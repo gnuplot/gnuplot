@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.61 2016/05/13 07:04:13 markisch Exp $
+# $Id: Makefile,v 1.62 2016/06/14 18:25:39 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 # This assumes a typical installation of the MinGW toolkit, the free
@@ -48,6 +48,9 @@
 #PROGRAMFILES32=/c/Program\ Files
 # On 64bit machines: (no access to ProgramFiles(x86) variable!)
 PROGRAMFILES32=/c/Program\ Files\ \(x86\)
+
+# Define if you would like a UNICODE build
+UNICODE=1
 
 # GIF, PNG, JPEG device drivers
 # Requires gd library. There are two possibilities how to configure these
@@ -299,6 +302,10 @@ ifdef DEBUG
 else
   CFLAGS += -O2 -pipe
   LDFLAGS += -s
+endif
+
+ifdef UNICODE
+  CFLAGS += -DUNICODE -D_UNICODE
 endif
 
 LDFLAGS2 = -mwindows -Wl,--enable-auto-import
@@ -574,7 +581,7 @@ endif
 %.$(O): $W/%.c
 	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
 
-LDLIBS = -lkernel32 -lgdi32 -lwinspool -lcomdlg32 -lcomctl32 -ladvapi32 -lshell32 -lmsimg32 -lgdiplus
+LDLIBS = -lkernel32 -lgdi32 -lwinspool -lcomdlg32 -lcomctl32 -ladvapi32 -lshell32 -lmsimg32 -lgdiplus -lshlwapi
 LDLIBS += -lhtmlhelp
 LDFLAGS2 += -L$(HHWPATH)lib
 ifdef MINGW64
@@ -784,6 +791,7 @@ config.h: $(TOP)/config/config.mgw
 ifdef LUA
 gnuplot-lua-tikz.sty: $(T)/lua/gnuplot-tikz.lua
 	$(LUA) $< style
+
 $(LUA_HELP): $(T)/lua/gnuplot-tikz.lua
 	$(LUA) $< termhelp > $@
 endif

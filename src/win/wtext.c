@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.66 2016/07/02 08:28:00 markisch Exp $
+ * $Id: wtext.c,v 1.67 2016/07/05 16:00:56 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -43,10 +43,10 @@
    in win/wtext.h */
 
 #include "syscfg.h"
-#include <string.h>
-#include <stdlib.h>
+#include <assert.h>
 #include <ctype.h>
-#include <dos.h>
+#include <stdlib.h>
+#include <string.h>
 #ifndef __MSC__
 # include <mem.h>
 #endif
@@ -98,9 +98,9 @@ static void TextMakeFont(LPTW lptw);
 static void TextSelectFont(LPTW lptw);
 static int ReallocateKeyBuf(LPTW lptw);
 static void UpdateCaretPos(LPTW lptw);
-static LPSTR GetUInt(LPSTR str, uint *pval);
+static LPTSTR GetUInt(LPTSTR str, uint *pval);
 
-static char szNoMemory[] = "out of memory";
+static TCHAR szNoMemory[] = TEXT("out of memory");
 
 static const COLORREF TextColorTable[16] = {
 	RGB(0,0,0),		/* black */
@@ -217,7 +217,7 @@ TextInit(LPTW lptw)
     hglobal = GlobalAlloc(LHND, lptw->KeyBufSize);
     lptw->KeyBuf = (BYTE *)GlobalLock(hglobal);
     if (lptw->KeyBuf == (BYTE *)NULL) {
-	MessageBox((HWND)NULL,szNoMemory,(LPSTR)NULL, MB_ICONHAND | MB_SYSTEMMODAL);
+	MessageBox(NULL, szNoMemory, NULL, MB_ICONHAND | MB_SYSTEMMODAL);
 	return(1);
     }
     lptw->KeyBufIn = lptw->KeyBufOut = lptw->KeyBuf;
@@ -227,8 +227,8 @@ TextInit(LPTW lptw)
 				    lptw->Origin.x, lptw->Origin.y,
 				    lptw->Size.x, lptw->Size.y,
 				    NULL, NULL, lptw->hInstance, lptw);
-    if (lptw->hWndParent == (HWND)NULL) {
-	MessageBox((HWND)NULL,"Couldn't open parent text window",(LPSTR)NULL, MB_ICONHAND | MB_SYSTEMMODAL);
+    if (lptw->hWndParent == NULL) {
+	MessageBox(NULL, TEXT("Couldn't open parent text window"), NULL, MB_ICONHAND | MB_SYSTEMMODAL);
 	return(1);
     }
     GetClientRect(lptw->hWndParent, &rect);
@@ -238,8 +238,8 @@ TextInit(LPTW lptw)
 				  0, lptw->ButtonHeight,
 				  rect.right, rect.bottom - lptw->ButtonHeight,
 				  lptw->hWndParent, NULL, lptw->hInstance, lptw);
-    if (lptw->hWndText == (HWND)NULL) {
-	MessageBox((HWND)NULL,"Couldn't open text window",(LPSTR)NULL, MB_ICONHAND | MB_SYSTEMMODAL);
+    if (lptw->hWndText == NULL) {
+	MessageBox(NULL, TEXT("Couldn't open text window"), NULL, MB_ICONHAND | MB_SYSTEMMODAL);
 	return(1);
     }
 
@@ -264,24 +264,24 @@ TextInit(LPTW lptw)
     }
 
     lptw->hPopMenu = CreatePopupMenu();
-    AppendMenu(lptw->hPopMenu, MF_STRING, M_COPY_CLIP, "&Copy to Clipboard\tCtrl-Ins");
-    AppendMenu(lptw->hPopMenu, MF_STRING, M_PASTE, "&Paste\tShift-Ins");
+    AppendMenu(lptw->hPopMenu, MF_STRING, M_COPY_CLIP, TEXT("&Copy to Clipboard\tCtrl-Ins"));
+    AppendMenu(lptw->hPopMenu, MF_STRING, M_PASTE, TEXT("&Paste\tShift-Ins"));
     AppendMenu(lptw->hPopMenu, MF_SEPARATOR, 0, NULL);
-    AppendMenu(lptw->hPopMenu, MF_STRING, M_CHOOSE_FONT, "Choose &Font...");
+    AppendMenu(lptw->hPopMenu, MF_STRING, M_CHOOSE_FONT, TEXT("Choose &Font..."));
     AppendMenu(lptw->hPopMenu, MF_STRING | (lptw->bSysColors ? MF_CHECKED : MF_UNCHECKED),
-	       M_SYSCOLORS, "&System Colors");
+	       M_SYSCOLORS, TEXT("&System Colors"));
     AppendMenu(lptw->hPopMenu, MF_STRING | (lptw->bWrap ? MF_CHECKED : MF_UNCHECKED),
-	       M_WRAP, "&Wrap long lines");
-    if (lptw->IniFile != (LPSTR)NULL) {
-	char buf[MAX_PATH+80];
-	wsprintf(buf, "&Update %s", lptw->IniFile);
-	AppendMenu(lptw->hPopMenu, MF_STRING, M_WRITEINI, (LPSTR)buf);
+	       M_WRAP, TEXT("&Wrap long lines"));
+    if (lptw->IniFile != NULL) {
+	TCHAR buf[MAX_PATH+80];
+	wsprintf(buf, TEXT("&Update %s"), lptw->IniFile);
+	AppendMenu(lptw->hPopMenu, MF_STRING, M_WRITEINI, buf);
     }
 
     sysmenu = GetSystemMenu(lptw->hWndParent,0);	/* get the sysmenu */
     AppendMenu(sysmenu, MF_SEPARATOR, 0, NULL);
-    AppendMenu(sysmenu, MF_POPUP, (UINT_PTR)lptw->hPopMenu, "&Options");
-    AppendMenu(sysmenu, MF_STRING, M_ABOUT, "&About");
+    AppendMenu(sysmenu, MF_POPUP, (UINT_PTR)lptw->hPopMenu, TEXT("&Options"));
+    AppendMenu(sysmenu, MF_STRING, M_ABOUT, TEXT("&About"));
 
     if (lptw->lpmw)
 	LoadMacros(lptw);
@@ -409,8 +409,8 @@ NewLine(LPTW lptw)
 
     UpdateCaretPos(lptw);
     if (lptw->bFocus && lptw->bGetCh) {
-		UpdateCaretPos(lptw);
-		ShowCaret(lptw->hWndText);
+	UpdateCaretPos(lptw);
+	ShowCaret(lptw->hWndText);
     }
 
     if (lptw->CursorFlag)
@@ -1057,12 +1057,12 @@ TextMakeFont(LPTW lptw)
 {
     LOGFONT lf;
     TEXTMETRIC tm;
-    LPSTR p;
+    LPTSTR p;
     HDC hdc;
 
     hdc = GetDC(lptw->hWndText);
-    _fmemset(&lf, 0, sizeof(LOGFONT));
-    _fstrncpy(lf.lfFaceName,lptw->fontname,LF_FACESIZE);
+    memset(&lf, 0, sizeof(LOGFONT));
+    _tcsncpy(lf.lfFaceName, lptw->fontname, LF_FACESIZE);
     lf.lfHeight = -MulDiv(lptw->fontsize, GetDeviceCaps(hdc, LOGPIXELSY), 72);
     lf.lfPitchAndFamily = FIXED_PITCH;
     lf.lfOutPrecision = OUT_OUTLINE_PRECIS;
@@ -1070,12 +1070,12 @@ TextMakeFont(LPTW lptw)
     /* ClearType quality is only supported on XP or later */
     lf.lfQuality = IsWindowsXPorLater() ? CLEARTYPE_QUALITY : PROOF_QUALITY;
     lf.lfCharSet = DEFAULT_CHARSET;
-    if ( (p = _fstrstr(lptw->fontname," Italic")) != (LPSTR)NULL ) {
-	lf.lfFaceName[ (unsigned int)(p-lptw->fontname) ] = '\0';
+    if ((p = _tcsstr(lptw->fontname, TEXT(" Italic"))) != NULL) {
+	lf.lfFaceName[(unsigned int)(p - lptw->fontname)] = NUL;
 	lf.lfItalic = TRUE;
     }
-    if ( (p = _fstrstr(lptw->fontname," Bold")) != (LPSTR)NULL ) {
-	lf.lfFaceName[ (unsigned int)(p-lptw->fontname) ] = '\0';
+    if ((p = _tcsstr(lptw->fontname, TEXT(" Bold"))) != NULL) {
+	lf.lfFaceName[(unsigned int)(p - lptw->fontname)] = NUL;
 	lf.lfWeight = FW_BOLD;
     }
     if (lptw->hfont != 0)
@@ -1099,24 +1099,24 @@ TextSelectFont(LPTW lptw) {
     LOGFONT lf;
     CHOOSEFONT cf;
     HDC hdc;
-    char lpszStyle[LF_FACESIZE];
-    LPSTR p;
+    TCHAR lpszStyle[LF_FACESIZE];
+    LPTSTR p;
 
     /* Set all structure fields to zero. */
-    _fmemset(&cf, 0, sizeof(CHOOSEFONT));
-    _fmemset(&lf, 0, sizeof(LOGFONT));
+    memset(&cf, 0, sizeof(CHOOSEFONT));
+    memset(&lf, 0, sizeof(LOGFONT));
     cf.lStructSize = sizeof(CHOOSEFONT);
     cf.hwndOwner = lptw->hWndParent;
-    _fstrncpy(lf.lfFaceName,lptw->fontname,LF_FACESIZE);
-    if ( (p = _fstrstr(lptw->fontname," Bold")) != (LPSTR)NULL ) {
-	_fstrncpy(lpszStyle,p+1,LF_FACESIZE);
-	lf.lfFaceName[ (unsigned int)(p-lptw->fontname) ] = '\0';
+    _tcsncpy(lf.lfFaceName, lptw->fontname, LF_FACESIZE);
+    if ((p = _tcsstr(lptw->fontname, TEXT(" Bold"))) != NULL) {
+	_tcsncpy(lpszStyle, p + 1, LF_FACESIZE);
+	lf.lfFaceName[ (unsigned int)(p-lptw->fontname) ] = NUL;
     }
-    else if ( (p = _fstrstr(lptw->fontname," Italic")) != (LPSTR)NULL ) {
-	_fstrncpy(lpszStyle,p+1,LF_FACESIZE);
-	lf.lfFaceName[ (unsigned int)(p-lptw->fontname) ] = '\0';
+    else if ((p = _tcsstr(lptw->fontname, TEXT(" Italic"))) != NULL) {
+	_tcsncpy(lpszStyle, p + 1, LF_FACESIZE);
+	lf.lfFaceName[ (unsigned int)(p-lptw->fontname) ] = NUL;
     } else
-	_fstrcpy(lpszStyle,"Regular");
+	_tcscpy(lpszStyle, TEXT("Regular"));
     cf.lpszStyle = lpszStyle;
     hdc = GetDC(lptw->hWndText);
     lf.lfHeight = -MulDiv(lptw->fontsize, GetDeviceCaps(hdc, LOGPIXELSY), 72);
@@ -1127,12 +1127,13 @@ TextSelectFont(LPTW lptw) {
     cf.Flags = CF_SCREENFONTS | CF_FIXEDPITCHONLY | CF_INITTOLOGFONTSTRUCT | CF_USESTYLE;
     if (ChooseFont(&cf)) {
 	RECT rect;
-	_fstrcpy(lptw->fontname,lf.lfFaceName);
+
+	_tcscpy(lptw->fontname,lf.lfFaceName);
 	lptw->fontsize = cf.iPointSize / 10;
 	if (cf.nFontType & BOLD_FONTTYPE)
-	    lstrcat(lptw->fontname," Bold");
+	    _tcscat(lptw->fontname, TEXT(" Bold"));
 	if (cf.nFontType & ITALIC_FONTTYPE)
-	    lstrcat(lptw->fontname," Italic");
+	    _tcscat(lptw->fontname, TEXT(" Italic"));
 	TextMakeFont(lptw);
 	/* force a window update */
 	GetClientRect(lptw->hWndText, (LPRECT) &rect);
@@ -1205,11 +1206,11 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
     case WM_SIZE:
 	if (lParam > 0) { /* Vista sets window size to 0,0 when Windows-D is pressed */
-		SetWindowPos(lptw->hWndText, (HWND)NULL, 0, lptw->ButtonHeight,
-			     LOWORD(lParam), HIWORD(lParam) - lptw->ButtonHeight - lptw->StatusHeight,
-			     SWP_NOZORDER | SWP_NOACTIVATE);
-		SendMessage(lptw->lpmw->hToolbar, WM_SIZE, wParam, lParam);
-		SendMessage(lptw->hStatusbar, WM_SIZE, wParam, lParam);
+	    SetWindowPos(lptw->hWndText, (HWND)NULL, 0, lptw->ButtonHeight,
+			    LOWORD(lParam), HIWORD(lParam) - lptw->ButtonHeight - lptw->StatusHeight,
+			    SWP_NOZORDER | SWP_NOACTIVATE);
+	    SendMessage(lptw->lpmw->hToolbar, WM_SIZE, wParam, lParam);
+	    SendMessage(lptw->hStatusbar, WM_SIZE, wParam, lParam);
 	}
 	return(0);
     case WM_COMMAND:
@@ -1219,21 +1220,21 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return(0);
     case WM_NOTIFY:
 	switch (((LPNMHDR)lParam)->code) {
-		case TBN_DROPDOWN: {
-			RECT rc;
-			TPMPARAMS tpm;
-			LPNMTOOLBAR lpnmTB = (LPNMTOOLBAR)lParam;
-			SendMessage(lpnmTB->hdr.hwndFrom, TB_GETRECT, (WPARAM)lpnmTB->iItem, (LPARAM)&rc);
-			MapWindowPoints(lpnmTB->hdr.hwndFrom, HWND_DESKTOP, (LPPOINT)&rc, 2);
-			tpm.cbSize    = sizeof(TPMPARAMS);
-			tpm.rcExclude = rc;
-			TrackPopupMenuEx(lptw->hPopMenu, TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_VERTICAL,
-				rc.left, rc.bottom, lptw->hWndText, &tpm);
-			return TBDDRET_DEFAULT;
-		}
-		default:
-			return FALSE;
-    }
+	    case TBN_DROPDOWN: {
+		RECT rc;
+		TPMPARAMS tpm;
+		LPNMTOOLBAR lpnmTB = (LPNMTOOLBAR)lParam;
+		SendMessage(lpnmTB->hdr.hwndFrom, TB_GETRECT, (WPARAM)lpnmTB->iItem, (LPARAM)&rc);
+		MapWindowPoints(lpnmTB->hdr.hwndFrom, HWND_DESKTOP, (LPPOINT)&rc, 2);
+		tpm.cbSize    = sizeof(TPMPARAMS);
+		tpm.rcExclude = rc;
+		TrackPopupMenuEx(lptw->hPopMenu, TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_VERTICAL,
+			rc.left, rc.bottom, lptw->hWndText, &tpm);
+		return TBDDRET_DEFAULT;
+	    }
+	    default:
+		return FALSE;
+	}
     case WM_ERASEBKGND:
 	return 1;
     case WM_DROPFILES:
@@ -1291,20 +1292,19 @@ ReallocateKeyBuf(LPTW lptw)
     int pos_out = lptw->KeyBufOut - lptw->KeyBuf;
     BYTE *NewKeyBuf = (BYTE *)GlobalLock(h);
 
-    if (NewKeyBuf == (BYTE *)NULL) {
-	MessageBox((HWND)NULL, szNoMemory, (LPSTR)NULL,
-		   MB_ICONHAND | MB_SYSTEMMODAL);
+    if (NewKeyBuf == NULL) {
+	MessageBox((HWND)NULL, szNoMemory, NULL, MB_ICONHAND | MB_SYSTEMMODAL);
 	return 1;
     }
     if (lptw->KeyBufIn > lptw->KeyBufOut) {
 	/*  | Buf ... Out ... In | */
-	_fmemcpy(NewKeyBuf, lptw->KeyBufOut,
+	memcpy(NewKeyBuf, lptw->KeyBufOut,
 		  lptw->KeyBufIn - lptw->KeyBufOut);
 	lptw->KeyBufIn = NewKeyBuf + (pos_in - pos_out);
     } else {
 	/*  | Buf ... In ... Out ... | */
-	_fmemcpy(NewKeyBuf, lptw->KeyBufOut, lptw->KeyBufSize - pos_out );
-	_fmemcpy(NewKeyBuf, lptw->KeyBuf, pos_in );
+	memcpy(NewKeyBuf, lptw->KeyBufOut, lptw->KeyBufSize - pos_out);
+	memcpy(NewKeyBuf, lptw->KeyBuf, pos_in);
 	lptw->KeyBufIn = NewKeyBuf + (lptw->KeyBufSize - pos_out + pos_in);
     }
     if (h_old) {
@@ -1628,19 +1628,19 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	    } /* switch(wparam) */
 	} /* if(Ctrl) */
 	break;
-	case WM_CONTEXTMENU:
-	{
-		POINT pt;
-		pt.x = GET_X_LPARAM(lParam);
-		pt.y = GET_Y_LPARAM(lParam);
-		if (pt.x == -1) { /* keyboard activation */
-			pt.x = pt.y = 0;
-			ClientToScreen(hwnd, &pt);
-		}
-		TrackPopupMenu(lptw->hPopMenu, TPM_LEFTALIGN,
-			pt.x, pt.y, 0, hwnd, NULL);
-		return 0;
+    case WM_CONTEXTMENU:
+    {
+	POINT pt;
+	pt.x = GET_X_LPARAM(lParam);
+	pt.y = GET_Y_LPARAM(lParam);
+	if (pt.x == -1) { /* keyboard activation */
+	    pt.x = pt.y = 0;
+	    ClientToScreen(hwnd, &pt);
 	}
+	TrackPopupMenu(lptw->hPopMenu, TPM_LEFTALIGN,
+		pt.x, pt.y, 0, hwnd, NULL);
+	return 0;
+    }
     case WM_LBUTTONDOWN:
     { /* start marking text */
 	POINT pt;
@@ -2217,41 +2217,41 @@ void
 WriteTextIni(LPTW lptw)
 {
     RECT rect;
-    LPSTR file = lptw->IniFile;
-    LPSTR section = lptw->IniSection;
-    char profile[80];
+    LPTSTR file = lptw->IniFile;
+    LPTSTR section = lptw->IniSection;
+    TCHAR profile[80];
     int iconic;
 
-
-    if ((file == (LPSTR)NULL) || (section == (LPSTR)NULL))
+    if ((file == NULL) || (section == NULL))
 	return;
 
     iconic = IsIconic(lptw->hWndParent);
     if (iconic)
 	ShowWindow(lptw->hWndParent, SW_SHOWNORMAL);
     GetWindowRect(lptw->hWndParent,&rect);
-    wsprintf(profile, "%d %d", rect.left, rect.top);
-    WritePrivateProfileString(section, "TextOrigin", profile, file);
-    wsprintf(profile, "%d %d", rect.right-rect.left, rect.bottom-rect.top);
-    WritePrivateProfileString(section, "TextSize", profile, file);
-    wsprintf(profile, "%d", iconic);
-    WritePrivateProfileString(section, "TextMinimized", profile, file);
-    wsprintf(profile, "%s,%d", lptw->fontname, lptw->fontsize);
-    WritePrivateProfileString(section, "TextFont", profile, file);
-    wsprintf(profile, "%d", lptw->bWrap);
-    WritePrivateProfileString(section, "TextWrap", profile, file);
-    wsprintf(profile, "%d", lptw->ScreenBuffer.size - 1);
-    WritePrivateProfileString(section, "TextLines", profile, file);
-    wsprintf(profile, "%d", lptw->bSysColors);
-    WritePrivateProfileString(section, "SysColors", profile, file);
+    wsprintf(profile, TEXT("%d %d"), rect.left, rect.top);
+    WritePrivateProfileString(section, TEXT("TextOrigin"), profile, file);
+    wsprintf(profile, TEXT("%d %d"), rect.right-rect.left, rect.bottom-rect.top);
+    WritePrivateProfileString(section, TEXT("TextSize"), profile, file);
+    wsprintf(profile, TEXT("%d"), iconic);
+    WritePrivateProfileString(section, TEXT("TextMinimized"), profile, file);
+    wsprintf(profile, TEXT("%s,%d"), lptw->fontname, lptw->fontsize);
+    WritePrivateProfileString(section, TEXT("TextFont"), profile, file);
+    wsprintf(profile, TEXT("%d"), lptw->bWrap);
+    WritePrivateProfileString(section, TEXT("TextWrap"), profile, file);
+    wsprintf(profile, TEXT("%d"), lptw->ScreenBuffer.size - 1);
+    WritePrivateProfileString(section, TEXT("TextLines"), profile, file);
+    wsprintf(profile, TEXT("%d"), lptw->bSysColors);
+    WritePrivateProfileString(section, TEXT("SysColors"), profile, file);
     if (iconic)
 	ShowWindow(lptw->hWndParent, SW_SHOWMINIMIZED);
     return;
 }
 
+
 /* Helper function to avoid signedness conflict --- windows delivers an INT, we want an uint */
-static LPSTR
-GetUInt(LPSTR str, uint *pval)
+static LPTSTR
+GetUInt(LPTSTR str, uint *pval)
 {
     INT val_fromGetInt;
 
@@ -2260,85 +2260,85 @@ GetUInt(LPSTR str, uint *pval)
     return str;
 }
 
+
 void
 ReadTextIni(LPTW lptw)
 {
-    LPSTR file = lptw->IniFile;
-    LPSTR section = lptw->IniSection;
-    char profile[81];
-    LPSTR p;
+    LPTSTR file = lptw->IniFile;
+    LPTSTR section = lptw->IniSection;
+    TCHAR profile[81];
+    LPTSTR p;
     BOOL bOKINI;
 
-    bOKINI = (file != (LPSTR)NULL) && (section != (LPSTR)NULL);
-    profile[0] = '\0';
+    bOKINI = (file != NULL) && (section != NULL);
+    profile[0] = NUL;
 
     if (bOKINI)
-	GetPrivateProfileString(section, "TextOrigin", "", profile, 80, file);
-    if ( (p = GetInt(profile, (LPINT)&lptw->Origin.x)) == NULL)
+	GetPrivateProfileString(section, TEXT("TextOrigin"), TEXT(""), profile, 80, file);
+    if ((p = GetInt(profile, (LPINT)&lptw->Origin.x)) == NULL)
 	lptw->Origin.x = CW_USEDEFAULT;
-    if ( (p = GetInt(p, (LPINT)&lptw->Origin.y)) == NULL)
+    if ((p = GetInt(p, (LPINT)&lptw->Origin.y)) == NULL)
 	lptw->Origin.y = CW_USEDEFAULT;
-    if ( (file != (LPSTR)NULL) && (section != (LPSTR)NULL) )
-	GetPrivateProfileString(section, "TextSize", "", profile, 80, file);
-    if ( (p = GetInt(profile, (LPINT)&lptw->Size.x)) == NULL)
+    if (bOKINI)
+	GetPrivateProfileString(section, TEXT("TextSize"), TEXT(""), profile, 80, file);
+    if ((p = GetInt(profile, (LPINT)&lptw->Size.x)) == NULL)
 	lptw->Size.x = CW_USEDEFAULT;
-    if ( (p = GetInt(p, (LPINT)&lptw->Size.y)) == NULL)
+    if ((p = GetInt(p, (LPINT)&lptw->Size.y)) == NULL)
 	lptw->Size.y = CW_USEDEFAULT;
 
     if (bOKINI)
-	GetPrivateProfileString(section, "TextFont", "", profile, 80, file);
+	GetPrivateProfileString(section, TEXT("TextFont"), TEXT(""), profile, 80, file);
     {
-	char *size;
-	size = _fstrchr(profile,',');
+	LPTSTR size = _tcschr(profile, ',');
 	if (size) {
-	    *size++ = '\0';
-	    if ( (p = GetInt(size, &lptw->fontsize)) == NULL)
+	    *size++ = NUL;
+	    if ( (p = GetInt(size, (LPINT) &lptw->fontsize)) == NULL)
 		lptw->fontsize = TEXTFONTSIZE;
 	}
 	if (lptw->fontsize == 0)
 	    lptw->fontsize = TEXTFONTSIZE;
 
-	_fstrcpy(lptw->fontname, profile);
-        if (!(*lptw->fontname)) {
-			if (GetACP() == 932) /* Japanese Shift-JIS */
-				strcpy(lptw->fontname, "MS Gothic");
-			else {
-				/* select a default type face depending on the OS version */
-				OSVERSIONINFO versionInfo;
-				ZeroMemory(&versionInfo, sizeof(OSVERSIONINFO));
-				versionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-				GetVersionEx(&versionInfo);
-				if (versionInfo.dwMajorVersion >= 6) /* Vista or later */
-					strcpy(lptw->fontname, "Consolas");
-				else if ((versionInfo.dwMajorVersion == 5) && (versionInfo.dwMinorVersion >= 1)) /* Windows XP */
-					strcpy(lptw->fontname, "Lucida Console");
-				else /* Windows 2000 or earlier */
-					strcpy(lptw->fontname, "Courier New");
-			}
-        }
+	_tcscpy(lptw->fontname, profile);
+	if (!(*lptw->fontname)) {
+	    if (GetACP() == 932) /* Japanese Shift-JIS */
+		_tcscpy(lptw->fontname, TEXT("MS Gothic"));
+	    else {
+		/* select a default type face depending on the OS version */
+		OSVERSIONINFO versionInfo;
+		ZeroMemory(&versionInfo, sizeof(OSVERSIONINFO));
+		versionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+		GetVersionEx(&versionInfo);
+		if (versionInfo.dwMajorVersion >= 6) /* Vista or later */
+		    _tcscpy(lptw->fontname, TEXT("Consolas"));
+		else if ((versionInfo.dwMajorVersion == 5) && (versionInfo.dwMinorVersion >= 1)) /* Windows XP */
+		    _tcscpy(lptw->fontname, TEXT("Lucida Console"));
+		else /* Windows 2000 or earlier */
+		    _tcscpy(lptw->fontname, TEXT("Courier New"));
+	    }
+	}
     }
 
     if (bOKINI) {
 	int iconic;
-	GetPrivateProfileString(section, "TextMinimized", "", profile, 80, file);
+	GetPrivateProfileString(section, TEXT("TextMinimized"), TEXT(""), profile, 80, file);
 	if ((p = GetInt(profile, &iconic)) == NULL)
 	    iconic = 0;
 	if (iconic)
 	    lptw->nCmdShow = SW_SHOWMINIMIZED;
     }
     lptw->bSysColors = FALSE;
-    GetPrivateProfileString(section, "SysColors", "", profile, 80, file);
+    GetPrivateProfileString(section, TEXT("SysColors"), TEXT(""), profile, 80, file);
     if ((p = GetInt(profile, &lptw->bSysColors)) == NULL)
 	lptw->bSysColors = 0;
 
     /*  autowrapping is activated by default */
-    GetPrivateProfileString(section, "TextWrap", "", profile, 80, file);
+    GetPrivateProfileString(section, TEXT("TextWrap"), TEXT(""), profile, 80, file);
     if ((p = GetInt(profile, &lptw->bWrap)) == NULL)
 	lptw->bWrap = TRUE;
     sb_wrap(&(lptw->ScreenBuffer), lptw->bWrap ? 80 : 0);
 
     /* length of screen buffer (unwrapped lines) */
-    GetPrivateProfileString(section, "TextLines", "", profile, 80, file);
+    GetPrivateProfileString(section, TEXT("TextLines"), TEXT(""), profile, 80, file);
     if ((p = GetUInt(profile, &lptw->ScreenBuffer.size)) == NULL)
 	lptw->ScreenBuffer.size = 400;
 }
@@ -2351,11 +2351,11 @@ AboutDlgProc(HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam)
     switch (wMsg) {
     case WM_INITDIALOG:
     {
-	char buf[80];
+	TCHAR buf[80];
 
-	GetWindowText(GetParent(hDlg),buf,80);
+	GetWindowText(GetParent(hDlg), buf, 80);
 	SetDlgItemText(hDlg, AB_TEXT1, buf);
-	SetDlgItemText(hDlg, AB_TEXT2, (LPSTR)lParam);
+	SetDlgItemText(hDlg, AB_TEXT2, (LPCTSTR) lParam);
 	return TRUE;
     }
     case WM_DRAWITEM:
@@ -2378,8 +2378,8 @@ AboutDlgProc(HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam)
 
 
 void
-AboutBox(HWND hwnd, LPSTR str)
+AboutBox(HWND hwnd, LPTSTR str)
 {
-    DialogBoxParam(hdllInstance, "AboutDlgBox", hwnd,
-		   AboutDlgProc, (LPARAM)str);
+    DialogBoxParam(hdllInstance, TEXT("AboutDlgBox"), hwnd,
+                   AboutDlgProc, (LPARAM)str);
 }

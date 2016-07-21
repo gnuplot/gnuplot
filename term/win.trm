@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.134 2016/05/23 19:14:14 markisch Exp $
+ * $Id: win.trm,v 1.135 2016/07/21 07:35:52 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -116,6 +116,8 @@ TERM_PUBLIC void WIN_modify_plots __PROTO((unsigned int operations, int plotno))
 #ifdef TERM_BODY
 
 #include <windows.h>
+#include <tchar.h>
+#include <wchar.h>
 #include "win/winmain.h"
 
 
@@ -160,7 +162,7 @@ typedef struct {
 
 static int WIN_last_linetype = LT_NODRAW; /* HBB 20000813: linetype caching */
 termentry * WIN_term = NULL;
-char WIN_inifontname[MAXFONTNAME] = WINFONT;
+TCHAR WIN_inifontname[MAXFONTNAME] = TEXT(WINFONT);
 int WIN_inifontsize = WINFONTSIZE;
 static path_points WIN_poly = {0, 0, NULL};
 
@@ -230,7 +232,11 @@ WIN_options()
 			color = TRUE;
 			dashed = FALSE;
 			rounded = FALSE;
+#ifdef UNICODE
+			WideCharToMultiByte(CP_ACP, 0, WIN_inifontname, -1, fontname, MAXFONTNAME, 0, 0);
+#else
 			strcpy(fontname, WIN_inifontname);
+#endif
 			fontsize = WIN_inifontsize;
 			fontscale = linewidth = 1;
 			set_color = set_dashed = TRUE;
@@ -454,14 +460,25 @@ WIN_options()
 	}
 	if (set_title) {
 		free (graphwin->Title);
+#ifdef UNICODE
+		graphwin->Title = (title) ?  UnicodeText(title, encoding) : _tcsdup(WINGRAPHTITLE);
+#else
 		graphwin->Title = (title) ?  title : strdup(WINGRAPHTITLE);
+#endif
 		GraphChangeTitle(graphwin);
 	}
 	if (set_fontsize)
 		graphwin->deffontsize = graphwin->fontsize = fontsize;
 	if (set_font) {
+#ifdef UNICODE
+		LPWSTR wfontname = UnicodeText(fontname, encoding);
+		wcscpy(graphwin->fontname, wfontname);
+		wcscpy(graphwin->deffontname, wfontname);
+		free(wfontname);
+#else
 		strcpy(graphwin->fontname, fontname);
 		strcpy(graphwin->deffontname, fontname);
+#endif
 	}
 	/* font initialization */
 	WIN_set_font(NULL);
@@ -496,15 +513,26 @@ WIN_update_options()
 		term->flags & TERM_ENHANCED_TEXT ? "enhanced" : "noenhanced");
 
 	set_fontsize = (graphwin->deffontsize != WIN_inifontsize);
-	set_font = (strcmp(graphwin->deffontname, WIN_inifontname) != 0);
+	set_font = (_tcscmp(graphwin->deffontname, WIN_inifontname) != 0);
 	if (set_font || set_fontsize) {
-		char * fontstring = (char*) gp_alloc(strlen(graphwin->fontname) + 25, "win font");
-		if (!set_fontsize)
+		/* We need two cases below because there's no appropriate format specifier. Really? */
+		char * fontstring = (char*) gp_alloc(_tcslen(graphwin->deffontname) + 24, "win font");
+		if (!set_fontsize) {
+#ifdef UNICODE
+			sprintf(fontstring, " font \"%ws\"", graphwin->deffontname);
+#else
 			sprintf(fontstring, " font \"%s\"", graphwin->deffontname);
-		else
+#endif
+		} else {
+#ifdef UNICODE
+			sprintf(fontstring, " font \"%ws, %d\"",
+				set_font ? graphwin->deffontname : TEXT(""), graphwin->deffontsize);
+#else
 			sprintf(fontstring, " font \"%s, %d\"",
-				set_font ? graphwin->deffontname : "", graphwin->deffontsize);
-		strcat (term_options, fontstring);
+				set_font ? graphwin->deffontname : TEXT(""), graphwin->deffontsize);
+#endif
+		}
+		strcat(term_options, fontstring);
 		free(fontstring);
 	}
 

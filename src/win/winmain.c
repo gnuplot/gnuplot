@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.85 2016/05/08 12:48:21 markisch Exp $
+ * $Id: winmain.c,v 1.86 2016/05/08 12:54:36 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -62,6 +62,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <tchar.h>
 #include <ctype.h>
 #include <fcntl.h>
 #include <io.h>
@@ -105,11 +106,11 @@ MW menuwin;
 LPGW graphwin; /* current graph window */
 LPGW listgraphs; /* list of graph windows */
 PW pausewin;
-LPSTR szModuleName;
-LPSTR szPackageDir;
-LPSTR winhelpname;
-LPSTR szMenuName;
-static LPSTR szLanguageCode = NULL;
+LPTSTR szModuleName;
+LPTSTR szPackageDir;
+LPTSTR winhelpname;
+LPTSTR szMenuName;
+static LPTSTR szLanguageCode = NULL;
 #if defined(WGP_CONSOLE) && defined(CONSOLE_SWITCH_CP)
 BOOL cp_changed = FALSE;
 UINT cp_input;  /* save previous codepage settings */
@@ -128,12 +129,12 @@ int CALLBACK ShutDown();
 
 
 static void
-CheckMemory(LPSTR str)
+CheckMemory(LPTSTR str)
 {
-        if (str == (LPSTR)NULL) {
-                MessageBox(NULL, "out of memory", "gnuplot", MB_ICONSTOP | MB_OK);
-                gp_exit(EXIT_FAILURE);
-        }
+    if (str == NULL) {
+	MessageBox(NULL, TEXT("out of memory"), TEXT("gnuplot"), MB_ICONSTOP | MB_OK);
+	gp_exit(EXIT_FAILURE);
+    }
 }
 
 
@@ -164,7 +165,7 @@ kill_pending_Pause_dialog()
 void
 WinExit(void)
 {
-	LPGW lpgw;
+    LPGW lpgw;
 
     /* Last chance, call before anything else to avoid a crash. */
     WinCloseHelp();
@@ -173,11 +174,11 @@ WinExit(void)
 
     _fcloseall();
 
-	/* Close all graph windows */
-	for (lpgw = listgraphs; lpgw != NULL; lpgw = lpgw->next) {
-		if (GraphHasWindow(lpgw))
-			GraphClose(lpgw);
-	}
+    /* Close all graph windows */
+    for (lpgw = listgraphs; lpgw != NULL; lpgw = lpgw->next) {
+	if (GraphHasWindow(lpgw))
+	    GraphClose(lpgw);
+    }
 
 #ifndef WGP_CONSOLE
     TextMessage();  /* process messages */
@@ -189,9 +190,9 @@ WinExit(void)
 #ifdef CONSOLE_SWITCH_CP
     /* restore console codepages */
     if (cp_changed) {
-		SetConsoleCP(cp_input);
-		SetConsoleOutputCP(cp_output);
-		/* file APIs are per process */
+	SetConsoleCP(cp_input);
+	SetConsoleOutputCP(cp_output);
+	/* file APIs are per process */
     }
 #endif
 #endif
@@ -205,10 +206,10 @@ WinExit(void)
 int CALLBACK
 ShutDown()
 {
-	/* First chance for wgnuplot to close help system. */
-	WinCloseHelp();
-	gp_exit(EXIT_SUCCESS);
-	return 0;
+    /* First chance for wgnuplot to close help system. */
+    WinCloseHelp();
+    gp_exit(EXIT_SUCCESS);
+    return 0;
 }
 
 
@@ -228,25 +229,24 @@ GetDllVersion(LPCTSTR lpszDllName)
     hinstDll = LoadLibrary(lpszDllName);
 
     if (hinstDll) {
-        DLLGETVERSIONPROC pDllGetVersion;
-        pDllGetVersion = (DLLGETVERSIONPROC)GetProcAddress(hinstDll,
-                          "DllGetVersion");
+	DLLGETVERSIONPROC pDllGetVersion;
+	pDllGetVersion = (DLLGETVERSIONPROC)GetProcAddress(hinstDll, "DllGetVersion");
 
-        /* Because some DLLs might not implement this function, you
-        must test for it explicitly. Depending on the particular
-        DLL, the lack of a DllGetVersion function can be a useful
-        indicator of the version. */
-        if (pDllGetVersion) {
-            DLLVERSIONINFO dvi;
-            HRESULT hr;
+	/* Because some DLLs might not implement this function, you
+	must test for it explicitly. Depending on the particular
+	DLL, the lack of a DllGetVersion function can be a useful
+	indicator of the version. */
+	if (pDllGetVersion) {
+	    DLLVERSIONINFO dvi;
+	    HRESULT hr;
 
-            ZeroMemory(&dvi, sizeof(dvi));
-            dvi.cbSize = sizeof(dvi);
-            hr = (*pDllGetVersion)(&dvi);
-            if (SUCCEEDED(hr))
-               dwVersion = PACKVERSION(dvi.dwMajorVersion, dvi.dwMinorVersion);
-        }
-        FreeLibrary(hinstDll);
+	    ZeroMemory(&dvi, sizeof(dvi));
+	    dvi.cbSize = sizeof(dvi);
+	    hr = (*pDllGetVersion)(&dvi);
+	    if (SUCCEEDED(hr))
+		dwVersion = PACKVERSION(dvi.dwMajorVersion, dvi.dwMinorVersion);
+	}
+	FreeLibrary(hinstDll);
     }
     return dwVersion;
 }
@@ -273,27 +273,28 @@ appdata_directory(void)
     static char dir[MAX_PATH] = "";
 
     if (dir[0])
-        return dir;
+	return dir;
+
+    /* FIMXE: "ANSI" Version, no Unicode support */
 
     /* Make sure that SHGetSpecialFolderPath is supported. */
     hShell32 = LoadLibrary(TEXT("shell32.dll"));
     if (hShell32) {
-        pSHGetSpecialFolderPath =
-            GetProcAddress(hShell32,
-                           TEXT("SHGetSpecialFolderPathA"));
-        if (pSHGetSpecialFolderPath)
-            (*pSHGetSpecialFolderPath)(NULL, dir, CSIDL_APPDATA, FALSE);
-        FreeModule(hShell32);
-        return dir;
+	pSHGetSpecialFolderPath =
+	    GetProcAddress(hShell32, "SHGetSpecialFolderPathA");
+	if (pSHGetSpecialFolderPath)
+	    (*pSHGetSpecialFolderPath)(NULL, dir, CSIDL_APPDATA, FALSE);
+	FreeModule(hShell32);
+	return dir;
     }
 
     /* use APPDATA environment variable as fallback */
-    if (dir[0] == '\0') {
-        char *appdata = getenv("APPDATA");
-        if (appdata) {
-            strcpy(dir, appdata);
-            return dir;
-        }
+    if (dir[0] == NUL) {
+	char *appdata = getenv("APPDATA");
+	if (appdata) {
+	    strcpy(dir, appdata);
+	    return dir;
+	}
     }
 
     return NULL;
@@ -303,104 +304,104 @@ appdata_directory(void)
 static void
 WinCloseHelp(void)
 {
-	/* Due to a known bug in the HTML help system we have to
-	 * call this as soon as possible before the end of the program.
-	 * See e.g. http://helpware.net/FAR/far_faq.htm#HH_CLOSE_ALL
-	 */
-	if (IsWindow(help_window))
-		SendMessage(help_window, WM_CLOSE, 0, 0);
-	Sleep(0);
+    /* Due to a known bug in the HTML help system we have to
+     * call this as soon as possible before the end of the program.
+     * See e.g. http://helpware.net/FAR/far_faq.htm#HH_CLOSE_ALL
+     */
+    if (IsWindow(help_window))
+	SendMessage(help_window, WM_CLOSE, 0, 0);
+    Sleep(0);
 }
 
 
-static char *
+static LPTSTR
 GetLanguageCode()
 {
-	static char lang[6] = "";
+    static TCHAR lang[6] = TEXT("");
 
-	if (lang[0] == NUL) {
-		GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SABBREVLANGNAME, lang, sizeof(lang));
-		//strcpy(lang, "JPN"); //TEST
-		/* language definition files for Japanese already use "ja" as abbreviation */
-		if (strcmp(lang, "JPN") == 0)
-			lang[1] = 'A';
-		/* prefer lower case */
-		lang[0] = tolower((unsigned char)lang[0]);
-		lang[1] = tolower((unsigned char)lang[1]);
-		/* only use two character sequence */
-		lang[2] = NUL;
-	}
+    if (lang[0] == NUL) {
+	GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SABBREVLANGNAME, lang, sizeof(lang));
+	//strcpy(lang, "JPN"); //TEST
+	/* language definition files for Japanese already use "ja" as abbreviation */
+	if (_tcscmp(lang, TEXT("JPN")) == 0)
+	    lang[1] = 'A';
+	/* prefer lower case */
+	lang[0] = tolower((unsigned char)lang[0]);
+	lang[1] = tolower((unsigned char)lang[1]);
+	/* only use two character sequence */
+	lang[2] = NUL;
+    }
 
-	return lang;
+    return lang;
 }
 
 
-static char *
-LocalisedFile(const char * name, const char * ext, const char * defaultname)
+static LPTSTR
+LocalisedFile(LPCTSTR name, LPCTSTR ext, LPCTSTR defaultname)
 {
-	char * lang;
-	char * filename;
+    LPTSTR lang;
+    LPTSTR filename;
 
-	/* Allow user to override language detection. */
-	if (szLanguageCode)
-		lang = szLanguageCode;
-	else
-		lang = GetLanguageCode();
+    /* Allow user to override language detection. */
+    if (szLanguageCode)
+	lang = szLanguageCode;
+    else
+	lang = GetLanguageCode();
 
-	filename = (LPSTR) malloc(strlen(szModuleName) + strlen(name) + strlen(lang) + strlen(ext) + 1);
-	if (filename) {
-		strcpy(filename, szModuleName);
-		strcat(filename, name);
-		strcat(filename, lang);
-		strcat(filename, ext);
-		if (!existfile(filename)) {
-			strcpy(filename, szModuleName);
-			strcat(filename, defaultname);
-		}
+    filename = (LPTSTR) malloc((_tcslen(szModuleName) + _tcslen(name) + _tcslen(lang) + _tcslen(ext) + 1) * sizeof(TCHAR));
+    if (filename) {
+	_tcscpy(filename, szModuleName);
+	_tcscat(filename, name);
+	_tcscat(filename, lang);
+	_tcscat(filename, ext);
+	if (!PathFileExists(filename)) {
+	    _tcscpy(filename, szModuleName);
+	    _tcscat(filename, defaultname);
 	}
-	return filename;
+    }
+    return filename;
 }
 
 
 static void
-ReadMainIni(LPSTR file, LPSTR section)
+ReadMainIni(LPTSTR file, LPTSTR section)
 {
-	char profile[81] = "";
-	const char hlpext[] = ".chm";
-	const char name[] = "wgnuplot-";
+    TCHAR profile[81] = TEXT("");
+    const TCHAR hlpext[] = TEXT(".chm");
+    const TCHAR name[] = TEXT("wgnuplot-");
 
-	/* Language code override */
-	GetPrivateProfileString(section, "Language", "", profile, 80, file);
-	if (profile[0] != NUL)
-		szLanguageCode = strdup(profile);
-	else
-		szLanguageCode = NULL;
+    /* Language code override */
+    GetPrivateProfileString(section, TEXT("Language"), TEXT(""), profile, 80, file);
+    if (profile[0] != NUL)
+	szLanguageCode = _tcsdup(profile);
+    else
+	szLanguageCode = NULL;
 
-	/* help file name */
-	GetPrivateProfileString(section, "HelpFile", "", profile, 80, file);
-	if (profile[0] != NUL) {
-		winhelpname = (LPSTR) malloc(strlen(szModuleName) + strlen(profile) + 1);
-		if (winhelpname) {
-			strcpy(winhelpname, szModuleName);
-			strcat(winhelpname, profile);
-		}
-	} else {
-		/* default name is "wgnuplot-LL.chm" */
-		winhelpname = LocalisedFile(name, hlpext, HELPFILE);
+    /* help file name */
+    GetPrivateProfileString(section, TEXT("HelpFile"), TEXT(""), profile, 80, file);
+    if (profile[0] != NUL) {
+	winhelpname = (LPTSTR) malloc((_tcslen(szModuleName) + _tcslen(profile) + 1) * sizeof(TCHAR));
+	if (winhelpname) {
+	    _tcscpy(winhelpname, szModuleName);
+	    _tcscat(winhelpname, profile);
 	}
+    } else {
+	/* default name is "wgnuplot-LL.chm" */
+	winhelpname = LocalisedFile(name, hlpext, TEXT(HELPFILE));
+    }
 
-	/* menu file name */
-	GetPrivateProfileString(section, "MenuFile", "", profile, 80, file);
-	if (profile[0] != NUL) {
-		szMenuName = (LPSTR) malloc(strlen(szModuleName) + strlen(profile) + 1);
-		if (szMenuName) {
-			strcpy(szMenuName, szModuleName);
-			strcat(szMenuName, profile);
-		}
-	} else {
-		/* default name is "wgnuplot-LL.mnu" */
-		szMenuName = LocalisedFile(name, ".mnu", "wgnuplot.mnu");
+    /* menu file name */
+    GetPrivateProfileString(section, TEXT("MenuFile"), TEXT(""), profile, 80, file);
+    if (profile[0] != NUL) {
+	szMenuName = (LPTSTR) malloc((_tcslen(szModuleName) + _tcslen(profile) + 1) * sizeof(TCHAR));
+	if (szMenuName) {
+	    _tcscpy(szMenuName, szModuleName);
+	    _tcscat(szMenuName, profile);
 	}
+    } else {
+	/* default name is "wgnuplot-LL.mnu" */
+	szMenuName = LocalisedFile(name, TEXT(".mnu"), TEXT("wgnuplot.mnu"));
+    }
 }
 
 
@@ -412,11 +413,11 @@ int
 main(int argc, char **argv)
 #endif
 {
-	LPSTR tail;
-	int i;
-
+    LPTSTR tail;
 #ifdef WGP_CONSOLE
-	HINSTANCE hInstance = GetModuleHandle(NULL), hPrevInstance = NULL;
+    HINSTANCE hInstance = GetModuleHandle(NULL), hPrevInstance = NULL;
+#else
+    int i;
 #endif
 
 
@@ -430,172 +431,175 @@ main(int argc, char **argv)
 # endif
 #endif /* WGP_CONSOLE */
 
-        szModuleName = (LPSTR)malloc(MAXSTR+1);
-        CheckMemory(szModuleName);
+    szModuleName = (LPTSTR) malloc((MAXSTR + 1) * sizeof(TCHAR));
+    CheckMemory(szModuleName);
 
-        /* get path to EXE */
-        GetModuleFileName(hInstance, (LPSTR) szModuleName, MAXSTR);
-        if ((tail = (LPSTR)_fstrrchr(szModuleName,'\\')) != (LPSTR)NULL)
-        {
-                tail++;
-                *tail = 0;
-        }
-        szModuleName = (LPSTR)realloc(szModuleName, _fstrlen(szModuleName)+1);
-        CheckMemory(szModuleName);
+    /* get path to EXE */
+    GetModuleFileName(hInstance, (LPTSTR) szModuleName, MAXSTR);
+    if ((tail = _tcsrchr(szModuleName,'\\')) != NULL) {
+	tail++;
+	*tail = 0;
+    }
+    szModuleName = (LPTSTR) realloc(szModuleName, (_tcslen(szModuleName) + 1) * sizeof(TCHAR));
+    CheckMemory(szModuleName);
 
-        if (_fstrlen(szModuleName) >= 5 && _fstrnicmp(&szModuleName[_fstrlen(szModuleName)-5], "\\bin\\", 5) == 0)
-        {
-                int len = _fstrlen(szModuleName)-4;
-                szPackageDir = (LPSTR)malloc(len+1);
-                CheckMemory(szPackageDir);
-                _fstrncpy(szPackageDir, szModuleName, len);
-                szPackageDir[len] = '\0';
-        }
-        else
-                szPackageDir = szModuleName;
+    if (_tcslen(szModuleName) >= 5 && _tcsnicmp(&szModuleName[_tcslen(szModuleName)-5], TEXT("\\bin\\"), 5) == 0) {
+	size_t len = _tcslen(szModuleName) - 4;
+	szPackageDir = (LPTSTR) malloc((len + 1) * sizeof(TCHAR));
+	CheckMemory(szPackageDir);
+	_tcsncpy(szPackageDir, szModuleName, len);
+	szPackageDir[len] = NUL;
+    } else {
+	szPackageDir = szModuleName;
+    }
 
 #ifndef WGP_CONSOLE
-        textwin.hInstance = hInstance;
-        textwin.hPrevInstance = hPrevInstance;
-        textwin.nCmdShow = nCmdShow;
-        textwin.Title = L"gnuplot";
+    textwin.hInstance = hInstance;
+    textwin.hPrevInstance = hPrevInstance;
+    textwin.nCmdShow = nCmdShow;
+    textwin.Title = L"gnuplot";
 #endif
 
-		/* create structure of first graph window */
-		graphwin = (LPGW) calloc(1, sizeof(GW));
-		listgraphs = graphwin;
+    /* create structure of first graph window */
+    graphwin = (LPGW) calloc(1, sizeof(GW));
+    listgraphs = graphwin;
 
-		/* locate ini file */
-		{
-			char * inifile;
-			get_user_env(); /* this hasn't been called yet */
-			inifile = gp_strdup("~\\wgnuplot.ini");
-			gp_expand_tilde(&inifile);
-
-			/* if tilde expansion fails use current directory as
-			   default - that was the previous default behaviour */
-			if (inifile[0] == '~') {
-				free(inifile);
-				inifile = "wgnuplot.ini";
-			}
-
-#ifndef WGP_CONSOLE
-			textwin.IniFile = inifile;
+    /* locate ini file */
+    {
+	char * inifile;
+#ifdef UNICODE
+	LPWSTR winifile;
 #endif
-			graphwin->IniFile = inifile;
+	get_user_env(); /* this hasn't been called yet */
+	inifile = gp_strdup("~\\wgnuplot.ini");
+	gp_expand_tilde(&inifile);
 
-			ReadMainIni(inifile, "WGNUPLOT");
-		}
+	/* if tilde expansion fails use current directory as
+	    default - that was the previous default behaviour */
+	if (inifile[0] == '~') {
+	    free(inifile);
+	    inifile = "wgnuplot.ini";
+	}
+#ifdef UNICODE
+	graphwin->IniFile = winifile = UnicodeText(inifile, S_ENC_DEFAULT);
+#else
+	graphwin->IniFile = inifile;
+#endif
+#ifndef WGP_CONSOLE
+	textwin.IniFile = graphwin->IniFile;
+#endif
+	ReadMainIni(graphwin->IniFile, TEXT("WGNUPLOT"));
+    }
 
 #ifndef WGP_CONSOLE
-        textwin.IniSection = "WGNUPLOT";
+    textwin.IniSection = TEXT("WGNUPLOT");
     textwin.DragPre = L"load '";
     textwin.DragPost = L"'\n";
-        textwin.lpmw = &menuwin;
-        textwin.ScreenSize.x = 80;
-        textwin.ScreenSize.y = 80;
-        textwin.KeyBufSize = 2048;
-        textwin.CursorFlag = 1; /* scroll to cursor after \n & \r */
-        textwin.shutdown = MakeProcInstance((FARPROC)ShutDown, hInstance);
-        textwin.AboutText = (LPSTR)malloc(1024);
-        CheckMemory(textwin.AboutText);
-        sprintf(textwin.AboutText,
-	    "Version %s patchlevel %s\n" \
-	    "last modified %s\n" \
-	    "%s\n%s, %s and many others\n" \
-	    "gnuplot home:     http://www.gnuplot.info\n",
-            gnuplot_version, gnuplot_patchlevel,
-	    gnuplot_date,
-	    gnuplot_copyright, authors[1], authors[0]);
-        textwin.AboutText = (LPSTR)realloc(textwin.AboutText, _fstrlen(textwin.AboutText)+1);
-        CheckMemory(textwin.AboutText);
+    textwin.lpmw = &menuwin;
+    textwin.ScreenSize.x = 80;
+    textwin.ScreenSize.y = 80;
+    textwin.KeyBufSize = 2048;
+    textwin.CursorFlag = 1; /* scroll to cursor after \n & \r */
+    textwin.shutdown = MakeProcInstance((FARPROC)ShutDown, hInstance);
+    textwin.AboutText = (LPTSTR) malloc(1024 * sizeof(TCHAR));
+    CheckMemory(textwin.AboutText);
+    wsprintf(textwin.AboutText,
+	TEXT("Version %hs patchlevel %hs\n") \
+	TEXT("last modified %hs\n") \
+	TEXT("%hs\n%hs, %hs and many others\n") \
+	TEXT("gnuplot home:     http://www.gnuplot.info\n"),
+        gnuplot_version, gnuplot_patchlevel,
+	gnuplot_date,
+	gnuplot_copyright, authors[1], authors[0]);
+    textwin.AboutText = (LPTSTR) realloc(textwin.AboutText, (_tcslen(textwin.AboutText) + 1) * sizeof(TCHAR));
+    CheckMemory(textwin.AboutText);
 
-        menuwin.szMenuName = szMenuName;
+    menuwin.szMenuName = szMenuName;
 #endif
 
     pausewin.hInstance = hInstance;
     pausewin.hPrevInstance = hPrevInstance;
     pausewin.Title = L"gnuplot pause";
 
-        graphwin->hInstance = hInstance;
-        graphwin->hPrevInstance = hPrevInstance;
+    graphwin->hInstance = hInstance;
+    graphwin->hPrevInstance = hPrevInstance;
 #ifdef WGP_CONSOLE
-        graphwin->lptw = NULL;
+    graphwin->lptw = NULL;
 #else
-        graphwin->lptw = &textwin;
+    graphwin->lptw = &textwin;
 #endif
 
-		/* init common controls */
-	{
-	    INITCOMMONCONTROLSEX initCtrls;
-	    initCtrls.dwSize = sizeof(INITCOMMONCONTROLSEX);
-	    initCtrls.dwICC = ICC_WIN95_CLASSES;
-	    InitCommonControlsEx(&initCtrls);
-	}
+    /* init common controls */
+    {
+	INITCOMMONCONTROLSEX initCtrls;
+	initCtrls.dwSize = sizeof(INITCOMMONCONTROLSEX);
+	initCtrls.dwICC = ICC_WIN95_CLASSES;
+	InitCommonControlsEx(&initCtrls);
+    }
 
 #ifndef WGP_CONSOLE
-	if (TextInit(&textwin))
-		gp_exit(EXIT_FAILURE);
-	textwin.hIcon = LoadIcon(hInstance, "TEXTICON");
-	SetClassLongPtr(textwin.hWndParent, GCLP_HICON, (LONG_PTR)textwin.hIcon);
+    if (TextInit(&textwin))
+	gp_exit(EXIT_FAILURE);
+    textwin.hIcon = LoadIcon(hInstance, TEXT("TEXTICON"));
+    SetClassLongPtr(textwin.hWndParent, GCLP_HICON, (LONG_PTR)textwin.hIcon);
 
-	/* Note: we want to know whether this is an interactive session so that we can
-	 * decide whether or not to write status information to stderr.  The old test
-	 * for this was to see if (argc > 1) but the addition of optional command line
-	 * switches broke this.  What we really wanted to know was whether any of the
-	 * command line arguments are file names or an explicit in-line "-e command".
-	 * (This is a copy of a code snippet from plot.c)
-	 */
-	for (i = 1; i < argc; i++) {
-		if (!stricmp(argv[i], "/noend"))
-			continue;
-		if ((argv[i][0] != '-') || (argv[i][1] == 'e')) {
-			interactive = FALSE;
-			break;
-		}
-	}
-	if (interactive)
-		ShowWindow(textwin.hWndParent, textwin.nCmdShow);
-	if (IsIconic(textwin.hWndParent)) { /* update icon */
-		RECT rect;
-		GetClientRect(textwin.hWndParent, (LPRECT) &rect);
-		InvalidateRect(textwin.hWndParent, (LPRECT) &rect, 1);
-		UpdateWindow(textwin.hWndParent);
-	}
+    /* Note: we want to know whether this is an interactive session so that we can
+     * decide whether or not to write status information to stderr.  The old test
+     * for this was to see if (argc > 1) but the addition of optional command line
+     * switches broke this.  What we really wanted to know was whether any of the
+     * command line arguments are file names or an explicit in-line "-e command".
+     * (This is a copy of a code snippet from plot.c)
+     */
+    for (i = 1; i < argc; i++) {
+	    if (!_stricmp(argv[i], "/noend"))
+		    continue;
+	    if ((argv[i][0] != '-') || (argv[i][1] == 'e')) {
+		    interactive = FALSE;
+		    break;
+	    }
+    }
+    if (interactive)
+	ShowWindow(textwin.hWndParent, textwin.nCmdShow);
+    if (IsIconic(textwin.hWndParent)) { /* update icon */
+	RECT rect;
+	GetClientRect(textwin.hWndParent, (LPRECT) &rect);
+	InvalidateRect(textwin.hWndParent, (LPRECT) &rect, 1);
+	UpdateWindow(textwin.hWndParent);
+    }
 # ifndef __WATCOMC__
-	/* Finally, also redirect C++ standard output streams. */
-	RedirectOutputStreams(TRUE);
+    /* Finally, also redirect C++ standard output streams. */
+    RedirectOutputStreams(TRUE);
 # endif
 #else /* WGP_CONSOLE */
 #ifdef CONSOLE_SWITCH_CP
-        /* Change codepage of console to match that of the graph window.
-           WinExit() will revert this.
-           Attention: display of characters does not work correctly with
-           "Terminal" font! Users will have to use "Lucida Console" or similar.
-        */
-        cp_input = GetConsoleCP();
-        cp_output = GetConsoleOutputCP();
-        if (cp_input != GetACP()) {
-            cp_changed = TRUE;
-            SetConsoleCP(GetACP()); /* keyboard input */
-            SetConsoleOutputCP(GetACP()); /* screen output */
-            SetFileApisToANSI(); /* file names etc. */
-        }
+    /* Change codepage of console to match that of the graph window.
+        WinExit() will revert this.
+        Attention: display of characters does not work correctly with
+        "Terminal" font! Users will have to use "Lucida Console" or similar.
+    */
+    cp_input = GetConsoleCP();
+    cp_output = GetConsoleOutputCP();
+    if (cp_input != GetACP()) {
+	cp_changed = TRUE;
+	SetConsoleCP(GetACP()); /* keyboard input */
+	SetConsoleOutputCP(GetACP()); /* screen output */
+	SetFileApisToANSI(); /* file names etc. */
+    }
 #endif
 #endif
 
-	gp_atexit(WinExit);
+    gp_atexit(WinExit);
 
-	if (!isatty(fileno(stdin)))
-		setmode(fileno(stdin), O_BINARY);
+    if (!_isatty(_fileno(stdin)))
+	_setmode(_fileno(stdin), O_BINARY);
 
-	gnu_main(argc, argv);
+    gnu_main(argc, argv);
 
-	/* First chance to close help system for console gnuplot,
-	   second for wgnuplot */
-	WinCloseHelp();
-	gp_exit_cleanup();
-	return 0;
+    /* First chance to close help system for console gnuplot,
+	second for wgnuplot */
+    WinCloseHelp();
+    gp_exit_cleanup();
+    return 0;
 }
 
 
@@ -728,83 +732,83 @@ MyPutS(char *str)
 int
 MyFPrintF(FILE *file, const char *fmt, ...)
 {
-	int count;
-	va_list args;
+    int count;
+    va_list args;
 
-	va_start(args, fmt);
-	if (isterm(file)) {
-		char *buf;
-
-		count = vsnprintf(NULL, 0, fmt, args) + 1;
-		if (count == 0)
-			count = MAXPRINTF;
-		va_end(args);
-		va_start(args, fmt);
-		buf = (char *) malloc(count * sizeof(char));
-		count = vsnprintf(buf, count, fmt, args);
-		TextPutS(&textwin, buf);
-		free(buf);
-	} else {
-		count = vfprintf(file, fmt, args);
-	}
-	va_end(args);
-	return count;
-}
-
-int
-MyVFPrintF(FILE *file, const char *fmt, va_list args)
-{
-	int count;
-
-	if (isterm(file)) {
-		char *buf;
-		va_list args_copied;
-
-		va_copy(args_copied, args);
-		count = vsnprintf(NULL, 0U, fmt, args) + 1;
-		if (count == 0)
-			count = MAXPRINTF;
-		va_end(args_copied);
-		buf = (char *) malloc(count * sizeof(char));
-		count = vsnprintf(buf, count, fmt, args);
-		TextPutS(&textwin, buf);
-		free(buf);
-	} else {
-		count = vfprintf(file, fmt, args);
-	}
-	return count;
-}
-
-int
-MyPrintF(const char *fmt, ...)
-{
-	int count;
+    va_start(args, fmt);
+    if (isterm(file)) {
 	char *buf;
-	va_list args;
 
-	va_start(args, fmt);
 	count = vsnprintf(NULL, 0, fmt, args) + 1;
 	if (count == 0)
-		count = MAXPRINTF;
+	    count = MAXPRINTF;
 	va_end(args);
 	va_start(args, fmt);
 	buf = (char *) malloc(count * sizeof(char));
 	count = vsnprintf(buf, count, fmt, args);
 	TextPutS(&textwin, buf);
 	free(buf);
-	va_end(args);
-	return count;
+    } else {
+	count = vfprintf(file, fmt, args);
+    }
+    va_end(args);
+    return count;
+}
+
+int
+MyVFPrintF(FILE *file, const char *fmt, va_list args)
+{
+    int count;
+
+    if (isterm(file)) {
+	char *buf;
+	va_list args_copied;
+
+	va_copy(args_copied, args);
+	count = vsnprintf(NULL, 0U, fmt, args) + 1;
+	if (count == 0)
+	    count = MAXPRINTF;
+	va_end(args_copied);
+	buf = (char *) malloc(count * sizeof(char));
+	count = vsnprintf(buf, count, fmt, args);
+	TextPutS(&textwin, buf);
+	free(buf);
+    } else {
+	count = vfprintf(file, fmt, args);
+    }
+    return count;
+}
+
+int
+MyPrintF(const char *fmt, ...)
+{
+    int count;
+    char *buf;
+    va_list args;
+
+    va_start(args, fmt);
+    count = vsnprintf(NULL, 0, fmt, args) + 1;
+    if (count == 0)
+	count = MAXPRINTF;
+    va_end(args);
+    va_start(args, fmt);
+    buf = (char *) malloc(count * sizeof(char));
+    count = vsnprintf(buf, count, fmt, args);
+    TextPutS(&textwin, buf);
+    free(buf);
+    va_end(args);
+    return count;
 }
 
 size_t
 MyFWrite(const void *ptr, size_t size, size_t n, FILE *file)
 {
     if (isterm(file)) {
-        size_t i;
-        for (i=0; i<n; i++)
-            TextPutCh(&textwin, ((BYTE *)ptr)[i]);
-        TextMessage();
-        return n;
+	size_t i;
+	for (i = 0; i < n; i++)
+	    TextPutCh(&textwin, ((BYTE *)ptr)[i]);
+	TextMessage();
+	return n;
     }
     return fwrite(ptr, size, n, file);
 }
@@ -813,12 +817,12 @@ size_t
 MyFRead(void *ptr, size_t size, size_t n, FILE *file)
 {
     if (isterm(file)) {
-        size_t i;
+	size_t i;
 
-        for (i=0; i<n; i++)
-            ((BYTE *)ptr)[i] = TextGetChE(&textwin);
-        TextMessage();
-        return n;
+	for (i = 0; i < n; i++)
+	    ((BYTE *)ptr)[i] = TextGetChE(&textwin);
+	TextMessage();
+	return n;
     }
     return fread(ptr, size, n, file);
 }
@@ -946,7 +950,7 @@ DWORD WINAPI stdin_pipe_reader(LPVOID param)
 #else
     unsigned char c;
     if (fread(&c, 1, 1, stdin) == 1)
-        return (DWORD)c;
+	return (DWORD)c;
     return EOF;
 #endif
 }
@@ -954,37 +958,37 @@ DWORD WINAPI stdin_pipe_reader(LPVOID param)
 
 int ConsoleGetch()
 {
-	int fd = fileno(stdin);
-	HANDLE h;
-	DWORD waitResult;
+    int fd = _fileno(stdin);
+    HANDLE h;
+    DWORD waitResult;
 
-	if (!isatty(fd))
-		h = CreateThread(NULL, 0, stdin_pipe_reader, NULL, 0, NULL);
-	else
-		h = (HANDLE)_get_osfhandle(fd);
+    if (!_isatty(fd))
+	h = CreateThread(NULL, 0, stdin_pipe_reader, NULL, 0, NULL);
+    else
+	h = (HANDLE)_get_osfhandle(fd);
 
-	do {
-		waitResult = MsgWaitForMultipleObjects(1, &h, FALSE, INFINITE, QS_ALLINPUT);
-		if (waitResult == WAIT_OBJECT_0) {
-				DWORD c;
-			if (isatty(fd)) {
-				c = ConsoleReadCh();
-				if (c != NUL)
-					return c;
-			} else {
-				GetExitCodeThread(h, &c);
-				CloseHandle(h);
-				return c;
-			}
-		} else if (waitResult == WAIT_OBJECT_0+1) {
-			WinMessageLoop();
-			if (ctrlc_flag)
-				return '\r';
-		} else
-			break;
-	} while (1);
+    do {
+	waitResult = MsgWaitForMultipleObjects(1, &h, FALSE, INFINITE, QS_ALLINPUT);
+	if (waitResult == WAIT_OBJECT_0) {
+	    DWORD c;
+	    if (_isatty(fd)) {
+		c = ConsoleReadCh();
+		if (c != NUL)
+		    return c;
+	    } else {
+		GetExitCodeThread(h, &c);
+		CloseHandle(h);
+		return c;
+	    }
+	} else if (waitResult == WAIT_OBJECT_0+1) {
+	    WinMessageLoop();
+	    if (ctrlc_flag)
+		return '\r';
+	} else
+		break;
+    } while (1);
 
-	return '\r';
+    return '\r';
 }
 
 #endif /* WGP_CONSOLE */
@@ -992,40 +996,40 @@ int ConsoleGetch()
 
 int ConsoleReadCh()
 {
-	INPUT_RECORD rec;
-	DWORD recRead;
-	HANDLE h;
+    INPUT_RECORD rec;
+    DWORD recRead;
+    HANDLE h;
 
-	h = GetStdHandle(STD_INPUT_HANDLE);
-	if (h == NULL)
-		return NUL;
+    h = GetStdHandle(STD_INPUT_HANDLE);
+    if (h == NULL)
+	    return NUL;
 
-	ReadConsoleInput(h, &rec, 1, &recRead);
-	/* FIXME: We should handle rec.Event.KeyEvent.wRepeatCount > 1, too. */
-	if (recRead == 1 && rec.EventType == KEY_EVENT && rec.Event.KeyEvent.bKeyDown &&
-			(rec.Event.KeyEvent.wVirtualKeyCode < VK_SHIFT ||
-				rec.Event.KeyEvent.wVirtualKeyCode > VK_MENU)) {
-		if (rec.Event.KeyEvent.uChar.AsciiChar) {
-			if ((rec.Event.KeyEvent.dwControlKeyState == SHIFT_PRESSED) && (rec.Event.KeyEvent.wVirtualKeyCode == VK_TAB))
-				return 034; /* remap Shift-Tab */
-			else
-				return rec.Event.KeyEvent.uChar.AsciiChar;
-		} else {
-			switch (rec.Event.KeyEvent.wVirtualKeyCode) {
-				case VK_UP: return 020;
-				case VK_DOWN: return 016;
-				case VK_LEFT: return 002;
-				case VK_RIGHT: return 006;
-				case VK_HOME: return 001;
-				case VK_END: return 005;
-				case VK_DELETE: return 0117;
-			}
+    ReadConsoleInput(h, &rec, 1, &recRead);
+    /* FIXME: We should handle rec.Event.KeyEvent.wRepeatCount > 1, too. */
+    if (recRead == 1 && rec.EventType == KEY_EVENT && rec.Event.KeyEvent.bKeyDown &&
+       (rec.Event.KeyEvent.wVirtualKeyCode < VK_SHIFT ||
+	rec.Event.KeyEvent.wVirtualKeyCode > VK_MENU)) {
+	    if (rec.Event.KeyEvent.uChar.AsciiChar) {
+		if ((rec.Event.KeyEvent.dwControlKeyState == SHIFT_PRESSED) && (rec.Event.KeyEvent.wVirtualKeyCode == VK_TAB))
+		    return 034; /* remap Shift-Tab */
+		else
+		    return rec.Event.KeyEvent.uChar.AsciiChar;
+	    } else {
+		switch (rec.Event.KeyEvent.wVirtualKeyCode) {
+		case VK_UP: return 020;
+		case VK_DOWN: return 016;
+		case VK_LEFT: return 002;
+		case VK_RIGHT: return 006;
+		case VK_HOME: return 001;
+		case VK_END: return 005;
+		case VK_DELETE: return 0117;
 		}
-	}
+	    }
+    }
 
-	/* Error reading event or, key up or, one of the following event records:
-	   MOUSE_EVENT_RECORD, WINDOW_BUFFER_SIZE_RECORD, MENU_EVENT_RECORD, FOCUS_EVENT_RECORD */
-	return NUL;
+    /* Error reading event or, key up or, one of the following event records:
+	MOUSE_EVENT_RECORD, WINDOW_BUFFER_SIZE_RECORD, MENU_EVENT_RECORD, FOCUS_EVENT_RECORD */
+    return NUL;
 }
 
 
@@ -1039,30 +1043,39 @@ static char win_prntmp[MAX_PRT_LEN+1];
 FILE *
 open_printer()
 {
-	char *temp;
+    char *temp;
 
-	if ((temp = getenv("TEMP")) == (char *)NULL)
-		*win_prntmp = '\0';
-	else  {
-		safe_strncpy(win_prntmp, temp, MAX_PRT_LEN);
-		/* stop X's in path being converted by mktemp */
-		for (temp = win_prntmp; *temp != NUL; temp++)
-			*temp = tolower((unsigned char)*temp);
-		if ((strlen(win_prntmp) > 0) && (win_prntmp[strlen(win_prntmp) - 1] != '\\'))
-			strcat(win_prntmp, "\\");
-	}
-	strncat(win_prntmp, "_gptmp", MAX_PRT_LEN - strlen(win_prntmp));
-	strncat(win_prntmp, "XXXXXX", MAX_PRT_LEN - strlen(win_prntmp));
-	mktemp(win_prntmp);
-	return fopen(win_prntmp, "w");
+    if ((temp = getenv("TEMP")) == (char *)NULL)
+	*win_prntmp = '\0';
+    else  {
+	safe_strncpy(win_prntmp, temp, MAX_PRT_LEN);
+	/* stop X's in path being converted by _mktemp */
+	for (temp = win_prntmp; *temp != NUL; temp++)
+	    *temp = tolower((unsigned char)*temp);
+	if ((strlen(win_prntmp) > 0) && (win_prntmp[strlen(win_prntmp) - 1] != '\\'))
+	    strcat(win_prntmp, "\\");
+    }
+    strncat(win_prntmp, "_gptmp", MAX_PRT_LEN - strlen(win_prntmp));
+    strncat(win_prntmp, "XXXXXX", MAX_PRT_LEN - strlen(win_prntmp));
+    _mktemp(win_prntmp);
+    return fopen(win_prntmp, "w");
 }
+
 
 void
 close_printer(FILE *outfile)
 {
+#ifdef UNICODE
+    LPWSTR printer = UnicodeText(win_prntmp, S_ENC_DEFAULT);
+    fclose(outfile);
+    DumpPrinter(graphwin->hWndGraph, graphwin->Title, printer);
+    free(printer);
+#else
     fclose(outfile);
     DumpPrinter(graphwin->hWndGraph, graphwin->Title, win_prntmp);
+#endif
 }
+
 
 void
 screen_dump()
@@ -1074,44 +1087,47 @@ screen_dump()
 void
 win_raise_terminal_window(int id)
 {
-	LPGW lpgw = listgraphs;
-	while ((lpgw != NULL) && (lpgw->Id != id))
-		lpgw = lpgw->next;
-	if (lpgw != NULL) {
-		ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);
-		BringWindowToTop(lpgw->hWndGraph);
-	}
+    LPGW lpgw = listgraphs;
+    while ((lpgw != NULL) && (lpgw->Id != id))
+	lpgw = lpgw->next;
+    if (lpgw != NULL) {
+	ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);
+	BringWindowToTop(lpgw->hWndGraph);
+    }
 }
+
 
 void
 win_raise_terminal_group(void)
 {
-	LPGW lpgw = listgraphs;
-	while (lpgw != NULL) {
-		ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);
-		BringWindowToTop(lpgw->hWndGraph);
-		lpgw = lpgw->next;
-	}
+    LPGW lpgw = listgraphs;
+    while (lpgw != NULL) {
+	ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);
+	BringWindowToTop(lpgw->hWndGraph);
+	lpgw = lpgw->next;
+    }
 }
+
 
 void
 win_lower_terminal_window(int id)
 {
-	LPGW lpgw = listgraphs;
-	while ((lpgw != NULL) && (lpgw->Id != id))
-		lpgw = lpgw->next;
-	if (lpgw != NULL)
-		SetWindowPos(lpgw->hWndGraph, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
+    LPGW lpgw = listgraphs;
+    while ((lpgw != NULL) && (lpgw->Id != id))
+	lpgw = lpgw->next;
+    if (lpgw != NULL)
+	SetWindowPos(lpgw->hWndGraph, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
 }
+
 
 void
 win_lower_terminal_group(void)
 {
-	LPGW lpgw = listgraphs;
-	while (lpgw != NULL) {
-		SetWindowPos(lpgw->hWndGraph, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
-		lpgw = lpgw->next;
-	}
+    LPGW lpgw = listgraphs;
+    while (lpgw != NULL) {
+	SetWindowPos(lpgw->hWndGraph, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
+	lpgw = lpgw->next;
+    }
 }
 
 
@@ -1119,15 +1135,15 @@ win_lower_terminal_group(void)
 static TBOOLEAN
 WinWindowOpened(void)
 {
-	LPGW lpgw;
+    LPGW lpgw;
 
-	lpgw = listgraphs;
-	while (lpgw != NULL) {
-		if (GraphHasWindow(lpgw))
-			return TRUE;
-		lpgw = lpgw->next;
-	}
-	return FALSE;
+    lpgw = listgraphs;
+    while (lpgw != NULL) {
+	if (GraphHasWindow(lpgw))
+	    return TRUE;
+	lpgw = lpgw->next;
+    }
+    return FALSE;
 }
 
 
@@ -1137,14 +1153,14 @@ WinWindowOpened(void)
 TBOOLEAN
 WinAnyWindowOpen(void)
 {
-	TBOOLEAN window_opened = WinWindowOpened();
+    TBOOLEAN window_opened = WinWindowOpened();
 #ifdef WXWIDGETS
-	window_opened |= wxt_window_opened();
+    window_opened |= wxt_window_opened();
 #endif
 #ifdef HAVE_LIBCACA
-	window_opened |= CACA_window_opened();
+    window_opened |= CACA_window_opened();
 #endif
-	return window_opened;
+    return window_opened;
 }
 
 
@@ -1152,9 +1168,9 @@ WinAnyWindowOpen(void)
 void
 WinPersistTextClose(void)
 {
-	if (!WinAnyWindowOpen() &&
-		(textwin.hWndParent != NULL) && !IsWindowVisible(textwin.hWndParent))
-		PostMessage(textwin.hWndParent, WM_CLOSE, 0, 0);
+    if (!WinAnyWindowOpen() &&
+	(textwin.hWndParent != NULL) && !IsWindowVisible(textwin.hWndParent))
+	PostMessage(textwin.hWndParent, WM_CLOSE, 0, 0);
 }
 #endif
 
@@ -1162,30 +1178,30 @@ WinPersistTextClose(void)
 void
 WinMessageLoop(void)
 {
-	MSG msg;
+    MSG msg;
 
-	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-		/* HBB 19990505: Petzold says we should check this: */
-		if (msg.message == WM_QUIT)
-			return;
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	}
+    while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+	/* HBB 19990505: Petzold says we should check this: */
+	if (msg.message == WM_QUIT)
+	    return;
+	TranslateMessage(&msg);
+	DispatchMessage(&msg);
+    }
 }
 
 
 void
 WinRaiseConsole(void)
 {
-	HWND console = NULL;
+    HWND console = NULL;
 #ifndef WGP_CONSOLE
-	console = textwin.hWndParent;
+    console = textwin.hWndParent;
 #else
-	console = GetConsoleWindow();
+    console = GetConsoleWindow();
 #endif
-	if (console != NULL) {
-		ShowWindow(console, SW_SHOWNORMAL);
-		BringWindowToTop(console);
+    if (console != NULL) {
+	ShowWindow(console, SW_SHOWNORMAL);
+	BringWindowToTop(console);
     }
 }
 

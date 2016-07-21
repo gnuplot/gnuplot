@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.13 2014/08/18 03:49:06 sfeam Exp $
+# $Id: Makefile,v 1.14 2016/05/07 09:17:16 markisch Exp $
 #
 # GNUPLOT Makefile OpenWatcom 1.3 on Win32
 
@@ -72,6 +72,7 @@ BINARYFILES=$(M)binary1 $(M)binary2 $(M)binary3
 
 CPPFLAGS =  -DHAVE_CONFIG_H -D_Windows -DHAVE_CONFIG_H -DUSE_MOUSE -DEAM_OBJECTS
 CPPFLAGS += -DVERSION_MAJOR="5.1" -DPATCHLEVEL="0"
+CPPFLAGS += -DUNICODE -D_UNICODE
 # library-dependent ones may have to be added, like:
 # -DHAVE_LIBPNG -DHAVE_LIBPDF 
 
@@ -170,6 +171,7 @@ FILE {
 LIBRARY kernel32.lib,user32.lib,gdi32.lib,winspool.lib,comdlg32.lib
 LIBRARY comctl32.lib,advapi32.lib,shell32.lib
 LIBRARY msimg32.lib
+LIBRARY shlwapi.lib
 OPTION map
 OPTION SYMFILE
 NAME $^&
@@ -192,6 +194,7 @@ FILE {
 LIBRARY kernel32.lib,user32.lib,gdi32.lib,winspool.lib,comdlg32.lib
 LIBRARY advapi32.lib,shell32.lib
 LIBRARY msimg32.lib
+LIBRARY shlwapi.lib
 OPTION map
 OPTION SYMFILE
 NAME $^&
@@ -214,6 +217,7 @@ FILE {
 LIBRARY kernel32.lib,user32.lib,gdi32.lib,winspool.lib,comdlg32.lib
 LIBRARY advapi32.lib,shell32.lib
 LIBRARY msimg32.lib
+LIBRARY shlwapi.lib
 OPTION map
 OPTION SYMFILE
 NAME gnuplot.exe

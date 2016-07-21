@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.337 2016/05/26 20:53:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.338 2016/07/02 09:41:18 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1633,7 +1633,7 @@ timed_pause(double sleep_time)
 /* process the 'pause' command */
 #define EAT_INPUT_WITH(slurp) do {int junk=0; do {junk=slurp;} while (junk != EOF && junk != '\n');} while (0)
 
-#if defined(_WIN32)
+#if defined(_WIN32) && defined(WGP_CONSOLE)
 /* mode == 0: => enc -> current locale (for output)
  * mode == !0: => current locale -> enc (for input)
  */
@@ -1737,7 +1737,7 @@ pause_command()
 	    current = add_udv_by_name("MOUSE_BUTTON");
 	    Ginteger(&current->udv_value,-1);
 	} else
-	    int_warn(NO_CARET,"Mousing not active");
+	    int_warn(NO_CARET, "Mousing not active");
     } else
 #endif
 	sleep_time = real_expression();
@@ -1812,7 +1812,7 @@ pause_command()
 		EAT_INPUT_WITH(fgetc(stdin));
 	    }
 	}
-#else /* !(WIN32 || OS2) */
+#else /* !(_WIN32 || OS2) */
 #ifdef USE_MOUSE
 	if (term && term->waitforinput) {
 	    /* It does _not_ work to do EAT_INPUT_WITH(term->waitforinput()) */
@@ -1821,7 +1821,7 @@ pause_command()
 #endif /* USE_MOUSE */
 	    EAT_INPUT_WITH(fgetc(stdin));
 
-#endif /* !(WIN32 || OS2) */
+#endif /* !(_WIN32 || OS2) */
     }
     if (sleep_time > 0)
 	timed_pause(sleep_time);
@@ -1984,7 +1984,7 @@ print_command()
 	    }
 	    continue;
 	}
-	if (type_udv(c_token) == ARRAY && !equals(c_token+1,"[")) {
+	if (type_udv(c_token) == ARRAY && !equals(c_token+1, "[")) {
 	    udvt_entry *array = add_udv(c_token++);
 	    save_array_content(print_out, array->udv_value.v.value_array);
 	    continue;
@@ -1994,13 +1994,14 @@ print_command()
 	    if (dataline != NULL)
 		len = strappend(&dataline, &size, len, a.v.string_val);
 	    else
-#ifdef WIN32
+#if defined(_WIN32) && defined(WGP_CONSOLE)
+		/* FIXME: That is probably not the right location to do this conversion in the long run. */
 		if (print_out == stderr) {
-			char *nbuf = translate_string_encoding(a.v.string_val, 0, encoding);
-			gpfree_string(&a);
-			fputs(nbuf, print_out);
-			free(nbuf);
-	    } else
+		    char *nbuf = translate_string_encoding(a.v.string_val, 0, encoding);
+		    gpfree_string(&a);
+		    fputs(nbuf, print_out);
+		    free(nbuf);
+		} else
 #endif
 		fputs(a.v.string_val, print_out);
 	    gpfree_string(&a);
@@ -2106,7 +2107,7 @@ refresh_request()
     }
 
     if (refresh_ok == E_REFRESH_OK_2D) {
-	refresh_bounds(first_plot, refresh_nplots); 
+	refresh_bounds(first_plot, refresh_nplots);
 	do_plot(first_plot, refresh_nplots);
 	update_gpval_variables(1);
     } else if (refresh_ok == E_REFRESH_OK_3D) {
@@ -2338,8 +2339,9 @@ $PALETTE u 1:2 t 'red' w l lt 1 lc rgb 'red',\
 #if defined(_MSC_VER) || defined(__MINGW32__)
     /* On Vista/Windows 7 tmpfile() fails. */
     if (!f) {
-	char  buf[PATH_MAX];
-	GetTempPath(sizeof(buf), buf);
+	char buf[PATH_MAX];
+	/* We really want the "ANSI" version */
+	GetTempPathA(sizeof(buf), buf);
 	strcat(buf, "gnuplot-pal.tmp");
 	f = fopen(buf, "w+");
     }
@@ -2587,7 +2589,7 @@ changedir(char *path)
 
 # if defined(__EMX__)
 	(void) _chdrive(driveno + 1);
-# elif defined(__DJGPP__) 
+# elif defined(__DJGPP__)
 	(void) setdisk(driveno);
 # endif
 	path += 2;		/* move past drive letter */
@@ -2889,32 +2891,40 @@ help_command()
     /* open help file if necessary */
     help_window = HtmlHelp(parent, winhelpname, HH_GET_WIN_HANDLE, (DWORD_PTR)NULL);
     if (help_window == NULL) {
-        help_window = HtmlHelp(parent, winhelpname, HH_DISPLAY_TOPIC, (DWORD_PTR)NULL);
-        if (help_window == NULL) {
-            fprintf(stderr, "Error: Could not open help file \"%s\"\n", winhelpname);
-            return;
-        }
+	help_window = HtmlHelp(parent, winhelpname, HH_DISPLAY_TOPIC, (DWORD_PTR)NULL);
+	if (help_window == NULL) {
+	    fprintf(stderr, "Error: Could not open help file \"%ls\"\n", winhelpname);
+	    return;
+	}
     }
     if (END_OF_COMMAND) {
-        /* show table of contents */
-        HtmlHelp(parent, winhelpname, HH_DISPLAY_TOC, (DWORD_PTR)NULL);
+	/* show table of contents */
+	HtmlHelp(parent, winhelpname, HH_DISPLAY_TOC, (DWORD_PTR)NULL);
     } else {
-        /* lookup topic in index */
-        HH_AKLINK link;
-        char buf[128];
-        int start = c_token;
-        while (!(END_OF_COMMAND))
-            c_token++;
-        capture(buf, start, c_token - 1, 128);
-        link.cbStruct =     sizeof(HH_AKLINK) ;
-        link.fReserved =    FALSE;
-        link.pszKeywords =  buf;
-        link.pszUrl =       NULL;
-        link.pszMsgText =   NULL;
-        link.pszMsgTitle =  NULL;
-        link.pszWindow =    NULL;
-        link.fIndexOnFail = TRUE;
-        HtmlHelp(parent, winhelpname, HH_KEYWORD_LOOKUP, (DWORD_PTR)&link);
+	/* lookup topic in index */
+	HH_AKLINK link;
+	char buf[128];
+#ifdef UNICODE
+	WCHAR wbuf[128];
+#endif
+	int start = c_token;
+	while (!(END_OF_COMMAND))
+	    c_token++;
+	capture(buf, start, c_token - 1, sizeof(buf));
+	link.cbStruct =     sizeof(HH_AKLINK) ;
+	link.fReserved =    FALSE;
+#ifdef UNICODE
+	MultiByteToWideChar(WinGetCodepage(encoding), 0, buf, sizeof(buf), wbuf, sizeof(wbuf) / sizeof(WCHAR));
+	link.pszKeywords =  wbuf;
+#else
+	link.pszKeywords =  buf;
+#endif
+	link.pszUrl =       NULL;
+	link.pszMsgText =   NULL;
+	link.pszMsgTitle =  NULL;
+	link.pszWindow =    NULL;
+	link.fIndexOnFail = TRUE;
+	HtmlHelp(parent, winhelpname, HH_KEYWORD_LOOKUP, (DWORD_PTR)&link);
     }
 }
 #else  /* !_Windows */
@@ -3241,7 +3251,8 @@ rlgets(char *s, size_t n, const char *prompt)
 # endif				/* USE_READLINE */
 
 
-# if defined(MSDOS) || defined(_Windows)
+# if defined(MSDOS) || defined(_WIN32)
+
 void
 do_shell()
 {
@@ -3249,14 +3260,14 @@ do_shell()
     c_token++;
 
     if (user_shell) {
-#  if defined(_Windows)
+#  if defined(_WIN32)
 	if (WinExec(user_shell, SW_SHOWNORMAL) <= 32)
 #  elif defined(DJGPP)
-	    if (system(user_shell) == -1)
+	if (system(user_shell) == -1)
 #  else
-		if (spawnl(P_WAIT, user_shell, NULL) == -1)
-#  endif			/* !(_Windows || DJGPP) */
-		    os_error(NO_CARET, "unable to spawn shell");
+	if (spawnl(P_WAIT, user_shell, NULL) == -1)
+#  endif /* !(_WIN32 || DJGPP) */
+	    os_error(NO_CARET, "unable to spawn shell");
     }
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.h,v 1.15 2014/06/04 08:11:00 markisch Exp $
+ * $Id: winmain.h,v 1.16 2016/05/06 10:22:53 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.h */
@@ -60,15 +60,15 @@ extern PW pausewin;
 extern MW menuwin;
 
 extern HWND help_window;
-extern LPSTR winhelpname;
-extern LPSTR szModuleName;
-extern LPSTR szPackageDir;
-extern LPSTR szMenuName;
+extern LPTSTR winhelpname;
+extern LPTSTR szModuleName;
+extern LPTSTR szPackageDir;
+extern LPTSTR szMenuName;
 
-int Pause __PROTO((LPSTR str));
-void screen_dump __PROTO((void));
-void kill_pending_Pause_dialog __PROTO((void));
-void win_sleep __PROTO((DWORD dwMilliSeconds));
+int Pause (LPSTR str);
+void screen_dump(void);
+void kill_pending_Pause_dialog(void);
+void win_sleep(DWORD dwMilliSeconds);
 TBOOLEAN WinAnyWindowOpen(void);
 void WinPersistTextClose(void);
 void WinMessageLoop(void);

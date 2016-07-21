@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.361 2016/04/23 22:59:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.362 2016/05/25 15:02:28 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -990,11 +990,18 @@ show_version(FILE *fp)
 #endif
 	    "";
 
+	    const char *unicodebuild =
+#if defined(_WIN32) && defined(UNICODE)
+		"+UNICODE  ";
+#else
+		"";
+#endif
+
 	    sprintf(compile_options, "\
-%s%s\n%s%s\n\
+%s%s\n%s%s%s\n\
 %s%s%s\n\
 %s%s%s%s\n%s\n",
-		    rdline, gnu_rdline, compatibility, binary_files,
+		    rdline, gnu_rdline, compatibility, unicodebuild, binary_files,
 		    libcerf, libgd, linuxvga,
 		    nocwdrc, x11, use_mouse, hiddenline,
 		    plotoptions);
@@ -1084,19 +1091,19 @@ show_version(FILE *fp)
 	}
 
 	{
+#ifndef _WIN32
 	    char *helpfile = NULL;
 
-#ifndef WIN32
 	    if ((helpfile = getenv("GNUHELP")) == NULL)
 		helpfile = HELPFILE;
+	    fprintf(stderr, "HELPFILE           = \"%s\"\n", helpfile);
 #else
-	    helpfile = winhelpname;
+	    fprintf(stderr, "HELPFILE           = \"%ls\"\n", winhelpname);
 #endif
-	fprintf(stderr, "HELPFILE           = \"%s\"\n", helpfile);
 	}
 
-#if defined(WIN32) && !defined(WGP_CONSOLE)
-	fprintf(stderr, "MENUNAME           = \"%s\"\n", szMenuName);
+#if defined(_WIN32) && !defined(WGP_CONSOLE)
+	fprintf(stderr, "MENUNAME           = \"%ls\"\n", szMenuName);
 #endif
 
 #ifdef HAVE_LIBCACA

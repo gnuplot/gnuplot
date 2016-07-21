@@ -1,5 +1,35 @@
 2016-07-21  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	Enable UNICODE build on Windows.
+	Patch #727
+
+	src/command.c src/show.c src/win/wcommon.h src/win/wgdiplus.cpp
+	src/win/wgnuplib.c|h src/win/wgraph.c src/win/winmain.c|h
+	src/win/wprinter.c src/win/wtext.c term/gd.trm term/win.trm
+	config/mingw/Makefile config/watcom/Makefile:
+
+	Windows offers two versions of its API:  a (multi-byte) variant
+	termed "ANSI" and a Unicode (wchar_t) variant "W".  A set of TCHAR
+	macros and types enables writing code which can be compiled with
+	or without the UNICODE/_UNICODE flags being set.  With this change
+	gnuplot on Windows now uses the Unicode variant by default.  While this
+	at first looks like a massive set of changes, most of it is actually
+	rather simple:
+	  - Wrap strings constants in TEXT() macros.
+	  - Use TCHAR types instead of plain char types.
+	  - Replace string functions by tchar equivalents:
+		_tcsdup (strdup) wsprintf (sprintf) _tcscmp (strcmp)
+		_tcscpy (strcpy) _tcsncpy (strncpy) _tcscat (strcat)
+		_tcsstr (strstr)
+	  - Modify printf format strings.
+	In addition we now explicitly call "ANSI" functions, or provide
+	conversions from CHAR to WCHAR or vice versa in some cases.
+
+	src/show.c (show_version):  Add UNICODE build information to output of
+	"show version long".
+
+2016-07-21  Bastian Maerkisch  <bmaerkisch@web.de>
+
 	* src/win/wgdiplus.c wrc/win/wgnuplib.h src/win/wgraph.c term/win.trm:
 	Aggregate related move/vector requests in a polyline.  This saves
 	space in the internal list of drawing commands and accelerates

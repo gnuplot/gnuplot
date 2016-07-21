@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.77 2016/05/23 14:22:21 markisch Exp $
+ * $Id: wgnuplib.h,v 1.78 2016/07/21 07:35:52 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -64,11 +64,11 @@ extern "C" {
 
 /* ================================== */
 /* wprinter.c - windows printer routines */
-void DumpPrinter(HWND hwnd, LPSTR szAppName, LPSTR szFileName);
+void DumpPrinter(HWND hwnd, LPTSTR szAppName, LPTSTR szFileName);
 
 
 typedef struct tagPRINT {
-	HDC		hdcPrn;
+	HDC	hdcPrn;
 	HWND	hDlgPrint;
 	BOOL	bUserAbort;
 	POINT	pdef;
@@ -113,15 +113,15 @@ typedef struct tagMW
 	HMENU	hMenu;
 	BYTE	**macro;
 	BYTE	*macrobuf;
-	int		nCountMenu;
+	int	nCountMenu;
 	DLGPROC	lpProcInput;
 	LPWSTR	szPrompt;
 	LPWSTR	szAnswer;
-	int		nChar;
-	int		nButton;
+	int	nChar;
+	int	nButton;
 	HWND	hToolbar;
 	HWND	hButton[BUTTONMAX];
-	int		hButtonID[BUTTONMAX];
+	int	hButtonID[BUTTONMAX];
 } MW;
 typedef MW * LPMW;
 
@@ -132,21 +132,21 @@ typedef MW * LPMW;
 #define MAXFONTNAME 80
 typedef struct tagTW
 {
-	GP_LPPRINT	lpr;			/* must be first */
+	GP_LPPRINT	lpr;		/* must be first */
 	HINSTANCE hInstance;		/* required */
 	HINSTANCE hPrevInstance;	/* required */
 	LPWSTR	Title;			/* required */
 	LPMW	lpmw;			/* optional */
 	POINT	ScreenSize;		/* optional */  /* size of the visible screen in characters */
 	unsigned int KeyBufSize;	/* optional */
-	LPSTR	IniFile;		/* optional */
-	LPSTR	IniSection;		/* optional */
+	LPTSTR	IniFile;		/* optional */
+	LPTSTR	IniSection;		/* optional */
 	LPWSTR	DragPre;		/* optional */
 	LPWSTR	DragPost;		/* optional */
 	int	nCmdShow;		/* optional */
 	FARPROC shutdown;		/* optional */
 	HICON	hIcon;			/* optional */
-	LPSTR   AboutText;		/* optional */
+	LPTSTR	AboutText;		/* optional */
 	HMENU	hPopMenu;
 	HWND	hWndText;
 	HWND	hWndParent;
@@ -163,7 +163,7 @@ typedef struct tagTW
 	BOOL	bGetCh;
 	BOOL	bSysColors;
 	HBRUSH	hbrBackground;
-	char	fontname[MAXFONTNAME];	/* font name */
+	TCHAR	fontname[MAXFONTNAME];	/* font name */
 	int	fontsize;		/* font size in pts */
 	HFONT	hfont;
 	int	CharAscent;
@@ -215,7 +215,7 @@ void TextScrollReverse(LPTW lptw);
 void TextAttr(LPTW lptw, BYTE attr);
 #endif /* WGP_CONSOLE */
 
-void AboutBox(HWND hwnd, LPSTR str);
+void AboutBox(HWND hwnd, LPTSTR str);
 
 /* ================================== */
 /* wgraph.c - graphics window */
@@ -298,23 +298,23 @@ struct GWOPBLK {			/* kept in local memory */
 
 
 typedef struct tagGW {
-	GP_LPPRINT	lpr;		/* must be first */
+	GP_LPPRINT	lpr;	/* must be first */
 	HINSTANCE hInstance;	/* required */
-	HINSTANCE hPrevInstance;	/* required */
-	int		Id;	/* plot number */
-	LPSTR	Title;		/* required */
-	int		xmax;		/* required */
-	int		ymax;		/* required */
+	HINSTANCE hPrevInstance;/* required */
+	int	Id;		/* plot number */
+	LPTSTR	Title;		/* required */
+	int	xmax;		/* required */
+	int	ymax;		/* required */
 	LPTW	lptw;		/* optional */  /* associated text window */
 	POINT	Origin;		/* optional */	/* origin of graph window */
 	POINT	Size;		/* optional */	/* size of graph window */
-	LPSTR	IniFile;	/* optional */
-	LPSTR	IniSection;	/* optional */
+	LPTSTR	IniFile;	/* optional */
+	LPTSTR	IniSection;	/* optional */
 	HWND	hWndGraph;	/* window handle */
 	HWND	hStatusbar;	/* window handle of status bar */
-	int		StatusHeight;	/* height of status line area */
+	int	StatusHeight;	/* height of status line area */
 	HWND	hToolbar;
-	int		ToolbarHeight;
+	int	ToolbarHeight;
 	HMENU	hPopMenu;	/* popup menu */
 	HBITMAP	hBitmap;	/* bitmap of current graph */
 	BOOL	buffervalid;	/* indicates if hBitmap is valid */
@@ -353,23 +353,23 @@ typedef struct tagGW {
 	unsigned int maxtooltips;
 	unsigned int numtooltips;
 
-	int		htic;		/* horizontal size of point symbol (xmax units) */
+	int	htic;		/* horizontal size of point symbol (xmax units) */
 	int 	vtic;		/* vertical size of point symbol (ymax units)*/
-	int		hchar;		/* horizontal size of character (xmax units) */
-	int		vchar;		/* vertical size of character (ymax units)*/
+	int	hchar;		/* horizontal size of character (xmax units) */
+	int	vchar;		/* vertical size of character (ymax units)*/
 
-	char	fontname[MAXFONTNAME];	/* current font name */
-	int		fontsize;	/* current font size in pts */
-	char	deffontname[MAXFONTNAME]; /* default font name */
-	int		deffontsize;	/* default font size */
-	int		angle;		/* text angle */
+	TCHAR	fontname[MAXFONTNAME];	/* current font name */
+	int	fontsize;	/* current font size in pts */
+	TCHAR	deffontname[MAXFONTNAME]; /* default font name */
+	int	deffontsize;	/* default font size */
+	int	angle;		/* text angle */
 	BOOL	rotate;		/* can text be rotated 90 degrees ? */
-	int		justify;	/* text justification */
+	int	justify;	/* text justification */
 	HFONT	hfonth;		/* horizonal font */
 	HFONT	hfontv;		/* rotated font (arbitrary angle) */
 	LOGFONT	lf;			/* cached to speed up rotated fonts */
 	double	org_pointsize;	/* Original Pointsize */
-	int		encoding_error; /* last unknown encoding */
+	int	encoding_error; /* last unknown encoding */
 	double	fontscale;	/* scale factor for font sizes */
 	enum set_encoding_id encoding;	/* text encoding */
 	LONG	tmHeight;	/* text metric of current font */
@@ -384,24 +384,28 @@ typedef struct tagGW {
 	double	linewidth;	/* scale factor for linewidth */
 
 	HBRUSH	colorbrush[WGNUMPENS+2];   /* brushes to fill points */
-	COLORREF background;		/* background color */
-	HBRUSH	hbrush;				/* background brush */
-	HBRUSH	hcolorbrush;		/* */
-	int		sampling;			/* current sampling factor */
+	COLORREF background;	/* background color */
+	HBRUSH	hbrush;		/* background brush */
+	HBRUSH	hcolorbrush;	/* */
+	int	sampling;	/* current sampling factor */
 
-	struct tagGW * next;		/* pointer to next window */
+	struct tagGW * next;	/* pointer to next window */
 } GW;
 typedef GW *  LPGW;
 
+/* No TEXT Macro required for fonts */
 #define WINFONTSIZE 10
-#define WINFONT "Tahoma"
-#ifndef WINJPFONT
-#define WINJPFONT "MS PGothic"
+#ifndef WINFONT
+# define WINFONT "Tahoma"
 #endif
-#define WINGRAPHTITLE "gnuplot graph"
+#ifndef WINJPFONT
+# define WINJPFONT "MS PGothic"
+#endif
+
+#define WINGRAPHTITLE TEXT("gnuplot graph")
 
 extern termentry * WIN_term;
-extern char WIN_inifontname[MAXFONTNAME];
+extern TCHAR WIN_inifontname[MAXFONTNAME];
 extern int WIN_inifontsize;
 
 void GraphInitStruct(LPGW lpgw);
@@ -419,7 +423,7 @@ void GraphRedraw(LPGW lpgw);
 void GraphModifyPlots(LPGW lpgw, unsigned int operations, int plotno);
 void win_close_terminal_window(LPGW lpgw);
 TBOOLEAN GraphHasWindow(LPGW lpgw);
-char * GraphDefaultFont(void);
+LPTSTR GraphDefaultFont(void);
 
 #ifdef USE_MOUSE
 void Graph_set_cursor(LPGW lpgw, int c, int x, int y);

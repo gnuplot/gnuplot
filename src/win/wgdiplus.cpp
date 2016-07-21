@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.23 2016/07/15 04:20:55 sfeam Exp $
+ * $Id: wgdiplus.cpp,v 1.24 2016/07/21 07:35:52 markisch Exp $
  */
 
 /*
@@ -35,6 +35,7 @@ extern "C" {
 #define GDIPVER 0x0110
 #include <gdiplus.h>
 
+#include <tchar.h>
 #include <wchar.h>
 #include "wgdiplus.h"
 #include "wgnuplib.h"
@@ -57,7 +58,7 @@ static void gdiplusPolyline(Graphics &graphics, Pen &pen, Point *points, int pol
 static void gdiplusFilledPolygon(Graphics &graphics, Brush &brush, POINT *ppt, int polyi);
 static Brush * gdiplusPatternBrush(int style, COLORREF color, double alpha, COLORREF backcolor, BOOL transparent);
 static void gdiplusDot(Graphics &graphics, Brush &brush, int x, int y);
-static Font * SetFont_gdiplus(Graphics &graphics, LPRECT rect, LPGW lpgw, char * fontname, int size);
+static Font * SetFont_gdiplus(Graphics &graphics, LPRECT rect, LPGW lpgw, LPTSTR fontname, int size);
 
 
 void
@@ -325,7 +326,7 @@ gdiplusDot(Graphics &graphics, Brush &brush, int x, int y)
 
 
 static Font *
-SetFont_gdiplus(Graphics &graphics, LPRECT rect, LPGW lpgw, char * fontname, int size)
+SetFont_gdiplus(Graphics &graphics, LPRECT rect, LPGW lpgw, LPTSTR fontname, int size)
 {
 	if ((fontname == NULL) || (*fontname == 0))
 		fontname = lpgw->deffontname;
@@ -333,47 +334,55 @@ SetFont_gdiplus(Graphics &graphics, LPRECT rect, LPGW lpgw, char * fontname, int
 		size = lpgw->deffontsize;
 
 	/* make a local copy */
-	fontname = strdup(fontname);
+	fontname = _tcsdup(fontname);
 
 	/* save current font */
-	strcpy(lpgw->fontname, fontname);
+	_tcscpy(lpgw->fontname, fontname);
 	lpgw->fontsize = size;
 
 	/* extract font style */
 	INT fontStyle = FontStyleRegular;
-	char * italic, * bold, * underline, * strikeout;
-	if ((italic = strstr(fontname, " Italic")) != NULL)
+	LPTSTR italic, bold, underline, strikeout;
+	if ((italic = _tcsstr(fontname, TEXT(" Italic"))) != NULL)
 		fontStyle |= FontStyleItalic;
-	else if ((italic = strstr(fontname, ":Italic")) != NULL)
+	else if ((italic = _tcsstr(fontname, TEXT(":Italic"))) != NULL)
 		fontStyle |= FontStyleItalic;
-	if ((bold = strstr(fontname, " Bold")) != NULL)
+	if ((bold = _tcsstr(fontname, TEXT(" Bold"))) != NULL)
 		fontStyle |= FontStyleBold;
-	else if ((bold = strstr(fontname, ":Bold")) != NULL)
+	else if ((bold = _tcsstr(fontname, TEXT(":Bold"))) != NULL)
 		fontStyle |= FontStyleBold;
-	if ((underline = strstr(fontname, " Underline")) != NULL)
+	if ((underline = _tcsstr(fontname, TEXT(" Underline"))) != NULL)
 		fontStyle |= FontStyleUnderline;
-	if ((strikeout = strstr(fontname, " Strikeout")) != NULL)
+	if ((strikeout = _tcsstr(fontname, TEXT(" Strikeout"))) != NULL)
 		fontStyle |= FontStyleStrikeout;
 	if (italic) *italic = 0;
 	if (strikeout) *strikeout = 0;
 	if (bold) * bold = 0;
 	if (underline) * underline = 0;
 
+#ifdef UNICODE
+	const FontFamily * fontFamily = new FontFamily(fontname);
+#else
 	LPWSTR family = UnicodeText(fontname, lpgw->encoding);
-	free(fontname);
 	const FontFamily * fontFamily = new FontFamily(family);
 	free(family);
+#endif
 	Font * font;
 	int fontHeight;
 	if (fontFamily->GetLastStatus() != Ok) {
 		delete fontFamily;
-#if !(defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR))
+	free(fontname);
+#if (!defined(__MINGW32__) || defined(__MINGW64_VERSION_MAJOR))
 		// MinGW 4.8.1 does not have this
 		fontFamily = FontFamily::GenericSansSerif();
+#else
+#ifdef UNICODE
+		fontFamily = new FontFamily(GraphDefaultFont());
 #else
 		family = UnicodeText(GraphDefaultFont(), S_ENC_DEFAULT); // should always be available
 		fontFamily = new FontFamily(family);
 		free(family);
+#endif
 #endif
 		font = new Font(fontFamily, size * lpgw->sampling, fontStyle, UnitPoint);
 		fontHeight = font->GetSize() / fontFamily->GetEmHeight(fontStyle) * graphics.GetDpiY() / 72. *
@@ -1161,7 +1170,14 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 			int size = curptr->x;
 			char * fontname = (char *) LocalLock(curptr->htext);
 			delete font;
+#ifdef UNICODE
+			/* FIXME: Maybe this should be in win.trm instead. */
+			LPWSTR wfontname = UnicodeText(fontname, lpgw->encoding);
+			font = SetFont_gdiplus(graphics, rect, lpgw, wfontname, size);
+			free(wfontname);
+#else
 			font = SetFont_gdiplus(graphics, rect, lpgw, fontname, size);
+#endif
 			LocalUnlock(curptr->htext);
 			/* recalculate shifting of rotated text */
 			hshift = - sin(M_PI/180. * lpgw->angle) * MulDiv(lpgw->vchar, rr-rl, lpgw->xmax) / 2;
