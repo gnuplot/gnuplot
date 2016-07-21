@@ -4,6 +4,7 @@
 	* src/graphics.c (plot_image_or_update_axes):  If this flag is set,
 	implement "plot ... with image pixels" using term->filled_polygon()
 	rather than term->fillbox().
+	* term/qt.trm: Set TERM_POLYGON_PIXELS to avoid aliasing artifacts.
 
 2016-07-19  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
