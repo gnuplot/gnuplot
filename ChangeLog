@@ -1,3 +1,10 @@
+2016-07-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term_api.h:  Define TERM_POLYGON_PIXELS.
+	* src/graphics.c (plot_image_or_update_axes):  If this flag is set,
+	implement "plot ... with image pixels" using term->filled_polygon()
+	rather than term->fillbox().
+
 2016-07-19  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* term/aquaterm.trm:  The AQUA_boxfill() routine scales very badly 

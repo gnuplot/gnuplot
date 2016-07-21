@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.29 2016/07/03 04:59:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.30 2016/07/05 20:47:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4835,7 +4835,8 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 				corners[0].style = FS_TRANSPARENT_SOLID + (alpha<<4);
 			}
 
-			if (rectangular_image && term->fillbox) {
+			if (rectangular_image && term->fillbox
+			&&  !(term->flags & TERM_POLYGON_PIXELS)) {
 			    /* Some terminals (canvas) can do filled rectangles */
 			    /* more efficiently than filled polygons. */
 			    (*term->fillbox)( corners[0].style,

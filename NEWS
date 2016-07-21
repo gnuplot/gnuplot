@@ -22,6 +22,7 @@ Changes in 5.0.4
 * FIX bad plot iteration with negative increment, e.g. plot for [i=9:1:-1] foo(i)
 * FIX smoothed curves could not be plotted as filledcurves; now they can be
 * FIX win terminal apply color to enhanced text
+* FIX aquaterm slow rendering of images with keyword "pixels"
 
 Changes in 5.0.3
 ================
