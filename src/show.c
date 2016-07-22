@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.363 2016/07/21 09:07:44 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.364 2016/07/21 19:22:51 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2761,11 +2761,8 @@ show_histogram()
 static void
 show_textbox()
 {
-	fprintf(stderr, "\ttextboxes are %s ",
-		textbox_opts.opaque ? "opaque" : "transparent");
-	fprintf(stderr, "with margins %4.1f, %4.1f  and %s border\n",
-		textbox_opts.xmargin, textbox_opts.ymargin,
-		textbox_opts.noborder ? "no" : "");
+    fprintf(stderr, "\ttextbox style");
+    save_style_textbox(stderr);
 }
 #endif
 

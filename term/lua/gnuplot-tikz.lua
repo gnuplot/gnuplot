@@ -37,7 +37,7 @@
 
 
 
-  $Date: 2015/12/30 04:33:25 $
+  $Date: 2015/12/31 21:03:49 $
   $Author: sfeam $
   $Rev: 100 $
 
@@ -80,8 +80,8 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
-pgf.REVISION = string.sub("$Rev: 100 $",7,-3)
-pgf.REVISION_DATE = string.gsub("$Date: 2015/12/30 04:33:25 $",
+pgf.REVISION = string.sub("$Rev: 102 $",7,-3)
+pgf.REVISION_DATE = string.gsub("$Date: 2016/07/22 21:03:49 $",
                                 "$Date: ([0-9]+).([0-9]+).([0-9]+) .*","%1/%2/%3")
 
 pgf.styles = {}
@@ -2303,7 +2303,10 @@ term.boxed_text = function(x, y, option)
       if (gfx.boxed_text_count > 0) then
 	 gp.write('\\node[')
 	 if (option == 'BACKGROUNDFILL') then
-	    gp.write('fill = gpbgfillcolor,')
+	    gp.write('fill={}, ')
+	    if gfx.opacity < 1.0 then
+		gp.write(string.format("opacity=%.2f, ", gfx.opacity))
+	    end
 	 else
 	    gfx.boxed_text = false
 	    gp.write('draw, gp path,')

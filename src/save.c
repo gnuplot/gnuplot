@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.304 2016/05/27 04:20:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.305 2016/07/09 17:15:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -593,10 +593,8 @@ save_set_all(FILE *fp)
 #endif
 
 #ifdef EAM_BOXED_TEXT
-    fprintf(fp, "set style textbox %s margins %4.1f, %4.1f %s\n",
-	    textbox_opts.opaque ? "opaque": "transparent",
-	    textbox_opts.xmargin, textbox_opts.ymargin,
-	    textbox_opts.noborder ? "noborder" : "border");
+    fprintf(fp, "set style textbox");
+    save_style_textbox(fp);
 #endif
 
     save_offsets(fp, "set offsets");
@@ -1217,6 +1215,27 @@ save_style_parallel(FILE *fp)
     save_linetype(fp, &(parallel_axis_style.lp_properties), FALSE);
     fprintf(fp, "\n");
 }
+
+#ifdef EAM_BOXED_TEXT
+void
+save_style_textbox(FILE *fp)
+{
+    fprintf(fp, " %s margins %4.1f, %4.1f",
+	    textbox_opts.opaque ? "opaque": "transparent",
+	    textbox_opts.xmargin, textbox_opts.ymargin);
+    if (textbox_opts.opaque) {
+	fprintf(fp, " fc ");
+	save_pm3dcolor(fp, &(textbox_opts.fillcolor));
+    }
+    if (textbox_opts.noborder) {
+	fprintf(fp, " noborder");
+    } else {
+	fprintf(fp, " border ");
+	save_pm3dcolor(fp, &(textbox_opts.border_color));
+    }
+    fputs("\n",fp);
+}
+#endif
 
 void
 save_position(FILE *fp, struct position *pos, int ndim, TBOOLEAN offset)

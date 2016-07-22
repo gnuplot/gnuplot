@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.93 2015/08/01 22:52:03 broeker Exp $
+ * $Id: pslatex.trm,v 1.94 2016/07/08 17:19:33 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -129,6 +129,7 @@ static int epslatex_text_layer = 0;
 /* Support for optimization of set_color */
 static t_colorspec tex_previous_colorspec = {-1, 0, 0.0};  /* Initialize to invalid type */
 static char tex_current_color[64];
+static char tex_rgb_colordef[64];
 static TBOOLEAN tex_color_synced = FALSE;
 
 /* support for cairolatex */
@@ -145,6 +146,7 @@ static TBOOLEAN PSLATEX_saved = FALSE;
 static int PSLATEX_xbox, PSLATEX_ybox;
 static double PSLATEX_xmargin = 1.0;
 static double PSLATEX_ymargin = 1.0;
+static double PSLATEX_opacity = 1.0;
 
 /* Common functions for epslatex and ps(la)tex */
 
@@ -543,6 +545,9 @@ EPSLATEX_common_init()
 \\usepackage{graphicx}\n\
 \\usepackage{color}\n", gpoutfile);
 
+	    if (ISCAIROTERMINAL)
+		fprintf(gpoutfile, "\\usepackage{transparent}\n");
+
             if (inputenc)
                 fprintf(gpoutfile, "\\usepackage[%s]{inputenc}\n", inputenc);
 
@@ -750,6 +755,7 @@ EPSLATEX_put_text(unsigned int x, unsigned int y, const char *str)
     if (gpoutfile) {
 	if (!tex_color_synced) {
 	    fputs(tex_current_color, gpoutfile);
+	    fputs("%%\n", gpoutfile);
 	    tex_color_synced = TRUE;
 	}
 	if (PSLATEX_inbox) {
@@ -868,12 +874,7 @@ EPSLATEX_set_color(t_colorspec *colorspec)
 	    return;
 	else
 	    memcpy(&tex_previous_colorspec, colorspec, sizeof(t_colorspec));
-#if (0)	/* Not correct for version 5 */
-        if (colorspec->type == TC_LT && !ps_params->color)
-            PS_linetype(colorspec->lt);
-        else
-#endif
-            PS_set_color(colorspec);
+	PS_set_color(colorspec);
     }
 
     /* Many [most? all?] of the set_color commands only affect the *.eps     */
@@ -887,7 +888,8 @@ EPSLATEX_set_color(t_colorspec *colorspec)
         double r = (double)((colorspec->lt >> 16 ) & 255) / 255.;
         double g = (double)((colorspec->lt >> 8 ) & 255) / 255.;
         double b = (double)(colorspec->lt & 255) / 255.;
-	sprintf(tex_current_color, "      \\colorrgb{%3.2f,%3.2f,%3.2f}%%\n",r,g,b);
+	sprintf(tex_current_color, "      \\colorrgb{%3.2f,%3.2f,%3.2f}",r,g,b);
+	sprintf(tex_rgb_colordef, "\\definecolor{tbcol}{rgb}{%3.2f,%3.2f,%3.2f}",r,g,b);
     }
 
     if (colorspec->type == TC_LT) {
@@ -897,8 +899,10 @@ EPSLATEX_set_color(t_colorspec *colorspec)
         else
             linetype = (linetype % 9) + 3;
 
-	sprintf(tex_current_color, "      \\csname LT%c\\endcsname%%\n",
+	sprintf(tex_current_color, "      \\csname LT%c\\endcsname",
                 "wba012345678"[linetype]);
+	/* FIXME */
+	sprintf(tex_rgb_colordef, "\\definecolor{tbcol}{rgb}{1,1,1}");
     }
 
     if (colorspec->type != TC_FRAC)
@@ -909,15 +913,16 @@ EPSLATEX_set_color(t_colorspec *colorspec)
 
     if (ps_params->blacktext) {
 	if (gray <= 0)
-	    sprintf(tex_current_color, "      \\color{black}%%\n");
+	    sprintf(tex_current_color, "      \\color{black}");
 	else if (gray >= 1)
-	    sprintf(tex_current_color, "      \\color{white}%%\n");
+	    sprintf(tex_current_color, "      \\color{white}");
         else
-	    sprintf(tex_current_color, "      \\colorgray{%s}%%\n",save_space(gray));
+	    sprintf(tex_current_color, "      \\colorgray{%s}",save_space(gray));
     } else {
 	rgb_color color;
 	rgb1_from_gray( colorspec->value, &color );
-	sprintf(tex_current_color, "      \\colorrgb{%3.2f,%3.2f,%3.2f}%%\n",color.r,color.g,color.b);
+	sprintf(tex_current_color, "      \\colorrgb{%3.2f,%3.2f,%3.2f}",color.r,color.g,color.b);
+	sprintf(tex_rgb_colordef, "\\definecolor{tbcol}{rgb}{%3.2f,%3.2f,%3.2f}",color.r,color.g,color.b);
     }
 }
 
@@ -1022,22 +1027,29 @@ EPSLATEX_boxed_text(unsigned int x, unsigned int y, int option)
 	PSLATEX_inbox = FALSE;
 	break;
     case TEXTBOX_BACKGROUNDFILL:
-	/* FIXME: should use background fill rather than white */
+	/* FIXME: should use current color rather than white */
+	if (!tex_color_synced) {
+	    /* FIXME: sync tex_current_color also? */
+	    fprintf(gpoutfile, "        %s\n", tex_rgb_colordef);
+	    tex_color_synced = TRUE;
+	}
 	/* FIXME: I have zero idea why CENTER requires r while RIGHT requires c */
 	fprintf(gpoutfile, "\t\\put(%d,%d)", PSLATEX_xbox, PSLATEX_ybox);
+if (ISCAIROTERMINAL)
 	switch (ps_justify) {
 	case LEFT:
-	    fprintf(gpoutfile, "{\\colorbox{white}{\\usebox{\\gptboxtext}}}\n");
+	    fputs("{", gpoutfile);
 	    break;
 	case CENTRE:
-	    fprintf(gpoutfile, "{\\makebox[0.5\\width][r]");
-	    fprintf(gpoutfile, "{\\colorbox{white}{\\usebox{\\gptboxtext}}}}\n");
+	    fputs("{\\makebox[0.5\\width][r]{", gpoutfile);
 	    break;
 	case RIGHT:
-	    fprintf(gpoutfile, "{\\makebox[-\\width][c]");
-	    fprintf(gpoutfile, "{\\colorbox{white}{\\usebox{\\gptboxtext}}}}\n");
+	    fputs("{\\makebox[-\\width][c]{", gpoutfile);
 	    break;
 	}
+	if (PSLATEX_opacity < 1.0)
+	    fprintf(gpoutfile,"\\transparent{%.2f}",PSLATEX_opacity);
+	fputs("\\colorbox{tbcol}{\\usebox{\\gptboxtext}}}}\n", gpoutfile);
 	break;
     case TEXTBOX_MARGINS:
 	PSLATEX_xmargin = (double)x / 100.;

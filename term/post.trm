@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.291 2016/01/01 00:12:25 sfeam Exp $
+ * $Id: post.trm,v 1.292 2016/05/15 22:18:22 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -389,7 +389,7 @@ NULL
 	       TBx2 TBxmargin add TBy2 TBymargin add L\n\
 	       TBx2 TBxmargin add TBy1 TBymargin sub L closepath } def\n\
 /DrawTextBox { PopTextBox stroke /Boxing false def} def\n\
-/FillTextBox { gsave PopTextBox 1 1 1 setrgbcolor fill grestore /Boxing false def} def\n\
+/FillTextBox { gsave PopTextBox fill grestore /Boxing false def} def\n\
 0 0 0 0 InitTextBox\n\
 /TBxmargin 20 def\n\
 /TBymargin 20 def\n\

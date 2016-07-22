@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.126 2016/05/06 18:32:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.127 2016/07/08 17:19:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -794,7 +794,9 @@ write_label(unsigned int x, unsigned int y, struct text_label *this_label)
 
 	    /* Blank out the box and reprint the label */
 	    if (textbox_opts.opaque) {
+		apply_pm3dcolor(&textbox_opts.fillcolor);
 		(*term->boxed_text)(0,0, TEXTBOX_BACKGROUNDFILL);
+		apply_pm3dcolor(&(this_label->textcolor));
 		if (this_label->rotate && (*term->text_angle) (this_label->rotate)) {
 		    write_multiline(x + htic, y + vtic, this_label->text,
 				this_label->pos, justify, this_label->rotate,
@@ -806,9 +808,11 @@ write_label(unsigned int x, unsigned int y, struct text_label *this_label)
 		}
 	    }
 
-	    /* Draw the bounding box - FIXME should set line properties first */
-	    if (!textbox_opts.noborder)
+	    /* Draw the bounding box */
+	    if (!textbox_opts.noborder) {
+		apply_pm3dcolor(&textbox_opts.border_color);
 		(*term->boxed_text)(0,0, TEXTBOX_OUTLINE);
+	    }
 
 	    (*term->boxed_text)(0,0, TEXTBOX_FINISH);
 	}

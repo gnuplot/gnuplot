@@ -300,8 +300,10 @@ typedef struct textbox_style {
     TBOOLEAN noborder;	/* True if you want fill only, no lines */
     double xmargin;	/* fraction of default margin to use */
     double ymargin;	/* fraction of default margin to use */
+    t_colorspec border_color;	/* TC_LT + LT_NODRAW is "noborder" */
+    t_colorspec fillcolor;	/* only used if opaque is TRUE */
 } textbox_style;
-#define DEFAULT_TEXTBOX_STYLE { FALSE, FALSE, 1.0, 1.0 }
+#define DEFAULT_TEXTBOX_STYLE { FALSE, FALSE, 1.0, 1.0, BLACK_COLORSPEC, BACKGROUND_COLORSPEC }
 #endif
 
 /***********************************************************/

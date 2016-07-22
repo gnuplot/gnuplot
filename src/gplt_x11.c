@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.252 2015/06/02 00:37:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.253 2016/06/12 17:45:38 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -2392,7 +2392,6 @@ exec_cmd(plot_struct *plot, char *command)
 			fill_gc = XCreateGC(dpy,plot->window,0,0);
 		    XCopyGC(dpy, *current_gc, ~0, fill_gc);
 		    XSetFillStyle(dpy, fill_gc, FillSolid);
-		    XSetForeground(dpy, fill_gc, plot->cmap->colors[0]);
 		    XFillRectangle(dpy, plot->pixmap, fill_gc, 
 			bb[0], bb[1], bb[2]-bb[0], bb[3]-bb[1]);
 		    /* boxing = FALSE; */

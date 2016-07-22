@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.999 2016/07/15 03:28:14 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1000 2016/07/15 04:11:27 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -11968,7 +11968,7 @@ Ffigure_multiple_keys
        set style histogram <histogram style options>
        set style line <n> <linestyle>
        set style rectangle <object options> <linestyle> <fillstyle>
-       set style textbox {opaque|transparent} {{no}border}
+       set style textbox {opaque|transparent} {{no}border} {fillcolor}
 
 4 set style arrow
 ?commands set style arrow
@@ -12503,10 +12503,14 @@ Ffigure_multiple_keys
 ?show style textbox
 ?textbox
 
- Syntax: set style textbox {opaque|transparent}{{no}border}
+ Syntax: set style textbox {opaque|transparent}{{no}border {<bordercolor>}}
+                           {fillcolor <color>}
+                           {margins <xmargin>,<ymargin>}
 
  This command controls the appearance of labels with the attribute 'boxed'.
  Terminal types that do not support boxed text will ignore this style.
+ Note: The current implementation is experimental; details may change.
+ Implementation for some terminals (svg, win) is incomplete.
 3 surface
 ?commands set surface
 ?commands unset surface

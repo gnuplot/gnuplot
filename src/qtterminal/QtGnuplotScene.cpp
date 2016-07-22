@@ -603,7 +603,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 			break;
 		case TEXTBOX_BACKGROUNDFILL:
 			/* Fill bounding box */
-			m_currentBrush.setColor(m_widget->backgroundColor());
+			m_currentBrush.setColor(m_currentPen.color());
 			m_currentBrush.setStyle(Qt::SolidPattern);
 			outline = m_currentTextBox.adjusted(
 				 -m_textMargin.x(), -m_textMargin.y(),

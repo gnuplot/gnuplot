@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.183 2015/07/09 01:40:56 sfeam Exp $
+ * $Id: gd.trm,v 1.184 2016/07/21 09:07:44 markisch Exp $
  */
 
 /* GNUPLOT -- gd.trm */
@@ -2209,13 +2209,13 @@ ENHGD_boxed_text(unsigned int x, unsigned int y, int option)
 		png_state.color);
 	break;
     case TEXTBOX_BACKGROUNDFILL:
-	/* Fill the box with background color. FIXME - other colors? */
+	/* Fill the box with current color. */
 	gdImageFilledRectangle(png_state.image,
 		bounding_box[0] - bounding_xmargin,
 		bounding_box[1] - bounding_ymargin,
 		bounding_box[2] + bounding_xmargin,
 		bounding_box[3] + bounding_ymargin,
-		png_state.color_table[0]);
+		png_state.color);
 	break;
     case TEXTBOX_MARGINS:
 	/* Change the text margins */

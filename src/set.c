@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.521 2016/06/01 04:03:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.522 2016/06/09 17:53:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4618,12 +4618,19 @@ set_style()
 		if (!equals(c_token++,",") || END_OF_COMMAND)
 		    break;
 		textbox_opts.ymargin = real(const_express(&a));
+	    } else if (almost_equals(c_token,"fillc$olor") || equals(c_token,"fc")) {
+		parse_colorspec(&textbox_opts.fillcolor, TC_RGB);
 	    } else if (almost_equals(c_token,"nobo$rder")) {
 		c_token++;
 		textbox_opts.noborder = TRUE;
-	    } else if (almost_equals(c_token,"bo$rder")) {
+		textbox_opts.border_color.type = TC_LT;
+		textbox_opts.border_color.lt = LT_NODRAW;
+	    } else if (almost_equals(c_token,"bo$rdercolor")) {
 		c_token++;
 		textbox_opts.noborder = FALSE;
+		if (equals(c_token,"lt"))
+		    c_token--;
+		parse_colorspec(&textbox_opts.border_color, TC_RGB);
 	    } else
 		int_error(c_token,"unrecognized option");
 	}

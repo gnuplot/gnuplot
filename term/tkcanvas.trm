@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: tkcanvas.trm,v 1.35 2016/03/07 06:32:11 markisch Exp $
+ * $Id: tkcanvas.trm,v 1.36 2016/06/13 21:22:45 sfeam Exp $
  *
  */
 
@@ -2085,7 +2085,7 @@ TK_boxed_text(unsigned int x, unsigned int y, int option)
 	tk_boxed = TRUE;
 	break;
     case TEXTBOX_BACKGROUNDFILL:
-	fprintf(gpoutfile, tk_box[tk_script_language], (tk_background[0] != NUL) ? tk_background : "white", "");
+	fprintf(gpoutfile, tk_box[tk_script_language], tk_color, "");
 	break;
     case TEXTBOX_GREY:
 	fprintf(gpoutfile, tk_box[tk_script_language], "grey75", "");

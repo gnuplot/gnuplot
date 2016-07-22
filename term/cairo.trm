@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.75 2015/07/13 17:54:44 sfeam Exp $
+ * $Id: cairo.trm,v 1.76 2016/03/03 19:57:44 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -1177,6 +1177,10 @@ void cairotrm_set_color(t_colorspec *colorspec)
 	} else return;
 
 	gp_cairo_set_color(&plot, rgb1, alpha);
+#if PSLATEX_DRIVER
+	/* Used by EPSLATEX_boxed_text */
+	PSLATEX_opacity = 1.0 - alpha;
+#endif
 }
 
 

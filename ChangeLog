@@ -1,3 +1,19 @@
+2016-07-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.c src/gadgets.h src/save.c src/save.h src/set.c
+	src/show.c docs/gnuplot.doc:
+	Bookkeeping and core code implementation of textbox fillcolor and
+	bordercolor. Note that transparency is possible if the fillcolor
+	contains an alpha component.
+
+	    set style textbox {noborder | border {<border_color}}
+	                      {fillcolor <fill_color>}
+
+	* src/qtterminal/QtGnuplotScene.cpp src/wxterminal/gp_cairo.c
+	term/cairo.trm term/gd.trm term/lua/gnuplot-tikz.lua term/post.trm
+	term/pslatex.trm term/tkcanvas.trm src/gplt_x11.c:
+	Textbox fillcolor support for individual terminals.
+
 2016-07-21  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	Enable UNICODE build on Windows.
