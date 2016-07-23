@@ -4615,9 +4615,13 @@ set_style()
 		    break;
 		}
 		textbox_opts.xmargin = real(const_express(&a));
+		if (textbox_opts.xmargin < 0)
+		    textbox_opts.xmargin = 0;
 		if (!equals(c_token++,",") || END_OF_COMMAND)
 		    break;
 		textbox_opts.ymargin = real(const_express(&a));
+		if (textbox_opts.ymargin < 0)
+		    textbox_opts.ymargin = 0;
 	    } else if (almost_equals(c_token,"fillc$olor") || equals(c_token,"fc")) {
 		parse_colorspec(&textbox_opts.fillcolor, TC_RGB);
 	    } else if (almost_equals(c_token,"nobo$rder")) {
