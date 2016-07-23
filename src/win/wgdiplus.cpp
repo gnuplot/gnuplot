@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.24 2016/07/21 07:35:52 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.25 2016/07/21 09:07:44 markisch Exp $
  */
 
 /*
@@ -395,7 +395,7 @@ SetFont_gdiplus(Graphics &graphics, LPRECT rect, LPGW lpgw, LPTSTR fontname, int
 	}
 
 	RectF box;
-	graphics.MeasureString(L"0123456789", 10, font, PointF(0, 0), &box);
+	graphics.MeasureString(L"0123456789", -1, font, PointF(0, 0), StringFormat::GenericTypographic(), &box);
 	// lpgw->vchar = MulDiv(box.Height, lpgw->ymax, rect->bottom - rect->top);
 	lpgw->vchar = MulDiv(fontHeight, lpgw->ymax, rect->bottom - rect->top);
 	lpgw->hchar = MulDiv(box.Width, lpgw->xmax, 10 * (rect->right - rect->left));
@@ -566,7 +566,7 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 
 	lpgw->angle = 0;
 	lpgw->justify = LEFT;
-	StringFormat stringFormat;
+	StringFormat stringFormat(StringFormat::GenericTypographic());
 	stringFormat.SetAlignment(StringAlignmentNear);
 	stringFormat.SetLineAlignment(StringAlignmentNear);
 	font = SetFont_gdiplus(graphics, rect, lpgw, NULL, 0);
@@ -1038,7 +1038,7 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 				break;
 			default:
 				break;
-			}			
+			}
 			break;
 #endif
 
