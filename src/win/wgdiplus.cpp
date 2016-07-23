@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.25 2016/07/21 09:07:44 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.26 2016/07/23 18:39:12 markisch Exp $
  */
 
 /*
@@ -983,14 +983,10 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 					}
 					rect.Offset(boxedtext.start.x, boxedtext.start.y);
 					if (boxedtext.option == TEXTBOX_OUTLINE) {
-						/* FIXME: Shouldn't we use the current color brush lpgw->hcolorbrush? */
-						Pen * pen = gdiplusCreatePen(PS_SOLID, line_width, RGB(0,0,0), 1.);
-						graphics.DrawRectangle(pen, rect);
-						delete pen;
+						graphics.DrawRectangle(&pen, rect);
 					} else {
-						/* Fill bounding box with background color. */
-						SolidBrush brush(gdiplusCreateColor(lpgw->background, 1.));
-						graphics.FillRectangle(&brush, rect);
+						/* Fill bounding box with current color. */
+						graphics.FillRectangle(&solid_brush, rect);
 					}
 				} else {
 					double theta = boxedtext.angle * M_PI/180.;
@@ -1021,11 +1017,9 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 					if (boxedtext.option == TEXTBOX_OUTLINE) {
 						rect[4].x = rect[0].x;
 						rect[4].y = rect[0].y;
-						Pen * pen = gdiplusCreatePen(PS_SOLID, line_width, RGB(0,0,0), 1.);
-						gdiplusPolyline(graphics, *pen, rect, 5);
-						delete pen;
+						gdiplusPolyline(graphics, pen, rect, 5);
 					} else {
-						gdiplusSolidFilledPolygonEx(hdc, rect, 4, lpgw->background, 1., TRUE);
+						gdiplusSolidFilledPolygonEx(hdc, rect, 4, last_color, alpha_c, TRUE);
 					}
 				}
 				boxedtext.boxing = FALSE;

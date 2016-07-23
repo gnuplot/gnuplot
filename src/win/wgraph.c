@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.206 2016/07/21 09:07:44 markisch Exp $
+ * $Id: wgraph.c,v 1.207 2016/07/21 19:22:51 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -2142,7 +2142,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					boxedtext.box.top - dy, boxedtext.box.bottom + dy,
 					boxedtext.angle);
 #endif
-				if ((boxedtext.angle % 90) == 0) {
+				if (((boxedtext.angle % 90) == 0) && (alpha_c == 1.)) {
 					RECT rect;
 
 					switch (boxedtext.angle) {
@@ -2176,11 +2176,10 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					rect.top    += boxedtext.start.y;
 					rect.bottom += boxedtext.start.y;
 					if (boxedtext.option == TEXTBOX_OUTLINE)
-						/* FIXME: Shouldn't we use the current color brush lpgw->hcolorbrush? */
-						FrameRect(hdc, &rect, GetStockBrush(BLACK_BRUSH));
+						FrameRect(hdc, &rect, lpgw->hcolorbrush);
 					else
-						/* Fill bounding box with background color. */
-						FillRect(hdc, &rect, lpgw->hbrush);
+						/* Fill bounding box with current color. */
+						FillRect(hdc, &rect, lpgw->hcolorbrush);
 				} else {
 					double theta = boxedtext.angle * M_PI/180.;
 					double sin_theta = sin(theta);
@@ -2208,7 +2207,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 						rect[i].y += boxedtext.start.y;
 					}
 #ifdef HAVE_GDIPLUS
-					if (!lpgw->antialiasing)
+					if (!lpgw->antialiasing && (alpha_c == 1.))
 #endif
 					{
 						HBRUSH save_brush;
@@ -2216,11 +2215,10 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 						if (boxedtext.option == TEXTBOX_OUTLINE) {
 							save_brush = SelectObject(hdc, GetStockBrush(NULL_BRUSH));
-							/* FIXME: Shouldn't we use the current color brush lpgw->hcolorbrush? */
-							save_pen = SelectObject(hdc, GetStockPen(BLACK_PEN));
+							save_pen = SelectObject(hdc, lpgw->hapen);
 						} else {
-							/* Fill bounding box with background color. */
-							save_brush = SelectObject(hdc, lpgw->hbrush);
+							/* Fill bounding box with current color. */
+							save_brush = SelectObject(hdc, lpgw->hcolorbrush);
 							save_pen = SelectObject(hdc, GetStockPen(NULL_PEN));
 						}
 						Polygon(hdc, rect, 4);
@@ -2232,9 +2230,9 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 						if (boxedtext.option == TEXTBOX_OUTLINE) {
 							rect[4].x = rect[0].x;
 							rect[4].y = rect[0].y;
-							gdiplusPolylineEx(hdc, rect, 5, PS_SOLID, line_width, RGB(0,0,0) /* last_color */, 1.);
+							gdiplusPolylineEx(hdc, rect, 5, PS_SOLID, line_width, last_color, alpha_c);
 						} else {
-							gdiplusSolidFilledPolygonEx(hdc, rect, 4, lpgw->background, 1., lpgw->polyaa);
+							gdiplusSolidFilledPolygonEx(hdc, rect, 4, last_color, alpha_c, lpgw->antialiasing);
 						}
 					}
 #endif
@@ -3928,7 +3926,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				/* track hypertexts */
 				track_tooltip(lpgw, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 				/* track (show) mouse position -- send the event to gnuplot */
-				Wnd_exec_event(lpgw, lParam,  GE_motion, wParam);
+				Wnd_exec_event(lpgw, lParam, GE_motion, wParam);
 				return 0L; /* end of WM_MOUSEMOVE */
 
 			case WM_LBUTTONDOWN: {

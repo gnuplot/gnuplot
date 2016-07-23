@@ -1,5 +1,9 @@
 2016-07-23  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgdiplus.cpp src/win/wgraph.c:  Textbox fillcolor and
+	bordercolor support for windows terminal.  Transparency works
+	except when using the GDI only variant with antialiasing disabled.
+
 	* src/win/wgdiplus.cpp:  Use StringFormat::GenericTypographic() to draw
 	text.  This reduces differences in text placement between GDI and GDI+
 	output.
