@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.68 2016/07/21 09:07:44 markisch Exp $
+ * $Id: wtext.c,v 1.69 2016/07/24 16:08:19 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -833,7 +833,7 @@ DoLine(LPTW lptw, HDC hdc, int xpos, int ypos, int x, int y, int count)
     BYTE attr;
 
     idx = 0;
-    if (y <= sb_length(&(lptw->ScreenBuffer))) {
+    if (y < sb_length(&(lptw->ScreenBuffer))) {
 	lb = sb_get(&(lptw->ScreenBuffer), y);
 	if (lb  == NULL)
 	   return;
@@ -842,7 +842,6 @@ DoLine(LPTW lptw, HDC hdc, int xpos, int ypos, int x, int y, int count)
 	lb_set_attr(lb, NOTEXT);
 	a = lb_subattr(lb, x + idx, count - idx);
     } else {
-	/* FIXME: actually, we could just do nothing in this case */
 	w = (LPWSTR) malloc(sizeof(WCHAR) * (count + 1));
 	a = (PBYTE) malloc(sizeof(PBYTE) * (count + 1));
 	wmemset(w, L' ', count);

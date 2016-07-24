@@ -10,6 +10,9 @@
 	(at least in the most common case).  Windows sizes in wgnuplot.ini are
 	(still) interpreted to be given in the default resolution of 96dpi.
 
+	* src/win/wtext.c (DoLine):  Fix off-by-one error which caused the
+	the area below the last line to contain garbage in some cases. 
+
 2016-07-23  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgdiplus.cpp src/win/wgraph.c:  Textbox fillcolor and
