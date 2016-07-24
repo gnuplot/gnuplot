@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.86 2016/05/08 12:54:36 markisch Exp $
+ * $Id: winmain.c,v 1.87 2016/07/21 09:07:44 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -420,7 +420,6 @@ main(int argc, char **argv)
     int i;
 #endif
 
-
 #ifndef WGP_CONSOLE
 # if defined( __MINGW32__) && !defined(_W64)
 #  define argc _argc
@@ -508,7 +507,7 @@ main(int argc, char **argv)
 	TEXT("last modified %hs\n") \
 	TEXT("%hs\n%hs, %hs and many others\n") \
 	TEXT("gnuplot home:     http://www.gnuplot.info\n"),
-        gnuplot_version, gnuplot_patchlevel,
+	gnuplot_version, gnuplot_patchlevel,
 	gnuplot_date,
 	gnuplot_copyright, authors[1], authors[0]);
     textwin.AboutText = (LPTSTR) realloc(textwin.AboutText, (_tcslen(textwin.AboutText) + 1) * sizeof(TCHAR));
@@ -551,12 +550,12 @@ main(int argc, char **argv)
      * (This is a copy of a code snippet from plot.c)
      */
     for (i = 1; i < argc; i++) {
-	    if (!_stricmp(argv[i], "/noend"))
-		    continue;
-	    if ((argv[i][0] != '-') || (argv[i][1] == 'e')) {
-		    interactive = FALSE;
-		    break;
-	    }
+	if (!_stricmp(argv[i], "/noend"))
+	    continue;
+	if ((argv[i][0] != '-') || (argv[i][1] == 'e')) {
+	    interactive = FALSE;
+	    break;
+	}
     }
     if (interactive)
 	ShowWindow(textwin.hWndParent, textwin.nCmdShow);
@@ -712,9 +711,7 @@ MyFPutS(const char *str, FILE *file)
 {
     if (isterm(file)) {
         TextPutS(&textwin, (char*) str);
-#ifndef WGP_CONSOLE
         TextMessage();
-#endif
         return (*str);  /* different from Borland library */
     }
     return fputs(str,file);
@@ -1251,8 +1248,8 @@ WinGetEncoding(UINT cp)
     enum set_encoding_id encoding;
 
     /* The code below is the inverse to the code found in UnicodeText().
-	For a list of code page identifiers see
-	http://msdn.microsoft.com/en-us/library/dd317756%28v=vs.85%29.aspx
+       For a list of code page identifiers see
+       http://msdn.microsoft.com/en-us/library/dd317756%28v=vs.85%29.aspx
     */
     switch (cp) {
     case 437:   encoding = S_ENC_CP437; break;
@@ -1329,6 +1326,19 @@ win_fopen(const char *filename, const char *mode)
     free(wfilename);
     free(wmode);
     return file;
-    return fopen(filename, mode);
 }
 #endif
+
+
+UINT
+GetDPI()
+{
+    HDC hdc_screen = GetDC(NULL);
+    if (hdc_screen) {
+	UINT dpi = GetDeviceCaps(hdc_screen, LOGPIXELSX);
+	ReleaseDC(NULL, hdc_screen);
+	return dpi;
+    } else {
+	return 96;
+    }
+}

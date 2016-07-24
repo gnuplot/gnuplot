@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.207 2016/07/21 19:22:51 markisch Exp $
+ * $Id: wgraph.c,v 1.208 2016/07/23 19:12:39 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -536,6 +536,9 @@ GraphInit(LPGW lpgw)
 			button.dwData = i;
 			ret = SendMessage(lpgw->hToolbar, TB_INSERTBUTTON, (WPARAM)num++, (LPARAM)&button);
 		}
+
+		/* silence compiler warning */
+		(void) ret;
 
 		/* auto-resize and show */
 		SendMessage(lpgw->hToolbar, TB_AUTOSIZE, (WPARAM)0, (LPARAM)0);
@@ -1578,7 +1581,6 @@ draw_image(LPGW lpgw, HDC hdc, char *image, POINT corners[4], unsigned int width
 {
 	BITMAPINFO bmi;
 	HRGN hrgn;
-	int rc;
 
 	if (image == NULL)
 		return;
@@ -1620,7 +1622,7 @@ draw_image(LPGW lpgw, HDC hdc, char *image, POINT corners[4], unsigned int width
 			dibimage = image;
 		}
 
-		rc = StretchDIBits(hdc,
+		StretchDIBits(hdc,
 			GPMIN(corners[0].x, corners[1].x) , GPMIN(corners[0].y, corners[1].y),
 			abs(corners[1].x - corners[0].x), abs(corners[1].y - corners[0].y),
 			0, 0, width, height,
@@ -1703,7 +1705,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	int polymax = 200;			/* size of ppt */
 	int polyi = 0;				/* number of points in ppt */
 	POINT *ppt;					/* storage of polyline/polygon-points */
-	unsigned int lastop=-1;		/* used for plotting last point on a line */
 
 	/* filled polygons and boxes */
 	unsigned int fillstyle = 0;	/* current fill style */
@@ -2935,7 +2936,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		} /* switch(opcode) */
 		} /* hide layer? */
 
-		lastop = curptr->op;
 		ngwop++;
 		curptr++;
 		if ((unsigned)(curptr - blkptr->gwop) >= GWOPMAX) {
@@ -3217,6 +3217,7 @@ WriteGraphIni(LPGW lpgw)
 	LPTSTR file = lpgw->IniFile;
 	LPTSTR section = lpgw->IniSection;
 	TCHAR profile[80];
+	UINT dpi;
 #ifdef WIN_CUSTOM_PENS
 	int i;
 #endif
@@ -3225,14 +3226,16 @@ WriteGraphIni(LPGW lpgw)
 		return;
 	if (IsIconic(lpgw->hWndGraph))
 		ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);
+	/* Rescale window size to 96dpi. */
 	GetWindowRect(lpgw->hWndGraph, &rect);
-	wsprintf(profile, TEXT("%d %d"), rect.left, rect.top);
+	dpi = GetDPI();
+	wsprintf(profile, TEXT("%d %d"), MulDiv(rect.left, 96, dpi), MulDiv(rect.top, 96, dpi));
 	WritePrivateProfileString(section, TEXT("GraphOrigin"), profile, file);
 	if (lpgw->Canvas.x != 0) {
-		wsprintf(profile, TEXT("%d %d"), lpgw->Canvas.x, lpgw->Canvas.y);
+		wsprintf(profile, TEXT("%d %d"), MulDiv(lpgw->Canvas.x, 96, dpi), MulDiv(lpgw->Canvas.y, 96, dpi));
 		WritePrivateProfileString(section, TEXT("GraphSize"), profile, file);
 	} else if (lpgw->Size.x != CW_USEDEFAULT) {
-		wsprintf(profile, TEXT("%d %d"), lpgw->Size.x - lpgw->Decoration.x, lpgw->Size.y - lpgw->Decoration.y);
+		wsprintf(profile, TEXT("%d %d"), MulDiv(lpgw->Size.x - lpgw->Decoration.x, 96, dpi), MulDiv(lpgw->Size.y - lpgw->Decoration.y, 96, dpi));
 		WritePrivateProfileString(section, TEXT("GraphSize"), profile, file);
 	}
 	wsprintf(profile, TEXT("%s,%d"), lpgw->deffontname, lpgw->deffontsize);
@@ -3306,6 +3309,7 @@ ReadGraphIni(LPGW lpgw)
 	LPTSTR p;
 	int r, g, b;
 	BOOL bOKINI;
+	UINT dpi;
 #ifdef WIN_CUSTOM_PENS
 	int i;
 	int colorstyle, monostyle;
@@ -3327,6 +3331,16 @@ ReadGraphIni(LPGW lpgw)
 		lpgw->Size.x = CW_USEDEFAULT;
 	if ((p = GetInt(p, (LPINT)&lpgw->Size.y)) == NULL)
 		lpgw->Size.y = CW_USEDEFAULT;
+	/* Saved size and origin are normalised to 96dpi. */
+	dpi = GetDPI();
+	if (lpgw->Origin.x != CW_USEDEFAULT)
+		lpgw->Origin.x = MulDiv(lpgw->Origin.x, dpi, 96);
+	if (lpgw->Origin.y != CW_USEDEFAULT)
+		lpgw->Origin.y = MulDiv(lpgw->Origin.y, dpi, 96);
+	if (lpgw->Size.x != CW_USEDEFAULT)
+		lpgw->Size.x = MulDiv(lpgw->Size.x, dpi, 96);
+	if (lpgw->Size.y != CW_USEDEFAULT)
+		lpgw->Size.y = MulDiv(lpgw->Size.y, dpi, 96);
 	if ((lpgw->Size.x != CW_USEDEFAULT) && (lpgw->Size.y != CW_USEDEFAULT)) {
 		lpgw->Canvas.x = lpgw->Size.x;
 		lpgw->Canvas.y = lpgw->Size.y;
@@ -4789,6 +4803,7 @@ Graph_set_ruler (LPGW lpgw, int x, int y )
 	DrawRuler(lpgw); /* draw ruler at new positions */
 	DrawRulerLineTo(lpgw);
 }
+
 
 /* put_tmptext(int i, char c[]) term API
  * 	i: 0..at statusline

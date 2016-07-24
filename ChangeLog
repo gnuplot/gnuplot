@@ -1,3 +1,15 @@
+2016-07-24  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgnuplot.exe.manifest src/win/wgnuplot.exe.manifest64
+	src/win/wgraph.c src/win/winmain.c|h src/win/wtext.c:
+	Windows scales gnuplot's windows according to the monitor's scaling
+	factor.  This in turn may be based on the monitor's DPI or explicit
+	user setting.  In consequence gnuplot's text window and output look
+	blurred e.g. on high-resolution screens.  This changeset makes gnuplot
+	(system) DPI aware so that Windows no longer scales automatically
+	(at least in the most common case).  Windows sizes in wgnuplot.ini are
+	(still) interpreted to be given in the default resolution of 96dpi.
+
 2016-07-23  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgdiplus.cpp src/win/wgraph.c:  Textbox fillcolor and

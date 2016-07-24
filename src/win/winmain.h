@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.h,v 1.16 2016/05/06 10:22:53 markisch Exp $
+ * $Id: winmain.h,v 1.17 2016/07/21 09:07:44 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.h */
@@ -78,8 +78,10 @@ enum set_encoding_id WinGetEncoding(UINT cp);
 LPWSTR UnicodeText(LPCSTR str, enum set_encoding_id encoding);
 LPSTR AnsiText(LPCWSTR strw,  enum set_encoding_id encoding);
 
-int ConsoleReadCh();
+int ConsoleReadCh(void);
 DWORD WINAPI stdin_pipe_reader(LPVOID param);
+
+UINT GetDPI(void);
 
 #ifdef __cplusplus
 }

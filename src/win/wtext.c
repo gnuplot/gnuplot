@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.67 2016/07/05 16:00:56 markisch Exp $
+ * $Id: wtext.c,v 1.68 2016/07/21 09:07:44 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -672,7 +672,7 @@ TextPutChW(LPTW lptw, WCHAR ch)
 	case '\t': {
 	    uint tab = 8 - (lptw->CursorPos.x  % 8);
 	    lb_set_attr(sb_get_last(&(lptw->ScreenBuffer)), lptw->Attr);
-	    sb_last_insert_str(&(lptw->ScreenBuffer), lptw->CursorPos.x, L"        ", tab);
+	    sb_last_insert_str(&(lptw->ScreenBuffer), lptw->CursorPos.x, L"         ", tab);
 	    UpdateText(lptw, tab);
 	    if (lptw->bSuspend == 0) {
 		UpdateScrollBars(lptw);
@@ -2221,6 +2221,7 @@ WriteTextIni(LPTW lptw)
     LPTSTR section = lptw->IniSection;
     TCHAR profile[80];
     int iconic;
+    UINT dpi;
 
     if ((file == NULL) || (section == NULL))
 	return;
@@ -2228,10 +2229,12 @@ WriteTextIni(LPTW lptw)
     iconic = IsIconic(lptw->hWndParent);
     if (iconic)
 	ShowWindow(lptw->hWndParent, SW_SHOWNORMAL);
-    GetWindowRect(lptw->hWndParent,&rect);
-    wsprintf(profile, TEXT("%d %d"), rect.left, rect.top);
+    /* Rescale window size to 96dpi. */
+    GetWindowRect(lptw->hWndParent, &rect);
+    dpi = GetDPI();
+    wsprintf(profile, TEXT("%d %d"), MulDiv(rect.left, 96, dpi), MulDiv(rect.top, 96, dpi));
     WritePrivateProfileString(section, TEXT("TextOrigin"), profile, file);
-    wsprintf(profile, TEXT("%d %d"), rect.right-rect.left, rect.bottom-rect.top);
+    wsprintf(profile, TEXT("%d %d"), MulDiv(rect.right-rect.left, 96, dpi), MulDiv(rect.bottom-rect.top, 96, dpi));
     WritePrivateProfileString(section, TEXT("TextSize"), profile, file);
     wsprintf(profile, TEXT("%d"), iconic);
     WritePrivateProfileString(section, TEXT("TextMinimized"), profile, file);
@@ -2269,6 +2272,7 @@ ReadTextIni(LPTW lptw)
     TCHAR profile[81];
     LPTSTR p;
     BOOL bOKINI;
+    UINT dpi;
 
     bOKINI = (file != NULL) && (section != NULL);
     profile[0] = NUL;
@@ -2285,6 +2289,16 @@ ReadTextIni(LPTW lptw)
 	lptw->Size.x = CW_USEDEFAULT;
     if ((p = GetInt(p, (LPINT)&lptw->Size.y)) == NULL)
 	lptw->Size.y = CW_USEDEFAULT;
+    /* Saved size and position are normalised to 96dpi. */
+    dpi = GetDPI();
+    if (lptw->Origin.x != CW_USEDEFAULT)
+	lptw->Origin.x = MulDiv(lptw->Origin.x, dpi, 96);
+    if (lptw->Origin.y != CW_USEDEFAULT)
+	lptw->Origin.y = MulDiv(lptw->Origin.y, dpi, 96);
+    if (lptw->Size.x != CW_USEDEFAULT)
+	lptw->Size.x = MulDiv(lptw->Size.x, dpi, 96);
+    if (lptw->Size.y != CW_USEDEFAULT)
+	lptw->Size.y = MulDiv(lptw->Size.y, dpi, 96);
 
     if (bOKINI)
 	GetPrivateProfileString(section, TEXT("TextFont"), TEXT(""), profile, 80, file);
