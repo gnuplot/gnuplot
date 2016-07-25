@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.209 2016/07/24 16:08:19 markisch Exp $
+ * $Id: wgraph.c,v 1.210 2016/07/25 10:07:28 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -476,16 +476,25 @@ GraphInit(LPGW lpgw)
 		BOOL ret;
 		TCHAR buttontext[10];
 		unsigned num = 0;
+		UINT dpi = GetDPI();
+		TBADDBITMAP bitmap = {0};
 
-		SendMessage(lpgw->hToolbar, TB_SETBITMAPSIZE, (WPARAM)0, (LPARAM)((16<<16) + 16));
+		if (dpi > 96)
+			SendMessage(lpgw->hToolbar, TB_SETBITMAPSIZE, (WPARAM)0, (LPARAM)((24<<16) + 24));
+		else
+			SendMessage(lpgw->hToolbar, TB_SETBITMAPSIZE, (WPARAM)0, (LPARAM)((16<<16) + 16));
+
 		/* load standard toolbar icons: standard, history & view */
-		SendMessage(lpgw->hToolbar, TB_LOADIMAGES, (WPARAM)IDB_STD_SMALL_COLOR, (LPARAM)HINST_COMMCTRL);
-		SendMessage(lpgw->hToolbar, TB_LOADIMAGES, (WPARAM)IDB_HIST_SMALL_COLOR, (LPARAM)HINST_COMMCTRL);
-		SendMessage(lpgw->hToolbar, TB_LOADIMAGES, (WPARAM)IDB_VIEW_SMALL_COLOR, (LPARAM)HINST_COMMCTRL);
+		SendMessage(lpgw->hToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
+		bitmap.hInst = HINST_COMMCTRL;
+		bitmap.nID = (dpi > 96)  ? IDB_STD_LARGE_COLOR : IDB_STD_SMALL_COLOR;
+		SendMessage(lpgw->hToolbar, TB_ADDBITMAP, 0, (WPARAM)&bitmap);
+		bitmap.nID = (dpi > 96)  ? IDB_HIST_LARGE_COLOR : IDB_HIST_SMALL_COLOR;
+		SendMessage(lpgw->hToolbar, TB_ADDBITMAP, 0, (WPARAM)&bitmap);
+		bitmap.nID = (dpi > 96)  ? IDB_VIEW_LARGE_COLOR : IDB_VIEW_SMALL_COLOR;
+		SendMessage(lpgw->hToolbar, TB_ADDBITMAP, 0, (WPARAM)&bitmap);
 
 		/* create buttons */
-		SendMessage(lpgw->hToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
-
 		ZeroMemory(&button, sizeof(button));
 		button.fsState = TBSTATE_ENABLED;
 		button.fsStyle = BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_NOPREFIX;

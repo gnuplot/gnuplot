@@ -1,5 +1,10 @@
 2016-07-25  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgraph.c src/win/wmenu.c:  Use the "large" icon set for the
+	toolbar if the nominal resolution is larger than 96dpi.  Use
+	TB_ADDBUTTON instead of TB_LOADIMAGES as this somehow eliminates
+	another major resource leak.
+
 	* src/win/wgraph.c (drawgraph) src/win/wgdiplus.cpp(drawgraph_gdiplus):
 	Missing cleanup of cached point symbols caused a sizeable resource
 	leak. Bugfix.
@@ -9,15 +14,15 @@
 	* src/win/wgnuplot.exe.manifest src/win/wgnuplot.exe.manifest64
 	src/win/wgraph.c src/win/winmain.c|h src/win/wtext.c:
 	Windows scales gnuplot's windows according to the monitor's scaling
-	factor.  This in turn may be based on the monitor's DPI or explicit
-	user setting.  In consequence gnuplot's text window and output look
+	factor.  This in turn may be based on the monitor's DPI or an explicit
+	user setting.  In consequence gnuplot's text window and plot output look
 	blurred e.g. on high-resolution screens.  This changeset makes gnuplot
 	(system) DPI aware so that Windows no longer scales automatically
-	(at least in the most common case).  Windows sizes in wgnuplot.ini are
+	(at least in the most common case).  Window sizes in wgnuplot.ini are
 	(still) interpreted to be given in the default resolution of 96dpi.
 
 	* src/win/wtext.c (DoLine):  Fix off-by-one error which caused the
-	the area below the last line to contain garbage in some cases. 
+	area below the last line to contain garbage in some cases. 
 
 2016-07-23  Bastian Maerkisch  <bmaerkisch@web.de>
 

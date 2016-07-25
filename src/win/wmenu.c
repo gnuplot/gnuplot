@@ -1,5 +1,5 @@
 /*
- * $Id: wmenu.c,v 1.30 2016/05/21 06:28:04 markisch Exp $Id: wmenu.c,v 1.30 2016/05/21 06:28:04 markisch Exp $
+ * $Id: wmenu.c,v 1.31 2016/05/23 14:22:21 markisch Exp $Id: wmenu.c,v 1.31 2016/05/23 14:22:21 markisch Exp $
  */
 
 /* GNUPLOT - win/wmenu.c */
@@ -534,6 +534,8 @@ LoadMacros(LPTW lptw)
     RECT rect;
     char *ButtonText[BUTTONMAX];
     int ButtonIcon[BUTTONMAX];
+    UINT dpi = GetDPI();
+    TBADDBITMAP bitmap = {0};
 
     lpmw = lptw->lpmw;
 
@@ -719,14 +721,22 @@ LoadMacros(LPTW lptw)
 
     /* set size of toolbar icons */
     /* lparam is (height<<16 + width) / default 16,15 */
-    SendMessage(lpmw->hToolbar, TB_SETBITMAPSIZE, (WPARAM)0, (LPARAM)((16 << 16) + 16));
+    if (dpi <= 96)
+	SendMessage(lpmw->hToolbar, TB_SETBITMAPSIZE, (WPARAM)0, (LPARAM)((24<<16) + 24));
+    else
+	SendMessage(lpmw->hToolbar, TB_SETBITMAPSIZE, (WPARAM)0, (LPARAM)((16<<16) + 16));
+
     /* load standard toolbar icons: standard, history & view */
-    SendMessage(lpmw->hToolbar, TB_LOADIMAGES, (WPARAM)IDB_STD_SMALL_COLOR, (LPARAM)HINST_COMMCTRL);
-    SendMessage(lpmw->hToolbar, TB_LOADIMAGES, (WPARAM)IDB_HIST_SMALL_COLOR, (LPARAM)HINST_COMMCTRL);
-    SendMessage(lpmw->hToolbar, TB_LOADIMAGES, (WPARAM)IDB_VIEW_SMALL_COLOR, (LPARAM)HINST_COMMCTRL);
+    SendMessage(lpmw->hToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
+    bitmap.hInst = HINST_COMMCTRL;
+    bitmap.nID = (dpi > 96)  ? IDB_STD_LARGE_COLOR : IDB_STD_SMALL_COLOR;
+    SendMessage(lpmw->hToolbar, TB_ADDBITMAP, 0, (WPARAM)&bitmap);
+    bitmap.nID = (dpi > 96)  ? IDB_HIST_LARGE_COLOR : IDB_HIST_SMALL_COLOR;
+    SendMessage(lpmw->hToolbar, TB_ADDBITMAP, 0, (WPARAM)&bitmap);
+    bitmap.nID = (dpi > 96)  ? IDB_VIEW_LARGE_COLOR : IDB_VIEW_SMALL_COLOR;
+    SendMessage(lpmw->hToolbar, TB_ADDBITMAP, 0, (WPARAM)&bitmap);
 
     /* create buttons */
-    SendMessage(lpmw->hToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
     for (i = 0; i < lpmw->nButton; i++) {
 	TBBUTTON button;
 	ZeroMemory(&button, sizeof(button));
