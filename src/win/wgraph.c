@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.208 2016/07/23 19:12:39 markisch Exp $
+ * $Id: wgraph.c,v 1.209 2016/07/24 16:08:19 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -561,7 +561,7 @@ GraphInit(LPGW lpgw)
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->color ? MF_CHECKED : MF_UNCHECKED),
 		M_COLOR, TEXT("C&olor"));
 	//AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->doublebuffer ? MF_CHECKED : MF_UNCHECKED),
-	//	M_DOUBLEBUFFER, "&Double buffer");
+	//	M_DOUBLEBUFFER, TEXT("&Double buffer"));
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->oversample ? MF_CHECKED : MF_UNCHECKED),
 		M_OVERSAMPLE, TEXT("O&versampling"));
 #ifdef HAVE_GDIPLUS
@@ -829,6 +829,7 @@ DestroyPens(LPGW lpgw)
 	int i;
 
 	DeleteObject(lpgw->hbrush);
+	DeleteObject(lpgw->hnull);
 	DeleteObject(lpgw->hapen);
 	DeleteObject(lpgw->hsolid);
 	for (i = 0; i < WGNUMPENS + 2; i++)
@@ -2952,6 +2953,14 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				return;
 			curptr = (struct GWOP *)blkptr->gwop;
 		}
+	} /* while (ngwop < lpgw->nGWOP) */
+
+	/* cleanup */
+	if (ps_caching && (cb_memdc != NULL)) {
+		SelectObject(cb_memdc, cb_old_bmp);
+		DeleteObject(cb_membmp);
+		DeleteDC(cb_memdc);
+		cb_memdc = NULL;
 	}
 	LocalFreePtr(ppt);
 }
@@ -4787,6 +4796,7 @@ Graph_set_cursor(LPGW lpgw, int c, int x, int y)
 		ruler_lineto.on = FALSE;
 	}
 }
+
 
 /* set_ruler(int x, int y) term API: x<0 switches ruler off. */
 void

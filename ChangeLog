@@ -1,3 +1,9 @@
+2016-07-25  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c (drawgraph) src/win/wgdiplus.cpp(drawgraph_gdiplus):
+	Missing cleanup of cached point symbols caused a sizeable resource
+	leak. Bugfix.
+
 2016-07-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgnuplot.exe.manifest src/win/wgnuplot.exe.manifest64

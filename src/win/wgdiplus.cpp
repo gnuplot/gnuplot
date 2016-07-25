@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.26 2016/07/23 18:39:12 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.27 2016/07/23 19:12:39 markisch Exp $
  */
 
 /*
@@ -470,7 +470,7 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 #endif
 
 	/* point symbols */
-	int last_symbol = 0;
+	unsigned last_symbol = 0;
 	CachedBitmap *cb = NULL;
 	POINT cb_ofs;
 	bool ps_caching = false;
@@ -1263,7 +1263,7 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 		case W_filled_polygon_draw: {
 			bool found = false;
 			int i, k;
-			bool same_rot = true;
+			//bool same_rot = true;
 
 			// Test if successive polygons share a common edge:
 			if ((last_poly != NULL) && (polyi > 2)) {
@@ -1274,14 +1274,14 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 							if ((ppt[(i + 1) % polyi].x == last_poly[(k + 1) % last_polyi].x) &&
 							    (ppt[(i + 1) % polyi].y == last_poly[(k + 1) % last_polyi].y)) {
 								//found = true;
-								same_rot = true;
+								//same_rot = true;
 							}
 							// This is the dominant case for filling between curves,
 							// see fillbetween.dem and polar.dem.
 							if ((ppt[(i + 1) % polyi].x == last_poly[(k + last_polyi - 1) % last_polyi].x) &&
 							    (ppt[(i + 1) % polyi].y == last_poly[(k + last_polyi - 1) % last_polyi].y)) {
 								found = true;
-								same_rot = false;
+								//same_rot = false;
 							}
 						}
 					}
@@ -1548,7 +1548,12 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 				break;
 			curptr = (struct GWOP *)blkptr->gwop;
 		}
-	}
-	if (pattern_brush) delete pattern_brush;
+	} /* while (ngwop < lpgw->nGWOP) */
+
+	/* clean-up */
+	if (pattern_brush)
+		delete pattern_brush;
+	if (cb)
+		delete cb;
 	LocalFreePtr(ppt);
 }
