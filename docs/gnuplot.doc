@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.57 2016/06/18 00:16:24 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.58 2016/07/06 04:43:57 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -12279,8 +12279,8 @@ Ffigure_missing
       set termoption {no}enhanced
       set termoption font "<fontname>{,<fontsize>}"
       set termoption fontscale <scale>
-      set termoption {solid|dashed}
       set termoption {linewidth <lw>}{lw <lw>}
+      set termoption {dashed|solid}         # not generally relevant in verion 5
 
 3 tics
 ?commands set tics
