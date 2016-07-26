@@ -1,3 +1,9 @@
+2016-07-26  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* win/gnuplot.iss:  Enforce inclusion of directory and program group
+	pages since the default changed in Inno setup version 5.5.7.
+	Bug #1831
+
 2016-07-25  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c src/win/wmenu.c:  Use the "large" icon set for the
@@ -20,6 +26,7 @@
 	(system) DPI aware so that Windows no longer scales automatically
 	(at least in the most common case).  Window sizes in wgnuplot.ini are
 	(still) interpreted to be given in the default resolution of 96dpi.
+	See also bug #1807.
 
 	* src/win/wtext.c (DoLine):  Fix off-by-one error which caused the
 	area below the last line to contain garbage in some cases. 
