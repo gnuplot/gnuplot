@@ -2,7 +2,8 @@
 # Test page for enhanced text mode in UTF-8 encoding
 #
 # Suggested PostScript font test
-# set term post color fontfile /usr/local/fonts/'l_10646.ttf' font "LucidaSansUnicode,12"
+# set fontpath "/usr/local/share/fonts"
+# set term post color adobeglyphnames fontfile 'l_10646.ttf' font "LucidaSansUnicode,12"
 # set output 'enhanced_utf8.ps'
 #
 set termoption enhanced
