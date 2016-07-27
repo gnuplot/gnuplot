@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.210 2016/07/25 10:07:28 markisch Exp $
+ * $Id: wgraph.c,v 1.211 2016/07/25 10:31:33 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -978,7 +978,7 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 		IsWindowsXPorLater() && lpgw->antialiasing ? CLEARTYPE_QUALITY : PROOF_QUALITY;
 
 	if (!TryCreateFont(lpgw, NULL, hdc)) {
-		static const char warn_font_not_available[] = 
+		static const char warn_font_not_available[] =
 			"Warning:  font \"" TCHARFMT "\" not available, trying \"" TCHARFMT "\" instead.\n";
 		static const char err_giving_up[] = "Error:  could not substitute another font. Giving up.\n";
 		if (_tcscmp(lpgw->fontname, lpgw->deffontname) != 0) {
@@ -1627,7 +1627,6 @@ draw_image(LPGW lpgw, HDC hdc, char *image, POINT corners[4], unsigned int width
 					p[0] = p[1] = p[2] = luma;
 				}
 			}
-
 		} else {
 			dibimage = image;
 		}
@@ -2982,31 +2981,27 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 static void
 SaveAsEMF(LPGW lpgw)
 {
-    char *cwd;
-    static OPENFILENAME Ofn;
-    static TCHAR lpstrCustomFilter[256] = { '\0' };
-    static TCHAR lpstrFileName[MAX_PATH] = { '\0' };
-    static TCHAR lpstrFileTitle[MAX_PATH] = { '\0' };
-    HWND hwnd = lpgw->hWndGraph;
+	static OPENFILENAME Ofn;
+	static TCHAR lpstrCustomFilter[256] = { '\0' };
+	static TCHAR lpstrFileName[MAX_PATH] = { '\0' };
+	static TCHAR lpstrFileTitle[MAX_PATH] = { '\0' };
+	HWND hwnd = lpgw->hWndGraph;
 
-    Ofn.lStructSize = sizeof(OPENFILENAME);
-    Ofn.hwndOwner = hwnd;
-    Ofn.lpstrInitialDir = NULL;
-    Ofn.lpstrFilter = TEXT("Enhanced Metafile (*.EMF)\0*.EMF\0All Files (*.*)\0*.*\0");
-    Ofn.lpstrCustomFilter = lpstrCustomFilter;
-    Ofn.nMaxCustFilter = 255;
-    Ofn.nFilterIndex = 1;   /* start with the *.emf filter */
-    Ofn.lpstrFile = lpstrFileName;
-    Ofn.nMaxFile = MAX_PATH;
-    Ofn.lpstrFileTitle = lpstrFileTitle;
-    Ofn.nMaxFileTitle = MAX_PATH;
-    Ofn.lpstrInitialDir = NULL;
-    Ofn.lpstrTitle = NULL;
-    Ofn.Flags = OFN_OVERWRITEPROMPT;
-    Ofn.lpstrDefExt = TEXT("emf");
-
-    /* save cwd as GetSaveFileName apparently changes it */
-    cwd = _getcwd(NULL, 0);
+	Ofn.lStructSize = sizeof(OPENFILENAME);
+	Ofn.hwndOwner = hwnd;
+	Ofn.lpstrInitialDir = NULL;
+	Ofn.lpstrFilter = TEXT("Enhanced Metafile (*.EMF)\0*.EMF\0All Files (*.*)\0*.*\0");
+	Ofn.lpstrCustomFilter = lpstrCustomFilter;
+	Ofn.nMaxCustFilter = 255;
+	Ofn.nFilterIndex = 1;   /* start with the *.emf filter */
+	Ofn.lpstrFile = lpstrFileName;
+	Ofn.nMaxFile = MAX_PATH;
+	Ofn.lpstrFileTitle = lpstrFileTitle;
+	Ofn.nMaxFileTitle = MAX_PATH;
+	Ofn.lpstrInitialDir = NULL;
+	Ofn.lpstrTitle = NULL;
+	Ofn.Flags = OFN_OVERWRITEPROMPT | OFN_NOREADONLYRETURN | OFN_NOCHANGEDIR;
+	Ofn.lpstrDefExt = TEXT("emf");
 
 	if (GetSaveFileName(&Ofn) != 0) {
 		RECT rect, mfrect;
@@ -3033,15 +3028,9 @@ SaveAsEMF(LPGW lpgw)
 
 		DeleteEnhMetaFile(hemf);
 		ReleaseDC(hwnd, hdc);
-
-		/* restore cwd */
-		if (cwd != NULL)
-			_chdir( cwd );
-    }
-
-    /* free the cwd buffer allcoated by _getcwd */
-    free(cwd);
+	}
 }
+
 
 /* ================================== */
 
@@ -3164,7 +3153,6 @@ CopyPrint(LPGW lpgw)
 
 	GlobalUnlock(pd.hDevMode);
 	GlobalUnlock(pd.hDevNames);
-
 	/* We no longer free these structures, but preserve them for the next time
 	GlobalFree(pd.hDevMode);
 	GlobalFree(pd.hDevNames);
@@ -3173,9 +3161,7 @@ CopyPrint(LPGW lpgw)
 	if (printer == NULL)
 		return;	/* abort */
 
-
 	/* Print Size Dialog */
-
 	if (!PrintSize(printer, hwnd, &rect)) {
 		DeleteDC(printer);
 		return; /* abort */

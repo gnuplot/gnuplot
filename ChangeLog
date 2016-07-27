@@ -1,3 +1,9 @@
+2016-07-27  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph (SaveAsEMF):  Tweak flags for GetSaveFileName() to make
+	sure that the file/path is not read-only and to preserve the current
+	working directory.
+
 2016-07-26  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* win/gnuplot.iss:  Enforce inclusion of directory and program group
