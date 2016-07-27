@@ -17,6 +17,7 @@ Changes not in 5.0
 * NEW 'set term svg standalone' embeds images rather than including by reference
 * NEW 'set table OUTFILE {append}'
 * NEW gnuplot on Windows is system DPI aware
+* NEW windows terminal supports saving graph as bitmap
 * CHANGE Revise placement of axis labels in 3D plots
 * CHANGE Track font/enhanced for key title separately from the key entries
 * CHANGE order of margins in `set margins <left>, <right>, <bottom>, <top>`

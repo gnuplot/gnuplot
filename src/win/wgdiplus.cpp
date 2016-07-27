@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.27 2016/07/23 19:12:39 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.28 2016/07/25 10:07:28 markisch Exp $
  */
 
 /*
@@ -34,6 +34,7 @@ extern "C" {
 #include <windowsx.h>
 #define GDIPVER 0x0110
 #include <gdiplus.h>
+#include <iostream>
 
 #include <tchar.h>
 #include <wchar.h>
@@ -42,6 +43,7 @@ extern "C" {
 #include "winmain.h"
 #include "wcommon.h"
 using namespace Gdiplus;
+using namespace std;
 
 static bool gdiplusInitialized = false;
 static ULONG_PTR gdiplusToken;
@@ -1556,4 +1558,105 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 	if (cb)
 		delete cb;
 	LocalFreePtr(ppt);
+}
+
+
+UINT nImageCodecs = 0; // number of image encoders
+ImageCodecInfo * pImageCodecInfo = NULL;  // list of image encoders
+
+
+static int
+gdiplusGetEncoders()
+{
+	UINT num = 0;
+	UINT size = 0;
+
+	GetImageEncodersSize(&nImageCodecs, &size);
+	if (size == 0)
+		return -1;
+	pImageCodecInfo = (ImageCodecInfo *) malloc(size);
+	if (pImageCodecInfo == NULL)
+		return -1;
+	GetImageEncoders(nImageCodecs, size, pImageCodecInfo);
+	return num;
+}
+
+
+void
+SaveAsBitmap(LPGW lpgw)
+{
+	static OPENFILENAMEW Ofn;
+	static WCHAR lpstrCustomFilter[256] = { '\0' };
+	static WCHAR lpstrFileName[MAX_PATH] = { '\0' };
+	static WCHAR lpstrFileTitle[MAX_PATH] = { '\0' };
+	UINT i;
+
+	/* ask GDI+ about supported encoders */
+	if (pImageCodecInfo == NULL)
+		if (gdiplusGetEncoders() < 0)
+			cerr << "Error:  GDI+ could not retrieve the list of encoders" << endl;
+#if 0
+	for (i = 0; i < nImageCodecs; i++) {
+		char * descr = AnsiText(pImageCodecInfo[i].FormatDescription, S_ENC_DEFAULT);
+		char * ext = AnsiText(pImageCodecInfo[i].FilenameExtension, S_ENC_DEFAULT);
+		cerr << i << ": " << descr << " " << ext << endl;
+		free(descr);
+		free(ext);
+	}
+#endif
+
+	// assemble filter list
+	UINT npng = 1;
+	size_t len;
+	for (i = 0, len = 1; i < nImageCodecs; i++) {
+		len += wcslen(pImageCodecInfo[i].FormatDescription) + wcslen(pImageCodecInfo[i].FilenameExtension) + 2;
+		// make PNG the default selection
+		if (wcsnicmp(pImageCodecInfo[i].FormatDescription, L"PNG", 3) == 0)
+			npng = i + 1;
+	}
+	LPWSTR filter = (LPWSTR) malloc(len * sizeof(WCHAR));
+	swprintf(filter, L"%ls\t%ls\t", pImageCodecInfo[0].FormatDescription, pImageCodecInfo[0].FilenameExtension);
+	for (i = 1; i < nImageCodecs; i++) {
+		LPWSTR type = (LPWSTR) malloc((wcslen(pImageCodecInfo[i].FormatDescription) + wcslen(pImageCodecInfo[i].FilenameExtension) + 3) * sizeof(WCHAR));
+		swprintf(type, L"%ls\t%ls\t", pImageCodecInfo[i].FormatDescription, pImageCodecInfo[i].FilenameExtension);
+		wcscat(filter, type);
+		free(type);
+	}
+	for (i = 1; i < len; i++) {
+		if (filter[i] == TEXT('\t'))
+			filter[i] = TEXT('\0');
+	}
+
+	// init save file dialog parameters
+	Ofn.lStructSize = sizeof(OPENFILENAME);
+	Ofn.hwndOwner = lpgw->hWndGraph;
+	Ofn.lpstrInitialDir = NULL;
+	Ofn.lpstrFilter = filter;
+	Ofn.lpstrCustomFilter = lpstrCustomFilter;
+	Ofn.nMaxCustFilter = 255;
+	Ofn.nFilterIndex = npng;
+	Ofn.lpstrFile = lpstrFileName;
+	Ofn.nMaxFile = MAX_PATH;
+	Ofn.lpstrFileTitle = lpstrFileTitle;
+	Ofn.nMaxFileTitle = MAX_PATH;
+	Ofn.lpstrInitialDir = NULL;
+	Ofn.lpstrTitle = NULL;
+	Ofn.Flags = OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR | OFN_NOREADONLYRETURN;
+	Ofn.lpstrDefExt = L"png";
+
+	if (GetSaveFileNameW(&Ofn) != 0) {
+		Bitmap * bitmap = Bitmap::FromHBITMAP(lpgw->hBitmap, 0);
+		UINT ntype = Ofn.nFilterIndex - 1;
+#if 0
+		LPWSTR wtype = pImageCodecInfo[ntype].FormatDescription;
+		char * type = AnsiText(wtype, S_ENC_DEFAULT);
+		SizeF size;
+		bitmap->GetPhysicalDimension(&size);
+		cerr << endl << "Saving bitmap: size: " << size.Width << " x " << size.Height << "  type: " << type << " ..." << endl;
+		free(type);
+#endif
+		bitmap->Save(Ofn.lpstrFile, &(pImageCodecInfo[ntype].Clsid), NULL);
+		delete bitmap;
+	}
+	free(filter);
 }

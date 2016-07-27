@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.211 2016/07/25 10:31:33 markisch Exp $
+ * $Id: wgraph.c,v 1.212 2016/07/27 19:29:15 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -562,6 +562,7 @@ GraphInit(LPGW lpgw)
 	/* actions */
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_COPY_CLIP, TEXT("&Copy to Clipboard (Ctrl+C)"));
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_SAVE_AS_EMF, TEXT("&Save as EMF... (Ctrl+S)"));
+	AppendMenu(lpgw->hPopMenu, MF_STRING, M_SAVE_AS_BITMAP, TEXT("S&ave as Bitmap..."));
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_PRINT, TEXT("&Print..."));
 	/* settings */
 	AppendMenu(lpgw->hPopMenu, MF_SEPARATOR, 0, NULL);
@@ -4061,6 +4062,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				case M_CHOOSE_FONT:
 				case M_COPY_CLIP:
 				case M_SAVE_AS_EMF:
+				case M_SAVE_AS_BITMAP:
 				case M_LINESTYLE:
 				case M_BACKGROUND:
 				case M_PRINT:
@@ -4303,6 +4305,11 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				case M_SAVE_AS_EMF:
 					SaveAsEMF(lpgw);
 					return 0;
+				case M_SAVE_AS_BITMAP:
+#ifdef HAVE_GDIPLUS
+					SaveAsBitmap(lpgw);
+#endif
+					return 0;
 #ifdef WIN_CUSTOM_PENS
 				case M_LINESTYLE:
 					if (LineStyle(lpgw))
@@ -4352,6 +4359,11 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					} else {
 						CheckMenuItem(lpgw->hPopMenu, M_GDIPLUS, MF_BYCOMMAND | MF_UNCHECKED);
 						EnableMenuItem(lpgw->hPopMenu, M_PATTERNAA, MF_BYCOMMAND | MF_ENABLED);
+					}
+					if (lpgw->gdiplus && lpgw->doublebuffer) {
+						EnableMenuItem(lpgw->hPopMenu, M_SAVE_AS_BITMAP, MF_BYCOMMAND | MF_ENABLED);
+					} else {
+						EnableMenuItem(lpgw->hPopMenu, M_SAVE_AS_BITMAP, MF_BYCOMMAND | MF_DISABLED);
 					}
 					if (lpgw->antialiasing)
 						CheckMenuItem(lpgw->hPopMenu, M_ANTIALIASING, MF_BYCOMMAND | MF_CHECKED);

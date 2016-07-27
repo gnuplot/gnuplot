@@ -1,6 +1,11 @@
 2016-07-27  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/win/wgraph (SaveAsEMF):  Tweak flags for GetSaveFileName() to make
+	* src/win/wgraph.c src/win/wgdiplus.cpp|h src/win/wresourc.h:  Add an
+	option to the menu to save the current graph as bitmap.  Supports all
+	encoders available to GDI+.  On my system that is (TIFF, JPEG, GIF, PNG,
+	and BMP).  Defaults to PNG.
+
+	* src/win/wgraph.c (SaveAsEMF):  Tweak flags for GetSaveFileName() to make
 	sure that the file/path is not read-only and to preserve the current
 	working directory.
 
