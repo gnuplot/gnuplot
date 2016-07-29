@@ -1,3 +1,9 @@
+2016-07-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c:  "splot ... with dots" was accidentally broken by the
+	addition of multibyte PT_CHARACTER support.  This was a regression from
+	released versions of 5.0.
+
 2016-07-27  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c src/win/wgdiplus.cpp|h src/win/wresourc.h:  Add an
