@@ -4,15 +4,14 @@ set xrange [ -0.50 : 12.00 ]
 set yrange [ 30.00 : 110.0 ]
 unset ylabel
 set bmargin  3
-set key autotitle columnhead
 unset key
 
 set multiplot layout 1,2
 
 set style textbox opaque border lc "blue"
 set title "textboxes with blue border"
-plot 'table.dat' using 0:2 title col with lines lw 3,  \
-     ''          using 0:2:2 with labels center boxed notitle
+plot 'table.dat' using 0:2 title column with lines lw 3,  \
+     ''          using 0:2:2 with labels center boxed notitle column
 
 set style textbox opaque margins 6,1.5 fc "grey75" border lc black
 set title "larger textboxes with grey fill"
