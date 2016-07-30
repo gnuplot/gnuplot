@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.58 2016/07/06 04:43:57 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.59 2016/07/26 19:50:48 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -340,6 +340,19 @@ C
        plot 'file' using 1:(f(column(2)))
        call 'script' 1.23 "ABC"
           (in script:  print ARG1, ARG2, "number of args = ", ARGC
+2 Demos and Online Examples
+?demos
+?online examples
+?examples
+ The `gnuplot` distribution contains a collection of examples in the `demo`
+ directory. You can browse on-line versions of these examples produced by the
+ png, svg, and canvas terminals at
+^ <a href="http://gnuplot.info/demos/">
+   http://gnuplot.info/demos
+^ </a>
+ The commands that produced each demo plot are shown next to the plot, and
+ the corresponding gnuplot script can be downloaded to serve as a model for
+ generating similar plots.
 
 2 Batch/Interactive Operation
 ?batch/interactive
@@ -2684,11 +2697,23 @@ Ffigure_newsyntax
 2 Plotting
 ?plotting
  There are four `gnuplot` commands which actually create a plot: `plot`,
- `splot`, `replot`, and `refresh`.  `plot` generates 2D plots, `splot` generates
- 3D plots (actually 2D projections, of course), and `replot` appends its
- arguments to the previous `plot` or `splot` and executes the modified
- command.  `refresh` reexecutes the previous `plot` or `splot` command using
- previously stored data rather than rereading data from a file.
+ `splot`, `replot`, and `refresh`.  Other commands control the layout, style,
+ and content of the plot that will eventually be created.
+ `plot` generates 2D plots. `splot` generates 3D plots (actually 2D projections,
+ of course). `replot` reexecutes the previous `plot` or `splot` command.
+ `refresh` is similar to `replot` but it reuses any previously stored data
+ rather than rereading data from a file or input stream.
+
+=multiplot
+=inset
+=subfigures
+ Each time you issue one of these four commands it will redraw the screen or
+ generate a new page of output containing all of the currently defined axes,
+ labels, titles, and all of the various functions or data sources listed in the
+ original plot command. If instead you need to place several complete plots next
+ to each other on the same page, e.g. to make a panel of sub-figures or to inset
+ a small plot inside a larger plot, use the command `set multiplot` to suppress
+ generation of a new page for each plot command.
 
  Much of the general information about plotting can be found in the discussion
  of `plot`; information specific to 3D can be found in the `splot` section.
@@ -4289,8 +4314,8 @@ Ffigure_mapcontours
 ?commands clear
 ?clear
  The `clear` command erases the current screen or output device as specified
- by `set output`.  This usually generates a formfeed on hardcopy devices.  Use
- `set terminal` to set the device type.
+ by `set terminal` and `set output`.  This usually generates a formfeed on
+ hardcopy devices.
 
  For some terminals `clear` erases only the portion of the plotting surface
  defined by `set size`, so for these it can be used in conjunction with `set
@@ -6299,7 +6324,6 @@ Ffigure_mapcontours
  Note that the use of "\t", "\n", or "\f" requires use of double-quotes
  rather than single-quotes.
 5 using_examples
-?examples
 ?commands plot datafile using examples
 ?plot datafile using examples
 ?datafile using examples
@@ -10134,7 +10158,7 @@ Ffigure_missing
 ?nomultiplot
 ?layout
  The command `set multiplot` places `gnuplot` in the multiplot mode, in which
- several plots are placed on the same page, window, or screen.
+ several plots are placed next to each other on the same page or screen window.
 
  Syntax:
        set multiplot
@@ -10153,8 +10177,10 @@ Ffigure_missing
  to its normal single-plot mode.  For other terminals, each separate `plot`
  command produces an updated display.
 
+=inset
  The `clear` command is used to erase the rectangular area of the page that will
- be used for the next plot.  This is typically needed for "inset" plots.
+ be used for the next plot.  This is typically needed to inset a small plot
+ inside a larger plot.
 
  Any labels or arrows that have been defined will be drawn for each plot
  according to the current size and origin (unless their coordinates are
