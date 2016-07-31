@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.292.2.10 2015/08/01 05:19:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.292.2.11 2016/07/31 12:39:47 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -916,9 +916,14 @@ history_command()
 	if (line_to_do == NULL)
 	    int_error(c_token, "not in history");
 
-	/* Add the command to the history.
-	   Note that history commands themselves are no longer added to the history. */
-	add_history((char *) line_to_do);
+	/* Replace current entry "history !..." in history list	*/
+	/* with the command we found by searching.		*/
+#if defined(HAVE_LIBREADLINE)
+	free(replace_history_entry(history_length-1, line_to_do, NULL)->line);
+#elif defined(READLINE)
+	free(history->line);
+	history->line = (char *) line_to_do;
+#endif
 
 	printf("  Executing:\n\t%s\n", line_to_do);
 	do_string(line_to_do);
