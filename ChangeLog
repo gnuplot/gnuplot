@@ -1,3 +1,9 @@
+2016-07-31  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/wxterminal/wxt_gui.cpp:  Handle errors when creating a cairo
+	surface.
+	Bug #1621
+
 2016-07-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term_api.h:  Define TERM_POLYGON_PIXELS.
