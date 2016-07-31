@@ -1,4 +1,4 @@
-# $Id: README.win-ja,v 1.6 2011-02-25 11:39:16+09 shige Exp $
+# $Id: README.win-ja,v 1.8 2012-03-09 16:12:29+09 shige Exp $
 # a Japanized kit of wgnuplot
 # Shigeharu TAKENO <shige@iee.niit.ac.jp>
 #
@@ -19,9 +19,9 @@ Shigeharu TAKENO <shige@iee.niit.ac.jp>
   (HTML help 形式)
 [d] README.win-ja:   このファイル (MS-Windows ユーザへの説明書)
 
-なお、[b],[c] はバイナリファイルで、[a],[d] は日本語テキストファ
-イルですが、漢字コードは Shift_JIS になっています。必要ならば適当
-に変換してご利用ください。
+なお、[b],[c] はバイナリファイルで、[a],[d] は日本語テキ
+ストファイルですが、漢字コードは Shift_JIS になっています。必要な
+らば適当に変換してご利用ください。
 
 他のファイル (主に Unix ユーザへの説明書) に関しては、README.ja 
 をご覧ください。
@@ -33,6 +33,11 @@ Shigeharu TAKENO <shige@iee.niit.ac.jp>
 
 gnuplot のマニュアル日本語訳を PDF や PS、LaTeX などの他のフォー
 マットの形式に変換したファイルもそこに置いてあります。
+
+なお、最新の MS-Windows 用の gnuplot は、インストーラによるインス
+トール形式になっていて、それで日本語を選択した場合は、この日本語
+化キットは必要なく、自動的にメニュー、ヘルプは日本語が使えるよう
+になります。
 
 
 2. インストール
@@ -67,44 +72,41 @@ MS-Windows 用の gnuplot は、必要ならば gnuplot の公式ホームページ
 ます。書かれていることと実体の機能のずれを気にしなければ、gnuplot
 のバージョンが多少違っても、ほぼ問題なく利用できると思います。
 
-オリジナルサイトの gnuplot バイナリの場合は、bin/ 以下に実行バイ
-ナリや英語版のヘルプファイルやメニューファイルが含まれていると思
-います。
-
-できれば、オリジナルのヘルプファイル (wgnuplot.hlp, または 
-wgnuplot.chm) とメニューファイル (wgnuplot.mnu) を名前を変えて保
-存しておくといいでしょう。
-
-> cd bin
-> copy wgnuplot.mnu wgnuplot-en.mnu
-> copy wgnuplot.hlp wgnuplot-en.hlp
-
-または
-
-> copy wgnuplot.chm wgnuplot-en.chm
-
 
 [2] 日本語化キットのコピー
 
-wgnuplot-ja.mnu と wgnuplot-ja.hlp または wgnuplot-ja.chm を元々
-の wgnuplot.mnu, wgnuplot.hlp または wgnuplot.chm の代わりにコピ
-ーします。
+以前は、ヘルプファイルとメニューファイルの名前を変更する必要があ
+りましたが、現在の (CVS 版) wgnuplot では、順に
+
+・wgnuplot.ini の HelpFile, MenuFile を探す
+・日本語環境であれば wgnuplot-ja.chm, wgnuplot-ja.mnu を探す
+・wgnuplot.chm, wgnuplot.mnu を探す
+
+のように検索するようになっていますので、オリジナルの (英語版の)
+wgnuplot.chm, wgnuplot.mnu が置かれているのと同じ場所に
+wgnuplot-ja.chm, wgnuplot-ja.mnu (必要ならば wgnuplot-ja.hlp も)
+をコピーしてください。
 
 なお、環境変数を利用して日本語のヘルプファイルと英語のヘルプファ
 イルを共存させて切替えることも可能です。それに関してはヘルプファ
 イルを参照してください。
 
-ヘルプファイルは、wgnuplot は wgnuplot.hlp か wgnuplot.chm のどち
-らか一方のみを使用しますが、どちらを使用するかはコンパイル時に決
-定されています。多分、[1] の段階でどちらか一方のみが付属している
-と思いますが、それが使用されるヘルプファイルです。心配ならば両方
-をコピーして構いません。
+ヘルプファイルは、wgnuplot は .hlp か .chm のどちらか一方の形式の
+みを使用しますが、どちらを使用するかはコンパイル時に決定されてい
+ます。多分、[1] の段階でどちらか一方のみが付属していると思います
+が、それが使用されるヘルプファイルです。心配ならば両方をコピーし
+て構いません。
+
 
 [3] wgnuplot のフォントの設定
 
+現在の wgnuplot (CVS 版) では、日本語環境の場合はデフォルトで日本
+語が出るように設定されていると思いますが、出ない場合、あるいはフ
+ォントを変えたい場合は、以下のようにしてください。
+
 (1) まず wgnuplot を起動します。wgnuplot.ini がまだない場合 (過去
 に wgnuplot の設定を行なったことがない場合)、でたらめな文字が並ん
-だ状態のウィンドウが立ち上がると思います。
+だ状態になっているかもしれません。
 
 (2) その立ち上がったウィンドウでマウスの右クリックを行ない、
 「Choose Font」を選択し、適切な日本語フォントを設定します。
@@ -116,9 +118,12 @@ wgnuplot.ini」を選択し、wgnuplot.ini を更新します。これで、画面に
 
 [4] Window terminal のフォント設定
 
-次はグラフ画面のフォント設定を行ないます。これにより、グラフ画面
-に日本語も表示できるようになります。[3] の wgnuplot の起動画面に
-表示されている gnuplot プロンプト
+現在の wgnuplot (CVS 版) では、日本語環境の場合はデフォルトでグラ
+フウィンドウでも日本語が出るように設定されていると思いますが、出
+ない場合、あるいはフォントを変えたい場合は、以下のようにしてくだ
+さい。
+
+[3] の wgnuplot の起動画面に表示されている gnuplot プロンプト
 
  gnuplot>
 
@@ -151,14 +156,9 @@ wgnuplot.ini」を行なうのですが、このまま普通にマウス右クリックす
  gnuplot> set title '日本語も表示できます'
  gnuplot> plot cos(x)
 
-としてみてください。なお、gnuplot プロンプト入力時には正しく日本
-語が表示されないかもしれませんが、入力後に入力画面をリフレッシュ
-すると表示されます。グラフ画面にもそれで一応日本語が表示されると
-思います。
-
-もし、日本語がうまく出ない場合は、日本語フォントの設定や上記の作
-業手順、または gnuplot バイナリのバージョン等を確認してみてくださ
-い。
+としてみてください。もし、日本語がうまく出ない場合は、日本語フォ
+ントの設定や上記の作業手順、または gnuplot バイナリのバージョン等
+を確認してみてください。
 
 また、[2] によって既に起動画面のメニュー等は日本語で表示されてい
 ると思いますが、一応そのサブメニュー等の日本語表示も確認しておい
@@ -259,7 +259,7 @@ http://ayapin.film.s.dendai.ac.jp/cgi-bin/trees.cgi
 
 に Unix 環境での例が書かれていますが、MS-Windows でも
 
- set title 'これは十勝です' font "Ryumin-Light-83pv-RKSJ-H,32"
+ set title 'これは十勝です' font "Ryumin-Light-90ms-RKSJ-H,32"
  set terminal postscript eps
  set output "kanji.eps"
  plot sin(x) w l

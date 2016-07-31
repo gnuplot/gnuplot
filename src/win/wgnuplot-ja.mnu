@@ -4,7 +4,7 @@
 ; Modified for 4.0, John Bollinger, 31 Dec 2002
 ; translated by Masahito Yamaga (ma@yama-ga.com) (for 3.7.2)
 ; translated by Shigeharu TAKENO 03/25 2006 (for 4.1)
-; $Id: wgnuplot-ja.mnu,v 1.4 2014/12/23 12:25:24 broeker Exp $
+; $Id: wgp410-sj.mnu,v 1.8 2016-07-29 19:34:49+09 shige Exp $
 
 [Menu]
 ファイル(&F)
@@ -74,7 +74,7 @@
 [EndMenu]
 
 [Menu]
-プロット(&P)
+描画命令(&P)
 	プロット (plot)
 		plot 
 	3次元プロット (splot)
@@ -102,13 +102,13 @@
 	スタイル (単一)
 		線 (Lines)
 			with lines
-		ポイント (Points)
+		記号点 (Points)
 			with points
-		線とポイント (Lines and Points)
+		線と記号点 (Lines and Points)
 			with linespoints
-		垂線 (Impulses)
+		鉛直線 (Impulses)
 			with impulses
-		ドット (Dots)
+		小さい点 (Dots)
 			with dots
 		ステップ (Steps)
 			with steps
@@ -151,8 +151,8 @@
 [EndMenu]
 
 [Menu]
-表現(&E)
-	変数
+数式(&E)
+	変数値
 		print 
 	複素数 ...
 		{[INPUT]Real part?[EOS],[INPUT]Imaginary part?[EOS]}
@@ -471,23 +471,23 @@
 	軸のラベルを表示
 		show xlabel{ENTER}show ylabel{ENTER}show zlabel{ENTER}
 	--
-	X 軸をひかない
+	X 軸を書かない
 		unset xzeroaxis{ENTER}
-	Y 軸をひかない
+	Y 軸を書かない
 		unset yzeroaxis{ENTER}
-	X,Y 両軸をひく
+	X,Y 両軸を書く
 		set zeroaxis{ENTER}
 	軸の状態を表示
 		show zeroaxis{ENTER}
 [EndMenu]
 
 [Menu]
-チャート(&C)
-	グリッドを表示する
+グラフ要素(&C)
+	格子線 (grid) を表示する
 		set grid{ENTER}
-	グリッドを表示しない
+	格子線 (grid) を表示しない
 		unset grid{ENTER}
-	グリッドの状態を表示
+	格子線 (grid) の状態を表示
 		show grid{ENTER}
 	--
 	矢印を追加
@@ -509,13 +509,13 @@
 	タイトルを表示
 		show title{ENTER}
 	--
-	凡例の位置を設定
+	凡例 (key) の位置を設定
 		set key [INPUT]Key position?{ENTER}
-	凡例の位置をデフォルトに
+	凡例 (key) の位置をデフォルトに
 		set key{ENTER}
-	凡例を表示しない
+	凡例 (key) を表示しない
 		unset key{ENTER}
-	凡例の位置を表示
+	凡例 (key) の位置を表示
 		show key{ENTER}
 	--
 	オフセットを設定
@@ -537,13 +537,13 @@
 	データの表示スタイル
 	線 (Lines)
 		set style data lines{ENTER}
-	ポイント (Points)
+	記号点 (Points)
 		set style data points{ENTER}
-	線とポイント (Lines + Points)
+	線と記号点 (Lines + Points)
 		set style data linespoints{ENTER}
-	ドット (Dots)
+	小さい点 (Dots)
 		set style data dots{ENTER}
-	垂線 (Impulses)
+	鉛直線 (Impulses)
 		set style data impulses{ENTER}
 	--
 	エラーバー (Error Bars)
@@ -567,13 +567,13 @@
 	関数の表示スタイル
 	線 (Lines)
 		set style function lines{ENTER}
-	ポイント (Points)
+	記号点 (Points)
 		set style function points{ENTER}
-	線とポイント (Lines + Points)
+	線と記号点 (Lines + Points)
 		set style function linespoints{ENTER}
-	ドット (Dots)
+	小さい点 (Dots)
 		set style function dots{ENTER}
-	垂線 (Impulses)
+	鉛直線 (Impulses)
 		set style function impulses{ENTER}
 	--
 	エラーバー (Error Bars)
@@ -594,8 +594,8 @@
 		unset style function{ENTER}
 	--
 	[Menu]
-	矢の表示スタイル
-	矢先 (Head)
+	矢 (arrow) の表示スタイル
+	片矢先 (Head)
 		set style arrow [INPUT]Arrow number?[EOS] head{ENTER}
 	両矢先 (Heads)
 		set style arrow [INPUT]Arrow number?[EOS] heads{ENTER}
@@ -635,7 +635,7 @@
 		set style pointtype [INPUT]Point Type?{ENTER}
 	点の大きさ (Point Size)
 		set style pointsize [INPUT]Point Size?{ENTER}
-;	色 (Palette)
+;	3 次元描画用の色 (Palette)
 ;		set style line{ENTER}
 	[EndMenu]
 	線、点のスタイルの表示
@@ -650,15 +650,15 @@
 	等高線
 		直線で描画
 			set cntrparam linear{ENTER}
-		曲線で描画
+		3 次スプライン補間で描画
 			set cntrparam cubicspline{ENTER}
-		B-spline 補間で描画
+		B スプライン補間で描画
 			set cntrparam bspline{ENTER}
 		等高線の数
 			set cntrparam levels [INPUT]How many contours?{ENTER}
 		補間する点の数
 			set cntrparam points [INPUT]How many points for the contours?{ENTER}
-		B-spline 補間の次数
+		B スプライン補間の次数
 			set cntrparam order [INPUT]Order of B-splines (2-10)?{ENTER}
 		--
 		床に等高線を表示する

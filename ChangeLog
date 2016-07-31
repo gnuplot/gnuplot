@@ -1,3 +1,8 @@
+2016-07-31  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* src/win/wgnuplot-ja.mnu src/win/README.win-ja:  Update Japanese
+	menu translations and help text.
+
 2016-07-31  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/wxterminal/wxt_gui.cpp:  Handle errors when creating a cairo
