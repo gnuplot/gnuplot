@@ -23,11 +23,15 @@
 	commands '!' and after pipe symbols '<', '|'.
 	Bug #1747
 
-	* src/command.c (history_command):  The `history !` command replaced
-	the last command in the history list by the search result.  That used
-	to be the history command itself, but since 2016-03-31 history
-	commands are no longer stored in the history.  Now simply re-add
-	the search result to the history.  Bug fix.
+	* src/readline.c:  The return value of the *_getch() functions should
+	be int, not char, in order to avoid confusion between EOF (-1) and
+	(char)0xff.
+	Bug 1558
+
+	* src/qtterminal/qtconversion.cpp:  Avoid use of isnan() in C++ code.
+	The C++11 standard has it as a function in the std namespace, whereas
+	older compilers provude it as a macro or as ::isnan(). Use (var != var)
+	instead.
 
 2016-07-21  Ethan A Merritt  <merritt@u.washington.edu>
 
