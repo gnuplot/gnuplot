@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.16.2.5 2016/03/22 16:48:33 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.16.2.6 2016/07/15 04:19:24 sfeam Exp $
  */
 
 /*
@@ -1551,6 +1551,10 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 	if (polyi >= 2) {
 		gdiplusPolyline(graphics, pen, ppt, polyi);
 	}
-	if (pattern_brush) delete pattern_brush;
+	/* clean-up */
+	if (pattern_brush)
+		delete pattern_brush;
+	if (cb)
+		delete cb;
 	LocalFreePtr(ppt);
 }

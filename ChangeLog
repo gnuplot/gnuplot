@@ -5,6 +5,10 @@
 
 2016-07-31  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgraph.c (drawgraph) src/win/wgdiplus.cpp(drawgraph_gdiplus):
+	Missing cleanup of cached point symbols caused a sizeable resource
+	leak. Bugfix.
+
 	* win/gnuplot.iss:  Enforce inclusion of directory and program group
 	pages since the default changed in Inno setup version 5.5.7.
 	Bug #1831

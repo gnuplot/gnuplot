@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.189.2.9 2016/03/22 16:48:33 markisch Exp $
+ * $Id: wgraph.c,v 1.189.2.10 2016/03/22 17:10:03 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -3006,7 +3006,14 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 #endif
 			Polyline(hdc, ppt, polyi);
 	}
-    LocalFreePtr(ppt);
+	/* cleanup */
+	if (ps_caching && (cb_memdc != NULL)) {
+		SelectObject(cb_memdc, cb_old_bmp);
+		DeleteObject(cb_membmp);
+		DeleteDC(cb_memdc);
+		cb_memdc = NULL;
+	}
+	LocalFreePtr(ppt);
 }
 
 /* ================================== */
