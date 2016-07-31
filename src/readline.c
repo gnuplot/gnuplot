@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.62 2014/05/09 22:14:12 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.62.2.1 2016/07/31 12:32:22 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -248,11 +248,11 @@ static int ansi_getc __PROTO((void));
 #  define TEXTGNUPLOT 0xf0
 #  ifdef WGP_CONSOLE
 #   define special_getc() win_getch()
-static char win_getch __PROTO((void));
+static int win_getch(void);
 #  else
 #   define special_getc() msdos_getch()
 #  endif /* WGP_CONSOLE */
-static char msdos_getch __PROTO((void));	/* HBB 980308: PROTO'ed it */
+static int msdos_getch(void);
 #  define DEL_ERASES_CURRENT_CHAR
 # endif				/* _Windows */
 
@@ -265,7 +265,7 @@ static char msdos_getch __PROTO((void));	/* HBB 980308: PROTO'ed it */
 #   include <conio.h>
 #  endif			/* __EMX__ */
 #  define special_getc() msdos_getch()
-static char msdos_getch();
+static int msdos_getch();
 #  define DEL_ERASES_CURRENT_CHAR
 # endif				/* MSDOS */
 
@@ -276,8 +276,8 @@ static char msdos_getch();
 #  undef special_getc()
 # endif				/* special_getc */
 # define special_getc() os2_getch()
-static char msdos_getch __PROTO((void));	/* HBB 980308: PROTO'ed it */
-static char os2_getch __PROTO((void));
+static int msdos_getch(void);
+static int os2_getch(void);
 #  define DEL_ERASES_CURRENT_CHAR
 #endif /* OS2 */
 
@@ -1133,7 +1133,7 @@ ansi_getc()
 #if defined(MSDOS) || defined(_Windows) || defined(OS2)
 
 #ifdef WGP_CONSOLE
-static char
+static int
 win_getch()
 {
     if (term && term->waitforinput)
@@ -1144,7 +1144,7 @@ win_getch()
 #endif
 
 /* Convert Arrow keystrokes to Control characters: */
-static char
+static int
 msdos_getch()
 {
 	char c;
@@ -1216,7 +1216,7 @@ msdos_getch()
 #ifdef OS2
 /* We need to call different procedures, dependent on the
    session type: VIO/window or an (XFree86) xterm */
-static char
+static int
 os2_getch() {
   static int IsXterm = 0;
   static int init = 0;
