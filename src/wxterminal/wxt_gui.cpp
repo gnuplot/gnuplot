@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.154 2016/02/11 14:06:27 markisch Exp $
+ * $Id: wxt_gui.cpp,v 1.155 2016/02/14 08:51:56 markisch Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -551,6 +551,11 @@ void wxtFrame::OnExport( wxCommandEvent& WXUNUSED( event ) )
 		surface = cairo_pdf_surface_create(
 			fullpathFilename.mb_str(wxConvUTF8),
 			wxt_current_plot->device_xmax, wxt_current_plot->device_ymax);
+		if (cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS) {
+			fprintf(stderr, "Cairo error: could not create surface for file %s.\n", (const char *)fullpathFilename.mb_str());
+			cairo_surface_destroy(surface);
+			break;
+		}
 		wxt_current_plot->cr = cairo_create(surface);
 		cairo_surface_destroy(surface);
 
@@ -573,6 +578,11 @@ void wxtFrame::OnExport( wxCommandEvent& WXUNUSED( event ) )
 		surface = cairo_svg_surface_create(
 			fullpathFilename.mb_str(wxConvUTF8),
 			wxt_current_plot->device_xmax, wxt_current_plot->device_ymax);
+		if (cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS) {
+			fprintf(stderr, "Cairo error: could not create surface for file %s.\n", (const char *)fullpathFilename.mb_str());
+			cairo_surface_destroy(surface);
+			break;
+		}
 		wxt_current_plot->cr = cairo_create(surface);
 		cairo_surface_destroy(surface);
 
