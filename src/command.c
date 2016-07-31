@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.292.2.9 2015/07/13 04:08:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.292.2.10 2015/08/01 05:19:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -916,14 +916,9 @@ history_command()
 	if (line_to_do == NULL)
 	    int_error(c_token, "not in history");
 
-	/* Replace current entry "history !..." in history list	*/
-	/* with the command we found by searching.		*/
-#if defined(HAVE_LIBREADLINE)
-	free(replace_history_entry(history_length-1, line_to_do, NULL)->line);
-#elif defined(READLINE)
-	free(history->line);
-	history->line = (char *) line_to_do;
-#endif
+	/* Add the command to the history.
+	   Note that history commands themselves are no longer added to the history. */
+	add_history((char *) line_to_do);
 
 	printf("  Executing:\n\t%s\n", line_to_do);
 	do_string(line_to_do);
@@ -931,6 +926,7 @@ history_command()
 
     } else {
 	int n = 0;		   /* print only <last> entries */
+	char *tmp;
 	TBOOLEAN append = FALSE;   /* rewrite output file or append it */
 	static char *name = NULL;  /* name of the output file; NULL for stdout */
 
@@ -944,8 +940,9 @@ history_command()
 	if (!END_OF_COMMAND && isanumber(c_token)) {
 	    n = int_expression();
 	}
-	free(name);
-	if ((name = try_to_get_string())) {
+	if ((tmp = try_to_get_string())) {
+	    free(name);
+	    name = tmp;
 	    if (!END_OF_COMMAND && almost_equals(c_token, "ap$pend")) {
 		append = TRUE;
 		c_token++;
