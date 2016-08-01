@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.151 2016/06/05 17:58:46 sfeam Exp $
+ * $Id: axis.h,v 1.152 2016/06/09 20:06:53 sfeam Exp $
  *
  */
 
@@ -147,7 +147,7 @@ typedef struct ticdef {
     struct position offset;
     TBOOLEAN rangelimited;		/* Limit tics to data range */
     TBOOLEAN enhanced;			/* Use enhanced text mode or labels */
-    TBOOLEAN logscaling;		/* place tics suitably for logscaled axis */
+    TBOOLEAN logscaling;		/* place tics using old logscale algorithm */
 } t_ticdef;
 
 /* we want two auto modes for minitics - default where minitics are

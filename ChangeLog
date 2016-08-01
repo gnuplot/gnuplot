@@ -2,6 +2,9 @@
 
 	* src/unset.c:  "unset y2mtics" was clearing the setting for x, not y2.
 
+	* src/axis.h src/command.c src/unset.c: Internal flag ticdef->logscaling
+	was not being cleared by "unset log" or "set nonlinear".
+
 2016-07-31  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/wxterminal/wxt_gui.cpp:  Handle errors when creating a cairo

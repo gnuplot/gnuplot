@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.339 2016/07/21 09:07:44 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.340 2016/07/21 19:22:51 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1431,6 +1431,7 @@ link_command()
 	    int_error(NO_CARET,"must unlink axis before setting it to nonlinear");
 	/* Clear previous log status */
 	secondary_axis->log = FALSE;
+	secondary_axis->ticdef.logscaling = FALSE;
 #else
 	int_error(command_token, "This copy of gnuplot does not support nonlinear axes");
 #endif
