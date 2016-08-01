@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.206.2.8 2015/12/29 19:11:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.206.2.9 2016/01/11 23:32:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -473,7 +473,7 @@ unset_command()
 	break;
     case S_Y2DTICS:
     case S_Y2MTICS:
-	unset_month_day_tics(FIRST_X_AXIS);
+	unset_month_day_tics(SECOND_Y_AXIS);
 	break;
     case S_MZTICS:
 	unset_minitics(FIRST_Z_AXIS);

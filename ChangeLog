@@ -1,3 +1,7 @@
+2016-08-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/unset.c:  "unset y2mtics" was clearing the setting for x, not y2.
+
 2016-07-31  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/win/wgnuplot-ja.mnu src/win/README.win-ja:  Update Japanese
