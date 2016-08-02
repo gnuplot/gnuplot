@@ -1,9 +1,23 @@
+2016-08-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.h src/plot2d.c:
+	Stricter definition of nonlinear(axis) allows to distinguish nonlinear
+	axes from linked (linear) axes.
+
+	* src/axis.h demo/nonlinear2.dem:
+	Rework tic and particularly minitic generation for nonlinear axes,
+	including special case code for logscale axes.  The default minitics
+	for log-scale axes in this mode are now always equivalent to 
+	"set mtics base" (i.e. unit intervals 1-9 for log10).
+	Nonlinear axes part 17
+
 2016-08-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/unset.c:  "unset y2mtics" was clearing the setting for x, not y2.
 
 	* src/axis.h src/command.c src/unset.c: Internal flag ticdef->logscaling
 	was not being cleared by "unset log" or "set nonlinear".
+	Nonlinear axes part 16
 
 2016-07-31  Bastian Maerkisch  <bmaerkisch@web.de>
 

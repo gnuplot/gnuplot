@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.152 2016/06/09 20:06:53 sfeam Exp $
+ * $Id: axis.h,v 1.153 2016/08/02 04:40:58 sfeam Exp $
  *
  */
 
@@ -42,7 +42,7 @@
 #else
 
 # define NONLINEAR_AXES 1
-# define nonlinear(axis) ((axis)->linked_to_primary != NULL)
+# define nonlinear(axis) ((axis)->linked_to_primary != NULL && (axis)->link_udf->at != NULL)
 # define invalid_coordinate(x,y) ((unsigned)(x)==intNaN || (unsigned)(y)==intNaN)
 #endif
 

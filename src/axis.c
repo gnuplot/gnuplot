@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.198 2016/05/26 20:53:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.199 2016/06/09 20:06:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -258,9 +258,13 @@ axis_log_value_checked(AXIS_INDEX axis, double coord, const char *what)
 char *
 axis_name(AXIS_INDEX axis)
 {
-    static char name[] = "paxis 00 ";
+    static char name[] = "primary 00 ";
     if (axis >= PARALLEL_AXES) {
 	sprintf(name, "paxis %d ", axis-PARALLEL_AXES+1);
+	return name;
+    }
+    if (axis < 0) {
+	sprintf(name, "primary %2s", axis_defaults[-axis].name);
 	return name;
     }
     return (char *) axis_defaults[axis].name;
@@ -969,7 +973,11 @@ gen_tics(struct axis *this, tic_callback callback)
     if (this->min >= VERYLARGE || this->max <= -VERYLARGE)
 	return;
 
-    if (def->def.user) {	/* user-defined tic entries */
+    /* user-defined tic entries
+     * We place them exactly where requested.
+     * Note: No minitics in this case
+     */
+    if (def->def.user) {
 	struct ticmark *mark = def->def.user;
 	double uncertain = (this->max - this->min) / 10;
 	double internal_min = this->min - SIGNIF * uncertain;
@@ -993,12 +1001,10 @@ gen_tics(struct axis *this, tic_callback callback)
 
 	    /* This condition is only possible if we are in polar mode */
 	    if (this->index == POLAR_AXIS) {
-#ifdef NONLINEAR_AXES
-		if (this->linked_to_primary)
+		if (nonlinear(this))
 		    internal = eval_link_function(this->linked_to_primary, mark->position)
 			     - eval_link_function(this->linked_to_primary, polar_shift);
 		else
-#endif
 		    internal = axis_log_value(this, mark->position)
 			     - axis_log_value(this, polar_shift);
 	    } else {
@@ -1054,10 +1060,18 @@ gen_tics(struct axis *this, tic_callback callback)
 	    return;
     }
 
-    /* series-tics
-     * need to distinguish user co-ords from internal co-ords.
-     * - for logscale, internal = log(user), else internal = user
+    /* series-tics, either TIC_COMPUTED ("autofreq") or TIC_SERIES (user-specified increment)
      *
+     * We need to distinguish internal user coords from user coords.
+     * before version 5.1
+     * -	logscale: internal = log(user), all other: internal = user
+     * now that we have nonlinear axes in version 5.1
+     * -	internal = primary axis, user = secondary axis
+     *		TIC_COMPUTED ("autofreq") tries for equal spacing on primary axis
+     *		TIC_SERIES   requests equal spacing on secondary (user) axis
+     *		minitics are always evenly spaced in user coords
+     *
+     * FIXME: This comment describes the pre-version 5.1 code; not sure we want to keep it
      * The minitics are a bit of a drag - we need to distinuish
      * the cases step>1 from step == 1.
      * If step = 1, we are looking at 1,10,100,1000 for example, so
@@ -1109,7 +1123,7 @@ gen_tics(struct axis *this, tic_callback callback)
 	    }
 	    break;
 	case TIC_COMPUTED:
-	    if (nonlinear(this) && this->ticdef.logscaling) {
+	    if (nonlinear(this)) {
 		lmin = this->linked_to_primary->min;
 		lmax = this->linked_to_primary->max;
 		this->ticstep = make_tics(this->linked_to_primary, 20);
@@ -1155,15 +1169,21 @@ gen_tics(struct axis *this, tic_callback callback)
 	if ((minitics != MINI_OFF) && (this->miniticscale != 0)) {
 	    FPRINTF((stderr,"axis.c: %d  start = %g end = %g step = %g base = %g\n", 
 			__LINE__, start, end, step, this->base));
+
 	    /* {{{  figure out ministart, ministep, miniend */
 	    if (minitics == MINI_USER) {
 		/* they have said what they want */
 		if (this->mtic_freq <= 0) {
 		    minitics = MINI_OFF;
- 		} else if (nonlinear(this)) {
-		    ministart = ministep = step / this->mtic_freq;
+		} else if (nonlinear(this)) {
+		    /* NB: In the case of TIC_COMPUTED this is wrong but we'll fix it later */
+		    double nsteps = this->mtic_freq;
+		    if (this->log && nsteps == this->base)
+			nsteps -= 1;
+		    ministart = ministep = step / nsteps;
 		    miniend = step;
- 		} else if (this->log || (this->linked_to_primary && def->logscaling)) {
+
+ 		} else if (this->log) {
 		    /* NB: Can't get here if "set log" is implemented as nonlinear */
  		    ministart = ministep = step / this->mtic_freq * this->base;
  		    miniend = step * this->base;
@@ -1174,7 +1194,12 @@ gen_tics(struct axis *this, tic_callback callback)
 		    ministart = ministep = step / this->mtic_freq;
 		    miniend = step;
  		}
-	    } else if (this->log || (this->linked_to_primary && def->logscaling)) {
+	    } else if (nonlinear(this) && this->log) {
+		/* FIXME: Not sure this works for all values of step */
+		ministart = ministep = step / (this->base - 1);
+		miniend = step;
+	    } else if (this->log) {
+		/* NB: Can't get here if "set log" is implemented as nonlinear */
 		if (step > 1.5) {	/* beware rounding errors */
 		    /* {{{  10,100,1000 case */
 		    /* no more than five minitics */
@@ -1267,15 +1292,14 @@ gen_tics(struct axis *this, tic_callback callback)
 	    if (this->index == POLAR_AXIS) {
 		/* Defer translation until after limit check */
 		internal = tic;
-#ifdef NONLINEAR_AXES
-	    } else if (this->linked_to_primary && (def->type == TIC_COMPUTED) && def->logscaling) {
-		internal = tic;
-		user = eval_link_function(this->linked_to_primary->linked_to_secondary, tic);
-	    } else if (nonlinear(this) && def->type == TIC_SERIES) {
-		user = tic;
-		internal = tic;	/* But it isn't really, so this is confusing! */
-#endif
+	    } else if (nonlinear(this)) {
+		if (def->type == TIC_COMPUTED)
+		    user = eval_link_function(this->linked_to_primary->linked_to_secondary, tic);
+		else
+		    user = tic;
+		internal = tic;	/* It isn't really, but this makes the range checks work */
 	    } else if (this->log) {
+		/* Can't get here if logscale is implemented using nonlinear */
 		/* log scale => dont need to worry about zero ? */
 		internal = tic;
 		user = axis_undo_log(this, internal);
@@ -1320,7 +1344,7 @@ gen_tics(struct axis *this, tic_callback callback)
 			} else if (polar && this->index == POLAR_AXIS) {
 			    double min = (R_AXIS.autoscale & AUTOSCALE_MIN) ? 0 : R_AXIS.min;
 			    double r = fabs(user) + min;
-			    /* POLAR_AXIS is the only sane axis, where the actual value */
+			    /* POLAR_AXIS used to be the only sane axis, where the actual value */
 			    /* is stored and we shift its position just before plotting.*/
 			    internal = axis_log_value(this, tic)
 				     - axis_log_value(this, R_AXIS.min);
@@ -1335,11 +1359,9 @@ gen_tics(struct axis *this, tic_callback callback)
 			}
 
 			/* This is where we finally decided to put the tic mark */
-#ifdef NONLINEAR_AXES
-			if (this->linked_to_primary && (def->type == TIC_COMPUTED || def->type == TIC_SERIES) && def->logscaling)
+			if (nonlinear(this) && (def->type == TIC_COMPUTED))
 			    position = user;
 			else
-#endif
 			    position = internal;
 
 			/* Range-limited tic placement */
@@ -1347,6 +1369,7 @@ gen_tics(struct axis *this, tic_callback callback)
 			&&  !inrange(position, this->data_min, this->data_max))
 			    continue;
 
+			/* This writes the tic mark and label */
 			(*callback) (this, position, label, 0, lgrd, def->def.user);
 
 	 		/* Polar axis tics are mirrored across the origin */
@@ -1363,41 +1386,38 @@ gen_tics(struct axis *this, tic_callback callback)
 	    }
 	    if ((minitics != MINI_OFF) && (this->miniticscale != 0)) {
 		/* {{{  process minitics */
-		double mplace, mtic, temptic;
-		FPRINTF((stderr,"minitics start end step %g %g %g\n", ministart, miniend, ministep));
+		double mplace, mtic_user, mtic_internal;
+
 		for (mplace = ministart; mplace < miniend; mplace += ministep) {
 		    if (this->tictype == DT_TIMEDATE) {
-			mtic = time_tic_just(this->timelevel - 1, internal + mplace);
-			temptic = mtic;
-#ifdef NONLINEAR_AXES
-		    } else if (nonlinear(this) && this->minitics == MINI_USER) {
-			temptic = internal + mplace;
-			if (this->ticdef.type == TIC_COMPUTED)
-			    mtic = eval_link_function(this, temptic);
-			else
-			    mtic =temptic;
-		    } else if (this->linked_to_primary && def->logscaling) {
-			mtic = user * mplace;
-			temptic = internal + eval_link_function(this->linked_to_primary, mplace);
-			FPRINTF((stderr,"minitic internal %g user %g mplace %g step %g temptic %g -> mtic %g\n",
-				internal, user, mplace, step, temptic, mtic));
-#endif
+			mtic_user = time_tic_just(this->timelevel - 1, internal + mplace);
+			mtic_internal = mtic_user;
+		    } else if (nonlinear(this) && (def->type == TIC_COMPUTED)) {
+			/* FIXME: make up for bad calculation of ministart/ministep/miniend */
+			double this_major = eval_link_function(this, internal);
+			double next_major = eval_link_function(this, internal+step);
+			mtic_user = this_major + mplace/miniend * (next_major - this_major);	
+			mtic_internal = eval_link_function(this->linked_to_primary, mtic_user);
+		    } else if (nonlinear(this) && this->log) {
+			mtic_user = internal + mplace;
+			mtic_internal = eval_link_function(this->linked_to_primary, mtic_user);
 		    } else {
-			mtic = internal
+			mtic_user = internal
 			    + (this->log && step <= 1.5 ? axis_do_log(this,mplace) : mplace);
-			temptic = mtic;
+			mtic_internal = mtic_user;
 		    }
 		    if (polar && this->index == POLAR_AXIS)
-			temptic += R_AXIS.min;
+			mtic_internal += R_AXIS.min;
 
 		    /* Range-limited tic placement */
+		    /* FIXME: why do we not test against mtic_user? */
 		    if (def->rangelimited
-		    &&  !inrange(temptic, this->data_min, this->data_max))
+		    &&  !inrange(mtic_internal, this->data_min, this->data_max))
 			continue;
 
-		    if (inrange(temptic, internal_min, internal_max)
-			&& inrange(temptic, start - step * SIGNIF, end + step * SIGNIF))
-			(*callback) (this, mtic, NULL, 1, mgrd, NULL);
+		    if (inrange(mtic_internal, internal_min, internal_max)
+		    &&  inrange(mtic_internal, start - step * SIGNIF, end + step * SIGNIF))
+			(*callback) (this, mtic_user, NULL, 1, mgrd, NULL);
 		}
 		/* }}} */
 	    }

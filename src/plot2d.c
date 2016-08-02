@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.388 2016/05/08 18:43:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.389 2016/06/18 06:00:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -3084,7 +3084,7 @@ eval_plots()
 		    if (!parametric && !polar) {
 			t_min = axis_array[SAMPLE_AXIS].min;
 			t_max = axis_array[SAMPLE_AXIS].max;
-			if (nonlinear(&axis_array[SAMPLE_AXIS])) {
+			if (axis_array[SAMPLE_AXIS].linked_to_primary) {
 			    AXIS *primary = axis_array[SAMPLE_AXIS].linked_to_primary;
 			    t_min = eval_link_function(primary, t_min);
 			    t_max = eval_link_function(primary, t_max);
@@ -3100,7 +3100,7 @@ eval_plots()
 			double x, temp;
 			struct value a;
 			double t = t_min + i * t_step;
-			if (nonlinear(&axis_array[SAMPLE_AXIS])) {
+			if (axis_array[SAMPLE_AXIS].linked_to_primary) {
 			    AXIS *vis = axis_array[SAMPLE_AXIS].linked_to_primary->linked_to_secondary;
 			    t = eval_link_function(vis, t_min + i * t_step);
 			} else

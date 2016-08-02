@@ -19,7 +19,7 @@ set style data lines
 set xtics border out scale 1,0.5 nomirror
 set mxtics 10.000000
 set ytics border out scale 1,0.5 nomirror
-set ytics  norangelimit autofreq  textcolor rgb "dark-violet" 
+set ytics  norangelimit 0.1 textcolor rgb "dark-violet" 
 set y2tics border out scale 1,0.5 nomirror
 set y2tics  norangelimit autofreq  textcolor rgb "#56b4e9" 
 set xlabel "jw (radians)" 
