@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.59 2016/07/26 19:50:48 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.60 2016/07/30 05:36:58 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2448,6 +2448,7 @@ Ffigure_newsyntax
 ?rgbcolor variable
 ?lc rgbcolor variable
 ?tc rgbcolor variable
+?textcolor variable
  You can assign a separate color for each data point, line segment, or label in
  your plot.  `lc rgbcolor variable` tells the program to read RGB color
  information for each line in the data file. This requires a corresponding
@@ -3844,7 +3845,8 @@ Ffigure_labels1
  The `labels` style reads coordinates and text from a data file and places
  the text string at the corresponding 2D or 3D position.  3 or 4 input columns
  of basic data are required.  Additional input columns may be used to provide
- information such as variable font size or text color (see `rgbcolor variable`).
+ properties that vary point by point such as text rotation angle (keywords
+ `rotate variable`) or color (see `textcolor variable`).
 
       3 columns:  x  y  string    # 2D version
       4 columns:  x  y  z  string # 3D version
@@ -3881,7 +3883,11 @@ Ffigure_labels2
    symbol(z) = "∙□+⊙♠♣♡♢"[int(z):int(z)]
    splot 'file' using 1:2:(symbol($3)) with labels
 
- See also `datastrings`, `set style data`.
+ This example shows use of labels with variable rotation angle in column 4 and
+ textcolor ("tc") in column 5.  Note that variable color is always taken from
+ the last column in the `using` specifier.
+
+   plot $Data using 1:2:3:4:5 with labels tc variable rotate variable
 2 lines
 ?plotting styles lines
 ?style lines
@@ -9650,7 +9656,10 @@ Ffigure_missing
  See `set xdata` and `set timefmt`.
 
  The options available for `set label` are also available for the `labels` plot
- style. See `labels`.
+ style. See `labels`.  In this case the properties `textcolor`, `rotate`, and
+ `pointsize` may be followed by keyword `variable` rather than by a fixed value.
+ In this case the corresponding property of individual labels is determined by
+ additional columns in the `using` specifier. 
 
 4 examples
 ?label examples

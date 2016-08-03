@@ -5,6 +5,12 @@
 	plots came out mangled.  This was a regression from 4.6.6 and 5.0.1.
 	Bug #1835
 
+	* src/set.c src/gadgets.h src/plot2d.c demo/rotate_labels.dem
+	docs/gnuplot.doc demo/all.dem:  New option `rotate variable` to assign
+	a separate rotation angle for each point in a 2D `plot with labels` 
+	using the contents of the 4th entry in the using specifier.
+	    plot foo using 1:2:3:4 with labels rotate variable
+
 2016-08-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/unset.c:  "unset y2mtics" was clearing the setting for x, not y2.

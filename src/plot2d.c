@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.26 2016/05/11 18:39:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.27 2016/06/18 05:59:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -524,9 +524,9 @@ get_data(struct curve_points *current_plot)
 
     case LABELPOINTS:
 	/* 3 column data: X Y Label */
-	/* 4th column allows rgb variable or pointsize variable */
+	/* extra columns allow variable pointsize and/or rotation */
 	min_cols = 3;
-	max_cols = 4;
+	max_cols = 5;
 	expect_string( 3 );
 	break;
 
@@ -1122,7 +1122,10 @@ get_data(struct curve_points *current_plot)
 		    tl = store_label(current_plot->labels, &(current_plot->points[i]), 
 			    i, df_tokens[2], 
 			    current_plot->varcolor ? current_plot->varcolor[i] : 0.0);
-		    tl->lp_properties.p_size = v[3];
+		    if (current_plot->labels->tag == VARIABLE_ROTATE_LABEL_TAG)
+			tl->rotate = (int)(v[3]);
+		    else
+			tl->lp_properties.p_size = v[3];
 		}
 		i++;
 		break;
