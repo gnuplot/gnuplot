@@ -1,0 +1,41 @@
+#
+# Exercise use of 'every' subsampling with image plots
+# This was a regression in 5.0.3 
+#
+
+$Matrix << EOM
+3 3 3 3 3 3 3
+3 4 4 4 4 4 3
+3 4 5 5 5 4 3
+3 4 5 6 5 4 3
+3 4 5 5 5 4 3
+3 4 4 4 4 4 3
+3 3 3 3 3 3 3
+EOM
+
+unset key
+set ticscale 0
+set border 0
+set xrange [-0.5:6.5]
+set yrange [-0.5:6.5]
+set grid lt -1
+set cbrange [3:6]
+unset colorbox
+
+set multiplot layout 2,2
+
+set title "Full 7x7 matrix"
+plot $Matrix matrix with image
+set title "Subsample columns by every ::2::4"
+plot $Matrix every ::2::4 matrix with image
+set title "Subsample rows by every :::2::4"
+plot $Matrix every :::2::4 matrix with image
+set title "Sample alternate columns by every 2"
+set xtics 2
+plot $Matrix every 2 matrix with image
+
+unset multiplot
+
+pause -1 "<cr> to continue"
+
+

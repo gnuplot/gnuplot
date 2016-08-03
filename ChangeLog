@@ -11,6 +11,9 @@
 	plots came out mangled.  This was a regression from 4.6.6
 	Bug #1835
 
+	* demo/matrix_every.dem demo/all.dem:  Add demo that serves as a unit
+	test for the above regression and fix.
+
 2016-08-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h src/plot2d.c:
