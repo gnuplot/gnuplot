@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.329 2016/05/24 18:14:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.330 2016/06/15 18:00:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -235,6 +235,7 @@ static TBOOLEAN index_found = FALSE;
 static int df_longest_columnhead = 0;
 
 /* stuff for every point:line */
+static TBOOLEAN set_every = FALSE;
 static int everypoint = 1;
 static int firstpoint = 0;
 static int lastpoint = MAXINT;
@@ -1027,7 +1028,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 {
     int name_token = c_token - 1;
     TBOOLEAN duplication = FALSE;
-    TBOOLEAN set_index = FALSE, set_every = FALSE, set_skip = FALSE;
+    TBOOLEAN set_index = FALSE, set_skip = FALSE;
     TBOOLEAN set_using = FALSE;
     TBOOLEAN set_matrix = FALSE;
 
@@ -1063,6 +1064,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     blank_count = 2;
     /* by initialising blank_count, leading blanks will be ignored */
 
+    set_every = FALSE;
     everypoint = everyline = 1; /* unless there is an every spec */
     firstpoint = firstline = 0;
     lastpoint = lastline = MAXINT;
@@ -2409,6 +2411,13 @@ df_determine_matrix_info(FILE *fin)
 		/* Save matrix dimensions in case it contains an image */
 		df_xpixels = nc;
 		df_ypixels = nr;
+
+		if (set_every) {
+		    df_xpixels = 1 + ((int)(GPMIN(lastpoint,df_xpixels-1)) - firstpoint) / everypoint;
+		    df_ypixels = 1 + ((int)(GPMIN(lastline,df_ypixels-1)) - firstline) / everyline;
+		    FPRINTF((stderr,"datafile.c:%d filtering (%d,%d) to (%d,%d)\n",
+				 __LINE__, nc, nr, df_xpixels, df_ypixels));
+		}
 
 		/* This matrix is the one (and only) requested by name.	*/
 		/* Dummy up index range and skip rest of file.		*/

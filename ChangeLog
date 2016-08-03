@@ -6,6 +6,11 @@
 	contents of the 4th entry in the `using` specifier.
 	    plot foo using 1:2:3:4 with labels rotate variable
 
+	* src/datafile.c:  Matrix dimensions were not being adjusted to account
+	for subsampling by "every" in the using specifier, so "with image"
+	plots came out mangled.  This was a regression from 4.6.6
+	Bug #1835
+
 2016-08-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h src/plot2d.c:
