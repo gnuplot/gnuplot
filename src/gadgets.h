@@ -96,6 +96,7 @@ typedef struct text_label {
  * indicated by tag = -2 */
 #define NONROTATABLE_LABEL_TAG -2
 #define ROTATE_IN_3D_LABEL_TAG -3
+#define VARIABLE_ROTATE_LABEL_TAG -4
 #define EMPTY_LABELSTRUCT \
     {NULL, NONROTATABLE_LABEL_TAG, \
      {character, character, character, 0.0, 0.0, 0.0}, CENTRE, 0, 0, \

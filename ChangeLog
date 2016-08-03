@@ -1,3 +1,11 @@
+2016-08-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c src/gadgets.h src/plot2d.c demo/rotate_labels.dem
+	docs/gnuplot.doc demo/all.dem:  New option `rotate variable` to assign
+	a separate rotation angle for each point in a 2D plot using the 
+	contents of the 4th entry in the `using` specifier.
+	    plot foo using 1:2:3:4 with labels rotate variable
+
 2016-08-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h src/plot2d.c:

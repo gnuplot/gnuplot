@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.71 2016/05/09 03:32:26 sfeam Exp $
+# $Id: all.dem,v 1.72 2016/07/23 04:09:20 sfeam Exp $
 #
 # Executes all demos (OK, MOST demos) in this directory.
 # This serves as a series of unit tests for non-interactive capabilities.
@@ -278,6 +278,10 @@ reset
 
 print "********************** file hypertext.dem *********************"
 load "hypertext.dem"
+reset
+
+print "********************** file rotate_labels.dem *****************"
+load "rotate_labels.dem"
 reset
 
 print "********************** file stats.dem *********************"

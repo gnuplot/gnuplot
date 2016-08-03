@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.522 2016/06/09 17:53:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.524 2016/07/23 06:24:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -6072,6 +6072,12 @@ parse_label_options( struct text_label *this_label, int ndim)
 		    int_error(c_token,"invalid option");
 		c_token++;
 		this_label->tag = ROTATE_IN_3D_LABEL_TAG;
+	    } else if (almost_equals(c_token,"var$iable")) {
+		if (ndim == 2)	/* only in 2D plot with labels */
+		    this_label->tag = VARIABLE_ROTATE_LABEL_TAG;
+		else
+		    set_rot = FALSE;
+		c_token++;
 	    } else
 		rotate = TEXT_VERTICAL;
 	    continue;
