@@ -1,3 +1,10 @@
+2016-08-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c:  Matrix dimensions were not being adjusted to account
+	for subsampling by "every" in the using specifier, so "with image"
+	plots came out mangled.  This was a regression from 4.6.6 and 5.0.1.
+	Bug #1835
+
 2016-08-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/unset.c:  "unset y2mtics" was clearing the setting for x, not y2.
