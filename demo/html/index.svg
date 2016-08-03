@@ -121,6 +121,7 @@ on mouse-coordinate tracking.
 
     <h4>Text options</h4>
     <ul>
+    <li><a href="rotate_labels.html">rotated text</a></li>
     <li><a href="enhanced_utf8.html">enhanced text</a></li>
     <li><a href="datastrings.html">string data</a></li>
     <li><a href="stringvar.html">string variables</a></li>

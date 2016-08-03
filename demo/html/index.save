@@ -123,7 +123,7 @@ Here are samples of PNG output from some of the demos.
 
     <h4>Text options</h4>
     <ul>
-    <li><a href="textrotate.html">rotated text</a></li>
+    <li><a href="rotate_labels.html">rotated text</a></li>
     <li><a href="enhanced_utf8.html">'enhanced' text</a></li>
     <li><a href="datastrings.html">string data</a></li>
     <li><a href="cities.html">variable font size</a></li>
