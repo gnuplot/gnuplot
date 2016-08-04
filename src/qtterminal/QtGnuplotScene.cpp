@@ -295,6 +295,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		int size        ; in >> size;
 		m_font.setFamily(fontName);
 		m_font.setPointSize(size);
+		m_font.setStyleStrategy(QFont::ForceOutline);	// pcf fonts die if rotated
 	}
 	else if (type == GEPoint)
 	{

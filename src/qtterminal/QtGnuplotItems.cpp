@@ -70,6 +70,7 @@ void QtGnuplotEnhanced::addText(const QString& fontName, double fontSize,
 	}
 	font.setStyle(fontStyle);
 	font.setWeight(fontWeight);
+	font.setStyleStrategy(QFont::ForceOutline);	// pcf fonts die if rotated
 	QtGnuplotEnhancedFragment* item = new QtGnuplotEnhancedFragment(font, text, this);
 	item->setPos(m_currentPos + QPointF(0., -base));
 	if (showFlag)
