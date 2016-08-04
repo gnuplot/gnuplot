@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.173 2016/05/02 03:58:27 sfeam Exp $
+ * $Id: svg.trm,v 1.174 2016/05/21 22:57:43 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -181,10 +181,10 @@ static int SVG_plotno = 0;
 static TBOOLEAN SVG_gridline = FALSE;
 static TBOOLEAN SVG_hasgrid = FALSE;
 
-static int SVG_fontAscent = 0;	/* estimated current font ascent*/
-static int SVG_fontDescent = 0;	/* estimated current font descent*/
-static int SVG_fontLeading = 0;	/* estimated current font leading*/
-static int SVG_fontAvWidth = 0;	/* estimated current font char average width*/
+static double SVG_fontAscent  = 0;	/* estimated current font ascent*/
+static double SVG_fontDescent = 0;	/* estimated current font descent*/
+static double SVG_fontLeading = 0;	/* estimated current font leading*/
+static double SVG_fontAvWidth = 0;	/* estimated current font char average width*/
 
 static short SVG_Pen_RealID __PROTO ((int));
 static void SVG_PathOpen __PROTO ((void));
@@ -373,10 +373,10 @@ SVG_SetFont (const char *name, double size)
  * 'font-size' (!), we have to to define font properties in a less
  * than optimal way */
 
-    SVG_fontAscent = (int) (SVG_fontSizeCur * 1.00 * SVG_SCALE);
-    SVG_fontDescent = (int) (SVG_fontSizeCur * 0.25 * SVG_SCALE);
-    SVG_fontLeading = (int) (SVG_fontSizeCur * 0.25 * SVG_SCALE);
-    SVG_fontAvWidth = (int) (SVG_fontSizeCur * 0.70 * SVG_SCALE);
+    SVG_fontAscent  = (SVG_fontSizeCur * 0.90 * SVG_SCALE);
+    SVG_fontDescent = (SVG_fontSizeCur * 0.25 * SVG_SCALE);
+    SVG_fontLeading = (SVG_fontSizeCur * 0.35 * SVG_SCALE);
+    SVG_fontAvWidth = (SVG_fontSizeCur * 0.70 * SVG_SCALE);
 
     term->h_char = SVG_fontAvWidth;
     term->v_char = (SVG_fontAscent + SVG_fontDescent + SVG_fontLeading);
@@ -1459,6 +1459,7 @@ TERM_PUBLIC void
 SVG_put_text (unsigned int x, unsigned int y, const char *str)
 {
     char *alignment;
+    double vertical_offset;
     int h = x, v = y;
 
     SVG_PathClose ();
@@ -1479,14 +1480,9 @@ SVG_put_text (unsigned int x, unsigned int y, const char *str)
     }
 
 /* vertical justification*/
-
-    if (SVG_TextAngle % 180) {
-	/* vertical text */
-	h += (SVG_fontAscent - SVG_fontDescent) / 2;
-    } else {
-	/* horizontal text */
-	v -= (SVG_fontAscent - SVG_fontDescent) / 2;
-    }
+    vertical_offset = (SVG_fontAscent - SVG_fontDescent) / 2.;
+    h += vertical_offset * sin(SVG_TextAngle * DEG2RAD);
+    v -= vertical_offset * cos(SVG_TextAngle * DEG2RAD);
 
 /* define text position and attributes */
 

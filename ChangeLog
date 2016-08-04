@@ -1,3 +1,7 @@
+2016-08-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm:  Better vertical justification of rotated text.
+
 2016-08-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c src/gadgets.h src/plot2d.c demo/rotate_labels.dem
