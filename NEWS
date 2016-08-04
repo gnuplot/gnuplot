@@ -2,6 +2,7 @@ Changes since release of 5.0.4
 ==============================
 * NEW allow filename completion for system commands and pipes (backport from 5.1)
 * NEW option to plot with labels {rotate variable}
+* CHANGE qt terminal force selection of outline font rather than bitmap font
 * FIX qt terminal set TERM_POLYGON_PIXELS to avoid aliasing artifacts
 * FIX Do not confuse EOF with 8-bit character 0x177 (E.g. in Cyrillic encodings).
 * FIX regression in rendering 'plot ... matrix every ... with image'

@@ -2,6 +2,14 @@
 
 	* term/svg.trm:  Better vertical justification of rotated text.
 
+	* src/qtterminal/QtGnuplotScene.cpp src/qtterminal/QtGnuplotItems.cpp:
+	*.pcf (bitmap) fonts are non-rotatable. Furthermore Qt can die horribly
+	while trying (seen with Qt 5.4.2). To make matters worse, requesting
+	font "Times" may give you the Adobe pcf font Times (perfect name match)
+	rather than a rotatable ttf or odf font like TimesNewRoman.  This patch
+	adds style strategy QFont::ForceOutline to forbid selection of a
+	bitmap font.
+
 2016-08-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c:  Matrix dimensions were not being adjusted to account
