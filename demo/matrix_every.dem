@@ -32,6 +32,7 @@ set title "Subsample rows by every :::2::4"
 plot $Matrix every :::2::4 matrix with image
 set title "Sample alternate columns by every 2"
 set xtics 2
+set xrange [-1:7]
 plot $Matrix every 2 matrix with image
 
 unset multiplot
