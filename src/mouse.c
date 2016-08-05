@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.188 2016/04/25 18:36:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.189 2016/05/08 18:43:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -492,7 +492,9 @@ GetAnnotateString(char *s, double x, double y, int mode, char *fmt)
 	    double phi, r;
 	    double rmin = (R_AXIS.autoscale & AUTOSCALE_MIN) ? 0.0 : R_AXIS.set_min;
 	    phi = atan2(y,x);
-	    if (R_AXIS.log)
+	    if (nonlinear(&R_AXIS))
+		r = eval_link_function(&R_AXIS, x/cos(phi) + R_AXIS.linked_to_primary->min);
+	    else if (R_AXIS.log)
 		r = AXIS_UNDO_LOG(POLAR_AXIS, x/cos(phi) + AXIS_DO_LOG(POLAR_AXIS, rmin));
 	    else
 		r = x/cos(phi) + rmin;

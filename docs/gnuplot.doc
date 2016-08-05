@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1003 2016/07/30 05:33:14 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1004 2016/08/03 19:28:55 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8460,7 +8460,7 @@ Ffigure_missing
        set decimalsign ','
 
  Please note: If you set an explicit string, this affects only numbers that
- are printed using gnuplot's gprintf() formatting routine, include axis tics.
+ are printed using gnuplot's gprintf() formatting routine, including axis tics.
  It does not affect the format expected for input data, and it does not affect
  numbers printed with the sprintf() formatting routine. To change the behavior
  of both input and output formatting, instead use the form

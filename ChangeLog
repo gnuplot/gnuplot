@@ -1,8 +1,9 @@
 2016-08-05  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/plot2d.c src/set.c:  When logscaling is implemented via nonlinear
-	axes, a test for "if (R_AXIS.log)" must come _after_ a test for
-	"if nonlinear(&R_AXIS)".  Only affects logscaled polar axis.
+	* src/plot2d.c src/set.c src/mouse.c:  When logscaling is implemented
+	via nonlinear axes, any test for "if (R_AXIS.log)" must come _after_
+	a test for "if nonlinear(&R_AXIS)". Only affects logscaled polar axis.
+	Nonlinear axes part 19
 
 2016-08-05  Bastian Maerkisch  <bmaerkisch@web.de>
 
