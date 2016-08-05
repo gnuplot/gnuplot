@@ -1,6 +1,12 @@
+2016-08-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c src/set.c:  When logscaling is implemented via nonlinear
+	axes, a test for "if (R_AXIS.log)" must come _after_ a test for
+	"if nonlinear(&R_AXIS)".  Only affects logscaled polar axis.
+
 2016-08-05  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* term/svg.trm term/lua.trm term/svg.trm term/post.trm src/plot.c
+	* term/canvas.trm term/lua.trm term/svg.trm term/post.trm src/plot.c
 	src/win/winmain.c|h:  The code to determine paths relative to the
 	gnuplot executable on Windows spread by copy and paste.  Let all those
 	sites call a single new function instead and fix an improper handling

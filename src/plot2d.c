@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.390 2016/08/03 04:22:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.391 2016/08/03 19:28:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1377,13 +1377,13 @@ store2d_point(
 	    }
 	}
 
-	if (R_AXIS.log) {
+	if (nonlinear(&R_AXIS)) {
+	    AXIS *shadow = R_AXIS.linked_to_primary;
+	    y = eval_link_function(shadow, y) - shadow->min;
+	} else if (R_AXIS.log) {
 	    if (R_AXIS.min <= 0 || R_AXIS.autoscale & AUTOSCALE_MIN)
 		int_error(NO_CARET,"In log mode rrange must not include 0");
 	    y = AXIS_DO_LOG(POLAR_AXIS,y) - AXIS_DO_LOG(POLAR_AXIS,R_AXIS.min);
-	} else if (nonlinear(&R_AXIS)) {
-	    AXIS *shadow = R_AXIS.linked_to_primary;
-	    y = eval_link_function(shadow, y) - shadow->min;
 	} else if (!(R_AXIS.autoscale & AUTOSCALE_MIN)) {
 	    /* we store internally as if plotting r(t)-rmin */
 		y -= R_AXIS.min;
@@ -1406,12 +1406,12 @@ store2d_point(
 	    &&  yhigh > R_AXIS.max) {
 		cp->type = OUTRANGE;
 	    }
-	    if (R_AXIS.log) {
-		yhigh = AXIS_DO_LOG(POLAR_AXIS,yhigh)
-			- AXIS_DO_LOG(POLAR_AXIS,R_AXIS.min);
-	    } else if (nonlinear(&R_AXIS)) {
+	    if (nonlinear(&R_AXIS)) {
 		AXIS *shadow = R_AXIS.linked_to_primary;
 		yhigh = eval_link_function(shadow, yhigh) - shadow->min;
+	    } else if (R_AXIS.log) {
+		yhigh = AXIS_DO_LOG(POLAR_AXIS,yhigh)
+			- AXIS_DO_LOG(POLAR_AXIS,R_AXIS.min);
 	    } else if (!(R_AXIS.autoscale & AUTOSCALE_MIN)) {
 		/* we store internally as if plotting r(t)-rmin */
 		yhigh -= R_AXIS.min;
@@ -1425,12 +1425,12 @@ store2d_point(
 	    &&  ylow > R_AXIS.max) {
 		cp->type = OUTRANGE;
 	    }
-	    if (R_AXIS.log) {
-		ylow = AXIS_DO_LOG(POLAR_AXIS,ylow)
-		     - AXIS_DO_LOG(POLAR_AXIS,R_AXIS.min);
-	    } else if (nonlinear(&R_AXIS)) {
+	    if (nonlinear(&R_AXIS)) {
 		AXIS *shadow = R_AXIS.linked_to_primary;
 		ylow = eval_link_function(shadow, ylow) - shadow->min;
+	    } else if (R_AXIS.log) {
+		ylow = AXIS_DO_LOG(POLAR_AXIS,ylow)
+		     - AXIS_DO_LOG(POLAR_AXIS,R_AXIS.min);
 	    } else if (!(R_AXIS.autoscale & AUTOSCALE_MIN)) {
 		/* we store internally as if plotting r(t)-rmin */
 		ylow -= R_AXIS.min;
@@ -3162,12 +3162,12 @@ eval_plots()
 				if (R_AXIS.autoscale & AUTOSCALE_MIN)
 				    R_AXIS.min = 0;
 			    }
-			    if (R_AXIS.log) {
-				temp = AXIS_DO_LOG(POLAR_AXIS,temp)
-				     - AXIS_DO_LOG(POLAR_AXIS,R_AXIS.min);
-			    } else if (nonlinear(&R_AXIS)) {
+			    if (nonlinear(&R_AXIS)) {
 				AXIS *shadow = R_AXIS.linked_to_primary;
 				temp = eval_link_function(shadow, temp) - shadow->min;
+			    } else if (R_AXIS.log) {
+				temp = AXIS_DO_LOG(POLAR_AXIS,temp)
+				     - AXIS_DO_LOG(POLAR_AXIS,R_AXIS.min);
 			    } else if (!(R_AXIS.autoscale & AUTOSCALE_MIN))
 				temp -= R_AXIS.min;
 
