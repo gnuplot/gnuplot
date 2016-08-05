@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.87 2016/07/21 09:07:44 markisch Exp $
+ * $Id: winmain.c,v 1.88 2016/07/24 16:08:19 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -301,6 +301,27 @@ appdata_directory(void)
 }
 
 
+/* retrieve path relative to gnuplot executable */
+LPSTR
+RelativePathToGnuplot(const char * path)
+{
+#ifdef UNICODE
+    LPSTR ansi_dir = AnsiText(szPackageDir, encoding);
+    LPSTR rel_path = (char *) gp_realloc(ansi_dir, strlen(ansi_dir) + strlen(path) + 1, "RelativePathToGnuplot");
+    if (rel_path == NULL) {
+	free(ansi_dir);
+	return (LPSTR) path;
+    }
+#else
+    char * rel_path = (char * ) gp_alloc(strlen(szPackageDir) + strlen(path) + 1, "RelativePathToGnuplot");
+    strcpy(rel_path, szPackageDir);
+#endif
+    /* szPackageDir is guaranteed to have a trailing backslash */
+    strcat(rel_path, path);
+    return rel_path;
+}
+
+
 static void
 WinCloseHelp(void)
 {
@@ -433,9 +454,9 @@ main(int argc, char **argv)
     szModuleName = (LPTSTR) malloc((MAXSTR + 1) * sizeof(TCHAR));
     CheckMemory(szModuleName);
 
-    /* get path to EXE */
+    /* get path to gnuplot executable  */
     GetModuleFileName(hInstance, (LPTSTR) szModuleName, MAXSTR);
-    if ((tail = _tcsrchr(szModuleName,'\\')) != NULL) {
+    if ((tail = _tcsrchr(szModuleName, '\\')) != NULL) {
 	tail++;
 	*tail = 0;
     }

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.168 2016/05/25 14:20:47 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.169 2016/06/14 18:25:39 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -88,11 +88,12 @@ extern int vms_ktid;
 extern smg$create_key_table();
 #endif /* VMS */
 
-#ifdef _Windows
+#ifdef _WIN32
 # include <windows.h>
 # include "win/winmain.h"
 # include "win/wcommon.h"
-#endif /* _Windows */
+# include <io.h>           // for isatty
+#endif /* _WIN32 */
 
 /* GNU readline
  * Only required by two files directly,
@@ -255,14 +256,14 @@ take_privilege()
 void
 bail_to_command_line()
 {
-#ifdef _Windows
+#ifdef _WIN32
     kill_pending_Pause_dialog();
     ctrlc_flag = FALSE;
 #endif
     LONGJMP(command_line_env, TRUE);
 }
 
-#if defined(_Windows)
+#if defined(_WIN32)
 int
 gnu_main(int argc, char **argv)
 #else
@@ -282,7 +283,7 @@ main(int argc, char **argv)
     setuid(getuid());
 #endif
 
-#if defined(MSDOS) && !defined(_Windows) && !defined(__GNUC__)
+#if defined(MSDOS) && !defined(_WIN32) && !defined(__GNUC__)
     PC_setup();
 #endif /* MSDOS !Windows */
 
@@ -457,7 +458,7 @@ main(int argc, char **argv)
      * command line arguments are file names or an explicit in-line "-e command".
      */
     for (i = 1; i < argc; i++) {
-# ifdef _Windows
+# ifdef _WIN32
 	if (!stricmp(argv[i], "/noend"))
 	    continue;
 # endif
@@ -603,13 +604,13 @@ main(int argc, char **argv)
 	    ++argv;
 	    c_token = 0;
 	    if (!strncmp(*argv, "-persist", 2) || !strcmp(*argv, "--persist")
-#ifdef _Windows
+#ifdef _WIN32
 		|| !stricmp(*argv, "-noend") || !stricmp(*argv, "/noend")
 #endif
 	    ) {
 		FPRINTF((stderr,"'persist' command line option recognized\n"));
 	    } else if (strcmp(*argv, "-") == 0) {
-#if defined(_Windows) && !defined(WGP_CONSOLE)
+#if defined(_WIN32) && !defined(WGP_CONSOLE)
 		TextShow(&textwin);
 		interactive = TRUE;
 #else
@@ -669,7 +670,7 @@ RECOVER_FROM_ERROR_IN_DASH:
 	while (!com_line())
 	    ctrlc_flag = FALSE; /* reset asynchronous Ctrl-C flag */
 
-#ifdef _Windows
+#ifdef _WIN32
     /* On Windows, handle 'persist' by keeping the main input loop running (windows/wxt), */
     /* but only if there are any windows open. Note that qt handles this properly. */
     if (persist_cl) {
@@ -704,7 +705,7 @@ RECOVER_FROM_ERROR_IN_DASH:
 
     /* HBB 20040223: Not all compilers like exit() to end main() */
     /* exit(exit_status); */
-#if ! defined(_Windows)
+#if ! defined(_WIN32)
     /* Windows does the cleanup later */
     gp_exit_cleanup();
 #endif
@@ -782,18 +783,13 @@ load_rcfile(int where)
 
     if (where == 0) {
 #ifdef GNUPLOT_SHARE_DIR
-# if defined(_Windows)
-	/* retrieve path relative to gnuplot executable,
-	 * whose path is in szModuleName (winmain.c) */
-	rcfile = gp_alloc(strlen((char *)szPackageDir) + 1
-	       + strlen(GNUPLOT_SHARE_DIR) + 1 + strlen("gnuplotrc") + 1, "rcfile");
-	strcpy(rcfile, (char *)szPackageDir);
-	PATH_CONCAT(rcfile, GNUPLOT_SHARE_DIR);
+# if defined(_WIN32)
+	rcfile = RelativePathToGnuplot(GNUPLOT_SHARE_DIR "\\gnuplotrc");
 # else
 	rcfile = (char *) gp_alloc(strlen(GNUPLOT_SHARE_DIR) + 1 + strlen("gnuplotrc") + 1, "rcfile");
 	strcpy(rcfile, GNUPLOT_SHARE_DIR);
-# endif
 	PATH_CONCAT(rcfile, "gnuplotrc");
+# endif
 	plotrc = fopen(rcfile, "r");
 #endif
 
@@ -823,6 +819,7 @@ load_rcfile(int where)
     free(rcfile);
 }
 
+
 void
 get_user_env()
 {
@@ -847,7 +844,7 @@ get_user_env()
 	const char *env_shell;
 
 	if ((env_shell = getenv("SHELL")) == NULL)
-#if defined(MSDOS) || defined(_Windows) || defined(OS2)
+#if defined(MSDOS) || defined(_WIN32) || defined(OS2)
 	    if ((env_shell = getenv("COMSPEC")) == NULL)
 #endif
 		env_shell = SHELL;

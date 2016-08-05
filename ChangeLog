@@ -1,3 +1,13 @@
+2016-08-05  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* term/svg.trm term/lua.trm term/svg.trm term/post.trm src/plot.c
+	src/win/winmain.c|h:  The code to determine paths relative to the
+	gnuplot executable on Windows spread by copy and paste.  Let all those
+	sites call a single new function instead and fix an improper handling
+	of wide strings which was overlooked due to an explicit type cast. 
+	Fix memory leaks while at it.
+	Bug #1837
+
 2016-08-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm:  Better vertical justification of rotated text.
@@ -49,7 +59,7 @@
 
 2016-07-31  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/wxterminal/wxt_gui.cpp:  Handle errors when creating a cairo
+	* src/wxterminal/wxt_gui.cpp:  Handle errors when creating cairo
 	surfaces.
 	Bug #1621
 
@@ -161,7 +171,7 @@
 	* src/show.c (show_version):  Add UNICODE build information to output of
 	"show version long".
 
-	* src/external.c|h:  Use the dll_open_w() also for console mode gnuplot
+	* src/external.c|h:  Use dll_open_w() also for console mode gnuplot
 	on Windows.
 
 	* src/command.c src/show.c src/win/wgnuplib.h src/win/wgraph.c

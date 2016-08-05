@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.292 2016/05/15 22:18:22 sfeam Exp $
+ * $Id: post.trm,v 1.293 2016/07/23 03:34:41 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -400,13 +400,13 @@ NULL
 
 /* external/internal prologue files machinery */
 #if defined(GNUPLOT_PS_DIR)
-# if defined(_Windows)
+# if defined(_WIN32)
 #  include "win/winmain.h"
 # elif defined(OS2)
 #  define INCL_DOSPROCESS
 #  define INCL_DOSMODULEMGR
 #  include <os2.h>
-# endif /* _Windows || OS2 */
+# endif /* _WIN32 || OS2 */
 #else /* GNUPLOT_PS_DIR */
 # include "PostScript/prologues.h"
 #endif /* GNUPLOT_PS_DIR */
@@ -4055,15 +4055,8 @@ PS_open_prologue_file(char *name)
     /* Allocate and load default directory into ps_prologue_dir.　*/
     /* FIXME:  Why should we have to recalculate this every time? */
 #ifdef GNUPLOT_PS_DIR
-#   if defined(_Windows)
-	/* retrieve prologues path relatively to gnuplot executable,
-	 * whose path is in szModuleName (winmain.c) */
-	ps_prologue_dir = gp_alloc(strlen((char*) szPackageDir)
-			+ strlen(GNUPLOT_PS_DIR) + 2, "Prolog path");
-	strcpy(ps_prologue_dir, (char*) szPackageDir);
-	strcat(ps_prologue_dir, "\\");
-	/* GNUPLOT_PS_DIR is _relative_ path */
-	strcat(ps_prologue_dir, GNUPLOT_PS_DIR);
+#   if defined(_WIN32)
+	ps_prologue_dir = RelativePathToGnuplot(GNUPLOT_PS_DIR);
 #   elif defined(OS2)
 	const ULONG bufsiz = 1024;
 	CHAR exepath[bufsiz];
@@ -4088,7 +4081,7 @@ PS_open_prologue_file(char *name)
 	    /* unsucessful to retrieve executable path */
 	    strcpy(ps_prologue_dir,"");
 	}
-#   else /* !_Windows && !OS2 */
+#   else /* !_WIN32 && !OS2 */
 	/* use hardcoded _absolute_ path */
 	ps_prologue_dir = gp_strdup(GNUPLOT_PS_DIR);
 #   endif

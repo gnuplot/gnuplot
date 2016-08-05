@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.76 2014/04/21 22:57:25 sfeam Exp $
+ * $Id: canvas.trm,v 1.77 2014/05/05 22:19:22 sfeam Exp $
  *
  */
 
@@ -415,31 +415,21 @@ CANVAS_graphics()
      *        when the page is viewed.
      */
     if (CANVAS_scriptdir == NULL) {
-	char *canvas_default_jsdir = "";
 #ifdef GNUPLOT_JS_DIR
-# if defined(_Windows)
-	/* retrieve path relative to the gnuplot executable,
-	 * whose path is in szModuleName (winmain.c) */
-	/* EAM FIXME: memory leak */
-	canvas_default_jsdir = gp_alloc(strlen((char*) szPackageDir)
-			+ strlen(GNUPLOT_JS_DIR) + 2, "jsdir");
-	strcpy(canvas_default_jsdir, (char*) szPackageDir);
-	len = strlen(canvas_default_jsdir);
-	if (*canvas_default_jsdir && canvas_default_jsdir[len-1] != '\\' && canvas_default_jsdir[len-1] != '/')
-	    strcat(canvas_default_jsdir, "\\");
-	/* GNUPLOT_JS_DIR is _relative_ path */
-	strcat(canvas_default_jsdir, GNUPLOT_JS_DIR);
-# else /* !_Windows */
+# if defined(_WIN32)
+	CANVAS_scriptdir = RelativePathToGnuplot(GNUPLOT_JS_DIR);
+# else /* !_WIN32 */
 	/* use hardcoded _absolute_ path */
-	canvas_default_jsdir = GNUPLOT_JS_DIR;
+	CANVAS_scriptdir = strdup(GNUPLOT_JS_DIR);
 # endif
+#else
+	CANVAS_scriptdir = strdup("");
 #endif /* GNUPLOT_JS_DIR */
-	CANVAS_scriptdir = gp_strdup(canvas_default_jsdir);
     }
 
 #if !defined(VMS)
     len = strlen(CANVAS_scriptdir);
-# if defined(_Windows)
+# if defined(_WIN32)
     if (*CANVAS_scriptdir && CANVAS_scriptdir[len-1] != '\\' && CANVAS_scriptdir[len-1] != '/') {
 	CANVAS_scriptdir = gp_realloc(CANVAS_scriptdir, len+2, "jsdir");
 	if (CANVAS_scriptdir[len-1] == '\\') /* use backslash if used in jsdir, otherwise slash */

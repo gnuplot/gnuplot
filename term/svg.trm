@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.174 2016/05/21 22:57:43 sfeam Exp $
+ * $Id: svg.trm,v 1.175 2016/08/04 23:00:54 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -892,31 +892,21 @@ SVG_init ()
  *	  Figure out the full URL to use for xlink:href="gnuplot_svg.js"
  */
     if (SVG_scriptdir == NULL) {
-	char *svg_default_jsdir = "";
 #ifdef GNUPLOT_JS_DIR
-# if defined(_Windows)
-	/* retrieve path relative to the gnuplot executable,
-	 * whose path is in szModuleName (winmain.c) */
-	/* EAM FIXME: memory leak */
-	svg_default_jsdir = gp_alloc(strlen((char*) szPackageDir)
-			+ strlen(GNUPLOT_JS_DIR) + 2, "jsdir");
-	strcpy(svg_default_jsdir, (char*) szPackageDir);
-	len = strlen(svg_default_jsdir);
-	if (*svg_default_jsdir && svg_default_jsdir[len-1] != '\\' && svg_default_jsdir[len-1] != '/')
-	    strcat(svg_default_jsdir, "\\");
-	/* GNUPLOT_JS_DIR is _relative_ path */
-	strcat(svg_default_jsdir, GNUPLOT_JS_DIR);
-# else /* !_Windows */
+# if defined(_WIN32)
+	SVG_scriptdir = RelativePathToGnuplot(GNUPLOT_JS_DIR);
+# else /* !_WIN32 */
 	/* use hardcoded _absolute_ path */
-	svg_default_jsdir = GNUPLOT_JS_DIR;
+	SVG_scriptdir = gp_strdup(GNUPLOT_JS_DIR);
 # endif
-#endif /* GNUPLOT_JS_DIR */
+#else
 	SVG_scriptdir = gp_strdup(svg_default_jsdir);
+#endif /* GNUPLOT_JS_DIR */
     }
 
 #if !defined(VMS)
     len = strlen(SVG_scriptdir);
-# if defined(_Windows)
+# if defined(_WIN32)
     if (*SVG_scriptdir && SVG_scriptdir[len-1] != '\\' && SVG_scriptdir[len-1] != '/') {
 	SVG_scriptdir = gp_realloc(SVG_scriptdir, len+2, "jsdir");
 	if (SVG_scriptdir[len-1] == '\\') /* use backslash if used in jsdir, otherwise slash */

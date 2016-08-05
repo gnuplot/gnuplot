@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.h,v 1.17 2016/07/21 09:07:44 markisch Exp $
+ * $Id: winmain.h,v 1.18 2016/07/24 16:08:19 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.h */
@@ -46,6 +46,7 @@
 #ifndef GNUPLOT_WINMAIN_H
 #define GNUPLOT_WINMAIN_H
 
+#include <tchar.h>
 #include <wchar.h>
 #include "wgnuplib.h"
 
@@ -61,8 +62,6 @@ extern MW menuwin;
 
 extern HWND help_window;
 extern LPTSTR winhelpname;
-extern LPTSTR szModuleName;
-extern LPTSTR szPackageDir;
 extern LPTSTR szMenuName;
 
 int Pause (LPSTR str);
@@ -77,6 +76,7 @@ UINT WinGetCodepage(enum set_encoding_id encoding);
 enum set_encoding_id WinGetEncoding(UINT cp);
 LPWSTR UnicodeText(LPCSTR str, enum set_encoding_id encoding);
 LPSTR AnsiText(LPCWSTR strw,  enum set_encoding_id encoding);
+LPSTR RelativePathToGnuplot(const char * path);
 
 int ConsoleReadCh(void);
 DWORD WINAPI stdin_pipe_reader(LPVOID param);
