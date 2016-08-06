@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.h,v 1.18 2016/07/24 16:08:19 markisch Exp $
+ * $Id: winmain.h,v 1.19 2016/08/05 05:10:29 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.h */
@@ -76,6 +76,7 @@ UINT WinGetCodepage(enum set_encoding_id encoding);
 enum set_encoding_id WinGetEncoding(UINT cp);
 LPWSTR UnicodeText(LPCSTR str, enum set_encoding_id encoding);
 LPSTR AnsiText(LPCWSTR strw,  enum set_encoding_id encoding);
+void MultiByteAccumulate(BYTE ch, LPWSTR wstr, int * count);
 LPSTR RelativePathToGnuplot(const char * path);
 
 int ConsoleReadCh(void);

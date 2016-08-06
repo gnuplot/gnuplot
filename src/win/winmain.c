@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.88 2016/07/24 16:08:19 markisch Exp $
+ * $Id: winmain.c,v 1.89 2016/08/05 05:10:29 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -111,11 +111,6 @@ LPTSTR szPackageDir;
 LPTSTR winhelpname;
 LPTSTR szMenuName;
 static LPTSTR szLanguageCode = NULL;
-#if defined(WGP_CONSOLE) && defined(CONSOLE_SWITCH_CP)
-BOOL cp_changed = FALSE;
-UINT cp_input;  /* save previous codepage settings */
-UINT cp_output;
-#endif
 HWND help_window = NULL;
 
 char *authors[]={
@@ -126,7 +121,10 @@ char *authors[]={
 void WinExit(void);
 static void WinCloseHelp(void);
 int CALLBACK ShutDown();
-
+#ifdef WGP_CONSOLE
+static int ConsolePutS(const char *str);
+static int ConsolePutCh(int ch);
+#endif
 
 static void
 CheckMemory(LPTSTR str)
@@ -186,15 +184,6 @@ WinExit(void)
     /* revert C++ stream redirection */
     RedirectOutputStreams(FALSE);
 # endif
-#else
-#ifdef CONSOLE_SWITCH_CP
-    /* restore console codepages */
-    if (cp_changed) {
-	SetConsoleCP(cp_input);
-	SetConsoleOutputCP(cp_output);
-	/* file APIs are per process */
-    }
-#endif
 #endif
 #ifdef HAVE_GDIPLUS
     gdiplusCleanup();
@@ -252,7 +241,8 @@ GetDllVersion(LPCTSTR lpszDllName)
 }
 
 
-BOOL IsWindowsXPorLater(void)
+BOOL 
+IsWindowsXPorLater(void)
 {
     OSVERSIONINFO versionInfo;
 
@@ -455,7 +445,7 @@ main(int argc, char **argv)
     CheckMemory(szModuleName);
 
     /* get path to gnuplot executable  */
-    GetModuleFileName(hInstance, (LPTSTR) szModuleName, MAXSTR);
+    GetModuleFileName(hInstance, szModuleName, MAXSTR);
     if ((tail = _tcsrchr(szModuleName, '\\')) != NULL) {
 	tail++;
 	*tail = 0;
@@ -590,22 +580,6 @@ main(int argc, char **argv)
     /* Finally, also redirect C++ standard output streams. */
     RedirectOutputStreams(TRUE);
 # endif
-#else /* WGP_CONSOLE */
-#ifdef CONSOLE_SWITCH_CP
-    /* Change codepage of console to match that of the graph window.
-        WinExit() will revert this.
-        Attention: display of characters does not work correctly with
-        "Terminal" font! Users will have to use "Lucida Console" or similar.
-    */
-    cp_input = GetConsoleCP();
-    cp_output = GetConsoleOutputCP();
-    if (cp_input != GetACP()) {
-	cp_changed = TRUE;
-	SetConsoleCP(GetACP()); /* keyboard input */
-	SetConsoleOutputCP(GetACP()); /* screen output */
-	SetFileApisToANSI(); /* file names etc. */
-    }
-#endif
 #endif
 
     gp_atexit(WinExit);
@@ -623,11 +597,91 @@ main(int argc, char **argv)
 }
 
 
-#ifndef WGP_CONSOLE
+void
+MultiByteAccumulate(BYTE ch, LPWSTR wstr, int * count)
+{
+    static char mbstr[4] = "";
+    static int mbwait = 0;
+    static int mbcount = 0;
 
-/* replacement stdio routines that use Text Window for stdin/stdout */
-/* WARNING: Do not write to stdout/stderr with functions not listed
-   in win/wtext.h */
+    *count = 0;
+
+    /* try to re-sync on control characters */
+    /* works for utf8 and sjis */
+    if (ch < 32) {
+	mbwait = mbcount = 0;
+	mbstr[0] = NUL;
+    }
+
+    if (encoding == S_ENC_UTF8) { /* combine UTF8 byte sequences */
+	if (mbwait == 0) {
+	    /* first byte */
+	    mbcount = 0;
+	    mbstr[mbcount] = ch;
+	    if ((ch & 0xE0) == 0xC0) {
+		// expect one more byte
+		mbwait = 1;
+	    } else if ((ch & 0xF0) == 0xE0) {
+		// expect two more bytes
+		mbwait = 2;
+	    } else if ((ch & 0xF8) == 0xF0) {
+		// expect three more bytes
+		mbwait = 3;
+	    }
+	} else {
+	    /* subsequent byte */
+	    /*assert((ch & 0xC0) == 0x80);*/
+	    if ((ch & 0xC0) == 0x80) {
+		mbcount++;
+		mbwait--;
+	    } else {
+		/* invalid sequence */
+		mbcount = 0;
+		mbwait = 0;
+	    }
+	    mbstr[mbcount] = ch;
+	}
+	if (mbwait == 0) {
+	    *count = MultiByteToWideChar(CP_UTF8, 0, mbstr, mbcount + 1, wstr, 2);
+	}
+    } else if (encoding == S_ENC_SJIS) { /* combine S-JIS sequences */
+	if (mbwait == 0) {
+	    /* first or single byte */
+	    mbcount = 0;
+	    mbstr[mbcount] = ch;
+	    if (is_sjis_lead_byte(ch)) {
+		/* first byte */
+		mbwait = 1;
+	    }
+	} else {
+	    if ((ch >= 0x40) && (ch <= 0xfc)) {
+		/* valid */
+		mbcount++;
+	    } else {
+		/* invalid */
+		mbcount = 0;
+	    }
+	    mbwait = 0; /* max. double byte sequences */
+	    mbstr[mbcount] = ch;
+	}
+	if (mbwait == 0) {
+	    *count = MultiByteToWideChar(932, 0, mbstr, mbcount + 1, wstr, 2);
+	}
+    } else {
+	mbcount = 0;
+	mbwait = 0;
+	mbstr[0] = (char) ch;
+	*count = MultiByteToWideChar(WinGetCodepage(encoding), 0, mbstr, mbcount + 1, wstr, 2);
+    }
+}
+
+
+/* replacement stdio routines that use
+ *  -  Text Window for stdin/stdout (wgnuplot)
+ *  -  Unicode console APIs to handle encodings (console gnuplot)
+ * WARNING: Do not write to stdout/stderr with functions not listed
+ * in win/wtext.h
+*/
 
 #undef kbhit
 #undef getche
@@ -654,14 +708,27 @@ main(int argc, char **argv)
 #undef fwrite
 #undef fread
 
-#define isterm(f) (f==stdin || f==stdout || f==stderr)
+#ifndef WGP_CONSOLE
+# define TEXTMESSAGE TextMessage()
+# define GETCH() TextGetChE(&textwin)
+# define PUTS(s) TextPutS(&textwin, (char*) s)
+# define PUTCH(c) TextPutCh(&textwin, (BYTE) c)
+# define isterm(f) (f==stdin || f==stdout || f==stderr)
+#else
+# define TEXTMESSAGE
+# define GETCH() ConsoleReadCh()
+# define PUTS(s) ConsolePutS(s)
+# define PUTCH(c) ConsolePutCh(c)
+# define isterm(f) _isatty(_fileno(f))
+#endif
 
 int
 MyPutCh(int ch)
 {
-    return TextPutCh(&textwin, (BYTE)ch);
+    return PUTCH(ch);
 }
 
+#ifndef WGP_CONSOLE
 int
 MyKBHit()
 {
@@ -679,37 +746,54 @@ MyGetChE()
 {
     return TextGetChE(&textwin);
 }
+#endif
+
 
 int
 MyFGetC(FILE *file)
 {
-    if (isterm(file)) {
-        return MyGetChE();
-    }
+    if (isterm(file))
+	return GETCH();
     return fgetc(file);
 }
 
 char *
 MyGetS(char *str)
 {
-    TextPutS(&textwin,"\nDANGER: gets() used\n");
-    MyFGetS(str,80,stdin);
-    if (strlen(str) > 0
-        && str[strlen(str)-1]=='\n')
-        str[strlen(str)-1] = '\0';
+    MyFGetS(str, 80, stdin);
+    if (strlen(str) > 0 && str[strlen(str) - 1] == '\n')
+	str[strlen(str) - 1] = '\0';
     return str;
 }
 
 char *
 MyFGetS(char *str, unsigned int size, FILE *file)
 {
-    char *p;
-
     if (isterm(file)) {
-        p = TextGetS(&textwin, str, size);
-        if (p != (char *)NULL)
-            return str;
-        return (char *)NULL;
+#ifndef WGP_CONSOLE
+	char * p = TextGetS(&textwin, str, size);
+	if (p != NULL)
+	    return str;
+	return NULL;
+#else
+	unsigned int i;
+	int c;
+
+	c = ConsoleGetch();
+	if (c == EOF)
+	    return NULL;
+
+	for (i = 1; i < size - 1; i++) {
+	    c = ConsoleGetch();
+	    if (str[i] == EOF)
+		break;
+	     str[i] = c;
+	    if (str[i] == '\n')
+		break;
+	}
+	str[i] = NUL;
+	return str;
+#endif
     }
     return fgets(str,size,file);
 }
@@ -718,11 +802,9 @@ int
 MyFPutC(int ch, FILE *file)
 {
     if (isterm(file)) {
-        MyPutCh((BYTE)ch);
-#ifndef WGP_CONSOLE
-        TextMessage();
-#endif
-        return ch;
+	PUTCH(ch);
+	TEXTMESSAGE;
+	return ch;
     }
     return fputc(ch,file);
 }
@@ -731,20 +813,20 @@ int
 MyFPutS(const char *str, FILE *file)
 {
     if (isterm(file)) {
-        TextPutS(&textwin, (char*) str);
-        TextMessage();
-        return (*str);  /* different from Borland library */
+	PUTS(str);
+	TEXTMESSAGE;
+	return (*str);
     }
     return fputs(str,file);
 }
 
 int
-MyPutS(char *str)
+MyPutS(const char *str)
 {
-    TextPutS(&textwin, str);
-    MyPutCh('\n');
-    TextMessage();
-    return 0;   /* different from Borland library */
+    PUTS(str);
+    PUTCH('\n');
+    TEXTMESSAGE;
+    return 0;
 }
 
 int
@@ -764,7 +846,7 @@ MyFPrintF(FILE *file, const char *fmt, ...)
 	va_start(args, fmt);
 	buf = (char *) malloc(count * sizeof(char));
 	count = vsnprintf(buf, count, fmt, args);
-	TextPutS(&textwin, buf);
+	PUTS(buf);
 	free(buf);
     } else {
 	count = vfprintf(file, fmt, args);
@@ -789,7 +871,7 @@ MyVFPrintF(FILE *file, const char *fmt, va_list args)
 	va_end(args_copied);
 	buf = (char *) malloc(count * sizeof(char));
 	count = vsnprintf(buf, count, fmt, args);
-	TextPutS(&textwin, buf);
+	PUTS(buf);
 	free(buf);
     } else {
 	count = vfprintf(file, fmt, args);
@@ -812,7 +894,7 @@ MyPrintF(const char *fmt, ...)
     va_start(args, fmt);
     buf = (char *) malloc(count * sizeof(char));
     count = vsnprintf(buf, count, fmt, args);
-    TextPutS(&textwin, buf);
+    PUTS(buf);
     free(buf);
     va_end(args);
     return count;
@@ -824,8 +906,8 @@ MyFWrite(const void *ptr, size_t size, size_t n, FILE *file)
     if (isterm(file)) {
 	size_t i;
 	for (i = 0; i < n; i++)
-	    TextPutCh(&textwin, ((BYTE *)ptr)[i]);
-	TextMessage();
+	    PUTCH(((BYTE *)ptr)[i]);
+	TEXTMESSAGE;
 	return n;
     }
     return fwrite(ptr, size, n, file);
@@ -838,8 +920,8 @@ MyFRead(void *ptr, size_t size, size_t n, FILE *file)
 	size_t i;
 
 	for (i = 0; i < n; i++)
-	    ((BYTE *)ptr)[i] = TextGetChE(&textwin);
-	TextMessage();
+	    ((BYTE *)ptr)[i] = GETCH();
+	TEXTMESSAGE;
 	return n;
     }
     return fread(ptr, size, n, file);
@@ -911,7 +993,8 @@ fake_popen(const char * command, const char * type)
 }
 
 
-int fake_pclose(FILE *stream)
+int
+fake_pclose(FILE *stream)
 {
     int rc = 0;
     if (!stream)
@@ -953,10 +1036,10 @@ int fake_pclose(FILE *stream)
 }
 #endif
 
-#else /* WGP_CONSOLE */
+#ifdef WGP_CONSOLE
 
-
-DWORD WINAPI stdin_pipe_reader(LPVOID param)
+DWORD WINAPI
+stdin_pipe_reader(LPVOID param)
 {
 #if 0
     HANDLE h = (HANDLE)_get_osfhandle(fileno(stdin));
@@ -974,7 +1057,8 @@ DWORD WINAPI stdin_pipe_reader(LPVOID param)
 }
 
 
-int ConsoleGetch()
+int
+ConsoleGetch()
 {
     int fd = _fileno(stdin);
     HANDLE h;
@@ -1012,26 +1096,50 @@ int ConsoleGetch()
 #endif /* WGP_CONSOLE */
 
 
-int ConsoleReadCh()
+int
+ConsoleReadCh()
 {
+    const int max_input = 8;
+    static char console_input[8];
+    static int first_input_char = 0;
+    static int last_input_char = 0;
     INPUT_RECORD rec;
     DWORD recRead;
     HANDLE h;
 
+    if (first_input_char != last_input_char) {
+	int c = console_input[first_input_char];
+	first_input_char++;
+	first_input_char %= max_input;
+	return c;
+    }
+
     h = GetStdHandle(STD_INPUT_HANDLE);
     if (h == NULL)
-	    return NUL;
+	return NUL;
 
-    ReadConsoleInput(h, &rec, 1, &recRead);
+    ReadConsoleInputW(h, &rec, 1, &recRead);
     /* FIXME: We should handle rec.Event.KeyEvent.wRepeatCount > 1, too. */
     if (recRead == 1 && rec.EventType == KEY_EVENT && rec.Event.KeyEvent.bKeyDown &&
        (rec.Event.KeyEvent.wVirtualKeyCode < VK_SHIFT ||
 	rec.Event.KeyEvent.wVirtualKeyCode > VK_MENU)) {
-	    if (rec.Event.KeyEvent.uChar.AsciiChar) {
-		if ((rec.Event.KeyEvent.dwControlKeyState == SHIFT_PRESSED) && (rec.Event.KeyEvent.wVirtualKeyCode == VK_TAB))
+	    if (rec.Event.KeyEvent.uChar.UnicodeChar) {
+		if ((rec.Event.KeyEvent.dwControlKeyState == SHIFT_PRESSED) && (rec.Event.KeyEvent.wVirtualKeyCode == VK_TAB)) {
 		    return 034; /* remap Shift-Tab */
-		else
-		    return rec.Event.KeyEvent.uChar.AsciiChar;
+		} else {
+		    int i, count;
+		    char mbchar[8];
+		    count = WideCharToMultiByte(WinGetCodepage(encoding), 0, 
+				&rec.Event.KeyEvent.uChar.UnicodeChar, 1, 
+				mbchar, sizeof(mbchar), 
+				NULL, NULL);
+		    for (i = 1; i < count; i++) {
+			console_input[last_input_char] = mbchar[i];
+			last_input_char++;
+			last_input_char %= max_input;
+		    }
+		    return mbchar[0];
+		}
 	    } else {
 		switch (rec.Event.KeyEvent.wVirtualKeyCode) {
 		case VK_UP: return 020;
@@ -1050,6 +1158,35 @@ int ConsoleReadCh()
     return NUL;
 }
 
+#ifdef WGP_CONSOLE
+
+static int
+ConsolePutS(const char *str)
+{
+    LPWSTR wstr = UnicodeText(str, encoding);
+    HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+    WriteConsoleW(h, wstr, wcslen(wstr), NULL, NULL);
+    //fputws(wstr, stdout);
+    free(wstr);
+    return 0;
+}
+
+
+static int
+ConsolePutCh(int ch)
+{
+    WCHAR w[3];
+    int count;
+
+    MultiByteAccumulate(ch, w, &count);
+    if (count > 0) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+	WriteConsoleW(h, w, count, NULL, NULL);
+    }
+    return ch;
+}
+
+#endif
 
 /* public interface to printer routines : Windows PRN emulation
  * (formerly in win.trm)
@@ -1063,7 +1200,7 @@ open_printer()
 {
     char *temp;
 
-    if ((temp = getenv("TEMP")) == (char *)NULL)
+    if ((temp = getenv("TEMP")) == NULL)
 	*win_prntmp = '\0';
     else  {
 	safe_strncpy(win_prntmp, temp, MAX_PRT_LEN);
@@ -1336,7 +1473,6 @@ AnsiText(LPCWSTR strw,  enum set_encoding_id encoding)
 }
 
 
-#if !defined(WGP_CONSOLE)
 FILE * 
 win_fopen(const char *filename, const char *mode)
 {
@@ -1348,7 +1484,6 @@ win_fopen(const char *filename, const char *mode)
     free(wmode);
     return file;
 }
-#endif
 
 
 UINT

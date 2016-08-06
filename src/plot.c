@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.169 2016/06/14 18:25:39 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.170 2016/08/05 05:10:29 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -422,7 +422,6 @@ main(int argc, char **argv)
      * EAM - Jan 2013 YES.
      */
     setvbuf(stdin, (char *) NULL, _IONBF, 0);
-
 #endif
 
     gpoutfile = stdout;
@@ -475,26 +474,6 @@ main(int argc, char **argv)
     else
 	show_version(NULL); /* Only load GPVAL_COMPILE_OPTIONS */
 
-#ifdef WGP_CONSOLE
-#ifdef CONSOLE_SWITCH_CP
-    if (cp_changed && interactive) {
-	fprintf(stderr,
-	    "\ngnuplot changed the codepage of this console from %i to %i to\n" \
-	    "match the graph window. Some characters might only display correctly\n" \
-	    "if you change the font to a non-raster type.\n",
-	    cp_input, GetConsoleCP());
-    }
-#else
-    if ((GetConsoleCP() != GetACP()) && interactive) {
-	fprintf(stderr,
-	    "\nWarning: The codepage of the graph window (%i) and that of the\n" \
-	    "console (%i) differ. Use `set encoding` or `!chcp` if extended\n" \
-	    "characters don't display correctly.\n",
-	    GetACP(), GetConsoleCP());
-    }
-#endif
-#endif
-
     update_gpval_variables(3);  /* update GPVAL_ variables available to user */
 
 #ifdef VMS
@@ -544,6 +523,9 @@ main(int argc, char **argv)
 #endif /* GNUPLOT_HISTORY */
 
 	    fprintf(stderr, "\nTerminal type set to '%s'\n", term->name);
+#if defined(READLINE) && defined(WGP_CONSOLE)
+	    fprintf(stderr, "Encoding set to '%s'.\n", encoding_names[encoding]);
+#endif
 	}			/* if (interactive && term != 0) */
     } else {
 	/* come back here from int_error() */
@@ -1064,7 +1046,7 @@ wrapper_for_write_history()
 	return;
     remove(expanded_history_filename);
     if (gnuplot_history_size < 0)
-    	write_history(expanded_history_filename);
+	write_history(expanded_history_filename);
     else
 	write_history_n(gnuplot_history_size, expanded_history_filename, "w");
 }

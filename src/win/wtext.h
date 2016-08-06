@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.h,v 1.17 2014/03/20 00:58:37 markisch Exp $
+ * $Id: wtext.h,v 1.18 2016/02/14 08:49:11 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.h */
@@ -45,20 +45,26 @@ extern "C" {
 #include <stdarg.h>
 #include "syscfg.h"
 
-#ifndef WGP_CONSOLE
-
 /* redefine functions that can talk to tty devices, to use
  * implementation in winmain.c */
-
+#ifndef WGP_CONSOLE
 #define kbhit()  MyKBHit()
 #define getche() MyGetChE()
-#define getch()  MyGetCh()
 #define putch(ch)  MyPutCh(ch)
+#else
+#define putch(ch)  ConsolePutCh(ch)
+#endif
+ 
+#undef  getch
+#ifndef WGP_CONSOLE
+#define getch()  MyGetCh()
+#else
+#define getch()  ConsoleGetch()
+#endif
+#undef  getchar
+#define getchar()   getch()
 
 #define fgetc(file) MyFGetC(file)
-#undef  getchar
-#define getchar()   MyGetCh()
-#undef  getc
 #define getc(file)  MyFGetC(file)
 #define fgets(str,sz,file)  MyFGetS(str,sz,file)
 #define gets(str)   MyGetS(str)
@@ -114,7 +120,7 @@ char * MyGetS(char *str);
 char * MyFGetS(char *str, unsigned int size, FILE *file);
 int MyFPutC(int ch, FILE *file);
 int MyFPutS(const char *str, FILE *file);
-int MyPutS(char *str);
+int MyPutS(const char *str);
 int MyFPrintF(FILE *file, const char *fmt, ...);
 int MyVFPrintF(FILE *file, const char *fmt, va_list args);
 int MyPrintF(const char *fmt, ...);
@@ -129,11 +135,8 @@ int fake_pclose(FILE *stream);
 /* redirect C++ standard output streams */
 void RedirectOutputStreams(int init);
 
-#else /* WGP_CONSOLE */
+#ifdef WGP_CONSOLE
 
-#define getch ConsoleGetch
-#undef getchar
-#define getchar ConsoleGetch
 int ConsoleGetch();
 
 #endif /* WGP_CONSOLE */

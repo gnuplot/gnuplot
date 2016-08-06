@@ -1,5 +1,10 @@
 2016-08-06  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/command.c src/plot.c src/syscfg.h src/win/winmain.c|h
+	src/win/wtext.c|h:  Enable support for encodings (including UTF-8) for
+	console mode gnuplot on Windows.
+	Patch #734
+
 	* src/win/wmenu.c src/win/wgdiplus.c|h src/win/wgnuplot.mnu:  Images
 	of toolbar icons can be read from a file.
 

@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.59 2016/05/08 12:48:21 markisch Exp $
+ * $Id: syscfg.h,v 1.60 2016/05/25 15:02:28 markisch Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -135,7 +135,7 @@
 #endif
 
 /* The unicode/encoding support requires translation of file names */
-#if !defined(WGP_CONSOLE) && !defined(WINDOWS_NO_GUI)
+#if !defined(WINDOWS_NO_GUI)
 /* Need to include definition of fopen before re-defining */
 #include <stdlib.h>
 #include <stdio.h>

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.340 2016/07/21 19:22:51 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.341 2016/08/02 04:40:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1634,51 +1634,6 @@ timed_pause(double sleep_time)
 /* process the 'pause' command */
 #define EAT_INPUT_WITH(slurp) do {int junk=0; do {junk=slurp;} while (junk != EOF && junk != '\n');} while (0)
 
-#if defined(_WIN32) && defined(WGP_CONSOLE)
-/* mode == 0: => enc -> current locale (for output)
- * mode == !0: => current locale -> enc (for input)
- */
-char *
-translate_string_encoding(char *str, int mode, enum set_encoding_id enc)
-{
-    char *lenc, *nstr, *locale;
-    unsigned loccp, enccp, fromcp, tocp;
-    int length;
-    LPWSTR textw;
-
-    if (enc == S_ENC_DEFAULT) return gp_strdup(str);
-#ifdef WGP_CONSOLE
-    if (mode == 0)
-	loccp = GetConsoleOutputCP(); /* output codepage */
-    else
-	loccp = GetConsoleCP(); /* input code page */
-#else
-    locale = setlocale(LC_CTYPE, "");
-    if (!(lenc = strchr(locale, '.')) || !sscanf(++lenc, "%i", &loccp))
-	return gp_strdup(str);
-#endif
-    enccp = WinGetCodepage(enc);
-    if (enccp == loccp)
-	return gp_strdup(str);
-    if (mode == 0) {
-	fromcp = enccp; 
-	tocp = loccp;
-    } else {
-	fromcp = loccp;
-	tocp = enccp;
-    }
-
-    length = MultiByteToWideChar(fromcp, 0, str, -1, NULL, 0);
-    textw = (LPWSTR) malloc(sizeof(WCHAR) * length);
-    MultiByteToWideChar(fromcp, 0, str, -1, textw, length);
-    length = WideCharToMultiByte(tocp, 0, textw, -1, NULL, 0, NULL, NULL);
-    nstr = (char *) malloc(length);
-    WideCharToMultiByte(tocp, 0, textw, -1, nstr, length, NULL, NULL);
-    free(textw);
-    return nstr;
-}
-#endif
-
 
 void
 pause_command()
@@ -1755,11 +1710,6 @@ pause_command()
 	    free(buf);
 	    buf = tmp;
 	    if (sleep_time >= 0) {
-#ifdef WGP_CONSOLE
-		char * nbuf = translate_string_encoding(buf, 0, encoding);
-		free(buf);
-		buf = nbuf;
-#endif
 		fputs(buf, stderr);
 	    }
 #elif defined(OS2)
@@ -1995,15 +1945,6 @@ print_command()
 	    if (dataline != NULL)
 		len = strappend(&dataline, &size, len, a.v.string_val);
 	    else
-#if defined(_WIN32) && defined(WGP_CONSOLE)
-		/* FIXME: That is probably not the right location to do this conversion in the long run. */
-		if (print_out == stderr) {
-		    char *nbuf = translate_string_encoding(a.v.string_val, 0, encoding);
-		    gpfree_string(&a);
-		    fputs(nbuf, print_out);
-		    free(nbuf);
-		} else
-#endif
 		fputs(a.v.string_val, print_out);
 	    gpfree_string(&a);
 	    need_space = FALSE;
@@ -3130,7 +3071,7 @@ do_system(const char *cmd)
     if (!cmd)
 	return;
     restrict_popen();
-#if defined(_WIN32) && !defined(WGP_CONSOLE)
+#ifdef _WIN32
     {
 	LPWSTR wcmd = UnicodeText(cmd, encoding);
 	_wsystem(wcmd);

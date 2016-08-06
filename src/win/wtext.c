@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.69 2016/07/24 16:08:19 markisch Exp $
+ * $Id: wtext.c,v 1.70 2016/07/24 20:08:34 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -570,80 +570,10 @@ TextResume(LPTW lptw)
 int
 TextPutCh(LPTW lptw, BYTE ch)
 {
-    static char mbstr[4] = "";
-    static int mbwait = 0;
-    static int mbcount = 0;
     WCHAR w[2];
     int count = 0;
 
-    /* try to re-sync on control characters */
-    /* works for utf8 and sjis */
-    if (ch < 32) {
-	mbwait = mbcount = 0;
-	mbstr[0] = NUL;
-    }
-
-    if (encoding == S_ENC_UTF8) { /* combine UTF8 byte sequences */
-	if (mbwait == 0) {
-	    /* first byte */
-	    mbcount = 0;
-	    mbstr[mbcount] = ch;
-	    if ((ch & 0xE0) == 0xC0) {
-		// expect one more byte
-		mbwait = 1;
-	    } else if ((ch & 0xF0) == 0xE0) {
-		// expect two more bytes
-		mbwait = 2;
-	    } else if ((ch & 0xF8) == 0xF0) {
-		// expect three more bytes
-		mbwait = 3;
-	    }
-	} else {
-	    /* subsequent byte */
-	    /*assert((ch & 0xC0) == 0x80);*/
-	    if ((ch & 0xC0) == 0x80) {
-		mbcount++;
-		mbwait--;
-	    } else {
-		/* invalid sequence */
-		mbcount = 0;
-		mbwait = 0;
-	    }
-	    mbstr[mbcount] = ch;
-	}
-	if (mbwait == 0) {
-	    count = MultiByteToWideChar(WinGetCodepage(encoding), 0, mbstr, mbcount + 1, w, 2);
-	}
-    } else if (encoding == S_ENC_SJIS) { /* combine S-JIS sequences */
-	if (mbwait == 0) {
-	    /* first or single byte */
-	    mbcount = 0;
-	    mbstr[mbcount] = ch;
-	    if (is_sjis_lead_byte(ch)) {
-		/* first byte */
-		mbwait = 1;
-	    }
-	} else {
-	    if ((ch >= 0x40) && (ch <= 0xfc)) {
-		/* valid */
-		mbcount++;
-	    } else {
-		/* invalid */
-		mbcount = 0;
-	    }
-	    mbwait = 0; /* max. double byte sequences */
-	    mbstr[mbcount] = ch;
-	}
-	if (mbwait == 0) {
-	    count = MultiByteToWideChar(WinGetCodepage(encoding), 0, mbstr, mbcount + 1, w, 2);
-	}
-    } else {
-	mbcount = 0;
-	mbwait = 0;
-	mbstr[0] = (char) ch;
-	count = MultiByteToWideChar(WinGetCodepage(encoding), 0, mbstr, mbcount + 1, w, 2);
-    }
-
+    MultiByteAccumulate(ch, w, &count);
     if (count == 1) { 
 	/* FIXME: we only handle UCS-2: one double-byte only */
 	TextPutChW(lptw, w[0]);
@@ -2140,11 +2070,11 @@ TextGetS(LPTW lptw, LPSTR str, unsigned int size)
     LPSTR next = str;
 
     while (--size > 0) {
-	switch(*next = TextGetChE(lptw)) {
+	switch (*next = TextGetChE(lptw)) {
 	case EOF:
 	    *next = 0;
 	    if (next == str)
-		return (LPSTR) NULL;
+		return NULL;
 	    return str;
 	case '\n':
 	    *(next+1) = 0;
