@@ -1,3 +1,8 @@
+2016-08-06  Tatsuro MATSUOKA  <tmacchant3@yahoo.co.jp>
+
+	* src/wxterminal/wxt_gui.h:  Correct spelling of include file name.
+	Bug #1836
+
 2016-08-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm:  Better vertical justification of rotated text.

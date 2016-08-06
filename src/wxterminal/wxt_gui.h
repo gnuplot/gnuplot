@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.48.2.5 2016/02/13 16:30:57 markisch Exp $
+ * $Id: wxt_gui.h,v 1.48.2.6 2016/03/22 17:08:36 markisch Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -172,9 +172,9 @@ extern "C" {
  * console window */
 # ifdef _Windows
 #  ifndef _WIN32_WINNT 
-#   define _WIN32_WINNT 0x0500
+#   define _WIN32_WINNT 0x0501
 #  endif
-#  include "Windows.h"
+#  include <windows.h>
 #  include "win/wtext.h"
 #  include "win/winmain.h"
 # endif
