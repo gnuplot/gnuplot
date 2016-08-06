@@ -214,6 +214,7 @@
 			[INPUT]First arg[EOS]?[INPUT]Second arg[EOS]:[INPUT]Third arg[EOS]
 	[EndMenu]
 [EndMenu]
+
 [Menu]
 Fu&nctions
 	[Menu]
@@ -729,10 +730,14 @@ Fu&nctions
 		[ABOUT]
 [EndMenu]
 
-; now some buttons
-;   a number after a semicolon in the title string is interpreted as icon index
-;   see the article "Toolbar Standard Button Image Index Values" on MSDN
+; Toolbar Buttons
+;   A number after a semicolon in the title string is interpreted as icon index
+;   see the article "Toolbar Standard Button Image Index Values" on MSDN:
 ;   http://msdn.microsoft.com/en-us/library/bb760433%28v=vs.85%29.aspx
+;   Alternatively, a path to an image file relative to share/images may be given.
+;   Images loaded will be scaled to ButtonSize (in pixels).
+;[ButtonSize]
+;	24
 [Button]
 	Replot;4
 		replot{ENTER}

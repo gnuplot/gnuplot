@@ -1,3 +1,8 @@
+2016-08-06  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wmenu.c src/win/wgdiplus.c|h src/win/wgnuplot.mnu:  Images
+	of toolbar icons can be read from a file.
+
 2016-08-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c src/set.c src/mouse.c:  When logscaling is implemented
@@ -66,8 +71,8 @@
 
 2016-07-31  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/wxterminal/wxt_gui.cpp:  Handle errors when creating cairo
-	surfaces.
+	* src/wxterminal/wxt_gui.cpp:  Handle errors when creating a cairo
+	surface.
 	Bug #1621
 
 2016-07-29  Ethan A Merritt  <merritt@u.washington.edu>
@@ -80,12 +85,12 @@
 
 	* src/win/wgraph.c src/win/wgdiplus.cpp|h src/win/wresourc.h:  Add an
 	option to the menu to save the current graph as bitmap.  Supports all
-	encoders available to GDI+.  On my system that is (TIFF, JPEG, GIF, PNG,
-	and BMP).  Defaults to PNG.
+	encoders available to GDI+.  On my system that is (TIFF, JPEG, GIF,
+	PNG, and BMP).  Defaults to PNG.
 
-	* src/win/wgraph.c (SaveAsEMF):  Tweak flags for GetSaveFileName() to make
-	sure that the file/path is not read-only and to preserve the current
-	working directory.
+	* src/win/wgraph.c (SaveAsEMF):  Tweak flags for GetSaveFileName() to
+	make sure that the file/path is not read-only and to preserve the
+	current working directory.
 
 2016-07-26  Bastian Maerkisch  <bmaerkisch@web.de>
 
@@ -118,7 +123,7 @@
 	See also bug #1807.
 
 	* src/win/wtext.c (DoLine):  Fix off-by-one error which caused the
-	area below the last line to contain garbage in some cases. 
+	area below the last line to contain garbage in some cases.
 
 2016-07-23  Bastian Maerkisch  <bmaerkisch@web.de>
 
@@ -196,15 +201,15 @@
 
 2016-07-20  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/history.c (write_history_list):  Recent regression caused the 
+	* src/history.c (write_history_list):  Recent regression caused the
 	the history list numbering to be off-by-one. E.g. "history !N"
 	mistakenly re-executed command N-1 rather than command N.
 	See also Bug #1763
 
 2016-07-19  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
-	* term/aquaterm.trm:  The AQUA_boxfill() routine scales very badly 
-	with the total number of rectangles, making it horribly slow when 
+	* term/aquaterm.trm:  The AQUA_boxfill() routine scales very badly
+	with the total number of rectangles, making it horribly slow when
 	invoked by "plot $foo with image pixels".  Set the terminal flag
 	TERM_POLYGON_PIXELS so that the image processing code will call
 	term->filled_polygon() in preference to term->fillbox().
@@ -224,7 +229,7 @@
 	The command 'set key spacing <foo>' adjusts the vertical spacing of
 	entries in the key.  However a complicated minimum size test caused the
 	result to be discontinuous as a function of <foo>.
-	I.e. 'set key spacing 2' came out the same as 'set key spacing 1' 
+	I.e. 'set key spacing 2' came out the same as 'set key spacing 1'
 	but both were smaller than 'set key spacing 1.8'.
 	This patch makes the vertical spacing a simple multiplier for
 	character height in the current font.  It also dissociates the

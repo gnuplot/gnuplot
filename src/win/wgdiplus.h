@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.h,v 1.6 2014/01/04 15:46:38 markisch Exp $
+ * $Id: wgdiplus.h,v 1.7 2016/07/27 19:38:23 markisch Exp $
  */
 
 /*
@@ -51,6 +51,7 @@ extern void gdiplusCircleEx(HDC hdc, POINT *p, int radius, UINT style, float wid
 extern void drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect);
 
 extern void SaveAsBitmap(LPGW lpgw);
+extern HBITMAP gdiplusLoadBitmap(LPWSTR file, int size);
 
 #ifdef __cplusplus
 }

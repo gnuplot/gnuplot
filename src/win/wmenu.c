@@ -1,5 +1,5 @@
 /*
- * $Id: wmenu.c,v 1.31 2016/05/23 14:22:21 markisch Exp $Id: wmenu.c,v 1.31 2016/05/23 14:22:21 markisch Exp $
+ * $Id: wmenu.c,v 1.32 2016/07/25 10:31:33 markisch Exp $Id: wmenu.c,v 1.32 2016/07/25 10:31:33 markisch Exp $
  */
 
 /* GNUPLOT - win/wmenu.c */
@@ -61,7 +61,7 @@
 #include "stdfn.h"
 #include "wcommon.h"
 #include "winmain.h"
-
+#include "wgdiplus.h"
 
 /* title of error messages */
 #define MBOXTITLE lptw->Title
@@ -82,7 +82,7 @@
 #define OPTIONS 134
 #define ABOUT 135
 #define CMDMAX 135
-char * keyword[] = {
+static char * keyword[] = {
     "[INPUT]", "[EOS]", "[OPEN]", "[SAVE]", "[DIRECTORY]",
     "[OPTIONS]", "[ABOUT]",
     "{ENTER}", "{ESC}", "{TAB}",
@@ -91,7 +91,7 @@ char * keyword[] = {
     "{^Q}", "{^R}", "{^S}", "{^T}", "{^U}", "{^V}", "{^W}", "{^X}",
     "{^Y}", "{^Z}", "{^[}", "{^\\}", "{^]}", "{^^}", "{^_}",
     NULL};
-BYTE keyeq[] = {
+static BYTE keyeq[] = {
     INPUT, EOS, OPEN, SAVE, DIRECTORY,
     OPTIONS, ABOUT,
     13, 27, 9,
@@ -100,7 +100,6 @@ BYTE keyeq[] = {
     17, 18, 19, 20, 21, 22, 23, 24,
     25, 26, 28, 29, 30, 31,
     0};
-
 
 #define GBUFSIZE 512
 typedef struct tagGFILE {
@@ -534,6 +533,11 @@ LoadMacros(LPTW lptw)
     RECT rect;
     char *ButtonText[BUTTONMAX];
     int ButtonIcon[BUTTONMAX];
+    char *ButtonIconFile[BUTTONMAX];
+    const int ButtonExtra = 15 + 5 + 12;  /* number of standard icons */
+    int ButtonIndex = 0;
+    int bLoadStandardButtons = FALSE;
+    int ButtonSize = 16;
     UINT dpi = GetDPI();
     TBADDBITMAP bitmap = {0};
 
@@ -606,9 +610,29 @@ LoadMacros(LPTW lptw)
 	    if (nMenuLevel > 0)
 		nMenuLevel--;	/* back up one menu */
 
+	} else if (!_stricmp(buf, "[ButtonSize]")) {
+	    unsigned size;
+
+	    if (!(nInc = GetLine(buf, MAXSTR, menufile))) {
+		nLine += nInc;
+		swprintf_s(wbuf, MAXSTR, L"Problem on line %d of %s\n", nLine, lpmw->szMenuName);
+		MessageBoxW(lptw->hWndParent, wbuf, MBOXTITLE, MB_ICONEXCLAMATION);
+		goto errorcleanup;
+	    }
+	    errno = 0;
+	    size = strtoul(buf, NULL, 10);
+	    if (errno == 0 && size > 0) {
+		ButtonSize = size;
+	    } else {
+		swprintf_s(wbuf, MAXSTR, L"Invalid button size on line %d\n", nLine);
+		MessageBoxW(lptw->hWndParent, wbuf, MBOXTITLE, MB_ICONEXCLAMATION);
+		goto errorcleanup;
+	    }
+
 	} else if (!_stricmp(buf, "[Button]")) {
 	    /* button macro */
 	    char *icon;
+
 	    if (lpmw->nButton >= BUTTONMAX) {
 		swprintf_s(wbuf, MAXSTR, L"Too many buttons at line %d of %s\n", nLine, lpmw->szMenuName);
 		MessageBoxW(lptw->hWndParent, wbuf, MBOXTITLE, MB_ICONEXCLAMATION);
@@ -631,12 +655,30 @@ LoadMacros(LPTW lptw)
 	    ButtonText[lpmw->nButton] = (char *)macroptr;
 	    ButtonIcon[lpmw->nButton] = I_IMAGENONE; /* comctl 5.81, Win 2000 */
 	    if ((icon = strchr((char *)macroptr, ';'))) {
+		int inumber;
+
 		*icon = NUL;
-		ButtonIcon[lpmw->nButton] = atoi(++icon);
+		errno = 0;
+		inumber = strtoul(++icon, NULL, 10);
+		if (errno == 0 && inumber != 0) {
+		    ButtonIcon[lpmw->nButton] = inumber;
+		    ButtonIconFile[lpmw->nButton] = NULL;
+		    bLoadStandardButtons = TRUE;
+		} else {
+		    /* strip trailing white space */
+		    char * end = icon + strlen(icon) - 1;
+		    while (isspace((unsigned char) *end)) {
+			*end = NUL;
+			end--;
+		    }
+		    ButtonIcon[lpmw->nButton] = ButtonIndex;
+		    ButtonIconFile[lpmw->nButton] = strdup(icon);
+		    ButtonIndex++;
+		}
 	    }
 	    macroptr += strlen((char *)macroptr)  + 1;
 	    *macroptr = '\0';
-	    if (!(nInc = GetLine(buf,MAXSTR,menufile))) {
+	    if (!(nInc = GetLine(buf, MAXSTR, menufile))) {
 		nLine += nInc;
 		swprintf_s(wbuf, MAXSTR, L"Problem on line %d of %s\n", nLine, lpmw->szMenuName);
 		MessageBoxW(lptw->hWndParent, wbuf, MBOXTITLE, MB_ICONEXCLAMATION);
@@ -719,28 +761,43 @@ LoadMacros(LPTW lptw)
     if (lpmw->hToolbar == NULL)
 	goto cleanup;
 
-    /* set size of toolbar icons */
-    /* lparam is (height<<16 + width) / default 16,15 */
-    if (dpi <= 96)
-	SendMessage(lpmw->hToolbar, TB_SETBITMAPSIZE, (WPARAM)0, (LPARAM)((24<<16) + 24));
-    else
-	SendMessage(lpmw->hToolbar, TB_SETBITMAPSIZE, (WPARAM)0, (LPARAM)((16<<16) + 16));
-
-    /* load standard toolbar icons: standard, history & view */
     SendMessage(lpmw->hToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
     bitmap.hInst = HINST_COMMCTRL;
-    bitmap.nID = (dpi > 96)  ? IDB_STD_LARGE_COLOR : IDB_STD_SMALL_COLOR;
-    SendMessage(lpmw->hToolbar, TB_ADDBITMAP, 0, (WPARAM)&bitmap);
-    bitmap.nID = (dpi > 96)  ? IDB_HIST_LARGE_COLOR : IDB_HIST_SMALL_COLOR;
-    SendMessage(lpmw->hToolbar, TB_ADDBITMAP, 0, (WPARAM)&bitmap);
-    bitmap.nID = (dpi > 96)  ? IDB_VIEW_LARGE_COLOR : IDB_VIEW_SMALL_COLOR;
-    SendMessage(lpmw->hToolbar, TB_ADDBITMAP, 0, (WPARAM)&bitmap);
+
+    /* set size of toolbar icons */
+    /* loading standard bitmaps forces a specific button size */
+    if (bLoadStandardButtons)
+	ButtonSize = (dpi <= 96) ? 16 : 24;
+    SendMessage(lpmw->hToolbar, TB_SETBITMAPSIZE, (WPARAM)0, MAKELPARAM(ButtonSize, ButtonSize));
+
+    /* only load standard bitmaps if required. */
+    if (bLoadStandardButtons) {
+	bitmap.nID = (dpi > 96)  ? IDB_STD_LARGE_COLOR : IDB_STD_SMALL_COLOR;
+	SendMessage(lpmw->hToolbar, TB_ADDBITMAP, 0, (WPARAM)&bitmap);
+	bitmap.nID = (dpi > 96)  ? IDB_HIST_LARGE_COLOR : IDB_HIST_SMALL_COLOR;
+	SendMessage(lpmw->hToolbar, TB_ADDBITMAP, 0, (WPARAM)&bitmap);
+	bitmap.nID = (dpi > 96)  ? IDB_VIEW_LARGE_COLOR : IDB_VIEW_SMALL_COLOR;
+	SendMessage(lpmw->hToolbar, TB_ADDBITMAP, 0, (WPARAM)&bitmap);
+    }
 
     /* create buttons */
     for (i = 0; i < lpmw->nButton; i++) {
 	TBBUTTON button;
 	ZeroMemory(&button, sizeof(button));
 	button.iBitmap = ButtonIcon[i];
+	if (ButtonIconFile[i] != NULL) {
+	    char * fname = RelativePathToGnuplot(GNUPLOT_SHARE_DIR "\\images");
+	    fname = realloc(fname, strlen(fname) + strlen(ButtonIconFile[i]) + 2);
+	    PATH_CONCAT(fname, ButtonIconFile[i]);
+	    if (bLoadStandardButtons)
+		button.iBitmap += ButtonExtra;
+	    LPWSTR wfname = UnicodeText(fname, S_ENC_DEFAULT);
+	    bitmap.hInst = NULL;
+	    bitmap.nID = (UINT_PTR) gdiplusLoadBitmap(wfname, ButtonSize);
+	    SendMessage(lpmw->hToolbar, TB_ADDBITMAP, 0, (WPARAM)&bitmap);
+	    free(fname);
+	    free(wfname);
+	}
 	button.idCommand = lpmw->hButtonID[i];
 	button.fsState = TBSTATE_ENABLED;
 	button.fsStyle = BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_NOPREFIX;

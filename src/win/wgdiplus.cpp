@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.28 2016/07/25 10:07:28 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.29 2016/07/27 19:38:22 markisch Exp $
  */
 
 /*
@@ -1659,4 +1659,37 @@ SaveAsBitmap(LPGW lpgw)
 		delete bitmap;
 	}
 	free(filter);
+}
+
+
+static Bitmap *
+ResizeBitmap(Bitmap &bmp, INT width, INT height)
+{
+	unsigned iheight = bmp.GetHeight();
+	unsigned iwidth = bmp.GetWidth();
+	if (width != height) {
+		double aspect = (double)iwidth / iheight;
+		if (iwidth > iheight)
+			height = static_cast<unsigned>(width / aspect);
+		else
+			width = static_cast<unsigned>(height * aspect);
+	}
+	Bitmap * nbmp = new Bitmap(width, height, bmp.GetPixelFormat());
+	Graphics graphics(nbmp);
+	graphics.DrawImage(&bmp, 0, 0, width - 1, height - 1);
+	return nbmp;
+}
+
+
+HBITMAP
+gdiplusLoadBitmap(LPWSTR file, int size)
+{
+	gdiplusInit();
+	Bitmap ibmp(file);
+	Bitmap * bmp = ResizeBitmap(ibmp, size, size);
+	HBITMAP hbitmap;
+	Color color(0, 0, 0);
+	bmp->GetHBITMAP(color, &hbitmap);
+	delete bmp;
+	return hbitmap;
 }
