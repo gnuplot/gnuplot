@@ -1,3 +1,7 @@
+2016-08-06  Tatsuro MATSUOKA  <tmacchant3@yahoo.co.jp>
+
+	* src/wxterminal/wxt_gui.h:  Correct spelling of include file name.
+ 
 2016-08-06  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/command.c src/plot.c src/syscfg.h src/win/winmain.c|h
