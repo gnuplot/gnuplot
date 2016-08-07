@@ -1,5 +1,5 @@
 /*
- * $Id: canvasmath.js,v 1.9 2012/05/03 20:35:22 sfeam Exp $
+ * $Id: canvasmath.js,v 1.10 2012/11/16 03:47:31 sfeam Exp $
  */
 // The canvastext.js code was released to the public domain by Jim Studt, 2007.
 // He may keep some sort of up to date copy at http://www.federated.com/~jim/canvastext/
@@ -275,6 +275,7 @@ CanvasTextFunctions.letters = {
 8463: { width: 21, points: [[9,22],[3,1],[-1,-1],[5,7],[7,11],[9,13],[11,14],[13,14],[15,14],[16,12],[16,10],[14,5],[14,2],[15,1],[19,3],[-1,-1],[7,21],[9,22],[-1,-1],[4,15],[14,20]] },
 8491: { width: 0, points: [[-99,197]] },
 8495: { width: 18, points: [[4,6],[8,7],[11,8],[14,10],[15,12],[14,14],[12,15],[9,15],[6,14],[4,11],[3,8],[3,5],[4,3],[5,2],[7,1],[9,1],[12,2],[14,4],[-1,-1],[9,15],[7,14],[5,11],[4,8],[4,4],[5,2]] },
+8722: { width: 20, points: [[2,9],[18,9]] },
 
 // Used to indicate missing glyph
 129: { width: 18, points: [[2,-2],[2,21],[16,21],[16,-2],[2,-2]] }
