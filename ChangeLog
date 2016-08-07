@@ -16,6 +16,8 @@
 	It affects only numbers formatted by gprint().  Other hyphens are 
 	not affected even if they are in a gprintf format string.
 
+	* PATCHLEVEL: increment to 5pre to distinguish test builds from 5.0.4
+
 2016-08-06  Tatsuro MATSUOKA  <tmacchant3@yahoo.co.jp>
 
 	* src/wxterminal/wxt_gui.h:  Correct spelling of include file name.
