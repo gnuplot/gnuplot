@@ -1,5 +1,5 @@
 /*
- * $Id: util.h,v 1.47 2016/02/29 23:12:43 sfeam Exp $
+ * $Id: util.h,v 1.48 2016/05/05 15:23:03 markisch Exp $
  */
 
 /* GNUPLOT - util.h */
@@ -61,6 +61,10 @@ extern char *current_locale;	/* LC_TIME */
 
 /* degree sign */
 extern char degree_sign[8];
+
+/* minus sign */
+extern const char *minus_sign;
+extern TBOOLEAN use_minus_sign;
 
 extern const char *current_prompt; /* needed by is_error() and friends */
 

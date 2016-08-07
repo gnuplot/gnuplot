@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.140 2016/05/05 18:59:34 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.141 2016/07/03 05:01:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -64,6 +64,10 @@ char *decimalsign = NULL;
 
 /* degree sign.  Defaults to UTF-8 but will be changed to match encoding */
 char degree_sign[8] = "°";
+
+/* minus sign (encoding-specific string) */
+const char *minus_sign = NULL;
+TBOOLEAN use_minus_sign = FALSE;
 
 /* Holds the name of the current LC_NUMERIC as set by "set decimal locale" */
 char *numeric_locale = NULL;
@@ -924,6 +928,47 @@ gprintf(
 		    memmove(dotpos1, dotpos2 + 1, taillength);
 		    /* insert decimalsign */
 		    memcpy(dotpos2, decimalsign, newlength);
+		}
+	    }
+	}
+
+    /* EXPERIMENTAL
+     * Some people prefer a "real" minus sign to the hyphen that standard
+     * formatted input and output both use.  Unlike decimal signs, there is
+     * no internationalization mechanism to specify this preference.
+     * This code replaces all hyphens with the character string specified by
+     * 'set minus_sign "..."'   typically unicode character U+2212 "−".
+     * Use at your own risk.  Should be OK for graphical output, but text output
+     * will not be readable by standard formatted input routines.
+     */
+	if (use_minus_sign		/* set minussign */
+	    && minus_sign		/* current encoding provides one */
+	    && !table_mode		/* not used inside "set table" */
+	    && !(term->flags & TERM_IS_LATEX)	/* but LaTeX doesn't want it */
+	   ) {
+
+	    char *dotpos1 = dest;
+	    char *dotpos2;
+	    size_t newlength = strlen(minus_sign);
+
+	    /* dot is the default hyphen we will be replacing */
+	    int dot = '-';
+
+	    /* replace every dot by the contents of minus_sign */
+	    while ((dotpos2 = strchr(dotpos1,dot)) != NULL) {
+		if (newlength == 1) {	/* The normal case */
+		    *dotpos2 = *minus_sign;
+		    dotpos1++;
+		} else {		/* Some multi-byte minus marker */
+		    size_t taillength = strlen(dotpos2);
+		    dotpos1 = dotpos2 + newlength;
+		    if (dotpos1 + taillength > limit)
+			int_error(NO_CARET,
+				  "format too long due to minus_sign string");
+		    /* move tail end of string out of the way */
+		    memmove(dotpos1, dotpos2 + 1, taillength);
+		    /* insert minus_sign */
+		    memcpy(dotpos2, minus_sign, newlength);
 		}
 	    }
 	}

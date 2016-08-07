@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.305 2016/07/09 17:15:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.306 2016/07/23 03:34:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -617,6 +617,11 @@ set encoding %s\n\
 	fprintf(fp, "set decimalsign '%s'\n", decimalsign);
     if (!numeric_locale && !decimalsign)
 	fprintf(fp, "unset decimalsign\n");
+
+    if (use_minus_sign)
+	fprintf(fp, "set minussign\n");
+    else
+	fprintf(fp, "unset minussign\n");
 
     fputs("set view ", fp);
     if (splot_map == TRUE)

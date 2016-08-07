@@ -1,3 +1,21 @@
+2016-08-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/save.c src/set.c src/show.c src/tables.c src/tables.h src/unset.c
+	src/util.c src/util.h docs/gnuplot.doc term/js/canvasmath.js:
+
+	New command "set minussign" tells gprintf() to use an encoding-specific
+	minus sign character for numeric output rather than the ascii hypen
+	character produced by sprintf().
+	    UTF-8:	Unicode U+2212 "minus sign"
+	    CP1252:	ALT+150 "en dash"
+	    SJIS:	0x817c
+	    default:	ascii \055 "hyphen"
+
+	The substitution of minus sign for hyphen is not made during tabular
+	output ("set table") or when the current terminal is a LaTeX terminal.
+	It affects only numbers formatted by gprint().  Other hyphens are 
+	not affected even if they are in a gprintf format string.
+
 2016-08-06  Tatsuro MATSUOKA  <tmacchant3@yahoo.co.jp>
 
 	* src/wxterminal/wxt_gui.h:  Correct spelling of include file name.
