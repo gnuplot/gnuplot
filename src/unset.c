@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.206.2.9 2016/01/11 23:32:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.206.2.10 2016/07/31 15:02:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -103,6 +103,7 @@ static void unset_logscale __PROTO((void));
 static void unset_mapping __PROTO((void));
 static void unset_margin __PROTO((t_position *));
 static void unset_missing __PROTO((void));
+static void unset_minus_sign __PROTO((void));
 #ifdef USE_MOUSE
 static void unset_mouse __PROTO((void));
 #endif
@@ -326,6 +327,9 @@ unset_command()
 	free(df_commentschars);
 	df_commentschars = gp_strdup(DEFAULT_COMMENTS_CHARS);
 	df_unset_datafile_binary();
+	break;
+    case S_MINUS_SIGN:
+	unset_minus_sign();
 	break;
     case S_MONOCHROME:
 	unset_monochrome();
@@ -1176,6 +1180,13 @@ unset_margin(t_position *margin)
 {
     margin->scalex = character;
     margin->x = -1;
+}
+
+/* process 'unset minus_sign' command */
+static void
+unset_minus_sign()
+{
+    use_minus_sign = FALSE;
 }
 
 /* process 'unset datafile' command */

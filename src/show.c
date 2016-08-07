@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.326.2.13 2015/12/29 19:12:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.326.2.14 2016/01/01 00:51:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -159,6 +159,7 @@ static void show_loadpath __PROTO((void));
 static void show_fontpath __PROTO((void));
 static void show_zero __PROTO((void));
 static void show_datafile __PROTO((void));
+static void show_minus_sign __PROTO((void));
 #ifdef USE_MOUSE
 static void show_mouse __PROTO((void));
 #endif
@@ -329,6 +330,9 @@ show_command()
 	break;
     case S_LOGSCALE:
 	show_logscale();
+	break;
+    case S_MINUS_SIGN:
+	show_minus_sign();
 	break;
     case S_OFFSETS:
 	show_offsets();
@@ -749,6 +753,7 @@ show_all()
     show_logscale();
     show_offsets();
     show_margin();
+    show_minus_sign();
     show_output();
     show_print();
     show_parametric();
@@ -2561,6 +2566,18 @@ show_decimalsign()
         fprintf(stderr, "\tdecimalsign for output has default value (normally '.')\n");
 
     fprintf(stderr, "\tdegree sign for output is %s \n", degree_sign);
+}
+
+/* process 'show minus_sign' command */
+static void
+show_minus_sign()
+{
+    SHOW_ALL_NL;
+
+    if (use_minus_sign && minus_sign)
+        fprintf(stderr, "\tminus sign for output is %s \n", minus_sign);
+    else
+        fprintf(stderr, "\tno special minus sign\n");
 }
 
 

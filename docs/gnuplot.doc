@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.60 2016/07/30 05:36:58 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.61 2016/08/04 04:27:44 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -249,6 +249,12 @@ C
  * Shell invocation of gnuplot can pass parameters to a gnuplot script.
  gnuplot -c scriptfile.gp ARG1 ARG2 ARG3 ...
 
+ * New command `set minussign` causes routine gprintf() to use a typographic
+ character "minus sign" rather than a hyphen for negative numbers.  This affects
+ only axis tic labels and strings explicitly created with gprintf(). This 
+ command first appeared in version 5.0 patchlevel 5 and is considered EXPERIMENTAL
+ (implementation details may change).
+
 3 New commands
 #start
 # import f(x) from "plugin.so"             # load function from shared library
@@ -267,6 +273,7 @@ C
 # set style textbox                        # text elements can be enclosed in a box
 # set view map {scale}                     # allows resizing a 3D projection plot
 # set multiplot {next|previous}            # navigate within the auto-layout grid
+# set minussign                            # use typographic "minus sign", not hyphen
 #end
 
 2 Changes in version 5
@@ -9988,6 +9995,50 @@ Ffigure_missing
  labels will be included in either the margin calculation or the calculation
  of the positions of other text to be written in the margin.  This can lead
  to tic labels overwriting other text if the axis is very close to the border.
+3 minussign
+?commands set minussign
+?commands show minussign
+?commands unset minussign
+?set minussign
+?show minussign
+?unset minussign
+?minussign
+ Gnuplot uses the C language library routine sprintf() for most formatted input.
+ However it also has its own formatting routine `gprintf()` that is used to
+ generate axis tic labels. The C library routine always use a hyphen character
+ (ascii \055) to indicate a negative number, as in -7.  Many people prefer a
+ different typographic minus sign character (unicode U+2212) for this purpose,
+ as in −7.  The command
+
+      set minussign
+
+ causes gprintf() to use this minus sign character rather than a hyphen in
+ numeric output. In a utf-8 locale this is the multibyte sequence corresponding
+ to unicode U+2212.  In a Window codepage 1252 locale this is the 8-bit 
+ character ALT+150 ("en dash").  The `set minussign` command will affect axis
+ tic labels and any labels that are created by explicitly invoking gprintf.
+ It has no effect on other strings that contain a hyphen.  See `gprintf`.
+
+ Note that this command is ignored when you are using any of the LaTeX
+ terminals, as LaTeX has its own mechanism for handling minus signs.
+ It also is not necessary when using the postscript terminal because the 
+ postscript prologue output by gnuplot remaps the ascii hyphen code \055 to a
+ different glyph named `minus`.  If you want to use the postscript terminal
+ while `set minussign` is active,  you will probably need to select the option
+ `set term post adobeglyphnames`.
+
+ This command is EXPERIMENTAL. It has known limitations and implementation
+ details may change.
+
+ Example (assumes utf8 locale):
+
+      set minus
+      A = -5
+      print "A = ",A                 # printed string will contain a hyphen
+      print gprintf("A = %g",A)      # printed string will contain character U+2212
+      set label "V = -5"             # label will contain a hyphen
+      set label sprintf("V = %g",-5) # label will contain a hyphen
+      set label gprintf("V = %g",-5) # label will contain character U+2212
 3 monochrome
 ?commands set monochrome
 ?set monochrome

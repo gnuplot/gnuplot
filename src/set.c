@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.27 2016/06/01 04:03:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.28 2016/08/04 04:27:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -106,6 +106,7 @@ static void set_locale __PROTO((void));
 static void set_logscale __PROTO((void));
 static void set_mapping __PROTO((void));
 static void set_margin __PROTO((t_position *));
+static void set_minus_sign __PROTO((void));
 static void set_missing __PROTO((void));
 static void set_separator __PROTO((void));
 static void set_datafile_commentschars __PROTO((void));
@@ -171,6 +172,8 @@ static void set_palette_function __PROTO((void));
 static void parse_histogramstyle __PROTO((histogram_style *hs,
 		t_histogram_type def_type, int def_gap));
 static void set_style_parallel __PROTO((void));
+
+static const char *encoding_minus __PROTO((void));
 
 static const struct position default_position
 	= {first_axes, first_axes, first_axes, 0., 0., 0.};
@@ -350,6 +353,9 @@ set_command()
 	    break;
 	case S_TMARGIN:
 	    set_margin(&tmargin);
+	    break;
+	case S_MINUS_SIGN:
+	    set_minus_sign();
 	    break;
 	case S_DATAFILE:
 	    if (almost_equals(++c_token,"miss$ing"))
@@ -1652,6 +1658,9 @@ set_encoding()
 
     /* Set degree sign to match encoding */
     set_degreesign(l);
+
+    /* Set minus sign to match encoding */
+    minus_sign = encoding_minus();
 }
 
 static void
@@ -1719,6 +1728,20 @@ set_degreesign(char *locale)
     }
 }
 
+/* Encoding-specific character enabled by "set minussign" */
+static const char *
+encoding_minus()
+{
+    static const char minus_utf8[4] = {0xE2, 0x88, 0x92, 0x0};
+    static const char minus_1252[2] = {0x96, 0x0};
+    static const char minus_sjis[4] = {0x81, 0x7c, 0x0, 0x0};
+    switch (encoding) {
+	case S_ENC_UTF8:	return minus_utf8;
+	case S_ENC_CP1252:	return minus_1252;
+	case S_ENC_SJIS:	return minus_sjis;
+	default:		return NULL;
+    }
+}
 
 /* process 'set fit' command */
 static void
@@ -2751,6 +2774,14 @@ set_margin(t_position *margin)
 	    margin->x = 1;
     }
 
+}
+
+/* process 'set minus_sign' command */
+static void
+set_minus_sign()
+{
+    c_token++;
+    use_minus_sign = TRUE;
 }
 
 static void
