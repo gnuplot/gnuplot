@@ -28,6 +28,7 @@ plot 'immigration.dat' using 0:($6+$12+$13+$14):xtic(strcol(1)[6:]) with linespo
 
 unset multi
 
-if (!exists("MANUAL_FIGURES")) pause -1 "Hit return to continue"
+if (exists("MANUAL_FIGURES")) exit
+pause -1 "Hit return to continue"
 
 reset
