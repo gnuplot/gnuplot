@@ -16,6 +16,11 @@
 	It affects only numbers formatted by gprint().  Other hyphens are 
 	not affected even if they are in a gprintf format string.
 
+	* src/boundary.c (do_key_layout):  Tweak vertical spacing of key titles
+	to make the result more like previous versions (in particular
+	the canvas terminal).  See patch of 2016-07-14
+	
+
 2016-08-06  Tatsuro MATSUOKA  <tmacchant3@yahoo.co.jp>
 
 	* src/wxterminal/wxt_gui.h:  Correct spelling of include file name.

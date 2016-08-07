@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.32 2016/05/09 03:32:27 sfeam Exp $
+ * $Id: boundary.c,v 1.33 2016/07/15 04:11:27 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -983,7 +983,7 @@ do_key_layout(legend_key *key)
 	key_sample_width = 0;
     }
 
-    key_sample_height = GPMAX( t->v_tic, t->v_char );
+    key_sample_height = GPMAX( 1.25 * t->v_tic, t->v_char );
     key_entry_height = key_sample_height * key->vert_factor;
     /* HBB 20020122: safeguard to prevent division by zero later */
     if (key_entry_height == 0)
