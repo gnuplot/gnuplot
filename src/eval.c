@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.134 2016/03/04 04:58:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.135 2016/03/17 05:53:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -984,6 +984,7 @@ update_gpval_variables(int context)
 	fill_gpval_string("GPVAL_TERMOPTIONS", term_options);
 	fill_gpval_string("GPVAL_OUTPUT", (outstr) ? outstr : "");
 	fill_gpval_string("GPVAL_ENCODING", encoding_names[encoding]);
+	fill_gpval_string("GPVAL_MINUS_SIGN", minus_sign ? minus_sign : "-");
     }
 
     /* If we are called from int_error() then set the error state */
