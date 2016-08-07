@@ -1,7 +1,7 @@
 2016-08-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/save.c src/set.c src/show.c src/tables.c src/tables.h src/unset.c
-	src/util.c src/util.h docs/gnuplot.doc term/js/canvasmath.js:
+	src/util.c src/util.h src/eval.c docs/gnuplot.doc term/js/canvasmath.js:
 
 	New command "set minussign" tells gprintf() to use an encoding-specific
 	minus sign character for numeric output rather than the ascii hypen
