@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.62 2016/06/14 18:25:39 markisch Exp $
+# $Id: Makefile,v 1.63 2016/07/21 09:07:44 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 # This assumes a typical installation of the MinGW toolkit, the free
@@ -126,7 +126,7 @@ endif
 # Requires libcaca version 0.99.beta15 or newer. A post-beta18
 # svn version is recommended since it contains an improved
 # win32 backend.
-CACA=1
+#CACA=1
 
 # Uncomment if you have libiconv
 ICONV=1
@@ -164,11 +164,12 @@ GNUPLOT_SHARE_DIR = share
 DESTDIR = "$(PROGRAMFILES)/gnuplot"
 
 # Do you want some special optimization / flags?
-#CFLAGS +=
+CFLAGS += -Dlint
 ifdef CLANG
 CFLAGS += -fcolor-diagnostics -fansi-escape-codes
-CFLAGS += -Wno-error=incompatible-ms-struct -Wno-ignored-attributes
+CFLAGS += -Wno-incompatible-ms-struct -Wno-ignored-attributes
 CFLAGS += -isystem c:/msys64/mingw64/include -pedantic
+CXXFLAGS += -std=c++11
 endif
 ifdef MINGW64
 # This does not seem to work even if GCC_COLORS is set.
@@ -315,7 +316,7 @@ ifdef PIPES
 endif
 
 ifdef CONSOLE
-  OPTS += -DWGP_CONSOLE -DCONSOLE_SWITCH_CP
+  OPTS += -DWGP_CONSOLE
   LDFLAGS2 = -mconsole
 endif
 
@@ -648,7 +649,7 @@ wxt_gui.$(O): $(S)/wxterminal/wxt_gui.cpp $(S)/wxterminal/wxt_gui.h
 	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) $(CAIRO_CFLAGS) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
 
 gp_cairo.$(O): $(S)/wxterminal/gp_cairo.c $(S)/wxterminal/gp_cairo.h
-	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) $(PANGOCAIRO_CFLAGS) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
+	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) $(PANGOCAIRO_CFLAGS) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
 
 qt_term.$(O): $(S)/qtterminal/qt_term.cpp $(S)/qtterminal/qt_term.h
 	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
@@ -732,7 +733,7 @@ $(JASRC): $(D)gnuplot-ja.doc $(D)term-ja.diff $(CORETERM)
 	-mkdir $(JA)demo
 	cp -r $(TOP)/term/* $(JA)term/
 	cp -r $(TOP)/docs/* $(JA)docs/
-	cp $(M)*.dat $(M)*.png $(M)*.rgb $(JA)demo/
+	cp $(M)*.dat $(M)*.png $(M)*.rgb $(M)*.dem $(JA)demo/
 	# Apply patch for Japanese docs
 	-rm $(JAD)tex2ja.awk $(JAD)sjisenc.c
 	-(cd $(JA) ; patch -p0 -i docs/term-ja.diff)
@@ -793,7 +794,7 @@ gnuplot-lua-tikz.sty: $(T)/lua/gnuplot-tikz.lua
 	$(LUA) $< style
 
 $(LUA_HELP): $(T)/lua/gnuplot-tikz.lua
-	$(LUA) $< termhelp > $@
+	cmd /c "$(LUA) $< termhelp > $@"
 endif
 
 

@@ -1,3 +1,11 @@
+2016-08-08  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/mingw/Makefile:  Avoid warning messages when using clang.
+	Omit C++ flags when building gp_cairo.c.  Japanese help file was
+	missing a graph from the demos.  Execute lua via the cmd.exe shell
+	in order to avoid errors when redirecting its output (Seems to be
+	a lua bug in Mingw64).
+
 2016-08-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/save.c src/set.c src/show.c src/tables.c src/tables.h src/unset.c
@@ -19,12 +27,12 @@
 	* src/boundary.c (do_key_layout):  Tweak vertical spacing of key titles
 	to make the result more like previous versions (in particular
 	the canvas terminal).  See patch of 2016-07-14
-	
 
 2016-08-06  Tatsuro MATSUOKA  <tmacchant3@yahoo.co.jp>
 
 	* src/wxterminal/wxt_gui.h:  Correct spelling of include file name.
- 
+	Bug #1836
+
 2016-08-06  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/command.c src/plot.c src/syscfg.h src/win/winmain.c|h
