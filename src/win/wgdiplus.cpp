@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.30 2016/08/06 13:08:31 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.31 2016/08/09 05:20:24 markisch Exp $
  */
 
 /*
@@ -27,6 +27,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// include iostream / cstdio _before_ syscfg.h in order
+// to avoid re-definition by wtext.h/winmain.c routines
+#include <iostream>
 extern "C" {
 # include "syscfg.h"
 }
@@ -34,16 +37,17 @@ extern "C" {
 #include <windowsx.h>
 #define GDIPVER 0x0110
 #include <gdiplus.h>
-#include <iostream>
-
 #include <tchar.h>
 #include <wchar.h>
+
 #include "wgdiplus.h"
 #include "wgnuplib.h"
 #include "winmain.h"
 #include "wcommon.h"
 using namespace Gdiplus;
-using namespace std;
+// do not use namespace std: otherwise MSVC complains about
+// ambiguous symbool bool
+//using namespace std;
 
 static bool gdiplusInitialized = false;
 static ULONG_PTR gdiplusToken;
@@ -1594,12 +1598,12 @@ SaveAsBitmap(LPGW lpgw)
 	/* ask GDI+ about supported encoders */
 	if (pImageCodecInfo == NULL)
 		if (gdiplusGetEncoders() < 0)
-			cerr << "Error:  GDI+ could not retrieve the list of encoders" << endl;
+			std::cerr << "Error:  GDI+ could not retrieve the list of encoders" << std::endl;
 #if 0
 	for (i = 0; i < nImageCodecs; i++) {
 		char * descr = AnsiText(pImageCodecInfo[i].FormatDescription, S_ENC_DEFAULT);
 		char * ext = AnsiText(pImageCodecInfo[i].FilenameExtension, S_ENC_DEFAULT);
-		cerr << i << ": " << descr << " " << ext << endl;
+		std::cerr << i << ": " << descr << " " << ext << std::endl;
 		free(descr);
 		free(ext);
 	}
@@ -1652,7 +1656,7 @@ SaveAsBitmap(LPGW lpgw)
 		char * type = AnsiText(wtype, S_ENC_DEFAULT);
 		SizeF size;
 		bitmap->GetPhysicalDimension(&size);
-		cerr << endl << "Saving bitmap: size: " << size.Width << " x " << size.Height << "  type: " << type << " ..." << endl;
+		std::cerr << std::endl << "Saving bitmap: size: " << size.Width << " x " << size.Height << "  type: " << type << " ..." << std::endl;
 		free(type);
 #endif
 		bitmap->Save(Ofn.lpstrFile, &(pImageCodecInfo[ntype].Clsid), NULL);
