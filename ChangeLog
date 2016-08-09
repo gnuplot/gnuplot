@@ -1,10 +1,17 @@
+2016-08-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* config/mingw/Makefile:  Enforce calling the lua executable instead
+	of the lua wrapper script of Mingw64.  Better fix for the build failure
+	of gnuplot-tikz.help.
+
 2016-08-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/mingw/Makefile:  Avoid warning messages when using clang.
-	Omit C++ flags when building gp_cairo.c.  Japanese help file was
-	missing a graph from the demos.  Execute lua via the cmd.exe shell
-	in order to avoid errors when redirecting its output (Seems to be
-	a lua bug in Mingw64).
+	Qt 5.x assumes C++11. Omit C++ flags when building gp_cairo.c.
+	Japanese help file was missing a graph from the demos.  Execute lua
+	via the cmd.exe shell in order to avoid errors when redirecting its
+	output (Seems to be a lua bug in Mingw64).  Remove obsolete flag
+	CONSOLE_SWITCH_CP.  Do not enable caca terminal by default.
 
 2016-08-07  Ethan A Merritt  <merritt@u.washington.edu>
 
