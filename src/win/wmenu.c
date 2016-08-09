@@ -1,5 +1,5 @@
 /*
- * $Id: wmenu.c,v 1.33 2016/08/06 13:08:31 markisch Exp $Id: wmenu.c,v 1.33 2016/08/06 13:08:31 markisch Exp $
+ * $Id: wmenu.c,v 1.34 2016/08/09 07:59:30 markisch Exp $Id: wmenu.c,v 1.34 2016/08/09 07:59:30 markisch Exp $
  */
 
 /* GNUPLOT - win/wmenu.c */
@@ -786,8 +786,10 @@ LoadMacros(LPTW lptw)
 	ZeroMemory(&button, sizeof(button));
 	button.iBitmap = ButtonIcon[i];
 	if (ButtonIconFile[i] != NULL) {
+	    char * fname;
 	    LPWSTR wfname;
-	    char * fname = RelativePathToGnuplot(GNUPLOT_SHARE_DIR "\\images");
+
+	    fname = RelativePathToGnuplot(GNUPLOT_SHARE_DIR "\\images");
 	    fname = realloc(fname, strlen(fname) + strlen(ButtonIconFile[i]) + 2);
 	    PATH_CONCAT(fname, ButtonIconFile[i]);
 	    if (bLoadStandardButtons)
