@@ -1,5 +1,5 @@
 /*
- * $Id: wmenu.c,v 1.34 2016/08/09 07:59:30 markisch Exp $Id: wmenu.c,v 1.34 2016/08/09 07:59:30 markisch Exp $
+ * $Id: wmenu.c,v 1.35 2016/08/09 08:13:59 markisch Exp $Id: wmenu.c,v 1.35 2016/08/09 08:13:59 markisch Exp $
  */
 
 /* GNUPLOT - win/wmenu.c */
@@ -786,11 +786,16 @@ LoadMacros(LPTW lptw)
 	ZeroMemory(&button, sizeof(button));
 	button.iBitmap = ButtonIcon[i];
 	if (ButtonIconFile[i] != NULL) {
+#ifdef HAVE_GDIPLUS
 	    char * fname;
 	    LPWSTR wfname;
 
+#ifdef GNUPLOT_SHARE_DIR
 	    fname = RelativePathToGnuplot(GNUPLOT_SHARE_DIR "\\images");
-	    fname = realloc(fname, strlen(fname) + strlen(ButtonIconFile[i]) + 2);
+#else
+	    fname = RelativePathToGnuplot("images");
+#endif
+	    fname = (char *) realloc(fname, strlen(fname) + strlen(ButtonIconFile[i]) + 2);
 	    PATH_CONCAT(fname, ButtonIconFile[i]);
 	    if (bLoadStandardButtons)
 		button.iBitmap += ButtonExtra;
@@ -800,6 +805,12 @@ LoadMacros(LPTW lptw)
 	    SendMessage(lpmw->hToolbar, TB_ADDBITMAP, 0, (WPARAM)&bitmap);
 	    free(fname);
 	    free(wfname);
+#else
+	    static TBOOLEAN warn_once = TRUE;
+	    if (warn_once)
+		fprintf(stderr, "Error:  This version of gnuplot cannot load icon bitmaps as it does not include support for GDI+.\n");
+	    warn_once = FALSE;
+#endif
 	}
 	button.idCommand = lpmw->hButtonID[i];
 	button.fsState = TBSTATE_ENABLED;
