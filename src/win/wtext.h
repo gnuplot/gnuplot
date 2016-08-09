@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.h,v 1.18 2016/02/14 08:49:11 markisch Exp $
+ * $Id: wtext.h,v 1.19 2016/08/06 13:22:50 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.h */
@@ -65,6 +65,7 @@ extern "C" {
 #define getchar()   getch()
 
 #define fgetc(file) MyFGetC(file)
+#undef getc
 #define getc(file)  MyFGetC(file)
 #define fgets(str,sz,file)  MyFGetS(str,sz,file)
 #define gets(str)   MyGetS(str)
