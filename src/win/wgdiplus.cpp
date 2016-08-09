@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.32 2016/08/09 08:05:25 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.33 2016/08/09 12:02:59 markisch Exp $
  */
 
 /*
@@ -836,6 +836,7 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 				draw_update_keybox(lpgw, plotno, points[0].X, points[0].Y);
 				draw_update_keybox(lpgw, plotno, points[polyi - 1].X, points[polyi - 1].Y);
 			}
+			delete [] points;
 			break;
 		}
 
@@ -1646,6 +1647,8 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 		delete pattern_brush;
 	if (cb)
 		delete cb;
+	if (font)
+		delete font;
 	LocalFreePtr(ppt);
 }
 
