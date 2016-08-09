@@ -1,5 +1,5 @@
 /*
- * $Id: wmenu.c,v 1.32 2016/07/25 10:31:33 markisch Exp $Id: wmenu.c,v 1.32 2016/07/25 10:31:33 markisch Exp $
+ * $Id: wmenu.c,v 1.33 2016/08/06 13:08:31 markisch Exp $Id: wmenu.c,v 1.33 2016/08/06 13:08:31 markisch Exp $
  */
 
 /* GNUPLOT - win/wmenu.c */
@@ -786,12 +786,13 @@ LoadMacros(LPTW lptw)
 	ZeroMemory(&button, sizeof(button));
 	button.iBitmap = ButtonIcon[i];
 	if (ButtonIconFile[i] != NULL) {
+	    LPWSTR wfname;
 	    char * fname = RelativePathToGnuplot(GNUPLOT_SHARE_DIR "\\images");
 	    fname = realloc(fname, strlen(fname) + strlen(ButtonIconFile[i]) + 2);
 	    PATH_CONCAT(fname, ButtonIconFile[i]);
 	    if (bLoadStandardButtons)
 		button.iBitmap += ButtonExtra;
-	    LPWSTR wfname = UnicodeText(fname, S_ENC_DEFAULT);
+	    wfname = UnicodeText(fname, S_ENC_DEFAULT);
 	    bitmap.hInst = NULL;
 	    bitmap.nID = (UINT_PTR) gdiplusLoadBitmap(wfname, ButtonSize);
 	    SendMessage(lpmw->hToolbar, TB_ADDBITMAP, 0, (WPARAM)&bitmap);
