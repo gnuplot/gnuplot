@@ -1,5 +1,5 @@
 /*
- * $Id: wcommon.h,v 1.25 2016/05/21 05:29:31 markisch Exp $
+ * $Id: wcommon.h,v 1.26 2016/07/21 09:07:44 markisch Exp $
  */
 
 /* GNUPLOT - wcommon.h */
@@ -107,11 +107,9 @@ unsigned luma_from_color(unsigned red, unsigned green, unsigned blue);
 void add_tooltip(LPGW lpgw, PRECT rect, LPWSTR text);
 void clear_tooltips(LPGW lpgw);
 void draw_update_keybox(LPGW lpgw, unsigned plotno, unsigned x, unsigned y);
-int draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, const char * str);
+int draw_enhanced_text(LPGW lpgw, LPRECT rect, int x, int y, const char * str);
 void draw_get_enhanced_text_extend(PRECT extend);
 void draw_image(LPGW lpgw, HDC hdc, char *image, POINT corners[4], unsigned int width, unsigned int height, int color_mode);
-void SetFont(LPGW lpgw, HDC hdc);
-void GraphChangeFont(LPGW lpgw, LPCTSTR font, int fontsize, HDC hdc, RECT rect);
 
 #ifdef __cplusplus
 }
