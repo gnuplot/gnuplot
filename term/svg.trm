@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.175 2016/08/04 23:00:54 sfeam Exp $
+ * $Id: svg.trm,v 1.176 2016/08/05 05:10:29 markisch Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -900,7 +900,7 @@ SVG_init ()
 	SVG_scriptdir = gp_strdup(GNUPLOT_JS_DIR);
 # endif
 #else
-	SVG_scriptdir = gp_strdup(svg_default_jsdir);
+	SVG_scriptdir = gp_strdup("");
 #endif /* GNUPLOT_JS_DIR */
     }
 
