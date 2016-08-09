@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.24 2014/08/15 19:25:13 sfeam Exp $
+# $Id: Makefile,v 1.25 2014/08/18 03:49:06 sfeam Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -69,7 +69,7 @@ DEBUG = 0
 #GDDIR = gdwin32
 #LUADIR = lua
 PDFDIR = pdflib
-#QTDIR = C:\\Qt\\4.8.4
+#QTDIR = C:\Qt\4.8.4
 QTDIR = d:\Source\Qt-5.2.1\5.2.1\msvc2012
 #CAIRODIR = cairo-pango
 #CACADIR = libcaca
@@ -80,7 +80,7 @@ LIBDIR =  d:\msvc-libs
 # installation directory
 DESTDIR = "$(PROGRAMFILES)\gnuplot"
 
-TOP = ..\\..
+TOP = ..\..
 
 # directory for PostScript prolog and associated files
 GNUPLOT_PS_DIR = share\\PostScript
@@ -122,6 +122,8 @@ OPTIONS = $(OPTIONS) /DGNUPLOT_HISTORY
 
 EXTRA_TARGETS =
 
+VERSION_CPPFLAGS = -DVERSION_MAJOR=\"5.1\" -DPATCHLEVEL=\"0\"
+
 # flags for terminals
 # see other terminal defines in term.h
 TERMFLAGS = /I$(T) /DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" /DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\"
@@ -134,7 +136,7 @@ LDFLAGS = $(LDFLAGS) /DEBUG
 !ENDIF
 COMMONLIBS = kernel32.lib user32.lib gdi32.lib winspool.lib \
              comdlg32.lib comctl32.lib advapi32.lib shell32.lib \
-             msimg32.lib gdiplus.lib
+             msimg32.lib gdiplus.lib shlwapi.lib
 CONSOLELIBS = ole32.lib oleaut32.lib comctl32.lib
 
 !IFDEF LIBDIR
@@ -189,9 +191,9 @@ QTLIBS = QtCore4.lib QtGui4.lib QtNetwork4.lib QtSvg4.lib
 CFLAGS = $(CFLAGS) /I$(QTDIR)\include /I$(QTDIR)\include\QtCore /I$(QTDIR)\include\QtGui /I$(QTDIR)\include\QtWidgets /I$(QTDIR)\include\QtNetwork /I$(QTDIR)\include\QtSvg /DQTGNUPLOT_DATA_DIR=\"$(GNUPLOT_QT_DIR)\"
 LDFLAGS = $(LDFLAGS) /libpath:$(QTDIR)\lib
 CFLAGS = $(CFLAGS) -DQTTERM -DQT_NO_OPENGL
-MOC=$(QTDIR)\\bin\\moc
-UIC=$(QTDIR)\\bin\\uic
-RCC=$(QTDIR)\\bin\\rcc
+MOC=$(QTDIR)\bin\moc
+UIC=$(QTDIR)\bin\uic
+RCC=$(QTDIR)\bin\rcc
 EXTRA_TARGETS = $(EXTRA_TARGETS) gnuplot_qt.exe
 !ENDIF
 
@@ -226,17 +228,17 @@ MACHINE = IX86
 # macros for makefile.all
 
 O=obj
-S=$(TOP)\\src
-W=$(S)\\win\\
-WX=$(S)\\wxterminal\\
-Q=$(S)\\qtterminal\\
-T=$(TOP)\\term\\
-D=$(TOP)\\docs\\
-M=$(TOP)\\demo\\
+S=$(TOP)\src
+W=$(S)\win\\
+WX=$(S)\wxterminal\\
+Q=$(S)\qtterminal\\
+T=$(TOP)\term\\
+D=$(TOP)\docs\\
+M=$(TOP)\demo\\
 
 default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe gnuplot.exe demo_plugin.dll $(EXTRA_TARGETS)
 
-!INCLUDE $(S)\\makefile.all
+!INCLUDE $(S)\makefile.all
 
 OBJS = $(COREOBJS) version.obj
 
@@ -296,10 +298,10 @@ ALL_CONSOLE_OBJS = $(OBJS:.obj=.cobj) $(WINOBJS:.obj=.cobj)
 	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $*.cpp /Fo$@
 
 {$(S)}.c.obj:
-	$(CC) /c $(CFLAGS) $(WIN_CFLAGS) $(S)\\$*.c
+	$(CC) /c $(CFLAGS) $(WIN_CFLAGS) $(S)\$*.c
 
 {$(S)}.c.cobj:
-	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $(S)\\$*.c /Fo$@
+	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $(S)\$*.c /Fo$@
 
 {$(W)}.c.obj:
 	$(CC) /c $(CFLAGS) $(WIN_CFLAGS) $(W)$*.c /Fo$@
@@ -444,25 +446,25 @@ wgnuplot.res :  $(W)wgnuplot.rc $(W)wgnuplib.rc $(W)wresourc.h $(W)grpicon.ico $
 $(HELPFILE): doc2html.exe $(D)gnuplot.doc gnuplot.exe
 	doc2html $(D)gnuplot.doc $(D)windows\\
 	cd $(D)
-	-"..\\config\\msvc\\gnuplot" -e "winhelp=1" plotstyles.gnu
+	-"..\config\msvc\gnuplot" -e "winhelp=1" plotstyles.gnu
 	-"$(HHWPATH)hhc" windows\wgnuplot.hhp
-	cd ..\\config\\msvc
+	cd ..\config\msvc
 	if exist $(D)windows\wgnuplot.chm copy $(D)windows\wgnuplot.chm .
 
 doc2html.exe: $(D)windows\doc2html.c $(D)termdoc.c $(D)xref.c version.obj $(CORETERM)
-	$(CC) $(CFLAGS) /F 5000 /W1 /I. /DWINDOWS_NO_GUI /I$(D) /I$(T) -Fedoc2html.exe $(D)windows\doc2html.c $(D)termdoc.c $(D)xref.c version.obj
+	$(CC) $(CFLAGS) /F 5000 /W1 /I. $(VERSION_CPPFLAGS) /DWINDOWS_NO_GUI /I$(D) /I$(T) -Fedoc2html.exe $(D)windows\doc2html.c $(D)termdoc.c $(D)xref.c version.obj
 
 
 # make binary demo files
 # WINDOWS_NO_GUI makes sure that wtext.h does not redefine fread() etc.
-$(M)bf_test.exe : $(S)\\bf_test.c
-	$(CC) $(CFLAGS) /F 5000 /W1 /DWINDOWS_NO_GUI /Fe$(M)bf_test.exe $(S)\\bf_test.c
+$(M)bf_test.exe : $(S)\bf_test.c
+	$(CC) $(CFLAGS) /F 5000 /W1 /DWINDOWS_NO_GUI /Fe$(M)bf_test.exe $(S)\bf_test.c
 	cd $(M)
 	bf_test
-	cd ..\\config\\msvc
+	cd ..\config\msvc
 
-demo_plugin.dll: $(M)plugin\\demo_plugin.c
-	$(CC) $(CFLAGS) /LD /D_USRDLL /D_WINDLL $(M)plugin\\$*.c /link /out:$@
+demo_plugin.dll: $(M)plugin\demo_plugin.c
+	$(CC) $(CFLAGS) /LD /D_USRDLL /D_WINDLL $(M)plugin\$*.c /link /out:$@
 
 # clean up temporary files
 clean:
