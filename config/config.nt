@@ -86,10 +86,10 @@
 /* #undef HAVE_EDITLINE_READLINE_H */
 
 /* Define to 1 if you have the `erf' function. */
-/* #undef HAVE_ERF */
+#define HAVE_ERF 1
 
 /* Define to 1 if you have the `erfc' function. */
-/* #undef HAVE_ERFC */
+#define HAVE_ERFC 1
 
 /* Define to 1 if you have the <errno.h> header file. */
 #define HAVE_ERRNO_H 1
@@ -279,10 +279,10 @@
 #define HAVE_SNPRINTF 1
 
 /* Define to 1 if stdbool.h conforms to C99. */
-/* #undef HAVE_STDBOOL_H */
+#define HAVE_STDBOOL_H 1
 
 /* Define to 1 if you have the <stdint.h> header file. */
-/* #undef HAVE_STDINT_H */
+#define HAVE_STDINT_H 1
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 #define HAVE_STDLIB_H 1
@@ -594,7 +594,7 @@
 #define GP_INLINE __inline
 #define GP_EXCEPTION_NAME _exception
 #define GP_MATHERR _matherr
-#define isnan _isnan
+/* no longer needed with VS2015: #define isnan _isnan */
 #define ftruncate _chsize
 #define strtoll _strtoi64
 #define isblank isspace
