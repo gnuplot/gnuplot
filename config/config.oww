@@ -574,6 +574,7 @@
 
 #define popen _popen
 #define strnlen strnlen_s
+#define ftruncate _chsize
 
 /* gnuplot.gih is not used by wgnuplot */
 #define NO_GIH 1
