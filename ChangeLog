@@ -1,13 +1,18 @@
 2016-08-10  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wcommon.h src/win/wgraph.c src/win/wprinter.c:  Store the
+	memory handles itself to save the user's printer selection (instead of
+	the pointer returned by GlobalAlloc) and use them in all printer
+	dialogs. Bugfix.
+
 	* src/win/wprinter.c (DumpPrinter, PrintDlgProc) src/win/wgraph.c 
 	(CopyPrint) src/win/wgnuplib.h (GP_PRINT):  Changing the private data
 	of some possibly unknown window is dangerous.  Store the pointer to the
 	printer data in the dialog's 'WindowLong's instead.
 
 	* src/win/wprinter (DumpPrinter):  The Escape() function always expects
-	a byte encoded string, irrespective if UNICODE is set or not. Explicit
-	type casting may hide errors.
+	a byte encoded string, irrespective if UNICODE is defined or not.
+	Explicit type casting may hide errors. Bugfix.
 
 2016-08-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
