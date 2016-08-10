@@ -1,5 +1,5 @@
 /*
- * $Id: wresourc.h,v 1.19 2014/01/04 15:46:38 markisch Exp $
+ * $Id: wresourc.h,v 1.20 2016/07/27 19:38:22 markisch Exp $
  */
 
 /* GNUPLOT - win/wresourc.h */
@@ -81,14 +81,13 @@
 #define M_POLYAA       NUMMENU+18
 #define M_PATTERNAA    NUMMENU+19
 #define M_FASTROTATE   NUMMENU+20
-#define M_HIDEGRID     NUMMENU+21
-#define M_HIDEPLOT     NUMMENU+22
-#define M_SAVE_AS_BITMAP  NUMMENU+23
+#define M_SAVE_AS_BITMAP  NUMMENU+21
+#define M_HIDEGRID     NUMMENU+22
+#define M_HIDEPLOT     NUMMENU+23
 /* Warning: need MAXPLOTSHIDE free slots */
 /* wtext.c */
 #define M_SYSCOLORS    NUMMENU+50
 #define M_WRAP         NUMMENU+51
-
 
 /* wprinter.c */
 #define PSIZE_SBOX 100
@@ -119,4 +118,3 @@
 /* HBB 20010208: cursors for mouse-enabled wgnuplot */
 #define IDC_SCALING    222
 #define IDC_ROTATING   223
-

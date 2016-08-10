@@ -1,5 +1,8 @@
 2016-08-10  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wresourc.h:  Message code for saving as bitmap was in conflict
+	with the message code for hiding graph #2.  Bugfix.
+
 	* src/win/wcommon.h src/win/wgraph.c src/win/wprinter.c:  Store the
 	memory handles itself to save the user's printer selection (instead of
 	the pointer returned by GlobalAlloc) and use them in all printer
