@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.214 2016/08/09 05:22:36 markisch Exp $
+ * $Id: wgraph.c,v 1.215 2016/08/09 12:02:59 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -3095,13 +3095,14 @@ CopyClip(LPGW lpgw)
 			rect.bottom - rect.top);
 	if (bitmap) {
 		/* there is enough memory and the bitmaps OK */
-		SelectObject(mem, bitmap);
+		HBITMAP oldbmp = (HBITMAP) SelectObject(mem, bitmap);
 		BitBlt(mem,0,0,rect.right - rect.left,
 			rect.bottom - rect.top, hdc, rect.left,
 			rect.top, SRCCOPY);
+		SelectObject(mem, oldbmp);
 	} else {
 		MessageBeep(MB_ICONHAND);
-		MessageBox(hwnd, TEXT("Insufficient Memory to Copy Clipboard"),
+		MessageBox(hwnd, TEXT("Insufficient memory to copy to clipboard"),
 			lpgw->Title, MB_ICONHAND | MB_OK);
 	}
 	DeleteDC(mem);
@@ -3135,8 +3136,9 @@ CopyClip(LPGW lpgw)
 	 * the Clipboard */
 	OpenClipboard(hwnd);
 	EmptyClipboard();
-	SetClipboardData(CF_ENHMETAFILE,hemf);
-	SetClipboardData(CF_BITMAP, bitmap);
+	SetClipboardData(CF_ENHMETAFILE, hemf);
+	if (bitmap)
+		SetClipboardData(CF_BITMAP, bitmap);
 	CloseClipboard();
 	ReleaseDC(hwnd, hdc);
 	DeleteEnhMetaFile(hemf);
@@ -3174,11 +3176,9 @@ CopyPrint(LPGW lpgw)
 
 	pDevNames = (DEVNAMES *) GlobalLock(pd.hDevNames);
 	pDevMode = (DEVMODE *) GlobalLock(pd.hDevMode);
-
 	szDriver = (LPCTSTR)pDevNames + pDevNames->wDriverOffset;
 	szDevice = (LPCTSTR)pDevNames + pDevNames->wDeviceOffset;
 	szOutput = (LPCTSTR)pDevNames + pDevNames->wOutputOffset;
-
 	printer = CreateDC(szDriver, szDevice, szOutput, pDevMode);
 
 	GlobalUnlock(pd.hDevMode);
@@ -3198,13 +3198,13 @@ CopyPrint(LPGW lpgw)
 	}
 
 	pr.hdcPrn = printer;
-	SetWindowLongPtr(hwnd, 4, (LONG_PTR)&pr);
-	PrintRegister((GP_LPPRINT)&pr);
+	PrintRegister(&pr);
 
 	EnableWindow(hwnd, FALSE);
 	pr.bUserAbort = FALSE;
+	pr.szTitle = lpgw->Title;
 	pr.hDlgPrint = CreateDialogParam(hdllInstance, TEXT("CancelDlgBox"),
-					 hwnd, PrintDlgProc, (LPARAM)lpgw->Title);
+					 hwnd, PrintDlgProc, (LPARAM) &pr);
 	SetAbortProc(printer, PrintAbortProc);
 
 	memset(&docInfo, 0, sizeof(DOCINFO));
@@ -3234,8 +3234,7 @@ CopyPrint(LPGW lpgw)
 		DestroyWindow(pr.hDlgPrint);
 	}
 	DeleteDC(printer);
-	SetWindowLong(hwnd, 4, (LONG)(0L));
-	PrintUnregister((GP_LPPRINT)&pr);
+	PrintUnregister(&pr);
 	/* make certain that the screen pen set is restored */
 	SendMessage(lpgw->hWndGraph, WM_COMMAND, M_REBUILDTOOLS, 0L);
 	return;

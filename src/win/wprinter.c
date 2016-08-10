@@ -1,5 +1,5 @@
 /*
- * $Id: wprinter.c,v 1.14 2016/07/21 09:07:44 markisch Exp $
+ * $Id: wprinter.c,v 1.15 2016/08/10 14:03:20 markisch Exp $
  */
 
 /* GNUPLOT - win/wprinter.c */
@@ -214,15 +214,14 @@ INT_PTR CALLBACK
 PrintDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
     GP_LPPRINT lpr;
-    lpr = (GP_LPPRINT) GetWindowLongPtr(GetParent(hDlg), 4);
-    /* FIXME: cause of crash in bug #3544949. No idea yet as to why this could happen, though. */
-    if (lpr == NULL)
-	    return FALSE;
 
+    lpr = (GP_LPPRINT) GetWindowLongPtr(hDlg, 0);
     switch (message) {
     case WM_INITDIALOG:
+	lpr = (GP_LPPRINT) lParam;
 	lpr->hDlgPrint = hDlg;
-	SetWindowText(hDlg, (LPTSTR) lParam);
+	SetWindowLongPtr(hDlg, 0, (LONG_PTR) lpr);
+	SetWindowText(hDlg, lpr->szTitle);
 	EnableMenuItem(GetSystemMenu(hDlg, FALSE), SC_CLOSE, MF_GRAYED);
 	return TRUE;
     case WM_COMMAND:
@@ -242,7 +241,7 @@ PrintAbortProc(HDC hdcPrn, int code)
     MSG msg;
     GP_LPPRINT lpr= PrintFind(hdcPrn);
     while (!lpr->bUserAbort && PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
-	if (!lpr->hDlgPrint || !IsDialogMessage(lpr->hDlgPrint,&msg)) {
+	if (!lpr->hDlgPrint || !IsDialogMessage(lpr->hDlgPrint, &msg)) {
 	    TranslateMessage(&msg);
 	    DispatchMessage(&msg);
 	}
@@ -308,14 +307,14 @@ DumpPrinter(HWND hwnd, LPTSTR szAppName, LPTSTR szFileName)
 	    return;	/* abort */
 
 	pr.hdcPrn = printer;
-	SetWindowLongPtr(hwnd, 4, (LONG_PTR)((GP_LPPRINT)&pr));
 	PrintRegister(&pr);
 	if ((buf = (LPSTR) malloc(4096 + 2)) != NULL) {
 	    bufcount = (WORD *)buf;
 	    EnableWindow(hwnd, FALSE);
 	    pr.bUserAbort = FALSE;
+	    pr.szTitle = szAppName;
 	    pr.hDlgPrint = CreateDialogParam(hdllInstance, TEXT("CancelDlgBox"),
-						hwnd, PrintDlgProc, (LPARAM)szAppName);
+						hwnd, PrintDlgProc, (LPARAM) &pr);
 	    SetAbortProc(printer, PrintAbortProc);
 
 	    memset(&di, 0, sizeof(DOCINFO));
@@ -347,7 +346,6 @@ DumpPrinter(HWND hwnd, LPTSTR szAppName, LPTSTR szFileName)
 	    }
 	}
 	DeleteDC(printer);
-	SetWindowLong(hwnd, 4, 0L);
 	PrintUnregister(&pr);
     }
     fclose(f);

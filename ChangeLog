@@ -1,5 +1,10 @@
 2016-08-10  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wprinter.c (DumpPrinter, PrintDlgProc) src/win/wgraph.c 
+	(CopyPrint) src/win/wgnuplib.h (GP_PRINT):  Changing the private data
+	of some possibly unknown window is dangerous.  Store the pointer to the
+	printer data in the dialog's 'WindowLong's instead.
+
 	* src/win/wprinter (DumpPrinter):  The Escape() function always expects
 	a byte encoded string, irrespective if UNICODE is set or not. Explicit
 	type casting may hide errors.
