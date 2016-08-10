@@ -1,3 +1,9 @@
+2016-08-10  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wprinter (DumpPrinter):  The Escape() function always expects
+	a byte encoded string, irrespective if UNICODE is set or not. Explicit
+	type casting may hide errors.
+
 2016-08-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/msvc/Makefile (#QTDIR, TOP, MOC, UIC, RCC, S, W, WX, Q)

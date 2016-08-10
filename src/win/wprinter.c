@@ -1,5 +1,5 @@
 /*
- * $Id: wprinter.c,v 1.13 2016/05/07 09:26:36 markisch Exp $
+ * $Id: wprinter.c,v 1.14 2016/07/21 09:07:44 markisch Exp $
  */
 
 /* GNUPLOT - win/wprinter.c */
@@ -154,7 +154,7 @@ PrintSize(HDC printer, HWND hwnd, LPRECT lprect)
     pr.pdef.y = MulDiv(lprect->bottom-lprect->top, 254, 10*GetDeviceCaps(hdc, LOGPIXELSX));
     ReleaseDC(hwnd,hdc);
 
-    if (DialogBox (hdllInstance, TEXT("PrintSizeDlgBox"), hwnd, PrintSizeDlgProc) == IDOK) {
+    if (DialogBox(hdllInstance, TEXT("PrintSizeDlgBox"), hwnd, PrintSizeDlgProc) == IDOK) {
 	lprect->left = MulDiv(pr.poff.x * 10, GetDeviceCaps(printer, LOGPIXELSX), 254);
 	lprect->top = MulDiv(pr.poff.y * 10, GetDeviceCaps(printer, LOGPIXELSY), 254);
 	lprect->right = lprect->left + MulDiv(pr.psize.x * 10, GetDeviceCaps(printer, LOGPIXELSX), 254);
@@ -262,7 +262,7 @@ DumpPrinter(HWND hwnd, LPTSTR szAppName, LPTSTR szFileName)
     LPCTSTR szDriver, szDevice, szOutput;
     GP_PRINT pr;
     DOCINFO di;
-    LPTSTR buf;
+    LPSTR buf;
     WORD * bufcount;
     int count;
     FILE *f;
@@ -292,16 +292,13 @@ DumpPrinter(HWND hwnd, LPTSTR szAppName, LPTSTR szFileName)
     if (PrintDlg(&pd)) {
 	pDevNames = (DEVNAMES *) GlobalLock(pd.hDevNames);
 	pDevMode = (DEVMODE *) GlobalLock(pd.hDevMode);
-
 	szDriver = (LPCTSTR)pDevNames + pDevNames->wDriverOffset;
 	szDevice = (LPCTSTR)pDevNames + pDevNames->wDeviceOffset;
 	szOutput = (LPCTSTR)pDevNames + pDevNames->wOutputOffset;
-
 	printer = CreateDC(szDriver, szDevice, szOutput, pDevMode);
 
 	GlobalUnlock(pd.hDevMode);
 	GlobalUnlock(pd.hDevNames);
-
 	/* We no longer free these structures, but preserve them for the next time
 	GlobalFree(pd.hDevMode);
 	GlobalFree(pd.hDevNames);
@@ -312,10 +309,10 @@ DumpPrinter(HWND hwnd, LPTSTR szAppName, LPTSTR szFileName)
 
 	pr.hdcPrn = printer;
 	SetWindowLongPtr(hwnd, 4, (LONG_PTR)((GP_LPPRINT)&pr));
-	PrintRegister((GP_LPPRINT)&pr);
-	if ((buf = (LPTSTR) malloc((4096 + 2) * sizeof(TCHAR))) != NULL) {
+	PrintRegister(&pr);
+	if ((buf = (LPSTR) malloc(4096 + 2)) != NULL) {
 	    bufcount = (WORD *)buf;
-	    EnableWindow(hwnd,FALSE);
+	    EnableWindow(hwnd, FALSE);
 	    pr.bUserAbort = FALSE;
 	    pr.hDlgPrint = CreateDialogParam(hdllInstance, TEXT("CancelDlgBox"),
 						hwnd, PrintDlgProc, (LPARAM)szAppName);
@@ -329,7 +326,7 @@ DumpPrinter(HWND hwnd, LPTSTR szAppName, LPTSTR szFileName)
 		       (count = fread(buf + 2, 1, 4096, f)) != 0 ) {
 		    int ret;
 		    *bufcount = count;
-		    ret = Escape(printer, PASSTHROUGH, count + 2, (LPSTR)buf, NULL);
+		    ret = Escape(printer, PASSTHROUGH, count + 2, buf, NULL);
 		    ldone += count;
 		    if (ret != SP_ERROR) {
 			wsprintf(pcdone, TEXT("%d%% done"), (int)(ldone * 100 / lsize));
@@ -351,7 +348,7 @@ DumpPrinter(HWND hwnd, LPTSTR szAppName, LPTSTR szFileName)
 	}
 	DeleteDC(printer);
 	SetWindowLong(hwnd, 4, 0L);
-	PrintUnregister((GP_LPPRINT)&pr);
+	PrintUnregister(&pr);
     }
     fclose(f);
 }
