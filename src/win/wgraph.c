@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.215 2016/08/09 12:02:59 markisch Exp $
+ * $Id: wgraph.c,v 1.216 2016/08/10 14:28:35 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -3151,11 +3151,10 @@ static void
 CopyPrint(LPGW lpgw)
 {
 	DOCINFO docInfo;
-
 	HDC printer;
 	PRINTDLG pd;
-	static DEVNAMES * pDevNames = NULL;
-	static DEVMODE * pDevMode = NULL;
+	DEVNAMES * pDevNames;
+	DEVMODE * pDevMode;
 	LPCTSTR szDriver, szDevice, szOutput;
 	HWND hwnd = lpgw->hWndGraph;
 	RECT rect;
@@ -3168,8 +3167,9 @@ CopyPrint(LPGW lpgw)
 	pd.lStructSize = sizeof(pd);
 	pd.hwndOwner = hwnd;
 	pd.Flags = PD_PRINTSETUP;
-	pd.hDevNames = pDevNames;
-	pd.hDevMode = pDevMode;
+	pd.hDevNames = hDevNames;
+	pd.hDevMode = hDevMode;
+
 
 	if (!PrintDlg(&pd))
 		return;
@@ -3187,6 +3187,8 @@ CopyPrint(LPGW lpgw)
 	GlobalFree(pd.hDevMode);
 	GlobalFree(pd.hDevNames);
 	*/
+	hDevNames = pd.hDevNames;
+	hDevMode = pd.hDevMode;
 
 	if (printer == NULL)
 		return;	/* abort */

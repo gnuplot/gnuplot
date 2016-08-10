@@ -1,5 +1,5 @@
 /*
- * $Id: wcommon.h,v 1.26 2016/07/21 09:07:44 markisch Exp $
+ * $Id: wcommon.h,v 1.27 2016/08/09 12:02:59 markisch Exp $
  */
 
 /* GNUPLOT - wcommon.h */
@@ -96,6 +96,9 @@ void LoadMacros(LPTW lptw);
 void CloseMacros(LPTW lptw);
 
 /* wprinter.c - Printer setup and dump */
+extern HGLOBAL hDevNames;
+extern HGLOBAL hDevMode;
+
 BOOL PrintSize(HDC printer, HWND hwnd, LPRECT lprect);
 void PrintRegister(GP_LPPRINT lpr);
 void PrintUnregister(GP_LPPRINT lpr);

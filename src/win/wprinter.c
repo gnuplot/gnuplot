@@ -1,5 +1,5 @@
 /*
- * $Id: wprinter.c,v 1.15 2016/08/10 14:03:20 markisch Exp $
+ * $Id: wprinter.c,v 1.16 2016/08/10 14:28:35 markisch Exp $
  */
 
 /* GNUPLOT - win/wprinter.c */
@@ -60,7 +60,9 @@
 #include "wresourc.h"
 #include "wcommon.h"
 
-GP_LPPRINT prlist = NULL;
+static GP_LPPRINT prlist = NULL;
+HGLOBAL hDevNames = NULL;
+HGLOBAL hDevMode = NULL;
 
 static GP_LPPRINT PrintFind(HDC hdc);
 
@@ -101,21 +103,17 @@ PrintSizeDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 	    return FALSE;
 	case IDOK:
 	    if (SendDlgItemMessage(hdlg, PSIZE_OTHER, BM_GETCHECK, 0, 0L)) {
-		SendDlgItemMessage(hdlg, PSIZE_X, WM_GETTEXT, 7,
-				   (LPARAM) (LPSTR) buf);
+		SendDlgItemMessage(hdlg, PSIZE_X, WM_GETTEXT, 7, (LPARAM) buf);
 		GetInt(buf, (LPINT)&lpr->psize.x);
-		SendDlgItemMessage(hdlg, PSIZE_Y, WM_GETTEXT, 7,
-				   (LPARAM) (LPSTR) buf);
+		SendDlgItemMessage(hdlg, PSIZE_Y, WM_GETTEXT, 7, (LPARAM) buf);
 		GetInt(buf, (LPINT)&lpr->psize.y);
 	    } else {
 		lpr->psize.x = lpr->pdef.x;
 		lpr->psize.y = lpr->pdef.y;
 	    }
-	    SendDlgItemMessage(hdlg, PSIZE_OFFX, WM_GETTEXT, 7,
-			       (LPARAM) (LPSTR) buf);
+	    SendDlgItemMessage(hdlg, PSIZE_OFFX, WM_GETTEXT, 7, (LPARAM) buf);
 	    GetInt(buf, (LPINT)&lpr->poff.x);
-	    SendDlgItemMessage(hdlg, PSIZE_OFFY, WM_GETTEXT, 7,
-			       (LPARAM) (LPSTR) buf);
+	    SendDlgItemMessage(hdlg, PSIZE_OFFY, WM_GETTEXT, 7, (LPARAM) buf);
 	    GetInt(buf, (LPINT)&lpr->poff.y);
 
 	    if (lpr->psize.x <= 0)
@@ -255,9 +253,8 @@ DumpPrinter(HWND hwnd, LPTSTR szAppName, LPTSTR szFileName)
 {
     HDC printer;
     PRINTDLG pd;
-    /* FIXME: share these with CopyPrint */
-    static DEVNAMES * pDevNames = NULL;
-    static DEVMODE * pDevMode = NULL;
+    DEVNAMES * pDevNames;
+    DEVMODE * pDevMode;
     LPCTSTR szDriver, szDevice, szOutput;
     GP_PRINT pr;
     DOCINFO di;
@@ -285,8 +282,8 @@ DumpPrinter(HWND hwnd, LPTSTR szAppName, LPTSTR szFileName)
     pd.lStructSize = sizeof(pd);
     pd.hwndOwner = hwnd;
     pd.Flags = PD_PRINTSETUP;
-    pd.hDevNames = pDevNames;
-    pd.hDevMode = pDevMode;
+    pd.hDevNames = hDevNames;
+    pd.hDevMode = hDevMode;
 
     if (PrintDlg(&pd)) {
 	pDevNames = (DEVNAMES *) GlobalLock(pd.hDevNames);
@@ -302,6 +299,8 @@ DumpPrinter(HWND hwnd, LPTSTR szAppName, LPTSTR szFileName)
 	GlobalFree(pd.hDevMode);
 	GlobalFree(pd.hDevNames);
 	*/
+	hDevNames = pd.hDevNames;
+	hDevMode = pd.hDevMode;
 
 	if (printer == NULL)
 	    return;	/* abort */
