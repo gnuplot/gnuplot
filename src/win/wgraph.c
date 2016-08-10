@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.216 2016/08/10 14:28:35 markisch Exp $
+ * $Id: wgraph.c,v 1.217 2016/08/10 16:02:22 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -3049,9 +3049,9 @@ SaveAsEMF(LPGW lpgw)
 		antialiasing = lpgw->antialiasing;
 		lpgw->antialiasing = FALSE;
 
-		hmf = CreateEnhMetaFile(hdc, Ofn.lpstrFile, &mfrect, (LPCTSTR)NULL);
+		hmf = CreateEnhMetaFile(hdc, Ofn.lpstrFile, &mfrect, NULL);
 		/* Always create EMF files using GDI only! */
-		drawgraph(lpgw, hmf, (LPRECT) &rect);
+		drawgraph(lpgw, hmf, &rect);
 		hemf = CloseEnhMetaFile(hmf);
 
 		lpgw->antialiasing = antialiasing;
@@ -3096,7 +3096,7 @@ CopyClip(LPGW lpgw)
 	if (bitmap) {
 		/* there is enough memory and the bitmaps OK */
 		HBITMAP oldbmp = (HBITMAP) SelectObject(mem, bitmap);
-		BitBlt(mem,0,0,rect.right - rect.left,
+		BitBlt(mem, 0, 0, rect.right - rect.left,
 			rect.bottom - rect.top, hdc, rect.left,
 			rect.top, SRCCOPY);
 		SelectObject(mem, oldbmp);
@@ -3123,9 +3123,9 @@ CopyClip(LPGW lpgw)
 
 		GetPlotRectInMM(lpgw, &mfrect, hdc);
 
-		hmf = CreateEnhMetaFile(hdc, (LPCTSTR)NULL, &mfrect, (LPCTSTR)NULL);
+		hmf = CreateEnhMetaFile(hdc, NULL, &mfrect, NULL);
 		/* Always create EMF files using GDI only! */
-		drawgraph(&gwclip, hmf, (LPRECT) &rect);
+		drawgraph(&gwclip, hmf, &rect);
 		hemf = CloseEnhMetaFile(hmf);
 
 		DestroyFonts(&gwclip);
@@ -3208,6 +3208,8 @@ CopyPrint(LPGW lpgw)
 	pr.hDlgPrint = CreateDialogParam(hdllInstance, TEXT("CancelDlgBox"),
 					 hwnd, PrintDlgProc, (LPARAM) &pr);
 	SetAbortProc(printer, PrintAbortProc);
+	SetWindowLongPtr(GetDlgItem(pr.hDlgPrint, CANCEL_PROGRESS), GWL_STYLE, WS_CHILD | WS_VISIBLE | PBS_MARQUEE);
+	SendMessage(GetDlgItem(pr.hDlgPrint, CANCEL_PROGRESS), PBM_SETMARQUEE, 1, 0);
 
 	memset(&docInfo, 0, sizeof(DOCINFO));
 	docInfo.cbSize = sizeof(DOCINFO);
@@ -3221,6 +3223,7 @@ CopyPrint(LPGW lpgw)
 		SetMapMode(printer, MM_TEXT);
 		SetBkMode(printer, OPAQUE);
 		StartPage(printer);
+
 		DestroyFonts(lpgw);
 		MakeFonts(lpgw, &rect, printer);
 		DestroyPens(lpgw);	/* rebuild pens */
@@ -3832,14 +3835,14 @@ LineStyleDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 }
 
 
-/* GetWindowLong(hwnd, 4) must be available for use */
+/* GetWindowLongPtr(hwnd, 4) must be available for use */
 static BOOL
 LineStyle(LPGW lpgw)
 {
 	BOOL status = FALSE;
 	LS ls;
 
-	SetWindowLongPtr(lpgw->hWndGraph, 4, (LONG_PTR)((LPLS)&ls));
+	SetWindowLongPtr(lpgw->hWndGraph, 4, (LONG_PTR) &ls);
 	memcpy(&ls.colorpen, &lpgw->colorpen, (WGNUMPENS + 2) * sizeof(LOGPEN));
 	memcpy(&ls.monopen, &lpgw->monopen, (WGNUMPENS + 2) * sizeof(LOGPEN));
 
@@ -3848,7 +3851,7 @@ LineStyle(LPGW lpgw)
 		memcpy(&lpgw->monopen, &ls.monopen, (WGNUMPENS + 2) * sizeof(LOGPEN));
 		status = TRUE;
 	}
-	SetWindowLong(lpgw->hWndGraph, 4, (LONG)(0L));
+	SetWindowLongPtr(lpgw->hWndGraph, 4, 0L);
 	return status;
 }
 

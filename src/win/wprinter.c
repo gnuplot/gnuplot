@@ -1,5 +1,5 @@
 /*
- * $Id: wprinter.c,v 1.16 2016/08/10 14:28:35 markisch Exp $
+ * $Id: wprinter.c,v 1.17 2016/08/10 16:02:22 markisch Exp $
  */
 
 /* GNUPLOT - win/wprinter.c */
@@ -50,6 +50,7 @@
 #include <windows.h>
 #include <windowsx.h>
 #include <commdlg.h>
+#include <commctrl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <tchar.h>
@@ -315,6 +316,7 @@ DumpPrinter(HWND hwnd, LPTSTR szAppName, LPTSTR szFileName)
 	    pr.hDlgPrint = CreateDialogParam(hdllInstance, TEXT("CancelDlgBox"),
 						hwnd, PrintDlgProc, (LPARAM) &pr);
 	    SetAbortProc(printer, PrintAbortProc);
+	    SendMessage(GetDlgItem(pr.hDlgPrint, CANCEL_PROGRESS), PBM_SETRANGE32, 0, lsize);
 
 	    memset(&di, 0, sizeof(DOCINFO));
 	    di.cbSize = sizeof(DOCINFO);
@@ -329,6 +331,7 @@ DumpPrinter(HWND hwnd, LPTSTR szAppName, LPTSTR szFileName)
 		    if (ret != SP_ERROR) {
 			wsprintf(pcdone, TEXT("%d%% done"), (int)(ldone * 100 / lsize));
 			SetWindowText(GetDlgItem(pr.hDlgPrint, CANCEL_PCDONE), pcdone);
+			SendMessage(GetDlgItem(pr.hDlgPrint, CANCEL_PROGRESS), PBM_SETPOS, ldone, 0);
 		    } else {
 			SetWindowText(GetDlgItem(pr.hDlgPrint, CANCEL_PCDONE), TEXT("Passthrough Error!"));
 		    }
