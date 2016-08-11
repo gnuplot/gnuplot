@@ -31,10 +31,10 @@
 #define EAM_BOXED_TEXT 1
 
 /* Define to allow placement of rectangles and other objects */
-/* Warning: Uses union initializers which VC++ does not like */
-/* undef EAM_OBJECTS */
-#define EAM_OBJECTS 1
-#define WITH_C89
+/* Warning: Uses union initializers which earlier versions of VC did not support */
+#if _MSC_VER >= 1900
+# define EAM_OBJECTS 1
+#endif
 
 /* Define if color information should be passed for each vertex. */
 /* #undef EXTENDED_COLOR_SPECS */
@@ -95,10 +95,14 @@
 /* #undef HAVE_EDITLINE_READLINE_H */
 
 /* Define to 1 if you have the `erf' function. */
-#define HAVE_ERF 1
+#if _MSC_VER >= 1800
+# define HAVE_ERF 1
+#endif
 
 /* Define to 1 if you have the `erfc' function. */
-#define HAVE_ERFC 1
+#if _MSC_VER >= 1800
+# define HAVE_ERFC 1
+#endif
 
 /* Define to 1 if you have the <errno.h> header file. */
 #define HAVE_ERRNO_H 1
@@ -307,7 +311,10 @@
 #define HAVE_SNPRINTF 1
 
 /* Define to 1 if stdbool.h conforms to C99. */
-#define HAVE_STDBOOL_H 1
+/* Available since VS 2013 only */ 
+#if _MSC_VER >= 1800
+# define HAVE_STDBOOL_H 1
+#endif
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #define HAVE_STDINT_H 1
@@ -629,7 +636,10 @@
 #define GP_INLINE __inline
 #define GP_EXCEPTION_NAME _exception
 #define GP_MATHERR _matherr
-/* no longer needed with VS2015: #define isnan _isnan */
+/* no longer needed with VS2015: */
+#if _MSC_VER < 1900
+# define isnan _isnan
+#endif
 #define ftruncate _chsize
 #define strtoll _strtoi64
 #define isblank isspace
