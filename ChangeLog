@@ -1,3 +1,8 @@
+2016-08-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (box_range_fiddling):  afl-fuzz found a crash caused by
+	 an incorrect test for no data points.
+
 2016-08-11  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c:  Print the error code if opening the print dialog
@@ -103,7 +108,7 @@
 	src/util.c src/util.h docs/gnuplot.doc term/js/canvasmath.js:
 
 	New command "set minussign" tells gprintf() to use an encoding-specific
-	minus sign character for numeric output rather than the ascii hypen
+	minus sign character for numeric output rather than the ascii hyphen
 	character produced by sprintf().
 	    UTF-8:	Unicode U+2212 "minus sign"
 	    CP1252:	ALT+150 "en dash"
