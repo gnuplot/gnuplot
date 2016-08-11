@@ -1,5 +1,8 @@
 2016-08-11  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgraph.c:  Print the error code if opening the print dialog
+	should fail.
+
 	* config/config.nt (HAVE_ERF, HAVE_ERFC, HAVE_STDBOOL_H, isnan
 	EAM_OBJECTS):  Version dependent macros to re-enable compilation
 	with at least VS2012 or newer.

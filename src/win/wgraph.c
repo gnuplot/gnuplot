@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.217 2016/08/10 16:02:22 markisch Exp $
+ * $Id: wgraph.c,v 1.218 2016/08/10 17:52:27 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -3169,10 +3169,14 @@ CopyPrint(LPGW lpgw)
 	pd.Flags = PD_PRINTSETUP;
 	pd.hDevNames = hDevNames;
 	pd.hDevMode = hDevMode;
+	pd.nCopies = 1;
 
-
-	if (!PrintDlg(&pd))
+	if (!PrintDlg(&pd)) {
+		DWORD error = CommDlgExtendedError();
+		if (error != 0)
+			fprintf(stderr, "\nError:  Opening the print dialog failed with error code %04x.\n", error);
 		return;
+	}
 
 	pDevNames = (DEVNAMES *) GlobalLock(pd.hDevNames);
 	pDevMode = (DEVMODE *) GlobalLock(pd.hDevMode);
@@ -3183,7 +3187,7 @@ CopyPrint(LPGW lpgw)
 
 	GlobalUnlock(pd.hDevMode);
 	GlobalUnlock(pd.hDevNames);
-	/* We no longer free these structures, but preserve them for the next time
+	/* We no longer free these but preserve them for the next time
 	GlobalFree(pd.hDevMode);
 	GlobalFree(pd.hDevNames);
 	*/
