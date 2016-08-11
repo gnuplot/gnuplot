@@ -3,6 +3,10 @@
 	* src/plot2d.c (box_range_fiddling):  afl-fuzz found a crash caused by
 	 an incorrect test for no data points.
 
+	* src/command.c (link_command):  If the "set nonlinear" failed to
+	complete it could leave an axis marked as nonlinear but with no mapping
+	functions defined.  Now we reset the links on failure.
+
 2016-08-11  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c:  Print the error code if opening the print dialog
