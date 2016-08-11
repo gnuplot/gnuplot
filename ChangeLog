@@ -3,6 +3,11 @@
 	* src/plot2d.c (box_range_fiddling):  afl-fuzz found a crash caused by
 	 an incorrect test for no data points.
 
+	* src/set.c (encoding_minus):  Comment out replacement of the SJIS minus
+	sign character.  The character itself is correct but it is a full-width
+	rather glyph so it does not mix well with half-width digits in a number.
+	This problem is specific to SJIS.
+
 2016-08-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/config.oww (ftruncate): Definition needed to compile on
