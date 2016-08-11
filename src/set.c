@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.526 2016/08/05 20:39:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.527 2016/08/07 18:18:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1718,11 +1718,12 @@ encoding_minus()
 {
     static const char minus_utf8[4] = {0xE2, 0x88, 0x92, 0x0};
     static const char minus_1252[2] = {0x96, 0x0};
-    static const char minus_sjis[4] = {0x81, 0x7c, 0x0, 0x0};
+    /* NB: This SJIS character is correct, but produces bad spacing if used	*/
+    /*     static const char minus_sjis[4] = {0x81, 0x7c, 0x0, 0x0};		*/
     switch (encoding) {
 	case S_ENC_UTF8:	return minus_utf8;
 	case S_ENC_CP1252:	return minus_1252;
-	case S_ENC_SJIS:	return minus_sjis;
+	case S_ENC_SJIS:
 	default:		return NULL;
     }
 }

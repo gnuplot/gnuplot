@@ -7,6 +7,11 @@
 	complete it could leave an axis marked as nonlinear but with no mapping
 	functions defined.  Now we reset the links on failure.
 
+	* src/set.c (encoding_minus):  Comment out replacement of the SJIS minus 
+	sign character.  The character itself is correct but it is a full-width
+	rather glyph so it does not mix well with half-width digits in a number.
+	This problem is specific to SJIS.
+
 2016-08-11  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c:  Print the error code if opening the print dialog
