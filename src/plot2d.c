@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.27 2016/06/18 05:59:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.28 2016/08/04 04:27:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1606,7 +1606,7 @@ box_range_fiddling(struct curve_points *plot)
     double xlow, xhigh;
     int i = plot->p_count - 1;
 
-    if (i == 0)
+    if (i <= 0)
 	return;
     if (axis_array[plot->x_axis].autoscale & AUTOSCALE_MIN) {
 	if (plot->points[0].type != UNDEFINED && plot->points[1].type != UNDEFINED) {
