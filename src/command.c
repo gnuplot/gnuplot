@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.342 2016/08/06 13:22:50 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.343 2016/08/12 06:08:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1471,8 +1471,6 @@ link_command()
 	/* FIXME: could return here except for the need to free link_udf->at */
 	linked = FALSE;
     } else {
-	secondary_axis->linked_to_primary = primary_axis;
-	primary_axis->linked_to_secondary = secondary_axis;
 	linked = TRUE;
     }
 
@@ -1507,19 +1505,23 @@ link_command()
 	struct udft_entry *temp = primary_axis->link_udf;
 	primary_axis->link_udf = secondary_axis->link_udf;
 	secondary_axis->link_udf = temp;
+	secondary_axis->linked_to_primary = primary_axis;
+	primary_axis->linked_to_secondary = secondary_axis;
 	clone_linked_axes(secondary_axis, primary_axis);
     } else 
 #endif
 
     /* Clone the range information */
     if (linked) {
+	secondary_axis->linked_to_primary = primary_axis;
+	primary_axis->linked_to_secondary = secondary_axis;
 	clone_linked_axes(primary_axis, secondary_axis);
     } else {
 	free_at(secondary_axis->link_udf->at);
 	secondary_axis->link_udf->at = NULL;
 	free_at(primary_axis->link_udf->at);
 	primary_axis->link_udf->at = NULL;
-	/* Clean up after failed attempt to set nonlinear */
+	/* Shouldn't be necessary, but it doesn't hurt */
 	primary_axis->linked_to_secondary = NULL;
 	secondary_axis->linked_to_primary = NULL;
     }
