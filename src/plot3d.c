@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.253 2016/06/09 20:06:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.254 2016/06/18 06:00:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1994,20 +1994,18 @@ eval_3dplots()
 		axis_array[FIRST_Y_AXIS].max = -VERYLARGE;
 	}
 
-	/*{{{  figure ranges, taking logs etc into account */
+	/*{{{  figure ranges, restricting logscale limits to be positive */
+	u_min = axis_log_value_checked(u_axis, axis_array[u_axis].min, "x range");
+	u_max = axis_log_value_checked(u_axis, axis_array[u_axis].max, "x range");
 	if (nonlinear(&axis_array[u_axis])) {
 	    u_min = axis_array[u_axis].linked_to_primary->min;
 	    u_max = axis_array[u_axis].linked_to_primary->max;
-	} else {
-	    u_min = axis_log_value_checked(u_axis, axis_array[u_axis].min, "x range");
-	    u_max = axis_log_value_checked(u_axis, axis_array[u_axis].max, "x range");
-	}
+	} 
+	v_min = axis_log_value_checked(v_axis, axis_array[v_axis].min, "y range");
+	v_max = axis_log_value_checked(v_axis, axis_array[v_axis].max, "y range");
 	if (nonlinear(&axis_array[v_axis])) {
 	    v_min = axis_array[v_axis].linked_to_primary->min;
 	    v_max = axis_array[v_axis].linked_to_primary->max;
-	} else {
-	    v_min = axis_log_value_checked(v_axis, axis_array[v_axis].min, "y range");
-	    v_max = axis_log_value_checked(v_axis, axis_array[v_axis].max, "y range");
 	}
 	/*}}} */
 

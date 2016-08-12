@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.392 2016/08/05 20:39:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.393 2016/08/12 00:07:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -3089,6 +3089,8 @@ eval_plots()
 			t_max = axis_array[SAMPLE_AXIS].max;
 			if (axis_array[SAMPLE_AXIS].linked_to_primary) {
 			    AXIS *primary = axis_array[SAMPLE_AXIS].linked_to_primary;
+			    if (primary->log && !(t_min > 0 && t_max > 0))
+				int_error(NO_CARET,"logscaled axis must have positive range");
 			    t_min = eval_link_function(primary, t_min);
 			    t_max = eval_link_function(primary, t_max);
 			    FPRINTF((stderr,"sample range on primary axis: %g %g\n", t_min, t_max));

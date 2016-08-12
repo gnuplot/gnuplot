@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.199 2016/06/09 20:06:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.200 2016/08/03 04:22:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -244,7 +244,7 @@ double
 axis_log_value_checked(AXIS_INDEX axis, double coord, const char *what)
 {
     if (axis_array[axis].log) {
-	if (coord <= 0.0) {
+	if (!(coord > 0.0)) {
 	    int_error(NO_CARET, "%s has %s coord of %g; must be above 0 for log scale!",
 			what, axis_name(axis), coord);
 	} else

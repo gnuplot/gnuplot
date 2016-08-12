@@ -1,3 +1,11 @@
+2016-08-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot3d.c (eval_3dplots) src/plot2d.c (eval_plots):
+	Check for legal log-scaled axis ranges before trying to plot.
+
+	* src/axis.c (axis_log_value_checked):  Rewrite test for positive 
+	values so that it catches NaN as well as negative numbers.
+
 2016-08-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (box_range_fiddling):  afl-fuzz found a crash caused by
