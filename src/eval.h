@@ -1,5 +1,5 @@
 /*
- * $Id: eval.h,v 1.48 2016/02/07 22:15:36 sfeam Exp $
+ * $Id: eval.h,v 1.49 2016/03/04 04:58:03 sfeam Exp $
  */
 
 /* GNUPLOT - eval.h */
@@ -167,7 +167,7 @@ void f_jtern __PROTO((union argument *x));
 
 void execute_at __PROTO((struct at_type *at_ptr));
 void evaluate_at __PROTO((struct at_type *at_ptr, struct value *val_ptr));
-void free_at __PROTO((struct at_type *at_ptr));
+void real_free_at __PROTO((struct at_type *at_ptr));
 struct udvt_entry * add_udv_by_name __PROTO((char *key));
 struct udvt_entry * get_udv_by_name __PROTO((char *key));
 void del_udv_by_name __PROTO(( char *key, TBOOLEAN isWildcard ));
@@ -184,5 +184,9 @@ void fill_gpval_complex __PROTO((char *var, double areal, double aimag));
 /* C-callable versions of internal gnuplot functions word() and words() */
 char * gp_word __PROTO((char *string, int i));
 int gp_words __PROTO((char *string));
+
+/* Wrap real_free_at in a macro */
+#define free_at(at_ptr) \
+ do { real_free_at(at_ptr); at_ptr = NULL; } while (0)
 
 #endif /* GNUPLOT_EVAL_H */
