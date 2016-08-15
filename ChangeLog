@@ -5,7 +5,7 @@
 
 	* src/set.c (encoding_minus):  Comment out replacement of the SJIS minus
 	sign character.  The character itself is correct but it is a full-width
-	rather glyph so it does not mix well with half-width digits in a number.
+	glyph so it does not mix well with half-width digits in a number.
 	This problem is specific to SJIS.
 
 2016-08-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
@@ -23,7 +23,7 @@
 	src/util.c src/util.h src/eval.c docs/gnuplot.doc term/js/canvasmath.js:
 
 	New command "set minussign" tells gprintf() to use an encoding-specific
-	minus sign character for numeric output rather than the ascii hypen
+	minus sign character for numeric output rather than the ascii hyphen
 	character produced by sprintf().
 	    UTF-8:	Unicode U+2212 "minus sign"
 	    CP1252:	ALT+150 "en dash"
