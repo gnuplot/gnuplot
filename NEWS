@@ -8,6 +8,7 @@ Changes since release of 5.0.4
 * FIX Do not confuse EOF with 8-bit character 0x177 (E.g. in Cyrillic encodings).
 * FIX regression in rendering 'plot ... matrix every ... with image'
 * FIX svg - better vertical justification of rotated text
+* FIX order dependence of "fillcolor" keyword in plot commands
 
 Changes in 5.0.4
 ================

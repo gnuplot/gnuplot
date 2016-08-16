@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.28 2016/08/04 04:27:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.29 2016/08/12 00:09:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2069,10 +2069,12 @@ eval_plots()
 	    TBOOLEAN set_smooth = FALSE, set_axes = FALSE, set_title = FALSE;
 	    TBOOLEAN set_with = FALSE, set_lpstyle = FALSE;
 	    TBOOLEAN set_fillstyle = FALSE;
+	    TBOOLEAN set_fillcolor = FALSE;
 	    TBOOLEAN set_labelstyle = FALSE;
 #ifdef EAM_OBJECTS
 	    TBOOLEAN set_ellipseaxes_units = FALSE;
 #endif
+	    t_colorspec fillcolor;
 	    int sample_range_token;	/* Only used by function plots */
 
 	    plot_num++;
@@ -2465,6 +2467,7 @@ eval_plots()
 
 		    new_lt = lp_parse(&lp, LP_ADHOC,
 				     this_plot->plot_style & PLOT_STYLE_HAS_POINT);
+
 		    if (stored_token != c_token) {
 			if (set_lpstyle) {
 			    duplication=TRUE;
@@ -2525,7 +2528,8 @@ eval_plots()
 			set_fillstyle = TRUE;
 		    }
 		    if (equals(c_token,"fc") || almost_equals(c_token,"fillc$olor")) {
-			parse_colorspec(&this_plot->lp_properties.pm3d_color, TC_VARIABLE);
+			parse_colorspec(&fillcolor, TC_VARIABLE);
+			set_fillcolor = TRUE;
 		    }
 		    if (stored_token != c_token)
 			continue;
@@ -2567,7 +2571,7 @@ eval_plots()
 	    /* No line/point style given. As lp_parse also supplies
 	     * the defaults for linewidth and pointsize, call it now
 	     * to define them. */
-	    if (! set_lpstyle) {
+	    if (!set_lpstyle) {
 		this_plot->lp_properties.l_type = line_num;
 		this_plot->lp_properties.l_width = 1.0;
 		this_plot->lp_properties.p_type = line_num;
@@ -2585,7 +2589,13 @@ eval_plots()
 
 		lp_parse(&this_plot->lp_properties, LP_ADHOC,
 			 this_plot->plot_style & PLOT_STYLE_HAS_POINT);
+	    }
 
+	    /* If this plot style uses a fillstyle and we saw an explicit */
+	    /* fill color, apply it now.				  */
+	    if (this_plot->plot_style & PLOT_STYLE_HAS_FILL){
+		if (set_fillcolor)
+		    this_plot->lp_properties.pm3d_color = fillcolor;
 	    }
 
 	    /* Some low-level routines expect to find the pointflag attribute */
