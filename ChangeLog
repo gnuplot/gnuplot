@@ -1,3 +1,11 @@
+2016-08-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c (lp_parse) src/plot2d.c (eval_plots): Remove order
+	dependence of the "fillcolor" keyword and confusion with line style.
+	For example these commands were not working:
+	    plot 'silver.dat' with boxes fs solid 1.0 border -1 fc "cyan"
+	    plot 'silver.dat' with boxes fc "cyan" fs solid 1.0 border -1 lw 2
+
 2016-08-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot3d.c (eval_3dplots) src/plot2d.c (eval_plots):

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.204 2016/05/06 12:12:52 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.205 2016/05/21 05:35:38 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1053,10 +1053,12 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
 	    continue;
 	}
 
-	/* This is so that "set obj ... lw N fc <colorspec>" doesn't eat */
-	/* up the colorspec as a line property.  We need to parse it later */
-	/* as a _fill_ property */
-	if ((destination_class == LP_NOFILL)
+	/* This is so that "set obj ... lw N fc <colorspec>" doesn't eat up the
+	 * fc colorspec as a line property.  We need to parse it later as a
+	 * _fill_ property. Also prevents "plot ... fc <col1> fs <foo> lw <baz>"
+	 * from generating an error claiming redundant line properties.
+	 */
+	if ((destination_class == LP_NOFILL || destination_class == LP_ADHOC)
 	&&  (equals(c_token,"fc") || almost_equals(c_token,"fillc$olor")))
 	    break;
 
