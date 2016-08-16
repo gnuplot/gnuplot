@@ -3591,6 +3591,19 @@ Ffigure_filledcurves
  If the values of <a>, <x>, <y> are out of the drawing boundary, then they
  are moved to the graph boundary. Then the actually filled area in the case
  of option xy=<x>,<y> will depend on xrange and yrange.
+3 fill properties
+?filledcurves border
+=border
+ Plotting `with filledcurves` can be further customized by giving a fillstyle
+ (solid/transparent/pattern) or a fillcolor.  If no fillstyle (`fs`)
+ is given in the plot command then the current default fill style is used.
+ See `set style fill`.  If no fillcolor (`fc`) is given in the plot command,
+ the usual linetype color sequence is followed.
+
+ The {{no}border} property of the fillstyle is honored by filledcurves mode
+ `closed`, the default.  It is ignored by all other filledcurves modes.
+ Example:
+      plot 'data' with filledcurves fc "cyan" fs solid 0.5 border lc "blue"
 2 financebars
 ?plotting styles financebars
 ?style financebars
