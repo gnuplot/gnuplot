@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.394 2016/08/12 16:54:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.395 2016/08/16 19:19:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -149,6 +149,9 @@ cp_extend(struct curve_points *cp, int num)
 	    }
 	}
 	cp->p_max = num;
+	cp->p_max -= 1;		/* Set trigger point for reallocation ahead of	*/
+				/* true end in case two slots are used at once	*/
+				/* (e.g. redundant final point of closed curve)	*/
     } else {
 	free(cp->points);
 	cp->points = NULL;
@@ -1276,8 +1279,15 @@ images:
 
     }                           /*while */
 
-    /* This removes extra point caused by blank lines after data. */
-    if (i>0 && current_plot->points[i-1].type == UNDEFINED)
+    /* If the plot style specifically requests a closed curve, we can make */
+    /* this easier by duplicating the first point at the end of the curve. */
+    if (current_plot->plot_style == FILLEDCURVES
+    &&  current_plot->filledcurves_options.closeto == FILLEDCURVES_CLOSED) {
+	current_plot->points[i++] = current_plot->points[0];
+    }
+
+    /* This removes an extra point caused by blank lines after data. */
+    if (i > 0 && current_plot->points[i-1].type == UNDEFINED)
 	i--;
 
     current_plot->p_count = i;

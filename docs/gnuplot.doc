@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1008 2016/08/08 20:46:14 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1009 2016/08/10 20:39:07 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -12256,10 +12256,27 @@ Ffigure_multiple_keys
  from pattern <n>, much as the line type cycles for multiple line plots.
 
  The `empty` option causes filled boxes not to be filled. This is the default.
+5 set style fill border
+?commands set style fill border
+?set style fill border
+?fillstyle border
+=border
+ The bare keyword `border` causes the filled object to be surrounded by a
+ solid line of the current linetype and color.  You can change the color of
+ this line by adding either a linetype or a linecolor.
+ `noborder` specifies that no bounding line is drawn.
+ Examples:
+      # Half-intensity fill, full intensity border in same color
+      set style fill solid 0.5 border
+      # Half-transparent fill, solid black border (linetype -1)
+      set style fill transparent solid 0.5 border -1
+      # Pattern fill in current color, border using color of linetype 5
+      plot ... with boxes fillstyle pattern 2 border lt 5
+      # Fill area in cyan, border in blue
+      plot ... with boxes fillcolor "cyan" fs solid border linecolor "blue"
 
- By default, `border`, the box is bounded by a solid line of the current
- linetype. `border <colorspec>` allows you to change the color of the border.
- `noborder` specifies that no bounding lines are drawn.
+ Note: The border property of a fill style with only affect plots drawn
+ `with filledcurves` in the default mode (closed curve).
 5 set style fill transparent
 ?commands set style fill transparent
 ?set style fill transparent

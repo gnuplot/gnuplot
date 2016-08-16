@@ -6,6 +6,13 @@
 	    plot 'silver.dat' with boxes fs solid 1.0 border -1 fc "cyan"
 	    plot 'silver.dat' with boxes fc "cyan" fs solid 1.0 border -1 lw 2
 
+	* src/graphics.c (plot_filledcurves) src/plot2d.c (cp_extend)
+	docs/gnuplot.doc:
+	This is a CHANGE in filledcurves behaviour with repect to fillstyle.
+	The fillstyle "border" attribute is now ignored except for filledcurves
+	option "closed", the default. In order to make sure the border is
+	drawn all the way around, duplicate the first point at the end.
+
 2016-08-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot3d.c (eval_3dplots) src/plot2d.c (eval_plots):
