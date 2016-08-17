@@ -1,6 +1,6 @@
 /*
- *  $Id: lua.trm,v 1.32 2015/12/30 18:30:56 sfeam Exp $
- *  $Date: 2015/12/30 18:30:56 $
+ *  $Id: lua.trm,v 1.33 2016/08/05 05:10:29 markisch Exp $
+ *  $Date: 2016/08/05 05:10:29 $
  *  $Rev: 99 $
  */
 
@@ -881,7 +881,8 @@ LUA_init()
 {
   fseek(gpoutfile, 0, SEEK_SET);
   /* ignore compiler warnings here, because `gpoutfile' is already open */
-  (void)ftruncate(fileno(gpoutfile), 0);
+  if (fflush(gpoutfile) || ftruncate(fileno(gpoutfile), 0))
+	int_warn(NO_CARET, "Error re-writing output file: %s", strerror(errno));
 
   /* reset image counter */
   image_cnt = 0;

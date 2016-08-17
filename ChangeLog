@@ -1,3 +1,8 @@
+2016-08-17  Daniel J Sebald <daniel.sebald@ieee.org>
+
+	* term/lua.trm: Warn on error from fflush() or ftruncate().
+	Bug #1840
+
 2016-08-17  AMD  <allanduncan@sf.net>
 
 	* term/post.trm: Different treatment of simplex/duplex option 
