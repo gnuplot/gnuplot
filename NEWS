@@ -4,6 +4,7 @@ Changes since release of 5.0.4
 * NEW option to plot with labels {rotate variable}
 * NEW command "set minussign"
 * CHANGE qt terminal force selection of outline font rather than bitmap font
+* CHANGE post terminal simplex/duplex output depends on PostScript level setting
 * FIX qt terminal set TERM_POLYGON_PIXELS to avoid aliasing artifacts
 * FIX Do not confuse EOF with 8-bit character 0x177 (E.g. in Cyrillic encodings).
 * FIX regression in rendering 'plot ... matrix every ... with image'
