@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1009 2016/08/10 20:39:07 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1011 2016/08/16 21:49:28 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6053,19 +6053,19 @@ Ffigure_jitter
  externally or by using `fit` with an appropriate model.
 
  Syntax:
-       smooth {unique | frequency | cumulative | cnormal | kdensity {bandwidth}
+       smooth {unique | frequency | fnormal | cumulative | cnormal
+                      | kdensity {bandwidth}
                       | csplines | acsplines | mcsplines | bezier | sbezier
                       | unwrap}
 
- `unique`, `frequency`, `cumulative` and `cnormal` plot the data after
- making them monotonic.  `unwrap` manipulates the data to avoid jumps
- of more than pi by adding or subtracting multiples of 2*pi.  Each of
- the other routines uses the data to determine the coefficients of a
- continuous curve between the endpoints of the data.  This curve is
- then plotted in the same manner as a function, that is, by finding
- its value at uniform intervals along the abscissa (see `set samples`)
- and connecting these points with straight line segments (if a line
- style is chosen).
+ `unique`, `frequency`, `fnormal`, `cumulative` and `cnormal` plot the data
+ after making them monotonic. `unwrap` manipulates the data to avoid jumps of
+ more than pi by adding or subtracting multiples of 2*pi. Each of the other
+ routines uses the data to determine the coefficients of a continuous curve
+ between the endpoints of the data. This curve is then plotted in the same
+ manner as a function, that is, by finding its value at uniform intervals along
+ the abscissa (see `set samples`) and connecting these points with straight line
+ segments (if a line style is chosen).
 
  If `autoscale` is in effect, the ranges will be computed such that the
  plotted curve lies within the borders of the graph.
@@ -6233,6 +6233,26 @@ Ffigure_jitter
       bin(val) = binwidth * floor(val/binwidth)
       plot "datafile" using (bin(column(1))):(1.0) smooth frequency
       plot "datafile" using (bin(column(1))) smooth frequency  # same result
+ See also
+^ <a href="http://www.gnuplot.info/demo/smooth.html">
+ smooth.dem
+^ </a>
+5 fnormal
+?commands plot datafile smooth fnormal
+?plot datafile smooth fnormal
+?plot smooth fnormal
+?data-file smooth fnormal
+?datafile smooth fnormal
+?plot fnormal
+?smooth fnormal
+?fnormal
+ The `fnormal` option work just like the `frequency` option, but produces a
+ normalized histogram. It makes the data monotonic in x and normalises the
+ y-values so they all sum to 1. Points with the same x-value are replaced by a
+ single point containing the sumed y-values. To plot a histogram of the number
+ of data values in equal size bins, set the y-value to 1.0 so that the sum is a
+ count of occurances in that bin. This is done implicitly if only a single
+ column is provided.
  See also
 ^ <a href="http://www.gnuplot.info/demo/smooth.html">
  smooth.dem

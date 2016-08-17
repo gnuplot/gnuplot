@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.53 2015/10/09 21:50:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.54 2015/10/28 20:18:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -995,7 +995,8 @@ gen_interp_frequency(struct curve_points *plot)
 
     curves = num_curves(plot);
 
-    if (plot->plot_smooth == SMOOTH_CUMULATIVE_NORMALISED) {
+    if (plot->plot_smooth == SMOOTH_FREQUENCY_NORMALISED
+    ||  plot->plot_smooth == SMOOTH_CUMULATIVE_NORMALISED) {
 	first_point = 0;
 
 	for (i = 0; i < curves; i++) {
@@ -1048,6 +1049,16 @@ gen_interp_frequency(struct curve_points *plot)
 		plot->points[j].y = y / y_total;
 	    }
 	}
+
+        /* Finally, normalized frequency smoothing means that we take our
+           existing histogram and divide each value by the total */
+        if (plot->plot_smooth == SMOOTH_FREQUENCY_NORMALISED) {
+	    for (j = first_point; j < first_point + num_points; j++) {
+		if (plot->points[j].type == UNDEFINED)
+		    continue;
+		plot->points[j].y /= y_total;
+	    }
+        }
 
 
         do_freq(plot, first_point, num_points);
@@ -1211,6 +1222,7 @@ cp_implode(struct curve_points *cp)
 	    } else {
 		cp->points[j].x = x;
  		if ( cp->plot_smooth == SMOOTH_FREQUENCY ||
+ 		     cp->plot_smooth == SMOOTH_FREQUENCY_NORMALISED ||
  		     cp->plot_smooth == SMOOTH_CUMULATIVE ||
 		     cp->plot_smooth == SMOOTH_CUMULATIVE_NORMALISED )
 		    k = 1;
@@ -1264,6 +1276,7 @@ cp_implode(struct curve_points *cp)
 	if (k) {
 	    cp->points[j].x = x;
 	    if ( cp->plot_smooth == SMOOTH_FREQUENCY ||
+		 cp->plot_smooth == SMOOTH_FREQUENCY_NORMALISED ||
 		 cp->plot_smooth == SMOOTH_CUMULATIVE ||
 		 cp->plot_smooth == SMOOTH_CUMULATIVE_NORMALISED)
 		k = 1;

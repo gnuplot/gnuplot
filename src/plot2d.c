@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.395 2016/08/16 19:19:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.396 2016/08/16 19:59:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2258,6 +2258,7 @@ eval_plots()
 		    switch(found_token) {
 		    case SMOOTH_UNWRAP:
 		    case SMOOTH_FREQUENCY:
+		    case SMOOTH_FREQUENCY_NORMALISED:
 			this_plot->plot_smooth = found_token;
 			break;
 		    case SMOOTH_KDENSITY:
@@ -2857,6 +2858,7 @@ eval_plots()
 		/* sort and average, if the style requires */
 		case SMOOTH_UNIQUE:
 		case SMOOTH_FREQUENCY:
+		case SMOOTH_FREQUENCY_NORMALISED:
 		case SMOOTH_CUMULATIVE:
 		case SMOOTH_CUMULATIVE_NORMALISED:
 		case SMOOTH_CSPLINES:
@@ -2878,6 +2880,7 @@ eval_plots()
 		    gen_interp_unwrap(this_plot);
 		    break;
 		case SMOOTH_FREQUENCY:
+		case SMOOTH_FREQUENCY_NORMALISED:
 		case SMOOTH_CUMULATIVE:
 		    gen_interp_frequency(this_plot);
 		    break;

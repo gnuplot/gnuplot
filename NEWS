@@ -20,6 +20,7 @@ Changes not in 5.0
 * NEW windows terminal supports saving graph as bitmap
 * NEW textbox style supports fillcolor and bordercolor
 * NEW command "set minussign" (first appeared in 5.0.5)
+* NEW "smooth fnormal" normalized frequency
 * CHANGE Revise placement of axis labels in 3D plots
 * CHANGE Track font/enhanced for key title separately from the key entries
 * CHANGE order of margins in `set margins <left>, <right>, <bottom>, <top>`
