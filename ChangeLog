@@ -1,4 +1,4 @@
-2015-08-24  Dima Kogan  <dima@secretsauce.net>
+2016-08-17  Dima Kogan  <dima@secretsauce.net>
 
 	* src/gp_types.h src/interpol.c src/plot2d.c src/tables.c
 	docs/gnuplot.doc:  New option "smooth fnormal" plots normalize
