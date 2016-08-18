@@ -1,5 +1,5 @@
 /*
- * $Id: eval.h,v 1.45 2014/02/28 00:24:20 sfeam Exp $
+ * $Id: eval.h,v 1.46 2014/03/10 01:28:37 sfeam Exp $
  */
 
 /* GNUPLOT - eval.h */
@@ -167,7 +167,7 @@ void f_jtern __PROTO((union argument *x));
 
 void execute_at __PROTO((struct at_type *at_ptr));
 void evaluate_at __PROTO((struct at_type *at_ptr, struct value *val_ptr));
-void free_at __PROTO((struct at_type *at_ptr));
+void real_free_at __PROTO((struct at_type *at_ptr));
 struct udvt_entry * add_udv_by_name __PROTO((char *key));
 struct udvt_entry * get_udv_by_name __PROTO((char *key));
 void del_udv_by_name __PROTO(( char *key, TBOOLEAN isWildcard ));
@@ -187,5 +187,9 @@ int gp_words __PROTO((char *string));
 
 /* Evaluate the function linking secondary axis to primary axis */
 double eval_link_function __PROTO((int, double));
+
+/* Wrap real_free_at in a macro */
+#define free_at(at_ptr) \
+ do { real_free_at(at_ptr); at_ptr = NULL; } while (0)
 
 #endif /* GNUPLOT_EVAL_H */

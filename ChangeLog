@@ -1,3 +1,10 @@
+2016-08-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/eval.c src/eval.h (free_at): afl-fuzz found multiple crashes
+	caused by trying to evaluate a defunct action table.  This patch wraps
+	free_at() in a macro that clears the pointer to an action table after
+	freeing it.
+
 2016-08-17  AMD  <allanduncan@sf.net>
 
 	* term/post.trm: Different treatment of simplex/duplex option 

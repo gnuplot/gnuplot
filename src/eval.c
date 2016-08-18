@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.119.2.2 2015/08/01 05:07:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.119.2.3 2016/08/07 19:50:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -683,7 +683,7 @@ evaluate_at(struct at_type *at_ptr, struct value *val_ptr)
 }
 
 void
-free_at(struct at_type *at_ptr)
+real_free_at(struct at_type *at_ptr)
 {
     int i;
     /* All string constants belonging to this action table have to be
@@ -697,7 +697,7 @@ free_at(struct at_type *at_ptr)
 	    gpfree_string(&(a->arg.v_arg));
 	/* a summation contains its own action table wrapped in a private udf */
 	if (a->index == SUM) {
-	    free_at(a->arg.udf_arg->at);
+	    real_free_at(a->arg.udf_arg->at);
 	    free(a->arg.udf_arg);
 	}
 #ifdef HAVE_EXTERNAL_FUNCTIONS
