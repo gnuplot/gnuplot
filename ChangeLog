@@ -1,7 +1,7 @@
 2016-08-17  Dima Kogan  <dima@secretsauce.net>
 
 	* src/gp_types.h src/interpol.c src/plot2d.c src/tables.c
-	docs/gnuplot.doc:  New option "smooth fnormal" plots normalize
+	docs/gnuplot.doc:  New option "smooth fnormal" plots normalized
 	frequency, analogous to plot foo using 1:(1./total) smooth freq"
 
 2016-08-17  Daniel J Sebald <daniel.sebald@ieee.org>
