@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.164 2016/04/28 04:00:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.165 2016/05/13 14:09:40 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1877,6 +1877,7 @@ fit_command()
 	if (i > MAX_NUM_VAR)
 	    Eexc(c_token, "too many range specifiers");
 	axis_init(scratch_axis, 1);
+	scratch_axis->linked_to_primary = NULL;
 	dummy_token[num_ranges] = parse_range(scratch_axis->index);
 	range_min[num_ranges] = scratch_axis->min;
 	range_max[num_ranges] = scratch_axis->max;

@@ -1,3 +1,7 @@
+2016-08-18  Ethan A Merritt  <merritt@u.washington.edu >
+
+	* src/fit.c: Clear SAMPLE_AXIS before using it as scratch space.
+
 2016-08-17  Dima Kogan  <dima@secretsauce.net>
 
 	* src/gp_types.h src/interpol.c src/plot2d.c src/tables.c
