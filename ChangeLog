@@ -19,6 +19,8 @@
 	* src/axis.c (gstrdms):  Sanity check user-provided format.
 	Reject format characters that are not handled explicitly.
 
+	* src/stats.c (statsrequest):  Early exit if there are no usable points.
+
 2016-08-18  Ethan A Merritt  <merritt@u.washington.edu >
 
 	* src/fit.c: Clear SAMPLE_AXIS before using it as scratch space.
