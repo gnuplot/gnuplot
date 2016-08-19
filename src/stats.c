@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stats.c,v 1.27 2016/06/08 23:43:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stats.c,v 1.28 2016/06/08 23:45:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stats.c */
@@ -829,6 +829,33 @@ statsrequest(void)
 	if ( parametric )
 	    int_error( NO_CARET, "Stats command not available in parametric mode" );
 
+	/* Parse the remainder of the command line */
+	while( !(END_OF_COMMAND) ) {
+	    if ( almost_equals( c_token, "out$put" ) ) {
+		    do_output = TRUE;
+		    c_token++;
+
+	    } else if ( almost_equals( c_token, "noout$put" ) ) {
+		    do_output = FALSE;
+		    c_token++;
+
+	    } else if ( almost_equals(c_token, "pre$fix")
+		   ||   equals(c_token, "name")) {
+		c_token++;
+		free ( prefix );
+		if (almost_equals(c_token,"col$umnheader")) {
+		    df_set_key_title_columnhead(NULL);
+		    continue;
+		}
+		prefix = try_to_get_string();
+		if (!legal_identifier(prefix) || !strcmp ("GPVAL_", prefix))
+		    int_error( --c_token, "illegal prefix" );
+
+	    }  else {
+		int_error( c_token, "Unrecognized fit option");
+	    }
+	}
+
 	/* If the user has set an explicit locale for numeric input, apply it */
 	/* here so that it affects data fields read from the input file. */
 	set_numeric_locale();
@@ -915,38 +942,18 @@ statsrequest(void)
 	    int_warn( NO_CARET, "All points out of range" );
 	else
 	    int_warn( NO_CARET, "No valid data points found in file" );
-	/* Skip rest of command line and return error */
-	while (!END_OF_COMMAND) c_token++;
-	goto stats_cleanup;
     }
 
-    /* Parse the remainder of the command line: 0 to 2 tokens possible */
-    while( !(END_OF_COMMAND) ) {
-	if ( almost_equals( c_token, "out$put" ) ) {
-		do_output = TRUE;
-		c_token++;
-
-	} else if ( almost_equals( c_token, "noout$put" ) ) {
-		do_output = FALSE;
-		c_token++;
-
-	} else if ( almost_equals(c_token, "pre$fix")
-	       ||   equals(c_token, "name")) {
-	    c_token++;
-	    free ( prefix );
-	    prefix = try_to_get_string();
-	    if (!legal_identifier(prefix) || !strcmp ("GPVAL_", prefix))
-		int_error( --c_token, "illegal prefix" );
-
-	}  else {
-	    int_error( c_token, "Expecting [no]output or prefix");
+    /* The analysis variables are named STATS_* unless the user either */
+    /* gave a specific name or told us to use a columnheader.          */
+    if (!prefix) {
+	if (df_key_title && *df_key_title) {
+	    prefix = gp_strdup(df_key_title);
+	    squash_spaces(prefix, 0);
+	} else {
+	    prefix = gp_strdup("STATS_");
 	}
-
     }
-
-    /* Set defaults if not explicitly set by user */
-    if (!prefix)
-	prefix = gp_strdup("STATS_");
     i = strlen(prefix);
     if (prefix[i-1] != '_') {
 	prefix = (char *) gp_realloc(prefix, i+2, "prefix");

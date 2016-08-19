@@ -4,6 +4,12 @@
 	Modify squash_spaces() utility routine to optionally leave a single
 	space in place of whitespace or remove whitespace altogether.
 
+	* src/datafile.h src/datafile.c src/stats.c docs/gnuplot.doc:
+	Rearrange the order in which we parse the "stats" command.
+	This allows passing "columnheader" or "columnheader(N)" to the 
+	"name" option rather than a fixed character string.
+	Bug #1841
+
 2016-08-18  Ethan A Merritt  <merritt@u.washington.edu >
 
 	* src/fit.c: Clear SAMPLE_AXIS before using it as scratch space.
