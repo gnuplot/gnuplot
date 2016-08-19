@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.200 2016/08/03 04:22:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.201 2016/08/12 16:54:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -2354,6 +2354,10 @@ eval_link_function(struct axis *axis, double raw_coord)
     link_udf->dummy_values[1-dummy_var].type = INVALID_NAME;
 
     Gcomplex(&link_udf->dummy_values[dummy_var], raw_coord, 0.0);
+
+    if (link_udf->at == NULL)
+	int_error(NO_CARET,"corrupt axis link");
+
     evaluate_at(link_udf->at, &a);
 
     if (undefined || a.type != CMPLX) {

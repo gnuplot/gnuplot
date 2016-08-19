@@ -10,6 +10,12 @@
 	"name" option rather than a fixed character string.
 	Bug #1841
 
+	* src/axis.c (eval_link_function) src/save.c (save_nonlinear):
+	If there is an expression-parsing error while processing a 
+	"set nonlinear" command, the forward/reverse axis mapping can be
+	left in a corrupted state.  Add a sanity check for this to prevent
+	bad things from happening when the axis mapping function is invoked.
+
 2016-08-18  Ethan A Merritt  <merritt@u.washington.edu >
 
 	* src/fit.c: Clear SAMPLE_AXIS before using it as scratch space.

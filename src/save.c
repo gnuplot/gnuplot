@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.306 2016/07/23 03:34:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.307 2016/08/07 18:18:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1370,13 +1370,18 @@ void
 save_nonlinear(FILE *fp, AXIS *this_axis)
 {
 #ifdef NONLINEAR_AXES
-    if (this_axis->linked_to_primary
-    &&  this_axis->index == -this_axis->linked_to_primary->index) {
+    AXIS *primary = this_axis->linked_to_primary;
+
+    if (primary &&  this_axis->index == -primary->index) {
 	fprintf(fp, "set nonlinear %s ", axis_name(this_axis->index));
-	if (this_axis->linked_to_primary->link_udf->at)
-	    fprintf(fp, "via %s ", this_axis->linked_to_primary->link_udf->definition);
+	if (primary->link_udf->at)
+	    fprintf(fp, "via %s ", primary->link_udf->definition);
+	else
+	    fprintf(stderr, "[corrupt linkage] ");
 	if (this_axis->link_udf->at)
 	    fprintf(fp, "inverse %s ", this_axis->link_udf->definition);
+	else
+	    fprintf(stderr, "[corrupt linkage] ");
 	fputs("\n", fp);
     }
 #endif
