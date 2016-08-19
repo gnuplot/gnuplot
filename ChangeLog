@@ -16,6 +16,9 @@
 	left in a corrupted state.  Add a sanity check for this to prevent
 	bad things from happening when the axis mapping function is invoked.
 
+	* src/axis.c (gstrdms):  Sanity check user-provided format.
+	Reject format characters that are not handled explicitly.
+
 2016-08-18  Ethan A Merritt  <merritt@u.washington.edu >
 
 	* src/fit.c: Clear SAMPLE_AXIS before using it as scratch space.

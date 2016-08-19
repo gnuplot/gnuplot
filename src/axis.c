@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.201 2016/08/12 16:54:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.202 2016/08/19 19:12:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -2157,8 +2157,11 @@ char *c, *cfmt;
 
     for (c = cfmt = gp_strdup(format); *c; ) {
 	if (*c++ == '%') {
-	    while (*c && !strchr("DdMmSsEN%",*c))
+	    while (*c && !strchr("DdMmSsEN%",*c)) {
+		if (!isdigit(*c) && !isspace(*c) && !ispunct(*c))
+			int_error(NO_CARET,"unrecognized format: \"%s\"",format);
 		c++;
+	    }
 	    switch (*c) {
 	    case 'D':	*c = 'g'; dtype = 1; degrees = Degrees; break;
 	    case 'd':	*c = 'f'; dtype = 2; break;
