@@ -21,6 +21,8 @@
 
 	* src/stats.c (statsrequest):  Early exit if there are no usable points.
 
+	* src/fit.c (update): Fix error in error reporting (null filename).
+
 2016-08-18  Ethan A Merritt  <merritt@u.washington.edu >
 
 	* src/fit.c: Clear SAMPLE_AXIS before using it as scratch space.

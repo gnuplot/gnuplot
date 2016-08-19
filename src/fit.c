@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.165 2016/05/13 14:09:40 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.166 2016/08/18 20:33:49 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1519,12 +1519,7 @@ update(char *pfile, char *npfile)
 	    /* Technically, a prior fit command isn't really required.  But since
 	    all variables in the parameter file would be marked '# FIXED' in that
 	    case, it cannot be directly used in a subsequent fit command. */
-#if 1
-	    Eex2("'update' requires a prior 'fit' since the parameter file %s does not exist yet.", ofilename);
-#else
-	    fprintf(stderr, "'update' without a prior 'fit' and without a previous parameter file:\n");
-	    fprintf(stderr, " all variables will be marked '# FIXED'!\n");
-#endif
+	    Eex("Nothing to update!");
 	}
 
 	if (!(nf = fopen(ofilename, "w")))
