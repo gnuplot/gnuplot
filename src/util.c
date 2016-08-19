@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.128.2.3 2015/08/03 18:33:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.128.2.4 2016/08/07 18:41:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -1282,11 +1282,12 @@ graph_error(const char *fmt, va_dcl)
 /*}}} */
 
 
-/* Squash spaces in the given string (DFK) */
-/* That is, reduce all multiple white-space chars to single spaces */
-/* Done in place. Currently used only by help_command() */
+/*
+ * Reduce all multiple white-space chars to single spaces (if remain == 1)
+ * or remove altogether (if remain == 0).  Modifies the original string.
+ */
 void
-squash_spaces(char *s)
+squash_spaces(char *s, int remain)
 {
     char *r = s;	/* reading point */
     char *w = s;	/* writing point */
@@ -1295,7 +1296,7 @@ squash_spaces(char *s)
     for (w = r = s; *r != NUL; r++) {
 	if (isspace((unsigned char) *r)) {
 	    /* white space; only copy if we haven't just copied a space */
-	    if (!space) {
+	    if (!space && remain > 0) {
 		space = TRUE;
 		*w++ = ' ';
 	    }			/* else ignore multiple spaces */

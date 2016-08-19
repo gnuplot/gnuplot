@@ -1,5 +1,5 @@
 /*
- * $Id: util.h,v 1.44 2014/04/05 06:17:09 markisch Exp $
+ * $Id: util.h,v 1.44.2.1 2016/08/07 18:41:09 sfeam Exp $
  */
 
 /* GNUPLOT - util.h */
@@ -118,11 +118,7 @@ void int_warn __PROTO(());
 void graph_error __PROTO(());
 #endif
 
-/* FIXME HBB 20010726: should be moved to where help_comamnd() is, and
- * made static. Currently, that's command.c, but it should probably
- * move to help.c, instead.
- */
-void squash_spaces __PROTO((char *));
+void squash_spaces __PROTO((char *s, int remain));
 
 TBOOLEAN existdir __PROTO((const char *));
 TBOOLEAN existfile(const char *);
