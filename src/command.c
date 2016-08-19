@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.343 2016/08/12 06:08:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.344 2016/08/12 21:52:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -3001,7 +3001,7 @@ help_command()
     if (len > 0)
 	helpbuf[len++] = ' ';	/* add a space */
     capture(helpbuf + len, start, c_token - 1, MAX_LINE_LEN - len);
-    squash_spaces(helpbuf + base);	/* only bother with new stuff */
+    squash_spaces(helpbuf + base, 1);	/* only bother with new stuff */
     len = strlen(helpbuf);
 
     /* now, a lone ? will print subtopics only */
