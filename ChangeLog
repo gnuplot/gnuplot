@@ -1,7 +1,7 @@
 2016-08-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp (wxtFrame::OnExport):  The Export widget
-	on a plot window should dump a copy of the file in that window, not a
+	on a plot window should dump a copy of the plot in that window, not a
 	copy of the currently active plot.  Modify the OnExport function 
 	accordingly.  Unfortunately to generate PDF or SVG files we want to
 	reexecute the list of commands that generated the plot, but we only 
@@ -9,6 +9,10 @@
 	inactive windows is limited to the clipboard or PNG files.
 	Bug #1843
 	
+	* src/readline.c (getc_wrapper):  Clear errno before reading next
+	character.  This fix contributed anonymously.
+	Bug #1846
+
 2016-08-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util.c (squash_spaces) src/util.h src/command.c:

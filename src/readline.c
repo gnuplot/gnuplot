@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.62.2.1 2016/07/31 12:32:22 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.62.2.2 2016/07/31 13:18:47 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -83,6 +83,7 @@ getc_wrapper(FILE* fp /* should be stdin, supplied by readline */)
 	}
 	else
 #endif
+	errno = 0;
 	if (fp)
 	    c = getc(fp);
 	else
