@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.73 2016/06/14 18:25:39 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.74 2016/06/20 08:25:25 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -81,6 +81,7 @@ getc_wrapper(FILE* fp)
 #if defined(WGP_CONSOLE)
 	    c = ConsoleGetch();
 #else
+	errno = 0;
 	if (fp)
 	    c = getc(fp);
 	else
