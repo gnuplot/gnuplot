@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.128.2.24 2016/02/13 16:30:57 markisch Exp $
+ * $Id: wxt_gui.cpp,v 1.128.2.25 2016/07/31 11:57:14 markisch Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -511,14 +511,20 @@ void wxtFrame::OnExport( wxCommandEvent& WXUNUSED( event ) )
 {
 	static int userFilterIndex = 0;
 	static wxString saveDir;
+	TBOOLEAN active = (wxt_current_plot->cr == panel->plot.cr);
 
 	if (saveDir.IsEmpty())
 		saveDir = wxGetCwd();
 
-	wxFileDialog exportFileDialog (this, wxT("Exported File Format"),
+
+	wxFileDialog exportFileDialog (this,
+		active	? wxT("Exported File Format")
+			: wxT("Inactive plot window can only export PNG files"),
 		saveDir, wxT(""),
-		wxT("PNG files (*.png)|*.png|PDF files (*.pdf)|*.pdf|SVG files (*.svg)|*.svg"),
+		active	? wxT("PNG files (*.png)|*.png|PDF files (*.pdf)|*.pdf|SVG files (*.svg)|*.svg")
+			: wxT("PNG files (*.png)|*.png"),
 		wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+
 	exportFileDialog.SetFilterIndex(userFilterIndex);
 
 	if (exportFileDialog.ShowModal() == wxID_CANCEL)
@@ -538,7 +544,7 @@ void wxtFrame::OnExport( wxCommandEvent& WXUNUSED( event ) )
 	switch (exportFileDialog.GetFilterIndex()) {
 	case 0 :
 		/* Save as PNG file. */
-		surface = cairo_get_target(wxt_current_plot->cr);
+		surface = cairo_get_target(panel->plot.cr);
 		ierr = cairo_surface_write_to_png(surface, fullpathFilename.mb_str(wxConvUTF8));
 		if (ierr != CAIRO_STATUS_SUCCESS)
 			fprintf(stderr,"error writing PNG file: %s\n", cairo_status_to_string(ierr));
