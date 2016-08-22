@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.529 2016/07/05 20:47:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.530 2016/08/16 19:59:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -289,6 +289,8 @@ place_arrows(int layer)
 	int sx, sy, ex, ey;
 
 	if (this_arrow->arrow_properties.layer != layer)
+	    continue;
+	if (this_arrow->type == arrow_end_undefined)
 	    continue;
 	get_arrow(this_arrow, &sx, &sy, &ex, &ey);
 

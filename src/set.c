@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.527 2016/08/07 18:18:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.528 2016/08/12 06:25:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -750,6 +750,7 @@ set_arrow()
 	this_arrow->start = default_position;
 	this_arrow->end = default_position;
 	this_arrow->angle = 0.0;
+	this_arrow->type = arrow_end_undefined;
 
 	default_arrow_style(&(new_arrow->arrow_properties));
     }

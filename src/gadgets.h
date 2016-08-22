@@ -109,7 +109,8 @@ typedef struct text_label {
 typedef enum arrow_type {
     arrow_end_absolute,
     arrow_end_relative,
-    arrow_end_oriented
+    arrow_end_oriented,
+    arrow_end_undefined
     } arrow_type;
 
 typedef struct arrow_def {
