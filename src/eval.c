@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.136 2016/08/07 19:53:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.137 2016/08/13 00:16:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -710,8 +710,12 @@ evaluate_at(struct at_type *at_ptr, struct value *val_ptr)
     }
 
     if (!undefined && val_ptr->type == ARRAY) {
-	int_warn(NO_CARET, "evaluate_at: unsupported array operation");
+	/* Aug 2016: error rather than warning because too many places
+	 * cannot deal with UNDEFINED or NaN where they were expecting a number
+	 * E.g. load_one_range()
+	 */
 	val_ptr->type = NOTDEFINED;
+	int_error(NO_CARET, "evaluate_at: unsupported array operation");
     }
 }
 

@@ -5,6 +5,12 @@
 	If we see an arrow with that type later, it indicates corruption due
 	to an error exit from "set arrow".
 
+	* src/eval.c (evaluate_at): Make unsupported array operations fatal
+	(int_error) rather than informational (int_warn).  The int_warn version
+	eventually returned UNDEFINED or NaN to the caller, and not all callers
+	were prepared to deal with that.  E.g. 
+	    array A[1]; set xrange [0:A]; set param; splot u,u,u ---> boom!
+
 2016-08-21  Ethan A Merritt  <merritt@u.washington.edu >
 
 	* src/wxterminal/wxt_gui.cpp (wxtFrame::OnExport):  The Export widget
