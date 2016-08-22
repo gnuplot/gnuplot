@@ -11,6 +11,10 @@
 	were prepared to deal with that.  E.g. 
 	    array A[1]; set xrange [0:A]; set param; splot u,u,u ---> boom!
 
+	* src/tabulate.c (output_number):  Oops. Forgot to check for log being
+	implemented via nonlinear axes.  This should have been part of the
+	nonlinear axis patch set. 
+
 2016-08-21  Ethan A Merritt  <merritt@u.washington.edu >
 
 	* src/wxterminal/wxt_gui.cpp (wxtFrame::OnExport):  The Export widget
