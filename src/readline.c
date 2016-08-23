@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.74 2016/06/20 08:25:25 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.75 2016/08/22 17:45:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -72,6 +72,7 @@ getc_wrapper(FILE* fp)
     int c;
 
     while (1) {
+	errno = 0;
 #ifdef USE_MOUSE
 	if (term && term->waitforinput && interactive) {
 	    c = term->waitforinput(0);
@@ -81,7 +82,6 @@ getc_wrapper(FILE* fp)
 #if defined(WGP_CONSOLE)
 	    c = ConsoleGetch();
 #else
-	errno = 0;
 	if (fp)
 	    c = getc(fp);
 	else
