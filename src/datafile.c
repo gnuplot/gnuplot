@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.290.2.23 2016/06/15 18:00:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.290.2.24 2016/08/04 03:16:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -334,7 +334,7 @@ static struct curve_points *df_current_plot;	/* used to process histogram labels
 #define NO_COLUMN_HEADER (-99)  /* some value that can never be a real column */
 static int column_for_key_title = NO_COLUMN_HEADER;
 static TBOOLEAN df_already_got_headers = FALSE;
-static char *df_key_title = NULL;     /* filled in from column header if requested */
+char *df_key_title = NULL;     /* filled in from column header if requested */
 
 
 /* Binary *read* variables used by df_readbinary().
@@ -2869,7 +2869,9 @@ df_set_key_title_columnhead(struct curve_points *plot)
     } else if (!END_OF_COMMAND && isanumber(c_token)) {
 	column_for_key_title = int_expression();
     } else {
-	if (df_no_use_specs == 1)
+	if (!plot) /* stats "name" option rather than plot title */
+	    column_for_key_title = use_spec[0].column;
+	else if (df_no_use_specs == 1)
 	    column_for_key_title = use_spec[0].column;
 	else if (plot->plot_type == DATA3D)
 	    column_for_key_title = use_spec[2].column;

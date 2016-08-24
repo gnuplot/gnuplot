@@ -5,6 +5,12 @@
 	and relative boxwidth.
 	Bug #1827
 
+	* src/datafile.h src/datafile.c src/stats.c docs/gnuplot.doc:
+	Rearrange the order in which we parse the "stats" command.
+	This allows passing "columnheader" or "columnheader(N)" to the 
+	"name" option rather than a fixed character string.
+	Bug #1841
+
 2016-08-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp (wxtFrame::OnExport):  The Export widget

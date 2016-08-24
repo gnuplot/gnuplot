@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.62 2016/08/07 18:41:08 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.63 2016/08/08 20:46:57 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -14210,13 +14210,17 @@ Ffigure_missing
  When `matrix` is specified, all matrix entries are included in the analysis.
  The matrix dimensions are saved in the variables STATS_size_x and STATS_size_y.
 
- It may be convenient to track the statistics from more than one file at the
- same time. The `name` option causes the default prefix "STATS" to be replaced
- by a user-specified string.  For example, the mean value of column 2 data from
- two different files could be compared by
+=columnheader
+ It may be convenient to track the statistics from more than one file or data
+ column in parallel. The `name` option causes the default prefix "STATS" to be
+ replaced by a user-specified string.  For example, the mean value of column 2
+ data from two different files could be compared by
       stats "file1.dat" using 2 name "A"
       stats "file2.dat" using 2 name "B"
       if (A_mean < B_mean) {...}
+ The keyword `columnheader` or function `columnheader(N)` can be used to
+ generate the prefix from the contents of the first row of a data file:
+      do for [COL=5:8] { stats 'datafile' using COL name columnheader }
 
  The index reported in STATS_index_xxx corresponds to the value of pseudo-column
  0 ($0) in plot commands.  I.e. the first point has index 0, the last point
