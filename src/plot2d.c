@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.398 2016/08/19 18:45:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.399 2016/08/24 17:25:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2842,6 +2842,18 @@ eval_plots()
 		}
 #endif
 
+		/* Restore auto-scaling prior to smoothing operation */
+		switch (this_plot->plot_smooth) {
+		case SMOOTH_FREQUENCY:
+		case SMOOTH_FREQUENCY_NORMALISED:
+		case SMOOTH_CUMULATIVE:
+		case SMOOTH_CUMULATIVE_NORMALISED:
+		    restore_autoscaled_ranges(&axis_array[this_plot->x_axis], &axis_array[this_plot->y_axis]);
+		    break;
+		default:
+		    break;
+		}
+
 		/* Fiddle the auto-scaling data for specific plot styles */
 		if (this_plot->plot_style == HISTOGRAMS)
 		    histogram_range_fiddling(this_plot);
@@ -2894,11 +2906,11 @@ eval_plots()
 		case SMOOTH_FREQUENCY:
 		case SMOOTH_FREQUENCY_NORMALISED:
 		case SMOOTH_CUMULATIVE:
-		    gen_interp_frequency(this_plot);
-		    break;
 		case SMOOTH_CUMULATIVE_NORMALISED:
-		    restore_autoscaled_ranges(NULL, &axis_array[this_plot->y_axis]);
+		    /* These commands all replace the original data  */
+		    /* so we must reevaluate min/max for autoscaling */
 		    gen_interp_frequency(this_plot);
+		    refresh_bounds(this_plot, 1);
 		    break;
 		case SMOOTH_CSPLINES:
 		case SMOOTH_ACSPLINES:
