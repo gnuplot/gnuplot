@@ -1,3 +1,10 @@
+2016-08-24  Ethan A Merritt  <merritt@u.washington.edu >
+
+	* src/plot2d.c (refresh_bounds box_range_fiddling): Improved autoscaling
+	of plots "with boxes". Extend y range to 0. Distinguish between absolute
+	and relative boxwidth.
+	Bug #1827
+
 2016-08-22  Ethan A Merritt  <merritt@u.washington.edu >
 
 	* src/gadgets.h (arrow_end_undefined) src/set.c src/graphics.c:

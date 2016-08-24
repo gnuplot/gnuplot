@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.397 2016/08/17 19:38:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.398 2016/08/19 18:45:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -362,6 +362,8 @@ refresh_bounds(struct curve_points *first_plot, int nplots)
 		continue;
 	    }
 	}
+	if (this_plot->plot_style == BOXES || this_plot->plot_style == IMPULSES)
+	    impulse_range_fiddling(this_plot);
     }
 
     this_plot = first_plot;
@@ -1661,7 +1663,10 @@ box_range_fiddling(struct curve_points *plot)
 	return;
     if (axis_array[plot->x_axis].autoscale & AUTOSCALE_MIN) {
 	if (plot->points[0].type != UNDEFINED && plot->points[1].type != UNDEFINED) {
-	    xlow = plot->points[0].x - (plot->points[1].x - plot->points[0].x) / 2.;
+	    if (boxwidth_is_absolute)
+		xlow = plot->points[0].x - boxwidth;
+	    else
+		xlow = plot->points[0].x - (plot->points[1].x - plot->points[0].x) / 2.;
 	    xlow = AXIS_DE_LOG_VALUE(plot->x_axis, xlow);
 	    if (axis_array[plot->x_axis].min > xlow)
 		axis_array[plot->x_axis].min = xlow;
@@ -1669,7 +1674,10 @@ box_range_fiddling(struct curve_points *plot)
     }
     if (axis_array[plot->x_axis].autoscale & AUTOSCALE_MAX) {
 	if (plot->points[i].type != UNDEFINED && plot->points[i-1].type != UNDEFINED) {
-	    xhigh = plot->points[i].x + (plot->points[i].x - plot->points[i-1].x) / 2.;
+	    if (boxwidth_is_absolute)
+		xhigh = plot->points[i].x + boxwidth;
+	    else
+		xhigh = plot->points[i].x + (plot->points[i].x - plot->points[i-1].x) / 2.;
 	    xhigh = AXIS_DE_LOG_VALUE(plot->x_axis, xhigh);
 	    if (axis_array[plot->x_axis].max < xhigh)
 		axis_array[plot->x_axis].max = xhigh;
