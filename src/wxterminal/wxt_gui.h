@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.48.2.6 2016/03/22 17:08:36 markisch Exp $
+ * $Id: wxt_gui.h,v 1.48.2.7 2016/08/06 20:00:03 markisch Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -596,7 +596,6 @@ static wxt_window_t* wxt_findwindowbyid(wxWindowID);
 
 /* pointers to currently active instances */
 static wxt_window_t *wxt_current_window;
-static command_list_t *wxt_current_command_list;
 static wxtPanel *wxt_current_panel;
 static plot_struct *wxt_current_plot;
 

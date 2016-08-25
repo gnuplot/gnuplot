@@ -1,3 +1,13 @@
+2016-08-25  Ethan A Merritt  <merritt@u.washington.edu >
+
+	* src/wxterminal/wxt_gui.cpp (wxtFrame::OnExport):  Revisit the file
+	export widget. I misread the code previously, thinking there was only a
+	single global command list. Actually there is a global pointer but each
+	window has its own command list.  So we really can export inactive plots
+	as well as the active plot.  The global command list pointer is now
+	unused so get rid of it.
+	Bug #1843
+
 2016-08-24  Ethan A Merritt  <merritt@u.washington.edu >
 
 	* src/plot2d.c (refresh_bounds box_range_fiddling): Improved autoscaling

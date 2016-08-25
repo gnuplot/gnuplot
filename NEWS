@@ -10,8 +10,9 @@ Changes since release of 5.0.4
 * CHANGE qt terminal sets TERM_POLYGON_PIXELS to avoid aliasing artifacts
 * FIX Do not confuse EOF with 8-bit character 0x177 (E.g. in Cyrillic encodings).
 * FIX regression in rendering 'plot ... matrix every ... with image'
-* FIX svg - better vertical justification of rotated text
 * FIX order dependence of "fillcolor" keyword in plot commands
+* FIX svg - better vertical justification of rotated text
+* FIX wxt - file export widget correctly handles inactive plots
 
 Changes in 5.0.4
 ================
