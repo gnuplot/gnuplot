@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.156 2016/07/31 11:52:42 markisch Exp $
+ * $Id: wxt_gui.cpp,v 1.157 2016/08/21 18:20:49 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -505,32 +505,20 @@ wxtFrame::~wxtFrame()
 
 
 /* toolbar event : Export to file
- * We will create a file dialog using platform-independant wxWidgets functions.
- * FIXME: Any window, active or inactive, can generate a bitmap dump.
- * That suffices for export to the clipboard or to a PNG file.
- * But to [re]generate the plot as a PDF or SVG file requires reexecuting the
- * plot commands from a stored list. As it stands, the program only stores a
- * single such list (wxt_current_command_list).  In order to reexecute the 
- * commands for an inactive plot window we would need to store a per-window
- * list rather than re-use a single global list.
+ * We will create a file dialog, using platform-independant wxWidgets functions
  */
 void wxtFrame::OnExport( wxCommandEvent& WXUNUSED( event ) )
 {
 	static int userFilterIndex = 0;
 	static wxString saveDir;
-	TBOOLEAN active = (wxt_current_plot->cr == panel->plot.cr);
 
 	if (saveDir.IsEmpty())
 		saveDir = wxGetCwd();
 
-	wxFileDialog exportFileDialog (this,
-		active	? wxT("Exported File Format")
-			: wxT("Inactive plot window can only export PNG files"),
+	wxFileDialog exportFileDialog (this, wxT("Exported File Format"),
 		saveDir, wxT(""),
-		active	? wxT("PNG files (*.png)|*.png|PDF files (*.pdf)|*.pdf|SVG files (*.svg)|*.svg")
-			: wxT("PNG files (*.png)|*.png"),
+		wxT("PNG files (*.png)|*.png|PDF files (*.pdf)|*.pdf|SVG files (*.svg)|*.svg"),
 		wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
-
 	exportFileDialog.SetFilterIndex(userFilterIndex);
 
 	if (exportFileDialog.ShowModal() == wxID_CANCEL)
@@ -558,55 +546,55 @@ void wxtFrame::OnExport( wxCommandEvent& WXUNUSED( event ) )
 
 	case 1 :
 		/* Save as PDF file. */
-		save_cr = wxt_current_plot->cr;
+		save_cr = panel->plot.cr;
 		cairo_save(save_cr);
 		surface = cairo_pdf_surface_create(
 			fullpathFilename.mb_str(wxConvUTF8),
-			wxt_current_plot->device_xmax, wxt_current_plot->device_ymax);
+			panel->plot.device_xmax, panel->plot.device_ymax);
 		if (cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS) {
 			fprintf(stderr, "Cairo error: could not create surface for file %s.\n", (const char *)fullpathFilename.mb_str());
 			cairo_surface_destroy(surface);
 			break;
 		}
-		wxt_current_plot->cr = cairo_create(surface);
+		panel->plot.cr = cairo_create(surface);
 		cairo_surface_destroy(surface);
 
-		cairo_scale(wxt_current_plot->cr,
-			1./(double)wxt_current_plot->oversampling_scale,
-			1./(double)wxt_current_plot->oversampling_scale);
-		wxt_current_panel->wxt_cairo_refresh();
+		cairo_scale(panel->plot.cr,
+			1./(double)panel->plot.oversampling_scale,
+			1./(double)panel->plot.oversampling_scale);
+		panel->wxt_cairo_refresh();
 
-		cairo_show_page(wxt_current_plot->cr);
+		cairo_show_page(panel->plot.cr);
 		cairo_surface_finish(surface);
-		wxt_current_plot->cr = save_cr;
-		cairo_restore(wxt_current_plot->cr);
+		panel->plot.cr = save_cr;
+		cairo_restore(panel->plot.cr);
 		break;
 
 	case 2 :
 #ifdef CAIRO_HAS_SVG_SURFACE
 		/* Save as SVG file. */
-		save_cr = wxt_current_plot->cr;
+		save_cr = panel->plot.cr;
 		cairo_save(save_cr);
 		surface = cairo_svg_surface_create(
 			fullpathFilename.mb_str(wxConvUTF8),
-			wxt_current_plot->device_xmax, wxt_current_plot->device_ymax);
+			panel->plot.device_xmax, panel->plot.device_ymax);
 		if (cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS) {
 			fprintf(stderr, "Cairo error: could not create surface for file %s.\n", (const char *)fullpathFilename.mb_str());
 			cairo_surface_destroy(surface);
 			break;
 		}
-		wxt_current_plot->cr = cairo_create(surface);
+		panel->plot.cr = cairo_create(surface);
 		cairo_surface_destroy(surface);
 
-		cairo_scale(wxt_current_plot->cr,
-			1./(double)wxt_current_plot->oversampling_scale,
-			1./(double)wxt_current_plot->oversampling_scale);
-		wxt_current_panel->wxt_cairo_refresh();
+		cairo_scale(panel->plot.cr,
+			1./(double)panel->plot.oversampling_scale,
+			1./(double)panel->plot.oversampling_scale);
+		panel->wxt_cairo_refresh();
 
-		cairo_show_page(wxt_current_plot->cr);
+		cairo_show_page(panel->plot.cr);
 		cairo_surface_finish(surface);
-		wxt_current_plot->cr = save_cr;
-		cairo_restore(wxt_current_plot->cr);
+		panel->plot.cr = save_cr;
+		cairo_restore(panel->plot.cr);
 		break;
 #endif
 
@@ -1900,7 +1888,6 @@ void wxt_init()
 	/* initialize helper pointers */
 	wxt_current_panel = wxt_current_window->frame->panel;
 	wxt_current_plot = &(wxt_current_panel->plot);
-	wxt_current_command_list = &(wxt_current_panel->command_list);
 
 	wxt_sigint_check();
 
@@ -2020,8 +2007,6 @@ void wxt_graphics()
 
 	/* apply the queued rendering settings */
 	wxt_current_panel->wxt_settings_apply();
-
-	FPRINTF((stderr,"Graphics1\n"));
 
 	wxt_MutexGuiEnter();
 	/* set the transformation matrix of the context, and other details */
@@ -2832,7 +2817,7 @@ void wxt_command_push(gp_command command)
 {
 	wxt_sigint_init();
 	wxt_current_panel->command_list_mutex.Lock();
-	wxt_current_command_list->push_back(command);
+	wxt_current_panel->command_list.push_back(command);
 	wxt_current_panel->command_list_mutex.Unlock();
 	wxt_sigint_check();
 	wxt_sigint_restore();
