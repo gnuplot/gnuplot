@@ -398,6 +398,7 @@ typedef struct {
   int xoffset;	/* To adjust left or right, e.g. for y2tics */
   struct position origin;
   struct position size;
+  TBOOLEAN invert;	/* gradient low->high runs top->bot rather than bot->top */
   BoundingBox bounds;
 } color_box_struct;
 

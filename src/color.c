@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.120 2015/04/16 05:11:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.121 2016/04/25 18:36:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -552,8 +552,6 @@ cbtick_callback(
 void
 draw_color_smooth_box(int plot_mode)
 {
-    double tmp;
-
     if (color_box.where == SMCOLOR_BOX_NO)
 	return;
     if (!term->filled_polygon)
@@ -636,8 +634,13 @@ draw_color_smooth_box(int plot_mode)
 	}
     }
 
-    if (color_box.bounds.ybot > color_box.bounds.ytop) { /* switch them */
-	tmp = color_box.bounds.ytop;
+    if (color_box.bounds.ybot > color_box.bounds.ytop) {
+	double tmp = color_box.bounds.ytop;
+	color_box.bounds.ytop = color_box.bounds.ybot;
+	color_box.bounds.ybot = tmp;
+    }
+    if (color_box.invert && color_box.rotation == 'v') {
+	double tmp = color_box.bounds.ytop;
 	color_box.bounds.ytop = color_box.bounds.ybot;
 	color_box.bounds.ybot = tmp;
     }
