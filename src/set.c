@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.29 2016/08/07 18:41:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.30 2016/08/12 06:30:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3760,6 +3760,14 @@ set_colorbox()
 		    get_position_default(&color_box.size, screen);
 		}
 		c_token--;
+		continue;
+	    case S_COLORBOX_INVERT: /* Flip direction of color gradient + cbaxis */
+		c_token++;
+		color_box.invert = TRUE;
+		continue;
+	    case S_COLORBOX_NOINVERT: /* Flip direction of color gradient + cbaxis */
+		c_token++;
+		color_box.invert = FALSE;
 		continue;
 	    } /* switch over colorbox lookup table */
 	    int_error(c_token,"invalid colorbox option");

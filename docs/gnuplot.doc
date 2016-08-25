@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.63 2016/08/08 20:46:57 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.64 2016/08/25 04:28:36 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7991,7 +7991,7 @@ Ffigure_mapcontours
 
        set colorbox
        set colorbox {
-                  { vertical | horizontal }
+                  { vertical | horizontal } {{no}invert}
                   { default | user }
                   { origin x, y }
                   { size x, y }

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.133.2.4 2015/10/05 16:04:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.133.2.5 2016/08/07 18:41:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -437,6 +437,8 @@ const struct gen_table set_colorbox_tbl[] =
     { "nobo$rder",	S_COLORBOX_NOBORDER },
     { "o$rigin",	S_COLORBOX_ORIGIN },
     { "s$ize",		S_COLORBOX_SIZE },
+    { "inv$ert",	S_COLORBOX_INVERT },
+    { "noinv$ert",	S_COLORBOX_NOINVERT },
     { "fr$ont",		S_COLORBOX_FRONT },
     { "ba$ck",		S_COLORBOX_BACK },
     { NULL, S_COLORBOX_INVALID }

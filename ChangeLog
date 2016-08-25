@@ -8,6 +8,14 @@
 	unused so get rid of it.
 	Bug #1843
 
+	* src/color.c src/set.c src/gadgets.c src/gadgets.h src/tables.c
+	src/tables.h src/save.c docs/gnuplot.doc:  New keyword
+	"set colorbox {{no}invert" flips the top/bottom orientation of a
+	vertical gradient; i.e. the same color maps to the same numerical value
+	but the orientation of the sample is inverted.  Display of horizontal
+	gradients is not affected.
+	Tracker issue #1808
+
 2016-08-24  Ethan A Merritt  <merritt@u.washington.edu >
 
 	* src/plot2d.c (refresh_bounds box_range_fiddling): Improved autoscaling

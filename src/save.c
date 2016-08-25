@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.256.2.18 2016/05/04 21:56:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.256.2.19 2016/08/07 18:41:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -963,6 +963,7 @@ set origin %g,%g\n",
     fputs(" size ", fp);
     save_position(fp, &color_box.size, FALSE);
     fprintf(fp, " %s ", color_box.layer ==  LAYER_FRONT ? "front" : "back");
+    fprintf(fp, " %sinvert ", color_box.invert ? "" : "no");
     if (color_box.border == 0) fputs("noborder", fp);
 	else if (color_box.border_lt_tag < 0) fputs("bdefault", fp);
 		 else fprintf(fp, "border %d", color_box.border_lt_tag);
