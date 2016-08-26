@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.325 2016/04/15 17:55:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.326 2016/07/02 09:36:33 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1556,6 +1556,10 @@ init_terminal()
 #ifdef VMS
 	term_name = vms_init();
 #endif /* VMS */
+
+	if (term_name == (char *) NULL
+            && getenv ("DOMTERM") != NULL)
+          term_name = "domterm";
 
 #ifdef __BEOS__
 	env_term = getenv("TERM");

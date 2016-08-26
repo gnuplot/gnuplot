@@ -1,9 +1,10 @@
 2016-08-26  Per Bothner  <per@bothner.com>
 
-	* term/svg.trm:  New terminal "domterm" wraps svg output in escape 
-	sequences compatible with in-line display in terminal emulators based on
-	DomTerm (http://domterm.org). Conceptually similar to the tektronix,
-	sixel, selanar etc graphic modes that interleaved with text output in
+	* term/svg.trm src/term.c (init_terminal):
+	New terminal "domterm" wraps svg output in escape sequences compatible
+	with in-line display in terminal emulators based on DomTerm
+	(http://domterm.org). Conceptually similar to the tektronix, sixel,
+	selanar etc graphic modes that interleaved with text output in
 	old-school character cell terminals or emulators like xterm.
 
 2016-08-25  Ethan A Merritt  <merritt@u.washington.edu >
