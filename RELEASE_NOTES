@@ -1,47 +1,40 @@
-		GNUPLOT Version 5.0.4 Release Notes
+		GNUPLOT Version 5.0.5 Release Notes
 		===================================
 
 Gnuplot version 5.0 was initially released in January 2015.
 Please see the NEWS and ChangeLog files for a complete list of bug fixes
 and minor changes accummulated since then.
 
-These release notes are for version 5.0 patchlevel 4 (5.0.4).
-This release contains bug-fixes and a few changes back-ported from the
-development version.
+These release notes are for version 5.0 patchlevel 5 (5.0.5).
+This release contains bug-fixes, a few changes back-ported from the
+development version, and a few new features.
 
-Release Notes date: 15-Jul-2016
+Release Notes date: 25-Aug-2016
 
-This patchlevel 5.0.4 incremental release includes
+This patchlevel 5.0.5 incremental release includes
 ==================================================
 
-* CHANGE minimum linewidth of all cairo terminals is now 0.2 pt
-* CHANGE in-line datablock lines are not limited to 1024 characters
-* CHANGE do not truncate or renumber history items in the active session
-* CHANGE (Windows only) open piped output using mode "wb" rather than "w"
-* CHANGE backport 5.1 use of "lc variable" to color boxplot factors
-* CHANGE gnuplot_svg.js now remaps coords for svg image embedded in larger object
-* CHANGE disallow "set palette maxcolors 1" (which has never worked)
-* CHANGE data-input errors in "stats" now generate a warning rather than an error
-* FIX placement of objects and labels using linked secondary axis coordinates
-* FIX 'set term qt <N> close' acts immediately rather than after next mouse event
-* FIX emf terminal could lose track of bold/italic/etc font properties
-* FIX emf terminal text placement of UTF-8 strings
-* FIX regression that caused "set log x; plot '-'; replot" to mess up autoscaling
-* FIX regression in v5 that mangled 3D arrows defined by "from ... rto ..."
-* FIX transposition of row/column count in plotting ascii x/y/z data "with image"
-* FIX 7-column input to "splot ... with vectors"
-* FIX ignore incomplete "every" spec for image plots
-* FIX placement of xyplane does not depend on having tics or grid lines enabled
-* FIX early program exit on replot+resize with inline data
-* FIX bad plot iteration with negative increment, e.g. plot for [i=9:1:-1] foo(i)
-* FIX smoothed curves could not be plotted as filledcurves; now they can be
-* FIX win terminal apply color to enhanced text
+* NEW allow filename completion for system commands and pipes (backport from 5.1)
+* NEW option to plot with labels {rotate variable}
+* NEW command "set minussign"
+* NEW stats command "name" option now accepts "columnheader" or "columnheader(N)"
+* CHANGE qt terminal force selection of outline font rather than bitmap font
+* CHANGE post terminal simplex/duplex output depends on PostScript level setting
+* CHANGE improved autoscaling of plot "with boxes"
+* CHANGE qt terminal sets TERM_POLYGON_PIXELS to avoid aliasing artifacts
+* FIX Do not confuse EOF with 8-bit character 0x177 (E.g. in Cyrillic encodings).
+* FIX regression in rendering 'plot ... matrix every ... with image'
+* FIX order dependence of "fillcolor" keyword in plot commands
+* FIX svg - better vertical justification of rotated text
+* FIX wxt - file export widget correctly handles inactive plots
 
 
-NOTABLE NEW FEATURES IN PATCHLEVEL 5.0.4
+NOTABLE NEW FEATURES IN PATCHLEVEL 5.0.5
 ========================================
 
-None.
+New command "set minussign" uses unicode character U+2122 "MINUS SIGN" rather
+than an ascii hyphen when formatting numerical output.
+
 Incremental releases 5.0.1, 5.0.2, etc are primarily intended to provide
 bug fixes rather than new features.
 
@@ -183,6 +176,7 @@ KNOWN ISSUES
 * If you configure in the wxt terminal without also configuring in X11,
   you may need to set the environmental variable TERMLIBS:
     TERMLIBS="-lX11"  ./configure
+  Version 3.0.0 of the wxgtk library is buggy; please use a newer version.
 
 * Compilation on Solaris may require adding -liconv to LIB_FLAGS
   Building the plugin demo with a SunPro Compiler requires changing the
@@ -293,7 +287,7 @@ Options for generating interactive plots for web display
 Installation
 ------------
 
-You can download a source tarball for gnuplot version 5.0.4 from the 
+You can download a source tarball for gnuplot version 5.0.5 from the 
 gnuplot development site on SourceForge.
 	http://sourceforge.net/projects/gnuplot
 
@@ -301,7 +295,7 @@ Installation instructions are available in the source itself; the short
 version for linux/unix-like systems is to unpack the tarball and then
 <PRE>
 build it:
-      cd gnuplot-5.0.4 ; ./configure ; make
+      cd gnuplot-5.0.5 ; ./configure ; make
 test it:
       make check
 install it:
