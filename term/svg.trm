@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.176 2016/08/05 05:10:29 markisch Exp $
+ * $Id: svg.trm,v 1.177 2016/08/09 11:50:57 markisch Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -19,6 +19,10 @@
 
 		Hans-Bernhard Br"oker
 		broeker@physik.rwth-aachen.de
+
+	DomTerm support
+
+		Per Bothner  <per@bothner.com>
 
 ------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -132,6 +136,9 @@ static char *SVG_name = NULL;
 static char *SVG_scriptdir = NULL;
 static TBOOLEAN SVG_mouseable = FALSE;
 static TBOOLEAN SVG_standalone = FALSE;
+static TBOOLEAN SVG_domterm = FALSE;
+static TBOOLEAN SVG_emit_doctype = TRUE;
+static TBOOLEAN SVG_redirected = FALSE;
 
 static TBOOLEAN SVG_groupFilledIsOpen = FALSE; /* open pm3d group flag*/
 static TBOOLEAN SVG_inTextBox = FALSE;
@@ -200,6 +207,7 @@ static void SVG_StyleFillColor __PROTO((void));
 static void SVG_local_reset __PROTO((void));
 static void SVG_DefineFillPattern __PROTO((int fillpat));
 static void SVG_MoveForced __PROTO((unsigned int x, unsigned int y));
+static void SVG_write_preamble __PROTO ((void));
 
 /* Points to source of requested embedded font */
 static char *SVG_embedded_font = NULL;
@@ -508,6 +516,14 @@ SVG_options ()
     if (!almost_equals(c_token-1, "termopt$ion"))
 	SVG_local_reset();
 
+    if (strcmp(term->name, "domterm") == 0) {
+        SVG_emit_doctype = FALSE;
+        SVG_domterm = TRUE;
+    } else {
+        SVG_emit_doctype = TRUE;
+        SVG_domterm = FALSE;
+    }
+
     while (!END_OF_COMMAND) {
 	if (almost_equals(c_token, "s$ize")) {
 	    double value;
@@ -774,10 +790,6 @@ SVG_local_reset()
 TERM_PUBLIC void
 SVG_init ()
 {
-    int len;
-    double stroke_width;
-    char *svg_encoding = "";
-
     /* setup pens*/
     SVG_pens[0].width = SVG_LineWidth;
     strcpy (SVG_pens[0].color, "white"); /* should really be background */
@@ -833,8 +845,15 @@ SVG_init ()
 
     term->h_tic = term->v_char / 2;
     term->v_tic = term->v_char / 2;
+}
 
 /* write file header*/
+static void
+SVG_write_preamble ()
+{
+    int len;
+    double stroke_width;
+    char *svg_encoding = "";
 
     switch (encoding) {
 	case S_ENC_ISO8859_1:	svg_encoding = "encoding=\"iso-8859-1\" "; break;
@@ -856,11 +875,15 @@ SVG_init ()
 				break;
     }
 
-    fprintf (gpoutfile,
-	     "<?xml version=\"1.0\" %s standalone=\"no\"?>\n"
-	     "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\"\n"
-	     " \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n"
-	     "<svg ", svg_encoding);
+    if (SVG_domterm)
+      fprintf(gpoutfile, "\033]72;");
+    if (SVG_emit_doctype)
+        fprintf (gpoutfile,
+                 "<?xml version=\"1.0\" %s standalone=\"no\"?>\n"
+                 "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\"\n"
+                 " \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n",
+                 svg_encoding);
+    fprintf(gpoutfile, "<svg ");
 
     if (SVG_mouseable)
 	fprintf (gpoutfile, " onload=\"if (typeof(gnuplot_svg)!='undefined') gnuplot_svg.Init(evt)\" ");
@@ -1059,8 +1082,10 @@ SVG_init ()
 TERM_PUBLIC void
 SVG_graphics ()
 {
-    /* EAM 5-May-2004 We must force a new group with fill:none in order for  */
-    /* multiple plots per page to work. Otherwise new plots are black-filled */
+    SVG_write_preamble();
+
+    /* We must force a new group with fill:none in order for multiple */
+    /* plots per page to work. Otherwise new plots are black-filled   */
     SVG_GroupOpen();
 
     SVG_fillPattern = -1;
@@ -1213,6 +1238,13 @@ SVG_text ()
 	(int)(term->ymax/SVG_SCALE)-26);
 	fprintf(gpoutfile,"    onclick='gnuplot_svg.toggleGrid();'/>\n");
     }
+
+    fputs("</svg>\n\n", gpoutfile);
+
+    if (SVG_domterm) {
+        fprintf(gpoutfile, "\007");
+        fflush(gpoutfile);
+    }
 }
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1221,7 +1253,6 @@ SVG_text ()
 TERM_PUBLIC void
 SVG_reset ()
 {
-    fputs("</svg>\n\n", gpoutfile);
 }
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -2169,7 +2200,7 @@ TERM_TABLE_START (svg_driver)
     SVG_options, SVG_init, SVG_reset, SVG_text, null_scale, SVG_graphics,
     SVG_move, SVG_vector, SVG_linetype, SVG_put_text, SVG_text_angle,
     SVG_justify_text, SVG_point, do_arrow, SVG_set_font, do_pointsize,
-    TERM_CAN_MULTIPLOT | TERM_CAN_DASH | TERM_ALPHA_CHANNEL|TERM_LINEWIDTH,
+    TERM_CAN_DASH | TERM_ALPHA_CHANNEL|TERM_LINEWIDTH,
     0 /* suspend */, 0 /* resume */ , SVG_fillbox, SVG_linewidth
 #ifdef USE_MOUSE
    , 0, 0, 0, 0, 0 /* no mouse support for svg */
@@ -2197,6 +2228,42 @@ TERM_TABLE_END (svg_driver)
 
 #undef LAST_TERM
 #define LAST_TERM svg_driver
+
+TERM_TABLE_START (domterm_driver)
+    "domterm", "DomTerm terminal emulator with embedded SVG",
+    0 /* xmax */ , 0 /* ymax */ , 0 /* vchar */ , 0 /* hchar */ ,
+    0 /* vtic */ , 0 /* htic */ ,
+    SVG_options, SVG_init, SVG_reset, SVG_text, null_scale, SVG_graphics,
+    SVG_move, SVG_vector, SVG_linetype, SVG_put_text, SVG_text_angle,
+    SVG_justify_text, SVG_point, do_arrow, SVG_set_font, do_pointsize,
+    TERM_CAN_DASH | TERM_ALPHA_CHANNEL|TERM_LINEWIDTH,
+    0 /* suspend */, 0 /* resume */ , SVG_fillbox, SVG_linewidth
+#ifdef USE_MOUSE
+   , 0, 0, 0, 0, 0 /* no mouse support for svg */
+#endif
+   , SVG_make_palette,
+   SVG_previous_palette,
+   SVG_set_color,
+   SVG_filled_polygon
+#ifdef WRITE_PNG_IMAGE
+    , SVG_image
+#else
+    , NULL	/* image */
+#endif
+   , ENHsvg_OPEN, ENHsvg_FLUSH, ENHsvg_writec
+   , SVG_layer	/* layer */
+   , SVG_path 	/* path */
+   , SVG_SCALE	/* pixel oversampling scale */
+   , SVG_hypertext	/* hypertext support */
+#ifdef EAM_BOXED_TEXT
+   , SVG_boxed_text	/* boxed text labels */
+#endif
+   , NULL		/* modify_plots */
+   , SVG_dashtype	/* Version 5 dashtype support */
+TERM_TABLE_END (domterm_driver)
+
+#undef LAST_TERM
+#define LAST_TERM domterm_driver
 
 #endif /* TERM_TABLE */
 #endif /* TERM_PROTO_ONLY */
@@ -2265,4 +2332,20 @@ START_HELP(svg)
 " directory list in the GNUPLOT_FONTPATH environmental variable.",
 " NB: You must embed an svg font, not a TrueType or PostScript font."
 END_HELP(svg)
-#endif
+
+START_HELP(domterm)
+"1 domterm",
+"?set terminal domterm",
+"?terminal domterm",
+"?set term domterm",
+"?term domterm",
+"?domterm",
+" The `domterm` terminal device runs on the DomTerm terminal emulator",
+" including the domterm and qtdomterm programs.",
+" It supports SVG graphics embedded directly in the terminal output.",
+" See http://domterm.org .",
+"",
+" Please read the help for the `svg` terminal.",
+""
+END_HELP(domterm)
+#endif /* TERM_HELP */
