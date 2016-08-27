@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.365 2016/07/23 03:34:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.366 2016/08/07 18:18:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2453,8 +2453,11 @@ show_colorbox()
 	default: /* should *never* happen */
 	    int_error(NO_CARET, "Argh!");
     }
-    fprintf(stderr,"\tcolor gradient is %s in the color box\n",
-	color_box.rotation == 'v' ? "VERTICAL" : "HORIZONTAL");
+    if (color_box.rotation == 'v')
+	fprintf(stderr,"\tcolor gradient is vertical %s\n",
+	color_box.invert ? " (inverted)" : "");
+    else
+	fprintf(stderr,"\tcolor gradient is horizontal\n");
 }
 
 
