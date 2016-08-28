@@ -16,7 +16,7 @@ set boxwidth 0.05
 set xrange [-0.1 : 1.1] noextend
 set yrange [-0.4 : 1.6]
 plot "random-points" u 1:(0.25*rand(0)-.35) t '', \
-     "" u (bin($1,0.05)):(20/N) smooth freq t 'smooth frequency' w boxes, \
+     "" u (bin($1,0.05)):(20./N) smooth freq t 'smooth frequency' w boxes, \
      "" u 1:(1.) smooth cnorm t 'smooth cnorm'
 pause -1 "Hit enter to continue"
 
@@ -29,7 +29,7 @@ set yrange [-0.4 : 1.1]
 set ytics 0,.2
 
 plot "random-points" u 2:(0.25*rand(0)-.35) t '', \
-     "" u (bin($2,0.05)):(20/N) smooth freq t 'smooth frequency' w boxes, \
+     "" u (bin($2,0.05)):(20./N) smooth freq t 'smooth frequency' w boxes, \
      "" u 2:(1.) smooth cnorm t 'smooth cnorm'
 pause -1 "Hit enter to continue"
 
@@ -39,7 +39,7 @@ set title "Lognormal Distribution"
 set boxwidth 0.1
 set xrange [0 : *] noextend
 plot "random-points" u 3:(0.25*rand(0)-.35) t '', \
-    "" u (bin($3,0.1)):(10/N) smooth freq t 'smooth frequency' w boxes, \
+    "" u (bin($3,0.1)):(10./N) smooth freq t 'smooth frequency' w boxes, \
     "" u 3:(1.) smooth cnorm t 'smooth cnorm'
 pause -1 "Hit enter to continue"
 
@@ -53,7 +53,7 @@ set ytics nomirror  0,.2
 set y2tics nomirror tc "red" 0,50
 
 plot "random-points" u 4:(0.25*rand(0)-.35) t '', \
-     "" u (bin($4,0.1)):(10/N) smooth freq t 'smooth frequency' w boxes, \
+     "" u (bin($4,0.1)):(10./N) smooth freq t 'smooth frequency' w boxes, \
      "" u 4:(1.) smooth cnorm t 'smooth cnorm' lc "#88eeff" lw 5, \
      "" u 4:(1.) axes x1y2 smooth cumulative t 'smooth cumulative' lc "red"
 pause -1 "Hit enter to continue"

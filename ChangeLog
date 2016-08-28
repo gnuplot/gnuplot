@@ -1,3 +1,9 @@
+2016-08-28  Ethan A Merritt  <merritt@u.washington.edu >
+
+	* demo/smooth.dem docs/gnuplot.doc:  Update docs for "smooth" option.
+	Fix regression in demo caused by failure to promote N = points per bin
+	to a real number.
+
 2016-08-26  Per Bothner  <per@bothner.com>
 
 	* term/svg.trm src/term.c (init_terminal):
@@ -10,7 +16,7 @@
 2016-08-25  Ethan A Merritt  <merritt@u.washington.edu >
 
 	* src/color.c src/set.c src/gadgets.c src/gadgets.h src/tables.c
-	src/tables.h src/save.c docs/gnuplot.doc:  New keyword
+	src/tables.h src/save.c src/show.c docs/gnuplot.doc:  New keyword
 	"set colorbox {{no}invert" flips the top/bottom orientation of a
 	vertical gradient; i.e. the same color maps to the same numerical value
 	but the orientation of the sample is inverted.  Display of horizontal

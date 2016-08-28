@@ -6054,31 +6054,32 @@ Ffigure_jitter
  externally or by using `fit` with an appropriate model.
 
  Syntax:
-       smooth {unique | frequency | fnormal | cumulative | cnormal
+       smooth {unique | frequency | fnormal | cumulative | cnormal | bins
                       | kdensity {bandwidth}
                       | csplines | acsplines | mcsplines | bezier | sbezier
                       | unwrap}
 
- `unique`, `frequency`, `fnormal`, `cumulative` and `cnormal` plot the data
- after making them monotonic. `unwrap` manipulates the data to avoid jumps of
- more than pi by adding or subtracting multiples of 2*pi. Each of the other
- routines uses the data to determine the coefficients of a continuous curve
- between the endpoints of the data. This curve is then plotted in the same
+ The `unique`, `frequency`, `fnormal`, `cumulative` and `cnormal` sort the data
+ on x and then plot some aspect of the distribution of x values.
+
+ The spline and Bezier options determine coefficients describing a continuous
+ curve between the endpoints of the data. This curve is then plotted in the same
  manner as a function, that is, by finding its value at uniform intervals along
  the abscissa (see `set samples`) and connecting these points with straight line
  segments (if a line style is chosen).
 
- If `autoscale` is in effect, the ranges will be computed such that the
- plotted curve lies within the borders of the graph.
+ `unwrap` manipulates the data to avoid jumps of more than pi by adding or
+ subtracting multiples of 2*pi. 
 
- If `autoscale` is not in effect, and the smooth option is either `acspline`
- or `cspline`, the sampling of the generated curve is done across the
- intersection of the x range covered by the input data and the fixed abscissa
- range as defined by `set xrange`.
+ If `autoscale` is in effect, axis ranges will be computed for the final curve
+ rather than for the original data.
 
- If too few points are available to allow the selected option to be applied,
- an error message is produced.  The minimum number is one for `unique` and
- `frequency`, four for `acsplines`, and three for the others.
+ If `autoscale` is not in effect, and a spline curve is being generated,
+ sampling of the spline fit is done across the intersection of the x range
+ covered by the input data and the fixed abscissa range defined by `set xrange`.
+
+ If too few points are available to apply the requested smoothing operation
+ an error message is produced.
 
  The `smooth` options have no effect on function plots.
 5 acsplines
@@ -6174,7 +6175,7 @@ Ffigure_jitter
 ?mcsplines
  The `mcsplines` option connects consecutive points by cubic splines constrained
  such that the smoothed function preserves the monotonicity and convexity of the
- original data points.
+ original data points.  This reduces the effect of outliers.
  FN Fritsch & RE Carlson (1980) "Monotone Piecewise Cubic Interpolation",
  SIAM Journal on Numerical Analysis 17: 238–246.
 5 sbezier
