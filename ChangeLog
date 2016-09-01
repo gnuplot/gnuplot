@@ -1,3 +1,11 @@
+2016-09-01  Ethan A Merritt  <merritt@u.washington.edu >
+
+	* term/pslatex.trm:  The begin/end of plot bookkeeping of internal state
+	that would otherwise be done by PS_layer() needs to be done instead by
+	the replacement routine PSLATEX_layer().  In particular the final line
+	a plot needs to be stroked and the linetype reset.
+	Bug #1852
+
 2016-08-28  Ethan A Merritt  <merritt@u.washington.edu >
 
 	* demo/smooth.dem docs/gnuplot.doc:  Update docs for "smooth" option.

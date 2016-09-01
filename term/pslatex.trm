@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.95 2016/07/23 03:34:41 sfeam Exp $
+ * $Id: pslatex.trm,v 1.96 2016/07/25 16:59:12 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -944,10 +944,22 @@ EPSLATEX_linetype(int linetype)
 TERM_PUBLIC void
 EPSLATEX_layer(t_termlayer syncpoint)
 {
+    static int plotno = 0;
+
     switch (syncpoint) {
+
+    case TERM_LAYER_BEFORE_PLOT:
+	fprintf(gppsfile, "%% Begin plot #%d\n", ++plotno);
+	break;
+    
+    case TERM_LAYER_AFTER_PLOT:
+	PS_linetype(LT_UNDEFINED);	/* Forces a stroke and resets linetype */
+	fprintf(gppsfile, "%% End plot #%d\n", plotno);
+	break;
 
     case TERM_LAYER_RESET:        /* Start of plot; reset flag */
 	epslatex_text_layer = 0;
+	plotno = 0;
 	break;
 
     case TERM_LAYER_BACKTEXT: /* Start of "back" text layer */
