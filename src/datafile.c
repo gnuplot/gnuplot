@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.290.2.24 2016/08/04 03:16:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.290.2.25 2016/08/25 04:28:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -5351,15 +5351,8 @@ df_generate_pseudodata()
 	AXIS_INDEX u_axis = FIRST_X_AXIS;
 	AXIS_INDEX v_axis = FIRST_Y_AXIS;
 
-	if ((df_pseudorecord >= nusteps) && (df_pseudorecord > 0)) {
-	    df_pseudorecord = 0;
-	    if (++df_pseudospan >= nvsteps)
-		return NULL;
-	    else
-		return ""; /* blank record for end of scan line */
-	}
-
-	if (df_pseudospan == 0) {
+	/* Fill in the static variables only once per plot */
+	if (df_pseudospan == 0 && df_pseudorecord == 0) {
 	    if (samples_1 < 2 || samples_2 < 2 || iso_samples_1 < 2 || iso_samples_2 < 2)
 		int_error(NO_CARET, "samples or iso_samples < 2. Must be at least 2.");
 	    if (parametric) {
@@ -5387,9 +5380,25 @@ df_generate_pseudodata()
 	    nvsteps = iso_samples_2;
 	}
 
+	/* wrap at end of each line */
+	if (df_pseudorecord >= nusteps) {
+	    df_pseudorecord = 0;
+	    if (++df_pseudospan >= nvsteps)
+		return NULL;
+	    else
+		return ""; /* blank record for end of scan line */
+	}
+
 	/* Duplicate algorithm from calculate_set_of_isolines() */
 	u = u_min + df_pseudorecord * u_step;
 	v = v_max - df_pseudospan * v_isostep;
+
+	/* Round-off error is most visible at the border */
+	if (df_pseudorecord == nusteps-1)
+	    u = u_max;
+	if (df_pseudospan == nvsteps-1)
+	    v = v_min;
+
 	if (parametric) {
 	    df_pseudovalue_0 = u;
 	    df_pseudovalue_1 = v;
