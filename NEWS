@@ -1,5 +1,5 @@
-Changes since release of 5.0.4
-==============================
+Changes in 5.0.5
+================
 * NEW allow filename completion for system commands and pipes (backport from 5.1)
 * NEW option to plot "with labels ... {rotate variable}"
 * NEW command "set minussign"
@@ -9,6 +9,7 @@ Changes since release of 5.0.4
 * CHANGE post terminal simplex/duplex output depends on PostScript level setting
 * CHANGE improved autoscaling of plot "with boxes"
 * CHANGE qt terminal sets TERM_POLYGON_PIXELS to avoid aliasing artifacts
+* CHANGE all stats and fit commands skip header records in data
 * FIX Do not confuse EOF with 8-bit character 0x177 (E.g. in Cyrillic encodings).
 * FIX regression in rendering 'plot ... matrix every ... with image'
 * FIX order dependence of "fillcolor" keyword in plot commands
