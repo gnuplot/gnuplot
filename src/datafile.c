@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.332 2016/08/19 16:51:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.333 2016/09/02 17:48:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2056,14 +2056,11 @@ df_readascii(double v[], int max)
 			    axcol = 2;
 			    break;
 			case CT_CBTICLABEL:
-			    /* EAM FIXME - Which column to set for cbtic? */
 			    axis = COLOR_AXIS;
 			    axcol = 3;
 			    break;
 		    }
-		    /* FIXME EAM - Trap special case of only a single
-		     * 'using' column. But really we need to handle
-		     * general case of implicit column 0 */
+		    /* Trap special case of only a single 'using' column */
 		    if (output == 1)
 			xpos = (axcol == 0) ? df_datum : v[axcol-1];
 		    else
@@ -4805,7 +4802,6 @@ df_readbinary(double v[], int max)
 	    bytes_total    += record_skip;
 
 	    /* Allocate a chunk of memory and stuff it */
-	    /* EAM FIXME: Is this a leak if the plot errors out? */
 	    memory_data = gp_alloc(bytes_total, "df_readbinary slurper");
 	    this_record->memory_data = memory_data;
 
@@ -5236,7 +5232,6 @@ df_readbinary(double v[], int max)
 			axcol = 2;
 			break;
 		    case CT_CBTICLABEL:
-			/* EAM FIXME - Which column to set for cbtic? */
 			axis = COLOR_AXIS;
 			axcol = 2;
 			break;
@@ -5320,7 +5315,6 @@ df_generate_pseudodata()
 
 	if ((axis_array[SAMPLE_AXIS].range_flags & RANGE_SAMPLED)) {
 	    /* This is the case of an explicit sampling range */
-	    /* FIXME: should allow for round-off error in floating point summation! */
 	    if (!inrange(t, t_min, t_max))
 		return NULL;
 	} else {

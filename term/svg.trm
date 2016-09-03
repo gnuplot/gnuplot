@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.177 2016/08/09 11:50:57 markisch Exp $
+ * $Id: svg.trm,v 1.178 2016/08/26 20:26:39 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -138,7 +138,6 @@ static TBOOLEAN SVG_mouseable = FALSE;
 static TBOOLEAN SVG_standalone = FALSE;
 static TBOOLEAN SVG_domterm = FALSE;
 static TBOOLEAN SVG_emit_doctype = TRUE;
-static TBOOLEAN SVG_redirected = FALSE;
 
 static TBOOLEAN SVG_groupFilledIsOpen = FALSE; /* open pm3d group flag*/
 static TBOOLEAN SVG_inTextBox = FALSE;
