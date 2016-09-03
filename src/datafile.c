@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.333 2016/09/02 17:48:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.334 2016/09/03 21:46:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1040,7 +1040,6 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	data_fp = NULL;
     }
 
-    /*{{{  initialise static variables */
     free(df_format);
     df_format = NULL;         /* no format string */
 
@@ -1087,10 +1086,20 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     /* Save for use by df_readline(). */
     /* Perhaps it should be a parameter to df_readline? */
     df_current_plot = plot;
+
+    /* If 'set key autotitle columnhead' is in effect we always treat the
+     * first data row as non-data (df_readline() will return DF_COLUMNHEADERS
+     * rather than the column count).  This is true even if the key is off
+     * or the data is read from 'stats' or from 'fit' rather than plot.
+     * FIXME:  This should probably be controlled by an option to 
+     *         'set datafile' rather than 'set key'.  Or maybe both?
+     */
     column_for_key_title = NO_COLUMN_HEADER;
-    parse_1st_row_as_headers = FALSE;
     df_already_got_headers = FALSE;
-    /*}}} */
+    if ((&keyT)->auto_titles == COLUMNHEAD_KEYTITLES)
+	parse_1st_row_as_headers = TRUE;
+    else
+	parse_1st_row_as_headers = FALSE;
 
     if (!cmd_filename)
 	int_error(c_token, "missing filename");

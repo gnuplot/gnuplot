@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1014 2016/08/25 20:07:08 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1016 2016/08/28 18:42:27 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -654,7 +654,8 @@ C
 
    plot for [i=2:6] 'datafile' using i title "Results for ".columnhead(i)
 
- See `labels`, `using xticlabels`, `plot title`, `using`.
+ This use of column headings is automated by `set key autotitle columnhead`.
+ See `labels`, `using xticlabels`, `plot title`, `using`, `key autotitle`.
 2 Enhanced text mode
 ?enhanced text
 ?enhanced
@@ -1562,7 +1563,7 @@ C marker below is used to signal this to doc2html:
 ?column
 #column(x) & int or string & column $x$ during datafile manipulation. \\
 %column(x)@int or string@column $x$ during datafile manipulation.
- `column(x)` may be used only in expressions as part of `using` manipulations
+ `column(x)` may be used only as part of a plot, splot, or stats command.
  to fits or datafile plots.  It evaluates to the numerical value of the contents
  of column x. See `plot datafile using`.
 4 columnhead
@@ -1570,9 +1571,9 @@ C marker below is used to signal this to doc2html:
 ?columnhead
 #columnhead(x) & int & string containing first entry of column $x$ in datafile. \\
 %columnhead(x)@int@string containing first entry of column $x$ in datafile.
- `columnhead(x)` may only be used in expressions as part of `using` manipulations
- to fits or datafile plots.  It evaluates to a string containing the contents of
- column x in the first line of data. See `plot datafile using`.
+ `columnhead(x)` may only be used as part of a plot, splot, or stats command.
+ It evaluates to a string containing the content of column x in the first line
+ of a data file. See `plot datafile using`.
 4 exists
 ?expressions functions exists
 ?exists
@@ -6497,7 +6498,7 @@ Ffigure_jitter
  $1, $2, ... are shorthand for column(1), column(2) ...  The function `valid(N)`
  tests whether the value in the Nth column is a valid number.
 =column
-=columnhead
+=columnheader
  If each column of data in the input file contains a label in the first row
  rather than a data value, this label can be used to identify the column on
  input and/or in the plot legend. The column() function can be used to select
@@ -6513,8 +6514,7 @@ Ffigure_jitter
        plot 'datafile' using "Age":"Height", '' using "Age":"Weight"
 
  The full string must match. Comparison is case-sensitive.
- To use the column labels in the plot legend, use 
- `set key autotitle columnhead`.
+ To use column labels in the plot legend, use `set key autotitle columnhead`.
 
  In addition to the actual columns 1...N in the input data file, gnuplot
  presents data from several "pseudo-columns" that hold bookkeeping information.
@@ -9685,21 +9685,6 @@ Ffigure_missing
  subtracted from the height of the key box.  This is useful mainly when you are
  putting a box around the key and want larger borders around the key entries.
 
- All plotted curves of `plot`s and `splot`s are titled according to the
- default option `autotitles`. The automatic generation of titles can be
- suppressed by `noautotitles`; then only those titles explicitly defined
- by `(s)plot ... title ...` will be drawn.
-
-=columnheader
- The command `set key autotitle columnheader` causes the first entry in each
- column of input data to be interpreted as a text string and used as a title for
- the corresponding plot. If the quantity being plotted is a function of data
- from several columns, gnuplot may be confused as to which column to draw the
- title from. In this case it is necessary to specify the column explicitly in
- the plot command, e.g.
-
-       plot "datafile" using (($2+$3)/$4) title columnhead(3) with lines
-
  An overall title can be put on the key (`title "<text>"`)---see also `syntax`
  for the distinction between text in single- or double-quotes. The justification
  of the title defaults to center and can be changed by the keywords `right` or
@@ -9749,6 +9734,30 @@ Ffigure_missing
  This places the key in the bottom left corner, left-justifies the text,
  gives it a title, and draws a box around it in linetype 3:
        set key left bottom Left title 'Legend' box 3
+4 key autotitle
+?set key autotitle
+?key autotitle
+?autotitle
+ `set key autotitle` causes each plot to be identified in the key by the name
+ of the data file or function used in the plot command. This is the default.
+ `set key noautitle` disables the automatic generation of plot titles.
+=columnnheader
+ The command `set key autotitle columnheader` causes the first entry in each
+ column of input data to be interpreted as a text string and used as a title for
+ the corresponding plot. If the quantity being plotted is a function of data
+ from several columns, gnuplot may be confused as to which column to draw the
+ title from. In this case it is necessary to specify the column explicitly in
+ the plot command, e.g.
+
+       plot "datafile" using (($2+$3)/$4) title columnhead(3) with lines
+
+ Note: The effect of `set key autotitle columnheader`, treatment of the first
+ line in a data file as column headers rather than data applies even if the
+ key is disabled by `unset key`.  It also applies to `stats` and `fit` commands
+ even though they generate no key.
+
+ In all cases an explicit `title` or `notitle` keyword in the plot command
+ itself will override the default from `set key autotitle`.
 4 key placement
 ?commands set key placement
 ?set key placement

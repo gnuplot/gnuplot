@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.366 2016/08/07 18:18:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.367 2016/08/27 20:51:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1860,8 +1860,9 @@ show_key()
     SHOW_ALL_NL;
 
     if (!(key->visible)) {
-	fputs("\
-\tkey is OFF\n", stderr);
+	fputs("\tkey is OFF\n", stderr);
+	if (key->auto_titles == COLUMNHEAD_KEYTITLES)
+	    fputs("\ttreatment of first record as column headers remains in effect\n", stderr);
 	return;
     }
 

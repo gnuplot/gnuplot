@@ -2,6 +2,21 @@
 
 	* src/datafile.c term/svg.trm:  Remove dead code and comments.
 
+	* src/stats.c:  Track and report number of lines treated as column 
+	headers rather than as data.
+
+	* src/show.c:  Show state of 'autotitle columnheaders' even if the key
+	is currently unset.
+
+	* docs/gnuplot.doc:  Update sections referring to columnheaders.
+	Note that the effect of `set key autotitle columnhead` extands to
+	stats and fit commands, and applies even if the key is unset.
+
+	* src/datafile.c (df_open):  Guarantee that first line of data is
+	skipped if 'set key autotitle columnhead' is in effect regardless of
+	whether the column headers are used.
+	Bug #1751
+
 2016-09-02  Ethan A Merritt  <merritt@u.washington.edu >
 
 	* src/datafile.c (df_generate_pseudodata):
