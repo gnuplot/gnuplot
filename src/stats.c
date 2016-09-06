@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stats.c,v 1.30 2016/08/19 21:49:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stats.c,v 1.31 2016/09/03 23:04:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stats.c */
@@ -966,7 +966,9 @@ statsrequest(void)
 	if (df_key_title && *df_key_title) {
 	    prefix = gp_strdup(df_key_title);
 	    squash_spaces(prefix, 0);
-	} else {
+	} 
+	if (!legal_identifier(prefix)) {
+	    int_warn(NO_CARET, "columnhead %s is not a valid prefix", prefix ? prefix : "");
 	    prefix = gp_strdup("STATS_");
 	}
     }
