@@ -9,6 +9,10 @@
 	UNDEFINED point with a blank line when smoothed data is tabulated.
 	Bug #1274
 
+	* src/stats.c: In the case of 'stats foo prefix columnhead' check that
+	the string found in the column header is a legal identifier (i.e. rule
+	out numbers and punctuation).
+
 2016-09-03  Ethan A Merritt  <merritt@u.washington.edu >
 
 	* src/stats.c:  Track and report number of lines treated as column 
