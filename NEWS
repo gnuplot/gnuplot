@@ -11,6 +11,7 @@ Changes in 5.0.5
 * CHANGE qt terminal sets TERM_POLYGON_PIXELS to avoid aliasing artifacts
 * CHANGE all stats and fit commands skip header records in data
 * FIX Do not confuse EOF with 8-bit character 0x177 (E.g. in Cyrillic encodings).
+* FIX use blank line rather than 'u' flag in "set table" output of smoothed data
 * FIX regression in rendering 'plot ... matrix every ... with image'
 * FIX order dependence of "fillcolor" keyword in plot commands
 * FIX svg - better vertical justification of rotated text

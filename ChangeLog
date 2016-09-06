@@ -1,3 +1,14 @@
+2016-09-06  Ethan A Merritt  <merritt@u.washington.edu >
+
+	* src/tabulate.c( imploded ): The smoothing routine cp_implode()
+	creates a new set of plots separated by dummy UNDEFINED points.
+	However data files use a blank line to separate curves.  Thus
+	  "set table foo; plot ... smooth freq"
+	creates a file foo that is not in standard format, creating problems
+	if it is read back in to plot later.  This patch replaces each
+	UNDEFINED point with a blank line when smoothed data is tabulated.
+	Bug #1274
+
 2016-09-03  Ethan A Merritt  <merritt@u.washington.edu >
 
 	* src/stats.c:  Track and report number of lines treated as column 
@@ -7,7 +18,7 @@
 	is currently unset.
 
 	* docs/gnuplot.doc:  Update sections referring to columnheaders.
-	Note that the effect of `set key autotitle columnhead` extands to
+	Note that the effect of `set key autotitle columnhead` extends to
 	stats and fit commands, and applies even if the key is unset.
 
 	* src/datafile.c (df_open):  Guarantee that first line of data is
