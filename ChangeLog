@@ -1,3 +1,10 @@
+2016-09-06  Daniel J Sebald <daniel.sebald@ieee.org>
+
+	* src/graph3d.c (setup_3d_box_corners): Add quandrant processing for
+	surface_rot_x similar to that for surface_rot_z.  This fixes
+	inconsistent borders drawn when the base is upside down.
+	Bug #1810
+
 2016-09-06  Ethan A Merritt  <merritt@u.washington.edu >
 
 	* src/stats.c: In the case of 'stats foo prefix columnhead' check that
