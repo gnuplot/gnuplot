@@ -5,6 +5,16 @@
 	detection of the Windows version.
 	Bug #1851
 
+2016-09-07  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/eval.c:  Windows 10 also deprecated the VerifyVersionInfo API
+	which is used by the external findversion.h, as well as GetVersionEx.
+	Since the above patch fixes GetVersionEx's behaviour on all current
+	Windows versions, there's no need to rely on findversion.h any more.
+	See Feature Request 422
+
+	* config/mingw/Makefile:  Resource target depends on manifest files.
+
 2016-09-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/pslatex.trm:  For pslatex, epslatex, cairolatex "standalone"

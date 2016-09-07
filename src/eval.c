@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.137 2016/08/13 00:16:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.138 2016/08/22 22:22:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -239,7 +239,7 @@ static JMP_BUF fpe_env;
 static RETSIGTYPE
 fpe(int an_int)
 {
-#if defined(MSDOS) && !defined(__EMX__) && !defined(DJGPP) && !defined(_Windows)
+#if defined(MSDOS) && !defined(__EMX__) && !defined(DJGPP) && !defined(_WIN32)
     /* thanks to lotto@wjh12.UUCP for telling us about this  */
     _fpreset();
 #endif
@@ -1049,14 +1049,9 @@ update_gpval_variables(int context)
 
 /* System information is stored in GPVAL_BITS GPVAL_MACHINE GPVAL_SYSNAME */
 #ifdef HAVE_UNAME
-#include <sys/utsname.h>
-    struct utsname uts;
-#elif defined(_Windows)
-#include <windows.h>
-/* external header file findverion.h to find windows version from windows 2000 to 8.1*/
-#ifdef HAVE_FINDVERSION_H
-#include <findversion.h>
-#endif
+# include <sys/utsname.h>
+#elif defined(_WIN32)
+# include <windows.h>
 #endif
 
 void
@@ -1065,27 +1060,26 @@ fill_gpval_sysinfo()
 /* For linux/posix systems with uname */
 #ifdef HAVE_UNAME
     struct utsname uts;
+
     if (uname(&uts) < 0)
 	return;
     fill_gpval_string("GPVAL_SYSNAME", uts.sysname);
     fill_gpval_string("GPVAL_MACHINE", uts.machine);
 
 /* For Windows systems */
-#elif defined(_Windows)
+#elif defined(_WIN32)
     SYSTEM_INFO stInfo;
-
-#ifdef HAVE_FINDVERSION_H
-    OSVERSIONINFOEX ret;
-    int exitCode = GetVersionExEx(&ret);
+    OSVERSIONINFO osvi;
     char s[30];
-    snprintf(s, 30, "Windows_NT-%d.%d", ret.dwMajorVersion, ret.dwMinorVersion);
-    fill_gpval_string("GPVAL_SYSNAME", s);
-#else
-    fill_gpval_string("GPVAL_SYSNAME", "Windows");
-#endif
 
-    GetSystemInfo( &stInfo );
-    switch( stInfo.wProcessorArchitecture )
+    ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
+    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+    GetVersionEx(&osvi);
+    snprintf(s, 30, "Windows_NT-%ld.%ld", osvi.dwMajorVersion, osvi.dwMinorVersion);
+    fill_gpval_string("GPVAL_SYSNAME", s);
+
+    GetSystemInfo(&stInfo);
+    switch (stInfo.wProcessorArchitecture)
     {
     case PROCESSOR_ARCHITECTURE_INTEL:
         fill_gpval_string("GPVAL_MACHINE", "x86");
@@ -1102,7 +1096,7 @@ fill_gpval_sysinfo()
 #endif
 
 /* For all systems */
-    fill_gpval_integer("GPVAL_BITS", 8*sizeof(void *));
+    fill_gpval_integer("GPVAL_BITS", 8 * sizeof(void *));
 }
 
 /* Callable wrapper for the words() internal function */
