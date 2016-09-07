@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.218 2016/08/10 17:52:27 markisch Exp $
+ * $Id: wgraph.c,v 1.219 2016/08/11 08:37:42 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -1069,7 +1069,6 @@ SelFont(LPGW lpgw)
 	LOGFONT lf;
 	CHOOSEFONT cf;
 	HDC hdc;
-	TCHAR lpszStyle[LF_FACESIZE];
 	TCHAR * p;
 
 	/* Set all structure fields to zero. */
@@ -1079,23 +1078,26 @@ SelFont(LPGW lpgw)
 	cf.hwndOwner = lpgw->hWndGraph;
 	_tcsncpy(lf.lfFaceName, lpgw->fontname, LF_FACESIZE);
 	if ((p = _tcsstr(lpgw->fontname, TEXT(" Bold"))) != NULL) {
-		_tcsncpy(lpszStyle, p + 1, LF_FACESIZE);
-		lf.lfFaceName[ (unsigned int)(p-lpgw->fontname) ] = '\0';
-	} else if ((p = _tcsstr(lpgw->fontname, TEXT(" Italic"))) != NULL) {
-		_tcsncpy(lpszStyle, p + 1, LF_FACESIZE);
-		lf.lfFaceName[ (unsigned int)(p-lpgw->fontname) ] = '\0';
+		lf.lfWeight = FW_BOLD;
+		lf.lfFaceName[p - lpgw->fontname] = NUL;
 	} else {
-		_tcscpy(lpszStyle, TEXT("Regular"));
+		lf.lfWeight = FW_NORMAL;
 	}
-	cf.lpszStyle = lpszStyle;
+	if ((p = _tcsstr(lpgw->fontname, TEXT(" Italic"))) != NULL) {
+		lf.lfItalic = TRUE;
+		lf.lfFaceName[p - lpgw->fontname] = NUL;
+	} else {
+		lf.lfItalic = FALSE;
+	}
+	lf.lfCharSet = DEFAULT_CHARSET;
 	hdc = GetDC(lpgw->hWndGraph);
 	lf.lfHeight = -MulDiv(lpgw->fontsize, GetDeviceCaps(hdc, LOGPIXELSY), 72);
 	ReleaseDC(lpgw->hWndGraph, hdc);
 	cf.lpLogFont = &lf;
 	cf.nFontType = SCREEN_FONTTYPE;
-	cf.Flags = CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT | CF_USESTYLE;
+	cf.Flags = CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT | CF_SCALABLEONLY;
 	if (ChooseFont(&cf)) {
-		_tcscpy(lpgw->fontname,lf.lfFaceName);
+		_tcscpy(lpgw->fontname, lf.lfFaceName);
 		lpgw->fontsize = cf.iPointSize / 10;
 		if (cf.nFontType & BOLD_FONTTYPE)
 			_tcscat(lpgw->fontname, TEXT(" Bold"));

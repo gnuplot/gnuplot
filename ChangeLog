@@ -1,3 +1,11 @@
+2016-09-07  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c src/win/wtext.c:  Ensure proper initalisation of the
+	font chooser dialog also on non-english systems by using the LOGFONT
+	fields to request bold or italic fonts instead of using strings.
+	Request scalable fonts only, to ensure fonts can be scaled or rotated,
+	or offer (some) Unicode characters.
+
 2016-09-06  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* src/graph3d.c (setup_3d_box_corners): Add quandrant processing for
