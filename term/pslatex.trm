@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.96 2016/07/25 16:59:12 sfeam Exp $
+ * $Id: pslatex.trm,v 1.97 2016/09/01 19:01:16 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -405,6 +405,7 @@ PSTEX_text()
 /* Functions for epslatex */
 
 /* the common init function for the epslatex driver */
+/* used by pslatex epslatex cairolatex */
 TERM_PUBLIC void
 EPSLATEX_common_init()
 {
@@ -472,6 +473,10 @@ EPSLATEX_common_init()
         case S_ENC_KOI8_U:
             inputenc = "koi8-u";
             break;
+	case S_ENC_UTF8:
+	    /* utf8x (not utf8) is needed to pick up degree and micro signs */
+	    inputenc = "utf8x";
+	    break;
         case S_ENC_INVALID:
             int_error(NO_CARET, "invalid input encoding used");
             break;
@@ -601,7 +606,7 @@ EPSLATEX_common_init()
 
         fputs("\\begingroup\n", gpoutfile);
         
-        if (inputenc)
+        if (inputenc && encoding != S_ENC_UTF8)
             fprintf(gpoutfile, "\
   %% Encoding inside the plot.  In the header of your document, this encoding\n\
   %% should to defined, e.g., by using\n\
