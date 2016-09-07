@@ -9,7 +9,7 @@ These release notes are for version 5.0 patchlevel 5 (5.0.5).
 This release contains bug-fixes, a few changes back-ported from the
 development version, and a few new features.
 
-Release Notes date: 25-Aug-2016
+Release Notes date: 07-Sep-2016
 
 This patchlevel 5.0.5 incremental release includes
 ==================================================
@@ -18,11 +18,14 @@ This patchlevel 5.0.5 incremental release includes
 * NEW option to plot with labels {rotate variable}
 * NEW command "set minussign"
 * NEW stats command "name" option now accepts "columnheader" or "columnheader(N)"
+* NEW command option "set colorbox invert"
 * CHANGE qt terminal force selection of outline font rather than bitmap font
 * CHANGE post terminal simplex/duplex output depends on PostScript level setting
 * CHANGE improved autoscaling of plot "with boxes"
 * CHANGE qt terminal sets TERM_POLYGON_PIXELS to avoid aliasing artifacts
+* CHANGE all stats and fit commands skip header records if "autotitle columnhead"
 * FIX Do not confuse EOF with 8-bit character 0x177 (E.g. in Cyrillic encodings).
+* FIX use blank line rather than 'u' flag in "set table" output of smoothed data
 * FIX regression in rendering 'plot ... matrix every ... with image'
 * FIX order dependence of "fillcolor" keyword in plot commands
 * FIX svg - better vertical justification of rotated text
