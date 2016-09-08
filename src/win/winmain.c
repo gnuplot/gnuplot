@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.89 2016/08/05 05:10:29 markisch Exp $
+ * $Id: winmain.c,v 1.90 2016/08/06 13:22:50 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -168,6 +168,9 @@ WinExit(void)
     /* Last chance, call before anything else to avoid a crash. */
     WinCloseHelp();
 
+    /* clean-up call for printing system */
+    PrintingCleanup();
+
     term_reset();
 
     _fcloseall();
@@ -190,6 +193,7 @@ WinExit(void)
 #endif
     return;
 }
+
 
 /* call back function from Text Window WM_CLOSE */
 int CALLBACK
@@ -1129,9 +1133,9 @@ ConsoleReadCh()
 		} else {
 		    int i, count;
 		    char mbchar[8];
-		    count = WideCharToMultiByte(WinGetCodepage(encoding), 0, 
-				&rec.Event.KeyEvent.uChar.UnicodeChar, 1, 
-				mbchar, sizeof(mbchar), 
+		    count = WideCharToMultiByte(WinGetCodepage(encoding), 0,
+				&rec.Event.KeyEvent.uChar.UnicodeChar, 1,
+				mbchar, sizeof(mbchar),
 				NULL, NULL);
 		    for (i = 1; i < count; i++) {
 			console_input[last_input_char] = mbchar[i];
@@ -1303,7 +1307,7 @@ WinWindowOpened(void)
 
 
 /* returns true if there are any graph windows open (wxt/caca/win terminals) */
-/* Note: This routine is used to handle "persist". Do not test for qt windows here 
+/* Note: This routine is used to handle "persist". Do not test for qt windows here
          since they run in a separate process */
 TBOOLEAN
 WinAnyWindowOpen(void)
@@ -1473,7 +1477,7 @@ AnsiText(LPCWSTR strw,  enum set_encoding_id encoding)
 }
 
 
-FILE * 
+FILE *
 win_fopen(const char *filename, const char *mode)
 {
     FILE * file;

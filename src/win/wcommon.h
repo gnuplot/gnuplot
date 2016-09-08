@@ -1,5 +1,5 @@
 /*
- * $Id: wcommon.h,v 1.27 2016/08/09 12:02:59 markisch Exp $
+ * $Id: wcommon.h,v 1.28 2016/08/10 16:02:22 markisch Exp $
  */
 
 /* GNUPLOT - wcommon.h */
@@ -99,11 +99,14 @@ void CloseMacros(LPTW lptw);
 extern HGLOBAL hDevNames;
 extern HGLOBAL hDevMode;
 
-BOOL PrintSize(HDC printer, HWND hwnd, LPRECT lprect);
+void PrintingCleanup(void);
+void * PrintingCallbackCreate(GP_LPPRINT lpr);
+void PrintingCallbackFree(void * callback);
 void PrintRegister(GP_LPPRINT lpr);
 void PrintUnregister(GP_LPPRINT lpr);
 BOOL CALLBACK PrintAbortProc(HDC hdcPrn, int code);
 INT_PTR CALLBACK PrintDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK PrintSizeDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam);
 
 /* wgraph.c */
 unsigned luma_from_color(unsigned red, unsigned green, unsigned blue);

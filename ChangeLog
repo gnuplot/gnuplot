@@ -5,7 +5,16 @@
 	detection of the Windows version.
 	Bug #1851
 
-2016-09-07  Bastian Maerkisch  <bmaerkisch@web.de>
+2016-09-08  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c src/win/winmain.c src/win/wprinter.c
+	src/win/wcommon.h src/win/wgnuplib.h src/win/wgnuplib.rc:
+	Replace the deprecated old-style print-setup dialog (which was shown
+	when the user requests the windows terminal to print) by a print
+	property sheet.  Integrate the previously separate dialog to request
+	the print size.  This sadly requires quite a bit of code to implement
+	a COM callback object.  Also we now properly clean-up printing
+	resources.
 
 	* src/eval.c:  Windows 10 also deprecated the VerifyVersionInfo API
 	which is used by the external findversion.h, as well as GetVersionEx.

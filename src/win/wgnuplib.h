@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.81 2016/08/09 12:02:59 markisch Exp $
+ * $Id: wgnuplib.h,v 1.82 2016/08/10 14:28:35 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -82,6 +82,8 @@ typedef struct tagPRINT {
 	POINT	pdef;
 	POINT	psize;
 	POINT	poff;
+	BOOL	bDriverChanged;
+	void *	services;
 	struct tagPRINT *next;
 } GP_PRINT;
 typedef GP_PRINT *  GP_LPPRINT;

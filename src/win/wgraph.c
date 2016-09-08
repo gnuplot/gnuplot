@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.219 2016/08/11 08:37:42 markisch Exp $
+ * $Id: wgraph.c,v 1.220 2016/09/07 15:27:53 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -3154,37 +3154,67 @@ CopyPrint(LPGW lpgw)
 {
 	DOCINFO docInfo;
 	HDC printer;
-	PRINTDLG pd;
+	PRINTDLGEX pd;
 	DEVNAMES * pDevNames;
 	DEVMODE * pDevMode;
 	LPCTSTR szDriver, szDevice, szOutput;
 	HWND hwnd = lpgw->hWndGraph;
 	RECT rect;
 	GP_PRINT pr;
+	PROPSHEETPAGE psp;
+	HPROPSHEETPAGE hpsp;
+	HDC hdc;
 
-	/* Print Setup Dialog */
+	/* Print Property Sheet Dialog */
+	memset(&pr, 0, sizeof(pr));
+	hdc = GetDC(hwnd);
+	GetClientRect(hwnd, &rect);
+	pr.pdef.x = MulDiv(rect.right - rect.left, 254, 10 * GetDeviceCaps(hdc, LOGPIXELSX));
+	pr.pdef.y = MulDiv(rect.bottom  - rect.top, 254, 10 * GetDeviceCaps(hdc, LOGPIXELSX));
+	pr.psize.x = -1; /* will be initialised to paper size whenever the printer driver changes */
+	pr.psize.y = -1;
+	ReleaseDC(hwnd, hdc);
 
-	/* See http://support.microsoft.com/kb/240082 */
+	psp.dwSize      = sizeof(PROPSHEETPAGE);
+	psp.dwFlags     = PSP_USETITLE;
+	psp.hInstance   = lpgw->hInstance;
+	psp.pszTemplate = TEXT("PrintSizeDlgBox");  //MAKEINTRESOURCE(DLG_FONT);
+	psp.pszIcon     = NULL; // MAKEINTRESOURCE(IDI_FONT);
+	psp.pfnDlgProc  = PrintSizeDlgProc;
+	psp.pszTitle    = TEXT("Layout");
+	psp.lParam      = (LPARAM) &pr;
+	psp.pfnCallback = NULL;
+	hpsp = CreatePropertySheetPage(&psp);
+
 	memset(&pd, 0, sizeof(pd));
 	pd.lStructSize = sizeof(pd);
 	pd.hwndOwner = hwnd;
-	pd.Flags = PD_PRINTSETUP;
+	pd.Flags = PD_NOPAGENUMS | PD_NOSELECTION | PD_NOCURRENTPAGE | PD_USEDEVMODECOPIESANDCOLLATE;
 	pd.hDevNames = hDevNames;
 	pd.hDevMode = hDevMode;
 	pd.nCopies = 1;
+	pd.nPropertyPages = 1;
+	pd.lphPropertyPages = &hpsp;
+	pd.nStartPage = START_PAGE_GENERAL;
+	pd.lpCallback = PrintingCallbackCreate(&pr);
 
-	if (!PrintDlg(&pd)) {
+	if (PrintDlgEx(&pd) != S_OK) {
 		DWORD error = CommDlgExtendedError();
 		if (error != 0)
 			fprintf(stderr, "\nError:  Opening the print dialog failed with error code %04x.\n", error);
+		PrintingCallbackFree(pd.lpCallback);
 		return;
 	}
+	PrintingCallbackFree(pd.lpCallback);
+	if (pd.dwResultAction != PD_RESULT_PRINT)
+		return;
 
+	/* See http://support.microsoft.com/kb/240082 */
 	pDevNames = (DEVNAMES *) GlobalLock(pd.hDevNames);
 	pDevMode = (DEVMODE *) GlobalLock(pd.hDevMode);
-	szDriver = (LPCTSTR)pDevNames + pDevNames->wDriverOffset;
-	szDevice = (LPCTSTR)pDevNames + pDevNames->wDeviceOffset;
-	szOutput = (LPCTSTR)pDevNames + pDevNames->wOutputOffset;
+	szDriver = (LPCTSTR) pDevNames + pDevNames->wDriverOffset;
+	szDevice = (LPCTSTR) pDevNames + pDevNames->wDeviceOffset;
+	szOutput = (LPCTSTR) pDevNames + pDevNames->wOutputOffset;
 	printer = CreateDC(szDriver, szDevice, szOutput, pDevMode);
 
 	GlobalUnlock(pd.hDevMode);
@@ -3199,11 +3229,11 @@ CopyPrint(LPGW lpgw)
 	if (printer == NULL)
 		return;	/* abort */
 
-	/* Print Size Dialog */
-	if (!PrintSize(printer, hwnd, &rect)) {
-		DeleteDC(printer);
-		return; /* abort */
-	}
+	/* Print Size Dialog results */
+	rect.left = MulDiv(pr.poff.x * 10, GetDeviceCaps(printer, LOGPIXELSX), 254);
+	rect.top = MulDiv(pr.poff.y * 10, GetDeviceCaps(printer, LOGPIXELSY), 254);
+	rect.right = rect.left + MulDiv(pr.psize.x * 10, GetDeviceCaps(printer, LOGPIXELSX), 254);
+	rect.bottom = rect.top + MulDiv(pr.psize.y * 10, GetDeviceCaps(printer, LOGPIXELSY), 254);
 
 	pr.hdcPrn = printer;
 	PrintRegister(&pr);
@@ -3230,11 +3260,11 @@ CopyPrint(LPGW lpgw)
 		SetBkMode(printer, OPAQUE);
 		StartPage(printer);
 
+		/* Always print using GDI only! */
 		DestroyFonts(lpgw);
 		MakeFonts(lpgw, &rect, printer);
 		DestroyPens(lpgw);	/* rebuild pens */
 		MakePens(lpgw, printer);
-		/* Always print using GDI only! */
 		drawgraph(lpgw, printer, &rect);
 		if (EndPage(printer) > 0)
 			EndDoc(printer);

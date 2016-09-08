@@ -1,5 +1,5 @@
 /*
- * $Id: wprinter.c,v 1.17 2016/08/10 16:02:22 markisch Exp $
+ * $Id: wprinter.c,v 1.18 2016/08/10 17:52:27 markisch Exp $
  */
 
 /* GNUPLOT - win/wprinter.c */
@@ -47,10 +47,13 @@
 #endif
 
 #define STRICT
+#include <initguid.h>
 #include <windows.h>
 #include <windowsx.h>
+#include <unknwn.h>
 #include <commdlg.h>
 #include <commctrl.h>
+#include <OCIdl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <tchar.h>
@@ -68,14 +71,178 @@ HGLOBAL hDevMode = NULL;
 static GP_LPPRINT PrintFind(HDC hdc);
 
 
+/* COM object for PrintDlgEx callbacks, implemented in C 
+*/
+typedef struct {
+    IPrintDialogCallback callback;
+    IObjectWithSite site;
+
+    IUnknown * pUnkSite_;
+    IPrintDialogServices * services_;
+    GP_LPPRINT lpr_;
+} PrintingCallbackHandler;
+
+// IUnknown
+HRESULT STDMETHODCALLTYPE
+QueryInterface(IPrintDialogCallback * This, REFIID riid, void ** object)
+{
+    if (IsEqualIID(riid, &IID_IUnknown)) {
+	*object = (void *) This;
+    } else if (IsEqualIID(riid, &IID_IPrintDialogCallback)) {
+	*object = (void *) &((PrintingCallbackHandler *)This)->callback;
+    } else if (IsEqualIID(riid, &IID_IObjectWithSite)) {
+	*object = (void *) &((PrintingCallbackHandler *)This)->site;
+    } else {
+	return E_NOINTERFACE;
+    }
+    return S_OK;
+}
+
+static ULONG STDMETHODCALLTYPE
+AddRef(IPrintDialogCallback * This)
+{
+    return 1;
+}
+
+static ULONG STDMETHODCALLTYPE
+Release(IPrintDialogCallback * This)
+{
+    return 1;
+}
+
+// IPrintDialogCallback
+static HRESULT STDMETHODCALLTYPE
+InitDone(IPrintDialogCallback * This)
+{
+    /* the general page is initialised, but not shown yet */
+    PrintingCallbackHandler * Base = (PrintingCallbackHandler *) ((char *) This - offsetof(PrintingCallbackHandler, callback));
+#if 0
+    IPrintDialogServices * services = Base->services_;
+    if (services != NULL) {
+    }
+#endif
+    Base->lpr_->bDriverChanged = TRUE;
+    /* always return false to enable default actions */
+    return S_FALSE;
+}
+
+static HRESULT STDMETHODCALLTYPE 
+SelectionChange(IPrintDialogCallback * This)
+{
+    /* the user has selected a different printer */
+    PrintingCallbackHandler * Base = (PrintingCallbackHandler *) ((char *) This - offsetof(PrintingCallbackHandler, callback));
+#if 0
+    IPrintDialogServices * services = Base->services_;
+    if (services != NULL) {
+    }
+#endif
+    Base->lpr_->bDriverChanged = TRUE;
+    /* always return false to enable default actions */
+    return S_FALSE;
+}
+
+static HRESULT STDMETHODCALLTYPE
+HandleMessage(IPrintDialogCallback * This, HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT * pResult)
+{
+    // WM_INITDIALOG: lParam points to PRINTDLGEX struct
+    /* enable default message handling */
+    return S_FALSE;
+}
+
+static HRESULT STDMETHODCALLTYPE
+SetSite(IObjectWithSite * This, IUnknown * pUnkSite)
+{
+    PrintingCallbackHandler * Base = (PrintingCallbackHandler *) ((char *) This - offsetof(PrintingCallbackHandler, site));
+    if (Base->pUnkSite_ != NULL) {
+	Base->pUnkSite_->lpVtbl->Release(Base->pUnkSite_);
+	Base->pUnkSite_ = NULL;
+    }
+    if (pUnkSite == NULL) {
+	if (Base->services_ != NULL) {
+	    Base->services_->lpVtbl->Release(Base->services_);
+	    Base->services_ = NULL;
+	}
+    } else {
+	Base->pUnkSite_ = pUnkSite;
+	pUnkSite->lpVtbl->AddRef(pUnkSite);
+	if (Base->services_ == NULL) {
+	    pUnkSite->lpVtbl->QueryInterface(pUnkSite, &IID_IPrintDialogServices, (void **) &(Base->services_));
+	    Base->lpr_->services = Base->services_;
+	}
+    }
+    return S_OK;
+}
+
+static HRESULT STDMETHODCALLTYPE
+GetSite(IObjectWithSite * This, REFIID riid, void ** ppvSite)
+{
+    /* according to documentation this _must_ be implemented */
+    PrintingCallbackHandler * Base = (PrintingCallbackHandler *) ((char *) This - offsetof(PrintingCallbackHandler, site));
+    *ppvSite = Base->pUnkSite_;
+    return (Base->pUnkSite_ != NULL) ? S_OK : E_FAIL;
+}
+
+static IPrintDialogCallbackVtbl IPrintDialogCallback_Vtbl = {
+    QueryInterface, AddRef, Release, InitDone, SelectionChange, HandleMessage
+};
+
+static IObjectWithSiteVtbl IObjectWithSite_Vtbl = {
+    (void *) QueryInterface, (void *) AddRef, (void *) Release, SetSite, GetSite
+};
+
+static void
+PrintingCallbackInit(PrintingCallbackHandler * This, GP_LPPRINT lpr)
+{
+    memset(This, 0, sizeof(PrintingCallbackHandler));
+    This->callback.lpVtbl = &IPrintDialogCallback_Vtbl;
+    This->site.lpVtbl = &IObjectWithSite_Vtbl;
+    This->lpr_ = lpr;
+}
+
+static void
+PrintingCallbackFini(PrintingCallbackHandler * This)
+{
+    if (This->services_ != NULL)
+	This->services_->lpVtbl->Release(This->services_);
+}
+
+void *
+PrintingCallbackCreate(GP_LPPRINT lpr)
+{
+    PrintingCallbackHandler * callback = (PrintingCallbackHandler *) malloc(sizeof(PrintingCallbackHandler));
+    /* initialize COM object for the printing dialog callback */
+    PrintingCallbackInit(callback, lpr);
+    return callback;
+}
+
+
+void
+PrintingCallbackFree(void * callback)
+{
+    PrintingCallbackFini((PrintingCallbackHandler *) callback);
+    free(callback);
+}
+
+
+
+void PrintingCleanup(void)
+{
+    if (hDevNames) GlobalFree(hDevNames);
+    if (hDevMode)  GlobalFree(hDevMode);
+}
+
+
 INT_PTR CALLBACK
 PrintSizeDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 {
     TCHAR buf[8];
-    GP_LPPRINT lpr = (GP_LPPRINT)GetWindowLongPtr(GetParent(hdlg), 4);
+    HWND hPropSheetDlg = GetParent(hdlg);
+    GP_LPPRINT lpr = (GP_LPPRINT) GetWindowLongPtr(hdlg, GWLP_USERDATA);
 
     switch (wmsg) {
     case WM_INITDIALOG:
+	lpr = (GP_LPPRINT) ((PROPSHEETPAGE *) lparam)->lParam;
+	SetWindowLongPtr(hdlg, GWLP_USERDATA, (LONG_PTR) lpr);
 	wsprintf(buf, TEXT("%d"), lpr->pdef.x);
 	SetDlgItemText(hdlg, PSIZE_DEFX, buf);
 	wsprintf(buf, TEXT("%d"), lpr->pdef.y);
@@ -93,16 +260,35 @@ PrintSizeDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 	EnableWindow(GetDlgItem(hdlg, PSIZE_Y), FALSE);
 	return TRUE;
     case WM_COMMAND:
-	switch (wparam) {
+	switch (LOWORD(wparam)) {
 	case PSIZE_DEF:
-	    EnableWindow(GetDlgItem(hdlg, PSIZE_X), FALSE);
-	    EnableWindow(GetDlgItem(hdlg, PSIZE_Y), FALSE);
+	    if (HIWORD(wparam) == BN_CLICKED) {
+		EnableWindow(GetDlgItem(hdlg, PSIZE_X), FALSE);
+		EnableWindow(GetDlgItem(hdlg, PSIZE_Y), FALSE);
+		PropSheet_Changed(hPropSheetDlg, hdlg);
+	    }
 	    return FALSE;
 	case PSIZE_OTHER:
-	    EnableWindow(GetDlgItem(hdlg, PSIZE_X), TRUE);
-	    EnableWindow(GetDlgItem(hdlg, PSIZE_Y), TRUE);
+	    if (HIWORD(wparam) == BN_CLICKED) {
+		EnableWindow(GetDlgItem(hdlg, PSIZE_X), TRUE);
+		EnableWindow(GetDlgItem(hdlg, PSIZE_Y), TRUE);
+		PropSheet_Changed(hPropSheetDlg, hdlg);
+	    }
 	    return FALSE;
-	case IDOK:
+	case PSIZE_X:
+	case PSIZE_Y:
+	case PSIZE_OFFX:
+	case PSIZE_OFFY:
+	    if (HIWORD(wparam) == EN_UPDATE)
+		PropSheet_Changed(hPropSheetDlg, hdlg);
+	    return FALSE;
+	} /* switch (wparam) */
+	break;
+    case WM_NOTIFY:
+	switch (((LPNMHDR) lparam)->code) {
+	case PSN_APPLY:  /* apply changes */
+	    /* FIXME: Need to check for valid input.
+	    */
 	    if (SendDlgItemMessage(hdlg, PSIZE_OTHER, BM_GETCHECK, 0, 0L)) {
 		SendDlgItemMessage(hdlg, PSIZE_X, WM_GETTEXT, 7, (LPARAM) buf);
 		GetInt(buf, (LPINT)&lpr->psize.x);
@@ -122,47 +308,71 @@ PrintSizeDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 	    if (lpr->psize.y <= 0)
 		lpr->psize.y = lpr->pdef.y;
 
-	    EndDialog(hdlg, IDOK);
+	    PropSheet_UnChanged(hPropSheetDlg, hdlg);
+	    SetWindowLongPtr(hdlg, DWLP_MSGRESULT, PSNRET_NOERROR);
 	    return TRUE;
-	case IDCANCEL:
-	    EndDialog(hdlg, IDCANCEL);
+	}
+	case PSN_SETACTIVE: /* display: intialize according to printer */
+	    if (lpr->psize.x < 0 || lpr->bDriverChanged) {  
+		/* FIXME: also if settings changed (paper size, orientation) */
+		IPrintDialogServices * services = (IPrintDialogServices *) lpr->services;
+
+		/* Set size to full paper size of current printer */
+		if (services) {
+		    LPDEVMODE lpDevMode;
+		    UINT size;
+		    HRESULT hr;
+		    LPTSTR lpPrinterName = NULL;
+		    LPTSTR lpPortName = NULL;
+
+		    size = 0;
+		    hr = services->lpVtbl->GetCurrentPrinterName(services, NULL, &size);
+		    if (SUCCEEDED(hr) && size > 0) {
+			lpPrinterName = (LPTSTR) malloc(size * sizeof(TCHAR));
+			hr = services->lpVtbl->GetCurrentPrinterName(services, lpPrinterName, &size);
+		    }
+
+		    size = 0;
+		    hr = services->lpVtbl->GetCurrentPortName(services, NULL, &size);
+		    if (SUCCEEDED(hr) && size > 0) {
+			lpPortName = (LPTSTR) malloc(size * sizeof(TCHAR));
+			hr = services->lpVtbl->GetCurrentPortName(services, lpPortName, &size);
+		    }
+
+		    size = 0;
+		    hr = services->lpVtbl->GetCurrentDevMode(services, NULL, &size);
+		    if (SUCCEEDED(hr) && size > 0) {
+			lpDevMode = (LPDEVMODE) malloc(size * sizeof(TCHAR));
+			hr = services->lpVtbl->GetCurrentDevMode(services, lpDevMode, &size);
+		    }
+		    if (SUCCEEDED(hr) && size > 0 && lpPortName != NULL && lpPrinterName != NULL) {
+			HDC printer = CreateDC(TEXT("WINSPOOL"), lpPrinterName, lpPortName, lpDevMode);
+			lpr->psize.x = GetDeviceCaps(printer, HORZSIZE);
+			lpr->psize.y = GetDeviceCaps(printer, VERTSIZE);
+			DeleteDC(printer);
+		    }
+		    free(lpPrinterName);
+		    free(lpPortName);
+		    free(lpDevMode);
+		} 
+	    }
+	    if (lpr->psize.x < 0) {
+		/* something went wrong */
+		lpr->psize.x = lpr->pdef.x;
+		lpr->psize.y = lpr->pdef.y;
+	    }
+	    /* apply changes */
+	    wsprintf(buf, TEXT("%d"), lpr->psize.x);
+	    SetDlgItemText(hdlg, PSIZE_X, buf);
+	    wsprintf(buf, TEXT("%d"), lpr->psize.y);
+	    SetDlgItemText(hdlg, PSIZE_Y, buf);
+	    lpr->bDriverChanged = FALSE;
+
+	    SetWindowLongPtr(hdlg, DWLP_MSGRESULT, 0); /* accept activation */
 	    return TRUE;
-	} /* switch(wparam) */
 	break;
-    } /* switch(msg) */
+    } /* switch (msg) */
     return FALSE;
-}
-
-
-/* GetWindowLong(hwnd, 4) must be available for use */
-BOOL
-PrintSize(HDC printer, HWND hwnd, LPRECT lprect)
-{
-    HDC hdc;
-    BOOL status = FALSE;
-    GP_PRINT pr;
-
-    SetWindowLongPtr(hwnd, 4, (LONG_PTR)&pr);
-    pr.poff.x = 0;
-    pr.poff.y = 0;
-    pr.psize.x = GetDeviceCaps(printer, HORZSIZE);
-    pr.psize.y = GetDeviceCaps(printer, VERTSIZE);
-    hdc = GetDC(hwnd);
-    GetClientRect(hwnd,lprect);
-    pr.pdef.x = MulDiv(lprect->right-lprect->left, 254, 10*GetDeviceCaps(hdc, LOGPIXELSX));
-    pr.pdef.y = MulDiv(lprect->bottom-lprect->top, 254, 10*GetDeviceCaps(hdc, LOGPIXELSX));
-    ReleaseDC(hwnd,hdc);
-
-    if (DialogBox(hdllInstance, TEXT("PrintSizeDlgBox"), hwnd, PrintSizeDlgProc) == IDOK) {
-	lprect->left = MulDiv(pr.poff.x * 10, GetDeviceCaps(printer, LOGPIXELSX), 254);
-	lprect->top = MulDiv(pr.poff.y * 10, GetDeviceCaps(printer, LOGPIXELSY), 254);
-	lprect->right = lprect->left + MulDiv(pr.psize.x * 10, GetDeviceCaps(printer, LOGPIXELSX), 254);
-	lprect->bottom = lprect->top + MulDiv(pr.psize.y * 10, GetDeviceCaps(printer, LOGPIXELSY), 254);
-	status = TRUE;
-    }
-    SetWindowLongPtr(hwnd, 4, (LONG_PTR)(0L));
-
-    return status;
 }
 
 
@@ -214,12 +424,12 @@ PrintDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
     GP_LPPRINT lpr;
 
-    lpr = (GP_LPPRINT) GetWindowLongPtr(hDlg, 0);
+    lpr = (GP_LPPRINT) GetWindowLongPtr(hDlg, GWLP_USERDATA);
     switch (message) {
     case WM_INITDIALOG:
 	lpr = (GP_LPPRINT) lParam;
 	lpr->hDlgPrint = hDlg;
-	SetWindowLongPtr(hDlg, 0, (LONG_PTR) lpr);
+	SetWindowLongPtr(hDlg, GWLP_USERDATA, (LONG_PTR) lpr);
 	SetWindowText(hDlg, lpr->szTitle);
 	EnableMenuItem(GetSystemMenu(hDlg, FALSE), SC_CLOSE, MF_GRAYED);
 	return TRUE;
