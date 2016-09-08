@@ -1,3 +1,10 @@
+2016-09-08  Tatsuro MATSUOKA  <tmacchant3@yahoo.co.jp>
+
+	* src/win/wgnuplot.exe.manifest src/win/wgnuplot.exe.manifest64:  Add
+	compatibility flags vor Windows 7, 8, 8.1, and 10 to enable proper
+	detection of the Windows version.
+	Bug #1851
+
 2016-09-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/pslatex.trm:  For pslatex, epslatex, cairolatex "standalone"
