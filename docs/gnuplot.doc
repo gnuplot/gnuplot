@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1016 2016/08/28 18:42:27 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1017 2016/09/03 23:04:45 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1564,8 +1564,8 @@ C marker below is used to signal this to doc2html:
 #column(x) & int or string & column $x$ during datafile manipulation. \\
 %column(x)@int or string@column $x$ during datafile manipulation.
  `column(x)` may be used only as part of a plot, splot, or stats command.
- to fits or datafile plots.  It evaluates to the numerical value of the contents
- of column x. See `plot datafile using`.
+ It evaluates to the numerical value of the content of column x.
+ See `plot datafile using`.
 4 columnhead
 ?expressions functions columnhead
 ?columnhead
@@ -7135,7 +7135,7 @@ Ffigure_jitter
  the index of the desired style.
 
  If gnuplot was built with `pm3d` support, the special keyword `palette` is
- allowed for smooth color change of lines, points and dots in `splots`. The
+ allowed for smooth color change of lines, points and dots in `splot`. The
  color is chosen from a smooth palette which was set previously with the
  command `set palette`. The color value corresponds to the z-value of the
  point coordinates or to the color coordinate if specified by the 4th parameter
@@ -9735,12 +9735,13 @@ Ffigure_missing
  gives it a title, and draws a box around it in linetype 3:
        set key left bottom Left title 'Legend' box 3
 4 key autotitle
+?commands set key autotitle
 ?set key autotitle
 ?key autotitle
 ?autotitle
  `set key autotitle` causes each plot to be identified in the key by the name
  of the data file or function used in the plot command. This is the default.
- `set key noautitle` disables the automatic generation of plot titles.
+ `set key noautotitle` disables the automatic generation of plot titles.
 =columnnheader
  The command `set key autotitle columnheader` causes the first entry in each
  column of input data to be interpreted as a text string and used as a title for
@@ -12319,7 +12320,7 @@ Ffigure_multiple_keys
       # Fill area in cyan, border in blue
       plot ... with boxes fillcolor "cyan" fs solid border linecolor "blue"
 
- Note: The border property of a fill style with only affect plots drawn
+ Note: The border property of a fill style only affects plots drawn
  `with filledcurves` in the default mode (closed curve).
 5 set style fill transparent
 ?commands set style fill transparent
