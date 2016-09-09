@@ -1,3 +1,8 @@
+2016-09-09  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/term-ja.diff docs/gnuplot-ja.doc:
+	Sync Japanese documentation to doc version 1.1017
+
 2016-09-08  Tatsuro MATSUOKA  <tmacchant3@yahoo.co.jp>
 
 	* src/win/wgnuplot.exe.manifest src/win/wgnuplot.exe.manifest64:  Add
