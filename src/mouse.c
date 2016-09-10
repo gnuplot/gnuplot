@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.189 2016/05/08 18:43:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.190 2016/08/06 05:47:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -2119,7 +2119,12 @@ event_motion(struct gp_event_t *ge)
 	    start_x = mouse_x;
 	    start_y = mouse_y;
 	    redraw = TRUE;
-	} /* if (mousebutton 2 is down) */
+	} else if (button & (1 << 3)) {
+	    /* dragging with button 3 -> change azimuth */
+	    azimuth += (mouse_x - start_x) * 90.0 / term->xmax;
+	    start_x = mouse_x;
+	    redraw = TRUE;
+	}
 
 	if (!ALMOST2D) {
 	    turn_ruler_off();
@@ -2136,6 +2141,7 @@ event_motion(struct gp_event_t *ge)
 		fill_gpval_float("GPVAL_VIEW_ROT_Z", surface_rot_z);
 		fill_gpval_float("GPVAL_VIEW_SCALE", surface_scale);
 		fill_gpval_float("GPVAL_VIEW_ZSCALE", surface_zscale);
+		fill_gpval_float("GPVAL_VIEW_AZIMUTH", azimuth);
 	    } else {
 		/* postpone the replotting */
 		needreplot = TRUE;

@@ -1,5 +1,5 @@
 #
-# $Id: world.dem,v 1.10 2011/11/26 00:31:14 sfeam Exp $
+# $Id: world.dem,v 1.11 2014/10/05 00:33:15 sfeam Exp $
 #
 #
 set title "Gnuplot Correspondences\ngeographic coordinate system"
@@ -27,6 +27,7 @@ set angles degrees
 set title "3D version using spherical coordinate system"
 set ticslevel 0
 set view 70,40,0.8,1.2
+set view equal xyz
 set mapping spherical
 set parametric
 set samples 32
@@ -56,6 +57,7 @@ unset arrow
 set title "3D version using cylindrical coordinate system"
 set ticslevel 0.0
 set view 70,40,0.8,1.2
+set view equal xy
 set mapping cylindrical
 set parametric
 set samples 32

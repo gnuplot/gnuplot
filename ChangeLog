@@ -1,3 +1,17 @@
+2016-09-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c src/graph3d.h src/mouse.c src/save.c src/set.c
+	src/show.c src/unset.c src/eval.c docs/gnuplot.doc demo/azimuth.dem:
+
+	New command "set view azimuth <angle-in-degrees>"
+	Changing the view angles rot_x and rot_z cannot move the z axis out of
+	the plane normal to the canvas horizontal. This patch adds a new angular
+	setting "azimuth" that rotates the plane containing the z axis about
+	the line of sight.  I.e. "set view azimuth 90" places the z axis 
+	parallel to the canvas horizontal rather than the canvas vertical.
+	Click-and-drag with right mouse button provides interactive control of
+	the azimuth.  Azimuth is ignored by 2D plots and by "set view map".
+
 2016-09-09  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/term-ja.diff docs/gnuplot-ja.doc:

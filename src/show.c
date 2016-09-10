@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.367 2016/08/27 20:51:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.368 2016/09/03 23:04:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2737,6 +2737,7 @@ show_view()
     fprintf(stderr,"\t\t%s axes are %s\n",
 		aspect_ratio_3D == 2 ? "x/y" : aspect_ratio_3D == 3 ? "x/y/z" : "",
 		aspect_ratio_3D >= 2 ? "on the same scale" : "independently scaled");
+    fprintf(stderr, "\t\t azimuth %g\n", azimuth);
 }
 
 

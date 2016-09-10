@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1017 2016/09/03 23:04:45 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1018 2016/09/08 20:17:04 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -203,6 +203,8 @@ C
  * New command `set jitter` allows creation of bee swarm plots (see `beeswarm`).
 
  * New commands `break` and `continue` allow more complicated loop structure.
+
+ * 3D plots can be rotated about the line of sight (see `set view azimuth`).
 
  * Support for array variables (see `arrays`).
 
@@ -13142,6 +13144,7 @@ Ffigure_multiple_keys
        set view <rot_x>{,{<rot_z>}{,{<scale>}{,<scale_z>}}}
        set view map {scale <scale>}
        set view {no}equal {xy|xyz}
+       set view azimuth <angle>
        show view
 
  where <rot_x> and <rot_z> control the rotation angles (in degrees) in a
@@ -13167,6 +13170,17 @@ Ffigure_multiple_keys
 
  The first sets all the four default values.  The second changes only scale,
  to 0.5.
+4 azimuth
+?set view azimuth
+?view azimuth
+?azimuth
+       set view azimuth <angle-in-degrees>
+ The setting of azimuth affects the orientation of the z axis in a 3D graph
+ (splot). At the default azimuth = 0 the z axis of the plot lies in the plane
+ orthogonal to the screen horizontal.  I.e. the projection of the z axis lies
+ along the screen vertical.  Non-zero azimuth rotates the plot about the line
+ of sight through the origin so that a projection of the z axis is no longer
+ vertical.  When azimuth = 90 the z axis is horizontal rather than vertical.
 4 equal_axes
 ?set view equal_axes
 ?set view equal xyz

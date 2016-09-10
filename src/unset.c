@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.240 2016/08/02 04:40:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.241 2016/08/07 18:18:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1641,6 +1641,7 @@ unset_view()
     surface_scale = 1.0;
     surface_lscale = 0.0;
     surface_zscale = 1.0;
+    azimuth = 0.0;
 }
 
 

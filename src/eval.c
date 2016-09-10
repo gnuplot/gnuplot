@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.138 2016/08/22 22:22:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.139 2016/09/08 15:21:02 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -972,6 +972,7 @@ update_gpval_variables(int context)
 	fill_gpval_float("GPVAL_VIEW_ROT_Z", surface_rot_z);
 	fill_gpval_float("GPVAL_VIEW_SCALE", surface_scale);
 	fill_gpval_float("GPVAL_VIEW_ZSCALE", surface_zscale);
+	fill_gpval_float("GPVAL_VIEW_AZIMUTH", azimuth);
 	return;
     }
 

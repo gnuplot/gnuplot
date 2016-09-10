@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.529 2016/08/22 18:44:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.530 2016/08/25 20:07:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -5234,6 +5234,12 @@ set_view()
     } else if (almost_equals(c_token,"noequal$_axes")) {
 	aspect_ratio_3D = 0;
 	c_token++;
+	return;
+    }
+
+    if (equals(c_token,"azimuth")) {
+	c_token++;
+	azimuth = real_expression();
 	return;
     }
 

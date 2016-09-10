@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.344 2016/07/29 18:28:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.345 2016/09/06 22:53:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -95,6 +95,7 @@ float surface_scale = 1.0;
 float surface_zscale = 1.0;
 float surface_lscale = 0.0;
 float mapview_scale = 1.0;
+float azimuth = 0.0;
 
 /* Set by 'set view map': */
 int splot_map = FALSE;
@@ -638,10 +639,11 @@ do_3dplot(
     mat_scale(surface_scale / 2.0, surface_scale / 2.0, surface_scale / 2.0, mat);
     mat_mult(trans_mat, trans_mat, mat);
 
-    /* The extrema need to be set even when a surface is not being
-     * drawn.   Without this, gnuplot used to assume that the X and
-     * Y axis started at zero.   -RKC
-     */
+    /* The azimuth is applied as a rotation about the line of sight */
+    if (azimuth !=0 && !splot_map) {
+	mat_rot_z(azimuth, mat);
+	mat_mult(trans_mat, trans_mat, mat);
+    }
 
     if (polar)
 	int_error(NO_CARET,"Cannot splot in polar coordinate system.");
@@ -806,7 +808,7 @@ do_3dplot(
      * difference for other terminals.  If it causes problems, then we will need
      * a separate BoundingBox structure to track the actual 3D graph box.
      */
-    else {
+    else if (azimuth == 0) {
 	int xl, xb, xr, xf, yl, yb, yr, yf;
 
 	map3d_xy(zaxis_x, zaxis_y, base_z, &xl, &yl);

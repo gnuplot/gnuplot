@@ -1,0 +1,35 @@
+set view equal xy
+set zzeroaxis; set xzeroaxis; set yzeroaxis
+set xyplane at 0
+unset border
+unset key
+unset xtics
+unset ytics
+set ztics axis
+
+set arrow 1 from 0,0,0 to 1,0,0 head filled lw 1.5
+set label 1 at 1.2,0,0 "X" center
+set arrow 2 from 0,0,0 to 0,1,0 head filled lw 1.5
+set label 2 at 0,1.2,0 "Y" center
+set arrow 3 from 0,0,0 to 0,0,21 head filled lw 1.5
+set label 3 at 0,0,23 "Z" center
+
+set view 60, 30, 1., 1.75
+
+set multiplot layout 1,3
+
+set view azimuth 0.
+set title 'azimuth 0' offset 0,2
+splot sample [t=0:20] '+' using (cos($1)):(sin($1)):($1) with lines lw 2
+
+set title 'azimuth 10' offset 0,2
+set view azimuth 10.
+replot
+
+set title 'azimuth 60' offset 0,2
+set view azimuth 60.
+replot
+
+unset multiplot
+pause -1 "Hit return to continue"
+reset

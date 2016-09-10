@@ -22,6 +22,7 @@ Changes not in 5.0
 * NEW command "set minussign" (first appeared in 5.0.5)
 * NEW "smooth fnormal" normalized frequency
 * NEW terminal domterm (supports in-line SVG in DomTerm terminal emulator)
+* NEW "set view azimuth <angle>" controls azimuth of the z axis in 3D plots
 * CHANGE Revise placement of axis labels in 3D plots
 * CHANGE Track font/enhanced for key title separately from the key entries
 * CHANGE order of margins in `set margins <left>, <right>, <bottom>, <top>`
