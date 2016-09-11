@@ -1,3 +1,8 @@
+2016-09-11  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wprinter.c:  Previous change failed to apply default size
+	when not the corresponding property sheet was not shown.
+
 2016-09-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c src/graph3d.h src/mouse.c src/save.c src/set.c
