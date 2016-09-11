@@ -8,6 +8,12 @@
 	valid window handle to DumpPrinter().  Include the current terminal
 	name in the print job title.
 
+	* src/win/wprinter (DumpPrinter):  The Escape() PASSTHROUGH function
+	was included in Windows 3(!) for backward compatibility with earlier
+	versions and is no longer supported by some printer drivers.  Make
+	use of the appropriate printer spooler API instead.  For constistency,
+	use a print property sheet instead of a print-setup dialog here too.
+
 2016-09-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c src/graph3d.h src/mouse.c src/save.c src/set.c

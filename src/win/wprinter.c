@@ -1,5 +1,5 @@
 /*
- * $Id: wprinter.c,v 1.19 2016/09/08 18:43:00 markisch Exp $
+ * $Id: wprinter.c,v 1.20 2016/09/08 19:00:35 markisch Exp $
  */
 
 /* GNUPLOT - win/wprinter.c */
@@ -433,6 +433,7 @@ PrintDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	SetWindowLongPtr(hDlg, GWLP_USERDATA, (LONG_PTR) lpr);
 	SetWindowText(hDlg, lpr->szTitle);
 	EnableMenuItem(GetSystemMenu(hDlg, FALSE), SC_CLOSE, MF_GRAYED);
+	SetFocus(GetDlgItem(hDlg, IDCANCEL));
 	return TRUE;
     case WM_COMMAND:
 	lpr->bUserAbort = TRUE;
@@ -449,29 +450,29 @@ BOOL CALLBACK
 PrintAbortProc(HDC hdcPrn, int code)
 {
     MSG msg;
-    GP_LPPRINT lpr= PrintFind(hdcPrn);
+    GP_LPPRINT lpr = PrintFind(hdcPrn);
     while (!lpr->bUserAbort && PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
 	if (!lpr->hDlgPrint || !IsDialogMessage(lpr->hDlgPrint, &msg)) {
 	    TranslateMessage(&msg);
 	    DispatchMessage(&msg);
 	}
     }
-    return(!lpr->bUserAbort);
+    return !lpr->bUserAbort;
 }
 
 
 void
 DumpPrinter(HWND hwnd, LPTSTR szAppName, LPTSTR szFileName)
 {
-    HDC printer;
-    PRINTDLG pd;
+    PRINTDLGEX pd;
     DEVNAMES * pDevNames;
-    DEVMODE * pDevMode;
-    LPCTSTR szDriver, szDevice, szOutput;
+    LPCTSTR szDevice;
     GP_PRINT pr;
-    DOCINFO di;
+    HANDLE printer;
+    DOC_INFO_1 di;
+    DWORD jobid;
+    HRESULT hr;
     LPSTR buf;
-    WORD * bufcount;
     int count;
     FILE *f;
     long lsize;
@@ -487,25 +488,29 @@ DumpPrinter(HWND hwnd, LPTSTR szAppName, LPTSTR szFileName)
     fseek(f, 0L, SEEK_SET);
     ldone = 0;
 
-    /* Print Setup Dialog */
-
+    /* Print Property Sheet  */
     /* See http://support.microsoft.com/kb/240082 */
     memset(&pd, 0, sizeof(pd));
     pd.lStructSize = sizeof(pd);
     pd.hwndOwner = hwnd;
-    pd.Flags = PD_PRINTSETUP;
+    pd.Flags = PD_NOPAGENUMS | PD_NOSELECTION | PD_NOCURRENTPAGE | PD_USEDEVMODECOPIESANDCOLLATE;
     pd.hDevNames = hDevNames;
     pd.hDevMode = hDevMode;
+    pd.hDevNames = NULL;
+    pd.hDevMode = NULL;
+    pd.nCopies = 1;
+    pd.nStartPage = START_PAGE_GENERAL;
 
-    if (PrintDlg(&pd)) {
+    if ((hr = PrintDlgEx(&pd)) != S_OK) {
+	DWORD error = CommDlgExtendedError();
+	fprintf(stderr, "\nError:  Opening the print dialog failed with error code %04x (%04x).\n", hr, error);
+    }
+
+    if (pd.dwResultAction == PD_RESULT_PRINT) {
 	pDevNames = (DEVNAMES *) GlobalLock(pd.hDevNames);
-	pDevMode = (DEVMODE *) GlobalLock(pd.hDevMode);
-	szDriver = (LPCTSTR)pDevNames + pDevNames->wDriverOffset;
 	szDevice = (LPCTSTR)pDevNames + pDevNames->wDeviceOffset;
-	szOutput = (LPCTSTR)pDevNames + pDevNames->wOutputOffset;
-	printer = CreateDC(szDriver, szDevice, szOutput, pDevMode);
-
-	GlobalUnlock(pd.hDevMode);
+	if (!OpenPrinter((LPTSTR)szDevice, &printer, NULL))
+		printer = NULL;
 	GlobalUnlock(pd.hDevNames);
 	/* We no longer free these structures, but preserve them for the next time
 	GlobalFree(pd.hDevMode);
@@ -519,38 +524,44 @@ DumpPrinter(HWND hwnd, LPTSTR szAppName, LPTSTR szFileName)
 
 	pr.hdcPrn = printer;
 	PrintRegister(&pr);
-	if ((buf = (LPSTR) malloc(4096 + 2)) != NULL) {
-	    bufcount = (WORD *)buf;
+	if ((buf = (LPSTR) malloc(4096)) != NULL) {
 	    EnableWindow(hwnd, FALSE);
 	    pr.bUserAbort = FALSE;
 	    pr.szTitle = szAppName;
 	    pr.hDlgPrint = CreateDialogParam(hdllInstance, TEXT("CancelDlgBox"),
 						hwnd, PrintDlgProc, (LPARAM) &pr);
-	    SetAbortProc(printer, PrintAbortProc);
 	    SendMessage(GetDlgItem(pr.hDlgPrint, CANCEL_PROGRESS), PBM_SETRANGE32, 0, lsize);
 
-	    memset(&di, 0, sizeof(DOCINFO));
-	    di.cbSize = sizeof(DOCINFO);
-	    di.lpszDocName = szAppName;
-	    if (StartDoc(printer, &di) > 0) {
+	    di.pDocName = szAppName;
+	    di.pOutputFile = NULL;
+	    di.pDatatype = TEXT("RAW");
+	    if ((jobid = StartDocPrinter(printer, 1, (LPBYTE) &di)) > 0) {
 		while (pr.hDlgPrint && !pr.bUserAbort &&
-		       (count = fread(buf + 2, 1, 4096, f)) != 0 ) {
+		       (count = fread(buf, 1, 4096, f)) != 0 ) {
 		    int ret;
-		    *bufcount = count;
-		    ret = Escape(printer, PASSTHROUGH, count + 2, buf, NULL);
+		    DWORD dwBytesWritten;
+
+		    ret = WritePrinter(printer, buf, count, &dwBytesWritten); 
 		    ldone += count;
-		    if (ret != SP_ERROR) {
+		    if (dwBytesWritten > 0) {
 			wsprintf(pcdone, TEXT("%d%% done"), (int)(ldone * 100 / lsize));
 			SetWindowText(GetDlgItem(pr.hDlgPrint, CANCEL_PCDONE), pcdone);
 			SendMessage(GetDlgItem(pr.hDlgPrint, CANCEL_PROGRESS), PBM_SETPOS, ldone, 0);
-		    } else {
-			SetWindowText(GetDlgItem(pr.hDlgPrint, CANCEL_PCDONE), TEXT("Passthrough Error!"));
+		    } else if (ret == 0) {
+			SetWindowText(GetDlgItem(pr.hDlgPrint, CANCEL_PCDONE), TEXT("Error writing to printer!"));
+			pr.bUserAbort  = TRUE;
 		    }
-		    if (pr.bUserAbort)
-			AbortDoc(printer);
-		    else
-			EndDoc(printer);
+    
+		    /* handle window messages */
+		    PrintAbortProc(printer, 0);
 		}
+		if (pr.bUserAbort) {
+		    if (SetJob(printer, jobid, 0, NULL, JOB_CONTROL_DELETE) == 0) {
+			SetWindowText(GetDlgItem(pr.hDlgPrint, CANCEL_PCDONE), TEXT("Error: Failed to cancel print job!"));
+			fprintf(stderr, "Error: Failed to cancel print job!\n");
+		    }
+		}
+		EndDocPrinter(printer);
 		if (!pr.bUserAbort) {
 		    EnableWindow(hwnd, TRUE);
 		    DestroyWindow(pr.hDlgPrint);
@@ -558,7 +569,7 @@ DumpPrinter(HWND hwnd, LPTSTR szAppName, LPTSTR szFileName)
 		free(buf);
 	    }
 	}
-	DeleteDC(printer);
+	ClosePrinter(printer);
 	PrintUnregister(&pr);
     }
     fclose(f);
