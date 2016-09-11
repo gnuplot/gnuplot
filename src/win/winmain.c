@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.90 2016/08/06 13:22:50 markisch Exp $
+ * $Id: winmain.c,v 1.91 2016/09/08 18:43:00 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -1224,14 +1224,30 @@ open_printer()
 void
 close_printer(FILE *outfile)
 {
+    LPTSTR fname;
+    HWND hwnd;
+    TCHAR title[100];
+
 #ifdef UNICODE
-    LPWSTR printer = UnicodeText(win_prntmp, S_ENC_DEFAULT);
-    fclose(outfile);
-    DumpPrinter(graphwin->hWndGraph, graphwin->Title, printer);
-    free(printer);
+    fname = UnicodeText(win_prntmp, S_ENC_DEFAULT);
 #else
+    fname = win_prntmp;
+#endif
     fclose(outfile);
-    DumpPrinter(graphwin->hWndGraph, graphwin->Title, win_prntmp);
+
+#ifndef WGP_CONSOLE
+    hwnd = textwin.hWndParent;
+#else
+    hwnd = GetDesktopWindow();
+#endif
+    if (term->name != NULL)
+	wsprintf(title, TEXT("gnuplot graph (%hs)"), term->name);
+    else
+	_tcscpy(title, TEXT("gnuplot graph"));
+    DumpPrinter(hwnd, title, fname);
+
+#ifdef UNICODE
+    free(fname);
 #endif
 }
 
