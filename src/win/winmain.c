@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.91 2016/09/08 18:43:00 markisch Exp $
+ * $Id: winmain.c,v 1.92 2016/09/11 20:51:47 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -1217,7 +1217,7 @@ open_printer()
     strncat(win_prntmp, "_gptmp", MAX_PRT_LEN - strlen(win_prntmp));
     strncat(win_prntmp, "XXXXXX", MAX_PRT_LEN - strlen(win_prntmp));
     _mktemp(win_prntmp);
-    return fopen(win_prntmp, "w");
+    return fopen(win_prntmp, "wb");
 }
 
 
