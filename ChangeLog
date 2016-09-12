@@ -16,6 +16,9 @@
 	* src/win/wpause.c:  Use default GUI font (not the archaic system font).
 	Match the size of the dialog box to the actual length of the message.
 
+	* src/win/wtext.c (UpdateScrollBars):  The size of the scroll bar
+	thumb reflects the length or width of the scrollable area.
+
 2016-09-07  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* src/graph3d.c (setup_3d_box_corners): Add quandrant processing for

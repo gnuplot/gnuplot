@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.50 2014/02/12 20:49:09 markisch Exp $
+ * $Id: wtext.c,v 1.51 2014/05/09 22:14:12 broeker Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -408,8 +408,8 @@ NewLine(LPTW lptw)
 
     UpdateCaretPos(lptw);
     if (lptw->bFocus && lptw->bGetCh) {
-		UpdateCaretPos(lptw);
-		ShowCaret(lptw->hWndText);
+	UpdateCaretPos(lptw);
+	ShowCaret(lptw->hWndText);
     }
 
     if (lptw->CursorFlag)
@@ -422,6 +422,7 @@ static void
 UpdateScrollBars(LPTW lptw)
 {
     signed int length;  /* this must be signed for this to work! */
+    SCROLLINFO si;
 
     /* horizontal scroll bar */
     length = sb_max_line_length(&(lptw->ScreenBuffer)) + 1;
@@ -429,8 +430,17 @@ UpdateScrollBars(LPTW lptw)
 	/* maximum horizontal scroll position is given by maximum line length */
 	lptw->ScrollMax.x = max(0, lptw->CharSize.x * length - lptw->ClientSize.x);
 	lptw->ScrollPos.x = min(lptw->ScrollPos.x, lptw->ScrollMax.x);
-	SetScrollRange(lptw->hWndText, SB_HORZ, 0, lptw->ScrollMax.x, FALSE);
-	SetScrollPos(lptw->hWndText, SB_HORZ, lptw->ScrollPos.x, TRUE);
+
+	/* update scroll bar page size, range and position */
+	si.cbSize = sizeof(SCROLLINFO);
+	si.fMask = SIF_PAGE | SIF_RANGE | SIF_POS;
+	si.nPage = lptw->ClientSize.x;
+	si.nMin = 0;
+	/* The maximum reported scroll position will be (nMax - (nPage - 1)),
+	   so we need to set nMax to the full range. */
+	si.nMax = lptw->CharSize.x * length;
+	si.nPos = lptw->ScrollPos.x;
+	SetScrollInfo(lptw->hWndText, SB_HORZ, &si, TRUE);
 	ShowScrollBar(lptw->hWndText, SB_HORZ, TRUE);
     } else {
 	lptw->ScrollMax.x = 0;
@@ -443,8 +453,17 @@ UpdateScrollBars(LPTW lptw)
     if (length >= lptw->ScreenSize.y) {
 	lptw->ScrollMax.y = max(0, lptw->CharSize.y * length - lptw->ClientSize.y);
 	lptw->ScrollPos.y = min(lptw->ScrollPos.y, lptw->ScrollMax.y);
-	SetScrollRange(lptw->hWndText, SB_VERT, 0, lptw->ScrollMax.y, FALSE);
-	SetScrollPos(lptw->hWndText, SB_VERT, lptw->ScrollPos.y, TRUE);
+
+	/* update scroll bar page size, range and position */
+	si.cbSize = sizeof(SCROLLINFO);
+	si.fMask = SIF_PAGE | SIF_RANGE | SIF_POS;
+	si.nPage = lptw->ClientSize.y;
+	si.nMin = 0;
+	/* The maximum reported scroll position will be (nMax - (nPage - 1)),
+	   so we need to set nMax to the full range. */
+	si.nMax = lptw->CharSize.y * length;
+	si.nPos = lptw->ScrollPos.y;
+	SetScrollInfo(lptw->hWndText, SB_VERT, &si, TRUE);
 	ShowScrollBar(lptw->hWndText, SB_VERT, TRUE);
     } else {
 	lptw->ScrollMax.y = 0;
