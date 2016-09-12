@@ -1,10 +1,14 @@
 2016-09-12  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/menu.c:  Change mouse pointer to indicate rotation during azimuth
+	* src/mouse.c:  Change mouse pointer to indicate rotation during azimuth
 	change via mouse.  Add a help text for dragging with mouse button 3.
 
-	* src/menu.c:  Revert mouse pointer to normal when enabling/disabling
+	* src/mouse.c:  Revert mouse pointer to normal when enabling/disabling
 	mouse mode.
+
+	* src/win/wgraph.c (GraphInit):  Do not set an (automatic) window class
+	mouse pointer.  As we set the pointer ourselves as required, that caused
+	flickering of the mouse pointer.
 
 2016-09-11  Bastian Maerkisch  <bmaerkisch@web.de>
 

@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.220 2016/09/07 15:27:53 markisch Exp $
+ * $Id: wgraph.c,v 1.221 2016/09/08 18:43:00 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -420,7 +420,7 @@ GraphInit(LPGW lpgw)
 		wndclass.cbWndExtra = 2 * sizeof(void *);
 		wndclass.hInstance = lpgw->hInstance;
 		wndclass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-		wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
+		wndclass.hCursor = NULL;
 		wndclass.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
 		wndclass.lpszMenuName = NULL;
 		wndclass.lpszClassName = szGraphClass;
@@ -3230,6 +3230,11 @@ CopyPrint(LPGW lpgw)
 		return;	/* abort */
 
 	/* Print Size Dialog results */
+	if (pr.psize.x < 0) {
+	    /* apply default values */
+	    pr.psize.x = pr.pdef.x;
+	    pr.psize.y = pr.pdef.y;
+	}
 	rect.left = MulDiv(pr.poff.x * 10, GetDeviceCaps(printer, LOGPIXELSX), 254);
 	rect.top = MulDiv(pr.poff.y * 10, GetDeviceCaps(printer, LOGPIXELSY), 254);
 	rect.right = rect.left + MulDiv(pr.psize.x * 10, GetDeviceCaps(printer, LOGPIXELSX), 254);
@@ -4000,11 +4005,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	if ((lpgw == graphwin) && mouse_setting.on) {
 		switch (message) {
 			case WM_MOUSEMOVE:
-#if 1
 				SetCursor(hptrCurrent);
-#else
-				SetCursor(hptrCrossHair);
-#endif
 				if (zoombox.on) {
 					Wnd_refresh_zoombox(lpgw, lParam);
 				}
@@ -4313,12 +4314,6 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			} /* switch (wParam) */
 
 			return 0L;
-#if 0 /* DO WE NEED THIS ??? */
-		case WM_MOUSEMOVE:
-			/* set default pointer: */
-			SetCursor(hptrDefault);
-			return 0L;
-#endif
 #endif /* USE_MOUSE */
 		case WM_COMMAND:
 			switch(LOWORD(wParam))
