@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.189.2.11 2016/07/31 12:26:30 markisch Exp $
+ * $Id: wgraph.c,v 1.189.2.12 2016/09/12 15:05:21 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -475,12 +475,18 @@ GraphInit(LPGW lpgw)
 		BOOL ret;
 		char buttontext[10];
 		unsigned num = 0;
+		TBADDBITMAP bitmap = {0};
 
 		SendMessage(lpgw->hToolbar, TB_SETBITMAPSIZE, (WPARAM)0, (LPARAM)((16<<16) + 16));
 		/* load standard toolbar icons: standard, history & view */
-		SendMessage(lpgw->hToolbar, TB_LOADIMAGES, (WPARAM)IDB_STD_SMALL_COLOR, (LPARAM)HINST_COMMCTRL);
-		SendMessage(lpgw->hToolbar, TB_LOADIMAGES, (WPARAM)IDB_HIST_SMALL_COLOR, (LPARAM)HINST_COMMCTRL);
-		SendMessage(lpgw->hToolbar, TB_LOADIMAGES, (WPARAM)IDB_VIEW_SMALL_COLOR, (LPARAM)HINST_COMMCTRL);
+		SendMessage(lpgw->hToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
+		bitmap.hInst = HINST_COMMCTRL;
+		bitmap.nID = IDB_STD_SMALL_COLOR;
+		SendMessage(lpgw->hToolbar, TB_ADDBITMAP, 0, (WPARAM)&bitmap);
+		bitmap.nID = IDB_HIST_SMALL_COLOR;
+		SendMessage(lpgw->hToolbar, TB_ADDBITMAP, 0, (WPARAM)&bitmap);
+		bitmap.nID = IDB_VIEW_SMALL_COLOR;
+		SendMessage(lpgw->hToolbar, TB_ADDBITMAP, 0, (WPARAM)&bitmap);
 
 		/* create buttons */
 		SendMessage(lpgw->hToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);

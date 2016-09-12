@@ -22,6 +22,10 @@
 	* src/win/wtext.c:  Ctrl-C copies to clipboard if there's selected text
 	or sets the Ctrl-C (break) flag otherwise.
 
+	* src/win/wgraph.c src/win/wmenu.c:  Use TB_ADDBUTTON instead of
+	TB_LOADIMAGES to load standard icons as this somehow eliminates
+	a resource leak.
+
 2016-09-07  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* src/graph3d.c (setup_3d_box_corners): Add quandrant processing for

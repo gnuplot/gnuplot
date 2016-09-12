@@ -1,5 +1,5 @@
 /*
- * $Id: wmenu.c,v 1.26 2013/12/27 19:51:22 markisch Exp $Id: wmenu.c,v 1.26 2013/12/27 19:51:22 markisch Exp $
+ * $Id: wmenu.c,v 1.27 2014/04/03 00:36:17 markisch Exp $Id: wmenu.c,v 1.27 2014/04/03 00:36:17 markisch Exp $
  */
 
 /* GNUPLOT - win/wmenu.c */
@@ -764,6 +764,7 @@ int i;
 RECT rect;
 char *ButtonText[BUTTONMAX];
 int ButtonIcon[BUTTONMAX];
+TBADDBITMAP bitmap = {0};
 
 	lpmw = lptw->lpmw;
 
@@ -946,16 +947,22 @@ int ButtonIcon[BUTTONMAX];
 	if (lpmw->hToolbar == NULL)
 	    goto cleanup;
 
+	SendMessage(lpmw->hToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
+
 	/* set size of toolbar icons */
 	/* lparam is (height<<16 + width) / default 16,15 */
-	SendMessage(lpmw->hToolbar, TB_SETBITMAPSIZE, (WPARAM)0, (LPARAM)((16<<16) + 16));
+	SendMessage(lpmw->hToolbar, TB_SETBITMAPSIZE, (WPARAM)0, MAKELPARAM(16, 16));
 	/* load standard toolbar icons: standard, history & view */
-	SendMessage(lpmw->hToolbar, TB_LOADIMAGES, (WPARAM)IDB_STD_SMALL_COLOR, (LPARAM)HINST_COMMCTRL);
-	SendMessage(lpmw->hToolbar, TB_LOADIMAGES, (WPARAM)IDB_HIST_SMALL_COLOR, (LPARAM)HINST_COMMCTRL);
-	SendMessage(lpmw->hToolbar, TB_LOADIMAGES, (WPARAM)IDB_VIEW_SMALL_COLOR, (LPARAM)HINST_COMMCTRL);
+
+	bitmap.hInst = HINST_COMMCTRL;
+	bitmap.nID = IDB_STD_SMALL_COLOR;
+	SendMessage(lpmw->hToolbar, TB_ADDBITMAP, 0, (WPARAM)&bitmap);
+	bitmap.nID = IDB_HIST_SMALL_COLOR;
+	SendMessage(lpmw->hToolbar, TB_ADDBITMAP, 0, (WPARAM)&bitmap);
+	bitmap.nID = IDB_VIEW_SMALL_COLOR;
+	SendMessage(lpmw->hToolbar, TB_ADDBITMAP, 0, (WPARAM)&bitmap);
 
 	/* create buttons */
-	SendMessage(lpmw->hToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
 	for (i = 0; i < lpmw->nButton; i++) {
 		TBBUTTON button;
 		ZeroMemory(&button, sizeof(button));
@@ -981,9 +988,7 @@ int ButtonIcon[BUTTONMAX];
 	SetWindowPos(lptw->hWndText, (HWND)NULL, 0, lptw->ButtonHeight,
 			rect.right, rect.bottom - lptw->ButtonHeight - lptw->StatusHeight,
 			SWP_NOZORDER | SWP_NOACTIVATE);
-
 	goto cleanup;
-
 
 nomemory:
 	MessageBox(lptw->hWndParent, "Out of memory", lptw->Title, MB_ICONEXCLAMATION);
@@ -1007,14 +1012,15 @@ cleanup:
 	if (menufile != (GFILE *)NULL)
 		Gfclose(menufile);
 	return;
-
 }
+
 
 void
 CloseMacros(LPTW lptw)
 {
 HGLOBAL hglobal;
 LPMW lpmw;
+
 	lpmw = lptw->lpmw;
 
 	hglobal = (HGLOBAL)GlobalHandle(lpmw->macro);
