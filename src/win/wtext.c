@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.71 2016/08/06 13:22:50 markisch Exp $
+ * $Id: wtext.c,v 1.72 2016/09/07 15:27:53 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -148,7 +148,7 @@ CreateTextClass(LPTW lptw)
     wndclass.cbWndExtra = 2 * sizeof(void *);
     wndclass.hInstance = lptw->hInstance;
     wndclass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-    wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wndclass.hCursor = NULL;
     wndclass.hbrBackground = NULL;
     lptw->hbrBackground = CreateSolidBrush(lptw->bSysColors ?
 					   GetSysColor(COLOR_WINDOW) : RGB(0,0,0));
@@ -1608,6 +1608,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	    RECT rect;
 	    POINT pt;
 
+	    SetCursor(LoadCursor(NULL, IDC_IBEAM));
 	    pt.x = LOWORD(lParam);
 	    pt.y = HIWORD(lParam);
 	    GetClientRect(hwnd, &rect);
@@ -1668,6 +1669,9 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		      && (GetAsyncKeyState(VK_LBUTTON) < 0));
 	    } /* moved inside viewport */
 	} /* if(dragging) */
+	else {
+	    SetCursor(LoadCursor(NULL, IDC_ARROW));
+	}
 	break;
     case WM_MOUSEWHEEL: {
 	    WORD fwKeys;

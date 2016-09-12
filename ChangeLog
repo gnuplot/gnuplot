@@ -10,6 +10,8 @@
 	mouse pointer.  As we set the pointer ourselves as required, that caused
 	flickering of the mouse pointer.
 
+	* src/win/wtext.c:  Change mouse pointer while marking text.
+
 2016-09-11  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wprinter.c:  Previous change failed to apply default size
