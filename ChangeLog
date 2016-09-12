@@ -1,3 +1,9 @@
+2016-09-12  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/config.nt (HAVE_ERF, HAVE_ERFC, HAVE_STDBOOL_H, isnan
+	EAM_OBJECTS):  Version dependent macros to enable compilation
+	with at least VS2012 or newer.
+
 2016-09-07  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* src/graph3d.c (setup_3d_box_corners): Add quandrant processing for
