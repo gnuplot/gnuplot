@@ -12,6 +12,11 @@
 
 	* src/win/wtext.c:  Change mouse pointer while marking text.
 
+	src/term/cairo.trm (cairotrm_init):  Redirection of output to a printer
+	on Windows requires the use of gpoutfile.  Let pdfcairo on Windows
+	always use the cairostream_write callback to enable printing of PDF
+	files.
+
 2016-09-11  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wprinter.c:  Previous change failed to apply default size

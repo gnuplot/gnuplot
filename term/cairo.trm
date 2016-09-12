@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.76 2016/03/03 19:57:44 sfeam Exp $
+ * $Id: cairo.trm,v 1.77 2016/07/23 03:34:41 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -649,16 +649,23 @@ void cairotrm_init()
 
 	if (!strcmp(term->name,"pdfcairo")) {
 		/* Output can either be a file or stdout */
+#ifndef _WIN32
 		if (!outstr) {
+#endif
+		/* Redirection to a printer on Windows requires the use of gpoutfile
+		   via the cairostream_write callback.
+		*/ 
 		    surface = cairo_pdf_surface_create_for_stream(
 			(cairo_write_func_t)cairostream_write, cairostream_error,
 				plot.device_xmax /*double width_in_points*/,
 				plot.device_ymax /*double height_in_points*/);
+#ifndef _WIN32
 		} else {
 		    surface = cairo_pdf_surface_create(outstr,
 				plot.device_xmax /*double width_in_points*/,
 				plot.device_ymax /*double height_in_points*/);
 		}
+#endif
 		/* it is up to the pdf viewer to do the hinting */
 		plot.hinting = 0;
 		/* disable OPERATOR_SATURATE, not implemented in cairo pdf backend,
@@ -835,7 +842,7 @@ void cairotrm_graphics()
 cairo_status_t
 cairostream_write(void *closure, unsigned char *data, unsigned int length)
 {
-	/* in case of a cairolatex terminal, output is redirected to secondary file */
+	/* in case of a cairolatex terminal, output is redirected to a secondary file */
 	if (length != fwrite(data, 1, length, (ISCAIROLATEX) ? gppsfile : gpoutfile))
 		return CAIRO_STATUS_WRITE_ERROR;
 	return CAIRO_STATUS_SUCCESS;
