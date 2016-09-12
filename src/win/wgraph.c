@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.189.2.10 2016/03/22 17:10:03 markisch Exp $
+ * $Id: wgraph.c,v 1.189.2.11 2016/07/31 12:26:30 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -2161,7 +2161,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				/* Make a copy for future reference */
 				char * str = LocalLock(curptr->htext);
 				free(hypertext);
-				hypertext = UnicodeText(str, encoding);
+				hypertext = UnicodeText(str, lpgw->encoding);
 				hypertype = curptr->x;
 				LocalUnlock(curptr->htext);
 			}

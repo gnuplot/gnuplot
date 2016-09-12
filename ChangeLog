@@ -7,6 +7,10 @@
 	* src/win/wgnuplib.rc:  Change (nominal) font size of most dialogs to
 	8pt in order to match Windows default settings.
 
+	* src/win/wgraph.c src/win/wgdiplus.cpp (W_hypertext):  Use the
+	encoding which was active while plotting (not the current one) to
+	display hypertext.
+
 2016-09-07  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* src/graph3d.c (setup_3d_box_corners): Add quandrant processing for
