@@ -1,3 +1,11 @@
+2016-09-12  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/menu.c:  Change mouse pointer to indicate rotation during azimuth
+	change via mouse.  Add a help text for dragging with mouse button 3.
+
+	* src/menu.c:  Revert mouse pointer to normal when enabling/disabling
+	mouse mode.
+
 2016-09-11  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wprinter.c:  Previous change failed to apply default size
