@@ -52,7 +52,7 @@ BEGIN
 	CTEXT "Printing", -1, 8, 4, 184, 8, WS_CHILD | WS_VISIBLE | WS_GROUP
 	CTEXT "", CANCEL_PCDONE, 8, 16, 184, 8, WS_CHILD | WS_VISIBLE | WS_GROUP
 	CONTROL "Progress", CANCEL_PROGRESS, PROGRESS_CLASS, 0, 8, 27, 184, 14, WS_EX_LEFT
-	CONTROL "&Cancel", IDCANCEL, "button", BS_PUSHBUTTON | WS_GROUP | WS_TABSTOP | WS_CHILD, 84, 50, 32, 14
+	CONTROL "&Cancel", IDCANCEL, "button", BS_DEFPUSHBUTTON | WS_GROUP | WS_TABSTOP | WS_CHILD, 84, 50, 32, 14
 END
 
 LineStyleDlgBox DIALOGEX 16, 32, 172, 137
@@ -88,6 +88,20 @@ BEGIN
     PUSHBUTTON "OK", IDOK,  142, 6,  32, 12
     LTEXT   "", AB_TEXT2,  4, 22, 172, 48
     LTEXT   "", AB_TEXT3,  4, 70, 172, 48
+END
+
+PrintDlgExEmpty DIALOG DISCARDABLE  0, 0, 280, 75
+STYLE DS_CONTROL | DS_3DLOOK | WS_CHILD
+FONT 8, "MS Shell Dlg"
+BEGIN
+END
+
+PrintDlgExSelect DIALOG DISCARDABLE  0, 0, 280, 75
+STYLE DS_CONTROL | DS_3DLOOK | WS_CHILD
+FONT 8, "MS Shell Dlg"
+BEGIN
+    LTEXT           "Note that any printer settings will be ignored.  Use terminal options instead.",
+                    stc1, 6, 52, 257, 18, WS_GROUP
 END
 
 IDC_SCALING   CURSOR "scaling.cur"

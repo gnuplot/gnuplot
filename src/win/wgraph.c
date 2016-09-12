@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.221 2016/09/08 18:43:00 markisch Exp $
+ * $Id: wgraph.c,v 1.222 2016/09/12 17:42:11 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -3197,6 +3197,11 @@ CopyPrint(LPGW lpgw)
 	pd.lphPropertyPages = &hpsp;
 	pd.nStartPage = START_PAGE_GENERAL;
 	pd.lpCallback = PrintingCallbackCreate(&pr);
+
+	/* remove the lower part of the "general" property sheet */
+	pd.lpPrintTemplateName = TEXT("PrintDlgExEmpty");
+	pd.hInstance = graphwin->hInstance;
+	pd.Flags |= PD_ENABLEPRINTTEMPLATE;
 
 	if (PrintDlgEx(&pd) != S_OK) {
 		DWORD error = CommDlgExtendedError();

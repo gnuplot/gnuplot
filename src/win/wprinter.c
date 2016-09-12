@@ -1,5 +1,5 @@
 /*
- * $Id: wprinter.c,v 1.20 2016/09/08 19:00:35 markisch Exp $
+ * $Id: wprinter.c,v 1.21 2016/09/11 21:07:31 markisch Exp $
  */
 
 /* GNUPLOT - win/wprinter.c */
@@ -500,6 +500,13 @@ DumpPrinter(HWND hwnd, LPTSTR szAppName, LPTSTR szFileName)
     pd.hDevMode = NULL;
     pd.nCopies = 1;
     pd.nStartPage = START_PAGE_GENERAL;
+
+    /* Replace the additional options in the lower part of the dialog with 
+     * a hint to change print options via terminal options. 
+     */
+    pd.lpPrintTemplateName = TEXT("PrintDlgExSelect");
+    pd.hInstance = graphwin->hInstance;
+    pd.Flags |= PD_ENABLEPRINTTEMPLATE;
 
     if ((hr = PrintDlgEx(&pd)) != S_OK) {
 	DWORD error = CommDlgExtendedError();

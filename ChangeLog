@@ -20,6 +20,12 @@
 	* src/win/winmain.c (open_printer):  Open temporary file in binary mode
 	as required e.g. for PDF data.
 
+	* src/win/wgnuplib.rc src/win/wgraph.c (CopyPrint) src/win/wprinter.c
+	(DumpPrinter):  Remove unused lower part of the "general" print
+	property sheet by supplying an (empty) dialog template.  Add a note 
+	that printer settings will be ignored since the PRN file mechanism
+	sends terminal output to the printer unaltered.
+
 2016-09-11  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wprinter.c:  Previous change failed to apply default size
