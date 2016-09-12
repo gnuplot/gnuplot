@@ -1,5 +1,5 @@
 /*
- * $Id: wpause.c,v 1.27.2.1 2014/09/09 07:59:10 markisch Exp $
+ * $Id: wpause.c,v 1.27.2.2 2014/12/31 04:38:44 sfeam Exp $
  */
 
 /* GNUPLOT - win/wpause.c */
@@ -195,6 +195,7 @@ PauseBox(LPPW lppw)
 	int width, height;
 	TEXTMETRIC tm;
 	RECT rect;
+	SIZE size;
 	char *current_pause_title = lppw->Title;
 
 #ifdef USE_MOUSE
@@ -208,17 +209,19 @@ PauseBox(LPPW lppw)
 	if (!lppw->hPrevInstance)
 		CreatePauseClass(lppw);
 	GetWindowRect(GetDesktopWindow(), &rect);
-	if ( (lppw->Origin.x == CW_USEDEFAULT) || (lppw->Origin.x == 0) )
+	if ((lppw->Origin.x == CW_USEDEFAULT) || (lppw->Origin.x == 0))
 		lppw->Origin.x = (rect.right + rect.left) / 2;
-	if ( (lppw->Origin.y == CW_USEDEFAULT) || (lppw->Origin.y == 0) )
+	if ((lppw->Origin.y == CW_USEDEFAULT) || (lppw->Origin.y == 0))
 		lppw->Origin.y = (rect.bottom + rect.top) / 2;
 
 	hdc = GetDC(NULL);
-	SelectObject(hdc, GetStockObject(SYSTEM_FONT));
+	SelectObject(hdc, GetStockObject(DEFAULT_GUI_FONT));
+	/* determine actual text size */
+	GetTextExtentPoint32(hdc, lppw->Message, strlen(lppw->Message), &size);
 	GetTextMetrics(hdc, &tm);
-	width  = max(24, 4 + strlen(lppw->Message)) * tm.tmAveCharWidth;
-	width = min(width, rect.right-rect.left);
-	height = 28 * (tm.tmHeight + tm.tmExternalLeading) / 4;
+	width = max(28 * tm.tmAveCharWidth, size.cx + 6 * tm.tmAveCharWidth);
+	width = min(width, rect.right - rect.left);
+	height = 8 * size.cy;
 	ReleaseDC(NULL,hdc);
 
 	lppw->hWndPause = CreateWindowEx(
@@ -290,6 +293,7 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	TEXTMETRIC tm;
 	LPPW lppw;
 	int cxChar, cyChar, middle;
+	HFONT hfont;
 
 	lppw = (LPPW)GetWindowLongPtr(hwnd, 0);
 
@@ -302,8 +306,8 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			return 0;
 		case WM_COMMAND:
 			if ((LOWORD(wParam) == IDCANCEL) || (LOWORD(wParam) == IDOK)) {
-					lppw->bPauseCancel = LOWORD(wParam);
-					lppw->bPause = FALSE;
+				lppw->bPauseCancel = LOWORD(wParam);
+				lppw->bPause = FALSE;
 				break;
 			}
 			return 0;
@@ -312,7 +316,7 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			return 0;
 		case WM_PAINT: {
 			hdc = BeginPaint(hwnd, &ps);
-			SelectObject(hdc, GetStockObject(SYSTEM_FONT));
+			SelectObject(hdc, GetStockObject(DEFAULT_GUI_FONT));
 			SetTextAlign(hdc, TA_CENTER);
 			GetClientRect(hwnd, &rect);
 			SetBkMode(hdc,TRANSPARENT);
@@ -332,7 +336,8 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			SetWindowLongPtr(hwnd, 0, (LONG_PTR)lppw);
 			lppw->hWndPause = hwnd;
 			hdc = GetDC(hwnd);
-			SelectObject(hdc, GetStockObject(SYSTEM_FONT));
+			hfont = (HFONT) GetStockObject(DEFAULT_GUI_FONT);
+			SelectObject(hdc, hfont);
 			GetTextMetrics(hdc, &tm);
 			cxChar = tm.tmAveCharWidth;
 			cyChar = tm.tmHeight + tm.tmExternalLeading;
@@ -340,21 +345,23 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			middle = ((LPCREATESTRUCT) lParam)->cx / 2;
 			lppw->hOK = CreateWindow((LPSTR)"button", (LPSTR)"OK",
 					ws_opts | BS_DEFPUSHBUTTON,
-					middle - 10 * cxChar, 3 * cyChar,
-					8 * cxChar, 7 * cyChar / 4,
+					middle - 13 * cxChar, 3 * cyChar,
+					10 * cxChar, 7 * cyChar / 4,
 					hwnd, (HMENU)IDOK,
 					((LPCREATESTRUCT) lParam)->hInstance, NULL);
 			lppw->bDefOK = TRUE;
 			lppw->hCancel = CreateWindow((LPSTR)"button", (LPSTR)"Cancel",
 					ws_opts | BS_PUSHBUTTON,
-					middle + 2 * cxChar, 3 * cyChar,
-					8 * cxChar, 7 * cyChar / 4,
+					middle - 1 * cxChar, 3 * cyChar,
+					10 * cxChar, 7 * cyChar / 4,
 					hwnd, (HMENU)IDCANCEL,
 					((LPCREATESTRUCT) lParam)->hInstance, NULL);
 			lppw->lpfnOK = (WNDPROC) GetWindowLongPtr(lppw->hOK, GWLP_WNDPROC);
 			SetWindowLongPtr(lppw->hOK, GWLP_WNDPROC, (LONG_PTR)PauseButtonProc);
 			lppw->lpfnCancel = (WNDPROC) GetWindowLongPtr(lppw->hCancel, GWLP_WNDPROC);
 			SetWindowLongPtr(lppw->hCancel, GWLP_WNDPROC, (LONG_PTR)PauseButtonProc);
+			SendMessage(lppw->hOK, WM_SETFONT, (WPARAM)hfont, 0);
+			SendMessage(lppw->hCancel, WM_SETFONT, (WPARAM)hfont, 0);
 			if (GetParent(hwnd))
 				EnableWindow(GetParent(hwnd), FALSE);
 			return 0;
