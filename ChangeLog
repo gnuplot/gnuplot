@@ -1,3 +1,9 @@
+2016-09-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (setup_3d_box_corners):  2016-09-06 revision to which
+	plot edges have tic labels attached should not have been applied to
+	"set view map" mode.
+
 2016-09-12  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/config.nt (HAVE_ERF, HAVE_ERFC, HAVE_STDBOOL_H, isnan
