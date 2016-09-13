@@ -1,3 +1,9 @@
+2016-09-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	*src/boundary.c src/graph3d.c src/set.c:  Write plot titles using the 
+	general routine write_label() rather than in-line code.  This allows
+	support for additional text properties, in particular "boxed".
+
 2016-09-12  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/mouse.c:  Change mouse pointer to indicate rotation during azimuth

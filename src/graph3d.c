@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.345 2016/09/06 22:53:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.346 2016/09/10 05:46:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -822,7 +822,6 @@ do_3dplot(
     /* PLACE TITLE */
     if (title.text != 0) {
 	unsigned int x, y;
-	int tmpx, tmpy;
 	if (splot_map) { /* case 'set view map' */
 	    int map_x1, map_y1, map_x2, map_y2;
 	    int tics_len = 0;
@@ -834,24 +833,18 @@ do_3dplot(
 	    map3d_xy(X_AXIS.max, Y_AXIS.max, base_z, &map_x2, &map_y2);
 	    /* Distance between the title base line and graph top line or the upper part of
 	       tics is as given by character height: */
-	    map3d_position_r(&(title.offset), &tmpx, &tmpy, "3dplot");
 #define DEFAULT_Y_DISTANCE 1.0
-	    x = (unsigned int) ((map_x1 + map_x2) / 2 + tmpx);
-	    y = (unsigned int) (map_y1 + tics_len + tmpy + (DEFAULT_Y_DISTANCE + titlelin - 0.5) * (t->v_char));
+	    x = (unsigned int) ((map_x1 + map_x2) / 2);
+	    y = (unsigned int) (map_y1 + tics_len + (DEFAULT_Y_DISTANCE + titlelin - 0.5) * (t->v_char));
 #undef DEFAULT_Y_DISTANCE
 	} else { /* usual 3d set view ... */
-	    map3d_position_r(&(title.offset), &tmpx, &tmpy, "3dplot");
-	    x = (unsigned int) ((plot_bounds.xleft + plot_bounds.xright) / 2 + tmpx);
-	    y = (unsigned int) (plot_bounds.ytop + tmpy + titlelin * (t->h_char));
+	    x = (unsigned int) ((plot_bounds.xleft + plot_bounds.xright) / 2);
+	    y = (unsigned int) (plot_bounds.ytop + titlelin * (t->h_char));
 	}
-	ignore_enhanced(title.noenhanced);
-	apply_pm3dcolor(&(title.textcolor));
-	/* PM: why there is JUST_TOP and not JUST_BOT? We should draw above baseline!
-	 * But which terminal understands that? It seems vertical justification does
-	 * not work... */
-	write_multiline(x, y, title.text, CENTRE, JUST_TOP, 0, title.font);
+
+	/* NB: write_label applies text color but does not reset it */
+	write_label(x, y, &title);
 	reset_textcolor(&(title.textcolor));
-	ignore_enhanced(FALSE);
     }
 
     /* PLACE TIMEDATE */

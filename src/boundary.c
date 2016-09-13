@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.33 2016/07/15 04:11:27 sfeam Exp $
+ * $Id: boundary.c,v 1.34 2016/08/08 02:50:37 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -64,7 +64,7 @@ static int key_height;		/* ditto */
 static int key_title_height;	/* nominal number of lines * character height */
 static int key_title_extra;	/* allow room for subscript/superscript */
 static int time_y, time_x;
-static int title_y;
+static int title_x, title_y;
 
 /*
  * These quantities are needed in do_plot() e.g. for histogtram title layout
@@ -771,6 +771,7 @@ boundary(struct curve_points *plots, int count)
 	x2label_y += t->v_char;
 
     title_y = x2label_y + title_textheight;
+    title_x = (plot_bounds.xleft + plot_bounds.xright) / 2;
 
     ylabel_y = plot_bounds.ytop + x2tic_height + x2tic_textheight + ylabel_textheight;
 
@@ -1554,15 +1555,13 @@ draw_titles()
 	double tmpx, tmpy;
 	unsigned int x, y;
 	map_position_r(&(title.offset), &tmpx, &tmpy, "doplot");
-	/* we worked out y-coordinate in boundary() */
-	x = (plot_bounds.xleft + plot_bounds.xright) / 2 + tmpx;
-	y = title_y - t->v_char / 2;
+	/* we worked out y-coordinate in boundary(), including the y offset */
+	x = title_x;
+	y = title_y - tmpy - t->v_char / 2;
 
-	ignore_enhanced(title.noenhanced);
-	apply_pm3dcolor(&(title.textcolor));
-	write_multiline(x, y, title.text, CENTRE, JUST_TOP, 0, title.font);
+	/* NB: write_label applies text color but does not reset it */
+	write_label(x, y, &title);
 	reset_textcolor(&(title.textcolor));
-	ignore_enhanced(FALSE);
     }
 
     /* X2LABEL */

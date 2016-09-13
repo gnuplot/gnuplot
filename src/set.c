@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.530 2016/08/25 20:07:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.531 2016/09/10 05:46:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -475,6 +475,7 @@ set_command()
 	    break;
 	case S_TITLE:
 	    set_xyzlabel(&title);
+	    title.rotate = 0.0;
 	    break;
 	case S_VIEW:
 	    set_view();
