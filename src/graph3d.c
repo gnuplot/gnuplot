@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.346 2016/09/10 05:46:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.347 2016/09/13 18:51:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2085,7 +2085,7 @@ setup_3d_box_corners()
     }
 
     quadrant = surface_rot_x / 90;
-    if (quadrant & 2) {
+    if ((quadrant & 2) && !splot_map) {
 	double temp;
 	temp = front_y;
 	front_y = back_y;
