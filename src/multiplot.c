@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: multiplot.c,v 1.4 2015/01/10 05:28:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: multiplot.c,v 1.5 2016/06/09 19:34:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -236,6 +236,7 @@ multiplot_start()
     mp_layout.title.text = NULL;
     free(mp_layout.title.font);
     mp_layout.title.font = NULL;
+    mp_layout.title.boxed = 0;
 
     /* Parse options */
     while (!END_OF_COMMAND) {
@@ -260,6 +261,12 @@ multiplot_start()
 
         if (almost_equals(c_token,"noenh$anced")) {
             mp_layout.title.noenhanced = TRUE;
+            c_token++;
+            continue;
+        }
+        
+	if (equals(c_token,"boxed")) {
+            mp_layout.title.boxed = 1;
             c_token++;
             continue;
         }
@@ -442,20 +449,14 @@ multiplot_start()
 
     /* Place overall title before doing anything else */
     if (mp_layout.title.text) {
-	double tmpx, tmpy;
 	unsigned int x, y;
 	char *p = mp_layout.title.text;
 
-	map_position_r(&(mp_layout.title.offset), &tmpx, &tmpy, "mp title");
-	x = term->xmax  / 2 + tmpx;
-	y = term->ymax - term->v_char + tmpy;;
+	x = term->xmax  / 2;
+	y = term->ymax - term->v_char;
 
-	ignore_enhanced(mp_layout.title.noenhanced);
-	apply_pm3dcolor(&(mp_layout.title.textcolor));
-	write_multiline(x, y, mp_layout.title.text,
-			CENTRE, JUST_TOP, 0, mp_layout.title.font);
+	write_label(x, y, &(mp_layout.title));
 	reset_textcolor(&(mp_layout.title.textcolor));
-	ignore_enhanced(FALSE);
 
 	/* Calculate fractional height of title compared to entire page */
 	/* If it would fill the whole page, forget it! */

@@ -1,3 +1,8 @@
+2016-09-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/multiplot.c:  Allow "boxed" attribute in the title for a multiplot
+	layout. Example:  set multiplot layout 2,2 title "Example" boxed
+
 2016-09-14  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (drawgraph):  Fix a GDI resource leak which is
@@ -6,9 +11,9 @@
 
 2016-09-13  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/boundary.c src/graph3d.c src/set.c:  Write plot titles using the 
-	general routine write_label() rather than in-line code.  This allows
-	support for additional text properties, in particular "boxed".
+	* src/boundary.c src/graph3d.c src/set.c src/unset.c:  Write plot titles
+	using the general routine write_label() rather than in-line code.
+	This allows use of additional text properties, in particular "boxed".
 
 	* src/graph3d.c (setup_3d_box_corners):  2016-09-06 revision to which
 	plot edges have tic labels attached should not have been applied to
