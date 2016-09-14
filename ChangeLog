@@ -1,3 +1,9 @@
+2016-09-14  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c (drawgraph):  Fix a GDI resource leak which is
+	only important when opening and closing a massive number of different
+	graph windows.
+
 2016-09-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (setup_3d_box_corners):  2016-09-06 revision to which
