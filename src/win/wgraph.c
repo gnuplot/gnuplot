@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.222 2016/09/12 17:42:11 markisch Exp $
+ * $Id: wgraph.c,v 1.223 2016/09/12 18:01:34 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -3001,6 +3001,11 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		DeleteObject(cb_membmp);
 		DeleteDC(cb_memdc);
 		cb_memdc = NULL;
+	}
+	if (lpgw->hcolorbrush) {
+		SelectObject(hdc, GetStockObject(BLACK_BRUSH));
+		DeleteObject(lpgw->hcolorbrush);
+		lpgw->hcolorbrush = NULL;
 	}
 	LocalFreePtr(ppt);
 }

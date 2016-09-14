@@ -1,3 +1,9 @@
+2016-09-14  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c (drawgraph):  Fix a GDI resource leak which is
+	only important when opening and closing a massive number of different
+	graph windows.
+
 2016-09-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/boundary.c src/graph3d.c src/set.c:  Write plot titles using the 
