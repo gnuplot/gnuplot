@@ -1,7 +1,10 @@
 2016-09-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c docs/gnuplot.doc:  Ignore "set termopt {dashed|solid}".
-	Remove use of this option from the manual.
+	Remove use of this option from examples in the manual.
+
+	* src/graph3d.c (ztick_callback):  orientation of z-axis tick marks
+	changes with azimuth.  "set zlabel rotate parallel" also.
 
 2016-09-14  Ethan A Merritt  <merritt@u.washington.edu>
 

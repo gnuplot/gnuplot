@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.347 2016/09/13 18:51:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.348 2016/09/14 03:54:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2622,7 +2622,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	apply_pm3dcolor(&(Z_AXIS.label.textcolor));
 
 	if (Z_AXIS.label.tag == ROTATE_IN_3D_LABEL_TAG)
-	    Z_AXIS.label.rotate = TEXT_VERTICAL;
+	    Z_AXIS.label.rotate = 90. - azimuth;
 	term->text_angle(Z_AXIS.label.rotate);
 	write_multiline(x, y, Z_AXIS.label.text,
 			h_just, v_just, Z_AXIS.label.rotate, Z_AXIS.label.font);
@@ -2898,17 +2898,26 @@ ztick_callback(
 	map3d_xyz(0., 0., place, &v1);
     else
 	map3d_xyz(zaxis_x, zaxis_y, place, &v1);
+
+    /* Needed both for grid and for azimuth ztics */
+    map3d_xyz(right_x, right_y, place, &v3);
+
     if (grid.l_type > LT_NODRAW) {
 	(t->layer)(TERM_LAYER_BEGIN_GRID);
 	map3d_xyz(back_x, back_y, place, &v2);
-	map3d_xyz(right_x, right_y, place, &v3);
 	draw3d_line(&v1, &v2, &grid);
 	draw3d_line(&v2, &v3, &grid);
 	(t->layer)(TERM_LAYER_END_GRID);
     }
-    v2.x = v1.x + len / (double)xscaler;
-    v2.y = v1.y;
-    v2.z = v1.z;
+    if (azimuth != 0) {
+	v2.x = v1.x + (v3.x - v1.x) * len / xyscaler;
+	v2.y = v1.y + (v3.y - v1.y) * len / xyscaler;
+	v2.z = v1.z + (v3.z - v1.z) * len / xyscaler;
+    } else {
+	v2.x = v1.x + len / (double)xscaler;
+	v2.y = v1.y;
+	v2.z = v1.z;
+    }
     v2.real_z = v1.real_z;
     draw3d_line(&v1, &v2, &border_lp);
 
@@ -2948,12 +2957,19 @@ ztick_callback(
     }
 
     if (Z_AXIS.ticmode & TICS_MIRROR) {
-	map3d_xyz(right_x, right_y, place, &v1);
-	v2.x = v1.x - len / (double)xscaler;
-	v2.y = v1.y;
-	v2.z = v1.z;
-	v2.real_z = v1.real_z;
-	draw3d_line(&v1, &v2, &border_lp);
+	if (azimuth != 0) {
+	    v2.x = v3.x + (v1.x - v3.x) * len / xyscaler;
+	    v2.y = v3.y + (v1.y - v3.y) * len / xyscaler;
+	    v2.z = v3.z + (v1.z - v3.z) * len / xyscaler;
+	    draw3d_line(&v3, &v2, &border_lp);
+	} else {
+	    map3d_xyz(right_x, right_y, place, &v1);
+	    v2.x = v1.x - len / (double)xscaler;
+	    v2.y = v1.y;
+	    v2.z = v1.z;
+	    v2.real_z = v1.real_z;
+	    draw3d_line(&v1, &v2, &border_lp);
+	}
     }
 }
 
