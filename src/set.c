@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.531 2016/09/10 05:46:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.532 2016/09/13 18:51:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4858,11 +4858,8 @@ set_termoptions()
 	    real_expression();   /* Silently ignore the request */
 	}
     } else if (almost_equals(c_token,"dash$ed") || equals(c_token,"solid")) {
-	num_tokens = GPMIN(num_tokens,c_token+1);
-	if (term->flags & TERM_CAN_DASH)
-	    ok_to_call_terminal = TRUE;
-	else
-	    c_token++;
+	/* Silently ignore the request */
+	num_tokens = GPMIN(num_tokens,++c_token);
     } else if (almost_equals(c_token,"dashl$ength") || equals(c_token,"dl")) {
 	num_tokens = GPMIN(num_tokens,c_token+2);
 	if (term->flags & TERM_CAN_DASH)

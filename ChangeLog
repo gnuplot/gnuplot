@@ -1,3 +1,8 @@
+2016-09-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c docs/gnuplot.doc:  Ignore "set termopt {dashed|solid}".
+	Remove use of this option from the manual.
+
 2016-09-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/multiplot.c:  Allow "boxed" attribute in the title for a multiplot
