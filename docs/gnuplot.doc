@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1019 2016/09/10 05:46:22 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1020 2016/09/15 19:19:43 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2583,6 +2583,11 @@ Ffigure_newsyntax
  associated with each line, analogous to `linecolor` or `linewidth`.  It is not
  necessary to place the current terminal in a special mode just to draw dashed
  lines.  I.e. the command `set term <termname> {solid|dashed}` is now ignored.
+ If backwards compatibility with old scripts written for version 4 is required,
+ the following lines can be used instead:
+
+      if (GPVAL_VERSION >= 5.0) set for [i=1:9] linetype i dashtype i
+      if (GPVAL_VERSION < 5.0) set termoption dashed
 
  All lines have the property `dashtype solid` unless you specify otherwise.
  You can change the default for a particular linetype using the command
