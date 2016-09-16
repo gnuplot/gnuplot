@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.368 2016/09/03 23:04:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.369 2016/09/10 05:46:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2333,6 +2333,7 @@ show_palette()
 	    sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY ? "GRAY" : "COLOR");
 
 	switch( sm_palette.colorMode ) {
+	  default:
 	  case SMPAL_COLOR_MODE_GRAY: break;
 	  case SMPAL_COLOR_MODE_RGB:
 	    fprintf(stderr,"\trgb color mapping by rgbformulae are %i,%i,%i\n",
@@ -2359,9 +2360,6 @@ show_palette()
 			sm_palette.cubehelix_start, sm_palette.cubehelix_cycles,
 			sm_palette.cubehelix_saturation);
 	    break;
-	  default:
-	    fprintf( stderr, "%s:%d oops: Unknown color mode '%c'.\n",
-		     __FILE__, __LINE__, (char)(sm_palette.colorMode) );
 	}
 	fprintf(stderr,"\tfigure is %s\n",
 	    sm_palette.positive == SMPAL_POSITIVE ? "POSITIVE" : "NEGATIVE");
@@ -2376,14 +2374,12 @@ show_palette()
 	fputs(" color positions for discrete palette terminals\n", stderr);
 	fputs( "\tColor-Model: ", stderr );
 	switch( sm_palette.cmodel ) {
+	default:
 	case C_MODEL_RGB: fputs( "RGB\n", stderr ); break;
 	case C_MODEL_HSV: fputs( "HSV\n", stderr ); break;
 	case C_MODEL_CMY: fputs( "CMY\n", stderr ); break;
 	case C_MODEL_YIQ: fputs( "YIQ\n", stderr ); break;
 	case C_MODEL_XYZ: fputs( "XYZ\n", stderr ); break;
-	default:
-	  fprintf( stderr, "%s:%d ooops: Unknown color mode '%c'.\n",
-		   __FILE__, __LINE__, (char)(sm_palette.cmodel) );
 	}
 	fprintf(stderr,"\tgamma is %.4g\n", sm_palette.gamma );
 	return;

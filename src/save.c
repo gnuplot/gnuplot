@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.310 2016/09/10 05:46:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.311 2016/09/10 18:42:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -937,17 +937,16 @@ set origin %g,%g\n",
     else {
       fputs( "color model ", fp );
       switch( sm_palette.cmodel ) {
+	default:
 	case C_MODEL_RGB: fputs( "RGB ", fp ); break;
 	case C_MODEL_HSV: fputs( "HSV ", fp ); break;
 	case C_MODEL_CMY: fputs( "CMY ", fp ); break;
 	case C_MODEL_YIQ: fputs( "YIQ ", fp ); break;
 	case C_MODEL_XYZ: fputs( "XYZ ", fp ); break;
-	default:
-	  fprintf( stderr, "%s:%d ooops: Unknown color model '%c'.\n",
-		   __FILE__, __LINE__, (char)(sm_palette.cmodel) );
       }
       fputs( "\nset palette ", fp );
       switch( sm_palette.colorMode ) {
+      default:
       case SMPAL_COLOR_MODE_RGB:
 	fprintf( fp, "rgbformulae %d, %d, %d\n", sm_palette.formulaR,
 		 sm_palette.formulaG, sm_palette.formulaB );
@@ -976,9 +975,6 @@ set origin %g,%g\n",
 		sm_palette.cubehelix_start, sm_palette.cubehelix_cycles,
 		sm_palette.cubehelix_saturation);
 	break;
-      default:
-	fprintf( stderr, "%s:%d ooops: Unknown color mode '%c'.\n",
-		 __FILE__, __LINE__, (char)(sm_palette.colorMode) );
       }
     }
 

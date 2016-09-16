@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.37 2014/11/02 22:42:46 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.38 2015/05/08 18:32:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - getcolor.c */
@@ -236,6 +236,7 @@ color_components_from_gray(double gray, rgb_color *color)
 	gray = 1.0;
 
     switch(sm_palette.colorMode) {
+    default:	/* Can't happen */
     case SMPAL_COLOR_MODE_GRAY:
 	color->r = color->g = color->b = pow(gray, 1.0/sm_palette.gamma);
 	return;  /* all done, no color space transformation needed  */
@@ -267,9 +268,6 @@ color_components_from_gray(double gray, rgb_color *color)
 	if (color->b > 1.0) color->b = 1.0; if (color->b < 0.0) color->b = 0.0;
 	}	
 	break;
-    default:
-	fprintf(stderr, "%s:%d ooops: Unknown colorMode '%c'.\n",
-		__FILE__, __LINE__, (char)(sm_palette.colorMode));
     }
 }
 
@@ -291,6 +289,7 @@ rgb1_from_gray(double gray, rgb_color *color)
 
     /* transform to RGB if necessary */
     switch(sm_palette.cmodel) {
+    default:
     case C_MODEL_RGB:
 	break;
     case C_MODEL_HSV:
@@ -305,9 +304,6 @@ rgb1_from_gray(double gray, rgb_color *color)
     case C_MODEL_XYZ:
 	CIEXYZ_2_RGB(color);
 	break;
-    default:
-	fprintf(stderr, "%s:%d ooops: Unknown color model '%c'\n",
-		__FILE__, __LINE__, (char)(sm_palette.cmodel));
     }
 }
 

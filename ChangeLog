@@ -1,10 +1,19 @@
+2016-09-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/getcolor.c src/save.c src/show.c:  Remove unreachable case
+	statements in color mode switch.  The fprintf warning they contained
+	would have accessed uninitialized memory (found by canalyze static
+	code analysis tool).
+
+	* src/graph3d.c: Remove out-of-date comments.
+
+	* src/graph3d.c (ztick_callback):  orientation of z-axis tick marks
+	changes with azimuth.  "set zlabel rotate parallel" also.
+
 2016-09-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c docs/gnuplot.doc:  Ignore "set termopt {dashed|solid}".
 	Remove use of this option from examples in the manual.
-
-	* src/graph3d.c (ztick_callback):  orientation of z-axis tick marks
-	changes with azimuth.  "set zlabel rotate parallel" also.
 
 2016-09-14  Ethan A Merritt  <merritt@u.washington.edu>
 
