@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.348 2016/09/14 03:54:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.349 2016/09/17 04:21:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -722,10 +722,8 @@ do_3dplot(
     if (nonlinear(&Z_AXIS))
 	zscale3d = 2.0 / (ceiling_z1 - floor_z1) * surface_zscale;
 
-    /* Allow 'set view equal xy' to adjust rendered length of the X and/or Y axes. */
-    /* FIXME EAM - This only works correctly if the coordinate system of the       */
-    /* terminal itself is isotropic.  E.g. x11 does not work because the x and y   */
-    /* coordinates always run from 0-4095 regardless of the shape of the window.   */
+    /* Allow 'set view equal xy' to adjust rendered length of the X and/or Y axes.  */
+    /* NB: only works correctly for terminals whose coordinate system is isotropic. */
     xcenter3d = ycenter3d = zcenter3d = 0.0;
     if (aspect_ratio_3D >= 2) {
 	if (yscale3d > xscale3d) {
@@ -742,10 +740,10 @@ do_3dplot(
     /* FIXME: I do not understand why this is correct */
     if (nonlinear(&Z_AXIS))
 	zcenter3d = 0.0;
-    else
     /* Without this the rotation center would be located at */
     /* the bottom of the plot. This places it in the middle.*/
-    zcenter3d =  -(ceiling_z - floor_z) / 2.0 * zscale3d + 1;
+    else
+	zcenter3d =  -(ceiling_z - floor_z) / 2.0 * zscale3d + 1;
 
     /* Needed for mousing by outboard terminal drivers */
     if (splot_map) {
@@ -2642,7 +2640,7 @@ xtick_callback(
     char *text,
     int ticlevel,
     struct lp_style_type grid,		/* linetype or -2 for none */
-    struct ticmark *userlabels)	/* currently ignored in 3D plots */
+    struct ticmark *userlabels)
 {
     double scale = tic_scale(ticlevel, this_axis) * (this_axis->tic_in ? 1 : -1);
     double other_end = Y_AXIS.min + Y_AXIS.max - xaxis_y;
@@ -2765,7 +2763,7 @@ ytick_callback(
     char *text,
     int ticlevel,
     struct lp_style_type grid,
-    struct ticmark *userlabels)	/* currently ignored in 3D plots */
+    struct ticmark *userlabels)
 {
     double scale = tic_scale(ticlevel, this_axis) * (this_axis->tic_in ? 1 : -1);
     double other_end = X_AXIS.min + X_AXIS.max - yaxis_x;
@@ -2887,7 +2885,7 @@ ztick_callback(
     char *text,
     int ticlevel,
     struct lp_style_type grid,
-    struct ticmark *userlabels)	/* currently ignored in 3D plots */
+    struct ticmark *userlabels)
 {
     struct termentry *t = term;
     int len = tic_scale(ticlevel, this_axis)
