@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.103 2016/03/17 05:53:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.104 2016/04/25 18:36:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -530,7 +530,8 @@ parse_array_assignment_expression()
 /* add action table entries for primary expressions, i.e. either a
  * parenthesized expression, a variable name, a numeric constant, a
  * function evaluation, a power operator or postfix '!' (factorial)
- * expression */
+ * expression.
+ * Sep 2016 cardinality expression |Array| */
 static void
 parse_primary_expression()
 {
@@ -566,6 +567,18 @@ parse_primary_expression()
 		at_highest_column_used = a.v.int_val;
 	}
 	add_action(DOLLARS)->v_arg = a;
+
+    } else if (equals(c_token, "|")) {
+	struct udvt_entry *udv = add_udv(++c_token);
+	if (udv->udv_value.type != ARRAY)
+	    int_error(c_token, "not an array");
+	c_token++;
+	add_action(PUSH)->udv_arg = udv;
+	if (!equals(c_token, "|"))
+	    int_error(c_token, "'|' expected");
+	c_token++;
+	add_action(CARDINALITY);
+
     } else if (isanumber(c_token)) {
 	union argument *foo = add_action(PUSHC);
 	convert(&(foo->v_arg), c_token);

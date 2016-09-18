@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.91 2016/04/26 16:46:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.92 2016/05/13 07:05:02 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1313,6 +1313,22 @@ f_index(union argument *arg)
 	int_error(NO_CARET, "array index out of range");
 
     push( &array.v.value_array[i] );
+}
+
+/*
+ * f_cardinality() extracts the number of elements in an array.
+ */
+void
+f_cardinality(union argument *arg)
+{
+    struct value array;
+    (void) arg;			/* avoid -Wunused warning */
+    (void) pop(&array);
+
+    if (array.type != ARRAY)
+	int_error(NO_CARET, "internal error: cardinality of a non-array variable");
+
+    push(Ginteger(&array, array.v.value_array[0].v.int_val));
 }
 
 /* Magic number! */

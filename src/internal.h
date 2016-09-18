@@ -1,5 +1,5 @@
 /*
- * $Id: internal.h,v 1.25 2014/03/30 19:05:46 markisch Exp $
+ * $Id: internal.h,v 1.26 2016/02/07 22:15:36 sfeam Exp $
  */
 
 /* GNUPLOT - internal.h */
@@ -86,6 +86,7 @@ void f_nes __PROTO((union argument *x));
 void f_gprintf __PROTO((union argument *x));
 void f_range __PROTO((union argument *x));
 void f_index __PROTO((union argument *x));
+void f_cardinality __PROTO((union argument *x));
 void f_sprintf __PROTO((union argument *x));
 void f_strlen __PROTO((union argument *x));
 void f_strstrt __PROTO((union argument *x));

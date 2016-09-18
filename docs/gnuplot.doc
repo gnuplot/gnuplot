@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1021 2016/09/15 19:36:09 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1022 2016/09/17 06:06:17 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1791,10 +1791,12 @@ C marker below is used to signal this to doc2html:
        !           !a        * logical negation
        !           a!        * factorial
        $           $3        * call arg/column during `using` manipulation
+       ||          |A|         cardinality of array A
 =factorial
 =negation
 =one's complement
 =operator precedence
+=cardinality
 #\begin{tabular}{|ccl|} \hline
 #\multicolumn{3}{|c|}{Unary Operators}\\ \hline \hline
 #Symbol & Example & Explanation \\ \hline
@@ -1804,6 +1806,7 @@ C marker below is used to signal this to doc2html:
 #\verb@!@ & \verb@!a@ & * logical negation \\
 #\verb@!@ & \verb@a!@ & * factorial \\
 #\verb@$@ & \verb@$3@ & * call arg/column during `using` manipulation \\
+#\verb@|@ & \verb@|A|@ & cardinality of array A \\
 C ugly hack: doc2ms uses $ as delimiter for eqn's so it doesn't seem to
 C be able to print them. So we have to typeset this table without using
 C eqn (at least that's the only solution I found, without any real docs
@@ -1827,6 +1830,7 @@ C ... and restart the table:
 %!@!a@* logical negation
 %!@a!@* factorial
 %$@$3@* call arg/column during `using` manipulation
+%|@|A|@cardinality of array A
 @end table
 
 ^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3">
@@ -1845,6 +1849,7 @@ C ... and restart the table:
 ^<tr>    <td><tt>!</tt></td>    <td><tt>!a</tt></td>    <td>* logical negation</td></tr>
 ^<tr>    <td><tt>!</tt></td>    <td><tt>a!</tt></td>    <td>* factorial</td></tr>
 ^<tr>    <td><tt>$</tt></td>    <td><tt>$3</tt></td>    <td>* call arg/column during `using` manipulation</td></tr>
+^<tr>    <td><tt>|</tt></td>    <td><tt>|A|</tt></td>   <td>cardinality of array A</td></tr>
 ^</tbody>
 ^</table>
 
@@ -2180,11 +2185,13 @@ C ... and restart the table:
  `value`.
 3 Arrays
 ?arrays
+?cardinality
  Arrays are implemented as indexed lists of user variables.  The elements in an
  array are not limited to a single type of variable.  Arrays must be created
  explicitly before being referenced. The size of an array cannot be changed
  after creation.  All elements are initially undefined.  In most places an array
  element can be used instead of a named user variable.
+ The cardinality (number of elements) of array A is given by the expression |A|.
 
  Example:
       array A[6]

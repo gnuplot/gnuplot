@@ -1,3 +1,9 @@
+2016-09-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/internal.c src/eval.h src/eval.c src/internal.h src/parse.c
+	docs/gnuplot.doc:  New cardinality operator |A| reports number of
+	entries in array A.   Example:  plot for [i = 1 : |A|] f(A[i])
+
 2016-09-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/getcolor.c src/save.c src/show.c:  Remove unreachable case
