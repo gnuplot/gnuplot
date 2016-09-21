@@ -1,3 +1,11 @@
+2016-09-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/QtGnuplotScene.h src/qtterminal/QtGnuplotScene.cpp:
+	qt terminal support for rotation of boxed text.
+
+	* src/wxterminal/gp_cairo.c:
+	cairo/wxt terminal support for rotation of boxed text.
+
 2016-09-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/internal.c src/eval.h src/eval.c src/internal.h src/parse.c

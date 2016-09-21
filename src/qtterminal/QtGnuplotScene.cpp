@@ -353,8 +353,11 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		else
 			m_currentGroup.append(textItem);
 #ifdef EAM_BOXED_TEXT
-		if (m_inTextBox)
+		if (m_inTextBox) {
 			m_currentTextBox |= rect;
+			m_currentBoxRotation = m_textAngle;
+			m_currentBoxOrigin = point;
+		}
 #endif
 	}
 	else if (type == GEEnhancedFlush)
@@ -400,8 +403,11 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		else
 			m_currentGroup.append(m_enhanced);
 #ifdef EAM_BOXED_TEXT
-		if (m_inTextBox)
+		if (m_inTextBox) {
 			m_currentTextBox |= rect;
+			m_currentBoxRotation = m_textAngle;
+			m_currentBoxOrigin = point;
+		}
 #endif
 		m_enhanced = 0;
 	}
@@ -599,6 +605,8 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 				  m_textMargin.x(), m_textMargin.y());
 			rectItem = addRect(outline, m_currentPen, Qt::NoBrush);
 			rectItem->setZValue(m_currentZ++);
+			rectItem->setTransformOriginPoint(m_currentBoxOrigin);
+			rectItem->setRotation(-m_currentBoxRotation);
 			m_currentGroup.append(rectItem);
 			m_inTextBox = false;
 			break;
@@ -611,6 +619,8 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 				  m_textMargin.x(), m_textMargin.y());
 			rectItem = addRect(outline, Qt::NoPen, m_currentBrush);
 			rectItem->setZValue(m_currentZ++);
+			rectItem->setTransformOriginPoint(m_currentBoxOrigin);
+			rectItem->setRotation(-m_currentBoxRotation);
 			m_currentGroup.append(rectItem);
 			m_inTextBox = false;
 			break;

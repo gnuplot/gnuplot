@@ -101,6 +101,8 @@ private:
 	QPointF m_zoomBoxCorner;
 	double  m_currentPointSize;
 	double  m_textAngle;
+	double  m_currentBoxRotation;
+	QPoint  m_currentBoxOrigin;
 	QPoint  m_textOffset;
 	double  m_currentZ;
 	QTime   m_watches[4];
