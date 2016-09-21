@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.69 2016/09/15 19:21:14 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.70 2016/09/15 19:36:32 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -12071,6 +12071,7 @@ Ffigure_missing
                               {{pointtype | pt} <point_type>}
                               {{pointsize | ps} <point_size>}
                               {{pointinterval | pi} <interval>}
+                              {{dashtype | dt} <dashtype>}
                               {palette}
        unset style line
        show style line
