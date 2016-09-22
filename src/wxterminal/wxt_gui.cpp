@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.159 2016/09/22 06:59:06 markisch Exp $
+ * $Id: wxt_gui.cpp,v 1.160 2016/09/22 07:03:32 markisch Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -117,8 +117,9 @@
 #include "bitmaps/png/config_png.h"
 #include "bitmaps/png/help_png.h"
 
-/* standard icon art from wx (used only for "Export to file" */
+/* standard icon art from wx */
 #include <wx/artprov.h>
+#include <wx/printdlg.h>
 
 extern "C" {
 #ifdef HAVE_CONFIG_H
@@ -192,6 +193,9 @@ BEGIN_EVENT_TABLE( wxtFrame, wxFrame )
 	EVT_CLOSE( wxtFrame::OnClose )
 	EVT_SIZE( wxtFrame::OnSize )
 	EVT_TOOL( Toolbar_ExportToFile, wxtFrame::OnExport )
+#ifdef WXT_PRINT
+	EVT_TOOL( Toolbar_Print, wxtFrame::OnPrint )
+#endif
 	/* Clipboard widget (should consolidate this with Export to File) */
 	EVT_TOOL( Toolbar_CopyToClipboard, wxtFrame::OnCopy )
 #ifdef USE_MOUSE
@@ -445,6 +449,11 @@ wxtFrame::wxtFrame( const wxString& title, wxWindowID id )
 	toolbar->AddTool(Toolbar_ExportToFile, wxT("Export"),
 				wxArtProvider::GetBitmap(wxART_FILE_SAVE_AS, wxART_TOOLBAR),
 				wxT("Export plot to file"));
+#ifdef WXT_PRINT
+	toolbar->AddTool(Toolbar_Print, wxT("Print"),
+				wxArtProvider::GetBitmap(wxART_PRINT, wxART_TOOLBAR),
+				wxT("Print plot"));
+#endif
 #ifdef USE_MOUSE
 #ifdef __WXOSX_COCOA__
 	/* wx 2.9 Cocoa bug & crash workaround for Lion, which does not have toolbar separators anymore */
@@ -647,6 +656,60 @@ void wxtFrame::OnExport( wxCommandEvent& WXUNUSED( event ) )
 	/* Save user environment selections. */
 	userFilterIndex = exportFileDialog.GetFilterIndex();
 }
+
+#ifdef WXT_PRINT
+/* toolbar event : Print
+ */
+void wxtFrame::OnPrint( wxCommandEvent& WXUNUSED( event ) )
+{
+	wxPrintDialogData printDialogData(printData);
+	printDialogData.EnablePageNumbers(false);
+	wxPrintDialog printDialog(this, &printDialogData);
+
+	if (printDialog.ShowModal() == wxID_CANCEL)
+		return;
+
+	wxDC* wxdc = printDialog.GetPrintDC();
+	wxdc->StartDoc(GetTitle());
+	wxdc->StartPage();
+
+	cairo_t* save_cr = panel->plot.cr;
+	cairo_save(save_cr);
+	cairo_surface_t *surface = NULL;
+#ifdef _WIN32
+	HDC hdc = (HDC) wxdc->GetHandle();
+	surface = cairo_win32_printing_surface_create(hdc);
+#endif
+	if (cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS) {
+		fprintf(stderr, "Cairo error: could not create surface for printer.\n");
+		cairo_surface_destroy(surface);
+	} else {
+		panel->plot.cr = cairo_create(surface);
+		// scale the plot according to the ratio of printer and screen dpi
+		wxSize ppi = wxdc->GetPPI();
+		unsigned dpi = 96;
+#ifdef _WIN32
+		dpi = GetDPI();
+#endif
+		double scaleX = ppi.GetWidth() / (double) dpi;
+		double scaleY = ppi.GetHeight() / (double) dpi;
+		cairo_surface_set_fallback_resolution(surface, ppi.GetWidth(), ppi.GetHeight());
+		cairo_scale(panel->plot.cr,
+			scaleX / panel->plot.oversampling_scale,
+			scaleY / panel->plot.oversampling_scale);
+		panel->wxt_cairo_refresh();
+		cairo_show_page(panel->plot.cr);
+		cairo_surface_destroy(surface);
+		cairo_surface_finish(surface);
+
+		panel->plot.cr = save_cr;
+		cairo_restore(panel->plot.cr);
+	}
+	wxdc->EndPage();
+	wxdc->EndDoc();
+	delete wxdc;
+}
+#endif
 
 /* toolbar event : Copy to clipboard
  * We will copy the panel to a bitmap, using platform-independant wxWidgets functions */

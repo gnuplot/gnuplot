@@ -1,5 +1,12 @@
 2016-09-22  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/wxterminal/wxt_gui.cpp|h:  Add "print" toolbar button. For now,
+	it is only available on Windows, but support could in principle be added
+	for other platforms. See feature request #304.
+
+	* src/wxterminal/wxt_gui.cpp:  Eliminate warnings about unused
+	variables. Used define _WIN32 to test for Windows platform.
+
 	* src/wxterminal/wxt_gui.cpp (wxtFrame::OnExport):  Save as enhanced
 	metafile (emf). Only available on Windows.
 
