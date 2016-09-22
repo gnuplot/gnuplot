@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.158 2016/08/26 04:16:10 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.159 2016/09/22 06:59:06 markisch Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -164,7 +164,7 @@ wxtAnchorPoint wxt_display_anchor = {0,0,0};
 #define wxt_update_anchors(x,y,size)
 #endif
 
-#if defined(WXT_MONOTHREADED) && !defined(_Windows)
+#if defined(WXT_MONOTHREADED) && !defined(_WIN32)
 static int yield = 0;	/* used in wxt_waitforinput() */
 #endif
 
@@ -769,7 +769,7 @@ void wxtFrame::OnClose( wxCloseEvent& event )
 		this->Destroy();
 	}
 
-#if defined(_Windows) && !defined(WGP_CONSOLE)
+#if defined(_WIN32) && !defined(WGP_CONSOLE)
 	/* Close text window if this was the last plot window. */
 	WinPersistTextClose();
 #endif
@@ -1419,6 +1419,7 @@ static void wxt_initialize_key_boxes(int i)
 		wxt_key_boxes[i].right = wxt_key_boxes[i].ytop = 0;
 	}
 }
+
 static void wxt_initialize_hidden(int i)
 {
 	for (; i<wxt_max_key_boxes; i++)
@@ -1594,7 +1595,7 @@ void wxtPanel::RaiseConsoleWindow()
 	}
 #endif /* USE_GTK */
 
-#ifdef WIN32
+#ifdef _WIN32
 	WinRaiseConsole();
 #endif
 
@@ -2138,7 +2139,7 @@ void wxt_reset()
 	/* sent when gnuplot exits and when the terminal or the output change.*/
 	FPRINTF((stderr,"wxt_reset\n"));
 
-#if defined(WXT_MONOTHREADED) && !defined(_Windows)
+#if defined(WXT_MONOTHREADED) && !defined(_WIN32)
 	yield = 0;
 #endif
 
@@ -3789,7 +3790,7 @@ bool wxt_exec_event(int type, int mx, int my, int par1, int par2, wxWindowID id)
 	event.par2 = par2;
 	event.winid = id;
 
-#if defined(_Windows)
+#if defined(_WIN32)
 	wxt_process_one_event(&event);
 	return true;
 #elif defined(WXT_MONOTHREADED)
@@ -3904,7 +3905,7 @@ int wxt_waitforinput(int options)
  * the terminal events are directly processed when they are received */
 int wxt_waitforinput(int options)
 {
-#ifdef _Windows
+#ifdef _WIN32
 	if (options == TERM_ONLY_CHECK_MOUSING) {
 		WinMessageLoop();
 		return NUL;
@@ -3925,7 +3926,7 @@ int wxt_waitforinput(int options)
 	} else
 		return getch();
 
-#else /* !_Windows */
+#else /* !_WIN32 */
 	/* Generic hybrid GUI & console message loop */
 	/* (used mainly on MacOSX - still single threaded) */
 	if (yield)
@@ -4003,8 +4004,9 @@ TBOOLEAN wxt_window_opened(void)
  * all the plot windows are closed. */
 void wxt_atexit()
 {
-	int i;
+#ifndef _WIN32
 	int openwindows = 0;
+#endif
 	int persist_setting;
 
 	if (wxt_status == STATUS_UNINITIALIZED)
@@ -4058,12 +4060,12 @@ void wxt_atexit()
 
 	FPRINTF((stderr,"wxt_atexit: handling \"persist\" setting\n"));
 
-#ifdef _Windows
+#ifdef _WIN32
 	if (!persist_cl) {
 		interactive = TRUE;
 		while (!com_line());
 	}
-#else /*_Windows*/
+#else /*_WIN32*/
 
 	/* process events directly */
 	wxt_handling_persist = true;
@@ -4079,6 +4081,7 @@ void wxt_atexit()
 	/* declare the iterator */
 	std::vector<wxt_window_t>::iterator wxt_iter;
 
+	int i;
 	for(wxt_iter = wxt_window_list.begin(), i=0;
 			wxt_iter != wxt_window_list.end(); wxt_iter++, i++)
 	{
@@ -4130,7 +4133,7 @@ void wxt_atexit()
 				  "has PID %d\n", pid));
 	}
 # endif /* HAVE_WORKING_FORK */
-#endif /* !_Windows */
+#endif /* !_WIN32 */
 
 	/* cleanup and quit */
 	wxt_cleanup();
