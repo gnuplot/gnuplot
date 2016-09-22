@@ -1,3 +1,8 @@
+2016-09-22  Per Bothner  <per@bothner.com>
+
+	* term/svg.trm (SVG_image): In domterm mode an embedded image should
+	always be inline rather than linking to an external file.
+
 2016-09-22  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/wxterminal/wxt_gui.cpp|h:  Add "print" toolbar button. For now,

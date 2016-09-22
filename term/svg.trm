@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.178 2016/08/26 20:26:39 sfeam Exp $
+ * $Id: svg.trm,v 1.179 2016/09/03 21:46:29 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1831,12 +1831,19 @@ SVG_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecol
 	    PREC, X(corner[0].x), PREC, Y(corner[0].y), 
 	    PREC, X(corner[1].x) - X(corner[0].x), PREC, Y(corner[1].y) - Y(corner[0].y));
 
-    if (!SVG_standalone) {
+    if (SVG_standalone || SVG_domterm) {
+	/* Embed the PNG file in SVG by converting to base64 */
+	fprintf(gpoutfile, "xlink:href='data:image/png;base64,");
+	if (write_png_base64_image(m, n, image, color_mode, gpoutfile))
+	    os_error(NO_CARET, "SVG_image: could not write to gnuplot output file.");
+	fprintf(gpoutfile, "'/>\n");
+
+    } else {
+        /* Write the image to a png file */
 	char *image_file;
         char *base_name = SVG_name ? SVG_name : "gp";
 	int wpiresult;
    
-        /* Write the image to a png file */
         image_file = gp_alloc(strlen(base_name)+16, "SVG_image");
         sprintf(image_file, "%s_image_%02d.png", base_name, ++SVG_imageno);
         wpiresult = write_png_image(m, n, image, color_mode, image_file);
@@ -1849,14 +1856,7 @@ SVG_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecol
 
 	if (wpiresult != 0)
 	    os_error(NO_CARET, "SVG_image: could not write to PNG reference file.");
-    } else {
-	/* Embed the PNG file in SVG by converting to base64 */
-	fprintf(gpoutfile, "xlink:href='data:image/png;base64,");
-	if (write_png_base64_image(m, n, image, color_mode, gpoutfile))
-	    os_error(NO_CARET, "SVG_image: could not write to gnuplot output file.");
-	fprintf(gpoutfile, "'/>\n");
     }
-
 }
 #endif
 
