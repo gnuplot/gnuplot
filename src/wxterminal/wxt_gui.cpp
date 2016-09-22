@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.157 2016/08/21 18:20:49 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.158 2016/08/26 04:16:10 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -517,7 +517,11 @@ void wxtFrame::OnExport( wxCommandEvent& WXUNUSED( event ) )
 
 	wxFileDialog exportFileDialog (this, wxT("Exported File Format"),
 		saveDir, wxT(""),
-		wxT("PNG files (*.png)|*.png|PDF files (*.pdf)|*.pdf|SVG files (*.svg)|*.svg"),
+		wxT("PNG files (*.png)|*.png|PDF files (*.pdf)|*.pdf|SVG files (*.svg)|*.svg"
+#ifdef __WXMSW__
+		    "|Enhanced Metafile (*.emf)|*.emf"
+#endif
+		   ),
 		wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
 	exportFileDialog.SetFilterIndex(userFilterIndex);
 
@@ -596,6 +600,43 @@ void wxtFrame::OnExport( wxCommandEvent& WXUNUSED( event ) )
 		panel->plot.cr = save_cr;
 		cairo_restore(panel->plot.cr);
 		break;
+#endif
+
+#ifdef __WXMSW__
+	case 3: {
+		/* Save as Enhanced Metafile. */
+		save_cr = panel->plot.cr;
+		cairo_save(save_cr);
+
+		RECT rect;
+		rect.left = rect.top = 0;
+		unsigned dpi = GetDPI();
+		rect.right  = MulDiv(panel->plot.device_xmax, dpi, 10);
+		rect.bottom = MulDiv(panel->plot.device_ymax, dpi, 10);
+		HDC hmf = CreateEnhMetaFileW(NULL, fullpathFilename.wc_str(), &rect, NULL);
+		// The win32_printing surface makes an effort to use the GDI API wherever possible,
+		// which should reduce the file size in many cases. 
+		surface = cairo_win32_printing_surface_create(hmf);
+		if (cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS) {
+			fprintf(stderr, "Cairo error: could not create surface for metafile.\n");
+			cairo_surface_destroy(surface);
+		} else {
+			panel->plot.cr = cairo_create(surface);
+			cairo_scale(panel->plot.cr,
+				1. / panel->plot.oversampling_scale,
+				1. / panel->plot.oversampling_scale);
+
+			panel->wxt_cairo_refresh();
+			cairo_show_page(panel->plot.cr);
+			cairo_surface_destroy(surface);
+			cairo_surface_finish(surface);
+			panel->plot.cr = save_cr;
+			cairo_restore(panel->plot.cr);
+		}
+		HENHMETAFILE hemf = CloseEnhMetaFile(hmf);
+		DeleteEnhMetaFile(hemf);
+		break;
+	}
 #endif
 
 	default :

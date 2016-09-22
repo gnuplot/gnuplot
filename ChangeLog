@@ -1,3 +1,8 @@
+2016-09-22  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/wxterminal/wxt_gui.cpp (wxtFrame::OnExport):  Save as enhanced
+	metafile (emf). Only available on Windows.
+
 2016-09-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/QtGnuplotScene.h src/qtterminal/QtGnuplotScene.cpp:
