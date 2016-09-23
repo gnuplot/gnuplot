@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.399 2016/08/24 17:25:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.400 2016/08/24 17:46:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -116,6 +116,7 @@ cp_alloc(int num)
     cp->lp_properties = default_lp_properties;
     default_arrow_style(&(cp->arrow_properties));
     cp->fill_properties = default_fillstyle;
+    cp->filledcurves_options = filledcurves_opts_data;
 
     return (cp);
 }
