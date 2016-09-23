@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.34 2016/08/09 13:09:51 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.35 2016/09/23 14:05:58 markisch Exp $
  */
 
 /*
@@ -468,9 +468,9 @@ EnhancedPutText(int x, int y, char * text)
 		g->DrawString(textw, -1, enhstate_gdiplus.font, pointF, enhstate_gdiplus.stringformat, enhstate_gdiplus.brush);
 	} else {
 		/* shift rotated text correctly */
-		g->TranslateTransform(x, y + enhstate.lpgw->tmDescent);
+		g->TranslateTransform(x, y);
 		g->RotateTransform(-enhstate.lpgw->angle);
-		g->DrawString(textw, -1, enhstate_gdiplus.font, PointF(0,0), enhstate_gdiplus.stringformat, enhstate_gdiplus.brush);
+		g->DrawString(textw, -1, enhstate_gdiplus.font, PointF(0, enhstate.lpgw->tmDescent), enhstate_gdiplus.stringformat, enhstate_gdiplus.brush);
 		g->ResetTransform();
 	}
 	free(textw);
@@ -678,7 +678,7 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 
 	/* calculate text shifting for horizontal text */
 	hshift = 0;
-	vshift = -MulDiv(lpgw->vchar, rb - rt, lpgw->ymax) / 2;
+	vshift = -lpgw->tmHeight / 2;
 
 	/* init layer variables */
 	lpgw->numplots = 0;
@@ -1233,8 +1233,8 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 			if (lpgw->angle != (int)curptr->x) {
 				lpgw->angle = (int)curptr->x;
 				/* recalculate shifting of rotated text */
-				hshift = - sin(M_PI/180. * lpgw->angle) * MulDiv(lpgw->vchar, rr-rl, lpgw->xmax) / 2;
-				vshift = - cos(M_PI/180. * lpgw->angle) * MulDiv(lpgw->vchar, rb-rt, lpgw->ymax) / 2;
+				hshift = - sin(M_PI/180. * lpgw->angle) * lpgw->tmHeight / 2.;
+				vshift = - cos(M_PI/180. * lpgw->angle) * lpgw->tmHeight / 2.;
 			}
 			break;
 
@@ -1267,8 +1267,8 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 #endif
 			LocalUnlock(curptr->htext);
 			/* recalculate shifting of rotated text */
-			hshift = - sin(M_PI/180. * lpgw->angle) * MulDiv(lpgw->vchar, rr-rl, lpgw->xmax) / 2;
-			vshift = - cos(M_PI/180. * lpgw->angle) * MulDiv(lpgw->vchar, rb-rt, lpgw->ymax) / 2;
+			hshift = - sin(M_PI/180. * lpgw->angle) * lpgw->tmHeight / 2.;
+			vshift = - cos(M_PI/180. * lpgw->angle) * lpgw->tmHeight / 2.;
 			break;
 		}
 

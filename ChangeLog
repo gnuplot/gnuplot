@@ -1,5 +1,8 @@
 2016-09-23  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgdiplus.cpp (EnhancedPutText):  Fix reference of rotation
+	for enhanced text.
+
 	* src/win/wgraph.c src/win/wgdiplus.cpp:  Positioning of rotated text
 	depends on the currently selected font and in particular on the font
 	size.  Bugfix.
