@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.128 2016/07/23 03:34:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.129 2016/08/25 20:07:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -772,8 +772,11 @@ write_label(unsigned int x, unsigned int y, struct text_label *this_label)
 	    get_offsets(this_label, &htic, &vtic);
 #ifdef EAM_BOXED_TEXT
 	    /* Initialize the bounding box accounting */
-	    if (this_label->boxed && term->boxed_text)
+	    if ((this_label->boxed && term->boxed_text)
+	    &&  (textbox_opts.opaque || !textbox_opts.noborder))
+	    {
 		(*term->boxed_text)(x + htic, y + vtic, TEXTBOX_INIT);
+	    }
 #endif
 	    if (this_label->rotate && (*term->text_angle) (this_label->rotate)) {
 		write_multiline(x + htic, y + vtic, this_label->text,
@@ -786,7 +789,9 @@ write_label(unsigned int x, unsigned int y, struct text_label *this_label)
 	    }
 	}
 #ifdef EAM_BOXED_TEXT
-	if (this_label->boxed && term->boxed_text) {
+	if ((this_label->boxed && term->boxed_text)
+	&&  (textbox_opts.opaque || !textbox_opts.noborder))
+	{
 
 	    /* Adjust the bounding box margins */
 	    (*term->boxed_text)((int)(textbox_opts.xmargin * 100.),
@@ -797,6 +802,9 @@ write_label(unsigned int x, unsigned int y, struct text_label *this_label)
 		apply_pm3dcolor(&textbox_opts.fillcolor);
 		(*term->boxed_text)(0,0, TEXTBOX_BACKGROUNDFILL);
 		apply_pm3dcolor(&(this_label->textcolor));
+		/* Init for each of fill and border */
+		if (!textbox_opts.noborder)
+		    (*term->boxed_text)(x + htic, y + vtic, TEXTBOX_INIT);
 		if (this_label->rotate && (*term->text_angle) (this_label->rotate)) {
 		    write_multiline(x + htic, y + vtic, this_label->text,
 				this_label->pos, justify, this_label->rotate,

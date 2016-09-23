@@ -3,6 +3,9 @@
 	* term/svg.trm (SVG_image): Image support was conditional on png support
 	but this can be relaxed for in-line images.
 
+	* src/gadgets.c (write_label): If current textbox style has neither a
+	border nor fill, then the "boxed" attribute can be ignored.
+
 2016-09-22  Per Bothner  <per@bothner.com>
 
 	* term/svg.trm (SVG_image): In domterm mode an embedded image should
