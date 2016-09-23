@@ -1,3 +1,8 @@
+2016-09-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm (SVG_image): Image support was conditional on png support
+	but this can be relaxed for in-line images.
+
 2016-09-22  Per Bothner  <per@bothner.com>
 
 	* term/svg.trm (SVG_image): In domterm mode an embedded image should
