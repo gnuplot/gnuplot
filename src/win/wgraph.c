@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.224 2016/09/14 18:10:04 markisch Exp $
+ * $Id: wgraph.c,v 1.225 2016/09/23 14:09:45 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -1007,14 +1007,13 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	hfontold = (HFONT) SelectObject(hdc, lpgw->hfonth);
 	Wnd_GetTextSize(hdc, "0123456789", 10, &cx, &cy);
 	lpgw->vchar = MulDiv(cy, lpgw->ymax, lprect->bottom - lprect->top);
-	lpgw->hchar = MulDiv(cx/10, lpgw->xmax, lprect->right - lprect->left);
+	lpgw->hchar = MulDiv(cx, lpgw->xmax, 10 * (lprect->right - lprect->left));
 
 	/* CMW: Base tick size on character size */
 	lpgw->htic = MulDiv(lpgw->hchar, 2, 5);
-	cy = MulDiv(cx/10, 2*GetDeviceCaps(hdc, LOGPIXELSY), 5*GetDeviceCaps(hdc, LOGPIXELSX));
+	cy = MulDiv(cx, 2 * GetDeviceCaps(hdc, LOGPIXELSY), 50 * GetDeviceCaps(hdc, LOGPIXELSX));
 	lpgw->vtic = MulDiv(cy, lpgw->ymax, lprect->bottom - lprect->top);
 	/* find out if we can rotate text 90deg */
-	SelectObject(hdc, lpgw->hfontv);
 	result = GetDeviceCaps(hdc, TEXTCAPS);
 	if ((result & TC_CR_90) || (result & TC_CR_ANY))
 		lpgw->rotate = TRUE;
