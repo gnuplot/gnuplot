@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.223 2016/09/12 18:01:34 markisch Exp $
+ * $Id: wgraph.c,v 1.224 2016/09/14 18:10:04 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -1483,13 +1483,13 @@ draw_text_justify(HDC hdc, int justify)
 	switch (justify)
 	{
 		case LEFT:
-			SetTextAlign(hdc, TA_LEFT|TA_BOTTOM);
+			SetTextAlign(hdc, TA_LEFT | TA_TOP);
 			break;
 		case RIGHT:
-			SetTextAlign(hdc, TA_RIGHT|TA_BOTTOM);
+			SetTextAlign(hdc, TA_RIGHT | TA_TOP);
 			break;
 		case CENTRE:
-			SetTextAlign(hdc, TA_CENTER|TA_BOTTOM);
+			SetTextAlign(hdc, TA_CENTER | TA_TOP);
 			break;
 	}
 }
@@ -1850,11 +1850,10 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	lpgw->angle = 0;
 	SetFont(lpgw, hdc);
 	lpgw->justify = LEFT;
-	SetTextAlign(hdc, TA_LEFT|TA_BOTTOM);
-
-	/* calculate text shifting for horizontal text */
+	SetTextAlign(hdc, TA_LEFT|TA_TOP);
+	/* calculate text shift for horizontal text */
 	hshift = 0;
-	vshift = MulDiv(lpgw->vchar, rb - rt, lpgw->ymax)/2;
+	vshift = - lpgw->tmHeight / 2;  /* centered */
 
 	/* init layer variables */
 	lpgw->numplots = 0;
@@ -2086,7 +2085,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 						dxr = 0;
 					}
 				}
-
 				if (keysample) {
 					draw_update_keybox(lpgw, plotno, xdash - dxl, ydash - vsize);
 					draw_update_keybox(lpgw, plotno, xdash + dxr, ydash + vsize);
@@ -2476,8 +2474,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				lpgw->angle = (int)curptr->x;
 				SetFont(lpgw, hdc);
 				/* recalculate shifting of rotated text */
-				hshift = sin(M_PI/180. * lpgw->angle) * MulDiv(lpgw->vchar, rr-rl, lpgw->xmax) / 2;
-				vshift = cos(M_PI/180. * lpgw->angle) * MulDiv(lpgw->vchar, rb-rt, lpgw->ymax) / 2;
+				hshift = - sin(M_PI/180. * lpgw->angle) * lpgw->tmHeight / 2.;
+				vshift = - cos(M_PI/180. * lpgw->angle) * lpgw->tmHeight / 2.;
 			}
 			break;
 
@@ -2506,8 +2504,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			LocalUnlock(curptr->htext);
 			SetFont(lpgw, hdc);
 			/* recalculate shifting of rotated text */
-			hshift = sin(M_PI/180. * lpgw->angle) * MulDiv(lpgw->vchar, rr-rl, lpgw->xmax) / 2;
-			vshift = cos(M_PI/180. * lpgw->angle) * MulDiv(lpgw->vchar, rb-rt, lpgw->ymax) / 2;
+			hshift = - sin(M_PI/180. * lpgw->angle) * lpgw->tmHeight / 2.;
+			vshift = - cos(M_PI/180. * lpgw->angle) * lpgw->tmHeight / 2.;
 			break;
 		}
 

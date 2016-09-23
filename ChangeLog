@@ -1,3 +1,11 @@
+2016-09-23  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c src/win/wgdiplus.cpp:  Positioning of rotated text
+	depends on the currently selected font and in particular on the font
+	size.  Bugfix.
+
+	* src/win/wgdiplus.cpp:  Take fontscale into account. Bugfix.
+
 2016-09-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm (SVG_image): Image support was conditional on png support
@@ -14,8 +22,8 @@
 2016-09-22  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/wxterminal/wxt_gui.cpp|h:  Add "print" toolbar button. For now,
-	it is only available on Windows, but support could in principle be added
-	for other platforms. See feature request #304.
+	it is only available on Windows, but support could in principle be
+	added for other platforms. See feature request #304.
 
 	* src/wxterminal/wxt_gui.cpp:  Eliminate warnings about unused
 	variables. Used define _WIN32 to test for Windows platform.
