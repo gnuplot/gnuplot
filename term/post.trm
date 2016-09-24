@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.294 2016/08/05 05:10:29 markisch Exp $
+ * $Id: post.trm,v 1.295 2016/08/17 17:09:13 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -76,6 +76,10 @@
  *
  * Christoph Bersch Nov 2011 (cvs Apr 2013): Add support for Level 3 /FlateDecode 
  * filter for plotstyle 'with image'.
+ *
+ * Ethan Merritt Sep 2016:  Support rotatation of boxed text, including text
+ * strings using the glyphshow mechanism.  Special-case the 'minus sign' glyph
+ * at U+2212 by unconditionally mapping it to /minus.
  */
 
 #include "driver.h"
@@ -136,6 +140,7 @@ TERM_PUBLIC void PS_layer __PROTO((t_termlayer syncpoint));
 #ifdef EAM_BOXED_TEXT
 TERM_PUBLIC void ENHPS_boxed_text __PROTO((unsigned int, unsigned int, int));
 #endif
+static int PS_in_textbox = 0;
 
 #endif /* TERM_PROTO */
 
@@ -323,16 +328,29 @@ static const char GPFAR * GPFAR ENHPS_header[] = {
 /*	[<fontname (a string)> <fontsize> <vertical offset> <width significant?> <printed?> <overprint> <text string>]  */
 /* EAM Mar 2004 - Add in a special case overprint 3 = save, overprint 4 = restore */
 /* EAM Nov 2007 - Accommodate UTF-8 support (Gshow) */
+/* EAM Sep 2016 - rotatable textbox */
 
+"/Metrics {ExtendTextBox Gswidth} def\n",
+"/Lwidth {currentpoint stroke M 0 vshift R Metrics} def\n",
+"/Rwidth {currentpoint stroke M dup stringwidth pop neg vshift R Metrics} def\n",
+"/Cwidth {currentpoint stroke M dup stringwidth pop -2 div vshift R Metrics} def\n",
+"/GLwidth {currentpoint stroke M 0 vshift R {ExtendTextBox} forall} def\n",
+"/GRwidth {currentpoint stroke M dup Gwidth vshift R {ExtendTextBox} forall} def\n",
+"/GCwidth {currentpoint stroke M dup Gwidth 2 div vshift R {ExtendTextBox} forall} def\n",
+"/GLwidth2 {0 Gwidth AddGlyphWidth} def\n",
+"/GRwidth2 {Gwidth -1 mul 0 AddGlyphWidth} def\n",
+"/GCwidth2 {Gwidth 2 div dup -1 mul AddGlyphWidth} def\n",
+"/AddGlyphWidth { dup TBx2 gt {userdict /TBx2 3 -1 roll put} {pop} ifelse\n",
+"                 dup TBx1 lt {userdict /TBx1 3 -1 roll put} {pop} ifelse } def\n",
 "/MFshow {\n",
 "   { dup 5 get 3 ge\n",	/* EAM test for overprint 3 or 4 */
 "     { 5 get 3 eq {gsave} {grestore} ifelse }\n", /* EAM */
 "     {dup dup 0 get findfont exch 1 get scalefont setfont\n",
 "     [ currentpoint ] exch dup 2 get 0 exch R dup 5 get 2 ne {dup dup 6\n",
-"     get exch 4 get {textshow} {stringwidth pop 0 R} ifelse }if dup 5 get 0 eq\n",
+"     get exch 4 get {textshow} {Metrics pop 0 R} ifelse }if dup 5 get 0 eq\n",
 "     {dup 3 get {2 get neg 0 exch R pop} {pop aload pop M} ifelse} {dup 5\n",
-"     get 1 eq {dup 2 get exch dup 3 get exch 6 get stringwidth pop -2 div\n",
-"     dup 0 R} {dup 6 get stringwidth pop -2 div 0 R 6 get\n",
+"     get 1 eq {dup 2 get exch dup 3 get exch 6 get Gswidth pop -2 div\n",
+"     dup 0 R} {dup 6 get Gswidth pop -2 div 0 R 6 get\n",
 "     textshow 2 index {aload pop M neg 3 -1 roll neg R pop pop} {pop pop pop\n",
 "     pop aload pop M} ifelse }ifelse }ifelse }\n",
 "     ifelse }\n", /* EAM */
@@ -373,17 +391,18 @@ NULL
 #ifdef EAM_BOXED_TEXT
     static const char GPFAR psi4[] = "\
 %%\n\
-%% Support for boxed text - Ethan A Merritt May 2005\n%%\n\
+%% Support for boxed text - Ethan A Merritt Sep 2016\n%%\n\
 /InitTextBox { userdict /TBy2 3 -1 roll put userdict /TBx2 3 -1 roll put\n\
            userdict /TBy1 3 -1 roll put userdict /TBx1 3 -1 roll put\n\
 	   /Boxing true def } def\n\
-/ExtendTextBox { Boxing\n\
-    { gsave dup false charpath pathbbox\n\
+/ExtendTextBox { dup type /stringtype eq\n\
+    { Boxing { gsave dup false charpath pathbbox\n\
       dup TBy2 gt {userdict /TBy2 3 -1 roll put} {pop} ifelse\n\
       dup TBx2 gt {userdict /TBx2 3 -1 roll put} {pop} ifelse\n\
       dup TBy1 lt {userdict /TBy1 3 -1 roll put} {pop} ifelse\n\
       dup TBx1 lt {userdict /TBx1 3 -1 roll put} {pop} ifelse\n\
-      grestore } if } def\n\
+      grestore } if }\n\
+    {} ifelse} def\n\
 /PopTextBox { newpath TBx1 TBxmargin sub TBy1 TBymargin sub M\n\
                TBx1 TBxmargin sub TBy2 TBymargin add L\n\
 	       TBx2 TBxmargin add TBy2 TBymargin add L\n\
@@ -2212,57 +2231,106 @@ PS_put_text(unsigned int x, unsigned int y, const char *str)
 #define PS_GLYPH 2
     unsigned long ch;
 
-    if (!str && !strlen(str))
+    if (!str || !strlen(str))
 	return;
-    PS_move(x,y);
+
+    if (PS_in_textbox > 0) {
+	int save_ang = ps_ang;
+	PS_in_textbox = -1;
+	/* Write once with no rotation and no actual "show" command */
+	ps_ang = 0;
+	PS_put_text(0, 0, str);
+	/* Now restore the angle and the "show" command and fall through */
+	fprintf(gppsfile,"/Boxing false def\n");
+	fprintf(gppsfile,"grestore\n");
+	ps_ang = save_ang;
+	PS_in_textbox = 1;
+    }
+
+    if (PS_in_textbox >= 0)
+	PS_move(x,y);
+
     if (ps_ang != 0)
 	fprintf(gppsfile,"currentpoint gsave translate %d rotate 0 0 M\n", ps_ang);
+    else if (PS_in_textbox > 0)
+	fprintf(gppsfile,"gsave currentpoint translate\n");
 
     if (encoding == S_ENC_UTF8 && contains8bit(str)) {
 	/* UTF-8 encoding with multibyte characters present */
+	/* Note: uses an intermediate array rather than direct output via fputs so
+	 * that the bounding box (used by boxed text) can be calculated in 2 passes:
+	 *   [char sequence] GLwidth [char sequence] GLwidth2
+	 * First pass updates height, second pass updates width.
+	 * There must surely be some some way to do this in one pass!
+	 */
+	char strarray[MAX_LINE_LEN];
 	int mode = PS_NONE;
+	char *c = strarray;
 
-	putc('[', gppsfile);
+	*c++ = '[';
 
 	for (utf8toulong(&ch, &str); ch != '\0'; utf8toulong(&ch, &str)) {
 	    if (ch < 0x100) {
 		if (mode != PS_TEXT)
-		    putc('(', gppsfile);
+		    *c++ = '(';
 		if (ch == '(' || ch == ')' || ch == '\\')
-		    putc('\\', gppsfile);
-		putc((char)ch, gppsfile);
+		    *c++ = '\\';
+		*c++ = ch;
 		mode = PS_TEXT;
 	    } else {
 		int i;
 		if (mode == PS_TEXT)
-		    putc(')', gppsfile);
-		putc('/', gppsfile);
+		    *c++ = ')';
+		*c++ = '/';
 #if (ADOBE_ENCODING_NAMES)
 		for (i = 0; i < psglyphs; i++) {
 		    if (aglist[i].unicode == ch) {
-		    	fputs(aglist[i].glyphname, gppsfile);
+			*c = 0;
+			strcat(c, aglist[i].glyphname);
+			c += strlen(aglist[i].glyphname);
 			break;
 		    }
 		}
 		if (i >= psglyphs) /* Must not have found a glyph name */
 #endif
-		    fprintf(gppsfile, (ch > 0xffff) ? "u%lX" : "uni%04lX", ch);
+		    {
+		    /* Special case for the minus sign emitted by gprintf */
+		    if (ch == 0x2212)
+			sprintf(c, "minus");
+		    else
+			sprintf(c, (ch > 0xffff) ? "u%lX%c" : "uni%04lX%c", ch, 0);
+		    }
+		while (*c) c++;
 		mode = PS_GLYPH;
 	    }
 	}
 
 	if (mode == PS_TEXT)
-	    putc(')', gppsfile);
+	    *c++ = ')';
 
+	*c++ = ']';
+	*c = 0;
 	switch(ps_justify) {
 	    case LEFT :
-		fputs("] GLshow\n", gppsfile);
+		if (PS_in_textbox < 0) {
+		    fprintf(gppsfile,"%s GLwidth\n", strarray);
+		    fprintf(gppsfile,"%s GLwidth2\n", strarray);
+		} else
+		    fprintf(gppsfile,"%s GLshow\n", strarray);
 		break;
 	    case CENTRE :
-		fputs("] GCshow\n", gppsfile);
+		if (PS_in_textbox < 0) {
+		    fprintf(gppsfile,"%s GCwidth\n", strarray);
+		    fprintf(gppsfile,"%s GCwidth2\n", strarray);
+		} else
+		    fprintf(gppsfile,"%s GCshow\n", strarray);
 		break;
 	    case RIGHT :
-		fputs("] GRshow\n", gppsfile);
+		if (PS_in_textbox < 0) {
+		    fprintf(gppsfile,"%s GRwidth\n", strarray);
+		    fprintf(gppsfile,"%s GRwidth2\n", strarray);
+		} else
+		    fprintf(gppsfile,"%s GRshow\n", strarray);
 		break;
 	}
 
@@ -2279,18 +2347,27 @@ PS_put_text(unsigned int x, unsigned int y, const char *str)
 
 	switch(ps_justify) {
 	    case LEFT :
-		fputs(") Lshow\n", gppsfile);
+		if (PS_in_textbox < 0)
+		    fputs(") Lwidth\n", gppsfile);
+		else
+		    fputs(") Lshow\n", gppsfile);
 		break;
 	    case CENTRE :
-		fputs(") Cshow\n", gppsfile);
+		if (PS_in_textbox < 0)
+		    fputs(") Cwidth\n", gppsfile);
+		else
+		    fputs(") Cshow\n", gppsfile);
 		break;
 	    case RIGHT :
-		fputs(") Rshow\n", gppsfile);
+		if (PS_in_textbox < 0)
+		    fputs(") Rwidth\n", gppsfile);
+		else
+		    fputs(") Rshow\n", gppsfile);
 		break;
 	}
     }
 
-    if (ps_ang != 0)
+    if (ps_ang != 0 && (PS_in_textbox == 0))
 	fputs("grestore\n", gppsfile);
     ps_path_count = 0;
     PS_relative_ok = FALSE;
@@ -2536,6 +2613,7 @@ ENHPS_OPEN(
 
 	if (!ENHps_opened_string) {
 	    int safelen = strlen(fontname) + 40;
+	    TBOOLEAN show_this = showflag && (PS_in_textbox >= 0);
 	    free(ENHps_opensequence);
 	    ENHps_opensequence = gp_alloc(safelen,"ENHPS_opensequence");
 	    if (!fontname || !*fontname)
@@ -2546,13 +2624,13 @@ ENHPS_OPEN(
 	    snprintf(ENHps_opensequence, safelen, "[(%s) %.1f %.1f %s %s %d ",
 		    fontname, fontsize, base,
 		    widthflag ? "true" : "false",
-		    showflag ? "true" : "false",
+		    show_this ? "true" : "false",
 		    overprint);
 #else
 	    sprintf(ENHps_opensequence, "[(%s) %.1f %.1f %s %s %d ",
 		    fontname, fontsize, base,
 		    widthflag ? "true" : "false",
-		    showflag ? "true" : "false",
+		    show_this ? "true" : "false",
 		    overprint);
 #endif
 	    fprintf(gppsfile, "%s(", ENHps_opensequence);
@@ -2612,7 +2690,12 @@ ENHPS_WRITEC(int c)
 		}
 		if (i >= psglyphs) /* Must not have found a glyph name */
 #endif
-		    fprintf(gppsfile, (wch > 0xffff) ? "u%lX" : "uni%04lX", wch);
+		    {
+		    if (wch == 0x2212)
+			fprintf(gppsfile, "minus");
+		    else
+			fprintf(gppsfile, (wch > 0xffff) ? "u%lX" : "uni%04lX", wch);
+		    }
 		fprintf(gppsfile, "]\n");
 
 		/* Mark string closed */
@@ -2692,6 +2775,19 @@ ENHPS_put_text(unsigned int x, unsigned int y, const char *str)
 
     PS_FLUSH_PATH;
 
+    if (PS_in_textbox > 0) {
+	int save_ang = ps_ang;
+	PS_in_textbox = -1;
+	/* Write once with no rotation and no actual "show" command */
+	ps_ang = 0;
+	ENHPS_put_text(0, 0, str);
+	/* Now restore the angle and the "show" command and fall through */
+	ps_ang = save_ang;
+	fprintf(gppsfile,"/Boxing false def\n");
+	fprintf(gppsfile,"grestore\n");
+	PS_in_textbox = 1;
+    }
+
     /* FIXME: if there are no magic characters, we should just be able
      * punt the string to PS_put_text(), which will give shorter
      * ps output [eg tics and stuff rarely need extra processing],
@@ -2706,11 +2802,13 @@ ENHPS_put_text(unsigned int x, unsigned int y, const char *str)
      * }
      */
 
-    PS_move(x,y);
+    if (PS_in_textbox >= 0)
+	PS_move(x,y);
 
     if (ps_ang != 0)
-	fprintf(gppsfile,"currentpoint gsave translate %d rotate 0 0 moveto\n",
-		ps_ang);
+	fprintf(gppsfile,"currentpoint gsave translate %d rotate 0 0 moveto\n", ps_ang);
+    else if (PS_in_textbox > 0)
+	fprintf(gppsfile,"gsave currentpoint translate\n");
 
     fputs("[ ", gppsfile);
 
@@ -2763,7 +2861,7 @@ ENHPS_put_text(unsigned int x, unsigned int y, const char *str)
 	break;
     }
 
-    if (ps_ang != 0)
+    if (ps_ang != 0 && (PS_in_textbox == 0))
 	fputs("grestore\n", gppsfile);
     ps_path_count = 0;
     PS_relative_ok = FALSE;
@@ -2810,16 +2908,27 @@ ENHPS_boxed_text __PROTO((unsigned int x, unsigned int y, int option))
 {
     switch (option) {
     case TEXTBOX_INIT:
-	/* Initialize bounding box for the text string */
-	fprintf(gppsfile,"%d %d %d %d InitTextBox\n",x,y,x,y);
+	/* Initialize bounding box for the text string drawn at the origin */
+	/* Redefine /textshow so that we update the bounding box without actually writing */
+	fprintf(gppsfile,"%d %d M\n",x,y);
+	fprintf(gppsfile,"currentpoint gsave translate 0 0 moveto\n");
+	fprintf(gppsfile,"0 0 0 0 InitTextBox\n");
+	/* This flags that when we write the string, we must do it twice.
+	 * Once to update the bounding box,
+	 * then rotate,
+	 * the a second time to actually draw the string
+	 */ 
+	PS_in_textbox = 1;
 	break;
     case TEXTBOX_OUTLINE:
 	/* Stroke the outline of the accumulated bounding box */
-	fputs("DrawTextBox\n", gppsfile);
+	fputs("DrawTextBox grestore\n", gppsfile);
+	PS_in_textbox = 0;
 	break;
     case TEXTBOX_BACKGROUNDFILL:
 	/* Fill bounding box with background color */
-	fputs("FillTextBox\n", gppsfile);
+	fputs("FillTextBox grestore\n", gppsfile);
+	PS_in_textbox = 0;
 	break;
     case TEXTBOX_MARGINS:
 	/* Change text margins */

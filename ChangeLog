@@ -1,3 +1,9 @@
+2016-09-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm: postscript terminal support for rotation of boxed text.
+	This happens to also remove incompatibility of "set minussign" and
+	"set term post noadobeglyphnames" and utf8 encoding.
+
 2016-09-24 Akira Kakuto <kakuto@fuk.kindai.ac.jp>
 
 	* src/wxterminal/wxt_gui.cpp (OnExport):  VS2010 does not accept
