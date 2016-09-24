@@ -1,3 +1,8 @@
+2016-09-24 Akira Kakuto <kakuto@fuk.kindai.ac.jp>
+
+	* src/wxterminal/wxt_gui.cpp (OnExport):  VS2010 does not accept
+	splitting the string argument for wxT().
+
 2016-09-23  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgdiplus.cpp (EnhancedPutText):  Fix reference of rotation
