@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.103 2014/05/09 22:14:12 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.104 2014/05/13 18:26:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -1141,6 +1141,7 @@ set_plot_with_palette(int plot_num, int plot_mode)
     struct curve_points *this_2dplot = first_plot;
     int surface = 0;
     struct text_label *this_label = first_label;
+    struct object *this_object;
 
     plot_has_palette = TRUE;
     /* Is pm3d switched on globally? */
@@ -1189,8 +1190,9 @@ set_plot_with_palette(int plot_num, int plot_mode)
 	}
     }
 
-    /* Any label with 'textcolor palette'? */
 #define TC_USES_PALETTE(tctype) (tctype==TC_Z) || (tctype==TC_CB) || (tctype==TC_FRAC)
+
+    /* Any label with 'textcolor palette'? */
     for (; this_label != NULL; this_label = this_label->next) {
 	if (TC_USES_PALETTE(this_label->textcolor.type))
 	    return;
@@ -1204,6 +1206,12 @@ set_plot_with_palette(int plot_num, int plot_mode)
     if (plot_mode == MODE_SPLOT)
 	if (TC_USES_PALETTE(axis_array[FIRST_Z_AXIS].label.textcolor.type)) return;
     if (TC_USES_PALETTE(axis_array[COLOR_AXIS].label.textcolor.type)) return;
+
+    for (this_object = first_object; this_object != NULL; this_object = this_object->next) {
+	if (TC_USES_PALETTE(this_object->lp_properties.pm3d_color.type))
+	    return;
+    }
+    
 #undef TC_USES_PALETTE
 
     /* Palette with continuous colors is not used. */
