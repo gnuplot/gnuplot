@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.121 2016/04/25 18:36:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.122 2016/08/25 20:07:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -683,48 +683,33 @@ draw_color_smooth_box(int plot_mode)
     /* write the colour box label */
     if (CB_AXIS.label.text) {
 	int x, y;
+	int len;
+	int save_rotation = CB_AXIS.label.rotate;
 	apply_pm3dcolor(&(CB_AXIS.label.textcolor));
 	if (color_box.rotation == 'h') {
-	    int len = CB_AXIS.ticscale * (CB_AXIS.tic_in ? 1 : -1) * 
-		(term->v_tic);
+	    len = CB_AXIS.ticscale * (CB_AXIS.tic_in ? 1 : -1) * (term->v_tic);
 
-	    map3d_position_r(&(CB_AXIS.label.offset), &x, &y, "smooth_box");
-	    x += (color_box.bounds.xleft + color_box.bounds.xright) / 2;
+	    x = (color_box.bounds.xleft + color_box.bounds.xright) / 2;
+	    y = color_box.bounds.ybot - 2.7 * term->v_char;
 
-#define DEFAULT_Y_DISTANCE 1.0
-	    y += color_box.bounds.ybot + (- DEFAULT_Y_DISTANCE - 1.7) * term->v_char;
-#undef DEFAULT_Y_DISTANCE
 	    if (len < 0) y += len;
-	    if (x<0) x = 0;
-	    if (y<0) y = 0;
-	    write_multiline(x, y, CB_AXIS.label.text, CENTRE, JUST_CENTRE, 0,
-			    CB_AXIS.label.font);
+	    if (CB_AXIS.label.rotate == TEXT_VERTICAL)
+		CB_AXIS.label.rotate = 0;
 	} else {
-	    int len = CB_AXIS.ticscale * (CB_AXIS.tic_in ? -1 : 1) *
-		(term->h_tic);
+	    len = CB_AXIS.ticscale * (CB_AXIS.tic_in ? -1 : 1) * (term->h_tic);
 	    /* calculate max length of cb-tics labels */
 	    widest_tic_strlen = 0;
-	    if (CB_AXIS.ticmode & TICS_ON_BORDER) {
-	      	widest_tic_strlen = 0; /* reset the global variable */
+	    if (CB_AXIS.ticmode & TICS_ON_BORDER) /* Recalculate widest_tic_strlen */
 		gen_tics(&axis_array[COLOR_AXIS], widest_tic_callback);
-	    }
-	    map3d_position_r(&(CB_AXIS.label.offset), &x, &y, "smooth_box");
-#define DEFAULT_X_DISTANCE 0.0
-	    x += color_box.bounds.xright + (widest_tic_strlen + DEFAULT_X_DISTANCE + 1.5) * term->h_char;
-#undef DEFAULT_X_DISTANCE
+	    x = color_box.bounds.xright + (widest_tic_strlen + 1.5) * term->h_char;
 	    if (len > 0) x += len;
-	    y += (color_box.bounds.ybot + color_box.bounds.ytop) / 2;
-	    if (x<0) x = 0;
-	    if (y<0) y = 0;
-	    if ((*term->text_angle)(CB_AXIS.label.rotate)) {
-		write_multiline(x, y, CB_AXIS.label.text, CENTRE, JUST_TOP,
-				CB_AXIS.label.rotate, CB_AXIS.label.font);
-		(*term->text_angle)(0);
-	    } else {
-		write_multiline(x, y, CB_AXIS.label.text, LEFT, JUST_TOP, 0, CB_AXIS.label.font);
-	    }
+	    y = (color_box.bounds.ybot + color_box.bounds.ytop) / 2;
 	}
+	if (x<0) x = 0;
+	if (y<0) y = 0;
+	write_label(x, y, &(CB_AXIS.label));
 	reset_textcolor(&(CB_AXIS.label.textcolor));
+	CB_AXIS.label.rotate = save_rotation;
     }
 
 }

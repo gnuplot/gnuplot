@@ -14,6 +14,9 @@
 
 	* src/plot2d.c (eval_plots):  Initialize fillcolor.
 
+	* src/color.c: Use the shared routine write_label() to handle the 2D
+	cb axis label.
+
 2016-09-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/pm3d.c (set_plot_with_palette): When checking for plot elements 
