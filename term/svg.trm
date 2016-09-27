@@ -108,7 +108,9 @@ TERM_PUBLIC void ENHsvg_writec __PROTO((int));
 TERM_PUBLIC void SVG_path __PROTO((int p));
 TERM_PUBLIC void SVG_hypertext __PROTO((int, const char *));
 
+#ifdef WRITE_PNG_IMAGE
 TERM_PUBLIC void SVG_image __PROTO((unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecolor color_mode));
+#endif
 
 #define SVG_SCALE	10.	/* Coordinates accuracy is 1/SVG_SCALE pixel */
 #define PREC		1	/* Decimal places needed for SVG_SCALEd values */
@@ -1820,6 +1822,7 @@ SVG_layer(t_termlayer syncpoint)
 /*------------------------------------------------------------------------------------------------------------------------------------
 	SVG_image
 ------------------------------------------------------------------------------------------------------------------------------------*/
+#ifdef WRITE_PNG_IMAGE
 TERM_PUBLIC void
 SVG_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecolor color_mode) 
 {
@@ -1834,10 +1837,8 @@ SVG_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecol
 	if (write_png_base64_image(m, n, image, color_mode, gpoutfile))
 	    os_error(NO_CARET, "SVG_image: could not write to gnuplot output file.");
 	fprintf(gpoutfile, "'/>\n");
-    }
 
-#ifdef WRITE_PNG_IMAGE
-    else {
+    } else {
         /* Write the image to a png file */
 	char *image_file;
         char *base_name = SVG_name ? SVG_name : "gp";
@@ -1856,9 +1857,8 @@ SVG_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecol
 	if (wpiresult != 0)
 	    os_error(NO_CARET, "SVG_image: could not write to PNG reference file.");
     }
-#endif
-
 }
+#endif
 
 
 /* Enhanced text mode support starts here */
@@ -2208,7 +2208,11 @@ TERM_TABLE_START (svg_driver)
    SVG_previous_palette,
    SVG_set_color,
    SVG_filled_polygon
-   , SVG_image
+#ifdef WRITE_PNG_IMAGE
+    , SVG_image
+#else
+    , NULL	/* image */
+#endif
    , ENHsvg_OPEN, ENHsvg_FLUSH, ENHsvg_writec
    , SVG_layer	/* layer */
    , SVG_path 	/* path */
@@ -2240,7 +2244,11 @@ TERM_TABLE_START (domterm_driver)
    SVG_previous_palette,
    SVG_set_color,
    SVG_filled_polygon
-   , SVG_image
+#ifdef WRITE_PNG_IMAGE
+    , SVG_image
+#else
+    , NULL	/* image */
+#endif
    , ENHsvg_OPEN, ENHsvg_FLUSH, ENHsvg_writec
    , SVG_layer	/* layer */
    , SVG_path 	/* path */
