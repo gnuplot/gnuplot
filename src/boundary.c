@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.34 2016/08/08 02:50:37 sfeam Exp $
+ * $Id: boundary.c,v 1.35 2016/09/13 18:51:08 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -81,8 +81,8 @@ int key_cols;
 /* borders of plotting area
  * computed once on every call to do_plot
  *
- * The order in which things is done is getting pretty critical:
- *  plot_bounds.ytop depends on title, x2label, ylabels (if no rotated text)
+ * The order in which things are done has become critical:
+ *  plot_bounds.ytop depends on title, x2label
  *  plot_bounds.ybot depends on key, if "under"
  *  once we have these, we can setup the y1 and y2 tics and the
  *  only then can we calculate plot_bounds.xleft and plot_bounds.xright
@@ -112,25 +112,23 @@ boundary(struct curve_points *plots, int count)
      * yields undesirable results */
     int can_rotate = (*t->text_angle) (TEXT_VERTICAL);
 
-    int xtic_textheight;	/* height of xtic labels */
-    int x2tic_textheight;	/* height of x2tic labels */
-    int title_textheight;	/* height of title */
-    int xlabel_textheight;	/* height of xlabel */
-    int x2label_textheight;	/* height of x2label */
-    int timetop_textheight;	/* height of timestamp (if at top) */
-    int timebot_textheight;	/* height of timestamp (if at bottom) */
-    int ylabel_textheight;	/* height of (unrotated) ylabel */
-    int y2label_textheight;	/* height of (unrotated) y2label */
-    int ylabel_textwidth;	/* width of (rotated) ylabel */
-    int y2label_textwidth;	/* width of (rotated) y2label */
-    int timelabel_textwidth;	/* width of timestamp */
-    int ytic_textwidth;		/* width of ytic labels */
-    int y2tic_textwidth;	/* width of y2tic labels */
-    int x2tic_height;		/* 0 for tic_in or no x2tics, ticscale*v_tic otherwise */
+    int xtic_textheight=0;	/* height of xtic labels */
+    int x2tic_textheight=0;	/* height of x2tic labels */
+    int title_textheight=0;	/* height of title */
+    int xlabel_textheight=0;	/* height of xlabel */
+    int x2label_textheight=0;	/* height of x2label */
+    int timetop_textheight=0;	/* height of timestamp (if at top) */
+    int timebot_textheight=0;	/* height of timestamp (if at bottom) */
+    int ylabel_textwidth=0;	/* width of (rotated) ylabel */
+    int y2label_textwidth=0;	/* width of (rotated) y2label */
+    int timelabel_textwidth=0;	/* width of timestamp */
+    int ytic_textwidth=0;	/* width of ytic labels */
+    int y2tic_textwidth=0;	/* width of y2tic labels */
+    int x2tic_height=0;		/* 0 for tic_in or no x2tics, ticscale*v_tic otherwise */
     int xtic_textwidth=0;	/* amount by which the xtic label protrude to the right */
-    int xtic_height;
-    int ytic_width;
-    int y2tic_width;
+    int xtic_height=0;
+    int ytic_width=0;
+    int y2tic_width=0;
 
     /* figure out which rotatable items are to be rotated
      * (ylabel and y2label are rotated if possible) */
@@ -187,7 +185,7 @@ boundary(struct curve_points *plots, int count)
     /* title */
     if (titlelin) {
 	double tmpx, tmpy;
-	map_position_r(&(title.offset), &tmpx, &tmpy, "boundary");
+	map_position_r(&(title.offset), &tmpx, &tmpy, "title");
 	if (title.font)
 	    t->set_font(title.font);
 	title_textheight = (int) ((titlelin) * (t->v_char) + tmpy);
@@ -199,12 +197,9 @@ boundary(struct curve_points *plots, int count)
 
     /* x2label */
     if (x2lablin) {
-	double tmpx, tmpy;
-	map_position_r(&(axis_array[SECOND_X_AXIS].label.offset),
-		       &tmpx, &tmpy, "boundary");
 	if (axis_array[SECOND_X_AXIS].label.font)
 	    t->set_font(axis_array[SECOND_X_AXIS].label.font);
-	x2label_textheight = (int) (x2lablin * t->v_char + tmpy);
+	x2label_textheight = (int) (x2lablin * t->v_char);
 	if (!axis_array[SECOND_X_AXIS].ticmode)
 	    x2label_textheight += 0.5 * t->v_char;
 	if (axis_array[SECOND_X_AXIS].label.font)
@@ -236,31 +231,30 @@ boundary(struct curve_points *plots, int count)
     } else
 	timetop_textheight = 0;
 
-    /* horizontal ylabel */
-    if (axis_array[FIRST_Y_AXIS].label.text && !can_rotate) {
-	double tmpx, tmpy;
-	map_position_r(&(axis_array[FIRST_Y_AXIS].label.offset),
-		       &tmpx, &tmpy, "boundary");
-	if (axis_array[FIRST_Y_AXIS].label.font)
-	    t->set_font(axis_array[FIRST_Y_AXIS].label.font);
-	ylabel_textheight = (int) (ylablin * t->v_char + tmpy);
-	if (axis_array[FIRST_Y_AXIS].label.font)
-	    t->set_font("");
-    } else
-	ylabel_textheight = 0;
+    /* ylabel placement */
+    if (axis_array[FIRST_Y_AXIS].label.text) {
+	if (can_rotate && axis_array[FIRST_Y_AXIS].label.rotate != 0) {
+	    ylabel_textwidth = ylablin * t->v_char;
+	    if (!axis_array[FIRST_Y_AXIS].ticmode)
+		ylabel_textwidth += 0.5 * t->v_char;
+	} else {
+	    /* How on earth did this used to work when it was always set to 0? */
+	    ylabel_textwidth = estimate_strlen(axis_array[FIRST_Y_AXIS].label.text) * t->h_char;
+	}
+    }
 
-    /* horizontal y2label */
-    if (axis_array[SECOND_Y_AXIS].label.text && !can_rotate) {
-	double tmpx, tmpy;
-	map_position_r(&(axis_array[SECOND_Y_AXIS].label.offset),
-		       &tmpx, &tmpy, "boundary");
-	if (axis_array[SECOND_Y_AXIS].label.font)
-	    t->set_font(axis_array[FIRST_Y_AXIS].label.font);
-	y2label_textheight = (int) (y2lablin * t->v_char + tmpy);
-	if (axis_array[SECOND_Y_AXIS].label.font)
-	    t->set_font("");
-    } else
-	y2label_textheight = 0;
+    /* y2label placement */
+    if (axis_array[SECOND_Y_AXIS].label.text) {
+	if (can_rotate && axis_array[SECOND_Y_AXIS].label.rotate != 0) {
+	    y2label_textwidth = y2lablin * t->v_char;
+	    if (!axis_array[SECOND_Y_AXIS].ticmode)
+		y2label_textwidth += 0.5 * t->v_char;
+	} else {
+	    /* should be (estimate_strlen()*t->h_char) but that's not what 5.0 did */
+	    /* this is an ugly ad hoc approximation of what it did before */
+	    y2label_textwidth = estimate_strlen(axis_array[SECOND_Y_AXIS].label.text) * t->h_char;
+	}
+    }
 
     /* compute plot_bounds.ytop from the various components
      *     unless tmargin is explicitly specified
@@ -286,10 +280,8 @@ boundary(struct curve_points *plots, int count)
 	/* Auto-calculation of space required */
 	int top_margin = x2label_textheight + title_textheight;
 
-	if (timetop_textheight + ylabel_textheight > top_margin)
-	    top_margin = timetop_textheight + ylabel_textheight;
-	if (y2label_textheight > top_margin)
-	    top_margin = y2label_textheight;
+	if (timetop_textheight > top_margin)
+	    top_margin = timetop_textheight;
 
 	top_margin += x2tic_height + x2tic_textheight;
 	/* x2tic_height and x2tic_textheight are computed as only the
@@ -476,18 +468,6 @@ boundary(struct curve_points *plots, int count)
     else
 	ytic_width = 0;
 
-    /* ylabel */
-    if (axis_array[FIRST_Y_AXIS].label.text && can_rotate) {
-	double tmpx, tmpy;
-	map_position_r(&(axis_array[FIRST_Y_AXIS].label.offset),
-		       &tmpx, &tmpy, "boundary");
-	ylabel_textwidth = (int) (ylablin * (t->v_char) - tmpx);
-	if (!axis_array[FIRST_Y_AXIS].ticmode)
-	    ylabel_textwidth += 0.5 * t->v_char;
-    } else
-	/* this should get large for NEGATIVE ylabel.xoffsets  DBT 11-5-98 */
-	ylabel_textwidth = 0;
-
     /* timestamp */
     if (timelabel.text && vertical_timelabel) {
 	double tmpx, tmpy;
@@ -594,17 +574,6 @@ boundary(struct curve_points *plots, int count)
 	y2tic_width = (int) (t->h_tic * axis_array[SECOND_Y_AXIS].ticscale);
     else
 	y2tic_width = 0;
-
-    /* y2label */
-    if (can_rotate && axis_array[SECOND_Y_AXIS].label.text) {
-	double tmpx, tmpy;
-	map_position_r(&(axis_array[SECOND_Y_AXIS].label.offset),
-		       &tmpx, &tmpy, "boundary");
-	y2label_textwidth = (int) (y2lablin * t->v_char + tmpx);
-	if (!axis_array[SECOND_Y_AXIS].ticmode)
-	    y2label_textwidth += 0.5 * t->v_char;
-    } else
-	y2label_textwidth = 0;
 
     /* Make room for the color box if needed. */
     if (rmargin.scalex != screen) {
@@ -773,34 +742,26 @@ boundary(struct curve_points *plots, int count)
     title_y = x2label_y + title_textheight;
     title_x = (plot_bounds.xleft + plot_bounds.xright) / 2;
 
-    ylabel_y = plot_bounds.ytop + x2tic_height + x2tic_textheight + ylabel_textheight;
-
-    y2label_y = plot_bounds.ytop + x2tic_height + x2tic_textheight + y2label_textheight;
-
     /* Shift upward by 0.2 line to allow for descenders in xlabel text */
     xlabel_y = plot_bounds.ybot - xtic_height - xtic_textheight - xlabel_textheight
 	+ ((float)xlablin+0.2) * t->v_char;
     ylabel_x = plot_bounds.xleft - ytic_width - ytic_textwidth;
-    if (axis_array[FIRST_Y_AXIS].label.text && can_rotate)
-	ylabel_x -= ylabel_textwidth;
+    ylabel_x -= ylabel_textwidth;
 
     y2label_x = plot_bounds.xright + y2tic_width + y2tic_textwidth;
-    if (axis_array[SECOND_Y_AXIS].label.text && can_rotate)
-	y2label_x += y2label_textwidth - y2lablin * t->v_char;
+    /* Intentionally not applied
+	y2label_x += y2label_textwidth / 2;
+     */
 
     if (vertical_timelabel) {
 	if (timelabel_bottom)
 	    time_y = xlabel_y - timebot_textheight + xlabel_textheight;
-	else {
-	    time_y = title_y + timetop_textheight - title_textheight
-		- x2label_textheight;
-	}
+	else
+	    time_y = title_y + timetop_textheight - title_textheight - x2label_textheight;
     } else {
 	if (timelabel_bottom)
 	    time_y = plot_bounds.ybot - xtic_height - xtic_textheight - xlabel_textheight
 		- timebot_textheight + t->v_char;
-	else if (ylabel_textheight > 0)
-	    time_y = ylabel_y + timetop_textheight;
 	else
 	    time_y = plot_bounds.ytop + x2tic_height + x2tic_textheight
 		+ timetop_textheight + (int) t->h_char;
@@ -1470,84 +1431,41 @@ draw_titles()
 
     /* YLABEL */
     if (axis_array[FIRST_Y_AXIS].label.text) {
-	ignore_enhanced(axis_array[FIRST_Y_AXIS].label.noenhanced);
-	apply_pm3dcolor(&(axis_array[FIRST_Y_AXIS].label.textcolor));
-	/* we worked out x-posn in boundary() */
-	if ((*t->text_angle) (axis_array[FIRST_Y_AXIS].label.rotate)) {
-	    double tmpx, tmpy;
-	    unsigned int x, y;
-	    map_position_r(&(axis_array[FIRST_Y_AXIS].label.offset),
-			   &tmpx, &tmpy, "doplot");
-
-	    x = ylabel_x + (t->v_char / 2);
-	    y = (plot_bounds.ytop + plot_bounds.ybot) / 2 + tmpy;
-
-	    write_multiline(x, y, axis_array[FIRST_Y_AXIS].label.text,
-			    CENTRE, JUST_TOP, axis_array[FIRST_Y_AXIS].label.rotate,
-			    axis_array[FIRST_Y_AXIS].label.font);
-	    (*t->text_angle) (0);
-	} else {
-	    /* really bottom just, but we know number of lines
-	       so we need to adjust x-posn by one line */
-	    unsigned int x = ylabel_x;
-	    unsigned int y = ylabel_y;
-
-	    write_multiline(x, y, axis_array[FIRST_Y_AXIS].label.text,
-			    LEFT, JUST_TOP, 0,
-			    axis_array[FIRST_Y_AXIS].label.font);
-	}
+	unsigned int x = ylabel_x;
+	unsigned int y = (plot_bounds.ytop + plot_bounds.ybot) / 2;
+	x += t->h_char;
+	axis_array[FIRST_Y_AXIS].label.pos = CENTRE;
+	write_label(x, y, &(axis_array[FIRST_Y_AXIS].label));
 	reset_textcolor(&(axis_array[FIRST_Y_AXIS].label.textcolor));
-	ignore_enhanced(FALSE);
     }
 
     /* Y2LABEL */
     if (axis_array[SECOND_Y_AXIS].label.text) {
-	ignore_enhanced(axis_array[SECOND_Y_AXIS].label.noenhanced);
-	apply_pm3dcolor(&(axis_array[SECOND_Y_AXIS].label.textcolor));
-	/* we worked out coordinates in boundary() */
-	if ((*t->text_angle) (axis_array[SECOND_Y_AXIS].label.rotate)) {
-	    double tmpx, tmpy;
-	    unsigned int x, y;
-	    map_position_r(&(axis_array[SECOND_Y_AXIS].label.offset),
-			   &tmpx, &tmpy, "doplot");
-	    x = y2label_x + (t->v_char / 2) - 1;
-	    y = (plot_bounds.ytop + plot_bounds.ybot) / 2 + tmpy;
-
-	    write_multiline(x, y, axis_array[SECOND_Y_AXIS].label.text,
-			    CENTRE, JUST_TOP,
-			    axis_array[SECOND_Y_AXIS].label.rotate,
-			    axis_array[SECOND_Y_AXIS].label.font);
-	    (*t->text_angle) (0);
+	unsigned int x = y2label_x;
+	unsigned int y = (plot_bounds.ytop + plot_bounds.ybot) / 2;
+	if (axis_array[SECOND_Y_AXIS].label.rotate) {
+	    x += 2 * t->h_char;
+	    axis_array[SECOND_Y_AXIS].label.pos = CENTRE;
 	} else {
-	    /* really bottom just, but we know number of lines */
-	    unsigned int x = y2label_x;
-	    unsigned int y = y2label_y;
-
-	    write_multiline(x, y, axis_array[SECOND_Y_AXIS].label.text,
-			    RIGHT, JUST_TOP, 0,
-			    axis_array[SECOND_Y_AXIS].label.font);
+	    axis_array[SECOND_Y_AXIS].label.pos = LEFT;
 	}
+	write_label(x, y, &(axis_array[SECOND_Y_AXIS].label));
 	reset_textcolor(&(axis_array[SECOND_Y_AXIS].label.textcolor));
-	ignore_enhanced(FALSE);
     }
 
     /* XLABEL */
     if (axis_array[FIRST_X_AXIS].label.text) {
+	struct text_label *label = &axis_array[FIRST_X_AXIS].label;
 	double tmpx, tmpy;
 	unsigned int x, y;
-	map_position_r(&(axis_array[FIRST_X_AXIS].label.offset),
-		       &tmpx, &tmpy, "doplot");
+	map_position_r(&(label->offset), &tmpx, &tmpy, "xlabel");
 
-	x = (plot_bounds.xright + plot_bounds.xleft) / 2 +  tmpx;
-	y = xlabel_y - t->v_char / 2;   /* HBB */
+	x = (plot_bounds.xright + plot_bounds.xleft) / 2;
+	y = xlabel_y - t->v_char / 2;
+	y -= tmpy;	/* xlabel_y already contained tmpy */
 
-	ignore_enhanced(axis_array[FIRST_X_AXIS].label.noenhanced);
-	apply_pm3dcolor(&(axis_array[FIRST_X_AXIS].label.textcolor));
-	write_multiline(x, y, axis_array[FIRST_X_AXIS].label.text,
-			CENTRE, JUST_TOP, 0,
-			axis_array[FIRST_X_AXIS].label.font);
-	reset_textcolor(&(axis_array[FIRST_X_AXIS].label.textcolor));
-	ignore_enhanced(FALSE);
+	write_label(x, y, label);
+	reset_textcolor(&(label->textcolor));
     }
 
     /* PLACE TITLE */
@@ -1566,19 +1484,12 @@ draw_titles()
 
     /* X2LABEL */
     if (axis_array[SECOND_X_AXIS].label.text) {
-	double tmpx, tmpy;
 	unsigned int x, y;
-	map_position_r(&(axis_array[SECOND_X_AXIS].label.offset),
-		       &tmpx, &tmpy, "doplot");
 	/* we worked out y-coordinate in boundary() */
-	x = (plot_bounds.xright + plot_bounds.xleft) / 2 + tmpx;
+	x = (plot_bounds.xright + plot_bounds.xleft) / 2;
 	y = x2label_y - t->v_char / 2 - 1;
-	ignore_enhanced(axis_array[SECOND_X_AXIS].label.noenhanced);
-	apply_pm3dcolor(&(axis_array[SECOND_X_AXIS].label.textcolor));
-	write_multiline(x, y, axis_array[SECOND_X_AXIS].label.text, CENTRE,
-			JUST_TOP, 0, axis_array[SECOND_X_AXIS].label.font);
+	write_label(x, y, &(axis_array[SECOND_X_AXIS].label));
 	reset_textcolor(&(axis_array[SECOND_X_AXIS].label.textcolor));
-	ignore_enhanced(FALSE);
     }
 
     /* PLACE TIMEDATE */

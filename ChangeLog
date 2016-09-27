@@ -1,3 +1,14 @@
+2016-09-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/boundary.c: Use the shared routine write_label() to handle the 2D
+	x, y, x2, and y2 axis labels rather than separate in-line code for each.
+	This allows additional text properties for the axis labels, notably
+	"boxed".  However this changes the effect of setting an offset for y, y2
+	axis labels.  Previously this altered placement of the plot borders
+	while leaving the absolute placement of the axis label on the page
+	unchanged.  Now the plot borders remain fixed but the axis label moves.
+	Bug #1550
+
 2016-09-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/pm3d.c (set_plot_with_palette): When checking for plot elements 
