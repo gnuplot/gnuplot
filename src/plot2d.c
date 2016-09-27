@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.400 2016/08/24 17:46:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.401 2016/09/24 06:04:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2139,7 +2139,8 @@ eval_plots()
 #ifdef EAM_OBJECTS
 	    TBOOLEAN set_ellipseaxes_units = FALSE;
 #endif
-	    t_colorspec fillcolor;
+	    t_colorspec fillcolor = DEFAULT_COLORSPEC;
+
 	    int sample_range_token;	/* Only used by function plots */
 
 	    plot_num++;
