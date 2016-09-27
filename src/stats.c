@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stats.c,v 1.14.2.10 2016/09/03 23:18:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stats.c,v 1.14.2.11 2016/09/06 19:43:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stats.c */
@@ -743,6 +743,7 @@ statsrequest(void)
 
     /* Vars for variable handling */
     static char *prefix = NULL;       /* prefix for user-defined vars names */
+    TBOOLEAN prefix_from_columnhead = FALSE;
 
     /* Vars that control output */
     TBOOLEAN do_output = TRUE;     /* Generate formatted output */
@@ -830,6 +831,7 @@ statsrequest(void)
 		free ( prefix );
 		if (almost_equals(c_token,"col$umnheader")) {
 		    df_set_key_title_columnhead(NULL);
+		    prefix_from_columnhead = TRUE;
 		    continue;
 		}
 		prefix = try_to_get_string();
@@ -939,16 +941,17 @@ statsrequest(void)
 
     /* The analysis variables are named STATS_* unless the user either */
     /* gave a specific name or told us to use a columnheader.          */
-    if (!prefix) {
-	if (df_key_title && *df_key_title) {
-	    prefix = gp_strdup(df_key_title);
-	    squash_spaces(prefix, 0);
-	} 
+    if (!prefix && prefix_from_columnhead && df_key_title && *df_key_title) {
+	prefix = gp_strdup(df_key_title);
+	squash_spaces(prefix, 0);
 	if (!legal_identifier(prefix)) {
 	    int_warn(NO_CARET, "columnhead %s is not a valid prefix", prefix ? prefix : "");
-	    prefix = gp_strdup("STATS_");
+	    free(prefix);
+	    prefix = NULL;
 	}
     }
+    if (!prefix)
+	prefix = gp_strdup("STATS_");
     i = strlen(prefix);
     if (prefix[i-1] != '_') {
 	prefix = (char *) gp_realloc(prefix, i+2, "prefix");

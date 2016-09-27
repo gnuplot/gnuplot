@@ -2,6 +2,9 @@
 
 	* src/plot2d.c (eval_plots):  Initialize fillcolor.
 
+	* src/stats.c: Do not use columnheader as a prefix for "stats" unless it
+	is specifically requested. 
+
 2016-09-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/pm3d.c (set_plot_with_palette): When checking for plot elements 
