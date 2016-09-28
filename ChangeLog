@@ -7,6 +7,10 @@
 	different processes, the currently active process has to allow the other
 	to "raise" itself.
 
+	* src/win/winmain.c:  Change only the state of minimised windows when
+	raising text or graph windows.  In particular that does leave
+	maximised windows as they are.
+
 2016-09-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/boundary.c: Use the shared routine write_label() to handle the 2D

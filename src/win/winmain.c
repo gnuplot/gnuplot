@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.92 2016/09/11 20:51:47 markisch Exp $
+ * $Id: winmain.c,v 1.93 2016/09/12 17:52:26 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -1266,7 +1266,8 @@ win_raise_terminal_window(int id)
     while ((lpgw != NULL) && (lpgw->Id != id))
 	lpgw = lpgw->next;
     if (lpgw != NULL) {
-	ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);
+	if (IsIconic(lpgw->hWndGraph))
+	    ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);
 	BringWindowToTop(lpgw->hWndGraph);
     }
 }
@@ -1277,7 +1278,8 @@ win_raise_terminal_group(void)
 {
     LPGW lpgw = listgraphs;
     while (lpgw != NULL) {
-	ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);
+	if (IsIconic(lpgw->hWndGraph))
+	    ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);
 	BringWindowToTop(lpgw->hWndGraph);
 	lpgw = lpgw->next;
     }
@@ -1375,7 +1377,8 @@ WinRaiseConsole(void)
     console = GetConsoleWindow();
 #endif
     if (console != NULL) {
-	ShowWindow(console, SW_SHOWNORMAL);
+	if (IsIconic(console))
+	    ShowWindow(console, SW_SHOWNORMAL);
 	BringWindowToTop(console);
     }
 }
