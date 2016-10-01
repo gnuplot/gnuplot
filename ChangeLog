@@ -9,6 +9,8 @@
 	Remove the offending loop that eats whitespace.
 	Bug #1863
 
+	* src/boundary.c: Revised placement of x2label.
+
 2016-10-01  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* QtGnuplotItems.{h|cpp} (QtGnuplotEnhancedFragment::width):

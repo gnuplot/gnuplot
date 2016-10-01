@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.35 2016/09/13 18:51:08 sfeam Exp $
+ * $Id: boundary.c,v 1.36 2016/09/27 05:36:23 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -73,6 +73,7 @@ int key_entry_height;		/* bigger of t->v_char, t->v_tic */
 int key_point_offset;		/* offset from x for point sample */
 int key_col_wth, yl_ref;
 int ylabel_x, y2label_x, xlabel_y, x2label_y;
+int x2label_yoffset;
 int ylabel_y, y2label_y, xtic_y, x2tic_y, ytic_x, y2tic_x;
 int key_rows;
 int key_cols;
@@ -197,11 +198,13 @@ boundary(struct curve_points *plots, int count)
 
     /* x2label */
     if (x2lablin) {
+	double tmpx, tmpy;
+	map_position_r(&(axis_array[SECOND_X_AXIS].label.offset),
+			&tmpx, &tmpy, "x2label");
 	if (axis_array[SECOND_X_AXIS].label.font)
 	    t->set_font(axis_array[SECOND_X_AXIS].label.font);
 	x2label_textheight = (int) (x2lablin * t->v_char);
-	if (!axis_array[SECOND_X_AXIS].ticmode)
-	    x2label_textheight += 0.5 * t->v_char;
+	x2label_yoffset = tmpy;
 	if (axis_array[SECOND_X_AXIS].label.font)
 	    t->set_font("");
     } else
@@ -278,7 +281,9 @@ boundary(struct curve_points *plots, int count)
 	plot_bounds.ytop -= (int)(tmargin.x * (float)t->v_char + 0.5);
     } else {
 	/* Auto-calculation of space required */
-	int top_margin = x2label_textheight + title_textheight;
+	int top_margin = title_textheight;
+	if (x2label_textheight + x2label_yoffset > 0)
+	    top_margin += x2label_textheight;
 
 	if (timetop_textheight > top_margin)
 	    top_margin = timetop_textheight;
@@ -735,12 +740,17 @@ boundary(struct curve_points *plots, int count)
     /*  compute coordinates for axis labels, title et al
      *     (some of these may not be used) */
 
-    x2label_y = plot_bounds.ytop + x2tic_height + x2tic_textheight + x2label_textheight;
-    if (x2tic_textheight && (title_textheight || x2label_textheight))
-	x2label_y += t->v_char;
+    x2label_y = plot_bounds.ytop + x2label_textheight;
+    if (x2label_textheight + x2label_yoffset >= 0) {
+	x2label_y += 1.5 * x2tic_textheight;
+	if (!axis_array[SECOND_X_AXIS].ticmode)
+	    x2label_y += 0.5 * t->v_char;
+    }
 
-    title_y = x2label_y + title_textheight;
     title_x = (plot_bounds.xleft + plot_bounds.xright) / 2;
+    title_y = plot_bounds.ytop + title_textheight + x2tic_textheight;
+    if (x2label_y + x2label_yoffset > plot_bounds.ytop)
+	title_y += x2label_textheight;
 
     /* Shift upward by 0.2 line to allow for descenders in xlabel text */
     xlabel_y = plot_bounds.ybot - xtic_height - xtic_textheight - xlabel_textheight
@@ -1487,7 +1497,7 @@ draw_titles()
 	unsigned int x, y;
 	/* we worked out y-coordinate in boundary() */
 	x = (plot_bounds.xright + plot_bounds.xleft) / 2;
-	y = x2label_y - t->v_char / 2 - 1;
+	y = x2label_y - t->v_char / 2;
 	write_label(x, y, &(axis_array[SECOND_X_AXIS].label));
 	reset_textcolor(&(axis_array[SECOND_X_AXIS].label.textcolor));
     }
