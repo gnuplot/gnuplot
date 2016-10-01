@@ -1,3 +1,11 @@
+2016-10-01  Daniel J Sebald <daniel.sebald@ieee.org>
+
+	* QtGnuplotItems.{h|cpp} (QtGnuplotEnhancedFragment::width):
+	Introduce a true string width function rather than using boundingBox(),
+	which ignores leading or trailing whitespace.  This repairs enhanced
+	text overprint and place-holder markup in the qt terminal.
+	Bug #1863
+
 2016-09-28  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/mousecmn.h src/qtterminal/qt_term.cpp 
