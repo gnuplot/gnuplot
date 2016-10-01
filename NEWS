@@ -34,6 +34,7 @@ Changes not in 5.0
 * CHANGE Only update axis->data_min/max if the point being stored is INRANGE
 * CHANGE auto-generation of minitics on logscale axis has changed
 * CHANGE revised printing dialogs on Windows
+* CHANGE preserve whitespace following opening { in enhanced text strings
 * FIX cairo.trm - reset terminal font after printing an enhanced text string
 * FIX autoscaling of data with "smooth cnorm"
 * FIX Built-in readline handles S-JIS encoding
