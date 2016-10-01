@@ -17,6 +17,7 @@ Changes in 5.0.5
 * FIX svg - better vertical justification of rotated text
 * FIX wxt - file export widget correctly handles inactive plots
 * FIX epslatex - reset linetype between plots (needed if plotted "notitle")
+* FIX qt - leading or trailing whitespace in enhanced text was being ignored
 
 Changes in 5.0.4
 ================
