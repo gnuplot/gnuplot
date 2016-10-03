@@ -7,7 +7,7 @@
 	blurry lines.  Replaces the old "oversampling" method which drew on a
 	bitmap four times as large and then scaled down.
 
-	* term/win.trm:  Update documentation of graph-menu and 
+	* term/win.trm:  Update documentation of graph-menu and wgnuplot.ini.
 
 2016-10-01  Ethan A Merritt  <merritt@u.washington.edu>
 
