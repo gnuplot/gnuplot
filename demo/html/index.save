@@ -127,6 +127,7 @@ Here are samples of PNG output from some of the demos.
     <li><a href="rotate_labels.html">rotated text</a></li>
     <li><a href="enhanced_utf8.html">'enhanced' text</a></li>
     <li><a href="datastrings.html">string data</a></li>
+    <li><a href="textbox.html">boxed text</a></li>
     <li><a href="cities.html">variable font size</a></li>
     <li><a href="stringvar.html">string variables</a></li>
     <li><font color=gray>hypertext (no png support)</font></li>

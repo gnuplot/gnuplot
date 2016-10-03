@@ -126,6 +126,7 @@ on mouse-coordinate tracking.
     <li><a href="enhanced_utf8.html">enhanced text</a></li>
     <li><a href="datastrings.html">string data</a></li>
     <li><a href="stringvar.html">string variables</a></li>
+    <li><font color=gray>boxed text (no svg support)</font></li>
     <li><a href="cities.html">variable font size</a></li>
     <li><a href="hypertext.html">hypertext</a></li>
     </ul>
