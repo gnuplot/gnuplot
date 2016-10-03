@@ -1,3 +1,8 @@
+2016-10-03 Allin Cottrell  <cottrell@wfu.edu>
+
+	* src/win/wprinter.c:  Cross-compilation requires lower case include
+	file names.
+
 2016-10-03  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgdiplus.cpp src/win/wgraph:  Implement oversampling for the

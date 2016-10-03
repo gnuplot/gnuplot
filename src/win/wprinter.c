@@ -1,5 +1,5 @@
 /*
- * $Id: wprinter.c,v 1.21 2016/09/11 21:07:31 markisch Exp $
+ * $Id: wprinter.c,v 1.22 2016/09/12 18:01:34 markisch Exp $
  */
 
 /* GNUPLOT - win/wprinter.c */
@@ -53,7 +53,7 @@
 #include <unknwn.h>
 #include <commdlg.h>
 #include <commctrl.h>
-#include <OCIdl.h>
+#include <ocidl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
