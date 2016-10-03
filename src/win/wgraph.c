@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.225 2016/09/23 14:09:45 markisch Exp $
+ * $Id: wgraph.c,v 1.226 2016/09/24 09:07:38 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -562,11 +562,13 @@ GraphInit(LPGW lpgw)
 		M_COLOR, TEXT("C&olor"));
 	//AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->doublebuffer ? MF_CHECKED : MF_UNCHECKED),
 	//	M_DOUBLEBUFFER, TEXT("&Double buffer"));
-	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->oversample ? MF_CHECKED : MF_UNCHECKED),
-		M_OVERSAMPLE, TEXT("O&versampling"));
 #ifdef HAVE_GDIPLUS
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->gdiplus ? MF_CHECKED : MF_UNCHECKED),
 		M_GDIPLUS, TEXT("GDI&+ only backend"));
+	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->oversample ? MF_CHECKED : MF_UNCHECKED),
+		M_OVERSAMPLE, TEXT("O&versampling"));
+	if (!lpgw->gdiplus)
+		EnableMenuItem(lpgw->hPopMenu, M_OVERSAMPLE, MF_BYCOMMAND | MF_DISABLED);
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->antialiasing ? MF_CHECKED : MF_UNCHECKED),
 		M_ANTIALIASING, TEXT("&Antialiasing"));
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->polyaa ? MF_CHECKED : MF_UNCHECKED),
@@ -574,7 +576,7 @@ GraphInit(LPGW lpgw)
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->patternaa || lpgw->gdiplus ? MF_CHECKED : MF_UNCHECKED),
 		M_PATTERNAA, TEXT("Antialiasing of patt&erns"));
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->fastrotation ? MF_CHECKED : MF_UNCHECKED),
-		M_FASTROTATE, TEXT("Fast &rotation w/o antialiasing "));
+		M_FASTROTATE, TEXT("Fast &rotation w/o antialiasing"));
 	if (lpgw->gdiplus)
 		EnableMenuItem(lpgw->hPopMenu, M_PATTERNAA, MF_BYCOMMAND | MF_DISABLED);
 #endif
@@ -1014,6 +1016,7 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	cy = MulDiv(cx, 2 * GetDeviceCaps(hdc, LOGPIXELSY), 50 * GetDeviceCaps(hdc, LOGPIXELSX));
 	lpgw->vtic = MulDiv(cy, lpgw->ymax, lprect->bottom - lprect->top);
 	/* find out if we can rotate text 90deg */
+	SelectObject(hdc, lpgw->hfontv);  //  FIXME: FIXME
 	result = GetDeviceCaps(hdc, TEXTCAPS);
 	if ((result & TC_CR_90) || (result & TC_CR_ANY))
 		lpgw->rotate = TRUE;
@@ -1143,7 +1146,7 @@ static void
 dot(HDC hdc, int xdash, int ydash)
 {
 	MoveTo(hdc, xdash, ydash);
-	LineTo(hdc, xdash, ydash+1);
+	LineTo(hdc, xdash, ydash + 1);
 }
 
 
@@ -1849,7 +1852,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	lpgw->angle = 0;
 	SetFont(lpgw, hdc);
 	lpgw->justify = LEFT;
-	SetTextAlign(hdc, TA_LEFT|TA_TOP);
+	SetTextAlign(hdc, TA_LEFT | TA_TOP);
 	/* calculate text shift for horizontal text */
 	hshift = 0;
 	vshift = - lpgw->tmHeight / 2;  /* centered */
@@ -3169,10 +3172,10 @@ CopyPrint(LPGW lpgw)
 
 	/* Print Property Sheet Dialog */
 	memset(&pr, 0, sizeof(pr));
+	GetPlotRect(lpgw, &rect);
 	hdc = GetDC(hwnd);
-	GetClientRect(hwnd, &rect);
 	pr.pdef.x = MulDiv(rect.right - rect.left, 254, 10 * GetDeviceCaps(hdc, LOGPIXELSX));
-	pr.pdef.y = MulDiv(rect.bottom  - rect.top, 254, 10 * GetDeviceCaps(hdc, LOGPIXELSX));
+	pr.pdef.y = MulDiv(rect.bottom  - rect.top, 254, 10 * GetDeviceCaps(hdc, LOGPIXELSY));
 	pr.psize.x = -1; /* will be initialised to paper size whenever the printer driver changes */
 	pr.psize.y = -1;
 	ReleaseDC(hwnd, hdc);
@@ -3335,7 +3338,7 @@ WriteGraphIni(LPGW lpgw)
 	wsprintf(profile, TEXT("%d"), lpgw->doublebuffer);
 	WritePrivateProfileString(section, TEXT("GraphDoublebuffer"), profile, file);
 	wsprintf(profile, TEXT("%d"), lpgw->oversample);
-	WritePrivateProfileString(section, TEXT("GraphOversampling"), profile, file);
+	WritePrivateProfileString(section, TEXT("GraphGDI+Oversampling"), profile, file);
 	wsprintf(profile, TEXT("%d"), lpgw->gdiplus);
 	WritePrivateProfileString(section, TEXT("GraphGDI+"), profile, file);
 	wsprintf(profile, TEXT("%d"), lpgw->antialiasing);
@@ -3469,9 +3472,9 @@ ReadGraphIni(LPGW lpgw)
 		lpgw->doublebuffer = TRUE;
 
 	if (bOKINI)
-		GetPrivateProfileString(section, TEXT("GraphOversampling"), TEXT(""), profile, 80, file);
+		GetPrivateProfileString(section, TEXT("GraphGDI+Oversampling"), TEXT(""), profile, 80, file);
 	if ((p = GetInt(profile, (LPINT)&lpgw->oversample)) == NULL)
-		lpgw->oversample = FALSE;
+		lpgw->oversample = TRUE;
 
 	if (bOKINI)
 		GetPrivateProfileString(section, TEXT("GraphGDI+"), TEXT(""), profile, 80, file);
@@ -4416,17 +4419,17 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 						CheckMenuItem(lpgw->hPopMenu, M_DOUBLEBUFFER, MF_BYCOMMAND | MF_CHECKED);
 					else
 						CheckMenuItem(lpgw->hPopMenu, M_DOUBLEBUFFER, MF_BYCOMMAND | MF_UNCHECKED);
-					if (lpgw->oversample)
-						CheckMenuItem(lpgw->hPopMenu, M_OVERSAMPLE, MF_BYCOMMAND | MF_CHECKED);
-					else
-						CheckMenuItem(lpgw->hPopMenu, M_OVERSAMPLE, MF_BYCOMMAND | MF_UNCHECKED);
 #ifdef HAVE_GDIPLUS
+					CheckMenuItem(lpgw->hPopMenu, M_OVERSAMPLE, MF_BYCOMMAND | 
+						(lpgw->oversample && lpgw->gdiplus ? MF_CHECKED : MF_UNCHECKED));
 					if (lpgw->gdiplus) {
 						CheckMenuItem(lpgw->hPopMenu, M_GDIPLUS, MF_BYCOMMAND | MF_CHECKED);
 						EnableMenuItem(lpgw->hPopMenu, M_PATTERNAA, MF_BYCOMMAND | MF_DISABLED);
+						EnableMenuItem(lpgw->hPopMenu, M_OVERSAMPLE, MF_BYCOMMAND | MF_ENABLED);
 					} else {
 						CheckMenuItem(lpgw->hPopMenu, M_GDIPLUS, MF_BYCOMMAND | MF_UNCHECKED);
 						EnableMenuItem(lpgw->hPopMenu, M_PATTERNAA, MF_BYCOMMAND | MF_ENABLED);
+						EnableMenuItem(lpgw->hPopMenu, M_OVERSAMPLE, MF_BYCOMMAND | MF_DISABLED);
 					}
 					if (lpgw->gdiplus && lpgw->doublebuffer) {
 						EnableMenuItem(lpgw->hPopMenu, M_SAVE_AS_BITMAP, MF_BYCOMMAND | MF_ENABLED);
@@ -4461,7 +4464,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					MakeFonts(lpgw, (LPRECT)&rect, hdc);
 					ReleaseDC(hwnd, hdc);
 					GetClientRect(hwnd, &rect);
-					InvalidateRect(hwnd, (LPRECT) &rect, 1);
+					InvalidateRect(hwnd, &rect, 1);
 					UpdateWindow(hwnd);
 					return 0;
 			}
@@ -4575,7 +4578,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			HBITMAP oldbmp;
 			LONG width, height;
 			LONG wwidth, wheight;
-			int sampling;
+			const int sampling = 1;
 			RECT memrect;
 			RECT wrect;
 
@@ -4586,12 +4589,6 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			SetViewportExtEx(hdc, rect.right, rect.bottom, NULL);
 			/* double buffering */
 			if (lpgw->doublebuffer) {
-				/* choose oversampling */
-				if (lpgw->oversample)
-					sampling = 2; /* anything bigger than that makes the computer crawl ... */
-				else
-					sampling = 1;
-
 				/* Was the window resized? */
 				GetWindowRect(hwnd, &wrect);
 				wwidth =  wrect.right - wrect.left;
@@ -4600,7 +4597,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					RECT rect;
 					DestroyFonts(lpgw);
 					GetPlotRect(lpgw, &rect);
-					MakeFonts(lpgw, (LPRECT)&rect, hdc);
+					MakeFonts(lpgw, &rect, hdc);
 					lpgw->buffervalid = FALSE;
 				}
 

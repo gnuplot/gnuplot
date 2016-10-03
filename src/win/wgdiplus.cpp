@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.35 2016/09/23 14:05:58 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.36 2016/09/23 14:11:56 markisch Exp $
  */
 
 /*
@@ -46,7 +46,7 @@ extern "C" {
 #include "wcommon.h"
 using namespace Gdiplus;
 // do not use namespace std: otherwise MSVC complains about
-// ambiguous symbool bool
+// ambiguous symbol bool
 //using namespace std;
 
 static bool gdiplusInitialized = false;
@@ -59,9 +59,9 @@ const int pattern_num = 8;
 
 static Color gdiplusCreateColor(COLORREF color, double alpha);
 static Pen * gdiplusCreatePen(UINT style, float width, COLORREF color, double alpha);
-static void gdiplusPolyline(Graphics &graphics, Pen &pen, POINT *ppt, int polyi);
 static void gdiplusPolyline(Graphics &graphics, Pen &pen, Point *points, int polyi);
-static void gdiplusFilledPolygon(Graphics &graphics, Brush &brush, POINT *ppt, int polyi);
+static void gdiplusFilledPolygon(Graphics &graphics, Brush &brush, Point *points, int polyi);
+static void gdiplusFilledPolygon(Graphics &graphics, Brush &brush, PointF *points, int polyi);
 static Brush * gdiplusPatternBrush(int style, COLORREF color, double alpha, COLORREF backcolor, BOOL transparent);
 static void gdiplusDot(Graphics &graphics, Brush &brush, int x, int y);
 static Font * SetFont_gdiplus(Graphics &graphics, LPRECT rect, LPGW lpgw, LPTSTR fontname, int size);
@@ -281,31 +281,57 @@ gdiplusPolyline(Graphics &graphics, Pen &pen, Point *points, int polyi)
 }
 
 
-void
-gdiplusPolyline(Graphics &graphics, Pen &pen, POINT *ppt, int polyi)
+static void
+gdiplusPolyline(Graphics &graphics, Pen &pen, PointF *points, int polyi)
 {
-	Point * points = new Point[polyi];
-	for (int i = 0; i < polyi; i++) {
-		points[i].X = ppt[i].x;
-		points[i].Y = ppt[i].y;
+	// Dash patterns get scaled with line width, in contrast to GDI.
+	// Avoid smearing out caused by antialiasing for small line widths.
+	SmoothingMode mode = graphics.GetSmoothingMode();
+	if ((mode != SmoothingModeNone) && (pen.GetDashStyle() != DashStyleSolid) && (pen.GetWidth() < 2))
+		graphics.SetSmoothingMode(SmoothingModeNone);
+
+	bool all_vert_or_horz = true;
+	for (int i = 1; i < polyi; i++)
+		if (!((points[i - 1].X == points[i].X) ||
+		      (points[i - 1].Y == points[i].Y)))
+			all_vert_or_horz = false;
+
+	// if all lines are horizontal or vertical we snap to nearest pixel
+	// to avoid "blurry" lines
+	if (all_vert_or_horz) {
+		for (int i = 0; i < polyi; i++) {
+			points[i].X = INT(points[i].X + 0.5);
+			points[i].Y = INT(points[i].Y + 0.5);
+		}
 	}
-	gdiplusPolyline(graphics, pen, points, polyi);
-	delete [] points;
+
+	if ((points[0].X != points[polyi - 1].X) ||
+	    (points[0].Y != points[polyi - 1].Y))
+		graphics.DrawLines(&pen, points, polyi);
+	else
+		graphics.DrawPolygon(&pen, points, polyi - 1);
+
+	/* restore */
+	if (mode != SmoothingModeNone)
+		graphics.SetSmoothingMode(mode);
 }
 
 
 static void
-gdiplusFilledPolygon(Graphics &graphics, Brush &brush, POINT *ppt, int polyi)
+gdiplusFilledPolygon(Graphics &graphics, Brush &brush, PointF *points, int polyi)
 {
-	Point * points = new Point[polyi];
-	for (int i = 0; i < polyi; i++) {
-		points[i].X = ppt[i].x;
-		points[i].Y = ppt[i].y;
-	}
 	graphics.SetCompositingQuality(CompositingQualityGammaCorrected);
 	graphics.FillPolygon(&brush, points, polyi);
 	graphics.SetCompositingQuality(CompositingQualityDefault);
-	delete [] points;
+}
+
+
+static void
+gdiplusFilledPolygon(Graphics &graphics, Brush &brush, Point *points, int polyi)
+{
+	graphics.SetCompositingQuality(CompositingQualityGammaCorrected);
+	graphics.FillPolygon(&brush, points, polyi);
+	graphics.SetCompositingQuality(CompositingQualityDefault);
 }
 
 
@@ -546,9 +572,9 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 	/* polylines and polygons */
 	int polymax = 200;			/* size of ppt */
 	int polyi = 0;				/* number of points in ppt */
-	POINT * ppt;				/* storage of polyline/polygon-points */
+	PointF * ppt;				/* storage of polyline/polygon-points */
 	int last_polyi = 0;			/* number of points in last_poly */
-	POINT * last_poly = NULL;	/* storage of last filled polygon */
+	PointF * last_poly = NULL;	/* storage of last filled polygon */
 	unsigned int lastop = -1;	/* used for plotting last point on a line */
 
 	/* filled polygons and boxes */
@@ -581,10 +607,10 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 	bool ps_caching = false;
 
 	/* coordinates and lengths */
-	int xdash, ydash;			/* the transformed coordinates */
+	float xdash, ydash;			/* the transformed coordinates */
 	int rr, rl, rt, rb;			/* coordinates of drawing area */
 	int htic, vtic;				/* tic sizes */
-	int hshift, vshift;			/* correction of text position */
+	float hshift, vshift;			/* correction of text position */
 
 	/* indices */
 	int seq = 0;				/* sequence counter for W_image and W_boxedtext */
@@ -664,7 +690,7 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 					DashCapFlat);
 	solid_pen.SetLineJoin(lpgw->rounded ? LineJoinRound : LineJoinMiter);
 
-	ppt = (POINT *) LocalAllocPtr(LHND, (polymax + 1) * sizeof(POINT));
+	ppt = (PointF *) malloc((polymax + 1) * sizeof(PointF));
 
 	htic = (lpgw->org_pointsize * MulDiv(lpgw->htic, rr - rl, lpgw->xmax) + 1);
 	vtic = (lpgw->org_pointsize * MulDiv(lpgw->vtic, rb - rt, lpgw->ymax) + 1);
@@ -677,8 +703,8 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 	font = SetFont_gdiplus(graphics, rect, lpgw, NULL, 0);
 
 	/* calculate text shifting for horizontal text */
-	hshift = 0;
-	vshift = -lpgw->tmHeight / 2;
+	hshift = 0.0;
+	vshift = - lpgw->tmHeight / 2;
 
 	/* init layer variables */
 	lpgw->numplots = 0;
@@ -708,9 +734,14 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 		return;
 
 	while (ngwop < lpgw->nGWOP) {
-		/* transform the coordinates */
-		xdash = MulDiv(curptr->x, rr-rl-1, lpgw->xmax) + rl;
-		ydash = MulDiv(curptr->y, rt-rb+1, lpgw->ymax) + rb - 1;
+		// transform the coordinates
+		if (lpgw->oversample) {
+			xdash = float(curptr->x) * (rr - rl) / float(lpgw->xmax);
+			ydash = float(curptr->y) * (rt - rb) / float(lpgw->ymax) + rb;
+		} else {
+			xdash = MulDiv(curptr->x, rr - rl, lpgw->xmax) + rl;
+			ydash = MulDiv(curptr->y, rt - rb, lpgw->ymax) + rb;
+		}
 
 		/* finish last filled polygon */
 		if ((last_poly != NULL) &&
@@ -806,10 +837,10 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 			/* point symbols */
 			if ((curptr->op >= W_dot) && (curptr->op <= W_dot + WIN_POINT_TYPES)) {
 				RECT rect;
-				rect.left = xdash - htic;
-				rect.right = xdash + htic;
-				rect.top = ydash - vtic;
-				rect.bottom = ydash + vtic;
+				rect.left = xdash - htic - 0.5;
+				rect.right = xdash + htic + 0.5;
+				rect.top = ydash - vtic - 0.5;
+				rect.bottom = ydash + vtic + 0.5;
 				add_tooltip(lpgw, &rect, hypertext);
 				hypertext = NULL;
 			}
@@ -825,11 +856,16 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 		case W_polyline: {
 			POINTL * poly = (POINTL *) LocalLock(curptr->htext);
 			polyi = curptr->x;
-			Point * points = new Point[polyi];
+			PointF * points = new PointF[polyi];
 			for (int i = 0; i < polyi; i++) {
-				/* transform the coordinates */
-				points[i].X = MulDiv(poly[i].x, rr-rl-1, lpgw->xmax) + rl;
-				points[i].Y = MulDiv(poly[i].y, rt-rb+1, lpgw->ymax) + rb - 1;
+				// transform the coordinates
+				if (lpgw->oversample) {
+					points[i].X = float(poly[i].x) * (rr - rl) / float(lpgw->xmax) + rl;
+					points[i].Y = float(poly[i].y) * (rt - rb) / float(lpgw->ymax) + rb;
+				} else {
+					points[i].X = MulDiv(poly[i].x, rr - rl, lpgw->xmax) + rl;
+					points[i].Y = MulDiv(poly[i].y, rt - rb, lpgw->ymax) + rb;
+				}
 			}
 			LocalUnlock(poly);
 			gdiplusPolyline(graphics, pen, points, polyi);
@@ -938,15 +974,21 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 					}
 					RectF size;
 					int dxl, dxr;
-					graphics.MeasureString(textw, -1, font, PointF(0,0), &size);
-					if (lpgw->justify == LEFT) {
-						dxl = 0;
-						dxr = size.Width;
-					} else if (lpgw->justify == CENTRE) {
-						dxl = dxr = size.Width / 2;
-					} else {
-						dxl = size.Width;
-						dxr = 0;
+#ifndef EAM_BOXED_TEXT
+					if (keysample) {
+#else
+					if (keysample || boxedtext.boxing) {
+#endif
+						graphics.MeasureString(textw, -1, font, PointF(0,0), &size);
+						if (lpgw->justify == LEFT) {
+							dxl = 0;
+							dxr = size.Width + 0.5;
+						} else if (lpgw->justify == CENTRE) {
+							dxl = dxr = size.Width / 2;
+						} else {
+							dxl = size.Width + 0.5;
+							dxr = 0;
+						}
 					}
 					if (keysample) {
 						draw_update_keybox(lpgw, plotno, xdash - dxl, ydash - size.Height / 2);
@@ -1082,37 +1124,37 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 						graphics.FillRectangle(&solid_brush, rect);
 					}
 				} else {
-					double theta = boxedtext.angle * M_PI/180.;
-					double sin_theta = sin(theta);
-					double cos_theta = cos(theta);
-					POINT  rect[5];
+					float theta = boxedtext.angle * M_PI / 180.;
+					float sin_theta = sin(theta);
+					float cos_theta = cos(theta);
+					PointF rect[5];
 
-					rect[0].x =  (boxedtext.box.left   - dx) * cos_theta +
+					rect[0].X =  (boxedtext.box.left   - dx) * cos_theta +
 								 (boxedtext.box.top    - dy) * sin_theta;
-					rect[0].y = -(boxedtext.box.left   - dx) * sin_theta +
+					rect[0].Y = -(boxedtext.box.left   - dx) * sin_theta +
 								 (boxedtext.box.top    - dy) * cos_theta;
-					rect[1].x =  (boxedtext.box.left   - dx) * cos_theta +
+					rect[1].X =  (boxedtext.box.left   - dx) * cos_theta +
 								 (boxedtext.box.bottom + dy) * sin_theta;
-					rect[1].y = -(boxedtext.box.left   - dx) * sin_theta +
+					rect[1].Y = -(boxedtext.box.left   - dx) * sin_theta +
 								 (boxedtext.box.bottom + dy) * cos_theta;
-					rect[2].x =  (boxedtext.box.right  + dx) * cos_theta +
+					rect[2].X =  (boxedtext.box.right  + dx) * cos_theta +
 								 (boxedtext.box.bottom + dy) * sin_theta;
-					rect[2].y = -(boxedtext.box.right  + dx) * sin_theta +
+					rect[2].Y = -(boxedtext.box.right  + dx) * sin_theta +
 								 (boxedtext.box.bottom + dy) * cos_theta;
-					rect[3].x =  (boxedtext.box.right  + dx) * cos_theta +
+					rect[3].X =  (boxedtext.box.right  + dx) * cos_theta +
 								 (boxedtext.box.top    - dy) * sin_theta;
-					rect[3].y = -(boxedtext.box.right  + dx) * sin_theta +
+					rect[3].Y = -(boxedtext.box.right  + dx) * sin_theta +
 								 (boxedtext.box.top    - dy) * cos_theta;
 					for (int i = 0; i < 4; i++) {
-						rect[i].x += boxedtext.start.x;
-						rect[i].y += boxedtext.start.y;
+						rect[i].X += boxedtext.start.x;
+						rect[i].Y += boxedtext.start.y;
 					}
 					if (boxedtext.option == TEXTBOX_OUTLINE) {
-						rect[4].x = rect[0].x;
-						rect[4].y = rect[0].y;
+						rect[4].X = rect[0].X;
+						rect[4].Y = rect[0].Y;
 						gdiplusPolyline(graphics, pen, rect, 5);
 					} else {
-						gdiplusSolidFilledPolygonEx(hdc, rect, 4, last_color, alpha_c, TRUE);
+						gdiplusFilledPolygon(graphics, *fill_brush, rect, 4);
 					}
 				}
 				boxedtext.boxing = FALSE;
@@ -1202,8 +1244,9 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 		}
 
 		case W_move:
-			ppt[0].x = xdash;
-			ppt[0].y = ydash;
+			// This is used for filled boxes only.
+			ppt[0].X = xdash;
+			ppt[0].Y = ydash;
 			break;
 
 		case W_boxfill: {
@@ -1211,17 +1254,20 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 			 * lower right corner of the box. The upper left corner was stored into
 			 * ppt[0] by a preceding W_move, and the style was set
 			 * by a W_fillstyle call. */
-			POINT p;
-			UINT  height, width;
+			// snap to pixel grid
+			Point p1(xdash + 0.5, ydash + 0.5);
+			Point p2(ppt[0].X + 0.5, ppt[0].Y + 0.5);
+			Point p;
+			int height, width;
 
-			p.x = GPMIN(ppt[0].x, xdash);
-			p.y = GPMIN(ppt[0].y, ydash);
-			width = abs(xdash - ppt[0].x);
-			height = abs(ppt[0].y - ydash);
+			p.X = GPMIN(p1.X, p2.X);
+			p.Y = GPMIN(p1.Y, p2.Y);
+			width = abs(p2.X - p1.X);
+			height = abs(p1.Y - p2.Y);
 
 			SmoothingMode mode = graphics.GetSmoothingMode();
 			graphics.SetSmoothingMode(SmoothingModeNone);
-			graphics.FillRectangle(fill_brush, (INT) p.x, p.y, width, height);
+			graphics.FillRectangle(fill_brush, p.X, p.Y, width, height);
 			graphics.SetSmoothingMode(mode);
 			if (keysample)
 				draw_update_keybox(lpgw, plotno, xdash + 1, ydash);
@@ -1233,8 +1279,8 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 			if (lpgw->angle != (int)curptr->x) {
 				lpgw->angle = (int)curptr->x;
 				/* recalculate shifting of rotated text */
-				hshift = - sin(M_PI/180. * lpgw->angle) * lpgw->tmHeight / 2.;
-				vshift = - cos(M_PI/180. * lpgw->angle) * lpgw->tmHeight / 2.;
+				hshift = - sin(M_PI / 180. * lpgw->angle) * lpgw->tmHeight / 2.;
+				vshift = - cos(M_PI / 180. * lpgw->angle) * lpgw->tmHeight / 2.;
 			}
 			break;
 
@@ -1267,16 +1313,16 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 #endif
 			LocalUnlock(curptr->htext);
 			/* recalculate shifting of rotated text */
-			hshift = - sin(M_PI/180. * lpgw->angle) * lpgw->tmHeight / 2.;
-			vshift = - cos(M_PI/180. * lpgw->angle) * lpgw->tmHeight / 2.;
+			hshift = - sin(M_PI / 180. * lpgw->angle) * lpgw->tmHeight / 2.;
+			vshift = - cos(M_PI / 180. * lpgw->angle) * lpgw->tmHeight / 2.;
 			break;
 		}
 
 		case W_pointsize:
 			if (curptr->x > 0) {
 				double pointsize = curptr->x / 100.0;
-				htic = pointsize * MulDiv(lpgw->htic, rr-rl, lpgw->xmax) + 1;
-				vtic = pointsize * MulDiv(lpgw->vtic, rb-rt, lpgw->ymax) + 1;
+				htic = pointsize * MulDiv(lpgw->htic, rr - rl, lpgw->xmax) + 1;
+				vtic = pointsize * MulDiv(lpgw->vtic, rb - rt, lpgw->ymax) + 1;
 			} else {
 				htic = vtic = 0;
 			}
@@ -1345,10 +1391,10 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 			/* a point of the polygon is coming */
 			if (polyi >= polymax) {
 				polymax += 200;
-				ppt = (POINT *) LocalReAllocPtr(ppt, LHND, (polymax + 1) * sizeof(POINT));
+				ppt = (PointF *) realloc(ppt, (polymax + 1) * sizeof(PointF));
 			}
-			ppt[polyi].x = xdash;
-			ppt[polyi].y = ydash;
+			ppt[polyi].X = xdash;
+			ppt[polyi].Y = ydash;
 			polyi++;
 			break;
 		}
@@ -1363,16 +1409,16 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 				// Check for a common edge with previous filled polygon.
 				for (i = 0; (i < polyi) && !found; i++) {
 					for (k = 0; (k < last_polyi) && !found; k++) {
-						if ((ppt[i].x == last_poly[k].x) && (ppt[i].y == last_poly[k].y)) {
-							if ((ppt[(i + 1) % polyi].x == last_poly[(k + 1) % last_polyi].x) &&
-							    (ppt[(i + 1) % polyi].y == last_poly[(k + 1) % last_polyi].y)) {
+						if ((ppt[i].X == last_poly[k].X) && (ppt[i].Y == last_poly[k].Y)) {
+							if ((ppt[(i + 1) % polyi].X == last_poly[(k + 1) % last_polyi].X) &&
+							    (ppt[(i + 1) % polyi].Y == last_poly[(k + 1) % last_polyi].Y)) {
 								//found = true;
 								//same_rot = true;
 							}
 							// This is the dominant case for filling between curves,
 							// see fillbetween.dem and polar.dem.
-							if ((ppt[(i + 1) % polyi].x == last_poly[(k + last_polyi - 1) % last_polyi].x) &&
-							    (ppt[(i + 1) % polyi].y == last_poly[(k + last_polyi - 1) % last_polyi].y)) {
+							if ((ppt[(i + 1) % polyi].X == last_poly[(k + last_polyi - 1) % last_polyi].X) &&
+							    (ppt[(i + 1) % polyi].Y == last_poly[(k + last_polyi - 1) % last_polyi].Y)) {
 								found = true;
 								//same_rot = false;
 							}
@@ -1387,16 +1433,16 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 
 				int extra = polyi - 2;
 				// extend buffer to make room for extra points
-				last_poly = (POINT *) realloc(last_poly, (last_polyi + extra + 1) * sizeof(POINT));
+				last_poly = (PointF *) realloc(last_poly, (last_polyi + extra + 1) * sizeof(PointF));
 				/* TODO: should use memmove instead */
 				for (int n = last_polyi - 1; n >= k; n--) {
-					last_poly[n + extra].x = last_poly[n].x;
-					last_poly[n + extra].y = last_poly[n].y;
+					last_poly[n + extra].X = last_poly[n].X;
+					last_poly[n + extra].Y = last_poly[n].Y;
 				}
 				// copy new points
 				for (int n = 0; n < extra; n++) {
-					last_poly[k + n].x = ppt[(i + 2 + n) % polyi].x;
-					last_poly[k + n].y = ppt[(i + 2 + n) % polyi].y;
+					last_poly[k + n].X = ppt[(i + 2 + n) % polyi].X;
+					last_poly[k + n].Y = ppt[(i + 2 + n) % polyi].Y;
 				}
 				last_polyi += extra;
 			} else {
@@ -1409,8 +1455,8 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 					free(last_poly);
 				}
 				// save the current polygon
-				last_poly = (POINT *) malloc(sizeof(POINT) * (polyi + 1));
-				memcpy(last_poly, ppt, sizeof(POINT) * (polyi + 1));
+				last_poly = (PointF *) malloc(sizeof(PointF) * (polyi + 1));
+				memcpy(last_poly, ppt, sizeof(PointF) * (polyi + 1));
 				last_polyi = polyi;
 			}
 
@@ -1425,8 +1471,8 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 				color_mode = curptr->x;
 			} else if (seq < 5) {
 				/* Next four OPs contain the `corner` array */
-				corners[seq - 1].x = xdash;
-				corners[seq - 1].y = ydash;
+				corners[seq - 1].x = xdash + 0.5;
+				corners[seq - 1].y = ydash + 0.5;
 			} else {
 				/* The last OP contains the image and it's size */
 				char * image = (char *) LocalLock(curptr->htext);
@@ -1508,7 +1554,11 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 
 			// draw cached point symbol
 			if ((last_symbol == curptr->op) && (cb != NULL)) {
-				graphics.DrawCachedBitmap(cb, xdash - cb_ofs.x, ydash - cb_ofs.y);
+				// always draw point symbols on integer (pixel) positions
+				if (lpgw->oversample)
+					graphics.DrawCachedBitmap(cb, INT(xdash + 0.5) - cb_ofs.x, INT(ydash + 0.5) - cb_ofs.y);
+				else
+					graphics.DrawCachedBitmap(cb, xdash - cb_ofs.x, ydash - cb_ofs.y);
 				break;
 			} else {
 				if (cb != NULL) {
@@ -1525,17 +1575,23 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 			// Switch between cached and direct drawing
 			if (ps_caching) {
 				// Create a compatible bitmap
-				b = new Bitmap(2*htic+3, 2*vtic+3);
+				b = new Bitmap(2 * htic + 3, 2 * vtic + 3);
 				g = Graphics::FromImage(b);
 				if (lpgw->antialiasing)
 					g->SetSmoothingMode(SmoothingModeAntiAlias8x8);
-				cb_ofs.x = xofs = htic+1;
-				cb_ofs.y = yofs = vtic+1;
+				cb_ofs.x = xofs = htic + 1;
+				cb_ofs.y = yofs = vtic + 1;
 				last_symbol = curptr->op;
 			} else {
 				g = &graphics;
-				xofs = xdash;
-				yofs = ydash;
+				// snap to pixel
+				if (lpgw->oversample) {
+					xofs = xdash + 0.5;
+					yofs = ydash + 0.5;
+				} else {
+					xofs = xdash;
+					yofs = ydash;
+				}
 			}
 
 			switch (curptr->op) {
@@ -1558,7 +1614,7 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 				g->FillEllipse(&solid_brush, xofs - htic, yofs - htic, 2 * htic, 2 * htic);
 				break;
 			default: {	/* potentially closed figure */
-				POINT p[6];
+				Point p[6];
 				int i;
 				int shape = 0;
 				int filled = 0;
@@ -1590,16 +1646,16 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 					if (pointshapes[shape][i * 2 + 1] == 0
 						&& pointshapes[shape][i * 2] == 0)
 						break;
-					p[i].x = xofs + htic * pointshapes[shape][i * 2] + 0.5;
-					p[i].y = yofs + vtic * pointshapes[shape][i * 2 + 1] + 0.5;
+					p[i].X = xofs + htic * pointshapes[shape][i * 2] + 0.5;
+					p[i].Y = yofs + vtic * pointshapes[shape][i * 2 + 1] + 0.5;
 				}
 				if (filled) {
 					/* filled polygon with border */
 					gdiplusFilledPolygon(*g, solid_brush, p, i);
 				} else {
 					/* Outline polygon */
-					p[i].x = p[0].x;
-					p[i].y = p[0].y;
+					p[i].X = p[0].X;
+					p[i].Y = p[0].Y;
 					gdiplusPolyline(*g, solid_pen, p, i + 1);
 					gdiplusDot(*g, solid_brush, xofs, yofs);
 				}
@@ -1609,8 +1665,11 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 			if (b != NULL) {
 				// create a chached bitmap for faster redrawing
 				cb = new CachedBitmap(b, &graphics);
-				// display bitmap
-				graphics.DrawCachedBitmap(cb, xdash - xofs, ydash - yofs);
+				// display point symbol snapped to pixel
+				if (lpgw->oversample)
+					graphics.DrawCachedBitmap(cb, INT(xdash + 0.5) - xofs, INT(ydash + 0.5) - yofs);
+				else
+					graphics.DrawCachedBitmap(cb, xdash - xofs, ydash - yofs);
 				delete b;
 				delete g;
 			}
@@ -1650,7 +1709,7 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 		delete cb;
 	if (font)
 		delete font;
-	LocalFreePtr(ppt);
+	free(ppt);
 }
 
 
