@@ -1,3 +1,10 @@
+2016-10-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/win/wprinter.c: Has to include syscfg.h if definition of
+	WINVER in there is to make any difference.
+
+	* src/win/wpause.c: Dito.
+
 2016-10-03 Allin Cottrell  <cottrell@wfu.edu>
 
 	* src/win/wprinter.c:  Cross-compilation requires lower case include
@@ -16,14 +23,14 @@
 
 2016-10-01  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/term.c (enhanced_recursion):
-	The enhanced text code was eating any whitespace that followed an opening '{'.
-	While this may not be noticeable in most cases, it breaks using the &{space}
-	syntax to create or reproduce blank space in an enhanced text string.
-	Possibly the idea was to allow  "{  /FontName text-in-new-font }" but the
-	documentation has specifically disallowed this for many years.
-	Remove the offending loop that eats whitespace.
-	Bug #1863
+	* src/term.c (enhanced_recursion): The enhanced text code was
+	eating any whitespace that followed an opening '{'.  While this
+	may not be noticeable in most cases, it breaks using the &{space}
+	syntax to create or reproduce blank space in an enhanced text
+	string.  Possibly the idea was to allow "{ /FontName
+	text-in-new-font }" but the documentation has specifically
+	disallowed this for many years.  Remove the offending loop that
+	eats whitespace.  Bug #1863
 
 	* src/boundary.c: Revised placement of x2label.
 
@@ -37,12 +44,12 @@
 
 2016-09-28  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/mousecmn.h src/qtterminal/qt_term.cpp 
-	src/qtterminal/QtGnuplotEvent.h src/qtterminal/QtGnuplotWindow.cpp|h:
-	Enable space-raises-console and terminal option "raise" for qt on
-	Windows.  Since gnuplot and the qt terminal are realized as two
-	different processes, the currently active process has to allow the other
-	to "raise" itself.
+	* src/mousecmn.h src/qtterminal/qt_term.cpp
+	src/qtterminal/QtGnuplotEvent.h
+	src/qtterminal/QtGnuplotWindow.cpp|h: Enable space-raises-console
+	and terminal option "raise" for qt on Windows.  Since gnuplot and
+	the qt terminal are realized as two different processes, the
+	currently active process has to allow the other to "raise" itself.
 
 	* src/win/winmain.c:  Change only the state of minimised windows when
 	raising text or graph windows.  In particular that does leave

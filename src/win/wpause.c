@@ -1,5 +1,5 @@
 /*
- * $Id: wpause.c,v 1.35 2016/05/18 08:15:01 markisch Exp $
+ * $Id: wpause.c,v 1.36 2016/05/18 08:22:30 markisch Exp $
  */
 
 /* GNUPLOT - win/wpause.c */
@@ -44,9 +44,7 @@
 /* MessageBox ALWAYS appears in the middle of the screen so instead */
 /* we use this PauseBox so we can decide where it is to be placed */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
+#include "syscfg.h"
 
 #define STRICT
 #include <windows.h>
