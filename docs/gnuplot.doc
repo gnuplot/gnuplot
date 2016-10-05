@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1023 2016/09/19 04:40:30 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1024 2016/09/21 20:57:04 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3343,12 +3343,12 @@ Ffigure_boxplot
  These default properties may be changed using the `set style boxplot` command.
  See `set style boxplot`, `bars`, `boxwidth`, `fillstyle`, `candlesticks`.
 
-2 boxxyerrorbars
-?plotting styles boxxyerrorbars
-?style boxxyerrorbars
-?boxxyerrorbars
-Ffigure_boxxyerrorbars
- The `boxxyerrorbars` style is only relevant to 2D data plotting.  It is similar
+2 boxxyerror
+?plotting styles boxxyerror
+?style boxxyerror
+?boxxyerror
+Ffigure_boxxyerror
+ The `boxxyerror` style is only relevant to 2D data plotting.  It is similar
  to the `xyerrorbars` style except that it draws rectangular areas rather than
  simple crosses.  It uses either 4 or 6 basic columns of input data.
  Additional input columns may be used to provide information such as
@@ -3361,6 +3361,9 @@ Ffigure_boxxyerrorbars
  way as they are for the `xyerrorbars` style---either from xlow to xhigh and
  from ylow to yhigh, or from x-xdelta to x+xdelta and from y-ydelta to
  y+ydelta, depending on how many data columns are provided.
+
+ The 6 column form of the command provides a convenient way to plot rectangles
+ with arbitraty x and y bounds.
 
  An additional (5th or 7th) input column may be used to provide variable 
  (per-datapoint) color information (see `linecolor` and `rgbcolor variable`).
@@ -7107,7 +7110,7 @@ Ffigure_jitter
  or
       boxes            boxplot        ellipses       image
       boxerrorbars     candlesticks   filledcurves   rgbimage
-      boxxyerrorbars   circles        histograms     rgbalpha   pm3d
+      boxxyerror       circles        histograms     rgbalpha   pm3d
  or
       table
 

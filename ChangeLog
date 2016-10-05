@@ -1,3 +1,9 @@
+2016-10-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc docs/plotstyles.gnu src/save.c:  Refer to the plot
+	style as "boxxyerror" rather than "boxxyerrorbars" to reduce confusion
+	arising from the style not drawing bars of any sort.
+
 2016-10-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/win/wprinter.c: Has to include syscfg.h if definition of

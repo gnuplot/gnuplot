@@ -127,7 +127,7 @@ plot demo . 'candlesticks.dat' using 1:4:3:5 with yerrorlines title 'with yerror
 #
 set output out . 'figure_boxxyerrorbars' . ext
 plot demo . 'candlesticks.dat' using 1:4:($1-sin($1)/2.):($1+sin($1)/2.):3:5 \
-     with boxxyerrorbars title 'with boxxyerrorbars' fs empty
+     with boxxyerror title 'with boxxyerror' fs empty
 #
 set output out . 'figure_xyerrorbars' . ext
 plot demo . 'candlesticks.dat' using 1:4:($1-sin($1)/2.):($1+sin($1)/2.):3:5 \
