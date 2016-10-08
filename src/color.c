@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.122 2016/08/25 20:07:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.123 2016/09/28 03:34:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -645,11 +645,15 @@ draw_color_smooth_box(int plot_mode)
 	color_box.bounds.ybot = tmp;
     }
 
+    term->layer(TERM_LAYER_BEGIN_COLORBOX);
+
     /* The PostScript terminal has an Optimized version */
     if ((term->flags & TERM_IS_POSTSCRIPT) != 0)
 	draw_inside_color_smooth_box_postscript();
     else
 	draw_inside_color_smooth_box_bitmap();
+
+    term->layer(TERM_LAYER_END_COLORBOX);
 
     if (color_box.border) {
 	/* now make boundary around the colour box */

@@ -1,5 +1,7 @@
 2016-10-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/color.c src/term_api.h:  Add layer calls for color box.
+
 	* src/win/wgdiplus.cpp (W_image):  Draw images with GDI+ using nearest
 	neighbour interpolation.
 

@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.147 2016/02/29 07:07:15 sfeam Exp $
+ * $Id: term_api.h,v 1.148 2016/04/01 16:19:41 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -204,6 +204,8 @@ typedef enum termlayer {
 	TERM_LAYER_END_PM3D_MAP,
 	TERM_LAYER_BEGIN_IMAGE,
 	TERM_LAYER_END_IMAGE,
+	TERM_LAYER_BEGIN_COLORBOX,
+	TERM_LAYER_END_COLORBOX,
 	TERM_LAYER_3DPLOT
 } t_termlayer;
 
