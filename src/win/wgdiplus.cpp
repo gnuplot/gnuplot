@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.37 2016/10/03 17:27:43 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.38 2016/10/08 19:46:10 markisch Exp $
  */
 
 /*
@@ -584,6 +584,8 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 	bool transparent = false;	/* transparent fill? */
 	Brush * pattern_brush = NULL;
 	Brush * fill_brush = NULL;
+	Bitmap * poly_bitmap = NULL;
+	Graphics * poly_graphics = NULL;
 
 	/* images */
 	POINT corners[4];			/* image corners */
@@ -747,11 +749,16 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 		if ((last_poly != NULL) &&
 			(((lastop == W_filled_polygon_draw) && (curptr->op != W_fillstyle)) ||
 			 ((curptr->op == W_fillstyle) && (curptr->x != unsigned(last_fillstyle))))) {
-			SmoothingMode mode = graphics.GetSmoothingMode();
-			if (lpgw->antialiasing && !lpgw->polyaa)
-				graphics.SetSmoothingMode(SmoothingModeNone);
-			gdiplusFilledPolygon(graphics, *fill_brush, last_poly, last_polyi);
-			graphics.SetSmoothingMode(mode);
+			if (poly_graphics == NULL) {
+				// changing smoothing mode is necessary in case of new/unknown code paths
+				SmoothingMode mode = graphics.GetSmoothingMode();
+				if (lpgw->antialiasing && !lpgw->polyaa)
+					graphics.SetSmoothingMode(SmoothingModeNone);
+				gdiplusFilledPolygon(graphics, *fill_brush, last_poly, last_polyi);
+				graphics.SetSmoothingMode(mode);
+			} else {
+				gdiplusFilledPolygon(*poly_graphics, *fill_brush, last_poly, last_polyi);
+			}
 			last_polyi = 0;
 			free(last_poly);
 			last_poly = NULL;
@@ -772,7 +779,7 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 							lpgw->hideplot[idx] = FALSE;
 					}
 					if (plotno <= lpgw->maxhideplots)
-						skipplot = (lpgw->hideplot[plotno - 1] == TRUE);
+						skipplot = (lpgw->hideplot[plotno - 1] > 0);
 					break;
 				case TERM_LAYER_AFTER_PLOT:
 					skipplot = false;
@@ -810,14 +817,38 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 					plotno = 0;
 					break;
 				case TERM_LAYER_BEGIN_PM3D_MAP:
+					// Antialiasing of pm3d polygons is obtained by drawing to
+					// bitmap four times as large and copying it back with interpolation
+					if (lpgw->antialiasing && lpgw->polyaa) {
+						float scale = 2.f;
+						poly_bitmap = new Bitmap(scale * (rr - rl), scale * (rb - rt), &graphics);
+						poly_graphics = Graphics::FromImage(poly_bitmap);
+						poly_graphics->SetSmoothingMode(SmoothingModeNone);
+						Matrix transform(scale, 0.0f, 0.0f, scale, 0.0f, 0.0f);
+						poly_graphics->SetTransform(&transform);
+					}
+					break;
+				case TERM_LAYER_END_PM3D_MAP:
+					if (poly_graphics != NULL) {
+						delete poly_graphics;
+						poly_graphics = NULL;
+						graphics.SetInterpolationMode(InterpolationModeHighQualityBilinear);
+						graphics.SetPixelOffsetMode(PixelOffsetModeHighQuality);
+						graphics.DrawImage(poly_bitmap, 0, 0, rr - rl, rb - rt);
+						graphics.SetInterpolationMode(InterpolationModeNearestNeighbor);
+						graphics.SetPixelOffsetMode(PixelOffsetModeNone);
+						delete poly_bitmap;
+					}
+					break;
 				case TERM_LAYER_BEGIN_IMAGE:
-					// antialiasing is not supported properly for pm3d polygons
-					// and failsafe images
+				case TERM_LAYER_BEGIN_COLORBOX:
+					// Turn of antialiasing for failsafe/pixel images and color boxes
+					// to avoid seams.
 					if (lpgw->antialiasing)
 						graphics.SetSmoothingMode(SmoothingModeNone);
 					break;
-				case TERM_LAYER_END_PM3D_MAP:
 				case TERM_LAYER_END_IMAGE:
+				case TERM_LAYER_END_COLORBOX:
 					if (lpgw->antialiasing)
 						graphics.SetSmoothingMode(SmoothingModeAntiAlias8x8);
 					break;
@@ -868,7 +899,10 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 				}
 			}
 			LocalUnlock(poly);
-			gdiplusPolyline(graphics, pen, points, polyi);
+			if (poly_graphics == NULL)
+				gdiplusPolyline(graphics, pen, points, polyi);
+			else
+				gdiplusPolyline(*poly_graphics, pen, points, polyi);
 			if (keysample) {
 				draw_update_keybox(lpgw, plotno, points[0].X, points[0].Y);
 				draw_update_keybox(lpgw, plotno, points[polyi - 1].X, points[polyi - 1].Y);
@@ -1447,11 +1481,16 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 				last_polyi += extra;
 			} else {
 				if (last_poly != NULL) {
-					SmoothingMode mode = graphics.GetSmoothingMode();
-					if (lpgw->antialiasing && !lpgw->polyaa)
-						graphics.SetSmoothingMode(SmoothingModeNone);
-					gdiplusFilledPolygon(graphics, *fill_brush, last_poly, last_polyi);
-					graphics.SetSmoothingMode(mode);
+					if (poly_graphics == NULL) {
+						// changing smoothing mode is still necessary in case of new/unknown code paths
+						SmoothingMode mode = graphics.GetSmoothingMode();
+						if (lpgw->antialiasing && !lpgw->polyaa)
+							graphics.SetSmoothingMode(SmoothingModeNone);
+						gdiplusFilledPolygon(graphics, *fill_brush, last_poly, last_polyi);
+						graphics.SetSmoothingMode(mode);
+					} else {
+						gdiplusFilledPolygon(*poly_graphics, *fill_brush, last_poly, last_polyi);
+					}
 					free(last_poly);
 				}
 				// save the current polygon

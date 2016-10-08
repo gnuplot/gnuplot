@@ -1,5 +1,9 @@
 2016-10-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgdiplus.cpp:  Enable antialiasing for polygons without
+	seams:  Draw a run of filled polygons to a bitmap four times as large
+	as the canvas and scale down with interpolation.
+
 	* src/color.c src/term_api.h:  Add layer calls for color box.
 
 	* src/win/wgdiplus.cpp (W_image):  Draw images with GDI+ using nearest
