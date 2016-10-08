@@ -1,3 +1,8 @@
+2016-10-08  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c (drawgraph):  Missed to recreate the brush in case
+	of fractional solid fill was requested. Bugfix.
+
 2016-10-06  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc:  Fill in missing function definitions for "help"
