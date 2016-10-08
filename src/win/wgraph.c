@@ -564,16 +564,21 @@ GraphInit(LPGW lpgw)
 	//	M_DOUBLEBUFFER, TEXT("&Double buffer"));
 #ifdef HAVE_GDIPLUS
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->gdiplus ? MF_CHECKED : MF_UNCHECKED),
-		M_GDIPLUS, TEXT("GDI&+ backend"));
+		M_GDIPLUS, TEXT("GDI&+ only backend"));
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->oversample ? MF_CHECKED : MF_UNCHECKED),
 		M_OVERSAMPLE, TEXT("O&versampling"));
-	if (!lpgw->gdiplus) {
-		//EnableMenuItem(lpgw->hPopMenu, M_OVERSAMPLE, MF_BYCOMMAND | MF_GRAYED);
-	}
+	if (!lpgw->gdiplus)
+		EnableMenuItem(lpgw->hPopMenu, M_OVERSAMPLE, MF_BYCOMMAND | MF_DISABLED);
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->antialiasing ? MF_CHECKED : MF_UNCHECKED),
 		M_ANTIALIASING, TEXT("&Antialiasing"));
+	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->polyaa ? MF_CHECKED : MF_UNCHECKED),
+		M_POLYAA, TEXT("Antialiasing of pol&ygons"));
+	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->patternaa || lpgw->gdiplus ? MF_CHECKED : MF_UNCHECKED),
+		M_PATTERNAA, TEXT("Antialiasing of patt&erns"));
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->fastrotation ? MF_CHECKED : MF_UNCHECKED),
 		M_FASTROTATE, TEXT("Fast &rotation w/o antialiasing"));
+	if (lpgw->gdiplus)
+		EnableMenuItem(lpgw->hPopMenu, M_PATTERNAA, MF_BYCOMMAND | MF_DISABLED);
 #endif
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_BACKGROUND, TEXT("&Background..."));
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_CHOOSE_FONT, TEXT("&Font..."));
@@ -962,33 +967,33 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	lpgw->lf.lfOutPrecision = OUT_OUTLINE_PRECIS;
 	lpgw->lf.lfClipPrecision = CLIP_DEFAULT_PRECIS;
 	/* ClearType quality is only supported on XP or later */
-	// FIXME: What to use for printers / metafiles? How to switch?
-	lpgw->lf.lfQuality = CLEARTYPE_QUALITY; // PROOF_QUALITY // ANTIALIASED_QUALITY
+	lpgw->lf.lfQuality =
+		IsWindowsXPorLater() && lpgw->antialiasing ? CLEARTYPE_QUALITY : PROOF_QUALITY;
 
 	if (!TryCreateFont(lpgw, NULL, hdc)) {
-		//static const char warn_font_not_available[] =
-		//	"Warning:  font \"" TCHARFMT "\" not available, trying \"" TCHARFMT "\" instead.\n";
-		//static const char err_giving_up[] = "Error:  could not substitute another font. Giving up.\n";
+		static const char warn_font_not_available[] =
+			"Warning:  font \"" TCHARFMT "\" not available, trying \"" TCHARFMT "\" instead.\n";
+		static const char err_giving_up[] = "Error:  could not substitute another font. Giving up.\n";
 		if (_tcscmp(lpgw->fontname, lpgw->deffontname) != 0) {
-			//fprintf(stderr, warn_font_not_available, lpgw->fontname, lpgw->deffontname);
+			fprintf(stderr, warn_font_not_available, lpgw->fontname, lpgw->deffontname);
 			if (!TryCreateFont(lpgw, lpgw->deffontname, hdc)) {
 				if (_tcscmp(lpgw->deffontname, GraphDefaultFont()) != 0) {
-					//fprintf(stderr, warn_font_not_available, lpgw->deffontname, GraphDefaultFont());
+					fprintf(stderr, warn_font_not_available, lpgw->deffontname, GraphDefaultFont());
 					if (!TryCreateFont(lpgw, GraphDefaultFont(), hdc)) {
-						//fprintf(stderr, err_giving_up);
+						fprintf(stderr, err_giving_up);
 					}
 				} else {
-					//fprintf(stderr, err_giving_up);
+					fprintf(stderr, err_giving_up);
 				}
 			}
 		} else {
 			if (_tcscmp(lpgw->fontname, GraphDefaultFont()) != 0) {
-				//fprintf(stderr, warn_font_not_available, lpgw->fontname, GraphDefaultFont());
+				fprintf(stderr, warn_font_not_available, lpgw->fontname, GraphDefaultFont());
 				if (!TryCreateFont(lpgw, GraphDefaultFont(), hdc)) {
-					//fprintf(stderr, err_giving_up);
+					fprintf(stderr, err_giving_up);
 				}
 			} else {
-				//fprintf(stderr, "Error:  font \"" TCHARFMT "\" not available, but don't know which font to substitute.\n", lpgw->fontname);
+				fprintf(stderr, "Error:  font \"" TCHARFMT "\" not available, but don't know which font to substitute.\n", lpgw->fontname);
 			}
 		}
 	}
@@ -1011,7 +1016,7 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	cy = MulDiv(cx, 2 * GetDeviceCaps(hdc, LOGPIXELSY), 50 * GetDeviceCaps(hdc, LOGPIXELSX));
 	lpgw->vtic = MulDiv(cy, lpgw->ymax, lprect->bottom - lprect->top);
 	/* find out if we can rotate text 90deg */
-	SelectObject(hdc, lpgw->hfontv);
+	SelectObject(hdc, lpgw->hfontv);  //  FIXME: FIXME
 	result = GetDeviceCaps(hdc, TEXTCAPS);
 	if ((result & TC_CR_90) || (result & TC_CR_ANY))
 		lpgw->rotate = TRUE;
@@ -1978,7 +1983,12 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				ppt[i].y = MulDiv(poly[i].y, rt-rb+1, lpgw->ymax) + rb - 1;
 			}
 			LocalUnlock(poly);
-			Polyline(hdc, ppt, polyi);
+#ifdef HAVE_GDIPLUS
+			if (lpgw->antialiasing)
+				gdiplusPolyline(hdc, ppt, polyi, &cur_penstruct, alpha_c);
+			else
+#endif
+				Polyline(hdc, ppt, polyi);
 			if (keysample) {
 				draw_update_keybox(lpgw, plotno, ppt[0].x, ppt[0].y);
 				draw_update_keybox(lpgw, plotno, ppt[polyi - 1].x, ppt[polyi - 1].y);
@@ -2238,6 +2248,9 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 						rect[i].x += boxedtext.start.x;
 						rect[i].y += boxedtext.start.y;
 					}
+#ifdef HAVE_GDIPLUS
+					if (!lpgw->antialiasing && (alpha_c == 1.))
+#endif
 					{
 						HBRUSH save_brush;
 						HPEN save_pen;
@@ -2254,6 +2267,17 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 						SelectObject(hdc, save_brush);
 						SelectObject(hdc, save_pen);
 					}
+#ifdef HAVE_GDIPLUS
+					else {
+						if (boxedtext.option == TEXTBOX_OUTLINE) {
+							rect[4].x = rect[0].x;
+							rect[4].y = rect[0].y;
+							gdiplusPolylineEx(hdc, rect, 5, PS_SOLID, line_width, last_color, alpha_c);
+						} else {
+							gdiplusSolidFilledPolygonEx(hdc, rect, 4, last_color, alpha_c, lpgw->antialiasing);
+						}
+					}
+#endif
 				}
 				boxedtext.boxing = FALSE;
 				break;
@@ -2326,7 +2350,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					transparent = TRUE;
 					alpha = 1.;
 				} else {
-					/* Printers do not support AlphaBlend() */
+					/* Printer does not support AlphaBlend() */
 					fillstyle = (fillstyle & 0xfffffff0) | FS_PATTERN;
 					if (warn_no_transparent) {
 						fprintf(stderr, "Warning: Transparency not supported on this device.\n");
@@ -2372,6 +2396,21 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			p.x = GPMIN(ppt[0].x, xdash);
 			p.y = GPMIN(ydash, ppt[0].y);
 
+#ifdef HAVE_GDIPLUS
+			if (lpgw->antialiasing && lpgw->patternaa &&
+			    (((fillstyle & 0x0f) == FS_PATTERN) ||
+			     ((fillstyle & 0x0f) == FS_TRANSPARENT_PATTERN))) {
+				ppt[1].x = ppt[0].x;
+				ppt[1].y = ydash;
+				ppt[2].x = xdash;
+				ppt[2].y = ydash;
+				ppt[3].x = xdash;
+				ppt[3].y = ppt[0].y;
+				ppt[4].x = ppt[0].x;
+				ppt[4].y = ppt[0].y;
+				gdiplusPatternFilledPolygonEx(hdc, ppt, 5, fill_color, 1., lpgw->background, transparent, pattern);
+			} else
+#endif
 			if (transparent) {
 				HDC memdc;
 				HBITMAP membmp, oldbmp;
@@ -2559,11 +2598,29 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		case W_filled_polygon_draw: {
 			/* end of point series --> draw polygon now */
 			if (!transparent) {
-				/* fill area without border */
-				SelectObject(hdc, lpgw->hnull);
-				Polygon(hdc, ppt, polyi);
-				SelectObject(hdc, lpgw->hapen); /* restore previous pen */
+#ifdef HAVE_GDIPLUS
+				if (lpgw->antialiasing && ((fillstyle & 0x0f) == FS_SOLID)) {
+					/* solid, antialiased fill */
+					gdiplusSolidFilledPolygonEx(hdc, ppt, polyi, fill_color, alpha_c, lpgw->antialiasing && lpgw->polyaa);
+				} else if (lpgw->antialiasing && lpgw->patternaa && ((fillstyle & 0x0f) == FS_PATTERN)) {
+					gdiplusPatternFilledPolygonEx(hdc, ppt, polyi, fill_color, 1., lpgw->background, transparent, pattern);
+				} else
+#endif
+				{
+					/* fill area without border */
+					SelectObject(hdc, lpgw->hnull);
+					Polygon(hdc, ppt, polyi);
+					SelectObject(hdc, lpgw->hapen); /* restore previous pen */
+				}
 			} else {
+#ifdef HAVE_GDIPLUS
+				if (lpgw->antialiasing && (fillstyle & 0x0f) == FS_TRANSPARENT_SOLID) {
+					gdiplusSolidFilledPolygonEx(hdc, ppt, polyi, fill_color, alpha, lpgw->polyaa);
+				} else if (lpgw->antialiasing && lpgw->patternaa && ((fillstyle & 0x0f) == FS_TRANSPARENT_PATTERN)) {
+					gdiplusPatternFilledPolygonEx(hdc, ppt, polyi, fill_color, 1., lpgw->background, transparent, pattern);
+				} else
+#endif
+				{
 				/* BM: To support transparent fill on Windows we draw the
 				   polygon into a memory bitmap using a memory device context.
 
@@ -2667,6 +2724,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				DeleteObject(membmp);
 				DeleteDC(memdc);
 			}
+			}
 			polyi = 0;
 			}
 			break;
@@ -2752,26 +2810,67 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				break;
 			case W_plus: /* do plus */
 			case W_star: /* do star: first plus, then cross */
-				SelectObject(dc, lpgw->hsolid);
-				MoveTo(dc, xofs - htic, yofs);
-				LineTo(dc, xofs + htic, yofs);
-				MoveTo(dc, xofs, yofs - vtic);
-				LineTo(dc, xofs, yofs + vtic);
-				SelectObject(dc, lpgw->hapen);
-				if (curptr->op == W_plus)
-					break;
+#ifdef HAVE_GDIPLUS
+				if (lpgw->antialiasing) {
+					POINT a, b;
+					a.x = xofs - htic;
+					a.y = yofs;
+					b.x = xofs + htic;
+					b.y = yofs;
+					gdiplusLineEx(dc, a, b, PS_SOLID, line_width, last_color, alpha_c);
+					a.x = xofs;
+					a.y = yofs - vtic;
+					b.x = xofs;
+					b.y = yofs + vtic;
+					gdiplusLineEx(dc, a, b, PS_SOLID, line_width, last_color, alpha_c);
+				} else
+#endif
+				{
+					SelectObject(dc, lpgw->hsolid);
+					MoveTo(dc, xofs - htic, yofs);
+					LineTo(dc, xofs + htic, yofs);
+					MoveTo(dc, xofs, yofs - vtic);
+					LineTo(dc, xofs, yofs + vtic);
+					SelectObject(dc, lpgw->hapen);
+				}
+				if (curptr->op == W_plus) break;
 			case W_cross: /* do X */
-				SelectObject(dc, lpgw->hsolid);
-				MoveTo(dc, xofs - htic, yofs - vtic);
-				LineTo(dc, xofs + htic, yofs + vtic);
-				MoveTo(dc, xofs - htic, yofs + vtic);
-				LineTo(dc, xofs + htic, yofs - vtic);
-				SelectObject(dc, lpgw->hapen);
+#ifdef HAVE_GDIPLUS
+				if (lpgw->antialiasing) {
+					POINT a, b;
+					a.x = xofs - htic;
+					a.y = yofs - vtic;
+					b.x = xofs + htic;
+					b.y = yofs + vtic;
+					gdiplusLineEx(dc, a, b, PS_SOLID, line_width, last_color, alpha_c);
+					a.x = xofs - htic;
+					a.y = yofs + vtic;
+					b.x = xofs + htic;
+					b.y = yofs - vtic;
+					gdiplusLineEx(dc, a, b, PS_SOLID, line_width, last_color, alpha_c);
+				} else
+#endif
+				{
+					SelectObject(dc, lpgw->hsolid);
+					MoveTo(dc, xofs - htic, yofs - vtic);
+					LineTo(dc, xofs + htic, yofs + vtic);
+					MoveTo(dc, xofs - htic, yofs + vtic);
+					LineTo(dc, xofs + htic, yofs - vtic);
+					SelectObject(dc, lpgw->hapen);
+				}
 				break;
 			case W_circle: /* do open circle */
 				SelectObject(dc, lpgw->hsolid);
-				Arc(dc, xofs - htic, yofs - vtic, xofs + htic + 1, yofs + vtic + 1,
-					xofs, yofs + vtic + 1, xofs, yofs + vtic + 1);
+#ifdef HAVE_GDIPLUS
+				if (lpgw->antialiasing) {
+					POINT p;
+					p.x = xofs;
+					p.y = yofs;
+					gdiplusCircleEx(dc, &p, htic, PS_SOLID, line_width, last_color, alpha_c);
+				} else
+#endif
+					Arc(dc, xofs-htic, yofs-vtic, xofs+htic+1, yofs+vtic+1,
+						xofs, yofs+vtic+1, xofs, yofs+vtic+1);
 				dot(dc, xofs, yofs);
 				SelectObject(dc, lpgw->hapen);
 				break;
@@ -2780,6 +2879,14 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				Ellipse(dc, xofs-htic, yofs-vtic,
 				            xofs+htic+1, yofs+vtic+1);
 				SelectObject(dc, lpgw->hapen);
+#ifdef HAVE_GDIPLUS
+				if (lpgw->antialiasing) {
+					POINT p;
+					p.x = xofs;
+					p.y = yofs;
+					gdiplusCircleEx(dc, &p, htic, PS_SOLID, line_width, last_color, alpha_c);
+				}
+#endif
 				break;
 			default: {	/* potentially closed figure */
 				POINT p[6];
@@ -2820,16 +2927,31 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				}
 				if (filled) {
 					/* Filled polygon */
-					SelectObject(dc, lpgw->hsolid);
-					Polygon(dc, p, i);
-					SelectObject(dc, lpgw->hapen);
+	#ifdef HAVE_GDIPLUS
+					if (lpgw->antialiasing) {
+						/* filled polygon with border */
+						gdiplusSolidFilledPolygonEx(dc, p, i, last_color, alpha_c, TRUE);
+					} else
+	#endif
+					{
+						SelectObject(dc, lpgw->hsolid);
+						Polygon(dc, p, i);
+						SelectObject(dc, lpgw->hapen);
+					}
 				} else {
 					/* Outline polygon */
 					p[i].x = p[0].x;
 					p[i].y = p[0].y;
-					SelectObject(dc, lpgw->hsolid);
-					Polyline(dc, p, i + 1);
-					SelectObject(dc, lpgw->hapen);
+	#ifdef HAVE_GDIPLUS
+					if (lpgw->antialiasing) {
+						gdiplusPolylineEx(dc, p, i + 1, PS_SOLID, line_width, last_color, alpha_c);
+					} else
+	#endif
+					{
+						SelectObject(dc, lpgw->hsolid);
+						Polyline(dc, p, i + 1);
+						SelectObject(dc, lpgw->hapen);
+					}
 					dot(dc, xofs, yofs);
 				}
 			} /* default case */
@@ -2920,16 +3042,23 @@ SaveAsEMF(LPGW lpgw)
 		HDC hdc;
 		HENHMETAFILE hemf;
 		HDC hmf;
+		TBOOLEAN antialiasing;
 
 		/* get the context */
 		hdc = GetDC(hwnd);
 		GetPlotRect(lpgw, &rect);
 		GetPlotRectInMM(lpgw, &mfrect, hdc);
 
+		/* temporarily disable antialiasing */
+		antialiasing = lpgw->antialiasing;
+		lpgw->antialiasing = FALSE;
+
 		hmf = CreateEnhMetaFile(hdc, Ofn.lpstrFile, &mfrect, NULL);
 		/* Always create EMF files using GDI only! */
 		drawgraph(lpgw, hmf, &rect);
 		hemf = CloseEnhMetaFile(hmf);
+
+		lpgw->antialiasing = antialiasing;
 
 		DeleteEnhMetaFile(hemf);
 		ReleaseDC(hwnd, hdc);
@@ -3135,7 +3264,10 @@ CopyPrint(LPGW lpgw)
 	docInfo.lpszDocName = lpgw->Title;
 
 	if (StartDoc(printer, &docInfo) > 0) {
+		TBOOLEAN aa = lpgw->antialiasing;
 		lpgw->sampling = 1;
+		/* Mixing GDI/GDI+ does not seem to work properly on printer devices. */
+		lpgw->antialiasing = FALSE;
 		SetMapMode(printer, MM_TEXT);
 		SetBkMode(printer, OPAQUE);
 		StartPage(printer);
@@ -3148,6 +3280,7 @@ CopyPrint(LPGW lpgw)
 		drawgraph(lpgw, printer, &rect);
 		if (EndPage(printer) > 0)
 			EndDoc(printer);
+		lpgw->antialiasing = aa;
 	}
 	if (!pr.bUserAbort) {
 		EnableWindow(hwnd, TRUE);
@@ -3207,6 +3340,10 @@ WriteGraphIni(LPGW lpgw)
 	WritePrivateProfileString(section, TEXT("GraphGDI+"), profile, file);
 	wsprintf(profile, TEXT("%d"), lpgw->antialiasing);
 	WritePrivateProfileString(section, TEXT("GraphAntialiasing"), profile, file);
+	wsprintf(profile, TEXT("%d"), lpgw->polyaa);
+	WritePrivateProfileString(section, TEXT("GraphPolygonAA"), profile, file);
+	wsprintf(profile, TEXT("%d"), lpgw->patternaa);
+	WritePrivateProfileString(section, TEXT("GraphPatternAA"), profile, file);
 	wsprintf(profile, TEXT("%d"), lpgw->fastrotation);
 	WritePrivateProfileString(section, TEXT("GraphFastRotation"), profile, file);
 	wsprintf(profile, TEXT("%d %d %d"),GetRValue(lpgw->background),
@@ -3345,6 +3482,16 @@ ReadGraphIni(LPGW lpgw)
 		GetPrivateProfileString(section, TEXT("GraphAntialiasing"), TEXT(""), profile, 80, file);
 	if ((p = GetInt(profile, (LPINT)&lpgw->antialiasing)) == NULL)
 		lpgw->antialiasing = TRUE;
+
+	if (bOKINI)
+		GetPrivateProfileString(section, TEXT("GraphPolygonAA"), TEXT(""), profile, 80, file);
+	if ((p = GetInt(profile, (LPINT)&lpgw->polyaa)) == NULL)
+		lpgw->polyaa = FALSE;
+
+	if (bOKINI)
+		GetPrivateProfileString(section, TEXT("GraphPatternAA"), TEXT(""), profile, 80, file);
+	if ((p = GetInt(profile, (LPINT)&lpgw->patternaa)) == NULL)
+		lpgw->patternaa = TRUE;
 
 	if (bOKINI)
 		GetPrivateProfileString(section, TEXT("GraphFastRotation"), TEXT(""), profile, 80, file);
@@ -3983,6 +4130,8 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				case M_OVERSAMPLE:
 				case M_GDIPLUS:
 				case M_ANTIALIASING:
+				case M_POLYAA:
+				case M_PATTERNAA:
 				case M_FASTROTATE:
 				case M_CHOOSE_FONT:
 				case M_COPY_CLIP:
@@ -4202,6 +4351,14 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					lpgw->antialiasing = !lpgw->antialiasing;
 					SendMessage(hwnd, WM_COMMAND, M_REBUILDTOOLS, 0L);
 					return 0;
+				case M_POLYAA:
+					lpgw->polyaa = !lpgw->polyaa;
+					SendMessage(hwnd, WM_COMMAND, M_REBUILDTOOLS, 0L);
+					return 0;
+				case M_PATTERNAA:
+					lpgw->patternaa = !lpgw->patternaa;
+					SendMessage(hwnd, WM_COMMAND, M_REBUILDTOOLS, 0L);
+					return 0;
 				case M_FASTROTATE:
 					lpgw->fastrotation = !lpgw->fastrotation;
 					SendMessage(hwnd, WM_COMMAND, M_REBUILDTOOLS, 0L);
@@ -4251,35 +4408,50 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					WIN_update_options();
 					return 0;
 				case M_REBUILDTOOLS:
-					CheckMenuItem(lpgw->hPopMenu, M_COLOR, MF_BYCOMMAND |
-									(lpgw->color ? MF_CHECKED : MF_UNCHECKED));
-					CheckMenuItem(lpgw->hPopMenu, M_DOUBLEBUFFER, MF_BYCOMMAND |
-									(lpgw->doublebuffer ? MF_CHECKED : MF_UNCHECKED));
+					if (lpgw->color)
+						CheckMenuItem(lpgw->hPopMenu, M_COLOR, MF_BYCOMMAND | MF_CHECKED);
+					else
+						CheckMenuItem(lpgw->hPopMenu, M_COLOR, MF_BYCOMMAND | MF_UNCHECKED);
+					if (lpgw->doublebuffer)
+						CheckMenuItem(lpgw->hPopMenu, M_DOUBLEBUFFER, MF_BYCOMMAND | MF_CHECKED);
+					else
+						CheckMenuItem(lpgw->hPopMenu, M_DOUBLEBUFFER, MF_BYCOMMAND | MF_UNCHECKED);
 #ifdef HAVE_GDIPLUS
+					CheckMenuItem(lpgw->hPopMenu, M_OVERSAMPLE, MF_BYCOMMAND | 
+						(lpgw->oversample && lpgw->gdiplus ? MF_CHECKED : MF_UNCHECKED));
 					if (lpgw->gdiplus) {
 						CheckMenuItem(lpgw->hPopMenu, M_GDIPLUS, MF_BYCOMMAND | MF_CHECKED);
-						EnableMenuItem(lpgw->hPopMenu, M_ANTIALIASING, MF_BYCOMMAND | MF_ENABLED);
+						EnableMenuItem(lpgw->hPopMenu, M_PATTERNAA, MF_BYCOMMAND | MF_DISABLED);
 						EnableMenuItem(lpgw->hPopMenu, M_OVERSAMPLE, MF_BYCOMMAND | MF_ENABLED);
-						EnableMenuItem(lpgw->hPopMenu, M_FASTROTATE, MF_BYCOMMAND | MF_ENABLED);
-						CheckMenuItem(lpgw->hPopMenu, M_ANTIALIASING, MF_BYCOMMAND | 
-										(lpgw->antialiasing ? MF_CHECKED : MF_UNCHECKED));
-						CheckMenuItem(lpgw->hPopMenu, M_OVERSAMPLE, MF_BYCOMMAND | 
-										(lpgw->oversample && lpgw->gdiplus ? MF_CHECKED : MF_UNCHECKED));
-						CheckMenuItem(lpgw->hPopMenu, M_FASTROTATE, MF_BYCOMMAND |
-										(lpgw->fastrotation ? MF_CHECKED : MF_UNCHECKED));
 					} else {
 						CheckMenuItem(lpgw->hPopMenu, M_GDIPLUS, MF_BYCOMMAND | MF_UNCHECKED);
-						EnableMenuItem(lpgw->hPopMenu, M_ANTIALIASING, MF_BYCOMMAND | MF_GRAYED);
-						EnableMenuItem(lpgw->hPopMenu, M_OVERSAMPLE, MF_BYCOMMAND | MF_GRAYED);
-						EnableMenuItem(lpgw->hPopMenu, M_FASTROTATE, MF_BYCOMMAND | MF_GRAYED);
+						EnableMenuItem(lpgw->hPopMenu, M_PATTERNAA, MF_BYCOMMAND | MF_ENABLED);
+						EnableMenuItem(lpgw->hPopMenu, M_OVERSAMPLE, MF_BYCOMMAND | MF_DISABLED);
 					}
-					if (lpgw->gdiplus && lpgw->doublebuffer)
+					if (lpgw->gdiplus && lpgw->doublebuffer) {
 						EnableMenuItem(lpgw->hPopMenu, M_SAVE_AS_BITMAP, MF_BYCOMMAND | MF_ENABLED);
-					else
+					} else {
 						EnableMenuItem(lpgw->hPopMenu, M_SAVE_AS_BITMAP, MF_BYCOMMAND | MF_DISABLED);
+					}
+					if (lpgw->antialiasing)
+						CheckMenuItem(lpgw->hPopMenu, M_ANTIALIASING, MF_BYCOMMAND | MF_CHECKED);
+					else
+						CheckMenuItem(lpgw->hPopMenu, M_ANTIALIASING, MF_BYCOMMAND | MF_UNCHECKED);
+					if (lpgw->polyaa)
+						CheckMenuItem(lpgw->hPopMenu, M_POLYAA, MF_BYCOMMAND | MF_CHECKED);
+					else
+						CheckMenuItem(lpgw->hPopMenu, M_POLYAA, MF_BYCOMMAND | MF_UNCHECKED);
+					if (lpgw->patternaa || lpgw->gdiplus)
+						CheckMenuItem(lpgw->hPopMenu, M_PATTERNAA, MF_BYCOMMAND | MF_CHECKED);
+					else
+						CheckMenuItem(lpgw->hPopMenu, M_PATTERNAA, MF_BYCOMMAND | MF_UNCHECKED);
+					CheckMenuItem(lpgw->hPopMenu, M_FASTROTATE, MF_BYCOMMAND |
+									(lpgw->fastrotation ? MF_CHECKED : MF_UNCHECKED));
 #endif
-					CheckMenuItem(lpgw->hPopMenu, M_GRAPH_TO_TOP, MF_BYCOMMAND |
-								(lpgw->graphtotop ? MF_CHECKED : MF_UNCHECKED));
+					if (lpgw->graphtotop)
+						CheckMenuItem(lpgw->hPopMenu, M_GRAPH_TO_TOP, MF_BYCOMMAND | MF_CHECKED);
+					else
+						CheckMenuItem(lpgw->hPopMenu, M_GRAPH_TO_TOP, MF_BYCOMMAND | MF_UNCHECKED);
 					lpgw->buffervalid = FALSE;
 					DestroyPens(lpgw);
 					DestroyFonts(lpgw);
