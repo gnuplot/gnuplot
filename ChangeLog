@@ -1,5 +1,8 @@
 2016-10-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgdiplus.cpp (W_image):  Draw images with GDI+ using nearest
+	neighbour interpolation.
+
 	* src/wxterminal/wxt_gui.cpp|h (wxt_cairo_create_platform_context):
 	Let cairo manage the Windows GDI bitmap internally. Requires cairo 1.4.
 

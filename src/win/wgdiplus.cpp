@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.36 2016/09/23 14:11:56 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.37 2016/10/03 17:27:43 markisch Exp $
  */
 
 /*
@@ -1478,24 +1478,15 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 				char * image = (char *) LocalLock(curptr->htext);
 				unsigned int width = curptr->x;
 				unsigned int height = curptr->y;
-#ifndef USE_GDIP_IMAGES
-		 		HDC hdc = graphics.GetHDC(); /* switch back to GDI */
-				draw_image(lpgw, hdc, image, corners, width, height, color_mode);
-				graphics.ReleaseHDC(hdc); /* switch back to GDI+ */
-#else
 				if (image) {
 					Bitmap * bitmap;
 
-					/* With GDI+ interpolation of images cannot be avoided.
-					Try to keep it simple at least: */
-					graphics.SetInterpolationMode(InterpolationModeBilinear);
-					SmoothingMode mode = graphics.GetSmoothingMode();
-					graphics.SetSmoothingMode(SmoothingModeNone);
+					graphics.SetPixelOffsetMode(PixelOffsetModeHighQuality);
 
 					/* create clip region */
 					Rect clipRect(
-						GPMIN(corners[2].x, corners[3].x), GPMIN(corners[2].y, corners[3].y),
-						GPMAX(corners[2].x, corners[3].x) + 1, GPMAX(corners[2].y, corners[3].y) + 1);
+						(INT) GPMIN(corners[2].x, corners[3].x), (INT) GPMIN(corners[2].y, corners[3].y),
+						abs(corners[2].x - corners[3].x), abs(corners[2].y - corners[3].y));
 					graphics.SetClip(clipRect);
 
 					if (color_mode != IC_RGBA) {
@@ -1537,9 +1528,8 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 						delete bitmap;
 					}
 					graphics.ResetClip();
-					graphics.SetSmoothingMode(mode);
+					graphics.SetPixelOffsetMode(PixelOffsetModeNone);
 				}
-#endif
 				LocalUnlock(curptr->htext);
 			}
 			seq = (seq + 1) % 6;
