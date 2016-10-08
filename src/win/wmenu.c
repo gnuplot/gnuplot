@@ -1,5 +1,5 @@
 /*
- * $Id: wmenu.c,v 1.35 2016/08/09 08:13:59 markisch Exp $Id: wmenu.c,v 1.35 2016/08/09 08:13:59 markisch Exp $
+ * $Id: wmenu.c,v 1.36 2016/08/09 11:55:25 markisch Exp $Id: wmenu.c,v 1.36 2016/08/09 11:55:25 markisch Exp $
  */
 
 /* GNUPLOT - win/wmenu.c */
@@ -305,7 +305,7 @@ SendMacro(LPTW lptw, UINT m)
 		    bi.pidlRoot = NULL;
 		    bi.pszDisplayName = NULL;
 		    bi.lpszTitle = szTitle;
-		    /* BIF_NEWDIALOGSTYLE is supported by Win 2000 or later (Version 5.0)*/
+		    /* BIF_NEWDIALOGSTYLE is supported by Win 2000 or later (Version 5.0) */
 		    bi.ulFlags = BIF_NEWDIALOGSTYLE | BIF_EDITBOX |
 				    BIF_STATUSTEXT |
 				    BIF_RETURNONLYFSDIRS | BIF_RETURNFSANCESTORS;
@@ -326,8 +326,8 @@ SendMacro(LPTW lptw, UINT m)
 			len = wcslen(szPath);
 			flag = len > 0;
 			if (flag)
-				for (i = 0; i < len; i++)
-					*d++ = szPath[i];
+			    for (i = 0; i < len; i++)
+				*d++ = szPath[i];
 
 			/* Allocate a pointer to an IMalloc interface.
 			   Get the address of our task allocator's IMalloc interface. */
@@ -343,8 +343,8 @@ SendMacro(LPTW lptw, UINT m)
 		    wcscpy(lpmw->szPrompt, szTitle);
 		    flag = DialogBox(hdllInstance, TEXT("InputDlgBox"), lptw->hWndParent, InputBoxDlgProc);
 		    if (flag) {
-			    for (i = 0; i < lpmw->nChar; i++)
-				    *d++ = lpmw->szAnswer[i];
+			for (i = 0; i < lpmw->nChar; i++)
+			    *d++ = lpmw->szAnswer[i];
 		    }
 		}
 		LocalFreePtr(szTitle);
@@ -830,7 +830,7 @@ LoadMacros(LPTW lptw)
 
     /* auto-resize and show */
     SendMessage(lpmw->hToolbar, TB_AUTOSIZE, (WPARAM)0, (LPARAM)0);
-    ShowWindow(lpmw->hToolbar, TRUE);
+    ShowWindow(lpmw->hToolbar, SW_SHOW);
 
     /* move top of client text window down to allow space for toolbar */
     GetClientRect(lpmw->hToolbar, &rect);

@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.72 2016/09/07 15:27:53 markisch Exp $
+ * $Id: wtext.c,v 1.73 2016/09/12 17:44:01 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -259,7 +259,7 @@ TextInit(LPTW lptw)
 	SetWindowPos(lptw->hWndText, (HWND)NULL, 0, 0,
 			rect.right, rect.bottom - lptw->StatusHeight,
 			SWP_NOZORDER | SWP_NOACTIVATE);
-	ShowWindow(lptw->hStatusbar, TRUE);
+	ShowWindow(lptw->hStatusbar, SW_SHOW);
     }
 
     lptw->hPopMenu = CreatePopupMenu();
