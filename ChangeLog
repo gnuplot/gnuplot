@@ -1,5 +1,11 @@
 2016-10-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/wxterminal/wxt_gui.cpp|h (wxt_cairo_create_platform_context):
+	Let cairo manage the Windows GDI bitmap internally. Requires cairo 1.4.
+
+	* src/wxterminal/wxt_gui.cpp (OnPrint):  Use wxDC::GetHDC() instead of
+	GetHandle() since that is also available in wxWidgets 2.8.
+
 	* src/win/wgraph.c (drawgraph):  Missed to recreate the brush in case
 	of fractional solid fill was requested. Bugfix.
 

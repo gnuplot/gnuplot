@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.57 2016/08/26 04:16:10 sfeam Exp $
+ * $Id: wxt_gui.h,v 1.58 2016/09/22 07:09:42 markisch Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -444,8 +444,6 @@ private:
 #if defined(GTK_SURFACE)
 	GdkPixmap *gdkpixmap;
 #elif defined(__WXMSW__)
-	HDC hdc;
-	HBITMAP hbm;
 #else /* generic 'image' surface */
 	unsigned int *data32;
 	wxBitmap* cairo_bitmap;
