@@ -9,7 +9,7 @@ These release notes are for version 5.0 patchlevel 5 (5.0.5).
 This release contains bug-fixes, a few changes back-ported from the
 development version, and a few new features.
 
-Release Notes date: 07-Sep-2016
+Release Notes date: 10-Oct-2016
 
 This patchlevel 5.0.5 incremental release includes
 ==================================================
@@ -26,10 +26,11 @@ This patchlevel 5.0.5 incremental release includes
 * CHANGE all stats and fit commands skip header records if "autotitle columnhead"
 * FIX Do not confuse EOF with 8-bit character 0x177 (E.g. in Cyrillic encodings).
 * FIX use blank line rather than 'u' flag in "set table" output of smoothed data
-* FIX regression in rendering 'plot ... matrix every ... with image'
 * FIX order dependence of "fillcolor" keyword in plot commands
 * FIX svg - better vertical justification of rotated text
 * FIX wxt - file export widget correctly handles inactive plots
+* FIX qt - preserve leading and trailing whitespace in enhanced text strings
+* FIX various bugs affecting matrix data plotted "with image"
 
 
 NOTABLE NEW FEATURES IN PATCHLEVEL 5.0.5

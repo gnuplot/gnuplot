@@ -12,12 +12,12 @@ Changes in 5.0.5
 * CHANGE all stats and fit commands skip header records if "autotitle columnhead"
 * FIX Do not confuse EOF with 8-bit character 0x177 (E.g. in Cyrillic encodings).
 * FIX use blank line rather than 'u' flag in "set table" output of smoothed data
-* FIX regression in rendering 'plot ... matrix every ... with image'
 * FIX order dependence of "fillcolor" keyword in plot commands
 * FIX svg - better vertical justification of rotated text
 * FIX wxt - file export widget correctly handles inactive plots
 * FIX epslatex - reset linetype between plots (needed if plotted "notitle")
 * FIX qt - leading or trailing whitespace in enhanced text was being ignored
+* FIX regression in rendering 'plot ... matrix every ... with image'
 
 Changes in 5.0.4
 ================
