@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.532 2016/09/13 18:51:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.533 2016/09/15 19:19:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -108,6 +108,7 @@ static void set_logscale __PROTO((void));
 static void set_mapping __PROTO((void));
 static void set_margin __PROTO((t_position *));
 static void set_minus_sign __PROTO((void));
+static void set_micro __PROTO((void));
 static void set_missing __PROTO((void));
 static void set_separator __PROTO((void));
 static void set_datafile_commentschars __PROTO((void));
@@ -175,6 +176,7 @@ static void parse_histogramstyle __PROTO((histogram_style *hs,
 static void set_style_parallel __PROTO((void));
 static void parse_lighting_options __PROTO((void));
 
+static const char *encoding_micro __PROTO((void));
 static const char *encoding_minus __PROTO((void));
 
 static const struct position default_position
@@ -360,6 +362,9 @@ set_command()
 	    break;
 	case S_TMARGIN:
 	    set_margin(&tmargin);
+	    break;
+	case S_MICRO:
+	    set_micro();
 	    break;
 	case S_MINUS_SIGN:
 	    set_minus_sign();
@@ -1645,6 +1650,9 @@ set_encoding()
 
     /* Set minus sign to match encoding */
     minus_sign = encoding_minus();
+
+    /* Set micro character to match encoding */
+    micro = encoding_micro();
 }
 
 static void
@@ -1714,6 +1722,24 @@ set_degreesign(char *locale)
     }
 }
 
+/* Encoding-specific character enabled by "set micro" */
+static const char *
+encoding_micro()
+{
+    static const char micro_utf8[4] = {0xC2, 0xB5, 0x0, 0x0};
+    static const char micro_1252[2] = {0x96, 0x0};
+    static const char micro_latin1[2] = {0xB5, 0x0};
+    static const char micro_default[2] = {'u', 0x0};
+    switch (encoding) {
+	case S_ENC_UTF8:	return micro_utf8;
+	case S_ENC_CP1252:	return micro_1252;
+	case S_ENC_ISO8859_1:
+	case S_ENC_ISO8859_15:	return micro_latin1;
+	default:		return micro_default;
+    }
+}
+
+/* process 'set fit' command */
 /* Encoding-specific character enabled by "set minussign" */
 static const char *
 encoding_minus()
@@ -2804,6 +2830,14 @@ set_margin(t_position *margin)
 	    margin->x = 1;
     }
 
+}
+
+/* process 'set micro' command */
+static void
+set_micro()
+{
+    c_token++;
+    use_micro = TRUE;
 }
 
 /* process 'set minus_sign' command */

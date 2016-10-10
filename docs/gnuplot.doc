@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1025 2016/10/05 22:03:46 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1026 2016/10/06 21:52:54 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -267,11 +267,14 @@ C
  * Shell invocation of gnuplot can pass parameters to a gnuplot script.
  gnuplot -c scriptfile.gp ARG1 ARG2 ARG3 ...
 
- * New command `set minussign` causes routine gprintf() to use a typographic
- character "minus sign" rather than a hyphen for negative numbers.  This affects
- only axis tic labels and strings explicitly created with gprintf(). This 
- command first appeared in version 5.0 patchlevel 5 and is considered EXPERIMENTAL
- (implementation details may change).
+ * New commands `set minussign` and `set micro` cause routine gprintf() to use a
+ typographic character "minus sign" rather than a hyphen for negative numbers, 
+ and "micro sign" rather than "u" for prefixing units in scientific notation.
+ This affects only axis tic labels and strings explicitly created with gprintf().
+ The specific byte sequence used to represent these characters depends on the 
+ current encoding.
+ The `set minus`  command first appeared in version 5.0 patchlevel 5 and is
+ considered EXPERIMENTAL (implementation details may change).
 
 3 New commands
 #start
@@ -293,6 +296,7 @@ C
 # set view map {scale}                     # allows resizing a 3D projection plot
 # set multiplot {next|previous}            # navigate within the auto-layout grid
 # set minussign                            # use typographic "minus sign", not hyphen
+# set micro                                # use typographic "micro sign", not "u"
 #end
 
 2 Differences from version 4
@@ -10338,6 +10342,23 @@ Ffigure_multiple_keys
  labels will be included in either the margin calculation or the calculation
  of the positions of other text to be written in the margin.  This can lead
  to tic labels overwriting other text if the axis is very close to the border.
+3 micro
+?commands set micro
+?commands show micro
+?commands unset micro
+?set micro
+?show micro
+?unset micro
+?micro
+ By default the "%c" format specifier for scientific notation used to generate
+ axis tick labels uses a lower case u as a prefix to indicate "micro" (10^-6).
+ The `set micro` command tells gnuplot to use a different typographic 
+ character (unicode U+00B5).  The byte sequence used to represent this character
+ depends on the current encoding.  See `format specifiers`, `encoding`.
+
+ This command is EXPERIMENTAL. It has known limitations and implementation
+ details may change.
+
 3 minussign
 ?commands set minussign
 ?commands show minussign
@@ -10366,9 +10387,7 @@ Ffigure_multiple_keys
  terminals, as LaTeX has its own mechanism for handling minus signs.
  It also is not necessary when using the postscript terminal because the 
  postscript prologue output by gnuplot remaps the ascii hyphen code \055 to a
- different glyph named `minus`.  If you want to use the postscript terminal
- while `set minussign` is active,  you will probably need to select the option
- `set term post adobeglyphnames`.
+ different glyph named `minus`.
 
  This command is EXPERIMENTAL. It has known limitations and implementation
  details may change.

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.146 2016/08/17 19:38:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.147 2016/08/25 20:07:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -217,6 +217,7 @@ const struct gen_table set_tbl[] =
     { "tmar$gin", S_TMARGIN },
     { "bmar$gin", S_BMARGIN },
 
+    { "micro", S_MICRO },
     { "minus$sign", S_MINUS_SIGN },
 #ifdef USE_MOUSE
     { "mo$use", S_MOUSE },

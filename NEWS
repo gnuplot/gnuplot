@@ -20,6 +20,7 @@ Changes not in 5.0
 * NEW windows terminal supports saving graph as bitmap
 * NEW textbox style supports fillcolor and bordercolor
 * NEW command "set minussign" (first appeared in 5.0.5)
+* NEW command "set micro"
 * NEW "smooth fnormal" normalized frequency
 * NEW terminal domterm (supports in-line SVG in DomTerm terminal emulator)
 * NEW "set view azimuth <angle>" controls azimuth of the z axis in 3D plots

@@ -1,3 +1,13 @@
+2016-10-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/eval.c src/save.c src/set.c src/show.c src/tables.c src/tables.h
+	src/unset.c src/util.c src/util.h demo/special_chars.dem:
+
+	New command "set micro" tells gnuplot to use an encoding-specific
+	character sequence rather than "u" for the micro sign (unicode U+00B5)
+	used as a prefix in scientific notation.  This affects the "%c" format
+	used by gprintf() to label axis ticks.
+
 2016-10-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgdiplus.cpp:  Enable antialiasing for polygons without

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.142 2016/08/07 18:18:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.143 2016/08/19 16:13:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -65,8 +65,10 @@ char *decimalsign = NULL;
 /* degree sign.  Defaults to UTF-8 but will be changed to match encoding */
 char degree_sign[8] = "°";
 
-/* minus sign (encoding-specific string) */
+/* encoding-specific characters used by gprintf() */
+const char *micro = NULL;
 const char *minus_sign = NULL;
+TBOOLEAN use_micro = FALSE;
 TBOOLEAN use_minus_sign = FALSE;
 
 /* Holds the name of the current LC_NUMERIC as set by "set decimal locale" */
@@ -834,6 +836,11 @@ gprintf(
 		    /* HBB 20010121: avoid division of -ve ints! */
 		    power = (power + 24) / 3;
 		    snprintf(dest, remaining_space, temp, "yzafpnum kMGTPEZY"[power]);
+
+		    /* Replace u with micro character */
+		    if (use_micro && power == 6)
+			snprintf(dest, remaining_space, "%s%s", micro, &temp[2]);
+
 		} else {
 		    /* please extend the range ! */
 		    /* fall back to simple exponential */
