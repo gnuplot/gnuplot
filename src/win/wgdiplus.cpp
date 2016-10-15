@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.16.2.8 2016/09/12 15:05:21 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.16.2.9 2016/09/12 15:14:15 markisch Exp $
  */
 
 /*
@@ -508,7 +508,7 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 	Graphics graphics(hdc);
 
 	if (lpgw->antialiasing) {
-		graphics.SetSmoothingMode(SmoothingModeAntiAlias);
+		//graphics.SetSmoothingMode(SmoothingModeAntiAlias);
 		graphics.SetSmoothingMode(SmoothingModeAntiAlias8x8);
 		// graphics.SetTextRenderingHint(TextRenderingHintAntiAlias);
 		graphics.SetTextRenderingHint(TextRenderingHintClearTypeGridFit);
@@ -581,7 +581,7 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 		curptr = (struct GWOP *)blkptr->gwop;
 	}
 	if (curptr == NULL)
-	    return;
+		return;
 
 	while (ngwop < lpgw->nGWOP) {
 		/* transform the coordinates */
@@ -1338,24 +1338,15 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 				char * image = (char *) LocalLock(curptr->htext);
 				unsigned int width = curptr->x;
 				unsigned int height = curptr->y;
-#ifndef USE_GDIP_IMAGES
-		 		HDC hdc = graphics.GetHDC(); /* switch back to GDI */
-				draw_image(lpgw, hdc, image, corners, width, height, color_mode);
-				graphics.ReleaseHDC(hdc); /* switch back to GDI+ */
-#else
 				if (image) {
 					Bitmap * bitmap;
 
-					/* With GDI+ interpolation of images cannot be avoided.
-					Try to keep it simple at least: */
-					graphics.SetInterpolationMode(InterpolationModeBilinear);
-					SmoothingMode mode = graphics.GetSmoothingMode();
-					graphics.SetSmoothingMode(SmoothingModeNone);
+					graphics.SetPixelOffsetMode(PixelOffsetModeHighQuality);
 
 					/* create clip region */
 					Rect clipRect(
-						GPMIN(corners[2].x, corners[3].x), GPMIN(corners[2].y, corners[3].y),
-						GPMAX(corners[2].x, corners[3].x) + 1, GPMAX(corners[2].y, corners[3].y) + 1);
+						(INT) GPMIN(corners[2].x, corners[3].x), (INT) GPMIN(corners[2].y, corners[3].y),
+						abs(corners[2].x - corners[3].x), abs(corners[2].y - corners[3].y));
 					graphics.SetClip(clipRect);
 
 					if (color_mode != IC_RGBA) {
@@ -1397,9 +1388,8 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 						delete bitmap;
 					}
 					graphics.ResetClip();
-					graphics.SetSmoothingMode(mode);
+					graphics.SetPixelOffsetMode(PixelOffsetModeNone);
 				}
-#endif
 				LocalUnlock(curptr->htext);
 			}
 			seq = (seq + 1) % 6;

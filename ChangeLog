@@ -4,6 +4,12 @@
 	win_sleep() even if usleep() is available.
 	Bug #1867
 
+	* src/win/wgraph.c src/win/wmenu.c src/win/wtext.c:  Argument of the
+	function ShowWindow is not a boolean.
+
+	* src/win/wgdiplus.cpp (W_image):  Draw images with GDI+ using nearest
+	neighbour interpolation.
+
 2016-10-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp:  Screen refresh must hold mutex lock,
