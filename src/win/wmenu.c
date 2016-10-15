@@ -1,5 +1,5 @@
 /*
- * $Id: wmenu.c,v 1.27 2014/04/03 00:36:17 markisch Exp $Id: wmenu.c,v 1.27 2014/04/03 00:36:17 markisch Exp $
+ * $Id: wmenu.c,v 1.27.2.1 2016/09/12 17:22:56 markisch Exp $Id: wmenu.c,v 1.27.2.1 2016/09/12 17:22:56 markisch Exp $
  */
 
 /* GNUPLOT - win/wmenu.c */
@@ -978,7 +978,7 @@ TBADDBITMAP bitmap = {0};
 
 	/* auto-resize and show */
 	SendMessage(lpmw->hToolbar, TB_AUTOSIZE, (WPARAM)0, (LPARAM)0);
-	ShowWindow(lpmw->hToolbar, TRUE);
+	ShowWindow(lpmw->hToolbar, SW_SHOW);
 
 	/* move top of client text window down to allow space for toolbar */
 	GetClientRect(lpmw->hToolbar, &rect);

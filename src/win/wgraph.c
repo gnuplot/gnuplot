@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.189.2.13 2016/09/12 17:22:56 markisch Exp $
+ * $Id: wgraph.c,v 1.189.2.14 2016/09/14 18:22:41 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -455,7 +455,7 @@ GraphInit(LPGW lpgw)
 		RECT rect;
 		/* auto-adjust size */
 		SendMessage(lpgw->hStatusbar, WM_SIZE, (WPARAM)0, (LPARAM)0);
-		ShowWindow(lpgw->hStatusbar, TRUE);
+		ShowWindow(lpgw->hStatusbar, SW_SHOW);
 
 		/* make room */
 		GetClientRect(lpgw->hStatusbar, &rect);
@@ -544,7 +544,7 @@ GraphInit(LPGW lpgw)
 
 		/* auto-resize and show */
 		SendMessage(lpgw->hToolbar, TB_AUTOSIZE, (WPARAM)0, (LPARAM)0);
-		ShowWindow(lpgw->hToolbar, TRUE);
+		ShowWindow(lpgw->hToolbar, SW_SHOW);
 
 		/* make room */
 		GetClientRect(lpgw->hToolbar, &rect);
@@ -1779,7 +1779,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	int seq = 0;				/* sequence counter for W_image and W_boxedtext */
 	int i;
 
-    if (lpgw->locked) return;
+	if (lpgw->locked) return;
 
 	/* clear hypertexts only in display sessions */
 	interactive = (GetObjectType(hdc) == OBJ_MEMDC) ||
@@ -1872,7 +1872,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		curptr = (struct GWOP *)blkptr->gwop;
 	}
 	if (curptr == NULL)
-	    return;
+		return;
 
 	while (ngwop < lpgw->nGWOP) {
 		/* transform the coordinates */
@@ -2107,7 +2107,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 						dxr = 0;
 					}
 				}
-
 				if (keysample) {
 					draw_update_keybox(lpgw, plotno, xdash - dxl, ydash - vsize);
 					draw_update_keybox(lpgw, plotno, xdash + dxr, ydash + vsize);
@@ -3035,31 +3034,31 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 static void
 SaveAsEMF(LPGW lpgw)
 {
-    char *cwd;
-    static OPENFILENAME Ofn;
-    static char lpstrCustomFilter[256] = { '\0' };
-    static char lpstrFileName[MAX_PATH] = { '\0' };
-    static char lpstrFileTitle[MAX_PATH] = { '\0' };
-    HWND hwnd = lpgw->hWndGraph;
+	char *cwd;
+	static OPENFILENAME Ofn;
+	static char lpstrCustomFilter[256] = { '\0' };
+	static char lpstrFileName[MAX_PATH] = { '\0' };
+	static char lpstrFileTitle[MAX_PATH] = { '\0' };
+	HWND hwnd = lpgw->hWndGraph;
 
-    Ofn.lStructSize = sizeof(OPENFILENAME);
-    Ofn.hwndOwner = hwnd;
-    Ofn.lpstrInitialDir = (LPSTR)NULL;
-    Ofn.lpstrFilter = (LPCTSTR) "Enhanced Metafile (*.EMF)\0*.EMF\0All Files (*.*)\0*.*\0";
-    Ofn.lpstrCustomFilter = lpstrCustomFilter;
-    Ofn.nMaxCustFilter = 255;
-    Ofn.nFilterIndex = 1;   /* start with the *.emf filter */
-    Ofn.lpstrFile = lpstrFileName;
-    Ofn.nMaxFile = MAX_PATH;
-    Ofn.lpstrFileTitle = lpstrFileTitle;
-    Ofn.nMaxFileTitle = MAX_PATH;
-    Ofn.lpstrInitialDir = (LPSTR)NULL;
-    Ofn.lpstrTitle = (LPSTR)NULL;
-    Ofn.Flags = OFN_OVERWRITEPROMPT;
-    Ofn.lpstrDefExt = (LPSTR) "emf";
+	Ofn.lStructSize = sizeof(OPENFILENAME);
+	Ofn.hwndOwner = hwnd;
+	Ofn.lpstrInitialDir = (LPSTR)NULL;
+	Ofn.lpstrFilter = (LPCTSTR) "Enhanced Metafile (*.EMF)\0*.EMF\0All Files (*.*)\0*.*\0";
+	Ofn.lpstrCustomFilter = lpstrCustomFilter;
+	Ofn.nMaxCustFilter = 255;
+	Ofn.nFilterIndex = 1;   /* start with the *.emf filter */
+	Ofn.lpstrFile = lpstrFileName;
+	Ofn.nMaxFile = MAX_PATH;
+	Ofn.lpstrFileTitle = lpstrFileTitle;
+	Ofn.nMaxFileTitle = MAX_PATH;
+	Ofn.lpstrInitialDir = (LPSTR)NULL;
+	Ofn.lpstrTitle = (LPSTR)NULL;
+	Ofn.Flags = OFN_OVERWRITEPROMPT;
+	Ofn.lpstrDefExt = (LPSTR) "emf";
 
-    /* save cwd as GetSaveFileName apparently changes it */
-    cwd = _getcwd(NULL, 0);
+	/* save cwd as GetSaveFileName apparently changes it */
+	cwd = _getcwd(NULL, 0);
 
 	if (GetSaveFileName(&Ofn) != 0) {
 		RECT rect, mfrect;
@@ -3090,11 +3089,12 @@ SaveAsEMF(LPGW lpgw)
 		/* restore cwd */
 		if (cwd != NULL)
 			_chdir( cwd );
-    }
+	}
 
-    /* free the cwd buffer allcoated by _getcwd */
-    free(cwd);
+	/* free the cwd buffer allcoated by _getcwd */
+	free(cwd);
 }
+
 
 /* ================================== */
 
@@ -3894,7 +3894,7 @@ Wnd_exec_event(LPGW lpgw, LPARAM lparam, char type, int par1)
 	if (type != GE_keypress) /* no timestamp for key events */
 		par2 = thisTimestamp - lastTimestamp;
 	else
-			par2 = 0;
+		par2 = 0;
 
 	/* map events from inactive graph windows */
 	if (lpgw != graphwin) {
@@ -3999,7 +3999,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				/* track hypertexts */
 				track_tooltip(lpgw, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 				/* track (show) mouse position -- send the event to gnuplot */
-				Wnd_exec_event(lpgw, lParam,  GE_motion, wParam);
+				Wnd_exec_event(lpgw, lParam, GE_motion, wParam);
 				return 0L; /* end of WM_MOUSEMOVE */
 
 			case WM_LBUTTONDOWN: {
@@ -4097,12 +4097,9 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 #endif /* USE_MOUSE */
 
-
-
-	switch(message)
-	{
+	switch(message) {
 		case WM_SYSCOMMAND:
-			switch(LOWORD(wParam))
+			switch (LOWORD(wParam))
 			{
 				case M_GRAPH_TO_TOP:
 				case M_COLOR:
