@@ -1,3 +1,9 @@
+2016-10-15  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/command.c (timed_pause) src/stdfn.h (GP_SLEEP):  Enforce usage of
+	win_sleep() even if usleep() is available.
+	Bug #1867
+
 2016-10-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp:  Screen refresh must hold mutex lock,
@@ -15,6 +21,9 @@
 	used by gprintf() to label axis ticks.
 
 2016-10-08  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c src/win/wmenu.c src/win/wtext.c:  Argument of the
+	function ShowWindow is not a boolean.
 
 	* src/win/wgdiplus.cpp:  Enable antialiasing for polygons without
 	seams:  Draw a run of filled polygons to a bitmap four times as large
@@ -59,9 +68,9 @@
 
 2016-10-03  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/win/wgdiplus.cpp src/win/wgraph:  Implement oversampling for the
+	* src/win/wgdiplus.cpp src/win/wgraph.c: Implement oversampling for the
 	GDI+ windows terminal, i.e. draw diagonal lines at fractional pixel
-	positions to avoid "wobbling" effects.   Vertical or horizontal lines
+	positions to avoid "wobbling" effects.  Vertical or horizontal lines
 	and point symbols are still snapped to the nearest pixel to avoid
 	blurry lines.  Replaces the old "oversampling" method which drew on a
 	bitmap four times as large and then scaled down.
