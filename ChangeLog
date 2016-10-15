@@ -1,5 +1,9 @@
 2016-10-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgdiplus.cpp:  Take fontscale into account. Bugfix.
+
+2016-10-15  Bastian Maerkisch  <bmaerkisch@web.de>
+
 	* src/command.c (timed_pause) src/stdfn.h (GP_SLEEP):  Enforce usage of
 	win_sleep() even if usleep() is available.
 	Bug #1867
