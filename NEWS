@@ -1,6 +1,7 @@
 Changes in 5.0.6
 ================
 * FIX wxt - multithreaded wxt was faulting during resize (mutex lock failure)
+* FIX windows - timed pause only worked for intervals < 1 second
 
 Changes in 5.0.5
 ================
