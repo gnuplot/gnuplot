@@ -13,6 +13,10 @@
 	* src/win/wgraph.c (drawgraph):  Missed to recreate the brush in case
 	of fractional solid fill was requested. Bugfix.
 
+	* src/win/wgdiplus.cpp:  Use StringFormat::GenericTypographic() to draw
+	text.  This reduces differences in text placement between GDI and GDI+
+	output.
+
 2016-10-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp:  Screen refresh must hold mutex lock,
