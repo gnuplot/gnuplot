@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.189.2.15 2016/10/15 09:41:17 markisch Exp $
+ * $Id: wgraph.c,v 1.189.2.16 2016/10/15 09:52:55 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -50,6 +50,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <direct.h>           /* for _chdir */
+#include <tchar.h>
 #include "winmain.h"
 #include "wresourc.h"
 #include "wcommon.h"
@@ -1066,42 +1067,44 @@ SelFont(LPGW lpgw)
 	LOGFONT lf;
 	CHOOSEFONT cf;
 	HDC hdc;
-	char lpszStyle[LF_FACESIZE];
-	char *p;
+	TCHAR * p;
 
 	/* Set all structure fields to zero. */
-	_fmemset(&cf, 0, sizeof(CHOOSEFONT));
-	_fmemset(&lf, 0, sizeof(LOGFONT));
+	memset(&cf, 0, sizeof(CHOOSEFONT));
+	memset(&lf, 0, sizeof(LOGFONT));
 	cf.lStructSize = sizeof(CHOOSEFONT);
 	cf.hwndOwner = lpgw->hWndGraph;
-	_fstrncpy(lf.lfFaceName,lpgw->fontname,LF_FACESIZE);
-	if ((p = _fstrstr(lpgw->fontname," Bold")) != (LPSTR)NULL) {
-		_fstrncpy(lpszStyle,p+1,LF_FACESIZE);
-		lf.lfFaceName[ (unsigned int)(p-lpgw->fontname) ] = '\0';
-	} else if ((p = _fstrstr(lpgw->fontname," Italic")) != (LPSTR)NULL) {
-		_fstrncpy(lpszStyle,p+1,LF_FACESIZE);
-		lf.lfFaceName[ (unsigned int)(p-lpgw->fontname) ] = '\0';
+	_tcsncpy(lf.lfFaceName, lpgw->fontname, LF_FACESIZE);
+	if ((p = _tcsstr(lpgw->fontname, TEXT(" Bold"))) != NULL) {
+		lf.lfWeight = FW_BOLD;
+		lf.lfFaceName[p - lpgw->fontname] = NUL;
 	} else {
-		_fstrcpy(lpszStyle,"Regular");
+		lf.lfWeight = FW_NORMAL;
 	}
-	cf.lpszStyle = lpszStyle;
+	if ((p = _tcsstr(lpgw->fontname, TEXT(" Italic"))) != NULL) {
+		lf.lfItalic = TRUE;
+		lf.lfFaceName[p - lpgw->fontname] = NUL;
+	} else {
+		lf.lfItalic = FALSE;
+	}
+	lf.lfCharSet = DEFAULT_CHARSET;
 	hdc = GetDC(lpgw->hWndGraph);
 	lf.lfHeight = -MulDiv(lpgw->fontsize, GetDeviceCaps(hdc, LOGPIXELSY), 72);
 	ReleaseDC(lpgw->hWndGraph, hdc);
 	cf.lpLogFont = &lf;
 	cf.nFontType = SCREEN_FONTTYPE;
-	cf.Flags = CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT | CF_USESTYLE;
+	cf.Flags = CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT | CF_SCALABLEONLY;
 	if (ChooseFont(&cf)) {
-		_fstrcpy(lpgw->fontname,lf.lfFaceName);
+		_tcscpy(lpgw->fontname, lf.lfFaceName);
 		lpgw->fontsize = cf.iPointSize / 10;
 		if (cf.nFontType & BOLD_FONTTYPE)
-			lstrcat(lpgw->fontname," Bold");
+			_tcscat(lpgw->fontname, TEXT(" Bold"));
 		if (cf.nFontType & ITALIC_FONTTYPE)
-			lstrcat(lpgw->fontname," Italic");
+			_tcscat(lpgw->fontname, TEXT(" Italic"));
 		/* set current font as default font */
-		strcpy(lpgw->deffontname, lpgw->fontname);
+		_tcscpy(lpgw->deffontname, lpgw->fontname);
 		lpgw->deffontsize = lpgw->fontsize;
-		SendMessage(lpgw->hWndGraph,WM_COMMAND,M_REBUILDTOOLS,0L);
+		SendMessage(lpgw->hWndGraph, WM_COMMAND, M_REBUILDTOOLS, 0L);
 	}
 }
 
