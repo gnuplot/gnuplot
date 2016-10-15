@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.189.2.14 2016/09/14 18:22:41 markisch Exp $
+ * $Id: wgraph.c,v 1.189.2.15 2016/10/15 09:41:17 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -2349,23 +2349,20 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				if (alpha_c < 1.) {
 					alpha = alpha_c;
 					fill_color = last_color;
-					draw_new_brush(lpgw, hdc, fill_color);
-					solid_brush = lpgw->hcolorbrush;
 				} else if ((int)(fillstyle >> 4) == 100) {
 					/* special case this common choice */
 					// FIXME: we should already have that!
 					fill_color = last_color;
-					draw_new_brush(lpgw, hdc, fill_color);
-					solid_brush = lpgw->hcolorbrush;
 				} else {
 					double density = MINMAX(0, (int)(fillstyle >> 4), 100) * 0.01;
 					COLORREF color =
 						RGB(255 - density * (255 - GetRValue(last_color)),
 							255 - density * (255 - GetGValue(last_color)),
 							255 - density * (255 - GetBValue(last_color)));
-					solid_brush = lpgw->hcolorbrush;
 					fill_color = color;
 				}
+				draw_new_brush(lpgw, hdc, fill_color);
+				solid_brush = lpgw->hcolorbrush;
 				break;
 			}
 			case FS_TRANSPARENT_PATTERN:
