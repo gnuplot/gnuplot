@@ -23,6 +23,9 @@
 	Request scalable fonts only, to ensure fonts can be scaled or rotated,
 	or offer (some) Unicode characters.
 
+	* src/win/wgraph.c (MakeFonts):  Calculation of hchar and vtic lost
+	precision.  Bugfix.
+
 2016-10-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp:  Screen refresh must hold mutex lock,
