@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.106 2016/10/18 00:51:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.107 2016/10/18 01:00:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -1308,8 +1308,6 @@ check_for_iteration()
 	this_iter->iteration_increment = iteration_increment;
 	this_iter->iteration_current = iteration_current;
 	this_iter->iteration = iteration;
-	this_iter->done = FALSE;
-	this_iter->really_done = FALSE;
 	this_iter->next = NULL;
 	this_iter->prev = NULL;
 
@@ -1323,89 +1321,73 @@ check_for_iteration()
 	}
 	iter->prev = this_iter; /* a shortcut: making the list circular */
 
-	fprintf(stderr,"New iteration structure %p at depth %d\n", this_iter, nesting_depth);
 	nesting_depth++;
     }
 
     return iter;
 }
 
-/* Set up next iteration.
- * Return TRUE if there is one, FALSE if we're done
+/*
+ * Reset iteration at this level to start value.
+ * Any iteration levels underneath are reset also.
+ */
+void
+reset_iteration(t_iterator *iter)
+{
+    if (iter) {
+	iter->iteration_current = iter->iteration_start;
+	if (iter->iteration_string) {
+	    gpfree_string(&(iter->iteration_udv->udv_value));
+	    Gstring(&(iter->iteration_udv->udv_value), 
+		    gp_word(iter->iteration_string, iter->iteration_current));
+	} else {
+	    /* This traps fatal user error of reassigning iteration variable to a string */
+	    gpfree_string(&(iter->iteration_udv->udv_value));
+	    Ginteger(&(iter->iteration_udv->udv_value), iter->iteration_current);	
+	}
+	reset_iteration(iter->next);
+    }
+}
+
+/*
+ * Increment the iteration position recursively.
+ * returns TRUE if the iteration is still in range
+ * returns FALSE if the incement put it past the end limit
  */
 TBOOLEAN
 next_iteration(t_iterator *iter)
 {
-    t_iterator *this_iter;
-    TBOOLEAN condition = FALSE;
-    
+    /* Once it goes out of range it will stay that way until reset */
     if (!iter || empty_iteration(iter))
 	return FALSE;
 
-    /* Support for nested iteration:
-     * we start with the innermost loop. */
-    this_iter = iter->prev; /* linked to the last element of the list */
-    
-    if (!this_iter)
-	return FALSE;
-    
-    while (!iter->really_done && this_iter != iter && this_iter->done) {
-	this_iter->iteration_current = this_iter->iteration_start;
-	this_iter->done = FALSE;
-	if (this_iter->iteration_string) {
-	    gpfree_string(&(this_iter->iteration_udv->udv_value));
-	    Gstring(&(this_iter->iteration_udv->udv_value), 
-		    gp_word(this_iter->iteration_string, this_iter->iteration_current));
-	} else {
-	    gpfree_string(&(this_iter->iteration_udv->udv_value));
-	    Ginteger(&(this_iter->iteration_udv->udv_value), this_iter->iteration_current);	
-	}
-	
-	this_iter = this_iter->prev;
-    }
-   
-    if (!this_iter->iteration_udv) {
-	this_iter->iteration = 0;
-	return FALSE;
-    }
+    /* Give sub-iterations a chance to advance */
+    if (next_iteration(iter->next))
+	return TRUE;
+
+    /* Increment at this level */
     iter->iteration++;
-    /* don't increment if we're at the last iteration */
-    if (!iter->really_done)
-	this_iter->iteration_current += this_iter->iteration_increment;
-    if (this_iter->iteration_string) {
-	gpfree_string(&(this_iter->iteration_udv->udv_value));
-	Gstring(&(this_iter->iteration_udv->udv_value), 
-		gp_word(this_iter->iteration_string, this_iter->iteration_current));
+    iter->iteration_current += iter->iteration_increment;
+    if (iter->iteration_string) {
+	gpfree_string(&(iter->iteration_udv->udv_value));
+	Gstring(&(iter->iteration_udv->udv_value), 
+		gp_word(iter->iteration_string, iter->iteration_current));
     } else {
 	/* This traps fatal user error of reassigning iteration variable to a string */
-	gpfree_string(&(this_iter->iteration_udv->udv_value));
-	Ginteger(&(this_iter->iteration_udv->udv_value), this_iter->iteration_current);	
+	gpfree_string(&(iter->iteration_udv->udv_value));
+	Ginteger(&(iter->iteration_udv->udv_value), iter->iteration_current);	
     }
+   
+    /* If this runs off the end, leave the value out-of-range and return FALSE */ 
+    if (iter->iteration_increment > 0 &&  iter->iteration_end - iter->iteration_current < 0)
+	return FALSE;
+    if (iter->iteration_increment < 0 &&  iter->iteration_end - iter->iteration_current > 0)
+	return FALSE;
+
+    /* Reset sub-iterations, if any */
+    reset_iteration(iter->next);
     
-    /* Mar 2014 revised to avoid integer overflow */
-    if (this_iter->iteration_increment > 0
-    &&  this_iter->iteration_end - this_iter->iteration_current < this_iter->iteration_increment)
-	this_iter->done = TRUE;
-    else if (this_iter->iteration_increment < 0
-    &&  this_iter->iteration_end - this_iter->iteration_current > this_iter->iteration_increment)
-	this_iter->done = TRUE;
-    else
-	this_iter->done = FALSE;
-    
-    /* We return false only if we're, um, really done */
-    this_iter = iter;
-    while (this_iter) {
-	condition = condition || (!this_iter->done);
-	this_iter = this_iter->next;
-    }
-    if (!condition) {
-	if (!iter->really_done) {
-	    iter->really_done = TRUE;
-	    condition = TRUE;
-	} else 
-	    condition = FALSE;
-    }
-    return condition;
+    return TRUE;
 }
 
 /*

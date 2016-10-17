@@ -6,6 +6,9 @@
 	* src/parse.c:  Simplify the code that supports iteration.
 	Part 2:  Do not pre-calculate whether an iteration is "just once".
 
+	* src/parse.h src/parse.c:  Simplify the code that supports iteration.
+	Part 3:  Re-write next_iteration() to use recursion.
+
 2016-10-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/command.c (timed_pause) src/stdfn.h (GP_SLEEP):  Enforce usage of
