@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.104 2016/04/25 18:36:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.105 2016/09/19 04:40:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -1255,7 +1255,6 @@ check_for_iteration()
 	int iteration_increment = 1;
 	int iteration_current;
 	int iteration = 0;
-	TBOOLEAN empty_iteration;
 	TBOOLEAN just_once = FALSE;
 
 	c_token++;
@@ -1302,14 +1301,6 @@ check_for_iteration()
 
 	iteration_current = iteration_start;
 
-	empty_iteration = FALSE;	
-	if ( (iteration_udv != NULL)
-	&&   ((iteration_end > iteration_start && iteration_increment < 0)
-	   || (iteration_end < iteration_start && iteration_increment > 0))) {
-		empty_iteration = TRUE;
-		FPRINTF((stderr,"Empty iteration\n"));
-	}
-
 	/* Allocating a node of the linked list nested iterations. */
 	/* Iterating just once is the same as not iterating at all */
 	/* so we skip building the node in that case.		   */
@@ -1331,24 +1322,19 @@ check_for_iteration()
 	    this_iter->iteration = iteration;
 	    this_iter->done = FALSE;
 	    this_iter->really_done = FALSE;
-	    this_iter->empty_iteration = empty_iteration;
 	    this_iter->next = NULL;
 	    this_iter->prev = NULL;
 	    if (nesting_depth == 0) {
 		/* first "for" statement: this will be the listhead */
 		iter = this_iter;
-	    }
-	    else {
+	    } else {
 		/* not the first "for" statement: attach the newly created node to the end of the list */
-		iter->prev->next = this_iter;  /* iter->prev points to the last node of the list */
+		iter->prev->next = this_iter;
 		this_iter->prev = iter->prev;
 	    }
 	    iter->prev = this_iter; /* a shortcut: making the list circular */
 
-	    /* if one iteration in the chain is empty, the subchain of nested iterations is too */
-	    if (!iter->empty_iteration) 
-		iter->empty_iteration = empty_iteration;
-
+	    FPRINTF((stderr,"New iteration structure %p at depth %d\n", this_iter, nesting_depth));
 	    nesting_depth++;
 	}
     }
@@ -1365,7 +1351,7 @@ next_iteration(t_iterator *iter)
     t_iterator *this_iter;
     TBOOLEAN condition = FALSE;
     
-    if (!iter || iter->empty_iteration)
+    if (!iter || empty_iteration(iter))
 	return FALSE;
 
     /* Support for nested iteration:
@@ -1434,13 +1420,23 @@ next_iteration(t_iterator *iter)
     return condition;
 }
 
+/*
+ * Returns TRUE if
+ * - this really is an iteration and
+ * - the top level iteration covers no usable range
+ */
 TBOOLEAN
 empty_iteration(t_iterator *iter)
 {
     if (!iter)
 	return FALSE;
-    else
-	return iter->empty_iteration;
+
+    if ((iter->iteration_end > iter->iteration_start && iter->iteration_increment < 0)
+    ||  (iter->iteration_end < iter->iteration_start && iter->iteration_increment > 0)) {
+	return TRUE;
+    }
+
+    return (empty_iteration(iter->next));
 }
 
 t_iterator *

@@ -1,3 +1,8 @@
+2016-10-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/parse.h src/parse.c:  Simplify the code that supports iteration.
+	Part 1:  Do not try to pre-calculate and flag empty iterations.
+
 2016-10-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/command.c (timed_pause) src/stdfn.h (GP_SLEEP):  Enforce usage of
