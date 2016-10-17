@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.105 2016/09/19 04:40:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.106 2016/10/18 00:51:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -1255,7 +1255,6 @@ check_for_iteration()
 	int iteration_increment = 1;
 	int iteration_current;
 	int iteration = 0;
-	TBOOLEAN just_once = FALSE;
 
 	c_token++;
 	if (!equals(c_token++, "[") || !isletter(c_token))
@@ -1301,42 +1300,31 @@ check_for_iteration()
 
 	iteration_current = iteration_start;
 
-	/* Allocating a node of the linked list nested iterations. */
-	/* Iterating just once is the same as not iterating at all */
-	/* so we skip building the node in that case.		   */
-	if (iteration_start == iteration_end)
-	    just_once = TRUE;
-	if (iteration_start < iteration_end && iteration_end < iteration_start + iteration_increment)
-	    just_once = TRUE;
-	if (iteration_start > iteration_end && iteration_end > iteration_start + iteration_increment)
-	    just_once = TRUE;
+	this_iter = gp_alloc(sizeof(t_iterator), "iteration linked list");
+	this_iter->iteration_udv = iteration_udv; 
+	this_iter->iteration_string = iteration_string;
+	this_iter->iteration_start = iteration_start;
+	this_iter->iteration_end = iteration_end;
+	this_iter->iteration_increment = iteration_increment;
+	this_iter->iteration_current = iteration_current;
+	this_iter->iteration = iteration;
+	this_iter->done = FALSE;
+	this_iter->really_done = FALSE;
+	this_iter->next = NULL;
+	this_iter->prev = NULL;
 
-	if (!just_once) {
-	    this_iter = gp_alloc(sizeof(t_iterator), "iteration linked list");
-	    this_iter->iteration_udv = iteration_udv; 
-	    this_iter->iteration_string = iteration_string;
-	    this_iter->iteration_start = iteration_start;
-	    this_iter->iteration_end = iteration_end;
-	    this_iter->iteration_increment = iteration_increment;
-	    this_iter->iteration_current = iteration_current;
-	    this_iter->iteration = iteration;
-	    this_iter->done = FALSE;
-	    this_iter->really_done = FALSE;
-	    this_iter->next = NULL;
-	    this_iter->prev = NULL;
-	    if (nesting_depth == 0) {
-		/* first "for" statement: this will be the listhead */
-		iter = this_iter;
-	    } else {
-		/* not the first "for" statement: attach the newly created node to the end of the list */
-		iter->prev->next = this_iter;
-		this_iter->prev = iter->prev;
-	    }
-	    iter->prev = this_iter; /* a shortcut: making the list circular */
-
-	    FPRINTF((stderr,"New iteration structure %p at depth %d\n", this_iter, nesting_depth));
-	    nesting_depth++;
+	if (nesting_depth == 0) {
+	    /* first "for" statement: this will be the listhead */
+	    iter = this_iter;
+	} else {
+	    /* not the first "for" statement: attach the newly created node to the end of the list */
+	    iter->prev->next = this_iter;
+	    this_iter->prev = iter->prev;
 	}
+	iter->prev = this_iter; /* a shortcut: making the list circular */
+
+	fprintf(stderr,"New iteration structure %p at depth %d\n", this_iter, nesting_depth);
+	nesting_depth++;
     }
 
     return iter;
