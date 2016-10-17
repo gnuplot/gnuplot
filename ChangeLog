@@ -9,6 +9,11 @@
 	* src/parse.h src/parse.c:  Simplify the code that supports iteration.
 	Part 3:  Re-write next_iteration() to use recursion.
 
+	* src/parse.h src/parse.c demo/iterate.dem:  Dynamic reevaluation of
+	iteration limits.  Allows inner loop to reference variable from outer
+	loop:  E.g.    for [i=1:N] for [j=i:i+1] f(i,j)
+	Bug #1817
+
 2016-10-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/command.c (timed_pause) src/stdfn.h (GP_SLEEP):  Enforce usage of

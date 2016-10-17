@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.107 2016/10/18 01:00:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.108 2016/10/18 01:11:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -1236,6 +1236,8 @@ is_builtin_function(int t_num)
  * If one (or more) is found, an iterator structure is allocated and filled
  * and a pointer to that structure is returned.
  * The pointer is NULL if no "for" statements are found.
+ * If the iteration limits are constants, store them as is.
+ * If they are given as expressions, store an action table for the expression.
  */
 t_iterator *
 check_for_iteration()
@@ -1255,6 +1257,8 @@ check_for_iteration()
 	int iteration_increment = 1;
 	int iteration_current;
 	int iteration = 0;
+	struct at_type *iteration_start_at = NULL;
+	struct at_type *iteration_end_at = NULL;
 
 	c_token++;
 	if (!equals(c_token++, "[") || !isletter(c_token))
@@ -1263,14 +1267,31 @@ check_for_iteration()
 
 	if (equals(c_token, "=")) {
 	    c_token++;
-	    iteration_start = int_expression();
+	    if (isanumber(c_token) && equals(c_token+1,":")) {
+		/* Save the constant value only */
+		iteration_start = int_expression();
+	    } else {
+		/* Save the expression as well as the value */
+		struct value v;
+		iteration_start_at = perm_at();
+		evaluate_at(iteration_start_at, &v);
+		iteration_start = real(&v);
+	    }
 	    if (!equals(c_token++, ":"))
 	    	int_error(c_token-1, errormsg);
 	    if (equals(c_token,"*")) {
 		iteration_end = INT_MAX;
 		c_token++;
-	    } else
+	    } else if (isanumber(c_token) && (equals(c_token+1,":") || equals(c_token+1,"]"))) {
+		/* Save the constant value only */
 		iteration_end = int_expression();
+	    } else {
+		/* Save the expression as well as the value */
+		struct value v;
+		iteration_end_at = perm_at();
+		evaluate_at(iteration_end_at, &v);
+		iteration_end = real(&v);
+	    }
 	    if (equals(c_token,":")) {
 	    	c_token++;
 	    	iteration_increment = int_expression();
@@ -1308,6 +1329,8 @@ check_for_iteration()
 	this_iter->iteration_increment = iteration_increment;
 	this_iter->iteration_current = iteration_current;
 	this_iter->iteration = iteration;
+	this_iter->start_at = iteration_start_at;
+	this_iter->end_at = iteration_end_at;
 	this_iter->next = NULL;
 	this_iter->prev = NULL;
 
@@ -1334,19 +1357,31 @@ check_for_iteration()
 void
 reset_iteration(t_iterator *iter)
 {
-    if (iter) {
-	iter->iteration_current = iter->iteration_start;
-	if (iter->iteration_string) {
-	    gpfree_string(&(iter->iteration_udv->udv_value));
-	    Gstring(&(iter->iteration_udv->udv_value), 
-		    gp_word(iter->iteration_string, iter->iteration_current));
-	} else {
-	    /* This traps fatal user error of reassigning iteration variable to a string */
-	    gpfree_string(&(iter->iteration_udv->udv_value));
-	    Ginteger(&(iter->iteration_udv->udv_value), iter->iteration_current);	
-	}
-	reset_iteration(iter->next);
+    if (!iter)
+	return;
+
+    if (iter->start_at) {
+	struct value v;
+	evaluate_at(iter->start_at, &v);
+	iter->iteration_start = real(&v);
     }
+    iter->iteration_current = iter->iteration_start;
+    if (iter->iteration_string) {
+	gpfree_string(&(iter->iteration_udv->udv_value));
+	Gstring(&(iter->iteration_udv->udv_value), 
+		gp_word(iter->iteration_string, iter->iteration_current));
+    } else {
+	/* This traps fatal user error of reassigning iteration variable to a string */
+	gpfree_string(&(iter->iteration_udv->udv_value));
+	Ginteger(&(iter->iteration_udv->udv_value), iter->iteration_current);	
+    }
+    if (iter->end_at) {
+	struct value v;
+	evaluate_at(iter->end_at, &v);
+	iter->iteration_end = real(&v);
+    }
+    reset_iteration(iter->next);
+
 }
 
 /*
@@ -1415,6 +1450,8 @@ cleanup_iteration(t_iterator *iter)
     while (iter) {
 	t_iterator *next = iter->next;
 	free(iter->iteration_string);
+	free(iter->start_at);
+	free(iter->end_at);
 	free(iter);
 	iter = next;
     }

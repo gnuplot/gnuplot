@@ -20,3 +20,13 @@ splot for [i=1:*] "whale.dat" index i title sprintf("scan %d",i) with lines
 pause -1 "Hit return to continue"
 reset
 
+
+# Dynamic reevaluation of iteration limits
+# inner loop refers to the control variable of an outer loop
+#
+set key opaque box height 1 title "Dynamic iteration limits"
+set title "plot for [i=1:4] for [k=i:i] for [j=1:k] 10*k + cos(j*x)"
+plot for [i=1:4] for [k=i:i] for [j=1:k] 10*k + cos(j*x) lw j \
+     title sprintf("k=%d  j=%d", i, j)
+pause -1 "Hit return to continue"
+reset
