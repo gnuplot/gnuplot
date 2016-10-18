@@ -1,3 +1,8 @@
+2016-10-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/parse.h src/parse.c:  Simplify the code that supports iteration.
+	Part 4:  Iteration list no longer needs to be double-linked.
+
 2016-10-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/parse.h src/parse.c:  Simplify the code that supports iteration.
@@ -503,7 +508,7 @@
 	
 	* src/readline.c (getc_wrapper):  Clear errno before reading next
 	character.  This fix contributed anonymously.
-	Bug #1846
+	Bug #1846 #1865
 
 2016-08-19  Ethan A Merritt  <merritt@u.washington.edu>
 

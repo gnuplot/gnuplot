@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.108 2016/10/18 01:11:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.109 2016/10/18 06:26:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -1245,6 +1245,7 @@ check_for_iteration()
     char *errormsg = "Expecting iterator \tfor [<var> = <start> : <end> {: <incr>}]\n\t\t\tor\tfor [<var> in \"string of words\"]";
     int nesting_depth = 0;
     t_iterator *iter = NULL;
+    t_iterator *prev = NULL;
     t_iterator *this_iter = NULL;
 
     /* Now checking for iteration parameters */
@@ -1332,17 +1333,15 @@ check_for_iteration()
 	this_iter->start_at = iteration_start_at;
 	this_iter->end_at = iteration_end_at;
 	this_iter->next = NULL;
-	this_iter->prev = NULL;
 
 	if (nesting_depth == 0) {
 	    /* first "for" statement: this will be the listhead */
 	    iter = this_iter;
 	} else {
 	    /* not the first "for" statement: attach the newly created node to the end of the list */
-	    iter->prev->next = this_iter;
-	    this_iter->prev = iter->prev;
+	    prev->next = this_iter;
 	}
-	iter->prev = this_iter; /* a shortcut: making the list circular */
+	prev = this_iter;
 
 	nesting_depth++;
     }
