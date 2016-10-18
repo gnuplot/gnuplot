@@ -1,3 +1,12 @@
+2016-10-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/parse.c src/parse.h demo/iterate.dem:
+	Backport revised iteration code from development version, including
+	dynamic reevaluation of start/end limits in nested iterations.
+	This allows an inner loop to reference a variable from an outer loop:
+	E.g.    for [i=1:N] for [j=i:i+1] f(i,j)
+	Bug #1817
+
 2016-10-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgdiplus.cpp:  Take fontscale into account. Bugfix.
@@ -206,7 +215,7 @@
 	
 	* src/readline.c (getc_wrapper):  Clear errno before reading next
 	character.  This fix contributed anonymously.
-	Bug #1846
+	Bug #1846 #1865
 
 2016-08-19  Ethan A Merritt  <merritt@u.washington.edu>
 

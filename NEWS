@@ -1,5 +1,6 @@
 Changes in 5.0.6
 ================
+* CHANGE - start/end limits in nested iterations are reevaluated on the fly
 * FIX wxt - multithreaded wxt was faulting during resize (mutex lock failure)
 * FIX windows - timed pause only worked for intervals < 1 second
 

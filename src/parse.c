@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.88.2.5 2015/08/05 15:50:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.88.2.6 2016/01/11 23:32:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -1111,6 +1111,8 @@ is_builtin_function(int t_num)
  * If one (or more) is found, an iterator structure is allocated and filled
  * and a pointer to that structure is returned.
  * The pointer is NULL if no "for" statements are found.
+ * If the iteration limits are constants, store them as is.
+ * If they are given as expressions, store an action table for the expression.
  */
 t_iterator *
 check_for_iteration()
@@ -1118,6 +1120,7 @@ check_for_iteration()
     char *errormsg = "Expecting iterator \tfor [<var> = <start> : <end> {: <incr>}]\n\t\t\tor\tfor [<var> in \"string of words\"]";
     int nesting_depth = 0;
     t_iterator *iter = NULL;
+    t_iterator *prev = NULL;
     t_iterator *this_iter = NULL;
 
     /* Now checking for iteration parameters */
@@ -1130,8 +1133,8 @@ check_for_iteration()
 	int iteration_increment = 1;
 	int iteration_current;
 	int iteration = 0;
-	TBOOLEAN empty_iteration;
-	TBOOLEAN just_once = FALSE;
+	struct at_type *iteration_start_at = NULL;
+	struct at_type *iteration_end_at = NULL;
 
 	c_token++;
 	if (!equals(c_token++, "[") || !isletter(c_token))
@@ -1140,14 +1143,31 @@ check_for_iteration()
 
 	if (equals(c_token, "=")) {
 	    c_token++;
-	    iteration_start = int_expression();
+	    if (isanumber(c_token) && equals(c_token+1,":")) {
+		/* Save the constant value only */
+		iteration_start = int_expression();
+	    } else {
+		/* Save the expression as well as the value */
+		struct value v;
+		iteration_start_at = perm_at();
+		evaluate_at(iteration_start_at, &v);
+		iteration_start = real(&v);
+	    }
 	    if (!equals(c_token++, ":"))
 	    	int_error(c_token-1, errormsg);
 	    if (equals(c_token,"*")) {
 		iteration_end = INT_MAX;
 		c_token++;
-	    } else
+	    } else if (isanumber(c_token) && (equals(c_token+1,":") || equals(c_token+1,"]"))) {
+		/* Save the constant value only */
 		iteration_end = int_expression();
+	    } else {
+		/* Save the expression as well as the value */
+		struct value v;
+		iteration_end_at = perm_at();
+		evaluate_at(iteration_end_at, &v);
+		iteration_end = real(&v);
+	    }
 	    if (equals(c_token,":")) {
 	    	c_token++;
 	    	iteration_increment = int_expression();
@@ -1179,145 +1199,125 @@ check_for_iteration()
 
 	iteration_current = iteration_start;
 
-	empty_iteration = FALSE;	
-	if ( (iteration_udv != NULL)
-	&&   ((iteration_end > iteration_start && iteration_increment < 0)
-	   || (iteration_end < iteration_start && iteration_increment > 0))) {
-		empty_iteration = TRUE;
-		FPRINTF((stderr,"Empty iteration\n"));
+	this_iter = gp_alloc(sizeof(t_iterator), "iteration linked list");
+	this_iter->iteration_udv = iteration_udv; 
+	this_iter->iteration_string = iteration_string;
+	this_iter->iteration_start = iteration_start;
+	this_iter->iteration_end = iteration_end;
+	this_iter->iteration_increment = iteration_increment;
+	this_iter->iteration_current = iteration_current;
+	this_iter->iteration = iteration;
+	this_iter->start_at = iteration_start_at;
+	this_iter->end_at = iteration_end_at;
+	this_iter->next = NULL;
+
+	if (nesting_depth == 0) {
+	    /* first "for" statement: this will be the listhead */
+	    iter = this_iter;
+	} else {
+	    /* not the first "for" statement: attach the newly created node to the end of the list */
+	    prev->next = this_iter;
 	}
+	prev = this_iter;
 
-	/* Allocating a node of the linked list nested iterations. */
-	/* Iterating just once is the same as not iterating at all */
-	/* so we skip building the node in that case.		   */
-	if (iteration_start == iteration_end)
-	    just_once = TRUE;
-	if (iteration_start < iteration_end && iteration_end < iteration_start + iteration_increment)
-	    just_once = TRUE;
-	if (iteration_start > iteration_end && iteration_end > iteration_start + iteration_increment)
-	    just_once = TRUE;
-
-	if (!just_once) {
-	    this_iter = gp_alloc(sizeof(t_iterator), "iteration linked list");
-	    this_iter->iteration_udv = iteration_udv; 
-	    this_iter->iteration_string = iteration_string;
-	    this_iter->iteration_start = iteration_start;
-	    this_iter->iteration_end = iteration_end;
-	    this_iter->iteration_increment = iteration_increment;
-	    this_iter->iteration_current = iteration_current;
-	    this_iter->iteration = iteration;
-	    this_iter->done = FALSE;
-	    this_iter->really_done = FALSE;
-	    this_iter->empty_iteration = empty_iteration;
-	    this_iter->next = NULL;
-	    this_iter->prev = NULL;
-	    if (nesting_depth == 0) {
-		/* first "for" statement: this will be the listhead */
-		iter = this_iter;
-	    }
-	    else {
-		/* not the first "for" statement: attach the newly created node to the end of the list */
-		iter->prev->next = this_iter;  /* iter->prev points to the last node of the list */
-		this_iter->prev = iter->prev;
-	    }
-	    iter->prev = this_iter; /* a shortcut: making the list circular */
-
-	    /* if one iteration in the chain is empty, the subchain of nested iterations is too */
-	    if (!iter->empty_iteration) 
-		iter->empty_iteration = empty_iteration;
-
-	    nesting_depth++;
-	}
+	nesting_depth++;
     }
 
     return iter;
 }
 
-/* Set up next iteration.
- * Return TRUE if there is one, FALSE if we're done
+/*
+ * Reset iteration at this level to start value.
+ * Any iteration levels underneath are reset also.
+ */
+void
+reset_iteration(t_iterator *iter)
+{
+    if (!iter)
+	return;
+
+    if (iter->start_at) {
+	struct value v;
+	evaluate_at(iter->start_at, &v);
+	iter->iteration_start = real(&v);
+    }
+    iter->iteration_current = iter->iteration_start;
+    if (iter->iteration_string) {
+	gpfree_string(&(iter->iteration_udv->udv_value));
+	Gstring(&(iter->iteration_udv->udv_value), 
+		gp_word(iter->iteration_string, iter->iteration_current));
+    } else {
+	/* This traps fatal user error of reassigning iteration variable to a string */
+	gpfree_string(&(iter->iteration_udv->udv_value));
+	Ginteger(&(iter->iteration_udv->udv_value), iter->iteration_current);	
+    }
+    if (iter->end_at) {
+	struct value v;
+	evaluate_at(iter->end_at, &v);
+	iter->iteration_end = real(&v);
+    }
+    reset_iteration(iter->next);
+
+}
+
+/*
+ * Increment the iteration position recursively.
+ * returns TRUE if the iteration is still in range
+ * returns FALSE if the incement put it past the end limit
  */
 TBOOLEAN
 next_iteration(t_iterator *iter)
 {
-    t_iterator *this_iter;
-    TBOOLEAN condition = FALSE;
-    
-    if (!iter || iter->empty_iteration)
+    /* Once it goes out of range it will stay that way until reset */
+    if (!iter || empty_iteration(iter))
 	return FALSE;
 
-    /* Support for nested iteration:
-     * we start with the innermost loop. */
-    this_iter = iter->prev; /* linked to the last element of the list */
-    
-    if (!this_iter)
-	return FALSE;
-    
-    while (!iter->really_done && this_iter != iter && this_iter->done) {
-	this_iter->iteration_current = this_iter->iteration_start;
-	this_iter->done = FALSE;
-	if (this_iter->iteration_string) {
-	    gpfree_string(&(this_iter->iteration_udv->udv_value));
-	    Gstring(&(this_iter->iteration_udv->udv_value), 
-		    gp_word(this_iter->iteration_string, this_iter->iteration_current));
-	} else {
-	    gpfree_string(&(this_iter->iteration_udv->udv_value));
-	    Ginteger(&(this_iter->iteration_udv->udv_value), this_iter->iteration_current);	
-	}
-	
-	this_iter = this_iter->prev;
-    }
-   
-    if (!this_iter->iteration_udv) {
-	this_iter->iteration = 0;
-	return FALSE;
-    }
+    /* Give sub-iterations a chance to advance */
+    if (next_iteration(iter->next))
+	return TRUE;
+
+    /* Increment at this level */
     iter->iteration++;
-    /* don't increment if we're at the last iteration */
-    if (!iter->really_done)
-	this_iter->iteration_current += this_iter->iteration_increment;
-    if (this_iter->iteration_string) {
-	gpfree_string(&(this_iter->iteration_udv->udv_value));
-	Gstring(&(this_iter->iteration_udv->udv_value), 
-		gp_word(this_iter->iteration_string, this_iter->iteration_current));
+    iter->iteration_current += iter->iteration_increment;
+    if (iter->iteration_string) {
+	gpfree_string(&(iter->iteration_udv->udv_value));
+	Gstring(&(iter->iteration_udv->udv_value), 
+		gp_word(iter->iteration_string, iter->iteration_current));
     } else {
 	/* This traps fatal user error of reassigning iteration variable to a string */
-	gpfree_string(&(this_iter->iteration_udv->udv_value));
-	Ginteger(&(this_iter->iteration_udv->udv_value), this_iter->iteration_current);	
+	gpfree_string(&(iter->iteration_udv->udv_value));
+	Ginteger(&(iter->iteration_udv->udv_value), iter->iteration_current);	
     }
+   
+    /* If this runs off the end, leave the value out-of-range and return FALSE */ 
+    if (iter->iteration_increment > 0 &&  iter->iteration_end - iter->iteration_current < 0)
+	return FALSE;
+    if (iter->iteration_increment < 0 &&  iter->iteration_end - iter->iteration_current > 0)
+	return FALSE;
+
+    /* Reset sub-iterations, if any */
+    reset_iteration(iter->next);
     
-    /* Mar 2014 revised to avoid integer overflow */
-    if (this_iter->iteration_increment > 0
-    &&  this_iter->iteration_end - this_iter->iteration_current < this_iter->iteration_increment)
-	this_iter->done = TRUE;
-    else if (this_iter->iteration_increment < 0
-    &&  this_iter->iteration_end - this_iter->iteration_current > this_iter->iteration_increment)
-	this_iter->done = TRUE;
-    else
-	this_iter->done = FALSE;
-    
-    /* We return false only if we're, um, really done */
-    this_iter = iter;
-    while (this_iter) {
-	condition = condition || (!this_iter->done);
-	this_iter = this_iter->next;
-    }
-    if (!condition) {
-	if (!iter->really_done) {
-	    iter->really_done = TRUE;
-	    condition = TRUE;
-	} else 
-	    condition = FALSE;
-    }
-    return condition;
+    return TRUE;
 }
 
+/*
+ * Returns TRUE if
+ * - this really is an iteration and
+ * - the top level iteration covers no usable range
+ */
 TBOOLEAN
 empty_iteration(t_iterator *iter)
 {
     if (!iter)
 	return FALSE;
-    else
-	return iter->empty_iteration;
+
+    if ((iter->iteration_end > iter->iteration_start && iter->iteration_increment < 0)
+    ||  (iter->iteration_end < iter->iteration_start && iter->iteration_increment > 0)) {
+	return TRUE;
+    }
+
+    return (empty_iteration(iter->next));
 }
 
 t_iterator *
@@ -1326,6 +1326,8 @@ cleanup_iteration(t_iterator *iter)
     while (iter) {
 	t_iterator *next = iter->next;
 	free(iter->iteration_string);
+	free(iter->start_at);
+	free(iter->end_at);
 	free(iter);
 	iter = next;
     }
