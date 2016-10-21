@@ -1,0 +1,21 @@
+set title "set minussign; set micro"
+unset minus
+unset micro
+set label 1 gprintf("no special characters:  %.2s %cUnits", -1.23e-6)
+set minus
+set micro
+set label 2 gprintf("   special characters:  %.2s %cUnits", -1.23e-6)
+set label 3 sprintf("current encoding %s", GPVAL_ENCODING)
+
+set label 1 at 1,4 font ",20"
+set label 2 at 1,3 font ",20"
+set label 3 at 1,1 font ",15" noenhanced
+
+unset border
+unset xtics
+unset ytics
+unset key
+
+plot [0:10][0:10] -10
+
+reset

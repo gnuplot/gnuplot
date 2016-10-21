@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.326.2.16 2016/08/27 20:50:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.326.2.17 2016/09/03 23:18:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -159,6 +159,7 @@ static void show_loadpath __PROTO((void));
 static void show_fontpath __PROTO((void));
 static void show_zero __PROTO((void));
 static void show_datafile __PROTO((void));
+static void show_micro __PROTO((void));
 static void show_minus_sign __PROTO((void));
 #ifdef USE_MOUSE
 static void show_mouse __PROTO((void));
@@ -330,6 +331,9 @@ show_command()
 	break;
     case S_LOGSCALE:
 	show_logscale();
+	break;
+    case S_MICRO:
+	show_micro();
 	break;
     case S_MINUS_SIGN:
 	show_minus_sign();
@@ -753,6 +757,7 @@ show_all()
     show_logscale();
     show_offsets();
     show_margin();
+    show_micro();
     show_minus_sign();
     show_output();
     show_print();
@@ -2570,6 +2575,16 @@ show_decimalsign()
         fprintf(stderr, "\tdecimalsign for output has default value (normally '.')\n");
 
     fprintf(stderr, "\tdegree sign for output is %s \n", degree_sign);
+}
+
+/* process 'show micro' command */
+static void
+show_micro()
+{
+    SHOW_ALL_NL;
+
+    fprintf(stderr, "\tmicro character for output is %s \n", 
+    	(use_micro && micro) ? micro : "u");
 }
 
 /* process 'show minus_sign' command */

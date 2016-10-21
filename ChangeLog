@@ -1,3 +1,18 @@
+2016-10-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/eval.c src/save.c src/set.c src/show.c src/tables.c src/tables.h
+	src/unset.c src/util.c src/util.h demo/special_chars.dem:
+	New command "set micro" tells gnuplot to use an encoding-specific
+	character sequence rather than "u" for the micro sign (unicode U+00B5)
+	used as a prefix in scientific notation.  This affects the "%c" format
+	used by gprintf() to label axis ticks.
+
+	* term/pslatex.trm:  For pslatex, epslatex, cairolatex "standalone"
+	option, if the current encoding is utf8 then put a line in the output
+	/usepackage[utf8x]{inputenc}
+	Note that [utf8x] (not [utf8]) is needed to correctly process the 
+	degree sign and micro characters.
+
 2016-10-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/parse.c src/parse.h demo/iterate.dem:
