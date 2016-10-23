@@ -6,6 +6,13 @@
 	* term/svg.trm:  Transition to SVG 2.0
 	Remove DTD.  Remove option "fontfile" and references to SVG fonts.
 
+	* src/axis.h src/axis.c src/show.c: Macros AXIS_IS_FIRST AXIS_IS_SECOND
+	are used only once. Remove them.
+
+	* src/internal.c: Clarify error message printed when an undefined 
+	variable is found in a string expression.
+	Bug #1783
+
 2016-10-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/parse.h src/parse.c:  Simplify the code that supports iteration.
