@@ -3,6 +3,9 @@
 	* src/set.c (set_style):  Allow "set style textbox border" without a
 	specific border color to default to black.
 
+	* term/svg.trm:  Transition to SVG 2.0
+	Remove DTD.  Remove option "fontfile" and references to SVG fonts.
+
 2016-10-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/parse.h src/parse.c:  Simplify the code that supports iteration.

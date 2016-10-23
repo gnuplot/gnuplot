@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.180 2016/09/22 21:06:36 sfeam Exp $
+ * $Id: svg.trm,v 1.182 2016/09/27 17:39:38 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -60,6 +60,10 @@
  *
  * Inline image data in Base64 encoding
  *   Daniel Sebald May 2016
+ *
+ * Transition to SVG 2.0
+ *   remove DTD
+ *   remove option "fontfile" and references to SVG fonts 
  */
 
 /*
@@ -207,10 +211,6 @@ static void SVG_local_reset __PROTO((void));
 static void SVG_DefineFillPattern __PROTO((int fillpat));
 static void SVG_MoveForced __PROTO((unsigned int x, unsigned int y));
 static void SVG_write_preamble __PROTO ((void));
-
-/* Points to source of requested embedded font */
-static char *SVG_embedded_font = NULL;
-static void SVG_load_fontfile __PROTO((char *fontfile));
 
 /* Stuff for enhanced text mode */
 static int ENHsvg_string_state = 0;
@@ -649,18 +649,6 @@ SVG_options ()
 	    continue;
 	}
 
-	if (almost_equals(c_token, "fontfile")) {
-	    char *fontfile_name;
-	    c_token++;
-
-	    fontfile_name = try_to_get_string();
-	    if (!fontfile_name)
-		int_error(c_token, "Font filename expected");
-	    gp_expand_tilde(&fontfile_name);
-	    SVG_embedded_font = fontfile_name;
-	    continue;
-	}
-
 	if (almost_equals(c_token, "linew$idth") || equals(c_token, "lw")) {
 	    c_token++;
 	    SVG_linewidth_factor = real_expression();
@@ -735,11 +723,6 @@ SVG_options ()
 	    "name \"%s\" ", SVG_name);
     }
 
-    if (SVG_embedded_font) {
-	sprintf(term_options + strlen(term_options),
-	    "fontfile \"%s\" ", SVG_embedded_font);
-    }
-
     sprintf(term_options + strlen(term_options),
 	SVG_linecap == ROUNDED ? "rounded " : SVG_linecap == SQUARE ? "square " : "butt ");
 
@@ -767,9 +750,6 @@ SVG_local_reset()
     free(SVG_fontNameDef);
     SVG_fontNameDef = gp_strdup("Arial");
     SVG_fontSizeDef  = 12;
-    if (SVG_embedded_font)
-	free(SVG_embedded_font);
-    SVG_embedded_font = NULL;
     SVG_mouseable = FALSE;
     SVG_standalone = FALSE;
     free(SVG_name);
@@ -878,9 +858,7 @@ SVG_write_preamble ()
       fprintf(gpoutfile, "\033]72;");
     if (SVG_emit_doctype)
         fprintf (gpoutfile,
-                 "<?xml version=\"1.0\" %s standalone=\"no\"?>\n"
-                 "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\"\n"
-                 " \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n",
+                 "<?xml version=\"1.0\" %s standalone=\"no\"?>\n",
                  svg_encoding);
     fprintf(gpoutfile, "<svg ");
 
@@ -1000,8 +978,6 @@ SVG_write_preamble ()
     /* Start prologue section of output file, and load fonts if requested */
 
     fprintf(gpoutfile,"<defs>\n");
-    if (SVG_embedded_font)
-	SVG_load_fontfile(SVG_embedded_font);
 
     /* definitions of point symbols */
     /* FIXME: SVG scales linewidth along with the marker itself, and
@@ -2066,70 +2042,6 @@ ENHsvg_writec(int c)
     }
 }
 
-static void
-SVG_load_fontfile(char *fontfile)
-{
-    if (fontfile) {
-	unsigned int linesread = 0;
-	FILE *ffont = NULL;
-	char line[256];
-	char *fontname = NULL;
-#if defined(PIPES)
-	TBOOLEAN ispipe = FALSE;
-#endif
-
-#if defined(PIPES)
-	if ( *fontfile == '<' ) {
-	    restrict_popen();
-	    ispipe = TRUE;
-	    ffont = popen(fontfile + 1, "r" );
-	    if ( !ffont )
-		int_error(NO_CARET, "Could not execute pipe '%s'",
-			  fontfile + 1 );
-	} else
-#endif
-	{
-	    ffont = fopen(fontfile, "r");
-	    if (!ffont)
-		int_error(NO_CARET, "Font file '%s' not found", fontfile);
-	}
-
-	/* read the file */
-	while (fgets(line,255,ffont)) {
-	    /* Echo fontname to terminal */
-	    if ((fontname = strstr(line,"font-family"))) {
-		fprintf(stderr, "Font file '%s' contains the font '%s'\n",
-				fontfile, fontname);
-	    }
-
-	    /* Copy contents into output file */
-	    fputs(line,gpoutfile);
-
-	    ++linesread;
-	}
-#if defined(PIPES)
-	if ( ispipe ) {
-	    int exitcode;
-	    if ( (exitcode = pclose(ffont)) != 0 )
-		int_error(NO_CARET, "Command '%s' generated error exitcode %d",
-			  fontfile + 1, exitcode);
-	} else
-#endif
-	    fclose(ffont);
-
-	if (linesread == 0) {
-#if defined(PIPES)
-	    if ( ispipe )
-		int_error(NO_CARET,
-		    "Command '%s' generates empty output", fontfile + 1);
-	    else
-#endif
-		int_error(NO_CARET, "Font file '%s' is empty", fontfile);
-	}
-
-    }
-}
-
 TERM_PUBLIC void
 SVG_path(int p)
 {
@@ -2285,7 +2197,6 @@ START_HELP(svg)
 "                        {mouse} {standalone | jsdir <dirname>}",
 "                        {name <plotname>}",
 "                        {font \"<fontname>{,<fontsize>}\"}",
-"                        {fontfile <filename>}",
 "                        {rounded|butt|square} {solid|dashed} {linewidth <lw>}",
 "                        {background <rgb_color>}",
 "",
@@ -2321,15 +2232,7 @@ START_HELP(svg)
 " in a web page or embedding document, then a unique name is required",
 " to avoid potential conflicting references to other SVG plots.",
 " Use the `name` option to ensure uniqueness.",
-"",
-" SVG allows you to embed fonts directly into an SVG document, or to",
-" provide a hypertext link to the desired font. The `fontfile` option",
-" specifies a local file which is copied into the <defs> section of the",
-" resulting SVG output file.  This file may either itself contain a font,",
-" or may contain the records necessary to create a hypertext reference to",
-" the desired font. Gnuplot will look for the requested file using the",
-" directory list in the GNUPLOT_FONTPATH environmental variable.",
-" NB: You must embed an svg font, not a TrueType or PostScript font."
+""
 END_HELP(svg)
 
 START_HELP(domterm)
