@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.153 2016/08/02 04:40:58 sfeam Exp $
+ * $Id: axis.h,v 1.154 2016/08/03 04:22:18 sfeam Exp $
  *
  */
 
@@ -92,13 +92,6 @@ typedef enum AXIS_INDEX {
     AXIS_ARRAY_SIZE = PARALLEL_AXES
 } AXIS_INDEX;
 
-
-/* HBB NOTE 2015-01-28: SECOND_Z_AXIS is not actually used */
-#define AXIS_IS_SECOND(AXIS) (((AXIS) >= SECOND_Y_AXIS) && ((AXIS) <= SECOND_X_AXIS))
-#define AXIS_IS_FIRST(AXIS)  (((AXIS) >=  FIRST_Z_AXIS) && ((AXIS) <=  FIRST_X_AXIS))
-
-#define AXIS_MAP_FROM_FIRST_TO_SECOND(AXIS) (SECOND_AXES + ((AXIS) - FIRST_AXES))
-#define AXIS_MAP_FROM_SECOND_TO_FIRST(AXIS) (FIRST_AXES + ((AXIS) - SECOND_AXES))
 
 /* sample axis doesn't need mtics, so use the slot to hold sample interval */
 # define SAMPLE_INTERVAL mtic_freq

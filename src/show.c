@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.370 2016/09/17 04:52:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.371 2016/10/10 22:53:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -267,7 +267,9 @@ show_command()
 	break;
     case S_ZEROAXIS:
 	show_zeroaxis(FIRST_X_AXIS);
+	show_zeroaxis(SECOND_X_AXIS);
 	show_zeroaxis(FIRST_Y_AXIS);
+	show_zeroaxis(SECOND_Y_AXIS);
 	show_zeroaxis(FIRST_Z_AXIS);
 	break;
     case S_XZEROAXIS:
@@ -1718,12 +1720,6 @@ show_zeroaxis(AXIS_INDEX axis)
 	fputc('\n',stderr);
     } else
 	fprintf(stderr, "\t%szeroaxis is OFF\n", axis_name(axis));
-
-    /* If this is a 'first' axis. To output secondary axis, call self
-     * recursively: */
-    if (AXIS_IS_FIRST(axis)) {
-	show_zeroaxis(AXIS_MAP_FROM_FIRST_TO_SECOND(axis));
-    }
 }
 
 /* Show label number <tag> (0 means show all) */
@@ -2925,7 +2921,7 @@ show_timestamp()
     show_xyzlabel("", "time", &timelabel);
     fprintf(stderr, "\twritten in %s corner\n",
 	    (timelabel_bottom ? "bottom" : "top"));
-    if (timelabel_rotate)
+    if (timelabel.rotate)
 	fputs("\trotated if the terminal allows it\n\t", stderr);
     else
 	fputs("\tnot rotated\n\t", stderr);
