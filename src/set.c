@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.533 2016/09/15 19:19:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.534 2016/10/10 22:53:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4708,6 +4708,10 @@ set_style()
 	    } else if (almost_equals(c_token,"bo$rdercolor")) {
 		c_token++;
 		textbox_opts.noborder = FALSE;
+		textbox_opts.border_color.type = TC_LT;
+		textbox_opts.border_color.lt = LT_BLACK;
+		if (END_OF_COMMAND)
+		    continue;
 		if (equals(c_token,"lt"))
 		    c_token--;
 		parse_colorspec(&textbox_opts.border_color, TC_RGB);
