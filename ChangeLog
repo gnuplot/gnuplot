@@ -3,7 +3,7 @@
 	* src/plot2d.c: Never decrease value of highest_iteration.
 	Avoids missed plots when a plot command contains more than one
 	iteration and the last iteration is shorter than the others.
-	Bug #1869
+	Bug #1871
 
 2016-10-23  Ethan A Merritt  <merritt@u.washington.edu>
 
