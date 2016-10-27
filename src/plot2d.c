@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.32 2016/09/28 03:50:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.33 2016/10/26 19:07:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1954,7 +1954,6 @@ eval_plots()
     char *xtitle = NULL;
     int begin_token = c_token;  /* so we can rewind for second pass */
     int start_token=0, end_token;
-    int highest_iteration = 0;	/* last index reached in iteration [i=start:*] */
     legend_key *key = &keyT;
     char orig_dummy_var[MAX_ID_LEN+1];
 
@@ -2909,14 +2908,12 @@ eval_plots()
 	if (empty_iteration(plot_iterator) && this_plot) {
 	    this_plot->plot_type = NODATA;
 	} else if (forever_iteration(plot_iterator) && (this_plot->plot_type == NODATA)) {
-	    if (highest_iteration < plot_iterator->iteration)
-		highest_iteration = plot_iterator->iteration;
+	    FPRINTF((stderr,"Ending * iteration at %d\n",plot_iterator->iteration));
+	    ;
 	} else if (forever_iteration(plot_iterator) && (this_plot->plot_type == FUNC)) {
 	    int_error(NO_CARET,"unbounded iteration in function plot");
 	} else if (next_iteration(plot_iterator)) {
 	    c_token = start_token;
-	    if (highest_iteration < plot_iterator->iteration)
-		highest_iteration = plot_iterator->iteration;
 	    continue;
 	}
 
@@ -3258,10 +3255,8 @@ eval_plots()
 
 	    /* Iterate-over-plot mechanism */
 	    if (next_iteration(plot_iterator)) {
-		if (plot_iterator->iteration <= highest_iteration) {
-		    c_token = start_token;
-		    continue;
-		}
+		c_token = start_token;
+		continue;
 	    }
 
 	    plot_iterator = cleanup_iteration(plot_iterator);

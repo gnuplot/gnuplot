@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.231.2.6 2016/05/17 19:12:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.231.2.7 2016/06/18 05:59:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1297,7 +1297,6 @@ eval_3dplots()
     int i;
     struct surface_points **tp_3d_ptr;
     int start_token=0, end_token;
-    int highest_iteration = 0;	/* last index reached in iteration [i=start:*] */
     TBOOLEAN eof_during_iteration = FALSE;  /* set when for [n=start:*] hits NODATA */
     int begin_token;
     TBOOLEAN some_data_files = FALSE, some_functions = FALSE;
@@ -1933,7 +1932,6 @@ eval_3dplots()
 	    if (empty_iteration(plot_iterator))
 		this_plot->plot_type = NODATA;
 	    if (forever_iteration(plot_iterator) && (this_plot->plot_type == NODATA)) {
-		highest_iteration = plot_iterator->iteration;
 		eof_during_iteration = TRUE;
 	    }
 	    if (forever_iteration(plot_iterator) && (this_plot->plot_type == FUNC3D)) {
@@ -1955,7 +1953,6 @@ eval_3dplots()
 	    /* Nothing to do */ ;
 	} else if (next_iteration(plot_iterator)) {
 	    c_token = start_token;
-	    highest_iteration = plot_iterator->iteration;
 	    continue;
 	}
 
@@ -2138,10 +2135,8 @@ eval_3dplots()
 
 	    /* Iterate-over-plot mechanism */
 	    if (crnt_param == 0 && next_iteration(plot_iterator)) {
-		if (plot_iterator->iteration <= highest_iteration) {
-		    c_token = start_token;
-		    continue;
-		}
+		c_token = start_token;
+		continue;
 	    }
 
 	    if (crnt_param == 0)

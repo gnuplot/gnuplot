@@ -1,3 +1,9 @@
+2016-10-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c src/plot3d.c: Recent reorganization of next_iteration()
+	code makes it unnecessary to separately track highest iteration in each
+	plot clause.
+
 2016-10-26  Thomas Sefzick <t.sefzick@fz-juelich.de>
 
 	* src/plot2d.c: Never decrease value of highest_iteration.
