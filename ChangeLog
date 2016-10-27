@@ -1,5 +1,17 @@
 2016-10-27  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/save.c src/show.c src/gadgets.c:  save/show style arrow was
+	showing incorrect settings for head/heads/backhead, and reporting
+	LT_DEFAULT as an actual line type.
+
+	* src/misc.c (arrow_use_properties): If an arrowstyle has no explicit
+	linetype or color, apply the current plot linecolor. This prevents 3D
+	vector plots with a default linetype from being colored as if they
+	were "lc palette z".
+	Bug #1869
+
+2016-10-27  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* src/plot2d.c src/plot3d.c: Recent reorganization of next_iteration()
 	code makes it unnecessary to separately track highest iteration in each
 	plot clause.
