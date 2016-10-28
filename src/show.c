@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.371 2016/10/10 22:53:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.372 2016/10/23 23:13:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -3285,9 +3285,7 @@ show_arrowstyle(int tag)
 	    fflush(stderr);
 
 	    fprintf(stderr, "\t %s %s",
-		    this_arrowstyle->arrow_properties.head ?
-		    (this_arrowstyle->arrow_properties.head==2 ?
-		     " both heads " : " one head ") : " nohead",
+		    arrow_head_names[this_arrowstyle->arrow_properties.head],
 		    this_arrowstyle->arrow_properties.layer ? "front" : "back");
 	    save_linetype(stderr, &(this_arrowstyle->arrow_properties.lp_properties), FALSE);
 	    fputc('\n', stderr);

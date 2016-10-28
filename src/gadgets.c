@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.129 2016/08/25 20:07:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.130 2016/09/23 05:28:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -660,7 +660,9 @@ reset_textcolor(const struct t_colorspec *tc)
 void
 default_arrow_style(struct arrow_style_type *arrow)
 {
-    static const struct lp_style_type tmp_lp_style = DEFAULT_LP_STYLE_TYPE;
+    static const struct lp_style_type tmp_lp_style = 
+	{0, LT_DEFAULT, 0, DASHTYPE_SOLID, 0, 1.0, 0.0, DEFAULT_P_CHAR,
+	DEFAULT_COLORSPEC, DEFAULT_DASHPATTERN};
 
     arrow->tag = -1;
     arrow->layer = LAYER_BACK;

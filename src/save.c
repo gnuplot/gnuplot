@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.313 2016/10/05 22:03:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.314 2016/10/10 22:53:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1619,6 +1619,8 @@ save_linetype(FILE *fp, lp_style_type *lp, TBOOLEAN show_point)
 	fprintf(fp, " lt black");
     else if (lp->l_type == LT_BACKGROUND)
 	fprintf(fp, " lt bgnd");
+    else if (lp->l_type == LT_DEFAULT)
+	; /* Dont' print anything */
     else if (lp->l_type < 0)
 	fprintf(fp, " lt %d", lp->l_type+1);
 
