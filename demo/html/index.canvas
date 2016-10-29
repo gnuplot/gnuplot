@@ -19,8 +19,7 @@
 </canvas>
 
 <p>
-The canvas driver for gnuplot was contributed by Bruce Lueckenhoff and extended by Ethan Merritt (sfeam).
-To view the results you need a browser that supports the HTML5 'canvas' element.
+To view these demos you need a browser that supports the HTML5 'canvas' element.
 </p>
 
 
@@ -55,6 +54,7 @@ To view the results you need a browser that supports the HTML5 'canvas' element.
     <li><a href="spline.html">B-splines</a></li>
     <li><a href="airfoil.html">Bezier splines</a></li>
     <li><font color=gray>complex functions</font></li>
+    <li><a href="cerf.html">complex error function</li>
     <li><a href="prob2.html">probability</a></li>
     <li><a href="prob.html">probability (more)</a></li>
     <li><a href="random.html">random numbers</a></li>
@@ -100,6 +100,11 @@ To view the results you need a browser that supports the HTML5 'canvas' element.
     <li><a href="rgba_lines.html">RGB + alpha channel</a></li>
     <li><a href="pm3dcolors.html">pm3d colors</a></li>
     </ul>
+
+    <h4>Animation</h4>
+    <ul>
+    <li><font color=gray>not supported</font></li>
+    </ul>
 </td>
 
 <td rowspan=2>
@@ -118,6 +123,7 @@ To view the results you need a browser that supports the HTML5 'canvas' element.
 
     <h4>Text options</h4>
     <ul>
+    <li><a href="rotate_labels.html">rotated text</a></li>
     <li><a href="enhanced_utf8.html">enhanced text</a></li>
     <li><a href="datastrings.html">string data</a></li>
     <li><a href="cities.html">variable font size</a></li>
@@ -142,11 +148,6 @@ To view the results you need a browser that supports the HTML5 'canvas' element.
     <li><a href="dashtypes.html">dashed lines</a></li>
     <li><a href="transparent.html">transparency</a></li>
     <li><a href="transparent_solids.html">transparent solids</a></li>
-    </ul>
-
-    <h4>Animation</h4>
-    <ul>
-    <li><font color=gray>not supported</font></li>
     </ul>
 </td>
 
@@ -192,7 +193,7 @@ To view the results you need a browser that supports the HTML5 'canvas' element.
 		<td class="mb1"><span id="gnuplot_canvas_y">&nbsp;</span></td>
 	    </table>
 	<br>Note:
-	<ul><li>Zoom using right (Firefox, Konqueror) or center (Opera, Safari) mouse button
+	<ul><li>Zoom using right (Firefox, Chrome) or center (Opera, Safari) mouse button
 	    <li>Mark point using left mouse button
 	    <li>&#10112; toggles first plot on/off&nbsp;&nbsp;  # toggles grid on/off
 	</ul>
@@ -210,7 +211,7 @@ To view the results you need a browser that supports the HTML5 'canvas' element.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page created by Ethan Merritt<br>April 2014</i>
+    <i>This page created by Ethan Merritt<br>October 2016</i>
     </td>
 
     <td>

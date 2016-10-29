@@ -54,7 +54,7 @@ on mouse-coordinate tracking.
     <li><a href="spline.html">B-splines</a></li>
     <li><a href="airfoil.html">Bezier splines</a></li>
     <li><font color=gray>complex trig functions</font></li>
-    <li><a href="cerf.html">complex error function</font></li>
+    <li><a href="cerf.html">complex error function</li>
     <li><a href="prob2.html">probability</a></li>
     <li><a href="prob.html">probability (more)</a></li>
     <li><a href="random.html">random numbers</a></li>
@@ -100,6 +100,11 @@ on mouse-coordinate tracking.
     <li><a href="rgba_lines.html">RGB + Alpha</a></li>
     <li><a href="pm3dcolors.html">pm3d colors</a></li>
     </ul>
+
+    <h4>Animation</h4>
+    <ul>
+    <li><font color=gray>not supported</font></li>
+    </ul>
 </td>
 
 <td rowspan=2>
@@ -118,6 +123,7 @@ on mouse-coordinate tracking.
 
     <h4>Text options</h4>
     <ul>
+    <li><a href="rotate_labels.html">rotated text</a></li>
     <li><a href="enhanced_utf8.html">enhanced text</a></li>
     <li><a href="datastrings.html">string data</a></li>
     <li><a href="stringvar.html">string variables</a></li>
@@ -142,11 +148,6 @@ on mouse-coordinate tracking.
     <li><a href="dashtypes.html">dashed lines</a></li>
     <li><a href="transparent.html">transparency</a></li>
     <li><a href="transparent_solids.html">transparent solids</a></li>
-    </ul>
-
-    <h4>Animation</h4>
-    <ul>
-    <li><font color=gray>not supported</font></li>
     </ul>
 </td>
 
@@ -180,7 +181,7 @@ on mouse-coordinate tracking.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page created by Ethan Merritt<br>April 2014</i>
+    <i>This page created by Ethan Merritt<br>October 2016</i>
     </td>
 
     <td>
