@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.71 2016/09/21 20:56:56 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.72 2016/10/21 21:00:08 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -13890,7 +13890,7 @@ Ffigure_missing
  the first column of input data contains the x coordinates.  For binary input
  data, the first element of the first row must contain the number of columns.
  This is the default for `binary matrix` input, but requires an additional
- keyword `nonuniform` for test input data.
+ keyword `nonuniform` for text input data.
  See `matrix nonuniform` for examples.
 
 5 uniform
