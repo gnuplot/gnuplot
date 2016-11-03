@@ -334,6 +334,7 @@ typedef struct {
     struct position user_pos;	/* if user specified position, this is it */
     VERT_JUSTIFY vpos;		/* otherwise these guide auto-positioning */
     JUSTIFY hpos;
+    TBOOLEAN fixed;		/* prevents key in 3D plot from rotating/scaling with plot */
     t_key_sample_positioning just;
     t_key_stack_direction stack_dir;
     double swidth;		/* 'width' of the linestyle sample line in the key */
@@ -364,7 +365,7 @@ extern legend_key keyT;
 		{ TRUE, \
 		GPKEY_AUTO_INTERIOR_LRTBC, GPKEY_RMARGIN, \
 		DEFAULT_KEY_POSITION, \
-		JUST_TOP, RIGHT, \
+		JUST_TOP, RIGHT, TRUE, \
 		GPKEY_RIGHT, GPKEY_VERTICAL, \
 		4.0, 1.0, 0.0, 0.0, \
 		FILENAME_KEYTITLES, \
@@ -413,6 +414,7 @@ typedef struct t_image {
 } t_image;
 
 extern BoundingBox plot_bounds;	/* Plot Boundary */
+extern BoundingBox page_bounds;	/* 3D boundary prior to view transformation */
 extern BoundingBox canvas; 	/* Writable area on terminal */
 extern BoundingBox *clip_area;	/* Current clipping box */
 

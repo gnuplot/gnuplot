@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.349 2016/09/17 04:21:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.350 2016/09/17 04:51:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -787,6 +787,9 @@ do_3dplot(
 
     else if (hidden3d && border_layer == LAYER_BEHIND)
 	draw_3d_graphbox(plots, pcount, ALLGRID, LAYER_BACK);
+
+    /* Save state of plot_bounds before applying rotations, etc */
+    memcpy(&page_bounds, &plot_bounds, sizeof(page_bounds));
 
     /* Clipping in 'set view map' mode should be like 2D clipping */
     if (splot_map) {
@@ -3469,16 +3472,14 @@ do_3dkey_layout(legend_key *key, int *xinkey, int *yinkey)
 	int corner_x, corner_y;
 
 	map3d_position(&key->user_pos, &corner_x, &corner_y, "key");
-	if (key->hpos == CENTRE) {
+
+	if (key->hpos == CENTRE)
 	    key->bounds.xleft = corner_x - key_width / 2;
-	    key->bounds.xright = corner_x + key_width / 2;
-	} else if (key->hpos == RIGHT) {
+	else if (key->hpos == RIGHT)
 	    key->bounds.xleft = corner_x - key_width;
-	    key->bounds.xright = corner_x;
-	} else {
+	else
 	    key->bounds.xleft = corner_x;
-	    key->bounds.xright = corner_x + key_width;
-	}
+	key->bounds.xright = key->bounds.xleft + key_width;
 
 	key->bounds.ytop = corner_y;
 	key->bounds.ybot = corner_y - key_height;
@@ -3487,51 +3488,53 @@ do_3dkey_layout(legend_key *key, int *xinkey, int *yinkey)
 	*yinkey = key->bounds.ytop - key_title_height - key_title_extra;
 
     } else {
+	BoundingBox *bounds = key->fixed ? &page_bounds : &plot_bounds;
+
 	if (key->region != GPKEY_AUTO_INTERIOR_LRTBC && key->margin == GPKEY_BMARGIN) {
 	    if (ptitl_cnt > 0) {
 		/* we divide into columns, then centre in column by considering
 		 * ratio of key_left_size to key_right_size
 		 * key_size_left / (key_size_left+key_size_right)
-		 *               * (plot_bounds.xright-plot_bounds.xleft)/key_cols
+		 *               * (bounds->xright-bounds->xleft)/key_cols
 		 * do one integer division to maximise accuracy (hope we dont overflow!)
 		 */
-		*xinkey = plot_bounds.xleft
-		   + ((plot_bounds.xright - plot_bounds.xleft) * key_size_left)
+		*xinkey = bounds->xleft
+		   + ((bounds->xright - bounds->xleft) * key_size_left)
 		   / (key_cols * (key_size_left + key_size_right));
 		key->bounds.xleft = *xinkey - key_size_left;
 		key->bounds.xright = key->bounds.xleft + key_width;
 
-		key->bounds.ytop = plot_bounds.ybot;
-		key->bounds.ybot = plot_bounds.ybot - key_height;
+		key->bounds.ytop = bounds->ybot;
+		key->bounds.ybot = bounds->ybot - key_height;
 		*yinkey = key->bounds.ytop - key_title_height - key_title_extra;
 	    }
 
 	} else {
 	    if (key->vpos == JUST_TOP) {
-		key->bounds.ytop = plot_bounds.ytop - t->v_tic;
+		key->bounds.ytop = bounds->ytop - t->v_tic;
 		key->bounds.ybot = key->bounds.ytop - key_height;
 		*yinkey = key->bounds.ytop - key_title_height - key_title_extra;
 	    } else {
-		key->bounds.ybot = plot_bounds.ybot + t->v_tic;
+		key->bounds.ybot = bounds->ybot + t->v_tic;
 		key->bounds.ytop = key->bounds.ybot + key_height;
 		*yinkey = key->bounds.ytop - key_title_height - key_title_extra;
 	    }
 	    if (key->region != GPKEY_AUTO_INTERIOR_LRTBC && key->margin == GPKEY_RMARGIN) {
 		/* keys outside plot border (right) */
-		key->bounds.xleft = plot_bounds.xright + t->h_tic;
+		key->bounds.xleft = bounds->xright + t->h_tic;
 		key->bounds.xright = key->bounds.xleft + key_width;
 		*xinkey = key->bounds.xleft + key_size_left;
 	    } else if (key->region != GPKEY_AUTO_INTERIOR_LRTBC && key->margin == GPKEY_LMARGIN) {
 		/* keys outside plot border (left) */
-		key->bounds.xright = plot_bounds.xleft - t->h_tic;
+		key->bounds.xright = bounds->xleft - t->h_tic;
 		key->bounds.xleft = key->bounds.xright - key_width;
 		*xinkey = key->bounds.xleft + key_size_left;
 	    } else if (key->hpos == LEFT) {
-		key->bounds.xleft = plot_bounds.xleft + t->h_tic;
+		key->bounds.xleft = bounds->xleft + t->h_tic;
 		key->bounds.xright = key->bounds.xleft + key_width;
 		*xinkey = key->bounds.xleft + key_size_left;
 	    } else {
-		key->bounds.xright = plot_bounds.xright - t->h_tic;
+		key->bounds.xright = bounds->xright - t->h_tic;
 		key->bounds.xleft = key->bounds.xright - key_width;
 		*xinkey = key->bounds.xleft + key_size_left;
 	    }

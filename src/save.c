@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.314 2016/10/10 22:53:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.315 2016/10/28 22:53:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -404,7 +404,7 @@ save_set_all(FILE *fp)
     fputs("set key ", fp);
     switch (key->region) {
 	case GPKEY_AUTO_INTERIOR_LRTBC:
-	    fputs("inside", fp);
+	    fputs(key->fixed ? "fixed" : "inside", fp);
 	    break;
 	case GPKEY_AUTO_EXTERIOR_LRTBC:
 	    fputs("outside", fp);

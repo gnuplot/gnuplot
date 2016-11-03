@@ -1,3 +1,20 @@
+2016-11-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.c src/gadgets.h src/graph3d.c src/save.c src/set.c
+	src/show.c src/tables.c src/tables.h docs/gnuplot.doc:
+
+	"set key" already offers 3 choices for placement of 3D plots:
+	1) "at" user-specified position
+	2) "outside" - shrinks the entire plot so that the key can be drawn
+	   in one of the margins
+	3) "inside" - (the default) rotates and scales with the plot itself
+	   as the view changes.
+	This patch introduces a 4th option
+	4) "fixed" is like "inside" except that it is not affected by changing
+	   the current view angles or scaling.
+	"fixed" key placement does not move when the plot rotates. For 2D plots
+	this is identical to "inside".  The new option is now the default.
+	
 2016-11-03  Craig DeForest  <zowie@users.sf.net>
 
 	* src/datafile.c (plot_option_binary):  Interpretation of dimensions

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.130 2016/09/23 05:28:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.131 2016/10/28 22:53:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -61,9 +61,11 @@ color_box_struct default_color_box = {SMCOLOR_BOX_DEFAULT, 'v', 1, LT_BLACK, LAY
 					{screen, screen, screen, 0.05, 0.6, 0.0}, FALSE,
 					{0,0,0,0} };
 
-/* The graph box, in terminal coordinates, as calculated by boundary()
- * or boundary3d(): */
+/* The graph box (terminal coordinates) calculated by boundary() or boundary3d() */
 BoundingBox plot_bounds;
+
+/* The bounding box for 3D plots prior to applying view transformations */
+BoundingBox page_bounds;
 
 /* The bounding box for the entire drawable area  of current terminal */
 BoundingBox canvas;
