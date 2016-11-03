@@ -1,3 +1,12 @@
+2016-11-03  Craig DeForest  <zowie@users.sf.net>
+
+	* src/datafile.c (plot_option_binary):  Interpretation of dimensions
+	given via "binary record=(a,b)" contridicted that for dimensions given
+	via "binary array=(a,b)".  This caused mangling of image data read in
+	using the "record" keyword.  Change the interpretation to match that 
+	of "array".
+	Bug #1873
+
 2016-10-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/save.c src/show.c src/gadgets.c:  save/show style arrow was
