@@ -55,6 +55,10 @@ Here are samples of PNG output from some of the demos.
     <li><a href="stats.html">data statistics</a></li>
     </ul>
 
+    <h4>Animation</h4>
+    <ul>
+    <li><a href="animate2.html">animated gif</a></li>
+    </ul>
 </td>
 
 <td rowspan=2>
@@ -75,6 +79,8 @@ Here are samples of PNG output from some of the demos.
     <h4>Coordinate and<br> axis transforms</h4>
     <ul>
     <li><a href="linkedaxes.html">linked axes</a></li>
+    <li><a href="nonlinear3.html">nonlinear axes</a></li>
+    <li><a href="nonlinear1.html">broken axes</a></li>
     <li><a href="polar.html">polar coords</a></li>
     <li><a href="poldat.html">polar data</a></li>
     <li><a href="world.html">cylindrical/spherical</a></li>
@@ -99,10 +105,6 @@ Here are samples of PNG output from some of the demos.
     <li><a href="pm3dgamma.html">pm3d gamma</a></li>
     </ul>
 
-    <h4>Animation</h4>
-    <ul>
-    <li><a href="animate2.html">animated gif</a></li>
-    </ul>
 </td>
 
 <td rowspan=2>
@@ -166,8 +168,8 @@ Here are samples of PNG output from some of the demos.
 </tr>
 
 <tr valign=top><td align=center width=500>
-<img src="showcase_plot_1.png"><br clear=all>
-<img src="showcase_plot_2.png"><br clear=all>
+<img src="showcase_plot_1.png" width=500><br clear=all>
+<img src="showcase_plot_2.png" width=500><br clear=all>
 </td></tr>
 
 </tbody></table>
@@ -179,7 +181,7 @@ Here are samples of PNG output from some of the demos.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated September 2016</i>
+    <i>This page generated November 2016</i>
     </td>
 
     <td>

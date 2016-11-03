@@ -77,6 +77,8 @@
     <h4>Coordinate and<br> axis transforms</h4>
     <ul>
     <li><a href="linkedaxes.html">linked axes</a></li>
+    <li><a href="nonlinear3.html">nonlinear axes</a></li>
+    <li><a href="nonlinear1.html">broken axes</a></li>
     <li><a href="polar.html">polar coords</a></li>
     <li><a href="poldat.html">polar data</a></li>
     <li><a href="world.html">cylindrical/spherical</a></li>
@@ -206,7 +208,7 @@
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated September 2016</i>
+    <i>This page generated November 2016</i>
     </td>
 
     <td>
