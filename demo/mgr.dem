@@ -1,5 +1,5 @@
 #
-# $Id: mgr.dem,v 1.9 2011/04/09 20:56:43 sfeam Exp $
+# $Id: mgr.dem,v 1.10 2011/04/09 23:50:05 sfeam Exp $
 #
 print "Watch some  cubic splines"
 set samples 50
@@ -36,7 +36,15 @@ pause -1 "Accentuate the relative changes with a log-scale (-> return)"
 set logscale y
 set grid x y mx my
 replot
+pause -1 "Next - shaded area for error range (-> return)"
+#
+Shadecolor = "#80E0A080"
+plot 'silver.dat' using 1:($2+$3):($2-$3) with filledcurve fc rgb Shadecolor \
+     title "Shaded error region", \
+     '' using 1:2 smooth mcspline lw 2 \
+     title "Monotonic spline through data"
 pause -1 "Now approximate the data with a bezier curve between the endpoints (-> return)"
+#
 unset logscale y
 plot "silver.dat" t "experimental" w errorb,\
                "" smooth sbezier t "bezier"
