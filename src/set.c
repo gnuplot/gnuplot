@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.535 2016/10/23 23:08:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.536 2016/11/03 22:27:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1727,14 +1727,20 @@ static const char *
 encoding_micro()
 {
     static const char micro_utf8[4] = {0xC2, 0xB5, 0x0, 0x0};
-    static const char micro_1252[2] = {0x96, 0x0};
+    static const char micro_437[2] = {0x96, 0x0};
     static const char micro_latin1[2] = {0xB5, 0x0};
     static const char micro_default[2] = {'u', 0x0};
     switch (encoding) {
 	case S_ENC_UTF8:	return micro_utf8;
-	case S_ENC_CP1252:	return micro_1252;
+	case S_ENC_CP1250:
+	case S_ENC_CP1251:
+	case S_ENC_CP1252:
+	case S_ENC_CP1254:
 	case S_ENC_ISO8859_1:
+	case S_ENC_ISO8859_9:
 	case S_ENC_ISO8859_15:	return micro_latin1;
+	case S_ENC_CP437:
+	case S_ENC_CP850:	return micro_437;
 	default:		return micro_default;
     }
 }

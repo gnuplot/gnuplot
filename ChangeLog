@@ -17,6 +17,9 @@
 	line width.  This in particular improves the appearance of grid lines
 	in polar plots.
 
+	* src/set.c (encoding_micro):  Fix micro sign for CP1252 and add a few
+	more encodings, including CP437 and CP850.
+
 2016-11-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c src/gadgets.h src/graph3d.c src/save.c src/set.c
