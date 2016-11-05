@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.230 2016/10/08 19:12:44 markisch Exp $
+ * $Id: wgraph.c,v 1.231 2016/11/05 10:04:09 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -1216,15 +1216,8 @@ draw_enhanced_init(HDC hdc)
 	enhstate.cleanup = &EnhancedCleanup;
 
 	enhstate_gdi.hdc = hdc;
-	enhstate.res_scale = 1.;
-	if ((GetDeviceCaps(hdc, TECHNOLOGY) == DT_RASPRINTER)) {
-		HDC hdc_screen = GetDC(NULL);
-		enhstate.res_scale = (double) GetDeviceCaps(hdc, VERTRES) /
-		           (double) GetDeviceCaps(hdc_screen, VERTRES);
-		ReleaseDC(NULL, hdc_screen);
-	}
-
-	SetTextAlign(hdc, TA_LEFT|TA_BASELINE);
+	enhstate.res_scale = GetDeviceCaps(hdc, LOGPIXELSY) / 96.;
+	SetTextAlign(hdc, TA_LEFT | TA_BASELINE);
 }
 
 

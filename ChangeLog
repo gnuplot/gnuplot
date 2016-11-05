@@ -7,6 +7,10 @@
 	* src/win/wgraph.c (CopyPrint):  Also use GDI+ to print if the user
 	selected the GDI+ backend.
 
+	* src/win/wgdiplus.cpp src/win/wgraph.c (draw_enhanced_init):  Take
+	DPI into account when calculating the scaling factor for super- and
+	subscripts.  Makes special code for printing superfluous.
+
 2016-11-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c src/gadgets.h src/graph3d.c src/save.c src/set.c

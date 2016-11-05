@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.39 2016/10/08 20:31:49 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.40 2016/11/05 10:01:10 markisch Exp $
  */
 
 /*
@@ -524,20 +524,11 @@ draw_enhanced_init(LPGW lpgw, Graphics &graphics, SolidBrush &brush, LPRECT rect
 	enhstate_gdiplus.graphics = &graphics;
 	enhstate_gdiplus.font = SetFont_gdiplus(graphics, rect, lpgw, lpgw->fontname, lpgw->fontsize);
 	enhstate_gdiplus.brush = &brush;
-	enhstate.res_scale = 1.;
-	HDC hdc = graphics.GetHDC();
-	if ((GetDeviceCaps(hdc, TECHNOLOGY) == DT_RASPRINTER)) {
-		HDC hdc_screen = GetDC(NULL);
-		enhstate.res_scale = (double) GetDeviceCaps(hdc, VERTRES) /
-		           (double) GetDeviceCaps(hdc_screen, VERTRES);
-		ReleaseDC(NULL, hdc_screen);
-	}
-	graphics.ReleaseHDC(hdc);
+	enhstate.res_scale = graphics.GetDpiY() / 96.;
 
 	enhstate_gdiplus.stringformat = new StringFormat(StringFormat::GenericTypographic());
 	enhstate_gdiplus.stringformat->SetAlignment(StringAlignmentNear);
 	enhstate_gdiplus.stringformat->SetLineAlignment(StringAlignmentFar);
-
 }
 
 
