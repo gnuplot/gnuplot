@@ -1,8 +1,11 @@
 2016-11-05  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/win/wgdiplus.cpp|h (drawgraph_gdiplus:  Add wrapper functions 
+	* src/win/wgdiplus.cpp|h (drawgraph_gdiplus):  Add wrapper functions
 	instead of trying to determine the target (screen/printer/metafile)
 	from the device context using GDI functions.
+
+	* src/win/wgraph.c (CopyPrint):  Also use GDI+ to print if the user
+	selected the GDI+ backend.
 
 2016-11-03  Ethan A Merritt  <merritt@u.washington.edu>
 

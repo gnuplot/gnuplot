@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.228 2016/10/08 16:12:12 markisch Exp $
+ * $Id: wgraph.c,v 1.230 2016/10/08 19:12:44 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -3156,6 +3156,7 @@ CopyPrint(LPGW lpgw)
 {
 	DOCINFO docInfo;
 	HDC printer;
+	HANDLE printerHandle;
 	PRINTDLGEX pd;
 	DEVNAMES * pDevNames;
 	DEVMODE * pDevMode;
@@ -3259,33 +3260,52 @@ CopyPrint(LPGW lpgw)
 	SetWindowLongPtr(GetDlgItem(pr.hDlgPrint, CANCEL_PROGRESS), GWL_STYLE, WS_CHILD | WS_VISIBLE | PBS_MARQUEE);
 	SendMessage(GetDlgItem(pr.hDlgPrint, CANCEL_PROGRESS), PBM_SETMARQUEE, 1, 0);
 
+#ifdef HAVE_GDIPLUS
+	if (lpgw->gdiplus)
+		OpenPrinter((LPTSTR) szDevice, &printerHandle, NULL);
+#endif
+
 	memset(&docInfo, 0, sizeof(DOCINFO));
 	docInfo.cbSize = sizeof(DOCINFO);
 	docInfo.lpszDocName = lpgw->Title;
 
 	if (StartDoc(printer, &docInfo) > 0) {
-		TBOOLEAN aa = lpgw->antialiasing;
-		lpgw->sampling = 1;
-		/* Mixing GDI/GDI+ does not seem to work properly on printer devices. */
-		lpgw->antialiasing = FALSE;
+		StartPage(printer);
 		SetMapMode(printer, MM_TEXT);
 		SetBkMode(printer, OPAQUE);
-		StartPage(printer);
-
-		/* Always print using GDI only! */
-		DestroyFonts(lpgw);
-		MakeFonts(lpgw, &rect, printer);
-		DestroyPens(lpgw);	/* rebuild pens */
-		MakePens(lpgw, printer);
-		drawgraph(lpgw, printer, &rect);
+#ifdef HAVE_GDIPLUS
+		if (lpgw->gdiplus) {
+			/* Print using GDI+ */
+			print_gdiplus(lpgw, printer, printerHandle, &rect);
+		} else {
+#endif
+			/* Print using GDI */
+			TBOOLEAN aa = lpgw->antialiasing;
+			lpgw->sampling = 1;
+			/* Do not mix GDI/GDI+ on printer devices. */
+			lpgw->antialiasing = FALSE;
+			DestroyFonts(lpgw);
+			MakeFonts(lpgw, &rect, printer);
+			DestroyPens(lpgw);
+			MakePens(lpgw, printer);
+			drawgraph(lpgw, printer, &rect);
+			lpgw->antialiasing = aa;
+			hdc = GetDC(hwnd);
+			DestroyFonts(lpgw);
+			MakeFonts(lpgw, &rect, hdc);
+			ReleaseDC(hwnd, hdc);
+		}
 		if (EndPage(printer) > 0)
 			EndDoc(printer);
-		lpgw->antialiasing = aa;
 	}
 	if (!pr.bUserAbort) {
 		EnableWindow(hwnd, TRUE);
 		DestroyWindow(pr.hDlgPrint);
 	}
+#ifdef HAVE_GDIPLUS
+	if (lpgw->gdiplus)
+		ClosePrinter(printerHandle);
+#endif
 	DeleteDC(printer);
 	PrintUnregister(&pr);
 	/* make certain that the screen pen set is restored */
@@ -4564,7 +4584,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			MakeFonts(lpgw, (LPRECT)&rect, hdc);
 			ReleaseDC(hwnd, hdc);
 			if (lpgw->lptw && (lpgw->lptw->DragPre != NULL) && (lpgw->lptw->DragPost != NULL))
-			    DragAcceptFiles(hwnd, TRUE);
+				DragAcceptFiles(hwnd, TRUE);
 			return 0;
 
 		case WM_ERASEBKGND:
@@ -4721,8 +4741,8 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				}
 			}
 			if (lpgw->Size.x == CW_USEDEFAULT) {
-			    lpgw->Size.x = LOWORD(lParam);
-			    lpgw->Size.y = HIWORD(lParam);
+				lpgw->Size.x = LOWORD(lParam);
+				lpgw->Size.y = HIWORD(lParam);
 			}
 			break;
 #ifndef WGP_CONSOLE
@@ -4786,7 +4806,7 @@ void
 win_close_terminal_window(LPGW lpgw)
 {
 	if (GraphHasWindow(lpgw))
-		SendMessage( lpgw->hWndGraph, WM_CLOSE, 0L, 0L);
+		SendMessage(lpgw->hWndGraph, WM_CLOSE, 0L, 0L);
 }
 
 
@@ -4813,7 +4833,7 @@ Graph_set_cursor(LPGW lpgw, int c, int x, int y)
 		break;
 	case -3: /* switch on line between ruler and mouse cursor */
 		if (ruler.on && ruler_lineto.on)
-		    break;
+			break;
 		ruler_lineto.x = x;
 		ruler_lineto.y = y;
 		ruler_lineto.on = TRUE;
@@ -4994,7 +5014,7 @@ Draw_XOR_Text(LPGW lpgw, const char *text, size_t length, int x, int y)
 	int cx, cy;
 
 	if (!text || !text[0])
-	       return; /* no text to be displayed */
+		return; /* no text to be displayed */
 
 	hdc = GetDC(lpgw->hWndGraph);
 
