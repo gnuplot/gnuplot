@@ -1,6 +1,7 @@
 Changes not in 5.0
 ==================
 * NEW command "set nonlinear <axis> via f(axis) inverse g(axis)"
+* NEW 3D plot style "splot ... using <x>:<y>:<z>:<zlow>:<zhigh> with zerrorfill
 * NEW implementation of "set log" (treat as special case of "set nonlinear")
 * NEW array data type
 * NEW styles points and linespoints accept `pointtype variable`

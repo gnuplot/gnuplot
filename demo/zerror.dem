@@ -1,0 +1,20 @@
+set yrange [0.5:5.5]
+set zrange [1:*]
+set xyplane at 1
+set log z
+set key opaque box height 1 at screen .9, .8
+set border 127
+set grid z
+
+set title "splot with zerrorfill (no depth sorting)"
+splot for [k=1:5] 'silver.dat' using 1:(k):2:3 with zerror lt black fc lt k title "k = ".k
+
+pause -1 "Hit return to continue" 
+
+set title "splot with zerrorfill (set pm3d depthorder)"
+set pm3d depthorder
+set style fill transparent solid 0.5
+splot for [k=1:5] 'silver.dat' using 1:(k):2:3 with zerror lt black fc lt k title "k = ".k
+
+pause -1 "Hit return to continue"
+reset

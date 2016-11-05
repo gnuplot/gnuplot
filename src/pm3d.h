@@ -1,5 +1,5 @@
 /*
- * $Id: pm3d.h,v 1.33 2016/05/26 20:09:50 sfeam Exp $
+ * $Id: pm3d.h,v 1.34 2016/05/27 04:20:23 sfeam Exp $
  */
 
 /* GNUPLOT - pm3d.h */
@@ -137,7 +137,8 @@ extern lighting_model pm3d_shade;
 extern struct lp_style_type default_pm3d_border;
 
 /* Used by routine filled_quadrangle() in color.c */
-extern struct lp_style_type pm3d_border_lp;	/* FIXME: Needed anymore? */
+extern struct lp_style_type pm3d_border_lp;
+extern TBOOLEAN track_pm3d_quadrangles;
 
 #if defined(NONLINEAR_AXES) && (NONLINEAR_AXES > 0)
 #   define z2cb(z) (z)
@@ -156,6 +157,7 @@ void pm3d_depth_queue_clear __PROTO((void));
 void pm3d_depth_queue_flush __PROTO((void));
 void pm3d_reset __PROTO((void));
 void pm3d_draw_one __PROTO((struct surface_points* plots));
+void pm3d_add_quadrangle __PROTO((struct surface_points* plot, gpdPoint *corners));
 double z2cb_with_logs __PROTO((double z));
 double cb2gray __PROTO((double cb));
 void

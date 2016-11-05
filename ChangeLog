@@ -1,3 +1,17 @@
+2016-11-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gp_types.h src/graph3d.c src/graph3d.h src/plot3d.c src/pm3d.c
+	src/pm3d.h src/tables.c demo/all.dem demo/zerror.dem docs/gnuplot.doc:
+
+	New 3D plot style
+	    splot <data> using <x>:<y>:<z>:<zlow>:<zhigh> with zerrorfill
+	          {fillcolor <colorspec>}
+	This produces a plot similar to the 2D filledcurves option to fill the
+	area between two curves.  The primary linecolor is used to draw a line
+	through the z values.  The fillcolor (defaults to the linecolor if not
+	given) is used to fill the area between zlow and zhigh.  Depth sorting
+	is possible using `set pm3d depthorder`.
+
 2016-11-05  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgdiplus.cpp|h (drawgraph_gdiplus):  Add wrapper functions

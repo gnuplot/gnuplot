@@ -1,5 +1,5 @@
 /*
- * $Id: graph3d.h,v 1.51 2016/05/09 03:32:27 sfeam Exp $
+ * $Id: graph3d.h,v 1.52 2016/09/10 05:46:22 sfeam Exp $
  */
 
 /* GNUPLOT - graph3d.h */
@@ -99,7 +99,7 @@ typedef struct surface_points {
     TBOOLEAN noautoscale;	/* ignore data from this plot during autoscaling */
     struct lp_style_type lp_properties;
     struct arrow_style_type arrow_properties;
-    struct fill_style_type fill_properties;	/* FIXME: ignored in 3D */
+    struct fill_style_type fill_properties;
     struct text_label *labels;	/* Only used if plot_style == LABELPOINTS */
     struct t_image image_properties;	/* only used if plot_style is IMAGE, RGBIMAGE or RGBA_IMAGE */
     struct udvt_entry *sample_var;	/* Only used if plot has private sampling range */

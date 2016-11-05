@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.255 2016/08/12 16:54:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.256 2016/10/27 18:43:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -120,6 +120,9 @@ sp_alloc(int num_samp_1, int num_iso_1, int num_samp_2, int num_iso_2)
 
     /* Initialize various fields */
     sp->lp_properties = default_lp_properties;
+    sp->fill_properties = default_fillstyle;
+    if (sp->fill_properties.fillstyle == FS_EMPTY)
+	sp->fill_properties.fillstyle = FS_SOLID;
     default_arrow_style(&(sp->arrow_properties));
 
     if (num_iso_2 > 0 && num_samp_1 > 0) {
@@ -799,6 +802,7 @@ get_3ddata(struct surface_points *this_plot)
 	struct coordinate GPHUGE *cphead = NULL; /* Only for VECTOR plots */
 	double x, y, z;
 	double xtail, ytail, ztail;
+	double zlow, zhigh;
 	double color = VERYLARGE;
 	int pm3d_color_from_column = FALSE;
 #define color_from_column(x) pm3d_color_from_column = x
@@ -1048,13 +1052,24 @@ get_3ddata(struct surface_points *this_plot)
 		    color_from_column(FALSE);
 		}
 
-	    } else {	/* all other plot styles */
+	    } else if (this_plot->plot_style == ZERRORFILL) {
+		if (j == 4) {
+		    zlow = v[2] - v[3];
+		    zhigh = v[2] + v[3];
+		} else if (j == 5) {
+		    zlow = v[3];
+		    zhigh = v[4];
+		} else {
+		    int_error(NO_CARET, "this plot style wants 4 or 5 input columns");
+		}
+		color_from_column(FALSE);
+		track_pm3d_quadrangles = TRUE;
 
+	    } else {	/* all other plot styles */
 		if (j >= 4) {
 		    color = v[3];
 		    color_from_column(TRUE);
 		}
-
 	    }
 #undef color_from_column
 
@@ -1092,6 +1107,11 @@ get_3ddata(struct surface_points *this_plot)
 		STORE_WITH_LOG_AND_UPDATE_RANGE(cp->z, z, cp->type, z_axis,
 				this_plot->noautoscale, NOOP,
 				cp->z=0;goto come_here_if_undefined);
+
+		if (this_plot->plot_style == ZERRORFILL) {
+		    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_ZLOW, zlow, cp->type, z_axis, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
+		    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_ZHIGH, zhigh, cp->type, z_axis, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
+		}
 
 		if (this_plot->plot_style == VECTOR)
 		    STORE_WITH_LOG_AND_UPDATE_RANGE(cphead->z, ztail, cphead->type, z_axis, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
@@ -1329,6 +1349,9 @@ eval_3dplots()
     /* Assume that the input data can be re-read later */
     volatile_data = FALSE;
 
+    /* Assume that we don't need to allocate or initialize pm3d quadrangles */
+    track_pm3d_quadrangles = FALSE;
+
     xtitle = NULL;
     ytitle = NULL;
 
@@ -1371,6 +1394,7 @@ eval_3dplots()
 	    TBOOLEAN set_lpstyle = FALSE;
 	    TBOOLEAN checked_once = FALSE;
 	    TBOOLEAN set_labelstyle = FALSE;
+	    TBOOLEAN set_fillstyle = FALSE;
 	    int sample_range_token;
 
 	    if (!was_definition && (!parametric || crnt_param == 0))
@@ -1688,6 +1712,17 @@ eval_3dplots()
 		    }
 		}
 
+		/* Some plots have a fill style as well */
+		if ((this_plot->plot_style & PLOT_STYLE_HAS_FILL) && !set_fillstyle){
+		    int stored_token = c_token;
+		    if (equals(c_token,"fc") || almost_equals(c_token,"fillc$olor")) {
+			parse_colorspec(&this_plot->fill_properties.border_color, TC_RGB);
+			set_fillstyle = TRUE;
+		    }
+		    if (stored_token != c_token)
+			continue;
+		}
+
 		break; /* unknown option */
 
 	    }  /* while (!END_OF_COMMAND)*/
@@ -1750,6 +1785,11 @@ eval_3dplots()
 			this_plot->hidden3d_top_linetype = line_num;
 		}
 	    }
+
+	    /* No fillcolor given; use the line color for fill also */
+	    if ((this_plot->plot_style & PLOT_STYLE_HAS_FILL) && !set_fillstyle)
+		this_plot->fill_properties.border_color
+		    = this_plot->lp_properties.pm3d_color;
 
 	    /* Some low-level routines expect to find the pointflag attribute */
 	    /* in lp_properties (they don't have access to the full header).  */

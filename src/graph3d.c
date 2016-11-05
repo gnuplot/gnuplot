@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.350 2016/09/17 04:51:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.351 2016/11/03 22:27:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -118,6 +118,7 @@ static void do_3dkey_layout __PROTO((legend_key *key, int *xinkey, int *yinkey))
 static void plot3d_impulses __PROTO((struct surface_points * plot));
 static void plot3d_lines __PROTO((struct surface_points * plot));
 static void plot3d_points __PROTO((struct surface_points * plot));
+static void plot3d_zerrorfill __PROTO((struct surface_points * plot));
 static void plot3d_vectors __PROTO((struct surface_points * plot));
 /* no pm3d for impulses */
 static void plot3d_lines_pm3d __PROTO((struct surface_points * plot));
@@ -153,6 +154,7 @@ static void key_sample_line __PROTO((int xl, int yl));
 static void key_sample_point __PROTO((int xl, int yl, int pointtype));
 static void key_sample_line_pm3d __PROTO((struct surface_points *plot, int xl, int yl));
 static void key_sample_point_pm3d __PROTO((struct surface_points *plot, int xl, int yl, int pointtype));
+static void key_sample_fill __PROTO((int xl, int yl, struct fill_style_type *fs));
 static TBOOLEAN can_pm3d = FALSE;
 static void key_text __PROTO((int xl, int yl, char *text));
 static void check3d_for_variable_color __PROTO((struct surface_points *plot, struct coordinate *point));
@@ -627,7 +629,7 @@ do_3dplot(
     int key_count;
     TBOOLEAN key_pass = FALSE;
     legend_key *key = &keyT;
-    TBOOLEAN pm3d_order_depth = 0;
+    TBOOLEAN pm3d_order_depth = FALSE;
     AXIS *primary_z;
 
     /* Initiate transformation matrix using the global view variables. */
@@ -990,7 +992,7 @@ do_3dplot(
 
     pm3d_order_depth = (can_pm3d && !draw_contour && pm3d.direction == PM3D_DEPTH);
 
-    if (pm3d_order_depth) {
+    if (pm3d_order_depth || track_pm3d_quadrangles) {
 	pm3d_depth_queue_clear();
     }
 
@@ -1041,10 +1043,10 @@ do_3dplot(
 	    /* First draw the graph plot itself */
 	    if (!key_pass)
 	    switch (this_plot->plot_style) {
-	    case BOXES:	/* can't do boxes in 3d yet so use impulses */
-	    case FILLEDCURVES:
+	    case BOXES:		/* can't do boxes in 3d yet so use impulses */
+	    case FILLEDCURVES:	/* same, but maybe we could dummy up ZERRORFILL? */
 	    case IMPULSES:
-		if (!(hidden3d && draw_this_surface))
+		if (!hidden3d)
 		    plot3d_impulses(this_plot);
 		break;
 	    case STEPS:	/* HBB: I think these should be here */
@@ -1093,6 +1095,13 @@ do_3dplot(
 	    case VECTOR:
 		if (!hidden3d || this_plot->opt_out_of_hidden3d)
 		    plot3d_vectors(this_plot);
+		break;
+
+	    case ZERRORFILL:
+		/* Always draw filled areas even if we _also_ do hidden3d processing */
+		plot3d_zerrorfill(this_plot);
+		term_apply_lp_properties(&(this_plot->lp_properties));
+		plot3d_lines(this_plot);
 		break;
 
 	    case PM3DSURFACE:
@@ -1207,6 +1216,12 @@ do_3dplot(
 
 	    case VECTOR:
 		key_sample_line_pm3d(this_plot, xl, yl);
+		break;
+
+	    case ZERRORFILL:
+		key_sample_fill(xl, yl, &this_plot->fill_properties);
+		term_apply_lp_properties(&this_plot->lp_properties);
+		key_sample_line(xl, yl);
 		break;
 
 	    case PLOT_STYLE_NONE:
@@ -1353,7 +1368,7 @@ do_3dplot(
 	} /* loop over surfaces */
 
     if (!key_pass)
-    if (pm3d_order_depth) {
+    if (pm3d_order_depth || track_pm3d_quadrangles) {
 	pm3d_depth_queue_flush(); /* draw pending plots */
     }
 
@@ -3186,6 +3201,22 @@ key_sample_point(int xl, int yl, int pointtype)
     clip_area = clip_save;
 }
 
+static void
+key_sample_fill(int xl, int yl, struct fill_style_type *fs)
+{
+    int style = style_from_fill(fs);
+    unsigned int x = xl + key_sample_left;
+    unsigned int y = yl - key_entry_height/4;
+    unsigned int w = key_sample_right - key_sample_left;
+    unsigned int h = key_entry_height/2;
+
+    (term->layer)(TERM_LAYER_BEGIN_KEYSAMPLE);
+    apply_pm3dcolor(&fs->border_color);
+    if (w > 0)
+	(term->fillbox)(style,x,y,w,h);
+    (term->layer)(TERM_LAYER_END_KEYSAMPLE);
+}
+
 
 /*
  * returns minimal and maximal values of the cb-range (or z-range if taking the
@@ -3398,6 +3429,54 @@ plot3d_vectors(struct surface_points *plot)
 	    draw_clip_arrow((int)x1, (int)y1, (int)x2, (int)y2, ap.head);
 	}
     }
+}
+
+/* 
+ * splot with zerrorfill
+ * This 3D style is similar to a 2D filledcurves plot between two lines.
+ * Put together a list of the component quadrangles using the data structures
+ * normally used by pm3d routines pm3d_plot(), pm3d_depth_queue_flush().
+ * The component quadrangles from all plots are sorted and flushed together.
+ */
+static void
+plot3d_zerrorfill(struct surface_points *plot)
+{
+    struct iso_curve *curve = plot->iso_crvs;
+    int i1, i2;		/* index leading and trailing coord of current quadrangle */
+    int count = 0;
+    gpdPoint corner[4];
+
+    /* Find leading edge of first quadrangle */
+    for (i1=0; i1 < curve->p_count; i1++) {
+	if (curve->points[i1].type == INRANGE)
+	    break;
+    }
+
+    for (i2=i1+1; i2 < curve->p_count; i2++) {
+	if (curve->points[i2].type != INRANGE)
+	    continue;
+	count++;	/* Found one */
+	corner[0].x = corner[1].x = curve->points[i1].x;
+	corner[0].y = corner[1].y = curve->points[i1].y;
+	corner[0].z = curve->points[i1].CRD_ZLOW;
+	corner[1].z = curve->points[i1].CRD_ZHIGH;
+	corner[2].x = corner[3].x = curve->points[i2].x;
+	corner[2].y = corner[3].y = curve->points[i2].y;
+	corner[3].z = curve->points[i2].CRD_ZLOW;
+	corner[2].z = curve->points[i2].CRD_ZHIGH;
+	pm3d_add_quadrangle(plot, corner);
+	i1 = i2;
+    }
+
+    if (count == 0)
+	int_error(NO_CARET, "all points out of range");
+
+    /* Default is to write out each zerror plot as we come to it     */
+    /* (most recent plot occludes all previous plots). To get proper */
+    /* sorting, use "set pm3d depthorder".                           */
+    if (pm3d.direction != PM3D_DEPTH)
+	pm3d_depth_queue_flush();
+
 }
 
 static void

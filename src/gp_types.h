@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.71 2016/05/08 04:17:25 sfeam Exp $
+ * $Id: gp_types.h,v 1.72 2016/08/17 19:38:16 sfeam Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -115,6 +115,7 @@ typedef enum PLOT_STYLE {
     SURFACEGRID  = 31*PLOT_STYLE_BITS + PLOT_STYLE_HAS_LINE,
     PARALLELPLOT = 32*PLOT_STYLE_BITS + PLOT_STYLE_HAS_LINE,
     TABLESTYLE   = 33*PLOT_STYLE_BITS,
+    ZERRORFILL   = 34*PLOT_STYLE_BITS + PLOT_STYLE_HAS_FILL,
     PLOT_STYLE_NONE = -1
 } PLOT_STYLE;
 
@@ -177,6 +178,9 @@ typedef enum coord_type {
 #define CRD_PTSIZE xlow
 /* Used by splot styles POINTSTYLE and LINESPOINTS with variable point type */
 #define CRD_PTTYPE xhigh
+/* Used by splot style ZERRORFILL */
+#define CRD_ZLOW xlow
+#define CRD_ZHIGH xhigh
 
 
 typedef struct coordinate {

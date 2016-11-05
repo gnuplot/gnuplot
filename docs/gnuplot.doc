@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1027 2016/10/10 22:53:38 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1028 2016/11/03 22:27:20 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -205,6 +205,8 @@ C
  * New commands `break` and `continue` allow more complicated loop structure.
 
  * 3D plots can be rotated about the line of sight (see `set view azimuth`).
+
+ * New 3D plot style `with zerrorfill`
 
  * Support for array variables (see `arrays`).
 
@@ -3362,9 +3364,9 @@ Ffigure_boxplot
 ?style boxxyerror
 ?boxxyerror
 Ffigure_boxxyerror
- The `boxxyerror` style is only relevant to 2D data plotting.  It is similar
- to the `xyerrorbars` style except that it draws rectangular areas rather than
- simple crosses.  It uses either 4 or 6 basic columns of input data.
+ The `boxxyerror` plot style is only relevant to 2D data plotting.
+ It is similar to the `xyerrorbars` style except that it draws rectangular areas
+ rather than crosses.  It uses either 4 or 6 basic columns of input data.
  Additional input columns may be used to provide information such as
  variable line or fill color (see `rgbcolor variable`).
 
@@ -3567,8 +3569,8 @@ Ffigure_dots
 ?style filledcurves
 ?filledcurves
 Ffigure_filledcurves
- The `filledcurves` style is only relevant to 2D plotting. Three variants
- are possible. The first two variants require either a function or two columns
+ The `filledcurves` style is only used for 2D plotting. It has three variants.
+ The first two variants require either a single function or two columns (x,y)
  of input data, and may be further modified by the options listed below.
 
  Syntax:
@@ -3593,10 +3595,10 @@ Ffigure_filledcurves
      filledcurves xy=10,20 ... point 10,20 of x1,y1 axes (arc-like shape).
      filledcurves above r=1.5  the area of a polar plot outside radius 1.5
 
- The third variant requires three columns of input data: the x coordinate and
- two y coordinates corresponding to two curves sampled at the same set of
- x coordinates; the area between the two curves is filled.
+ The third variant fills the area between two curves sampled at the same set of
+ x coordinates.  It requires three columns of input data (x, y1, y2).
  This is the default if there are three or more columns of input data.
+ See also the similar 3D plot style `zerrorfill`.
 
       3 columns:  x  y1  y2
 
@@ -4343,6 +4345,42 @@ Ffigure_yerrorlines
 ^ <a href="http://www.gnuplot.info/demo/mgr.html">
  errorbar demo.
 ^ </a>
+2 zerrorfill
+?plotting styles zerrorfill
+?style zerrorfill
+?zerrorfill
+ Syntax:
+
+      splot DATA using 1:2:3:4[:5] with zerrorfill {fc|fillcolor <colorspec>}
+                 {lt|linetype <n>} {<line properties>}
+
+ The `zerrorfill` plot style is similar to one variant of the 2D plot style
+ `filledcurves`.  It fills the area between two functions or data lines that
+ are sampled at the same x and y points.  It requires 4 or 5 input columns:
+
+      4 columns:  x  y  z  zdelta
+      5 columns:  x  y  z  zlow  zhigh
+
+ The area between zlow and zhigh is filled and then a line is drawn through the
+ z values. By default both the line and the fill area use the same color, but
+ you can change this in the splot command.  The fill area properties are also
+ affected by the global fill style; see `set style fill`.
+
+ If there are multiple curves in the splot command each new curve may occlude
+ all previous curves.  To get proper depth sorting so that curves can only be
+ occluded by curves closer to the viewer, use the command `set pm3d depthorder`.
+ Unfortunately this causes all the filled areas to be drawn after all of the
+ corresponding lines of z values.  In order to see both the lines and the
+ depth-sorted fill areas you probably will need to make the fill areas 
+ partially transparent or use pattern fill rather than solid fill.
+
+ The fill area in the first two examples below is the same.
+
+      splot 'data' using 1:2:3:4 with zerrorfill fillcolor "grey" lt black
+      splot 'data' using 1:2:3:($3-$4):($3+$4) with zerrorfill
+      splot '+' using 1:(const):(func1($1)):(func2($1)) with zerrorfill
+      splot for [k=1:5] datafile[k] with zerrorfill lt black fc lt (k+1)
+
 2 3D plots
 ?3D plots
 ?plotting styles 3D plots
@@ -7123,8 +7161,8 @@ Ffigure_jitter
       surface      vectors    parallelaxes
  or
       boxes            boxplot        ellipses       image
-      boxerrorbars     candlesticks   filledcurves   rgbimage
-      boxxyerror       circles        histograms     rgbalpha   pm3d
+      boxerrorbars     candlesticks   filledcurves   rgbimage    pm3d
+      boxxyerror       circles        histograms     rgbalpha    zerrorfill
  or
       table
 
