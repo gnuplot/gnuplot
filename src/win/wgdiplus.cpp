@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.40 2016/11/05 10:01:10 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.41 2016/11/05 11:44:04 markisch Exp $
  */
 
 /*
@@ -59,6 +59,7 @@ const int pattern_num = 8;
 enum draw_target { DRAW_SCREEN, DRAW_PRINTER, DRAW_PLOTTER, DRAW_METAFILE };
 
 static Color gdiplusCreateColor(COLORREF color, double alpha);
+static void gdiplusSetDashStyle(Pen *pen, enum DashStyle style);
 static Pen * gdiplusCreatePen(UINT style, float width, COLORREF color, double alpha);
 static void gdiplusPolyline(Graphics &graphics, Pen &pen, Point *points, int polyi);
 static void gdiplusFilledPolygon(Graphics &graphics, Brush &brush, Point *points, int polyi);
@@ -114,6 +115,25 @@ gdiplusCreateColor(COLORREF color, double alpha)
 }
 
 
+static void
+gdiplusSetDashStyle(Pen *pen, enum DashStyle style)
+{
+	const REAL dashstyles[4][6] = {
+		{ 16.f, 8.f },	// dash
+		{ 3.f, 3.f },	// dot
+		{ 8.f, 5.f, 3.f, 5.f }, // dash dot
+		{ 8.f, 4.f, 3.f, 4.f, 3.f, 4.f } // dash dot dot
+	};
+	const int dashstyle_len[4] = { 2, 2, 4, 6 };
+
+	style = static_cast<enum DashStyle>(style % 5);
+	if (style == 0)
+		pen->SetDashStyle(style);
+	else
+		pen->SetDashPattern(dashstyles[style - 1], dashstyle_len[style - 1]);
+}
+
+
 static Pen *
 gdiplusCreatePen(UINT style, float width, COLORREF color, double alpha)
 {
@@ -122,7 +142,7 @@ gdiplusCreatePen(UINT style, float width, COLORREF color, double alpha)
 	Pen * pen = new Pen(gdipColor, width > 1 ? width : 1);
 	if (style <= PS_DASHDOTDOT)
 		// cast is save since GDI and GDI+ use same numbers
-		pen->SetDashStyle(static_cast<DashStyle>(style));
+		gdiplusSetDashStyle(pen, static_cast<DashStyle>(style));
 	pen->SetLineCap(LineCapSquare, LineCapSquare, DashCapFlat);
 	pen->SetLineJoin(LineJoinMiter);
 
@@ -268,8 +288,6 @@ gdiplusPolyline(Graphics &graphics, Pen &pen, Point *points, int polyi)
 	// Dash patterns get scaled with line width, in contrast to GDI.
 	// Avoid smearing out caused by antialiasing for small line widths.
 	SmoothingMode mode = graphics.GetSmoothingMode();
-	if ((mode != SmoothingModeNone) && (pen.GetDashStyle() != DashStyleSolid) && (pen.GetWidth() < 2))
-		graphics.SetSmoothingMode(SmoothingModeNone);
 
 	if ((points[0].X != points[polyi - 1].X) ||
 		(points[0].Y != points[polyi - 1].Y))
@@ -289,8 +307,6 @@ gdiplusPolyline(Graphics &graphics, Pen &pen, PointF *points, int polyi)
 	// Dash patterns get scaled with line width, in contrast to GDI.
 	// Avoid smearing out caused by antialiasing for small line widths.
 	SmoothingMode mode = graphics.GetSmoothingMode();
-	if ((mode != SmoothingModeNone) && (pen.GetDashStyle() != DashStyleSolid) && (pen.GetWidth() < 2))
-		graphics.SetSmoothingMode(SmoothingModeNone);
 
 	bool all_vert_or_horz = true;
 	for (int i = 1; i < polyi; i++)
@@ -965,7 +981,7 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 			pen.SetWidth(cur_penstruct.lopnWidth.x);
 			if (cur_penstruct.lopnStyle <= PS_DASHDOTDOT)
 				// cast is save since GDI and GDI+ use the same numbers
-				pen.SetDashStyle(static_cast<DashStyle>(cur_penstruct.lopnStyle));
+				gdiplusSetDashStyle(&pen, static_cast<DashStyle>(cur_penstruct.lopnStyle));
 			else
 				pen.SetDashStyle(DashStyleSolid);
 
@@ -982,15 +998,15 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 				dt %= WGNUMPENS;
 				dt += 2;
 				cur_penstruct.lopnStyle = lpgw->monopen[dt].lopnStyle;
-				pen.SetDashStyle(static_cast<DashStyle>(cur_penstruct.lopnStyle));
+				gdiplusSetDashStyle(&pen, static_cast<DashStyle>(cur_penstruct.lopnStyle));
 			} else if (dt == DASHTYPE_SOLID) {
 				cur_penstruct.lopnStyle = PS_SOLID;
-				pen.SetDashStyle(static_cast<DashStyle>(cur_penstruct.lopnStyle));
+				gdiplusSetDashStyle(&pen, static_cast<DashStyle>(cur_penstruct.lopnStyle));
 			} else if (dt == DASHTYPE_AXIS) {
 				dt = 1;
 				cur_penstruct.lopnStyle =
 					lpgw->dashed ? lpgw->monopen[dt].lopnStyle : lpgw->colorpen[dt].lopnStyle;
-				pen.SetDashStyle(static_cast<DashStyle>(cur_penstruct.lopnStyle));
+				gdiplusSetDashStyle(&pen, static_cast<DashStyle>(cur_penstruct.lopnStyle));
 			} else if (dt == DASHTYPE_CUSTOM) {
 				t_dashtype * dash = static_cast<t_dashtype *>(LocalLock(curptr->htext));
 				INT count = 0;

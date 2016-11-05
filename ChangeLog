@@ -11,6 +11,12 @@
 	DPI into account when calculating the scaling factor for super- and
 	subscripts.  Makes special code for printing superfluous.
 
+	* src/win/wgdiplus.cpp:  Default GDI+ dash patterns use a very narrow
+	spacing which does not scale with the line width.  We now use our own
+	custom dash patterns which resemble the GDI default patterns for unit
+	line width.  This in particular improves the appearance of grid lines
+	in polar plots.
+
 2016-11-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c src/gadgets.h src/graph3d.c src/save.c src/set.c
