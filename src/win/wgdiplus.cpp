@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.38 2016/10/08 19:46:10 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.39 2016/10/08 20:31:49 markisch Exp $
  */
 
 /*
@@ -56,6 +56,7 @@ static ULONG_PTR gdiplusToken;
 #define MINMAX(a,val,b) (((val) <= (a)) ? (a) : ((val) <= (b) ? (val) : (b)))
 const int pattern_num = 8;
 
+enum draw_target { DRAW_SCREEN, DRAW_PRINTER, DRAW_PLOTTER, DRAW_METAFILE };
 
 static Color gdiplusCreateColor(COLORREF color, double alpha);
 static Pen * gdiplusCreatePen(UINT style, float width, COLORREF color, double alpha);
@@ -65,6 +66,7 @@ static void gdiplusFilledPolygon(Graphics &graphics, Brush &brush, PointF *point
 static Brush * gdiplusPatternBrush(int style, COLORREF color, double alpha, COLORREF backcolor, BOOL transparent);
 static void gdiplusDot(Graphics &graphics, Brush &brush, int x, int y);
 static Font * SetFont_gdiplus(Graphics &graphics, LPRECT rect, LPGW lpgw, LPTSTR fontname, int size);
+static void do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target target);
 
 
 /* Internal state of enhanced text processing.
@@ -542,6 +544,43 @@ draw_enhanced_init(LPGW lpgw, Graphics &graphics, SolidBrush &brush, LPRECT rect
 void
 drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 {
+	gdiplusInit();
+	Graphics graphics(hdc);
+	do_draw_gdiplus(lpgw, graphics, rect, DRAW_SCREEN);
+}
+
+
+void
+metafile_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect, LPWSTR name)
+{
+	gdiplusInit();
+	Metafile metafile(name, hdc, EmfTypeEmfPlusDual, NULL);
+	Graphics graphics(&metafile);
+	do_draw_gdiplus(lpgw, graphics, rect, DRAW_METAFILE);
+}
+
+
+void
+print_gdiplus(LPGW lpgw, HDC hdc, HANDLE printer, LPRECT rect)
+{
+	gdiplusInit();
+
+	// temporarily turn of antialiasing
+	BOOL aa = lpgw->antialiasing;
+	lpgw->antialiasing = FALSE;
+
+	Graphics graphics(hdc, printer);
+	graphics.SetPageUnit(UnitPixel);
+	do_draw_gdiplus(lpgw, graphics, rect, DRAW_PRINTER);
+
+	// restore settings
+	lpgw->antialiasing = aa;
+}
+
+
+static void
+do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target target)
+{
 	/* draw ops */
 	unsigned int ngwop = 0;
 	struct GWOP *curptr;
@@ -557,7 +596,7 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 	int hypertype = 0;
 
 	/* colors */
-	bool isColor;				/* use colors? */
+	bool isColor = true;		/* use colors? */
 	COLORREF last_color = 0;	/* currently selected color */
 	double alpha_c = 1.;		/* alpha for transparency */
 
@@ -620,47 +659,32 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 	if (lpgw->locked) return;
 
 	/* clear hypertexts only in display sessions */
-	interactive = (GetObjectType(hdc) == OBJ_MEMDC) ||
-		((GetObjectType(hdc) == OBJ_DC) && (GetDeviceCaps(hdc, TECHNOLOGY) == DT_RASDISPLAY));
+	interactive = (target == DRAW_SCREEN);
 	if (interactive)
 		clear_tooltips(lpgw);
+
+	/* Need to scale line widths for raster printers so they are the same
+	   as on screen */
+	if (target == DRAW_PRINTER) {
+		HDC hdc = graphics.GetHDC();
+		HDC hdc_screen = GetDC(NULL);
+		lw_scale = (double) GetDeviceCaps(hdc, VERTRES) /
+		           (double) GetDeviceCaps(hdc_screen, VERTRES);
+		line_width *= lw_scale;
+		ReleaseDC(NULL, hdc_screen);
+		graphics.ReleaseHDC(hdc);
+	}
+
+	// only cache point symbols when drawing to a screen
+	ps_caching = (target == DRAW_SCREEN);
 
 	rr = rect->right;
 	rl = rect->left;
 	rt = rect->top;
 	rb = rect->bottom;
 
-	/* The GDI status query functions don't work on metafile, printer or
-	 * plotter handles, so can't know whether the screen is actually showing
-	 * color or not, if drawgraph() is being called from CopyClip().
-	 * Solve by defaulting isColor to TRUE in those cases.
-	 * Note that info on color capabilities of printers would be available
-	 * via DeviceCapabilities().
-	 */
-	isColor = (((GetDeviceCaps(hdc, PLANES) * GetDeviceCaps(hdc, BITSPIXEL)) > 2)
-	       || (GetDeviceCaps(hdc, TECHNOLOGY) == DT_METAFILE)
-	       || (GetDeviceCaps(hdc, TECHNOLOGY) == DT_PLOTTER)
-	       || (GetDeviceCaps(hdc, TECHNOLOGY) == DT_RASPRINTER));
-
-	/* Need to scale line widths for raster printers so they are the same
-	   as on screen */
-	if ((GetDeviceCaps(hdc, TECHNOLOGY) == DT_RASPRINTER)) {
-		HDC hdc_screen = GetDC(NULL);
-		lw_scale = (double) GetDeviceCaps(hdc, VERTRES) /
-		           (double) GetDeviceCaps(hdc_screen, VERTRES);
-		line_width *= lw_scale;
-		ReleaseDC(NULL, hdc_screen);
-	}
-
-	ps_caching = !((GetDeviceCaps(hdc, TECHNOLOGY) == DT_METAFILE)
-	            || (GetDeviceCaps(hdc, TECHNOLOGY) == DT_PLOTTER)
-	            || (GetDeviceCaps(hdc, TECHNOLOGY) == DT_RASPRINTER));
-
-	gdiplusInit();
-	Graphics graphics(hdc);
-
 	if (lpgw->antialiasing) {
-		graphics.SetSmoothingMode(SmoothingModeAntiAlias);
+		//graphics.SetSmoothingMode(SmoothingModeAntiAlias);
 		graphics.SetSmoothingMode(SmoothingModeAntiAlias8x8);
 		// graphics.SetTextRenderingHint(TextRenderingHintAntiAlias);
 		graphics.SetTextRenderingHint(TextRenderingHintClearTypeGridFit);
