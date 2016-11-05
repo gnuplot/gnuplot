@@ -72,6 +72,7 @@ Here are samples of PNG output from some of the demos.
     <li><a href="pm3d.html">pm3d coloring</a></li>
     <li><a href="hidden2.html">pm3d hidden surfaces</a></li>
     <li><a href="world2.html">3D mapping</a></li>
+    <li><a href="zerror.html">shaded error region</a></li>
     <li><a href="azimuth.html">azimuth</a></li>
     <li><a href="pm3d_lighting.html">lighting model</a></li>
     </ul>
