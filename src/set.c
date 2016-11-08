@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.536 2016/11/03 22:27:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.537 2016/11/05 14:58:45 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -5200,11 +5200,11 @@ set_timestamp()
 	}
 
 	if (almost_equals(c_token,"r$otate")) {
-	    timelabel_rotate = TRUE;
+	    timelabel.rotate = TEXT_VERTICAL;
 	    c_token++;
 	    continue;
 	} else if (almost_equals(c_token, "n$orotate")) {
-	    timelabel_rotate = FALSE;
+	    timelabel.rotate = 0;
 	    c_token++;
 	    continue;
 	}
@@ -5242,7 +5242,10 @@ set_timestamp()
 
     if (!(timelabel.text))
 	timelabel.text = gp_strdup(DEFAULT_TIMESTAMP_FORMAT);
-
+    if (timelabel.rotate && !timelabel_bottom)
+	timelabel.pos = RIGHT;
+    else
+	timelabel.pos = LEFT;
 }
 
 

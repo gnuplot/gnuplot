@@ -455,7 +455,6 @@ extern text_label timelabel;
 /* asctime() format */
 # define DEFAULT_TIMESTAMP_FORMAT "%a %b %d %H:%M:%S %Y"
 #endif
-extern int timelabel_rotate;
 extern int timelabel_bottom;
 
 extern TBOOLEAN	polar;
@@ -553,6 +552,9 @@ void clip_vector __PROTO((unsigned int x, unsigned int y));
 /* Common routines for setting line or text color from t_colorspec */
 void apply_pm3dcolor __PROTO((struct t_colorspec *tc));
 void reset_textcolor __PROTO((const struct t_colorspec *tc));
+
+/* Timestamp code shared by 2D and 3D */
+void do_timelabel __PROTO((unsigned int x, unsigned int y));
 
 extern fill_style_type default_fillstyle;
 

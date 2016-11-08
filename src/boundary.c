@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.36 2016/09/27 05:36:23 sfeam Exp $
+ * $Id: boundary.c,v 1.37 2016/10/01 23:07:00 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -102,7 +102,7 @@ int key_cols;
 void
 boundary(struct curve_points *plots, int count)
 {
-    int yticlin = 0, y2ticlin = 0, timelin = 0;
+    int yticlin = 0, y2ticlin = 0;
     legend_key *key = &keyT;
 
     struct termentry *t = term;
@@ -118,11 +118,10 @@ boundary(struct curve_points *plots, int count)
     int title_textheight=0;	/* height of title */
     int xlabel_textheight=0;	/* height of xlabel */
     int x2label_textheight=0;	/* height of x2label */
-    int timetop_textheight=0;	/* height of timestamp (if at top) */
-    int timebot_textheight=0;	/* height of timestamp (if at bottom) */
     int ylabel_textwidth=0;	/* width of (rotated) ylabel */
     int y2label_textwidth=0;	/* width of (rotated) y2label */
     int timelabel_textwidth=0;	/* width of timestamp */
+    int timelabel_textheight=0;	/* height of timestamp */
     int ytic_textwidth=0;	/* width of ytic labels */
     int y2tic_textwidth=0;	/* width of y2tic labels */
     int x2tic_height=0;		/* 0 for tic_in or no x2tics, ticscale*v_tic otherwise */
@@ -133,7 +132,7 @@ boundary(struct curve_points *plots, int count)
 
     /* figure out which rotatable items are to be rotated
      * (ylabel and y2label are rotated if possible) */
-    int vertical_timelabel = can_rotate ? timelabel_rotate : 0;
+    int vertical_timelabel = can_rotate ? timelabel.rotate : 0;
     int vertical_xtics  = can_rotate ? axis_array[FIRST_X_AXIS].tic_rotate : 0;
     int vertical_x2tics = can_rotate ? axis_array[SECOND_X_AXIS].tic_rotate : 0;
     int vertical_ytics  = can_rotate ? axis_array[FIRST_Y_AXIS].tic_rotate : 0;
@@ -175,8 +174,6 @@ boundary(struct curve_points *plots, int count)
 	label_width(axis_array[FIRST_Y_AXIS].formatstring, &yticlin);
     if (axis_array[SECOND_Y_AXIS].ticmode)
 	label_width(axis_array[SECOND_Y_AXIS].formatstring, &y2ticlin);
-    if (timelabel.text)
-	label_width(timelabel.text, &timelin);
     /*}}} */
 
     /*{{{  preliminary plot_bounds.ytop  calculation */
@@ -227,12 +224,17 @@ boundary(struct curve_points *plots, int count)
 	x2tic_height = 0;
 
     /* timestamp */
-    if (timelabel.text && !timelabel_bottom) {
-	double tmpx, tmpy;
-	map_position_r(&(timelabel.offset), &tmpx, &tmpy, "boundary");
-	timetop_textheight = (int) ((timelin + 2) * t->v_char + tmpy);
-    } else
-	timetop_textheight = 0;
+    if (timelabel.text) {
+	int timelin;
+	timelabel_textwidth = label_width(timelabel.text, &timelin);
+	if (vertical_timelabel) {
+	    timelabel_textheight = timelabel_textwidth * t->v_char;
+	    timelabel_textwidth = (timelin + 1.5) * t->h_char;
+	} else {
+	    timelabel_textheight = timelin * t->v_char;
+	    timelabel_textwidth = timelabel_textwidth * t->h_char;
+	}
+    }
 
     /* ylabel placement */
     if (axis_array[FIRST_Y_AXIS].label.text) {
@@ -285,8 +287,8 @@ boundary(struct curve_points *plots, int count)
 	if (x2label_textheight + x2label_yoffset > 0)
 	    top_margin += x2label_textheight;
 
-	if (timetop_textheight > top_margin)
-	    top_margin = timetop_textheight;
+	if (timelabel_textheight > top_margin && !timelabel_bottom && !vertical_timelabel)
+	    top_margin = timelabel_textheight;
 
 	top_margin += x2tic_height + x2tic_textheight;
 	/* x2tic_height and x2tic_textheight are computed as only the
@@ -365,18 +367,6 @@ boundary(struct curve_points *plots, int count)
     } else
 	xlabel_textheight = 0;
 
-    /* timestamp */
-    if (timelabel.text && timelabel_bottom) {
-	/* && !vertical_timelabel)
-	 * DBT 11-18-98 resize plot for vertical timelabels too !
-	 */
-	double tmpx, tmpy;
-	map_position_r(&(timelabel.offset), &tmpx, &tmpy, "boundary");
-	/* offset is subtracted because if . 0, the margin is smaller */
-	timebot_textheight = (int) (timelin * t->v_char - tmpy);
-    } else
-	timebot_textheight = 0;
-
     /* compute plot_bounds.ybot from the various components
      *     unless bmargin is explicitly specified  */
 
@@ -392,10 +382,8 @@ boundary(struct curve_points *plots, int count)
 	plot_bounds.ybot += xtic_height + xtic_textheight;
 	if (xlabel_textheight > 0)
 	    plot_bounds.ybot += xlabel_textheight;
-	if (timebot_textheight > 0)
-	    plot_bounds.ybot += timebot_textheight;
-	/* HBB 19990616: round to nearest integer, required to escape
-	 * floating point inaccuracies */
+	if (!vertical_timelabel && timelabel_bottom && timelabel_textheight > 0)
+	    plot_bounds.ybot += timelabel_textheight;
 	if (plot_bounds.ybot == (int) (t->ymax * yoffset)) {
 	    /* make room for the end of rotated ytics or y2tics */
 	    plot_bounds.ybot += (int) (t->h_char * 2);
@@ -473,20 +461,11 @@ boundary(struct curve_points *plots, int count)
     else
 	ytic_width = 0;
 
-    /* timestamp */
-    if (timelabel.text && vertical_timelabel) {
-	double tmpx, tmpy;
-	map_position_r(&(timelabel.offset), &tmpx, &tmpy, "boundary");
-	timelabel_textwidth = (int) ((timelin + 1.5) * t->v_char - tmpx);
-    } else
-	timelabel_textwidth = 0;
-
     if (lmargin.x < 0) {
 	/* Auto-calculation */
-	double tmpx, tmpy;
 	int space_to_left = key_xleft;
 
-	if (space_to_left < timelabel_textwidth)
+	if (space_to_left < timelabel_textwidth && vertical_timelabel)
 	    space_to_left = timelabel_textwidth;
 	if (space_to_left < ylabel_textwidth)
 	    space_to_left = ylabel_textwidth;
@@ -494,17 +473,10 @@ boundary(struct curve_points *plots, int count)
 	plot_bounds.xleft += space_to_left;
 	plot_bounds.xleft += ytic_width + ytic_textwidth;
 
-	/* make sure plot_bounds.xleft is wide enough for a negatively
-	 * x-offset horizontal timestamp
-	 */
-	map_position_r(&(timelabel.offset), &tmpx, &tmpy, "boundary");
-	if (!vertical_timelabel
-	    && plot_bounds.xleft - ytic_width - ytic_textwidth < -(int) (tmpx))
-	    plot_bounds.xleft = ytic_width + ytic_textwidth - (int) (tmpx);
-	if (plot_bounds.xleft == (int) (t->xmax * xoffset)) {
-	    /* make room for end of xtic or x2tic label */
-	    plot_bounds.xleft += (int) (t->h_char * 2);
-	}
+	if (plot_bounds.xleft - ytic_width - ytic_textwidth < 0)
+	    plot_bounds.xleft = ytic_width + ytic_textwidth;
+	if (plot_bounds.xleft == t->xmax * xoffset)
+	    plot_bounds.xleft += t->h_char * 2;
 	/* DBT 12-3-98  extra margin just in case */
 	plot_bounds.xleft += 0.5 * t->h_char;
     }
@@ -759,29 +731,22 @@ boundary(struct curve_points *plots, int count)
     ylabel_x -= ylabel_textwidth;
 
     y2label_x = plot_bounds.xright + y2tic_width + y2tic_textwidth;
-    /* Intentionally not applied
-	y2label_x += y2label_textwidth / 2;
-     */
 
+    /* Nov 2016  - simplify placement of timestamp
+     * Stamp the same place on the page regardless of plot margins
+     */
     if (vertical_timelabel) {
+	time_x = 1.5 * term->h_char;
 	if (timelabel_bottom)
-	    time_y = xlabel_y - timebot_textheight + xlabel_textheight;
+	    time_y = term->v_char;
 	else
-	    time_y = title_y + timetop_textheight - title_textheight - x2label_textheight;
+	    time_y = term->ymax - term->v_char;
     } else {
+	time_x = 1.0 * term->h_char;
 	if (timelabel_bottom)
-	    time_y = plot_bounds.ybot - xtic_height - xtic_textheight - xlabel_textheight
-		- timebot_textheight + t->v_char;
+	    time_y = timelabel_textheight - 0.5 * term->v_char;
 	else
-	    time_y = plot_bounds.ytop + x2tic_height + x2tic_textheight
-		+ timetop_textheight + (int) t->h_char;
-    }
-    if (vertical_timelabel)
-	time_x = plot_bounds.xleft - ytic_width - ytic_textwidth - timelabel_textwidth;
-    else {
-	double tmpx, tmpy;
-	map_position_r(&(timelabel.offset), &tmpx, &tmpy, "boundary");
-	time_x = plot_bounds.xleft - ytic_width - ytic_textwidth + (int) (tmpx);
+	    time_y = term->ymax;
     }
 
     xtic_y = plot_bounds.ybot - xtic_height
@@ -1502,34 +1467,7 @@ draw_titles()
 	reset_textcolor(&(axis_array[SECOND_X_AXIS].label.textcolor));
     }
 
-    /* PLACE TIMEDATE */
-    if (timelabel.text) {
-	/* we worked out coordinates in boundary() */
-	char *str;
-	time_t now;
-	unsigned int x = time_x;
-	unsigned int y = time_y;
-	time(&now);
-	/* there is probably no way to find out in advance how many
-	 * chars strftime() writes */
-	str = gp_alloc(MAX_LINE_LEN + 1, "timelabel.text");
-	strftime(str, MAX_LINE_LEN, timelabel.text, localtime(&now));
-
-	apply_pm3dcolor(&(timelabel.textcolor));
-	if (timelabel_rotate && (*t->text_angle) (TEXT_VERTICAL)) {
-	    x += t->v_char / 2;	/* HBB */
-	    if (timelabel_bottom)
-		write_multiline(x, y, str, LEFT, JUST_TOP, TEXT_VERTICAL, timelabel.font);
-	    else
-		write_multiline(x, y, str, RIGHT, JUST_TOP, TEXT_VERTICAL, timelabel.font);
-	    (*t->text_angle) (0);
-	} else {
-	    y -= t->v_char / 2;	/* HBB */
-	    if (timelabel_bottom)
-		write_multiline(x, y, str, LEFT, JUST_BOT, 0, timelabel.font);
-	    else
-		write_multiline(x, y, str, LEFT, JUST_TOP, 0, timelabel.font);
-	}
-	free(str);
-    }
+    /* PLACE TIMELABEL */
+    if (timelabel.text)
+	do_timelabel(time_x, time_y);
 }

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.351 2016/11/03 22:27:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.352 2016/11/05 21:21:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -850,35 +850,12 @@ do_3dplot(
 	reset_textcolor(&(title.textcolor));
     }
 
-    /* PLACE TIMEDATE */
+    /* PLACE TIMELABEL */
     if (timelabel.text) {
-	char str[MAX_LINE_LEN+1];
-	time_t now;
-	int tmpx, tmpy;
 	unsigned int x, y;
-
-	map3d_position_r(&(timelabel.offset), &tmpx, &tmpy, "3dplot");
-	x = t->v_char + tmpx;
-	y = timelabel_bottom
-	    ? yoffset * Y_AXIS.max + tmpy + t->v_char
-	    : plot_bounds.ytop + tmpy - t->v_char;
-
-	time(&now);
-	strftime(str, MAX_LINE_LEN, timelabel.text, localtime(&now));
-
-	if (timelabel_rotate && (*t->text_angle) (TEXT_VERTICAL)) {
-	    if (timelabel_bottom)
-		write_multiline(x, y, str, LEFT, JUST_TOP, TEXT_VERTICAL, timelabel.font);
-	    else
-		write_multiline(x, y, str, RIGHT, JUST_TOP, TEXT_VERTICAL, timelabel.font);
-
-	    (*t->text_angle) (0);
-	} else {
-	    if (timelabel_bottom)
-		write_multiline(x, y, str, LEFT, JUST_BOT, 0, timelabel.font);
-	    else
-		write_multiline(x, y, str, LEFT, JUST_TOP, 0, timelabel.font);
-	}
+	x = t->v_char;
+	y = timelabel_bottom ? page_bounds.ybot : page_bounds.ytop;
+	do_timelabel(x,y);
     }
 
     /* Add 'back' color box */

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1028 2016/11/03 22:27:20 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1029 2016/11/05 21:21:07 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -12995,8 +12995,7 @@ Ffigure_multiple_keys
 ?show timestamp
 ?timestamp
 ?notimestamp
- The command `set timestamp` places the time and date of the plot in the left
- margin.
+ The command `set timestamp` places the current time and date in the plot margin. 
 
  Syntax:
        set timestamp {"<format>"} {top|bottom} {{no}rotate}
@@ -13005,12 +13004,11 @@ Ffigure_multiple_keys
        unset timestamp
        show timestamp
 
- The format string allows you to choose the format used to write the date and
- time.  Its default value is what asctime() uses: "%a %b %d %H:%M:%S %Y"
- (weekday, month name, day of the month, hours, minutes, seconds, four-digit
- year).  With `top` or `bottom` you can place the timestamp at the top or
- bottom of the left margin (default: bottom).  `rotate` lets you write the
- timestamp vertically, if your terminal supports vertical text.  The constants
+ The format string is used to write the date and time.  Its default value is
+ what asctime() uses: "%a %b %d %H:%M:%S %Y" (weekday, month name, day of the
+ month, hours, minutes, seconds, four-digit year).  With `top` or `bottom` you
+ can place the timestamp along the top left or bottom left margin
+ (default: bottom).  `rotate` writes the timestamp vertically. The constants
  <xoff> and <yoff> are offsets that let you adjust the position more finely.
  <font> is used to specify the font with which the time is to be written.
 

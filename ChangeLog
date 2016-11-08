@@ -1,3 +1,13 @@
+2016-11-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/boundary.c src/gadgets.c src/gadgets.h src/graph3d.c src/set.c
+	src/unset.c src/show.c:  Use the shared routine write_label() to handle
+	"set timestamp" in both 2D and 3D.  Place the timestamp relative to page
+	borders rather than the plot borders.  Timestamp offsets no longer
+	affect placement of plot borders.  A timestamp is still generated for
+	each subplot in a multiplot but now they all end up in the same place
+	rather than overlapping bits of the mulitplot.  This could be improved.
+
 2016-11-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/win/wgraph.c (CopyPrint): Fix braces broken by #ifdef.
