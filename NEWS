@@ -28,6 +28,7 @@ Changes not in 5.0
 * NEW wxt supports saving graph as EMF on Windows
 * NEW wxt supports printing on Windows
 * CHANGE Revise placement of axis labels in 3D plots
+* CHANGE Timestamp is now placed relative to page rather than plot boundary
 * CHANGE Track font/enhanced for key title separately from the key entries
 * CHANGE order of margins in `set margins <left>, <right>, <bottom>, <top>`
 * CHANGE Store and reuse x,y dimensions from the time image data is read in

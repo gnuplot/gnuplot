@@ -6,7 +6,7 @@
 	borders rather than the plot borders.  Timestamp offsets no longer
 	affect placement of plot borders.  A timestamp is still generated for
 	each subplot in a multiplot but now they all end up in the same place
-	rather than overlapping bits of the mulitplot.  This could be improved.
+	rather than overlapping bits of the multiplot.  This could be improved.
 
 2016-11-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
