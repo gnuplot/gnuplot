@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.123 2016/09/28 03:34:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.124 2016/10/08 20:13:17 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -216,9 +216,13 @@ ifilled_quadrangle(gpiPoint* icorners)
     if (pm3d.border.l_type != LT_NODRAW) {
 	int i;
 
-	/* It should be sufficient to set only the color, but for some */
-	/* reason this causes the svg terminal to lose the fill type.  */
-	term_apply_lp_properties(&pm3d_border_lp);
+	/* LT_DEFAULT means draw border in current color */
+	/* FIXME: currently there is no obvious way to set LT_DEFAULT  */
+	if (pm3d.border.l_type != LT_DEFAULT) {
+	    /* It should be sufficient to set only the color, but for some */
+	    /* reason this causes the svg terminal to lose the fill type.  */
+	    term_apply_lp_properties(&pm3d_border_lp);
+	}
 
 	term->move(icorners[0].x, icorners[0].y);
 	for (i = 3; i >= 0; i--) {
