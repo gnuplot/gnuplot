@@ -4,6 +4,9 @@
 	LT_DEFAULT, draw quadrangle borders in current color.  Unfortunately
 	this is still a magic number (lt -6) in the user interface.
 
+	* src/qtterminal/QtGnuplotScene.{cpp,h}: Track current fillstyle so that
+	qt terminal can distinguish between opaque and transparent pattern fill.
+
 2016-11-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/boundary.c src/gadgets.c src/gadgets.h src/graph3d.c src/set.c

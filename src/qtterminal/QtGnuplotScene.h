@@ -110,6 +110,7 @@ private:
 	bool    m_inKeySample;
 	bool    m_preserve_visibility;
 	bool	m_inTextBox;
+	int	m_currentFillStyle;
 	QRectF	m_currentTextBox;
 	QPointF m_textMargin;
 	QList<QGraphicsItem*> m_currentGroup;
