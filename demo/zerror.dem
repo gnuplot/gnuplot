@@ -1,3 +1,6 @@
+#
+# zerrorfill with and without depth-sorting
+#
 set yrange [0.5:5.5]
 set zrange [1:*]
 set xyplane at 1
@@ -15,6 +18,26 @@ set title "splot with zerrorfill (set pm3d depthorder)"
 set pm3d depthorder
 set style fill transparent solid 0.5
 splot for [k=1:5] 'silver.dat' using 1:(k):2:3 with zerror lt black fc lt k title "k = ".k
+
+pause -1 "Hit return to continue"
+reset
+#
+# Reproduce surface1.dem plot #16
+# using zerrorfill instead of hidden3d parametric surfaces
+#
+set format z "%.1f" 
+unset key
+set view 66, 200, 1, 1
+unset xtics
+unset ytics
+set title "\"fence plot\" using zerrorfill" 
+set xlabel "X axis"  rotate parallel 
+set ylabel "Y axis" rotate parallel
+set pm3d depthorder
+sinc(u,v) = sin(sqrt(u**2+v**2)) / sqrt(u**2+v**2)
+
+set style fill  transparent solid 0.75 noborder
+splot for [i=-5:4][x=-50:50:5] '+' using (i):($1/100.):(-1):(-1):(sinc($1/10., 1.+i)) with zerrorfill
 
 pause -1 "Hit return to continue"
 reset
