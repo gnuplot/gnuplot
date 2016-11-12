@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.352 2016/11/05 21:21:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.353 2016/11/08 05:41:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1076,7 +1076,8 @@ do_3dplot(
 
 	    case ZERRORFILL:
 		/* Always draw filled areas even if we _also_ do hidden3d processing */
-		plot3d_zerrorfill(this_plot);
+		if (term->filled_polygon)
+		    plot3d_zerrorfill(this_plot);
 		term_apply_lp_properties(&(this_plot->lp_properties));
 		plot3d_lines(this_plot);
 		break;
@@ -3187,6 +3188,8 @@ key_sample_fill(int xl, int yl, struct fill_style_type *fs)
     unsigned int w = key_sample_right - key_sample_left;
     unsigned int h = key_entry_height/2;
 
+    if (!(term->fillbox))
+	return;
     (term->layer)(TERM_LAYER_BEGIN_KEYSAMPLE);
     apply_pm3dcolor(&fs->border_color);
     if (w > 0)

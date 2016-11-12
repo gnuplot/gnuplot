@@ -1,3 +1,8 @@
+2016-11-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c: Check terminal supports filled_polygon before trying
+	to carry out "with zerrorfill"
+
 2016-11-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/color.c (ifilled_quadrangle):  If pm3d border linetype is 
