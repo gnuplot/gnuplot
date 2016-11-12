@@ -1,0 +1,61 @@
+#
+# Two different methods to construct a fence plot
+#
+# 1) Each fence is a separate parametric surface
+#    surface appearance is controlled by "set hidden3d"
+#
+set title "fence plot constructed with separate parametric surfaces"
+sinc(u,v) = sin(sqrt(u**2+v**2)) / sqrt(u**2+v**2)
+set xrange [-5:5]; set yrange [-5:5]
+set xtics offset 0,-1
+set ytics offset 0,-1
+set zrange [-1:1]
+set format z "%.1f" 
+set arrow 1 from 5,-5,-1.2 to 5,5,-1.2 lt -1
+set label 1 "increasing v" at 6,0,-1
+set arrow 2 from 5,6,-1 to 5,5,-1 lt -1
+set label 2 "u=0" at 5,6.5,-1
+set arrow 3 from 5,6,sinc(5,5) to 5,5,sinc(5,5) lt -1
+set label 3 "u=1" at 5,6.5,sinc(5,5)
+set parametric
+set hidden3d offset 0	# front/back coloring makes no sense for fenceplot #
+set isosamples 2,33
+array U[10]
+u=-5; du=(4.99-(-4.99))/9
+do for [i=1:10] { U[i] = u + i * du }
+
+set view 70, 25
+set urange [0:1]
+set vrange [-4.99:4.99]
+splot for [i=1:10] U[i], v, (u<0.5) ? -1 : sinc(U[i],v) notitle
+
+pause -1 "Hit return to continue"
+unset hidden3d
+
+#
+# 2) Each fence is a curve drawn with zerror
+#    surface appearance is controlled by "set pm3d" and "set style fill"
+#    depth-cueing is controlled by "set pm3d depth"
+#
+set format z "%.1f" 
+unset key
+unset arrow
+unset label
+set view 70,25
+unset xtics
+unset ytics
+set title "fence plot constructed with zerrorfill" 
+set zrange [-1:1]
+set arrow 1 from 5,-.5,-1.2 to 5,.5,-1.2 lt -1
+set label 1 "sampling on Y" at 6,-0.1,-1
+set xlabel "X axis"  rotate parallel 
+set xrange [-5:4]
+set yrange [-0.5:0.5]
+set pm3d depthorder border lt -6
+sinc(u,v) = sin(sqrt(u**2+v**2)) / sqrt(u**2+v**2)
+
+set style fill  solid 0.5 noborder
+splot for [x=-4:4][y=-50:50:3] '+' using (x):($1/100.):(-1):(-1):(sinc($1/10., 1.+x)) with zerrorfill
+
+pause -1 "Hit return to continue"
+reset
