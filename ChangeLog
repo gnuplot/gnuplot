@@ -1,3 +1,8 @@
+2016-11-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/boundary.c:  Better adjustment of plot x2label and plot title when
+	x2tics are enabled.
+
 2016-11-03  Craig DeForest  <zowie@users.sf.net>
 
 	* src/datafile.c (plot_option_binary):  Interpretation of dimensions

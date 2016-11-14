@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.15.2.4 2015/09/25 16:58:55 sfeam Exp $
+ * $Id: boundary.c,v 1.15.2.5 2015/10/29 23:25:47 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -764,10 +764,10 @@ boundary(struct curve_points *plots, int count)
      *     (some of these may not be used) */
 
     x2label_y = plot_bounds.ytop + x2tic_height + x2tic_textheight + x2label_textheight;
-    if (x2tic_textheight && (title_textheight || x2label_textheight))
-	x2label_y += t->v_char;
-
     title_y = x2label_y + title_textheight;
+
+    if (x2tic_textheight && x2label_textheight)
+	x2label_y += t->v_char;
 
     ylabel_y = plot_bounds.ytop + x2tic_height + x2tic_textheight + ylabel_textheight;
 
