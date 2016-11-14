@@ -6,6 +6,8 @@
 	Previous code was using axis->label->pos to store this, but that
 	confounds the tic labels and the axis label proper.
 
+	* src/boundary: Revise calculation of space needed for x2 axis ticmarks.
+
 2016-11-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c: Check terminal supports filled_polygon before trying

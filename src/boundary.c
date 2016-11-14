@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.38 2016/11/08 05:41:24 sfeam Exp $
+ * $Id: boundary.c,v 1.39 2016/11/14 19:59:24 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -215,12 +215,11 @@ boundary(struct curve_points *plots, int count)
 	x2tic_textheight = 0;
 
     /* tics */
-    if (!axis_array[SECOND_X_AXIS].tic_in
-	&& ((axis_array[SECOND_X_AXIS].ticmode & TICS_ON_BORDER)
-	    || ((axis_array[FIRST_X_AXIS].ticmode & TICS_MIRROR)
-		&& (axis_array[FIRST_X_AXIS].ticmode & TICS_ON_BORDER))))
-	x2tic_height = (int) (t->v_tic * axis_array[SECOND_X_AXIS].ticscale);
-    else
+    if (axis_array[SECOND_X_AXIS].ticmode & TICS_ON_BORDER) {
+	x2tic_height = t->v_tic * axis_array[SECOND_X_AXIS].ticscale;
+	if (axis_array[SECOND_X_AXIS].tic_in)
+	    x2tic_height = -x2tic_height;
+    } else
 	x2tic_height = 0;
 
     /* timestamp */
@@ -290,12 +289,10 @@ boundary(struct curve_points *plots, int count)
 	if (timelabel_textheight > top_margin && !timelabel_bottom && !vertical_timelabel)
 	    top_margin = timelabel_textheight;
 
-	top_margin += x2tic_height + x2tic_textheight;
-	/* x2tic_height and x2tic_textheight are computed as only the
-	 *     relevant heights, but they nonetheless need a blank
-	 *     space above them  */
-	if (top_margin > x2tic_height)
-	    top_margin += (int) t->v_char;
+	top_margin += x2tic_textheight;
+	top_margin += t->v_char;
+	if (x2tic_height > 0)
+	    top_margin += x2tic_height;
 
 	plot_bounds.ytop -= top_margin;
 	if (plot_bounds.ytop == (int)(0.5 + (ysize + yoffset) * (t->ymax-1))) {
@@ -713,16 +710,20 @@ boundary(struct curve_points *plots, int count)
      *     (some of these may not be used) */
 
     x2label_y = plot_bounds.ytop + x2label_textheight;
+    x2label_y += 0.5 * t->v_char;
     if (x2label_textheight + x2label_yoffset >= 0) {
 	x2label_y += 1.5 * x2tic_textheight;
-	if (!axis_array[SECOND_X_AXIS].ticmode)
-	    x2label_y += 0.5 * t->v_char;
+	/* Adjust for the tics themselves */
+	if (x2tic_height > 0)
+	    x2label_y += x2tic_height;
     }
 
     title_x = (plot_bounds.xleft + plot_bounds.xright) / 2;
     title_y = plot_bounds.ytop + title_textheight + x2tic_textheight;
     if (x2label_y + x2label_yoffset > plot_bounds.ytop)
 	title_y += x2label_textheight;
+    if (x2tic_height > 0)
+	title_y += x2tic_height;
 
     /* Shift upward by 0.2 line to allow for descenders in xlabel text */
     xlabel_y = plot_bounds.ybot - xtic_height - xtic_textheight - xlabel_textheight
@@ -752,7 +753,7 @@ boundary(struct curve_points *plots, int count)
     xtic_y = plot_bounds.ybot - xtic_height
 	- (int) (vertical_xtics ? t->h_char : t->v_char);
 
-    x2tic_y = plot_bounds.ytop + x2tic_height
+    x2tic_y = plot_bounds.ytop + (x2tic_height > 0 ? x2tic_height : 0)
 	+ (vertical_x2tics ? (int) t->h_char : x2tic_textheight);
 
     ytic_x = plot_bounds.xleft - ytic_width
