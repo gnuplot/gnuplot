@@ -3,6 +3,9 @@
 	* src/boundary.c:  Better adjustment of plot x2label and plot title when
 	x2tics are enabled.
 
+	* src/graph3d.c:  Avoid writing zlabel twice when 'set grid defaultlayer'.
+	Bug #1277
+
 2016-11-03  Craig DeForest  <zowie@users.sf.net>
 
 	* src/datafile.c (plot_option_binary):  Interpretation of dimensions
