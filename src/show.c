@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.374 2016/11/03 22:27:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.375 2016/11/08 05:41:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -3353,7 +3353,7 @@ show_ticdefp(struct axis *this_axis)
 	fprintf(stderr, "\n\t  tics are limited to data range");
     fputs("\n\t  labels are ", stderr);
     if (this_axis->manual_justify) {
-    	switch (this_axis->label.pos) {
+    	switch (this_axis->tic_pos) {
     	case LEFT:{
 		fputs("left justified, ", stderr);
 		break;

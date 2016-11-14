@@ -1,5 +1,5 @@
 #
-# $Id: surface1.dem,v 1.12 2012/07/07 05:18:18 sfeam Exp $
+# $Id: surface1.dem,v 1.13 2013/10/18 18:22:11 sfeam Exp $
 #
 set title "3D surface from a grid (matrix) of Z values"
 set xrange [-0.5:4.5]
@@ -105,7 +105,7 @@ set label 1 "This is equal to 1" at -5,-2,1.5 centre
 set arrow 1 from -5,-2.1,1.4 to 0,0,1
 splot [-12:12.01] [-12:12.01] sinc(u,v)
 pause -1 "Hit return to continue (15)"
-set title "\"fence plot\" using separate parametric surfaces"
+set title "fence plot constructed with separate parametric surfaces"
 # A method suggested by Hans-Bernhard Broeker
 # <broeker@physik.rwth-aachen.de>: display a separate parametric
 # surface for each fence.

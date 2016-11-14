@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.203 2016/08/19 21:27:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.204 2016/10/23 23:13:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1550,9 +1550,9 @@ axis_output_tics(
 	}
 
 	if (this_axis->manual_justify)
-	    tic_hjust = this_axis->label.pos;
+	    tic_hjust = this_axis->tic_pos;
 	else
-	    this_axis->label.pos = tic_hjust;
+	    this_axis->tic_pos = tic_hjust;
 
 	if (this_axis->ticmode & TICS_MIRROR)
 	    tic_mirror = mirror_position;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.353 2016/11/08 05:41:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.354 2016/11/13 01:25:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2711,7 +2711,7 @@ xtick_callback(
 
 	/* allow manual justification of tick labels, but only for "set view map" */
 	if (splot_map && this_axis->manual_justify)
-	    just = this_axis->label.pos;
+	    just = this_axis->tic_pos;
 	else if (tic_unitx * xscaler < -0.9)
 	    just = LEFT;
 	else if (tic_unitx * xscaler < 0.9)
@@ -2833,7 +2833,7 @@ ytick_callback(
 
 	/* allow manual justification of tick labels, but only for "set view map" */
 	if (splot_map && this_axis->manual_justify)
-	    just = this_axis->label.pos;
+	    just = this_axis->tic_pos;
 	else if (tic_unitx * xscaler < -0.9)
 	    just = (this_axis->index == FIRST_Y_AXIS) ? LEFT : RIGHT;
 	else if (tic_unitx * xscaler < 0.9)

@@ -30,14 +30,14 @@ unset key
 set view 66, 200, 1, 1
 unset xtics
 unset ytics
-set title "\"fence plot\" using zerrorfill" 
+set title "fence plot constructed with zerrorfill" 
 set xlabel "X axis"  rotate parallel 
 set ylabel "Y axis" rotate parallel
 set pm3d depthorder
 sinc(u,v) = sin(sqrt(u**2+v**2)) / sqrt(u**2+v**2)
 
 set style fill  transparent solid 0.75 noborder
-splot for [i=-5:4][x=-50:50:5] '+' using (i):($1/100.):(-1):(-1):(sinc($1/10., 1.+i)) with zerrorfill
+splot for [i=-5:4][y=-50:50:5] '+' using (i):($1/100.):(-1):(-1):(sinc($1/10., 1.+i)) with zerrorfill
 
 pause -1 "Hit return to continue"
 reset

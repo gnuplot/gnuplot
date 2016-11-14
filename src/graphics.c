@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.530 2016/08/16 19:59:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.531 2016/08/22 18:44:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -246,7 +246,7 @@ place_grid(int layer)
 	else if ((*t->text_angle)(rotate_tics))
 	    tic_hjust = (rotate_tics == TEXT_VERTICAL) ? RIGHT : LEFT;
 	if (R_AXIS.manual_justify)
-	    tic_hjust = R_AXIS.label.pos;
+	    tic_hjust = R_AXIS.tic_pos;
 	tic_direction = 1;
 	gen_tics(&axis_array[POLAR_AXIS], xtick2d_callback);
 	(*t->text_angle) (0);
@@ -3956,7 +3956,7 @@ place_parallel_axes(struct curve_points *first_plot, int pcount, int layer)
 	    tic_vjust = JUST_TOP;
 	}
 	if (this_axis->manual_justify)
-	    tic_hjust = this_axis->label.pos;
+	    tic_hjust = this_axis->tic_pos;
 
 	tic_start = axis_map(&axis_array[FIRST_X_AXIS], axis_coord);
 	tic_mirror = tic_start; /* tic extends on both sides of axis */

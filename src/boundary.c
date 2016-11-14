@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.37 2016/10/01 23:07:00 sfeam Exp $
+ * $Id: boundary.c,v 1.38 2016/11/08 05:41:24 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -658,9 +658,9 @@ boundary(struct curve_points *plots, int count)
     if (axis_array[SECOND_X_AXIS].ticmode & TICS_ON_BORDER && vertical_x2tics) {
 	/* Assuming left justified tic labels. Correction below if they aren't */
 	double projection = sin((double)axis_array[SECOND_X_AXIS].tic_rotate*DEG2RAD);
-	if (axis_array[SECOND_X_AXIS].label.pos == RIGHT)
+	if (axis_array[SECOND_X_AXIS].tic_pos == RIGHT)
 	    projection *= -1;
-	else if (axis_array[SECOND_X_AXIS].label.pos == CENTRE)
+	else if (axis_array[SECOND_X_AXIS].tic_pos == CENTRE)
 	    projection = 0.5*fabs(projection);
 	widest_tic_strlen = 0;		/* reset the global variable ... */
 	gen_tics(&axis_array[SECOND_X_AXIS], widest_tic_callback);
@@ -677,14 +677,14 @@ boundary(struct curve_points *plots, int count)
 	/* This adjustment will happen again in axis_output_tics but we need it now */
 	if (axis_array[FIRST_X_AXIS].tic_rotate == TEXT_VERTICAL
 	&& !axis_array[FIRST_X_AXIS].manual_justify)
-	    axis_array[FIRST_X_AXIS].label.pos = RIGHT;
+	    axis_array[FIRST_X_AXIS].tic_pos = RIGHT;
 	if (axis_array[FIRST_X_AXIS].tic_rotate == 90)
 	    projection = -1.0;
 	else if (axis_array[FIRST_X_AXIS].tic_rotate == TEXT_VERTICAL)
 	    projection = -1.0;
 	else
 	    projection = -sin((double)axis_array[FIRST_X_AXIS].tic_rotate*DEG2RAD);
-	if (axis_array[FIRST_X_AXIS].label.pos == RIGHT)
+	if (axis_array[FIRST_X_AXIS].tic_pos == RIGHT)
 	    projection *= -1;
 	widest_tic_strlen = 0;		/* reset the global variable ... */
 	gen_tics(&axis_array[FIRST_X_AXIS], widest_tic_callback);

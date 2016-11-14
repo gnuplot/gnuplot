@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.537 2016/11/05 14:58:45 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.538 2016/11/08 05:41:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4998,20 +4998,20 @@ set_tics()
 	    ++c_token;
 	} else if (almost_equals(c_token, "l$eft")) {
 	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
-		axis_array[i].label.pos = LEFT;
+		axis_array[i].tic_pos = LEFT;
 		axis_array[i].manual_justify = TRUE;
 	    }
 	    c_token++;
 	} else if (almost_equals(c_token, "c$entre")
 		|| almost_equals(c_token, "c$enter")) {
 	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
-		axis_array[i].label.pos = CENTRE;
+		axis_array[i].tic_pos = CENTRE;
 		axis_array[i].manual_justify = TRUE;
 	    }
 	    c_token++;
 	} else if (almost_equals(c_token, "ri$ght")) {
 	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
-		axis_array[i].label.pos = RIGHT;
+		axis_array[i].tic_pos = RIGHT;
 		axis_array[i].manual_justify = TRUE;
 	    }
 	    c_token++;
@@ -5551,16 +5551,16 @@ set_tic_prop(struct axis *this_axis)
 		++c_token;
 		this_axis->ticdef.offset = default_offset;
 	    } else if (almost_equals(c_token, "l$eft")) {
-		this_axis->label.pos = LEFT;
+		this_axis->tic_pos = LEFT;
 		this_axis->manual_justify = TRUE;
 		c_token++;
 	    } else if (almost_equals(c_token, "c$entre")
 		       || almost_equals(c_token, "c$enter")) {
-		this_axis->label.pos = CENTRE;
+		this_axis->tic_pos = CENTRE;
 		this_axis->manual_justify = TRUE;
 		c_token++;
 	    } else if (almost_equals(c_token, "ri$ght")) {
-		this_axis->label.pos = RIGHT;
+		this_axis->tic_pos = RIGHT;
 		this_axis->manual_justify = TRUE;
 		c_token++;
 	    } else if (almost_equals(c_token, "autoj$ustify")) {

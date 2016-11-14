@@ -1,3 +1,11 @@
+2016-11-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c src/axis.h src/boundary.c src/color.c src/graph3d.c
+	src/graphics.c src/save.c src/set.c src/show.c:  Add a new field to
+	the axis structure that stores tic label horizontal justification.
+	Previous code was using axis->label->pos to store this, but that
+	confounds the tic labels and the axis label proper.
+
 2016-11-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c: Check terminal supports filled_polygon before trying
