@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.316 2016/11/03 22:27:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.317 2016/11/14 19:59:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -802,6 +802,8 @@ set origin %g,%g\n",
 	save_textcolor(fp, &(lab.textcolor));				 \
 	if (lab.tag == ROTATE_IN_3D_LABEL_TAG)				 \
 	    fprintf(fp, " rotate parallel");				 \
+	else if (lab.rotate == TEXT_VERTICAL)				 \
+	    fprintf(fp, " rotate");					 \
 	else if (lab.rotate)						 \
 	    fprintf(fp, " rotate by %d", lab.rotate);			 \
 	else								 \

@@ -8,6 +8,8 @@
 
 	* src/boundary: Revise calculation of space needed for x2 axis ticmarks.
 
+	* src/save.c: saved timestamp command must use compatible syntax
+
 2016-11-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c: Check terminal supports filled_polygon before trying
