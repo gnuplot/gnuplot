@@ -33,9 +33,9 @@ pause -1 "Hit return to continue"
 unset hidden3d
 
 #
-# 2) Each fence is a curve drawn with zerror
+# 2) Each fence is a curve drawn with zerrorfill
 #    surface appearance is controlled by "set pm3d" and "set style fill"
-#    depth-cueing is controlled by "set pm3d depth"
+#    If depth-cueing is needed, use "set pm3d depthorder"
 #
 set format z "%.1f" 
 unset key
@@ -51,10 +51,9 @@ set label 1 "sampling on Y" at 6,-0.1,-1
 set xlabel "X axis"  rotate parallel 
 set xrange [-5:4]
 set yrange [-0.5:0.5]
-set pm3d depthorder border lt -6
 sinc(u,v) = sin(sqrt(u**2+v**2)) / sqrt(u**2+v**2)
 
-set style fill  solid 0.5 noborder
+set style fill  solid 0.75 noborder
 splot for [x=-4:4][y=-50:50:3] '+' using (x):($1/100.):(-1):(-1):(sinc($1/10., 1.+x)) with zerrorfill
 
 pause -1 "Hit return to continue"

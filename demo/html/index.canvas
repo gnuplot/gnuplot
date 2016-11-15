@@ -113,6 +113,7 @@
     <li><a href="running_avg.html">running averages</a></li>
     <li><a href="smooth.html">binning/histograms</a></li>
     <li><a href="array.html">arrays</a></li>
+    <li><a href="fenceplot.html">fence plots</a></li>
     <li><a href="gantt.html">Gantt chart</a></li>
     <li><a href="heatmaps.html">2D and 3D heat maps</a></li>
     <li><a href="violinplot.html">Violin plot</a></li>

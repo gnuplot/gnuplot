@@ -593,6 +593,25 @@ set label 1 font ",10"
 set key font ",9" spacing 0.5
 load '../demo/custom_key.dem'
 
+# Fence plot
+reset
+set output out . 'figure_fenceplot' . ext
+set title "fence plot constructed with zerrorfill" 
+unset key
+set zrange [-1:1]
+set xtics ( "A" -2, "B" -1, "C" 0, "D" 1, "E" 2 ) scale 0 offset -1
+set xrange [-3:2]
+set xyplane at -1.1
+set yrange [-0.5:0.5]
+set ytics format "  %.1f" scale 0
+set ylabel "Y value"  rotate parallel offset -2
+unset ztics
+set zlabel "Z value" rotate offset 5
+sinc(u,v) = sin(sqrt(u**2+v**2)) / sqrt(u**2+v**2)
+set style fill  solid 0.5 noborder
+splot for [x=-2:2][y=-50:50:3] '+' using (x):($1/100.):(-1):(-1):(sinc($1/10., 1.+2*x)) with zerrorfill
+reset
+
 # close last file
 unset outp
 

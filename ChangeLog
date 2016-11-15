@@ -1,3 +1,8 @@
+2016-11-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/plotstyles.gnu docs/gnuplot.doc demo/html/* demo/fenceplot.dem:
+	Add zerror+fenceplot demo to the documentation and the online demo set.
+
 2016-11-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (SaveAsEMF):  Option to save graph in EMF+ format.
@@ -16,7 +21,7 @@
 	src/graphics.c src/save.c src/set.c src/show.c:  Add a new field to
 	the axis structure that stores tic label horizontal justification.
 	Previous code was using axis->label->pos to store this, but that
-	confounds the tic labels and the axis label proper.
+	confounds justification of the tic labels and the axis label proper.
 
 	* src/boundary: Revise calculation of space needed for x2 axis ticmarks.
 
