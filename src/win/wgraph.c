@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.232 2016/11/05 11:44:04 markisch Exp $
+ * $Id: wgraph.c,v 1.233 2016/11/06 23:19:23 broeker Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -4038,7 +4038,6 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				/* track (show) mouse position -- send the event to gnuplot */
 				Wnd_exec_event(lpgw, lParam, GE_motion, wParam);
 				return 0L; /* end of WM_MOUSEMOVE */
-
 			case WM_LBUTTONDOWN: {
 				int i;
 				int x = GET_X_LPARAM(lParam);
@@ -4067,11 +4066,9 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				 * context menu !!! */
 				Wnd_exec_event(lpgw, lParam, GE_buttonpress, 3);
 				return 0L;
-
 			case WM_MBUTTONDOWN:
 				Wnd_exec_event(lpgw, lParam, GE_buttonpress, 2);
 				return 0L;
-
 			case WM_MOUSEWHEEL:	/* shige, BM : mouse wheel support */
 			case WM_MOUSEHWHEEL: {
 				WORD fwKeys;
@@ -4087,46 +4084,22 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					Wnd_exec_event(lpgw, lParam, GE_modifier, modifier_mask);
 					last_modifier_mask = modifier_mask;
 				}
-				if (message == WM_MOUSEWHEEL)
+				if (message == WM_MOUSEWHEEL) {
 					Wnd_exec_event(lpgw, lParam, GE_buttonpress, zDelta > 0 ? 4 : 5);
-				else
+					Wnd_exec_event(lpgw, lParam, GE_buttonrelease, zDelta > 0 ? 4 : 5);
+				} else {
 					Wnd_exec_event(lpgw, lParam, GE_buttonpress, zDelta > 0 ? 6 : 7);
+					Wnd_exec_event(lpgw, lParam, GE_buttonrelease, zDelta > 0 ? 6 : 7);
+				}
 				return 0L;
 			}
-
-			case WM_LBUTTONDBLCLK:
-				Wnd_exec_event(lpgw, lParam, GE_buttonrelease, 1);
-				return 0L;
-
-			case WM_RBUTTONDBLCLK:
-				Wnd_exec_event(lpgw, lParam, GE_buttonrelease, 3);
-				return 0L;
-
-			case WM_MBUTTONDBLCLK:
-				Wnd_exec_event(lpgw, lParam, GE_buttonrelease, 2);
-				return 0L;
-
-#if 1
 			case WM_LBUTTONUP:
-#else
-			case WM_LBUTTONCLICK:
-#endif
 				Wnd_exec_event(lpgw, lParam, GE_buttonrelease, 1);
 				return 0L;
-
-#if 1
 			case WM_RBUTTONUP:
-#else
-			case WM_RBUTTONCLICK:
-#endif
 				Wnd_exec_event(lpgw, lParam, GE_buttonrelease, 3);
 				return 0L;
-
-#if 1
 			case WM_MBUTTONUP:
-#else
-			case WM_MBUTTONCLICK:
-#endif
 				Wnd_exec_event(lpgw, lParam, GE_buttonrelease, 2);
 				return 0L;
 
@@ -4134,7 +4107,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 #endif /* USE_MOUSE */
 
-	switch(message) {
+	switch (message) {
 		case WM_SYSCOMMAND:
 			switch (LOWORD(wParam))
 			{

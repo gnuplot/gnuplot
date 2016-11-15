@@ -1,3 +1,10 @@
+2016-11-15  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	 * src/win/wgraph.c (WndGraphProc):  Remove dead code in mouse handling:
+	Single and double clicks are handles by the code in mouse.c and the
+	window is not even configured to receive double click events.  Also make
+	sure that mouse wheel "button" are released again.
+
 2016-11-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c src/axis.h src/boundary.c src/color.c src/graph3d.c
