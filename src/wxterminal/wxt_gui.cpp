@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.164 2016/10/08 16:23:05 markisch Exp $
+ * $Id: wxt_gui.cpp,v 1.165 2016/10/13 23:16:46 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -3572,6 +3572,21 @@ void wxt_update_position(int number)
 
 	wxt_sigint_check();
 	wxt_sigint_restore();
+}
+
+
+/* print the current plot */
+void wxt_screen_dump(void)
+{
+#ifdef WXT_PRINT
+	wxCommandEvent event;
+	if (wxt_current_window && wxt_current_window->frame && wxt_current_window->frame->IsShown())
+		wxt_current_window->frame->OnPrint(event);
+	else
+		int_error(c_token, "No active plot.");
+#else
+	int_error(c_token, "Printing support for the wxt terminal is not available on this platform.");
+#endif
 }
 
 

@@ -1,5 +1,8 @@
 2016-11-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/wxterminal/wxt_term.h src/win/wxt_gui.cpp src/win/winmain.c:
+	screendump command supports wxt terminal.
+
 	 * src/win/wgraph.c (WndGraphProc):  Remove dead code in mouse handling:
 	Single and double clicks are handles by the code in mouse.c and the
 	window is not even configured to receive double click events.  Also make

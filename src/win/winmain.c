@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.93 2016/09/12 17:52:26 markisch Exp $
+ * $Id: winmain.c,v 1.94 2016/09/28 14:58:36 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -1255,7 +1255,20 @@ close_printer(FILE *outfile)
 void
 screen_dump()
 {
-    GraphPrint(graphwin);
+    if (term == NULL) {
+	int_error(c_token, "");
+    }
+    if (strcmp(term->name, "windows") == 0)
+	GraphPrint(graphwin);
+#ifdef WXWIDGETS
+    else if (strcmp(term->name, "wxt") == 0)
+	wxt_screen_dump();
+#endif
+#ifdef QTTERM
+    //else if (strcmp(term->name, "qt") == 0)
+#endif
+    else
+	int_error(c_token, "screendump not supported for terminal `%s`", term->name);
 }
 
 
