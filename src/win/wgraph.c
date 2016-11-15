@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.233 2016/11/06 23:19:23 broeker Exp $
+ * $Id: wgraph.c,v 1.234 2016/11/15 08:04:23 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -3017,7 +3017,11 @@ SaveAsEMF(LPGW lpgw)
 	Ofn.lStructSize = sizeof(OPENFILENAME);
 	Ofn.hwndOwner = hwnd;
 	Ofn.lpstrInitialDir = NULL;
-	Ofn.lpstrFilter = TEXT("Enhanced Metafile (*.EMF)\0*.EMF\0All Files (*.*)\0*.*\0");
+#ifdef HAVE_GDIPLUS
+	Ofn.lpstrFilter = TEXT("Enhanced Metafile (*.emf)\0*.emf\0Enhanced Metafile+ (*.emf)\0*.emf\0");
+#else
+	Ofn.lpstrFilter = TEXT("Enhanced Metafile (*.emf)\0*.emf\0");
+#endif
 	Ofn.lpstrCustomFilter = lpstrCustomFilter;
 	Ofn.nMaxCustFilter = 255;
 	Ofn.nFilterIndex = 1;   /* start with the *.emf filter */
@@ -3042,18 +3046,24 @@ SaveAsEMF(LPGW lpgw)
 		GetPlotRect(lpgw, &rect);
 		GetPlotRectInMM(lpgw, &mfrect, hdc);
 
-		/* temporarily disable antialiasing */
-		antialiasing = lpgw->antialiasing;
-		lpgw->antialiasing = FALSE;
+		switch (Ofn.nFilterIndex) {
+		case 1:  /* GDI Enhanced Metafile (EMF) */
+			/* temporarily disable antialiasing */
+			antialiasing = lpgw->antialiasing;
+			lpgw->antialiasing = FALSE;
 
-		hmf = CreateEnhMetaFile(hdc, Ofn.lpstrFile, &mfrect, NULL);
-		/* Always create EMF files using GDI only! */
-		drawgraph(lpgw, hmf, &rect);
-		hemf = CloseEnhMetaFile(hmf);
-
-		lpgw->antialiasing = antialiasing;
-
-		DeleteEnhMetaFile(hemf);
+			hmf = CreateEnhMetaFile(hdc, Ofn.lpstrFile, &mfrect, NULL);
+			drawgraph(lpgw, hmf, &rect);
+			hemf = CloseEnhMetaFile(hmf);
+			lpgw->antialiasing = antialiasing;
+			DeleteEnhMetaFile(hemf);
+			break;
+#ifdef HAVE_GDIPLUS
+		case 2:  /* GDI+ Enhanced Metafile (EMF+) */
+			metafile_gdiplus(lpgw, hdc, &rect, Ofn.lpstrFile);
+			break;
+#endif
+		}
 		ReleaseDC(hwnd, hdc);
 	}
 }

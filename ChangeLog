@@ -1,5 +1,7 @@
 2016-11-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgraph.c (SaveAsEMF):  Option to save graph in EMF+ format.
+
 	* src/wxterminal/wxt_term.h src/win/wxt_gui.cpp src/win/winmain.c:
 	screendump command supports wxt terminal.
 
