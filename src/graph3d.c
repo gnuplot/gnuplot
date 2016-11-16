@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.354 2016/11/13 01:25:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.355 2016/11/14 19:59:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -836,10 +836,8 @@ do_3dplot(
 	    map3d_xy(X_AXIS.max, Y_AXIS.max, base_z, &map_x2, &map_y2);
 	    /* Distance between the title base line and graph top line or the upper part of
 	       tics is as given by character height: */
-#define DEFAULT_Y_DISTANCE 1.0
 	    x = (unsigned int) ((map_x1 + map_x2) / 2);
-	    y = (unsigned int) (map_y1 + tics_len + (DEFAULT_Y_DISTANCE + titlelin - 0.5) * (t->v_char));
-#undef DEFAULT_Y_DISTANCE
+	    y = (unsigned int) (map_y1 + tics_len + (titlelin + 0.5) * (t->v_char));
 	} else { /* usual 3d set view ... */
 	    x = (unsigned int) ((plot_bounds.xleft + plot_bounds.xright) / 2);
 	    y = (unsigned int) (plot_bounds.ytop + titlelin * (t->h_char));
@@ -2339,8 +2337,6 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		splot_map) {
 
 	    unsigned int x1, y1;
-	    int tmpx, tmpy;
-	    int angle = 0;
 
 	    if (splot_map) { /* case 'set view map' */
 		/* copied from xtick_callback(): baseline of tics labels */
@@ -2353,9 +2349,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		TERMCOORD(&v2, x1, y1);
 		/* Default displacement with respect to baseline of tics labels */
 		y1 -= (unsigned int) ((1.5) * t->v_char);
-		angle = X_AXIS.label.rotate;
 	    } else { /* usual 3d set view ... */
-		/* The only angle that makes sense is running parallel to the axis */
 		if (X_AXIS.label.tag == ROTATE_IN_3D_LABEL_TAG) {
 		    double ang, angx0, angx1, angy0, angy1;
 		    map3d_xy_double(X_AXIS.min, xaxis_y, base_z, &angx0, &angy0);
@@ -2363,7 +2357,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		    ang = atan2(angy1-angy0, angx1-angx0) / DEG2RAD;
 		    if (ang < -90) ang += 180;
 		    if (ang > 90) ang -= 180;
-		    angle = (ang > 0) ? floor(ang + 0.5) : floor(ang - 0.5);
+		    X_AXIS.label.rotate = (ang > 0) ? floor(ang + 0.5) : floor(ang - 0.5);
 		}
 
 		if (X_AXIS.ticmode & TICS_ON_AXIS) {
@@ -2372,7 +2366,6 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		    map3d_xyz(mid_x, xaxis_y, base_z, &v1);
 		}
 
-		/* DEBUG Replace old offset "step" with fraction of unit vector */
 		if (X_AXIS.ticmode & TICS_ON_AXIS) {
 		    v1.x += 2. * t->h_tic * ((X_AXIS.tic_in) ? 1.0 : -1.0) * tic_unitx;
 		    v1.y += 2. * t->h_tic * ((X_AXIS.tic_in) ? 1.0 : -1.0) * tic_unity;
@@ -2388,18 +2381,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		TERMCOORD(&v1, x1, y1);
 	    }
 
-	    map3d_position_r(&(X_AXIS.label.offset), &tmpx, &tmpy, "graphbox");
-	    x1 += tmpx; /* user-defined label offset */
-	    y1 += tmpy;
-
-	    ignore_enhanced(X_AXIS.label.noenhanced);
-	    apply_pm3dcolor(&(X_AXIS.label.textcolor));
-	    term->text_angle(angle);
-	    write_multiline(x1, y1, X_AXIS.label.text, CENTRE, JUST_TOP,
-			    angle, X_AXIS.label.font);
-	    term->text_angle(0);
-	    reset_textcolor(&(X_AXIS.label.textcolor));
-	    ignore_enhanced(FALSE);
+	    write_label(x1, y1, &X_AXIS.label);
 	    }
 	}
 
@@ -2441,9 +2423,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		(surface_rot_x > 90 && FRONTGRID != whichgrid) ||
 		splot_map) {
 		unsigned int x1, y1;
-		int tmpx, tmpy;
-		int h_just, v_just;
-		int angle = 0;
+		int save_rotate = Y_AXIS.label.rotate;
 
 		if (splot_map) { /* case 'set view map' */
 		    /* copied from ytick_callback(): baseline of tics labels */
@@ -2468,11 +2448,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		    }
 		    /* Default displacement with respect to baseline of tics labels */
 		    x1 -= (unsigned int) ((0.5 + widest_tic_strlen) * t->h_char);
-		    h_just = CENTRE; /* vertical justification for rotated text */
-		    v_just = JUST_BOT; /* horizontal -- does not work for rotated text? */
-		    angle = Y_AXIS.label.rotate;
 		} else { /* usual 3d set view ... */
-		    /* The only angle that makes sense is running parallel to the axis */
 		    if (Y_AXIS.label.tag == ROTATE_IN_3D_LABEL_TAG) {
 			double ang, angx0, angx1, angy0, angy1;
 			map3d_xy_double(yaxis_x, Y_AXIS.min, base_z, &angx0, &angy0);
@@ -2480,7 +2456,10 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 			ang = atan2(angy1-angy0, angx1-angx0) / DEG2RAD;
 			if (ang < -90) ang += 180;
 			if (ang > 90) ang -= 180;
-			angle = (ang > 0) ? floor(ang + 0.5) : floor(ang - 0.5);
+			Y_AXIS.label.rotate = (ang > 0) ? floor(ang + 0.5) : floor(ang - 0.5);
+		    } else {
+			/* The 2D default state (ylabel rotate) is not wanted in 3D */
+			Y_AXIS.label.rotate = 0;
 		    }
 
 		    if (Y_AXIS.ticmode & TICS_ON_AXIS) {
@@ -2489,7 +2468,6 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 			map3d_xyz(yaxis_x, mid_y, base_z, &v1);
 		    }
 
-		    /* DEBUG Replace old offset "step" with fraction of unit vector */
 		    if (Y_AXIS.ticmode & TICS_ON_AXIS) {
 			v1.x += 2. * t->h_tic * ((Y_AXIS.tic_in) ? 1.0 : -1.0) * tic_unitx;
 			v1.y += 2. * t->h_tic * ((Y_AXIS.tic_in) ? 1.0 : -1.0) * tic_unity;
@@ -2503,24 +2481,10 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 			v1.y -= tic_unity * Y_AXIS.ticscale * t->v_tic;
 		    }
 		    TERMCOORD(&v1, x1, y1);
-		    h_just = CENTRE;
-		    v_just = JUST_TOP;
 		}
 
-		map3d_position_r(&(Y_AXIS.label.offset), &tmpx, &tmpy, "graphbox");
-		x1 += tmpx; /* user-defined label offset */
-		y1 += tmpy;
-
-		ignore_enhanced(Y_AXIS.label.noenhanced);
-		apply_pm3dcolor(&(Y_AXIS.label.textcolor));
-
-		term->text_angle(angle);
-		write_multiline(x1, y1, Y_AXIS.label.text, h_just, v_just,
-				angle, Y_AXIS.label.font);
-		term->text_angle(0);
-
-		reset_textcolor(&(Y_AXIS.label.textcolor));
-		ignore_enhanced(FALSE);
+		write_label(x1, y1, &Y_AXIS.label);
+		Y_AXIS.label.rotate = save_rotate;
 	    }
 	}
 
@@ -2576,18 +2540,17 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	map3d_xyz(X_AXIS.max, 0.0, base_z, &v2);
 	draw3d_line(&v1, &v2, X_AXIS.zeroaxis);
     }
+
     /* PLACE ZLABEL - along the middle grid Z axis - eh ? */
     if (Z_AXIS.label.text
 	&& (splot_map == FALSE)
+	&& (current_layer == LAYER_FRONT || whichgrid == ALLGRID)
 	&& (draw_surface
 	    || (draw_contour & CONTOUR_SRF)
 	    || strpbrk(pm3d.where,"st") != NULL
 	    )
 	) {
-	int tmpx, tmpy;
 	vertex v1;
-	int h_just = CENTRE;
-	int v_just = JUST_TOP;
 	double mid_z;
 
 	if (nonlinear(&Z_AXIS)) {
@@ -2600,30 +2563,23 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	    map3d_xyz(0, 0, mid_z, &v1);
 	    TERMCOORD(&v1, x, y);
 	    x -= 5 * t->h_char;
-	    h_just = RIGHT;
 	} else {
 	    map3d_xyz(zaxis_x, zaxis_y, mid_z, &v1);
 	    TERMCOORD(&v1, x, y);
 	    x -= 7 * t->h_char;
-	    h_just = CENTRE;
 	}
 
-	map3d_position_r(&(Z_AXIS.label.offset), &tmpx, &tmpy, "graphbox");
-	x += tmpx;
-	y += tmpy;
+	if (Z_AXIS.label.tag == ROTATE_IN_3D_LABEL_TAG) {
+	    double ang, angx0, angx1, angy0, angy1;
+	    map3d_xy_double(zaxis_x, zaxis_y, Z_AXIS.min, &angx0, &angy0);
+	    map3d_xy_double(zaxis_x, zaxis_y, Z_AXIS.max, &angx1, &angy1);
+	    ang = atan2(angy1-angy0, angx1-angx0) / DEG2RAD;
+	    if (ang < -90) ang += 180;
+	    if (ang > 90) ang -= 180;
+	    Z_AXIS.label.rotate = (ang > 0) ? floor(ang + 0.5) : floor(ang - 0.5);
+	}
 
-	ignore_enhanced(Z_AXIS.label.noenhanced);
-	apply_pm3dcolor(&(Z_AXIS.label.textcolor));
-
-	if (Z_AXIS.label.tag == ROTATE_IN_3D_LABEL_TAG)
-	    Z_AXIS.label.rotate = 90. - azimuth;
-	term->text_angle(Z_AXIS.label.rotate);
-	write_multiline(x, y, Z_AXIS.label.text,
-			h_just, v_just, Z_AXIS.label.rotate, Z_AXIS.label.font);
-	term->text_angle(0);
-
-	reset_textcolor(&(Z_AXIS.label.textcolor));
-	ignore_enhanced(FALSE);
+	write_label(x, y, &Z_AXIS.label);
     }
 
     clip_area = clip_save;

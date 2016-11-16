@@ -1,3 +1,11 @@
+2016-11-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.h src/graph3d.c src/set.c:  Use the shared routine
+	write_label() to handle 3D axis labels. This allows explicit rotation
+	of xlabel and zlabel (ylabel rotation is suppressed so that the 2D
+	default "ylabel rotate" does not affect 3D plots).  The revised zlabel
+	code avoids printing the label twice (Bug #1277).
+
 2016-11-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/plotstyles.gnu docs/gnuplot.doc demo/html/* demo/fenceplot.dem:

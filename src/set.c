@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.538 2016/11/08 05:41:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.539 2016/11/14 19:59:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -6121,7 +6121,7 @@ parse_label_options( struct text_label *this_label, int ndim)
 	set_rot = FALSE, set_font = FALSE, set_offset = FALSE,
 	set_layer = FALSE, set_textcolor = FALSE, set_hypertext = FALSE;
     int layer = LAYER_BACK;
-    TBOOLEAN axis_label = (this_label->tag == -2);
+    TBOOLEAN axis_label = (this_label->tag <= NONROTATING_LABEL_TAG);
     TBOOLEAN hypertext = FALSE;
     struct position offset = default_offset;
     t_colorspec textcolor = {TC_DEFAULT,0,0.0};
@@ -6167,6 +6167,8 @@ parse_label_options( struct text_label *this_label, int ndim)
 	    if (equals(c_token, "by")) {
 		c_token++;
 		rotate = int_expression();
+		if (this_label->tag == ROTATE_IN_3D_LABEL_TAG)
+		    this_label->tag = NONROTATING_LABEL_TAG;
 	    } else if (almost_equals(c_token,"para$llel")) {
 		if (this_label->tag >= 0)
 		    int_error(c_token,"invalid option");
@@ -6186,7 +6188,7 @@ parse_label_options( struct text_label *this_label, int ndim)
 	    c_token++;
 	    set_rot = TRUE;
 	    if (this_label->tag == ROTATE_IN_3D_LABEL_TAG)
-		this_label->tag = NONROTATABLE_LABEL_TAG;
+		this_label->tag = NONROTATING_LABEL_TAG;
 	    continue;
 	}
 
