@@ -1,3 +1,10 @@
+2016-11-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/pdf.trm:  Mark this terminal as DEPRECATED. GmbH dropped support
+	in 2007 for the free (as in beer) but license-restricted version of
+	PDFlib.  The --with-pdf configuration option remains unchanged for now
+	but will be removed in a future gnuplot release (probably 5.2).
+
 2016-11-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/boundary.c:  Better adjustment of plot x2label and plot title when

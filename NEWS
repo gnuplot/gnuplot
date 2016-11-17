@@ -3,6 +3,7 @@ Changes in 5.0.6
 * NEW command 'set micro' enables encoding-specific char for gprintf %c format
 * CHANGE - start/end limits in nested iterations are reevaluated on the fly
 * CHANGE - revised adjustment of x2label and plot title when x2tics are present
+* CHANGE - mark non-free pdf terminal DEPRECATED (to be removed in release 5.2)
 * FIX assignment of x/y dimensions in "binary record=(a,b) ... with image"
 * FIX wxt - multithreaded wxt was faulting during resize (mutex lock failure)
 * FIX windows - timed pause only worked for intervals < 1 second
