@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.ac,v 1.22 2016/07/02 06:20:00 markisch Exp $
+dnl $Id: configure.ac,v 1.23 2016/11/17 22:57:20 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -108,7 +108,7 @@ test x"$EMACS" = xt && EMACS=
 AC_CHECK_PROGS(EMACS, emacs xemacs, no)
 
 dnl Allow manual specification of tex
-AC_ARG_WITH(latex,[  --without-latex         disable latex support, (default enable)],[],[with_latex="yes"])
+AC_ARG_WITH(latex,[  --without-latex         disable installation of latex support files],[],[with_latex="yes"])
 if test "$with_latex" = yes; then
   AC_CHECK_PROGS(PLAINTEX, tex, no)
   AC_CHECK_PROGS(LATEX, latex latex2e, no)

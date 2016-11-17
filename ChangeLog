@@ -7,10 +7,10 @@
 	manually uncomment the commented-out #include statement in term.h.
 	GmbH dropped support in 2007 for the free (as in beer) but license-
 	restricted version of PDFlib.  The gnuplot pdf driver has not been
-	touched since 2010 other than trivial bug to accommodate new default
-	terminal settings for version 5.  PDF output remains possible using
-	the pdfcairo terminal, any latex terminal + pdflatex, the export menu
-	provided by the wxt and qt interactive terminals.
+	touched since 2010 other than to accommodate new default terminal
+	settings for version 5.  PDF output remains possible using the pdfcairo
+	terminal, any latex terminal + pdflatex, and the export menu provided by
+	the wxt and qt interactive terminals.
 
 	* docs/gnuplot.doc docs/plotstyles.gnu docs/titlepag.tex:
 	Repair broken hyperlink in docs.  Use color in the histogram plot
