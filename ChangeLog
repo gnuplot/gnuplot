@@ -5,6 +5,9 @@
 	PDFlib.  The --with-pdf configuration option remains unchanged for now
 	but will be removed in a future gnuplot release (probably 5.2).
 
+	* src/qtterminal/QtGnuplotScene.{cpp,h}: Track current fillstyle so that
+	qt terminal can distinguish between opaque and transparent pattern fill.
+
 2016-11-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/boundary.c:  Better adjustment of plot x2label and plot title when
