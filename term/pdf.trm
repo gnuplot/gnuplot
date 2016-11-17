@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.93 2014/03/20 20:50:10 markisch Exp $
+ * $Id: pdf.trm,v 1.94 2014/05/07 04:37:28 sfeam Exp $
  */
 
 /*------------------------------
@@ -1725,8 +1725,11 @@ START_HELP(pdf)
 "?terminal pdf",
 "?term pdf",
 "?pdf",
-" This terminal produces files in the Adobe Portable Document Format",
-" (PDF), useable for printing or display with tools like Acrobat Reader",
+" [DEPRECATED] This terminal uses the non-free library PDFlib (GmbH Munchen)"
+" to produce files in Portable Document Format. Unless you have a commercial",
+" license for PDFlib and need some special feature it provides you would do",
+" better to use the cairopdf terminal instead.  Gnuplot can also export PDF",
+" files from wxt or qt interactive terminal sessions.",
 "",
 " Syntax:",
 "       set terminal pdf {monochrome|color|colour}",

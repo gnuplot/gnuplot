@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.ac,v 1.21 2016/05/23 19:02:18 markisch Exp $
+dnl $Id: configure.ac,v 1.22 2016/07/02 06:20:00 markisch Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -633,68 +633,6 @@ AC_SEARCH_LIBS([iconv_open], [iconv],
     [AC_DEFINE([HAVE_ICONV], 1, [define if you have libiconv and iconv.h])]
   )]
 )
-
-dnl The Portable Document Format (PDF) terminal
-AC_ARG_WITH(pdf,dnl
-[  --with-pdf[=DIR]        enable pdf terminal 
-                          (requires PDFlib)],,
-  test -z "$with_pdf" && with_pdf=no)
-
-if test "$with_pdf" != no; then
-  AC_PATH_PROG([PDFLIB_CONFIG], [pdflib-config])
-  if test -n "$PDFLIB_CONFIG"; then
-    libpdf_CPPFLAGS=`pdflib-config --cflags`
-    # D'oh - libraries don't belong here
-    libpdf_LDFLAGS=`pdflib-config --ldflags |sed 's/ -l[[^ ]][[^ ]]*//g'`
-  elif test -d "$with_pdf"; then
-    libpdf_CPPFLAGS="-I$with_pdf/include"
-    libpdf_LDFLAGS="-L$with_pdf/lib"
-  fi
-
-  _cppflags="$CPPFLAGS"
-  _ldflags="$LDFLAGS"
-  _libs="$LIBS"
-  CPPFLAGS="$CPPFLAGS $libpdf_CPPFLAGS"
-  LDFLAGS="$LDFLAGS $libpdf_LDFLAGS"
-
-  AC_CHECK_LIB(pdf,PDF_get_majorversion,
-    [AC_DEFINE(HAVE_LIBPDF,1,[ Define if you have the PDFlib library. ])
-     AC_CHECK_HEADERS(pdflib.h,,
-       AC_MSG_WARN([please add path to pdflib.h to CPPFLAGS in Makefile]))
-    ],
-    with_pdf=no)
-
-  if test "$with_pdf" != no; then
-    AC_CHECK_LIB(pdf,PDF_begin_pattern, ,
-      [AC_DEFINE(HAVE_OLD_LIBPDF,1,[ Define if your PDFlib is too old to support patterns. ])
-      AC_MSG_WARN([your version of libpdf is too old!])
-      ])
-  fi
-
-  if test "$with_pdf" != no; then
-    AC_CHECK_LIB(pdf,PDF_setdashpattern, ,
-      [AC_DEFINE(HAVE_NODASH_LIBPDF,1,[ Define if your PDFlib doesn't support dash patterns. ])
-      AC_MSG_WARN([your version of libpdf is too old!])
-      ])
-  fi
-
-  if test "$with_pdf" != no; then
-    AC_CHECK_LIB(pdf,PDF_begin_document, ,
-      [AC_DEFINE(HAVE_LIBPDF_OPEN_FILE,1,[ Define if your PDFlib is too old to use PDF_begin_document. ])
-      AC_MSG_WARN([your version of libpdf is rather old.])
-      ])
-  fi
-
-  LIBS="$_libs"
-  if test "$with_pdf" = no; then
-    CPPFLAGS="$_cppflags"
-    LDFLAGS="$_ldflags"
-  else
-    TERMLIBS="$TERMLIBS -lpdf"
-  fi
-
-fi
-dnl end pdf
 
 dnl check presence of lua/TikZ support
 AC_ARG_WITH(lua,dnl
@@ -1359,18 +1297,6 @@ if test "$no_x" != yes; then
   AC_MSG_RESULT([    (with application defaults, in $X11_APPDEFAULTS_DIR)])
 else
   AC_MSG_RESULT([  X Window System terminal: no (requires X libraries)])
-fi
-
-if test "$ac_cv_header_pdflib_h" = yes; then
-  AC_MSG_RESULT([  PDFlib pdf terminal: yes])
-  if test "$ac_cv_lib_pdf_PDF_begin_pattern" != yes; then
-    AC_MSG_RESULT([      (pattern fills not supported, libpdf too old)])
-  fi
-  if test "$ac_cv_lib_pdf_PDF_setdashpattern" != yes; then
-    AC_MSG_RESULT([      (dash patterns not supported, libpdf too old)])
-  fi
-else
-  AC_MSG_RESULT([  PDFlib pdf terminal: no (use --with-pdf to enable)])
 fi
 
 if test "$with_linux_vga" = yes; then
