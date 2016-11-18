@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.235 2016/11/15 17:05:13 markisch Exp $
+ * $Id: wgraph.c,v 1.236 2016/11/18 10:04:40 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -3118,7 +3118,7 @@ CopyClip(LPGW lpgw)
 	bitmap = CreateCompatibleBitmap(hdc, rect.right - rect.left,
 			rect.bottom - rect.top);
 	if (bitmap) {
-		/* there is enough memory and the bitmaps OK */
+		/* there is enough memory and the bitmap is available */
 		HBITMAP oldbmp = (HBITMAP) SelectObject(mem, bitmap);
 		BitBlt(mem, 0, 0, rect.right - rect.left,
 			rect.bottom - rect.top, hdc, rect.left,
@@ -3134,6 +3134,11 @@ CopyClip(LPGW lpgw)
 	/* OK, bitmap done, now create an enhanced Metafile context
 	 * and redraw the whole plot into that.
 	 */
+#ifdef HAVE_GDIPLUS
+	if (lpgw->gdiplus) {
+		hemf = clipboard_gdiplus(lpgw, hdc, &rect);
+	} else
+#endif
 	{
 		/* make copy of window's main status struct for modification */
 		GW gwclip = *lpgw;
@@ -3148,7 +3153,6 @@ CopyClip(LPGW lpgw)
 		GetPlotRectInMM(lpgw, &mfrect, hdc);
 
 		hmf = CreateEnhMetaFile(hdc, NULL, &mfrect, NULL);
-		/* Always create EMF files using GDI only! */
 		drawgraph(&gwclip, hmf, &rect);
 		hemf = CloseEnhMetaFile(hmf);
 

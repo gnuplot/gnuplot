@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.42 2016/11/05 12:02:57 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.43 2016/11/18 10:04:40 markisch Exp $
  */
 
 /*
@@ -576,6 +576,17 @@ metafile_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect, LPWSTR name)
 	Metafile metafile(name, hdc, EmfTypeEmfPlusDual, NULL);
 	Graphics graphics(&metafile);
 	do_draw_gdiplus(lpgw, graphics, rect, DRAW_METAFILE);
+}
+
+
+HENHMETAFILE
+clipboard_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
+{
+	gdiplusInit();
+	Metafile metafile(hdc, EmfTypeEmfPlusDual, NULL);
+	Graphics graphics(&metafile);
+	do_draw_gdiplus(lpgw, graphics, rect, DRAW_METAFILE);
+	return metafile.GetHENHMETAFILE();
 }
 
 

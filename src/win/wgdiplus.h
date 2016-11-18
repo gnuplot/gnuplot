@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.h,v 1.9 2016/11/05 10:01:10 markisch Exp $
+ * $Id: wgdiplus.h,v 1.10 2016/11/18 10:04:40 markisch Exp $
  */
 
 /*
@@ -52,6 +52,7 @@ extern void InitFont_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect);
 
 extern void drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect);
 extern void metafile_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect, LPWSTR name);
+extern HENHMETAFILE clipboard_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect);
 extern void print_gdiplus(LPGW lpgw, HDC hdc, HANDLE printer, LPRECT rect);
 
 extern void SaveAsBitmap(LPGW lpgw);

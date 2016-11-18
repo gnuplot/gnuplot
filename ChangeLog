@@ -1,5 +1,9 @@
 2016-11-18  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgraph.c (CopyClip) src/win/wgdiplus.cpp (clipboard_gdiplus):
+	Use GDI+ to copy EMF+ data to clipboard if the user selected the GDI+
+	backend.
+
 	* src/win/wgraph.c src/win/wgdiplus.cpp|h (InitFont_gdiplus):
 	Determine initial font metrics etc. using the correct API (GDI/GDI+)
 	instead of always using GDI.  Take actual canvas size into account.
