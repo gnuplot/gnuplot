@@ -12,6 +12,10 @@
 	the pdfcairo terminal, any latex terminal + pdflatex, the export menu
 	provided by the wxt and qt interactive terminals.
 
+	* docs/gnuplot.doc docs/plotstyles.gnu docs/titlepag.tex:
+	Repair broken hyperlink in docs.  Use color in the histogram plot
+	styles figures.  Add Daniel Sebald to list of contributers. 
+
 2016-11-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.h src/graph3d.c src/set.c:  Use the shared routine
