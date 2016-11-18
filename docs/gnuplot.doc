@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1030 2016/11/08 05:41:24 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1031 2016/11/15 20:23:21 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4381,7 +4381,7 @@ Ffigure_yerrorlines
       splot '+' using 1:(const):(func1($1)):(func2($1)) with zerrorfill
       splot for [k=1:5] datafile[k] with zerrorfill lt black fc lt (k+1)
 
- This plot style can also be used to create fence plots. See `fence plots`.
+ This plot style can also be used to create fence plots. See `fenceplots`.
 
 2 3D plots
 ?3D plots
