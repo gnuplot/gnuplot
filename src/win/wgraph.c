@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.234 2016/11/15 08:04:23 markisch Exp $
+ * $Id: wgraph.c,v 1.235 2016/11/15 17:05:13 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -623,7 +623,6 @@ GraphInit(LPGW lpgw)
 		lpgw->Size.y = lpgw->Canvas.y + lpgw->Decoration.y;
 		SetWindowPos(lpgw->hWndGraph, HWND_BOTTOM, lpgw->Origin.x, lpgw->Origin.y, lpgw->Size.x, lpgw->Size.y, SWP_NOACTIVATE | SWP_NOZORDER  | SWP_NOMOVE);
 	}
-
 	ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);
 }
 
@@ -663,12 +662,23 @@ GraphClose(LPGW lpgw)
 void
 GraphStart(LPGW lpgw, double pointsize)
 {
+	HDC hdc;
+	RECT rect;
+
 	lpgw->locked = TRUE;
 	lpgw->buffervalid = FALSE;
 	DestroyBlocks(lpgw);
 	lpgw->org_pointsize = pointsize;
 	if (!lpgw->hWndGraph || !IsWindow(lpgw->hWndGraph))
 		GraphInit(lpgw);
+
+	// initialize font (and pens)
+	hdc = GetDC(lpgw->hWndGraph);
+	MakePens(lpgw, hdc);
+	GetPlotRect(lpgw, &rect);
+	MakeFonts(lpgw, &rect, hdc);
+	ReleaseDC(lpgw->hWndGraph, hdc);
+
 	if (IsIconic(lpgw->hWndGraph))
 		ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);
 	if (lpgw->graphtotop) {
@@ -948,6 +958,13 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	int result;
 	LPTSTR p;
 	int cx, cy;
+
+#ifdef HAVE_GDIPLUS
+	if (lpgw->gdiplus && !(lpgw->rotating && lpgw->fastrotation)) {
+		InitFont_gdiplus(lpgw, hdc, lprect);
+		return;
+	}
+#endif
 
 	lpgw->rotate = FALSE;
 	memset(&(lpgw->lf), 0, sizeof(LOGFONT));
@@ -4455,7 +4472,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					hdc = GetDC(hwnd);
 					MakePens(lpgw, hdc);
 					GetPlotRect(lpgw, &rect);
-					MakeFonts(lpgw, (LPRECT)&rect, hdc);
+					MakeFonts(lpgw, &rect, hdc);
 					ReleaseDC(hwnd, hdc);
 					GetClientRect(hwnd, &rect);
 					InvalidateRect(hwnd, &rect, 1);
@@ -4552,21 +4569,14 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			lpgw = (LPGW) ((CREATESTRUCT *)lParam)->lpCreateParams;
 			SetWindowLongPtr(hwnd, 0, (LONG_PTR)lpgw);
 			lpgw->hWndGraph = hwnd;
-			hdc = GetDC(hwnd);
-			MakePens(lpgw, hdc);
 #ifdef USE_MOUSE
 			LoadCursors(lpgw);
 #endif
-			GetPlotRect(lpgw, &rect);
-			MakeFonts(lpgw, (LPRECT)&rect, hdc);
-			ReleaseDC(hwnd, hdc);
 			if (lpgw->lptw && (lpgw->lptw->DragPre != NULL) && (lpgw->lptw->DragPost != NULL))
 				DragAcceptFiles(hwnd, TRUE);
 			return 0;
-
 		case WM_ERASEBKGND:
 			return 1; /* we erase the background ourselves */
-
 		case WM_PAINT: {
 			HDC memdc = NULL;
 			HBITMAP oldbmp;
@@ -4581,6 +4591,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			SetBkMode(hdc, OPAQUE);
 			GetPlotRect(lpgw, &rect);
 			SetViewportExtEx(hdc, rect.right, rect.bottom, NULL);
+
 			/* double buffering */
 			if (lpgw->doublebuffer) {
 				/* Was the window resized? */
@@ -4712,7 +4723,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					MakeFonts(lpgw, &rect, hdc);
 					ReleaseDC(hwnd, hdc);
 
-					GetClientRect(hwnd, &rect);
+					GetPlotRect(lpgw, &rect);
 					InvalidateRect(hwnd, &rect, 1);
 					UpdateWindow(hwnd);
 				}
@@ -4767,11 +4778,13 @@ GraphChangeFont(LPGW lpgw, LPCTSTR font, int fontsize, HDC hdc, RECT rect)
 	} else {
 		remakefonts = (_tcscmp(lpgw->fontname, lpgw->deffontname) != 0) || (newfontsize != lpgw->fontsize);
 	}
+	remakefonts |= (lpgw->hfonth == 0);
 
 	if (remakefonts) {
 		lpgw->fontsize = newfontsize;
 		_tcscpy(lpgw->fontname, font_is_not_empty ? font : lpgw->deffontname);
 
+		SelectObject(hdc, GetStockObject(SYSTEM_FONT));
 		DestroyFonts(lpgw);
 		MakeFonts(lpgw, &rect, hdc);
 	}

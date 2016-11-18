@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.41 2016/11/05 11:44:04 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.42 2016/11/05 12:02:57 markisch Exp $
  */
 
 /*
@@ -476,6 +476,18 @@ SetFont_gdiplus(Graphics &graphics, LPRECT rect, LPGW lpgw, LPTSTR fontname, int
 	lpgw->vtic = MulDiv(cy, lpgw->ymax, rect->bottom - rect->top);
 
 	return font;
+}
+
+
+void
+InitFont_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
+{
+	gdiplusInit();
+	Graphics graphics(hdc);
+	// call for the side effects:  set vchar/hchar and text metrics
+	Font * font = SetFont_gdiplus(graphics, rect, lpgw, lpgw->fontname, lpgw->fontscale * lpgw->fontsize);
+	// TODO:  save font object for later use
+	delete font;
 }
 
 
