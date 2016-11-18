@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.539 2016/11/14 19:59:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.540 2016/11/16 21:47:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1645,14 +1645,7 @@ set_encoding()
 	encoding = temp;
     }
 
-    /* Set degree sign to match encoding */
-    set_degreesign(l);
-
-    /* Set minus sign to match encoding */
-    minus_sign = encoding_minus();
-
-    /* Set micro character to match encoding */
-    micro = encoding_micro();
+    init_special_chars();
 }
 
 static void
@@ -1761,6 +1754,25 @@ encoding_minus()
 	default:		return NULL;
     }
 }
+
+
+void
+init_special_chars(void)
+{
+    /* Set degree sign to match encoding */
+    char * l = NULL;
+#ifdef HAVE_LOCALE_H
+    l = setlocale(LC_CTYPE, "");
+#endif
+    set_degreesign(l);
+
+    /* Set minus sign to match encoding */
+    minus_sign = encoding_minus();
+
+    /* Set micro character to match encoding */
+    micro = encoding_micro();
+}
+
 
 /* process 'set fit' command */
 static void

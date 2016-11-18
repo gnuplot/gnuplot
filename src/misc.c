@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.206 2016/08/16 19:19:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.207 2016/10/28 22:58:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -45,6 +45,7 @@ static char *RCSid() { return RCSid("$Id: misc.c,v 1.206 2016/08/16 19:19:27 sfe
 #include "variable.h"
 #include "axis.h"
 #include "scanner.h"		/* so that scanner() can count curly braces */
+#include "setshow.h"
 #ifdef _Windows
 # include <fcntl.h>
 # if defined(__WATCOMC__) || defined(__MSC__)
@@ -1733,4 +1734,5 @@ init_encoding(void)
     encoding = encoding_from_locale();
     if (encoding == S_ENC_INVALID)
 	encoding = S_ENC_DEFAULT;
+    init_special_chars();
 }

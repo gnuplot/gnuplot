@@ -1,3 +1,10 @@
+2016-11-18  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* set.c (set_encoding, init_special_chars) misc.c (init_encoding)
+	setshow.h:  Move initialisation of special characters to a separate
+	function, which is also called during program init on Windows.
+	Bug fix.
+
 2016-11-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/pdf.trm configure.ac src/term.h:

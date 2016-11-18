@@ -1,5 +1,5 @@
 /*
- * $Id: setshow.h,v 1.54 2015/08/03 04:16:38 sfeam Exp $
+ * $Id: setshow.h,v 1.55 2015/12/19 21:45:35 sfeam Exp $
  */
 
 /* GNUPLOT - setshow.h */
@@ -53,6 +53,7 @@ void show_command __PROTO((void));
 void show_version __PROTO((FILE *fp));
 void set_format __PROTO((void));
 void set_colorsequence __PROTO((int option));
+void init_special_chars(void);
 char *conv_text __PROTO((const char *s));
 void delete_linestyle __PROTO((struct linestyle_def **, struct linestyle_def *, struct linestyle_def *));
 void delete_dashtype __PROTO((struct custom_dashtype_def *, struct custom_dashtype_def *));
