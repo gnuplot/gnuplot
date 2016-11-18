@@ -71,7 +71,7 @@ plot demo . 'silver.dat' u 1:($2-10.) title 'with fsteps' with fsteps
 set output out . 'figure_steps' . ext
 set style fill solid 0.25 noborder
 plot demo . 'silver.dat' u 1:($2-10.) title 'with fillsteps' with fillsteps, \
-                      '' u 1:($2-10.) title 'with steps' with steps lw 4
+                      '' u 1:($2-10.) title 'with steps' with steps lw 3 dt solid
 #
 set output out . 'figure_histeps' . ext
 plot demo . 'silver.dat' u 1:($2-10.) title 'with histeps' with histeps
@@ -182,69 +182,6 @@ unset ytics
 set xrange [-3:3]
 set yrange [-4:4]
 splot invnorm(rand(0)),invnorm(rand(0)),invnorm(rand(0)) with dots notitle
-
-#
-# Histograms
-# ==========
-#
-reset
-set style data histogram
-set boxwidth 0.9 rel
-set key auto column invert
-set yrange [0:*]
-set offset 0,0,2,0
-unset xtics
-set tmargin 1
-#
-set output out . 'figure_histclust' . ext
-set style histogram clustered
-plot demo . 'histopt.dat' using 1 fs solid 0.5, '' using 2 fs empty
-#
-set output out . 'figure_histerrorbar' . ext
-set title "Histogram with error bars" offset 0,-1
-set style fill solid border -1
-set style histogram errorbars lw 2
-plot demo . 'histerror.dat' using 2:3 fs solid 0.5 ti 'A', '' using 4:5 fs empty ti 'B'
-#
-set output out . 'figure_histrows' . ext
-set style histogram rows
-set title "Rowstacked" offset 0,-1
-plot demo . 'histopt.dat' using 1 fs solid 0.5, '' using 2 fs empty
-#
-set output out . 'figure_newhist' . ext
-set style histogram cluster
-set style data histogram
-unset title
-set key auto column noinvert
-set xtics 1 offset character 0,0.3
-plot newhistogram "Set A", \
-    demo . 'histopt.dat' u 1 t col, '' u 2 t col fs empty, \
-    newhistogram "Set B" at 8, \
-    demo . 'histopt.dat' u 1 t col, '' u 2 t col fs empty
-#
-set output out . 'figure_histcols' . ext
-set style histogram columnstacked
-set title "Columnstacked" offset 0,-1
-set boxwidth 0.8 rel
-set xtics
-
-if (winhelp !=0) {
-# greyscale rgb for png
-set linetype 11 lc rgb "gray0"
-set linetype 12 lc rgb "white"
-set linetype 13 lc rgb "gray40"
-set linetype 14 lc rgb "gray70"
-set style fill solid 1.0 border -1
-
-plot newhistogram lt 11, \
-     'histopt.dat' using 1 title column, \
-     '' using 2 title column
-} else {
-# patterned fill for pdf
-set style fill pattern
-plot 'histopt.dat' using 1 title column, \
-     '' using 2 title column
-}
 
 #
 # Circles
@@ -523,6 +460,69 @@ unset multiplot
 #
 if (GPVAL_TERM eq "pdfcairo") \
     set term pdfcairo color font fontspec size 3.5,2.0 dashlength 0.2
+
+#
+# Histograms
+# ==========
+#
+reset
+set style data histogram
+set boxwidth 0.9 rel
+set key auto column invert
+set yrange [0:*]
+set offset 0,0,2,0
+unset xtics
+set tmargin 1
+#
+set output out . 'figure_histclust' . ext
+set style histogram clustered
+plot demo . 'histopt.dat' using 1 fs solid 0.5, '' using 2 fs empty
+#
+set output out . 'figure_histerrorbar' . ext
+set title "Histogram with error bars" offset 0,-1
+set style fill solid border -1
+set style histogram errorbars lw 2
+plot demo . 'histerror.dat' using 2:3 fs solid 0.5 ti 'A', '' using 4:5 fs empty ti 'B'
+#
+set output out . 'figure_histrows' . ext
+set style histogram rows
+set title "Rowstacked" offset 0,-1
+plot demo . 'histopt.dat' using 1 fs solid 0.5, '' using 2 fs empty
+#
+set output out . 'figure_newhist' . ext
+set style histogram cluster
+set style data histogram
+unset title
+set key auto column noinvert
+set xtics 1 offset character 0,0.3
+plot newhistogram "Set A", \
+    demo . 'histopt.dat' u 1 t col, '' u 2 t col fs empty, \
+    newhistogram "Set B" at 8, \
+    demo . 'histopt.dat' u 1 t col, '' u 2 t col fs empty
+#
+set output out . 'figure_histcols' . ext
+set style histogram columnstacked
+set title "Columnstacked" offset 0,-1
+set boxwidth 0.8 rel
+set xtics
+
+if (winhelp !=0) {
+# greyscale rgb for png
+set linetype 11 lc rgb "gray0"
+set linetype 12 lc rgb "white"
+set linetype 13 lc rgb "gray40"
+set linetype 14 lc rgb "gray70"
+set style fill solid 1.0 border -1
+
+plot newhistogram lt 11, \
+     'histopt.dat' using 1 title column, \
+     '' using 2 title column
+} else {
+# patterned fill for pdf
+# set style fill pattern
+plot 'histopt.dat' using 1 title column, \
+     '' using 2 title column
+}
 
 
 #
