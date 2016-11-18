@@ -6,3 +6,4 @@ soundfit.par
 binary?
 *.manifest
 *.tmp
+*.exe

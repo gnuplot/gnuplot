@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.236 2016/11/18 10:04:40 markisch Exp $
+ * $Id: wgraph.c,v 1.237 2016/11/18 18:06:28 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -623,6 +623,19 @@ GraphInit(LPGW lpgw)
 		lpgw->Size.y = lpgw->Canvas.y + lpgw->Decoration.y;
 		SetWindowPos(lpgw->hWndGraph, HWND_BOTTOM, lpgw->Origin.x, lpgw->Origin.y, lpgw->Size.x, lpgw->Size.y, SWP_NOACTIVATE | SWP_NOZORDER  | SWP_NOMOVE);
 	}
+
+	// initialize font (and pens)
+	{
+		HDC hdc;
+		RECT rect;
+
+		hdc = GetDC(lpgw->hWndGraph);
+		MakePens(lpgw, hdc);
+		GetPlotRect(lpgw, &rect);
+		MakeFonts(lpgw, &rect, hdc);
+		ReleaseDC(lpgw->hWndGraph, hdc);
+	}
+
 	ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);
 }
 
@@ -662,22 +675,12 @@ GraphClose(LPGW lpgw)
 void
 GraphStart(LPGW lpgw, double pointsize)
 {
-	HDC hdc;
-	RECT rect;
-
 	lpgw->locked = TRUE;
 	lpgw->buffervalid = FALSE;
 	DestroyBlocks(lpgw);
 	lpgw->org_pointsize = pointsize;
 	if (!lpgw->hWndGraph || !IsWindow(lpgw->hWndGraph))
-		GraphInit(lpgw);
-
-	// initialize font (and pens)
-	hdc = GetDC(lpgw->hWndGraph);
-	MakePens(lpgw, hdc);
-	GetPlotRect(lpgw, &rect);
-	MakeFonts(lpgw, &rect, hdc);
-	ReleaseDC(lpgw->hWndGraph, hdc);
+	    GraphInit(lpgw);
 
 	if (IsIconic(lpgw->hWndGraph))
 		ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);

@@ -1,9 +1,13 @@
 VERSION
 *.d
 *.h
+*.o
 *.co
 *.po
+*.dll
 *.exe
+*.lib
+*.def
 *.map
 *.mnu
 *.ico
@@ -33,3 +37,4 @@ platforms
 *.layout
 obj
 bin
+*.help
