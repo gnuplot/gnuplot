@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.113 2016/09/26 05:38:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.114 2016/11/05 21:21:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -384,6 +384,8 @@ void pm3d_depth_queue_flush(void)
     if (pm3d.direction != PM3D_DEPTH && !track_pm3d_quadrangles)
 	return;
 
+    term->layer(TERM_LAYER_BEGIN_PM3D_FLUSH);
+
     if (current_quadrangle > 0 && quadrangles) {
 
 	quadrangle* qp;
@@ -442,6 +444,8 @@ void pm3d_depth_queue_flush(void)
     }
 
     pm3d_depth_queue_clear();
+
+    term->layer(TERM_LAYER_END_PM3D_FLUSH);
 }
 
 /*

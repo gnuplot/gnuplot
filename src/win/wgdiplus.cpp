@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.44 2016/11/18 18:06:28 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.45 2016/11/19 06:31:07 markisch Exp $
  */
 
 /*
@@ -742,7 +742,8 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 					plotno = 0;
 					break;
 				case TERM_LAYER_BEGIN_PM3D_MAP:
-					// Antialiasing of pm3d polygons is obtained by drawing to
+				case TERM_LAYER_BEGIN_PM3D_FLUSH:
+					// Antialiasing of pm3d polygons is obtained by drawing to a
 					// bitmap four times as large and copying it back with interpolation
 					if (lpgw->antialiasing && lpgw->polyaa) {
 						float scale = 2.f;
@@ -754,6 +755,7 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 					}
 					break;
 				case TERM_LAYER_END_PM3D_MAP:
+				case TERM_LAYER_END_PM3D_FLUSH:
 					if (poly_graphics != NULL) {
 						delete poly_graphics;
 						poly_graphics = NULL;
