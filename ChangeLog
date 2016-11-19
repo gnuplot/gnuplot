@@ -1,3 +1,20 @@
+2016-11-19  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c src/win/wgdiplus.cpp|h src/win/wgnuplib.h:  
+	Until version 4.4 the windows terminal used only the Windows GDI to
+	draw.  Since 4.6 it can additionally use a mixture of GDI and GDI+ -
+	mainly to enable antialiasing.  Version 5.0 added a new variant in a
+	separate code path which now only uses GDI+ (5.1).  Not only is this
+	faster than the mixed GDI/GDI+ code, it also offers improved support
+	for transparency (5.0), custom dash patterns (5.0), oversampling (5.1),
+	and antialiasing of polygons with less (5.0) or no artefacts (5.1).
+	Version 5.0 still uses GDI for enhanced text and images, but that
+	changed in 5.1 already and could be backported to 5.0.  The GDI+ variant
+	is the default since version 5.0 for drawing to the screen and is now
+	also used for printing, copying to clipboard and saving of EMF data.
+	The transition to GDI+ is now complete and this change removes the
+	transitional GDI/GDI+ code.
+
 2016-11-18  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (CopyClip) src/win/wgdiplus.cpp (clipboard_gdiplus):

@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.h,v 1.10 2016/11/18 10:04:40 markisch Exp $
+ * $Id: wgdiplus.h,v 1.11 2016/11/18 18:06:28 markisch Exp $
  */
 
 /*
@@ -36,17 +36,6 @@ extern "C" {
 
 extern void gdiplusInit(void);
 extern void gdiplusCleanup(void);
-
-extern void gdiplusLine(HDC hdc, POINT x, POINT y, const PLOGPEN logpen, double alpha);
-extern void gdiplusLineEx(HDC hdc, POINT x, POINT y, UINT style, float width, COLORREF color, double alpha);
-
-extern void gdiplusPolyline(HDC hdc, POINT *ppt, int polyi, const PLOGPEN logpen, double alpha);
-extern void gdiplusPolylineEx(HDC hdc, POINT *ppt, int polyi, UINT style, float width, COLORREF color, double alpha);
-
-extern void gdiplusSolidFilledPolygonEx(HDC hdc, POINT *ppt, int polyi, COLORREF color, double alpha, BOOL aa);
-extern void gdiplusPatternFilledPolygonEx(HDC hdc, POINT *ppt, int polyi, COLORREF color, double alpha, COLORREF backcolor, BOOL transparent, int style);
-
-extern void gdiplusCircleEx(HDC hdc, POINT *p, int radius, UINT style, float width, COLORREF color, double alpha);
 
 extern void InitFont_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect);
 
