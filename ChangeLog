@@ -1,5 +1,8 @@
 2016-11-19  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/pm3d.c (pm3d_depth_queue_flush) src/term_api.h
+	src/win/wgdiplus.cpp:  Add layer calls for pm3d queue flush.
+
 	* src/win/wgraph.c src/win/wgdiplus.cpp|h src/win/wgnuplib.h:  
 	Until version 4.4 the windows terminal used only the Windows GDI to
 	draw.  Since 4.6 it can additionally use a mixture of GDI and GDI+ -
