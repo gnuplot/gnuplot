@@ -5,6 +5,10 @@
 	Show "inline" color plots on the Windows command line with
 	"set term caca driver utf8".
 
+	* config/msvc/Makefile:  Enable Unicode build.  Include Manifest files.
+	HTML help compiler is located in 32 bit program folder.  Support
+	building 32 and 64 bit variants.
+
 2016-11-19  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/pm3d.c (pm3d_depth_queue_flush) src/term_api.h

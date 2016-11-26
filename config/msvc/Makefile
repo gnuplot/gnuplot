@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.25 2014/08/18 03:49:06 sfeam Exp $
+# $Id: Makefile,v 1.26 2016/08/09 20:25:04 broeker Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -49,7 +49,7 @@ PDFLIB = 0
 #     http://wiki.wxwidgets.org/Visual_Studio_2008_%289.0%29
 WXT = 0
 # Build Cairo Terminals (cairolatex, epslatex, pdflatex)
-CAIRO = 1
+CAIRO = 0
 # Build qt terminal?
 QT = 0
 # Set to one if you have Qt5 (instead of Qt4)
@@ -116,7 +116,7 @@ CBASEFLAGS = /EHsc /GR /MD /O2 /nologo
 CFLAGS = $(CBASEFLAGS) /I. /I$(TOP) /I$(S) /I$(T) /D_Windows /DWIN32 /DHAVE_CONFIG_H /D__MSC__ $(OPTIONS)
 CFLAGS = $(CFLAGS) /DGNUPLOT_SHARE_DIR=\"$(GNUPLOT_SHARE_DIR)\"
 WIN_CFLAGS = /DUSE_FAKEPIPES
-CONSOLE_CFLAGS = /DWGP_CONSOLE /DCONSOLE_SWITCH_CP /DPIPES
+CONSOLE_CFLAGS = /DWGP_CONSOLE /DPIPES
 OPTIONS = /DUSE_MOUSE
 OPTIONS = $(OPTIONS) /DGNUPLOT_HISTORY
 
@@ -129,8 +129,8 @@ VERSION_CPPFLAGS = -DVERSION_MAJOR=\"5.1\" -DPATCHLEVEL=\"0\"
 TERMFLAGS = /I$(T) /DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" /DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\"
 
 # linker flags, append paths for external libs later
-LDFLAGS = /nologo /MACHINE:$(MACHINE) /MANIFEST
-LDFLAGS = $(LDFLAGS) /MANIFESTDEPENDENCY:"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'"
+LDFLAGS = /nologo /MACHINE:$(MACHINE)
+LDFLAGS = $(LDFLAGS) /MANIFEST:EMBED /MANIFESTINPUT:$(W)$(MANIFEST)
 !IF "$(DEBUG)" == "1"
 LDFLAGS = $(LDFLAGS) /DEBUG
 !ENDIF
@@ -217,12 +217,22 @@ CACALIBS = libcaca.lib
 !ENDIF
 
 HELPFILE = wgnuplot.chm
-HHWPATH=$(PROGRAMFILES)\HTML Help Workshop\\
+!IF "$(PLATFORM)" == "X64"
+HHC=""%%PROGRAMFILES(X86)%%\HTML Help Workshop\hhc""
+!ELSE
+HHC="$(PROGRAMFILES)\HTML Help Workshop\hhc"
+!ENDIF
 
 !IF "$(PROCESSOR_ARCHITECTURE)" == "ALPHA"
 MACHINE = $(PROCESSOR_ARCHITECTURE)
 !ELSE
+!IF "$(PLATFORM)" == "X64"
+MACHINE = X64
+MANIFEST = wgnuplot.exe.manifest64
+!ELSE
 MACHINE = IX86
+MANIFEST = wgnuplot.exe.manifest
+!ENDIF
 !ENDIF
 
 # macros for makefile.all
@@ -447,7 +457,7 @@ $(HELPFILE): doc2html.exe $(D)gnuplot.doc gnuplot.exe
 	doc2html $(D)gnuplot.doc $(D)windows\\
 	cd $(D)
 	-"..\config\msvc\gnuplot" -e "winhelp=1" plotstyles.gnu
-	-"$(HHWPATH)hhc" windows\wgnuplot.hhp
+	-$(HHC) windows\wgnuplot.hhp
 	cd ..\config\msvc
 	if exist $(D)windows\wgnuplot.chm copy $(D)windows\wgnuplot.chm .
 
