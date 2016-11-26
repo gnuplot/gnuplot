@@ -1,3 +1,10 @@
+2016-11-26  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	 * src/win/winmain.c (WinMain):  Enable Windows 10 support for
+	console virtual terminal sequences, i.e. escape sequences.
+	Show "inline" color plots on the Windows command line with
+	"set term caca driver utf8".
+
 2016-11-19  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/pm3d.c (pm3d_depth_queue_flush) src/term_api.h

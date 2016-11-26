@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.94 2016/09/28 14:58:36 markisch Exp $
+ * $Id: winmain.c,v 1.95 2016/11/15 08:16:12 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -584,6 +584,17 @@ main(int argc, char **argv)
     /* Finally, also redirect C++ standard output streams. */
     RedirectOutputStreams(TRUE);
 # endif
+#else  /* !WGP_CONSOLE */
+# ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+#  define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
+# endif
+    {
+	/* Enable Windows 10 Console Virtual Terminal Sequences */
+	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
+	DWORD  mode;
+	GetConsoleMode(handle, &mode);
+	SetConsoleMode(handle, mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+    }
 #endif
 
     gp_atexit(WinExit);
