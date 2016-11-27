@@ -1,3 +1,12 @@
+2016-11-27  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	 * term/dumb.trm:  Color support by ANSI escape sequences (16, 256,
+	or RGB).  In 16/256 color mode, RGB colors are mapped assuming a
+	fixed palette, which likely is not the actual palette of the
+	terminal.  Support filled polygons.  Relax priority condition
+	for overwriting a "pixel" by allowing equal type.
+	Patch #741
+
 2016-11-26  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	 * src/win/winmain.c (WinMain):  Enable Windows 10 support for
@@ -14,7 +23,7 @@
 	* src/pm3d.c (pm3d_depth_queue_flush) src/term_api.h
 	src/win/wgdiplus.cpp:  Add layer calls for pm3d queue flush.
 
-	* src/win/wgraph.c src/win/wgdiplus.cpp|h src/win/wgnuplib.h:  
+	* src/win/wgraph.c src/win/wgdiplus.cpp|h src/win/wgnuplib.h:
 	Until version 4.4 the windows terminal used only the Windows GDI to
 	draw.  Since 4.6 it can additionally use a mixture of GDI and GDI+ -
 	mainly to enable antialiasing.  Version 5.0 added a new variant in a
@@ -61,7 +70,7 @@
 
 	* docs/gnuplot.doc docs/plotstyles.gnu docs/titlepag.tex:
 	Repair broken hyperlink in docs.  Use color in the histogram plot
-	styles figures.  Add Daniel Sebald to list of contributers. 
+	styles figures.  Add Daniel Sebald to list of contributers.
 
 2016-11-16  Ethan A Merritt  <merritt@u.washington.edu>
 
@@ -107,7 +116,7 @@
 
 2016-11-10  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/color.c (ifilled_quadrangle):  If pm3d border linetype is 
+	* src/color.c (ifilled_quadrangle):  If pm3d border linetype is
 	LT_DEFAULT, draw quadrangle borders in current color.  Unfortunately
 	this is still a magic number (lt -6) in the user interface.
 
@@ -180,13 +189,13 @@
 	   the current view angles or scaling.
 	"fixed" key placement does not move when the plot rotates. For 2D plots
 	this is identical to "inside".  The new option is now the default.
-	
+
 2016-11-03  Craig DeForest  <zowie@users.sf.net>
 
 	* src/datafile.c (plot_option_binary):  Interpretation of dimensions
 	given via "binary record=(a,b)" contridicted that for dimensions given
 	via "binary array=(a,b)".  This caused mangling of image data read in
-	using the "record" keyword.  Change the interpretation to match that 
+	using the "record" keyword.  Change the interpretation to match that
 	of "array".
 	Bug #1873
 
@@ -226,7 +235,7 @@
 	* src/axis.h src/axis.c src/show.c: Macros AXIS_IS_FIRST AXIS_IS_SECOND
 	are used only once. Remove them.
 
-	* src/internal.c: Clarify error message printed when an undefined 
+	* src/internal.c: Clarify error message printed when an undefined
 	variable is found in a string expression.
 	Bug #1783
 
@@ -384,11 +393,11 @@
 	cb axis label.
 
 	* src/stats.c: Do not use columnheader as a prefix for "stats" unless it
-	is specifically requested. 
+	is specifically requested.
 
 2016-09-25  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/pm3d.c (set_plot_with_palette): When checking for plot elements 
+	* src/pm3d.c (set_plot_with_palette): When checking for plot elements
 	that refer to palette coloring, go through the list of objects also.
 
 2016-09-24  Ethan A Merritt  <merritt@u.washington.edu>
@@ -512,8 +521,8 @@
 
 	* src/win/wtext.c:  Change mouse pointer while marking text.
 
-	* src/term/cairo.trm (cairotrm_init):  Redirection of output to a 
-	printer on Windows requires the use of gpoutfile.  Let pdfcairo on 
+	* src/term/cairo.trm (cairotrm_init):  Redirection of output to a
+	printer on Windows requires the use of gpoutfile.  Let pdfcairo on
 	Windows always use the cairostream_write callback to enable printing
 	of PDF files.
 
@@ -522,7 +531,7 @@
 
 	* src/win/wgnuplib.rc src/win/wgraph.c (CopyPrint) src/win/wprinter.c
 	(DumpPrinter):  Remove unused lower part of the "general" print
-	property sheet by supplying an (empty) dialog template.  Add a note 
+	property sheet by supplying an (empty) dialog template.  Add a note
 	that printer settings will be ignored since the PRN file mechanism
 	sends terminal output to the printer unaltered.
 
@@ -551,7 +560,7 @@
 	Changing the view angles rot_x and rot_z cannot move the z axis out of
 	the plane normal to the canvas horizontal. This patch adds a new angular
 	setting "azimuth" that rotates the plane containing the z axis about
-	the line of sight.  I.e. "set view azimuth 90" places the z axis 
+	the line of sight.  I.e. "set view azimuth 90" places the z axis
 	parallel to the canvas horizontal rather than the canvas vertical.
 	Click-and-drag with right mouse button provides interactive control of
 	the azimuth.  Azimuth is ignored by 2D plots and by "set view map".
@@ -592,7 +601,7 @@
 	* term/pslatex.trm:  For pslatex, epslatex, cairolatex "standalone"
 	option, if the current encoding is utf8 then put a line in the output
 	/usepackage[utf8x]{inputenc}
-	Note that [utf8x] (not [utf8]) is needed to correctly process the 
+	Note that [utf8x] (not [utf8]) is needed to correctly process the
 	degree sign and micro characters.
 
 2016-09-07  Bastian Maerkisch  <bmaerkisch@web.de>
@@ -631,7 +640,7 @@
 
 	* src/datafile.c term/svg.trm:  Remove dead code and comments.
 
-	* src/stats.c:  Track and report number of lines treated as column 
+	* src/stats.c:  Track and report number of lines treated as column
 	headers rather than as data.
 
 	* src/show.c:  Show state of 'autotitle columnheaders' even if the key
@@ -720,24 +729,24 @@
 	* src/eval.c (evaluate_at): Make unsupported array operations fatal
 	(int_error) rather than informational (int_warn).  The int_warn version
 	eventually returned UNDEFINED or NaN to the caller, and not all callers
-	were prepared to deal with that.  E.g. 
+	were prepared to deal with that.  E.g.
 	    array A[1]; set xrange [0:A]; set param; splot u,u,u ---> boom!
 
 	* src/tabulate.c (output_number):  Oops. Forgot to check for log being
 	implemented via nonlinear axes.  This should have been part of the
-	nonlinear axis patch set. 
+	nonlinear axis patch set.
 
 2016-08-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp (wxtFrame::OnExport):  The Export widget
 	on a plot window should dump a copy of the plot in that window, not a
-	copy of the currently active plot.  Modify the OnExport function 
+	copy of the currently active plot.  Modify the OnExport function
 	accordingly.  Unfortunately to generate PDF or SVG files we want to
-	reexecute the list of commands that generated the plot, but we only 
-	keep such a list for the currently active plot.  So Export from 
+	reexecute the list of commands that generated the plot, but we only
+	keep such a list for the currently active plot.  So Export from
 	inactive windows is limited to the clipboard or PNG files.
 	Bug #1843
-	
+
 	* src/readline.c (getc_wrapper):  Clear errno before reading next
 	character.  This fix contributed anonymously.
 	Bug #1846 #1865
@@ -750,12 +759,12 @@
 
 	* src/datafile.h src/datafile.c src/stats.c docs/gnuplot.doc:
 	Rearrange the order in which we parse the "stats" command.
-	This allows passing "columnheader" or "columnheader(N)" to the 
+	This allows passing "columnheader" or "columnheader(N)" to the
 	"name" option rather than a fixed character string.
 	Bug #1841
 
 	* src/axis.c (eval_link_function) src/save.c (save_nonlinear):
-	If there is an expression-parsing error while processing a 
+	If there is an expression-parsing error while processing a
 	"set nonlinear" command, the forward/reverse axis mapping can be
 	left in a corrupted state.  Add a sanity check for this to prevent
 	bad things from happening when the axis mapping function is invoked.
@@ -789,7 +798,7 @@
 
 2016-08-17  AMD  <allanduncan@sf.net>
 
-	* term/post.trm: Different treatment of simplex/duplex option 
+	* term/post.trm: Different treatment of simplex/duplex option
 	depending on whether the PostScript support is limited to Level 1.
 
 2016-08-16  Ethan A Merritt  <merritt@u.washington.edu>
@@ -812,7 +821,7 @@
 	* src/plot3d.c (eval_3dplots) src/plot2d.c (eval_plots):
 	Check for legal log-scaled axis ranges before trying to plot.
 
-	* src/axis.c (axis_log_value_checked):  Rewrite test for positive 
+	* src/axis.c (axis_log_value_checked):  Rewrite test for positive
 	values so that it catches NaN as well as negative numbers.
 
 	* src/command.c (link_command): More robust handling of error during
@@ -833,7 +842,7 @@
 	complete it could leave an axis marked as nonlinear but with no mapping
 	functions defined.  Now we reset the links on failure.
 
-	* src/set.c (encoding_minus):  Comment out replacement of the SJIS minus 
+	* src/set.c (encoding_minus):  Comment out replacement of the SJIS minus
 	sign character.  The character itself is correct but it is a full-width
 	rather glyph so it does not mix well with half-width digits in a number.
 	This problem is specific to SJIS.
@@ -865,7 +874,7 @@
 	the pointer returned by GlobalAlloc) and use them in all printer
 	dialogs. Bugfix.
 
-	* src/win/wprinter.c (DumpPrinter, PrintDlgProc) src/win/wgraph.c 
+	* src/win/wprinter.c (DumpPrinter, PrintDlgProc) src/win/wgraph.c
 	(CopyPrint) src/win/wgnuplib.h (GP_PRINT):  Changing the private data
 	of some possibly unknown window is dangerous.  Store the pointer to the
 	printer data in the dialog's 'WindowLong's instead.
@@ -952,7 +961,7 @@
 
 	The substitution of minus sign for hyphen is not made during tabular
 	output ("set table") or when the current terminal is a LaTeX terminal.
-	It affects only numbers formatted by gprint().  Other hyphens are 
+	It affects only numbers formatted by gprint().  Other hyphens are
 	not affected even if they are in a gprintf format string.
 
 	* src/boundary.c (do_key_layout):  Tweak vertical spacing of key titles
@@ -987,7 +996,7 @@
 	src/win/winmain.c|h:  The code to determine paths relative to the
 	gnuplot executable on Windows spread by copy and paste.  Let all those
 	sites call a single new function instead and fix an improper handling
-	of wide strings which was overlooked due to an explicit type cast. 
+	of wide strings which was overlooked due to an explicit type cast.
 	Fix memory leaks while at it.
 	Bug #1837
 
@@ -1007,7 +1016,7 @@
 
 	* src/set.c src/gadgets.h src/plot2d.c demo/rotate_labels.dem
 	docs/gnuplot.doc demo/all.dem:  New option `rotate variable` to assign
-	a separate rotation angle for each point in a 2D plot using the 
+	a separate rotation angle for each point in a 2D plot using the
 	contents of the 4th entry in the `using` specifier.
 	    plot foo using 1:2:3:4 with labels rotate variable
 
@@ -1028,7 +1037,7 @@
 	* src/axis.h demo/nonlinear2.dem:
 	Rework tic and particularly minitic generation for nonlinear axes,
 	including special case code for logscale axes.  The default minitics
-	for log-scale axes in this mode are now always equivalent to 
+	for log-scale axes in this mode are now always equivalent to
 	"set mtics base" (i.e. unit intervals 1-9 for log10).
 	Nonlinear axes part 17
 

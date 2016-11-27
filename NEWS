@@ -27,6 +27,7 @@ Changes not in 5.0
 * NEW "set view azimuth <angle>" controls azimuth of the z axis in 3D plots
 * NEW wxt supports saving graph as EMF on Windows
 * NEW wxt supports printing on Windows
+* NEW dumb suports ANSI colors and filled polygons
 * CHANGE Revise placement of axis labels in 3D plots
 * CHANGE Timestamp is now placed relative to page rather than plot boundary
 * CHANGE Track font/enhanced for key title separately from the key entries
@@ -41,6 +42,7 @@ Changes not in 5.0
 * CHANGE windows terminal provides better oversampling
 * CHANGE New default "set key fixed" prevents 3D key box from rotating with plot
 * CHANGE Deprecate pdf terminal requiring non-free library PDFlib
+* CHANGE windows terminal also uses GDI+ for printing and copy-to-clipboard
 * FIX cairo.trm - reset terminal font after printing an enhanced text string
 * FIX autoscaling of data with "smooth cnorm"
 * FIX Built-in readline handles S-JIS encoding
