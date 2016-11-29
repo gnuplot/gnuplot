@@ -7,6 +7,7 @@ Changes in 5.0.6
 * FIX assignment of x/y dimensions in "binary record=(a,b) ... with image"
 * FIX wxt - multithreaded wxt was faulting during resize (mutex lock failure)
 * FIX windows - timed pause only worked for intervals < 1 second
+* FIX Front/back layering of border+grid lines was not always correct in hidden3d
 
 Changes in 5.0.5
 ================
