@@ -1,5 +1,5 @@
 /*
- * $Id: pm3d.h,v 1.34 2016/05/27 04:20:23 sfeam Exp $
+ * $Id: pm3d.h,v 1.35 2016/11/05 21:21:07 sfeam Exp $
  */
 
 /* GNUPLOT - pm3d.h */
@@ -57,10 +57,12 @@
   direction of taking the scans: forward = as the scans are stored in the
   file; backward = opposite direction, i.e. like from the end of the file
 */
-#define PM3D_SCANS_AUTOMATIC  'a'
-#define PM3D_SCANS_FORWARD    'f'
-#define PM3D_SCANS_BACKWARD   'b'
-#define PM3D_DEPTH            'd'
+typedef enum {
+    PM3D_SCANS_AUTOMATIC,
+    PM3D_SCANS_FORWARD,
+    PM3D_SCANS_BACKWARD,
+    PM3D_DEPTH
+} pm3d_scandir;
 
 /*
   clipping method:
@@ -107,8 +109,8 @@ typedef struct {
   char where[7];	/* base, top, surface */
   char flush;   	/* left, right, center */
   char ftriangles;   	/* 0/1 (don't) draw flushing triangles */
-  char direction;	/* forward, backward */
   char clip;		/* 1in, 4in */
+  pm3d_scandir direction;
   PM3D_IMPL_MODE implicit;
 			/* 1: [default] draw ALL surfaces with pm3d
 			   0: only surfaces specified with 'with pm3d' */

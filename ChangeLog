@@ -5,6 +5,9 @@
 		set pm3d; set hidden3d; splot x*y with points
 	Bugfix
 
+	* src/pm3d.h:  Replace #defined constants PM3D_SCANS_xxx with an
+	enum.
+
 2016-11-27  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	 * term/dumb.trm:  Color support by ANSI escape sequences (16, 256,
