@@ -1,3 +1,10 @@
+2016-11-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (do_3dplot): Front/back layering of border+grid
+	components was not always correct in hidden3d mode.  For example:
+		set pm3d; set hidden3d; splot x*y with points
+	Bugfix
+
 2016-11-27  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	 * term/dumb.trm:  Color support by ANSI escape sequences (16, 256,

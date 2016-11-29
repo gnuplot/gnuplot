@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.355 2016/11/14 19:59:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.356 2016/11/16 21:47:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -778,17 +778,14 @@ do_3dplot(
     if (splot_map && border_layer != LAYER_FRONT)
 	draw_3d_graphbox(plots, pcount, BORDERONLY, LAYER_BACK);
 
-    else if (!hidden3d && (grid_layer == LAYER_BACK))
+    else if (grid_layer == LAYER_BACK)
 	draw_3d_graphbox(plots, pcount, ALLGRID, LAYER_BACK);
 
-    else if (!hidden3d && (grid_layer == LAYER_BEHIND))
+    else if (grid_layer == LAYER_BEHIND)
 	/* Default layering mode.  Draw the back part now, but not if
 	 * hidden3d is in use, because that relies on all isolated
 	 * lines being output after all surfaces have been defined. */
 	draw_3d_graphbox(plots, pcount, BACKGRID, LAYER_BACK);
-
-    else if (hidden3d && border_layer == LAYER_BEHIND)
-	draw_3d_graphbox(plots, pcount, ALLGRID, LAYER_BACK);
 
     /* Save state of plot_bounds before applying rotations, etc */
     memcpy(&page_bounds, &plot_bounds, sizeof(page_bounds));
@@ -1361,10 +1358,7 @@ do_3dplot(
      * The 3rd case is the non-hidden3d default - draw back pieces (done earlier),
      * then the graph, and now the front pieces.
      */
-    if (hidden3d && border_layer == LAYER_BEHIND)
-	draw_3d_graphbox(plots, pcount, FRONTGRID, LAYER_FRONT);
-
-    else if (hidden3d || grid_layer == LAYER_FRONT)
+    if (grid_layer == LAYER_FRONT)
 	draw_3d_graphbox(plots, pcount, ALLGRID, LAYER_FRONT);
 
     else if (grid_layer == LAYER_BEHIND)
@@ -2105,6 +2099,10 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
     int x, y;		/* point in terminal coordinates */
     struct termentry *t = term;
     BoundingBox *clip_save = clip_area;
+
+    FPRINTF((stderr,
+	"draw_3d_graphbox: whichgrid = %d current_layer = %d border_layer = %d\n",
+	whichgrid,current_layer,border_layer));
 
     clip_area = &canvas;
     if (draw_border && splot_map) {
