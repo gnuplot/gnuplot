@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: dumb.trm,v 1.35 2016/02/10 10:52:07 markisch Exp $
+ * $Id: dumb.trm,v 1.36 2016/11/27 06:39:42 markisch Exp $
  *
  */
 
@@ -122,8 +122,6 @@ TERM_PUBLIC void dumb_set_color __PROTO((t_colorspec *));
 
 /* matrix of characters */
 static charcell *dumb_matrix = NULL;
-/* matrix of priority at each position */
-static char *dumb_priority = NULL;
 #ifndef NO_DUMB_COLOR_SUPPORT
 /* matrix of colors */
 static t_colorspec *dumb_colors = NULL;
@@ -145,7 +143,7 @@ static int dumb_colormode = 0;
 
 #define DUMB_PIXEL(x,y) dumb_matrix[dumb_xmax*(y)+(x)]
 
-static void dumb_set_pixel __PROTO((int x, int y, int v, int p));
+static void dumb_set_pixel __PROTO((int x, int y, int v));
 
 enum DUMB_id { DUMB_FEED, DUMB_NOFEED, DUMB_ENH, DUMB_NOENH, 
                DUMB_SIZE, DUMB_ASPECT,
@@ -250,20 +248,19 @@ DUMB_options()
 
 
 static void
-dumb_set_pixel(int x, int y, int v, int p)
+dumb_set_pixel(int x, int y, int v)
 {
     char *charpixel;
 
-    if ((unsigned int) x <= dumb_xmax &&	/* ie x>=0 && x<=dumb_xmax */
-	(unsigned int) y <= dumb_ymax &&
-	p >= dumb_priority[dumb_xmax * y + x]) {
-	    dumb_priority[dumb_xmax * y + x] = p;
-	    charpixel = (char *)(&dumb_matrix[dumb_xmax * y + x]);
-	    /* null-terminate single ascii character (needed for UTF-8) */
-	    dumb_matrix[dumb_xmax * y + x] = 0;
-	    *charpixel = v;
+    if ((unsigned int) x <= dumb_xmax 	/* ie x>=0 && x<=dumb_xmax */
+    &&  (unsigned int) y <= dumb_ymax 
+    )  {
+	charpixel = (char *)(&dumb_matrix[dumb_xmax * y + x]);
+	/* null-terminate single ascii character (needed for UTF-8) */
+	dumb_matrix[dumb_xmax * y + x] = 0;
+	*charpixel = v;
 #ifndef NO_DUMB_COLOR_SUPPORT
-	    memcpy(&dumb_colors[dumb_xmax * y + x], &dumb_color, sizeof(t_colorspec));
+	memcpy(&dumb_colors[dumb_xmax * y + x], &dumb_color, sizeof(t_colorspec));
 #endif
     }
 }
@@ -275,7 +272,6 @@ DUMB_init()
     int size = (dumb_xmax+1) * (dumb_ymax+1);
 
     dumb_matrix = gp_realloc(dumb_matrix, size*sizeof(charcell), "dumb terminal");
-    dumb_priority = gp_realloc(dumb_priority, size*sizeof(char), "dumb terminal");
 #ifndef NO_DUMB_COLOR_SUPPORT
     dumb_colors = gp_realloc(dumb_colors, size*sizeof(t_colorspec), "dumb terminal");    
 #endif
@@ -290,7 +286,6 @@ DUMB_graphics()
     charcell *pm = dumb_matrix;
 
     memset(dumb_matrix, 0, size * sizeof(charcell));
-    memset(dumb_priority, 0, size * sizeof(char));
 #ifndef NO_DUMB_COLOR_SUPPORT
     memset(dumb_colors, 0, size * sizeof(t_colorspec));
 #endif
@@ -460,9 +455,7 @@ TERM_PUBLIC void
 DUMB_reset()
 {
     free(dumb_matrix);
-    free(dumb_priority);
     dumb_matrix = NULL;
-    dumb_priority = NULL;
 #ifndef NO_DUMB_COLOR_SUPPORT
     free(dumb_colors);
     dumb_colors = NULL;
@@ -504,7 +497,7 @@ DUMB_move(unsigned int x, unsigned int y)
 TERM_PUBLIC void
 DUMB_point(unsigned int x, unsigned int y, int point)
 {
-    dumb_set_pixel(x, y, point == -1 ? '.' : point % 26 + 'A', 4);
+    dumb_set_pixel(x, y, point == -1 ? '.' : point % 26 + 'A');
 }
 
 
@@ -515,7 +508,6 @@ DUMB_vector(unsigned int arg_x, unsigned int arg_y)
 				 * unsigned-signed=unsigned and */
     int y = arg_y;		/* abs and cast to double wouldn't work */
     char pen, pen1;
-    int priority;
     int delta;
 
     if (ABS(y - dumb_y) > ABS(x - dumb_x)) {
@@ -523,92 +515,79 @@ DUMB_vector(unsigned int arg_x, unsigned int arg_y)
 	case DUMB_AXIS_CONST:
 	    pen = ':';
 	    pen1 = '+';
-	    priority = 1;
 	    break;
 
 	case DUMB_BORDER_CONST:
 	    pen = '|';
 	    pen1 = '+';
-	    priority = 3;
 	    break;
 
 	case DUMB_FILL_CONST:
 	    pen = pen1 = 'X';
-	    priority = 2;
 	    break;
 
 	default:
 	    pen = dumb_pen;
 	    pen1 = dumb_pen;
-	    priority = 4;
 	    break;
 	}
-	dumb_set_pixel(dumb_x, dumb_y, pen1, priority);
+	dumb_set_pixel(dumb_x, dumb_y, pen1);
 	for (delta = 1; delta < ABS(y - dumb_y); delta++) {
 	    dumb_set_pixel(dumb_x  + (int) ((double) (x - dumb_x) *
 					    delta / ABS(y - dumb_y) + 0.5),
-			   dumb_y + delta * sign(y - dumb_y), pen, priority);
+			   dumb_y + delta * sign(y - dumb_y), pen);
 	}
-	dumb_set_pixel(x, y, pen1, priority);
+	dumb_set_pixel(x, y, pen1);
     } else if (ABS(x - dumb_x) > ABS(y - dumb_y)) {
 	switch (dumb_pen) {
 	case DUMB_AXIS_CONST:
 	    pen = '.';
 	    pen1 = '+';
-	    priority = 1;
 	    break;
 
 	case DUMB_BORDER_CONST:
 	    pen = '-';
 	    pen1 = '+';
-	    priority = 3;
 	    break;
 
 	case DUMB_FILL_CONST:
 	    pen = pen1 = 'X';
-	    priority = 2;
 	    break;
 
 	default:
 	    pen = dumb_pen;
 	    pen1 = dumb_pen;
-	    priority = 4;
 	    break;
 	}
-	dumb_set_pixel(dumb_x, dumb_y, pen1, priority);
+	dumb_set_pixel(dumb_x, dumb_y, pen1);
 	for (delta = 1; delta < ABS(x - dumb_x); delta++)
 	    dumb_set_pixel(dumb_x + delta * sign(x - dumb_x),
 			   dumb_y +
-			   (int) ((double) (y - dumb_y) * delta / ABS(x - dumb_x)
-				  + 0.5),
-			   pen, priority);
-	dumb_set_pixel(x, y, pen1, priority);
+			   (int) ((double) (y - dumb_y) * delta / ABS(x - dumb_x) + 0.5),
+			   pen);
+	dumb_set_pixel(x, y, pen1);
     } else {
 	switch (dumb_pen) {
 	case DUMB_AXIS_CONST:	/* zero length axis */
 	    pen = '+';
-	    priority = 1;
 	    break;
 
 	case DUMB_BORDER_CONST:	/* zero length border */
 	    pen = '+';
-	    priority = 3;
 	    break;
 
 	case DUMB_FILL_CONST:
 	    pen = '#';
-	    priority = 2;
 	    break;
 
 	default:
 	    pen = dumb_pen;
-	    priority = 4;
 	    break;
 	}
 	for (delta = 0; delta <= ABS(x - dumb_x); delta++)
 	    dumb_set_pixel(dumb_x + delta * sign(x - dumb_x),
 			   dumb_y + delta * sign(y - dumb_y),
-			   pen, priority);
+			   pen);
     }
     dumb_x = x;
     dumb_y = y;

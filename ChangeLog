@@ -1,3 +1,14 @@
+2016-12-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/dumb.trm: The set_pixel routine originally used a priority rank
+	such that pixels belonging to the border or axis linetypes would always
+	b overwritten by pixels belonging to a plot. This system started to
+	break when the border linetype LT_BLACK became the default linetype and
+	broke further with the addition of a new priority level for fill areas.
+	The core code is pretty good at issuing draw commands in the desired
+	order, so at this point we get better results by dropping the priority
+	rank and having all set_pixel operations overwrite previous contents.
+
 2016-11-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (do_3dplot): Front/back layering of border+grid
