@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: vgagl.trm,v 1.22 2013/01/26 00:19:22 sfeam Exp $
+ * $Id: vgagl.trm,v 1.23 2013/08/24 03:33:35 sfeam Exp $
  */
 
 #if defined(USE_MOUSE)
@@ -57,7 +57,7 @@
  */
 
 /*
- * Compile with -l3kit -lvgagl -lvga
+ * Compile with -l3dkit -lvgagl -lvga
  */
 
 #define VGAGL_DEBUGGING

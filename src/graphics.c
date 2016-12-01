@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.531 2016/08/22 18:44:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.532 2016/11/14 19:59:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1300,9 +1300,8 @@ plot_betweencurves(struct curve_points *plot)
      */
     for (i = 0; i < plot->p_count-1; i++) {
 
-	/* FIXME: This isn't really testing for undefined points, it	*/
-	/* is looking for blank lines. We need to distinguish these.	*/
-	/* Anyhow, if there's a blank line then start a new fill area.	*/
+	/* This isn't really testing for undefined points, it is looking */
+	/* for blank lines. If there is one then start a new fill area.  */
 	if (plot->points[i].type == UNDEFINED
 	    || plot->points[i+1].type == UNDEFINED)
 	    continue;
@@ -2807,7 +2806,6 @@ filter_boxplot(struct curve_points *plot)
     qsort(plot->points, N, sizeof(struct coordinate), compare_ypoints);
 
     /* Return a count of well-defined points with this index */
-    /* FIXME: This could be moved into plot_boxplot() */
     while (plot->points[N-1].type == UNDEFINED)
 	N--;
 

@@ -9,6 +9,9 @@
 	order, so at this point we get better results by dropping the priority
 	rank and having all set_pixel operations overwrite previous contents.
 
+	* src/graphics.c src/plot2d.c term/vgagl.trm:
+	Clean up typos, comments, old FIXMEs, dead code
+
 2016-11-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (do_3dplot): Front/back layering of border+grid

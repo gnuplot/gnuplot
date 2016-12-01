@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.403 2016/10/26 19:03:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.404 2016/10/27 18:43:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -667,7 +667,7 @@ get_data(struct curve_points *current_plot)
 	    cp_extend(current_plot, i + i + 1000);
 	}
 
-	/* Version 5	DEBUG DEBUG
+	/* Version 5
 	 * We are now trying to pass back all available info even if one of the requested
 	 * columns was missing or undefined.  This check replaces the DF_UNDEFINED case in
 	 * the main switch statement below.
@@ -816,15 +816,14 @@ get_data(struct curve_points *current_plot)
 	    continue;
 
 	case DF_UNDEFINED:
-	    /* NaN or bad result from extended using expression */
-	    /* Version 5:
-	     * FIXME - can't actually get here because we trapped DF_UNDEFINED above
-	     */
+	    /* Version 5:  can't get here because we trapped DF_UNDEFINED above */
+#if (0)
 	    current_plot->points[i].type = UNDEFINED;
 	    FPRINTF((stderr,"undefined point %g %g %g\n", v[0], v[1], v[2]));
 	    if (current_plot->plot_style == IMAGE)
 		goto images;
 	    i++;
+#endif
 	    continue;
 
 	case DF_FIRST_BLANK:
@@ -1943,8 +1942,7 @@ store_label(
 	string = "";
 
     textlen = 0;
-    /* FIXME EAM - this code is ugly but seems to work */
-    /* We need to handle quoted separators and quoted quotes */
+    /* Handle quoted separators and quoted quotes */
     if (df_separators) {
 	TBOOLEAN in_quote = FALSE;
 	while (string[textlen]) {
@@ -3143,7 +3141,6 @@ eval_plots()
 			    t_max = eval_link_function(primary, t_max);
 			    FPRINTF((stderr,"sample range on primary axis: %g %g\n", t_min, t_max));
 			} else {
-			    /* FIXME: What if SAMPLE_AXIS is not x_axis? */
 			    axis_unlog_interval(&X_AXIS, &t_min, &t_max, 1);
 			}
 
@@ -3544,7 +3541,6 @@ parametric_fixup(struct curve_points *start_plot, int *plot_num)
 			yp->points[i].type = OUTRANGE;
 
 		    /* Fill in the R_AXIS min/max if autoscaling */
-		    /* EAM FIXME: This was Bug #1323.  What about log scale? */
 		    if ((R_AXIS.autoscale & AUTOSCALE_MAX) && (fabs(r) > R_AXIS.max)) {
 			if ((R_AXIS.max_constraint & CONSTRAINT_UPPER)
 			&&  (R_AXIS.max_ub < fabs(r)))
