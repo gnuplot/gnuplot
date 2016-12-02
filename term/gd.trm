@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.184 2016/07/21 09:07:44 markisch Exp $
+ * $Id: gd.trm,v 1.185 2016/07/23 03:34:41 sfeam Exp $
  */
 
 /* GNUPLOT -- gd.trm */
@@ -1868,11 +1868,10 @@ PNG_set_font(const char *fontname)
     char *name = gp_strdup(fontname);
 
     sep = strcspn(fontname,",");
-    strncpy(name,fontname,sep);
     name[sep] = '\0';
-    if ((sscanf(&(fontname[sep+1]),"%d",&size) < 1)
-    || !(size > 0))
-	size = png_state.default_ttfsize;
+    size = png_state.default_ttfsize;
+    if (fontname[sep] == ',')
+	sscanf(&(fontname[sep+1]),"%d",&size);
 
     if (!strcmp(name,"small"))
 	font = gdFontGetSmall();
