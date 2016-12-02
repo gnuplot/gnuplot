@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.256 2016/10/27 18:43:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.257 2016/11/05 21:21:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -753,10 +753,13 @@ get_3ddata(struct surface_points *this_plot)
     int xdatum = 0;
     int ydatum = 0;
     int j;
-    double v[MAXDATACOLS];
     int pt_in_iso_crv = 0;
     struct iso_curve *this_iso;
     int retval = 0;
+    double v[MAXDATACOLS];
+
+    /* Initialize the space that will hold input data values */
+    memset(v, 0, sizeof(v));
 
     if (mapping3d == MAP3D_CARTESIAN) {
 	/* do this check only, if we have PM3D / PM3D-COLUMN not compiled in */
