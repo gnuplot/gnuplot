@@ -1,3 +1,8 @@
+2016-12-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm (PNG_set_font): Repair a read past end of string error
+	found by valgrind.
+
 2016-11-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (do_3dplot): Front/back layering of border+grid
