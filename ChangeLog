@@ -3,6 +3,10 @@
 	* term/gd.trm (PNG_set_font): Repair a read past end of string error
 	found by valgrind.
 
+	* src/plot3d.c: Initialize vector of data values so that incomplete 
+	data lines do not result in passing uninitialized values to
+	STORE_WITH_LOG_AND_UPDATE_RANGE
+
 2016-11-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (do_3dplot): Front/back layering of border+grid
