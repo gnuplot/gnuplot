@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.185 2016/07/23 03:34:41 sfeam Exp $
+ * $Id: gd.trm,v 1.186 2016/12/03 04:10:46 sfeam Exp $
  */
 
 /* GNUPLOT -- gd.trm */
@@ -94,6 +94,7 @@
  *                          added support for line width and TrueType fonts
  * Shige Takeno, Mar 2011: deal with libgd built to use SJIS rather than UTF-8
  * Ethan Merritt, Apr 2012: Don't claim to support versions 1.x of libgd
+ * kmiya@culti, Nov 2016: sixelgd terminal
  */
 
 #define GD_DEFINED_COLORS	96	/* Must not exceed size of pm3d_color_names_tbl[] */
@@ -146,15 +147,21 @@ TERM_PUBLIC void ENHGD_boxed_text __PROTO((unsigned int, unsigned int, int));
 #include <gdfontmb.h>
 #include <gdfontg.h>
 
+/* some version test macros */
+#define GD_NUM_VERSION(major, minor, release) \
+	(((major) * 10000) + ((minor) * 100) + (release))
+#define GD_THIS_VERSION \
+	GD_NUM_VERSION(GD_MAJOR_VERSION, GD_MINOR_VERSION, GD_RELEASE_VERSION)
+#define GD_MIN_VERSION(major, minor, release) \
+	(GD_THIS_VERSION >= GD_NUM_VERSION(major, minor,release))
+
 /* Before version 2.0.36, the libgd function gdFTUseFontConfig() didn't */
 /* do what we need.  Test for earlier versions and ignore it.           */
-#ifdef GD_MAJOR_VERSION
-#  if (GD_MINOR_VERSION > 0  ||  GD_RELEASE_VERSION > 35)
-#    define gdUseFontConfig(x) gdFTUseFontConfig(x)
-#  endif
+#if GD_MIN_VERSION(2,0,36)
+# define gdUseFontConfig(x) gdFTUseFontConfig(x)
 #endif
 #ifndef gdUseFontConfig
-#define gdUseFontConfig(x) 0
+# define gdUseFontConfig(x) 0
 #endif
 
 /* These intermediate functions are necessary on Windows since 
@@ -181,9 +188,9 @@ static void PNG_init_brush __PROTO((int));
 #define GREG_YMAX 480
 
 /* This will be the default font */
-# define gdfont gdFontMediumBold
-# define PNG_VCHAR 13
-# define PNG_HCHAR 7
+#define gdfont gdFontMediumBold
+#define PNG_VCHAR 13
+#define PNG_HCHAR 7
 
 #define PNG_TICSIZE (GREG_YMAX/100)
 
@@ -405,6 +412,7 @@ image_do_crop ()
 	}
 	bg = gdImageColorAllocateAlpha(im_crop,255,255,255,127);
 
+	/* FIXME: getting black background for truecolor & transparent */
 	gdImagePaletteCopy(im_crop, png_state.image);
 	if (png_state.flags & PNG_USE_TRANSPARENT) {
 	    gdImageColorTransparent(im_crop, bg);
@@ -418,6 +426,11 @@ image_do_crop ()
 	gdImageCopy(im_crop, png_state.image, 0, 0, x1, y1, x, y);
 	gdImageDestroy(png_state.image);
 	png_state.image = im_crop;
+	/* Re-set transparency for sixelgd */
+	if (strcmp("sixelgd", term->name) == 0 && 
+	    png_state.TrueColor && (png_state.flags & PNG_USE_TRANSPARENT)) {
+	    gdImageColorTransparent(png_state.image, png_state.color_table[0]);
+	}
     }
 }
 
@@ -1434,11 +1447,16 @@ PNG_graphics()
 {
     int i;
     unsigned int rgb;
- 
-    for (i = png_state.n_colors; i < GD_DEFINED_COLORS; i++)
+    unsigned int n_colors = GD_DEFINED_COLORS;
+
+    /* avoid to pre-allocate colors for the sixel terminal in indexed mode */ 
+    if ((strcmp("sixelgd", term->name) == 0) && !png_state.TrueColor)
+	n_colors = 1;
+
+    for (i = png_state.n_colors; i < n_colors; i++)
 	png_state.rgb_table[i] = pm3d_color_names_tbl[i].value;
-    if (png_state.n_colors < GD_DEFINED_COLORS)
-	png_state.n_colors = GD_DEFINED_COLORS;
+    if (png_state.n_colors < n_colors)
+	png_state.n_colors = n_colors;
 
     /* TrueColor images default to a black background; load white instead.	*/
     /* If PNG_USE_TRANSPARENT, store the background alpha in the output file	*/
@@ -1484,6 +1502,13 @@ PNG_graphics()
     else
 	gdImageColorTransparent(png_state.image, -1);
 
+    /* Fix for truecolor and transparent options */
+    if (strcmp("sixelgd", term->name) == 0 && 
+        png_state.TrueColor && png_state.flags & PNG_USE_TRANSPARENT) {
+	gdImageAlphaBlending(png_state.image, 0);
+	gdImageFill(png_state.image, 1, 1, png_state.color_table[0]);
+	gdImageAlphaBlending(png_state.image, 1);
+    }
 }
 
 /*
@@ -1629,13 +1654,20 @@ PNG_vector(unsigned int x, unsigned int y)
 TERM_PUBLIC void
 PNG_linetype(int type)
 {
-    if (type >= (png_state.n_colors - 3))
-	type %= (png_state.n_colors - 3);
+    if (type >= (GD_DEFINED_COLORS - 3))
+	type %= (GD_DEFINED_COLORS - 3);
     if (type <= LT_BACKGROUND) /* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
 	type = -3;	/* Draw in background color */
 
-    png_state.color = png_state.color_table[type + 3];
-    png_state.rgb = png_state.rgb_table[type + 3];
+    if (type + 3 >= png_state.n_colors) {
+	int rgb = pm3d_color_names_tbl[type + 3].value;
+	png_state.color = gdImageColorResolve(png_state.image, 
+				(rgb >> 16) & 0xff, (rgb >> 8) & 0xff, rgb & 0xff);
+	png_state.rgb = rgb;
+    } else {
+	png_state.color = png_state.color_table[type + 3];
+	png_state.rgb = png_state.rgb_table[type + 3];
+    }
     png_state.linetype = type;
 
     if (type == LT_AXIS)
@@ -2861,3 +2893,139 @@ END_HELP(gif)
 #endif /* TERM_HELP */
 #endif /* HAVE_GD_GIF */
 #endif
+
+
+#define WITH_GD_SIXEL
+#ifdef WITH_GD_SIXEL
+/*
+ * Sixel support comes almost for free.
+ * We just piggy-back on the libgd PNG routines.
+ */
+
+#ifdef TERM_REGISTER
+register_term(sixelgd)
+#endif
+
+#ifdef TERM_PROTO
+TERM_PUBLIC void SIXELGD_text(void);
+#define GOT_NEXT_PROTO
+#endif
+
+#ifndef TERM_PROTO_ONLY
+
+#ifdef TERM_BODY
+
+#include "sixel.c"
+
+/*
+ * All functions except the final write to file
+ * are actually performed by the PNG driver code
+ */
+TERM_PUBLIC void
+SIXELGD_text()
+{
+    image_do_crop();
+
+    /* maximum number of palette colors (256), no truecolor images, fill optimization */
+    if (png_state.TrueColor)
+	gdImageSixel(png_state.image, gpoutfile, 256, FALSE, TRUE);
+    else
+	gdImageSixel(png_state.image, gpoutfile, 16, FALSE, TRUE);
+    gdImageDestroy(png_state.image);
+}
+
+#endif /* TERM_BODY */
+
+#ifdef TERM_TABLE
+
+TERM_TABLE_START(sixelgd_driver)
+    "sixelgd", "sixel using libgd and TrueType fonts",
+    GREG_XMAX, GREG_YMAX, PNG_VCHAR, PNG_HCHAR,
+    PNG_TICSIZE, PNG_TICSIZE, PNG_options, PNG_init, PNG_reset,
+    SIXELGD_text, null_scale, PNG_graphics, PNG_move, PNG_vector,
+    PNG_linetype, PNG_put_text, PNG_text_angle,
+    PNG_justify_text, PNG_point, do_arrow, PNG_set_font,
+    PNG_pointsize,
+    TERM_CAN_MULTIPLOT|TERM_BINARY|TERM_ALPHA_CHANNEL|TERM_LINEWIDTH|TERM_FONTSCALE,
+    0 /*suspend*/, 0 /*resume*/,
+    PNG_boxfill,
+    PNG_linewidth,
+#ifdef USE_MOUSE
+    0, 0, 0, 0, 0, /* no mouse support */
+#endif
+    PNG_make_palette,
+    0, /* previous_palette() ... no, single array of 256 colours for PNG */
+    PNG_set_color,
+    PNG_filled_polygon,
+    PNG_image,
+    ENHGD_OPEN, ENHGD_FLUSH, do_enh_writec,
+    NULL,		/* layering */
+    NULL,		/* path */
+    0.0,		/* tscale */
+    NULL		/* hypertext */
+#ifdef EAM_BOXED_TEXT
+    , ENHGD_boxed_text
+#endif
+TERM_TABLE_END(sixelgd_driver)
+
+#undef LAST_TERM
+#define LAST_TERM sixelgd_driver
+
+#endif /* TERM_TABLE */
+#endif /* TERM_PROTO_ONLY */
+
+
+#ifdef TERM_HELP
+START_HELP(sixelgd)
+"1 sixelgd",
+"?commands set terminal sixelgd",
+"?set terminal sixelgd",
+"?set term sixelgd",
+"?terminal sixelgd",
+"?term sixelgd",
+"?sixelgd",
+" Syntax:",
+"       set terminal sixelgd",
+"              {{no}enhanced}",
+"              {{no}transparent} {rounded|butt}",
+"              {linewidth <lw>} {dashlength <dl>}",
+"              {tiny | small | medium | large | giant}",
+"              {font \"<face> {,<pointsize>}\"} {fontscale <scale>}",
+"              {size <x>,<y>} {{no}crop}",
+"              {background <rgb_color>}",
+"",
+" The `sixel` output format was originally used by DEC terminals and printers.",
+" This driver creates sixel images using the gd library.",
+"",
+" `transparent` instructs the driver to make the background color transparent.",
+" Default is `notransparent`.",
+"",
+" The `linewidth` and `dashlength` options are scaling factors that affect all",
+" lines drawn, i.e. they are multiplied by values requested in various drawing",
+" commands.",
+"",
+" By default the sixel output uses 16 indexed colors. The `truecolor` option",
+" instead creates a TrueColor png image that is mapped down onto 256 colors",
+" in the output sixel image. Transparent fill styles require the `truecolor`",
+" option. See `fillstyle`.",
+" A `transparent` background is possible in either indexed or TrueColor images.",
+"",
+" `butt` instructs the driver to use a line drawing method that does",
+" not overshoot the desired end point of a line.  This setting is only",
+" applicable for line widths greater than 1.  This setting is most useful when",
+" drawing horizontal or vertical lines.  Default is `rounded`.",
+"",
+" The details of font selection are complicated.",
+" For more information please see the separate section under `fonts`.",
+"",
+" The output plot size <x,y> is given in pixels---it defaults to 640x480.",
+" Please see additional information under `canvas` and `set size`.",
+" Blank space at the edges of the finished plot may be trimmed using the `crop`",
+" option, resulting in a smaller final image size. Default is `nocrop`."
+"",
+" The terminal has been sucessfully tested with the xterm, mlterm and mintty",
+" terminals.  The later two support the `truecolor` mode using 256 sixel",
+" colors out of box."
+END_HELP(sixelgd)
+#endif /* TERM_HELP */
+#endif /* WITH_GD_SIXEL */

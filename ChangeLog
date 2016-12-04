@@ -1,3 +1,24 @@
+2016-12-04  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* term/gd.trm term/sixel.c term/Makefile.am.in:  
+	New terminal "sixelgd" based on kmiya@culti's sixel.c code
+	available at http://nanno.dip.jp/softlib/man/rlogin/#REGWIND
+	It produces sixel graphics like the "sixel" terminal, but uses
+	gdlib to draw instead of the built-in bitmap code.  It hence
+	offers an enhanced feature set, including support for up to 256
+	colors, outline fonts, transparency, and anti-aliased lines.
+	"set term sixelgd" uses only 16 colors for sixel output and up to
+	256 palette colors internally, but "set term sixelgd truecolor"
+	maps the internal ARGB image back down into 256 sixel colors
+	using dithering.
+	sixelgd piggy backs on the png/gif/jpeg terminal routines and
+	thus offers the same options.  In "notruecolor" mode we no longer
+	pre-allocate colors to avoid unnecessary transformations of the
+	image in gdImageSixel.  The "transparent" option works with
+	mintty or mlterm on Windows, but does currently not work with
+	xterm or mlterm on *nix.
+	Patch #742
+
 2016-12-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm (PNG_set_font): Repair a read past end of string error

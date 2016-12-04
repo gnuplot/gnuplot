@@ -28,6 +28,7 @@ Changes not in 5.0
 * NEW wxt supports saving graph as EMF on Windows
 * NEW wxt supports printing on Windows
 * NEW dumb suports ANSI colors and filled polygons
+* NEW terminal sixelgd (sixel terminal graphics using gdlib)
 * CHANGE Revise placement of axis labels in 3D plots
 * CHANGE Timestamp is now placed relative to page rather than plot boundary
 * CHANGE Track font/enhanced for key title separately from the key entries
