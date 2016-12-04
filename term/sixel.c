@@ -1,5 +1,5 @@
 /*
-   $Id$
+   $Id: sixel.c,v 1.1 2016/12/04 20:09:52 markisch Exp $
 
    This code was originally written by kmiya@culti and obtained as a
    tar archive sixel.tar.gz dated 06-Dec-2014 from
