@@ -1,3 +1,12 @@
+2016-12-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm: Co-opt the existing "animate" keyword for use by the new
+	sixelgd terminal.  It sets the cursor position at the top left of the
+	terminal before each plot so that successive plots overwrite the same
+	screen area rather than scrolling off the top.  This is convenient when
+	generating an animation sequence, particularly if you save it to a file
+	for later playback.
+
 2016-12-05  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/sixel.c:  Required minimal version of gdlib is 2.1.0

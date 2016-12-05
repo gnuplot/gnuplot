@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.186 2016/12/03 04:10:46 sfeam Exp $
+ * $Id: gd.trm,v 1.187 2016/12/04 20:09:52 markisch Exp $
  */
 
 /* GNUPLOT -- gd.trm */
@@ -905,14 +905,15 @@ PNG_options()
 
 	/* parse gif animation options */
 	case GIF_ANIMATE:
-	    if (strncmp("gif",term->name,3))
+	    if (strncmp("gif",term->name,3) == 0)
+		gif_anim_option = 1;
+	    else if (strncmp("sixel",term->name,5) != 0)
 		int_error(c_token,"Only the gif terminal supports animation");
 	    c_token++;
 	    png_state.animate = TRUE;
 	    png_state.frame_count = 0;
 	    png_state.frame_delay = 10;
 	    png_state.frame_optimization = FALSE;
-	    gif_anim_option = 1;
 	    break;
 	case GIF_DELAY:
 	    if (strncmp("gif",term->name,3))
@@ -1097,10 +1098,13 @@ PNG_options()
     }
 
     if (png_state.animate) {
-	sprintf(term_options + strlen(term_options),
-	    "animate delay %d loop %d %soptimize ", 
-	    png_state.frame_delay, png_state.loop_count,
-	    png_state.frame_optimization ? "" : "no");
+	if (strncmp("sixel",term->name,5) == 0)
+	    sprintf(term_options + strlen(term_options), "animate ");
+	else
+	    sprintf(term_options + strlen(term_options),
+		"animate delay %d loop %d %soptimize ", 
+		png_state.frame_delay, png_state.loop_count,
+		png_state.frame_optimization ? "" : "no");
     }
 
     sprintf(term_options + strlen(term_options),
@@ -1212,7 +1216,7 @@ PNG_reset()
 	PNG_fill_tile.im = (gdImagePtr)0;
     }
 #ifdef GIF_ANIMATION
-    if (png_state.animate) {
+    if (png_state.animate && !strncmp(term->name,"gif",3)) {
 	gdImageGifAnimEnd(gpoutfile);
 	png_state.frame_count = 0;
 	png_state.animate = FALSE;
@@ -2926,6 +2930,10 @@ SIXELGD_text()
 {
     image_do_crop();
 
+    /* The 'animate' option makes each plot write in place rather than scrolling */
+    if (png_state.animate)
+	fprintf(gpoutfile,  "\033[H");
+
     /* maximum number of palette colors (256), no truecolor images, fill optimization */
     if (png_state.TrueColor)
 	gdImageSixel(png_state.image, gpoutfile, 256, FALSE, TRUE);
@@ -2991,11 +2999,19 @@ START_HELP(sixelgd)
 "              {linewidth <lw>} {dashlength <dl>}",
 "              {tiny | small | medium | large | giant}",
 "              {font \"<face> {,<pointsize>}\"} {fontscale <scale>}",
-"              {size <x>,<y>} {{no}crop}",
+"              {size <x>,<y>} {{no}crop} {animate}",
 "              {background <rgb_color>}",
 "",
 " The `sixel` output format was originally used by DEC terminals and printers.",
-" This driver creates sixel images using the gd library.",
+" This driver produces a sixel output stream by converting a PNG image created",
+" internally using the gd library. The sixel output stream can be viewed in the",
+" terminal as it is created or it can be written to a file so that it can be",
+" replayed later by echoing the file to the terminal.",
+"",
+" The `animate` option resets the cursor position to the terminal top left at",
+" the start of every plot so that successive plots overwrite the same area on",
+" the screen rather than having earlier plots scroll off the top. This may be",
+" desirable in order to create an in-place animation.",
 "",
 " `transparent` instructs the driver to make the background color transparent.",
 " Default is `notransparent`.",
@@ -3016,7 +3032,7 @@ START_HELP(sixelgd)
 " drawing horizontal or vertical lines.  Default is `rounded`.",
 "",
 " The details of font selection are complicated.",
-" For more information please see the separate section under `fonts`.",
+" For more information please see `fonts`.",
 "",
 " The output plot size <x,y> is given in pixels---it defaults to 640x480.",
 " Please see additional information under `canvas` and `set size`.",
@@ -3025,7 +3041,8 @@ START_HELP(sixelgd)
 "",
 " The terminal has been sucessfully tested with the xterm, mlterm and mintty",
 " terminals.  The later two support the `truecolor` mode using 256 sixel",
-" colors out of box."
+" colors out of box. Distributed copies of xterm may or may not have been",
+" configured to support sixel graphics and 256 colors."
 END_HELP(sixelgd)
 #endif /* TERM_HELP */
 #endif /* WITH_GD_SIXEL */
