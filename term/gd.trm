@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.187 2016/12/04 20:09:52 markisch Exp $
+ * $Id: gd.trm,v 1.188 2016/12/06 05:11:05 sfeam Exp $
  */
 
 /* GNUPLOT -- gd.trm */
@@ -221,11 +221,11 @@ static struct {
     int linewidth;
     TBOOLEAN capbutt;  /* use capbutt on lines with GD2, 20051205 MWS*/
     TBOOLEAN use_builtin;
-    int ttfsize;
+    double ttfsize;
     char *ttffont;
     gdFontPtr default_font;
     char *    default_ttffont;
-    int       default_ttfsize;
+    double    default_ttfsize;
     double    fontscale;
     TBOOLEAN  TrueColor;
     double    dashfraction;	/* Where in a dot-dash pattern we left off */
@@ -630,7 +630,7 @@ PNG_Diamond(
 TERM_PUBLIC void
 PNG_options()
 {
-    int i;
+    double tmp;
     char *string;
     unsigned long color;
     TBOOLEAN gif_anim_option = FALSE; /* set to TRUE if an animated gif option given */
@@ -789,7 +789,7 @@ PNG_options()
 		    char *comma = strrchr(s,',');
 		    double fontsize;
 		    if (comma && (1 == sscanf(comma+1,"%lf",&fontsize))) {
-			png_state.default_ttfsize = (int)(fontsize+0.5);
+			png_state.default_ttfsize = fontsize;
 			png_state.ttfsize = png_state.default_ttfsize;
 			*comma = '\0';
 		    }
@@ -811,13 +811,13 @@ PNG_options()
 		/* First try the old GDFONTPATH mechanism for locating fonts */
 		(void)gdUseFontConfig(0);
 		err = gdImageStringFT(NULL, &brect[0], 0,
-			png_state.ttffont, (double)png_state.default_ttfsize*png_state.fontscale,
+			png_state.ttffont, png_state.default_ttfsize*png_state.fontscale,
 			0.0, 0, 0, "test");
 	
 		/* If that didn't work, try again using the fontconfig mechanism */
 		if (err && gdUseFontConfig(1)) {
 		    err = gdImageStringFT(NULL, &brect[0], 0,
-			png_state.ttffont, (double)png_state.default_ttfsize*png_state.fontscale,
+			png_state.ttffont, png_state.default_ttfsize*png_state.fontscale,
 			0.0, 0, 0, "test");
 		}
 
@@ -969,9 +969,9 @@ PNG_options()
 
 #ifdef HAVE_GD_TTF
 	    /* Check for explicit TTF font size */
-	    if (sscanf(string, "%d", &i) == 1) {
-		if (i > 0 && i < 999)
-		    png_state.default_ttfsize = i;
+	    if (sscanf(string, "%lf", &tmp) == 1) {
+		if (tmp > 0 && tmp < 999)
+		    png_state.default_ttfsize = tmp;
 		else
 		    int_warn(c_token,"illegal font size");
 		c_token++;
@@ -1014,13 +1014,13 @@ PNG_options()
 	/* First try the old GDFONTPATH mechanism for locating fonts */
 	(void)gdUseFontConfig(0);
 	err = gdImageStringFT(NULL, &brect[0], 0,
-		png_state.ttffont, (double)png_state.default_ttfsize*png_state.fontscale,
+		png_state.ttffont, png_state.default_ttfsize*png_state.fontscale,
 		0.0, 0, 0, "test");
 
 	/* If that didn't work, try again using fontconfig mechanism */
 	if (err && gdUseFontConfig(1)) {
 	    err = gdImageStringFT(NULL, &brect[0], 0,
-		png_state.ttffont, (double)png_state.default_ttfsize*png_state.fontscale,
+		png_state.ttffont, png_state.default_ttfsize*png_state.fontscale,
 		0.0, 0, 0, "test");
 	}
 
@@ -1047,7 +1047,7 @@ PNG_options()
 	int brect[8];
 	char *err;
 	err = gdImageStringFT(NULL, &brect[0], 0,
-		png_state.default_ttffont, (double)png_state.default_ttfsize*png_state.fontscale,
+		png_state.default_ttffont, png_state.default_ttfsize*png_state.fontscale,
 		0.0, 0, 0, "f00000000g");
 	if (!err) {
 	    term->h_char = .11 * (float)(brect[2] - brect[0]) + 0.5;
@@ -1120,7 +1120,7 @@ PNG_options()
 		"fontscale %.1f ", png_state.fontscale);
 	if (strlen(term_options) + strlen(png_state.ttffont) < sizeof(term_options) - 32)
 	    sprintf(term_options + strlen(term_options),
-		"font \"%s,%d\" ", png_state.ttffont, png_state.ttfsize);
+		"font \"%s,%.1f\" ", png_state.ttffont, png_state.ttfsize);
     } else switch (term->h_char) {
     case 5:
 	strcat(term_options,"tiny ");
@@ -1710,7 +1710,7 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
 	/* Draw once with a NULL image to get the bounding rectangle */
 	/* then draw it again, centered.                             */
 	err = gdImageStringFT(NULL, brect, png_state.color,
-			png_state.ttffont, (double)png_state.ttfsize*png_state.fontscale,
+			png_state.ttffont, png_state.ttfsize*png_state.fontscale,
 			(double)png_state.angle * M_PI_2 / 90. ,
 			x, Y(y), (char *)string);
 	if (err) {
@@ -1732,7 +1732,7 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
 		default:	break;
 	    }
 	    err = gdImageStringFT(png_state.image, brect, png_state.color,
-			png_state.ttffont, (double)png_state.ttfsize*png_state.fontscale,
+			png_state.ttffont, png_state.ttfsize*png_state.fontscale,
 			(double)png_state.angle * M_PI_2 / 90.,
 			x, Y(y), (char *)string);
 	    if (err)
@@ -1899,7 +1899,7 @@ TERM_PUBLIC int
 PNG_set_font(const char *fontname)
 {
     int  sep;
-    int  size;
+    double size;
     gdFontPtr font = png_state.default_font;
     char *name = gp_strdup(fontname);
 
@@ -1907,7 +1907,7 @@ PNG_set_font(const char *fontname)
     name[sep] = '\0';
     size = png_state.default_ttfsize;
     if (fontname[sep] == ',')
-	sscanf(&(fontname[sep+1]),"%d",&size);
+	sscanf(&(fontname[sep+1]),"%lf",&size);
 
     if (!strcmp(name,"small"))
 	font = gdFontGetSmall();
@@ -1947,7 +1947,7 @@ PNG_set_font(const char *fontname)
         /* First try the old GDFONTPATH mechanism for locating fonts */
 	(void)gdUseFontConfig(0);
 	err = gdImageStringFT(NULL, &brect[0], 0,
-		png_state.ttffont, (double)png_state.ttfsize*png_state.fontscale,
+		png_state.ttffont, png_state.ttfsize*png_state.fontscale,
 		0.0, 0, 0, "f00000000g");
 	/* If that didn't work, try again using fontconfig mechanism */
 	if (err && gdUseFontConfig(1)) {
@@ -1955,7 +1955,7 @@ PNG_set_font(const char *fontname)
 		    png_state.ttffont));
 	    err = gdImageStringFT(NULL, &brect[0], 0,
 		png_state.ttffont, 
-		(double)png_state.default_ttfsize*png_state.fontscale,
+		png_state.default_ttfsize*png_state.fontscale,
 		0.0, 0, 0, "f00000000g");
 	}
 	if (!err) {

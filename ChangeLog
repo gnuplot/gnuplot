@@ -7,6 +7,10 @@
 	generating an animation sequence, particularly if you save it to a file
 	for later playback.
 
+	* term/gd.trm: It is only by historical accident that the gd terminal
+	only tracked integer font sizes.  Make it a double so that fractional
+	font sizes are possible.
+
 2016-12-05  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/sixel.c:  Required minimal version of gdlib is 2.1.0
