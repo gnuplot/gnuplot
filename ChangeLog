@@ -1,3 +1,8 @@
+2016-12-05  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* term/sixel.c:  Required minimal version of gdlib is 2.1.0
+	(gdImagePaletteToTrueColor, gdImageTrueColorToPaletteSetMethod).
+
 2016-12-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/gd.trm term/sixel.c term/Makefile.am.in:  

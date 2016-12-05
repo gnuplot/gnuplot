@@ -1,5 +1,5 @@
 /*
-   $Id: sixel.c,v 1.1 2016/12/04 20:09:52 markisch Exp $
+   $Id: sixel.c,v 1.2 2016/12/04 23:11:45 markisch Exp $
 
    This code was originally written by kmiya@culti and obtained as a
    tar archive sixel.tar.gz dated 06-Dec-2014 from
@@ -557,12 +557,12 @@ gdImageSixel(gdImagePtr im, FILE *out, int maxPalet, int optTrue, int optFill)
     if ( maxPalet <= 0 )
 	maxPalet = gdMaxColors;
 
-#if !GD_MIN_VERSION(2,2,1)
+#if !GD_MIN_VERSION(2,1,0)
 	optTrue = 0;
 #endif
 
     if ( optTrue ) {
-#if GD_MIN_VERSION(2,2,1)
+#if GD_MIN_VERSION(2,1,0)
 	if ( !gdImageTrueColor(im) )
 	    gdImagePaletteToTrueColor(im);
 #endif
@@ -575,7 +575,7 @@ gdImageSixel(gdImagePtr im, FILE *out, int maxPalet, int optTrue, int optFill)
 	    maxPalet = gdMaxColors;
 
 	if ( !gdImageTrueColor(im) && gdImageColorsTotal(im) > maxPalet ) {
-#if GD_MIN_VERSION(2,2,1)
+#if GD_MIN_VERSION(2,1,0)
 	    int red, green, blue;
 	    back = gdImageGetTransparent(im);
 	    if (back >= 0) {
@@ -595,7 +595,7 @@ gdImageSixel(gdImagePtr im, FILE *out, int maxPalet, int optTrue, int optFill)
 	}
 
 	if ( gdImageTrueColor(im) ) {
-#if GD_MIN_VERSION(2,2,1)
+#if GD_MIN_VERSION(2,1,0)
 	    // poor ... but fast
 	    //gdImageTrueColorToPaletteSetMethod(im, GD_QUANT_JQUANT, 0);
 	    // debug version ?
