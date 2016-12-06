@@ -5,6 +5,8 @@
 
 	* src/show.c: Separate "show xyplane" from "show tics".
 
+	* src/unset.c: "reset" should return border_layer to "front"
+
 2016-12-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm: Co-opt the existing "animate" keyword for use by the new
