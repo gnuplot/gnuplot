@@ -1,3 +1,8 @@
+2016-12-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c:  Revert problematic patch 2016-11-29 affecting order
+	of grid drawing.  Work-around for the bug it fixed: 'set border behind'
+
 2016-12-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm: Co-opt the existing "animate" keyword for use by the new
