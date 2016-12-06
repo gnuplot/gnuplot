@@ -1,3 +1,9 @@
+2016-12-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm: It is only by historical accident that the gd terminal
+	tracks font size as an integer.  Make it a double so that fractional
+	font sizes are possible.
+
 2016-12-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm (PNG_set_font): Repair a read past end of string error
