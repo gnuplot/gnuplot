@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1032 2016/11/18 05:34:26 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1033 2016/12/04 20:45:44 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -206,15 +206,15 @@ C
 
  * 3D plots can be rotated about the line of sight (see `set view azimuth`).
 
- * New 3D plot style `with zerrorfill`
+ * New 3D plot style `with zerrorfill` (see `zerrorfill`).
 
  * Support for array variables (see `arrays`).
 
  * Support for nonlinear axes (see `set nonlinear`).
 
- * Customized plot legends (see `plot title`, `set key`, `multiple keys`)
+ * Customized plot legends (see `plot title`, `set key`, `multiple keys`).
 
- * New full-featured terminal driver for sixel graphics
+ * New full-featured terminal driver for sixel graphics (see `sixelgd`).
 
 3 Version 5.0
 
@@ -3598,19 +3598,18 @@ Ffigure_filledcurves
      filledcurves xy=10,20 ... point 10,20 of x1,y1 axes (arc-like shape).
      filledcurves above r=1.5  the area of a polar plot outside radius 1.5
 
+Ffigure_yerrorfill
  The third variant fills the area between two curves sampled at the same set of
  x coordinates.  It requires three columns of input data (x, y1, y2).
  This is the default if there are three or more columns of input data.
+ If you have a y value in column 2 and an associated error value in column 3
+ the area of uncertainty can be represented by shading.
  See also the similar 3D plot style `zerrorfill`.
 
-      3 columns:  x  y1  y2
+     3 columns:  x  y  yerror
 
- Example of filling the area between two input curves.
-^ <a href="http://www.gnuplot.info/demo/fillbetween.html">
- fill between curves demo.
-^ </a>
-
-     plot 'data' using 1:2:3 with filledcurves
+     plot $DAT using 1:($2-$3):($2+$3) with filledcurves, \
+          $DAT using 1:2 smooth mcs with lines
 
  The `above` and `below` options apply both to commands of the form
      ... filledcurves above {x1|x2|y|r}=<val>
@@ -3625,8 +3624,8 @@ Ffigure_filledcurves
  Zooming a filled curve drawn from a datafile may produce empty or incorrect
  areas because gnuplot is clipping points and lines, and not areas.
 
- If the values of <a>, <x>, <y> are out of the drawing boundary, then they
- are moved to the graph boundary. Then the actually filled area in the case
+ If the values <x>, <y>, or <a> are outside the drawing boundary they are
+ moved to the graph boundary. Then the actual fill area in the case
  of option xy=<x>,<y> will depend on xrange and yrange.
 3 fill properties
 ?filledcurves border

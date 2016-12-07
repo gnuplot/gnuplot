@@ -144,7 +144,8 @@ plot demo . 'candlesticks.dat' using 1:4:($1-sin($1)/2.):($1+sin($1)/2.) \
 set output out . 'figure_xerrorlines' . ext
 plot demo . 'candlesticks.dat' using 1:4:($1-sin($1)/2.):($1+sin($1)/2.) \
      with xerrorlines title 'with xerrorlines'
-     
+
+# 
 #
 # Boxplot
 # =======
@@ -461,6 +462,19 @@ unset multiplot
 if (GPVAL_TERM eq "pdfcairo") \
     set term pdfcairo color font fontspec size 3.5,2.0 dashlength 0.2
 
+#
+# Filledcurves used to represent error on y
+#
+reset
+set output out . 'figure_yerrorfill' . ext
+set logscale y
+set ytics  norangelimit logscale autofreq 
+set title "Ag 108 decay data" 
+set xlabel "Time (sec)" 
+set ylabel "Rate" 
+Shadecolor = "#80E0A080"
+plot 'silver.dat' using 1:($2+$3):($2-$3) with filledcurve fc rgb Shadecolor title "Shaded error region", \
+     '' using 1:2 smooth mcspline lw 1.5  title "Monotonic spline through data"     
 #
 # Histograms
 # ==========

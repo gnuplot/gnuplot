@@ -1,3 +1,8 @@
+2016-12-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc docs/plotstyles.gnu:  Update filledcurves to include
+	an example of representing error on y as a shaded region of uncertainty.
+
 2016-12-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c:  Revert problematic patch 2016-11-29 affecting order
