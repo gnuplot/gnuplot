@@ -2,6 +2,10 @@
 
 	* src/unset.c (reset_command):  Reset border layer to "front".
 
+	* src/graph3d.c: Revert unsuccessful changeset (2016-11-29) that
+	tried to make layering of the plot border components correct in all
+	cases by default.  It broke as many cases as it fixed.
+
 2016-12-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm: It is only by historical accident that the gd terminal

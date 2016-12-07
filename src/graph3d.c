@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.311.2.15 2016/09/14 03:54:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.311.2.18 2016/12/07 04:27:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2531,6 +2531,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
     /* PLACE ZLABEL - along the middle grid Z axis - eh ? */
     if (Z_AXIS.label.text
 	&& (splot_map == FALSE)
+	&& (current_layer == LAYER_FRONT || whichgrid == ALLGRID)
 	&& (draw_surface
 	    || (draw_contour & CONTOUR_SRF)
 	    || strpbrk(pm3d.where,"st") != NULL
