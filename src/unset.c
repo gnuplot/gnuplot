@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.206.2.11 2016/08/07 18:41:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.206.2.12 2016/10/21 21:00:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1831,6 +1831,7 @@ reset_command()
     clip_lines2 = FALSE;
 
     border_lp = default_border_lp;
+    border_layer = LAYER_FRONT;
     draw_border = 31;
 
     draw_surface = TRUE;
