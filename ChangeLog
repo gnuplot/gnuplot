@@ -1,3 +1,10 @@
+2016-12-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/boundary.c:  Fix incorrect vertical placement of multi-line
+	x2 axis tick labels.  The calculated y coordinate must describe the
+	bottom line of the label, not the top line.
+	Bug #1882
+
 2016-12-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc docs/plotstyles.gnu:  Update filledcurves to include

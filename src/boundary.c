@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.39 2016/11/14 19:59:24 sfeam Exp $
+ * $Id: boundary.c,v 1.40 2016/11/14 20:09:46 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -754,7 +754,7 @@ boundary(struct curve_points *plots, int count)
 	- (int) (vertical_xtics ? t->h_char : t->v_char);
 
     x2tic_y = plot_bounds.ytop + (x2tic_height > 0 ? x2tic_height : 0)
-	+ (vertical_x2tics ? (int) t->h_char : x2tic_textheight);
+	+ (vertical_x2tics ? (int) t->h_char : t->v_char);
 
     ytic_x = plot_bounds.xleft - ytic_width
 	- (vertical_ytics
