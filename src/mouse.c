@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.191 2016/09/10 05:46:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.192 2016/09/12 17:37:58 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -644,7 +644,6 @@ static AXIS *axis_array_copy = NULL;
 static void
 apply_zoom(struct t_zoom *z)
 {
-    char s[1024];		/* HBB 20011005: made larger */
     int is_splot_map = (is_3d_plot && (splot_map == TRUE));
 
     if (zoom_now != NULL) {	/* remember the current zoom */
@@ -685,21 +684,19 @@ apply_zoom(struct t_zoom *z)
     /* Now we're committed. Notify the terminal the the next replot is a zoom */
     (*term->layer)(TERM_LAYER_BEFORE_ZOOM);
 
-    sprintf(s, "set xr[%.12g:%.12g]; set yr[%.12g:%.12g]",
-	       zoom_now->xmin, zoom_now->xmax, 
-	       zoom_now->ymin, zoom_now->ymax);
+    /* New range on primary axes */
+    set_explicit_range(&axis_array[FIRST_X_AXIS], zoom_now->xmin, zoom_now->xmax);
+    set_explicit_range(&axis_array[FIRST_Y_AXIS], zoom_now->ymin, zoom_now->ymax);
 
     /* EAM Apr 2013 - The tests on VERYLARGE protect against trying to   */
     /* interpret the autoscaling initial state as an actual limit value. */
     if (!is_3d_plot
     && (zoom_now->x2min < VERYLARGE && zoom_now->x2max > -VERYLARGE)) {
-	sprintf(s + strlen(s), "; set x2r[% #g:% #g]",
-		zoom_now->x2min, zoom_now->x2max);
+	set_explicit_range(&axis_array[SECOND_X_AXIS], zoom_now->x2min, zoom_now->x2max);
     }
     if (!is_3d_plot
     && (zoom_now->y2min < VERYLARGE && zoom_now->y2max > -VERYLARGE)) {
-	sprintf(s + strlen(s), "; set y2r[% #g:% #g]",
-		zoom_now->y2min, zoom_now->y2max);
+	set_explicit_range(&axis_array[SECOND_Y_AXIS], zoom_now->y2min, zoom_now->y2max);
     }
 
     /* EAM Jun 2007 - The autoscale save/restore was too complicated, and broke
@@ -717,7 +714,6 @@ apply_zoom(struct t_zoom *z)
 	    axis_array_copy[i].formatstring = axis_array[i].formatstring;
 	}
 	memcpy(axis_array, axis_array_copy, sizeof(axis_array));
-	s[0] = '\0';	/* FIXME:  Is this better than calling replotrequest()? */
 
 	/* The shadowed primary axis, if any, is not restored by the memcpy.	*/
 	/* We choose to recalculate the limits, but alternatively we could find	*/
@@ -743,7 +739,7 @@ apply_zoom(struct t_zoom *z)
 	inside_zoom = TRUE;
     }
 
-    do_string_replot(s);
+    do_string_replot("");
     inside_zoom = FALSE;
 }
 

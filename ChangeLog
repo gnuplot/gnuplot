@@ -5,6 +5,17 @@
 	bottom line of the label, not the top line.
 	Bug #1882
 
+	* src/axis.c (set_explicit_range): New routine called from apply_zoom()
+	to change the range of one axis directly, i.e. instead of constructing
+	and interpreting a "set [axis]range [newmin:newmax]" command. This
+	prevents loss of precision in the axis coordinates that can occur if
+	there is an intermediate ascii representation for the range limits.
+	Bugs #1881 #1882
+
+	* src/mouse.c (apply_zoom): Call new routine set_explicit_range()
+	rather than constructing an executable "set range" command string.
+	Bugs #1881 #1882
+
 2016-12-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc docs/plotstyles.gnu:  Update filledcurves to include

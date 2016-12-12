@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.204 2016/10/23 23:13:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.205 2016/11/14 19:59:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1669,6 +1669,30 @@ axis_draw_2d_zeroaxis(AXIS_INDEX axis, AXIS_INDEX crossaxis)
     }
 }
 /* }}} */
+
+/* Mouse zoom/scroll operations were constructing a series of "set [xyx2y2]range"
+ * commands for interpretation.  This caused loss of precision.
+ * This routine replaces the interpreted string with a direct update of the
+ * axis min/max.   Called from mouse.c (apply_zoom)
+ */
+void
+set_explicit_range(struct axis *this_axis, double newmin, double newmax)
+{
+    this_axis->set_min = newmin;
+    this_axis->set_autoscale &= ~AUTOSCALE_MIN;
+    this_axis->min_constraint = CONSTRAINT_NONE;
+    
+    this_axis->set_max = newmax;
+    this_axis->set_autoscale &= ~AUTOSCALE_MAX;
+    this_axis->max_constraint = CONSTRAINT_NONE;
+
+    /* If this is one end of a linked axis pair, replicate the new range to the	*/
+    /* linked axis, possibly via a mapping function. 				*/
+    if (this_axis->linked_to_secondary)
+	clone_linked_axes(this_axis, this_axis->linked_to_secondary);
+    else if (this_axis->linked_to_primary)
+	clone_linked_axes(this_axis, this_axis->linked_to_primary);
+}
 
 double
 get_num_or_time(struct axis *axis)
