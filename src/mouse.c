@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.192 2016/09/12 17:37:58 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.193 2016/12/12 17:29:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1502,17 +1502,31 @@ int is_mouse_outside_plot(void)
 #undef CHECK_AXIS_OUTSIDE
 }
 
-/* Return a new (upper or lower) axis limit that is a linear
-   combination of the current limits.  */
+/* Return a new upper or lower axis limit that is a linear
+ * combination of the current limits.
+ */
 static double
 rescale(int AXIS, double w1, double w2) 
 {
-  double logval, val;
-  logval = w1*axis_array[AXIS].min+w2*axis_array[AXIS].max;
-  val = AXIS_DE_LOG_VALUE(AXIS,logval);
-  return val;
-}
+    double newlimit;
+    struct axis *axis = &axis_array[AXIS];
+    double axmin = axis->min;
+    double axmax = axis->max;
 
+    if (nonlinear(axis)) {
+	axmin = eval_link_function(axis->linked_to_primary, axmin);
+	axmax = eval_link_function(axis->linked_to_primary, axmax);
+    }
+
+    newlimit = w1*axmin + w2*axmax;
+
+    if (nonlinear(axis))
+	newlimit = eval_link_function(axis->linked_to_primary->linked_to_secondary, newlimit);
+    else
+	newlimit = AXIS_DE_LOG_VALUE(AXIS,newlimit);
+
+    return newlimit;
+}
 
 /* Rescale axes and do zoom. */
 static void
@@ -1598,18 +1612,35 @@ do_zoom_scroll_down()
 }
 
 
-/* Return new lower and upper axis limits as current limits resized
-   around current mouse position. */
+/* Return new lower and upper axis limits from expanding current limits
+ * relative to current mouse position.
+ */
 static void
 rescale_around_mouse(double *newmin, double *newmax, int AXIS, double mouse_pos, double scale)
 {
-  double unlog_pos = AXIS_LOG_VALUE(AXIS, mouse_pos);
+    struct axis *axis = &axis_array[AXIS];
+    struct axis *primary = axis->linked_to_primary;
+    double axmin = axis->min;
+    double axmax = axis->max;
 
-  *newmin = unlog_pos + (axis_array[AXIS].min - unlog_pos) * scale;
-  *newmin = AXIS_DE_LOG_VALUE(AXIS,*newmin);
+    if (nonlinear(axis)) {
+	axmin = eval_link_function(primary, axmin);
+	axmax = eval_link_function(primary, axmax);
+	mouse_pos = eval_link_function(primary, mouse_pos);
+    } else {
+	mouse_pos = AXIS_LOG_VALUE(AXIS, mouse_pos);
+    }
 
-  *newmax = unlog_pos + (axis_array[AXIS].max - unlog_pos) * scale;
-  *newmax = AXIS_DE_LOG_VALUE(AXIS,*newmax);
+  *newmin = mouse_pos + (axmin - mouse_pos) * scale;
+  *newmax = mouse_pos + (axmax - mouse_pos) * scale;
+
+    if (nonlinear(axis)) {
+	*newmin = eval_link_function(primary->linked_to_secondary, *newmin);
+	*newmax = eval_link_function(primary->linked_to_secondary, *newmax);
+    } else {
+      *newmin = AXIS_DE_LOG_VALUE(AXIS,*newmin);
+      *newmax = AXIS_DE_LOG_VALUE(AXIS,*newmax);
+    }
 }
 
 

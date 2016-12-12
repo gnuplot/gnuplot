@@ -17,6 +17,11 @@
 	rather than constructing an executable "set range" command string.
 	Bugs #1881 #1882
 
+	* src/mouse.c (rescale rescale_around_mouse): Zoom in response to
+	mousing hotkeys +/- must take into account nonlinear axes.
+	Nonlinear axes part 20
+	Bug #1883
+
 2016-12-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc docs/plotstyles.gnu:  Update filledcurves to include
