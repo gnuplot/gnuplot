@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.155 2016/10/23 23:13:36 sfeam Exp $
+ * $Id: axis.h,v 1.156 2016/11/14 19:59:24 sfeam Exp $
  *
  */
 
@@ -627,6 +627,7 @@ void axis_invert_if_requested __PROTO((struct axis *));
 void axis_revert_range __PROTO((AXIS_INDEX));
 void axis_revert_and_unlog_range __PROTO((AXIS_INDEX));
 void axis_init __PROTO((AXIS *this_axis, TBOOLEAN infinite));
+void set_explicit_range __PROTO((struct axis *axis, double newmin, double newmax));
 double axis_log_value_checked __PROTO((AXIS_INDEX, double, const char *));
 void axis_checked_extend_empty_range __PROTO((AXIS_INDEX, const char *mesg));
 char * copy_or_invent_formatstring __PROTO((struct axis *));
