@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.206 2016/12/12 17:29:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.207 2016/12/13 21:57:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -105,7 +105,7 @@ const struct gen_table axisname_tbl[] =
 /* HBB 20000416: they may not need to be array[]ed, but it'd sure
  * make coding easier, in some places... */
 /* HBB 20000416: for the testing, these are global... */
-/* static */ int tic_start, tic_direction, tic_text,
+int tic_start, tic_direction, tic_text,
     rotate_tics, tic_hjust, tic_vjust, tic_mirror;
 
 /* These are declare volatile in order to fool the compiler into not */
@@ -430,12 +430,24 @@ axis_checked_extend_empty_range(AXIS_INDEX axis, const char *mesg)
 
 /* Simpler alternative routine for nonlinear axes (including log scale) */
 void
-axis_check_empty_nonlinear(struct axis *this_axis)
+axis_check_empty_nonlinear(struct axis *axis)
 {
-    if (this_axis->min == VERYLARGE
-    ||  this_axis->max == -VERYLARGE
-    ||  (this_axis->max - this_axis->min == 0))
-	int_error(NO_CARET,"Empty or undefined axis range");
+    /* Poorly defined via/inv nonlinear mappings can leave NaN in derived range */
+    if (isnan(axis->min) || isnan(axis->max))
+	goto undefined_axis_range_error;
+    axis = axis->linked_to_primary;
+    if (isnan(axis->min) || isnan(axis->max))
+	goto undefined_axis_range_error;
+
+    /* Autoscaling failed or never happened (no valid data points?) */
+    if (axis->min == VERYLARGE ||  axis->max == -VERYLARGE
+    ||  (axis->max - axis->min == 0))
+	goto undefined_axis_range_error;
+
+    return;
+    undefined_axis_range_error:
+	int_error(NO_CARET,"empty or undefined %s axis range", axis_name(axis->index));
+    return;
 }
 
 /* }}} */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.258 2016/12/04 00:29:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.259 2016/12/13 21:57:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -2178,7 +2178,7 @@ eval_3dplots()
     }
 
     if (nonlinear(&axis_array[FIRST_X_AXIS])) {
-	axis_check_empty_nonlinear(axis_array[FIRST_X_AXIS].linked_to_primary);
+	axis_check_empty_nonlinear(&axis_array[FIRST_X_AXIS]);
 	/* Transfer observed data or function ranges back to primary axes */
 	clone_linked_axes(axis_array[FIRST_X_AXIS].linked_to_primary, &axis_array[FIRST_X_AXIS]);
     } else {
@@ -2186,7 +2186,7 @@ eval_3dplots()
 	axis_revert_and_unlog_range(FIRST_X_AXIS);
     }
     if (nonlinear(&axis_array[FIRST_Y_AXIS])) {
-	axis_check_empty_nonlinear(axis_array[FIRST_Y_AXIS].linked_to_primary);
+	axis_check_empty_nonlinear(&axis_array[FIRST_Y_AXIS]);
 	/* Transfer observed data or function ranges back to primary axes */
 	clone_linked_axes(axis_array[FIRST_Y_AXIS].linked_to_primary, &axis_array[FIRST_Y_AXIS]);
     } else {

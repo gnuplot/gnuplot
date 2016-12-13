@@ -6,6 +6,9 @@
 	a crash after axis range corruption. 
 	Example of bug:    set log; splot $FOO using 1:2:(NaN)
 
+	* src/axis.c (axis_check_empty_nonlinear) src/axis.h src/plot3d.c:
+	Additional sanity check on axis range after nonlinear transform.
+
 2016-12-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/boundary.c:  Fix incorrect vertical placement of multi-line
