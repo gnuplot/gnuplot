@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.205 2016/11/14 19:59:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.206 2016/12/12 17:29:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -426,6 +426,16 @@ axis_checked_extend_empty_range(AXIS_INDEX axis, const char *mesg)
 		      axis_name(axis));
 	}
     }
+}
+
+/* Simpler alternative routine for nonlinear axes (including log scale) */
+void
+axis_check_empty_nonlinear(struct axis *this_axis)
+{
+    if (this_axis->min == VERYLARGE
+    ||  this_axis->max == -VERYLARGE
+    ||  (this_axis->max - this_axis->min == 0))
+	int_error(NO_CARET,"Empty or undefined axis range");
 }
 
 /* }}} */

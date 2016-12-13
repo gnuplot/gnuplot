@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.156 2016/11/14 19:59:24 sfeam Exp $
+ * $Id: axis.h,v 1.157 2016/12/12 18:29:45 sfeam Exp $
  *
  */
 
@@ -630,6 +630,7 @@ void axis_init __PROTO((AXIS *this_axis, TBOOLEAN infinite));
 void set_explicit_range __PROTO((struct axis *axis, double newmin, double newmax));
 double axis_log_value_checked __PROTO((AXIS_INDEX, double, const char *));
 void axis_checked_extend_empty_range __PROTO((AXIS_INDEX, const char *mesg));
+void axis_check_empty_nonlinear __PROTO((struct axis *this_axis));
 char * copy_or_invent_formatstring __PROTO((struct axis *));
 double quantize_normal_tics __PROTO((double, int));
 void setup_tics __PROTO((struct axis *, int));

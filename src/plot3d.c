@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.257 2016/11/05 21:21:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.258 2016/12/04 00:29:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1183,13 +1183,6 @@ get_3ddata(struct surface_points *this_plot)
     if (dgrid3d && this_plot->num_iso_read > 0)
 	grid_nongrid_data(this_plot);
 
-    /* This check used to be done in graph3d */
-    if (X_AXIS.min == VERYLARGE || X_AXIS.max == -VERYLARGE ||
-	Y_AXIS.min == VERYLARGE || Y_AXIS.max == -VERYLARGE) {
-	    /* FIXME: Should we set plot type to NODATA? */
-	    int_warn(NO_CARET,
-		"No usable data in this plot to auto-scale axis range");
-	    }
 
     if (this_plot->num_iso_read <= 1)
 	this_plot->has_grid_topology = FALSE;
@@ -2184,15 +2177,17 @@ eval_3dplots()
 	int_error(c_token, "no functions or data to plot");
     }
 
-    /* Only relevant for NONLINEAR_AXES (include logscale) */
-    /* Transfer observed data or function ranges back to primary axes */
     if (nonlinear(&axis_array[FIRST_X_AXIS])) {
+	axis_check_empty_nonlinear(axis_array[FIRST_X_AXIS].linked_to_primary);
+	/* Transfer observed data or function ranges back to primary axes */
 	clone_linked_axes(axis_array[FIRST_X_AXIS].linked_to_primary, &axis_array[FIRST_X_AXIS]);
     } else {
 	axis_checked_extend_empty_range(FIRST_X_AXIS, "All points x value undefined");
 	axis_revert_and_unlog_range(FIRST_X_AXIS);
     }
     if (nonlinear(&axis_array[FIRST_Y_AXIS])) {
+	axis_check_empty_nonlinear(axis_array[FIRST_Y_AXIS].linked_to_primary);
+	/* Transfer observed data or function ranges back to primary axes */
 	clone_linked_axes(axis_array[FIRST_Y_AXIS].linked_to_primary, &axis_array[FIRST_Y_AXIS]);
     } else {
 	axis_checked_extend_empty_range(FIRST_Y_AXIS, "All points y value undefined");

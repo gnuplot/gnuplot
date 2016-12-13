@@ -1,3 +1,11 @@
+2016-12-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (axis_check_empty_nonlinear) src/axis.h src/plot3d.c:
+	New routine analogous to the existing axis_checked_extend_empty_range
+	except that it applies to nonlinear axes.  This is a bug fix to prevent
+	a crash after axis range corruption. 
+	Example of bug:    set log; splot $FOO using 1:2:(NaN)
+
 2016-12-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/boundary.c:  Fix incorrect vertical placement of multi-line
