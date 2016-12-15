@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.114 2016/11/05 21:21:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.115 2016/11/19 06:43:49 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -552,6 +552,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
     }
 
     if (pm3d.direction == PM3D_DEPTH) {
+	int needed_quadrangles = 0;
 
 	for (scan = 0; scan < this_plot->num_iso_read - 1; scan++) {
 
@@ -560,15 +561,21 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 
 	    are_ftriangles = pm3d.ftriangles && (scanA->p_count != scanB->p_count);
 	    if (!are_ftriangles)
-		allocated_quadrangles += GPMIN(scanA->p_count, scanB->p_count) - 1;
+		needed_quadrangles += GPMIN(scanA->p_count, scanB->p_count) - 1;
 	    else {
-		allocated_quadrangles += GPMAX(scanA->p_count, scanB->p_count) - 1;
+		needed_quadrangles += GPMAX(scanA->p_count, scanB->p_count) - 1;
 	    }
 	}
-	allocated_quadrangles *= (interp_i > 1) ? interp_i : 1;
-	allocated_quadrangles *= (interp_j > 1) ? interp_j : 1;
-	quadrangles = (quadrangle*)gp_realloc(quadrangles, allocated_quadrangles * sizeof (quadrangle), "pm3d_plot->quadrangles");
-	/* DEBUG: fprintf(stderr, "allocated_quadrangles = %d\n", allocated_quadrangles); */
+	needed_quadrangles *= (interp_i > 1) ? interp_i : 1;
+	needed_quadrangles *= (interp_j > 1) ? interp_j : 1;
+
+	while (current_quadrangle + needed_quadrangles >= allocated_quadrangles) {
+	    FPRINTF((stderr, "allocated_quadrangles = %d current = %d needed = %d\n",
+		allocated_quadrangles, current_quadrangle, needed_quadrangles));
+	    allocated_quadrangles = needed_quadrangles + 2*allocated_quadrangles;	
+	    quadrangles = (quadrangle*)gp_realloc(quadrangles, 
+			allocated_quadrangles * sizeof (quadrangle), "pm3d_plot->quadrangles");
+	}
     }
     /* pm3d_rearrange_scan_array(this_plot, (struct iso_curve***)0, (int*)0, &scan_array, &invert); */
 

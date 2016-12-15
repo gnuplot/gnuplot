@@ -7,6 +7,10 @@
 	* src/plot2d.c:  Fuzz-testing found a crash from trying to adjust the
 	range of a boxplot containing no points.
 
+	* src/pm3d.c:  The combination 'set pm3d depthorder interpolate N,M'
+	was not correctly tracking memory allocation.
+	Bug #1884
+
 2016-12-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (axis_check_empty_nonlinear) src/axis.h src/plot3d.c:
