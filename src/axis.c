@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.208 2016/12/14 22:53:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.209 2016/12/15 17:05:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -167,6 +167,7 @@ static TBOOLEAN axis_position_zeroaxis __PROTO((AXIS_INDEX));
 static void load_one_range __PROTO((struct axis *axis, double *a, t_autoscale *autoscale, t_autoscale which ));
 static double quantize_duodecimal_tics __PROTO((double, int));
 static void get_position_type __PROTO((enum position_type * type, AXIS_INDEX *axes));
+static TBOOLEAN bad_axis_range __PROTO((struct axis *axis));
 
 /* ---------------------- routines ----------------------- */
 
@@ -309,6 +310,29 @@ extend_parallel_axis(int paxis)
     return &parallel_axis[paxis-1];
 }
 
+/* 
+ * Most of the crashes found during fuzz-testing of version 5.1 were a
+ * consequence of an axis range being corrupted, i.e. NaN or Inf.
+ * Corruption became easier with the introduction of nonlinear axes,
+ * but even apart from that autoscaling bad data could cause a fault.
+ * NB: Some platforms may need help with isnan() and isinf().
+ */
+static TBOOLEAN
+bad_axis_range(struct axis *axis)
+{
+    if (isnan(axis->min) || isnan(axis->max))
+	return TRUE;
+#ifdef isinf
+    if (isinf(axis->min) || isinf(axis->max))
+	return TRUE;
+#endif
+    if (axis->max == -VERYLARGE || axis->min == VERYLARGE)
+	return TRUE;
+    if (axis->max - axis->min == 0.0)
+	return TRUE;
+    return FALSE;
+}
+
 /* {{{ axis_checked_extend_empty_range() */
 /*
  * === SYNOPSIS ===
@@ -391,13 +415,9 @@ axis_checked_extend_empty_range(AXIS_INDEX axis, const char *mesg)
     double dmin = this_axis->min;
     double dmax = this_axis->max;
 
-    /* HBB 20000501: this same action was taken just before most of
-     * the invocations of this function, so I moved it into here.
-     * Only do this if 'mesg' is non-NULL --> pass NULL if you don't
-     * want the test */
-    if (mesg
-    && (this_axis->min >= VERYLARGE || this_axis->max <= -VERYLARGE))
-	int_error(c_token, mesg);
+    /* pass msg == NULL if for some reason you trust the axis range */
+    if (mesg && bad_axis_range(this_axis))
+	    int_error(c_token, mesg);
 
     if (dmax - dmin == 0.0) {
 	/* empty range */
@@ -432,15 +452,11 @@ void
 axis_check_empty_nonlinear(struct axis *axis)
 {
     /* Poorly defined via/inv nonlinear mappings can leave NaN in derived range */
-    if (isnan(axis->min) || isnan(axis->max))
-	goto undefined_axis_range_error;
-    axis = axis->linked_to_primary;
-    if (isnan(axis->min) || isnan(axis->max))
+    if (bad_axis_range(axis))
 	goto undefined_axis_range_error;
 
-    /* Autoscaling failed or never happened (no valid data points?) */
-    if (axis->min >= VERYLARGE ||  axis->max <= -VERYLARGE
-    ||  (axis->max - axis->min == 0))
+    axis = axis->linked_to_primary;
+    if (bad_axis_range(axis))
 	goto undefined_axis_range_error;
 
     return;
