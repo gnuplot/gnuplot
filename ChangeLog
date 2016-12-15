@@ -3,6 +3,10 @@
 	* src/plot2d.c:  Fuzz-testing found a crash from trying to adjust the
 	range of a boxplot containing no points.
 
+	* src/pm3d.c:  The combination 'set pm3d depthorder interpolate N,M'
+	was not correctly tracking memory allocation.
+	Bug #1884
+
 2016-12-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/unset.c (reset_command):  Reset border layer to "front".
