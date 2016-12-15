@@ -1,3 +1,8 @@
+2016-12-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c:  Fuzz-testing found a crash from trying to adjust the
+	range of a boxplot containing no points.
+
 2016-12-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/unset.c (reset_command):  Reset border layer to "front".
