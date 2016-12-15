@@ -1,7 +1,11 @@
 2016-12-15  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/axis.c: Even more paranoid checks to protect against corrupted
-	axis range state (Inf/-Inf) found by fuzzing.
+	* src/axis.c (bad_axis_range): Even more paranoid checks to protect
+	against corrupted axis range state (Inf/-Inf) found by fuzzing.
+	Introduce new routine bad_axis_range().
+
+	* src/plot2d.c:  Fuzz-testing found a crash from trying to adjust the
+	range of a boxplot containing no points.
 
 2016-12-13  Ethan A Merritt  <merritt@u.washington.edu>
 
