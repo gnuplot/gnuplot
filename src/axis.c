@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.207 2016/12/13 21:57:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.208 2016/12/14 22:53:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -396,8 +396,7 @@ axis_checked_extend_empty_range(AXIS_INDEX axis, const char *mesg)
      * Only do this if 'mesg' is non-NULL --> pass NULL if you don't
      * want the test */
     if (mesg
-	&& (this_axis->min == VERYLARGE
-	    || this_axis->max == -VERYLARGE))
+    && (this_axis->min >= VERYLARGE || this_axis->max <= -VERYLARGE))
 	int_error(c_token, mesg);
 
     if (dmax - dmin == 0.0) {
@@ -440,7 +439,7 @@ axis_check_empty_nonlinear(struct axis *axis)
 	goto undefined_axis_range_error;
 
     /* Autoscaling failed or never happened (no valid data points?) */
-    if (axis->min == VERYLARGE ||  axis->max == -VERYLARGE
+    if (axis->min >= VERYLARGE ||  axis->max <= -VERYLARGE
     ||  (axis->max - axis->min == 0))
 	goto undefined_axis_range_error;
 
