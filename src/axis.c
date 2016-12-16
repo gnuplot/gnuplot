@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.209 2016/12/15 17:05:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.210 2016/12/15 20:22:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -327,8 +327,6 @@ bad_axis_range(struct axis *axis)
 	return TRUE;
 #endif
     if (axis->max == -VERYLARGE || axis->min == VERYLARGE)
-	return TRUE;
-    if (axis->max - axis->min == 0.0)
 	return TRUE;
     return FALSE;
 }
