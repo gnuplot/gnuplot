@@ -5,6 +5,13 @@
 	axis_checked_extend_empty_range, which is perfectly happy to expand an
 	initially empty range.
 
+	* src/wxterminal/gp_cairo.c:  Valgrind found some use-after-free 
+	problems with cairo object accounting.  Replace g_object_unref() with
+	g_clear_object() everywhere.   This is a macro that decrements object
+	reference count and clears the pointer when the count hits zero.
+	Clear the pointer in-line for pango_attr_list_unref().
+	Bug #1886
+
 2016-12-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (bad_axis_range): Even more paranoid checks to protect
