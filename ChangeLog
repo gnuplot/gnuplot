@@ -1,3 +1,14 @@
+2016-12-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (some_grid_selected gen_tics) src/unset.c set.c (set_grid)
+	src/graphics.c (place_grid xtick2d_callback ytick2d_callback)
+	src/boundary.c:  Cleaner separation of control over polar grid elements
+	and rectangular grid components. Each can be set or cleared independent
+	of the others, e.g. "set grid r" will give you circles about the origin
+	even in a non-polar plot.  Sanity checking of polar_grid_angle, the
+	spacing between radial lines in a polar grid.
+	Bug #1888
+
 2016-12-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (bad_axis_range):  Don't include a test (max-min == 0) in

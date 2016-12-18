@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.210 2016/12/15 20:22:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.211 2016/12/16 23:28:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1376,7 +1376,7 @@ gen_tics(struct axis *this, tic_callback callback)
 			    gstrftime(label, MAX_ID_LEN-1, this->ticfmt, (double) user);
 			} else if (this->tictype == DT_DMS) {
 			    gstrdms(label, this->ticfmt, (double)user);
-			} else if (polar && this->index == POLAR_AXIS) {
+			} else if (this->index == POLAR_AXIS) {
 			    double min = (R_AXIS.autoscale & AUTOSCALE_MIN) ? 0 : R_AXIS.min;
 			    double r = fabs(user) + min;
 			    /* POLAR_AXIS used to be the only sane axis, where the actual value */
@@ -1971,6 +1971,9 @@ some_grid_selected()
     for (i = 0; i < NUMBER_OF_MAIN_VISIBLE_AXES; i++)
 	if (axis_array[i].gridmajor || axis_array[i].gridminor)
 	    return TRUE;
+    /* Dec 2016 - CHANGE */
+    if (polar_grid_angle > 0)
+	return TRUE;
     return FALSE;
 }
 

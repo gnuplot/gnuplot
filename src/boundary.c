@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.40 2016/11/14 20:09:46 sfeam Exp $
+ * $Id: boundary.c,v 1.41 2016/12/12 17:21:35 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -595,7 +595,7 @@ boundary(struct curve_points *plots, int count)
     setup_tics(&axis_array[FIRST_X_AXIS], 20);
     setup_tics(&axis_array[SECOND_X_AXIS], 20);
 
-    if (polar)
+    if (R_AXIS.ticmode)
 	setup_tics(&axis_array[POLAR_AXIS], 10);
 
 

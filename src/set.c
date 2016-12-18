@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.540 2016/11/16 21:47:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.541 2016/11/18 08:20:57 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2049,12 +2049,14 @@ set_grid()
 	else GRID_MATCH(POLAR_AXIS, "nor$tics")
 	else GRID_MATCH(POLAR_AXIS, "nomr$tics")
 	else if (almost_equals(c_token,"po$lar")) {
-	    if (!some_grid_selected())
-		axis_array[POLAR_AXIS].gridmajor = TRUE;
+	    /* Dec 2016 - zero or negative disables radial grid lines */
+	    axis_array[POLAR_AXIS].gridmajor = TRUE;	/* Enable both circles and radii */
 	    polar_grid_angle = 30*DEG2RAD;
 	    c_token++;
-	    if (isanumber(c_token) || type_udv(c_token) == INTGR || type_udv(c_token) == CMPLX)
-		polar_grid_angle = ang2rad*real_expression();
+	    if (isanumber(c_token) || type_udv(c_token) == INTGR || type_udv(c_token) == CMPLX) {
+		double ang = real_expression();
+		polar_grid_angle = (ang > 2.*M_PI) ? DEG2RAD*ang : ang2rad*ang;
+	    }
 	} else if (almost_equals(c_token,"nopo$lar")) {
 	    polar_grid_angle = 0; /* not polar grid */
 	    c_token++;
@@ -2085,6 +2087,7 @@ set_grid()
 	/* no axis specified, thus select default grid */
 	if (polar) {
 	    axis_array[POLAR_AXIS].gridmajor = TRUE;
+	    polar_grid_angle = 30.*DEG2RAD;
 	} else {
 	    axis_array[FIRST_X_AXIS].gridmajor = TRUE;
 	    axis_array[FIRST_Y_AXIS].gridmajor = TRUE;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.532 2016/11/14 19:59:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.533 2016/12/01 19:40:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -233,8 +233,8 @@ place_grid(int layer)
     x_axis = FIRST_X_AXIS;
     y_axis = FIRST_Y_AXIS;
 
-    /* POLAR GRID */
-    if (polar && R_AXIS.ticmode) {
+    /* POLAR GRID circles */
+    if (R_AXIS.ticmode) {
 	/* Piggyback on the xtick2d_callback.  Avoid a call to the full    */
 	/* axis_output_tics(), which wasn't really designed for this axis. */
 	tic_start = map_y(0);   /* Always equivalent to tics on phi=0 axis */
@@ -252,18 +252,19 @@ place_grid(int layer)
 	(*t->text_angle) (0);
     }
 
-    /* Radial lines */
-    if (polar_grid_angle) {
+    /* POLAR GRID radial lines */
+    if (polar_grid_angle > 0) {
 	double theta = 0;
 	int ox = map_x(0);
 	int oy = map_y(0);
 	term_apply_lp_properties(&grid_lp);
+	if (largest_polar_circle <=0)
+	    largest_polar_circle = R_AXIS.max;
 	for (theta = 0; theta < 6.29; theta += polar_grid_angle) {
 	    int x = map_x(largest_polar_circle * cos(theta));
 	    int y = map_y(largest_polar_circle * sin(theta));
 	    draw_clip_line(ox, oy, x, y);
 	}
-	draw_clip_line(ox, oy, map_x(largest_polar_circle * cos(theta)), map_y(largest_polar_circle * sin(theta)));
     }
 
     /* Restore the grid line types if we had turned them off to draw labels only */
@@ -3380,7 +3381,7 @@ xtick2d_callback(
     if (grid.l_type > LT_NODRAW) {
 	(t->layer)(TERM_LAYER_BEGIN_GRID);
 	term_apply_lp_properties(&grid);
-	if (polar_grid_angle) {
+	if (this_axis->index == POLAR_AXIS) {
 	    double x = place, y = 0, s = sin(0.1), c = cos(0.1);
 	    int i;
 	    int ogx = map_x(x);
@@ -3490,49 +3491,29 @@ ytick2d_callback(
 #   undef MINIMUM_SEPARATION
 
     if (grid.l_type > LT_NODRAW) {
+	legend_key *key = &keyT;
 	(t->layer)(TERM_LAYER_BEGIN_GRID);
 	term_apply_lp_properties(&grid);
-	if (polar_grid_angle) {
-	    double x = 0, y = place, s = sin(0.1), c = cos(0.1);
-	    int i;
-	    if (place > largest_polar_circle)
-		largest_polar_circle = place;
-	    else if (-place > largest_polar_circle)
-		largest_polar_circle = -place;
-	    clip_move(map_x(x), map_y(y));
-	    for (i = 1; i <= 63 /* 2pi/0.1 */ ; ++i) {
-		{
-		    /* cos(t+dt) = cos(t)cos(dt)-sin(t)cos(dt) */
-		    double tx = x * c - y * s;
-		    /* sin(t+dt) = sin(t)cos(dt)+cos(t)sin(dt) */
-		    y = y * c + x * s;
-		    x = tx;
-		}
-		clip_vector(map_x(x), map_y(y));
-	    }
-	} else {
-	    /* Make the grid avoid the key box */
-	    legend_key *key = &keyT;
-	    if (key->visible && y < key->bounds.ytop && y > key->bounds.ybot
-	    &&  key->bounds.xleft < plot_bounds.xright && key->bounds.xright > plot_bounds.xleft) {
-		if (key->bounds.xleft > plot_bounds.xleft) {
-		    (*t->move) (plot_bounds.xleft, y);
-		    (*t->vector) (key->bounds.xleft, y);
-		}
-		if (key->bounds.xright < plot_bounds.xright) {
-		    (*t->move) (key->bounds.xright, y);
-		    (*t->vector) (plot_bounds.xright, y);
-		}
-	    } else {
+	/* Make the grid avoid the key box */
+	if (key->visible && y < key->bounds.ytop && y > key->bounds.ybot
+	&&  key->bounds.xleft < plot_bounds.xright && key->bounds.xright > plot_bounds.xleft) {
+	    if (key->bounds.xleft > plot_bounds.xleft) {
 		(*t->move) (plot_bounds.xleft, y);
+		(*t->vector) (key->bounds.xleft, y);
+	    }
+	    if (key->bounds.xright < plot_bounds.xright) {
+		(*t->move) (key->bounds.xright, y);
 		(*t->vector) (plot_bounds.xright, y);
 	    }
+	} else {
+	    (*t->move) (plot_bounds.xleft, y);
+	    (*t->vector) (plot_bounds.xright, y);
 	}
 	term_apply_lp_properties(&border_lp);	/* border linetype */
 	(t->layer)(TERM_LAYER_END_GRID);
     }
-    /* we precomputed tic posn and text posn */
 
+    /* we precomputed tic posn and text posn */
     (*t->move) (tic_start, y);
     (*t->vector) (tic_start + ticsize, y);
 
