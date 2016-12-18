@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.317 2016/11/14 19:59:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.318 2016/11/14 23:29:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -377,6 +377,7 @@ save_set_all(FILE *fp)
 	SAVE_GRID(FIRST_X_AXIS);
 	SAVE_GRID(FIRST_Y_AXIS);
 	SAVE_GRID(FIRST_Z_AXIS);
+	SAVE_GRID(POLAR_AXIS);
 	fputs(" \\\n", fp);
 	SAVE_GRID(SECOND_X_AXIS);
 	SAVE_GRID(SECOND_Y_AXIS);
