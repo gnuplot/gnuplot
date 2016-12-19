@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.541 2016/11/18 08:20:57 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.542 2016/12/19 02:02:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4073,8 +4073,9 @@ set_polar()
 
     if (polar)
 	return;
-    else
-	polar = TRUE;
+
+    polar = TRUE;
+    raxis = TRUE;
 
     if (!parametric) {
 	if (interactive)

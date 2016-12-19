@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.533 2016/12/01 19:40:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.534 2016/12/19 02:02:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -234,7 +234,7 @@ place_grid(int layer)
     y_axis = FIRST_Y_AXIS;
 
     /* POLAR GRID circles */
-    if (R_AXIS.ticmode) {
+    if (R_AXIS.ticmode && (raxis || polar)) {
 	/* Piggyback on the xtick2d_callback.  Avoid a call to the full    */
 	/* axis_output_tics(), which wasn't really designed for this axis. */
 	tic_start = map_y(0);   /* Always equivalent to tics on phi=0 axis */
@@ -882,7 +882,7 @@ do_plot(struct curve_points *plots, int pcount)
     /* DRAW TICS AND GRID */
     if (grid_layer == LAYER_FRONT)
 	place_grid(grid_layer);
-    if (polar && raxis)
+    if (raxis)
 	place_raxis();
 
     /* Redraw the axis tic labels and tic marks if "set tics front" */

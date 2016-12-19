@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.211 2016/12/16 23:28:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.212 2016/12/19 02:02:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -136,7 +136,7 @@ struct lp_style_type mgrid_lp  = DEFAULT_GRID_LP;
 int grid_layer = LAYER_BEHIND;
 TBOOLEAN grid_tics_in_front = FALSE;
 double polar_grid_angle = 0;	/* nonzero means a polar grid */
-TBOOLEAN raxis = TRUE;
+TBOOLEAN raxis = FALSE;
 
 /* Length of the longest tics label, set by widest_tic_callback(): */
 int widest_tic_strlen;
@@ -167,7 +167,6 @@ static TBOOLEAN axis_position_zeroaxis __PROTO((AXIS_INDEX));
 static void load_one_range __PROTO((struct axis *axis, double *a, t_autoscale *autoscale, t_autoscale which ));
 static double quantize_duodecimal_tics __PROTO((double, int));
 static void get_position_type __PROTO((enum position_type * type, AXIS_INDEX *axes));
-static TBOOLEAN bad_axis_range __PROTO((struct axis *axis));
 
 /* ---------------------- routines ----------------------- */
 
@@ -317,7 +316,7 @@ extend_parallel_axis(int paxis)
  * but even apart from that autoscaling bad data could cause a fault.
  * NB: Some platforms may need help with isnan() and isinf().
  */
-static TBOOLEAN
+TBOOLEAN
 bad_axis_range(struct axis *axis)
 {
     if (isnan(axis->min) || isnan(axis->max))

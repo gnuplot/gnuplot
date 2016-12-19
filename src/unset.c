@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.246 2016/12/07 20:04:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.247 2016/12/19 02:02:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1460,6 +1460,7 @@ unset_polar()
 		(void) fprintf(stderr,"\n\tdummy variable is x for curves\n");
 	}
     }
+    raxis = FALSE;
 }
 
 
@@ -1887,7 +1888,7 @@ reset_command()
     }
 #endif
 
-    raxis = TRUE;
+    raxis = FALSE;
     for (i=2; i<MAX_TICLEVEL; i++)
 	ticscale[i] = 1;
     unset_timefmt();

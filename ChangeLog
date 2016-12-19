@@ -1,3 +1,9 @@
+2016-12-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c src/axis.h src/boundary.c src/graphics.c src/set.c
+	src/unset.c:  More tweaks of the raxis/polar grid code.  Allow polar
+	grid even in cartesian axis mode.
+
 2016-12-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (some_grid_selected gen_tics) src/unset.c set.c (set_grid)

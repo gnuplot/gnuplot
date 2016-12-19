@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.41 2016/12/12 17:21:35 sfeam Exp $
+ * $Id: boundary.c,v 1.43 2016/12/20 04:20:33 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -595,8 +595,17 @@ boundary(struct curve_points *plots, int count)
     setup_tics(&axis_array[FIRST_X_AXIS], 20);
     setup_tics(&axis_array[SECOND_X_AXIS], 20);
 
-    if (R_AXIS.ticmode)
+    /* Make sure that if polar grid is shown on a cartesian axis plot */
+    /* the rtics match up with the primary x tics.                    */
+    if (R_AXIS.ticmode && (polar || raxis)) {
+	if (bad_axis_range(&R_AXIS) || (!polar && R_AXIS.min != 0)) {
+	    set_explicit_range(&R_AXIS, 0.0, X_AXIS.max);
+	    R_AXIS.min = 0;
+	    R_AXIS.max = axis_array[FIRST_X_AXIS].max;
+	    int_warn(NO_CARET, "resetting rrange");
+	}
 	setup_tics(&axis_array[POLAR_AXIS], 10);
+    }
 
 
     /* Modify the bounding box to fit the aspect ratio, if any was
