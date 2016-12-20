@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1033 2016/12/04 20:45:44 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1034 2016/12/08 04:52:32 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -215,6 +215,10 @@ C
  * Customized plot legends (see `plot title`, `set key`, `multiple keys`).
 
  * New full-featured terminal driver for sixel graphics (see `sixelgd`).
+
+ * Polar grid elements (circles and radial lines) can be generated whether or
+   not the program is in polar mode for the purpose of interpreting input
+   coordinates.
 
 3 Version 5.0
 
@@ -9425,7 +9429,7 @@ Ffigure_missing
 
  Syntax:
        set grid {{no}{m}xtics} {{no}{m}ytics} {{no}{m}ztics}
-                {{no}{m}x2tics} {{no}{m}y2tics}
+                {{no}{m}x2tics} {{no}{m}y2tics} {{no}{m}rtics}
                 {{no}{m}cbtics}
                 {polar {<angle>}}
                 {layerdefault | front | back}
@@ -9445,11 +9449,11 @@ Ffigure_missing
  for major and minor grid lines, also via a predefined linestyle, as
  far as the active terminal driver supports this (see `set style line`).
 
- Additionally, a polar grid can be selected for 2D plots---circles are drawn
- to intersect the selected tics, and radial lines are drawn at definable
- intervals.  (The interval is given in degrees or radians, depending on the
- `set angles` setting.)  Note that a polar grid is no longer automatically
- generated in polar mode.
+ A polar grid can be selected for 2D plots.  Circles are drawn to intersect
+ major and/or minor tics along the r axis, and radial lines are drawn with a
+ spacing of <angle>.  This is the default action of of `set grid` if the
+ program is already in polar mode, but can be enabled explicitly by
+ `set grid polar <angle> rtics` whether or not the program is in polar mode.
 
  The pertinent tics must be enabled before `set grid` can draw them; `gnuplot`
  will quietly ignore instructions to draw grid lines at non-existent tics, but
@@ -12091,10 +12095,10 @@ Ffigure_multiple_keys
 ?set rtics
 ?show rtics
 ?rtics
- The `set rtics` command places tics along the polar axis. These will only be
- shown in polar plot mode.  The tics and labels are drawn to the right of the
- origin. The `mirror` keyword causes them to be drawn also to the left of the
- origin. See `polar`, `set xtics`, and `set mxtics` for discussion of keywords.
+ The `set rtics` command places tics along the polar axis.  The tics and labels
+ are drawn to the right of the origin. The `mirror` keyword causes them to be
+ drawn also to the left of the origin. See `polar`, `set xtics`, and
+ `set mxtics` for discussion of keywords.
 3 samples
 ?commands set samples
 ?commands show samples
