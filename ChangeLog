@@ -1,3 +1,8 @@
+2016-12-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/show.c src/set.c:  Repair a few places where axis_array[index].foo
+	was not replaced with axis->foo.
+
 2016-12-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c src/axis.h src/boundary.c src/graphics.c src/set.c

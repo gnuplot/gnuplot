@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.376 2016/11/14 19:59:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.377 2016/12/07 04:57:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -145,7 +145,7 @@ static void show_size __PROTO((void));
 static void show_origin __PROTO((void));
 static void show_term __PROTO((void));
 static void show_tics __PROTO((TBOOLEAN showx, TBOOLEAN showy, TBOOLEAN showz, TBOOLEAN showx2, TBOOLEAN showy2, TBOOLEAN showcb));
-static void show_mtics __PROTO((AXIS_INDEX));
+static void show_mtics __PROTO((struct axis *));
 static void show_timestamp __PROTO((void));
 static void show_range __PROTO((AXIS_INDEX axis));
 static void show_link __PROTO((void));
@@ -457,25 +457,25 @@ show_command()
 	show_tics(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
 	break;
     case S_MXTICS:
-	show_mtics(FIRST_X_AXIS);
+	show_mtics(&axis_array[FIRST_X_AXIS]);
 	break;
     case S_MYTICS:
-	show_mtics(FIRST_Y_AXIS);
+	show_mtics(&axis_array[FIRST_Y_AXIS]);
 	break;
     case S_MZTICS:
-	show_mtics(FIRST_Z_AXIS);
+	show_mtics(&axis_array[FIRST_Z_AXIS]);
 	break;
     case S_MCBTICS:
-	show_mtics(COLOR_AXIS);
+	show_mtics(&axis_array[COLOR_AXIS]);
 	break;
     case S_MX2TICS:
-	show_mtics(SECOND_X_AXIS);
+	show_mtics(&axis_array[SECOND_X_AXIS]);
 	break;
     case S_MY2TICS:
-	show_mtics(SECOND_Y_AXIS);
+	show_mtics(&axis_array[SECOND_Y_AXIS]);
 	break;
     case S_MRTICS:
-	show_mtics(POLAR_AXIS);
+	show_mtics(&R_AXIS);
 	break;
     case S_XYPLANE:
 	if (xyplane.absolute)
@@ -799,11 +799,11 @@ show_all()
     show_origin();
     show_term();
     show_tics(TRUE,TRUE,TRUE,TRUE,TRUE,TRUE);
-    show_mtics(FIRST_X_AXIS);
-    show_mtics(FIRST_Y_AXIS);
-    show_mtics(FIRST_Z_AXIS);
-    show_mtics(SECOND_X_AXIS);
-    show_mtics(SECOND_Y_AXIS);
+    show_mtics(&axis_array[FIRST_X_AXIS]);
+    show_mtics(&axis_array[FIRST_Y_AXIS]);
+    show_mtics(&axis_array[FIRST_Z_AXIS]);
+    show_mtics(&axis_array[SECOND_X_AXIS]);
+    show_mtics(&axis_array[SECOND_Y_AXIS]);
     show_xyzlabel("", "time", &timelabel);
     if (parametric || polar) {
 	if (!is_3d_plot)
@@ -2888,24 +2888,27 @@ show_tics(
 
 /* process 'show m[xyzx2y2cb]tics' commands */
 static void
-show_mtics(AXIS_INDEX axis)
+show_mtics(struct axis *axis)
 {
-    switch (axis_array[axis].minitics) {
+    char *name = axis_name(axis->index);
+
+    switch (axis->minitics) {
     case MINI_OFF:
-	fprintf(stderr, "\tminor %stics are off\n", axis_name(axis));
+	fprintf(stderr, "\tminor %stics are off\n", name);
 	break;
     case MINI_DEFAULT:
 	fprintf(stderr, "\
 \tminor %stics are off for linear scales\n\
-\tminor %stics are computed automatically for log scales\n", axis_name(axis), axis_name(axis));
+\tminor %stics are computed automatically for log scales\n", 
+	name, name);
 	break;
     case MINI_AUTO:
-	fprintf(stderr, "\tminor %stics are computed automatically\n", axis_name(axis));
+	fprintf(stderr, "\tminor %stics are computed automatically\n", name);
 	break;
     case MINI_USER:
 	fprintf(stderr, "\
 \tminor %stics are drawn with %d subintervals between major xtic marks\n",
-		axis_name(axis), (int) axis_array[axis].mtic_freq);
+		name, (int) axis->mtic_freq);
 	break;
     default:
 	int_error(NO_CARET, "Unknown minitic type in show_mtics()");
