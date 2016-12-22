@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.542 2016/12/19 02:02:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.543 2016/12/20 04:20:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -5542,7 +5542,7 @@ set_tic_prop(struct axis *this_axis)
 		    this_axis->miniticscale = 0.5;
 		    ++c_token;
 		} else {
-		    axis_array[axis].ticscale = real_expression();
+		    this_axis->ticscale = real_expression();
 		    if (equals(c_token, ",")) {
 			++c_token;
 			this_axis->miniticscale = real_expression();
@@ -5550,7 +5550,7 @@ set_tic_prop(struct axis *this_axis)
 			this_axis->miniticscale = 0.5 * this_axis->ticscale;
 		}
 	    } else if (almost_equals(c_token, "ro$tate")) {
-		axis_array[axis].tic_rotate = TEXT_VERTICAL;
+		this_axis->tic_rotate = TEXT_VERTICAL;
 		++c_token;
 		if (equals(c_token, "by")) {
 		    c_token++;
