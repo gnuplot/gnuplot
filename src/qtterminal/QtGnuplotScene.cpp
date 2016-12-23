@@ -461,7 +461,6 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 			m_zoomStopText->setPlainText(text); /// @todo font
 			m_zoomStopText->setPos(m_lastMousePos);
 			m_zoomRect->setRect(QRectF(m_zoomBoxCorner + QPointF(0.5, 0.5), m_lastMousePos + QPointF(0.5, 0.5)).normalized());
-			m_zoomRect->setZValue(32767);  // make sure guide box is on top
 		}
 	}
 	else if (type == GELineTo)
@@ -665,10 +664,13 @@ void QtGnuplotScene::resetItems()
 
 	m_zoomRect = addRect(QRect(), QPen(QColor(0, 0, 0, 200)), QBrush(QColor(0, 0, 255, 40)));
 	m_zoomRect->setVisible(false);
+	m_zoomRect->setZValue(32767);       // make sure guide box is on top
 	m_zoomStartText = addText("");
 	m_zoomStopText  = addText("");
 	m_zoomStartText->setVisible(false);
 	m_zoomStopText->setVisible(false);
+	m_zoomStartText->setZValue(32767);  // make sure guide box annotation is on top
+	m_zoomStopText->setZValue(32767);
 	m_horizontalRuler = addLine(QLine(0, 0, width(), 0) , QPen(QColor(0, 0, 0, 200)));
 	m_verticalRuler   = addLine(QLine(0, 0, 0, height()), QPen(QColor(0, 0, 0, 200)));
 	m_lineTo          = addLine(QLine()                 , QPen(QColor(0, 0, 0, 200)));

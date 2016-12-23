@@ -1,3 +1,8 @@
+2016-12-23  Daniel J Sebald <daniel.sebald@ieee.org>
+
+	* src/qtterminal/QtGnuplotScene.cpp:  Draw zoombox coordinates in front
+	of everything else.
+
 2016-12-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/show.c src/set.c:  Repair a few places where axis_array[index].foo
