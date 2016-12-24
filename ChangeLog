@@ -1,3 +1,7 @@
+2016-12-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/save.c:  Convert save tic/mtics routine to use axis pointers.
+
 2016-12-23  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* src/qtterminal/QtGnuplotScene.cpp:  Draw zoombox coordinates in front

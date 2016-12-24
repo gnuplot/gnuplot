@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.318 2016/11/14 23:29:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.319 2016/12/19 21:13:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -57,8 +57,8 @@ static char *RCSid() { return RCSid("$Id: save.c,v 1.318 2016/11/14 23:29:36 sfe
 
 static void save_functions__sub __PROTO((FILE *));
 static void save_variables__sub __PROTO((FILE *));
-static void save_tics __PROTO((FILE *, AXIS_INDEX));
-static void save_ptics __PROTO((FILE *, struct axis *));
+static void save_tics __PROTO((FILE *, struct axis *));
+static void save_mtics __PROTO((FILE *, struct axis *));
 static void save_zeroaxis __PROTO((FILE *,AXIS_INDEX));
 static void save_set_all __PROTO((FILE *));
 
@@ -757,41 +757,23 @@ set origin %g,%g\n",
 	fprintf(fp, " %g%c", ticscale[i], i<MAX_TICLEVEL-1 ? ',' : '\n');
     }
 
-#define SAVE_MINI(axis)							\
-    switch(axis_array[axis].minitics & TICS_MASK) {			\
-    case 0:								\
-	fprintf(fp, "set nom%stics\n", axis_name(axis));	\
-	break;								\
-    case MINI_AUTO:							\
-	fprintf(fp, "set m%stics\n", axis_name(axis));		\
-	break;								\
-    case MINI_DEFAULT:							\
-	fprintf(fp, "set m%stics default\n", axis_name(axis));	\
-	break;								\
-    case MINI_USER:							\
-	fprintf(fp, "set m%stics %f\n", axis_name(axis),	\
-		axis_array[axis].mtic_freq);				\
-	break;								\
-    }
+    save_mtics(fp, &axis_array[FIRST_X_AXIS]);
+    save_mtics(fp, &axis_array[FIRST_Y_AXIS]);
+    save_mtics(fp, &axis_array[FIRST_Z_AXIS]);
+    save_mtics(fp, &axis_array[SECOND_X_AXIS]);
+    save_mtics(fp, &axis_array[SECOND_Y_AXIS]);
+    save_mtics(fp, &axis_array[COLOR_AXIS]);
+    save_mtics(fp, &R_AXIS);
 
-    SAVE_MINI(FIRST_X_AXIS);
-    SAVE_MINI(FIRST_Y_AXIS);
-    SAVE_MINI(FIRST_Z_AXIS);	/* HBB 20000506: noticed mztics were not saved! */
-    SAVE_MINI(SECOND_X_AXIS);
-    SAVE_MINI(SECOND_Y_AXIS);
-    SAVE_MINI(COLOR_AXIS);
-    SAVE_MINI(POLAR_AXIS);
-#undef SAVE_MINI
-
-    save_tics(fp, FIRST_X_AXIS);
-    save_tics(fp, FIRST_Y_AXIS);
-    save_tics(fp, FIRST_Z_AXIS);
-    save_tics(fp, SECOND_X_AXIS);
-    save_tics(fp, SECOND_Y_AXIS);
-    save_tics(fp, COLOR_AXIS);
-    save_tics(fp, POLAR_AXIS);
+    save_tics(fp, &axis_array[FIRST_X_AXIS]);
+    save_tics(fp, &axis_array[FIRST_Y_AXIS]);
+    save_tics(fp, &axis_array[FIRST_Z_AXIS]);
+    save_tics(fp, &axis_array[SECOND_X_AXIS]);
+    save_tics(fp, &axis_array[SECOND_Y_AXIS]);
+    save_tics(fp, &axis_array[COLOR_AXIS]);
+    save_tics(fp, &R_AXIS);
     for (axis=0; axis<num_parallel_axes; axis++)
-	save_ptics(fp, &parallel_axis[axis]);
+	save_tics(fp, &parallel_axis[axis]);
 
 #define SAVE_AXISLABEL_OR_TITLE(name,suffix,lab)			 \
     {									 \
@@ -1095,7 +1077,7 @@ set origin %g,%g\n",
 
 
 static void
-save_ptics(FILE *fp, struct axis *this_axis)
+save_tics(FILE *fp, struct axis *this_axis)
 {
     if ((this_axis->ticmode & TICS_MASK) == NO_TICS) {
 	fprintf(fp, "unset %stics\n", axis_name(this_axis->index));
@@ -1189,9 +1171,24 @@ save_ptics(FILE *fp, struct axis *this_axis)
 }
 
 static void
-save_tics(FILE *fp, AXIS_INDEX axis)
+save_mtics(FILE *fp, struct axis *axis)
 {
-    save_ptics(fp, &axis_array[axis]);
+    char *name = axis_name(axis->index);
+
+    switch(axis->minitics & TICS_MASK) {
+    case 0:
+	fprintf(fp, "set nom%stics\n", name);
+	break;
+    case MINI_AUTO:
+	fprintf(fp, "set m%stics\n", name);
+	break;
+    case MINI_DEFAULT:
+	fprintf(fp, "set m%stics default\n", name);
+	break;
+    case MINI_USER:
+	fprintf(fp, "set m%stics %f\n", name, axis->mtic_freq);
+	break;
+    }
 }
 
 void
