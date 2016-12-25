@@ -1,3 +1,8 @@
+2016-12-25  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wmenu.c src/win/wgnuplot.mnu:  Show text for toolbar icons
+	as tooltips, which can be a bit more descriptive.
+
 2016-12-24  Vicente Olivert Riera <Vincent.Riera@imgtec.com>
 
 	* configure.ac:  Keep track of gdlib-config path found during configure.

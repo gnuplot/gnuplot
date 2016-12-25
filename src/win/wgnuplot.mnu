@@ -742,26 +742,26 @@ Fu&nctions
 	Replot;4
 		replot{ENTER}
 [Button]
-	Open;7
+	Open script file;7
 		load '[OPEN]load[EOS]*.plt[EOS]'{ENTER}
 [Button]
-	Save;8
+	Save script file;8
 		save '[SAVE]save[EOS]*.plt[EOS]'{ENTER}
 [Button]
-	ChDir;31
+	Change directory;31
 		cd '[DIRECTORY]New directory?[EOS]'{ENTER}
 [Button]
-	Print;14
-		set terminal [INPUT]Terminal type?{ENTER}set output "PRN"{ENTER}replot{ENTER}set terminal win{ENTER}set output{ENTER}
+	Send terminal output to printer;14
+		set term push; set terminal [INPUT]Terminal type?{ENTER}set output "PRN"{ENTER}replot{ENTER}set term pop{ENTER}unset output{ENTER}
 [Button]
-	PrtSc;14
+	Print current screen contents (win/wxt/qt);14
 		screendump{ENTER}
 [Button]
-	Prev;15
+	Previous history entry;15
 		{^P}
 [Button]
-	Next;16
+	Next history entry;16
 		{^N}
 [Button]
-	Options;10
+	Options menu;10
 		[OPTIONS]

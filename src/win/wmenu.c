@@ -1,5 +1,5 @@
 /*
- * $Id: wmenu.c,v 1.36 2016/08/09 11:55:25 markisch Exp $Id: wmenu.c,v 1.36 2016/08/09 11:55:25 markisch Exp $
+ * $Id: wmenu.c,v 1.37 2016/10/08 19:09:16 markisch Exp $Id: wmenu.c,v 1.37 2016/10/08 19:09:16 markisch Exp $
  */
 
 /* GNUPLOT - win/wmenu.c */
@@ -744,7 +744,7 @@ LoadMacros(LPTW lptw)
 	}
     }
 
-    if ( (lpmw->nCountMenu - lpmw->nButton) > 0 ) {
+    if ((lpmw->nCountMenu - lpmw->nButton) > 0) {
 	/* we have a menu bar so put it on the window */
 	SetMenu(lptw->hWndParent, lpmw->hMenu);
 	DrawMenuBar(lptw->hWndParent);
@@ -754,13 +754,15 @@ LoadMacros(LPTW lptw)
 	goto cleanup;		/* no buttons */
 
     /* create a toolbar */
-    lpmw->hToolbar = CreateWindowEx(0, TOOLBARCLASSNAME, NULL,
-				    WS_CHILD | TBSTYLE_LIST, // TBSTYLE_WRAPABLE
+    lpmw->hToolbar = CreateWindowEx(0,
+				    TOOLBARCLASSNAME, NULL,
+				    WS_CHILD | TBSTYLE_LIST | TBSTYLE_TOOLTIPS,
 				    0, 0, 0, 0,
 				    lptw->hWndParent, (HMENU)ID_TOOLBAR, lptw->hInstance, NULL);
     if (lpmw->hToolbar == NULL)
 	goto cleanup;
 
+    SendMessage(lpmw->hToolbar, TB_SETEXTENDEDSTYLE, 0, (LPARAM) TBSTYLE_EX_MIXEDBUTTONS | TBSTYLE_EX_DOUBLEBUFFER | TBSTYLE_EX_HIDECLIPPEDBUTTONS);
     SendMessage(lpmw->hToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
     bitmap.hInst = HINST_COMMCTRL;
 
@@ -773,11 +775,11 @@ LoadMacros(LPTW lptw)
     /* only load standard bitmaps if required. */
     if (bLoadStandardButtons) {
 	bitmap.nID = (dpi > 96)  ? IDB_STD_LARGE_COLOR : IDB_STD_SMALL_COLOR;
-	SendMessage(lpmw->hToolbar, TB_ADDBITMAP, 0, (WPARAM)&bitmap);
+	SendMessage(lpmw->hToolbar, TB_ADDBITMAP, 0, (LPARAM)&bitmap);
 	bitmap.nID = (dpi > 96)  ? IDB_HIST_LARGE_COLOR : IDB_HIST_SMALL_COLOR;
-	SendMessage(lpmw->hToolbar, TB_ADDBITMAP, 0, (WPARAM)&bitmap);
+	SendMessage(lpmw->hToolbar, TB_ADDBITMAP, 0, (LPARAM)&bitmap);
 	bitmap.nID = (dpi > 96)  ? IDB_VIEW_LARGE_COLOR : IDB_VIEW_SMALL_COLOR;
-	SendMessage(lpmw->hToolbar, TB_ADDBITMAP, 0, (WPARAM)&bitmap);
+	SendMessage(lpmw->hToolbar, TB_ADDBITMAP, 0, (LPARAM)&bitmap);
     }
 
     /* create buttons */
@@ -802,7 +804,7 @@ LoadMacros(LPTW lptw)
 	    wfname = UnicodeText(fname, S_ENC_DEFAULT);
 	    bitmap.hInst = NULL;
 	    bitmap.nID = (UINT_PTR) gdiplusLoadBitmap(wfname, ButtonSize);
-	    SendMessage(lpmw->hToolbar, TB_ADDBITMAP, 0, (WPARAM)&bitmap);
+	    SendMessage(lpmw->hToolbar, TB_ADDBITMAP, 0, (LPARAM)&bitmap);
 	    free(fname);
 	    free(wfname);
 #else
@@ -814,7 +816,7 @@ LoadMacros(LPTW lptw)
 	}
 	button.idCommand = lpmw->hButtonID[i];
 	button.fsState = TBSTATE_ENABLED;
-	button.fsStyle = BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_NOPREFIX;
+	button.fsStyle = BTNS_AUTOSIZE | BTNS_NOPREFIX;
 	if (MacroCommand(lptw, lpmw->hButtonID[i]) == OPTIONS)
 	    button.fsStyle |= BTNS_WHOLEDROPDOWN;
 #ifdef UNICODE
@@ -833,12 +835,14 @@ LoadMacros(LPTW lptw)
     ShowWindow(lpmw->hToolbar, SW_SHOW);
 
     /* move top of client text window down to allow space for toolbar */
-    GetClientRect(lpmw->hToolbar, &rect);
-    lptw->ButtonHeight = rect.bottom + 1;
+    GetWindowRect(lpmw->hToolbar, &rect);
+    lptw->ButtonHeight = rect.bottom - rect.top + 1;
     lptw->ButtonHeight++;
     GetClientRect(lptw->hWndParent, &rect);
-    SetWindowPos(lptw->hWndText, (HWND)NULL, 0, lptw->ButtonHeight,
-		rect.right, rect.bottom - lptw->ButtonHeight - lptw->StatusHeight,
+    SetWindowPos(lptw->hWndText, (HWND)NULL,
+		0, lptw->ButtonHeight,
+		rect.right,
+		rect.bottom - lptw->ButtonHeight - lptw->StatusHeight,
 		SWP_NOZORDER | SWP_NOACTIVATE);
     goto cleanup;
 
