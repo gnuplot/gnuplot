@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.75 2016/09/10 05:46:21 sfeam Exp $
+# $Id: all.dem,v 1.76 2016/11/05 21:21:07 sfeam Exp $
 #
 # Executes all demos (OK, MOST demos) in this directory.
 # This serves as a series of unit tests for non-interactive capabilities.
@@ -71,6 +71,10 @@ reset
 
 print "******************** file poldat.dem ********************"
 load "poldat.dem"
+reset
+
+print "******************** file ttics.dem ********************"
+load "ttics.dem"
 reset
 
 print "******************** file boxplot.dem ********************"
