@@ -358,12 +358,20 @@ set datafile separator "\t"
 plot demo . 'cities.dat' using 5:4:($3 < 5000 ? "-" : CityName(1,3)) with labels
 
 #
+# Following example plots will be set in colour mode for pdf output
+#
+if (GPVAL_TERM eq "pdfcairo") \
+    set term pdfcairo color font fontspec size 3.5,2.0 dashlength 0.2
+
+#
 # Polar plot
 # ==========
 #
 reset
 set output out . 'figure_polar' . ext
 unset border
+set tmargin 2
+set bmargin 2
 set style fill   solid 0.50 border
 set grid polar 0.523599 lt 0 lw 1
 set key title "bounding radius 2.5"
@@ -371,9 +379,10 @@ set key at screen 0.95, screen 0.95
 set key noinvert samplen 0.7
 set polar
 set size ratio 1 1,1
-set noxtics
-set noytics
-set rrange [ 0.100000 : 4.00000 ]
+unset xtics
+unset ytics
+set ttics ("0" 0, "π/2" 90, "π" 180, "3π/2" 270)
+set rrange [ 0.1 : 4.0 ]
 butterfly(x)=exp(cos(x))-2*cos(4*x)+sin(x/12)**5
 GPFUN_butterfly = "butterfly(x)=exp(cos(x))-2*cos(4*x)+sin(x/12)**5"
 plot 3.+sin(t)*cos(5*t) with filledcurve above r=2.5 notitle, \
@@ -455,12 +464,6 @@ do for [power = 0:3] {
 }
 unset multiplot
 
-
-#
-# Following example plots will be set in colour mode for pdf output
-#
-if (GPVAL_TERM eq "pdfcairo") \
-    set term pdfcairo color font fontspec size 3.5,2.0 dashlength 0.2
 
 #
 # Filledcurves used to represent error on y

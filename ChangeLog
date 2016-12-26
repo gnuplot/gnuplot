@@ -1,3 +1,16 @@
+2016-12-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c src/axis.h src/tables.c src/tables.h:
+	Define new axis THETA_AXIS to hold tic definitions for labeled angles
+	on perimeter of polar grid.
+
+	* src/graphics.c (ttick_callback) src/save.c src/set.c src/show.c
+	src/unset.c:  Support for "set ttics" "set mttics" and placement of
+	labeled angles on perimeter of polar grid.
+
+	* demo/ttics.dem docs/gnuplot.doc docs/plotstyles.gnu:
+	Demo and documentation for "set ttics".
+
 2016-12-25  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wmenu.c src/win/wgnuplot.mnu:  Show text for toolbar icons

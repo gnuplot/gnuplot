@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.319 2016/12/19 21:13:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.320 2016/12/24 19:51:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -348,8 +348,9 @@ save_set_all(FILE *fp)
     SAVE_FORMAT(SECOND_X_AXIS);
     SAVE_FORMAT(SECOND_Y_AXIS);
     SAVE_FORMAT(FIRST_Z_AXIS );
-    SAVE_FORMAT(COLOR_AXIS );
-    SAVE_FORMAT(POLAR_AXIS );
+    SAVE_FORMAT(COLOR_AXIS);
+    SAVE_FORMAT(POLAR_AXIS);
+    fprintf(fp, "set ttics format \"%s\"\n", THETA_AXIS.formatstring);
 #undef SAVE_FORMAT
 
     fprintf(fp, "set timefmt \"%s\"\n", timefmt);
@@ -764,6 +765,7 @@ set origin %g,%g\n",
     save_mtics(fp, &axis_array[SECOND_Y_AXIS]);
     save_mtics(fp, &axis_array[COLOR_AXIS]);
     save_mtics(fp, &R_AXIS);
+    save_mtics(fp, &THETA_AXIS);
 
     save_tics(fp, &axis_array[FIRST_X_AXIS]);
     save_tics(fp, &axis_array[FIRST_Y_AXIS]);
@@ -772,6 +774,7 @@ set origin %g,%g\n",
     save_tics(fp, &axis_array[SECOND_Y_AXIS]);
     save_tics(fp, &axis_array[COLOR_AXIS]);
     save_tics(fp, &R_AXIS);
+    save_tics(fp, &THETA_AXIS);
     for (axis=0; axis<num_parallel_axes; axis++)
 	save_tics(fp, &parallel_axis[axis]);
 

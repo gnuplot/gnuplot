@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.212 2016/12/19 02:02:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.213 2016/12/20 04:20:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -79,6 +79,13 @@ const AXIS default_axis_state = DEFAULT_AXIS_STRUCT;
 /* EAM DEBUG - Dynamic allocation of parallel axes. */
 AXIS *parallel_axis = NULL;
 int num_parallel_axes = 0;
+
+/* Separate axis THETA for tics around perimeter of polar grid
+ * Initialize to blank rather than DEFAULT_AXIS_STRUCT because
+ * it is too different from "real" axes for the defaults to make sense.
+ * The fields we do need are initialized in unset_polar().
+ */
+AXIS THETA_AXIS = {0};
 
 /* HBB 20000506 new variable: parsing table for use with the table
  * module, to help generalizing set/show/unset/save, where possible */
@@ -259,6 +266,9 @@ char *
 axis_name(AXIS_INDEX axis)
 {
     static char name[] = "primary 00 ";
+    if (axis == THETA_index)
+	return "t";
+
     if (axis >= PARALLEL_AXES) {
 	sprintf(name, "paxis %d ", axis-PARALLEL_AXES+1);
 	return name;

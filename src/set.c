@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.543 2016/12/20 04:20:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.544 2016/12/22 04:55:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -166,6 +166,7 @@ static void set_linestyle __PROTO((struct linestyle_def **head, lp_class destina
 static void set_arrowstyle __PROTO((void));
 static int assign_arrowstyle_tag __PROTO((void));
 static int set_tic_prop __PROTO((struct axis *));
+static void set_mttics __PROTO((struct axis *this_axis));
 
 static void check_palette_grayscale __PROTO((void));
 static int set_palette_defined __PROTO((void));
@@ -550,10 +551,14 @@ set_command()
 	    set_tic_prop(&axis_array[COLOR_AXIS]);
 	    break;
 	case S_RTICS:
-	case S_NORTICS:
 	case S_MRTICS:
-	case S_NOMRTICS:
 	    set_tic_prop(&axis_array[POLAR_AXIS]);
+	    break;
+	case S_TTICS:
+	    set_tic_prop(&THETA_AXIS);
+	    break;
+	case S_MTTICS:
+	    set_mttics(&THETA_AXIS);
 	    break;
 	case S_XDATA:
 	    set_timedata(&axis_array[FIRST_X_AXIS]);
@@ -5504,6 +5509,8 @@ set_tic_prop(struct axis *this_axis)
 	sfxptr = &nocmd[strlen(nocmd)];
 	(void) strcpy(sfxptr, "t$ics");	/* STRING */
     }
+    if (axis == THETA_AXIS.index)
+	cmdptr = "ttics";
 
     if (almost_equals(c_token, cmdptr) || axis >= PARALLEL_AXES) {
 	TBOOLEAN axisset = FALSE;
@@ -5735,6 +5742,31 @@ set_tic_prop(struct axis *this_axis)
 	match = 1;
     }
     return (match);
+}
+
+/*
+ * minor tics around perimeter of polar grid circle (theta).
+ * This version works like other axes (parameter is # of subintervals)
+ * but it might be more reasonable to simply take increment in degress.
+ */
+static void
+set_mttics(struct axis *this_axis)
+{
+    c_token++;
+
+    if (END_OF_COMMAND) {
+	this_axis->minitics = MINI_AUTO;
+	++c_token;
+    } else {
+	int freq = int_expression();
+	if (freq > 0 && freq < 361) {
+	    this_axis->mtic_freq = freq;
+	    this_axis->minitics = MINI_USER;
+	} else {
+	    this_axis->minitics = MINI_AUTO;
+	    int_warn(c_token-1,"Expecting number of intervals");
+	}
+    }
 }
 
 /* process a 'set {x/y/z}label command */

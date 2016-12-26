@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1034 2016/12/08 04:52:32 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1035 2016/12/20 19:59:59 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -217,8 +217,9 @@ C
  * New full-featured terminal driver for sixel graphics (see `sixelgd`).
 
  * Polar grid elements (circles and radial lines) can be generated whether or
-   not the program is in polar mode for the purpose of interpreting input
-   coordinates.
+ not the program is in polar mode for the purpose of interpreting input
+ coordinates. Tickmarks and labels around the perimeter of the polar grid
+ are controlled by `set ttics`.  See `ttics`.
 
 3 Version 5.0
 
@@ -4428,7 +4429,7 @@ Ffigure_polar
  interpret input 2D coordinates as <angle>,<radius> rather than <x>,<y>.
  Many, but not all, of the 2D plotting styles work in polar mode.
  The figure shows a combination of plot styles `lines` and `filledcurves`.
- See `set polar`, `set rrange`, `set size square`.
+ See `set polar`, `set rrange`, `set size square`, `set ttics`.
 2 Bee swarm plots
 ?beeswarm
 ?bee swarm
@@ -9449,11 +9450,13 @@ Ffigure_missing
  for major and minor grid lines, also via a predefined linestyle, as
  far as the active terminal driver supports this (see `set style line`).
 
- A polar grid can be selected for 2D plots.  Circles are drawn to intersect
- major and/or minor tics along the r axis, and radial lines are drawn with a
- spacing of <angle>.  This is the default action of of `set grid` if the
- program is already in polar mode, but can be enabled explicitly by
- `set grid polar <angle> rtics` whether or not the program is in polar mode.
+ A polar grid can be drawn for 2D plots.  This is the default action of 
+ `set grid` if the program is already in polar mode, but can be enabled
+ explicitly by `set grid polar <angle> rtics` whether or not the program is in
+ polar mode.  Circles are drawn to intersect major and/or minor tics along the
+ r axis, and radial lines are drawn with a spacing of <angle>.  Tic marks
+ around the perimeter are controlled by `set ttics`, but these do not produce
+ radial grid lines.
 
  The pertinent tics must be enabled before `set grid` can draw them; `gnuplot`
  will quietly ignore instructions to draw grid lines at non-existent tics, but
@@ -12014,7 +12017,8 @@ Ffigure_multiple_keys
  3 units of the origin.  This has the effect of limiting x and y to [-3:3].
 
  You may want to `set size square` to have `gnuplot` try to make the aspect
- ratio equal to unity, so that circles look circular.
+ ratio equal to unity, so that circles look circular.  Tic marks around the
+ perimeter can be specified using `set ttics`.
  See also
 ^ <a href="http://www.gnuplot.info/demo/polar.html">
  polar demos (polar.dem)
@@ -13213,6 +13217,16 @@ Ffigure_multiple_keys
  The `set trange` command sets the parametric range used to compute x and y
  values when in parametric or polar modes.  Please see `set xrange` for
  details.
+3 ttics
+?commands set ttics
+?commands show ttics
+?set ttics
+?show ttics
+?ttics
+ The `set ttics` command places tics around the perimeter (largest circle)
+ of the polar grid.  The angular position is always given in degrees.
+ The full perimeter can be labeled regardless of the current trange.
+ Additional properties of the tic marks can be set. See `xtics`.
 3 urange
 ?commands set urange
 ?commands show urange

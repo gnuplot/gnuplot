@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.377 2016/12/07 04:57:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.378 2016/12/22 05:02:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -477,6 +477,9 @@ show_command()
     case S_MRTICS:
 	show_mtics(&R_AXIS);
 	break;
+    case S_MTTICS:
+	show_mtics(&THETA_AXIS);
+	break;
     case S_XYPLANE:
 	if (xyplane.absolute)
 	    fprintf(stderr, "\txyplane intercepts z axis at %g\n", xyplane.z);
@@ -612,6 +615,9 @@ show_command()
 	break;
     case S_RTICS:
 	show_ticdef(POLAR_AXIS);
+	break;
+    case S_TTICS:
+	show_ticdefp(&THETA_AXIS);
 	break;
     case S_X2TICS:
     case S_X2DTICS:

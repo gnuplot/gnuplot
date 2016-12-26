@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.247 2016/12/19 02:02:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.248 2016/12/20 04:20:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -396,6 +396,9 @@ unset_command()
     case S_RTICS:
 	unset_tics(&axis_array[POLAR_AXIS]);
 	break;
+    case S_TTICS:
+	unset_tics(&THETA_AXIS);
+	break;
     case S_PAXIS:
 	i = int_expression();
 	if (almost_equals(c_token, "tic$s")) {
@@ -510,6 +513,9 @@ unset_command()
 	break;
     case S_MRTICS:
 	unset_minitics(&axis_array[POLAR_AXIS]);
+	break;
+    case S_MTTICS:
+	unset_minitics(&THETA_AXIS);
 	break;
     case S_XDATA:
 	unset_timedata(FIRST_X_AXIS);
@@ -1461,6 +1467,17 @@ unset_polar()
 	}
     }
     raxis = FALSE;
+
+    /* Initialize THETA axis structure */
+    THETA_AXIS.min = 0.;
+    THETA_AXIS.max = 359.;
+    THETA_AXIS.ticdef = default_axis_ticdef;
+    THETA_AXIS.index = THETA_index;
+    free(THETA_AXIS.formatstring);
+    THETA_AXIS.formatstring = gp_strdup(DEF_FORMAT);
+    THETA_AXIS.ticscale = 1.0;
+    THETA_AXIS.miniticscale = 0.5;
+    THETA_AXIS.tic_in = TRUE;
 }
 
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.534 2016/12/19 02:02:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.535 2016/12/20 04:20:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -123,6 +123,8 @@ static TBOOLEAN two_edge_intersect __PROTO((struct coordinate GPHUGE * points, i
 
 static void ytick2d_callback __PROTO((struct axis *, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels));
 static void xtick2d_callback __PROTO((struct axis *, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels));
+static void ttick_callback __PROTO((struct axis *, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels));
+
 static int histeps_compare __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
 
 static void get_arrow __PROTO((struct arrow_def* arrow, int* sx, int* sy, int* ex, int* ey));
@@ -201,6 +203,7 @@ place_grid(int layer)
     struct termentry *t = term;
     int save_lgrid = grid_lp.l_type;
     int save_mgrid = mgrid_lp.l_type;
+    BoundingBox *clip_save = clip_area;
 
     term_apply_lp_properties(&border_lp);	/* border linetype */
     largest_polar_circle = 0;
@@ -233,6 +236,8 @@ place_grid(int layer)
     x_axis = FIRST_X_AXIS;
     y_axis = FIRST_Y_AXIS;
 
+    clip_area = &canvas;
+
     /* POLAR GRID circles */
     if (R_AXIS.ticmode && (raxis || polar)) {
 	/* Piggyback on the xtick2d_callback.  Avoid a call to the full    */
@@ -258,7 +263,7 @@ place_grid(int layer)
 	int ox = map_x(0);
 	int oy = map_y(0);
 	term_apply_lp_properties(&grid_lp);
-	if (largest_polar_circle <=0)
+	if (largest_polar_circle <= 0)
 	    largest_polar_circle = R_AXIS.max;
 	for (theta = 0; theta < 6.29; theta += polar_grid_angle) {
 	    int x = map_x(largest_polar_circle * cos(theta));
@@ -267,9 +272,19 @@ place_grid(int layer)
 	}
     }
 
+    /* POLAR GRID tickmarks along the perimeter of the outer circle */
+    if (THETA_AXIS.ticmode && R_AXIS.gridmajor) {
+	term_apply_lp_properties(&border_lp);
+	if (largest_polar_circle <= 0)
+	    largest_polar_circle = R_AXIS.max;
+	copy_or_invent_formatstring(&THETA_AXIS);
+	gen_tics(&THETA_AXIS, ttick_callback);
+    }
+
     /* Restore the grid line types if we had turned them off to draw labels only */
     grid_lp.l_type = save_lgrid;
     mgrid_lp.l_type = save_mgrid;
+    clip_area = clip_save;
 }
 
 static void
@@ -3535,6 +3550,64 @@ ytick2d_callback(
 			this_axis->ticdef.font);
 	ignore_enhanced(FALSE);
 	term_apply_lp_properties(&border_lp);	/* reset to border linetype */
+    }
+}
+
+/* called by gen_ticks to place ticmarks on perimeter of polar grid circle */
+/* also uses global tic_start, tic_direction, tic_text and tic_just */
+static void
+ttick_callback(
+    struct axis *this_axis,
+    double place,
+    char *text,
+    int ticlevel,
+    struct lp_style_type grid,	/* grid.l_type == LT_NODRAW means no grid */
+    struct ticmark *userlabels)	/* User-specified tic labels */
+{
+    int xl, yl; /* Inner limit of ticmark */
+    int xu, yu; /* Outer limit of ticmark */
+    int text_x, text_y;
+    double delta = 0.05 * tic_scale(ticlevel, this_axis) * (this_axis->tic_in ? -1 : 1);
+    double theta = place * DEG2RAD;
+    double cos_t = largest_polar_circle * cos(theta);
+    double sin_t = largest_polar_circle * sin(theta);
+
+    /* Skip label if we've already written a user-specified one here */
+    while (userlabels) {
+	double here = userlabels->position;
+	if (abs(here - place) <= 0.02) {
+	    text = NULL;
+	    break;
+	}
+	userlabels = userlabels->next;
+    }
+
+    xl = map_x(0.95 * cos_t);
+    yl = map_y(0.95 * sin_t);
+    xu = map_x(cos_t);
+    yu = map_y(sin_t);
+    text_x = xu + (xu-xl) * (2. + this_axis->ticdef.offset.x);
+    text_y = yu + (yu-yl) * (2. + this_axis->ticdef.offset.x);
+
+    xl = map_x( (1.+delta) * cos_t);
+    yl = map_y( (1.+delta) * sin_t);
+    if (this_axis->ticmode & TICS_MIRROR) {
+	xu = map_x( (1.-delta) * cos_t);
+	yu = map_y( (1.-delta) * sin_t);
+    }
+
+    term->move(xl,yl);
+    term->vector(xu,yu);
+
+    if (text) {
+	/* The normal meaning of "offset" as x/y displacement doesn't work well */
+	/* for theta tic labels. Use it as a radial offset instead */
+	if (this_axis->ticdef.textcolor.type != TC_DEFAULT)
+	    apply_pm3dcolor(&(this_axis->ticdef.textcolor));
+	write_multiline(text_x, text_y, text,
+		tic_hjust, tic_vjust, rotate_tics, /* FIXME: these are not correct */
+		this_axis->ticdef.font);
+	term_apply_lp_properties(&border_lp);
     }
 }
 

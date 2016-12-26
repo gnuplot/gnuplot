@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.158 2016/12/13 21:57:21 sfeam Exp $
+ * $Id: axis.h,v 1.159 2016/12/20 04:20:33 sfeam Exp $
  *
  */
 
@@ -95,6 +95,7 @@ typedef enum AXIS_INDEX {
 
 /* sample axis doesn't need mtics, so use the slot to hold sample interval */
 # define SAMPLE_INTERVAL mtic_freq
+# define THETA_index 1234	/* Used to identify THETA_AXIS */
 
 /* What kind of ticmarking is wanted? */
 typedef enum en_ticseries_type {
@@ -382,6 +383,9 @@ extern TBOOLEAN inside_zoom;
 
 /* axes being used by the current plot */
 extern AXIS_INDEX x_axis, y_axis, z_axis;
+
+extern struct axis THETA_AXIS;
+
 /* macros to reduce code clutter caused by the array notation, mainly
  * in graphics.c and fit.c */
 #define X_AXIS axis_array[x_axis]
