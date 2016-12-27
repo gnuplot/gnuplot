@@ -82,6 +82,7 @@
     <li><a href="nonlinear1.html">broken axes</a></li>
     <li><a href="polar.html">polar coords</a></li>
     <li><a href="poldat.html">polar data</a></li>
+    <li><a href="ttics.html">polar grid</a></li>
     <li><a href="world.html">cylindrical/spherical</a></li>
     <li><a href="timedat.html">time/date coords</a></li>
     </ul>
@@ -210,7 +211,7 @@
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated November 2016</i>
+    <i>This page generated December 2016</i>
     </td>
 
     <td>
@@ -231,4 +232,4 @@
     
 </tr>
 </tbody></table>
-</body></html>
+/body></html>
