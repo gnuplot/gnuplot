@@ -1,3 +1,13 @@
+2016-12-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c: Do not allow the axis range on polar axis R to invert.
+	Bug #1880
+
+2016-12-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c src/unset.c:  Accept only polar_grid_angle > 0.
+	Bug #1888
+
 2016-12-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c:  Fuzz-testing found a crash from trying to adjust the

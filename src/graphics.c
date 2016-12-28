@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.30 2016/07/05 20:47:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.31 2016/07/21 19:00:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -252,7 +252,7 @@ place_grid(int layer)
     }
 
     /* Radial lines */
-    if (polar_grid_angle) {
+    if (polar_grid_angle > 0) {
 	double theta = 0;
 	int ox = map_x(0);
 	int oy = map_y(0);
@@ -3319,7 +3319,7 @@ xtick2d_callback(
     if (grid.l_type > LT_NODRAW) {
 	(t->layer)(TERM_LAYER_BEGIN_GRID);
 	term_apply_lp_properties(&grid);
-	if (polar_grid_angle) {
+	if (polar_grid_angle > 0) {
 	    double x = place, y = 0, s = sin(0.1), c = cos(0.1);
 	    int i;
 	    int ogx = map_x(x);
@@ -3431,7 +3431,7 @@ ytick2d_callback(
     if (grid.l_type > LT_NODRAW) {
 	(t->layer)(TERM_LAYER_BEGIN_GRID);
 	term_apply_lp_properties(&grid);
-	if (polar_grid_angle) {
+	if (polar_grid_angle > 0) {
 	    double x = 0, y = place, s = sin(0.1), c = cos(0.1);
 	    int i;
 	    if (place > largest_polar_circle)
