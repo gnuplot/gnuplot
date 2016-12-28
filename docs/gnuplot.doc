@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1035 2016/12/20 19:59:59 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1036 2016/12/26 23:46:25 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -13225,7 +13225,7 @@ Ffigure_multiple_keys
 ?ttics
  The `set ttics` command places tics around the perimeter (largest circle)
  of the polar grid.  The angular position is always given in degrees.
- The full perimeter can be labeled regardless of the current trange.
+ The full perimeter can be labeled regardless of the current t axis range.
  Additional properties of the tic marks can be set. See `xtics`.
 3 urange
 ?commands set urange

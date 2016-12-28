@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.544 2016/12/22 04:55:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.545 2016/12/26 23:46:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -6500,6 +6500,14 @@ void
 rrange_to_xy()
 {
     double min;
+
+    /* An inverted R axis makes no sense */
+    if (R_AXIS.set_min > R_AXIS.set_max) {
+	min = R_AXIS.set_max;
+	R_AXIS.set_max = R_AXIS.set_min;
+	R_AXIS.set_min = min;
+    }
+
     if (R_AXIS.set_autoscale & AUTOSCALE_MIN)
 	min = 0;
     else
