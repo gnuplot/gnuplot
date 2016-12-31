@@ -1,3 +1,9 @@
+2016-12-31  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c (drawgraph):  Fix incorrect determination for
+	drawing to a metafile which caused point symbols to be drawn as
+	a bitmap.
+
 2016-12-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c: Do not allow the axis range on polar axis R to invert.
@@ -118,6 +124,10 @@
 	mousing hotkeys +/- must take into account nonlinear axes.
 	Nonlinear axes part 20
 	Bug #1883
+
+2016-12-10  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/util.c (strappend):  Fix insufficient memory allocation.
 
 2016-12-07  Ethan A Merritt  <merritt@u.washington.edu>
 
