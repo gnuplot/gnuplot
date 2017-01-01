@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.93 2016/09/19 04:40:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.94 2016/10/23 23:14:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1102,6 +1102,19 @@ f_power(union argument *arg)
     default:
 	BAD_TYPE(a.type)
     }
+
+    /* Catch underflow and return 0 */
+    /* Note: fpclassify() is an ISOC99 macro found also in other libc implementations */
+#ifdef fpclassify
+    if (errno == ERANGE && result.type == CMPLX) {
+	int fperror = fpclassify(result.v.cmplx_val.real);
+	if (fperror == FP_ZERO || fperror == FP_SUBNORMAL) {
+	    result.v.cmplx_val.real = 0.0;
+	    errno = 0;
+	}
+    }
+#endif
+
     push(&result);
 }
 

@@ -1,3 +1,10 @@
+2017-01-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/internal.c (f_power): Use ISOC99 macro fpclassify(), if present,
+	to detect floating underflow from evaluating X**Y.  Return 0.0 rather
+	than UNDEFINED.
+	Bug #1877
+
 2017-01-01  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/qtterminal/QtGnuplotWindow (print):  QPrinterDialog requires
