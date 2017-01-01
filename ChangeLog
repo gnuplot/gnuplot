@@ -1,3 +1,9 @@
+2017-01-01  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/qtterminal/QtGnuplotWindow (print):  QPrinterDialog requires
+	a parent on Windows.  Set a generic document name.  Disable page
+	range option in print dialog.
+
 2016-12-31  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (drawgraph):  Fix incorrect determination for

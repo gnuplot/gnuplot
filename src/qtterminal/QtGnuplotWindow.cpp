@@ -153,7 +153,10 @@ void QtGnuplotWindow::on_keyAction()
 void QtGnuplotWindow::print()
 {
 	QPrinter printer;
-	if (QPrintDialog(&printer).exec() == QDialog::Accepted)
+	printer.setDocName(tr("gnuplot-qt graph"));
+	QPrintDialog dialog(&printer, this);
+	dialog.setOption(QAbstractPrintDialog::PrintPageRange, false);
+	if (dialog.exec() == QDialog::Accepted)
 		m_widget->print(printer);
 }
 
