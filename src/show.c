@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.378 2016/12/22 05:02:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.379 2016/12/26 23:46:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1157,12 +1157,9 @@ show_autoscale()
 
     fputs("\tautoscaling is ", stderr);
     if (parametric) {
-	if (is_3d_plot) {
-	    SHOW_AUTOSCALE(T_AXIS);
-	} else {
-	    SHOW_AUTOSCALE(U_AXIS);
-	    SHOW_AUTOSCALE(V_AXIS);
-	}
+	SHOW_AUTOSCALE(T_AXIS);
+	SHOW_AUTOSCALE(U_AXIS);
+	SHOW_AUTOSCALE(V_AXIS);
     }
 
     if (polar) {
@@ -1466,20 +1463,13 @@ show_format()
     SHOW_ALL_NL;
 
     fprintf(stderr, "\ttic format is:\n");
-#define SHOW_FORMAT(_axis)						\
-    fprintf(stderr, "\t  %s-axis: \"%s\"%s\n", axis_name(_axis),	\
-	    conv_text(axis_array[_axis].formatstring),			\
-	    axis_array[_axis].tictype == DT_DMS ? " geographic" :	\
-	    axis_array[_axis].tictype == DT_TIMEDATE ? " time" :	\
-	    "");
-    SHOW_FORMAT(FIRST_X_AXIS );
-    SHOW_FORMAT(FIRST_Y_AXIS );
-    SHOW_FORMAT(SECOND_X_AXIS);
-    SHOW_FORMAT(SECOND_Y_AXIS);
-    SHOW_FORMAT(FIRST_Z_AXIS );
-    SHOW_FORMAT(COLOR_AXIS);
-    SHOW_FORMAT(POLAR_AXIS);
-#undef SHOW_FORMAT
+    save_axis_format(stderr, FIRST_X_AXIS );
+    save_axis_format(stderr, FIRST_Y_AXIS );
+    save_axis_format(stderr, SECOND_X_AXIS);
+    save_axis_format(stderr, SECOND_Y_AXIS);
+    save_axis_format(stderr, FIRST_Z_AXIS );
+    save_axis_format(stderr, COLOR_AXIS);
+    save_axis_format(stderr, POLAR_AXIS);
 }
 
 

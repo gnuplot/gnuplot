@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.320 2016/12/24 19:51:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.321 2016/12/26 23:46:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -337,21 +337,14 @@ save_set_all(FILE *fp)
     }
     fprintf(fp, "\n");
 
-#define SAVE_FORMAT(axis)					\
-    fprintf(fp, "set format %s \"%s\" %s\n", axis_name(axis),	\
-	    conv_text(axis_array[axis].formatstring),		\
-	    axis_array[axis].tictype == DT_DMS ? "geographic" :	\
-	    axis_array[axis].tictype == DT_TIMEDATE ? "timedate" : \
-	    "");
-    SAVE_FORMAT(FIRST_X_AXIS );
-    SAVE_FORMAT(FIRST_Y_AXIS );
-    SAVE_FORMAT(SECOND_X_AXIS);
-    SAVE_FORMAT(SECOND_Y_AXIS);
-    SAVE_FORMAT(FIRST_Z_AXIS );
-    SAVE_FORMAT(COLOR_AXIS);
-    SAVE_FORMAT(POLAR_AXIS);
+    save_axis_format(fp, FIRST_X_AXIS );
+    save_axis_format(fp, FIRST_Y_AXIS );
+    save_axis_format(fp, SECOND_X_AXIS);
+    save_axis_format(fp, SECOND_Y_AXIS);
+    save_axis_format(fp, FIRST_Z_AXIS );
+    save_axis_format(fp, COLOR_AXIS);
+    save_axis_format(fp, POLAR_AXIS);
     fprintf(fp, "set ttics format \"%s\"\n", THETA_AXIS.formatstring);
-#undef SAVE_FORMAT
 
     fprintf(fp, "set timefmt \"%s\"\n", timefmt);
 
@@ -1207,6 +1200,17 @@ save_num_or_time_input(FILE *fp, double x, struct axis *this_axis)
     } else {
 	fprintf(fp,"%#g",x);
     }
+}
+
+void
+save_axis_format(FILE *fp, AXIS_INDEX axis)
+{
+    fprintf(fp, 
+	    (fp == stderr) ? "\t  %s-axis: \"%s\"%s\n" : "set format %s \"%s\" %s\n",
+	     axis_name(axis), conv_text(axis_array[axis].formatstring),
+	    axis_array[axis].tictype == DT_DMS ? "geographic" :
+	    axis_array[axis].tictype == DT_TIMEDATE ? "timedate" :
+	    "");
 }
 
 void
