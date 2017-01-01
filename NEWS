@@ -46,6 +46,7 @@ Changes not in 5.0
 * CHANGE Deprecate pdf terminal requiring non-free library PDFlib
 * CHANGE windows terminal also uses GDI+ for printing and copy-to-clipboard
 * CHANGE raxis/polar grid can coexist with cartesian axes
+* CHANGE evaluation of norm(x) or x**y returns 0 on floating underflow
 * FIX cairo.trm - reset terminal font after printing an enhanced text string
 * FIX autoscaling of data with "smooth cnorm"
 * FIX Built-in readline handles S-JIS encoding

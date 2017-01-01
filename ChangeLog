@@ -11,6 +11,10 @@
 	than UNDEFINED.
 	Bug #1877
 
+	* src/specfun.c (f_normal): Values of x < -38 cause floating underflow
+	in the calculation of norm(x).  Return 0.0 rather than UNDEFINED.
+	See bug #1877
+
 	* src/save.c src/save.h src/show.c:  Consolidate save/show axis format.
 	Fix minor bug in "show auto" (2D reports 3D status and vice versa).
 
