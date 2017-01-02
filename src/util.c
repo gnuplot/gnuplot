@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.128.2.5 2016/08/19 16:14:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.128.2.6 2016/10/21 21:00:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -1611,7 +1611,8 @@ strappend(char **dest, size_t *size, size_t len, const char *src)
     size_t destlen = (len != 0) ? len : strlen(*dest);
     size_t srclen = strlen(src);
     if (destlen + srclen + 1 > *size) {
-	*size *= 2;
+	while (destlen + srclen + 1 > *size)
+	    *size *= 2;
 	*dest = (char *) gp_realloc(*dest, *size, "strappend");
     }
     memcpy(*dest + destlen, src, srclen + 1);
