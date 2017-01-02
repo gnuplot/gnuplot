@@ -11,6 +11,7 @@ Changes in 5.0.6
 * FIX windows - timed pause only worked for intervals < 1 second
 * FIX Front/back layering of border+grid lines was not always correct in hidden3d
 * FIX "set pm3d depthorder interpolate N,M" memory allocation failure
+* FIX aquaterm failed to honor request to disable enhanced text markup
 
 Changes in 5.0.5
 ================
