@@ -1,3 +1,9 @@
+2017-01-02  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c (drawgraph):  Fix incorrect detection of a
+	metafile device context which caused point symbols to be drawn as
+	a bitmap.
+
 2017-01-02  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* term/aquaterm.trm (ENHAQUA_put_text):  aquaterm was ignoring

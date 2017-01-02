@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.189.2.17 2016/10/15 18:29:29 markisch Exp $
+ * $Id: wgraph.c,v 1.189.2.18 2016/10/15 18:42:51 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -1796,9 +1796,12 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	 * Solve by defaulting isColor to TRUE in those cases.
 	 * Note that info on color capabilities of printers would be available
 	 * via DeviceCapabilities().
+	 * Also note that querying the technology of a metafile dc does not work.
+	 * Query the type instead.
 	 */
 	isColor = (((GetDeviceCaps(hdc, PLANES) * GetDeviceCaps(hdc, BITSPIXEL)) > 2)
-	       || (GetDeviceCaps(hdc, TECHNOLOGY) == DT_METAFILE)
+	       || (GetObjectType(hdc) == OBJ_ENHMETADC)
+	       || (GetObjectType(hdc) == OBJ_METADC)
 	       || (GetDeviceCaps(hdc, TECHNOLOGY) == DT_PLOTTER)
 	       || (GetDeviceCaps(hdc, TECHNOLOGY) == DT_RASPRINTER));
 
@@ -1822,7 +1825,9 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		warn_no_transparent = ((shadedblendcaps & SB_CONST_ALPHA) == 0);
 	}
 
-	ps_caching = !((GetDeviceCaps(hdc, TECHNOLOGY) == DT_METAFILE)
+	// only cache point symbols when drawing to a screen
+	ps_caching = !((GetObjectType(hdc) == OBJ_ENHMETADC)
+	            || (GetObjectType(hdc) == OBJ_METADC)
 	            || (GetDeviceCaps(hdc, TECHNOLOGY) == DT_PLOTTER)
 	            || (GetDeviceCaps(hdc, TECHNOLOGY) == DT_RASPRINTER));
 
