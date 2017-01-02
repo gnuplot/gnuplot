@@ -12,6 +12,11 @@
 	* src/win/winmain.c (open_printer):  Open temporary file in binary mode
 	as required e.g. for PDF data.
 
+	* src/win/wprinter (DumpPrinter):  The Escape() PASSTHROUGH function
+	was included in Windows 3(!) for backward compatibility with earlier
+	versions and is no longer supported by some printer drivers.  Detect
+	that and display an error message.
+
 2017-01-02  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* term/aquaterm.trm (ENHAQUA_put_text):  aquaterm was ignoring

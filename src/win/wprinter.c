@@ -1,5 +1,5 @@
 /*
- * $Id: wprinter.c,v 1.11 2013/12/27 19:51:22 markisch Exp $
+ * $Id: wprinter.c,v 1.12 2014/03/30 18:33:21 markisch Exp $
  */
 
 /* GNUPLOT - win/wprinter.c */
@@ -272,6 +272,8 @@ DumpPrinter(HWND hwnd, LPSTR szAppName, LPSTR szFileName)
 	long lsize;
 	long ldone;
 	char pcdone[10];
+	DWORD escape = PASSTHROUGH;
+	int rc;
 
 	if ((f = fopen(szFileName, "rb")) == NULL)
 		return;
@@ -312,6 +314,13 @@ DumpPrinter(HWND hwnd, LPSTR szAppName, LPSTR szFileName)
 
 		if (printer == NULL)
 			return;	/* abort */
+
+		/* Test if the printer supports pass-through */
+		if ((rc = ExtEscape(printer, QUERYESCSUPPORT, sizeof (DWORD), (LPCSTR) &escape, 0, NULL)) <= 0)  {
+			MessageBox(hwnd, "The selected printer driver does not support passing through data to the printer.", "Printer Error", MB_ICONERROR | MB_OK);
+			DeleteDC(printer);
+			goto cleanup;
+		}
 
 		pr.hdcPrn = printer;
 		SetWindowLongPtr(hwnd, 4, (LONG_PTR)((GP_LPPRINT)&pr));
@@ -356,6 +365,6 @@ DumpPrinter(HWND hwnd, LPSTR szAppName, LPSTR szFileName)
 		SetWindowLong(hwnd, 4, 0L);
 		PrintUnregister((GP_LPPRINT)&pr);
 	}
-
+cleanup:
 	fclose(f);
 }
