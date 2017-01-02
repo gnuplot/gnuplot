@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.77.2.1 2014/12/08 19:25:40 markisch Exp $
+ * $Id: winmain.c,v 1.77.2.2 2014/12/31 04:38:44 sfeam Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -866,7 +866,7 @@ fake_popen(const char * command, const char * type)
 		/* Now open temporary file. */
 		/* system() returns 1 if the command could not be executed. */
 		if (rc != 1)
-			f = fopen(pipe_filename, "r");
+			f = fopen(pipe_filename, type);
 		else {
 			remove(pipe_filename);
 			free(pipe_filename);
@@ -1035,7 +1035,7 @@ open_printer()
 {
 	char *temp;
 
-	if ((temp = getenv("TEMP")) == (char *)NULL)
+	if ((temp = getenv("TEMP")) == NULL)
 		*win_prntmp = '\0';
 	else  {
 		safe_strncpy(win_prntmp, temp, MAX_PRT_LEN);
@@ -1048,8 +1048,9 @@ open_printer()
 	strncat(win_prntmp, "_gptmp", MAX_PRT_LEN - strlen(win_prntmp));
 	strncat(win_prntmp, "XXXXXX", MAX_PRT_LEN - strlen(win_prntmp));
 	mktemp(win_prntmp);
-	return fopen(win_prntmp, "w");
+	return fopen(win_prntmp, "wb");
 }
+
 
 void
 close_printer(FILE *outfile)
