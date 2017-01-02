@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.55 2016/03/10 01:42:40 sfeam Exp $
+ * $Id: aquaterm.trm,v 1.56 2016/07/19 20:30:13 sfeam Exp $
  *
  */
 
@@ -852,11 +852,15 @@ static NSMutableDictionary *attributes;
 TERM_PUBLIC void 
 ENHAQUA_put_text(unsigned int x, unsigned int y, const char str[])
 {
-  if (!strpbrk(str, "{}^_@&~"))
-    {
-      AQUA_put_text(x,y,str);
-      return;
-    }
+
+  if (!strlen(str))
+    return;
+
+  if (ignore_enhanced_text || !strpbrk(str, "{}^_@&~")) {
+    AQUA_put_text(x,y,str);
+    return;
+  }
+
   /* set up the global variables needed by enhanced_recursion() */
   enhanced_fontscale = 1;
   strncpy(enhanced_escape_format,"\\%o",sizeof(enhanced_escape_format));

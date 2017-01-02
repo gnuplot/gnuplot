@@ -1,3 +1,9 @@
+2017-01-02  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* term/aquaterm.trm (ENHAQUA_put_text):  aquaterm was ignoring
+	ignore_enhanced_text;  i.e. you could not bypass enhanced text 
+	processing.
+
 2017-01-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/internal.c (f_power): Use ISOC99 macro fpclassify(), if present,
