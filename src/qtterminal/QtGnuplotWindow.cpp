@@ -147,7 +147,7 @@ void QtGnuplotWindow::on_keyAction()
 void QtGnuplotWindow::print()
 {
 	QPrinter printer;
-	if (QPrintDialog(&printer).exec() == QDialog::Accepted)
+	if (QPrintDialog(&printer, this).exec() == QDialog::Accepted)
 		m_widget->print(printer);
 }
 

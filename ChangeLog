@@ -4,6 +4,11 @@
 	metafile device context which caused point symbols to be drawn as
 	a bitmap.
 
+	* src/util.c (strappend):  Fix insufficient memory allocation.
+
+	* src/qtterminal/QtGnuplotWindow.cpp (print):  QPrinterDialog
+	requires a parent on Windows.
+
 2017-01-02  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* term/aquaterm.trm (ENHAQUA_put_text):  aquaterm was ignoring
