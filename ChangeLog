@@ -1,3 +1,9 @@
+2017-01-02  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* term/aquaterm.trm (ENHAQUA_put_text):  aquaterm was ignoring
+	ignore_enhanced_text;  i.e. you could not bypass enhanced text 
+	processing.
+
 2016-12-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c: Do not allow the axis range on polar axis R to invert.
