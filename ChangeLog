@@ -1,3 +1,8 @@
+2017-01-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc:  Clarify the meaning of the binary file keyword
+	"transpose".  Provide index entries for all binary file keywords.
+
 2017-01-02  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (drawgraph):  Fix incorrect detection of a

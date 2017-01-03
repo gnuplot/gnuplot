@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.72 2016/10/21 21:00:08 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.73 2016/10/30 17:19:59 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5520,6 +5520,7 @@ Ffigure_mapcontours
  array, matrix, or image to specific x/y/z positions.
 5 scan
 ?binary keywords scan
+?scan
  A great deal of confusion can arise concerning the relationship between how
  gnuplot scans a binary file and the dimensions seen on the plot.  To lessen
  the confusion, conceptually think of gnuplot _always_ scanning the binary file
@@ -5541,7 +5542,11 @@ Ffigure_mapcontours
  analogous to the x, y and z of Cartesian coordinates.
 5 transpose
 ?binary keywords transpose
- Shorthand notation for `scan=yx` or `scan=yxz`.
+?transpose
+ Shorthand notation for `scan=yx` or `scan=yxz`.  I.e. it affects the assignment
+ of pixels to scan lines during input.  To instead transpose an image when it is
+ displayed try
+      plot 'imagefile' binary filetype=auto flipx rotate=90deg with rgbimage
 5 dx, dy, dz
 ?binary keywords dx
 ?binary keywords dy
@@ -5560,11 +5565,15 @@ Ffigure_mapcontours
  they may also be used with matrix binary files.
 5 flipx, flipy, flipz
 ?binary keywords flipx
+?flipx
+?flipy
+?flipz
  Sometimes the scanning directions in a binary datafile are not consistent with
  that assumed by gnuplot.  These keywords can flip the scanning direction along
  dimensions x, y, z.
 5 origin 
 ?binary keywords origin
+?binary origin
  When gnuplot generates coordinates based upon transposition and flip, it
  attempts to always position the lower left point in the array at the origin,
  i.e., the data lies in the first quadrant of a Cartesian system after transpose
@@ -5579,12 +5588,14 @@ Ffigure_mapcontours
 5 center
 ?binary keywords center
 ?keywords center
+?center
  Similar to `origin`, this keyword will position the array such that its center
  lies at the point given by the tuple.  For example, `center=(0,0)`.  Center
  does not apply when the size of the array is `Inf`.
 5 rotate
 ?binary keywords rotate
 ?keywords rotate
+?rotate
  The transpose and flip commands provide some flexibility in generating and
  orienting coordinates.  However, for full degrees of freedom, it is possible to
  apply a rotational vector described by a rotational angle in two dimensions.
@@ -5601,6 +5612,7 @@ Ffigure_mapcontours
  `center`.
 5 perpendicular
 ?binary keywords perpendicular
+?perpendicular
  For `splot`, the concept of a rotational vector is implemented by a triple
  representing the vector to be oriented normal to the two-dimensional x-y plane.
  Naturally, the default is (0,0,1).  Thus specifying both rotate and
