@@ -5,6 +5,9 @@
 	smoothing options and the other showing various 2D plot styles 
 	with errorbars.
 
+	* docs/gnuplot.doc:  Clarify the meaning of the binary file keyword
+	"transpose".  Provide index entries for all binary file keywords.
+
 2017-01-02  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* term/aquaterm.trm (ENHAQUA_put_text):  aquaterm was ignoring
