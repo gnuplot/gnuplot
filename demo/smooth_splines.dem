@@ -1,0 +1,49 @@
+#
+# $Id: smooth_splines.dem,v 1.11 2016/11/05 22:07:21 sfeam Exp $
+#
+# First part of old mgr.dem
+# show same data with various spline smoothing choices
+
+print "various splines for smoothing"
+
+set title "cubic spline fit to data (no weights)"
+set samples 300
+set xlabel "Time (sec)"
+set ylabel "Rate"
+plot "silver.dat" t "experimental" w errorb, \
+               ""  smooth csplines t "cubic smooth" lw 2
+
+pause -1 "Now apply a smoothing spline, weighted by 1/rel error (-> return)"
+set title "acsplines weighted by relative error"
+# error is column 3; weight larger errors less
+# start with rel error = 1/($3/$2)
+S=1
+plot "silver.dat" t "experimental" w errorb,\
+               "" u 1:2:(S*$2/$3) smooth acsplines t "acspline Y/Z" lw 2
+
+pause -1 "Make it smoother by changing the smoothing weights (-> return)"
+set title "acsplines with increasing weight from error estimate"
+plot "silver.dat" t "rate" w errorb,\
+               "" u 1:2:($2/($3*1.e1)) sm acs t "acspline Y/(Z*1.e1)" lw 2,\
+               "" u 1:2:($2/($3*1.e3)) sm acs t "         Y/(Z*1.e3)" lw 2,\
+               "" u 1:2:($2/($3*1.e5)) sm acs t "         Y/(Z*1.e5)" lw 2
+
+pause -1 "Accentuate the relative changes with a log-scale (-> return)"
+set title "same plot (various weighting) in log scale"
+set logscale y
+set grid x y mx my
+replot
+
+pause -1 "Now approximate the data with a bezier curve between the endpoints (-> return)"
+set title "Bezier curve rather than cubic spline"
+unset logscale y
+plot "silver.dat" t "experimental" w errorb,\
+               "" smooth sbezier t "bezier" lw 2
+
+pause -1 "You would rather use log-scales ? (-> return)"
+set title "Bezier curve with log scale"
+set logscale y
+replot
+
+pause -1 "Hit return to continue"
+reset

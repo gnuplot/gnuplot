@@ -9,9 +9,9 @@ GNUPLOT_LIB = ..
 #
 # Auto-generation of html demo set.
 #
-html_3d: binary.html bivariat.html contours.html datastrings.html discrete.html fenceplot.html hidden.html hidden2.html margins.html multimsh.html pm3dcolors.html pm3d.html pm3d_lighting.html pointsize.html random.html rgb_variable.html scatter.html singulr.html surface1.html surface2.html azimuth.html transparent_solids.html vector.html world.html world2.html zerror.html
+html_3d: binary.html bivariat.html contours.html datastrings.html discrete.html errorbars.html fenceplot.html hidden.html hidden2.html margins.html multimsh.html pm3dcolors.html pm3d.html pm3d_lighting.html pointsize.html random.html rgb_variable.html scatter.html singulr.html surface1.html surface2.html azimuth.html transparent_solids.html vector.html world.html world2.html zerror.html
 
-html_2d: airfoil.html approximate.html array.html barchart_art.html boxplot.html candlesticks.html canvas_utf8.html circles.html cities.html controls.html custom_key.html dashtypes.html electron.html enhanced_utf8.html fillbetween.html fillcrvs.html fillstyle.html finance.html histograms.html histograms2.html hypertext.html gantt.html index.html iterate.html jitter.html layout.html lines_arrows.html linkedaxes.html mgr.html multiaxis.html multiplt.html nonlinear1.html nonlinear3.html nokey.html param.html piecewise.html polar.html poldat.html prob2.html prob.html rainbow.html ellipse.html rectangle.html rgba_lines.html rgbalpha.html rotate_labels.html rugplot.html running_avg.html simple.html smooth.html spline.html steps.html transparent.html timedat.html ttics.html using.html varcolor.html world.html heatmaps.html stats.html violinplot.html
+html_2d: airfoil.html approximate.html array.html barchart_art.html boxplot.html candlesticks.html canvas_utf8.html circles.html cities.html controls.html custom_key.html dashtypes.html electron.html enhanced_utf8.html fillbetween.html fillcrvs.html fillstyle.html finance.html histograms.html histograms2.html hypertext.html gantt.html index.html iterate.html jitter.html layout.html lines_arrows.html linkedaxes.html multiaxis.html multiplt.html nonlinear1.html nonlinear3.html nokey.html param.html piecewise.html polar.html poldat.html prob2.html prob.html rainbow.html ellipse.html rectangle.html rgba_lines.html rgbalpha.html rotate_labels.html rugplot.html running_avg.html simple.html smooth.html smooth_splines.html spline.html steps.html transparent.html timedat.html ttics.html using.html varcolor.html world.html heatmaps.html stats.html violinplot.html
 
 html: html_2d html_3d
 
@@ -32,8 +32,8 @@ canvas_utf8.html: canvas_utf8.dem
 #
 # Examples of mousing code
 #
-mgr.html: jsdir
-	./webify_canvas.pl --mouse --grid mgr
+smooth_splines.html: jsdir
+	./webify_canvas.pl --mouse --grid smooth_splines
 
 cities.html: jsdir
 	./webify_canvas.pl --mouse cities

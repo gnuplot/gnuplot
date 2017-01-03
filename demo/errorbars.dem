@@ -1,0 +1,65 @@
+#
+# $Id: errobars.dem,v 1.0 2017/01/03 22:07:21 sfeam Exp $
+#
+# Second part of old mgr.dem
+# Show the same plot with various errorbar styles
+#
+print "various styles of errorbar"
+
+set xlabel "Resistance [Ohm]"
+set ylabel "Power [W]"
+
+set title "error represented by xyerrorbars"
+n(x)=1.53**2*x/(5.67+x)**2
+plot [0:50] "battery.dat" t "Power" with xyerrorbars, n(x) t "Theory" w lines
+
+pause -1 "Would you like boxes? (-> return)"
+set title "error represented by boxxyerror"
+plot [0:50] "battery.dat" t "Power" with boxxyerr, n(x) t "Theory" w lines
+
+pause -1 "Only X-Bars? (-> return)"
+set title "error represented by xerrorbars"
+plot [0:50] "battery.dat" u 1:2:3 t "Power" w xerr, n(x) t "Theory" w lines
+
+pause -1 "Only Y-Bars? (-> return)"
+set title "error represented by yerrorbars"
+plot [0:50] "battery.dat" u 1:2:4 t "Power" w yerr, n(x) t "Theory" w lines
+
+pause -1 "Logscaled? (-> return)"
+set title "yerrorbars in log scale"
+set logscale y
+plot [0:50] "battery.dat" u 1:2:4 t "Power" w yerr, n(x) t "Theory" w lines
+
+pause -1 "X as well? (-> return)"
+set title "xyerrorbars in log scale"
+set logscale xy
+plot [1:50] "battery.dat" t "Power" w xyerr, n(x) t "Theory" w lines
+
+pause -1 "If you like bars without tics (-> return)"
+set title "xyerrorbars with no crossbar"
+unset logscale
+set bars small
+plot [0:50] "battery.dat" t "Power" with xyerrorbars, n(x) t "Theory" w lines
+
+pause -1 "X-Bars only (-> return)"
+set title "xerrorbars with no crossbar"
+plot [0:50] "battery.dat" u 1:2:3 t "Power" w xerr, n(x) t "Theory" w lines
+
+pause -1 "Y-Bars only (-> return)"
+set title "yerrorbars with no crossbar"
+plot [0:50] "battery.dat" u 1:2:4 t "Power" w yerr, n(x) t "Theory" w lines
+
+pause -1 "filledcurve shaded error region"
+set title "Error on y represented by filledcurve shaded region"
+set xlabel "Time (sec)" 
+set ylabel "Rate" 
+set grid xtics mxtics ytics mytics
+set log y
+Shadecolor = "#80E0A080"
+#
+plot 'silver.dat' using 1:($2+$3):($2-$3) \
+      with filledcurve fc rgb Shadecolor title "Shaded error region",\
+     '' using 1:2 smooth mcspline lw 2   title "Monotonic spline through data"
+
+pause -1 "Hit return to continue"
+reset

@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.76 2016/11/05 21:21:07 sfeam Exp $
+# $Id: all.dem,v 1.77 2016/12/26 23:50:53 sfeam Exp $
 #
 # Executes all demos (OK, MOST demos) in this directory.
 # This serves as a series of unit tests for non-interactive capabilities.
@@ -38,8 +38,14 @@ print "******************** file autoscale.dem ********************"
 load "autoscale.dem"
 reset
 
-print "******************** file mgr.dem ********************"
-load "mgr.dem"
+print "******************** file smooth_splines.dem ********************"
+load "smooth_splines.dem"
+load "monotonic_spline.dem"
+reset
+
+
+print "******************** file errorbars.dem ********************"
+load "errorbars.dem"
 reset
 
 print "******************** file zerror.dem ********************"
@@ -137,10 +143,6 @@ reset
 
 print "******************** file spline.dem ********************"
 load "spline.dem"
-reset
-
-print "******************** file monotonic_spline.dem **********"
-load "monotonic_spline.dem"
 reset
 
 print "******************** file binary.dem ********************"

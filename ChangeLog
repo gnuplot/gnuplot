@@ -1,3 +1,10 @@
+2017-01-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* demo/smooth_splines.dem demo/errorbars.dem demo/all.dem demo/html/*:
+	Split mgr.dem into two parts, one illustrating the various spline
+	smoothing options and the other showing various 2D plot styles 
+	with errorbars.
+
 2017-01-02  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* term/aquaterm.trm (ENHAQUA_put_text):  aquaterm was ignoring

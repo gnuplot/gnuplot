@@ -28,7 +28,7 @@
     <li><a href="fillcrvs.html">filled&nbsp;curves</a></li>
     <li><a href="fillbetween.html">fill&nbsp;between&nbsp;curves</a></li>
     <li><a href="candlesticks.html">candlesticks</a></li>
-    <li><a href="mgr.html">error bars</a></li>
+    <li><a href="errorbars.html">error bars</a></li>
     <li><a href="histograms.html">histograms</a> (<a href="histograms2.html">more</a>)</li>
     <li><a href="steps.html">step functions</a></li>
     <li><a href="multiaxis.html">multiple axis scales</a></li>
@@ -47,14 +47,20 @@
     <h4>Math functions</h4>
     <ul>
     <li><a href="approximate.html">approximation</a></li>
-    <li><a href="spline.html">B-splines</a></li>
-    <li><a href="airfoil.html">Bezier splines</a></li>
     <li><font color=gray>complex functions</font></li>
     <li><a href="prob2.html">probability</a></li>
     <li><a href="prob.html">probability (more)</a></li>
     <li><a href="random.html">random numbers</a></li>
     <li><a href="bivariat.html">recursion, etc...</a></li>
     <li><a href="stats.html">data statistics</a></li>
+    </ul>
+
+    <h4>Curve fitting</h4>
+    <ul>
+    <li><a href="smooth_spline.html">cubic and Bezier splines</a></li>
+    <li><a href="monotonic_spline.html">monotonic csplines</a></li>
+    <li><a href="spline.html">Explicit B-splines</a></li>
+    <li><a href="airfoil.html">Explicit Bezier splines</a></li>
     </ul>
 
 </td>
@@ -211,7 +217,7 @@
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated December 2016</i>
+    <i>This page generated January 2017</i>
     </td>
 
     <td>
