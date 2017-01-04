@@ -1,6 +1,9 @@
 #
 # Miscellaneous neat things you can do using the string variables code
 #
+iswindows = substr(GPVAL_SYSNAME, 1, 7) eq "Windows"
+cat = iswindows ? "type" : "cat"
+
 set print "stringvar.tmp"
 print ""
 print "Exercise substring handling"
@@ -27,7 +30,7 @@ print "foo[1:1] eq 'A' && foo[2:2] ne 'X' = ", \
 
 unset print
 
-set label 1 system("cat stringvar.tmp") at graph 0.1, graph 0.9
+set label 1 system(cat . " stringvar.tmp") at graph 0.1, graph 0.9
 unset xtics
 unset ytics
 set yrange [0:1]
@@ -43,7 +46,11 @@ print "foo          = ",foo
 print "strlen(foo)  = ",strlen(foo)
 print "substr(foo,3,4) = ",substr(foo,3,4)
 print ""
-haystack = "`date`"
+if (!iswindows) {
+  haystack = system("date")
+} else {
+  haystack = system("date /T") . " " . system("time /T")
+}
 needle = ":"
 S = strstrt(haystack,needle)
 print "haystack     = \`date\`"
@@ -65,7 +72,7 @@ if (strlen(foo) != 245) print "sprintf output of long strings BROKEN"
 print ""
 
 unset print
-set label 1 system("cat stringvar.tmp") at graph 0.1, graph 0.9
+set label 1 system(cat . " stringvar.tmp") at graph 0.1, graph 0.9
 unset xtics
 unset ytics
 set yrange [0:1]
@@ -89,7 +96,7 @@ print "foo = ",foo
 print "word(foo, 4) = ",word(foo, 4)
 
 unset print
-set label 1 system("cat stringvar.tmp") at graph 0.1, graph 0.9
+set label 1 system(cat . " stringvar.tmp") at graph 0.1, graph 0.9
 unset xtics
 unset ytics
 set yrange [0:1]

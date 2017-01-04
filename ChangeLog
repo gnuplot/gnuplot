@@ -1,8 +1,12 @@
+2017-01-04  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* demo/stringvar.dem:  Add platform specific code for Windows.
+
 2017-01-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* demo/smooth_splines.dem demo/errorbars.dem demo/all.dem demo/html/*:
 	Split mgr.dem into two parts, one illustrating the various spline
-	smoothing options and the other showing various 2D plot styles 
+	smoothing options and the other showing various 2D plot styles
 	with errorbars.
 
 	* docs/gnuplot.doc:  Clarify the meaning of the binary file keyword
@@ -11,7 +15,7 @@
 2017-01-02  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* term/aquaterm.trm (ENHAQUA_put_text):  aquaterm was ignoring
-	ignore_enhanced_text;  i.e. you could not bypass enhanced text 
+	ignore_enhanced_text;  i.e. you could not bypass enhanced text
 	processing.
 
 2017-01-01  Ethan A Merritt  <merritt@u.washington.edu>
@@ -106,7 +110,7 @@
 	axis_checked_extend_empty_range, which is perfectly happy to expand an
 	initially empty range.
 
-	* src/wxterminal/gp_cairo.c:  Valgrind found some use-after-free 
+	* src/wxterminal/gp_cairo.c:  Valgrind found some use-after-free
 	problems with cairo object accounting.  Replace g_object_unref() with
 	g_clear_object() everywhere.   This is a macro that decrements object
 	reference count and clears the pointer when the count hits zero.
@@ -131,7 +135,7 @@
 	* src/axis.c (axis_check_empty_nonlinear) src/axis.h src/plot3d.c:
 	New routine analogous to the existing axis_checked_extend_empty_range
 	except that it applies to nonlinear axes.  This is a bug fix to prevent
-	a crash after axis range corruption. 
+	a crash after axis range corruption.
 	Example of bug:    set log; splot $FOO using 1:2:(NaN)
 
 	* src/axis.c (axis_check_empty_nonlinear) src/axis.h src/plot3d.c:
@@ -145,7 +149,7 @@
 	Bug #1882
 
 	* src/axis.c (set_explicit_range) src/axis.h: New routine called from
-	apply_zoom() to change the range of one axis directly instead of 
+	apply_zoom() to change the range of one axis directly instead of
 	constructing and interpreting a "set [axis]range [newmin:newmax]"
 	command string. This prevents loss of precision in the axis coordinates
 	that can occur if there is an intermediate ascii representation for the
@@ -199,7 +203,7 @@
 
 2016-12-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* term/gd.trm term/sixel.c term/Makefile.am.in:  
+	* term/gd.trm term/sixel.c term/Makefile.am.in:
 	New terminal "sixelgd" based on kmiya@culti's sixel.c code
 	available at http://nanno.dip.jp/softlib/man/rlogin/#REGWIND
 	It produces sixel graphics like the "sixel" terminal, but uses
@@ -223,7 +227,7 @@
 	* term/gd.trm (PNG_set_font): Repair a read past end of string error
 	found by valgrind.
 
-	* src/plot3d.c: Initialize vector of data values so that incomplete 
+	* src/plot3d.c: Initialize vector of data values so that incomplete
 	data lines do not result in passing uninitialized values to
 	STORE_WITH_LOG_AND_UPDATE_RANGE
 
