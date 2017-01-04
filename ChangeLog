@@ -2,8 +2,11 @@
 
 	* demo/stringvar.dem:  Add platform specific code for Windows.
 
-	* src/term.c:  Disable output of binary data to the wgnuplot
-	text window.
+	* src/term.c (term_initialise):  Disable output of binary data to the
+	wgnuplot text window.
+
+	* src/win/winmain.c (WinRaiseConsole):  Raise pause message box instead
+	of the text window during pause.
 
 2017-01-03  Ethan A Merritt  <merritt@u.washington.edu>
 

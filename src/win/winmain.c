@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.95 2016/11/15 08:16:12 markisch Exp $
+ * $Id: winmain.c,v 1.96 2016/11/26 19:41:29 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -165,7 +165,7 @@ WinExit(void)
 {
     LPGW lpgw;
 
-    /* Last chance, call before anything else to avoid a crash. */
+    /* Last chance to close Windows help, call before anything else to avoid a crash. */
     WinCloseHelp();
 
     /* clean-up call for printing system */
@@ -1397,6 +1397,8 @@ WinRaiseConsole(void)
     HWND console = NULL;
 #ifndef WGP_CONSOLE
     console = textwin.hWndParent;
+    if (pausewin.bPause && IsWindow(pausewin.hWndPause))
+	console = pausewin.hWndPause;
 #else
     console = GetConsoleWindow();
 #endif
