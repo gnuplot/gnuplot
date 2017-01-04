@@ -2,6 +2,9 @@
 
 	* demo/stringvar.dem:  Add platform specific code for Windows.
 
+	* src/term.c:  Disable output of binary data to the wgnuplot
+	text window.
+
 2017-01-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* demo/smooth_splines.dem demo/errorbars.dem demo/all.dem demo/html/*:

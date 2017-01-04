@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.327 2016/08/27 01:04:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.328 2016/10/01 21:55:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -324,7 +324,7 @@ term_close_output()
 	output_pipe_open = FALSE;
     } else
 #endif /* PIPES */
-#ifdef _Windows
+#ifdef _WIN32
     if (stricmp(outstr, "PRN") == 0)
 	close_printer(gpoutfile);
     else
@@ -369,7 +369,7 @@ term_set_output(char *dest)
 #if defined(PIPES)
 	if (*dest == '|') {
 	    restrict_popen();
-#ifdef _Windows
+#ifdef _WIN32
 	    if (term && (term->flags & TERM_BINARY))
 		f = popen(dest + 1, "wb");
 	    else
@@ -384,7 +384,7 @@ term_set_output(char *dest)
 	} else {
 #endif /* PIPES */
 
-#ifdef _Windows
+#ifdef _WIN32
 	if (outstr && stricmp(outstr, "PRN") == 0) {
 	    /* we can't call open_printer() while printer is open, so */
 	    close_printer(gpoutfile);   /* close printer immediately if open */
@@ -474,13 +474,20 @@ term_initialise()
 	    fputs("Cannot reopen output file in binary", stderr);
 	/* and carry on, hoping for the best ! */
     }
-#if defined(MSDOS) || defined (_Windows) || defined(OS2)
-# ifdef _Windows
+#if defined(MSDOS) || defined (_WIN32) || defined(OS2)
+# ifdef _WIN32
     else if (!outstr && (term->flags & TERM_BINARY))
 # else
     else if (!outstr && !interactive && (term->flags & TERM_BINARY))
 # endif
 	{
+#if defined(_WIN32) && !defined(WGP_CONSOLE)
+#ifdef PIPES
+	    if (!output_pipe_open)
+#endif
+		if (outstr == NULL)
+		    int_error(c_token, "cannot output binary data to wgnuplot text window");
+#endif
 	    /* binary to stdout in non-interactive session... */
 	    fflush(stdout);
 	    setmode(fileno(stdout), O_BINARY);
@@ -1539,7 +1546,7 @@ void
 init_terminal()
 {
     char *term_name = DEFAULTTERM;
-#if (defined(MSDOS) && !defined(_Windows)) || defined(SUN) || defined(X11)
+#if (defined(MSDOS) && !defined(_WIN32)) || defined(SUN) || defined(X11)
     char *env_term = NULL;      /* from TERM environment var */
 #endif
 #ifdef X11
@@ -1578,11 +1585,10 @@ init_terminal()
 	    term_name = "wxt";
 #endif
 
-#ifdef _Windows
-	/* let the wxWidgets terminal be the default when available */
+#ifdef _WIN32
 	if (term_name == (char *) NULL)
 	    term_name = "win";
-#endif /* _Windows */
+#endif /* _WIN32 */
 
 #if defined(__APPLE__) && defined(__MACH__) && defined(HAVE_FRAMEWORK_AQUATERM)
 	/* Mac OS X with AquaTerm installed */
