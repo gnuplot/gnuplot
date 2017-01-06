@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.66 2016/09/08 15:08:17 markisch Exp $
+# $Id: Makefile,v 1.67 2017/01/06 16:07:20 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 # This assumes a typical installation of the MinGW toolkit, the free
@@ -26,12 +26,12 @@
 # Comment out the definition lines to disable the according features:
 
 # Define this only if doing a release build
-RELEASE=1
+#RELEASE=1
 
 # Set-up your compiler environment
 #
 # Define if you are using MSYS2/MinGW64 instead of MSYS/MinGW
-MINGW64=1
+#MINGW64=1
 # Define if you want a 32bit version (even using a 64bit compiler)
 #M32=1
 # Define if you use clang instead of gcc, requires MINGW64
@@ -66,10 +66,10 @@ UNICODE=1
 # fontconfig or iconv; then, uncomment GDAUTOCONFIGLIBS so that all of the
 # libraries needed for linking will be taken by running 'gdlib-config'.
 # Uncomment BGD if you want to use the binary DLL version of libgd.
-NEWGD=1
-JPEG=1
-FREETYPE=1
-GDAUTOCONFIGLIBS=1
+#NEWGD=1
+#JPEG=1
+#FREETYPE=1
+#GDAUTOCONFIGLIBS=1
 #BGD=1
 
 # PDF device driver
@@ -96,17 +96,17 @@ MOUSE=1
 # Cairo/Pango terminals
 # Uncomment the following lines to select the pngcairo and pdfcairo
 # terminals
-CAIROTERMS=1
-CAIROLIBS=1
+#CAIROTERMS=1
+#CAIROLIBS=1
 
 # WXWIDGETS interactive terminal
 # Requires wxWidgets, Cairo, Pango, and their respective dependencies.
 # Uncomment the following lines to compile it.
-WXT=1
-CAIROLIBS=1
+#WXT=1
+#CAIROLIBS=1
 
 # Build qt terminal?
-QT = 1
+#QT = 1
 # specify QT installation directory
 #QT_DIR = /c/Qt/5.2.1/mingw48_32
 ifndef MINGW64
@@ -120,13 +120,13 @@ endif
 endif
 
 # Uncomment the following line to select the lua/tikz terminal
-LUA=lua
+#LUA=lua
 
 # Uncomment the following line to select the caca terminal
 # Requires libcaca version 0.99.beta15 or newer. A post-beta18
 # svn version is recommended since it contains an improved
 # win32 backend.
-CACA=1
+#CACA=1
 
 # Uncomment if you have libiconv
 ICONV=1
