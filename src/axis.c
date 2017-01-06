@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.213 2016/12/20 04:20:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.214 2016/12/26 23:46:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1386,14 +1386,9 @@ gen_tics(struct axis *this, tic_callback callback)
 			} else if (this->tictype == DT_DMS) {
 			    gstrdms(label, this->ticfmt, (double)user);
 			} else if (this->index == POLAR_AXIS) {
-			    double min = (R_AXIS.autoscale & AUTOSCALE_MIN) ? 0 : R_AXIS.min;
-			    double r = fabs(user) + min;
-			    /* POLAR_AXIS used to be the only sane axis, where the actual value */
-			    /* is stored and we shift its position just before plotting.*/
 			    internal = axis_log_value(this, tic)
 				     - axis_log_value(this, R_AXIS.min);
-			    r = tic;
-			    gprintf(label, sizeof(label), this->ticfmt, log10_base, r);
+			    gprintf(label, sizeof(label), this->ticfmt, log10_base, tic);
 			} else if (this->index >= PARALLEL_AXES) {
 			    /* FIXME: needed because ticfmt is not maintained for parallel axes */
 			    gprintf(label, sizeof(label), this->formatstring,
