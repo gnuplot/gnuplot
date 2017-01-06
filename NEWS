@@ -30,6 +30,7 @@ Changes not in 5.0
 * NEW dumb suports ANSI colors and filled polygons
 * NEW terminal sixelgd (sixel terminal graphics using gdlib)
 * NEW "set [m]ttics" controls placement of labels around perimeter of polar grid
+* NEW windows graph windows can be docked to the wgnuplot text window
 * CHANGE Revise placement of axis labels in 3D plots
 * CHANGE Timestamp is now placed relative to page rather than plot boundary
 * CHANGE Track font/enhanced for key title separately from the key entries

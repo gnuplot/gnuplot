@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.239 2016/11/19 06:31:07 markisch Exp $
+ * $Id: wgraph.c,v 1.240 2016/12/31 06:55:04 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -117,6 +117,7 @@ static void	DrawZoomBox(LPGW lpgw);
 static void	LoadCursors(LPGW lpgw);
 static void	DestroyCursors(LPGW lpgw);
 #endif /* USE_MOUSE */
+static void	DrawFocusIndicator(LPGW lpgw);
 
 /* ================================== */
 
@@ -428,18 +429,41 @@ GraphInit(LPGW lpgw)
 		RegisterClass(&wndclass);
 	}
 
-	lpgw->hWndGraph = CreateWindow(szGraphClass, lpgw->Title,
-		WS_OVERLAPPEDWINDOW,
-		lpgw->Origin.x, lpgw->Origin.y,
-		lpgw->Size.x, lpgw->Size.y,
-		NULL, NULL, lpgw->hInstance, lpgw);
+	if (!lpgw->bDocked) {
+		lpgw->hWndGraph = CreateWindow(szGraphClass, lpgw->Title,
+		    WS_OVERLAPPEDWINDOW,
+		    lpgw->Origin.x, lpgw->Origin.y,
+		    lpgw->Size.x, lpgw->Size.y,
+		    NULL, NULL, lpgw->hInstance, lpgw);
+	}
+#ifndef WGP_CONSOLE
+	else {
+		RECT rect;
+		SIZE size;
 
+		/* Note: whatever we set here as initial window size will be overridden
+		         by DockedUpdateLayout() below.
+		*/
+		GetClientRect(textwin.hWndParent, &rect);
+		DockedGraphSize(lpgw->lptw, &size, TRUE);
+		lpgw->Origin.x = rect.right - 200;
+		lpgw->Origin.y = textwin.ButtonHeight;
+		lpgw->Size.x = size.cx;
+		lpgw->Size.y = size.cy;
+		lpgw->hWndGraph = CreateWindow(szGraphClass, lpgw->Title,
+		    WS_CHILD,
+		    lpgw->Origin.x, lpgw->Origin.y,
+		    lpgw->Size.x, lpgw->Size.y,
+		    textwin.hWndParent, NULL, lpgw->hInstance, lpgw);
+	}
+#endif
 	if (lpgw->hWndGraph)
 		SetClassLongPtr(lpgw->hWndGraph, GCLP_HICON,
 			(LONG_PTR) LoadIcon(lpgw->hInstance, TEXT("GRPICON")));
 
-	lpgw->hStatusbar = CreateWindowEx(0, STATUSCLASSNAME, NULL,
-				  WS_CHILD | SBARS_SIZEGRIP,
+	if (!lpgw->bDocked)
+		lpgw->hStatusbar = CreateWindowEx(0, STATUSCLASSNAME, NULL,
+				  WS_CHILD | (lpgw->bDocked ? 0 : SBARS_SIZEGRIP),
 				  0, 0, 0, 0,
 				  lpgw->hWndGraph, (HMENU)ID_GRAPHSTATUS,
 				  lpgw->hInstance, lpgw);
@@ -447,7 +471,7 @@ GraphInit(LPGW lpgw)
 		RECT rect;
 		/* auto-adjust size */
 		SendMessage(lpgw->hStatusbar, WM_SIZE, (WPARAM)0, (LPARAM)0);
-		ShowWindow(lpgw->hStatusbar, SW_SHOW);
+		ShowWindow(lpgw->hStatusbar, SW_SHOWNOACTIVATE);
 
 		/* make room */
 		GetClientRect(lpgw->hStatusbar, &rect);
@@ -471,9 +495,9 @@ GraphInit(LPGW lpgw)
 		TBADDBITMAP bitmap = {0};
 
 		if (dpi > 96)
-			SendMessage(lpgw->hToolbar, TB_SETBITMAPSIZE, (WPARAM)0, (LPARAM)((24<<16) + 24));
+			SendMessage(lpgw->hToolbar, TB_SETBITMAPSIZE, (WPARAM)0, MAKELPARAM(24, 24));
 		else
-			SendMessage(lpgw->hToolbar, TB_SETBITMAPSIZE, (WPARAM)0, (LPARAM)((16<<16) + 16));
+			SendMessage(lpgw->hToolbar, TB_SETBITMAPSIZE, (WPARAM)0, MAKELPARAM(16, 16));
 
 		/* load standard toolbar icons: standard, history & view */
 		SendMessage(lpgw->hToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
@@ -542,7 +566,7 @@ GraphInit(LPGW lpgw)
 
 		/* auto-resize and show */
 		SendMessage(lpgw->hToolbar, TB_AUTOSIZE, (WPARAM)0, (LPARAM)0);
-		ShowWindow(lpgw->hToolbar, SW_SHOW);
+		ShowWindow(lpgw->hToolbar, SW_SHOWNOACTIVATE);
 
 		/* make room */
 		GetClientRect(lpgw->hToolbar, &rect);
@@ -618,10 +642,13 @@ GraphInit(LPGW lpgw)
 	}
 
 	/* resize to match requested canvas size */
-	if (lpgw->Canvas.x != 0) {
+	if (!lpgw->bDocked && lpgw->Canvas.x != 0) {
 		lpgw->Size.x = lpgw->Canvas.x + lpgw->Decoration.x;
 		lpgw->Size.y = lpgw->Canvas.y + lpgw->Decoration.y;
-		SetWindowPos(lpgw->hWndGraph, HWND_BOTTOM, lpgw->Origin.x, lpgw->Origin.y, lpgw->Size.x, lpgw->Size.y, SWP_NOACTIVATE | SWP_NOZORDER  | SWP_NOMOVE);
+		SetWindowPos(lpgw->hWndGraph, HWND_BOTTOM, 
+			     lpgw->Origin.x, lpgw->Origin.y, 
+			     lpgw->Size.x, lpgw->Size.y,
+			     SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOMOVE);
 	}
 
 	// initialize font (and pens)
@@ -637,6 +664,12 @@ GraphInit(LPGW lpgw)
 	}
 
 	ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);
+
+#ifndef WGP_CONSOLE
+	/* update docked window layout */
+	if (lpgw->bDocked)
+		DockedUpdateLayout(lpgw->lptw);
+#endif
 }
 
 
@@ -689,7 +722,12 @@ GraphStart(LPGW lpgw, double pointsize)
 		 * unless mouse mode is on */
 #ifdef USE_MOUSE
 		if (mouse_setting.on) {
-			BringWindowToTop(lpgw->hWndGraph);
+#ifndef WGP_CONSOLE
+			if (lpgw->bDocked)
+				SetFocus(lpgw->hWndGraph);
+			else
+#endif
+				BringWindowToTop(lpgw->hWndGraph);
 			return;
 		}
 #endif /* USE_MOUSE */
@@ -706,7 +744,7 @@ GraphEnd(LPGW lpgw)
 	RECT rect;
 
 	GetClientRect(lpgw->hWndGraph, &rect);
-	InvalidateRect(lpgw->hWndGraph, (LPRECT) &rect, 1);
+	InvalidateRect(lpgw->hWndGraph, &rect, 1);
 	lpgw->buffervalid = FALSE;
 	lpgw->locked = FALSE;
 	UpdateWindow(lpgw->hWndGraph);
@@ -2072,7 +2110,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		}
 
 		case W_text_encoding:
-			lpgw->encoding = curptr->x;
+			lpgw->encoding = (enum set_encoding_id) curptr->x;
 			break;
 
 		case W_put_text: {
@@ -3980,6 +4018,11 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				int i;
 				int x = GET_X_LPARAM(lParam);
 				int y = GET_Y_LPARAM(lParam) - lpgw->ToolbarHeight;
+
+				/* need to set input focus to current graph */
+				if (lpgw->bDocked)
+					SetFocus(hwnd);
+
 				for (i = 0; (i < lpgw->numplots) && (i < lpgw->maxkeyboxes) && (i < lpgw->maxhideplots); i++) {
 					if ((lpgw->keyboxes[i].left != INT_MAX) &&
 						(x >= lpgw->keyboxes[i].left) &&
@@ -3991,7 +4034,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 							SendMessage(lpgw->hToolbar, TB_CHECKBUTTON, M_HIDEPLOT + i, (LPARAM)lpgw->hideplot[i]);
 						lpgw->buffervalid = FALSE;
 						GetClientRect(hwnd, &rect);
-						InvalidateRect(hwnd, (LPRECT) &rect, 1);
+						InvalidateRect(hwnd, &rect, 1);
 						UpdateWindow(hwnd);
 						return 0L;
 					}
@@ -4046,6 +4089,29 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 #endif /* USE_MOUSE */
 
 	switch (message) {
+#ifndef WGP_CONSOLE
+		case WM_SETFOCUS:
+			if (lpgw->bDocked) {
+				char status[100];
+				// register input focus
+				lpgw->lptw->hWndFocus = hwnd;
+				DrawFocusIndicator(lpgw);
+
+				if (lpgw != graphwin) {
+					sprintf(status, "(inactive, window number %i)", lpgw->Id);
+					UpdateStatusLine(lpgw, status);
+				}
+			}
+			break;
+		case WM_KILLFOCUS:
+			if (lpgw->bDocked) {
+				// remove focus indicator by enforcing a redraw
+				GetClientRect(hwnd, &rect);
+				InvalidateRect(hwnd, &rect, 1);
+				UpdateWindow(hwnd);
+			}
+			break;
+#endif
 		case WM_SYSCOMMAND:
 			switch (LOWORD(wParam))
 			{
@@ -4089,12 +4155,23 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			 * here... */
 #ifndef DISABLE_SPACE_RAISES_CONSOLE
 			if (wParam == VK_SPACE) {
-				WinRaiseConsole();
+#ifndef WGP_CONSOLE
+				if (lpgw->bDocked)
+					SetFocus(lpgw->lptw->hWndText);
+				else
+#endif
+					WinRaiseConsole();
 				return 0L;
 			}
 #endif /* DISABLE_SPACE_RAISES_CONSOLE */
 			if (wParam == 'q') {
 				GraphClose(lpgw);
+#ifndef WGP_CONSOLE
+				if (lpgw->bDocked) {
+				    DockedUpdateLayout(lpgw->lptw);
+				    SetFocus(lpgw->lptw->hWndText);
+				}
+#endif
 				return 0L;
 			}
 #ifdef USE_MOUSE
@@ -4316,7 +4393,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					lpgw->hidegrid = SendMessage(lpgw->hToolbar, TB_ISBUTTONCHECKED, LOWORD(wParam), (LPARAM)0);
 					lpgw->buffervalid = FALSE;
 					GetClientRect(hwnd, &rect);
-					InvalidateRect(hwnd, (LPRECT) &rect, 1);
+					InvalidateRect(hwnd, &rect, 1);
 					UpdateWindow(hwnd);
 					return 0;
 				case M_WRITEINI:
@@ -4350,7 +4427,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					lpgw->hideplot[button] = SendMessage(lpgw->hToolbar, TB_ISBUTTONCHECKED, LOWORD(wParam), (LPARAM)0);
 				lpgw->buffervalid = FALSE;
 				GetClientRect(hwnd, &rect);
-				InvalidateRect(hwnd, (LPRECT) &rect, 1);
+				InvalidateRect(hwnd, &rect, 1);
 				UpdateWindow(hwnd);
 				return 0;
 			}
@@ -4373,6 +4450,11 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			if (LOWORD(wParam) != WM_CONTEXTMENU)
 				return 1;
 			/* intentionally fall through */
+		case WM_LBUTTONDOWN:
+			/* need to set input focus to current graph */
+			if (lpgw->bDocked)
+				SetFocus(hwnd);
+			break;
 		case WM_CONTEXTMENU:
 		{	/* Note that this only works via mouse in `unset mouse`
 			 * mode. You can access the popup via the System menu,
@@ -4394,6 +4476,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					RECT rc;
 					TPMPARAMS tpm;
 					LPNMTOOLBAR lpnmTB = (LPNMTOOLBAR)lParam;
+
 					SendMessage(lpnmTB->hdr.hwndFrom, TB_GETRECT, (WPARAM)lpnmTB->iItem, (LPARAM)&rc);
 					MapWindowPoints(lpnmTB->hdr.hwndFrom, HWND_DESKTOP, (LPPOINT)&rc, 2);
 					tpm.cbSize    = sizeof(TPMPARAMS);
@@ -4405,6 +4488,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				case TTN_GETDISPINFO: {
 					LPTOOLTIPTEXT lpttt = (LPTOOLTIPTEXT)lParam;
 					UINT_PTR idButton = lpttt->hdr.idFrom;
+
 					lpttt->hinst = 0;
 					switch (idButton) {
 						case M_COPY_CLIP:
@@ -4544,7 +4628,15 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 #endif
 					drawgraph(lpgw, hdc, &rect);
 			}
+
+#ifndef WGP_CONSOLE
+			/* indicate input focus */
+			if (lpgw->bDocked && (GetFocus() == hwnd))
+				DrawFocusIndicator(lpgw);
+#endif
+
 			EndPaint(hwnd, &ps);
+
 #ifdef USE_MOUSE
 			/* drawgraph() erases the plot window, so immediately after
 			 * it has completed, all the 'real-time' stuff the gnuplot core
@@ -4562,6 +4654,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			SendMessage(lpgw->hStatusbar, WM_SIZE, wParam, lParam);
 			if (lpgw->hToolbar) {
 				RECT rect;
+
 				SendMessage(lpgw->hToolbar, WM_SIZE, wParam, lParam);
 				/* make room */
 				GetClientRect(lpgw->hToolbar, &rect);
@@ -4659,8 +4752,13 @@ GraphChangeFont(LPGW lpgw, LPCTSTR font, int fontsize, HDC hdc, RECT rect)
 void
 win_close_terminal_window(LPGW lpgw)
 {
-	if (GraphHasWindow(lpgw))
+	if (GraphHasWindow(lpgw)) {
 		SendMessage(lpgw->hWndGraph, WM_CLOSE, 0L, 0L);
+#ifndef WGP_CONSOLE
+		if (lpgw->bDocked)
+			DockedUpdateLayout(lpgw->lptw);
+#endif
+	}
 }
 
 
@@ -4904,8 +5002,17 @@ Draw_XOR_Text(LPGW lpgw, const char *text, size_t length, int x, int y)
 static void
 UpdateStatusLine(LPGW lpgw, const char text[])
 {
+	if (lpgw == NULL)
+		return;
+
 	LPWSTR wtext = UnicodeText(text, encoding);
-	SendMessageW(lpgw->hStatusbar, WM_SETTEXT, (WPARAM)0, (LPARAM)wtext);
+	if (!lpgw->bDocked) {
+		if (lpgw->hStatusbar)
+			SendMessageW(lpgw->hStatusbar, SB_SETTEXT, (WPARAM)0, (LPARAM)wtext);
+	} else {
+		if (lpgw->lptw != NULL && lpgw->lptw->hStatusbar)
+			SendMessageW(lpgw->lptw->hStatusbar, SB_SETTEXT, (WPARAM)1, (LPARAM)wtext);
+	}
 	free(wtext);
 }
 
@@ -4980,7 +5087,7 @@ GraphModifyPlots(LPGW lpgw, unsigned int ops, int plotno)
 
 		lpgw->buffervalid = FALSE;
 		GetClientRect(lpgw->hWndGraph, &rect);
-		InvalidateRect(lpgw->hWndGraph, (LPRECT) &rect, 1);
+		InvalidateRect(lpgw->hWndGraph, &rect, 1);
 		UpdateToolbar(lpgw);
 		UpdateWindow(lpgw->hWndGraph);
 	}
@@ -5098,6 +5205,24 @@ DrawZoomBox(LPGW lpgw)
 		} else {
 			Draw_XOR_Text(lpgw, zoombox.text2, strlen(zoombox.text2), tx, ty + lpgw->vchar / 2);
 		}
+	}
+}
+
+
+static void
+DrawFocusIndicator(LPGW lpgw)
+{
+	if (lpgw->bDocked) {
+		HDC hdc;
+		RECT rect;
+
+		GetPlotRect(lpgw, &rect);
+		hdc = GetDC(lpgw->hWndGraph);
+		SelectObject(hdc, GetStockObject(DC_PEN));
+		SelectObject(hdc, GetStockObject(NULL_BRUSH));
+		SetDCPenColor(hdc, RGB(0, 0, 128));
+		Rectangle(hdc, rect.left + 1, rect.top + 1, rect.right - 1, rect.bottom - 1);
+		ReleaseDC(lpgw->hWndGraph, hdc);
 	}
 }
 

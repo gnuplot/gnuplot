@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.73 2016/09/12 17:44:01 markisch Exp $
+ * $Id: wtext.c,v 1.74 2016/10/08 19:09:16 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -72,14 +72,20 @@
 /* font stuff */
 #define TEXTFONTSIZE 9
 
-
 #ifndef WGP_CONSOLE
+
+enum docked_layout
+{
+    DOCKED_LAYOUT_NONE, DOCKED_LAYOUT_HORIZONTAL, DOCKED_LAYOUT_VERTICAL
+};
 
 /* limits */
 static POINT ScreenMinSize = {16,4};
 
 INT_PTR CALLBACK AboutDlgProc(HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam);
 static LRESULT CALLBACK WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+static LRESULT CALLBACK WndToolbarProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+static LRESULT CALLBACK WndSeparatorProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 static LRESULT CALLBACK WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 static void CreateTextClass(LPTW lptw);
@@ -99,6 +105,9 @@ static void TextSelectFont(LPTW lptw);
 static int ReallocateKeyBuf(LPTW lptw);
 static void UpdateCaretPos(LPTW lptw);
 static LPTSTR GetUInt(LPTSTR str, uint *pval);
+static enum docked_layout DockedLayout(LPTW lptw);
+static unsigned NumberOfDockedWindows(LPTW lptw);
+static void ApplyLayout(LPTW lptw, HWND hwnd, unsigned width, unsigned height);
 
 static TCHAR szNoMemory[] = TEXT("out of memory");
 
@@ -141,19 +150,43 @@ CreateTextClass(LPTW lptw)
        to receive UTF16 WM_CHAR messages. */
     WNDCLASSW wndclass;
 
-    hdllInstance = lptw->hInstance;	/* not using a DLL */
+    hdllInstance = lptw->hInstance;
     wndclass.style = CS_HREDRAW | CS_VREDRAW;
     wndclass.lpfnWndProc = WndTextProc;
     wndclass.cbClsExtra = 0;
     wndclass.cbWndExtra = 2 * sizeof(void *);
     wndclass.hInstance = lptw->hInstance;
-    wndclass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+    wndclass.hIcon = NULL;
     wndclass.hCursor = NULL;
     wndclass.hbrBackground = NULL;
     lptw->hbrBackground = CreateSolidBrush(lptw->bSysColors ?
-					   GetSysColor(COLOR_WINDOW) : RGB(0,0,0));
+					   GetSysColor(COLOR_WINDOW) : RGB(255,255,255));
     wndclass.lpszMenuName = NULL;
     wndclass.lpszClassName = szTextClass;
+    RegisterClassW(&wndclass);
+
+    wndclass.style = CS_HREDRAW | CS_VREDRAW;
+    wndclass.lpfnWndProc = WndToolbarProc;
+    wndclass.cbClsExtra = 0;
+    wndclass.cbWndExtra = 2 * sizeof(void *);
+    wndclass.hInstance = lptw->hInstance;
+    wndclass.hIcon = NULL;
+    wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wndclass.hbrBackground = NULL;
+    wndclass.lpszMenuName = NULL;
+    wndclass.lpszClassName = szToolbarClass;
+    RegisterClassW(&wndclass);
+
+    wndclass.style = CS_HREDRAW | CS_VREDRAW;
+    wndclass.lpfnWndProc = WndSeparatorProc;
+    wndclass.cbClsExtra = 0;
+    wndclass.cbWndExtra = 2 * sizeof(void *);
+    wndclass.hInstance = lptw->hInstance;
+    wndclass.hIcon = NULL;
+    wndclass.hCursor = NULL;
+    wndclass.hbrBackground = NULL;
+    wndclass.lpszMenuName = NULL;
+    wndclass.lpszClassName = szSeparatorClass;
     RegisterClassW(&wndclass);
 
     wndclass.style = CS_HREDRAW | CS_VREDRAW;
@@ -166,7 +199,7 @@ CreateTextClass(LPTW lptw)
     else
 	wndclass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
     wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wndclass.hbrBackground = (HBRUSH) GetStockObject(WHITE_BRUSH);
+    wndclass.hbrBackground = NULL;
     wndclass.lpszMenuName = NULL;
     wndclass.lpszClassName = szParentClass;
     RegisterClassW(&wndclass);
@@ -217,7 +250,7 @@ TextInit(LPTW lptw)
     lptw->KeyBuf = (BYTE *)GlobalLock(hglobal);
     if (lptw->KeyBuf == (BYTE *)NULL) {
 	MessageBox(NULL, szNoMemory, NULL, MB_ICONHAND | MB_SYSTEMMODAL);
-	return(1);
+	return 1;
     }
     lptw->KeyBufIn = lptw->KeyBufOut = lptw->KeyBuf;
 
@@ -228,9 +261,29 @@ TextInit(LPTW lptw)
 				    NULL, NULL, lptw->hInstance, lptw);
     if (lptw->hWndParent == NULL) {
 	MessageBox(NULL, TEXT("Couldn't open parent text window"), NULL, MB_ICONHAND | MB_SYSTEMMODAL);
-	return(1);
+	return 1;
     }
     GetClientRect(lptw->hWndParent, &rect);
+
+    lptw->hWndToolbar = CreateWindowW(szToolbarClass, L"gnuplot toolbar",
+				      WS_CHILD,
+				     0, 0,
+				     rect.right, rect.bottom,
+				     lptw->hWndParent, NULL, lptw->hInstance, lptw);
+    if (lptw->hWndToolbar == NULL) {
+	MessageBox(NULL, TEXT("Couldn't open toolbar window"), NULL, MB_ICONHAND | MB_SYSTEMMODAL);
+	return 1;
+    }
+
+    lptw->hWndSeparator = CreateWindowW(szSeparatorClass, L"gnuplot separator",
+				      WS_CHILD,
+				      rect.right, rect.top,
+				      rect.right, rect.top,
+				      lptw->hWndParent, NULL, lptw->hInstance, lptw);
+    if (lptw->hWndSeparator == NULL) {
+	MessageBox(NULL, TEXT("Couldn't open separator window"), NULL, MB_ICONHAND | MB_SYSTEMMODAL);
+	return 1;
+    }
 
     lptw->hWndText = CreateWindowW(szTextClass, lptw->Title,
 				  WS_CHILD | WS_VSCROLL | WS_HSCROLL,
@@ -239,7 +292,7 @@ TextInit(LPTW lptw)
 				  lptw->hWndParent, NULL, lptw->hInstance, lptw);
     if (lptw->hWndText == NULL) {
 	MessageBox(NULL, TEXT("Couldn't open text window"), NULL, MB_ICONHAND | MB_SYSTEMMODAL);
-	return(1);
+	return 1;
     }
 
     lptw->hStatusbar = CreateWindowEx(0, STATUSCLASSNAME, NULL,
@@ -249,6 +302,10 @@ TextInit(LPTW lptw)
 				  lptw->hInstance, lptw);
     if (lptw->hStatusbar) {
 	RECT rect;
+	/* reserve an extra slot for docked graph windows */
+	int edges[2] = { 200, -1 };
+	SendMessage(lptw->hStatusbar, SB_SETPARTS, (WPARAM)2, (LPARAM)&edges);
+
 	/* auto-adjust size */
 	SendMessage(lptw->hStatusbar, WM_SIZE, (WPARAM)0, (LPARAM)0);
 
@@ -259,7 +316,7 @@ TextInit(LPTW lptw)
 	SetWindowPos(lptw->hWndText, (HWND)NULL, 0, 0,
 			rect.right, rect.bottom - lptw->StatusHeight,
 			SWP_NOZORDER | SWP_NOACTIVATE);
-	ShowWindow(lptw->hStatusbar, SW_SHOW);
+	ShowWindow(lptw->hStatusbar, SW_SHOWNOACTIVATE);
     }
 
     lptw->hPopMenu = CreatePopupMenu();
@@ -282,14 +339,15 @@ TextInit(LPTW lptw)
     AppendMenu(sysmenu, MF_POPUP, (UINT_PTR)lptw->hPopMenu, TEXT("&Options"));
     AppendMenu(sysmenu, MF_STRING, M_ABOUT, TEXT("&About"));
 
-    if (lptw->lpmw)
+    if (lptw->lpmw != NULL)
 	LoadMacros(lptw);
 
     ShowWindow(lptw->hWndText, SW_SHOWNORMAL);
+    ShowWindow(lptw->hWndToolbar, SW_SHOWNOACTIVATE);
     BringWindowToTop(lptw->hWndText);
     SetFocus(lptw->hWndText);
     TextMessage();
-    return(0);
+    return 0;
 }
 
 
@@ -313,7 +371,7 @@ TextClose(LPTW lptw)
 	GlobalFree(hglobal);
     }
 
-    if (lptw->lpmw)
+    if (lptw->lpmw != NULL)
 	CloseMacros(lptw);
     lptw->hWndParent = (HWND)NULL;
 }
@@ -406,7 +464,6 @@ NewLine(LPTW lptw)
     /* maximum line size may have changed, so update scroll bars */
     UpdateScrollBars(lptw);
 
-    UpdateCaretPos(lptw);
     if (lptw->bFocus && lptw->bGetCh) {
 	UpdateCaretPos(lptw);
 	ShowCaret(lptw->hWndText);
@@ -1068,11 +1125,11 @@ TextSelectFont(LPTW lptw)
 	    _tcscat(lptw->fontname, TEXT(" Italic"));
 	TextMakeFont(lptw);
 	/* force a window update */
-	GetClientRect(lptw->hWndText, (LPRECT) &rect);
+	GetClientRect(lptw->hWndText, &rect);
 	SendMessage(lptw->hWndText, WM_SIZE, SIZE_RESTORED,
-		    MAKELPARAM(rect.right-rect.left, rect.bottom-rect.top));
-	GetClientRect(lptw->hWndText, (LPRECT) &rect);
-	InvalidateRect(lptw->hWndText, (LPRECT) &rect, 1);
+		    MAKELPARAM(rect.right - rect.left, rect.bottom - rect.top));
+	GetClientRect(lptw->hWndText, &rect);
+	InvalidateRect(lptw->hWndText, &rect, 1);
 	UpdateWindow(lptw->hWndText);
     }
 }
@@ -1090,7 +1147,7 @@ TextUpdateStatus(LPTW lptw)
 
 	enc = encoding;
 	swprintf_s(buf, sizeof(buf)/sizeof(WCHAR), L"encoding: %hs", encoding_names[enc]);
-	SendMessageW(lptw->hStatusbar, WM_SETTEXT, (WPARAM)0, (LPARAM)buf);
+	SendMessageW(lptw->hStatusbar, SB_SETTEXT, (WPARAM)0, (LPARAM)buf);
     }
 }
 
@@ -1104,9 +1161,9 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     lptw = (LPTW)GetWindowLongPtrW(hwnd, 0);
 
-    switch(message) {
+    switch (message) {
     case WM_SYSCOMMAND:
-	switch(LOWORD(wParam)) {
+	switch (LOWORD(wParam)) {
 	case M_COPY_CLIP:
 	case M_PASTE:
 	case M_CHOOSE_FONT:
@@ -1118,15 +1175,17 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	break;
     case WM_SETFOCUS:
-	if (IsWindow(lptw->hWndText)) {
+	if (IsWindow(lptw->hWndFocus)) {
+	    SetFocus(lptw->hWndFocus);
+	    return 0;
+	} else if (IsWindow(lptw->hWndText)) {
 	    SetFocus(lptw->hWndText);
-	    return(0);
+	    return 0;
 	}
 	break;
-    case WM_GETMINMAXINFO:
-    {
+    case WM_GETMINMAXINFO: {
 	POINT * MMinfo = (POINT *)lParam;
-        MMinfo[3].x = GetSystemMetrics(SM_CXVSCROLL) + 2 * GetSystemMetrics(SM_CXFRAME);
+	MMinfo[3].x = GetSystemMetrics(SM_CXVSCROLL) + 2 * GetSystemMetrics(SM_CXFRAME);
 	MMinfo[3].y = GetSystemMetrics(SM_CYHSCROLL) + 2 * GetSystemMetrics(SM_CYFRAME)
 	    + GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CYMENU);
 	if (lptw) {
@@ -1134,54 +1193,97 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	    MMinfo[3].y += ScreenMinSize.y * lptw->CharSize.y;
 	    MMinfo[3].y += lptw->ButtonHeight + lptw->StatusHeight;
 	}
-	return(0);
+	return 0;
     }
     case WM_SIZE:
-	if (lParam > 0) { /* Vista sets window size to 0,0 when Windows-D is pressed */
-	    SetWindowPos(lptw->hWndText, (HWND)NULL, 0, lptw->ButtonHeight,
-			    LOWORD(lParam), HIWORD(lParam) - lptw->ButtonHeight - lptw->StatusHeight,
-			    SWP_NOZORDER | SWP_NOACTIVATE);
-	    SendMessage(lptw->lpmw->hToolbar, WM_SIZE, wParam, lParam);
+	/* Vista sets the window size to 0,0 when Windows-D is pressed */
+	if (lParam > 0) { 
+	    unsigned width = LOWORD(lParam);
+	    unsigned height = HIWORD(lParam) - lptw->StatusHeight;
+
+	    ApplyLayout(lptw, hwnd, width, height);
+
+	    // also resize status bar
 	    SendMessage(lptw->hStatusbar, WM_SIZE, wParam, lParam);
 	}
-	return(0);
+	return 0;
     case WM_COMMAND:
-	if (IsWindow(lptw->hWndText))
-	    SetFocus(lptw->hWndText);
 	SendMessage(lptw->hWndText, message, wParam, lParam); /* pass on menu commands */
-	return(0);
-    case WM_NOTIFY:
-	switch (((LPNMHDR)lParam)->code) {
-	    case TBN_DROPDOWN: {
-		RECT rc;
-		TPMPARAMS tpm;
-		LPNMTOOLBAR lpnmTB = (LPNMTOOLBAR)lParam;
-		SendMessage(lpnmTB->hdr.hwndFrom, TB_GETRECT, (WPARAM)lpnmTB->iItem, (LPARAM)&rc);
-		MapWindowPoints(lpnmTB->hdr.hwndFrom, HWND_DESKTOP, (LPPOINT)&rc, 2);
-		tpm.cbSize    = sizeof(TPMPARAMS);
-		tpm.rcExclude = rc;
-		TrackPopupMenuEx(lptw->hPopMenu, TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_VERTICAL,
-			rc.left, rc.bottom, lptw->hWndText, &tpm);
-		return TBDDRET_DEFAULT;
-	    }
-	    default:
-		return FALSE;
-	}
+	return 0;
     case WM_ERASEBKGND:
 	return 1;
+    case WM_PAINT: {
+	/* clear empty space next to docked graph windows, if any */
+	HDC hdc;
+	PAINTSTRUCT ps;
+	RECT rect;
+	int width, height;
+
+	hdc = BeginPaint(hwnd, &ps);
+
+	GetClientRect(hwnd, &rect);
+	width = rect.right - rect.left;
+	height = rect.bottom - rect.top - lptw->StatusHeight;
+
+	if (lptw->nDocked > 0) {
+	    enum docked_layout layout = DockedLayout(lptw);
+	    unsigned m, rows, cols;
+
+	    m = GPMAX(lptw->nDocked, lptw->nDockCols * lptw->nDockRows);
+	    cols = lptw->nDockCols;
+	    rows = (m + cols - 1) / cols;
+
+	    SetDCBrushColor(hdc, lptw->SeparatorColor);
+	    if (layout == DOCKED_LAYOUT_HORIZONTAL) {
+		unsigned non_empty_rows = ((lptw->nDocked + (cols - 1)) / cols);
+		unsigned xofs = MulDiv(width, lptw->HorzFracDock, 1000) + lptw->SeparatorWidth / 2;
+		rect.left = xofs;
+		rect.top    = MulDiv(height, non_empty_rows, rows);
+		rect.bottom = height;
+		if (non_empty_rows != rows)
+		    FillRect(hdc, &rect, GetStockObject(DC_BRUSH));
+		if (non_empty_rows > 0) {
+		    unsigned empty_cols = non_empty_rows * cols - lptw->nDocked;
+		    rect.left = xofs +	MulDiv(width - xofs, cols - empty_cols, cols);
+		    rect.bottom = rect.top;
+		    rect.top = MulDiv(height, non_empty_rows - 1, rows);
+		    FillRect(hdc, &rect, GetStockObject(DC_BRUSH));
+		}
+	    } else {
+		unsigned non_empty_rows = ((lptw->nDocked + (cols - 1)) / cols);
+		unsigned yofs = MulDiv(height, lptw->VertFracDock, 1000) + lptw->SeparatorWidth / 2;
+		unsigned gheight = height - yofs;
+		rect.top = yofs + MulDiv(gheight, non_empty_rows, rows);
+		rect.bottom = height;
+		if (non_empty_rows != rows)
+		    FillRect(hdc, &rect, GetStockObject(DC_BRUSH));
+		if (non_empty_rows > 0) {
+		    unsigned empty_cols = non_empty_rows * cols - lptw->nDocked;
+		    rect.left = MulDiv(width, cols - empty_cols, cols);
+		    rect.bottom = rect.top;
+		    rect.top = yofs + MulDiv(gheight, non_empty_rows - 1, rows);
+		    FillRect(hdc, &rect, GetStockObject(DC_BRUSH));
+		}
+	    }
+	}
+
+	EndPaint(hwnd, &ps);
+	return 0;
+    }
     case WM_DROPFILES:
 	DragFunc(lptw, (HDROP)wParam);
 	break;
-	case WM_CONTEXTMENU:
-		SendMessage(lptw->hWndText, WM_CONTEXTMENU, wParam, lParam);
-		return 0;
-    case WM_CREATE:
-    {
+    case WM_CONTEXTMENU:
+	SendMessage(lptw->hWndText, WM_CONTEXTMENU, wParam, lParam);
+	return 0;
+    case WM_CREATE: {
 	TEXTMETRIC tm;
 
+	// store pointer to text window struct
 	lptw = (LPTW) ((CREATESTRUCT *)lParam)->lpCreateParams;
 	SetWindowLongPtrW(hwnd, 0, (LONG_PTR)lptw);
 	lptw->hWndParent = hwnd;
+
 	/* get character size */
 	TextMakeFont(lptw);
 	hdc = GetDC(hwnd);
@@ -1192,10 +1294,11 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	lptw->CharAscent = tm.tmAscent;
 	ReleaseDC(hwnd, hdc);
 
+	// init drag'n drop
 	if ((lptw->DragPre != NULL) && (lptw->DragPost != NULL))
 	    DragAcceptFiles(hwnd, TRUE);
+	break;
     }
-    break;
     case WM_DESTROY:
 	DragAcceptFiles(hwnd, FALSE);
 	DeleteObject(lptw->hfont);
@@ -1288,6 +1391,156 @@ UpdateCaretPos(LPTW lptw)
 }
 
 
+// child toolbar window
+LRESULT CALLBACK
+WndSeparatorProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    LPTW lptw;
+
+    lptw = (LPTW)GetWindowLongPtrW(hwnd, 0);
+    switch (message) {
+    case WM_CREATE:
+	lptw = (LPTW)((CREATESTRUCT *)lParam)->lpCreateParams;
+	SetWindowLongPtrW(hwnd, 0, (LONG_PTR)lptw);
+	lptw->hWndText = hwnd;
+	break;
+    case WM_ERASEBKGND: {
+	HDC hdc = GetDC(hwnd);
+	RECT rect;
+	SetDCBrushColor(hdc, GetSysColor(COLOR_WINDOWFRAME));
+	GetClientRect(hwnd, &rect);
+	FillRect(hdc, &rect, GetStockObject(DC_BRUSH));
+	ReleaseDC(hwnd, hdc);
+	return 1;
+    }
+    case WM_LBUTTONDOWN:
+	if (wParam == MK_LBUTTON) {
+	    WCHAR buf[100];
+
+	    lptw->bFracChanging = TRUE;
+	    SetCapture(hwnd);
+	    swprintf_s(buf, sizeof(buf) / sizeof(WCHAR), L"fraction: %.1f %%",
+		(DockedLayout(lptw) == DOCKED_LAYOUT_HORIZONTAL ? lptw->HorzFracDock : lptw->VertFracDock) / 10.);
+	    SendMessageW(lptw->hStatusbar, SB_SETTEXT, (WPARAM)1, (LPARAM)buf);
+	}
+	break;
+    case WM_LBUTTONUP:
+	if (lptw->bFracChanging) {
+	    lptw->bFracChanging = FALSE;
+	    ReleaseCapture();
+	    SendMessageW(lptw->hStatusbar, SB_SETTEXT, (WPARAM)1, (LPARAM)L"");
+	}
+	break;
+    case WM_MOUSEMOVE: {
+	TRACKMOUSEEVENT tme;
+
+	if (lptw->bFracChanging) {
+	    RECT rect;
+	    POINT point;
+	    WCHAR buf[100];
+	    enum docked_layout layout;
+	    unsigned width, height;
+
+	    GetClientRect(lptw->hWndParent, &rect);
+	    width = rect.right - rect.left;
+	    height = rect.bottom - rect.top - lptw->StatusHeight;
+	    GetWindowRect(hwnd, &rect);
+	    point.x = (rect.left + rect.right) / 2;
+	    point.y = (rect.top + rect.bottom) / 2;;
+	    ScreenToClient(lptw->hWndParent, &point);
+	    layout = DockedLayout(lptw);
+	    if (layout == DOCKED_LAYOUT_HORIZONTAL) {
+		int xPos = GET_X_LPARAM(lParam);
+		lptw->HorzFracDock = MulDiv(xPos + point.x, 1000, width);
+		if (lptw->HorzFracDock < 100) lptw->HorzFracDock = 100;
+		if (lptw->HorzFracDock > 900) lptw->HorzFracDock = 900;
+	    } else {
+		int yPos = GET_Y_LPARAM(lParam);
+		lptw->VertFracDock = MulDiv(yPos + point.y, 1000, height);
+		if (lptw->VertFracDock < 100) lptw->VertFracDock = 100;
+		if (lptw->VertFracDock > 900) lptw->VertFracDock = 900;
+	    }
+	    swprintf_s(buf, sizeof(buf) / sizeof(WCHAR), L"fraction: %.1f %%",
+		(layout == DOCKED_LAYOUT_HORIZONTAL ? lptw->HorzFracDock : lptw->VertFracDock) / 10.);
+	    SendMessageW(lptw->hStatusbar, SB_SETTEXT, (WPARAM)1, (LPARAM)buf);
+	    DockedUpdateLayout(lptw);
+	    return 0;
+	}
+
+	// we want to receive mouse leave messages
+	tme.cbSize = sizeof(TRACKMOUSEEVENT);
+	tme.dwFlags = TME_LEAVE;
+	tme.hwndTrack = hwnd;
+	TrackMouseEvent(&tme);
+	break;
+    }
+    case WM_SETCURSOR: {
+	enum docked_layout layout;
+
+	layout = DockedLayout(lptw);
+	if (layout == DOCKED_LAYOUT_HORIZONTAL)
+	    SetCursor(LoadCursor(NULL, IDC_SIZEWE));
+	else
+	    SetCursor(LoadCursor(NULL, IDC_SIZENS));
+	return TRUE;
+    }
+    case WM_MOUSELEAVE:
+	SetCursor(LoadCursor(NULL, IDC_ARROW));
+	return 0;
+    } /* switch(message) */
+
+    return DefWindowProcW(hwnd, message, wParam, lParam);
+}
+
+
+/* child toolbar window */
+LRESULT CALLBACK
+WndToolbarProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    LPTW lptw;
+
+    lptw = (LPTW)GetWindowLongPtrW(hwnd, 0);
+
+    switch (message) {
+    case WM_CREATE:
+	lptw = (LPTW)((CREATESTRUCT *)lParam)->lpCreateParams;
+	SetWindowLongPtrW(hwnd, 0, (LONG_PTR)lptw);
+	lptw->hWndText = hwnd;
+	break;
+    case WM_SIZE:
+	SendMessage(lptw->lpmw->hToolbar, WM_SIZE, wParam, lParam);
+	break;
+    case WM_ERASEBKGND:
+	return 1;
+    case WM_COMMAND:
+	if (IsWindow(lptw->hWndText))
+	    SetFocus(lptw->hWndText);
+	/* pass on menu commands */
+	SendMessage(lptw->hWndText, message, wParam, lParam);
+	return 0;
+    case WM_NOTIFY:
+	switch (((LPNMHDR)lParam)->code) {
+	case TBN_DROPDOWN: {
+	    RECT rc;
+	    TPMPARAMS tpm;
+	    LPNMTOOLBAR lpnmTB = (LPNMTOOLBAR)lParam;
+
+	    SendMessage(lpnmTB->hdr.hwndFrom, TB_GETRECT, (WPARAM)lpnmTB->iItem, (LPARAM)&rc);
+	    MapWindowPoints(lpnmTB->hdr.hwndFrom, HWND_DESKTOP, (LPPOINT)&rc, 2);
+	    tpm.cbSize = sizeof(TPMPARAMS);
+	    tpm.rcExclude = rc;
+	    TrackPopupMenuEx(lptw->hPopMenu, TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_VERTICAL,
+			     rc.left, rc.bottom, lptw->hWndText, &tpm);
+	    return TBDDRET_DEFAULT;
+	}
+	default:
+	    return FALSE;
+	}
+    } /* switch(message) */
+    return DefWindowProcW(hwnd, message, wParam, lParam);
+}
+
+
 /* child text window */
 LRESULT CALLBACK
 WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -1303,6 +1556,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     switch(message) {
     case WM_SETFOCUS:
 	lptw->bFocus = TRUE;
+	lptw->hWndFocus = hwnd;
 	CreateCaret(hwnd, 0, lptw->CharSize.x, 2+lptw->CaretHeight);
 	UpdateCaretPos(lptw);
 	if (lptw->bGetCh)
@@ -1400,7 +1654,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	    UpdateCaretPos(lptw);
 	    ShowCaret(hwnd);
 	}
-	return(0);
+	return 0;
 	}
     case WM_VSCROLL:
 	switch(LOWORD(wParam)) {
@@ -1438,7 +1692,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	    SetScrollPos(hwnd, SB_VERT, lptw->ScrollPos.y, TRUE);
 	    UpdateWindow(hwnd);
 	}
-	return(0);
+	return 0;
     case WM_HSCROLL:
 	switch(LOWORD(wParam)) {
 	case SB_LINEUP:
@@ -1469,7 +1723,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	    SetScrollPos(hwnd, SB_HORZ, lptw->ScrollPos.x, TRUE);
 	    UpdateWindow(hwnd);
 	}
-	return(0);
+	return 0;
     case WM_KEYDOWN:
 	if (GetKeyState(VK_SHIFT) < 0) {
 	    switch(wParam) {
@@ -1560,8 +1814,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	    } /* switch(wparam) */
 	} /* if(Ctrl) */
 	break;
-    case WM_CONTEXTMENU:
-    {
+    case WM_CONTEXTMENU: {
 	POINT pt;
 	pt.x = GET_X_LPARAM(lParam);
 	pt.y = GET_Y_LPARAM(lParam);
@@ -1573,9 +1826,13 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		pt.x, pt.y, 0, hwnd, NULL);
 	return 0;
     }
-    case WM_LBUTTONDOWN:
-    { /* start marking text */
+    case WM_LBUTTONDOWN: {
+	/* start marking text */
 	POINT pt;
+
+	/* grab input focus if there are docked graph windows */
+	if (lptw->nDocked > 0)
+	    SetFocus(hwnd);
 
 	pt.x = LOWORD(lParam);
 	pt.y = HIWORD(lParam);
@@ -1586,8 +1843,8 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	lptw->Marking = TRUE;
 	break;
     }
-    case WM_LBUTTONUP:
-    { /* finish marking text */
+    case WM_LBUTTONUP: {
+	/* finish marking text */
 	/* ensure begin mark is before end mark */
 	ReleaseCapture();
 	lptw->Marking = FALSE;
@@ -1881,21 +2138,21 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		AboutBox(hwnd, lptw->AboutText);
 		return 0;
 	    } /* switch(loword(wparam)) */
-	return(0);
+	return 0;
     case WM_SYSCOLORCHANGE:
 	DeleteObject(lptw->hbrBackground);
 	lptw->hbrBackground = CreateSolidBrush(lptw->bSysColors ?
-					       GetSysColor(COLOR_WINDOW) : RGB(0,0,0));
-	return(0);
+					       GetSysColor(COLOR_WINDOW) : RGB(255,255,255));
+	return 0;
     case WM_ERASEBKGND:
 	return 1; /* not necessary */
-    case WM_PAINT:
-    {
+    case WM_PAINT: {
 	POINT source, width, dest;
 	POINT MarkBegin, MarkEnd;
 
 	/* check update region */
-	if (!GetUpdateRect(hwnd, NULL, FALSE)) return(0);
+	if (!GetUpdateRect(hwnd, NULL, FALSE))
+	    return 0;
 
 	hdc = BeginPaint(hwnd, &ps);
 
@@ -2000,6 +2257,194 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	break;
     } /* switch(message) */
     return DefWindowProcW(hwnd, message, wParam, lParam);
+}
+
+
+static enum docked_layout
+DockedLayout(LPTW lptw)
+{
+    RECT rect;
+    unsigned width, height;
+
+    if (lptw->nDocked == 0)
+	return DOCKED_LAYOUT_NONE;
+
+    GetClientRect(lptw->hWndParent, &rect);
+    width = rect.right - rect.left;
+    height = rect.bottom - rect.top - lptw->StatusHeight;
+    if (width >= height)
+	return DOCKED_LAYOUT_HORIZONTAL;
+    else
+	return DOCKED_LAYOUT_VERTICAL;
+}
+
+
+/* redraw text window by triggering a resize event */
+void
+DockedUpdateLayout(LPTW lptw)
+{
+    HWND hwnd = lptw->hWndParent;
+    RECT rect;
+
+    GetClientRect(hwnd, &rect);
+    SendMessage(hwnd, WM_SIZE, SIZE_RESTORED,
+		MAKELPARAM(rect.right - rect.left, rect.bottom - rect.top));
+    GetClientRect(hwnd, &rect);
+    InvalidateRect(hwnd, &rect, 1);
+    UpdateWindow(hwnd);
+}
+
+
+static unsigned
+NumberOfDockedWindows(LPTW lptw)
+{
+    LPGW lpgw = listgraphs;
+    unsigned n = 0;
+    while (lpgw != NULL) {
+	if (lpgw->bDocked && GraphHasWindow(lpgw))
+	    n++;
+	lpgw = lpgw->next;
+    }
+    return n;
+}
+
+
+void
+DockedGraphSize(LPTW lptw, SIZE *size, BOOL newwindow)
+{
+    enum docked_layout layout;
+    unsigned width, height;
+    unsigned m, cols, rows;
+    RECT rect;
+
+    GetClientRect(lptw->hWndParent, &rect);
+    width = rect.right - rect.left;
+    height = rect.bottom - rect.top - lptw->StatusHeight;
+
+    // Are we about to create a new window?
+    if (newwindow) 
+	lptw->nDocked++;
+
+    // Only determine the (future) layout now
+    layout = DockedLayout(lptw);
+
+    m = GPMAX(lptw->nDocked, lptw->nDockCols * lptw->nDockRows);
+    cols = lptw->nDockCols;
+    rows = (m + cols - 1) / cols;
+
+    if (layout == DOCKED_LAYOUT_HORIZONTAL) {
+	size->cx = (MulDiv(width, 1000 - lptw->HorzFracDock, 1000) - lptw->SeparatorWidth / 2) / cols;
+	size->cy = height / rows;
+    } else {
+	size->cx = width / cols;
+	size->cy = (MulDiv(height, 1000 - lptw->VertFracDock, 1000) - lptw->SeparatorWidth / 2) / rows;
+    }
+}
+
+
+static void
+ApplyLayout(LPTW lptw, HWND hwnd, unsigned width, unsigned height)
+{
+    LPGW lpgw;
+    enum docked_layout layout;
+
+    // count actual number of docked graph windows
+    lptw->nDocked = NumberOfDockedWindows(lptw);
+
+    layout = DockedLayout(lptw);
+    if (layout == DOCKED_LAYOUT_NONE) {
+	// no docked graph windows:  resize text and toolbar windows
+	SetWindowPos(lptw->hWndText, NULL,
+	    0, lptw->ButtonHeight,
+	    width, height - lptw->ButtonHeight,
+	    SWP_NOZORDER | SWP_NOACTIVATE);
+	if (lptw->lpmw != NULL)
+	    SetWindowPos(lptw->hWndToolbar, NULL,
+		0, 0,
+		width, lptw->ButtonHeight,
+		SWP_NOZORDER | SWP_NOACTIVATE);
+	SetWindowPos(lptw->hWndSeparator, NULL,
+	    width, 0,
+	    width, 0,
+	    SWP_NOZORDER | SWP_NOACTIVATE);
+	ShowWindow(lptw->hWndSeparator, SW_HIDE);
+    } else {
+	unsigned n, m;
+	unsigned cols, rows;
+	SIZE size;
+	RECT rect;
+
+	// first resize text and toolbar windows
+	if (layout == DOCKED_LAYOUT_HORIZONTAL) {
+	    // split window horizontally
+	    SetWindowPos(lptw->hWndText, NULL,
+		0, lptw->ButtonHeight,
+		MulDiv(width, lptw->HorzFracDock, 1000) - lptw->SeparatorWidth / 2,
+		height - lptw->ButtonHeight,
+		SWP_NOZORDER | SWP_NOACTIVATE);
+	    if (lptw->lpmw != NULL)
+		SetWindowPos(lptw->hWndToolbar, NULL,
+		    0, 0,
+		    MulDiv(width, lptw->HorzFracDock, 1000) - lptw->SeparatorWidth / 2, lptw->ButtonHeight,
+		    SWP_NOZORDER | SWP_NOACTIVATE);
+	    SetWindowPos(lptw->hWndSeparator, NULL,
+		MulDiv(width, lptw->HorzFracDock, 1000) - lptw->SeparatorWidth / 2, 0,
+		lptw->SeparatorWidth, height,
+		SWP_NOZORDER | SWP_NOACTIVATE);
+	} else {
+	    // split window vertically
+	    SetWindowPos(lptw->hWndText, NULL,
+		0, lptw->ButtonHeight,
+		width,
+		MulDiv(height, lptw->VertFracDock, 1000) - lptw->SeparatorWidth / 2 - lptw->ButtonHeight,
+		SWP_NOZORDER | SWP_NOACTIVATE);
+	    if (lptw->lpmw != NULL)
+		SetWindowPos(lptw->hWndToolbar, NULL,
+		    0, 0,
+		    width, lptw->ButtonHeight,
+		    SWP_NOZORDER | SWP_NOACTIVATE);
+	    SetWindowPos(lptw->hWndSeparator, NULL,
+		0, MulDiv(height, lptw->VertFracDock, 1000) - lptw->SeparatorWidth / 2,
+		width, lptw->SeparatorWidth,
+		SWP_NOZORDER | SWP_NOACTIVATE);
+	}
+	ShowWindow(lptw->hWndSeparator, SW_SHOWNOACTIVATE);
+
+	// Number of slots to reserve might be larger than number of actual plots
+	m = GPMAX(lptw->nDocked, lptw->nDockCols * lptw->nDockRows);
+	cols = lptw->nDockCols;
+	rows = (m + cols - 1) / cols;
+
+	// Resize graph windows
+	n = 0;
+	lpgw = listgraphs;
+	DockedGraphSize(lptw, &size, FALSE);
+	while (lpgw != NULL) {
+	    if (lpgw->bDocked && GraphHasWindow(lpgw)) {
+		if (layout == DOCKED_LAYOUT_HORIZONTAL) {
+		    // all plot windows in the right part of the window in cols columns
+		    lpgw->Origin.x  = MulDiv(width, lptw->HorzFracDock, 1000) + lptw->SeparatorWidth / 2;
+		    lpgw->Origin.x += size.cx * (n % cols);
+		    lpgw->Origin.y  = size.cy * (n / cols);
+		} else {
+		    // all plot windows in the lower part of the window in cols columns
+		    lpgw->Origin.x  = size.cx * (n % cols);
+		    lpgw->Origin.y  = MulDiv(height, lptw->VertFracDock, 1000) + lptw->SeparatorWidth / 2;
+		    lpgw->Origin.y += size.cy * (n / cols);
+		}
+		SetWindowPos(lpgw->hWndGraph, NULL,
+		    lpgw->Origin.x, lpgw->Origin.y,
+		    size.cx, size.cy,
+		    SWP_NOZORDER | SWP_NOACTIVATE);
+		n++;
+	    }
+	    lpgw = lpgw->next;
+	}
+
+	GetClientRect(hwnd, &rect);
+	InvalidateRect(hwnd, &rect, 0);
+	UpdateWindow(hwnd);
+    }
 }
 
 
@@ -2156,14 +2601,15 @@ WriteTextIni(LPTW lptw)
     LPTSTR file = lptw->IniFile;
     LPTSTR section = lptw->IniSection;
     TCHAR profile[80];
-    int iconic;
+    BOOL iconic, zoomed;
     UINT dpi;
 
     if ((file == NULL) || (section == NULL))
 	return;
 
     iconic = IsIconic(lptw->hWndParent);
-    if (iconic)
+    zoomed = IsZoomed(lptw->hWndParent);
+    if (iconic || zoomed)
 	ShowWindow(lptw->hWndParent, SW_SHOWNORMAL);
     /* Rescale window size to 96dpi. */
     GetWindowRect(lptw->hWndParent, &rect);
@@ -2174,6 +2620,8 @@ WriteTextIni(LPTW lptw)
     WritePrivateProfileString(section, TEXT("TextSize"), profile, file);
     wsprintf(profile, TEXT("%d"), iconic);
     WritePrivateProfileString(section, TEXT("TextMinimized"), profile, file);
+    wsprintf(profile, TEXT("%d"), zoomed);
+    WritePrivateProfileString(section, TEXT("TextMaximized"), profile, file);
     wsprintf(profile, TEXT("%s,%d"), lptw->fontname, lptw->fontsize);
     WritePrivateProfileString(section, TEXT("TextFont"), profile, file);
     wsprintf(profile, TEXT("%d"), lptw->bWrap);
@@ -2182,8 +2630,14 @@ WriteTextIni(LPTW lptw)
     WritePrivateProfileString(section, TEXT("TextLines"), profile, file);
     wsprintf(profile, TEXT("%d"), lptw->bSysColors);
     WritePrivateProfileString(section, TEXT("SysColors"), profile, file);
+    wsprintf(profile, TEXT("%d"), lptw->VertFracDock);
+    WritePrivateProfileString(section, TEXT("DockVerticalTextFrac"), profile, file);
+    wsprintf(profile, TEXT("%d"), lptw->HorzFracDock);
+    WritePrivateProfileString(section, TEXT("DockHorizontalTextFrac"), profile, file);
     if (iconic)
 	ShowWindow(lptw->hWndParent, SW_SHOWMINIMIZED);
+    if (zoomed)
+	ShowWindow(lptw->hWndParent, SW_SHOWMAXIMIZED);
     return;
 }
 
@@ -2276,6 +2730,16 @@ ReadTextIni(LPTW lptw)
 	if (iconic)
 	    lptw->nCmdShow = SW_SHOWMINIMIZED;
     }
+
+    if (bOKINI) {
+	int maximize;
+	GetPrivateProfileString(section, TEXT("TextMaximized"), TEXT(""), profile, 80, file);
+	if ((p = GetInt(profile, &maximize)) == NULL)
+	    maximize = 0;
+	if (maximize)
+	    lptw->nCmdShow = SW_SHOWMAXIMIZED;
+    }
+
     lptw->bSysColors = FALSE;
     GetPrivateProfileString(section, TEXT("SysColors"), TEXT(""), profile, 80, file);
     if ((p = GetInt(profile, &lptw->bSysColors)) == NULL)
@@ -2291,6 +2755,33 @@ ReadTextIni(LPTW lptw)
     GetPrivateProfileString(section, TEXT("TextLines"), TEXT(""), profile, 80, file);
     if ((p = GetUInt(profile, &lptw->ScreenBuffer.size)) == NULL)
 	lptw->ScreenBuffer.size = 400;
+
+    /* control variables for docked graphs */
+    /* TODO: an additional "Docked" switch would be nice */
+#if 0
+    // Disabled these since they are controlled by "set term win"
+    GetPrivateProfileString(section, TEXT("DockCols"), TEXT(""), profile, 80, file);
+    if ((p = GetUInt(profile, &lptw->nDockCols)) == NULL)
+	lptw->nDockCols = 1;
+    GetPrivateProfileString(section, TEXT("DockRows"), TEXT(""), profile, 80, file);
+    if ((p = GetUInt(profile, &lptw->nDockRows)) == NULL)
+	lptw->nDockRows = 1;
+#else
+    lptw->nDockCols = 1;
+    lptw->nDockRows = 1;
+#endif
+    GetPrivateProfileString(section, TEXT("DockVerticalTextFrac"), TEXT(""), profile, 80, file);
+    if ((p = GetUInt(profile, &lptw->VertFracDock)) == NULL)
+	lptw->VertFracDock = 350;
+    GetPrivateProfileString(section, TEXT("DockHorizontalTextFrac"), TEXT(""), profile, 80, file);
+    if ((p = GetUInt(profile, &lptw->HorzFracDock)) == NULL)
+	lptw->HorzFracDock = 400;
+    GetPrivateProfileString(section, TEXT("DockSeparatorWidth"), TEXT(""), profile, 80, file);
+    if ((p = GetUInt(profile, &lptw->SeparatorWidth)) == NULL)
+	lptw->SeparatorWidth = 6;
+    lptw->SeparatorWidth = MulDiv(lptw->SeparatorWidth, dpi, 96);
+    /* TODO: Add wgnuplot.ini setting for this */
+    lptw->SeparatorColor = RGB(240, 240, 240);
 }
 
 

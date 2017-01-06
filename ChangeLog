@@ -1,3 +1,16 @@
+2017-01-06  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wcommon.h src/win/wgnuplib.c|h src/win/wgraph.c src/win/wmenu.c
+	src/win/wtext.c term/win.trm docs/gnuplot.doc:
+	Graph windows can be docked to the wgnuplot text window with 
+	`set term win docked`.  Multiple graph windows can be docked at the same
+	time and their layout can be changed with the new `layout <rows>,<cols>`
+	option.  The fraction of the window which is reserved for text input
+	can changed by moving a separator bar with the mouse and via wgnuplot.ini.
+	This is useful in particular for Windows in "tablet mode" which only
+	displays one maximised window at the time.
+	Patch #711
+	
 2017-01-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (gen_tics):  Remove dead code for polar axis tics.

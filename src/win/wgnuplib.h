@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.83 2016/09/08 18:43:00 markisch Exp $
+ * $Id: wgnuplib.h,v 1.84 2016/11/19 06:31:07 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -160,7 +160,10 @@ typedef struct tagTW
 	HMENU	hPopMenu;
 	HWND	hWndText;
 	HWND	hWndParent;
+	HWND	hWndToolbar;
 	HWND	hStatusbar;
+	HWND	hWndSeparator;
+	HWND	hWndFocus;		/* window with input focus */
 	POINT	Origin;
 	POINT	Size;
 	SB	ScreenBuffer;
@@ -191,6 +194,15 @@ typedef struct tagTW
 	BOOL	Marking;
 	int	bSuspend;
 	int	MaxCursorPos;
+	/* variables for docked graphs */
+	UINT	nDocked;
+	UINT	VertFracDock;
+	UINT	HorzFracDock;
+	UINT	nDockCols;
+	UINT	nDockRows;
+	UINT	SeparatorWidth;
+	COLORREF	SeparatorColor;
+	BOOL	bFracChanging;
 } TW;
 typedef TW *  LPTW;
 
@@ -316,6 +328,7 @@ typedef struct tagGW {
 	int	xmax;		/* required */
 	int	ymax;		/* required */
 	LPTW	lptw;		/* optional */  /* associated text window */
+	BOOL	bDocked;	/* is the graph docked to the text window? */
 	POINT	Origin;		/* optional */	/* origin of graph window */
 	POINT	Size;		/* optional */	/* size of graph window */
 	LPTSTR	IniFile;	/* optional */

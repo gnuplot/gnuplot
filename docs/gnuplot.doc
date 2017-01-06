@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1037 2016/12/28 04:23:02 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1038 2017/01/04 04:24:31 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -220,6 +220,9 @@ C
  not the program is in polar mode for the purpose of interpreting input
  coordinates. Tickmarks and labels around the perimeter of the polar grid
  are controlled by `set ttics`.  See `ttics`.
+ 
+ * `windows` graph windows can be docked to the wgnuplot text window, which is
+ especially useful with Windows in "tablet mode".
 
 3 Version 5.0
 

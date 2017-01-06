@@ -1,5 +1,5 @@
 /*
- * $Id: wmenu.c,v 1.37 2016/10/08 19:09:16 markisch Exp $Id: wmenu.c,v 1.37 2016/10/08 19:09:16 markisch Exp $
+ * $Id: wmenu.c,v 1.38 2016/12/25 10:16:48 markisch Exp $Id: wmenu.c,v 1.38 2016/12/25 10:16:48 markisch Exp $
  */
 
 /* GNUPLOT - win/wmenu.c */
@@ -758,7 +758,7 @@ LoadMacros(LPTW lptw)
 				    TOOLBARCLASSNAME, NULL,
 				    WS_CHILD | TBSTYLE_LIST | TBSTYLE_TOOLTIPS,
 				    0, 0, 0, 0,
-				    lptw->hWndParent, (HMENU)ID_TOOLBAR, lptw->hInstance, NULL);
+				    lptw->hWndToolbar, (HMENU)ID_TOOLBAR, lptw->hInstance, NULL);
     if (lpmw->hToolbar == NULL)
 	goto cleanup;
 
@@ -832,13 +832,16 @@ LoadMacros(LPTW lptw)
 
     /* auto-resize and show */
     SendMessage(lpmw->hToolbar, TB_AUTOSIZE, (WPARAM)0, (LPARAM)0);
-    ShowWindow(lpmw->hToolbar, SW_SHOW);
+    ShowWindow(lpmw->hToolbar, SW_SHOWNOACTIVATE);
 
     /* move top of client text window down to allow space for toolbar */
-    GetWindowRect(lpmw->hToolbar, &rect);
+    GetClientRect(lpmw->hToolbar, &rect);
     lptw->ButtonHeight = rect.bottom - rect.top + 1;
-    lptw->ButtonHeight++;
     GetClientRect(lptw->hWndParent, &rect);
+    SetWindowPos(lptw->hWndToolbar, NULL,
+		 0, 0,
+		 rect.right, lptw->ButtonHeight,
+		 SWP_NOZORDER | SWP_NOACTIVATE);
     SetWindowPos(lptw->hWndText, (HWND)NULL,
 		0, lptw->ButtonHeight,
 		rect.right,

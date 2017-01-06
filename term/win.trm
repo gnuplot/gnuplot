@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.137 2016/07/21 19:22:51 markisch Exp $
+ * $Id: win.trm,v 1.138 2016/10/03 17:28:59 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -40,6 +40,9 @@
  *
  *   Gnuplot for Windows:
  *       Maurice Castro, Russell Lang
+ *
+ *   Current maintainer:
+ *       Bastian Maerkisch
  *
  */
 
@@ -127,6 +130,7 @@ enum WIN_id { WIN_DEFAULT, WIN_MONOCHROME, WIN_COLOR, WIN_GTITLE,
 	      WIN_ENHANCED, WIN_NOENHANCED, WIN_FONT, WIN_SIZE, WIN_WSIZE,
 	      WIN_POSITION, WIN_CLOSE, WIN_BACKGROUND, WIN_FONTSCALE,
 	      WIN_LINEWIDTH, WIN_SOLID, WIN_DASHED, WIN_ROUND, WIN_BUTT,
+	      WIN_DOCKED, WIN_STANDALONE, WIN_LAYOUT,
 	      WIN_OTHER };
 
 static struct gen_table WIN_opts[] =
@@ -151,6 +155,9 @@ static struct gen_table WIN_opts[] =
     { "ws$ize", WIN_WSIZE },
     { "pos$ition", WIN_POSITION },
     { "cl$ose", WIN_CLOSE },
+    { "dock$ed", WIN_DOCKED },
+    { "standalone", WIN_STANDALONE },
+    { "lay$out", WIN_LAYOUT },
     { NULL, WIN_OTHER }
 };
 
@@ -168,6 +175,7 @@ static path_points WIN_poly = {0, 0, NULL};
 
 static void WIN_add_path_point(path_points * poly, int x, int y);
 static void WIN_flush_line(path_points * poly);
+static TBOOLEAN WIN_docked = FALSE;  /* docked window option is "sticky" */
 
 
 static void
@@ -214,6 +222,7 @@ WIN_options()
 	TBOOLEAN set_linewidth = FALSE, set_size = FALSE;
 	TBOOLEAN set_position = FALSE, set_number = FALSE;
 	TBOOLEAN set_wsize = FALSE, set_rounded = FALSE;
+	TBOOLEAN set_docked = FALSE, set_layout = FALSE;
 	TBOOLEAN color, dashed, rounded;
 	COLORREF background;
 	double fontscale, linewidth;
@@ -225,6 +234,7 @@ WIN_options()
 	int fontsize;
 	char fontname[MAXFONTNAME];
 	int window_number;
+	unsigned dock_cols, dock_rows;
 
 	while (!END_OF_COMMAND) {
 		switch (lookup_table(&WIN_opts[0], c_token)) {
@@ -393,6 +403,39 @@ WIN_options()
 				fontsize = int_expression();
 			}
 			break;
+		case WIN_DOCKED:
+			c_token++;
+			if (!graphwin->bDocked && GraphHasWindow(graphwin))
+				int_error(c_token, "Cannot change the mode of an open window.");
+			set_docked = TRUE;
+			WIN_docked = TRUE;
+			break;
+		case WIN_STANDALONE:
+			c_token++;
+			if (graphwin->bDocked && GraphHasWindow(graphwin))
+				int_error(c_token, "Cannot change the mode of an open window.");
+			set_docked = TRUE;
+			WIN_docked = FALSE;
+			break;
+		case WIN_LAYOUT:
+			c_token++;
+			dock_rows = int_expression();
+			if (END_OF_COMMAND || !equals(c_token, ","))
+				int_error(c_token, "expecting ', <num_cols>'");
+			if (dock_rows == 0) {
+				dock_rows = 1;
+				fprintf(stderr, "Warning: layout requires at least one row.\n");
+			}
+			c_token++;
+			if (END_OF_COMMAND)
+				int_error(c_token, "expecting <num_cols>");
+			dock_cols = int_expression();
+			if (dock_cols == 0) {
+				dock_cols = 1;
+				fprintf(stderr, "Warning: layout requires at least one column.\n");
+			}
+			set_layout = TRUE;
+			break;
 		case WIN_OTHER:
 		default:
 			window_number = int_expression();
@@ -412,6 +455,7 @@ WIN_options()
 			lpgw->next = calloc(1, sizeof(GW));
 			lpgw = lpgw->next;
 			lpgw->Id = window_number;
+			lpgw->bDocked = WIN_docked; /* "sticky" default */
 		}
 #ifdef USE_MOUSE
 		/* set status line of previous graph window */
@@ -446,18 +490,37 @@ WIN_options()
 		graphwin->Size.x = win_width;
 		graphwin->Size.y = win_height;
 	}
-	if (set_size) {
-		graphwin->Canvas.x = win_width;
-		graphwin->Canvas.y = win_height;
+#ifdef WGP_CONSOLE
+	if (set_docked && WIN_docked) {
+		fputs("Warning: option `docked` ignored for console mode gnuplot.\n", stderr);
+		WIN_docked = FALSE;
 	}
-	if (set_wsize) {
-		graphwin->Canvas.x = 0;
-		graphwin->Canvas.y = 0;
+#endif
+	if (!WIN_docked) {
+		if (set_docked)
+			graphwin->bDocked = WIN_docked;
+		if (set_size) {
+			graphwin->Canvas.x = win_width;
+			graphwin->Canvas.y = win_height;
+		}
+		if (set_wsize) {
+			graphwin->Canvas.x = 0;
+			graphwin->Canvas.y = 0;
+		}
+		if (set_position) {
+			graphwin->Origin.x = win_x;
+			graphwin->Origin.y = win_y;
+		}
+	} else {
+		if (set_docked)
+			graphwin->bDocked = WIN_docked;
 	}
-	if (set_position) {
-		graphwin->Origin.x = win_x;
-		graphwin->Origin.y = win_y;
+#ifndef WGP_CONSOLE
+	if (set_layout) {
+		textwin.nDockRows = dock_rows;
+		textwin.nDockCols = dock_cols;
 	}
+#endif
 	if (set_title) {
 		free (graphwin->Title);
 #ifdef UNICODE
@@ -490,6 +553,13 @@ WIN_options()
 		return;
 	}
 
+#ifndef WGP_CONSOLE
+	/* update text window */
+	if (set_layout) {
+		DockedUpdateLayout(&textwin);
+	}
+#endif
+
 	/* update graph window */
 	if ((set_position || set_size || set_wsize) && GraphHasWindow(graphwin))
 		GraphUpdateWindowPosSize(graphwin);
@@ -505,12 +575,21 @@ WIN_update_options()
 	TBOOLEAN set_font = FALSE, set_fontsize = FALSE;
 
 	/* update term_options */
-	sprintf(term_options, "%i %s %s %s %s",
+	sprintf(term_options, "%i %s %s %s %s %s",
 		graphwin->Id,
 		graphwin->color ? "color" : "monochrome",
 		graphwin->dashed ? "dashed" : "solid",
 		graphwin->rounded ? "rounded" : "butt",
-		term->flags & TERM_ENHANCED_TEXT ? "enhanced" : "noenhanced");
+		term->flags & TERM_ENHANCED_TEXT ? "enhanced" : "noenhanced",
+		graphwin->bDocked ? "docked" : "standalone");
+
+#ifndef WGP_CONSOLE
+	if (graphwin->bDocked) {
+		char buf[128];
+		sprintf(buf, " layout %i,%i", textwin.nDockRows, textwin.nDockCols);
+		strcat(term_options, buf);
+	}
+#endif
 
 	set_fontsize = (graphwin->deffontsize != WIN_inifontsize);
 	set_font = (_tcscmp(graphwin->deffontname, WIN_inifontname) != 0);
@@ -539,12 +618,14 @@ WIN_update_options()
 		sprintf(&(term_options[strlen(term_options)]),
 			" linewidth %.1f", graphwin->linewidth);
 
-	if (graphwin->Canvas.x != 0)
-		sprintf(&(term_options[strlen(term_options)]),
-			" size %li,%li", graphwin->Canvas.x, graphwin->Canvas.y);
-	else if (graphwin->Size.x != CW_USEDEFAULT)
-		sprintf(&(term_options[strlen(term_options)]),
-			" wsize %li,%li", graphwin->Size.x, graphwin->Size.y);
+	if (!graphwin->bDocked) {
+		if (graphwin->Canvas.x != 0)
+			sprintf(&(term_options[strlen(term_options)]),
+				" size %li,%li", graphwin->Canvas.x, graphwin->Canvas.y);
+		else if (graphwin->Size.x != CW_USEDEFAULT)
+			sprintf(&(term_options[strlen(term_options)]),
+				" wsize %li,%li", graphwin->Size.x, graphwin->Size.y);
+	}
 }
 
 
@@ -1106,6 +1187,7 @@ START_HELP(windows)
 "                            {title \"Plot Window Title\"}",
 "                            {{size | wsize} <width>,<height>}",
 "                            {position <x>,<y>}",
+"                            {docked {layout <rows>,<cols>} | standalone}",
 "                            {close}",
 "",
 " Multiple plot windows are supported: `set terminal win <n>` directs the",
@@ -1132,6 +1214,14 @@ START_HELP(windows)
 " the origin of the window i.e. the position of the top left corner on the",
 " screen (again in pixel). These options override any default settings",
 " from the `wgnuplot.ini` file.",
+"",
+" `docked` embeds the graph window into the wgnuplot text window.",
+" The `size` and `position` options are ignored.  Note that `docked` is not",
+" available for console-mode gnuplot.  Setting this option also changes the",
+" default for new windows.  The initial default is `standalone`.  The `layout`",
+" option allows to reserve a minimal number of columns and rows for graphs in",
+" docked mode.  If there are more graphs than fit the given layout additional",
+" rows will be added.  Graphs are sorted by the numerical id.",
 "",
 " Other options may be changed using the `graph-menu` or the initialization file",
 " `wgnuplot.ini`.",
@@ -1316,6 +1406,7 @@ START_HELP(windows)
 "       TextFont=Consolas,9",
 "       TextWrap=1",
 "       TextLines=400",
+"       TextMaximized=0",
 "       SysColors=0",
 "       GraphOrigin=0 150",
 "       GraphSize=640 330",
@@ -1329,6 +1420,8 @@ START_HELP(windows)
 "       GraphPatternAA=1",
 "       GraphFastRotation=1",
 "       GraphBackground=255 255 255",
+"       DockVerticalTextFrac=350",
+"       DockHorizontalTextFrac=400",
 #ifdef WIN_CUSTOM_PENS
 "       Border=0 0 0 0 0",
 "       Axis=192 192 192 2 2",
@@ -1344,7 +1437,7 @@ START_HELP(windows)
 " These settings apply to the wgnuplot text-window only."
 "",
 " The `TextOrigin` and `TextSize` entries specify the location and size of the",
-" text window.",
+" text window. If `TextMaximized` is non-zero, the window will be maximized.",
 "",
 " The `TextFont` entry specifies the text window font and size.",
 "",
@@ -1355,6 +1448,12 @@ START_HELP(windows)
 " from within wgnuplot.",
 "",
 " See `text-menu`.",
+"",
+"^ <h3>Docked graph options</h3>",
+"",
+" `DockVerticalTextFrac` and `DockHorizontalTextFrac` set the fraction of the",
+" window reserved for the text window in permille of the vertical or horizontal",
+" layout respectively.",
 "",
 "^ <h3>Graph window options</h3>",
 "",
