@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.405 2016/12/01 19:40:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.406 2016/12/15 20:23:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -67,6 +67,7 @@ static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.405 2016/12/01 19:40:27 s
 static struct curve_points * cp_alloc __PROTO((int num));
 static int get_data __PROTO((struct curve_points *));
 static void store2d_point __PROTO((struct curve_points *, int i, double x, double y, double xlow, double xhigh, double ylow, double yhigh, double width));
+static void theta_r_to_x_y __PROTO(( double theta, double r, double *x, double *y));
 static void eval_plots __PROTO((void));
 static void parametric_fixup __PROTO((struct curve_points * start_plot, int *plot_num));
 static void box_range_fiddling __PROTO((struct curve_points *plot));
@@ -1350,7 +1351,6 @@ store2d_point(
     dummy_type = cp->type = INRANGE;
 
     if (polar) {
-	double newx, newy;
 	double theta = x * ang2rad;
 	AXIS *theta_axis = &axis_array[T_AXIS];
 
@@ -1393,22 +1393,7 @@ store2d_point(
 	    }
 	}
 
-	if (nonlinear(&R_AXIS)) {
-	    AXIS *shadow = R_AXIS.linked_to_primary;
-	    y = eval_link_function(shadow, y) - shadow->min;
-	} else if (R_AXIS.log) {
-	    if (R_AXIS.min <= 0 || R_AXIS.autoscale & AUTOSCALE_MIN)
-		int_error(NO_CARET,"In log mode rrange must not include 0");
-	    y = AXIS_DO_LOG(POLAR_AXIS,y) - AXIS_DO_LOG(POLAR_AXIS,R_AXIS.min);
-	} else if (!(R_AXIS.autoscale & AUTOSCALE_MIN)) {
-	    /* we store internally as if plotting r(t)-rmin */
-		y -= R_AXIS.min;
-	}
-
-	newx = y * cos(x * ang2rad);
-	newy = y * sin(x * ang2rad);
-	y = newy;
-	x = newx;
+	theta_r_to_x_y(x, y, &x, &y);
 
 	/* Some plot styles use xhigh and yhigh for other quantities, */
 	/* which polar mode transforms would break		      */
@@ -1418,43 +1403,9 @@ store2d_point(
 	    xhigh = x + radius;
 
 	} else {
-	    if (!(R_AXIS.autoscale & AUTOSCALE_MAX) 
-	    &&  yhigh > R_AXIS.max) {
-		cp->type = OUTRANGE;
-	    }
-	    if (nonlinear(&R_AXIS)) {
-		AXIS *shadow = R_AXIS.linked_to_primary;
-		yhigh = eval_link_function(shadow, yhigh) - shadow->min;
-	    } else if (R_AXIS.log) {
-		yhigh = AXIS_DO_LOG(POLAR_AXIS,yhigh)
-			- AXIS_DO_LOG(POLAR_AXIS,R_AXIS.min);
-	    } else if (!(R_AXIS.autoscale & AUTOSCALE_MIN)) {
-		/* we store internally as if plotting r(t)-rmin */
-		yhigh -= R_AXIS.min;
-	    }
-	    newx = yhigh * cos(xhigh * ang2rad);
-	    newy = yhigh * sin(xhigh * ang2rad);
-	    yhigh = newy;
-	    xhigh = newx;
-
-	    if (!(R_AXIS.autoscale & AUTOSCALE_MAX) 
-	    &&  ylow > R_AXIS.max) {
-		cp->type = OUTRANGE;
-	    }
-	    if (nonlinear(&R_AXIS)) {
-		AXIS *shadow = R_AXIS.linked_to_primary;
-		ylow = eval_link_function(shadow, ylow) - shadow->min;
-	    } else if (R_AXIS.log) {
-		ylow = AXIS_DO_LOG(POLAR_AXIS,ylow)
-		     - AXIS_DO_LOG(POLAR_AXIS,R_AXIS.min);
-	    } else if (!(R_AXIS.autoscale & AUTOSCALE_MIN)) {
-		/* we store internally as if plotting r(t)-rmin */
-		ylow -= R_AXIS.min;
-	    }
-	    newx = ylow * cos(xlow * ang2rad);
-	    newy = ylow * sin(xlow * ang2rad);
-	    ylow = newy;
-	    xlow = newx;
+	    /* Jan 2017 - now omitting range check on rhigh, rlow */
+	    theta_r_to_x_y(xhigh, yhigh, &xhigh, &yhigh);
+	    theta_r_to_x_y(xlow, ylow, &xlow, &ylow);
 	}
     }
 
@@ -3200,7 +3151,7 @@ eval_plots()
 				this_plot->points[i].z = 0;
 			} else if (polar) {
 			    double y;
-			    double phi = x;
+			    double theta = x;
 
 			    if (temp > R_AXIS.max) {
 				if (R_AXIS.autoscale & AUTOSCALE_MAX)
@@ -3212,17 +3163,8 @@ eval_plots()
 				if (R_AXIS.autoscale & AUTOSCALE_MIN)
 				    R_AXIS.min = 0;
 			    }
-			    if (nonlinear(&R_AXIS)) {
-				AXIS *shadow = R_AXIS.linked_to_primary;
-				temp = eval_link_function(shadow, temp) - shadow->min;
-			    } else if (R_AXIS.log) {
-				temp = AXIS_DO_LOG(POLAR_AXIS,temp)
-				     - AXIS_DO_LOG(POLAR_AXIS,R_AXIS.min);
-			    } else if (!(R_AXIS.autoscale & AUTOSCALE_MIN))
-				temp -= R_AXIS.min;
 
-			    y = temp * sin(phi * ang2rad);
-			    x = temp * cos(phi * ang2rad);
+			    theta_r_to_x_y(theta, temp, &x, &y);
 
 			    if ((this_plot->plot_style == FILLEDCURVES) 
 			    &&  (this_plot->filledcurves_options.closeto == FILLEDCURVES_ATR)) {
@@ -3230,8 +3172,8 @@ eval_plots()
 				double temp = this_plot->filledcurves_options.at;
 				temp = AXIS_LOG_VALUE(POLAR_AXIS,temp)
 				     - AXIS_LOG_VALUE(POLAR_AXIS,R_AXIS.min);
-				yhigh = temp * sin(phi * ang2rad);
-				xhigh = temp * cos(phi * ang2rad);
+				yhigh = temp * sin(theta * ang2rad);
+				xhigh = temp * cos(theta * ang2rad);
 				STORE_WITH_LOG_AND_UPDATE_RANGE(
 				    this_plot->points[i].xhigh, xhigh, this_plot->points[i].type, x_axis,
 				    this_plot->noautoscale, NOOP, goto come_here_if_undefined);
@@ -3688,4 +3630,25 @@ parse_plot_title(struct curve_points *this_plot, char *xtitle, char *ytitle, TBO
 	this_plot->title_no_enhanced = TRUE;
     }
 
+}
+
+/*
+ * Convert polar coordinates [theta;r] to the corresponding [x;y]
+ */
+static void
+theta_r_to_x_y( double theta, double r, double *x, double *y)
+{
+    if (nonlinear(&R_AXIS)) {
+	AXIS *shadow = R_AXIS.linked_to_primary;
+	r = eval_link_function(shadow, r) - shadow->min;
+    } else if (R_AXIS.log) {
+	/* Can't get here if logscale is implemented as nonlinear axis */
+	r = AXIS_DO_LOG(POLAR_AXIS, r) - AXIS_DO_LOG(POLAR_AXIS, R_AXIS.min);
+    } else if (!(R_AXIS.autoscale & AUTOSCALE_MIN)) {
+	/* We store internally as if plotting r(theta) - rmin */
+	r -= R_AXIS.min;
+    }
+
+    *x = r * cos(theta * ang2rad);
+    *y = r * sin(theta * ang2rad);
 }
