@@ -18,6 +18,11 @@
 	* src/plot2d.c (theta_r_to_x_y):  Consolodate polar->cartesian input
 	coordinate conversion into calls to a new routine theta_r_to_x_y().
 
+	* src/graphics.c src/unset.c demo/ttics.dem docs/gnuplot.doc:
+	Allow rotation of polar grid (theta) tic labels by "set ttics rotate".
+	Extend the fixed range of theta axis so that the user can label from 
+	-180 -> 180  rather than 0 -> 360.
+
 2017-01-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* demo/stringvar.dem:  Add platform specific code for Windows.

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1038 2017/01/04 04:24:31 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1039 2017/01/06 16:07:21 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10045,12 +10045,11 @@ Ffigure_multiple_keys
  axis labels or other text.
 
  Some terminals support enclosing the label in a box.  See `set style textbox`.
- Note: Currently the boxed enclosure is limited to unrotated text.
+ Not all terminals can handle boxes for rotated text.
 
- If `rotate` is given, the label is written vertically (if the terminal can do
- so, of course).  If `rotate by <degrees>` is given, conforming terminals will
- try to write the text at the specified angle; non-conforming terminals will
- treat this as vertical text.
+ If `rotate` is given, the label is written vertically. If `rotate by <degrees>`
+ is given, the baseline of the text will be set to the specified angle.
+ Some terminals do not support text rotation.
 
  Font and its size can be chosen explicitly by `font "<name>{,<size>}"` if the
  terminal supports font settings.  Otherwise the default font of the terminal
@@ -13241,7 +13240,12 @@ Ffigure_multiple_keys
  The `set ttics` command places tics around the perimeter (largest circle)
  of the polar grid.  The angular position is always given in degrees.
  The full perimeter can be labeled regardless of the current t axis range.
+ The desired range of the tic labels should be given as shown below.
  Additional properties of the tic marks can be set. See `xtics`.
+
+      set ttics -180, 30, 180
+      set ttics add ("Theta = 0" 0)
+      set ttics font ":Italic" rotate
 3 urange
 ?commands set urange
 ?commands show urange

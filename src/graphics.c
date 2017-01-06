@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.535 2016/12/20 04:20:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.536 2016/12/26 23:46:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -279,6 +279,7 @@ place_grid(int layer)
 	    largest_polar_circle = R_AXIS.max;
 	copy_or_invent_formatstring(&THETA_AXIS);
 	gen_tics(&THETA_AXIS, ttick_callback);
+	term->text_angle(0);
     }
 
     /* Restore the grid line types if we had turned them off to draw labels only */
@@ -3604,8 +3605,11 @@ ttick_callback(
 	/* for theta tic labels. Use it as a radial offset instead */
 	if (this_axis->ticdef.textcolor.type != TC_DEFAULT)
 	    apply_pm3dcolor(&(this_axis->ticdef.textcolor));
+	/* The only rotation angle that makes sense is the angle being labeled */
+	if (this_axis->tic_rotate != 0.0)
+	    term->text_angle(place - 90.0);
 	write_multiline(text_x, text_y, text,
-		tic_hjust, tic_vjust, rotate_tics, /* FIXME: these are not correct */
+		tic_hjust, tic_vjust, 0.0, /* FIXME: these are not correct */
 		this_axis->ticdef.font);
 	term_apply_lp_properties(&border_lp);
     }
