@@ -1,3 +1,8 @@
+2017-01-07 Akira Kakuto <kakuto@fuk.kindai.ac.jp>
+
+	* src/win/wgraph.c (UpdateStatusLine):   Re-order code to support MSVC
+	2010 (and OpenWatcom).
+
 2017-01-06  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wcommon.h src/win/wgnuplib.c|h src/win/wgraph.c src/win/wmenu.c
