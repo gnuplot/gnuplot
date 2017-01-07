@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.138 2016/10/03 17:28:59 markisch Exp $
+ * $Id: win.trm,v 1.139 2017/01/06 16:07:19 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -1215,13 +1215,13 @@ START_HELP(windows)
 " screen (again in pixel). These options override any default settings",
 " from the `wgnuplot.ini` file.",
 "",
-" `docked` embeds the graph window into the wgnuplot text window.",
-" The `size` and `position` options are ignored.  Note that `docked` is not",
-" available for console-mode gnuplot.  Setting this option also changes the",
-" default for new windows.  The initial default is `standalone`.  The `layout`",
-" option allows to reserve a minimal number of columns and rows for graphs in",
-" docked mode.  If there are more graphs than fit the given layout additional",
-" rows will be added.  Graphs are sorted by the numerical id.",
+" `docked` embeds the graph window in the wgnuplot text window and the `size`",
+" and `position` options are ignored.  Note that `docked` is not available for",
+" console-mode gnuplot.  Setting this option changes the default for new"
+" windows.  The initial default is `standalone`.  The `layout` option allows to",
+" reserve a minimal number of columns and rows for graphs in docked mode.  If",
+" there are more graphs than fit the given layout additional rows will be added.",
+" Graphs are sorted by the numerical id, filling rows first.",
 "",
 " Other options may be changed using the `graph-menu` or the initialization file",
 " `wgnuplot.ini`.",
@@ -1453,7 +1453,7 @@ START_HELP(windows)
 "",
 " `DockVerticalTextFrac` and `DockHorizontalTextFrac` set the fraction of the",
 " window reserved for the text window in permille of the vertical or horizontal",
-" layout respectively.",
+" layout.",
 "",
 "^ <h3>Graph window options</h3>",
 "",
