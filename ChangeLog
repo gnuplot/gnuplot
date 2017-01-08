@@ -15,6 +15,17 @@
 	title positioned at the beginning or end of a plotted line. E.g.
 	    plot FOO ... with lines title "Foo" at end {left|right}
 
+	* src/plot2d.c (polar_to_xy):
+	Rename theta_r_to_x_y() to polar_to_xy() and add parameter TBOOLEAN update
+	TRUE - do range-checking against rrange and update limits if autoscaling
+	FALSE - convert theta;r to x;y with no range checking or update
+	This patch moves the range checking done at each original site into the
+	shared routine. The original range checks were not identical so it is
+	possible that consolidation breaks something.  In particular the call
+	from parametric_fixup() originally updated rrange based on fabs(r)
+	rather than r.  If necessary we can replicate this using two 
+	successive calls to polar_to_xy().
+
 2017-01-07 Akira Kakuto <kakuto@fuk.kindai.ac.jp>
 
 	* src/win/wgraph.c (UpdateStatusLine):   Re-order code to support MSVC

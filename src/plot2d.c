@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.407 2017/01/06 06:44:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.408 2017/01/08 04:53:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -67,7 +67,7 @@ static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.407 2017/01/06 06:44:27 s
 static struct curve_points * cp_alloc __PROTO((int num));
 static int get_data __PROTO((struct curve_points *));
 static void store2d_point __PROTO((struct curve_points *, int i, double x, double y, double xlow, double xhigh, double ylow, double yhigh, double width));
-static void theta_r_to_x_y __PROTO(( double theta, double r, double *x, double *y));
+static coord_type polar_to_xy __PROTO(( double theta, double r, double *x, double *y, TBOOLEAN update));
 static void eval_plots __PROTO((void));
 static void parametric_fixup __PROTO((struct curve_points * start_plot, int *plot_num));
 static void box_range_fiddling __PROTO((struct curve_points *plot));
@@ -1373,27 +1373,12 @@ store2d_point(
 	/* "y" at this point is really "r", so check it against rrange.	*/
 	if (y < R_AXIS.data_min)
 	    R_AXIS.data_min = y;
-	if (y < R_AXIS.min) {
-	    if (R_AXIS.autoscale & AUTOSCALE_MIN)
-		R_AXIS.min = 0;
-	    else
-		cp->type = OUTRANGE;
-	}
 	if (y > R_AXIS.data_max)
 	    R_AXIS.data_max = y;
-	if (y > R_AXIS.max) {
-	    if (R_AXIS.autoscale & AUTOSCALE_MAX)	{
-		if ((R_AXIS.max_constraint & CONSTRAINT_UPPER)
-		&&  (R_AXIS.max_ub < y))
-			R_AXIS.max = R_AXIS.max_ub;
-		else
-		    R_AXIS.max = y;
-	    } else {
-		cp->type = OUTRANGE;
-	    }
-	}
 
-	theta_r_to_x_y(x, y, &x, &y);
+	/* Convert from polar to cartesian coordinates and check ranges */
+	if (polar_to_xy(x, y, &x, &y, TRUE) == OUTRANGE)
+	    cp->type = OUTRANGE;
 
 	/* Some plot styles use xhigh and yhigh for other quantities, */
 	/* which polar mode transforms would break		      */
@@ -1403,9 +1388,9 @@ store2d_point(
 	    xhigh = x + radius;
 
 	} else {
-	    /* Jan 2017 - now omitting range check on rhigh, rlow */
-	    theta_r_to_x_y(xhigh, yhigh, &xhigh, &yhigh);
-	    theta_r_to_x_y(xlow, ylow, &xlow, &ylow);
+	    /* Jan 2017 - now skipping range check on rhigh, rlow */
+	    (void) polar_to_xy(xhigh, yhigh, &xhigh, &yhigh, FALSE);
+	    (void) polar_to_xy(xlow, ylow, &xlow, &ylow, FALSE);
 	}
     }
 
@@ -3153,18 +3138,9 @@ eval_plots()
 			    double y;
 			    double theta = x;
 
-			    if (temp > R_AXIS.max) {
-				if (R_AXIS.autoscale & AUTOSCALE_MAX)
-				    R_AXIS.max = temp;
-				else
-				    this_plot->points[i].type = OUTRANGE;
-			    }
-			    if (temp < R_AXIS.min) {
-				if (R_AXIS.autoscale & AUTOSCALE_MIN)
-				    R_AXIS.min = 0;
-			    }
-
-			    theta_r_to_x_y(theta, temp, &x, &y);
+			    /* Convert from polar to cartesian coordinates and check ranges */
+			    if (polar_to_xy(theta, temp, &x, &y, TRUE) == OUTRANGE)
+				this_plot->points[i].type = OUTRANGE;;
 
 			    if ((this_plot->plot_style == FILLEDCURVES) 
 			    &&  (this_plot->filledcurves_options.closeto == FILLEDCURVES_ATR)) {
@@ -3479,30 +3455,15 @@ parametric_fixup(struct curve_points *start_plot, int *plot_num)
 	    for (i = 0; i < yp->p_count; ++i) {
 		if (polar) {
 		    double r = yp->points[i].y;
-		    double t = xp->points[i].y * ang2rad;
+		    double t = xp->points[i].y;
 		    double x, y;
 
-		    if (!(R_AXIS.autoscale & AUTOSCALE_MAX) && r > R_AXIS.max)
+		    /* Convert from polar to cartesian coordinate and check ranges */
+		    /* FIXME: The old in-line conversion checked R_AXIS.max agains fabs(r).
+		     * That's not what polar_to_xy() is currently doing.
+		     */
+		    if (polar_to_xy(t, r, &x, &y, TRUE) == OUTRANGE)
 			yp->points[i].type = OUTRANGE;
-
-		    /* Fill in the R_AXIS min/max if autoscaling */
-		    if ((R_AXIS.autoscale & AUTOSCALE_MAX) && (fabs(r) > R_AXIS.max)) {
-			if ((R_AXIS.max_constraint & CONSTRAINT_UPPER)
-			&&  (R_AXIS.max_ub < fabs(r)))
-			    R_AXIS.max = R_AXIS.max_ub;
-			else
-			    R_AXIS.max = fabs(r);
-		    }
-		    if (R_AXIS.autoscale & AUTOSCALE_MIN) {
-			    R_AXIS.min = 0;
-		    } else {
-			/* store internally as if plotting r(t)-rmin */
-			r -= (r > 0) ? R_AXIS.min : -R_AXIS.min;
-		    }
-
-		    /* Convert from polar to cartesian for plotting */
-		    x = r * cos(t);
-		    y = r * sin(t);
 
 		    if (boxwidth >= 0 && boxwidth_is_absolute) {
 			coord_type dmy_type = INRANGE;
@@ -3646,10 +3607,45 @@ parse_plot_title(struct curve_points *this_plot, char *xtitle, char *ytitle, TBO
 
 /*
  * Convert polar coordinates [theta;r] to the corresponding [x;y]
+ * If update is TRUE then check and update rrange autoscaling
  */
-static void
-theta_r_to_x_y( double theta, double r, double *x, double *y)
+static coord_type
+polar_to_xy( double theta, double r, double *x, double *y, TBOOLEAN update)
 {
+    coord_type status = INRANGE;
+
+    /* NB: Range checks from multiple original sites are consolidated here.
+     * They were not all identical but I hope this version is close enough.
+     * One caller (parametric fixup) did R_AXIS.max range checks
+     * against fabs(r) rather than r.  Does that matter?  Did something break?
+     */
+    if (update) {
+	if (FALSE) {
+	    /* inverted_raxis not currently allowed */
+	    ;
+	} else {
+	    if (r < R_AXIS.min) {
+		if (R_AXIS.autoscale & AUTOSCALE_MIN)
+		    R_AXIS.min = 0;
+		else if (r < 0 && -r > R_AXIS.max)
+		    status = OUTRANGE;
+		else if (r >= 0 && r < R_AXIS.min)
+		    status = OUTRANGE;
+	    }
+	    if (r > R_AXIS.max) {
+		if (R_AXIS.autoscale & AUTOSCALE_MAX)	{
+		    if ((R_AXIS.max_constraint & CONSTRAINT_UPPER)
+		    &&  (R_AXIS.max_ub < r))
+			    R_AXIS.max = R_AXIS.max_ub;
+		    else
+			R_AXIS.max = r;
+		} else {
+		    status = OUTRANGE;
+		}
+	    }
+	}
+    }
+
     if (nonlinear(&R_AXIS)) {
 	AXIS *shadow = R_AXIS.linked_to_primary;
 	r = eval_link_function(shadow, r) - shadow->min;
@@ -3658,9 +3654,11 @@ theta_r_to_x_y( double theta, double r, double *x, double *y)
 	r = AXIS_DO_LOG(POLAR_AXIS, r) - AXIS_DO_LOG(POLAR_AXIS, R_AXIS.min);
     } else if (!(R_AXIS.autoscale & AUTOSCALE_MIN)) {
 	/* We store internally as if plotting r(theta) - rmin */
-	r -= R_AXIS.min;
+	r = r - R_AXIS.min;
     }
 
     *x = r * cos(theta * ang2rad);
     *y = r * sin(theta * ang2rad);
+
+    return status;
 }
