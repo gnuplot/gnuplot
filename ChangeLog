@@ -5,6 +5,11 @@
 	range [0:360].  Handle auto-generated tic at 360 as a special case and
 	omit it if there is already a tic at 0.
 
+	* src/boundary.c src/graphics.c (ttick_callback place_grid):  Reserve
+	sufficient space for THETA tic labels at the top and bottom of plot.
+	ttic labels should not toggle on/off with the grid.
+	Bug #1892
+
 2017-01-07 Akira Kakuto <kakuto@fuk.kindai.ac.jp>
 
 	* src/win/wgraph.c (UpdateStatusLine):   Re-order code to support MSVC

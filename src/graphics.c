@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.536 2016/12/26 23:46:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.537 2017/01/06 19:24:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -273,7 +273,7 @@ place_grid(int layer)
     }
 
     /* POLAR GRID tickmarks along the perimeter of the outer circle */
-    if (THETA_AXIS.ticmode && R_AXIS.gridmajor) {
+    if (THETA_AXIS.ticmode) {
 	term_apply_lp_properties(&border_lp);
 	if (largest_polar_circle <= 0)
 	    largest_polar_circle = R_AXIS.max;
@@ -3587,6 +3587,9 @@ ttick_callback(
     yl = map_y(0.95 * sin_t);
     xu = map_x(cos_t);
     yu = map_y(sin_t);
+
+    /* The normal meaning of "offset" as x/y displacement doesn't work well */
+    /* for theta tic labels. Use it as a radial offset instead */
     text_x = xu + (xu-xl) * (2. + this_axis->ticdef.offset.x);
     text_y = yu + (yu-yl) * (2. + this_axis->ticdef.offset.x);
 
@@ -3601,8 +3604,6 @@ ttick_callback(
     term->vector(xu,yu);
 
     if (text) {
-	/* The normal meaning of "offset" as x/y displacement doesn't work well */
-	/* for theta tic labels. Use it as a radial offset instead */
 	if (this_axis->ticdef.textcolor.type != TC_DEFAULT)
 	    apply_pm3dcolor(&(this_axis->ticdef.textcolor));
 	/* The only rotation angle that makes sense is the angle being labeled */

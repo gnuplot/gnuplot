@@ -11,8 +11,6 @@ unset xtics
 unset ytics
 set border 0
 set size square
-set tmargin 4
-set bmargin 3
 unset key
 
 set rrange [0:6.1]

@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.43 2016/12/20 04:20:33 sfeam Exp $
+ * $Id: boundary.c,v 1.44 2016/12/20 04:21:39 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -129,6 +129,7 @@ boundary(struct curve_points *plots, int count)
     int xtic_height=0;
     int ytic_width=0;
     int y2tic_width=0;
+    int ttic_textheight=0;	/* vertical clearance for ttics */
 
     /* figure out which rotatable items are to be rotated
      * (ylabel and y2label are rotated if possible) */
@@ -222,6 +223,12 @@ boundary(struct curve_points *plots, int count)
     } else
 	x2tic_height = 0;
 
+    /* Polar (theta) tic labels need space at top and bottom of plot */
+    if (THETA_AXIS.ticmode) {
+	/* FIXME:  Really 5% of polar grid radius, but we don't know that yet */
+	ttic_textheight = 2. * t->v_char;
+    }
+
     /* timestamp */
     if (timelabel.text) {
 	int timelin;
@@ -293,6 +300,7 @@ boundary(struct curve_points *plots, int count)
 	top_margin += t->v_char;
 	if (x2tic_height > 0)
 	    top_margin += x2tic_height;
+	top_margin += ttic_textheight;
 
 	plot_bounds.ytop -= top_margin;
 	if (plot_bounds.ytop == (int)(0.5 + (ysize + yoffset) * (t->ymax-1))) {
@@ -384,6 +392,12 @@ boundary(struct curve_points *plots, int count)
 	if (plot_bounds.ybot == (int) (t->ymax * yoffset)) {
 	    /* make room for the end of rotated ytics or y2tics */
 	    plot_bounds.ybot += (int) (t->h_char * 2);
+	}
+	/* Last chance for better estimate of space required for ttic labels */
+	/* It is too late to go back and adjust positions relative to ytop */
+	if (ttic_textheight > 0) {
+	    ttic_textheight = 0.05 * (plot_bounds.ytop - plot_bounds.ybot);
+	    plot_bounds.ybot += ttic_textheight;
 	}
     }
 
@@ -729,6 +743,7 @@ boundary(struct curve_points *plots, int count)
 
     title_x = (plot_bounds.xleft + plot_bounds.xright) / 2;
     title_y = plot_bounds.ytop + title_textheight + x2tic_textheight;
+    title_y += ttic_textheight;
     if (x2label_y + x2label_yoffset > plot_bounds.ytop)
 	title_y += x2label_textheight;
     if (x2tic_height > 0)
@@ -737,6 +752,7 @@ boundary(struct curve_points *plots, int count)
     /* Shift upward by 0.2 line to allow for descenders in xlabel text */
     xlabel_y = plot_bounds.ybot - xtic_height - xtic_textheight - xlabel_textheight
 	+ ((float)xlablin+0.2) * t->v_char;
+    xlabel_y -= ttic_textheight;
     ylabel_x = plot_bounds.xleft - ytic_width - ytic_textwidth;
     ylabel_x -= ylabel_textwidth;
 
