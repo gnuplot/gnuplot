@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.249 2016/12/26 23:46:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.250 2017/01/06 19:24:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1469,8 +1469,8 @@ unset_polar()
     raxis = FALSE;
 
     /* Initialize THETA axis structure */
-    THETA_AXIS.min = -179.;
-    THETA_AXIS.max = 359.;
+    THETA_AXIS.min = 0.;
+    THETA_AXIS.max = 360.;
     THETA_AXIS.ticdef = default_axis_ticdef;
     THETA_AXIS.index = THETA_index;
     free(THETA_AXIS.formatstring);

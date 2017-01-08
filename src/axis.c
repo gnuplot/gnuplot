@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.214 2016/12/26 23:46:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.215 2017/01/06 06:43:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1055,7 +1055,9 @@ gen_tics(struct axis *this, tic_callback callback)
 		internal = axis_log_value(this, mark->position) - polar_shift;
 	    }
 
-	    if (!inrange(internal, internal_min, internal_max))
+	    if (this->index == THETA_index)
+		; /* No harm done if the angular placement wraps at 2pi */
+	    else if (!inrange(internal, internal_min, internal_max))
 		continue;
 
 	    if (mark->level < 0) {
@@ -1330,6 +1332,12 @@ gen_tics(struct axis *this, tic_callback callback)
 	    nsteps++;
 	}
 
+	/* Special case.  I hate it. */
+	if (this->index == THETA_index) {
+	    if (start == 0 && end > 360)
+		nsteps--;
+	}
+
 	for (tic = start; nsteps > 0; tic += step, nsteps--) {
 
 	    /* {{{  calc internal and user co-ords */
@@ -1355,6 +1363,15 @@ gen_tics(struct axis *this, tic_callback callback)
 		user = CheckZero(internal, step);
 	    }
 	    /* }}} */
+
+	    /* Allows placement of theta tics outside the range [0:360] */
+	    if (this->index == THETA_index) {
+		if (internal > internal_max)
+		    internal -= 360.;
+		if (internal < internal_min)
+		    internal += 360.;
+	    }
+
 	    if (internal > internal_max)
 		break;		/* gone too far - end of series = VERYLARGE perhaps */
 	    if (internal >= internal_min) {

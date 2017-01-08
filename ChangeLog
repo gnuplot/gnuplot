@@ -1,3 +1,10 @@
+2017-01-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (gen_tics) unset.c (unset_polar):  Allow placement of tics
+	and tic labels along THETA (set ttics) using angles outside the fixed
+	range [0:360].  Handle auto-generated tic at 360 as a special case and
+	omit it if there is already a tic at 0.
+
 2017-01-07 Akira Kakuto <kakuto@fuk.kindai.ac.jp>
 
 	* src/win/wgraph.c (UpdateStatusLine):   Re-order code to support MSVC
