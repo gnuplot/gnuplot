@@ -26,6 +26,17 @@
 	rather than r.  If necessary we can replicate this using two 
 	successive calls to polar_to_xy().
 
+	* src/plot2d.c (polar_to_xy):
+	Mapping negative numbers onto a polar plot with (R_AXIS.min != 0)
+	was giving incorrect placement.  This patch catches and corrects most of
+	the bad cases. Examples that were bad before this patch:
+	    set polar; set grid polar; set rrange [1:5]; plot -2, 3
+	(note that the "-2" circle was drawn outside the "3" circle
+	    load 'ttics.dem'; set rrange [1:6]; replot
+	(weird displacement of -t curve)
+	Some corner cases may remain (e.g. nonlinear R with nonzero min)
+	Bug #1892
+
 2017-01-07 Akira Kakuto <kakuto@fuk.kindai.ac.jp>
 
 	* src/win/wgraph.c (UpdateStatusLine):   Re-order code to support MSVC

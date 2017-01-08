@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.408 2017/01/08 04:53:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.409 2017/01/08 07:04:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -3627,9 +3627,11 @@ polar_to_xy( double theta, double r, double *x, double *y, TBOOLEAN update)
 	    if (r < R_AXIS.min) {
 		if (R_AXIS.autoscale & AUTOSCALE_MIN)
 		    R_AXIS.min = 0;
+		else if (R_AXIS.min < 0)
+		    status = OUTRANGE;
 		else if (r < 0 && -r > R_AXIS.max)
 		    status = OUTRANGE;
-		else if (r >= 0 && r < R_AXIS.min)
+		else if (r >= 0)
 		    status = OUTRANGE;
 	    }
 	    if (r > R_AXIS.max) {
@@ -3652,10 +3654,21 @@ polar_to_xy( double theta, double r, double *x, double *y, TBOOLEAN update)
     } else if (R_AXIS.log) {
 	/* Can't get here if logscale is implemented as nonlinear axis */
 	r = AXIS_DO_LOG(POLAR_AXIS, r) - AXIS_DO_LOG(POLAR_AXIS, R_AXIS.min);
-    } else if (!(R_AXIS.autoscale & AUTOSCALE_MIN)) {
+    } else if ((R_AXIS.autoscale & AUTOSCALE_MIN)) {
+	; /* Leave it */
+    } else if (r >= R_AXIS.min) {
 	/* We store internally as if plotting r(theta) - rmin */
 	r = r - R_AXIS.min;
+    } else if (r < -R_AXIS.min) {
+	/* If (r < R_AXIS.min < 0) we already flagged OUTRANGE above */
+	/* That leaves the case (r < 0  &&  R_AXIS.min >= 0) */
+	r = r + R_AXIS.min;
+    } else {
+	*x = not_a_number();
+	*y = not_a_number();
+	return OUTRANGE;
     }
+    /* FIXME: I think nonlinear R with R_AXIS.min != 0 remains a problem  */
 
     *x = r * cos(theta * ang2rad);
     *y = r * sin(theta * ang2rad);
