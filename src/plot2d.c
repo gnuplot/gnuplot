@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.406 2016/12/15 20:23:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.407 2017/01/06 06:44:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -3609,16 +3609,28 @@ parse_plot_title(struct curve_points *this_plot, char *xtitle, char *ytitle, TBO
 	    if (equals(c_token,"end")) {
 		this_plot->title_position->scalex = character;
 		this_plot->title_position->x = 1;
+		this_plot->title_position->y = LEFT;
 		c_token++;
 	    } else if (almost_equals(c_token,"beg$inning")) {
 		this_plot->title_position->scalex = character;
 		this_plot->title_position->x = -1;
+		this_plot->title_position->y = RIGHT;
 		c_token++;
 	    } else {
 		get_position_default(this_plot->title_position, screen, 2);
 	    }
 	    if (save_token == c_token)
 		int_error(c_token, "expecting \"at {beginning|end|<xpos>,<ypos>}\"");
+	    if (equals(c_token,"right")) {
+		if (this_plot->title_position->scalex == character)
+		    this_plot->title_position->y = RIGHT;
+		c_token++;
+	    }
+	    if (equals(c_token,"left")) {
+		if (this_plot->title_position->scalex == character)
+		    this_plot->title_position->y = LEFT;
+		c_token++;
+	    }
 	}
     }
 

@@ -10,6 +10,11 @@
 	ttic labels should not toggle on/off with the grid.
 	Bug #1892
 
+	* src/set.c (parse_plot_title) src/plot2d.c (attach_title_to_plot):
+	Accept keywords {left|right} to control text justification of a plot
+	title positioned at the beginning or end of a plotted line. E.g.
+	    plot FOO ... with lines title "Foo" at end {left|right}
+
 2017-01-07 Akira Kakuto <kakuto@fuk.kindai.ac.jp>
 
 	* src/win/wgraph.c (UpdateStatusLine):   Re-order code to support MSVC

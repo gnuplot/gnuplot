@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.537 2017/01/06 19:24:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.538 2017/01/08 04:47:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4066,7 +4066,7 @@ attach_title_to_plot(struct curve_points *this_plot, legend_key *key)
 	(*t->linetype)(LT_BLACK);
 
     write_multiline(x, y, this_plot->title,
-    	(this_plot->title_position->x > 0) ? LEFT : RIGHT,
+    	(JUSTIFY)this_plot->title_position->y,
 	JUST_TOP, 0, key->font);
 }
 
