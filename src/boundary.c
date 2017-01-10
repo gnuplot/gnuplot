@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.44 2016/12/20 04:21:39 sfeam Exp $
+ * $Id: boundary.c,v 1.45 2017/01/08 04:47:58 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -39,6 +39,7 @@
 #include "alloc.h"
 #include "axis.h"
 #include "misc.h"
+#include "plot2d.h"	/* for polar_to_xy */
 #include "pm3d.h"	/* for is_plot_with_palette */
 
 #define ERRORBARTIC GPMAX((t->h_tic/2),1)
@@ -1491,6 +1492,21 @@ draw_titles()
 	y = x2label_y - t->v_char / 2;
 	write_label(x, y, &(axis_array[SECOND_X_AXIS].label));
 	reset_textcolor(&(axis_array[SECOND_X_AXIS].label.textcolor));
+    }
+
+    /* RLABEL */
+    if (axis_array[POLAR_AXIS].label.text) {
+	unsigned int x, y;
+	double px, py;
+
+	(void)polar_to_xy(0.0, R_AXIS.min, &px, &py, FALSE);
+	x = map_x(px);
+	y = map_y(py);
+	(void)polar_to_xy(0.0, R_AXIS.max, &px, &py, FALSE);
+	x = (x + map_x(px)) / 2;
+	y = y + t->v_char;
+	write_label(x, y, &(axis_array[POLAR_AXIS].label));
+	reset_textcolor(&(axis_array[POLAR_AXIS].label.textcolor));
     }
 
     /* PLACE TIMELABEL */

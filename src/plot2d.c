@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.409 2017/01/08 07:04:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.410 2017/01/09 06:02:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -67,7 +67,6 @@ static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.409 2017/01/08 07:04:50 s
 static struct curve_points * cp_alloc __PROTO((int num));
 static int get_data __PROTO((struct curve_points *));
 static void store2d_point __PROTO((struct curve_points *, int i, double x, double y, double xlow, double xhigh, double ylow, double yhigh, double width));
-static coord_type polar_to_xy __PROTO(( double theta, double r, double *x, double *y, TBOOLEAN update));
 static void eval_plots __PROTO((void));
 static void parametric_fixup __PROTO((struct curve_points * start_plot, int *plot_num));
 static void box_range_fiddling __PROTO((struct curve_points *plot));
@@ -3609,7 +3608,7 @@ parse_plot_title(struct curve_points *this_plot, char *xtitle, char *ytitle, TBO
  * Convert polar coordinates [theta;r] to the corresponding [x;y]
  * If update is TRUE then check and update rrange autoscaling
  */
-static coord_type
+coord_type
 polar_to_xy( double theta, double r, double *x, double *y, TBOOLEAN update)
 {
     coord_type status = INRANGE;

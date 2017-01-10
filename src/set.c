@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.545 2016/12/26 23:46:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.546 2016/12/28 04:23:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -594,6 +594,9 @@ set_command()
 	    break;
 	case S_CBLABEL:
 	    set_xyzlabel(&axis_array[COLOR_AXIS].label);
+	    break;
+	case S_RLABEL:
+	    set_xyzlabel(&axis_array[POLAR_AXIS].label);
 	    break;
 	case S_X2LABEL:
 	    set_xyzlabel(&axis_array[SECOND_X_AXIS].label);

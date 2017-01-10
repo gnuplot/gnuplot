@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.379 2016/12/26 23:46:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.380 2017/01/01 23:53:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -533,6 +533,9 @@ show_command()
 	break;
     case S_CBLABEL:
 	show_axislabel(COLOR_AXIS);
+	break;
+    case S_RLABEL:
+	show_axislabel(POLAR_AXIS);
 	break;
     case S_X2LABEL:
 	show_axislabel(SECOND_X_AXIS);

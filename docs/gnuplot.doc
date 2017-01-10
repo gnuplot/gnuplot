@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1040 2017/01/06 19:24:07 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1041 2017/01/08 04:41:22 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -12087,7 +12087,14 @@ Ffigure_multiple_keys
  current rrange is non-zero (and not autoscaled), then a white circle is drawn
  at the center of the polar plot to indicate that the plot lines and axes do
  not reach 0.  The axis line is drawn using the same line type as the plot
- border.  See `polar`, `rrange`, `rtics`, `set grid`.
+ border.  See `polar`, `rrange`, `rtics`, `rlabel`, `set grid`.
+3 rlabel
+?commands set rlabel
+?rlabel
+?set rlabel
+?unset rlabel
+ This command places a label above the r axis. The label will be drawn whether
+ or not the plot is in polar mode.  See `set xlabel` for additional keywords.
 3 rmargin
 ?commands set rmargin
 ?set rmargin

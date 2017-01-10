@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.321 2016/12/26 23:46:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.322 2017/01/01 23:53:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -796,7 +796,6 @@ set origin %g,%g\n",
     fprintf(fp, "set timestamp %s \n", timelabel_bottom ? "bottom" : "top");
     SAVE_AXISLABEL_OR_TITLE("", "timestamp", timelabel);
 
-    save_prange(fp, axis_array + POLAR_AXIS);
     save_prange(fp, axis_array + T_AXIS);
     save_prange(fp, axis_array + U_AXIS);
     save_prange(fp, axis_array + V_AXIS);
@@ -820,6 +819,9 @@ set origin %g,%g\n",
 
     SAVE_AXISLABEL(COLOR_AXIS);
     save_prange(fp, axis_array + COLOR_AXIS);
+
+    SAVE_AXISLABEL(POLAR_AXIS);
+    save_prange(fp, axis_array + POLAR_AXIS);
 
     for (axis=0; axis<num_parallel_axes; axis++)
 	save_prange(fp, &parallel_axis[axis]);

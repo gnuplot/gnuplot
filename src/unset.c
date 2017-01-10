@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.250 2017/01/06 19:24:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.251 2017/01/08 04:41:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -546,6 +546,9 @@ unset_command()
 	break;
     case S_CBLABEL:
 	unset_axislabel(COLOR_AXIS);
+	break;
+    case S_RLABEL:
+	unset_axislabel(POLAR_AXIS);
 	break;
     case S_X2LABEL:
 	unset_axislabel(SECOND_X_AXIS);

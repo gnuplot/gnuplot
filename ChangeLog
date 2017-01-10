@@ -1,3 +1,11 @@
+2017-01-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/save.c src/set.c src/show.c src/tables.c src/tables.h src/unset.c
+	src/boundary.c src/plot2d.c src/plot2d.h docs/gnuplot.doc:
+	New command "set rlabel" places an axis label above the raxis. The label
+	is printed whether or not the program is currently in polar mode.
+	Keywords for offset, font, etc as for the other axis label commands.
+
 2017-01-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (gen_tics) unset.c (unset_polar):  Allow placement of tics
