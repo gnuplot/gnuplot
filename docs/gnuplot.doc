@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1041 2017/01/08 04:41:22 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1042 2017/01/10 21:22:54 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -216,10 +216,14 @@ C
 
  * New full-featured terminal driver for sixel graphics (see `sixelgd`).
 
- * Polar grid elements (circles and radial lines) can be generated whether or
- not the program is in polar mode for the purpose of interpreting input
- coordinates. Tickmarks and labels around the perimeter of the polar grid
- are controlled by `set ttics`.  See `ttics`.
+ * Significant improvements and extensions to the polar coordinate system.
+ Previous versions of gnuplot produced incorrect or unexpected results for
+ out-of-range values of r and for rrange inverted (e.g. rrange [90:0]).
+ Inverted rrange can now be used to generate plots in a celestial horizontal
+ coordinates (center = zenith = altitude 90, perimeter = horizon = altitude 0).
+ Polar grid elements (circles and radial lines) can now be generated whether or
+ not the program is in polar mode.  Tickmarks and labels around the perimeter
+ of the polar grid are controlled by `set ttics`.  See `ttics`.
  
  * `windows` graph windows can be docked to the wgnuplot text window, which is
  especially useful with Windows in "tablet mode".

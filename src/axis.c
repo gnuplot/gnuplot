@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.215 2017/01/06 06:43:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.216 2017/01/08 04:41:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1048,6 +1048,8 @@ gen_tics(struct axis *this, tic_callback callback)
 		if (nonlinear(this))
 		    internal = eval_link_function(this->linked_to_primary, mark->position)
 			     - eval_link_function(this->linked_to_primary, polar_shift);
+		else if (inverted_raxis)
+		    internal = R_AXIS.set_min - mark->position;
 		else
 		    internal = axis_log_value(this, mark->position)
 			     - axis_log_value(this, polar_shift);
@@ -1403,8 +1405,11 @@ gen_tics(struct axis *this, tic_callback callback)
 			} else if (this->tictype == DT_DMS) {
 			    gstrdms(label, this->ticfmt, (double)user);
 			} else if (this->index == POLAR_AXIS) {
-			    internal = axis_log_value(this, tic)
-				     - axis_log_value(this, R_AXIS.min);
+			    if (inverted_raxis)
+				internal = R_AXIS.min - tic;
+			    else
+				internal = axis_log_value(this, tic)
+					 - axis_log_value(this, R_AXIS.min);
 			    gprintf(label, sizeof(label), this->ticfmt, log10_base, tic);
 			} else if (this->index >= PARALLEL_AXES) {
 			    /* FIXME: needed because ticfmt is not maintained for parallel axes */

@@ -1,0 +1,84 @@
+#
+# Calculate solar path in horizontal coordinates (altitude, azimuth)
+# Use gnuplot's polar mode with inverted R range so that the horizon
+# (altitude 0°) is at the perimeter and altitude 90° is at the center.
+#
+
+set label 1 at screen 0.02, 0.95 font ":Bold,10"
+set label 1 "Solar path at\nLatitude 47.47 N"
+set timestamp "Seattle - %d %b %Y"
+
+# Set up equations for Azimuth(t) and Altitude(t) 
+# as a function of t, the number of seconds  before or after noon
+# (local standard time) on the day of interest at a particular latitude.
+# Here we calculate for Seattle (47.47 N  -122.28 W)
+
+  Latitude = 47.47
+  Date = "21-12-2016 12:00"
+  call 'solar_params.dem'
+
+  array dummy[150]
+  array winter_alt[150]
+  array winter_azi[150]
+  time = -12 * Hour
+  do for [t = 1 : 150] {
+	winter_alt[t] = Altitude(time)
+	winter_azi[t] = Azimuth(time)
+        dummy[t] = t
+	time = time + 10 * Minute
+  }
+
+  Date = "21-06-2016 12:00"
+  call 'solar_params.dem'
+
+  array summer_alt[150]
+  array summer_azi[150]
+  time = -12 * Hour
+  do for [t = 1 : 150] {
+	summer_alt[t] = Altitude(time)
+	summer_azi[t] = Azimuth(time)
+	time = time + 10 * Minute
+  }
+
+  Date = strftime(TimeFormat,time(0))
+  call 'solar_params.dem'
+
+  array today_alt[150]
+  array today_azi[150]
+  time = -12 * Hour
+  do for [t = 1 : 150] {
+	today_alt[t] = Altitude(time)
+	today_azi[t] = Azimuth(time)
+	time = time + 10 * Minute
+  }
+
+#
+set angle degrees
+
+set polar
+set grid polar
+unset xtics 
+unset ytics
+unset border
+unset key
+set size square
+set rrange [90:0]
+
+set ttics add ("N" 90, "E" 0, "S" -90, "W" 180) font ":Bold"
+set rtics format "%.0f°"
+set rtics 30
+set rlabel "Altitude" offset -2 font ":Bold"
+
+# By convention North (azimuth 0°) should be at the top with angles
+# increasing clockwise, but gnuplot doesn't yet support anything but
+# theta=0 at the right and angles increasing counter-clockwise.
+# So we must manually label the angles and add an offset both to the
+# tic labels and to the plotted azimuthal angle.
+#
+# plot [t = -8*Hour : 8*Hour] '+' using (90-Azimuth(t)):(Altitude(t)) title "Winter Solstice" at end
+
+plot dummy using (90 - winter_azi[$1]):(winter_alt[$1]) lw 2 title "   Winter Solstice" at beg left, \
+     dummy using (90 - summer_azi[$1]):(summer_alt[$1]) lw 2 title "   Summer Solstice" at beg left, \
+     dummy using (90 - today_azi[$1]):(today_alt[$1]) lw 2 title "Today   " at end right
+
+ pause -1 "<cr> to continue"

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.546 2016/12/28 04:23:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.547 2017/01/10 21:22:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -6504,11 +6504,18 @@ rrange_to_xy()
 {
     double min;
 
-    /* An inverted R axis makes no sense */
+    /* An inverted R axis makes no sense in most cases.
+     * One reasonable use is to project altitude/azimuth spherical coordinates
+     * so that the zenith (azimuth = 90) is in the center and the horizon
+     * (azimuth = 0) is at the perimeter.
+     */
     if (R_AXIS.set_min > R_AXIS.set_max) {
-	min = R_AXIS.set_max;
-	R_AXIS.set_max = R_AXIS.set_min;
-	R_AXIS.set_min = min;
+	if (nonlinear(&R_AXIS))
+	    int_error(NO_CARET, "cannot invert nonlinear R axis");
+	int_warn(NO_CARET, "inverted R axis");
+	inverted_raxis = TRUE;
+    } else {
+	inverted_raxis = FALSE;
     }
 
     if (R_AXIS.set_autoscale & AUTOSCALE_MIN)
@@ -6523,13 +6530,14 @@ rrange_to_xy()
 	Y_AXIS.set_autoscale = AUTOSCALE_NONE;
 	if (nonlinear(&R_AXIS))
 	    X_AXIS.set_max = eval_link_function(R_AXIS.linked_to_primary, R_AXIS.set_max)
-			   - eval_link_function(R_AXIS.linked_to_primary, R_AXIS.set_min);
+			   - eval_link_function(R_AXIS.linked_to_primary, min);
 	else if (R_AXIS.log)
 	    /* NB: Can't get here if "set log" is implemented as nonlinear */
 	    X_AXIS.set_max =  AXIS_DO_LOG(POLAR_AXIS, R_AXIS.set_max)
 			    - AXIS_DO_LOG(POLAR_AXIS, min);
 	else
-	    X_AXIS.set_max = R_AXIS.set_max - min;
+	    X_AXIS.set_max = fabs(R_AXIS.set_max - min);
+
 	Y_AXIS.set_max = X_AXIS.set_max;
 	Y_AXIS.set_min = X_AXIS.set_min = -X_AXIS.set_max;
     }

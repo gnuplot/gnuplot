@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.132 2016/11/03 22:27:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.133 2016/11/08 05:41:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -127,6 +127,7 @@ int timelabel_bottom = TRUE;
 
 /* flag for polar mode */
 TBOOLEAN polar = FALSE;
+TBOOLEAN inverted_raxis = FALSE;
 
 /* zero threshold, may _not_ be 0! */
 double zero = ZERO;

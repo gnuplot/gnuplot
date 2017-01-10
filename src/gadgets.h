@@ -458,6 +458,7 @@ extern text_label timelabel;
 extern int timelabel_bottom;
 
 extern TBOOLEAN	polar;
+extern TBOOLEAN inverted_raxis;	/* true if R_AXIS.set_min > R_AXIS.set_max */
 
 #define ZERO 1e-8		/* default for 'zero' set option */
 extern double zero;		/* zero threshold, not 0! */

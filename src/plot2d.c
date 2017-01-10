@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.410 2017/01/09 06:02:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.411 2017/01/10 21:22:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -3619,9 +3619,9 @@ polar_to_xy( double theta, double r, double *x, double *y, TBOOLEAN update)
      * against fabs(r) rather than r.  Does that matter?  Did something break?
      */
     if (update) {
-	if (FALSE) {
-	    /* inverted_raxis not currently allowed */
-	    ;
+	if (inverted_raxis) {
+	    if (!inrange(r, R_AXIS.set_min, R_AXIS.set_max))
+		status = OUTRANGE;
 	} else {
 	    if (r < R_AXIS.min) {
 		if (R_AXIS.autoscale & AUTOSCALE_MIN)
@@ -3653,6 +3653,8 @@ polar_to_xy( double theta, double r, double *x, double *y, TBOOLEAN update)
     } else if (R_AXIS.log) {
 	/* Can't get here if logscale is implemented as nonlinear axis */
 	r = AXIS_DO_LOG(POLAR_AXIS, r) - AXIS_DO_LOG(POLAR_AXIS, R_AXIS.min);
+    } else if (inverted_raxis) {
+	r = R_AXIS.set_min - r;
     } else if ((R_AXIS.autoscale & AUTOSCALE_MIN)) {
 	; /* Leave it */
     } else if (r >= R_AXIS.min) {

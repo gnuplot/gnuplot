@@ -6,6 +6,19 @@
 	is printed whether or not the program is currently in polar mode.
 	Keywords for offset, font, etc as for the other axis label commands.
 
+	* src/axis.c src/gadgets.c src/gadgets.h src/graphics.c src/mouse.c
+	src/plot2d.c src/set.c docs/gnuplod.doc:  Support inverted r axis range.
+	rrange must be linear and have fixed max/min (no autoscaling).
+
+	Allows use of polar mode to display a projection of celestial horizontal
+	coordinates (altitude + azimuth) with the zenith (altitude 90) at the
+	center and the horizon (altitude 0) at the perimeter. Theta represents 
+	the azimuthal angle. 
+
+	* demo/solar_path.dem demo/solar_params.dem demo/all.dem:
+	Use inverted rrange to display solar path at a specific latitude in
+	celestial horizontal coordinates.
+
 2017-01-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (gen_tics) unset.c (unset_polar):  Allow placement of tics

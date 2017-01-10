@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.538 2017/01/08 04:47:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.539 2017/01/08 04:53:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -242,8 +242,8 @@ place_grid(int layer)
     if (R_AXIS.ticmode && (raxis || polar)) {
 	/* Piggyback on the xtick2d_callback.  Avoid a call to the full    */
 	/* axis_output_tics(), which wasn't really designed for this axis. */
-	tic_start = map_y(0);   /* Always equivalent to tics on phi=0 axis */
-	tic_mirror = tic_start; /* tic extends on both sides of phi=0 */
+	tic_start = map_y(0);   /* Always equivalent to tics on theta=0 axis */
+	tic_mirror = tic_start; /* tic extends on both sides of theta=0 */
 	tic_text = tic_start - t->v_char;
 	rotate_tics = R_AXIS.tic_rotate;
 	if (rotate_tics == 0)
@@ -3400,14 +3400,15 @@ xtick2d_callback(
 	if (this_axis->index == POLAR_AXIS) {
 	    double x = place, y = 0, s = sin(0.1), c = cos(0.1);
 	    int i;
-	    int ogx = map_x(x);
-	    int ogy = map_y(0);
-	    int gx, gy;
+	    int ogx, ogy, gx, gy;
 
 	    if (place > largest_polar_circle)
 		largest_polar_circle = place;
 	    else if (-place > largest_polar_circle)
 		largest_polar_circle = -place;
+
+	    ogx = map_x(x);
+	    ogy = map_y(0);
 	    for (i = 1; i <= 63 /* 2pi/0.1 */ ; ++i) {
 		{
 		    /* cos(t+dt) = cos(t)cos(dt)-sin(t)cos(dt) */
@@ -3941,14 +3942,19 @@ place_raxis()
 
     x0 = map_x(0);
     y0 = map_y(0);
-    rightend = (R_AXIS.autoscale & AUTOSCALE_MAX) ? R_AXIS.max : R_AXIS.set_max;
-    xend = map_x( AXIS_LOG_VALUE(POLAR_AXIS,rightend)
-		- AXIS_LOG_VALUE(POLAR_AXIS,R_AXIS.set_min));
+    if (inverted_raxis) {
+	xend = map_x(R_AXIS.set_min);
+    } else {
+	rightend = (R_AXIS.autoscale & AUTOSCALE_MAX) ? R_AXIS.max : R_AXIS.set_max;
+	xend = map_x( AXIS_LOG_VALUE(POLAR_AXIS,rightend)
+		    - AXIS_LOG_VALUE(POLAR_AXIS,R_AXIS.set_min));
+    }
     yend = y0;
     term_apply_lp_properties(&border_lp);
     draw_clip_line(x0,y0,xend,yend);
 
 #ifdef EAM_OBJECTS
+    if (!inverted_raxis)
     if (!(R_AXIS.autoscale & AUTOSCALE_MIN) && R_AXIS.set_min != 0)
 	place_objects( &raxis_circle, LAYER_FRONT, 2);
 #endif
