@@ -56,8 +56,8 @@ Here are samples of PNG output from some of the demos.
     <ul>
     <li><a href="smooth_splines.html">cubic and Bezier splines</a></li>
     <li><a href="monotonic_spline.html">monotonic csplines</a></li>
-    <li><a href="spline.html">Explicit B-splines</a></li>
-    <li><a href="airfoil.html">Explicit Bezier splines</a></li>
+    <li><a href="spline.html">explicit B-splines</a></li>
+    <li><a href="airfoil.html">explicit Bezier splines</a></li>
     <li><a href="fit.html">Levenberg-Marquardt DLS</a></li>
     </ul>
 
@@ -130,7 +130,8 @@ Here are samples of PNG output from some of the demos.
     <li><a href="fenceplot.html">fence plots</a></li>
     <li><a href="gantt.html">Gantt chart</a></li>
     <li><a href="heatmaps.html">2D and 3D heat maps</a></li>
-    <li><a href="violinplot.html">Violin plot</a></li>
+    <li><a href="solar_path.html">solar path diagram</a></li>
+    <li><a href="violinplot.html">violin plot</a></li>
     </ul>
 
     <h4>Text options</h4>
