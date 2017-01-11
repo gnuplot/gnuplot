@@ -7,8 +7,9 @@
 	Keywords for offset, font, etc as for the other axis label commands.
 
 	* src/axis.c src/gadgets.c src/gadgets.h src/graphics.c src/mouse.c
-	src/plot2d.c src/set.c docs/gnuplod.doc:  Support inverted r axis range.
+	src/plot2d.c src/set.c docs/gnuplot.doc:  Support inverted r axis range.
 	rrange must be linear and have fixed max/min (no autoscaling).
+	Bug #1880
 
 	Allows use of polar mode to display a projection of celestial horizontal
 	coordinates (altitude + azimuth) with the zenith (altitude 90) at the
