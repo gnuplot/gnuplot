@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.251 2017/01/08 04:41:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.252 2017/01/10 21:22:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1471,7 +1471,9 @@ unset_polar()
     }
     raxis = FALSE;
 
-    /* Initialize THETA axis structure */
+    /* Clear and reinitialize THETA axis structure */
+    unset_tics(&THETA_AXIS);
+    unset_minitics(&THETA_AXIS);
     THETA_AXIS.min = 0.;
     THETA_AXIS.max = 360.;
     THETA_AXIS.ticdef = default_axis_ticdef;
@@ -1481,6 +1483,7 @@ unset_polar()
     THETA_AXIS.ticscale = 1.0;
     THETA_AXIS.miniticscale = 0.5;
     THETA_AXIS.tic_in = TRUE;
+    THETA_AXIS.tic_rotate = 0;
 }
 
 
