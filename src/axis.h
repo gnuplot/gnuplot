@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.159 2016/12/20 04:20:33 sfeam Exp $
+ * $Id: axis.h,v 1.160 2016/12/26 23:46:25 sfeam Exp $
  *
  */
 
@@ -667,6 +667,8 @@ void extend_primary_ticrange __PROTO((AXIS *axis));
 
 int map_x __PROTO((double value));
 int map_y __PROTO((double value));
+
+coord_type polar_to_xy __PROTO(( double theta, double r, double *x, double *y, TBOOLEAN update));
 
 void set_cbminmax __PROTO((void));
 

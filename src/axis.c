@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.216 2017/01/08 04:41:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.217 2017/01/11 04:13:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1026,14 +1026,11 @@ gen_tics(struct axis *this, tic_callback callback)
 	double uncertain = (this->max - this->min) / 10;
 	double internal_min = this->min - SIGNIF * uncertain;
 	double internal_max = this->max + SIGNIF * uncertain;
-	double polar_shift = 0;
 
 	/* polar labels always +ve, and if rmin has been set, they are
 	 * relative to rmin.
 	 */
 	if (polar && this->index == POLAR_AXIS) {
-	    if (!(R_AXIS.autoscale & AUTOSCALE_MIN))
-		polar_shift = R_AXIS.min;
 	    internal_min = X_AXIS.min - SIGNIF * uncertain;
 	    internal_max = X_AXIS.max + SIGNIF * uncertain;
 	}
@@ -1045,16 +1042,11 @@ gen_tics(struct axis *this, tic_callback callback)
 
 	    /* This condition is only possible if we are in polar mode */
 	    if (this->index == POLAR_AXIS) {
-		if (nonlinear(this))
-		    internal = eval_link_function(this->linked_to_primary, mark->position)
-			     - eval_link_function(this->linked_to_primary, polar_shift);
-		else if (inverted_raxis)
-		    internal = R_AXIS.set_min - mark->position;
-		else
-		    internal = axis_log_value(this, mark->position)
-			     - axis_log_value(this, polar_shift);
+		double px, py;
+		polar_to_xy(0.0, mark->position, &px, &py, FALSE);
+		internal = px;
 	    } else {
-		internal = axis_log_value(this, mark->position) - polar_shift;
+		internal = axis_log_value(this, mark->position);
 	    }
 
 	    if (this->index == THETA_index)
@@ -1344,7 +1336,7 @@ gen_tics(struct axis *this, tic_callback callback)
 
 	    /* {{{  calc internal and user co-ords */
 	    if (this->index == POLAR_AXIS) {
-		/* Defer translation until after limit check */
+		/* Defer polar conversion until after limit check */
 		internal = tic;
 	    } else if (nonlinear(this)) {
 		if (def->type == TIC_COMPUTED)
@@ -1405,11 +1397,10 @@ gen_tics(struct axis *this, tic_callback callback)
 			} else if (this->tictype == DT_DMS) {
 			    gstrdms(label, this->ticfmt, (double)user);
 			} else if (this->index == POLAR_AXIS) {
-			    if (inverted_raxis)
-				internal = R_AXIS.min - tic;
-			    else
-				internal = axis_log_value(this, tic)
-					 - axis_log_value(this, R_AXIS.min);
+			    double px, py;
+			    user = internal;
+			    polar_to_xy(0.0, user, &px, &py, FALSE);
+			    internal = px;
 			    gprintf(label, sizeof(label), this->ticfmt, log10_base, tic);
 			} else if (this->index >= PARALLEL_AXES) {
 			    /* FIXME: needed because ticfmt is not maintained for parallel axes */
@@ -1467,13 +1458,20 @@ gen_tics(struct axis *this, tic_callback callback)
 			    + (this->log && step <= 1.5 ? axis_do_log(this,mplace) : mplace);
 			mtic_internal = mtic_user;
 		    }
-		    if (polar && this->index == POLAR_AXIS)
-			mtic_internal += R_AXIS.min;
+		    if (polar && this->index == POLAR_AXIS) {
+			/* FIXME: is this really the only case where	*/
+			/* mtic_internal is the correct position?	*/
+			double px, py;
+			mtic_user = user + mplace;
+			polar_to_xy(0.0, mtic_user, &px, &py, FALSE);
+			mtic_internal = px;
+			(*callback) (this, mtic_internal, NULL, 1, mgrd, NULL);
+			continue;
+		    }
 
 		    /* Range-limited tic placement */
-		    /* FIXME: why do we not test against mtic_user? */
 		    if (def->rangelimited
-		    &&  !inrange(mtic_internal, this->data_min, this->data_max))
+		    &&  !inrange(mtic_user, this->data_min, this->data_max))
 			continue;
 
 		    if (inrange(mtic_internal, internal_min, internal_max)
@@ -2550,4 +2548,82 @@ map_y(double value)
 	}
     }
     return AXIS_MAP(y_axis, value);
+}
+
+/*
+ * Convert polar coordinates [theta;r] to the corresponding [x;y]
+ * If update is TRUE then check and update rrange autoscaling
+ */
+coord_type
+polar_to_xy( double theta, double r, double *x, double *y, TBOOLEAN update)
+{
+    coord_type status = INRANGE;
+
+    FPRINTF((stderr,"polar_to_xy( %g %g )\n", theta, r));
+
+    /* NB: Range checks from multiple original sites are consolidated here.
+     * They were not all identical but I hope this version is close enough.
+     * One caller (parametric fixup) did R_AXIS.max range checks
+     * against fabs(r) rather than r.  Does that matter?  Did something break?
+     */
+    if (update) {
+	if (inverted_raxis) {
+	    if (!inrange(r, R_AXIS.set_min, R_AXIS.set_max))
+		status = OUTRANGE;
+	} else {
+	    if (r < R_AXIS.min) {
+		if (R_AXIS.autoscale & AUTOSCALE_MIN)
+		    R_AXIS.min = 0;
+		else if (R_AXIS.min < 0)
+		    status = OUTRANGE;
+		else if (r < 0 && -r > R_AXIS.max)
+		    status = OUTRANGE;
+		else if (r >= 0)
+		    status = OUTRANGE;
+	    }
+	    if (r > R_AXIS.max) {
+		if (R_AXIS.autoscale & AUTOSCALE_MAX)	{
+		    if ((R_AXIS.max_constraint & CONSTRAINT_UPPER)
+		    &&  (R_AXIS.max_ub < r))
+			    R_AXIS.max = R_AXIS.max_ub;
+		    else
+			R_AXIS.max = r;
+		} else {
+		    status = OUTRANGE;
+		}
+	    }
+	}
+    }
+
+    if (nonlinear(&R_AXIS)) {
+	AXIS *shadow = R_AXIS.linked_to_primary;
+	if (R_AXIS.log && r <= 0)
+	    r = not_a_number();
+	else
+	    r = eval_link_function(shadow, r) - shadow->min;
+    } else if (R_AXIS.log) {
+	/* Can't get here if logscale is implemented as nonlinear axis */
+	r = AXIS_DO_LOG(POLAR_AXIS, r) - AXIS_DO_LOG(POLAR_AXIS, R_AXIS.min);
+    } else if (inverted_raxis) {
+	r = R_AXIS.set_min - r;
+    } else if ((R_AXIS.autoscale & AUTOSCALE_MIN)) {
+	; /* Leave it */
+    } else if (r >= R_AXIS.min) {
+	/* We store internally as if plotting r(theta) - rmin */
+	r = r - R_AXIS.min;
+    } else if (r < -R_AXIS.min) {
+	/* If (r < R_AXIS.min < 0) we already flagged OUTRANGE above */
+	/* That leaves the case (r < 0  &&  R_AXIS.min >= 0) */
+	r = r + R_AXIS.min;
+    } else {
+	*x = not_a_number();
+	*y = not_a_number();
+	return OUTRANGE;
+    }
+    /* FIXME: I think nonlinear R with R_AXIS.min != 0 remains a problem  */
+
+    *x = r * cos(theta * ang2rad);
+    *y = r * sin(theta * ang2rad);
+
+    return status;
 }

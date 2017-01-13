@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.411 2017/01/10 21:22:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.412 2017/01/11 04:13:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -3144,11 +3144,8 @@ eval_plots()
 			    if ((this_plot->plot_style == FILLEDCURVES) 
 			    &&  (this_plot->filledcurves_options.closeto == FILLEDCURVES_ATR)) {
 			    	double xhigh, yhigh;
-				double temp = this_plot->filledcurves_options.at;
-				temp = AXIS_LOG_VALUE(POLAR_AXIS,temp)
-				     - AXIS_LOG_VALUE(POLAR_AXIS,R_AXIS.min);
-				yhigh = temp * sin(theta * ang2rad);
-				xhigh = temp * cos(theta * ang2rad);
+				(void) polar_to_xy(theta, this_plot->filledcurves_options.at,
+						    &xhigh, &yhigh, TRUE);
 				STORE_WITH_LOG_AND_UPDATE_RANGE(
 				    this_plot->points[i].xhigh, xhigh, this_plot->points[i].type, x_axis,
 				    this_plot->noautoscale, NOOP, goto come_here_if_undefined);
@@ -3602,77 +3599,4 @@ parse_plot_title(struct curve_points *this_plot, char *xtitle, char *ytitle, TBO
 	this_plot->title_no_enhanced = TRUE;
     }
 
-}
-
-/*
- * Convert polar coordinates [theta;r] to the corresponding [x;y]
- * If update is TRUE then check and update rrange autoscaling
- */
-coord_type
-polar_to_xy( double theta, double r, double *x, double *y, TBOOLEAN update)
-{
-    coord_type status = INRANGE;
-
-    /* NB: Range checks from multiple original sites are consolidated here.
-     * They were not all identical but I hope this version is close enough.
-     * One caller (parametric fixup) did R_AXIS.max range checks
-     * against fabs(r) rather than r.  Does that matter?  Did something break?
-     */
-    if (update) {
-	if (inverted_raxis) {
-	    if (!inrange(r, R_AXIS.set_min, R_AXIS.set_max))
-		status = OUTRANGE;
-	} else {
-	    if (r < R_AXIS.min) {
-		if (R_AXIS.autoscale & AUTOSCALE_MIN)
-		    R_AXIS.min = 0;
-		else if (R_AXIS.min < 0)
-		    status = OUTRANGE;
-		else if (r < 0 && -r > R_AXIS.max)
-		    status = OUTRANGE;
-		else if (r >= 0)
-		    status = OUTRANGE;
-	    }
-	    if (r > R_AXIS.max) {
-		if (R_AXIS.autoscale & AUTOSCALE_MAX)	{
-		    if ((R_AXIS.max_constraint & CONSTRAINT_UPPER)
-		    &&  (R_AXIS.max_ub < r))
-			    R_AXIS.max = R_AXIS.max_ub;
-		    else
-			R_AXIS.max = r;
-		} else {
-		    status = OUTRANGE;
-		}
-	    }
-	}
-    }
-
-    if (nonlinear(&R_AXIS)) {
-	AXIS *shadow = R_AXIS.linked_to_primary;
-	r = eval_link_function(shadow, r) - shadow->min;
-    } else if (R_AXIS.log) {
-	/* Can't get here if logscale is implemented as nonlinear axis */
-	r = AXIS_DO_LOG(POLAR_AXIS, r) - AXIS_DO_LOG(POLAR_AXIS, R_AXIS.min);
-    } else if (inverted_raxis) {
-	r = R_AXIS.set_min - r;
-    } else if ((R_AXIS.autoscale & AUTOSCALE_MIN)) {
-	; /* Leave it */
-    } else if (r >= R_AXIS.min) {
-	/* We store internally as if plotting r(theta) - rmin */
-	r = r - R_AXIS.min;
-    } else if (r < -R_AXIS.min) {
-	/* If (r < R_AXIS.min < 0) we already flagged OUTRANGE above */
-	/* That leaves the case (r < 0  &&  R_AXIS.min >= 0) */
-	r = r + R_AXIS.min;
-    } else {
-	*x = not_a_number();
-	*y = not_a_number();
-	return OUTRANGE;
-    }
-    /* FIXME: I think nonlinear R with R_AXIS.min != 0 remains a problem  */
-
-    *x = r * cos(theta * ang2rad);
-    *y = r * sin(theta * ang2rad);
-
-    return status;
 }

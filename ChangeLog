@@ -1,3 +1,11 @@
+2017-01-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c src/axis.h src/boundary.c src/plot2d.c src/plot2d.h:
+	Continue consolidation of polar to cartesian coordinate conversion.
+	This patch fixes various problems with logscale r axis tic placement.
+	It adds a filter to categorically reject points with negative r value 
+	if the raxis is logscaled.
+
 2017-01-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/unset.c (unset_polar): "reset" needs to free data structures and
