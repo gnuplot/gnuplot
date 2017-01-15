@@ -63,7 +63,8 @@ typedef enum position_type {
     second_axes,
     graph,
     screen,
-    character
+    character,
+    polar_axes
 } position_type;
 
 /* A full 3D position, with all 3 coordinates of possible using different axes.

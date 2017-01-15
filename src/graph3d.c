@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.356 2016/11/16 21:47:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.358 2016/12/07 04:30:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2938,6 +2938,7 @@ map3d_getposition(
     TBOOLEAN screen_coords = FALSE;
     TBOOLEAN char_coords = FALSE;
     TBOOLEAN plot_coords = FALSE;
+    double xx, yy;
 
     switch (pos->scalex) {
     case first_axes:
@@ -2956,6 +2957,13 @@ map3d_getposition(
     case character:
 	*xpos = *xpos * term->h_char + 0.5;
 	char_coords = TRUE;
+	break;
+    case polar_axes:
+	(void) polar_to_xy(*xpos, *ypos, &xx, &yy, FALSE);
+	*xpos = axis_log_value_checked(FIRST_X_AXIS, xx, what);
+	*ypos = axis_log_value_checked(FIRST_Y_AXIS, yy, what);
+	plot_coords = TRUE;
+	pos->scaley = polar_axes;	/* Just to make sure */
 	break;
     }
 
@@ -2980,11 +2988,14 @@ map3d_getposition(
 	*ypos = *ypos * term->v_char + 0.5;
 	char_coords = TRUE;
 	break;
+    case polar_axes:
+	break;
     }
 
     switch (pos->scalez) {
     case first_axes:
     case second_axes:
+    case polar_axes:
 	*zpos = axis_log_value_checked(FIRST_Z_AXIS, *zpos, what);
 	plot_coords = TRUE;
 	break;

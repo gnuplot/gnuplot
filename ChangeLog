@@ -1,3 +1,10 @@
+2017-01-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c src/gadgets.h src/graphics.c src/save.c src/graph3d.c
+	docs/gnuplot.doc:  New keyword `polar` to specify position. This allows
+	labels, arrows, and objects to be placed in 2D plots using polar
+	coordinates and 3D plots using cylindrical coordinates.
+
 2017-01-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c src/axis.h src/boundary.c src/plot2d.c src/plot2d.h:

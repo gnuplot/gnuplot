@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.539 2017/01/08 04:53:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.540 2017/01/11 04:13:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3673,6 +3673,15 @@ map_position_double(
 	    *x = pos->x * t->h_char;
 	    break;
 	}
+    case polar_axes:
+	{
+	double xx, yy;
+	    (void) polar_to_xy(pos->x, pos->y, &xx, &yy, FALSE);
+	    *x = AXIS_MAP(FIRST_X_AXIS, xx);
+	    *y = AXIS_MAP(FIRST_Y_AXIS, yy);
+	    pos->scaley = polar_axes;	/* Just to make sure */
+	    break;
+	}
     }
     switch (pos->scaley) {
     case first_axes:
@@ -3708,6 +3717,8 @@ map_position_double(
 	    *y = pos->y * t->v_char;
 	    break;
 	}
+    case polar_axes:
+	    break;
     }
     *x += 0.5;
     *y += 0.5;
@@ -3757,6 +3768,9 @@ map_position_r(
 	    *x = pos->x * t->h_char;
 	    break;
 	}
+    case polar_axes:
+	    *x = 0;
+	    break;
     }
 
     /* Maybe they only want one coordinate translated? */
@@ -3798,6 +3812,9 @@ map_position_r(
 	    *y = pos->y * t->v_char;
 	    break;
 	}
+    case polar_axes:
+	    *y = 0;
+	    break;
     }
 }
 /*}}} */

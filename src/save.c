@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.322 2017/01/01 23:53:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.323 2017/01/10 21:22:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -62,7 +62,7 @@ static void save_mtics __PROTO((FILE *, struct axis *));
 static void save_zeroaxis __PROTO((FILE *,AXIS_INDEX));
 static void save_set_all __PROTO((FILE *));
 
-const char *coord_msg[] = {"first ", "second ", "graph ", "screen ", "character "};
+const char *coord_msg[] = {"first ", "second ", "graph ", "screen ", "character ", "polar "};
 /*
  *  functions corresponding to the arguments of the GNUPLOT `save` command
  */
@@ -1250,9 +1250,6 @@ save_style_textbox(FILE *fp)
 void
 save_position(FILE *fp, struct position *pos, int ndim, TBOOLEAN offset)
 {
-    assert(first_axes == 0 && second_axes == 1 && graph == 2 && screen == 3 &&
-	   character == 4);
-
     if (offset) {
 	if (pos->x == 0 && pos->y == 0 && pos->z == 0)
 	    return;
@@ -1271,7 +1268,7 @@ save_position(FILE *fp, struct position *pos, int ndim, TBOOLEAN offset)
     else
 	fprintf(fp, ", ");
 
-    if (pos->scaley == first_axes) {
+    if (pos->scaley == first_axes || pos->scalex == polar_axes) {
 	if (pos->scaley != pos->scalex) fprintf(fp, "first ");
 	save_num_or_time_input(fp, pos->y, &axis_array[FIRST_Y_AXIS]);
     } else {

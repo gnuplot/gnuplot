@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1042 2017/01/10 21:22:54 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1043 2017/01/11 04:13:59 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -223,7 +223,8 @@ C
  coordinates (center = zenith = altitude 90, perimeter = horizon = altitude 0).
  Polar grid elements (circles and radial lines) can now be generated whether or
  not the program is in polar mode.  Tickmarks and labels around the perimeter
- of the polar grid are controlled by `set ttics`.  See `ttics`.
+ of the polar grid are controlled by `set ttics`.  The r axis has its own label.
+ Label, object, and arrow positions may be specified in polar coordinates.
  
  * `windows` graph windows can be docked to the wgnuplot text window, which is
  especially useful with Windows in "tablet mode".
@@ -604,7 +605,7 @@ C
 
        {<system>} <x>, {<system>} <y> {,{<system>} <z>}
 
- Each <system> can either be `first`, `second`, `graph`, `screen`, or
+ Each <system> can either be `first`, `second`, `polar`, `graph`, `screen`, or
  `character`.
 
  `first` places the x, y, or z coordinate in the system defined by the left
@@ -617,6 +618,10 @@ C
  gives the position in character widths and heights from the bottom left of
  the screen area (screen 0,0), `character` coordinates depend on the chosen
  font size.
+
+ `polar` causes the first two values to be interpreted as angle theta and radius
+ r rather than as x and y.  This could be used, for example, to place labels on
+ a 2D plot in polar coordinates or a 3D plot in cylindrical coordinates.
 
  If the coordinate system for x is not specified, `first` is used.  If the
  system for y is not specified, the one used for x is adopted.
@@ -10029,8 +10034,8 @@ Ffigure_multiple_keys
        show label
 
  The <position> is specified by either x,y or x,y,z, and may be preceded by
- `first`, `second`, `graph`, `screen`, or `character` to select the coordinate
- system.  See `coordinates` for details.
+ `first`, `second`, `polar`, `graph`, `screen`, or `character` to indicate the
+ coordinate system.  See `coordinates` for details.
 
  The tag is an integer that is used to identify the label. If no <tag>
  is given, the lowest unused tag value is assigned automatically.  The
