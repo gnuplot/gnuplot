@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.540 2017/01/11 04:13:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.541 2017/01/15 19:05:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -262,6 +262,7 @@ place_grid(int layer)
 	double theta = 0;
 	int ox = map_x(0);
 	int oy = map_y(0);
+	(t->layer)(TERM_LAYER_BEGIN_GRID);
 	term_apply_lp_properties(&grid_lp);
 	if (largest_polar_circle <= 0)
 	    largest_polar_circle = R_AXIS.max;
@@ -270,6 +271,7 @@ place_grid(int layer)
 	    int y = map_y(largest_polar_circle * sin(theta));
 	    draw_clip_line(ox, oy, x, y);
 	}
+	(t->layer)(TERM_LAYER_END_GRID);
     }
 
     /* POLAR GRID tickmarks along the perimeter of the outer circle */
