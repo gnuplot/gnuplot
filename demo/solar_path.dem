@@ -5,52 +5,54 @@
 #
 
 set label 1 at screen 0.02, 0.95 font ":Bold,10"
-set label 1 "Solar path at\nLatitude 47.47 N"
-set timestamp "Seattle - %d %b %Y"
+set label 1 "Solar path at\nLatitude 47.67 N"
+set timestamp "Seattle - %d %b %Y" offset 1,1
 
-# Set up equations for Azimuth(t) and Altitude(t) 
-# as a function of t, the number of seconds  before or after noon
-# (local standard time) on the day of interest at a particular latitude.
-# Here we calculate for Seattle (47.47 N  -122.28 W)
+# Set up equations for Azimuth(t) and Altitude(t) as a function of
+# t = seconds  before or after solar noon on the day of interest
+# at a particular latitude.
+# Here we calculate for Seattle (47.67 N  -122.28 W)
 
-  Latitude = 47.47
-  Date = "21-12-2016 12:00"
+  Latitude = 47.67
+  Longitude = -122.28
+  Date = "21-12-2016"
   call 'solar_params.dem'
 
   array dummy[150]
-  array winter_alt[150]
-  array winter_azi[150]
+  array winter_alt[150]; array winter_azi[150]
   time = -12 * Hour
   do for [t = 1 : 150] {
 	winter_alt[t] = Altitude(time)
 	winter_azi[t] = Azimuth(time)
-        dummy[t] = t
 	time = time + 10 * Minute
   }
+  print Date, "    sunrise ", sunrise, "   sunset ", sunset, "    sunlight ", sunlight
 
-  Date = "21-06-2016 12:00"
+  Date = "22-06-2017"
   call 'solar_params.dem'
 
-  array summer_alt[150]
-  array summer_azi[150]
+  array summer_alt[150]; array summer_azi[150]
   time = -12 * Hour
   do for [t = 1 : 150] {
 	summer_alt[t] = Altitude(time)
 	summer_azi[t] = Azimuth(time)
 	time = time + 10 * Minute
   }
+  print Date, "    sunrise ", sunrise, "   sunset ", sunset, "    sunlight ", sunlight
 
-  Date = strftime(TimeFormat,time(0))
+  Date = strftime("%d-%m-%Y",time(0) + Day*Longitude/360.)
   call 'solar_params.dem'
 
-  array today_alt[150]
-  array today_azi[150]
+  array today_alt[150]; array today_azi[150]
   time = -12 * Hour
   do for [t = 1 : 150] {
 	today_alt[t] = Altitude(time)
 	today_azi[t] = Azimuth(time)
+	dummy[t] = time
 	time = time + 10 * Minute
   }
+  print Date, "    sunrise ", sunrise, "   sunset ", sunset, "    sunlight ", sunlight
+  today = "Today ☉ \n".sunlight."\nof sunlight"
 
 #
 set angle degrees
@@ -68,6 +70,8 @@ set ttics add ("N" 90, "E" 0, "S" -90, "W" 180) font ":Bold"
 set rtics format "%.0f°"
 set rtics 30
 set rlabel "Altitude" offset -2 font ":Bold"
+set border polar
+set style data lines
 
 # By convention North (azimuth 0°) should be at the top with angles
 # increasing clockwise, but gnuplot doesn't yet support anything but
@@ -79,6 +83,6 @@ set rlabel "Altitude" offset -2 font ":Bold"
 
 plot dummy using (90 - winter_azi[$1]):(winter_alt[$1]) lw 2 title "   Winter Solstice" at beg left, \
      dummy using (90 - summer_azi[$1]):(summer_alt[$1]) lw 2 title "   Summer Solstice" at beg left, \
-     dummy using (90 - today_azi[$1]):(today_alt[$1]) lw 2 title "Today   " at end right
+     dummy using (90 - today_azi[$1]):(today_alt[$1]) lw 2 title today at end right
 
  pause -1 "<cr> to continue"

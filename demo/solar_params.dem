@@ -7,19 +7,22 @@
 # Input:
 #	Date - string with format "dd-mm-YYYY HH:MM"
 #	Latitude - in degrees
+#	Longitude - in degrees
 #
 # Output:
 #	Function definitions
 #		Azimuth(t) = Solar azimuth at time t
 #		Altitude(t) = Solar altitude at time t
 #	where t is time in seconds relative to local solar noon on Date.
+#		sunrise, sunset (string containing local standard time)
+#		sunlight (string containing time between sunrise, sunset)
 #
 # Local values:
 	Minute = 60.
 	Hour = 3600.
 	Day = 86400.
 	TimeFormat = "%d-%m-%Y %H:%M"
-	phi = Latitude
+	Phi = Latitude
 	set angle degrees
 #
 #     n	= local time in days since noon on 1 Jan 2000
@@ -53,13 +56,23 @@ eps = 23.439 - n * 0.0000004
 RAsc = atan2( cos(eps) * sin(lambda), cos(lambda) )
 Dec = asin( sin(eps) * sin(lambda) )
 
+# Length of day
+daylength = 2.0 * acos( -sin(Dec)*sin(Phi) / cos(Phi) )
+# Correction for displacement of this location from center of timezone
+corr = Longitude - floor(Longitude/15.0) * 15.0 - 7.5
+rise = (daylength/2.0 - corr) * Day/360.
+set  = (daylength/2.0 + corr) * Day/360.
+
+sunlight = strftime("%tH h %tM m", daylength * Day/360.)
+sunrise = strftime("%tH:%tM", (Day/2)-rise)
+sunset  = strftime("%tH:%tM", (Day/2)+set)
 
 # Horizontal coordinates
 
 h(t) = 360. * t / Day
-Altitude(t) = asin( sin(Dec) * sin(phi) + cos(Dec) * cos(phi) * cos(h(t)) )
+Altitude(t) = asin( sin(Dec) * sin(Phi) + cos(Dec) * cos(Phi) * cos(h(t)) )
 
-cosAzi(t)  = ( sin(Dec) * sin(phi) - cos(Dec) * cos(h(t)) * sin(phi) ) \
+cosAzi(t)  = ( sin(Dec) * sin(Phi) - cos(Dec) * cos(h(t)) * sin(Phi) ) \
            / cos(Altitude(t))
 sinAzi(t)  = ( -cos(Dec) * sin(h(t)) ) \
            / cos(Altitude(t))

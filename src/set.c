@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.547 2017/01/10 21:22:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.548 2017/01/11 04:13:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1025,6 +1025,9 @@ set_border()
 	    c_token++;
 	} else if (equals(c_token,"behind")) {
 	    border_layer = LAYER_BEHIND;
+	    c_token++;
+	} else if (equals(c_token,"polar")) {
+	    draw_border |= 4096;
 	    c_token++;
 	} else {
 	    int save_token = c_token;

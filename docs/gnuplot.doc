@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1043 2017/01/11 04:13:59 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1044 2017/01/15 19:05:03 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7891,6 +7891,7 @@ Ffigure_fenceplot
                   {linestyle | ls <line_style>}
                   {linetype | lt <line_type>} {linewidth | lw <line_width>}
                   {linecolor | lc <colorspec>} {dashtype | dt <dashtype>}
+                  {polar}
        unset border
        show border
 
@@ -7922,6 +7923,7 @@ Ffigure_fenceplot
              512   no effect   top right back
             1024   no effect   top left front
             2048   no effect   top right front
+            4096   polar       no effect
 #\begin{tabular}{|c|c|c|} \hline
 #\multicolumn{3}{|c|}{Graph Border Encoding} \\ \hline \hline
 #Bit & plot & splot \\ \hline
@@ -7937,6 +7939,7 @@ Ffigure_fenceplot
 #512 & no effect & top right back \\
 #1024 & no effect & top left front \\
 #2048 & no effect & top right front \\
+#4096 & polar & no effect \\
 %c c c .
 %Bit@plot@splot
 %_
@@ -7952,6 +7955,7 @@ Ffigure_fenceplot
 %512@no effect@top right back
 %1024@no effect@top left front
 %2048@no effect@top right front
+%4096@polar@no effect
 @end table
 
 ^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3">
@@ -7976,6 +7980,7 @@ Ffigure_fenceplot
 ^<tr>    <td>512</td>    <td>no effect</td>    <td>top right back</td></tr>
 ^<tr>    <td>1024</td>    <td>no effect</td>    <td>top left front</td></tr>
 ^<tr>    <td>2048</td>    <td>no effect</td>    <td>top right front</td></tr>
+^<tr>    <td>4096</td>    <td>polar</td>    <td>no effect</td></tr>
 ^</tbody>
 ^</table>
 
@@ -8006,6 +8011,8 @@ Ffigure_fenceplot
  The `set grid` options 'back', 'front' and 'layerdefault' also
  control the order in which the border lines are drawn with respect to
  the output of the plotted data.
+
+ The `polar` keyword enables a circular border for polar plots.
 
  Examples:
 
@@ -13253,8 +13260,10 @@ Ffigure_multiple_keys
 ?set ttics
 ?show ttics
 ?ttics
- The `set ttics` command places tics around the perimeter (largest circle)
- of the polar grid.  The angular position is always given in degrees.
+ The `set ttics` command places tics around the perimeter of a polar plot.
+ This is the border if `set border polar` is enabled, otherwise the outermost
+ circle of the polar grid drawn at the rightmost ticmark along the r axis.
+ See `set grid`, `set rtics`. The angular position is always labeled in degrees.
  The full perimeter can be labeled regardless of the current trange setting.
  The desired range of the tic labels should be given as shown below.
  Additional properties of the tic marks can be set. See `xtics`.

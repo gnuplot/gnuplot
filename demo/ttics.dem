@@ -23,4 +23,11 @@ if (GPVAL_ENCODING eq "utf8") {
 plot t lt 3 lw 2, -t lt 4 lw 2
 #
 pause -1 "<cr> to continue"
-reset
+
+set title "Polar plot with border and rotated labels for ttics"
+set ttics rotate
+set rrange [0:6.5]
+set border polar
+replot
+
+pause -1 "<cr> to continue"

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.541 2017/01/15 19:05:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.543 2017/01/17 21:09:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -76,7 +76,8 @@ struct lp_style_type bar_lp;
  * key->reverse] and use them throughout.
  */
 
-/* set by tic_callback - how large to draw polar radii */
+/* radius used to draw ttics and radial grid lines. */
+/* NB: x-axis coordinates, not polar. updated by xtick2d_callback. */
 static double largest_polar_circle;
 
 /* used for filled points */
@@ -137,6 +138,8 @@ static void plot_circles __PROTO((struct curve_points *plot));
 static void plot_ellipses __PROTO((struct curve_points *plot));
 static void do_rectangle __PROTO((int dimensions, t_object *this_object, fill_style_type *fillstyle));
 #endif
+
+static void draw_polar_circle __PROTO((double place));
 
 static void plot_parallel __PROTO((struct curve_points *plot));
 
@@ -201,6 +204,7 @@ static void
 place_grid(int layer)
 {
     struct termentry *t = term;
+    double ytemp;
     int save_lgrid = grid_lp.l_type;
     int save_mgrid = mgrid_lp.l_type;
     BoundingBox *clip_save = clip_area;
@@ -265,7 +269,7 @@ place_grid(int layer)
 	term->layer(TERM_LAYER_BEGIN_GRID);
 	term_apply_lp_properties(&grid_lp);
 	if (largest_polar_circle <= 0)
-	    largest_polar_circle = R_AXIS.max;
+	    polar_to_xy(0.0, R_AXIS.max, &largest_polar_circle, &ytemp, FALSE);
 	for (theta = 0; theta < 6.29; theta += polar_grid_angle) {
 	    int x = map_x(largest_polar_circle * cos(theta));
 	    int y = map_y(largest_polar_circle * sin(theta));
@@ -278,7 +282,7 @@ place_grid(int layer)
     if (THETA_AXIS.ticmode) {
 	term_apply_lp_properties(&border_lp);
 	if (largest_polar_circle <= 0)
-	    largest_polar_circle = R_AXIS.max;
+	    polar_to_xy(0.0, R_AXIS.max, &largest_polar_circle, &ytemp, FALSE);
 	copy_or_invent_formatstring(&THETA_AXIS);
 	gen_tics(&THETA_AXIS, ttick_callback);
 	term->text_angle(0);
@@ -3400,31 +3404,9 @@ xtick2d_callback(
 	(t->layer)(TERM_LAYER_BEGIN_GRID);
 	term_apply_lp_properties(&grid);
 	if (this_axis->index == POLAR_AXIS) {
-	    double x = place, y = 0, s = sin(0.1), c = cos(0.1);
-	    int i;
-	    int ogx, ogy, gx, gy;
-
-	    if (place > largest_polar_circle)
-		largest_polar_circle = place;
-	    else if (-place > largest_polar_circle)
-		largest_polar_circle = -place;
-
-	    ogx = map_x(x);
-	    ogy = map_y(0);
-	    for (i = 1; i <= 63 /* 2pi/0.1 */ ; ++i) {
-		{
-		    /* cos(t+dt) = cos(t)cos(dt)-sin(t)cos(dt) */
-		    double tx = x * c - y * s;
-		    /* sin(t+dt) = sin(t)cos(dt)+cos(t)sin(dt) */
-		    y = y * c + x * s;
-		    x = tx;
-		}
-		gx = map_x(x);
-		gy = map_y(y);
-		draw_clip_line(ogx, ogy, gx, gy);
-		ogx = gx;
-		ogy = gy;
-	    }
+	    if (fabs(place) > largest_polar_circle)
+		largest_polar_circle = fabs(place);
+	    draw_polar_circle(place);
 	} else {
 	    legend_key *key = &keyT;
 	    if (key->visible && x < key->bounds.xright && x > key->bounds.xleft
@@ -3882,6 +3864,20 @@ plot_border()
 
 	if (border_complete)
 	    closepath();
+
+	if (((draw_border & 4096) != 0) && ((R_AXIS.autoscale & AUTOSCALE_BOTH) == 0)) {
+	    double ytemp;
+
+	    /* Full-width circular border is visually too heavy compared to the edges */
+	    lp_style_type polar_border = border_lp;
+	    polar_border.l_width = polar_border.l_width / 2.;
+	    term_apply_lp_properties(&polar_border);
+
+	    if (largest_polar_circle <= 0)
+		polar_to_xy(0.0, R_AXIS.max, &largest_polar_circle, &ytemp, FALSE);
+	    draw_polar_circle(largest_polar_circle);
+	}
+
 	(*term->layer) (TERM_LAYER_END_BORDER);
 }
 
@@ -5064,3 +5060,29 @@ skip_pixel:
 
 }
 
+
+/*
+ * Draw one circle of the polar grid or border
+ * NB: place is in x-axis coordinates
+ */
+static void
+draw_polar_circle(double place)
+{
+    double x, y, angle;
+    double step = 2.5;
+    int ogx, ogy, gx, gy;
+
+    x = place;
+    y = 0.0;
+    ogx = map_x(x);
+    ogy = map_y(y);
+    for ( angle = step; angle <= 360.; angle += step) {
+	x = place * cos(angle*DEG2RAD);
+	y = place * sin(angle*DEG2RAD);
+	gx = map_x(x);
+	gy = map_y(y);
+	draw_clip_line(ogx, ogy, gx, gy);
+	ogx = gx;
+	ogy = gy;
+    }
+}
