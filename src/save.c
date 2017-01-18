@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.256.2.20 2016/08/27 20:50:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.256.2.21 2016/10/21 21:00:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1501,7 +1501,8 @@ save_data_func_style(FILE *fp, const char *which, enum PLOT_STYLE style)
     }
 }
 
-void save_dashtype(FILE *fp, int d_type, const t_dashtype *dt)
+void
+save_dashtype(FILE *fp, int d_type, const t_dashtype *dt)
 {
     /* this is indicated by LT_AXIS (lt 0) instead */
     if (d_type == DASHTYPE_AXIS)
@@ -1530,13 +1531,13 @@ save_linetype(FILE *fp, lp_style_type *lp, TBOOLEAN show_point)
 {
     if (lp->l_type == LT_NODRAW)
 	fprintf(fp, " lt nodraw");
-    else if (lp->l_type == LT_BLACK)
-	fprintf(fp, " lt black");
     else if (lp->l_type == LT_BACKGROUND)
 	fprintf(fp, " lt bgnd");
-    else if (lp->l_type < 0)
-	fprintf(fp, " lt %d", lp->l_type+1);
+    else if (lp->l_type == LT_AXIS)
+	fprintf(fp, " lt 0");
 
+    if (lp->l_type == LT_BLACK && lp->pm3d_color.type == TC_LT)
+	fprintf(fp, " lt black");
     else if (lp->pm3d_color.type != TC_DEFAULT) {
 	fprintf(fp, " linecolor");
 	if (lp->pm3d_color.type == TC_LT)

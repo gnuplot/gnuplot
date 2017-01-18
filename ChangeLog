@@ -1,3 +1,8 @@
+2017-01-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/save.c (save_linetype):  Save and show commands were failing to
+	list linecolor for lines that were originally specified as "lt -1".
+
 2017-01-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc:  Clarify the meaning of the binary file keyword
