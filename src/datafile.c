@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.335 2016/09/03 23:04:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.336 2016/11/03 17:15:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1982,7 +1982,7 @@ df_readascii(double v[], int max)
 		if (df_column[j].header) {
 		    if (df_longest_columnhead < strlen(df_column[j].header))
 			df_longest_columnhead = strlen(df_column[j].header);
-		    FPRINTF((stderr,"Col %d: \"%s\"\n",j,df_column[j].header));
+		    FPRINTF((stderr,"Col %d: \"%s\"\n",j+1,df_column[j].header));
 		}
 	    }
 	    df_already_got_headers = TRUE;
@@ -2120,6 +2120,16 @@ df_readascii(double v[], int max)
 		    evaluate_inside_using = TRUE;
 		    evaluate_at(use_spec[output].at, &a);
 		    evaluate_inside_using = FALSE;
+		    /* If column N contains the "missing" flag and is referenced by */
+		    /* using N then we caught it already.  Here we are checking for */
+		    /* indirect references like using ($N) or using "header_of_N".  */
+		    /* It does not catch deeper evaluations like using (2*f($N)).   */
+		    if ((a.type == CMPLX) && isnan(a.v.cmplx_val.real)
+		    && (a.v.cmplx_val.imag == DF_MISSING)) {
+			return_value = DF_MISSING;
+			v[output] = not_a_number();
+			continue;
+		    }
 		    if (undefined) {
 			return_value = DF_UNDEFINED;
 			v[output] = not_a_number();
@@ -2461,21 +2471,8 @@ df_determine_matrix_info(FILE *fin)
 void
 f_dollars(union argument *x)
 {
-    int column = x->v_arg.v.int_val;
-    struct value a;
-
-    if (column == -3)	/* pseudocolumn -3 means "last column" */
-	column = df_no_cols;
-
-    if (column == 0) {
-	push(Gcomplex(&a, (double) df_datum, 0.0));     /* $0 */
-    } else if (column > df_no_cols || df_column[column-1].good != DF_GOOD) {
-	undefined = TRUE;
-	/* Nov 2014: This is needed in case the value is referenced */
-	/* in an expression inside a 'using' clause.		    */
-	push(Gcomplex(&a, not_a_number(), 0.0));
-    } else
-	push(Gcomplex(&a, df_column[column-1].datum, 0.0));
+    push(&x->v_arg);
+    f_column(x);
 }
 
 /*}}} */
@@ -2534,13 +2531,16 @@ f_column(union argument *arg)
 	push(Gcomplex(&a, (double) df_datum, 0.0));
     else if (column == -3)	/* pseudocolumn -3 means "last column" */
 	push(Gcomplex(&a, df_column[df_no_cols - 1].datum, 0.0));
-    else if (column < 1
-	     || column > df_no_cols
-	     || df_column[column - 1].good != DF_GOOD
-	     ) {
+    else if (column < 1 || column > df_no_cols) {
 	undefined = TRUE;
 	/* Nov 2014: This is needed in case the value is referenced */
 	/* in an expression inside a 'using' clause.		    */
+	push(Gcomplex(&a, not_a_number(), 0.0));
+    } else if (df_column[column-1].good == DF_MISSING) {
+	/* Doesn't set undefined to TRUE although perhaps it should */
+	push(Gcomplex(&a, not_a_number(), (double)DF_MISSING));
+    } else if (df_column[column-1].good != DF_GOOD) {
+	undefined = TRUE;
 	push(Gcomplex(&a, not_a_number(), 0.0));
     } else
 	push(Gcomplex(&a, df_column[column - 1].datum, 0.0));
