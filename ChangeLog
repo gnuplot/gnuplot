@@ -1,3 +1,8 @@
+2017-01-20  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgdiplus.cpp (gdiplusCreatePen):  Remove now unused static
+	function.
+
 2017-01-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/save.c (save_linetype):  Save and show commands were failing to

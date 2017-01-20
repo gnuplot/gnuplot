@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.45 2016/11/19 06:31:07 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.46 2016/11/19 06:43:49 markisch Exp $
  */
 
 /*
@@ -60,7 +60,6 @@ enum draw_target { DRAW_SCREEN, DRAW_PRINTER, DRAW_PLOTTER, DRAW_METAFILE };
 
 static Color gdiplusCreateColor(COLORREF color, double alpha);
 static void gdiplusSetDashStyle(Pen *pen, enum DashStyle style);
-static Pen * gdiplusCreatePen(UINT style, float width, COLORREF color, double alpha);
 static void gdiplusPolyline(Graphics &graphics, Pen &pen, Point *points, int polyi);
 static void gdiplusFilledPolygon(Graphics &graphics, Brush &brush, Point *points, int polyi);
 static void gdiplusFilledPolygon(Graphics &graphics, Brush &brush, PointF *points, int polyi);
@@ -131,22 +130,6 @@ gdiplusSetDashStyle(Pen *pen, enum DashStyle style)
 		pen->SetDashStyle(style);
 	else
 		pen->SetDashPattern(dashstyles[style - 1], dashstyle_len[style - 1]);
-}
-
-
-static Pen *
-gdiplusCreatePen(UINT style, float width, COLORREF color, double alpha)
-{
-	// create GDI+ pen
-	Color gdipColor = gdiplusCreateColor(color, alpha);
-	Pen * pen = new Pen(gdipColor, width > 1 ? width : 1);
-	if (style <= PS_DASHDOTDOT)
-		// cast is save since GDI and GDI+ use same numbers
-		gdiplusSetDashStyle(pen, static_cast<DashStyle>(style));
-	pen->SetLineCap(LineCapSquare, LineCapSquare, DashCapFlat);
-	pen->SetLineJoin(LineJoinMiter);
-
-	return pen;
 }
 
 
