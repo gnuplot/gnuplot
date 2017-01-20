@@ -13,6 +13,7 @@ Changes in 5.0.6
 * FIX "set pm3d depthorder interpolate N,M" memory allocation failure
 * FIX aquaterm failed to honor request to disable enhanced text markup
 * FIX save and show commands failed to list linecolor for lines with "lt -1"
+* FIX the "missing" data flag is honored by "using ($n)" as it is for "using n"
 
 Changes in 5.0.5
 ================

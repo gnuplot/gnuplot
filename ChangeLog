@@ -1,3 +1,19 @@
+2017-01-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (f_dollar f_column df_readascii):
+	Version 5 was supposed to do away with differences between data read
+	by 'plot ... using N' and 'plot ... using ($N)'. It turns out that was
+	not true with regard to missing data.  If the "missing" flag is present
+	in the data then 'using N' catches it but 'using ($N)' does not.
+	The problem is that ($N) and (column(N)) and "header_of_N" all invoke
+	expression evaluation, which has had no mechanism to indicate a missing
+	value on return rather than NaN.  This patch overloads the imaginary
+	slot of a NaN value to hold DF_MISSING rather than 0.0 on return from
+	f_dollar() and f_column() as appropriate.  For convenience the body of
+	f_dollar() is replaced by a pass-through to f_column() so that both
+	routines behave the same way.
+	Bug #1896
+
 2017-01-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/save.c (save_linetype):  Save and show commands were failing to
