@@ -1,5 +1,5 @@
 /*
- * $Id: wprinter.c,v 1.23 2016/10/03 17:34:25 markisch Exp $
+ * $Id: wprinter.c,v 1.24 2016/10/04 21:46:21 broeker Exp $
  */
 
 /* GNUPLOT - win/wprinter.c */
@@ -186,7 +186,11 @@ static IPrintDialogCallbackVtbl IPrintDialogCallback_Vtbl = {
 };
 
 static IObjectWithSiteVtbl IObjectWithSite_Vtbl = {
-    (void *) QueryInterface, (void *) AddRef, (void *) Release, SetSite, GetSite
+    (HRESULT(*)(IObjectWithSite *, const IID *const, void **)) QueryInterface, 
+    (ULONG (*)(IObjectWithSite *)) AddRef,
+    (ULONG (*)(IObjectWithSite *)) Release, 
+    SetSite,
+    GetSite
 };
 
 static void
@@ -318,12 +322,17 @@ PrintSizeDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 
 		/* Set size to full paper size of current printer */
 		if (services) {
-		    LPDEVMODE lpDevMode;
-		    UINT size;
-		    HRESULT hr;
 		    LPTSTR lpPrinterName = NULL;
 		    LPTSTR lpPortName = NULL;
+		    LPDEVMODE lpDevMode = NULL;
+		    UINT size;
+		    HRESULT hr;
 
+		    /* Note:  The Windows 8.1 SDK says that these functions expect LPWSTR
+			      arguments, in contrast to the MSDN documentation, MinGW, and
+			      what was actually seen in a debugger on Windows 10.
+			      So warnings about type mismatch can be safely ignored.
+		    */
 		    size = 0;
 		    hr = services->lpVtbl->GetCurrentPrinterName(services, NULL, &size);
 		    if (SUCCEEDED(hr) && size > 0) {
@@ -344,12 +353,14 @@ PrintSizeDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 			lpDevMode = (LPDEVMODE) malloc(size * sizeof(TCHAR));
 			hr = services->lpVtbl->GetCurrentDevMode(services, lpDevMode, &size);
 		    }
+
 		    if (SUCCEEDED(hr) && size > 0 && lpPortName != NULL && lpPrinterName != NULL) {
 			HDC printer = CreateDC(TEXT("WINSPOOL"), lpPrinterName, lpPortName, lpDevMode);
 			lpr->psize.x = GetDeviceCaps(printer, HORZSIZE);
 			lpr->psize.y = GetDeviceCaps(printer, VERTSIZE);
 			DeleteDC(printer);
 		    }
+
 		    free(lpPrinterName);
 		    free(lpPortName);
 		    free(lpDevMode);
