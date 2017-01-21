@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.412 2017/01/11 04:13:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.414 2017/01/14 06:24:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -674,7 +674,10 @@ get_data(struct curve_points *current_plot)
 	 */
 	if (j == DF_UNDEFINED) {
 	    current_plot->points[i].type = UNDEFINED;
-	    j = df_no_use_specs;
+	    if (missing_val && !strcmp(missing_val, "NaN"))
+		j = DF_MISSING;
+	    else
+		j = df_no_use_specs;
 	}
 
 	if (j > 0) {

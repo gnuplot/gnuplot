@@ -6,7 +6,7 @@
 
 	* src/win/wprinter.c:  Fix compiler warnings.
 
-2017-01-20  Ethan A Merritt  <merritt@u.washington.edu>
+2017-01-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (f_dollar f_column df_readascii):
 	Version 5 was supposed to do away with differences between data read
@@ -16,11 +16,19 @@
 	The problem is that ($N) and (column(N)) and "header_of_N" all invoke
 	expression evaluation, which has had no mechanism to indicate a missing
 	value on return rather than NaN.  This patch overloads the imaginary
-	slot of a NaN return value to hold DF_MISSING rather than 0.0 on return
-	from f_dollar() and f_column() as appropriate.  For convenience the
-	body of f_dollar() is replaced by a pass-through to f_column() so that
-	both routines behave the same way.
+	slot of a complex NaN value to hold DF_MISSING rather than 0.0 on return
+	from f_dollar() and f_column() as appropriate.  For convenience the body
+	of f_dollar() is replaced by a pass-through to f_column() so that both
+	routines behave the same way.
 	Bug #1896
+
+	* src/plot2d.c (get_data) src/set.c src/show.c docs/gnuplot.doc:
+	The fix for bug #1896 did not address the case where a missing value is
+	encountered during evaluation of an expression.  E.g. 'using ($1+$2)'
+	when there is missing data in either column 1 or 2 will evaluate to NaN.
+	This patch adds an additional option 'set datafile missing NaN' that
+	tells gnuplot to treat NaN data values as missing rather than invalid.
+	Based on patch #725 (Christoph Bersch)
 
 2017-01-20  Bastian Maerkisch  <bmaerkisch@web.de>
 

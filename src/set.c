@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.548 2017/01/11 04:13:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.549 2017/01/19 01:14:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2935,7 +2935,12 @@ set_missing()
     c_token++;
     free(missing_val);
     missing_val = NULL;
-    if (!END_OF_COMMAND && !(missing_val = try_to_get_string()))
+    if (END_OF_COMMAND)
+	return;
+    if (equals(c_token,"NaN") || equals(c_token,"nan")) {
+	missing_val = strdup("NaN");
+	c_token++;
+    } else if (!(missing_val = try_to_get_string()))
 	int_error(c_token, "expected missing-value string");
 }
 
