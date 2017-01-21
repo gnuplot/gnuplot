@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.84 2016/11/19 06:31:07 markisch Exp $
+ * $Id: wgnuplib.h,v 1.85 2017/01/06 16:07:19 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -66,7 +66,7 @@ extern "C" {
 #ifdef UNICODE
 # define TCHARFMT "%ls"
 #else
-# define TCHARFMT "%s"
+# define TCHARFMT "%hs"
 #endif
 
 /* ================================== */

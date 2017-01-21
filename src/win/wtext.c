@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.74 2016/10/08 19:09:16 markisch Exp $
+ * $Id: wtext.c,v 1.75 2017/01/06 16:07:20 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -1147,7 +1147,7 @@ TextUpdateStatus(LPTW lptw)
 
 	enc = encoding;
 	swprintf_s(buf, sizeof(buf)/sizeof(WCHAR), L"encoding: %hs", encoding_names[enc]);
-	SendMessageW(lptw->hStatusbar, SB_SETTEXT, (WPARAM)0, (LPARAM)buf);
+	SendMessageW(lptw->hStatusbar, SB_SETTEXTW, (WPARAM)0, (LPARAM)buf);
     }
 }
 
@@ -1421,14 +1421,14 @@ WndSeparatorProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	    SetCapture(hwnd);
 	    swprintf_s(buf, sizeof(buf) / sizeof(WCHAR), L"fraction: %.1f %%",
 		(DockedLayout(lptw) == DOCKED_LAYOUT_HORIZONTAL ? lptw->HorzFracDock : lptw->VertFracDock) / 10.);
-	    SendMessageW(lptw->hStatusbar, SB_SETTEXT, (WPARAM)1, (LPARAM)buf);
+	    SendMessageW(lptw->hStatusbar, SB_SETTEXTW, (WPARAM)1, (LPARAM)buf);
 	}
 	break;
     case WM_LBUTTONUP:
 	if (lptw->bFracChanging) {
 	    lptw->bFracChanging = FALSE;
 	    ReleaseCapture();
-	    SendMessageW(lptw->hStatusbar, SB_SETTEXT, (WPARAM)1, (LPARAM)L"");
+	    SendMessageW(lptw->hStatusbar, SB_SETTEXTW, (WPARAM)1, (LPARAM)L"");
 	}
 	break;
     case WM_MOUSEMOVE: {
@@ -1462,7 +1462,7 @@ WndSeparatorProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	    }
 	    swprintf_s(buf, sizeof(buf) / sizeof(WCHAR), L"fraction: %.1f %%",
 		(layout == DOCKED_LAYOUT_HORIZONTAL ? lptw->HorzFracDock : lptw->VertFracDock) / 10.);
-	    SendMessageW(lptw->hStatusbar, SB_SETTEXT, (WPARAM)1, (LPARAM)buf);
+	    SendMessageW(lptw->hStatusbar, SB_SETTEXTW, (WPARAM)1, (LPARAM)buf);
 	    DockedUpdateLayout(lptw);
 	    return 0;
 	}

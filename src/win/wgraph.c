@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.241 2017/01/06 16:07:20 markisch Exp $
+ * $Id: wgraph.c,v 1.242 2017/01/07 07:52:27 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -2999,9 +2999,16 @@ SaveAsEMF(LPGW lpgw)
 			DeleteEnhMetaFile(hemf);
 			break;
 #ifdef HAVE_GDIPLUS
-		case 2:  /* GDI+ Enhanced Metafile (EMF+) */
+		case 2: {/* GDI+ Enhanced Metafile (EMF+) */
+#ifndef UNICODE
+			LPWSTR wfile = UnicodeText(Ofn.lpstrFile, S_ENC_DEFAULT);
+			metafile_gdiplus(lpgw, hdc, &rect, wfile);
+			free(wfile);
+#else
 			metafile_gdiplus(lpgw, hdc, &rect, Ofn.lpstrFile);
+#endif
 			break;
+		}
 #endif
 		}
 		ReleaseDC(hwnd, hdc);
@@ -5010,10 +5017,10 @@ UpdateStatusLine(LPGW lpgw, const char text[])
 	wtext = UnicodeText(text, encoding);
 	if (!lpgw->bDocked) {
 		if (lpgw->hStatusbar)
-			SendMessageW(lpgw->hStatusbar, SB_SETTEXT, (WPARAM)0, (LPARAM)wtext);
+			SendMessageW(lpgw->hStatusbar, SB_SETTEXTW, (WPARAM)0, (LPARAM)wtext);
 	} else {
 		if (lpgw->lptw != NULL && lpgw->lptw->hStatusbar)
-			SendMessageW(lpgw->lptw->hStatusbar, SB_SETTEXT, (WPARAM)1, (LPARAM)wtext);
+			SendMessageW(lpgw->lptw->hStatusbar, SB_SETTEXTW, (WPARAM)1, (LPARAM)wtext);
 	}
 	free(wtext);
 }

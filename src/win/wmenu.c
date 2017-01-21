@@ -1,5 +1,5 @@
 /*
- * $Id: wmenu.c,v 1.38 2016/12/25 10:16:48 markisch Exp $Id: wmenu.c,v 1.38 2016/12/25 10:16:48 markisch Exp $
+ * $Id: wmenu.c,v 1.39 2017/01/06 16:07:19 markisch Exp $Id: wmenu.c,v 1.39 2017/01/06 16:07:19 markisch Exp $
  */
 
 /* GNUPLOT - win/wmenu.c */
@@ -590,7 +590,7 @@ LoadMacros(LPTW lptw)
 	    /* new menu */
 	    if (!(nInc = GetLine(buf, MAXSTR, menufile))) {
 		nLine += nInc;
-		swprintf_s(wbuf, MAXSTR, L"Problem on line %d of %s\n", nLine, lpmw->szMenuName);
+		swprintf_s(wbuf, MAXSTR, L"Problem on line %d of " TCHARFMT "\n", nLine, lpmw->szMenuName);
 		MessageBoxW(lptw->hWndParent, wbuf, MBOXTITLE, MB_ICONEXCLAMATION);
 		goto errorcleanup;
 	    }
@@ -598,7 +598,7 @@ LoadMacros(LPTW lptw)
 	    if (nMenuLevel < MENUDEPTH) {
 		nMenuLevel++;
 	    } else {
-		swprintf_s(wbuf, MAXSTR, L"Menu is too deep at line %d of %s\n", nLine, lpmw->szMenuName);
+		swprintf_s(wbuf, MAXSTR, L"Menu is too deep at line %d of " TCHARFMT "\n", nLine, lpmw->szMenuName);
 		MessageBoxW(lptw->hWndParent, wbuf, MBOXTITLE, MB_ICONEXCLAMATION);
 		goto errorcleanup;
 	    }
@@ -615,7 +615,7 @@ LoadMacros(LPTW lptw)
 
 	    if (!(nInc = GetLine(buf, MAXSTR, menufile))) {
 		nLine += nInc;
-		swprintf_s(wbuf, MAXSTR, L"Problem on line %d of %s\n", nLine, lpmw->szMenuName);
+		swprintf_s(wbuf, MAXSTR, L"Problem on line %d of " TCHARFMT "\n", nLine, lpmw->szMenuName);
 		MessageBoxW(lptw->hWndParent, wbuf, MBOXTITLE, MB_ICONEXCLAMATION);
 		goto errorcleanup;
 	    }
@@ -634,13 +634,13 @@ LoadMacros(LPTW lptw)
 	    char *icon;
 
 	    if (lpmw->nButton >= BUTTONMAX) {
-		swprintf_s(wbuf, MAXSTR, L"Too many buttons at line %d of %s\n", nLine, lpmw->szMenuName);
+		swprintf_s(wbuf, MAXSTR, L"Too many buttons at line %d of " TCHARFMT "\n", nLine, lpmw->szMenuName);
 		MessageBoxW(lptw->hWndParent, wbuf, MBOXTITLE, MB_ICONEXCLAMATION);
 		goto errorcleanup;
 	    }
 	    if (!(nInc = GetLine(buf, MAXSTR, menufile))) {
 		nLine += nInc;
-		swprintf_s(wbuf, MAXSTR, L"Problem on line %d of %s\n", nLine, lpmw->szMenuName);
+		swprintf_s(wbuf, MAXSTR, L"Problem on line %d of " TCHARFMT "\n", nLine, lpmw->szMenuName);
 		MessageBoxW(lptw->hWndParent, wbuf, MBOXTITLE, MB_ICONEXCLAMATION);
 		goto errorcleanup;
 	    }
@@ -648,7 +648,7 @@ LoadMacros(LPTW lptw)
 	    if (strlen(buf) + 1 < MACROLEN - (macroptr - lpmw->macrobuf)) {
 		strcpy((char *)macroptr, buf);
 	    } else {
-		swprintf_s(wbuf, MAXSTR, L"Out of space for storing menu macros\n at line %d of %s\n", nLine, lpmw->szMenuName);
+		swprintf_s(wbuf, MAXSTR, L"Out of space for storing menu macros\n at line %d of " TCHARFMT "\n", nLine, lpmw->szMenuName);
 		MessageBoxW(lptw->hWndParent, wbuf, MBOXTITLE, MB_ICONEXCLAMATION);
 		goto errorcleanup;
 	    }
@@ -680,7 +680,7 @@ LoadMacros(LPTW lptw)
 	    *macroptr = '\0';
 	    if (!(nInc = GetLine(buf, MAXSTR, menufile))) {
 		nLine += nInc;
-		swprintf_s(wbuf, MAXSTR, L"Problem on line %d of %s\n", nLine, lpmw->szMenuName);
+		swprintf_s(wbuf, MAXSTR, L"Problem on line %d of " TCHARFMT "\n", nLine, lpmw->szMenuName);
 		MessageBoxW(lptw->hWndParent, wbuf, MBOXTITLE, MB_ICONEXCLAMATION);
 		goto errorcleanup;
 	    }
@@ -689,7 +689,7 @@ LoadMacros(LPTW lptw)
 	    if (strlen(buf) + 1 < MACROLEN - (macroptr - lpmw->macrobuf))
 		strcpy((char *)macroptr,buf);
 	    else {
-		swprintf_s(wbuf, MAXSTR, L"Out of space for storing menu macros\n at line %d of %s \n", nLine, lpmw->szMenuName);
+		swprintf_s(wbuf, MAXSTR, L"Out of space for storing menu macros\n at line %d of " TCHARFMT " \n", nLine, lpmw->szMenuName);
 		MessageBoxW(lptw->hWndParent, wbuf, MBOXTITLE, MB_ICONEXCLAMATION);
 		goto errorcleanup;
 	    }
@@ -702,7 +702,7 @@ LoadMacros(LPTW lptw)
 	} else {
 	    /* menu item */
 	    if (lpmw->nCountMenu >= NUMMENU) {
-		swprintf_s(wbuf, MAXSTR, L"Too many menu items at line %d of %s\n", nLine, lpmw->szMenuName);
+		swprintf_s(wbuf, MAXSTR, L"Too many menu items at line %d of " TCHARFMT "\n", nLine, lpmw->szMenuName);
 		MessageBoxW(lptw->hWndParent, wbuf, MBOXTITLE, MB_ICONEXCLAMATION);
 		goto errorcleanup;
 	    }
@@ -723,7 +723,7 @@ LoadMacros(LPTW lptw)
 		AppendMenuW(hMenu[nMenuLevel], MF_STRING, lpmw->nCountMenu, wbuf);
 		if (!(nInc = GetLine(buf, MAXSTR, menufile))) {
 		    nLine += nInc;
-		    swprintf_s(wbuf, MAXSTR, L"Problem on line %d of %s\n", nLine, lpmw->szMenuName);
+		    swprintf_s(wbuf, MAXSTR, L"Problem on line %d of " TCHARFMT "\n", nLine, lpmw->szMenuName);
 		    MessageBoxW(lptw->hWndParent, wbuf, MBOXTITLE, MB_ICONEXCLAMATION);
 		    goto errorcleanup;
 		}
@@ -732,7 +732,7 @@ LoadMacros(LPTW lptw)
 		if (strlen(buf) + 1 < MACROLEN - (macroptr - lpmw->macrobuf))
 		    strcpy((char *)macroptr, buf);
 		else {
-		    swprintf_s(wbuf, MAXSTR, L"Out of space for storing menu macros\n at line %d of %s\n", nLine, lpmw->szMenuName);
+		    swprintf_s(wbuf, MAXSTR, L"Out of space for storing menu macros\n at line %d of " TCHARFMT "\n", nLine, lpmw->szMenuName);
 		    MessageBoxW(lptw->hWndParent, wbuf, MBOXTITLE, MB_ICONEXCLAMATION);
 		    goto errorcleanup;
 		}
