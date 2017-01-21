@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.73 2016/10/30 17:19:59 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.74 2017/01/04 04:24:17 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8173,21 +8173,28 @@ Ffigure_mapcontours
 ?show datafile missing
 ?set missing
 ?missing
- The `set datafile missing` command tells `gnuplot` there is a special string
- used in input data files to denote a missing data entry.  There is no default
- character for `missing`, but in many cases any non-parseable string of
- characters found where a numerical value is expected will cause the line to be
- treated as missing data. There is a distinction between missing data and 
- invalid data (e.g. "NaN", 1/0.).  Invalid data causes a gap in the line drawn
- through the points; missing data does not.
-
  Syntax:
        set datafile missing "<string>"
+       set datafile missing NaN
        show datafile missing
        unset datafile
 
- `Note`: The treatment of certain cases has changed in this version of gnuplot.
- The example below shows the difference.
+ The `set datafile missing` command tells `gnuplot` there is a special string
+ used in input data files to denote a missing data entry.  There is no default
+ character for `missing`.  Gnuplot makes a distinction between missing data and
+ invalid data (e.g. "NaN", 1/0.).  For example invalid data causes a gap in a
+ line drawn through sequential data points; missing data does not.
+
+ Non-numeric characters found in a numeric field will usually be interpreted as
+ invalid rather than as a missing data point unless they happen to match the
+ `missing` string.
+
+ Conversely `set datafile missing NaN` causes all data or expressions evaluating
+ to not-a-number (NaN) to be treated as missing data.
+
+ Note: The treatment of missing or invalid data values in certain cases has
+ changed in this version of gnuplot.
+ The example below shows differences between gnuplot version 4 and version 5.
 Ffigure_missing
  Example:
        set style data linespoints
@@ -8221,9 +8228,10 @@ Ffigure_missing
           5 50
           e
 
- Plot (a) differs because the third line contains only one valid number.
- Old gnuplot versions switched to a single-datum-on-a-line convention that the
- line number is "x" and the datum is "y", erroneously placing the point at(2,3).
+ Plot (a) differs in gnuplot 4 and gnuplot 5 because the third line contains
+ only one valid number.  Version 4 switched to a single-datum-on-a-line
+ convention that the line number is "x" and the datum is "y", erroneously
+ placing the point at(2,3).
 
  Both the old and new gnuplot versions handle the same data correctly if the
  '?' character is designated as a marker for missing data (b).
@@ -8234,7 +8242,13 @@ Ffigure_missing
 ^ <a href="http://www.gnuplot.info/demo/mgr.html">
  imageNaN demo.
 ^ </a>
-
+ As of version 5.0.6 this is also true for the missing value flag.
+ Earlier versions failed to recognize the missing value flag if the plot
+ command specified `using ($N)` rather than `using N`.  Note, however, that
+ even in current gnuplot using a "missing" value for computation will result
+ in NaN. I.e. a `missing` string in either columns 1 or 2 will cause
+ `using ($1+$2)` to evaluate as NaN.  If you nevertheless want to treat this
+ as missing data, use the command `set datafile missing NaN`.
 4 set datafile separator
 ?set datafile separator
 ?show datafile separator

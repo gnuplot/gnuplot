@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.326.2.17 2016/09/03 23:18:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.326.2.18 2016/10/21 21:00:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -3077,6 +3077,8 @@ show_datafile()
     if (END_OF_COMMAND || almost_equals(c_token,"miss$ing")) {
 	if (missing_val == NULL)
 	    fputs("\tNo missing data string set for datafile\n", stderr);
+	else if (!strcmp(missing_val,"NaN"))
+	    fprintf(stderr,"\tall NaN (not-a-number) values will be treated as missing data\n");
 	else
 	    fprintf(stderr, "\t\"%s\" in datafile is interpreted as missing value\n",
 		missing_val);
