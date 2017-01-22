@@ -1,3 +1,9 @@
+2017-01-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (parse_label_options):  Save label z value into its point
+	colorspec as well as its text colorspec
+	Bug #1897
+
 2017-01-21  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgnuplib.h src/win/wgraph.c src/win/win/wmenu.c 
