@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.160 2016/12/26 23:46:25 sfeam Exp $
+ * $Id: axis.h,v 1.161 2017/01/14 06:23:22 sfeam Exp $
  *
  */
 
@@ -88,6 +88,7 @@ typedef enum AXIS_INDEX {
     U_AXIS,
     V_AXIS,		/* Last index into axis_array[] */
     PARALLEL_AXES,	/* Parallel axis data is allocated dynamically */
+    THETA_index = 1234,	/* Used to identify THETA_AXIS */
 
     AXIS_ARRAY_SIZE = PARALLEL_AXES
 } AXIS_INDEX;
@@ -95,7 +96,6 @@ typedef enum AXIS_INDEX {
 
 /* sample axis doesn't need mtics, so use the slot to hold sample interval */
 # define SAMPLE_INTERVAL mtic_freq
-# define THETA_index 1234	/* Used to identify THETA_AXIS */
 
 /* What kind of ticmarking is wanted? */
 typedef enum en_ticseries_type {

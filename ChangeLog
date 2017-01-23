@@ -4,6 +4,9 @@
 	to cairolatex terminal.
 	Bug #1898
 
+	* src/axis.h src/graphics.c:  Fix type mismatch in numeric comparison
+	(clang generates an error or warning).
+
 2017-01-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (parse_label_options):  Save label z value into its point

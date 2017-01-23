@@ -52,7 +52,7 @@ set timestamp "Seattle - %d %b %Y" offset 1,1
 	time = time + 10 * Minute
   }
   print Date, "    sunrise ", sunrise, "   sunset ", sunset, "    sunlight ", sunlight
-  today = "Today ☉ \n".sunlight."\nof sunlight"
+  today = "Today ☉  \n".sunlight."\nof sunlight"
 
 #
 set angle degrees

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.543 2017/01/17 21:09:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.544 2017/01/19 01:14:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3561,7 +3561,7 @@ ttick_callback(
     /* Skip label if we've already written a user-specified one here */
     while (userlabels) {
 	double here = userlabels->position;
-	if (abs(here - place) <= 0.02) {
+	if (fabs(here - place) <= 0.02) {
 	    text = NULL;
 	    break;
 	}
