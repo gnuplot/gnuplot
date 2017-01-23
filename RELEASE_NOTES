@@ -5,7 +5,7 @@ Gnuplot version 5.0 was initially released in January 2015.
 Please see the NEWS and ChangeLog files for a complete list of bug fixes
 and minor changes accummulated since then.
 
-These release notes are for version 5.0 patchlevel 5 (5.0.6).
+These release notes are for version 5.0 patchlevel 6 (5.0.6).
 This release contains bug-fixes, a few changes back-ported from the
 development version, and a few new features.
 
@@ -35,7 +35,7 @@ NOTABLE NEW FEATURES IN PATCHLEVEL 5.0.6
 ========================================
 
 New command "set micro" tells gnuplot to use an encoding-specific character for
-the micro- scientific prefix output by grpintf %c.
+the micro- scientific prefix output by gprintf format %c.
 
 New command "set datafile missing NaN" tells gnuplot to treat a data point whose
 value is invalid as if it were missing altogether.  See documentation.

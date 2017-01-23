@@ -6,7 +6,7 @@ Changes in 5.0.6
 * CHANGE - revised adjustment of x2label and plot title when x2tics are present
 * CHANGE - mark non-free pdf terminal DEPRECATED (to be removed in release 5.2)
 * CHANGE - allow fractional font sizes for gdlib terminals
-* CHANGE - do not allow inverted R axis (support not backported from 5.1)
+* CHANGE - do not allow inverted R axis (requires support not backported from 5.1)
 * FIX assignment of x/y dimensions in "binary record=(a,b) ... with image"
 * FIX wxt - multithreaded wxt was faulting during resize (mutex lock failure)
 * FIX windows - timed pause only worked for intervals < 1 second
