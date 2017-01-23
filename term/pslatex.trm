@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.97 2016/09/01 19:01:16 sfeam Exp $
+ * $Id: pslatex.trm,v 1.98 2016/09/08 03:17:18 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -954,12 +954,14 @@ EPSLATEX_layer(t_termlayer syncpoint)
     switch (syncpoint) {
 
     case TERM_LAYER_BEFORE_PLOT:
-	fprintf(gppsfile, "%% Begin plot #%d\n", ++plotno);
+	if (!ISCAIROTERMINAL)
+	    fprintf(gppsfile, "%% Begin plot #%d\n", ++plotno);
 	break;
     
     case TERM_LAYER_AFTER_PLOT:
 	PS_linetype(LT_UNDEFINED);	/* Forces a stroke and resets linetype */
-	fprintf(gppsfile, "%% End plot #%d\n", plotno);
+	if (!ISCAIROTERMINAL)
+	    fprintf(gppsfile, "%% End plot #%d\n", plotno);
 	break;
 
     case TERM_LAYER_RESET:        /* Start of plot; reset flag */
@@ -994,11 +996,13 @@ EPSLATEX_layer(t_termlayer syncpoint)
 	break;
 
     case TERM_LAYER_BEGIN_PM3D_MAP:
+	if (!ISCAIROTERMINAL)
 	if (gppsfile && (gppsfile != gpoutfile))
 	    fprintf(gppsfile, "%%pm3d_map_begin\n");
 	break;
     
     case TERM_LAYER_END_PM3D_MAP:
+	if (!ISCAIROTERMINAL)
 	if (gppsfile && (gppsfile != gpoutfile))
 	    fprintf(gppsfile, "%%pm3d_map_end\n");
 	break;
