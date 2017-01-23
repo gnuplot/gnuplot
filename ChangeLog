@@ -1,3 +1,9 @@
+2017-01-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/pslatex.trm:  Do not write postscript comments in output stream
+	to cairolatex terminal.
+	Bug #1898
+
 2017-01-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (parse_label_options):  Save label z value into its point
