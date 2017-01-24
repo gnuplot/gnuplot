@@ -5,8 +5,8 @@
 
 2017-01-24  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* term/canvas.trm term/js/gnuplot_mouse.js: Mouse support for inverted
-	r axis.
+	* term/canvas.trm term/svg.trm term/js/gnuplot_mouse.js
+	term/js/gnuplot_svg.js: Mouse support for inverted r axis.
 
 2017-01-24  Bastian Maerkisch  <bmaerkisch@web.de>
 

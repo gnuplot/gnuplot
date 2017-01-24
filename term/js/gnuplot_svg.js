@@ -346,8 +346,10 @@ gnuplot_svg.convert_to_polar = function (x,y)
     phi = Math.atan2(y,x);
     if (gnuplot_svg.plot_logaxis_r) 
         r = Math.exp( (x/Math.cos(phi) + Math.log(gnuplot_svg.plot_axis_rmin)/Math.LN10) * Math.LN10);
+    else if (gnuplot_svg.plot_axis_rmin > gnuplot_svg.plot_axis_rmax)
+        r = gnuplot_svg.plot_axis_rmin - x/Math.cos(phi);
     else
-        r = x/Math.cos(phi) + gnuplot_svg.plot_axis_rmin;
+        r = gnuplot_svg.plot_axis_rmin + x/Math.cos(phi);
     polar.ang = phi * 180./Math.PI;
     polar.r = r;
     return polar;
