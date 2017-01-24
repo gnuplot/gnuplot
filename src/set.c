@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.550 2017/01/21 23:40:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.551 2017/01/23 02:13:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1662,7 +1662,7 @@ set_encoding()
 static void
 set_degreesign(char *locale)
 {
-#if defined(HAVE_ICONV) && !(defined WIN32)
+#if defined(HAVE_ICONV) && !(defined _WIN32)
     char degree_utf8[3] = {'\302', '\260', '\0'};
     size_t lengthin = 3;
     size_t lengthout = 8;
@@ -1691,22 +1691,6 @@ set_degreesign(char *locale)
 	}
 	return;
     }
-#elif defined(WIN32)
-    if (locale) {
-	char *encoding = strchr(locale, '.');
-	if (encoding) {
-	    unsigned cp;
-	    encoding++; /* Step past the dot in, e.g., German_Germany.1252 */
-	    /* iconv does not understand encodings returned by setlocale() */
-	    if (sscanf(encoding, "%i", &cp)) {
-		wchar_t wdegreesign = 176; /* "\u00B0" */
-		int n = WideCharToMultiByte(cp, WC_COMPOSITECHECK, &wdegreesign, 1,
-			degree_sign, sizeof(degree_sign) - 1, NULL, NULL);
-		degree_sign[n] = NUL;
-	    }
-	}
-	return;
-    }
 #else
     (void)locale; /* -Wunused argument */
 #endif
@@ -1722,6 +1706,10 @@ set_degreesign(char *locale)
     case S_ENC_CP852:	degree_sign[0] = '\370'; break;
     case S_ENC_SJIS:	break;  /* should be 0x818B */
     case S_ENC_CP950:	break;  /* should be 0xA258 */
+    /* default applies at least to:
+       ISO8859-1, -2, -9, -15,   
+       CP1250, CP1251, CP1252, CP1254
+     */
     default:		degree_sign[0] = '\260'; break;
     }
 }

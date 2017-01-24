@@ -13,6 +13,10 @@
 	* src/win/wgdiplus.cpp (clipboard_gdiplus, metafile_gdiplus): 
 	Explicitly set the size of the metafile.
 
+	* src/set.c (set_degreesign):  Remove special Windows code since we
+	cannot rely on the locale on this platform.  Fixes degree sign for
+	UTF-8 encoding.
+
 2017-01-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/pslatex.trm:  Do not write postscript comments in output stream
