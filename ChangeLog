@@ -3,9 +3,15 @@
 	* src/win/wgraph.c (SaveAsEMF):  Default to EMF+ format when using the
 	GDI+ backend.
 
-	* src/win/wgraph.c (CopyClip):  Only set attempt to set clipboard data
-	when the bitmap/metafile handle is valid.  Emit error messages 
-	otherwise.
+	* src/win/wgraph.c (CopyClip):  Only attempt to set clipboard data if
+	the bitmap/metafile handle is valid.  Emit an error message otherwise.
+
+	* src/win/wgdiplus.cpp (clipboard_gdiplus):  Retrieving the handle to
+	the metafile requires releasing the graphics object first.  Fixes
+	copying EMF data to clipboard.
+
+	* src/win/wgdiplus.cpp (clipboard_gdiplus, metafile_gdiplus): 
+	Explicitly set the size of the metafile.
 
 2017-01-23  Ethan A Merritt  <merritt@u.washington.edu>
 

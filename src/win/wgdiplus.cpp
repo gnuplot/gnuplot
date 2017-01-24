@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.46 2016/11/19 06:43:49 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.47 2017/01/20 06:27:03 markisch Exp $
  */
 
 /*
@@ -424,22 +424,28 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 
 
 void
-metafile_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect, LPWSTR name)
+metafile_gdiplus(LPGW lpgw, HDC hdc, LPRECT lprect, LPWSTR name)
 {
 	gdiplusInit();
-	Metafile metafile(name, hdc, EmfTypeEmfPlusDual, NULL);
+	Rect rect(lprect->left, lprect->top, lprect->right - lprect->left, lprect->bottom - lprect->top);
+	Metafile metafile(name, hdc, rect, MetafileFrameUnitPixel, EmfTypeEmfPlusDual, NULL);
 	Graphics graphics(&metafile);
-	do_draw_gdiplus(lpgw, graphics, rect, DRAW_METAFILE);
+	do_draw_gdiplus(lpgw, graphics, lprect, DRAW_METAFILE);
 }
 
 
 HENHMETAFILE
-clipboard_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
+clipboard_gdiplus(LPGW lpgw, HDC hdc, LPRECT lprect)
 {
 	gdiplusInit();
-	Metafile metafile(hdc, EmfTypeEmfPlusDual, NULL);
-	Graphics graphics(&metafile);
-	do_draw_gdiplus(lpgw, graphics, rect, DRAW_METAFILE);
+	Rect rect(lprect->left, lprect->top, lprect->right - lprect->left, lprect->bottom - lprect->top);
+	Metafile metafile(hdc, rect, MetafileFrameUnitPixel, EmfTypeEmfPlusDual, NULL);
+	// Note: We can only get a valid handle once the graphics object has released
+	// the metafile. Creating the graphics object on the heap seems the only way to
+	// achieve that.
+	Graphics * graphics = Graphics::FromImage(&metafile);
+	do_draw_gdiplus(lpgw, *graphics, lprect, DRAW_METAFILE);
+	delete graphics;
 	return metafile.GetHENHMETAFILE();
 }
 
