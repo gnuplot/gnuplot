@@ -1,3 +1,13 @@
+2017-01-24  Stefan Althoefer  <stefan-alth@users.sourceforge.net>
+
+	* term/js/gnuplot_mouse.js:  Improved placement of hypertext and 
+	mouse-click output. Fix multiline hypertext.
+
+2017-01-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.trm term/js/gnuplot_mouse.js: Mouse support for inverted
+	r axis.
+
 2017-01-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/pslatex.trm:  Do not write postscript comments in output stream
