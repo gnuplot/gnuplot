@@ -1,3 +1,12 @@
+2017-01-24  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c (SaveAsEMF):  Default to EMF+ format when using the
+	GDI+ backend.
+
+	* src/win/wgraph.c (CopyClip):  Only set attempt to set clipboard data
+	when the bitmap/metafile handle is valid.  Emit error messages 
+	otherwise.
+
 2017-01-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/pslatex.trm:  Do not write postscript comments in output stream
@@ -16,8 +25,8 @@
 2017-01-21  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgnuplib.h src/win/wgraph.c src/win/win/wmenu.c 
-	src/win/wtext.c:  Fix string formats and messages in several place to
-	make non-Unicode build work again.
+	src/win/wtext.c:  Fix string formats and messages in several places to
+	make non-Unicode builds work again.
 
 	* src/win/wprinter.c:  Fix compiler warnings.
 

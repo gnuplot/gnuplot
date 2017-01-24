@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.242 2017/01/07 07:52:27 markisch Exp $
+ * $Id: wgraph.c,v 1.243 2017/01/21 14:41:55 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -2970,7 +2970,7 @@ SaveAsEMF(LPGW lpgw)
 #endif
 	Ofn.lpstrCustomFilter = lpstrCustomFilter;
 	Ofn.nMaxCustFilter = 255;
-	Ofn.nFilterIndex = 1;   /* start with the *.emf filter */
+	Ofn.nFilterIndex = (lpgw->gdiplus ? 2 : 1);
 	Ofn.lpstrFile = lpstrFileName;
 	Ofn.nMaxFile = MAX_PATH;
 	Ofn.lpstrFileTitle = lpstrFileTitle;
@@ -3091,9 +3091,14 @@ CopyClip(LPGW lpgw)
 	 * the Clipboard */
 	OpenClipboard(hwnd);
 	EmptyClipboard();
-	SetClipboardData(CF_ENHMETAFILE, hemf);
+	if (hemf)
+		SetClipboardData(CF_ENHMETAFILE, hemf);
+	else
+		fprintf(stderr, "Error: no metafile data available.\n");
 	if (bitmap)
 		SetClipboardData(CF_BITMAP, bitmap);
+	else
+		fprintf(stderr, "Error: no bitmap data available.\n");
 	CloseClipboard();
 	ReleaseDC(hwnd, hdc);
 	DeleteEnhMetaFile(hemf);
