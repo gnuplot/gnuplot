@@ -1,7 +1,7 @@
 /*
- * $Id: gnuplot_mouse.js,v 1.23 2014/09/26 01:50:11 sfeam Exp $
+ * $Id: gnuplot_mouse.js,v 1.24 2014/09/26 20:41:51 sfeam Exp $
  */
-    gnuplot.mouse_version = " 26 September 2014";
+    gnuplot.mouse_version = " 24 January 2017";
 
 // Mousing code for use with gnuplot's 'canvas' terminal driver.
 // The functions defined here assume that the javascript plot produced by
@@ -119,8 +119,18 @@ gnuplot.mouse_update = function(e)
   gnuplot.ploty = -(gnuplot.mousey - gnuplot.plot_ybot);
 
   // Limit tracking to the interior of the plot
-  if (gnuplot.plotx < 0 || gnuplot.ploty < 0) return;
-  if (gnuplot.mousex > gnuplot.plot_xmax || gnuplot.mousey < gnuplot.plot_ytop) return;
+  if (gnuplot.plotx < 0 || gnuplot.ploty < 0){
+      if (gnuplot.hypertext_list != "undefined" && gnuplot.hypertext_list.length > 0) {
+	  gnuplot.check_hypertext();
+      } 
+      return;
+  }
+  if (gnuplot.mousex > gnuplot.plot_xmax || gnuplot.mousey < gnuplot.plot_ytop){
+      if (gnuplot.hypertext_list != "undefined" && gnuplot.hypertext_list.length > 0) {
+	  gnuplot.check_hypertext();
+      } 
+      return;
+  }
 
   var axis_xmin = (gnuplot.zoomed) ? gnuplot.zoom_axis_xmin : gnuplot.plot_axis_xmin;
   var axis_xmax = (gnuplot.zoomed) ? gnuplot.zoom_axis_xmax : gnuplot.plot_axis_xmax;
@@ -238,9 +248,27 @@ gnuplot.check_hypertext = function()
 		if (len < ll) len = ll;
 	    }
 	}
+
+	// text shift (so it is not covered by cursor)
+	var shiftx = 14;
+
+	if (linkx > gnuplot.plot_term_xmax-(len+8) ){
+	    // position text left of cursor if we are to far in the right hemisphere
+	    // else we might print over the border
+	    linkx = linkx - len;
+	    shiftx = -shiftx;
+	}
+	if (linky > 14*lines.length ){
+	    // position text top of cursor if we are low enough in the plot
+	    // else we might print over the border
+	    linky = linky - 14*lines.length;
+	}
+
 	ctx.fillStyle = "rgba(238,238,238,0.8)"
-	ctx.fillRect(linkx+10, linky+4, len+8, 14*lines.length);
-	ctx.drawText("sans", 10, linkx+14, linky+14, text);
+	ctx.fillRect(linkx+shiftx, linky+4, len+8, 14*lines.length);
+	for (var l=0; l<lines.length; l++) {
+	    ctx.drawText("sans", 10, linkx+shiftx+4, linky+14+l*14, lines[l]);
+	}
 	break;
     }
   } 
@@ -303,8 +331,10 @@ gnuplot.convert_to_polar = function (x,y)
     phi = Math.atan2(y,x);
     if (gnuplot.plot_logaxis_r) 
         r = Math.exp( (x/Math.cos(phi) + Math.log(gnuplot.plot_axis_rmin)/Math.LN10) * Math.LN10);
+    else if (gnuplot.plot_axis_rmin > gnuplot.plot_axis_rmax)
+	r = gnuplot.plot_axis_rmin - x/Math.cos(phi);
     else
-        r = x/Math.cos(phi) + gnuplot.plot_axis_rmin;
+        r = gnuplot.plot_axis_rmin + x/Math.cos(phi);
     polar.ang = phi * 180./Math.PI;
     polar.r = r;
     return polar;
@@ -336,7 +366,15 @@ gnuplot.saveclick = function (event)
     else
       label_y = y.toPrecision(4);
     click = " " + label_x + ", " + label_y;
-    ctx.drawText("sans", 9, gnuplot.mousex, gnuplot.mousey, click);
+
+    var len = ctx.measureText("sans", 9, click);
+    if (gnuplot.mousex > gnuplot.plot_term_xmax-(len) ){
+	// draw left of cursor when we are near the right side of the plot
+	len += ctx.measureText("sans", 9, " ");
+	ctx.drawText("sans", 9, gnuplot.mousex-len, gnuplot.mousey, click);
+    } else {
+	ctx.drawText("sans", 9, gnuplot.mousex, gnuplot.mousey, click);
+    }
   }
 
   // Save starting corner of zoom box
