@@ -578,6 +578,7 @@
 #define ftruncate _chsize
 #define _fcloseall fcloseall
 #define mktemp _mktemp
+#define wcsnicmp _wcsnicmp
 
 /* gnuplot.gih is not used by wgnuplot */
 #define NO_GIH 1

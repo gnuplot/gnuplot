@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.47 2017/01/20 06:27:03 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.48 2017/01/24 19:07:42 markisch Exp $
  */
 
 /*
@@ -1712,10 +1712,10 @@ SaveAsBitmap(LPGW lpgw)
 			npng = i + 1;
 	}
 	LPWSTR filter = (LPWSTR) malloc(len * sizeof(WCHAR));
-	swprintf(filter, L"%ls\t%ls\t", pImageCodecInfo[0].FormatDescription, pImageCodecInfo[0].FilenameExtension);
+	wsprintf(filter, L"%ls\t%ls\t", pImageCodecInfo[0].FormatDescription, pImageCodecInfo[0].FilenameExtension);
 	for (i = 1; i < nImageCodecs; i++) {
 		LPWSTR type = (LPWSTR) malloc((wcslen(pImageCodecInfo[i].FormatDescription) + wcslen(pImageCodecInfo[i].FilenameExtension) + 3) * sizeof(WCHAR));
-		swprintf(type, L"%ls\t%ls\t", pImageCodecInfo[i].FormatDescription, pImageCodecInfo[i].FilenameExtension);
+		wsprintf(type, L"%ls\t%ls\t", pImageCodecInfo[i].FormatDescription, pImageCodecInfo[i].FilenameExtension);
 		wcscat(filter, type);
 		free(type);
 	}

@@ -1,3 +1,8 @@
+2017-01-25  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgdiplus.cpp config/config.oww config/watcom/Makefile:
+	Enable build with OpenWatcom and GDI+.  See Patch #746.
+
 2017-01-24  Stefan Althoefer  <stefan-alth@users.sourceforge.net>
 
 	* term/js/gnuplot_mouse.js:  Improved placement of hypertext and 
