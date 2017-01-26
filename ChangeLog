@@ -1,3 +1,11 @@
+2017-01-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_determine_matrix_info):  Check and report error
+	return from fseek, which cannot work if the input stream is a pipe.
+	Now you get: "seek error in binary input stream - Illegal seek" instead
+	of the non-informative "File doesn't factorize into full matrix".
+	Bug #1901
+
 2017-01-24  Stefan Althoefer  <stefan-alth@users.sourceforge.net>
 
 	* term/js/gnuplot_mouse.js:  Improved placement of hypertext and 
