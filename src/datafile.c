@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.336 2016/11/03 17:15:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.337 2017/01/21 05:04:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2334,6 +2334,7 @@ df_determine_matrix_info(FILE *fin)
 	float fdummy;
 	off_t nc, nr;	/* off_t because they contribute to fseek offset */
 	off_t flength;
+	int ierr;
 
 	/* Read first value for number of columns. */
 	fdummy = df_read_a_float(fin);
@@ -2349,7 +2350,9 @@ df_determine_matrix_info(FILE *fin)
 
 	/* Read nc+1 value for corner_1 x. */
 	if (nc > 1) {
-	    fseek(fin, (nc-2)*sizeof(float), SEEK_CUR);
+	    ierr = fseek(fin, (nc-2)*sizeof(float), SEEK_CUR);
+	    if (ierr < 0)
+		int_error(NO_CARET, "seek error in binary input stream - %s", strerror(errno));
 	    fdummy = df_read_a_float(fin);
 	}
 	df_matrix_corner[1][0] = fdummy;
@@ -2358,14 +2361,18 @@ df_determine_matrix_info(FILE *fin)
 	df_matrix_corner[0][1] = df_read_a_float(fin);
 
 	/* Compute length of file and number of columns. */
-	fseek(fin, 0L, SEEK_END);
+	ierr = fseek(fin, 0L, SEEK_END);
+	if (ierr < 0)
+	    int_error(NO_CARET, "seek error in binary input stream - %s", strerror(errno));
 	flength = ftell(fin)/sizeof(float);
 	nr = flength/(nc + 1);
 	if (nr*(nc + 1) != flength)
 	    int_error(NO_CARET, "File doesn't factorize into full matrix");
 
 	/* Read last value for corner_1 y */
-	fseek(fin, -(nc + 1)*sizeof(float), SEEK_END);
+	ierr = fseek(fin, -(nc + 1)*sizeof(float), SEEK_END);
+	if (ierr < 0)
+	    int_error(NO_CARET, "seek error in binary input stream - %s", strerror(errno));
 	df_matrix_corner[1][1] = df_read_a_float(fin);
 
 	/* Set up scan information for df_readbinary(). */
@@ -2373,7 +2380,9 @@ df_determine_matrix_info(FILE *fin)
 	df_bin_record[0].scan_dim[1] = nr;
 
 	/* Reset counter file pointer. */
-	fseek(fin, 0L, SEEK_SET);
+	ierr = fseek(fin, 0L, SEEK_SET);
+	if (ierr < 0)
+	    int_error(NO_CARET, "seek error in binary input stream - %s", strerror(errno));
 
     } else {
 
