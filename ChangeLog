@@ -1,3 +1,8 @@
+2017-01-27  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/stdfn.c|h (gp_getcwd):  New function for Windows which is aware
+	of the current internal encoding. Bugfix.
+
 2017-01-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_determine_matrix_info):  Check and report error
@@ -10,6 +15,8 @@
 
 	* src/win/wgdiplus.cpp config/config.oww config/watcom/Makefile:
 	Enable build with OpenWatcom and GDI+.  See Patch #746.
+
+	* src/win/wprinter.c:  Add missing calling convention.
 
 2017-01-24  Stefan Althoefer  <stefan-alth@users.sourceforge.net>
 

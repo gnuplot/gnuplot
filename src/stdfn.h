@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.53 2016/01/10 00:41:12 sfeam Exp $
+ * $Id: stdfn.h,v 1.54 2016/10/15 09:08:52 markisch Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -342,7 +342,10 @@ int ms_snprintf(char *str, size_t size, const char * format, ...);
 #endif
 
 #ifndef GP_GETCWD
-# if defined(HAVE_GETCWD)
+# if defined(_WIN32)
+#  define GP_GETCWD(path,len) gp_getcwd (path, len)
+char * gp_getcwd(char *path, size_t len);
+# elif defined(HAVE_GETCWD)
 #   if defined(__EMX__)
 #     define GP_GETCWD(path,len) _getcwd2 (path, len)
 #   else

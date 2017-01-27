@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.30 2014/03/20 00:58:35 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.31 2016/05/08 13:03:17 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - stdfn.c */
@@ -487,6 +487,19 @@ void gp_exit(int status)
     gp_exit_cleanup();
     exit(status);
 }
+
+#if _WIN32
+char *
+gp_getcwd(char *path, size_t len)
+{
+    wchar_t wpath[MAX_PATH + 1];
+    if (_wgetcwd(wpath, MAX_PATH) != NULL) {
+	WideCharToMultiByte(WinGetCodepage(encoding), 0, wpath, -1, path, len, NULL, 0);
+	return path;
+    }
+    return NULL;
+}
+#endif
 
 
 #if !defined(HAVE_DIRENT_H) && defined(_WIN32) && (!defined(__WATCOMC__))
