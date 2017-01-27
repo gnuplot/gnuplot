@@ -15,6 +15,7 @@ Changes in 5.0.6
 * FIX aquaterm failed to honor request to disable enhanced text markup
 * FIX save and show commands failed to list linecolor for lines with "lt -1"
 * FIX the "missing" data flag is honored by "using ($n)" as it is for "using n"
+* FIX error reporting of line number inside a bracketed clause
 
 Changes in 5.0.5
 ================
