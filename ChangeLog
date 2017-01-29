@@ -1,12 +1,16 @@
 2017-01-29  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/stdfn.c|h src/misc.c config/config.mgw:  Always use our own Windows version of opendir
-	and friends as they handle encodings. Bugfix.
+	* src/win/wmenu.c:  Revise the patch dated 2017-01-25 so it does not
+	break non-UNICODE builds.
 
-	* src/stdfn.c src/syscfg.h src/util.c src/win/wmenu.c:  Only include direct.h where required.
-	Remove a few unnecessary includes.
+	* src/stdfn.c|h src/misc.c config/config.mgw:  Always use our own
+	Windows version of opendir and friends as they handle encodings.
+	Bugfix.
 
-	* src/win/mingw/Makefile:   Optionally use pkg-config to use gdlib.
+	* src/stdfn.c src/syscfg.h src/util.c src/win/wmenu.c:  Only include 
+	direct.h where required. Remove a few unnecessary includes.
+
+	* src/win/mingw/Makefile:  Optionally use pkg-config to use gdlib.
 	Required with recent updates of MSYS2/Mingw-w64
 
 2017-01-28  Bastian Maerkisch  <bmaerkisch@web.de>

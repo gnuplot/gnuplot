@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.48 2017/01/24 19:07:42 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.49 2017/01/25 15:17:47 markisch Exp $
  */
 
 /*
@@ -39,6 +39,10 @@ extern "C" {
 #include <gdiplus.h>
 #include <tchar.h>
 #include <wchar.h>
+#ifdef __WATCOMC__
+// swprintf_s is missing from <cwchar>
+# define swprintf_s(s, c, f, ...) swprintf(s, c, f, __VA_ARGS__)
+#endif
 
 #include "wgdiplus.h"
 #include "wgnuplib.h"
@@ -1712,10 +1716,11 @@ SaveAsBitmap(LPGW lpgw)
 			npng = i + 1;
 	}
 	LPWSTR filter = (LPWSTR) malloc(len * sizeof(WCHAR));
-	wsprintf(filter, L"%ls\t%ls\t", pImageCodecInfo[0].FormatDescription, pImageCodecInfo[0].FilenameExtension);
+	swprintf_s(filter, len, L"%ls\t%ls\t", pImageCodecInfo[0].FormatDescription, pImageCodecInfo[0].FilenameExtension);
 	for (i = 1; i < nImageCodecs; i++) {
-		LPWSTR type = (LPWSTR) malloc((wcslen(pImageCodecInfo[i].FormatDescription) + wcslen(pImageCodecInfo[i].FilenameExtension) + 3) * sizeof(WCHAR));
-		wsprintf(type, L"%ls\t%ls\t", pImageCodecInfo[i].FormatDescription, pImageCodecInfo[i].FilenameExtension);
+		size_t len2 = wcslen(pImageCodecInfo[i].FormatDescription) + wcslen(pImageCodecInfo[i].FilenameExtension) + 3;
+		LPWSTR type = (LPWSTR) malloc(len2 * sizeof(WCHAR));
+		swprintf_s(type, len2, L"%ls\t%ls\t", pImageCodecInfo[i].FormatDescription, pImageCodecInfo[i].FilenameExtension);
 		wcscat(filter, type);
 		free(type);
 	}
