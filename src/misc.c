@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.207 2016/10/28 22:58:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.208 2016/11/18 08:20:57 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -46,22 +46,21 @@ static char *RCSid() { return RCSid("$Id: misc.c,v 1.207 2016/10/28 22:58:52 sfe
 #include "axis.h"
 #include "scanner.h"		/* so that scanner() can count curly braces */
 #include "setshow.h"
-#ifdef _Windows
+#ifdef _WIN32
 # include <fcntl.h>
 # if defined(__WATCOMC__) || defined(__MSC__)
 #  include <io.h>        /* for setmode() */
 # endif
 #endif
-#if defined(HAVE_DIRENT_H)
+#if defined(HAVE_DIRENT_H) && !defined(_WIN32)
 # include <sys/types.h>
 # include <dirent.h>
-#elif defined(_WIN32)
-/* Windows version of opendir() and friends in stdfn.c */
-# ifdef __WATCOM
-#  include <direct.h>
-# endif
 #endif
 #ifdef _WIN32
+/* Windows version of opendir() and friends are in stdfn.c */
+/* Note: OpenWatcom has them in direct.h, but we prefer
+         the built-in variants as they handle encodings.
+*/
 # include "win/winmain.h"
 #endif
 

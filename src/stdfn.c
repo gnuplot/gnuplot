@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.31 2016/05/08 13:03:17 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.32 2017/01/28 10:10:10 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - stdfn.c */
@@ -501,9 +501,9 @@ gp_getcwd(char *path, size_t len)
 }
 #endif
 
-
-#if !defined(HAVE_DIRENT_H) && defined(_WIN32) && (!defined(__WATCOMC__))
-/* BM: OpenWatcom has dirent functions in direct.h!*/
+#ifdef _WIN32
+/* Note: OpenWatcom has dirent functions in direct.h but we use our functions
+		 since they support encodings. */
 /*
 
     Implementation of POSIX directory browsing functions and types for Win32.
@@ -518,14 +518,14 @@ struct DIR
 {
     intptr_t            handle; /* -1 for failed rewind */
     struct _wfinddata_t info;
-    struct dirent       result; /* d_name null iff first time */
+    struct gp_dirent    result; /* d_name null iff first time */
     WCHAR               *name;  /* null-terminated string */
     char                info_mbname[4*260];
 };
 
 
 DIR *
-opendir(const char *name)
+gp_opendir(const char *name)
 {
     DIR *dir = 0;
     char *mbname;
@@ -563,7 +563,7 @@ opendir(const char *name)
 
 
 int
-closedir(DIR *dir)
+gp_closedir(DIR *dir)
 {
     int result = -1;
 
@@ -583,10 +583,10 @@ closedir(DIR *dir)
 }
 
 
-struct dirent *
-readdir(DIR *dir)
+struct gp_dirent *
+gp_readdir(DIR *dir)
 {
-    struct dirent *result = 0;
+    struct gp_dirent *result = 0;
 
     if (dir && dir->handle != -1) {
 	if (!dir->result.d_name || _wfindnext(dir->handle, &dir->info) != -1) {
@@ -606,7 +606,7 @@ readdir(DIR *dir)
 
 
 void
-rewinddir(DIR *dir)
+gp_rewinddir(DIR *dir)
 {
     if (dir && dir->handle != -1) {
 	_findclose(dir->handle);
@@ -632,4 +632,4 @@ rewinddir(DIR *dir)
     But that said, if there are any problems please get in touch.
 
 */
-#endif /* !HAVE_DIRENT_H && _WIN32 */
+#endif /* _WIN32 */

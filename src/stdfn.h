@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.54 2016/10/15 09:08:52 markisch Exp $
+ * $Id: stdfn.h,v 1.55 2017/01/28 10:10:10 markisch Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -400,7 +400,7 @@ void gp_exit_cleanup __PROTO((void));
 
 char * gp_basename __PROTO((char *path));
 
-#if !defined(HAVE_DIRENT_H) && defined(WIN32) && (!defined(__WATCOMC__))
+#ifdef _WIN32
 /*
 
     Declaration of POSIX directory browsing functions and types for Win32.
@@ -422,21 +422,27 @@ char * gp_basename __PROTO((char *path));
     But that said, if there are any problems please get in touch.
 
 */
-typedef struct DIR DIR;
+typedef struct GPDIR GPDIR;
 
-struct dirent
+struct gp_dirent
 {
     char *d_name;
 };
 
-DIR           *opendir __PROTO((const char *));
-int           closedir __PROTO((DIR *));
-struct dirent *readdir __PROTO((DIR *));
-void          rewinddir __PROTO((DIR *));
+GPDIR * gp_opendir(const char *);
+int gp_closedir(GPDIR *);
+struct gp_dirent *gp_readdir(GPDIR *);
+void gp_rewinddir(GPDIR *);
+#define opendir(p) gp_opendir(p)
+#define closedir(d) gp_closedir(d)
+#define readdir(d) gp_readdir(d)
+#define rewinddir(d) gp_rewinddir(d)
+#define dirent gp_dirent
+#define DIR GPDIR
 #elif defined(HAVE_DIRENT_H)
 # include <sys/types.h>
 # include <dirent.h>
-#endif /* !HAVE_DIRENT_H && WIN32 */
+#endif /* !HAVE_DIRENT_H && _WIN32 */
 
 
 /* Misc. defines */
