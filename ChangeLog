@@ -1,5 +1,7 @@
 2017-01-29  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* config/config.oww:  The OpenWatcom v2 fork has erf and erfc.
+
 	* src/win/wmenu.c:  Revise the patch dated 2017-01-25 so it does not
 	break non-UNICODE builds.
 
