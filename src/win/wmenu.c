@@ -1,5 +1,5 @@
 /*
- * $Id: wmenu.c,v 1.39 2017/01/06 16:07:19 markisch Exp $Id: wmenu.c,v 1.39 2017/01/06 16:07:19 markisch Exp $
+ * $Id: wmenu.c,v 1.40 2017/01/21 14:41:55 markisch Exp $Id: wmenu.c,v 1.40 2017/01/21 14:41:55 markisch Exp $
  */
 
 /* GNUPLOT - win/wmenu.c */
@@ -56,6 +56,9 @@
 #include <sys/stat.h>
 #include <wchar.h>
 #include <tchar.h>
+#ifdef __WATCOMC__
+# include <direct.h>
+#endif
 #include "wgnuplib.h"
 #include "wresourc.h"
 #include "stdfn.h"

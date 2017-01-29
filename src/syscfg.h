@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.60 2016/05/25 15:02:28 markisch Exp $
+ * $Id: syscfg.h,v 1.61 2016/08/06 13:22:50 markisch Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -234,9 +234,6 @@ FILE * win_fopen(const char *filename, const char *mode);
  * in the Windows section
  */
 #ifdef __WATCOMC__
-# include <direct.h>
-# include <dos.h>
-# define HAVE_GETCWD 1
 # define GP_EXCEPTION_NAME _exception
 #endif
 

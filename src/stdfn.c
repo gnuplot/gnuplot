@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.32 2017/01/28 10:10:10 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.33 2017/01/29 06:30:08 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - stdfn.c */
@@ -41,6 +41,10 @@ static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.32 2017/01/28 10:10:10 mar
  * - Lars Hecking
  */
 
+#if defined(_WIN32) && defined(__WATCOMC__)
+#  include <direct.h>
+#endif
+
 #include "stdfn.h"
 
 #ifdef _WIN32
@@ -48,9 +52,7 @@ static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.32 2017/01/28 10:10:10 mar
 #include <windows.h>
 #include "term_api.h"
 #include "win/winmain.h"
-#ifndef HAVE_DIRENT_H
 #include <io.h> /* _findfirst and _findnext set errno iff they return -1 */
-#endif
 #endif
 #ifdef NEED_CEXP
 #include <math.h>
