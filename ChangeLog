@@ -1,4 +1,12 @@
-2017-01-27  Bastian Maerkisch  <bmaerkisch@web.de>
+2017-01-29  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/stdfn.c|h src/misc.c:  Always use our own Windows version of opendir
+	and friends	on as it handles encodings. Bugfix.
+
+	* src/win/mingw/Makefile:   Optionally use pkg-config to use gdlib.
+	Required with recent updates of MSYS2/Mingw-w64
+
+2017-01-28  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/stdfn.c|h (gp_getcwd):  New function for Windows which is aware
 	of the current internal encoding. Bugfix.

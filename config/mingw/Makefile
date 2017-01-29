@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.67 2017/01/06 16:07:20 markisch Exp $
+# $Id: Makefile,v 1.68 2017/01/06 16:12:24 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 # This assumes a typical installation of the MinGW toolkit, the free
@@ -70,6 +70,7 @@ UNICODE=1
 #JPEG=1
 #FREETYPE=1
 #GDAUTOCONFIGLIBS=1
+#GDPKGCONFIG=1
 #BGD=1
 
 # PDF device driver
@@ -374,18 +375,25 @@ ifdef PNG
   CFLAGS += -DHAVE_LIBPNG
   ifndef BGD
   ifndef GDAUTOCONFIGLIBS
+  ifndef GDPKGCONFIG
     TERMLIBS += -lpng -lz
+  endif
   endif
   endif
 endif
 
 ifdef NEWGD
   CFLAGS += -DHAVE_LIBGD -DHAVE_GD_H -DHAVE_GD_GIF -DGIF_ANIMATION -DHAVE_GD_PNG
+ifdef GDPKGCONFIG
+  CFLAGS += $(shell pkg-config --cflags gdlib)
+endif
 ifdef JPEG
   CFLAGS += -DHAVE_GD_JPEG
   ifndef BGD
   ifndef GDAUTOCONFIGLIBS
+  ifndef GDPKGCONFIG
     TERMLIBS += -ljpeg
+  endif
   endif
   endif
 endif
@@ -393,12 +401,17 @@ ifdef FREETYPE
   CFLAGS += -DHAVE_GD_TTF
   ifndef BGD
   ifndef GDAUTOCONFIGLIBS
+  ifndef GDPKGCONFIG
     TERMLIBS += -lfreetype
+  endif
   endif
   endif
 endif
 ifdef GDAUTOCONFIGLIBS
   TERMLIBS += $(shell gdlib-config --libs)
+endif
+ifdef GDPKGCONFIG
+  TERMLIBS += $(shell pkg-config --libs gdlib)
 endif
 endif
 
