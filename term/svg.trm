@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.183 2016/10/23 23:09:29 sfeam Exp $
+ * $Id: svg.trm,v 1.184 2017/01/24 23:42:57 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -944,7 +944,7 @@ SVG_write_preamble ()
 		int_warn(NO_CARET, "Failed to insert javascript file %s\n", fullname);
  	    else {
 		fprintf(gpoutfile,
-		    "<script language=\"javaScript\" TYPE=\"text/javascript\" > <![CDATA[\n");
+		    "<script type=\"text/javascript\" > <![CDATA[\n");
 		while (fgets(buf, sizeof(buf), svg_js_fd))
 		    fputs(buf, gpoutfile);
 		fprintf(gpoutfile,"]]>\n</script>\n");
