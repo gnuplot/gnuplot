@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.31 2016/07/21 19:00:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.32 2016/12/28 04:22:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -76,9 +76,6 @@ int    bar_layer = LAYER_FRONT;
 
 /* set by tic_callback - how large to draw polar radii */
 static double largest_polar_circle;
-
-/* used for filled points */
-static t_colorspec background_fill = BACKGROUND_COLORSPEC;
 
 /*}}} */
 
