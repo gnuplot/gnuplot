@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.99.2.4 2015/04/30 05:38:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.99.2.5 2015/05/05 19:01:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1165,11 +1165,11 @@ build_networks(struct surface_points *plots, int pcount)
 	if (this_plot->plot_type == NODATA)
 	    continue;
 
-	crvlen = this_plot->iso_crvs->p_count;
-
 	/* Allow individual plots to opt out of hidden3d calculations */
 	if (this_plot->opt_out_of_hidden3d)
 	    continue;
+
+	crvlen = this_plot->iso_crvs->p_count;
 
 	/* We can't use the linetype passed to us, because it has been through */
 	/* load_linetype(), which replaced the nominal linetype with the one   */
@@ -1245,9 +1245,13 @@ build_networks(struct surface_points *plots, int pcount)
 
 		} else for (i = 0; i < icrvs->p_count; i++) {
 		    long int thisvertex, basevertex;
+		    int interval = this_plot->lp_properties.p_interval;
 
-		    thisvertex = store_vertex(points + i, lp,
-					      color_from_column);
+		    /* NULL lp means don't draw a point at this vertex */
+		    if (this_plot->plot_style == LINESPOINTS && interval && (i % interval))
+			thisvertex = store_vertex(points + i, NULL, color_from_column);
+		    else
+			thisvertex = store_vertex(points + i, lp, color_from_column);
 
 		    if (this_plot->plot_style == VECTOR) {
 			store_vertex(icrvs->next->points+i, 0, 0);

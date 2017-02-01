@@ -3,6 +3,8 @@
 	* src/graph3d.c (plot3d_points) src/gadgets.{ch} src/graphics.c:
 	Apply pointinterval property to splot with linespoints.
 
+	* src/hidden3d.c: Apply pointinterval property in hidden3d mode also.
+
 2017-01-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util.c (print_line_with_error):  Replace macros
