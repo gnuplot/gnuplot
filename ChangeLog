@@ -7,6 +7,11 @@
 	Similar to "pointinterval" except that the resulting spacing between
 	point symbols does not depend on the total number of data points.
 
+2017-02-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (plot3d_points):  Apply pointinterval property to
+	splot with linespoints.
+
 2017-01-29  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/config.oww:  The OpenWatcom v2 fork has erf and erfc.

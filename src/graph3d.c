@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.358 2016/12/07 04:30:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.359 2017/01/15 19:05:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1804,6 +1804,7 @@ plot3d_points(struct surface_points *plot)
     int x, y;
     struct termentry *t = term;
     struct iso_curve *icrvs = plot->iso_crvs;
+    int interval = plot->lp_properties.p_interval;
 
     /* Set whatever we can that applies to every point in the loop */
     if (plot->lp_properties.p_type == PT_CHARACTER) {
@@ -1822,11 +1823,26 @@ plot3d_points(struct surface_points *plot)
 	    set_rgbcolor_const( plot->lp_properties.pm3d_color.lt );
 
 	for (i = 0; i < icrvs->p_count; i++) {
+	
+	    /* Only print 1 point per interval */
+	    if ((plot->plot_style == LINESPOINTS) && (interval) && (i % interval))
+		continue;
+
 	    point = &(icrvs->points[i]);
 	    if (point->type == INRANGE) {
 		map3d_xy(point->x, point->y, point->z, &x, &y);
 
 		if (!clip_point(x, y)) {
+
+		    /* A negative interval indicates we should blank */
+		    /* out the area behind the point symbol          */
+		    if (plot->plot_style == LINESPOINTS && interval < 0) {
+			(*t->set_color)(&background_fill);
+			(*t->pointsize)(pointsize * pointintervalbox);
+			(*t->point) (x, y, 6);
+			term_apply_lp_properties(&(plot->lp_properties));
+		    }
+
 		    check3d_for_variable_color(plot, point);
 
 		    if ((plot->plot_style == POINTSTYLE || plot->plot_style == LINESPOINTS)
