@@ -466,6 +466,7 @@ extern double zero;		/* zero threshold, not 0! */
 
 extern double pointsize;
 extern double pointintervalbox;
+extern t_colorspec background_fill;
 
 #define SOUTH		1 /* 0th bit */
 #define WEST		2 /* 1th bit */

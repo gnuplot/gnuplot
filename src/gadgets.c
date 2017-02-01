@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.134 2017/01/11 04:13:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.135 2017/02/01 04:30:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -135,6 +135,9 @@ double zero = ZERO;
 /* Status of 'set pointsize' and 'set pointintervalbox' commands */
 double pointsize = 1.0;
 double pointintervalbox = 1.0;
+
+/* used for filled points */
+t_colorspec background_fill = BACKGROUND_COLORSPEC;
 
 /* set border */
 int draw_border = 31;	/* The current settings */

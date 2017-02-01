@@ -9,8 +9,8 @@
 
 2017-02-01  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/graph3d.c (plot3d_points):  Apply pointinterval property to
-	splot with linespoints.
+	* src/graph3d.c (plot3d_points) src/gadgets.c src/gadgets.h:
+	Apply pointinterval property to splot with linespoints.
 
 2017-01-29  Bastian Maerkisch  <bmaerkisch@web.de>
 
