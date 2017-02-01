@@ -12,6 +12,8 @@
 	* src/graph3d.c (plot3d_points) src/gadgets.c src/gadgets.h:
 	Apply pointinterval property to splot with linespoints.
 
+	* src/hidden3d.c: Apply pointinterval property in hidden3d mode also.
+
 2017-01-29  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/config.oww:  The OpenWatcom v2 fork has erf and erfc.
