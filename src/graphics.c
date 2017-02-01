@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.544 2017/01/19 01:14:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.545 2017/01/23 21:33:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -613,6 +613,7 @@ do_plot(struct curve_points *plots, int pcount)
     for (curve = 0; curve < pcount; this_plot = this_plot->next, curve++) {
 
 	TBOOLEAN localkey = key->visible;	/* a local copy */
+	this_plot->current_plotno = curve;
 
 	/* Sync point for start of new curve (used by svg, post, ...) */
 	if (term->hypertext) {
@@ -2083,9 +2084,29 @@ plot_points(struct curve_points *plot)
     int x, y;
     int p_width, p_height;
     int pointtype;
-    int interval = plot->lp_properties.p_interval;
     struct termentry *t = term;
+    int interval = plot->lp_properties.p_interval;
+    int number = abs(plot->lp_properties.p_number);
+    int offset = 0; 
 
+    /* The "pointnumber" property limits the total number of points drawn for this curve */
+    if (number) {
+	int pcountin = 0;
+	for (i = 0; i < plot->p_count; i++) {
+	    if (plot->points[i].type == INRANGE) pcountin++;
+        }
+	if (pcountin > number) {
+	    if (number > 1)
+		interval = (float)(pcountin-1)/(float)(number-1);
+	    else
+		interval = pcountin;
+	    /* offset the first point drawn so that successive plots are more distinct */
+	    offset = plot->current_plotno * ceil(interval/6.0);
+	    if (plot->lp_properties.p_number < 0)
+		interval = -interval;
+	}
+    }
+ 
     /* Set whatever we can that applies to every point in the loop */
     if (plot->lp_properties.p_type == PT_CHARACTER) {
 	ignore_enhanced(TRUE);
@@ -2105,9 +2126,11 @@ plot_points(struct curve_points *plot)
 	jitter_points(plot);
 
     for (i = 0; i < plot->p_count; i++) {
-	if ((plot->plot_style == LINESPOINTS) && (interval) && (i % interval)) {
+
+	/* Only print 1 point per interval */
+	if ((plot->plot_style == LINESPOINTS) && (interval) && ((i-offset) % interval))
 	    continue;
-	}
+
 	if (plot->points[i].type == INRANGE) {
 
 	    x = map_x(plot->points[i].x);
@@ -3948,7 +3971,7 @@ place_raxis()
     t_object raxis_circle = {
 	NULL, 1, 1, OBJ_CIRCLE,	OBJ_CLIP, /* link, tag, layer (front), object_type, clip */
 	{FS_SOLID, 100, 0, BLACK_COLORSPEC},
-	{0, LT_BACKGROUND, 0, DASHTYPE_AXIS, 0, 0.2, 0.0, DEFAULT_P_CHAR, BACKGROUND_COLORSPEC, DEFAULT_DASHPATTERN},
+	{0, LT_BACKGROUND, 0, DASHTYPE_AXIS, 0, 0, 0.2, 0.0, DEFAULT_P_CHAR, BACKGROUND_COLORSPEC, DEFAULT_DASHPATTERN},
 	{.circle = {1, {0,0,0,0.,0.,0.}, {graph,0,0,0.02,0.,0.}, 0., 360. }}
     };
 #endif

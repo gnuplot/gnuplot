@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1045 2017/01/19 01:14:22 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1046 2017/01/21 23:40:32 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4091,6 +4091,7 @@ Ffigure_lines
 ?linespoints
 ?lp
 ?pointinterval
+?pointnumber
 Ffigure_linespoints
  The `linespoints` style (short form `lp`) connects adjacent points with
  straight line segments and then goes back to draw a small symbol at each point.
@@ -4100,12 +4101,17 @@ Ffigure_linespoints
  also be used to provide information such as variable line color.
  See `lines` and `points`.
 
- The `pointinterval` (short form `pi`) property of the linetype can be used to
- control whether or not every point in the plot is given a symbol.  For example,
- 'with lp pi 3' will draw line segments through every data point, but will only
- place a symbol on every 3rd point.  A negative value for `pointinterval` will
- erase the portion of line segment that passes underneath the symbol. The size
- of the erased portion is controlled by `set pointintervalbox`.
+ Two keywords control whether or not every point in the plot is marked with a
+ symbol, `pointinterval` (short form `pi`) and `pointnumber` (short form `pn`).
+
+ `pi N` or `pi -N` tells gnuplot to only place a a symbol on every Nth point.
+ A negative value for N will erase the portion of line segment that passes
+ underneath the symbol. The size of the erased portion is controlled by
+ `set pointintervalbox`.
+
+ `pn N` or `pn -N` tells gnuplot to label only N of the data points, evenly
+ spaced over the data set.  As with `pi`, a negative value for N will erase the
+ portion of line segment that passes underneath the symbol.
 
 2 parallelaxes
 ?plotting style parallelaxes
@@ -8175,9 +8181,9 @@ Ffigure_fenceplot
  `set cntrlabel` controls the labeling of contours, either in the key (default)
  or on the plot itself in the case of `splot ... with labels`.  In the latter 
  case labels are placed along each contour line according to the "pointinterval"
- property of the label descriptor.  By default a label is placed on the 5th
- line segment making up the contour line and repeated every 20th segment.
- These defaults are equivalent to 
+ or "pointnumber" property of the label descriptor.  By default a label is
+ placed on the 5th line segment making up the contour line and repeated every
+ 20th segment.  These defaults are equivalent to 
        set cntrlabel start 5 interval 20
  They can be changed either via the `set cntrlabel` command or by specifying the
  interval in the `splot` command itself
@@ -11988,12 +11994,13 @@ Ffigure_multiple_keys
 ?commands set pointintervalbox
 ?set pointintervalbox
 ?pointintervalbox
- The `pointinterval` property of line types is used in plot style `linespoints`.
- A negative value of pointinterval, e.g. -N, means that point symbols are drawn
- only for every Nth point, and that a box (actually circle) behind each point
- symbol is blanked out by filling with the background color.  The command
- `set pointintervalbox` controls the radius of this blanked-out region.
- It is a multiplier for the default radius, which is equal to the point size.
+ The `pointinterval` and `pointnumber` properties of a line type are used only
+ in plot style `linespoints`.  A negative value of pointinterval or pointnumber,
+ e.g. -N, means that before the selected set of point symbols are drawn a box
+ (actually circle) behind each point symbol is blanked out by filling with the
+ background color.  The command `set pointintervalbox` controls the radius of
+ this blanked-out region.  It is a multiplier for the default radius, which is
+ equal to the point size.
 3 pointsize
 ?commands set pointsize
 ?commands show pointsize
@@ -12634,6 +12641,7 @@ Ffigure_multiple_keys
 =interval
 =linespoints
 =pointinterval
+=pointnumber
  Each terminal has a default set of line and point types, which can be seen
  by using the command `test`.  `set style line` defines a set of line types
  and widths and point types and sizes so that you can refer to them later by
@@ -12647,6 +12655,7 @@ Ffigure_multiple_keys
                               {{pointtype | pt} <point_type>}
                               {{pointsize | ps} <point_size>}
                               {{pointinterval | pi} <interval>}
+                              {{pointnumber | pn} <max_symbols>}
                               {{dashtype | dt} <dashtype>}
                               {palette}
        unset style line
@@ -12678,6 +12687,9 @@ Ffigure_multiple_keys
  every 3rd point in plots using `with linespoints`.  A negative value for the
  interval is treated the same as a positive value, except that some terminals
  will try to interrupt the line where it passes through the point symbol.
+
+ The `pointnumber` property is similar to `pointinterval` except that rather
+ than plotting every Nth point it limits the total number of points to N.
 
  Not all terminals support the `linewidth` and `pointsize` features; if
  not supported, the option will be ignored.

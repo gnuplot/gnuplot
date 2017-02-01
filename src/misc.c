@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.208 2016/11/18 08:20:57 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.209 2017/01/29 06:30:08 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -978,6 +978,7 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
     /* keep track of which options were set during this call */
     int set_lt = 0, set_pal = 0, set_lw = 0; 
     int set_pt = 0, set_ps  = 0, set_pi = 0;
+    int set_pn = 0;
     int set_dt = 0;
     int new_lt = 0;
 
@@ -1187,7 +1188,19 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
 		newlp.p_interval = int_expression();
 		set_pi = 1;
 	    } else {
-		int_warn(c_token, "No pointinterval specifier allowed, here");
+		int_warn(c_token, "No pointinterval specifier allowed here");
+		int_expression();
+	    }
+	    continue;
+	}
+
+	if (almost_equals(c_token, "pointn$umber") || equals(c_token, "pn")) {
+	    c_token++;
+	    if (allow_point) {
+		newlp.p_number = int_expression();
+		set_pn = 1;
+	    } else {
+		int_warn(c_token, "No pointnumber specifier allowed here)");
 		int_expression();
 	    }
 	    continue;
@@ -1214,8 +1227,9 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
 	break;
     }
 
-    if (set_lt > 1 || set_pal > 1 || set_lw > 1 || set_pt > 1 || set_ps > 1 || set_dt > 1)
-	int_error(c_token, "duplicated arguments in style specification");
+    if (set_lt > 1 || set_pal > 1 || set_lw > 1 || set_pt > 1 || set_ps > 1 || set_dt > 1
+    || (set_pi + set_pn > 1))
+	int_error(c_token, "duplicate or conflicting arguments in style specification");
 
     if (set_pal) {
 	lp->pm3d_color = newlp.pm3d_color;
@@ -1232,8 +1246,14 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
     }
     if (set_ps)
 	lp->p_size = newlp.p_size;
-    if (set_pi)
+    if (set_pi) {
 	lp->p_interval = newlp.p_interval;
+        lp->p_number = 0;
+    }
+    if (set_pn) {
+        lp->p_number = newlp.p_number;
+	lp->p_interval = 0;
+    }
     if (newlp.l_type == LT_COLORFROMCOLUMN)
 	lp->l_type = LT_COLORFROMCOLUMN;
     if (set_dt) {

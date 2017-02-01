@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.133 2016/11/08 05:41:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.134 2017/01/11 04:13:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -140,10 +140,10 @@ double pointintervalbox = 1.0;
 int draw_border = 31;	/* The current settings */
 int user_border = 31;	/* What the user last set explicitly */
 int border_layer = LAYER_FRONT;
-# define DEFAULT_BORDER_LP { 0, LT_BLACK, 0, DASHTYPE_SOLID, 0, 1.0, 1.0, DEFAULT_P_CHAR, BLACK_COLORSPEC, DEFAULT_DASHPATTERN }
+# define DEFAULT_BORDER_LP { 0, LT_BLACK, 0, DASHTYPE_SOLID, 0, 0, 1.0, 1.0, DEFAULT_P_CHAR, BLACK_COLORSPEC, DEFAULT_DASHPATTERN }
 struct lp_style_type border_lp = DEFAULT_BORDER_LP;
 const struct lp_style_type default_border_lp = DEFAULT_BORDER_LP;
-const struct lp_style_type background_lp = {0, LT_BACKGROUND, 0, DASHTYPE_SOLID, 0, 1.0, 0.0, DEFAULT_P_CHAR, BACKGROUND_COLORSPEC, DEFAULT_DASHPATTERN};
+const struct lp_style_type background_lp = {0, LT_BACKGROUND, 0, DASHTYPE_SOLID, 0, 0, 1.0, 0.0, DEFAULT_P_CHAR, BACKGROUND_COLORSPEC, DEFAULT_DASHPATTERN};
 
 /* set clip */
 TBOOLEAN clip_lines1 = TRUE;
@@ -663,7 +663,7 @@ void
 default_arrow_style(struct arrow_style_type *arrow)
 {
     static const struct lp_style_type tmp_lp_style = 
-	{0, LT_DEFAULT, 0, DASHTYPE_SOLID, 0, 1.0, 0.0, DEFAULT_P_CHAR,
+	{0, LT_DEFAULT, 0, DASHTYPE_SOLID, 0, 0, 1.0, 0.0, DEFAULT_P_CHAR,
 	DEFAULT_COLORSPEC, DEFAULT_DASHPATTERN};
 
     arrow->tag = -1;

@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.149 2016/10/08 20:13:17 markisch Exp $
+ * $Id: term_api.h,v 1.150 2016/11/19 06:43:49 markisch Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -121,6 +121,7 @@ typedef struct lp_style_type {	/* contains all Line and Point properties */
     int	    p_type;
     int     d_type;		/* Dashtype */
     int     p_interval;		/* Every Nth point in style LINESPOINTS */
+    int     p_number;		/* specify number of points in style LINESPOINTS */
     double  l_width;
     double  p_size;
     char    p_char[8];		/* string holding UTF-8 char used if p_type = PT_CHARACTER */
@@ -130,7 +131,7 @@ typedef struct lp_style_type {	/* contains all Line and Point properties */
 } lp_style_type;
 
 #define DEFAULT_P_CHAR {0,0,0,0,0,0,0,0}
-#define DEFAULT_LP_STYLE_TYPE {0, LT_BLACK, 0, DASHTYPE_SOLID, 0, 1.0, PTSZ_DEFAULT, DEFAULT_P_CHAR, DEFAULT_COLORSPEC, DEFAULT_DASHPATTERN}
+#define DEFAULT_LP_STYLE_TYPE {0, LT_BLACK, 0, DASHTYPE_SOLID, 0, 0, 1.0, PTSZ_DEFAULT, DEFAULT_P_CHAR, DEFAULT_COLORSPEC, DEFAULT_DASHPATTERN}
 
 /* Bit definitions for lp_style_type.flags */
 #define LP_SHOW_POINTS     (0x1) /* if not set, ignore the point properties of this line style */
@@ -144,12 +145,12 @@ typedef struct lp_style_type {	/* contains all Line and Point properties */
                               0xf0e442, 0x0072b2, 0xd55e00, 0xcc79a7 }
 
 #define DEFAULT_MONO_LINETYPES { \
-	{0, LT_BLACK, 0, DASHTYPE_SOLID, 0, 1.0 /*linewidth*/, PTSZ_DEFAULT, DEFAULT_P_CHAR, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}, \
-	{0, LT_BLACK, 0, 1 /* dt 2 */, 0, 1.0 /*linewidth*/, PTSZ_DEFAULT, DEFAULT_P_CHAR, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}, \
-	{0, LT_BLACK, 0, 2 /* dt 3 */, 0, 1.0 /*linewidth*/, PTSZ_DEFAULT, DEFAULT_P_CHAR, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}, \
-	{0, LT_BLACK, 0, 3 /* dt 4 */, 0, 1.0 /*linewidth*/, PTSZ_DEFAULT, DEFAULT_P_CHAR, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}, \
-	{0, LT_BLACK, 0, 0 /* dt 1 */, 0, 2.0 /*linewidth*/, PTSZ_DEFAULT, DEFAULT_P_CHAR, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}, \
-	{0, LT_BLACK, 0, DASHTYPE_CUSTOM, 0, 1.2 /*linewidth*/, PTSZ_DEFAULT, DEFAULT_P_CHAR, BLACK_COLORSPEC, {{16.,8.,2.,5.,2.,5.,2.,8.},{0,0,0,0,0,0,0,0}}} \
+	{0, LT_BLACK, 0, DASHTYPE_SOLID, 0, 0, 1.0 /*linewidth*/, PTSZ_DEFAULT, DEFAULT_P_CHAR, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}, \
+	{0, LT_BLACK, 0, 1 /* dt 2 */, 0, 0, 1.0 /*linewidth*/, PTSZ_DEFAULT, DEFAULT_P_CHAR, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}, \
+	{0, LT_BLACK, 0, 2 /* dt 3 */, 0, 0, 1.0 /*linewidth*/, PTSZ_DEFAULT, DEFAULT_P_CHAR, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}, \
+	{0, LT_BLACK, 0, 3 /* dt 4 */, 0, 0, 1.0 /*linewidth*/, PTSZ_DEFAULT, DEFAULT_P_CHAR, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}, \
+	{0, LT_BLACK, 0, 0 /* dt 1 */, 0, 0, 2.0 /*linewidth*/, PTSZ_DEFAULT, DEFAULT_P_CHAR, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}, \
+	{0, LT_BLACK, 0, DASHTYPE_CUSTOM, 0, 0, 1.2 /*linewidth*/, PTSZ_DEFAULT, DEFAULT_P_CHAR, BLACK_COLORSPEC, {{16.,8.,2.,5.,2.,5.,2.,8.},{0,0,0,0,0,0,0,0}}} \
 }
 
 typedef enum e_arrow_head {
