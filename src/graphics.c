@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.545 2017/01/23 21:33:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.546 2017/02/01 04:30:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -79,9 +79,6 @@ struct lp_style_type bar_lp;
 /* radius used to draw ttics and radial grid lines. */
 /* NB: x-axis coordinates, not polar. updated by xtick2d_callback. */
 static double largest_polar_circle;
-
-/* used for filled points */
-static t_colorspec background_fill = BACKGROUND_COLORSPEC;
 
 /*}}} */
 
