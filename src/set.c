@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.551 2017/01/23 02:13:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.552 2017/01/24 21:08:28 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -6510,7 +6510,6 @@ rrange_to_xy()
     if (R_AXIS.set_min > R_AXIS.set_max) {
 	if (nonlinear(&R_AXIS))
 	    int_error(NO_CARET, "cannot invert nonlinear R axis");
-	int_warn(NO_CARET, "inverted R axis");
 	inverted_raxis = TRUE;
     } else {
 	inverted_raxis = FALSE;
