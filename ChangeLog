@@ -2,6 +2,11 @@
 
 	* demo/boxclusters.dem demo/html/*:  Add demo to collection.
 
+	* src/gplt_x11.c:  Zero out each command string as it is freed.
+	I am not sure this fixes a reported use-after-free segmentation error
+	but it can't hurt.
+	Bug #1866
+
 2017-02-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (plot3d_points) src/gadgets.{ch} src/graphics.c:

@@ -17,6 +17,7 @@ Changes in 5.0.6
 * FIX save and show commands failed to list linecolor for lines with "lt -1"
 * FIX the "missing" data flag is honored by "using ($n)" as it is for "using n"
 * FIX error reporting of line number inside a bracketed clause
+* FIX gnuplot_x11: possible fix for sporadic use-after-free error
 
 Changes in 5.0.5
 ================
