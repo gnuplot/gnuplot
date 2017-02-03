@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.253 2016/06/12 17:45:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.254 2016/07/23 03:34:41 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -1080,8 +1080,10 @@ delete_plot(plot_struct *plot)
 
     FPRINTF((stderr, "Delete plot %d\n", plot->plot_number));
 
-    for (i = 0; i < plot->ncommands; ++i)
+    for (i = 0; i < plot->ncommands; ++i) {
 	free(plot->commands[i]);
+	plot->commands[i] = NULL;
+    }
     plot->ncommands = 0;
     if (plot->commands)
 	free(plot->commands);
@@ -1129,8 +1131,10 @@ prepare_plot(plot_struct *plot)
 {
     int i;
 
-    for (i = 0; i < plot->ncommands; ++i)
+    for (i = 0; i < plot->ncommands; ++i) {
 	free(plot->commands[i]);
+	plot->commands[i] = NULL;
+    }
     plot->ncommands = 0;
 
     if (!plot->posn_flags) {
