@@ -1,3 +1,7 @@
+2017-02-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* demo/boxclusters.dem demo/html/*:  Add demo to collection.
+
 2017-02-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (plot3d_points) src/gadgets.{ch} src/graphics.c:

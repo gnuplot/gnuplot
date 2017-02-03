@@ -1,9 +1,7 @@
 #
 # Boxplot demo
 #
-reset
-
-print "*** Boxplot demo ***"
+set title "Boxplot"
 
 set style fill solid 0.25 border -1
 set style boxplot outliers pointtype 7
