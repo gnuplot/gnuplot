@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.109 2016/10/18 06:26:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.110 2016/10/18 18:50:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -66,7 +66,6 @@ TBOOLEAN parse_1st_row_as_headers = FALSE;
 udvt_entry *df_array = NULL;
 
 /* Iteration structures used for bookkeeping */
-/* Iteration can be nested so long as different iterators are used */
 t_iterator * plot_iterator = NULL;
 t_iterator * set_iterator = NULL;
 
@@ -1252,6 +1251,7 @@ check_for_iteration()
     /* Nested "for" statements are supported, each one corresponds to a node of the linked list */
     while (equals(c_token, "for")) {
 	struct udvt_entry *iteration_udv = NULL;
+	t_value original_udv_value;
 	char *iteration_string = NULL;
 	int iteration_start;
 	int iteration_end;
@@ -1265,6 +1265,8 @@ check_for_iteration()
 	if (!equals(c_token++, "[") || !isletter(c_token))
 	    int_error(c_token-1, errormsg);
 	iteration_udv = add_udv(c_token++);
+	original_udv_value = iteration_udv->udv_value;
+	iteration_udv->udv_value.type = NOTDEFINED;
 
 	if (equals(c_token, "=")) {
 	    c_token++;
@@ -1323,6 +1325,7 @@ check_for_iteration()
 	iteration_current = iteration_start;
 
 	this_iter = gp_alloc(sizeof(t_iterator), "iteration linked list");
+	this_iter->original_udv_value = original_udv_value;
 	this_iter->iteration_udv = iteration_udv; 
 	this_iter->iteration_string = iteration_string;
 	this_iter->iteration_start = iteration_start;
@@ -1448,6 +1451,7 @@ cleanup_iteration(t_iterator *iter)
 {
     while (iter) {
 	t_iterator *next = iter->next;
+	iter->iteration_udv->udv_value = iter->original_udv_value;
 	free(iter->iteration_string);
 	free(iter->start_at);
 	free(iter->end_at);

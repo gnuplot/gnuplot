@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.345 2016/08/19 16:13:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.346 2016/10/15 09:08:52 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1320,8 +1320,10 @@ do_command()
     c_token++;
     do_iterator = check_for_iteration();
 
-    if (!equals(c_token,"{"))
+    if (!equals(c_token,"{")) {
+	cleanup_iteration(do_iterator);
 	int_error(c_token,"expecting {do-clause}");
+    }
     end_token = find_clause(&do_start, &do_end);
 
     clause = new_clause(do_start, do_end);
@@ -1342,6 +1344,10 @@ do_command()
     free(clause);
     end_clause();
     c_token = end_token;
+
+    /* FIXME:  If any of the above exited via int_error() then this	*/
+    /* cleanup never happens and we leak memory.  But do_iterator can	*/
+    /* not be static or global because do_command() can recurse.	*/
     do_iterator = cleanup_iteration(do_iterator);
     requested_break = FALSE;
     requested_continue = FALSE;

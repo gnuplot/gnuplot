@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1047 2017/02/01 04:30:23 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1048 2017/02/03 04:13:15 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2450,6 +2450,17 @@ Ffigure_newsyntax
            plot 0.5 + sum [k=1:TERMS] fourier(k,x) notitle 
        }
        unset multiplot
+
+?scope
+=scope
+ The scope of an iteration variable is private to that iteration.
+ You cannot permanently change the value of the iteration variable inside the
+ iterated clause.  If the iteration variable has a value prior to iteration,
+ that value will be retained or restored at the end of the iteration.
+ E.g. the following clause will iterate 10 times, after which i is again "A".
+
+      i = "A"
+      do for [i=1:10] { i=10 }
 
 2 linetypes, colors, and styles
 ?linetypes

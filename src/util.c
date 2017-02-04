@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.145 2016/12/10 10:25:04 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.146 2017/01/29 12:18:21 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -1165,6 +1165,8 @@ common_error_exit()
     eval_reset_after_error();
     clause_reset_after_error();
     parse_reset_after_error();
+    set_iterator = cleanup_iteration(set_iterator);
+    plot_iterator = cleanup_iteration(plot_iterator);
     scanning_range_in_progress = FALSE;
     inside_zoom = FALSE;
 
