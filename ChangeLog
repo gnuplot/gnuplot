@@ -1,3 +1,10 @@
+2017-02-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c:  Limit the scope of a sample variable to the plot
+	command it is used in.  I.e. restore value of t after execution of
+	plot sample [t=0:10] '+' using (f(t)):(g(t))
+	Bug #1755
+
 2017-02-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/parse.h src/parse.c src/util.c src/command.c docs/gnuplot.doc:

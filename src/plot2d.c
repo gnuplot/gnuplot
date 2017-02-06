@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.414 2017/01/14 06:24:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.415 2017/01/21 23:40:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2079,7 +2079,8 @@ eval_plots()
 #endif
 	    t_colorspec fillcolor = DEFAULT_COLORSPEC;
 
-	    int sample_range_token;	/* Only used by function plots */
+	    int sample_range_token;		/* Only used by function plots */
+	    t_value original_value_sample_var;	/* Only used by data plots */
 
 	    plot_num++;
 
@@ -2126,16 +2127,17 @@ eval_plots()
 		specs = df_open(name_str, MAXDATACOLS, this_plot);
 
 		/* Store a pointer to the named variable used for sampling */
-		if (sample_range_token > 0) {
+		if (sample_range_token > 0)
 		    this_plot->sample_var = add_udv(sample_range_token);
-		} else {
-		    /* FIXME: This has the side effect of creating a named variable x */
-		    /* or overwriting an existing variable x.  Maybe it should save   */
-		    /* and restore the pre-existing variable in this case?            */
+		else
 		    this_plot->sample_var = add_udv_by_name(c_dummy_var[0]);
-		}
-		if (this_plot->sample_var->udv_value.type == NOTDEFINED)
-		    Gcomplex(&(this_plot->sample_var->udv_value), 0.0, 0.0);
+
+		/* Save prior value of sample variable so we can restore it later */
+		original_value_sample_var = this_plot->sample_var->udv_value;
+		this_plot->sample_var->udv_value.type = NOTDEFINED;
+
+		/* Not sure this is necessary */
+		Gcomplex(&(this_plot->sample_var->udv_value), 0.0, 0.0);
 
 		/* include modifiers in default title */
 		this_plot->token = end_token = c_token - 1;
@@ -2889,6 +2891,10 @@ eval_plots()
 	    /* Note position in command line for second pass */
 		this_plot->token = c_token;
 		tp_ptr = &(this_plot->next);
+
+	    /* restore original value of sample variable */
+	    if (name_str)
+		this_plot->sample_var->udv_value = original_value_sample_var;
 
 	} /* !is_defn */
 

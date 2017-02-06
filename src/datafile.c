@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.337 2017/01/21 05:04:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.338 2017/01/27 01:28:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -5343,8 +5343,12 @@ df_generate_pseudodata()
 		t = AXIS_DE_LOG_VALUE(x_axis, t);
 	}
 
+	/* This allows commands of the form
+	 *   plot sample [foo=0:10] '+' using (sin(foo)):(cos(foo)):(foo)
+	 */
 	if (df_current_plot && df_current_plot->sample_var)
 	    Gcomplex(&(df_current_plot->sample_var->udv_value), t, 0.0);
+
 	df_pseudovalue_0 = t;
 	sprintf(df_line,"%g",t);
 	++df_pseudorecord;
