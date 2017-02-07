@@ -1,3 +1,9 @@
+2017-02-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/hidden3d.c (build_networks):  Hidden3d structures were not
+	correctly initialized for "splot with dots".
+	Bug #1904
+
 2017-02-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c:  Limit the scope of a sample variable to the plot
