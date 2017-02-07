@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.359 2017/01/15 19:05:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.361 2017/02/01 19:48:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -921,14 +921,8 @@ do_3dplot(
 
 	if (key->title.text) {
 	    int center = (key->bounds.xright + key->bounds.xleft) / 2;
-
-	    if (key->textcolor.type == TC_RGB && key->textcolor.value < 0)
-		apply_pm3dcolor(&(key->box.pm3d_color));
-	    else
-		apply_pm3dcolor(&(key->textcolor));
-	    write_multiline(center, key->bounds.ytop - (key_title_extra + t->v_char)/2,
-			    key->title.text, CENTRE, JUST_TOP, 0, 
-			    key->title.font ? key->title.font : key->font);
+	    int titley = key->bounds.ytop - (key_title_extra + t->v_char)/2;
+	    write_label(center, titley, &key->title);
 	    (*t->linetype)(LT_BLACK);
 	}
     }

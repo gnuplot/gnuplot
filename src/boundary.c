@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.46 2017/01/10 21:22:54 sfeam Exp $
+ * $Id: boundary.c,v 1.47 2017/01/14 06:23:22 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -106,11 +106,6 @@ boundary(struct curve_points *plots, int count)
     legend_key *key = &keyT;
 
     struct termentry *t = term;
-    /* FIXME HBB 20000506: this line is the reason for the 'D0,1;D1,0'
-     * bug in the HPGL terminal: we actually carry out the switch of
-     * text orientation, just for finding out if the terminal can do
-     * that. *But* we're not in graphical mode, yet, so this call
-     * yields undesirable results */
     int can_rotate = (*t->text_angle) (TEXT_VERTICAL);
 
     int xtic_textheight=0;	/* height of xtic labels */
@@ -805,7 +800,7 @@ boundary(struct curve_points *plots, int count)
     /* Set default clipping to the plot boundary */
     clip_area = &plot_bounds;
 
-    /* Sanity check. FIXME:  Stricter test? Fatal error? */
+    /* Sanity checks */
     if (plot_bounds.xright < plot_bounds.xleft
     ||  plot_bounds.ytop   < plot_bounds.ybot)
 	int_warn(NO_CARET, "Terminal canvas area too small to hold plot."
@@ -1378,18 +1373,9 @@ draw_key(legend_key *key, TBOOLEAN key_pass, int *xinkey, int *yinkey)
 
 	/* Only draw the title once */
 	if (key_pass || !key->front) {
-	    /* FIXME: Now that there is a full text_label structure for the key title */
-	    /*        maybe we should call write_label() to get the full processing?  */
-	    if (key->textcolor.type == TC_RGB && key->textcolor.value < 0)
-		apply_pm3dcolor(&(key->box.pm3d_color));
-	    else
-		apply_pm3dcolor(&(key->textcolor));
-	    ignore_enhanced(key->title.noenhanced);
-	    write_multiline(title_anchor, 
+	    write_label(title_anchor,
 			key->bounds.ytop - (key_title_extra + key_entry_height)/2,
-			key->title.text, key->title.pos, JUST_TOP, 0, 
-			key->title.font ? key->title.font : key->font);
-	    ignore_enhanced(FALSE);
+			&key->title);
 	    (*t->linetype)(LT_BLACK);
 	}
     }
