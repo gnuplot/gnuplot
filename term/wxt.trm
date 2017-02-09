@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.42.2.3 2016/01/18 02:02:29 sfeam Exp $
+ * $Id: wxt.trm,v 1.42.2.4 2016/01/26 17:24:39 sfeam Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -470,7 +470,7 @@ TERM_TABLE_START (wxt_driver)
     wxt_text_angle, wxt_justify_text,
     wxt_point, do_arrow, wxt_set_font,
     wxt_pointsize,
-    TERM_CAN_MULTIPLOT|TERM_NO_OUTPUTFILE|TERM_ALPHA_CHANNEL|TERM_CAN_DASH|TERM_FONTSCALE|TERM_ENHANCED_TEXT,
+    TERM_CAN_MULTIPLOT|TERM_NO_OUTPUTFILE|TERM_ALPHA_CHANNEL|TERM_CAN_DASH|TERM_FONTSCALE|TERM_ENHANCED_TEXT|TERM_LINEWIDTH,
     wxt_text /* suspend */, 0 /* resume */, wxt_fillbox, wxt_linewidth
 #ifdef USE_MOUSE
     , wxt_waitforinput, wxt_put_tmptext, wxt_set_ruler, wxt_set_cursor, wxt_set_clipboard

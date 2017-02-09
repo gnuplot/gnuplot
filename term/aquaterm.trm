@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.56 2016/07/19 20:30:13 sfeam Exp $
+ * $Id: aquaterm.trm,v 1.51.2.6 2017/01/02 04:12:58 sfeam Exp $
  *
  */
 
@@ -238,27 +238,33 @@ AQUA_options()
 	continue;
     }
 
-	if (equals(c_token, "solid")) {
-	    c_token++;
-	    AQUA_dashedlines = FALSE;
-	    continue;
-	}
-	
-	if (almost_equals(c_token, "dash$ed")) {
-	    c_token++;
-	    AQUA_dashedlines = TRUE;
-	    continue;
-	}
+    if (equals(c_token, "solid")) {
+	c_token++;
+	AQUA_dashedlines = FALSE;
+	continue;
+    }
+    
+    if (almost_equals(c_token, "dash$ed")) {
+	c_token++;
+	AQUA_dashedlines = TRUE;
+	continue;
+    }
 
-	if (equals(c_token, "dl") || almost_equals(c_token, "dashl$ength")) {
-	    c_token++;
-	    if (END_OF_COMMAND)
-		int_error(c_token, "expecting dashlength multiplier");
-	    AQUA_dashlength_factor = real_expression();
-	    if (AQUA_dashlength_factor < 0.0)
-		AQUA_dashlength_factor = AQUA_DEFAULT_DASHLENGTH_FACTOR;
-	    continue;
-	}
+    if (equals(c_token, "linewidth") || equals(c_token, "lw")) {
+	c_token++;
+	AQUA_LineWidth = real_expression();
+	continue;
+    }
+
+    if (equals(c_token, "dl") || almost_equals(c_token, "dashl$ength")) {
+	c_token++;
+	if (END_OF_COMMAND)
+	    int_error(c_token, "expecting dashlength multiplier");
+	AQUA_dashlength_factor = real_expression();
+	if (AQUA_dashlength_factor < 0.0)
+	    AQUA_dashlength_factor = AQUA_DEFAULT_DASHLENGTH_FACTOR;
+	continue;
+    }
 
     if (almost_equals(c_token, "enh$anced")) {
       term->put_text = ENHAQUA_put_text;
@@ -295,6 +301,8 @@ AQUA_options()
 	  AQUA_dashedlines?"dashed":"solid");
   if (AQUA_dashedlines)
     sprintf(&(term_options[strlen(term_options)]), " dl %3.1f", AQUA_dashlength_factor);
+  if (AQUA_LineWidth != 1.0)
+    sprintf(&(term_options[strlen(term_options)]), " linewidth %3.1f", AQUA_LineWidth);
 }
 
 static NSString* 
@@ -675,6 +683,7 @@ AQUA_boxfill(int style, unsigned int x1, unsigned int y1, unsigned int width, un
 TERM_PUBLIC void
 AQUA_linewidth(double linewidth)
 {
+  linewidth *= AQUA_LineWidth;
   [adapter setLinewidth:linewidth];
 }
 
@@ -964,7 +973,7 @@ TERM_TABLE_START(aqua_driver)
   AQUA_text_angle,
   AQUA_justify_text, AQUA_point, do_arrow, AQUA_set_font,
   AQUA_pointsize,
-  TERM_CAN_MULTIPLOT|TERM_NO_OUTPUTFILE|TERM_CAN_DASH|TERM_POLYGON_PIXELS,
+  TERM_CAN_MULTIPLOT|TERM_NO_OUTPUTFILE|TERM_CAN_DASH|TERM_POLYGON_PIXELS|TERM_LINEWIDTH,
   AQUA_suspend, AQUA_resume,
   AQUA_boxfill, AQUA_linewidth
 #ifdef USE_MOUSE
@@ -1002,6 +1011,7 @@ START_HELP(aqua)
 " Syntax:",
 "       set terminal aqua {<n>} {title \"<wintitle>\"} {size <x> <y>}",
 "                         {font \"<fontname>{,<fontsize>}\"}",
+"                         {linewidth <lw>}\"}",
 "                         {{no}enhanced} {solid|dashed} {dl <dashlength>}}",
 "",
 " where <n> is the number of the window to draw in (default is 0),",

@@ -164,6 +164,7 @@ static int  qt_optionWidth    = 640;
 static int  qt_optionHeight   = 480;
 static int  qt_optionFontSize = 9;
 static double qt_optionDashLength = 1.0;
+static double qt_optionLineWidth = 1.0;
 
 /* Encapsulates all Qt options that have a constructor and destructor. */
 struct QtOption {
@@ -797,7 +798,7 @@ void qt_pointsize(double ptsize)
 
 void qt_linewidth(double lw)
 {
-	qt->out << GELineWidth << lw;
+	qt->out << GELineWidth << lw * qt_optionLineWidth;
 }
 
 int qt_text_angle(int angle)
@@ -1224,6 +1225,7 @@ enum QT_id {
 	QT_DASH,
 	QT_DASHLENGTH,
 	QT_SOLID,
+	QT_LINEWIDTH,
 	QT_OTHER
 };
 
@@ -1246,6 +1248,8 @@ static struct gen_table qt_opts[] = {
 	{"dashl$ength",	QT_DASHLENGTH},
 	{"dl",		QT_DASHLENGTH},
 	{"solid",	QT_SOLID},
+	{"linewidth",	QT_LINEWIDTH},
+	{"lw",		QT_LINEWIDTH},
 	{NULL,          QT_OTHER}
 };
 
@@ -1268,6 +1272,7 @@ void qt_options()
 	bool set_widget = false;
 	bool set_dash = false;
 	bool set_dashlength = false;
+	bool set_linewidth = false;
 	int previous_WindowId = qt_optionWindowId;
 
 #ifndef WIN32
@@ -1385,6 +1390,10 @@ void qt_options()
 			// qt_optionDash = false;
 			c_token++;
 			break;
+		case QT_LINEWIDTH:
+			SETCHECKDUP(set_linewidth);
+			qt_optionLineWidth = real_expression();
+			break;
 		case QT_OTHER:
 		default:
 			qt_optionWindowId = int_expression();
@@ -1435,6 +1444,7 @@ void qt_options()
 
 	if (set_enhanced) termOptions += qt_optionEnhanced ? " enhanced" : " noenhanced";
 	                  termOptions += " font \"" + fontSettings + '"';
+	if (set_linewidth) termOptions += " linewidth " + QString::number(qt_optionLineWidth);
 	if (set_dashlength) termOptions += " dashlength " + QString::number(qt_optionDashLength);
 	if (set_widget)   termOptions += " widget \"" + qt_option->Widget + '"';
 	if (set_persist)  termOptions += qt_optionPersist ? " persist" : " nopersist";

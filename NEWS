@@ -8,6 +8,7 @@ Changes in 5.0.6
 * CHANGE - allow fractional font sizes for gdlib terminals
 * CHANGE - do not allow inverted R axis (requires support not backported from 5.1)
 * CHANGE - allow pointinterval property in 'with lp' for splot as well as for plot
+* CHANGE - "linewidth <lw>" is accepted as a terminal option for aquaterm, qt, wxt
 * FIX assignment of x/y dimensions in "binary record=(a,b) ... with image"
 * FIX wxt - multithreaded wxt was faulting during resize (mutex lock failure)
 * FIX windows - timed pause only worked for intervals < 1 second
