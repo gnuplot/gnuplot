@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.ac,v 1.24 2016/11/18 05:51:30 sfeam Exp $
+dnl $Id: configure.ac,v 1.25 2016/12/24 22:26:43 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -1053,7 +1053,7 @@ AC_ARG_WITH(cairo,dnl
 if test "${with_cairo}" = yes ; then
   dnl cairo terminals
   PKG_CHECK_MODULES_NOFAIL(CAIROPDF,dnl
-       [cairo >= 1.2 cairo-pdf >= 1.2 pango >= 1.22 pangocairo >= 1.10 glib-2.0])
+       [cairo >= 1.2 cairo-pdf >= 1.2 pango >= 1.22 pangocairo >= 1.10 glib-2.0 >= 2.28])
   if test $pkg_failed != no; then
     AC_MSG_WARN([The cairo terminals will not be compiled.])
     with_cairo=no
@@ -1373,7 +1373,7 @@ fi
 if test "$with_cairo" = yes; then
   AC_MSG_RESULT([  cairo-based pdf and png terminals: yes ])
 else
-  AC_MSG_RESULT([  cairo-based terminals: no (requires cairo>1.2, pango>1.22)])
+  AC_MSG_RESULT([  cairo-based terminals: no (requires cairo>=1.2, pango>=1.22, glib>=2.28)])
 fi
 
 if test "$with_lua" = yes; then
