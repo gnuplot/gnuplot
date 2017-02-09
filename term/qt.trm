@@ -1,5 +1,5 @@
 /* GNUPLOT - qt.trm 
- * $Id: qt.trm,v 1.14.2.1 2016/07/21 19:29:01 sfeam Exp $
+ * $Id: qt.trm,v 1.14.2.2 2017/02/09 21:13:11 sfeam Exp $
  */
 
 /*[
@@ -148,12 +148,14 @@ START_HELP(qt)
 "",
 " The dashlength affects only custom dash patterns, not Qt's built-in set.",
 "",
+#if (QTVER == 4)
 " The Qt rendering speed is affected strongly by the rendering mode used.",
-" In Qt version 4.7 or newer this can be controlled by the environmental",
+" In Qt version 4 this can be controlled by the environmental",
 " variable QT_GRAPHICSSYSTEM. The options are \"native\", \"raster\", or",
 " \"opengl\" in order of increasing rendering speed.  For earlier versions",
 " of Qt the terminal defaults to \"raster\".",
 "",
+#endif
 " To obtain the best output possible, the rendering involves three",
 " mechanisms : antialiasing, oversampling and hinting.",
 " Oversampling combined with antialiasing provides subpixel accuracy,",
@@ -173,7 +175,6 @@ START_HELP(qt)
 "",
 " The gnuplot outboard driver, gnuplot_qt, is searched in a default place",
 " chosen when the program is compiled.  You can override that by defining",
-" the environment variable GNUPLOT_DRIVER_DIR to point to a different",
-" location."
+" the environment variable GNUPLOT_DRIVER_DIR."
 END_HELP(qt)
 #endif /* TERM_HELP */

@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.370.2.15 2016/07/13 18:32:27 sfeam Exp $
+dnl $Id: configure.in,v 1.370.2.16 2016/09/07 04:14:29 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -1274,6 +1274,7 @@ if test "${enable_qt_ok}" = yes ; then
   AC_SUBST(QT_LIBS)
   AC_SUBST(LRELEASE)
   AC_DEFINE(QTTERM,1, [ Define if you want the Qt terminal. ])
+  AC_DEFINE_UNQUOTED(QTVER,$QTVER,[ only used for docs])
 fi
 AM_CONDITIONAL(BUILD_QT, test "${enable_qt_ok}" = yes)
 

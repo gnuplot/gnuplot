@@ -9,6 +9,9 @@
 	Add "linewidth <lw>" to the list of options accepted for "set term" or
 	"set termoption".
 
+	* configure.in term/qt.trm:  Qt4 info only printed for Qt4 build.
+	Bug #1905
+
 2017-02-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/hidden3d.c (build_networks):  Hidden3d structures were not
