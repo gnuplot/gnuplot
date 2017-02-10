@@ -1299,12 +1299,12 @@ static struct gen_table qt_opts[] = {
 	{"noct$rlq",    QT_NOCTRL},
 	{"ti$tle",      QT_TITLE},
 	{"cl$ose",      QT_CLOSE},
-	{"dash$ed",	QT_DASH},
-	{"dashl$ength",	QT_DASHLENGTH},
-	{"dl",		QT_DASHLENGTH},
-	{"solid",	QT_SOLID},
-	{"linewidth",	QT_LINEWIDTH},
-	{"lw",		QT_LINEWIDTH},
+	{"dash$ed",     QT_DASH},
+	{"dashl$ength", QT_DASHLENGTH},
+	{"dl",          QT_DASHLENGTH},
+	{"solid",       QT_SOLID},
+	{"line$width",  QT_LINEWIDTH},
+	{"lw",          QT_LINEWIDTH},
 	{NULL,          QT_OTHER}
 };
 

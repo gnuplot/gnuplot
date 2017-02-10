@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.57 2017/01/02 04:13:06 sfeam Exp $
+ * $Id: aquaterm.trm,v 1.58 2017/02/09 21:13:23 sfeam Exp $
  *
  */
 
@@ -250,9 +250,13 @@ AQUA_options()
 	continue;
     }
 
-    if (equals(c_token, "linewidth") || equals(c_token, "lw")) {
+    if (equals(c_token, "lw") || almost_equals(c_token, "linew$idth")) {
 	c_token++;
+	if (END_OF_COMMAND)
+	    int_error(c_token, "expecting line width");
 	AQUA_LineWidth = real_expression();
+	if (AQUA_LineWidth < 0.0)
+	    AQUA_LineWidth = 1.0;
 	continue;
     }
 

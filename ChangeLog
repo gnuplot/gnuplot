@@ -1,3 +1,8 @@
+2017-02-10  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
+
+	* src/qtterminal/qt_term.cpp term/aquaterm.trm:
+	Make the the "set term ... linewidth" option more like other terminals.
+
 2017-02-09  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* configure.ac: Require glib version >= 2.28
