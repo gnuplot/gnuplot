@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.162 2017/01/23 21:33:24 sfeam Exp $
+ * $Id: axis.h,v 1.163 2017/02/01 04:30:23 sfeam Exp $
  *
  */
 
@@ -373,7 +373,10 @@ extern int tic_text, rotate_tics, tic_hjust, tic_vjust;
 /* extern int grid_selection; --- comm'ed out, HBB 20010806 */
 extern struct lp_style_type grid_lp; /* linestyle for major grid lines */
 extern struct lp_style_type mgrid_lp; /* linestyle for minor grid lines */
+
 extern double polar_grid_angle; /* angle step in polar grid in radians */
+extern double theta_origin;	/* 0 = right side of plot */
+extern double theta_direction;	/* 1 = counterclockwise -1 = clockwise */
 
 /* Length of the longest tics label, set by widest_tic_callback(): */
 extern int widest_tic_strlen;
@@ -669,6 +672,7 @@ int map_x __PROTO((double value));
 int map_y __PROTO((double value));
 
 coord_type polar_to_xy __PROTO(( double theta, double r, double *x, double *y, TBOOLEAN update));
+double polar_radius __PROTO((double r));
 
 void set_cbminmax __PROTO((void));
 

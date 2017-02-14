@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.219 2017/01/15 19:05:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.220 2017/02/01 04:30:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -144,6 +144,8 @@ int grid_layer = LAYER_BEHIND;
 TBOOLEAN grid_tics_in_front = FALSE;
 double polar_grid_angle = 0;	/* nonzero means a polar grid */
 TBOOLEAN raxis = FALSE;
+double theta_origin = 0.0;	/* default origin at right side */
+double theta_direction = 1;	/* counterclockwise from origin */
 
 /* Length of the longest tics label, set by widest_tic_callback(): */
 int widest_tic_strlen;
@@ -1041,13 +1043,10 @@ gen_tics(struct axis *this, tic_callback callback)
 	    double internal;
 
 	    /* This condition is only possible if we are in polar mode */
-	    if (this->index == POLAR_AXIS) {
-		double px, py;
-		polar_to_xy(0.0, mark->position, &px, &py, FALSE);
-		internal = px;
-	    } else {
+	    if (this->index == POLAR_AXIS)
+		internal = polar_radius(mark->position);
+	    else
 		internal = axis_log_value(this, mark->position);
-	    }
 
 	    if (this->index == THETA_index)
 		; /* No harm done if the angular placement wraps at 2pi */
@@ -1397,10 +1396,8 @@ gen_tics(struct axis *this, tic_callback callback)
 			} else if (this->tictype == DT_DMS) {
 			    gstrdms(label, this->ticfmt, (double)user);
 			} else if (this->index == POLAR_AXIS) {
-			    double px, py;
 			    user = internal;
-			    polar_to_xy(0.0, user, &px, &py, FALSE);
-			    internal = px;
+			    internal = polar_radius(user);
 			    gprintf(label, sizeof(label), this->ticfmt, log10_base, tic);
 			} else if (this->index >= PARALLEL_AXES) {
 			    /* FIXME: needed because ticfmt is not maintained for parallel axes */
@@ -1461,10 +1458,8 @@ gen_tics(struct axis *this, tic_callback callback)
 		    if (polar && this->index == POLAR_AXIS) {
 			/* FIXME: is this really the only case where	*/
 			/* mtic_internal is the correct position?	*/
-			double px, py;
 			mtic_user = user + mplace;
-			polar_to_xy(0.0, mtic_user, &px, &py, FALSE);
-			mtic_internal = px;
+			mtic_internal = polar_radius(mtic_user);
 			(*callback) (this, mtic_internal, NULL, 1, mgrd, NULL);
 			continue;
 		    }
@@ -2624,10 +2619,20 @@ polar_to_xy( double theta, double r, double *x, double *y, TBOOLEAN update)
 	*y = not_a_number();
 	return OUTRANGE;
     }
-    /* FIXME: I think nonlinear R with R_AXIS.min != 0 remains a problem  */
 
-    *x = r * cos(theta * ang2rad);
-    *y = r * sin(theta * ang2rad);
+    /* Correct for theta=0 position and handedness */
+    theta = theta * theta_direction * ang2rad + theta_origin * DEG2RAD;
+
+    *x = r * cos(theta);
+    *y = r * sin(theta);
 
     return status;
+}
+
+double
+polar_radius(double r)
+{
+    double px, py;
+    polar_to_xy(0.0, r, &px, &py, FALSE);
+    return sqrt(px*px + py*py);
 }

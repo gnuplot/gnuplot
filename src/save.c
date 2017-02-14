@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.325 2017/01/18 19:35:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.326 2017/02/01 04:30:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -386,6 +386,12 @@ save_set_all(FILE *fp)
 	fputc('\n', fp);
     }
     fprintf(fp, "%sset raxis\n", raxis ? "" : "un");
+
+    /* Theta axis origin and direction */
+    fprintf(fp, "set theta %s %s\n",
+	theta_direction > 0 ? "counterclockwise" : "clockwise",
+	theta_origin == 180 ? "left" : theta_origin ==  90 ? "top" :
+	theta_origin == -90 ? "bottom" : "right");
 
     /* Save parallel axis state */
     save_style_parallel(fp);

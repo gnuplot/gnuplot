@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.546 2017/02/01 04:30:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.547 2017/02/01 20:01:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -201,7 +201,6 @@ static void
 place_grid(int layer)
 {
     struct termentry *t = term;
-    double ytemp;
     int save_lgrid = grid_lp.l_type;
     int save_mgrid = mgrid_lp.l_type;
     BoundingBox *clip_save = clip_area;
@@ -266,7 +265,7 @@ place_grid(int layer)
 	term->layer(TERM_LAYER_BEGIN_GRID);
 	term_apply_lp_properties(&grid_lp);
 	if (largest_polar_circle <= 0)
-	    polar_to_xy(0.0, R_AXIS.max, &largest_polar_circle, &ytemp, FALSE);
+	    largest_polar_circle = polar_radius(R_AXIS.max);
 	for (theta = 0; theta < 6.29; theta += polar_grid_angle) {
 	    int x = map_x(largest_polar_circle * cos(theta));
 	    int y = map_y(largest_polar_circle * sin(theta));
@@ -279,7 +278,7 @@ place_grid(int layer)
     if (THETA_AXIS.ticmode) {
 	term_apply_lp_properties(&border_lp);
 	if (largest_polar_circle <= 0)
-	    polar_to_xy(0.0, R_AXIS.max, &largest_polar_circle, &ytemp, FALSE);
+	    largest_polar_circle = polar_radius(R_AXIS.max);
 	copy_or_invent_formatstring(&THETA_AXIS);
 	gen_tics(&THETA_AXIS, ttick_callback);
 	term->text_angle(0);
@@ -3574,7 +3573,7 @@ ttick_callback(
     int xu, yu; /* Outer limit of ticmark */
     int text_x, text_y;
     double delta = 0.05 * tic_scale(ticlevel, this_axis) * (this_axis->tic_in ? -1 : 1);
-    double theta = place * DEG2RAD;
+    double theta = (place * theta_direction + theta_origin) * DEG2RAD;
     double cos_t = largest_polar_circle * cos(theta);
     double sin_t = largest_polar_circle * sin(theta);
 
@@ -3613,7 +3612,7 @@ ttick_callback(
 	    apply_pm3dcolor(&(this_axis->ticdef.textcolor));
 	/* The only rotation angle that makes sense is the angle being labeled */
 	if (this_axis->tic_rotate != 0.0)
-	    term->text_angle(place - 90.0);
+	    term->text_angle(place * theta_direction + theta_origin - 90.0);
 	write_multiline(text_x, text_y, text,
 		tic_hjust, tic_vjust, 0.0, /* FIXME: these are not correct */
 		this_axis->ticdef.font);
@@ -3886,7 +3885,6 @@ plot_border()
 	    closepath();
 
 	if (((draw_border & 4096) != 0) && ((R_AXIS.autoscale & AUTOSCALE_BOTH) == 0)) {
-	    double ytemp;
 
 	    /* Full-width circular border is visually too heavy compared to the edges */
 	    lp_style_type polar_border = border_lp;
@@ -3894,7 +3892,7 @@ plot_border()
 	    term_apply_lp_properties(&polar_border);
 
 	    if (largest_polar_circle <= 0)
-		polar_to_xy(0.0, R_AXIS.max, &largest_polar_circle, &ytemp, FALSE);
+		largest_polar_circle = polar_radius(R_AXIS.max);
 	    draw_polar_circle(largest_polar_circle);
 	}
 

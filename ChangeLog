@@ -1,3 +1,17 @@
+2017-02-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c src/axis.h src/graphics.c src/save.c src/set.c src/show.c
+	src/tables.c src/tables.h src/unset.c src/mouse.c src/boundary.c
+	docs/gnuplot.doc demo/ttics.dem:
+
+	New command
+	    set theta {right|top|left|bottom}
+	    set theta {clockwise|cw|counterclockwise|ccw}
+
+	controls layout of polar mode plots by specifying where to place the
+	origin (theta=0) of the angular coordinate and its sense of rotation.
+	The default remains "right" and "counterclockwise".
+
 2017-02-10  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* src/qtterminal/qt_term.cpp term/aquaterm.trm:

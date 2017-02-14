@@ -31,3 +31,11 @@ set border polar
 replot
 
 pause -1 "<cr> to continue"
+
+set title "Theta origin at top, increasing clockwise"
+set ttics norotate offset 1
+set theta clockwise top
+replot
+
+pause -1 "<cr> to continue"
+

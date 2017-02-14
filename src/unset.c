@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.252 2017/01/10 21:22:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.253 2017/01/12 21:52:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1470,6 +1470,8 @@ unset_polar()
 	}
     }
     raxis = FALSE;
+    theta_origin = 0.0;
+    theta_direction = 1.0;
 
     /* Clear and reinitialize THETA axis structure */
     unset_tics(&THETA_AXIS);

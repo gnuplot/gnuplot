@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.553 2017/02/01 00:28:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.554 2017/02/01 04:30:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -139,6 +139,7 @@ static void set_surface __PROTO((void));
 static void set_table __PROTO((void));
 static void set_terminal __PROTO((void));
 static void set_termoptions __PROTO((void));
+static void set_theta __PROTO((void));
 static void set_tics __PROTO((void));
 static void set_ticscale __PROTO((void));
 static void set_timefmt __PROTO((void));
@@ -466,6 +467,9 @@ set_command()
 	    break;
 	case S_TERMOPTIONS:
 	    set_termoptions();
+	    break;
+	case S_THETA:
+	    set_theta();
 	    break;
 	case S_TICS:
 	    set_tics();
@@ -4950,6 +4954,29 @@ set_termoptions()
     num_tokens = save_end_of_line;
 }
 
+/* Various properties of the theta axis in polar mode */
+static void
+set_theta()
+{
+    c_token++;
+    while (!END_OF_COMMAND) {
+	if (almost_equals(c_token, "r$ight"))
+	    theta_origin = 0.0;
+	else if (almost_equals(c_token, "t$op"))
+	    theta_origin = 90.0;
+	else if (almost_equals(c_token, "l$eft"))
+	    theta_origin = 180.0;
+	else if (almost_equals(c_token, "b$ottom"))
+	    theta_origin = -90.;
+	else if (equals(c_token, "clockwise") || equals(c_token, "cw"))
+	    theta_direction = -1;
+	else if (equals(c_token, "counterclockwise") || equals(c_token, "ccw"))
+	    theta_direction = 1;
+	else
+	    int_error(c_token,"unrecognized option");
+	c_token++;
+    }
+}
 
 /* process 'set tics' command */
 static void

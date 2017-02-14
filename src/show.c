@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.382 2017/01/19 01:14:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.383 2017/01/21 23:40:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -640,6 +640,13 @@ show_command()
     case S_TERMOPTIONS:
 	fprintf(stderr,"Terminal options are '%s'\n",
 		(*term_options) ? term_options : "[none]");
+	break;
+
+    case S_THETA:
+	fprintf(stderr,"Theta increases %s with origin at %s of plot\n",
+		theta_direction > 0 ? "counterclockwise" : "clockwise",
+		theta_origin == 180 ? "left" : theta_origin ==  90 ? "top" :
+		theta_origin == -90 ? "bottom" : "right");
 	break;
 
     /* HBB 20010525: 'set commands' that don't have an

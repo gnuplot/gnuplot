@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.47 2017/01/14 06:23:22 sfeam Exp $
+ * $Id: boundary.c,v 1.48 2017/02/07 21:46:05 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -1482,14 +1482,10 @@ draw_titles()
     /* RLABEL */
     if (axis_array[POLAR_AXIS].label.text) {
 	unsigned int x, y;
-	double px, py;
 
-	(void)polar_to_xy(0.0, R_AXIS.min, &px, &py, FALSE);
-	x = map_x(px);
-	y = map_y(py);
-	(void)polar_to_xy(0.0, R_AXIS.max, &px, &py, FALSE);
-	x = (x + map_x(px)) / 2;
-	y = y + t->v_char;
+	/* This assumes we always have a horizontal R axis */
+	x = map_x(polar_radius(R_AXIS.max) / 2.0);
+	y = map_y(0.0) + t->v_char;
 	write_label(x, y, &(axis_array[POLAR_AXIS].label));
 	reset_textcolor(&(axis_array[POLAR_AXIS].label.textcolor));
     }

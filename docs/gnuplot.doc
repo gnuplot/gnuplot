@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1048 2017/02/03 04:13:15 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1049 2017/02/04 23:59:27 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -225,6 +225,8 @@ C
  not the program is in polar mode.  Tickmarks and labels around the perimeter
  of the polar grid are controlled by `set ttics`.  The r axis has its own label.
  Label, object, and arrow positions may be specified in polar coordinates.
+ The origin of the angular coordinate theta and the sense (clockwise or
+ counterclockwise) of increasing theta can be speficied by `set theta`.
  
  * `windows` graph windows can be docked to the wgnuplot text window, which is
  especially useful with Windows in "tablet mode".
@@ -4458,7 +4460,7 @@ Ffigure_polar
  interpret input 2D coordinates as <angle>,<radius> rather than <x>,<y>.
  Many, but not all, of the 2D plotting styles work in polar mode.
  The figure shows a combination of plot styles `lines` and `filledcurves`.
- See `set polar`, `set rrange`, `set size square`, `set ttics`.
+ See `set polar`, `set rrange`, `set size square`, `set theta`, `set ttics`.
 2 Bee swarm plots
 ?beeswarm
 ?bee swarm
@@ -7799,9 +7801,7 @@ Ffigure_fenceplot
  parametric mode, then, controls all ranges (t, u, v, x, y, and z) and allows
  x, y, and z to be fully autoscaled.
 
- Autoscaling works the same way for polar mode as it does for parametric mode
- for `plot`, with the extension that in polar mode `set dummy` can be used to
- change the independent variable from t (see `set dummy`).
+ Autoscaling works the same way for polar mode as it does for parametric mode.
 
  When tics are displayed on second axes but no plot has been specified for
  those axes, x2range and y2range are inherited from xrange and yrange.  This
@@ -7867,9 +7867,7 @@ Ffigure_fenceplot
  in autoscale mode.  If `set rrange` is used to limit the extent of the polar
  axis, then xrange and yrange will adjust to match this automatically.
  However, explicit xrange and yrange commands can later be used to make
- further adjustments.  See `set rrange`.  The trange may also be autoscaled.
- Note that if the trange is contained within one quadrant, autoscaling will
- produce a polar plot of only that single quadrant.
+ further adjustments.  See `set rrange`.
 
  Explicitly setting one or two ranges but not others may lead to unexpected
  results.
@@ -12042,9 +12040,9 @@ Ffigure_multiple_keys
        unset polar
        show polar
 
- In polar coordinates, the dummy variable (t) is an angle.  The default range
- of t is [0:2*pi], or, if degree units have been selected, to [0:360] (see
- `set angles`).
+ In polar coordinates, the dummy variable (t) represents an angle theta.
+ The default range of t is [0:2*pi], or [0:360] if degree units have been
+ selected (see `set angles`).
 
  The command `unset polar` changes the meaning of the plot back to the default
  rectangular coordinate system.
@@ -12070,6 +12068,10 @@ Ffigure_multiple_keys
  radius and the size of the graph are scaled automatically.  The second `plot`
  expands the domain, and restricts the size of the graph to the area within
  3 units of the origin.  This has the effect of limiting x and y to [-3:3].
+
+ By default polar plots are oriented such that theta=0 is at the far right,
+ with theta increasing counterclockwise.  You can change both the origin and
+ the sense explicitly.  See `set theta`.
 
  You may want to `set size square` to have `gnuplot` try to make the aspect
  ratio equal to unity, so that circles look circular.  Tic marks around the
@@ -12983,6 +12985,18 @@ Ffigure_multiple_keys
       set termoption fontscale <scale>
       set termoption {linewidth <lw>}{lw <lw>}
 
+3 theta
+?commands set theta
+?set theta
+?unset theta
+?theta
+ Polar coordinate plots are by default oriented such that theta = 0 is on the
+ right side of the plot, with theta increasing as you proceed counterclockwise
+ so that theta = 90 degrees is at the top.  "set theta" allows you to change
+ the origin and direction of the polar angular coordinate theta.
+      set theta {right|top|left|bottom}
+      set theta {clockwise|cw|counterclockwise|ccw}
+ "unset theta" restores the default state "set theta right ccw".
 3 tics
 ?commands set tics
 ?commands unset tics
