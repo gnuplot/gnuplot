@@ -2,7 +2,7 @@
 
 	* src/axis.c src/axis.h src/graphics.c src/save.c src/set.c src/show.c
 	src/tables.c src/tables.h src/unset.c src/mouse.c src/boundary.c
-	docs/gnuplot.doc demo/ttics.dem:
+	docs/gnuplot.doc demo/ttics.dem demo/solar_path.dem:
 
 	New command
 	    set theta {right|top|left|bottom}

@@ -35,6 +35,7 @@ Changes not in 5.0
 * NEW    "set rlabel" places a label above the r axis
 * NEW    "set rrange [90:0]" plots in celestial horizontal coordinates
 * NEW    "set border polar" uses border linetype for perimeter of polar plot
+* NEW    "set theta <origin> <sense>" orientation of polar coordinate theta
 * NEW label, arrow, and object positions may be given in polar coordinates
 * CHANGE Revise placement of axis labels in 3D plots
 * CHANGE Timestamp is now placed relative to page rather than plot boundary

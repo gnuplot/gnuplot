@@ -66,23 +66,18 @@ unset key
 set size square
 set rrange [90:0]
 
-set ttics add ("N" 90, "E" 0, "S" -90, "W" 180) font ":Bold"
+set ttics add ("N" 0, "E" 90, "S" 180, "W" -90) font ":Bold"
 set rtics format "%.0f°"
 set rtics 30
 set rlabel "Altitude" offset -2 font ":Bold"
 set border polar
 set style data lines
 
-# By convention North (azimuth 0°) should be at the top with angles
-# increasing clockwise, but gnuplot doesn't yet support anything but
-# theta=0 at the right and angles increasing counter-clockwise.
-# So we must manually label the angles and add an offset both to the
-# tic labels and to the plotted azimuthal angle.
-#
-# plot [t = -8*Hour : 8*Hour] '+' using (90-Azimuth(t)):(Altitude(t)) title "Winter Solstice" at end
+# By convention North (azimuth 0°) is at the top with angles increasing clockwise
+set theta top clockwise
 
-plot dummy using (90 - winter_azi[$1]):(winter_alt[$1]) lw 2 title "   Winter Solstice" at beg left, \
-     dummy using (90 - summer_azi[$1]):(summer_alt[$1]) lw 2 title "   Summer Solstice" at beg left, \
-     dummy using (90 - today_azi[$1]):(today_alt[$1]) lw 2 title today at end right
+plot dummy using (winter_azi[$1]):(winter_alt[$1]) lw 2 title "   Winter Solstice" at beg left, \
+     dummy using (summer_azi[$1]):(summer_alt[$1]) lw 2 title "   Summer Solstice" at beg left, \
+     dummy using (today_azi[$1]):(today_alt[$1]) lw 2 title today at end right
 
  pause -1 "<cr> to continue"

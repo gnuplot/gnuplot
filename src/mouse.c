@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.195 2017/01/11 04:13:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.196 2017/02/14 21:49:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -492,10 +492,12 @@ GetAnnotateString(char *s, double x, double y, int mode, char *fmt)
 	    double r;
 	    double phi = atan2(y,x);
 	    double rmin = (R_AXIS.autoscale & AUTOSCALE_MIN) ? 0.0 : R_AXIS.set_min;
-	    double theta = (phi/ang2rad) / DEG2RAD;
+	    double theta = phi / DEG2RAD;
 
 	    /* Undo "set theta" */
 	    theta = (theta - theta_origin) * theta_direction;
+	    if (theta > 180.)
+		theta = theta - 360.;
 
 	    if (nonlinear(&R_AXIS))
 		r = eval_link_function(&R_AXIS, x/cos(phi) + R_AXIS.linked_to_primary->min);
