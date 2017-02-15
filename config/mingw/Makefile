@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.68 2017/01/06 16:12:24 markisch Exp $
+# $Id: Makefile,v 1.69 2017/01/29 06:32:22 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 # This assumes a typical installation of the MinGW toolkit, the free
@@ -137,6 +137,7 @@ ICONV=1
 CERF=1
 
 # Uncomment if console mode gnuplot should use GNU readline
+# (not recommended)
 #GNUREADLINE=1
 
 # Below you can adapt paths according to your software setup:
@@ -165,11 +166,12 @@ GNUPLOT_SHARE_DIR = share
 DESTDIR = "$(PROGRAMFILES)/gnuplot"
 
 # Do you want some special optimization / flags?
-CFLAGS += -Dlint
+#CFLAGS +=
+CWFLAGS += -Wno-unused-function
 ifdef CLANG
 CFLAGS += -fcolor-diagnostics -fansi-escape-codes
-CFLAGS += -Wno-incompatible-ms-struct -Wno-ignored-attributes
-CFLAGS += -isystem c:/msys64/mingw64/include -pedantic
+CWFLAGS += -Wno-incompatible-ms-struct -Wno-ignored-attributes
+CWFLAGS += -Wno-infinite-recursion
 CXXFLAGS += -std=c++11
 endif
 ifdef MINGW64
@@ -309,6 +311,8 @@ endif
 ifdef UNICODE
   CFLAGS += -DUNICODE -D_UNICODE
 endif
+
+CFLAGS += $(CWFLAGS)
 
 LDFLAGS2 = -mwindows -Wl,--enable-auto-import
 ifdef PIPES
@@ -904,7 +908,9 @@ tutorial.pdf: $(TUT)/eg1.plt $(TUT)/eg2.plt $(TUT)/eg3.plt $(TUT)/eg4.plt \
 	GNUPLOT_LIB=$(TUT) GNUPLOT_PS_DIR=$(T)PostScript ./$(TARGET) eg7.plt
 	GNUPLOT_LIB=$(TUT) ./$(TARGET) linepoin.plt
 	GNUPLOT_LIB=$(TUT) ./$(TARGET) test.plt
+#ifdef LUA
 	GNUPLOT_LIB=$(TUT) GNUPLOT_LUA_DIR=$(T)lua ./$(TARGET) test_tikz.plt
+#endif
 	# run latex twice to get refernces right
 	TEXINPUTS=.:$(TUT) latex tutorial.tex
 	TEXINPUTS=.:$(TUT) latex tutorial.tex
