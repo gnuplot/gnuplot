@@ -1,7 +1,7 @@
 #
-# $Id: polar.dem,v 1.7 2010/11/18 23:59:58 sfeam Exp $
+# $Id: polar.dem,v 1.8 2010/11/19 05:15:03 sfeam Exp $
 #
-# Show some of the new polar capabilities.
+# Various ways of plotting functions in polar coordinates
 #
 unset border
 set clip

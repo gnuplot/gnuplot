@@ -87,9 +87,9 @@
     <li><a href="linkedaxes.html">linked axes</a></li>
     <li><a href="nonlinear3.html">nonlinear axes</a></li>
     <li><a href="nonlinear1.html">broken axes</a></li>
-    <li><a href="polar.html">polar coords</a></li>
+    <li><a href="ttics.html">polar coords</a></li>
+    <li><a href="polar.html">polar functions</a></li>
     <li><a href="poldat.html">polar data</a></li>
-    <li><a href="ttics.html">polar grid</a></li>
     <li><a href="world.html">cylindrical/spherical</a></li>
     <li><a href="timedat.html">time/date coords</a></li>
     </ul>
