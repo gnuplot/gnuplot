@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1049 2017/02/04 23:59:27 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1050 2017/02/14 21:49:17 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -216,17 +216,17 @@ C
 
  * New full-featured terminal driver for sixel graphics (see `sixelgd`).
 
- * Significant improvements and extensions to the polar coordinate system.
+ * Substantial improvements and extensions to the polar coordinate system.
  Previous versions of gnuplot produced incorrect or unexpected results for
  out-of-range values of r and for rrange inverted (e.g. rrange [90:0]).
- Inverted rrange can now be used to generate plots in a celestial horizontal
+ Inverted rrange can now be used to generate plots in celestial horizontal
  coordinates (center = zenith = altitude 90, perimeter = horizon = altitude 0).
  Polar grid elements (circles and radial lines) can now be generated whether or
  not the program is in polar mode.  Tickmarks and labels around the perimeter
  of the polar grid are controlled by `set ttics`.  The r axis has its own label.
  Label, object, and arrow positions may be specified in polar coordinates.
- The origin of the angular coordinate theta and the sense (clockwise or
- counterclockwise) of increasing theta can be speficied by `set theta`.
+ The origin and sense (clockwise or counterclockwise) of the angular coordinate
+ theta can be specified by `set theta`.
  
  * `windows` graph windows can be docked to the wgnuplot text window, which is
  especially useful with Windows in "tablet mode".
@@ -7801,8 +7801,6 @@ Ffigure_fenceplot
  parametric mode, then, controls all ranges (t, u, v, x, y, and z) and allows
  x, y, and z to be fully autoscaled.
 
- Autoscaling works the same way for polar mode as it does for parametric mode.
-
  When tics are displayed on second axes but no plot has been specified for
  those axes, x2range and y2range are inherited from xrange and yrange.  This
  is done _before_ applying offsets or autoextending the ranges to a whole
@@ -7869,8 +7867,6 @@ Ffigure_fenceplot
  However, explicit xrange and yrange commands can later be used to make
  further adjustments.  See `set rrange`.
 
- Explicitly setting one or two ranges but not others may lead to unexpected
- results.
  See also
 ^ <a href="http://www.gnuplot.info/demo/poldat.html">
  polar demos.
