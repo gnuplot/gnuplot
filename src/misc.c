@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.209 2017/01/29 06:30:08 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.210 2017/02/01 04:30:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1540,7 +1540,7 @@ arrow_use_properties(struct arrow_style_type *arrow, int tag)
     }
 
     /* tag not found: */
-    if (this->tag != tag)
+    if (!this || this->tag != tag)
 	int_warn(NO_CARET,"arrowstyle %d not found", tag);
 
     /* Restore orginal color if the style doesn't specify one */

@@ -1,3 +1,11 @@
+2017-02-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c src/hidden3d.c:  Arrowhead properties were being applied as
+	each plot was set up. This doesn't work in hidden3d mode because arrows
+	from multiple plots are sorted jointly and drawn later.  Arrowhead style
+	must be applied separatedly for each arrow.
+	Bug #1492
+
 2017-02-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/config.oww config/watcom/Makefile src/win/winmain.c:
