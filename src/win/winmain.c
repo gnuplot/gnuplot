@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.96 2016/11/26 19:41:29 markisch Exp $
+ * $Id: winmain.c,v 1.97 2017/01/04 06:30:53 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -978,11 +978,17 @@ fake_popen(const char * command, const char * type)
 	LPWSTR wcmd;
 	pipe_type = *type;
 	/* Execute command with redirection of stdout to temporary file. */
+#ifndef __WATCOMC__
 	cmd = (char *) malloc(strlen(command) + strlen(pipe_filename) + 5);
 	sprintf(cmd, "%s > %s", command, pipe_filename);
 	wcmd = UnicodeText(cmd, encoding);
 	rc = _wsystem(wcmd);
 	free(wcmd);
+#else
+	cmd = (char *) malloc(strlen(command) + strlen(pipe_filename) + 15);
+	sprintf(cmd, "cmd /c %s > %s", command, pipe_filename);
+	system(cmd);
+#endif
 	free(cmd);
 	/* Now open temporary file. */
 	/* system() returns 1 if the command could not be executed. */
@@ -1022,13 +1028,20 @@ fake_pclose(FILE *stream)
     if (pipe_type == 'w') {
 	char * cmd;
 	LPWSTR wcmd;
+
+#ifndef __WATCOMC__
 	cmd = (char *) gp_alloc(strlen(pipe_command) + strlen(pipe_filename) + 10, "fake_pclose");
 	/* FIXME: this won't work for binary data. We need a proper `cat` replacement. */
 	sprintf(cmd, "type %s | %s", pipe_filename, pipe_command);
 	wcmd = UnicodeText(cmd, encoding);
 	rc = _wsystem(wcmd);
-	free(cmd);
 	free(wcmd);
+#else
+	cmd = (char *) gp_alloc(strlen(pipe_command) + strlen(pipe_filename) + 20, "fake_pclose");
+	sprintf(cmd, "cmd/c type %s | %s", pipe_filename, pipe_command);
+	system(cmd);
+#endif
+	free(cmd);
     }
 
     /* Delete temp file again. */

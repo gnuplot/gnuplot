@@ -218,7 +218,6 @@
 
 /* Define to 1 if you have the `pclose' function. */
 #define HAVE_PCLOSE 1
-#define pclose _pclose
 
 /* Define to 1 if you have the <pdflib.h> header file. */
 /* #undef HAVE_PDFLIB_H */
@@ -576,7 +575,14 @@
 
 #define GP_INLINE _inline
 
-#define popen _popen
+#ifndef USE_FAKEPIPES
+# define popen _popen
+# define pclose _pclose
+#else
+# ifndef PIPES
+#  define PIPES 1
+# endif
+#endif
 #define __STDC_WANT_LIB_EXT1__ 1
 #define strnlen strnlen_s
 #define ftruncate _chsize
