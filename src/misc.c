@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.188.2.9 2015/12/29 20:33:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.188.2.10 2016/08/16 19:35:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1525,19 +1525,29 @@ arrow_use_properties(struct arrow_style_type *arrow, int tag)
      *  copies its data into the structure 'ap'. */
     struct arrowstyle_def *this;
 
+    /* If a color has already been set for this arrow, keep it */
+    struct t_colorspec save_colorspec = arrow->lp_properties.pm3d_color;
+
+    /* Default if requested style is not found */
+    default_arrow_style(arrow);
+
     this = first_arrowstyle;
     while (this != NULL) {
 	if (this->tag == tag) {
 	    *arrow = this->arrow_properties;
-	    return;
+	    break;
 	} else {
 	    this = this->next;
 	}
     }
 
     /* tag not found: */
-    default_arrow_style(arrow);
-    int_warn(NO_CARET,"arrowstyle %d not found", tag);
+    if (!this || this->tag != tag)
+	int_warn(NO_CARET,"arrowstyle %d not found", tag);
+
+    /* Restore orginal color if the style doesn't specify one */
+    if (arrow->lp_properties.pm3d_color.type == TC_DEFAULT)
+	arrow->lp_properties.pm3d_color = save_colorspec;
 }
 
 void

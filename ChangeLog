@@ -1,3 +1,11 @@
+2017-02-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c (arrow_use_properties): If an arrowstyle has no explicit
+	linetype or color, apply the current plot linecolor. This prevents 3D
+	vector plots with a default linetype from being colored as if they
+	were "lc palette z".
+	Bug #1869
+
 2017-02-10  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* src/qtterminal/qt_term.cpp term/aquaterm.trm:
