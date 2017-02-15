@@ -8,8 +8,11 @@
 	* src/win/wgraph.c:  Fix initialization of the graph window struct when
 	switching from standalone to docked mode and a previous window was open.
 
-	config/mingw/Makefile:  New variable CWFLAGS for warning flags to be
+	* config/mingw/Makefile:  New variable CWFLAGS for warning flags to be
 	put last in CFLAGS in order to overwrite e.g. -Wall.
+
+	* config/mingw/Makefile:  New target "7z" which is similar to the "zip"
+	target but outputs a 7-zip packed binary package.
 
 2017-02-14  Ethan A Merritt  <merritt@u.washington.edu>
 
