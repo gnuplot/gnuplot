@@ -6,6 +6,12 @@
 	were "lc palette z".
 	Bug #1869
 
+	* src/hidden3d.c:  Arrowhead properties were being applied as each plot
+	was set up. This doesn't work in hidden3d mode because arrows from 
+	multiple plots are sorted jointly and drawn later.  Arrowhead style must
+	be applied separatedly for each arrow.
+	Bug #1492
+
 2017-02-10  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* src/qtterminal/qt_term.cpp term/aquaterm.trm:

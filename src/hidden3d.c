@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.99.2.6 2017/02/02 18:33:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.99.2.7 2017/02/07 21:40:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1205,7 +1205,8 @@ build_networks(struct surface_points *plots, int pcount)
 		this_plot->arrow_properties.head_length= 1;
 		this_plot->arrow_properties.head_angle = 0;
 	    }
-	    apply_3dhead_properties(&(this_plot->arrow_properties));
+	    /* NB: It would not work to apply arrowhead properties now */
+	    /* because hidden3d code mixes arrows from multiple plots. */
 	}
 
 	/* HBB 20000715: new initialization code block for non-grid
@@ -1781,6 +1782,13 @@ draw_edge(p_edge e, p_vertex v1, p_vertex v2)
 	} else {
 	    if (e->v1 == v1-vlist && e->v2 != v2-vlist)
 		lptemp.p_type = 0;
+	}
+	if (lptemp.p_type == PT_BACKARROW || lptemp.p_type == PT_ARROWHEAD) {
+	    /* FIXME: e->lp points to this_plot->lp_properties but what we need is */
+	    /* a pointer to the immediately following field e->arrow_properties.   */
+	    lp_style_type *lp = e->lp;
+	    arrow_style_type *as = (arrow_style_type *)(&lp[1]);
+	    apply_3dhead_properties(as);
 	}
     }
 
