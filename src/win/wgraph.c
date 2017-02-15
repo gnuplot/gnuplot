@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.243 2017/01/21 14:41:55 markisch Exp $
+ * $Id: wgraph.c,v 1.244 2017/01/24 18:56:53 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -476,6 +476,8 @@ GraphInit(LPGW lpgw)
 		/* make room */
 		GetClientRect(lpgw->hStatusbar, &rect);
 		lpgw->StatusHeight = rect.bottom - rect.top;
+	} else {
+		lpgw->StatusHeight = 0;
 	}
 
 	/* create a toolbar */
@@ -698,6 +700,8 @@ GraphClose(LPGW lpgw)
 		DestroyWindow(lpgw->hWndGraph);
 	WinMessageLoop();
 	lpgw->hWndGraph = NULL;
+	lpgw->hStatusbar = NULL;
+	lpgw->hToolbar = NULL;
 
 	lpgw->locked = TRUE;
 	DestroyBlocks(lpgw);
@@ -713,7 +717,7 @@ GraphStart(LPGW lpgw, double pointsize)
 	DestroyBlocks(lpgw);
 	lpgw->org_pointsize = pointsize;
 	if (!lpgw->hWndGraph || !IsWindow(lpgw->hWndGraph))
-	    GraphInit(lpgw);
+		GraphInit(lpgw);
 
 	if (IsIconic(lpgw->hWndGraph))
 		ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);
@@ -2899,7 +2903,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			if (ps_caching) {
 				/* copy memory bitmap to screen */
 				TransparentBlt(hdc, xdash - xofs, ydash - yofs, 2*htic+2, 2*vtic+2,
-					           dc, 0, 0, 2*htic+2, 2*vtic+2, 0x00ffffff);
+				               dc, 0, 0, 2*htic+2, 2*vtic+2, 0x00ffffff);
 				/* partial clean up */
 				SelectObject(dc, old_brush);
 				SelectObject(dc, old_pen);
@@ -3195,9 +3199,9 @@ CopyPrint(LPGW lpgw)
 
 	/* Print Size Dialog results */
 	if (pr.psize.x < 0) {
-	    /* apply default values */
-	    pr.psize.x = pr.pdef.x;
-	    pr.psize.y = pr.pdef.y;
+		/* apply default values */
+		pr.psize.x = pr.pdef.x;
+		pr.psize.y = pr.pdef.y;
 	}
 	rect.left = MulDiv(pr.poff.x * 10, GetDeviceCaps(printer, LOGPIXELSX), 254);
 	rect.top = MulDiv(pr.poff.y * 10, GetDeviceCaps(printer, LOGPIXELSY), 254);
@@ -4180,8 +4184,8 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				GraphClose(lpgw);
 #ifndef WGP_CONSOLE
 				if (lpgw->bDocked) {
-				    DockedUpdateLayout(lpgw->lptw);
-				    SetFocus(lpgw->lptw->hWndText);
+					DockedUpdateLayout(lpgw->lptw);
+					SetFocus(lpgw->lptw->hWndText);
 				}
 #endif
 				return 0L;
@@ -5038,6 +5042,9 @@ static void
 UpdateToolbar(LPGW lpgw)
 {
 	unsigned i;
+
+	if (lpgw->hToolbar == NULL)
+		return;
 
 	SendMessage(lpgw->hToolbar, TB_HIDEBUTTON, M_HIDEGRID, (LPARAM)!lpgw->hasgrid);
 	if (!lpgw->hasgrid) {

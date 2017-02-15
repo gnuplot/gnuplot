@@ -5,6 +5,9 @@
 	the command string to include the shell and wide character variant
 	_wsystem() does not seem to work.
 
+	* src/win/wgraph.c:  Fix initialization of the graph window struct when
+	switching from standalone to docked mode and a previous window was open.
+
 2017-02-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c src/axis.h src/graphics.c src/save.c src/set.c src/show.c
