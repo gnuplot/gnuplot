@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.74 2017/01/04 04:24:17 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.75 2017/01/21 23:55:49 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7541,12 +7541,8 @@ Ffigure_mapcontours
  in autoscale mode.  If `set rrange` is used to limit the extent of the polar
  axis, then xrange and yrange will adjust to match this automatically.
  However, explicit xrange and yrange commands can later be used to make
- further adjustments.  See `set rrange`.  The trange may also be autoscaled.
- Note that if the trange is contained within one quadrant, autoscaling will
- produce a polar plot of only that single quadrant.
+ further adjustments.  See `set rrange`.
 
- Explicitly setting one or two ranges but not others may lead to unexpected
- results.
  See also
 ^ <a href="http://www.gnuplot.info/demo/poldat.html">
  polar demos.
