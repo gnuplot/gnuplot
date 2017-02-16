@@ -9,7 +9,7 @@
 if (strstrt(GPVAL_TERMINALS, " windows ") == 0) {
    fontspec = "Times,12"
 } else {
-   fontspec = "Times New Roman,12"
+   fontspec = "Tahoma,12"
 }
 MANUAL_FIGURES = 1
 
@@ -21,9 +21,9 @@ if (winhelp == 0) {
 } else {
 #   prefer pngcairo over gd based png
     if (strstrt(GPVAL_TERMINALS, " pngcairo ") > 0) {
-        set term pngcairo font fontspec size 448,225 dashlength 0.2
+        set term pngcairo font fontspec size 448,225 dashlength 0.2 fontscale 0.6
     } else {
-        set term png font fontspec size 448,225 dashlength 0.2
+        set term png font fontspec size 448,225 dashlength 0.2 fontscale 0.6
     }
     out = "./windows/"
 }
@@ -195,8 +195,8 @@ unset key
 set size ratio -1
 set xrange [-2.5:1.5]
 set yrange [-1:2.5]
-set xtics font "Times,10" format "%.1f" scale 0.5
-set ytics font "Times,10" format "%.1f" scale 0.5
+set xtics font ",10" format "%.1f" scale 0.5
+set ytics font ",10" format "%.1f" scale 0.5
 plot demo . 'optimize.dat' with circles lc rgb "gray" fs transparent solid 0.2 nobo,\
      demo . 'optimize.dat' u 1:2 with linespoints lw 2 pt 7 ps 0.3 lc rgb "black"
      
@@ -306,8 +306,8 @@ set yrange [ -10 : 137 ]
 set zrange [  -1 :   1 ]
 set xyplane at -1
 set bmargin at screen 0.25
-set xtics offset 0,0 font "Times,10"
-set ytics offset 0,0 font "Times,10"
+set xtics offset 0,0 font ",10"
+set ytics offset 0,0 font ",10"
 set view 45, 25, 1.0, 1.35
 set grid
 unset key
@@ -608,7 +608,7 @@ set output out . 'figure_multiple_keys' . ext
 set xtics font ",6"  offset 0,1
 set label 1 font ",10"
 set key font ",9" spacing 0.5
-load '../demo/custom_key.dem'
+load demo . 'custom_key.dem'
 
 # Fence plot
 reset
