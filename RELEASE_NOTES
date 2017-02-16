@@ -9,14 +9,14 @@ These release notes are for version 5.0 patchlevel 6 (5.0.6).
 This release contains bug-fixes, a few changes back-ported from the
 development version, and a few new features.
 
-Release Notes date: 21-Jan-2017
+Release Notes date: 15-Feb-2017
 
 This patchlevel 5.0.6 incremental release includes
 ==================================================
 
 * NEW command 'set micro' enables encoding-specific char for gprintf %c format
 * NEW command 'set datafile missing NaN' treats invalid data as if it were missing
-* CHANGE - start/end limits in nested iterations are reevaluated on the fly
+* CHANGE - start/end limits in nested iterations are reevaluated dynamically
 * CHANGE - revised adjustment of x2label and plot title when x2tics are present
 * CHANGE - mark non-free pdf terminal DEPRECATED (to be removed in release 5.2)
 * CHANGE - allow fractional font sizes for gdlib terminals
@@ -29,6 +29,10 @@ This patchlevel 5.0.6 incremental release includes
 * FIX aquaterm failed to honor request to disable enhanced text markup
 * FIX save and show commands failed to list linecolor for lines with "lt -1"
 * FIX the "missing" data flag is honored by "using ($n)" as it is for "using n"
+* FIX error reporting of line number inside a bracketed clause
+* FIX gnuplot_x11: possible fix for sporadic use-after-free error
+* FIX initialization of hidden3d structures for splot with dots
+* FIX track arrowhead properties in hidden3d mode
 
 
 NOTABLE NEW FEATURES IN PATCHLEVEL 5.0.6
