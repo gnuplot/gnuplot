@@ -4,7 +4,6 @@
 set title "Angle labels (ttics) for polar plots" offset 0,1
 set polar
 set ttics 0,30 format "%g".GPVAL_DEGREE_SIGN font ":Italic"
-#set ttics rotate
 set mttics 3
 set grid r polar 60
 unset xtics
