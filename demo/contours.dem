@@ -1,5 +1,5 @@
 #
-# $Id: contours.dem,v 1.16 2013/05/20 01:33:09 sfeam Exp $
+# $Id: contours.dem,v 1.17 2013/06/27 19:37:13 sfeam Exp $
 #
 set samples 20
 set isosamples 21
@@ -47,8 +47,8 @@ set title "contours on both base and surface"
 set contour both
 set hidden3d
 splot x**2-y**2 with lines, x**2-y**2 with labels boxed notitle
-unset hidden3d
 pause -1 "Hit return to continue (7)"
+unset hidden3d
 
 set contour base
 set title "2 surfaces"

@@ -1,3 +1,10 @@
+2017-02-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot3d.c:  When hidden3d mode is set, two linetypes are reserved
+	for each plot (front and back surface).  This is not necessary if both
+	the front and the back use the same linetype ('set hidden3d nooffset'),
+	so if the linetype offset is zero then reserve only one linetype.
+
 2017-02-16  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* docs/plotstyles.gnu:  On Windows, use "Tahoma" instead of "Times"
