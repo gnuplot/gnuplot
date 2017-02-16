@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.259 2016/12/13 21:57:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.260 2016/12/14 22:53:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -44,6 +44,7 @@ static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.259 2016/12/13 21:57:21 s
 #include "datafile.h"
 #include "eval.h"
 #include "graph3d.h"
+#include "hidden3d.h"
 #include "misc.h"
 #include "parse.h"
 #include "pm3d.h"
@@ -1811,7 +1812,12 @@ eval_3dplots()
 		&& this_plot->plot_style != RGBA_IMAGE
 		/* same as above, for an (rgb)image plot */
 		) {
-		line_num += 1 + (draw_contour != 0) + (hidden3d != 0);
+		line_num++;
+		if (draw_contour != CONTOUR_NONE)
+		    line_num++;
+		/* This reserves a second color for the back of a hidden3d surface */
+		if (hidden3d && hiddenBacksideLinetypeOffset != 0)
+		    line_num++;
 	    }
 
 	    if (this_plot->plot_style == RGBIMAGE || this_plot->plot_style == RGBA_IMAGE) {

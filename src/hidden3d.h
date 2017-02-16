@@ -1,5 +1,5 @@
 /*
- * $Id: hidden3d.h,v 1.12 2010/07/15 04:44:03 sfeam Exp $
+ * $Id: hidden3d.h,v 1.13 2013/06/27 19:37:14 sfeam Exp $
  */
 
 /* GNUPLOT - hidden3d.h */
@@ -52,6 +52,7 @@
 /* Variables of hidden3d.c needed by other modules: */
 
 extern TBOOLEAN disable_mouse_z;
+extern int hiddenBacksideLinetypeOffset;
 
 /* Prototypes of functions exported by hidden3d.c */
 

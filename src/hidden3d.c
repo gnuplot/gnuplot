@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.115 2017/02/07 21:40:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.116 2017/02/15 21:08:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -134,7 +134,7 @@ static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.115 2017/02/07 21:40:43
 
 /* The actual configuration is stored in these variables, modifiable
  * at runtime through 'set hidden3d' options */
-static int hiddenBacksideLinetypeOffset = BACKSIDE_LINETYPE_OFFSET;
+       int hiddenBacksideLinetypeOffset = BACKSIDE_LINETYPE_OFFSET;
 static long hiddenTriangleLinesdrawnPattern = TRIANGLE_LINESDRAWN_PATTERN;
 static int hiddenHandleUndefinedPoints = HANDLE_UNDEFINED_POINTS;
 static int hiddenShowAlternativeDiagonal = SHOW_ALTERNATIVE_DIAGONAL;
