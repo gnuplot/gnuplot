@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.115 2016/11/19 06:43:49 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.116 2016/12/15 20:34:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -1296,11 +1296,12 @@ set_plot_with_palette(int plot_num, int plot_mode)
     if (plot_mode == MODE_SPLOT)
 	if (TC_USES_PALETTE(axis_array[FIRST_Z_AXIS].label.textcolor.type)) return;
     if (TC_USES_PALETTE(axis_array[COLOR_AXIS].label.textcolor.type)) return;
-
+#ifdef EAM_OBJECTS
     for (this_object = first_object; this_object != NULL; this_object = this_object->next) {
 	if (TC_USES_PALETTE(this_object->lp_properties.pm3d_color.type))
 	    return;
     }
+#endif
     
 #undef TC_USES_PALETTE
 
