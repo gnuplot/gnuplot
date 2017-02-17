@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.78 2016/08/05 05:10:29 markisch Exp $
+ * $Id: canvas.trm,v 1.79 2017/01/24 21:44:21 sfeam Exp $
  *
  */
 
@@ -517,14 +517,16 @@ CANVAS_graphics()
 	    "  else if (canvas.addEventListener) {canvas.addEventListener('mouseover', %s, false);} \n"
 	    "  gnuplot.zoomed = false;\n"
 	    "  gnuplot.zoom_axis_width = 0;\n"
-	    "  gnuplot.zoom_in_progress = false;\n"
+	    "  gnuplot.zoom_in_progress = false;\n",
+		CANVAS_name, CANVAS_name, CANVAS_name, CANVAS_name, CANVAS_name);
+	fprintf(gpoutfile,
 	    "  gnuplot.polar_mode = %s;\n"
+	    "  gnuplot.polar_theta0 = %d;\n"
+	    "  gnuplot.polar_sense = %d;\n"
 	    "  ctx.clearRect(0,0,%d,%d);\n"
 	    "}\n",
-		CANVAS_name, CANVAS_name, CANVAS_name, CANVAS_name, CANVAS_name,
-		(polar) ? "true" : "false",
-		(int)(term->xmax / CANVAS_OVERSAMPLE), (int)(term->ymax / CANVAS_OVERSAMPLE)
-	);
+		(polar) ? "true" : "false", (int)theta_origin, (int)theta_direction,
+		(int)(term->xmax / CANVAS_OVERSAMPLE), (int)(term->ymax / CANVAS_OVERSAMPLE));
     }
 
     fprintf(gpoutfile, "// Gnuplot version %s.%s\n", gnuplot_version, gnuplot_patchlevel);

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.184 2017/01/24 23:42:57 sfeam Exp $
+ * $Id: svg.trm,v 1.185 2017/01/31 20:34:56 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1128,6 +1128,8 @@ SVG_text ()
 	    fprintf(gpoutfile, "gnuplot_svg.plot_axis_rmin = %g;\n",
 		(R_AXIS.autoscale & AUTOSCALE_MIN) ? 0.0 : R_AXIS.set_min);
 	    fprintf(gpoutfile, "gnuplot_svg.plot_axis_rmax = %g;\n", R_AXIS.set_max);
+	    fprintf(gpoutfile, "gnuplot_svg.polar_theta0 = %d;\n", (int)theta_origin);
+	    fprintf(gpoutfile, "gnuplot_svg.polar_sense = %d;\n", (int)theta_direction);
 	}
 
 	if ((axis_array[SECOND_X_AXIS].ticmode & TICS_MASK) != NO_TICS) {

@@ -1,3 +1,8 @@
+2017-02-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.trm term/js/gnuplot_mouse.js term/js/gnuplot_svg.js
+	term/svg.trm:  Mousing support for "set theta <origin> <sense>".
+
 2017-02-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot3d.c:  When hidden3d mode is set, two linetypes are reserved

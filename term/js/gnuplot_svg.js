@@ -15,7 +15,7 @@ function cursorPoint(evt){
 
 var gnuplot_svg = { };
 
-gnuplot_svg.version = "17 May 2016";
+gnuplot_svg.version = "17 February 2017";
 
 gnuplot_svg.SVGDoc = null;
 gnuplot_svg.SVGRoot = null;
@@ -350,8 +350,10 @@ gnuplot_svg.convert_to_polar = function (x,y)
         r = gnuplot_svg.plot_axis_rmin - x/Math.cos(phi);
     else
         r = gnuplot_svg.plot_axis_rmin + x/Math.cos(phi);
-    polar.ang = phi * 180./Math.PI;
+    phi = phi * (180./Math.PI) * gnuplot_svg.polar_sense + gnuplot_svg.polar_theta0;
+    if (phi > 180.) phi = phi - 360.;
     polar.r = r;
+    polar.ang = phi;
     return polar;
 }
 
