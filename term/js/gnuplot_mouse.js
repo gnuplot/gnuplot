@@ -335,8 +335,13 @@ gnuplot.convert_to_polar = function (x,y)
 	r = gnuplot.plot_axis_rmin - x/Math.cos(phi);
     else
         r = gnuplot.plot_axis_rmin + x/Math.cos(phi);
-    phi = phi * (180./Math.PI) * gnuplot.polar_sense + gnuplot.polar_theta0;
-    if (phi > 180.) phi = phi - 360.;
+    phi = phi * (180./Math.PI);
+    if (gnuplot.polar_sense < 0)
+	phi = -phi;
+    if (gnuplot.polar_theta0 != 0)
+	phi = phi + gnuplot.polar_theta0;
+    if (phi > 180.)
+	phi = phi - 360.;
     polar.r = r;
     polar.ang = phi;
     return polar;
