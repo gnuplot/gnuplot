@@ -353,7 +353,7 @@ gnuplot_svg.convert_to_polar = function (x,y)
     phi = phi * (180./Math.PI);
     if (gnuplot_svg.polar_sense < 0)
 	phi = -phi;
-    if (gnuplot_svg.polar_theta0 != 0)
+    if (gnuplot_svg.polar_theta0 != undefined)
 	phi = phi + gnuplot_svg.polar_theta0;
     if (phi > 180.)
 	phi = phi - 360.;
