@@ -1,3 +1,15 @@
+2017-02-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_readbinary) src/plot2d.c (get_data):
+	Version 5 intentionally returns input data with a flag UNDEFINED rather
+	than skipping the point altogether. Unfortunately the binary data input
+	path failed to clear/initialize/set-to-NaN the value returned from
+	function evaluation during binary data input. Now we explicitly set NaN
+	in additional to returning DF_UNDEFINED.
+	This fix is incomplete because store2d_point() later overwrites the 
+	UNDEFINED flag, which is almost certainly the wrong thing to do.
+	Bug #1911
+
 2017-02-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (arrow_use_properties): If an arrowstyle has no explicit

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.35 2016/12/15 20:29:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.36 2017/01/21 23:55:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -653,6 +653,9 @@ get_data(struct curve_points *current_plot)
 		j = DF_MISSING;
 	    else
 		j = df_no_use_specs;
+	} else {
+	    /* Assume range is OK; we will check later */
+	    current_plot->points[i].type = INRANGE;
 	}
 
 	if (j > 0) {
@@ -1303,7 +1306,9 @@ store2d_point(
     }
 #endif
 
-    dummy_type = cp->type = INRANGE;
+    /* FIXME this destroys any UNDEFINED flag assigned during input */
+    cp->type = INRANGE;
+    dummy_type = cp->type;
 
     if (polar) {
 	double newx, newy;

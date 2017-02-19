@@ -21,6 +21,7 @@ Changes in 5.0.6
 * FIX gnuplot_x11: possible fix for sporadic use-after-free error
 * FIX initialization of hidden3d structures for splot with dots
 * FIX track arrowhead properties in hidden3d mode
+* FIX tracking of NaN values from function evaluated during binary data input
 
 Changes in 5.0.5
 ================
