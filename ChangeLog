@@ -13,6 +13,10 @@
 	UNDEFINED flag, which is almost certainly the wrong thing to do.
 	Bug #1911
 
+	* term/svg.trm:  Default to embedding generated images rather than 
+	creating and linking to separate *.png files.
+	Bug #1801
+
 2017-02-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm term/js/gnuplot_mouse.js term/js/gnuplot_svg.js

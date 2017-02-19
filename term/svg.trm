@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.185 2017/01/31 20:34:56 sfeam Exp $
+ * $Id: svg.trm,v 1.186 2017/02/17 20:19:25 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1811,7 +1811,8 @@ SVG_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecol
 	    PREC, X(corner[0].x), PREC, Y(corner[0].y), 
 	    PREC, X(corner[1].x) - X(corner[0].x), PREC, Y(corner[1].y) - Y(corner[0].y));
 
-    if (SVG_standalone || SVG_domterm) {
+    /* Feb 2017 - always embed images */
+    if (TRUE || SVG_standalone || SVG_domterm) {
 	/* Embed the PNG file in SVG by converting to base64 */
 	fprintf(gpoutfile, "xlink:href='data:image/png;base64,");
 	if (write_png_base64_image(m, n, image, color_mode, gpoutfile))
@@ -2196,11 +2197,9 @@ START_HELP(svg)
 "",
 " Syntax:",
 "       set terminal svg {size <x>,<y> {|fixed|dynamic}}",
-"                        {{no}enhanced}",
-"                        {fname \"<font>\"} {fsize <fontsize>}",
 "                        {mouse} {standalone | jsdir <dirname>}",
 "                        {name <plotname>}",
-"                        {font \"<fontname>{,<fontsize>}\"}",
+"                        {font \"<fontname>{,<fontsize>}\"} {{no}enhanced}",
 "                        {rounded|butt|square} {solid|dashed} {linewidth <lw>}",
 "                        {background <rgb_color>}",
 "",
@@ -2215,10 +2214,8 @@ START_HELP(svg)
 " <fontsize> is the font size (in points, default 12). SVG viewing",
 " programs may substitute other fonts when the file is displayed.",
 "",
-" The svg terminal supports an enhanced text mode, which allows font",
-" and other formatting commands to be embedded in labels and other text",
-" strings. The enhanced text mode syntax is shared with other gnuplot",
-" terminal types. See `enhanced` for more details.",
+" The enhanced text mode syntax is shared with other gnuplot terminal types.",
+" See `enhanced` for more details.",
 "",
 " The `mouse` option tells gnuplot to add support for mouse tracking and for",
 " toggling individual plots on/off by clicking on the corresponding key entry.",
@@ -2227,15 +2224,13 @@ START_HELP(svg)
 " You can change this by using the `jsdir` option to specify either a",
 " different local directory or a general URL. The latter is usually",
 " appropriate if you are embedding the svg into a web page.",
-" Alternatively, the `standalone` option embeds the mousing code and any",
-" images in the svg document itself rather than linking to an external",
-" resource.",
+" Alternatively, the `standalone` option embeds the mousing code in the svg",
+" document itself rather than linking to an external resource.",
 "",
 " When an SVG file will be used in conjunction with external files,",
-" e.g. if it embeds a PNG image or is referenced by javascript code",
-" in a web page or embedding document, then a unique name is required",
-" to avoid potential conflicting references to other SVG plots.",
-" Use the `name` option to ensure uniqueness.",
+" e.g. if it is referenced by javascript code in a web page or parent document,",
+" then a unique name is required to avoid potential conflicting references",
+" to other SVG plots.  Use the `name` option to ensure uniqueness.",
 ""
 END_HELP(svg)
 
