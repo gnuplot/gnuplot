@@ -3,6 +3,16 @@
 	* src/plot2d.h src/plot2d.c src/interpol.c: Remove the EXPERIMENTAL
 	warning and conditional compilation for "smooth bins".
 
+	* src/datafile.c (df_readbinary) src/plot2d.c (get_data):
+	Version 5 intentionally returns input data with a flag UNDEFINED rather
+	than skipping the point altogether. Unfortunately the binary data input
+	path failed to clear/initialize/set-to-NaN the value returned from
+	function evaluation during binary data input. Now we explicitly set NaN
+	in additional to returning DF_UNDEFINED.
+	This fix is incomplete because store2d_point() later overwrites the 
+	UNDEFINED flag, which is almost certainly the wrong thing to do.
+	Bug #1911
+
 2017-02-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm term/js/gnuplot_mouse.js term/js/gnuplot_svg.js
