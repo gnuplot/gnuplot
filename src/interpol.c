@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.54 2015/10/28 20:18:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.55 2016/08/17 19:38:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -1446,7 +1446,6 @@ mcs_interp(struct curve_points *plot)
 #undef C3
 }
 
-#ifdef SMOOTH_BINS_OPTION
 /*
  * Binned histogram of input values.
  *   plot FOO using N:(1) bins{=<nbins>} {binrange=[binlow:binhigh]} with boxes
@@ -1540,4 +1539,3 @@ make_bins(struct curve_points *plot, int nbins, double binlow, double binhigh)
     /* Clean up */
     free(bin);
 }
-#endif

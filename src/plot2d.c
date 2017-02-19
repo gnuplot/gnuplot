@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.415 2017/01/21 23:40:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.416 2017/02/07 00:45:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1947,10 +1947,8 @@ eval_plots()
     legend_key *key = &keyT;
     char orig_dummy_var[MAX_ID_LEN+1];
 
-#ifdef SMOOTH_BINS_OPTION
     int nbins = 0;
     double binlow, binhigh;
-#endif
 
     double newhist_start = 0.0;
     int histogram_sequence = -1;
@@ -2170,7 +2168,6 @@ eval_plots()
 	    while (!END_OF_COMMAND) {
 		int save_token = c_token;
 
-#ifdef SMOOTH_BINS_OPTION
 		/* bin the data if requested */
 		if (equals(c_token, "bins")) {
 		    if (set_smooth) {
@@ -2196,7 +2193,6 @@ eval_plots()
 		    }
 		    continue;
 		}
-#endif
 
 		/*  deal with smooth */
 		if (almost_equals(c_token, "s$mooth")) {
@@ -2777,12 +2773,10 @@ eval_plots()
 		    goto SKIPPED_EMPTY_FILE;
 		}
 
-#ifdef SMOOTH_BINS_OPTION
 		/* If we are to bin the data, do that first */
 		if (this_plot->plot_smooth == SMOOTH_BINS) {
 		    make_bins(this_plot, nbins, binlow, binhigh);
 		}
-#endif
 
 		/* Restore auto-scaling prior to smoothing operation */
 		switch (this_plot->plot_smooth) {

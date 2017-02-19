@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1050 2017/02/14 21:49:17 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1051 2017/02/15 00:46:19 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6266,7 +6266,6 @@ Ffigure_fenceplot
 ?data-file bins
 ?datafile bins
 ?bins
- This option is EXPERIMENTAL (implementation details may change).
  Syntax:
       plot 'DATA' using <XCOL> {:<YCOL>} bins{=<NBINS>}
            {binrange [<LOW>:<HIGH>]}

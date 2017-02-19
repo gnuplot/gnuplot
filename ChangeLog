@@ -1,3 +1,8 @@
+2017-02-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.h src/plot2d.c src/interpol.c: Remove the EXPERIMENTAL
+	warning and conditional compilation for "smooth bins".
+
 2017-02-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm term/js/gnuplot_mouse.js term/js/gnuplot_svg.js
