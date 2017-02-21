@@ -1,3 +1,11 @@
+2017-02-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm term/write_png_image.c:  Backport svg terminal from 5.1.
+	Generated bitmap images are embedded rather than being stored as
+	external *.png files.  This version contains support for the "domterm"
+	terminal emulator (http://domterm.org) that can display svg graphics
+	in-line.
+
 2017-02-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_readbinary) src/plot2d.c (get_data):
