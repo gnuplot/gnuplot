@@ -251,8 +251,7 @@ gnuplot_svg.showHypertext = function(evt, mouseovertext)
     // left-justify multiline text
     var tspan_element = hypertext.firstChild;
     while (tspan_element) {
-        // if (typeof tspan_element == 'tspan') // Broken
-	    tspan_element.setAttributeNS(null,"x",anchor_x+14);
+	tspan_element.setAttributeNS(null,"x",anchor_x+14);
 	tspan_element = tspan_element.nextElementSibling;
     }
 
