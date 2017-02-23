@@ -1,3 +1,10 @@
+2017-02-23  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/term.c (term_initialise):  Revise the test for output of binary
+	data to the wgnuplot text window by checking if the terminal actually
+	writes to output.  Fixes caca output to a console window in wgnuplot.
+	Bug #1912
+
 2017-02-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.h src/plot2d.c src/interpol.c: Remove the EXPERIMENTAL
