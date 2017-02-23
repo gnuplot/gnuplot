@@ -5,6 +5,15 @@
 	writes to output.  Fixes caca output to a console window in wgnuplot.
 	Bug #1912
 
+	* demo/borders.dem demo/boxclusters.dem demo/boxplot.dem
+	demo/circles.dem demo/ellipse.dem demo/ellipses_style.dem
+	demo/histograms.dem demo/histograms2.dem demo/matrix_every.dem
+	demo/mgr.dem demo/molecule.dem demo/orbits.dem demo/parallel.dem
+	demo/probably_tux.dem demo/solar_path.dem demo/special_chars.dem
+	demo/stats.dem demo/ttics.dem demo/world2.dem:
+	End all demos with 'pause -1; reset'.  Set encoding to utf8 when
+	required.
+
 2017-02-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.h src/plot2d.c src/interpol.c: Remove the EXPERIMENTAL

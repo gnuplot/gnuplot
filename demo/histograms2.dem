@@ -67,4 +67,5 @@ newhistogram "British Isles" lt 2 fs pattern 1, \
 '' u 10:xtic(1), '' u 21
 #
 #
-pause -1
+pause -1 "Hit return to continue"
+reset

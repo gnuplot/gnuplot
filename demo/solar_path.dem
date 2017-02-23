@@ -4,6 +4,9 @@
 # (altitude 0°) is at the perimeter and altitude 90° is at the center.
 #
 
+save_encoding = GPVAL_ENCODING
+set encoding utf8
+
 set label 1 at screen 0.02, 0.95 font ":Bold,10"
 set label 1 "Solar path at\nLatitude 47.67 N"
 set timestamp "Seattle - %d %b %Y" offset 1,1
@@ -80,4 +83,7 @@ plot dummy using (winter_azi[$1]):(winter_alt[$1]) lw 2 title "   Winter Solstic
      dummy using (summer_azi[$1]):(summer_alt[$1]) lw 2 title "   Summer Solstice" at beg left, \
      dummy using (today_azi[$1]):(today_alt[$1]) lw 2 title today at end right
 
- pause -1 "<cr> to continue"
+pause -1 "<cr> to continue"
+
+set encoding save_encoding
+reset

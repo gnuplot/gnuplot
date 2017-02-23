@@ -36,4 +36,4 @@ set border 3
 replot
 
 pause -1 "Hit return to continue"
-
+reset

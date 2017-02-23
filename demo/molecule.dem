@@ -16,4 +16,5 @@ set title "Hidden3d mode with a mixture of surfaces, points, and lines"
 replot 18 notitle
 
 pause -1 "Hit return to continue"
+reset
 

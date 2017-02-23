@@ -32,6 +32,9 @@ reset
 
 set title "Parallel Axis Plot" font ",15"
 
+save_encoding = GPVAL_ENCODING
+set encoding utf8
+
 set border 0
 unset ytics
 set xtics ("X" 1, "Y" 2, "Z" 3, "B" 4) nomirror 
@@ -46,4 +49,5 @@ plot 'GM1_sugar.pdb' using 6:7:8:10:5 with parallel lc var lw 2
 
 pause -1 "Hit return to continue"
 
+set encoding save_encoding
 reset

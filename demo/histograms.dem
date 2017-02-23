@@ -120,4 +120,4 @@ set xlabel "(Same plot using rowstacked rather than clustered histogram)"
 replot
 #
 pause -1 "<cr> to finish histogram demo"
-
+reset

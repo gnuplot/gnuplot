@@ -1,5 +1,5 @@
 #
-# $Id: mgr.dem,v 1.10 2011/04/09 23:50:05 sfeam Exp $
+# $Id: mgr.dem,v 1.11 2016/11/05 22:07:21 sfeam Exp $
 #
 print "Watch some  cubic splines"
 set samples 50
@@ -82,5 +82,5 @@ pause -1 "X-Bars only (-> return)"
 plot [0:50] "battery.dat" u 1:2:3 t "Power" w xerr, n(x) t "Theory" w lines
 pause -1 "Y-Bars only (-> return)"
 plot [0:50] "battery.dat" u 1:2:4 t "Power" w yerr, n(x) t "Theory" w lines
+pause -1 "Hit return to continue"
 reset
-
