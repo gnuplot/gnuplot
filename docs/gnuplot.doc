@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.75 2017/01/21 23:55:49 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.76 2017/02/15 00:38:22 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5931,15 +5931,16 @@ Ffigure_mapcontours
                       | csplines | acsplines | mcsplines | bezier | sbezier
                       | unwrap}
 
- `unique`, `frequency`, `cumulative` and `cnormal` plot the data after
- making them monotonic.  `unwrap` manipulates the data to avoid jumps
- of more than pi by adding or subtracting multiples of 2*pi.  Each of
- the other routines uses the data to determine the coefficients of a
- continuous curve between the endpoints of the data.  This curve is
- then plotted in the same manner as a function, that is, by finding
- its value at uniform intervals along the abscissa (see `set samples`)
- and connecting these points with straight line segments (if a line
- style is chosen).
+ `unique`, `frequency`, `cumulative` and `cnormal` plot the data after them
+ monotonic.  `unwrap` manipulates the data to avoid jumps of more than pi by
+ adding or subtracting multiples of 2*pi.  Each of the other routines uses the
+ data to determine the coefficients of a continuous curve between the endpoints
+ of the data.  This curve is then plotted in the same manner as a function,
+ that is, by finding its value at uniform intervals along the abscissa
+ (see `set samples`) and connecting these points with straight line segments.
+ If the data set is interrupted by blank lines or undefined values a separate
+ continuous curve is fit for each uninterrupted subset of the data.
+ Adjacent separately fit segments may be separated by a gap or discontinuity.
 
  If `autoscale` is in effect, the ranges will be computed such that the
  plotted curve lies within the borders of the graph.

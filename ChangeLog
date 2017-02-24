@@ -1,3 +1,13 @@
+2017-02-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/interpol.c (do_cubic) docs/gnuplot.doc:  Document that smooth
+	options (splines and bezier variants) are sensitive to blank lines and
+	undefined values in the input data. Curves are fit separately to each
+	uninterrupted subset of the original data. Curve segments that are 
+	entirely out of range on x are now ignored rather than triggering a
+	error message.
+	Bug #1911
+
 2017-02-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm term/write_png_image.c:  Backport svg terminal from 5.1.
