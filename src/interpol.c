@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.55 2016/08/17 19:38:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.56 2017/02/19 19:11:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -874,9 +874,12 @@ do_cubic(
     xstart = GPMAX(this_points[0].x, sxmin);
     xend = GPMIN(this_points[num_points - 1].x, sxmax);
 
-    if (xstart >= xend)
-	int_error(plot->token,
-		  "Cannot smooth: no data within fixed xrange!");
+    if (xstart >= xend) {
+	/* This entire segment lies outside the current x range. */
+	for (i = 0; i < samples_1; i++)
+	    dest[i].type = OUTRANGE;
+	return;
+    }
 #endif
     xdiff = (xend - xstart) / (samples_1 - 1);
 

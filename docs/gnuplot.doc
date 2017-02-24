@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1051 2017/02/15 00:46:19 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1052 2017/02/19 19:11:07 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6201,7 +6201,9 @@ Ffigure_fenceplot
  curve between the endpoints of the data. This curve is then plotted in the same
  manner as a function, that is, by finding its value at uniform intervals along
  the abscissa (see `set samples`) and connecting these points with straight line
- segments (if a line style is chosen).
+ segments. If the data set is interrupted by blank lines or undefined values a
+ separate continuous curve is fit for each uninterrupted subset of the data.
+ Adjacent separately fit segments may be separated by a gap or discontinuity.
 
  `unwrap` manipulates the data to avoid jumps of more than pi by adding or
  subtracting multiples of 2*pi. 
