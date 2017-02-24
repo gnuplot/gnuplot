@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.256.2.21 2016/10/21 21:00:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.256.2.22 2017/01/18 21:36:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1535,6 +1535,8 @@ save_linetype(FILE *fp, lp_style_type *lp, TBOOLEAN show_point)
 	fprintf(fp, " lt bgnd");
     else if (lp->l_type == LT_AXIS)
 	fprintf(fp, " lt 0");
+    else if (lp->l_type == LT_DEFAULT)
+	;
 
     if (lp->l_type == LT_BLACK && lp->pm3d_color.type == TC_LT)
 	fprintf(fp, " lt black");
