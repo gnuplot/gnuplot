@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.48.2.6 2017/02/25 14:07:53 markisch Exp $
+# $Id: Makefile,v 1.48.2.7 2017/02/25 14:09:02 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 # This assumes a typical installation of the MinGW toolkit, the free
@@ -604,7 +604,7 @@ endif
 
 # explicit rules
 
-wgplt_res.$(O): $(W)/wgnuplot.rc $(W)/wgnuplib.rc $(W)/wresourc.h $(W)/texticon.ico $(W)/grpicon.ico
+wgplt_res.$(O): $(W)/wgnuplot.rc $(W)/wgnuplib.rc $(W)/wresourc.h $(W)/texticon.ico $(W)/grpicon.ico $(W)/wgnuplot.exe.manifest $(W)/wgnuplot.exe.manifest64
 	$(RC) $(RCFLAGS) $< $(RCOUT)
 	$(RES2COFF)
 
