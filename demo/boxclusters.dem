@@ -37,3 +37,4 @@ plot for [i=0:3] 'candlesticks.dat' \
      using (xcoord(i)):(column(i+2)):(color(i)) with boxes lc palette z
 
 pause -1 "<cr> to continue"
+reset

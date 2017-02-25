@@ -29,3 +29,4 @@ set title "Labels with hidden line removal"
 set hidden nooffset
 replot
 pause -1 "Hit return to continue"
+reset

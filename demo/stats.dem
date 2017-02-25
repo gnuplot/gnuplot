@@ -42,4 +42,5 @@ plot 'orbital_elements.dat' index 1 using (f($0)):2 title "  Data" lw 2, \
 
 pause -1 "Hit return to continue"
 
+reset
 }

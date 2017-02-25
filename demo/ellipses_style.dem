@@ -69,4 +69,4 @@ plot 'ellipses.dat' u 1:2:3:4:5 with ellipses units xy title "units xy",\
      '' u 1:2:3:4:5 with ellipses units yy title "units yy"
 
 pause -1 'Hit <cr> to continue'
-
+reset

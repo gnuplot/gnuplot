@@ -121,3 +121,4 @@ plot 'empty-circles.dat' with circles lw 2 lc rgb "red", \
      'hemisphr.dat' u (100*$1):(100*$2) with points pt 7 lc rgb "black"
 
 pause -1 "Hit return to continue"
+reset

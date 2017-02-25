@@ -27,6 +27,14 @@
 	line width.  This in particular improves the appearance of grid lines
 	in polar plots.
 
+	* demo/borders.dem demo/boxclusters.dem demo/boxplot.dem
+	demo/circles.dem demo/ellipse.dem demo/ellipses_style.dem
+	demo/histograms.dem demo/histograms2.dem demo/mgr.dem demo/molecule.dem
+	demo/orbits.dem demo/parallel.dem demo/special_chars.dem
+	demo/stats.dem demo/world2.dem:
+	End all demos with 'pause -1; reset'.  Set encoding to utf8 when
+	required.
+
 2017-02-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/mingw/Makefile:  Enforce calling the lua executable instead

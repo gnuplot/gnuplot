@@ -18,4 +18,5 @@ unset key
 
 plot [0:10][0:10] -10
 
+pause -1 "Hit return to continue"
 reset

@@ -58,4 +58,6 @@ plot for [i=1:n_f] 'energy_circles.dat' using (i):(filter(8, 4, i))
 
 pause -1 'Hit <cr> to continue: boxplot demo finished'
 
+pause -1 'Hit <cr> to continue: boxplot demo finished'
 
+reset
