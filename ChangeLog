@@ -14,6 +14,13 @@
 	we now try to at least automatically copy all DLLs from Mingw-w64.
 	Applies to targets `install`, `installer`, and `zip`.
 
+	* src/set.c (set_degreesign):  Remove special Windows code since we
+	cannot rely on the locale on this platform.  Fixes degree sign for
+	UTF-8 encoding.
+
+	* src/set.c (encoding_micro):  Fix micro sign for CP1252 and add a few
+	more encodings, including CP437 and CP850.
+
 2017-02-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/mingw/Makefile:  Enforce calling the lua executable instead

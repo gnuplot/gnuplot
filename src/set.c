@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.35 2017/01/21 23:55:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.36 2017/01/23 02:13:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1703,22 +1703,8 @@ set_degreesign(char *locale)
 	}
 	return;
     }
-#elif defined(WIN32)
-    if (locale) {
-	char *encoding = strchr(locale, '.');
-	if (encoding) {
-	    unsigned cp;
-	    encoding++; /* Step past the dot in, e.g., German_Germany.1252 */
-	    /* iconv does not understand encodings returned by setlocale() */
-	    if (sscanf(encoding, "%i", &cp)) {
-		wchar_t wdegreesign = 176; /* "\u00B0" */
-		int n = WideCharToMultiByte(cp, WC_COMPOSITECHECK, &wdegreesign, 1,
-			degree_sign, sizeof(degree_sign) - 1, NULL, NULL);
-		degree_sign[n] = NUL;
-	    }
-	}
-	return;
-    }
+#else
+    (void)locale; /* -Wunused argument */
 #endif
 
     /* These are the internally-known encodings */
@@ -1732,6 +1718,10 @@ set_degreesign(char *locale)
     case S_ENC_CP852:	degree_sign[0] = '\370'; break;
     case S_ENC_SJIS:	break;  /* should be 0x818B */
     case S_ENC_CP950:	break;  /* should be 0xA258 */
+    /* default applies at least to:
+       ISO8859-1, -2, -9, -15,   
+       CP1250, CP1251, CP1252, CP1254
+     */
     default:		degree_sign[0] = '\260'; break;
     }
 }
@@ -1741,14 +1731,20 @@ static const char *
 encoding_micro()
 {
     static const char micro_utf8[4] = {0xC2, 0xB5, 0x0, 0x0};
-    static const char micro_1252[2] = {0x96, 0x0};
+    static const char micro_437[2] = {0x96, 0x0};
     static const char micro_latin1[2] = {0xB5, 0x0};
     static const char micro_default[2] = {'u', 0x0};
     switch (encoding) {
 	case S_ENC_UTF8:	return micro_utf8;
-	case S_ENC_CP1252:	return micro_1252;
+	case S_ENC_CP1250:
+	case S_ENC_CP1251:
+	case S_ENC_CP1252:
+	case S_ENC_CP1254:
 	case S_ENC_ISO8859_1:
+	case S_ENC_ISO8859_9:
 	case S_ENC_ISO8859_15:	return micro_latin1;
+	case S_ENC_CP437:
+	case S_ENC_CP850:	return micro_437;
 	default:		return micro_default;
     }
 }
