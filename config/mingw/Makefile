@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.48.2.8 2017/02/25 14:10:50 markisch Exp $
+# $Id: Makefile,v 1.48.2.9 2017/02/25 14:12:59 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 # This assumes a typical installation of the MinGW toolkit, the free
@@ -165,7 +165,7 @@ ifdef CLANG
 CFLAGS += -fcolor-diagnostics -fansi-escape-codes
 CWFLAGS += -Wno-incompatible-ms-struct -Wno-ignored-attributes
 CWFLAGS += -Wno-infinite-recursion
-
+CXXFLAGS += -std=c++11
 endif
 ifdef MINGW64
 # This does not seem to work even if GCC_COLORS is set.
@@ -645,7 +645,7 @@ wxt_gui.$(O): $(S)/wxterminal/wxt_gui.cpp $(S)/wxterminal/wxt_gui.h
 	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) $(CAIRO_CFLAGS) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
 
 gp_cairo.$(O): $(S)/wxterminal/gp_cairo.c $(S)/wxterminal/gp_cairo.h
-	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) $(PANGOCAIRO_CFLAGS) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
+	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) $(PANGOCAIRO_CFLAGS) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
 
 qt_term.$(O): $(S)/qtterminal/qt_term.cpp $(S)/qtterminal/qt_term.h
 	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
