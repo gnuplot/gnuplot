@@ -9,6 +9,13 @@
 	* config/mingw/Makefile:  New target "7z" which is similar to the "zip"
 	target but outputs a 7-zip packed binary package.
 
+	* config/mingw/Makefile:  Resource target depends on manifest files.
+
+2017-02-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* config/mingw/Makefile:  Enforce calling the lua executable instead
+	of the lua wrapper script of Mingw64.
+
 2017-02-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/interpol.c (do_cubic) docs/gnuplot.doc:  Document that smooth
