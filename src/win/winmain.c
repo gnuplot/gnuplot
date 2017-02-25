@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.77.2.2 2014/12/31 04:38:44 sfeam Exp $
+ * $Id: winmain.c,v 1.77.2.3 2017/01/02 09:08:53 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -1175,11 +1175,14 @@ WinRaiseConsole(void)
 	HWND console = NULL;
 #ifndef WGP_CONSOLE
 	console = textwin.hWndParent;
+	if (pausewin.bPause && IsWindow(pausewin.hWndPause))
+		console = pausewin.hWndPause;
 #else
 	console = GetConsoleWindow();
 #endif
 	if (console != NULL) {
-		ShowWindow(console, SW_SHOWNORMAL);
+		if (IsIconic(console))
+			ShowWindow(console, SW_SHOWNORMAL);
 		BringWindowToTop(console);
 	}
 }

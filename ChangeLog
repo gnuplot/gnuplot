@@ -40,6 +40,9 @@
 	provide the characters required by the 2nd "with labels" plot.  Scale
 	down fontsizes to better fit the size of the plots.
 
+	* src/win/winmain.c (WinRaiseConsole):  Raise pause message box instead
+	of the text window during pause.
+
 2017-02-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/mingw/Makefile:  Enforce calling the lua executable instead
