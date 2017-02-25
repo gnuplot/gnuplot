@@ -35,6 +35,11 @@
 	End all demos with 'pause -1; reset'.  Set encoding to utf8 when
 	required.
 
+	* docs/plotstyles.gnu:  On Windows, use "Tahoma" instead of "Times"
+	"Times New Roman".  The former is not available and the later does not
+	provide the characters required by the 2nd "with labels" plot.  Scale
+	down fontsizes to better fit the size of the plots.
+
 2017-02-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/mingw/Makefile:  Enforce calling the lua executable instead
