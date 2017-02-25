@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.48.2.10 2017/02/25 14:20:04 markisch Exp $
+# $Id: Makefile,v 1.48.2.11 2017/02/25 14:22:20 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 # This assumes a typical installation of the MinGW toolkit, the free
@@ -872,16 +872,18 @@ TUT = $(TOP)/tutorial
 tutorial.pdf: $(TUT)/eg1.plt $(TUT)/eg2.plt $(TUT)/eg3.plt $(TUT)/eg4.plt \
 	$(TUT)/eg5.plt $(TUT)/eg6.plt $(TUT)/eg7.plt $(TUT)/linepoin.plt \
 	$(TUT)/test.plt $(TUT)/test_tikz.plt $(TUT)/tutorial.tex
-	GNUPLOT_LIB=$(TUT) gnuplot eg1.plt
-	GNUPLOT_LIB=$(TUT) gnuplot eg2.plt
-	GNUPLOT_LIB=$(TUT) gnuplot eg3.plt
-	GNUPLOT_LIB=$(TUT) gnuplot eg4.plt
-	GNUPLOT_LIB=$(TUT) gnuplot eg5.plt
-	GNUPLOT_LIB=$(TUT) gnuplot eg6.plt
-	GNUPLOT_LIB=$(TUT) GNUPLOT_PS_DIR=$(T)PostScript gnuplot eg7.plt
-	GNUPLOT_LIB=$(TUT) gnuplot linepoin.plt
-	GNUPLOT_LIB=$(TUT) gnuplot test.plt
-	GNUPLOT_LIB=$(TUT) GNUPLOT_LUA_DIR=$(T)lua gnuplot test_tikz.plt
+	GNUPLOT_LIB=$(TUT) ./$(TARGET) eg1.plt
+	GNUPLOT_LIB=$(TUT) ./$(TARGET) eg2.plt
+	GNUPLOT_LIB=$(TUT) ./$(TARGET) eg3.plt
+	GNUPLOT_LIB=$(TUT) ./$(TARGET) eg4.plt
+	GNUPLOT_LIB=$(TUT) ./$(TARGET) eg5.plt
+	GNUPLOT_LIB=$(TUT) ./$(TARGET) eg6.plt
+	GNUPLOT_LIB=$(TUT) GNUPLOT_PS_DIR=$(T)PostScript ./$(TARGET) eg7.plt
+	GNUPLOT_LIB=$(TUT) ./$(TARGET) linepoin.plt
+	GNUPLOT_LIB=$(TUT) ./$(TARGET) test.plt
+#ifdef LUA
+	GNUPLOT_LIB=$(TUT) GNUPLOT_LUA_DIR=$(T)lua ./$(TARGET) test_tikz.plt
+#endif
 	# run latex twice to get refernces right
 	TEXINPUTS=.:$(TUT) latex tutorial.tex
 	TEXINPUTS=.:$(TUT) latex tutorial.tex
