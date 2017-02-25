@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.48.2.11 2017/02/25 14:22:20 markisch Exp $
+# $Id: Makefile,v 1.48.2.12 2017/02/25 14:29:26 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 # This assumes a typical installation of the MinGW toolkit, the free
@@ -1024,6 +1024,26 @@ endif
 ifdef EXTRADIST
 	cp -pR $(EXTRADIST)/* $(DESTDIR)/
 endif
+# required DLLs
+ifdef DLLS
+ifdef MINGW64
+ifndef M32
+	ldd gnuplot.exe gnuplot_qt.exe | cut -d " " -f 3 | grep "^/mingw64/bin" | sort | uniq | xargs -t -i cp {} $(DESTDIR)/bin
+ifdef QT
+	-mkdir $(DESTDIR)/bin/platforms
+	cp /mingw64/share/qt5/plugins/platforms/qminimal.dll $(DESTDIR)/bin/platforms
+	cp /mingw64/share/qt5/plugins/platforms/qwindows.dll $(DESTDIR)/bin/platforms
+endif # QT
+else # !M32
+	ldd gnuplot.exe gnuplot_qt.exe | cut -d " " -f 3 | grep "^/mingw32/bin" | sort | uniq | xargs -t -i cp {} $(DESTDIR)/bin
+ifdef QT
+	-mkdir $(DESTDIR)/bin/platforms
+	cp /mingw32/share/qt5/plugins/platforms/qminimal.dll $(DESTDIR)/bin/platforms
+	cp /mingw32/share/qt5/plugins/platforms/qwindows.dll $(DESTDIR)/bin/platforms
+endif # QT
+endif # M32
+endif # MINGW64
+endif # DLLS
 
 installer:
 	$(MAKE) DESTDIR=./dist install

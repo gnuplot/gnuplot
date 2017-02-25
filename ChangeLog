@@ -1,15 +1,18 @@
 2017-02-25  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/mingw/Makefile:  Optionally use pkg-config to use gdlib.
-	Required with recent updates of MSYS2/Mingw-w64
+	Required with recent updates of MSYS2/Mingw-w64.  New variable
+	CWFLAGS for warning flags to be put last in CFLAGS in order to
+	overwrite e.g. -Wall.  New target "7z" which is similar to the "zip"
+	target but outputs a 7-zip packed binary package.  Resource target
+	depends on manifest files.  Use C++11 mode. Omit C++ flags when
+	building gp_cairo.c.  Use local the build of gnuplot to create plots
+	for the turorial.
 
-	* config/mingw/Makefile:  New variable CWFLAGS for warning flags to be
-	put last in CFLAGS in order to overwrite e.g. -Wall.
-
-	* config/mingw/Makefile:  New target "7z" which is similar to the "zip"
-	target but outputs a 7-zip packed binary package.
-
-	* config/mingw/Makefile:  Resource target depends on manifest files.
+	* config/mingw/Makefile:  Collecting all required DLLs for a Windows
+	binary package can be tedious.  When activated via the DLLS=1 option,
+	we now try to at least automatically copy all DLLs from Mingw-w64.
+	Applies to targets `install`, `installer`, and `zip`.
 
 2017-02-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
