@@ -100,6 +100,7 @@ private:
 	QtGnuplotWidget* m_widget;
 	Ui_settingsDialog* m_ui;
 	QColor m_chosenBackgroundColor;
+	quint32 m_pid;
 };
 
 #endif // QTGNUPLOTWINDOW_H

@@ -43,6 +43,13 @@
 	* src/win/winmain.c (WinRaiseConsole):  Raise pause message box instead
 	of the text window during pause.
 
+	* src/mousecmn.h src/qtterminal/qt_term.cpp
+	src/qtterminal/QtGnuplotEvent.h
+	src/qtterminal/QtGnuplotWindow.cpp|h: Enable space-raises-console
+	and terminal option "raise" for qt on Windows.  Since gnuplot and
+	the qt terminal are realized as two different processes, the
+	currently active process has to allow the other to "raise" itself.
+
 2017-02-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/mingw/Makefile:  Enforce calling the lua executable instead

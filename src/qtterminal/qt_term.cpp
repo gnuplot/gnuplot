@@ -105,6 +105,9 @@ struct QtGnuplotState {
     QLocalSocket socket;
     QByteArray   outBuffer;
     QDataStream  out;
+#ifdef _WIN32
+    DWORD        pid;
+#endif
 
     bool       enhancedSymbol;
     QString    enhancedFontName;
@@ -240,10 +243,15 @@ void execGnuplotQt()
 
 	qint64 pid;
 	qt->gnuplot_qtStarted = QProcess::startDetached(filename, QStringList(), QString(), &pid);
-	if (qt->gnuplot_qtStarted)
+	if (qt->gnuplot_qtStarted) {
 		qt->localServerName = "qtgnuplot" + QString::number(pid);
-	else
+#ifdef _WIN32
+		// save the terminal's PID for later use
+		qt->pid = pid;
+#endif
+	} else {
 		fprintf(stderr, "Could not start gnuplot_qt with path %s\n", filename.toUtf8().data());
+	}
 }
 
 /*-------------------------------------------------------
@@ -373,6 +381,19 @@ bool qt_processTermEvent(gp_event_t* event)
 		QPoint p = qt_gnuplotCoord(event->mx, event->my);
 		event->mx = p.x();
 		event->my = p.y();
+	}
+
+	if (event->type == GE_raise)
+	{
+#ifdef _WIN32
+# ifndef WGP_CONSOLE
+		SetForegroundWindow(textwin.hWndParent);
+# else
+		SetForegroundWindow(GetConsoleWindow());
+# endif
+		WinRaiseConsole();
+#endif
+		return true;
 	}
 
 	// Send the event to gnuplot core
@@ -514,6 +535,10 @@ void qt_graphics()
 	// Initialize window
 	qt->out << GESetCurrentWindow << qt_optionWindowId;
 	qt->out << GEInitWindow;
+#ifdef _WIN32
+	// Let the terminal window know our PID
+	qt->out << GEPID << quint32(GetCurrentProcessId());
+#endif
 	qt->out << GEActivate;
 	qt->out << GETitle << qt_option->Title;
 	qt->out << GESetCtrl << qt_optionCtrl;
@@ -537,7 +562,13 @@ void qt_graphics()
 void qt_text()
 {
 	if (qt_optionRaise)
+	{
+#ifdef _WIN32
+		// The qt graph window is in another process and we must explicitly allow it to "raise".
+		AllowSetForegroundWindow(qt->pid);
+#endif
 		qt->out << GERaise;
+	}
 	qt->out << GEDone;
 	qt_flushOutBuffer();
 }
@@ -547,7 +578,7 @@ void qt_text_wrapper()
 	if (!qt)
 		return;
 
-	// Remember scale to update the status bar while the plot is inactive
+	// Remember scale so that we can update the status bar while the plot is inactive
 	qt->out << GEScale;
 
 	const int axis_order[4] = {FIRST_X_AXIS, FIRST_Y_AXIS, SECOND_X_AXIS, SECOND_Y_AXIS};
