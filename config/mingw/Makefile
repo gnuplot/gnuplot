@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.48.2.4 2016/03/22 16:49:48 markisch Exp $
+# $Id: Makefile,v 1.48.2.5 2017/02/25 14:04:52 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 # This assumes a typical installation of the MinGW toolkit, the free
@@ -124,7 +124,7 @@ endif
 # Requires libcaca version 0.99.beta15 or newer. A post-beta18
 # svn version is recommended since it contains an improved
 # win32 backend.
-CACA=1
+#CACA=1
 
 # Uncomment if you have libiconv
 ICONV=1
@@ -160,10 +160,12 @@ DESTDIR = "$(PROGRAMFILES)/gnuplot"
 
 # Do you want some special optimization / flags?
 #CFLAGS +=
+CWFLAGS += -Wno-unused-function
 ifdef CLANG
 CFLAGS += -fcolor-diagnostics -fansi-escape-codes
-CFLAGS += -Wno-error=incompatible-ms-struct -Wno-ignored-attributes
-CFLAGS +=  -isystem c:/msys64/mingw64/include -pedantic
+CWFLAGS += -Wno-incompatible-ms-struct -Wno-ignored-attributes
+CWFLAGS += -Wno-infinite-recursion
+
 endif
 ifdef MINGW64
 # This does not seem to work even if GCC_COLORS is set.
@@ -298,6 +300,9 @@ else
   CFLAGS += -O2 -pipe
   LDFLAGS += -s
 endif
+
+
+CFLAGS += $(CWFLAGS)
 
 LDFLAGS2 = -mwindows -Wl,--enable-auto-import
 ifdef PIPES

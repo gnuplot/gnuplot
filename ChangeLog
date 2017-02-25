@@ -3,6 +3,9 @@
 	* src/win/mingw/Makefile:  Optionally use pkg-config to use gdlib.
 	Required with recent updates of MSYS2/Mingw-w64
 
+	* config/mingw/Makefile:  New variable CWFLAGS for warning flags to be
+	put last in CFLAGS in order to overwrite e.g. -Wall.
+
 2017-02-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/interpol.c (do_cubic) docs/gnuplot.doc:  Document that smooth
