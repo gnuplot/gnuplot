@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.16.2.11 2016/10/15 14:32:00 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.16.2.12 2016/10/16 05:31:02 markisch Exp $
  */
 
 /*
@@ -50,6 +50,7 @@ const int pattern_num = 8;
 
 static Color gdiplusCreateColor(COLORREF color, double alpha);
 static Pen * gdiplusCreatePen(UINT style, float width, COLORREF color, double alpha);
+static void gdiplusSetDashStyle(Pen *pen, enum DashStyle style);
 static void gdiplusPolyline(Graphics &graphics, Pen &pen, POINT *ppt, int polyi);
 static void gdiplusFilledPolygon(Graphics &graphics, Brush &brush, POINT *ppt, int polyi);
 static Brush * gdiplusPatternBrush(int style, COLORREF color, double alpha, COLORREF backcolor, BOOL transparent);
@@ -94,13 +95,30 @@ gdiplusCreatePen(UINT style, float width, COLORREF color, double alpha)
 	// create GDI+ pen
 	Color gdipColor = gdiplusCreateColor(color, alpha);
 	Pen * pen = new Pen(gdipColor, width > 1 ? width : 1);
-	if (style <= PS_DASHDOTDOT)
-		// cast is save since GDI and GDI+ use same numbers
-		pen->SetDashStyle(static_cast<DashStyle>(style));
+	gdiplusSetDashStyle(pen, static_cast<DashStyle>(style));
 	pen->SetLineCap(LineCapSquare, LineCapSquare, DashCapFlat);
 	pen->SetLineJoin(LineJoinMiter);
 
 	return pen;
+}
+
+
+static void
+gdiplusSetDashStyle(Pen *pen, enum DashStyle style)
+{
+	const REAL dashstyles[4][6] = {
+		{ 16.f, 8.f },	// dash
+		{ 3.f, 3.f },	// dot
+		{ 8.f, 5.f, 3.f, 5.f }, // dash dot
+		{ 8.f, 4.f, 3.f, 4.f, 3.f, 4.f } // dash dot dot
+	};
+	const int dashstyle_len[4] = { 2, 2, 4, 6 };
+
+	style = static_cast<enum DashStyle>(style % 5);
+	if (style == 0)
+		pen->SetDashStyle(style);
+	else
+		pen->SetDashPattern(dashstyles[style - 1], dashstyle_len[style - 1]);
 }
 
 
@@ -386,6 +404,18 @@ SetFont_gdiplus(Graphics &graphics, LPRECT rect, LPGW lpgw, char * fontname, int
 	lpgw->vtic = MulDiv(cy, lpgw->ymax, rect->bottom - rect->top);
 
 	return font;
+}
+
+
+void
+InitFont_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
+{
+	gdiplusInit();
+	Graphics graphics(hdc);
+	// call for the side effects:  set vchar/hchar and text metrics
+	Font * font = SetFont_gdiplus(graphics, rect, lpgw, lpgw->fontname, lpgw->fontscale * lpgw->fontsize);
+	// TODO:  save font object for later use
+	delete font;
 }
 
 
@@ -781,7 +811,7 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 			pen.SetWidth(cur_penstruct.lopnWidth.x);
 			if (cur_penstruct.lopnStyle <= PS_DASHDOTDOT)
 				// cast is save since GDI and GDI+ use the same numbers
-				pen.SetDashStyle(static_cast<DashStyle>(cur_penstruct.lopnStyle));
+				gdiplusSetDashStyle(&pen, static_cast<DashStyle>(cur_penstruct.lopnStyle));
 			else
 				pen.SetDashStyle(DashStyleSolid);
 
@@ -798,15 +828,15 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 				dt %= WGNUMPENS;
 				dt += 2;
 				cur_penstruct.lopnStyle = lpgw->monopen[dt].lopnStyle;
-				pen.SetDashStyle(static_cast<DashStyle>(cur_penstruct.lopnStyle));
+				gdiplusSetDashStyle(&pen, static_cast<DashStyle>(cur_penstruct.lopnStyle));
 			} else if (dt == DASHTYPE_SOLID) {
 				cur_penstruct.lopnStyle = PS_SOLID;
-				pen.SetDashStyle(static_cast<DashStyle>(cur_penstruct.lopnStyle));
+				gdiplusSetDashStyle(&pen, static_cast<DashStyle>(cur_penstruct.lopnStyle));
 			} else if (dt == DASHTYPE_AXIS) {
 				dt = 1;
 				cur_penstruct.lopnStyle =
 					lpgw->dashed ? lpgw->monopen[dt].lopnStyle : lpgw->colorpen[dt].lopnStyle;
-				pen.SetDashStyle(static_cast<DashStyle>(cur_penstruct.lopnStyle));
+				gdiplusSetDashStyle(&pen, static_cast<DashStyle>(cur_penstruct.lopnStyle));
 			} else if (dt == DASHTYPE_CUSTOM) {
 				t_dashtype * dash = static_cast<t_dashtype *>(LocalLock(curptr->htext));
 				INT count = 0;
