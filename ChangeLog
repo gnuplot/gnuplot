@@ -6,6 +6,9 @@
 	* config/mingw/Makefile:  New variable CWFLAGS for warning flags to be
 	put last in CFLAGS in order to overwrite e.g. -Wall.
 
+	* config/mingw/Makefile:  New target "7z" which is similar to the "zip"
+	target but outputs a 7-zip packed binary package.
+
 2017-02-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/interpol.c (do_cubic) docs/gnuplot.doc:  Document that smooth
