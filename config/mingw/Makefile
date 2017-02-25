@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.48.2.3 2016/02/13 17:20:32 markisch Exp $
+# $Id: Makefile,v 1.48.2.4 2016/03/22 16:49:48 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 # This assumes a typical installation of the MinGW toolkit, the free
@@ -67,6 +67,7 @@ PROGRAMFILES32=/c/Program\ Files\ \(x86\)
 #JPEG=1
 #FREETYPE=1
 #GDAUTOCONFIGLIBS=1
+#GDPKGCONFIG=1
 #BGD=1
 
 # PDF device driver
@@ -109,7 +110,11 @@ MOUSE=1
 ifndef MINGW64
 QT_DIR = /d/Source/Qt-5.2.1-mingw/5.2.1/mingw48_32
 else
+ifdef M32
+QT_DIR = /mingw32
+else
 QT_DIR = /mingw64
+endif
 endif
 
 # Uncomment the following line to select the lua/tikz terminal
@@ -149,7 +154,6 @@ GNUPLOT_TEX_DIR = share/texmf/tex
 # gnuplot will look for gnuplotrc here:
 GNUPLOT_SHARE_DIR = share
 
-
 # Destination directory, used in 'make install':
 #DESTDIR = /local/opt/gnuplot-4.5
 DESTDIR = "$(PROGRAMFILES)/gnuplot"
@@ -186,6 +190,8 @@ GNUSORT = /bin/sort
 
 # Inno Setup Compiler
 # get it from: http://www.jrsoftware.org/isdl.php
+# Use unicode version of Inno Setup Compiler but not Standard version
+# because the setup file of gnuplot installer is now encoded utf-8 with BOM.
 ISCC = $(PROGRAMFILES32)/Inno\ Setup\ 5/iscc
 
 # Directory that might contain extra files to be shipped with the installer.
@@ -358,18 +364,25 @@ ifdef PNG
   CFLAGS += -DHAVE_LIBPNG
   ifndef BGD
   ifndef GDAUTOCONFIGLIBS
+  ifndef GDPKGCONFIG
     TERMLIBS += -lpng -lz
+  endif
   endif
   endif
 endif
 
 ifdef NEWGD
   CFLAGS += -DHAVE_LIBGD -DHAVE_GD_H -DHAVE_GD_GIF -DGIF_ANIMATION -DHAVE_GD_PNG
+ifdef GDPKGCONFIG
+  CFLAGS += $(shell pkg-config --cflags gdlib)
+endif
 ifdef JPEG
   CFLAGS += -DHAVE_GD_JPEG
   ifndef BGD
   ifndef GDAUTOCONFIGLIBS
+  ifndef GDPKGCONFIG
     TERMLIBS += -ljpeg
+  endif
   endif
   endif
 endif
@@ -377,12 +390,17 @@ ifdef FREETYPE
   CFLAGS += -DHAVE_GD_TTF
   ifndef BGD
   ifndef GDAUTOCONFIGLIBS
+  ifndef GDPKGCONFIG
     TERMLIBS += -lfreetype
+  endif
   endif
   endif
 endif
 ifdef GDAUTOCONFIGLIBS
   TERMLIBS += $(shell gdlib-config --libs)
+endif
+ifdef GDPKGCONFIG
+  TERMLIBS += $(shell pkg-config --libs gdlib)
 endif
 endif
 
@@ -759,6 +777,7 @@ config.h: $(TOP)/config/config.mgw
 ifdef LUA
 gnuplot-lua-tikz.sty: $(T)/lua/gnuplot-tikz.lua
 	$(LUA) $< style
+
 $(LUA_HELP): $(T)/lua/gnuplot-tikz.lua
 	$(LUA) $< termhelp > $@
 endif
