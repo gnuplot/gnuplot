@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.128.2.27 2016/08/26 04:16:01 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.128.2.28 2016/10/13 23:16:54 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -165,7 +165,7 @@ wxtAnchorPoint wxt_display_anchor = {0,0,0};
 #endif
 
 #if defined(WXT_MONOTHREADED) && !defined(_Windows)
-static int yield = 0;	/* used in wxt_waitforinput() */
+static int wxt_yield = 0;	/* used in wxt_waitforinput() */
 #endif
 
 char *wxt_enhanced_fontname = NULL;
@@ -2099,7 +2099,7 @@ void wxt_reset()
 	FPRINTF((stderr,"wxt_reset\n"));
 
 #if defined(WXT_MONOTHREADED) && !defined(_Windows)
-	yield = 0;
+	wxt_yield = 0;
 #endif
 
 	if (wxt_status == STATUS_UNINITIALIZED)
@@ -3817,7 +3817,7 @@ int wxt_waitforinput(int options)
 #else /* !_Windows */
 	/* Generic hybrid GUI & console message loop */
 	/* (used mainly on MacOSX - still single threaded) */
-	if (yield)
+	if (wxt_yield)
 		return '\0';
 
 	if (wxt_status == STATUS_UNINITIALIZED)
@@ -3827,7 +3827,7 @@ int wxt_waitforinput(int options)
 		// If we're just checking mouse status, yield to the app for a while
 		if (wxTheApp) {
 			wxTheApp->Yield();
-			yield = 0;
+			wxt_yield = 0;
 		}
 		return '\0'; // gets dropped on floor
 	}
@@ -3835,9 +3835,9 @@ int wxt_waitforinput(int options)
 	while (wxTheApp) {
 	  // Loop with timeout of 10ms until stdin is ready to read,
 	  // while also handling window events.
-	  yield = 1;
+	  wxt_yield = 1;
 	  wxTheApp->Yield();
-	  yield = 0;
+	  wxt_yield = 0;
 
 	  struct timeval tv;
 	  fd_set read_fd;
