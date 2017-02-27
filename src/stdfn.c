@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.33 2017/01/29 06:30:08 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.34 2017/01/29 12:18:21 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - stdfn.c */
@@ -459,8 +459,7 @@ void gp_exit_cleanup(void)
 static void debug_exit_handler(void)
 {
     if (exit_handlers) {
-        fprintf(stderr, "Gnuplot not exited using gp_exit(). Exit handlers may"
-                " not work correctly!\n");
+        fprintf(stderr, "Gnuplot exiting abnormally. Trying to execute exit handlers anyway.\n");
         gp_exit_cleanup();
     }
 }
