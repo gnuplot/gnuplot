@@ -11,7 +11,10 @@
 
 2017-02-27  Ethan A Merritt  <merritt@u.washington.edu>
 
-	configure.in:  Bump versioning to 5.0.6pre in preparation for release
+	* configure.in:  Bump versioning to 5.0.6pre in preparation for release
+
+	* src/stdfn.c:  Clarify warning message for abnormal exit.
+	Bug #1913
 
 2017-02-27  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
