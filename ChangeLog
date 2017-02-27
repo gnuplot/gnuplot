@@ -1,3 +1,9 @@
+2017-02-27  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* src/wxterminal/wxt_gui.cpp:  Rename static int yield to avoid 
+	name conflict on Solaris 10.
+	Bug #1914
+
 2017-02-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/interpol.c (do_cubic) docs/gnuplot.doc:  Document that smooth
