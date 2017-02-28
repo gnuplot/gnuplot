@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.16.2.13 2017/02/25 14:56:52 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.16.2.14 2017/02/28 06:27:11 markisch Exp $
  */
 
 /*
@@ -593,7 +593,7 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 
 	/* calculate text shifting for horizontal text */
 	hshift = 0;
-	vshift = -MulDiv(lpgw->vchar, rb - rt, lpgw->ymax) / 2;
+	vshift = - lpgw->tmHeight / 2;
 
 	/* init layer variables */
 	lpgw->numplots = 0;
@@ -1193,8 +1193,8 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 			if (lpgw->angle != (int)curptr->x) {
 				lpgw->angle = (int)curptr->x;
 				/* recalculate shifting of rotated text */
-				hshift = - sin(M_PI/180. * lpgw->angle) * MulDiv(lpgw->vchar, rr-rl, lpgw->xmax) / 2;
-				vshift = - cos(M_PI/180. * lpgw->angle) * MulDiv(lpgw->vchar, rb-rt, lpgw->ymax) / 2;
+				hshift = - sin(M_PI/180. * lpgw->angle) * lpgw->tmHeight / 2;
+				vshift = - cos(M_PI/180. * lpgw->angle) * lpgw->tmHeight / 2;
 			}
 			break;
 
@@ -1220,8 +1220,8 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 			font = SetFont_gdiplus(graphics, rect, lpgw, fontname, size);
 			LocalUnlock(curptr->htext);
 			/* recalculate shifting of rotated text */
-			hshift = - sin(M_PI/180. * lpgw->angle) * MulDiv(lpgw->vchar, rr-rl, lpgw->xmax) / 2;
-			vshift = - cos(M_PI/180. * lpgw->angle) * MulDiv(lpgw->vchar, rb-rt, lpgw->ymax) / 2;
+			hshift = - sin(M_PI/180. * lpgw->angle) * lpgw->tmHeight / 2;
+			vshift = - cos(M_PI/180. * lpgw->angle) * lpgw->tmHeight / 2;
 			break;
 		}
 
