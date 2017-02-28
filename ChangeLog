@@ -1,3 +1,10 @@
+2017-02-28  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c src/win/wgdiplus.cpp|h (InitFont_gdiplus):
+	Determine initial font metrics etc. using the correct API (GDI/GDI+)
+	instead of always using GDI.  Take actual canvas size into account.
+	Bug fix.
+
 2017-02-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	configure.in:  Bump versioning to 5.0.6pre in preparation for release

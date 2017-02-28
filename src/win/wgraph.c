@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.189.2.18 2016/10/15 18:42:51 markisch Exp $
+ * $Id: wgraph.c,v 1.189.2.19 2017/01/02 08:49:00 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -454,6 +454,7 @@ GraphInit(LPGW lpgw)
 				  lpgw->hInstance, lpgw);
 	if (lpgw->hStatusbar) {
 		RECT rect;
+
 		/* auto-adjust size */
 		SendMessage(lpgw->hStatusbar, WM_SIZE, (WPARAM)0, (LPARAM)0);
 		ShowWindow(lpgw->hStatusbar, SW_SHOW);
@@ -543,6 +544,9 @@ GraphInit(LPGW lpgw)
 			ret = SendMessage(lpgw->hToolbar, TB_INSERTBUTTON, (WPARAM)num++, (LPARAM)&button);
 		}
 
+		/* silence compiler warning */
+		(void) ret;
+
 		/* auto-resize and show */
 		SendMessage(lpgw->hToolbar, TB_AUTOSIZE, (WPARAM)0, (LPARAM)0);
 		ShowWindow(lpgw->hToolbar, SW_SHOW);
@@ -624,6 +628,18 @@ GraphInit(LPGW lpgw)
 		SetWindowPos(lpgw->hWndGraph, HWND_BOTTOM, lpgw->Origin.x, lpgw->Origin.y, lpgw->Size.x, lpgw->Size.y, SWP_NOACTIVATE | SWP_NOZORDER  | SWP_NOMOVE);
 	}
 
+	// initialize font (and pens)
+	{
+		HDC hdc;
+		RECT rect;
+
+		hdc = GetDC(lpgw->hWndGraph);
+		MakePens(lpgw, hdc);
+		GetPlotRect(lpgw, &rect);
+		MakeFonts(lpgw, &rect, hdc);
+		ReleaseDC(lpgw->hWndGraph, hdc);
+	}
+
 	ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);
 }
 
@@ -669,6 +685,7 @@ GraphStart(LPGW lpgw, double pointsize)
 	lpgw->org_pointsize = pointsize;
 	if (!lpgw->hWndGraph || !IsWindow(lpgw->hWndGraph))
 		GraphInit(lpgw);
+
 	if (IsIconic(lpgw->hWndGraph))
 		ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);
 	if (lpgw->graphtotop) {
@@ -693,7 +710,7 @@ GraphEnd(LPGW lpgw)
 	RECT rect;
 
 	GetClientRect(lpgw->hWndGraph, &rect);
-	InvalidateRect(lpgw->hWndGraph, (LPRECT) &rect, 1);
+	InvalidateRect(lpgw->hWndGraph, &rect, 1);
 	lpgw->buffervalid = FALSE;
 	lpgw->locked = FALSE;
 	UpdateWindow(lpgw->hWndGraph);
@@ -948,7 +965,14 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	char *p;
 	int cx, cy;
 
-	lpgw->rotate = FALSE;
+#ifdef HAVE_GDIPLUS
+	if (lpgw->gdiplus) {
+		InitFont_gdiplus(lpgw, hdc, lprect);
+		/* Version 5.0 still needs GDI fonts for enhanced text */
+		lpgw->rotate = TRUE;
+	}
+#endif
+
 	memset(&(lpgw->lf), 0, sizeof(LOGFONT));
 	strncpy(lpgw->lf.lfFaceName, lpgw->fontname, LF_FACESIZE);
 	lpgw->lf.lfHeight = -MulDiv(lpgw->fontsize * lpgw->fontscale, GetDeviceCaps(hdc, LOGPIXELSY), 72) * lpgw->sampling;
@@ -1001,6 +1025,17 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	lpgw->lf.lfOrientation = 900;
 	lpgw->hfontv = CreateFontIndirect(&(lpgw->lf));
 
+#ifdef HAVE_GDIPLUS
+	/* When using GDI+, we still require the font metrics from GDI for enhanced text,
+	but the text size is obtained by GDI+ already.  We also do not change hchar/vchar
+	for fast rotation (using GDI) in order not to change layout.
+	*/
+	if (lpgw->gdiplus) {
+		hfontold = (HFONT) SelectObject(hdc, lpgw->hfonth);
+		GetTextMetrics(hdc, (TEXTMETRIC *)&tm);
+	} else {
+#endif
+
 	/* save text size */
 	hfontold = (HFONT) SelectObject(hdc, lpgw->hfonth);
 	Wnd_GetTextSize(hdc, "0123456789", 10, &cx, &cy);
@@ -1011,22 +1046,30 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	lpgw->htic = MulDiv(lpgw->hchar, 2, 5);
 	cy = MulDiv(cx, 2 * GetDeviceCaps(hdc, LOGPIXELSY), 50 * GetDeviceCaps(hdc, LOGPIXELSX));
 	lpgw->vtic = MulDiv(cy, lpgw->ymax, lprect->bottom - lprect->top);
+
 	/* find out if we can rotate text 90deg */
+	lpgw->rotate = FALSE;
 	SelectObject(hdc, lpgw->hfontv);
 	result = GetDeviceCaps(hdc, TEXTCAPS);
 	if ((result & TC_CR_90) || (result & TC_CR_ANY))
 		lpgw->rotate = TRUE;
+
 	GetTextMetrics(hdc, (TEXTMETRIC *)&tm);
 	if (tm.tmPitchAndFamily & TMPF_VECTOR)
 		lpgw->rotate = TRUE;	/* vector fonts can all be rotated */
 	if (tm.tmPitchAndFamily & TMPF_TRUETYPE)
 		lpgw->rotate = TRUE;	/* truetype fonts can all be rotated */
+
+#ifdef HAVE_GDIPLUS
+	}
+#endif
+
 	/* store text metrics for later use */
 	lpgw->tmHeight = tm.tmHeight;
 	lpgw->tmAscent = tm.tmAscent;
 	lpgw->tmDescent = tm.tmDescent;
+
 	SelectObject(hdc, hfontold);
-	return;
 }
 
 
@@ -1200,18 +1243,23 @@ luma_from_color(unsigned red, unsigned green, unsigned blue)
 static unsigned int WDPROC
 GraphGetTextLength(LPGW lpgw, HDC hdc, LPCSTR text)
 {
-    SIZE size;
-    LPWSTR textw;
+	SIZE size;
+	LPWSTR textw;
 
-    textw = UnicodeText(text, lpgw->encoding);
-    if (textw) {
-        GetTextExtentPoint32W(hdc, textw, wcslen(textw), &size);
-        free(textw);
-    } else
-        GetTextExtentPoint32(hdc, text, strlen(text), &size);
-    size.cx += GetTextCharacterExtra(hdc);
-    return size.cx;
+	if (text == NULL)
+		return 0;
+
+	textw = UnicodeText(text, lpgw->encoding);
+	if (textw) {
+		GetTextExtentPoint32W(hdc, textw, wcslen(textw), &size);
+		free(textw);
+	} else {
+		GetTextExtentPoint32A(hdc, text, strlen(text), &size);
+	}
+	return size.cx;
 }
+
+
 
 
 void WDPROC
@@ -1550,6 +1598,7 @@ draw_new_brush(LPGW lpgw, HDC hdc, COLORREF color)
 	lpgw->hcolorbrush = new_brush;
 }
 
+
 void
 draw_update_keybox(LPGW lpgw, unsigned plotno, unsigned x, unsigned y)
 {
@@ -1611,7 +1660,6 @@ draw_image(LPGW lpgw, HDC hdc, char *image, POINT corners[4], unsigned int width
 {
 	BITMAPINFO bmi;
 	HRGN hrgn;
-	int rc;
 
 	if (image == NULL)
 		return;
@@ -1648,12 +1696,11 @@ draw_image(LPGW lpgw, HDC hdc, char *image, POINT corners[4], unsigned int width
 					p[0] = p[1] = p[2] = luma;
 				}
 			}
-
 		} else {
 			dibimage = image;
 		}
 
-		rc = StretchDIBits(hdc,
+		StretchDIBits(hdc,
 			GPMIN(corners[0].x, corners[1].x) , GPMIN(corners[0].y, corners[1].y),
 			abs(corners[1].x - corners[0].x), abs(corners[1].y - corners[0].y),
 			0, 0, width, height,
@@ -1884,8 +1931,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 	while (ngwop < lpgw->nGWOP) {
 		/* transform the coordinates */
-		xdash = MulDiv(curptr->x, rr-rl-1, lpgw->xmax) + rl;
-		ydash = MulDiv(curptr->y, rt-rb+1, lpgw->ymax) + rb - 1;
+		xdash = MulDiv(curptr->x, rr - rl, lpgw->xmax) + rl;
+		ydash = MulDiv(curptr->y, rt - rb, lpgw->ymax) + rb - 1;
 
 		/* ignore superfluous moves - see bug #1523 */
 		/* FIXME: we should do this in win.trm, not here */
@@ -2378,7 +2425,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					transparent = TRUE;
 					alpha = 1.;
 				} else {
-					/* Printer does not support AlphaBlend() */
+					/* Printers do not support AlphaBlend() */
 					fillstyle = (fillstyle & 0xfffffff0) | FS_PATTERN;
 					if (warn_no_transparent) {
 						fprintf(stderr, "Warning: Transparency not supported on this device.\n");
@@ -4022,7 +4069,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 							SendMessage(lpgw->hToolbar, TB_CHECKBUTTON, M_HIDEPLOT + i, (LPARAM)lpgw->hideplot[i]);
 						lpgw->buffervalid = FALSE;
 						GetClientRect(hwnd, &rect);
-						InvalidateRect(hwnd, (LPRECT) &rect, 1);
+						InvalidateRect(hwnd, &rect, 1);
 						UpdateWindow(hwnd);
 						return 0L;
 					}
@@ -4378,7 +4425,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					lpgw->hidegrid = SendMessage(lpgw->hToolbar, TB_ISBUTTONCHECKED, LOWORD(wParam), (LPARAM)0);
 					lpgw->buffervalid = FALSE;
 					GetClientRect(hwnd, &rect);
-					InvalidateRect(hwnd, (LPRECT) &rect, 1);
+					InvalidateRect(hwnd, &rect, 1);
 					UpdateWindow(hwnd);
 					return 0;
 				case M_WRITEINI:
@@ -4435,10 +4482,10 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					hdc = GetDC(hwnd);
 					MakePens(lpgw, hdc);
 					GetPlotRect(lpgw, &rect);
-					MakeFonts(lpgw, (LPRECT)&rect, hdc);
+					MakeFonts(lpgw, &rect, hdc);
 					ReleaseDC(hwnd, hdc);
 					GetClientRect(hwnd, &rect);
-					InvalidateRect(hwnd, (LPRECT) &rect, 1);
+					InvalidateRect(hwnd, &rect, 1);
 					UpdateWindow(hwnd);
 					return 0;
 			}
@@ -4449,7 +4496,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					lpgw->hideplot[button] = SendMessage(lpgw->hToolbar, TB_ISBUTTONCHECKED, LOWORD(wParam), (LPARAM)0);
 				lpgw->buffervalid = FALSE;
 				GetClientRect(hwnd, &rect);
-				InvalidateRect(hwnd, (LPRECT) &rect, 1);
+				InvalidateRect(hwnd, &rect, 1);
 				UpdateWindow(hwnd);
 				return 0;
 			}
@@ -4532,21 +4579,14 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			lpgw = ((CREATESTRUCT *)lParam)->lpCreateParams;
 			SetWindowLongPtr(hwnd, 0, (LONG_PTR)lpgw);
 			lpgw->hWndGraph = hwnd;
-			hdc = GetDC(hwnd);
-			MakePens(lpgw, hdc);
 #ifdef USE_MOUSE
 			LoadCursors(lpgw);
 #endif
-			GetPlotRect(lpgw, &rect);
-			MakeFonts(lpgw, (LPRECT)&rect, hdc);
-			ReleaseDC(hwnd, hdc);
-			if ( lpgw->lptw && (lpgw->lptw->DragPre!=(LPSTR)NULL) && (lpgw->lptw->DragPost!=(LPSTR)NULL) )
-			    DragAcceptFiles(hwnd, TRUE);
-			return(0);
-
+			if (lpgw->lptw && (lpgw->lptw->DragPre != NULL) && (lpgw->lptw->DragPost != NULL))
+				DragAcceptFiles(hwnd, TRUE);
+			return 0;
 		case WM_ERASEBKGND:
-			return(1); /* we erase the background ourselves */
-
+			return 1; /* we erase the background ourselves */
 		case WM_PAINT: {
 			HDC memdc = NULL;
 			HBITMAP oldbmp;
@@ -4561,6 +4601,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			SetBkMode(hdc, OPAQUE);
 			GetPlotRect(lpgw, &rect);
 			SetViewportExtEx(hdc, rect.right, rect.bottom, NULL);
+
 			/* double buffering */
 			if (lpgw->doublebuffer) {
 				/* choose oversampling */
@@ -4577,7 +4618,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					RECT rect;
 					DestroyFonts(lpgw);
 					GetPlotRect(lpgw, &rect);
-					MakeFonts(lpgw, (LPRECT)&rect, hdc);
+					MakeFonts(lpgw, &rect, hdc);
 					lpgw->buffervalid = FALSE;
 				}
 
@@ -4698,14 +4739,14 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					MakeFonts(lpgw, &rect, hdc);
 					ReleaseDC(hwnd, hdc);
 
-					GetClientRect(hwnd, &rect);
+					GetPlotRect(lpgw, &rect);
 					InvalidateRect(hwnd, &rect, 1);
 					UpdateWindow(hwnd);
 				}
 			}
 			if (lpgw->Size.x == CW_USEDEFAULT) {
-			    lpgw->Size.x = LOWORD(lParam);
-			    lpgw->Size.y = HIWORD(lParam);
+				lpgw->Size.x = LOWORD(lParam);
+				lpgw->Size.y = HIWORD(lParam);
 			}
 			break;
 #ifndef WGP_CONSOLE
@@ -4735,7 +4776,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case WM_CLOSE:
 			GraphClose(lpgw);
 			return 0;
-		}
+	}
 	return DefWindowProc(hwnd, message, wParam, lParam);
 }
 
@@ -4743,24 +4784,26 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 void
 GraphChangeFont(LPGW lpgw, LPCSTR font, int fontsize, HDC hdc, RECT rect)
 {
-    int newfontsize;
-    bool remakefonts = FALSE;
-    bool font_is_not_empty = (font != NULL && *font != '\0');
+	int newfontsize;
+	bool remakefonts = FALSE;
+	bool font_is_not_empty = (font != NULL && *font != '\0');
 
-    newfontsize = (fontsize != 0) ? fontsize : lpgw->deffontsize;
-    if (font_is_not_empty) {
+	newfontsize = (fontsize != 0) ? fontsize : lpgw->deffontsize;
+	if (font_is_not_empty) {
 		remakefonts = (strcmp(lpgw->fontname, font) != 0) || (newfontsize != lpgw->fontsize);
-    } else {
+	} else {
 		remakefonts = (strcmp(lpgw->fontname, lpgw->deffontname) != 0) || (newfontsize != lpgw->fontsize);
-    }
+	}
+	remakefonts |= (lpgw->hfonth == 0);
 
-    if (remakefonts) {
-        lpgw->fontsize = newfontsize;
-        strcpy(lpgw->fontname, font_is_not_empty ? font : lpgw->deffontname);
+	if (remakefonts) {
+		lpgw->fontsize = newfontsize;
+		strcpy(lpgw->fontname, font_is_not_empty ? font : lpgw->deffontname);
 
-        DestroyFonts(lpgw);
-        MakeFonts(lpgw, &rect, hdc);
-    }
+		SelectObject(hdc, GetStockObject(SYSTEM_FONT));
+		DestroyFonts(lpgw);
+		MakeFonts(lpgw, &rect, hdc);
+	}
 }
 
 
@@ -4796,7 +4839,7 @@ Graph_set_cursor(LPGW lpgw, int c, int x, int y)
 		break;
 	case -3: /* switch on line between ruler and mouse cursor */
 		if (ruler.on && ruler_lineto.on)
-		    break;
+			break;
 		ruler_lineto.x = x;
 		ruler_lineto.y = y;
 		ruler_lineto.on = TRUE;
@@ -4849,6 +4892,7 @@ Graph_set_cursor(LPGW lpgw, int c, int x, int y)
 	}
 }
 
+
 /* set_ruler(int x, int y) term API: x<0 switches ruler off. */
 void WDPROC
 Graph_set_ruler (LPGW lpgw, int x, int y )
@@ -4870,12 +4914,12 @@ Graph_set_ruler (LPGW lpgw, int x, int y )
  *	1, 2: at corners of zoom box with \r separating text
  */
 void WDPROC
-Graph_put_tmptext (LPGW lpgw, int where, LPCSTR text )
+Graph_put_tmptext(LPGW lpgw, int where, LPCSTR text)
 {
-    /* Position of the annotation string (mouse movement) or zoom box
-     * text or whatever temporary text added...
-     */
-    switch (where) {
+	/* Position of the annotation string (mouse movement) or zoom box
+	* text or whatever temporary text added...
+	*/
+	switch (where) {
 	case 0:
 		UpdateStatusLine(lpgw, text);
 		break;
@@ -4902,7 +4946,7 @@ Graph_put_tmptext (LPGW lpgw, int where, LPCSTR text )
 
 
 void WDPROC
-Graph_set_clipboard (LPGW lpgw, LPCSTR s)
+Graph_set_clipboard(LPGW lpgw, LPCSTR s)
 {
 	size_t length;
 	HGLOBAL memHandle;
@@ -5079,7 +5123,7 @@ GraphModifyPlots(LPGW lpgw, unsigned int ops)
 
 		lpgw->buffervalid = FALSE;
 		GetClientRect(lpgw->hWndGraph, &rect);
-		InvalidateRect(lpgw->hWndGraph, (LPRECT) &rect, 1);
+		InvalidateRect(lpgw->hWndGraph, &rect, 1);
 		UpdateToolbar(lpgw);
 		UpdateWindow(lpgw->hWndGraph);
 	}
@@ -5091,7 +5135,7 @@ GraphModifyPlots(LPGW lpgw, unsigned int ops)
 /* Draw the ruler.
  */
 static void
-DrawRuler (LPGW lpgw)
+DrawRuler(LPGW lpgw)
 {
 	HDC hdc;
 	int iOldRop;
@@ -5116,10 +5160,11 @@ DrawRuler (LPGW lpgw)
 	ReleaseDC(lpgw->hWndGraph, hdc);
 }
 
+
 /* Draw the ruler line to cursor position.
  */
 static void
-DrawRulerLineTo (LPGW lpgw)
+DrawRulerLineTo(LPGW lpgw)
 {
 	HDC hdc;
 	int iOldRop;
@@ -5144,10 +5189,11 @@ DrawRulerLineTo (LPGW lpgw)
 	ReleaseDC(lpgw->hWndGraph, hdc);
 }
 
+
 /* Draw the zoom box.
  */
 static void
-DrawZoomBox (LPGW lpgw)
+DrawZoomBox(LPGW lpgw)
 {
 	HDC hdc;
 	long fx, fy, tx, ty, text_y;
@@ -5192,7 +5238,7 @@ DrawZoomBox (LPGW lpgw)
 		if (separator) {
 			Draw_XOR_Text(lpgw, zoombox.text2, separator - zoombox.text2, tx, ty);
 			Draw_XOR_Text(lpgw, separator + 1, strlen(separator + 1), tx, ty + text_y);
-		} else  {
+		} else {
 			Draw_XOR_Text(lpgw, zoombox.text2, strlen(zoombox.text2), tx, ty + lpgw->vchar / 2);
 		}
 	}

@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.16.2.12 2016/10/16 05:31:02 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.16.2.13 2017/02/25 14:56:52 markisch Exp $
  */
 
 /*
@@ -375,7 +375,7 @@ SetFont_gdiplus(Graphics &graphics, LPRECT rect, LPGW lpgw, char * fontname, int
 	int fontHeight;
 	if (fontFamily->GetLastStatus() != Ok) {
 		delete fontFamily;
-#if defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR)
+#if (!defined(__MINGW32__) || defined(__MINGW64_VERSION_MAJOR))
 		// MinGW 4.8.1 does not have this
 		fontFamily = FontFamily::GenericSansSerif();
 #else
@@ -384,12 +384,18 @@ SetFont_gdiplus(Graphics &graphics, LPRECT rect, LPGW lpgw, char * fontname, int
 		free(family);
 #endif
 		font = new Font(fontFamily, size * lpgw->sampling, fontStyle, UnitPoint);
-		fontHeight = font->GetSize() / fontFamily->GetEmHeight(fontStyle) * graphics.GetDpiY() / 72. *
-			(fontFamily->GetCellAscent(fontStyle) + fontFamily->GetCellDescent(fontStyle));
+		double scale = font->GetSize() / fontFamily->GetEmHeight(fontStyle) * graphics.GetDpiY() / 72.;
+		/* store text metrics for later use */
+		lpgw->tmHeight = fontHeight = scale * (fontFamily->GetCellAscent(fontStyle) + fontFamily->GetCellDescent(fontStyle));
+		lpgw->tmAscent = scale * fontFamily->GetCellAscent(fontStyle);
+		lpgw->tmDescent = scale * fontFamily->GetCellDescent(fontStyle);
 	} else {
 		font = new Font(fontFamily, size * lpgw->sampling, fontStyle, UnitPoint);
-		fontHeight = font->GetSize() / fontFamily->GetEmHeight(fontStyle) * graphics.GetDpiY() / 72. *
-			(fontFamily->GetCellAscent(fontStyle) + fontFamily->GetCellDescent(fontStyle));
+		double scale = font->GetSize() / fontFamily->GetEmHeight(fontStyle) * graphics.GetDpiY() / 72.;
+		/* store text metrics for later use */
+		lpgw->tmHeight = fontHeight = scale * (fontFamily->GetCellAscent(fontStyle) + fontFamily->GetCellDescent(fontStyle));
+		lpgw->tmAscent = scale * fontFamily->GetCellAscent(fontStyle);
+		lpgw->tmDescent = scale * fontFamily->GetCellDescent(fontStyle);
 		delete fontFamily;
 	}
 
@@ -397,7 +403,9 @@ SetFont_gdiplus(Graphics &graphics, LPRECT rect, LPGW lpgw, char * fontname, int
 	graphics.MeasureString(L"0123456789", -1, font, PointF(0, 0), StringFormat::GenericTypographic(), &box);
 	// lpgw->vchar = MulDiv(box.Height, lpgw->ymax, rect->bottom - rect->top);
 	lpgw->vchar = MulDiv(fontHeight, lpgw->ymax, rect->bottom - rect->top);
-	lpgw->hchar = MulDiv(box.Width, lpgw->xmax, 10 * (rect->right - rect->left));
+	//lpgw->hchar = MulDiv(box.Width, lpgw->xmax, 10 * (rect->right - rect->left));
+	lpgw->hchar = MulDiv(unsigned(ceil(box.Width)), lpgw->xmax, 10 * (rect->right - rect->left));
+	lpgw->hchar = unsigned(box.Width * lpgw->xmax / 10 / (rect->right - rect->left) + 0.5);
 	lpgw->rotate = TRUE;
 	lpgw->htic = MulDiv(lpgw->hchar, 2, 5);
 	unsigned cy = MulDiv(box.Width, 2 * graphics.GetDpiY(), 50 * graphics.GetDpiX());
@@ -616,13 +624,13 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 
 	while (ngwop < lpgw->nGWOP) {
 		/* transform the coordinates */
-		xdash = MulDiv(curptr->x, rr-rl-1, lpgw->xmax) + rl;
-		ydash = MulDiv(curptr->y, rt-rb+1, lpgw->ymax) + rb - 1;
+		xdash = MulDiv(curptr->x, rr - rl, lpgw->xmax) + rl;
+		ydash = MulDiv(curptr->y, rt - rb, lpgw->ymax) + rb - 1;
 
 		/* ignore superfluous moves - see bug #1523 */
 		/* FIXME: we should do this in win.trm, not here */
 		if ((lastop == W_vect) && (curptr->op == W_move) && (xdash == ppt[polyi -1].x) && (ydash == ppt[polyi -1].y)) {
-		    curptr->op = 0;
+			curptr->op = 0;
 		}
 
 		/* finish last polygon / polyline */
@@ -867,17 +875,24 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 						graphics.DrawString(textw, -1, font, PointF(0,0), &stringFormat, &solid_brush);
 						graphics.ResetTransform();
 					}
+					// only need to measure the string when boxing or drawing a key text
 					RectF size;
 					int dxl, dxr;
-					graphics.MeasureString(textw, -1, font, PointF(0,0), &size);
-					if (lpgw->justify == LEFT) {
-						dxl = 0;
-						dxr = size.Width;
-					} else if (lpgw->justify == CENTRE) {
-						dxl = dxr = size.Width / 2;
-					} else {
-						dxl = size.Width;
-						dxr = 0;
+#ifndef EAM_BOXED_TEXT
+					if (keysample) {
+#else
+					if (keysample || boxedtext.boxing) {
+#endif
+						graphics.MeasureString(textw, -1, font, PointF(0,0), StringFormat::GenericTypographic(), &size);
+						if (lpgw->justify == LEFT) {
+							dxl = 0;
+							dxr = size.Width;
+						} else if (lpgw->justify == CENTRE) {
+							dxl = dxr = size.Width / 2;
+						} else {
+							dxl = size.Width;
+							dxr = 0;
+						}
 					}
 					if (keysample) {
 						draw_update_keybox(lpgw, plotno, xdash - dxl, ydash - size.Height / 2);
@@ -924,6 +939,7 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 
 				draw_enhanced_text(lpgw, hdc, rect, xdash, ydash, str);
 				draw_get_enhanced_text_extend(&extend);
+
 				if (keysample) {
 					draw_update_keybox(lpgw, plotno, xdash - extend.left, ydash - extend.top);
 					draw_update_keybox(lpgw, plotno, xdash + extend.right, ydash + extend.bottom);
