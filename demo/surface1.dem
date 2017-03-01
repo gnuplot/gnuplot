@@ -1,5 +1,5 @@
 #
-# $Id: surface1.dem,v 1.13 2013/10/18 18:22:11 sfeam Exp $
+# $Id: surface1.dem,v 1.14 2016/11/14 19:59:23 sfeam Exp $
 #
 set title "3D surface from a grid (matrix) of Z values"
 set xrange [-0.5:4.5]
@@ -40,9 +40,9 @@ unset label
 set grid
 splot x**2+y**2, x**2-y**2
 pause -1 "Hit return to continue (2)"
-rep x*y
+splot x**2+y**2, x**2-y**2, x*y
 pause -1 "Hit return to continue (3)"
-rep (x**3+y**3)/10
+splot x**2+y**2, x**2-y**2, x*y, (x**3+y**3)/10
 pause -1 "Hit return to continue (4)"
 set ticslevel 0.0
 set title "3D gnuplot demo ( ticslevel = 0.0 )"

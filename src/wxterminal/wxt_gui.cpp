@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.166 2016/11/15 08:16:12 markisch Exp $
+ * $Id: wxt_gui.cpp,v 1.167 2017/02/27 17:27:06 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -2136,12 +2136,6 @@ void wxt_graphics()
 	/* clear the command list, and free the allocated memory */
 	wxt_current_panel->ClearCommandlist();
 
-	/* Don't reset the hide_plot flags if this refresh is a zoom/unzoom */
-	if (wxt_zoom_command)
-		wxt_zoom_command = FALSE;
-	else
-		wxt_initialize_hidden(0);
-
 	/* Clear the count of hypertext anchor points */
 	wxt_n_anchors = 0;
 
@@ -2908,6 +2902,9 @@ void wxt_modify_plots(unsigned int ops, int plotno)
 	}
 	wxt_MutexGuiEnter();
 	wxt_current_panel->wxt_cairo_refresh();
+	// Empirically, without this Update() the plots are toggled correctly but the 
+	// change may not show on the screen until a mouse or other event next arrives
+	wxt_current_panel->Update();
 	wxt_MutexGuiLeave();
 }
 
