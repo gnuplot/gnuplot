@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.167 2017/02/27 17:27:06 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.168 2017/03/01 18:42:50 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -135,7 +135,6 @@ extern "C" {
 static int wxt_cur_plotno = 0;
 static TBOOLEAN wxt_in_key_sample = FALSE;
 static TBOOLEAN wxt_in_plot = FALSE;
-static TBOOLEAN wxt_zoom_command = FALSE;
 #ifdef USE_MOUSE
 typedef struct {
 	unsigned int left;
@@ -2683,7 +2682,6 @@ void wxt_layer(t_termlayer layer)
 	/* operations in the plot itself.  These are buffered for later	*/
 	/* execution in sequential order.				*/
 	if (layer == TERM_LAYER_BEFORE_ZOOM) {
-		wxt_zoom_command = TRUE;
 		return;
 	}
 	if (layer == TERM_LAYER_RESET || layer == TERM_LAYER_RESET_PLOTNO) {
