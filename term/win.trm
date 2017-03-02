@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.126.2.5 2014/12/08 19:23:58 markisch Exp $
+ * $Id: win.trm,v 1.126.2.6 2014/12/18 14:57:26 broeker Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -479,10 +479,10 @@ WIN_update_options()
 
 	if (graphwin->Canvas.x != 0)
 		sprintf(&(term_options[strlen(term_options)]),
-			" size %i,%i", graphwin->Canvas.x, graphwin->Canvas.y);
+			" size %li,%li", graphwin->Canvas.x, graphwin->Canvas.y);
 	else if (graphwin->Size.x != CW_USEDEFAULT)
 		sprintf(&(term_options[strlen(term_options)]),
-			" wsize %i,%i", graphwin->Size.x, graphwin->Size.y);
+			" wsize %li,%li", graphwin->Size.x, graphwin->Size.y);
 }
 
 
@@ -510,7 +510,7 @@ WIN_reset()
 TERM_PUBLIC void
 WIN_text()
 {
-    GraphEnd(graphwin);
+	GraphEnd(graphwin);
 }
 
 
@@ -906,7 +906,7 @@ TERM_PUBLIC void
 WIN_layer(t_termlayer syncpoint)
 {
 	/* ignore LAYER_RESET in multiplot mode */
-    if (((syncpoint == TERM_LAYER_RESET) ||
+	if (((syncpoint == TERM_LAYER_RESET) ||
 	     (syncpoint == TERM_LAYER_RESET_PLOTNO)) &&
 		multiplot)
 				return;
@@ -953,7 +953,7 @@ TERM_TABLE_START(win_driver)
     WIN_justify_text, WIN_point, do_arrow, WIN_set_font,
     WIN_set_pointsize,
     TERM_CAN_MULTIPLOT|TERM_NO_OUTPUTFILE|TERM_ALPHA_CHANNEL|TERM_CAN_DASH
-        |TERM_LINEWIDTH|TERM_FONTSCALE | TERM_ENHANCED_TEXT,
+        |TERM_LINEWIDTH|TERM_FONTSCALE|TERM_ENHANCED_TEXT,
     WIN_text /* suspend */ , WIN_resume,
     WIN_boxfill, WIN_linewidth,
 #ifdef USE_MOUSE
@@ -971,11 +971,11 @@ TERM_TABLE_START(win_driver)
     WIN_layer,
     0, /* no term->path */
     0.0, /* Scale (unused) */
-    WIN_hypertext
+    WIN_hypertext,
 #ifdef EAM_BOXED_TEXT
-    , WIN_boxed_text
+    WIN_boxed_text,
 #endif
-    , WIN_modify_plots, WIN_dashtype
+    WIN_modify_plots, WIN_dashtype
 TERM_TABLE_END(win_driver)
 
 #undef LAST_TERM
@@ -1210,13 +1210,13 @@ START_HELP(windows)
 "       [WGNUPLOT]",
 "       TextOrigin=0 0",
 "       TextSize=640 150",
-"       TextFont=Terminal,9",
+"       TextFont=Consolas,9",
 "       TextWrap=1",
 "       TextLines=400",
 "       SysColors=0",
 "       GraphOrigin=0 150",
 "       GraphSize=640 330",
-"       GraphFont=Arial,10",
+"       GraphFont=Tahoma,10",
 "       GraphColor=1",
 "       GraphToTop=1",
 "       GraphDoublebuffer=1",

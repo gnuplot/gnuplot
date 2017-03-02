@@ -1,3 +1,21 @@
+2017-03-02  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/msvc/Makefile:  Support building 32 and 64 bit variants.
+	Include Manifest files. HTML help compiler is located in 32 bit program
+	folder.  
+
+	* config/msvc/Makefile (#QTDIR, TOP, MOC, UIC, RCC, S, W, WX, Q)
+	(T, D, M, {$(S)}.c.obj, {$(S)}.c.cobj, $(HELPFILE), doc2html.exe)
+	($(M)bf_test.exe, demo_plugin.dll): Reduce slightly excessive use
+	of double backslashes. Changes by Hans-Bernhard Broeker.
+
+	* config/mingw/Makefile:  Enforce calling the lua executable instead
+	of the lua wrapper script of Mingw64.
+
+	* src/win/wgdiplus.cpp src/win/wgnuplib.h src/win/wtext.c
+	src/wixterminal/wxt_gui.cpp term/caca.trm term/win.trm:  Eliminate a few
+	compiler warnings.
+
 2017-03-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (plot_command splot_command) src/gplt_x11.c

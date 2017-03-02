@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.51.2.3 2016/10/15 09:41:17 markisch Exp $
+ * $Id: wtext.c,v 1.51.2.4 2016/10/15 18:29:29 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -695,6 +695,9 @@ DoLine(LPTW lptw, HDC hdc, int xpos, int ypos, int x, int y, int count)
     char *outp;
     LPLB lb;
 
+    /* silence compiler warning */
+    (void) num;
+
     idx = 0;
     num = count;
     if (y <= sb_length(&(lptw->ScreenBuffer))) {
@@ -722,7 +725,6 @@ DoLine(LPTW lptw, HDC hdc, int xpos, int ypos, int x, int y, int count)
     free(outp);
 #else
     while (num > 0) {
-	num = 0;
 	attr = *pa;
 	while ((num > 0) && (attr == *pa)) {
 	    /* skip over bytes with same attribute */
@@ -742,7 +744,7 @@ DoLine(LPTW lptw, HDC hdc, int xpos, int ypos, int x, int y, int count)
 	free(outp);
 
 	xpos += lptw->CharSize.x * (count - num - idx);
-	idx = count-num;
+	idx = count - num;
     }
 #endif
 }
@@ -1949,7 +1951,7 @@ TextGetCh(LPTW lptw)
     int ch;
 
     TextStartEditing(lptw);
-	while (!TextKBHit(lptw)) {
+    while (!TextKBHit(lptw)) {
 	/* CMW: can't use TextMessage here as it does not idle properly */
 	MSG msg;
 	GetMessage(&msg, 0, 0, 0);
@@ -1957,11 +1959,11 @@ TextGetCh(LPTW lptw)
 	DispatchMessage(&msg);
     }
     ch = *lptw->KeyBufOut++;
-    if (ch=='\r')
+    if (ch == '\r')
 	ch = '\n';
     if (lptw->KeyBufOut - lptw->KeyBuf >= lptw->KeyBufSize)
 	lptw->KeyBufOut = lptw->KeyBuf;	/* wrap around */
-	TextStopEditing(lptw);
+    TextStopEditing(lptw);
     return ch;
 }
 
@@ -1982,12 +1984,12 @@ TextGetS(LPTW lptw, LPSTR str, unsigned int size)
 {
     LPSTR next = str;
 
-    while (--size>0) {
-	switch(*next = TextGetChE(lptw)) {
+    while (--size > 0) {
+	switch (*next = TextGetChE(lptw)) {
 	case EOF:
 	    *next = 0;
 	    if (next == str)
-		return (LPSTR) NULL;
+		return NULL;
 	    return str;
 	case '\n':
 	    *(next+1) = 0;
@@ -2010,7 +2012,7 @@ int WDPROC
 TextPutS(LPTW lptw, LPSTR str)
 {
     TextPutStr(lptw, str);
-    return str[_fstrlen(str)-1];
+    return str[strlen(str) - 1];
 }
 
 

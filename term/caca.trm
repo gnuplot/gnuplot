@@ -1,7 +1,7 @@
 /*
  * GNUPLOT - caca.trm
  *
- * $Id: caca.trm,v 1.6.2.3 2015/05/18 23:33:06 sfeam Exp $
+ * $Id: caca.trm,v 1.6.2.4 2016/03/22 16:48:34 markisch Exp $
  *
  * This file uses UTF8 encoding and a tab size of 4.
  *
@@ -2017,8 +2017,8 @@ CACA_waitforinput(int options)
 {
 	TBOOLEAN loop = TRUE;
 
-    /* Not implemented: hotkeys during non-interactive input */
-    if (options == TERM_ONLY_CHECK_MOUSING)
+	/* Not implemented: hotkeys during non-interactive input */
+	if (options == TERM_ONLY_CHECK_MOUSING)
 		return NUL;
 
 	/* Redundant check since normally term->waitforinput should be NULL in
@@ -2877,7 +2877,10 @@ CACA_draw_line(caca_canvas_t *cv, int x1, int y1, int x2, int y2, uint32_t ch)
 {
     int dx, dy;
     int xinc, yinc;
-	TBOOLEAN first = TRUE;
+    TBOOLEAN first = TRUE;
+
+    /* silence compiler warning */
+    (void) first;
 
     dx = abs(x2 - x1);
     dy = abs(y2 - y1);
@@ -3083,11 +3086,11 @@ CACA_internal_draw_box(caca_canvas_t *cv, int x, int y, int w, int h,
     int x2 = x + w - 1;
     int y2 = y + h - 1;
 
-	uint32_t attr_bg = caca_get_attr(cv, x, y);
-	uint32_t attr_fg = caca_get_attr(cv, -1, -1);
-	caca_set_attr(cv,
-				(attr_fg & 0x0003ffff) | /* new foreground color (18 bits) */
-				(attr_bg & 0xfffc0000)); /* keep current background color (14 bit) */
+    uint32_t attr_bg = caca_get_attr(cv, x, y);
+    uint32_t attr_fg = caca_get_attr(cv, -1, -1);
+    caca_set_attr(cv,
+                  (attr_fg & 0x0003ffff) | /* new foreground color (18 bits) */
+                  (attr_bg & 0xfffc0000)); /* keep current background color (14 bit) */
 
     if(x > x2)
     {
