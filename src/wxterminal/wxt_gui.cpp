@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.128.2.28 2016/10/13 23:16:54 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.128.2.29 2017/02/27 17:33:06 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -134,7 +134,6 @@ extern "C" {
 static int wxt_cur_plotno = 0;
 static TBOOLEAN wxt_in_key_sample = FALSE;
 static TBOOLEAN wxt_in_plot = FALSE;
-static TBOOLEAN wxt_zoom_command = FALSE;
 #ifdef USE_MOUSE
 typedef struct {
 	unsigned int left;
@@ -2034,12 +2033,6 @@ void wxt_graphics()
 	/* clear the command list, and free the allocated memory */
 	wxt_current_panel->ClearCommandlist();
 
-	/* Don't reset the hide_plot flags if this refresh is a zoom/unzoom */
-	if (wxt_zoom_command)
-		wxt_zoom_command = FALSE;
-	else
-		wxt_initialize_hidden(0);
-
 	/* Clear the count of hypertext anchor points */
 	wxt_n_anchors = 0;
 
@@ -2587,7 +2580,6 @@ void wxt_layer(t_termlayer layer)
 	/* operations in the plot itself.  These are buffered for later	*/
 	/* execution in sequential order.				*/
 	if (layer == TERM_LAYER_BEFORE_ZOOM) {
-		wxt_zoom_command = TRUE;
 		return;
 	}
 	if (layer == TERM_LAYER_RESET || layer == TERM_LAYER_RESET_PLOTNO) {
@@ -2806,6 +2798,9 @@ void wxt_modify_plots(unsigned int ops, int plotno)
 	}
 	wxt_MutexGuiEnter();
 	wxt_current_panel->wxt_cairo_refresh();
+	// Empirically, without this Update() the plots are toggled correctly but the 
+	// change may not show on the screen until a mouse or other event next arrives
+	wxt_current_panel->Update();
 	wxt_MutexGuiLeave();
 }
 

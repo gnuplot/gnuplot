@@ -10,6 +10,7 @@ Changes in 5.0.6
 * CHANGE - do not allow inverted R axis (requires support not backported from 5.1)
 * CHANGE - allow pointinterval property in 'with lp' for splot as well as for plot
 * CHANGE - "linewidth <lw>" is accepted as a terminal option for aquaterm, qt, wxt
+* CHANGE - spline segments outside xrange are ignored rather than treated as errors
 * FIX assignment of x/y dimensions in "binary record=(a,b) ... with image"
 * FIX wxt - multithreaded wxt was faulting during resize (mutex lock failure)
 * FIX windows - timed pause only worked for intervals < 1 second
@@ -23,6 +24,7 @@ Changes in 5.0.6
 * FIX initialization of hidden3d structures for splot with dots
 * FIX track arrowhead properties in hidden3d mode
 * FIX tracking of NaN values from function evaluated during binary data input
+* FIX 3D rotation does not clobber hidden/visible status of plots
 
 Changes in 5.0.5
 ================

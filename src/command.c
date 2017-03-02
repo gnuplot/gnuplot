@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.292.2.13 2016/08/19 16:14:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.292.2.14 2016/10/15 09:16:07 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1586,6 +1586,9 @@ plot_command()
     add_udv_by_name("MOUSE_CTRL")->udv_undef = TRUE;
 #endif
     plotrequest();
+    /* Clear "hidden" flag for any plots that may have been toggled off */
+    if (term->modify_plots)
+	term->modify_plots(MODPLOTS_SET_VISIBLE, -1);
     SET_CURSOR_ARROW;
 }
 
@@ -1976,6 +1979,9 @@ splot_command()
     add_udv_by_name("MOUSE_BUTTON")->udv_undef = TRUE;
 #endif
     plot3drequest();
+    /* Clear "hidden" flag for any plots that may have been toggled off */
+    if (term->modify_plots)
+	term->modify_plots(MODPLOTS_SET_VISIBLE, -1);
     SET_CURSOR_ARROW;
 }
 

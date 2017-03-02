@@ -1,3 +1,15 @@
+2017-03-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c (plot_command splot_command) src/gplt_x11.c
+	src/qtterminal/QtGnuplotScene.cpp src/wxterminal/wxt_gui.cpp:
+
+	The toggle status of all plots (plot visible or hidden) was being reset
+	in the terminal driver on every clear() event.  This caused the toggle
+	state to be lost when the plot was rotated/panned and on refresh/replot.
+	Now we do away with the automatic reset in the terminal drivers.
+	Instead we send term->modify_plots(MODPLOTS_SET_VISIBLE, -1) as part of
+	the plot and splot commands.
+
 2017-02-28  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c src/win/wgdiplus.cpp:  Positioning of rotated text

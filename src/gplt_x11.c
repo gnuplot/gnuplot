@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.246.2.3 2014/12/15 04:24:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.246.2.4 2017/02/03 22:41:17 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -248,7 +248,6 @@ typedef struct {
 } x11BoundingBox;
 static TBOOLEAN x11_in_key_sample = FALSE;
 static TBOOLEAN x11_in_plot = FALSE;
-static TBOOLEAN retain_toggle_state = FALSE;
 static int x11_cur_plotno = 0;
 
 /* information about one window/plot */
@@ -1489,7 +1488,6 @@ record()
 		switch(layer)
 		{
 		case TERM_LAYER_BEFORE_ZOOM:
-		    retain_toggle_state = TRUE;
 		    break;
 		default:
 		    if (plot)
@@ -1865,7 +1863,6 @@ record()
 		    }
 		}
 
-		retain_toggle_state = TRUE;
 		display(plot);
 	    }
 	    return 1;
@@ -3557,12 +3554,6 @@ display(plot_struct *plot)
     x11_in_key_sample = FALSE;
     x11_initialize_key_boxes(plot, 0);
 
-    /* Maintain on/off toggle state when zooming */
-    if (retain_toggle_state)
-	retain_toggle_state = FALSE;
-    else
-	x11_initialize_hidden(plot, 0);
-
     /* loop over accumulated commands from inboard driver */
     for (n = 0; n < plot->ncommands; n++) {
 	exec_cmd(plot, plot->commands[n]);
@@ -5068,7 +5059,6 @@ process_event(XEvent *event)
 	/* Note: we can toggle even if the plot is not in the active window */
 	if (event->xbutton.button == 1) {
 	    if (x11_check_for_toggle(plot, event->xbutton.x, event->xbutton.y)) {
-		retain_toggle_state = TRUE;
 		display(plot);
 	    }
 	}

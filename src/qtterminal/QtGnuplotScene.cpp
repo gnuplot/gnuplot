@@ -186,7 +186,6 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 	if (type == GEClear)
 	{
 		resetItems();
-		m_preserve_visibility = false;
 	}
 	else if (type == GELineWidth)
 	{
@@ -873,6 +872,7 @@ void QtGnuplotScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 				    m_plot_group[i]->setVisible(true);
 				    m_key_boxes[i].setHidden(false);
 			    }
+			    m_preserve_visibility = true;
 			    break;
 		    }
 	    }
