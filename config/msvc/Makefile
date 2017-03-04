@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.24 2014/08/15 19:25:13 sfeam Exp $
+# $Id: Makefile,v 1.25 2014/08/18 03:49:06 sfeam Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -49,9 +49,9 @@ PDFLIB = 0
 #     http://wiki.wxwidgets.org/Visual_Studio_2008_%289.0%29
 WXT = 0
 # Build Cairo Terminals (cairolatex, epslatex, pdflatex)
-CAIRO = 1
+CAIRO = 0
 # Build qt terminal?
-QT = 0
+QT = 1
 # Set to one if you have Qt5 (instead of Qt4)
 QT5 = 1
 # Build the lua/tikz terminal?
@@ -69,18 +69,21 @@ DEBUG = 0
 #GDDIR = gdwin32
 #LUADIR = lua
 PDFDIR = pdflib
-#QTDIR = C:\\Qt\\4.8.4
-QTDIR = d:\Source\Qt-5.2.1\5.2.1\msvc2012
+#QTDIR = C:\Qt\4.8.4
+!IF "$(PLATFORM)" == "X64"
+QTDIR = c:\Qt\5.8\msvc2015_64
+!ELSE
+QTDIR = c:\Qt\5.8\msvc2015_32
+!ENDIF
 #CAIRODIR = cairo-pango
 #CACADIR = libcaca
 CAIRODIR = d:\msvc-libs
 LIBDIR =  d:\msvc-libs
 
-
 # installation directory
 DESTDIR = "$(PROGRAMFILES)\gnuplot"
 
-TOP = ..\\..
+TOP = ..\..
 
 # directory for PostScript prolog and associated files
 GNUPLOT_PS_DIR = share\\PostScript
@@ -189,9 +192,9 @@ QTLIBS = QtCore4.lib QtGui4.lib QtNetwork4.lib QtSvg4.lib
 CFLAGS = $(CFLAGS) /I$(QTDIR)\include /I$(QTDIR)\include\QtCore /I$(QTDIR)\include\QtGui /I$(QTDIR)\include\QtWidgets /I$(QTDIR)\include\QtNetwork /I$(QTDIR)\include\QtSvg /DQTGNUPLOT_DATA_DIR=\"$(GNUPLOT_QT_DIR)\"
 LDFLAGS = $(LDFLAGS) /libpath:$(QTDIR)\lib
 CFLAGS = $(CFLAGS) -DQTTERM -DQT_NO_OPENGL
-MOC=$(QTDIR)\\bin\\moc
-UIC=$(QTDIR)\\bin\\uic
-RCC=$(QTDIR)\\bin\\rcc
+MOC=$(QTDIR)\bin\moc
+UIC=$(QTDIR)\bin\uic
+RCC=$(QTDIR)\bin\rcc
 EXTRA_TARGETS = $(EXTRA_TARGETS) gnuplot_qt.exe
 !ENDIF
 
@@ -215,28 +218,38 @@ CACALIBS = libcaca.lib
 !ENDIF
 
 HELPFILE = wgnuplot.chm
-HHWPATH=$(PROGRAMFILES)\HTML Help Workshop\\
+!IF "$(PLATFORM)" == "X64"
+HHC=""%%PROGRAMFILES(X86)%%\HTML Help Workshop\hhc""
+!ELSE
+HHC="$(PROGRAMFILES)\HTML Help Workshop\hhc"
+!ENDIF
 
 !IF "$(PROCESSOR_ARCHITECTURE)" == "ALPHA"
 MACHINE = $(PROCESSOR_ARCHITECTURE)
 !ELSE
+!IF "$(PLATFORM)" == "X64"
+MACHINE = X64
+MANIFEST = wgnuplot.exe.manifest64
+!ELSE
 MACHINE = IX86
+MANIFEST = wgnuplot.exe.manifest
+!ENDIF
 !ENDIF
 
 # macros for makefile.all
 
 O=obj
-S=$(TOP)\\src
-W=$(S)\\win\\
-WX=$(S)\\wxterminal\\
-Q=$(S)\\qtterminal\\
-T=$(TOP)\\term\\
-D=$(TOP)\\docs\\
-M=$(TOP)\\demo\\
+S=$(TOP)\src
+W=$(S)\win\\
+WX=$(S)\wxterminal\\
+Q=$(S)\qtterminal\\
+T=$(TOP)\term\\
+D=$(TOP)\docs\\
+M=$(TOP)\demo\\
 
 default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe gnuplot.exe demo_plugin.dll $(EXTRA_TARGETS)
 
-!INCLUDE $(S)\\makefile.all
+!INCLUDE $(S)\makefile.all
 
 OBJS = $(COREOBJS) version.obj
 
@@ -278,7 +291,7 @@ moc_QtGnuplotEvent.cpp: $(Q)QtGnuplotEvent.h
 	$(MOC) -o $@ $**
 
 gnuplot_qt.exe: ui_QtGnuplotSettings.h $(GNUPLOTQTOBJS)
-	$(LD) /entry:mainCRTStartup /subsystem:windows $(LDFLAGS) /map:gnuplot_qt.map /out:$@ $(GNUPLOTQTOBJS) $(QTLIBS) shell32.lib
+	$(LD) /entry:mainCRTStartup /subsystem:windows $(LDFLAGS) /map:gnuplot_qt.map /out:$@ $(GNUPLOTQTOBJS) $(QTLIBS) shell32.lib user32.lib
 !ENDIF
 
 WINOBJS = winmain.obj wgnuplib.obj wgraph.obj wprinter.obj wtext.obj \
@@ -296,10 +309,10 @@ ALL_CONSOLE_OBJS = $(OBJS:.obj=.cobj) $(WINOBJS:.obj=.cobj)
 	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $*.cpp /Fo$@
 
 {$(S)}.c.obj:
-	$(CC) /c $(CFLAGS) $(WIN_CFLAGS) $(S)\\$*.c
+	$(CC) /c $(CFLAGS) $(WIN_CFLAGS) $(S)\$*.c
 
 {$(S)}.c.cobj:
-	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $(S)\\$*.c /Fo$@
+	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $(S)\$*.c /Fo$@
 
 {$(W)}.c.obj:
 	$(CC) /c $(CFLAGS) $(WIN_CFLAGS) $(W)$*.c /Fo$@
@@ -444,9 +457,9 @@ wgnuplot.res :  $(W)wgnuplot.rc $(W)wgnuplib.rc $(W)wresourc.h $(W)grpicon.ico $
 $(HELPFILE): doc2html.exe $(D)gnuplot.doc gnuplot.exe
 	doc2html $(D)gnuplot.doc $(D)windows\\
 	cd $(D)
-	-"..\\config\\msvc\\gnuplot" -e "winhelp=1" plotstyles.gnu
-	-"$(HHWPATH)hhc" windows\wgnuplot.hhp
-	cd ..\\config\\msvc
+	-"..\config\msvc\gnuplot" -e "winhelp=1" plotstyles.gnu
+	-$(HHC) windows\wgnuplot.hhp
+	cd ..\config\msvc
 	if exist $(D)windows\wgnuplot.chm copy $(D)windows\wgnuplot.chm .
 
 doc2html.exe: $(D)windows\doc2html.c $(D)termdoc.c $(D)xref.c version.obj $(CORETERM)
@@ -455,14 +468,14 @@ doc2html.exe: $(D)windows\doc2html.c $(D)termdoc.c $(D)xref.c version.obj $(CORE
 
 # make binary demo files
 # WINDOWS_NO_GUI makes sure that wtext.h does not redefine fread() etc.
-$(M)bf_test.exe : $(S)\\bf_test.c
-	$(CC) $(CFLAGS) /F 5000 /W1 /DWINDOWS_NO_GUI /Fe$(M)bf_test.exe $(S)\\bf_test.c
+$(M)bf_test.exe : $(S)\bf_test.c
+	$(CC) $(CFLAGS) /F 5000 /W1 /DWINDOWS_NO_GUI /Fe$(M)bf_test.exe $(S)\bf_test.c
 	cd $(M)
 	bf_test
-	cd ..\\config\\msvc
+	cd ..\config\msvc
 
-demo_plugin.dll: $(M)plugin\\demo_plugin.c
-	$(CC) $(CFLAGS) /LD /D_USRDLL /D_WINDLL $(M)plugin\\$*.c /link /out:$@
+demo_plugin.dll: $(M)plugin\demo_plugin.c
+	$(CC) $(CFLAGS) /LD /D_USRDLL /D_WINDLL $(M)plugin\$*.c /link /out:$@
 
 # clean up temporary files
 clean:
