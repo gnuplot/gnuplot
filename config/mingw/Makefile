@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.48.2.12 2017/02/25 14:29:26 markisch Exp $
+# $Id: Makefile,v 1.48.2.13 2017/02/25 14:32:07 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 # This assumes a typical installation of the MinGW toolkit, the free
@@ -781,7 +781,7 @@ config.h: $(TOP)/config/config.mgw
 # generate LUA TeX support files and terminal help
 ifdef LUA
 gnuplot-lua-tikz.sty: $(T)/lua/gnuplot-tikz.lua
-	$(LUA) $< style
+	$(LUA).exe $< style
 
 $(LUA_HELP): $(T)/lua/gnuplot-tikz.lua
 	$(LUA).exe $< termhelp > $@
