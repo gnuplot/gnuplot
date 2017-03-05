@@ -1,3 +1,10 @@
+2017-03-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (get_data):  Defer initialization of parallel plot data
+	structures so that it catches both "set style data parallel" and 
+	"with parallel".  Example failure case:
+	set style data parallel; plot 'silver.dat' using 1:2:3 lc var
+
 2017-03-02  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/msvc/Makefile:  Support building 32 and 64 bit variants.
@@ -22,7 +29,7 @@
 	src/qtterminal/QtGnuplotScene.cpp src/wxterminal/wxt_gui.cpp:
 
 	The toggle status of all plots (plot visible or hidden) was being reset
-	in the terminal driver on every clear() event.  This caused the toggle
+	by some terminal drivers on every clear() event.  This caused the toggle
 	state to be lost when the plot was rotated/panned and on refresh/replot.
 	Now we do away with the automatic reset in the terminal drivers.
 	Instead we send term->modify_plots(MODPLOTS_SET_VISIBLE, -1) as part of

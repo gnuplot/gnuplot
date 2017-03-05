@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.36 2017/01/21 23:55:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.37 2017/02/19 19:47:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -753,9 +753,8 @@ get_data(struct curve_points *current_plot)
 	/* I decided the only reasonable option is to handle it separately.	*/
 	if (current_plot->plot_style == PARALLELPLOT && j > 0) {
 	    int iaxis;
-	    /* FIXME: this apparently cannot trigger.  Good or bad? */
 	    if (j != current_plot->n_par_axes)
-		fprintf(stderr,"Expecting %d input columns, got %d\n",
+		int_error(NO_CARET, "Expecting %d input columns, got %d\n",
 			current_plot->n_par_axes, j);
 	    /* Primary coordinate structure holds only x range and 1st y value.	*/
 	    /* The x range brackets the parallel axes by 0.5 on either side.	*/
@@ -2377,19 +2376,6 @@ eval_plots()
 			    int_error(c_token, "'with table' requires a previous 'set table'");
 		    }
 
-		    /* Parallel plots require allocating additional storage.		*/
-		    /* NB: This will be one column more than needed if the final column	*/
-		    /*     contains variable color information. We will free it later.	*/
-		    if (this_plot->plot_style == PARALLELPLOT) {
-			int i;
-			if (df_no_use_specs < 2)
-			    int_error(NO_CARET, "not enough 'using' columns");
-			this_plot->n_par_axes = df_no_use_specs;
-			this_plot->z_n = gp_alloc((df_no_use_specs) * sizeof(double*), "z_n");
-			for (i = 0; i < this_plot->n_par_axes; i++)
-			    this_plot->z_n[i] = gp_alloc(this_plot->p_max * sizeof(double), "z_n[i]");
-		    }
-		
 		    set_with = TRUE;
 		    continue;
 		}
@@ -2761,6 +2747,20 @@ eval_plots()
 		    this_plot->plot_type = NODATA;
 		    goto SKIPPED_EMPTY_FILE;
 		}
+
+		/* Parallel plots require allocating additional storage.		*/
+		/* NB: This will be one column more than needed if the final column	*/
+		/*     contains variable color information. We will free it later.	*/
+		if (this_plot->plot_style == PARALLELPLOT) {
+		    int i;
+		    if (df_no_use_specs < 2)
+			int_error(NO_CARET, "not enough 'using' columns");
+		    this_plot->n_par_axes = df_no_use_specs;
+		    this_plot->z_n = gp_alloc((df_no_use_specs) * sizeof(double*), "z_n");
+		    for (i = 0; i < this_plot->n_par_axes; i++)
+			this_plot->z_n[i] = gp_alloc(this_plot->p_max * sizeof(double), "z_n[i]");
+		}
+		
 		/* Reset flags to auto-scale X axis to contents of data set */
 		if (!(uses_axis[x_axis] & USES_AXIS_FOR_DATA) && X_AXIS.autoscale) {
 		    struct axis *scaling_axis;
