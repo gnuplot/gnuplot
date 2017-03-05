@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: dumb.trm,v 1.36 2016/11/27 06:39:42 markisch Exp $
+ * $Id: dumb.trm,v 1.37 2016/12/01 19:31:10 sfeam Exp $
  *
  */
 
@@ -125,13 +125,11 @@ static charcell *dumb_matrix = NULL;
 #ifndef NO_DUMB_COLOR_SUPPORT
 /* matrix of colors */
 static t_colorspec *dumb_colors = NULL;
+static t_colorspec dumb_color;
+static t_colorspec dumb_prev_color;
 #endif
 /* current character used to draw */
 static char dumb_pen;
-#ifndef NO_DUMB_COLOR_SUPPORT
-/* current color */
-static t_colorspec dumb_color;
-#endif
 /* current X position */
 static int dumb_x;
 /* current Y position */
@@ -170,6 +168,7 @@ DUMB_options()
 {
     int x, y;
     int cmd;
+    TBOOLEAN set_size = FALSE;
 
     while (!END_OF_COMMAND) {
 	switch ((cmd = lookup_table(&DUMB_opts[0], c_token))) {
@@ -221,14 +220,24 @@ DUMB_options()
 	    /* Fall through */
 	case DUMB_OTHER:
 	default:
+	    if (set_size) {
+		int_warn(c_token++,"unrecognized option");
+		break;
+	    }
 	    x = int_expression();
+	    if (x <= 0 || x > 1024)
+		x = DUMB_XMAX;
 	    if (!END_OF_COMMAND) {
 		if (equals(c_token,","))
 		    c_token++;
 		y = int_expression();
+		if (y <= 0 || y > 1024)
+		    y = DUMB_YMAX;
+fprintf(stderr,"dumb x, y = %d %d\n", x, y);
 		dumb_xmax = term->xmax = x;
 		dumb_ymax = term->ymax = y;
 	    }
+	    set_size = TRUE;
  	    break;
 	}
     }
@@ -377,10 +386,9 @@ DUMB_text()
     putc('\f', gpoutfile);
     for (y = dumb_ymax - 1; y >= 0; y--) {
 #ifndef NO_DUMB_COLOR_SUPPORT
-	t_colorspec prev_color;
 	if (dumb_colormode > 0) {
 	    fputs("\033[0;39m", gpoutfile); /* reset colors to default */
-	    memset(&prev_color, 0, sizeof(t_colorspec));
+	    memset(&dumb_prev_color, 0, sizeof(t_colorspec));
 	}
 #endif
     for (x = 0; x < dumb_xmax; x++) {
@@ -395,7 +403,7 @@ DUMB_text()
 
 		if (dumb_colormode < DUMB_ANSI)
 		    break;
-		if (prev_color.type == TC_LT && prev_color.lt == color->lt)
+		if (dumb_prev_color.type == TC_LT && dumb_prev_color.lt == color->lt)
 		    break;
 		n = color->lt + 1;
 		/* map line type to colors */
@@ -405,29 +413,29 @@ DUMB_text()
 		    if (n > 15) n = ((n - 1) % 15) + 1;
 		    fprintf(gpoutfile, "\033[%i;%im", n > 8 ? 22 : 1, 30 + (n % 8));
 		}
-		memcpy(&prev_color, color, sizeof(t_colorspec));
+		memcpy(&dumb_prev_color, color, sizeof(t_colorspec));
 		break;
 	    }
 	    case TC_FRAC: {
 		rgb255_color rgb255;
 
-		if (prev_color.type == TC_FRAC && prev_color.value == color->value)
+		if (dumb_prev_color.type == TC_FRAC && dumb_prev_color.value == color->value)
 		    break;
 		rgb255maxcolors_from_gray(color->value, &rgb255);
 		DUMB_rgb_color(rgb255);
-		memcpy(&prev_color, color, sizeof(t_colorspec));
+		memcpy(&dumb_prev_color, color, sizeof(t_colorspec));
 		break;
 	    }
 	    case TC_RGB: {
 		rgb255_color rgb255;
 
-		if (prev_color.type == TC_RGB && prev_color.lt == color->lt)
+		if (dumb_prev_color.type == TC_RGB && dumb_prev_color.lt == color->lt)
 		    break;
 		rgb255.r = (color->lt >> 16) & 0xff;
 		rgb255.g = (color->lt >>  8) & 0xff;
 		rgb255.b = (color->lt >>  0) & 0xff;
 		DUMB_rgb_color(rgb255);
-		memcpy(&prev_color, color, sizeof(t_colorspec));
+		memcpy(&dumb_prev_color, color, sizeof(t_colorspec));
 		break;
 	    }
 	    }
