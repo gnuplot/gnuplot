@@ -1,3 +1,21 @@
+2017-03-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	Deal with various corner-case failures found by fuzzing the demo set.
+
+	* src/hidden3d.c (build_networks):  A degenerate polygon can fall all 
+	the way through the classification loop, leaving the flag value -2 as
+	the polygon number which is then used as an array index.  Oops.
+
+	* term/dumb.trm (DUMB_options): Sanity check terminal size.
+
+	* src/plot2d.c (eval_plots): Dummy variable must not be an array.
+	E.g.  array t[10]; set dummy t; plot t
+
+	* src/plot2d.c (get_data):  Defer initialization of parallel plot data
+	structures so that it catches both "set style data parallel" and 
+	"with parallel".  Example failure case:
+	set style data parallel; plot 'silver.dat' using 1:2:3 lc var
+
 2017-03-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (plot_command splot_command) src/gplt_x11.c
