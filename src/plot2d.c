@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.417 2017/02/19 19:11:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.418 2017/02/19 19:47:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2134,6 +2134,9 @@ eval_plots()
 		    this_plot->sample_var = add_udv(sample_range_token);
 		else
 		    this_plot->sample_var = add_udv_by_name(c_dummy_var[0]);
+
+		if (this_plot->sample_var->udv_value.type == ARRAY)
+		    int_error(NO_CARET, "name conflict: dummy variable cannot be array");
 
 		/* Save prior value of sample variable so we can restore it later */
 		original_value_sample_var = this_plot->sample_var->udv_value;
