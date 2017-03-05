@@ -16,6 +16,10 @@
 	"with parallel".  Example failure case:
 	set style data parallel; plot 'silver.dat' using 1:2:3 lc var
 
+	* src/plot2d.c (eval_plots): Recently added stringent tests on axis
+	scaling caused "plot with table" to fail because the y axis range is
+	undefined. Skip the tests for this plot style.
+
 2017-03-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (plot_command splot_command) src/gplt_x11.c
