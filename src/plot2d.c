@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.420 2017/03/05 05:59:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.421 2017/03/07 01:05:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -3333,7 +3333,7 @@ eval_plots()
     }
 
 
-    if (this_plot->plot_style == TABLESTYLE) {
+    if (this_plot && this_plot->plot_style == TABLESTYLE) {
 	/* the y axis range has no meaning in this case */
 	;
     } else if (uses_axis[FIRST_Y_AXIS] && nonlinear(&axis_array[FIRST_Y_AXIS])) {
