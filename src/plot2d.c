@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.421 2017/03/07 01:05:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.422 2017/03/07 07:41:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -48,6 +48,7 @@ static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.421 2017/03/07 01:05:59 s
 #include "interpol.h"
 #include "misc.h"
 #include "parse.h"
+#include "pm3d.h"	/* for is_plot_with_palette */
 #include "setshow.h"
 #include "tables.h"
 #include "tabulate.h"
@@ -3371,7 +3372,8 @@ eval_plots()
      * but it caused problems if do_plot() itself was called for a refresh
      * rather than for plot/replot.  So we call it here instead.
      */
-    set_cbminmax();
+    if (is_plot_with_palette())
+	set_cbminmax();
 
     /* the following ~5 lines were moved from the end of the
      * function to here, as do_plot calles term->text, which
