@@ -1,3 +1,12 @@
+2017-03-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/QtGnuplotEvent.h: Move new enum GEPID (2017-02-25) to
+	end of enum list rather than in the middle.  Otherwise the gnuplot_qt
+	built for 5.0.6 is incompatible with gnuplot executables 5.0.0-5, which
+	makes comparison of multiple versions to debug things harder than it
+	needs to be.  If the new event is at the end, all earlier gnuplot 5.0.x
+	versions can share gnuplot_qt 5.0.6.
+
 2017-03-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (get_data):  Defer initialization of parallel plot data

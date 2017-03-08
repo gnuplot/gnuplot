@@ -52,7 +52,7 @@ enum QtGnuplotEventType {
 // Events for QtGnuplotApplication
 GESetCurrentWindow = 1000, GEInitWindow, GECloseWindow, GEExit, GEPersist,
 // Events for QtGnuplotWindow
-GEStatusText, GETitle, GESetCtrl, GESetPosition, GEPID,
+GEStatusText, GETitle, GESetCtrl, GESetPosition,
 // Events for QtGnuplotWidget
 GESetWidgetSize, GECursor,
 // Events for QtGnuplotScene
@@ -62,7 +62,8 @@ GEZoomStart, GEZoomStop, GERuler, GECopyClipboard, GEMove, GEVector, GELineTo,
 GESetFont, GEEnhancedFlush, GEEnhancedFinish, GEImage, GESetSceneSize, GERaise,
 GEWrapCursor, GEScale, GEActivate, GEDesactivate, GELayer, GEPlotNumber, GEHypertext,
 GETextBox, GEModPlots, GEAfterPlot, GEFontMetricRequest, GEDashPattern,
-GEDone
+GEDone,
+GEPID
 };
 
 enum QtGnuplotModPlots {
