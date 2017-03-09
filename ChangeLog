@@ -1,3 +1,10 @@
+2017-03-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (eval_plots):  Do not enforce cbrange validity if the
+	palette is not used by this plot.  Prevents spurious error from
+	"set log" with default cbrange.
+	Bug #1920
+
 2017-03-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/QtGnuplotEvent.h: Move new enum GEPID (2017-02-25) to
