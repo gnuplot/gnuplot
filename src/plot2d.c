@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.422 2017/03/07 07:41:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.423 2017/03/09 07:10:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -3368,10 +3368,12 @@ eval_plots()
 	    axis_array[FIRST_Y_AXIS].max = axis_array[SECOND_Y_AXIS].max;
     }
 
-    /* June 2014 - This call was in boundary(), called from do_plot()
-     * but it caused problems if do_plot() itself was called for a refresh
-     * rather than for plot/replot.  So we call it here instead.
+    /* This call was in boundary(), called from do_plot(), but it caused
+     * logscaling problems if do_plot() itself was called for refresh
+     * rather than for plot/replot.  So we moved it here (June 2014)
+     * and added palette checks (March 2017).
      */
+    set_plot_with_palette(0, MODE_PLOT);
     if (is_plot_with_palette())
 	set_cbminmax();
 
