@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1053 2017/02/24 19:51:16 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1054 2017/03/10 18:36:35 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9731,8 +9731,9 @@ Ffigure_missing
  then many points may lie exactly on top of each other.  Jittering introduces an
  offset to the coordinates of these superimposed points that spreads them into a
  cluster.  The threshold value for treating the points as being overlapped may
- be specified in  character widths or any of the usual coordinate options.
- See `coordinates`.
+ be specified in character widths or any of the usual coordinate options.
+ See `coordinates`.  Jitter affects only 2D plot styles "with points" and
+ "with impulses".
 
  The default jittering operation displaces points only along x.
  This produces a distinctive pattern sometimes called a "bee swarm plot".
@@ -12920,7 +12921,7 @@ Ffigure_multiple_keys
  normal plot style.  For example
 
       set table
-      plot <file> using 1:2:3:4:5:6:7:8:9:10 with table
+      plot <file> using 1:2:3:4:($5+$6):(func($7)):8:9:10 with table
 3 terminal
 ?commands set terminal
 ?commands show terminal

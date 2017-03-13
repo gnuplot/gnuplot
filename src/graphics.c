@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.547 2017/02/01 20:01:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.548 2017/02/14 21:49:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -971,6 +971,7 @@ recheck_ranges(struct curve_points *plot)
 
 /* plot_impulses:
  * Plot the curves in IMPULSES style
+ * Mar 2017 - Apply "set jitter" to x coordinate of impulses
  */
 
 static void
@@ -978,6 +979,12 @@ plot_impulses(struct curve_points *plot, int yaxis_x, int xaxis_y)
 {
     int i;
     int x, y;
+
+    /* Displace overlapping impulses if "set jitter" is in effect.
+     * This operation loads jitter offsets into xhigh and yhigh.
+     */
+    if (jitter.spread > 0)
+	jitter_points(plot);
 
     for (i = 0; i < plot->p_count; i++) {
 
@@ -993,6 +1000,10 @@ plot_impulses(struct curve_points *plot, int yaxis_x, int xaxis_y)
 
 	x = map_x(plot->points[i].x);
 	y = map_y(plot->points[i].y);
+
+	/* The jitter x offset is a scaled multiple of character width. */
+	if (!polar && jitter.spread > 0)
+	    x += plot->points[i].xhigh * 0.3 * term->h_char;
 
 	if (invalid_coordinate(x,y))
 	    continue;

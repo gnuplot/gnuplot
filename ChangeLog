@@ -1,3 +1,8 @@
+2017-03-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_impulses) docs/gnuplot.doc:  Apply the x offset
+	created by "set jitter" to 2D plots with impulses.
+
 2017-03-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc:  Restore EXPERIMENTAL warning to documentation for
