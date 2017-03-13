@@ -9,7 +9,7 @@ These release notes are for version 5.0 patchlevel 6 (5.0.6).
 This release contains bug-fixes, a few changes back-ported from the
 development version, and a few new features.
 
-Release Notes date: 03-Mar-2017
+Release Notes date: 13-Mar-2017
 
 This patchlevel 5.0.6 incremental release includes
 ==================================================
@@ -267,7 +267,7 @@ in addition to several platform-specific modes.
    support libraries
    To disable these terminals:
        ./configure --without-cairo
-       ./configure --with-cairo --disable-wxt
+       ./configure --with-cairo --disable-wxwidgets
 
 3) X11 (the "classic" interactive interface)
    This used to be the preferred interactive interface, but the newer
