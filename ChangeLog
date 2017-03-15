@@ -1,3 +1,10 @@
+2017-03-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	More corner-case failures found by fuzzing the demo set.
+
+	* term/dumb.trm:  terminal character grid y limit was not checked in
+	the color+utf8 case.
+
 2017-06-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm:  Normalize handling of terminal option "fontscale" to

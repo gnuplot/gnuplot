@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: dumb.trm,v 1.37 2016/12/01 19:31:10 sfeam Exp $
+ * $Id: dumb.trm,v 1.38 2017/03/05 05:55:50 sfeam Exp $
  *
  */
 
@@ -619,6 +619,9 @@ TERM_PUBLIC void
 DUMB_put_text(unsigned int x, unsigned int y, const char *str)
 {
     int i, length;
+
+    if ((unsigned int) y > dumb_ymax)
+	return;
 
     length = gp_strlen(str);
     if (x + length > dumb_xmax)
