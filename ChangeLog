@@ -8,6 +8,9 @@
 	- new option binwidth=<width>. Now you can either determine binwidth
 	  from range + nbins, or nbins from range + binwidth
 
+	* src/set.c (set_table):  The "set table <filename>" command was not
+	doing tilde expansion on filename.
+
 2017-03-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_impulses) docs/gnuplot.doc:  Apply the x offset

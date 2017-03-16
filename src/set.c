@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.554 2017/02/01 04:30:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.555 2017/02/14 21:49:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4824,6 +4824,7 @@ set_table()
 	/* 'set table "foo"' creates a new output file */
 	/* 'set table "foo" append' writes to the end of an existing output file */
 	TBOOLEAN append = FALSE;
+	gp_expand_tilde(&tablefile);
 	if (equals(c_token,"append")) {
 	    c_token++;
 	    append = TRUE;
