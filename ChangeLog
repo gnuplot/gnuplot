@@ -8,6 +8,8 @@
 	- new option binwidth=<width>. Now you can either determine binwidth
 	  from range + nbins, or nbins from range + binwidth
 
+	* src/plot2d.c src/tables.c:  "smooth bins" is the same as "bins".
+
 	* src/set.c (set_table):  The "set table <filename>" command was not
 	doing tilde expansion on filename.
 

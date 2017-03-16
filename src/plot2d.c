@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.424 2017/03/09 21:09:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.425 2017/03/16 18:16:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2221,6 +2221,10 @@ eval_plots()
 		    c_token++;
 
 		    switch(found_token) {
+		    case SMOOTH_BINS:
+			/* catch the "bins" keyword by itself on the next pass */
+			c_token--;
+			continue;
 		    case SMOOTH_UNWRAP:
 		    case SMOOTH_FREQUENCY:
 		    case SMOOTH_FREQUENCY_NORMALISED:
