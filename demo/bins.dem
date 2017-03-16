@@ -37,9 +37,15 @@ EOD
 set title "Comparison of a binned histogram and\na kernel density model of the same data"
 
 set style data lines
-set xtics 1 norangelimit
+set xtics 1 norangelimit nomirror
+set grid y
+set yrange [0:5.5]
+set style fill solid 0.5 noborder
+set jitter spread 0.5
+
 plot $DATA using 1 bins=20 with boxes title '20 bins', \
-        '' using 1:(1) smooth kdensity bandwidth .5 lw 2 title 'smooth kdensity'
+        '' using 1:(1) smooth kdensity bandwidth .5 lw 2 title 'smooth kdensity', \
+        '' using 1:(.9) with impulse lc "black" title 'jittered data'
  
 pause -1 "Hit return to continue"
 reset

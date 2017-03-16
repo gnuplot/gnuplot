@@ -1,5 +1,5 @@
 #
-# $Id: random.dem,v 1.16 2014/03/23 13:27:27 markisch Exp $
+# $Id: random.dem,v 1.17 2015/06/26 20:51:18 sfeam Exp $
 #
 # random.dem
 #
@@ -168,7 +168,7 @@ bin(x) = (1.0/scale)*floor(x*scale)
 plot $random using (bin(sqrt($1**2+$2**2+$3**2))):(1.0*scale/nsamp) every :::::0 smooth frequency with steps \
         title "scaled bin frequency", \
         maxwell(x, 1/sqrt(2)) with lines title "Maxwell p.d.f.", \
-        $random using (sqrt($1**2+$2**2+$3**2)):(scale/nsamp) bins=25 with impulse lw 5 title "assign samples to 25 bins"
+        $random using (sqrt($1**2+$2**2+$3**2)):(scale/nsamp) bins=25 binrange [xlow:xhigh] with impulse lw 5 title "assign samples to 25 bins"
 #
 if (oneplot) unset multiplot
 #

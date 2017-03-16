@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.423 2017/03/09 07:10:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.424 2017/03/09 21:09:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1953,7 +1953,7 @@ eval_plots()
     char orig_dummy_var[MAX_ID_LEN+1];
 
     int nbins = 0;
-    double binlow, binhigh;
+    double binlow, binhigh, binwidth;
 
     double newhist_start = 0.0;
     int histogram_sequence = -1;
@@ -2198,6 +2198,13 @@ eval_plots()
 			    int_error(c_token, "incomplete bin range");
 			binlow = axis_array[SAMPLE_AXIS].min;
 			binhigh = axis_array[SAMPLE_AXIS].max;
+		    }
+		    binwidth = -1;
+		    if (equals(c_token, "binwidth")) {
+			if (!equals(++c_token, "="))
+			    int_error(c_token, "expecting binwidth=<width>");
+			c_token++;
+			binwidth = real_expression();
 		    }
 		    continue;
 		}
@@ -2784,7 +2791,7 @@ eval_plots()
 
 		/* If we are to bin the data, do that first */
 		if (this_plot->plot_smooth == SMOOTH_BINS) {
-		    make_bins(this_plot, nbins, binlow, binhigh);
+		    make_bins(this_plot, nbins, binlow, binhigh, binwidth);
 		}
 
 		/* Restore auto-scaling prior to smoothing operation */

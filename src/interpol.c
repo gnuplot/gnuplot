@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.56 2017/02/19 19:11:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.57 2017/02/24 19:51:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -1451,38 +1451,75 @@ mcs_interp(struct curve_points *plot)
 
 /*
  * Binned histogram of input values.
- *   plot FOO using N:(1) bins{=<nbins>} {binrange=[binlow:binhigh]} with boxes
- * If no binrange is given, the range is taken from the x axis range.
- * In the latter case "set xrange" may exclude some data points,
- * while "set auto x" will include all data points.
+ *
+ *   plot FOO using N:(1) bins{=<nbins>} {binrange=[binlow:binhigh]}
+ *                        {binwidth=<width>} with boxes
+ *
+ * This option is EXPERIMENTAL, details may change before inclusion in a stable
+ * gnuplot release.
+ *
+ * If no binrange is given, binlow and binhigh are taken from the x range of the data.
+ * In either of these cases binlow is the midpoint x-coordinate of the first bin
+ * and binhigh is the midpoint x-coordinate of the last bin.
+ * Points that lie exactly on a bin boundary are assigned to the upper bin.
+ * Bin assignments are not affected by "set xrange".
+ * Notes:
+ *    binwidth = (binhigh-binlow) / (nbins-1)
+ *        xmin = binlow - binwidth/2
+ *        xmax = binhigh + binwidth/2
+ *    first bin holds points with (xmin =< x < xmin + binwidth)
+ *    last bin holds points with (xmax-binwidth =< x < binhigh + binwidth)
  */
 void
-make_bins(struct curve_points *plot, int nbins, double binlow, double binhigh)
+make_bins(struct curve_points *plot, int nbins,
+          double binlow, double binhigh, double binwidth)
 {
     int i, binno;
     double *bin;
-    double bottom, top, binwidth, range;
+    double bottom, top, range;
     struct axis *xaxis = &axis_array[plot->x_axis];
     struct axis *yaxis = &axis_array[plot->y_axis];
     double ymax = 0;
     int N = plot->p_count;
 
-    /* Divide the range on X into the requested number of bins.
-     * NB: This range is independent of the values of the points.
-     */
-    if (binlow == 0 && binhigh == 0) {
-	bottom = xaxis->data_min;
-	top = xaxis->data_max;
-    } else {
+    /* Find the range of points to be binned */
+    if (binlow != binhigh) {
+	/* Explicit binrange [min:max] in the plot command */
 	bottom = binlow;
 	top = binhigh;
+    } else {
+	/* Take binrange from the data itself */
+	bottom = VERYLARGE; top = -VERYLARGE;
+	for (i=0; i<N; i++) {
+	    if (bottom > plot->points[i].x)
+		bottom = plot->points[i].x;
+	    if (top < plot->points[i].x)
+		top = plot->points[i].x;
+	}
+	if (top <= bottom)
+	    int_warn(NO_CARET, "invalid bin range [%g:%g]", bottom, top);
     }
     bottom = axis_log_value(xaxis, bottom);
     top = axis_log_value(xaxis, top);
-    binwidth = (top - bottom) / (nbins - 1);
-    bottom -= binwidth/2.;
-    top += binwidth/2.;
+
+    /* If a fixed binwidth was provided, find total number of bins */
+    if (binwidth > 0) {
+	double temp;
+	nbins = 1 + (top - bottom) / binwidth;
+	temp = nbins * binwidth - (top - bottom);
+	bottom -= temp/2.;
+	top += temp/2.;
+    }
+    /* otherwise we use (N-1) intervals between midpoints of bin 1 and bin N */
+    else {
+	binwidth = (top - bottom) / (nbins - 1);
+	bottom -= binwidth/2.;
+	top += binwidth/2.;
+    }
     range = top - bottom;
+
+    FPRINTF((stderr,"make_bins: %d bins from %g to %g, binwidth %g\n",
+	    nbins, bottom, top, binwidth));
 
     bin = gp_alloc(nbins*sizeof(double), "bins");
     for (i=0; i<nbins; i++)
@@ -1491,7 +1528,6 @@ make_bins(struct curve_points *plot, int nbins, double binlow, double binhigh)
 	if (plot->points[i].type == UNDEFINED)
 	    continue;
 	binno = floor(nbins * (plot->points[i].x - bottom) / range);
-        /* FIXME: Should outrange points be dumped in the first/last bin? */
 	if (0 <= binno && binno < nbins)
 	    bin[binno] += axis_de_log_value(yaxis, plot->points[i].y);
     }
