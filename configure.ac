@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.ac,v 1.26 2017/02/09 20:48:24 sfeam Exp $
+dnl $Id: configure.ac,v 1.27 2017/02/11 04:14:40 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -1080,7 +1080,7 @@ AM_CONDITIONAL(BUILD_GPCAIRO, test "${build_gpcairo}" = yes)
 
 dnl Enable subsystem to generate statistical summary of file contents
 AC_ARG_ENABLE(stats,dnl
-[  --enable-stats          Include command to generate statistical summary of data],
+[  --disable-stats          Omit calculation of statistical summary of data],
   [if test "$enableval" != no; then
     AC_DEFINE(USE_STATS,1,
                [ Define to add support for generating a statistical summary of data])

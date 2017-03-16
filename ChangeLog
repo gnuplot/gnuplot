@@ -1,7 +1,7 @@
 2017-03-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/interpol.h src/interpol.c src/plot2d.c docs/gnuplot.doc:
-	Clean up code, documentation and demos for 'bins' option.
+	Clean up code, documentation, and demos for the 'bins' option.
 	- document the algorithm for choosing bins
 	- binrange defaults to min/max of current data set (not axis range)
 	- trap degenerate case of all points UNDEFINED
@@ -17,6 +17,8 @@
 	an array by name, try to retrieve that array by name for a subsequent
 	plot that uses the special filename '' or "". E.g.
 	    plot Array with lines, '' with impulses
+
+	* configure.ac:  enable/disable comment for stats command was reversed
 
 2017-03-13  Ethan A Merritt  <merritt@u.washington.edu>
 
