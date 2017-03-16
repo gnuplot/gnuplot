@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.339 2017/02/07 00:45:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.340 2017/02/19 19:47:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -261,6 +261,7 @@ static char **df_datablock_line = NULL;
 
 /* for arrays */
 static int df_array_index = 0;
+static char *df_arrayname = NULL;
 
 /* track dimensions of input matrix/array/image */
 static unsigned int df_xpixels;
@@ -1105,7 +1106,12 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	int_error(c_token, "missing filename");
     if (!cmd_filename[0]) {
 	if (!df_filename || !*df_filename)
-	    int_error(c_token, "No previous filename");
+	    int_error(c_token-1, "No previous filename");
+	if (!strcmp(df_filename,"@@") && df_arrayname) {
+	    df_array = get_udv_by_name(df_arrayname);
+	    if (df_array->udv_value.type != ARRAY)
+		int_error(c_token-1, "Array %s invalid", df_arrayname);
+	}
     } else {
 	free(df_filename);
 	df_filename = gp_strdup(cmd_filename);
@@ -1355,6 +1361,8 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     } else if (!strcmp(df_filename, "@@") && df_array) {
 	/* df_array was set in string_or_express() */
 	df_array_index = 0;
+	/* save name so we can refer to it later */
+	df_arrayname = df_array->udv_name;
     } else {
 
 	/* filename cannot be static array! */

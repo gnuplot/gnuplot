@@ -11,6 +11,11 @@
 	* src/set.c (set_table):  The "set table <filename>" command was not
 	doing tilde expansion on filename.
 
+	* src/datafile.c (df_open):  If the previous plot command plotted from
+	an array by name, try to retrieve that array by name for a subsequent
+	plot that uses the special filename '' or "". E.g.
+	    plot Array with lines, '' with impulses
+
 2017-03-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_impulses) docs/gnuplot.doc:  Apply the x offset
