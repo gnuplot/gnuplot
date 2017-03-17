@@ -1,3 +1,7 @@
+2017-03-17  Release 5.0.6
+
+	PATCHLEVEL etc:  Bump versioning to 5.0.6 for release
+
 2017-03-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (eval_plots):  Do not enforce cbrange validity if the
