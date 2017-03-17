@@ -4582,7 +4582,7 @@ Ffigure_fenceplot
 3 old-style
 ?commands call old-style
 ?call old-style
- This describes the call mechanism used by previous versions of gnuplot, now
+ This describes the call mechanism used by older versions of gnuplot, now
  deprecated.
 
        call "<input-file>" <param-0> <param-1> ... <param-9>
@@ -5935,14 +5935,18 @@ Ffigure_fenceplot
                           {skip <number-of-lines>}
                           {using <using list>}
                           {smooth <option>}
+                          {bins <options>}
                           {volatile} {noautoscale}
 
- The modifiers `binary`, `index`, `every`, `skip`, `using`, and `smooth` are
- discussed separately.  In brief, `binary` allows data entry from a binary
+ The modifiers `binary`, `index`, `every`, `skip`, `using`, `bins`, and `smooth`
+ are discussed separately.  In brief, `binary` allows data entry from a binary
  file, `index` selects which data sets in a multi-data-set file are to be
  plotted, `every` specifies which points within a single data set are to be
  plotted, `using` determines how the columns within a single record are to be
  interpreted, and `smooth` allows for simple interpolation and approximation.
+ `bins` sorts individual input points into equal-sized intervals along x and
+ plots a single accumulated value per interval.
+
  `splot` has a similar syntax, but does not support the `smooth` option.
 
  The `noautoscale` keyword means that the points making up this plot will be
