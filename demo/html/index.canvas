@@ -119,6 +119,7 @@
     <li><a href="iterate.html">iteration</a></li>
     <li><a href="scatter.html">non-gridded data</a></li>
     <li><a href="running_avg.html">running averages</a></li>
+    <li><a href="bins.html">automatic binning</a></li>
     <li><a href="smooth.html">binning/histograms</a></li>
     <li><a href="array.html">arrays</a></li>
     <li><a href="fenceplot.html">fence plots</a></li>
@@ -219,7 +220,7 @@
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated January 2017</i>
+    <i>This page generated March 2017</i>
     </td>
 
     <td>
