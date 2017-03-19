@@ -1,3 +1,11 @@
+2017-03-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.h src/graphics.c (plot_border):  Range-limited y2 axis was
+	drawn in the wrong direction (top-to-bottom rather than bottom-to-top).
+	If the top plot border was drawn also, this resulted in a spurious
+	diagonal line across the plot.
+	Bug #1921
+
 2017-03-17  Release 5.0.6
 
 	PATCHLEVEL etc:  Bump versioning to 5.0.6 for release

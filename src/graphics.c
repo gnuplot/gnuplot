@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.32 2016/12/28 04:22:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.33 2017/02/01 23:08:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3689,10 +3689,14 @@ plot_border()
 {
     int min, max;
 
+	TBOOLEAN border_complete = ((draw_border & 15) == 15);
+
 	(*term->layer) (TERM_LAYER_BEGIN_BORDER);
 	term_apply_lp_properties(&border_lp);	/* border linetype */
 	if (border_complete)
 	    newpath();
+
+	/* Trace border anticlockwise from upper left */
 	(*term->move) (plot_bounds.xleft, plot_bounds.ytop);
 
 	if (border_west && axis_array[FIRST_Y_AXIS].ticdef.rangelimited) {
@@ -3722,9 +3726,9 @@ plot_border()
 	if (border_east && axis_array[SECOND_Y_AXIS].ticdef.rangelimited) {
 		max = AXIS_MAP(SECOND_Y_AXIS,axis_array[SECOND_Y_AXIS].data_max);
 		min = AXIS_MAP(SECOND_Y_AXIS,axis_array[SECOND_Y_AXIS].data_min);
-		(*term->move) (plot_bounds.xright, max);
-		(*term->vector) (plot_bounds.xright, min);
-		(*term->move) (plot_bounds.xright, plot_bounds.ybot);
+		(*term->move) (plot_bounds.xright, min);
+		(*term->vector) (plot_bounds.xright, max);
+		(*term->move) (plot_bounds.xright, plot_bounds.ytop);
 	} else if (border_east) {
 	    (*term->vector) (plot_bounds.xright, plot_bounds.ytop);
 	} else {
@@ -3734,8 +3738,8 @@ plot_border()
 	if (border_north && axis_array[SECOND_X_AXIS].ticdef.rangelimited) {
 		max = AXIS_MAP(SECOND_X_AXIS,axis_array[SECOND_X_AXIS].data_max);
 		min = AXIS_MAP(SECOND_X_AXIS,axis_array[SECOND_X_AXIS].data_min);
-		(*term->move) (min, plot_bounds.ytop);
-		(*term->vector) (max, plot_bounds.ytop);
+		(*term->move) (max, plot_bounds.ytop);
+		(*term->vector) (min, plot_bounds.ytop);
 		(*term->move) (plot_bounds.xright, plot_bounds.ytop);
 	} else if (border_north) {
 	    (*term->vector) (plot_bounds.xleft, plot_bounds.ytop);

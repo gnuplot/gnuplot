@@ -1,3 +1,7 @@
+Changes in 5.0.7
+================
+* FIX rangelimited y2 axis could produce spurious diagonal line across plot
+
 Changes in 5.0.6
 ================
 * NEW command 'set micro' enables encoding-specific char for gprintf %c format
