@@ -1,3 +1,10 @@
+2017-03-20  Jeremy Green  <jeremyrgreen@users.sf.net>
+
+	* src/graphics.c (plot_betweencurves):  Revised algorithm for filling
+	the area between two curves.  Rather than filling adjacent segments
+	one by one, trace the outline of the entire filled area.
+	This avoids artifacts at the boundaries between segments.
+
 2017-03-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.h src/graphics.c (plot_border):  Range-limited y2 axis was

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.549 2017/03/13 22:34:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.550 2017/03/20 03:01:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -99,7 +99,6 @@ static void plot_boxes __PROTO((struct curve_points * plot, int xaxis_y));
 static void plot_filledcurves __PROTO((struct curve_points * plot));
 static void finish_filled_curve __PROTO((int, gpiPoint *, struct curve_points *));
 static void plot_betweencurves __PROTO((struct curve_points * plot));
-static void fill_between __PROTO((double, double, double, double, double, double, double, double, struct curve_points *));
 static void plot_vectors __PROTO((struct curve_points * plot));
 static void plot_f_bars __PROTO((struct curve_points * plot));
 static void plot_c_bars __PROTO((struct curve_points * plot));
@@ -1307,10 +1306,12 @@ plot_filledcurves(struct curve_points *plot)
 static void
 plot_betweencurves(struct curve_points *plot)
 {
-    double x1, x2, yl1, yu1, yl2, yu2;
+    double x1, x2, yl1, yu1, yl2, yu2, dy;
     double xmid, ymid;
     double xu1, xu2;	/* For polar plots */
-    int i;
+    int i, j, istart=0, finish=0, points=0, max_corners_needed;
+    static gpiPoint *corners = 0;
+    static int corners_allocated = 0;
 
     /* If terminal doesn't support filled polygons, approximate with bars */
     if (!term->filled_polygon) {
@@ -1324,105 +1325,113 @@ plot_betweencurves(struct curve_points *plot)
      */
     plot->filledcurves_options.closeto = FILLEDCURVES_BETWEEN;
 
+    /* there are possibly 2 side points plus one extra to specify above/below */
+    max_corners_needed = plot->p_count * 2 + 3;
+    if (max_corners_needed > corners_allocated) {
+        corners_allocated = max_corners_needed;
+	corners = gp_realloc(corners, corners_allocated*sizeof(gpiPoint), "betweencurves vertices");
+    }
     /*
-     * Fill the region one quadrilateral at a time.
+     * Form a polygon, first forward along the lower points
+     *    and then backward along the upper ones.
      * Check each interval to see if the curves cross.
-     * If so, split the interval into two parts.
+     * If so, split the polygon into multiple parts.
      */
-    for (i = 0; i < plot->p_count-1; i++) {
+    for (i = 0; i < plot->p_count; i++) {
 
 	/* This isn't really testing for undefined points, it is looking */
 	/* for blank lines. If there is one then start a new fill area.  */
-	if (plot->points[i].type == UNDEFINED
-	    || plot->points[i+1].type == UNDEFINED)
-	    continue;
+        if (plot->points[i].type == UNDEFINED)
+            continue;
+
+	if (points == 0) {
+	    istart=i;
+	    dy=0.0;
+	}
+
+	if (finish == 2) { /* start the polygon at the previously-found crossing */
+ 	    corners[points].x = map_x(xmid);
+	    corners[points].y = map_y(ymid);
+	    points++;
+	}
 
 	x1  = plot->points[i].x;
 	xu1 = plot->points[i].xhigh;
 	yl1 = plot->points[i].y;
 	yu1 = plot->points[i].yhigh;
-	x2  = plot->points[i+1].x;
-	xu2 = plot->points[i+1].xhigh;
-	yl2 = plot->points[i+1].y;
-	yu2 = plot->points[i+1].yhigh;
+	if (i+1 >= plot->p_count || plot->points[i+1].type == UNDEFINED)
+            finish=1;
+	else {
+	    finish=0;
+	    x2  = plot->points[i+1].x;
+	    xu2 = plot->points[i+1].xhigh;
+	    yl2 = plot->points[i+1].y;
+	    yu2 = plot->points[i+1].yhigh;
+	}
 
-	/* EAM 19-July-2007  Special case for polar plots. */
+	corners[points].x = map_x(x1);
+	corners[points].y = map_y(yl1);
+	points++;
+
 	if (polar) {
-	    /* Find intersection of the two lines.                   */
-	    /* Probably could use this code in the general case too. */
-	    double A = (yl2-yl1) / (x2-x1);
-	    double C = (yu2-yu1) / (xu2-xu1);
-	    double b = yl1 - x1 * A;
-	    double d = yu1 - xu1 * C;
-	    xmid = (d-b) / (A-C);
-	    ymid = A * xmid + b;
+	    double ox = map_x(0);
+	    double oy = map_y(0);
+	    double plx = map_x(plot->points[istart].x);
+	    double ply = map_y(plot->points[istart].y);
+	    double pux = map_x(plot->points[istart].xhigh);
+	    double puy = map_y(plot->points[istart].yhigh);
+	    double drl = (plx-ox)*(plx-ox) + (ply-oy)*(ply-oy);
+	    double dru = (pux-ox)*(pux-ox) + (puy-oy)*(puy-oy);
 
-	    if ((x1-xmid)*(xmid-x2) > 0) {
-		fill_between(x1,xu1,yl1,yu1, xmid,xmid,ymid,ymid,plot);
-		fill_between(xmid,xmid,ymid,ymid, x2,xu2,yl2,yu2,plot);
-	    } else
-		fill_between(x1,xu1,yl1,yu1, x2,xu2,yl2,yu2,plot);
+	    dy += dru-drl;
+	} else {
+	    dy += yu1-yl1;
+	}
 
-	} else if ((yu1-yl1)*(yu2-yl2) < 0) {
-	    /* Cheap test for intersection in the general case */
-	    xmid = (x1*(yl2-yu2) + x2*(yu1-yl1))
-		 / ((yu1-yl1) + (yl2-yu2));
-	    ymid = yu1 + (yu2-yu1)*(xmid-x1)/(x2-x1);
-	    fill_between(x1,xu1,yl1,yu1, xmid,xmid,ymid,ymid,plot);
-	    fill_between(xmid,xmid,ymid,ymid, x2,xu2,yl2,yu2,plot);
+	if (!finish) {
+	    /* EAM 19-July-2007  Special case for polar plots. */
+	    if (polar) {
+	        /* Find intersection of the two lines.                   */
+	        /* Probably could use this code in the general case too. */
+	        double A = (yl2-yl1) / (x2-x1);
+		double C = (yu2-yu1) / (xu2-xu1);
+		double b = yl1 - x1 * A;
+		double d = yu1 - xu1 * C;
+		xmid = (d-b) / (A-C);
+		ymid = A * xmid + b;
 
-	} else
-	    fill_between(x1,xu1,yl1,yu1, x2,xu2,yl2,yu2,plot);
+		if ((x1-xmid)*(xmid-x2) > 0)
+		    finish=2;
+	    } else if ((yu1-yl1)*(yu2-yl2) < 0) {
+	        /* Cheap test for intersection in the general case */
+	        xmid = (x1*(yl2-yu2) + x2*(yu1-yl1))
+		     / ((yu1-yl1) + (yl2-yu2));
+		ymid = yu1 + (yu2-yu1)*(xmid-x1)/(x2-x1);
+
+		finish=2;
+	    }
+	}
+
+	if (finish == 2) { /* curves cross */
+	    corners[points].x = map_x(xmid);
+	    corners[points].y = map_y(ymid);
+	    points++;
+	}
+
+	if (finish) {
+	    for (j = i; j >= istart; j--) {
+	        corners[points].x = map_x(plot->points[j].xhigh);
+		corners[points].y = map_y(plot->points[j].yhigh);
+		points++;
+	    }
+
+	    corners[points].x = (dy < 0) ? 1 : 0;
+
+	    finish_filled_curve(points, corners, plot);
+	    points=0;
+	}
 
     }
-}
-
-static void
-fill_between(
-double x1, double xu1, double yl1, double yu1,
-double x2, double xu2, double yl2, double yu2,
-struct curve_points *plot)
-{
-    gpiPoint box[5]; /* Must leave room for additional point if needed after clipping */
-
-    box[0].x   = map_x(x1);
-    box[0].y   = map_y(yl1);
-    box[1].x   = map_x(xu1);
-    box[1].y   = map_y(yu1);
-    box[2].x   = map_x(xu2);
-    box[2].y   = map_y(yu2);
-    box[3].x   = map_x(x2);
-    box[3].y   = map_y(yl2);
-    
-    /* finish_filled_curve() will handle clipping, fill style, and */
-    /* any distinction between above/below (flagged in box[4].x)   */
-    if (polar) {
-	/* "above" or "below" evaluated in terms of radial distance from origin */
-	/* FIXME: Most of this should be offloaded to a separate subroutine */
-	double ox = map_x(0);
-	double oy = map_y(0);
-	double plx = map_x(x1);
-	double ply = map_y(yl1);
-	double pux = map_x(xu1);
-	double puy = map_y(yu1);
-	double drl = (plx-ox)*(plx-ox) + (ply-oy)*(ply-oy);
-	double dru = (pux-ox)*(pux-ox) + (puy-oy)*(puy-oy);
-	double dx1 = dru - drl;
-	
-	double dx2;
-	plx = map_x(x2);
-	ply = map_y(yl2);
-	pux = map_x(xu2);
-	puy = map_y(yu2);
-	drl = (plx-ox)*(plx-ox) + (ply-oy)*(ply-oy);
-	dru = (pux-ox)*(pux-ox) + (puy-oy)*(puy-oy);
-	dx2 = dru - drl;
-	
-	box[4].x = (dx1+dx2 < 0) ? 1 : 0;
-    } else
-	box[4].x = ((yu1-yl1) + (yu2-yl2) < 0) ? 1 : 0;
-
-    finish_filled_curve(4, box, plot);
 }
 
 
