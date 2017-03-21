@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.290.2.29 2017/01/27 01:28:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.290.2.30 2017/02/19 19:47:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -3544,8 +3544,8 @@ plot_option_binary(TBOOLEAN set_matrix, TBOOLEAN set_default)
 	    df_matrix_file = FALSE;
 	    plot_option_array();
 	    set_record = TRUE;
-	    df_xpixels = df_bin_record[df_num_bin_records - 1].cart_dim[1];
-	    df_ypixels = df_bin_record[df_num_bin_records - 1].cart_dim[0];
+	    df_xpixels = df_bin_record[df_num_bin_records - 1].cart_dim[0];
+	    df_ypixels = df_bin_record[df_num_bin_records - 1].cart_dim[1];
 	    FPRINTF((stderr,"datafile.c:%d  record dimensions %d x %d\n", __LINE__,
 		df_xpixels, df_ypixels));
 	    continue;

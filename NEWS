@@ -1,6 +1,7 @@
 Changes in 5.0.7
 ================
 * FIX rangelimited y2 axis could produce spurious diagonal line across plot
+* FIX assignment of x/y dimensions in "binary record=(a,b) ... with image"
 
 Changes in 5.0.6
 ================
@@ -15,7 +16,6 @@ Changes in 5.0.6
 * CHANGE - allow pointinterval property in 'with lp' for splot as well as for plot
 * CHANGE - "linewidth <lw>" is accepted as a terminal option for aquaterm, qt, wxt
 * CHANGE - spline segments outside xrange are ignored rather than treated as errors
-* FIX assignment of x/y dimensions in "binary record=(a,b) ... with image"
 * FIX wxt - multithreaded wxt was faulting during resize (mutex lock failure)
 * FIX windows - timed pause only worked for intervals < 1 second
 * FIX Front/back layering of border+grid lines was not always correct in hidden3d
