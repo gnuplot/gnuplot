@@ -1,7 +1,21 @@
+2017-03-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/QtGnuplotEvent.h src/qtterminal/QtGnuplotWindow.cpp:
+	Event type GEPID was added between the 5.0.5 and 5.0.6 releases.
+	It is used only by Windows, and only to allow space-raises-console.
+	Adding it in the middle of the enum definition made gnuplot_qt built for
+	5.0.6 incompatible with previous builds, so I moved GEPID to the highest
+	defined enum value.  Unfortunately this broke the code in
+	QtGnuplotEventHandler that treats any event type > GEDone as an error.
+	So now we put it back in the middle of the enum definition but only
+	define it for WIN32.
+
+	Add a warning that GEDone must be the highest event type value defined.
+
 2017-03-21  Craig DeForest  <zowie@users.sf.net>
 
 	* src/datafile.c (plot_option_binary):  Interpretation of dimensions
-	given via "binary record=(a,b)" contridicted that for dimensions given
+	given via "binary record=(a,b)" contradicted that for dimensions given
 	via "binary array=(a,b)".  This caused mangling of image data read in
 	using the "record" keyword.
 	NB: This was applied 2016-11-03 but somehow got lost in 5.0.6 - reapply!

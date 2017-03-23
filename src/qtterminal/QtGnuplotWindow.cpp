@@ -296,8 +296,10 @@ void QtGnuplotWindow::processEvent(QtGnuplotEventType type, QDataStream& in)
 		in >> pos;
 		move(pos);
 	}
+#ifdef _WIN32
 	else if (type == GEPID)
 		in >> m_pid;
+#endif
 	else
 		m_widget->processEvent(type, in);
 }
