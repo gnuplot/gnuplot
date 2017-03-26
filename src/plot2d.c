@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.425 2017/03/16 18:16:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.426 2017/03/16 22:35:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -236,6 +236,8 @@ plotrequest()
     AXIS_INIT2D(SECOND_X_AXIS, 0);
     AXIS_INIT2D(SECOND_Y_AXIS, 1);
     AXIS_INIT2D(T_AXIS, 0);
+    AXIS_INIT2D(U_AXIS, 0);
+    AXIS_INIT2D(V_AXIS, 0);
     AXIS_INIT2D(POLAR_AXIS, 1);
     AXIS_INIT2D(COLOR_AXIS, 1);
 
