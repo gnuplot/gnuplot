@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1055 2017/03/13 22:34:47 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1058 2017/03/17 00:00:54 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6513,7 +6513,7 @@ Ffigure_fenceplot
 
        plot '+' using ($1):(sin($1)):(sin($1)**2) with filledcurves 
 
- An independent sampling range can be provided immediately before the '+'. Like
+ An independent sampling range can be provided immediately before the '+'. As
  in normal function plots, a name can be assigned to the independent variable. 
  If given for the first plot element, the sampling range specifier has to be 
  preceeded by the `sample` keyword (see also `plot sampling`).
@@ -6524,11 +6524,11 @@ Ffigure_fenceplot
 
        plot $MYDATA, [t=-3:25:1] '+' using (t):(f(t)) 
 
- Similarly the pseudo-file '++' returns 2 columns of data forming a regular
- grid of [x,y] coordinates with the number of points along x controlled by
- `set samples` and the number of points along y controlled by `set isosamples`.
- In parametric mode the samples are along u and v rather than along x and y.
- You must set xrange and yrange (or urange and vrange) before plotting '++'.
+ The pseudo-file '++' returns 2 columns of data forming a regular grid of [u,v]
+ coordinates with the number of points along u controlled by `set samples` and
+ the number of points along v controlled by `set isosamples`.  You must set
+ urange and vrange before plotting '++'.  However the x and y ranges can be
+ autoscaled or can be explicitly set to different values than urange and vrange.
  Examples:
 
        splot '++' using 1:2:(sin($1)*sin($2)) with pm3d

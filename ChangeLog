@@ -1,3 +1,12 @@
+2017-03-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_generate_pseudodata):  Use axes u and v to sample
+	pseudofile "++" rather than axes x and y.  This allows for sampling
+	ranges that are distinct from the plot axis range, as was already true
+	for sampling "+".  The downside of this change is that we don't 
+	currently support nonlinear sampling on u or v, so it doesn't work as
+	well when plotting logscale x or y.
+
 2017-03-20  Jeremy Green  <jeremyrgreen@users.sf.net>
 
 	* src/graphics.c (plot_betweencurves):  Revised algorithm for filling

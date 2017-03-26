@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.340 2017/02/19 19:47:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.341 2017/03/16 21:45:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -5370,8 +5370,15 @@ df_generate_pseudodata()
 	static double u_min, u_max, u_step, v_min, v_max, v_isostep;
 	static int nusteps, nvsteps;
 	double u, v;
-	AXIS_INDEX u_axis = FIRST_X_AXIS;
-	AXIS_INDEX v_axis = FIRST_Y_AXIS;
+
+	/* (March 2017) THIS IS A CHANGE
+	 * Sample on u and v rather than on x and y.
+	 * This decouples the sampling range from the plot range.
+	 * FIXME: We don't yet support nonlinear u or v.
+	 * FIXME: plot3d range check fails to recognize that autoscaled log x/y is OK.
+	 */
+	AXIS_INDEX u_axis = U_AXIS;
+	AXIS_INDEX v_axis = V_AXIS;
 
 	/* Fill in the static variables only once per plot */
 	if (df_pseudospan == 0 && df_pseudorecord == 0) {
@@ -5383,21 +5390,21 @@ df_generate_pseudodata()
 		v_min = axis_array[V_AXIS].min;
 		v_max = axis_array[V_AXIS].max;
 	    } else {
-		axis_checked_extend_empty_range(FIRST_X_AXIS, "x range is invalid");
-		axis_checked_extend_empty_range(FIRST_Y_AXIS, "y range is invalid");
+		axis_checked_extend_empty_range(u_axis, "u range is invalid");
+		axis_checked_extend_empty_range(v_axis, "v range is invalid");
 		if (nonlinear(&(axis_array[u_axis]))) {
 		    u_min = axis_array[u_axis].linked_to_primary->min;
 		    u_max = axis_array[u_axis].linked_to_primary->max;
 		} else {
-		    u_min = axis_log_value_checked(u_axis, axis_array[u_axis].min, "x range");
-		    u_max = axis_log_value_checked(u_axis, axis_array[u_axis].max, "x range");
+		    u_min = axis_array[u_axis].min;
+		    u_max = axis_array[u_axis].max;
 		}
 		if (nonlinear(&axis_array[v_axis])) {
 		    v_min = axis_array[v_axis].linked_to_primary->min;
 		    v_max = axis_array[v_axis].linked_to_primary->max;
 		} else {
-		    v_min = axis_log_value_checked(v_axis, axis_array[v_axis].min, "y range");
-		    v_max = axis_log_value_checked(v_axis, axis_array[v_axis].max, "y range");
+		    v_min = axis_array[v_axis].min;
+		    v_max = axis_array[v_axis].max;
 		}
 	    }
 
