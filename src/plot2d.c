@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.427 2017/03/28 20:48:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.428 2017/03/29 04:08:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -795,7 +795,7 @@ get_data(struct curve_points *current_plot)
 		ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE( current_plot->z_n[iaxis][i],
 			v[iaxis], dummy_type,
 			&parallel_axis[iaxis],
-			current_plot->noautoscale, NOOP, NOOP, 0 );
+			current_plot->noautoscale, NOOP, NOOP );
 	    }
 	    i++;
 

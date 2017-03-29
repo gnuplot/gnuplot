@@ -18,6 +18,9 @@
 	* demo/sampling.dem:  Unit tests for some of the failures addressed
 	by this set of changes.
 
+	* src/axis.h src/plot2d.c:  The macro ACTUAL_STORE_WITH_LOG_...
+	no longer needs a special case parameter for the color axis.
+
 2017-03-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_generate_pseudodata):  Use axes u and v to sample

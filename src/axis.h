@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.164 2017/02/14 21:49:17 sfeam Exp $
+ * $Id: axis.h,v 1.165 2017/03/29 04:08:07 sfeam Exp $
  *
  */
 
@@ -505,7 +505,7 @@ do {									\
 
 #define ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, TYPE, AXIS,  \
 					       NOAUTOSCALE, OUT_ACTION,   \
-					       UNDEF_ACTION, is_cb_axis)  \
+					       UNDEF_ACTION)              \
 do {									  \
     struct axis *axis = AXIS;						  \
     double curval = (VALUE);						  \
@@ -586,10 +586,10 @@ do {									  \
     }									  \
 } while(0)
 
-/* normal calls go though this macro, marked as not being a color axis */
+/* normal calls go though this macro */
 #define STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, TYPE, AXIS, NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION)	 \
  if (AXIS != NO_AXIS) \
- ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, TYPE, (&axis_array[AXIS]), NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION, 0)
+ ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, TYPE, (&axis_array[AXIS]), NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION)
 
 /* Implementation of the above for the color axis. It should not change
  * the type of the point (out-of-range color is plotted with the color
@@ -600,7 +600,7 @@ do {									  \
 {									  \
     coord_type c_type_tmp = TYPE;					  \
     ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, c_type_tmp, &axis_array[AXIS],	  \
-					   NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION, 1); \
+					   NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION); \
 }
 
 /* #define NOOP (0) caused many warnings from gcc 3.2 */
