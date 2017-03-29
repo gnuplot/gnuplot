@@ -16,7 +16,7 @@
 	to transfer the min/max values to the primary axis structure as well.
 
 	* demo/sampling.dem:  Unit tests for some of the failures addressed
-	by this set of changes.
+	by this set of changes and a couple that have not been fixed yet.
 
 	* src/axis.h src/plot2d.c:  The macro ACTUAL_STORE_WITH_LOG_...
 	no longer needs a special case parameter for the color axis.

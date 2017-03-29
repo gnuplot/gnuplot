@@ -15,12 +15,14 @@ if (ARGC < 1) ARG1 = 0
 
 set trange [20:50]
 
-if (ARG1 <= 0) {
+if (ARG1 <= 1) {
+    print "test 1: explicit trange distinct from xrange"
     plot '+' using 1:(10. + sin($1)) title "trange [20:50]"
     pause -1 "Hit <cr> to continue"
 }
 
-if (ARG1 <= 1) {
+if (ARG1 <= 2) {
+    print "test 2: range set by 'sample' keyword, linear x axis"
     plot sample [t=20:50] '+' using (t):(10. + sin(t))
     pause -1 "Hit <cr> to continue"
 }
@@ -28,28 +30,32 @@ if (ARG1 <= 1) {
 
 set log x
 
-if (ARG1 <= 2) {
+if (ARG1 <= 3) {
+    print "test 3: range set by 'sample' keyword, logscale x axis"
     plot sample [t=20:50] '+' using (t):(10. + sin(t))
     pause -1 "Hit <cr> to continue"
 }
 
 unset log
 
-if (ARG1 <= 3) {
+if (ARG1 <= 4) {
+    print "test 4: splot '++' with autoscaled y (linear xy)"
     splot '++' using 1:2:($1*$2)
     pause -1 "Hit <cr> to continue"
 }
 
 set log xy
 
-if (ARG1 <= 4) {
+if (ARG1 <= 5) {
+    print "test 5: splot '++' with autoscaled y (logscale xy)"
     splot '++' using 1:2:($1*$2)
     pause -1 "Hit <cr> to continue"
 }
 
 unset log
 
-if (ARG1 <= 5) {
+if (ARG1 <= 6) {
+    print "test 6: plot '++' with image (linear xy)"
     plot '++' using 1:2:($1*$2) with image
     pause -1 "Hit <cr> to continue"
 }
@@ -57,7 +63,8 @@ if (ARG1 <= 5) {
 
 set log xy
 
-if (ARG1 <= 6) {
+if (ARG1 <= 7) {
+    print "test 7: plot '++' with image (logscale xy)"
     plot '++' using 1:2:($1*$2) with image
     pause -1 "Hit <cr> to continue"
 }
@@ -77,7 +84,8 @@ set xrange [ .1 : 12 ] noreverse nowriteback
 
 
 
-if (ARG1 <= 7) {
+if (ARG1 <= 8) {
+    print "test 8: multiple sampling ranges in one plot command"
     set multiplot layout 2,1
     set title "Piecewise function sampling along linear x" font ",13"
     plot sample [*:1] x, [1:2.*pi] cos(x), [2.*pi:10] (x-8)**2
@@ -89,3 +97,19 @@ if (ARG1 <= 7) {
 }
 
 reset
+
+set xrange [1:100]
+set yrange [1:100]
+set urange [0:100]
+set vrange [70:90]
+set style data lines
+set xyplane at 0
+
+set hidden3d
+set title "3D sampling range distinct from plot x/y range"
+
+splot '++' using 1:2:($1*25.*sin($2/50)), \
+      [u=30:70][v=0:50] '++' using 1:2:(u*v), \
+      [u=40:80][v=30:60] '++' using (u):(v):(u*sqrt(v)) lt 4, \
+      [u=1:100][v=500:1000] '++' using (90):(u):(v) lt 6
+
