@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.341 2017/03/16 21:45:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.342 2017/03/26 19:22:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -5319,27 +5319,25 @@ df_generate_pseudodata()
 		    axis_array[FIRST_X_AXIS].min = -10;
 		t_min = X_AXIS.min;
 		t_max = X_AXIS.max;
-#ifdef NONLINEAR_AXES
-		if (X_AXIS.linked_to_primary) {
-		    AXIS *primary = X_AXIS.linked_to_primary;
-		    t_min = eval_link_function(primary, t_min);
-		    t_max = eval_link_function(primary, t_max);
-		} else
-#endif
-		    axis_unlog_interval(&X_AXIS, &t_min, &t_max, 1);
 	    }
+
+	    /* If the axis is nonlinear we do the sampling on the primary   */
+	    /* (hidden) axis so that the samples are evenly spaced.         */
+	    /* NB: This means "t" is in the hidden linear coordinate space. */
+	    if nonlinear(&X_AXIS) {
+		AXIS *primary = X_AXIS.linked_to_primary;
+		t_min = eval_link_function(primary, t_min);
+		t_max = eval_link_function(primary, t_max);
+	    } else  {
+		axis_unlog_interval(&X_AXIS, &t_min, &t_max, 1);
+	    }
+
 	    if (t_step == 0)	/* always true unless explicit sample interval was given */
 		t_step = (t_max - t_min) / (samples_1 - 1);
 	    if (t_step == 0)	/* prevent infinite loop on zero range */
 		t_step = 1;
 	}
 	t = t_min + df_pseudorecord * t_step;
-#ifdef NONLINEAR_AXES
-	if (X_AXIS.linked_to_primary) {
-	    AXIS *vis = X_AXIS.linked_to_primary->linked_to_secondary;
-            t = eval_link_function(vis, t);
-	}
-#endif
 
 	if ((axis_array[SAMPLE_AXIS].range_flags & RANGE_SAMPLED)) {
 	    /* This is the case of an explicit sampling range */
@@ -5349,8 +5347,13 @@ df_generate_pseudodata()
 	    /* This is the usual case */
 	    if (df_pseudorecord >= samples_1)
 		return NULL;
-	    if (!parametric)
-		t = AXIS_DE_LOG_VALUE(x_axis, t);
+	}
+
+	if (nonlinear(&X_AXIS)) {
+	    AXIS *visible = X_AXIS.linked_to_primary->linked_to_secondary;
+            t = eval_link_function(visible, t);
+	} else if (!parametric) {
+	    t = AXIS_DE_LOG_VALUE(x_axis, t);
 	}
 
 	/* This allows commands of the form

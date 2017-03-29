@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.163 2017/02/01 04:30:23 sfeam Exp $
+ * $Id: axis.h,v 1.164 2017/02/14 21:49:17 sfeam Exp $
  *
  */
 
@@ -535,11 +535,6 @@ do {									  \
 	break;  /* this plot is not being used for autoscaling */	  \
     if (TYPE != INRANGE)						  \
 	break;  /* don't set y range if x is outrange, for example */	  \
-    if ((! is_cb_axis) && axis->linked_to_primary) {	  		  \
-	axis = axis->linked_to_primary;					  \
-	if (axis->link_udf->at) 					  \
-	    curval = eval_link_function(axis, curval);			  \
-    } 									  \
     if (   (curval < axis->min)						  \
         && ((curval <= axis->max) || (axis->max == -VERYLARGE))		  \
        ) {								  \
@@ -667,6 +662,7 @@ void gstrdms __PROTO((char *label, char *format, double value));
 void clone_linked_axes __PROTO((AXIS *axis1, AXIS *axis2));
 AXIS *get_shadow_axis __PROTO((AXIS *axis));
 void extend_primary_ticrange __PROTO((AXIS *axis));
+void update_primary_axis_range __PROTO((struct axis *secondary));
 
 int map_x __PROTO((double value));
 int map_y __PROTO((double value));

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.426 2017/03/16 22:35:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.427 2017/03/28 20:48:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2958,15 +2958,6 @@ eval_plots()
     /* parametric or polar fns can still affect x ranges */
     if (!parametric && !polar) {
 
-	/* Autoscaling on x used the primary axis, so we must transform */
-	/* the range that was found back onto the visible X axis.	*/
-	/* If we were _not_ autoscaling, well I guess it doesn't hurt.	*/
-	/* NB: clone_linked_axes() is overkill.				*/
-	if (nonlinear(&axis_array[FIRST_X_AXIS])) {
-	    clone_linked_axes(axis_array[FIRST_X_AXIS].linked_to_primary,
-				&axis_array[FIRST_X_AXIS]);
-	}
-
 	/* If we were expecting to autoscale on X but found no usable
 	 * points in the data files, then the axis limits are still sitting
 	 * at +/- VERYLARGE.  The default range for bare functions is [-10:10].
@@ -2982,10 +2973,7 @@ eval_plots()
 	/* check that xmin -> xmax is not too small */
 	axis_checked_extend_empty_range(FIRST_X_AXIS, "x range is invalid");
 
-	if (axis_array[SECOND_X_AXIS].linked_to_primary) {
-	    clone_linked_axes(axis_array[SECOND_X_AXIS].linked_to_primary, &axis_array[SECOND_X_AXIS]);
-	    /* FIXME: This obsoletes OUTRANGE/INRANGE for secondary axis data */
-	} else if (uses_axis[SECOND_X_AXIS] & USES_AXIS_FOR_DATA) {
+	if (uses_axis[SECOND_X_AXIS] & USES_AXIS_FOR_DATA) {
 	    /* check that x2min -> x2max is not too small */
 	    axis_checked_extend_empty_range(SECOND_X_AXIS, "x2 range is invalid");
 	} else if (axis_array[SECOND_X_AXIS].autoscale) {
@@ -3329,7 +3317,6 @@ eval_plots()
 	axis_revert_and_unlog_range(SECOND_X_AXIS);
     } else {
 	/* FIXME: If this triggers, doesn't it clobber linked axes? */
-	/*        Maybe we should just call clone_linked_axes()?    */
 	assert(uses_axis[FIRST_X_AXIS]);
 	if (axis_array[SECOND_X_AXIS].autoscale & AUTOSCALE_MIN)
 	    axis_array[SECOND_X_AXIS].min = axis_array[FIRST_X_AXIS].min;
@@ -3346,18 +3333,23 @@ eval_plots()
 	    axis_array[FIRST_X_AXIS].max = axis_array[SECOND_X_AXIS].max;
     }
 
+    /* min/max values were tracked during input for the visible axes.       */
+    /* Now we use them to update the corresponding shadow (nonlinear) ones. */
+	update_primary_axis_range(&axis_array[FIRST_X_AXIS]);
+	update_primary_axis_range(&axis_array[SECOND_X_AXIS]);
+
 
     if (this_plot && this_plot->plot_style == TABLESTYLE) {
 	/* the y axis range has no meaning in this case */
 	;
     } else if (uses_axis[FIRST_Y_AXIS] && nonlinear(&axis_array[FIRST_Y_AXIS])) {
-	clone_linked_axes(axis_array[FIRST_Y_AXIS].linked_to_primary, &axis_array[FIRST_Y_AXIS]);
+	update_primary_axis_range(&axis_array[FIRST_Y_AXIS]);
     } else if (uses_axis[FIRST_Y_AXIS]) {
 	axis_checked_extend_empty_range(FIRST_Y_AXIS, "all points y value undefined!");
 	axis_revert_and_unlog_range(FIRST_Y_AXIS);
     }
     if (uses_axis[SECOND_Y_AXIS] && axis_array[SECOND_Y_AXIS].linked_to_primary) {
-	clone_linked_axes(axis_array[SECOND_Y_AXIS].linked_to_primary, &axis_array[SECOND_Y_AXIS]);
+	update_primary_axis_range(&axis_array[SECOND_Y_AXIS]);
     } else if (uses_axis[SECOND_Y_AXIS]) {
 	axis_checked_extend_empty_range(SECOND_Y_AXIS, "all points y2 value undefined!");
 	axis_revert_and_unlog_range(SECOND_Y_AXIS);

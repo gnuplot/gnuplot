@@ -1,3 +1,23 @@
+2017-03-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.h (ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE) 
+	src/axis.c (update_primary_axis_range) src/plot2d.c src/plot3d.c 
+	src/datafile.c (df_generate_pseudodata):
+
+	The nonlinear axis code as originally introduced tracked data min/max
+	in the primary (i.e. linear) axis structure.  That was unnecessarily
+	complicated since it required a coordinate transformation to update the
+	range every time a point was stored.  Also since the current range
+	stored in the visible axis structure was not always up-to-date, some
+	autoscaling operations during plot layout could fail.
+	Now we change this to track data min/max in the secondary (i.e. visible)
+	axis coordinate system. At the end of data input and function evaluation
+	we call new routine update_primary_axis() just once per nonlinear axis
+	to transfer the min/max values to the primary axis structure as well.
+
+	* demo/sampling.dem:  Unit tests for some of the failures addressed
+	by this set of changes.
+
 2017-03-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_generate_pseudodata):  Use axes u and v to sample

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.260 2016/12/14 22:53:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.261 2017/02/16 23:52:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -2006,12 +2006,8 @@ eval_3dplots()
 	if (!parametric) {
 	    /* Autoscaling tracked the visible axis coordinates.	*/
 	    /* For nonlinear axes we must transform the limits back to the primary axis */
-	    if (nonlinear(&axis_array[FIRST_X_AXIS]))
-		clone_linked_axes(axis_array[FIRST_X_AXIS].linked_to_primary,
-			&axis_array[FIRST_X_AXIS]);
-	    if (nonlinear(&axis_array[FIRST_Y_AXIS]))
-		clone_linked_axes(axis_array[FIRST_Y_AXIS].linked_to_primary,
-			&axis_array[FIRST_Y_AXIS]);
+	    update_primary_axis_range(&axis_array[FIRST_X_AXIS]);
+	    update_primary_axis_range(&axis_array[FIRST_Y_AXIS]);
 
 	    /* Check that xmin -> xmax is not too small.
 	     * Give error if xrange badly set from missing datafile error.
@@ -2184,25 +2180,24 @@ eval_3dplots()
     }
 
     if (nonlinear(&axis_array[FIRST_X_AXIS])) {
-	axis_check_empty_nonlinear(&axis_array[FIRST_X_AXIS]);
 	/* Transfer observed data or function ranges back to primary axes */
-	clone_linked_axes(axis_array[FIRST_X_AXIS].linked_to_primary, &axis_array[FIRST_X_AXIS]);
+	update_primary_axis_range(&axis_array[FIRST_X_AXIS]);
+	axis_check_empty_nonlinear(&axis_array[FIRST_X_AXIS]);
     } else {
 	axis_checked_extend_empty_range(FIRST_X_AXIS, "All points x value undefined");
 	axis_revert_and_unlog_range(FIRST_X_AXIS);
     }
     if (nonlinear(&axis_array[FIRST_Y_AXIS])) {
-	axis_check_empty_nonlinear(&axis_array[FIRST_Y_AXIS]);
 	/* Transfer observed data or function ranges back to primary axes */
-	clone_linked_axes(axis_array[FIRST_Y_AXIS].linked_to_primary, &axis_array[FIRST_Y_AXIS]);
+	update_primary_axis_range(&axis_array[FIRST_Y_AXIS]);
+	axis_check_empty_nonlinear(&axis_array[FIRST_Y_AXIS]);
     } else {
 	axis_checked_extend_empty_range(FIRST_Y_AXIS, "All points y value undefined");
 	axis_revert_and_unlog_range(FIRST_Y_AXIS);
     }
     if (nonlinear(&axis_array[FIRST_Z_AXIS])) {
-	AXIS *primary = axis_array[FIRST_Z_AXIS].linked_to_primary;
+	update_primary_axis_range(&axis_array[FIRST_Z_AXIS]);
 	extend_primary_ticrange(&axis_array[FIRST_Z_AXIS]);
-	clone_linked_axes(primary, &axis_array[FIRST_Z_AXIS]);
     } else {
 	axis_checked_extend_empty_range(FIRST_Z_AXIS, splot_map ? NULL : "All points y value undefined");
 	axis_revert_and_unlog_range(FIRST_Z_AXIS);

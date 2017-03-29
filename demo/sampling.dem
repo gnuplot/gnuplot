@@ -1,0 +1,91 @@
+# 27 Mar 2017
+# Each of these plot commands failed on some version between
+# 5.0 and 5.1 (March 2017).  I collect them here to use as
+# unit tests for continued success of the code added to repair breakage.
+#
+# Usage:  call 'sampling.dem' <testno>
+#
+
+set urange [1:100]
+set vrange [1:100]
+set xrange [1:100]
+set key opaque box
+
+if (ARGC < 1) ARG1 = 0
+
+set trange [20:50]
+
+if (ARG1 <= 0) {
+    plot '+' using 1:(10. + sin($1)) title "trange [20:50]"
+    pause -1 "Hit <cr> to continue"
+}
+
+if (ARG1 <= 1) {
+    plot sample [t=20:50] '+' using (t):(10. + sin(t))
+    pause -1 "Hit <cr> to continue"
+}
+
+
+set log x
+
+if (ARG1 <= 2) {
+    plot sample [t=20:50] '+' using (t):(10. + sin(t))
+    pause -1 "Hit <cr> to continue"
+}
+
+unset log
+
+if (ARG1 <= 3) {
+    splot '++' using 1:2:($1*$2)
+    pause -1 "Hit <cr> to continue"
+}
+
+set log xy
+
+if (ARG1 <= 4) {
+    splot '++' using 1:2:($1*$2)
+    pause -1 "Hit <cr> to continue"
+}
+
+unset log
+
+if (ARG1 <= 5) {
+    plot '++' using 1:2:($1*$2) with image
+    pause -1 "Hit <cr> to continue"
+}
+
+
+set log xy
+
+if (ARG1 <= 6) {
+    plot '++' using 1:2:($1*$2) with image
+    pause -1 "Hit <cr> to continue"
+}
+
+reset 
+#
+#  piecewise functions along nonlinear x axis
+#
+unset border
+set key center top reverse Left
+set xzeroaxis
+set yzeroaxis
+set xtics axis out scale 1,8
+set xtics add  (1.00000 1, 6.28319 1)
+set ytics axis
+set xrange [ .1 : 12 ] noreverse nowriteback
+
+
+
+if (ARG1 <= 7) {
+    set multiplot layout 2,1
+    set title "Piecewise function sampling along linear x" font ",13"
+    plot sample [*:1] x, [1:2.*pi] cos(x), [2.*pi:10] (x-8)**2
+    set nonlinear x via x inv x
+    set title "nonlinear (identity mapped) x" font ",13"
+    plot sample [*:1] x, [1:2.*pi] cos(x), [2.*pi:10] (x-8)**2
+    unset multiplot
+    pause -1 "Hit <cr> to continue"
+}
+
+reset

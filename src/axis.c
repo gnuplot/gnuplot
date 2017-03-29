@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.220 2017/02/01 04:30:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.221 2017/02/14 21:49:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -2509,6 +2509,25 @@ extend_primary_ticrange(AXIS *axis)
 	    primary->max = ceil(primary->max);
     }
 }
+
+/*
+ * As data is read in or functions evaluated, the min/max values are tracked
+ * for the visible axes but not for the primary (linear) axes.
+ * This routine fills in the primary min/max from the linked secondary axis.
+ */
+void
+update_primary_axis_range(struct axis *secondary)
+{
+    struct axis *primary = secondary->linked_to_primary;
+
+    if (nonlinear(secondary)) {
+	primary->min = eval_link_function(primary, secondary->min);
+	primary->max = eval_link_function(primary, secondary->max);
+	primary->data_min = eval_link_function(primary, secondary->data_min);
+	primary->data_max = eval_link_function(primary, secondary->data_max);
+    }
+}
+
 #endif
 
 
