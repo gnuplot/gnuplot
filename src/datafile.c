@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.342 2017/03/26 19:22:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.343 2017/03/29 04:08:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -5456,6 +5456,15 @@ df_generate_pseudodata()
 	}
 	sprintf(df_line,"%g %g", df_pseudovalue_0, df_pseudovalue_1);
 	++df_pseudorecord;
+
+	/* This allows commands of the form
+	 *   splot sample [foo=0:10][baz=44:55] '++' using (foo):(baz):(foo*baz)
+	 */
+	if (df_current_plot && df_current_plot->sample_var)
+	    Gcomplex(&(df_current_plot->sample_var->udv_value), df_pseudovalue_0, 0.0);
+	if (df_current_plot && df_current_plot->sample_var2)
+	    Gcomplex(&(df_current_plot->sample_var2->udv_value), df_pseudovalue_1, 0.0);
+
     }
 
     return df_line;

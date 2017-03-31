@@ -1,3 +1,9 @@
+2017-03-31  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.h src/plot3d.c src/datafile.c:  Add a slot in the plot 
+	structure to track a 2nd named sampling variable, e.g. 
+	    splot [u=1:5][v=1:5] '++' using (u):(v):(u*sin(v))
+
 2017-03-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h (ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE) 
