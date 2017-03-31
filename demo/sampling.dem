@@ -114,3 +114,6 @@ splot '++' using 1:2:($1*25.*sin($2/10)), \
       [u=40:80][v=30:60] '++' using (u):(v):(u*sqrt(v)) lt 4, \
       [u=1:100][v=500:1000] '++' using (90):(u):(v) lt 6
 
+pause -1 "Hit <cr> to continue"
+
+reset
