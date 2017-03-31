@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.311.2.19 2016/12/07 21:45:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.311.2.20 2017/02/01 23:08:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -642,10 +642,18 @@ do_3dplot(
      */
 
     /* absolute or relative placement of xyplane along z */
-    if (xyplane.absolute)
-	base_z = AXIS_LOG_VALUE(0, xyplane.z);
-    else
+    if (xyplane.absolute) {
+	if (Z_AXIS.log) {
+	    if (xyplane.z <= 0)
+		base_z = Z_AXIS.min;
+	    else
+		base_z = AXIS_LOG_VALUE(FIRST_Z_AXIS, xyplane.z);
+	} else {
+	    base_z = xyplane.z;
+	}
+    } else {
 	base_z = Z_AXIS.min - (Z_AXIS.max - Z_AXIS.min) * xyplane.z;
+    }
 
     /* If we are to draw the bottom grid make sure zmin is updated properly. */
     if (X_AXIS.ticmode || Y_AXIS.ticmode || (draw_border & 0x00f)) {
