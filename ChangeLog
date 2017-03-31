@@ -4,6 +4,13 @@
 	structure to track a 2nd named sampling variable, e.g. 
 	    splot [u=1:5][v=1:5] '++' using (u):(v):(u*sin(v))
 
+	* src/plot2d.c src/plot3d.c:  Extend the sampling range parsing to
+	track named sampling variables for 2D sampling '++' as well as 1D
+	sampling '+'. Minor cosmetic modifications to the 2D and 3D code to
+	make it more obviously parallel.
+
+	* demo/sampling.dem:  Add example of named sampling ranges in 3D.
+
 2017-03-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h (ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE) 

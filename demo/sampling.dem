@@ -85,7 +85,7 @@ set xrange [ .1 : 12 ] noreverse nowriteback
 
 
 if (ARG1 <= 8) {
-    print "test 8: multiple sampling ranges in one plot command"
+    print "test 8: multiple sampling ranges in one 2D plot command"
     set multiplot layout 2,1
     set title "Piecewise function sampling along linear x" font ",13"
     plot sample [*:1] x, [1:2.*pi] cos(x), [2.*pi:10] (x-8)**2
@@ -107,8 +107,9 @@ set xyplane at 0
 
 set hidden3d
 set title "3D sampling range distinct from plot x/y range"
+print "test 9: 3D sampling range distinct from plot x/y range"
 
-splot '++' using 1:2:($1*25.*sin($2/50)), \
+splot '++' using 1:2:($1*25.*sin($2/10)), \
       [u=30:70][v=0:50] '++' using 1:2:(u*v), \
       [u=40:80][v=30:60] '++' using (u):(v):(u*sqrt(v)) lt 4, \
       [u=1:100][v=500:1000] '++' using (90):(u):(v) lt 6

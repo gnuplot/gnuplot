@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.428 2017/03/29 04:08:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.429 2017/03/29 04:20:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -215,7 +215,7 @@ void
 plotrequest()
 {
     int dummy_token = 0;
-    AXIS_INDEX t_axis;
+    AXIS_INDEX axis;
 
     if (!term)                  /* unknown */
 	int_error(c_token, "use 'set term' to set terminal type first");
@@ -244,12 +244,12 @@ plotrequest()
 #ifdef NONLINEAR_AXES
     /* Nonlinear mapping of x or y via linkage to a hidden primary axis. */
     /* The user set autoscale for the visible axis; apply it also to the hidden axis. */
-    for (t_axis = 0; t_axis < NUMBER_OF_MAIN_VISIBLE_AXES; t_axis++) {
-	if (t_axis == SAMPLE_AXIS)
+    for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++) {
+	AXIS *secondary = &axis_array[axis];
+	if (axis == SAMPLE_AXIS)
 	    continue;
-	if (axis_array[t_axis].linked_to_primary
-	&&  axis_array[t_axis].linked_to_primary->index == -t_axis) {
-	    AXIS *secondary = &axis_array[t_axis];
+	if (secondary->linked_to_primary
+	&&  secondary->linked_to_primary->index == -secondary->index) {
 	    AXIS *primary = secondary->linked_to_primary;
 	    primary->set_autoscale = secondary->set_autoscale;
 	    axis_init(primary, 1);
@@ -279,8 +279,8 @@ plotrequest()
 	c_token++;
 
     /* Clear out any tick labels read from data files in previous plot */
-    for (t_axis=0; t_axis<AXIS_ARRAY_SIZE; t_axis++) {
-	struct ticdef *ticdef = &axis_array[t_axis].ticdef;
+    for (axis=0; axis<AXIS_ARRAY_SIZE; axis++) {
+	struct ticdef *ticdef = &axis_array[axis].ticdef;
 	if (ticdef->def.user)
 	    ticdef->def.user = prune_dataticks(ticdef->def.user);
 	if (!ticdef->def.user && ticdef->type == TIC_USER)
@@ -2096,7 +2096,6 @@ eval_plots()
 		axis_array[SAMPLE_AXIS].range_flags |= RANGE_SAMPLED;
 
 	    was_definition = FALSE;
-	    dummy_func = &plot_func;
 
 	    /* Allow replacement of the dummy variable in a function */
 	    if (sample_range_token > 0)
@@ -2106,7 +2105,7 @@ eval_plots()
 	    else
 		strcpy(c_dummy_var[0], orig_dummy_var);
 
-	    /* Should this be saved in "this_plot"? */
+	    dummy_func = &plot_func;	/* needed by parsing code */
 	    name_str = string_or_express(NULL);
 	    dummy_func = NULL;
 
@@ -3400,7 +3399,6 @@ eval_plots()
 	print_table(first_plot, plot_num);
 
     } else {
-	/* do_plot now uses axis_array[] */
 	do_plot(first_plot, plot_num);
 
 	/* after do_plot(), axis_array[].min and .max
@@ -3409,13 +3407,12 @@ eval_plots()
 	 *  --> save them now for writeback if requested
 	 */
 	save_writeback_all_axes();
+	/* update GPVAL_ variables available to user */
+	update_gpval_variables(1);
 
 	/* Mark these plots as safe for quick refresh */
 	SET_REFRESH_OK(E_REFRESH_OK_2D, plot_num);
     }
-
-    /* update GPVAL_ variables available to user */
-    update_gpval_variables(1);
 
 }                               /* eval_plots */
 

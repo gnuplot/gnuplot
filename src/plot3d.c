@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.261 2017/02/16 23:52:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.262 2017/03/29 04:08:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -339,9 +339,7 @@ refresh_3dbounds(struct surface_points *first_plot, int nplots)
 	struct axis *z_axis = &axis_array[FIRST_Z_AXIS];
 	struct iso_curve *this_curve;
 
-	/* IMAGE clipping is done elsewhere, so we don't need INRANGE/OUTRANGE
-	 * checks.  
-	 */
+	/* IMAGE clipping is done elsewhere, so we don't need INRANGE/OUTRANGE checks */
 	if (this_plot->plot_style == IMAGE 
 	||  this_plot->plot_style == RGBIMAGE
 	||  this_plot->plot_style == RGBA_IMAGE) {
@@ -1325,6 +1323,7 @@ eval_3dplots()
     char *xtitle;
     char *ytitle;
     legend_key *key = &keyT;
+    char orig_dummy_u_var[MAX_ID_LEN+1], orig_dummy_v_var[MAX_ID_LEN+1];
 
     /* Free memory from previous splot.
      * If there is an error within this function, the memory is left allocated,
@@ -1348,6 +1347,10 @@ eval_3dplots()
 
     /* Assume that we don't need to allocate or initialize pm3d quadrangles */
     track_pm3d_quadrangles = FALSE;
+
+    /* Explicit ranges in the splot command may temporarily rename dummy variables */
+    strcpy(orig_dummy_u_var, c_dummy_var[0]);
+    strcpy(orig_dummy_v_var, c_dummy_var[1]);
 
     xtitle = NULL;
     ytitle = NULL;
@@ -1392,16 +1395,46 @@ eval_3dplots()
 	    TBOOLEAN checked_once = FALSE;
 	    TBOOLEAN set_labelstyle = FALSE;
 	    TBOOLEAN set_fillstyle = FALSE;
-	    int sample_range_token;
+
+	    int u_sample_range_token, v_sample_range_token;
+	    t_value original_value_u, original_value_v;
 
 	    if (!was_definition && (!parametric || crnt_param == 0))
 		start_token = c_token;
 	    was_definition = FALSE;
 
-	    /* Check for a sampling range */
-	    sample_range_token = parse_range(SAMPLE_AXIS);
-	    if (sample_range_token > 0)
+	    /* Check for sampling range[s]
+	     * Note: we must allow both for '+', which uses SAMPLE_AXIS,
+	     *       and '++', which uses U_AXIS and V_AXIS
+	     */
+	    u_sample_range_token = parse_range(SAMPLE_AXIS);
+	    if (u_sample_range_token != 0) {
+		axis_array[U_AXIS].min = axis_array[SAMPLE_AXIS].min;
+		axis_array[U_AXIS].max = axis_array[SAMPLE_AXIS].max;
+		axis_array[U_AXIS].autoscale = axis_array[SAMPLE_AXIS].autoscale;
+	    }
+	    v_sample_range_token = parse_range(V_AXIS);
+
+	    /* EXPERIMENTAL: allow sampling interval in range
+	     * Preliminary version in df_generate_pseudodata is hard-coded for
+	     * SAMPLE_AXIS only so it does not work for '++'.
+	     */
+	    if (u_sample_range_token > 0)
 		axis_array[SAMPLE_AXIS].range_flags |= RANGE_SAMPLED;
+
+	    /* Allow replacement of the dummy variables in a function */
+	    if (u_sample_range_token > 0)
+		copy_str(c_dummy_var[0], u_sample_range_token, MAX_ID_LEN);
+	    else if (u_sample_range_token < 0)
+		strcpy(c_dummy_var[0], set_dummy_var[0]);
+	    else
+		strcpy(c_dummy_var[0], orig_dummy_u_var);
+	    if (v_sample_range_token > 0)
+		copy_str(c_dummy_var[1], v_sample_range_token, MAX_ID_LEN);
+	    else if (v_sample_range_token < 0)
+		strcpy(c_dummy_var[1], set_dummy_var[1]);
+	    else
+		strcpy(c_dummy_var[1], orig_dummy_v_var);
 
 	    /* Should this be saved in this_plot? */
 	    dummy_func = &plot_func;
@@ -1445,18 +1478,19 @@ eval_3dplots()
 		if (df_matrix)
 		    this_plot->has_grid_topology = TRUE;
 
-		/* EAM FIXME - this seems to work but I am uneasy that c_dummy_var[]	*/
-		/*             is not being loaded with the variable name.		*/
-		if (sample_range_token > 0) {
-		    this_plot->sample_var = add_udv(sample_range_token);
-		} else {
-		    /* FIXME: This has the side effect of creating a named variable x */
-		    /* or overwriting an existing variable x.  Maybe it should save   */
-		    /* and restore the pre-existing variable in this case?            */
+		/* Store pointers to the named variables used for sampling */
+		if (u_sample_range_token > 0)
+		    this_plot->sample_var = add_udv(u_sample_range_token);
+		else
 		    this_plot->sample_var = add_udv_by_name(c_dummy_var[0]);
-		}
-		if (this_plot->sample_var->udv_value.type == NOTDEFINED)
-		    Gcomplex(&(this_plot->sample_var->udv_value), 0.0, 0.0);
+		if (v_sample_range_token > 0)
+		    this_plot->sample_var2 = add_udv(v_sample_range_token);
+		else
+		    this_plot->sample_var2 = add_udv_by_name(c_dummy_var[1]);
+
+		/* Save prior values of u, v so we can restore later */
+		original_value_u = this_plot->sample_var->udv_value;
+		original_value_v = this_plot->sample_var2->udv_value;
 
 		/* for capture to key */
 		this_plot->token = end_token = c_token - 1;
@@ -1947,6 +1981,13 @@ eval_3dplots()
 		int_error(NO_CARET, "unbounded iteration in function plot");
 	    }
 
+	    /* restore original value of sample variables */
+	    /* FIXME: sometime this_plot has changed since we save sample_var! */
+	    if (name_str && this_plot->sample_var) {
+		this_plot->sample_var->udv_value = original_value_u;
+		this_plot->sample_var2->udv_value = original_value_v;
+	    }
+
 	}			/* !is_definition() : end of scope of this_plot */
 
 	if (crnt_param != 0) {
@@ -2089,10 +2130,12 @@ eval_3dplots()
 		    break;
 		}
 
-		/* Check for a sampling range */
-		/* Currently we are supporting only sampling of pseudofile '+' and   */
-		/* this loop is for functions only, so the sampling range is ignored */
-		parse_range(SAMPLE_AXIS);
+		/* Check for a sampling range
+		 * Currently we only support sampling of pseudofiles '+' and '++'.
+		 * This loop is for functions only, so the sampling range is ignored.
+		 */
+		(void)parse_range(U_AXIS);
+		(void)parse_range(V_AXIS);
 
 		dummy_func = &plot_func;
 		name_str = string_or_express(&at_ptr);
@@ -2325,12 +2368,13 @@ eval_3dplots()
     plot3d_num=plot_num;
 
     /* perform the plot */
-    if (table_mode)
+    if (table_mode) {
 	print_3dtable(plot_num);
-    else {
+
+    } else {
 	do_3dplot(first_3dplot, plot_num, 0);
 
-	/* after do_3dplot(), axis_array[] and max_array[].min
+	/* after do_3dplot(), axis_array[].min and .max
 	 * contain the plotting range actually used (rounded
 	 * to tic marks, not only the min/max data values)
 	 * --> save them now for writeback if requested
