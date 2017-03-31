@@ -11,6 +11,11 @@
 
 	* demo/sampling.dem:  Add example of named sampling ranges in 3D.
 
+	* src/graph3d.c (do_3dplot):  "set xyplane at 0; set log z; splot..." =>
+	no plot drawn.  Change this so that "at 0" for logscale z is treated as
+	"xyplane at <Z-axis min>".
+	Bugfix.
+
 2017-03-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h (ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE) 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.361 2017/02/01 19:48:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.362 2017/02/07 21:46:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -656,10 +656,15 @@ do_3dplot(
 
     /* absolute or relative placement of xyplane along z */
     if (nonlinear(&Z_AXIS)) {
-	if (xyplane.absolute)
-	    base_z1 = eval_link_function(primary_z, xyplane.z);
-	else
+	if (xyplane.absolute) {
+	    if (primary_z->log && xyplane.z <= 0) {
+		base_z1 = eval_link_function(primary_z, Z_AXIS.min);
+	    } else {
+		base_z1 = eval_link_function(primary_z, xyplane.z);
+	    }
+	} else {
 	    base_z1 = primary_z->min - (primary_z->max - primary_z->min) * xyplane.z;
+	}
 	base_z = eval_link_function(&Z_AXIS, base_z1);
     } else {
 	if (xyplane.absolute)
