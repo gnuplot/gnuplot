@@ -1,3 +1,7 @@
+2017-04-01  Daniel J Sebald <daniel.sebald@ieee.org>
+
+	* src/plot.c (main):  Exit with error if dropping privilege fails.
+
 2017-03-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (do_3dplot):  "set xyplane at 0; set log z; splot..." =>
