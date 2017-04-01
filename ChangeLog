@@ -1,3 +1,7 @@
+2017-04-01  Daniel J Sebald <daniel.sebald@ieee.org>
+
+	* src/plot.c (main):  Exit with error if dropping privilege fails.
+
 2017-03-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.h src/plot3d.c src/datafile.c:  Add a slot in the plot 

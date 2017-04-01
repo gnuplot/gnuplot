@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.170 2016/08/05 05:10:29 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.171 2016/08/06 13:22:50 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -280,7 +280,10 @@ main(int argc, char **argv)
 /* make sure that we really have revoked root access, this might happen if
    gnuplot is compiled without vga support but is installed suid by mistake */
 #ifdef __linux__
-    setuid(getuid());
+    if (setuid(getuid()) != 0) {
+	fprintf(stderr,"gnuplot: refusing to run at elevated privilege\n");
+	exit(EXIT_FAILURE);
+    }
 #endif
 
 #if defined(MSDOS) && !defined(_WIN32) && !defined(__GNUC__)
