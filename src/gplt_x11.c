@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.255 2017/02/03 22:40:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.256 2017/03/01 18:42:49 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -4350,7 +4350,7 @@ static char*
 getMultiTabConsoleSwitchCommand(unsigned long *newGnuplotXID)
 {
 /* NOTE: This code uses the DCOP mechanism from KDE3, which went away in KDE4 */
-#ifdef HAVE_STRDUP	/* We assume that any machine missing strdup is too old for KDE */
+#ifdef USE_KDE3_DCOP
     char *cmd = NULL; /* result */
     char *ptr = getenv("KONSOLE_DCOP_SESSION"); /* Try KDE's Konsole first. */
     *newGnuplotXID = 0;
@@ -4425,8 +4425,8 @@ getMultiTabConsoleSwitchCommand(unsigned long *newGnuplotXID)
     /* now test for GNOME multitab console */
     /* ... if somebody bothers to implement it ... */
 
-#endif /* HAVE_STRDUP */
-/* NOTE: End of DCOP/KDE3 code (no longer works in KDE4) */
+#endif /* USE_KDE3_DCOP */
+
     /* we are not running in any known (implemented) multitab console */
     return NULL;
 }

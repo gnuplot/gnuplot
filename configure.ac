@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.ac,v 1.27 2017/02/11 04:14:40 sfeam Exp $
+dnl $Id: configure.ac,v 1.28 2017/03/17 23:59:32 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -173,6 +173,9 @@ if test "$no_x" != yes; then
   CPPFLAGS="$CPPFLAGS $X_CFLAGS"
   LIBRARIES_FOR_X="$X_LIBS -lX11 $X_EXTRA_LIBS"
   AC_DEFINE(X11,1,[ Define if you are using the X11 window system. ])
+  AC_ARG_WITH(x-dcop,dnl
+  [--with-x-dcop           gnuplot_x11 can use KDE3/DCOP for space-raises-console],
+  AC_DEFINE(USE_KDE3_DCOP,1,[ Define if gnuplot_x11 can use KDE3 DCOP to raise konsole]))
 fi
 AM_CONDITIONAL(BUILD_GNUPLOT_X11, test "$no_x" != yes)
 
@@ -1293,6 +1296,10 @@ if test "$no_x" != yes; then
     AC_MSG_RESULT([    (enable plotting to windows opened by external apps) ])
   else
     AC_MSG_RESULT([    (disable plotting to windows opened by external apps) ])
+  fi
+
+  if test "$with_x_dcop" = yes; then
+    AC_MSG_RESULT([    (gnuplot_x11 can use KDE3/DCOP to raise konsole) ])
   fi
 
   AC_MSG_RESULT([    (with application defaults, in $X11_APPDEFAULTS_DIR)])
