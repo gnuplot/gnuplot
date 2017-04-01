@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.168.2.9 2015/07/13 04:08:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.168.2.10 2016/06/18 05:36:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -2288,8 +2288,12 @@ do_event(struct gp_event_t *ge)
     case GE_buttonrelease_old:
 	/* ignore */
 	break;
+    case GE_raise:
+	/* FIXME: No generic routine implemented! */
+	/* Individual terminal types must handle it themselves if they care */
+	break;
     default:
-	fprintf(stderr, "%s:%d protocol error\n", __FILE__, __LINE__);
+	fprintf(stderr, "%s:%d unrecognized event type %d\n", __FILE__, __LINE__, ge->type);
 	break;
     }
 
@@ -2529,8 +2533,10 @@ bind_display(char *lhs)
 
 	fprintf(stderr, "\n");
 	/* keystrokes */
+#if (0)	/* Not implemented in the core code! */
 #ifndef DISABLE_SPACE_RAISES_CONSOLE
 	fprintf(stderr, " %-12s   %s\n", "Space", "raise gnuplot console window");
+#endif
 #endif
 	fprintf(stderr, " %-12s * %s\n", "q", "close this plot window");
 	fprintf(stderr, "\n");

@@ -383,18 +383,18 @@ bool qt_processTermEvent(gp_event_t* event)
 		event->my = p.y();
 	}
 
+#ifdef _WIN32
 	if (event->type == GE_raise)
 	{
-#ifdef _WIN32
 # ifndef WGP_CONSOLE
 		SetForegroundWindow(textwin.hWndParent);
 # else
 		SetForegroundWindow(GetConsoleWindow());
 # endif
 		WinRaiseConsole();
-#endif
 		return true;
 	}
+#endif
 
 	// Send the event to gnuplot core
 	do_event(event);

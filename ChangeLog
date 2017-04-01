@@ -1,3 +1,13 @@
+2017-04-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/mouse.c term/qt.trm src/qtterminal/qt_term.cpp
+	src/qtterminal/QtGnuplotWindow.cpp: The qt terminal assumed that
+	"space-raises-console" would be implemented in the core code.
+	But it never was.  Instead on non-MSWin platforms hitting <space>
+	in the qt window generates a mouse protocol error.
+	Document that "space-raises-console" is only for MSWin, and have
+	other platforms treat it like any other key.
+
 2017-04-01  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* src/plot.c (main):  Exit with error if dropping privilege fails.

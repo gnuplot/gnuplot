@@ -1,5 +1,5 @@
 /* GNUPLOT - qt.trm 
- * $Id: qt.trm,v 1.14.2.2 2017/02/09 21:13:11 sfeam Exp $
+ * $Id: qt.trm,v 1.14.2.3 2017/02/12 04:54:32 sfeam Exp $
  */
 
 /*[
@@ -169,9 +169,9 @@ START_HELP(qt)
 " drawn. This can be controlled with the keyword \"raise\".",
 " The keyword \"persist\" will prevent gnuplot from exiting before you",
 " explicitely close all the plot windows.",
-" Finally, by default the key <space> raises the gnuplot console window, and",
-" 'q' closes the plot window. The keyword \"ctrl\" allows you to replace those",
-" bindings by <ctrl>+<space> and <ctrl>+'q', respectively.",
+" Finally, by default the <space> key raises the gnuplot console window",
+" [MS Windows only], and 'q' closes the plot window. The keyword \"ctrl\" ",
+" allows you to replace those bindings by <ctrl>+<space> and <ctrl>+'q'.",
 "",
 " The gnuplot outboard driver, gnuplot_qt, is searched in a default place",
 " chosen when the program is compiled.  You can override that by defining",

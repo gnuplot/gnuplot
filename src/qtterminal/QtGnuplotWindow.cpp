@@ -309,14 +309,14 @@ void QtGnuplotWindow::keyPressEvent(QKeyEvent* event)
 	if ((event->key() == 'Q') && ( !m_ctrl || (QApplication::keyboardModifiers() & Qt::ControlModifier) ))
 		close();
 
+#ifdef _WIN32
 #if !defined(DISABLE_SPACE_RAISES_CONSOLE)
 	if ((event->key() == Qt::Key_Space) && ( !m_ctrl || (QApplication::keyboardModifiers() & Qt::ControlModifier) ))
 	{
-#ifdef _WIN32
 		AllowSetForegroundWindow(m_pid);
-#endif
 		m_eventHandler->postTermEvent(GE_raise, 0, 0, 0, 0, m_widget);
 	}
+#endif
 #endif
 
 	QMainWindow::keyPressEvent(event);
