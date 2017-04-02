@@ -4,6 +4,9 @@
 	stored in GPVAL_PWD.  However if the current directoty is invalid
 	GPVAL_PWD still contains the previous string.
 
+	* src/command.c (pwd_command):  Sanity check the validity of the
+	current working directory.
+
 2017-04-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c term/qt.trm src/qtterminal/qt_term.cpp
