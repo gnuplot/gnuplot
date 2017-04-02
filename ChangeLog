@@ -1,3 +1,9 @@
+2017-04-02  Daniel J Sebald <daniel.sebald@ieee.org>
+
+	* src/eval.c (update_gpval_variables):  Sanity check the string
+	stored in GPVAL_PWD.  However if the current directoty is invalid
+	GPVAL_PWD still contains the previous string.
+
 2017-04-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c term/qt.trm src/qtterminal/qt_term.cpp

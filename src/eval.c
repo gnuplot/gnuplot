@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.141 2016/09/19 04:40:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.142 2016/10/10 22:53:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -1036,14 +1036,15 @@ update_gpval_variables(int context)
 	fill_gpval_string("GPVAL_ERRMSG","");
     }
 
+    /* GPVAL_PWD is unreliable.  If the current directory becomes invalid,
+     * GPVAL_PWD does not reflect this.  If this matters, the user can
+     * instead do something like    MY_PWD = "`pwd`"
+     */
     if (context == 3 || context == 5) {
-	char *save_file = NULL;
-	save_file = (char *) gp_alloc(PATH_MAX, "filling GPVAL_PWD");
-	if (save_file) {
-	    GP_GETCWD(save_file, PATH_MAX);
-	    fill_gpval_string("GPVAL_PWD", save_file);
-	    free(save_file);
-	}
+	char *save_file = gp_alloc(PATH_MAX, "GPVAL_PWD");
+	int ierror = (GP_GETCWD(save_file, PATH_MAX) == NULL);
+	fill_gpval_string("GPVAL_PWD", ierror ? "" : save_file);
+	free(save_file);
     }
 
     if (context == 6) {
