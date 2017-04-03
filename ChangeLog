@@ -1,3 +1,8 @@
+2017-04-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c (save_command):  Don't use loadpath to choose an
+	output directory.
+
 2017-04-02  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* src/eval.c (update_gpval_variables):  Sanity check the string

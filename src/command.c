@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.348 2017/03/01 18:42:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.349 2017/04/02 18:30:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2154,7 +2154,11 @@ save_command()
 #endif
     {
     gp_expand_tilde(&save_file);
+#ifdef _WIN32
     fp = strcmp(save_file,"-") ? loadpath_fopen(save_file,"w") : stdout;
+#else
+    fp = strcmp(save_file,"-") ? fopen(save_file,"w") : stdout;
+#endif
     }
 
     if (!fp)
