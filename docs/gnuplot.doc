@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.76 2017/02/15 00:38:22 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.77 2017/02/24 19:52:08 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10514,18 +10514,20 @@ Ffigure_missing
  Minor tic marks along the z axis are controlled by `set mztics`.  Please
  see `set mxtics`.
 3 object
-?object
+?objects
 ?commands set object
 ?commands show object
 ?set object
 ?show object
- The `set object` command defines a single object which will appear in all
- subsequent 2D plots. You may define as many objects as you like. Currently the
+ The `set object` command defines a single object which will appear in
+ subsequent plots. You may define as many objects as you like. Currently the
  supported object types are `rectangle`, `circle`, `ellipse`, and `polygon`.
  Rectangles inherit a default set of style properties (fill, color, border) from
  those set by the command `set style rectangle`, but each object can also be
  given individual style properties. Circles, ellipses, and polygons  inherit the
- fill style from `set style fill`.
+ fill style from `set style fill`.  Objects to be drawn in 2D plots may be 
+ defined in any combination of axis, graph, or screen coordinates.
+ Objects in 3D plots must use screen coordinates.
 
  Syntax:
      set object <index>
