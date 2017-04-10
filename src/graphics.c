@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.550 2017/03/20 03:01:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.551 2017/03/21 04:17:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -398,7 +398,7 @@ place_objects(struct object *listhead, int layer, int dimensions)
 	    double radius;
 	    BoundingBox *clip_save = clip_area;
 
-	    if (dimensions == 2 || e->center.scalex == screen) {
+	    if (dimensions == 2) {
 		map_position_double(&e->center, &x1, &y1, "rect");
 		map_position_r(&e->extent, &radius, NULL, "rect");
 	    } else if (splot_map) {
@@ -406,8 +406,22 @@ place_objects(struct object *listhead, int layer, int dimensions)
 		map3d_position_double(&e->center, &x1, &y1, "rect");
 		map3d_position_r(&e->extent, &junkw, &junkh, "rect");
 		radius = junkw;
-	    } else
-		break;
+	    } else /* General 3D splot */ {
+		if (e->center.scalex == screen)
+		    map_position_double(&e->center, &x1, &y1, "rect");
+		else if (e->center.scalex == first_axes)
+		    map3d_position_double(&e->center, &x1, &y1, "rect");
+		else
+		    break;
+		/* radius must not change with rotation */
+		if (e->extent.scalex == first_axes) {
+		    struct axis *axis = &axis_array[FIRST_X_AXIS];
+		    double axis_frac =  e->extent.x / (axis->max - axis->min);
+		    radius = axis_frac * xscaler * surface_scale;
+		} else {
+		    map_position_r(&e->extent, &radius, NULL, "rect");
+		}
+	    }
 
 	    if ((e->center.scalex == screen || e->center.scaley == screen) 
 	    ||  (this_object->clip == OBJ_NOCLIP))

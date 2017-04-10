@@ -1,3 +1,17 @@
+2017-04-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/eval.c (update_gpval_variables):  New exported variables giving
+	screen coordinates of the 3D plot axial center and radius of the
+	enclosing sphere. GPVAL_VIEW_XCENT GPVAL_VIEW_YCENT GPVAL_VIEW_RADIUS.
+
+	* src/graphics.c (place_objects):  Allow placement and size of circles
+	in 3D plot to use axis coordinates (used to only allow screen coords).
+	As in 2D, the radius of the circle is always scaled to match the x axis
+	and the circle itself is always drawn in the plane of the figure.
+
+	* demo/armillary.dem docs/gnuplot.doc:  Document and provide example
+	for use of axis coordinates to place circles in 3D.
+
 2017-04-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (save_command):  Don't use loadpath to choose an

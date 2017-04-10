@@ -1,0 +1,65 @@
+#
+# Circles in 3D using
+# - sampling
+# - circle objects in axis coordinates
+#
+unset border
+unset key
+set angles degrees
+set view 44, 237, 1.6207, 1.0
+set view 74, 316, 1.6207, 1.0
+set view azimuth 23.5
+set view  equal xyz
+set style data lines
+set xzeroaxis
+set yzeroaxis
+set zzeroaxis
+set xyplane at 0
+unset tics
+set xrange [ -1.1  : 1.1  ]
+set yrange [ -1.1  : 1.1  ]
+set zrange [ -1.1  : 1.1  ]
+#
+set title "Various circles in 3D" font ",20"
+set arrow from 0,0,-1.2 to 0,0,1.2 lw 2 filled
+#
+# Place circles as objects using Cartesian coordinates
+#
+set object  1 circle at  0,0,0 radius 1.0 fs empty border -1 lw 3
+#set object 1        behind fs transparent solid 0.25 border -1 lw 3 fc "gray50"
+set object 11 circle at  1,0,0 radius 0.1 fs transparent solid 0.5 fc "orchid" 
+set object 12 circle at  0,1,0 radius 0.1 fs transparent solid 0.5 fc "turquoise" 
+set object 13 circle at -1,0,0 radius 0.1 fs transparent solid 0.5 fc "steelblue" 
+set object 14 circle at 0,-1,0 radius 0.1 fs transparent solid 0.5 fc "gold" 
+set object 15 circle at  0,0,1 radius 0.1 fs transparent solid 0.5 fc "green" 
+set object 16 circle at 0,0,-1 radius 0.1 fs transparent solid 0.5 fc "greenyellow" 
+#
+# Plot Zodiac constellations in polar (actually cylindrical) coordinates
+#
+save_encoding = GPVAL_ENCODING
+set encoding utf8
+
+set label 1 "♐" at polar 266.54, 1.1, 0 font ",15"
+set label 2 "♑" at polar 299.66, 1.1, 0 font ",15"
+set label 3 "♒" at polar 327.83, 1.1, 0 font ",15"
+set label 4 "♓" at polar 351.52, 1.1, 0 font ",15"
+set label 5 "♈" at polar 29.03, 1.1, 0 font ",15"
+set label 6 "♉" at polar 53.41, 1.1, 0 font ",15"
+set label 7 "♊" at polar 90.37, 1.1, 0 font ",15"
+set label 8 "♋" at polar 118.20, 1.1, 0 font ",15"
+set label 9 "♌" at polar 138.13, 1.1, 0 font ",15"
+set label 10 "♍" at polar 174.10, 1.1, 0 font ",15"
+set label 11 "♎" at polar 217.75, 1.1, 0 font ",15"
+set label 12 "♏" at polar 241.08, 1.1, 0 font ",15"
+set label 13 "⛎" at polar 247.98, 1.1, 0 font ",15"
+#
+# plot sampled parametric circles
+#
+splot sample [u=0:360] '+' using (cos(u)):(0):(sin(u)) lw 2, \
+             [u=0:360] '+' using (cos(u)):(sin(u)):(0) lw 2, \
+             [u=0:360] '+' using (0):(cos(u)):(sin(u)) lw 2
+
+pause -1 "Hit <cr> to continue"
+
+set encoding save_encoding
+reset
