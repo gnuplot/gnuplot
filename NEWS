@@ -1,5 +1,6 @@
 Changes in 5.0.7
 ================
+* CHANGE allow placement of circles in 3D plots using axis coordinates
 * FIX rangelimited y2 axis could produce spurious diagonal line across plot
 * FIX assignment of x/y dimensions in "binary record=(a,b) ... with image"
 

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.77 2017/02/24 19:52:08 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.78 2017/04/07 17:04:33 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10527,7 +10527,8 @@ Ffigure_missing
  given individual style properties. Circles, ellipses, and polygons  inherit the
  fill style from `set style fill`.  Objects to be drawn in 2D plots may be 
  defined in any combination of axis, graph, or screen coordinates.
- Objects in 3D plots must use screen coordinates.
+ Objects in 3D plots must use screen coordinates, except that circles and
+ polygons can be specified in 3D using axis or screen coordinates.
 
  Syntax:
      set object <index>
@@ -10647,13 +10648,15 @@ Ffigure_missing
 
  The position of the circle is specified by giving the position of the center
  center followed by the radius.  The keywords `at` and `center` are synonyms.
- The position and radius may be given in x-axis, graph, or canvas
- coordinates. See `coordinates`. In all cases the radius is calculated
- relative to the horizontal scale of the axis, graph, or canvas.  Any
- disparity between the horizontal and vertical scaling will be corrected for
- so that the result is always a circle. If you want to draw a circle in plot
- coordinates (such that it will appear as an ellipse if the horizontal and
- vertical scales are different), use `set object ellipse` instead.
+ The position and radius may be given in x-axis, graph, or screen coordinates.
+ See `coordinates`. Circles in 3D plots must use axis or screen coordinates.
+ In all cases the radius is calculated relative to the horizontal scale of the
+ axis, graph, or canvas.  Any disparity between the horizontal and vertical
+ scaling will be corrected for so that the result is always a circle.
+ If you want to draw a circle in plot coordinates (such that it will appear as
+ an ellipse if the horizontal and vertical scales are different), use
+ `set object ellipse` instead.
+
 
  By default a full circle is drawn. The optional qualifier `arc` specifies
  a starting angle and ending angle, in degrees, for one arc of the circle.
