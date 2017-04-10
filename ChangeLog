@@ -12,6 +12,14 @@
 	* demo/armillary.dem docs/gnuplot.doc:  Document and provide example
 	for use of axis coordinates to place circles in 3D.
 
+	* demo/Makefile.am.in: Place quotes around $(GNUTERM) so that multi-word
+	definitions do not gum up "make check".
+
+	* src/plot.c src/term.c:  Defer detection of initial terminal type until
+	after error handling has been set up.  This allows us to parse GNUTERM
+	for terminal options in additional to the bare terminal name.
+	E.g. GNUTERM="wxt size 500,500"
+
 2017-04-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (save_command):  Don't use loadpath to choose an

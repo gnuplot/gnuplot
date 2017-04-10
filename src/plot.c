@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.171 2016/08/06 13:22:50 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.172 2017/04/01 04:18:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -439,13 +439,9 @@ main(int argc, char **argv)
     init_memory();
 
     interactive = FALSE;
-    init_terminal();		/* can set term type if it likes */
-    push_terminal(0);		/* remember the default terminal */
 
-    /* reset the terminal when exiting */
-    /* this is done through gp_atexit so that other terminal functions
-     * can be registered to be executed before the terminal is reset. */
-    gp_atexit(term_reset);
+    /* April 2017:  We used to call init_terminal() here, but now   */
+    /* We defer initialization until error handling has bee set up. */
 
 # if defined(WIN32) && !defined(WGP_CONSOLE)
     interactive = TRUE;
@@ -490,8 +486,6 @@ main(int argc, char **argv)
     if (!SETJMP(command_line_env, 1)) {
 	/* first time */
 	interrupt_setup();
-	/* should move this stuff to another initialisation routine,
-	 * something like init_set() maybe */
 	get_user_env();
 	init_loadpath();
 	init_locale();
@@ -505,6 +499,16 @@ main(int argc, char **argv)
 	init_encoding();
 #endif
 	init_session();
+
+	/* April 2017: Now that the session is initialized and error handling
+	 * is in place, it is safe to allow parsing of GNUTERM during terminal
+	 * initialization. atexit processing is done in reverse order. We want
+	 * the generic terminal shutdown in term_reset to be executed before
+	 * any terminal specific cleanup requested by individual terminals.
+	 */
+	init_terminal();
+	push_terminal(0);	/* remember the initial terminal */
+	gp_atexit(term_reset);
 
 	if (interactive && term != 0) {		/* not unknown */
 #ifdef GNUPLOT_HISTORY
@@ -525,7 +529,6 @@ main(int argc, char **argv)
 	    gp_atexit(wrapper_for_write_history);
 #endif /* GNUPLOT_HISTORY */
 
-	    fprintf(stderr, "\nTerminal type set to '%s'\n", term->name);
 #if defined(READLINE) && defined(WGP_CONSOLE)
 	    fprintf(stderr, "Encoding set to '%s'.\n", encoding_names[encoding]);
 #endif

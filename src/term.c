@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.329 2017/01/04 06:24:29 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.330 2017/02/23 08:40:50 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1522,7 +1522,7 @@ change_term(const char *origname, int length)
 	term->dashtype = null_dashtype;
 
     if (interactive)
-	fprintf(stderr, "Terminal type set to '%s'\n", term->name);
+	fprintf(stderr, "\nTerminal type is now '%s'\n", term->name);
 
     /* Invalidate any terminal-specific structures that may be active */
     invalidate_palette();
@@ -1531,9 +1531,7 @@ change_term(const char *origname, int length)
 }
 
 /*
- * Routine to detect what terminal is being used (or do anything else
- * that would be nice).  One anticipated (or allowed for) side effect
- * is that the global ``term'' may be set.
+ * Find an appropriate initial terminal type.
  * The environment variable GNUTERM is checked first; if that does
  * not exist, then the terminal hardware is checked, if possible,
  * and finally, we can check $TERM for some kinds of terminals.
@@ -1556,7 +1554,15 @@ init_terminal()
     /* GNUTERM environment variable is primary */
     gnuterm = getenv("GNUTERM");
     if (gnuterm != (char *) NULL) {
-	term_name = gnuterm;
+	/* April 2017 - allow GNUTERM to include terminal options */
+	char *set_term = "set term ";
+	char *set_term_command = gp_alloc(strlen(set_term) + strlen(gnuterm) + 4, NULL);
+	strcpy(set_term_command, set_term);
+	strcat(set_term_command, gnuterm);
+	do_string(set_term_command);
+	free(set_term_command);
+	return;
+
     } else {
 
 #ifdef VMS
