@@ -33,7 +33,7 @@ check-interactive: check-prepare $(BINARY_FILES)
 	else \
 	  ( bdir=`pwd` ; PATH=$$bdir/../src:$$PATH \
 	    GNUPLOT_DRIVER_DIR=$$bdir/../src \
-	    GNUTERM=$(GNUTERM) \
+	    GNUTERM="$(GNUTERM)" \
 	    GNUPLOT_LIB=$(srcdir) $(GNUPLOT) $(DEMO) ); \
 	fi
 
@@ -45,7 +45,7 @@ check-noninteractive: check-prepare $(BINARY_FILES)
 	else \
 	  ( bdir=`pwd` ; PATH=$$bdir/../src:$$PATH\
 	    GNUPLOT_DRIVER_DIR=$$bdir/../src \
-	    GNUTERM=$(GNUTERM) \
+	    GNUTERM="$(GNUTERM)" \
 	    GNUPLOT_LIB=$(srcdir) $(GNUPLOT) $(DEMO) </dev/null ); \
 	fi
 
@@ -57,7 +57,7 @@ epslatex:
 	else \
 	  ( bdir=`pwd` ; PATH=$$bdir/../src:$$PATH \
 	    GNUPLOT_DRIVER_DIR=$$bdir/../src \
-	    GNUTERM=$(GNUTERM) \
+	    GNUTERM="$(GNUTERM)" \
 	    GNUPLOT_LIB=$(srcdir) $(GNUPLOT) epslatex.dem ); \
 	fi
 	latex epslatex

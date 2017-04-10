@@ -9,6 +9,9 @@
 	As in 2D, the radius of the circle is always scaled to match the x axis
 	and the circle itself is always drawn in the plane of the figure.
 
+	* demo/Makefile.am.in:  Place quotes around $(GNUTERM) so that
+	multi-word definitions do not gum up "make check".
+
 2017-04-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c term/qt.trm src/qtterminal/qt_term.cpp
