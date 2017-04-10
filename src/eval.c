@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.119.2.4 2016/08/18 17:23:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.119.2.5 2016/10/21 21:00:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -939,6 +939,16 @@ update_gpval_variables(int context)
 	fill_gpval_float("GPVAL_VIEW_ROT_Z", surface_rot_z);
 	fill_gpval_float("GPVAL_VIEW_SCALE", surface_scale);
 	fill_gpval_float("GPVAL_VIEW_ZSCALE", surface_zscale);
+
+	/* Screen coordinates of 3D rotational center and radius of the sphere */
+	/* in which x/y axes are drawn after 'set view equal xy[z]' */
+	fill_gpval_float("GPVAL_VIEW_XCENT",
+		(double)(canvas.xright+1 - xmiddle)/(double)(canvas.xright+1));
+	fill_gpval_float("GPVAL_VIEW_YCENT", 
+		1.0 - (double)(canvas.ytop+1 - ymiddle)/(double)(canvas.ytop+1));
+	fill_gpval_float("GPVAL_VIEW_RADIUS", 
+		0.5 * surface_scale * xscaler/(double)(canvas.xright+1));
+
 	return;
     }
 
