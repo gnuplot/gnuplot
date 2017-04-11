@@ -1,3 +1,8 @@
+2017-04-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c docs/gnuplot.doc demo/armillary.dem:
+	Allow polar (cylindrical) coordinates for circles in 3D plots.
+
 2017-04-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c (update_gpval_variables):  New exported variables giving

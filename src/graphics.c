@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.551 2017/03/21 04:17:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.552 2017/04/10 21:59:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -409,7 +409,7 @@ place_objects(struct object *listhead, int layer, int dimensions)
 	    } else /* General 3D splot */ {
 		if (e->center.scalex == screen)
 		    map_position_double(&e->center, &x1, &y1, "rect");
-		else if (e->center.scalex == first_axes)
+		else if (e->center.scalex == first_axes || e->center.scalex == polar_axes)
 		    map3d_position_double(&e->center, &x1, &y1, "rect");
 		else
 		    break;

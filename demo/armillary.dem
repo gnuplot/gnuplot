@@ -1,13 +1,16 @@
 #
-# Circles in 3D using
+# Placing circles in 3D using
 # - sampling
 # - circle objects in axis coordinates
+# - circle objects and labels in polar (cylindrical) coordinates
 #
+save_encoding = GPVAL_ENCODING
+set encoding utf8
+
 unset border
 unset key
 set angles degrees
-set view 44, 237, 1.6207, 1.0
-set view 74, 316, 1.6207, 1.0
+set view 68, 302, 1.62, 1.0
 set view azimuth 23.5
 set view  equal xyz
 set style data lines
@@ -20,38 +23,60 @@ set xrange [ -1.1  : 1.1  ]
 set yrange [ -1.1  : 1.1  ]
 set zrange [ -1.1  : 1.1  ]
 #
-set title "Various circles in 3D" font ",20"
+set title "Drawing circles in 3D" font ",20"
 set arrow from 0,0,-1.2 to 0,0,1.2 lw 2 filled
 #
-# Place circles as objects using Cartesian coordinates
+# Place circles as objects using Cartesian axis coordinates
 #
-set object  1 circle at  0,0,0 radius 1.0 fs empty border -1 lw 3
-#set object 1        behind fs transparent solid 0.25 border -1 lw 3 fc "gray50"
-set object 11 circle at  1,0,0 radius 0.1 fs transparent solid 0.5 fc "orchid" 
-set object 12 circle at  0,1,0 radius 0.1 fs transparent solid 0.5 fc "turquoise" 
-set object 13 circle at -1,0,0 radius 0.1 fs transparent solid 0.5 fc "steelblue" 
-set object 14 circle at 0,-1,0 radius 0.1 fs transparent solid 0.5 fc "gold" 
-set object 15 circle at  0,0,1 radius 0.1 fs transparent solid 0.5 fc "green" 
-set object 16 circle at 0,0,-1 radius 0.1 fs transparent solid 0.5 fc "greenyellow" 
+set object 21 circle at 0,0,0  radius 1.0 fs empty border -1 lw 3
+set object 22 circle at 0,0,1  radius 0.1 fs transparent solid 0.5 fc "slategray"
+set object 23 circle at 0,0,-1 radius 0.1 fs transparent solid 0.5 fc "slategray"
+
 #
 # Plot Zodiac constellations in polar (actually cylindrical) coordinates
 #
-save_encoding = GPVAL_ENCODING
-set encoding utf8
+set label 1 "♐" at polar 266.54, 1.1, 0 center font ",15"
+set label 2 "♑" at polar 299.66, 1.1, 0 center font ",15"
+set label 3 "♒" at polar 327.83, 1.1, 0 center font ",15"
+set label 4 "♓" at polar 351.52, 1.1, 0 center font ",15"
+set label 5 "♈" at polar 29.03, 1.1, 0 center font ",15"
+set label 6 "♉" at polar 53.41, 1.1, 0 center font ",15"
+set label 7 "♊" at polar 90.37, 1.1, 0 center font ",15"
+set label 8 "♋" at polar 118.20, 1.1, 0 center font ",15"
+set label 9 "♌" at polar 138.13, 1.1, 0 center font ",15"
+set label 10 "♍" at polar 174.10, 1.1, 0 center font ",15"
+set label 11 "♎" at polar 217.75, 1.1, 0 center font ",15"
+set label 12 "♏" at polar 241.08, 1.1, 0 center font ",15"
+set label 13 "⛎" at polar 247.98, 1.1, 0 center font ",15"
 
-set label 1 "♐" at polar 266.54, 1.1, 0 font ",15"
-set label 2 "♑" at polar 299.66, 1.1, 0 font ",15"
-set label 3 "♒" at polar 327.83, 1.1, 0 font ",15"
-set label 4 "♓" at polar 351.52, 1.1, 0 font ",15"
-set label 5 "♈" at polar 29.03, 1.1, 0 font ",15"
-set label 6 "♉" at polar 53.41, 1.1, 0 font ",15"
-set label 7 "♊" at polar 90.37, 1.1, 0 font ",15"
-set label 8 "♋" at polar 118.20, 1.1, 0 font ",15"
-set label 9 "♌" at polar 138.13, 1.1, 0 font ",15"
-set label 10 "♍" at polar 174.10, 1.1, 0 font ",15"
-set label 11 "♎" at polar 217.75, 1.1, 0 font ",15"
-set label 12 "♏" at polar 241.08, 1.1, 0 font ",15"
-set label 13 "⛎" at polar 247.98, 1.1, 0 font ",15"
+set obj  1 circle at polar 266.54, 1.1, 0 radius char 1.5
+set obj  2 circle at polar 299.66, 1.1, 0 radius char 1.5
+set obj  3 circle at polar 327.83, 1.1, 0 radius char 1.5
+set obj  4 circle at polar 351.52, 1.1, 0 radius char 1.5
+set obj  5 circle at polar 29.03, 1.1, 0 radius char 1.5
+set obj  6 circle at polar 53.41, 1.1, 0 radius char 1.5
+set obj  7 circle at polar 90.37, 1.1, 0 radius char 1.5
+set obj  8 circle at polar 118.20, 1.1, 0 radius char 1.5
+set obj  9 circle at polar 138.13, 1.1, 0 radius char 1.5
+set obj 10 circle at polar 174.10, 1.1, 0 radius char 1.5
+set obj 11 circle at polar 217.75, 1.1, 0 radius char 1.5
+set obj 12 circle at polar 241.08, 1.1, 0 radius char 1.5
+set obj 13 circle at polar 247.98, 1.1, 0 radius char 1.5
+
+
+set obj  1 fs solid fc rgb hsv2rgb(266./360., 0.5, 1.0)
+set obj  2 fs solid fc rgb hsv2rgb(299./360., 0.5, 1.0)
+set obj  3 fs solid fc rgb hsv2rgb(327./360., 0.5, 1.0)
+set obj  4 fs solid fc rgb hsv2rgb(351./360., 0.5, 1.0)
+set obj  5 fs solid fc rgb hsv2rgb(29./360., 0.5, 1.0)
+set obj  6 fs solid fc rgb hsv2rgb(53./360., 0.5, 1.0)
+set obj  7 fs solid fc rgb hsv2rgb(90./360., 0.5, 1.0)
+set obj  8 fs solid fc rgb hsv2rgb(118./360., 0.5, 1.0)
+set obj  9 fs solid fc rgb hsv2rgb(138./360., 0.5, 1.0)
+set obj 10 fs solid fc rgb hsv2rgb(174./360., 0.5, 1.0)
+set obj 11 fs solid fc rgb hsv2rgb(217./360., 0.5, 1.0)
+set obj 12 fs solid fc rgb hsv2rgb(241./360., 0.5, 1.0)
+set obj 13 fs solid fc rgb hsv2rgb(247./360., 0.5, 1.0)
 #
 # plot sampled parametric circles
 #

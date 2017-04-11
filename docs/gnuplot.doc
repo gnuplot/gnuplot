@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1060 2017/04/07 17:04:19 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1061 2017/04/10 21:59:35 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -11049,9 +11049,10 @@ Ffigure_multiple_keys
  those set by the command `set style rectangle`, but each object can also be
  given individual style properties. Circles, ellipses, and polygons  inherit the
  fill style from `set style fill`.  Objects to be drawn in 2D plots may be 
- defined in any combination of axis, graph, or screen coordinates.
- Objects in 3D plots must use screen coordinates, except that circles and
- polygons can be specified in 3D using axis or sreen coordinates.
+ defined in any combination of axis, graph, polar, or screen coordinates.
+ 
+ Object specifications in 3D plots cannot use graph coordinates.
+ Rectangles and ellipses in 3D plots are limited to screen coordinates.
 
  Syntax:
      set object <index>
@@ -11171,8 +11172,8 @@ Ffigure_multiple_keys
 
  The position of the circle is specified by giving the position of the center
  center followed by the radius.  The keywords `at` and `center` are synonyms.
- The position and radius may be given in x-axis, graph, or screen coordinates.
- See `coordinates`. Circles in 3D plots must use axis or screen coordinates.
+ In 2D plots the position and radius may be given in any coordinate system.
+ See `coordinates`. Circles in 3D plots cannot use graph coordinates.
  In all cases the radius is calculated relative to the horizontal scale of the
  axis, graph, or canvas.  Any disparity between the horizontal and vertical
  scaling will be corrected for so that the result is always a circle.
@@ -11199,7 +11200,7 @@ Ffigure_multiple_keys
          from <position> rto <position> ... {rto <position>}
 
  The position of the polygon may be specified by giving the position of a
- sequence of vertices. These may be given in axis, graph, or screen coordinates.
+ sequence of vertices. These may be given in any coordinate system.
  If relative coordinates are used (rto) then the coordinate type must match
  that of the previous vertex.
  See `coordinates`.
