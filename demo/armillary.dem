@@ -1,5 +1,5 @@
 #
-# Placing circles in 3D using
+# Show placement of circles in 3D using
 # - sampling
 # - circle objects in axis coordinates
 # - circle objects and labels in polar (cylindrical) coordinates
@@ -11,7 +11,7 @@ unset border
 unset key
 set angles degrees
 set view 68, 302, 1.62, 1.0
-set view azimuth 23.5
+set view azimuth 23.4
 set view  equal xyz
 set style data lines
 set xzeroaxis
@@ -34,49 +34,16 @@ set object 23 circle at 0,0,-1 radius 0.1 fs transparent solid 0.5 fc "slategray
 
 #
 # Plot Zodiac constellations in polar (actually cylindrical) coordinates
+# Place a circle around the corresponding glyph
 #
-set label 1 "♐" at polar 266.54, 1.1, 0 center font ",15"
-set label 2 "♑" at polar 299.66, 1.1, 0 center font ",15"
-set label 3 "♒" at polar 327.83, 1.1, 0 center font ",15"
-set label 4 "♓" at polar 351.52, 1.1, 0 center font ",15"
-set label 5 "♈" at polar 29.03, 1.1, 0 center font ",15"
-set label 6 "♉" at polar 53.41, 1.1, 0 center font ",15"
-set label 7 "♊" at polar 90.37, 1.1, 0 center font ",15"
-set label 8 "♋" at polar 118.20, 1.1, 0 center font ",15"
-set label 9 "♌" at polar 138.13, 1.1, 0 center font ",15"
-set label 10 "♍" at polar 174.10, 1.1, 0 center font ",15"
-set label 11 "♎" at polar 217.75, 1.1, 0 center font ",15"
-set label 12 "♏" at polar 241.08, 1.1, 0 center font ",15"
-set label 13 "⛎" at polar 247.98, 1.1, 0 center font ",15"
+array Zodiac[13] = ["♐", "♑", "♒", "♓", "♈", "♉", "♊", "♋", "♌", "♍", "♎", "♏", "⛎"] 
+array Longitude[13] = [267., 300., 328., 352., 29., 53., 90., 118., 138., 174., 218., 241., 248.]
+do for [i=1:13] {
+    set label i Zodiac[i] at polar Longitude[i], 1.1, 0 center font ",15"
+    set obj i circle at polar Longitude[i], 1.1, 0 radius char 1.5
+    set obj i fs solid fc rgb hsv2rgb( Longitude[i]/360., 0.5, 1.0)
+}
 
-set obj  1 circle at polar 266.54, 1.1, 0 radius char 1.5
-set obj  2 circle at polar 299.66, 1.1, 0 radius char 1.5
-set obj  3 circle at polar 327.83, 1.1, 0 radius char 1.5
-set obj  4 circle at polar 351.52, 1.1, 0 radius char 1.5
-set obj  5 circle at polar 29.03, 1.1, 0 radius char 1.5
-set obj  6 circle at polar 53.41, 1.1, 0 radius char 1.5
-set obj  7 circle at polar 90.37, 1.1, 0 radius char 1.5
-set obj  8 circle at polar 118.20, 1.1, 0 radius char 1.5
-set obj  9 circle at polar 138.13, 1.1, 0 radius char 1.5
-set obj 10 circle at polar 174.10, 1.1, 0 radius char 1.5
-set obj 11 circle at polar 217.75, 1.1, 0 radius char 1.5
-set obj 12 circle at polar 241.08, 1.1, 0 radius char 1.5
-set obj 13 circle at polar 247.98, 1.1, 0 radius char 1.5
-
-
-set obj  1 fs solid fc rgb hsv2rgb(266./360., 0.5, 1.0)
-set obj  2 fs solid fc rgb hsv2rgb(299./360., 0.5, 1.0)
-set obj  3 fs solid fc rgb hsv2rgb(327./360., 0.5, 1.0)
-set obj  4 fs solid fc rgb hsv2rgb(351./360., 0.5, 1.0)
-set obj  5 fs solid fc rgb hsv2rgb(29./360., 0.5, 1.0)
-set obj  6 fs solid fc rgb hsv2rgb(53./360., 0.5, 1.0)
-set obj  7 fs solid fc rgb hsv2rgb(90./360., 0.5, 1.0)
-set obj  8 fs solid fc rgb hsv2rgb(118./360., 0.5, 1.0)
-set obj  9 fs solid fc rgb hsv2rgb(138./360., 0.5, 1.0)
-set obj 10 fs solid fc rgb hsv2rgb(174./360., 0.5, 1.0)
-set obj 11 fs solid fc rgb hsv2rgb(217./360., 0.5, 1.0)
-set obj 12 fs solid fc rgb hsv2rgb(241./360., 0.5, 1.0)
-set obj 13 fs solid fc rgb hsv2rgb(247./360., 0.5, 1.0)
 #
 # plot sampled parametric circles
 #

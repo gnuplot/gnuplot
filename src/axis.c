@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.221 2017/02/14 21:49:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.222 2017/03/29 04:08:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -2577,8 +2577,6 @@ polar_to_xy( double theta, double r, double *x, double *y, TBOOLEAN update)
 {
     coord_type status = INRANGE;
 
-    FPRINTF((stderr,"polar_to_xy( %g %g )\n", theta, r));
-
     /* NB: Range checks from multiple original sites are consolidated here.
      * They were not all identical but I hope this version is close enough.
      * One caller (parametric fixup) did R_AXIS.max range checks
@@ -2648,6 +2646,10 @@ polar_to_xy( double theta, double r, double *x, double *y, TBOOLEAN update)
     return status;
 }
 
+/*
+ * converts polar coordinate r into a magnitude on x
+ * allowing for R_AXIS.min != 0, axis inversion, nonlinearity, etc.
+ */
 double
 polar_radius(double r)
 {
