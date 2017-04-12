@@ -28,13 +28,14 @@ set arrow from 0,0,-1.2 to 0,0,1.2 lw 2 filled
 #
 # Place circles as objects using Cartesian axis coordinates
 #
-set object 21 circle at 0,0,0  radius 1.0 fs empty border -1 lw 3
+set object 21 circle at 0,0,0  radius 1.0 fs empty border lc "black" lw 3
 set object 22 circle at 0,0,1  radius 0.1 fs transparent solid 0.5 fc "slategray"
 set object 23 circle at 0,0,-1 radius 0.1 fs transparent solid 0.5 fc "slategray"
 
 #
-# Plot Zodiac constellations in polar (actually cylindrical) coordinates
+# Plot symbols for Zodiac constellations in polar (actually cylindrical) coordinates
 # Place a circle around the corresponding glyph
+# Note: Many fonts do not provide glyphs for these symbols
 #
 array Zodiac[13] = ["♐", "♑", "♒", "♓", "♈", "♉", "♊", "♋", "♌", "♍", "♎", "♏", "⛎"] 
 array Longitude[13] = [267., 300., 328., 352., 29., 53., 90., 118., 138., 174., 218., 241., 248.]
