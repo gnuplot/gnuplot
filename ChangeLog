@@ -1,3 +1,9 @@
+2017-04-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/hidden3d.c (build_networks):  A degenerate polygon can fall all 
+	the way through the classification loop, leaving the flag value -2 as
+	the polygon number which is then used as an array index.  Oops.
+
 2017-04-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c (update_gpval_variables):  New exported variables giving
