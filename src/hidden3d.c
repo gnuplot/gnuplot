@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.99.2.7 2017/02/07 21:40:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.99.2.8 2017/02/15 21:19:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1463,9 +1463,11 @@ build_networks(struct surface_points *plots, int pcount)
 				     * all edges are new, so there is
 				     * no other polygon orientation to
 				     * consider */
-				    if (!plist[pnum].frontfacing)
-					elist[e1].style = elist[e2].style = elist[e3].style
-					    = below;
+				    if (pnum > -2) {
+					if (!plist[pnum].frontfacing)
+					    elist[e1].style = elist[e2].style
+						= elist[e3].style = below;
+				    }
 				}
 			    }
 			}
