@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.256 2017/03/01 18:42:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.257 2017/04/01 21:03:11 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -4431,8 +4431,8 @@ getMultiTabConsoleSwitchCommand(unsigned long *newGnuplotXID)
     return NULL;
 }
 
-#endif
 #endif	/* DISABLE_SPACE_RAISES_CONSOLE */
+#endif  /* USE_MOUSE */
 
 
 /*---------------------------------------------------------------------------
