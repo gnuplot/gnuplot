@@ -81,6 +81,7 @@ Here are samples of PNG output from some of the demos.
     <li><a href="world2.html">3D mapping</a></li>
     <li><a href="zerror.html">shaded error region</a></li>
     <li><a href="azimuth.html">azimuth</a></li>
+    <li><a href="armillary.html">circles and polygons</a></li>
     <li><a href="pm3d_lighting.html">lighting model</a></li>
     </ul>
 
@@ -193,7 +194,7 @@ Here are samples of PNG output from some of the demos.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated March 2017</i>
+    <i>This page generated April 2017</i>
     </td>
 
     <td>

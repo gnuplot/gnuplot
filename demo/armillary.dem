@@ -10,7 +10,7 @@ set encoding utf8
 unset border
 unset key
 set angles degrees
-set view 68, 302, 1.62, 1.0
+set view 64, 302, 1.62, 1.0
 set view azimuth 23.4
 set view  equal xyz
 set style data lines
@@ -23,14 +23,21 @@ set xrange [ -1.1  : 1.1  ]
 set yrange [ -1.1  : 1.1  ]
 set zrange [ -1.1  : 1.1  ]
 #
-set title "Drawing circles in 3D" font ",20"
+set title "Circles and polygons in 3D" font ",20"
 set arrow from 0,0,-1.2 to 0,0,1.2 lw 2 filled
 #
 # Place circles as objects using Cartesian axis coordinates
 #
-set object 21 circle at 0,0,0  radius 1.0 fs empty border lc "black" lw 3
+set object 21 circle at 0,0,0  radius 1.0 fs empty border lc "black" lw 3 front
 set object 22 circle at 0,0,1  radius 0.1 fs transparent solid 0.5 fc "slategray"
 set object 23 circle at 0,0,-1 radius 0.1 fs transparent solid 0.5 fc "slategray"
+
+#
+# Pentagonal "base"
+#
+set obj 24 polygon from polar 0, 0.5, -1.2 to polar 72, 0.5, -1.2 to polar 144, 0.5, -1.2 to polar 216, 0.5, -1.2 to polar 288, 0.5, -1.2 to polar 0, 0.5, -1.2
+set obj 24 fillstyle solid border border lc "black" back fc "olive"
+
 
 #
 # Plot symbols for Zodiac constellations in polar (actually cylindrical) coordinates
