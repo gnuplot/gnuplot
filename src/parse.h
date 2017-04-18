@@ -1,5 +1,5 @@
 /*
- * $Id: parse.h,v 1.37 2016/10/18 18:50:44 sfeam Exp $
+ * $Id: parse.h,v 1.38 2017/02/04 23:59:27 sfeam Exp $
  */
 
 /* GNUPLOT - parse.h */
@@ -87,6 +87,7 @@ struct at_type * create_call_column_at __PROTO((char *));
 struct udvt_entry * add_udv __PROTO((int t_num));
 struct udft_entry * add_udf __PROTO((int t_num));
 void cleanup_udvlist __PROTO((void));
+int is_function __PROTO((int t_num));
 
 /* Code that uses the iteration routines here must provide */
 /* a blank iteration structure to use for bookkeeping.     */
