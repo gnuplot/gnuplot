@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.362 2017/02/07 21:46:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.363 2017/04/01 04:06:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -3011,7 +3011,10 @@ map3d_getposition(
     case first_axes:
     case second_axes:
     case polar_axes:
-	*zpos = axis_log_value_checked(FIRST_Z_AXIS, *zpos, what);
+	if (splot_map)
+	    *zpos = 1;	/* Avoid failure if z=0 with logscale z */
+	else
+	    *zpos = axis_log_value_checked(FIRST_Z_AXIS, *zpos, what);
 	plot_coords = TRUE;
 	break;
     case graph:
@@ -3075,7 +3078,7 @@ map3d_position_r(
 {
     double xpos = pos->x;
     double ypos = pos->y;
-    double zpos = pos->z;
+    double zpos = (splot_map) ? Z_AXIS.min : pos->z;
 
     /* startpoint in graph coordinates */
     if (map3d_getposition(pos, what, &xpos, &ypos, &zpos) == 0) {
@@ -3093,6 +3096,8 @@ map3d_position_r(
 	else
 	    ypos = 0;
 	if (pos->scalez == graph)
+	    zpos = Z_AXIS.min;
+	else if (splot_map)
 	    zpos = Z_AXIS.min;
 	else
 	    zpos = 0;

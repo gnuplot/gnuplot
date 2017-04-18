@@ -1,3 +1,13 @@
+2017-04-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (place_objects):  Error messages from placement of
+	circles and ellipses were misleadingly refering to "rect N" instead
+	of "object N".
+
+	* src/graph3d.c (map3d_position_r):  Placement of generic objects in
+	"set view map" mode should not fail just because the z coordinate is
+	non-positive and z is log-scaled.  The projection only uses x and y.
+
 2017-04-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c docs/gnuplot.doc demo/armillary.dem:
