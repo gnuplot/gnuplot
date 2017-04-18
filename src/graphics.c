@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.34 2017/03/20 03:02:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.35 2017/04/10 22:17:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -386,18 +386,18 @@ place_objects(struct object *listhead, int layer, int dimensions)
 	    BoundingBox *clip_save = clip_area;
 
 	    if (dimensions == 2) {
-		map_position_double(&e->center, &x1, &y1, "rect");
-		map_position_r(&e->extent, &radius, NULL, "rect");
+		map_position_double(&e->center, &x1, &y1, "object");
+		map_position_r(&e->extent, &radius, NULL, "object");
 	    } else if (splot_map) {
 		int junkw, junkh;
-		map3d_position_double(&e->center, &x1, &y1, "rect");
-		map3d_position_r(&e->extent, &junkw, &junkh, "rect");
+		map3d_position_double(&e->center, &x1, &y1, "object");
+		map3d_position_r(&e->extent, &junkw, &junkh, "object");
 		radius = junkw;
 	    } else /* General 3D splot */ {
 		if (e->center.scalex == screen)
-		    map_position_double(&e->center, &x1, &y1, "rect");
+		    map_position_double(&e->center, &x1, &y1, "object");
 		else if (e->center.scalex == first_axes)
-		    map3d_position_double(&e->center, &x1, &y1, "rect");
+		    map3d_position_double(&e->center, &x1, &y1, "object");
 		else
 		    break;
 		/* radius must not change with rotation */
@@ -406,7 +406,7 @@ place_objects(struct object *listhead, int layer, int dimensions)
 		    double axis_frac =  e->extent.x / (axis->max - axis->min);
 		    radius = axis_frac * xscaler * surface_scale;
 		} else {
-		    map_position_r(&e->extent, &radius, NULL, "rect");
+		    map_position_r(&e->extent, &radius, NULL, "object");
 		}
 	    }
 
