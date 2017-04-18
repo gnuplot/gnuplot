@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.88.2.6 2016/01/11 23:32:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.88.2.7 2016/10/18 18:56:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -1104,6 +1104,30 @@ is_builtin_function(int t_num)
 	    return (i);
     }
     return (0);
+}
+
+/*
+ * Test for the existence of a function without triggering errors
+ * Return values:
+ *   0  no such function is defined
+ *  -1  built-in function
+ *   1  user-defined function
+ */
+int
+is_function(int t_num)
+{
+    struct udft_entry **udf_ptr = &first_udf;
+
+    if (is_builtin_function(t_num))
+	return -1;
+
+    while (*udf_ptr) {
+	if (equals(t_num, (*udf_ptr)->udf_name))
+	    return 1;
+	udf_ptr = &((*udf_ptr)->next_udf);
+    }
+
+    return 0;
 }
 
 /* Look for iterate-over-plot constructs, of the form

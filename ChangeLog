@@ -8,6 +8,9 @@
 	"set view map" mode should not fail just because the z coordinate is
 	non-positive and z is log-scaled.  The projection only uses x and y.
 
+	* src/parse.h src/parse.c src/misc.c (parse_fillstyle):  New utility
+	routine is_function(token) for convenience in parsing.
+
 2017-04-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/hidden3d.c (build_networks):  A degenerate polygon can fall all 

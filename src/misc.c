@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.188.2.10 2016/08/16 19:35:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.188.2.11 2017/02/15 20:59:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1319,7 +1319,8 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
 		set_fill = TRUE;
 		c_token++;
 		
-		if (isanumber(c_token) || type_udv(c_token) == INTGR || type_udv(c_token) == CMPLX) {
+		if (isanumber(c_token) || is_function(c_token)
+                ||  type_udv(c_token) == INTGR || type_udv(c_token) == CMPLX) {
 		    if (fs->fillstyle == FS_SOLID) {
 			/* user sets 0...1, but is stored as an integer 0..100 */
 			fs->filldensity = 100.0 * real_expression() + 0.5;
