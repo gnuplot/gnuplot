@@ -74,5 +74,15 @@ do for [i=1:4]{ set object i noclip; set object i*11 noclip; set object i*111 no
 plot 0
 
 pause -1 "Hit return to continue"
+
+set title "Clipping in 3D projection ('set view map')"
+do for [i=1:4]{ set object i clip; set object i*11 clip; set object i*111 clip; }
+set view map
+set zrange [.1:100]
+set log z
+splot 0
+
+pause -1 "Hit return to continue"
+
 undefine fs
 reset

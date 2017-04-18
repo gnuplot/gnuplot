@@ -5,6 +5,7 @@ Changes in 5.0.7
 * FIX rangelimited y2 axis could produce spurious diagonal line across plot
 * FIX assignment of x/y dimensions in "binary record=(a,b) ... with image"
 * FIX negative array index caused by hidden3d degenerate polygon
+* FIX object clipping in "set view map"
 
 Changes in 5.0.6
 ================
