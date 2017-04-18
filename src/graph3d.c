@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.363 2017/04/01 04:06:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.364 2017/04/18 22:15:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -799,6 +799,7 @@ do_3dplot(
     memcpy(&page_bounds, &plot_bounds, sizeof(page_bounds));
 
     /* Clipping in 'set view map' mode should be like 2D clipping */
+    /* FIXME:  Wasn't this already done in boundary3d?            */
     if (splot_map) {
 	int map_x1, map_y1, map_x2, map_y2;
 	map3d_xy(X_AXIS.min, Y_AXIS.min, base_z, &map_x1, &map_y1);
@@ -2315,10 +2316,14 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
     } /* if (draw_border) */
 
     /* In 'set view map' mode, treat grid as in 2D plots */
-    if (splot_map && current_layer != abs(grid_layer))
+    if (splot_map && current_layer != abs(grid_layer)) {
+	clip_area = clip_save;
 	return;
-    if (whichgrid == BORDERONLY)
+    }
+    if (whichgrid == BORDERONLY) {
+	clip_area = clip_save;
 	return;
+    }
 
     /* Draw ticlabels and axis labels */
 

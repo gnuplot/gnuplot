@@ -26,6 +26,9 @@
 	* src/parse.h src/parse.c src/misc.c (parse_fillstyle):  New utility
 	routine is_function(token) for convenience in parsing.
 
+	* src/graph3d.c (draw_3d_graphbox): Clipping area was not maintained
+	across this routine, causing object clipping in "set view map" to fail.
+
 2017-04-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c docs/gnuplot.doc demo/armillary.dem:
