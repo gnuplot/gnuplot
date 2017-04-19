@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.97 2016/09/22 01:39:35 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.98 2016/12/17 06:30:19 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -1788,7 +1788,8 @@ void gp_cairo_boxed_text(plot_struct *plot, int x, int y, int option)
 		    cairo_set_source_rgba(plot->cr, 0.75, 0.75, 0.75, 0.50);
 		    cairo_fill(plot->cr);
 		} else {  /* option == TEXTBOX_OUTLINE */
-		    cairo_set_line_width(plot->cr, 0.5*plot->oversampling_scale);
+		    cairo_set_line_width(plot->cr,
+					 0.5*plot->linewidth*plot->oversampling_scale);
 		    cairo_set_source_rgba(plot->cr, plot->color.r, plot->color.g,
 					  plot->color.b, 1. - plot->color.alpha);
 		    cairo_stroke(plot->cr);
