@@ -6,6 +6,7 @@ Changes in 5.0.7
 * FIX assignment of x/y dimensions in "binary record=(a,b) ... with image"
 * FIX negative array index caused by hidden3d degenerate polygon
 * FIX object clipping in "set view map"
+* FIX cairo terminals: scale textbox border linewidth by terminal linewidth
 
 Changes in 5.0.6
 ================

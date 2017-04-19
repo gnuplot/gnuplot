@@ -1,3 +1,9 @@
+2017-04-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/gp_cairo.cpp (gp_cairo_boxed_text): Scale linewidth of
+	textbox border by the current terminal linewidth setting.
+	Bug #1825
+
 2017-04-19  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* configure.in docs/Makefile.am:  Some systems allow for parallel
