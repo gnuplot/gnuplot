@@ -8,6 +8,9 @@
 	accordingly.
 	Patch #750
 
+	* src/win/wgdiplus.cpp (drawgraph_gdiplus):  Use generic string format
+	to determine string extent.  Bug fix.
+
 2017-04-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (place_objects):  Error messages from placement of
