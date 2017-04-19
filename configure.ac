@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.ac,v 1.28 2017/03/17 23:59:32 sfeam Exp $
+dnl $Id: configure.ac,v 1.29 2017/04/01 21:03:11 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -642,8 +642,15 @@ AC_ARG_WITH(lua,dnl
 [  --without-lua         disable lua/TikZ terminal (default enabled)],,
   [test -z "${with_lua}" && with_lua=yes])
 
+dnl Some distributions allow for parallel installation of different
+dnl lua versions.  We test for that in order of pereference.
 if test "${with_lua}" = yes ; then
-  PKG_CHECK_MODULES(LUA, [lua], LUAFOUND=yes, [PKG_CHECK_MODULES(LUA, [lua5.1], LUAFOUND=yes, [LUAFOUND=no])])
+  LUA=lua
+  PKG_CHECK_MODULES([LUA], [lua], LUAFOUND=yes,
+    [PKG_CHECK_MODULES([LUA], [lua5.3], LUA=lua5.3, 
+      [PKG_CHECK_MODULES([LUA], [lua5.2], LUA=lua5.2, 
+        [PKG_CHECK_MODULES([LUA], [lua5.1], LUA=lua5.1, 
+          [LUAFOUND=no])])])])
   if test $pkg_failed != no; then
     AC_MSG_WARN([Could not find support for lua using pkg-config.])
     with_lua=no
@@ -654,7 +661,7 @@ if test "${with_lua}" = yes ; then
     CPPFLAGS="$CPPFLAGS $LUA_CFLAGS"
   else
     dnl if pkg-config didn't work, we migh still find it manually
-    AC_SEARCH_LIBS(luaL_openlibs, lua lua5.1,
+    AC_SEARCH_LIBS(luaL_openlibs, lua lua5.3 lua5.2 lua5.1,
        with_lua=yes, with_lua=no)
   fi
   if test "$with_lua" = yes; then
@@ -662,7 +669,7 @@ if test "${with_lua}" = yes ; then
      AC_CHECK_HEADERS(lua.h,,
        AC_MSG_WARN([please add path to lua.h to CPPFLAGS in Makefile]))
   fi
-
+  AC_SUBST(LUA)
 fi
 AM_CONDITIONAL(BUILD_LUA, test "${with_lua}" = yes)
 dnl end lua
