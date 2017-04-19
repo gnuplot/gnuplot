@@ -1,3 +1,13 @@
+2017-04-19  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* configure.in docs/Makefile.am:  Some systems allow for parallel
+	installation of different lua versions (e.g. Ubuntu).  We already use
+	pkg-config to test for "lua" and "lua5.1" packages.  This patch extends
+	that mechanism to lua5.2 and lua5.3.  Change the name of the lua
+	executable used to build the docs of the gnuplot lua terminal
+	accordingly.
+	Patch #750
+
 2017-04-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (place_objects):  Error messages from placement of

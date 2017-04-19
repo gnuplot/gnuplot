@@ -113,7 +113,7 @@ $(SRC_VERSION_O):
 if BUILD_LUA
 LUA_HELP = gnuplot-tikz.help
 $(LUA_HELP): $(top_srcdir)/term/lua/gnuplot-tikz.lua
-	$(AM_V_GEN)lua $< termhelp > $@
+	$(AM_V_GEN) $(LUA) $< termhelp > $@
 else
 LUA_HELP = 
 endif
