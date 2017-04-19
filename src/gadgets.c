@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.135 2017/02/01 04:30:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.136 2017/02/01 19:48:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -825,6 +825,7 @@ write_label(unsigned int x, unsigned int y, struct text_label *this_label)
 
 	    /* Draw the bounding box */
 	    if (!textbox_opts.noborder) {
+		(*term->linewidth)(textbox_opts.linewidth);
 		apply_pm3dcolor(&textbox_opts.border_color);
 		(*term->boxed_text)(0,0, TEXTBOX_OUTLINE);
 	    }

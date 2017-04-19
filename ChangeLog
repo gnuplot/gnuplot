@@ -4,6 +4,9 @@
 	textbox border by the current terminal linewidth setting.
 	Bug #1825
 
+	* src/gadgets.h src/gadgets.c src/save.c src/set.c docs/gnuplot.doc:
+	Add a "linewidth" property to the textbox style.
+
 2017-04-19  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* configure.ac docs/Makefile.am:  Some systems allow for parallel

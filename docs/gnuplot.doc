@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1061 2017/04/10 21:59:35 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1062 2017/04/11 17:44:17 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -12881,7 +12881,8 @@ Ffigure_multiple_keys
 ?textbox
 ?boxed
 
- Syntax: set style textbox {opaque|transparent}{{no}border {<bordercolor>}}
+ Syntax: set style textbox {opaque|transparent}
+                           {{no}border {<bordercolor>}}{linewidth <lw>}
                            {fillcolor <color>}
                            {margins <xmargin>,<ymargin>}
 

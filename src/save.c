@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.326 2017/02/01 04:30:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.327 2017/02/14 21:49:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1249,6 +1249,7 @@ save_style_textbox(FILE *fp)
 	fprintf(fp, " border ");
 	save_pm3dcolor(fp, &(textbox_opts.border_color));
     }
+    fprintf(fp, " linewidth %4.1f", textbox_opts.linewidth);
     fputs("\n",fp);
 }
 #endif

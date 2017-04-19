@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.555 2017/02/14 21:49:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.556 2017/03/16 20:04:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4753,6 +4753,11 @@ set_style()
 		if (equals(c_token,"lt"))
 		    c_token--;
 		parse_colorspec(&textbox_opts.border_color, TC_RGB);
+	    } else if (almost_equals(c_token,"linew$idth") || equals(c_token,"lw")) {
+		c_token++;
+		textbox_opts.linewidth = real_expression();
+		if (textbox_opts.linewidth < 0)
+		    textbox_opts.linewidth = 1.0;
 	    } else
 		int_error(c_token,"unrecognized option");
 	}
