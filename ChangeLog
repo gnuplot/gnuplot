@@ -11,6 +11,8 @@
 	* src/win/wgdiplus.cpp (drawgraph_gdiplus):  Use generic string format
 	to determine string extent.  Bug fix.
 
+	* term/caca.trm:  Eliminate compiler warnings.
+
 2017-04-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (place_objects):  Error messages from placement of

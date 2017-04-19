@@ -1,7 +1,7 @@
 /*
  * GNUPLOT - caca.trm
  *
- * $Id: caca.trm,v 1.9 2015/05/03 12:32:31 broeker Exp $
+ * $Id: caca.trm,v 1.10 2015/05/18 23:32:50 sfeam Exp $
  *
  * This file uses UTF8 encoding and a tab size of 4.
  *
@@ -1669,7 +1669,7 @@ CACA_text_angle(int ang)
 		CACA_ang += 360;
 	CACA_ang %= 360;
 	return TRUE;
-};
+}
 
 
 static wchar_t
@@ -2183,7 +2183,7 @@ float_compare(const void * elem1, const void * elem2)
 {
 	int val = *(float *)elem1 - *(float *)elem2;
 	return (0 < val) - (val < 0);
-};
+}
 
 
 TERM_PUBLIC void
@@ -2889,6 +2889,9 @@ CACA_draw_line(caca_canvas_t *cv, int x1, int y1, int x2, int y2, uint32_t ch)
     int xinc, yinc;
     TBOOLEAN first = TRUE;
 
+    /* silence compiler warning */
+    (void) first;
+
     dx = abs(x2 - x1);
     dy = abs(y2 - y1);
 
@@ -3065,7 +3068,7 @@ CACA_draw_thin_line(caca_canvas_t *cv, int x1, int y1, int x2, int y2)
 	s.x2 = x2;
 	s.y2 = y2;
 	CACA_internal_draw_thin_line(cv, &s);
-};
+}
 
 
 static void
