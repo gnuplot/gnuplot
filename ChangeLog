@@ -1,3 +1,8 @@
+2017-04-21  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgdiplus.cpp: Correct calculation of vertical drawing position.
+	Corrects differences between position of point symbols and error bars.
+
 2017-04-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/gp_cairo.cpp (gp_cairo_boxed_text): Scale linewidth of

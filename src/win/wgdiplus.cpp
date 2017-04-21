@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.50 2017/01/29 20:47:00 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.51 2017/04/19 18:50:25 markisch Exp $
  */
 
 /*
@@ -656,11 +656,11 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 	while (ngwop < lpgw->nGWOP) {
 		// transform the coordinates
 		if (lpgw->oversample) {
-			xdash = float(curptr->x) * (rr - rl) / float(lpgw->xmax);
-			ydash = float(curptr->y) * (rt - rb) / float(lpgw->ymax) + rb;
+			xdash = float(curptr->x) * (rr - rl) / float(lpgw->xmax) + rl;
+			ydash = float(rb) - float(curptr->y) * (rb - rt) / float(lpgw->ymax) + rt;
 		} else {
 			xdash = MulDiv(curptr->x, rr - rl, lpgw->xmax) + rl;
-			ydash = MulDiv(curptr->y, rt - rb, lpgw->ymax) + rb;
+			ydash = rb - MulDiv(curptr->y, rb - rt, lpgw->ymax) + rt;
 		}
 
 		/* finish last filled polygon */
@@ -812,10 +812,10 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 				// transform the coordinates
 				if (lpgw->oversample) {
 					points[i].X = float(poly[i].x) * (rr - rl) / float(lpgw->xmax) + rl;
-					points[i].Y = float(poly[i].y) * (rt - rb) / float(lpgw->ymax) + rb;
+					points[i].Y = float(rb) - float(poly[i].y) * (rb - rt) / float(lpgw->ymax) + rt;
 				} else {
 					points[i].X = MulDiv(poly[i].x, rr - rl, lpgw->xmax) + rl;
-					points[i].Y = MulDiv(poly[i].y, rt - rb, lpgw->ymax) + rb;
+					points[i].Y = rb - MulDiv(poly[i].y, rb - rt, lpgw->ymax) + rt;
 				}
 			}
 			LocalUnlock(poly);
