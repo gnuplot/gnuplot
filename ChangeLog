@@ -1,3 +1,15 @@
+2017-04-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c (do_system do_system_func report_error) src/eval.c
+	docs/gnuplot.doc:
+
+	Introduce new user-visible variables GPVAL_SYSTEM_ERRNO and 
+	GPVAL_SYSTEM_ERRMSG that hold the status returned by
+	    system "some command"
+	    ! "some command"
+	    foo = system("some command")
+	    foo = "`some command`"
+
 2017-04-21  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgdiplus.cpp: Correct calculation of vertical drawing position.

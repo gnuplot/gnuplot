@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.349 2017/04/02 18:30:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.350 2017/04/04 04:25:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -149,6 +149,7 @@ static int read_line __PROTO((const char *prompt, int start));
 static void do_system __PROTO((const char *));
 static void test_palette_subcommand __PROTO((void));
 static int find_clause __PROTO((int *, int *));
+static int report_error __PROTO((int ierr));
 
 static int expand_1level_macros __PROTO((void));
 
@@ -3083,6 +3084,8 @@ help_command()
 static void
 do_system(const char *cmd)
 {
+    int ierr;
+
 /* (am, 19980929)
  * OS/2 related note: cmd.exe returns 255 if called w/o argument.
  * i.e. calling a shell by "!" will always end with an error message.
@@ -3099,7 +3102,8 @@ do_system(const char *cmd)
 	free(wcmd);
     }
 #else
-    system(cmd);
+    ierr = system(cmd);
+    report_error(ierr);
 #endif
 }
 
@@ -3602,8 +3606,11 @@ do_system_func(const char *cmd, char **output)
     /* close stream */
     ierr = pclose(f);
 
+    ierr = report_error(ierr);
+
     result = gp_realloc(result, strlen(result)+1, "do_system_func");
     *output = result;
+
     return ierr;
 
 #else /* VMS || PIPES */
@@ -3614,4 +3621,24 @@ do_system_func(const char *cmd, char **output)
 
 #endif /* VMS || PIPES */
 
+}
+
+static int
+report_error(int ierr)
+{
+    int reported_error;
+
+    /* FIXME:  This does not seem to report all reasonable errors correctly */
+    if (ierr == -1 && errno != 0)
+	reported_error = errno;
+    else
+	reported_error = WEXITSTATUS(ierr);
+
+    fill_gpval_integer("GPVAL_SYSTEM_ERRNO", reported_error); 
+    if (reported_error == 127)
+	fill_gpval_string("GPVAL_SYSTEM_ERRMSG", "command not found or shell failed");
+    else
+	fill_gpval_string("GPVAL_SYSTEM_ERRMSG", strerror(reported_error));
+
+    return reported_error;
 }

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.143 2017/04/02 18:28:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.144 2017/04/10 21:59:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -1044,6 +1044,8 @@ update_gpval_variables(int context)
     if (context == 3 || context == 4) {
 	fill_gpval_integer("GPVAL_ERRNO", 0);
 	fill_gpval_string("GPVAL_ERRMSG","");
+	fill_gpval_integer("GPVAL_SYSTEM_ERRNO", 0);
+	fill_gpval_string("GPVAL_SYSTEM_ERRMSG","");
     }
 
     /* GPVAL_PWD is unreliable.  If the current directory becomes invalid,
