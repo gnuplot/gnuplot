@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.51 2017/04/19 18:50:25 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.52 2017/04/21 14:41:03 markisch Exp $
  */
 
 /*
@@ -656,11 +656,11 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 	while (ngwop < lpgw->nGWOP) {
 		// transform the coordinates
 		if (lpgw->oversample) {
-			xdash = float(curptr->x) * (rr - rl) / float(lpgw->xmax) + rl;
-			ydash = float(rb) - float(curptr->y) * (rb - rt) / float(lpgw->ymax) + rt;
+			xdash = float(curptr->x) * (rr - rl - 1) / float(lpgw->xmax) + rl;
+			ydash = float(rb) - float(curptr->y) * (rb - rt - 1) / float(lpgw->ymax) + rt - 1;
 		} else {
-			xdash = MulDiv(curptr->x, rr - rl, lpgw->xmax) + rl;
-			ydash = rb - MulDiv(curptr->y, rb - rt, lpgw->ymax) + rt;
+			xdash = MulDiv(curptr->x, rr - rl - 1, lpgw->xmax) + rl;
+			ydash = rb - MulDiv(curptr->y, rb - rt - 1, lpgw->ymax) + rt - 1;
 		}
 
 		/* finish last filled polygon */
@@ -811,11 +811,11 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 			for (int i = 0; i < polyi; i++) {
 				// transform the coordinates
 				if (lpgw->oversample) {
-					points[i].X = float(poly[i].x) * (rr - rl) / float(lpgw->xmax) + rl;
-					points[i].Y = float(rb) - float(poly[i].y) * (rb - rt) / float(lpgw->ymax) + rt;
+					points[i].X = float(poly[i].x) * (rr - rl - 1) / float(lpgw->xmax) + rl;
+					points[i].Y = float(rb) - float(poly[i].y) * (rb - rt - 1) / float(lpgw->ymax) + rt - 1;
 				} else {
-					points[i].X = MulDiv(poly[i].x, rr - rl, lpgw->xmax) + rl;
-					points[i].Y = rb - MulDiv(poly[i].y, rb - rt, lpgw->ymax) + rt;
+					points[i].X = MulDiv(poly[i].x, rr - rl - 1, lpgw->xmax) + rl;
+					points[i].Y = rb - MulDiv(poly[i].y, rb - rt - 1, lpgw->ymax) + rt - 1;
 				}
 			}
 			LocalUnlock(poly);
@@ -869,7 +869,7 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 			pen.SetColor(color);
 			pen.SetWidth(cur_penstruct.lopnWidth.x);
 			if (cur_penstruct.lopnStyle <= PS_DASHDOTDOT)
-				// cast is save since GDI and GDI+ use the same numbers
+				// cast is safe since GDI and GDI+ use the same numbers
 				gdiplusSetDashStyle(&pen, static_cast<DashStyle>(cur_penstruct.lopnStyle));
 			else
 				pen.SetDashStyle(DashStyleSolid);
@@ -1172,7 +1172,8 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 					/* style == 2 --> use fill pattern according to
 							 * fillpattern. Pattern number is enumerated */
 					int pattern = GPMAX(fillstyle >> 4, 0) % pattern_num;
-					if (pattern_brush) delete pattern_brush;
+					if (pattern_brush)
+						delete pattern_brush;
 					pattern_brush = gdiplusPatternBrush(pattern,
 									last_color, 1., lpgw->background, transparent);
 					fill_brush = pattern_brush;
@@ -1275,8 +1276,8 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 		case W_pointsize:
 			if (curptr->x > 0) {
 				double pointsize = curptr->x / 100.0;
-				htic = pointsize * MulDiv(lpgw->htic, rr - rl, lpgw->xmax) + 1;
-				vtic = pointsize * MulDiv(lpgw->vtic, rb - rt, lpgw->ymax) + 1;
+				htic = MulDiv(pointsize * lpgw->htic, rr - rl, lpgw->xmax) + 1;
+				vtic = MulDiv(pointsize * lpgw->vtic, rb - rt, lpgw->ymax) + 1;
 			} else {
 				htic = vtic = 0;
 			}

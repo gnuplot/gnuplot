@@ -2,6 +2,9 @@
 
 	* src/win/wgraph.c src/win/wcommon.h (draw_image):  Make static.
 
+	* src/win/wgraph.c src/win/wgdiplus.cpp:  Off-by-one error in
+	mapping of graph coordinates.
+
 2017-04-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (do_system do_system_func report_error) src/eval.c

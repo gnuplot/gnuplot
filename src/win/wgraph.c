@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.245 2017/02/15 09:16:02 markisch Exp $
+ * $Id: wgraph.c,v 1.246 2017/04/23 17:46:58 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -1018,20 +1018,19 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	lpgw->lf.lfHeight = -MulDiv(lpgw->fontsize * lpgw->fontscale, GetDeviceCaps(hdc, LOGPIXELSY), 72) * lpgw->sampling;
 	lpgw->lf.lfCharSet = DEFAULT_CHARSET;
 	if (((p = _tcsstr(lpgw->fontname, TEXT(" Italic"))) != NULL) ||
-		((p = _tcsstr(lpgw->fontname, TEXT(":Italic"))) != NULL)) {
+	    ((p = _tcsstr(lpgw->fontname, TEXT(":Italic"))) != NULL)) {
 		lpgw->lf.lfFaceName[(unsigned int) (p - lpgw->fontname)] = NUL;
 		lpgw->lf.lfItalic = TRUE;
 	}
 	if (((p = _tcsstr(lpgw->fontname, TEXT(" Bold"))) != NULL) ||
-		((p = _tcsstr(lpgw->fontname, TEXT(":Bold"))) != NULL)) {
+	    ((p = _tcsstr(lpgw->fontname, TEXT(":Bold"))) != NULL)) {
 		lpgw->lf.lfFaceName[(unsigned int) (p - lpgw->fontname)] = NUL;
 		lpgw->lf.lfWeight = FW_BOLD;
 	}
 	lpgw->lf.lfOutPrecision = OUT_OUTLINE_PRECIS;
 	lpgw->lf.lfClipPrecision = CLIP_DEFAULT_PRECIS;
-	/* ClearType quality is only supported on XP or later */
-	lpgw->lf.lfQuality =
-		IsWindowsXPorLater() && lpgw->antialiasing ? CLEARTYPE_QUALITY : PROOF_QUALITY;
+	lpgw->lf.lfQuality = lpgw->antialiasing ? CLEARTYPE_QUALITY : PROOF_QUALITY;
+	_tcsncpy(lpgw->lf.lfFaceName, lpgw->fontname, LF_FACESIZE);
 
 	if (!TryCreateFont(lpgw, NULL, hdc)) {
 		static const char warn_font_not_available[] =
@@ -1950,8 +1949,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 	while (ngwop < lpgw->nGWOP) {
 		/* transform the coordinates */
-		xdash = MulDiv(curptr->x, rr-rl-1, lpgw->xmax) + rl;
-		ydash = MulDiv(curptr->y, rt-rb+1, lpgw->ymax) + rb - 1;
+		xdash = MulDiv(curptr->x, rr - rl - 1, lpgw->xmax) + rl;
+		ydash = rb - MulDiv(curptr->y, rb - rt - 1, lpgw->ymax) + rt - 1;
 
 		/* handle layer commands first */
 		if (curptr->op == W_layer) {
@@ -2040,8 +2039,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			}
 			for (i = 0; i < polyi; i++) {
 				/* transform the coordinates */
-				ppt[i].x = MulDiv(poly[i].x, rr-rl-1, lpgw->xmax) + rl;
-				ppt[i].y = MulDiv(poly[i].y, rt-rb+1, lpgw->ymax) + rb - 1;
+				ppt[i].x = MulDiv(poly[i].x, rr - rl - 1, lpgw->xmax) + rl;
+				ppt[i].y = rb - MulDiv(poly[i].y, rb - rt - 1, lpgw->ymax) + rt - 1;
 			}
 			LocalUnlock(poly);
 			Polyline(hdc, ppt, polyi);
@@ -2538,8 +2537,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		case W_pointsize:
 			if (curptr->x > 0) {
 				double pointsize = curptr->x / 100.0;
-				htic = pointsize * MulDiv(lpgw->htic, rr-rl, lpgw->xmax) + 1;
-				vtic = pointsize * MulDiv(lpgw->vtic, rb-rt, lpgw->ymax) + 1;
+				htic = MulDiv(pointsize * lpgw->htic, rr - rl, lpgw->xmax) + 1;
+				vtic = MulDiv(pointsize * lpgw->vtic, rb - rt, lpgw->ymax) + 1;
 			} else {
 				htic = vtic = 0;
 			}
