@@ -8,6 +8,9 @@
 	* src/win/wgdiplus.cpp (SetFont_gdiplus):  Fix memory leak and
 	simplify a bit.
 
+	* src/win/wgdiplus.cpp:  Use a compatible bitmap for cached
+	point symbols.  Eliminates artifacts on some systems.
+
 2017-04-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (do_system do_system_func report_error) src/eval.c

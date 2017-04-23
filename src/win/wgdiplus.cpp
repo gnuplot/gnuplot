@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.53 2017/04/23 17:50:20 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.54 2017/04/23 17:53:02 markisch Exp $
  */
 
 /*
@@ -1519,7 +1519,7 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 			// Switch between cached and direct drawing
 			if (ps_caching) {
 				// Create a compatible bitmap
-				b = new Bitmap(2 * htic + 3, 2 * vtic + 3);
+				b = new Bitmap(2 * htic + 3, 2 * vtic + 3, &graphics);
 				g = Graphics::FromImage(b);
 				if (lpgw->antialiasing)
 					g->SetSmoothingMode(SmoothingModeAntiAlias8x8);
