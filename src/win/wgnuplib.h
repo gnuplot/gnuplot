@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.85 2017/01/06 16:07:19 markisch Exp $
+ * $Id: wgnuplib.h,v 1.86 2017/01/21 14:41:55 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -358,6 +358,7 @@ typedef struct tagGW {
 	BOOL	doublebuffer;	/* double buffering? */
 	BOOL	oversample;	/* oversampling? */
 	BOOL	gdiplus;	/* Use GDI+ only backend? */
+	BOOL	d2d;
 	BOOL	antialiasing;	/* anti-aliasing? */
 	BOOL	polyaa;		/* anti-aliasing for polygons ? */
 	BOOL	fastrotation;	/* rotate without anti-aliasing? */

@@ -626,6 +626,8 @@
 #endif
 
 #define HAVE_GDIPLUS
+#define HAVE_DWRITE
+#define HAVE_D2D
 
 /* Windows Interprocess Communication is required for mouse support. */
 /* Both USE_MOUSE and WIN_IPC must be defined together in the Makefile. */

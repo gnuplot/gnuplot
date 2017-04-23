@@ -1,5 +1,19 @@
 2017-04-23  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wd2d.cpp|h src/win/wgraph.c src/win/wgdiplus.cpp|h
+	src/win/wgnuplib.h src/win/winmain.c src/win/wresourc.h
+	term/win.trm config/mingw/Makefile config/msvc/Makefile
+	config/config.nt config/config.mgw:
+
+	New windows terminal backend which uses Direct2D and DirectWrite
+	instead of GDI+ or GDI.  It uses graphic card acceleration and is hence
+	typically much faster.  DirectWrite offers a much superior text
+	rendering quality in particular for rotated text.  The terminal is
+	feature-complete for drawing to the screen.  Printing, copying to
+	clipboard and saving of EMF fall back to the GDI+ code.  Pattern
+	fill is still implemented using GDI+ and is slow.  As of now, this code
+	is considered experimental.
+
 	* src/win/wgraph.c src/win/wcommon.h (draw_image):  Make static.
 
 	* src/win/wgraph.c src/win/wgdiplus.cpp:  Off-by-one error in

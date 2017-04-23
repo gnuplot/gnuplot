@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.26 2016/08/09 20:25:04 broeker Exp $
+# $Id: Makefile,v 1.27 2016/11/26 19:45:07 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -136,7 +136,8 @@ LDFLAGS = $(LDFLAGS) /DEBUG
 !ENDIF
 COMMONLIBS = kernel32.lib user32.lib gdi32.lib winspool.lib \
              comdlg32.lib comctl32.lib advapi32.lib shell32.lib \
-             msimg32.lib gdiplus.lib shlwapi.lib
+             msimg32.lib gdiplus.lib shlwapi.lib \
+             d2d1.lib dwrite.lib ole32.lib
 CONSOLELIBS = ole32.lib oleaut32.lib comctl32.lib
 
 !IFDEF LIBDIR
@@ -295,7 +296,7 @@ gnuplot_qt.exe: ui_QtGnuplotSettings.h $(GNUPLOTQTOBJS)
 
 WINOBJS = winmain.obj wgnuplib.obj wgraph.obj wprinter.obj wtext.obj \
 	screenbuf.obj wpause.obj wmenu.obj gpexecute.obj wgdiplus.obj \
-	wredirect.obj
+	wd2d.obj wredirect.obj
 
 ALL_CONSOLE_OBJS = $(OBJS:.obj=.cobj) $(WINOBJS:.obj=.cobj)
 

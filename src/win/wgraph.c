@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.246 2017/04/23 17:46:58 markisch Exp $
+ * $Id: wgraph.c,v 1.247 2017/04/23 17:50:20 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -66,6 +66,9 @@
 #include "getcolor.h"
 #ifdef HAVE_GDIPLUS
 # include "wgdiplus.h"
+#endif
+#ifdef HAVE_D2D
+# include "wd2d.h"
 #endif
 #include "plot.h"
 
@@ -590,10 +593,19 @@ GraphInit(LPGW lpgw)
 		M_COLOR, TEXT("C&olor"));
 	//AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->doublebuffer ? MF_CHECKED : MF_UNCHECKED),
 	//	M_DOUBLEBUFFER, TEXT("&Double buffer"));
-#ifdef HAVE_GDIPLUS
 	AppendMenu(lpgw->hPopMenu, MF_SEPARATOR, 0, NULL);
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->gdiplus ? MF_CHECKED : MF_UNCHECKED),
+		M_GDI, TEXT("&GDI backend"));
+#ifdef HAVE_GDIPLUS
+	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->gdiplus ? MF_CHECKED : MF_UNCHECKED),
 		M_GDIPLUS, TEXT("GDI&+ backend"));
+#endif
+#ifdef HAVE_D2D
+	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->d2d ? MF_CHECKED : MF_UNCHECKED),
+		M_D2D, TEXT("Direct&2D backend"));
+#endif
+	AppendMenu(lpgw->hPopMenu, MF_SEPARATOR, 0, NULL);
+#ifdef HAVE_GDIPLUS
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->oversample ? MF_CHECKED : MF_UNCHECKED),
 		M_OVERSAMPLE, TEXT("O&versampling"));
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->antialiasing ? MF_CHECKED : MF_UNCHECKED),
@@ -2974,7 +2986,8 @@ SaveAsEMF(LPGW lpgw)
 #endif
 	Ofn.lpstrCustomFilter = lpstrCustomFilter;
 	Ofn.nMaxCustFilter = 255;
-	Ofn.nFilterIndex = (lpgw->gdiplus ? 2 : 1);
+	/* Direct2D cannot do EMF. Fall back to GDI+ instead. */
+	Ofn.nFilterIndex = (lpgw->gdiplus || lpgw->d2d ? 2 : 1);
 	Ofn.lpstrFile = lpstrFileName;
 	Ofn.nMaxFile = MAX_PATH;
 	Ofn.lpstrFileTitle = lpstrFileTitle;
@@ -3070,6 +3083,12 @@ CopyClip(LPGW lpgw)
 	 */
 #ifdef HAVE_GDIPLUS
 	if (lpgw->gdiplus) {
+		hemf = clipboard_gdiplus(lpgw, hdc, &rect);
+	} else
+#endif
+#if defined(HAVE_GDIPLUS) && defined(HAVE_D2D)
+	/* Direct2D cannot do EMF. Fall back to GDI+. */
+	if (lpgw->d2d) {
 		hemf = clipboard_gdiplus(lpgw, hdc, &rect);
 	} else
 #endif
@@ -3234,7 +3253,7 @@ CopyPrint(LPGW lpgw)
 		SetMapMode(printer, MM_TEXT);
 		SetBkMode(printer, OPAQUE);
 #ifdef HAVE_GDIPLUS
-		if (lpgw->gdiplus) {
+		if (lpgw->gdiplus || lpgw->d2d) {
 			/* Print using GDI+ */
 			print_gdiplus(lpgw, printer, printerHandle, &rect);
 		} else 
@@ -3312,8 +3331,16 @@ WriteGraphIni(LPGW lpgw)
 	WritePrivateProfileString(section, TEXT("GraphDoublebuffer"), profile, file);
 	wsprintf(profile, TEXT("%d"), lpgw->oversample);
 	WritePrivateProfileString(section, TEXT("GraphGDI+Oversampling"), profile, file);
+	// FIXME: Do not default to Direct2D just yet.
+#if 1
+	wsprintf(profile, TEXT("%d"), lpgw->gdiplus || lpgw->d2d);
+	WritePrivateProfileString(section, TEXT("GraphGDI+"), profile, file);
+#else
 	wsprintf(profile, TEXT("%d"), lpgw->gdiplus);
 	WritePrivateProfileString(section, TEXT("GraphGDI+"), profile, file);
+	wsprintf(profile, TEXT("%d"), lpgw->d2d);
+	WritePrivateProfileString(section, TEXT("GraphD2D"), profile, file);
+#endif
 	wsprintf(profile, TEXT("%d"), lpgw->antialiasing);
 	WritePrivateProfileString(section, TEXT("GraphAntialiasing"), profile, file);
 	wsprintf(profile, TEXT("%d"), lpgw->polyaa);
@@ -3447,10 +3474,22 @@ ReadGraphIni(LPGW lpgw)
 	if ((p = GetInt(profile, (LPINT)&lpgw->oversample)) == NULL)
 		lpgw->oversample = TRUE;
 
+#ifdef HAVE_GDIPLUS
 	if (bOKINI)
 		GetPrivateProfileString(section, TEXT("GraphGDI+"), TEXT(""), profile, 80, file);
 	if ((p = GetInt(profile, (LPINT)&lpgw->gdiplus)) == NULL)
 		lpgw->gdiplus = TRUE;
+#endif
+
+#ifdef HAVE_D2D
+	if (bOKINI)
+		GetPrivateProfileString(section, TEXT("GraphD2D"), TEXT(""), profile, 80, file);
+	// FIXME: Do not default to Direct2D for now
+	if ((p = GetInt(profile, (LPINT)&lpgw->d2d)) == NULL)
+		lpgw->d2d = FALSE;
+	if (lpgw->d2d)
+		lpgw->gdiplus = FALSE;
+#endif
 
 	if (bOKINI)
 		GetPrivateProfileString(section, TEXT("GraphAntialiasing"), TEXT(""), profile, 80, file);
@@ -3460,7 +3499,7 @@ ReadGraphIni(LPGW lpgw)
 	if (bOKINI)
 		GetPrivateProfileString(section, TEXT("GraphPolygonAA"), TEXT(""), profile, 80, file);
 	if ((p = GetInt(profile, (LPINT)&lpgw->polyaa)) == NULL)
-		lpgw->polyaa = FALSE;
+		lpgw->polyaa = TRUE;
 
 	if (bOKINI)
 		GetPrivateProfileString(section, TEXT("GraphFastRotation"), TEXT(""), profile, 80, file);
@@ -3965,32 +4004,28 @@ GraphUpdateMenu(LPGW lpgw)
 {
 	CheckMenuItem(lpgw->hPopMenu, M_COLOR, MF_BYCOMMAND |
 					(lpgw->color ? MF_CHECKED : MF_UNCHECKED));
-	CheckMenuItem(lpgw->hPopMenu, M_DOUBLEBUFFER, MF_BYCOMMAND |
-					(lpgw->doublebuffer ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(lpgw->hPopMenu, M_GDI, MF_BYCOMMAND | ((!lpgw->gdiplus && !lpgw->d2d) ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(lpgw->hPopMenu, M_GDIPLUS, MF_BYCOMMAND | (lpgw->gdiplus ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(lpgw->hPopMenu, M_D2D, MF_BYCOMMAND | (lpgw->d2d ? MF_CHECKED : MF_UNCHECKED));
 #ifdef HAVE_GDIPLUS
-	if (lpgw->gdiplus) {
-		CheckMenuItem(lpgw->hPopMenu, M_GDIPLUS, MF_BYCOMMAND | MF_CHECKED);
+	if (lpgw->gdiplus || lpgw->d2d) {
 		EnableMenuItem(lpgw->hPopMenu, M_ANTIALIASING, MF_BYCOMMAND | MF_ENABLED);
 		EnableMenuItem(lpgw->hPopMenu, M_POLYAA, MF_BYCOMMAND | MF_ENABLED);
 		EnableMenuItem(lpgw->hPopMenu, M_OVERSAMPLE, MF_BYCOMMAND | MF_ENABLED);
-		EnableMenuItem(lpgw->hPopMenu, M_FASTROTATE, MF_BYCOMMAND | MF_ENABLED);
 	} else {
-		CheckMenuItem(lpgw->hPopMenu, M_GDIPLUS, MF_BYCOMMAND | MF_UNCHECKED);
 		EnableMenuItem(lpgw->hPopMenu, M_ANTIALIASING, MF_BYCOMMAND | MF_GRAYED);
 		EnableMenuItem(lpgw->hPopMenu, M_POLYAA, MF_BYCOMMAND | MF_GRAYED);
 		EnableMenuItem(lpgw->hPopMenu, M_OVERSAMPLE, MF_BYCOMMAND | MF_GRAYED);
-		EnableMenuItem(lpgw->hPopMenu, M_FASTROTATE, MF_BYCOMMAND | MF_GRAYED);
 	}
-	CheckMenuItem(lpgw->hPopMenu, M_ANTIALIASING, MF_BYCOMMAND | 
-					(lpgw->gdiplus && lpgw->antialiasing ? MF_CHECKED : MF_UNCHECKED));
+	EnableMenuItem(lpgw->hPopMenu, M_FASTROTATE, MF_BYCOMMAND | (lpgw->gdiplus ? MF_ENABLED : MF_DISABLED));
+	CheckMenuItem(lpgw->hPopMenu, M_ANTIALIASING, MF_BYCOMMAND |
+					((lpgw->gdiplus || lpgw->d2d) && lpgw->antialiasing ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(lpgw->hPopMenu, M_OVERSAMPLE, MF_BYCOMMAND | 
-					(lpgw->gdiplus && lpgw->oversample ? MF_CHECKED : MF_UNCHECKED));
+					((lpgw->gdiplus || lpgw->d2d) && lpgw->oversample ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(lpgw->hPopMenu, M_FASTROTATE, MF_BYCOMMAND |
 					(lpgw->gdiplus && lpgw->fastrotation ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(lpgw->hPopMenu, M_POLYAA, MF_BYCOMMAND | 
-					(lpgw->gdiplus && lpgw->polyaa ? MF_CHECKED : MF_UNCHECKED));
-	EnableMenuItem(lpgw->hPopMenu, M_SAVE_AS_BITMAP, MF_BYCOMMAND | 
-					(lpgw->doublebuffer) ? MF_ENABLED : MF_GRAYED);
+					((lpgw->gdiplus || lpgw->d2d) && lpgw->polyaa ? MF_CHECKED : MF_UNCHECKED));
 #endif
 	CheckMenuItem(lpgw->hPopMenu, M_GRAPH_TO_TOP, MF_BYCOMMAND |
 				(lpgw->graphtotop ? MF_CHECKED : MF_UNCHECKED));
@@ -4129,13 +4164,14 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 #endif
 		case WM_SYSCOMMAND:
-			switch (LOWORD(wParam))
-			{
+			switch (LOWORD(wParam)) {
 				case M_GRAPH_TO_TOP:
 				case M_COLOR:
 				case M_DOUBLEBUFFER:
 				case M_OVERSAMPLE:
+				case M_GDI:
 				case M_GDIPLUS:
+				case M_D2D:
 				case M_ANTIALIASING:
 				case M_POLYAA:
 				case M_FASTROTATE:
@@ -4340,8 +4376,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			return 0L;
 #endif /* USE_MOUSE */
 		case WM_COMMAND:
-			switch(LOWORD(wParam))
-			{
+			switch(LOWORD(wParam)) {
 				case M_GRAPH_TO_TOP:
 					lpgw->graphtotop = !lpgw->graphtotop;
 					SendMessage(hwnd, WM_COMMAND, M_REBUILDTOOLS, 0L);
@@ -4360,8 +4395,19 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					lpgw->doublebuffer = !lpgw->doublebuffer;
 					SendMessage(hwnd, WM_COMMAND, M_REBUILDTOOLS, 0L);
 					return 0;
+				case M_GDI:
+					lpgw->gdiplus = FALSE;
+					lpgw->d2d = FALSE;
+					SendMessage(hwnd, WM_COMMAND, M_REBUILDTOOLS, 0L);
+					return 0;
 				case M_GDIPLUS:
-					lpgw->gdiplus = !lpgw->gdiplus;
+					lpgw->gdiplus = TRUE;
+					lpgw->d2d = FALSE;
+					SendMessage(hwnd, WM_COMMAND, M_REBUILDTOOLS, 0L);
+					return 0;
+				case M_D2D:
+					lpgw->d2d = TRUE;
+					lpgw->gdiplus = FALSE;
 					SendMessage(hwnd, WM_COMMAND, M_REBUILDTOOLS, 0L);
 					return 0;
 				case M_ANTIALIASING:
@@ -4550,6 +4596,16 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			RECT memrect;
 			RECT wrect;
 
+#if defined(HAVE_D2D) && !defined(DCRENDERER)
+			if (lpgw->d2d) {
+				RECT rect;
+				GetPlotRect(lpgw, &rect);
+				drawgraph_d2d(lpgw, hwnd, &rect);
+				ValidateRect(hwnd, NULL);
+				return 0;
+			} else {
+#endif
+
 			hdc = BeginPaint(hwnd, &ps);
 			SetMapMode(hdc, MM_TEXT);
 			SetBkMode(hdc, OPAQUE);
@@ -4608,6 +4664,11 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 						drawgraph_gdiplus(lpgw, memdc, &memrect);
 					else
 #endif
+#if defined(HAVE_D2D) && defined(DCRENDERER)
+					if (lpgw->d2d)
+						drawgraph_d2d(lpgw, memdc, &memrect);
+					else
+#endif
 						drawgraph(lpgw, memdc, &memrect);
 
 					/* restore antialiasing */
@@ -4642,6 +4703,11 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					drawgraph_gdiplus(lpgw, hdc, &rect);
 				else
 #endif
+#if defined(HAVE_D2D) && defined(DCRENDERER)
+				if (lpgw->d2d)
+					drawgraph_d2d(lpgw, hdc, &rect);
+				else
+#endif
 					drawgraph(lpgw, hdc, &rect);
 			}
 
@@ -4652,6 +4718,9 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 #endif
 
 			EndPaint(hwnd, &ps);
+#if defined(HAVE_D2D) && !defined(DCRENDERER)
+			}
+#endif
 
 #ifdef USE_MOUSE
 			/* drawgraph() erases the plot window, so immediately after

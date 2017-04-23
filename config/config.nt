@@ -632,6 +632,8 @@
 #endif
 
 #define HAVE_GDIPLUS
+#define HAVE_DWRITE
+#define HAVE_D2D
 
 #define GP_INLINE __inline
 #define GP_EXCEPTION_NAME _exception

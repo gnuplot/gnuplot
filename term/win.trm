@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.139 2017/01/06 16:07:19 markisch Exp $
+ * $Id: win.trm,v 1.140 2017/01/07 07:51:35 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -1414,6 +1414,7 @@ START_HELP(windows)
 "       GraphColor=1",
 "       GraphToTop=1",
 "       GraphGDI+=1",
+"       GraphD2D=0",
 "       GraphGDI+Oversampling=1",
 "       GraphAntialiasing=1",
 "       GraphPolygonAA=0",

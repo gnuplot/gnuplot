@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.54 2017/04/23 17:53:02 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.55 2017/04/23 17:55:27 markisch Exp $
  */
 
 /*
@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extern "C" {
 # include "syscfg.h"
 }
+#define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
 #include <windowsx.h>
 #define GDIPVER 0x0110
@@ -67,7 +68,7 @@ static void gdiplusSetDashStyle(Pen *pen, enum DashStyle style);
 static void gdiplusPolyline(Graphics &graphics, Pen &pen, Point *points, int polyi);
 static void gdiplusFilledPolygon(Graphics &graphics, Brush &brush, Point *points, int polyi);
 static void gdiplusFilledPolygon(Graphics &graphics, Brush &brush, PointF *points, int polyi);
-static Brush * gdiplusPatternBrush(int style, COLORREF color, double alpha, COLORREF backcolor, BOOL transparent);
+Brush * gdiplusPatternBrush(int style, COLORREF color, double alpha, COLORREF backcolor, BOOL transparent);
 static void gdiplusDot(Graphics &graphics, Brush &brush, int x, int y);
 static Font * SetFont_gdiplus(Graphics &graphics, LPRECT rect, LPGW lpgw, LPTSTR fontname, int size);
 static void do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target target);
@@ -211,7 +212,7 @@ gdiplusFilledPolygon(Graphics &graphics, Brush &brush, Point *points, int polyi)
 }
 
 
-static Brush *
+Brush *
 gdiplusPatternBrush(int style, COLORREF color, double alpha, COLORREF backcolor, BOOL transparent)
 {
 	Color gdipColor = gdiplusCreateColor(color, alpha);

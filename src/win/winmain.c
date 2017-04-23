@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.97 2017/01/04 06:30:53 markisch Exp $
+ * $Id: winmain.c,v 1.98 2017/02/15 09:13:20 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -191,6 +191,7 @@ WinExit(void)
 #ifdef HAVE_GDIPLUS
     gdiplusCleanup();
 #endif
+    CoUninitialize();
     return;
 }
 
@@ -542,6 +543,11 @@ main(int argc, char **argv)
 #else
     graphwin->lptw = &textwin;
 #endif
+
+    /* COM Initialization */
+    if (!SUCCEEDED(CoInitialize(NULL))) {
+	// FIXME: Need to abort
+    }
 
     /* init common controls */
     {
