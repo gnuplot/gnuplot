@@ -5,6 +5,9 @@
 	* src/win/wgraph.c src/win/wgdiplus.cpp:  Off-by-one error in
 	mapping of graph coordinates.
 
+	* src/win/wgdiplus.cpp (SetFont_gdiplus):  Fix memory leak and
+	simplify a bit.
+
 2017-04-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (do_system do_system_func report_error) src/eval.c

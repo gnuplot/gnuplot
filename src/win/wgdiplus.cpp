@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.52 2017/04/21 14:41:03 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.53 2017/04/23 17:50:20 markisch Exp $
  */
 
 /*
@@ -263,7 +263,7 @@ SetFont_gdiplus(Graphics &graphics, LPRECT rect, LPGW lpgw, LPTSTR fontname, int
 	_tcscpy(lpgw->fontname, fontname);
 	lpgw->fontsize = size;
 
-	/* extract font style */
+	/* set up font style */
 	INT fontStyle = FontStyleRegular;
 	LPTSTR italic, bold, underline, strikeout;
 	if ((italic = _tcsstr(fontname, TEXT(" Italic"))) != NULL)
@@ -279,9 +279,9 @@ SetFont_gdiplus(Graphics &graphics, LPRECT rect, LPGW lpgw, LPTSTR fontname, int
 	if ((strikeout = _tcsstr(fontname, TEXT(" Strikeout"))) != NULL)
 		fontStyle |= FontStyleStrikeout;
 	if (italic) *italic = 0;
-	if (strikeout) *strikeout = 0;
 	if (bold) *bold = 0;
 	if (underline) *underline = 0;
+	if (strikeout) *strikeout = 0;
 
 #ifdef UNICODE
 	const FontFamily * fontFamily = new FontFamily(fontname);
@@ -290,14 +290,16 @@ SetFont_gdiplus(Graphics &graphics, LPRECT rect, LPGW lpgw, LPTSTR fontname, int
 	const FontFamily * fontFamily = new FontFamily(family);
 	free(family);
 #endif
+	free(fontname);
 	Font * font;
 	int fontHeight;
+	bool deleteFontFamily = true;
 	if (fontFamily->GetLastStatus() != Ok) {
 		delete fontFamily;
-		free(fontname);
 #if (!defined(__MINGW32__) || defined(__MINGW64_VERSION_MAJOR))
 		// MinGW 4.8.1 does not have this
 		fontFamily = FontFamily::GenericSansSerif();
+		deleteFontFamily = false;
 #else
 #ifdef UNICODE
 		fontFamily = new FontFamily(GraphDefaultFont());
@@ -307,28 +309,20 @@ SetFont_gdiplus(Graphics &graphics, LPRECT rect, LPGW lpgw, LPTSTR fontname, int
 		free(family);
 #endif
 #endif
-		font = new Font(fontFamily, size * lpgw->sampling, fontStyle, UnitPoint);
-		double scale = font->GetSize() / fontFamily->GetEmHeight(fontStyle) * graphics.GetDpiY() / 72.;
-		/* store text metrics for later use */
-		lpgw->tmHeight = fontHeight = scale * (fontFamily->GetCellAscent(fontStyle) + fontFamily->GetCellDescent(fontStyle));
-		lpgw->tmAscent = scale * fontFamily->GetCellAscent(fontStyle);
-		lpgw->tmDescent = scale * fontFamily->GetCellDescent(fontStyle);
-	} else {
-		font = new Font(fontFamily, size * lpgw->sampling, fontStyle, UnitPoint);
-		double scale = font->GetSize() / fontFamily->GetEmHeight(fontStyle) * graphics.GetDpiY() / 72.;
-		/* store text metrics for later use */
-		lpgw->tmHeight = fontHeight = scale * (fontFamily->GetCellAscent(fontStyle) + fontFamily->GetCellDescent(fontStyle));
-		lpgw->tmAscent = scale * fontFamily->GetCellAscent(fontStyle);
-		lpgw->tmDescent = scale * fontFamily->GetCellDescent(fontStyle);
-		delete fontFamily;
 	}
+	font = new Font(fontFamily, size * lpgw->sampling, fontStyle, UnitPoint);
+	double scale = font->GetSize() / fontFamily->GetEmHeight(fontStyle) * graphics.GetDpiY() / 72.;
+	/* store text metrics for later use */
+	lpgw->tmHeight = fontHeight = scale * (fontFamily->GetCellAscent(fontStyle) + fontFamily->GetCellDescent(fontStyle));
+	lpgw->tmAscent = scale * fontFamily->GetCellAscent(fontStyle);
+	lpgw->tmDescent = scale * fontFamily->GetCellDescent(fontStyle);
+	if (deleteFontFamily)
+		delete fontFamily;
 
 	RectF box;
 	graphics.MeasureString(L"0123456789", -1, font, PointF(0, 0), StringFormat::GenericTypographic(), &box);
-	// lpgw->vchar = MulDiv(box.Height, lpgw->ymax, rect->bottom - rect->top);
 	lpgw->vchar = MulDiv(fontHeight, lpgw->ymax, rect->bottom - rect->top);
 	lpgw->hchar = MulDiv(box.Width, lpgw->xmax, 10 * (rect->right - rect->left));
-	lpgw->rotate = TRUE;
 	lpgw->htic = MulDiv(lpgw->hchar, 2, 5);
 	unsigned cy = MulDiv(box.Width, 2 * graphics.GetDpiY(), 50 * graphics.GetDpiX());
 	lpgw->vtic = MulDiv(cy, lpgw->ymax, rect->bottom - rect->top);
