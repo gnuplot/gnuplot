@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.351 2017/04/22 04:44:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.352 2017/04/24 06:01:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -3098,13 +3098,13 @@ do_system(const char *cmd)
 #ifdef _WIN32
     {
 	LPWSTR wcmd = UnicodeText(cmd, encoding);
-	_wsystem(wcmd);
+	ierr = _wsystem(wcmd);
 	free(wcmd);
     }
 #else
     ierr = system(cmd);
-    report_error(ierr);
 #endif
+    report_error(ierr);
 }
 
 /* is_history_command:

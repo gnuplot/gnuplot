@@ -1,3 +1,8 @@
+2017-04-24  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/command.c (do_system):  Report return code of (_w)system()
+	also on Windows.
+
 2017-04-24 Akira Kakuto <kakuto@fuk.kindai.ac.jp>
 
 	* src/command.c (report_error): Dummy up WEXITSTATUS(ierr) as a no-op
