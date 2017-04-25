@@ -1,3 +1,8 @@
+2017-04-25  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgdiplus.cpp:  Graphics::MeasureString did not take trailing
+	spaces into account. Bug fix.
+
 2017-04-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/command.c (do_system):  Report return code of (_w)system()

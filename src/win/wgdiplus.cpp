@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.55 2017/04/23 17:55:27 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.56 2017/04/23 18:27:53 markisch Exp $
  */
 
 /*
@@ -410,6 +410,9 @@ draw_enhanced_init(LPGW lpgw, Graphics &graphics, SolidBrush &brush, LPRECT rect
 	enhstate_gdiplus.stringformat = new StringFormat(StringFormat::GenericTypographic());
 	enhstate_gdiplus.stringformat->SetAlignment(StringAlignmentNear);
 	enhstate_gdiplus.stringformat->SetLineAlignment(StringAlignmentFar);
+	INT flags = enhstate_gdiplus.stringformat->GetFormatFlags();
+	flags |= StringFormatFlagsMeasureTrailingSpaces;
+	enhstate_gdiplus.stringformat->SetFormatFlags(flags);
 }
 
 
@@ -615,6 +618,9 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 	StringFormat stringFormat(StringFormat::GenericTypographic());
 	stringFormat.SetAlignment(StringAlignmentNear);
 	stringFormat.SetLineAlignment(StringAlignmentNear);
+	INT flags = stringFormat.GetFormatFlags();
+	flags |= StringFormatFlagsMeasureTrailingSpaces;
+	stringFormat.SetFormatFlags(flags);
 	font = SetFont_gdiplus(graphics, rect, lpgw, NULL, 0);
 
 	/* calculate text shifting for horizontal text */
@@ -928,7 +934,7 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 #else
 					if (keysample || boxedtext.boxing) {
 #endif
-						graphics.MeasureString(textw, -1, font, PointF(0,0), StringFormat::GenericTypographic(), &size);
+						graphics.MeasureString(textw, -1, font, PointF(0,0), &stringFormat, &size);
 						if (lpgw->justify == LEFT) {
 							dxl = 0;
 							dxr = size.Width + 0.5;
