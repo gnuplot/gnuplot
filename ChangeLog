@@ -5,6 +5,11 @@
 	verions 4.something.  Revise the documentation and the support code.
 	Remove pointless use of "update" from the fit demo.
 
+	* docs/gnuplot.doc demo/cerf.dem demo/complex_trig.dem
+	demo/heatmaps.dem demo/pm3d_lighting.dem demo/rgb_variable.dem:
+	Update demos in accordance with the recent change to have '++' sample
+	on u and v rather than x and y.
+
 2017-04-25  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgdiplus.cpp:  Graphics::MeasureString did not take trailing

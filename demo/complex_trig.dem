@@ -21,6 +21,8 @@ phase(x,y) = hsv2rgb( Hue(x,y), sqrt(x**2+y**2), 1. )
 
 set xrange [-pi/2. : pi/2.]
 set yrange [-pi/2. : pi/2.]
+set urange [-pi/2. : pi/2.]
+set vrange [-pi/2. : pi/2.]
 set xtics ("-π/2" -pi/2., "-π/4" -pi/4., "0" 0, "π/4" pi/4., "π/2" pi/2.)
 set ytics ("-π/2" -pi/2., "-π/4" -pi/4., "0" 0, "π/4" pi/4., "π/2" pi/2.)
 

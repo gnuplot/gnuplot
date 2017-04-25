@@ -13,8 +13,8 @@ set xyplane -0.05
 set format ""
 set grid x y lt black
 unset ztics
-set xrange [ -20. : 20. ]
-set yrange [ -20. : 20. ]
+set urange [ -20. : 20. ]
+set vrange [ -20. : 20. ]
 set zrange [ -0.25 : 0.5 ]
 
 set style fill solid 1.00 noborder

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1064 2017/04/22 04:44:51 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1065 2017/04/25 23:40:47 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -230,6 +230,10 @@ C
  
  * `windows` graph windows can be docked to the wgnuplot text window, which is
  especially useful with Windows in "tablet mode".
+
+ * Pseudo-file '++' generates samples on the u and v axes, rather than x and y.
+ This allows placement of multiple parametric surfaces in 3D that occupy
+ distinct regions of Cartesian space.  See `sampling.dem`.
 
 3 Version 5.0
 
@@ -6530,6 +6534,7 @@ Ffigure_fenceplot
  the number of points along v controlled by `set isosamples`.  You must set
  urange and vrange before plotting '++'.  However the x and y ranges can be
  autoscaled or can be explicitly set to different values than urange and vrange.
+ Use of u and v to sample '++' is a CHANGE from version 5.0
  Examples:
 
        splot '++' using 1:2:(sin($1)*sin($2)) with pm3d
@@ -15054,7 +15059,7 @@ Ffigure_multiple_keys
 ?commands update
 ?update
  This command updates the current values of variables stored in the given
- file, which must be formatted as an initial-value file (see `fit).
+ file, which must be formatted as an initial-value file (see `fit`).
 
  If the file name does not exist, a new file is created containing all
  currently defined user variables. All variables not used in the last fit
@@ -15071,7 +15076,7 @@ Ffigure_multiple_keys
  appending `.old` and then opens a new file.  That is, "`update 'fred'`"
  behaves the same as "`!rename fred fred.old; update 'fred.old' 'fred'`".
 
- Please see `fit` for more information.
+ Note: This command may be revised or removed in a future gnuplot version.
 2 While
 ?while
 ?commands while

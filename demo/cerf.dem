@@ -46,8 +46,9 @@ set isosamples 200, 200
 set size ratio 1 1,1
 set cbtics   ("0" -pi, "2π" pi)
 set title "Complex error function cerf( x + iy )" 
-set xrange [ -3 : 3 ]
-set yrange [ -3 : 3 ]
+set auto xy
+set urange [ -3 : 3 ]
+set vrange [ -3 : 3 ]
 set tics scale 0
 set cblabel "Phase Angle" 
 set cblabel  offset character -2, 0, 0 font "" textcolor lt -1 rotate by -270

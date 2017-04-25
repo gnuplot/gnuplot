@@ -88,6 +88,8 @@ RGB(R,G,B) =  int(255.*R) * 2**16 + int(255.*G) * 2**8  + int(255.*B)
 
 set xr [0.01:1]
 set yr [0.01:1]
+set ur [0.01:1]
+set vr [0.01:1]
 set zr [0:1.065]
 set xtics ("R=1" 1)
 set ytics ("G=1" 1)
