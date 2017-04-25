@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.166 2016/08/18 20:33:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.167 2016/08/19 22:28:41 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1648,39 +1648,16 @@ update(char *pfile, char *npfile)
 
 
 /*****************************************************************
-    Backup a file by renaming it to something useful. Return
-    the new name in tofile
+    Backup a file by renaming it to something useful.
+    Return the new name in tofile.
+    NB: tofile must point to a char array[] or allocated data.
+	See update()
 *****************************************************************/
-
-/* tofile must point to a char array[] or allocated data. See update() */
-
+#ifdef MSDOS
 static void
 backup_file(char *tofile, const char *fromfile)
 {
-#if defined(MSDOS) || defined(VMS)
     char *tmpn;
-#endif
-
-/* first attempt, for all o/s other than MSDOS */
-
-#ifndef MSDOS
-    strcpy(tofile, fromfile);
-#ifdef VMS
-    /* replace all dots with _, since we will be adding the only
-     * dot allowed in VMS names
-     */
-    while ((tmpn = strchr(tofile, '.')) != NULL)
-	*tmpn = '_';
-#endif /*VMS */
-    strcat(tofile, BACKUP_SUFFIX);
-    if (rename(fromfile, tofile) == 0)
-	return;			/* hurrah */
-    if (existfile(tofile))
-	Eex2("The backup file %s already exists and will not be overwritten.", tofile);
-#endif
-
-#ifdef MSDOS
-    /* first attempt for msdos. */
 
     /* Copy only the first 8 characters of the filename, to comply
      * with the restrictions of FAT filesystems. */
@@ -1693,12 +1670,22 @@ backup_file(char *tofile, const char *fromfile)
 
     if (rename(fromfile, tofile) == 0)
 	return;			/* success */
-#endif /* MSDOS */
 
     /* get here => rename failed. */
     Eex3("Could not rename file %s to %s", fromfile, tofile);
 }
+#endif /* MSDOS */
 
+#ifndef MSDOS
+static void
+backup_file(char *tofile, const char *fromfile)
+{
+    strcpy(tofile, fromfile);
+    strcat(tofile, BACKUP_SUFFIX);
+    if (rename(fromfile, tofile) != 0)
+	Eex2("Error writing backup file %s", tofile);
+}
+#endif /* not MSDOS */
 
 /* Modified from save.c:save_range() */
 static void

@@ -1,5 +1,5 @@
 #
-# $Id: fit.dem,v 1.20 2014/09/20 11:31:12 markisch Exp $
+# $Id: fit.dem,v 1.21 2015/04/15 04:22:05 sfeam Exp $
 #
 
 myencoding = GPVAL_ENCODING
@@ -168,8 +168,7 @@ print "  fit command: fit f(x,y) 'soundvel.dat' using 1:-2:2 via 'sound.par'\n"
 pause -1 "Press enter to start the fit."
 
 fit f(x,y) 'soundvel.dat' using 1:-2:2 via 'sound.par'
-#create soundfit.par, reading from sound.par and updating values
-update 'sound.par' 'soundfit.par'
+
 set title 'pseudo-3d multi-branch fit to velocity data'
 plot 'soundvel.dat', vlong(x), vtrans(x)
 print ''
