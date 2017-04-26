@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1065 2017/04/25 23:40:47 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1066 2017/04/26 01:01:24 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2456,6 +2456,20 @@ Ffigure_newsyntax
            plot 0.5 + sum [k=1:TERMS] fourier(k,x) notitle 
        }
        unset multiplot
+
+=iteration-specifier
+ Iteration is controlled by an iteration specifier with syntax
+
+      for [<var> in "string of N elements"]
+
+ or
+
+      for [<var> = <start> : <end> { : <increment> }]
+
+ In the first case <var> is a string variable that successively evaluates to
+ single-word substrings 1 to N of the string in the iteration specifier.
+ In the second case <start>, <end>, and <increment> are integers or integer
+ expressions.
 
 ?scope
 =scope
