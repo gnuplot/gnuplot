@@ -1,3 +1,8 @@
+2017-05-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.trm:  Fix incorrect initialization of axis width/height.
+	Bug #1925
+
 2017-04-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/fit.c (backup_file) demo/fit.dem docs/gnuplot.doc:
