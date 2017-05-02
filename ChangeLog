@@ -1,3 +1,8 @@
+2017-05-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.trm:  Fix incorrect initialization of axis width/height.
+	Bug #1925
+
 2017-04-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/gp_cairo.cpp (gp_cairo_boxed_text): Scale linewidth of
