@@ -3,6 +3,11 @@
 	* term/canvas.trm:  Fix incorrect initialization of axis width/height.
 	Bug #1925
 
+	* term/js/gnuplot_mouse.js:  Work-around for plots that were generated
+	prior to the above fix.  You can use this mousing code even if the plots
+	being moused contain the initialization error.
+	Bug #1925
+
 2017-04-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/gp_cairo.cpp (gp_cairo_boxed_text): Scale linewidth of

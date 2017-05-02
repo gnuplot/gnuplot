@@ -1,7 +1,7 @@
 /*
- * $Id: gnuplot_mouse.js,v 1.22.2.2 2014/09/26 20:42:56 sfeam Exp $
+ * $Id: gnuplot_mouse.js,v 1.22.2.3 2017/01/24 21:43:11 sfeam Exp $
  */
-    gnuplot.mouse_version = " 24 January 2017";
+    gnuplot.mouse_version = " 2 May 2017";
 
 // Mousing code for use with gnuplot's 'canvas' terminal driver.
 // The functions defined here assume that the javascript plot produced by
@@ -485,6 +485,10 @@ gnuplot.zoomXY = function(x,y)
 {
   var zoom = new Object;
   var xreal, yreal;
+
+  // Work-around for bug in plots created prior to version 5.0.7
+  gnuplot.plot_axis_width  = gnuplot.plot_axis_xmax - gnuplot.plot_axis_xmin;
+  gnuplot.plot_axis_height = gnuplot.plot_axis_ymax - gnuplot.plot_axis_ymin;
 
   zoom.x = x; zoom.y = y; zoom.clip = false;
 
