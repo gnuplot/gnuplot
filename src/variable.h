@@ -1,5 +1,5 @@
 /*
- * $Id: variable.h,v 1.16 2008/03/16 20:03:59 sfeam Exp $
+ * $Id: variable.h,v 1.17 2008/03/18 00:16:33 sfeam Exp $
  */
 
 /* GNUPLOT - variable.h */
@@ -89,6 +89,7 @@ char *loadpath_handler __PROTO((int, char *));
 #define get_loadpath()     loadpath_handler(ACTION_GET,NULL)
 #define save_loadpath()    loadpath_handler(ACTION_SAVE,NULL)
 #define clear_loadpath()   loadpath_handler(ACTION_CLEAR,NULL)
+#define dump_loadpath()    loadpath_handler(ACTION_SHOW,NULL)
 
 /* Fontpath related */
 
@@ -99,6 +100,7 @@ char *fontpath_handler __PROTO((int, char *));
 #define get_fontpath()     fontpath_handler(ACTION_GET,NULL)
 #define save_fontpath()    fontpath_handler(ACTION_SAVE,NULL)
 #define clear_fontpath()   fontpath_handler(ACTION_CLEAR,NULL)
+#define dump_fontpath()    fontpath_handler(ACTION_SHOW,NULL)
 
 /* Locale related */
 
@@ -109,6 +111,7 @@ char *locale_handler __PROTO((int, char *));
 #define init_locale()      locale_handler(ACTION_INIT,NULL)
 #define set_var_locale(path)   locale_handler(ACTION_SET,(path))
 #define get_time_locale()       locale_handler(ACTION_GET,NULL)
+#define dump_locale()      locale_handler(ACTION_SHOW,NULL)
 
 #ifdef HAVE_LOCALE_H
 #define set_numeric_locale() \

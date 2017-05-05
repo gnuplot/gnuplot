@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.53 2016/04/23 00:36:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.54 2016/05/09 03:32:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -52,7 +52,6 @@ static char *RCSid() { return RCSid("$Id: util3d.c,v 1.53 2016/04/23 00:36:22 sf
 #include "pm3d.h"
 #include "term_api.h"
 
-/* EAM DEBUG - moved these here from axis.h */
 #define AXIS_ACTUAL_MIN(axis) GPMIN(axis_array[axis].max, axis_array[axis].min)
 #define AXIS_ACTUAL_MAX(axis) GPMAX(axis_array[axis].max, axis_array[axis].min)
 

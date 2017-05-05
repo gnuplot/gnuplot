@@ -1,3 +1,12 @@
+2017-05-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/eval.c:  Add some DEBUG_* variables to help diagnose problems on
+	other people's machines.
+
+	* src/show.c src/variable.h:  All of the *_handler(ACTION, PARAM) calls
+	are hidden by macros defined in variable.h except for ACTION_SHOW.
+	Wrap these calls in a macro also.
+
 2017-05-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm:  Fix incorrect initialization of axis width/height.
@@ -7,7 +16,7 @@
 
 	* src/fit.c (backup_file) demo/fit.dem docs/gnuplot.doc:
 	The "update" command has not worked exactly as documented since
-	verions 4.something.  Revise the documentation and the support code.
+	version 4.something.  Revise the documentation and the support code.
 	Remove pointless use of "update" from the fit demo.
 
 	* docs/gnuplot.doc demo/cerf.dem demo/complex_trig.dem

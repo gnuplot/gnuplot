@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.383 2017/01/21 23:40:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.384 2017/02/14 21:49:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -3039,7 +3039,7 @@ static void
 show_locale()
 {
     SHOW_ALL_NL;
-    locale_handler(ACTION_SHOW,NULL);
+    dump_locale();
 }
 
 
@@ -3048,7 +3048,7 @@ static void
 show_loadpath()
 {
     SHOW_ALL_NL;
-    loadpath_handler(ACTION_SHOW,NULL);
+    dump_loadpath();
 }
 
 
@@ -3057,7 +3057,7 @@ static void
 show_fontpath()
 {
     SHOW_ALL_NL;
-    fontpath_handler(ACTION_SHOW,NULL);
+    dump_fontpath();
 }
 
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.144 2017/04/10 21:59:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.145 2017/04/22 04:44:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -509,7 +509,6 @@ pop_or_convert_from_string(struct value *v)
 {
     (void) pop(v);
 
-    /* DEBUG Dec 2014 - Consolidate sanity check for variable type */
     /* FIXME: Test for INVALID_VALUE? Other corner cases? */
     if (v->type == INVALID_NAME)
 	int_error(NO_CARET, "invalid dummy variable name");
@@ -935,6 +934,9 @@ update_plot_bounds(void)
     fill_gpval_integer("GPVAL_TERM_XSIZE", canvas.xright+1);
     fill_gpval_integer("GPVAL_TERM_YSIZE", canvas.ytop+1);
     fill_gpval_integer("GPVAL_TERM_SCALE", term->tscale);
+    /* DEBUG - added temporarily to help debug terminals on other people's systems */
+    fill_gpval_integer("DEBUG_TERM_HTIC", term->h_tic);
+    fill_gpval_integer("DEBUG_TERM_VTIC", term->v_tic);
 }
 
 /*
