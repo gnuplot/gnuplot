@@ -1,3 +1,12 @@
+2017-05-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term_api.h src/set.c term/cairo.trm term/post.trm:
+	In order to scale up an existing plot uniformly, e.g. for printing
+	a poster-size PostScript or PDF file, it is convenient to be able to
+	give the scale factor in the "set term" command.  We already offer
+	"set termoption {linewidth <factor>} {fontscale <factor>}".  This patch
+	adds "set termoption {pointscale <factor>}" to scale up pointsize.
+
 2017-05-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c:  Add some DEBUG_* variables to help diagnose problems on

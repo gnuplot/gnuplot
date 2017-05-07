@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.150 2016/11/19 06:43:49 markisch Exp $
+ * $Id: term_api.h,v 1.151 2017/02/01 04:30:23 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -268,10 +268,11 @@ typedef enum t_imagecolor { IC_PALETTE, IC_RGB, IC_RGBA }
 #define TERM_MONOCHROME      (1<<10)	/* term is running in mono mode    */
 #define TERM_LINEWIDTH       (1<<11)	/* support for set term linewidth  */
 #define TERM_FONTSCALE       (1<<12)	/* terminal supports fontscale     */
-#define TERM_IS_LATEX        (1<<13)	/* text uses TeX markup            */
-#define TERM_EXTENDED_COLOR  (1<<14)	/* uses EXTENDED_COLOR_SPECS       */
-#define TERM_NULL_SET_COLOR  (1<<15)	/* no support for RGB color        */
-#define TERM_POLYGON_PIXELS  (1<<16)	/* filledpolygon rather than fillbox */
+#define TERM_POINTSCALE      (1<<13)	/* terminal supports fontscale     */
+#define TERM_IS_LATEX        (1<<14)	/* text uses TeX markup            */
+#define TERM_EXTENDED_COLOR  (1<<15)	/* uses EXTENDED_COLOR_SPECS       */
+#define TERM_NULL_SET_COLOR  (1<<16)	/* no support for RGB color        */
+#define TERM_POLYGON_PIXELS  (1<<17)	/* filledpolygon rather than fillbox */
 
 /* The terminal interface structure --- heart of the terminal layer.
  *

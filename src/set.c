@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.556 2017/03/16 20:04:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.557 2017/04/20 00:07:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4926,6 +4926,14 @@ set_termoptions()
     } else if (equals(c_token,"fontscale")) {
 	num_tokens = GPMIN(num_tokens,c_token+2);
 	if (term->flags & TERM_FONTSCALE)
+	    ok_to_call_terminal = TRUE;
+	else {
+	    c_token++;
+	    real_expression();   /* Silently ignore the request */
+	}
+    } else if (equals(c_token,"pointscale") || equals(c_token,"ps")) {
+	num_tokens = GPMIN(num_tokens,c_token+2);
+	if (term->flags & TERM_POINTSCALE)
 	    ok_to_call_terminal = TRUE;
 	else {
 	    c_token++;
