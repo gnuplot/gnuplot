@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.248 2017/04/23 18:27:53 markisch Exp $
+ * $Id: wgraph.c,v 1.249 2017/05/08 07:37:11 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -4200,7 +4200,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					DeleteMenu (sysmenu, --i, MF_BYPOSITION);
 					DeleteMenu (sysmenu, --i, MF_BYPOSITION);
 					if (lpgw->lptw)
-						ShowWindow (lpgw->lptw->hWndParent, SW_SHOWNORMAL);
+						ShowWindow(lpgw->lptw->hWndParent, SW_SHOWNORMAL);
 					break;
 			}
 			break;
@@ -4772,9 +4772,15 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					UpdateWindow(hwnd);
 				}
 			}
+			// update internal variables
 			if (lpgw->Size.x == CW_USEDEFAULT) {
 				lpgw->Size.x = LOWORD(lParam);
 				lpgw->Size.y = HIWORD(lParam);
+			}
+			if (lpgw->Canvas.x != 0) {
+				GetPlotRect(lpgw, &rect);
+				lpgw->Canvas.x = rect.right - rect.left;
+				lpgw->Canvas.y = rect.bottom - rect.top;
 			}
 			break;
 #ifndef WGP_CONSOLE

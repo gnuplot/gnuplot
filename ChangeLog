@@ -3,6 +3,11 @@
 	* src/win/wgraph.c src/win/wd2d.cpp|h:  Reorganize initialisation of
 	the Direct2D backend to correctly init font related terminal properties.
 
+	* src/win/wd2d.cpp (d2dSetFont):  Missing init of indicator that text
+	can be rotated.
+
+	* src/win/wgraph.c (WM_SIZE):  Track canvas (and window) size.
+
 2017-05-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term_api.h src/set.c term/cairo.trm term/post.trm:
