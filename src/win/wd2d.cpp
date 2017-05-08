@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.1 2017/04/23 18:27:53 markisch Exp $
+ * $Id: wd2d.cpp,v 1.2 2017/05/08 07:37:11 markisch Exp $
  */
 
 /*
@@ -462,6 +462,9 @@ d2dSetFont(ID2D1RenderTarget * pRenderTarget, LPRECT rect, LPGW lpgw, LPTSTR fon
 			lpgw->vtic = MulDiv(cy, lpgw->ymax, rect->bottom - rect->top);
 		}
 	}
+
+	// Only vector fonts allowed.
+	lpgw->rotate = TRUE;
 
 	SafeRelease(&pTextLayout);
 	free(fontname);
