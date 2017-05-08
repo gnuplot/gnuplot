@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: wd2d.h,v 1.1 2017/04/23 18:27:53 markisch Exp $
  */
 
 /*
@@ -40,7 +40,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extern "C" {
 #endif
 
-extern void d2dInit(void);
+extern HRESULT d2dInit(void);
 extern void d2dCleanup(void);
 
 #ifdef DCRENDERER
@@ -48,6 +48,8 @@ extern void drawgraph_d2d(LPGW lpgw, HDC hdc, LPRECT rect);
 #else
 extern void drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect);
 #endif
+
+void InitFont_d2d(LPGW lpgw, HDC hdc, LPRECT rect);
 
 #ifdef __cplusplus
 }

@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: wd2d.cpp,v 1.1 2017/04/23 18:27:53 markisch Exp $
  */
 
 /*
@@ -56,8 +56,14 @@ extern "C" {
 const int pattern_num = 8;
 const float textbox_width = 3000.f;
 
-static ID2D1Factory* g_pDirect2dFactory = NULL;
+static ID2D1Factory * g_pDirect2dFactory = NULL;
 static IDWriteFactory * g_pDWriteFactory = NULL;
+// TODO: Shouldn't the render target be a LPGW member?!
+#ifdef DCRENDERER
+static ID2D1DCRenderTarget * pRenderTarget = NULL;
+#else
+static ID2D1HwndRenderTarget * pRenderTarget = NULL;
+#endif
 
 static HRESULT d2dCreateStrokeStyle(D2D1_DASH_STYLE dashStyle, bool rounded, ID2D1StrokeStyle **ppStrokeStyle);
 static HRESULT d2dCreateStrokeStyle(const FLOAT * dashes, UINT dashesCount, bool rounded, ID2D1StrokeStyle **ppStrokeStyle);
@@ -74,11 +80,8 @@ extern Gdiplus::Brush * gdiplusPatternBrush(int style, COLORREF color, double al
 
 /* Release COM pointers safely 
 */
-
 template<class Interface>
-inline void SafeRelease(
-	Interface **ppInterfaceToRelease
-)
+inline void SafeRelease(Interface **ppInterfaceToRelease)
 {
 	if (*ppInterfaceToRelease != NULL) {
 		(*ppInterfaceToRelease)->Release();
@@ -98,7 +101,80 @@ static struct {
 } enhstate_d2d;
 
 
-/* ****************  ....   ************************* */
+/* ****************  D2D initialization   ************************* */
+
+
+HRESULT
+d2dInit(void)
+{
+	HRESULT hr = S_OK;
+
+	// Create D2D factory
+	if (g_pDirect2dFactory == NULL) {
+		hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &g_pDirect2dFactory);
+	}
+
+	// Create a DirectWrite factory
+	if (SUCCEEDED(hr) && g_pDWriteFactory == NULL) {
+		hr = DWriteCreateFactory(
+			DWRITE_FACTORY_TYPE_SHARED,
+			__uuidof(g_pDWriteFactory),
+			reinterpret_cast<IUnknown **>(&g_pDWriteFactory)
+		);
+	}
+
+#ifdef DCRENDERER
+	// Create a render target
+	// TODO: Should this become a LPGW member?!
+	if (SUCCEEDED(hr) && pRenderTarget == NULL) {
+		D2D1_RENDER_TARGET_PROPERTIES props = D2D1::RenderTargetProperties(
+			D2D1_RENDER_TARGET_TYPE_DEFAULT,
+			D2D1::PixelFormat(
+				DXGI_FORMAT_B8G8R8A8_UNORM,
+				D2D1_ALPHA_MODE_IGNORE),
+			0,
+			0,
+			D2D1_RENDER_TARGET_USAGE_NONE,
+			D2D1_FEATURE_LEVEL_DEFAULT
+		);
+		hr = g_pDirect2dFactory->CreateDCRenderTarget(&props, &pRenderTarget);
+	}
+#endif
+	return hr;
+}
+
+
+void 
+d2dCleanup(void)
+{
+	SafeRelease(&pRenderTarget);
+	SafeRelease(&g_pDirect2dFactory);
+	SafeRelease(&g_pDWriteFactory);
+}
+
+
+#ifndef DCRENDERER
+static HRESULT
+d2dCreateRenderTarget(HWND hwnd, D2D1_SIZE_U & size)
+{
+	HRESULT hr = S_OK;
+
+	// Create a render target
+	D2D1_RENDER_TARGET_PROPERTIES rtProps = D2D1::RenderTargetProperties();
+	rtProps.usage = D2D1_RENDER_TARGET_USAGE_GDI_COMPATIBLE;
+
+	// Create a GDI compatible Hwnd render target.
+	hr = g_pDirect2dFactory->CreateHwndRenderTarget(
+		rtProps,
+		D2D1::HwndRenderTargetProperties(hwnd, size),
+		&pRenderTarget
+	);
+	return hr;
+}
+#endif
+
+
+/* ****************  D2D drawing functions   ************************* */
 
 
 static HRESULT
@@ -393,6 +469,21 @@ d2dSetFont(ID2D1RenderTarget * pRenderTarget, LPRECT rect, LPGW lpgw, LPTSTR fon
 }
 
 
+void
+InitFont_d2d(LPGW lpgw, HDC hdc, LPRECT rect)
+{
+	HRESULT hr = d2dInit();
+#ifdef DCRENDERER
+	if (SUCCEEDED(hr)) {
+		hr = pRenderTarget->BindDC(hdc, rect);
+		IDWriteTextFormat * pWriteTextFormat = NULL;  // must initialize
+		d2dSetFont(pRenderTarget, rect, lpgw, lpgw->fontname, lpgw->fontsize, &pWriteTextFormat);
+		SafeRelease(&pWriteTextFormat);
+	}
+#endif
+}
+
+
 static void
 EnhancedSetFont()
 {
@@ -603,60 +694,18 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 	// still need GDI+ for pattern fill, init
 	gdiplusInit();
 
-	// Create D2D factory
-	if (g_pDirect2dFactory == NULL) {
-		hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &g_pDirect2dFactory);
-		if (!SUCCEEDED(hr))
-			return;
-	}
-	// Create a DirectWrite factory
-	if (g_pDWriteFactory == NULL) {
-		hr = DWriteCreateFactory(
-			DWRITE_FACTORY_TYPE_SHARED,
-			__uuidof(g_pDWriteFactory),
-			reinterpret_cast<IUnknown **>(&g_pDWriteFactory)
-		);
-		if (!SUCCEEDED(hr))
-			return;
-	}
-
-	// Create a render target
-	// TODO: Should this become a LPGW member?!
-#ifdef DCRENDERER
-	static ID2D1DCRenderTarget * pRenderTarget = NULL;
-	if (pRenderTarget == NULL) {
-		D2D1_RENDER_TARGET_PROPERTIES props = D2D1::RenderTargetProperties(
-			D2D1_RENDER_TARGET_TYPE_DEFAULT,
-			D2D1::PixelFormat(
-				DXGI_FORMAT_B8G8R8A8_UNORM,
-				D2D1_ALPHA_MODE_IGNORE),
-			0,
-			0,
-			D2D1_RENDER_TARGET_USAGE_NONE,
-			D2D1_FEATURE_LEVEL_DEFAULT
-		);
-		hr = g_pDirect2dFactory->CreateDCRenderTarget(&props, &pRenderTarget);
-		if (!SUCCEEDED(hr))
-			return;
-	}
-	hr = pRenderTarget->BindDC(hdc, rect);
-	if (FAILED(hr)) {
-		fprintf(stderr, "Error: binding DC to render target failed\n");
+	hr = d2dInit();
+	if (!SUCCEEDED(hr))
 		return;
-	}
-#else
-	static ID2D1HwndRenderTarget * pRenderTarget = NULL;
-	ID2D1GdiInteropRenderTarget * pGDIRenderTarget = NULL;
-	D2D1_RENDER_TARGET_PROPERTIES rtProps = D2D1::RenderTargetProperties();
-	rtProps.usage = D2D1_RENDER_TARGET_USAGE_GDI_COMPATIBLE;
 
-	// Create a GDI compatible Hwnd render target.
+#ifdef DCRENDERER
+	hr = pRenderTarget->BindDC(hdc, rect);
+#else
 	D2D1_SIZE_U size = D2D1::SizeU(rr - rl, rb - rt);
-	hr = g_pDirect2dFactory->CreateHwndRenderTarget(
-		rtProps,
-		D2D1::HwndRenderTargetProperties(hwnd, size),
-		&pRenderTarget
-	);
+	hr = d2dCreateRenderTarget(hwnd, size);
+	if (FAILED(hr))
+		return;
+	ID2D1GdiInteropRenderTarget * pGDIRenderTarget = NULL;
 	if (SUCCEEDED(hr)) {
 		hr = pRenderTarget->QueryInterface(__uuidof(ID2D1GdiInteropRenderTarget), (void**)&pGDIRenderTarget);
 	}
@@ -664,6 +713,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 		pRenderTarget->Resize(size);
 	}
 #endif
+
 	pRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 	// Note that this will always be 96 for a DC Render Target.
 	pRenderTarget->GetDpi(&dpiX, &dpiY);

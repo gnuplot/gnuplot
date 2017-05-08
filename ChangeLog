@@ -1,3 +1,8 @@
+2017-05-08  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c src/win/wd2d.cpp|h:  Reorganize initialisation of
+	the Direct2D backend to correctly init font related terminal properties.
+
 2017-05-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term_api.h src/set.c term/cairo.trm term/post.trm:

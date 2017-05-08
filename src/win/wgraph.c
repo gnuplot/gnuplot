@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.247 2017/04/23 17:50:20 markisch Exp $
+ * $Id: wgraph.c,v 1.248 2017/04/23 18:27:53 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -351,7 +351,6 @@ GraphOpSize(LPGW lpgw, UINT op, UINT x, UINT y, LPCSTR str, DWORD size)
 	this->used++;
 	lpgw->nGWOP++;
 	lpgw->buffervalid = FALSE;
-	return;
 }
 
 /* ================================== */
@@ -1020,6 +1019,11 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 #ifdef HAVE_GDIPLUS
 	if (lpgw->gdiplus && !(lpgw->rotating && lpgw->fastrotation)) {
 		InitFont_gdiplus(lpgw, hdc, lprect);
+	}
+#endif
+#ifdef HAVE_D2D
+	if (lpgw->d2d) {
+		InitFont_d2d(lpgw, hdc, lprect);
 		return;
 	}
 #endif
@@ -1135,7 +1139,6 @@ SetFont(LPGW lpgw, HDC hdc)
 		if (lpgw->hfontv)
 			SelectObject(hdc, lpgw->hfontv);
 	}
-	return;
 }
 
 
@@ -1208,7 +1211,6 @@ static void
 DestroyCursors(LPGW lpgw)
 {
 	/* No-op. Cursors from LoadCursor() don't need destroying */
-	return;
 }
 
 #endif /* USE_MOUSE */
@@ -1357,7 +1359,8 @@ GraphEnhancedFlush(void)
 	unsigned int x, y, len;
 	double angle = M_PI/180. * enhstate.lpgw->angle;
 
-	if (!enhstate.opened_string) return;
+	if (!enhstate.opened_string)
+		return;
 	*enhanced_cur_text = '\0';
 
 	/* print the string fragment, perhaps invisibly */
@@ -1636,7 +1639,8 @@ void
 draw_update_keybox(LPGW lpgw, unsigned plotno, unsigned x, unsigned y)
 {
 	LPRECT bb;
-	if (plotno == 0) return;
+	if (plotno == 0)
+		return;
 	if (plotno > lpgw->maxkeyboxes) {
 		int i;
 		lpgw->maxkeyboxes += 10;
@@ -1860,7 +1864,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	int seq = 0;				/* sequence counter for W_image and W_boxedtext */
 	int i;
 
-	if (lpgw->locked) return;
+	if (lpgw->locked) 
+		return;
 
 	/* clear hypertexts only in display sessions */
 	interactive = (GetObjectType(hdc) == OBJ_MEMDC) ||
@@ -3125,7 +3130,6 @@ CopyClip(LPGW lpgw)
 	CloseClipboard();
 	ReleaseDC(hwnd, hdc);
 	DeleteEnhMetaFile(hemf);
-	return;
 }
 
 
@@ -3285,7 +3289,6 @@ CopyPrint(LPGW lpgw)
 	PrintUnregister(&pr);
 	/* make certain that the screen pen set is restored */
 	SendMessage(lpgw->hWndGraph, WM_COMMAND, M_REBUILDTOOLS, 0L);
-	return;
 }
 
 
@@ -3373,7 +3376,6 @@ WriteGraphIni(LPGW lpgw)
 		WritePrivateProfileString(section, entry, profile, file);
 	}
 #endif
-	return;
 }
 
 
@@ -4653,7 +4655,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 						MakeFonts(lpgw, &memrect, memdc);
 					}
 
-					/* Temporarily switch of antialiasing during rotation */
+					/* Temporarily switch off antialiasing during rotation (GDI+) */
 					save_aa = lpgw->antialiasing;
 					if (lpgw->rotating && lpgw->fastrotation)
 						lpgw->antialiasing = FALSE;
@@ -4926,7 +4928,7 @@ Graph_set_cursor(LPGW lpgw, int c, int x, int y)
 
 /* set_ruler(int x, int y) term API: x<0 switches ruler off. */
 void
-Graph_set_ruler (LPGW lpgw, int x, int y )
+Graph_set_ruler(LPGW lpgw, int x, int y)
 {
 	DrawRuler(lpgw); /* remove previous drawing, if any */
 	DrawRulerLineTo(lpgw);
