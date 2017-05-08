@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.2 2017/05/08 07:37:11 markisch Exp $
+ * $Id: wd2d.cpp,v 1.3 2017/05/08 07:48:40 markisch Exp $
  */
 
 /*
@@ -49,10 +49,10 @@ extern "C" {
 #include "wgnuplib.h"
 #include "wcommon.h"
 
-
+// FIXME: only one copy!
 #define GWOPMAX 4096
+
 #define MINMAX(a,val,b) (((val) <= (a)) ? (a) : ((val) <= (b) ? (val) : (b)))
-#define D2DCOLORREF(c, a) D2D1::ColorF(GetRValue(c) / 255.f, GetGValue(c) / 255.f, GetBValue(c) / 255.f, a)
 const int pattern_num = 8;
 const float textbox_width = 3000.f;
 
@@ -573,6 +573,13 @@ gdiplusGraphics(LPGW lpgw, HDC hdc)
 # define GETHDC  hr = pGDIRenderTarget->GetDC(D2D1_DC_INITIALIZE_MODE_COPY, &hdc);
 # define RELEASEHDC pGDIRenderTarget->ReleaseDC(NULL);
 #endif
+
+
+static inline D2D1::ColorF
+D2DCOLORREF(COLORREF c, float a)
+{
+	return D2D1::ColorF(GetRValue(c) / 255.f, GetGValue(c) / 255.f, GetBValue(c) / 255.f, a);
+}
 
 
 void

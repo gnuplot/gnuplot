@@ -7,6 +7,8 @@
 	can be rotated.
 
 	* src/win/wgraph.c (WM_SIZE):  Track canvas (and window) size.
+	
+	* src/win/wd2d.cpp (D2DCOLORREF):  Replace macro by an inline function.
 
 2017-05-07  Ethan A Merritt  <merritt@u.washington.edu>
 
