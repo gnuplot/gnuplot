@@ -8,6 +8,7 @@ Changes in 5.0.7
 * FIX object clipping in "set view map"
 * FIX cairo terminals: scale textbox border linewidth by terminal linewidth
 * FIX canvas terminal: initialization of plot dimensions (affects first zoom)
+* NEW set term {pngcairo|pdfcairo} pointscale <factor>
 
 Changes in 5.0.6
 ================

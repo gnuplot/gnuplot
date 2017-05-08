@@ -1,3 +1,13 @@
+2017-05-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/cairo.trm:
+	In order to scale up an existing plot uniformly, e.g. for printing
+	a poster-size PostScript or PDF file, it is convenient to be able to
+	give the scale factor in the "set term" command.  We already offer
+	"set term ... {linewidth <factor>} {fontscale <factor>}".  This patch
+	adds "set term ... {pointscale <factor>}" to scale up pointsize for
+	cairo terminals.
+
 2017-05-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm:  Fix incorrect initialization of axis width/height.

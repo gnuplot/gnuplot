@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.71.2.4 2015/07/13 18:20:03 sfeam Exp $
+ * $Id: cairo.trm,v 1.71.2.5 2016/03/03 19:58:08 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -118,12 +118,13 @@ typedef struct cairo_params_t {
     float height;
     float base_linewidth;
     float lw;
+    float ps;
     TBOOLEAN pdf_output;              /* format of the graphics produced by cairolatex */
 } cairo_params_t;
 
 #define CAIROEPS_PARAMS_DEFAULT { \
     CAIROTERM_EPS, INCHES, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, TRUE, FALSE, "", \
-    12, 0.5, 5*72., 3*72., 0.25, 1.0, FALSE \
+    12, 0.5, 5*72., 3*72., 0.25, 1.0, 1.0, FALSE \
 }
 static cairo_params_t cairoeps_params = CAIROEPS_PARAMS_DEFAULT;
 static const cairo_params_t cairoeps_params_default = CAIROEPS_PARAMS_DEFAULT;
@@ -131,12 +132,12 @@ static const cairo_params_t cairoeps_params_default = CAIROEPS_PARAMS_DEFAULT;
 #ifdef HAVE_CAIROEPS
 #define CAIROLATEX_PARAMS_DEFAULT { \
     CAIROTERM_LATEX, INCHES, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, TRUE, FALSE, "", \
-    11, 0.6, 5*72., 3*72., 0.25, 1.0, FALSE \
+    11, 0.6, 5*72., 3*72., 0.25, 1.0, 1.0, FALSE \
 }
 #else
 #define CAIROLATEX_PARAMS_DEFAULT { \
     CAIROTERM_LATEX, INCHES, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, TRUE, FALSE, "", \
-    11, 0.6, 5*72., 3*72., 0.25, 1.0, TRUE \
+    11, 0.6, 5*72., 3*72., 0.25, 1.0, 1.0, TRUE \
 }
 #endif
 static cairo_params_t cairolatex_params = CAIROLATEX_PARAMS_DEFAULT;
@@ -144,14 +145,14 @@ static const cairo_params_t cairolatex_params_default = CAIROLATEX_PARAMS_DEFAUL
 
 #define CAIROPDF_PARAMS_DEFAULT { \
     CAIROTERM_PDF, INCHES, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, TRUE, FALSE, "", \
-    12, 0.5, 5*72., 3*72., 0.25, 1.0, FALSE \
+    12, 0.5, 5*72., 3*72., 0.25, 1.0, 1.0, FALSE \
 }
 static cairo_params_t cairopdf_params = CAIROPDF_PARAMS_DEFAULT;
 static const cairo_params_t cairopdf_params_default = CAIROPDF_PARAMS_DEFAULT;
 
 #define CAIROPNG_PARAMS_DEFAULT { \
     CAIROTERM_PNG, PIXELS, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, FALSE, FALSE, "", \
-    12, 1.0, 640., 480., 1.0, 1.0, FALSE \
+    12, 1.0, 640., 480., 1.0, 1.0, 1.0, FALSE \
 }
 static cairo_params_t cairopng_params = CAIROPNG_PARAMS_DEFAULT;
 static const cairo_params_t cairopng_params_default = CAIROPNG_PARAMS_DEFAULT;
@@ -188,6 +189,7 @@ enum CAIROTRM_id {
     CAIROTRM_CROP,
     CAIROTRM_NOCROP,
     CAIROTRM_BACKGROUND,
+    CAIROTRM_POINTSCALE,
     CAIROLATEX_STANDALONE,
     CAIROLATEX_INPUT,
     CAIROLATEX_HEADER,
@@ -210,6 +212,8 @@ static struct gen_table cairotrm_opts[] = {
     {"square", CAIROTRM_SQUARE},
     {"lw", CAIROTRM_LINEWIDTH},
     {"linew$idth", CAIROTRM_LINEWIDTH},
+    {"pointscale", CAIROTRM_POINTSCALE},
+    {"ps", CAIROTRM_POINTSCALE},
     {"dash$ed", CAIROTRM_DASHED},
     {"solid", CAIROTRM_SOLID},
     {"mono$chrome", CAIROTRM_MONO},
@@ -350,6 +354,12 @@ TERM_PUBLIC void cairotrm_options()
 			cairo_params->lw = real_expression();
 			if (cairo_params->lw < 0.0)
 			    cairo_params->lw = cairo_params_default->lw;
+			break;
+		case CAIROTRM_POINTSCALE:
+			c_token++;
+			cairo_params->ps = real_expression();
+			if (cairo_params->ps < 0.0)
+			    cairo_params->ps = 1.0;
 			break;
 		case CAIROTRM_DASHED:
 		case CAIROTRM_SOLID:
@@ -593,6 +603,12 @@ TERM_PUBLIC void cairotrm_options()
 		snprintf(tmp_term_options,sizeof(tmp_term_options), " linewidth %g", cairo_params->lw);
 		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options)-1);
 	}
+
+	if (cairo_params->ps != 1.0) {
+		snprintf(tmp_term_options,sizeof(tmp_term_options), " pointscale %g", cairo_params->ps);
+		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options)-1);
+	}
+
 
 	if (cairo_params->dash_length != cairo_params_default->dash_length) {
 		snprintf(tmp_term_options,sizeof(tmp_term_options), " dashlength %g", cairo_params->dash_length);
@@ -1122,9 +1138,7 @@ void cairotrm_point(unsigned int x, unsigned int y, int pointstyle)
 
 void cairotrm_pointsize(double ptsize)
 {
-	/* same behaviour as x11 terminal */
-	if (ptsize<0) ptsize = 1;
-
+	ptsize = (ptsize < 0) ? cairo_params->ps : cairo_params->ps * ptsize;
 	gp_cairo_set_pointsize(&plot, ptsize);
 }
 
@@ -1671,6 +1685,7 @@ START_HELP(pngcairo)
 "                      {{no}transparent} {{no}crop} {background <rgbcolor>",
 "                      {font <font>} {fontscale <scale>}",
 "                      {linewidth <lw>} {rounded|butt|square} {dashlength <dl>}",
+"                      {pointscale <ps>}",
 "                      {size <XX>{unit},<YY>{unit}}",
 "",
 " This terminal supports an enhanced text mode, which allows font and other",
@@ -1708,8 +1723,7 @@ START_HELP(pngcairo)
 " Pango, the library used to layout the text, is based on utf-8. Thus, the pngcairo",
 " terminal has to convert from your encoding to utf-8. The default input",
 " encoding is based on your \'locale\'. If you want to use another encoding,",
-" make sure gnuplot knows which one you are using. See `encoding` for more",
-" details.",
+" make sure gnuplot knows which one you are using. See `encoding` for more detail.",
 "",
 " Pango may give unexpected results with fonts that do not respect the unicode",
 " mapping. With the Symbol font, for example, the pngcairo terminal will use the map",
@@ -1723,16 +1737,9 @@ START_HELP(pngcairo)
 " with your default setup (if the demo enhancedtext.dem is not displayed",
 " properly for example), you probably have to install one of the Adobe or",
 " OpenOffice Symbol fonts, and remove the Microsoft one.",
-" Other non-conform fonts, such as \"wingdings\" have been observed working.",
 "",
-" The rendering of the plot cannot be altered yet. To obtain the best output",
-" possible, the rendering involves two mechanisms : antialiasing and",
-" oversampling.",
-" Antialiasing allows to display non-horizontal and non-vertical lines",
-" smoother.",
-" Oversampling combined with antialiasing provides subpixel accuracy,",
-" so that gnuplot can draw a line from non-integer coordinates. This avoids",
-" wobbling effects on diagonal lines ('plot x' for example).",
+" Rendering uses oversampling, antialiasing, and font hinting to the extent",
+" supported by the cairo and pango libraries.",
 ""
 END_HELP(pngcairo)
 #endif /* TERM_HELP */
