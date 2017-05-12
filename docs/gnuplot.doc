@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1067 2017/04/26 21:04:23 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1068 2017/05/07 19:20:52 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -189,137 +189,167 @@ C
            gnuplot-beta@lists.sourceforge.net
 
  When posting a question, please include full details of the gnuplot version,
- the terminal type, and the operating system you are using.  A _small_ script
- demonstrating the problem may be useful.  Function plots are preferable to
- datafile plots.
+ the terminal type, and the operating system you are using.  A short 
+ self-contained script demonstrating the problem is often helpful.  
 
-2 New features in version 5
-?new-features
-3 Version 5.1
- This is the current development version. New features introduced here will
- generally not appear in a supported release until version 5.2 although some
- may be back-ported to version 5.0 if it seems warranted.
-
- * New command `set jitter` allows creation of bee swarm plots (see `beeswarm`).
-
- * New commands `break` and `continue` allow more complicated loop structure.
-
- * 3D plots can be rotated about the line of sight (see `set view azimuth`).
-
- * New 3D plot style `with zerrorfill` (see `zerrorfill`).
-
- * Support for array variables (see `arrays`).
-
- * Support for nonlinear axes (see `set nonlinear`).
-
- * Customized plot legends (see `plot title`, `set key`, `multiple keys`).
-
- * New full-featured terminal driver for sixel graphics (see `sixelgd`).
-
- * Substantial improvements and extensions to the polar coordinate system.
- Previous versions of gnuplot produced incorrect or unexpected results for
- out-of-range values of r and for rrange inverted (e.g. rrange [90:0]).
- Inverted rrange can now be used to generate plots in celestial horizontal
- coordinates (center = zenith = altitude 90, perimeter = horizon = altitude 0).
- Polar grid elements (circles and radial lines) can now be generated whether or
- not the program is in polar mode.  Tickmarks and labels around the perimeter
- of the polar grid are controlled by `set ttics`.  The r axis has its own label.
- Label, object, and arrow positions may be specified in polar coordinates.
- The origin and sense (clockwise or counterclockwise) of the angular coordinate
- theta can be specified by `set theta`.
- 
- * `windows` graph windows can be docked to the wgnuplot text window, which is
- especially useful with Windows in "tablet mode".
-
- * Pseudo-file '++' generates samples on the u and v axes, rather than x and y.
- This allows placement of multiple parametric surfaces in 3D that occupy
- distinct regions of Cartesian space.  See `sampling.dem`.
-
-3 Version 5.0
-
- * The dot-dash pattern of a line can now be specified independent of other
- line properties. See `dashtype`, `set dashtype`, `set linetype`.
-
- * Text markup now supports bold and italic font settings in addition to 
- subscript, superscript, font size and other previously available properties.
- Enhanced text mode is now enabled by default. See `enhanced text`.
-
- * Interactive terminals support hypertext labels that only appear when the
- mouse hovers over the label's anchor point.
-
- * New coordinate system (Degrees, Minutes, Seconds). See `set xtics geographic`.
-
- * The default format for axis labels is "% h" ("$%h$" for LaTeX terminals).
- This format is like the C standard format %g except that the exponential term,
- if present, is written using a superscript.  E.g. 1.2 x 10^5 rather than 1.2E05.
-
- * Command scripts may place in-line data in a named data block for repeated
- plotting. See `inline data`.
-
- * Support for 32-bit Alpha channel + RGB color #AARRGGBB.  See `colorspec`.
-
- * Support for HSV color space via a translation function hsv2rgb(H,S,V).
-
- * Secondary axes (x2, y2) may be locked to the primary axis via a mapping
- function.  In the simplest case this guarantees that the primary and secondary
- axis ranges are identical.  In the general case it allows you to define a
- non-linear axis, something that previously was possible only for log scaling.
- See `set link`.
-
- * Each function in a plot command may optionally be preceded by a sampling
- range.  This does not affect the overall range of the plot, only the range
- over which this function is sampled.  See `plot` and `piecewise.dem`.
-
- * If the external library libcerf is available, it is used to provide complex
- math routines cerf, cdawson, erfi, faddeeva, and the Voigt profile
- VP(x,sigma,gamma).
-
- * The `import` command attaches a user-defined function name to a function
- provided by an external shared object (support is operating-system dependent).
- A template header and example source and make files for creating a suitable
- external shared object are provided in the demo collection.
-
- * Previous commands in the history list of an interactive session can be
- reexecuted by number.  For example, `history !5` will reexecute the command
- numbered 5 in the `history` list.
-
- * Bit-shift operators >> and <<.
-
- * New plot styles: `with parallelaxes`, `with table`, labeled contours.
-
- * Shell invocation of gnuplot can pass parameters to a gnuplot script.
- gnuplot -c scriptfile.gp ARG1 ARG2 ARG3 ...
-
- * New commands `set minussign` and `set micro` cause routine gprintf() to use a
- typographic character "minus sign" rather than a hyphen for negative numbers, 
- and "micro sign" rather than "u" for prefixing units in scientific notation.
- This affects only axis tic labels and strings explicitly created with gprintf().
- The specific byte sequence used to represent these characters depends on the 
- current encoding.
- The `set minus`  command first appeared in version 5.0 patchlevel 5 and is
- considered EXPERIMENTAL (implementation details may change).
-
-3 New commands
+2 New features
+3 Features introduced in version 5.1
+?new version_5.1
+?new
+ Version 5.1 is the current development version. New features introduced here
+ will generally not appear in a supported release until version 5.2. Details
+ may change before that.
+4 New plot styles and style options
+?new plot styles
 #start
-# import f(x) from "plugin.so"             # load function from shared library
-# set history {quiet|numers} {full|trim}   # controls output of history command
-# history !N                               # re-execute prior command by number
-# plot <datafile> skip N                   # skip lines at start of ascii data file
-# plot ... smooth mcsplines                # monotonic cubic spline fit to data
-# reset session                            # restore initial state of current session
-# set arrow <tag> from <start> length <len> angle <ang>
-# set colorsequence default|classic|podo   # colors used by successive plot elements
-# set monochrome                           # alternative set of linetypes
-# set dashtype <tag> <dash-spec>           # user-defined dash patterns
-# set nonlinear x via f(x) inverse g(x)    # non-linear visible axis
-# set link x2 via f(x) inverse g(x)        # links visible x axes or y axes
-# set fit quiet|results|brief|verbose      # control the amount of fit output
-# set contours; splot ... with labels      # label contour lines with numeric values
-# set style textbox                        # text elements can be enclosed in a box
-# set view map {scale}                     # allows resizing a 3D projection plot
-# set multiplot {next|previous}            # navigate within the auto-layout grid
-# set minussign                            # use typographic "minus sign", not hyphen
-# set micro                                # use typographic "micro sign", not "u"
+#b 3D plot style `with zerrorfill`. See `zerrorfill`, `fenceplots` and
+^ <a href="http://gnuplot.info/demo_5.1/zerror.html">
+   zerror demo.
+^ </a>
+#b Beeswarm plots. See `set jitter`, `beeswarm` and
+^ <a href="http://gnuplot.info/demo_5.1/jitter.html">
+   beeswarm plot demo
+^ </a>
+#b The symbol used for individual points in a plot can be controlled by data values
+## (see `pointtype variable`)
+#end
+4 New data pre-processing filters
+?new filters
+#start
+#b Normalized frequency of occurrence in a data set (see `smooth fnormal`)
+#b Automated binning of data (see `bins`)
+#end
+4 Polar mode improvements and extensions
+?new polar mode features
+#start
+#b Polar coordinate may be used in Label, arrow, and object definitions
+#b `set [m]tics` places ticmarks and labels on the perimeter of a polar plot. See
+^ <a href="http://gnuplot.info/demo_5.1/ttics.html"> polar axis and ticlabels demo
+^ </a>
+#b `set rlabel`  places a label above the r axis
+#b set rrange [90:0] allows use of celestial horizontal coordinates. See
+^ <a href="http://gnuplot.info/demo_5.1/solar_path.html"> solar path demo
+^ </a>
+#b `set border polar` draws a solid line around the perimeter of a polar plot
+#b `set theta` controls the position of theta = 0 around the perimeter of a
+## polar plot and the sense (clockwise or anti-clockwise) of increasing theta
+#end
+4 Nonlinear coordinates systems
+?new nonlinear coordinates
+#start
+#b Any plot axis can be assigned a pair of functions, possibly nonlinear, that
+## describe the forward and reverse mapping to a linear range (see `set nonlinear`)
+^ <a href="http://gnuplot.info/demo_5.1/nonlinear3.html">
+   Nonlinear x/y axis demo
+^ </a>
+#b The familiar command `set logscale` is re-implemented as a special case of a 
+## nonlinear axis where the pair of functions is log(x) and exp(x).
+#end
+4 New commands and command options
+?new commands
+#start
+#b Inside the bracketed clause of an iteration, `continue` jumps to immediately
+## to the next iteration, `break` immediately exits from the iteration
+#b `toggle {<plotno> | "plottitle" | all}"` interactively enables or disables 
+## display of one element of the current plot (see `toggle`)
+#b `set table "outfile.name" append` will append subsequent tabulated plots to
+## to an existing text file rather replacing its contents
+#b `set pm3d lighting` describes a lighting model with specular highlighting
+## (see `lighting`)
+#b `set minussign` tells gnuplot to use a special symbol in the current 
+## encoding to replace the ascii character '-' in negative numbers
+#b `set micro` tells gnuplot to use a special symbol in the current encoding to
+## replace the ascii character 'u' for the scientific notation prefix "micro"
+## These special typographic symbols are used only in axis tic labels and strings
+## explicitly created with gprintf(). The byte sequence used to represent these
+## characters depends on the current encoding.
+#end
+4 New data type "array"
+?new features
+#start
+#b This gnuplot version introduces a new data type `array name[size]`.
+## An array must be declared before use. An array element may be a string,
+## an integer, a real number, or a complex value.  A single array may contain
+## elements with different types. See `arrays`.
+#end
+
+4 New terminals and terminal options
+#start
+#b See `sixelgd` for description of a new terminal that supports interleaving
+## plots with the command lines that generated them if gnuplot is run inside a
+## vt340-compatible terminal emulator
+#b The `domterm` terminal supports interleaving plots with the command lines
+## that generated them if gnuplot is run inside an svg-aware terminal emulator
+#b The `windows` terminal supports saving the current graph to a bitmap file
+#b The `windows` terminal graph window can be docked to the wgnuplot text window
+#b The `wxt` terminal supports exporting to an EMF file or printer on Windows
+#b the `dumb` terminal supports ANSI colors for lines and fill area
+#end
+4 Other new features
+#start
+#b An additional rotation angle `azimuth` affects the orientation of 3D plots.
+## This can be set from the command line (see `set view azimuth`) or by dragging
+## with the right mouse button.
+#b gnuplot running under Windows can interpret Unicode (BMP) input scripts by
+## converting them to the current encoding from `set encoding`, including UTF-8
+#b Textboxes can be assigned a border color and fill color (see `set style textbox`)
+#b Customized plot legends (see `plot title`, `set key`, `multiple keys`)
+#b A sampling range specifier for plotting with pseudofile '+' can include a
+## sampling interval.  For example:
+## plot sample [t=0:100:10] '+' using (t):(1):(label[t]) with labels
+#b Pseudo-file '++' generates samples on the u and v axes, rather than x and y.
+## This allows placement of multiple parametric surfaces in 3D that occupy
+## distinct regions of Cartesian space.  See `sampling.dem`.
+#end
+
+3 Features introduced in version 5.0
+?Features introduced in version 5.0
+#start
+#b The dot-dash pattern of a line can now be specified independent of other
+## line properties. See `dashtype`, `set dashtype`, `set linetype`
+#b The default sequence of colors used for successive elements in a plot is
+## more easily distinguished by users with color-vision defects.
+## The color sequence is under user control (see `set colorsequence`).
+## This mechanism can also be used to generate monochrome plots
+## (see `set monochrome`). In previous gnuplot versions `monochrome` could only
+## be selected when changing the current terminal via `set terminal`.
+#b New plot styles `with parallelaxes`, `with table`, and labeled contours.
+#b New data pre-processing filter for monotonic cubic splines (see `smooth mcsplines`)
+#b Text markup now supports bold and italic font settings in addition to 
+## subscript, superscript, font size and other previously available properties.
+## Enhanced text mode is now enabled by default. See `enhanced text`.
+## Text elements can be enclosed in a box (see `set style textbox`).
+#b Interactive terminals support hypertext labels that only appear when the
+## mouse hovers over the label's anchor point.
+#b New coordinate system (Degrees, Minutes, Seconds). See `set xtics geographic`.
+#b The default format for axis labels is "% h" ("$%h$" for LaTeX terminals).
+## This format is like the C standard format %g except that the exponential term,
+## if present, is written using a superscript.  E.g. 1.2 x 10^5 rather than 1.2E05.
+#b Command scripts may place in-line data in a named data block for repeated
+## plotting. See `inline data`.
+#b Support for 32-bit Alpha channel + RGB color #AARRGGBB.  See `colorspec`.
+#b Support for HSV color space via a translation function hsv2rgb(H,S,V).
+#b Secondary axes (x2, y2) may be locked to the primary axis via a mapping
+## function.  In the simplest case this guarantees that the primary and secondary
+## axis ranges are identical.  In the general case it allows you to define a
+## non-linear axis, something that previously was possible only for log scaling.
+## See `set link`.
+#b Each function in a plot command may optionally be preceded by a sampling
+## range.  This does not affect the overall range of the plot, only the range
+## over which this function is sampled.  See `plot` and `piecewise.dem`.
+#b If the external library libcerf is available, it is used to provide complex
+## math routines cerf, cdawson, erfi, faddeeva, and the Voigt profile
+## VP(x,sigma,gamma).
+#b The `import` command attaches a user-defined function name to a function
+## provided by an external shared object (support is operating-system dependent).
+## A template header and example source and make files for creating a suitable
+## external shared object are provided in the demo collection.
+#b Previous commands in the history list of an interactive session can be
+## reexecuted by number.  For example, `history !5` will reexecute the command
+## numbered 5 in the `history` list.
+#b Bit-shift operators >> and <<.
+#b Shell invocation of gnuplot can pass parameters to a gnuplot script.
+## gnuplot -c scriptfile.gp ARG1 ARG2 ARG3 ...
 #end
 
 2 Differences from version 4
@@ -4703,6 +4733,10 @@ Ffigure_fenceplot
 2 exit
 ?commands exit
 ?exit
+      exit
+      exit message "error message text"
+      exit status <integer error code>
+
  The commands `exit` and `quit`, as well as the END-OF-FILE character (usually
  Ctrl-D) terminate input from the current input stream: terminal session, pipe,
  or file input (pipe).  If input streams are nested (inherited `load` scripts),
@@ -4719,6 +4753,11 @@ Ffigure_fenceplot
  In interactive mode it prints the error message and returns to the command
  line, breaking out of all nested loops or calls.  In non-interactive mode
  the program will exit.
+
+ When gnuplot exits to the controlling shell, the return value is not usually
+ informative. This variant of the command allows you to return a specific value.
+
+      exit status <value>
 
  See help for `batch/interactive` for more details.
 2 fit
@@ -6412,7 +6451,7 @@ Ffigure_fenceplot
  The `frequency` option makes the data monotonic in x; points with the same
  x-value are replaced by a single point having the summed y-values.
  To plot a histogram of the number of data values in equal size bins,
- set the y-value to 1.0 so that the sum is a count of occurances in that bin.
+ set the y-value to 1.0 so that the sum is a count of occurrences in that bin.
  This is done implicitly if only a single column is provided.
  Example:
       binwidth = <something>  # set width of x values in each bin
@@ -6437,7 +6476,7 @@ Ffigure_fenceplot
  y-values so they all sum to 1. Points with the same x-value are replaced by a
  single point containing the sumed y-values. To plot a histogram of the number
  of data values in equal size bins, set the y-value to 1.0 so that the sum is a
- count of occurances in that bin. This is done implicitly if only a single
+ count of occurrences in that bin. This is done implicitly if only a single
  column is provided.
  See also
 ^ <a href="http://www.gnuplot.info/demo/smooth.html">
@@ -7937,6 +7976,7 @@ Ffigure_fenceplot
 ?commands unset border
 ?commands show border
 ?set border
+?set border polar
 ?unset border
 ?show border
 ?border
@@ -10629,6 +10669,7 @@ Ffigure_multiple_keys
  shift key held down changes the `xyplane`.  If additionally to these
  buttons the modifier <ctrl> is held down, the coordinate axes are displayed
  but the data are suppressed.  This is useful for large data sets.
+ Mouse button 3 controls the azimuth of the z axis (see `set view azimuth`).
 
  Mousing is not available inside multiplot mode. When multiplot is completed
  using `unset multiplot`, then the mouse will be turned on again but acts only
@@ -13036,7 +13077,6 @@ Ffigure_multiple_keys
       set termoption {no}enhanced
       set termoption font "<fontname>{,<fontsize>}"
       set termoption fontscale <scale>
-      set termoption {pointscale <scale>}{ps <scale>}
       set termoption {linewidth <lw>}{lw <lw>}
 
 3 theta

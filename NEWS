@@ -1,41 +1,46 @@
 Changes not in 5.0
 ==================
-* NEW command "set nonlinear <axis> via f(axis) inverse g(axis)"
-* NEW implementation of "set log" (treat as special case of "set nonlinear")
-* NEW 3D plot style "splot ... using <x>:<y>:<z>:<zlow>:<zhigh> with zerrorfill
-* NEW array data type
-* NEW styles points and linespoints accept `pointtype variable`
-* NEW `set pm3d lighting` pm3d lighting model with specular highlighting
-* NEW `set jitter` allows creation of bee swarm plots
-* NEW commands `break` and `continue`
-* NEW data filter "bins" sorts input into equal width bins on x
-* NEW hidden3d now observes 'image' and 'rgbimage' as occluding objects
-* NEW new command `toggle {<plotno> | "plottitle" | all}`
-* NEW Optional sampling interval in range specifier for pseudofile '+'
-* NEW point style associated with "plot with labels" is shown in the key
-* NEW gnuplot on Windows handles Unicode (BMP) input and converts it according
-      to current `set encoding`, including UTF-8.
-* NEW 'set term svg standalone' embeds images rather than including by reference
-* NEW 'set table OUTFILE {append}'
-* NEW gnuplot on Windows is system DPI aware
-* NEW windows terminal supports saving graph as bitmap
-* NEW textbox style supports fillcolor and bordercolor
-* NEW commands "set minussign" and "set micro" (first appeared in 5.0.5)
-* NEW "smooth fnormal" normalized frequency
-* NEW terminal domterm (supports in-line SVG in DomTerm terminal emulator)
-* NEW "set view azimuth <angle>" controls azimuth of the z axis in 3D plots
-* NEW wxt supports saving graph as EMF on Windows
-* NEW wxt supports printing on Windows
-* NEW dumb suports ANSI colors and filled polygons
-* NEW terminal sixelgd (sixel terminal graphics using gdlib)
-* NEW windows graph windows can be docked to the wgnuplot text window
-* NEW improveements, extensions, and bug fixes for polar graph mode
+* NEW plot styles
+* NEW    splot ... using <x>:<y>:<z>:<zlow>:<zhigh> with zerrorfill
+* NEW    "set jitter" allows creation of bee swarm plots
+* NEW    data filter "bins" sorts input into equal width bins on x
+* NEW    "with points" and "with linespoints" accept `pointtype variable`
+* NEW    hidden3d now treats 'image' and 'rgbimage' as occluding rectangles
+* NEW    "smooth fnormal" normalized frequency
+* NEW polar mode improvements and extensions
 * NEW    "set [m]ttics" places labels around perimeter of polar grid
 * NEW    "set rlabel" places a label above the r axis
 * NEW    "set rrange [90:0]" plots in celestial horizontal coordinates
 * NEW    "set border polar" uses border linetype for perimeter of polar plot
 * NEW    "set theta <origin> <sense>" orientation of polar coordinate theta
-* NEW label, arrow, and object positions may be given in polar coordinates
+* NEW    label, arrow, and object positions may be given in polar coordinates
+* NEW nonlinear coordinate systems
+* NEW    "set nonlinear <axis> via f(axis) inverse g(axis)"
+* NEW    "set log" re-implemented as special case of "set nonlinear"
+* NEW data type array[size]
+* NEW commands and command options
+* NEW    "break" exits from iteration loop
+* NEW    "continue" begins next iteration immediately
+* NEW    "toggle {<plotno> | "plottitle" | all}"
+* NEW    "set pm3d lighting" specifies lighting model with specular highlighting
+* NEW    "set table OUTFILE {append}"
+* NEW    "set minussign" and "set micro" (first appeared in 5.0.5)
+* NEW    "set view azimuth <angle>" controls azimuth of the z axis in 3D plots
+* NEW terminals and terminal options
+* NEW    terminal domterm (supports in-line SVG in DomTerm terminal emulator)
+* NEW    terminal sixelgd (sixel terminal graphics using gdlib)
+* NEW    svg 'standalone' embeds images rather than including by reference
+* NEW    windows terminal supports saving graph as bitmap
+* NEW    windows graph windows can be docked to the wgnuplot text window
+* NEW    wxt supports saving graph as EMF on Windows
+* NEW    wxt supports printing on Windows
+* NEW    dumb suports ANSI colors and filled polygons
+* NEW Optional sampling interval in range specifier for pseudofile '+'
+* NEW gnuplot on Windows
+*        converts Unicode (BMP) input to current `set encoding`, including UTF-8
+*        is system DPI aware
+* NEW textbox style supports fillcolor and bordercolor
+* CHANGE point style associated with "plot with labels" is shown in the key
 * CHANGE Revise placement of axis labels in 3D plots
 * CHANGE Timestamp is now placed relative to page rather than plot boundary
 * CHANGE Track font/enhanced for key title separately from the key entries

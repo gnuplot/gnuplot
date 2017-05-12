@@ -1,3 +1,10 @@
+2017-05-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/doc2tex.c docs/doc2gih.c:  Support bulleted lists at top level
+	(i.e. not in a table).
+
+	* NEWS docs/gnuplot.doc:  Revise the section describing new features.
+
 2017-05-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c src/win/wd2d.cpp|h:  Reorganize initialisation of
