@@ -3,6 +3,12 @@
 	* docs/windows/doc2html.c:   Support bulleted lists at top level
 	(i.e. not in a table).
 
+	* src/term.c (do_arc):  Remove hack for the windows terminal which was
+	meant to fix the drawing of circles, but broke it.  Note that there are
+	similar cases in the code (ellipses) where a hack like this is actually
+	necessary.  Further investigations required.
+	Bug #1880
+
 2017-05-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgnuplib.h src/win/wgraph.c src/win/wgdiplus.cpp
@@ -25,7 +31,7 @@
 	can be rotated.
 
 	* src/win/wgraph.c (WM_SIZE):  Track canvas (and window) size.
-	
+
 	* src/win/wd2d.cpp (D2DCOLORREF):  Replace macro by an inline function.
 
 2017-05-07  Ethan A Merritt  <merritt@u.washington.edu>
