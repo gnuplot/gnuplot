@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.16.2.15 2017/02/28 06:42:42 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.16.2.16 2017/03/04 08:20:39 markisch Exp $
  */
 
 /*
@@ -363,45 +363,40 @@ SetFont_gdiplus(Graphics &graphics, LPRECT rect, LPGW lpgw, char * fontname, int
 	if ((strikeout = strstr(fontname, " Strikeout")) != NULL)
 		fontStyle |= FontStyleStrikeout;
 	if (italic) *italic = 0;
+	if (bold) *bold = 0;
+	if (underline) *underline = 0;
 	if (strikeout) *strikeout = 0;
-	if (bold) * bold = 0;
-	if (underline) * underline = 0;
 
 	LPWSTR family = UnicodeText(fontname, lpgw->encoding);
-	free(fontname);
 	const FontFamily * fontFamily = new FontFamily(family);
 	free(family);
+	free(fontname);
 	Font * font;
 	int fontHeight;
+	bool deleteFontFamily = true;
 	if (fontFamily->GetLastStatus() != Ok) {
 		delete fontFamily;
 #if (!defined(__MINGW32__) || defined(__MINGW64_VERSION_MAJOR))
 		// MinGW 4.8.1 does not have this
 		fontFamily = FontFamily::GenericSansSerif();
+		deleteFontFamily = false;
 #else
 		family = UnicodeText(GraphDefaultFont(), S_ENC_DEFAULT); // should always be available
 		fontFamily = new FontFamily(family);
 		free(family);
 #endif
-		font = new Font(fontFamily, size * lpgw->sampling, fontStyle, UnitPoint);
-		double scale = font->GetSize() / fontFamily->GetEmHeight(fontStyle) * graphics.GetDpiY() / 72.;
-		/* store text metrics for later use */
-		lpgw->tmHeight = fontHeight = scale * (fontFamily->GetCellAscent(fontStyle) + fontFamily->GetCellDescent(fontStyle));
-		lpgw->tmAscent = scale * fontFamily->GetCellAscent(fontStyle);
-		lpgw->tmDescent = scale * fontFamily->GetCellDescent(fontStyle);
-	} else {
-		font = new Font(fontFamily, size * lpgw->sampling, fontStyle, UnitPoint);
-		double scale = font->GetSize() / fontFamily->GetEmHeight(fontStyle) * graphics.GetDpiY() / 72.;
-		/* store text metrics for later use */
-		lpgw->tmHeight = fontHeight = scale * (fontFamily->GetCellAscent(fontStyle) + fontFamily->GetCellDescent(fontStyle));
-		lpgw->tmAscent = scale * fontFamily->GetCellAscent(fontStyle);
-		lpgw->tmDescent = scale * fontFamily->GetCellDescent(fontStyle);
-		delete fontFamily;
 	}
+	font = new Font(fontFamily, size * lpgw->sampling, fontStyle, UnitPoint);
+	double scale = font->GetSize() / fontFamily->GetEmHeight(fontStyle) * graphics.GetDpiY() / 72.;
+	/* store text metrics for later use */
+	lpgw->tmHeight = fontHeight = scale * (fontFamily->GetCellAscent(fontStyle) + fontFamily->GetCellDescent(fontStyle));
+	lpgw->tmAscent = scale * fontFamily->GetCellAscent(fontStyle);
+	lpgw->tmDescent = scale * fontFamily->GetCellDescent(fontStyle);
+	if (deleteFontFamily)
+		delete fontFamily;
 
 	RectF box;
 	graphics.MeasureString(L"0123456789", -1, font, PointF(0, 0), StringFormat::GenericTypographic(), &box);
-	// lpgw->vchar = MulDiv(box.Height, lpgw->ymax, rect->bottom - rect->top);
 	lpgw->vchar = MulDiv(fontHeight, lpgw->ymax, rect->bottom - rect->top);
 	//lpgw->hchar = MulDiv(box.Width, lpgw->xmax, 10 * (rect->right - rect->left));
 	lpgw->hchar = MulDiv(unsigned(ceil(box.Width)), lpgw->xmax, 10 * (rect->right - rect->left));
@@ -589,6 +584,9 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 	StringFormat stringFormat(StringFormat::GenericTypographic());
 	stringFormat.SetAlignment(StringAlignmentNear);
 	stringFormat.SetLineAlignment(StringAlignmentNear);
+	INT flags = stringFormat.GetFormatFlags();
+	flags |= StringFormatFlagsMeasureTrailingSpaces;
+	stringFormat.SetFormatFlags(flags);
 	font = SetFont_gdiplus(graphics, rect, lpgw, NULL, 0);
 
 	/* calculate text shifting for horizontal text */
@@ -624,8 +622,8 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 
 	while (ngwop < lpgw->nGWOP) {
 		/* transform the coordinates */
-		xdash = MulDiv(curptr->x, rr - rl, lpgw->xmax) + rl;
-		ydash = MulDiv(curptr->y, rt - rb, lpgw->ymax) + rb - 1;
+		xdash = MulDiv(curptr->x, rr - rl - 1, lpgw->xmax) + rl;
+		ydash = rb - MulDiv(curptr->y, rb - rt - 1, lpgw->ymax) + rt - 1;
 
 		/* ignore superfluous moves - see bug #1523 */
 		/* FIXME: we should do this in win.trm, not here */
@@ -818,7 +816,7 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 			pen.SetColor(color);
 			pen.SetWidth(cur_penstruct.lopnWidth.x);
 			if (cur_penstruct.lopnStyle <= PS_DASHDOTDOT)
-				// cast is save since GDI and GDI+ use the same numbers
+				// cast is safe since GDI and GDI+ use the same numbers
 				gdiplusSetDashStyle(&pen, static_cast<DashStyle>(cur_penstruct.lopnStyle));
 			else
 				pen.SetDashStyle(DashStyleSolid);
@@ -883,7 +881,7 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 #else
 					if (keysample || boxedtext.boxing) {
 #endif
-						graphics.MeasureString(textw, -1, font, PointF(0,0), StringFormat::GenericTypographic(), &size);
+						graphics.MeasureString(textw, -1, font, PointF(0,0), &stringFormat, &size);
 						if (lpgw->justify == LEFT) {
 							dxl = 0;
 							dxr = size.Width;
@@ -1141,7 +1139,8 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 					/* style == 2 --> use fill pattern according to
 							 * fillpattern. Pattern number is enumerated */
 					int pattern = GPMAX(fillstyle >> 4, 0) % pattern_num;
-					if (pattern_brush) delete pattern_brush;
+					if (pattern_brush)
+						delete pattern_brush;
 					pattern_brush = gdiplusPatternBrush(pattern,
 									last_color, 1., lpgw->background, transparent);
 					fill_brush = pattern_brush;
@@ -1220,16 +1219,16 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 			font = SetFont_gdiplus(graphics, rect, lpgw, fontname, size);
 			LocalUnlock(curptr->htext);
 			/* recalculate shifting of rotated text */
-			hshift = - sin(M_PI/180. * lpgw->angle) * lpgw->tmHeight / 2;
-			vshift = - cos(M_PI/180. * lpgw->angle) * lpgw->tmHeight / 2;
+			hshift = - sin(M_PI / 180. * lpgw->angle) * lpgw->tmHeight / 2.;
+			vshift = - cos(M_PI / 180. * lpgw->angle) * lpgw->tmHeight / 2.;
 			break;
 		}
 
 		case W_pointsize:
 			if (curptr->x > 0) {
 				double pointsize = curptr->x / 100.0;
-				htic = pointsize * MulDiv(lpgw->htic, rr-rl, lpgw->xmax) + 1;
-				vtic = pointsize * MulDiv(lpgw->vtic, rb-rt, lpgw->ymax) + 1;
+				htic = MulDiv(pointsize * lpgw->htic, rr - rl, lpgw->xmax) + 1;
+				vtic = MulDiv(pointsize * lpgw->vtic, rb - rt, lpgw->ymax) + 1;
 			} else {
 				htic = vtic = 0;
 			}
@@ -1468,12 +1467,12 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 			// Switch between cached and direct drawing
 			if (ps_caching) {
 				// Create a compatible bitmap
-				b = new Bitmap(2*htic+3, 2*vtic+3);
+				b = new Bitmap(2 * htic + 3, 2 * vtic + 3, &graphics);
 				g = Graphics::FromImage(b);
 				if (lpgw->antialiasing)
 					g->SetSmoothingMode(SmoothingModeAntiAlias8x8);
-				cb_ofs.x = xofs = htic+1;
-				cb_ofs.y = yofs = vtic+1;
+				cb_ofs.x = xofs = htic + 1;
+				cb_ofs.y = yofs = vtic + 1;
 				last_symbol = curptr->op;
 			} else {
 				g = &graphics;
@@ -1489,7 +1488,8 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 			case W_star: /* do star: first plus, then cross */
 				g->DrawLine(&solid_pen, xofs - htic, yofs, xofs + htic, yofs);
 				g->DrawLine(&solid_pen, xofs, yofs - vtic, xofs, yofs + vtic);
-				if (curptr->op == W_plus) break;
+				if (curptr->op == W_plus)
+					break;
 			case W_cross: /* do X */
 				g->DrawLine(&solid_pen, xofs - htic, yofs - vtic, xofs + htic - 1, yofs + vtic);
 				g->DrawLine(&solid_pen, xofs - htic, yofs + vtic, xofs + htic - 1, yofs - vtic);

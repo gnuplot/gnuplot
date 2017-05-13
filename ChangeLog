@@ -1,3 +1,10 @@
+2017-05-13  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgdiplus.cpp:  Backport fixes from 5.1:
+	Graphics::MeasureString did not take trailing spaces into account.
+	Off-by-one error in mapping of graph coordinates.
+	Fix memory leak in SetFont_gdiplus.
+
 2017-05-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/cairo.trm:
