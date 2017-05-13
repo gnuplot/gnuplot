@@ -1,9 +1,9 @@
 /*
- * $Id: wgdiplus.cpp,v 1.56 2017/04/23 18:27:53 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.57 2017/04/25 19:29:30 markisch Exp $
  */
 
 /*
-Copyright (c) 2011-2014 Bastian Maerkisch. All rights reserved.
+Copyright (c) 2011-2017 Bastian Maerkisch. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
@@ -534,7 +534,7 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 #endif
 
 	/* point symbols */
-	unsigned last_symbol = 0;
+	enum win_pointtypes last_symbol = W_invalid_pointtype;
 	CachedBitmap *cb = NULL;
 	POINT cb_ofs;
 	bool ps_caching = false;
@@ -576,9 +576,7 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 	rb = rect->bottom;
 
 	if (lpgw->antialiasing) {
-		//graphics.SetSmoothingMode(SmoothingModeAntiAlias);
 		graphics.SetSmoothingMode(SmoothingModeAntiAlias8x8);
-		// graphics.SetTextRenderingHint(TextRenderingHintAntiAlias);
 		graphics.SetTextRenderingHint(TextRenderingHintClearTypeGridFit);
 	}
 	graphics.SetInterpolationMode(InterpolationModeNearestNeighbor);
@@ -1283,7 +1281,7 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 				htic = vtic = 0;
 			}
 			/* invalidate point symbol cache */
-			last_symbol = 0;
+			last_symbol = W_invalid_pointtype;
 			break;
 
 		case W_line_width:
@@ -1295,7 +1293,7 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 			solid_pen.SetWidth(line_width);
 			pen.SetWidth(line_width);
 			/* invalidate point symbol cache */
-			last_symbol = 0;
+			last_symbol = W_invalid_pointtype;
 			break;
 
 		case W_setcolor: {
@@ -1335,7 +1333,7 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 
 			/* invalidate point symbol cache */
 			if (last_color != color)
-				last_symbol = 0;
+				last_symbol = W_invalid_pointtype;
 
 			/* remember this color */
 			cur_penstruct.lopnColor = color;
@@ -1498,13 +1496,15 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 		}
 
 		default: {
+			enum win_pointtypes symbol = (enum win_pointtypes) curptr->op;
+
 			/* This covers only point symbols. All other codes should be
 			   handled in the switch statement. */
-			if ((curptr->op < W_dot) || (curptr->op > W_dot + WIN_POINT_TYPES))
+			if ((symbol < W_dot) || (symbol > W_last_pointtype))
 				break;
 
 			// draw cached point symbol
-			if ((last_symbol == curptr->op) && (cb != NULL)) {
+			if (ps_caching && (last_symbol == symbol) && (cb != NULL)) {
 				// always draw point symbols on integer (pixel) positions
 				if (lpgw->oversample)
 					graphics.DrawCachedBitmap(cb, INT(xdash + 0.5) - cb_ofs.x, INT(ydash + 0.5) - cb_ofs.y);
@@ -1532,7 +1532,7 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 					g->SetSmoothingMode(SmoothingModeAntiAlias8x8);
 				cb_ofs.x = xofs = htic + 1;
 				cb_ofs.y = yofs = vtic + 1;
-				last_symbol = curptr->op;
+				last_symbol = symbol;
 			} else {
 				g = &graphics;
 				// snap to pixel
@@ -1545,7 +1545,7 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 				}
 			}
 
-			switch (curptr->op) {
+			switch (symbol) {
 			case W_dot:
 				gdiplusDot(*g, solid_brush, xofs, yofs);
 				break;
@@ -1553,7 +1553,8 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 			case W_star: /* do star: first plus, then cross */
 				g->DrawLine(&solid_pen, xofs - htic, yofs, xofs + htic, yofs);
 				g->DrawLine(&solid_pen, xofs, yofs - vtic, xofs, yofs + vtic);
-				if (curptr->op == W_plus) break;
+				if (symbol == W_plus)
+					break;
 			case W_cross: /* do X */
 				g->DrawLine(&solid_pen, xofs - htic, yofs - vtic, xofs + htic - 1, yofs + vtic);
 				g->DrawLine(&solid_pen, xofs - htic, yofs + vtic, xofs + htic - 1, yofs - vtic);
@@ -1584,12 +1585,12 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 
 				// This should never happen since all other codes should be
 				// handled in the switch statement.
-				if ((curptr->op < W_box) || (curptr->op > W_fpentagon))
+				if ((symbol < W_box) || (symbol > W_last_pointtype))
 					break;
 
 				// Calculate index, instead of an ugly long switch statement;
 				// Depends on definition of commands in wgnuplib.h.
-				index = (curptr->op - W_box);
+				index = (symbol - W_box);
 				shape = index / 2;
 				filled = (index % 2) > 0;
 

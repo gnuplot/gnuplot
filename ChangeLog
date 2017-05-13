@@ -1,3 +1,9 @@
+2017-05-13  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgnuplib.h src/win/wgraph.c src/win/wgdiplus.cpp
+	src/win/wd2d.cpp:  Replace defines for commands and point symbol types
+	by enums.
+
 2017-05-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/doc2tex.c docs/doc2gih.c:  Support bulleted lists at top level
@@ -768,7 +774,7 @@
 	This is useful in particular for Windows in "tablet mode" which only
 	displays one maximised window at the time.
 	Patch #711
-	
+
 2017-01-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (gen_tics):  Remove dead code for polar axis tics.

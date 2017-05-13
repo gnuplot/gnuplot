@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.249 2017/05/08 07:37:11 markisch Exp $
+ * $Id: wgraph.c,v 1.250 2017/05/08 07:50:41 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -472,6 +472,7 @@ GraphInit(LPGW lpgw)
 				  lpgw->hInstance, lpgw);
 	if (lpgw->hStatusbar) {
 		RECT rect;
+
 		/* auto-adjust size */
 		SendMessage(lpgw->hStatusbar, WM_SIZE, (WPARAM)0, (LPARAM)0);
 		ShowWindow(lpgw->hStatusbar, SW_SHOWNOACTIVATE);
@@ -1019,6 +1020,7 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 #ifdef HAVE_GDIPLUS
 	if (lpgw->gdiplus && !(lpgw->rotating && lpgw->fastrotation)) {
 		InitFont_gdiplus(lpgw, hdc, lprect);
+		return;
 	}
 #endif
 #ifdef HAVE_D2D
@@ -1108,7 +1110,6 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	lpgw->tmAscent = tm.tmAscent;
 	lpgw->tmDescent = tm.tmDescent;
 	SelectObject(hdc, hfontold);
-	return;
 }
 
 
@@ -1123,7 +1124,6 @@ DestroyFonts(LPGW lpgw)
 		DeleteObject(lpgw->hfontv);
 		lpgw->hfontv = 0;
 	}
-	return;
 }
 
 
@@ -1848,7 +1848,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 	/* point symbols */
 	bool ps_caching = FALSE;
-	int last_symbol = 0;
+	enum win_pointtypes last_symbol = W_invalid_pointtype;
 	HDC cb_memdc = NULL;
 	HBITMAP cb_old_bmp;
 	HBITMAP cb_membmp;
@@ -2560,7 +2560,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				htic = vtic = 0;
 			}
 			/* invalidate point symbol cache */
-			last_symbol = 0;
+			last_symbol = W_invalid_pointtype;
 			break;
 
 		case W_line_width:
@@ -2570,7 +2570,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			line_width = curptr->x == 100 ? 1 : (curptr->x / 100.0);
 			line_width *= lpgw->sampling * lpgw->linewidth * lw_scale;
 			/* invalidate point symbol cache */
-			last_symbol = 0;
+			last_symbol = W_invalid_pointtype;
 			break;
 
 		case W_setcolor: {
@@ -2617,7 +2617,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 			/* invalidate point symbol cache */
 			if (last_color != color)
-				last_symbol = 0;
+				last_symbol = W_invalid_pointtype;
 
 			/* remember this color */
 			last_color = color;
@@ -2779,14 +2779,15 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			HDC dc;
 			HBRUSH old_brush;
 			HPEN old_pen;
+			enum win_pointtypes symbol = (enum win_pointtypes) curptr->op;
 
 			/* This covers only point symbols. All other codes should be
 			   handled in the switch statement. */
-			if ((curptr->op < W_dot) || (curptr->op > W_dot + WIN_POINT_TYPES))
+			if ((symbol < W_dot) || (symbol > W_last_pointtype))
 				break;
 
 			/* draw cached point symbol */
-			if (ps_caching && (last_symbol == curptr->op) && (cb_memdc != NULL)) {
+			if (ps_caching && (last_symbol == symbol) && (cb_memdc != NULL)) {
 				TransparentBlt(hdc, xdash - cb_ofs.x, ydash - cb_ofs.y, 2*htic+2, 2*vtic+2,
 					           cb_memdc, 0, 0, 2*htic+2, 2*vtic+2, 0x00ffffff);
 				break;
@@ -2821,14 +2822,14 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 				cb_ofs.x = xofs = htic+1;
 				cb_ofs.y = yofs = vtic+1;
-				last_symbol = curptr->op;
+				last_symbol = symbol;
 			} else {
 				dc = hdc;
 				xofs = xdash;
 				yofs = ydash;
 			}
 
-			switch (curptr->op) {
+			switch (symbol) {
 			case W_dot:
 				dot(dc, xofs, yofs);
 				break;
@@ -2840,7 +2841,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				MoveTo(dc, xofs, yofs - vtic);
 				LineTo(dc, xofs, yofs + vtic);
 				SelectObject(dc, lpgw->hapen);
-				if (curptr->op == W_plus)
+				if (symbol == W_plus)
 					break;
 			case W_cross: /* do X */
 				SelectObject(dc, lpgw->hsolid);
@@ -2883,13 +2884,13 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 				/* This should never happen since all other codes should be
 				   handled in the switch statement. */
-				if ((curptr->op < W_box) || (curptr->op > W_fpentagon))
+				if ((symbol < W_box) || (symbol > W_last_pointtype))
 					break;
 
 				/* Calculate index, instead of an ugly long switch statement;
 				   Depends on definition of commands in wgnuplib.h.
 				*/
-				index = (curptr->op - W_box);
+				index = symbol - W_box;
 				shape = index / 2;
 				filled = (index % 2) > 0;
 
@@ -4136,7 +4137,6 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			case WM_MBUTTONUP:
 				Wnd_exec_event(lpgw, lParam, GE_buttonrelease, 2);
 				return 0L;
-
 		} /* switch over mouse events */
 	}
 #endif /* USE_MOUSE */

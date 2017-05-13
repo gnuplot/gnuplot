@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.86 2017/01/21 14:41:55 markisch Exp $
+ * $Id: wgnuplib.h,v 1.87 2017/04/23 18:27:53 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -274,49 +274,37 @@ struct GWOPBLK {			/* kept in local memory */
 	UINT used;				/* number of GWOP's used */
 };
 
+/* point types */
+enum win_pointtypes {
+	W_invalid_pointtype = 0,
+	W_dot = 10,
+	W_plus, W_cross, W_star, 
+	W_box, W_fbox,
+	W_circle, W_fcircle, 
+	W_itriangle, W_fitriangle, 
+	W_triangle, W_ftriangle,
+	W_diamond, W_fdiamond,
+	W_pentagon, W_fpentagon,
+	W_last_pointtype = W_fpentagon
+};
+#define WIN_POINT_TYPES (W_last_pointtype - W_dot + 1)
+
 /* ops */
-#define W_endoflist 0
-
-#define WIN_POINT_TYPES 15	/* required by win.trm */
-#define W_dot 10
-#define W_plus 11
-#define W_cross 12
-#define W_star 13
-#define W_box 14
-#define W_fbox 15
-#define W_circle 16
-#define W_fcircle 17
-#define W_itriangle 18
-#define W_fitriangle 19
-#define W_triangle 20
-#define W_ftriangle 21
-#define W_diamond 22
-#define W_fdiamond 23
-#define W_pentagon 24
-#define W_fpentagon 25
-
-#define W_move 30
-#define W_vect 31
-#define W_line_type 32
-#define W_put_text 33
-#define W_justify 34
-#define W_text_angle 35
-#define W_pointsize 36
-#define W_line_width 37
-#define W_setcolor 38
-#define W_filled_polygon_pt   39
-#define W_filled_polygon_draw 40
-#define W_boxfill 41
-#define W_fillstyle 42
-#define W_font 43
-#define W_enhanced_text 44
-#define W_image 45
-#define W_layer 46
-#define W_text_encoding 47
-#define W_hypertext 48
-#define W_boxedtext 49
-#define W_dash_type 50
-#define W_polyline 51
+enum win_draw_commands {
+	W_endoflist = 0,
+	W_point = 9, 
+	W_pointsize = 30,
+	W_setcolor,
+	W_polyline, W_line_type, W_dash_type, W_line_width,
+	W_put_text, W_enhanced_text, W_boxedtext,
+	 W_text_encoding, W_font, W_justify, W_text_angle,
+	W_filled_polygon_draw, W_filled_polygon_pt,
+	W_fillstyle,
+	W_move, W_boxfill,
+	W_image,
+	W_layer,
+	W_hypertext
+};
 
 
 typedef struct tagGW {

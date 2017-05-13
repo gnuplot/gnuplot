@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.3 2017/05/08 07:48:40 markisch Exp $
+ * $Id: wd2d.cpp,v 1.4 2017/05/08 07:53:53 markisch Exp $
  */
 
 /*
@@ -662,7 +662,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 #endif
 
 	/* point symbols */
-	unsigned last_symbol = 0;
+	enum win_pointtypes last_symbol = W_invalid_pointtype;
 #if 0
 	CachedBitmap *cb = NULL;
 	POINT cb_ofs;
@@ -1458,7 +1458,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 				htic = vtic = 0;
 			}
 			/* invalidate point symbol cache */
-			last_symbol = 0;
+			last_symbol = W_invalid_pointtype;
 			break;
 
 		case W_line_width:
@@ -1468,7 +1468,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 			line_width = curptr->x == 100 ? 1 : (curptr->x / 100.0);
 			line_width *= lpgw->sampling * lpgw->linewidth * lw_scale;
 			/* invalidate point symbol cache */
-			last_symbol = 0;
+			last_symbol = W_invalid_pointtype;
 			break;
 
 		case W_setcolor: {
@@ -1505,7 +1505,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 
 			/* invalidate point symbol cache */
 			if (last_color != color)
-				last_symbol = 0;
+				last_symbol = W_invalid_pointtype;
 
 			/* remember this color */
 			cur_penstruct.lopnColor = color;
@@ -1704,14 +1704,16 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 		}
 
 		default: {
+			enum win_pointtypes symbol = (enum win_pointtypes) curptr->op;
+
 			/* This covers only point symbols. All other codes should be
 			   handled in the switch statement. */
-			if ((curptr->op < W_dot) || (curptr->op > W_dot + WIN_POINT_TYPES))
+			if ((symbol < W_dot) || (symbol > W_last_pointtype))
 				break;
 
 #if 0
 			// draw cached point symbol
-			if ((last_symbol == curptr->op) && (cb != NULL)) {
+			if (ps_caching && (last_symbol == symbol) && (cb != NULL)) {
 				// always draw point symbols on integer (pixel) positions
 				GETHDC
 				Graphics * graphics = gdiplusGraphics(lpgw, hdc);
@@ -1746,7 +1748,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 					g->SetSmoothingMode(SmoothingModeAntiAlias8x8);
 				cb_ofs.x = xofs = htic + 1;
 				cb_ofs.y = yofs = vtic + 1;
-				last_symbol = curptr->op;
+				last_symbol = symbol;
 #endif
 			} else {
 				// snap to pixel
@@ -1759,7 +1761,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 				}
 			}
 
-			switch (curptr->op) {
+			switch (symbol) {
 			case W_dot:
 				d2dDot(pRenderTarget, pSolidBrush, xofs, yofs);
 				break;
@@ -1767,7 +1769,8 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 			case W_star: /* do star: first plus, then cross */
 				pRenderTarget->DrawLine(D2D1::Point2F(xofs - htic, yofs), D2D1::Point2F(xofs + htic, yofs), pSolidBrush, line_width);
 				pRenderTarget->DrawLine(D2D1::Point2F(xofs, yofs - vtic), D2D1::Point2F(xofs, yofs + vtic), pSolidBrush, line_width);
-				if (curptr->op == W_plus) break;
+				if (symbol == W_plus)
+					break;
 			case W_cross: /* do X */
 				pRenderTarget->DrawLine(D2D1::Point2F(xofs - htic, yofs - vtic), D2D1::Point2F(xofs + htic, yofs + vtic), pSolidBrush, line_width);
 				pRenderTarget->DrawLine(D2D1::Point2F(xofs - htic, yofs + vtic), D2D1::Point2F(xofs + htic, yofs - vtic), pSolidBrush, line_width);
@@ -1798,12 +1801,12 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 
 				// This should never happen since all other codes should be
 				// handled in the switch statement.
-				if ((curptr->op < W_box) || (curptr->op > W_fpentagon))
+				if ((symbol < W_box) || (symbol > W_last_pointtype))
 					break;
 
 				// Calculate index, instead of an ugly long switch statement;
 				// Depends on definition of commands in wgnuplib.h.
-				index = (curptr->op - W_box);
+				index = (symbol - W_box);
 				shape = index / 2;
 				filled = (index % 2) > 0;
 
