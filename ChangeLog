@@ -1,9 +1,23 @@
 2017-05-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/win/wgdiplus.cpp:  Backport fixes from 5.1:
+	Backport fixes from 5.1:
+
+	* src/win/wgdiplus.cpp:
 	Graphics::MeasureString did not take trailing spaces into account.
 	Off-by-one error in mapping of graph coordinates.
 	Fix memory leak in SetFont_gdiplus.
+
+	* src/win/wgraph.c:
+	(drawgraph) Off-by-one error in mapping of graph coordinates.
+	(CopyClip) Only attempt to set clipboard data if the bitmap/metafile
+	handle is valid.  Emit an error message otherwise.
+	(SaveAsEMF) Tweak flags for GetSaveFileName() to make sure that the
+	file/path is not read-only and to preserve the current working
+	directory.
+	(WndGraphProc): Remove dead code in mouse handling: Single and double
+	clicks are handled by the code in mouse.c and the window is not even
+	configured to receive double click events.  Also make sure that mouse
+	wheel "button"s are released again.
 
 2017-05-08  Ethan A Merritt  <merritt@u.washington.edu>
 
