@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.65.2.2 2014/12/31 04:38:44 sfeam Exp $
+ * $Id: wgnuplib.h,v 1.65.2.3 2017/03/04 08:20:40 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -405,6 +405,34 @@ typedef struct tagGW {
 } GW;
 typedef GW *  LPGW;
 
+
+typedef struct {
+	LPGW lpgw;           /* graph window */
+	LPRECT rect;         /* rect to update */
+	BOOL opened_string;  /* started processing of substring? */
+	BOOL show;           /* print this substring? */
+	int overprint;       /* overprint flag */
+	BOOL widthflag;      /* FALSE for zero width boxes */
+	BOOL sizeonly;       /* only measure length of substring? */
+	double base;         /* current baseline position (above initial baseline) */
+	int xsave, ysave;    /* save text position for overprinted text */
+	int x, y;            /* current text position */
+	TCHAR fontname[MAXFONTNAME]; /* current font name */
+	double fontsize;     /* current font size */
+	int totalwidth;      /* total width of printed text */
+	int totalasc;        /* total height above center line */
+	int totaldesc;       /* total height below center line */
+	double res_scale;    /* scaling due to different resolution (printers) */
+	int shift;           /* baseline alignment */
+	void (* set_font)();
+	unsigned (* text_length)(char *);
+	void (* put_text)(int , int, char *);
+	void (* cleanup)();
+} enhstate_struct;
+extern enhstate_struct enhstate;
+
+
+/* No TEXT Macro required for fonts */
 #define WINFONTSIZE 10
 #define WINFONT "Tahoma"
 #ifndef WINJPFONT
@@ -441,9 +469,9 @@ void WDPROC Graph_set_clipboard(LPGW lpgw, LPCSTR s);
 #endif
 
 /* BM: callback functions for enhanced text */
-void WDPROC GraphEnhancedOpen(char *fontname, double fontsize, double base,
-    BOOL widthflag, BOOL showflag, int overprint);
-void WDPROC GraphEnhancedFlush(void);
+void GraphEnhancedOpen(char *fontname, double fontsize, double base,
+    TBOOLEAN widthflag, TBOOLEAN showflag, int overprint);
+void GraphEnhancedFlush(void);
 
 void WIN_update_options __PROTO((void));
 

@@ -1,6 +1,6 @@
 2017-05-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	Backport fixes from 5.1:
+	Backport changes from 5.1:
 
 	* src/win/wgdiplus.cpp:
 	Graphics::MeasureString did not take trailing spaces into account.
@@ -18,6 +18,15 @@
 	clicks are handled by the code in mouse.c and the window is not even
 	configured to receive double click events.  Also make sure that mouse
 	wheel "button"s are released again.
+
+	* src/win/wcommon.h src/win/wgnuplib.h src/win/wgraph.c
+	src/win/wgdiplus.cpp:  GDI+ implementation of enhanced text.
+	Until now the GDI+ backend still used the GDI code to draw enhanced
+	text, which caused differences in layout if text was rendered as
+	"normal" or enhanced text.  We now re-use the previous GDI-only
+	routines and introduce function pointers to call GDI or GDI+ code
+	depending on if they are called from drawgraph() or
+	drawgraph_gdiplus().
 
 2017-05-08  Ethan A Merritt  <merritt@u.washington.edu>
 

@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.189.2.21 2017/02/28 06:42:42 markisch Exp $
+ * $Id: wgraph.c,v 1.189.2.22 2017/05/13 06:18:25 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -185,26 +185,11 @@ static TBOOLEAN brushes_initialized = FALSE;
    Do not access outside draw_enhanced_text, GraphEnhancedOpen or
    GraphEnhancedFlush.
 */
+enhstate_struct enhstate;
+
 static struct {
-	LPGW lpgw;           /* graph window */
 	HDC  hdc;            /* device context */
-	LPRECT rect;         /* rect to update */
-	BOOL opened_string;  /* started processing of substring? */
-	BOOL show;           /* print this substring? */
-	int overprint;       /* overprint flag */
-	BOOL widthflag;      /* FALSE for zero width boxes */
-	BOOL sizeonly;       /* only measure length of substring? */
-	double base;         /* current baseline position (above initial baseline) */
-	int xsave, ysave;    /* save text position for overprinted text */
-	int x, y;            /* current text position */
-	char fontname[MAXFONTNAME]; /* current font name */
-	double fontsize;     /* current font size */
-	int totalwidth;      /* total width of printed text */
-	int totalasc;        /* total height above center line */
-	int totaldesc;       /* total height below center line */
-	double res_scale;    /* scaling due to different resolution (printers) */
-	int shift;           /* baseline alignment */
-} enhstate;
+} enhstate_gdi;
 
 
 /* ================================== */
@@ -223,7 +208,9 @@ static void	Wnd_GetTextSize(HDC hdc, LPCSTR str, size_t len, int *cx, int *cy);
 static void	GetPlotRect(LPGW lpgw, LPRECT rect);
 static void	MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc);
 static void	DestroyFonts(LPGW lpgw);
+static void	SetFont(LPGW lpgw, HDC hdc);
 static void	SelFont(LPGW lpgw);
+static void	GraphChangeFont(LPGW lpgw, LPCTSTR font, int fontsize, HDC hdc, RECT rect);
 static void	dot(HDC hdc, int xdash, int ydash);
 static unsigned int GraphGetTextLength(LPGW lpgw, HDC hdc, LPCSTR text);
 static void	draw_text_justify(HDC hdc, int justify);
@@ -972,10 +959,9 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	int cx, cy;
 
 #ifdef HAVE_GDIPLUS
-	if (lpgw->gdiplus) {
+	if (lpgw->gdiplus && !(lpgw->rotating && lpgw->fastrotation)) {
 		InitFont_gdiplus(lpgw, hdc, lprect);
-		/* Version 5.0 still needs GDI fonts for enhanced text */
-		lpgw->rotate = TRUE;
+		return;
 	}
 #endif
 
@@ -1031,17 +1017,6 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	lpgw->lf.lfOrientation = 900;
 	lpgw->hfontv = CreateFontIndirect(&(lpgw->lf));
 
-#ifdef HAVE_GDIPLUS
-	/* When using GDI+, we still require the font metrics from GDI for enhanced text,
-	but the text size is obtained by GDI+ already.  We also do not change hchar/vchar
-	for fast rotation (using GDI) in order not to change layout.
-	*/
-	if (lpgw->gdiplus) {
-		hfontold = (HFONT) SelectObject(hdc, lpgw->hfonth);
-		GetTextMetrics(hdc, (TEXTMETRIC *)&tm);
-	} else {
-#endif
-
 	/* save text size */
 	hfontold = (HFONT) SelectObject(hdc, lpgw->hfonth);
 	Wnd_GetTextSize(hdc, "0123456789", 10, &cx, &cy);
@@ -1052,24 +1027,16 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	lpgw->htic = MulDiv(lpgw->hchar, 2, 5);
 	cy = MulDiv(cx, 2 * GetDeviceCaps(hdc, LOGPIXELSY), 50 * GetDeviceCaps(hdc, LOGPIXELSX));
 	lpgw->vtic = MulDiv(cy, lpgw->ymax, lprect->bottom - lprect->top);
-
 	/* find out if we can rotate text 90deg */
-	lpgw->rotate = FALSE;
 	SelectObject(hdc, lpgw->hfontv);
 	result = GetDeviceCaps(hdc, TEXTCAPS);
 	if ((result & TC_CR_90) || (result & TC_CR_ANY))
 		lpgw->rotate = TRUE;
-
 	GetTextMetrics(hdc, (TEXTMETRIC *)&tm);
 	if (tm.tmPitchAndFamily & TMPF_VECTOR)
 		lpgw->rotate = TRUE;	/* vector fonts can all be rotated */
 	if (tm.tmPitchAndFamily & TMPF_TRUETYPE)
 		lpgw->rotate = TRUE;	/* truetype fonts can all be rotated */
-
-#ifdef HAVE_GDIPLUS
-	}
-#endif
-
 	/* store text metrics for later use */
 	lpgw->tmHeight = tm.tmHeight;
 	lpgw->tmAscent = tm.tmAscent;
@@ -1093,7 +1060,7 @@ DestroyFonts(LPGW lpgw)
 }
 
 
-void
+static void
 SetFont(LPGW lpgw, HDC hdc)
 {
 	SelectObject(hdc, lpgw->hfonth);
@@ -1243,7 +1210,7 @@ luma_from_color(unsigned red, unsigned green, unsigned blue)
 }
 
 
-static unsigned int WDPROC
+static unsigned int
 GraphGetTextLength(LPGW lpgw, HDC hdc, LPCSTR text)
 {
 	SIZE size;
@@ -1263,14 +1230,56 @@ GraphGetTextLength(LPGW lpgw, HDC hdc, LPCSTR text)
 }
 
 
+/*   local enhanced text helper functions */
+
+static void
+EnhancedSetFont()
+{
+	GraphChangeFont(enhstate.lpgw, enhstate.fontname, enhstate.fontsize,
+	                enhstate_gdi.hdc, *(enhstate.rect));
+	SetFont(enhstate.lpgw, enhstate_gdi.hdc);
+}
+
+static unsigned
+EnhancedTextLength(char * text)
+{
+	return GraphGetTextLength(enhstate.lpgw, enhstate_gdi.hdc, text);
+}
+
+static void
+EnhancedPutText(int x, int y, char * text)
+{
+	draw_put_text(enhstate.lpgw, enhstate_gdi.hdc, x, y, text);
+}
+
+static void
+EnhancedCleanup()
+{
+	/* restore text alignment */
+	draw_text_justify(enhstate_gdi.hdc, enhstate.lpgw->justify);
+}
+
+static void
+draw_enhanced_init(HDC hdc)
+{
+	enhstate.set_font = &EnhancedSetFont;
+	enhstate.text_length = &EnhancedTextLength;
+	enhstate.put_text = &EnhancedPutText;
+	enhstate.cleanup = &EnhancedCleanup;
+
+	enhstate_gdi.hdc = hdc;
+	enhstate.res_scale = GetDeviceCaps(hdc, LOGPIXELSY) / 96.;
+	SetTextAlign(hdc, TA_LEFT | TA_BASELINE);
+}
 
 
-void WDPROC
+/* enhanced text functions shared with wgdiplus.cpp */
+
+void
 GraphEnhancedOpen(char *fontname, double fontsize, double base,
-    BOOL widthflag, BOOL showflag, int overprint)
+    TBOOLEAN widthflag, TBOOLEAN showflag, int overprint)
 {
 	const int win_scale = 1; /* scaling of base offset */
-	char *fontstring;
 
 	/* There are two special cases:
 	 * overprint = 3 means save current position
@@ -1297,15 +1306,13 @@ GraphEnhancedOpen(char *fontname, double fontsize, double base,
 		/* widthflag FALSE means do not update text position after printing */
 		enhstate.widthflag = widthflag;
 		/* Select font */
-		if ((fontname != NULL) && (strlen(fontname) > 0))
-			fontstring = fontname;
-		else
-			fontstring = enhstate.lpgw->deffontname;
-		strcpy(enhstate.fontname, fontstring);
+		if ((fontname != NULL) && (strlen(fontname) > 0)) {
+			strcpy(enhstate.fontname, fontname);
+		} else {
+			_tcscpy(enhstate.fontname, enhstate.lpgw->deffontname);
+		}
 		enhstate.fontsize = fontsize;
-		GraphChangeFont(enhstate.lpgw, enhstate.fontname, enhstate.fontsize,
-		                enhstate.hdc, *(enhstate.rect));
-		SetFont(enhstate.lpgw, enhstate.hdc);
+		enhstate.set_font();
 
 		/* Scale fractional font height to vertical units of display */
 		/* TODO: Proper use of OUTLINEFONTMETRICS would yield better
@@ -1317,7 +1324,7 @@ GraphEnhancedOpen(char *fontname, double fontsize, double base,
 }
 
 
-void WDPROC
+void
 GraphEnhancedFlush(void)
 {
 	int width, height;
@@ -1334,7 +1341,7 @@ GraphEnhancedFlush(void)
 	y = enhstate.y - enhstate.base * cos(angle);
 
 	/* calculate length of string first */
-	len = GraphGetTextLength(enhstate.lpgw, enhstate.hdc, enhanced_text);
+	len = enhstate.text_length(enhanced_text);
 	width = cos(angle) * len;
 	height = -sin(angle) * len;
 
@@ -1350,7 +1357,7 @@ GraphEnhancedFlush(void)
 
 	/* display string */
 	if (enhstate.show && !enhstate.sizeonly)
-		draw_put_text(enhstate.lpgw, enhstate.hdc, x, y, enhanced_text);
+		enhstate.put_text(x, y, enhanced_text);
 
 	/* update drawing position according to text length */
 	if (!enhstate.widthflag) {
@@ -1391,20 +1398,19 @@ GraphEnhancedFlush(void)
 
 
 int
-draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, const char * str)
+draw_enhanced_text(LPGW lpgw, LPRECT rect, int x, int y, const char * str)
 {
 	const char * original_string = str;
 	unsigned int pass, num_passes;
 	struct termentry *tsave;
-	char save_fontname[MAXFONTNAME];
+	TCHAR save_fontname[MAXFONTNAME];
 	int save_fontsize;
 
 	/* Init enhanced text state */
 	enhstate.lpgw = lpgw;
-	enhstate.hdc = hdc;
 	enhstate.rect = rect;
 	enhstate.opened_string = FALSE;
-	strcpy(enhstate.fontname, lpgw->fontname);
+	_tcscpy(enhstate.fontname, lpgw->fontname);
 	enhstate.fontsize = lpgw->fontsize;
 	/* Store the start position */
 	enhstate.x = x;
@@ -1413,16 +1419,8 @@ draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, const char * s
 	enhstate.totalasc = 0;
 	enhstate.totaldesc = 0;
 
-	enhstate.res_scale = 1.;
-	if ((GetDeviceCaps(hdc, TECHNOLOGY) == DT_RASPRINTER)) {
-		HDC hdc_screen = GetDC(NULL);
-		enhstate.res_scale = (double) GetDeviceCaps(hdc, VERTRES) /
-		           (double) GetDeviceCaps(hdc_screen, VERTRES);
-		ReleaseDC(NULL, hdc_screen);
-	}
-
 	/* Save font information */
-	strcpy(save_fontname, lpgw->fontname);
+	_tcscpy(save_fontname, lpgw->fontname);
 	save_fontsize = lpgw->fontsize;
 
 	/* Set up global variables needed by enhanced_recursion() */
@@ -1440,7 +1438,6 @@ draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, const char * s
 	}
 
 	/* We actually print everything left to right. */
-	SetTextAlign(hdc, TA_LEFT|TA_BASELINE);
 	/* Adjust baseline position: */
 	enhstate.shift = lpgw->tmHeight/2 - lpgw->tmDescent;
 	enhstate.x += sin(lpgw->angle * M_PI/180) * enhstate.shift;
@@ -1461,8 +1458,9 @@ draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, const char * s
 		 * closing brace in the string. We increment past it (else
 		 * we get stuck in an infinite loop) and try again.
 		 */
+		char * save_fontname_a = save_fontname;
 		while (*(str = enhanced_recursion(str, TRUE,
-				save_fontname, save_fontsize,
+				save_fontname_a, save_fontsize,
 				0.0, TRUE, TRUE, 0))) {
 			GraphEnhancedFlush();
 			if (!*++str)
@@ -1484,12 +1482,13 @@ draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, const char * s
 	/* restore terminal */
 	if (WIN_term) term = tsave;
 
-	/* restore previous font */
-	GraphChangeFont(lpgw, save_fontname, save_fontsize, hdc, *rect);
-	SetFont(lpgw, hdc);
+	/* restore font */
+	_tcscpy(enhstate.fontname, save_fontname);
+	enhstate.fontsize = save_fontsize;
+	enhstate.set_font();
 
-	/* restore text alignment */
-	draw_text_justify(hdc, enhstate.lpgw->justify);
+	/* clean-up */
+	enhstate.cleanup();
 
 	return enhstate.totalwidth;
 }
@@ -1542,7 +1541,7 @@ draw_put_text(LPGW lpgw, HDC hdc, int x, int y, char * str)
 
 	/* support text encoding */
 	if ((lpgw->encoding == S_ENC_DEFAULT) || (lpgw->encoding == S_ENC_INVALID)) {
-		TextOut(hdc, x, y, str, lstrlen(str));
+		TextOutA(hdc, x, y, str, strlen(str));
 	} else {
 		LPWSTR textw = UnicodeText(str, lpgw->encoding);
 		if (textw) {
@@ -1555,7 +1554,7 @@ draw_put_text(LPGW lpgw, HDC hdc, int x, int y, char * str)
 				lpgw->encoding_error = lpgw->encoding;
 			}
 			/* fall back to standard encoding */
-			TextOut(hdc, x, y, str, strlen(str));
+			TextOutA(hdc, x, y, str, strlen(str));
 		}
 	}
 	SetBkMode(hdc, OPAQUE);
@@ -2194,7 +2193,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			if (str) {
 				RECT extend;
 
-				draw_enhanced_text(lpgw, hdc, rect, xdash, ydash, str);
+				draw_enhanced_init(hdc);
+				draw_enhanced_text(lpgw, rect, xdash, ydash, str);
 				draw_get_enhanced_text_extend(&extend);
 				if (keysample) {
 					draw_update_keybox(lpgw, plotno, xdash - extend.left, ydash - extend.top);

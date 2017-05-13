@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.16.2.16 2017/03/04 08:20:39 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.16.2.17 2017/05/13 05:55:00 markisch Exp $
  */
 
 /*
@@ -34,6 +34,7 @@ extern "C" {
 #include <windowsx.h>
 #define GDIPVER 0x0110
 #include <gdiplus.h>
+#include <tchar.h>
 
 #include "wgdiplus.h"
 #include "wgnuplib.h"
@@ -56,6 +57,18 @@ static void gdiplusFilledPolygon(Graphics &graphics, Brush &brush, POINT *ppt, i
 static Brush * gdiplusPatternBrush(int style, COLORREF color, double alpha, COLORREF backcolor, BOOL transparent);
 static void gdiplusDot(Graphics &graphics, Brush &brush, int x, int y);
 static Font * SetFont_gdiplus(Graphics &graphics, LPRECT rect, LPGW lpgw, char * fontname, int size);
+/* Internal state of enhanced text processing.
+*/
+
+static struct {
+	Graphics * graphics; /* graphics object */
+	Font * font;
+	SolidBrush * brush;
+	StringFormat *stringformat;
+} enhstate_gdiplus;
+
+
+/* ****************  ....   ************************* */
 
 
 void
@@ -419,6 +432,78 @@ InitFont_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 	Font * font = SetFont_gdiplus(graphics, rect, lpgw, lpgw->fontname, lpgw->fontscale * lpgw->fontsize);
 	// TODO:  save font object for later use
 	delete font;
+}
+
+
+static void
+EnhancedSetFont()
+{
+	if ((enhstate.lpgw->fontsize != enhstate.fontsize) ||
+	    (_tcscmp(enhstate.lpgw->fontname, enhstate.fontname) != 0)) {
+		if (enhstate_gdiplus.font)
+			delete enhstate_gdiplus.font;
+		enhstate_gdiplus.font = SetFont_gdiplus(*enhstate_gdiplus.graphics, enhstate.rect, enhstate.lpgw, enhstate.fontname, enhstate.fontsize);
+	}
+}
+
+
+static unsigned
+EnhancedTextLength(char * text)
+{
+	LPWSTR textw = UnicodeText(enhanced_text, enhstate.lpgw->encoding);
+	RectF box;
+	enhstate_gdiplus.graphics->MeasureString(textw, -1, enhstate_gdiplus.font, PointF(0, 0), enhstate_gdiplus.stringformat, &box);
+	free(textw);
+	return ceil(box.Width);
+}
+
+
+static void
+EnhancedPutText(int x, int y, char * text)
+{
+	LPWSTR textw = UnicodeText(text, enhstate.lpgw->encoding);
+	Graphics *g = enhstate_gdiplus.graphics;
+	if (enhstate.lpgw->angle == 0) {
+		PointF pointF(x, y + enhstate.lpgw->tmDescent);
+		g->DrawString(textw, -1, enhstate_gdiplus.font, pointF, enhstate_gdiplus.stringformat, enhstate_gdiplus.brush);
+	} else {
+		/* shift rotated text correctly */
+		g->TranslateTransform(x, y);
+		g->RotateTransform(-enhstate.lpgw->angle);
+		g->DrawString(textw, -1, enhstate_gdiplus.font, PointF(0, enhstate.lpgw->tmDescent), enhstate_gdiplus.stringformat, enhstate_gdiplus.brush);
+		g->ResetTransform();
+	}
+	free(textw);
+}
+
+
+static void
+EnhancedCleanup()
+{
+	delete enhstate_gdiplus.font;
+	delete enhstate_gdiplus.stringformat;
+}
+
+
+static void
+draw_enhanced_init(LPGW lpgw, Graphics &graphics, SolidBrush &brush, LPRECT rect)
+{
+	enhstate.set_font = &EnhancedSetFont;
+	enhstate.text_length = &EnhancedTextLength;
+	enhstate.put_text = &EnhancedPutText;
+	enhstate.cleanup = &EnhancedCleanup;
+
+	enhstate_gdiplus.graphics = &graphics;
+	enhstate_gdiplus.font = SetFont_gdiplus(graphics, rect, lpgw, lpgw->fontname, lpgw->fontsize);
+	enhstate_gdiplus.brush = &brush;
+	enhstate.res_scale = graphics.GetDpiY() / 96.;
+
+	enhstate_gdiplus.stringformat = new StringFormat(StringFormat::GenericTypographic());
+	enhstate_gdiplus.stringformat->SetAlignment(StringAlignmentNear);
+	enhstate_gdiplus.stringformat->SetLineAlignment(StringAlignmentFar);
+	INT flags = enhstate_gdiplus.stringformat->GetFormatFlags();
+	flags |= StringFormatFlagsMeasureTrailingSpaces;
+	enhstate_gdiplus.stringformat->SetFormatFlags(flags);
 }
 
 
@@ -873,7 +958,6 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 						graphics.DrawString(textw, -1, font, PointF(0,0), &stringFormat, &solid_brush);
 						graphics.ResetTransform();
 					}
-					// only need to measure the string when boxing or drawing a key text
 					RectF size;
 					int dxl, dxr;
 #ifndef EAM_BOXED_TEXT
@@ -918,24 +1002,11 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 		}
 
 		case W_enhanced_text: {
-			/* TODO: This section still uses GDI. Convert to GDI+. */
-			HDC hdc = graphics.GetHDC();
-			char * str;
-			str = (char *) LocalLock(curptr->htext);
+			char * str = (char *) LocalLock(curptr->htext);
 			if (str) {
 				RECT extend;
-
-				/* Setup GDI fonts: force re-make */
-				int save_fontsize = lpgw->fontsize;
-				lpgw->fontsize = -1;
-				GraphChangeFont(lpgw, lpgw->fontname, save_fontsize, hdc, *rect);
-				SetFont(lpgw, hdc);
-				lpgw->fontsize = save_fontsize;
-
-				/* Set GDI text color */
-				SetTextColor(hdc, last_color);
-
-				draw_enhanced_text(lpgw, hdc, rect, xdash, ydash, str);
+				draw_enhanced_init(lpgw, graphics, solid_brush, rect);
+				draw_enhanced_text(lpgw, rect, xdash, ydash, str);
 				draw_get_enhanced_text_extend(&extend);
 
 				if (keysample) {
@@ -958,7 +1029,6 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 #endif
 			}
 			LocalUnlock(curptr->htext);
-			graphics.ReleaseHDC(hdc);
 			break;
 		}
 
