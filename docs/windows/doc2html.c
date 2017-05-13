@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2html.c,v 1.8 2015/05/31 03:43:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2html.c,v 1.9 2016/01/16 12:33:43 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - doc2html.c */
@@ -206,6 +206,7 @@ process_line(char *line, FILE *b, FILE *c, FILE *d)
     static int level = 1;
     static TBOOLEAN startpage = TRUE;
     static TBOOLEAN tabl = FALSE;
+    static TBOOLEAN intable = FALSE;
     static TBOOLEAN skiptable = FALSE;
     static TBOOLEAN forcetable = FALSE;
     static TBOOLEAN para = FALSE;
@@ -355,8 +356,9 @@ process_line(char *line, FILE *b, FILE *c, FILE *d)
             }
 	    break;
     case '@':{			/* start/end table */
-            skiptable = !skiptable;
-            if (!skiptable) forcetable = FALSE;
+	    skiptable = !skiptable;
+	    if (!skiptable) forcetable = FALSE;
+	    intable = !intable; /* just for latex list support */
 	    break;
 	}
     case '^':{			/* html link escape */
@@ -387,7 +389,27 @@ process_line(char *line, FILE *b, FILE *c, FILE *d)
             if (para) fprintf(b, "</p><p align=\"justify\">\n");
             break;
     case '#':{			/* latex table entry */
-	    break;		/* ignore */
+	    if (!intable) {  /* HACK: we just handle itemized lists */
+		/* Itemized list outside of table */
+		if (line[1] == 's')
+		    (void) fputs("<ul>\n", b);
+		else if (line[1] == 'e')
+		    (void) fputs("</ul>\n", b);
+		else if (line[1] == 'b') {
+		    /* Bullet */
+		    fprintf(b, "<li>%s\n", line2+2);
+		}
+		else if (line[1] == '#') {
+		    /* Continuation of bulleted line */
+		    fputs(line2+2, b);
+		}
+		else {
+		    if (strchr(line, '\n'))
+			*(strchr(line, '\n')) = '\0';
+		    fprintf(b, "<li><pre>%s</pre>\n", line + 1);
+		}
+	    }
+	    break;
 	}
     case '%':{			/* troff table entry */
 	    break;		/* ignore */
