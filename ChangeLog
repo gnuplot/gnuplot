@@ -28,6 +28,8 @@
 	depending on if they are called from drawgraph() or
 	drawgraph_gdiplus().
 
+	* src/win/wgraph.c src/win/wcommon.h (draw_image):  Make static.
+
 2017-05-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/cairo.trm:

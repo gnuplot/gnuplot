@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.189.2.22 2017/05/13 06:18:25 markisch Exp $
+ * $Id: wgraph.c,v 1.189.2.23 2017/05/13 06:38:48 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -215,6 +215,7 @@ static void	dot(HDC hdc, int xdash, int ydash);
 static unsigned int GraphGetTextLength(LPGW lpgw, HDC hdc, LPCSTR text);
 static void	draw_text_justify(HDC hdc, int justify);
 static void	draw_put_text(LPGW lpgw, HDC hdc, int x, int y, char * str);
+static void	draw_image(LPGW lpgw, HDC hdc, char *image, POINT corners[4], unsigned int width, unsigned int height, int color_mode);
 static void	drawgraph(LPGW lpgw, HDC hdc, LPRECT rect);
 static void	CopyClip(LPGW lpgw);
 static void	SaveAsEMF(LPGW lpgw);
@@ -343,7 +344,6 @@ GraphOpSize(LPGW lpgw, UINT op, UINT x, UINT y, LPCSTR str, DWORD size)
 	this->used++;
 	lpgw->nGWOP++;
 	lpgw->buffervalid = FALSE;
-	return;
 }
 
 /* ================================== */
