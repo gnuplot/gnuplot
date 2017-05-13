@@ -26,6 +26,7 @@ check-prepare:
 check-local: check-noninteractive
 
 check-interactive: check-prepare $(BINARY_FILES)
+	FIT_LOG=
 	@if test -z "$(GNUTERM)" ; then \
 	  ( bdir=`pwd` ; PATH=$$bdir/../src:$$PATH \
 	    GNUPLOT_DRIVER_DIR=$$bdir/../src \
@@ -38,6 +39,7 @@ check-interactive: check-prepare $(BINARY_FILES)
 	fi
 
 check-noninteractive: check-prepare $(BINARY_FILES)
+	FIT_LOG=
 	@if test -z "$(GNUTERM)" ; then \
 	  ( bdir=`pwd` ; PATH=$$bdir/../src:$$PATH \
 	    GNUPLOT_DRIVER_DIR=$$bdir/../src \

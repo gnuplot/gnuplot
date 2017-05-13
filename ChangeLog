@@ -1,3 +1,8 @@
+2017-05-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* demo/Makefile.am.in src/fit.c:  Suppress creation of fit log file
+	during "make check".
+
 2017-05-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* docs/windows/doc2html.c:   Support bulleted lists at top level

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.167 2016/08/19 22:28:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.168 2017/04/25 23:40:47 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -2559,6 +2559,12 @@ getfitlogfile()
 
     if (fitlogfile == NULL) {
 	char *tmp = getenv(GNUFITLOG);	/* open logfile */
+
+	/* If GNUFITLOG is defined but null, do not write to log file */
+	if (tmp != NULL && *tmp == '\0') {
+	    fit_suppress_log = TRUE;
+	    return NULL;
+	}
 
 	if (tmp != NULL && *tmp != '\0') {
 	    char *tmp2 = tmp + (strlen(tmp) - 1);
