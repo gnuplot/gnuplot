@@ -2,6 +2,9 @@
 
 	* src/win/wgraph.c (MakeFonts):  Revert accidental change made in
 	revision 1.247.
+	
+	* src/win/wgraph.c (MakeFonts):  Handle empty type face name (GDI).
+	Bug #1860
 
 2017-05-14  Ethan A Merritt  <merritt@u.washington.edu>
 

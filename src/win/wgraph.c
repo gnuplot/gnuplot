@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.252 2017/05/14 18:51:20 markisch Exp $
+ * $Id: wgraph.c,v 1.253 2017/05/15 14:49:05 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -1048,6 +1048,10 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	lpgw->lf.lfOutPrecision = OUT_OUTLINE_PRECIS;
 	lpgw->lf.lfClipPrecision = CLIP_DEFAULT_PRECIS;
 	lpgw->lf.lfQuality = lpgw->antialiasing ? CLEARTYPE_QUALITY : PROOF_QUALITY;
+
+	/* Handle zero length type face name by replacing with default name */
+	if (lpgw->lf.lfFaceName[0] == 0)
+		_tcsncpy(lpgw->lf.lfFaceName, GraphDefaultFont(), LF_FACESIZE);
 
 	if (!TryCreateFont(lpgw, NULL, hdc)) {
 		static const char warn_font_not_available[] =
