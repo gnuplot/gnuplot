@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.251 2017/05/13 11:49:29 markisch Exp $
+ * $Id: wgraph.c,v 1.252 2017/05/14 18:51:20 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -981,7 +981,7 @@ TryCreateFont(LPGW lpgw, LPTSTR fontface, HDC hdc)
 {
 	if (fontface != NULL)
 		_tcsncpy(lpgw->lf.lfFaceName, fontface, LF_FACESIZE);
-	lpgw->hfonth = CreateFontIndirect((LOGFONT *)&(lpgw->lf));
+	lpgw->hfonth = CreateFontIndirect(&(lpgw->lf));
 
 	if (lpgw->hfonth != 0) {
 		/* Test if we actually got the requested font. Note that this also seems to work
@@ -1048,7 +1048,6 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	lpgw->lf.lfOutPrecision = OUT_OUTLINE_PRECIS;
 	lpgw->lf.lfClipPrecision = CLIP_DEFAULT_PRECIS;
 	lpgw->lf.lfQuality = lpgw->antialiasing ? CLEARTYPE_QUALITY : PROOF_QUALITY;
-	_tcsncpy(lpgw->lf.lfFaceName, lpgw->fontname, LF_FACESIZE);
 
 	if (!TryCreateFont(lpgw, NULL, hdc)) {
 		static const char warn_font_not_available[] =
