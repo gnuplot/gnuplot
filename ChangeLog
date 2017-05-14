@@ -1,9 +1,9 @@
-2017-05-13  Ethan A Merritt  <merritt@u.washington.edu>
+2017-05-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* demo/Makefile.am.in src/fit.c:  Suppress creation of fit log file
 	during "make check".
 
-2017-05-13  Bastian Maerkisch  <bmaerkisch@web.de>
+2017-05-14  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* docs/windows/doc2html.c:   Support bulleted lists at top level
 	(i.e. not in a table).
@@ -13,6 +13,8 @@
 	similar cases in the code (ellipses) where a hack like this is actually
 	necessary.  Further investigations required.
 	Bug #1880
+
+	* term/win.trm:  Update windows terminal help text to current status.
 
 2017-05-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
@@ -3487,7 +3489,7 @@
 
 2016-02-04  Joachim Wuttke  <jwuttke@users.sourceforge.net>
 
-	* term/tkcanvs.trm:  Replace old (pre-1999) tkcanvas.trm with a
+	* term/tkcanvas.trm:  Replace old (pre-1999) tkcanvas.trm with a
 	rewrite from Joachim Wuttke  <jwuttke@users.sourceforge.net>
 	and Bastian Maerkisch  <bmaerkisch@web.de>
 

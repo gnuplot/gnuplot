@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.140 2017/01/07 07:51:35 markisch Exp $
+ * $Id: win.trm,v 1.141 2017/04/23 18:27:52 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -1148,11 +1148,11 @@ TERM_TABLE_START(win_driver)
     WIN_layer,
     0, /* no term->path */
     0.0, /* Scale (unused) */
-    WIN_hypertext
+    WIN_hypertext,
 #ifdef EAM_BOXED_TEXT
-    , WIN_boxed_text
+    WIN_boxed_text,
 #endif
-    , WIN_modify_plots, WIN_dashtype
+    WIN_modify_plots, WIN_dashtype
 TERM_TABLE_END(win_driver)
 
 #undef LAST_TERM
@@ -1171,8 +1171,8 @@ START_HELP(windows)
 "?term windows",
 "?windows",
 " The `windows` terminal is a fast interactive terminal driver that uses the",
-" Windows GDI to draw and write text. The cross-platform `terminal wxt` is also",
-" supported on Windows.",
+" Windows GDI to draw and write text. The cross-platform `terminal wxt` and",
+" `terminal qt` are also supported on Windows.",
 "",
 " Syntax:",
 "       set terminal windows {<n>}",
@@ -1220,12 +1220,13 @@ START_HELP(windows)
 " console-mode gnuplot.  Setting this option changes the default for new"
 " windows.  The initial default is `standalone`.  The `layout` option allows to",
 " reserve a minimal number of columns and rows for graphs in docked mode.  If",
-" there are more graphs than fit the given layout additional rows will be added.",
+" there are more graphs than fit the given layout, additional rows will be added.",
 " Graphs are sorted by the numerical id, filling rows first.",
 "",
 " Other options may be changed using the `graph-menu` or the initialization file",
 " `wgnuplot.ini`.",
 "",
+/* FIXME:  Move to persist section */
 " The Windows version normally terminates immediately as soon as the end of",
 " any files given as command line arguments is reached (i.e. in non-interactive",
 " mode), unless you specify `-` as the last command line option.",
@@ -1255,10 +1256,10 @@ START_HELP(windows)
 " `Copy to Clipboard` copies a bitmap and an enhanced metafile picture.",
 "",
 " `Save as EMF...` allows the user to save the current graph window as",
-" enhanced metafile.",
+" enhanced metafile (EMF or EMF+).",
 "",
 " `Save as Bitmap...` allows the user to save a copy of the graph as bitmap",
-"  file.",
+" file.",
 "",
 " `Print...` prints the graphics windows using a Windows printer driver and",
 " allows selection of the printer and scaling of the output."
@@ -1271,19 +1272,28 @@ START_HELP(windows)
 " all grayscale output.  This is e.g. useful to test appearance of monochrome",
 " printouts.",
 "",
-" `GDI+ only backend` draws to screen using the GDI+ Windows API. This is",
-" faster than the GDI variant with antialiasing enabled and offers",
-" oversampling.  Printing and the generation of enhanced metafile data are",
-" still done using the GDI API only.",
+" `GDI backend` draws to the screen using Windows GDI. This is the classical",
+" windows terminal, which is fast, but lacks many features such as",
+" anti-aliasing, oversampling and full transparency support. It is now",
+" deprecated.",
+"",
+" `GDI+ backend` draws to the screen using the GDI+ Windows API. It supports",
+" full antialiasing, oversampling, transparency and custom dash patterns.",
+" This is the currently preferred variant.",
+"",
+" `Direct2D backend` uses Direct2D & DirectWrite APIs to draw. It uses graphic",
+" card acceleration and is hence typically much faster.  Printing, saving and",
+" copying to clipboard fall back to GDI+.",
+" This will become the default backend but is currently still considered",
+" experimental.", 
 "",
 " `Oversampling` draws diagonal lines at fractional pixel positions to avoid",
 " \"wobbling\" effects.  Vertical or horizontal lines are still snapped",
-" to integer pixel positions to avoid blurry lines.  Oversampling requires",
-" GDI+.",
+" to integer pixel positions to avoid blurry lines.",
 "",
 " `Antialiasing` enables smoothing of lines and edges. Note that this slows",
-" down drawing.  `Antialiasing of polygons` is disabled by default since",
-" this might cause bright \"seams\" around the polygons.",
+" down drawing.  `Antialiasing of polygons` is enabled by default but might",
+" slow down drawing with the GDI+ backend.",
 "",
 " `Fast rotation` switches antialiasing temporarily off while rotating the",
 " graph with the mouse. This speeds up drawing considerably at the expense",
@@ -1417,8 +1427,7 @@ START_HELP(windows)
 "       GraphD2D=0",
 "       GraphGDI+Oversampling=1",
 "       GraphAntialiasing=1",
-"       GraphPolygonAA=0",
-"       GraphPatternAA=1",
+"       GraphPolygonAA=1",
 "       GraphFastRotation=1",
 "       GraphBackground=255 255 255",
 "       DockVerticalTextFrac=350",
