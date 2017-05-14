@@ -19,6 +19,9 @@
 	* docs/gnuplot.doc:  Add a few more items to the section describing new
 	features.
 
+	* src/win/wgraph.c:  Use radio buttons to indicate the current backend
+	selection.
+
 2017-05-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgnuplib.h src/win/wgraph.c src/win/wgdiplus.cpp

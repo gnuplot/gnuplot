@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.250 2017/05/08 07:50:41 markisch Exp $
+ * $Id: wgraph.c,v 1.251 2017/05/13 11:49:29 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -4007,10 +4007,13 @@ GraphUpdateMenu(LPGW lpgw)
 {
 	CheckMenuItem(lpgw->hPopMenu, M_COLOR, MF_BYCOMMAND |
 					(lpgw->color ? MF_CHECKED : MF_UNCHECKED));
-	CheckMenuItem(lpgw->hPopMenu, M_GDI, MF_BYCOMMAND | ((!lpgw->gdiplus && !lpgw->d2d) ? MF_CHECKED : MF_UNCHECKED));
-	CheckMenuItem(lpgw->hPopMenu, M_GDIPLUS, MF_BYCOMMAND | (lpgw->gdiplus ? MF_CHECKED : MF_UNCHECKED));
-	CheckMenuItem(lpgw->hPopMenu, M_D2D, MF_BYCOMMAND | (lpgw->d2d ? MF_CHECKED : MF_UNCHECKED));
-#ifdef HAVE_GDIPLUS
+	if (lpgw->gdiplus)
+		CheckMenuRadioItem(lpgw->hPopMenu, M_GDI, M_D2D, M_GDIPLUS, MF_BYCOMMAND);
+	else if (lpgw->d2d)
+		CheckMenuRadioItem(lpgw->hPopMenu, M_GDI, M_D2D, M_D2D, MF_BYCOMMAND);
+	else
+		CheckMenuRadioItem(lpgw->hPopMenu, M_GDI, M_D2D, M_GDI, MF_BYCOMMAND);
+#if defined(HAVE_GDIPLUS) || defined(HAVE_D2D)
 	if (lpgw->gdiplus || lpgw->d2d) {
 		EnableMenuItem(lpgw->hPopMenu, M_ANTIALIASING, MF_BYCOMMAND | MF_ENABLED);
 		EnableMenuItem(lpgw->hPopMenu, M_POLYAA, MF_BYCOMMAND | MF_ENABLED);
