@@ -16,6 +16,9 @@
 
 	* term/win.trm:  Update windows terminal help text to current status.
 
+	* docs/gnuplot.doc:  Add a few more items to the section describing new
+	features.
+
 2017-05-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgnuplib.h src/win/wgraph.c src/win/wgdiplus.cpp

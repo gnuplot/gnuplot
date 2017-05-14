@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1068 2017/05/07 19:20:52 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1069 2017/05/13 03:42:42 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -282,8 +282,11 @@ C
 ## that generated them if gnuplot is run inside an svg-aware terminal emulator
 #b The `windows` terminal supports saving the current graph to a bitmap file
 #b The `windows` terminal graph window can be docked to the wgnuplot text window
+#b New (experimental) Direct2D/DirectWrite backend for the `windows` terminal
 #b The `wxt` terminal supports exporting to an EMF file or printer on Windows
-#b the `dumb` terminal supports ANSI colors for lines and fill area
+#b The `dumb` terminal supports ANSI colors for lines and fill area
+#b The `tkcanvas` terminal has been rewritten to support many more modern gnuplot
+## features, as well as new languages. (Since 5.0.3)
 #end
 4 Other new features
 #start
@@ -300,6 +303,10 @@ C
 #b Pseudo-file '++' generates samples on the u and v axes, rather than x and y.
 ## This allows placement of multiple parametric surfaces in 3D that occupy
 ## distinct regions of Cartesian space.  See `sampling.dem`.
+#b ^R initiates a reverse-search through the history for the built-in readline
+## which is used on Windows, too, see `Command-line-editing`.
+#b Revised printing support on Windows using `set output "PRN"`, 
+## see `windows printing`.
 #end
 
 3 Features introduced in version 5.0
