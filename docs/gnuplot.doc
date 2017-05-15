@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1069 2017/05/13 03:42:42 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1070 2017/05/14 14:56:05 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5568,11 +5568,10 @@ Ffigure_fenceplot
        pause <time> {"<string>"}
        pause mouse {<endcondition>}{, <endcondition>} {"<string>"}
 
- <time> may be any constant or expression.  Choosing -1 will wait until a
- carriage return is hit, zero (0) won't pause at all, and a positive number
- will wait the specified number of seconds.  The time is rounded to an integer
- number of seconds if subsecond time resolution is not supported by the given
- platform.  `pause 0` is synonymous with `print`.
+ <time> may be any constant or floating-point expression.  `pause -1` will wait
+ until a carriage return is hit, zero (0) won't pause at all, and a positive
+ number will wait the specified number of seconds.
+ `pause 0` is synonymous with `print`.
 
  If the current terminal supports `mousing`, then `pause mouse` will terminate
  on either a mouse click or on ctrl-C.  For all other terminals, or if mousing
@@ -6793,6 +6792,8 @@ Ffigure_fenceplot
        %*20[^\n]   ignore 20 non-newline characters
        %lf         read a double-precision number (y by default)
 
+=filter
+=NaN
  One trick is to use the ternary `?:` operator to filter data:
 
        plot 'file' using 1:($3>10 ? $2 : 1/0)
@@ -6801,7 +6802,6 @@ Ffigure_fenceplot
  the datum in column three exceeds ten.  `1/0` is undefined; `gnuplot`
  quietly ignores undefined points, so unsuitable points are suppressed.
  Or you can use the pre-defined variable NaN to achieve the same result.
-=NaN
 
  In fact, you can use a constant expression for the column number, provided it
  doesn't start with an opening parenthesis; constructs like `using
@@ -6815,16 +6815,11 @@ Ffigure_fenceplot
  the first element on a line is a time with an embedded space, the y value
  should be specified as column three.
 
- It should be noted that `plot 'file'`, `plot 'file' using 1:2`, and `plot
- 'file' using ($1):($2)` can be subtly different: 1) if `file` has some lines
- with one column and some with two, the first will invent x values when they
- are missing, the second will quietly ignore the lines with one column, and
- the third will store an undefined value for lines with one point (so that in
- a plot with lines, no line joins points across the bad point); 2) if a line
- contains text at the first column, the first will abort the plot on an error,
- but the second and third should quietly skip the garbage.
+ It should be noted that (a) `plot 'file'`, (b) `plot 'file' using 1:2`, and
+ (c) `plot 'file' using ($1):($2)` can be subtly different.  The exact 
+ behaviour has changed in version 5.  See `missing`.
 
- In fact, it is often possible to plot a file with lots of lines of garbage at
+ It is often possible to plot a file with lots of lines of garbage at
  the top simply by specifying
 
        plot 'file' using 1:2
@@ -8968,9 +8963,8 @@ Ffigure_missing
  representation of dates or numbers.
  See also `set locale` and `set decimalsign`.
 
- Generally you must set the encoding before setting the terminal type.
- Note that encoding is not supported by all terminal drivers and that
- the device must be able to produce the desired non-standard characters.
+ Generally you must set the encoding before setting the terminal type, as it
+ may affect the choice of appropriate fonts.
 3 errorbars
 ?commands set errorbars
 ?commands show errorbars
@@ -14816,6 +14810,7 @@ Ffigure_multiple_keys
 ?commands stats
 ?stats
 ?statistics
+=filter
  Syntax:
       stats {<ranges>} 'filename' {matrix | using N{:M}} {name 'prefix'} {{no}output}
 
