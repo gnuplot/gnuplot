@@ -1,3 +1,11 @@
+2017-05-15  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/term.c (do_arc):  Remove hack for the windows terminal which was
+	meant to fix the drawing of circles, but broke it.  Note that there are
+	similar cases in the code (ellipses) where a hack like this is actually
+	necessary.  Further investigations required.
+	Bug #1880
+
 2017-05-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	Backport changes from 5.1:
