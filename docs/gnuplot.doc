@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1070 2017/05/14 14:56:05 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.1071 2017/05/15 00:12:13 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -304,7 +304,7 @@ C
 ## This allows placement of multiple parametric surfaces in 3D that occupy
 ## distinct regions of Cartesian space.  See `sampling.dem`.
 #b ^R initiates a reverse-search through the history for the built-in readline
-## which is used on Windows, too, see `Command-line-editing`.
+## which is used on Windows, too, see `command-line-editing`.
 #b Revised printing support on Windows using `set output "PRN"`, 
 ## see `windows printing`.
 #end
