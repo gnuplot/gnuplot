@@ -1,14 +1,15 @@
 Changes in 5.0.7
 ================
+* NEW set term {pngcairo|pdfcairo} pointscale <factor>
 * CHANGE allow placement of circles in 3D plots using axis coordinates
 * CHANGE ignore invalid z coordinate for 3D objects placed in "set view map"
+* CHANGE distinguish 'bind "shift-Button1"' from 'bind "Button1"'
 * FIX rangelimited y2 axis could produce spurious diagonal line across plot
 * FIX assignment of x/y dimensions in "binary record=(a,b) ... with image"
 * FIX negative array index caused by hidden3d degenerate polygon
 * FIX object clipping in "set view map"
 * FIX cairo terminals: scale textbox border linewidth by terminal linewidth
 * FIX canvas terminal: initialization of plot dimensions (affects first zoom)
-* NEW set term {pngcairo|pdfcairo} pointscale <factor>
 
 Changes in 5.0.6
 ================

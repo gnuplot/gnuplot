@@ -1,3 +1,8 @@
+2017-05-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/mouse.c:  Allow "bind 'shift-Button1' 'something'".
+	Previously the shift key was ignored.
+
 2017-05-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/term.c (do_arc):  Remove hack for the windows terminal which was

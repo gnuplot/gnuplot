@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.78 2017/04/07 17:04:33 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.79 2017/04/10 22:17:05 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2630,7 +2630,7 @@ Ffigure_newsyntax
      ctrl-alt-a != ctrl-alt-A
 
  List of modifiers (alt == meta):
-     ctrl, alt
+     ctrl, alt, shift (only valid for Button1)
 
  List of supported special keys:
 
