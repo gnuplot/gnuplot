@@ -1,3 +1,8 @@
+2017-05-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/mouse.c:  Allow "bind 'shift-Button1' 'something'".
+	Previously the shift key was ignored.
+
 2017-05-14  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (MakeFonts):  Revert accidental change made in

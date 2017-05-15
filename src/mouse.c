@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.197 2017/02/14 23:57:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.198 2017/04/01 18:09:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -2509,6 +2509,9 @@ bind_scan_lhs(bind_t * out, const char *in)
 	} else if (!strncasecmp(ptr, "ctrl-", 5)) {
 	    out->modifier |= Mod_Ctrl;
 	    ptr += 5;
+	} else if (!strncasecmp(ptr, "shift-", 6)) {
+	    out->modifier |= Mod_Shift;
+	    ptr += 6;
 	} else if (NO_KEY != (itmp = lookup_key(ptr, &len))) {
 	    out->key = itmp;
 	    ptr += len;
@@ -2540,6 +2543,9 @@ bind_fmt_lhs(const bind_t * in)
     if (in->modifier & Mod_Alt) {
 	strcat(out, "Alt-");
     }
+    if (in->modifier & Mod_Shift) {
+	strcat(out, "Shift-");
+    }
     if (in->key > GP_FIRST_KEY && in->key < GP_LAST_KEY) {
 	strcat(out,special_keys[in->key - GP_FIRST_KEY]);
     } else {
@@ -2563,9 +2569,14 @@ bind_fmt_lhs(const bind_t * in)
 static int
 bind_matches(const bind_t * a, const bind_t * b)
 {
-    /* discard Shift modifier */
-    int a_mod = a->modifier & (Mod_Ctrl | Mod_Alt);
-    int b_mod = b->modifier & (Mod_Ctrl | Mod_Alt);
+    int a_mod = a->modifier;
+    int b_mod = b->modifier;
+
+    /* discard Shift modifier (except for mouse button) */
+    if (a->key != GP_Button1) {
+	a_mod &= (Mod_Ctrl | Mod_Alt);
+	b_mod &= (Mod_Ctrl | Mod_Alt);
+    }
 
     if (a->key == b->key && a_mod == b_mod)
 	return 1;
@@ -2576,7 +2587,7 @@ bind_matches(const bind_t * a, const bind_t * b)
 static void
 bind_display_one(bind_t * ptr)
 {
-    fprintf(stderr, " %-12s ", bind_fmt_lhs(ptr));
+    fprintf(stderr, " %-13s ", bind_fmt_lhs(ptr));
     fprintf(stderr, "%c ", ptr->allwindows ? '*' : ' ');
     if (ptr->command) {
 	fprintf(stderr, "`%s`\n", ptr->command);
