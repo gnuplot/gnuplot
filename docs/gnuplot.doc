@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1071 2017/05/15 00:12:13 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1072 2017/05/15 01:54:21 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -222,7 +222,7 @@ C
 4 Polar mode improvements and extensions
 ?new polar mode features
 #start
-#b Polar coordinate may be used in Label, arrow, and object definitions
+#b Polar coordinate may be used in label, arrow, and object definitions
 #b `set [m]tics` places ticmarks and labels on the perimeter of a polar plot. See
 ^ <a href="http://gnuplot.info/demo_5.1/ttics.html"> polar axis and ticlabels demo
 ^ </a>
@@ -243,7 +243,7 @@ C
    Nonlinear x/y axis demo
 ^ </a>
 #b The familiar command `set logscale` is re-implemented as a special case of a 
-## nonlinear axis where the pair of functions is log(x) and exp(x).
+## nonlinear axis where the paired functions are log(x) and exp(x).
 #end
 4 New commands and command options
 ?new commands
@@ -268,7 +268,7 @@ C
 ?new features
 #start
 #b This gnuplot version introduces a new data type `array name[size]`.
-## An array must be declared before use. An array element may be a string,
+## An array must be declared before use. Each array element may be a string,
 ## an integer, a real number, or a complex value.  A single array may contain
 ## elements with different types. See `arrays`.
 #end
@@ -2690,7 +2690,7 @@ Ffigure_newsyntax
 3 dashtype
 ?dashtype
 =dashtype
- In gnuplot version 5 the dash pattern (`dashtype`) is a seperate property 
+ In gnuplot version 5 the dash pattern (`dashtype`) is a separate property 
  associated with each line, analogous to `linecolor` or `linewidth`.  It is not
  necessary to place the current terminal in a special mode just to draw dashed
  lines.  I.e. the command `set term <termname> {solid|dashed}` is now ignored.
@@ -3468,7 +3468,7 @@ Ffigure_boxxyerror
  y+ydelta, depending on how many data columns are provided.
 
  The 6 column form of the command provides a convenient way to plot rectangles
- with arbitraty x and y bounds.
+ with arbitrary x and y bounds.
 
  An additional (5th or 7th) input column may be used to provide variable 
  (per-datapoint) color information (see `linecolor` and `rgbcolor variable`).
@@ -6113,7 +6113,7 @@ Ffigure_fenceplot
  contributes a count of 1 to the accumulation of total counts in the bin for
  that x coordinate value.  If a second column is given then the value in that
  column is added to the accumulation for the bin.  Thus the following two plot
- commnad are equivalent:
+ command are equivalent:
       plot 'DATA" using N bins=20
       set samples 20
       plot 'DATA' using (column(N)):(1)
@@ -14036,7 +14036,7 @@ Ffigure_multiple_keys
  Minor (unlabeled) tics can be added automatically by the `set mxtics`
  command, or at explicit positions by the `set xtics ("" <pos> 1, ...)` form.
 
- The apparence of the tics (line style, line width etc.) is determined by the
+ The appearance of the tics (line style, line width etc.) is determined by the
  border line (see `set border`), even if the tics are drawn at the axes.
 4 xtics timedata
 ?set xtics timedata
