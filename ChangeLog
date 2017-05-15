@@ -6,6 +6,9 @@
 	necessary.  Further investigations required.
 	Bug #1880
 
+	* src/win/wgraph.c (MakeFonts):  Handle empty type face name (GDI).
+	Bug #1860
+
 2017-05-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	Backport changes from 5.1:

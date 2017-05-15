@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.189.2.23 2017/05/13 06:38:48 markisch Exp $
+ * $Id: wgraph.c,v 1.189.2.24 2017/05/13 06:47:55 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -984,6 +984,10 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	/* ClearType quality is only supported on XP or later */
 	lpgw->lf.lfQuality =
 		IsWindowsXPorLater() && lpgw->antialiasing ? CLEARTYPE_QUALITY : PROOF_QUALITY;
+
+	/* Handle zero length type face name by replacing with default name */
+	if (lpgw->lf.lfFaceName[0] == 0)
+		_tcsncpy(lpgw->lf.lfFaceName, GraphDefaultFont(), LF_FACESIZE);
 
 	if (!TryCreateFont(lpgw, NULL, hdc)) {
 		if (strcmp(lpgw->fontname, lpgw->deffontname) != 0) {
