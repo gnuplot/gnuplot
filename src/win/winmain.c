@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.77.2.3 2017/01/02 09:08:53 markisch Exp $
+ * $Id: winmain.c,v 1.77.2.4 2017/02/25 15:20:45 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -128,7 +128,9 @@ char *authors[]={
 void WinExit(void);
 static void WinCloseHelp(void);
 int CALLBACK ShutDown();
-
+#ifdef WGP_CONSOLE
+static BOOL WINAPI ConsoleHandler(DWORD dwType);
+#endif
 
 static void
 CheckMemory(LPSTR str)
@@ -201,6 +203,7 @@ WinExit(void)
 #endif
     return;
 }
+
 
 /* call back function from Text Window WM_CLOSE */
 int CALLBACK
@@ -414,12 +417,11 @@ main(int argc, char **argv)
 #endif
 {
 	LPSTR tail;
-	int i;
-
 #ifdef WGP_CONSOLE
 	HINSTANCE hInstance = GetModuleHandle(NULL), hPrevInstance = NULL;
+#else
+	int i;
 #endif
-
 
 #ifndef WGP_CONSOLE
 # if defined( __MINGW32__) && !defined(_W64)
@@ -583,6 +585,8 @@ main(int argc, char **argv)
             SetFileApisToANSI(); /* file names etc. */
         }
 #endif
+    // set console mode handler to catch "abort" signals
+    SetConsoleCtrlHandler(ConsoleHandler, TRUE);
 #endif
 
 	gp_atexit(WinExit);
@@ -1021,6 +1025,45 @@ int ConsoleReadCh()
 	   MOUSE_EVENT_RECORD, WINDOW_BUFFER_SIZE_RECORD, MENU_EVENT_RECORD, FOCUS_EVENT_RECORD */
 	return NUL;
 }
+
+
+
+#ifdef WGP_CONSOLE
+/* This is called by the system to signal various events. 
+   Note that it is executed in a separate thread.  */
+BOOL WINAPI
+ConsoleHandler(DWORD dwType)
+{
+    switch (dwType) {
+    case CTRL_CLOSE_EVENT:
+    case CTRL_LOGOFF_EVENT:
+    case CTRL_SHUTDOWN_EVENT: {
+	HANDLE h;
+	INPUT_RECORD rec;
+	DWORD written;
+
+	// NOTE: returning from this handler terminates the application.
+	// Instead, we signal the main thread to clean up and exit and
+	// then idle by sleeping.
+	terminate_flag = TRUE;
+	// send ^D to main thread input queue
+	h = GetStdHandle(STD_INPUT_HANDLE);
+	ZeroMemory(&rec, sizeof(rec));
+	rec.EventType = KEY_EVENT;
+	rec.Event.KeyEvent.bKeyDown = TRUE;
+	rec.Event.KeyEvent.wRepeatCount = 1;
+	rec.Event.KeyEvent.uChar.AsciiChar = 004;
+	WriteConsoleInput(h, &rec, 1, &written);
+	// give the main thread time to exit
+	Sleep(10000);
+	return TRUE;
+    }
+    default:
+	break;
+    }
+    return FALSE;
+}
+#endif
 
 
 /* public interface to printer routines : Windows PRN emulation

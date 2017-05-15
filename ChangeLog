@@ -1,9 +1,16 @@
 2017-05-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/set.c (set_encoding, init_special_chars) setshow.h
-	src/misc.c (init_encoding):  Move initialisation of special characters
-	to a separate function, which is also called during program init on
-	Windows.  Bug fix.
+	* src/win/wgraph.c (WM_SIZE):  Track canvas (and window) size.
+
+	* src/win/winmain.c (ConsoleHandler) src/plot.c|h (terminate_flag)
+	src/readline.c (readline):  Add an event handler to catch "close" 
+	signals to console mode gnuplot on Windows.  These events are passed
+	on to the main thread to terminate cleanly.
+	Bugs #1916, #1917, #1918
+
+	* src/set.c (set_encoding, init_special_chars) src/setshow.h
+	src/plot.c:  Move initialisation of special characters to a separate
+	function, which is also called during program init.  Bug fix.
 
 2017-05-15  Ethan A Merritt  <merritt@u.washington.edu>
 
