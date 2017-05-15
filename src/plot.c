@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.164.2.1 2014/12/31 04:32:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.164.2.2 2017/04/01 04:20:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -515,6 +515,7 @@ main(int argc, char **argv)
 
 	memset(&sm_palette, 0, sizeof(sm_palette));
 	init_fit();		/* Initialization of fitting module */
+	init_special_chars();
 	init_session();
 
 	if (interactive && term != 0) {		/* not unknown */

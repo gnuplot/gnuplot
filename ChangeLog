@@ -1,3 +1,10 @@
+2017-05-15  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/set.c (set_encoding, init_special_chars) setshow.h
+	src/misc.c (init_encoding):  Move initialisation of special characters
+	to a separate function, which is also called during program init on
+	Windows.  Bug fix.
+
 2017-05-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c:  Allow "bind 'shift-Button1' 'something'".

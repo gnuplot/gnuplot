@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.36 2017/01/23 02:13:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.37 2017/02/25 14:41:15 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1661,20 +1661,13 @@ set_encoding()
 	encoding = temp;
     }
 
-    /* Set degree sign to match encoding */
-    set_degreesign(l);
-
-    /* Set minus sign to match encoding */
-    minus_sign = encoding_minus();
-
-    /* Set micro character to match encoding */
-    micro = encoding_micro();
+    init_special_chars();
 }
 
 static void
 set_degreesign(char *locale)
 {
-#if defined(HAVE_ICONV) && !(defined WIN32)
+#if defined(HAVE_ICONV) && !(defined _WIN32)
     char degree_utf8[3] = {'\302', '\260', '\0'};
     size_t lengthin = 3;
     size_t lengthout = 8;
@@ -1765,6 +1758,25 @@ encoding_minus()
 	default:		return NULL;
     }
 }
+
+
+void
+init_special_chars(void)
+{
+    /* Set degree sign to match encoding */
+    char * l = NULL;
+#ifdef HAVE_LOCALE_H
+    l = setlocale(LC_CTYPE, "");
+#endif
+    set_degreesign(l);
+
+    /* Set minus sign to match encoding */
+    minus_sign = encoding_minus();
+
+    /* Set micro character to match encoding */
+    micro = encoding_micro();
+}
+
 
 /* process 'set fit' command */
 static void
