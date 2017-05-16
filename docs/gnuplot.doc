@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1074 2017/05/16 03:22:25 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1073 2017/05/15 18:46:49 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7317,9 +7317,9 @@ Ffigure_fenceplot
       linespoints  labels     histeps   financebars   xyerrorbars  yerrorlines
       surface      vectors    parallelaxes
  or
-      boxes            boxplot        ellipses       image
-      boxerrorbars     candlesticks   filledcurves   rgbimage    pm3d
-      boxxyerror       circles        histograms     rgbalpha    zerrorfill
+      boxes         boxplot        ellipses       histograms  rgbalpha
+      boxerrorbars  candlesticks   filledcurves   image       rgbimage
+      boxxyerror    circles        fillsteps      pm3d        zerrorfill
  or
       table
 
