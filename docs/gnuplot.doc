@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.80 2017/05/16 03:27:04 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.81 2017/05/16 23:15:38 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6887,7 +6887,7 @@ Ffigure_mapcontours
                          {linecolor | lc <colorspec>}
                          {pointtype | pt <point_type>}
                          {pointsize | ps <point_size>}
-                         {fill | fs <fillstyle>}
+                         {fill | fs <fillstyle>} {fillcolor | fc <colorspec>}
                          {nohidden3d} {nocontours} {nosurface}
                          {palette}}
                     }
@@ -11968,9 +11968,22 @@ Ffigure_missing
 
  The `empty` option causes filled boxes not to be filled. This is the default.
 
- By default, `border`, the box is bounded by a solid line of the current
+=border
+ By default a filled object is bounded by a solid line of the current
  linetype. `border <colorspec>` allows you to change the color of the border.
- `noborder` specifies that no bounding lines are drawn.
+ `noborder` specifies that no bounding lines are drawn for this fillstyle.
+
+?fillcolor
+?fc
+ Fill color (`fillcolor <colorspec>`) is distinct from fill style.  I.e.  plot
+ elements or objects can share a fillstyle while retaining separate colors.
+ In most places where a fillstyle is accepted you can also specify a fill color.
+ Fillcolor may be abbreviated `fc`.
+ Otherwise the fill color is take from the current linetype.
+ Example:
+
+       plot FOO with boxes fillstyle solid 1.0 fillcolor "cyan"
+
 5 set style fill transparent
 ?commands set style fill transparent
 ?set style fill transparent
