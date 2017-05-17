@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1073 2017/05/15 18:46:49 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1076 2017/05/16 23:13:46 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7304,7 +7304,7 @@ Ffigure_fenceplot
                          {linecolor | lc <colorspec>}
                          {pointtype | pt <point_type>}
                          {pointsize | ps <point_size>}
-                         {fill | fs <fillstyle>}
+                         {fill | fs <fillstyle>} {fillcolor | fc <colorspec>}
                          {nohidden3d} {nocontours} {nosurface}
                          {palette}}
                     }
@@ -12587,6 +12587,18 @@ Ffigure_multiple_keys
  from pattern <n>, much as the line type cycles for multiple line plots.
 
  The `empty` option causes filled boxes not to be filled. This is the default.
+
+?fillcolor
+?fc
+ Fill color (`fillcolor <colorspec>`) is distinct from fill style.  I.e.  plot
+ elements or objects can share a fillstyle while retaining separate colors.
+ In most places where a fillstyle is accepted you can also specify a fill color.
+ Fillcolor may be abbreviated `fc`.
+ Otherwise the fill color is take from the current linetype.
+ Example:
+
+       plot FOO with boxes fillstyle solid 1.0 fillcolor "cyan"
+
 5 set style fill border
 ?commands set style fill border
 ?set style fill border
@@ -12618,66 +12630,6 @@ Ffigure_multiple_keys
  interpreted as an alpha value; that is, density 0 is fully transparent,
  density 1 is fully opaque.  In the case of transparent pattern fill, the
  background of the pattern is either fully transparent or fully opaque.
-
-@start table - Driver support for transparency
-       terminal   solid pattern    pm3d
-       --------------------------------
-       gif           no     yes      no
-       jpeg         yes      no     yes
-       pdf          yes     yes     yes
-       png    TrueColor   index     yes
-       post          no     yes      no
-       svg          yes      no     yes
-       win          yes     yes     yes
-       wxt          yes     yes     yes
-       x11           no     yes      no
-#\begin{tabular}{|cccl|} \hline
-#Terminal   &   solid & pattern &    pm3d \\ \hline
-#gif        &      no &     yes &      no \\
-#jpeg       &     yes &      no &     yes \\
-#pdf        &     yes &     yes &     yes \\
-#png        &TrueColor&   index &     yes \\
-#post       &      no &     yes &      no \\
-#svg        &     yes &      no &     yes \\
-#win        &     yes &     yes &     yes \\
-#wxt        &     yes &     yes &     yes \\
-#x11        &      no &     yes &      no \\
-%c c c c .
-%Terminal@solid@pattern@pm3d
-%_
-%gif@no@yes@no
-%jpeg@yes@no@yes
-%pdf@yes@yes@yes
-%png@TrueColor@index@yes
-%post@no@yes@no
-%svg@yes@yes@yes
-%win@yes@yes@yes
-%wxt@yes@yes@yes
-%x11@no@yes@no
-@end table
-
-^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3">
-^<colgroup>
-^  <col align="center">
-^  <col align="center">
-^  <col align="center">
-^  <col align="center">
-^</colgroup>
-^<thead>
-^<tr>    <th>Terminal</th>    <th>solid</th>    <th>pattern</th>    <th>pm3d</th></tr>
-^</thead>
-^<tbody>
-^<tr>    <td>gif</td>    <td>no</td>    <td>yes</td>    <td>no</td></tr>
-^<tr>    <td>jpeg</td>    <td>yes</td>    <td>no</td>    <td>yes</td></tr>
-^<tr>    <td>pdf</td>    <td>yes</td>    <td>yes</td>    <td>yes</td></tr>
-^<tr>    <td>png</td>    <td>TrueColor</td>    <td>index</td>    <td>yes</td></tr>
-^<tr>    <td>post</td>    <td>no</td>    <td>yes</td>    <td>no</td></tr>
-^<tr>    <td>svg</td>    <td>yes</td>    <td>yes</td>    <td>yes</td></tr>
-^<tr>    <td>win</td>    <td>yes</td>    <td>yes</td>    <td>yes</td></tr>
-^<tr>    <td>wxt</td>    <td>yes</td>    <td>yes</td>    <td>yes</td></tr>
-^<tr>    <td>x11</td>    <td>no</td>    <td>yes</td>    <td>no</td></tr>
-^</tbody>
-^</table>
 
  Note that there may be additional limitations on the creation or viewing of
  graphs containing transparent fill areas.  For example, the png terminal can
