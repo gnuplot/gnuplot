@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2rtf.c,v 1.15 2005/06/03 05:11:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2rtf.c,v 1.16 2007/10/24 00:47:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - doc2rtf.c */
@@ -139,6 +139,7 @@ process_line(char *line, FILE *b)
     static int inquote = FALSE;
     static int inref = FALSE;
     struct LIST *klist;
+    static int initem = FALSE;
 
     line_count++;
 
@@ -234,9 +235,21 @@ process_line(char *line, FILE *b)
 	}
     case '=':			/* latex index entry */
     case 'F':			/* latex embedded figure */
-    case '#':{			/* latex table entry */
-	    break;		/* ignore */
-	}
+    case '#':			/* latex table entry */
+	/* or new item entry */
+	if (strncmp(line2 + 1, "start", 5) == 0) {
+	    fprintf(b, "\\par\n");
+	    initem = TRUE;
+	} else if (strncmp(line2 + 1, "end", 3) == 0) {
+	    fprintf(b, "\\par\n");
+	    initem = FALSE;
+	} else if ((line2[1] != NUL) && (line2[1] == 'b')) {
+	    fprintf(b, "\\par\n");
+	    fprintf(b, "\\pard \\plain \\qj \\fs20 \\f0 * ");
+	    fprintf(b, "%s", &line2[2]);
+        } else if ((line2[1] != NUL) && (line2[1] == '#'))
+	  fprintf(b, "%s", &line2[2]);
+	break;
     case '%':{			/* troff table entry */
 	    break;		/* ignore */
 	}
@@ -247,6 +260,10 @@ process_line(char *line, FILE *b)
 	tabl = 0;
 	break;
     case ' ':{			/* normal text line */
+	    if (initem) {
+		fprintf(b, "%s", &line2[1]);
+		break;
+	    }
 	    if ((line2[1] == NUL) || (line2[1] == '\n')) {
 		fprintf(b, "\\par\n");
 		llpara = para;
