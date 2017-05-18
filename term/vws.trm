@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: vws.trm,v 1.18 2006/07/21 02:35:48 sfeam Exp $
+ * $Id: vws.trm,v 1.19 2007/10/16 21:19:45 sfeam Exp $
  *
  */
 
@@ -484,6 +484,7 @@ START_HELP(VWS)
 "?terminal VWS",
 "?term VWS",
 "?VWS",
+" Note: legacy terminal.",
 " The `VWS` terminal driver supports the VAX Windowing System.  It has",
 " no options.  It will sense the display type (monochrome, gray scale,",
 " or color.)  All line styles are plotted as solid lines."

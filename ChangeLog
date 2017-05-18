@@ -1,3 +1,16 @@
+2017-05-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc
+	term/ai.trm term/corel.trm term/djsvga.trm term/dxf.trm term/dxy.trm
+	term/emxvga.trm term/epson.trm term/excl.trm term/ggi.trm term/grass.trm
+	term/hp500c.trm term/hpljii.trm term/hppj.trm term/mif.trm term/pbm.trm
+	term/pc.trm term/regis.trm term/vws.trm:
+	Flag bitmap and legacy terminals in the documentation.
+
+	* src/term.h: Remove legacy terminals from the default build.
+	corel (postscript variant of CorelDraw format circa 1995)
+	dxf (Autocad DWGR10 format circa 1988)
+
 2017-05-18  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc: typos, missing section for "set mttics".

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pc.trm,v 1.22 2006/07/07 03:51:22 sfeam Exp $
+ * $Id: pc.trm,v 1.23 2006/07/21 02:35:47 sfeam Exp $
  *
  */
 
@@ -553,6 +553,7 @@ START_HELP(dospc)
 "?terminal dospc",
 "?term dospc",
 "?dospc",
+" Note: legacy terminal.",
 " The `dospc` terminal driver supports PCs with arbitrary graphics boards,",
 " which will be automatically detected.  It should be used only if you are",
 " not using the gcc or Zortec C/C++ compilers."

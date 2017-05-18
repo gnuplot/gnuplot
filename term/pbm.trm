@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pbm.trm,v 1.29 2008/05/30 04:47:20 sfeam Exp $
+ * $Id: pbm.trm,v 1.30 2009/06/08 04:37:29 sfeam Exp $
  *
  */
 
@@ -490,6 +490,7 @@ START_HELP(pbm)
 "?terminal pbm",
 "?term pbm",
 "?pbm",
+" Note: only available if gnuplot is configured --with-bitmap-terminals.",
 " Syntax:",
 "       set terminal pbm {<fontsize>} {<mode>} {size <x>,<y>}",
 "",

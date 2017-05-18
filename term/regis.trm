@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: regis.trm,v 1.14 2006/07/07 03:51:23 sfeam Exp $
+ * $Id: regis.trm,v 1.15 2006/07/21 02:35:48 sfeam Exp $
  *
  */
 
@@ -265,6 +265,7 @@ START_HELP(regis)
 "?terminal regis",
 "?term regis",
 "?regis",
+" Note: legacy terminal.",
 " The `regis` terminal device generates output in the REGIS graphics language.",
 " It has the option of using 4 (the default) or 16 colors.",
 "",

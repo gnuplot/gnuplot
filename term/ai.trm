@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: ai.trm,v 1.22 2011/08/02 20:40:31 sfeam Exp $
+ * $Id: ai.trm,v 1.23 2013/01/26 00:19:21 sfeam Exp $
  *
  */
 
@@ -537,7 +537,7 @@ START_HELP(aifm)
 "?term aifm",
 "?aifm",
 "",
-" `NOTE: Outdated terminal`, originally written for Adobe Illustrator 3.0+.",
+" `NOTE: Legacy terminal`, originally written for Adobe Illustrator 3.0+.",
 " Since Adobe Illustrator understands PostScript level 1 commands directly,",
 " you should use `set terminal post level1` instead.",
 "",

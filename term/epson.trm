@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: epson.trm,v 1.26 2011/11/19 04:24:17 sfeam Exp $
+ * $Id: epson.trm,v 1.27 2015/03/24 18:49:11 sfeam Exp $
  *
  */
 
@@ -1137,6 +1137,7 @@ START_HELP(epson_180dpi)
 "?terminal dpu414",
 "?term dpu414",
 "?dpu414",
+" Note: only available if gnuplot is configured --with-bitmap-terminals.",
 " This driver supports a family of Epson printers and derivatives.",
 "",
 " `epson_180dpi` and `epson_60dpi` are drivers for Epson LQ-style 24-pin",

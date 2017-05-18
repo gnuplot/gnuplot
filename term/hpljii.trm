@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: hpljii.trm,v 1.23 2006/07/07 03:51:22 sfeam Exp $
+ * $Id: hpljii.trm,v 1.24 2006/07/21 02:35:47 sfeam Exp $
  *
  */
 
@@ -414,6 +414,7 @@ START_HELP(hpljii)
 "?terminal hpdj",
 "?term hpdj",
 "?hpdj",
+" Note: only available if gnuplot is configured --with-bitmap-terminals.",
 " The `hpljii` terminal driver supports the HP Laserjet Series II printer.  The",
 " `hpdj` driver supports the HP DeskJet 500 printer.  These drivers allow a",
 " choice of resolutions.",

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: dxy.trm,v 1.13 2006/07/07 03:51:21 sfeam Exp $
+ * $Id: dxy.trm,v 1.14 2006/07/21 02:35:45 sfeam Exp $
  *
  */
 
@@ -198,6 +198,7 @@ START_HELP(dxy800a)
 "?terminal dxy800a",
 "?term dxy800a",
 "?dxy800a",
+" Note: legacy terminal. ",
 " This terminal driver supports the Roland DXY800A plotter.  It has no options."
 END_HELP(dxy800a)
 #endif

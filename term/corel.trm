@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: corel.trm,v 1.17 2006/07/21 02:35:45 sfeam Exp $
+ * $Id: corel.trm,v 1.18 2013/01/26 00:19:22 sfeam Exp $
  */
 
 /*
@@ -23,6 +23,9 @@
 
 /*
  * adapted to the new terminal layout by Stefan Bodewig (Dec. 1995)
+ */
+/*
+ * 2017: removed from default build and marked "legacy"
  */
 
 #include "driver.h"
@@ -438,13 +441,11 @@ START_HELP(corel)
 "?terminal corel",
 "?term corel",
 "?corel",
-" The `corel` terminal driver supports CorelDraw.",
+" Legacy terminal for CorelDraw (circa 1995).",
 "",
 " Syntax:",
-"       set terminal corel {  default",
-"                           | {monochrome | color",
-"                                {\"<font>\" {<fontsize> ",
-"                                   {<xsize> <ysize> {<linewidth> }}}}}",
+"       set terminal corel {monochrome | color} {\"<font>\" {<fontsize>}}",
+"                          {<xsize> <ysize> {<linewidth> }}",
 "",
 " where the fontsize and linewidth are specified in points and the sizes in",
 " inches.  The defaults are monochrome, \"SwitzerlandLight\", 22, 8.2, 10 and 1.2."

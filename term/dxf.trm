@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: dxf.trm,v 1.15 2006/07/07 03:51:21 sfeam Exp $
+ * $Id: dxf.trm,v 1.16 2006/07/21 02:35:45 sfeam Exp $
  *
  */
 
@@ -411,13 +411,10 @@ START_HELP(dxf)
 "?terminal dxf",
 "?term dxf",
 "?dxf",
-" The `dxf` terminal driver creates pictures that can be imported into AutoCad",
-" (Release 10.x).  It has no options of its own, but some features of its plots",
-" may be modified by other means.  The default size is 120x80 AutoCad units,",
-" which can be changed by `set size`.  `dxf` uses seven colors (white, red,",
-" yellow, green, cyan, blue and magenta), which can be changed only by",
-" modifying the source file.  If a black-and-white plotting device is used, the",
-" colors are mapped to differing line thicknesses.  See the description of the",
-" AutoCad print/plot command."
+" Legacy terminal driver `dxf` for export to  AutoCad (Release 10.x).",
+" It has no options. The default size is 120x80 AutoCad units.",
+" `dxf` uses seven colors (white, red, yellow, green, cyan, blue and magenta)",
+" that can be changed only by modifying the source file.  If a black-and-white",
+" plotting device is used the colors are mapped to differing line thicknesses."
 END_HELP(dxf)
 #endif /* TERM_HELP */

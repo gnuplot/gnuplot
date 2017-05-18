@@ -631,6 +631,7 @@ START_HELP(grass)
 "?terminal grass",
 "?term grass",
 "?grass",
+" Note: legacy terminal.",
 " The `grass` terminal driver gives `gnuplot` capabilities to users of the ",
 " GRASS geographic information system.  Contact grassp-list@moon.cecer.army.mil",
 " for more information.  Pages are written to the current frame of the GRASS",

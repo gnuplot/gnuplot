@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1078 2017/05/18 16:31:38 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1079 2017/05/18 19:24:19 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -15124,6 +15124,9 @@ Ffigure_multiple_keys
  because they were not configured or installed on your system. To see a list of
  terminals available on a particular gnuplot installation, type 'set terminal'
  with no modifiers.
+
+ Terminals marked `legacy` are not built by default in recent gnuplot versions
+ and may not actually work.
 <3 -- all terminal stuff is pulled from the .trm files
 1 Bugs
 ?bugs

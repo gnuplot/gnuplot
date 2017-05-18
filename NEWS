@@ -61,6 +61,7 @@ Changes not in 5.0
 * CHANGE support for space-in-x11-raises-KDE3-konsole is now a configure option
 * CHANGE don't use loadpath to choose output directory for "save"
 * CHANGE GNUTERM may contain terminal options in addition to bare terminal name
+* CHANGE remove legacy terminals corel and dxf from default build
 * FIX cairo.trm - reset terminal font after printing an enhanced text string
 * FIX autoscaling of data with "smooth cnorm"
 * FIX Built-in readline handles S-JIS encoding

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: hp500c.trm,v 1.16 2006/07/07 03:51:22 sfeam Exp $
+ * $Id: hp500c.trm,v 1.17 2006/07/21 02:35:47 sfeam Exp $
  *
  */
 
@@ -534,6 +534,7 @@ START_HELP(hp500c)
 "?terminal hp500c",
 "?term hp500c",
 "?hp500c",
+" Note: only available if gnuplot is configured --with-bitmap-terminals.",
 " The `hp500c` terminal driver supports the Hewlett Packard HP DeskJet 500c.",
 " It has options for resolution and compression.",
 "",
