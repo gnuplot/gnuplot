@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1077 2017/05/17 21:03:31 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1078 2017/05/18 16:31:38 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -223,7 +223,7 @@ C
 ?new polar mode features
 #start
 #b Polar coordinates may be used in label, arrow, and object definitions
-#b `set [m]tics` places ticmarks and labels on the perimeter of a polar plot. See
+#b `set [m]ttics` places ticmarks and labels on the perimeter of a polar plot. See
 ^ <a href="http://gnuplot.info/demo_5.1/ttics.html"> polar axis and ticlabels demo
 ^ </a>
 #b `set rlabel`  places a label above the r axis
@@ -249,7 +249,7 @@ C
 4 New commands and command options
 ?new commands
 #start
-#b Inside the bracketed clause of an iteration, `continue` jumps to immediately
+#b Inside the bracketed clause of an iteration, `continue` jumps immediately
 ## to the next iteration, `break` immediately exits from the iteration
 #b `toggle {<plotno> | "plottitle" | all}"` interactively enables or disables 
 ## display of one element of the current plot (see `toggle`)
@@ -261,9 +261,9 @@ C
 ## encoding to replace the ascii character '-' in negative numbers
 #b `set micro` tells gnuplot to use a special symbol in the current encoding to
 ## replace the ascii character 'u' for the scientific notation prefix "micro"
-## These special typographic symbols are used only in axis tic labels and strings
-## explicitly created with gprintf(). The byte sequence used to represent these
-## characters depends on the current encoding.
+## The special typographic symbols for micro and minussign are used only in axis
+## tic labels and strings explicitly created with gprintf(). The byte sequence
+## used to represent these characters depends on the current encoding.
 #end
 4 New data type "array"
 ?new features
