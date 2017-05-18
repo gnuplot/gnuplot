@@ -11,6 +11,10 @@
 	corel (postscript variant of CorelDraw format circa 1995)
 	dxf (Autocad DWGR10 format circa 1988)
 
+	* docs/README docs/doc2tex.c: New markup ^#TeX in gnuplot.doc signals
+	that the rest of the line is a LaTeX command to be passed through 
+	verbatim to the *.tex output stream.  Ignored by other doc2foo paths.
+
 2017-05-18  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc: typos, missing section for "set mttics".

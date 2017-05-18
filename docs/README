@@ -151,6 +151,9 @@ Control characters in first column:
 0-9  used by VMS help and by doc2{tex,ms,html} formatters to define level,keyword
 @    used by doc2{tex,ms,rnh} to define table start/end
 #    used by doc2tex: table entry
+#TeX used by doc2tex: LaTeX command to be inserted in output stream (e.g. \newpage)
+#b   bulleted list entry
+##   continuation of bulleted item      
 =    used by doc2tex: index entry
 F    used by doc2{tex,html}: embedded figure (followed by base name of the pdf file)
 %    used by doc2ms: table entry

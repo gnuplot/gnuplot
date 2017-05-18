@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.28 2015/08/21 19:46:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.29 2017/05/13 03:42:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - doc2tex.c */
@@ -212,8 +212,11 @@ process_line( char *line, FILE *b)
 		}
 		else if (line[1] == '#') {
 		    /* Continuation of bulleted line */
-		    // fprintf(b, "%s", line + 2);
 		    puttex(line+2, b);
+		}
+		else if (!strncmp(line+1,"TeX",3)) {
+		    /* Treat rest of line as LaTeX command */
+		    fprintf(b, "%s\n", line + 5);
 		}
 		else {
 		    if (strchr(line, '\n'))
