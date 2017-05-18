@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1079 2017/05/18 19:24:19 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1080 2017/05/18 21:19:16 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4276,18 +4276,16 @@ Ffigure_steps
 ?plotting styles vectors
 ?style vectors
 ?vectors
+Ffigure_vectors
  The 2D `vectors` style draws a vector from (x,y) to (x+xdelta,y+ydelta).
  The 3D `vectors` style is similar, but requires six columns of basic data.
+ In both cases, an additional input column (5th in 2D, 7th in 3D) may be used
+ to provide variable (per-datapoint) color information. 
+ (see `linecolor` and `rgbcolor variable`).
  A small arrowhead is drawn at the end of each vector.
 
       4 columns:  x  y  xdelta  ydelta
       6 columns:  x  y  z  xdelta  ydelta  zdelta
-
- In both cases, an additional input column (5th in 2D, 7th in 3D) may be used
- to provide variable (per-datapoint) color information. 
- (see `linecolor` and `rgbcolor variable`).
-
- splot with vectors is supported only for `set mapping cartesian`.
 
  The keywords "with vectors" may be followed by an inline arrow style
  specifications, a reference to a predefined arrow style, or a request to read
@@ -4304,6 +4302,7 @@ Ffigure_steps
        plot 'file.dat' using 1:2:3:4 with vectors head filled lt 2
        splot 'file.dat' using 1:2:3:(1):(1):(1) with vectors filled head lw 2
 
+ splot with vectors is supported only for `set mapping cartesian`.
  `set clip one` and `set clip two` affect vectors drawn in 2D.
  See `set clip` and `arrowstyle`.
 2 xerrorbars

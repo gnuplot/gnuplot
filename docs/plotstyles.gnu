@@ -211,7 +211,7 @@ unset xtics; unset ytics
 plot demo . 'ellipses.dat' u 1:2:3:4:5 with ellipses units xy title "with ellipses",\
      '' u 1:2:3:4:5 with ellipses units xx notitle,\
      '' u 1:2:3:4:5 with ellipses units yy notitle
-     
+
 #
 # 2D heat map from an array of in-line data
 # =========================================
@@ -388,6 +388,31 @@ GPFUN_butterfly = "butterfly(x)=exp(cos(x))-2*cos(4*x)+sin(x/12)**5"
 plot 3.+sin(t)*cos(5*t) with filledcurve above r=2.5 notitle, \
      3.+sin(t)*cos(5*t) with line
 
+#
+# Vectors
+# =======
+#
+reset
+set output out . 'figure_vectors' . ext
+set label 1 "Vector field {/:Italic F(x,y) = (ky,-kx)}"
+set label 1 at 0.5, 3.0 left
+unset key
+unset clip one
+unset border
+set style arrow 1 head filled size .2, 20. lw 2 lc "slateblue1"
+set samples 5, 5
+set isosamples 5, 5
+set size ratio 1 1
+set xzeroaxis
+set yzeroaxis
+set xtics axis add ("" 0)
+set ytics axis add ("" 0)
+set urange [ -2.0 : 2.0 ]
+set vrange [ -2.0 : 2.0 ]
+
+plot '++' using 1:2:($2*0.4):(-$1*0.4) with vectors as 1
+
+     
 #
 # Missing Datapoints
 # ==================
