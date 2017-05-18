@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.70 2016/05/06 17:40:08 sfeam Exp $
+ * $Id: term.h,v 1.71 2016/11/17 22:57:20 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -219,7 +219,7 @@
 #include "cgm.trm"
 
 /* CorelDraw! eps format */
-#include "corel.trm"
+/* #include "corel.trm"  */
 
 /* debugging terminal */
 #ifdef DEBUG
@@ -234,8 +234,9 @@
 # include "caca.trm"
 #endif
 
-/* DXF format for use with AutoCad (Release 10.x) */
-#include "dxf.trm"
+/* Legacy terminal for export to AutoCad (Release 10.x) */
+/* DWGR10 format (1988) */
+/* #include "dxf.trm" */
 
 /* Enhanced Metafile Format driver */
 #include "emf.trm"
