@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1076 2017/05/16 23:13:46 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1077 2017/05/17 21:03:31 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -254,7 +254,7 @@ C
 #b `toggle {<plotno> | "plottitle" | all}"` interactively enables or disables 
 ## display of one element of the current plot (see `toggle`)
 #b `set table "outfile.name" append` will append subsequent tabulated plots to
-## to an existing text file rather replacing its contents
+## an existing text file rather replacing its contents
 #b `set pm3d lighting` describes a lighting model with specular highlighting
 ## (see `lighting`)
 #b `set minussign` tells gnuplot to use a special symbol in the current 
@@ -1455,7 +1455,9 @@ C marker below is used to signal this to doc2html:
 ?sqrt
 #sqrt(x) & any & $\sqrt{x}$,  square root of $x$ \\
 %sqrt(x)@any@$sqrt x $, square root of $x$
- The `sqrt(x)` function returns the square root of its argument.
+ The `sqrt(x)` function returns the square root of its argument. If the
+ x is a complex value, this always returns the root with positive real
+ part.
 4 tan
 ?expressions functions tan
 ?tan
@@ -4174,7 +4176,7 @@ Ffigure_linespoints
  Two keywords control whether or not every point in the plot is marked with a
  symbol, `pointinterval` (short form `pi`) and `pointnumber` (short form `pn`).
 
- `pi N` or `pi -N` tells gnuplot to only place a a symbol on every Nth point.
+ `pi N` or `pi -N` tells gnuplot to only place a symbol on every Nth point.
  A negative value for N will erase the portion of line segment that passes
  underneath the symbol. The size of the erased portion is controlled by
  `set pointintervalbox`.
@@ -6380,8 +6382,8 @@ Ffigure_fenceplot
 ?data-file smooth bins
 ?datafile smooth bins
 ?smooth bins
- "smooth bins" is the same as "bins"
- See `bins`
+ `smooth bins` is the same as `bins`.
+ See `bins`.
  For related plotting styles see `smooth frequency` and `smooth kdensity`.
 5 csplines
 ?commands plot datafile smooth csplines
@@ -8278,8 +8280,8 @@ Ffigure_fenceplot
 
  `set cntrlabel` controls the labeling of contours, either in the key (default)
  or on the plot itself in the case of `splot ... with labels`.  In the latter 
- case labels are placed along each contour line according to the "pointinterval"
- or "pointnumber" property of the label descriptor.  By default a label is
+ case labels are placed along each contour line according to the `pointinterval`
+ or `pointnumber` property of the label descriptor.  By default a label is
  placed on the 5th line segment making up the contour line and repeated every
  20th segment.  These defaults are equivalent to 
        set cntrlabel start 5 interval 20
@@ -9821,8 +9823,8 @@ Ffigure_missing
  offset to the coordinates of these superimposed points that spreads them into a
  cluster.  The threshold value for treating the points as being overlapped may
  be specified in character widths or any of the usual coordinate options.
- See `coordinates`.  Jitter affects only 2D plot styles "with points" and
- "with impulses".
+ See `coordinates`.  Jitter affects only 2D plot styles `with points` and
+ `with impulses`.
 
  The default jittering operation displaces points only along x.
  This produces a distinctive pattern sometimes called a "bee swarm plot".
@@ -9995,7 +9997,7 @@ Ffigure_missing
  `set key autotitle` causes each plot to be identified in the key by the name
  of the data file or function used in the plot command. This is the default.
  `set key noautotitle` disables the automatic generation of plot titles.
-=columnnheader
+=columnheader
  The command `set key autotitle columnheader` causes the first entry in each
  column of input data to be interpreted as a text string and used as a title for
  the corresponding plot. If the quantity being plotted is a function of data
@@ -10793,6 +10795,17 @@ Ffigure_multiple_keys
  be useful to avoid a tiny (or even empty) zoom region. `zoomjump` is off by
  default.
 
+3 mttics
+?commands set mttics
+?commands unset mttics
+?commands show mttics
+?set mttics
+?unset mttics
+?show mttics
+?mttics
+?nomttics
+ Minor tic marks around the perimeter of a polar plot are controlled by
+ by `set mttics`. Please see `set mxtics`.
 3 multiplot
 ?commands set multiplot
 ?commands unset multiplot
@@ -10966,8 +10979,8 @@ Ffigure_multiple_keys
        unset mxtics
        show mxtics
 
- The same syntax applies to `mytics`, `mztics`, `mx2tics`, `my2tics`, `mrtics`
- and `mcbtics`.
+ The same syntax applies to `mytics`, `mztics`, `mx2tics`, `my2tics`, `mrtics`,
+ `mttics` and `mcbtics`.
 
  <freq> is the number of sub-intervals (NOT the number of minor tics) between
  major tics (the default for a linear axis is either two or five
@@ -13040,11 +13053,11 @@ Ffigure_multiple_keys
 ?theta
  Polar coordinate plots are by default oriented such that theta = 0 is on the
  right side of the plot, with theta increasing as you proceed counterclockwise
- so that theta = 90 degrees is at the top.  "set theta" allows you to change
+ so that theta = 90 degrees is at the top.  `set theta` allows you to change
  the origin and direction of the polar angular coordinate theta.
       set theta {right|top|left|bottom}
       set theta {clockwise|cw|counterclockwise|ccw}
- "unset theta" restores the default state "set theta right ccw".
+ `unset theta` restores the default state "set theta right ccw".
 3 tics
 ?commands set tics
 ?commands unset tics
