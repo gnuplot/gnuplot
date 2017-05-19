@@ -1,3 +1,8 @@
+2017-05-19  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/term-ja.diff docs/faq-ja.tex docs/gnuplot-ja.doc:
+	Sync Japanese documentation to doc version 1.1080
+
 2017-05-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc
