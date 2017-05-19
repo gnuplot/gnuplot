@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1080 2017/05/18 21:19:16 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1081 2017/05/19 03:40:37 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3907,8 +3907,7 @@ Ffigure_histrows
  This will produce a plot in which each vertical bar corresponds to one row of
  data.  Each vertical bar contains a stack of two segments, corresponding in
  height to the values found in columns 2 and 4 of the datafile.
-
-
+#TeX \vspace{1em}
  Finally, the commands
 
        set style histogram columnstacked
