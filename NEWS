@@ -26,6 +26,7 @@ Changes not in 5.0
 * NEW    "set table OUTFILE {append}"
 * NEW    "set minussign" and "set micro" (first appeared in 5.0.5)
 * NEW    "set view azimuth <angle>" controls azimuth of the z axis in 3D plots
+* NEW    "save fit <filename>" replaces deprecated command "update"
 * NEW terminals and terminal options
 * NEW    terminal domterm (supports in-line SVG in DomTerm terminal emulator)
 * NEW    terminal sixelgd (sixel terminal graphics using gdlib)

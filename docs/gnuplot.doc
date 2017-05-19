@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1081 2017/05/19 03:40:37 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1082 2017/05/19 16:05:32 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -253,6 +253,7 @@ C
 ## to the next iteration, `break` immediately exits from the iteration
 #b `toggle {<plotno> | "plottitle" | all}"` interactively enables or disables 
 ## display of one element of the current plot (see `toggle`)
+#b `save fit` replaces deprecated command `update`
 #b `set table "outfile.name" append` will append subsequent tabulated plots to
 ## an existing text file rather replacing its contents
 #b `set pm3d lighting` describes a lighting model with specular highlighting
@@ -4939,8 +4940,8 @@ Ffigure_fenceplot
  had previously plotted both the data and the fitting function in one graph,
  you can display the current state of the fit.
 
- Once `fit` has finished, the `update` command may be used to store final
- values in a file for subsequent use as a parameter file.   See `update`
+ Once `fit` has finished, the `save fit` command may be used to store final
+ values in a file for subsequent use as a parameter file.   See `save fit`
  for details.
 3 adjustable parameters
 ?commands fit parameters
@@ -5323,9 +5324,7 @@ Ffigure_fenceplot
 
  The two forms of the `via` argument to `fit` serve two largely distinct
  purposes.  The `via "file"` form is best used for (possibly unattended) batch
- operation, where you just supply the startup values in a file and can later
- use `update` to copy the results back into another (or the same) parameter
- file.
+ operation, where you supply the starting parameter values in a file.
 
  The `via var1, var2, ...` form is best used interactively, where the command
  history mechanism may be used to edit the list of parameters to be fitted or
@@ -7621,15 +7620,11 @@ Ffigure_fenceplot
 ?commands save
 ?save set
 ?save
- The `save` command saves user-defined functions, variables, the `set
- term` status, all `set` options, or all of these, plus the last `plot`
- (`splot`) command to the specified file.
-
+?save fit
  Syntax:
-       save  {<option>} '<filename>'
+       save  {functions | variables | terminal | set | fit} '<filename>'
 
- where <option> is `functions`, `variables`, `terminal` or `set`. If
- no option is used, `gnuplot` saves functions, variables, `set`
+ If no option is specified, `gnuplot` saves functions, variables, `set`
  options and the last `plot` (`splot`) command.
 
  `save`d files are written in text format and may be read by the
@@ -7646,6 +7641,10 @@ Ffigure_fenceplot
  `terminal` status. Note that for a single gnuplot session you may
  rather use the other method of saving and restoring current terminal
  by the commands `set term push` and `set term pop`, see `set term`.
+
+ `save fit` saves only the variables used in the most recent `fit` command.
+ The saved file may be used as a parameter file to initialize future fit
+ commands using the `via` keyword.
 
  The filename must be enclosed in quotes.
 
@@ -15079,16 +15078,21 @@ Ffigure_multiple_keys
 2 update
 ?commands update
 ?update
- This command updates the current values of variables stored in the given
- file, which must be formatted as an initial-value file (see `fit`).
+ Note: This command is DEPRECATED.  Use `save fit` instead.
 
- If the file name does not exist, a new file is created containing all
- currently defined user variables. All variables not used in the last fit
- are marked as "#FIXED". This is useful for saving the current values of fit
- variables for later use or for restarting a converged or stopped fit.
+ The `update` command remains in version 5.2 for backwards compatibility but
+ will be removed in later versions.
 
  Syntax:
        update <filename> {<filename>}
+
+ This command updates the current values of variables stored in the given
+ file, which must be formatted as an initial-value file (see `fit`).
+
+ If the file does not exist, a new file is created containing all
+ currently defined user variables. All variables not used in the last fit
+ are marked as "#FIXED". This is useful for saving the current values of fit
+ variables for later use or for restarting a converged or stopped fit.
 
  If a second filename is supplied, the updated values are written to this
  file, and the original parameter file is left unmodified.
@@ -15096,8 +15100,6 @@ Ffigure_multiple_keys
  Otherwise, if the file already exists, `gnuplot` first renames it by
  appending `.old` and then opens a new file.  That is, "`update 'fred'`"
  behaves the same as "`!rename fred fred.old; update 'fred.old' 'fred'`".
-
- Note: This command may be revised or removed in a future gnuplot version.
 2 While
 ?while
 ?commands while

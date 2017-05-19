@@ -1,3 +1,10 @@
+2017-05-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c src/fit.c src/fit.h src/tables.c src/tables.h
+	docs/gnuplot.doc:  Deprecate command "update" in favor of new command
+	"save fit <filename>".  "update" will remain in version 5.2 for backward
+	compatability but will eventually go away altogether.
+
 2017-05-19  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/term-ja.diff docs/faq-ja.tex docs/gnuplot-ja.doc:

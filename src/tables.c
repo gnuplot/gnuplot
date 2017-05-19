@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.153 2017/02/14 21:49:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.154 2017/03/16 22:35:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -150,10 +150,11 @@ const struct gen_table dgrid3d_mode_tbl[] =
 /* 'save' command */
 const struct gen_table save_tbl[] =
 {
-    { "f$unctions", SAVE_FUNCS },
-    { "s$et", SAVE_SET },
-    { "t$erminal", SAVE_TERMINAL },
-    { "v$ariables", SAVE_VARS },
+    { "fit", SAVE_FIT },
+    { "fun$ctions", SAVE_FUNCS },
+    { "set", SAVE_SET },
+    { "ter$minal", SAVE_TERMINAL },
+    { "var$iables", SAVE_VARS },
     { NULL, SAVE_INVALID }
 };
 

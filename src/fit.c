@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.168 2017/04/25 23:40:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.169 2017/05/14 04:25:08 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1468,6 +1468,8 @@ createdvar(char *varname, double value)
 }
 
 
+/* Begin DEPRECATED section */
+
 /* argument: char *fn */
 #define VALID_FILENAME(fn) ((fn) != NULL && (*fn) != '\0')
 
@@ -1686,6 +1688,8 @@ backup_file(char *tofile, const char *fromfile)
 	Eex2("Error writing backup file %s", tofile);
 }
 #endif /* not MSDOS */
+
+/* End DEPRECATED section */
 
 /* Modified from save.c:save_range() */
 static void
@@ -2587,4 +2591,41 @@ getfitlogfile()
 	logfile = gp_strdup(fitlogfile);
     }
     return logfile;
+}
+
+
+/*
+ * replacement for "update", which is now deprecated.
+ * write current value of parameters used in previous fit to a file.
+ * That file can be used as an argument to 'via' in a subsequent fit command.
+ */
+void
+save_fit(FILE *fp)
+{
+    struct udvt_entry *udv;
+    int k;
+
+    if ((last_fit_command == NULL) || (strlen(last_fit_command) == 0)) {
+	int_warn(NO_CARET, "no previous fit command");
+	return;
+    } else {
+	fputs("# ", fp);
+	fputs(last_fit_command, fp);
+	fputs("\n", fp);
+	udv = get_udv_by_name("FIT_STDFIT");
+	if (udv)
+	    fprintf(fp,"# final sum of squares of residuals : %g\n",
+			udv->udv_value.v.cmplx_val.real);
+    }
+
+    for (k = 0; k < last_num_params; k++) {
+	udv = get_udv_by_name(last_par_name[k]);
+	if (udv->udv_value.type == INTGR)
+	    fprintf(fp, "%-15s = %-22i\n", udv->udv_name, udv->udv_value.v.int_val);
+	else if (udv->udv_value.type == CMPLX)
+	    fprintf(fp, "%-15s = %-22s\n", udv->udv_name, num_to_str(udv->udv_value.v.cmplx_val.real));
+	else
+	    int_warn(NO_CARET, "Parameter %s is not INTGR or CMPLX", udv->udv_name);
+    }
+    return;
 }
