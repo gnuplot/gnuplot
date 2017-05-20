@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.99 2017/04/23 18:27:52 markisch Exp $
+ * $Id: winmain.c,v 1.100 2017/05/20 16:43:19 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -1235,6 +1235,7 @@ ConsoleHandler(DWORD dwType)
     case CTRL_SHUTDOWN_EVENT: {
 	HANDLE h;
 	INPUT_RECORD rec;
+	DWORD written;
 
 	// NOTE: returning from this handler terminates the application.
 	// Insteadm, we signal the main thread to clean up and exit and
@@ -1247,7 +1248,6 @@ ConsoleHandler(DWORD dwType)
 	rec.Event.KeyEvent.bKeyDown = TRUE;
 	rec.Event.KeyEvent.wRepeatCount = 1;
 	rec.Event.KeyEvent.uChar.AsciiChar = 004;
-	DWORD written;
 	WriteConsoleInput(h, &rec, 1, &written);
 	// give the main thread time to exit
 	Sleep(10000);
