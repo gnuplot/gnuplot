@@ -1,3 +1,11 @@
+2017-05-20  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/winmain.c (ConsoleHandler) src/plot.c|h (terminate_flag)
+	src/readline.c (readline):  Add an event handler to catch "close" 
+	signals to console mode gnuplot on Windows.  These events are passed
+	on to the main thread to terminate cleanly.
+	Bugs #1916, #1917, #1918
+
 2017-05-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c src/fit.c src/fit.h src/tables.c src/tables.h

@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.98 2017/02/15 09:13:20 markisch Exp $
+ * $Id: winmain.c,v 1.99 2017/04/23 18:27:52 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -124,6 +124,7 @@ int CALLBACK ShutDown();
 #ifdef WGP_CONSOLE
 static int ConsolePutS(const char *str);
 static int ConsolePutCh(int ch);
+static BOOL WINAPI ConsoleHandler(DWORD dwType);
 #endif
 
 static void
@@ -601,6 +602,8 @@ main(int argc, char **argv)
 	GetConsoleMode(handle, &mode);
 	SetConsoleMode(handle, mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
     }
+    // set console mode handler to catch "abort" signals
+    SetConsoleCtrlHandler(ConsoleHandler, TRUE);
 #endif
 
     gp_atexit(WinExit);
@@ -1220,6 +1223,41 @@ ConsolePutCh(int ch)
     return ch;
 }
 
+
+/* This is called by the system to signal various events. 
+   Note that it is executed in a separate thread.  */
+BOOL WINAPI
+ConsoleHandler(DWORD dwType)
+{
+    switch (dwType) {
+    case CTRL_CLOSE_EVENT:
+    case CTRL_LOGOFF_EVENT:
+    case CTRL_SHUTDOWN_EVENT: {
+	HANDLE h;
+	INPUT_RECORD rec;
+
+	// NOTE: returning from this handler terminates the application.
+	// Insteadm, we signal the main thread to clean up and exit and
+	// then idle by sleeping.
+	terminate_flag = TRUE;
+	// send ^D to main thread input queue
+	h = GetStdHandle(STD_INPUT_HANDLE);
+	ZeroMemory(&rec, sizeof(rec));
+	rec.EventType = KEY_EVENT;
+	rec.Event.KeyEvent.bKeyDown = TRUE;
+	rec.Event.KeyEvent.wRepeatCount = 1;
+	rec.Event.KeyEvent.uChar.AsciiChar = 004;
+	DWORD written;
+	WriteConsoleInput(h, &rec, 1, &written);
+	// give the main thread time to exit
+	Sleep(10000);
+	return TRUE;
+    }
+    default:
+	break;
+    }
+    return FALSE;
+}
 #endif
 
 /* public interface to printer routines : Windows PRN emulation

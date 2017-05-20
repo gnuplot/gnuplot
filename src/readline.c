@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.75 2016/08/22 17:45:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.76 2016/08/23 00:23:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -1035,9 +1035,10 @@ readline(const char *prompt)
 		delete_backward();
 		break;
 	    case 004:		/* ^D */
-		if (max_pos == 0) {
+		/* Also catch asynchronous termination signal on Windows */
+		if (max_pos == 0 && terminate_flag) {
 		    reset_termio();
-		    return ((char *) NULL);
+		    return NULL;
 		}
 		/* intentionally omitting break */
 #ifdef DEL_ERASES_CURRENT_CHAR
@@ -1425,9 +1426,9 @@ static int
 win_getch()
 {
     if (term && term->waitforinput)
-        return term->waitforinput(0);
+	return term->waitforinput(0);
     else
-        return ConsoleGetch();
+	return ConsoleGetch();
 }
 #else
 

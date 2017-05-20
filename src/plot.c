@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.172 2017/04/01 04:18:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.173 2017/04/11 04:26:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -162,6 +162,8 @@ static int exit_status = EXIT_SUCCESS;
 
 /* Flag for asynchronous handling of Ctrl-C. Used by fit.c and Windows */
 TBOOLEAN ctrlc_flag = FALSE;
+/* Flag for (asynchronous) term signal on Windows. */
+TBOOLEAN terminate_flag = FALSE;
 
 #ifdef OS2
 # include <process.h>
@@ -388,7 +390,7 @@ main(int argc, char **argv)
 	    return 0;
 
 	} else if (!strncmp(argv[i], "-persist", 2) || !strcmp(argv[i], "--persist")
-#ifdef _Windows
+#ifdef _WIN32
 		|| !stricmp(argv[i], "-noend") || !stricmp(argv[i], "/noend")
 #endif
 		) {
@@ -443,7 +445,7 @@ main(int argc, char **argv)
     /* April 2017:  We used to call init_terminal() here, but now   */
     /* We defer initialization until error handling has bee set up. */
 
-# if defined(WIN32) && !defined(WGP_CONSOLE)
+# if defined(_WIN32) && !defined(WGP_CONSOLE)
     interactive = TRUE;
 # else
     interactive = isatty(fileno(stdin));
@@ -543,8 +545,7 @@ main(int argc, char **argv)
 	if (interactive == FALSE)
 	    exit_status = EXIT_FAILURE;
 #ifdef HAVE_READLINE_RESET
-	else
-	{
+	else {
 	    /* reset properly readline after a SIGINT+longjmp */
 	    rl_reset_after_signal ();
 	}
