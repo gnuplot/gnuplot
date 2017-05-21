@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1082 2017/05/19 16:05:32 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1083 2017/05/20 01:27:30 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -400,10 +400,6 @@ C
  * The optional bandwidth for the kernel density smoothing option is taken from
  a keyword rather than a data column.  See `smooth kdensity`.
 
- * `unset xrange` (and other axis ranges) restores the original default range.
-
- * `unset terminal` restores the original terminal of the gnuplot session.
-
 2 Deprecated syntax
 ?deprecated syntax
 ?backwards compatibility
@@ -421,7 +417,7 @@ C
        set title TITLE offset char 0, char -1
        set style data linespoints
        plot 1 linetype 2 pointtype 4
- Deprecated but present in version 5 if configured --enable-backwards-compatibility
+ Deprecated, present in version 5.0 if configured --enable-backwards-compatibility
        if (defined(VARNAME)) ...
        set style increment user
        plot 'file' thru f(x)
@@ -501,10 +497,10 @@ C
  canvas.  Scale values less than 1 will cause the plot to not fill the entire
  canvas.  Scale values larger than 1 will cause only a portion of the plot to
  fit on the canvas.  Please be aware that setting scale values larger than 1
- may cause problems on some terminal types.
+ may cause problems.
 
  The major exception to this convention is the PostScript driver, which
- by default continues to act as it has in earlier versions. Be warned that
+ by default continues to act as it did in earlier versions. Be warned that
  some future version of gnuplot may change the default behaviour of the
  PostScript driver as well.
 
@@ -515,7 +511,7 @@ C
        set output "figure.png"
        plot "data" with lines
 
- These commands will produce an output file "figure.png" that is 600 pixels
+ These commands produce an output file "figure.png" that is 600 pixels
  wide and 400 pixels tall. The plot will fill the lower left quarter of this
  canvas.  This is consistent with the way multiplot mode has always worked.
 
@@ -659,10 +655,9 @@ C
  left and 1,1 is top right (for splot, 0,0,0 is bottom left of plotting area;
  use negative z to get to the base---see `set xyplane`); `screen`
  specifies the screen area (the entire area---not just the portion selected by
- `set size`), with 0,0 at bottom left and 1,1 at top right; and `character`
- gives the position in character widths and heights from the bottom left of
- the screen area (screen 0,0), `character` coordinates depend on the chosen
- font size.
+ `set size`), with 0,0 at bottom left and 1,1 at top right. `character`
+ coordinates are used primarily for offsets, not absoute positions.
+ The `character` vertical and horizontal size depend on the current font.
 
  `polar` causes the first two values to be interpreted as angle theta and radius
  r rather than as x and y.  This could be used, for example, to place labels on
@@ -2325,8 +2320,7 @@ C ... and restart the table:
 =wxt
  These terminals find and access fonts using the external fontconfig tool set.
  Please see the
-^ <a href="http://fontconfig.org/fontconfig-user.html">
- fontconfig user manual.
+^ <a href="http://fontconfig.org/fontconfig-user.html"> fontconfig user manual.
 ^ </a>
  It is usually sufficient in gnuplot to request a font by a generic name and
  size, letting fontconfig substitute a similar font if necessary. The following
@@ -3480,6 +3474,7 @@ Ffigure_boxxyerror
  The interior of the boxes is drawn according to the current fillstyle.
  See `set style fill` and `boxes` for details.  Alternatively a new fillstyle
  may be specified in the plot command.
+#TeX \newpage
 2 candlesticks
 ?plotting styles candlesticks
 ?style candlesticks
@@ -3545,6 +3540,7 @@ Ffigure_candlesticks
    plot 'stat.dat' using 1:3:2:6:5 with candlesticks whiskerbars 0.5
 
  See `set boxwidth`, `set errorbars`, `set style fill`, and `boxplot`.
+#TeX \newpage
 2 circles
 ?plotting styles circles
 ?style circles
@@ -4673,6 +4669,8 @@ Ffigure_fenceplot
 2 clear
 ?commands clear
 ?clear
+=inset
+?inset
  The `clear` command erases the current screen or output device as specified
  by `set terminal` and `set output`.  This usually generates a formfeed on
  hardcopy devices.
@@ -5303,14 +5301,14 @@ Ffigure_fenceplot
  To improve the chances of finding the global optimum, you should set the
  starting values at least roughly in the vicinity of the solution, e.g.,
  within an order of magnitude, if possible.  The closer your starting values
- are to the solution, the less chance of stopping at another minimum.  One way
+ are to the solution, the less chance of stopping at a false minimum.  One way
  to find starting values is to plot data and the fitting function on the same
  graph and change parameter values and `replot` until reasonable similarity
- is reached.  The same plot is also useful to check whether the fit stopped at
- a minimum with a poor fit.
+ is reached.  The same plot is also useful to check whether the fit found a
+ false minimum.
 
- Of course, a reasonably good fit is not proof there is not a "better" fit (in
- either a statistical sense, characterized by an improved goodness-of-fit
+ Of course finding a nice-looking fit does not prove there is no "better" fit
+ (in either a statistical sense, characterized by an improved goodness-of-fit
  criterion, or a physical sense, with a solution more consistent with the
  model.)  Depending on the problem, it may be desirable to `fit` with various
  sets of starting values, covering a reasonable range for each parameter.
@@ -5539,23 +5537,7 @@ Ffigure_fenceplot
  arguments to `gnuplot`.  These are loaded in the order specified, and
  then `gnuplot` exits.
 2 lower
-?commands lower
-?lower
- Syntax:
-       lower {plot_window_nb}
-
- The `lower` command lowers (opposite to `raise`) plot window(s) associated
- with the interactive terminal of your gnuplot session, i.e. `pm`, `win`, `wxt`
- or `x11`. It puts the plot window to bottom in the z-order windows stack of
- the window manager of your desktop.
-
- As `x11` and `wxt` support multiple plot windows, then by default they lower
- these windows in descending order of most recently created on top to the least
- recently created on bottom. If a plot number is supplied as an optional
- parameter, only the associated plot window will be lowered if it exists.
-
- The optional parameter is ignored for single plot-window terminals, i.e. `pm`
- and `win`.
+ See `raise`.
 2 pause
 ?commands pause
 ?pause
@@ -6556,6 +6538,7 @@ Ffigure_fenceplot
 ?plot special-filenames
 ?datafile special-filenames
 ?special-filenames
+?+
 ?++
  There are a few filenames that have a special meaning:  '', '-', '+' and '++'.
 
@@ -6588,6 +6571,7 @@ Ffigure_fenceplot
 
        plot $MYDATA, [t=-3:25:1] '+' using (t):(f(t)) 
 
+?special-filenames ++
  The pseudo-file '++' returns 2 columns of data forming a regular grid of [u,v]
  coordinates with the number of points along u controlled by `set samples` and
  the number of points along v controlled by `set isosamples`.  You must set
@@ -6604,52 +6588,18 @@ Ffigure_fenceplot
  filters, titles, and line styles remain on the `plot` command line.  This is
  similar to << in unix shell script, and $DECK in VMS DCL.  The data are
  entered as though they are being read from a file, one data point per record.
- The letter "e" at the start of the first column terminates data entry.  The
- `using` option can be applied to these data---using it to filter them through
- a function might make sense, but selecting columns probably doesn't!
+ The letter "e" at the start of the first column terminates data entry.
 
  `'-'` is intended for situations where it is useful to have data and commands
- together, e.g., when `gnuplot` is run as a sub-process of some front-end
- application.  Some of the demos, for example, might use this feature.  While
+ together, e.g. when both are piped to `gnuplot` from another application.
+ Some of the demos, for example, might use this feature.  While
  `plot` options such as `index` and `every` are recognized, their use forces
- you to enter data that won't be used.  For example, while
-
-       plot '-' index 0, '-' index 1
-       2
-       4
-       6
-
-
-       10
-       12
-       14
-       e
-       2
-       4
-       6
-
-
-       10
-       12
-       14
-       e
-
- does indeed work,
-
-       plot '-', '-'
-       2
-       4
-       6
-       e
-       10
-       12
-       14
-       e
-
- is a lot easier to type.
+ you to enter data that won't be used.  For all but the simplest cases it is
+ probably easier to first define a datablock and then read from it rather than
+ from `'-'`.  See `datablocks`.
 
  If you use `'-'` with `replot`, you may need to enter the data more than once.
- See `replot`, `refresh`.
+ See `replot`, `refresh`.  Here again it may be better to use a datablock.
 
  A blank filename ('') specifies that the previous filename should be reused.
  This can be useful with things like
@@ -7110,12 +7060,15 @@ Ffigure_fenceplot
 ?commands plot sampling
 ?plot sampling
 =sample
- By default, computed functions or data generated for the pseudo-file "+" are
- sampled over the entire range of the plot. This range may have been specified
- by a prior `set xrange` command, by an explicit global range specifier at the
- very start of the plot command, or by autoscaling of the range to span data
- seen in all the elements of this plot command.  However, individual plot
- components can be assigned a more restricted sampling range. 
+4 1D sampling (x or t axis)
+?sampling 1D
+?plot sampling 1D
+ By default, computed functions or data generated for the pseudo-file "+"
+ are sampled over the entire range of the plot as set by a prior `set xrange`
+ command, by an explicit global range specifier at the very start of the plot
+ or splot command, or by autoscaling the xrange to span data seen in all the
+ elements of this plot.  However, individual plot components can be assigned
+ a more restricted sampling range. 
 
  Examples:
 
@@ -7140,6 +7093,29 @@ Ffigure_fenceplot
 
  This example shows one way of tracing out a helix in a 3D plot
        splot [-2:2][-2:2] sample [h=1:10] '+' using (cos(h)):(sin(h)):(h)
+
+4 2D sampling (u and v axes)
+?sampling 2D
+?plot sampling 2D
+ Computed functions or data generated for the pseudo-file '++' use samples
+ generated along the u and v axes. This is a CHANGE from versions prior to
+ 5.2 which sampled along the x and y axes.  See `special-filenames ++`.
+ 2D sampling can be used in either `plot` or `splot` commands.  
+
+ Example of 2D sampling in a 2D `plot` command.  These commands generated the
+ plot shown for plotstyle `with vectors`.  See `vectors`.
+      set urange [ -2.0 : 2.0 ]
+      set vrange [ -2.0 : 2.0 ]
+      plot '++' using ($1):($2):($2*0.4):(-$1*0.4) with vectors
+
+ Example of 2D sampling in a 3D `splot` command. These commands are similar to
+ the ones used in `sampling.dem`. Note that the two surfaces are sampled over
+ u and v ranges smaller than the full x and y ranges of the resulting plot.
+      set title "3D sampling range distinct from plot x/y range"
+      set xrange [1:100]
+      set yrange [1:100]
+      splot sample [u=30:70][v=0:50] '++' using 1:2:(u*v) lt 3, \
+            [u=40:80][v=30:60] '++' using (u):(v):(u*sqrt(v)) lt 4
 
 3 for loops in plot command
 ?commands plot for
@@ -7471,26 +7447,23 @@ Ffigure_fenceplot
  command) before exiting.
 2 raise
 ?commands raise
+?commands lower
 ?raise
+?lower
  Syntax:
-       raise {plot_window_nb}
+       raise {plot_window_id}
+       lower {plot_window_id}
 
- The `raise` command raises (opposite to `lower`) plot window(s) associated
- with the interactive terminal of your gnuplot session, i.e. `pm`, `win`, `wxt`
- or `x11`. It puts the plot window to front (top) in the z-order windows stack
- of the window manager of your desktop.
-
- As `x11` and `wxt` support multiple plot windows, then by default they raise
- these windows in descending order of most recently created on top to the least
- recently created on bottom. If a plot number is supplied as an optional
- parameter, only the associated plot window will be raised if it exists.
-
- The optional parameter is ignored for single plot-windows terminal, i.e. `pm`
- and `win`.
-
- If the window is not raised under X11, then perhaps the plot window is
- running in a different X11 session (telnet or ssh session, for example), or
- perhaps raising is blocked by your window manager policy setting.
+ The `raise` and `lower` commands function only for a some terminal types and
+ may depend also on your window manager and display preference settings.
+ An example of use is shown here
+       set term wxt 123     # create first plot window
+       plot $FOO
+       lower                # lower the only plot window that exists so far
+       set term wxt 456     # create 2nd plot window may occlude the first one
+       plot $BAZ
+       raise 123            # raise first plot window 
+ These commands are known to be unreliable.
 2 refresh
 ?commands refresh
 ?refresh
@@ -7924,31 +7897,6 @@ Ffigure_fenceplot
 
  This disables autoscaling of the z axis only:
        unset autoscale z
-4 parametric mode
-?commands set autoscale parametric
-?set autoscale parametric
-?set autoscale t
- When in parametric mode (`set parametric`), the xrange is as fully scalable
- as the y range.  In other words, in parametric mode the x axis can be
- automatically scaled to fit the range of the parametric function that is
- being plotted.  Of course, the y axis can also be automatically scaled just
- as in the non-parametric case.  If autoscaling on the x axis is not set, the
- current x range is used.
-
- Data files are plotted the same in parametric and non-parametric mode.
- However, there is a difference in mixed function and data plots: in
- non-parametric mode with autoscaled x, the x range of the datafile controls
- the x range of the functions; in parametric mode it has no influence.
-
- For completeness a last command `set autoscale t` is accepted.  However, the
- effect of this "scaling" is very minor.  When `gnuplot` determines that the
- t range would be empty, it makes a small adjustment if autoscaling is true.
- Otherwise, `gnuplot` gives an error.  Such behavior may, in fact, not be very
- useful and the command `set autoscale t` is certainly questionable.
-
- `splot` extends the above ideas as you would expect.  If autoscaling is set,
- then x, y, and z ranges are computed and each axis scaled to fit the
- resulting data.
 4 polar mode
 ?commands set autoscale polar
 ?set autoscale polar
@@ -7966,7 +7914,7 @@ Ffigure_fenceplot
 ?commands show bind
 ?show bind
 =bind
- Show the current state of all hotkey bindings. See `bind`.
+ `show bind` shows the current state of all hotkey bindings. See `bind`.
 3 bmargin
 ?commands set bmargin
 ?set bmargin
@@ -8934,9 +8882,8 @@ Ffigure_missing
 
  Valid values are
     default     - tells a terminal to use its default encoding
-    iso_8859_1  - the most common Western European encoding used by many
-                  Unix workstations and by MS-Windows. This encoding is
-                  known in the PostScript world as 'ISO-Latin1'.
+    iso_8859_1  - the most common Western European encoding prior to UTF-8.
+                  Known in the PostScript world as 'ISO-Latin1'.
     iso_8859_15 - a variant of iso_8859_1 that includes the Euro symbol
     iso_8859_2  - used in Central and Eastern Europe
     iso_8859_9  - used in Turkey (also known as Latin5)
@@ -15144,13 +15091,6 @@ Ffigure_multiple_keys
 =bessel
 =timefmt
 =nohidden3d
-=floating point exceptions
- Floating point exceptions (floating point number too large/small, divide by
- zero, etc.) may be generated by user defined functions.  Some of the demos in
- particular may cause numbers to exceed the floating point range.
- Whether the system ignores such exceptions (in which case `gnuplot` labels
- the corresponding point as undefined) or aborts `gnuplot` depends on the
- compiler/runtime environment.
 
  The gamma and bessel functions do not support complex arguments.
 
@@ -15165,8 +15105,10 @@ Ffigure_multiple_keys
  This means that multiplots whose constituent plots use different
  palettes will not display correctly in x11.
 
- Qt terminal: 3D rotation of polygons and surfaces can be very slow;
+ Qt terminal: 3D rotation of polygons and surfaces can be slow;
  this is strongly affected by the Qt rendering mode (see Qt documentation).
+
+ The `raise` and `lower` functions are unreliable.
 
 2 External libraries
 ?bugs external_libraries
@@ -15176,8 +15118,8 @@ Ffigure_multiple_keys
 =internationalization
 =pdf
  External library GD (used by PNG/JPEG/GIF drivers):
- Versions of libgd through 2.0.33 contain various bugs in mapping the characters
- of Adobe's Symbol font.  Also it is possible to trigger a library segfault if
+ Versions of libgd through 2.0.33 had various bugs in mapping the characters
+ of Adobe's Symbol font.  Also it was possible to trigger a library segfault if
  an anti-aliased line crosses an upper corner of the canvas.
 
  External library PDFlib (used by PDF driver):
