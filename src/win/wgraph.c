@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.253 2017/05/15 14:49:05 markisch Exp $
+ * $Id: wgraph.c,v 1.254 2017/05/15 14:58:46 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -385,6 +385,7 @@ GraphInitStruct(LPGW lpgw)
 		lpgw->sampling = 1;
 		lpgw->fontscale = 1.;
 		lpgw->linewidth = 1.;
+		lpgw->pointscale = 1.;
 		lpgw->color = TRUE;
 		lpgw->dashed = FALSE;
 		lpgw->IniSection = TEXT("WGNUPLOT");
@@ -2557,8 +2558,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		case W_pointsize:
 			if (curptr->x > 0) {
 				double pointsize = curptr->x / 100.0;
-				htic = MulDiv(pointsize * lpgw->htic, rr - rl, lpgw->xmax) + 1;
-				vtic = MulDiv(pointsize * lpgw->vtic, rb - rt, lpgw->ymax) + 1;
+				htic = MulDiv(pointsize * lpgw->pointscale * lpgw->htic, rr - rl, lpgw->xmax) + 1;
+				vtic = MulDiv(pointsize * lpgw->pointscale * lpgw->vtic, rb - rt, lpgw->ymax) + 1;
 			} else {
 				htic = vtic = 0;
 			}

@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.87 2017/04/23 18:27:53 markisch Exp $
+ * $Id: wgnuplib.h,v 1.88 2017/05/13 11:49:29 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -382,6 +382,7 @@ typedef struct tagGW {
 	double	org_pointsize;	/* Original Pointsize */
 	int	encoding_error; /* last unknown encoding */
 	double	fontscale;	/* scale factor for font sizes */
+	double	pointscale;	/* scale factor for point sizes */
 	enum set_encoding_id encoding;	/* text encoding */
 	LONG	tmHeight;	/* text metric of current font */
 	LONG	tmAscent;

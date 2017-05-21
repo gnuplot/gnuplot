@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.141 2017/04/23 18:27:52 markisch Exp $
+ * $Id: win.trm,v 1.142 2017/05/14 14:40:24 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -128,8 +128,9 @@ TERM_PUBLIC void WIN_modify_plots __PROTO((unsigned int operations, int plotno))
 
 enum WIN_id { WIN_DEFAULT, WIN_MONOCHROME, WIN_COLOR, WIN_GTITLE,
 	      WIN_ENHANCED, WIN_NOENHANCED, WIN_FONT, WIN_SIZE, WIN_WSIZE,
-	      WIN_POSITION, WIN_CLOSE, WIN_BACKGROUND, WIN_FONTSCALE,
-	      WIN_LINEWIDTH, WIN_SOLID, WIN_DASHED, WIN_ROUND, WIN_BUTT,
+	      WIN_POSITION, WIN_CLOSE, WIN_BACKGROUND,
+	      WIN_FONTSCALE, WIN_LINEWIDTH, WIN_POINTSCALE,
+	      WIN_SOLID, WIN_DASHED, WIN_ROUND, WIN_BUTT,
 	      WIN_DOCKED, WIN_STANDALONE, WIN_LAYOUT,
 	      WIN_OTHER };
 
@@ -150,6 +151,8 @@ static struct gen_table WIN_opts[] =
     { "fonts$cale", WIN_FONTSCALE },
     { "linewidth", WIN_LINEWIDTH },
     { "lw", WIN_LINEWIDTH },
+    { "pointscale", WIN_POINTSCALE},
+    { "ps", WIN_POINTSCALE},
     { "ti$tle", WIN_GTITLE },
     { "siz$e", WIN_SIZE },
     { "ws$ize", WIN_WSIZE },
@@ -223,9 +226,11 @@ WIN_options()
 	TBOOLEAN set_position = FALSE, set_number = FALSE;
 	TBOOLEAN set_wsize = FALSE, set_rounded = FALSE;
 	TBOOLEAN set_docked = FALSE, set_layout = FALSE;
+	TBOOLEAN set_pointscale = FALSE;
 	TBOOLEAN color, dashed, rounded;
 	COLORREF background;
 	double fontscale, linewidth;
+	double pointscale;
 	int win_x = 0;
 	int win_y = 0;
 	int win_width = 0;
@@ -248,10 +253,10 @@ WIN_options()
 			strcpy(fontname, WIN_inifontname);
 #endif
 			fontsize = WIN_inifontsize;
-			fontscale = linewidth = 1;
+			fontscale = linewidth = pointscale = 1;
 			set_color = set_dashed = TRUE;
 			set_font = set_fontsize = TRUE;
-			set_fontscale = set_linewidth = TRUE;
+			set_fontscale = set_linewidth = set_pointscale = TRUE;
 			set_rounded = TRUE;
 			c_token++;
 			break;
@@ -299,6 +304,12 @@ WIN_options()
 			set_linewidth = TRUE;
 			break;
 		}
+		case WIN_POINTSCALE:
+			c_token++;
+			pointscale = real_expression();
+			if (pointscale <= 0.0) pointscale = 1.;
+			set_pointscale = TRUE;
+			break;
 		case WIN_SOLID:
 			c_token++;
 			dashed = FALSE;
@@ -486,6 +497,8 @@ WIN_options()
 		graphwin->fontscale = fontscale;
 	if (set_linewidth)
 		graphwin->linewidth = linewidth;
+	if (set_pointscale)
+		graphwin->pointscale = pointscale;
 	if (set_size || set_wsize) {
 		graphwin->Size.x = win_width;
 		graphwin->Size.y = win_height;
@@ -617,6 +630,10 @@ WIN_update_options()
 	if (graphwin->linewidth != 1)
 		sprintf(&(term_options[strlen(term_options)]),
 			" linewidth %.1f", graphwin->linewidth);
+
+	if (graphwin->pointscale != 1)
+		sprintf(&(term_options[strlen(term_options)]),
+			" pointscale %.1f", graphwin->pointscale);
 
 	if (!graphwin->bDocked) {
 		if (graphwin->Canvas.x != 0)
@@ -1130,7 +1147,7 @@ TERM_TABLE_START(win_driver)
     WIN_justify_text, WIN_point, do_arrow, WIN_set_font,
     WIN_set_pointsize,
     TERM_CAN_MULTIPLOT|TERM_NO_OUTPUTFILE|TERM_ALPHA_CHANNEL|TERM_CAN_DASH
-        |TERM_LINEWIDTH|TERM_FONTSCALE|TERM_ENHANCED_TEXT,
+        |TERM_LINEWIDTH|TERM_FONTSCALE|TERM_POINTSCALE|TERM_ENHANCED_TEXT,
     WIN_text /* suspend */ , WIN_resume,
     WIN_boxfill, WIN_linewidth,
 #ifdef USE_MOUSE
@@ -1183,6 +1200,7 @@ START_HELP(windows)
 "                            {font <fontspec>}",
 "                            {fontscale <scale>}",
 "                            {linewdith <scale>}",
+"                            {pointscale <scale>}",
 "                            {background <rgb color>}",
 "                            {title \"Plot Window Title\"}",
 "                            {{size | wsize} <width>,<height>}",
@@ -1206,8 +1224,8 @@ START_HELP(windows)
 " Note that in previous versions of gnuplot the `font` statement could be left",
 " out and <fontsize> could be given as a number without double quotes. This is",
 " no longer supported.",
-" `linewidth` and `fontscale` can be used to scale the width of lines and",
-" the size of text.",
+" `linewidth`, `fontscale`, `pointscale` can be used to scale the width of",
+" lines, the size of text, or the size of the point symbols.",
 " `title` changes the title of the graph window.",
 " `size` defines the width and height of the window's drawing area in pixels,",
 " `wsize` defines the actual size of the window itself and `position` defines",

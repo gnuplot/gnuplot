@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.57 2017/04/25 19:29:30 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.58 2017/05/13 11:49:29 markisch Exp $
  */
 
 /*
@@ -1275,8 +1275,8 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 		case W_pointsize:
 			if (curptr->x > 0) {
 				double pointsize = curptr->x / 100.0;
-				htic = MulDiv(pointsize * lpgw->htic, rr - rl, lpgw->xmax) + 1;
-				vtic = MulDiv(pointsize * lpgw->vtic, rb - rt, lpgw->ymax) + 1;
+				htic = MulDiv(pointsize * lpgw->pointscale * lpgw->htic, rr - rl, lpgw->xmax) + 1;
+				vtic = MulDiv(pointsize * lpgw->pointscale * lpgw->vtic, rb - rt, lpgw->ymax) + 1;
 			} else {
 				htic = vtic = 0;
 			}

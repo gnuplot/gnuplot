@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.4 2017/05/08 07:53:53 markisch Exp $
+ * $Id: wd2d.cpp,v 1.5 2017/05/13 11:49:29 markisch Exp $
  */
 
 /*
@@ -1452,8 +1452,8 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 		case W_pointsize:
 			if (curptr->x > 0) {
 				double pointsize = curptr->x / 100.0;
-				htic = pointsize * MulDiv(lpgw->htic, rr - rl, lpgw->xmax) + 1;
-				vtic = pointsize * MulDiv(lpgw->vtic, rb - rt, lpgw->ymax) + 1;
+				htic = MulDiv(pointsize * lpgw->pointscale * lpgw->htic, rr - rl, lpgw->xmax) + 1;
+				vtic = MulDiv(pointsize * lpgw->pointscale * lpgw->vtic, rb - rt, lpgw->ymax) + 1;
 			} else {
 				htic = vtic = 0;
 			}
