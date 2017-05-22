@@ -1,3 +1,9 @@
+2017-05-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/stats.c:  Clean exit from stats routine after finding no data in
+	input file.
+	Bug #1930
+
 2017-05-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (WM_SIZE):  Track canvas (and window) size.

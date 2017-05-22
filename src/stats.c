@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stats.c,v 1.14.2.11 2016/09/06 19:43:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stats.c,v 1.14.2.12 2016/09/28 05:38:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stats.c */
@@ -937,6 +937,7 @@ statsrequest(void)
 	    int_warn( NO_CARET, "All points out of range" );
 	else
 	    int_warn( NO_CARET, "No valid data points found in file" );
+	goto stats_cleanup;
     }
 
     /* The analysis variables are named STATS_* unless the user either */
