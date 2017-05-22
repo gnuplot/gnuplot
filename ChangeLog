@@ -2,8 +2,10 @@
 
 	* Branchpoint for 5.2 (cvs tag -b branch-5-2-stable)
 
-	* VERSION PATCHLEVEL docs/gnuplot.doc docs/titlepag.tex src/version.c:
-	Bump verion info to 5.2.rc0
+	* VERSION PATCHLEVEL docs/gnuplot.doc docs/titlepag.tex src/version.c
+	configure.ac:
+
+	Bump version info to 5.2.rc0
 	This is not an actual release, just an internal identifier while we 
 	assemble and test a first real 5.2 release candidate.
 
