@@ -2,6 +2,25 @@
 
 	* Branchpoint for 5.2 (cvs tag -b branch-5-2-stable)
 
+	The main development branch (this one) remains 5.1 for now but will have
+	its version number bumped to 5.3 when 5.2 is released later this year.
+
+                                >>> NOTE <<<
+
+	Starting now
+	============
+
+	* Bugfixes for code already in place should be applied both to the main
+	branch (this one) and to the stable branch (branch-5-2-stable).
+
+	* Major new features and experimental changes belong here, not in the
+	stable branch.  They will appear eventually in release 5.4.
+
+	* Minor new features can go in both branches at your discretion, but
+	remember that the stable branch should ideally never break.
+	That means new code should be tested here in the development branch
+	first and only after testing be added or back-ported for 5.2.
+
 2017-05-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc:  Various trivial tweaks to improve the layout and
