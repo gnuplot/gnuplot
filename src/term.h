@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.71 2016/11/17 22:57:20 sfeam Exp $
+ * $Id: term.h,v 1.72 2017/05/18 21:18:57 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -234,9 +234,13 @@
 # include "caca.trm"
 #endif
 
-/* Legacy terminal for export to AutoCad (Release 10.x) */
-/* DWGR10 format (1988) */
-/* #include "dxf.trm" */
+/* Legacy terminal for export to AutoCad (Release 10.x)
+ * DWGR10 format (1988)
+ * Still included by popular demand although basically untouched for 20+ years.
+ * Someone please update this terminal to adhere to a newer DXF standard!
+ * http://images.autodesk.com/adsk/files/autocad_2012_pdf_dxf-reference_enu.pdf
+ */
+#include "dxf.trm"
 
 /* Enhanced Metafile Format driver */
 #include "emf.trm"
