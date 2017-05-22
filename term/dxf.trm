@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: dxf.trm,v 1.16 2006/07/21 02:35:45 sfeam Exp $
+ * $Id: dxf.trm,v 1.17 2017/05/18 21:19:16 sfeam Exp $
  *
  */
 
@@ -411,10 +411,11 @@ START_HELP(dxf)
 "?terminal dxf",
 "?term dxf",
 "?dxf",
-" Legacy terminal driver `dxf` for export to  AutoCad (Release 10.x).",
+" Terminal driver `dxf` for export to  AutoCad (Release 10.x).",
 " It has no options. The default size is 120x80 AutoCad units.",
 " `dxf` uses seven colors (white, red, yellow, green, cyan, blue and magenta)",
 " that can be changed only by modifying the source file.  If a black-and-white",
-" plotting device is used the colors are mapped to differing line thicknesses."
+" plotting device is used the colors are mapped to differing line thicknesses.",
+" Note: someone please update to use the 2012 DXF standard!"
 END_HELP(dxf)
 #endif /* TERM_HELP */

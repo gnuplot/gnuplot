@@ -1,5 +1,5 @@
-Changes not in 5.0
-==================
+Changes and new features in 5.2
+===============================
 * NEW plot styles
 * NEW    splot ... using <x>:<y>:<z>:<zlow>:<zhigh> with zerrorfill
 * NEW    "set jitter" allows creation of bee swarm plots

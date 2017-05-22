@@ -1,5 +1,255 @@
-		GNUPLOT VERSION 5.2 NOTES
-		=========================
+		GNUPLOT Version 5.2.rc0 Release Notes
+		=====================================
 
-This file is a placeholder for the release notes that will accompany
-stable gnuplot release 5.2.0.   
+This is a pre-release testing copy of gnuplot version 5.2.
+Please see the ChangeLog files for a complete list of work over the
+course of development from 5.0 to 5.2.
+
+Release Notes date: 22-May-2017
+
+FEATURES INTRODUCED IN VERSION 5.2
+==================================
+
+* NEW plot styles
+	splot ... using <x>:<y>:<z>:<zlow>:<zhigh> with zerrorfill
+	"set jitter" allows creation of bee swarm plots
+	data filter "bins" sorts input into equal width bins on x
+	"with points" and "with linespoints" accept `pointtype variable`
+	hidden3d now treats 'image' and 'rgbimage' as occluding rectangles
+	"smooth fnormal" normalized frequency
+* NEW polar mode improvements and extensions
+	"set [m]ttics" places labels around perimeter of polar grid
+	"set rlabel" places a label above the r axis
+	"set rrange [90:0]" plots in celestial horizontal coordinates
+	"set border polar" uses border linetype for perimeter of polar plot
+	"set theta <origin> <sense>" orientation of polar coordinate theta
+	label, arrow, and object positions may be given in polar coordinates
+* NEW nonlinear coordinate systems
+	"set nonlinear <axis> via f(axis) inverse g(axis)"
+	"set log" re-implemented as special case of "set nonlinear"
+* NEW data type array[size]
+* NEW commands and command options
+	"break" exits from iteration loop
+	"continue" begins next iteration immediately
+	"toggle {<plotno> | "plottitle" | all}"
+	"set pm3d lighting" specifies lighting model with specular highlighting
+	"set table OUTFILE {append}"
+	"set minussign" and "set micro" (first appeared in 5.0.5)
+	"set view azimuth <angle>" controls azimuth of the z axis in 3D plots
+	"save fit <filename>" replaces deprecated command "update"
+* NEW terminals and terminal options
+	terminal domterm (supports in-line SVG in DomTerm terminal emulator)
+	terminal sixelgd (sixel terminal graphics using gdlib)
+	svg 'standalone' embeds images rather than including by reference
+	windows terminal supports saving graph as bitmap
+	windows graph windows can be docked to the wgnuplot text window
+	wxt supports saving graph as EMF on Windows
+	wxt supports printing on Windows
+	dumb suports ANSI colors and filled polygons
+* NEW Optional sampling interval in range specifier for pseudofile '+'
+* NEW gnuplot on Windows
+*        converts Unicode (BMP) input to current `set encoding`, including UTF-8
+*        is system DPI aware
+* NEW textbox style supports fillcolor and bordercolor
+
+
+CHANGES FROM PREVIOUS VERSIONS
+==============================
+
+Gnuplot development assigns very high priority to backward compatibility
+with earlier versions.  However changes introduced in version 5 can affect
+the operation of some version 4 scripts.  Please see section
+"Differences from Version 4" in the User Manual.
+
+The "update" command is still recognized in version 5.2 but is deprecated
+and will be removed in the next version. Use "save fit" instead.
+
+The auto-placement of axis labels, title, timestamps and other text items
+on the page has changed slightly since versio 5.0.
+
+Other minor changes
+* point style associated with "plot with labels" is shown in the key
+* Track font/enhanced for key title separately from the key entries
+* order of margins in `set margins <left>, <right>, <bottom>, <top>`
+* Store and reuse x,y dimensions from the time image data is read in
+* Some STATS_* variables are of type integer rather than real (complex) 
+* ^R starts a backward search when using the built-in readline
+* Only update axis->data_min/max if the point being stored is INRANGE
+* auto-generation of minitics on logscale axis has changed
+* revised printing dialogs on Windows
+* preserve whitespace following opening { in enhanced text strings
+* windows terminal provides better oversampling
+* New default "set key fixed" prevents 3D key box from rotating with plot
+* windows terminal also uses GDI+ for printing and copy-to-clipboard
+* raxis/polar grid can coexist with cartesian axes
+* evaluation of norm(x) or x**y returns 0 on floating underflow
+* support for space-in-x11-raises-KDE3-konsole is now a configure option
+* don't use loadpath to choose output directory for "save"
+* GNUTERM may contain terminal options in addition to bare terminal name
+
+
+ONLINE DEMO PLOTS
+=================
+
+Demo plots illustrating new and old features are online at
+  http://gnuplot.sourceforge.net/demo_5.2/
+
+
+KNOWN ISSUES
+============
+
+* If you configure in the wxt terminal without also configuring in X11,
+  you may need to set the environmental variable TERMLIBS:
+    TERMLIBS="-lX11"  ./configure
+  Version 3.0.0 of the wxgtk library is buggy; please use a newer version.
+
+* Compilation on Solaris may require adding -liconv to LIB_FLAGS
+  Building the plugin demo with a SunPro Compiler requires changing the
+  build flags as shown in comments in ./demo/plugin/Makefile.am
+
+* Font initialization on OSX can be very slow, causing the qt terminal to
+  issue warning or error messages for the first plot command.
+
+* The antialiasing option produces artifacts in some versions of Qt.
+  In particular point types 1 and 2 appear unbalanced due to shading.
+
+* You can configure support for both wxt and qt into the same gnuplot
+  executable, but only one of these two output modes can be used in any
+  given gnuplot session.
+
+* The gnuplot build system is not very good at figuring out where to find
+  or install LaTeX-related files.  This can affect use of the lua/tikz
+  and ConTeXt terminals.
+
+* Using mouse clicks to toggle individual plots on/off does not always
+  work correctly for multiplots if the key box is opaque.
+  Toggling plots drawn in hidden3d mode (hidden line removal) does not work.
+
+* Mouse double-click to export terminal coordinates to the X11 clipboard
+  no longer works reliably, and may be deprecated in the future.
+
+* The "update" command for use with "fit" does not work as documented, and 
+  in practice works differently on different platforms.  Use with caution.
+  This command will probably be revised for subsequent gnuplot releases.
+
+
+		 NOTES TO PACKAGERS AND TESTERS 
+		===============================
+
+Obsolete or deprecated components
+---------------------------------
+
+The "gnuplot mode" elisp and TeX files for use with emacs are now
+maintained as a separate project: https://github.com/bruceravel/gnuplot-mode
+so there is no longer a configuration option --with-lisp-files.
+
+The TeX tutorial produced by --with-tutorial is horribly out of date.
+
+./configure --enable-backwards-compatibility will allow use of some
+deprecated syntax from old gnuplot versions.  However the result of
+using these deprecated commands may not match the old version output.
+
+
+Configuration options for interactive use
+-----------------------------------------
+
+The 5.2 source code supports three primary cross-platform output modes
+in addition to several platform-specific modes.
+
+1) Qt
+   The qt terminal supports interactive display with menu-driven
+   output to png, svg or pdf.  If either Qt4 or Qt5 is detected by the
+   configure script, this will be the default terminal.  It is now the
+   fastest and most full-featured interactive terminal option.
+
+   To disable this terminal:
+      ./configure --without-qt
+
+   To force use of Qt4 even if Qt5 is present:
+      ./configure --with-qt=qt4
+
+2) Cairo/pango/wxWidgets
+   This set of terminals includes
+   - pngcairo, pdfcairo, epscairo, and cairolatex for output to a file
+   - wxt for interactive display
+   All of these will be built by default if the configuration script finds
+   the required libcairo, libpango, libcairo, libwxgtk, and related
+   support libraries
+   To disable these terminals:
+       ./configure --without-cairo
+       ./configure --with-cairo --disable-wxwidgets
+
+3) X11 (the "classic" interactive interface)
+   This used to be the preferred interactive interface, but the newer
+   wxt and qt terminals offer nicer output and a wider range of features.
+
+
+Options for output to files
+---------------------------
+
+Of course the terminals (output modes) present in previous gnuplot versions
+are also still available. These include, among many more obscure options:
+
+- png/jpeg/gif output via libgd
+- PostScript (*.ps or *.eps)
+- Many flavors of TeX/LaTeX output, including TikZ and ConTeXt
+- Bitmapped output to support older devices (e.g. HP deskjet, epson, and
+  seiko printers, pbm bitmapped graphics files) is available if needed
+  but is no longer configured in by default.
+      ./configure --with-bitmap-terminals
+
+Options for generating interactive plots for web display
+--------------------------------------------------------
+
+- Mouseable output for display on the web can be created using either 
+  the canvas terminal (HTML5 2D canvas element) or the svg terminal.
+  Both allow zooming, toggling plot elements on/off, and user-scriptable
+  hot keys.
+
+			OTHER NOTES
+			===========
+
+Installation
+------------
+
+You can download a source tarball for gnuplot version 5.2.rc1 from the 
+gnuplot development site on SourceForge.
+	http://sourceforge.net/projects/gnuplot
+
+Installation instructions are available in the source itself; the short
+version for linux/unix-like systems is to unpack the tarball and then
+<PRE>
+build it:
+      cd gnuplot-5.2.rc1 ; ./configure ; make
+test it:
+      make check
+install it:
+      make install
+</PRE>
+
+Pay careful attention to the output of the ./configure script.
+It may indicate that some output drivers have been omitted because the
+necessary support libraries were not found.  In general you need to have
+previously installed the "*-devel-*" versions of these libraries. 
+
+
+Support
+-------
+Please report all bugs and installation problems to the bug tracker
+on SourceForge:
+	http://sourceforge.net/p/gnuplot/bugs/
+
+There is also an gnuplot discussion forum on usenet group
+	comp.graphics.apps.gnuplot
+
+
+Development
+-----------
+Gnuplot development is ongoing. The development branch on SourceForge
+contains preliminary implementations of new features.
+The source for version 5.2 is held in a separate branch of the CVS repository
+tagged as "branch-5-2-stable".  Development continues in the main branch using
+the version number 5.3 (odd minor number), for eventual release as stable
+version 5.4 (even minor number).  Bugfixes to version 5.2 will appear in
+patchlevel releases 5.2.1, 5.2.2, etc., approximately twice a year or
+as needed to correct a serious problem.
