@@ -10,47 +10,53 @@ Release Notes date: 22-May-2017
 FEATURES INTRODUCED IN VERSION 5.2
 ==================================
 
-* NEW plot styles
-	splot ... using <x>:<y>:<z>:<zlow>:<zhigh> with zerrorfill
-	"set jitter" allows creation of bee swarm plots
-	data filter "bins" sorts input into equal width bins on x
-	"with points" and "with linespoints" accept `pointtype variable`
-	hidden3d now treats 'image' and 'rgbimage' as occluding rectangles
-	"smooth fnormal" normalized frequency
+* NEW plot styles and options
+	o splot ... using <x>:<y>:<z>:<zlow>:<zhigh> with zerrorfill
+	o "set jitter" allows creation of bee swarm plots
+	o data filter "bins" sorts input into equal width bins on x
+	o "with points" and "with linespoints" accept `pointtype variable`
+	o hidden3d now treats 'image' and 'rgbimage' as occluding rectangles
+	o "smooth fnormal" normalized frequency
+	o Optional sampling interval in range specifier for pseudofile '+'
+
 * NEW polar mode improvements and extensions
-	"set [m]ttics" places labels around perimeter of polar grid
-	"set rlabel" places a label above the r axis
-	"set rrange [90:0]" plots in celestial horizontal coordinates
-	"set border polar" uses border linetype for perimeter of polar plot
-	"set theta <origin> <sense>" orientation of polar coordinate theta
-	label, arrow, and object positions may be given in polar coordinates
+	o "set [m]ttics" places labels around perimeter of polar grid
+	o "set rlabel" places a label above the r axis
+	o "set rrange [90:0]" plots in celestial horizontal coordinates
+	o "set border polar" uses border linetype for perimeter of polar plot
+	o "set theta <origin> <sense>" orientation of polar coordinate theta
+	o label, arrow, and object positions may be given in polar coordinates
+
 * NEW nonlinear coordinate systems
-	"set nonlinear <axis> via f(axis) inverse g(axis)"
-	"set log" re-implemented as special case of "set nonlinear"
+	o "set nonlinear <axis> via f(axis) inverse g(axis)"
+	o "set log" re-implemented as special case of "set nonlinear"
+
 * NEW data type array[size]
+
 * NEW commands and command options
-	"break" exits from iteration loop
-	"continue" begins next iteration immediately
-	"toggle {<plotno> | "plottitle" | all}"
-	"set pm3d lighting" specifies lighting model with specular highlighting
-	"set table OUTFILE {append}"
-	"set minussign" and "set micro" (first appeared in 5.0.5)
-	"set view azimuth <angle>" controls azimuth of the z axis in 3D plots
-	"save fit <filename>" replaces deprecated command "update"
+	o "break" exits from iteration loop
+	o "continue" begins next iteration immediately
+	o "toggle {<plotno> | "plottitle" | all}"
+	o "set pm3d lighting" specifies lighting model with specular highlighting
+	o "set table OUTFILE {append}"
+	o "set minussign" and "set micro" (first appeared in 5.0.5)
+	o "set view azimuth <angle>" controls azimuth of the z axis in 3D plots
+	o "save fit <filename>" replaces deprecated command "update"
+	o "set style textbox" supports fillcolor and bordercolor
+
 * NEW terminals and terminal options
-	terminal domterm (supports in-line SVG in DomTerm terminal emulator)
-	terminal sixelgd (sixel terminal graphics using gdlib)
-	svg 'standalone' embeds images rather than including by reference
-	windows terminal supports saving graph as bitmap
-	windows graph windows can be docked to the wgnuplot text window
-	wxt supports saving graph as EMF on Windows
-	wxt supports printing on Windows
-	dumb suports ANSI colors and filled polygons
-* NEW Optional sampling interval in range specifier for pseudofile '+'
+	o terminal domterm (supports in-line SVG in DomTerm terminal emulator)
+	o terminal sixelgd (sixel terminal graphics using gdlib)
+	o svg 'standalone' embeds images rather than including by reference
+	o windows terminal supports saving graph as bitmap
+	o windows graph windows can be docked to the wgnuplot text window
+	o wxt supports saving graph as EMF on Windows
+	o wxt supports printing on Windows
+	o dumb suports ANSI colors and filled polygons
+
 * NEW gnuplot on Windows
-*        converts Unicode (BMP) input to current `set encoding`, including UTF-8
-*        is system DPI aware
-* NEW textbox style supports fillcolor and bordercolor
+	o converts Unicode (BMP) input to current `set encoding`, including UTF-8
+	o the program is system DPI aware
 
 
 CHANGES FROM PREVIOUS VERSIONS
@@ -68,11 +74,13 @@ The auto-placement of axis labels, title, timestamps and other text items
 on the page has changed slightly since versio 5.0.
 
 Other minor changes
+===================
+
 * point style associated with "plot with labels" is shown in the key
 * Track font/enhanced for key title separately from the key entries
 * order of margins in `set margins <left>, <right>, <bottom>, <top>`
 * Store and reuse x,y dimensions from the time image data is read in
-* Some STATS_* variables are of type integer rather than real (complex) 
+* Some STATS_foo variables are of type integer rather than real (complex) 
 * ^R starts a backward search when using the built-in readline
 * Only update axis->data_min/max if the point being stored is INRANGE
 * auto-generation of minitics on logscale axis has changed
@@ -148,6 +156,9 @@ The TeX tutorial produced by --with-tutorial is horribly out of date.
 ./configure --enable-backwards-compatibility will allow use of some
 deprecated syntax from old gnuplot versions.  However the result of
 using these deprecated commands may not match the old version output.
+
+Terminal drivers for Next/Openstep and Sun workstations are no longer
+included.  Legacy terminal for coreldraw is no longer built by default.
 
 
 Configuration options for interactive use

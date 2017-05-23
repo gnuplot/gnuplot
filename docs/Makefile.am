@@ -46,7 +46,7 @@ gih_DATA = gnuplot.gih
 gihdir = @GIHDIR@
 
 noinst_PROGRAMS = checkdoc doc2ipf doc2tex doc2gih doc2rnh doc2hlp	\
-                  doc2rtf doc2ms alldoc2gih doc2wxhtml
+                  doc2rtf doc2ms alldoc2gih
 
 AM_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/term
 
@@ -78,7 +78,8 @@ DOCHEADERS = doc2x.h xref.h
 EXTRA_DIST = Makefile.in doc2texi.el figure_missing.pdf gnuplot.doc \
 titlepag.ipf titlepag.ms titlepag.tex	\
 toc_entr.sty psdoc faq-ja.tex gnuplot-ja.doc README.ja	\
-term-ja.diff plotstyles.gnu gnuplot.pdf windows
+term-ja.diff plotstyles.gnu gnuplot.pdf \
+windows/wgnuplot.* windows/doc2html.c 
 
 ELCS = gnuplot-eldoc.elc
 

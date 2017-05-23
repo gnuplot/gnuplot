@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1084 2017/05/21 17:37:35 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1084.2.1 2017/05/22 05:29:39 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -11069,7 +11069,7 @@ Ffigure_multiple_keys
  given individual style properties. Circles, ellipses, and polygons  inherit the
  fill style from `set style fill`.  Objects to be drawn in 2D plots may be 
  defined in any combination of axis, graph, polar, or screen coordinates.
- 
+
  Object specifications in 3D plots cannot use graph coordinates.
  Rectangles and ellipses in 3D plots are limited to screen coordinates.
 
