@@ -1,7 +1,7 @@
 2017-05-23  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* Makefile.maint README RELEASE_NOTES configure.ac docs/Makefile.am:
-	Continued preparation for 5.2 release.
+	* Makefile.maint README RELEASE_NOTES configure.ac docs/Makefile.am
+	ReleaseNotes.css: Continued preparation for 5.2 release.
 
 2017-05-23  Bastian Maerkisch  <bmaerkisch@web.de>
 
