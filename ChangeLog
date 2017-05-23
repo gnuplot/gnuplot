@@ -1,3 +1,11 @@
+2017-05-23  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	src/qtterminal/qt_term.cpp (qt_waitforinput):  The Windows code waits
+	for the named pipe internally used by the QLocalSocket object. But in
+	some cases the Qt object itself will not provide new data.  Handle
+	that case by Sleep()ing to release the CPU instead of idling rapidly.
+	Bug fix.
+
 2017-05-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/stats.c:  Clean exit from stats routine after finding no data in

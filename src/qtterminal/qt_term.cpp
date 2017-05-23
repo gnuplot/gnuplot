@@ -1145,6 +1145,7 @@ int qt_waitforinput(int options)
 			// are received, only transmit the last one.
 			gp_event_t tempEvent;
 			tempEvent.type = -1;
+			int size = qt->socket.bytesAvailable();
 			while (qt->socket.bytesAvailable() >= (int)sizeof(gp_event_t)) {
 				struct gp_event_t event;
 				qt->socket.read((char*) &event, sizeof(gp_event_t));
@@ -1163,6 +1164,10 @@ int qt_waitforinput(int options)
 					}
 				}
 			}
+			// If the native pipe handle signalled new data, but the QtLocalSocket 
+			// object has no data available, release the CPU for a little while.
+			if (size == 0)
+				Sleep(100);
 			// Replay move event
 			if (tempEvent.type == GE_motion)
 				qt_processTermEvent(&tempEvent);
