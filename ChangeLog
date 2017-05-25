@@ -1,3 +1,8 @@
+2017-05-25  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c (GraphEnd):  Let the gnuplot core know the current
+	window ID.
+
 2017-05-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* Makefile.maint README RELEASE_NOTES configure.ac docs/Makefile.am
