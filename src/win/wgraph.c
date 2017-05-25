@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.254 2017/05/15 14:58:46 markisch Exp $
+ * $Id: wgraph.c,v 1.255 2017/05/21 08:43:44 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -767,7 +767,7 @@ GraphEnd(LPGW lpgw)
 	lpgw->locked = FALSE;
 	UpdateWindow(lpgw->hWndGraph);
 #ifdef USE_MOUSE
-	gp_exec_event(GE_plotdone, 0, 0, 0, 0, 0);	/* notify main program */
+	gp_exec_event(GE_plotdone, 0, 0, 0, 0, lpgw->Id);	/* notify main program */
 #endif
 }
 
