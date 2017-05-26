@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.ac,v 1.30.2.1 2017/05/22 05:31:54 sfeam Exp $
+dnl $Id: configure.ac,v 1.30.2.2 2017/05/24 01:01:28 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -10,7 +10,7 @@ AC_INIT([gnuplot],[5.2.rc0])
 AC_CONFIG_SRCDIR(src/graphics.c)
 AC_PREREQ([2.69])
 AC_CONFIG_HEADERS(config.h:config.hin)
-AC_DEFINE(DEVELOPMENT_VERSION,1,[Provide contact info for gnuplot develoment])
+dnl AC_DEFINE(DEVELOPMENT_VERSION,1,[Provide contact info for gnuplot develoment])
 AM_INIT_AUTOMAKE([1.10 subdir-objects])
 
 AM_MAINTAINER_MODE
@@ -83,7 +83,7 @@ AC_FUNC_FSEEKO
 AC_SYS_LARGEFILE
 
 AC_ARG_WITH(libcerf,dnl
-[  --without-libcerf      build without special functions from libcerf (default enabled)],,
+[  --without-libcerf       build without special functions from libcerf (default enabled)],,
   [test -z "${with_libcerf}" && with_libcerf=yes])
 
 if test "${with_libcerf}" = yes ; then
@@ -371,7 +371,7 @@ dnl TODO: simplify, get rid of GGI_SUPPORT
 dnl new ggi driver
 GGI_SUPPORT=no
 AC_ARG_WITH(ggi,dnl
-[  --with-ggi[=DIR]        enable the ggi driver],
+[  --with-ggi[=DIR]          enable the ggi driver],
   [if test "$withval" != no; then
      if test -d $withval/include; then
        CPPFLAGS="$CPPFLAGS -I$withval/include"
@@ -394,7 +394,7 @@ please add path to ggi/wmh.h to CPPFLAGS in Makefile]))
    fi])
 
 AC_ARG_WITH(xmi,dnl
-[  --with-xmi[=DIR]        ggi's xmi support for pm3d (EXPERIMENTAL)],
+[  --with-xmi[=DIR]          ggi's xmi support for pm3d (EXPERIMENTAL)],
   [if test "$withval" != no -a "$GGI_SUPPORT" = yes; then
      if test -d $withval/include; then
        CPPFLAGS="$CPPFLAGS -I$withval/include"
@@ -564,7 +564,7 @@ dnl check presence of gd library
 dnl we don't check for libfreetype and libjpeg locations - if gd requires
 dnl them, the gdlib-config scipt contains all the required information
 AC_ARG_WITH(gd,dnl
-[  --with-gd[=DIR]         where to find Tom Boutell's gd library],,
+[  --with-gd[=DIR]           where to find Tom Boutell's gd library],,
   with_gd=yes)
 
 if test "$with_gd" != no; then
@@ -639,7 +639,7 @@ AC_SEARCH_LIBS([iconv_open], [iconv],
 
 dnl check presence of lua/TikZ support
 AC_ARG_WITH(lua,dnl
-[  --without-lua         disable lua/TikZ terminal (default enabled)],,
+[  --without-lua           disable lua/TikZ terminal (default enabled)],,
   [test -z "${with_lua}" && with_lua=yes])
 
 dnl Some distributions allow for parallel installation of different
@@ -766,7 +766,7 @@ AC_ARG_WITH(row-help,dnl
 dnl Whether we want to create the LaTeX tutorial
 TUTORIAL=notutorial
 AC_ARG_WITH(tutorial,dnl
-[  --with-tutorial      process the LaTeX tutorial when building])
+[  --with-tutorial         process the LaTeX tutorial when building])
 dnl only if latex/2e is found
 if test "$with_latex" != no -a "$with_tutorial" = yes ; then
   TUTORIAL=tutorial
@@ -792,7 +792,7 @@ AC_ARG_ENABLE(x11-mbfonts,dnl
 
 dnl x11_external
 AC_ARG_ENABLE(x11_external,dnl
-[  --disable-x11-external        disable drawing to windows belonging to external apps],,
+[  --disable-x11-external  disable drawing to windows belonging to external apps],,
   test -z "$enable_x11_external" && enable_x11_external=yes)
 
 if test "$enable_x11_external" = yes; then
@@ -863,7 +863,7 @@ AC_ARG_ENABLE(boxed_text,dnl
 
 dnl disable the "space raises console" behaviour
 AC_ARG_ENABLE(raise-console,dnl
-[  --disable-raise-console        spacebar in plot window does not raise console],,
+[  --disable-raise-console spacebar in plot window does not raise console],,
   test -z "$enable_raise_console" && enable_raise_console=yes)
   if test "$enable_raise_console" != yes; then
       AC_DEFINE(DISABLE_SPACE_RAISES_CONSOLE,1,
@@ -884,7 +884,7 @@ dnl hidden3d compile-time options...
 dnl NOTE: have to check that they're not both turned on --- the code
 dnl doesn't allow that choice.
 AC_ARG_ENABLE(h3d-quadtree,dnl
-[  --disable-h3d-quadtree   disable quadtree optimization in hidden3d code],,
+[  --disable-h3d-quadtree  disable quadtree optimization in hidden3d code],,
   [test -z "${enable_h3d_quadtree}" && enable_h3d_quadtree=yes])
 if test "$enable_h3d_quadtree" = yes; then
      AC_DEFINE(HIDDEN3D_QUADTREE,1,
@@ -942,7 +942,7 @@ if test "x${cxxerror}" != "xyes"; then
 fi
 
 AC_ARG_ENABLE(wxwidgets,dnl
-[  --disable-wxwidgets      wxWidgets terminal (default enabled)],,
+[  --disable-wxwidgets     wxWidgets terminal (default enabled)],,
   [test -z "${enable_wxwidgets}" && enable_wxwidgets=yes])
 
 if test "${enable_wxwidgets}" = yes ; then
@@ -958,8 +958,7 @@ if test "${enable_wxwidgets}" = yes ; then
   dnl The user can specify another path for wx-config
   WXWIDGETS_PATH="${PATH}"
   AC_ARG_WITH(wx,dnl
-  [--with-wx=DIR   Where to find wx-config, the wxWidgets configuration program
-    (default search in $PATH)],
+  [--with-wx=DIR           Where to find wx-config, a wxWidgets confinguration tool],
     [ if test "${with_wx}" != "no" ; then
 	WXWIDGETS_PATH="${with_wx}:${PATH}"
      fi ])
@@ -1036,7 +1035,7 @@ dnl  End wxWidgets terminal
 
 dnl  Allow to disable terminals requiring bitmap support.
 AC_ARG_WITH(bitmap_terminals,dnl
-[  --with-bitmap-terminals         dot-matrix printers and pbm])
+[  --with-bitmap-terminals dot-matrix printers and pbm])
 AS_IF([test "x${with_bitmap_terminals}" = "xyes"],,
   AC_DEFINE(NO_BITMAP_SUPPORT,1,
           [ Define to disable terminals that depend on code in bitmap.c ]))
@@ -1044,20 +1043,20 @@ AM_CONDITIONAL(BUILD_BITMAP, test "${with_bitmap_terminals}" = yes)
 
 dnl  Allow to include gpic terminal
 AC_ARG_WITH(gpic,dnl
-[  --with-gpic                     gpic terminal])
+[  --with-gpic             gpic terminal])
 AS_IF([test "x${with_gpic}" = "xyes"],
   AC_DEFINE(HAVE_GPIC,1,
           [ Define to include support for gpic terminal ],))
 
 dnl  Allow to include mif (FrameMaker 3) terminal
 AC_ARG_WITH(mif,dnl
-[  --with-mif                     mif terminal (FrameMaker 3)])
+[  --with-mif              mif terminal (FrameMaker 3)])
 AS_IF([test "x${with_mif}" = "xyes"],
   AC_DEFINE(HAVE_MIF,1,
           [ Define to include support for mif terminal ],))
 
 AC_ARG_WITH(cairo,dnl
-[  --without-cairo      cairo-based terminals (default enabled)],,
+[  --without-cairo         cairo-based terminals (default enabled)],,
   [test -z "${with_cairo}" && with_cairo=yes])
 
 if test "${with_cairo}" = yes ; then
@@ -1090,7 +1089,7 @@ AM_CONDITIONAL(BUILD_GPCAIRO, test "${build_gpcairo}" = yes)
 
 dnl Enable subsystem to generate statistical summary of file contents
 AC_ARG_ENABLE(stats,dnl
-[  --disable-stats          Omit calculation of statistical summary of data],
+[  --disable-stats         Omit calculation of statistical summary of data],
   [if test "$enableval" != no; then
     AC_DEFINE(USE_STATS,1,
                [ Define to add support for generating a statistical summary of data])
@@ -1101,7 +1100,7 @@ AC_ARG_ENABLE(stats,dnl
 
 dnl Enable parsing of deprecated syntax
 AC_ARG_ENABLE(backwards-compatibility,dnl
-[  --enable-backwards-compatibility       enable deprecated syntax ],
+[  --enable-backwards-compatibility       enable some deprecated syntax ],
   [if test "$enableval" = yes; then
     AC_DEFINE(BACKWARDS_COMPATIBLE,1,
                [ Define to allow use of certain deprecated syntax. ])
