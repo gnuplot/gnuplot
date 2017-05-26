@@ -2,10 +2,10 @@
 		=====================================
 
 This is a pre-release testing copy of gnuplot version 5.2.
-Please see the ChangeLog files for a complete list of work over the
+Please see the ChangeLog file for a complete list of changes made during the
 course of development from 5.0 to 5.2.
 
-Release Notes date: 22-May-2017
+Release Notes date: 24-May-2017
 
 FEATURES INTRODUCED IN VERSION 5.2
 ==================================
@@ -16,11 +16,11 @@ FEATURES INTRODUCED IN VERSION 5.2
 	o data filter "bins" sorts input into equal width bins on x
 	o "with points" and "with linespoints" accept `pointtype variable`
 	o hidden3d now treats 'image' and 'rgbimage' as occluding rectangles
-	o "smooth fnormal" normalized frequency
+	o "smooth fnormal" plots normalized frequency
 	o Optional sampling interval in range specifier for pseudofile '+'
 
 * NEW polar mode improvements and extensions
-	o "set [m]ttics" places labels around perimeter of polar grid
+	o "set [m]ttics" places theta tics and labels on perimeter of polar grid
 	o "set rlabel" places a label above the r axis
 	o "set rrange [90:0]" plots in celestial horizontal coordinates
 	o "set border polar" uses border linetype for perimeter of polar plot
@@ -32,6 +32,8 @@ FEATURES INTRODUCED IN VERSION 5.2
 	o "set log" re-implemented as special case of "set nonlinear"
 
 * NEW data type array[size]
+	o any element A[i] of an array may be an integer, complex, or string value
+	o operator |A| gives the cardinality of array A
 
 * NEW commands and command options
 	o "break" exits from iteration loop
@@ -52,7 +54,7 @@ FEATURES INTRODUCED IN VERSION 5.2
 	o windows graph windows can be docked to the wgnuplot text window
 	o wxt supports saving graph as EMF on Windows
 	o wxt supports printing on Windows
-	o dumb suports ANSI colors and filled polygons
+	o dumb supports ANSI colors and filled polygons
 
 * NEW gnuplot on Windows
 	o converts Unicode (BMP) input to current `set encoding`, including UTF-8
@@ -62,24 +64,30 @@ FEATURES INTRODUCED IN VERSION 5.2
 CHANGES FROM PREVIOUS VERSIONS
 ==============================
 
+Backward compatibility
+----------------------
+
 Gnuplot development assigns very high priority to backward compatibility
 with earlier versions.  However changes introduced in version 5 can affect
 the operation of some version 4 scripts.  Please see section
 "Differences from Version 4" in the User Manual.
 
+
+Deprecated commands
+-------------------
+
 The "update" command is still recognized in version 5.2 but is deprecated
 and will be removed in the next version. Use "save fit" instead.
 
-The auto-placement of axis labels, title, timestamps and other text items
-on the page has changed slightly since versio 5.0.
-
 Other minor changes
-===================
+-------------------
 
+* Auto-placement of axis labels, title, and other text items
+  on the page has changed slightly since version 5.0
 * point style associated with "plot with labels" is shown in the key
-* Track font/enhanced for key title separately from the key entries
+* text properties for the key title are separate from the key entries
 * order of margins in `set margins <left>, <right>, <bottom>, <top>`
-* Store and reuse x,y dimensions from the time image data is read in
+* Store and reuse x,y dimensions at the time image data is read in
 * Some STATS_foo variables are of type integer rather than real (complex) 
 * ^R starts a backward search when using the built-in readline
 * Only update axis->data_min/max if the point being stored is INRANGE
@@ -89,7 +97,7 @@ Other minor changes
 * windows terminal provides better oversampling
 * New default "set key fixed" prevents 3D key box from rotating with plot
 * windows terminal also uses GDI+ for printing and copy-to-clipboard
-* raxis/polar grid can coexist with cartesian axes
+* raxis/polar grid can coexist with Cartesian axes
 * evaluation of norm(x) or x**y returns 0 on floating underflow
 * support for space-in-x11-raises-KDE3-konsole is now a configure option
 * don't use loadpath to choose output directory for "save"
@@ -135,10 +143,6 @@ KNOWN ISSUES
 
 * Mouse double-click to export terminal coordinates to the X11 clipboard
   no longer works reliably, and may be deprecated in the future.
-
-* The "update" command for use with "fit" does not work as documented, and 
-  in practice works differently on different platforms.  Use with caution.
-  This command will probably be revised for subsequent gnuplot releases.
 
 
 		 NOTES TO PACKAGERS AND TESTERS 
