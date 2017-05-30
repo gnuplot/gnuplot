@@ -17,8 +17,6 @@ DOCUMENTATION:
 PLATFORMS:
 ==========
 
- -- Configuration/installation on OSX remains problematic
-
  -- We've seen a proof-of-principle build of gnuplot into javascript
     running in a browser.  If the tool chain is simple enough, we could
     make this a build target for autoconf/make.
@@ -34,17 +32,6 @@ Make a library (e.g. usr/local/gnuplot/scripts/, .../gnuplot/bin) of
 
 -- enclose script "gpsavediff" that diff's output of gnuplot's "save" command 
 and default setup after "reset" 
-
--- move pm3d/contrib/* files into the proposed gnuplot library, then remove
-pm3d/contrib and pm3d/ from cvs
-
-I.e., the last point is the main question: where to put pm3d/contrib/* files?
-
-Or put them to gnuplot web page?
-
-Or get rid of them.  The plot in the demo can be accomplished with no
-fancy use of awk/pm3d.  See for example the plots in varcolor.dem.
-
 
 INSTALLATION --- LINUX:
 =======================

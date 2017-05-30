@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1083 2017/05/20 01:27:30 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1084 2017/05/21 17:37:35 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -270,9 +270,10 @@ C
 ?new features
 #start
 #b This gnuplot version introduces a new data type `array name[size]`.
-## An array must be declared before use. Each array element may be a string,
+## An array must be declared before use. Each array element A[i] may be a string,
 ## an integer, a real number, or a complex value.  A single array may contain
-## elements with different types. See `arrays`.
+## elements with different types.  The cardinality operator |A| returns the size
+## of array A. See `arrays`.
 #end
 
 4 New terminals and terminal options
@@ -2440,10 +2441,10 @@ C ... and restart the table:
  When discussing data files, the term "record" will be resurrected and used
  to denote a single line of text in the file, that is, the characters between
  newline or end-of-record characters.  A "point" is the datum extracted from
- a single record.  A "datablock" is a set of points from consecutive records,
- delimited by blank records.  A line, when referred to in the context of a
- data file, is a subset of a datablock.  Note that the term "datablock" may
- also be used when referring to a named inline data block (see `datablocks`).
+ a single record.  A "block" of data is a set of consecutive records delimited
+ by blank records.  A line, when referred to in the context of a data file,
+ is a subset of a block.  Note that the term "data block" may also be used to
+ refer to a named block inline data (see `datablocks`).
 2 inline data and datablocks
 ?inline data
 ?inline
@@ -2749,9 +2750,9 @@ Ffigure_newsyntax
 
 2 layers
 ?layers
-=behind
-=front
-=back
+?behind
+?front
+?back
  A gnuplot plot is built up by drawing its various components in a fixed order.
  This order can be modified by assigning some components to a specific layer
  using the keywords `behind`, `back`, or `front`. For example, to replace the
@@ -6110,8 +6111,9 @@ Ffigure_fenceplot
 ?every
  The `every` keyword allows a periodic sampling of a data set to be plotted.
 
- In the discussion a "point" is a datum defined by a single record in the
- file; "block" here will mean the same thing as "datablock" (see `glossary`).
+ In the discussion a "point" is a datum defined by a single record in the file;
+ a "block" of data is a set of consecutive records with blank lines before and
+ after the block.
 
  Syntax:
        plot 'file' every {<point_incr>}
@@ -6269,7 +6271,7 @@ Ffigure_fenceplot
  (i.e. not binary) data file.  The lines that are skipped do not count toward 
  the line count used in processing the `every` keyword.  Note that `skip N`
  skips lines only at the start of the file, whereas `every ::N` skips lines at
- the start of every data block in the file.  See also `binary skip` for a
+ the start of every block of data in the file.  See also `binary skip` for a
  similar option that applies to binary data files.
 4 smooth
 ?commands plot datafile smooth
@@ -12891,7 +12893,7 @@ Ffigure_multiple_keys
  If a 3D data set is recognizable as a mesh (grid) then by default the program
  implicitly treats the plot style `with lines` as requesting a gridded surface.
  See `grid_data`.  The command `set surface explicit` suppresses this expansion,
- plotting only the individual lines described by separate datablocks in the
+ plotting only the individual lines described by separate blocks of data in the
  input file.  A gridded surface can still be plotted by explicitly requesting
  splot `with surface`.
 3 table
@@ -14420,7 +14422,7 @@ Ffigure_multiple_keys
  Syntax:
        splot {<ranges>}
              {<iteration>}
-             <function> | {{<file name> | <data block name>} {datafile-modifiers}}
+             <function> | {{<file name> | <datablock name>} {datafile-modifiers}}
              {<title-spec>} {with <style>}
              {, {definitions{,}} <function> ...}
 
@@ -14479,16 +14481,16 @@ Ffigure_multiple_keys
 
  Data file organization is essentially the same as for `plot`, except that
  each point is an (x,y,z) triple.  If only a single value is provided, it
- will be used for z, the datablock number will be used for y, and the index
- of the data point in the datablock will be used for x.  If two or four values
+ will be used for z, the block number will be used for y, and the index
+ of the data point in the block will be used for x.  If two or four values
  are provided, `gnuplot` uses the last value for calculating the color in
  pm3d plots.  Three values are interpreted as an (x,y,z) triple.  Additional
  values are generally used as errors, which can be used by `fit`.
 
- Single blank records separate datablocks in a `splot` datafile; `splot`
- treats datablocks as the equivalent of function y-isolines.  No line will
- join points separated by a blank record.  If all datablocks contain the same
- number of points, `gnuplot` will draw cross-isolines between datablocks,
+ Single blank records separate blocks of data in a `splot` datafile; `splot`
+ treats blocks as the equivalent of function y-isolines.  No line will join
+ points separated by a blank record.  If all blocks contain the same number of
+ points, `gnuplot` will draw cross-isolines between points in the blocks,
  connecting corresponding points.  This is termed "grid data", and is required
  for drawing a surface, for contouring (`set contour`) and hidden-line removal
  (`set hidden3d`). See also `splot grid_data`.
@@ -14647,16 +14649,16 @@ Ffigure_multiple_keys
           3 2 10
 
  Note that "datafile.dat" defines a 4 by 3 grid ( 4 rows of 3 points each ).
- Rows (datablocks) are separated by blank records.
+ Rows (blocks) are separated by blank records.
 
  Note also that the x value is held constant within each dataline.  If you
  instead keep y constant, and plot with hidden-line removal enabled, you will
  find that the surface is drawn 'inside-out'.
 
  Actually for grid data it is not necessary to keep the x values constant
- within a datablock, nor is it necessary to keep the same sequence of y
+ within a block, nor is it necessary to keep the same sequence of y
  values.  `gnuplot` requires only that the number of points be the same for
- each datablock.  However since the surface mesh, from which contours are
+ each block.  However since the surface mesh, from which contours are
  derived, connects sequentially corresponding points, the effect of an
  irregular grid on a surface plot is unpredictable and should be examined
  on a case-by-case basis.
@@ -14674,9 +14676,9 @@ Ffigure_multiple_keys
  However, `gnuplot` does not require that format.  In the case of functions,
  'samples' need not be equal to 'isosamples', i.e., not every x-isoline
  sample need intersect a y-isoline. In the case of data files, if there
- are an equal number of scattered data points in each datablock, then
- "isolines" will connect the points in a datablock, and "cross-isolines"
- will connect the corresponding points in each datablock to generate a
+ are an equal number of scattered data points in each block, then
+ "isolines" will connect the points in a block, and "cross-isolines"
+ will connect the corresponding points in each block to generate a
  "surface".  In either case, contour and hidden3d modes may give different
  plots than if the points were in the intended format.  Scattered data can be
  converted to a {different} grid format with `set dgrid3d`.
@@ -14740,14 +14742,14 @@ Ffigure_multiple_keys
       STATS_outofrange        # number of records filtered out by range limits
       STATS_invalid           # number of invalid/incomplete/missing records
       STATS_blank             # number of blank lines in the file
-      STATS_blocks            # number of indexable datablocks in the file
+      STATS_blocks            # number of indexable blocks of data in the file
       STATS_columns           # number of data columns in the first row of data
 #\begin{tabular}{|lcl|} \hline
 #\verb@STATS_records@    & $~~N~~$ &  total number of in-range data records  \\
 #\verb@STATS_outofrange@ & $~~~~~$  &  number of records filtered out by range limits  \\
 #\verb@STATS_invalid@    & $~~~~~$  &  number of invalid/incomplete/missing records  \\
 #\verb@STATS_blank@      & $~~~~~$  &  number of blank lines in the file  \\
-#\verb@STATS_blocks@     & $~~~~~$  &  number of indexable datablocks in the file  \\
+#\verb@STATS_blocks@     & $~~~~~$  &  number of indexable blocks of data in the file  \\
 #\verb@STATS_columns@    & $~~~~~$  &  number of data columns in the first row of data  \\
 %l l .
 %Variable@Description
@@ -14756,7 +14758,7 @@ Ffigure_multiple_keys
 %STATS_outofrange@number of records filtered out by range limits
 %STATS_invalid@number of invalid/incomplete/missing records
 %STATS_blank@number of blank lines in the file
-%STATS_blocks@number of indexable datablocks in the file
+%STATS_blocks@number of indexable blocks of data in the file
 %STATS_columns@number of data columns in the first row of data
 @end table
 

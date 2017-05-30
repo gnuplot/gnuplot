@@ -5,7 +5,7 @@ SUBDIRS = config m4 term src docs man demo tutorial share
 
 EXTRA_DIST = BUGS CodeStyle Copyright FAQ.pdf GNUmakefile INSTALL INSTALL.gnu \
 Makefile.maint PATCHLEVEL PGPKEYS PORTING README RELEASE_NOTES \
-VERSION configure.vms pm3d win
+VERSION configure.vms win
 
 DISTCLEANFILES = stamp-h
 
