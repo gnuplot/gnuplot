@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.48 2016/08/21 22:24:55 sfeam Exp $
+ * $Id: wxt.trm,v 1.49 2017/02/09 21:13:23 sfeam Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -466,7 +466,7 @@ TERM_PUBLIC void wxt_text_wrapper()
 
 #ifdef TERM_TABLE
 TERM_TABLE_START (wxt_driver)
-    "wxt", "wxWidgets cross-platform windowed terminal",
+    "wxt", "wxWidgets cross-platform interactive terminal",
     /* the following values are overriden by wxt_graphics */
     1 /* xmax */ , 1 /* ymax */ , 1 /* vchar */ , 1 /* hchar */ ,
     1 /* vtic */ , 1 /* htic */ ,

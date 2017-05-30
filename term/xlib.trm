@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: xlib.trm,v 1.28 2013/08/25 00:53:16 sfeam Exp $
+ * $Id: xlib.trm,v 1.29 2014/04/30 04:49:45 sfeam Exp $
  */
 
 /* GNUPLOT - xlib.trm */
@@ -65,7 +65,7 @@ Xlib_reset()
 
 #ifdef TERM_TABLE
 TERM_TABLE_START(xlib_driver)
-    "xlib", "X11 Window System (gnulib_x11 dump)",
+    "xlib", "X11 Window System (dump of gnuplot_x11 command stream)",
     X11_XMAX, X11_YMAX, X11_VCHAR, X11_HCHAR,
     X11_VTIC, X11_HTIC, X11_options, Xlib_init, Xlib_reset,
     Xlib_text, null_scale, X11_graphics, X11_move, X11_vector,

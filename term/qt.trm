@@ -1,5 +1,5 @@
 /* GNUPLOT - qt.trm 
- * $Id: qt.trm,v 1.17 2017/02/11 04:14:40 sfeam Exp $
+ * $Id: qt.trm,v 1.18 2017/04/01 18:09:09 sfeam Exp $
  */
 
 /*[
@@ -44,7 +44,7 @@ register_term (qt)
 
 #ifdef TERM_TABLE
 TERM_TABLE_START (qt_driver)
-    "qt", "Qt terminal",
+    "qt", "Qt cross-platform interactive terminal",
     /* the following values are overriden by qt_graphics */
     1 /* xmax */ , 1 /* ymax */ , 1 /* vchar */ , 1 /* hchar */ ,
     1 /* vtic */ , 1 /* htic */ ,

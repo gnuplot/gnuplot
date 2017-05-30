@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.225 2015/03/29 17:26:00 sfeam Exp $
+ * $Id: x11.trm,v 1.226 2015/07/09 01:40:56 sfeam Exp $
  *
  */
 
@@ -2314,7 +2314,7 @@ X11_image(unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_i
 #ifdef TERM_TABLE
 
 TERM_TABLE_START(x11_driver)
-    "x11", "X11 Window System",
+    "x11", "X11 Window System interactive terminal",
     X11_XMAX, X11_YMAX, X11_VCHAR, X11_HCHAR,
     X11_VTIC, X11_HTIC, X11_options, X11_init, X11_reset,
     X11_text, null_scale, X11_graphics, X11_move, X11_vector,
