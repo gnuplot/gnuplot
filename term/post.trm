@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.296 2016/09/24 16:32:39 sfeam Exp $
+ * $Id: post.trm,v 1.297 2017/05/07 19:20:52 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1639,7 +1639,6 @@ SDict begin [\n\
   /Title (%s)\n\
   /Subject (gnuplot plot)\n\
   /Creator (gnuplot %s patchlevel %s)\n\
-  /Author (%s)\n\
 %%  /Producer (gnuplot)\n\
 %%  /Keywords ()\n\
   /CreationDate (%s)\n\
@@ -1802,18 +1801,11 @@ end\n\
 
     /* HH: print pdf information interpreted by ghostscript/acrobat */
     {
-	char *username=getusername();
-	char *username2=PS_escape_string(username,"()\\");
 	char *outstr2=PS_escape_string(outstr,"()\\");
 	fprintf(gppsfile, psi3,
 		outstr2?outstr2:"",
 		gnuplot_version, gnuplot_patchlevel,
-		username2?username2:"", 
 		timedate);
-	if (username)
-	    free(username);
-	if (username2)
-	    free(username2);
 	if (outstr2)
 	    free(outstr2);
     }
