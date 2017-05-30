@@ -1,12 +1,12 @@
-		GNUPLOT Version 5.2.alpha Release Notes
-		=======================================
+		GNUPLOT Version 5.2.rc1 Release Notes
+		=====================================
 
 This is a pre-release testing copy of gnuplot version 5.2.
 Please see the ChangeLog file for a complete list of changes made during the
 course of development from 5.0 to 5.2.
 A first release candidate for version 5.2 is expected in June 2017.
 
-Release Notes date: 26-May-2017
+Release Notes date: 31-May-2017
 
 FEATURES INTRODUCED IN VERSION 5.2
 ==================================
@@ -253,7 +253,7 @@ Support
 -------
 Please report all bugs and installation problems to the bug tracker
 on SourceForge:
-	http://sourceforge.net/p/gnuplot/bugs/
+	https://sourceforge.net/p/gnuplot/bugs/
 
 There is also an gnuplot discussion forum on usenet group
 	comp.graphics.apps.gnuplot

@@ -1,3 +1,5 @@
+2017-05-31  Release candidate 5.2.rc1
+
 2017-05-30  (Debian /debian-science/packages/gnuplot.git/)
 
 	* term/post.trm:  Do not emit Author field containing current username.

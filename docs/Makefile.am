@@ -288,8 +288,8 @@ wxhelp/wgnuplot.hhc wxhelp/wgnuplot.hhk wxhelp/*.html windows/*.png
 wxhelp/wgnuplot.html: doc2wxhtml$(EXEEXT) $(srcdir)/gnuplot.doc 
 	$(AM_V_GEN) ./doc2wxhtml$(EXEEXT) $(srcdir)/gnuplot.doc wxhelp/
 
-doc2wxhtml_SOURCES = windows/doc2html.c termdoc.c xref.c allterm.h
-doc2wxhtml_CPPFLAGS = -DALL_TERM_DOC -DWXHELP -I../src $(AM_CPPFLAGS)
+#doc2wxhtml_SOURCES = windows/doc2html.c termdoc.c xref.c allterm.h
+#doc2wxhtml_CPPFLAGS = -DALL_TERM_DOC -DWXHELP -I../src $(AM_CPPFLAGS)
 
 wxhelp_figures: $(GNUPLOT_EXE) $(srcdir)/plotstyles.gnu
 	$(AM_V_at) [ -d windows ] || mkdir -p windows
