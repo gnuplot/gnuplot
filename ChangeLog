@@ -1,3 +1,10 @@
+2017-05-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm term/qt.trm term/wxt.trm term/x11.trm term/xlib.trm
+	Makefile.am TODO BUGS docs/gnuplot.doc:  "set term" output now indicates
+	which terminals are interactive.  Extra distribution files updated in
+	parallel with 5.2 release. 
+
 2017-05-30  (Debian /debian-science/packages/gnuplot.git/)
 
 	* term/post.trm:  Do not emit Author field containing current username.
