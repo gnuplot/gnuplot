@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.ac,v 1.30.2.3 2017/05/26 21:54:50 sfeam Exp $
+dnl $Id: configure.ac,v 1.30.2.4 2017/05/30 23:26:39 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -1275,8 +1275,8 @@ AC_MSG_RESULT([gnuplot will be compiled with the following terminals:])
 AC_MSG_RESULT([])
 
 AC_MSG_RESULT([  Standalone terminals: yes (always builtin)])
-AC_MSG_RESULT([    canvas, cgm, context, corel, dumb, dxf, eepic, emf, emtex,])
-AC_MSG_RESULT([    epslatex, fig, hpgl,latex, metafont, metapost, mif, pcl5,])
+AC_MSG_RESULT([    canvas, cgm, context, dumb, dxf, eepic, emf, emtex,])
+AC_MSG_RESULT([    epslatex, fig, hpgl, latex, metafont, metapost, mif, pcl5,])
 AC_MSG_RESULT([    postscript, pslatex, pstex, pstricks, qms, svg,])
 AC_MSG_RESULT([    tek40xx, tek410x, texdraw, tgif, tkcanvas, tpic, vttek])
 AC_MSG_RESULT([])
@@ -1354,10 +1354,6 @@ fi
 
 if test "$build_src_beos_subdir" = yes; then
   AC_MSG_RESULT([  be terminal (BeOS): yes])
-fi
-
-if test "$is_next" = yes; then
-  AC_MSG_RESULT([  next terminal: yes])
 fi
 
 if test "$with_caca" = yes; then
@@ -1533,12 +1529,6 @@ AC_MSG_RESULT([])
 AC_MSG_RESULT([gnuplot will install the following additional materials:])
 AC_MSG_RESULT([])
 
-if test "$TUTORIAL" = tutorial; then
-  AC_MSG_RESULT([  LaTeX tutorial: yes])
-else
-  AC_MSG_RESULT([  LaTeX tutorial: no])
-fi
-
 if test "$with_latex" != no; then
   AC_MSG_RESULT([  cfg file for epslatex terminal: yes])
   if test "$with_lua" != no; then
@@ -1553,9 +1543,9 @@ else
   AC_MSG_RESULT([  TeX *.sty for lua/tikz terminal: no])
 fi
 
-AC_MSG_RESULT([  Help file: yes (always), in $GIHDIR/gnuplot.gih])
+AC_MSG_RESULT([  Help file: $GIHDIR/gnuplot.gih])
 
-AC_MSG_RESULT([  PostScript prologue files: yes (always)])
+AC_MSG_RESULT([  PostScript prologue files: $GIHDIR/PostScript/])
 
 dnl end config report
 
