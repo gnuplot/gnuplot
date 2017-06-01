@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1086 2017/06/01 23:23:43 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1087 2017/06/02 00:12:49 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8168,7 +8168,7 @@ Ffigure_fenceplot
 ?unset clabel
 ?show clabel
 ?clabel
- This command is obsolete. Use `set cntrlabel` instead.
+ This command is deprecated. Use `set cntrlabel` instead.
  `unset clabel` is replaced by `set cntrlabel onecolor`.
  `set clabel "format"` is replaced by `set cntrlabel format "format"`.
 3 clip
