@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.353 2017/04/24 17:03:55 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.354 2017/05/20 01:27:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2443,30 +2443,11 @@ toggle_command()
 	term->modify_plots(MODPLOTS_INVERT_VISIBILITIES, plotno);
 }
 
-/* Begin DEPRECATED section */
-/* process the 'update' command */
 void
 update_command()
 {
-    /* old parameter filename */
-    char *opfname = NULL;
-    /* new parameter filename */
-    char *npfname = NULL;
-
-    /* 5.2 gets a warning; after that the command goes away */
-    int_warn(NO_CARET, "DEPRECATED command 'update', please use 'save fit' instead");
-
-    c_token++;
-    if (!(opfname = try_to_get_string()))
-	int_error(c_token, "Parameter filename expected");
-    if (!END_OF_COMMAND && !(npfname = try_to_get_string()))
-	int_error(c_token, "New parameter filename expected");
-
-    update(opfname, npfname);
-    free(npfname);
-    free(opfname);
+    int_error(NO_CARET, "DEPRECATED command 'update', please use 'save fit' instead");
 }
-/* End DEPRECATED section */
 
 /* the "import" command is only implemented if support is configured for */
 /* using functions from external shared objects as plugins. */

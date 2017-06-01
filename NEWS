@@ -1,5 +1,10 @@
-Changes not in 5.0
+Changes not in 5.2
 ==================
+* CHANGE remove deprecated command "update"
+* CHANGE remove deprecated option "thru"
+
+New features, changes and fixes in gnuplot version 5.2
+======================================================
 * NEW plot styles
 * NEW    splot ... using <x>:<y>:<z>:<zlow>:<zhigh> with zerrorfill
 * NEW    "set jitter" allows creation of bee swarm plots

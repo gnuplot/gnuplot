@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1085 2017/05/30 23:48:43 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1086 2017/06/01 23:23:43 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -15028,27 +15028,6 @@ Ffigure_multiple_keys
 ?commands update
 ?update
  Note: This command is DEPRECATED.  Use `save fit` instead.
-
- The `update` command remains in version 5.2 for backwards compatibility but
- will be removed in later versions.
-
- Syntax:
-       update <filename> {<filename>}
-
- This command updates the current values of variables stored in the given
- file, which must be formatted as an initial-value file (see `fit`).
-
- If the file does not exist, a new file is created containing all
- currently defined user variables. All variables not used in the last fit
- are marked as "#FIXED". This is useful for saving the current values of fit
- variables for later use or for restarting a converged or stopped fit.
-
- If a second filename is supplied, the updated values are written to this
- file, and the original parameter file is left unmodified.
-
- Otherwise, if the file already exists, `gnuplot` first renames it by
- appending `.old` and then opens a new file.  That is, "`update 'fred'`"
- behaves the same as "`!rename fred fred.old; update 'fred.old' 'fred'`".
 2 While
 ?while
 ?commands while

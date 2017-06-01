@@ -13,6 +13,9 @@
 	The "thru" command, deprecated since version 4.0, is now removed
 	completely.
 
+	* src/command.c src/fit.c docs/gnuplot.doc:
+	The "update" command, deprecated since 5.0, is now removed completely.
+
 2017-05-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm term/qt.trm term/wxt.trm term/x11.trm term/xlib.trm
