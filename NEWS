@@ -1,3 +1,7 @@
+Changes in 5.2.rc2
+==================
+* FIX terminal initialization must be done before executing ~/.gnuplot
+
 Changes and new features in 5.2
 ===============================
 * NEW plot styles

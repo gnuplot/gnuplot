@@ -1,3 +1,20 @@
+2017-06-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.c src/plot.c src/term.c:  A 2017-04-10 patch re-ordered
+	initialization of the session state, the default terminal, and error
+	handling. This had the undesirable effect that a command in ~/.gnuplot
+	that queried the terminal state would segfault because the terminal
+	had not yet been initialized. Now we reorder again to (1) error handling
+	(2) terminal init (3) session state from ~/.gnuplot.  For safety also
+	add sanity checks in load_linetype() so that term == NULL does not 
+	segfault.
+
+	* configure.ac PATCHLEVEL docs/titlepag.tex src/version.c:
+	Bump patchlevel to rc2 
+
+	Changes above this line will appear first in 5.2.rc2 if there is one,
+	otherwise in 5.2.0.
+
 2017-05-31  Release candidate 5.2.rc1
 
 2017-05-30  (Debian /debian-science/packages/gnuplot.git/)
