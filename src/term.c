@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.331 2017/04/11 04:26:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.332 2017/05/14 04:19:13 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2812,7 +2812,8 @@ load_linetype(struct lp_style_type *lp, int tag)
 
 recycle:
 
-    if ((tag > 0) && (monochrome || (term->flags & TERM_MONOCHROME))) {
+    if ((tag > 0)
+    && (monochrome || (term && (term->flags & TERM_MONOCHROME)))) {
 	for (this = first_mono_linestyle; this; this = this->next) {
 	    if (tag == this->tag) {
 		*lp = this->lp_properties;
@@ -2842,7 +2843,7 @@ recycle:
 
 	    /* Needed in version 5.0 to handle old terminals (pbm hpgl ...) */
 	    /* with no support for user-specified colors */
-	    if (term->set_color == null_set_color)
+	    if (term && term->set_color == null_set_color)
 		lp->l_type = tag;
 
 	    /* Do not recycle point properties. */
