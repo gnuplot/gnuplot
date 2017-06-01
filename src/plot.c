@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.173 2017/04/11 04:26:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.174 2017/05/20 16:43:19 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -443,7 +443,7 @@ main(int argc, char **argv)
     interactive = FALSE;
 
     /* April 2017:  We used to call init_terminal() here, but now   */
-    /* We defer initialization until error handling has bee set up. */
+    /* We defer initialization until error handling has been set up. */
 
 # if defined(_WIN32) && !defined(WGP_CONSOLE)
     interactive = TRUE;
@@ -500,17 +500,18 @@ main(int argc, char **argv)
 	   to properly handle keyboard input. */
 	init_encoding();
 #endif
-	init_session();
-
-	/* April 2017: Now that the session is initialized and error handling
-	 * is in place, it is safe to allow parsing of GNUTERM during terminal
-	 * initialization. atexit processing is done in reverse order. We want
+	/* April 2017: Now that error handling is in place, it is safe parse
+	 * GNUTERM during terminal initialization.
+	 * atexit processing is done in reverse order. We want
 	 * the generic terminal shutdown in term_reset to be executed before
 	 * any terminal specific cleanup requested by individual terminals.
 	 */
 	init_terminal();
 	push_terminal(0);	/* remember the initial terminal */
 	gp_atexit(term_reset);
+
+	/* Execute commands in ~/.gnuplot */
+	init_session();
 
 	if (interactive && term != 0) {		/* not unknown */
 #ifdef GNUPLOT_HISTORY

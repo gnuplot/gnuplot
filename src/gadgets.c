@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.136 2017/02/01 19:48:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.137 2017/04/20 00:07:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -609,10 +609,7 @@ apply_pm3dcolor(struct t_colorspec *tc)
 	return;
     }
     if (tc->type == TC_LT) {
-	/* Removed Jan 2015 
-	if (!monochrome_terminal)
-	 */
-	    t->set_color(tc);
+	t->set_color(tc);
 	return;
     }
     if (tc->type == TC_RGB) {
