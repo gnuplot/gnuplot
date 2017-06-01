@@ -9,6 +9,10 @@
 	For safety also add sanity checks in load_linetype() so that
 	term == NULL does not segfault.
 
+	* src/datafile.c src/datafile.h src/plot2d.c docs/gnuplot.doc:
+	The "thru" command, deprecated since version 4.0, is now removed
+	completely.
+
 2017-05-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm term/qt.trm term/wxt.trm term/x11.trm term/xlib.trm

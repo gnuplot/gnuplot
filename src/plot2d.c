@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.429 2017/03/29 04:20:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.430 2017/03/31 18:41:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1331,29 +1331,6 @@ store2d_point(
     struct coordinate GPHUGE *cp = &(current_plot->points[i]);
     coord_type dummy_type = INRANGE;   /* sometimes we dont care about outranging */
     TBOOLEAN excluded_range = FALSE;
-
-#ifdef BACKWARDS_COMPATIBLE
-    /* jev -- pass data values thru user-defined function */
-    /* div -- y is dummy variable 2 - copy value there */
-    if (ydata_func.at) {
-	struct value val;
-
-	(void) Gcomplex(&ydata_func.dummy_values[0], y, 0.0);
-	ydata_func.dummy_values[2] = ydata_func.dummy_values[0];
-	evaluate_at(ydata_func.at, &val);
-	y = undefined ? 0.0 : real(&val);
-
-	(void) Gcomplex(&ydata_func.dummy_values[0], ylow, 0.0);
-	ydata_func.dummy_values[2] = ydata_func.dummy_values[0];
-	evaluate_at(ydata_func.at, &val);
-	ylow = undefined ? 0 : real(&val);
-
-	(void) Gcomplex(&ydata_func.dummy_values[0], yhigh, 0.0);
-	ydata_func.dummy_values[2] = ydata_func.dummy_values[0];
-	evaluate_at(ydata_func.at, &val);
-	yhigh = undefined ? 0 : real(&val);
-    }
-#endif
 
     /* FIXME this destroys any UNDEFINED flag assigned during input */
     cp->type = INRANGE;

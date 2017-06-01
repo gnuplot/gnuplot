@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.343 2017/03/29 04:08:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.344 2017/03/31 05:45:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -57,7 +57,7 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.343 2017/03/29 04:08:07
  *
  * functions
  *   int df_open(char *file_name, int max_using, plot_header *plot)
- *      parses thru / index / using on command line
+ *      parses index / using on command line
  *      max_using is max no of 'using' columns allowed (obsolete?)
  *	plot_header is NULL if called from fit or set_palette code
  *      returns number of 'using' cols specified, or -1 on error (?)
@@ -149,9 +149,6 @@ static char * df_generate_pseudodata __PROTO((void));
 static char * df_generate_ascii_array_entry __PROTO((void));
 static int df_skip_bytes __PROTO((off_t nbytes));
 
-#ifdef BACKWARDS_COMPATIBLE
-static void plot_option_thru __PROTO((void));
-#endif
 /*}}} */
 
 /*{{{  variables */
@@ -170,11 +167,6 @@ AXIS_INDEX df_axis[MAXDATACOLS];
 TBOOLEAN df_matrix = FALSE;     /* indicates if data originated from a 2D or 3D format */
 
 void *df_pixeldata;		/* pixel data from an external library (e.g. libgd) */
-
-#ifdef BACKWARDS_COMPATIBLE
-/* jev -- the 'thru' function --- NULL means no dummy vars active */
-struct udft_entry ydata_func;
-#endif
 
 /* string representing missing values in ascii datafiles */
 char *missing_val = NULL;
@@ -1021,7 +1013,7 @@ initialize_plot_style(struct curve_points *plot)
 
 /*{{{  int df_open(char *file_name, int max_using, plot_header *plot) */
 
-/* open file, parsing using/thru/index stuff return number of using
+/* open file, parsing using/index stuff return number of using
  * specs [well, we have to return something !]
  */
 int
@@ -1118,11 +1110,6 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     }
 
     /* defer opening until we have parsed the modifiers... */
-
-#ifdef BACKWARDS_COMPATIBLE
-    free_at(ydata_func.at);
-    ydata_func.at = NULL;
-#endif
 
     /* pm 25.11.2001 allow any order of options */
     while (!END_OF_COMMAND) {
@@ -1225,15 +1212,6 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 		df_skip_at_front = 0;
 	    continue;
 	}
-
-#ifdef BACKWARDS_COMPATIBLE
-	/* deal with thru */
-	/* jev -- support for passing data from file thru user function */
-	if (almost_equals(c_token, "thru$")) {
-	    plot_option_thru();
-	    continue;
-	}
-#endif
 
 	/* deal with using */
 	if (almost_equals(c_token, "u$sing")) {
@@ -1443,11 +1421,6 @@ df_close()
     if (!data_fp && !df_datablock)
 	return;
 
-#ifdef BACKWARDS_COMPATIBLE
-    free_at(ydata_func.at);
-    ydata_func.at = NULL;
-#endif
-
     /* free any use expression storage */
     for (i = 0; i < MAXDATACOLS; ++i)
 	if (use_spec[i].at) {
@@ -1587,25 +1560,6 @@ plot_option_index()
 	df_upper_index = df_lower_index;
     }
 }
-
-#ifdef BACKWARDS_COMPATIBLE
-static void
-plot_option_thru()
-{
-    c_token++;
-    strcpy(c_dummy_var[0], set_dummy_var[0]);
-    /* allow y also as a dummy variable.
-     * during plot, c_dummy_var[0] and [1] are 'sacred'
-     * ie may be set by  splot [u=1:2] [v=1:2], and these
-     * names are stored only in c_dummy_var[]
-     * so choose dummy var 2 - can anything vital be here ?
-     */
-    dummy_func = &ydata_func;
-    strcpy(c_dummy_var[2], "y");
-    ydata_func.at = perm_at();
-    dummy_func = NULL;
-}
-#endif
 
 
 static void
