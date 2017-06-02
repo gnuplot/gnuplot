@@ -11,6 +11,7 @@ Changes in 5.0.7
 * FIX cairo terminals: scale textbox border linewidth by terminal linewidth
 * FIX canvas terminal: initialization of plot dimensions (affects first zoom)
 * FIX crash in stats if no usable data is found
+* FIX do not use LaTeX formatting in tabular output
 
 Changes in 5.0.6
 ================
