@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.170 2017/05/20 01:27:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.171 2017/06/02 00:12:49 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -280,7 +280,6 @@ static void setvar __PROTO((char *varname, double value));
 static void setvarerr __PROTO((char *varname, double value));
 static void setvarcovar(char *varname1, char *varname2, double value);
 static char *get_next_word __PROTO((char **s, char *subst));
-static void backup_file __PROTO((char *, const char *));
 
 
 /*****************************************************************
