@@ -1,5 +1,5 @@
 /*
- * $Id: datablock.c,v 1.7 2015/07/13 19:30:52 sfeam Exp $
+ * $Id: datablock.c,v 1.8 2016/03/18 05:43:54 sfeam Exp $
  */
 /* GNUPLOT - datablock.c */
 
@@ -103,13 +103,14 @@ datablock_command()
     name = parse_datablock_name();
     datablock = add_udv_by_name(name);
 
+    if (!equals(c_token, "<<") || !isletter(c_token+1))
+	int_error(c_token, "data block name must be followed by << EODmarker");
+
     if (datablock->udv_value.type != NOTDEFINED)
 	gpfree_datablock(&datablock->udv_value);
     datablock->udv_value.type = DATABLOCK;
     datablock->udv_value.v.data_array = NULL;
 
-    if (!equals(c_token, "<<") || !isletter(c_token+1))
-	int_error(c_token, "data block name must be followed by << EODmarker");
     c_token++;
     eod = (char *) gp_alloc(token[c_token].length +2, "datablock");
     copy_str(&eod[0], c_token, token[c_token].length + 2);

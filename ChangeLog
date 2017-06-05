@@ -1,3 +1,9 @@
+2017-06-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datablock.c(datablock_command):  Reorder sanity checks so that an
+	improper command (e.g. "$DATA = foo") does not clobber the previous
+	content of $DATA.
+
 2017-06-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/util.c (gprintf):  Do not use LaTeX formatting in tabular output.
