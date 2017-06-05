@@ -8,6 +8,10 @@
 	* demo/stringvar.dem:  Use the new syntax to avoid creating a temporary
 	file during execution of the demo.
 
+	* src/graphics.h src/graphics.c src/graph3d.c:  The 2D routine
+	attach_title_to_plot() can be shared by the 3D code in order to support
+	"splot ... with lines title at {beg|end}".
+
 2017-06-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/util.c (gprintf):  Do not use LaTeX formatting in tabular output.

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.553 2017/04/11 17:44:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.554 2017/04/18 22:15:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -55,6 +55,7 @@ static char *RCSid() { return RCSid("$Id: graphics.c,v 1.553 2017/04/11 17:44:17
 #include "plot2d.h"		/* for boxwidth */
 #include "term_api.h"
 #include "util.h"
+#include "util3d.h"
 
 
 /* Externally visible/modifiable status variables */
@@ -126,8 +127,6 @@ static int histeps_compare __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
 
 static void get_arrow __PROTO((struct arrow_def* arrow, int* sx, int* sy, int* ex, int* ey));
 static void map_position_double __PROTO((struct position* pos, double* x, double* y, const char* what));
-
-static void attach_title_to_plot __PROTO((struct curve_points *this_plot, legend_key *key));
 
 #ifdef EAM_OBJECTS
 static void plot_circles __PROTO((struct curve_points *plot));
@@ -4107,30 +4106,49 @@ place_parallel_axes(struct curve_points *first_plot, int pcount, int layer)
  * Label the curve by placing its title at one end of the curve.
  * This option is independent of the plot key, but uses the same
  * color/font/text options controlled by "set key".
+ * This routine is shared by 2D and 3D plots.
  */
-static void
+void
 attach_title_to_plot(struct curve_points *this_plot, legend_key *key)
 {
-    struct termentry *t = term;
+    struct coordinate *points;
+    int npoints;
     int index, x, y;
+    TBOOLEAN is_3D;
 
     if (this_plot->plot_type == NODATA)
 	return;
 
+    /* This routine handles both 2D and 3D plots */
+    if (this_plot->plot_type == DATA3D || this_plot->plot_type == FUNC3D) {
+	points = ((struct surface_points *)this_plot)->iso_crvs->points;
+	npoints = ((struct surface_points *)this_plot)->iso_crvs->p_count;
+	is_3D = TRUE;
+    } else {
+	points = this_plot->points;
+	npoints = this_plot->p_count;
+	is_3D = FALSE;
+    }
+
     /* beginning or end of plot trace */
     if (this_plot->title_position->x > 0) {
-	for (index=this_plot->p_count-1; index > 0; index--)
-	    if (this_plot->points[index].type == INRANGE)
+	for (index = npoints-1; index > 0; index--)
+	    if (points[index].type == INRANGE)
 		break;
     } else {
-	for (index=0; index < this_plot->p_count-1; index++)
-	    if (this_plot->points[index].type == INRANGE)
+	for (index=0; index < npoints-1; index++)
+	    if (points[index].type == INRANGE)
 		break;
     }
-    if (this_plot->points[index].type != INRANGE)
+    if (points[index].type != INRANGE)
 	return;
-    x = map_x(this_plot->points[index].x);
-    y = map_y(this_plot->points[index].y);
+
+    if (is_3D) {
+	map3d_xy(points[index].x, points[index].y, points[index].z, &x, &y);
+    } else {
+	x = map_x(points[index].x);
+	y = map_y(points[index].y);
+    }
 
     if (key->textcolor.type == TC_VARIABLE)
 	/* Draw key text in same color as plot */
@@ -4140,7 +4158,7 @@ attach_title_to_plot(struct curve_points *this_plot, legend_key *key)
 	apply_pm3dcolor(&key->textcolor);
     else
 	/* Draw key text in black */
-	(*t->linetype)(LT_BLACK);
+	(*term->linetype)(LT_BLACK);
 
     write_multiline(x, y, this_plot->title,
     	(JUSTIFY)this_plot->title_position->y,
@@ -4435,15 +4453,6 @@ check_for_variable_color(struct curve_points *plot, double *colorvalue)
     } else
 	return FALSE;
 }
-
-
-/* Similar to HBB's comment above, this routine is shared with
- * graph3d.c, so it shouldn't be in this module (graphics.c).
- * However, I feel that 2d and 3d graphing routines should be
- * made as much in common as possible.  They seem to be
- * bifurcating a bit too much.  (Dan Sebald)
- */
-#include "util3d.h"
 
 /* process_image:
  *

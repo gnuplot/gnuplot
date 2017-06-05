@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.364 2017/04/18 22:15:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.365 2017/04/19 21:32:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -995,14 +995,20 @@ do_3dplot(
 	    draw_this_surface = (draw_surface && !this_plot->opt_out_of_surface);
 
 	    /* User-specified key locations can use the 2D code */
-	    if (this_plot->title_position && this_plot->title_position->scalex != character) {
-		xl_prev = xl;
-		yl_prev = yl;
-		map3d_position(this_plot->title_position, &xl, &yl, "key sample");
-		xl -=  (key->just == GPKEY_LEFT) ? key_text_left : key_text_right;
+	    if (this_plot->title_position) {
+		if (this_plot->title_position->scalex != character) {
+		    xl_prev = xl;
+		    yl_prev = yl;
+		    map3d_position(this_plot->title_position, &xl, &yl, "key sample");
+		    xl -=  (key->just == GPKEY_LEFT) ? key_text_left : key_text_right;
+		} else { 
+		    /* Option to label the end of the curve on the plot itself */
+		    attach_title_to_plot((struct curve_points *)this_plot, key);
+		}
 	    }
 
-	    if (lkey) {
+	    if (lkey
+	    &&  (!this_plot->title_position || this_plot->title_position->scalex != character)) {
 		if (key->textcolor.type != TC_DEFAULT)
 		    /* Draw key text in same color as key title */
 		    apply_pm3dcolor(&key->textcolor);
@@ -1128,7 +1134,8 @@ do_3dplot(
 	    }			/* switch(plot-style) plot proper */
 
 	    /* Next draw the key sample */
-	    if (lkey)
+	    if (lkey
+	    &&  (!this_plot->title_position || this_plot->title_position->scalex != character))
 	    switch (this_plot->plot_style) {
 	    case BOXES:	/* can't do boxes in 3d yet so use impulses */
 	    case FILLEDCURVES:
@@ -1212,7 +1219,7 @@ do_3dplot(
 		NEXT_KEY_LINE();
 
 	    /* but not if the plot title was drawn somewhere else */
-	    if (this_plot->title_position && this_plot->title_position->scalex != character) {
+	    if (this_plot->title_position) {
 		xl = xl_prev;
 		yl = yl_prev;
 	    }
