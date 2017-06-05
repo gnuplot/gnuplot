@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1087 2017/06/02 00:12:49 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1088 2017/06/02 00:23:28 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2300,6 +2300,12 @@ C ... and restart the table:
       array A[200]
       do for [i=1:200] { A[i] = sin(i * pi/100.) }
       plot A title "sin(x) in centiradians"
+
+ To preserve the imaginary component of complex array values when plotting,
+ the value must be referenced as A[$1] rather than $2.  For example
+
+      plot A using (F1(real(A[$1])) : (F2(imag(A[$1]))
+
 2 Fonts
 ?fonts
  Gnuplot does not provide any fonts of its own. It relies on external font
