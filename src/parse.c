@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.111 2017/02/04 23:59:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.112 2017/04/19 06:20:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -552,32 +552,47 @@ parse_primary_expression()
 	struct value a;
 
 	c_token++;
-	if (equals(c_token,"N")) {	/* $N == pseudocolumn -3 means "last column" */
+	if (!isanumber(c_token)) {
+	    if (equals(c_token+1, "[")) {
+		struct udvt_entry *datablock_udv;
+		c_token--;
+		datablock_udv = get_udv_by_name(parse_datablock_name());
+		if (!datablock_udv)
+		    int_error(c_token-2,"No such datablock");
+		add_action(PUSH)->udv_arg = datablock_udv;
+	    } else
+		int_error(c_token, "Column number or datablock line expected");
+	} else if (equals(c_token,"N")) {
+	    /* $N == pseudocolumn -3 means "last column" */
 	    c_token++;
 	    Ginteger(&a, -3);
 	    at_highest_column_used = -3;
-	} else if (!isanumber(c_token)) {
-	    int_error(c_token, "Column number expected");
+	    add_action(DOLLARS)->v_arg = a;
 	} else {
 	    convert(&a, c_token++);
 	    if (a.type != INTGR || a.v.int_val < 0)
 		int_error(c_token, "Positive integer expected");
 	    if (at_highest_column_used < a.v.int_val)
 		at_highest_column_used = a.v.int_val;
+	    add_action(DOLLARS)->v_arg = a;
 	}
-	add_action(DOLLARS)->v_arg = a;
-
     } else if (equals(c_token, "|")) {
-	struct udvt_entry *udv = add_udv(++c_token);
-	if (udv->udv_value.type != ARRAY)
-	    int_error(c_token, "not an array");
+	struct udvt_entry *udv;
 	c_token++;
+	if (equals(c_token,"$")) {
+	    udv = get_udv_by_name(parse_datablock_name());
+	    if (!udv)
+		int_error(c_token-1, "no such datablock");
+	} else {
+	    udv = add_udv(c_token++);
+	    if (udv->udv_value.type != ARRAY)
+		int_error(c_token-1, "not an array");
+	}
 	add_action(PUSH)->udv_arg = udv;
 	if (!equals(c_token, "|"))
 	    int_error(c_token, "'|' expected");
 	c_token++;
 	add_action(CARDINALITY);
-
     } else if (isanumber(c_token)) {
 	union argument *foo = add_action(PUSHC);
 	convert(&(foo->v_arg), c_token);

@@ -2,9 +2,9 @@
 # Miscellaneous neat things you can do using the string variables code
 #
 iswindows = substr(GPVAL_SYSNAME, 1, 7) eq "Windows"
-cat = iswindows ? "type" : "cat"
+unset border
 
-set print "stringvar.tmp"
+set print $EXAMPLE
 print ""
 print "Exercise substring handling"
 print ""
@@ -30,16 +30,19 @@ print "foo[1:1] eq 'A' && foo[2:2] ne 'X' = ", \
 
 unset print
 
-set label 1 system(cat . " stringvar.tmp") at graph 0.1, graph 0.9
+do for [i=1:|$EXAMPLE|] {
+    set label i $EXAMPLE[i] at graph 0.1, graph (1.0 - i*0.05)
+}
+
 unset xtics
 unset ytics
 set yrange [0:1]
-plot 0
+plot 0 lc bgnd notitle
 
 pause -1 "Hit return to continue"
 
 
-set print "stringvar.tmp"
+set print $EXAMPLE
 print "Exercise string handling functions"
 print ""
 print "foo          = ",foo
@@ -72,14 +75,19 @@ if (strlen(foo) != 245) print "sprintf output of long strings BROKEN"
 print ""
 
 unset print
-set label 1 system(cat . " stringvar.tmp") at graph 0.1, graph 0.9
+
+unset label
+do for [i=1:|$EXAMPLE|] {
+    set label i $EXAMPLE[i] at graph 0.1, graph (1.0 - i*0.05)
+}
+
 unset xtics
 unset ytics
 set yrange [0:1]
-plot 0
+plot 0 lc bgnd notitle
 
 pause -1 "Hit return to continue"
-set print "stringvar.tmp"
+set print $EXAMPLE
 print "Exercise word and words functions"
 print ""
 foo = "word and words can handle 'quoted string'"
@@ -96,11 +104,16 @@ print "foo = ",foo
 print "word(foo, 4) = ",word(foo, 4)
 
 unset print
-set label 1 system(cat . " stringvar.tmp") at graph 0.1, graph 0.9
+
+unset label
+do for [i=1:|$EXAMPLE|] {
+    set label i $EXAMPLE[i] at graph 0.1, graph (1.0 - i*0.05)
+}
+
 unset xtics
 unset ytics
 set yrange [0:1]
-plot 0
+plot 0 lc bgnd notitle
 
 pause -1 "Hit return to continue"
 reset

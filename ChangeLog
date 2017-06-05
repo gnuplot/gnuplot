@@ -1,3 +1,13 @@
+2017-06-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c src/datablock.c src/datablock.h src/internal.c
+	src/parse.c src/util.c:  Extend array syntax to named datablocks.
+	|$DATABLOCK| gives the number of lines in the block.
+	$DATABLOCK[n] returns line n as a string.
+
+	* demo/stringvar.dem:  Use the new syntax to avoid creating a temporary
+	file during execution of the demo.
+
 2017-06-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/util.c (gprintf):  Do not use LaTeX formatting in tabular output.

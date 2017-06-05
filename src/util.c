@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.147 2017/02/04 23:59:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.148 2017/06/03 01:39:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -38,6 +38,7 @@ static char *RCSid() { return RCSid("$Id: util.c,v 1.147 2017/02/04 23:59:27 sfe
 
 #include "alloc.h"
 #include "command.h"
+#include "datablock.h"
 #include "datafile.h"		/* for df_showdata and df_reset_after_error */
 #include "internal.h"		/* for eval_reset_after_error */
 #include "misc.h"
@@ -1611,13 +1612,7 @@ value_to_str(struct value *val, TBOOLEAN need_quotes)
 	break;
     case DATABLOCK:
 	{
-	char **dataline = val->v.data_array;
-	int nlines = 0;
-	if (dataline != NULL) {
-	    while (*dataline++ != NULL)
-		nlines++;
-	}
-	sprintf(s[j], "<%d line data block>", nlines);
+	sprintf(s[j], "<%d line data block>", datablock_size(val));
 	break;
 	}
     case ARRAY:

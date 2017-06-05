@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.354 2017/05/20 01:27:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.355 2017/06/02 00:12:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1933,7 +1933,7 @@ print_command()
     screen_ok = FALSE;
     do {
 	++c_token;
-	if (equals(c_token, "$") && isletter(c_token+1)) {
+	if (equals(c_token, "$") && isletter(c_token+1) && !equals(c_token+2,"[")) {
 	    char *datablock_name = parse_datablock_name();
 	    char **line = get_datablock(datablock_name);
 

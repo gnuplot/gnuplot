@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1088 2017/06/02 00:23:28 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1089 2017/06/05 17:04:16 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6,7 +6,7 @@ C
 ?gnuplot
 ^<h2 align="center"> An Interactive Plotting Program </h2>
 ^<p align="center">  Thomas Williams & Colin Kelley</p>
-^<p align="center">  Version 5.0 organized by Ethan A Merritt and others</p>
+^<p align="center">  Version 5 organized by Ethan A Merritt and others</p>
 ^<p align="center">Major contributors (alphabetic order):<br>
 ^<br>
 ^  Hans-Bernhard Broeker, John Campbell,<br>
@@ -24,7 +24,7 @@ C
 ^  James R. Van Zandt, Alex Woo, Johannes Zellner<br>
 ^</p>
 ^<p align="center">  Copyright (C) 1986 - 1993, 1998 - 2004   Thomas Williams, Colin Kelley<br>
-^     Copyright (C) 2004 - 2014 various authors</p>
+^     Copyright (C) 2004 - 2017 various authors</p>
 ^<p align="center">   Mailing list for comments: <tt>gnuplot-info@lists.sourceforge.net</tt><br>
 ^      Mailing list for bug reports: <tt>gnuplot-bugs@lists.sourceforge.net</tt><br>
 ^      Web access (preferred): <tt>http://sourceforge.net/projects/gnuplot</tt></p>
@@ -1939,6 +1939,10 @@ C ... and restart the table:
  but (-2)**2 = 4.
 
  The factorial operator returns a real number to allow a greater range.
+
+?cardinality
+ This operator returns the number of elements |A| when applied to array A.
+ It returns the number of data lines |$DATA| when applied to datablock $DATA.
 4 Binary
 ?expressions operators binary
 ?operators binary
@@ -2263,12 +2267,13 @@ C ... and restart the table:
  `value`.
 3 Arrays
 ?arrays
-?cardinality
+=cardinality
  Arrays are implemented as indexed lists of user variables.  The elements in an
  array are not limited to a single type of variable.  Arrays must be created
  explicitly before being referenced. The size of an array cannot be changed
  after creation.  All elements are initially undefined.  In most places an array
  element can be used instead of a named user variable.
+
  The cardinality (number of elements) of array A is given by the expression |A|.
 
  Example:
