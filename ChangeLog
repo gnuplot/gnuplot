@@ -1,3 +1,8 @@
+2017-06-06  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/term.c (init_terminal):  Keep wxt as default terminal on Windows
+	(as in version 4.2-5.0).
+
 2017-06-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datablock.c(datablock_command):  Reorder sanity checks so that an
