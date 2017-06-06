@@ -1,3 +1,9 @@
+2017-06-06  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c:  Make the inclusion of the GDI variant of the
+	windows terminal depend on the preprocessor define USE_WINGDI.
+	Disabled by default.
+
 2017-06-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c src/datablock.c src/datablock.h src/internal.c
@@ -152,7 +158,7 @@
 	* src/mouse.c:  Allow "bind 'shift-Button1' 'something'".
 	Previously the shift key was ignored.
 
-2017-05-14  Bastian Maerkisch  <bmaerkisch@web.de>
+2017-05-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (MakeFonts):  Revert accidental change made in
 	revision 1.247.
