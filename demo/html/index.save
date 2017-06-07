@@ -1,12 +1,12 @@
-<html><head><title>Demos for gnuplot version 5.1</title>
+<html><head><title>Demos for gnuplot version 5.2</title>
 
 <link text="text/css" href="gnuplot_demo.css" rel="stylesheet"></head><body>
 
 
-<h2 align=center>Demos for gnuplot version 5.1 (pngcairo terminal)<br>
+<h2 align=center>Demos for gnuplot version 5.2 (pngcairo terminal)<br>
     See also the demo output for the
-    <a href="../demo_svg_5.1/">SVG</a> and
-    <a href="../demo_canvas_5.1/">canvas</a> terminals.
+    <a href="../demo_svg_5.2/">SVG</a> and
+    <a href="../demo_canvas_5.2/">canvas</a> terminals.
 </h2>
 
 <p>
@@ -194,7 +194,7 @@ Here are samples of PNG output from some of the demos.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated April 2017</i>
+    <i>This page generated June 2017</i>
     </td>
 
     <td>
