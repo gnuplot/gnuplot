@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.71 2017/02/15 09:28:40 markisch Exp $
+# $Id: Makefile,v 1.72 2017/04/23 18:27:53 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 # This assumes a typical installation of the MinGW toolkit, the free
@@ -26,7 +26,7 @@
 # Comment out the definition lines to disable the according features:
 
 # Define this only if doing a release build
-#RELEASE=1
+RELEASE=1
 
 # Set-up your compiler environment
 #
