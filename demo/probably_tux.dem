@@ -7,9 +7,6 @@
 set label 1 "Tux (probably)" font "Times:Bold" 
 set label 1 at graph 0.5, 0.4 center front 
 
-save_encoding = GPVAL_ENCODING
-set encoding utf8
-
 set xrange [-6:134]
 set yrange [-6:134]
 unset key
@@ -38,6 +35,3 @@ set nonlinear y via f(y) inverse g(y)
 
 plot 'blutux.rgb' binary array=(128,128) flipy format='%uchar' with rgbimage pixels
 
-pause -1 "Hit return to continue"
-set encoding save_encoding
-reset
