@@ -1,3 +1,8 @@
+2017-06-07  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/msvc/Makefile:  Enable Unicode build.  Add missing user32.lib
+	for gnuplot_qt.
+
 2017-06-06  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c:  Make the inclusion of the GDI variant of the

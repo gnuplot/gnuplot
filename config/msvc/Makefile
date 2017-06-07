@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.27 2016/11/26 19:45:07 markisch Exp $
+# $Id: Makefile,v 1.28 2017/04/23 18:27:53 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -114,6 +114,7 @@ CBASEFLAGS = /EHsc /GR /MD /Od /nologo /Zi /DDEBUG
 CBASEFLAGS = /EHsc /GR /MD /O2 /nologo
 !ENDIF
 CFLAGS = $(CBASEFLAGS) /I. /I$(TOP) /I$(S) /I$(T) /D_Windows /DWIN32 /DHAVE_CONFIG_H /D__MSC__ $(OPTIONS)
+CFLAGS = $(CFLAGS) /DUNICODE /D_UNICODE
 CFLAGS = $(CFLAGS) /DGNUPLOT_SHARE_DIR=\"$(GNUPLOT_SHARE_DIR)\"
 WIN_CFLAGS = /DUSE_FAKEPIPES
 CONSOLE_CFLAGS = /DWGP_CONSOLE /DPIPES
@@ -291,7 +292,7 @@ moc_QtGnuplotEvent.cpp: $(Q)QtGnuplotEvent.h
 	$(MOC) -o $@ $**
 
 gnuplot_qt.exe: ui_QtGnuplotSettings.h $(GNUPLOTQTOBJS)
-	$(LD) /entry:mainCRTStartup /subsystem:windows $(LDFLAGS) /map:gnuplot_qt.map /out:$@ $(GNUPLOTQTOBJS) $(QTLIBS) shell32.lib
+	$(LD) /entry:mainCRTStartup /subsystem:windows $(LDFLAGS) /map:gnuplot_qt.map /out:$@ $(GNUPLOTQTOBJS) $(QTLIBS) shell32.lib user32.lib
 !ENDIF
 
 WINOBJS = winmain.obj wgnuplib.obj wgraph.obj wprinter.obj wtext.obj \
