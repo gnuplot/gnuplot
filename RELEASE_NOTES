@@ -5,11 +5,12 @@ This is a pre-release testing copy of gnuplot version 5.2.
 Please see the ChangeLog file for a complete list of changes made during the
 course of development from 5.0 to 5.2.
 
-Release Notes date:  1-Jun-2017
+Release Notes date:  8-Jun-2017
 
 CHANGES SINCE rc1
 =================
 * FIX terminal initialization must be done before executing ~/.gnuplot
+* FIX polar border should not be clipped to rectangular border
 
 
 FEATURES INTRODUCED IN VERSION 5.2

@@ -2,6 +2,7 @@ Changes in 5.2.rc2
 ==================
 * FIX terminal initialization must be done before executing ~/.gnuplot
 * FIX do not use LaTeX formatting in tabular output
+* FIX polar border should not be clipped to rectangular border
 
 Changes and new features in 5.2
 ===============================

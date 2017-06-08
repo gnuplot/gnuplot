@@ -3,7 +3,7 @@ AUTOMAKE_OPTIONS = foreign
 
 SUBDIRS = config m4 term src docs man demo tutorial share
 
-EXTRA_DIST = BUGS Copyright GNUmakefile INSTALL INSTALL.gnu \
+EXTRA_DIST = BUGS Copyright FAQ.pdf GNUmakefile INSTALL INSTALL.gnu \
 Makefile.maint PATCHLEVEL PGPKEYS README RELEASE_NOTES \
 VERSION configure.vms win
 
