@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.554 2017/04/18 22:15:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.555 2017/06/06 06:39:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3921,16 +3921,20 @@ plot_border()
 	if (border_complete)
 	    closepath();
 
-	if (((draw_border & 4096) != 0) && ((R_AXIS.autoscale & AUTOSCALE_BOTH) == 0)) {
+	/* Polar border.  FIXME: Should this be limited to known R_AXIS.max? */
+	if ((draw_border & 4096) != 0) {
+	    lp_style_type polar_border = border_lp;
+	    BoundingBox *clip_save = clip_area;
+	    clip_area = &canvas;
 
 	    /* Full-width circular border is visually too heavy compared to the edges */
-	    lp_style_type polar_border = border_lp;
 	    polar_border.l_width = polar_border.l_width / 2.;
 	    term_apply_lp_properties(&polar_border);
 
 	    if (largest_polar_circle <= 0)
 		largest_polar_circle = polar_radius(R_AXIS.max);
 	    draw_polar_circle(largest_polar_circle);
+	    clip_area = clip_save;
 	}
 
 	(*term->layer) (TERM_LAYER_END_BORDER);

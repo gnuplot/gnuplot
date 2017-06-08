@@ -1,3 +1,8 @@
+2017-06-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_border):  Autoscaled rrange should not disable
+	polar border.  Polar border should not be clipped to xy border.
+
 2017-06-07  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/msvc/Makefile:  Enable Unicode build.  Add missing user32.lib
