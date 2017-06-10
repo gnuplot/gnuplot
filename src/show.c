@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.384 2017/02/14 21:49:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.385 2017/05/05 06:09:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -961,10 +961,6 @@ show_version(FILE *fp)
 #endif
 		"";
 
-	    const char *binary_files =
-		"+BINARY_DATA  "
-		"";
-
 	    const char *nocwdrc =
 #ifdef USE_CWDRC
 		"+"
@@ -976,10 +972,6 @@ show_version(FILE *fp)
 	    const char *x11 =
 #ifdef X11
 		"+X11  "
-		"+X11_POLYGON  "
-#ifdef USE_X11_MULTIBYTE
-		"+MULTIBYTE  "
-#endif
 #ifdef EXTERNAL_X11_WINDOW
 		"+X11_EXTERNAL "
 #endif
@@ -1003,16 +995,9 @@ show_version(FILE *fp)
 		"";
 
 	    const char *plotoptions=
-		"+DATASTRINGS  "
-		"+HISTOGRAMS  "
 #ifdef EAM_OBJECTS
 		"+OBJECTS  "
 #endif
-		"+STRINGVARS  "
-		"+MACROS  "
-		"+THIN_SPLINES  "
-		"+IMAGE  "
-		"+USER_LINETYPES "
 #ifdef USE_STATS
 		"+STATS "
 #else
@@ -1030,14 +1015,11 @@ show_version(FILE *fp)
 		"";
 #endif
 
-	    sprintf(compile_options, "\
-%s%s\n%s%s%s\n\
-%s%s%s\n\
-%s%s%s%s\n%s\n",
-		    rdline, gnu_rdline, compatibility, unicodebuild, binary_files,
+	    sprintf(compile_options, "    %s%s\n    %s%s%s\n    %s%s%s\n    %s%s%s%s\n",
+		    rdline, gnu_rdline, compatibility, unicodebuild, plotoptions,
 		    libcerf, libgd, linuxvga,
-		    nocwdrc, x11, use_mouse, hiddenline,
-		    plotoptions);
+		    nocwdrc, x11, use_mouse, hiddenline
+		    );
 	}
 
 	compile_options = gp_realloc(compile_options, strlen(compile_options)+1, "compile_options");
@@ -1099,8 +1081,8 @@ show_version(FILE *fp)
     if (almost_equals(c_token, "l$ong")) {
 
 	c_token++;
-	fprintf(stderr, "Compile options:\n%s", compile_options);
-	fprintf(stderr, "MAX_PARALLEL_AXES=%d\n\n", MAX_PARALLEL_AXES);
+	fprintf(stderr, "\nCompile options:\n%s", compile_options);
+	fprintf(stderr, "    MAX_PARALLEL_AXES=%d\n\n", MAX_PARALLEL_AXES);
 
 #ifdef X11
 	{
