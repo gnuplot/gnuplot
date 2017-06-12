@@ -1,6 +1,10 @@
+2017-06-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/util.c (gprintf):  Sanity check for NULL format
+
 2017-06-02  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* term/util.c (gprintf):  Do not use LaTeX formatting in tabular output.
+	* src/util.c (gprintf):  Do not use LaTeX formatting in tabular output.
 	Bug #1931
 
 2017-05-30  (Debian /debian-science/packages/gnuplot.git/)

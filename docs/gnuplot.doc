@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.81 2017/05/16 23:15:38 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.82 2017/05/17 21:03:46 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9498,7 +9498,7 @@ Ffigure_missing
  `set key autotitle` causes each plot to be identified in the key by the name
  of the data file or function used in the plot command. This is the default.
  `set key noautotitle` disables the automatic generation of plot titles.
-=columnnheader
+=columnheader
  The command `set key autotitle columnheader` causes the first entry in each
  column of input data to be interpreted as a text string and used as a title for
  the corresponding plot. If the quantity being plotted is a function of data
@@ -11839,7 +11839,7 @@ Ffigure_missing
 
  If `front` is given, the arrows are written on top of the graphed data. If
  `back` is given (the default), the arrow is written underneath the graphed
- data.  Using `front` will prevent a arrow from being obscured by dense data.
+ data.  Using `front` will prevent an arrow from being obscured by dense data.
 
  Examples:
 

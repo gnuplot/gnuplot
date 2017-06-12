@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.128.2.8 2017/01/28 06:53:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.128.2.9 2017/06/03 01:39:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -576,6 +576,10 @@ gprintf(
     *dest = '\0';
 
     set_numeric_locale();
+
+    /* Should never happen but fuzzer managed to hit it */
+    if (!format)
+	format = DEF_FORMAT;
 
     /* By default we wrap numbers output to latex terminals in $...$ */
     if (!strcmp(format, DEF_FORMAT)  && !table_mode
