@@ -12,6 +12,8 @@ Changes in 5.0.7
 * FIX canvas terminal: initialization of plot dimensions (affects first zoom)
 * FIX crash in stats if no usable data is found
 * FIX do not use LaTeX formatting in tabular output
+* FIX sanity check to catch "plot '+' binary"
+* FIX sanity check for NULL format passed to gprintf
 
 Changes in 5.0.6
 ================
