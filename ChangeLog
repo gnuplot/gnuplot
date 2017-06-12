@@ -33,6 +33,9 @@
 	* src/graphics.c (process_image):  Sanity check for empty image data
 	structure.
 
+	* src/internal.c (f_power f_value):  Initialize imaginary component
+	of returned value in case anyone ever looks at it.
+
 2017-06-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/show.c (show_version):  Remove obsolete configuration options
