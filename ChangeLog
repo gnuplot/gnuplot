@@ -26,6 +26,12 @@
 	int_error, the restore never happened.  Fix: make a use-once copy of
 	timelabel and print that instead.
 
+	* src/hidden3d.c (build_networks):  Empirical fix for array overrun 
+	faults found by fuzzing data fed to '-'.  I don't understand the true
+	general case that fails but ignoring input curves with "length <= 1"
+	fixes the cases found by fuzzing.  I worry there could be legitimate
+	cases that this filter also catches although I haven't found one.
+
 2017-06-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/show.c (show_version):  Remove obsolete configuration options

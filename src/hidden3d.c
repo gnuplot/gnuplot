@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.117 2017/02/16 23:52:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.118 2017/03/05 05:55:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1134,8 +1134,9 @@ build_networks(struct surface_points *plots, int pcount)
 	} /* switch */
     } /* for (plots) */
 
-    /* Check for no data at all */
-    if (max_crvlen <= 0)
+    /* Check for no usable data at all */
+    /* June 2017 - increase minimum length from 1 to 2 */
+    if (max_crvlen <= 1)
 	return;
 
     /* allocate all the lists to the size we need: */
