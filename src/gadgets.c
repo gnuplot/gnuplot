@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.137 2017/04/20 00:07:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.138 2017/06/01 22:55:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -888,20 +888,16 @@ label_width(const char *str, int *lines)
 void
 do_timelabel(unsigned int x, unsigned int y)
 {
+    struct text_label temp = timelabel;
     char str[MAX_LINE_LEN+1];
-    char *save_format = timelabel.text;
     time_t now;
-    time(&now);
-    /* there is probably no way to find out in advance how many
-     * chars strftime() writes */
-    strftime(str, MAX_LINE_LEN, save_format, localtime(&now));
-    timelabel.text = str;
 
-    /* The only drawback of using write_label() is that there is no way  */
-    /* to pass in a request for vertical justification JUST_BOT */
     if (timelabel.rotate == 0 && !timelabel_bottom)
 	y -= term->v_char;
 
-    write_label(x, y, &timelabel);
-    timelabel.text = save_format;
+    time(&now);
+    strftime(str, MAX_LINE_LEN, timelabel.text, localtime(&now));
+    temp.text = str;
+
+    write_label(x, y, &temp);
 }

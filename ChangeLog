@@ -21,6 +21,11 @@
 
 	* src/plot2d.c (eval_plots):  image plots cannot use '+' as input
 
+	* src/gadgets.c (do_timelable):  Previously we modified timelabel.text
+	in place and then restored it afterwards.  If the routine exited via
+	int_error, the restore never happened.  Fix: make a use-once copy of
+	timelabel and print that instead.
+
 2017-06-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/show.c (show_version):  Remove obsolete configuration options
