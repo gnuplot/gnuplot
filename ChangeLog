@@ -21,6 +21,9 @@
 
 	* src/datafile.c (df_open):  Sanity check to catch "plot '+' binary ..."
 
+	* src/gadgets.c (do_timestamp):  prevent early exit from do_timelabel
+	from corrupting the timestamp structure
+
 2017-06-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/show.c (show_version):  Remove obsolete configuration options
