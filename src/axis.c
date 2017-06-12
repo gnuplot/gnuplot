@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.135.2.9 2015/11/10 18:24:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.135.2.10 2016/04/14 20:13:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -2155,6 +2155,8 @@ clone_linked_axes(AXIS_INDEX axis2, AXIS_INDEX axis1)
     /* FIXME:  Should we test values in between the endpoints also? */
 	testmin = eval_link_function(axis1, axis_array[axis2].set_min);
 	testmax = eval_link_function(axis1, axis_array[axis2].set_max);
+	if (isnan(testmin) || isnan(testmax))
+	    suspect = TRUE;
 	if (fabs(testmin - axis_array[axis1].set_min) != 0
 	&&  fabs((testmin - axis_array[axis1].set_min) / testmin) > 1.e-6)
 	    suspect = TRUE;

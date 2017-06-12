@@ -10,6 +10,9 @@
 
 	* src/datafile.c (df_open):  Sanity check to catch "plot '+' binary ..."
 
+	* src/axis.c (clone_linked_axis):  Sanity check that inverse mapping
+	function does not yield NaN at axis range endpoints.
+
 2017-06-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util.c (gprintf):  Do not use LaTeX formatting in tabular output.
