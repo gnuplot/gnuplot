@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.430 2017/03/31 18:41:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.431 2017/06/01 23:23:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2745,15 +2745,20 @@ eval_plots()
 		uses_axis[y_axis] |= USES_AXIS_FOR_FUNC;
 	    }
 
-	    if (!in_parametric
-		&& this_plot->plot_style != IMAGE
-		&& this_plot->plot_style != RGBIMAGE
-		&& this_plot->plot_style != RGBA_IMAGE
-		/* don't increment the default line/point properties if
-		 * this_plot is an image */
+	    /* These plot styles do not consume line/point properties */
+	    if (!in_parametric && this_plot->plot_style != IMAGE
+		&& this_plot->plot_style != RGBIMAGE && this_plot->plot_style != RGBA_IMAGE
 	    ) {
 		++line_num;
 	    }
+
+	    /* Image plots require 2 input dimensions */
+	    if (this_plot->plot_style == IMAGE
+	    ||  this_plot->plot_style == RGBIMAGE ||  this_plot->plot_style == RGBA_IMAGE) {
+		if (!strcmp(df_filename,"+"))
+		    int_error(NO_CARET, "image plots need more than 1 coordinate dimension ");
+	    }
+
 	    if (this_plot->plot_type == DATA) {
 
 		/* get_data() will update the ranges of autoscaled axes, but some */

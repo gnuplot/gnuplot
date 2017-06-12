@@ -19,6 +19,8 @@
 
 	* src/datafile.c (df_open):  Sanity check to catch "plot '+' binary ..."
 
+	* src/plot2d.c (eval_plots):  image plots cannot use '+' as input
+
 2017-06-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/show.c (show_version):  Remove obsolete configuration options
