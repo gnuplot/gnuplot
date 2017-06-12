@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.35 2017/04/10 22:17:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.36 2017/04/18 23:03:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4273,6 +4273,11 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
     /* Detours necessary to handle 3D plots */
     TBOOLEAN project_points = FALSE;		/* True if 3D plot */
     int image_x_axis, image_y_axis, image_z_axis;
+
+    if (((struct surface_points *)plot)->plot_type == NODATA) {
+	int_warn(NO_CARET, "no image data");
+	return;
+    }
 
     if ((((struct surface_points *)plot)->plot_type == DATA3D)
     ||  (((struct surface_points *)plot)->plot_type == FUNC3D))

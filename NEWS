@@ -14,6 +14,7 @@ Changes in 5.0.7
 * FIX do not use LaTeX formatting in tabular output
 * FIX sanity check to catch "plot '+' binary"
 * FIX sanity check for NULL format passed to gprintf
+* FIX sanity check for empty image data structure on input
 
 Changes in 5.0.6
 ================

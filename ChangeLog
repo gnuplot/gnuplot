@@ -13,6 +13,9 @@
 	* src/axis.c (clone_linked_axis):  Sanity check that inverse mapping
 	function does not yield NaN at axis range endpoints.
 
+	* src/graphics.c (process_image):  Sanity check for empty image data
+	structure.
+
 2017-06-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util.c (gprintf):  Do not use LaTeX formatting in tabular output.
