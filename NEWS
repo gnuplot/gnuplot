@@ -5,7 +5,8 @@ Changes in 5.2.rc2
 * FIX polar border should not be clipped to rectangular border
 * FIX sanity check to catch "plot '+' binary"
 * FIX sanity check for NULL format passed to gprintf
-* FIX prevent early exit from do_timelabel from corrupting the timestamp
+* FIX sanity check inverse mapping function of set link and set nonlinear
+* FIX segfault from corruption of timestamp text
 
 Changes and new features in 5.2
 ===============================
