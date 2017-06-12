@@ -2,6 +2,8 @@
 
 	* src/util.c (gprintf):  Sanity check for NULL format
 
+	* src/datafile.c (df_open):  Sanity check to catch "plot '+' binary ..."
+
 2017-06-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/show.c (show_version):  Remove obsolete configuration options
