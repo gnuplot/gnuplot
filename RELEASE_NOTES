@@ -11,7 +11,7 @@ CHANGES SINCE rc1
 =================
 * FIX terminal initialization must complete before executing ~/.gnuplot
 * FIX polar border should not be clipped to rectangular border
-* FIX add various sanity checks for bad input produced by fuzz-testing
+* FIX add various sanity checks for bad input data found by fuzz-testing
 
 
 FEATURES INTRODUCED IN VERSION 5.2

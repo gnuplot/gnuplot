@@ -6,6 +6,7 @@ Changes in 5.2.rc2
 * FIX sanity check to catch "plot '+' binary"
 * FIX sanity check for NULL format passed to gprintf
 * FIX sanity check inverse mapping function of set link and set nonlinear
+* FIX sanity check for empty image data structure
 * FIX segfault from corruption of timestamp text
 
 Changes and new features in 5.2

@@ -17,6 +17,9 @@
 
 2017-06-12  Ethan A Merritt  <merritt@u.washington.edu>
 
+	Fix unhandled corner cases and improper command sequences found by
+	afl-fuzz testing gnuplot input scripts:
+
 	* src/util.c (gprintf):  Sanity check for NULL format
 
 	* src/datafile.c (df_open):  Sanity check to catch "plot '+' binary ..."
@@ -26,6 +29,9 @@
 
 	* src/axis.c (clone_linked_axis):  Sanity check that inverse mapping
 	function does not yield NaN at axis range endpoints.
+
+	* src/graphics.c (process_image):  Sanity check for empty image data
+	structure.
 
 2017-06-10  Ethan A Merritt  <merritt@u.washington.edu>
 
