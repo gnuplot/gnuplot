@@ -32,6 +32,9 @@
 	fixes the cases found by fuzzing.  I worry there could be legitimate
 	cases that this filter also catches although I haven't found one.
 
+	* src/axis.c (clone_linked_axis):  Sanity check that inverse mapping
+	function does not yield NaN at axis range endpoints.
+
 2017-06-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/show.c (show_version):  Remove obsolete configuration options

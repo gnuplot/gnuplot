@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.222 2017/03/29 04:08:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.223 2017/04/12 05:36:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -2406,6 +2406,8 @@ clone_linked_axes(AXIS *axis1, AXIS *axis2)
 	    suspect = TRUE;
 	testmin = eval_link_function(axis1, axis2->set_min);
 	testmax = eval_link_function(axis1, axis2->set_max);
+	if (isnan(testmin) || isnan(testmax))
+	    suspect = TRUE;
 	if (fabs(testmin - axis1->set_min) != 0
 	&&  fabs((testmin - axis1->set_min) / testmin) > 1.e-6)
 	    suspect = TRUE;
