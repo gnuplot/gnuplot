@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.5 2017/05/13 11:49:29 markisch Exp $
+ * $Id: wd2d.cpp,v 1.6 2017/05/21 08:43:44 markisch Exp $
  */
 
 /*
@@ -1467,6 +1467,8 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 			 * state */
 			line_width = curptr->x == 100 ? 1 : (curptr->x / 100.0);
 			line_width *= lpgw->sampling * lpgw->linewidth * lw_scale;
+			// Minimum line width is 1 pixel.
+			line_width = GPMAX(1, line_width);
 			/* invalidate point symbol cache */
 			last_symbol = W_invalid_pointtype;
 			break;
