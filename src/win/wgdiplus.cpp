@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.58 2017/05/13 11:49:29 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.59 2017/05/21 08:43:44 markisch Exp $
  */
 
 /*
@@ -1235,6 +1235,13 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 				/* recalculate shifting of rotated text */
 				hshift = - sin(M_PI / 180. * lpgw->angle) * lpgw->tmHeight / 2.;
 				vshift = - cos(M_PI / 180. * lpgw->angle) * lpgw->tmHeight / 2.;
+				if (lpgw->antialiasing) {
+					// Cleartype is only applied to non-rotated text
+					if ((lpgw->angle % 180) != 0)
+						graphics.SetTextRenderingHint(TextRenderingHintAntiAliasGridFit);
+					else
+						graphics.SetTextRenderingHint(TextRenderingHintClearTypeGridFit);
+				}
 			}
 			break;
 

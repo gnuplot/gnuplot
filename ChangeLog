@@ -1,3 +1,9 @@
+2017-06-13  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgdiplus.cpp:  Cleartype text antialiasing seems to be only
+	applied to horizontal text.  Use grayscale antialiasing for rotated
+	text.
+
 2017-06-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util.c (gprintf):  Sanity check for NULL format
