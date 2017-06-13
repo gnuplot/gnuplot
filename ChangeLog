@@ -12,6 +12,9 @@
 	* src/win/wgraph.c (WriteGraphIni):  Only save window size and position
 	for standalone graph windows.
 
+	* src/win/wd2d.cpp (W_line_width):  Enforce a minimum line width of 1
+	pixel to avoid tiny dash patterns for grids in polar plots.
+
 2017-06-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util.c (gprintf):  Sanity check for NULL format
