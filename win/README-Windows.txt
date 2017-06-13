@@ -1,4 +1,4 @@
-This is gnuplot version 5.0 -- binary distribution for Windows
+This is gnuplot version 5.2 -- binary distribution for Windows
 ===========================================================================
 
 gnuplot is a command-line driven interactive function plotting utility
@@ -12,7 +12,7 @@ Surfaces can be plotted as a mesh fitting the specified function, floating
 in the 3-d coordinate space, or as a contour plot on the x-y plane.
 For 2-d plots, there are also many plot styles including lines, points,
 boxes, heat maps, stacked histograms, and contoured projections of 3D data.
-Graphs may be labeled with arbitrary labels and arrows, axis labels,
+Graphs may be labelled with arbitrary labels and arrows, axis labels,
 a title, date and time, and a key.
 
 
@@ -69,6 +69,25 @@ gnuplot binaries
   found in the 'license' directory.
 
 
+Interactive Terminals
+---------------------
+
+gnuplot on Windows offers three different interactive terminal types:  windows,
+wxt, and qt.  The later two are also available on other platforms.  All three
+produce high quality output using antialiasing and oversampling with hinting
+and support all modern gnuplot features.  Differences can be found in the
+export formats available for saving and clipboard, printing support and the
+behaviour in persist mode.  Also wxt uses the same drawing code as the pngcairo
+and pdfcairo terminals, which allows for non-interactive saving of graphs.  The
+windows terminal's graph windows can be docked to the wgnuplot text window.
+
+By default, gnuplot on Windows will use the wxt terminal.  If you prefer, you
+can change this by setting the GNUTERM environment variable.  See below on how
+to change environment variables. Alternatively, you can add
+    set term windows / wxt / qt
+to your gnuplot.ini, see `help startup`.
+
+
 Installation
 ------------
 
@@ -84,7 +103,7 @@ provided you check the corresponding options:
   gnuplot's internet site and the demo scripts.
 
 * The extensions *.gp, *.gpl, *.plt will be associated to be opened with
-  wgnuplot. To change file associations in Windows 7 or Vista, go to
+  wgnuplot. To change file associations in Windows 7 or later, go to
   "Control Panel", "Control Panel Home", "Default Programs",
   "Set Associations". Select a file type in the list and click
   "Change Program".
@@ -96,22 +115,17 @@ provided you check the corresponding options:
 * gnuplot is added to the shortcuts of the Windows explorer "Run" Dialog.
   To start wgnuplot simply press Windows-R and execute `wgnuplot'.
 
-* You may select your default terminal of preference (wxt/windows) and the
-  installer will update the GNUTERM environment variable accordingly. See below
-  on how to change environment variables. Alternatively, you can later add
-    set term windows
-  or
-    set term wxt
-  to your gnuplot.ini, see `help startup`.
+* You may select your default terminal of preference (wxt/windows/qt) and the
+  installer will update the GNUTERM environment variable accordingly.
 
 * If you install the demo scripts, the directory containing the demos is
   included in the GNUPLOT_LIB search path, see below.
 
 Customisation:
 On startup, gnuplot executes the gnuplot.ini script from the user's
-application data directory %APPDATA% if found, see `help startup`. wgnuplot
-and the windows terminal load and save settings from/to wgnuplot.ini located
-in the appdata directory, see `help wgnuplot.ini`.
+application data directory %APPDATA% if found, see `help startup`. The wgnuplot
+text window and the windows terminal load and save settings from/to wgnuplot.ini
+located in the appdata directory, see `help wgnuplot.ini`.
 
 
 Fonts
@@ -132,13 +146,25 @@ console window (gnuplot.exe):
   window.
 
 
+Encodings
+---------
+
+Version 5.2 on Windows now supports command line input using all supported
+encodings, including UTF-8, see `help encoding`.  By default gnuplot will use
+an encoding which matches the system's ANSI codepage, if supported.  We
+recommend to add `set encoding utf8` to your gnuplot.ini file, see below.
+Note that while Unicode input on the command line is limited to the Basic
+Multilingual Plane (BMP), scripts may contain all characters (as in previous
+versions).
+
+
 Localisation
 ------------
 
-As of version 4.6 gnuplot supports localised versions of the menu and help
-files. By default, gnuplot tries to load wgnuplot-XX.mnu and wgnuplot-XX.chm,
-where XX is a two character language code. Currently, only English (default)
-and Japanese (ja) are supported, but you are invited to contribute.
+gnuplot supports localised versions of the menu and help files. By default,
+gnuplot tries to load wgnuplot-XX.mnu and wgnuplot-XX.chm, where XX is a two
+character language code. Currently, only English (default) and Japanese (ja)
+are supported, but you are invited to contribute.
 
 You can enforce a certain language by adding
   Language=XX
@@ -155,7 +181,7 @@ within gnuplot.
 Environmental variables
 -----------------------
 
-For a complete list of environment variables supported, type `help environment`
+For a list of environment variables supported, type `help environment`
 in gnuplot.
 
 To set/change environment variables go to "Control panel", "System",
@@ -187,4 +213,4 @@ for an up-to-date bug tracking system.
 
 --------------------------------------------------------------------------------
 
-The gnuplot team, February 2015
+The gnuplot team, June 2017
