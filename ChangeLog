@@ -1,10 +1,13 @@
 2017-06-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* win/README-Windows.txt:  Update to version 5.2.
-	
+
 	* src/win/wgdiplus.cpp:  Cleartype text antialiasing seems to be only
 	applied to horizontal text.  Use grayscale antialiasing for rotated
 	text.
+
+	* src/win/wgdiplus.cpp (InitFont_gdiplus):  Fix double application of
+	fontscale.
 
 2017-06-12  Ethan A Merritt  <merritt@u.washington.edu>
 
@@ -53,11 +56,11 @@
 	that queried the terminal state would segfault because the terminal
 	had not yet been initialized. Now we reorder again to (1) error handling
 	(2) terminal init (3) session state from ~/.gnuplot.  For safety also
-	add sanity checks in load_linetype() so that term == NULL does not 
+	add sanity checks in load_linetype() so that term == NULL does not
 	segfault.
 
 	* configure.ac PATCHLEVEL docs/titlepag.tex src/version.c:
-	Bump patchlevel to rc2 
+	Bump patchlevel to rc2
 
 	Changes above this line will appear first in 5.2.rc2 if there is one,
 	otherwise in 5.2.0.
@@ -101,7 +104,7 @@
 	configure.ac:
 
 	Bump version info to 5.2.rc0
-	This is not an actual release, just an internal identifier while we 
+	This is not an actual release, just an internal identifier while we
 	assemble and test a first real 5.2 release candidate.
 
 2017-05-21  Ethan A Merritt  <merritt@u.washington.edu>
@@ -112,14 +115,14 @@
 
 2017-05-21  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* term/win.trm src/win/wgraph.c src/win/wgdiplus.cpp 
+	* term/win.trm src/win/wgraph.c src/win/wgdiplus.cpp
 	src/win/wd2d.cpp src/win/wgnuplib.h:
 	Pointscale option for the windows terminal.
 
 2017-05-20  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/winmain.c (ConsoleHandler) src/plot.c|h (terminate_flag)
-	src/readline.c (readline):  Add an event handler to catch "close" 
+	src/readline.c (readline):  Add an event handler to catch "close"
 	signals to console mode gnuplot on Windows.  These events are passed
 	on to the main thread to terminate cleanly.
 	Bugs #1916, #1917, #1918
@@ -150,7 +153,7 @@
 	dxf (Autocad DWGR10 format circa 1988)
 
 	* docs/README docs/doc2tex.c: New markup ^#TeX in gnuplot.doc signals
-	that the rest of the line is a LaTeX command to be passed through 
+	that the rest of the line is a LaTeX command to be passed through
 	verbatim to the *.tex output stream.  Ignored by other doc2foo paths.
 
 	* docs/gnuplot.doc docs/plotstyles.gnu:  Add figure for "with vectors".
@@ -170,7 +173,7 @@
 
 	* src/win/wgraph.c (MakeFonts):  Revert accidental change made in
 	revision 1.247.
-	
+
 	* src/win/wgraph.c (MakeFonts):  Handle empty type face name (GDI).
 	Bug #1860
 
@@ -305,7 +308,7 @@
 	* src/command.c (do_system do_system_func report_error) src/eval.c
 	docs/gnuplot.doc:
 
-	Introduce new user-visible variables GPVAL_SYSTEM_ERRNO and 
+	Introduce new user-visible variables GPVAL_SYSTEM_ERRNO and
 	GPVAL_SYSTEM_ERRMSG that hold the status returned by
 	    system "some command"
 	    ! "some command"
@@ -421,8 +424,8 @@
 
 2017-03-31  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/plot2d.h src/plot3d.c src/datafile.c:  Add a slot in the plot 
-	structure to track a 2nd named sampling variable, e.g. 
+	* src/plot2d.h src/plot3d.c src/datafile.c:  Add a slot in the plot
+	structure to track a 2nd named sampling variable, e.g.
 	    splot [u=1:5][v=1:5] '++' using (u):(v):(u*sin(v))
 
 	* src/plot2d.c src/plot3d.c:  Extend the sampling range parsing to
@@ -439,8 +442,8 @@
 
 2017-03-29  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/axis.h (ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE) 
-	src/axis.c (update_primary_axis_range) src/plot2d.c src/plot3d.c 
+	* src/axis.h (ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE)
+	src/axis.c (update_primary_axis_range) src/plot2d.c src/plot3d.c
 	src/datafile.c (df_generate_pseudodata):
 
 	The nonlinear axis code as originally introduced tracked data min/max
@@ -465,7 +468,7 @@
 	* src/datafile.c (df_generate_pseudodata):  Use axes u and v to sample
 	pseudofile "++" rather than axes x and y.  This allows for sampling
 	ranges that are distinct from the plot axis range, as was already true
-	for sampling "+".  The downside of this change is that we don't 
+	for sampling "+".  The downside of this change is that we don't
 	currently support nonlinear sampling on u or v, so it doesn't work as
 	well when plotting logscale x or y.
 
@@ -516,7 +519,7 @@
 2017-03-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc:  Restore EXPERIMENTAL warning to documentation for
-	the "bins" plotting option (it had been removed 2017-02-19).  We may 
+	the "bins" plotting option (it had been removed 2017-02-19).  We may
 	consider changing the interpretation of binrange [min:max] to be more
 	consistent with R, so warning that "implementation details may change
 	before inclusion in a stable release" is appropriate.
@@ -532,7 +535,7 @@
 
 	Deal with various corner-case failures found by fuzzing the demo set.
 
-	* src/hidden3d.c (build_networks):  A degenerate polygon can fall all 
+	* src/hidden3d.c (build_networks):  A degenerate polygon can fall all
 	the way through the classification loop, leaving the flag value -2 as
 	the polygon number which is then used as an array index.  Oops.
 
@@ -542,7 +545,7 @@
 	E.g.  array t[10]; set dummy t; plot t
 
 	* src/plot2d.c (get_data):  Defer initialization of parallel plot data
-	structures so that it catches both "set style data parallel" and 
+	structures so that it catches both "set style data parallel" and
 	"with parallel".  Example failure case:
 	set style data parallel; plot 'silver.dat' using 1:2:3 lc var
 
@@ -564,7 +567,7 @@
 
 2017-02-27  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
-	* src/wxterminal/wxt_gui.cpp:  Rename static int yield to avoid 
+	* src/wxterminal/wxt_gui.cpp:  Rename static int yield to avoid
 	name conflict on Solaris 10.
 	Bug #1914
 
@@ -578,7 +581,7 @@
 	* src/interpol.c (do_cubic) docs/gnuplot.doc:  Document that smooth
 	options (splines and bezier variants) are sensitive to blank lines and
 	undefined values in the input data. Curves are fit separately to each
-	uninterrupted subset of the original data. Curve segments that are 
+	uninterrupted subset of the original data. Curve segments that are
 	entirely out of range on x are now ignored rather than triggering a
 	error message.
 	Bug #1911
@@ -610,11 +613,11 @@
 	path failed to clear/initialize/set-to-NaN the value returned from
 	function evaluation during binary data input. Now we explicitly set NaN
 	in additional to returning DF_UNDEFINED.
-	This fix is incomplete because store2d_point() later overwrites the 
+	This fix is incomplete because store2d_point() later overwrites the
 	UNDEFINED flag, which is almost certainly the wrong thing to do.
 	Bug #1911
 
-	* term/svg.trm:  Default to embedding generated images rather than 
+	* term/svg.trm:  Default to embedding generated images rather than
 	creating and linking to separate *.png files.
 	Bug #1801
 
@@ -755,7 +758,7 @@
 	Windows version of opendir and friends as they handle encodings.
 	Bugfix.
 
-	* src/stdfn.c src/syscfg.h src/util.c src/win/wmenu.c:  Only include 
+	* src/stdfn.c src/syscfg.h src/util.c src/win/wmenu.c:  Only include
 	direct.h where required. Remove a few unnecessary includes.
 
 	* src/win/mingw/Makefile:  Optionally use pkg-config to use gdlib.
@@ -783,7 +786,7 @@
 
 2017-01-24  Stefan Althoefer  <stefan-alth@users.sourceforge.net>
 
-	* term/js/gnuplot_mouse.js:  Improved placement of hypertext and 
+	* term/js/gnuplot_mouse.js:  Improved placement of hypertext and
 	mouse-click output. Fix multiline hypertext.
 
 2017-01-24  Ethan A Merritt  <merritt@u.washington.edu>
@@ -803,7 +806,7 @@
 	the metafile requires releasing the graphics object first.  Fixes
 	copying EMF data to clipboard.
 
-	* src/win/wgdiplus.cpp (clipboard_gdiplus, metafile_gdiplus): 
+	* src/win/wgdiplus.cpp (clipboard_gdiplus, metafile_gdiplus):
 	Explicitly set the size of the metafile.
 
 	* src/set.c (set_degreesign):  Remove special Windows code since we
@@ -827,7 +830,7 @@
 
 2017-01-21  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/win/wgnuplib.h src/win/wgraph.c src/win/win/wmenu.c 
+	* src/win/wgnuplib.h src/win/wgraph.c src/win/win/wmenu.c
 	src/win/wtext.c:  Fix string formats and messages in several places to
 	make non-Unicode builds work again.
 
@@ -888,7 +891,7 @@
 	* src/axis.c src/axis.h src/boundary.c src/plot2d.c src/plot2d.h:
 	Continue consolidation of polar to cartesian coordinate conversion.
 	This patch fixes various problems with logscale r axis tic placement.
-	It adds a filter to categorically reject points with negative r value 
+	It adds a filter to categorically reject points with negative r value
 	if the raxis is logscaled.
 
 2017-01-12  Ethan A Merritt  <merritt@u.washington.edu>
@@ -911,8 +914,8 @@
 
 	Allows use of polar mode to display a projection of celestial horizontal
 	coordinates (altitude + azimuth) with the zenith (altitude 90) at the
-	center and the horizon (altitude 0) at the perimeter. Theta represents 
-	the azimuthal angle. 
+	center and the horizon (altitude 0) at the perimeter. Theta represents
+	the azimuthal angle.
 
 	* demo/solar_path.dem demo/solar_params.dem demo/all.dem:
 	Use inverted rrange to display solar path at a specific latitude in
@@ -943,7 +946,7 @@
 	shared routine. The original range checks were not identical so it is
 	possible that consolidation breaks something.  In particular the call
 	from parametric_fixup() originally updated rrange based on fabs(r)
-	rather than r.  If necessary we can replicate this using two 
+	rather than r.  If necessary we can replicate this using two
 	successive calls to polar_to_xy().
 
 	* src/plot2d.c (polar_to_xy):
@@ -966,7 +969,7 @@
 
 	* src/win/wcommon.h src/win/wgnuplib.c|h src/win/wgraph.c src/win/wmenu.c
 	src/win/wtext.c term/win.trm docs/gnuplot.doc:
-	Graph windows can be docked to the wgnuplot text window with 
+	Graph windows can be docked to the wgnuplot text window with
 	`set term win docked`.  Multiple graph windows can be docked at the same
 	time and their layout can be changed with the new `layout <rows>,<cols>`
 	option.  The fraction of the window which is reserved for text input
@@ -984,7 +987,7 @@
 
 	* src/graphics.c src/unset.c demo/ttics.dem docs/gnuplot.doc:
 	Allow rotation of polar grid (theta) tic labels by "set ttics rotate".
-	Extend the fixed range of theta axis so that the user can label from 
+	Extend the fixed range of theta axis so that the user can label from
 	-180 -> 180  rather than 0 -> 360.
 
 2017-01-04  Bastian Maerkisch  <bmaerkisch@web.de>
