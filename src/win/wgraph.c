@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.256 2017/05/25 18:23:28 markisch Exp $
+ * $Id: wgraph.c,v 1.257 2017/06/06 15:44:45 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -3378,19 +3378,22 @@ WriteGraphIni(LPGW lpgw)
 
 	if ((file == NULL) || (section == NULL))
 		return;
-	if (IsIconic(lpgw->hWndGraph))
-		ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);
-	/* Rescale window size to 96dpi. */
-	GetWindowRect(lpgw->hWndGraph, &rect);
-	dpi = GetDPI();
-	wsprintf(profile, TEXT("%d %d"), MulDiv(rect.left, 96, dpi), MulDiv(rect.top, 96, dpi));
-	WritePrivateProfileString(section, TEXT("GraphOrigin"), profile, file);
-	if (lpgw->Canvas.x != 0) {
-		wsprintf(profile, TEXT("%d %d"), MulDiv(lpgw->Canvas.x, 96, dpi), MulDiv(lpgw->Canvas.y, 96, dpi));
-		WritePrivateProfileString(section, TEXT("GraphSize"), profile, file);
-	} else if (lpgw->Size.x != CW_USEDEFAULT) {
-		wsprintf(profile, TEXT("%d %d"), MulDiv(lpgw->Size.x - lpgw->Decoration.x, 96, dpi), MulDiv(lpgw->Size.y - lpgw->Decoration.y, 96, dpi));
-		WritePrivateProfileString(section, TEXT("GraphSize"), profile, file);
+	/* Only save window size and position for standalone graph windows. */
+	if (!lpgw->bDocked) {
+		if (IsIconic(lpgw->hWndGraph))
+			ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);
+		/* Rescale window size to 96dpi. */
+		GetWindowRect(lpgw->hWndGraph, &rect);
+		dpi = GetDPI();
+		wsprintf(profile, TEXT("%d %d"), MulDiv(rect.left, 96, dpi), MulDiv(rect.top, 96, dpi));
+		WritePrivateProfileString(section, TEXT("GraphOrigin"), profile, file);
+		if (lpgw->Canvas.x != 0) {
+			wsprintf(profile, TEXT("%d %d"), MulDiv(lpgw->Canvas.x, 96, dpi), MulDiv(lpgw->Canvas.y, 96, dpi));
+			WritePrivateProfileString(section, TEXT("GraphSize"), profile, file);
+		} else if (lpgw->Size.x != CW_USEDEFAULT) {
+			wsprintf(profile, TEXT("%d %d"), MulDiv(lpgw->Size.x - lpgw->Decoration.x, 96, dpi), MulDiv(lpgw->Size.y - lpgw->Decoration.y, 96, dpi));
+			WritePrivateProfileString(section, TEXT("GraphSize"), profile, file);
+		}
 	}
 	wsprintf(profile, TEXT("%s,%d"), lpgw->deffontname, lpgw->deffontsize);
 	WritePrivateProfileString(section, TEXT("GraphFont"), profile, file);

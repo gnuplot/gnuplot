@@ -7,6 +7,9 @@
 	* src/win/wgdiplus.cpp (InitFont_gdiplus):  Fix double application of
 	fontscale.
 
+	* src/win/wgraph.c (WriteGraphIni):  Only save window size and position
+	for standalone graph windows.
+
 2017-06-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util.c (gprintf):  Sanity check for NULL format
