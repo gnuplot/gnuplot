@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.100 2017/05/20 16:43:19 markisch Exp $
+ * $Id: winmain.c,v 1.101 2017/05/20 18:28:19 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -77,6 +77,9 @@
 #include "wcommon.h"
 #ifdef HAVE_GDIPLUS
 #include "wgdiplus.h"
+#endif
+#ifdef HAVE_D2D
+#include "wd2d.h"
 #endif
 #ifdef WXWIDGETS
 #include "wxterminal/wxt_term.h"
@@ -191,6 +194,9 @@ WinExit(void)
 #endif
 #ifdef HAVE_GDIPLUS
     gdiplusCleanup();
+#endif
+#ifdef HAVE_D2D
+    d2dCleanup();
 #endif
     CoUninitialize();
     return;
