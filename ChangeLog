@@ -6,12 +6,19 @@
 	* src/axis.c (eval_link_function):  Executing the general case nonlinear
 	mapping functions via a dynamically interpreting action table is slower
 	than in-line evaluation.  In the special case of log-scaled axes we can
-	short circuit the general case evaluation be an immediate call to the
+	short circuit the general case evaluation by an immediate call to the
 	log or exp function.  This more than recovers the execution speed of
 	pre-version 5 logscale code.  log-intensive benchmark timings:
 	version 4.6.6:         42.7u 42.7 total
 	version 5.1 generic:   57.5u 66.2 total   (why extra system time?)
 	version 5.1 optimized: 42.1u 42.4 total
+
+	* src/axis.c (gen_tics) src/contour.c (contour) src/plot2d.c (eval_plots)
+	src/set.c (load_tic_series) term/emf.trm term/write_png_image.c:
+	Explicitly initialize some variables indicated as suspect by compiler
+	option -Wuninitialized.  The one in set.c can cause a real fault;
+	the others look like false positives to me but I am not 100% certain.
+	Bug #1933
 
 2017-06-14  Bastian Maerkisch  <bmaerkisch@web.de>
 

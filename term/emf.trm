@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.101 2016/04/07 03:21:05 sfeam Exp $
+ * $Id: emf.trm,v 1.102 2016/05/06 17:40:08 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -1347,7 +1347,7 @@ EMF_put_text(unsigned int x, unsigned int y, const char str[])
     int nchars = slen;
 
 #ifdef HAVE_ICONV
-    char * wstr;
+    char * wstr = 0;
     if (encoding == S_ENC_UTF8 || encoding == S_ENC_SJIS) {
 	iconv_t cd;
 	size_t wsize, wlen, mblen;

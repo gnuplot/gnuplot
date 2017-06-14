@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.558 2017/05/07 19:20:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.559 2017/06/02 00:26:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -6129,6 +6129,7 @@ load_tic_series(struct axis *this_axis)
 
     if (!equals(c_token, ",")) {
 	/* only step specified */
+	incr_token = c_token;
 	incr = start;
 	start = -VERYLARGE;
 	end = VERYLARGE;

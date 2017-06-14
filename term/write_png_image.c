@@ -50,7 +50,7 @@ piecemeal_write_base64_data (const unsigned char *data, unsigned int length, bas
   unsigned int i_data = 0;
 
   while (1) {
-    unsigned int databyte;
+    unsigned int databyte = 0;
     if (b64->shift > 0) {
       if (i_data >= length)
         break;
