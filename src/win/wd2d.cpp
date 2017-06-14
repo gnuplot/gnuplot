@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.6 2017/05/21 08:43:44 markisch Exp $
+ * $Id: wd2d.cpp,v 1.6.2.1 2017/06/13 04:11:40 markisch Exp $
  */
 
 /*
@@ -26,6 +26,9 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+// Enable to activate the Direct2D debug layer
+//#define D2DDEBUG
 
 // include iostream / cstdio _before_ syscfg.h in order
 // to avoid re-definition by wtext.h/winmain.c routines
@@ -111,7 +114,14 @@ d2dInit(void)
 
 	// Create D2D factory
 	if (g_pDirect2dFactory == NULL) {
+#ifdef D2DDEBUG
+		D2D1_FACTORY_OPTIONS options;
+		ZeroMemory(&options, sizeof(D2D1_FACTORY_OPTIONS));
+		options.debugLevel = D2D1_DEBUG_LEVEL_INFORMATION;
+		hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory), &options, (void **) &g_pDirect2dFactory);
+#else
 		hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &g_pDirect2dFactory);
+#endif
 	}
 
 	// Create a DirectWrite factory
