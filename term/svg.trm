@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.186 2017/02/17 20:19:25 sfeam Exp $
+ * $Id: svg.trm,v 1.187 2017/02/20 19:38:03 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -640,12 +640,11 @@ SVG_options ()
 	    continue;
 	}
 
-	if (almost_equals(c_token, "fs$ize")) {
+	if (equals(c_token, "fontscale")) {
 	    c_token++;
-
-	    if (END_OF_COMMAND)
-		int_error(c_token,"fsize: expecting font size");
-	    SVG_fontSizeDef = real_expression();
+	    SVG_fontscale = real_expression();
+	    if (SVG_fontscale <= 0)
+		SVG_fontscale = 1.0;
 	    continue;
 	}
 
@@ -702,7 +701,7 @@ SVG_options ()
     SVG_set_font("");
 
     /* Save options back into options string in normalized format */
-    sprintf(term_options, "size %d,%d%s %s fname '%s'  fsize %g ",
+    sprintf(term_options, "size %d,%d%s %s font '%s,%g' ",
 	    (int)(SVG_xSize/SVG_SCALE), (int)(SVG_ySize/SVG_SCALE),
 	SVG_fixed_size ? " fixed": " dynamic",
 	term->put_text == ENHsvg_put_text ? "enhanced" : "",
@@ -2200,6 +2199,7 @@ START_HELP(svg)
 "                        {mouse} {standalone | jsdir <dirname>}",
 "                        {name <plotname>}",
 "                        {font \"<fontname>{,<fontsize>}\"} {{no}enhanced}",
+"                        {fontscale <multiplier>}",
 "                        {rounded|butt|square} {solid|dashed} {linewidth <lw>}",
 "                        {background <rgb_color>}",
 "",
