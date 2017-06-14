@@ -1,3 +1,10 @@
+2017-06-14  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wd2d.cpp:  When compiled with D2DDEBUG defined, enable the
+	Direct2D debug layer.
+
+	* src/win/winmain.c (WinExit):  Missing cleanup of Direct2D resources.
+
 2017-06-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgdiplus.cpp:  Cleartype text antialiasing seems to be only
