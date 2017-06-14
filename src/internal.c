@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.96 2017/04/22 04:44:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.97 2017/06/05 21:32:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1111,6 +1111,7 @@ f_power(union argument *arg)
 	int fperror = fpclassify(result.v.cmplx_val.real);
 	if (fperror == FP_ZERO || fperror == FP_SUBNORMAL) {
 	    result.v.cmplx_val.real = 0.0;
+	    result.v.cmplx_val.imag = 0.0;
 	    errno = 0;
 	}
     }
@@ -1920,6 +1921,7 @@ f_value(union argument *arg)
 	/* int_warn(NO_CARET,"undefined variable name passed to value()"); */
 	result.type = CMPLX;
 	result.v.cmplx_val.real = not_a_number();
+	result.v.cmplx_val.imag = 0;
     }
     push(&result);
 }
