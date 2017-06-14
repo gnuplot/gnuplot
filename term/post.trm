@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.297 2017/05/07 19:20:52 sfeam Exp $
+ * $Id: post.trm,v 1.298 2017/05/30 20:20:51 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -979,7 +979,7 @@ PS_options()
 	    set_fontscale = TRUE;
 	    c_token++;
 	    ps_params->fontscale = END_OF_COMMAND ? -1 : real_expression();
-	    if (ps_params->fontscale < 0.0)
+	    if (ps_params->fontscale <= 0)
 		ps_params->fontscale = 1.0;
 	    break;
 	case PS_FONTFILE: {
