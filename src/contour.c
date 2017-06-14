@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: contour.c,v 1.34 2015/05/08 18:17:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: contour.c,v 1.35 2016/05/09 03:32:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - contour.c */
@@ -202,7 +202,8 @@ contour(int num_isolines, struct iso_curve *iso_lines)
     poly_struct *p_polys, *p_poly;
     edge_struct *p_edges, *p_edge;
     double z = 0;
-    double z0, dz;
+    double z0 = 0;
+    double dz = 0;
     struct gnuplot_contours *save_contour_list;
 
     /* HBB FIXME 20050804: The number of contour_levels as set by 'set

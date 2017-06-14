@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.223 2017/04/12 05:36:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.223.2.1 2017/06/13 18:38:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1337,6 +1337,7 @@ gen_tics(struct axis *this, tic_callback callback)
 	    if (this->index == POLAR_AXIS) {
 		/* Defer polar conversion until after limit check */
 		internal = tic;
+		user = tic;
 	    } else if (nonlinear(this)) {
 		if (def->type == TIC_COMPUTED)
 		    user = eval_link_function(this->linked_to_primary->linked_to_secondary, tic);

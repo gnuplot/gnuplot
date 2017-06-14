@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.429 2017/03/29 04:20:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.430 2017/03/31 18:41:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1942,7 +1942,8 @@ static void
 eval_plots()
 {
     int i;
-    struct curve_points *this_plot, **tp_ptr;
+    struct curve_points *this_plot = NULL;
+    struct curve_points **tp_ptr;
     t_uses_axis uses_axis[AXIS_ARRAY_SIZE];
     int some_functions = 0;
     int plot_num, line_num;

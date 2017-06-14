@@ -3,6 +3,13 @@
 	* term/svg.trm:  Normalize handling of terminal option "fontscale" to
 	match other terminals. Remove obsolete keyword "fsize".
 
+	* src/axis.c (gen_tics) src/contour.c (contour) src/plot2d.c (eval_plots)
+	src/set.c (load_tic_series) term/emf.trm term/write_png_image.c:
+	Explicitly initialize some variables indicated as suspect by compiler
+	option -Wuninitialized.  The one in set.c can cause a real fault;
+	the others look like false positives to me but I am not 100% certain.
+	Bug #1933
+
 2017-06-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* win/README-Windows.txt:  Update to version 5.2.

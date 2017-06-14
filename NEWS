@@ -8,6 +8,7 @@ Changes in 5.2.rc2
 * FIX sanity check inverse mapping function of set link and set nonlinear
 * FIX sanity check for empty image data structure
 * FIX segfault from corruption of timestamp text
+* FIX several unitialized variables (see Bug 1933)
 * CHANGE svg terminal option "fontscale" replaces obsolete "fsize"
 
 Changes and new features in 5.2
