@@ -2,11 +2,14 @@
 
 	More corner-case failures found by fuzzing the demo set.
 
-	* term/dumb.trm:  terminal character grid y limit was not checked in
-	the color+utf8 case.
+	* term/dumb.trm:  terminal character grid y limit was not checked prior
+	to printing text with color+utf8 attributes.
 
 	* src/command.c (print_set_output):  Fix failure to reset flag indicating
 	output to a datablock. E.g. "set print $T; set print '-'; show print"
+
+	* src/graphics.c:  Sanity check for well-defined coordinates at the
+	corners of an image.  Variable initialization to make compiler happy.
 
 2017-06-14  Ethan A Merritt  <merritt@u.washington.edu>
 
