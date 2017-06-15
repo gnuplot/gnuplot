@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.353 2017/04/24 17:03:55 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.354 2017/05/20 01:27:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1839,10 +1839,10 @@ print_set_output(char *name, TBOOLEAN datablock, TBOOLEAN append_p)
 
     free(print_out_name);
     print_out_name = NULL;
+    print_out_var = NULL;
 
     if (! name) {
 	print_out = stderr;
-	print_out_var = NULL;
 	return;
     }
 
