@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.556 2017/06/08 16:24:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.557 2017/06/13 21:47:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1462,7 +1462,7 @@ plot_steps(struct curve_points *plot)
     enum coord_type prev = UNDEFINED;	/* type of previous point */
     int xprev, yprev;			/* previous point coordinates */
     int xleft, xright, ytop, ybot;	/* plot limits in terminal coords */
-    int y0;				/* baseline */
+    int y0=0;				/* baseline */
     int style = 0;
 
     /* EAM April 2011:  Default to lines only, but allow filled boxes */
@@ -2143,10 +2143,9 @@ plot_points(struct curve_points *plot)
 	    (*t->set_font) (plot->labels->font);
 	(*t->justify_text) (CENTRE);
     }
-    if (clip_points) {
-	p_width = t->h_tic * plot->lp_properties.p_size;
-	p_height = t->v_tic * plot->lp_properties.p_size;
-    }
+
+    p_width = t->h_tic * plot->lp_properties.p_size;
+    p_height = t->v_tic * plot->lp_properties.p_size;
 
     /* Displace overlapping points if "set jitter" is in effect	*/
     /* This operation leaves x and y untouched, but loads the	*/
@@ -2900,7 +2899,7 @@ plot_boxplot(struct curve_points *plot)
 
     struct coordinate candle;
     double median, quartile1, quartile3;
-    double whisker_top, whisker_bot;
+    double whisker_top=0, whisker_bot=0;
 
     int level;
     int levels = plot->boxplot_factors;
@@ -4566,6 +4565,11 @@ process_image(void *plot, t_procimg_action action)
 	p_end_corner[0] = points[p_count-1].x;
 	p_end_corner[1] = points[p_count-1].y;
     }
+
+    /* Catch pathological cases */
+    if (isnan(p_start_corner[0]) || isnan(p_end_corner[0])
+    ||  isnan(p_start_corner[1]) || isnan(p_end_corner[1]))
+	int_error(NO_CARET, "image coordinates undefined");
 
     /* This is a vestige of older code that calculated K and L on the fly	*/
     /* rather than keeping track of matrix/array/image dimensions on input	*/
