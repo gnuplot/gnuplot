@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.255.2.1 2017/05/25 18:22:12 markisch Exp $
+ * $Id: wgraph.c,v 1.255.2.2 2017/06/13 04:06:19 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -592,8 +592,6 @@ GraphInit(LPGW lpgw)
 		M_GRAPH_TO_TOP, TEXT("Bring to &Top"));
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->color ? MF_CHECKED : MF_UNCHECKED),
 		M_COLOR, TEXT("C&olor"));
-	//AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->doublebuffer ? MF_CHECKED : MF_UNCHECKED),
-	//	M_DOUBLEBUFFER, TEXT("&Double buffer"));
 	AppendMenu(lpgw->hPopMenu, MF_SEPARATOR, 0, NULL);
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->gdiplus ? MF_CHECKED : MF_UNCHECKED),
 		M_GDI, TEXT("&GDI backend"));
@@ -606,7 +604,7 @@ GraphInit(LPGW lpgw)
 		M_D2D, TEXT("Direct&2D backend"));
 #endif
 	AppendMenu(lpgw->hPopMenu, MF_SEPARATOR, 0, NULL);
-#ifdef HAVE_GDIPLUS
+#if defined(HAVE_GDIPLUS) || defined(HAVE_D2D)
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->oversample ? MF_CHECKED : MF_UNCHECKED),
 		M_OVERSAMPLE, TEXT("O&versampling"));
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->antialiasing ? MF_CHECKED : MF_UNCHECKED),
@@ -3338,8 +3336,6 @@ WriteGraphIni(LPGW lpgw)
 	WritePrivateProfileString(section, TEXT("GraphColor"), profile, file);
 	wsprintf(profile, TEXT("%d"), lpgw->graphtotop);
 	WritePrivateProfileString(section, TEXT("GraphToTop"), profile, file);
-	wsprintf(profile, TEXT("%d"), lpgw->doublebuffer);
-	WritePrivateProfileString(section, TEXT("GraphDoublebuffer"), profile, file);
 	wsprintf(profile, TEXT("%d"), lpgw->oversample);
 	WritePrivateProfileString(section, TEXT("GraphGDI+Oversampling"), profile, file);
 	// FIXME: Do not default to Direct2D just yet.
@@ -3473,11 +3469,6 @@ ReadGraphIni(LPGW lpgw)
 		GetPrivateProfileString(section, TEXT("GraphToTop"), TEXT(""), profile, 80, file);
 	if ((p = GetInt(profile, (LPINT)&lpgw->graphtotop)) == NULL)
 		lpgw->graphtotop = TRUE;
-
-	if (bOKINI)
-		GetPrivateProfileString(section, TEXT("GraphDoubleBuffer"), TEXT(""), profile, 80, file);
-	if ((p = GetInt(profile, (LPINT)&lpgw->doublebuffer)) == NULL)
-		lpgw->doublebuffer = TRUE;
 
 	if (bOKINI)
 		GetPrivateProfileString(section, TEXT("GraphGDI+Oversampling"), TEXT(""), profile, 80, file);
@@ -4179,7 +4170,6 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			switch (LOWORD(wParam)) {
 				case M_GRAPH_TO_TOP:
 				case M_COLOR:
-				case M_DOUBLEBUFFER:
 				case M_OVERSAMPLE:
 				case M_GDI:
 				case M_GDIPLUS:
@@ -4403,10 +4393,6 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					lpgw->oversample = !lpgw->oversample;
 					SendMessage(hwnd, WM_COMMAND, M_REBUILDTOOLS, 0L);
 					return 0;
-				case M_DOUBLEBUFFER:
-					lpgw->doublebuffer = !lpgw->doublebuffer;
-					SendMessage(hwnd, WM_COMMAND, M_REBUILDTOOLS, 0L);
-					return 0;
 				case M_GDI:
 					lpgw->gdiplus = FALSE;
 					lpgw->d2d = FALSE;
@@ -4608,32 +4594,24 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			RECT memrect;
 			RECT wrect;
 
+			GetPlotRect(lpgw, &rect);
 #if defined(HAVE_D2D) && !defined(DCRENDERER)
 			if (lpgw->d2d) {
-				RECT rect;
-				GetPlotRect(lpgw, &rect);
 				drawgraph_d2d(lpgw, hwnd, &rect);
 				ValidateRect(hwnd, NULL);
-				return 0;
 			} else {
 #endif
+				hdc = BeginPaint(hwnd, &ps);
+				SetMapMode(hdc, MM_TEXT);
+				SetBkMode(hdc, OPAQUE);
+				SetViewportExtEx(hdc, rect.right, rect.bottom, NULL);
 
-			hdc = BeginPaint(hwnd, &ps);
-			SetMapMode(hdc, MM_TEXT);
-			SetBkMode(hdc, OPAQUE);
-			GetPlotRect(lpgw, &rect);
-			SetViewportExtEx(hdc, rect.right, rect.bottom, NULL);
-
-			/* double buffering */
-			if (lpgw->doublebuffer) {
 				/* Was the window resized? */
 				GetWindowRect(hwnd, &wrect);
 				wwidth =  wrect.right - wrect.left;
 				wheight = wrect.bottom - wrect.top;
 				if ((lpgw->Size.x != wwidth) || (lpgw->Size.y != wheight)) {
-					RECT rect;
 					DestroyFonts(lpgw);
-					GetPlotRect(lpgw, &rect);
 					MakeFonts(lpgw, &rect, hdc);
 					lpgw->buffervalid = FALSE;
 				}
@@ -4672,17 +4650,22 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 					/* draw into memdc, then copy to hdc */
 #ifdef HAVE_GDIPLUS
-					if (lpgw->gdiplus && !(lpgw->rotating && lpgw->fastrotation))
+					if (lpgw->gdiplus && !(lpgw->rotating && lpgw->fastrotation)) {
 						drawgraph_gdiplus(lpgw, memdc, &memrect);
-					else
+					} else {
 #endif
 #if defined(HAVE_D2D) && defined(DCRENDERER)
-					if (lpgw->d2d)
-						drawgraph_d2d(lpgw, memdc, &memrect);
-					else
+						if (lpgw->d2d) {
+							drawgraph_d2d(lpgw, memdc, &memrect);
+						} else {
 #endif
-						drawgraph(lpgw, memdc, &memrect);
-
+							drawgraph(lpgw, memdc, &memrect);
+#if defined(HAVE_D2D) && defined(DCRENDERER)
+						}
+#endif
+#ifdef HAVE_GDIPLUS
+					}
+#endif
 					/* restore antialiasing */
 					lpgw->antialiasing = save_aa;
 
@@ -4709,31 +4692,15 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					SelectObject(memdc, oldbmp);
 					DeleteDC(memdc);
 				}
-			} else {
-#ifdef HAVE_GDIPLUS
-				if (lpgw->gdiplus && !(lpgw->rotating && lpgw->fastrotation))
-					drawgraph_gdiplus(lpgw, hdc, &rect);
-				else
-#endif
-#if defined(HAVE_D2D) && defined(DCRENDERER)
-				if (lpgw->d2d)
-					drawgraph_d2d(lpgw, hdc, &rect);
-				else
-#endif
-					drawgraph(lpgw, hdc, &rect);
+				EndPaint(hwnd, &ps);
+#if defined(HAVE_D2D) && !defined(DCRENDERER)
 			}
-
+#endif
 #ifndef WGP_CONSOLE
 			/* indicate input focus */
 			if (lpgw->bDocked && (GetFocus() == hwnd))
 				DrawFocusIndicator(lpgw);
 #endif
-
-			EndPaint(hwnd, &ps);
-#if defined(HAVE_D2D) && !defined(DCRENDERER)
-			}
-#endif
-
 #ifdef USE_MOUSE
 			/* drawgraph() erases the plot window, so immediately after
 			 * it has completed, all the 'real-time' stuff the gnuplot core

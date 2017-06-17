@@ -1,3 +1,8 @@
+2017-06-17  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c src/win/wgnuplib.h:  Remove the doublebuffer
+	setting.  It is always enabled.
+
 2017-06-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	More corner-case failures found by fuzzing the demo set.
@@ -22,6 +27,13 @@
 	option -Wuninitialized.  The one in set.c can cause a real fault;
 	the others look like false positives to me but I am not 100% certain.
 	Bug #1933
+
+2017-06-14  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wd2d.cpp:  When compiled with D2DDEBUG defined, enable the
+	Direct2D debug layer.
+
+	* src/win/winmain.c (WinExit):  Missing cleanup of Direct2D resources.
 
 2017-06-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
