@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.8 2017/06/14 07:43:06 markisch Exp $
+ * $Id: wd2d.cpp,v 1.9 2017/06/17 08:17:11 markisch Exp $
  */
 
 /*
@@ -81,7 +81,7 @@ static HRESULT d2dMeasureText(ID2D1RenderTarget * pRenderTarget, LPCWSTR text, I
 extern Gdiplus::Brush * gdiplusPatternBrush(int style, COLORREF color, double alpha, COLORREF backcolor, BOOL transparent);
 
 
-/* Release COM pointers safely 
+/* Release COM pointers safely
 */
 template<class Interface>
 inline void SafeRelease(Interface **ppInterfaceToRelease)
@@ -154,7 +154,7 @@ d2dInit(void)
 }
 
 
-void 
+void
 d2dCleanup(void)
 {
 	SafeRelease(&pRenderTarget);
@@ -248,12 +248,15 @@ d2dPolyline(ID2D1RenderTarget * pRenderTarget, ID2D1SolidColorBrush * pBrush, ID
 		      (points[i - 1].y == points[i].y)))
 			all_vert_or_horz = false;
 
-	// if all lines are horizontal or vertical we snap to nearest pixel
-	// to avoid "blurry" lines
+	// If all lines are horizontal or vertical we snap to nearest pixel
+	// to avoid "blurry" lines. But we need to take care of the DIP
+	// scaling factor.
 	if (all_vert_or_horz) {
+		FLOAT dpiX, dpiY;
+		pRenderTarget->GetDpi(&dpiX, &dpiY);
 		for (int i = 0; i < polyi; i++) {
-			points[i].x = trunc(points[i].x) + 0.5;
-			points[i].y = trunc(points[i].y) + 0.5;
+			points[i].x = (trunc(points[i].x * dpiX / 96.f) + 0.5) * 96.f / dpiX;
+			points[i].y = (trunc(points[i].y * dpiY / 96.f) + 0.5) * 96.f / dpiY;
 		}
 	}
 
@@ -333,7 +336,11 @@ d2dFilledPolygon(ID2D1RenderTarget * pRenderTarget, ID2D1SolidColorBrush * pBrus
 static void
 d2dDot(ID2D1RenderTarget * pRenderTarget, ID2D1SolidColorBrush * pBrush, float x, float y)
 {
-	pRenderTarget->FillRectangle(D2D1::RectF(x - 0.5f, y - 0.5f, x + 0.5f, y + 0.5f), pBrush);
+	FLOAT dpiX, dpiY;
+	pRenderTarget->GetDpi(&dpiX, &dpiY);
+	FLOAT ofsX = 0.5f * 96.f / dpiX;
+	FLOAT ofsY = 0.5f * 96.f / dpiY;
+	pRenderTarget->FillRectangle(D2D1::RectF(x - ofsX, y - ofsY, x + ofsX, y + ofsY), pBrush);
 }
 
 
@@ -357,11 +364,9 @@ d2dMeasureText(ID2D1RenderTarget * pRenderTarget, LPCWSTR text, IDWriteTextForma
 	if (SUCCEEDED(hr)) {
 		DWRITE_TEXT_METRICS textMetrics;
 		pTextLayout->GetMetrics(&textMetrics);
-
-		float dpiX, dpiY;
-		pRenderTarget->GetDpi(&dpiX, &dpiY);
-		size->width = textMetrics.widthIncludingTrailingWhitespace * dpiX / 96.f;
-		size->height = textMetrics.height * dpiY / 96.f;
+		// Note: result is in DIPs
+		size->width = textMetrics.widthIncludingTrailingWhitespace;
+		size->height = textMetrics.height;
 		SafeRelease(&pTextLayout);
 	}
 	return hr;
@@ -372,6 +377,8 @@ static HRESULT
 d2dSetFont(ID2D1RenderTarget * pRenderTarget, LPRECT rect, LPGW lpgw, LPTSTR fontname, int size, IDWriteTextFormat ** ppWriteTextFormat)
 {
 	HRESULT hr = S_OK;
+	FLOAT dpiX, dpiY; // render target DPI
+	FLOAT ddpiX, ddpiY; // desktop DPI
 
 	if ((fontname == NULL) || (*fontname == 0))
 		fontname = lpgw->deffontname;
@@ -395,7 +402,7 @@ d2dSetFont(ID2D1RenderTarget * pRenderTarget, LPRECT rect, LPGW lpgw, LPTSTR fon
 	if (italic) *italic = 0;
 	if (bold) *bold = 0;
 
-	// NOTE: We implement our own fallback
+	// NOTE: We implement our own fall-back
 	if (_tcscmp(fontname, TEXT("Times")) == 0) {
 		free(fontname);
 		fontname = _tcsdup(TEXT("Times New Roman"));
@@ -409,11 +416,11 @@ d2dSetFont(ID2D1RenderTarget * pRenderTarget, LPRECT rect, LPGW lpgw, LPTSTR fon
 	if (*ppWriteTextFormat)
 		SafeRelease(ppWriteTextFormat);
 
-	// The render target's DPI setting might be different,
-	// so we ask for the system DPI.
-	FLOAT dpiX, dpiY;
-	g_pDirect2dFactory->GetDesktopDpi(&dpiX, &dpiY);
-	FLOAT fontSize = size * dpiY / 72.f;
+	// Take into account differences between the render target's reported
+	// DPI setting and the system DPI.
+	g_pDirect2dFactory->GetDesktopDpi(&ddpiX, &ddpiY);
+	pRenderTarget->GetDpi(&dpiX, &dpiY);
+	FLOAT fontSize = size * ddpiY / dpiY * 96.f / 72.f;
 	hr = g_pDWriteFactory->CreateTextFormat(
 		family,
 		NULL,
@@ -440,9 +447,6 @@ d2dSetFont(ID2D1RenderTarget * pRenderTarget, LPRECT rect, LPGW lpgw, LPTSTR fon
 		);
 	}
 
-	// text metrics refer to the render target DPI
-	pRenderTarget->GetDpi(&dpiX, &dpiY);
-
 	// Deduce font metrics from text layout
 	if (SUCCEEDED(hr)) {
 		DWRITE_LINE_METRICS lineMetrics;
@@ -450,9 +454,10 @@ d2dSetFont(ID2D1RenderTarget * pRenderTarget, LPRECT rect, LPGW lpgw, LPTSTR fon
 		hr = pTextLayout->GetLineMetrics(&lineMetrics, 1, &count);
 
 		if (SUCCEEDED(hr)) {
-			lpgw->tmAscent = static_cast<FLOAT>(lineMetrics.baseline) * dpiY / 96.f;
-			lpgw->tmDescent = static_cast<FLOAT>(lineMetrics.height - lineMetrics.baseline) * dpiY / 96.f;
-			lpgw->tmHeight = static_cast<FLOAT>(lineMetrics.height) * dpiY / 96.f;
+			// Note:  values are in DIPs
+			lpgw->tmAscent = static_cast<FLOAT>(lineMetrics.baseline);
+			lpgw->tmDescent = static_cast<FLOAT>(lineMetrics.height - lineMetrics.baseline);
+			lpgw->tmHeight = static_cast<FLOAT>(lineMetrics.height);
 		}
 	}
 
@@ -465,7 +470,7 @@ d2dSetFont(ID2D1RenderTarget * pRenderTarget, LPRECT rect, LPGW lpgw, LPTSTR fon
 			FLOAT width = textMetrics.widthIncludingTrailingWhitespace * dpiX / 96.f;
 			//FLOAT height = textMetrics.height * dpiY / 96.f;
 
-			lpgw->vchar = MulDiv(lpgw->tmHeight, lpgw->ymax, rect->bottom - rect->top);
+			lpgw->vchar = MulDiv(lpgw->tmHeight * dpiY / 96.f, lpgw->ymax, rect->bottom - rect->top);
 			lpgw->hchar = MulDiv(width, lpgw->xmax, 10 * (rect->right - rect->left));
 			lpgw->htic = MulDiv(lpgw->hchar, 2, 5);
 			unsigned cy = MulDiv(width, 2, 50);
@@ -562,7 +567,19 @@ draw_enhanced_init(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, ID2D1SolidColor
 	// we cannot use pRenderTarget->GetDpi() since that always returns 96.0;
 	FLOAT dpiX, dpiY;
 	g_pDirect2dFactory->GetDesktopDpi(&dpiX, &dpiY);
-	enhstate.res_scale = dpiY / 96.0;
+	enhstate.res_scale = dpiY / 96.f;
+}
+
+
+static void
+d2d_update_keybox(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, unsigned plotno, FLOAT x, FLOAT y)
+{
+	// coordinates x,y are in DIPs, transform to pixels
+	FLOAT dpiX, dpiY;
+	pRenderTarget->GetDpi(&dpiX, &dpiY);
+	unsigned px = x * dpiX / 96.f + 0.5f;
+	unsigned py = y * dpiY / 96.f + 0.5f;
+	draw_update_keybox(lpgw, plotno, px, py);
 }
 
 
@@ -602,6 +619,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 	// COM return code
 	HRESULT hr = S_OK;
 	FLOAT dpiX, dpiY;
+	FLOAT pixtodipX, pixtodipY;	// pixel to DIP conversion factor
 #ifndef DCRENDERER
 	HDC hdc;
 #endif
@@ -737,6 +755,8 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 	pRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 	// Note that this will always be 96 for a DC Render Target.
 	pRenderTarget->GetDpi(&dpiX, &dpiY);
+	pixtodipX = 96.f / dpiX;
+	pixtodipY = 96.f / dpiY;
 	//printf("dpiX = %.1f, DPI = %u\n", dpiX, GetDPI());
 
 	/* background fill */
@@ -760,6 +780,9 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 
 	htic = (lpgw->org_pointsize * MulDiv(lpgw->htic, rr - rl, lpgw->xmax) + 1);
 	vtic = (lpgw->org_pointsize * MulDiv(lpgw->vtic, rb - rt, lpgw->ymax) + 1);
+	// rescale tic sizes to DIPs
+	htic *=  pixtodipX;
+	vtic *=  pixtodipY;
 
 	lpgw->angle = 0;
 	lpgw->justify = LEFT;
@@ -808,6 +831,9 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 			xdash = MulDiv(curptr->x, rr - rl - 1, lpgw->xmax) + rl + 0.5;
 			ydash = rb - MulDiv(curptr->y, rb - rt - 1, lpgw->ymax) + rt - 0.5;
 		}
+		// rescale coordinates to DIPs
+		xdash *=  pixtodipX;
+		ydash *=  pixtodipY;
 
 		/* finish last filled polygon */
 		if ((last_poly != NULL) &&
@@ -823,6 +849,11 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 					hr = d2dFilledPolygon(pPolygonRenderTarget, pFillBrush, last_poly, last_polyi);
 			} else {
 				GETHDC
+				// rescale coordinates back from DIPs to pixels
+				for (int i = 0; i < last_polyi; i++) {
+					last_poly[i].x /= pixtodipX;
+					last_poly[i].y /= pixtodipY;
+				}
 				Gdiplus::Graphics * graphics = gdiplusGraphics(lpgw, hdc);
 				gdiplusFilledPolygon(*graphics, *pattern_brush, reinterpret_cast<Gdiplus::PointF *>(last_poly), last_polyi);
 				delete graphics;
@@ -874,11 +905,8 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 					/* grey out keysample if graph is hidden */
 					if ((plotno <= lpgw->maxhideplots) && lpgw->hideplot[plotno - 1]) {
 						LPRECT bb = lpgw->keyboxes + plotno - 1;
-						D2D1_RECT_F rect;
-						rect.left = bb->left;
-						rect.right = bb->right;
-						rect.top = bb->top;
-						rect.bottom = bb->bottom;
+						D2D1_RECT_F rect = D2D1::RectF(bb->left * pixtodipX, bb->top * pixtodipY,
+						                               bb->right * pixtodipX, bb->bottom * pixtodipY);
 						pRenderTarget->FillRectangle(rect, pGrayBrush);
 					}
 					keysample = false;
@@ -987,6 +1015,9 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 					points[i].x = MulDiv(poly[i].x, rr - rl - 1, lpgw->xmax) + rl + 0.5;
 					points[i].y = rb - MulDiv(poly[i].y, rb - rt - 1, lpgw->ymax) + rt - 0.5;
 				}
+				// rescale coordinates to DIPs
+				points[i].x *=  pixtodipX;
+				points[i].y *=  pixtodipY;
 			}
 			LocalUnlock(poly);
 
@@ -995,8 +1026,8 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 			else
 				hr = d2dPolyline(pPolygonRenderTarget, pSolidBrush, pStrokeStyle, line_width, points, polyi);
 			if (keysample) {
-				draw_update_keybox(lpgw, plotno, points[0].x, points[0].y);
-				draw_update_keybox(lpgw, plotno, points[polyi - 1].x, points[polyi - 1].y);
+				d2d_update_keybox(lpgw, pRenderTarget, plotno, points[0].x, points[0].y);
+				d2d_update_keybox(lpgw, pRenderTarget, plotno, points[polyi - 1].x, points[polyi - 1].y);
 			}
 			delete [] points;
 			break;
@@ -1083,9 +1114,9 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 				if (textw) {
 					if (lpgw->angle != 0)
 						pRenderTarget->SetTransform(D2D1::Matrix3x2F::Rotation(-lpgw->angle, D2D1::Point2F(xdash + hshift, ydash + vshift)));
-					
+
 					pRenderTarget->DrawText(textw, static_cast<UINT32>(wcslen(textw)), pWriteTextFormat,
-											 D2D1::RectF(xdash + hshift + align_ofs, ydash + vshift, 
+											 D2D1::RectF(xdash + hshift + align_ofs, ydash + vshift,
 														 xdash + hshift + align_ofs + textbox_width, 8888), pSolidBrush);
 					if (lpgw->angle != 0)
 						pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
@@ -1111,8 +1142,8 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 						}
 					}
 					if (keysample) {
-						draw_update_keybox(lpgw, plotno, xdash - dxl, ydash - size.height / 2);
-						draw_update_keybox(lpgw, plotno, xdash + dxr, ydash + size.height / 2);
+						d2d_update_keybox(lpgw, pRenderTarget, plotno, xdash - dxl, ydash - size.height / 2);
+						d2d_update_keybox(lpgw, pRenderTarget, plotno, xdash + dxr, ydash + size.height / 2);
 					}
 #ifdef EAM_BOXED_TEXT
 					if (boxedtext.boxing) {
@@ -1144,8 +1175,8 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 				draw_get_enhanced_text_extend(&extend);
 
 				if (keysample) {
-					draw_update_keybox(lpgw, plotno, xdash - extend.left, ydash - extend.top);
-					draw_update_keybox(lpgw, plotno, xdash + extend.right, ydash + extend.bottom);
+					d2d_update_keybox(lpgw, pRenderTarget, plotno, xdash - extend.left, ydash - extend.top);
+					d2d_update_keybox(lpgw, pRenderTarget, plotno, xdash + extend.right, ydash + extend.bottom);
 				}
 #ifdef EAM_BOXED_TEXT
 				if (boxedtext.boxing) {
@@ -1275,6 +1306,11 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 							d2dFilledPolygon(pRenderTarget, pFillBrush, rect, 4);
 						} else {
 							GETHDC
+							// rescale coordinates back from DIPs to pixels
+							for (int i = 0; i < 4; i++) {
+								rect[i].x /= pixtodipX;
+								rect[i].y /= pixtodipY;
+							}
 							Gdiplus::Graphics * graphics = gdiplusGraphics(lpgw, hdc);
 							gdiplusFilledPolygon(*graphics, *pattern_brush, reinterpret_cast<Gdiplus::PointF *>(rect), 4);
 							delete graphics;
@@ -1380,21 +1416,22 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 			 * by a W_fillstyle call. */
 			// snap to pixel grid
 			D2D1_RECT_F rect;
-			rect.left = trunc(xdash);
-			rect.top = trunc(ydash);
-			rect.right = trunc(ppt[0].x);
-			rect.bottom = trunc(ppt[0].y);
+			rect.left = trunc(xdash / pixtodipX) * pixtodipX;
+			rect.top = trunc(ydash / pixtodipY) * pixtodipY;
+			rect.right = trunc(ppt[0].x / pixtodipX) * pixtodipX;
+			rect.bottom = trunc(ppt[0].y / pixtodipY) * pixtodipY;
 
 			D2D1_ANTIALIAS_MODE mode = pRenderTarget->GetAntialiasMode();
 			pRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_ALIASED);
 			if (pFillBrush != NULL) {
 				pRenderTarget->FillRectangle(rect, pFillBrush);
 			} else {
-				Gdiplus::Point p1(xdash + 0.5, ydash + 0.5);
-				Gdiplus::Point p2(ppt[0].x + 0.5, ppt[0].y + 0.5);
+				Gdiplus::Point p1(xdash / pixtodipX + 0.5, ydash / pixtodipY + 0.5);
+				Gdiplus::Point p2(ppt[0].x / pixtodipX + 0.5, ppt[0].y / pixtodipY + 0.5);
 				Gdiplus::Point p;
 				int height, width;
-	
+
+				// rescale coordinates from DIPs to pixels
 				p.X = GPMIN(p1.X, p2.X);
 				p.Y = GPMIN(p1.Y, p2.Y);
 				width = abs(p2.X - p1.X);
@@ -1409,7 +1446,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 			pRenderTarget->SetAntialiasMode(mode);
 
 			if (keysample)
-				draw_update_keybox(lpgw, plotno, xdash + 1, ydash);
+				d2d_update_keybox(lpgw, pRenderTarget, plotno, xdash + 1, ydash);
 			polyi = 0;
 			break;
 		}
@@ -1464,6 +1501,9 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 				double pointsize = curptr->x / 100.0;
 				htic = MulDiv(pointsize * lpgw->pointscale * lpgw->htic, rr - rl, lpgw->xmax) + 1;
 				vtic = MulDiv(pointsize * lpgw->pointscale * lpgw->vtic, rb - rt, lpgw->ymax) + 1;
+				// rescale tic length to DIPs
+				htic *= pixtodipX;
+				vtic *= pixtodipY;
 			} else {
 				htic = vtic = 0;
 			}
@@ -1479,6 +1519,8 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 			line_width *= lpgw->linewidth * lw_scale;
 			// Minimum line width is 1 pixel.
 			line_width = GPMAX(1, line_width);
+			// rescale line width to DIPs
+			line_width *= pixtodipY;
 			/* invalidate point symbol cache */
 			last_symbol = W_invalid_pointtype;
 			break;
@@ -1595,6 +1637,11 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 							hr = d2dFilledPolygon(pPolygonRenderTarget, pFillBrush, last_poly, last_polyi);
 					} else {
 						GETHDC
+						// rescale coordinates from DIPs to pixels
+						for (int i = 0; i < last_polyi; i++) {
+							last_poly[i].x /= pixtodipX;
+							last_poly[i].y /= pixtodipY;
+						}
 						Gdiplus::Graphics * graphics = gdiplusGraphics(lpgw, hdc);
 						gdiplusFilledPolygon(*graphics, *pattern_brush, reinterpret_cast<Gdiplus::PointF *>(last_poly), last_polyi);
 						delete graphics;
@@ -1651,7 +1698,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 						}
 					}
 					UINT32 stride = width * 4;
-					hr = pRenderTarget->CreateBitmap(size, argb_image, stride, 
+					hr = pRenderTarget->CreateBitmap(size, argb_image, stride,
 													 D2D1::BitmapProperties(
 														D2D1::PixelFormat(
 															DXGI_FORMAT_B8G8R8A8_UNORM,
@@ -1662,7 +1709,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 				} else {
 					UINT32 stride = width * 4;
 					UINT32 * argb_image = reinterpret_cast<UINT32 *>(image);
-					
+
 					// convert to gray-scale
 					if (!lpgw->color) {
 						argb_image = new UINT32[width * height];
@@ -1765,8 +1812,8 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 			} else {
 				// snap to pixel
 				if (lpgw->oversample) {
-					xofs = trunc(xdash) + 0.5;
-					yofs = trunc(ydash) + 0.5;
+					xofs = (trunc(xdash / pixtodipX) + 0.5) * pixtodipX;
+					yofs = (trunc(ydash / pixtodipY) + 0.5) * pixtodipY;
 				} else {
 					xofs = xdash;
 					yofs = ydash;
@@ -1858,8 +1905,8 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 			}
 #endif
 			if (keysample) {
-				draw_update_keybox(lpgw, plotno, xdash + htic, ydash + vtic);
-				draw_update_keybox(lpgw, plotno, xdash - htic, ydash - vtic);
+				d2d_update_keybox(lpgw, pRenderTarget, plotno, xdash + htic, ydash + vtic);
+				d2d_update_keybox(lpgw, pRenderTarget, plotno, xdash - htic, ydash - vtic);
 			}
 			break;
 			} /* default case */

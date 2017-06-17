@@ -1,10 +1,15 @@
 2017-06-17  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/win/wgraph.c src/win/wgnuplib.h:  Remove the doublebuffer setting.
-	It is always enabled.
+	* src/win/wgraph.c src/win/wgnuplib.h:  Remove the doublebuffer
+	setting.  It is always enabled.
 
 	* src/win/wgraph.c src/win/wgdiplus.cpp src/win/wd2d.cpp
 	src/win/wgnuplib.h:  Remove remnants of the old oversampling code.
+
+	* src/win/wd2d.cpp:  Direct2D uses coordinates in "device-independent-
+	pixels" (DIPs).  For a DCRenderingTarget these are identical to
+	pixels, but for other rendering targets we need to take a conversion
+	factor into account.
 
 2017-06-15  Ethan A Merritt  <merritt@u.washington.edu>
 
