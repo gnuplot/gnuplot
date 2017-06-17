@@ -1,3 +1,8 @@
+2017-06-17  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c src/win/wgnuplib.h:  Remove the doublebuffer setting.
+	It is always enabled.
+
 2017-06-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	More corner-case failures found by fuzzing the demo set.

@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.88 2017/05/13 11:49:29 markisch Exp $
+ * $Id: wgnuplib.h,v 1.89 2017/05/21 08:43:44 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -343,7 +343,6 @@ typedef struct tagGW {
 	BOOL	color;		/* color pens? */
 	BOOL	dashed;		/* dashed lines? */
 	BOOL	rounded;	/* rounded line caps and joins? */
-	BOOL	doublebuffer;	/* double buffering? */
 	BOOL	oversample;	/* oversampling? */
 	BOOL	gdiplus;	/* Use GDI+ only backend? */
 	BOOL	d2d;
