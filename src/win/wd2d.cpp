@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.6.2.1 2017/06/13 04:11:40 markisch Exp $
+ * $Id: wd2d.cpp,v 1.6.2.2 2017/06/14 07:46:53 markisch Exp $
  */
 
 /*
@@ -81,7 +81,7 @@ static HRESULT d2dMeasureText(ID2D1RenderTarget * pRenderTarget, LPCWSTR text, I
 extern Gdiplus::Brush * gdiplusPatternBrush(int style, COLORREF color, double alpha, COLORREF backcolor, BOOL transparent);
 
 
-/* Release COM pointers safely 
+/* Release COM pointers safely
 */
 template<class Interface>
 inline void SafeRelease(Interface **ppInterfaceToRelease)
@@ -154,7 +154,7 @@ d2dInit(void)
 }
 
 
-void 
+void
 d2dCleanup(void)
 {
 	SafeRelease(&pRenderTarget);
@@ -630,7 +630,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 	float align_ofs = 0.f;
 
 	/* lines */
-	double line_width = lpgw->sampling * lpgw->linewidth;	/* current line width */
+	double line_width = lpgw->linewidth;	/* current line width */
 	double lw_scale = 1.;
 	LOGPEN cur_penstruct;		/* current pen settings */
 	ID2D1StrokeStyle * pSolidStrokeStyle = NULL;
@@ -1476,7 +1476,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 			 * that linewidth is exactly 1 iff it's in default
 			 * state */
 			line_width = curptr->x == 100 ? 1 : (curptr->x / 100.0);
-			line_width *= lpgw->sampling * lpgw->linewidth * lw_scale;
+			line_width *= lpgw->linewidth * lw_scale;
 			// Minimum line width is 1 pixel.
 			line_width = GPMAX(1, line_width);
 			/* invalidate point symbol cache */

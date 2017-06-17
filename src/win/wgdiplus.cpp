@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.59.2.1 2017/06/13 03:43:52 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.59.2.2 2017/06/13 03:59:02 markisch Exp $
  */
 
 /*
@@ -311,7 +311,7 @@ SetFont_gdiplus(Graphics &graphics, LPRECT rect, LPGW lpgw, LPTSTR fontname, int
 #endif
 #endif
 	}
-	font = new Font(fontFamily, size * lpgw->sampling, fontStyle, UnitPoint);
+	font = new Font(fontFamily, size, fontStyle, UnitPoint);
 	double scale = font->GetSize() / fontFamily->GetEmHeight(fontStyle) * graphics.GetDpiY() / 72.;
 	/* store text metrics for later use */
 	lpgw->tmHeight = fontHeight = scale * (fontFamily->GetCellAscent(fontStyle) + fontFamily->GetCellDescent(fontStyle));
@@ -496,7 +496,7 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 	Font * font;
 
 	/* lines */
-	double line_width = lpgw->sampling * lpgw->linewidth;	/* current line width */
+	double line_width = lpgw->linewidth;	/* current line width */
 	double lw_scale = 1.;
 	LOGPEN cur_penstruct;		/* current pen settings */
 
@@ -1296,7 +1296,7 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 			 * that linewidth is exactly 1 iff it's in default
 			 * state */
 			line_width = curptr->x == 100 ? 1 : (curptr->x / 100.0);
-			line_width *= lpgw->sampling * lpgw->linewidth * lw_scale;
+			line_width *= lpgw->linewidth * lw_scale;
 			solid_pen.SetWidth(line_width);
 			pen.SetWidth(line_width);
 			/* invalidate point symbol cache */
@@ -1622,7 +1622,7 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 			} /* switch (point symbol) */
 
 			if (b != NULL) {
-				// create a chached bitmap for faster redrawing
+				// create a cached bitmap for faster redrawing
 				cb = new CachedBitmap(b, &graphics);
 				// display point symbol snapped to pixel
 				if (lpgw->oversample)

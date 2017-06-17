@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.255.2.2 2017/06/13 04:06:19 markisch Exp $
+ * $Id: wgraph.c,v 1.255.2.3 2017/06/17 19:59:17 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -382,7 +382,6 @@ GraphInitStruct(LPGW lpgw)
 		} else {
 			lpgw->Title = _tcsdup(WINGRAPHTITLE);
 		}
-		lpgw->sampling = 1;
 		lpgw->fontscale = 1.;
 		lpgw->linewidth = 1.;
 		lpgw->pointscale = 1.;
@@ -856,14 +855,14 @@ MakePens(LPGW lpgw, HDC hdc)
 
 	if ((GetDeviceCaps(hdc, NUMCOLORS) == 2) || !lpgw->color) {
 		pen = lpgw->monopen[1];
-		pen.lopnWidth.x *= lpgw->linewidth * lpgw->sampling;
+		pen.lopnWidth.x *= lpgw->linewidth;
 		lpgw->hapen = CreatePenIndirect(&pen); 	/* axis */
 		lpgw->hbrush = CreateSolidBrush(lpgw->background);
 		for (i = 0; i < WGNUMPENS + 2; i++)
 			lpgw->colorbrush[i] = CreateSolidBrush(lpgw->monopen[i].lopnColor);
 	} else {
 		pen = lpgw->colorpen[1];
-		pen.lopnWidth.x *= lpgw->linewidth * lpgw->sampling;
+		pen.lopnWidth.x *= lpgw->linewidth;
 		lpgw->hapen = CreatePenIndirect(&pen); 	/* axis */
 		lpgw->hbrush = CreateSolidBrush(lpgw->background);
 		for (i = 0; i < WGNUMPENS + 2; i++)
@@ -1032,7 +1031,7 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	lpgw->rotate = FALSE;
 	memset(&(lpgw->lf), 0, sizeof(LOGFONT));
 	_tcsncpy(lpgw->lf.lfFaceName, lpgw->fontname, LF_FACESIZE);
-	lpgw->lf.lfHeight = -MulDiv(lpgw->fontsize * lpgw->fontscale, GetDeviceCaps(hdc, LOGPIXELSY), 72) * lpgw->sampling;
+	lpgw->lf.lfHeight = -MulDiv(lpgw->fontsize * lpgw->fontscale, GetDeviceCaps(hdc, LOGPIXELSY), 72);
 	lpgw->lf.lfCharSet = DEFAULT_CHARSET;
 	if (((p = _tcsstr(lpgw->fontname, TEXT(" Italic"))) != NULL) ||
 	    ((p = _tcsstr(lpgw->fontname, TEXT(":Italic"))) != NULL)) {
@@ -1348,7 +1347,7 @@ GraphEnhancedOpen(char *fontname, double fontsize, double base,
 		/* TODO: Proper use of OUTLINEFONTMETRICS would yield better
 		   results. */
 		enhstate.base = win_scale * base *
-		                enhstate.lpgw->sampling * enhstate.lpgw->fontscale *
+		                enhstate.lpgw->fontscale *
 		                enhstate.res_scale;
 	}
 }
@@ -1814,7 +1813,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	double alpha_c = 1.;		/* alpha for transparency */
 
 	/* lines */
-	double line_width = lpgw->sampling * lpgw->linewidth;	/* current line width */
+	double line_width = lpgw->linewidth;	/* current line width */
 	double lw_scale = 1.;
 	LOGPEN cur_penstruct;		/* current pen settings */
 
@@ -2570,7 +2569,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			 * that linewidth is exactly 1 iff it's in default
 			 * state */
 			line_width = curptr->x == 100 ? 1 : (curptr->x / 100.0);
-			line_width *= lpgw->sampling * lpgw->linewidth * lw_scale;
+			line_width *= lpgw->linewidth * lw_scale;
 			/* invalidate point symbol cache */
 			last_symbol = W_invalid_pointtype;
 			break;
@@ -3266,7 +3265,6 @@ CopyPrint(LPGW lpgw)
 		} else 
 #endif
 		{
-			lpgw->sampling = 1;
 			DestroyFonts(lpgw);
 			MakeFonts(lpgw, &rect, printer);
 			DestroyPens(lpgw);
@@ -4590,7 +4588,6 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			HBITMAP oldbmp;
 			LONG width, height;
 			LONG wwidth, wheight;
-			const int sampling = 1;
 			RECT memrect;
 			RECT wrect;
 
@@ -4621,9 +4618,9 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				height = rect.bottom - rect.top;
 				memdc = CreateCompatibleDC(hdc);
 				memrect.left = 0;
-				memrect.right = width * sampling + sampling/2;
+				memrect.right = width;
 				memrect.top = 0;
-				memrect.bottom = height * sampling + sampling/2;
+				memrect.bottom = height;
 
 				if (!lpgw->buffervalid || (lpgw->hBitmap == NULL)) {
 					BOOL save_aa;
@@ -4635,13 +4632,6 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					/* Update window size */
 					lpgw->Size.x = wwidth;
 					lpgw->Size.y = wheight;
-
-					/* TODO: we really should cache the results ... */
-					if (sampling > 1) {
-						lpgw->sampling = sampling;
-						DestroyFonts(lpgw);
-						MakeFonts(lpgw, &memrect, memdc);
-					}
 
 					/* Temporarily switch off antialiasing during rotation (GDI+) */
 					save_aa = lpgw->antialiasing;
@@ -4675,17 +4665,8 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					oldbmp = (HBITMAP) SelectObject(memdc, lpgw->hBitmap);
 				}
 				if (lpgw->buffervalid) {
-					if (sampling == 1)
-						BitBlt(hdc, rect.left, rect.top, width, height, memdc, 0, 0, SRCCOPY);
-					else {
-						int stretch = SetStretchBltMode(hdc, HALFTONE);
-						StretchBlt(hdc, rect.left, rect.top, width, height,
-								   memdc,0, 0, memrect.right, memrect.bottom,
-								   SRCCOPY);
-						SetStretchBltMode(hdc, stretch);
-					}
+					BitBlt(hdc, rect.left, rect.top, width, height, memdc, 0, 0, SRCCOPY);
 				}
-				lpgw->sampling = 1;
 
 				/* select the old bitmap back into the device context */
 				if (memdc != NULL) {
