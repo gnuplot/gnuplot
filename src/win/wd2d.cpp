@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.7 2017/06/13 04:10:46 markisch Exp $
+ * $Id: wd2d.cpp,v 1.8 2017/06/14 07:43:06 markisch Exp $
  */
 
 /*
@@ -630,7 +630,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 	float align_ofs = 0.f;
 
 	/* lines */
-	double line_width = lpgw->sampling * lpgw->linewidth;	/* current line width */
+	double line_width = lpgw->linewidth;	/* current line width */
 	double lw_scale = 1.;
 	LOGPEN cur_penstruct;		/* current pen settings */
 	ID2D1StrokeStyle * pSolidStrokeStyle = NULL;
@@ -746,7 +746,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 	else
 		pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
 
-	/* Init brush and pens: need to be created after the Graphics object. */
+	// init brushes
 	hr = pRenderTarget->CreateSolidColorBrush(D2DCOLORREF(lpgw->background, 1.), &pSolidBrush);
 	hr = pRenderTarget->CreateSolidColorBrush(D2DCOLORREF(lpgw->background, 1.), &pSolidFillBrush);
 	hr = pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(0.75f, 0.75f, 0.75f, 0.5f), &pGrayBrush);
@@ -1476,7 +1476,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 			 * that linewidth is exactly 1 iff it's in default
 			 * state */
 			line_width = curptr->x == 100 ? 1 : (curptr->x / 100.0);
-			line_width *= lpgw->sampling * lpgw->linewidth * lw_scale;
+			line_width *= lpgw->linewidth * lw_scale;
 			// Minimum line width is 1 pixel.
 			line_width = GPMAX(1, line_width);
 			/* invalidate point symbol cache */
@@ -1844,7 +1844,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 			if (b != NULL) {
 				GETHDC
 				Graphics * graphics = gdiplusGraphics(lpgw, hdc);
-				// create a chached bitmap for faster redrawing
+				// create a cached bitmap for faster redrawing
 				cb = new CachedBitmap(b, graphics);
 				// display point symbol snapped to pixel
 				if (lpgw->oversample)

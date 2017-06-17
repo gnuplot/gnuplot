@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.89 2017/05/21 08:43:44 markisch Exp $
+ * $Id: wgnuplib.h,v 1.90 2017/06/17 08:04:16 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -398,7 +398,6 @@ typedef struct tagGW {
 	COLORREF background;	/* background color */
 	HBRUSH	hbrush;		/* background brush */
 	HBRUSH	hcolorbrush;	/* */
-	int	sampling;	/* current sampling factor */
 
 	struct tagGW * next;	/* pointer to next window */
 } GW;

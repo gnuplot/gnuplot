@@ -3,6 +3,9 @@
 	* src/win/wgraph.c src/win/wgnuplib.h:  Remove the doublebuffer setting.
 	It is always enabled.
 
+	* src/win/wgraph.c src/win/wgdiplus.cpp src/win/wd2d.cpp
+	src/win/wgnuplib.h:  Remove remnants of the old oversampling code.
+
 2017-06-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	More corner-case failures found by fuzzing the demo set.
