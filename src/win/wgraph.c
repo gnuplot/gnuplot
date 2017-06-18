@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.259 2017/06/17 08:04:16 markisch Exp $
+ * $Id: wgraph.c,v 1.260 2017/06/17 08:17:11 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -4662,7 +4662,6 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			if (lpgw->d2d) {
 				drawgraph_d2d(lpgw, hwnd, &rect);
 				ValidateRect(hwnd, NULL);
-				return 0;
 			} else {
 #endif
 				hdc = BeginPaint(hwnd, &ps);
@@ -4746,18 +4745,16 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				if (memdc != NULL) {
 					SelectObject(memdc, oldbmp);
 					DeleteDC(memdc);
-					}
 				}
+				EndPaint(hwnd, &ps);
+#if defined(HAVE_D2D) && !defined(DCRENDERER)
+			}
+#endif
 #ifndef WGP_CONSOLE
 			/* indicate input focus */
 			if (lpgw->bDocked && (GetFocus() == hwnd))
 				DrawFocusIndicator(lpgw);
 #endif
-			EndPaint(hwnd, &ps);
-#if defined(HAVE_D2D) && !defined(DCRENDERER)
-			}
-#endif
-
 #ifdef USE_MOUSE
 			/* drawgraph() erases the plot window, so immediately after
 			 * it has completed, all the 'real-time' stuff the gnuplot core
@@ -4770,6 +4767,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			UpdateToolbar(lpgw);
 
 			return 0;
+		}
 		case WM_SIZE:
 			SendMessage(lpgw->hStatusbar, WM_SIZE, wParam, lParam);
 			if (lpgw->hToolbar) {
