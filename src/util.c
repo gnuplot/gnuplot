@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.149 2017/06/05 21:32:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.150 2017/06/13 00:19:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -86,6 +86,7 @@ static void mant_exp __PROTO((double, double, TBOOLEAN, double *, int *, const c
 static void parse_sq __PROTO((char *));
 static TBOOLEAN utf8_getmore __PROTO((unsigned long * wch, const char **str, int nbytes));
 static char *utf8_strchrn __PROTO((const char *s, int N));
+static char *num_to_str(double r);
 
 /*
  * equals() compares string value of token number t_num with str[], and
@@ -1641,7 +1642,7 @@ value_to_str(struct value *val, TBOOLEAN need_quotes)
  * format. Rotates through 4 buffers 's[j]', and returns pointers to
  * them, to avoid execution ordering problems if this function is
  * called more than once between sequence points. */
-char *
+static char *
 num_to_str(double r)
 {
     static int i = 0;
