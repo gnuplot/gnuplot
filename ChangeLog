@@ -4,6 +4,9 @@
 	save_fit() is the only external caller of num_to_str().
 	Call value_to_str() instead and make num_to_str() local to util.c.
 
+	* src/internal.c (f_index):  Repair memory leak when a datablock
+	is accessed as $DATABLOCK[index].
+
 2017-06-18  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	Prepare use of HwndRenderTargets instead of a DCRenderTarget. This is a

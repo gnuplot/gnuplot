@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.97 2017/06/05 21:32:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.98 2017/06/14 00:42:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1332,7 +1332,7 @@ f_index(union argument *arg)
 	i--;	/* line numbers run from 1 to nlines */
 	if (i < 0 || i >= datablock_size(&array))
 	    int_error(NO_CARET, "datablock index out of range");
-	push( Gstring(&array, gp_strdup(array.v.data_array[i])) );
+	push( Gstring(&array, array.v.data_array[i]) );
     }
 
     else
@@ -1380,7 +1380,7 @@ f_word(union argument *arg)
     int nwords = 0;
     int in_string = 0;
     int ntarget;
-    char q;
+    char q = '\0';
     char *s;
 
     (void) arg;
