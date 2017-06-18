@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.9 2017/06/17 08:17:11 markisch Exp $
+ * $Id: wd2d.cpp,v 1.10 2017/06/18 06:27:58 markisch Exp $
  */
 
 /*
@@ -61,11 +61,9 @@ const float textbox_width = 3000.f;
 
 static ID2D1Factory * g_pDirect2dFactory = NULL;
 static IDWriteFactory * g_pDWriteFactory = NULL;
-// TODO: Shouldn't the render target be a LPGW member?!
 #ifdef DCRENDERER
-static ID2D1DCRenderTarget * pRenderTarget = NULL;
-#else
-static ID2D1HwndRenderTarget * pRenderTarget = NULL;
+// All graph windows share a common DC render target
+static ID2D1DCRenderTarget * g_pRenderTarget = NULL;
 #endif
 
 static HRESULT d2dCreateStrokeStyle(D2D1_DASH_STYLE dashStyle, bool rounded, ID2D1StrokeStyle **ppStrokeStyle);
@@ -108,7 +106,7 @@ static struct {
 
 
 HRESULT
-d2dInit(void)
+d2dInit(LPGW lpgw)
 {
 	HRESULT hr = S_OK;
 
@@ -133,55 +131,68 @@ d2dInit(void)
 		);
 	}
 
-#ifdef DCRENDERER
 	// Create a render target
-	// TODO: Should this become a LPGW member?!
-	if (SUCCEEDED(hr) && pRenderTarget == NULL) {
-		D2D1_RENDER_TARGET_PROPERTIES props = D2D1::RenderTargetProperties(
-			D2D1_RENDER_TARGET_TYPE_DEFAULT,
-			D2D1::PixelFormat(
-				DXGI_FORMAT_B8G8R8A8_UNORM,
-				D2D1_ALPHA_MODE_IGNORE),
-			0,
-			0,
-			D2D1_RENDER_TARGET_USAGE_NONE,
-			D2D1_FEATURE_LEVEL_DEFAULT
+	if (SUCCEEDED(hr) && lpgw->pRenderTarget == NULL) {
+#ifdef DCRENDERER
+		if (g_pRenderTarget == NULL) {
+			D2D1_RENDER_TARGET_PROPERTIES props = D2D1::RenderTargetProperties(
+				D2D1_RENDER_TARGET_TYPE_DEFAULT,
+				D2D1::PixelFormat(
+					DXGI_FORMAT_B8G8R8A8_UNORM,
+					D2D1_ALPHA_MODE_IGNORE),
+				0,
+				0,
+				D2D1_RENDER_TARGET_USAGE_NONE,
+				D2D1_FEATURE_LEVEL_DEFAULT
+			);
+			hr = g_pDirect2dFactory->CreateDCRenderTarget(&props, &g_pRenderTarget);
+		}
+		if (SUCCEEDED(hr)) {
+			lpgw->pRenderTarget = g_pRenderTarget;
+		}
+#else
+		ID2D1HwndRenderTarget *pRenderTarget;
+		D2D1_RENDER_TARGET_PROPERTIES rtProps = D2D1::RenderTargetProperties();
+		rtProps.usage = D2D1_RENDER_TARGET_USAGE_GDI_COMPATIBLE;
+
+		HWND hwnd = lpgw->hWndGraph;
+		RECT rect;
+		GetClientRect(hwnd, &rect);
+		D2D1_SIZE_U size = D2D1::SizeU(rect.right - rect.left, rect.bottom - rect.top);
+
+		// Create a GDI compatible Hwnd render target.
+		hr = g_pDirect2dFactory->CreateHwndRenderTarget(
+			rtProps,
+			D2D1::HwndRenderTargetProperties(hwnd, size),
+			&pRenderTarget
 		);
-		hr = g_pDirect2dFactory->CreateDCRenderTarget(&props, &pRenderTarget);
-	}
+		if (SUCCEEDED(hr)) {
+			lpgw->pRenderTarget = pRenderTarget;
+		}
 #endif
+	}
 	return hr;
+}
+
+
+void
+d2dReleaseRenderTarget(LPGW lpgw)
+{
+#ifndef DCRENDERER
+	SafeRelease(&(lpgw->pRenderTarget));
+#endif
 }
 
 
 void
 d2dCleanup(void)
 {
-	SafeRelease(&pRenderTarget);
+#ifdef DCRENDERER
+	SafeRelease(&g_pRenderTarget);
+#endif
 	SafeRelease(&g_pDirect2dFactory);
 	SafeRelease(&g_pDWriteFactory);
 }
-
-
-#ifndef DCRENDERER
-static HRESULT
-d2dCreateRenderTarget(HWND hwnd, D2D1_SIZE_U & size)
-{
-	HRESULT hr = S_OK;
-
-	// Create a render target
-	D2D1_RENDER_TARGET_PROPERTIES rtProps = D2D1::RenderTargetProperties();
-	rtProps.usage = D2D1_RENDER_TARGET_USAGE_GDI_COMPATIBLE;
-
-	// Create a GDI compatible Hwnd render target.
-	hr = g_pDirect2dFactory->CreateHwndRenderTarget(
-		rtProps,
-		D2D1::HwndRenderTargetProperties(hwnd, size),
-		&pRenderTarget
-	);
-	return hr;
-}
-#endif
 
 
 /* ****************  D2D drawing functions   ************************* */
@@ -336,6 +347,7 @@ d2dFilledPolygon(ID2D1RenderTarget * pRenderTarget, ID2D1SolidColorBrush * pBrus
 static void
 d2dDot(ID2D1RenderTarget * pRenderTarget, ID2D1SolidColorBrush * pBrush, float x, float y)
 {
+	// draw a rectangle with 1 pixel height and width
 	FLOAT dpiX, dpiY;
 	pRenderTarget->GetDpi(&dpiX, &dpiY);
 	FLOAT ofsX = 0.5f * 96.f / dpiX;
@@ -490,15 +502,15 @@ d2dSetFont(ID2D1RenderTarget * pRenderTarget, LPRECT rect, LPGW lpgw, LPTSTR fon
 void
 InitFont_d2d(LPGW lpgw, HDC hdc, LPRECT rect)
 {
-	HRESULT hr = d2dInit();
-#ifdef DCRENDERER
+	HRESULT hr = d2dInit(lpgw);
 	if (SUCCEEDED(hr)) {
-		hr = pRenderTarget->BindDC(hdc, rect);
+#ifdef DCRENDERER
+		hr = g_pRenderTarget->BindDC(hdc, rect);
+#endif
 		IDWriteTextFormat * pWriteTextFormat = NULL;  // must initialize
-		d2dSetFont(pRenderTarget, rect, lpgw, lpgw->fontname, lpgw->fontsize, &pWriteTextFormat);
+		d2dSetFont(lpgw->pRenderTarget, rect, lpgw, lpgw->fontname, lpgw->fontsize, &pWriteTextFormat);
 		SafeRelease(&pWriteTextFormat);
 	}
-#endif
 }
 
 
@@ -594,7 +606,7 @@ gdiplusGraphics(LPGW lpgw, HDC hdc)
 
 
 #ifdef DCRENDERER
-# define GETHDC  pRenderTarget->EndDraw();
+# define GETHDC  hr = pRenderTarget->EndDraw();
 # define RELEASEHDC pRenderTarget->BeginDraw();
 #else
 # define GETHDC  hr = pGDIRenderTarget->GetDC(D2D1_DC_INITIALIZE_MODE_COPY, &hdc);
@@ -711,7 +723,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 		return;
 
 	// TODO: Need a D2D way of doing the following calls
-#ifdef DCRENDER
+#ifdef DCRENDERER
 	/* clear hypertexts only in display sessions */
 	interactive = (GetObjectType(hdc) == OBJ_MEMDC) ||
 		((GetObjectType(hdc) == OBJ_DC) && (GetDeviceCaps(hdc, TECHNOLOGY) == DT_RASDISPLAY));
@@ -732,23 +744,27 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 	// still need GDI+ for pattern fill, init
 	gdiplusInit();
 
-	hr = d2dInit();
+	// create the D2D factory object and the render target
+	hr = d2dInit(lpgw);
 	if (!SUCCEEDED(hr))
 		return;
 
 #ifdef DCRENDERER
+	ID2D1DCRenderTarget * pRenderTarget = g_pRenderTarget;
+	// new device context or size changed
 	hr = pRenderTarget->BindDC(hdc, rect);
 #else
+	ID2D1HwndRenderTarget * pRenderTarget = static_cast<ID2D1HwndRenderTarget *>(lpgw->pRenderTarget);
 	D2D1_SIZE_U size = D2D1::SizeU(rr - rl, rb - rt);
-	hr = d2dCreateRenderTarget(hwnd, size);
-	if (FAILED(hr))
+	if (SUCCEEDED(hr)) {
+		hr = pRenderTarget->Resize(size);
+	}
+	// No need to draw to an occluded window
+	if (pRenderTarget->CheckWindowState() == D2D1_WINDOW_STATE_OCCLUDED)
 		return;
 	ID2D1GdiInteropRenderTarget * pGDIRenderTarget = NULL;
 	if (SUCCEEDED(hr)) {
 		hr = pRenderTarget->QueryInterface(__uuidof(ID2D1GdiInteropRenderTarget), (void**)&pGDIRenderTarget);
-	}
-	if (SUCCEEDED(hr)) {
-		pRenderTarget->Resize(size);
 	}
 #endif
 
@@ -1962,5 +1978,6 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 		hr = S_OK;
 		// discard device resources
 		SafeRelease(&pRenderTarget);
+		lpgw->pRenderTarget = NULL;
 	}
 }

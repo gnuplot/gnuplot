@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.90 2017/06/17 08:04:16 markisch Exp $
+ * $Id: wgnuplib.h,v 1.91 2017/06/17 08:17:11 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -306,6 +306,10 @@ enum win_draw_commands {
 	W_hypertext
 };
 
+#ifdef HAVE_D2D
+// forward definition of Direct2D render target structure
+struct ID2D1RenderTarget;
+#endif
 
 typedef struct tagGW {
 	GP_LPPRINT	lpr;	/* must be first */
@@ -398,6 +402,10 @@ typedef struct tagGW {
 	COLORREF background;	/* background color */
 	HBRUSH	hbrush;		/* background brush */
 	HBRUSH	hcolorbrush;	/* */
+
+#ifdef HAVE_D2D
+	struct ID2D1RenderTarget * pRenderTarget;
+#endif
 
 	struct tagGW * next;	/* pointer to next window */
 } GW;

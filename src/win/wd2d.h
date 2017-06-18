@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.h,v 1.1 2017/04/23 18:27:53 markisch Exp $
+ * $Id: wd2d.h,v 1.2 2017/05/08 07:37:11 markisch Exp $
  */
 
 /*
@@ -30,7 +30,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef WD2D_H
 #define WD2D_H
 
-#define DCRENDERER
+//#define DCRENDERER
 
 #include <windows.h>
 #include "wgnuplib.h"
@@ -40,7 +40,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extern "C" {
 #endif
 
-extern HRESULT d2dInit(void);
+extern HRESULT d2dInit(LPGW lpgw);
+extern void d2dReleaseRenderTarget(LPGW lpgw);
 extern void d2dCleanup(void);
 
 #ifdef DCRENDERER
