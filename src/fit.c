@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.171 2017/06/02 00:12:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.172 2017/06/03 22:27:50 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -2393,12 +2393,7 @@ save_fit(FILE *fp)
 
     for (k = 0; k < last_num_params; k++) {
 	udv = get_udv_by_name(last_par_name[k]);
-	if (udv->udv_value.type == INTGR)
-	    fprintf(fp, "%-15s = %-22i\n", udv->udv_name, udv->udv_value.v.int_val);
-	else if (udv->udv_value.type == CMPLX)
-	    fprintf(fp, "%-15s = %-22s\n", udv->udv_name, num_to_str(udv->udv_value.v.cmplx_val.real));
-	else
-	    int_warn(NO_CARET, "Parameter %s is not INTGR or CMPLX", udv->udv_name);
+	fprintf(fp, "%-15s = %-22s\n", udv->udv_name, value_to_str(&(udv->udv_value), FALSE));
     }
     return;
 }

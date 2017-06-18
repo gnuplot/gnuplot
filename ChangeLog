@@ -1,3 +1,9 @@
+2017-06-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/fit.c (save_fit) src/util.h src/util.c (num_to_str):
+	save_fit() is the only external caller of num_to_str().
+	Call value_to_str() instead and make num_to_str() local to util.c.
+
 2017-06-18  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	Prepare use of HwndRenderTargets instead of a DCRenderTarget. This is a
