@@ -1,12 +1,12 @@
-<html><head><title>Demos for gnuplot version 5.1</title>
+<html><head><title>Demos for gnuplot version 5.3</title>
 
 <link text="text/css" href="gnuplot_demo.css" rel="stylesheet"></head><body>
 
 
-<h2 align=center>Demos for gnuplot version 5.1 (pngcairo terminal)<br>
+<h2 align=center>Demos for gnuplot version 5.3 (pngcairo terminal)<br>
     See also the demo output for the
-    <a href="../demo_svg_5.1/">SVG</a> and
-    <a href="../demo_canvas_5.1/">canvas</a> terminals.
+    <a href="../demo_svg_cvs/">SVG</a> and
+    <a href="../demo_canvas_cvs/">canvas</a> terminals.
 </h2>
 
 <p>

@@ -21,9 +21,6 @@ PLATFORMS:
     running in a browser.  If the tool chain is simple enough, we could
     make this a build target for autoconf/make.
 
- -- autoconf handling of TBOOLEAN on Solaris also remains problematic.
-    The definition apparently needs to be different for C and C++.
-
 GNUPLOT TOOLS LIBRARY:
 ======================
 
@@ -48,20 +45,8 @@ Note: use
 => "Feature request" for feature requests.
 
 
-Projects, in no particular order:
-
-- break it into four layers:
-  : low level graphics  (some of term.c)
-  : plotting code, reading the setshow.h global variables
-  : parsing code - read a string, and parse and execute it
-  : front end, interact with terminal / gui
-  basically, gplotlib is layer 2, and the traditional gnuplot is
-  layer 4, which is little more than a small client of layer 3.
-  Terminal option lines are table driven,
-  so that even though the options are defined by layer 1, the
-  actual parsing is implemented in level 3
-
 Lars' list
+==========
 
 - provide library of replacement functions instead of stdfn.c
 - completely rewrite the parser. Use yacc/bison if possible.
@@ -82,23 +67,47 @@ Lars' list
   gp_fopen() - to be implemented
 
 HBB:
+===
 
 [Optional:] See if 16-bit compilations can be made to work again.
 
-Ethan's List (2016):
 
-- rewrite javascript support files for the canvas terminal to use
-  browser's font support.  Maintain more per-plot context, e.g. zoom state.
-- isosurfaces (3D contour of 4D data)
-- support mousing in multiplot output
-- add additional tic levels, possibly to appear only when zoomed
-- configuration/build options to create
-	javascript/emscripten executable
-	qt-based support for pdf, svg, png, etc (Lodewick patches)
-	configure option for a qt-only build (no cairo, no x11, no wxt)
-- better tracking of wrapped input lines by the builtin readline code
+Ethan's list of ideas for development series 5.3
+================================================
+
+Code cleanup
+------------
+- remove all the original axis_log/delog macros
+- other obsolete macros?  HUGE? GPFAR?  MSDOS remnants?
+- refactor VMS conditionals so that all the code is in vms.c
+- use libm Bessel functions j0, j1, y0, y1, jn, yn if present
+  rather than the hard-coded ones in standard.c
+  NB: the ones in standard.c claim accuracy to 1e-13
+      the libm man page for j0 claims accuracy to 2e-16
+- Other libm functions?
+- matrix data should be stored as (double) not (float)
+- audit all FIXMEs, some must be out of date
+- further optimization of STORE_WITH_LOG_AND_UPDATE_RANGE
+  to increase speed and reduce code size
+
+Build system options
+--------------------
+- OSX autoconf
+- all-qt or all-cairo build targets
+- emscriptem build target
+
+Terminals
+---------
+- canvas terminal overhaul (use browser's font support)
+- gnuplot enhanced text --> LeTeX conversion
+- possible updates for
+  dxy aquaterm 
+
+Fitting
+-------
+- Patch #655 (Bastian Maerkisch) additional fit algorithms
+
+Ideas for core extensions
+-------------------------
 - 64-bit integer arithmetic
-
-- Remove obsolete files.  But are they truly obsolete?
-   term/pc.trm config/makefile.emx
-
+- isosurfaces (3D contour of 4D data)

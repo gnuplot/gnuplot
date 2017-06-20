@@ -1,3 +1,7 @@
+2017-06-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	Bump version number of development branch to 5.3
+
 2017-06-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/fit.c (save_fit) src/util.h src/util.c (num_to_str):

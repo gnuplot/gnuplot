@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.225 2017/06/14 23:00:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.226 2017/06/15 05:36:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1102,15 +1102,15 @@ gen_tics(struct axis *this, tic_callback callback)
     /* series-tics, either TIC_COMPUTED ("autofreq") or TIC_SERIES (user-specified increment)
      *
      * We need to distinguish internal user coords from user coords.
-     * before version 5.1
+     * before version 5.2
      * -	logscale: internal = log(user), all other: internal = user
-     * now that we have nonlinear axes in version 5.1
+     * now that we have nonlinear axes in version 5.2
      * -	internal = primary axis, user = secondary axis
      *		TIC_COMPUTED ("autofreq") tries for equal spacing on primary axis
      *		TIC_SERIES   requests equal spacing on secondary (user) axis
      *		minitics are always evenly spaced in user coords
      *
-     * FIXME: This comment describes the pre-version 5.1 code; not sure we want to keep it
+     * FIXME: This comment describes the pre-version 5.2 code; not sure we want to keep it
      * The minitics are a bit of a drag - we need to distinuish
      * the cases step>1 from step == 1.
      * If step = 1, we are looking at 1,10,100,1000 for example, so

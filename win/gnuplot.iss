@@ -1,6 +1,6 @@
 ﻿;
 
-; $Id: gnuplot.iss,v 1.15 2016/07/26 19:53:13 markisch Exp $
+; $Id: gnuplot.iss,v 1.16 2016/08/09 07:59:30 markisch Exp $
 
 ;
 
@@ -78,11 +78,11 @@
 
 #define MyAppName "gnuplot"
 
-#define MyAppVersionShort "5.1"
+#define MyAppVersionShort "5.3"
 
-#define MyAppVersion "5.1 CVS"
+#define MyAppVersion "5.3 CVS"
 
-#define MyAppNumVersion "5.1.0"
+#define MyAppNumVersion "5.3.0"
 
 #define MyAppPublisher "gnuplot development team"
 
@@ -90,7 +90,7 @@
 
 #define MyAppExeName "wgnuplot.exe"
 
-#define MyInstallerName "gp510-win32-setup"
+#define MyInstallerName "gp530-win32-setup"
 
 #define MyDocuments "%USERPROFILE%\Documents"
 
