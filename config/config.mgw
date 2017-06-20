@@ -493,13 +493,13 @@
 #define PACKAGE_NAME "gnuplot"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "gnuplot 5.1"
+#define PACKAGE_STRING "gnuplot 5.2"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "gnuplot"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "5.1"
+#define PACKAGE_VERSION "5.2"
 
 /* The patch level, a.k.a. micro version number */
 /* #undef PATCHLEVEL */
@@ -561,7 +561,7 @@
 /* #undef USE_X11_MULTIBYTE */
 
 /* Version number of package */
-#define VERSION "5.1"
+#define VERSION "5.2"
 
 /* The main version number */
 /* #undef VERSION_MAJOR */
