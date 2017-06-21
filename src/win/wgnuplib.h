@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.91 2017/06/17 08:17:11 markisch Exp $
+ * $Id: wgnuplib.h,v 1.92 2017/06/18 19:54:43 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -287,7 +287,8 @@ enum win_pointtypes {
 	W_pentagon, W_fpentagon,
 	W_last_pointtype = W_fpentagon
 };
-#define WIN_POINT_TYPES (W_last_pointtype - W_dot + 1)
+// The dot is reserved for pt 0, number of (remaining) point types:
+#define WIN_POINT_TYPES (W_last_pointtype - W_plus + 1)
 
 /* ops */
 enum win_draw_commands {

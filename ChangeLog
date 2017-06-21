@@ -1,3 +1,8 @@
+2017-06-21  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgnuplib.h:  The dot needs not to be included in the number of
+	different point types for cycling through.  Bug introduced on 2017-05-13.
+
 2017-06-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/standard.h src/standard.c src/eval.c docs/gnuplot.doc:
