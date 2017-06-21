@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1090 2017/06/05 21:32:50 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1091 2017/06/20 19:29:42 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -994,10 +994,12 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>EllipticK(k)</td>    <td>real k in (-1:1)</td>    <td><i>K(k)</i> complete elliptic integral of the first kind</td></tr>
 ^<tr>    <td>EllipticE(k)</td>    <td>real k in [-1:1]</td>    <td><i>E(k)</i> complete elliptic integral of the second kind</td></tr>
 ^<tr>    <td>EllipticPi(n,k)</td>    <td> real n&lt;1, real k in (-1:1)</td>    <td> &Pi;(<i>n,k</i>) complete elliptic integral of the third kind</td></tr>
-^<tr>    <td>besj0(x)</td>    <td>int or real</td>    <td><i>J</i><sub>0</sub> Bessel function of <i>x</i>, in radians</td></tr>
-^<tr>    <td>besj1(x)</td>    <td>int or real</td>    <td><i>J</i><sub>1</sub> Bessel function of <i>x</i>, in radians</td></tr>
-^<tr>    <td>besy0(x)</td>    <td>int or real</td>    <td><i>Y</i><sub>0</sub> Bessel function of <i>x</i>, in radians</td></tr>
-^<tr>    <td>besy1(x)</td>    <td>int or real</td>    <td><i>Y</i><sub>1</sub> Bessel function of <i>x</i>, in radians</td></tr>
+^<tr>    <td>besj0(x)</td>    <td>int or real</td>    <td><i>J</i><sub>0</sub> Bessel function of <i>x</i> in radians</td></tr>
+^<tr>    <td>besj1(x)</td>    <td>int or real</td>    <td><i>J</i><sub>1</sub> Bessel function of <i>x</i> in radians</td></tr>
+^<tr>    <td>besjn(n,x)</td>    <td>int,real</td>    <td><i>J</i><sub>1</sub> Bessel function Jn of <i>x</i> in radians</td></tr>
+^<tr>    <td>besy0(x)</td>    <td>int or real</td>    <td><i>Y</i><sub>0</sub> Bessel function of <i>x</i> in radians</td></tr>
+^<tr>    <td>besy1(x)</td>    <td>int or real</td>    <td><i>Y</i><sub>1</sub> Bessel function of <i>x</i> in radians</td></tr>
+^<tr>    <td>besyn(n,x)</td>    <td>int,real</td>    <td><i>J</i><sub>1</sub> Bessel function Yn of <i>x</i> in radians</td></tr>
 ^<tr>    <td>ceil(x)</td>    <td>any</td>    <td>&lceil;<i>x</i>&rceil;, smallest integer not less than <i>x</i> (real part)</td></tr>
 ^<tr>    <td>cos(x)</td>    <td>radians</td>    <td>cos <i>x</i>, cosine of <i>x</i></td></tr>
 ^<tr>    <td>cosh(x)</td>    <td>any</td>    <td>cosh <i>x</i>, hyperbolic cosine of <i>x</i> in radians</td></tr>
@@ -1232,31 +1234,43 @@ C marker below is used to signal this to doc2html:
 4 besj0
 ?expressions functions besj0
 ?besj0
-#besj0(x) & int or real &  $J_{0}$ Bessel function of $x$, in radians \\
-%besj0(x)@int or real@$J sub 0$ Bessel function of $x$, in radians
+#besj0(x) & int or real &  $J_{0}$ Bessel function of $x$ in radians \\
+%besj0(x)@int or real@$J sub 0$ Bessel function of $x$ in radians
  The `besj0(x)` function returns the J0th Bessel function of its argument.
  `besj0` expects its argument to be in radians.
 4 besj1
 ?expressions functions besj1
 ?besj1
-#besj1(x) & int or real & $J_{1}$ Bessel function of $x$, in radians \\
-%besj1(x)@int or real@$J sub 1$ Bessel function of $x$, in radians
+#besj1(x) & int or real & $J_{1}$ Bessel function of $x$ in radians \\
+%besj1(x)@int or real@$J sub 1$ Bessel function of $x$ in radians
  The `besj1(x)` function returns the J1st Bessel function of its argument.
  `besj1` expects its argument to be in radians.
+4 besjn
+?expressions functions besjn
+?besjn
+#besjn(n,x) & int, real & $J_{n}$ Bessel function of $x$ in radians \\
+%besjn(n,x)@int,real@$J sub n$ Bessel function of $x$ in radians
+ The `besjn(n,x)` functions returns the Jn Bessel function of x in radians.
 4 besy0
 ?expressions functions besy0
 ?besy0
-#besy0(x) & int or real & $Y_{0}$ Bessel function of $x$, in radians \\
-%besy0(x)@int or real@$Y sub 0$ Bessel function of $x$, in radians
+#besy0(x) & int or real & $Y_{0}$ Bessel function of $x$ in radians \\
+%besy0(x)@int or real@$Y sub 0$ Bessel function of $x$ in radians
  The `besy0(x)` function returns the Y0th Bessel function of its argument.
  `besy0` expects its argument to be in radians.
 4 besy1
 ?expressions functions besy1
 ?besy1
-#besy1(x) & int or real & $Y_{1}$ Bessel function of $x$, in radians \\
-%besy1(x)@int or real@$Y sub 1$ Bessel function of $x$, in radians
+#besy1(x) & int or real & $Y_{1}$ Bessel function of $x$ in radians \\
+%besy1(x)@int or real@$Y sub 1$ Bessel function of $x$ in radians
  The `besy1(x)` function returns the Y1st Bessel function of its argument.
  `besy1` expects its argument to be in radians.
+4 besyn
+?expressions functions besyn
+?besyn
+#besyn(n,x) & int, real & $Y_{n}$ Bessel function of $x$ in radians \\
+%besyn(n,x)@int,real@$Y sub n$ Bessel function of $x$ in radians
+ The `besyn(n,x)` functions returns the Yn Bessel function of x in radians.
 4 ceil
 ?expressions functions ceil
 ?ceil

@@ -1,3 +1,13 @@
+2017-06-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/standard.h src/standard.c src/eval.c docs/gnuplot.doc:
+	Use Bessel functions j0, j1, jn, y0, y1, yn from libm if present.
+	These replace the hard-coded implementations besj0, besj1, besy0, besy1
+	in standard.c.   The old versions are still present if needed.
+	Add wrappers besjn(i, X) besyn(i, X).
+	The hard-coded implementations claimed accuracy to 1.e-13.
+	The libm implementations claim accuracy to 2.e-16.
+
 2017-06-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	Bump version number of development branch to 5.3

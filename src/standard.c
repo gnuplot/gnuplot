@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: standard.c,v 1.33 2015/01/20 02:10:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: standard.c,v 1.34 2016/01/15 05:06:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - standard.c */
@@ -45,6 +45,18 @@ static double carlson_elliptic_rf(double x,double y,double z);
 static double carlson_elliptic_rd(double x,double y,double z);
 static double carlson_elliptic_rj(double x,double y,double z,double p);
 
+#define PI_ON_FOUR       0.78539816339744830961566084581987572
+#define PI_ON_TWO        1.57079632679489661923131269163975144
+#define THREE_PI_ON_FOUR 2.35619449019234492884698253745962716
+#define TWO_ON_PI        0.63661977236758134307553505349005744
+
+#ifndef HAVE_LIBM
+
+/* June 2017
+ * These hard-coded Bessel approximations are used only if we
+ * can't use the functions in libm
+ */
+
 static double jzero __PROTO((double x));
 static double pzero __PROTO((double x));
 static double qzero __PROTO((double x));
@@ -64,6 +76,8 @@ static double ry1 __PROTO((double x));
  * John Wiley & Sons, 1968
  */
 
+static double dzero = 0.0;
+
 /* There appears to be a mistake in Hart, Cheney et al. on page 149.
  * Where it list Qn(x)/x ~ P(z*z)/Q(z*z), z = 8/x, it should read
  *               Qn(x)/z ~ P(z*z)/Q(z*z), z = 8/x
@@ -71,13 +85,6 @@ static double ry1 __PROTO((double x));
  * equation.
  * These bessel functions are accurate to about 1e-13
  */
-
-#define PI_ON_FOUR       0.78539816339744830961566084581987572
-#define PI_ON_TWO        1.57079632679489661923131269163975144
-#define THREE_PI_ON_FOUR 2.35619449019234492884698253745962716
-#define TWO_ON_PI        0.63661977236758134307553505349005744
-
-static double dzero = 0.0;
 
 /* jzero for x in [0,8]
  * Index 5849, 19.22 digits precision
@@ -273,6 +280,8 @@ static double GPFAR qyone[] = {
 	0.10726961437789255233221267e+4,
 	0.1e+1
 };
+
+#endif	/* hard-coded Bessel approximations if not HAVE_LIBM */
 
 /*
  * Make all the following internal routines perform autoconversion
@@ -869,6 +878,24 @@ f_exists(union argument *arg)
     }
 }
 
+#ifdef HAVE_LIBM
+
+/* June 2017
+ * Use the Bessel functions from libm if possible
+ */
+
+#define rj0(x) j0(x)
+#define rj1(x) j1(x)
+#define ry0(x) y0(x)
+#define ry1(x) y1(x)
+
+#else
+
+/* June 2017
+ * These hard-coded Bessel approximations are used only if we
+ * can't use the functions in ligm
+ */
+
 /* bessel function approximations */
 static double
 jzero(double x)
@@ -1062,6 +1089,11 @@ ry1(double x)
 		 (8.0 / x) * qone(x) * cos(x - THREE_PI_ON_FOUR)));
 }
 
+#define jn(n,x) not_a_number()
+#define yn(n,x) not_a_number()
+
+#endif	/* hard-coded Bessel approximations if not HAVE_LIBM */
+
 
 /* FIXME HBB 20010726: should bessel functions really call int_error,
  * right in the middle of evaluating some mathematical expression?
@@ -1126,6 +1158,36 @@ f_besy1(union argument *arg)
     else {
 	push(Gcomplex(&a, 0.0, 0.0));
 	undefined = TRUE;
+    }
+}
+
+void
+f_besjn(union argument *arg)
+{
+    struct value a,n;
+    (void) arg;
+    (void) pop(&a);
+    (void) pop(&n);
+    if ((n.type != INTGR) || (fabs(imag(&a)) > zero)) {
+	push(Gcomplex(&a, 0.0, 0.0));
+	undefined = TRUE;
+    } else {
+	push(Gcomplex(&a, jn(n.v.int_val, real(&a)), 0.0));
+    }
+}
+
+void
+f_besyn(union argument *arg)
+{
+    struct value a,n;
+    (void) arg;
+    (void) pop(&a);
+    (void) pop(&n);
+    if ((n.type != INTGR) || (fabs(imag(&a)) > zero)) {
+	push(Gcomplex(&a, 0.0, 0.0));
+	undefined = TRUE;
+    } else {
+	push(Gcomplex(&a, yn(n.v.int_val, real(&a)), 0.0));
     }
 }
 

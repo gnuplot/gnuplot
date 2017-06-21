@@ -1,5 +1,5 @@
 /*
- * $Id: standard.h,v 1.11 2006/07/14 00:30:41 sfeam Exp $
+ * $Id: standard.h,v 1.12 2008/03/30 03:03:48 sfeam Exp $
  */
 
 /* GNUPLOT - standard.h */
@@ -81,8 +81,10 @@ void f_floor __PROTO((union argument *x));
 void f_ceil __PROTO((union argument *x));
 void f_besj0 __PROTO((union argument *x));
 void f_besj1 __PROTO((union argument *x));
+void f_besjn __PROTO((union argument *x));
 void f_besy0 __PROTO((union argument *x));
 void f_besy1 __PROTO((union argument *x));
+void f_besyn __PROTO((union argument *x));
 void f_exists __PROTO((union argument *x));   /* exists("foo") */
 
 void f_tmsec __PROTO((union argument *x));
