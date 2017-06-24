@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: dumb.trm,v 1.38 2017/03/05 05:55:50 sfeam Exp $
+ * $Id: dumb.trm,v 1.39 2017/06/15 19:36:29 sfeam Exp $
  *
  */
 
@@ -233,7 +233,6 @@ DUMB_options()
 		y = int_expression();
 		if (y <= 0 || y > 1024)
 		    y = DUMB_YMAX;
-fprintf(stderr,"dumb x, y = %d %d\n", x, y);
 		dumb_xmax = term->xmax = x;
 		dumb_ymax = term->ymax = y;
 	    }
