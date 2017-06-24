@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.10 2017/06/18 06:27:58 markisch Exp $
+ * $Id: wd2d.cpp,v 1.11 2017/06/18 19:54:43 markisch Exp $
  */
 
 /*
@@ -66,9 +66,9 @@ static IDWriteFactory * g_pDWriteFactory = NULL;
 static ID2D1DCRenderTarget * g_pRenderTarget = NULL;
 #endif
 
-static HRESULT d2dCreateStrokeStyle(D2D1_DASH_STYLE dashStyle, bool rounded, ID2D1StrokeStyle **ppStrokeStyle);
-static HRESULT d2dCreateStrokeStyle(const FLOAT * dashes, UINT dashesCount, bool rounded, ID2D1StrokeStyle **ppStrokeStyle);
-static HRESULT d2dCreateStrokeStyle(D2D1_DASH_STYLE dashStyle, const FLOAT * dashes, UINT dashesCount, bool rounded, ID2D1StrokeStyle **ppStrokeStyle);
+static HRESULT d2dCreateStrokeStyle(D2D1_DASH_STYLE dashStyle, BOOL rounded, ID2D1StrokeStyle **ppStrokeStyle);
+static HRESULT d2dCreateStrokeStyle(const FLOAT * dashes, UINT dashesCount, BOOL rounded, ID2D1StrokeStyle **ppStrokeStyle);
+static HRESULT d2dCreateStrokeStyle(D2D1_DASH_STYLE dashStyle, const FLOAT * dashes, UINT dashesCount, BOOL rounded, ID2D1StrokeStyle **ppStrokeStyle);
 static HRESULT d2dPolyline(ID2D1RenderTarget * pRenderTarget, ID2D1SolidColorBrush * pBrush, ID2D1StrokeStyle * pStrokeStyle, float width, D2D1_POINT_2F *points, int polyi, bool closed = false);
 static void gdiplusFilledPolygon(Gdiplus::Graphics &graphics, Gdiplus::Brush &brush, Gdiplus::PointF *points, int polyi);
 static HRESULT d2dFilledPolygon(ID2D1RenderTarget * pRenderTarget, ID2D1SolidColorBrush * pBrush, D2D1_POINT_2F *points, int polyi);
@@ -199,7 +199,7 @@ d2dCleanup(void)
 
 
 static HRESULT
-d2dCreateStrokeStyle(D2D1_DASH_STYLE dashStyle, bool rounded, ID2D1StrokeStyle **ppStrokeStyle)
+d2dCreateStrokeStyle(D2D1_DASH_STYLE dashStyle, BOOL rounded, ID2D1StrokeStyle **ppStrokeStyle)
 {
 	const FLOAT dashstyles[4][6] = {
 		{ 16.f, 8.f },	// dash
@@ -219,14 +219,14 @@ d2dCreateStrokeStyle(D2D1_DASH_STYLE dashStyle, bool rounded, ID2D1StrokeStyle *
 
 
 static HRESULT
-d2dCreateStrokeStyle(const FLOAT * dashes, UINT dashesCount, bool rounded, ID2D1StrokeStyle **ppStrokeStyle)
+d2dCreateStrokeStyle(const FLOAT * dashes, UINT dashesCount, BOOL rounded, ID2D1StrokeStyle **ppStrokeStyle)
 {
 	return d2dCreateStrokeStyle(D2D1_DASH_STYLE_CUSTOM, dashes, dashesCount, rounded, ppStrokeStyle);
 }
 
 
 static HRESULT
-d2dCreateStrokeStyle(D2D1_DASH_STYLE dashStyle, const FLOAT * dashes, UINT dashesCount, bool rounded, ID2D1StrokeStyle **ppStrokeStyle)
+d2dCreateStrokeStyle(D2D1_DASH_STYLE dashStyle, const FLOAT * dashes, UINT dashesCount, BOOL rounded, ID2D1StrokeStyle **ppStrokeStyle)
 {
 	if (*ppStrokeStyle != NULL) {
 		if ((*ppStrokeStyle)->GetDashStyle() != dashStyle)

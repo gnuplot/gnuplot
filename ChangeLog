@@ -1,3 +1,8 @@
+2017-06-24  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wd2d.cpp:  Change the type of some parameters from bool to BOOL
+	to avoid warnings.
+
 2017-06-21  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgnuplib.h:  The dot needs not to be included in the number of
