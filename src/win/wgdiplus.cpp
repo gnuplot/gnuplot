@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.61 2017/06/13 03:55:48 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.62 2017/06/17 08:17:11 markisch Exp $
  */
 
 /*
@@ -327,6 +327,9 @@ SetFont_gdiplus(Graphics &graphics, LPRECT rect, LPGW lpgw, LPTSTR fontname, int
 	lpgw->htic = MulDiv(lpgw->hchar, 2, 5);
 	unsigned cy = MulDiv(box.Width, 2 * graphics.GetDpiY(), 50 * graphics.GetDpiX());
 	lpgw->vtic = MulDiv(cy, lpgw->ymax, rect->bottom - rect->top);
+
+	// Can always rotate text.
+	lpgw->rotate = TRUE;
 
 	return font;
 }

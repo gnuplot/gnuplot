@@ -1,5 +1,8 @@
 2017-06-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgdiplus.cpp:  We still need to indicate that text can be
+	rotated. Bug fix.
+
 	* src/win/wd2d.cpp:  Do not abort drawing if an error is encountered.
 	Add a few more error checks.
 
