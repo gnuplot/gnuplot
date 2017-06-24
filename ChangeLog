@@ -1,3 +1,8 @@
+2017-06-24  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgdiplus.cpp:  We still need to indicate that text can be
+	rotated. Bug fix.
+
 2017-06-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/dumb.trm:  Remove debug printout committed by mistake
