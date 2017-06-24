@@ -1,5 +1,8 @@
 2017-06-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgraph.c: Fix incorrect determination of the size of the-fly
+	toolbar and the statusbar.
+
 	* src/win/wgdiplus.cpp:  We still need to indicate that text can be
 	rotated. Bug fix.
 

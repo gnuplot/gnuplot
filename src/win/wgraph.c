@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.255.2.3 2017/06/17 19:59:17 markisch Exp $
+ * $Id: wgraph.c,v 1.255.2.4 2017/06/17 20:05:42 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -478,7 +478,7 @@ GraphInit(LPGW lpgw)
 		ShowWindow(lpgw->hStatusbar, SW_SHOWNOACTIVATE);
 
 		/* make room */
-		GetClientRect(lpgw->hStatusbar, &rect);
+		GetWindowRect(lpgw->hStatusbar, &rect);
 		lpgw->StatusHeight = rect.bottom - rect.top;
 	} else {
 		lpgw->StatusHeight = 0;
@@ -575,8 +575,8 @@ GraphInit(LPGW lpgw)
 		ShowWindow(lpgw->hToolbar, SW_SHOWNOACTIVATE);
 
 		/* make room */
-		GetClientRect(lpgw->hToolbar, &rect);
-		lpgw->ToolbarHeight = rect.bottom - rect.top + 1;
+		GetWindowRect(lpgw->hToolbar, &rect);
+		lpgw->ToolbarHeight = rect.bottom - rect.top;
 	}
 
 	lpgw->hPopMenu = CreatePopupMenu();
@@ -631,7 +631,7 @@ GraphInit(LPGW lpgw)
 	GraphUpdateMenu(lpgw);
 
 	/* modify the system menu to have the new items we want */
-	sysmenu = GetSystemMenu(lpgw->hWndGraph,0);
+	sysmenu = GetSystemMenu(lpgw->hWndGraph, 0);
 	AppendMenu(sysmenu, MF_SEPARATOR, 0, NULL);
 	AppendMenu(sysmenu, MF_POPUP, (UINT_PTR)lpgw->hPopMenu, TEXT("&Options"));
 	AppendMenu(sysmenu, MF_STRING, M_ABOUT, TEXT("&About"));
@@ -651,7 +651,7 @@ GraphInit(LPGW lpgw)
 		GetWindowRect(lpgw->hWndGraph, &wrect);
 		GetClientRect(lpgw->hWndGraph, &rect);
 		lpgw->Decoration.x = wrect.right - wrect.left + rect.left - rect.right;
-		lpgw->Decoration.y = wrect.bottom - wrect.top + rect.top- rect.bottom + lpgw->ToolbarHeight + lpgw->StatusHeight;
+		lpgw->Decoration.y = wrect.bottom - wrect.top + rect.top - rect.bottom + lpgw->ToolbarHeight + lpgw->StatusHeight;
 	}
 
 	/* resize to match requested canvas size */
@@ -937,7 +937,7 @@ GetPlotRect(LPGW lpgw, LPRECT rect)
 {
 	GetClientRect(lpgw->hWndGraph, rect);
 	rect->bottom -= lpgw->StatusHeight; /* leave some room for the status line */
-	rect->top += lpgw->ToolbarHeight + 1;
+	rect->top += lpgw->ToolbarHeight;
 	if (rect->bottom < rect->top) rect->bottom = rect->top;
 }
 
@@ -4702,8 +4702,8 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 				SendMessage(lpgw->hToolbar, WM_SIZE, wParam, lParam);
 				/* make room */
-				GetClientRect(lpgw->hToolbar, &rect);
-				lpgw->ToolbarHeight = rect.bottom - rect.top + 1;
+				GetWindowRect(lpgw->hToolbar, &rect);
+				lpgw->ToolbarHeight = rect.bottom - rect.top;
 			}
 			if ((wParam == SIZE_MAXIMIZED) || (wParam == SIZE_RESTORED)) {
 				RECT rect;
