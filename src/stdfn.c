@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.34 2017/01/29 12:18:21 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.35 2017/02/28 06:51:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stdfn.c */
@@ -595,7 +595,7 @@ gp_readdir(DIR *dir)
 	    WideCharToMultiByte(WinGetCodepage(encoding), 0, 
 				dir->info.name, sizeof(dir->info.name) / sizeof(wchar_t),
 				dir->info_mbname, sizeof(dir->info_mbname) / sizeof(char),
-				NUL, 0);
+				NULL, 0);
 	    result->d_name = dir->info_mbname;
 	}
     } else {
