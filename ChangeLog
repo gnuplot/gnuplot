@@ -1,5 +1,8 @@
 2017-06-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wd2d.cpp:  Do not abort drawing if an error is encountered.
+	Add a few more error checks.
+
 	* src/win/wd2d.cpp src/win/wgnuplib.h:  Add code for using a 
 	DeviceContext as RenderTarget.  Requires Direct2D 1.1 which is
 	available starting from Windows 7 with Platform Update.  Requires

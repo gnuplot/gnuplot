@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.13 2017/06/24 09:15:38 markisch Exp $
+ * $Id: wd2d.cpp,v 1.14 2017/06/24 11:22:12 markisch Exp $
  */
 
 /*
@@ -1058,15 +1058,17 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 					hr = d2dFilledPolygon(pPolygonRenderTarget, pFillBrush, last_poly, last_polyi);
 			} else {
 				GETHDC
-				// rescale coordinates back from DIPs to pixels
-				for (int i = 0; i < last_polyi; i++) {
-					last_poly[i].x /= pixtodipX;
-					last_poly[i].y /= pixtodipY;
+				if (SUCCEEDED(hr)) {
+					// rescale coordinates back from DIPs to pixels
+					for (int i = 0; i < last_polyi; i++) {
+						last_poly[i].x /= pixtodipX;
+						last_poly[i].y /= pixtodipY;
+					}
+					Gdiplus::Graphics * graphics = gdiplusGraphics(lpgw, hdc);
+					gdiplusFilledPolygon(*graphics, *pattern_brush, reinterpret_cast<Gdiplus::PointF *>(last_poly), last_polyi);
+					delete graphics;
+					RELEASEHDC
 				}
-				Gdiplus::Graphics * graphics = gdiplusGraphics(lpgw, hdc);
-				gdiplusFilledPolygon(*graphics, *pattern_brush, reinterpret_cast<Gdiplus::PointF *>(last_poly), last_polyi);
-				delete graphics;
-				RELEASEHDC
 			}
 			pRenderTarget->SetAntialiasMode(mode);
 			last_polyi = 0;
@@ -1512,18 +1514,20 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 						hr = d2dPolyline(pRenderTarget, pSolidBrush, pStrokeStyle, line_width, rect, 4, true);
 					} else {
 						if (pFillBrush != NULL) {
-							d2dFilledPolygon(pRenderTarget, pFillBrush, rect, 4);
+							hr = d2dFilledPolygon(pRenderTarget, pFillBrush, rect, 4);
 						} else {
 							GETHDC
-							// rescale coordinates back from DIPs to pixels
-							for (int i = 0; i < 4; i++) {
-								rect[i].x /= pixtodipX;
-								rect[i].y /= pixtodipY;
+							if (SUCCEEDED(hr)) {
+								// rescale coordinates back from DIPs to pixels
+								for (int i = 0; i < 4; i++) {
+									rect[i].x /= pixtodipX;
+									rect[i].y /= pixtodipY;
+								}
+								Gdiplus::Graphics * graphics = gdiplusGraphics(lpgw, hdc);
+								gdiplusFilledPolygon(*graphics, *pattern_brush, reinterpret_cast<Gdiplus::PointF *>(rect), 4);
+								delete graphics;
+								RELEASEHDC
 							}
-							Gdiplus::Graphics * graphics = gdiplusGraphics(lpgw, hdc);
-							gdiplusFilledPolygon(*graphics, *pattern_brush, reinterpret_cast<Gdiplus::PointF *>(rect), 4);
-							delete graphics;
-							RELEASEHDC
 						}
 					}
 				}
@@ -1646,11 +1650,13 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 				width = abs(p2.X - p1.X);
 				height = abs(p1.Y - p2.Y);
 				GETHDC
-				Gdiplus::Graphics * graphics = gdiplusGraphics(lpgw, hdc);
-				graphics->SetSmoothingMode(Gdiplus::SmoothingModeNone);
-				graphics->FillRectangle(pattern_brush, p.X, p.Y, width, height);
-				delete graphics;
-				RELEASEHDC
+				if (SUCCEEDED(hr)) {
+					Gdiplus::Graphics * graphics = gdiplusGraphics(lpgw, hdc);
+					graphics->SetSmoothingMode(Gdiplus::SmoothingModeNone);
+					graphics->FillRectangle(pattern_brush, p.X, p.Y, width, height);
+					delete graphics;
+					RELEASEHDC
+				}
 			}
 			pRenderTarget->SetAntialiasMode(mode);
 
@@ -1846,15 +1852,17 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 							hr = d2dFilledPolygon(pPolygonRenderTarget, pFillBrush, last_poly, last_polyi);
 					} else {
 						GETHDC
-						// rescale coordinates from DIPs to pixels
-						for (int i = 0; i < last_polyi; i++) {
-							last_poly[i].x /= pixtodipX;
-							last_poly[i].y /= pixtodipY;
+						if (SUCCEEDED(hr)) {
+							// rescale coordinates from DIPs to pixels
+							for (int i = 0; i < last_polyi; i++) {
+								last_poly[i].x /= pixtodipX;
+								last_poly[i].y /= pixtodipY;
+							}
+							Gdiplus::Graphics * graphics = gdiplusGraphics(lpgw, hdc);
+							gdiplusFilledPolygon(*graphics, *pattern_brush, reinterpret_cast<Gdiplus::PointF *>(last_poly), last_polyi);
+							delete graphics;
+							RELEASEHDC
 						}
-						Gdiplus::Graphics * graphics = gdiplusGraphics(lpgw, hdc);
-						gdiplusFilledPolygon(*graphics, *pattern_brush, reinterpret_cast<Gdiplus::PointF *>(last_poly), last_polyi);
-						delete graphics;
-						RELEASEHDC
 					}
 					pRenderTarget->SetAntialiasMode(mode);
 					free(last_poly);
@@ -1979,18 +1987,21 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 			if ((symbol < W_dot) || (symbol > W_last_pointtype))
 				break;
 
+			(void) last_symbol;
 #if 0
 			// draw cached point symbol
 			if (ps_caching && (last_symbol == symbol) && (cb != NULL)) {
 				// always draw point symbols on integer (pixel) positions
 				GETHDC
-				Graphics * graphics = gdiplusGraphics(lpgw, hdc);
-				if (lpgw->oversample)
-					graphics->DrawCachedBitmap(cb, INT(xdash + 0.5) - cb_ofs.x, INT(ydash + 0.5) - cb_ofs.y);
-				else
-					graphics->DrawCachedBitmap(cb, xdash - cb_ofs.x, ydash - cb_ofs.y);
-				delete graphics;
-				RELEASEHDC
+				if SUCCEEDED(hr) {
+					Graphics * graphics = gdiplusGraphics(lpgw, hdc);
+					if (lpgw->oversample)
+						graphics->DrawCachedBitmap(cb, INT(xdash + 0.5) - cb_ofs.x, INT(ydash + 0.5) - cb_ofs.y);
+					else
+						graphics->DrawCachedBitmap(cb, xdash - cb_ofs.x, ydash - cb_ofs.y);
+					delete graphics;
+					RELEASEHDC
+				}
 				break;
 			} else {
 				if (cb != NULL) {
@@ -2140,9 +2151,9 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 			curptr = (struct GWOP *)blkptr->gwop;
 		}
 
-		// stop looping on error
-		if (!SUCCEEDED(hr))
-			break;
+		if (FAILED(hr)) {
+			fprintf(stderr, "Warning: Direct2D back-end error %x; last command: %i\n", hr, lastop);
+		}
 	} /* while (ngwop < lpgw->nGWOP) */
 
 	/* clean-up */
