@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.92 2017/06/18 19:54:43 markisch Exp $
+ * $Id: wgnuplib.h,v 1.93 2017/06/21 08:46:09 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -326,7 +326,8 @@ typedef struct tagGW {
 	POINT	Size;		/* optional */	/* size of graph window */
 	LPTSTR	IniFile;	/* optional */
 	LPTSTR	IniSection;	/* optional */
-	HWND	hWndGraph;	/* window handle */
+	HWND	hWndGraph;	/* window handle of the top window */
+	HWND	hGraph;		/* window handle of the actual graph */
 	HWND	hStatusbar;	/* window handle of status bar */
 	int	StatusHeight;	/* height of status line area */
 	HWND	hToolbar;

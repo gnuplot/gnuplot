@@ -1,5 +1,5 @@
 /*
- * $Id: wcommon.h,v 1.30 2017/01/06 16:07:19 markisch Exp $
+ * $Id: wcommon.h,v 1.31 2017/04/23 17:46:58 markisch Exp $
  */
 
 /* GNUPLOT - wcommon.h */
@@ -75,7 +75,6 @@ extern LPWSTR szTextClass;
 extern LPWSTR szToolbarClass;
 extern LPWSTR szSeparatorClass;
 extern LPWSTR szPauseClass;
-extern LPTSTR szGraphClass;
 extern LPTSTR szAboutClass;
 
 void * LocalAllocPtr(UINT flags, UINT size);

@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.11 2017/06/18 19:54:43 markisch Exp $
+ * $Id: wd2d.cpp,v 1.12 2017/06/24 06:52:41 markisch Exp $
  */
 
 /*
@@ -155,7 +155,7 @@ d2dInit(LPGW lpgw)
 		D2D1_RENDER_TARGET_PROPERTIES rtProps = D2D1::RenderTargetProperties();
 		rtProps.usage = D2D1_RENDER_TARGET_USAGE_GDI_COMPATIBLE;
 
-		HWND hwnd = lpgw->hWndGraph;
+		HWND hwnd = lpgw->hGraph;
 		RECT rect;
 		GetClientRect(hwnd, &rect);
 		D2D1_SIZE_U size = D2D1::SizeU(rect.right - rect.left, rect.bottom - rect.top);
@@ -171,6 +171,26 @@ d2dInit(LPGW lpgw)
 		}
 #endif
 	}
+	return hr;
+}
+
+
+HRESULT
+d2dResize(LPGW lpgw, RECT rect)
+{
+	HRESULT hr = S_OK;
+
+	// do nothing if we don't have a target yet
+	if (lpgw->pRenderTarget == NULL)
+		return hr;
+
+#ifndef DCRENDERER
+	// HwndRenderTarget
+	ID2D1HwndRenderTarget * pRenderTarget = static_cast<ID2D1HwndRenderTarget *>(lpgw->pRenderTarget);
+	D2D1_SIZE_U size = D2D1::SizeU(rect.right - rect.left, rect.bottom - rect.top);
+	hr = pRenderTarget->Resize(size);
+#endif
+
 	return hr;
 }
 
@@ -755,17 +775,12 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 	hr = pRenderTarget->BindDC(hdc, rect);
 #else
 	ID2D1HwndRenderTarget * pRenderTarget = static_cast<ID2D1HwndRenderTarget *>(lpgw->pRenderTarget);
-	D2D1_SIZE_U size = D2D1::SizeU(rr - rl, rb - rt);
-	if (SUCCEEDED(hr)) {
-		hr = pRenderTarget->Resize(size);
-	}
 	// No need to draw to an occluded window
 	if (pRenderTarget->CheckWindowState() == D2D1_WINDOW_STATE_OCCLUDED)
 		return;
 	ID2D1GdiInteropRenderTarget * pGDIRenderTarget = NULL;
-	if (SUCCEEDED(hr)) {
+	if (SUCCEEDED(hr))
 		hr = pRenderTarget->QueryInterface(__uuidof(ID2D1GdiInteropRenderTarget), (void**)&pGDIRenderTarget);
-	}
 #endif
 
 	pRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
@@ -1442,12 +1457,12 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 			if (pFillBrush != NULL) {
 				pRenderTarget->FillRectangle(rect, pFillBrush);
 			} else {
+				// rescale coordinates from DIPs to pixels
 				Gdiplus::Point p1(xdash / pixtodipX + 0.5, ydash / pixtodipY + 0.5);
 				Gdiplus::Point p2(ppt[0].x / pixtodipX + 0.5, ppt[0].y / pixtodipY + 0.5);
 				Gdiplus::Point p;
 				int height, width;
 
-				// rescale coordinates from DIPs to pixels
 				p.X = GPMIN(p1.X, p2.X);
 				p.Y = GPMIN(p1.Y, p2.Y);
 				width = abs(p2.X - p1.X);
@@ -1977,7 +1992,6 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 	if (hr == D2DERR_RECREATE_TARGET) {
 		hr = S_OK;
 		// discard device resources
-		SafeRelease(&pRenderTarget);
-		lpgw->pRenderTarget = NULL;
+		d2dReleaseRenderTarget(lpgw);
 	}
 }

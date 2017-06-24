@@ -1,12 +1,18 @@
 2017-06-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/win/wd2d.cpp:  Change the type of some parameters from bool to BOOL
-	to avoid warnings.
+	* src/win/wgraph.c src/win/wgnuplib.h src/win/wd2d.cpp|h wcommon.h:
+	src/win/wgnuplib.h:  Allocate a separate subwindow for the graph
+	instead of handling the drawing within the parent window.  This makes
+	the HwndRenderTarget (mostly) functional.
+
+	* src/win/wd2d.cpp:  Change the type of some parameters from bool to
+	BOOL to avoid warnings.
 
 2017-06-21  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/win/wgnuplib.h:  The dot needs not to be included in the number of
-	different point types for cycling through.  Bug introduced on 2017-05-13.
+	* src/win/wgnuplib.h:  The dot needs not to be included in the number
+	of different point types for cycling through.  Bug introduced on
+	2017-05-13.
 
 2017-06-21  Ethan A Merritt  <merritt@u.washington.edu>
 

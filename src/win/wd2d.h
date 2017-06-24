@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.h,v 1.3 2017/06/18 19:54:43 markisch Exp $
+ * $Id: wd2d.h,v 1.4 2017/06/18 20:53:10 markisch Exp $
  */
 
 /*
@@ -41,6 +41,7 @@ extern "C" {
 #endif
 
 extern HRESULT d2dInit(LPGW lpgw);
+extern HRESULT d2dResize(LPGW lpgw, RECT rect);
 extern void d2dReleaseRenderTarget(LPGW lpgw);
 extern void d2dCleanup(void);
 
