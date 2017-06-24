@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.12 2017/06/24 06:52:41 markisch Exp $
+ * $Id: wd2d.cpp,v 1.13 2017/06/24 09:15:38 markisch Exp $
  */
 
 /*
@@ -30,6 +30,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Enable to activate the Direct2D debug layer
 //#define D2DDEBUG
 
+// Enable if you want to use Direct2D 1.1 (Windows 8 and Windows 7 Platform Update)
+#define HAVE_D2D11
+
 // include iostream / cstdio _before_ syscfg.h in order
 // to avoid re-definition by wtext.h/winmain.c routines
 #include <iostream>
@@ -41,9 +44,18 @@ extern "C" {
 #include <windowsx.h>
 #define GDIPVER 0x0110
 #include <gdiplus.h>
-#include <d2d1.h>
-#include <d2d1helper.h>
-#include <dwrite.h>
+#ifndef HAVE_D2D11
+# include <d2d1.h>
+# include <d2d1helper.h>
+# include <dwrite.h>
+#else
+# include <d2d1_1.h>
+# include <d2d1_1helper.h>
+# include <d3d11_1.h>
+# include <dwrite_1.h>
+# include <d2d1effects.h>
+# include <d2d1effecthelpers.h>
+#endif
 #include <tchar.h>
 #include <wchar.h>
 
@@ -59,8 +71,14 @@ extern "C" {
 const int pattern_num = 8;
 const float textbox_width = 3000.f;
 
+#ifndef HAVE_D2D11
 static ID2D1Factory * g_pDirect2dFactory = NULL;
 static IDWriteFactory * g_pDWriteFactory = NULL;
+#else
+static ID2D1Factory1 * g_pDirect2dFactory = NULL;
+static IDWriteFactory1 * g_pDWriteFactory = NULL;
+static ID3D11Device1 * g_pDirect3dDevice = NULL;
+#endif
 #ifdef DCRENDERER
 // All graph windows share a common DC render target
 static ID2D1DCRenderTarget * g_pRenderTarget = NULL;
@@ -104,6 +122,112 @@ static struct {
 
 /* ****************  D2D initialization   ************************* */
 
+#if defined(HAVE_D2D11) && !defined(DCRENDERER)
+static HRESULT 
+CreateD3dDevice(D3D_DRIVER_TYPE const type, ID3D11Device **device)
+{
+	// Set feature levels supported by our application
+	D3D_FEATURE_LEVEL featureLevels[] =
+	{
+		D3D_FEATURE_LEVEL_11_1,
+		D3D_FEATURE_LEVEL_11_0,
+		D3D_FEATURE_LEVEL_10_1,
+		D3D_FEATURE_LEVEL_10_0,
+		D3D_FEATURE_LEVEL_9_3,
+		D3D_FEATURE_LEVEL_9_2,
+		D3D_FEATURE_LEVEL_9_1
+	};
+
+	// This flag adds support for surfaces with a different color channel ordering
+	// than the API default. It is required for compatibility with Direct2D.
+	UINT flags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+#ifdef D2DDEBUG
+	// Note: This will fail if the D3D debug layer is not installed!
+	flags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
+	D3D_FEATURE_LEVEL returnedFeatureLevel;
+	return D3D11CreateDevice(NULL, type, 0, flags, featureLevels, ARRAYSIZE(featureLevels), D3D11_SDK_VERSION,
+						device, &returnedFeatureLevel, NULL);
+}
+
+
+static HRESULT
+d2dDCreateDeviceSwapChainBitmap(LPGW lpgw)
+{
+	HRESULT hr = S_OK;
+
+	ID2D1DeviceContext * pDirect2dDeviceContext = static_cast<ID2D1DeviceContext *>(lpgw->pRenderTarget);
+
+	if (pDirect2dDeviceContext == NULL || g_pDirect2dFactory == NULL)
+		return hr;
+
+	SafeRelease(&(lpgw->pDXGISwapChain));
+
+	IDXGIDevice * dxgiDevice = NULL;
+	hr = g_pDirect3dDevice->QueryInterface(__uuidof(IDXGIDevice), (void **) &dxgiDevice);
+
+	// Get the Display Adapter (virtual or GPU) we are using
+	IDXGIAdapter *dxgiAdapter = NULL;
+	if (SUCCEEDED(hr))
+		hr = dxgiDevice->GetAdapter(&dxgiAdapter);
+
+	// Get the DXGI factory instance
+	IDXGIFactory2 *dxgiFactory = NULL;
+	if (SUCCEEDED(hr))
+		hr = dxgiAdapter->GetParent(IID_PPV_ARGS(&dxgiFactory)); 
+
+	// Parameters for a Windows 7-compatible swap chain
+	DXGI_SWAP_CHAIN_DESC1 props = { };
+	props.Width = 0;
+	props.Height = 0;
+	props.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	props.Stereo = false;
+	props.SampleDesc.Count = 1;
+	props.SampleDesc.Quality = 0;
+	props.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	props.BufferCount = 2;
+	props.Scaling = DXGI_SCALING_STRETCH; // DXGI_SCALING_NONE
+	props.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;  // DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL
+	props.Flags = DXGI_SWAP_CHAIN_FLAG_GDI_COMPATIBLE;  // we still require GDI compatibility
+
+														// Create DXGI swap chain targeting a window handle (the only Windows 7-compatible option)
+	IDXGISwapChain1 * pDXGISwapChain = NULL;
+	if (SUCCEEDED(hr))
+		hr = dxgiFactory->CreateSwapChainForHwnd(g_pDirect3dDevice, lpgw->hGraph, &props, NULL, NULL, &pDXGISwapChain);
+	if (SUCCEEDED(hr))
+		lpgw->pDXGISwapChain = pDXGISwapChain;
+
+	// Get the back buffer as an IDXGISurface (Direct2D doesn't accept an ID3D11Texture2D directly as a render target)
+	IDXGISurface1 * dxgiBackBuffer = NULL;
+	if (SUCCEEDED(hr))
+		hr = pDXGISwapChain->GetBuffer(0, IID_PPV_ARGS(&dxgiBackBuffer));
+
+	// Get screen DPI
+	FLOAT dpiX, dpiY;
+	g_pDirect2dFactory->GetDesktopDpi(&dpiX, &dpiY);
+
+	// Create a Direct2D surface (bitmap) linked to the Direct3D texture back buffer via the DXGI back buffer
+	D2D1_BITMAP_PROPERTIES1 bitmapProperties =
+		D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW | D2D1_BITMAP_OPTIONS_GDI_COMPATIBLE, 
+		D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_IGNORE), dpiX, dpiY);
+	ID2D1Bitmap1 * pDirect2dBackBuffer = NULL;
+	if (SUCCEEDED(hr))
+		hr = pDirect2dDeviceContext->CreateBitmapFromDxgiSurface(dxgiBackBuffer, &bitmapProperties, &pDirect2dBackBuffer);
+	if (SUCCEEDED(hr)) {
+		pDirect2dDeviceContext->SetTarget(pDirect2dBackBuffer);
+		pDirect2dDeviceContext->SetDpi(dpiX, dpiY);
+		//pDirect2dDeviceContext->SetUnitMode(D2D1_UNIT_MODE_PIXELS);
+	}
+
+	SafeRelease(&dxgiDevice);
+	SafeRelease(&dxgiAdapter);
+	SafeRelease(&dxgiFactory);
+	SafeRelease(&dxgiBackBuffer);
+	SafeRelease(&pDirect2dBackBuffer);
+	return hr;
+}
+#endif
+
 
 HRESULT
 d2dInit(LPGW lpgw)
@@ -112,14 +236,12 @@ d2dInit(LPGW lpgw)
 
 	// Create D2D factory
 	if (g_pDirect2dFactory == NULL) {
-#ifdef D2DDEBUG
 		D2D1_FACTORY_OPTIONS options;
 		ZeroMemory(&options, sizeof(D2D1_FACTORY_OPTIONS));
+#ifdef D2DDEBUG
 		options.debugLevel = D2D1_DEBUG_LEVEL_INFORMATION;
-		hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory), &options, (void **) &g_pDirect2dFactory);
-#else
-		hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &g_pDirect2dFactory);
 #endif
+		hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(g_pDirect2dFactory), &options, reinterpret_cast<void **>(&g_pDirect2dFactory));
 	}
 
 	// Create a DirectWrite factory
@@ -151,6 +273,7 @@ d2dInit(LPGW lpgw)
 			lpgw->pRenderTarget = g_pRenderTarget;
 		}
 #else
+#ifndef HAVE_D2D11
 		ID2D1HwndRenderTarget *pRenderTarget;
 		D2D1_RENDER_TARGET_PROPERTIES rtProps = D2D1::RenderTargetProperties();
 		rtProps.usage = D2D1_RENDER_TARGET_USAGE_GDI_COMPATIBLE;
@@ -169,6 +292,41 @@ d2dInit(LPGW lpgw)
 		if (SUCCEEDED(hr)) {
 			lpgw->pRenderTarget = pRenderTarget;
 		}
+#else
+		// global objects (all windows)
+		if (g_pDirect3dDevice == NULL) {
+			// Create Direct3D device
+			ID3D11Device * device = NULL;
+			hr = CreateD3dDevice(D3D_DRIVER_TYPE_HARDWARE, &device);
+			if (hr == DXGI_ERROR_UNSUPPORTED)
+				hr = CreateD3dDevice(D3D_DRIVER_TYPE_WARP, &device);
+			if (SUCCEEDED(hr))
+				hr = device->QueryInterface(__uuidof(ID3D11Device1), (void **) &g_pDirect3dDevice);
+			SafeRelease(&device);
+		}
+
+		// window objects
+		if (SUCCEEDED(hr)) {
+			IDXGIDevice * dxgiDevice = NULL;
+			hr = g_pDirect3dDevice->QueryInterface(__uuidof(IDXGIDevice), (void **) &dxgiDevice);
+
+			// Create Direct2D device and context (our render target)
+			ID2D1Device * pDirect2dDevice = NULL;
+			ID2D1DeviceContext * pDirect2dDeviceContext = NULL;
+			if (SUCCEEDED(hr))
+				hr = g_pDirect2dFactory->CreateDevice(dxgiDevice, &pDirect2dDevice);
+			if (SUCCEEDED(hr))
+				hr = pDirect2dDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, &pDirect2dDeviceContext);
+			if (SUCCEEDED(hr))
+				lpgw->pRenderTarget = pDirect2dDeviceContext;
+
+			SafeRelease(&dxgiDevice);
+			SafeRelease(&pDirect2dDevice);
+		}
+
+		if (SUCCEEDED(hr))
+			hr = d2dDCreateDeviceSwapChainBitmap(lpgw);
+#endif
 #endif
 	}
 	return hr;
@@ -185,10 +343,17 @@ d2dResize(LPGW lpgw, RECT rect)
 		return hr;
 
 #ifndef DCRENDERER
+#ifndef HAVE_D2D11
 	// HwndRenderTarget
 	ID2D1HwndRenderTarget * pRenderTarget = static_cast<ID2D1HwndRenderTarget *>(lpgw->pRenderTarget);
 	D2D1_SIZE_U size = D2D1::SizeU(rect.right - rect.left, rect.bottom - rect.top);
 	hr = pRenderTarget->Resize(size);
+#else
+	// DeviceContext
+	hr = d2dDCreateDeviceSwapChainBitmap(lpgw);
+	if (FAILED(hr))
+		fprintf(stderr, "D2d: Unable to resize swap chain. hr = %0x\n", hr);
+#endif
 #endif
 
 	return hr;
@@ -199,6 +364,12 @@ void
 d2dReleaseRenderTarget(LPGW lpgw)
 {
 #ifndef DCRENDERER
+#ifdef HAVE_D2D11
+	ID2D1DeviceContext * pDirect2dDeviceContext = static_cast<ID2D1DeviceContext *>(lpgw->pRenderTarget);
+	if (pDirect2dDeviceContext != NULL)
+		pDirect2dDeviceContext->SetTarget(NULL);
+	SafeRelease(&(lpgw->pDXGISwapChain));
+#endif
 	SafeRelease(&(lpgw->pRenderTarget));
 #endif
 }
@@ -212,6 +383,9 @@ d2dCleanup(void)
 #endif
 	SafeRelease(&g_pDirect2dFactory);
 	SafeRelease(&g_pDWriteFactory);
+#ifdef HAVE_D2D11
+	SafeRelease(&g_pDirect3dDevice);
+#endif
 }
 
 
@@ -774,10 +948,14 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 	// new device context or size changed
 	hr = pRenderTarget->BindDC(hdc, rect);
 #else
+#ifndef HAVE_D2D11
 	ID2D1HwndRenderTarget * pRenderTarget = static_cast<ID2D1HwndRenderTarget *>(lpgw->pRenderTarget);
 	// No need to draw to an occluded window
 	if (pRenderTarget->CheckWindowState() == D2D1_WINDOW_STATE_OCCLUDED)
 		return;
+#else
+	ID2D1DeviceContext * pRenderTarget = static_cast<ID2D1DeviceContext *>(lpgw->pRenderTarget);
+#endif
 	ID2D1GdiInteropRenderTarget * pGDIRenderTarget = NULL;
 	if (SUCCEEDED(hr))
 		hr = pRenderTarget->QueryInterface(__uuidof(ID2D1GdiInteropRenderTarget), (void**)&pGDIRenderTarget);
@@ -948,9 +1126,9 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 					break;
 				case TERM_LAYER_BEGIN_PM3D_MAP:
 				case TERM_LAYER_BEGIN_PM3D_FLUSH:
-				    // Antialiasing of pm3d polygons is obtained by drawing to a
-				    // bitmap four times as large and copying it back with interpolation
-				    if (lpgw->antialiasing && lpgw->polyaa) {
+					// Antialiasing of pm3d polygons is obtained by drawing to a
+					// bitmap four times as large and copying it back with interpolation
+					if (lpgw->antialiasing && lpgw->polyaa) {
 						D2D1_SIZE_F size = D2D1::SizeF(2 * (rr - rl), 2 * (rb - rt));
 						if (SUCCEEDED(hr))
 							hr = pRenderTarget->CreateCompatibleRenderTarget(size, &pPolygonRenderTarget);
@@ -963,7 +1141,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 					break;
 				case TERM_LAYER_END_PM3D_MAP:
 				case TERM_LAYER_END_PM3D_FLUSH:
-				    if (pPolygonRenderTarget != NULL) {
+					if (pPolygonRenderTarget != NULL) {
 						ID2D1Bitmap * pBitmap;
 						if (SUCCEEDED(hr))
 							hr = pPolygonRenderTarget->EndDraw();
@@ -1977,6 +2155,17 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 	free(ppt);
 
 	hr = pRenderTarget->EndDraw();
+
+#if !defined(DCRENDERER) && defined(HAVE_D2D11)
+	// Present (new for Direct2D 1.1)
+	DXGI_PRESENT_PARAMETERS parameters = { 0 };
+	parameters.DirtyRectsCount = 0;
+	parameters.pDirtyRects = NULL;
+	parameters.pScrollRect = NULL;
+	parameters.pScrollOffset = NULL;
+
+	hr = lpgw->pDXGISwapChain->Present1(1, 0, &parameters);
+#endif
 
 	// TODO: some of these resource are device independent and could be preserved
 	SafeRelease(&pSolidBrush);

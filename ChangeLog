@@ -1,5 +1,11 @@
 2017-06-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wd2d.cpp src/win/wgnuplib.h:  Add code for using a 
+	DeviceContext as RenderTarget.  Requires Direct2D 1.1 which is
+	available starting from Windows 7 with Platform Update.  Requires
+	to link to the Direct3D 11.1 library d3d11.lib.  Not yet enabled
+	by default.
+
 	* src/win/wgraph.c src/win/wgnuplib.h src/win/wd2d.cpp|h wcommon.h:
 	src/win/wgnuplib.h:  Allocate a separate subwindow for the graph
 	instead of handling the drawing within the parent window.  This makes
