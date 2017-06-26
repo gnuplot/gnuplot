@@ -1,3 +1,13 @@
+2017-06-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/dumb.trm:  Core routine apply_lp_properties looks to see whether
+	the current terminal lacks color support by testing the equivalence
+	(term->set_color == null_set_color). Thus introduction of a non-NULL
+	dumb_set_color() routine to support color output had the side-effect of
+	losing the distinction between line types without color.  Fix this by
+	only listing dumb_set_color() in TERM_TABLE when color mode is active.
+	Bug fix.
+
 2017-06-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c: Fix incorrect determination of the size of the-fly

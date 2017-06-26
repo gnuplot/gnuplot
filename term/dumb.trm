@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: dumb.trm,v 1.38.2.1 2017/06/15 19:36:40 sfeam Exp $
+ * $Id: dumb.trm,v 1.38.2.2 2017/06/24 13:17:49 sfeam Exp $
  *
  */
 
@@ -210,10 +210,14 @@ DUMB_options()
 	case DUMB_ANSIRGB:
 	    c_token++;
 	    dumb_colormode = cmd;
+	    term->make_palette = dumb_make_palette;
+	    term->set_color = dumb_set_color;
 	    break;
 	case DUMB_NOCOLOR:
 	    c_token++;
 	    dumb_colormode = 0;
+	    term->make_palette = NULL;
+	    term->set_color = null_set_color;
 	    break;
 	case DUMB_SIZE:
 	    c_token++;
@@ -930,11 +934,9 @@ TERM_TABLE_START(dumb_driver)
 #ifdef USE_MOUSE
     NULL, NULL, NULL, NULL, NULL,
 #endif
-#ifndef NO_DUMB_COLOR_SUPPORT
-    dumb_make_palette, NULL /* previous_palette */, dumb_set_color,
-#else
-    NULL, NULL, NULL,
-#endif
+    NULL,	/* Color support sets this to dumb_make_palette */
+    NULL, 	/* previous_palette */
+    NULL,	/* Color support sets this to dumb_set_color */
     dumb_filled_polygon, /* filled_polygon */
     NULL, /* image */
 #ifndef NO_DUMB_ENHANCED_SUPPORT

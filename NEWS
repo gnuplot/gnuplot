@@ -9,6 +9,7 @@ Changes in 5.2.rc2
 * FIX sanity check for empty image data structure
 * FIX segfault from corruption of timestamp text
 * FIX several unitialized variables (see Bug 1933)
+* FIX dumb term: linetype character distinction was lost if not in color mode 
 * CHANGE svg terminal option "fontscale" replaces obsolete "fsize"
 
 Changes and new features in 5.2
