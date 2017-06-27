@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.19 2017/06/27 18:20:39 markisch Exp $
+ * $Id: wd2d.cpp,v 1.20 2017/06/27 19:06:10 markisch Exp $
  */
 
 /*
@@ -592,7 +592,7 @@ d2dCreatePatternBrush(LPGW lpgw, unsigned pattern, COLORREF color, bool transpar
 		if (SUCCEEDED(hr)) {
 			pRenderTarget->BeginDraw();
 			// always clear the target
-			pRenderTarget->Clear(D2DCOLORREF(lpgw->background, transparent ? 1.f : 0.f));
+			pRenderTarget->Clear(D2DCOLORREF(lpgw->background, transparent ? 0.f : 1.f));
 			switch (pattern) {
 			case 0:  // empty
 				break;
@@ -1847,8 +1847,8 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 			break;
 		}
 
-		case W_image:	{
-			/* Due to the structure of gwop 6, entries are needed in total. */
+		case W_image: {
+			/* Due to the structure of gwop, 6 entries are needed in total. */
 			if (seq == 0) {
 				/* First OP contains only the color mode */
 				color_mode = curptr->x;
