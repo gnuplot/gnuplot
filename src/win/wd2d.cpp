@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.16 2017/06/27 18:00:54 markisch Exp $
+ * $Id: wd2d.cpp,v 1.17 2017/06/27 18:06:02 markisch Exp $
  */
 
 /*
@@ -42,8 +42,6 @@ extern "C" {
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
 #include <windowsx.h>
-#define GDIPVER 0x0110
-#include <gdiplus.h>
 #ifndef HAVE_D2D11
 # include <d2d1.h>
 # include <d2d1helper.h>
@@ -59,7 +57,6 @@ extern "C" {
 #include <tchar.h>
 #include <wchar.h>
 
-#include "wgdiplus.h"
 #include "wd2d.h"
 #include "wgnuplib.h"
 #include "wcommon.h"
@@ -88,13 +85,10 @@ static HRESULT d2dCreateStrokeStyle(D2D1_DASH_STYLE dashStyle, BOOL rounded, ID2
 static HRESULT d2dCreateStrokeStyle(const FLOAT * dashes, UINT dashesCount, BOOL rounded, ID2D1StrokeStyle **ppStrokeStyle);
 static HRESULT d2dCreateStrokeStyle(D2D1_DASH_STYLE dashStyle, const FLOAT * dashes, UINT dashesCount, BOOL rounded, ID2D1StrokeStyle **ppStrokeStyle);
 static HRESULT d2dPolyline(ID2D1RenderTarget * pRenderTarget, ID2D1SolidColorBrush * pBrush, ID2D1StrokeStyle * pStrokeStyle, float width, D2D1_POINT_2F *points, int polyi, bool closed = false);
-static void gdiplusFilledPolygon(Gdiplus::Graphics &graphics, Gdiplus::Brush &brush, Gdiplus::PointF *points, int polyi);
-static HRESULT d2dFilledPolygon(ID2D1RenderTarget * pRenderTarget, ID2D1SolidColorBrush * pBrush, D2D1_POINT_2F *points, int polyi);
+static HRESULT d2dFilledPolygon(ID2D1RenderTarget * pRenderTarget, ID2D1Brush * pBrush, D2D1_POINT_2F *points, int polyi);
 static void d2dDot(ID2D1RenderTarget * pRenderTarget, ID2D1SolidColorBrush * pBrush, float x, float y);
 static HRESULT d2dMeasureText(ID2D1RenderTarget * pRenderTarget, LPCWSTR text, IDWriteTextFormat * pWriteTextFormat, D2D1_SIZE_F * size);
-
-// last remedy of GDI+
-extern Gdiplus::Brush * gdiplusPatternBrush(int style, COLORREF color, double alpha, COLORREF backcolor, BOOL transparent);
+static inline D2D1::ColorF D2DCOLORREF(COLORREF c, float a);
 
 
 /* Release COM pointers safely
@@ -188,7 +182,7 @@ d2dCreateDeviceSwapChainBitmap(LPGW lpgw)
 	props.BufferCount = 2;
 	props.Scaling = DXGI_SCALING_STRETCH; // DXGI_SCALING_NONE
 	props.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;  // DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL
-	props.Flags = DXGI_SWAP_CHAIN_FLAG_GDI_COMPATIBLE;  // we still require GDI compatibility
+	props.Flags = 0;
 
 	// Create DXGI swap chain targeting a window handle (the only Windows 7-compatible option)
 	IDXGISwapChain1 * pDXGISwapChain = NULL;
@@ -208,7 +202,7 @@ d2dCreateDeviceSwapChainBitmap(LPGW lpgw)
 
 	// Create a Direct2D surface (bitmap) linked to the Direct3D texture back buffer via the DXGI back buffer
 	D2D1_BITMAP_PROPERTIES1 bitmapProperties =
-		D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW | D2D1_BITMAP_OPTIONS_GDI_COMPATIBLE, 
+		D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW, 
 		D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_IGNORE), dpiX, dpiY);
 	ID2D1Bitmap1 * pDirect2dBackBuffer = NULL;
 	if (SUCCEEDED(hr))
@@ -276,14 +270,14 @@ d2dInit(LPGW lpgw)
 #ifndef HAVE_D2D11
 		ID2D1HwndRenderTarget *pRenderTarget;
 		D2D1_RENDER_TARGET_PROPERTIES rtProps = D2D1::RenderTargetProperties();
-		rtProps.usage = D2D1_RENDER_TARGET_USAGE_GDI_COMPATIBLE;
+		rtProps.usage = D2D1_RENDER_TARGET_USAGE_NONE;
 
 		HWND hwnd = lpgw->hGraph;
 		RECT rect;
 		GetClientRect(hwnd, &rect);
 		D2D1_SIZE_U size = D2D1::SizeU(rect.right - rect.left, rect.bottom - rect.top);
 
-		// Create a GDI compatible Hwnd render target.
+		// Create a Hwnd render target.
 		hr = g_pDirect2dFactory->CreateHwndRenderTarget(
 			rtProps,
 			D2D1::HwndRenderTargetProperties(hwnd, size),
@@ -496,17 +490,8 @@ d2dPolyline(ID2D1RenderTarget * pRenderTarget, ID2D1SolidColorBrush * pBrush, ID
 }
 
 
-static void
-gdiplusFilledPolygon(Gdiplus::Graphics &graphics, Gdiplus::Brush &brush, Gdiplus::PointF *points, int polyi)
-{
-	graphics.SetCompositingQuality(Gdiplus::CompositingQualityGammaCorrected);
-	graphics.FillPolygon(&brush, points, polyi);
-	graphics.SetCompositingQuality(Gdiplus::CompositingQualityDefault);
-}
-
-
 static HRESULT
-d2dFilledPolygon(ID2D1RenderTarget * pRenderTarget, ID2D1SolidColorBrush * pBrush, D2D1_POINT_2F *points, int polyi)
+d2dFilledPolygon(ID2D1RenderTarget * pRenderTarget, ID2D1Brush * pBrush, D2D1_POINT_2F *points, int polyi)
 {
 	HRESULT hr = S_OK;
 
@@ -576,6 +561,98 @@ d2dMeasureText(ID2D1RenderTarget * pRenderTarget, LPCWSTR text, IDWriteTextForma
 		SafeRelease(&pTextLayout);
 	}
 	return hr;
+}
+
+
+ID2D1BitmapBrush *
+d2dCreatePatternBrush(LPGW lpgw, unsigned pattern, COLORREF color, bool transparent)
+{
+	HRESULT hr = S_OK;
+	ID2D1RenderTarget * pMainRenderTarget = lpgw->pRenderTarget;
+	ID2D1BitmapBrush * pBitmapBrush = NULL;
+
+	// scale dash pattern with resolution
+	FLOAT dpiX, dpiY;
+	pMainRenderTarget->GetDpi(&dpiX, &dpiY);
+	FLOAT scale = dpiX / 96.f;
+	FLOAT size = 96.f * scale;
+
+	if (pMainRenderTarget == NULL)
+		return NULL;
+
+	// TODO:  Would it not be more efficient to retain the target?
+	ID2D1BitmapRenderTarget * pRenderTarget = NULL;
+	if (SUCCEEDED(hr)) {
+		// enforce the  pixel size of the bitmap
+		hr = pMainRenderTarget->CreateCompatibleRenderTarget(D2D1::SizeF(size, size), D2D1::SizeU(size, size), &pRenderTarget);
+	}
+
+	if (SUCCEEDED(hr)) {
+		ID2D1SolidColorBrush * pSolidBrush = NULL;
+		hr = pRenderTarget->CreateSolidColorBrush(D2DCOLORREF(color, 1.0f), &pSolidBrush);
+
+		pRenderTarget->SetAntialiasMode(lpgw->antialiasing ? D2D1_ANTIALIAS_MODE_PER_PRIMITIVE : D2D1_ANTIALIAS_MODE_ALIASED);
+		if (SUCCEEDED(hr)) {
+			pRenderTarget->BeginDraw();
+			// always clear the target
+			pRenderTarget->Clear(D2DCOLORREF(lpgw->background, transparent ? 1.f : 0.f));
+			switch (pattern) {
+			case 0:  // empty
+				break;
+			case 1:  // diagonal cross
+				for (float x = -size; x <= size; x += 6.f * scale)
+					pRenderTarget->DrawLine(D2D1::Point2F(0.f, x), D2D1::Point2F(size, x + size), pSolidBrush);
+				for (float x = 0.f; x <= 2*size; x += 6.f * scale)
+					pRenderTarget->DrawLine(D2D1::Point2F(0.f, x), D2D1::Point2F(size, x - size), pSolidBrush);
+				break;
+			case 2:  // fine diagonal cross
+				for (float x = -size; x <= size; x += 4.f * scale)
+					pRenderTarget->DrawLine(D2D1::Point2F(0.f, x), D2D1::Point2F(size, x + size), pSolidBrush, 0.5f);
+				for (float x = 0.f; x <= 2*size; x += 4.f * scale)
+					pRenderTarget->DrawLine(D2D1::Point2F(0.f, x), D2D1::Point2F(size, x - size), pSolidBrush, 0.5f);
+				break;
+			case 3:  // solid
+				pRenderTarget->FillRectangle(D2D1::RectF(0.f, 0.f, size, size), pSolidBrush);
+				break;
+			case 4:  // forward diagonals
+				for (float x = -size; x <= size; x += 6.f * scale)
+					pRenderTarget->DrawLine(D2D1::Point2F(0.f, x), D2D1::Point2F(size, x + size), pSolidBrush);
+				break;
+			case 5:  // backward diagonals
+				for (float x = 0.f; x <= 2 * size; x += 6.f * scale)
+					pRenderTarget->DrawLine(D2D1::Point2F(0.f, x), D2D1::Point2F(size, x - size), pSolidBrush);
+				break;
+			case 6:  // step forward diagonals
+				for (float x = -size - size / 2.f; x <= size + size / 2.f; x += 4.f * scale)
+					pRenderTarget->DrawLine(D2D1::Point2F(0.f, x), D2D1::Point2F(size, x + size + size / 2.f), pSolidBrush);
+				break;
+			case 7: // step backward diagonals
+				for (float x = 0.f; x <= 2 * size + size / 2.f; x += 4.f * scale)
+					pRenderTarget->DrawLine(D2D1::Point2F(0.f, x), D2D1::Point2F(size, x - size - size / 2.f), pSolidBrush);
+				break;
+			default:
+				// should not happen: ignore
+				break;
+			}
+			hr = pRenderTarget->EndDraw();
+
+			ID2D1Bitmap * pBitmap = NULL;
+			if (SUCCEEDED(hr))
+				hr = pRenderTarget->GetBitmap(&pBitmap);
+
+			if (SUCCEEDED(hr)) {
+				D2D1_BITMAP_BRUSH_PROPERTIES brushProperties =
+					D2D1::BitmapBrushProperties(D2D1_EXTEND_MODE_WRAP, D2D1_EXTEND_MODE_WRAP);
+
+				hr = pMainRenderTarget->CreateBitmapBrush(pBitmap, brushProperties, &pBitmapBrush);
+			}
+			SafeRelease(&pBitmap);
+		}
+		SafeRelease(&pSolidBrush);
+	}
+	SafeRelease(&pRenderTarget);
+
+	return pBitmapBrush;
 }
 
 
@@ -777,7 +854,7 @@ draw_enhanced_init(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, ID2D1SolidColor
 }
 
 
-static void
+static inline void
 d2d_update_keybox(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, unsigned plotno, FLOAT x, FLOAT y)
 {
 	// coordinates x,y are in DIPs, transform to pixels
@@ -787,25 +864,6 @@ d2d_update_keybox(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, unsigned plotno,
 	unsigned py = y * dpiY / 96.f + 0.5f;
 	draw_update_keybox(lpgw, plotno, px, py);
 }
-
-
-static Gdiplus::Graphics *
-gdiplusGraphics(LPGW lpgw, HDC hdc)
-{
-	Gdiplus::Graphics * g = Gdiplus::Graphics::FromHDC(hdc);
-	if (lpgw->antialiasing)
-		g->SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias8x8);
-	return g;
-}
-
-
-#ifdef DCRENDERER
-# define GETHDC  hr = pRenderTarget->EndDraw();
-# define RELEASEHDC pRenderTarget->BeginDraw();
-#else
-# define GETHDC  hr = pGDIRenderTarget->GetDC(D2D1_DC_INITIALIZE_MODE_COPY, &hdc);
-# define RELEASEHDC pGDIRenderTarget->ReleaseDC(NULL);
-#endif
 
 
 static inline D2D1::ColorF
@@ -826,9 +884,6 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 	HRESULT hr = S_OK;
 	FLOAT dpiX, dpiY;
 	FLOAT pixtodipX, pixtodipY;	// pixel to DIP conversion factor
-#ifndef DCRENDERER
-	HDC hdc;
-#endif
 
 	/* draw ops */
 	unsigned int ngwop = 0;
@@ -873,10 +928,9 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 	COLORREF last_fillcolor = 0;
 	double last_fill_alpha = 1.;
 	bool transparent = false;	/* transparent fill? */
-	Gdiplus::Brush * pattern_brush = NULL;
-	ID2D1SolidColorBrush * pFillBrush = NULL;
+	ID2D1Brush * pFillBrush = NULL;
 	ID2D1SolidColorBrush * pSolidFillBrush = NULL;
-	//ID2D1SolidColorBrush * pPatternFillBrush = NULL;
+	ID2D1BitmapBrush * pPatternFillBrush = NULL;
 	ID2D1SolidColorBrush * pGrayBrush = NULL;
 	ID2D1BitmapRenderTarget * pPolygonRenderTarget = NULL;
 
@@ -935,9 +989,6 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 	// TODO: not implemented yet
 	ps_caching = false;
 
-	// still need GDI+ for pattern fill, init
-	gdiplusInit();
-
 	// create the D2D factory object and the render target
 	hr = d2dInit(lpgw);
 	if (!SUCCEEDED(hr))
@@ -956,9 +1007,6 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 #else
 	ID2D1DeviceContext * pRenderTarget = static_cast<ID2D1DeviceContext *>(lpgw->pRenderTarget);
 #endif
-	ID2D1GdiInteropRenderTarget * pGDIRenderTarget = NULL;
-	if (SUCCEEDED(hr))
-		hr = pRenderTarget->QueryInterface(__uuidof(ID2D1GdiInteropRenderTarget), (void**)&pGDIRenderTarget);
 #endif
 
 	if (lpgw->antialiasing)
@@ -1059,19 +1107,6 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 					hr = d2dFilledPolygon(pRenderTarget, pFillBrush, last_poly, last_polyi);
 				else
 					hr = d2dFilledPolygon(pPolygonRenderTarget, pFillBrush, last_poly, last_polyi);
-			} else {
-				GETHDC
-				if (SUCCEEDED(hr)) {
-					// rescale coordinates back from DIPs to pixels
-					for (int i = 0; i < last_polyi; i++) {
-						last_poly[i].x /= pixtodipX;
-						last_poly[i].y /= pixtodipY;
-					}
-					Gdiplus::Graphics * graphics = gdiplusGraphics(lpgw, hdc);
-					gdiplusFilledPolygon(*graphics, *pattern_brush, reinterpret_cast<Gdiplus::PointF *>(last_poly), last_polyi);
-					delete graphics;
-					RELEASEHDC
-				}
 			}
 			pRenderTarget->SetAntialiasMode(mode);
 			last_polyi = 0;
@@ -1523,19 +1558,6 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 					} else {
 						if (pFillBrush != NULL) {
 							hr = d2dFilledPolygon(pRenderTarget, pFillBrush, rect, 4);
-						} else {
-							GETHDC
-							if (SUCCEEDED(hr)) {
-								// rescale coordinates back from DIPs to pixels
-								for (int i = 0; i < 4; i++) {
-									rect[i].x /= pixtodipX;
-									rect[i].y /= pixtodipY;
-								}
-								Gdiplus::Graphics * graphics = gdiplusGraphics(lpgw, hdc);
-								gdiplusFilledPolygon(*graphics, *pattern_brush, reinterpret_cast<Gdiplus::PointF *>(rect), 4);
-								delete graphics;
-								RELEASEHDC
-							}
 						}
 					}
 				}
@@ -1598,11 +1620,8 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 					/* style == 2 --> use fill pattern according to
 							 * fillpattern. Pattern number is enumerated */
 					int pattern = GPMAX(fillstyle >> 4, 0) % pattern_num;
-					if (pattern_brush)
-						delete pattern_brush;
-					pattern_brush = gdiplusPatternBrush(pattern,
-									last_color, 1., lpgw->background, transparent);
-					pFillBrush = NULL;  // indicate that we are using GDI+ to fill with a pattern
+					SafeRelease(&pPatternFillBrush);
+					pFillBrush = pPatternFillBrush = d2dCreatePatternBrush(lpgw, pattern, last_color, transparent);
 					break;
 				}
 				case FS_EMPTY:
@@ -1646,25 +1665,6 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 			pRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_ALIASED);
 			if (pFillBrush != NULL) {
 				pRenderTarget->FillRectangle(rect, pFillBrush);
-			} else {
-				// rescale coordinates from DIPs to pixels
-				Gdiplus::Point p1(xdash / pixtodipX + 0.5, ydash / pixtodipY + 0.5);
-				Gdiplus::Point p2(ppt[0].x / pixtodipX + 0.5, ppt[0].y / pixtodipY + 0.5);
-				Gdiplus::Point p;
-				int height, width;
-
-				p.X = GPMIN(p1.X, p2.X);
-				p.Y = GPMIN(p1.Y, p2.Y);
-				width = abs(p2.X - p1.X);
-				height = abs(p1.Y - p2.Y);
-				GETHDC
-				if (SUCCEEDED(hr)) {
-					Gdiplus::Graphics * graphics = gdiplusGraphics(lpgw, hdc);
-					graphics->SetSmoothingMode(Gdiplus::SmoothingModeNone);
-					graphics->FillRectangle(pattern_brush, p.X, p.Y, width, height);
-					delete graphics;
-					RELEASEHDC
-				}
 			}
 			pRenderTarget->SetAntialiasMode(mode);
 
@@ -1858,19 +1858,6 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 							hr = d2dFilledPolygon(pRenderTarget, pFillBrush, last_poly, last_polyi);
 						else
 							hr = d2dFilledPolygon(pPolygonRenderTarget, pFillBrush, last_poly, last_polyi);
-					} else {
-						GETHDC
-						if (SUCCEEDED(hr)) {
-							// rescale coordinates from DIPs to pixels
-							for (int i = 0; i < last_polyi; i++) {
-								last_poly[i].x /= pixtodipX;
-								last_poly[i].y /= pixtodipY;
-							}
-							Gdiplus::Graphics * graphics = gdiplusGraphics(lpgw, hdc);
-							gdiplusFilledPolygon(*graphics, *pattern_brush, reinterpret_cast<Gdiplus::PointF *>(last_poly), last_polyi);
-							delete graphics;
-							RELEASEHDC
-						}
 					}
 					pRenderTarget->SetAntialiasMode(mode);
 					free(last_poly);
@@ -2165,8 +2152,6 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 	} /* while (ngwop < lpgw->nGWOP) */
 
 	/* clean-up */
-	if (pattern_brush)
-		delete pattern_brush;
 #if 0
 	if (cb)
 		delete cb;
@@ -2189,13 +2174,11 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 	// TODO: some of these resource are device independent and could be preserved
 	SafeRelease(&pSolidBrush);
 	SafeRelease(&pSolidFillBrush);
+	SafeRelease(&pPatternFillBrush);
 	SafeRelease(&pGrayBrush);
 	SafeRelease(&pSolidStrokeStyle);
 	SafeRelease(&pStrokeStyle);
 	SafeRelease(&pWriteTextFormat);
-#ifndef DCRENDERER
-	SafeRelease(&pGDIRenderTarget);
-#endif
 
 	if (hr == D2DERR_RECREATE_TARGET) {
 		hr = S_OK;

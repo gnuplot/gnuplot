@@ -4,6 +4,10 @@
 	the polygon render target to avoid "ghost" images and enforce its
 	size in pixels.
 
+	* src/win/wd2d.cpp:  Direct2D implementation of pattern fill using a
+	bitmap brush.  This eliminates the last GDI/GDI+ fallback, so web
+	no longer aim to be compatible.
+
 2017-06-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/dumb.trm:  Core routine apply_lp_properties looks to see whether
