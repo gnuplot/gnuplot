@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.29 2017/06/07 18:00:27 markisch Exp $
+# $Id: Makefile,v 1.30 2017/06/27 18:00:54 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -61,6 +61,8 @@ LUA = 0
 # svn version is recommended since it contains an improved
 # win32 backend.
 CACA = 0
+# Enable if you want to use Direct2D 1.1 (Windows 8 and Windows 7 Platform Update)
+DIRECT2D11 = 0
 
 # Create debug build?
 DEBUG = 0
@@ -70,7 +72,7 @@ DEBUG = 0
 #LUADIR = lua
 PDFDIR = pdflib
 #QTDIR = C:\Qt\4.8.4
-QTDIR = d:\Source\Qt-5.2.1\5.2.1\msvc2012
+QTDIR = C:\Qt\5.8\msvc2015_64
 #CAIRODIR = cairo-pango
 #CACADIR = libcaca
 CAIRODIR = d:\msvc-libs
@@ -138,7 +140,7 @@ LDFLAGS = $(LDFLAGS) /DEBUG
 COMMONLIBS = kernel32.lib user32.lib gdi32.lib winspool.lib \
              comdlg32.lib comctl32.lib advapi32.lib shell32.lib \
              msimg32.lib gdiplus.lib shlwapi.lib \
-             d2d1.lib dwrite.lib d3d11.lib ole32.lib
+             d2d1.lib dwrite.lib ole32.lib
 CONSOLELIBS = ole32.lib oleaut32.lib comctl32.lib
 
 !IFDEF LIBDIR
@@ -217,6 +219,12 @@ LDFLAGS = $(LDFLAGS) /libpath:$(CACADIR)
 !ENDIF
 CACALIBS = libcaca.lib
 !ENDIF
+
+!IF "$(DIRECT2D11)" == "1"
+OPTIONS = $(OPTIONS) /DHAVE_D2D11
+D2DLIBS = d3d11.lib
+!ENDIF
+
 
 HELPFILE = wgnuplot.chm
 !IF "$(PLATFORM)" == "X64"
@@ -402,6 +410,9 @@ linkopt-w.msw: Makefile
 !IF "$(CACA)" == "1"
 	echo $(CACALIBS) >> linkopt-w.msw
 !ENDIF
+!IF "$(DIRECT2D11)" == "1"
+	echo $(D2DLIBS) >> linkopt-w.msw
+!ENDIF
 
 linkopt-c.msw: Makefile
 	echo $(ALL_CONSOLE_OBJS) > linkopt-c.msw
@@ -429,6 +440,9 @@ linkopt-c.msw: Makefile
 !ENDIF
 !IF "$(CACA)" == "1"
 	echo $(CACALIBS) >> linkopt-c.msw
+!ENDIF
+!IF "$(DIRECT2D11)" == "1"
+	echo $(D2DLIBS) >> linkopt-c.msw
 !ENDIF
 
 # rules

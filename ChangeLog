@@ -5,15 +5,21 @@
 	size in pixels.
 
 	* src/win/wd2d.cpp:  Direct2D implementation of pattern fill using a
-	bitmap brush.  This eliminates the last GDI/GDI+ fallback, so web
+	bitmap brush.  This eliminates the last GDI/GDI+ fallback, so we
 	no longer aim to be compatible.
 
 	* src/win/wd2d.cpp:  Instead of converting between pixel units and
 	so-called device-independent-pixels (DIPs) all the time, we now force
 	the two units to be the same.  For the DCRenderTarget this was always
 	the case, for the HwndRenderTarget this is done by forcing the
-	(internal) resolution to 96dpi and the DeviceContext supports the
-	SetUnit() call.  Partically reverts the changes on 2017-06-18.
+	(internal) resolution to 96dpi, and the DeviceContext supports the
+	SetUnit() call.  Partially reverts the changes made on 2017-06-18.
+
+	* config/mingw/Makefile config/msvc/Makefile src/win/wd2d.cpp|h:
+	Optionally use Direct2D 1.1 and a DeviceContext as RenderTarget,
+	which is available starting from Windows 7 with Platform Update and
+	requires to link to Direct3D 11.1. Otherwise default to using a
+	DCRenderTarget.
 
 2017-06-26  Ethan A Merritt  <merritt@u.washington.edu>
 

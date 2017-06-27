@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.h,v 1.4 2017/06/18 20:53:10 markisch Exp $
+ * $Id: wd2d.h,v 1.5 2017/06/24 09:15:38 markisch Exp $
  */
 
 /*
@@ -30,7 +30,12 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef WD2D_H
 #define WD2D_H
 
-#define DCRENDERER
+// Enable if you want to use Direct2D 1.1 (Windows 8 and Windows 7 Platform Update)
+//#define HAVE_D2D11
+
+#ifndef HAVE_D2D11
+# define DCRENDERER
+#endif
 
 #include <windows.h>
 #include "wgnuplib.h"

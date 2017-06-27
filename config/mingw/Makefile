@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.72 2017/04/23 18:27:53 markisch Exp $
+# $Id: Makefile,v 1.73 2017/06/27 18:00:54 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 # This assumes a typical installation of the MinGW toolkit, the free
@@ -139,6 +139,10 @@ CERF=1
 # Uncomment if console mode gnuplot should use GNU readline
 # (not recommended)
 #GNUREADLINE=1
+
+# Uncomment if you want to use Direct2D 1.1 (Windows 8 and Windows 7 Platform Update)
+#DIRECT2D11=1
+
 
 # Below you can adapt paths according to your software setup:
 
@@ -525,6 +529,11 @@ else
 	CFLAGS += -DREADLINE
 endif
 
+ifdef DIRECT2D11
+	CFLAGS += -DHAVE_D2D11
+	TERMLIBS += -ld3d11
+endif
+
 ifdef GNU_RC
   # RC = d:/cygnus/cygwin-b20/H-i586-cygwin32/bin/windres
   RC  = $(CCPATH)windres
@@ -599,7 +608,8 @@ endif
 %.$(O): $W/%.c
 	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
 
-LDLIBS = -lkernel32 -lgdi32 -lwinspool -lcomdlg32 -lcomctl32 -ladvapi32 -lshell32 -lmsimg32 -lgdiplus -lshlwapi -ld2d1 -ldwrite -ld3d11 -lole32
+LDLIBS = -lkernel32 -lgdi32 -lwinspool -lcomdlg32 -lcomctl32 -ladvapi32 -lshell32 -lmsimg32 -lgdiplus -lshlwapi -ld2d1 -ldwrite -lole32
+
 LDLIBS += -lhtmlhelp
 LDFLAGS2 += -L$(HHWPATH)lib
 ifdef MINGW64

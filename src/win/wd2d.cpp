@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.18 2017/06/27 18:12:27 markisch Exp $
+ * $Id: wd2d.cpp,v 1.19 2017/06/27 18:20:39 markisch Exp $
  */
 
 /*
@@ -29,9 +29,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Enable to activate the Direct2D debug layer
 //#define D2DDEBUG
-
-// Enable if you want to use Direct2D 1.1 (Windows 8 and Windows 7 Platform Update)
-#define HAVE_D2D11
 
 // include iostream / cstdio _before_ syscfg.h in order
 // to avoid re-definition by wtext.h/winmain.c routines
