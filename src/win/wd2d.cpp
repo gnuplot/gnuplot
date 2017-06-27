@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.15 2017/06/24 11:25:56 markisch Exp $
+ * $Id: wd2d.cpp,v 1.16 2017/06/27 18:00:54 markisch Exp $
  */
 
 /*
@@ -1135,10 +1135,13 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 					// bitmap four times as large and copying it back with interpolation
 					if (lpgw->antialiasing && lpgw->polyaa) {
 						D2D1_SIZE_F size = D2D1::SizeF(2 * (rr - rl), 2 * (rb - rt));
+						D2D1_SIZE_U pixelSize = D2D1::SizeU(2 * (rr - rl), 2 * (rb - rt));
 						if (SUCCEEDED(hr))
-							hr = pRenderTarget->CreateCompatibleRenderTarget(size, &pPolygonRenderTarget);
+							hr = pRenderTarget->CreateCompatibleRenderTarget(size, pixelSize, &pPolygonRenderTarget);
+
 						if (SUCCEEDED(hr)) {
 							pPolygonRenderTarget->BeginDraw();
+							pPolygonRenderTarget->Clear(D2D1::ColorF(1.0, 1.0, 1.0, 0.0));
 							pPolygonRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_ALIASED);
 							pPolygonRenderTarget->SetTransform(D2D1::Matrix3x2F::Scale(2.f, 2.f, D2D1::Point2F(0, 0)));
 						}

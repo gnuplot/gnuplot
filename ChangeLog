@@ -1,6 +1,8 @@
 2017-06-27  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/win/wd2d.cpp:  Respect the antialiasing setting.
+	* src/win/wd2d.cpp:  Respect the antialiasing setting.  Always clear
+	the polygon render target to avoid "ghost" images and enforce its
+	size in pixels.
 
 2017-06-26  Ethan A Merritt  <merritt@u.washington.edu>
 
