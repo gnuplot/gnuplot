@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.17 2017/06/27 18:06:02 markisch Exp $
+ * $Id: wd2d.cpp,v 1.18 2017/06/27 18:12:27 markisch Exp $
  */
 
 /*
@@ -210,7 +210,8 @@ d2dCreateDeviceSwapChainBitmap(LPGW lpgw)
 	if (SUCCEEDED(hr)) {
 		pDirect2dDeviceContext->SetTarget(pDirect2dBackBuffer);
 		pDirect2dDeviceContext->SetDpi(dpiX, dpiY);
-		//pDirect2dDeviceContext->SetUnitMode(D2D1_UNIT_MODE_PIXELS);
+		// Avoid rescaling units all the time
+		pDirect2dDeviceContext->SetUnitMode(D2D1_UNIT_MODE_PIXELS);
 	}
 
 	SafeRelease(&dxgiDevice);
@@ -284,6 +285,9 @@ d2dInit(LPGW lpgw)
 			&pRenderTarget
 		);
 		if (SUCCEEDED(hr)) {
+			// This makes pixels = DIPs, so we don't have to rescale positions etc.
+			// it comes at the expense of loosing the correct threshold for anti-aliasing.
+			pRenderTarget->SetDpi(96.f, 96.f);
 			lpgw->pRenderTarget = pRenderTarget;
 		}
 #else
@@ -454,8 +458,8 @@ d2dPolyline(ID2D1RenderTarget * pRenderTarget, ID2D1SolidColorBrush * pBrush, ID
 		FLOAT dpiX, dpiY;
 		pRenderTarget->GetDpi(&dpiX, &dpiY);
 		for (int i = 0; i < polyi; i++) {
-			points[i].x = (trunc(points[i].x * dpiX / 96.f) + 0.5) * 96.f / dpiX;
-			points[i].y = (trunc(points[i].y * dpiY / 96.f) + 0.5) * 96.f / dpiY;
+			points[i].x = trunc(points[i].x) + 0.5;
+			points[i].y = trunc(points[i].y) + 0.5;
 		}
 	}
 
@@ -527,11 +531,7 @@ static void
 d2dDot(ID2D1RenderTarget * pRenderTarget, ID2D1SolidColorBrush * pBrush, float x, float y)
 {
 	// draw a rectangle with 1 pixel height and width
-	FLOAT dpiX, dpiY;
-	pRenderTarget->GetDpi(&dpiX, &dpiY);
-	FLOAT ofsX = 0.5f * 96.f / dpiX;
-	FLOAT ofsY = 0.5f * 96.f / dpiY;
-	pRenderTarget->FillRectangle(D2D1::RectF(x - ofsX, y - ofsY, x + ofsX, y + ofsY), pBrush);
+	pRenderTarget->FillRectangle(D2D1::RectF(x - 0.5f, y - 0.5f, x + 0.5f, y + 0.5f), pBrush);
 }
 
 
@@ -703,7 +703,7 @@ d2dSetFont(ID2D1RenderTarget * pRenderTarget, LPRECT rect, LPGW lpgw, LPTSTR fon
 	// DPI setting and the system DPI.
 	g_pDirect2dFactory->GetDesktopDpi(&ddpiX, &ddpiY);
 	pRenderTarget->GetDpi(&dpiX, &dpiY);
-	FLOAT fontSize = size * ddpiY / dpiY * 96.f / 72.f;
+	FLOAT fontSize = size * ddpiY / 72.f;
 	hr = g_pDWriteFactory->CreateTextFormat(
 		family,
 		NULL,
@@ -750,10 +750,10 @@ d2dSetFont(ID2D1RenderTarget * pRenderTarget, LPRECT rect, LPGW lpgw, LPTSTR fon
 		hr = pTextLayout->GetMetrics(&textMetrics);
 
 		if (SUCCEEDED(hr)) {
-			FLOAT width = textMetrics.widthIncludingTrailingWhitespace * dpiX / 96.f;
+			FLOAT width = textMetrics.widthIncludingTrailingWhitespace;
 			//FLOAT height = textMetrics.height * dpiY / 96.f;
 
-			lpgw->vchar = MulDiv(lpgw->tmHeight * dpiY / 96.f, lpgw->ymax, rect->bottom - rect->top);
+			lpgw->vchar = MulDiv(lpgw->tmHeight, lpgw->ymax, rect->bottom - rect->top);
 			lpgw->hchar = MulDiv(width, lpgw->xmax, 10 * (rect->right - rect->left));
 			lpgw->htic = MulDiv(lpgw->hchar, 2, 5);
 			unsigned cy = MulDiv(width, 2, 50);
@@ -847,7 +847,7 @@ draw_enhanced_init(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, ID2D1SolidColor
 	enhstate_d2d.pBrush = pBrush;
 	enhstate_d2d.pWriteTextFormat = pWriteTextFormat;
 
-	// we cannot use pRenderTarget->GetDpi() since that always returns 96.0;
+	// We cannot use pRenderTarget->GetDpi() since that might be set to 96;
 	FLOAT dpiX, dpiY;
 	g_pDirect2dFactory->GetDesktopDpi(&dpiX, &dpiY);
 	enhstate.res_scale = dpiY / 96.f;
@@ -857,12 +857,7 @@ draw_enhanced_init(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, ID2D1SolidColor
 static inline void
 d2d_update_keybox(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, unsigned plotno, FLOAT x, FLOAT y)
 {
-	// coordinates x,y are in DIPs, transform to pixels
-	FLOAT dpiX, dpiY;
-	pRenderTarget->GetDpi(&dpiX, &dpiY);
-	unsigned px = x * dpiX / 96.f + 0.5f;
-	unsigned py = y * dpiY / 96.f + 0.5f;
-	draw_update_keybox(lpgw, plotno, px, py);
+	draw_update_keybox(lpgw, plotno, x + 0.5f, y + 0.5f);
 }
 
 
@@ -883,7 +878,6 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 	// COM return code
 	HRESULT hr = S_OK;
 	FLOAT dpiX, dpiY;
-	FLOAT pixtodipX, pixtodipY;	// pixel to DIP conversion factor
 
 	/* draw ops */
 	unsigned int ngwop = 0;
@@ -1015,8 +1009,6 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 		pRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_ALIASED);
 	// Note that this will always be 96 for a DC Render Target.
 	pRenderTarget->GetDpi(&dpiX, &dpiY);
-	pixtodipX = 96.f / dpiX;
-	pixtodipY = 96.f / dpiY;
 	//printf("dpiX = %.1f, DPI = %u\n", dpiX, GetDPI());
 
 	/* background fill */
@@ -1040,9 +1032,6 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 
 	htic = (lpgw->org_pointsize * MulDiv(lpgw->htic, rr - rl, lpgw->xmax) + 1);
 	vtic = (lpgw->org_pointsize * MulDiv(lpgw->vtic, rb - rt, lpgw->ymax) + 1);
-	// rescale tic sizes to DIPs
-	htic *=  pixtodipX;
-	vtic *=  pixtodipY;
 
 	lpgw->angle = 0;
 	lpgw->justify = LEFT;
@@ -1091,9 +1080,6 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 			xdash = MulDiv(curptr->x, rr - rl - 1, lpgw->xmax) + rl + 0.5;
 			ydash = rb - MulDiv(curptr->y, rb - rt - 1, lpgw->ymax) + rt - 0.5;
 		}
-		// rescale coordinates to DIPs
-		xdash *=  pixtodipX;
-		ydash *=  pixtodipY;
 
 		/* finish last filled polygon */
 		if ((last_poly != NULL) &&
@@ -1154,8 +1140,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 					/* grey out keysample if graph is hidden */
 					if ((plotno <= lpgw->maxhideplots) && lpgw->hideplot[plotno - 1]) {
 						LPRECT bb = lpgw->keyboxes + plotno - 1;
-						D2D1_RECT_F rect = D2D1::RectF(bb->left * pixtodipX, bb->top * pixtodipY,
-						                               bb->right * pixtodipX, bb->bottom * pixtodipY);
+						D2D1_RECT_F rect = D2D1::RectF(bb->left, bb->top, bb->right, bb->bottom);
 						pRenderTarget->FillRectangle(rect, pGrayBrush);
 					}
 					keysample = false;
@@ -1269,9 +1254,6 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 					points[i].x = MulDiv(poly[i].x, rr - rl - 1, lpgw->xmax) + rl + 0.5;
 					points[i].y = rb - MulDiv(poly[i].y, rb - rt - 1, lpgw->ymax) + rt - 0.5;
 				}
-				// rescale coordinates to DIPs
-				points[i].x *=  pixtodipX;
-				points[i].y *=  pixtodipY;
 			}
 			LocalUnlock(poly);
 
@@ -1656,10 +1638,10 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 			 * by a W_fillstyle call. */
 			// snap to pixel grid
 			D2D1_RECT_F rect;
-			rect.left = trunc(xdash / pixtodipX) * pixtodipX;
-			rect.top = trunc(ydash / pixtodipY) * pixtodipY;
-			rect.right = trunc(ppt[0].x / pixtodipX) * pixtodipX;
-			rect.bottom = trunc(ppt[0].y / pixtodipY) * pixtodipY;
+			rect.left = trunc(xdash);
+			rect.top = trunc(ydash);
+			rect.right = trunc(ppt[0].x);
+			rect.bottom = trunc(ppt[0].y);
 
 			D2D1_ANTIALIAS_MODE mode = pRenderTarget->GetAntialiasMode();
 			pRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_ALIASED);
@@ -1724,9 +1706,6 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 				double pointsize = curptr->x / 100.0;
 				htic = MulDiv(pointsize * lpgw->pointscale * lpgw->htic, rr - rl, lpgw->xmax) + 1;
 				vtic = MulDiv(pointsize * lpgw->pointscale * lpgw->vtic, rb - rt, lpgw->ymax) + 1;
-				// rescale tic length to DIPs
-				htic *= pixtodipX;
-				vtic *= pixtodipY;
 			} else {
 				htic = vtic = 0;
 			}
@@ -1742,8 +1721,6 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 			line_width *= lpgw->linewidth * lw_scale;
 			// Minimum line width is 1 pixel.
 			line_width = GPMAX(1, line_width);
-			// rescale line width to DIPs
-			line_width *= pixtodipY;
 			/* invalidate point symbol cache */
 			last_symbol = W_invalid_pointtype;
 			break;
@@ -2027,8 +2004,8 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 			} else {
 				// snap to pixel
 				if (lpgw->oversample) {
-					xofs = (trunc(xdash / pixtodipX) + 0.5) * pixtodipX;
-					yofs = (trunc(ydash / pixtodipY) + 0.5) * pixtodipY;
+					xofs = trunc(xdash) + 0.5;
+					yofs = trunc(ydash) + 0.5;
 				} else {
 					xofs = xdash;
 					yofs = ydash;

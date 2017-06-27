@@ -8,6 +8,13 @@
 	bitmap brush.  This eliminates the last GDI/GDI+ fallback, so web
 	no longer aim to be compatible.
 
+	* src/win/wd2d.cpp:  Instead of converting between pixel units and
+	so-called device-independent-pixels (DIPs) all the time, we now force
+	the two units to be the same.  For the DCRenderTarget this was always
+	the case, for the HwndRenderTarget this is done by forcing the
+	(internal) resolution to 96dpi and the DeviceContext supports the
+	SetUnit() call.  Partically reverts the changes on 2017-06-18.
+
 2017-06-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/dumb.trm:  Core routine apply_lp_properties looks to see whether
