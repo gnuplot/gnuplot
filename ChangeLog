@@ -1,3 +1,9 @@
+2017-06-27  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wd2d.cpp:  Respect the antialiasing setting.  Always clear
+	the polygon render target to avoid "ghost" images and enforce its
+	size in pixels.
+
 2017-06-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/dumb.trm:  Core routine apply_lp_properties looks to see whether
@@ -20,7 +26,7 @@
 
 	* term/dumb.trm:  Remove debug printout committed by mistake
 
-2017-06-18  Bastian Maerkisch  <bmaerkisch@web.de>
+2017-06-21  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgnuplib.h:  The dot needs not to be included in the number of
 	different point types for cycling through.  Bug introduced on 2017-05-13.

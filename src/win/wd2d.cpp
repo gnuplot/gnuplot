@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.6.2.2 2017/06/14 07:46:53 markisch Exp $
+ * $Id: wd2d.cpp,v 1.6.2.3 2017/06/17 20:05:44 markisch Exp $
  */
 
 /*
@@ -395,7 +395,7 @@ d2dSetFont(ID2D1RenderTarget * pRenderTarget, LPRECT rect, LPGW lpgw, LPTSTR fon
 	if (italic) *italic = 0;
 	if (bold) *bold = 0;
 
-	// NOTE: We implement our own fallback
+	// NOTE: We implement our own fall-back
 	if (_tcscmp(fontname, TEXT("Times")) == 0) {
 		free(fontname);
 		fontname = _tcsdup(TEXT("Times New Roman"));
@@ -693,7 +693,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 		return;
 
 	// TODO: Need a D2D way of doing the following calls
-#ifdef DCRENDER
+#ifdef DCRENDERER
 	/* clear hypertexts only in display sessions */
 	interactive = (GetObjectType(hdc) == OBJ_MEMDC) ||
 		((GetObjectType(hdc) == OBJ_DC) && (GetDeviceCaps(hdc, TECHNOLOGY) == DT_RASDISPLAY));
@@ -734,7 +734,10 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 	}
 #endif
 
-	pRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
+	if (lpgw->antialiasing)
+		pRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
+	else
+		pRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_ALIASED);
 	// Note that this will always be 96 for a DC Render Target.
 	pRenderTarget->GetDpi(&dpiX, &dpiY);
 	//printf("dpiX = %.1f, DPI = %u\n", dpiX, GetDPI());
@@ -746,7 +749,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 	else
 		pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
 
-	/* Init brush and pens: need to be created after the Graphics object. */
+	// init brushes
 	hr = pRenderTarget->CreateSolidColorBrush(D2DCOLORREF(lpgw->background, 1.), &pSolidBrush);
 	hr = pRenderTarget->CreateSolidColorBrush(D2DCOLORREF(lpgw->background, 1.), &pSolidFillBrush);
 	hr = pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(0.75f, 0.75f, 0.75f, 0.5f), &pGrayBrush);
@@ -889,14 +892,17 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 					break;
 				case TERM_LAYER_BEGIN_PM3D_MAP:
 				case TERM_LAYER_BEGIN_PM3D_FLUSH:
-				    // Antialiasing of pm3d polygons is obtained by drawing to a
-				    // bitmap four times as large and copying it back with interpolation
-				    if (lpgw->antialiasing && lpgw->polyaa) {
+					// Antialiasing of pm3d polygons is obtained by drawing to a
+					// bitmap four times as large and copying it back with interpolation
+					if (lpgw->antialiasing && lpgw->polyaa) {
 						D2D1_SIZE_F size = D2D1::SizeF(2 * (rr - rl), 2 * (rb - rt));
+						D2D1_SIZE_U pixelSize = D2D1::SizeU(2 * (rr - rl), 2 * (rb - rt));
 						if (SUCCEEDED(hr))
-							hr = pRenderTarget->CreateCompatibleRenderTarget(size, &pPolygonRenderTarget);
+							hr = pRenderTarget->CreateCompatibleRenderTarget(size, pixelSize, &pPolygonRenderTarget);
+
 						if (SUCCEEDED(hr)) {
 							pPolygonRenderTarget->BeginDraw();
+							pPolygonRenderTarget->Clear(D2D1::ColorF(1.0, 1.0, 1.0, 0.0));
 							pPolygonRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_ALIASED);
 							pPolygonRenderTarget->SetTransform(D2D1::Matrix3x2F::Scale(2.f, 2.f, D2D1::Point2F(0, 0)));
 						}
@@ -904,7 +910,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 					break;
 				case TERM_LAYER_END_PM3D_MAP:
 				case TERM_LAYER_END_PM3D_FLUSH:
-				    if (pPolygonRenderTarget != NULL) {
+					if (pPolygonRenderTarget != NULL) {
 						ID2D1Bitmap * pBitmap;
 						if (SUCCEEDED(hr))
 							hr = pPolygonRenderTarget->EndDraw();
@@ -927,11 +933,13 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 				case TERM_LAYER_BEGIN_COLORBOX:
 					// Turn of antialiasing for failsafe/pixel images and color boxes
 					// and pm3d polygons to avoid seams.
-					pRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_ALIASED);
+					if (lpgw->antialiasing)
+						pRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_ALIASED);
 					break;
 				case TERM_LAYER_END_IMAGE:
 				case TERM_LAYER_END_COLORBOX:
-					pRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
+					if (lpgw->antialiasing)
+						pRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 					break;
 				default:
 					break;
@@ -1083,9 +1091,9 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 				if (textw) {
 					if (lpgw->angle != 0)
 						pRenderTarget->SetTransform(D2D1::Matrix3x2F::Rotation(-lpgw->angle, D2D1::Point2F(xdash + hshift, ydash + vshift)));
-					
+
 					pRenderTarget->DrawText(textw, static_cast<UINT32>(wcslen(textw)), pWriteTextFormat,
-											 D2D1::RectF(xdash + hshift + align_ofs, ydash + vshift, 
+											 D2D1::RectF(xdash + hshift + align_ofs, ydash + vshift,
 														 xdash + hshift + align_ofs + textbox_width, 8888), pSolidBrush);
 					if (lpgw->angle != 0)
 						pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
@@ -1272,7 +1280,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 						hr = d2dPolyline(pRenderTarget, pSolidBrush, pStrokeStyle, line_width, rect, 4, true);
 					} else {
 						if (pFillBrush != NULL) {
-							d2dFilledPolygon(pRenderTarget, pFillBrush, rect, 4);
+							hr = d2dFilledPolygon(pRenderTarget, pFillBrush, rect, 4);
 						} else {
 							GETHDC
 							Gdiplus::Graphics * graphics = gdiplusGraphics(lpgw, hdc);
@@ -1651,7 +1659,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 						}
 					}
 					UINT32 stride = width * 4;
-					hr = pRenderTarget->CreateBitmap(size, argb_image, stride, 
+					hr = pRenderTarget->CreateBitmap(size, argb_image, stride,
 													 D2D1::BitmapProperties(
 														D2D1::PixelFormat(
 															DXGI_FORMAT_B8G8R8A8_UNORM,
@@ -1662,7 +1670,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 				} else {
 					UINT32 stride = width * 4;
 					UINT32 * argb_image = reinterpret_cast<UINT32 *>(image);
-					
+
 					// convert to gray-scale
 					if (!lpgw->color) {
 						argb_image = new UINT32[width * height];
@@ -1723,6 +1731,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 			if ((symbol < W_dot) || (symbol > W_last_pointtype))
 				break;
 
+			(void) last_symbol;
 #if 0
 			// draw cached point symbol
 			if (ps_caching && (last_symbol == symbol) && (cb != NULL)) {
@@ -1844,7 +1853,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 			if (b != NULL) {
 				GETHDC
 				Graphics * graphics = gdiplusGraphics(lpgw, hdc);
-				// create a chached bitmap for faster redrawing
+				// create a cached bitmap for faster redrawing
 				cb = new CachedBitmap(b, graphics);
 				// display point symbol snapped to pixel
 				if (lpgw->oversample)
