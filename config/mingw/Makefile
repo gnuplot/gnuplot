@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.71 2017/02/15 09:28:40 markisch Exp $
+# $Id: Makefile,v 1.72 2017/04/23 18:27:53 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 # This assumes a typical installation of the MinGW toolkit, the free
@@ -599,7 +599,7 @@ endif
 %.$(O): $W/%.c
 	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
 
-LDLIBS = -lkernel32 -lgdi32 -lwinspool -lcomdlg32 -lcomctl32 -ladvapi32 -lshell32 -lmsimg32 -lgdiplus -lshlwapi -ld2d1 -ldwrite -lole32
+LDLIBS = -lkernel32 -lgdi32 -lwinspool -lcomdlg32 -lcomctl32 -ladvapi32 -lshell32 -lmsimg32 -lgdiplus -lshlwapi -ld2d1 -ldwrite -ld3d11 -lole32
 LDLIBS += -lhtmlhelp
 LDFLAGS2 += -L$(HHWPATH)lib
 ifdef MINGW64

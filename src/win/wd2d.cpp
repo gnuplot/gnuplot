@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.14 2017/06/24 11:22:12 markisch Exp $
+ * $Id: wd2d.cpp,v 1.15 2017/06/24 11:25:56 markisch Exp $
  */
 
 /*
@@ -124,7 +124,7 @@ static struct {
 
 #if defined(HAVE_D2D11) && !defined(DCRENDERER)
 static HRESULT 
-CreateD3dDevice(D3D_DRIVER_TYPE const type, ID3D11Device **device)
+d2dCreateD3dDevice(D3D_DRIVER_TYPE const type, ID3D11Device **device)
 {
 	// Set feature levels supported by our application
 	D3D_FEATURE_LEVEL featureLevels[] =
@@ -152,7 +152,7 @@ CreateD3dDevice(D3D_DRIVER_TYPE const type, ID3D11Device **device)
 
 
 static HRESULT
-d2dDCreateDeviceSwapChainBitmap(LPGW lpgw)
+d2dCreateDeviceSwapChainBitmap(LPGW lpgw)
 {
 	HRESULT hr = S_OK;
 
@@ -190,7 +190,7 @@ d2dDCreateDeviceSwapChainBitmap(LPGW lpgw)
 	props.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;  // DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL
 	props.Flags = DXGI_SWAP_CHAIN_FLAG_GDI_COMPATIBLE;  // we still require GDI compatibility
 
-														// Create DXGI swap chain targeting a window handle (the only Windows 7-compatible option)
+	// Create DXGI swap chain targeting a window handle (the only Windows 7-compatible option)
 	IDXGISwapChain1 * pDXGISwapChain = NULL;
 	if (SUCCEEDED(hr))
 		hr = dxgiFactory->CreateSwapChainForHwnd(g_pDirect3dDevice, lpgw->hGraph, &props, NULL, NULL, &pDXGISwapChain);
@@ -297,9 +297,9 @@ d2dInit(LPGW lpgw)
 		if (g_pDirect3dDevice == NULL) {
 			// Create Direct3D device
 			ID3D11Device * device = NULL;
-			hr = CreateD3dDevice(D3D_DRIVER_TYPE_HARDWARE, &device);
+			hr = d2dCreateD3dDevice(D3D_DRIVER_TYPE_HARDWARE, &device);
 			if (hr == DXGI_ERROR_UNSUPPORTED)
-				hr = CreateD3dDevice(D3D_DRIVER_TYPE_WARP, &device);
+				hr = d2dCreateD3dDevice(D3D_DRIVER_TYPE_WARP, &device);
 			if (SUCCEEDED(hr))
 				hr = device->QueryInterface(__uuidof(ID3D11Device1), (void **) &g_pDirect3dDevice);
 			SafeRelease(&device);
@@ -325,7 +325,7 @@ d2dInit(LPGW lpgw)
 		}
 
 		if (SUCCEEDED(hr))
-			hr = d2dDCreateDeviceSwapChainBitmap(lpgw);
+			hr = d2dCreateDeviceSwapChainBitmap(lpgw);
 #endif
 #endif
 	}
@@ -350,7 +350,7 @@ d2dResize(LPGW lpgw, RECT rect)
 	hr = pRenderTarget->Resize(size);
 #else
 	// DeviceContext
-	hr = d2dDCreateDeviceSwapChainBitmap(lpgw);
+	hr = d2dCreateDeviceSwapChainBitmap(lpgw);
 	if (FAILED(hr))
 		fprintf(stderr, "D2d: Unable to resize swap chain. hr = %0x\n", hr);
 #endif
@@ -961,7 +961,10 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 		hr = pRenderTarget->QueryInterface(__uuidof(ID2D1GdiInteropRenderTarget), (void**)&pGDIRenderTarget);
 #endif
 
-	pRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
+	if (lpgw->antialiasing)
+		pRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
+	else
+		pRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_ALIASED);
 	// Note that this will always be 96 for a DC Render Target.
 	pRenderTarget->GetDpi(&dpiX, &dpiY);
 	pixtodipX = 96.f / dpiX;
@@ -1166,11 +1169,13 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 				case TERM_LAYER_BEGIN_COLORBOX:
 					// Turn of antialiasing for failsafe/pixel images and color boxes
 					// and pm3d polygons to avoid seams.
-					pRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_ALIASED);
+					if (lpgw->antialiasing)
+						pRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_ALIASED);
 					break;
 				case TERM_LAYER_END_IMAGE:
 				case TERM_LAYER_END_COLORBOX:
-					pRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
+					if (lpgw->antialiasing)
+						pRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 					break;
 				default:
 					break;

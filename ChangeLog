@@ -1,3 +1,7 @@
+2017-06-27  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wd2d.cpp:  Respect the antialiasing setting.
+
 2017-06-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/dumb.trm:  Core routine apply_lp_properties looks to see whether

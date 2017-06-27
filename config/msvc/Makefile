@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.28 2017/04/23 18:27:53 markisch Exp $
+# $Id: Makefile,v 1.29 2017/06/07 18:00:27 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -104,7 +104,7 @@ LD = link
 # /I  means extra include directory
 # /Fm means produce link map
 # /Od means suppress optimizations (esp. for debug)
-# /O2 mans optimize for speed
+# /O2 means optimize for speed
 # /Zi means prepare for codeview
 # /MD means include multi-thread support (DLL)
 # /GR means Enable Run-Time Type Information
@@ -138,7 +138,7 @@ LDFLAGS = $(LDFLAGS) /DEBUG
 COMMONLIBS = kernel32.lib user32.lib gdi32.lib winspool.lib \
              comdlg32.lib comctl32.lib advapi32.lib shell32.lib \
              msimg32.lib gdiplus.lib shlwapi.lib \
-             d2d1.lib dwrite.lib ole32.lib
+             d2d1.lib dwrite.lib d3d11.lib ole32.lib
 CONSOLELIBS = ole32.lib oleaut32.lib comctl32.lib
 
 !IFDEF LIBDIR
