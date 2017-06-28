@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.ac,v 1.31 2017/06/02 04:30:26 sfeam Exp $
+dnl $Id: configure.ac,v 1.32 2017/06/20 19:29:42 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -1378,7 +1378,7 @@ if test "$ac_cv_lib_gd_gdImageJpeg" = yes &&
       AC_MSG_RESULT([  libgd-based png, jpeg, and gif terminals: yes (no animated gif)])
     fi
 else
-    AC_MSG_RESULT([  libgd-based png, jpeg, and gif terminals: no (see config.log) ])
+    AC_MSG_RESULT([  libgd-based png, jpeg, and gif terminals: no (requires libgd,  see config.log) ])
 fi
 
 if test "$with_cairo" = yes; then
