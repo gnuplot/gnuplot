@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.80 2017/02/17 20:19:25 sfeam Exp $
+ * $Id: canvas.trm,v 1.81 2017/05/02 19:41:14 sfeam Exp $
  *
  */
 
@@ -583,6 +583,20 @@ CANVAS_graphics()
     );
 }
 
+static void
+CANVAS_mouse_param( char *gp_name, const char *js_name )
+{
+    struct udvt_entry *udv;
+    if ((udv = add_udv_by_name(gp_name))) {
+	if (udv->udv_value.type == INTGR) {
+	    fprintf(gpoutfile, "%s = ", js_name);
+	    fprintf(gpoutfile, "%d", udv->udv_value.v.int_val);
+	    fprintf(gpoutfile, "\n");
+	} else if (udv->udv_value.type == CMPLX) {
+	    fprintf(gpoutfile, "%s = %g;\n", js_name, udv->udv_value.v.cmplx_val.real);
+	}
+    }
+}
 
 TERM_PUBLIC void
 CANVAS_text()
@@ -593,7 +607,6 @@ CANVAS_text()
     /* same, so that they are re-used by all plots in a document, or whether  */
     /* they should be tied to the function name and hence private.            */
     if (TRUE) {
-	struct udvt_entry *udv;
 	fprintf(gpoutfile, "\n// plot boundaries and axis scaling information for mousing \n");
 	fprintf(gpoutfile, "gnuplot.plot_term_xmax = %d;\n", (int)(term->xmax / CANVAS_OVERSAMPLE));
 	fprintf(gpoutfile, "gnuplot.plot_term_ymax = %d;\n", (int)(term->ymax / CANVAS_OVERSAMPLE));
@@ -607,13 +620,8 @@ CANVAS_text()
 	/* Get true axis ranges as used in the plot */
 	update_gpval_variables(1);
 
-#define	MOUSE_PARAM( GP_NAME, js_NAME ) \
-	if ((udv = add_udv_by_name(GP_NAME))) { \
-	    if (udv->udv_value.type == INTGR)   \
-		fprintf(gpoutfile, "%s = %d;\n", js_NAME, udv->udv_value.v.int_val); \
-	    else if (udv->udv_value.type == CMPLX) \
-		fprintf(gpoutfile, "%s = %g;\n", js_NAME, udv->udv_value.v.cmplx_val.real); \
-	}
+#define	MOUSE_PARAM( GP_NAME, js_NAME ) CANVAS_mouse_param( GP_NAME, js_NAME)
+
 	if (axis_array[FIRST_X_AXIS].datatype != DT_TIMEDATE) {
 	    MOUSE_PARAM("GPVAL_X_MIN", "gnuplot.plot_axis_xmin");
 	    MOUSE_PARAM("GPVAL_X_MAX", "gnuplot.plot_axis_xmax");

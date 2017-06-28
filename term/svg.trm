@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.187 2017/02/20 19:38:03 sfeam Exp $
+ * $Id: svg.trm,v 1.188 2017/06/14 18:29:53 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1073,6 +1073,22 @@ SVG_graphics ()
     SVG_xLast = SVG_yLast = UINT_MAX;
 }
 
+static void
+svg_mouse_param( char *gp_name, const char *js_name)
+{
+    struct udvt_entry *udv;
+    if ((udv = add_udv_by_name(gp_name))) {
+	if (udv->udv_value.type == INTGR) {
+	    fprintf(gpoutfile, "gnuplot_svg.%s = ", js_name);
+	    fprintf(gpoutfile, "%d", udv->udv_value.v.int_val);
+	    fprintf(gpoutfile, "\n");
+	} else if (udv->udv_value.type == CMPLX) {
+	    fprintf(gpoutfile, "gnuplot_svg.%s = %g;\n",
+		    js_name, udv->udv_value.v.cmplx_val.real);
+	}
+    }
+}
+
 /*------------------------------------------------------------------------------------------------------------------------------------
 	SVG_text
 ------------------------------------------------------------------------------------------------------------------------------------*/
@@ -1083,7 +1099,6 @@ SVG_text ()
     SVG_GroupClose ();
 
     if (SVG_mouseable) {
-	struct udvt_entry *udv;
 
 	fprintf(gpoutfile, "\n<script type=\"text/javascript\"><![CDATA[\n");
 	fprintf(gpoutfile, "// plot boundaries and axis scaling information for mousing \n");
@@ -1099,15 +1114,8 @@ SVG_text ()
 	/* Get true axis ranges as used in the plot */
 	update_gpval_variables(1);
 
-#define	MOUSE_PARAM( GP_NAME, js_NAME ) \
-	if ((udv = add_udv_by_name(GP_NAME))) { \
-	    if (udv->udv_value.type == INTGR)   \
-		fprintf(gpoutfile, "gnuplot_svg.%s = %d;\n", \
-			js_NAME, udv->udv_value.v.int_val); \
-	    else if (udv->udv_value.type == CMPLX) \
-		fprintf(gpoutfile, "gnuplot_svg.%s = %g;\n", \
-			js_NAME, udv->udv_value.v.cmplx_val.real); \
-	}
+#define	MOUSE_PARAM( GP_NAME, js_NAME ) svg_mouse_param(GP_NAME, js_NAME)
+
 	if (axis_array[FIRST_X_AXIS].datatype != DT_TIMEDATE) {
 	    MOUSE_PARAM("GPVAL_X_MIN", "plot_axis_xmin");
 	    MOUSE_PARAM("GPVAL_X_MAX", "plot_axis_xmax");
