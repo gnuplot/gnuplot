@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.262 2017/06/18 19:54:43 markisch Exp $
+ * $Id: wgraph.c,v 1.263 2017/06/24 09:15:38 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -3655,8 +3655,6 @@ add_tooltip(LPGW lpgw, PRECT rect, LPWSTR text)
 		lpgw->tooltips = (struct tooltips *) realloc(lpgw->tooltips, lpgw->maxtooltips * sizeof(struct tooltips));
 	}
 
-	rect->top += lpgw->ToolbarHeight;
-	rect->bottom += lpgw->ToolbarHeight;
 	lpgw->tooltips[idx].rect = *rect;
 	lpgw->tooltips[idx].text = text;
 	lpgw->numtooltips++;
@@ -3668,13 +3666,13 @@ add_tooltip(LPGW lpgw, PRECT rect, LPWSTR text)
 		HWND hwnd = CreateWindowEx(WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL,
 									 WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP,
 									 CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-									 lpgw->hWndGraph, NULL, lpgw->hInstance, NULL);
+									 lpgw->hGraph, NULL, lpgw->hInstance, NULL);
 		lpgw->hTooltip = hwnd;
 
 		/* Associate the tooltip with the rect area.*/
 		ti.cbSize   = sizeof(TOOLINFO);
 		ti.uFlags   = TTF_SUBCLASS;
-		ti.hwnd     = lpgw->hWndGraph;
+		ti.hwnd     = lpgw->hGraph;
 		ti.hinst    = lpgw->hInstance;
 		ti.uId      = 0;
 		ti.rect     = * rect;
@@ -3718,7 +3716,7 @@ track_tooltip(LPGW lpgw, int x, int y)
 			int width;
 
 			ti.cbSize   = sizeof(TOOLINFO);
-			ti.hwnd     = lpgw->hWndGraph;
+			ti.hwnd     = lpgw->hGraph;
 			ti.hinst    = lpgw->hInstance;
 			ti.rect     = lpgw->tooltips[i].rect;
 			ti.lpszText = (LPTSTR) lpgw->tooltips[i].text;

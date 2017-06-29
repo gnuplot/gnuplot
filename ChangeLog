@@ -1,3 +1,8 @@
+2017-06-29  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c:  Unbreak hypertext tooltips.  Oversight in the
+	change on 2017-06-24.
+
 2017-06-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm (CANVAS_mouse_param) term/svg.trm (svg_mouse_param): 
