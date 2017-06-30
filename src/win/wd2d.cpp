@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.6.2.3 2017/06/17 20:05:44 markisch Exp $
+ * $Id: wd2d.cpp,v 1.6.2.4 2017/06/27 20:05:21 markisch Exp $
  */
 
 /*
@@ -525,7 +525,7 @@ EnhancedPutText(int x, int y, char * text)
 	LPWSTR textw = UnicodeText(text, enhstate.lpgw->encoding);
 
 	if (enhstate.lpgw->angle != 0)
-		pRenderTarget->SetTransform(D2D1::Matrix3x2F::Rotation(-enhstate.lpgw->angle, D2D1::Point2F(x, y - enhstate.lpgw->tmAscent)));
+		pRenderTarget->SetTransform(D2D1::Matrix3x2F::Rotation(-enhstate.lpgw->angle, D2D1::Point2F(x, y)));
 	const float align_ofs = 0.;
 	pRenderTarget->DrawText(textw, static_cast<UINT32>(wcslen(textw)), enhstate_d2d.pWriteTextFormat,
 							 D2D1::RectF(x + align_ofs, y - enhstate.lpgw->tmAscent,
@@ -559,10 +559,10 @@ draw_enhanced_init(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, ID2D1SolidColor
 	enhstate_d2d.pBrush = pBrush;
 	enhstate_d2d.pWriteTextFormat = pWriteTextFormat;
 
-	// we cannot use pRenderTarget->GetDpi() since that always returns 96.0;
+	// We cannot use pRenderTarget->GetDpi() since that might be set to 96;
 	FLOAT dpiX, dpiY;
 	g_pDirect2dFactory->GetDesktopDpi(&dpiX, &dpiY);
-	enhstate.res_scale = dpiY / 96.0;
+	enhstate.res_scale = dpiY / 96.f;
 }
 
 
@@ -738,6 +738,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 		pRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 	else
 		pRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_ALIASED);
+
 	// Note that this will always be 96 for a DC Render Target.
 	pRenderTarget->GetDpi(&dpiX, &dpiY);
 	//printf("dpiX = %.1f, DPI = %u\n", dpiX, GetDPI());
@@ -1240,10 +1241,11 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 						rect.bottom = + boxedtext.box.right  + dx;
 						break;
 					}
-					rect.left   += boxedtext.start.x;
-					rect.right  += boxedtext.start.x;
-					rect.top    += boxedtext.start.y;
-					rect.bottom += boxedtext.start.y;
+					// snap to grid
+					rect.left   += trunc(boxedtext.start.x) + 0.5;
+					rect.right  += trunc(boxedtext.start.x) + 0.5;
+					rect.top    += trunc(boxedtext.start.y) + 0.5;
+					rect.bottom += trunc(boxedtext.start.y) + 0.5;
 					if (boxedtext.option == TEXTBOX_OUTLINE) {
 						pRenderTarget->DrawRectangle(rect, pSolidBrush, line_width, pStrokeStyle);
 					} else {
@@ -1622,8 +1624,8 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 			break;
 		}
 
-		case W_image:	{
-			/* Due to the structure of gwop 6, entries are needed in total. */
+		case W_image: {
+			/* Due to the structure of gwop, 6 entries are needed in total. */
 			if (seq == 0) {
 				/* First OP contains only the color mode */
 				color_mode = curptr->x;
