@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.21 2017/06/27 19:22:27 markisch Exp $
+ * $Id: wd2d.cpp,v 1.22 2017/06/30 13:25:58 markisch Exp $
  */
 
 /*
@@ -1493,10 +1493,11 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 						rect.bottom = + boxedtext.box.right  + dx;
 						break;
 					}
-					rect.left   += boxedtext.start.x;
-					rect.right  += boxedtext.start.x;
-					rect.top    += boxedtext.start.y;
-					rect.bottom += boxedtext.start.y;
+					// snap to grid
+					rect.left   += trunc(boxedtext.start.x) + 0.5;
+					rect.right  += trunc(boxedtext.start.x) + 0.5;
+					rect.top    += trunc(boxedtext.start.y) + 0.5;
+					rect.bottom += trunc(boxedtext.start.y) + 0.5;
 					if (boxedtext.option == TEXTBOX_OUTLINE) {
 						pRenderTarget->DrawRectangle(rect, pSolidBrush, line_width, pStrokeStyle);
 					} else {

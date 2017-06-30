@@ -1,3 +1,8 @@
+2017-06-30  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wd2.cpp:  Fix center of rotation for enhanced text.  Snap
+	textbox coordinates to full pixels for vertical or horizontal
+	orientation.
 2017-06-29  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c:  Unbreak hypertext tooltips.  Oversight in the
