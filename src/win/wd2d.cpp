@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.20 2017/06/27 19:06:10 markisch Exp $
+ * $Id: wd2d.cpp,v 1.21 2017/06/27 19:22:27 markisch Exp $
  */
 
 /*
@@ -95,7 +95,6 @@ inline void SafeRelease(Interface **ppInterfaceToRelease)
 {
 	if (*ppInterfaceToRelease != NULL) {
 		(*ppInterfaceToRelease)->Release();
-
 		(*ppInterfaceToRelease) = NULL;
 	}
 }
@@ -449,11 +448,8 @@ d2dPolyline(ID2D1RenderTarget * pRenderTarget, ID2D1SolidColorBrush * pBrush, ID
 			all_vert_or_horz = false;
 
 	// If all lines are horizontal or vertical we snap to nearest pixel
-	// to avoid "blurry" lines. But we need to take care of the DIP
-	// scaling factor.
+	// to avoid "blurry" lines.
 	if (all_vert_or_horz) {
-		FLOAT dpiX, dpiY;
-		pRenderTarget->GetDpi(&dpiX, &dpiY);
 		for (int i = 0; i < polyi; i++) {
 			points[i].x = trunc(points[i].x) + 0.5;
 			points[i].y = trunc(points[i].y) + 0.5;
@@ -810,7 +806,7 @@ EnhancedPutText(int x, int y, char * text)
 	LPWSTR textw = UnicodeText(text, enhstate.lpgw->encoding);
 
 	if (enhstate.lpgw->angle != 0)
-		pRenderTarget->SetTransform(D2D1::Matrix3x2F::Rotation(-enhstate.lpgw->angle, D2D1::Point2F(x, y - enhstate.lpgw->tmAscent)));
+		pRenderTarget->SetTransform(D2D1::Matrix3x2F::Rotation(-enhstate.lpgw->angle, D2D1::Point2F(x, y)));
 	const float align_ofs = 0.;
 	pRenderTarget->DrawText(textw, static_cast<UINT32>(wcslen(textw)), enhstate_d2d.pWriteTextFormat,
 							 D2D1::RectF(x + align_ofs, y - enhstate.lpgw->tmAscent,
@@ -1004,6 +1000,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 		pRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 	else
 		pRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_ALIASED);
+
 	// Note that this will always be 96 for a DC Render Target.
 	pRenderTarget->GetDpi(&dpiX, &dpiY);
 	//printf("dpiX = %.1f, DPI = %u\n", dpiX, GetDPI());
