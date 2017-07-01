@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1091 2017/06/20 19:29:42 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1092 2017/06/21 06:07:32 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -996,10 +996,10 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>EllipticPi(n,k)</td>    <td> real n&lt;1, real k in (-1:1)</td>    <td> &Pi;(<i>n,k</i>) complete elliptic integral of the third kind</td></tr>
 ^<tr>    <td>besj0(x)</td>    <td>int or real</td>    <td><i>J</i><sub>0</sub> Bessel function of <i>x</i> in radians</td></tr>
 ^<tr>    <td>besj1(x)</td>    <td>int or real</td>    <td><i>J</i><sub>1</sub> Bessel function of <i>x</i> in radians</td></tr>
-^<tr>    <td>besjn(n,x)</td>    <td>int,real</td>    <td><i>J</i><sub>1</sub> Bessel function Jn of <i>x</i> in radians</td></tr>
+^<tr>    <td>besjn(n,x)</td>    <td>int,real</td>    <td><i>J</i><sub>n</sub> Bessel function of <i>x</i> in radians</td></tr>
 ^<tr>    <td>besy0(x)</td>    <td>int or real</td>    <td><i>Y</i><sub>0</sub> Bessel function of <i>x</i> in radians</td></tr>
 ^<tr>    <td>besy1(x)</td>    <td>int or real</td>    <td><i>Y</i><sub>1</sub> Bessel function of <i>x</i> in radians</td></tr>
-^<tr>    <td>besyn(n,x)</td>    <td>int,real</td>    <td><i>J</i><sub>1</sub> Bessel function Yn of <i>x</i> in radians</td></tr>
+^<tr>    <td>besyn(n,x)</td>    <td>int,real</td>    <td><i>Y</i><sub>n</sub> Bessel function of <i>x</i> in radians</td></tr>
 ^<tr>    <td>ceil(x)</td>    <td>any</td>    <td>&lceil;<i>x</i>&rceil;, smallest integer not less than <i>x</i> (real part)</td></tr>
 ^<tr>    <td>cos(x)</td>    <td>radians</td>    <td>cos <i>x</i>, cosine of <i>x</i></td></tr>
 ^<tr>    <td>cosh(x)</td>    <td>any</td>    <td>cosh <i>x</i>, hyperbolic cosine of <i>x</i> in radians</td></tr>
