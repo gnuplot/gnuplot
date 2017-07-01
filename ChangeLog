@@ -2,6 +2,8 @@
 
 	* docs/doc2texi.el:  Support for bulleted lists.
 
+	* docs/term-ja.diff docs/gnuplot-ja.doc:  Sync with gnuplot.doc 1.1092
+
 2017-06-30  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wd2.cpp:  Fix center of rotation for enhanced text.  Snap
