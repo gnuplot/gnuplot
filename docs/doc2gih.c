@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2gih.c,v 1.16 2007/10/24 00:47:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2gih.c,v 1.17 2017/05/13 03:42:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - doc2gih.c */
@@ -119,7 +119,7 @@ process_line(char *line, FILE *b)
 	    break;		/* ignore */
 	}
     case '#':{			/* latex table entry */
-	    if (line[1] == 'b') {	/* bullet */
+	    if (line[1] == 'b' && line[2] == ' ') {	/* bullet */
 		fputs(" * ", b);
 		fputs(line+2, b);
 	    }  else if (line[1] == '#') {
