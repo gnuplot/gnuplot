@@ -1,3 +1,9 @@
+2017-07-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (place_raxis):  Raxis was being truncated to R=0.
+	I.e. set rrange [90:-30] lost the final quarter of the axis.
+	Bug #1370
+
 2017-07-01  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/doc2texi.el:  Support for bulleted lists.

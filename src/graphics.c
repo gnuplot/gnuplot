@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.557 2017/06/13 21:47:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.558 2017/06/15 21:56:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4011,18 +4011,17 @@ place_raxis()
     };
 #endif
     int x0,y0, xend,yend;
-    double rightend;
 
-    x0 = map_x(0);
-    y0 = map_y(0);
     if (inverted_raxis) {
-	xend = map_x(R_AXIS.set_min);
+	xend = map_x(polar_radius(R_AXIS.set_min));
+	x0   = map_x(polar_radius(R_AXIS.set_max));
     } else {
-	rightend = (R_AXIS.autoscale & AUTOSCALE_MAX) ? R_AXIS.max : R_AXIS.set_max;
+	double rightend = (R_AXIS.autoscale & AUTOSCALE_MAX) ? R_AXIS.max : R_AXIS.set_max;
 	xend = map_x( AXIS_LOG_VALUE(POLAR_AXIS,rightend)
 		    - AXIS_LOG_VALUE(POLAR_AXIS,R_AXIS.set_min));
+	x0 = map_x(0);
     }
-    yend = y0;
+    yend = y0 = map_y(0);
     term_apply_lp_properties(&border_lp);
     draw_clip_line(x0,y0,xend,yend);
 
