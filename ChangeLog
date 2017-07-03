@@ -1,3 +1,8 @@
+2017-07-03  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* term/win.trm:  Cannot use docked graph windows in persist mode as
+	the text window will not be shown.
+
 2017-07-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (place_raxis):  Raxis was being truncated to R=0.
@@ -14,7 +19,7 @@
 
 2017-06-30  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/win/wd2.cpp:  Fix center of rotation for enhanced text.  Snap
+	* src/win/wd2d.cpp:  Fix center of rotation for enhanced text.  Snap
 	textbox coordinates to full pixels for vertical or horizontal
 	orientation.
 

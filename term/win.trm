@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.142 2017/05/14 14:40:24 markisch Exp $
+ * $Id: win.trm,v 1.143 2017/05/21 08:43:44 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -418,8 +418,12 @@ WIN_options()
 			c_token++;
 			if (!graphwin->bDocked && GraphHasWindow(graphwin))
 				int_error(c_token, "Cannot change the mode of an open window.");
-			set_docked = TRUE;
-			WIN_docked = TRUE;
+			if (persist_cl) {
+				fprintf(stderr, "Warning: cannot use docked graphs in persist mode\n");
+			} else {
+				set_docked = TRUE;
+				WIN_docked = TRUE;
+			}
 			break;
 		case WIN_STANDALONE:
 			c_token++;
@@ -950,7 +954,7 @@ WIN_image(unsigned int M, unsigned int N, coordval *image,
 			}
 			rgb_image -= 4 * M;
 		}
-    }
+	}
 
 	/* squeeze all the information into the buffer */
 	if ((color_mode == IC_PALETTE) || (color_mode == IC_RGB) || (color_mode == IC_RGBA)) {
@@ -1010,6 +1014,8 @@ WIN_set_color(t_colorspec *colorspec)
 TERM_PUBLIC void
 WIN_filled_polygon(int points, gpiPoint *corners)
 {
+	int i;
+
 	GraphOp(graphwin, W_fillstyle, corners->style, 0, NULL);
 
 	/* Eliminate duplicate polygon points. */
@@ -1017,12 +1023,9 @@ WIN_filled_polygon(int points, gpiPoint *corners)
 	    (corners[0].y == corners[points - 1].y))
 		points--;
 
-	{
-		int i;
-		for (i = 0; i < points; i++)
-			GraphOp(graphwin, W_filled_polygon_pt, corners[i].x, corners[i].y, NULL);
-		GraphOp(graphwin, W_filled_polygon_draw, points, 0, NULL);
-	}
+	for (i = 0; i < points; i++)
+		GraphOp(graphwin, W_filled_polygon_pt, corners[i].x, corners[i].y, NULL);
+	GraphOp(graphwin, W_filled_polygon_draw, points, 0, NULL);
 }
 
 
@@ -1105,7 +1108,7 @@ WIN_layer(t_termlayer syncpoint)
 	if (((syncpoint == TERM_LAYER_RESET) ||
 	     (syncpoint == TERM_LAYER_RESET_PLOTNO)) &&
 		multiplot)
-				return;
+		return;
 	GraphOp(graphwin, W_layer, syncpoint, 0, NULL);
 }
 
