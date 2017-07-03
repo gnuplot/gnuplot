@@ -5,7 +5,7 @@ This is a pre-release testing copy of gnuplot version 5.2.
 Please see the ChangeLog file for a complete list of changes made during the
 course of development from 5.0 to 5.2.
 
-Release Notes date: 02-Jul-2017
+Release Notes date: 03-Jul-2017
 
 CHANGES SINCE rc1
 =================
@@ -13,6 +13,7 @@ CHANGES SINCE rc1
 * FIX: incorrect clipping of polar border and raxis
 * FIX: add sanity checks to detect and handle various types of bad input data
        or command syntax found by fuzz-testing
+* FIX: windows terminal (various minor tweaks)
 
 
 FEATURES INTRODUCED IN VERSION 5.2
@@ -176,8 +177,8 @@ included.  Legacy terminal for coreldraw is no longer built by default.
 Configuration options for interactive use
 -----------------------------------------
 
-The 5.2 source code supports three primary cross-platform output modes
-in addition to several platform-specific modes.
+The 5.2 source code supports three primary cross-platform interactive
+modes in addition to several platform-specific modes.
 
 1) Qt
    The qt terminal supports interactive display with menu-driven
