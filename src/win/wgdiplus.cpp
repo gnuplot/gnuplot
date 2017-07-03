@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.16.2.18 2017/05/13 06:38:48 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.16.2.19 2017/06/13 03:49:04 markisch Exp $
  */
 
 /*
@@ -301,9 +301,7 @@ gdiplusFilledPolygon(Graphics &graphics, Brush &brush, POINT *ppt, int polyi)
 		points[i].X = ppt[i].x;
 		points[i].Y = ppt[i].y;
 	}
-	graphics.SetCompositingQuality(CompositingQualityGammaCorrected);
 	graphics.FillPolygon(&brush, points, polyi);
-	graphics.SetCompositingQuality(CompositingQualityDefault);
 	delete [] points;
 }
 
