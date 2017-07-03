@@ -3,6 +3,9 @@
 	* term/win.trm:  Cannot use docked graph windows in persist mode as
 	the text window will not be shown.
 
+	* src/internal.c:  Windows time() implementation with sub-second
+	resolution.
+
 2017-07-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (place_raxis):  Raxis was being truncated to R=0.

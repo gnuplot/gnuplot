@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.98 2017/06/14 00:42:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.99 2017/06/20 01:12:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1735,8 +1735,21 @@ f_time(union argument *arg)
     gettimeofday(&tp, NULL);
     tp.tv_sec -= SEC_OFFS_SYS;
     time_now = tp.tv_sec + (tp.tv_usec/1000000.0);
-#else
+#elif defined(_WIN32)
+    SYSTEMTIME systime;
+    FILETIME filetime;
+    ULARGE_INTEGER itime;
 
+    /* get current system time (UTC) */
+    GetSystemTime(&systime);
+    /* convert to integer value in 100ns steps */
+    SystemTimeToFileTime(&systime, &filetime);
+    itime.HighPart = filetime.dwHighDateTime;
+    itime.LowPart = filetime.dwLowDateTime;
+    /* reference of this value is 1601-01-01 (no typo!) */
+    /* strptime("%Y-%m-%d", "1601-01-01") = -11644473600.0 */
+    time_now = itime.QuadPart * 100e-9 - 11644473600.0 - SEC_OFFS_SYS;
+#else
     time_now = (double) time(NULL);
     time_now -= SEC_OFFS_SYS;
 #endif
@@ -1744,7 +1757,7 @@ f_time(union argument *arg)
     (void) arg; /* Avoid compiler warnings */
     pop(&val); 
     
-    switch(val.type) {
+    switch (val.type) {
 	case INTGR:
 	    push(Ginteger(&val, (int) time_now));
 	    break;
