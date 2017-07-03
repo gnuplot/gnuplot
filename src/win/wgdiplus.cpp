@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.62 2017/06/17 08:17:11 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.63 2017/06/24 19:48:52 markisch Exp $
  */
 
 /*
@@ -66,8 +66,6 @@ enum draw_target { DRAW_SCREEN, DRAW_PRINTER, DRAW_PLOTTER, DRAW_METAFILE };
 static Color gdiplusCreateColor(COLORREF color, double alpha);
 static void gdiplusSetDashStyle(Pen *pen, enum DashStyle style);
 static void gdiplusPolyline(Graphics &graphics, Pen &pen, Point *points, int polyi);
-static void gdiplusFilledPolygon(Graphics &graphics, Brush &brush, Point *points, int polyi);
-static void gdiplusFilledPolygon(Graphics &graphics, Brush &brush, PointF *points, int polyi);
 Brush * gdiplusPatternBrush(int style, COLORREF color, double alpha, COLORREF backcolor, BOOL transparent);
 static void gdiplusDot(Graphics &graphics, Brush &brush, int x, int y);
 static Font * SetFont_gdiplus(Graphics &graphics, LPRECT rect, LPGW lpgw, LPTSTR fontname, int size);
@@ -191,24 +189,6 @@ gdiplusPolyline(Graphics &graphics, Pen &pen, PointF *points, int polyi)
 	/* restore */
 	if (mode != SmoothingModeNone)
 		graphics.SetSmoothingMode(mode);
-}
-
-
-static void
-gdiplusFilledPolygon(Graphics &graphics, Brush &brush, PointF *points, int polyi)
-{
-	graphics.SetCompositingQuality(CompositingQualityGammaCorrected);
-	graphics.FillPolygon(&brush, points, polyi);
-	graphics.SetCompositingQuality(CompositingQualityDefault);
-}
-
-
-static void
-gdiplusFilledPolygon(Graphics &graphics, Brush &brush, Point *points, int polyi)
-{
-	graphics.SetCompositingQuality(CompositingQualityGammaCorrected);
-	graphics.FillPolygon(&brush, points, polyi);
-	graphics.SetCompositingQuality(CompositingQualityDefault);
 }
 
 
@@ -520,6 +500,7 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 	Brush * fill_brush = NULL;
 	Bitmap * poly_bitmap = NULL;
 	Graphics * poly_graphics = NULL;
+	float poly_scale = 2.f;
 
 	/* images */
 	POINT corners[4];			/* image corners */
@@ -674,10 +655,10 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 				SmoothingMode mode = graphics.GetSmoothingMode();
 				if (lpgw->antialiasing && !lpgw->polyaa)
 					graphics.SetSmoothingMode(SmoothingModeNone);
-				gdiplusFilledPolygon(graphics, *fill_brush, last_poly, last_polyi);
+				graphics.FillPolygon(fill_brush, last_poly, last_polyi);
 				graphics.SetSmoothingMode(mode);
 			} else {
-				gdiplusFilledPolygon(*poly_graphics, *fill_brush, last_poly, last_polyi);
+				poly_graphics->FillPolygon(fill_brush, last_poly, last_polyi);
 			}
 			last_polyi = 0;
 			free(last_poly);
@@ -741,11 +722,10 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 					// Antialiasing of pm3d polygons is obtained by drawing to a
 					// bitmap four times as large and copying it back with interpolation
 					if (lpgw->antialiasing && lpgw->polyaa) {
-						float scale = 2.f;
-						poly_bitmap = new Bitmap(scale * (rr - rl), scale * (rb - rt), &graphics);
+						poly_bitmap = new Bitmap(poly_scale * (rr - rl), poly_scale * (rb - rt), &graphics);
 						poly_graphics = Graphics::FromImage(poly_bitmap);
 						poly_graphics->SetSmoothingMode(SmoothingModeNone);
-						Matrix transform(scale, 0.0f, 0.0f, scale, 0.0f, 0.0f);
+						Matrix transform(poly_scale, 0.0f, 0.0f, poly_scale, 0.0f, 0.0f);
 						poly_graphics->SetTransform(&transform);
 					}
 					break;
@@ -1110,7 +1090,7 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 						rect[4].Y = rect[0].Y;
 						gdiplusPolyline(graphics, pen, rect, 5);
 					} else {
-						gdiplusFilledPolygon(graphics, *fill_brush, rect, 4);
+						graphics.FillPolygon(fill_brush, rect, 4);
 					}
 				}
 				boxedtext.boxing = FALSE;
@@ -1300,6 +1280,8 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 			 * state */
 			line_width = curptr->x == 100 ? 1 : (curptr->x / 100.0);
 			line_width *= lpgw->linewidth * lw_scale;
+			if (poly_graphics != NULL)
+				line_width *= poly_scale;
 			solid_pen.SetWidth(line_width);
 			pen.SetWidth(line_width);
 			/* invalidate point symbol cache */
@@ -1416,10 +1398,10 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 						SmoothingMode mode = graphics.GetSmoothingMode();
 						if (lpgw->antialiasing && !lpgw->polyaa)
 							graphics.SetSmoothingMode(SmoothingModeNone);
-						gdiplusFilledPolygon(graphics, *fill_brush, last_poly, last_polyi);
+						graphics.FillPolygon(fill_brush, last_poly, last_polyi);
 						graphics.SetSmoothingMode(mode);
 					} else {
-						gdiplusFilledPolygon(*poly_graphics, *fill_brush, last_poly, last_polyi);
+						poly_graphics->FillPolygon(fill_brush, last_poly, last_polyi);
 					}
 					free(last_poly);
 				}
@@ -1613,7 +1595,7 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 				}
 				if (filled) {
 					/* filled polygon with border */
-					gdiplusFilledPolygon(*g, solid_brush, p, i);
+					g->FillPolygon(&solid_brush, p, i);
 				} else {
 					/* Outline polygon */
 					p[i].X = p[0].X;

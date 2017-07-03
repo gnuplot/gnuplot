@@ -6,6 +6,12 @@
 	* src/internal.c:  Windows time() implementation with sub-second
 	resolution.
 
+	* src/win/wgdiplus.cpp:  Switching the compositing mode to take the
+	gamma factor into account for filled polygons not only slows down
+	drawing considerably, but also produces output different from
+	other terminals or windows back-ends.  So stop doing that. Also
+	scale the linewidth when drawing anti-aliased polygons. Bug fix.
+
 2017-07-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (place_raxis):  Raxis was being truncated to R=0.
