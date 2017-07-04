@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.22 2017/06/30 13:25:58 markisch Exp $
+ * $Id: wd2d.cpp,v 1.23 2017/06/30 13:30:09 markisch Exp $
  */
 
 /*
@@ -57,9 +57,6 @@ extern "C" {
 #include "wd2d.h"
 #include "wgnuplib.h"
 #include "wcommon.h"
-
-// FIXME: only one copy!
-#define GWOPMAX 4096
 
 #define MINMAX(a,val,b) (((val) <= (a)) ? (a) : ((val) <= (b) ? (val) : (b)))
 const int pattern_num = 8;

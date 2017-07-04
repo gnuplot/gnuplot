@@ -1,3 +1,9 @@
+2017-07-04  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgnuplib.h src/win/wgraph.c src/win/wgdiplus.cpp
+	src/win/wd2d.cpp:  Use a common definition of GWOPMAX and increase
+	to accomodate e.g. typicall pm3d plots.
+
 2017-07-03  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/win.trm:  Cannot use docked graph windows in persist mode as

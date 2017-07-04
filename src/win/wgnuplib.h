@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.94 2017/06/24 09:15:38 markisch Exp $
+ * $Id: wgnuplib.h,v 1.95 2017/06/24 11:22:12 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -273,6 +273,9 @@ struct GWOPBLK {			/* kept in local memory */
 	struct GWOP *gwop;	/* pointer to global block if locked */
 	UINT used;				/* number of GWOP's used */
 };
+
+/* Maximum number of GWOPBLK arrays to be remembered. */
+#define GWOPMAX (4*4096)
 
 /* point types */
 enum win_pointtypes {

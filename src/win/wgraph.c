@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.263 2017/06/24 09:15:38 markisch Exp $
+ * $Id: wgraph.c,v 1.264 2017/06/29 19:33:23 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -161,11 +161,6 @@ COLORREF wginitcolor[WGDEFCOLOR] =  {
 };
 #define WGDEFSTYLE 5
 int wginitstyle[WGDEFSTYLE] = {PS_SOLID, PS_DASH, PS_DOT, PS_DASHDOT, PS_DASHDOTDOT};
-
-/* Maximum number of GWOPBLK arrays to be remembered. */
-/* HBB 20010218: moved here from wgnuplib.h: other parts of the program don't
- * need to know about it */
-#define GWOPMAX 4096
 
 #define MINMAX(a,val,b) (((val) <= (a)) ? (a) : ((val) <= (b) ? (val) : (b)))
 

@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.63 2017/06/24 19:48:52 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.64 2017/07/03 19:44:13 markisch Exp $
  */
 
 /*
@@ -57,7 +57,6 @@ using namespace Gdiplus;
 static bool gdiplusInitialized = false;
 static ULONG_PTR gdiplusToken;
 
-#define GWOPMAX 4096
 #define MINMAX(a,val,b) (((val) <= (a)) ? (a) : ((val) <= (b) ? (val) : (b)))
 const int pattern_num = 8;
 
