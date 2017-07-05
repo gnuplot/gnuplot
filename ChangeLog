@@ -12,6 +12,8 @@
 	Fix "unset term" to act equivalently to "set term GNUTERM" as
 	documented.
 
+	* src/eval.c (set_gpval_axis_sth_double):  Remove unused parameter.
+
 2017-07-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgnuplib.h src/win/wgraph.c src/win/wgdiplus.cpp

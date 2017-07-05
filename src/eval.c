@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.146 2017/05/05 06:09:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.147 2017/06/21 06:07:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -843,10 +843,10 @@ clear_udf_list()
 static void update_plot_bounds __PROTO((void));
 static void fill_gpval_axis __PROTO((AXIS_INDEX axis));
 static void fill_gpval_sysinfo __PROTO((void));
-static void set_gpval_axis_sth_double __PROTO((const char *prefix, AXIS_INDEX axis, const char *suffix, double value, int is_int));
+static void set_gpval_axis_sth_double __PROTO((const char *prefix, AXIS_INDEX axis, const char *suffix, double value));
 
 static void
-set_gpval_axis_sth_double(const char *prefix, AXIS_INDEX axis, const char *suffix, double value, int is_int)
+set_gpval_axis_sth_double(const char *prefix, AXIS_INDEX axis, const char *suffix, double value)
 {
     struct udvt_entry *v;
     char *cc, s[24];
@@ -856,10 +856,7 @@ set_gpval_axis_sth_double(const char *prefix, AXIS_INDEX axis, const char *suffi
     v = add_udv_by_name(s);
     if (!v) 
 	return; /* should not happen */
-    if (is_int)
-	Ginteger(&v->udv_value, (int)(value+0.5));
-    else
-	Gcomplex(&v->udv_value, value, 0);
+    Gcomplex(&v->udv_value, value, 0);
 }
 
 static void
@@ -869,13 +866,13 @@ fill_gpval_axis(AXIS_INDEX axis)
     AXIS *ap = &axis_array[axis];
     double a = AXIS_DE_LOG_VALUE(axis, ap->min);
     double b = AXIS_DE_LOG_VALUE(axis, ap->max);
-    set_gpval_axis_sth_double(prefix, axis, "MIN", a, 0);
-    set_gpval_axis_sth_double(prefix, axis, "MAX", b, 0);
-    set_gpval_axis_sth_double(prefix, axis, "LOG", ap->base, 0);
+    set_gpval_axis_sth_double(prefix, axis, "MIN", a);
+    set_gpval_axis_sth_double(prefix, axis, "MAX", b);
+    set_gpval_axis_sth_double(prefix, axis, "LOG", ap->base);
 
     if (axis < POLAR_AXIS) {
-	set_gpval_axis_sth_double("GPVAL_DATA", axis, "MIN", AXIS_DE_LOG_VALUE(axis, ap->data_min), 0);
-	set_gpval_axis_sth_double("GPVAL_DATA", axis, "MAX", AXIS_DE_LOG_VALUE(axis, ap->data_max), 0);
+	set_gpval_axis_sth_double("GPVAL_DATA", axis, "MIN", AXIS_DE_LOG_VALUE(axis, ap->data_min));
+	set_gpval_axis_sth_double("GPVAL_DATA", axis, "MAX", AXIS_DE_LOG_VALUE(axis, ap->data_max));
     }
 }
 
