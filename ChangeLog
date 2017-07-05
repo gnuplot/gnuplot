@@ -1,3 +1,9 @@
+2017-07-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.ac docs/Makefile.am term/caca.trm:
+	Add caca terminal documentation to the user manual.  Fix segfault on
+	"set term caca driver raw".
+
 2017-07-03  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgdiplus.cpp:  Switching the compositing mode to take the

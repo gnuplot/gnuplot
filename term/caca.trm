@@ -1,7 +1,7 @@
 /*
  * GNUPLOT - caca.trm
  *
- * $Id: caca.trm,v 1.10 2015/05/18 23:32:50 sfeam Exp $
+ * $Id: caca.trm,v 1.11 2017/04/19 18:52:14 markisch Exp $
  *
  * This file uses UTF8 encoding and a tab size of 4.
  *
@@ -197,8 +197,10 @@ static caca_canvas_t * CACA_suspend_cv = NULL;
 static TBOOLEAN CACA_windowed = FALSE; /* graphics output in different window*/
 static TBOOLEAN CACA_exportonly = FALSE; /* no output to screen but to file */
 static TBOOLEAN CACA_processing_events = FALSE; /* flag processing of events in CACA_text() */
+#ifdef WIN32
 static unsigned CACA_codepage = 0;
 static unsigned TMP_codepage;
+#endif
 
 /* drawing */
 static char CACA_pen;		/* current character used to draw point symbols */
@@ -810,8 +812,12 @@ CACA_init_aspect_ratio(void)
 	if (CACA_dp) {
 		height = caca_get_display_height(CACA_dp) / (CACA_ymax + CACA_status_height + 1);
 		width = caca_get_display_width(CACA_dp) / (CACA_xmax + 1);
+		/* The caca man page says "these functions never fail". */
+		/* But in practice they can return 0. */
 	}
-	if (height > width) {
+	if (height == 0 || width == 0) {
+		term->h_tic = term->v_tic = 1;
+	} else if (height > width) {
 		term->h_tic = (height + width / 2) / width;
 		term->v_tic = 1;
 	} else {
@@ -3354,23 +3360,23 @@ START_HELP(caca)
 "?terminal caca",
 "?term caca",
 "?caca",
-" The `caca` terminal driver uses `libcaca` to plot using ascii characters.",
-" In contrast to the `dumb` terminal it is a full-fledged terminal and",
-" includes support for (RGB) colors, box fill, images, rotated text,",
-" filled polygons, unicode character encoding and mouse interaction.",
+" [EXPERIMENTAL] ",
+" The `caca` terminal is a mostly-for-fun output mode that uses `libcaca` to",
+" plot using ascii characters.  In contrast to the `dumb` terminal it includes",
+" support for color, box fill, images, rotated text, filled polygons,",
+" and mouse interaction.",
 "",
 " Syntax:",
 "       set terminal caca {{driver | format} {default | <driver> | list}}",
 "                         {color | monochrome}",
-"                         {{no}inverted}",
-"                         {enhanced | noenhanced}",
+"                         {{no}inverted} {{no}enhanced}",
 "                         {background <rgb color>}",
 "                         {title \"<plot window title>\"}",
 "                         {size <width>,<height>}",
 "                         {charset ascii|blocks|unicode}",
 "",
 " The `driver` option selects the `libcaca` display driver or export `format`.",
-" Use `default` to let `libcaca` choose the platform default display driver.",
+" Use `default` is to let `libcaca` choose the platform default display driver.",
 " The default driver can be changed by setting the environment variable",
 " CACA_DRIVER before starting `gnuplot`.",
 " Use `set term caca driver list` to print a list of supported output modes.",
@@ -3434,7 +3440,7 @@ START_HELP(caca)
 "?term caca bugs",
 "?caca limitations",
 "?caca bugs",
-" The `caca` terminal has some known bugs and limitations:",
+" The `caca` terminal has known bugs and limitations:",
 "",
 " Closing the terminal window by clicking the \"X\" on the title line",
 " does not work correctly. Press \"q\" to close the window.",
