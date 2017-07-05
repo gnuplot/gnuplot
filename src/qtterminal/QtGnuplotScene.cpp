@@ -345,10 +345,10 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		positionText(textItem, point);
 
 		QRectF rect = textItem->boundingRect();
-		if (m_textAlignment == Qt::AlignCenter) {
+		if (m_textAlignment & Qt::AlignCenter) {
 			rect.moveCenter(point);
 			rect.moveBottom(point.y());
-		} else if (m_textAlignment == Qt::AlignRight)
+		} else if (m_textAlignment & Qt::AlignRight)
 			rect.moveBottomRight(point);
 		else
 			rect.moveBottomLeft(point);
@@ -394,10 +394,10 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		addItem(m_enhanced);
 
 		QRectF rect = m_enhanced->boundingRect();
-		if (m_textAlignment == Qt::AlignCenter) {
+		if (m_textAlignment & Qt::AlignCenter) {
 			rect.moveCenter(point);
 			rect.moveBottom(point.y());
-		} else if (m_textAlignment == Qt::AlignRight)
+		} else if (m_textAlignment & Qt::AlignRight)
 			rect.moveBottomRight(point);
 		else
 			rect.moveBottomLeft(point);
@@ -739,11 +739,11 @@ void QtGnuplotScene::positionText(QGraphicsItem* item, const QPoint& point)
 
 	double cx = 0.;
 	double cy = (item->boundingRect().bottom() + item->boundingRect().top())/2.;
-	if (m_textAlignment == Qt::AlignLeft)
+	if (m_textAlignment & Qt::AlignLeft)
 		cx = item->boundingRect().left();
-	else if (m_textAlignment == Qt::AlignRight)
+	else if (m_textAlignment & Qt::AlignRight)
 		cx = item->boundingRect().right();
-	else if (m_textAlignment == Qt::AlignCenter)
+	else if (m_textAlignment & Qt::AlignCenter)
 		cx = (item->boundingRect().right() + item->boundingRect().left())/2.;
 
 	item->setTransformOriginPoint(cx, cy);
