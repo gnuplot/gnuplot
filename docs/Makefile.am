@@ -51,7 +51,7 @@ noinst_PROGRAMS = checkdoc doc2ipf doc2tex doc2gih doc2rnh doc2hlp	\
 AM_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/term
 
 T = $(top_srcdir)/term/
-CORETERM = $(T)ai.trm $(T)aquaterm.trm $(T)be.trm \
+CORETERM = $(T)ai.trm $(T)aquaterm.trm $(T)be.trm $(T)caca.trm \
 $(T)cairo.trm $(T)canvas.trm $(T)cgm.trm $(T)context.trm \
 $(T)corel.trm $(T)debug.trm $(T)djsvga.trm $(T)dumb.trm $(T)dxf.trm \
 $(T)dxy.trm $(T)eepic.trm $(T)emf.trm $(T)emxvga.trm $(T)epson.trm \

@@ -14,6 +14,10 @@
 
 	* src/eval.c (set_gpval_axis_sth_double):  Remove unused parameter.
 
+	* configure.ac docs/Makefile.am term/caca.trm:
+	Add caca terminal documentation to the user manual.  Fix segfault on
+	"set term caca driver raw".
+
 2017-07-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgnuplib.h src/win/wgraph.c src/win/wgdiplus.cpp

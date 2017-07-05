@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.ac,v 1.33 2017/06/28 21:28:43 sfeam Exp $
+dnl $Id: configure.ac,v 1.34 2017/06/28 21:35:26 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -748,10 +748,10 @@ fi
 
 dnl Disable experimental support for nonlinear axes
 AC_ARG_WITH(nonlinear-axes,dnl
-[  --without-nonlinear-axes     disable EXPERIMENTAL support for nonlinear axes])
+[  --without-nonlinear-axes     disable support for nonlinear axes])
 if test "$with_nonlinear_axes" = no; then
     AC_DEFINE(DISABLE_NONLINEAR_AXES, 1,
-               [ Define if you want to disable EXPERIMENTAL support for nonlinear axes ])
+               [ Define if you want to disable support for nonlinear axes ])
 fi
 
 dnl Sort help/subtopic tables by row or column
@@ -1360,7 +1360,7 @@ fi
 if test "$with_caca" = yes; then
   AC_MSG_RESULT([  caca terminal: yes (EXPERIMENTAL)])
 else
-  AC_MSG_RESULT([  caca terminal: no (requires libcaca >= 0.99.beta15)])
+  AC_MSG_RESULT([  caca terminal: no (use --with-caca to enable)])
 fi
 
 if test "$gnuplot_framework_AquaTerm" = yes; then
