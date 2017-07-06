@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.42 2014/05/09 22:14:12 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.43 2016/03/06 19:27:24 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -291,6 +291,7 @@ static int
 get_num(char str[])
 {
     int count = 0;
+    char *endptr;
 
     token[t_num].is_token = FALSE;
     token[t_num].l_val.type = INTGR;	/* assume unless . or E found */
@@ -315,7 +316,6 @@ get_num(char str[])
     }
     if (token[t_num].l_val.type == INTGR) {
 	long long lval;
-	char *endptr;
 	errno = 0;
 	lval = strtoll(str, &endptr, 0);
 	if (!errno) {
@@ -327,7 +327,7 @@ get_num(char str[])
 	    if ((token[t_num].l_val.v.int_val = lval) == lval)
 		return(count);
 	    if (str[0] == '0' && (str[1] == 'x' || str[1] == 'X')) {
-		if ((unsigned long)(token[t_num].l_val.v.int_val & 0xffffffff) == lval)
+		if (!memcmp(&token[t_num].l_val.v.int_val, &lval, sizeof(int)))
 		    return(count);
 	    }
 	}
@@ -336,7 +336,8 @@ get_num(char str[])
 	/* Fall through */
     }
     token[t_num].l_val.v.cmplx_val.imag = 0.0;
-    token[t_num].l_val.v.cmplx_val.real = atof(str);
+    token[t_num].l_val.v.cmplx_val.real = strtod(str, &endptr);
+    count = endptr - str;
     return (count);
 }
 

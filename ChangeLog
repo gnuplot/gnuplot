@@ -3,6 +3,12 @@
 	* src/qtterminal/qt_term.cpp (qt_boxed_text):  Increase the textbox
 	y margin slightly to allow more space for descenders.
 
+	* src/scanner.c (get_num):  More robust parsing of really big integer
+	constants.  E.g.  "print 0x12345678901234567890"
+	Use strtod() rather than atof() so that the parser's position in the
+	input line is tracked.  Also, do not assume that integers are
+	necessarily 32-bits.
+
 2017-07-05  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* src/qtterminal/QtGnuplotScene.cpp:  Qt::Align{Foo} are bit
