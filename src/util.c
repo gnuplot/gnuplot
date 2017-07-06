@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.150 2017/06/13 00:19:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.151 2017/06/18 20:38:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -493,28 +493,31 @@ mant_exp(
 
 /*}}} */
 
+/* Wrapper for gprintf_value() */
+void
+gprintf(char *outstring, size_t count, char *format, double log10_base, double x)
+{
+    struct value v;
+    Gcomplex(&v, x, 0.0);
+    gprintf_value(outstring, count, format, log10_base, &v);
+}
 
-/*{{{  gprintf */
-/* extended s(n)printf */
+/* Analogous to snprintf() but uses gnuplot's private format specs */
 /* HBB 20010121: added code to maintain consistency between mantissa
  * and exponent across sprintf() calls.  The problem: format string
  * '%t*10^%T' will display 9.99 as '10.0*10^0', but 10.01 as
  * '1.0*10^1'.  This causes problems for people using the %T part,
  * only, with logscaled axes, in combination with the occasional
  * round-off error. */
-/* EAM Nov 2012:
- * Unbelievably, the count parameter has been silently ignored or
- * improperly applied ever since this routine was introduced back
- * in version 3.7.  Now fixed to prevent buffer overflow.
- */
 void
-gprintf(
+gprintf_value(
     char *outstring,
     size_t count,
     char *format,
     double log10_base,
-    double x)
+    struct value *v)
 {
+    double x = v->v.cmplx_val.real;
     char tempdest[MAX_LINE_LEN + 1];
     char temp[MAX_LINE_LEN + 1];
     char *t;
@@ -577,22 +580,16 @@ gprintf(
 
 	/*{{{  convert conversion character */
 	switch (*format) {
-	    /*{{{  x and o */
+	    /*{{{  x and o can handle 64bit unsigned integers */
 	case 'x':
 	case 'X':
 	case 'o':
 	case 'O':
-	    if (fabs(x) >= (double)INT_MAX) {
-		t[0] = 'l';
-		t[1] = 'l';
-		t[2] = *format;
-		t[3] = '\0';
-		snprintf(dest, remaining_space, temp, (long long) x);
-	    } else {
-		t[0] = *format;
-		t[1] = '\0';
-		snprintf(dest, remaining_space, temp, (int) x);
-	    }
+	    t[0] = 'l';
+	    t[1] = 'l';
+	    t[2] = *format;
+	    t[3] = '\0';
+	    snprintf(dest, remaining_space, temp, v->v.int_val);
 	    break;
 	    /*}}} */
 	    /*{{{  e, f and g */
@@ -1004,8 +1001,6 @@ done:
 
     reset_numeric_locale();
 }
-
-/*}}} */
 
 /* some macros for the error and warning functions below
  * may turn this into a utility function later

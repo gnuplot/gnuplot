@@ -9,6 +9,11 @@
 	input line is tracked.  Also, do not assume that integers are
 	necessarily 32-bits.
 
+	* src/util.c (gprintf_value) src/util.h src/internal.c:
+	gprintf() only takes a (double) parameter.  The limits what can be
+	provided to format strings or 64-bit integers.  Provide a new
+	variant gprintg_value() that instead takes a parameter (struct value *).
+
 2017-07-05  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* src/qtterminal/QtGnuplotScene.cpp:  Qt::Align{Foo} are bit

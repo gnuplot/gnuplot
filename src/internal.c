@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.99 2017/06/20 01:12:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.100 2017/07/03 15:53:59 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1623,7 +1623,7 @@ f_gprintf(union argument *arg)
     buffer = gp_alloc(length, "f_gprintf");
 
     /* Call the old internal routine */
-    gprintf(buffer, length, fmt.v.string_val, base, real(&val));
+    gprintf_value(buffer, length, fmt.v.string_val, base, &val);
 
     FPRINTF((stderr," gprintf result = \"%s\"\n",buffer));
     push(Gstring(&result, buffer));

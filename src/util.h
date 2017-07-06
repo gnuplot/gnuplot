@@ -1,5 +1,5 @@
 /*
- * $Id: util.h,v 1.51 2016/10/10 22:53:38 sfeam Exp $
+ * $Id: util.h,v 1.52 2017/06/18 20:38:38 sfeam Exp $
  */
 
 /* GNUPLOT - util.h */
@@ -94,8 +94,8 @@ char *gp_stradd __PROTO((const char *, const char *));
 /* HBB 20010726: IMHO this one belongs into alloc.c: */
 char *gp_strdup __PROTO((const char *));
 
-/* HBB 20020405: moved this here, from axis.[ch] */
 void gprintf __PROTO((char *, size_t, char *, double, double));
+void gprintf_value __PROTO((char *, size_t, char *, double, struct value *));
 
 /* Error message handling */
 #if defined(VA_START) && defined(STDC_HEADERS)
