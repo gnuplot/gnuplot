@@ -199,10 +199,10 @@ Linux
 -----
 
 Ubuntu:
-	./configure fails to find lua support because Ubuntu packages it as
-	"lua5.1" rather than "lua".  You can fix this by adding a symlink
-	prior to running ./configure
-	    ln -s /usr/lib/pkgconfig/lua5.1.pc  /usr/lib/pkgconfig/lua.pc
+	./configure may fail to find lua support because Ubuntu packages it
+	as "lua5.1" or "lua5.3" rather than "lua".  If necessary, you can fix
+	this by adding a symlink prior to running ./configure
+	    ln -s /usr/lib/pkgconfig/lua5.3.pc  /usr/lib/pkgconfig/lua.pc
 
 
 Mac OSX
@@ -247,6 +247,13 @@ wxt terminal:
   Carbon API on Mac which is 32-bit only, that makes compiling gnuplot,
   cairo and pango to i386 necessary.
 
+  linux: Some wxWidgets configurations require linking to the X11 library but
+  fail to include "-lX11" in the string provided for auto-configuration.
+  You may have to add this manually when configuring gnuplot:
+      TERMLIBS="-lX11" ./configure
+  Note that some people have reported runtime problems with wxgtk 3.0.
+  If you have the option of linking to libraries for wxgtk 2.8 instead,
+  this may be preferable.  The -lX11 flag is not need in this case.
 
 VMS
 ---

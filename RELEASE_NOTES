@@ -123,10 +123,13 @@ Demo plots illustrating new and old features are online at
 KNOWN ISSUES
 ============
 
-* If you configure in the wxt terminal without also configuring in X11,
-  you may need to set the environmental variable TERMLIBS:
+* wxt terminal on linux: If you configure in the wxt terminal without also
+  configuring in X11 you may need to set the environmental variable TERMLIBS
+  during configuration:
     TERMLIBS="-lX11"  ./configure
-  Version 3.0.0 of the wxgtk library is buggy; please use a newer version.
+  Some people have reported runtime problems when the wxt terminal uses 
+  wxgtk library versions 3.0.x.  If you have the option of linking against
+  wxgtk version 2.8 instead, this may be a better choice.
 
 * Compilation on Solaris may require adding -liconv to LIB_FLAGS
   Building the plugin demo with a SunPro Compiler requires changing the
