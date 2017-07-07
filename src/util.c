@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.151 2017/06/18 20:38:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.152 2017/07/07 00:02:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -517,7 +517,7 @@ gprintf_value(
     double log10_base,
     struct value *v)
 {
-    double x = v->v.cmplx_val.real;
+    double x = real(v);		/* FIXME: only if INTGR or CMPLX */
     char tempdest[MAX_LINE_LEN + 1];
     char temp[MAX_LINE_LEN + 1];
     char *t;
