@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.264 2017/06/29 19:33:23 markisch Exp $
+ * $Id: wgraph.c,v 1.265 2017/07/04 09:22:47 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -1049,6 +1049,10 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	int result;
 	LPTSTR p;
 	int cx, cy;
+#endif
+
+#ifdef HAVE_D2D
+	lpgw->dpi = GetDeviceCaps(hdc, LOGPIXELSY);
 #endif
 
 #ifdef HAVE_GDIPLUS
@@ -3218,7 +3222,7 @@ static void
 CopyPrint(LPGW lpgw)
 {
 	DOCINFO docInfo;
-	HDC printer;
+	HDC printer = NULL;
 	HANDLE printerHandle;
 	PRINTDLGEX pd;
 	DEVNAMES * pDevNames;
@@ -3230,6 +3234,7 @@ CopyPrint(LPGW lpgw)
 	PROPSHEETPAGE psp;
 	HPROPSHEETPAGE hpsp;
 	HDC hdc;
+	unsigned dpiX, dpiY;
 
 	/* Print Property Sheet Dialog */
 	memset(&pr, 0, sizeof(pr));
@@ -3280,36 +3285,37 @@ CopyPrint(LPGW lpgw)
 	if (pd.dwResultAction != PD_RESULT_PRINT)
 		return;
 
-	/* See http://support.microsoft.com/kb/240082 */
-	pDevNames = (DEVNAMES *) GlobalLock(pd.hDevNames);
-	pDevMode = (DEVMODE *) GlobalLock(pd.hDevMode);
-	szDriver = (LPCTSTR) pDevNames + pDevNames->wDriverOffset;
-	szDevice = (LPCTSTR) pDevNames + pDevNames->wDeviceOffset;
-	szOutput = (LPCTSTR) pDevNames + pDevNames->wOutputOffset;
-	printer = CreateDC(szDriver, szDevice, szOutput, pDevMode);
-
-	GlobalUnlock(pd.hDevMode);
-	GlobalUnlock(pd.hDevNames);
-	/* We no longer free these but preserve them for the next time
-	GlobalFree(pd.hDevMode);
-	GlobalFree(pd.hDevNames);
-	*/
-	hDevNames = pd.hDevNames;
-	hDevMode = pd.hDevMode;
-
-	if (printer == NULL)
-		return;	/* abort */
-
 	/* Print Size Dialog results */
 	if (pr.psize.x < 0) {
 		/* apply default values */
 		pr.psize.x = pr.pdef.x;
 		pr.psize.y = pr.pdef.y;
 	}
-	rect.left = MulDiv(pr.poff.x * 10, GetDeviceCaps(printer, LOGPIXELSX), 254);
-	rect.top = MulDiv(pr.poff.y * 10, GetDeviceCaps(printer, LOGPIXELSY), 254);
-	rect.right = rect.left + MulDiv(pr.psize.x * 10, GetDeviceCaps(printer, LOGPIXELSX), 254);
-	rect.bottom = rect.top + MulDiv(pr.psize.y * 10, GetDeviceCaps(printer, LOGPIXELSY), 254);
+
+	/* See http://support.microsoft.com/kb/240082 */
+	pDevNames = (DEVNAMES *) GlobalLock(pd.hDevNames);
+	pDevMode = (DEVMODE *) GlobalLock(pd.hDevMode);
+	szDriver = (LPCTSTR) pDevNames + pDevNames->wDriverOffset;
+	szDevice = (LPCTSTR) pDevNames + pDevNames->wDeviceOffset;
+	szOutput = (LPCTSTR) pDevNames + pDevNames->wOutputOffset;
+
+#if defined(HAVE_D2D11) && !defined(DCRENDERER)
+	if (lpgw->d2d) {
+		dpiX = dpiY = 96;  // DIPS 
+	} else
+#endif
+	{
+		printer = CreateDC(szDriver, szDevice, szOutput, pDevMode);
+		if (printer == NULL)
+			goto cleanup;	/* abort */
+		dpiX = GetDeviceCaps(printer, LOGPIXELSX);
+		dpiY = GetDeviceCaps(printer, LOGPIXELSY);
+	}
+
+	rect.left = MulDiv(pr.poff.x * 10, dpiX, 254);
+	rect.top = MulDiv(pr.poff.y * 10, dpiY, 254);
+	rect.right = rect.left + MulDiv(pr.psize.x * 10, dpiX, 254);
+	rect.bottom = rect.top + MulDiv(pr.psize.y * 10, dpiY, 254);
 
 	pr.hdcPrn = printer;
 	PrintRegister(&pr);
@@ -3322,6 +3328,13 @@ CopyPrint(LPGW lpgw)
 	SetAbortProc(printer, PrintAbortProc);
 	SetWindowLongPtr(GetDlgItem(pr.hDlgPrint, CANCEL_PROGRESS), GWL_STYLE, WS_CHILD | WS_VISIBLE | PBS_MARQUEE);
 	SendMessage(GetDlgItem(pr.hDlgPrint, CANCEL_PROGRESS), PBM_SETMARQUEE, 1, 0);
+
+#if defined(HAVE_D2D11) && !defined(DCRENDERER)
+	if (lpgw->d2d) {
+	    // handle the rest in C++
+	    print_d2d(lpgw, pDevMode, szDevice, &rect);
+	} else {
+#endif
 
 #ifdef HAVE_GDIPLUS
 	if (lpgw->gdiplus)
@@ -3358,6 +3371,11 @@ CopyPrint(LPGW lpgw)
 		if (EndPage(printer) > 0)
 			EndDoc(printer);
 	}
+
+#if defined(HAVE_D2D11) && !defined(DCRENDERER)
+	}
+#endif
+
 	if (!pr.bUserAbort) {
 		EnableWindow(hwnd, TRUE);
 		DestroyWindow(pr.hDlgPrint);
@@ -3366,8 +3384,21 @@ CopyPrint(LPGW lpgw)
 	if (lpgw->gdiplus)
 		ClosePrinter(printerHandle);
 #endif
-	DeleteDC(printer);
+	if (printer != NULL)
+		DeleteDC(printer);
+
 	PrintUnregister(&pr);
+
+cleanup:
+	GlobalUnlock(pd.hDevMode);
+	GlobalUnlock(pd.hDevNames);
+	/* We no longer free these but preserve them for the next time
+	GlobalFree(pd.hDevMode);
+	GlobalFree(pd.hDevNames);
+	*/
+	hDevNames = pd.hDevNames;
+	hDevMode = pd.hDevMode;
+
 	/* make certain that the screen pen set is restored */
 	SendMessage(lpgw->hGraph, WM_COMMAND, M_REBUILDTOOLS, 0L);
 }

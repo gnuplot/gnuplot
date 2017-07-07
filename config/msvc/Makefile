@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.30 2017/06/27 18:00:54 markisch Exp $
+# $Id: Makefile,v 1.31 2017/06/27 19:06:11 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -111,7 +111,7 @@ LD = link
 # /MD means include multi-thread support (DLL)
 # /GR means Enable Run-Time Type Information
 !IF "$(DEBUG)" == "1"
-CBASEFLAGS = /EHsc /GR /MD /Od /nologo /Zi /DDEBUG
+CBASEFLAGS = /EHsc /GR /MDd /Od /nologo /Zi
 !ELSE
 CBASEFLAGS = /EHsc /GR /MD /O2 /nologo
 !ENDIF
@@ -221,8 +221,8 @@ CACALIBS = libcaca.lib
 !ENDIF
 
 !IF "$(DIRECT2D11)" == "1"
-OPTIONS = $(OPTIONS) /DHAVE_D2D11
-D2DLIBS = d3d11.lib
+OPTIONS = $(OPTIONS) /DHAVE_D2D11 /DHAVE_PRNTVPT
+D2DLIBS = d3d11.lib dxguid.lib prntvpt.lib
 !ENDIF
 
 

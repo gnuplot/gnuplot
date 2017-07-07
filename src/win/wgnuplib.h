@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.95 2017/06/24 11:22:12 markisch Exp $
+ * $Id: wgnuplib.h,v 1.96 2017/07/04 09:22:47 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -310,10 +310,6 @@ enum win_draw_commands {
 	W_hypertext
 };
 
-#ifdef HAVE_D2D
-// forward definition of Direct2D render target structure
-struct ID2D1RenderTarget;
-#endif
 
 typedef struct tagGW {
 	GP_LPPRINT	lpr;	/* must be first */
@@ -409,8 +405,14 @@ typedef struct tagGW {
 	HBRUSH	hcolorbrush;	/* */
 
 #ifdef HAVE_D2D
+#if !defined(HAVE_D2D11) || defined(DCRENDERER)
 	struct ID2D1RenderTarget * pRenderTarget;
+#else
+	struct ID2D1Device * pDirect2dDevice;
+	struct ID2D1DeviceContext * pRenderTarget;
 	struct IDXGISwapChain1 * pDXGISwapChain;
+#endif
+	int		dpi;			/* (nominal) resolution of output device */
 #endif
 
 	struct tagGW * next;	/* pointer to next window */

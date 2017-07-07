@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.73 2017/06/27 18:00:54 markisch Exp $
+# $Id: Makefile,v 1.74 2017/06/27 19:06:11 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 # This assumes a typical installation of the MinGW toolkit, the free
@@ -107,7 +107,7 @@ MOUSE=1
 #CAIROLIBS=1
 
 # Build qt terminal?
-#QT = 1
+#QT=1
 # specify QT installation directory
 #QT_DIR = /c/Qt/5.2.1/mingw48_32
 ifndef MINGW64
@@ -531,7 +531,8 @@ endif
 
 ifdef DIRECT2D11
 	CFLAGS += -DHAVE_D2D11
-	TERMLIBS += -ld3d11
+	TERMLIBS += -ld3d11 -ldxguid -lwindowscodecs -lprntvpt
+	EXTRATARGET += prntvpt.lib
 endif
 
 ifdef GNU_RC
@@ -601,26 +602,27 @@ WINOBJS += wtext.$(O) screenbuf.$(O) wmenu.$(O) wredirect.$(O)
 endif
 
 # default rules
-.SUFFIXES: .exe .$(O) .c
+.SUFFIXES: .exe .$(O) .c .lib .def
 .c.$(O):
 	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
 
 %.$(O): $W/%.c
 	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
 
-LDLIBS = -lkernel32 -lgdi32 -lwinspool -lcomdlg32 -lcomctl32 -ladvapi32 -lshell32 -lmsimg32 -lgdiplus -lshlwapi -ld2d1 -ldwrite -lole32
+%.lib: %.def
+	dlltool -d $^ -l $@
 
+LDLIBS = -lkernel32 -lgdi32 -lwinspool -lcomdlg32 -lcomctl32 -ladvapi32 -lshell32 -lmsimg32 -lgdiplus -lshlwapi -ld2d1 -ldwrite -lole32
 LDLIBS += -lhtmlhelp
 LDFLAGS2 += -L$(HHWPATH)lib
 ifdef MINGW64
 LDFLAGS2 += -L.
 endif
-
 ifndef M32
-$(TARGET): $(VERSIONING) $(OBJS) $(WINOBJS) wgplt_res.$(O) Makefile htmlhelp.lib
-else
-$(TARGET): $(VERSIONING) $(OBJS) $(WINOBJS) wgplt_res.$(O) Makefile
+	EXTRATARGET += htmlhelp.lib
 endif
+
+$(TARGET): $(VERSIONING) $(OBJS) $(WINOBJS) wgplt_res.$(O) Makefile $(EXTRATARGET)
 	$(LDX) $(LDFLAGS) $(LDFLAGS2) -o $@ $(OBJS) $(WINOBJS) wgplt_res.$(O) $(LDLIBS)\
 	$(TERMLIBS) $(WX_LIBS) $(PANGOCAIRO_LIBS)
 
@@ -738,14 +740,16 @@ $(BUILDHELPFILE): doc2html.exe $(D)gnuplot.doc $(D)windows/wgnuplot.hhp $(D)wind
 $(HELPFILE): $(BUILDHELPFILE)
 	$(CP) $^ $@
 
-htmlhelp.lib: htmlhelp.def
-	dlltool -d htmlhelp.def -l htmlhelp.lib
-
 htmlhelp.def:
 ifndef MINGW64
-	pexports c/Windows/System32/hhctrl.ocx > htmlhelp.def
+	pexports c/Windows/System32/hhctrl.ocx > $@
 else
-	gendef - /c/Windows/System32/hhctrl.ocx > htmlhelp.def
+	gendef - /c/Windows/System32/hhctrl.ocx > $@
+endif
+
+prntvpt.def:
+ifdef MINGW64
+	gendef - /c/Windows/System32/prntvpt.dll > prntvpt.def
 endif
 
 # Working directory for patched Japanese sources 
@@ -821,7 +825,7 @@ config.h: $(TOP)/config/config.mgw
 # generate LUA TeX support files and terminal help
 ifdef LUA
 gnuplot-lua-tikz.sty: $(T)/lua/gnuplot-tikz.lua
-	$(LUA) $< style
+	$(LUA).exe $< style
 
 $(LUA_HELP): $(T)/lua/gnuplot-tikz.lua
 	$(LUA).exe $< termhelp > $@

@@ -1,3 +1,15 @@
+2017-07-07  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wd2d.cpp|h src/win/wgnuplib.h src/win/wgraph.c
+	config/mingw/Makefile config/msvc/Makefile:
+	Direct2D printing support.  Requires D2d 1.1 and hence Windows 7
+	with platform update.  Mingw-w64 currently misses the required
+	prntvpt library and header, so we supply minimal definitions
+	taken from MSDN inline and create a library from the DLL.
+
+	* src/syscfg.h:  Minimum required API version is Windows 7 by
+	default.  Vista and XP are end-of-service.
+
 2017-07-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/dumb.trm:  Slightly nicer arrows.
@@ -48,7 +60,7 @@
 
 	* src/win/wgnuplib.h src/win/wgraph.c src/win/wgdiplus.cpp
 	src/win/wd2d.cpp:  Use a common definition of GWOPMAX and increase
-	to accomodate e.g. typicall pm3d plots.
+	to accommodate e.g. typical pm3d plots.
 
 2017-07-03  Bastian Maerkisch  <bmaerkisch@web.de>
 

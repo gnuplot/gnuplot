@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.23 2017/06/30 13:30:09 markisch Exp $
+ * $Id: wd2d.cpp,v 1.24 2017/07/04 09:22:47 markisch Exp $
  */
 
 /*
@@ -39,6 +39,9 @@ extern "C" {
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
 #include <windowsx.h>
+
+#include "wd2d.h"
+
 #ifndef HAVE_D2D11
 # include <d2d1.h>
 # include <d2d1helper.h>
@@ -50,11 +53,16 @@ extern "C" {
 # include <dwrite_1.h>
 # include <d2d1effects.h>
 # include <d2d1effecthelpers.h>
+#ifdef HAVE_PRNTVPT
+#  include <prntvpt.h>
+#endif
+# include <wincodec.h>
+# include <xpsobjectmodel_1.h>
+# include <documenttarget.h>
 #endif
 #include <tchar.h>
 #include <wchar.h>
 
-#include "wd2d.h"
 #include "wgnuplib.h"
 #include "wcommon.h"
 
@@ -69,6 +77,7 @@ static IDWriteFactory * g_pDWriteFactory = NULL;
 static ID2D1Factory1 * g_pDirect2dFactory = NULL;
 static IDWriteFactory1 * g_pDWriteFactory = NULL;
 static ID3D11Device1 * g_pDirect3dDevice = NULL;
+static IWICImagingFactory * g_wicFactory = NULL;
 #endif
 #ifdef DCRENDERER
 // All graph windows share a common DC render target
@@ -83,6 +92,24 @@ static HRESULT d2dFilledPolygon(ID2D1RenderTarget * pRenderTarget, ID2D1Brush * 
 static void d2dDot(ID2D1RenderTarget * pRenderTarget, ID2D1SolidColorBrush * pBrush, float x, float y);
 static HRESULT d2dMeasureText(ID2D1RenderTarget * pRenderTarget, LPCWSTR text, IDWriteTextFormat * pWriteTextFormat, D2D1_SIZE_F * size);
 static inline D2D1::ColorF D2DCOLORREF(COLORREF c, float a);
+static HRESULT d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool interactive);
+
+
+/* Mingw64 currently does not provide the Print Ticket Header, so we put
+our own definitions here, taken from MSDN */
+#ifndef HAVE_PRNTVPT
+extern "C" {
+	typedef HANDLE HPTPROVIDER;  // guessed
+	typedef enum tagEPrintTicketScope { 
+		kPTPageScope,
+		kPTDocumentScope,
+		kPTJobScope
+	} EPrintTicketScope;
+	HRESULT PTConvertDevModeToPrintTicket(HPTPROVIDER, ULONG, PDEVMODE, EPrintTicketScope scope, IStream *);
+	HRESULT PTCloseProvider(HPTPROVIDER hProvider);
+	HRESULT PTOpenProvider(PCWSTR, DWORD, HPTPROVIDER *);
+}
+#endif
 
 
 /* Release COM pointers safely
@@ -142,8 +169,7 @@ static HRESULT
 d2dCreateDeviceSwapChainBitmap(LPGW lpgw)
 {
 	HRESULT hr = S_OK;
-
-	ID2D1DeviceContext * pDirect2dDeviceContext = static_cast<ID2D1DeviceContext *>(lpgw->pRenderTarget);
+	ID2D1DeviceContext * pDirect2dDeviceContext = lpgw->pRenderTarget;
 
 	if (pDirect2dDeviceContext == NULL || g_pDirect2dFactory == NULL)
 		return hr;
@@ -304,15 +330,16 @@ d2dInit(LPGW lpgw)
 			// Create Direct2D device and context (our render target)
 			ID2D1Device * pDirect2dDevice = NULL;
 			ID2D1DeviceContext * pDirect2dDeviceContext = NULL;
-			if (SUCCEEDED(hr))
+			if (SUCCEEDED(hr) && lpgw->pDirect2dDevice == NULL)
 				hr = g_pDirect2dFactory->CreateDevice(dxgiDevice, &pDirect2dDevice);
+			if (SUCCEEDED(hr))
+				lpgw->pDirect2dDevice = pDirect2dDevice;
 			if (SUCCEEDED(hr))
 				hr = pDirect2dDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, &pDirect2dDeviceContext);
 			if (SUCCEEDED(hr))
 				lpgw->pRenderTarget = pDirect2dDeviceContext;
 
 			SafeRelease(&dxgiDevice);
-			SafeRelease(&pDirect2dDevice);
 		}
 
 		if (SUCCEEDED(hr))
@@ -356,12 +383,12 @@ d2dReleaseRenderTarget(LPGW lpgw)
 {
 #ifndef DCRENDERER
 #ifdef HAVE_D2D11
-	ID2D1DeviceContext * pDirect2dDeviceContext = static_cast<ID2D1DeviceContext *>(lpgw->pRenderTarget);
-	if (pDirect2dDeviceContext != NULL)
-		pDirect2dDeviceContext->SetTarget(NULL);
+	if (lpgw->pRenderTarget != NULL)
+		lpgw->pRenderTarget->SetTarget(NULL);
 	SafeRelease(&(lpgw->pDXGISwapChain));
 #endif
 	SafeRelease(&(lpgw->pRenderTarget));
+	SafeRelease(&(lpgw->pDirect2dDevice));
 #endif
 }
 
@@ -376,6 +403,7 @@ d2dCleanup(void)
 	SafeRelease(&g_pDWriteFactory);
 #ifdef HAVE_D2D11
 	SafeRelease(&g_pDirect3dDevice);
+	SafeRelease(&g_wicFactory);
 #endif
 }
 
@@ -571,10 +599,15 @@ d2dCreatePatternBrush(LPGW lpgw, unsigned pattern, COLORREF color, bool transpar
 		return NULL;
 
 	// TODO:  Would it not be more efficient to retain the target?
+	// NOTE:  Using a bitmap brush is non-optimal for printing, but works if we enforce
+	//        the bitmap format.
 	ID2D1BitmapRenderTarget * pRenderTarget = NULL;
 	if (SUCCEEDED(hr)) {
-		// enforce the  pixel size of the bitmap
-		hr = pMainRenderTarget->CreateCompatibleRenderTarget(D2D1::SizeF(size, size), D2D1::SizeU(size, size), &pRenderTarget);
+		// enforce the pixel size and the format of the bitmap
+		hr = pMainRenderTarget->CreateCompatibleRenderTarget(
+			D2D1::SizeF(size, size), D2D1::SizeU(size, size),
+			D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED),
+			&pRenderTarget);
 	}
 
 	if (SUCCEEDED(hr)) {
@@ -650,8 +683,6 @@ static HRESULT
 d2dSetFont(ID2D1RenderTarget * pRenderTarget, LPRECT rect, LPGW lpgw, LPTSTR fontname, int size, IDWriteTextFormat ** ppWriteTextFormat)
 {
 	HRESULT hr = S_OK;
-	FLOAT dpiX, dpiY; // render target DPI
-	FLOAT ddpiX, ddpiY; // desktop DPI
 
 	if ((fontname == NULL) || (*fontname == 0))
 		fontname = lpgw->deffontname;
@@ -691,9 +722,7 @@ d2dSetFont(ID2D1RenderTarget * pRenderTarget, LPRECT rect, LPGW lpgw, LPTSTR fon
 
 	// Take into account differences between the render target's reported
 	// DPI setting and the system DPI.
-	g_pDirect2dFactory->GetDesktopDpi(&ddpiX, &ddpiY);
-	pRenderTarget->GetDpi(&dpiX, &dpiY);
-	FLOAT fontSize = size * ddpiY / 72.f;
+	FLOAT fontSize = size * lpgw->dpi / 72.f;
 	hr = g_pDWriteFactory->CreateTextFormat(
 		family,
 		NULL,
@@ -838,9 +867,7 @@ draw_enhanced_init(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, ID2D1SolidColor
 	enhstate_d2d.pWriteTextFormat = pWriteTextFormat;
 
 	// We cannot use pRenderTarget->GetDpi() since that might be set to 96;
-	FLOAT dpiX, dpiY;
-	g_pDirect2dFactory->GetDesktopDpi(&dpiX, &dpiY);
-	enhstate.res_scale = dpiY / 96.f;
+	enhstate.res_scale = lpgw->dpi / 96.f;
 }
 
 
@@ -864,6 +891,206 @@ drawgraph_d2d(LPGW lpgw, HDC hdc, LPRECT rect)
 #else
 drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 #endif
+{
+	HRESULT hr = S_OK;
+
+	// create the D2D factory object and the render target
+	hr = d2dInit(lpgw);
+	if (FAILED(hr))
+		return;
+
+#ifdef DCRENDERER
+	ID2D1DCRenderTarget * pRenderTarget = g_pRenderTarget;
+	// new device context or size changed
+	hr = pRenderTarget->BindDC(hdc, rect);
+#else
+#ifndef HAVE_D2D11
+	ID2D1HwndRenderTarget * pRenderTarget = static_cast<ID2D1HwndRenderTarget *>(lpgw->pRenderTarget);
+	// No need to draw to an occluded window
+	if (pRenderTarget->CheckWindowState() == D2D1_WINDOW_STATE_OCCLUDED)
+		return;
+#else
+	ID2D1DeviceContext * pRenderTarget = lpgw->pRenderTarget;
+#endif
+#endif
+
+	// Get screen DPI
+	FLOAT dpiX, dpiY;
+	g_pDirect2dFactory->GetDesktopDpi(&dpiX, &dpiY);
+	lpgw->dpi = dpiY;
+
+	hr = d2d_do_draw(lpgw, pRenderTarget, rect, true);
+}
+
+
+#if defined(HAVE_D2D11) && !defined(DCRENDERER)
+
+// Creates a print job ticket stream to define options for the next print job.
+// Note: This is derived from an MSDN example
+HRESULT 
+GetPrintTicketFromDevmode(PCTSTR printerName, PDEVMODE pDevMode, WORD devModesize, LPSTREAM * pPrintTicketStream)
+{
+	HRESULT hr = S_OK;
+	HPTPROVIDER provider = NULL;
+
+	*pPrintTicketStream = NULL;
+
+	hr = CreateStreamOnHGlobal(NULL, TRUE, pPrintTicketStream);
+	if (SUCCEEDED(hr)) {
+		hr = PTOpenProvider(printerName, 1, &provider);
+	}
+	if (SUCCEEDED(hr)) {
+		hr = PTConvertDevModeToPrintTicket(provider, devModesize, pDevMode, kPTJobScope, *pPrintTicketStream);
+	}
+	if (FAILED(hr) && pPrintTicketStream != NULL) {
+		SafeRelease(pPrintTicketStream);
+	}
+	if (provider)
+		PTCloseProvider(provider);
+
+	return hr;
+}
+
+
+HRESULT
+print_d2d(LPGW lpgw, DEVMODE * pDevMode, LPCTSTR szDevice, LPRECT rect)
+{
+	HRESULT hr = S_OK;
+	ID2D1DeviceContext * pRenderTarget = lpgw->pRenderTarget;
+	IStream * jobPrintTicketStream;
+	IPrintDocumentPackageTarget * documentTarget;
+
+	// Create a print ticket, init print subsystem
+	if (SUCCEEDED(hr)) {
+		hr = GetPrintTicketFromDevmode(szDevice, pDevMode,
+				pDevMode->dmSize + pDevMode->dmDriverExtra, // size including private data
+				&jobPrintTicketStream);
+	}
+	IPrintDocumentPackageTargetFactory * documentTargetFactory = NULL;
+	if (SUCCEEDED(hr)) {
+		hr = CoCreateInstance(__uuidof(PrintDocumentPackageTargetFactory),
+				NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&documentTargetFactory));
+	}
+	if (SUCCEEDED(hr)) {
+		hr = documentTargetFactory->CreateDocumentPackageTargetForPrintJob(
+				szDevice, lpgw->Title,
+				NULL, jobPrintTicketStream, 
+				&documentTarget);
+	}
+
+	// Make sure that the D2D factory object and the render target are created
+	if (SUCCEEDED(hr)) {
+		hr = d2dInit(lpgw);
+	}
+
+	// Create a command list to save commands to
+	ID2D1CommandList * pCommandList;
+	if (SUCCEEDED(hr)) {
+		hr = pRenderTarget->CreateCommandList(&pCommandList);
+	}
+
+	// "Draw" to the command list
+	if (SUCCEEDED(hr)) {
+		ID2D1Image* originalTarget;
+		pRenderTarget->GetTarget(&originalTarget);
+		pRenderTarget->SetTarget(pCommandList);
+
+		// temporarily turn anti-aliasing off
+		BOOL save_aa = lpgw->antialiasing;
+		lpgw->antialiasing = FALSE;
+
+		// Pixel mode not supported for printing
+		unsigned save_dpi = lpgw->dpi;
+		lpgw->dpi = 96;
+		pRenderTarget->SetUnitMode(D2D1_UNIT_MODE_DIPS);
+
+		hr = d2d_do_draw(lpgw, pRenderTarget, rect, false);
+
+		pRenderTarget->SetUnitMode(D2D1_UNIT_MODE_PIXELS);
+		lpgw->dpi = save_dpi;
+		lpgw->antialiasing = save_aa;
+
+		pRenderTarget->SetTarget(originalTarget);
+		originalTarget->Release();
+	}
+
+	// Finalize the command list
+	if (SUCCEEDED(hr)) {
+		hr = pCommandList->Close();
+	}
+
+	// Create a WIC factory if it does not exist yet.
+	if (SUCCEEDED(hr) && g_wicFactory == NULL) {
+		// Create a WIC factory.
+		hr = CoCreateInstance(CLSID_WICImagingFactory,
+			NULL, CLSCTX_INPROC_SERVER,
+			IID_PPV_ARGS(&g_wicFactory));
+	}
+
+	// Finally create the print control.  This is can be used for a single print job only.
+	ID2D1PrintControl* printControl;
+	if (SUCCEEDED(hr)) {
+		D2D1_PRINT_CONTROL_PROPERTIES printControlProperties;
+		printControlProperties.rasterDPI = 150.f;
+		printControlProperties.fontSubset = D2D1_PRINT_FONT_SUBSET_MODE_DEFAULT;
+		printControlProperties.colorSpace = D2D1_COLOR_SPACE_SRGB; 
+		hr = lpgw->pDirect2dDevice->CreatePrintControl(
+			g_wicFactory,
+			documentTarget,
+			&printControlProperties,
+			&printControl
+		);
+	}
+
+	// Add a single page with the graph to the print control.
+	if (SUCCEEDED(hr)) {
+		FLOAT width, height;
+
+		// special case document conversion
+		if ((_tcscmp(TEXT("Microsoft Print to PDF"), szDevice) == 0) ||
+		   (_tcscmp(TEXT("Microsoft XPS Document Writer"), szDevice) == 0)) {
+			width = rect->right - rect->left;
+			height = rect->bottom - rect->top;
+		} else {
+			if ((pDevMode->dmFields & DM_PAPERLENGTH) && (pDevMode->dmFields & DM_PAPERWIDTH)) {
+				// paper size is given in 0.1 mm, convert to DIPS
+				width = pDevMode->dmPaperWidth / 254.f * 96.f;
+				height = pDevMode->dmPaperLength / 254.f * 96.f;
+			} else {
+				// TODO: do we need to check dmPaperSize?
+				// default to A4
+				width = 210.f / 25.4f * 96.f;
+				height = 297.f / 25.4f * 96.f;
+			}
+		}
+
+		hr = printControl->AddPage(pCommandList, D2D1::SizeF(width, height), NULL);
+	}
+
+	// Done.
+	if (SUCCEEDED(hr)) {
+		hr = printControl->Close();
+	}
+
+	// Clean-up
+	SafeRelease(&pCommandList);
+	SafeRelease(&printControl);
+	SafeRelease(&jobPrintTicketStream);
+	SafeRelease(&documentTargetFactory);
+
+	if (hr == D2DERR_RECREATE_TARGET) {
+		hr = S_OK;
+		// discard device resources
+		d2dReleaseRenderTarget(lpgw);
+	}
+
+	return hr;
+}
+#endif
+
+
+static HRESULT
+d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool interactive)
 {
 	// COM return code
 	HRESULT hr = S_OK;
@@ -952,16 +1179,8 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 
 	// check lock
 	if (lpgw->locked)
-		return;
+		return hr;
 
-	// TODO: Need a D2D way of doing the following calls
-#ifdef DCRENDERER
-	/* clear hypertexts only in display sessions */
-	interactive = (GetObjectType(hdc) == OBJ_MEMDC) ||
-		((GetObjectType(hdc) == OBJ_DC) && (GetDeviceCaps(hdc, TECHNOLOGY) == DT_RASDISPLAY));
-#else
-	interactive = true;
-#endif
 	if (interactive)
 		clear_tooltips(lpgw);
 
@@ -972,26 +1191,6 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 
 	// TODO: not implemented yet
 	ps_caching = false;
-
-	// create the D2D factory object and the render target
-	hr = d2dInit(lpgw);
-	if (!SUCCEEDED(hr))
-		return;
-
-#ifdef DCRENDERER
-	ID2D1DCRenderTarget * pRenderTarget = g_pRenderTarget;
-	// new device context or size changed
-	hr = pRenderTarget->BindDC(hdc, rect);
-#else
-#ifndef HAVE_D2D11
-	ID2D1HwndRenderTarget * pRenderTarget = static_cast<ID2D1HwndRenderTarget *>(lpgw->pRenderTarget);
-	// No need to draw to an occluded window
-	if (pRenderTarget->CheckWindowState() == D2D1_WINDOW_STATE_OCCLUDED)
-		return;
-#else
-	ID2D1DeviceContext * pRenderTarget = static_cast<ID2D1DeviceContext *>(lpgw->pRenderTarget);
-#endif
-#endif
 
 	if (lpgw->antialiasing)
 		pRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
@@ -1056,11 +1255,11 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 		if (!blkptr->gwop)
 			blkptr->gwop = (struct GWOP *) GlobalLock(blkptr->hblk);
 		if (!blkptr->gwop)
-			return;
+			return hr;
 		curptr = (struct GWOP *)blkptr->gwop;
 	}
 	if (curptr == NULL)
-		return;
+		return hr;
 
 	while (ngwop < lpgw->nGWOP) {
 		// transform the coordinates
@@ -1205,7 +1404,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 		/* special case hypertexts */
 		if ((hypertext != NULL) && (hypertype == TERM_HYPERTEXT_TOOLTIP)) {
 			/* point symbols */
-			if ((curptr->op >= W_dot) && (curptr->op <= W_dot + WIN_POINT_TYPES)) {
+			if ((curptr->op >= W_dot) && (curptr->op <= W_last_pointtype)) {
 				RECT rect;
 				rect.left = xdash - htic - 0.5;
 				rect.right = xdash + htic + 0.5;
@@ -1957,7 +2156,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 			if (ps_caching && (last_symbol == symbol) && (cb != NULL)) {
 				// always draw point symbols on integer (pixel) positions
 				GETHDC
-				if SUCCEEDED(hr) {
+				if (SUCCEEDED(hr)) {
 					Graphics * graphics = gdiplusGraphics(lpgw, hdc);
 					if (lpgw->oversample)
 						graphics->DrawCachedBitmap(cb, INT(xdash + 0.5) - cb_ofs.x, INT(ydash + 0.5) - cb_ofs.y);
@@ -2130,14 +2329,16 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 	hr = pRenderTarget->EndDraw();
 
 #if !defined(DCRENDERER) && defined(HAVE_D2D11)
-	// Present (new for Direct2D 1.1)
-	DXGI_PRESENT_PARAMETERS parameters = { 0 };
-	parameters.DirtyRectsCount = 0;
-	parameters.pDirtyRects = NULL;
-	parameters.pScrollRect = NULL;
-	parameters.pScrollOffset = NULL;
+	if (interactive) {
+		// Present (new for Direct2D 1.1)
+		DXGI_PRESENT_PARAMETERS parameters = { 0 };
+		parameters.DirtyRectsCount = 0;
+		parameters.pDirtyRects = NULL;
+		parameters.pScrollRect = NULL;
+		parameters.pScrollOffset = NULL;
 
-	hr = lpgw->pDXGISwapChain->Present1(1, 0, &parameters);
+		hr = lpgw->pDXGISwapChain->Present1(1, 0, &parameters);
+	}
 #endif
 
 	// TODO: some of these resource are device independent and could be preserved
@@ -2154,4 +2355,5 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 		// discard device resources
 		d2dReleaseRenderTarget(lpgw);
 	}
+	return hr;
 }
