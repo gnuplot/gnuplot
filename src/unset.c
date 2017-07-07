@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.253 2017/01/12 21:52:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.254 2017/02/14 21:49:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1632,9 +1632,14 @@ unset_terminal()
 
     term_reset();
 
+    /* FIXME: change is correct but reported result is truncated */
     if (original_terminal && original_terminal->udv_value.type != NOTDEFINED) {
-	char *termname = original_terminal->udv_value.v.string_val;
+	char *termname = gp_strdup(original_terminal->udv_value.v.string_val);
+	if (strchr(termname, ' '))
+	    *strchr(termname, ' ') = '\0';
+	*term_options = '\0';
 	term = change_term(termname, strlen(termname));
+	free(termname);
     }
     screen_ok = FALSE;
 }

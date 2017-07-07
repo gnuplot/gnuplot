@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.332.2.1 2017/06/01 22:51:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.332.2.2 2017/06/06 13:25:23 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1427,6 +1427,8 @@ set_term()
 	input_name = gp_input_line + token[c_token].start_index;
 	t = change_term(input_name, token[c_token].length);
 	if (!t && isstringvalue(c_token) && (input_name = try_to_get_string())) {
+	    if (strchr(input_name, ' '))
+		*strchr(input_name, ' ') = '\0';
 	    t = change_term(input_name, strlen(input_name));
 	    free(input_name);
 	} else {
@@ -1557,6 +1559,8 @@ init_terminal()
 	strcat(set_term_command, gnuterm);
 	do_string(set_term_command);
 	free(set_term_command);
+	/* replicate environmental variable GNUTERM for internal use */
+	Gstring(&(add_udv_by_name("GNUTERM")->udv_value), gp_strdup(gnuterm));
 	return;
 
     } else {

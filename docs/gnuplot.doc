@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1084.2.4 2017/06/01 22:50:58 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1084.2.5 2017/06/05 17:04:24 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -859,7 +859,10 @@ C  need @ in table, so end and restart the table !
  A number of shell environment variables are understood by `gnuplot`.  None of
  these are required, but may be useful.
 
- GNUTERM, if defined, is used as the default terminal type on start-up.
+ GNUTERM, if defined, is used to set the terminal type on start-up.
+ Starting with version 5.2 the entire string in GNUTERM is passed to 
+ "set term" so that terminal options may be included.  E.g.
+      GNUTERM="postscript eps color size 5in, 3in"
  This can be overridden by the ~/.gnuplot (or equivalent) start-up file
  (see `startup`) and of course by later explicit `set term` commands.
 
@@ -15026,9 +15029,11 @@ Ffigure_multiple_keys
 ?unset terminal
  The default terminal that is active at the time of program entry depends on the
  system platform, gnuplot build options, and the environmental variable GNUTERM.
- Whatever this default may be, gnuplot saves it in the internal variable GNUTERM.
- The `unset terminal` command restores this initial state.  It is equivalent to
- `set terminal GNUTERM`.
+ Whatever this default may be, gnuplot saves it to internal variable GNUTERM.
+ The `unset terminal` command restores the initial terminal type.
+ It is equivalent to `set terminal @GNUTERM`.  However if the string in GNUTERM
+ contains terminal options in addition to the bare terminal name, you may want
+ to instead use `set terminal @GNUTERM`.
 2 update
 ?commands update
 ?update

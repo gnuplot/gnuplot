@@ -1,6 +1,7 @@
 Changes since 5.2.rc2
 ====================
 * CHANGE add caca terminal documentation to the user manual
+* FIX copy environmental variable GNUTERM to intern variable on entry
 
 
 Changes in 5.2.rc2

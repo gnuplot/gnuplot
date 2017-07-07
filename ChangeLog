@@ -1,3 +1,17 @@
+2017-07-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (set_term init_terminal) src/unset.c (unset_terminal)
+	docs/gnuplot.doc:
+	On entry, copy environmental variable GNUTERM to internal variable
+	GNUTERM.  Note that starting with version 5.2 this is a string that
+	may include terminal options in addition to the terminal name. E.g.
+	    GNUTERM="post eps color size 5in,3in" 
+	Modify "set term <string>" to look only at the first word of <string>.
+	Thus "set term GNUTERM" works as before. Note that "set term @GNUTERM"
+	expands and applies the full set of options.
+	Fix "unset term" to act equivalently to "set term GNUTERM" as
+	documented.
+
 2017-07-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.ac docs/Makefile.am term/caca.trm:
