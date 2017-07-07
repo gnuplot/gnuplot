@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: dumb.trm,v 1.38.2.2 2017/06/24 13:17:49 sfeam Exp $
+ * $Id: dumb.trm,v 1.38.2.3 2017/06/26 15:32:48 sfeam Exp $
  *
  */
 
@@ -648,21 +648,33 @@ TERM_PUBLIC void
 DUMB_arrow(
     unsigned int sx, unsigned int sy,
     unsigned int ex, unsigned int ey,
-    int head)		/* ignored */
+    int head)	/* mostly ignored */
 {
     char saved_pen;
     char saved_x;
     char saved_y;
 
-    (void) head;		/* dummy usage avoid compiler warnings */
     saved_pen = dumb_pen;
     saved_x = dumb_x;
     saved_y = dumb_y;
 
-    dumb_pen = '>';
+    /* Arrow shaft */
+    if (ex == sx) dumb_pen = '|';
+    else if (ey == sy) dumb_pen = '-';
+    else dumb_pen = '.';
     dumb_x = sx;
     dumb_y = sy;
     DUMB_vector(ex, ey);
+
+    /* Arrow head */
+    if (head != NOHEAD) {
+	char headsym;
+	if (ex > sx) headsym = '>';
+	else if (ex < sx) headsym = '<';
+	else if (ey > sy) headsym = '^';
+	else headsym = 'v';
+	dumb_set_pixel(ex, ey, headsym);
+    }
 
     dumb_pen = saved_pen;
     dumb_x = saved_x;

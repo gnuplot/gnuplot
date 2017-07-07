@@ -12,6 +12,8 @@
 	Fix "unset term" to act equivalently to "set term GNUTERM" as
 	documented.
 
+	* term/dumb.trm:  Slightly nicer arrows.
+
 2017-07-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.ac docs/Makefile.am term/caca.trm:
