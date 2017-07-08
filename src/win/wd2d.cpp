@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.24 2017/07/04 09:22:47 markisch Exp $
+ * $Id: wd2d.cpp,v 1.25 2017/07/08 11:20:13 markisch Exp $
  */
 
 /*
@@ -1106,7 +1106,6 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 	bool gridline = false;
 	bool skipplot = false;
 	bool keysample = false;
-	bool interactive;
 	LPWSTR hypertext = NULL;
 	int hypertype = 0;
 
