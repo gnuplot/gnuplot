@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1084.2.5 2017/06/05 17:04:24 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1084.2.6 2017/07/08 00:11:35 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -15031,7 +15031,7 @@ Ffigure_multiple_keys
  system platform, gnuplot build options, and the environmental variable GNUTERM.
  Whatever this default may be, gnuplot saves it to internal variable GNUTERM.
  The `unset terminal` command restores the initial terminal type.
- It is equivalent to `set terminal @GNUTERM`.  However if the string in GNUTERM
+ It is equivalent to `set terminal GNUTERM`.  However if the string in GNUTERM
  contains terminal options in addition to the bare terminal name, you may want
  to instead use `set terminal @GNUTERM`.
 2 update
