@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.61 2016/08/06 13:22:50 markisch Exp $
+ * $Id: syscfg.h,v 1.62 2017/01/29 12:18:21 markisch Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -122,16 +122,20 @@
 # define PATHSEP ';'
 # define GNUPLOT_HISTORY_FILE "~\\gnuplot_history"
 /* Flags for windows.h:
-   Minimal required platform is Windows XP
- */
+   Minimal required platform is Windows 7, see
+   https://msdn.microsoft.com/en-us/library/windows/desktop/aa383745.aspx 
+*/
+#ifndef NTDDI_VERSION
+# define NTDDI_VERSION NTDDI_WIN7
+#endif
 #ifndef WINVER
-# define WINVER 0x0501
+# define WINVER _WIN32_WINNT_WIN7
 #endif
 #ifndef _WIN32_WINNT
-# define _WIN32_WINNT 0x0501
+# define _WIN32_WINNT _WIN32_WINNT_WIN7
 #endif
 #ifndef _WIN32_IE
-# define _WIN32_IE 0x0501
+# define _WIN32_IE _WIN32_IE_IE80
 #endif
 
 /* The unicode/encoding support requires translation of file names */
