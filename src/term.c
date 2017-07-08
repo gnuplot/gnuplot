@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.332.2.2 2017/06/06 13:25:23 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.332.2.3 2017/07/08 00:11:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1741,22 +1741,43 @@ test_term()
     (*t->vector) (x0 + xmax_t / 2, y0 + ymax_t - 1);
     (*t->move) (x0, y0 + ymax_t / 2);
     (*t->vector) (x0 + xmax_t - 1, y0 + ymax_t / 2);
-    /* test width and height of characters */
-    (*t->linetype) (LT_SOLID);
-    newpath();
-    (*t->move) (x0 + xmax_t / 2 - t->h_char * 10, y0 + ymax_t / 2 + t->v_char / 2);
-    (*t->vector) (x0 + xmax_t / 2 + t->h_char * 10, y0 + ymax_t / 2 + t->v_char / 2);
-    (*t->vector) (x0 + xmax_t / 2 + t->h_char * 10, y0 + ymax_t / 2 - t->v_char / 2);
-    (*t->vector) (x0 + xmax_t / 2 - t->h_char * 10, y0 + ymax_t / 2 - t->v_char / 2);
-    (*t->vector) (x0 + xmax_t / 2 - t->h_char * 10, y0 + ymax_t / 2 + t->v_char / 2);
-    closepath();
-    (*t->put_text) (x0 + xmax_t / 2 - t->h_char * 10, y0 + ymax_t / 2,
-		    "12345678901234567890");
-    (*t->put_text) (x0 + xmax_t / 2 - t->h_char * 10, y0 + ymax_t / 2 + t->v_char * 1.4,
-		    "test of character width:");
-    (*t->linetype) (LT_BLACK);
+
+    /* How well can we estimate width and height of characters?
+     * Textbox fill shows true size, surrounding box shows the generic estimate
+     * used to reserve space during plot layout.
+     */
+#ifdef EAM_BOXED_TEXT
+    if (TRUE) {
+	struct text_label sample = EMPTY_LABELSTRUCT;
+	struct textbox_style save_opts = textbox_opts;
+	sample.text = "12345678901234567890";
+	sample.pos = CENTRE;
+	sample.boxed = 1;
+	textbox_opts.opaque = TRUE;
+	textbox_opts.noborder = TRUE;
+	textbox_opts.fillcolor.type = TC_RGB;
+	textbox_opts.fillcolor.lt = 0xccccee;
+
+	(*t->linetype) (LT_SOLID);
+	write_label(xmax_t/2, ymax_t/2, &sample);
+	textbox_opts = save_opts;
+
+	sample.boxed = 0;
+	sample.text = "true vs. estimated text dimensions";
+	write_label(xmax_t/2, ymax_t/2 + 1.5 * t->v_char, &sample);
+
+	newpath();
+	(*t->move) (x0 + xmax_t / 2 - t->h_char * 10, y0 + ymax_t / 2 + t->v_char / 2);
+	(*t->vector) (x0 + xmax_t / 2 + t->h_char * 10, y0 + ymax_t / 2 + t->v_char / 2);
+	(*t->vector) (x0 + xmax_t / 2 + t->h_char * 10, y0 + ymax_t / 2 - t->v_char / 2);
+	(*t->vector) (x0 + xmax_t / 2 - t->h_char * 10, y0 + ymax_t / 2 - t->v_char / 2);
+	(*t->vector) (x0 + xmax_t / 2 - t->h_char * 10, y0 + ymax_t / 2 + t->v_char / 2);
+	closepath();
+    }
+#endif
 
     /* Test for enhanced text */
+    (*t->linetype) (LT_BLACK);
     if (t->flags & TERM_ENHANCED_TEXT) {
 	char *tmptext1 =   "Enhanced text:   {x@_{0}^{n+1}}";
 	char *tmptext2 = "&{Enhanced text:  }{/:Bold Bold}{/:Italic  Italic}";  
@@ -1784,30 +1805,6 @@ test_term()
     else
 	(*t->put_text) (x0 + xmax_t / 2 - strlen(str) * t->h_char,
 			y0 + ymax_t / 2 + t->v_char * 4, str);
-    /* test text angle */
-    (*t->linetype)(1);
-    str = "rotated ce+ntred text";
-    if ((*t->text_angle) (TEXT_VERTICAL)) {
-	if ((*t->justify_text) (CENTRE))
-	    (*t->put_text) (x0 + t->v_char,
-			    y0 + ymax_t / 2, str);
-	else
-	    (*t->put_text) (x0 + t->v_char,
-			    y0 + ymax_t / 2 - strlen(str) * t->h_char / 2, str);
-	(*t->justify_text) (LEFT);
-	str = " rotated by +45 deg";
-	(*t->text_angle)(45);
-	(*t->put_text)(x0 + t->v_char * 3, y0 + ymax_t / 2, str);
-	(*t->justify_text) (LEFT);
-	str = " rotated by -45 deg";
-	(*t->text_angle)(-45);
-	(*t->put_text)(x0 + t->v_char * 2, y0 + ymax_t / 2, str);
-    } else {
-	(void) (*t->justify_text) (LEFT);
-	(*t->put_text) (x0 + t->h_char * 2, y0 + ymax_t / 2 - t->v_char * 2, "can't rotate text");
-    }
-    (void) (*t->justify_text) (LEFT);
-    (void) (*t->text_angle) (0);
 
     /* test tic size */
     (*t->linetype)(2);
@@ -1846,31 +1843,47 @@ test_term()
 	y -= key_entry_height;
     }
 
-    /* test some arrows */
+    /* test arrows (should line up with rotated text) */
     (*t->linewidth) (1.0);
     (*t->linetype) (0);
     (*t->dashtype) (DASHTYPE_SOLID, NULL);
-    x = x0 + xmax_t * .28;
-    y = y0 + ymax_t * .5;
+    x = x0 + 2. * t->v_char;
+    y = y0 + ymax_t/2;
     xl = t->h_tic * 7;
     yl = t->v_tic * 7;
     i = curr_arrow_headfilled;
-    curr_arrow_headfilled = AS_NOFILL;
-    (*t->arrow) (x, y, x + xl, y, END_HEAD);
-    curr_arrow_headfilled = 1;
-    (*t->arrow) (x, y, x - xl, y, END_HEAD);
-    curr_arrow_headfilled = 2;
-    (*t->arrow) (x, y, x, y + yl, END_HEAD);
-    curr_arrow_headfilled = AS_EMPTY;
-    (*t->arrow) (x, y, x, y - yl, END_HEAD);
     curr_arrow_headfilled = AS_NOBORDER;
-    xl = t->h_tic * 5;
-    yl = t->v_tic * 5;
-    (*t->arrow) (x - xl, y - yl, x + xl, y + yl, END_HEAD | BACKHEAD);
-    (*t->arrow) (x - xl, y + yl, x, y, NOHEAD);
+    (*t->arrow) (x, y-yl, x, y+yl, BOTH_HEADS);
     curr_arrow_headfilled = AS_EMPTY;
-    (*t->arrow) (x, y, x + xl, y - yl, BACKHEAD);
+    (*t->arrow) (x, y, x + xl, y + yl, END_HEAD);
+    curr_arrow_headfilled = AS_NOFILL;
+    (*t->arrow) (x, y, x + xl, y - yl, END_HEAD);
     curr_arrow_headfilled = i;
+
+    /* test text angle (should match arrows) */
+    (*t->linetype)(0);
+    str = "rotated ce+ntred text";
+    if ((*t->text_angle) (TEXT_VERTICAL)) {
+	if ((*t->justify_text) (CENTRE))
+	    (*t->put_text) (x0 + t->v_char,
+			    y0 + ymax_t / 2, str);
+	else
+	    (*t->put_text) (x0 + t->v_char,
+			    y0 + ymax_t / 2 - strlen(str) * t->h_char / 2, str);
+	(*t->justify_text) (LEFT);
+	str = "  rotate by +45";
+	(*t->text_angle)(45);
+	(*t->put_text)(x0 + t->v_char * 3, y0 + ymax_t / 2, str);
+	(*t->justify_text) (LEFT);
+	str = "  rotate by -45";
+	(*t->text_angle)(-45);
+	(*t->put_text)(x0 + t->v_char * 3, y0 + ymax_t / 2, str);
+    } else {
+	(void) (*t->justify_text) (LEFT);
+	(*t->put_text) (x0 + t->h_char * 2, y0 + ymax_t / 2, "cannot rotate text");
+    }
+    (void) (*t->justify_text) (LEFT);
+    (void) (*t->text_angle) (0);
 
     /* test line widths */
     (void) (*t->justify_text) (LEFT);
@@ -1968,7 +1981,7 @@ test_term()
 	    str = "No filled polygons";
 	(*t->linetype)(LT_BLACK);
 	i = ((*t->justify_text) (CENTRE)) ? 0 : t->h_char * strlen(str) / 2;
-	(*t->put_text) (cen_x + i, cen_y + radius + t->v_char * 0.5, str);
+	(*t->put_text) (cen_x - i, cen_y + radius + t->v_char * 0.5, str);
     }
 
     term_end_plot();
