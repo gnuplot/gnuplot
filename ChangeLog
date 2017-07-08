@@ -1,3 +1,10 @@
+2017-07-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (test_term): Revise "test" command output.
+	- simplify rotated text and arrow section
+	- fix bug in "dumb" centering of polygon title
+	- compare true textbox area with generic estimated text dimensions.
+
 2017-07-07  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wd2d.cpp|h src/win/wgnuplib.h src/win/wgraph.c
