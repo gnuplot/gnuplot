@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.265 2017/07/04 09:22:47 markisch Exp $
+ * $Id: wgraph.c,v 1.266 2017/07/08 11:20:13 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -1222,9 +1222,9 @@ SelFont(LPGW lpgw)
 		lf.lfItalic = FALSE;
 	}
 	lf.lfCharSet = DEFAULT_CHARSET;
-	hdc = GetDC(lpgw->hWndGraph);
+	hdc = GetDC(lpgw->hGraph);
 	lf.lfHeight = -MulDiv(lpgw->fontsize, GetDeviceCaps(hdc, LOGPIXELSY), 72);
-	ReleaseDC(lpgw->hWndGraph, hdc);
+	ReleaseDC(lpgw->hGraph, hdc);
 	cf.lpLogFont = &lf;
 	cf.nFontType = SCREEN_FONTTYPE;
 	cf.Flags = CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT | CF_SCALABLEONLY;
@@ -3043,10 +3043,9 @@ SaveAsEMF(LPGW lpgw)
 	static TCHAR lpstrCustomFilter[256] = { '\0' };
 	static TCHAR lpstrFileName[MAX_PATH] = { '\0' };
 	static TCHAR lpstrFileTitle[MAX_PATH] = { '\0' };
-	HWND hwnd = lpgw->hWndGraph;
 
 	Ofn.lStructSize = sizeof(OPENFILENAME);
-	Ofn.hwndOwner = hwnd;
+	Ofn.hwndOwner = lpgw->hWndGraph;
 	Ofn.lpstrInitialDir = NULL;
 #if defined(HAVE_GDIPLUS) && defined(USE_WINGDI)
 	Ofn.lpstrFilter = TEXT("Enhanced Metafile (*.emf)\0*.emf\0Enhanced Metafile+ (*.emf)\0*.emf\0");
@@ -3073,6 +3072,7 @@ SaveAsEMF(LPGW lpgw)
 	Ofn.lpstrDefExt = TEXT("emf");
 
 	if (GetSaveFileName(&Ofn) != 0) {
+		HWND hwnd = lpgw->hGraph;
 		RECT rect;
 		HDC hdc;
 
@@ -3133,15 +3133,15 @@ CopyClip(LPGW lpgw)
 	HWND hwnd;
 	HDC hdc;
 
-	hwnd = lpgw->hWndGraph;
-
 	/* view the window */
+	hwnd = lpgw->hWndGraph;
 	if (IsIconic(hwnd))
 		ShowWindow(hwnd, SW_SHOWNORMAL);
 	BringWindowToTop(hwnd);
 	UpdateWindow(hwnd);
 
 	/* get the context */
+	hwnd = lpgw->hGraph;
 	hdc = GetDC(hwnd);
 	GetPlotRect(lpgw, &rect);
 
@@ -3158,7 +3158,7 @@ CopyClip(LPGW lpgw)
 		SelectObject(mem, oldbmp);
 	} else {
 		MessageBeep(MB_ICONHAND);
-		MessageBox(hwnd, TEXT("Insufficient memory to copy to clipboard"),
+		MessageBox(lpgw->hWndGraph, TEXT("Insufficient memory to copy to clipboard"),
 			lpgw->Title, MB_ICONHAND | MB_OK);
 	}
 	DeleteDC(mem);
@@ -3198,10 +3198,11 @@ CopyClip(LPGW lpgw)
 		DestroyPens(&gwclip);
 #endif
 	}
+	ReleaseDC(hwnd, hdc);
 
 	/* Now we have the Metafile and Bitmap prepared, post their contents to
 	 * the Clipboard */
-	OpenClipboard(hwnd);
+	OpenClipboard(lpgw->hWndGraph);
 	EmptyClipboard();
 	if (hemf)
 		SetClipboardData(CF_ENHMETAFILE, hemf);
@@ -3212,7 +3213,6 @@ CopyClip(LPGW lpgw)
 	else
 		fprintf(stderr, "Error: no bitmap data available.\n");
 	CloseClipboard();
-	ReleaseDC(hwnd, hdc);
 	DeleteEnhMetaFile(hemf);
 }
 
@@ -3239,12 +3239,12 @@ CopyPrint(LPGW lpgw)
 	/* Print Property Sheet Dialog */
 	memset(&pr, 0, sizeof(pr));
 	GetPlotRect(lpgw, &rect);
-	hdc = GetDC(hwnd);
+	hdc = GetDC(lpgw->hGraph);
 	pr.pdef.x = MulDiv(rect.right - rect.left, 254, 10 * GetDeviceCaps(hdc, LOGPIXELSX));
 	pr.pdef.y = MulDiv(rect.bottom  - rect.top, 254, 10 * GetDeviceCaps(hdc, LOGPIXELSY));
 	pr.psize.x = -1; /* will be initialised to paper size whenever the printer driver changes */
 	pr.psize.y = -1;
-	ReleaseDC(hwnd, hdc);
+	ReleaseDC(lpgw->hGraph, hdc);
 
 	psp.dwSize      = sizeof(PROPSHEETPAGE);
 	psp.dwFlags     = PSP_USETITLE;
@@ -3362,10 +3362,10 @@ CopyPrint(LPGW lpgw)
 			DestroyPens(lpgw);
 			MakePens(lpgw, printer);
 			drawgraph(lpgw, printer, &rect);
-			hdc = GetDC(hwnd);
+			hdc = GetDC(lpgw->hGraph);
 			DestroyFonts(lpgw);
 			MakeFonts(lpgw, &rect, hdc);
-			ReleaseDC(hwnd, hdc);
+			ReleaseDC(lpgw->hGraph, hdc);
 #endif // USE_WINGDI
 		}
 		if (EndPage(printer) > 0)

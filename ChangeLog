@@ -1,3 +1,8 @@
+2017-07-09  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c:  Fix a few more oversights concerning the
+	allocation of a separate subwindow for the graph (2017-06-24).
+
 2017-07-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (test_term): Revise "test" command output.
