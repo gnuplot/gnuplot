@@ -3,6 +3,8 @@ Changes not in 5.2
 * CHANGE remove deprecated command "update"
 * CHANGE remove deprecated option "thru"
 * CHANGE special case optimization of nonlinear code to speed up logscale
+* CHANGE windows terminal can print using Direct2D
+* CHANGE windows Direct2D backend supports pattern fill
 
 New features, changes and fixes in gnuplot version 5.2
 ======================================================
@@ -39,6 +41,7 @@ New features, changes and fixes in gnuplot version 5.2
 * NEW    svg 'standalone' embeds images rather than including by reference
 * NEW    windows terminal supports saving graph as bitmap
 * NEW    windows graph windows can be docked to the wgnuplot text window
+* NEW    windows terminal has experimental Direct2D driver
 * NEW    wxt supports saving graph as EMF on Windows
 * NEW    wxt supports printing on Windows
 * NEW    dumb suports ANSI colors and filled polygons
