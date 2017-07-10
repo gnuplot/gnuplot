@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.267 2017/07/09 18:17:47 markisch Exp $
+ * $Id: wgraph.c,v 1.268 2017/07/10 10:02:18 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -3120,6 +3120,38 @@ SaveAsEMF(LPGW lpgw)
 
 /* ================================== */
 
+
+HBITMAP
+GraphGetBitmap(LPGW lpgw)
+{
+	RECT rect;
+	HDC hdc;
+	HDC mem;
+	HBITMAP bitmap;
+
+	hdc = GetDC(lpgw->hGraph);
+	GetPlotRect(lpgw, &rect);
+
+	/* make a bitmap and copy it there */
+	mem = CreateCompatibleDC(hdc);
+	bitmap = CreateCompatibleBitmap(hdc, rect.right - rect.left, rect.bottom - rect.top);
+	if (bitmap) {
+		/* there is enough memory and the bitmap is available */
+		HBITMAP oldbmp = (HBITMAP) SelectObject(mem, bitmap);
+		/* copy from screen */
+		BitBlt(mem, 0, 0, rect.right - rect.left,
+			rect.bottom - rect.top, hdc, rect.left,
+			rect.top, SRCCOPY);
+		SelectObject(mem, oldbmp);
+	}
+	DeleteDC(mem);
+
+	ReleaseDC(hdc, lpgw->hGraph);
+
+	return bitmap;
+}
+
+
 /* copy graph window to clipboard --- note that the Metafile is drawn at the full
  * virtual resolution of the Windows terminal driver (24000 x 18000 pixels), to
  * preserve as much accuracy as remotely possible */
@@ -3127,7 +3159,6 @@ static void
 CopyClip(LPGW lpgw)
 {
 	RECT rect;
-	HDC mem;
 	HBITMAP bitmap;
 	HENHMETAFILE hemf = 0;
 	HWND hwnd;
@@ -3140,28 +3171,18 @@ CopyClip(LPGW lpgw)
 	BringWindowToTop(hwnd);
 	UpdateWindow(hwnd);
 
-	/* get the context */
-	hwnd = lpgw->hGraph;
-	hdc = GetDC(hwnd);
-	GetPlotRect(lpgw, &rect);
-
-	/* make a bitmap and copy it there */
-	mem = CreateCompatibleDC(hdc);
-	bitmap = CreateCompatibleBitmap(hdc, rect.right - rect.left,
-			rect.bottom - rect.top);
-	if (bitmap) {
-		/* there is enough memory and the bitmap is available */
-		HBITMAP oldbmp = (HBITMAP) SelectObject(mem, bitmap);
-		BitBlt(mem, 0, 0, rect.right - rect.left,
-			rect.bottom - rect.top, hdc, rect.left,
-			rect.top, SRCCOPY);
-		SelectObject(mem, oldbmp);
-	} else {
+	/* get a bitmap copy of the window */
+	bitmap = GraphGetBitmap(lpgw);
+	if (bitmap == NULL) {
 		MessageBeep(MB_ICONHAND);
 		MessageBox(lpgw->hWndGraph, TEXT("Insufficient memory to copy to clipboard"),
 			lpgw->Title, MB_ICONHAND | MB_OK);
 	}
-	DeleteDC(mem);
+
+	/* get the context */
+	hwnd = lpgw->hGraph;
+	hdc = GetDC(hwnd);
+	GetPlotRect(lpgw, &rect);
 
 	/* OK, bitmap done, now create an enhanced Metafile context
 	 * and redraw the whole plot into that.
@@ -3204,6 +3225,7 @@ CopyClip(LPGW lpgw)
 	 * the Clipboard */
 	OpenClipboard(lpgw->hWndGraph);
 	EmptyClipboard();
+	// Note that handles are owned by the system after calls to SetClipboardData()
 	if (hemf)
 		SetClipboardData(CF_ENHMETAFILE, hemf);
 	else
@@ -3239,12 +3261,12 @@ CopyPrint(LPGW lpgw)
 	/* Print Property Sheet Dialog */
 	memset(&pr, 0, sizeof(pr));
 	GetPlotRect(lpgw, &rect);
-	hdc = GetDC(lpgw->hGraph);
+	hdc = GetDC(hwnd);
 	pr.pdef.x = MulDiv(rect.right - rect.left, 254, 10 * GetDeviceCaps(hdc, LOGPIXELSX));
 	pr.pdef.y = MulDiv(rect.bottom  - rect.top, 254, 10 * GetDeviceCaps(hdc, LOGPIXELSY));
 	pr.psize.x = -1; /* will be initialised to paper size whenever the printer driver changes */
 	pr.psize.y = -1;
-	ReleaseDC(lpgw->hGraph, hdc);
+	ReleaseDC(hwnd, hdc);
 
 	psp.dwSize      = sizeof(PROPSHEETPAGE);
 	psp.dwFlags     = PSP_USETITLE;
@@ -3362,10 +3384,10 @@ CopyPrint(LPGW lpgw)
 			DestroyPens(lpgw);
 			MakePens(lpgw, printer);
 			drawgraph(lpgw, printer, &rect);
-			hdc = GetDC(lpgw->hGraph);
+			hdc = GetDC(hwnd);
 			DestroyFonts(lpgw);
 			MakeFonts(lpgw, &rect, hdc);
-			ReleaseDC(lpgw->hGraph, hdc);
+			ReleaseDC(hwnd, hdc);
 #endif // USE_WINGDI
 		}
 		if (EndPage(printer) > 0)
@@ -4671,6 +4693,14 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				case M_D2D:
 					lpgw->d2d = TRUE;
 					lpgw->gdiplus = FALSE;
+#ifndef DCRENDRER
+					// Only the DC renderer will use the memory bitmap
+					if (lpgw->hBitmap != NULL) {
+						DeleteObject(lpgw->hBitmap);
+						lpgw->hBitmap = NULL;
+					}
+#endif
+					// FIXME: Need more initialisation on backend change
 					SendMessage(hwnd, WM_COMMAND, M_REBUILDTOOLS, 0L);
 					return 0;
 				case M_ANTIALIASING:

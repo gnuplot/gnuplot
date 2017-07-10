@@ -1,5 +1,5 @@
 /*
- * $Id: wcommon.h,v 1.31 2017/04/23 17:46:58 markisch Exp $
+ * $Id: wcommon.h,v 1.32 2017/06/24 09:15:38 markisch Exp $
  */
 
 /* GNUPLOT - wcommon.h */
@@ -120,6 +120,7 @@ void clear_tooltips(LPGW lpgw);
 void draw_update_keybox(LPGW lpgw, unsigned plotno, unsigned x, unsigned y);
 int draw_enhanced_text(LPGW lpgw, LPRECT rect, int x, int y, const char * str);
 void draw_get_enhanced_text_extend(PRECT extend);
+HBITMAP GraphGetBitmap(LPGW lpgw);
 
 #ifdef __cplusplus
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.65 2017/07/04 09:22:47 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.66 2017/07/10 07:21:33 markisch Exp $
  */
 
 /*
@@ -1744,7 +1744,11 @@ SaveAsBitmap(LPGW lpgw)
 	Ofn.lpstrDefExt = L"png";
 
 	if (GetSaveFileNameW(&Ofn) != 0) {
-		Bitmap * bitmap = Bitmap::FromHBITMAP(lpgw->hBitmap, 0);
+		// Note that there might be a copy in lpgw->hBitmap., but documentation
+		// says we may not use that (although it seems to work).
+		// So we get a new copy of the screen:
+		HBITMAP hBitmap = GraphGetBitmap(lpgw);
+		Bitmap * bitmap = Bitmap::FromHBITMAP(hBitmap, 0);
 		UINT ntype = Ofn.nFilterIndex - 1;
 #if 0
 		LPWSTR wtype = pImageCodecInfo[ntype].FormatDescription;
@@ -1756,6 +1760,7 @@ SaveAsBitmap(LPGW lpgw)
 #endif
 		bitmap->Save(Ofn.lpstrFile, &(pImageCodecInfo[ntype].Clsid), NULL);
 		delete bitmap;
+		DeleteObject(hBitmap);
 	}
 	free(filter);
 }
