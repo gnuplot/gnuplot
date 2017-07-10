@@ -3,6 +3,10 @@
 	* src/win/wgdiplus.cpp (SaveAsBitmap):  Make sure that GDI+ is
 	initialized.  Bug fix.
 
+	* src/win/wgraph.c (TryCreateFont):  Silence font substitution
+	warnings in GDI backend again.  This is consistent with other backends
+	and less annoying.
+
 2017-07-09  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c:  Fix a few more oversights concerning the
