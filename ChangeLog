@@ -1,3 +1,8 @@
+2017-07-10  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgdiplus.cpp (SaveAsBitmap):  Make sure that GDI+ is
+	initialized.  Bug fix.
+
 2017-07-09  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c:  Fix a few more oversights concerning the
