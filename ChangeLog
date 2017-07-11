@@ -3,6 +3,10 @@
 	* src/win/wd2d.cpp:  Create an IDXGISurface instead of IDXGISurface1.
 	Bug #1941
 
+	* src/mingw/Makefile (clean):  Remove prntvpt.lib|def as the lib has
+	has to be recreated for 32/64 bit builds.
+	Bug #1942
+
 2017-07-11 Akira Kakuto <kakuto@fuk.kindai.ac.jp>
 
 	* src/win/wgraph.c (GraphGetBitmap):  Correct mixed up order of

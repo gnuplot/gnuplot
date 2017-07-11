@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.74 2017/06/27 19:06:11 markisch Exp $
+# $Id: Makefile,v 1.75 2017/07/08 11:20:13 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 # This assumes a typical installation of the MinGW toolkit, the free
@@ -954,6 +954,7 @@ clean:
 	$(RM) config.h wgnuplot.map wgnuplot.res
 	$(RM) *.$(O) *.po *.o *.co *.d *.map
 	$(RM) moc_*.cpp ui_*.h qrc_*.cpp
+	-$(RM) prntvpt.lib prntvpt.def
 	$(RM) doc2*.exe $(W)/wgnuplib.res wgnuplib.map wgnuplot.lib
 	$(RM) $(M)bf_test.exe demo_plugin.dll allterm.h allterm.c
 	$(RM) *.aux *.log *.dvi *.toc
