@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.100 2017/07/03 15:53:59 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.101 2017/07/07 00:02:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1052,7 +1052,7 @@ f_power(union argument *arg)
 	switch (b.type) {
 	case INTGR:
 	    if (a.v.cmplx_val.imag == 0.0) {
-		mag = pow(a.v.cmplx_val.real, (double) abs(b.v.int_val));
+		mag = pow(a.v.cmplx_val.real, fabs((double)b.v.int_val));
 		if (b.v.int_val < 0) {
 		    if (mag != 0.0)
 			mag = 1.0 / mag;
@@ -1062,7 +1062,7 @@ f_power(union argument *arg)
 		(void) Gcomplex(&result, mag, 0.0);
 	    } else {
 		/* not so good, but...! */
-		mag = pow(magnitude(&a), (double) abs(b.v.int_val));
+		mag = pow(magnitude(&a), fabs((double)b.v.int_val));
 		if (b.v.int_val < 0) {
 		    if (mag != 0.0)
 			mag = 1.0 / mag;

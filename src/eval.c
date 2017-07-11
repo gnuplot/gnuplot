@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.147 2017/06/21 06:07:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.148 2017/07/05 18:46:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -328,7 +328,7 @@ magnitude(struct value *val)
 {
     switch (val->type) {
     case INTGR:
-	return ((double) abs(val->v.int_val));
+	return (fabs((double)val->v.int_val));
     case CMPLX:
 	{
 	    /* The straightforward implementation sqrt(r*r+i*i)

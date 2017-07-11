@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: standard.c,v 1.34 2016/01/15 05:06:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: standard.c,v 1.35 2017/06/21 06:07:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - standard.c */
@@ -722,7 +722,7 @@ f_abs(union argument *arg)
     (void) pop(&a);
     switch (a.type) {
     case INTGR:
-	push(Ginteger(&a, abs(a.v.int_val)));
+	push(Ginteger(&a, a.v.int_val < 0 ? -a.v.int_val : a.v.int_val));
 	break;
     case CMPLX:
 	push(Gcomplex(&a, magnitude(&a), 0.0));
@@ -827,7 +827,7 @@ f_floor(union argument *arg)
     (void) pop(&a);
     switch (a.type) {
     case INTGR:
-	push(Ginteger(&a, (int) floor((double) a.v.int_val)));
+	push(&a);
 	break;
     case CMPLX:
 	push(Ginteger(&a, (int) floor(a.v.cmplx_val.real)));
@@ -846,7 +846,7 @@ f_ceil(union argument *arg)
     (void) pop(&a);
     switch (a.type) {
     case INTGR:
-	push(Ginteger(&a, (int) ceil((double) a.v.int_val)));
+	push(&a);
 	break;
     case CMPLX:
 	push(Ginteger(&a, (int) ceil(a.v.cmplx_val.real)));
