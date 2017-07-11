@@ -1,3 +1,8 @@
+2017-07-11  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wd2d.cpp:  Create an IDXGISurface instead of IDXGISurface1.
+	Bug #1941
+
 2017-07-11 Akira Kakuto <kakuto@fuk.kindai.ac.jp>
 
 	* src/win/wgraph.c (GraphGetBitmap):  Correct mixed up order of

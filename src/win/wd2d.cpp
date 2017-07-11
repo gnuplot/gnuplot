@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.25 2017/07/08 11:20:13 markisch Exp $
+ * $Id: wd2d.cpp,v 1.26 2017/07/08 20:17:37 markisch Exp $
  */
 
 /*
@@ -211,7 +211,7 @@ d2dCreateDeviceSwapChainBitmap(LPGW lpgw)
 		lpgw->pDXGISwapChain = pDXGISwapChain;
 
 	// Get the back buffer as an IDXGISurface (Direct2D doesn't accept an ID3D11Texture2D directly as a render target)
-	IDXGISurface1 * dxgiBackBuffer = NULL;
+	IDXGISurface * dxgiBackBuffer = NULL;
 	if (SUCCEEDED(hr))
 		hr = pDXGISwapChain->GetBuffer(0, IID_PPV_ARGS(&dxgiBackBuffer));
 
