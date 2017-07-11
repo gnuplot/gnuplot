@@ -55,6 +55,7 @@ Changes and new features in 5.2
 * NEW    svg 'standalone' embeds images rather than including by reference
 * NEW    windows terminal supports saving graph as bitmap
 * NEW    windows graph windows can be docked to the wgnuplot text window
+* NEW    windows terminal has experimental Direct2D driver
 * NEW    wxt supports saving graph as EMF on Windows
 * NEW    wxt supports printing on Windows
 * NEW    dumb suports ANSI colors and filled polygons
