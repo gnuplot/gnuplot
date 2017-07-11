@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.59.2.4 2017/06/24 19:50:23 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.59.2.5 2017/07/03 19:55:27 markisch Exp $
  */
 
 /*
@@ -1687,7 +1687,10 @@ SaveAsBitmap(LPGW lpgw)
 	static WCHAR lpstrFileTitle[MAX_PATH] = { '\0' };
 	UINT i;
 
-	/* ask GDI+ about supported encoders */
+	// make sure GDI+ is initialized
+	gdiplusInit();
+
+	// ask GDI+ about supported encoders
 	if (pImageCodecInfo == NULL)
 		if (gdiplusGetEncoders() < 0)
 			std::cerr << "Error:  GDI+ could not retrieve the list of encoders" << std::endl;
