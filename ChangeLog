@@ -1,3 +1,12 @@
+2017-07-11  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgdiplus.cpp (SaveAsBitmap):  Make sure that GDI+ is
+	initialized.  Bug fix.
+
+	* src/win/wgraph.c (TryCreateFont):  Silence font substitution
+	warnings in GDI backend again.  This is consistent with other backends
+	and less annoying.
+
 2017-07-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (test_term): Revise "test" command output.
@@ -32,8 +41,8 @@
 	* src/win/wgdiplus.cpp:  Switching the compositing mode to take the
 	gamma factor into account for filled polygons not only slows down
 	drawing considerably, but also produces output different from
-	other terminals or windows back-ends.  So stop doing that. Also
-	scale the linewidth when drawing anti-aliased polygons. Bug fix.
+	other terminals or windows back-ends.  So stop doing that.  Also
+	scale the linewidth when drawing anti-aliased polygons.  Bug fix.
 
 2017-07-03  Release candidate 5.2.rc1
 

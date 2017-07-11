@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.255.2.4 2017/06/17 20:05:42 markisch Exp $
+ * $Id: wgraph.c,v 1.255.2.5 2017/06/24 19:56:57 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -1052,14 +1052,14 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 		_tcsncpy(lpgw->lf.lfFaceName, GraphDefaultFont(), LF_FACESIZE);
 
 	if (!TryCreateFont(lpgw, NULL, hdc)) {
-		static const char warn_font_not_available[] =
-			"Warning:  font \"" TCHARFMT "\" not available, trying \"" TCHARFMT "\" instead.\n";
+		//static const char warn_font_not_available[] =
+		//	"Warning:  font \"" TCHARFMT "\" not available, trying \"" TCHARFMT "\" instead.\n";
 		static const char err_giving_up[] = "Error:  could not substitute another font. Giving up.\n";
 		if (_tcscmp(lpgw->fontname, lpgw->deffontname) != 0) {
-			fprintf(stderr, warn_font_not_available, lpgw->fontname, lpgw->deffontname);
+			//fprintf(stderr, warn_font_not_available, lpgw->fontname, lpgw->deffontname);
 			if (!TryCreateFont(lpgw, lpgw->deffontname, hdc)) {
 				if (_tcscmp(lpgw->deffontname, GraphDefaultFont()) != 0) {
-					fprintf(stderr, warn_font_not_available, lpgw->deffontname, GraphDefaultFont());
+					//fprintf(stderr, warn_font_not_available, lpgw->deffontname, GraphDefaultFont());
 					if (!TryCreateFont(lpgw, GraphDefaultFont(), hdc)) {
 						fprintf(stderr, err_giving_up);
 					}
@@ -1069,7 +1069,7 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 			}
 		} else {
 			if (_tcscmp(lpgw->fontname, GraphDefaultFont()) != 0) {
-				fprintf(stderr, warn_font_not_available, lpgw->fontname, GraphDefaultFont());
+				//fprintf(stderr, warn_font_not_available, lpgw->fontname, GraphDefaultFont());
 				if (!TryCreateFont(lpgw, GraphDefaultFont(), hdc)) {
 					fprintf(stderr, err_giving_up);
 				}
