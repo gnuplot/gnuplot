@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.268 2017/07/10 10:02:18 markisch Exp $
+ * $Id: wgraph.c,v 1.269 2017/07/10 10:09:07 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -3146,7 +3146,7 @@ GraphGetBitmap(LPGW lpgw)
 	}
 	DeleteDC(mem);
 
-	ReleaseDC(hdc, lpgw->hGraph);
+	ReleaseDC(lpgw->hGraph, hdc);
 
 	return bitmap;
 }

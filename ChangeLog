@@ -1,3 +1,8 @@
+2017-07-11 Akira Kakuto <kakuto@fuk.kindai.ac.jp>
+
+	* src/win/wgraph.c (GraphGetBitmap):  Correct mixed up order of
+	parameters for ReleaseDC().
+
 2017-07-10  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgdiplus.cpp (SaveAsBitmap):  Make sure that GDI+ is
