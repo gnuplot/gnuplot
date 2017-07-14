@@ -142,7 +142,7 @@ $ make install
    If gcc is installed, it is used by default. A different compiler can be
 used by passing its name to configure:
 
-$ ./configure CC=c89
+$ ./configure CC=c99
  
    Any environment settings for CFLAGS are included into the Makefile,
 so please make sure that these are really needed.
@@ -174,7 +174,6 @@ $ ./configure --help
   --disable-x11-mbfonts   disable multi-byte font support for x11
   --disable-x11-external  disable drawing to windows belonging to external apps
   --disable-raise-console spacebar in plot window does not raise console
-  --disable-macros        disable command line macros
   --disable-wxwidgets     wxWidgets terminal (default enabled)
   --enable-backwards-compatibility       enable deprecated syntax
 
@@ -197,11 +196,11 @@ options can have additional arguments:
 
 Linux
 -----
+	
+  ./configure may fail to find lua support if the package configuration tool is
+  installed as "lua5.1" or "lua5.3" rather than "lua".  If necessary, you can fix
+  this by adding a symlink prior to running ./configure as shown below:
 
-Ubuntu:
-	./configure may fail to find lua support because Ubuntu packages it
-	as "lua5.1" or "lua5.3" rather than "lua".  If necessary, you can fix
-	this by adding a symlink prior to running ./configure
 	    ln -s /usr/lib/pkgconfig/lua5.3.pc  /usr/lib/pkgconfig/lua.pc
 
 
@@ -365,15 +364,6 @@ See other sections of the manuals for more information about installing/using
 gnuplot on OS/2.
 
 
-Ultrix, SunOS, other systems with a SysV-like sprintf() function
-----------------------------------------------------------------
-
-The mousing code requires a patch in order to compile properly on these.
-You can download this patch from the contributed scripts section of the
-gnuplot project pages on SourceForge: http://gnuplot.sourceforge.net/scripts/
-Or you can avoid the problem via        ./configure --disable-mouse
-
-
 More details about ./configure --with-PACKAGE[=OPTION]
 ======================================================
 
@@ -420,15 +410,10 @@ non-default location that is not searched by the preprocessor or linker.
 
   --with-gd[=DIR]
 
-   Dto. for Thomas Boutell's gd library. configure determines whether
-   the found library supports gif, png, jpeg, and freetype.  This option
-   is on by default, i.e. configure will check if the library exists,
-   and use it if found, if you don't specify any option regarding this
-   package.
-
-  --with-pdf[=DIR]
-
-    Dto. for the pdf library. This option is on by default.
+   Thomas Boutell's gd library is needed to support jpeg and gif output.
+   It is also one of several options for producing png output.
+   This option is on by default, i.e. configure will check if the library exists,
+   and use it if found.
 
 
 Platform compiler problems
@@ -470,10 +455,6 @@ whenever you re-run configure.
   returning int will be assumed to return int, with possibly
   dangerous consequences. Especially scpecfun.c is vulnerable here.
 
- - HP-UX 9.x
-   It is recommended to use gcc, although the native compiler cc may
-  work with warnings.
-
  - HP-UX 10.x and above
    GCC has known problems on this platform if configured to use HP's
   assembler. The telltale symptom are tic labels all ending up at
@@ -494,6 +475,7 @@ whenever you re-run configure.
  - SunOS / Solaris
   There are known issues with regard to compiler support for Booleans.
   You may have to tweak gnuplot's definition of TBOOLEAN.
+  The plugin demo Makefile may also require editing as noted in comments.
 
 
 Environment variables
@@ -511,10 +493,6 @@ the name of the directory from which to load the initialization file
 GNUPLOT.INI and also to be used as the home directory in ~
 substitution.  See the help on 'start_up' for more information.
 
-HOME is examined as a directory where a .gnuplot startup file might be
-found. See help on "start-up". The Atari/MTOS version uses
-GNUPLOTPATH.
-
 If defined, the environment variable GNUHELP is used for the name of
 the .gih help file, otherwise HELPFILE (defined in makefile or
 command.c) is used.
@@ -524,17 +502,16 @@ help library.
 
 The usual system-wide environment variable is used to locate a command
 line shell to be used for executing commands and starting sub-shells.
-On the DOS family of platforms (including all versions of Windows and
-OS/2) the variable looked at is COMSPEC.  Other platforms will consult
-SHELL.
+On all versions of Windows and OS/2 the variable looked at is COMSPEC.
+Other platforms will consult SHELL.
 
-If gnuplot is configured for the X11 window system, it looks for the
-X11 driver program in GNUPLOT_DRIVER_DIR.  The default position used
-for the driver is fixed by the build process, so you should only have
-to set this if you moved gnuplot_x11 away from its original location.
+The x11 and qt terminals each require an auxilliary program (gnuplot_x11
+gnuplot_qt) to manage the displayed plots.  These are installed by 
+default in /usr/local/libexec/gnuplot/<version>/ but this default can be
+overridden by the environmental variable GNUPLOT_DRIVER_DIR.
 
-GDFONTPATH is the directory where png terminal searches TrueType and
-Adobe Type 1 fonts.  You should set it to directory where files like 
+GDFONTPATH is the directory where the libgd terminals (jpeg png gif)
+search for fonts.  You should set it to directory where files like 
 arial.ttf and Symbol.pfa exist.
 
 GNUPLOT_DEFAULT_GDFONT is the default font to be used by the png and
@@ -542,8 +519,7 @@ jpeg terminal types. This must either be a full path to the font file
 or the face name of a font found in the GDFONTPATH search path.
     
 GNUPLOT_FONTPATH is used by the postscript driver as search path for
-postscript (Adobe Type 1 and Type 2) fonts.  It is also used by the
-svg driver to look for svg or Adobe cef fonts.
+postscript (Adobe Type 1 and Type 2) fonts.
 
 GNUPLOT_PS_DIR is used by the postscript driver to use external prologue
 files. Depending on the build process, gnuplot contains either a builtin
@@ -553,14 +529,13 @@ to test the postscript terminal with custom prologue files.
 GNUPLOT_LIB may be used to define additional search directories for
 data and command files. The variable may contain a single directory
 name, or a list of directories separated by a platform-specific path
-separator, eg. ':' on Unix, or ';' on DOS/Windows/OS/2/Amiga
-platforms. The contents of GNUPLOT_LIB are appended to the `loadpath`
-variable, but not saved with the `save` and `save set` commands.
+separator, eg. ':' on Unix, or ';' on DOS/Windows/OS2 platforms.
+The contents of GNUPLOT_LIB are appended to the `loadpath`
+variable but are not saved with the `save` and `save set` commands.
 
 GNUFITLOG holds the name of a file that saves fit results. The default
 is fit.log. If the name ends with a "/" or "\", it is treated as a
-directory name, and "fit.log" will be created as a file in that
-directory.
+directory name, and "fit.log" will be created as a file in that directory.
 
 The CGI drivers need the CGIPATH environment variable to set the path
 to the CGI agents, and the CGIDISP and/or CGIPRNT environment variables
@@ -581,10 +556,12 @@ choice.
 How to test gnuplot
 ===================
 
-No comprehensive test suite for gnuplot's features has been written to date.
-However, the supplied demo files provide a good method of testing commonly
-used features. All command line examples below assume Unix Bourne shell
-syntax.
+The demo files distributed with the program source provide act also
+as unit tests for various gnuplot syntax, plotting, and terminal features.
+Output can be compared to the on-line demo output collection on the
+gnuplot web site.
+
+All command line examples below assume Unix Bourne shell syntax.
 
    Individual demo files can be run interactively by eg.
 
@@ -601,20 +578,20 @@ just compiled at the same time).
 
    To run the demos in a specified file without interaction, one can use
 
-$ gnuplot simple.dem </dev/null
-$ GNUPLOT_DRIVER_DIR=../src ../src/gnuplot simple.dem </dev/null
+$ gnuplot simple.dem </bin/yes
+$ GNUPLOT_DRIVER_DIR=../src ../src/gnuplot simple.dem </bin/yes
 
    To run all demos non-interactively, use
 
-$ gnuplot all.dem </dev/null
-$ GNUPLOT_DRIVER_DIR=../src ../src/gnuplot all.dem </dev/null
+$ gnuplot all.dem </bin/yes
+$ GNUPLOT_DRIVER_DIR=../src ../src/gnuplot all.dem </bin/yes
    For convenience, the special make target 'check' will run the above
    if you run it from the demo directory of the source tree:
 $ make check
 
    To use a different plotting device than the default, use eg.
 
-$ GNUTERM=dumb GNUPLOT_DRIVER_DIR=../src ../src/gnuplot all.dem </dev/null
+$ GNUTERM=dumb make check
 or
 gnuplot> set term dumb
 gnuplot> load 'all.dem'
