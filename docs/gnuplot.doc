@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1084.2.6 2017/07/08 00:11:35 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1084.2.7 2017/07/08 00:38:33 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -12217,7 +12217,8 @@ Ffigure_multiple_keys
  The resulting xrange and yrange are both [-(rmax-rmin) : +(rmax-rmin)].
  However if you later change the x or y range, for example by zooming, this does
  not change rrange, so data points continue to be clipped against rrange.
- Autoscaling of rmin always results in rmin = 0.
+ Unlike other axes, autoscaling the raxis always results in rmin = 0.
+ The `reverse` autoscaling flag is ignored.
  Note: Setting a negative value for rmin may produce unexpected results.
 3 rtics
 ?commands set rtics
