@@ -1,5 +1,5 @@
 /*
-   $Id: sixel.c,v 1.3 2016/12/05 13:45:26 markisch Exp $
+   $Id: sixel.c,v 1.4 2017/07/14 19:16:29 sfeam Exp $
 
    This code was originally written by kmiya@culti and obtained as a
    tar archive sixel.tar.gz dated 06-Dec-2014 from
@@ -113,7 +113,7 @@ PutFlash()
 {
     int n;
 
-#ifdef USE_SIXEL_VT240	# VT240 Max 255 ?
+#ifdef USE_SIXEL_VT240
     while ( save_count > 255 ) {
 	fprintf(out_fp, "!%d%c", 255, save_pix);
 	save_count -= 255;
