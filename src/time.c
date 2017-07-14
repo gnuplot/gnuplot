@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: time.c,v 1.30 2015/01/16 21:59:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: time.c,v 1.31 2015/10/22 16:16:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - time.c */
@@ -297,7 +297,6 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec)
 	if (yday) {
 
 	    if (tm->tm_yday < 0) {
-		// int_error(DATAFILE, "Illegal day of year");
 		return (NULL);
 	    }
 
@@ -310,11 +309,9 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec)
 	    tm->tm_mday = tm->tm_yday + 1;
 	}
 	if (tm->tm_mon < 0) {
-	    // int_error(DATAFILE, "illegal month");
 	    return (NULL);
 	}
 	if (tm->tm_mday < 1) {
-	    // int_error(DATAFILE, "illegal day of month");
 	    return (NULL);
 	}
 	if (tm->tm_mon > 11) {

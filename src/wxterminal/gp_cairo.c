@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.98 2016/12/17 06:30:19 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.99 2017/04/19 23:17:43 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -1538,8 +1538,9 @@ void gp_cairo_enhanced_open(plot_struct *plot, char* fontname, double fontsize, 
 	}
 
 	if (!gp_cairo_enhanced_opened_string) {
-		// Strip off Bold or Italic and apply immediately
-		// Is it really necessary to preserve plot->fontname?
+		/* Strip off Bold or Italic and apply immediately
+		 * Is it really necessary to preserve plot->fontname?
+		 */
 		char *save_plot_font = strdup(plot->fontname);
 		gp_cairo_set_font(plot, fontname, plot->fontsize);
 		strncpy(gp_cairo_enhanced_font, plot->fontname, sizeof(gp_cairo_enhanced_font));

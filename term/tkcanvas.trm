@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: tkcanvas.trm,v 1.36 2016/06/13 21:22:45 sfeam Exp $
+ * $Id: tkcanvas.trm,v 1.37 2016/07/23 03:34:41 sfeam Exp $
  *
  */
 
@@ -571,7 +571,6 @@ TK_graphics()
 
     /* set background */
     if (tk_background[0] != NUL) {
-	//TK_rectangle(0, 0, TK_XMAX, TK_YMAX, tk_background, "");
 	fprintf(gpoutfile, tk_set_background[tk_script_language], tk_background);
     }
 }
@@ -674,7 +673,6 @@ TK_dashtype(int dt, t_dashtype *custom_dash_pattern)
     TBOOLEAN preserve = FALSE;
 
     if (dt >= 0) {
-	// {PS_SOLID, PS_DASH, PS_DOT, PS_DASHDOT, PS_DASHDOTDOT};
 	dt %= 5;
 	dt += 2;
 	strcpy(tmp_dashpattern, tk_dashtypes[dt]);
@@ -1429,13 +1427,13 @@ TK_enhanced_flush()
 	;
     else if (tk_enhanced_overprint == 1) {
 	/* First pass of overprint, leave position in center of fragment */
-	//fprintf(gpoutfile, "incr xenh [expr ([lindex [$cv bbox $et] 2] - [lindex [$cv bbox $et] 0]) / 2]\n");
+	/* fprintf(gpoutfile, "incr xenh [expr ([lindex [$cv bbox $et] 2] - [lindex [$cv bbox $et] 0]) / 2]\n"); */
 	fprintf(gpoutfile, "set width [expr ([lindex [$cv bbox $et] 2] - [lindex [$cv bbox $et] 0])]\n");
 	fprintf(gpoutfile, "incr xenhb [expr int($width * %f)]\n", + cos(tk_angle * DEG2RAD) / 2);
 	fprintf(gpoutfile, "incr yenhb [expr int($width * %f)]\n", - sin(tk_angle * DEG2RAD) / 2);
     } else {
 	/* Normal case is to update position to end of fragment */
-	//fprintf(gpoutfile, "set xenh [lindex [$cv bbox $et] 2]\n");
+	/* fprintf(gpoutfile, "set xenh [lindex [$cv bbox $et] 2]\n"); */
 	fprintf(gpoutfile, "set width [expr ([lindex [$cv bbox $et] 2] - [lindex [$cv bbox $et] 0])]\n");
 	fprintf(gpoutfile, "incr xenhb [expr int($width * %f)]\n", + cos(tk_angle * DEG2RAD));
 	fprintf(gpoutfile, "incr yenhb [expr int($width * %f)]\n", - sin(tk_angle * DEG2RAD));
@@ -1754,17 +1752,11 @@ static char *tk_gnuplot_xy[] = {
   /* Ruby */
     "def gnuplot_xy(x1s, y1s, x2s, y2s, x1e, y1e, x2e, y2e,\n"
     "      x1m, y1m, x2m, y2m)\n"
-//  "  if (defined &user_gnuplot_coordinates)\n"
-//  "    id = win->find('withtag', 'current')\n"
-//  "    user_gnuplot_coordinates (win, id, x1s, y1s, x2s, y2s,\\\n"
-//  "      x1e, y1e, x2e, y2e, x1m, y1m, x2m, y2m)\n"
-//  "  else\n"
     "    print \" \", x1m!='' ? x1m : 0.5*(x1s+x1e)\n"
     "    print \" \", y1m!='' ? y1m : 0.5*(y1s+y1e)\n"
     "    print \" \", x2m!='' ? x2m : 0.5*(x2s+x2e)\n"
     "    print \" \", y2m!='' ? y2m : 0.5*(y2s+y2e)\n"
     "    print \"\\n\""
-//    "  end\n"
     "end\n",
 
   /* Rexx */

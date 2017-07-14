@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.198 2017/04/01 18:09:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.199 2017/05/16 03:22:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1491,8 +1491,6 @@ ChangeView(int x, int z)
 
 int is_mouse_outside_plot(void)
 {
-    // Here I look at both min/max each time because reversed ranges can make
-    // min > max
 #define CHECK_AXIS_OUTSIDE(real, axis)                                  \
     ( axis_array[axis].min <  VERYLARGE &&                              \
       axis_array[axis].max > -VERYLARGE &&                              \
@@ -1656,7 +1654,6 @@ rescale_around_mouse(double *newmin, double *newmax, int AXIS, double mouse_pos,
 static void
 zoom_in_X(int zoom_key)
 {
-    // I don't check for "outside" here. will do that later
     if (is_mouse_outside_plot()) {
         /* zoom in (X axis only) */
         double w1 = (zoom_key=='+') ? 23./25. : 23./21.;

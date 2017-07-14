@@ -1,3 +1,9 @@
+2017-07-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/mouse.c term/canvas.trm term/emf.trm term/tkcanvas.trm
+	term/sixel.c src/time.c src/wxterminal/gp_cairo.c docs/doc2tex.c:
+	Do not use C++ style comments in C source files.
+
 2017-07-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c (magnitude) src/standard.c(f_abs f_ceil f_floor):

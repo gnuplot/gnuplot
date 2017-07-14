@@ -1,5 +1,5 @@
 /*
-   $Id: sixel.c,v 1.2 2016/12/04 23:11:45 markisch Exp $
+   $Id: sixel.c,v 1.3 2016/12/05 13:45:26 markisch Exp $
 
    This code was originally written by kmiya@culti and obtained as a
    tar archive sixel.tar.gz dated 06-Dec-2014 from
@@ -47,14 +47,14 @@
 #include <string.h>
 #include <gd.h>
 
-// xterm sixel compatible ?
+/* xterm sixel compatible ? */
 #define USE_SIXEL_INITPAL 1
-// sixel true color extension
-// #define USE_SIXEL_TRUECOLOR
-// vt240 sixel compatible ?
-// #define USE_SIXEL_VT240
-// simple histogram
-// #define USE_SIXEL_HISMAP
+/* sixel true color extension */
+/* #define USE_SIXEL_TRUECOLOR */
+/* vt240 sixel compatible ? */
+/* #define USE_SIXEL_VT240 */
+/* simple histogram */
+/* #define USE_SIXEL_HISMAP */
 
 #define PALMAX		1024
 #define HASHMAX 	8
@@ -113,7 +113,7 @@ PutFlash()
 {
     int n;
 
-#ifdef USE_SIXEL_VT240	// VT240 Max 255 ?
+#ifdef USE_SIXEL_VT240	# VT240 Max 255 ?
     while ( save_count > 255 ) {
 	fprintf(out_fp, "!%d%c", 255, save_pix);
 	save_count -= 255;
@@ -121,8 +121,7 @@ PutFlash()
 #endif
 
     if ( save_count > 3 ) {
-	// DECGRI Graphics Repeat Introducer		! Pn Ch
-
+	/* DECGRI Graphics Repeat Introducer ! Pn Ch */
 	fprintf(out_fp, "!%d%c", save_count, save_pix);
     } else {
 	for ( n = 0 ; n < save_count ; n++ )
@@ -155,7 +154,7 @@ PutPixel(int pix)
 static void
 PutPalet(gdImagePtr im, int idx)
 {
-    // DECGCI Graphics Color Introducer			# Pc ; Pu; Px; Py; Pz
+    /* DECGCI Graphics Color Introducer # Pc ; Pu; Px; Py; Pz */
 
     if ( (palet_tab[idx].init & 001) == 0 ) {
  #ifdef USE_SIXEL_TRUECOLOR
@@ -183,21 +182,18 @@ PutPalet(gdImagePtr im, int idx)
 static void
 PutCr()
 {
-    // DECGCR Graphics Carriage Return
-
     fputs("$\n", out_fp);
-    // x = 0;
+    /* x = 0; */
 }
 
 
 static void
 PutLf()
 {
-    // DECGNL Graphics Next Line
-
+    /* DECGNL Graphics Next Line */
     fputs("-\n", out_fp);
-    // x = 0;
-    // y += 6;
+    /* x = 0; */
+    /* y += 6;*/
 }
 
 
@@ -596,12 +592,12 @@ gdImageSixel(gdImagePtr im, FILE *out, int maxPalet, int optTrue, int optFill)
 
 	if ( gdImageTrueColor(im) ) {
 #if GD_MIN_VERSION(2,1,0)
-	    // poor ... but fast
-	    //gdImageTrueColorToPaletteSetMethod(im, GD_QUANT_JQUANT, 0);
-	    // debug version ?
-	    //gdImageTrueColorToPaletteSetMethod(im, GD_QUANT_NEUQUANT, 9);
+	    /* poor ... but fast */
+	    /* gdImageTrueColorToPaletteSetMethod(im, GD_QUANT_JQUANT, 0); */
+	    /* debug version ? */
+	    /* gdImageTrueColorToPaletteSetMethod(im, GD_QUANT_NEUQUANT, 9); */
 
-	    // used libimagequant/pngquant2 best !!
+	    /* used libimagequant/pngquant2 best !! */
 	    gdImageTrueColorToPaletteSetMethod(im, GD_QUANT_LIQ, 0);
 #endif
 	    gdImageTrueColorToPalette(im, 1, maxPalet);
