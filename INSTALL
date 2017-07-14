@@ -2,20 +2,12 @@ Table of contents:
 ==================
 
     * Installation from sources
-	- For the impatient provides a quick overview of configuration and
-	  compilation instructions. 
-	- Lists those options to the configure shell script which are
-	  unique to gnuplot.
-	- Compiling by config/makefile.* for specific platforms.
     * More details about ./configure --with-PACKAGE[=OPTION]
     * Platform compiler problems
     * Environment variables
-	- The environment variables used by running gnuplot.
     * How to test gnuplot
     * Installing WPS object for gnuplot on OS/2
-	- How to install WPS icon for drag&drop.
-    * Compiling Gnuplot with the wxWidgets terminal
-	- Notes about the requirements of the `wxt` terminal.
+    * Compiling Gnuplot with the wxt (wxWidgets) terminal
 
 If you are installing a binary package, you may still want to check out
 some sections of this document, particularly the one discussing
@@ -37,10 +29,16 @@ This script is provided as part of the distributed source package, but if you
 are using sources downloaded directly from a CVS repository you may need to
 regenerate it using the preliminary script "./prepare".
 
-   A complete overview of configure options is below in the Basic
-Installation section. On platforms that do not support GNU
-autoconf/configure look for a suitable makefile in the "config" directory.
-Check "config/README" to see which of them to use for which platform.
+  The ./configure script inspects your system to see what support libraries
+are available, then modifies the gnuplot Makefile and header file config.h
+to use them.  Assuming you have already installed the necessary support
+libraries, the process is:
+
+      ./configure              # prepare Makefile and config.h
+      make                     # build the program and documentation
+      make check               # run unit tests to confirm successful build
+      make install             # install the program and documentation
+
 
 File location defaults
 ----------------------
@@ -556,8 +554,8 @@ choice.
 How to test gnuplot
 ===================
 
-The demo files distributed with the program source provide act also
-as unit tests for various gnuplot syntax, plotting, and terminal features.
+The demo files distributed with the program source act also as unit
+tests for various gnuplot syntax, plotting, and terminal features.
 Output can be compared to the on-line demo output collection on the
 gnuplot web site.
 
