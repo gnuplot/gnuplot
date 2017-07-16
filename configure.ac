@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.ac,v 1.34 2017/06/28 21:35:26 sfeam Exp $
+dnl $Id: configure.ac,v 1.35 2017/07/05 19:17:59 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -288,16 +288,6 @@ AC_CHECK_FUNCS(atexit memcpy memmove memset \
   strcspn strdup strndup strnlen strcasecmp stricmp strncasecmp strnicmp \
   sysinfo tcgetattr vfprintf doprnt uname usleep
 )
-
-AC_CHECK_FUNCS(snprintf, ,
- [  AC_MSG_RESULT([ 
-  WARNING: Could not find a working version of snprintf.
-           If a user provides gnuplot with an improper format statement
-	   then a buffer overflow and/or segfault can result.
-	   Please consider providing snprintf via an external library.
-  ])
-])
-
 
 dnl HBB 20030624: see if signgam is declared by math.h
 AC_CHECK_DECLS([signgam],,,

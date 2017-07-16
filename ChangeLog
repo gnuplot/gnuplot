@@ -1,3 +1,9 @@
+2017-07-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+ 	* config/config.cyg config/config.mgw config/config.nt config/config.os2
+	config/config.oww configure.ac src/internal.c term/post.trm:
+	snprintf() is now required.  Remove vestigial tests for HAVE_SNPRINTF.
+
 2017-07-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c term/canvas.trm term/emf.trm term/tkcanvas.trm

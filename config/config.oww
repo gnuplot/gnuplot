@@ -258,9 +258,6 @@
 /* Define to 1 if you have the `sleep' function. */
 #define HAVE_SLEEP 1
 
-/* Define to 1 if you have the `snprintf' function. */
-#define HAVE_SNPRINTF 1
-
 /* Define to 1 if stdbool.h conforms to C99. */
 #define HAVE_STDBOOL_H 1
 

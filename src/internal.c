@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.101 2017/07/07 00:02:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.102 2017/07/11 22:51:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1164,11 +1164,7 @@ f_concatenate(union argument *arg)
 	int i = b.v.int_val;
 	b.type = STRING;
 	b.v.string_val = (char *)gp_alloc(32,"str_const");
-#ifdef HAVE_SNPRINTF
 	snprintf(b.v.string_val,32,"%d",i);
-#else
-	sprintf(b.v.string_val,"%d",i);
-#endif
     }
 
     if (a.type != STRING || b.type != STRING)
@@ -1515,7 +1511,6 @@ f_sprintf(union argument *arg)
 	if ( spec_type != STRING && next_param->type == STRING )
 	    int_error(NO_CARET,"f_sprintf: attempt to print string value with numeric format");
 
-#ifdef HAVE_SNPRINTF
 	/* Use the format to print next arg */
 	switch(spec_type) {
 	case INTGR:
@@ -1533,22 +1528,6 @@ f_sprintf(union argument *arg)
 	default:
 	    int_error(NO_CARET,"internal error: invalid spec_type");
 	}
-#else
-	/* FIXME - this is bad; we should dummy up an snprintf equivalent */
-	switch(spec_type) {
-	case INTGR:
-	    sprintf(outpos, next_start, (int)real(next_param));
-	    break;
-	case CMPLX:
-	    sprintf(outpos, next_start, real(next_param));
-	    break;
-	case STRING:
-	    sprintf(outpos, next_start, next_param->v.string_val);
-	    break;
-	default:
-	    int_error(NO_CARET,"internal error: invalid spec_type");
-	}
-#endif
 
 	next_start[next_length] = tempchar;
 	next_start += next_length;

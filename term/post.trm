@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.298 2017/05/30 20:20:51 sfeam Exp $
+ * $Id: post.trm,v 1.299 2017/06/14 18:36:36 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2589,19 +2589,11 @@ ENHPS_OPEN(
 		fontname = ps_enh_font;
 	    else
 		PS_RememberFont(fontname);
-#ifdef HAVE_SNPRINTF
 	    snprintf(ENHps_opensequence, safelen, "[(%s) %.1f %.1f %s %s %d ",
 		    fontname, fontsize, base,
 		    widthflag ? "true" : "false",
 		    show_this ? "true" : "false",
 		    overprint);
-#else
-	    sprintf(ENHps_opensequence, "[(%s) %.1f %.1f %s %s %d ",
-		    fontname, fontsize, base,
-		    widthflag ? "true" : "false",
-		    show_this ? "true" : "false",
-		    overprint);
-#endif
 	    fprintf(gppsfile, "%s(", ENHps_opensequence);
 	    ENHps_opened_string = TRUE;
 	}
