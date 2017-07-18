@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.82 2017/05/17 21:03:46 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.83 2017/06/13 00:20:11 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -12354,9 +12354,10 @@ Ffigure_missing
 ?set table
 ?table
  When `table` mode is enabled, `plot` and `splot` commands print out a
- multicolumn text table of X Y {Z} R values rather than creating an actual
- plot on the current terminal.  The character R takes on one of three values:
- "i" if the point is in the active range, "o" if it is out-of-range, or "u"
+ multicolumn text table of values
+      X Y {Z} <flag>
+ rather than creating an actual plot on the current terminal. The flag character
+ is "i" if the point is in the active range, "o" if it is out-of-range, or "u"
  if it is undefined.  The data format is determined by the format of the axis
  tickmarks (see `set format`), and the columns are separated by single spaces.
  This can be useful if you want to generate contours and then save them for
@@ -12374,13 +12375,23 @@ Ffigure_missing
  `inline data`. You must explicitly `unset table` in order to go back to normal
  plotting on the current terminal.
 
- To avoid any style-dependent processing of the input data (smoothing,
- errorbar expansion, secondary range checking, etc), or to increase the number
- of columns that can be tabulated, you can use the keyword "table" instead of a
- normal plot style.  For example
+ See also `plot with table`.
+4 plot with table
+?plot with table
+?with table
+ To avoid any style-dependent processing of the input data being tabulated
+ (smoothing, errorbar expansion, secondary range checking, etc), or to increase
+ the number of columns that can be tabulated, use the keyword "table" instead of
+ a normal plot style.  In this case the output does not contain an extra, last,
+ column of flags `i`, `o`, `u` indicated inrange/outrange/undefined.
+ The destination for output must first be specified with `set table <where>`.
+ For example
 
       set table
       plot <file> using 1:2:3:4:5:6:7:8:9:10 with table
+
+ Because there is no actual plot style in this case the columns do not
+ correspond to specific axes.  Therefore xrange, yrange, etc are ignored.
 3 terminal
 ?commands set terminal
 ?commands show terminal

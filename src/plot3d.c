@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.231.2.8 2016/10/27 18:43:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.231.2.9 2016/12/04 00:29:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1603,9 +1603,6 @@ eval_3dplots()
 			}
 		    }
 
-		    if (this_plot->plot_style == TABLESTYLE)
-			int_error(NO_CARET, "use `plot with table` rather than `splot with table`"); 
-
 		    set_with = TRUE;
 		    continue;
 		}
@@ -1738,6 +1735,9 @@ eval_3dplots()
 
 	    if (duplication)
 		int_error(c_token, "duplicated or contradicting arguments in plot options");
+
+	    if (this_plot->plot_style == TABLESTYLE)
+		int_error(NO_CARET, "use `plot with table` rather than `splot with table`"); 
 
 	    /* set default values for title if this has not been specified */
 	    this_plot->title_is_filename = FALSE;

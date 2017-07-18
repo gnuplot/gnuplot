@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.38 2017/03/05 18:37:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.39 2017/03/10 00:49:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2372,12 +2372,12 @@ eval_plots()
 			    int_warn(c_token, "This plot style is only for datafiles, reverting to \"points\"");
 			    this_plot->plot_style = POINTSTYLE;
 			}
-		    if (this_plot->plot_style == TABLESTYLE) {
-			if (!table_mode)
-			    int_error(c_token, "'with table' requires a previous 'set table'");
-		    }
 
 		    set_with = TRUE;
+		    continue;
+		}
+
+		if (this_plot->plot_style == TABLESTYLE) {
 		    continue;
 		}
 
@@ -2546,6 +2546,9 @@ eval_plots()
 
 	    if (duplication)
 		int_error(c_token, "duplicated or contradicting arguments in plot options");
+
+	    if (this_plot->plot_style == TABLESTYLE && !table_mode)
+		int_error(NO_CARET, "'with table' requires a previous 'set table'");
 
 	    /* set default values for title if this has not been specified */
 	    this_plot->title_is_filename = FALSE;
@@ -3075,6 +3078,10 @@ eval_plots()
 		    if (parametric) {   /* toggle parametric axes */
 			in_parametric = !in_parametric;
 		    }
+
+		    if (this_plot->plot_style == TABLESTYLE)
+			int_warn(NO_CARET, "'with table' requires a data source not a pure function");
+
 		    plot_func.at = at_ptr;
 
 		    if (!parametric && !polar) {

@@ -15,6 +15,7 @@ Changes in 5.0.7
 * FIX sanity check to catch "plot '+' binary"
 * FIX sanity check for NULL format passed to gprintf
 * FIX sanity check for empty image data structure on input
+* FIX more consistent handling of plot 'with table'
 
 Changes in 5.0.6
 ================
