@@ -4,6 +4,7 @@
 	Fix inconsistent handling of "plot ... with table".
 	E.g. "set style data table; plot foo" tried to both plot and tabulate.
 	Warn that function plots are not handled.
+	Do not invalidate yrange.
 
 2017-07-11  Bastian Maerkisch  <bmaerkisch@web.de>
 
