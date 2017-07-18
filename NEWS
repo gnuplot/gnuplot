@@ -3,6 +3,7 @@ Changes since 5.2.rc2
 * CHANGE add caca terminal documentation to the user manual
 * CHANGE revise output of "test" command
 * FIX copy environmental variable GNUTERM to intern variable on entry
+* FIX more consistent handling of plot 'with table'
 
 
 Changes in 5.2.rc2

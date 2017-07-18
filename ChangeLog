@@ -1,3 +1,10 @@
+2017-07-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c src/plot3d.c docs/gnuplot.doc:
+	Fix inconsistent handling of "plot ... with table".
+	E.g. "set style data table; plot foo" tried to both plot and tabulate.
+	Warn that function plots are not handled.
+
 2017-07-11  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgdiplus.cpp (SaveAsBitmap):  Make sure that GDI+ is
