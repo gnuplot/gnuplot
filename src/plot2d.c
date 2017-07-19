@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.434 2017/07/18 20:25:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.435 2017/07/18 21:30:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2808,9 +2808,6 @@ eval_plots()
 			CB_AXIS.min = 0;
 		    if (CB_AXIS.autoscale & AUTOSCALE_MAX)
 			CB_AXIS.max = 255;
-		}
-		if (this_plot->plot_style == TABLESTYLE) {
-		    Y_AXIS.min = Y_AXIS.max = not_a_number();
 		}
 		if (polar) {
 		    polar_range_fiddling(this_plot);
