@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.436 2017/07/19 03:25:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.437 2017/07/20 18:04:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -744,7 +744,7 @@ get_data(struct curve_points *current_plot)
 	    }
 
 	    if (current_plot->plot_style == TABLESTYLE) {
-		/* tabulate_one_line()
+		/* tabulate_one_line() applies an input data filter and 
 		 * returns TRUE if the line was accepted and written out
 		 */
 		tabulate_one_line(v, df_strings, j);
@@ -2083,6 +2083,10 @@ eval_plots()
 		this_plot->plot_smooth = SMOOTH_NONE;
 		this_plot->filledcurves_options.opt_given = 0;
 
+		/* Only relevant to "with table" */
+		free_at(table_filter_at);
+		table_filter_at = NULL;
+
 		/* up to MAXDATACOLS cols */
 		df_set_plot_mode(MODE_PLOT);    /* Needed for binary datafiles */
 		specs = df_open(name_str, MAXDATACOLS, this_plot);
@@ -2303,6 +2307,18 @@ eval_plots()
 
 		    set_with = TRUE;
 		    continue;
+		}
+
+		if (this_plot->plot_style == TABLESTYLE) {
+		    if (equals(c_token,"if")) {
+			if (table_filter_at) {
+			    duplication = TRUE;
+			    break;
+			}
+			c_token++;
+			table_filter_at = perm_at();
+			continue;
+		    }
 		}
 
 		/* pick up line/point specs and other style-specific keywords

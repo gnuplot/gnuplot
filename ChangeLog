@@ -15,6 +15,16 @@
 	    set table {separator {comma|tab|whitespace|"<char>"}}
 	allows "plot with table" to create csv files.
 
+	* src/plot2d.c src/tabulate.c src/tabulate.h:  EXPERIMENTAL feature
+	(version in 5.3 is subject to change and may never appear in a released
+	version in this form).
+	    plot ... with table if <expression>
+	where <expression> can access input data fields by column number, etc,
+	as if it were a using specification. Implemented only for "with table"
+	but the mechanism could just as easily work for other plot styles.
+	Example:
+	    plot <file> using 1:2:($4+$5) with table if (strcol(3) eq "Red")
+
 2017-07-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c src/plot3d.c:  Fix inconsistent handling of 

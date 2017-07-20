@@ -1,5 +1,7 @@
 Changes not in 5.2
 ==================
+* NEW set table separator {tab|comma|"char"}
+* NEW plot ... with table if <expression>
 * CHANGE remove deprecated command "update"
 * CHANGE remove deprecated option "thru"
 * CHANGE special case optimization of nonlinear code to speed up logscale

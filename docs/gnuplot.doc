@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1097 2017/07/20 18:04:18 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1098 2017/07/20 19:05:59 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -12979,6 +12979,16 @@ Ffigure_multiple_keys
 
       plot <file> using ("File 1"):1:2:3 with table
       plot <file> using (sprintf("%4.2f",$1)) : (sprintf("%4.2f",$3)) with table
+
+ [EXPERIMENTAL] To select only a subset of the data points for tabulation you
+ can provide an input filter condition (`if <expression>`) at the end of the
+ command.  Note that the input filter may reference data columns that are not
+ part of the output.  This feature may change substantially before appearing in
+ a released version of gnuplot.
+
+      plot <file> using 1:2:($4+$5) with table if (strcol(3) eq "Red")
+      plot <file> using 1:2:($4+$5) with table if (10. < $1 && $1 < 100.)
+      plot <file> using 1:2:($4+$5) with table if (filter($6,$7) != 0)
 3 terminal
 ?commands set terminal
 ?commands show terminal
