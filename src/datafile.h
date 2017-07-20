@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.52 2016/08/19 16:51:58 sfeam Exp $
+ * $Id: datafile.h,v 1.53 2017/06/01 23:23:43 sfeam Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -100,6 +100,7 @@ extern AXIS_INDEX df_axis[];
 
 /* Returned to caller by df_readline() */
 extern char *df_tokens[];
+extern struct value df_strings[];	/* used only by TABLESTYLE */
 
 /* number of columns in first row of data return to user in STATS_columns */
 extern int df_last_col;

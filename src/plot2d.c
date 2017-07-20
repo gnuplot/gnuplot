@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.435 2017/07/18 21:30:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.436 2017/07/19 03:25:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -744,32 +744,10 @@ get_data(struct curve_points *current_plot)
 	    }
 
 	    if (current_plot->plot_style == TABLESTYLE) {
-	    /* Echo the values directly to the output file. FIXME: formats? */
-		int col;
-		int dummy_type = INRANGE;
-		FILE *outfile = (table_outfile) ? table_outfile : gpoutfile;
-
-		if (table_var == NULL) {
-		    for (col = 0; col < j; col++)
-			fprintf(outfile, " %g", v[col]);
-		    fprintf(outfile, "\n");
-		} else {
-		    char buf[64]; /* buffer large enough to hold %g + 2 extra chars */
-		    size_t size = sizeof(buf);
-		    char *line = (char *) gp_alloc(size, "");
-		    size_t len = 0;
-
-		    line[0] = NUL;
-		    for (col = 0; col < j; col++) {
-			snprintf(buf, sizeof(buf), " %g", v[col]);
-			len = strappend(&line, &size, len, buf);
-		    }
-		    append_to_datablock(&table_var->udv_value, line);
-		}
-		/* This tracks x range and avoids "invalid x range" error message */
-		STORE_WITH_LOG_AND_UPDATE_RANGE( current_plot->points[i].x,
-			v[0], dummy_type, current_plot->x_axis,
-			current_plot->noautoscale, NOOP, NOOP );
+		/* tabulate_one_line()
+		 * returns TRUE if the line was accepted and written out
+		 */
+		tabulate_one_line(v, df_strings, j);
 		continue;
 	    }
 
@@ -1922,7 +1900,8 @@ eval_plots()
     struct curve_points *this_plot = NULL;
     struct curve_points **tp_ptr;
     t_uses_axis uses_axis[AXIS_ARRAY_SIZE];
-    int some_functions = 0;
+    TBOOLEAN some_functions = FALSE;
+    TBOOLEAN some_tables = FALSE;
     int plot_num, line_num;
     TBOOLEAN was_definition = FALSE;
     int pattern_num;
@@ -2131,7 +2110,7 @@ eval_plots()
 
 		/* function to plot */
 
-		some_functions = 1;
+		some_functions = TRUE;
 		if (parametric) /* working on x parametric function */
 		    in_parametric = !in_parametric;
 		if (*tp_ptr) {
@@ -2492,8 +2471,12 @@ eval_plots()
 	    if (duplication)
 		int_error(c_token, "duplicated or contradicting arguments in plot options");
 
-	    if (this_plot->plot_style == TABLESTYLE && !table_mode)
-		int_error(NO_CARET, "'with table' requires a previous 'set table'");
+	    if (this_plot->plot_style == TABLESTYLE) {
+		if (!table_mode)
+		    int_error(NO_CARET, "'with table' requires a previous 'set table'");
+		expect_string( -1 );
+		some_tables = TRUE;
+	    }
 
 	    /* set default values for title if this has not been specified */
 	    this_plot->title_is_filename = FALSE;
@@ -2941,7 +2924,7 @@ eval_plots()
 	 * at +/- VERYLARGE.  The default range for bare functions is [-10:10].
 	 * Or we could give up and fall through to "x range invalid".
 	 */
-	if (some_functions && uses_axis[FIRST_X_AXIS])
+	if ((some_functions || some_tables) && uses_axis[FIRST_X_AXIS])
 	    if (axis_array[FIRST_X_AXIS].max == -VERYLARGE ||
 		axis_array[FIRST_X_AXIS].min == VERYLARGE) {
 		    axis_array[FIRST_X_AXIS].min = -10;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.345 2017/06/01 23:23:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.346 2017/06/13 00:24:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -286,6 +286,8 @@ static int fast_columns;        /* corey@cac optimization */
 char *df_tokens[MAXDATACOLS];			/* filled in by df_tokenise */
 static char *df_stringexpression[MAXDATACOLS];	/* filled in after evaluate_at() */
 static struct curve_points *df_current_plot;	/* used to process histogram labels + key entries */
+struct value df_strings[MAXDATACOLS];		/* used only by TABLESTYLE */
+static TBOOLEAN df_tabulate_strings = FALSE;	/* used only by TABLESTYLE */
 
 /* These control the handling of fields in the first row of a data file.
  * See also parse_1st_row_as_headers.
@@ -1264,6 +1266,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     df_pseudospan = 0;
     df_datablock = FALSE;
     df_datablock_line = NULL;
+    df_tabulate_strings = FALSE;
 
     if (plot) {
 
@@ -1988,6 +1991,12 @@ df_readascii(double v[], int max)
 	    if (limit > max + df_no_tic_specs)
 		limit = max + df_no_tic_specs;
 
+	    /* Used only by TABLESTYLE */
+	    if (df_tabulate_strings)
+		for (output = 0; output < limit; ++output)
+		    gpfree_string(&df_strings[output]);
+
+	    /* The real processing starts here */
 	    for (output = 0; output < limit; ++output) {
 		/* if there was no using spec, column is output+1 and at=NULL */
 		int column = use_spec[output].column;
@@ -2119,6 +2128,11 @@ df_readascii(double v[], int max)
 
 		    if (a.type == STRING) {
 			v[output] = not_a_number();	/* found a string, not a number */
+			if (df_tabulate_strings) {
+			    /* Save for TABLESTYLE */
+			    df_strings[output].type = STRING;
+			    df_strings[output].v.string_val = gp_strdup(a.v.string_val);
+			}
 
 			/* This string value will get parsed as if it were a data column */
 			/* so put it in quotes to allow embedded whitespace.             */
@@ -2764,6 +2778,12 @@ valid_format(const char *format)
 int
 expect_string(const char column)
 {
+    /* Used only by TABLESTYLE */
+    if (column <= 0) {
+	df_tabulate_strings = TRUE;
+	return -1;
+    }
+
     use_spec[column-1].expected_type = CT_STRING;
     /* Nasty hack to make 'plot "file" using "A":"B":"C" with labels' work.
      * The case of named columns is handled by create_call_column_at(),
