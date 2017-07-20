@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1096 2017/07/14 01:04:31 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1097 2017/07/20 18:04:18 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -12970,8 +12970,8 @@ Ffigure_multiple_keys
       set table $DATABLOCK1
       plot <file> using 1:2:3:4:($5+$6):(func($7)):8:9:10 with table
 
- Because there is no actual plot style in this case the columns have no 
- correspondence to specific axes.  Therefore xrange, yrange, etc are ignored.
+ Because there is no actual plot style in this case the columns do not
+ correspond to specific axes.  Therefore xrange, yrange, etc are ignored.
 
  If a `using` term evaluates to a string, the string is tabulated.
  Numerical data is always written with format %g.  If you want some other format

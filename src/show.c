@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.385 2017/05/05 06:09:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.386 2017/06/10 18:05:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -59,6 +59,7 @@ static char *RCSid() { return RCSid("$Id: show.c,v 1.385 2017/05/05 06:09:32 sfe
 #include "plot3d.h"
 #include "save.h"
 #include "tables.h"
+#include "tabulate.h"
 #include "util.h"
 #include "term_api.h"
 #include "variable.h"
@@ -160,6 +161,7 @@ static void show_loadpath __PROTO((void));
 static void show_fontpath __PROTO((void));
 static void show_zero __PROTO((void));
 static void show_datafile __PROTO((void));
+static void show_table __PROTO((void));
 static void show_micro __PROTO((void));
 static void show_minus_sign __PROTO((void));
 #ifdef USE_MOUSE
@@ -575,6 +577,9 @@ show_command()
 	break;
     case S_DATAFILE:
 	show_datafile();
+	break;
+    case S_TABLE:
+	show_table();
 	break;
 #ifdef USE_MOUSE
     case S_MOUSE:
@@ -3101,6 +3106,23 @@ show_datafile()
 
     if (!END_OF_COMMAND)
 	c_token++;
+}
+
+/* process 'show table' command */
+static void
+show_table()
+{
+    char foo[2] = {0,0};
+    foo[0] = (table_sep && *table_sep) ? *table_sep : '\t';
+    SHOW_ALL_NL;
+    if (table_mode)
+	fprintf(stderr, "\ttable mode is on, field separator %s\n",
+		foo[0] == '\t' ? "tab" :
+		foo[0] == ',' ? "comma" :
+		foo[0] == ' ' ? "whitespace" :
+		foo);
+    else
+	fprintf(stderr, "\ttable mode is off\n");
 }
 
 #ifdef USE_MOUSE

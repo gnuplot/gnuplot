@@ -2,7 +2,7 @@
 
 	* src/datafile.c (df_open df_readascii expect_string) src/datafile.h
 	src/plot2d.c src/tabulate.c src/tabulate.h docs/gnuplot.doc:
-	Move code for "plot with tables" into tabulate.c (tabulate_one_line).
+	Move code for "plot with table" into tabulate.c (tabulate_one_line).
 	Plot styles (e.g. "with labels") already call expect_string(column) to
 	signal that a particular input column is to be treated as a string.
 	Now we add special case so that "with table" can use expect_string(-1)
@@ -10,6 +10,10 @@
 	evaluates to a string.  This allows "plot ... with table" to create
 	tables containing strings and to use sprintf/gprintf to format
 	numerical output.
+
+	* src/set.c (set_separator) src/show.c (show_table):  New command option
+	    set table {separator {comma|tab|whitespace|"<char>"}}
+	allows "plot with table" to create csv files.
 
 2017-07-18  Ethan A Merritt  <merritt@u.washington.edu>
 
