@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.51 2016/03/21 23:13:47 sfeam Exp $
+ * $Id: datafile.h,v 1.52 2016/08/19 16:51:58 sfeam Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -104,6 +104,7 @@ extern struct udft_entry ydata_func; /* deprecated "thru" function */
 
 /* Returned to caller by df_readline() */
 extern char *df_tokens[];
+extern struct value df_strings[];	/* used only by TABLESTYLE */
 
 /* number of columns in first row of data return to user in STATS_columns */
 extern int df_last_col;

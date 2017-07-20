@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1084.2.8 2017/07/14 01:04:23 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1084.2.9 2017/07/18 20:25:39 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -12950,6 +12950,13 @@ Ffigure_multiple_keys
 
  Because there is no actual plot style in this case the columns do not
  correspond to specific axes.  Therefore xrange, yrange, etc are ignored.
+
+ If a `using` term evaluates to a string, the string is tabulated.
+ Numerical data is always written with format %g.  If you want some other format
+ use sprintf or gprintf to create a formatted string.
+
+      plot <file> using ("File 1"):1:2:3 with table
+      plot <file> using (sprintf("%4.2f",$1)) : (sprintf("%4.2f",$3)) with table
 3 terminal
 ?commands set terminal
 ?commands show terminal

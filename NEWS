@@ -1,8 +1,9 @@
 Changes since 5.2.rc2
 ====================
+* NEW "plot with table" can handle string-valued output columns
 * CHANGE add caca terminal documentation to the user manual
 * CHANGE revise output of "test" command
-* FIX copy environmental variable GNUTERM to intern variable on entry
+* FIX copy environmental variable GNUTERM to internal variable on entry
 * FIX more consistent handling of plot 'with table'
 
 

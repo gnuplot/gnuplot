@@ -1,3 +1,16 @@
+2017-07-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_open df_readascii expect_string) src/datafile.h
+	src/plot2d.c src/tabulate.c src/tabulate.h docs/gnuplot.doc:
+	Move code for "plot with tables" into tabulate.c (tabulate_one_line).
+	Plot styles (e.g. "with labels") already call expect_string(column) to
+	signal that a particular input column is to be treated as a string.
+	Now we add special case so that "with table" can use expect_string(-1)
+	to signal that any column is treated as a string if its using specifier
+	evaluates to a string.  This allows "plot ... with table" to create
+	tables containing strings and to use sprintf/gprintf to format
+	numerical output.
+
 2017-07-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c src/plot3d.c docs/gnuplot.doc:
