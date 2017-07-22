@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.172 2017/06/03 22:27:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.173 2017/06/18 20:39:15 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1591,6 +1591,7 @@ fit_command()
     double tmpd;
     time_t timer;
     int token1, token2, token3;
+    int fit_token;
     char *tmp, *file_name;
     TBOOLEAN zero_initial_value;
     AXIS *fit_xaxis, *fit_yaxis, *fit_zaxis;
@@ -1602,7 +1603,7 @@ fit_command()
     fit_yaxis = &axis_array[FIRST_Y_AXIS];
     fit_zaxis = &axis_array[FIRST_Z_AXIS];
 
-    c_token++;
+    fit_token = c_token++;
 
     /* First look for a restricted fit range... */
     /* Start with the current range limits on variable 1 ("x"),
@@ -2273,15 +2274,12 @@ fit_command()
 	free(last_dummy_var[i]);
 	last_dummy_var[i] = gp_strdup(c_dummy_var[i]);
     }
-    /* remember last fit command for 'save' */
+    /* remember last fit command for 'save fit' */
+    /* FIXME: This breaks if there is a ; internal to the fit command */
     free(last_fit_command);
-    last_fit_command = strdup(gp_input_line);
-    for (i = 0; i < num_tokens; i++) {
-	if (equals(i,";")) {
-	    last_fit_command[token[i].start_index] = '\0';
-	    break;
-	}
-    }
+    last_fit_command = strdup(&gp_input_line[token[fit_token].start_index]);
+    if (strchr(last_fit_command,';'))
+	*strchr(last_fit_command,';') = '\0';
     /* save fit command to user variable */
     fill_gpval_string("GPVAL_LAST_FIT", last_fit_command);
 }
