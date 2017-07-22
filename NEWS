@@ -16,6 +16,7 @@ Changes in 5.0.7
 * FIX sanity check for NULL format passed to gprintf
 * FIX sanity check for empty image data structure on input
 * FIX more consistent handling of plot 'with table'
+* FIX incorrect, possibly empty, command string was saved for previous fit
 
 Changes in 5.0.6
 ================

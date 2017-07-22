@@ -1,3 +1,11 @@
+2017-07-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/fit.c:  The code saving the previous "fit" command incorrectly
+	assumed that "fit" must be the first thing on the input line.  This
+	is clearly not true, particularly when the command is inside a {}
+	bracketed clause since the entire clause acts as one long input line.
+	Bug #1946
+
 2017-07-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c src/plot3d.c docs/gnuplot.doc:

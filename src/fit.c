@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.145.2.15 2016/04/28 04:00:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.145.2.16 2016/05/13 17:28:17 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1841,10 +1841,11 @@ fit_command()
     double tmpd;
     time_t timer;
     int token1, token2, token3;
+    int fit_token;
     char *tmp, *file_name;
     TBOOLEAN zero_initial_value;
 
-    c_token++;
+    fit_token = c_token++;
 
     /* FIXME EAM - I don't understand what these are needed for. */
     x_axis = FIRST_X_AXIS;
@@ -2521,14 +2522,11 @@ fit_command()
 	last_dummy_var[i] = gp_strdup(c_dummy_var[i]);
     }
     /* remember last fit command for 'save' */
+    /* FIXME: This breaks if there is a ; internal to the fit command */
     free(last_fit_command);
-    last_fit_command = strdup(gp_input_line);
-    for (i = 0; i < num_tokens; i++) {
-	if (equals(i,";")) {
-	    last_fit_command[token[i].start_index] = '\0';
-	    break;
-	}
-    }
+    last_fit_command = strdup(&gp_input_line[token[fit_token].start_index]);
+    if (strchr(last_fit_command,';'))
+	*strchr(last_fit_command,';') = '\0';
     /* save fit command to user variable */
     fill_gpval_string("GPVAL_LAST_FIT", last_fit_command);
 }
