@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.292.2.14 2016/10/15 09:16:07 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.292.2.15 2017/03/02 18:24:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1889,6 +1889,7 @@ save_command()
 	case SAVE_SET:
 	case SAVE_TERMINAL:
 	case SAVE_VARS:
+	case SAVE_FIT:
 	    c_token++;
 	    break;
 	default:
@@ -1924,6 +1925,9 @@ save_command()
 	break;
     case SAVE_VARS:
 	    save_variables(fp);
+	break;
+    case SAVE_FIT:
+	    save_fit(fp);
 	break;
     default:
 	    save_all(fp);
@@ -2141,6 +2145,7 @@ test_command()
 }
 
 
+/* Begin DEPRECATED section */
 /* process the 'update' command */
 void
 update_command()
@@ -2160,6 +2165,7 @@ update_command()
     free(npfname);
     free(opfname);
 }
+/* End DEPRECATED section */
 
 /* the "import" command is only implemented if support is configured for */
 /* using functions from external shared objects as plugins. */

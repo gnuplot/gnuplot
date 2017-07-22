@@ -1,5 +1,12 @@
 2017-07-22  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/command.c src/fit.c src/fit.h src/tables.c src/tables.h
+	docs/gnuplot.doc:  Deprecate command "update" in favor of new command
+	"save fit <filename>".  "update" remains for backward compatability but
+	will be removed in 5.3.
+
+2017-07-22  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* src/fit.c:  The code saving the previous "fit" command incorrectly
 	assumed that "fit" must be the first thing on the input line.  This
 	is clearly not true, particularly when the command is inside a {}

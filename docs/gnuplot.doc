@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.83 2017/06/13 00:20:11 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.84 2017/07/18 20:25:57 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4586,8 +4586,8 @@ Ffigure_mapcontours
  had previously plotted both the data and the fitting function in one graph,
  you can display the current state of the fit.
 
- Once `fit` has finished, the `update` command may be used to store final
- values in a file for subsequent use as a parameter file.   See `update`
+ Once `fit` has finished, the `save fit` command may be used to store final
+ values in a file for subsequent use as a parameter file.   See `save fit`
  for details.
 3 adjustable parameters
 ?commands fit parameters
@@ -4970,9 +4970,7 @@ Ffigure_mapcontours
 
  The two forms of the `via` argument to `fit` serve two largely distinct
  purposes.  The `via "file"` form is best used for (possibly unattended) batch
- operation, where you just supply the startup values in a file and can later
- use `update` to copy the results back into another (or the same) parameter
- file.
+ operation, where you supply the starting parameter values in a file.
 
  The `via var1, var2, ...` form is best used interactively, where the command
  history mechanism may be used to edit the list of parameters to be fitted or
@@ -7204,15 +7202,11 @@ Ffigure_mapcontours
 ?commands save
 ?save set
 ?save
- The `save` command saves user-defined functions, variables, the `set
- term` status, all `set` options, or all of these, plus the last `plot`
- (`splot`) command to the specified file.
-
+?save fit
  Syntax:
-       save  {<option>} '<filename>'
+       save  {functions | variables | terminal | set | fit} '<filename>'
 
- where <option> is `functions`, `variables`, `terminal` or `set`. If
- no option is used, `gnuplot` saves functions, variables, `set`
+ If no option is specified, `gnuplot` saves functions, variables, `set`
  options and the last `plot` (`splot`) command.
 
  `save`d files are written in text format and may be read by the
@@ -7229,6 +7223,10 @@ Ffigure_mapcontours
  `terminal` status. Note that for a single gnuplot session you may
  rather use the other method of saving and restoring current terminal
  by the commands `set term push` and `set term pop`, see `set term`.
+
+ `save fit` saves only the variables used in the most recent `fit` command.
+ The saved file may be used as a parameter file to initialize future fit
+ commands using the `via` keyword.
 
  The filename must be enclosed in quotes.
 
@@ -14417,9 +14415,16 @@ Ffigure_missing
 2 update
 ?commands update
 ?update
+ Note: This command is DEPRECATED.  Use `save fit` instead.
+
+ The `update` command remains in this version for backwards compatibility but
+ will be removed in a future version.
+
+ Syntax:
+       update <filename> {<filename>}
+
  This command updates the current values of variables stored in the given
- file, which has to be formatted as an initial-value file (as described in the
- `fit` section).
+ file, which must be formatted as an initial-value file (see `fit`).
 
  If the file name does not exist, a new file is created containing all
  currently defined user variables. All variables not used in the last fit
@@ -14438,8 +14443,6 @@ Ffigure_missing
  If renaming is not possible because that file already exists, update aborts
  with an error message. [Renaming is not done at all on VMS systems, since
  they use file-versioning.] 
-
- Please see `fit` for more information.
 2 While
 ?while
 ?commands while

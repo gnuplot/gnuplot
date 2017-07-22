@@ -1,5 +1,5 @@
 /*
- * $Id: fit.h,v 1.29.2.1 2014/09/21 04:54:32 sfeam Exp $
+ * $Id: fit.h,v 1.29.2.2 2015/02/26 18:43:46 sfeam Exp $
  */
 
 /* GNUPLOT - fit.h */
@@ -91,6 +91,7 @@ void error_ex(int t_num, const char *str, ...);
 #endif
 void init_fit __PROTO((void));
 void update __PROTO((char *pfile, char *npfile));
+void save_fit __PROTO((FILE *fp));
 void fit_command __PROTO((void));
 size_t wri_to_fil_last_fit_cmd __PROTO((FILE *fp));
 char *getfitlogfile __PROTO((void));

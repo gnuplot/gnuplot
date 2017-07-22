@@ -1,5 +1,5 @@
 /*
- * $Id: tables.h,v 1.91.2.3 2016/08/27 20:50:14 sfeam Exp $
+ * $Id: tables.h,v 1.91.2.4 2016/10/21 21:00:09 sfeam Exp $
  */
 
 /* GNUPLOT - tables.h */
@@ -68,7 +68,7 @@ enum plot_axes_id {
 /* plot smooth parameters in plot.h */
 
 /* options for 'save' command */
-enum save_id { SAVE_INVALID, SAVE_FUNCS, SAVE_TERMINAL, SAVE_SET, SAVE_VARS };
+enum save_id { SAVE_INVALID, SAVE_FUNCS, SAVE_TERMINAL, SAVE_SET, SAVE_VARS, SAVE_FIT };
 
 /* options for 'show' and 'set' commands
  * this is rather big, we might be better off with a hash table */
