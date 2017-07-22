@@ -5,6 +5,7 @@ Changes since 5.2.rc2
 * CHANGE revise output of "test" command
 * FIX copy environmental variable GNUTERM to internal variable on entry
 * FIX more consistent handling of plot 'with table'
+* FIX incorrect, possibly empty, command string was saved for previous fit
 
 
 Changes in 5.2.rc2

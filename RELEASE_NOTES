@@ -14,6 +14,8 @@ CHANGES SINCE rc1
 * FIX: add sanity checks to detect and handle various types of bad input data
        or command syntax found by fuzz-testing
 * FIX: windows terminal (various minor tweaks)
+* FIX: if 'fit' was invoked inside a bracketed clause, the string containing
+       the command was mishandled.
 
 
 FEATURES INTRODUCED IN VERSION 5.2
