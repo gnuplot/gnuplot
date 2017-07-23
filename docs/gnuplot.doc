@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1098 2017/07/20 19:05:59 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1099 2017/07/21 04:31:15 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -12944,6 +12944,7 @@ Ffigure_multiple_keys
 
  Syntax:
        set table {"outfile" | $datablock} {append}
+                 {separator {space|tab|comma|"<char>"}}
        plot <whatever>
        unset table
 
@@ -12979,6 +12980,10 @@ Ffigure_multiple_keys
 
       plot <file> using ("File 1"):1:2:3 with table
       plot <file> using (sprintf("%4.2f",$1)) : (sprintf("%4.2f",$3)) with table
+
+ To create a csv file use
+      set table "tab.csv" separator comma
+      plot <foo> using 1:2:3:4 with table
 
  [EXPERIMENTAL] To select only a subset of the data points for tabulation you
  can provide an input filter condition (`if <expression>`) at the end of the

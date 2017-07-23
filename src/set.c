@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.560 2017/06/15 05:36:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.561 2017/07/20 19:05:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2891,6 +2891,9 @@ set_separator(char **xx_separators)
 	return;
 
     if (almost_equals(c_token, "white$space")) {
+	c_token++;
+    } else if (equals(c_token,"space")) {
+	*xx_separators = gp_strdup(" ");
 	c_token++;
     } else if (equals(c_token, "comma")) {
 	*xx_separators = gp_strdup(",");

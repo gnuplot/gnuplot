@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.386 2017/06/10 18:05:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.387 2017/07/20 19:05:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -3119,7 +3119,7 @@ show_table()
 	fprintf(stderr, "\ttable mode is on, field separator %s\n",
 		foo[0] == '\t' ? "tab" :
 		foo[0] == ',' ? "comma" :
-		foo[0] == ' ' ? "whitespace" :
+		foo[0] == ' ' ? "space" :
 		foo);
     else
 	fprintf(stderr, "\ttable mode is off\n");
