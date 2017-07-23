@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.153 2017/07/07 00:15:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.154 2017/07/07 05:00:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -517,7 +517,7 @@ gprintf_value(
     double log10_base,
     struct value *v)
 {
-    double x = real(v);		/* FIXME: only if INTGR or CMPLX */
+    double x = real(v);
     char tempdest[MAX_LINE_LEN + 1];
     char temp[MAX_LINE_LEN + 1];
     char *t;
@@ -938,8 +938,7 @@ gprintf_value(
 	    }
 	}
 
-    /* EXPERIMENTAL
-     * Some people prefer a "real" minus sign to the hyphen that standard
+    /* Some people prefer a "real" minus sign to the hyphen that standard
      * formatted input and output both use.  Unlike decimal signs, there is
      * no internationalization mechanism to specify this preference.
      * This code replaces all hyphens with the character string specified by
@@ -1311,8 +1310,7 @@ parse_esc(char *instr)
 }
 
 
-/* FIXME HH 20020915: This function does nothing if dirent.h and windows.h
- * not available. */
+/* This function does nothing if dirent.h and windows.h not available. */
 TBOOLEAN
 existdir(const char *name)
 {

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.387 2017/07/20 19:05:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.388 2017/07/23 16:36:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1577,7 +1577,6 @@ show_style_rectangle()
     fprintf(stderr, "\tRectangle style is %s, fill color ",
 		default_rectangle.layer > 0 ? "front" :
 		default_rectangle.layer < 0 ? "behind" : "back");
-    /* FIXME: Broke with removal of use_palette? */
     save_pm3dcolor(stderr, &default_rectangle.lp_properties.pm3d_color);
     fprintf(stderr, ", lw %.1f ", default_rectangle.lp_properties.l_width);
     fprintf(stderr, ", fillstyle");

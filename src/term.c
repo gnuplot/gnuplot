@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.334 2017/07/05 18:31:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.335 2017/07/08 23:48:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -649,7 +649,6 @@ term_apply_lp_properties(struct lp_style_type *lp)
     (*term->linewidth) (lp->l_width);
 
     /* LT_DEFAULT (used only by "set errorbars"?) means don't change it */
-    /* FIXME: If this causes problems, test also for LP_ERRORBAR_SET    */
     if (lt == LT_DEFAULT)
 	;
     else
@@ -1150,7 +1149,7 @@ do_arc(
 	arc_end += 360.;
 
     /* Choose how finely to divide this arc into segments */
-    /* FIXME: INC=2 causes problems for gnuplot_x11 */
+    /* Note: INC=2 caused problems for gnuplot_x11 */
 #   define INC 3.
     segments = (arc_end - arc_start) / INC;
     if (segments < 1)

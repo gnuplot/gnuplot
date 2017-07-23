@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.327 2017/02/14 21:49:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.328 2017/04/20 00:07:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -280,7 +280,6 @@ save_set_all(FILE *fp)
     fprintf(fp, "set style rectangle %s fc ",
 	    default_rectangle.layer > 0 ? "front" :
 	    default_rectangle.layer < 0 ? "behind" : "back");
-    /* FIXME: broke with removal of use_palette? */
     save_pm3dcolor(fp, &default_rectangle.lp_properties.pm3d_color);
     fprintf(fp, " fillstyle ");
     save_fillstyle(fp, &default_rectangle.fillstyle);
@@ -798,7 +797,6 @@ set origin %g,%g\n",
 
     SAVE_AXISLABEL_OR_TITLE("", "title", title);
 
-    /* FIXME */
     fprintf(fp, "set timestamp %s \n", timelabel_bottom ? "bottom" : "top");
     SAVE_AXISLABEL_OR_TITLE("", "timestamp", timelabel);
 
@@ -1828,7 +1826,7 @@ save_object(FILE *fp, int tag)
 	    fprintf(fp, " fc ");
 	    if (this_object->lp_properties.l_type == LT_DEFAULT)
 		    fprintf(fp,"default");
-	    else /* FIXME: Broke with removal of use_palette? */
+	    else
 		    save_pm3dcolor(fp, &this_object->lp_properties.pm3d_color);
 	    fprintf(fp, " fillstyle ");
 	    save_fillstyle(fp, &this_object->fillstyle);

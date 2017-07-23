@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.173 2017/06/18 20:39:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.174 2017/07/22 22:07:45 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -342,7 +342,6 @@ ctrlc_setup()
 *****************************************************************/
 #if defined(MSDOS)
 
-/* HBB 980317: added a prototype... */
 int getchx __PROTO((void));
 
 int
@@ -1565,9 +1564,6 @@ print_function_definitions(struct at_type *at, FILE * device)
 void
 fit_command()
 {
-/* HBB 20000430: revised this completely, to make it more similar to
- * what plot3drequest() does */
-
     /* Backwards compatibility - these were the default names in 4.4 and 4.6	*/
     static const char *dummy_old_default[5] = {"x","y","t","u","v"};
 
@@ -1851,7 +1847,7 @@ fit_command()
     /* tsm patchset 230: new absolute convergence variable */
     FPRINTF((STANDARD, "epsilon_abs=%e\n", epsilon_abs));
 
-    /* HBB 970304: maxiter patch */
+    /* maximum number of iterations */
     maxiter = getivar(FITMAXITER);
     if (maxiter < 0)
 	maxiter = 0;
@@ -2103,7 +2099,7 @@ fit_command()
     }
 
     /* read in parameters */
-    max_params = MAX_PARAMS;	/* HBB 971023: make this resizeable */
+    max_params = MAX_PARAMS;
 
     if (!equals(c_token++, "via"))
 	Eexc(c_token, "Need via and either parameter list or file");

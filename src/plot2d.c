@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.437 2017/07/20 18:04:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.438 2017/07/21 04:31:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -803,13 +803,6 @@ get_data(struct curve_points *current_plot)
 
 	case DF_UNDEFINED:
 	    /* Version 5:  can't get here because we trapped DF_UNDEFINED above */
-#if (0)
-	    current_plot->points[i].type = UNDEFINED;
-	    FPRINTF((stderr,"undefined point %g %g %g\n", v[0], v[1], v[2]));
-	    if (current_plot->plot_style == IMAGE)
-		goto images;
-	    i++;
-#endif
 	    continue;
 
 	case DF_FIRST_BLANK:

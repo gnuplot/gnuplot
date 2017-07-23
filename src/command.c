@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.356 2017/06/05 21:32:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.357 2017/06/15 19:40:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1135,19 +1135,6 @@ do {                                  \
     gp_input_line[idx++] = ' '; /* s */  \
     gp_input_line[idx++] = ' '; /* e */  \
 } while (0)
-
-#if 0
-#define PRINT_TOKEN(tok)                                                    \
-do {                                                                        \
-    int i;                                                                  \
-    int end_index = token[tok].start_index + token[tok].length;             \
-    for (i = token[tok].start_index; i < end_index && gp_input_line[i]; i++) { \
-	fputc(gp_input_line[i], stderr);                                       \
-    }                                                                       \
-    fputc('\n', stderr);                                                    \
-    fflush(stderr);                                                         \
-} while (0)
-#endif
 
 /* Make a copy of an input line substring delimited by { and } */
 static char *
@@ -3373,7 +3360,6 @@ read_line(const char *prompt, int start)
     /* line are no longer valid.  We used to _not_ clear things here, but */
     /* that lead to errors when a mouse-triggered replot request came in  */
     /* while a new line was being read.   Bug 3602388 Feb 2013.           */
-    /* FIXME: If this causes problems, push it down into fgets_ipc().     */
     if (start == 0) {
 	c_token = num_tokens = 0;
 	gp_input_line[0] = '\0';
