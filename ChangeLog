@@ -1,7 +1,8 @@
 2017-07-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/fit.c src/command.c src/plot2d.c src/util.c src/term.c src/show.c
-	src/save.c: Remove dead code, out-of-date FIXMEs, comments, etc.
+	src/save.c src/axis.c:
+	Remove dead code, out-of-date FIXMEs, comments, etc.
 
 2017-07-22  Ethan A Merritt  <merritt@u.washington.edu>
 

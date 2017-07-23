@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.226 2017/06/15 05:36:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.227 2017/06/20 19:29:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1109,14 +1109,6 @@ gen_tics(struct axis *this, tic_callback callback)
      *		TIC_COMPUTED ("autofreq") tries for equal spacing on primary axis
      *		TIC_SERIES   requests equal spacing on secondary (user) axis
      *		minitics are always evenly spaced in user coords
-     *
-     * FIXME: This comment describes the pre-version 5.2 code; not sure we want to keep it
-     * The minitics are a bit of a drag - we need to distinuish
-     * the cases step>1 from step == 1.
-     * If step = 1, we are looking at 1,10,100,1000 for example, so
-     * minitics are 2,5,8, ...  - done in user co-ordinates
-     * If step>1, we are looking at 1,1e6,1e12 for example, so
-     * minitics are 10,100,1000,... - done in internal co-ords
      */
 
     {
@@ -1575,7 +1567,6 @@ axis_output_tics(
 		? (axis_is_second ? JUST_TOP : JUST_BOT)
 		: JUST_CENTRE;
 	    rotate_tics = TEXT_VERTICAL;
-	    /* FIXME HBB 20000501: why would we want this? */
 	    if (axis == FIRST_Y_AXIS)
 		(*ticlabel_position) += t->v_char / 2;
 	/* EAM - allow rotation by arbitrary angle in degrees      */
