@@ -1,7 +1,7 @@
 
 #include <gp_types.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 # define DLLEXPORT __declspec(dllexport)
 # define __inline__ __inline
 #else
