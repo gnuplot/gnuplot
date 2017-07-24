@@ -1,3 +1,15 @@
+2017-07-24  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/mingw/Makefile config/msvc/Makefile config/watcom/Makefile
+	config/config.mgw config/config.nt config/config.oww src/syscfg.h
+	src/command.c|h src/fit.c src/graph3d.c src/graphics.c src/mouse.c
+	src/plot.c src/plot2d.c src/plot3d.c src/show.c src/term.c|h
+	src/variable.c src/qtterminal/qt_term.cpp src/wxtterminal/gp_cairo.c
+	src/wxtterminal/wxt_gui.h term/caca.trm term/gd.trm term/wxt.trm
+	demo/gnuplot_plugin.h:  Use only _WIN32 to test for Windows.  This is
+	pre-defined by all supported compilers.  Eliminate uses of WIN32 and
+	_Windows.
+
 2017-07-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/fit.c src/command.c src/plot2d.c src/util.c src/term.c src/show.c

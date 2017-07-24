@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.335 2017/07/08 23:48:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.336 2017/07/23 18:57:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -270,7 +270,7 @@ void fflush_binary();
 # define FOPEN_BINARY(file) fopen(file, "wb")
 #endif /* !VMS */
 
-#if defined(MSDOS) || defined(WIN32)
+#if defined(MSDOS) || defined(_WIN32)
 # if defined(__DJGPP__)
 #  include <io.h>
 # endif
@@ -590,7 +590,7 @@ term_reset()
 #ifdef USE_MOUSE
     /* Make sure that ^C will break out of a wait for 'pause mouse' */
     paused_for_mouse = 0;
-#ifdef WIN32
+#ifdef _WIN32
     kill_pending_Pause_dialog();
 #endif
 #endif
@@ -2980,7 +2980,7 @@ check_for_mouse_events()
 	term->waitforinput(TERM_ONLY_CHECK_MOUSING);
     }
 #endif
-#ifdef WIN32
+#ifdef _WIN32
     /* Process windows GUI events (e.g. for text window, or wxt and windows terminals) */
     WinMessageLoop();
     /* On Windows, Ctrl-C only sets this flag. */

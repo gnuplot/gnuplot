@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.31 2017/06/27 19:06:11 markisch Exp $
+# $Id: Makefile,v 1.32 2017/07/08 11:20:13 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -115,7 +115,7 @@ CBASEFLAGS = /EHsc /GR /MDd /Od /nologo /Zi
 !ELSE
 CBASEFLAGS = /EHsc /GR /MD /O2 /nologo
 !ENDIF
-CFLAGS = $(CBASEFLAGS) /I. /I$(TOP) /I$(S) /I$(T) /D_Windows /DWIN32 /DHAVE_CONFIG_H /D__MSC__ $(OPTIONS)
+CFLAGS = $(CBASEFLAGS) /I. /I$(TOP) /I$(S) /I$(T) /DHAVE_CONFIG_H /D__MSC__ $(OPTIONS)
 CFLAGS = $(CFLAGS) /DUNICODE /D_UNICODE
 CFLAGS = $(CFLAGS) /DGNUPLOT_SHARE_DIR=\"$(GNUPLOT_SHARE_DIR)\"
 WIN_CFLAGS = /DUSE_FAKEPIPES

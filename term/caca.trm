@@ -1,7 +1,7 @@
 /*
  * GNUPLOT - caca.trm
  *
- * $Id: caca.trm,v 1.11 2017/04/19 18:52:14 markisch Exp $
+ * $Id: caca.trm,v 1.12 2017/07/05 19:17:59 sfeam Exp $
  *
  * This file uses UTF8 encoding and a tab size of 4.
  *
@@ -100,7 +100,7 @@ extern TBOOLEAN CACA_window_opened(void);
 #include <caca.h>
 #include <wchar.h>
 #include <signal.h>
-#ifdef WIN32
+#ifdef _WIN32
 # ifndef _WIN32_WINNT
 #  define _WIN32_WINNT 0x0501
 # endif
@@ -197,7 +197,7 @@ static caca_canvas_t * CACA_suspend_cv = NULL;
 static TBOOLEAN CACA_windowed = FALSE; /* graphics output in different window*/
 static TBOOLEAN CACA_exportonly = FALSE; /* no output to screen but to file */
 static TBOOLEAN CACA_processing_events = FALSE; /* flag processing of events in CACA_text() */
-#ifdef WIN32
+#ifdef _WIN32
 static unsigned CACA_codepage = 0;
 static unsigned TMP_codepage;
 #endif
@@ -728,7 +728,7 @@ CACA_init_display(void)
 			CACA_driver = strdup(caca_get_display_driver(CACA_dp));
 		CACA_windowed = (strcmp(CACA_driver, "x11") == 0);
 		CACA_windowed |= (strcmp(CACA_driver, "gl") == 0);
-#if defined(WIN32) && !defined(WGP_CONSOLE)
+#if defined(_WIN32) && !defined(WGP_CONSOLE)
 		CACA_windowed |= (strcmp(CACA_driver, "win32") == 0);
 #endif
 #ifdef USE_MOUSE
@@ -762,7 +762,7 @@ CACA_init_display(void)
 			/* NOTE: The slang backend driver sets its own signal handler for SIGINT */
 			signal(SIGINT, CACA_sigint_handler);
 		}
-#ifdef WIN32
+#ifdef _WIN32
 		if (strcmp(CACA_driver, "win32") == 0) {
 			/* On CJK Windows we change the codepage. Not sure why this
 			   solves the display problems, but apparently it works. See bug #1361. */
@@ -917,7 +917,7 @@ CACA_text()
 		fwrite(data, 1, bytes, gpoutfile);
 		free(data);
 	}
-#if defined(WIN32) && !defined(WGP_CONSOLE)
+#if defined(_WIN32) && !defined(WGP_CONSOLE)
 	/* Raise the console (graph!) window. Beware: */
 	/* we cannot call RaiseConsole() to do this.  */
 	else {
@@ -947,7 +947,7 @@ CACA_close_display(void)
 		caca_set_display_title(CACA_dp, "gnuplot");
 		caca_free_display(CACA_dp);
 		CACA_dp = NULL;
-#ifdef WIN32
+#ifdef _WIN32
 		if (strcmp(CACA_driver, "win32") == 0) {
 #ifndef WGP_CONSOLE
 			FreeConsole(); /* close the console window */
@@ -1651,7 +1651,7 @@ CACA_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, i
 				heads = block_arrows;
 				break;
 			}
-#ifndef WIN32
+#ifndef _WIN32
 			case CACA_UNICODE: {
 				/* Windows: 45° arrows are not available in Lucida Console nor Consolas. */
  				const wchar_t unicode_arrows[] = {
@@ -1840,7 +1840,7 @@ CACA_event_time(void)
 
 	gettimeofday(&tv, NULL);
 	return (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000;
-#elif defined (WIN32)
+#elif defined (_WIN32)
 	FILETIME time;
 
 	GetSystemTimeAsFileTime(&time);
@@ -1933,7 +1933,7 @@ CACA_process_events(void)
 								if (process_event(GE_keypress, mx, my, key, 0, 0))
 									loop = CACA_endpause;
 #else
-# ifdef WIN32
+# ifdef _WIN32
 								/* raise console */
 								WinRaiseConsole();
 # else
@@ -2004,7 +2004,7 @@ CACA_process_events(void)
 		loop = CACA_quit;
 	}
 
-#ifdef WIN32
+#ifdef _WIN32
 	/* Handle Windows message queue events. */
 	WinMessageLoop();
 #endif
@@ -2043,7 +2043,7 @@ CACA_waitforinput(int options)
 		return getchar();
 
 	while (loop == CACA_loop && (CACA_dp != NULL)) {
-#ifdef WIN32
+#ifdef _WIN32
 		HANDLE h;
 		DWORD res;
 
@@ -3285,7 +3285,7 @@ process_event(char type, int mx, int my, int par1, int par2, int winid)
 static int
 gp_kbhit(void)
 {
-#ifndef WIN32
+#ifndef _WIN32
 # ifdef HAVE_SELECT
     struct timeval tv = {0L, 0L};
     fd_set fds;

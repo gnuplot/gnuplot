@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.263 2017/03/31 18:41:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.264 2017/07/18 20:25:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -58,9 +58,7 @@ static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.263 2017/03/31 18:41:53 s
 
 #include "matrix.h" /* Used by thin-plate-splines in dgrid3d */
 
-#ifndef _Windows
-# include "help.h"
-#endif
+#include "help.h"
 
 /* global variables exported by this module */
 

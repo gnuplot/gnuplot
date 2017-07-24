@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.49 2017/02/09 21:13:23 sfeam Exp $
+ * $Id: wxt.trm,v 1.50 2017/05/30 23:07:40 sfeam Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -160,7 +160,7 @@ TERM_PUBLIC void wxt_options()
 	TBOOLEAN set_capjoin = FALSE, set_size = FALSE;
 	TBOOLEAN set_position = FALSE;
 
-#ifndef WIN32
+#ifndef _WIN32
 	if (term_interlock != NULL && term_interlock != (void *)wxt_init) {
 		term = NULL;
 		int_error(NO_CARET, "The wxt terminal cannot be used in a qt session");

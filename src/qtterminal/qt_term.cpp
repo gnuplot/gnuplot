@@ -62,7 +62,7 @@ extern "C" {
 	#include "alloc.h"     // for gp_alloc
 	#include "parse.h"     // for real_expression
 	#include "axis.h"
-#ifdef WIN32
+#ifdef _WIN32
 	#include "win/winmain.h"  // for WinMessageLoop, ConsoleReadCh, stdin_pipe_reader
 	#include "win/wgnuplib.h" // for TextStartEditing, TextStopEditing
 	#include "win/wtext.h"    // for kbhit, getchar
@@ -178,14 +178,14 @@ struct QtOption {
     QString FontName;
     QString Title;
     QString Widget;
-	QPoint  position;
+    QPoint  position;
 };
 static QtOption* qt_option = NULL;
 
 static void ensureOptionsCreated()
 {
 	if (!qt_option)
-	    qt_option = new QtOption();
+		qt_option = new QtOption();
 }
 
 static bool qt_setPosition = false;
@@ -220,7 +220,7 @@ QPoint qt_gnuplotCoord(int x, int y)
 }
 
 #ifndef GNUPLOT_QT
-# ifdef WIN32
+# ifdef _WIN32
 #  define GNUPLOT_QT "gnuplot_qt.exe"
 # else
 #  define GNUPLOT_QT "gnuplot_qt"
@@ -235,7 +235,7 @@ void execGnuplotQt()
 	if (path)
 		filename = QString(path);
 	if (filename.isEmpty()) {
-#ifdef WIN32
+#ifdef _WIN32
 		filename = QCoreApplication::applicationDirPath();
 #else
 		filename = QT_DRIVER_DIR;
@@ -482,7 +482,7 @@ void qt_sendFont()
 					: "\nWarning: slow font initialization");
 #ifdef Q_OS_MAC
 				// OSX can be slow (>30 seconds?!) in determining font metrics
-				// Give it more time rather than failing after 1 second 
+				// Give it more time rather than failing after 1 second
 				// Possibly this is only relevant to Qt5
 				GP_SLEEP(0.5);
 				continue;
@@ -629,7 +629,7 @@ void qt_enhanced_flush()
 	qt->out << GEEnhancedFlush << qt->enhancedFontName << qt->enhancedFontSize
 		<< (int)qt->enhancedFontStyle << (int)qt->enhancedFontWeight
 		<< qt->enhancedBase << qt->enhancedWidthFlag << qt->enhancedShowFlag
-		<< qt->enhancedOverprint 
+		<< qt->enhancedOverprint
 		<< qt->codec->toUnicode(qt->enhancedText);
 	qt->enhancedText.clear();
 }
@@ -652,9 +652,9 @@ void qt_enhanced_open(char* fontname, double fontsize, double base, TBOOLEAN wid
 
 	// Baseline correction.  Surely Qt itself provides this somehow?
 	if (qt_max_pos_base < base)
-	    qt_max_pos_base = base;
+		qt_max_pos_base = base;
 	if (qt_max_neg_base > base)
-	    qt_max_neg_base = base;
+		qt_max_neg_base = base;
 
 	// strip Bold or Italic property out of font name
 	QString tempname = fontname;
@@ -669,7 +669,7 @@ void qt_enhanced_open(char* fontname, double fontsize, double base, TBOOLEAN wid
 	int sep = tempname.indexOf(":");
 	if (sep >= 0)
 		tempname.truncate(sep);
-	
+
 	// Blank font name means keep using the previous font
 	if (!tempname.isEmpty())
 		qt->enhancedFontName = tempname;
@@ -739,7 +739,7 @@ void qt_linetype(int lt)
 		qt->out << GEPenStyle << Qt::DotLine;
 	else if (lt == LT_NODRAW)
 		qt->out << GEPenStyle << Qt::NoPen;
-	else 
+	else
 		qt->out << GEPenStyle << Qt::SolidLine;
 
 	if ((lt-1) == LT_BACKGROUND) {
@@ -921,8 +921,8 @@ void qt_image(unsigned int M, unsigned int N, coordval* image, gpiPoint* corner,
 // box, with \r separating text above and below the point.
 void qt_put_tmptext(int n, const char str[])
 {
-    if (!qt)
-        return;
+	if (!qt)
+		return;
 
 	if (n == 0)
 		qt->out << GEStatusText << QString(str);
@@ -936,8 +936,8 @@ void qt_put_tmptext(int n, const char str[])
 
 void qt_set_cursor(int c, int x, int y)
 {
-    if (!qt)
-        return;
+	if (!qt)
+		return;
 
 	// Cancel zoombox when Echap is pressed
 	if (c == 0)
@@ -984,7 +984,7 @@ void qt_set_clipboard(const char s[])
 int qt_waitforinput(int options)
 {
 #ifdef USE_MOUSE
-#ifndef WIN32
+#ifndef _WIN32
 	fd_set read_fds;
 	struct timeval one_msec;
 	int stdin_fd  = fileno(stdin);
@@ -1082,7 +1082,7 @@ int qt_waitforinput(int options)
 
 	return getchar();
 
-#else // Windows console and wgnuplot
+#else // _WIN32, Windows console and wgnuplot
 #ifdef WGP_CONSOLE
 	int fd = fileno(stdin);
 #endif
@@ -1129,7 +1129,7 @@ int qt_waitforinput(int options)
 
 	do {
 		int waitResult = -1;
-		
+
 #ifndef WGP_CONSOLE
 		// Process pending key events of the text console
 		if (kbhit() && (options != TERM_ONLY_CHECK_MOUSING))
@@ -1140,11 +1140,11 @@ int qt_waitforinput(int options)
 		if ((idx_socket != -1) && // (qt != NULL)) &&
 			(qt->socket.waitForReadyRead(0)) && (qt->socket.bytesAvailable() >= (int)sizeof(gp_event_t)))
 			waitResult = idx_socket; // data already available
-		
-		// Wait for a new event 
+
+		// Wait for a new event
 		if ((waitResult == -1) && (options != TERM_ONLY_CHECK_MOUSING))
 			waitResult = MsgWaitForMultipleObjects(idx, h, FALSE, INFINITE, QS_ALLINPUT);  // wait for new data
-		
+
 		if ((waitResult == idx_stdin) && (idx_stdin != -1)) { // console windows or caca terminal (TBD)
 #ifdef WGP_CONSOLE
 			if (!isatty(fd)) {
@@ -1154,7 +1154,7 @@ int qt_waitforinput(int options)
 				CloseHandle(h[0]);
 				c = dw;
 				quitLoop = true;
-			} else 
+			} else
 #endif
 			{
 				c = ConsoleReadCh();
@@ -1222,17 +1222,16 @@ int qt_waitforinput(int options)
 		}
 	} while (!quitLoop);
 
-
 #ifndef WGP_CONSOLE
 	if (options != TERM_ONLY_CHECK_MOUSING)
 		TextStopEditing(&textwin);
-	
+
 	// This happens if neither the qt queue is alive, nor there is a console window.
 	if ((options != TERM_ONLY_CHECK_MOUSING) && !waitOK)
 		return getchar();
 #endif
 	return c;
-#endif // WIN32
+#endif // _WIN32
 #else
 	return getchar();
 #endif // USE_MOUSE
@@ -1255,9 +1254,9 @@ void qt_atexit()
 	else
 		qt->out << GEExit;
 	qt_flushOutBuffer();
-        
-        delete qt;
-        qt = NULL;
+
+	delete qt;
+	qt = NULL;
 
 	delete qt_option;
 	qt_option = NULL;
@@ -1335,7 +1334,7 @@ void qt_options()
 	bool set_linewidth = false;
 	int previous_WindowId = qt_optionWindowId;
 
-#ifndef WIN32
+#ifndef _WIN32
 	if (term_interlock != NULL && term_interlock != (void *)qt_init) {
 		term = NULL;
 		int_error(NO_CARET, "The qt terminal cannot be used in a wxt session");
@@ -1517,12 +1516,12 @@ void qt_options()
 
 void qt_layer( t_termlayer syncpoint )
 {
-    static int current_plotno = 0;
+	static int current_plotno = 0;
 	if (!qt)
 		return;
 
-    /* We must ignore all syncpoints that we don't recognize */
-    switch (syncpoint) {
+	/* We must ignore all syncpoints that we don't recognize */
+	switch (syncpoint) {
 	case TERM_LAYER_BEFORE_PLOT:
 		current_plotno++;
 		qt->out << GEPlotNumber << current_plotno; break;
@@ -1546,9 +1545,9 @@ void qt_layer( t_termlayer syncpoint )
 		qt->out << GELayer << QTLAYER_BEFORE_ZOOM; break;
 	case TERM_LAYER_3DPLOT:
 		qt_is_3Dplot = true; break;
-    	default:
+	default:
 		break;
-    }
+	}
 }
 
 void qt_hypertext( int type, const char *text )

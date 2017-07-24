@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.357 2017/06/15 19:40:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.358 2017/07/23 18:57:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -117,11 +117,12 @@ int thread_rl_RetCode = -1; /* return code from readline in a thread */
 #endif /* OS2_IPC */
 
 
-#ifndef _Windows
+#ifndef _WIN32
 # include "help.h"
-#endif /* _Windows */
+#endif
 
-#ifdef _Windows
+#ifdef _WIN32
+#define WINODWS_LEAN_AND_MEAN
 # include <windows.h>
 # ifdef __MSC__
 #  include <malloc.h>
@@ -131,7 +132,7 @@ int thread_rl_RetCode = -1; /* return code from readline in a thread */
 # endif				/* !MSC */
 # include <htmlhelp.h>
 # include "win/winmain.h"
-#endif /* _Windows */
+#endif /* _WIN32 */
 
 #ifdef VMS
 int vms_vkid;			/* Virtual keyboard id */
@@ -650,7 +651,7 @@ raise_lower_command(int lower)
 #ifdef X11
 	    x11_lower_terminal_group();
 #endif
-#ifdef _Windows
+#ifdef _WIN32
 	    win_lower_terminal_group();
 #endif
 #ifdef WXWIDGETS
@@ -663,7 +664,7 @@ raise_lower_command(int lower)
 #ifdef X11
 	    x11_raise_terminal_group();
 #endif
-#ifdef _Windows
+#ifdef _WIN32
 	    win_raise_terminal_group();
 #endif
 #ifdef WXWIDGETS
@@ -687,7 +688,7 @@ raise_lower_command(int lower)
 #ifdef X11
 		x11_lower_terminal_window(number);
 #endif
-#ifdef _Windows
+#ifdef _WIN32
 		win_lower_terminal_window(number);
 #endif
 #ifdef WXWIDGETS
@@ -700,7 +701,7 @@ raise_lower_command(int lower)
 #ifdef X11
 		x11_raise_terminal_window(number);
 #endif
-#ifdef _Windows
+#ifdef _WIN32
 		win_raise_terminal_window(number);
 #endif
 #ifdef WXWIDGETS
@@ -1716,7 +1717,7 @@ pause_command()
 	    buf = tmp;
 	    if (strcmp(term->name, "pm") != 0 || sleep_time >= 0)
 		fputs(buf, stderr);
-#else /* Not WIN32 or OS2 */
+#else /* Not _WIN32 or OS2 */
 	    free(buf);
 	    buf = tmp;
 	    fputs(buf, stderr);
@@ -1733,7 +1734,7 @@ pause_command()
 	    int junk = 0;
 	    if (buf) {
 		/* Use of fprintf() triggers a bug in MinGW + SJIS encoding */
-		fputs(buf, stderr); fputs("\n",stderr);
+		fputs(buf, stderr); fputs("\n", stderr);
 	    }
 	    /* cannot use EAT_INPUT_WITH here */
 	    do {
@@ -2191,7 +2192,7 @@ void
 screendump_command()
 {
     c_token++;
-#ifdef _Windows
+#ifdef _WIN32
     screen_dump();
 #else
     fputs("screendump not implemented\n", stderr);
@@ -2818,7 +2819,7 @@ do_system(const char *cmd)
 
 
 #ifdef NO_GIH
-#if defined(_Windows)
+#ifdef _WIN32
 void
 help_command()
 {
@@ -2866,7 +2867,7 @@ help_command()
 	HtmlHelp(parent, winhelpname, HH_KEYWORD_LOOKUP, (DWORD_PTR)&link);
     }
 }
-#else  /* !_Windows */
+#else  /* !_WIN32 */
 #ifndef VMS
 void
 help_command()
@@ -2876,7 +2877,7 @@ help_command()
     fputs("This gnuplot was not built with inline help\n", stderr);
 }
 #endif /* VMS */
-#endif /* _Windows */
+#endif /* _WIN32 */
 #endif /* NO_GIH */
 
 
@@ -3070,7 +3071,7 @@ do_system(const char *cmd)
     if (!cmd)
 	return;
     restrict_popen();
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__WATCOMC__)
     {
 	LPWSTR wcmd = UnicodeText(cmd, encoding);
 	ierr = _wsystem(wcmd);
@@ -3254,7 +3255,7 @@ do_shell()
 /* read from stdin, everything except VMS */
 
 # ifndef USE_READLINE
-#  if defined(MSDOS) && !defined(_Windows) && !defined(__EMX__) && !defined(DJGPP)
+#  if defined(MSDOS) && !defined(__EMX__) && !defined(DJGPP)
 
 /* if interactive use console IO so CED will work */
 

@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.58 2016/09/22 07:09:42 markisch Exp $
+ * $Id: wxt_gui.h,v 1.59 2016/10/08 16:23:05 markisch Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -181,7 +181,7 @@ extern "C" {
 /* Windows native backend,
  * redefinition of fprintf, getch...
  * console window */
-# ifdef _Windows
+# ifdef _WIN32
 #  ifndef _WIN32_WINNT 
 #   define _WIN32_WINNT 0x0501
 #  endif
@@ -206,7 +206,7 @@ extern "C" {
 #  include <gtk/gtk.h>
 # endif
 
-# ifdef _Windows
+# ifdef _WIN32
 #  include <cairo-win32.h>
 # endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.62 2017/01/29 12:18:21 markisch Exp $
+ * $Id: syscfg.h,v 1.63 2017/07/08 11:14:06 markisch Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -93,23 +93,12 @@
 # endif  /* __DECC */
 #endif /* VMS */
 
-#if defined(_WINDOWS) || defined(_Windows) || defined(WIN32) || defined(_WIN32)
-# ifndef _Windows
-#  define _Windows
-# endif
-# ifndef WIN32
-#  define WIN32
-# endif
-# ifndef _WIN32
-#  define _WIN32
-# endif
+#ifdef _WIN32
 # ifdef _WIN64
 #  define OS "MS-Windows 64 bit"
 # else
 #  define OS "MS-Windows 32 bit"
 # endif
-/* introduced by Pedro Mendes, prm@aber.ac.uk */
-#  define far
 /* Fix for broken compiler headers
  * See stdfn.h
  */
@@ -148,7 +137,7 @@ FILE * win_fopen(const char *filename, const char *mode);
 #endif
 #endif /* _WINDOWS */
 
-#if defined(MSDOS) && !defined(_Windows)
+#if defined(MSDOS) && !defined(_WIN32)
 /* should this be here ? */
 # define OS       "MS-DOS"
 # undef HELPFILE
@@ -340,7 +329,7 @@ typedef RETSIGTYPE (*sigfunc)__PROTO((void));
 #endif
 
 /* Windows needs to redefine stdin/stdout functions */
-#if defined(_Windows) && !defined(WINDOWS_NO_GUI)
+#if defined(_WIN32) && !defined(WINDOWS_NO_GUI)
 # include "win/wtext.h"
 #endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.99 2017/04/19 23:17:43 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.100 2017/07/14 19:16:28 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -771,14 +771,14 @@ static gchar * gp_cairo_convert(plot_struct *plot, const char* string)
 }
 
 /*
- * The following #ifdef WIN32 section is all to work around a bug in
+ * The following #ifdef _WIN32 section is all to work around a bug in
  * the cairo/win32 backend for font rendering.  It has the effect of
  * testing for libfreetype support, and using that instead if possible.
  * Suggested by cairo developer Behdad Esfahbod.
  * Allin Cottrell suggests that this not necessary anymore for newer
  * versions of cairo.
  */
-#if defined(WIN32) && (CAIRO_VERSION_MAJOR < 2) && (CAIRO_VERSION_MINOR < 10)
+#if defined(_WIN32) && (CAIRO_VERSION_MAJOR < 2) && (CAIRO_VERSION_MINOR < 10)
 static PangoLayout *
 gp_cairo_create_layout(cairo_t *cr)
 {
@@ -2001,7 +2001,7 @@ const char* gp_cairo_enhanced_get_fontname(plot_struct *plot)
 const char *
 gp_cairo_default_font(void)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	return "Tahoma";
 #else
 	return "Sans";

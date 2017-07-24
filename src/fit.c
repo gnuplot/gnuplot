@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.174 2017/07/22 22:07:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.175 2017/07/23 18:57:02 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -129,7 +129,7 @@ static void Dblfn __PROTO(());
 #elif !defined(VMS)
 #  include <fcntl.h>
 #endif
-#ifdef WIN32
+#ifdef _WIN32
 # include "win/winmain.h"
 #endif
 
@@ -250,7 +250,7 @@ static udvt_entry *fit_dummy_udvs[MAX_NUM_VAR];
 			 internal Prototypes
 *****************************************************************/
 
-#if !defined(WIN32) || defined(WGP_CONSOLE)
+#if !defined(_WIN32) || defined(WGP_CONSOLE)
 static RETSIGTYPE ctrlc_handle __PROTO((int an_int));
 #endif
 static void ctrlc_setup __PROTO((void));
@@ -304,7 +304,7 @@ wri_to_fil_last_fit_cmd(FILE *fp)
     This is called when a SIGINT occurs during fit
 *****************************************************************/
 
-#if !defined(WIN32) || defined(WGP_CONSOLE)
+#if !defined(_WIN32) || defined(WGP_CONSOLE)
 static RETSIGTYPE
 ctrlc_handle(int an_int)
 {
@@ -331,7 +331,7 @@ ctrlc_setup()
  *
  *  I hope that other OSes do it better, if not... add #ifdefs :-(
  */
-#if (defined(__EMX__) || !defined(MSDOS)) && (!defined(WIN32) || defined(WGP_CONSOLE))
+#if (defined(__EMX__) || !defined(MSDOS)) && (!defined(_WIN32) || defined(WGP_CONSOLE))
     (void) signal(SIGINT, (sigfunc) ctrlc_handle);
 #endif
 }
@@ -745,7 +745,7 @@ fit_interrupt()
 {
     while (TRUE) {
 	fputs("\n\n(S)top fit, (C)ontinue, (E)xecute FIT_SCRIPT:  ", STANDARD);
-#ifdef WIN32
+#ifdef _WIN32
 	WinRaiseConsole();
 #endif
 	switch (getchar()) {
@@ -1003,7 +1003,7 @@ regress_check_stop(int iter, double chisq, double last_chisq, double lambda)
 	ctrlc_flag = TRUE;
     }
 #endif
-#ifdef WIN32
+#ifdef _WIN32
     /* This call makes the Windows GUI functional during fits.
        Pressing Ctrl-Break now finally has an effect. */
     WinMessageLoop();

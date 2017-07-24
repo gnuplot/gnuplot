@@ -618,11 +618,6 @@
  * ==================================================
  */
 
-
-#ifndef WIN32
-# define WIN32
-#endif
-
 /* Windows Interprocess Communication is required for mouse support. */
 #ifdef USE_MOUSE
 # define WIN_IPC 1

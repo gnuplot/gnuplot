@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.199 2017/05/16 03:22:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.200 2017/07/14 19:16:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -66,7 +66,7 @@ static char *RCSid() { return RCSid("$Id: mouse.c,v 1.199 2017/05/16 03:22:26 sf
 #include "util3d.h"
 #include "hidden3d.h"
 
-#ifdef _Windows
+#ifdef _WIN32
 # include "win/winmain.h"
 #endif
 
@@ -2243,7 +2243,7 @@ event_reset(struct gp_event_t *ge)
 
     if (paused_for_mouse) {
 	paused_for_mouse = 0;
-#ifdef WIN32
+#ifdef _WIN32
 	/* close pause message box */
 	kill_pending_Pause_dialog();
 #endif

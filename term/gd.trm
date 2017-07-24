@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.188 2016/12/06 05:11:05 sfeam Exp $
+ * $Id: gd.trm,v 1.189 2016/12/06 05:17:18 sfeam Exp $
  */
 
 /* GNUPLOT -- gd.trm */
@@ -168,7 +168,7 @@ TERM_PUBLIC void ENHGD_boxed_text __PROTO((unsigned int, unsigned int, int));
    the shared version of libgd uses a different calling convention
    and there is no proper macro defined.
 */
-#if defined(WIN32) && !defined(NONDLL)
+#if defined(_WIN32) && !defined(NONDLL)
 static void gp_gdImagePolygon(gdImagePtr, gdPointPtr, int, int);
 static void gp_gdImageFilledPolygon(gdImagePtr, gdPointPtr, int, int);
 #else
@@ -354,7 +354,7 @@ static PNG_FILL_TILE PNG_fill_tile = { (gdImagePtr)0, 0, 0 };
 static gdFTStringExtra PNG_FONT_INFO = {0,0,0,0,0,NULL,NULL};
 #endif
 
-#if defined(WIN32) && !defined(NONDLL)
+#if defined(_WIN32) && !defined(NONDLL)
 static void 
 gp_gdImagePolygon(gdImagePtr im, gdPointPtr p, int n, int c)
 {

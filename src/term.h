@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.72 2017/05/18 21:18:57 sfeam Exp $
+ * $Id: term.h,v 1.73 2017/05/22 20:36:56 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -90,7 +90,7 @@
 # ifdef OS2
 #  include "pm.trm"		/* OS/2 Presentation Manager */
 # endif
-# ifdef _Windows
+# ifdef _WIN32
 #  include "win.trm"		/* MS-Windows */
 # endif
 #else /* include all applicable terminals not commented out */
@@ -107,7 +107,7 @@
 
 /****************************************************************************/
 /* MS-DOS and Windows */
-#if defined(MSDOS) || defined(_Windows)
+#if defined(MSDOS) || defined(_WIN32)
 
 /* MSDOS with emx-gcc compiler */
 # if defined(MSDOS) && defined(__EMX__)
@@ -122,17 +122,17 @@
 # endif
 
 /* All other Compilers */
-# ifndef _Windows
+# ifndef _WIN32
 #  ifdef PC
 /* uncomment the next line to include SuperVGA support */
 #   define BGI_NAME "svga256"	/* the name of the SVGA.BGI for Borland C */
 /* this also triggers the inclusion of Super VGA support */
 #   include "pc.trm"		/* all PC types except MS WINDOWS */
 #  endif
-# else				/* _Windows */
+# else				/* _WIN32 */
 #  include "win.trm"		/* MS-Windows */
-# endif				/* _Windows */
-#endif /* MSDOS || _Windows */
+# endif				/* _WIN32 */
+#endif /* MSDOS || _WIN32 */
 /****************************************************************************/
 
 /* Apple Mac OS X */
@@ -174,7 +174,7 @@
 
 /****************************************************************************/
 /* Terminals not relevant for MSDOS, MS-Windows */
-#if !(defined(MSDOS) || defined(_Windows))
+#if !(defined(MSDOS) || defined(_WIN32))
 
 /* gpic for groff */
 #ifdef HAVE_GPIC
@@ -193,7 +193,7 @@
 # include "tek.trm"
 
 
-#endif /* !MSDOS && !_Windows */
+#endif /* !MSDOS && !_WIN32 */
 /****************************************************************************/
 
 

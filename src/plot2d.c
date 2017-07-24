@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.438 2017/07/21 04:31:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.439 2017/07/23 18:57:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -56,7 +56,7 @@ static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.438 2017/07/21 04:31:16 s
 #include "util.h"
 #include "variable.h" /* For locale handling */
 
-#ifndef _Windows
+#ifndef _WIN32
 # include "help.h"
 #endif
 

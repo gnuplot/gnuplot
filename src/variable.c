@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: variable.c,v 1.44 2013/07/02 22:19:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: variable.c,v 1.45 2016/01/10 00:41:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - variable.c */
@@ -228,7 +228,7 @@ static const struct path_table fontpath_tbl[] =
 };
 #endif
 
-#if defined(_Windows) && !defined(FONTPATHSET)
+#if defined(_WIN32) && !defined(FONTPATHSET)
 #  define FONTPATHSET
 static const struct path_table fontpath_tbl[] =
 {
@@ -340,7 +340,7 @@ fontpath_handler(int action, char *path)
 		/* convert all PATHSEPs to \0 */
 		PATHSEP_TO_NUL(fontpath);
 	    }
-#if defined(HAVE_DIRENT_H) || defined(_Windows)
+#if defined(HAVE_DIRENT_H) || defined(_WIN32)
 	    else {
 		/* set hardcoded paths */
 		const struct path_table *curr_fontpath = fontpath_tbl;

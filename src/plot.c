@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.174 2017/05/20 16:43:19 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.175 2017/06/01 22:55:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -288,7 +288,7 @@ main(int argc, char **argv)
     }
 #endif
 
-#if defined(MSDOS) && !defined(_WIN32) && !defined(__GNUC__)
+#if defined(MSDOS) && !defined(__GNUC__)
     PC_setup();
 #endif /* MSDOS !Windows */
 
@@ -817,7 +817,7 @@ get_user_env()
 	const char *env_home;
 
 	if ((env_home = getenv(HOME))
-#ifdef WIN32
+#ifdef _WIN32
 	    || (env_home = appdata_directory())
 	    || (env_home = getenv("USERPROFILE"))
 #endif

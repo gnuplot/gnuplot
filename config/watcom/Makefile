@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.16 2017/01/25 15:17:47 markisch Exp $
+# $Id: Makefile,v 1.17 2017/02/15 09:13:19 markisch Exp $
 #
 # GNUPLOT Makefile OpenWatcom 1.3 on Win32
 
@@ -76,7 +76,7 @@ CPPFLAGS += -DVERSION_MAJOR="5.1" -DPATCHLEVEL="0"
 CPPFLAGS += -DUNICODE -D_UNICODE
 # library-dependent ones may have to be added, like:
 # -DHAVE_LIBPNG -DHAVE_LIBPDF 
-#CPPFLAGS += -DHAVE_GDIPLUS
+CPPFLAGS += -DHAVE_GDIPLUS
 
 HELPFILE = wgnuplot.chm
 
@@ -96,7 +96,7 @@ ALL_TARGETS = $(DEFAULT_TARGETS) $(TARGETS_PLAIN) $(TARGETS_PIPES) $(TARGETS_CON
 DEFAULT_TARGETS += $(TARGETS_$(VARIANT))
 
 LDLIBS += LIBRARY htmlhelp.lib
-#LDLIBS += LIBRARY gdiplus.lib
+LDLIBS += LIBRARY gdiplus.lib
 
 # compiler flags, determined from MS ones by OW's "cl /showwopts"
 
@@ -134,8 +134,7 @@ default: $(DEFAULT_TARGETS) .SYMBOLIC
 all: $(ALL_TARGETS) .SYMBOLIC
 
 WINOBJS = winmain.$(O) wgnuplib.$(O) wgraph.$(O) wprinter.$(O) wtext.$(O) &
-        wpause.$(O) wmenu.$(O) gpexecute.$(O) screenbuf.$(O)
-#WINOBJS += wgdiplus.$(O)
+        wpause.$(O) wmenu.$(O) gpexecute.$(O) screenbuf.$(O) wgdiplus.$(O)
 
 OBJS = $(COREOBJS) version.$(O) $(WINOBJS)
 

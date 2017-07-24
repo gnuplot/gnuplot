@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.70 2015/08/08 18:32:17 sfeam Exp $
+ * $Id: command.h,v 1.71 2016/02/07 22:15:36 sfeam Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -93,7 +93,7 @@ extern struct udft_entry *dummy_func;
 extern char HelpFile[];         /* patch for do_help  - AP */
 #endif /* MSDOS */
 
-#ifdef _Windows
+#ifdef _WIN32
 # define SET_CURSOR_WAIT SetCursor(LoadCursor((HINSTANCE) NULL, IDC_WAIT))
 # define SET_CURSOR_ARROW SetCursor(LoadCursor((HINSTANCE) NULL, IDC_ARROW))
 #else
@@ -122,7 +122,7 @@ extern void x11_raise_terminal_group __PROTO((void));
 extern void x11_lower_terminal_window __PROTO((int));
 extern void x11_lower_terminal_group __PROTO((void));
 #endif
-#ifdef _Windows
+#ifdef _WIN32
 extern void win_raise_terminal_window __PROTO((int));
 extern void win_raise_terminal_group __PROTO((void));
 extern void win_lower_terminal_window __PROTO((int));

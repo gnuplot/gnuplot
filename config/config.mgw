@@ -617,11 +617,6 @@
  * ==================================================
  */
 
-
-#ifndef WIN32
-# define WIN32
-#endif
-
 #define HAVE_GDIPLUS
 #define HAVE_DWRITE
 #define HAVE_D2D
