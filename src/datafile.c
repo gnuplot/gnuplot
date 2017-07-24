@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.346 2017/06/13 00:24:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.347 2017/07/20 18:04:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -119,6 +119,7 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.346 2017/06/13 00:24:12
 #include "readline.h"
 #include "util.h"
 #include "breaders.h"
+#include "tabulate.h" /* For sanity check inblock != outblock */
 #include "variable.h" /* For locale handling */
 
 /* test to see if the end of an inline datafile is reached */
@@ -1341,6 +1342,9 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     } else if (df_filename[0] == '$') {
 	df_datablock = TRUE;
 	df_datablock_line = get_datablock(df_filename);
+	/* Better safe than sorry. Check for inblock != outblock */
+	if (table_var && table_var->udv_value.v.data_array == df_datablock_line)
+	    int_error(NO_CARET,"input and output datablock are the same");
     } else if (!strcmp(df_filename, "@@") && df_array) {
 	/* df_array was set in string_or_express() */
 	df_array_index = 0;
