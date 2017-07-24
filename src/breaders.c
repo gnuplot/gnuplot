@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: breaders.c,v 1.12 2012/06/08 17:33:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: breaders.c,v 1.13 2014/05/09 22:14:11 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - breaders.c */
@@ -385,7 +385,7 @@ df_libgd_get_pixel(int i, int j, int component)
     		return gdTrueColorGetRed(pixel);
     case 1:	return gdTrueColorGetGreen(pixel);
     case 2:	return gdTrueColorGetBlue(pixel);
-    case 3:	/* FIXME? Supposedly runs from 0-127 rather than 0-255 */
+    case 3:	/* runs from 0-127 rather than 0-255 */
 		alpha = 2 * gdTrueColorGetAlpha(pixel);
 		return (255-alpha);
     default:	return 0; /* shouldn't happen */
