@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.211 2017/02/15 21:08:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.212 2017/04/19 06:20:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -205,7 +205,6 @@ prepare_call(int calltype)
 
     /* Old-style "call" arguments were referenced as $0 ... $9 and $# */
     /* New-style has ARG0 = script-name, ARG1 ... ARG9 and ARGC */
-    /* FIXME:  If we defined these on entry, we could use get_udv* here */
     udv = add_udv_by_name("ARGC");
     Ginteger(&(udv->udv_value), call_argc);
     udv = add_udv_by_name("ARG0");
@@ -951,8 +950,6 @@ parse_dashtype(struct t_dashtype *dt)
 	res = DASHTYPE_CUSTOM;
 
     /* Or index of previously defined dashtype */
-    /* FIXME: Is the index enough or should we copy its contents into this one? */
-    /* FIXME: What happens if there is a recursive definition? */
     } else {
 	res = int_expression();
 	if (res < 0)
@@ -1417,8 +1414,6 @@ parse_colorspec(struct t_colorspec *tc, int options)
 	/*
 	 * July 2014 - translate linetype into user-defined linetype color.
 	 * This is a CHANGE!
-	 * FIXME: calling load_linetype here may obviate the need to call it
-	 * many places in the higher level code.  They could be removed.
 	 */
 	load_linetype(&lptemp, tc->lt + 1);
 	*tc = lptemp.pm3d_color;
