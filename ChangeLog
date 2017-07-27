@@ -1,3 +1,9 @@
+2017-07-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/fit.c:  Ignore non-numeric contents of potential dummy variables
+	x y t u v used during fit evaluation.
+	Bug #1949
+
 2017-07-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_open):  Reject plot command if input and output
