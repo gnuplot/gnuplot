@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.269 2017/07/10 10:09:07 markisch Exp $
+ * $Id: wgraph.c,v 1.270 2017/07/11 02:35:28 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -3468,17 +3468,11 @@ WriteGraphIni(LPGW lpgw)
 	wsprintf(profile, TEXT("%d"), lpgw->graphtotop);
 	WritePrivateProfileString(section, TEXT("GraphToTop"), profile, file);
 	wsprintf(profile, TEXT("%d"), lpgw->oversample);
-	WritePrivateProfileString(section, TEXT("GraphGDI+Oversampling"), profile, file);
-	// FIXME: Do not default to Direct2D just yet.
-#if 1
-	wsprintf(profile, TEXT("%d"), lpgw->gdiplus || lpgw->d2d);
 	WritePrivateProfileString(section, TEXT("GraphGDI+"), profile, file);
-#else
 	wsprintf(profile, TEXT("%d"), lpgw->gdiplus);
 	WritePrivateProfileString(section, TEXT("GraphGDI+"), profile, file);
 	wsprintf(profile, TEXT("%d"), lpgw->d2d);
 	WritePrivateProfileString(section, TEXT("GraphD2D"), profile, file);
-#endif
 	wsprintf(profile, TEXT("%d"), lpgw->antialiasing);
 	WritePrivateProfileString(section, TEXT("GraphAntialiasing"), profile, file);
 	wsprintf(profile, TEXT("%d"), lpgw->polyaa);
@@ -3616,9 +3610,9 @@ ReadGraphIni(LPGW lpgw)
 #ifdef HAVE_D2D
 	if (bOKINI)
 		GetPrivateProfileString(section, TEXT("GraphD2D"), TEXT(""), profile, 80, file);
-	// FIXME: Do not default to Direct2D for now
 	if ((p = GetInt(profile, (LPINT)&lpgw->d2d)) == NULL)
-		lpgw->d2d = FALSE;
+		lpgw->d2d = TRUE;
+	// D2D setting overrides the GDI+ setting
 	if (lpgw->d2d)
 		lpgw->gdiplus = FALSE;
 #endif
@@ -3636,7 +3630,7 @@ ReadGraphIni(LPGW lpgw)
 	if (bOKINI)
 		GetPrivateProfileString(section, TEXT("GraphFastRotation"), TEXT(""), profile, 80, file);
 	if ((p = GetInt(profile, (LPINT)&lpgw->fastrotation)) == NULL)
-		lpgw->fastrotation = TRUE;
+		lpgw->fastrotation = FALSE;
 
 	lpgw->background = RGB(255,255,255);
 	if (bOKINI)
