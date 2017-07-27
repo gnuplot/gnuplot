@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.26 2017/07/08 20:17:37 markisch Exp $
+ * $Id: wd2d.cpp,v 1.27 2017/07/11 04:51:38 markisch Exp $
  */
 
 /*
@@ -168,49 +168,58 @@ d2dCreateD3dDevice(D3D_DRIVER_TYPE const type, ID3D11Device **device)
 static HRESULT
 d2dCreateDeviceSwapChainBitmap(LPGW lpgw)
 {
+	// derived from code on "Katy's Code" Blog:
+	// https://katyscode.wordpress.com/2013/01/23/migrating-existing-direct2d-applications-to-use-direct2d-1-1-functionality-in-windows-7/
+	// and Kenny Kerr's MSDN Magazine Blog:
+	// https://msdn.microsoft.com/en-us/magazine/dn198239.aspx
 	HRESULT hr = S_OK;
 	ID2D1DeviceContext * pDirect2dDeviceContext = lpgw->pRenderTarget;
+	IDXGISwapChain1 * pDXGISwapChain = lpgw->pDXGISwapChain;
 
 	if (pDirect2dDeviceContext == NULL || g_pDirect2dFactory == NULL)
 		return hr;
 
-	SafeRelease(&(lpgw->pDXGISwapChain));
+	// do we already have a swap chain?
+	if (pDXGISwapChain == NULL) {
+		IDXGIDevice * dxgiDevice = NULL;
+		hr = g_pDirect3dDevice->QueryInterface(__uuidof(IDXGIDevice), (void **) &dxgiDevice);
 
-	IDXGIDevice * dxgiDevice = NULL;
-	hr = g_pDirect3dDevice->QueryInterface(__uuidof(IDXGIDevice), (void **) &dxgiDevice);
+		// Get the Display Adapter (virtual or GPU) we are using
+		IDXGIAdapter *dxgiAdapter = NULL;
+		if (SUCCEEDED(hr))
+			hr = dxgiDevice->GetAdapter(&dxgiAdapter);
 
-	// Get the Display Adapter (virtual or GPU) we are using
-	IDXGIAdapter *dxgiAdapter = NULL;
-	if (SUCCEEDED(hr))
-		hr = dxgiDevice->GetAdapter(&dxgiAdapter);
+		// Get the DXGI factory instance
+		IDXGIFactory2 *dxgiFactory = NULL;
+		if (SUCCEEDED(hr))
+			hr = dxgiAdapter->GetParent(IID_PPV_ARGS(&dxgiFactory)); 
 
-	// Get the DXGI factory instance
-	IDXGIFactory2 *dxgiFactory = NULL;
-	if (SUCCEEDED(hr))
-		hr = dxgiAdapter->GetParent(IID_PPV_ARGS(&dxgiFactory)); 
+		// Parameters for a Windows 7-compatible swap chain
+		DXGI_SWAP_CHAIN_DESC1 props = { };
+		props.Width = 0;
+		props.Height = 0;
+		props.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+		props.Stereo = false;
+		props.SampleDesc.Count = 1;
+		props.SampleDesc.Quality = 0;
+		props.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		props.BufferCount = 2;
+		props.Scaling = DXGI_SCALING_STRETCH; // DXGI_SCALING_NONE
+		props.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;  // DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL
+		props.Flags = 0;
 
-	// Parameters for a Windows 7-compatible swap chain
-	DXGI_SWAP_CHAIN_DESC1 props = { };
-	props.Width = 0;
-	props.Height = 0;
-	props.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-	props.Stereo = false;
-	props.SampleDesc.Count = 1;
-	props.SampleDesc.Quality = 0;
-	props.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	props.BufferCount = 2;
-	props.Scaling = DXGI_SCALING_STRETCH; // DXGI_SCALING_NONE
-	props.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;  // DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL
-	props.Flags = 0;
+		// Create DXGI swap chain targeting a window handle
+		if (SUCCEEDED(hr))
+			hr = dxgiFactory->CreateSwapChainForHwnd(g_pDirect3dDevice, lpgw->hGraph, &props, NULL, NULL, &pDXGISwapChain);
+		if (SUCCEEDED(hr))
+			lpgw->pDXGISwapChain = pDXGISwapChain;
 
-	// Create DXGI swap chain targeting a window handle (the only Windows 7-compatible option)
-	IDXGISwapChain1 * pDXGISwapChain = NULL;
-	if (SUCCEEDED(hr))
-		hr = dxgiFactory->CreateSwapChainForHwnd(g_pDirect3dDevice, lpgw->hGraph, &props, NULL, NULL, &pDXGISwapChain);
-	if (SUCCEEDED(hr))
-		lpgw->pDXGISwapChain = pDXGISwapChain;
+		SafeRelease(&dxgiDevice);
+		SafeRelease(&dxgiAdapter);
+		SafeRelease(&dxgiFactory);
+	}
 
-	// Get the back buffer as an IDXGISurface (Direct2D doesn't accept an ID3D11Texture2D directly as a render target)
+	// Get the back-buffer as an IDXGISurface
 	IDXGISurface * dxgiBackBuffer = NULL;
 	if (SUCCEEDED(hr))
 		hr = pDXGISwapChain->GetBuffer(0, IID_PPV_ARGS(&dxgiBackBuffer));
@@ -233,9 +242,6 @@ d2dCreateDeviceSwapChainBitmap(LPGW lpgw)
 		pDirect2dDeviceContext->SetUnitMode(D2D1_UNIT_MODE_PIXELS);
 	}
 
-	SafeRelease(&dxgiDevice);
-	SafeRelease(&dxgiAdapter);
-	SafeRelease(&dxgiFactory);
 	SafeRelease(&dxgiBackBuffer);
 	SafeRelease(&pDirect2dBackBuffer);
 	return hr;
@@ -368,7 +374,12 @@ d2dResize(LPGW lpgw, RECT rect)
 	hr = pRenderTarget->Resize(size);
 #else
 	// DeviceContext
-	hr = d2dCreateDeviceSwapChainBitmap(lpgw);
+	lpgw->pRenderTarget->SetTarget(NULL);
+	hr = lpgw->pDXGISwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+	if (SUCCEEDED(hr))
+		hr = d2dCreateDeviceSwapChainBitmap(lpgw);
+	else
+		d2dReleaseRenderTarget(lpgw);
 	if (FAILED(hr))
 		fprintf(stderr, "D2d: Unable to resize swap chain. hr = %0x\n", hr);
 #endif
