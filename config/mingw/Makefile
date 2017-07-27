@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.76 2017/07/11 07:04:57 markisch Exp $
+# $Id: Makefile,v 1.77 2017/07/24 07:54:50 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 # This assumes a typical installation of the MinGW toolkit, the free
@@ -740,16 +740,20 @@ $(BUILDHELPFILE): doc2html.exe $(D)gnuplot.doc $(D)windows/wgnuplot.hhp $(D)wind
 $(HELPFILE): $(BUILDHELPFILE)
 	$(CP) $^ $@
 
-htmlhelp.def:
+htmlhelp.def: /c/Windows/System32/hhctrl.ocx
 ifndef MINGW64
-	pexports c/Windows/System32/hhctrl.ocx > $@
+	pexports $^ > $@
 else
-	gendef - /c/Windows/System32/hhctrl.ocx > $@
+	gendef - $^ > $@
 endif
 
-prntvpt.def:
+prntvpt.def: /c/Windows/System32/prntvpt.dll
 ifdef MINGW64
-	gendef - /c/Windows/System32/prntvpt.dll > prntvpt.def
+ifdef M32
+	gendef - -r $^ > $@
+else
+	gendef - $^ > $@
+endif
 endif
 
 # Working directory for patched Japanese sources 

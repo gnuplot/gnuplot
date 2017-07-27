@@ -5,6 +5,12 @@
 
 	* src/win/wgraph.c term/win.trm:  Default to Direct2D backend.
 
+2017-07-27  Tatsuro MATSUOKA  <tmacchant3@yahoo.co.jp>
+
+	* config/mingw/Makefile (prntvpt.def):  Need to disable Win64 FS
+	redirection for 32bit builds.
+	Bug #1942
+
 2017-07-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_open):  Reject plot command if input and output
