@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.101 2017/05/20 18:28:19 markisch Exp $
+ * $Id: winmain.c,v 1.102 2017/06/14 07:43:39 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -1597,6 +1597,21 @@ win_fopen(const char *filename, const char *mode)
     free(wmode);
     return file;
 }
+
+
+#ifndef USE_FAKEPIPES
+FILE *
+win_popen(const char *filename, const char *mode)
+{
+    FILE * file;
+    LPWSTR wfilename = UnicodeText(filename, encoding);
+    LPWSTR wmode = UnicodeText(mode, encoding);
+    file = _wpopen(wfilename, wmode);
+    free(wfilename);
+    free(wmode);
+    return file;
+}
+#endif
 
 
 UINT

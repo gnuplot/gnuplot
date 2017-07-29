@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.63 2017/07/08 11:14:06 markisch Exp $
+ * $Id: syscfg.h,v 1.64 2017/07/24 07:54:52 markisch Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -134,6 +134,11 @@
 #include <stdio.h>
 FILE * win_fopen(const char *filename, const char *mode);
 #define fopen win_fopen
+#ifndef USE_FAKEPIPES
+FILE * win_popen(const char *filename, const char *mode);
+#undef popen
+#define popen win_popen
+#endif
 #endif
 #endif /* _WINDOWS */
 
