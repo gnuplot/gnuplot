@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.66 2017/07/10 07:21:33 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.67 2017/07/10 10:09:07 markisch Exp $
  */
 
 /*
@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extern "C" {
 # include "syscfg.h"
 }
-#define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
 #include <windowsx.h>
 #define GDIPVER 0x0110

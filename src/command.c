@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.358 2017/07/23 18:57:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.359 2017/07/24 07:54:50 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -122,7 +122,7 @@ int thread_rl_RetCode = -1; /* return code from readline in a thread */
 #endif
 
 #ifdef _WIN32
-#define WINODWS_LEAN_AND_MEAN
+# define WIN32_LEAN_AND_MEAN
 # include <windows.h>
 # ifdef __MSC__
 #  include <malloc.h>

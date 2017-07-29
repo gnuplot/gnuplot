@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.55 2017/01/28 10:10:10 markisch Exp $
+ * $Id: stdfn.h,v 1.56 2017/01/29 06:30:08 markisch Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -354,10 +354,6 @@ char * gp_getcwd(char *path, size_t len);
 # else
 #  define GP_GETCWD(path,len) getwd (path)
 # endif
-#endif
-
-#ifdef _WIN32
-# include <windows.h>
 #endif
 
 /* sleep delay time, where delay is a double value */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.35 2017/02/28 06:51:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.36 2017/07/03 07:35:35 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - stdfn.c */
@@ -49,14 +49,15 @@ static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.35 2017/02/28 06:51:28 sfe
 
 #ifdef _WIN32
 /* the WIN32 API has a Sleep function that does not consume CPU cycles */
-#include <windows.h>
-#include "term_api.h"
-#include "win/winmain.h"
-#include <io.h> /* _findfirst and _findnext set errno iff they return -1 */
+# define WIN32_LEAN_AND_MEAN
+# include <windows.h>
+# include "term_api.h"
+# include "win/winmain.h"
+# include <io.h> /* _findfirst and _findnext set errno iff they return -1 */
 #endif
 #ifdef NEED_CEXP
-#include <math.h>
-#include <complex.h>
+# include <math.h>
+# include <complex.h>
 #endif
 
 /*

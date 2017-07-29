@@ -8,8 +8,8 @@
 	* src/win/winmain.c src/syscfg.h config/config.nt config/config.nt
 	config/config.oww:  Unicode support for popen.
 
-	* src/stdfn.c|h src/command.c src/win/wgdiplus.cpp src/win/wd2d.cpp:
-	Do not include windows.h in a header file and use the
+	* src/stdfn.c|h src/command.c src/win/wgdiplus.cpp src/win/wd2d.cpp
+	src/internal.c:  Do not include windows.h in a header file and use the
 	WIN32_LEAN_AND_MEAN define to speed up compilation.
 
 2017-07-29  Ethan A Merritt  <merritt@u.washington.edu>

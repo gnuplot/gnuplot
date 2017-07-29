@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.27 2017/07/11 04:51:38 markisch Exp $
+ * $Id: wd2d.cpp,v 1.28 2017/07/27 09:01:13 markisch Exp $
  */
 
 /*
@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extern "C" {
 # include "syscfg.h"
 }
-#define WINDOWS_LEAN_AND_MEAN
+
 #include <windows.h>
 #include <windowsx.h>
 
