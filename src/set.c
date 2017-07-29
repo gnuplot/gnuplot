@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.561 2017/07/20 19:05:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.562 2017/07/23 16:36:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -5439,16 +5439,16 @@ set_range(struct axis *this_axis)
 	this_axis->set_max = this_axis->writeback_max;
 	this_axis->set_autoscale = AUTOSCALE_NONE;
     } else {
-	if (!equals(c_token,"["))
-	    int_error(c_token, "expecting '[' or 'restore'");
-	c_token++;
-	this_axis->set_autoscale =
-	    load_range(this_axis,
-		       &this_axis->set_min, &this_axis->set_max,
-		       this_axis->set_autoscale);
-	if (!equals(c_token,"]"))
-	    int_error(c_token, "expecting ']'");
-	c_token++;
+	if (equals(c_token,"[")) {
+	    c_token++;
+	    this_axis->set_autoscale =
+		load_range(this_axis,
+			   &this_axis->set_min, &this_axis->set_max,
+			   this_axis->set_autoscale);
+	    if (!equals(c_token,"]"))
+		int_error(c_token, "expecting ']'");
+	    c_token++;
+	}
 	while (!END_OF_COMMAND) {
 	    if (almost_equals(c_token, "rev$erse")) {
 		++c_token;
