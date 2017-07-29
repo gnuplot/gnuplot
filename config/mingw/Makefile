@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.77 2017/07/24 07:54:50 markisch Exp $
+# $Id: Makefile,v 1.78 2017/07/27 10:17:48 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 # This assumes a typical installation of the MinGW toolkit, the free
@@ -230,19 +230,11 @@ endif
 
 # Choose target to compile:
 # 1. wgnuplot.exe: The usual Windows GUI for input commands.
-# 2. wgnuplot_pipes.exe: The usual Windows GUI with support of pipes, so
-#    that e.g.  plot '<awk -f preprocess.awk my.dat')  or  x=system('ls -1')
-#    can work. Drawback: wgnuplot_pipes.exe keeps attached to a console (DOS)
-#    window it was launched from, or it opens a new one.
+# 2. wgnuplot_pipes.exe: Like wgnuplot, but with an additional console
+#    window, so you can see the output of commands like
+#      plot '<awk -f preprocess.awk my.dat')  or  x=system('ls -1')
 # 3. gnuplot.exe: Console mode instead of GUI for the text input.
 #
-
-# PIPES: define if you would prefer support of pipes undef Windows (e.g.
-# plot '<awk -f preprocess.awk my.dat'). Drawback: wgnuplot_pipes.exe keeps
-# attached to a console=DOS window it was launched from, or it opens a new one.
-
-# CONSOLE: define if you would prefer the console (non-GUI) version of the
-# text command window.
 
 ifndef TARGET
 TARGET=wgnuplot.exe
@@ -254,7 +246,11 @@ endif
 ifeq ($(TARGET),wgnuplot.exe)
 	MENUFILE=wgnuplot.mnu
 	O=o
+ifndef MINGW64
 	CFLAGSEXTRA=-DUSE_FAKEPIPES
+else
+	CFLAGSEXTRA=-DPIPES
+endif
 endif
 ifeq ($(TARGET),wgnuplot_pipes.exe)
 	MENUFILE=wgnuplot.mnu
