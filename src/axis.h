@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.165 2017/03/29 04:08:07 sfeam Exp $
+ * $Id: axis.h,v 1.166 2017/03/29 04:20:07 sfeam Exp $
  *
  */
 
@@ -476,6 +476,16 @@ do {									\
     if ((this_axis->set_autoscale & AUTOSCALE_MAX) == 0)		\
 	this_axis->max = AXIS_LOG_VALUE(axis, this_axis->set_max);	\
 } while (0)
+
+/* Simplest form of autoscaling (no check on autoscale constraints).
+ * Used by refresh_bounds() and refresh_3dbounds().
+ */
+#define autoscale_one_point(axis, x) do {\
+    if (axis->set_autoscale & AUTOSCALE_MIN && x < axis->min) \
+	axis->min = x; \
+    if (axis->set_autoscale & AUTOSCALE_MAX && x > axis->max) \
+	axis->max = x; \
+    } while (0);
 
 /* parse a position of the form
  *    [coords] x, [coords] y {,[coords] z}
