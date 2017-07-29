@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.430.2.5 2017/07/19 03:24:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.430.2.6 2017/07/20 18:32:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -321,7 +321,7 @@ refresh_bounds(struct curve_points *first_plot, int nplots)
 	    continue;
 	}
 
-	/* FIXME: I'm not entirely convinced this test does what the comment says. */
+	/* FIXME: I don't think this test does what the comment says. */
 	/*
 	 * If the state has been set to autoscale since the last plot,
 	 * mark everything INRANGE and re-evaluate the axis limits now.
@@ -346,20 +346,18 @@ refresh_bounds(struct curve_points *first_plot, int nplots)
 	     * refresh_3dbounds() in plot3d.c
 	     */
 	    if (!this_plot->noautoscale) {
-		if (x_axis->set_autoscale & AUTOSCALE_MIN && point->x < x_axis->min)
-		     x_axis->min = point->x;
-		if (x_axis->set_autoscale & AUTOSCALE_MAX && point->x > x_axis->max)
-		     x_axis->max = point->x;
+		autoscale_one_point(x_axis, point->x);
+		if (this_plot->plot_style == VECTOR)
+		    autoscale_one_point(x_axis, point->xhigh);
 	    }
 	    if (!inrange(point->x, x_axis->min, x_axis->max)) {
 		point->type = OUTRANGE;
 		continue;
 	    }
 	    if (!this_plot->noautoscale) {
-		if (y_axis->set_autoscale & AUTOSCALE_MIN && point->y < y_axis->min)
-		     y_axis->min = point->y;
-		if (y_axis->set_autoscale & AUTOSCALE_MAX && point->y > y_axis->max)
-		     y_axis->max = point->y;
+		autoscale_one_point(y_axis, point->y);
+		if (this_plot->plot_style == VECTOR)
+		    autoscale_one_point(y_axis, point->yhigh);
 	    }
 	    if (!inrange(point->y, y_axis->min, y_axis->max)) {
 		point->type = OUTRANGE;

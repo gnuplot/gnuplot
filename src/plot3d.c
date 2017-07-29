@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.263 2017/03/31 18:41:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.263.2.1 2017/07/18 20:25:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -363,34 +363,20 @@ refresh_3dbounds(struct surface_points *first_plot, int nplots)
 	     * Otherwise test INRANGE/OUTRANGE against previous axis limits.
 	     */
 
-	    /* This autoscaling logic is identical to that in
+	    /* This autoscaling logic is parallel to that in
 	     * refresh_bounds() in plot2d.c
 	     */
 	    if (!this_plot->noautoscale) {
-		if (x_axis->set_autoscale & AUTOSCALE_MIN && point->x < x_axis->min)
-		     x_axis->min = point->x;
-		if (x_axis->set_autoscale & AUTOSCALE_MAX && point->x > x_axis->max)
-		     x_axis->max = point->x;
+		autoscale_one_point(x_axis, point->x);
+		autoscale_one_point(y_axis, point->y);
 	    }
-	    if (!inrange(point->x, x_axis->min, x_axis->max)) {
+	    if (!inrange(point->x, x_axis->min, x_axis->max)
+	    ||  !inrange(point->y, y_axis->min, y_axis->max)) {
 		point->type = OUTRANGE;
 		continue;
 	    }
 	    if (!this_plot->noautoscale) {
-		if (y_axis->set_autoscale & AUTOSCALE_MIN && point->y < y_axis->min)
-		     y_axis->min = point->y;
-		if (y_axis->set_autoscale & AUTOSCALE_MAX && point->y > y_axis->max)
-		     y_axis->max = point->y;
-	    }
-	    if (!inrange(point->y, y_axis->min, y_axis->max)) {
-		point->type = OUTRANGE;
-		continue;
-	    }
-	    if (!this_plot->noautoscale) {
-		if (z_axis->set_autoscale & AUTOSCALE_MIN && point->z < z_axis->min)
-		     z_axis->min = point->z;
-		if (z_axis->set_autoscale & AUTOSCALE_MAX && point->z > z_axis->max)
-		     z_axis->max = point->z;
+		autoscale_one_point(z_axis, point->z);
 	    }
 	    if (!inrange(point->z, z_axis->min, z_axis->max)) {
 		point->type = OUTRANGE;

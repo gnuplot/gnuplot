@@ -1,3 +1,12 @@
+2017-07-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.h (autoscale_one_point) src/plot2d.c src/plot3d.c:
+	Refresh_bounds and refresh_3dbounds perform only a simplified version
+	of autoscaling.  Consolidate this into a macro autoscale_one_point().
+	Extend the simplified autoscaling to include both ends of a VECTOR plot.
+	Other cases remain where the simplified autoscale is insufficient.
+	Bug #1947
+
 2017-07-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/fit.c:  Ignore non-numeric contents of potential dummy variables

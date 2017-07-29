@@ -7,6 +7,7 @@ Changes since 5.2.rc2
 * FIX more consistent handling of plot 'with table'
 * FIX incorrect, possibly empty, command string was saved for previous fit
 * FIX ignore non-numeric values of potential dummy params used by "fit"
+* FIX autoscaling during refresh of volatile data plots "with vectors"
 
 
 Changes in 5.2.rc2
