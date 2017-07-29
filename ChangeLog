@@ -1,12 +1,17 @@
 2017-07-29  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/term.c (test_term):  Disable extra space around textbox for size
+	comparision.
+
+2017-07-29  Bastian Maerkisch  <bmaerkisch@web.de>
+
 	* config/mingw/Makefile config/msvc/Makefile:  Mingw-w64 and MSVC have
 	working popen/pclose implementations for GUI applications.  So we use
 	them instead of our own "fake" pipe emulation.
 	Bug #1950
 
-	* src/win/winmain.c src/syscfg.h config/config.nt config/config.nt
-	config/config.oww:  Unicode support for popen.
+	* src/win/winmain.c src/syscfg.h config/config.nt config/config.oww:
+	Unicode support for popen.
 
 	* src/stdfn.c|h src/command.c src/win/wgdiplus.cpp src/win/wd2d.cpp
 	src/internal.c:  Do not include windows.h in a header file and use the

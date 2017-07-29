@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.336 2017/07/23 18:57:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.337 2017/07/24 07:54:52 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1751,6 +1751,9 @@ test_term()
 	textbox_opts.noborder = TRUE;
 	textbox_opts.fillcolor.type = TC_RGB;
 	textbox_opts.fillcolor.lt = 0xccccee;
+	/* disable extra space around text */
+	textbox_opts.xmargin = 0;
+	textbox_opts.ymargin = 0;
 
 	(*t->linetype) (LT_SOLID);
 	write_label(xmax_t/2, ymax_t/2, &sample);
