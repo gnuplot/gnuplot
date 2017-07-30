@@ -8,6 +8,10 @@
 	* src/win/winmain.c src/syscfg.h config/config.nt config/config.oww:
 	Unicode support for popen.
 
+	* src/win/wd2d.cpp:  Direct2D implementation of pattern fill using a
+	bitmap brush.  This eliminates the last GDI/GDI+ fallback, so we
+	no longer aim to be compatible.
+
 2017-07-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h (autoscale_one_point) src/plot2d.c src/plot3d.c:
