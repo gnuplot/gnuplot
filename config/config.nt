@@ -645,7 +645,8 @@
 #ifdef USE_FAKEPIPES
 # define PIPES
 #elif defined(PIPES)
-# define popen _popen
+// Already defined in syscfg.h
+//# define popen _popen
 # define pclose _pclose
 #endif
 

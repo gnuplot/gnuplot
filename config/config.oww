@@ -568,7 +568,8 @@
 #define GP_INLINE _inline
 
 #ifndef USE_FAKEPIPES
-# define popen _popen
+// Already defined in syscfg.h
+//# define popen _popen
 # define pclose _pclose
 #else
 # ifndef PIPES
