@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.562 2017/07/23 16:36:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.563 2017/07/29 06:17:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -5336,6 +5336,10 @@ set_view()
 	    c_token++;
 	    mapview_scale = real_expression();
 	} 
+	if (aspect_ratio_3D != 0) {
+	    aspect_ratio = -1;
+	    aspect_ratio_3D = 0;
+	}
 	return;
     };
 

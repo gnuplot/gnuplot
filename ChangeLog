@@ -1,3 +1,11 @@
+2017-07-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_view):  Switching from "setview equal xy[z]" to 
+	"set view map" failed to clear the 3D aspect ratio flag, leading to
+	conflicting scale factors.  Now we treat it as "set size ratio -1",
+	which is what the documentation says.
+	Bug #1948
+
 2017-07-29  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/term.c (test_term):  Disable extra space around textbox for size
@@ -27,7 +35,7 @@
 	of autoscaling.  Consolidate this into a macro autoscale_one_point().
 	Extend the simplified autoscaling to include both ends of a VECTOR plot.
 	Other cases remain where the simplified autoscale is insufficient.
-	Bug #1947
+	Bug #1947 #1709
 
 2017-07-27  Ethan A Merritt  <merritt@u.washington.edu>
 
