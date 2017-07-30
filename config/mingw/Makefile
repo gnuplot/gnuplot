@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.72.2.2 2017/07/30 07:46:24 markisch Exp $
+# $Id: Makefile,v 1.72.2.3 2017/07/30 08:24:24 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 #
@@ -1029,8 +1029,8 @@ endif
 	-cp -p $(M)* $(DESTDIR)/demo/
 	mkdir -p $(DESTDIR)/demo/games
 	-cp -p $(M)/games/* $(DESTDIR)/demo/games/
-	mkdir -p $(DESTDIR)/contrib/pm3d/
-	-cp -p $(TOP)/pm3d/contrib/* $(DESTDIR)/contrib/pm3d/
+#	mkdir -p $(DESTDIR)/contrib/pm3d/
+#	-cp -p $(TOP)/pm3d/contrib/* $(DESTDIR)/contrib/pm3d/
 # docs
 	mkdir -p $(DESTDIR)/docs
 	-cp -p gnuplot.pdf $(DESTDIR)/docs/

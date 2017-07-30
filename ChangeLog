@@ -1,5 +1,16 @@
 2017-07-30  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* config/mingw/Makefile config/msvc/Makefile win/gnuplot.iss:
+	The pm3d and contrib subdirectories are no longer in the distribution
+	source, so they must not appear in the windows installer inventory.
+
+	* configure.ac PATCHLEVEL docs/titlepag.tex src/version.c:
+	Bump patchlevel to rc4 and repackage
+	NB: No change to any source files. This affects only the windows
+	build scripts.
+
+2017-07-30  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* configure.ac PATCHLEVEL docs/titlepag.tex src/version.c:
 	Bump patchlevel to rc3
 
