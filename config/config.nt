@@ -307,6 +307,9 @@
 /* #undef HAVE_SLEEP */
 /* Comment: well, actually it is there, but stdlib.h says it is `obsolete' */
 
+/* Define to 1 if you have the `snprintf' function. */
+#define HAVE_SNPRINTF 1
+
 /* Define to 1 if stdbool.h conforms to C99. */
 /* Available since VS 2013 only */ 
 #if _MSC_VER >= 1800
