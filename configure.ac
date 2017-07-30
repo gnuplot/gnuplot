@@ -1,12 +1,12 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.ac,v 1.30.2.8 2017/06/28 21:35:39 sfeam Exp $
+dnl $Id: configure.ac,v 1.30.2.9 2017/07/05 19:20:20 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
 dnl
-AC_INIT([gnuplot],[5.2.rc2])
+AC_INIT([gnuplot],[5.2.rc3])
 AC_CONFIG_SRCDIR(src/graphics.c)
 AC_PREREQ([2.69])
 AC_CONFIG_HEADERS(config.h:config.hin)

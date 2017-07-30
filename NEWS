@@ -1,14 +1,14 @@
-Changes since 5.2.rc2
-====================
+Changes in 5.2.rc3
+==================
 * NEW "plot with table" can handle string-valued output columns
 * CHANGE add caca terminal documentation to the user manual
-* CHANGE revise output of "test" command
+* CHANGE revised output of "test" command
+* CHANGE use Mingw-w64 and MSVC popen rather than built-in "fake" popen
 * FIX copy environmental variable GNUTERM to internal variable on entry
 * FIX more consistent handling of plot 'with table'
 * FIX incorrect, possibly empty, command string was saved for previous fit
 * FIX ignore non-numeric values of potential dummy params used by "fit"
 * FIX autoscaling during refresh of volatile data plots "with vectors"
-
 
 Changes in 5.2.rc2
 ==================
