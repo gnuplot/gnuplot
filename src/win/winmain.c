@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.101 2017/05/20 18:28:19 markisch Exp $
+ * $Id: winmain.c,v 1.101.2.1 2017/06/14 07:47:06 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -972,7 +972,8 @@ fake_popen(const char * command, const char * type)
     char tmpfile[MAX_PATH];
     DWORD ret;
 
-    if (type == NULL) return NULL;
+    if (type == NULL)
+	return NULL;
 
     pipe_type = NUL;
     if (pipe_filename != NULL)
@@ -1244,7 +1245,7 @@ ConsoleHandler(DWORD dwType)
 	DWORD written;
 
 	// NOTE: returning from this handler terminates the application.
-	// Insteadm, we signal the main thread to clean up and exit and
+	// Instead, we signal the main thread to clean up and exit and
 	// then idle by sleeping.
 	terminate_flag = TRUE;
 	// send ^D to main thread input queue
@@ -1265,6 +1266,7 @@ ConsoleHandler(DWORD dwType)
     return FALSE;
 }
 #endif
+
 
 /* public interface to printer routines : Windows PRN emulation
  * (formerly in win.trm)
@@ -1596,6 +1598,21 @@ win_fopen(const char *filename, const char *mode)
     free(wmode);
     return file;
 }
+
+
+#ifndef USE_FAKEPIPES
+FILE *
+win_popen(const char *filename, const char *mode)
+{
+    FILE * file;
+    LPWSTR wfilename = UnicodeText(filename, encoding);
+    LPWSTR wmode = UnicodeText(mode, encoding);
+    file = _wpopen(wfilename, wmode);
+    free(wfilename);
+    free(wmode);
+    return file;
+}
+#endif
 
 
 UINT

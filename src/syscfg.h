@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.61 2016/08/06 13:22:50 markisch Exp $
+ * $Id: syscfg.h,v 1.62 2017/01/29 12:18:21 markisch Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -141,10 +141,15 @@
 #include <stdio.h>
 FILE * win_fopen(const char *filename, const char *mode);
 #define fopen win_fopen
+#ifndef USE_FAKEPIPES
+FILE * win_popen(const char *filename, const char *mode);
+#undef popen
+#define popen win_popen
+#endif
 #endif
 #endif /* _WINDOWS */
 
-#if defined(MSDOS) && !defined(_Windows)
+#if defined(MSDOS) && !defined(_WIN32)
 /* should this be here ? */
 # define OS       "MS-DOS"
 # undef HELPFILE
@@ -336,7 +341,7 @@ typedef RETSIGTYPE (*sigfunc)__PROTO((void));
 #endif
 
 /* Windows needs to redefine stdin/stdout functions */
-#if defined(_Windows) && !defined(WINDOWS_NO_GUI)
+#if defined(_WIN32) && !defined(WINDOWS_NO_GUI)
 # include "win/wtext.h"
 #endif
 

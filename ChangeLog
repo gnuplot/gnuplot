@@ -5,8 +5,8 @@
 	them instead of our own "fake" pipe emulation.
 	Bug #1950
 
-	* src/win/winmain.c src/syscfg.h config/config.nt config/config.nt
-	config/config.oww:  Unicode support for popen.
+	* src/win/winmain.c src/syscfg.h config/config.nt config/config.oww:
+	Unicode support for popen.
 
 2017-07-29  Ethan A Merritt  <merritt@u.washington.edu>
 

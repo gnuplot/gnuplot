@@ -556,7 +556,6 @@
 /* Define as `fork' if `vfork' does not work. */
 /* #undef vfork */
 
-
 /*
  * ==================================================
  * Stuff not provided by config.hin (aka ./configure)
@@ -576,7 +575,8 @@
 #define GP_INLINE _inline
 
 #ifndef USE_FAKEPIPES
-# define popen _popen
+// Already defined in syscfg.h
+//# define popen _popen
 # define pclose _pclose
 #else
 # ifndef PIPES
