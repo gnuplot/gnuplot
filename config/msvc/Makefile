@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.28 2017/04/23 18:27:53 markisch Exp $
+# $Id: Makefile,v 1.28.2.1 2017/06/07 18:04:28 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -70,7 +70,7 @@ DEBUG = 0
 #LUADIR = lua
 PDFDIR = pdflib
 #QTDIR = C:\Qt\4.8.4
-QTDIR = d:\Source\Qt-5.2.1\5.2.1\msvc2012
+QTDIR = C:\Qt\5.8\msvc2015_64
 #CAIRODIR = cairo-pango
 #CACADIR = libcaca
 CAIRODIR = d:\msvc-libs
@@ -104,21 +104,21 @@ LD = link
 # /I  means extra include directory
 # /Fm means produce link map
 # /Od means suppress optimizations (esp. for debug)
-# /O2 mans optimize for speed
+# /O2 means optimize for speed
 # /Zi means prepare for codeview
 # /MD means include multi-thread support (DLL)
 # /GR means Enable Run-Time Type Information
 !IF "$(DEBUG)" == "1"
-CBASEFLAGS = /EHsc /GR /MD /Od /nologo /Zi /DDEBUG
+CBASEFLAGS = /EHsc /GR /MDd /Od /nologo /Zi
 !ELSE
 CBASEFLAGS = /EHsc /GR /MD /O2 /nologo
 !ENDIF
 CFLAGS = $(CBASEFLAGS) /I. /I$(TOP) /I$(S) /I$(T) /D_Windows /DWIN32 /DHAVE_CONFIG_H /D__MSC__ $(OPTIONS)
 CFLAGS = $(CFLAGS) /DUNICODE /D_UNICODE
 CFLAGS = $(CFLAGS) /DGNUPLOT_SHARE_DIR=\"$(GNUPLOT_SHARE_DIR)\"
-WIN_CFLAGS = /DUSE_FAKEPIPES
-CONSOLE_CFLAGS = /DWGP_CONSOLE /DPIPES
-OPTIONS = /DUSE_MOUSE
+WIN_CFLAGS =
+CONSOLE_CFLAGS = /DWGP_CONSOLE
+OPTIONS = /DUSE_MOUSE /DPIPES
 OPTIONS = $(OPTIONS) /DGNUPLOT_HISTORY
 
 EXTRA_TARGETS =

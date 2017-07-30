@@ -1,3 +1,13 @@
+2017-07-30  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/mingw/Makefile config/msvc/Makefile:  Mingw-w64 and MSVC have
+	working popen/pclose implementations for GUI applications.  So we use
+	them instead of our own "fake" pipe emulation.
+	Bug #1950
+
+	* src/win/winmain.c src/syscfg.h config/config.nt config/config.nt
+	config/config.oww:  Unicode support for popen.
+
 2017-07-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h (autoscale_one_point) src/plot2d.c src/plot3d.c:
