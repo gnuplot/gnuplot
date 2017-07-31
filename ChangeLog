@@ -1,3 +1,9 @@
+2017-07-31  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/watcom/Makefile:  Optionally build with GDI+ or Direct2D/
+	DirectWrite.  These libs are available at
+	https://sourceforge.net/p/gnuplot/patches/746/
+
 2017-07-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* config/mingw/Makefile config/msvc/Makefile win/gnuplot.iss:
@@ -12,10 +18,10 @@
 	which is what the documentation says.
 	Bug #1948
 
-2017-07-29  Bastian Maerkisch  <bmaerkisch@web.de>
+2017-07-30  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/term.c (test_term):  Disable extra space around textbox for size
-	comparision.
+	comparison.
 
 2017-07-29  Bastian Maerkisch  <bmaerkisch@web.de>
 
