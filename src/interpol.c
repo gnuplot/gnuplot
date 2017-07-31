@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.58 2017/03/16 18:16:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.59 2017/08/01 01:02:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -1242,7 +1242,6 @@ cp_implode(struct curve_points *cp)
 			    cp->points[j].type = OUTRANGE;
 			    goto is_outrange;
 			}
-			x = AXIS_UNDO_LOG(x_axis, x);
 		    }
 		    if (((x < X_AXIS.min) && !(X_AXIS.autoscale & AUTOSCALE_MIN))
 			|| ((x > X_AXIS.max) && !(X_AXIS.autoscale & AUTOSCALE_MAX))) {
@@ -1254,7 +1253,6 @@ cp_implode(struct curve_points *cp)
 			    cp->points[j].type = OUTRANGE;
 			    goto is_outrange;
 			}
-			y = AXIS_UNDO_LOG(y_axis, y);
 		    }
 		    if (((y < Y_AXIS.min) && !(Y_AXIS.autoscale & AUTOSCALE_MIN))
 			|| ((y > Y_AXIS.max) && !(Y_AXIS.autoscale & AUTOSCALE_MAX)))
@@ -1289,7 +1287,6 @@ cp_implode(struct curve_points *cp)
 			    cp->points[j].type = OUTRANGE;
 			    goto is_outrange2;
 			}
-			x = AXIS_UNDO_LOG(x_axis, x);
 		    }
 		    if (((x < X_AXIS.min) && !(X_AXIS.autoscale & AUTOSCALE_MIN))
 			|| ((x > X_AXIS.max) && !(X_AXIS.autoscale & AUTOSCALE_MAX))) {
@@ -1301,7 +1298,6 @@ cp_implode(struct curve_points *cp)
 			    cp->points[j].type = OUTRANGE;
 			    goto is_outrange2;
 			}
-			y = AXIS_UNDO_LOG(y_axis, y);
 		    }
 		    if (((y < Y_AXIS.min) && !(Y_AXIS.autoscale & AUTOSCALE_MIN))
 			|| ((y > Y_AXIS.max) && !(Y_AXIS.autoscale & AUTOSCALE_MAX)))

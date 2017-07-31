@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.168 2017/08/01 00:56:20 sfeam Exp $
+ * $Id: axis.h,v 1.169 2017/08/01 01:02:05 sfeam Exp $
  *
  */
 
@@ -409,8 +409,6 @@ extern struct axis THETA_AXIS;
     (((double)(pos) - axis->term_lower)/axis->term_scale + axis->min)
 
 /* These become no-ops because the nonlinear axis code stores untransformed values */
-#define AXIS_DO_LOG(axis,value) (value)
-#define AXIS_UNDO_LOG(axis,value) (value)
 #define axis_do_log(axis,value) (value)
 #define axis_undo_log(axis,value) (value)
 #define axis_log_value(axis,value) (value)

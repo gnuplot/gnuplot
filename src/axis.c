@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.229 2017/08/01 00:56:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.230 2017/08/01 01:02:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -252,14 +252,10 @@ axis_revert_and_unlog_range(AXIS_INDEX axis)
 double
 axis_log_value_checked(AXIS_INDEX axis, double coord, const char *what)
 {
-    if (axis_array[axis].log) {
-	if (!(coord > 0.0)) {
-	    int_error(NO_CARET, "%s has %s coord of %g; must be above 0 for log scale!",
-			what, axis_name(axis), coord);
-	} else
-	    return (AXIS_DO_LOG(axis,coord));
-    }
-    return (coord);
+    if (axis_array[axis].log && !(coord > 0.0))
+	int_error(NO_CARET, "%s has %s coord of %g; must be above 0 for log scale!",
+		    what, axis_name(axis), coord);
+    return coord;
 }
 
 /* }}} */
@@ -2619,9 +2615,6 @@ polar_to_xy( double theta, double r, double *x, double *y, TBOOLEAN update)
 	    r = not_a_number();
 	else
 	    r = eval_link_function(shadow, r) - shadow->min;
-    } else if (R_AXIS.log) {
-	/* Can't get here if logscale is implemented as nonlinear axis */
-	r = AXIS_DO_LOG(POLAR_AXIS, r) - AXIS_DO_LOG(POLAR_AXIS, R_AXIS.min);
     } else if (inverted_raxis) {
 	r = R_AXIS.set_min - r;
     } else if ((R_AXIS.autoscale & AUTOSCALE_MIN)) {
