@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.441 2017/07/29 06:24:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.442 2017/08/01 00:56:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1556,7 +1556,6 @@ box_range_fiddling(struct curve_points *plot)
 		xlow = plot->points[0].x - boxwidth;
 	    else
 		xlow = plot->points[0].x - (plot->points[1].x - plot->points[0].x) / 2.;
-	    xlow = AXIS_DE_LOG_VALUE(plot->x_axis, xlow);
 	    if (axis_array[plot->x_axis].min > xlow)
 		axis_array[plot->x_axis].min = xlow;
 	}
@@ -1567,7 +1566,6 @@ box_range_fiddling(struct curve_points *plot)
 		xhigh = plot->points[i].x + boxwidth;
 	    else
 		xhigh = plot->points[i].x + (plot->points[i].x - plot->points[i-1].x) / 2.;
-	    xhigh = AXIS_DE_LOG_VALUE(plot->x_axis, xhigh);
 	    if (axis_array[plot->x_axis].max < xhigh)
 		axis_array[plot->x_axis].max = xhigh;
 	}
@@ -3084,8 +3082,7 @@ eval_plots()
 			    t = 0.0;
 
 			/* parametric/polar => NOT a log quantity */
-			x = (!parametric && !polar)
-			    ? AXIS_DE_LOG_VALUE(x_axis, t) : t;
+			x = t;
 
 			(void) Gcomplex(&plot_func.dummy_values[0], x, 0.0);
 			evaluate_at(plot_func.at, &a);
@@ -3149,7 +3146,7 @@ eval_plots()
 
 			    /* A sampled function can only be OUTRANGE if it has a private range */
 			    if (sample_range_token != 0) {
-				double xx = AXIS_DE_LOG_VALUE(x_axis, t);
+				double xx = t;
 				if (!inrange(xx, axis_array[this_plot->x_axis].min,
 						axis_array[this_plot->x_axis].max))
 				    this_plot->points[i].type = OUTRANGE;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.228 2017/07/23 19:11:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.229 2017/08/01 00:56:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1957,8 +1957,8 @@ save_writeback_all_axes()
 
     for (axis = 0; axis < AXIS_ARRAY_SIZE; axis++)
 	if (axis_array[axis].range_flags & RANGE_WRITEBACK) {
-	    axis_array[axis].writeback_min = AXIS_DE_LOG_VALUE(axis,axis_array[axis].min);
-	    axis_array[axis].writeback_max = AXIS_DE_LOG_VALUE(axis,axis_array[axis].max);
+	    axis_array[axis].writeback_min = axis_array[axis].min;
+	    axis_array[axis].writeback_max = axis_array[axis].max;
 	}
 }
 
@@ -1994,13 +1994,13 @@ set_cbminmax()
 {
     if (CB_AXIS.set_autoscale & AUTOSCALE_MIN) {
 	if (CB_AXIS.min >= VERYLARGE)
-	    CB_AXIS.min = AXIS_DE_LOG_VALUE(FIRST_Z_AXIS,Z_AXIS.min);
+	    CB_AXIS.min = Z_AXIS.min;
     }
     CB_AXIS.min = axis_log_value_checked(COLOR_AXIS, CB_AXIS.min, "color axis");
 
     if (CB_AXIS.set_autoscale & AUTOSCALE_MAX) {
 	if (CB_AXIS.max <= -VERYLARGE)
-	    CB_AXIS.max = AXIS_DE_LOG_VALUE(FIRST_Z_AXIS,Z_AXIS.max);
+	    CB_AXIS.max = Z_AXIS.max;
     }
     CB_AXIS.max = axis_log_value_checked(COLOR_AXIS, CB_AXIS.max, "color axis");
 

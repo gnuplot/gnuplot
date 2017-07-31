@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.347 2017/07/20 18:04:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.348 2017/07/24 21:48:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -5332,8 +5332,6 @@ df_generate_pseudodata()
 	if (nonlinear(&X_AXIS)) {
 	    AXIS *visible = X_AXIS.linked_to_primary->linked_to_secondary;
             t = eval_link_function(visible, t);
-	} else if (!parametric) {
-	    t = AXIS_DE_LOG_VALUE(x_axis, t);
 	}
 
 	/* This allows commands of the form
@@ -5428,11 +5426,11 @@ df_generate_pseudodata()
 	    if (nonlinear(&axis_array[u_axis]))
 		df_pseudovalue_0 = eval_link_function(&axis_array[u_axis], u);
 	    else
-		df_pseudovalue_0 = AXIS_DE_LOG_VALUE(u_axis,u);
+		df_pseudovalue_0 = u;
 	    if (nonlinear(&axis_array[v_axis]))
 		df_pseudovalue_1 = eval_link_function(&axis_array[v_axis], v);
 	    else
-		df_pseudovalue_1 = AXIS_DE_LOG_VALUE(v_axis,v);
+		df_pseudovalue_1 = v;
 	}
 	sprintf(df_line,"%g %g", df_pseudovalue_0, df_pseudovalue_1);
 	++df_pseudorecord;

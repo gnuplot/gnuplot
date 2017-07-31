@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: contour.c,v 1.35 2016/05/09 03:32:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: contour.c,v 1.36 2017/06/15 05:36:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - contour.c */
@@ -250,11 +250,10 @@ contour(int num_isolines, struct iso_curve *iso_lines)
 		z = eval_link_function((&Z_AXIS), z);
 	    break;
 	case LEVELS_INCREMENTAL:
-	    z = AXIS_LOG_VALUE(FIRST_Z_AXIS, contour_levels_list[0]) +
-		i * AXIS_LOG_VALUE(FIRST_Z_AXIS, contour_levels_list[1]);
+	    z = contour_levels_list[0] + i * contour_levels_list[1];
 	    break;
 	case LEVELS_DISCRETE:
-	    z = AXIS_LOG_VALUE(FIRST_Z_AXIS, contour_levels_list[i]);
+	    z = contour_levels_list[i];
 	    break;
 	}
 	contour_level = z;
@@ -264,7 +263,7 @@ contour(int num_isolines, struct iso_curve *iso_lines)
 	    contour_list->isNewLevel = 1;
 	    /* Nov-2011 Use gprintf rather than sprintf so that LC_NUMERIC is used */
 	    gprintf(contour_list->label, sizeof(contour_list->label), 
-		    contour_format, 1.0, AXIS_DE_LOG_VALUE(FIRST_Z_AXIS,z));
+		    contour_format, 1.0, z);
 	    contour_list->z = z;
 	}
     }

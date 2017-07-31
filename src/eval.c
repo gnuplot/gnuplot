@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.148 2017/07/05 18:46:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.149 2017/07/11 22:51:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -864,15 +864,13 @@ fill_gpval_axis(AXIS_INDEX axis)
 {
     const char *prefix = "GPVAL";
     AXIS *ap = &axis_array[axis];
-    double a = AXIS_DE_LOG_VALUE(axis, ap->min);
-    double b = AXIS_DE_LOG_VALUE(axis, ap->max);
-    set_gpval_axis_sth_double(prefix, axis, "MIN", a);
-    set_gpval_axis_sth_double(prefix, axis, "MAX", b);
+    set_gpval_axis_sth_double(prefix, axis, "MIN", ap->min);
+    set_gpval_axis_sth_double(prefix, axis, "MAX", ap->max);
     set_gpval_axis_sth_double(prefix, axis, "LOG", ap->base);
 
     if (axis < POLAR_AXIS) {
-	set_gpval_axis_sth_double("GPVAL_DATA", axis, "MIN", AXIS_DE_LOG_VALUE(axis, ap->data_min));
-	set_gpval_axis_sth_double("GPVAL_DATA", axis, "MAX", AXIS_DE_LOG_VALUE(axis, ap->data_max));
+	set_gpval_axis_sth_double("GPVAL_DATA", axis, "MIN", ap->data_min);
+	set_gpval_axis_sth_double("GPVAL_DATA", axis, "MAX", ap->data_max);
     }
 }
 

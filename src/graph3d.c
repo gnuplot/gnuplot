@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.366 2017/06/06 06:39:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.367 2017/07/24 07:54:51 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -668,7 +668,7 @@ do_3dplot(
 	base_z = eval_link_function(&Z_AXIS, base_z1);
     } else {
 	if (xyplane.absolute)
-	    base_z1 = AXIS_LOG_VALUE(0, xyplane.z);
+	    base_z1 = xyplane.z;
 	else
 	    base_z1 = primary_z->min - (primary_z->max - primary_z->min) * xyplane.z;
 	base_z = base_z1;

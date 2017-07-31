@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.266 2017/07/29 06:24:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.267 2017/08/01 00:56:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1231,7 +1231,7 @@ calculate_set_of_isolines(
 	if (nonlinear(&axis_array[iso_axis]))
 	    isotemp = iso = eval_link_function(&axis_array[iso_axis], iso);
 	else
-	    isotemp = AXIS_DE_LOG_VALUE(iso_axis, iso);
+	    isotemp = iso;
 
 	(void) Gcomplex(&plot_func.dummy_values[cross ? 0 : 1], isotemp, 0.0);
 
@@ -1241,9 +1241,8 @@ calculate_set_of_isolines(
 	    double temp;
 
 	    if (nonlinear(&axis_array[sam_axis]))
-		temp = sam = eval_link_function(&axis_array[sam_axis], sam);
-	    else
-		temp = AXIS_DE_LOG_VALUE(sam_axis, sam);
+		sam = eval_link_function(&axis_array[sam_axis], sam);
+	    temp = sam;
 
 	    (void) Gcomplex(&plot_func.dummy_values[cross ? 1 : 0], temp, 0.0);
 

@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.167 2017/07/29 06:24:42 sfeam Exp $
+ * $Id: axis.h,v 1.168 2017/08/01 00:56:20 sfeam Exp $
  *
  */
 
@@ -413,8 +413,6 @@ extern struct axis THETA_AXIS;
 #define AXIS_UNDO_LOG(axis,value) (value)
 #define axis_do_log(axis,value) (value)
 #define axis_undo_log(axis,value) (value)
-#define AXIS_LOG_VALUE(axis,value) (value)
-#define AXIS_DE_LOG_VALUE(axis,coordinate) (coordinate)
 #define axis_log_value(axis,value) (value)
 #define axis_de_log_value(axis,coordinate) (coordinate)
 
@@ -434,9 +432,9 @@ do {									\
 									\
     this->autoscale = this->set_autoscale;				\
     this->min = (infinite && (this->set_autoscale & AUTOSCALE_MIN))	\
-	? VERYLARGE : AXIS_LOG_VALUE(axis, this->set_min);		\
+	? VERYLARGE : this->set_min;		\
     this->max = (infinite && (this->set_autoscale & AUTOSCALE_MAX))	\
-	? -VERYLARGE : AXIS_LOG_VALUE(axis, this->set_max);		\
+	? -VERYLARGE : this->set_max;		\
     this->log_base = this->log ? log(this->base) : 0;			\
 } while(0)
 
@@ -444,9 +442,9 @@ do {									\
 do {									\
     AXIS *this_axis = axis_array + axis;				\
     if ((this_axis->set_autoscale & AUTOSCALE_MIN) == 0)		\
-	this_axis->min = AXIS_LOG_VALUE(axis, this_axis->set_min);	\
+	this_axis->min = this_axis->set_min;	\
     if ((this_axis->set_autoscale & AUTOSCALE_MAX) == 0)		\
-	this_axis->max = AXIS_LOG_VALUE(axis, this_axis->set_max);	\
+	this_axis->max = this_axis->set_max;	\
 } while (0)
 
 /* Simplest form of autoscaling (no check on autoscale constraints).

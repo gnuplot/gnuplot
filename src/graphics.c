@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.559 2017/07/02 23:08:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.560 2017/07/24 07:54:51 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4017,8 +4017,7 @@ place_raxis()
 	x0   = map_x(polar_radius(R_AXIS.set_max));
     } else {
 	double rightend = (R_AXIS.autoscale & AUTOSCALE_MAX) ? R_AXIS.max : R_AXIS.set_max;
-	xend = map_x( AXIS_LOG_VALUE(POLAR_AXIS,rightend)
-		    - AXIS_LOG_VALUE(POLAR_AXIS,R_AXIS.set_min));
+	xend = map_x(rightend - R_AXIS.set_min);
 	x0 = map_x(0);
     }
     yend = y0 = map_y(0);
@@ -4544,9 +4543,9 @@ process_image(void *plot, t_procimg_action action)
      * function for images will be used.  Otherwise, the terminal function for
      * filled polygons are used to construct parallelograms for the pixel elements.
      */
-#define GRIDX(X) AXIS_DE_LOG_VALUE(image_x_axis,points[X].x)
-#define GRIDY(Y) AXIS_DE_LOG_VALUE(image_y_axis,points[Y].y)
-#define GRIDZ(Z) AXIS_DE_LOG_VALUE(project_points ? FIRST_Z_AXIS : ((struct curve_points *)plot)->z_axis, points[Z].z)
+#define GRIDX(X) points[X].x
+#define GRIDY(Y) points[Y].y
+#define GRIDZ(Z) points[Z].z
 
     if (project_points) {
 	map3d_xy_double(points[0].x, points[0].y, points[0].z, &p_start_corner[0], &p_start_corner[1]);
@@ -5059,13 +5058,8 @@ process_image(void *plot, t_procimg_action action)
 				    corners[i_corners].x = x;
 				    corners[i_corners].y = y;
 			    } else {
-				    if (log_axes) {
-					corners[i_corners].x = map_x(AXIS_LOG_VALUE(x_axis,p_corners[i_corners].x));
-					corners[i_corners].y = map_y(AXIS_LOG_VALUE(y_axis,p_corners[i_corners].y));
-				    } else {
-					corners[i_corners].x = map_x(p_corners[i_corners].x);
-					corners[i_corners].y = map_y(p_corners[i_corners].y);
-				    }
+				    corners[i_corners].x = map_x(p_corners[i_corners].x);
+				    corners[i_corners].y = map_y(p_corners[i_corners].y);
 			    }
 			    /* Clip rectangle if necessary */
 			    if (rectangular_image && term->fillbox && corners_in_view < 4) {

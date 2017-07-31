@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.201 2017/07/24 07:54:51 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.202 2017/08/01 00:56:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -365,14 +365,6 @@ MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double 
        *x = xmin + rounded-to-screen-resolution (xdistance)
      */
 
-    /* Now take into account possible log scales of x and y axes */
-    *x = AXIS_DE_LOG_VALUE(FIRST_X_AXIS, *x);
-    *y = AXIS_DE_LOG_VALUE(FIRST_Y_AXIS, *y);
-    if (!is_3d_plot) {
-	*x2 = AXIS_DE_LOG_VALUE(SECOND_X_AXIS, *x2);
-	*y2 = AXIS_DE_LOG_VALUE(SECOND_Y_AXIS, *y2);
-    }
-
     /* If x2 or y2 is linked to a primary axis via mapping function, apply it now */
     if (!is_3d_plot) {
 	AXIS *secondary = &axis_array[SECOND_X_AXIS];
@@ -613,10 +605,8 @@ GetRulerString(char *p, double x, double y)
     if (mouse_setting.polardistance) {
 	double rho, phi, rx, ry;
 	char ptmp[69];
-	x = AXIS_LOG_VALUE(FIRST_X_AXIS, x);
-	y = AXIS_LOG_VALUE(FIRST_Y_AXIS, y);
-	rx = AXIS_LOG_VALUE(FIRST_X_AXIS, ruler.x);
-	ry = AXIS_LOG_VALUE(FIRST_Y_AXIS, ruler.y);
+	rx = ruler.x;
+	ry = ruler.y;
 	format[0] = '\0';
 	strcat(format, " (");
 	strcat(format, mouse_setting.fmt);
@@ -1491,10 +1481,10 @@ int is_mouse_outside_plot(void)
 #define CHECK_AXIS_OUTSIDE(real, axis)                                  \
     ( axis_array[axis].min <  VERYLARGE &&                              \
       axis_array[axis].max > -VERYLARGE &&                              \
-      ( (real < AXIS_DE_LOG_VALUE(axis, axis_array[axis].min) &&        \
-         real < AXIS_DE_LOG_VALUE(axis, axis_array[axis].max)) ||       \
-        (real > AXIS_DE_LOG_VALUE(axis, axis_array[axis].min) &&        \
-         real > AXIS_DE_LOG_VALUE(axis, axis_array[axis].max))))
+      ( (real < axis_array[axis].min &&        \
+         real < axis_array[axis].max) ||       \
+        (real > axis_array[axis].min &&        \
+         real > axis_array[axis].max)))
 
     return
         CHECK_AXIS_OUTSIDE(real_x,  FIRST_X_AXIS)  ||
@@ -1525,8 +1515,6 @@ rescale(int AXIS, double w1, double w2)
 
     if (nonlinear(axis))
 	newlimit = eval_link_function(axis->linked_to_primary->linked_to_secondary, newlimit);
-    else
-	newlimit = AXIS_DE_LOG_VALUE(AXIS,newlimit);
 
     return newlimit;
 }
@@ -1630,9 +1618,7 @@ rescale_around_mouse(double *newmin, double *newmax, int AXIS, double mouse_pos,
 	axmin = eval_link_function(primary, axmin);
 	axmax = eval_link_function(primary, axmax);
 	mouse_pos = eval_link_function(primary, mouse_pos);
-    } else {
-	mouse_pos = AXIS_LOG_VALUE(AXIS, mouse_pos);
-    }
+    } 
 
   *newmin = mouse_pos + (axmin - mouse_pos) * scale;
   *newmax = mouse_pos + (axmax - mouse_pos) * scale;
@@ -1640,9 +1626,6 @@ rescale_around_mouse(double *newmin, double *newmax, int AXIS, double mouse_pos,
     if (nonlinear(axis)) {
 	*newmin = eval_link_function(primary->linked_to_secondary, *newmin);
 	*newmax = eval_link_function(primary->linked_to_secondary, *newmax);
-    } else {
-      *newmin = AXIS_DE_LOG_VALUE(AXIS,*newmin);
-      *newmax = AXIS_DE_LOG_VALUE(AXIS,*newmax);
     }
 }
 
@@ -2806,13 +2789,13 @@ recalc_ruler_pos()
     if (axis_array[FIRST_X_AXIS].log && ruler.x < 0)
 	ruler.px = -1;
     else {
-	P = AXIS_LOG_VALUE(FIRST_X_AXIS, ruler.x);
+	P = ruler.x;
 	ruler.px = AXIS_MAP(FIRST_X_AXIS, P);
     }
     if (axis_array[FIRST_Y_AXIS].log && ruler.y < 0)
 	ruler.py = -1;
     else {
-	P = AXIS_LOG_VALUE(FIRST_Y_AXIS, ruler.y);
+	P = ruler.y;
 	ruler.py = AXIS_MAP(FIRST_Y_AXIS, P);
     }
     MousePosToGraphPosReal(ruler.px, ruler.py, &dummy, &dummy, &ruler.x2, &ruler.y2);

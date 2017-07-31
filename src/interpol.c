@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.57 2017/02/24 19:51:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.58 2017/03/16 18:16:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -170,7 +170,7 @@ do {									\
 #define UPDATE_RANGE(TEST,OLD,NEW,AXIS)		\
 do {						\
     if (TEST)					\
-	(OLD) = AXIS_DE_LOG_VALUE(AXIS,NEW);	\
+	(OLD) = NEW;	\
 } while(0)
 
 #define spline_coeff_size 4
@@ -299,8 +299,7 @@ eval_kdensity (
     y = 0;
     for (i = 0; i < num_points; i++) {
 	Z = ( x - this_points[i].x )/bandwidth;
-	ytmp = this_points[i].y;
-	y += AXIS_DE_LOG_VALUE(cp->y_axis,ytmp) * exp( -0.5*Z*Z ) / bandwidth;
+	y += this_points[i].y * exp( -0.5*Z*Z ) / bandwidth;
     }
     y /= sqrt(2.0*M_PI);
 
@@ -462,10 +461,10 @@ do_bezier(
     x_axis = cp->x_axis;
     y_axis = cp->y_axis;
 
-    ixmin = sxmin = AXIS_LOG_VALUE(x_axis, X_AXIS.min);
-    ixmax = sxmax = AXIS_LOG_VALUE(x_axis, X_AXIS.max);
-    iymin = symin = AXIS_LOG_VALUE(y_axis, Y_AXIS.min);
-    iymax = symax = AXIS_LOG_VALUE(y_axis, Y_AXIS.max);
+    ixmin = sxmin = X_AXIS.min;
+    ixmax = sxmax = X_AXIS.max;
+    iymin = symin = Y_AXIS.min;
+    iymax = symax = Y_AXIS.max;
 
     for (i = 0; i < samples_1; i++) {
 	eval_bezier(cp, first_point, num_points,
@@ -615,13 +614,11 @@ cp_approx_spline(
     xp = gp_alloc((num_points) * sizeof(double), "x pos");
     yp = gp_alloc((num_points) * sizeof(double), "y pos");
 
-    /* KB 981107: With logarithmic axis first convert back to linear scale */
-
-    xp[0] = AXIS_DE_LOG_VALUE(x_axis, this_points[0].x);
-    yp[0] = AXIS_DE_LOG_VALUE(y_axis, this_points[0].y);
+    xp[0] = this_points[0].x;
+    yp[0] = this_points[0].y;
     for (i = 1; i < num_points; i++) {
-	xp[i] = AXIS_DE_LOG_VALUE(x_axis, this_points[i].x);
-	yp[i] = AXIS_DE_LOG_VALUE(y_axis, this_points[i].y);
+	xp[i] = this_points[i].x;
+	yp[i] = this_points[i].y;
 	h[i - 1] = xp[i] - xp[i - 1];
     }
 
@@ -737,11 +734,11 @@ cp_tridiag(struct curve_points *plot, int first_point, int num_points)
 
     /* KB 981107: With logarithmic axis first convert back to linear scale */
 
-    xp[0] = AXIS_DE_LOG_VALUE(x_axis,this_points[0].x);
-    yp[0] = AXIS_DE_LOG_VALUE(y_axis,this_points[0].y);
+    xp[0] = this_points[0].x;
+    yp[0] = this_points[0].y;
     for (i = 1; i < num_points; i++) {
-	xp[i] = AXIS_DE_LOG_VALUE(x_axis,this_points[i].x);
-	yp[i] = AXIS_DE_LOG_VALUE(y_axis,this_points[i].y);
+	xp[i] = this_points[i].x;
+	yp[i] = this_points[i].y;
 	h[i - 1] = xp[i] - xp[i - 1];
     }
 
@@ -856,10 +853,10 @@ do_cubic(
     x_axis = plot->x_axis;
     y_axis = plot->y_axis;
 
-    ixmin = sxmin = AXIS_LOG_VALUE(x_axis, X_AXIS.min);
-    ixmax = sxmax = AXIS_LOG_VALUE(x_axis, X_AXIS.max);
-    iymin = symin = AXIS_LOG_VALUE(y_axis, Y_AXIS.min);
-    iymax = symax = AXIS_LOG_VALUE(y_axis, Y_AXIS.max);
+    ixmin = sxmin = X_AXIS.min;
+    ixmax = sxmax = X_AXIS.max;
+    iymin = symin = Y_AXIS.min;
+    iymax = symax = Y_AXIS.max;
 
     this_points = (plot->points) + first_point;
 
@@ -890,11 +887,7 @@ do_cubic(
 	while ((x >= this_points[l + 1].x) && (l < num_points - 2))
 	    l++;
 
-	/* KB 981107: With logarithmic x axis the values were
-         * converted back to linear scale before calculating the
-         * coefficients. Use exponential for log x values. */
-	temp = AXIS_DE_LOG_VALUE(x_axis, x)
-	    - AXIS_DE_LOG_VALUE(x_axis, this_points[l].x);
+	temp = x - this_points[l].x;
 
 	/* Evaluate cubic spline polynomial */
 	y = ((sc[l][3] * temp + sc[l][2]) * temp + sc[l][1]) * temp + sc[l][0];
@@ -903,7 +896,7 @@ do_cubic(
          * log scale now. */
 	if (Y_AXIS.log) {
 	    if (y > 0.)
-		y = AXIS_DO_LOG(y_axis, y);
+		y = y;
 	    else
 		y = symin - (symax - symin);
 	}
@@ -953,10 +946,10 @@ do_freq(
     double ixmin, ixmax, iymin, iymax;
     double sxmin, sxmax, symin, symax;	/* starting values of above */
 
-    ixmin = sxmin = AXIS_LOG_VALUE(x_axis, X_AXIS.min);
-    ixmax = sxmax = AXIS_LOG_VALUE(x_axis, X_AXIS.max);
-    iymin = symin = AXIS_LOG_VALUE(y_axis, Y_AXIS.min);
-    iymax = symax = AXIS_LOG_VALUE(y_axis, Y_AXIS.max);
+    ixmin = sxmin = X_AXIS.min;
+    ixmax = sxmax = X_AXIS.max;
+    iymin = symin = Y_AXIS.min;
+    iymax = symax = Y_AXIS.max;
 
     this = (plot->points) + first_point;
 
@@ -1354,8 +1347,8 @@ mcs_interp(struct curve_points *plot)
     /* V5: Try to ensure that the sampling is fine enough to pass through the original points */
     int Nsamp = (samples_1 > 2*N) ? samples_1 : 2*N;
     struct coordinate *new_points = gp_alloc((Nsamp+1) * sizeof(coordinate), "mcs");
-    double sxmin = AXIS_LOG_VALUE(plot->x_axis, X_AXIS.min);
-    double sxmax = AXIS_LOG_VALUE(plot->x_axis, X_AXIS.max);
+    double sxmin = X_AXIS.min;
+    double sxmax = X_AXIS.max;
     double xstart, xend, xstep;
 
     xstart = GPMAX(p[0].x, sxmin);
@@ -1368,10 +1361,6 @@ mcs_interp(struct curve_points *plot)
 #define C1	ylow
 #define C2	yhigh
 #define C3	z
-
-    /* Work with the un-logged y values */
-    for (i = 0; i < N-1; i++)
-	p[i].y = AXIS_DE_LOG_VALUE(plot->y_axis, p[i].y);
 
     for (i = 0; i < N-1; i++) {
 	p[i].DX = p[i+1].x - p[i].x;
