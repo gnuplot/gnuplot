@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.230 2017/08/01 01:02:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.231 2017/08/01 01:07:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -196,8 +196,10 @@ axis_unlog_interval(struct axis *axis, double *min, double *max, TBOOLEAN checkr
 	    int_error(NO_CARET,
 		      "%s range must be greater than 0 for log scale",
 		      axis_name(axis->index));
-	*min = (*min<=0) ? -VERYLARGE : axis_do_log(axis,*min);
-	*max = (*max<=0) ? -VERYLARGE : axis_do_log(axis,*max);
+	if (*min <= 0)
+	    *min= -VERYLARGE;
+	if (*max <= 0)
+	    *max = -VERYLARGE;
     }
 }
 
@@ -609,8 +611,8 @@ copy_or_invent_formatstring(struct axis *this_axis)
 	strncpy(tempfmt, this_axis->formatstring, MAX_ID_LEN);
 	/* Ensure enough precision to distinguish tics */
 	if (!strcmp(tempfmt, DEF_FORMAT)) {
-	    double axmin = axis_de_log_value(this_axis,this_axis->min);
-	    double axmax = axis_de_log_value(this_axis,this_axis->max);
+	    double axmin = this_axis->min;
+	    double axmax = this_axis->max;
 	    int precision = ceil(-log10(GPMIN(fabs(axmax-axmin),fabs(axmin))));
 	    /* FIXME: Does horrible things for large value of precision */
 	    /* FIXME: Didn't I have a better patch for this? */
@@ -1042,7 +1044,7 @@ gen_tics(struct axis *this, tic_callback callback)
 	    if (this->index == POLAR_AXIS)
 		internal = polar_radius(mark->position);
 	    else
-		internal = axis_log_value(this, mark->position);
+		internal = mark->position;
 
 	    if (this->index == THETA_index)
 		; /* No harm done if the angular placement wraps at 2pi */
@@ -1130,15 +1132,15 @@ gen_tics(struct axis *this, tic_callback callback)
 		/* we can tolerate start <= 0 if step and end > 0 */
 		if (def->def.series.end <= 0 || def->def.series.incr <= 0)
 		    return;	/* just quietly ignore */
-		step = axis_do_log(this, def->def.series.incr);
+		step = def->def.series.incr;
 		if (def->def.series.start <= 0)	/* includes case 'undefined, i.e. -VERYLARGE */
 		    start = step * floor(lmin / step);
 		else
-		    start = axis_do_log(this, def->def.series.start);
+		    start = def->def.series.start;
 		if (def->def.series.end == VERYLARGE)
 		    end = step * ceil(lmax / step);
 		else
-		    end = axis_do_log(this, def->def.series.end);
+		    end = def->def.series.end;
 	    } else {
 		start = def->def.series.start;
 		step = def->def.series.incr;
@@ -1332,11 +1334,6 @@ gen_tics(struct axis *this, tic_callback callback)
 		else
 		    user = tic;
 		internal = tic;	/* It isn't really, but this makes the range checks work */
-	    } else if (this->log) {
-		/* Can't get here if logscale is implemented using nonlinear */
-		/* log scale => dont need to worry about zero ? */
-		internal = tic;
-		user = axis_undo_log(this, internal);
 	    } else {
 		/* Normal case (no log, no link) */
 		internal = (this->tictype == DT_TIMEDATE)
@@ -1440,8 +1437,7 @@ gen_tics(struct axis *this, tic_callback callback)
 			mtic_user = internal + mplace;
 			mtic_internal = eval_link_function(this->linked_to_primary, mtic_user);
 		    } else {
-			mtic_user = internal
-			    + (this->log && step <= 1.5 ? axis_do_log(this,mplace) : mplace);
+			mtic_user = internal + mplace;
 			mtic_internal = mtic_user;
 		    }
 		    if (polar && this->index == POLAR_AXIS) {

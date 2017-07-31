@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.138 2017/06/01 22:55:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.139 2017/06/13 05:40:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -640,7 +640,7 @@ apply_pm3dcolor(struct t_colorspec *tc)
 		break;
 	case TC_CB:
 		if (CB_AXIS.log)
-		    cbval = (tc->value <= 0) ? CB_AXIS.min : axis_do_log((&CB_AXIS),tc->value);
+		    cbval = (tc->value <= 0) ? CB_AXIS.min : tc->value;
 		else
 		    cbval = tc->value;
 		set_color(cb2gray(cbval));

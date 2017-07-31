@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.59 2017/08/01 01:02:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.60 2017/08/01 01:07:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -1484,8 +1484,6 @@ make_bins(struct curve_points *plot, int nbins,
 	if (top <= bottom)
 	    int_warn(NO_CARET, "invalid bin range [%g:%g]", bottom, top);
     }
-    bottom = axis_log_value(xaxis, bottom);
-    top = axis_log_value(xaxis, top);
 
     /* If a fixed binwidth was provided, find total number of bins */
     if (binwidth > 0) {
@@ -1514,7 +1512,7 @@ make_bins(struct curve_points *plot, int nbins,
 	    continue;
 	binno = floor(nbins * (plot->points[i].x - bottom) / range);
 	if (0 <= binno && binno < nbins)
-	    bin[binno] += axis_de_log_value(yaxis, plot->points[i].y);
+	    bin[binno] += plot->points[i].y;
     }
 
     if (xaxis->autoscale & AUTOSCALE_MIN) {
@@ -1538,11 +1536,11 @@ make_bins(struct curve_points *plot, int nbins,
 	plot->points[i].x     = bincent;
 	plot->points[i].xlow  = bincent - binwidth/2.;
 	plot->points[i].xhigh = bincent + binwidth/2.;
-	plot->points[i].y     = axis_log_value(yaxis, bin[i]);
+	plot->points[i].y     = bin[i];
 	plot->points[i].ylow  = plot->points[i].y;
 	plot->points[i].yhigh = plot->points[i].y;
 	plot->points[i].z = 0;	/* FIXME: leave it alone? */
-	if (inrange(axis_de_log_value(xaxis, bincent), xaxis->min, xaxis->max)) {
+	if (inrange(bincent, xaxis->min, xaxis->max)) {
 	    if (ymax < bin[i])
 		ymax = bin[i];
 	} else {

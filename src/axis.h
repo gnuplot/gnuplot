@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.169 2017/08/01 01:02:05 sfeam Exp $
+ * $Id: axis.h,v 1.170 2017/08/01 01:07:20 sfeam Exp $
  *
  */
 
@@ -408,11 +408,6 @@ extern struct axis THETA_AXIS;
 #define axis_mapback(axis, pos) \
     (((double)(pos) - axis->term_lower)/axis->term_scale + axis->min)
 
-/* These become no-ops because the nonlinear axis code stores untransformed values */
-#define axis_do_log(axis,value) (value)
-#define axis_undo_log(axis,value) (value)
-#define axis_log_value(axis,value) (value)
-#define axis_de_log_value(axis,coordinate) (coordinate)
 
 /* April 2015:  I'm not 100% sure, but I believe there is no longer
  * any need to treat 2D and 3D axis initialization differently
@@ -502,7 +497,7 @@ do {									  \
 	    OUT_ACTION;							  \
 	    break;							  \
 	} else if (!OPTIMIZE_LOG) {					  \
-	    STORE = axis_do_log(axis, curval);				  \
+	    STORE = curval;				  \
 	}								  \
     }									  \
     if (NOAUTOSCALE)							  \

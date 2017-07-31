@@ -18,6 +18,10 @@
 	* src/axis.c src/axis.h src/interpol.c src/mouse.c src/set.c:
 	Remove all instances of AXIS_DO_LOG and AXIS_UNDO_LOG
 
+	* src/axis.c src/axis.h src/gadgets.c src/graphics.c src/interpol.c
+	src/plot2d.c:  Remove all instances of axis_log_value axis_de_log_value
+	axis_do_log axis_undo_log
+
 2017-07-31  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/watcom/Makefile:  Optionally build with GDI+ or Direct2D/

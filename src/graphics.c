@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.560 2017/07/24 07:54:51 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.561 2017/08/01 01:02:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3442,7 +3442,7 @@ xtick2d_callback(
     /* Skip label if we've already written a user-specified one here */
 #   define MINIMUM_SEPARATION 2
     while (userlabels) {
-	int here = map_x(axis_log_value(this_axis,userlabels->position));
+	int here = map_x(userlabels->position);
 	if (abs(here-x) <= MINIMUM_SEPARATION) {
 	    text = NULL;
 	    break;
@@ -3533,7 +3533,7 @@ ytick2d_callback(
     /* Skip label if we've already written a user-specified one here */
 #   define MINIMUM_SEPARATION 2
     while (userlabels) {
-	int here = map_y(axis_log_value(this_axis,userlabels->position));
+	int here = map_y(userlabels->position);
 	if (abs(here-y) <= MINIMUM_SEPARATION) {
 	    text = NULL;
 	    break;
