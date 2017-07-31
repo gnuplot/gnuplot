@@ -19,6 +19,9 @@
 
 	* src/win/wd2d.cpp:  Missing WINAPI call type for print ticket API.
 
+	* src/win/wgraph.c (CopyPrint):  Check return values of GDI print API
+	function calls.
+
 2017-07-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* config/mingw/Makefile config/msvc/Makefile win/gnuplot.iss:
