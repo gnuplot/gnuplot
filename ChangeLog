@@ -30,6 +30,10 @@
 	Replace old routine axis_unlog_interval() with a simpler check
 	check_log_limits() to ensure min/max of a logscaled axis are positive
 
+	* src/axis.c src/axis.h src/plot2d.c src/plot3d.c:  Replace 
+	axis_revert_and_unlog_range() and axis_revert_range() with a single
+	routine axis_check_range(). This was the last of the *_unlog_* routines.
+
 2017-07-31  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/watcom/Makefile:  Optionally build with GDI+ or Direct2D/

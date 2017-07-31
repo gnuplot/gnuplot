@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.267 2017/08/01 00:56:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.268 2017/08/01 01:02:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -384,9 +384,9 @@ refresh_3dbounds(struct surface_points *first_plot, int nplots)
     }	/* End of this plot */
 
     /* handle 'reverse' ranges */
-    axis_revert_range(FIRST_X_AXIS);
-    axis_revert_range(FIRST_Y_AXIS);
-    axis_revert_range(FIRST_Z_AXIS);
+    axis_check_range(FIRST_X_AXIS);
+    axis_check_range(FIRST_Y_AXIS);
+    axis_check_range(FIRST_Z_AXIS);
 
     /* Make sure the bounds are reasonable, and tweak them if they aren't */
     axis_checked_extend_empty_range(FIRST_X_AXIS, NULL);
@@ -2209,7 +2209,7 @@ eval_3dplots()
 	axis_check_empty_nonlinear(&axis_array[FIRST_X_AXIS]);
     } else {
 	axis_checked_extend_empty_range(FIRST_X_AXIS, "All points x value undefined");
-	axis_revert_and_unlog_range(FIRST_X_AXIS);
+	axis_check_range(FIRST_X_AXIS);
     }
     if (nonlinear(&axis_array[FIRST_Y_AXIS])) {
 	/* Transfer observed data or function ranges back to primary axes */
@@ -2217,14 +2217,14 @@ eval_3dplots()
 	axis_check_empty_nonlinear(&axis_array[FIRST_Y_AXIS]);
     } else {
 	axis_checked_extend_empty_range(FIRST_Y_AXIS, "All points y value undefined");
-	axis_revert_and_unlog_range(FIRST_Y_AXIS);
+	axis_check_range(FIRST_Y_AXIS);
     }
     if (nonlinear(&axis_array[FIRST_Z_AXIS])) {
 	update_primary_axis_range(&axis_array[FIRST_Z_AXIS]);
 	extend_primary_ticrange(&axis_array[FIRST_Z_AXIS]);
     } else {
 	axis_checked_extend_empty_range(FIRST_Z_AXIS, splot_map ? NULL : "All points y value undefined");
-	axis_revert_and_unlog_range(FIRST_Z_AXIS);
+	axis_check_range(FIRST_Z_AXIS);
     }
 
     setup_tics(&axis_array[FIRST_X_AXIS], 20);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.444 2017/08/01 01:19:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.445 2017/08/01 05:08:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -370,8 +370,8 @@ refresh_bounds(struct curve_points *first_plot, int nplots)
     for (iplot = 0;  iplot < nplots; iplot++, this_plot = this_plot->next) {
 
 	/* handle 'reverse' ranges */
-	axis_revert_range( this_plot->x_axis );
-	axis_revert_range( this_plot->y_axis );
+	axis_check_range( this_plot->x_axis );
+	axis_check_range( this_plot->y_axis );
 
 	/* Make sure the bounds are reasonable, and tweak them if they aren't */
 	axis_checked_extend_empty_range(this_plot->x_axis, NULL);
@@ -3275,13 +3275,13 @@ eval_plots()
 	if (axis_array[FIRST_X_AXIS].max == -VERYLARGE ||
 	    axis_array[FIRST_X_AXIS].min == VERYLARGE)
 	    int_error(NO_CARET, "all points undefined!");
-	axis_revert_and_unlog_range(FIRST_X_AXIS);
+	axis_check_range(FIRST_X_AXIS);
     }
     if (uses_axis[SECOND_X_AXIS]) {
 	if (axis_array[SECOND_X_AXIS].max == -VERYLARGE ||
 	    axis_array[SECOND_X_AXIS].min == VERYLARGE)
 	    int_error(NO_CARET, "all points undefined!");
-	axis_revert_and_unlog_range(SECOND_X_AXIS);
+	axis_check_range(SECOND_X_AXIS);
     } else {
 	/* FIXME: If this triggers, doesn't it clobber linked axes? */
 	assert(uses_axis[FIRST_X_AXIS]);
@@ -3290,7 +3290,7 @@ eval_plots()
 	if (axis_array[SECOND_X_AXIS].autoscale & AUTOSCALE_MAX)
 	    axis_array[SECOND_X_AXIS].max = axis_array[FIRST_X_AXIS].max;
 	if (! axis_array[SECOND_X_AXIS].autoscale)
-	    axis_revert_and_unlog_range(SECOND_X_AXIS);
+	    axis_check_range(SECOND_X_AXIS);
     }
     if (! uses_axis[FIRST_X_AXIS]) {
 	assert(uses_axis[SECOND_X_AXIS]);
@@ -3313,13 +3313,13 @@ eval_plots()
 	update_primary_axis_range(&axis_array[FIRST_Y_AXIS]);
     } else if (uses_axis[FIRST_Y_AXIS]) {
 	axis_checked_extend_empty_range(FIRST_Y_AXIS, "all points y value undefined!");
-	axis_revert_and_unlog_range(FIRST_Y_AXIS);
+	axis_check_range(FIRST_Y_AXIS);
     }
     if (uses_axis[SECOND_Y_AXIS] && axis_array[SECOND_Y_AXIS].linked_to_primary) {
 	update_primary_axis_range(&axis_array[SECOND_Y_AXIS]);
     } else if (uses_axis[SECOND_Y_AXIS]) {
 	axis_checked_extend_empty_range(SECOND_Y_AXIS, "all points y2 value undefined!");
-	axis_revert_and_unlog_range(SECOND_Y_AXIS);
+	axis_check_range(SECOND_Y_AXIS);
     } else {
 	/* else we want to copy y2 range */
 	assert(uses_axis[FIRST_Y_AXIS]);
@@ -3330,7 +3330,7 @@ eval_plots()
 	/* Log() fixup is only necessary if the range was *not* copied from
 	 * the (already logarithmized) yrange */
 	if (! axis_array[SECOND_Y_AXIS].autoscale)
-	    axis_revert_and_unlog_range(SECOND_Y_AXIS);
+	    axis_check_range(SECOND_Y_AXIS);
     }
     if (! uses_axis[FIRST_Y_AXIS]) {
 	assert(uses_axis[SECOND_Y_AXIS]);

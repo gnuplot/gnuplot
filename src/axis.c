@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.233 2017/08/01 01:26:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.234 2017/08/01 05:08:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -217,24 +217,12 @@ axis_init(AXIS *this_axis, TBOOLEAN infinite)
     this_axis->data_max = -VERYLARGE;
 }
 
-/* {{{ axis_revert_range() */
-
 void
-axis_revert_range(AXIS_INDEX axis)
-{
-    axis_invert_if_requested( &axis_array[axis] );
-}
-
-/* {{{ axis_revert_and_unlog_range() */
-
-void
-axis_revert_and_unlog_range(AXIS_INDEX axis)
+axis_check_range(AXIS_INDEX axis)
 {
     axis_invert_if_requested(&axis_array[axis]);
     check_log_limits(&axis_array[axis], axis_array[axis].min, axis_array[axis].max);
 }
-
-/* }}} */
 
 /* {{{ axis_log_value_checked() */
 double

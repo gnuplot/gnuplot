@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.172 2017/08/01 01:22:08 sfeam Exp $
+ * $Id: axis.h,v 1.173 2017/08/01 05:08:27 sfeam Exp $
  *
  */
 
@@ -590,8 +590,7 @@ typedef void (*tic_callback) __PROTO((struct axis *, double, char *, int,
 t_autoscale load_range __PROTO((struct axis *, double *, double *, t_autoscale));
 void check_log_limits __PROTO((struct axis *, double, double));
 void axis_invert_if_requested __PROTO((struct axis *));
-void axis_revert_range __PROTO((AXIS_INDEX));
-void axis_revert_and_unlog_range __PROTO((AXIS_INDEX));
+void axis_check_range __PROTO((AXIS_INDEX));
 void axis_init __PROTO((AXIS *this_axis, TBOOLEAN infinite));
 void set_explicit_range __PROTO((struct axis *axis, double newmin, double newmax));
 double axis_log_value_checked __PROTO((AXIS_INDEX, double, const char *));
