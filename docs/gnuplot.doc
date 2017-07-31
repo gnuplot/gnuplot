@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1100 2017/07/23 16:36:02 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1101 2017/07/31 01:32:10 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10291,18 +10291,15 @@ Ffigure_multiple_keys
  Unlike line styles, redefinitions by `set linetype` are persistent;  they
  are not affected by `reset`.
 
- For example, linetypes one and two default to red and green. If you redefine
- them like this:
+ For example, whatever linetypes one and two look like to begin with, if you
+ redefine them like this:
 
        set linetype 1 lw 2 lc rgb "blue" pointtype 6
        set linetype 2 lw 2 lc rgb "forest-green" pointtype 8
 
- everywhere that uses lt 1 will now get a thick blue line rather than a thin red
- line (the previous default meaning of lt 1).  This includes uses such as the
- definition of a temporary linestyle derived from the base linetype 1.
-
- `Note`: This command was introduced in gnuplot version 4.6.  It supersedes an
- older rather cryptic command "set style increment user" that is now deprecated.
+ everywhere that uses lt 1 will now get a thick blue line.  This includes
+ uses such as the definition of a temporary linestyle derived from the base
+ linetype 1.  Similary lt 2 will now produce a think green line.
 
  This mechanism can be used to define a set of personal preferences for the
  sequence of lines used in gnuplot.  The recommended way to do this is to add
