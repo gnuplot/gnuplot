@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.265 2017/07/24 07:54:52 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.266 2017/07/29 06:24:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -247,7 +247,6 @@ plot3drequest()
     AXIS_INIT3D(V_AXIS, 1, 0);
     AXIS_INIT3D(COLOR_AXIS, 0, 1);
 
-#ifdef NONLINEAR_AXES
     /* Nonlinear mapping of x or y via linkage to a hidden primary axis. */
     /* The user set autoscale for the visible axis; apply it also to the hidden axis. */
     for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++) {
@@ -261,7 +260,6 @@ plot3drequest()
 	    axis_init(primary, 1);
 	}
     }
-#endif
 
     if (!term)			/* unknown */
 	int_error(c_token, "use 'set term' to set terminal type first");

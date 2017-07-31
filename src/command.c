@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.359 2017/07/24 07:54:50 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.360 2017/07/29 08:48:07 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1411,7 +1411,6 @@ link_command()
      * "set nonlinear" currently supports axes x x2 y y2 z r cb
      */
     if (equals(command_token,"nonlinear")) {
-#ifdef NONLINEAR_AXES
 	AXIS_INDEX axis;
 	if ((axis = lookup_table(axisname_tbl, c_token)) >= 0)
 	    secondary_axis = &axis_array[axis];
@@ -1427,9 +1426,6 @@ link_command()
 	/* Clear previous log status */
 	secondary_axis->log = FALSE;
 	secondary_axis->ticdef.logscaling = FALSE;
-#else
-	int_error(command_token, "This copy of gnuplot does not support nonlinear axes");
-#endif
 
     /*
      * "set link" applies to either x|x2 or y|y2
@@ -1489,7 +1485,6 @@ link_command()
 	}
     }
 
-#ifdef NONLINEAR_AXES
     else if (equals(command_token,"nonlinear") && linked) {
 	int_warn(c_token,"via mapping function required");
 	linked = FALSE;
@@ -1503,11 +1498,8 @@ link_command()
 	secondary_axis->linked_to_primary = primary_axis;
 	primary_axis->linked_to_secondary = secondary_axis;
 	clone_linked_axes(secondary_axis, primary_axis);
-    } else 
-#endif
-
-    /* Clone the range information */
-    if (linked) {
+    } else if (linked) {
+	/* Clone the range information */
 	secondary_axis->linked_to_primary = primary_axis;
 	primary_axis->linked_to_secondary = secondary_axis;
 	clone_linked_axes(primary_axis, secondary_axis);

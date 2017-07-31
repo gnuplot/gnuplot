@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.563 2017/07/29 06:17:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.564 2017/07/31 01:32:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2750,7 +2750,6 @@ set_logscale()
 	}
     }
 
-#if defined(NONLINEAR_AXES) && (NONLINEAR_AXES > 0)
     for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++) {
 	if (set_for_axis[axis]) {
 	    static char command[128];
@@ -2793,23 +2792,6 @@ set_logscale()
 	    axis_array[axis].linked_to_primary->log = TRUE;
 	}
     }
-
-#else
-    for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++) {
-	if (set_for_axis[axis]) {
-	    axis_array[axis].log = TRUE;
-	    axis_array[axis].base = newbase;
-	    axis_array[axis].log_base = log(newbase);
-	    if ((axis == POLAR_AXIS) && polar)
-		rrange_to_xy();
-	}
-    }
-
-    /* Because the log scaling is applied during data input, a quick refresh */
-    /* using existing stored data will not work if the log setting changes.  */
-    SET_REFRESH_OK(E_REFRESH_NOT_OK, 0);
-#endif
-
 }
 
 /* process 'set mapping3d' command */
@@ -5693,14 +5675,12 @@ set_tic_prop(struct axis *this_axis)
 		    this_axis->ticdef.def.user = NULL;
 		}
 		this_axis->ticdef.type = TIC_COMPUTED;
-#ifdef NONLINEAR_AXES
 	    } else if (almost_equals(c_token, "log$scale")) {
 		++c_token;
 		this_axis->ticdef.logscaling = TRUE;
 	    } else if (almost_equals(c_token, "nolog$scale")) {
 		++c_token;
 		this_axis->ticdef.logscaling = FALSE;
-#endif
 	    } else if (equals(c_token,"add")) {
 		++c_token;
 		this_axis->ticdef.def.mix = TRUE;

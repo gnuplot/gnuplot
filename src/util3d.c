@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.54 2016/05/09 03:32:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.55 2017/05/05 06:10:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -59,16 +59,9 @@ static char *RCSid() { return RCSid("$Id: util3d.c,v 1.54 2016/05/09 03:32:27 sf
 static void mat_unit __PROTO((transform_matrix mat));
 static GP_INLINE void draw3d_point_unconditional __PROTO((p_vertex, struct lp_style_type *));
 
-#ifdef NONLINEAR_AXES
 static double map_x3d __PROTO((double));
 static double map_y3d __PROTO((double));
 static double map_z3d __PROTO((double));
-#else
-/* Function macros to map from user 3D space into normalized -1..1 */
-#define map_x3d(x) ((x-X_AXIS.min)*xscale3d + xcenter3d - 1.0)
-#define map_y3d(y) ((y-Y_AXIS.min)*yscale3d + ycenter3d - 1.0)
-#define map_z3d(z) ((z-floor_z)*zscale3d + zcenter3d - 1.0)
-#endif
 
 static void
 mat_unit(transform_matrix mat)
@@ -1033,7 +1026,6 @@ polyline3d_next(p_vertex v2, struct lp_style_type *lp)
     polyline3d_previous_vertex = *v2;
 }
 
-#ifdef NONLINEAR_AXES
 static double
 map_x3d(double x)
 {
@@ -1072,4 +1064,3 @@ map_z3d(double z)
 
     return ((z - floor_z1)*zscale3d + zcenter3d - 1.0);
 }
-#endif

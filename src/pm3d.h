@@ -1,5 +1,5 @@
 /*
- * $Id: pm3d.h,v 1.35 2016/11/05 21:21:07 sfeam Exp $
+ * $Id: pm3d.h,v 1.36 2016/11/29 22:56:39 sfeam Exp $
  */
 
 /* GNUPLOT - pm3d.h */
@@ -142,12 +142,8 @@ extern struct lp_style_type default_pm3d_border;
 extern struct lp_style_type pm3d_border_lp;
 extern TBOOLEAN track_pm3d_quadrangles;
 
-#if defined(NONLINEAR_AXES) && (NONLINEAR_AXES > 0)
-#   define z2cb(z) (z)
-#else
-    /* The original routine, with log/unlog dance steps */
-#   define z2cb(z) z2cb_with_logs(z)
-#endif
+/* This became a no-op with nonlinear axis support */
+#define z2cb(z) (z)
 
 
 /****

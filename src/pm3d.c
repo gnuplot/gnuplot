@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.116 2016/12/15 20:34:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.117 2017/02/17 23:55:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -168,29 +168,6 @@ rms4 (double x1, double x2, double x3, double x4)
 /*
 * Now the routines which are really just those for pm3d.c
 */
-
-/*
- * Rescale z to cb values. Nothing to do if both z and cb are linear or log of the
- * same base, other it has to un-log z and subsequently log it again.
- */
-#if defined(NONLINEAR_AXES) && (NONLINEAR_AXES > 0)
-    /* z2cb is a no-op */
-#else
-double
-z2cb_with_logs(double z)
-{
-    if (!Z_AXIS.log && !CB_AXIS.log) /* both are linear */
-	return z;
-    if (Z_AXIS.log && !CB_AXIS.log) /* log z, linear cb */
-	return axis_undo_log((&Z_AXIS), z);
-    if (!Z_AXIS.log && CB_AXIS.log) /* linear z, log cb */
-	return (z<=0) ? CB_AXIS.min : axis_do_log((&CB_AXIS), z);
-    /* both are log */
-    if (Z_AXIS.base==CB_AXIS.base) /* can we compare double numbers like that? */
-	return z;
-    return z * Z_AXIS.log_base / CB_AXIS.log_base; /* log_cb(unlog_z(z)) */
-}
-#endif
 
 /*
  * Rescale cb (color) value into the interval of grays [0,1], taking care

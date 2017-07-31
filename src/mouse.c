@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.200 2017/07/14 19:16:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.201 2017/07/24 07:54:51 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -383,7 +383,6 @@ MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double 
 	    *y2 = eval_link_function(secondary, *y);
     }
 
-#ifdef NONLINEAR_AXES
     /* If x or y is linked to a (hidden) primary axis, it's a bit more complicated */
     if (!is_3d_plot) {
 	AXIS *secondary;
@@ -412,8 +411,6 @@ MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double 
 	    *y2 = eval_link_function(secondary, *y2);
 	}
     }
-#endif
-
 }
 
 static char *

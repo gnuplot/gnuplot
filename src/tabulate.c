@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.28 2017/07/21 04:31:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.29 2017/07/21 17:49:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tabulate.c */
@@ -96,11 +96,6 @@ output_number(double coord, int axis, char *buffer) {
 	    gstrftime(buffer+1, BUFFERSIZE-1, axis_array[axis].formatstring, coord);
 	while (strchr(buffer,'\n')) {*(strchr(buffer,'\n')) = ' ';}
 	strcat(buffer,"\"");
-#if !defined(NONLINEAR_AXES) || (NONLINEAR_AXES == 0)
-    } else if (axis_array[axis].log) {
-	double x = pow(axis_array[axis].base, coord);
-	gprintf(buffer, BUFFERSIZE, axis_array[axis].formatstring, 1.0, x);
-#endif
     } else
 	gprintf(buffer, BUFFERSIZE, axis_array[axis].formatstring, 1.0, coord);
     strcat(buffer, " ");

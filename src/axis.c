@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.227 2017/06/20 19:29:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.228 2017/07/23 19:11:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1657,14 +1657,12 @@ axis_set_scale_and_range(struct axis *axis, unsigned int lower, unsigned int upp
     axis->term_scale = (upper - lower) / (axis->max - axis->min);
     axis->term_lower = lower;
     axis->term_upper = upper;
-#ifdef NONLINEAR_AXES
     if (axis->linked_to_primary && axis->linked_to_primary->index <= 0) {
 	axis = axis->linked_to_primary;
 	axis->term_scale = (upper - lower) / (axis->max - axis->min);
 	axis->term_lower = lower;
 	axis->term_upper = upper;
     }
-#endif
 }
 /* }}} */
 
@@ -2011,10 +2009,8 @@ set_cbminmax()
 	CB_AXIS.max = CB_AXIS.min;
 	CB_AXIS.min = tmp;
     }
-#ifdef NONLINEAR_AXES
     if (CB_AXIS.linked_to_primary)
 	clone_linked_axes(&CB_AXIS, CB_AXIS.linked_to_primary);
-#endif
 }
 
 void
@@ -2330,13 +2326,11 @@ parse_range(AXIS_INDEX axis)
 	}
 	this_axis->autoscale =
 		load_range(this_axis, &this_axis->min, &this_axis->max, this_axis->autoscale);
-#ifdef NONLINEAR_AXES
 	if (this_axis->linked_to_primary) {
 	    AXIS *primary = this_axis->linked_to_primary;
 	    primary->min = eval_link_function(primary, this_axis->min);
 	    primary->max = eval_link_function(primary, this_axis->max);
 	}
-#endif
 
 	/* EXPERIMENTAL: optional sample interval */
 	if (axis == SAMPLE_AXIS) {
@@ -2429,7 +2423,6 @@ eval_link_function(struct axis *axis, double raw_coord)
     int dummy_var;
     struct value a;
 
-#if defined(NONLINEAR_AXES) && (NONLINEAR_AXES > 0)
     /* Special case to speed up evaluation of log scaling */
     /* benchmark timing summary
      * v4.6 (old-style logscale)	42.7 u 42.7 total
@@ -2446,7 +2439,6 @@ eval_link_function(struct axis *axis, double raw_coord)
 	    return exp(raw_coord * axis->log_base);
 	}
     }
-#endif
 
     if (abs(axis->index) == FIRST_Y_AXIS || abs(axis->index) == SECOND_Y_AXIS)
 	dummy_var = 1;
@@ -2472,7 +2464,6 @@ eval_link_function(struct axis *axis, double raw_coord)
     return a.v.cmplx_val.real;
 }
 
-#ifdef NONLINEAR_AXES
 /*
  * Obtain and initialize a shadow axis.
  * The details are hidden from the rest of the code (dynamic/static allocation, etc).
@@ -2540,8 +2531,6 @@ update_primary_axis_range(struct axis *secondary)
 	primary->data_max = eval_link_function(primary, secondary->data_max);
     }
 }
-
-#endif
 
 
 /*

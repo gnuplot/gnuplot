@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.125 2016/11/11 05:00:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.126 2016/11/14 19:59:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -446,14 +446,12 @@ cbtick_callback(
     double cb_place;
 
     /* position of tic as a fraction of the full palette range */
-#ifdef NONLINEAR_AXES
     if (this_axis->linked_to_primary) {
 	AXIS * primary = this_axis->linked_to_primary;
 	place = eval_link_function(primary, place);
 	cb_place = (place - primary->min) / (primary->max - primary->min);
     } else 
-#endif
-    cb_place = (place - this_axis->min) / (this_axis->max - this_axis->min);
+	cb_place = (place - this_axis->min) / (this_axis->max - this_axis->min);
 
     /* calculate tic position */
     if (color_box.rotation == 'h') {

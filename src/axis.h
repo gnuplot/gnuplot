@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.166 2017/03/29 04:20:07 sfeam Exp $
+ * $Id: axis.h,v 1.167 2017/07/29 06:24:42 sfeam Exp $
  *
  */
 
@@ -36,15 +36,9 @@
 #ifndef GNUPLOT_AXIS_H
 #define GNUPLOT_AXIS_H
 
-#ifdef DISABLE_NONLINEAR_AXES
-# define nonlinear(axis) FALSE
-# define invalid_coordinate(x,y) FALSE
-#else
-
-# define NONLINEAR_AXES 1
+/* Aug 2017 - unconditional support for nonlinear axes */
 # define nonlinear(axis) ((axis)->linked_to_primary != NULL && (axis)->link_udf->at != NULL)
 # define invalid_coordinate(x,y) ((unsigned)(x)==intNaN || (unsigned)(y)==intNaN)
-#endif
 
 #include <stddef.h>		/* for offsetof() */
 #include "gp_types.h"		/* for TBOOLEAN */
@@ -414,8 +408,6 @@ extern struct axis THETA_AXIS;
 #define axis_mapback(axis, pos) \
     (((double)(pos) - axis->term_lower)/axis->term_scale + axis->min)
 
-#if defined(NONLINEAR_AXES) && (NONLINEAR_AXES > 0)
-
 /* These become no-ops because the nonlinear axis code stores untransformed values */
 #define AXIS_DO_LOG(axis,value) (value)
 #define AXIS_UNDO_LOG(axis,value) (value)
@@ -425,26 +417,6 @@ extern struct axis THETA_AXIS;
 #define AXIS_DE_LOG_VALUE(axis,coordinate) (coordinate)
 #define axis_log_value(axis,value) (value)
 #define axis_de_log_value(axis,coordinate) (coordinate)
-
-#else /* !(NONLINEAR_AXES > 0) */
-
-/* Macros to deal with logscale axis values being stored as log */
-#define AXIS_DO_LOG(axis,value) (log(value) / axis_array[axis].log_base)
-#define AXIS_UNDO_LOG(axis,value) exp((value) * axis_array[axis].log_base)
-#define axis_do_log(axis,value) (log(value) / axis->log_base)
-#define axis_undo_log(axis,value) exp((value) * axis->log_base)
-
-/* Same, but these test if the axis is log, first: */
-#define AXIS_LOG_VALUE(axis,value)				\
-    (axis_array[axis].log ? AXIS_DO_LOG(axis,value) : (value))
-#define AXIS_DE_LOG_VALUE(axis,coordinate)				  \
-    (axis_array[axis].log ? AXIS_UNDO_LOG(axis,coordinate): (coordinate))
-#define axis_log_value(axis,value)				\
-    (axis->log ? axis_do_log(axis,value) : (value))
-#define axis_de_log_value(axis,coordinate)				  \
-    (axis->log ? axis_undo_log(axis,coordinate): (coordinate))
-
-#endif /* (NONLINEAR_AXES > 0) */
 
 /* April 2015:  I'm not 100% sure, but I believe there is no longer
  * any need to treat 2D and 3D axis initialization differently
@@ -507,11 +479,7 @@ do {									\
  * NOAUTOSCALE is per-plot property, whereas AUTOSCALE_XXX is per-axis.
  * Note: see the particular implementation for COLOR AXIS below.
  */
-#if defined(NONLINEAR_AXES) && (NONLINEAR_AXES > 0)
 #define OPTIMIZE_LOG 1
-#else
-#define OPTIMIZE_LOG 0
-#endif
 
 #define ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, TYPE, AXIS,  \
 					       NOAUTOSCALE, OUT_ACTION,   \

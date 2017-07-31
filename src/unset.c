@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.254 2017/02/14 21:49:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.255 2017/07/05 18:31:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1191,7 +1191,6 @@ unset_logscale()
 	c_token++;
     }
 
-#if defined(NONLINEAR_AXES) && (NONLINEAR_AXES > 0)
     for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++) {
 	if (set_for_axis[axis]) {
 	    static char command[64];
@@ -1203,19 +1202,6 @@ unset_logscale()
 	    axis_array[axis].ticdef.logscaling = FALSE;
 	}
     }
-
-#else
-    for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++) {
-	if (set_for_axis[axis]) {
-	    reset_logscale(&axis_array[axis]);
-	}
-    }
-
-    /* Because the log scaling is applied during data input, a quick refresh */
-    /* using existing stored data will not work if the log setting changes.  */
-    SET_REFRESH_OK(E_REFRESH_NOT_OK, 0);
-#endif
-
 }
 
 /* process 'unset mapping3d' command */
@@ -1909,14 +1895,12 @@ reset_command()
     parallel_axis = NULL;
     num_parallel_axes = 0;
 
-#ifdef NONLINEAR_AXES
     if (shadow_axis_array) {
 	for (i=0; i<NUMBER_OF_MAIN_VISIBLE_AXES; i++)
 	    free_axis_struct(&shadow_axis_array[i]);
 	free(shadow_axis_array);
 	shadow_axis_array = NULL;
     }
-#endif
 
     raxis = FALSE;
     for (i=2; i<MAX_TICLEVEL; i++)
