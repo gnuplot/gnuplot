@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.29 2017/07/29 08:48:07 markisch Exp $
+ * $Id: wd2d.cpp,v 1.31 2017/07/31 19:30:19 markisch Exp $
  */
 
 /*
@@ -104,15 +104,15 @@ static HRESULT d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT 
 our own definitions here, taken from MSDN */
 #ifndef HAVE_PRNTVPT
 extern "C" {
-	typedef HANDLE HPTPROVIDER;  // guessed
-	typedef enum tagEPrintTicketScope { 
+	typedef HANDLE HPTPROVIDER;
+	typedef enum tagEPrintTicketScope {
 		kPTPageScope,
 		kPTDocumentScope,
 		kPTJobScope
 	} EPrintTicketScope;
-	HRESULT PTConvertDevModeToPrintTicket(HPTPROVIDER, ULONG, PDEVMODE, EPrintTicketScope scope, IStream *);
-	HRESULT PTCloseProvider(HPTPROVIDER hProvider);
-	HRESULT PTOpenProvider(PCWSTR, DWORD, HPTPROVIDER *);
+	HRESULT WINAPI PTConvertDevModeToPrintTicket(HPTPROVIDER, ULONG, PDEVMODE, EPrintTicketScope, IStream *);
+	HRESULT WINAPI PTCloseProvider(HPTPROVIDER);
+	HRESULT WINAPI PTOpenProvider(PCWSTR, DWORD, HPTPROVIDER *);
 }
 #endif
 
@@ -142,7 +142,7 @@ static struct {
 /* ****************  D2D initialization   ************************* */
 
 #if defined(HAVE_D2D11) && !defined(DCRENDERER)
-static HRESULT 
+static HRESULT
 d2dCreateD3dDevice(D3D_DRIVER_TYPE const type, ID3D11Device **device)
 {
 	// Set feature levels supported by our application
@@ -197,7 +197,7 @@ d2dCreateDeviceSwapChainBitmap(LPGW lpgw)
 		// Get the DXGI factory instance
 		IDXGIFactory2 *dxgiFactory = NULL;
 		if (SUCCEEDED(hr))
-			hr = dxgiAdapter->GetParent(IID_PPV_ARGS(&dxgiFactory)); 
+			hr = dxgiAdapter->GetParent(IID_PPV_ARGS(&dxgiFactory));
 
 		// Parameters for a Windows 7-compatible swap chain
 		DXGI_SWAP_CHAIN_DESC1 props = { };
@@ -235,7 +235,7 @@ d2dCreateDeviceSwapChainBitmap(LPGW lpgw)
 
 	// Create a Direct2D surface (bitmap) linked to the Direct3D texture back buffer via the DXGI back buffer
 	D2D1_BITMAP_PROPERTIES1 bitmapProperties =
-		D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW, 
+		D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
 		D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_IGNORE), dpiX, dpiY);
 	ID2D1Bitmap1 * pDirect2dBackBuffer = NULL;
 	if (SUCCEEDED(hr))
@@ -955,7 +955,7 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 
 // Creates a print job ticket stream to define options for the next print job.
 // Note: This is derived from an MSDN example
-HRESULT 
+HRESULT
 GetPrintTicketFromDevmode(PCTSTR printerName, PDEVMODE pDevMode, WORD devModesize, LPSTREAM * pPrintTicketStream)
 {
 	HRESULT hr = S_OK;
@@ -1002,7 +1002,7 @@ print_d2d(LPGW lpgw, DEVMODE * pDevMode, LPCTSTR szDevice, LPRECT rect)
 	if (SUCCEEDED(hr)) {
 		hr = documentTargetFactory->CreateDocumentPackageTargetForPrintJob(
 				szDevice, lpgw->Title,
-				NULL, jobPrintTicketStream, 
+				NULL, jobPrintTicketStream,
 				&documentTarget);
 	}
 
@@ -1061,7 +1061,7 @@ print_d2d(LPGW lpgw, DEVMODE * pDevMode, LPCTSTR szDevice, LPRECT rect)
 		D2D1_PRINT_CONTROL_PROPERTIES printControlProperties;
 		printControlProperties.rasterDPI = 150.f;
 		printControlProperties.fontSubset = D2D1_PRINT_FONT_SUBSET_MODE_DEFAULT;
-		printControlProperties.colorSpace = D2D1_COLOR_SPACE_SRGB; 
+		printControlProperties.colorSpace = D2D1_COLOR_SPACE_SRGB;
 		hr = lpgw->pDirect2dDevice->CreatePrintControl(
 			g_wicFactory,
 			documentTarget,
@@ -1765,7 +1765,7 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 				break;
 			}
 			case TEXTBOX_MARGINS:
-				/* Adjust size of whitespace around text: default is 1/2 char height + 2 char widths. */
+				/* Adjust size of whitespace around text. */
 				boxedtext.margin.x = MulDiv(curptr->x * lpgw->hchar, rr - rl, 1000 * lpgw->xmax);
 				boxedtext.margin.y = MulDiv(curptr->y * lpgw->hchar, rr - rl, 1000 * lpgw->xmax);
 				break;
