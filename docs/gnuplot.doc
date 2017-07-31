@@ -245,7 +245,7 @@ C
 ^ <a href="http://gnuplot.info/demo_5.2/nonlinear3.html">
    Nonlinear x/y axis demo
 ^ </a>
-#b The familiar command `set logscale` is re-implemented as a special case of a 
+#b The familiar command `set logscale` has been reimplemented as a special case
 ## nonlinear axis where the paired functions are log(x) and exp(x).
 #end
 4 New commands and command options
@@ -6092,8 +6092,7 @@ Ffigure_fenceplot
 ?data-file bins
 ?datafile bins
 ?bins
- EXPERIMENTAL (implementation details may change further before this option
- appears in a stable release).
+ EXPERIMENTAL (implementation details may change)
  Syntax:
       plot 'DATA' using <XCOL> {:<YCOL>} bins{=<NBINS>}
            {binrange [<LOW>:<HIGH>]} {binwidth=<width>}
@@ -10271,7 +10270,7 @@ Ffigure_multiple_keys
        plot 'data' using 1:2:0 with labels hypertext point pt 7 \
             title 'mouse over point to see its order in data set'
 
- EXPERIMENTAL (implementation details may change):
+ EXPERIMENTAL (implementation details may change)
  Text of the form "image{<xsize>,<ysize>}:<filename>{\n<caption text>}" will
  trigger display of the image file in a pop-up box. The optional size overrides
  a default box size 300x200.  The types of image file recognized may vary by
@@ -11033,8 +11032,6 @@ Ffigure_multiple_keys
        set nonlinear <axis> via f(axis) inverse g(axis)
        unset nonlinear <axis>
 
- This option is EXPERIMENTAL (implementation details may change before appearing
- in a stable gnuplot release).
  This command is similar to the `set link` command except that only one of the
  two linked axes is visible.  The hidden axis remains linear. Coordinates along
  the visible axis are mapped by applying g(x) to hidden axis coordinates.
