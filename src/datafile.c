@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.348 2017/07/24 21:48:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.349 2017/08/01 01:02:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -5309,7 +5309,7 @@ df_generate_pseudodata()
 		t_min = eval_link_function(primary, t_min);
 		t_max = eval_link_function(primary, t_max);
 	    } else  {
-		axis_unlog_interval(&X_AXIS, &t_min, &t_max, 1);
+		check_log_limits(&X_AXIS, t_min, t_max);
 	    }
 
 	    if (t_step == 0)	/* always true unless explicit sample interval was given */

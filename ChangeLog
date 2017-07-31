@@ -26,6 +26,10 @@
 
 	* src/axis.c: Remove code only used by old logscale implementation
 
+	* src/axis.c src/axis.h src/datafile.c src/plot2d.c:
+	Replace old routine axis_unlog_interval() with a simpler check
+	check_log_limits() to ensure min/max of a logscaled axis are positive
+
 2017-07-31  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/watcom/Makefile:  Optionally build with GDI+ or Direct2D/

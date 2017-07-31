@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.443 2017/08/01 01:02:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.444 2017/08/01 01:19:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -3060,7 +3060,7 @@ eval_plots()
 			    t_max = eval_link_function(primary, t_max);
 			    FPRINTF((stderr,"sample range on primary axis: %g %g\n", t_min, t_max));
 			} else {
-			    axis_unlog_interval(&X_AXIS, &t_min, &t_max, 1);
+			    check_log_limits(&X_AXIS, t_min, t_max);
 			}
 
 			t_step = (t_max - t_min) / (samples_1 - 1);

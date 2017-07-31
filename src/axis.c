@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.232 2017/08/01 01:19:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.233 2017/08/01 01:26:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -179,31 +179,17 @@ static void get_position_type __PROTO((enum position_type * type, AXIS_INDEX *ax
 
 /* ---------------------- routines ----------------------- */
 
-/* check range and take logs of min and max if logscale
- * this also restores min and max for ranges like [10:-10]
- */
-
-/* {{{ axis_unlog_interval() */
-
-/* this is used in a few places all over the code: undo logscaling of
- * a given range if necessary. If checkrange is TRUE, will int_error() if
- * range is invalid */
 void
-axis_unlog_interval(struct axis *axis, double *min, double *max, TBOOLEAN checkrange)
+check_log_limits(struct axis *axis, double min, double max)
 {
     if (axis->log) {
-	if (checkrange && (*min<= 0.0 || *max <= 0.0))
+	if (min<= 0.0 || max <= 0.0)
 	    int_error(NO_CARET,
 		      "%s range must be greater than 0 for log scale",
 		      axis_name(axis->index));
-	if (*min <= 0)
-	    *min= -VERYLARGE;
-	if (*max <= 0)
-	    *max = -VERYLARGE;
     }
 }
 
-/* }}} */
 
 /* {{{ axis_invert_if_requested() */
 
@@ -245,7 +231,7 @@ void
 axis_revert_and_unlog_range(AXIS_INDEX axis)
 {
     axis_invert_if_requested(&axis_array[axis]);
-    axis_unlog_interval(&axis_array[axis], &axis_array[axis].min, &axis_array[axis].max, 1);
+    check_log_limits(&axis_array[axis], axis_array[axis].min, axis_array[axis].max);
 }
 
 /* }}} */
@@ -1100,10 +1086,8 @@ gen_tics(struct axis *this, tic_callback callback)
     /* series-tics, either TIC_COMPUTED ("autofreq") or TIC_SERIES (user-specified increment)
      *
      * We need to distinguish internal user coords from user coords.
-     * before version 5.2
-     * -	logscale: internal = log(user), all other: internal = user
-     * now that we have nonlinear axes in version 5.2
-     * -	internal = primary axis, user = secondary axis
+     * Now that we have nonlinear axes (as of version 5.2)
+     *  	internal = primary axis, user = secondary axis
      *		TIC_COMPUTED ("autofreq") tries for equal spacing on primary axis
      *		TIC_SERIES   requests equal spacing on secondary (user) axis
      *		minitics are always evenly spaced in user coords
