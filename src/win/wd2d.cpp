@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.28 2017/07/27 09:01:13 markisch Exp $
+ * $Id: wd2d.cpp,v 1.29 2017/07/29 08:48:07 markisch Exp $
  */
 
 /*
@@ -65,6 +65,11 @@ extern "C" {
 
 #include "wgnuplib.h"
 #include "wcommon.h"
+
+#ifndef __WATCOMC__
+// MSVC and MinGW64 have the __uuidof() special function
+# define HAVE_UUIDOF
+#endif
 
 #define MINMAX(a,val,b) (((val) <= (a)) ? (a) : ((val) <= (b) ? (val) : (b)))
 const int pattern_num = 8;
@@ -261,14 +266,24 @@ d2dInit(LPGW lpgw)
 #ifdef D2DDEBUG
 		options.debugLevel = D2D1_DEBUG_LEVEL_INFORMATION;
 #endif
-		hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(g_pDirect2dFactory), &options, reinterpret_cast<void **>(&g_pDirect2dFactory));
+		hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED,
+#ifdef HAVE_UUIDOF
+				__uuidof(g_pDirect2dFactory),
+#else
+				IID_ID2D1Factory,
+#endif
+				&options, reinterpret_cast<void **>(&g_pDirect2dFactory));
 	}
 
 	// Create a DirectWrite factory
 	if (SUCCEEDED(hr) && g_pDWriteFactory == NULL) {
 		hr = DWriteCreateFactory(
 			DWRITE_FACTORY_TYPE_SHARED,
+#ifdef HAVE_UUIDOF
 			__uuidof(g_pDWriteFactory),
+#else
+			IID_IDWriteFactory,
+#endif
 			reinterpret_cast<IUnknown **>(&g_pDWriteFactory)
 		);
 	}
@@ -399,7 +414,9 @@ d2dReleaseRenderTarget(LPGW lpgw)
 	SafeRelease(&(lpgw->pDXGISwapChain));
 #endif
 	SafeRelease(&(lpgw->pRenderTarget));
+#ifdef HAVE_D2D11
 	SafeRelease(&(lpgw->pDirect2dDevice));
+#endif
 #endif
 }
 
