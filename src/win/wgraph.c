@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.270 2017/07/11 02:35:28 markisch Exp $
+ * $Id: wgraph.c,v 1.271 2017/07/27 09:13:43 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -42,6 +42,19 @@
 
 #include "syscfg.h"
 
+/* Enable following define to include the GDI backend */
+//#define USE_WINGDI
+
+/* sanity check */
+#if !defined(USE_WINGDI) && !defined(HAVE_GDIPLUS) && !defined(HAVE_D2D)
+# error "No valid windows terminal backend enabled."
+#endif
+
+/* Use GDI instead of GDI+ while rotating splots */
+#if defined(HAVE_GDIPLUS) && defined(USE_WINGDI)
+#  define FASTROT_WITH_GDI
+#endif
+
 #define STRICT
 #include <windows.h>
 #include <windowsx.h>
@@ -74,19 +87,6 @@
 
 #ifndef WM_MOUSEHWHEEL /* requires _WIN32_WINNT >= 0x0600 */
 # define WM_MOUSEHWHEEL 0x020E
-#endif
-
-/* Enable following define to include the GDI backend */
-//#define USE_WINGDI
-
-/* sanity check */
-#if !defined(USE_WINGDI) && !defined(HAVE_GDIPLUS) && !defined(HAVE_D2D)
-# error "No valid windows terminal backend enabled." 
-#endif
-
-/* Use GDI instead of GDI+ while rotating splots */
-#if defined(HAVE_GDIPLUS) && defined(USE_WINGDI)
-#  define FASTROT_WITH_GDI
 #endif
 
 /* Names of window classes */
@@ -164,6 +164,7 @@ int wginitstyle[WGDEFSTYLE] = {PS_SOLID, PS_DASH, PS_DOT, PS_DASHDOT, PS_DASHDOT
 
 #define MINMAX(a,val,b) (((val) <= (a)) ? (a) : ((val) <= (b) ? (val) : (b)))
 
+#ifdef USE_WINGDI
 /* bitmaps for filled boxes (ULIG) */
 /* zeros represent the foreground color and ones represent the background color */
 #define PATTERN_BITMAP_LENGTH 16
@@ -197,6 +198,7 @@ static BITMAP pattern_bitdata[pattern_num];
 static HBITMAP pattern_bitmap[pattern_num];
 
 static TBOOLEAN brushes_initialized = FALSE;
+#endif
 
 
 /* Internal state of enhanced text processing.
@@ -885,6 +887,7 @@ StorePen(LPGW lpgw, int i, COLORREF ref, int colorstyle, int monostyle)
 static void
 MakePens(LPGW lpgw, HDC hdc)
 {
+#ifdef USE_WINGDI
 	int i;
 	LOGPEN pen;
 
@@ -922,6 +925,7 @@ MakePens(LPGW lpgw, HDC hdc)
 		}
 		brushes_initialized = TRUE;
 	}
+#endif
 }
 
 
@@ -929,6 +933,7 @@ MakePens(LPGW lpgw, HDC hdc)
 static void
 DestroyPens(LPGW lpgw)
 {
+#ifdef USE_WINGDI
 	int i;
 
 	DeleteObject(lpgw->hbrush);
@@ -949,6 +954,7 @@ DestroyPens(LPGW lpgw)
 		}
 		brushes_initialized = FALSE;
 	}
+#endif
 }
 
 /* ================================== */
