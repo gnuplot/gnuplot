@@ -22,6 +22,10 @@
 	src/plot2d.c:  Remove all instances of axis_log_value axis_de_log_value
 	axis_do_log axis_undo_log
 
+	* src/axis.h: Always optimize evaluation of logscale coordinates
+
+	* src/axis.c: Remove code only used by old logscale implementation
+
 2017-07-31  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/watcom/Makefile:  Optionally build with GDI+ or Direct2D/

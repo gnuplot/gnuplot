@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.231 2017/08/01 01:07:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.232 2017/08/01 01:19:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1211,14 +1211,6 @@ gen_tics(struct axis *this, tic_callback callback)
 			nsteps -= 1;
 		    ministart = ministep = step / nsteps;
 		    miniend = step;
-
- 		} else if (this->log) {
-		    /* NB: Can't get here if "set log" is implemented as nonlinear */
- 		    ministart = ministep = step / this->mtic_freq * this->base;
- 		    miniend = step * this->base;
-		    /* Suppress minitics that would lie on top of major tic */
-		    while (ministart <= 1 && ministep > 0)
-			ministart += ministep;
  		} else {
 		    ministart = ministep = step / this->mtic_freq;
 		    miniend = step;
@@ -1227,33 +1219,6 @@ gen_tics(struct axis *this, tic_callback callback)
 		/* FIXME: Not sure this works for all values of step */
 		ministart = ministep = step / (this->base - 1);
 		miniend = step;
-	    } else if (this->log) {
-		/* NB: Can't get here if "set log" is implemented as nonlinear */
-		if (step > 1.5) {	/* beware rounding errors */
-		    /* {{{  10,100,1000 case */
-		    /* no more than five minitics */
-		    if (step < 65535) /* could be INT_MAX but 54K is already ridiculous */
-			ministart = ministep = (int)(0.2 * step);
-		    else
-			ministart = ministep = 0.2 * step;
-		    if (ministep < 1)
-			ministart = ministep = 1;
-		    miniend = step;
-		    /* }}} */
-		} else {
-		    /* {{{  2,5,8 case */
-		    miniend = this->base;
-		    if (end - start >= 10)
-			minitics = MINI_OFF;
-		    else if (end - start >= 5) {
-			ministart = 2;
-			ministep = 3;
-		    } else {
-			ministart = 2;
-			ministep = 1;
-		    }
-		    /* }}} */
-		}
 	    } else if (this->tictype == DT_TIMEDATE) {
 		ministart = ministep =
 		    make_auto_time_minitics(this->timelevel, step);
