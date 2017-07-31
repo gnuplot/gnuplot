@@ -1766,8 +1766,8 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 			}
 			case TEXTBOX_MARGINS:
 				/* Adjust size of whitespace around text: default is 1/2 char height + 2 char widths. */
-				boxedtext.margin.x = MulDiv(curptr->y, (rr - rl) * lpgw->hchar, 100 * lpgw->xmax);
-				boxedtext.margin.y = MulDiv(curptr->y, (rb - rt) * lpgw->vchar, 400 * lpgw->ymax);
+				boxedtext.margin.x = MulDiv(curptr->x * lpgw->hchar, rr - rl, 1000 * lpgw->xmax);
+				boxedtext.margin.y = MulDiv(curptr->y * lpgw->hchar, rr - rl, 1000 * lpgw->xmax);
 				break;
 			default:
 				break;

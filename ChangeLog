@@ -10,6 +10,13 @@
 	* src/win/wgnuplib.h (GW):  Re-group fields.  Separate GDI-only struct
 	members.
 
+	* src/win/wd2d.cpp:  Enable compilation width OpenWatcom, which is
+	missing __uuidof().
+
+	* src/win/wgraph.c src/win/wgdiplus.cpp src/win/wd2d.cpp
+	(TEXTBOX_MARGINS):  Adjust scaling of textbox margin to be more like
+	what the qt terminal does (ie. much smaller).
+
 2017-07-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* config/mingw/Makefile config/msvc/Makefile win/gnuplot.iss:
