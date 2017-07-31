@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.96 2017/07/04 09:22:47 markisch Exp $
+ * $Id: wgnuplib.h,v 1.97 2017/07/08 11:20:13 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -313,98 +313,119 @@ enum win_draw_commands {
 
 typedef struct tagGW {
 	GP_LPPRINT	lpr;	/* must be first */
+
+	/* window properties etc. */
 	HINSTANCE hInstance;	/* required */
 	HINSTANCE hPrevInstance;/* required */
 	int	Id;		/* plot number */
 	LPTSTR	Title;		/* required */
-	int	xmax;		/* required */
-	int	ymax;		/* required */
-	LPTW	lptw;		/* optional */  /* associated text window */
-	BOOL	bDocked;	/* is the graph docked to the text window? */
-	POINT	Origin;		/* optional */	/* origin of graph window */
-	POINT	Size;		/* optional */	/* size of graph window */
+	LPTW	lptw;		/* associated text window, optional */
 	LPTSTR	IniFile;	/* optional */
 	LPTSTR	IniSection;	/* optional */
+
+	/* window size and position */
+	BOOL	bDocked;	/* is the graph docked to the text window? */
+	POINT	Origin;		/* origin of graph window */
+	POINT	Size;		/* size of graph window */
+	POINT	Canvas;		/* requested size of the canvas */
+	POINT	Decoration;	/* extent of the window decorations */
+	int	StatusHeight;	/* height of status line area */
+	int	ToolbarHeight;	/* height of the toolbar */
+
+	/* (subwindow) handles */
 	HWND	hWndGraph;	/* window handle of the top window */
 	HWND	hGraph;		/* window handle of the actual graph */
 	HWND	hStatusbar;	/* window handle of status bar */
-	int	StatusHeight;	/* height of status line area */
-	HWND	hToolbar;
-	int	ToolbarHeight;
+	HWND	hToolbar;	/* window handle of the toolbar */
 	HMENU	hPopMenu;	/* popup menu */
-	HBITMAP	hBitmap;	/* bitmap of current graph */
-	BOOL	buffervalid;	/* indicates if hBitmap is valid */
-	BOOL	rotating;	/* are we currently rotating the graph? */
-	POINT	Canvas;		/* requested size of the canvas */
-	POINT	Decoration;	/* extent of the window decorations */
+	HWND	hTooltip;	/* tooltip windows for hypertext */
 
-	struct GWOPBLK *gwopblk_head;
+	/* command list */
+	struct GWOPBLK *gwopblk_head;	/* graph command list */
 	struct GWOPBLK *gwopblk_tail;
 	unsigned int nGWOP;
 	BOOL	locked;		/* locked if being written */
 
+	/* off-screen bitmap used by GDI, GDI+ and D2D DCRenderer */
+	HBITMAP	hBitmap;	/* bitmap of current graph */
+	BOOL	buffervalid;	/* indicates if hBitmap is valid */
+
+	/* state */
 	BOOL	initialized;	/* already initialized? */
+	BOOL	rotating;	/* are we currently rotating the graph? */
+
+	/* options */
 	BOOL	graphtotop;	/* bring graph window to top after every plot? */
-	BOOL	color;		/* color pens? */
-	BOOL	dashed;		/* dashed lines? */
-	BOOL	rounded;	/* rounded line caps and joins? */
+	BOOL	color;		/* colored graph? */
 	BOOL	oversample;	/* oversampling? */
 	BOOL	gdiplus;	/* Use GDI+ only backend? */
-	BOOL	d2d;
+	BOOL	d2d;	/* Use Direct2D backend? */
 	BOOL	antialiasing;	/* anti-aliasing? */
 	BOOL	polyaa;		/* anti-aliasing for polygons ? */
 	BOOL	fastrotation;	/* rotate without anti-aliasing? */
+	COLORREF background;	/* background color */
 
-	BOOL	*hideplot;
-	unsigned int maxhideplots;
-	BOOL	hidegrid;
+	/* plot properties */
+	int	xmax;		/* required */
+	int	ymax;		/* required */
+	int	htic;		/* horizontal size of point symbol (xmax units) */
+	int	vtic;		/* vertical size of point symbol (ymax units)*/
+	int	hchar;		/* horizontal size of character (xmax units) */
+	int	vchar;		/* vertical size of character (ymax units)*/
+
+	/* layers */
 	unsigned int numplots;
 	BOOL	hasgrid;
+	BOOL	hidegrid;
+	BOOL	*hideplot;	/* array for handling hidden plots */
+	unsigned int maxhideplots;
 	LPRECT	keyboxes;
 	unsigned int maxkeyboxes;
 
-	HWND	hTooltip;	/* tooltip windows for hypertext */
+	/* hypertext */
 	struct tooltips * tooltips;
 	unsigned int maxtooltips;
 	unsigned int numtooltips;
 
-	int	htic;		/* horizontal size of point symbol (xmax units) */
-	int 	vtic;		/* vertical size of point symbol (ymax units)*/
-	int	hchar;		/* horizontal size of character (xmax units) */
-	int	vchar;		/* vertical size of character (ymax units)*/
+	/* points and lines */
+	double	pointscale;	/* scale factor for point sizes */
+	double	org_pointsize;	/* original pointsize */
+	BOOL	dashed;		/* dashed lines? */
+	BOOL	rounded;	/* rounded line caps and joins? */
+	double	linewidth;	/* scale factor for linewidth */
+	LOGPEN	colorpen[WGNUMPENS+2];	/* color pen definitions */
+	LOGPEN	monopen[WGNUMPENS+2];	/* mono pen definitions */
 
-	TCHAR	fontname[MAXFONTNAME];	/* current font name */
-	int	fontsize;	/* current font size in pts */
+	/* fonts */
+	double	fontscale;	/* scale factor for font sizes */
 	TCHAR	deffontname[MAXFONTNAME]; /* default font name */
 	int	deffontsize;	/* default font size */
+	TCHAR	fontname[MAXFONTNAME];	/* current font name */
+	int	fontsize;	/* current font size in pts */
 	int	angle;		/* text angle */
-	BOOL	rotate;		/* can text be rotated 90 degrees ? */
+	BOOL	rotate;		/* can text be rotated? */
 	int	justify;	/* text justification */
-	HFONT	hfonth;		/* horizonal font */
-	HFONT	hfontv;		/* rotated font (arbitrary angle) */
-	LOGFONT	lf;			/* cached to speed up rotated fonts */
-	double	org_pointsize;	/* Original Pointsize */
 	int	encoding_error; /* last unknown encoding */
-	double	fontscale;	/* scale factor for font sizes */
-	double	pointscale;	/* scale factor for point sizes */
 	enum set_encoding_id encoding;	/* text encoding */
 	LONG	tmHeight;	/* text metric of current font */
 	LONG	tmAscent;
 	LONG	tmDescent;
 
+#ifdef USE_WINGDI
+	/* GDI resources */
 	HPEN	hapen;		/* stored current pen */
 	HPEN	hsolid;		/* solid sibling of current pen */
 	HPEN	hnull;		/* empty null pen */
-	LOGPEN	colorpen[WGNUMPENS+2];	/* color pen definitions */
-	LOGPEN	monopen[WGNUMPENS+2];	/* mono pen definitions */
-	double	linewidth;	/* scale factor for linewidth */
-
 	HBRUSH	colorbrush[WGNUMPENS+2];   /* brushes to fill points */
-	COLORREF background;	/* background color */
 	HBRUSH	hbrush;		/* background brush */
-	HBRUSH	hcolorbrush;	/* */
+	HBRUSH	hcolorbrush;	/* color fill brush */
+	HFONT	hfonth;		/* horizontal font */
+	HFONT	hfontv;		/* rotated font (arbitrary angle) */
+	LOGFONT	lf;			/* cached to speed up rotated fonts */
+#endif
 
 #ifdef HAVE_D2D
+	/* Direct2D resources */
 #if !defined(HAVE_D2D11) || defined(DCRENDERER)
 	struct ID2D1RenderTarget * pRenderTarget;
 #else

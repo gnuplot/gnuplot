@@ -7,6 +7,9 @@
 	* src/win/wgraph.c:  Wrap a few more GDI-only code sections with tests
 	for USE_WINGDI.
 
+	* src/win/wgnuplib.h (GW):  Re-group fields.  Separate GDI-only struct
+	members.
+
 2017-07-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* config/mingw/Makefile config/msvc/Makefile win/gnuplot.iss:
