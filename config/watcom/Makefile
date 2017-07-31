@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.12 2013/07/06 08:09:20 markisch Exp $
+# $Id: Makefile,v 1.13 2014/08/18 03:49:06 sfeam Exp $
 #
 # GNUPLOT Makefile OpenWatcom 1.3 on Win32
 
@@ -79,7 +79,7 @@ HELPFILE = wgnuplot.chm
 DEFAULT_TARGETS = $(BINARYFILES) $(HELPFILE)
 
 TARGETS_PLAIN=wgnuplot.exe wgnuplot.mnu
-EXTRA_CPPFLAGS_PLAIN = 
+EXTRA_CPPFLAGS_PLAIN = -DUSE_FAKEPIPES -DPIPES
 
 TARGETS_PIPES=wgnuplot_pipes.exe wgnuplot.mnu
 EXTRA_CPPFLAGS_PIPES = -DPIPES=1
@@ -148,13 +148,13 @@ WIN_EXTRA_INPUTS = wgnuplot.res
 
 # default rule
 .c.obj: .AUTODEPEND
-        $(WCC) $(WCFLAGS) $[@
+	$(WCC) $(EXTRA_CPPFLAGS_PLAIN) $(WCFLAGS) $[@
 
 .c.cobj: .AUTODEPEND
-		$(WCC) $(EXTRA_CPPFLAGS_CONSOLE) $(WCFLAGS) $[@ -fo=$^@
+	$(WCC) $(EXTRA_CPPFLAGS_CONSOLE) $(WCFLAGS) $[@ -fo=$^@
 
 .c.pobj: .AUTODEPEND
-		$(WCC) $(EXTRA_CPPFLAGS_PIPES) $(WCFLAGS) $[@ -fo=$^@
+	$(WCC) $(EXTRA_CPPFLAGS_PIPES) $(WCFLAGS) $[@ -fo=$^@
 
 # file-specific rules
 wgnuplot.exe: $(OBJS) $(WIN_EXTRA_INPUTS)
