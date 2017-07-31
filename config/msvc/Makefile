@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.25 2014/08/18 03:49:06 sfeam Exp $
+# $Id: Makefile,v 1.25.2.1 2017/03/04 08:17:29 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -107,20 +107,20 @@ LD = link
 # /I  means extra include directory
 # /Fm means produce link map
 # /Od means suppress optimizations (esp. for debug)
-# /O2 mans optimize for speed
+# /O2 means optimize for speed
 # /Zi means prepare for codeview
 # /MD means include multi-thread support (DLL)
 # /GR means Enable Run-Time Type Information
 !IF "$(DEBUG)" == "1"
-CBASEFLAGS = /EHsc /GR /MD /Od /nologo /Zi /DDEBUG
+CBASEFLAGS = /EHsc /GR /MDd /Od /nologo /Zi
 !ELSE
 CBASEFLAGS = /EHsc /GR /MD /O2 /nologo
 !ENDIF
 CFLAGS = $(CBASEFLAGS) /I. /I$(TOP) /I$(S) /I$(T) /D_Windows /DWIN32 /DHAVE_CONFIG_H /D__MSC__ $(OPTIONS)
 CFLAGS = $(CFLAGS) /DGNUPLOT_SHARE_DIR=\"$(GNUPLOT_SHARE_DIR)\"
-WIN_CFLAGS = /DUSE_FAKEPIPES
-CONSOLE_CFLAGS = /DWGP_CONSOLE /DCONSOLE_SWITCH_CP /DPIPES
-OPTIONS = /DUSE_MOUSE
+WIN_CFLAGS =
+CONSOLE_CFLAGS = /DWGP_CONSOLE /DCONSOLE_SWITCH_CP
+OPTIONS = /DUSE_MOUSE /DPIPES
 OPTIONS = $(OPTIONS) /DGNUPLOT_HISTORY
 
 EXTRA_TARGETS =
