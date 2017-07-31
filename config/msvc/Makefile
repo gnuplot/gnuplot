@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.33 2017/07/24 07:54:50 markisch Exp $
+# $Id: Makefile,v 1.34 2017/07/29 08:28:59 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -564,8 +564,6 @@ install:
 	xcopy /Y $(TOP)\demo $(DESTDIR)\demo
 	if not exist $(DESTDIR)\demo\games mkdir $(DESTDIR)\demo\games
 	xcopy /Y $(TOP)\demo\games $(DESTDIR)\demo\games
-	if not exist $(DESTDIR)\contrib\pm3d mkdir $(DESTDIR)\contrib\pm3d
-	xcopy /Y $(TOP)\pm3d\contrib\*.* $(DESTDIR)\contrib\pm3d
 
 zip:
 	$(MAKE) DESTDIR=.\gnuplot install
