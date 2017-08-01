@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.60 2017/08/01 01:07:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.61 2017/08/01 01:19:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -272,7 +272,7 @@ eval_kdensity (
     unsigned int i;
     struct coordinate GPHUGE *this_points = (cp->points) + first_point;
   
-    double y, Z, ytmp;
+    double y, Z;
     double avg, sigma;
     double bandwidth, default_bandwidth;
 
