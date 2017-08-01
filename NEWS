@@ -1,3 +1,7 @@
+Changes since 5.2.rc3
+====================
+* FIX reconcile aspect ratio flags from "set view map" and "set view equal xy"
+
 Changes in 5.2.rc3
 ==================
 * NEW "plot with table" can handle string-valued output columns

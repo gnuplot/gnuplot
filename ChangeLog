@@ -1,3 +1,11 @@
+2017-08-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_view):  Switching from "set view equal xy[z]" to 
+	"set view map" failed to clear the 3D aspect ratio flag, leading to
+	conflicting scale factors.  Now we treat it as "set size ratio -1",
+	which is what the documentation says.
+	Bug #1948
+
 2017-07-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* config/mingw/Makefile config/msvc/Makefile win/gnuplot.iss:
