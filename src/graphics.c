@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.36 2017/04/18 23:03:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.37 2017/06/13 21:48:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4327,7 +4327,7 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
      */
 #define GRIDX(X) AXIS_DE_LOG_VALUE(image_x_axis,points[X].x)
 #define GRIDY(Y) AXIS_DE_LOG_VALUE(image_y_axis,points[Y].y)
-#define GRIDZ(Z) AXIS_DE_LOG_VALUE(image_z_axis,points[Z].z)
+#define GRIDZ(Z) (project_points ? AXIS_DE_LOG_VALUE(image_z_axis,points[Z].z) : 0.0)
 
     if (project_points) {
 	map3d_xy_double(points[0].x, points[0].y, points[0].z, &p_start_corner[0], &p_start_corner[1]);

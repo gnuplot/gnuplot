@@ -1,3 +1,12 @@
+2017-08-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c(plot_image_or_update_axes): Image code is shared by
+	2D and 3D paths.  If we are in 2D we cannot rely on pixel.z being a
+	reasonable z coordinate, so treat all z coordinats as 0.
+	5.0.6 would segfault on command
+	    set log xy; plot 'blutux.rgb' binary array=(128,128) flipy \
+		format='%uchar' with rgbimage
+
 2017-07-31  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/mingw/Makefile config/msvc/Makefile config/config.nt:

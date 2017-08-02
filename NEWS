@@ -6,6 +6,7 @@ Changes in 5.0.7
 * CHANGE allow placement of circles in 3D plots using axis coordinates
 * CHANGE ignore invalid z coordinate for 3D objects placed in "set view map"
 * CHANGE distinguish 'bind "shift-Button1"' from 'bind "Button1"'
+* CHANGE use Mingw-w64 and MSVC popen rather than built-in "fake" popen
 * FIX rangelimited y2 axis could produce spurious diagonal line across plot
 * FIX assignment of x/y dimensions in "binary record=(a,b) ... with image"
 * FIX negative array index caused by hidden3d degenerate polygon
@@ -19,6 +20,7 @@ Changes in 5.0.7
 * FIX sanity check for empty image data structure on input
 * FIX more consistent handling of plot 'with table'
 * FIX incorrect, possibly empty, command string was saved for previous fit
+* FIX 2D images with logscale axes could fail (segfault)
 
 Changes in 5.0.6
 ================
