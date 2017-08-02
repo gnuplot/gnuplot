@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.561 2017/08/01 01:02:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.562 2017/08/01 01:19:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4543,20 +4543,11 @@ process_image(void *plot, t_procimg_action action)
      * function for images will be used.  Otherwise, the terminal function for
      * filled polygons are used to construct parallelograms for the pixel elements.
      */
-#define GRIDX(X) points[X].x
-#define GRIDY(Y) points[Y].y
-#define GRIDZ(Z) points[Z].z
-
     if (project_points) {
-	map3d_xy_double(points[0].x, points[0].y, points[0].z, &p_start_corner[0], &p_start_corner[1]);
-	map3d_xy_double(points[p_count-1].x, points[p_count-1].y, points[p_count-1].z, &p_end_corner[0], &p_end_corner[1]);
-
-    } else if (X_AXIS.log || Y_AXIS.log) {
-	p_start_corner[0] = GRIDX(0);
-	p_start_corner[1] = GRIDY(0);
-	p_end_corner[0] = GRIDX(p_count-1);
-	p_end_corner[1] = GRIDY(p_count-1);
-
+	map3d_xy_double(points[0].x, points[0].y, points[0].z,
+			&p_start_corner[0], &p_start_corner[1]);
+	map3d_xy_double(points[p_count-1].x, points[p_count-1].y, points[p_count-1].z, 
+			&p_end_corner[0], &p_end_corner[1]);
     } else {
 	p_start_corner[0] = points[0].x;
 	p_start_corner[1] = points[0].y;
@@ -4605,22 +4596,12 @@ process_image(void *plot, t_procimg_action action)
 	    coord_type dummy_type;
 	    double x,y;
 
-	    if (X_AXIS.log || Y_AXIS.log) {
-	    x = GRIDX(i);
-	    y = GRIDY(i);
-	    x -= (GRIDX((5-i)%4) - GRIDX(i)) / (2*(K-1));
-	    y -= (GRIDY((5-i)%4) - GRIDY(i)) / (2*(K-1));
-	    x -= (GRIDX((i+2)%4) - GRIDX(i)) / (2*(L-1));
-	    y -= (GRIDY((i+2)%4) - GRIDY(i)) / (2*(L-1));
-
-	    } else {
 	    x = points[grid_corner[i]].x;
 	    y = points[grid_corner[i]].y;
 	    x -= (points[grid_corner[(5-i)%4]].x - points[grid_corner[i]].x)/(2*(K-1));
 	    y -= (points[grid_corner[(5-i)%4]].y - points[grid_corner[i]].y)/(2*(K-1));
 	    x -= (points[grid_corner[(i+2)%4]].x - points[grid_corner[i]].x)/(2*(L-1));
 	    y -= (points[grid_corner[(i+2)%4]].y - points[grid_corner[i]].y)/(2*(L-1));
-	    }
 
 	    /* Update range and store value back into itself. */
 	    dummy_type = INRANGE;
@@ -4666,11 +4647,8 @@ process_image(void *plot, t_procimg_action action)
     }
 
     if (project_points) {
-	map3d_xy_double(points[K-1].x, points[K-1].y, points[K-1].z, &p_mid_corner[0], &p_mid_corner[1]);
-    } else if (X_AXIS.log || Y_AXIS.log) {
-	p_mid_corner[0] = GRIDX(K-1);
-	p_mid_corner[1] = GRIDY(K-1);
-
+	map3d_xy_double(points[K-1].x, points[K-1].y, points[K-1].z,
+			&p_mid_corner[0], &p_mid_corner[1]);
     } else {
 	p_mid_corner[0] = points[K-1].x;
 	p_mid_corner[1] = points[K-1].y;
@@ -4949,7 +4927,6 @@ process_image(void *plot, t_procimg_action action)
 	/* Use sum of vectors to compute the pixel corners with respect to its center. */
 	struct {double x; double y; double z;} delta_grid[2], delta_pixel[2];
 	int j, i_image;
-	TBOOLEAN log_axes = (X_AXIS.log || Y_AXIS.log);
 
 	if (!term->filled_polygon)
 	    int_error(NO_CARET, "This terminal does not support filled polygons");
@@ -4957,21 +4934,12 @@ process_image(void *plot, t_procimg_action action)
 	(term->layer)(TERM_LAYER_BEGIN_IMAGE);
 
 	/* Grid spacing in 3D space. */
-	if (log_axes) {
-	    delta_grid[0].x = (GRIDX(grid_corner[1]) - GRIDX(grid_corner[0])) / (K-1);
-	    delta_grid[0].y = (GRIDY(grid_corner[1]) - GRIDY(grid_corner[0])) / (K-1);
-	    delta_grid[0].z = (GRIDZ(grid_corner[1]) - GRIDZ(grid_corner[0])) / (K-1);
-	    delta_grid[1].x = (GRIDX(grid_corner[2]) - GRIDX(grid_corner[0])) / (L-1);
-	    delta_grid[1].y = (GRIDY(grid_corner[2]) - GRIDY(grid_corner[0])) / (L-1);
-	    delta_grid[1].z = (GRIDZ(grid_corner[2]) - GRIDZ(grid_corner[0])) / (L-1);
-	} else {
-	    delta_grid[0].x = (points[grid_corner[1]].x - points[grid_corner[0]].x)/(K-1);
-	    delta_grid[0].y = (points[grid_corner[1]].y - points[grid_corner[0]].y)/(K-1);
-	    delta_grid[0].z = (points[grid_corner[1]].z - points[grid_corner[0]].z)/(K-1);
-	    delta_grid[1].x = (points[grid_corner[2]].x - points[grid_corner[0]].x)/(L-1);
-	    delta_grid[1].y = (points[grid_corner[2]].y - points[grid_corner[0]].y)/(L-1);
-	    delta_grid[1].z = (points[grid_corner[2]].z - points[grid_corner[0]].z)/(L-1);
-	}
+	delta_grid[0].x = (points[grid_corner[1]].x - points[grid_corner[0]].x) / (K-1);
+	delta_grid[0].y = (points[grid_corner[1]].y - points[grid_corner[0]].y) / (K-1);
+	delta_grid[0].z = (points[grid_corner[1]].z - points[grid_corner[0]].z) / (K-1);
+	delta_grid[1].x = (points[grid_corner[2]].x - points[grid_corner[0]].x) / (L-1);
+	delta_grid[1].y = (points[grid_corner[2]].y - points[grid_corner[0]].y) / (L-1);
+	delta_grid[1].z = (points[grid_corner[2]].z - points[grid_corner[0]].z) / (L-1);
 
 	/* Pixel dimensions in the 3D space. */
 	delta_pixel[0].x = (delta_grid[0].x + delta_grid[1].x) / 2;
@@ -4987,15 +4955,9 @@ process_image(void *plot, t_procimg_action action)
 
 	    double x_line_start, y_line_start, z_line_start;
 
-	    if (log_axes) {
-		x_line_start = GRIDX(grid_corner[0]) + j * delta_grid[1].x;
-		y_line_start = GRIDY(grid_corner[0]) + j * delta_grid[1].y;
-		z_line_start = GRIDZ(grid_corner[0]) + j * delta_grid[1].z;
-	    } else {
-		x_line_start = points[grid_corner[0]].x + j * delta_grid[1].x;
-		y_line_start = points[grid_corner[0]].y + j * delta_grid[1].y;
-		z_line_start = points[grid_corner[0]].z + j * delta_grid[1].z;
-	    }
+	    x_line_start = points[grid_corner[0]].x + j * delta_grid[1].x;
+	    y_line_start = points[grid_corner[0]].y + j * delta_grid[1].y;
+	    z_line_start = points[grid_corner[0]].z + j * delta_grid[1].z;
 
 	    for (i=0; i < K; i++) {
 

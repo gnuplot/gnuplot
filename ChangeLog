@@ -1,3 +1,8 @@
+2017-08-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c:  Separate code path for calculating image grid
+	coordinates for logscale axes is now redundant.
+
 2017-07-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.ac src/axis.c src/axis.h src/color.c src/command.c
