@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.173 2017/08/01 05:08:27 sfeam Exp $
+ * $Id: axis.h,v 1.174 2017/08/01 22:13:42 sfeam Exp $
  *
  */
 
@@ -463,10 +463,11 @@ do {									\
     (store) = get_num_or_time(this_axis);				\
 } while(0)
 
-/* store VALUE or log(VALUE) in STORE, set TYPE as appropriate
+/* store VALUE in STORE, set TYPE as appropriate
+ * VALUE must not be same as STORE
+ * Version 5: OK to store infinities or NaN
  * Do OUT_ACTION or UNDEF_ACTION as appropriate
  * adjust range provided type is INRANGE (ie dont adjust y if x is outrange
- * VALUE must not be same as STORE
  * NOAUTOSCALE is per-plot property, whereas AUTOSCALE_XXX is per-axis.
  * Note: see the particular implementation for COLOR AXIS below.
  */
@@ -477,7 +478,6 @@ do {									\
 do {									  \
     struct axis *axis = AXIS;						  \
     double curval = (VALUE);						  \
-    /* Version 5: OK to store infinities or NaN */			  \
     STORE = curval;							  \
     if (! (curval > -VERYLARGE && curval < VERYLARGE)) {		  \
 	TYPE = UNDEFINED;						  \
@@ -503,17 +503,14 @@ do {									  \
         && ((curval <= axis->max) || (axis->max == -VERYLARGE))		  \
        ) {								  \
 	if (axis->autoscale & AUTOSCALE_MIN)	{			  \
+	    axis->min = curval;						  \
 	    if (axis->min_constraint & CONSTRAINT_LOWER) {		  \
-		if (axis->min_lb <= curval) {				  \
-		    axis->min = curval;					  \
-		} else {						  \
+		if (axis->min_lb > curval) {				  \
 		    axis->min = axis->min_lb;				  \
 		    TYPE = OUTRANGE;					  \
 		    OUT_ACTION;						  \
 		    break;						  \
 		}							  \
-	    } else {							  \
-		axis->min = curval;					  \
 	    }								  \
 	} else if (curval != axis->max) {				  \
 	    TYPE = OUTRANGE;						  \
@@ -524,17 +521,14 @@ do {									  \
     if ( curval > axis->max						  \
     &&  (curval >= axis->min || axis->min == VERYLARGE)) {		  \
 	if (axis->autoscale & AUTOSCALE_MAX)	{			  \
+	    axis->max = curval;						  \
 	    if (axis->max_constraint & CONSTRAINT_UPPER) {		  \
-		if (axis->max_ub >= curval) {		 		  \
-		    axis->max = curval;					  \
-		} else {						  \
+		if (axis->max_ub < curval) {		 		  \
 		    axis->max = axis->max_ub;				  \
 		    TYPE =OUTRANGE;					  \
 		    OUT_ACTION;						  \
 		    break;						  \
 		}							  \
-	    } else {							  \
-		axis->max = curval;					  \
 	    }								  \
 	} else if (curval != axis->min) {				  \
 	    TYPE = OUTRANGE;						  \
