@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.80 2017/07/30 20:38:20 markisch Exp $
+# $Id: Makefile,v 1.81 2017/07/31 15:52:57 sfeam Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 #
@@ -608,7 +608,11 @@ endif
 	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
 
 %.lib: %.def
+ifndef M32
 	dlltool -d $^ -l $@
+else
+	dlltool -k -d $^ -l $@
+endif
 
 LDLIBS = -lkernel32 -lgdi32 -lwinspool -lcomdlg32 -lcomctl32 -ladvapi32 -lshell32 -lmsimg32 -lgdiplus -lshlwapi -ld2d1 -ldwrite -lole32
 LDLIBS += -lhtmlhelp
@@ -746,12 +750,10 @@ else
 endif
 
 prntvpt.def: /c/Windows/System32/prntvpt.dll
-ifdef MINGW64
-ifdef M32
-	gendef - -r $^ > $@
+ifndef MINGW64
+	pexports $^ > $@
 else
 	gendef - $^ > $@
-endif
 endif
 
 # Working directory for patched Japanese sources 

@@ -3,6 +3,11 @@
 	* config/watcom/Makefile:  Avoid expanding macros when extending the
 	list of objects to build.
 
+	* config/ming/Makefile:  Strip decorations when creating a 32bit
+	library by using the -k option of dlltool. Revert the incoreect
+	redirection change from 2017-07-27.
+	Bug #1942
+
 2017-08-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c:  Separate code path for calculating image grid
