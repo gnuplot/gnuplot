@@ -1,3 +1,8 @@
+2017-08-03  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/watcom/Makefile:  Avoid expanding macros when extending the
+	list of objects to build.
+
 2017-08-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c:  Separate code path for calculating image grid

@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.19 2017/07/24 16:09:08 markisch Exp $
+# $Id: Makefile,v 1.20 2017/07/31 18:28:00 markisch Exp $
 #
 # GNUPLOT Makefile OpenWatcom 1.3 on Win32
 
@@ -158,10 +158,10 @@ all: $(ALL_TARGETS) .SYMBOLIC
 WINOBJS = winmain.$(O) wgnuplib.$(O) wgraph.$(O) wprinter.$(O) wtext.$(O) &
           wpause.$(O) wmenu.$(O) gpexecute.$(O) screenbuf.$(O)
 !ifdef GDIPLUS
-WINOBJS += wgdiplus.$(O)
+WINOBJS = $(WINOBJS) wgdiplus.$(O)
 !endif
 !ifdef DIRECT2D
-WINOBJS += wd2d.$(O)
+WINOBJS = $(WINOBJS) wd2d.$(O)
 !endif
 
 OBJS = $(COREOBJS) version.$(O) $(WINOBJS)
