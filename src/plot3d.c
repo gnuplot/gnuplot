@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.269 2017/08/01 22:13:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.270 2017/08/05 01:18:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -405,7 +405,7 @@ splines_kernel(double h)
 /* PKJ:
    This function has been hived off out of the original grid_nongrid_data().
    No changes have been made, but variables only needed locally have moved
-   out of grid_nongrid_data() into this functin. */
+   out of grid_nongrid_data() into this function. */
 static void 
 thin_plate_splines_setup( struct iso_curve *old_iso_crvs,
 			  double **p_xx, int *p_numpoints )
@@ -676,10 +676,6 @@ grid_nongrid_data(struct surface_points *this_plot)
                * do have a good value in z and w, so we can proceed just as
                * if nothing had happened at all. Nice, isn't it? */
 	    points->type = INRANGE;
-            
-	    /* HBB 20010424: if log x or log y axis, we don't want to
-	     * log() the value again --> just store it, and trust that
-	     * it's always inrange */
 	    points->x = x;
 	    points->y = y;
 
@@ -786,7 +782,7 @@ get_3ddata(struct surface_points *this_plot)
 	struct coordinate GPHUGE *cphead = NULL; /* Only for VECTOR plots */
 	double x, y, z;
 	double xtail, ytail, ztail;
-	double zlow, zhigh;
+	double zlow = VERYLARGE, zhigh = -VERYLARGE;
 	double color = VERYLARGE;
 	int pm3d_color_from_column = FALSE;
 #define color_from_column(x) pm3d_color_from_column = x
