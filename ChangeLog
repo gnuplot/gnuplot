@@ -1,4 +1,8 @@
-2017-08-04 Ethan A Merritt  <merritt@u.washington.edu>
+2017-08-07  Martin Beranek
+
+	* term/metapost.trm:  Support for user-defined dashtypes.
+
+2017-08-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (parse_range) src/datafile.c (df_generate_pseudodata)
 	src/axis.h src/plot2d.c:  Somewhat delayed application of patch from 
