@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.135.2.10 2016/04/14 20:13:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.135.2.11 2017/06/13 19:11:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -2109,6 +2109,16 @@ parse_range(AXIS_INDEX axis)
 	axis_array[axis].autoscale =
 		load_range(axis, &axis_array[axis].min, &axis_array[axis].max,
 			   axis_array[axis].autoscale);
+
+	/* EXPERIMENTAL: optional sample interval */
+	if (axis == SAMPLE_AXIS) {
+	    axis_array[SAMPLE_AXIS].SAMPLE_INTERVAL = 0;
+	    if (equals(c_token, ":")) {
+		c_token++;
+		axis_array[SAMPLE_AXIS].SAMPLE_INTERVAL = real_expression();
+	    }
+	}
+
 	if (!equals(c_token, "]"))
 	    int_error(c_token, "']' expected");
 	c_token++;

@@ -1,3 +1,12 @@
+2017-08-04 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (parse_range) src/datafile.c (df_generate_pseudodata)
+	src/axis.h src/plot2d.c:  Somewhat delayed application of patch from 
+	2014-12-08, originally deferred so that the feature could be tested
+	in the development version.  Allow an optional sampling interval as
+	part of the sampling range spec for pseudofile '+' in a plot command:
+	    plot sample [a=0:360:10] '+' using (3+sin(a)):(cos(a)) with points
+
 2017-08-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c(plot_image_or_update_axes): Image code is shared by

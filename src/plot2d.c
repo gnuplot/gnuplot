@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.40 2017/07/18 20:25:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.41 2017/07/18 21:28:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -3084,6 +3084,11 @@ eval_plots()
 			if (sample_range_token != 0) {
 			    t_min = axis_array[SAMPLE_AXIS].min;
 			    t_max = axis_array[SAMPLE_AXIS].max;
+			    /* FIXME: Allowing individual sampling intervals would */
+			    /* require reallocating this_plot->points[] to match.  */
+			    if (axis_array[SAMPLE_AXIS].SAMPLE_INTERVAL != 0)
+				int_warn(sample_range_token,
+				    "function sampling intervals not supported");
 			} else {
 			    t_min = X_AXIS.min;
 			    t_max = X_AXIS.max;
