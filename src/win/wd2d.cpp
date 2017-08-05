@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.31 2017/07/31 19:30:19 markisch Exp $
+ * $Id: wd2d.cpp,v 1.32 2017/07/31 19:36:05 markisch Exp $
  */
 
 /*
@@ -619,7 +619,11 @@ d2dCreatePatternBrush(LPGW lpgw, unsigned pattern, COLORREF color, bool transpar
 
 	// scale dash pattern with resolution
 	FLOAT dpiX, dpiY;
+#ifdef HAVE_D2D11
 	pMainRenderTarget->GetDpi(&dpiX, &dpiY);
+#else
+	g_pDirect2dFactory->GetDesktopDpi(&dpiX, &dpiY);
+#endif
 	FLOAT scale = dpiX / 96.f;
 	FLOAT size = 96.f * scale;
 

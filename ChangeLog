@@ -8,6 +8,9 @@
 	* src/set.c (set_table):  Implement "append" option for datablocks.
 	Bug #1951
 
+	* src/win/wd2d.cpp (d2dCreatePatternBrush):  Scale pattern with
+	desktop DPI if not using a D2D 1.1 DeviceContext.
+
 2017-08-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot3d.c:  Update FIXMEs, comments, remove typos, add 
