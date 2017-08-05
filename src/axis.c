@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.234 2017/08/01 05:08:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.235 2017/08/01 22:13:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -2261,7 +2261,6 @@ parse_range(AXIS_INDEX axis)
 	    primary->max = eval_link_function(primary, this_axis->max);
 	}
 
-	/* EXPERIMENTAL: optional sample interval */
 	if (axis == SAMPLE_AXIS) {
 	    this_axis->SAMPLE_INTERVAL = 0;
 	    if (equals(c_token, ":")) {

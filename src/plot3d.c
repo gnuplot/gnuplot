@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.268 2017/08/01 01:02:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.269 2017/08/01 22:13:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1396,9 +1396,9 @@ eval_3dplots()
 	    }
 	    v_sample_range_token = parse_range(V_AXIS);
 
-	    /* EXPERIMENTAL: allow sampling interval in range
-	     * Preliminary version in df_generate_pseudodata is hard-coded for
-	     * SAMPLE_AXIS only so it does not work for '++'.
+	    /* FIXME: allow sampling interval in range clause for '++'
+	     * Current implementation in df_generate_pseudodata() and 
+	     * parse_range() is hard-coded for * SAMPLE_AXIS only.
 	     */
 	    if (u_sample_range_token > 0)
 		axis_array[SAMPLE_AXIS].range_flags |= RANGE_SAMPLED;
