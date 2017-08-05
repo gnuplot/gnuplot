@@ -1,3 +1,8 @@
+2017-08-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c:  "set key fixed" should be ignored in the case of
+	"set view map".
+
 2017-08-05  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/set.c (set_table):  Implement "append" option for datablocks.
