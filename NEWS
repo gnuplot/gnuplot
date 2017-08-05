@@ -1,6 +1,7 @@
 Changes since 5.2.rc3
 ====================
 * FIX reconcile aspect ratio flags from "set view map" and "set view equal xy"
+* FIX "set key fixed" should be ignored in the case of "set view map"
 
 Changes in 5.2.rc3
 ==================

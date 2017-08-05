@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.364 2017/04/18 22:15:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.365 2017/04/19 21:32:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -3545,7 +3545,11 @@ do_3dkey_layout(legend_key *key, int *xinkey, int *yinkey)
 	*yinkey = key->bounds.ytop - key_title_height - key_title_extra;
 
     } else {
-	BoundingBox *bounds = key->fixed ? &page_bounds : &plot_bounds;
+	BoundingBox *bounds;
+	if (key->fixed && !splot_map)
+	    bounds = &page_bounds;
+	else
+	    bounds = &plot_bounds;
 
 	if (key->region != GPKEY_AUTO_INTERIOR_LRTBC && key->margin == GPKEY_BMARGIN) {
 	    if (ptitl_cnt > 0) {
