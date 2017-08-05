@@ -1,3 +1,8 @@
+2017-08-05  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/set.c (set_table):  Implement "append" option for datablocks.
+	Bug #1951
+
 2017-08-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot3d.c:  Update FIXMEs, comments, remove typos, add 
@@ -20,8 +25,8 @@
 	list of objects to build.
 
 	* config/ming/Makefile:  Strip decorations when creating a 32bit
-	library by using the -k option of dlltool. Revert the incoreect
-	redirection change from 2017-07-27.
+	library by using the -k option of dlltool. Revert the incorrect
+	redirection change made on 2017-07-27.
 	Bug #1942
 
 2017-08-02  Ethan A Merritt  <merritt@u.washington.edu>
