@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.56 2017/01/29 06:30:08 markisch Exp $
+ * $Id: stdfn.h,v 1.57 2017/07/29 08:48:07 markisch Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -336,7 +336,7 @@ char *strndup __PROTO((const char * str, size_t n));
 size_t strnlen __PROTO((const char *str, size_t n));
 #endif
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && (_MSC_VER < 1900)
 int ms_vsnprintf(char *str, size_t size, const char *format, va_list ap);
 int ms_snprintf(char *str, size_t size, const char * format, ...);
 #endif

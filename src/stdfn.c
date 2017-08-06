@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.36 2017/07/03 07:35:35 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.37 2017/07/29 08:48:07 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - stdfn.c */
@@ -317,7 +317,7 @@ safe_strncpy(char *d, const char *s, size_t n)
 #ifndef HAVE_STRCSPN
 /*
  * our own substitute for strcspn()
- * return the length of the inital segment of str1
+ * return the length of the initial segment of str1
  * consisting of characters not in str2
  * returns strlen(str1) if none of the characters
  * from str2 are in str1
@@ -341,7 +341,7 @@ gp_strcspn(const char *str1, const char *str2)
 
 
 /* Standard compliant replacement functions for MSVC */
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && (_MSC_VER < 1900)
 int
 ms_vsnprintf(char *str, size_t size, const char *format, va_list ap)
 {
@@ -490,7 +490,7 @@ void gp_exit(int status)
     exit(status);
 }
 
-#if _WIN32
+#ifdef _WIN32
 char *
 gp_getcwd(char *path, size_t len)
 {
