@@ -1,3 +1,9 @@
+2017-08-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c src/plot3d.c:  Revert inadvertent change of 2017-03-31
+	that failed to call update_gpval_variables in "set table" mode.
+	Bug #1954
+
 2017-08-07  Martin Beranek
 
 	* term/metapost.trm:  Support for user-defined dashtypes.

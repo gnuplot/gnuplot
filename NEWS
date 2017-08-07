@@ -1,7 +1,9 @@
-Changes since 5.2.rc3
+Changes since 5.2.rc4
 ====================
 * FIX reconcile aspect ratio flags from "set view map" and "set view equal xy"
 * FIX "set key fixed" should be ignored in the case of "set view map"
+* FIX GPVAL_* variables were not being updated in "set table" mode
+* NEW user-defined dashtypes in metapost terminal
 
 Changes in 5.2.rc3
 ==================
