@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.111 2017/02/04 23:59:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.112 2017/04/19 06:20:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -104,6 +104,10 @@ static int  parse_array_assignment_expression __PROTO((void));
 static int is_builtin_function __PROTO((int t_num));
 
 static void set_up_columnheader_parsing __PROTO((struct at_entry *previous ));
+
+static TBOOLEAN no_iteration __PROTO((t_iterator *));
+static void reevaluate_iteration_limits __PROTO((t_iterator *iter));
+static void reset_iteration __PROTO((t_iterator *iter));
 
 /* Internal variables: */
 
@@ -1332,11 +1336,16 @@ check_for_iteration()
 	    Ginteger(&(iteration_udv->udv_value), iteration_start);
 	}
 	else if (equals(c_token++, "in")) {
-	    iteration_string = try_to_get_string();
-	    if (!iteration_string)
+	    /* Assume this is a string-valued expression. */
+	    /* It might be worth treating a string constant as a special case */
+	    struct value v;
+	    iteration_start_at = perm_at();
+	    evaluate_at(iteration_start_at, &v);
+	    if (v.type != STRING)
 	    	int_error(c_token-1, errormsg);
 	    if (!equals(c_token++, "]"))
 	    	int_error(c_token-1, errormsg);
+	    iteration_string = v.v.string_val;
 	    iteration_start = 1;
 	    iteration_end = gp_words(iteration_string);
 	    gpfree_array(&(iteration_udv->udv_value));
@@ -1377,20 +1386,47 @@ check_for_iteration()
 }
 
 /*
+ * Reevaluate the iteration limits
+ * (in case they are functions whose parameters have taken 
+ * on a new value)
+ */
+static void
+reevaluate_iteration_limits(t_iterator *iter)
+{
+    if (iter->start_at) {
+	struct value v;
+	evaluate_at(iter->start_at, &v);
+	if (iter->iteration_string) {
+	    /* unnecessary if iteration string is a constant */
+	    free(iter->iteration_string);
+	    if (v.type != STRING)
+		int_error(NO_CARET, "corrupt iteration string");
+	    iter->iteration_string = v.v.string_val;
+	    iter->iteration_start = 1;
+	    iter->iteration_end = gp_words(iter->iteration_string);
+	} else {
+	    iter->iteration_start = real(&v);
+	}
+    }
+    if (iter->end_at) {
+	struct value v;
+	evaluate_at(iter->end_at, &v);
+	iter->iteration_end = real(&v);
+    }
+}
+
+/*
  * Reset iteration at this level to start value.
  * Any iteration levels underneath are reset also.
  */
-void
+static void
 reset_iteration(t_iterator *iter)
 {
     if (!iter)
 	return;
 
-    if (iter->start_at) {
-	struct value v;
-	evaluate_at(iter->start_at, &v);
-	iter->iteration_start = real(&v);
-    }
+    reevaluate_iteration_limits(iter);
+    iter->iteration = -1;
     iter->iteration_current = iter->iteration_start;
     if (iter->iteration_string) {
 	gpfree_string(&(iter->iteration_udv->udv_value));
@@ -1401,13 +1437,7 @@ reset_iteration(t_iterator *iter)
 	gpfree_string(&(iter->iteration_udv->udv_value));
 	Ginteger(&(iter->iteration_udv->udv_value), iter->iteration_current);	
     }
-    if (iter->end_at) {
-	struct value v;
-	evaluate_at(iter->end_at, &v);
-	iter->iteration_end = real(&v);
-    }
     reset_iteration(iter->next);
-
 }
 
 /*
@@ -1419,16 +1449,26 @@ TBOOLEAN
 next_iteration(t_iterator *iter)
 {
     /* Once it goes out of range it will stay that way until reset */
-    if (!iter || empty_iteration(iter))
+    if (!iter || no_iteration(iter))
 	return FALSE;
 
     /* Give sub-iterations a chance to advance */
-    if (next_iteration(iter->next))
+    if (next_iteration(iter->next)) {
+	if (iter->iteration < 0)
+	    iter->iteration = 0;
 	return TRUE;
+    }
 
     /* Increment at this level */
-    iter->iteration++;
-    iter->iteration_current += iter->iteration_increment;
+    if (iter->iteration < 0) {
+	/* Just reset, haven't used start value yet */
+	iter->iteration = 0;
+	if (!empty_iteration(iter))
+	    return TRUE;
+    } else {
+	iter->iteration++;
+	iter->iteration_current += iter->iteration_increment;
+    }
     if (iter->iteration_string) {
 	gpfree_string(&(iter->iteration_udv->udv_value));
 	Gstring(&(iter->iteration_udv->udv_value), 
@@ -1445,10 +1485,14 @@ next_iteration(t_iterator *iter)
     if (iter->iteration_increment < 0 &&  iter->iteration_end - iter->iteration_current > 0)
 	return FALSE;
 
+    if (iter->next == NULL)
+	return TRUE;
+
     /* Reset sub-iterations, if any */
     reset_iteration(iter->next);
-    
-    return TRUE;
+
+    /* Go back to top or call self recursively */
+    return next_iteration(iter);
 }
 
 /*
@@ -1456,8 +1500,8 @@ next_iteration(t_iterator *iter)
  * - this really is an iteration and
  * - the top level iteration covers no usable range
  */
-TBOOLEAN
-empty_iteration(t_iterator *iter)
+static TBOOLEAN
+no_iteration(t_iterator *iter)
 {
     if (!iter)
 	return FALSE;
@@ -1467,7 +1511,21 @@ empty_iteration(t_iterator *iter)
 	return TRUE;
     }
 
-    return (empty_iteration(iter->next));
+    return FALSE;
+}
+
+/*
+ * Recursive test that no empty iteration exists in a nested set of iterations
+ */
+TBOOLEAN
+empty_iteration(t_iterator *iter)
+{
+    if (!iter)
+	return FALSE;
+    else if (no_iteration(iter))
+	return TRUE;
+    else
+	return no_iteration(iter->next);
 }
 
 t_iterator *
@@ -1475,6 +1533,7 @@ cleanup_iteration(t_iterator *iter)
 {
     while (iter) {
 	t_iterator *next = iter->next;
+	gpfree_string(&(iter->iteration_udv->udv_value));
 	iter->iteration_udv->udv_value = iter->original_udv_value;
 	free(iter->iteration_string);
 	free(iter->start_at);
@@ -1521,11 +1580,6 @@ set_up_columnheader_parsing( struct at_entry *previous )
 	    if (at_highest_column_used < u->udv_value.v.int_val)
 		at_highest_column_used = u->udv_value.v.int_val;
 	}
-#if (0) /* Currently handled elsewhere, but could be done here instead */
-	if (u->udv_value.type == STRING) {
-	    parse_1st_row_as_headers = TRUE;
-	}
-#endif
     }
 
     /* NOTE: There is no way to handle ... using (column(<general expression>)) */

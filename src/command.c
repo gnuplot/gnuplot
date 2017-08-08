@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.354 2017/05/20 01:27:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.354.2.1 2017/06/15 19:40:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1331,8 +1331,15 @@ do_command()
     begin_clause();
 
     iteration_depth++;
-    if (empty_iteration(do_iterator))
+
+    /* Sometimes the start point of a nested iteration is not within the
+     * limits for all levels of nesting. In this case we need to advance
+     * through the iteration to find the first good set of indices.
+     * If we don't find one, forget the whole thing.
+     */
+    if (empty_iteration(do_iterator) && !next_iteration(do_iterator)) {
 	strcpy(clause, ";");
+    }
 
     do {
 	requested_continue = FALSE;

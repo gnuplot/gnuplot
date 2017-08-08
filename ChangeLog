@@ -1,3 +1,11 @@
+2017-08-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c src/parse.c src/plot2d.c demo/iterate.dem:
+	Revise recursive iteration algorithm to address problems with empty
+	ranges in a nested iteration. Add support for dynamic reevaluation of
+	the string in nested ranges using "for [s in <string-expression>]".
+	Bug #1952
+
 2017-08-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c src/plot3d.c:  Revert inadvertent change of 2017-03-31

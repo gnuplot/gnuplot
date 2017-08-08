@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.430.2.7 2017/07/29 16:30:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.430.2.8 2017/08/08 04:30:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2900,9 +2900,9 @@ eval_plots()
 	}
 
 	/* Iterate-over-plot mechanism */
-	if (empty_iteration(plot_iterator) && this_plot) {
+	if (empty_iteration(plot_iterator) && this_plot)
 	    this_plot->plot_type = NODATA;
-	} else if (forever_iteration(plot_iterator) && (this_plot->plot_type == NODATA)) {
+	if (forever_iteration(plot_iterator) && (this_plot->plot_type == NODATA)) {
 	    FPRINTF((stderr,"Ending * iteration at %d\n",plot_iterator->iteration));
 	    ;
 	} else if (forever_iteration(plot_iterator) && (this_plot->plot_type == FUNC)) {
