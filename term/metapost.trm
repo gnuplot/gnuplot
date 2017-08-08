@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: metapost.trm,v 1.46 2012/11/25 22:01:22 sfeam Exp $
+ * $Id: metapost.trm,v 1.47 2015/11/30 02:54:02 sfeam Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -86,6 +86,7 @@ TERM_PUBLIC int MP_make_palette __PROTO((t_sm_palette *));
 TERM_PUBLIC void MP_previous_palette __PROTO((void));
 TERM_PUBLIC void MP_set_color __PROTO((t_colorspec *));
 TERM_PUBLIC void MP_filled_polygon __PROTO((int, gpiPoint *));
+TERM_PUBLIC void MP_dashtype __PROTO((int type, t_dashtype *custom_dash_type));
 
 /* 5 inches wide by 3 inches high (default) */
 #define MP_XSIZE 5.0
@@ -159,6 +160,8 @@ static int MP_prologues = -1;
 
 /* has color changed? */
 static int MP_color_changed = 0;
+
+static int MP_dash_changed = 0;
 
 /* has a font change taken place? */
 static TBOOLEAN MP_fontchanged = FALSE;
@@ -471,6 +474,7 @@ verbatimtex\n\
     }
     fputs("\n\
 color currentcolor; currentcolor:=black;\n\
+picture currentdash; currentdash:=dashpattern(on 1);\n\
 color fillcolor;\n\
 boolean colorlines,dashedlines;\n", gpoutfile);
     if (MP_color) {
@@ -484,7 +488,7 @@ boolean colorlines,dashedlines;\n", gpoutfile);
 	fputs("dashedlines:=true;\n", gpoutfile);
     }
     fputs("\n\
-def _wc = withpen currentpen withcolor currentcolor enddef;\n\
+def _wc = withpen currentpen withcolor currentcolor dashed currentdash enddef;\n\
 def _ac = addto currentpicture enddef;\n\
 def _sms = scaled mpt shifted enddef;\n\
 % drawing point-types\n\
@@ -515,17 +519,17 @@ ptpath5 = ptpath9 := (0,1/2)--(-1/2,-1/2)--(1/2,-1/2)--cycle;\n\
 \n\
 def linetype expr n =\n\
   currentcolor:= if colorlines : col[n] else: black fi;\n\
+  currentdash:= if dashedlines : lt[n] else: dashpattern(on 1) fi;\n\
   if n = -1 :\n\
       drawoptions(withcolor currentcolor withpen (currentpen scaled .5));\n\
-  elseif n < 1 :\n\
-    drawoptions(_wc);\n\
   else :\n\
-    drawoptions( if dashedlines: dashed lt[n] fi _wc);\n\
+    drawoptions(_wc);\n\
   fi\n\
 enddef;\n\
 \n\
 % dash patterns\n\
 picture lt[];\n\
+lt[-2]:=lt[-1]:=lt0:=dashpattern(on 1);\n\
 lt1=dashpattern(on 2 off 2); % dashes\n\
 lt2=dashpattern(on 2 off 2 on 0.2 off 2); %dash-dot\n\
 lt3=lt1 scaled 1.414;\n\
@@ -579,6 +583,8 @@ MP_graphics()
     MP_char_code++;
     /* reset MP_color_changed */
     MP_color_changed = 0;
+
+    MP_dash_changed = 0;
 }
 
 TERM_PUBLIC void
@@ -599,9 +605,10 @@ MP_linetype(int lt)
     if (MP_inline)
 	MP_endline();
     /* reset the color in case it has been changed in MP_set_color() */
-    if (MP_color_changed) {
+    if ((MP_color_changed) || (MP_dash_changed)) {
 	MP_oldline = linetype + 1;
 	MP_color_changed = 0;
+	MP_dash_changed = 0;
     }
     if (MP_oldline != linetype) {
 	fprintf(gpoutfile, "linetype %d;\n", linetype);
@@ -960,6 +967,46 @@ MP_filled_polygon(int points, gpiPoint *corners)
 }
 
 TERM_PUBLIC void
+MP_dashtype (int type, t_dashtype *custom_dash_type)
+{
+    switch (type) {
+        case DASHTYPE_SOLID:
+                fprintf(gpoutfile, "%%MP_dashtype%% DASHTYPE_SOLID\n");
+            break;
+        case DASHTYPE_AXIS:
+                fprintf(gpoutfile, "%%MP_dashtype%% DASHTYPE_AXIS\n");
+            /* Currently handled elsewhere? */
+            break;
+        case DASHTYPE_CUSTOM:
+                fprintf(gpoutfile, "%%MP_dashtype%% DASHTYPE_CUSTOM: ");
+            if (custom_dash_type) {
+                int i;
+                if (custom_dash_type->dstring[0] != '\0')
+                    fprintf(gpoutfile, "\"%s\"; ", custom_dash_type->dstring);
+                fprintf(gpoutfile, "[");
+                for (i = 0; i < DASHPATTERN_LENGTH && custom_dash_type->pattern[i] > 0; i++)
+                    fprintf(gpoutfile, i ? ", %.2f" : "%.2f", custom_dash_type->pattern[i]);
+                fprintf(gpoutfile, "]");
+                fprintf(gpoutfile, "\n");
+
+                MP_dash_changed = 1;
+                fprintf(gpoutfile, "currentdash:=dashpattern(");
+                for (i = 0; i < DASHPATTERN_LENGTH && custom_dash_type->pattern[i] > 0; i++)
+                    fprintf(gpoutfile, "%s %.2f ", i%2?"off":"on", custom_dash_type->pattern[i]);
+                fprintf(gpoutfile, ");\n");
+            } else {
+                fprintf(gpoutfile, "\n");
+            }
+            break;
+        default:
+                fprintf(gpoutfile, "%%MP_dashtype%% type = %i\n", type);
+            if (type>0)
+                MP_linetype(type);
+            break;
+    }
+}
+
+TERM_PUBLIC void
 MP_previous_palette()
 {
     return;
@@ -984,7 +1031,8 @@ TERM_TABLE_START(mp_driver)
     , MP_make_palette,
     MP_previous_palette,	/* write grestore */
     MP_set_color,
-    MP_filled_polygon
+    MP_filled_polygon,
+    .dashtype = MP_dashtype
 TERM_TABLE_END(mp_driver)
 #undef LAST_TERM
 #define LAST_TERM mp_driver

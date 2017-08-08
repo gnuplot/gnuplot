@@ -1,3 +1,7 @@
+2017-08-07  Martin Beranek
+
+	* term/metapost.trm:  Support for user-defined dashtypes.
+
 2017-08-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c:  "set key fixed" should be ignored in the case of

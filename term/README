@@ -81,6 +81,8 @@ struct TERMENTRY {
     void (*layer) __PROTO((t_termlayer syncpoint));
 /* Path control for end-joins of closed polygons on PostScript-like devices */
     void (*path) __PROTO((int p));
+/* Scale factor for converting terminal coordinates to output pixels */
+    double tscale;
 /* Hypertext support */
     void (*hypertext) __PROTO((int type, const char *text));
 #ifdef EAM_BOXED_TEXT
