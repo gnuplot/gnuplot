@@ -29,4 +29,48 @@ set title "plot for [i=1:4] for [k=i:i] for [j=1:k] 10*k + cos(j*x)"
 plot for [i=1:4] for [k=i:i] for [j=1:k] 10*k + cos(j*x) lw j \
      title sprintf("k=%d  j=%d", i, j)
 pause -1 "Hit return to continue"
+
+# More iteration tests (no graph output)
+#
+print "\n\ndynamic reevaluation of numeric iteration limits"
+#array J[3] = [ 1, 4, 3 ]
+J(n) = (n == 1) ? 1 : (n == 2) ? 4 : 3
+print "\nJ = 1 4 3"
+Output = ""
+print "do for [i=1:3] for [j=J(i):3] { save(i,j) }"
+do for [i=1:3] for [j=J(i):3] { Output = Output . sprintf("%d-%d ",i,j) }
+print Output
+
+#array J[3] = [ 4, 1, 3 ]
+J(n) = (n == 1) ? 4 : (n == 2) ? 1 : 3
+print "\nJ = 4 1 3"
+Output = ""
+print "do for [i=1:3] for [j=J(i):3] { save(i,j) }"
+do for [i=1:3] for [j=J(i):3] { Output = Output . sprintf("%d-%d ",i,j) }
+print Output
+
+print ""
+Output = ""
+print "do for [i=1:4] for [k=i:i] for [j=1:k] { save(i,j) }"
+do for [i=1:4] for [k=i:i] for [j=1:k] { Output = Output . sprintf("%d-%d ",i,j) }
+print Output
+
+print "\ndynamic reevaluation of iteration string"
+print ""
+
+#array A[3] = [ "a b", "", "d" ]
+A(i) = word(' "a b" "" "d" ',i)
+print 'A = "a b" "" "d"'
+
+print 'do for [ i = 1:3 ] { do for [ j in A(i)] { print "".i.": ".j }}'
+Output = ""
+do for [ i = 1:3 ] { do for [ j in A(i)] { Output = Output."  ".i.": ".j }}
+print Output
+
+print ""
+print 'do for [ i = 1:3 ] for [ j in A(i)] { print "".i.": ".j }'
+Output = ""
+do for [ i = 1:3 ] for [ j in A(i)] { Output = Output."  ".i.": ".j }
+print Output
+
 reset

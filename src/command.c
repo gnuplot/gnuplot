@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.292.2.15 2017/03/02 18:24:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.292.2.16 2017/07/23 05:09:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1150,8 +1150,16 @@ do_command()
     memcpy(clause, &gp_input_line[do_start+1], do_end - do_start);
     clause[do_end - do_start - 1] = '\0';
 
-    if (empty_iteration(do_iterator))
+
+    /* Bug #1952:  Skip to first index satisfiying all iteration limits.
+     * Sometimes the start point of a nested iteration is not within the
+     * limits for all levels of nesting. In this case we need to advance
+     * through the iteration to find the first good set of indices.
+     * If there are none, forget the whole thing.
+     */
+    if (empty_iteration(do_iterator) && !next_iteration(do_iterator)) {
 	strcpy(clause, ";");
+    }
 
     do {
 	do_string(clause);

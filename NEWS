@@ -23,6 +23,7 @@ Changes in 5.0.7
 * FIX more consistent handling of plot 'with table'
 * FIX incorrect, possibly empty, command string was saved for previous fit
 * FIX 2D images with logscale axes could fail (segfault)
+* FIX nested iteration containing an empty range
 
 Changes in 5.0.6
 ================
