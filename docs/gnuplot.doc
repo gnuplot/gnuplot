@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1084.2.9 2017/07/18 20:25:39 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1084.2.10 2017/07/20 18:32:11 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6070,8 +6070,7 @@ Ffigure_fenceplot
 ?data-file bins
 ?datafile bins
 ?bins
- EXPERIMENTAL (implementation details may change further before this option
- appears in a stable release).
+ EXPERIMENTAL (implementation details may change in a later version)_
  Syntax:
       plot 'DATA' using <XCOL> {:<YCOL>} bins{=<NBINS>}
            {binrange [<LOW>:<HIGH>]} {binwidth=<width>}
@@ -10269,18 +10268,15 @@ Ffigure_multiple_keys
  Unlike line styles, redefinitions by `set linetype` are persistent;  they
  are not affected by `reset`.
 
- For example, linetypes one and two default to red and green. If you redefine
- them like this:
+ For example, whatever linetypes one and two look like to begin with, if you
+ redefine them like this:
 
        set linetype 1 lw 2 lc rgb "blue" pointtype 6
        set linetype 2 lw 2 lc rgb "forest-green" pointtype 8
 
- everywhere that uses lt 1 will now get a thick blue line rather than a thin red
- line (the previous default meaning of lt 1).  This includes uses such as the
- definition of a temporary linestyle derived from the base linetype 1.
-
- `Note`: This command was introduced in gnuplot version 4.6.  It supersedes an
- older rather cryptic command "set style increment user" that is now deprecated.
+ everywhere that uses lt 1 will now get a thick blue line.  This includes
+ uses such as the definition of a temporary linestyle derived from the base
+ linetype 1.  Similary lt 2 will now produce a think green line.
 
  This mechanism can be used to define a set of personal preferences for the
  sequence of lines used in gnuplot.  The recommended way to do this is to add
@@ -11014,8 +11010,7 @@ Ffigure_multiple_keys
        set nonlinear <axis> via f(axis) inverse g(axis)
        unset nonlinear <axis>
 
- This option is EXPERIMENTAL (implementation details may change before appearing
- in a stable gnuplot release).
+ [new command in version 5.2]
  This command is similar to the `set link` command except that only one of the
  two linked axes is visible.  The hidden axis remains linear. Coordinates along
  the visible axis are mapped by applying g(x) to hidden axis coordinates.
@@ -12297,7 +12292,7 @@ Ffigure_multiple_keys
 
  The meaning of a negative value for <r> is different.  If <r>=-1, gnuplot
  tries to set the scales so that the unit has the same length on both the x
- and y axes.  This is equivalent to `set view equal xy`.  See `set view equal`.
+ and y axes.  This is the 2D equivalent to the 3D command `set view equal xy`.
  If <r>=-2, the unit on y has twice the length of the unit on x, and so on.
 
  The success of `gnuplot` in producing the requested aspect ratio depends on
