@@ -5,6 +5,10 @@
 	DEPEND=1.
 	Patch #756
 
+	* config/msvc/Makefile:  Improve compatibility with jom, the parallel
+	nmake like build utility, by adding a space after every backslash at
+	an end of line.  Otherwise this would be treated as line continuation.
+
 2017-08-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c src/plot3d.c:  Revert inadvertent change of 2017-03-31

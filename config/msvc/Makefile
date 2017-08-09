@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.35 2017/07/31 15:52:58 sfeam Exp $
+# $Id: Makefile,v 1.36 2017/08/09 04:44:28 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2010 or newer
 
@@ -259,15 +259,16 @@ BUILD_TARGETS = cl-wrap.cmd cl-wrap-c.cmd
 !ENDIF
 
 # macros for makefile.all
+# Note: make sure that there is a space after the last backslash for jom compatibility
 
 O=obj
 S=$(TOP)\src
-W=$(S)\win\\
-WX=$(S)\wxterminal\\
-Q=$(S)\qtterminal\\
-T=$(TOP)\term\\
-D=$(TOP)\docs\\
-M=$(TOP)\demo\\
+W=$(S)\win\\ 
+WX=$(S)\wxterminal\\ 
+Q=$(S)\qtterminal\\ 
+T=$(TOP)\term\\ 
+D=$(TOP)\docs\\ 
+M=$(TOP)\demo\\ 
 
 default: $(BUILD_TARGETS) wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe gnuplot.exe demo_plugin.dll $(EXTRA_TARGETS)
 
@@ -400,7 +401,7 @@ wgnuplot.exe: $(OBJS) $(WINOBJS) wgnuplot.res linkopt-w.msw
 !ENDIF
 
 gnuplot.exe: $(ALL_CONSOLE_OBJS) wgnuplot.res linkopt-c.msw
-	$(LD) /subsystem:console $(LDFLAGS) /map:wgnuplot.map /out:$@ @linkopt-c.msw
+	$(LD) /subsystem:console $(LDFLAGS) /map:gnuplot.map /out:$@ @linkopt-c.msw
 !IFDEF GDDIR
 	copy $(GDDIR)\bin\*.dll .
 !ENDIF
@@ -500,7 +501,7 @@ wgnuplot.res :  $(W)wgnuplot.rc $(W)wgnuplib.rc $(W)wresourc.h $(W)grpicon.ico $
 
 # build windows help file
 $(HELPFILE): doc2html.exe $(D)gnuplot.doc gnuplot.exe
-	doc2html $(D)gnuplot.doc $(D)windows\\
+	doc2html $(D)gnuplot.doc $(D)windows\\ 
 	cd $(D)
 	-"..\config\msvc\gnuplot" -e "winhelp=1" plotstyles.gnu
 	-$(HHC) windows\wgnuplot.hhp
