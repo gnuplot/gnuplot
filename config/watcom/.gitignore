@@ -16,5 +16,6 @@ TEXTICON.ico
 *.res
 linkopt1.oww
 *.map
+*.mbr
 wgnuplot.mnu
 fit.log
