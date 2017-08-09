@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.235 2017/08/01 22:13:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.236 2017/08/05 01:19:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -2296,13 +2296,6 @@ clone_linked_axes(AXIS *axis1, AXIS *axis2)
 {
     double testmin, testmax;
     TBOOLEAN suspect = FALSE;
-
-    /* DEBUG: This sanity check is only here for debugging */
-    if (axis1 != axis2->linked_to_primary && axis1 != axis2->linked_to_secondary) {
-	fprintf(stderr, "clone_linked_axes called for axes that are not linked\n");
-	/* No linkage, so nothing to do here */
-	return;
-    }
 
     memcpy(axis2, axis1, AXIS_CLONE_SIZE);
     if (axis2->link_udf == NULL || axis2->link_udf->at == NULL)
