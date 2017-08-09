@@ -1,7 +1,7 @@
 #
-# $Id: Makefile,v 1.34 2017/07/29 08:28:59 markisch Exp $
+# $Id: Makefile,v 1.35 2017/07/31 15:52:58 sfeam Exp $
 #
-# GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
+# GNUPLOT Makefile Microsoft Visual C++ 2010 or newer
 
 # John Bollinger bbands@yahoo.com, 4 March 2002:
 #   Added png support with zlib and libpng as subs of .\src
@@ -67,6 +67,10 @@ DIRECT2D11 = 0
 # Create debug build?
 DEBUG = 0
 
+# Create dependency files?
+# Caveat:  This increases build time by more than 50%.
+DEPEND = 0
+
 # Location of additional libraries
 #GDDIR = gdwin32
 #LUADIR = lua
@@ -102,6 +106,11 @@ GNUPLOT_SHARE_DIR = share
 #CC = cl
 LD = link
 
+!IF "$(DEPEND)" == "1"
+CCWRAP=cl-wrap.cmd
+CCWRAPC=cl-wrap-c.cmd
+!ENDIF
+
 # compiler flags
 # /I  means extra include directory
 # /Fm means produce link map
@@ -125,7 +134,7 @@ OPTIONS = $(OPTIONS) /DGNUPLOT_HISTORY
 
 EXTRA_TARGETS =
 
-VERSION_CPPFLAGS = -DVERSION_MAJOR=\"5.1\" -DPATCHLEVEL=\"0\"
+VERSION_CPPFLAGS = -DVERSION_MAJOR=\"5.3\" -DPATCHLEVEL=\"0\"
 
 # flags for terminals
 # see other terminal defines in term.h
@@ -245,6 +254,10 @@ MANIFEST = wgnuplot.exe.manifest
 !ENDIF
 !ENDIF
 
+!IF "$(DEPEND)" == "1"
+BUILD_TARGETS = cl-wrap.cmd cl-wrap-c.cmd
+!ENDIF
+
 # macros for makefile.all
 
 O=obj
@@ -256,9 +269,16 @@ T=$(TOP)\term\\
 D=$(TOP)\docs\\
 M=$(TOP)\demo\\
 
-default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe gnuplot.exe demo_plugin.dll $(EXTRA_TARGETS)
+default: $(BUILD_TARGETS) wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe gnuplot.exe demo_plugin.dll $(EXTRA_TARGETS)
 
 !INCLUDE $(S)\makefile.all
+
+# Include the generated dependency files
+!IF ![(for %i in (*.dep *.cdep) do @echo !INCLUDE %i) >Build.tmp]
+! INCLUDE Build.tmp
+! IF ![del Build.tmp]
+! ENDIF
+!ENDIF
 
 OBJS = $(COREOBJS) version.obj
 
@@ -317,35 +337,46 @@ ALL_CONSOLE_OBJS = $(OBJS:.obj=.cobj) $(WINOBJS:.obj=.cobj)
 .cpp.cobj:
 	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $*.cpp /Fo$@
 
+
+# Batch-mode script to both compile and produces .dep files suitable for NMAKE.
+# Adopted from https://stackoverflow.com/a/36091560
+# This looks more complicated than it is, see patch #756 for an explanation.
+# This is roughly equivalent to -M -MM -MP -MT$@ -MF$(@R).dep in GNU make + gcc.
+cl-wrap.cmd: Makefile
+	@echo @(setlocal enabledelayedexpansion ^& %* /showIncludes ^& echo Exit: !ERRORLEVEL!) ^| ^%COMSPEC^% /E:ON /V:ON /C "@for /f "tokens=*" %%%%B in ('find /v ""') do @if %%%%~xB == .c (set _=%%%%~nB&rem.>!_!.dep&echo %%%%B) else if %%%%~xB == .cpp (set _=%%%%~nB&rem.>!_!.dep&echo %%%%B) else for /f "tokens=1,2,3,*" %%%%C in ("%%%%B") do @if %%%%C == Note: (set i=%%%%F&if /i "!i:Windows Kits=!"=="!i!" (if /i "!i:Visual Studio=!"=="!i!" ((echo !_!.obj: !i!&echo "!i!":) >> !_!.dep))) else if %%%%C == Exit: (exit /b %%%%D) else echo %%%%B" > cl-wrap.cmd
+# same but with .dep/.obj replaced by .cdep/.cobj
+cl-wrap-c.cmd: Makefile
+	@echo @(setlocal enabledelayedexpansion ^& %* /showIncludes ^& echo Exit: !ERRORLEVEL!) ^| ^%COMSPEC^% /E:ON /V:ON /C "@for /f "tokens=*" %%%%B in ('find /v ""') do @if %%%%~xB == .c (set _=%%%%~nB&rem.>!_!.cdep&echo %%%%B) else if %%%%~xB == .cpp (set _=%%%%~nB&rem.>!_!.cdep&echo %%%%B) else for /f "tokens=1,2,3,*" %%%%C in ("%%%%B") do @if %%%%C == Note: (set i=%%%%F&if /i "!i:Windows Kits=!"=="!i!" (if /i "!i:Visual Studio=!"=="!i!" ((echo !_!.cobj: !i!&echo "!i!":) >> !_!.cdep))) else if %%%%C == Exit: (exit /b %%%%D) else echo %%%%B" > cl-wrap-c.cmd
+
 {$(S)}.c.obj:
-	$(CC) /c $(CFLAGS) $(WIN_CFLAGS) $(S)\$*.c
+	$(CCWRAP) $(CC) /c $(CFLAGS) $(WIN_CFLAGS) $(S)\$*.c
 
 {$(S)}.c.cobj:
-	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $(S)\$*.c /Fo$@
+	$(CCWRAPC) $(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $(S)\$*.c /Fo$@
 
 {$(W)}.c.obj:
-	$(CC) /c $(CFLAGS) $(WIN_CFLAGS) $(W)$*.c /Fo$@
+	$(CCWRAP) $(CC) /c $(CFLAGS) $(WIN_CFLAGS) $(W)$*.c /Fo$@
 
 {$(W)}.c.cobj:
-	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $(W)$*.c /Fo$@
+	$(CCWRAPC) $(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $(W)$*.c /Fo$@
 
 {$(W)}.cpp.obj:
-	$(CC) /c $(CFLAGS) $(WIN_CFLAGS) $(W)$*.cpp /Fo$@
+	$(CCWRAP) $(CC) /c $(CFLAGS) $(WIN_CFLAGS) $(W)$*.cpp /Fo$@
 
 {$(W)}.cpp.cobj:
-	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $(W)$*.cpp /Fo$@
+	$(CCWRAPC) $(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $(W)$*.cpp /Fo$@
 
 {$(WX)}.c.obj:
-	$(CC) /c $(CFLAGS) $(WIN_CFLAGS) $(WX)$*.c /Fo$@
+	$(CCWRAP) $(CC) /c $(CFLAGS) $(WIN_CFLAGS) $(WX)$*.c /Fo$@
 
 {$(WX)}.c.cobj:
-	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $(WX)$*.c /Fo$@
+	$(CCWRAPC) $(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $(WX)$*.c /Fo$@
 
 {$(Q)}.cpp.obj:
-	$(CC) /c $(CFLAGS) $(WIN_CFLAGS) $(Q)$*.cpp /Fo$@
+	$(CCWRAP) $(CC) /c $(CFLAGS) $(WIN_CFLAGS) $(Q)$*.cpp /Fo$@
 
 {$(Q)}.cpp.cobj:
-	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $(Q)$*.cpp /Fo$@
+	$(CCWRAPC) $(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $(Q)$*.cpp /Fo$@
 
 {$(S)}.c{$(M)}.exe:
 	$(CC) /c $(CFLAGS) $(W)$*.c /Fo$@
@@ -448,16 +479,15 @@ linkopt-c.msw: Makefile
 # rules
 
 term.obj: $(S)\term.c $(S)\term.h $(S)\plot.h $(S)\setshow.h $(S)\bitmap.h $(CORETERM)
-	$(CC) /c $(CFLAGS) $(WIN_CFLAGS) $(TERMFLAGS) $(S)\$(*B).c /Fo$@
+	$(CCWRAP) $(CC) /c $(CFLAGS) $(WIN_CFLAGS) $(TERMFLAGS) $(S)\$(*B).c /Fo$@
 
 term.cobj: $(S)\term.c $(S)\term.h $(S)\plot.h $(S)\setshow.h $(S)\bitmap.h $(CORETERM)
-	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $(TERMFLAGS) $(S)\$(*B).c /Fo$@
+	$(CCWRAPC) $(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $(TERMFLAGS) $(S)\$(*B).c /Fo$@
 
+
+# explicit dependencies 
 winmain.obj: $(W)winmain.c $(W)wgnuplib.h $(W)wtext.h $(S)\plot.h
-	$(CC) /c $(CFLAGS) $(WIN_CFLAGS) $(W)$(*B).c /Fo$@
-
 winmain.cobj: $(W)winmain.c $(W)wgnuplib.h $(W)wtext.h $(S)\plot.h
-	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $(W)winmain.c /Fo$@
 
 
 # resources
@@ -497,6 +527,8 @@ clean:
 	if exist *.obj del *.obj
 	if exist *.cobj del *.cobj
 	if exist *.map del *.map
+	if exist *.dep del *.dep
+	if exist *.cdep del *.cdep
 	if exist moc_*.cpp del moc_*.cpp
 	if exist qrc_*.cpp del qrc_*.cpp
 	if exist ui_*.h del ui_*.h
