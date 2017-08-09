@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.36 2017/08/09 04:44:28 markisch Exp $
+# $Id: Makefile,v 1.37 2017/08/09 04:53:33 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2010 or newer
 
@@ -600,4 +600,8 @@ install:
 
 zip:
 	$(MAKE) DESTDIR=.\gnuplot install
-	zip -mro9 gp500-msvc-win32.zip gnuplot
+!IF "$(PLATFORM)" == "X64"
+	zip -mro9 gp530-msvc-win64.zip gnuplot
+!ELSE
+	zip -mro9 gp530-msvc-win32.zip gnuplot
+!ENDIF

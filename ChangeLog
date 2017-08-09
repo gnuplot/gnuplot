@@ -9,6 +9,8 @@
 	nmake like build utility, by adding a space after every backslash at
 	an end of line.  Otherwise this would be treated as line continuation.
 
+	* config/msvc/Makefile (zip):  Distinguish 32/64 bit builds.
+
 2017-08-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c src/plot3d.c:  Revert inadvertent change of 2017-03-31
