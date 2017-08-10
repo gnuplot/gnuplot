@@ -1,3 +1,7 @@
+2017-08-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	PATCHLEVEL etc:  Bump versioning to 5.0.7
+
 2017-08-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c src/parse.c src/plot2d.c demo/iterate.dem:

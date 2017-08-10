@@ -1,54 +1,47 @@
-		GNUPLOT Version 5.0.6 Release Notes
+		GNUPLOT Version 5.0.7 Release Notes
 		===================================
 
 Gnuplot version 5.0 was initially released in January 2015.
 Please see the NEWS and ChangeLog files for a complete list of bug fixes
 and minor changes accummulated since then.
 
-These release notes are for version 5.0 patchlevel 6 (5.0.6).
+These release notes are for version 5.0 patchlevel 7 (5.0.7).
 This release contains bug-fixes, a few changes back-ported from the
-development version, and a few new features.
+development version, and a few new features.  This will probably be
+the final release in the 5.0 series.  Development has shifted to
+versions 5.2 (next stable release) and 5.3 (main development branch).
 
-Release Notes date: 13-Mar-2017
+Release Notes date: 08-Aug-2017
 
-This patchlevel 5.0.6 incremental release includes
-==================================================
-
-* NEW command 'set micro' enables encoding-specific char for gprintf %c format
-* NEW command 'set datafile missing NaN' treats invalid data as if it were missing
-* NEW backport updated svg/domterm terminal from development version
-* CHANGE - start/end limits in nested iterations are reevaluated dynamically
-* CHANGE - revised adjustment of x2label and plot title when x2tics are present
-* CHANGE - mark non-free pdf terminal DEPRECATED (to be removed in release 5.2)
-* CHANGE - allow fractional font sizes for gdlib terminals
-* CHANGE - do not allow inverted R axis (support not backported from 5.1)
-* CHANGE - "linewidth <lw>" is accepted as a terminal option for aquaterm, qt, wxt
-* CHANGE - spline segments outside xrange are ignored rather than treated as errors
+Changes in 5.0.7
+================
+* NEW set term {pngcairo|pdfcairo} pointscale <factor>
+* NEW "save fit" back-ported from version 5.2 as a replacement for "update"
+* CHANGE deprecate "update" command (but do not remove it)
+* CHANGE allow placement of circles in 3D plots using axis coordinates
+* CHANGE ignore invalid z coordinate for 3D objects placed in "set view map"
+* CHANGE distinguish 'bind "shift-Button1"' from 'bind "Button1"'
+* CHANGE use Mingw-w64 and MSVC popen rather than built-in "fake" popen
+* FIX rangelimited y2 axis could produce spurious diagonal line across plot
 * FIX assignment of x/y dimensions in "binary record=(a,b) ... with image"
-* FIX wxt - multithreaded wxt was faulting during resize (mutex lock failure)
-* FIX windows - timed pause only worked for intervals < 1 second
-* FIX Front/back layering of border+grid lines was not always correct in hidden3d
-* FIX "set pm3d depthorder interpolate N,M" memory allocation failure
-* FIX aquaterm failed to honor request to disable enhanced text markup
-* FIX save and show commands failed to list linecolor for lines with "lt -1"
-* FIX the "missing" data flag is honored by "using ($n)" as it is for "using n"
-* FIX error reporting of line number inside a bracketed clause
-* FIX gnuplot_x11: possible fix for sporadic use-after-free error
-* FIX tracking of NaN values from function evaluated during binary data input
-* FIX track arrowhead properties in hidden3d mode
-* FIX 3D rotation does not clobber hidden/visible status of plots
+* FIX negative array index caused by hidden3d degenerate polygon
+* FIX object clipping in "set view map"
+* FIX cairo terminals: scale textbox border linewidth by terminal linewidth
+* FIX canvas terminal: initialization of plot dimensions (affects first zoom)
+* FIX crash in stats if no usable data is found
+* FIX do not use LaTeX formatting in tabular output
+* FIX additional sanity checks for input data format
+* FIX more consistent handling of plot 'with table'
+* FIX incorrect, possibly empty, command string was saved for previous fit
+* FIX 2D images with logscale axes could fail (segfault)
+* FIX nested iteration containing an empty range
 
-
-NOTABLE NEW FEATURES IN PATCHLEVEL 5.0.6
+NOTABLE NEW FEATURES IN PATCHLEVEL 5.0.7
 ========================================
 
-New command "set micro" tells gnuplot to use an encoding-specific character for
-the micro- scientific prefix output by gprintf format %c.
-
-New command "set datafile missing NaN" tells gnuplot to treat a data point whose
-value is invalid as if it were missing altogether.  See documentation.
-Several bugs were fixed that relate to distinguishing invalid and missing data so
-the program behaviour in these corner cases has changed since 5.0.5.
+The "update" command is deprecated in favor of a new command "save fit".
+"update" will continue to be accepted in version 5.0 for compatibility but
+will be removed in a later version.
 
 Incremental releases 5.0.1, 5.0.2, etc are primarily intended to provide
 bug fixes rather than new features.
@@ -302,7 +295,7 @@ Options for generating interactive plots for web display
 Installation
 ------------
 
-You can download a source tarball for gnuplot version 5.0.6 from the 
+You can download a source tarball for gnuplot version 5.0.7 from the 
 gnuplot development site on SourceForge.
 	http://sourceforge.net/projects/gnuplot
 
@@ -310,7 +303,7 @@ Installation instructions are available in the source itself; the short
 version for linux/unix-like systems is to unpack the tarball and then
 <PRE>
 build it:
-      cd gnuplot-5.0.6 ; ./configure ; make
+      cd gnuplot-5.0.7 ; ./configure ; make
 test it:
       make check
 install it:
