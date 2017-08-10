@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.39 2017/08/10 15:24:21 markisch Exp $
+# $Id: Makefile,v 1.40 2017/08/10 15:28:25 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2010 or newer
 
@@ -41,6 +41,9 @@
 #	Now run:
 #	  nmake
 #
+
+# Set to one iff doing a release build
+RELEASE=0
 
 # Compilation options, disable by setting to zero
 # Is libgd available? (required by terminal png/jpeg/gif)?
@@ -158,6 +161,10 @@ CONSOLELIBS = ole32.lib oleaut32.lib comctl32.lib
 !IFDEF LIBDIR
 OPTIONS = $(OPTIONS) /I$(LIBDIR)\include
 LDFLAGS = $(LDFLAGS) /libpath:$(LIBDIR)\lib
+!ENDIF
+
+!IF "$(RELEASE)" != "1"
+OPTIONS = $(OPTIONS) /DDEVELOPMENT_VERSION
 !ENDIF
 
 !IF "$(GDLIB)" == "1"
@@ -386,11 +393,24 @@ cl-wrap-c.cmd: Makefile
 {$(S)}.c{$(M)}.exe:
 	$(CC) /c $(CFLAGS) $(W)$*.c /Fo$@
 
+# dependencies
+$(OBJS) $(WINOBJS): config.h
+$(ALL_CONSOLE_OBJS): config.h
 
-$(OBJS): config.h
+!IF "$(RELEASE)" != "1"
+version.obj: timestamp.h
+version.cobj: timestamp.h
+!ENDIF
 
 config.h: $(TOP)\config\config.nt
 	copy $(TOP)\config\config.nt config.h
+
+timestamp.h: $(TOP)\ChangeLog
+	@echo (Re-)Creating $@
+	@echo #ifndef GNUPLOT_TIMEBASE_H_INCLUDED>$@
+	@echo #define GNUPLOT_TIMEBASE_H_INCLUDED>>$@
+	@cmd /v:on /e:on /c "set n=0&for /f %%a in ($(TOP)\ChangeLog) do @if !n!==0 (echo const char gnuplot_date[] = "%%a";&set n=1)">>$@
+	@echo #endif>>$@
 
 wgnuplot.exe: $(OBJS) $(WINOBJS) wgnuplot.res linkopt-w.msw
 	$(LD) /subsystem:windows $(LDFLAGS) /map:wgnuplot.map /out:$@ @linkopt-w.msw
@@ -494,6 +514,9 @@ term.cobj: $(S)\term.c $(S)\term.h $(S)\plot.h $(S)\setshow.h $(S)\bitmap.h $(CO
 winmain.obj: $(W)winmain.c $(W)wgnuplib.h $(W)wtext.h $(S)\plot.h
 winmain.cobj: $(W)winmain.c $(W)wgnuplib.h $(W)wtext.h $(S)\plot.h
 
+ALL_CONSOLE_OBJS: $(BUILD_TARGETS)
+$(OBJS) $(WINOBJS): $(BUILD_TARGETS)
+
 
 # resources
 wgnuplot.mnu: $(W)wgnuplot.mnu
@@ -533,6 +556,7 @@ clean:
 	if exist moc_*.cpp del moc_*.cpp
 	if exist qrc_*.cpp del qrc_*.cpp
 	if exist ui_*.h del ui_*.h
+	if exist timestamp.h del timestamp.h
 	if exist wgnuplot.res del wgnuplot.res
 	if exist wgnuplot.chw del wgnuplot.chw
 	if exist $(M)bf_test.exe del $(M)bf_test.exe

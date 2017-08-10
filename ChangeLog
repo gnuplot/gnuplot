@@ -1,3 +1,10 @@
+2017-08-10  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/msvc/Makefile:  Handle empty lines in cl wrapper script.
+	jom dislikes changing the directory in a rule twice, so spawn
+	a subshell when required.  Automatically generate timestamp.h for
+	development builds.
+
 2017-08-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c src/parse.c src/plot2d.c demo/iterate.dem:
