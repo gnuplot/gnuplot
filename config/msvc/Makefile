@@ -1,7 +1,10 @@
 #
-# $Id: Makefile,v 1.38 2017/08/09 04:58:49 markisch Exp $
+# $Id: Makefile,v 1.39 2017/08/10 15:24:21 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2010 or newer
+
+# In order to do parallel builds you can use the nmake replacement jom,
+# see https://wiki.qt.io/Jom
 
 # John Bollinger bbands@yahoo.com, 4 March 2002:
 #   Added png support with zlib and libpng as subs of .\src
@@ -237,7 +240,8 @@ D2DLIBS = d3d11.lib dxguid.lib prntvpt.lib
 
 HELPFILE = wgnuplot.chm
 !IF "$(PLATFORM)" == "X64"
-HHC=""%%PROGRAMFILES(X86)%%\HTML Help Workshop\hhc""
+#HHC=""%%PROGRAMFILES(X86)%%\HTML Help Workshop\hhc""
+HHC="C:\Program Files (x86)\HTML Help Workshop\hhc"
 !ELSE
 HHC="$(PROGRAMFILES)\HTML Help Workshop\hhc"
 !ENDIF
@@ -502,10 +506,8 @@ wgnuplot.res :  $(W)wgnuplot.rc $(W)wgnuplib.rc $(W)wresourc.h $(W)grpicon.ico $
 # build windows help file
 $(HELPFILE): doc2html.exe $(D)gnuplot.doc gnuplot.exe
 	doc2html $(D)gnuplot.doc $(D)windows\\ 
-	cd $(D)
-	-"..\config\msvc\gnuplot" -e "winhelp=1" plotstyles.gnu
-	-$(HHC) windows\wgnuplot.hhp
-	cd ..\config\msvc
+	-.\gnuplot -e "winhelp=1; cd '$(D)'" plotstyles.gnu
+	cmd /c "cd $(D) & $(HHC) windows\wgnuplot.hhp & exit /b 0"
 	if exist $(D)windows\wgnuplot.chm copy $(D)windows\wgnuplot.chm .
 
 doc2html.exe: $(D)windows\doc2html.c $(D)termdoc.c $(D)xref.c version.obj $(CORETERM)
@@ -516,9 +518,7 @@ doc2html.exe: $(D)windows\doc2html.c $(D)termdoc.c $(D)xref.c version.obj $(CORE
 # WINDOWS_NO_GUI makes sure that wtext.h does not redefine fread() etc.
 $(M)bf_test.exe : $(S)\bf_test.c
 	$(CC) $(CFLAGS) /F 5000 /W1 /DWINDOWS_NO_GUI /Fe$(M)bf_test.exe $(S)\bf_test.c
-	cd $(M)
-	bf_test
-	cd ..\config\msvc
+	cmd /c "cd $(M) & bf_test"
 
 demo_plugin.dll: $(M)plugin\demo_plugin.c
 	$(CC) $(CFLAGS) /LD /D_USRDLL /D_WINDLL $(M)plugin\$*.c /link /out:$@
