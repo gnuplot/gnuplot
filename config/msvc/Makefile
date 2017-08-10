@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.37 2017/08/09 04:53:33 markisch Exp $
+# $Id: Makefile,v 1.38 2017/08/09 04:58:49 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2010 or newer
 
@@ -344,10 +344,10 @@ ALL_CONSOLE_OBJS = $(OBJS:.obj=.cobj) $(WINOBJS:.obj=.cobj)
 # This looks more complicated than it is, see patch #756 for an explanation.
 # This is roughly equivalent to -M -MM -MP -MT$@ -MF$(@R).dep in GNU make + gcc.
 cl-wrap.cmd: Makefile
-	@echo @(setlocal enabledelayedexpansion ^& %* /showIncludes ^& echo Exit: !ERRORLEVEL!) ^| ^%COMSPEC^% /E:ON /V:ON /C "@for /f "tokens=*" %%%%B in ('find /v ""') do @if %%%%~xB == .c (set _=%%%%~nB&rem.>!_!.dep&echo %%%%B) else if %%%%~xB == .cpp (set _=%%%%~nB&rem.>!_!.dep&echo %%%%B) else for /f "tokens=1,2,3,*" %%%%C in ("%%%%B") do @if %%%%C == Note: (set i=%%%%F&if /i "!i:Windows Kits=!"=="!i!" (if /i "!i:Visual Studio=!"=="!i!" ((echo !_!.obj: !i!&echo "!i!":) >> !_!.dep))) else if %%%%C == Exit: (exit /b %%%%D) else echo %%%%B" > cl-wrap.cmd
+	@echo @(setlocal enabledelayedexpansion ^& %* /showIncludes ^& echo Exit: !ERRORLEVEL!) ^| ^%COMSPEC^% /E:ON /V:ON /C "@for /f "tokens=1,* delims=]" %%%%A in ('find /v /n""') do @if %%%%~xB == .c (set _=%%%%~nB&rem.>!_!.dep&echo %%%%B) else if %%%%~xB == .cpp (set _=%%%%~nB&rem.>!_!.dep&echo %%%%B) else for /f "tokens=1,2,3,*" %%%%C in ("%%%%B") do @if %%%%C == Note: (set i=%%%%F&if /i "!i:Windows Kits=!"=="!i!" (if /i "!i:Visual Studio=!"=="!i!" ((echo !_!.obj: !i!&echo "!i!":) >> !_!.dep))) else if %%%%C == Exit: (exit /b %%%%D) else echo %%%%B" > cl-wrap.cmd
 # same but with .dep/.obj replaced by .cdep/.cobj
 cl-wrap-c.cmd: Makefile
-	@echo @(setlocal enabledelayedexpansion ^& %* /showIncludes ^& echo Exit: !ERRORLEVEL!) ^| ^%COMSPEC^% /E:ON /V:ON /C "@for /f "tokens=*" %%%%B in ('find /v ""') do @if %%%%~xB == .c (set _=%%%%~nB&rem.>!_!.cdep&echo %%%%B) else if %%%%~xB == .cpp (set _=%%%%~nB&rem.>!_!.cdep&echo %%%%B) else for /f "tokens=1,2,3,*" %%%%C in ("%%%%B") do @if %%%%C == Note: (set i=%%%%F&if /i "!i:Windows Kits=!"=="!i!" (if /i "!i:Visual Studio=!"=="!i!" ((echo !_!.cobj: !i!&echo "!i!":) >> !_!.cdep))) else if %%%%C == Exit: (exit /b %%%%D) else echo %%%%B" > cl-wrap-c.cmd
+	@echo @(setlocal enabledelayedexpansion ^& %* /showIncludes ^& echo Exit: !ERRORLEVEL!) ^| ^%COMSPEC^% /E:ON /V:ON /C "@for /f "tokens=1,* delims=]" %%%%A in ('find /v /n ""') do @if %%%%~xB == .c (set _=%%%%~nB&rem.>!_!.cdep&echo %%%%B) else if %%%%~xB == .cpp (set _=%%%%~nB&rem.>!_!.cdep&echo %%%%B) else for /f "tokens=1,2,3,*" %%%%C in ("%%%%B") do @if %%%%C == Note: (set i=%%%%F&if /i "!i:Windows Kits=!"=="!i!" (if /i "!i:Visual Studio=!"=="!i!" ((echo !_!.cobj: !i!&echo "!i!":) >> !_!.cdep))) else if %%%%C == Exit: (exit /b %%%%D) else echo %%%%B" > cl-wrap-c.cmd
 
 {$(S)}.c.obj:
 	$(CCWRAP) $(CC) /c $(CFLAGS) $(WIN_CFLAGS) $(S)\$*.c
