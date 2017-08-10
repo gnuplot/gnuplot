@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.88.2.8 2017/04/19 06:29:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.88.2.9 2017/08/09 18:22:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -1408,8 +1408,8 @@ cleanup_iteration(t_iterator *iter)
     while (iter) {
 	t_iterator *next = iter->next;
 	free(iter->iteration_string);
-	free(iter->start_at);
-	free(iter->end_at);
+	free_at(iter->start_at);
+	free_at(iter->end_at);
 	free(iter);
 	iter = next;
     }
