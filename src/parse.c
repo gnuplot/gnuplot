@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.112.2.1 2017/08/09 18:00:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.112.2.2 2017/08/10 20:43:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -1274,6 +1274,7 @@ check_for_iteration()
     t_iterator *iter = NULL;
     t_iterator *prev = NULL;
     t_iterator *this_iter = NULL;
+    TBOOLEAN no_parent = FALSE;
 
     /* Now checking for iteration parameters */
     /* Nested "for" statements are supported, each one corresponds to a node of the linked list */
@@ -1305,8 +1306,12 @@ check_for_iteration()
 		/* Save the expression as well as the value */
 		struct value v;
 		iteration_start_at = perm_at();
-		evaluate_at(iteration_start_at, &v);
-		iteration_start = real(&v);
+		if (no_parent) {
+		    iteration_start = 0;
+		} else {
+		    evaluate_at(iteration_start_at, &v);
+		    iteration_start = real(&v);
+		}
 	    }
 	    if (!equals(c_token++, ":"))
 	    	int_error(c_token-1, errormsg);
@@ -1320,8 +1325,12 @@ check_for_iteration()
 		/* Save the expression as well as the value */
 		struct value v;
 		iteration_end_at = perm_at();
-		evaluate_at(iteration_end_at, &v);
-		iteration_end = real(&v);
+		if (no_parent) {
+		    iteration_end = 0;
+		} else {
+		    evaluate_at(iteration_end_at, &v);
+		    iteration_end = real(&v);
+		}
 	    }
 	    if (equals(c_token,":")) {
 	    	c_token++;
@@ -1374,10 +1383,19 @@ check_for_iteration()
 	    /* first "for" statement: this will be the listhead */
 	    iter = this_iter;
 	} else {
-	    /* not the first "for" statement: attach the newly created node to the end of the list */
+	    /* nested "for": attach newly created node to the end of the list */
 	    prev->next = this_iter;
 	}
 	prev = this_iter;
+
+	/* If some depth of a nested iteration evaluates to an empty range, the
+	 * evaluated limits of depths below it are moot (and possibly invalid).
+	 * This flag tells us to skip their evaluation to avoid irrelevant errors.
+	 */
+	if (no_iteration(this_iter)) {
+	    no_parent = TRUE;
+	    FPRINTF((stderr,"iteration at level %d is moot\n", nesting_depth));
+	}
 
 	nesting_depth++;
     }
