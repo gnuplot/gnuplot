@@ -1,3 +1,11 @@
+2017-08-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/parse.c (check_for_iteration):  If some depth of a nested
+	iteration evaluates to an empty range, the evaluated limits of depths
+	below it are irrelevant and possibly invalid.  Add a test to skip
+	evaluation at lower depthes in such a case.
+	Bug #1952
+
 2017-08-10  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/msvc/Makefile:  Handle empty lines in cl wrapper script.
