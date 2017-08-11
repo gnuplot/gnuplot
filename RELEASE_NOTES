@@ -11,7 +11,7 @@ development version, and a few new features.  This will probably be
 the final release in the 5.0 series.  Development has shifted to
 versions 5.2 (next stable release) and 5.3 (main development branch).
 
-Release Notes date: 08-Aug-2017
+Release Notes date: 10-Aug-2017
 
 Changes in 5.0.7
 ================
@@ -36,7 +36,7 @@ Changes in 5.0.7
 * FIX 2D images with logscale axes could fail (segfault)
 * FIX nested iteration containing an empty range
 
-NOTABLE NEW FEATURES IN PATCHLEVEL 5.0.7
+Notable new features in patchlevel 5.0.7
 ========================================
 
 The "update" command is deprecated in favor of a new command "save fit".
@@ -47,7 +47,7 @@ Incremental releases 5.0.1, 5.0.2, etc are primarily intended to provide
 bug fixes rather than new features.
 
 
-FEATURES INTRODUCED IN VERSION 5
+Features introduced in version 5
 ================================
 
 * New plot styles "with parallelaxes" and labeled contours.
@@ -107,8 +107,8 @@ Many other additions are described in the "New Features" section of the
 documentation.
 
 
-CHANGES
-=======
+Differences between Version 4 and Version 5
+===========================================
 
 Gnuplot development assigns very high priority to backward compatibility
 with earlier versions.  For example any command script that worked in
@@ -171,14 +171,14 @@ A brief summary of potentially incompatible changes is given here.
 
 * Macro substitution is always enabled. I.e. "set/unset macros" has no effect.
 
-ONLINE DEMO PLOTS
+Online demo plots
 =================
 
 Demo plots illustrating new and old features are online at
   http://gnuplot.sourceforge.net/demo_5.0/
 
 
-KNOWN ISSUES
+Known issues
 ============
 
 * If you configure in the wxt terminal without also configuring in X11,
@@ -211,12 +211,8 @@ KNOWN ISSUES
 * Mouse double-click to export terminal coordinates to the X11 clipboard
   no longer works reliably, and may be deprecated in the future.
 
-* The "update" command for use with "fit" does not work as documented, and 
-  in practice works differently on different platforms.  Use with caution.
-  This command will probably be revised for subsequent gnuplot releases.
 
-
-		 NOTES TO PACKAGERS AND TESTERS 
+		NOTES TO PACKAGERS AND TESTERS 
 		===============================
 
 Obsolete or deprecated components
@@ -289,8 +285,8 @@ Options for generating interactive plots for web display
   Both allow zooming, toggling plot elements on/off, and user-scriptable
   hot keys.
 
-			OTHER NOTES
-			===========
+		OTHER NOTES
+		===========
 
 Installation
 ------------
