@@ -1,3 +1,8 @@
+2017-08-12  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/set.c (set_table):  Implement "append" option for datablocks.
+	Bug #1951
+
 2017-08-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/parse.c (check_for_iteration):  If some depth of a nested

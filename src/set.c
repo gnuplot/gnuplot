@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.558.2.1 2017/06/15 05:35:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.558.2.2 2017/08/02 01:45:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1378,7 +1378,7 @@ set_colorsequence(int option)
 	    colors = podo_colors;
 	linetype_recycle_count = 8;
 	for (i = 1; i <= 8; i++) {
-	    command = gp_alloc(strlen(command_template)+8, "dynamic command"); 
+	    command = gp_alloc(strlen(command_template)+8, "dynamic command");
 	    sprintf(command, command_template, i, colors[i-1]);
 	    do_string_and_free(command);
 	}
@@ -1711,7 +1711,7 @@ set_degreesign(char *locale)
     case S_ENC_SJIS:	break;  /* should be 0x818B */
     case S_ENC_CP950:	break;  /* should be 0xA258 */
     /* default applies at least to:
-       ISO8859-1, -2, -9, -15,   
+       ISO8859-1, -2, -9, -15,
        CP1250, CP1251, CP1252, CP1254
      */
     default:		degree_sign[0] = '\260'; break;
@@ -2121,7 +2121,7 @@ set_history()
 	    continue;
 	} else if (almost_equals(c_token, "num$bers")) {
 	    c_token++;
-	    history_quiet = FALSE; 
+	    history_quiet = FALSE;
 	    continue;
 	} else if (equals(c_token, "full")) {
 	    c_token++;
@@ -2781,7 +2781,7 @@ set_logscale()
 		sprintf(command, "set nonlinear %s via log(%s)/log(%g) inv (%g)**%s",
 			axis_name(axis), dummy, newbase, newbase, dummy);
 	    }
-	    do_string(command); 
+	    do_string(command);
 	    axis_array[axis].ticdef.logscaling = TRUE;
 	    axis_array[axis].base = newbase;
 	    axis_array[axis].log_base = log(newbase);
@@ -2829,7 +2829,7 @@ set_mapping()
     else
 	int_error(c_token,
 		  "expecting 'cartesian', 'spherical', or 'cylindrical'");
-	c_token++;
+    c_token++;
 }
 
 
@@ -4810,6 +4810,7 @@ set_table()
 {
     char *tablefile;
     int filename_token = ++c_token;
+    TBOOLEAN append = FALSE;
 
     if (table_outfile) {
 	fclose(table_outfile);
@@ -4820,17 +4821,24 @@ set_table()
     if (equals(c_token, "$") && isletter(c_token + 1)) { /* datablock */
 	/* NB: has to come first because try_to_get_string will choke on the datablock name */
 	table_var = add_udv_by_name(parse_datablock_name());
-	gpfree_string(&table_var->udv_value);
-	gpfree_datablock(&table_var->udv_value);
-	table_var->udv_value.type = DATABLOCK;
-	table_var->udv_value.v.data_array = NULL;
+	if (table_var == NULL)
+	    int_error(c_token, "Error allocating datablock");
+	if (equals(c_token, "append")) {
+	    c_token++;
+	    append = TRUE;
+	}
+	if (!append || table_var->udv_value.type != DATABLOCK) {
+	    gpfree_datablock(&table_var->udv_value);
+	    gpfree_string(&table_var->udv_value);
+	    table_var->udv_value.type = DATABLOCK;
+	    table_var->udv_value.v.data_array = NULL;
+	}
 
     } else if ((tablefile = try_to_get_string())) {  /* file name */
 	/* 'set table "foo"' creates a new output file */
 	/* 'set table "foo" append' writes to the end of an existing output file */
-	TBOOLEAN append = FALSE;
 	gp_expand_tilde(&tablefile);
-	if (equals(c_token,"append")) {
+	if (equals(c_token, "append")) {
 	    c_token++;
 	    append = TRUE;
 	}
@@ -5328,7 +5336,7 @@ set_view()
 	if (equals(c_token,"scale")) {
 	    c_token++;
 	    mapview_scale = real_expression();
-	} 
+	}
 	if (aspect_ratio_3D != 0) {
 	    aspect_ratio = -1;
 	    aspect_ratio_3D = 0;
@@ -6508,7 +6516,7 @@ parse_lighting_options()
 	    pm3d_shade.strength = clip_to_01(pm3d_shade.strength);
 	    continue;
 	}
-	
+
 	if (almost_equals(c_token,"spec$ular")) {
 	    c_token++;
 	    pm3d_shade.spec = real_expression();
