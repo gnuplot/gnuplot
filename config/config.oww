@@ -1,15 +1,18 @@
 /* Config.h for watcom/Makefile
  *
  * Prepared according to config.h from ./configure and by means of
- * config_strip.sh as of gnuplot 4.5 in Mai 2011.
+ * config_strip.sh as of gnuplot 5.3 in August 2017.
  */
 
-
-/* Define if you want to use the CGI terminal under SCO. */
-/* #undef CGI */
+/* Define to allow use of certain deprecated syntax. */
+/* #undef BACKWARDS_COMPATIBLE */
 
 /* Define if you want online help and subtopic tables sorted by column. */
 /* #undef COLUMN_HELP */
+
+/* Provide contact info for gnuplot develoment */
+/* #undef DEVELOPMENT_VERSION */
+/* Don't change it here -- this define is set in config/watcom/Makefile. */
 
 /* Define to treat spacebar like any other keystroke. */
 /* #undef DISABLE_SPACE_RAISES_CONSOLE */
@@ -22,6 +25,9 @@
 
 /* Define if this system uses a 32-bit DOS extender (djgpp/emx). */
 /* #undef DOS32 */
+
+/* Define to support boxed labels */
+#define EAM_BOXED_TEXT 1
 
 /* Define to allow placement of rectangles and other objects */
 #define EAM_OBJECTS 1
@@ -42,9 +48,6 @@
 /* Define if you want to use a gnuplot history file. */
 #define GNUPLOT_HISTORY 1
 
-/* Define to allow command line macros. */
-#define GP_MACROS 1
-
 /* Define if you want to use a newer version of libgrx under MSDOS/djgpp. */
 /* #undef GRX21 */
 
@@ -60,6 +63,9 @@
 /* Define to 1 if you have the `bzero' function. */
 /* #undef HAVE_BZERO */
 
+/* libcairo support for eps (cairo >= 1.6) */
+/* #undef HAVE_CAIROEPS */
+
 /* Define if you want the cairo-based terminals. */
 /* #undef HAVE_CAIROPDF */
 
@@ -69,6 +75,12 @@
 
 /* Define to 1 if you have the <dirent.h> header file. */
 /* #undef HAVE_DIRENT_H */
+
+/* Define to 1 if you have the <dlfcn.h> header file. */
+/* #undef HAVE_DLFCN_H */
+
+/* Define to 1 if you have the <dl.h> header file. */
+/* #undef HAVE_DL_H */
 
 /* Define to 1 if you have the `doprnt' function. */
 /* #undef HAVE_DOPRNT */
@@ -89,11 +101,20 @@
 /* Define to 1 if you have the <errno.h> header file. */
 #define HAVE_ERRNO_H 1
 
+/* Define if external function plugins are to be supported. */
+#define HAVE_EXTERNAL_FUNCTIONS 1
+
+/* Define to 1 if you have the `fdopen' function. */
+#define HAVE_FDOPEN 1
+
 /* Define to 1 if you have the <float.h> header file. */
 #define HAVE_FLOAT_H 1
 
 /* Define to 1 if you have the `fork' function. */
 /* #undef HAVE_FORK */
+
+/* Define to 1 if fseeko (and presumably ftello) exists and is declared. */
+/* #undef HAVE_FSEEKO */
 
 /* Define to 1 if you have the `gamma' function. */
 /* #undef HAVE_GAMMA */
@@ -127,11 +148,14 @@
 /* Define to 1 if you have the <ggi/xmi.h> header file. */
 /* #undef HAVE_GGI_XMI_H */
 
+/* Define to include support for gpic terminal */
+/* #undef HAVE_GPIC */
+
 /* Define to use gtk/gdk tweaks */
 /* #undef HAVE_GTK */
 
-/* Define to use gtk+ functions to handle cairo */
-/* #undef HAVE_GTK28 */
+/* define if you have libiconv and iconv.h */
+/* #undef HAVE_ICONV */
 
 /* Define to 1 if you have the `index' function. */
 /* #undef HAVE_INDEX */
@@ -139,14 +163,20 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
 
-/* Define if you use have kpsexpand (TeX). */
+/* Define if you want to use kpsexpand (TeX). */
 /* #undef HAVE_KPSEXPAND */
+
+/* Define to 1 if you have the <langinfo.h> header file. */
+/* #undef HAVE_LANGINFO_H */
 
 /* Define to 1 if you have the `lgamma' function. */
 /* #undef HAVE_LGAMMA */
 
-/* Define to 1 if you're using the aquaterm library on Mac OS X */
-/* #undef HAVE_LIBAQUATERM */
+/* Define if you have the caca library. */
+/* #undef HAVE_LIBCACA */
+
+/* define if you have libcerf */
+/* #undef HAVE_LIBCERF */
 
 /* Define to 1 if you have the <libc.h> header file. */
 /* #undef HAVE_LIBC_H */
@@ -160,13 +190,6 @@
 
 /* Define to 1 if you have the `m' library (-lm). */
 /* #undef HAVE_LIBM */
-
-/* Define to 1 if you have the `pdf' library (-lpdf). */
-/* #undef HAVE_LIBPDF */
-/* Don't change it here -- this define is set in config/watcom/Makefile. */
-
-/* Define if your pdf library is too old to use PDF_begin_document. */
-/* #undef HAVE_LIBPDF_OPEN_FILE */
 
 /* Define if you are using the GNU readline library. */
 /* #undef HAVE_LIBREADLINE */
@@ -202,25 +225,22 @@
 #define HAVE_MEMMOVE 1
 
 /* Define to 1 if you have the <memory.h> header file. */
-/* #undef HAVE_MEMORY_H */
+#define HAVE_MEMORY_H 1
 
 /* Define to 1 if you have the `memset' function. */
 #define HAVE_MEMSET 1
 
-/* Define if your pdf library doesn't support dash patterns. */
-/* #undef HAVE_NODASH_LIBPDF */
+/* Define to include support for mif terminal */
+/* #undef HAVE_MIF */
 
-/* Define if your pdf library is too old to support patterns. */
-/* #undef HAVE_OLD_LIBPDF */
+/* Define to 1 if the system has the type `off_t'. */
+#define HAVE_OFF_T 1
 
 /* Define to 1 if you have the `on_exit' function. */
 /* #undef HAVE_ON_EXIT */
 
 /* Define to 1 if you have the `pclose' function. */
 #define HAVE_PCLOSE 1
-
-/* Define to 1 if you have the <pdflib.h> header file. */
-/* #undef HAVE_PDFLIB_H */
 
 /* Define to 1 if you have the `poll' function. */
 /* #undef HAVE_POLL */
@@ -247,7 +267,8 @@
 /* #undef HAVE_SELECT */
 
 /* Define to 1 if you have the `setvbuf' function. */
-#define HAVE_SETVBUF 1
+/* #define HAVE_SETVBUF 1 */
+/* it is defined, but setvbuf(stdout) does not work for Windows GUI redirected stdout */
 
 /* Define to 1 if you have the <sgtty.h> header file. */
 /* #undef HAVE_SGTTY_H */
@@ -366,6 +387,9 @@
 /* Define if time_t is declared in time.h. */
 #define HAVE_TIME_T_IN_TIME_H 1
 
+/* Define to 1 if you have the `uname' function. */
+/* #undef HAVE_UNAME */
+
 /* Define to 1 if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1
 
@@ -429,12 +453,11 @@
 /* Define if this is an MSDOS system. */
 /* #undef MSDOS */
 
-/* Define if you want to read .gnuplot from current directory
-   (SECURITY RISK!). */
-/* #undef USE_CWDRC */
-
 /* Define to disable terminals that depend on code in bitmap.c */
-/* #undef NO_BITMAP_SUPPORT */
+#define NO_BITMAP_SUPPORT 1
+
+/* Define to 1 if your C compiler doesn't accept -c and -o together. */
+/* #undef NO_MINUS_C_MINUS_O */
 
 /* Name of package */
 /* #undef PACKAGE */
@@ -454,6 +477,9 @@
 /* Define to the version of this package. */
 /* #undef PACKAGE_VERSION */
 
+/* The patch level, a.k.a. micro version number */
+/* #undef PATCHLEVEL */
+
 /* Define if you do have the popen and pclose functions. */
 /* #undef PIPES */
 /* Don't change it here -- this define is set in config/watcom/Makefile. */
@@ -461,17 +487,17 @@
 /* Unix-type of Interprocess Communication is required for mouse support. */
 /* #undef PIPE_IPC */
 
-/* Define to 1 if the C compiler supports function prototypes. */
+/* Automake 1.12 dropped support for building without prototypes */
 #define PROTOTYPES 1
 
 /* Define if you want the Qt terminal. */
 /* #undef QTTERM */
 
+/* only used for docs */
+/* #undefine QTVER */
+
 /* Define if you want to use the included readline function. */
 #define READLINE 1
-
-/* Define as the return type of signal handlers (`int' or `void'). */
-#define RETSIGTYPE void
 
 /* Define to the type of arg 1 for `select'. */
 /* #undef SELECT_TYPE_ARG1 */
@@ -488,19 +514,21 @@
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
 
-/* Define if you want to use the sunview terminal (sun). */
-/* #undef SUN */
-
-/* Define to use thin plate spines. */
-/* #undef THIN_PLATE_SPLINES_GRID */
-
 /* Define if the 3dkit libray is present. */
 /* #undef THREEDKIT */
+
+/* Define if your libcaca does not have caca_export_canvas_to_memory but the
+   old caca_export_memory */
+/* #undef USE_CACA_EXPORT_MEMORY */
+
+/* Define if you want to read .gnuplot from current directory (SECURITY
+   RISK!). */
+/* #undef USE_CWDRC */
 
 /* Define if you want to use the experimental ggi driver. */
 /* #undef USE_GGI_DRIVER */
 
-/* Define if you want to have mouse support in interactive terminals. */
+/* Define if you have interactive terminals that use mouse support. */
 /* #undef USE_MOUSE */
 /* Don't change it here -- this define is set in config/watcom/Makefile. */
 
@@ -513,11 +541,11 @@
 /* Version number of package */
 /* #undef VERSION */
 
+/* The main version number */
+/* #undef VERSION_MAJOR */
+
 /* Define if the vgagl libray is present. */
 /* #undef VGAGL */
-
-/* Define to allow zooming or refresh of volatile data. EXPERIMENTAL */
-#define VOLATILE_REFRESH 1
 
 /* Define if you want the wxwidgets terminal. */
 /* #undef WXWIDGETS */
@@ -529,14 +557,17 @@
 /* Define to 1 if the X Window System is missing or not being used. */
 /* #undef X_DISPLAY_MISSING */
 
-/* Define like PROTOTYPES; this can be used by system headers. */
-/* #undef __PROTOTYPES */
+/* Number of bits in a file offset, on hosts where this is settable. */
+/* #undef _FILE_OFFSET_BITS */
+
+/* Define to 1 to make fseeko visible on some hosts (e.g. glibc 2.2). */
+/* #undef _LARGEFILE_SOURCE */
+
+/* Define for large files, on AIX-style hosts. */
+/* #undef _LARGE_FILES */
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */
-
-/* libgd versions < 1.8.4 need gdImageStringTTF rather than gdImageStringFT */
-/* #undef gdImageStringFT */
 
 /* Define to `__inline__' or `__inline' if that's what the C compiler
    calls it, or to nothing if 'inline' is not supported under any name.  */
@@ -547,7 +578,7 @@
 /* Define to `int' if <sys/types.h> does not define. */
 /* #undef pid_t */
 
-/* Define to `unsigned' if <sys/types.h> does not define. */
+/* Define to `unsigned int' if <sys/types.h> does not define. */
 /* #undef size_t */
 
 /* Define as `fork' if `vfork' does not work. */

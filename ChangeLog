@@ -11,6 +11,10 @@
 	separate automatic dependency rules.  gnuplot scripts are now always
 	executed using console mode gnuplot in order to see their output.
 
+	* config/config.oww:  Update to version 5.3.  In particular enable
+	boxed text and external functions and disable bitmap terminals by
+	default.
+
 2017-08-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/parse.c (check_for_iteration):  If some depth of a nested
