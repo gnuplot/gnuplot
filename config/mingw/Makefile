@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.81 2017/07/31 15:52:57 sfeam Exp $
+# $Id: Makefile,v 1.82 2017/08/03 08:03:51 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 #
@@ -25,6 +25,19 @@
 # ************** Begin of Configuration section ************************
 #
 
+# Choose target to compile:
+# 1. PLAIN: wgnuplot.exe: The usual Windows GUI for input commands.
+# 2. PIPES: wgnuplot_pipes.exe: Like wgnuplot, but with an additional console
+#    window, so you can see the output of commands like
+#      plot '<awk -f preprocess.awk my.dat')  or  x=system('ls -1')
+# 3. CONSOLE: gnuplot.exe: Console mode instead of GUI for the text input.
+#
+
+# Enable exactly one of these:
+VARIANT = PLAIN
+#VARIANT = PIPES
+#VARIANT = CONSOLE
+
 # Comment out the definition lines to disable the according features:
 
 # Define this only if doing a release build
@@ -38,13 +51,13 @@
 #M32=1
 # Define if you use clang instead of gcc, requires MINGW64
 #CLANG=1
-# Use the colorgcc frontend explicitely
+# Use the colorgcc frontend explicitly
 #COLORGCC=1
 # Specify the path to the compiler unless it is already in PATH
 #CCPATH = g:/mingw32/bin/
 #CCPATH = c:/apps/mingw/bin/
 
-# Path to 32bit programms
+# Path to 32bit programs
 # On 32bit machines:
 #PROGRAMFILES32="$(PROGRAMFILES)"
 #PROGRAMFILES32=/c/Program\ Files
@@ -230,25 +243,9 @@ endif
 # **********************************************************************
 #
 
-# Choose target to compile:
-# 1. wgnuplot.exe: The usual Windows GUI for input commands.
-# 2. wgnuplot_pipes.exe: Like wgnuplot, but with an additional console
-#    window, so you can see the output of commands like
-#      plot '<awk -f preprocess.awk my.dat')  or  x=system('ls -1')
-# 3. gnuplot.exe: Console mode instead of GUI for the text input.
-#
-
-ifndef TARGET
-TARGET=wgnuplot.exe
-#TARGET=wgnuplot_pipes.exe
-#TARGET=gnuplot.exe
-endif
-
-# Set PIPES and CONSOLE according to the target
-ifeq ($(TARGET),wgnuplot.exe)
-	MENUFILE=wgnuplot.mnu
-	O=o
-ifndef MINGW64
+# We enforce to use console mode gnuplot to run gnuplot scripts in order
+# to see their output during make.
+TARGET=gnuplot.exe
 	CFLAGSEXTRA=-DUSE_FAKEPIPES
 else
 	CFLAGSEXTRA=-DPIPES
@@ -316,22 +313,10 @@ endif
 
 CFLAGS += $(CWFLAGS)
 
-LDFLAGS2 = -mwindows -Wl,--enable-auto-import
-ifdef PIPES
-  OPTS += -DPIPES
-  LDFLAGS2 = -mconsole
-endif
-
-ifdef CONSOLE
-  OPTS += -DWGP_CONSOLE
-  LDFLAGS2 = -mconsole
-endif
-
 TOP = ../..
 
 # macros for makefile.all
-#O has been defined above already
-#O=o
+O=o
 S=$(TOP)/src
 W=$(S)/win
 T=$(TOP)/term/
@@ -340,12 +325,13 @@ M=$(TOP)/demo/
 
 VPATH = $(S):$(S)/wxterminal
 
-TERMFLAGS = -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\"
+CFLAGS += -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" 
+TERMFLAGS = -DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\"
 TERMFLAGS += -I$(TOP)/term
 
 TERMLIBS =
 
-CFLAGS += -I. -I$(S) -I$(T) -DHAVE_CONFIG_H $(OPTS)
+CFLAGS += -I. -I$(S) -I$(T) -DHAVE_CONFIG_H
 CFLAGS += -D__USE_MINGW_ANSI_STDIO=1
 CFLAGS += -DGNUPLOT_SHARE_DIR=\"$(GNUPLOT_SHARE_DIR)\"
 
@@ -469,7 +455,7 @@ ifdef QT
 	QT_CXXFLAGS += -I$(QT_DIR)/include/QtWidgets -I$(QT_DIR)/include/QtNetwork
 	QT_CXXFLAGS += -I$(QT_DIR)/include/QtSvg -DQTGNUPLOT_DATA_DIR=\"$(GNUPLOT_QT_DIR)\"
 	QT_LDFLAGS = -L$(QT_DIR)/lib
-#
+
 	CFLAGS += -DQTTERM -DQT_NO_OPENGL
 	TERMLIBS += $(QT_LIBS)
 	CXXFLAGS += $(QT_CXXFLAGS)
@@ -482,7 +468,7 @@ ifdef QT
 		moc_QtGnuplotWindow.o moc_QtGnuplotApplication.o \
 		moc_QtGnuplotWidget.o moc_QtGnuplotScene.o \
 		moc_QtGnuplotEvent.o qrc_QtGnuplotResource.o
-#
+
 	MOC = $(QT_DIR)/bin/moc
 	UIC = $(QT_DIR)/bin/uic
 	RCC = $(QT_DIR)/bin/rcc
@@ -517,12 +503,11 @@ ifdef CERF
 endif
 
 ifdef GNUREADLINE
-ifeq ($(TARGET),gnuplot.exe)
-	CFLAGS += -DHAVE_LIBREADLINE -D HAVE_READLINE_READLINE_H -DHAVE_READLINE_HISTORY_H -DHAVE_READLINE_RESET
-	TERMLIBS += -lreadline -lncurses
-else
-	CFLAGS += -DREADLINE
-endif
+#	readline only usable for console mode gnuplot
+	EXTRA_CPPFLAGS_PLAIN = -DREADLINE
+	EXTRA_CPPFLAGS_PIPES = -DREADLINE
+	EXTRA_CPPFLAGS_CONSOLE = -DHAVE_LIBREADLINE -D HAVE_READLINE_READLINE_H -DHAVE_READLINE_HISTORY_H -DHAVE_READLINE_RESET
+	TERMLIBS_CONSOLE += -lreadline -lncurses
 else
 	CFLAGS += -DREADLINE
 endif
@@ -530,7 +515,7 @@ endif
 ifdef DIRECT2D11
 	CFLAGS += -DHAVE_D2D11
 	TERMLIBS += -ld3d11 -ldxguid -lwindowscodecs -lprntvpt
-	EXTRATARGET += prntvpt.lib
+	EXTRALIBS += prntvpt.lib
 endif
 
 ifdef GNU_RC
@@ -539,13 +524,13 @@ ifdef GNU_RC
   RCFLAGS = --include-dir=$(W) \
 	--define __WIN32__ --define __WIN95__ \
 	--define __GNUWIN32__ --use-temp-file
-  RCOUT = wgplt_res.$(O)
-  RES2COFF = echo wgplt_res.$(O)
+  RCOUT = wgplt_res.o
+  RES2COFF = echo wgplt_res.o
 else
   RC = $(MSSDK)/bin/rc
   RCFLAGS = -v -i$(MSSDK)/include -i$(W) -dWIN32
   RCOUT = -fowgnuplot.res
-  RES2COFF = res2coff -i wgnuplot.res -o wgplt_res.$(O)
+  RES2COFF = res2coff -i wgnuplot.res -o wgplt_res.o
 endif
 
 ifdef RELEASE
@@ -565,47 +550,74 @@ LONGVERSION := $(MAINVERSION).0
 endif
 FULLVERSION := $(MAINVERSION) patchlevel $(PATCHLEVEL)
 
+TARGETS_PLAIN=wgnuplot.exe wgnuplot.mnu
+ifndef MINGW64
+	EXTRA_CPPFLAGS_PLAIN += -DUSE_FAKEPIPES
+else
+	EXTRA_CPPFLAGS_PLAIN += -DPIPES
+endif
 
-default: $(TARGET) $(MENUFILE) support
+TARGETS_PIPES=wgnuplot_pipes.exe wgnuplot.mnu
+EXTRA_CPPFLAGS_PIPES += -DPIPES
 
-console: 
-	$(MAKE) TARGET=gnuplot.exe default
+TARGETS_CONSOLE=gnuplot.exe
+EXTRA_CPPFLAGS_CONSOLE += -DWGP_CONSOLE -DPIPES
 
-windows:
-	$(MAKE) TARGET=wgnuplot.exe default
+ALL_TARGETS = $(DEFAULT_TARGETS) $(TARGETS_PLAIN) $(TARGETS_PIPES) $(TARGETS_CONSOLE) support docs
 
-pipes:
-	$(MAKE) TARGET=wgnuplot_pipes.exe default
+DEFAULT_TARGETS = $(VERSIONING) config.h $(TARGETS_$(VARIANT)) $(QT_TARGET) $(HELPFILE)
 
-docs:
-	$(MAKE) TARGET=gnuplot.exe gnuplot.pdf tutorial.pdf \
-		ps_symbols.pdf ps_fontfile_doc.pdf ps_guide.pdf
+default: $(DEFAULT_TARGETS)
 
-support: $(HELPFILE) $(M)bf_test.exe $(QT_TARGET) $(QT_TRANSLATION) demo_plugin.dll $(LUATARGETS) $(HELPFILEJA)
+windows: $(TARGETS_PLAIN)
+
+plain: $(TARGETS_PLAIN)
+
+pipes: $(TARGETS_PIPES)
+
+console: $(TARGETS_CONSOLE)
+
+docs: gnuplot.pdf tutorial.pdf ps_symbols.pdf ps_fontfile_doc.pdf ps_guide.pdf
+
+help: $(HELPFILE)
+
+support: $(M)bf_test.exe $(QT_TRANSLATION) demo_plugin.dll $(LUATARGETS)
 
 ja: $(HELPFILEJA)
 
-all: console windows pipes support docs
+all: $(DEFAULT_TARGETS) support docs
 
 
 # include the 'core makefile template'
 include $(S)/makefile.all
 
 OBJS = $(COREOBJS) version.$(O) gpexecute.$(O) $(WX_OBJS) $(CAIRO_OBJS) $(QT_OBJS)
-
 WINOBJS = winmain.$(O) wgnuplib.$(O) wgraph.$(O) wprinter.$(O) \
-	  wpause.$(O) wgdiplus.$(O) wd2d.$(O)
-ifneq ($(TARGET),gnuplot.exe)
-WINOBJS += wtext.$(O) screenbuf.$(O) wmenu.$(O) wredirect.$(O)
-endif
+	  wpause.$(O) wgdiplus.$(O) wd2d.$(O) 
+WINOBJS_WGNUPLOT = wtext.$(O) screenbuf.$(O) wmenu.$(O) wredirect.$(O)
 
 # default rules
-.SUFFIXES: .exe .$(O) .c .lib .def
-.c.$(O):
-	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
+.SUFFIXES: .exe .o .co .po .c .lib .def
+.c.o:
+	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PLAIN) -MMD -MT '$*.$o' -MF $*.d -o $@ $<
+%.o: $W/%.c
+	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PLAIN) -MMD -MT '$*.$o' -MF $*.d -o $@ $<
+%.o: $W/%.cpp
+	$(CXX) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PLAIN) $(CXXFLAGS) -MMD -MT '$*.$o' -MF $*.d -o $@ $<
 
-%.$(O): $W/%.c
-	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
+.c.po:
+	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PIPES) -MMD -MT '$*.$po' -MF $*.pd -o $@ $<
+%.po: $W/%.c
+	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PIPES) -MMD -MT '$*.$po' -MF $*.pd -o $@ $<
+%.po: $W/%.cpp
+	$(CXX) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PIPES) $(CXXFLAGS) -MMD -MT '$*.$po' -MF $*.d -o $@ $<
+
+.c.co:
+	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_CONSOLE) -MMD -MT '$*.$co' -MF $*.cd -o $@ $<
+%.co: $W/%.c
+	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_CONSOLE) -MMD -MT '$*.$co' -MF $*.cd -o $@ $<
+%.co: $W/%.cpp
+	$(CXX) -c $(CFLAGS) $(EXTRA_CPPFLAGS_CONSOLE) $(CXXFLAGS) -MMD -MT '$*.$co' -MF $*.d -o $@ $<
 
 %.lib: %.def
 ifndef M32
@@ -616,38 +628,63 @@ endif
 
 LDLIBS = -lkernel32 -lgdi32 -lwinspool -lcomdlg32 -lcomctl32 -ladvapi32 -lshell32 -lmsimg32 -lgdiplus -lshlwapi -ld2d1 -ldwrite -lole32
 LDLIBS += -lhtmlhelp
-LDFLAGS2 += -L$(HHWPATH)lib
+LDFLAGS2 += -Wl,--enable-auto-import -L$(HHWPATH)lib
 ifdef MINGW64
 LDFLAGS2 += -L.
 endif
 ifndef M32
-	EXTRATARGET += htmlhelp.lib
+	EXTRALIBS += htmlhelp.lib
 endif
 
-$(TARGET): $(VERSIONING) $(OBJS) $(WINOBJS) wgplt_res.$(O) Makefile $(EXTRATARGET)
-	$(LDX) $(LDFLAGS) $(LDFLAGS2) -o $@ $(OBJS) $(WINOBJS) wgplt_res.$(O) $(LDLIBS)\
-	$(TERMLIBS) $(WX_LIBS) $(PANGOCAIRO_LIBS)
-
-pgnuplot.exe: $(W)/pgnuplot.c version.$(O)
 	$(CC) -O2 -DWINDOWS_NO_GUI -DHAVE_STDBOOL_H -s -o $@ $^ -I$(W) -I$(S) -luser32
 
 # pull in dependency info for existing object files
 ifndef NODEPS
 -include $(OBJS:.$(O)=.d)
 -include $(WINOBJS:.$(O)=.d)
+-include $(WINOBJS_WGNUPLOT:.$(O)=.d)
+-include $(OBJS:.$(O)=.pd)
+-include $(WINOBJS:.$(O)=.pd)
+-include $(WINOBJS_WGNUPLOT:.$(O)=.pd)
+-include $(OBJS:.$(O)=.cd)
+-include $(WINOBJS:.$(O)=.cd)
 endif
+
 
 # explicit rules
 
-wgplt_res.$(O): $(W)/wgnuplot.rc $(W)/wgnuplib.rc $(W)/wresourc.h $(W)/texticon.ico $(W)/grpicon.ico $(W)/wgnuplot.exe.manifest $(W)/wgnuplot.exe.manifest64
+OBJS_PLAIN = $(OBJS) $(WINOBJS) $(WINOBJS_WGNUPLOT)
+OBJS_PIPES =  $(subst .o,.po,$(OBJS) $(WINOBJS) $(WINOBJS_WGNUPLOT))
+OBJS_CONSOLE =  $(subst .o,.co,$(OBJS) $(WINOBJS))
+
+wgnuplot.exe: $(VERSIONING) $(OBJS_PLAIN) wgplt_res.o $(EXTRALIBS)
+	$(LDX) $(LDFLAGS) -mwindows $(LDFLAGS2) -o $@ $(OBJS_PLAIN) wgplt_res.o $(LDLIBS)\
+	$(TERMLIBS) $(TERMLIBS_PLAIN) $(WX_LIBS) $(PANGOCAIRO_LIBS)
+
+wgnuplot_pipes.exe: $(VERSIONING) $(OBJS_PIPES) wgplt_res.o $(EXTRALIBS)
+	$(LDX) $(LDFLAGS) -mconsole $(LDFLAGS2) -o $@  $(OBJS_PIPES) wgplt_res.o $(LDLIBS)\
+	$(TERMLIBS) $(TERMLIBS_PIPES) $(WX_LIBS) $(PANGOCAIRO_LIBS)
+
+gnuplot.exe: $(VERSIONING) $(OBJS_CONSOLE) wgplt_res.o $(EXTRALIBS)
+	$(LDX) $(LDFLAGS) -mconsole $(LDFLAGS2) -o $@ $(OBJS_CONSOLE) wgplt_res.o  $(LDLIBS)\
+	$(TERMLIBS) $(TERMLIBS_CONSOLE) $(WX_LIBS) $(PANGOCAIRO_LIBS)
+
+wgnuplot.mnu: $(W)/wgnuplot.mnu
+	$(CP) $^ $@
+
+pgnuplot.exe: $(W)/pgnuplot.c version.o
+	$(CC) -O2 -DWINDOWS_NO_GUI -DHAVE_STDBOOL_H -s -o $@ $^ -I$(W) -I$(S) -luser32
+
+wgplt_res.o: $(W)/wgnuplot.rc $(W)/wgnuplib.rc $(W)/wresourc.h $(W)/texticon.ico $(W)/grpicon.ico $(W)/wgnuplot.exe.manifest $(W)/wgnuplot.exe.manifest64
 	$(RC) $(RCFLAGS) $< $(RCOUT)
 	$(RES2COFF)
 
-show.$(O): show.c plot.h setshow.h
-	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -DBINDIR=\"$(bindir)\" -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
-
-term.$(O): term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
-	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) $(TERMFLAGS) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
+term.o: term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
+	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PLAIN) $(TERMFLAGS) -MMD -MT '$*.$o' -MF $*.d -o $@ $<
+term.po: term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
+	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PIPES) $(TERMFLAGS) -MMD -MT '$*.$po' -MF $*.pd -o $@ $<
+term.co: term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
+	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_CONSOLE) $(TERMFLAGS) -MMD -MT '$*.$co' -MF $*.cd -o $@ $<
 
 ifndef RELEASE
 timestamp.h: $(TOP)/ChangeLog
@@ -662,32 +699,31 @@ $(S)/version.c: $(TOP)/VERSION $(TOP)/PATCHLEVEL $(TOP)/ChangeLog $(S)/Makefile.
 	$(MAKE) -C $(S) srcdir=. top_srcdir=.. -f Makefile.maint version.c
 endif
 
-WINDEPS = $(W)/wgnuplib.h $(W)/wcommon.h $(W)/wresourc.h $(W)/screenbuf.h $(W)/wgdiplus.h $(W)/wd2d.h
+# build timestamp.h first
+$(OBJS_PLAIN):  config.h $(VERSIONING)
+$(OBJS_PIPES):  config.h $(VERSIONING)
+$(OBJS_CONSOLE): config.h $(VERSIONING)
 
-winmain.$(O): $(W)/winmain.c $(W)/wgnuplib.h $(W)/wtext.h plot.h
-	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
+wxt_gui.o: $(S)/wxterminal/wxt_gui.cpp $(S)/wxterminal/wxt_gui.h
+	$(CXX) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PLAIN) $(CXXFLAGS) $(CAIRO_CFLAGS) -MMD -MT '$*.$o' -MF $*.d -o $@ $<
+wxt_gui.po: $(S)/wxterminal/wxt_gui.cpp $(S)/wxterminal/wxt_gui.h
+	$(CXX) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PIPES) $(CXXFLAGS) $(CAIRO_CFLAGS) -MMD -MT '$*.$po' -MF $*.pd -o $@ $<
+wxt_gui.co: $(S)/wxterminal/wxt_gui.cpp $(S)/wxterminal/wxt_gui.h
+	$(CXX) -c $(CFLAGS) $(EXTRA_CPPFLAGS_CONSOLE) $(CXXFLAGS) $(CAIRO_CFLAGS) -MMD -MT '$*.$co' -MF $*.cd -o $@ $<
 
-wgdiplus.$(O): $(W)/wgdiplus.cpp $(WINDEPS)
-	$(CXX) -c $(CFLAGS) $(CXXFLAGS) $(CFLAGSEXTRA) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
+gp_cairo.o: $(S)/wxterminal/gp_cairo.c $(S)/wxterminal/gp_cairo.h
+	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PLAIN) $(PANGOCAIRO_CFLAGS) -MMD -MT '$*.$o' -MF $*.d -o $@ $<
+gp_cairo.po: $(S)/wxterminal/gp_cairo.c $(S)/wxterminal/gp_cairo.h
+	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PIPES) $(PANGOCAIRO_CFLAGS) -MMD -MT '$*.$po' -MF $*.pd -o $@ $<
+gp_cairo.co: $(S)/wxterminal/gp_cairo.c $(S)/wxterminal/gp_cairo.h
+	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_CONSOLE) $(PANGOCAIRO_CFLAGS) -MMD -MT '$*.$co' -MF $*.cd -o $@ $<
 
-wd2d.$(O): $(W)/wd2d.cpp $(WINDEPS)
-	$(CXX) -c $(CFLAGS) $(CXXFLAGS) $(CFLAGSEXTRA) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
-
-wredirect.$(O): $(W)/wredirect.cpp $(WINDEPS)
-	$(CXX) -c $(CFLAGS) $(CXXFLAGS) $(CFLAGSEXTRA) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
-
-wgnuplot.mnu: $(W)/wgnuplot.mnu
-	$(CP) $^ $@
-
-wxt_gui.$(O): $(S)/wxterminal/wxt_gui.cpp $(S)/wxterminal/wxt_gui.h
-	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) $(CAIRO_CFLAGS) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
-
-gp_cairo.$(O): $(S)/wxterminal/gp_cairo.c $(S)/wxterminal/gp_cairo.h
-	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) $(PANGOCAIRO_CFLAGS) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
-
-qt_term.$(O): $(S)/qtterminal/qt_term.cpp $(S)/qtterminal/qt_term.h
-	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
-
+qt_term.o: $(S)/qtterminal/qt_term.cpp $(S)/qtterminal/qt_term.h
+	$(CXX) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PLAIN) $(CXXFLAGS) -MMD -MT '$*.$o' -MF $*.d -o $@ $<
+qt_term.po: $(S)/qtterminal/qt_term.cpp $(S)/qtterminal/qt_term.h
+	$(CXX) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PIPES) $(CXXFLAGS) -MMD -MT '$*.$po' -MF $*.pd -o $@ $<
+qt_term.co: $(S)/qtterminal/qt_term.cpp $(S)/qtterminal/qt_term.h
+	$(CXX) -c $(CFLAGS) $(EXTRA_CPPFLAGS_CONSOLE) $(CXXFLAGS) -MMD -MT '$*.$co' -MF $*.cd -o $@ $<
 
 # Call the Qt resource compiler
 qrc_QtGnuplotResource.cpp: $(S)/qtterminal/QtGnuplotResource.qrc
@@ -722,9 +758,9 @@ qtgnuplot_ja.qm: $(S)/qtterminal/po/qtgnuplot_ja.ts
 	$(LRELEASE) -qm $@ $<
 
 %.o: $(S)/qtterminal/%.cpp
-	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
+	$(CXX) -c $(CFLAGS) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
 %.o: %.cpp
-	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
+	$(CXX) -c $(CFLAGS) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
 
 gnuplot_qt.exe: $(QT_FILES_TARGETS) $(GNUPLOTQTOBJS)
 	$(LDX) -Wl,--subsystem,windows $(LDFLAGS) -Wl,-Map=gnuplot_qt.map -o $@ $(GNUPLOTQTOBJS) $(QT_LIBS) -lshell32
@@ -734,7 +770,7 @@ demo_plugin.dll: $(M)plugin/demo_plugin.c
 
 # convert gnuplot.doc to windows/wgnuplot.html
 $(BUILDHELPFILE): doc2html.exe $(D)gnuplot.doc $(D)windows/wgnuplot.hhp $(D)windows/wgnuplot.hhk \
-                  $(D)windows/wgnuplot.stp $(D)plotstyles.gnu $(CORETERM)
+                  $(D)windows/wgnuplot.stp $(D)plotstyles.gnu $(CORETERM) $(TARGET)
 	./doc2html $(D)gnuplot.doc $(D)windows/
 	-./$(TARGET) -d -e "winhelp=1; cd '$(D)'" plotstyles.gnu
 	-$(HHC) $(D)windows/wgnuplot.hhp
@@ -778,7 +814,8 @@ $(JASRC): $(D)gnuplot-ja.doc $(D)term-ja.diff $(CORETERM)
 
 wgnuplot-ja.chm: $(JASRC) doc2html-ja.exe \
                   $(D)windows/wgnuplot.hhp $(D)windows/wgnuplot.hhk \
-                  $(D)windows/wgnuplot.stp $(D)plotstyles.gnu
+                  $(D)windows/wgnuplot.stp $(D)plotstyles.gnu \
+                  $(TARGET)
 	# FIXME: some files always end up read-only...
 	chmod +w $(JADW)*
 	# Create Japanese html source in EUC-JP encoding
@@ -797,31 +834,28 @@ wgnuplot-ja.chm: $(JASRC) doc2html-ja.exe \
 	-$(HHC) $(JADW)wgnuplot.hhp
 	cp $(JADW)wgnuplot.chm $(HELPFILEJA)
 
-doc2html.exe: $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c version.$(O) $(LUA_HELP)
+doc2html.exe: $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c version.o $(LUA_HELP)
 	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI \
 	    -DVERSION_MAJOR='"$(MAINVERSION)"' -DPATCHLEVEL='"$(PATCHLEVEL)"' \
 	    $(CFLAGS) -I. -I$(D:/=) -I$(T:/=) \
 	    $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c
 
-doc2html-ja.exe: $(JASRC) $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c version.$(O) $(LUA_HELP)
+doc2html-ja.exe: $(JASRC) $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c version.o $(LUA_HELP)
 	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI \
 	    -DVERSION_MAJOR='"$(MAINVERSION)"' -DPATCHLEVEL='"$(PATCHLEVEL)"' \
 	    -DJAPANESE_DOC $(CFLAGS) -I. -I$(JAD) -I$(JA)/term \
 	    $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c
 
-doc2ms.exe: $(D)doc2ms.c $(D)termdoc.c $(D)xref.c version.$(O) $(LUA_HELP)
-	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI $(CFLAGS) -I. -I$(D:/=) -I$(T:/=) $(D)doc2ms.c $(D)termdoc.c $(D)xref.c version.$(O)
+doc2ms.exe: $(D)doc2ms.c $(D)termdoc.c $(D)xref.c version.o $(LUA_HELP)
+	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI $(CFLAGS) -I. -I$(D:/=) -I$(T:/=) $(D)doc2ms.c $(D)termdoc.c $(D)xref.c version.o
 
 #make binary demo files
 # WINDOWS_NO_GUI makes sure that wtext.h does not redefine fread() etc.
-$(M)bf_test.exe : bf_test.c 
+$(M)bf_test.exe: bf_test.c 
 	$(LD) $(LDFLAGS) $(CFLAGS) -DWINDOWS_NO_GUI -o $@ $^
 	(cd $(M) ; ./bf_test.exe )
 
-#
 # Create config.h
-#
-$(OBJS) $(WINOBJS): config.h
 config.h: $(TOP)/config/config.mgw
 	cp -p $< $@
 
@@ -873,7 +907,7 @@ endif
 gnuplot.tex: $(D)gnuplot.doc doc2tex.exe
 	./doc2tex $(D)gnuplot.doc gnuplot.tex
 
-gnuplot-figures.tex: $(D)gnuplot.doc doc2tex.exe
+gnuplot-figures.tex: $(D)gnuplot.doc doc2tex.exe $(TARGET)
 	GNUPLOT_LIB=$(M) ./$(TARGET) -d $(D)plotstyles.gnu
 	./doc2tex -figures $(D)gnuplot.doc gnuplot-figures.tex
 
@@ -956,7 +990,7 @@ ps_guide.pdf: $(D)psdoc/ps_guide.ps
 # clean up temporary files
 clean:
 	$(RM) config.h wgnuplot.map wgnuplot.res
-	$(RM) *.$(O) *.po *.o *.co *.d *.map
+	$(RM) *.o *.po *.co *.d *.cd *.pd *.map
 	$(RM) moc_*.cpp ui_*.h qrc_*.cpp
 	-$(RM) prntvpt.lib prntvpt.def
 	$(RM) doc2*.exe $(W)/wgnuplib.res wgnuplib.map wgnuplot.lib

@@ -1,5 +1,7 @@
 VERSION
 *.d
+*.cd
+*.pd
 *.h
 *.o
 *.co

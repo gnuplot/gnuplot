@@ -1,3 +1,16 @@
+2017-08-12  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/mingw/Makefile:  "Recursive make considered harmful".  Up
+	until now we tried to reduce the number of rules by using recursive
+	make for the three different targets "windows", "pipes" and "console".
+	That broke parallel builds of the "all" target because of multiple
+	attempts to build the same file due to insufficient dependency rules.
+	Instead of fixing this, we now follow the same concept as the
+	MSVC and OpenWatcom Makefiles and implement three set of rules and
+	avoid recursive make altogether.  This also allows us to implement
+	separate automatic dependency rules.  gnuplot scripts are now always
+	executed using console mode gnuplot in order to see their output.
+
 2017-08-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/parse.c (check_for_iteration):  If some depth of a nested
