@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.82 2017/08/03 08:03:51 markisch Exp $
+# $Id: Makefile,v 1.83 2017/08/12 06:41:29 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 #
@@ -246,22 +246,6 @@ endif
 # We enforce to use console mode gnuplot to run gnuplot scripts in order
 # to see their output during make.
 TARGET=gnuplot.exe
-	CFLAGSEXTRA=-DUSE_FAKEPIPES
-else
-	CFLAGSEXTRA=-DPIPES
-endif
-endif
-ifeq ($(TARGET),wgnuplot_pipes.exe)
-	MENUFILE=wgnuplot.mnu
-	PIPES=1
-	O=po
-endif
-ifeq ($(TARGET),gnuplot.exe)
-	PIPES=1
-	CONSOLE=1
-	O=co
-endif
-
 
 ifdef MINGW64
 ifdef M32
@@ -550,20 +534,18 @@ LONGVERSION := $(MAINVERSION).0
 endif
 FULLVERSION := $(MAINVERSION) patchlevel $(PATCHLEVEL)
 
-TARGETS_PLAIN=wgnuplot.exe wgnuplot.mnu
+TARGETS_PLAIN = wgnuplot.exe wgnuplot.mnu
 ifndef MINGW64
 	EXTRA_CPPFLAGS_PLAIN += -DUSE_FAKEPIPES
 else
 	EXTRA_CPPFLAGS_PLAIN += -DPIPES
 endif
 
-TARGETS_PIPES=wgnuplot_pipes.exe wgnuplot.mnu
+TARGETS_PIPES = wgnuplot_pipes.exe wgnuplot.mnu
 EXTRA_CPPFLAGS_PIPES += -DPIPES
 
-TARGETS_CONSOLE=gnuplot.exe
+TARGETS_CONSOLE = gnuplot.exe
 EXTRA_CPPFLAGS_CONSOLE += -DWGP_CONSOLE -DPIPES
-
-ALL_TARGETS = $(DEFAULT_TARGETS) $(TARGETS_PLAIN) $(TARGETS_PIPES) $(TARGETS_CONSOLE) support docs
 
 DEFAULT_TARGETS = $(VERSIONING) config.h $(TARGETS_$(VARIANT)) $(QT_TARGET) $(HELPFILE)
 
@@ -585,7 +567,7 @@ support: $(M)bf_test.exe $(QT_TRANSLATION) demo_plugin.dll $(LUATARGETS)
 
 ja: $(HELPFILEJA)
 
-all: $(DEFAULT_TARGETS) support docs
+all: $(DEFAULT_TARGETS) $(TARGETS_PLAIN) $(TARGETS_PIPES) $(TARGETS_CONSOLE) support docs
 
 
 # include the 'core makefile template'
@@ -635,8 +617,6 @@ endif
 ifndef M32
 	EXTRALIBS += htmlhelp.lib
 endif
-
-	$(CC) -O2 -DWINDOWS_NO_GUI -DHAVE_STDBOOL_H -s -o $@ $^ -I$(W) -I$(S) -luser32
 
 # pull in dependency info for existing object files
 ifndef NODEPS
