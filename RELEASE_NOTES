@@ -7,11 +7,12 @@ and minor changes accummulated since then.
 
 These release notes are for version 5.0 patchlevel 7 (5.0.7).
 This release contains bug-fixes, a few changes back-ported from the
-development version, and a few new features.  This will probably be
-the final release in the 5.0 series.  Development has shifted to
-versions 5.2 (next stable release) and 5.3 (main development branch).
+development version, and a few new features.
 
-Release Notes date: 10-Aug-2017
+This will probably be the final release in the 5.0 series.  Development has
+shifted to versions 5.2 (next stable release) and 5.3 (development branch).
+
+Release Notes date: 13-Aug-2017
 
 Changes in 5.0.7
 ================
