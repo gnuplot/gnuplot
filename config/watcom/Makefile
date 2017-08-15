@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.17 2017/02/15 09:13:19 markisch Exp $
+# $Id: Makefile,v 1.17.2.1 2017/06/20 22:08:43 sfeam Exp $
 #
 # GNUPLOT Makefile OpenWatcom 1.3 on Win32
 
@@ -57,6 +57,12 @@ GNUPLOT_PS_DIR = share/PostScript
 # paths for external libs added here... 
 LDLIBS = 
 
+# Optional libraries:
+# GDI+ and Direct2D/DirectWrite support libraries are available at
+#   https://sourceforge.net/p/gnuplot/patches/746/
+#GDIPLUS=1
+#DIRECT2D=1
+
 # Macros for makefile.all
 O=obj
 T=$(TOP)\term\
@@ -75,28 +81,38 @@ CPPFLAGS =  -DHAVE_CONFIG_H -D_Windows -DHAVE_CONFIG_H -DUSE_MOUSE -DEAM_OBJECTS
 CPPFLAGS += -DVERSION_MAJOR="5.2" -DPATCHLEVEL="0"
 CPPFLAGS += -DUNICODE -D_UNICODE
 # library-dependent ones may have to be added, like:
-# -DHAVE_LIBPNG -DHAVE_LIBPDF 
-#CPPFLAGS += -DHAVE_GDIPLUS
+# -DHAVE_LIBPNG -DHAVE_LIBPDF
+!ifdef GDIPLUS
+CPPFLAGS += -DHAVE_GDIPLUS
+!endif
+!ifdef DIRECT2D
+CPPFLAGS += -DHAVE_D2D
+!endif
 
 HELPFILE = wgnuplot.chm
 
 DEFAULT_TARGETS = $(BINARYFILES) $(HELPFILE)
 
 TARGETS_PLAIN=wgnuplot.exe wgnuplot.mnu
-EXTRA_CPPFLAGS_PLAIN = -DUSE_FAKEPIPES -DPIPES
+EXTRA_CPPFLAGS_PLAIN = -DUSE_FAKEPIPES
 
 TARGETS_PIPES=wgnuplot_pipes.exe wgnuplot.mnu
-EXTRA_CPPFLAGS_PIPES = -DPIPES=1
+EXTRA_CPPFLAGS_PIPES = 
 
 TARGETS_CONSOLE=gnuplot.exe
-EXTRA_CPPFLAGS_CONSOLE = -DPIPES=1 -DWGP_CONSOLE
+EXTRA_CPPFLAGS_CONSOLE = -DWGP_CONSOLE
 
 ALL_TARGETS = $(DEFAULT_TARGETS) $(TARGETS_PLAIN) $(TARGETS_PIPES) $(TARGETS_CONSOLE)
 
 DEFAULT_TARGETS += $(TARGETS_$(VARIANT))
 
 LDLIBS += LIBRARY htmlhelp.lib
-#LDLIBS += LIBRARY gdiplus.lib
+!ifdef GDIPLUS
+LDLIBS += LIBRARY gdiplus.lib
+!endif
+!ifdef DIRECT2D
+LDLIBS += LIBRARY d2d1.lib LIBRARY dwrite.lib
+!endif
 
 # compiler flags, determined from MS ones by OW's "cl /showwopts"
 
@@ -134,8 +150,13 @@ default: $(DEFAULT_TARGETS) .SYMBOLIC
 all: $(ALL_TARGETS) .SYMBOLIC
 
 WINOBJS = winmain.$(O) wgnuplib.$(O) wgraph.$(O) wprinter.$(O) wtext.$(O) &
-        wpause.$(O) wmenu.$(O) gpexecute.$(O) screenbuf.$(O)
-#WINOBJS += wgdiplus.$(O)
+          wpause.$(O) wmenu.$(O) gpexecute.$(O) screenbuf.$(O)
+!ifdef GDIPLUS
+WINOBJS = $(WINOBJS) wgdiplus.$(O)
+!endif
+!ifdef DIRECT2D
+WINOBJS = $(WINOBJS) wd2d.$(O)
+!endif
 
 OBJS = $(COREOBJS) version.$(O) $(WINOBJS)
 
@@ -250,7 +271,7 @@ wgnuplot.res :  $(W)\wgnuplot.rc $(W)\wgnuplib.rc &
 	   -d_WIN32 -dNDEBUG -dWIN32 $(W)\wgnuplot.rc
 
 term.obj: $(S)\term.c $(CORETERM) .AUTODEPEND
-        $(WCC) $(WCFLAGS) $(TERMFLAGS) $[@
+        $(WCC) $(EXTRA_CPPFLAGS_PLAIN) $(WCFLAGS) $(TERMFLAGS) $[@
 term.cobj: $(S)\term.c $(CORETERM) .AUTODEPEND
         $(WCC) $(EXTRA_CPPFLAGS_CONSOLE) $(WCFLAGS) $(TERMFLAGS) $[@ -fo=$^@
 term.pobj: $(S)\term.c $(CORETERM) .AUTODEPEND

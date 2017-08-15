@@ -13,6 +13,15 @@
 	boxed text and external functions and disable bitmap terminals by
 	default.
 
+	* src/win/wd2d.cpp:  Enable compilation with OpenWatcom, which is
+	missing __uuidof().
+
+	* config/watcom/Makefile:  Optionally build with GDI+ or Direct2D/
+	DirectWrite.  These libs are available at
+	https://sourceforge.net/p/gnuplot/patches/746/
+
+	* config/watcom/Makefile:  Drop option -j for signed chars.
+
 2017-08-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/grahics.c src/graphics.h(rgbscale) demo/image.dem demo/image2.dem:
