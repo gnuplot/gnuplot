@@ -9,6 +9,10 @@
 
 	* term/metapost.trm:  Missing check for EAM_BOXED_TEXT.
 
+	* config/config.oww:  Update to version 5.2.  In particular enable
+	boxed text and external functions and disable bitmap terminals by
+	default.
+
 2017-08-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/grahics.c src/graphics.h(rgbscale) demo/image.dem demo/image2.dem:
