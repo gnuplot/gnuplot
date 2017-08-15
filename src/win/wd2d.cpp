@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.6.2.5 2017/06/30 13:33:55 markisch Exp $
+ * $Id: wd2d.cpp,v 1.6.2.6 2017/07/30 08:20:35 markisch Exp $
  */
 
 /*
@@ -1342,9 +1342,9 @@ drawgraph_d2d(LPGW lpgw, HWND hwnd, LPRECT rect)
 				break;
 			}
 			case TEXTBOX_MARGINS:
-				/* Adjust size of whitespace around text: default is 1/2 char height + 2 char widths. */
-				boxedtext.margin.x = MulDiv(curptr->y, (rr - rl) * lpgw->hchar, 100 * lpgw->xmax);
-				boxedtext.margin.y = MulDiv(curptr->y, (rb - rt) * lpgw->vchar, 400 * lpgw->ymax);
+				/* Adjust size of whitespace around text. */
+				boxedtext.margin.x = MulDiv(curptr->x * lpgw->hchar, rr - rl, 1000 * lpgw->xmax);
+				boxedtext.margin.y = MulDiv(curptr->y * lpgw->hchar, rr - rl, 1000 * lpgw->xmax);
 				break;
 			default:
 				break;

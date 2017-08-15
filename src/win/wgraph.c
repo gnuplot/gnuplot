@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.255.2.7 2017/08/15 14:03:10 markisch Exp $
+ * $Id: wgraph.c,v 1.255.2.8 2017/08/29 11:38:16 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -2343,8 +2343,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			}
 			case TEXTBOX_MARGINS:
 				/* Adjust size of whitespace around text: default is 1/2 char height + 2 char widths. */
-				boxedtext.margin.x = MulDiv(curptr->y, (rr - rl) * lpgw->hchar, 100 * lpgw->xmax);
-				boxedtext.margin.y = MulDiv(curptr->y, (rb - rt) * lpgw->vchar, 400 * lpgw->ymax);
+				boxedtext.margin.x = MulDiv(curptr->x * lpgw->hchar, rr - rl, 1000 * lpgw->xmax);
+				boxedtext.margin.y = MulDiv(curptr->y * lpgw->hchar, rr - rl, 1000 * lpgw->xmax);
 				break;
 			default:
 				break;

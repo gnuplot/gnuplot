@@ -3,6 +3,10 @@
 	* src/win/wgraph.c (CopyPrint):  Check return values of GDI print API
 	function calls.
 
+	* src/win/wgraph.c src/win/wgdiplus.cpp src/win/wd2d.cpp
+	(TEXTBOX_MARGINS):  Adjust scaling of textbox margin to be more like
+	what the qt terminal does (ie. much smaller).
+
 2017-08-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/grahics.c src/graphics.h(rgbscale) demo/image.dem demo/image2.dem:
