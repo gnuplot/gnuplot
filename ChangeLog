@@ -1,3 +1,12 @@
+2017-08-15  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c src/win/wgdiplus.cpp:  We intend to scale line widths
+	with resolution when printing, but we got that wrong due to confusion of
+	constants.
+
+	* src/win/wgraph.c (CopyPrint):  Fix fallback from D2D to GDI+ for
+	printing.
+
 2017-08-12  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/set.c (set_table):  Implement "append" option for datablocks.

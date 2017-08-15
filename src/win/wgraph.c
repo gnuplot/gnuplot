@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.255.2.5 2017/06/24 19:56:57 markisch Exp $
+ * $Id: wgraph.c,v 1.255.2.6 2017/07/11 07:13:14 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -1900,8 +1900,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	   as on screen */
 	if ((GetDeviceCaps(hdc, TECHNOLOGY) == DT_RASPRINTER)) {
 		HDC hdc_screen = GetDC(NULL);
-		lw_scale = (double) GetDeviceCaps(hdc, VERTRES) /
-		           (double) GetDeviceCaps(hdc_screen, VERTRES);
+		lw_scale = (double) GetDeviceCaps(hdc, LOGPIXELSX) /
+		           (double) GetDeviceCaps(hdc_screen, LOGPIXELSY);
 		line_width *= lw_scale;
 		ReleaseDC(NULL, hdc_screen);
 		/* Does the printer support AlphaBlend with transparency (const alpha)? */
@@ -3246,7 +3246,11 @@ CopyPrint(LPGW lpgw)
 	SendMessage(GetDlgItem(pr.hDlgPrint, CANCEL_PROGRESS), PBM_SETMARQUEE, 1, 0);
 
 #ifdef HAVE_GDIPLUS
+#ifndef HAVE_D2D11
+	if (lpgw->gdiplus || lpgw->d2d)
+#else
 	if (lpgw->gdiplus)
+#endif
 		OpenPrinter((LPTSTR) szDevice, &printerHandle, NULL);
 #endif
 
@@ -3259,7 +3263,11 @@ CopyPrint(LPGW lpgw)
 		SetMapMode(printer, MM_TEXT);
 		SetBkMode(printer, OPAQUE);
 #ifdef HAVE_GDIPLUS
+#ifndef HAVE_D2D11
 		if (lpgw->gdiplus || lpgw->d2d) {
+#else
+		if (lpgw->gdiplus) {
+#endif
 			/* Print using GDI+ */
 			print_gdiplus(lpgw, printer, printerHandle, &rect);
 		} else 
@@ -3283,10 +3291,12 @@ CopyPrint(LPGW lpgw)
 		DestroyWindow(pr.hDlgPrint);
 	}
 #ifdef HAVE_GDIPLUS
-	if (lpgw->gdiplus)
+	if (printerHandle != NULL)
 		ClosePrinter(printerHandle);
 #endif
-	DeleteDC(printer);
+	if (printer != NULL)
+		DeleteDC(printer);
+
 	PrintUnregister(&pr);
 	/* make certain that the screen pen set is restored */
 	SendMessage(lpgw->hWndGraph, WM_COMMAND, M_REBUILDTOOLS, 0L);
