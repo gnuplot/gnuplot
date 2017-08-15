@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.273 2017/07/31 19:30:19 markisch Exp $
+ * $Id: wgraph.c,v 1.274 2017/07/31 19:45:27 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -3365,7 +3365,11 @@ CopyPrint(LPGW lpgw)
 #endif
 
 #ifdef HAVE_GDIPLUS
+#ifndef HAVE_D2D11
+	if (lpgw->gdiplus || lpgw->d2d)
+#else
 	if (lpgw->gdiplus)
+#endif
 		OpenPrinter((LPTSTR) szDevice, &printerHandle, NULL);
 #endif
 
@@ -3375,7 +3379,11 @@ CopyPrint(LPGW lpgw)
 
 	if (StartDoc(printer, &docInfo) > 0 && StartPage(printer) > 0) {
 #ifdef HAVE_GDIPLUS
+#ifndef HAVE_D2D11
 		if (lpgw->gdiplus || lpgw->d2d) {
+#else
+		if (lpgw->gdiplus) {
+#endif
 			/* Print using GDI+ */
 			print_gdiplus(lpgw, printer, printerHandle, &rect);
 		} else 
@@ -3414,7 +3422,7 @@ CopyPrint(LPGW lpgw)
 		DestroyWindow(pr.hDlgPrint);
 	}
 #ifdef HAVE_GDIPLUS
-	if (lpgw->gdiplus)
+	if (printerHandle != NULL)
 		ClosePrinter(printerHandle);
 #endif
 	if (printer != NULL)
@@ -3479,7 +3487,7 @@ WriteGraphIni(LPGW lpgw)
 	wsprintf(profile, TEXT("%d"), lpgw->graphtotop);
 	WritePrivateProfileString(section, TEXT("GraphToTop"), profile, file);
 	wsprintf(profile, TEXT("%d"), lpgw->oversample);
-	WritePrivateProfileString(section, TEXT("GraphGDI+"), profile, file);
+	WritePrivateProfileString(section, TEXT("GraphGDI+Oversampling"), profile, file);
 	wsprintf(profile, TEXT("%d"), lpgw->gdiplus);
 	WritePrivateProfileString(section, TEXT("GraphGDI+"), profile, file);
 	wsprintf(profile, TEXT("%d"), lpgw->d2d);
