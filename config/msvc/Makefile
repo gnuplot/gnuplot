@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.40 2017/08/10 15:28:25 markisch Exp $
+# $Id: Makefile,v 1.41 2017/08/10 15:31:23 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2010 or newer
 
@@ -113,8 +113,8 @@ GNUPLOT_SHARE_DIR = share
 LD = link
 
 !IF "$(DEPEND)" == "1"
-CCWRAP=cl-wrap.cmd
-CCWRAPC=cl-wrap-c.cmd
+CCWRAP=cl-wrap.cmd obj dep
+CCWRAPC=cl-wrap.cmd cobj cdep
 !ENDIF
 
 # compiler flags
@@ -266,7 +266,7 @@ MANIFEST = wgnuplot.exe.manifest
 !ENDIF
 
 !IF "$(DEPEND)" == "1"
-BUILD_TARGETS = cl-wrap.cmd cl-wrap-c.cmd
+BUILD_TARGETS = cl-wrap.cmd
 !ENDIF
 
 # macros for makefile.all
@@ -354,11 +354,10 @@ ALL_CONSOLE_OBJS = $(OBJS:.obj=.cobj) $(WINOBJS:.obj=.cobj)
 # Adopted from https://stackoverflow.com/a/36091560
 # This looks more complicated than it is, see patch #756 for an explanation.
 # This is roughly equivalent to -M -MM -MP -MT$@ -MF$(@R).dep in GNU make + gcc.
+# The script requires three arguments: The obj file extension, the file extension for the
+# dependencies, and the cl compiler command line.
 cl-wrap.cmd: Makefile
-	@echo @(setlocal enabledelayedexpansion ^& %* /showIncludes ^& echo Exit: !ERRORLEVEL!) ^| ^%COMSPEC^% /E:ON /V:ON /C "@for /f "tokens=1,* delims=]" %%%%A in ('find /v /n""') do @if %%%%~xB == .c (set _=%%%%~nB&rem.>!_!.dep&echo %%%%B) else if %%%%~xB == .cpp (set _=%%%%~nB&rem.>!_!.dep&echo %%%%B) else for /f "tokens=1,2,3,*" %%%%C in ("%%%%B") do @if %%%%C == Note: (set i=%%%%F&if /i "!i:Windows Kits=!"=="!i!" (if /i "!i:Visual Studio=!"=="!i!" ((echo !_!.obj: !i!&echo "!i!":) >> !_!.dep))) else if %%%%C == Exit: (exit /b %%%%D) else echo %%%%B" > cl-wrap.cmd
-# same but with .dep/.obj replaced by .cdep/.cobj
-cl-wrap-c.cmd: Makefile
-	@echo @(setlocal enabledelayedexpansion ^& %* /showIncludes ^& echo Exit: !ERRORLEVEL!) ^| ^%COMSPEC^% /E:ON /V:ON /C "@for /f "tokens=1,* delims=]" %%%%A in ('find /v /n ""') do @if %%%%~xB == .c (set _=%%%%~nB&rem.>!_!.cdep&echo %%%%B) else if %%%%~xB == .cpp (set _=%%%%~nB&rem.>!_!.cdep&echo %%%%B) else for /f "tokens=1,2,3,*" %%%%C in ("%%%%B") do @if %%%%C == Note: (set i=%%%%F&if /i "!i:Windows Kits=!"=="!i!" (if /i "!i:Visual Studio=!"=="!i!" ((echo !_!.cobj: !i!&echo "!i!":) >> !_!.cdep))) else if %%%%C == Exit: (exit /b %%%%D) else echo %%%%B" > cl-wrap-c.cmd
+	@echo @^%COMSPEC^% /v:on /e:on /c "@(set _args=%* & set _cl=!_args:*%3=! & set _cl=%3!_cl! & !_cl! /showIncludes & echo Exit: !ERRORLEVEL!)" ^| ^%COMSPEC^% /v:on /e:on /c "@for /f "tokens=1,* delims=]" %%%%A in ('find /v /n""') do @if %%%%~xB == .c (set _=%%%%~nB&rem.>!_!.%%2&echo %%%%B) else if %%%%~xB == .cpp (set _=%%%%~nB&rem.>!_!.%%2&echo %%%%B) else for /f "tokens=1,2,3,*" %%%%C in ("%%%%B") do @if %%%%C == Note: (set i=%%%%F&if /i "!i:Windows Kits=!"=="!i!" (if /i "!i:Visual Studio=!"=="!i!" ((echo !_!.%%1: !i!&echo "!i!":) >> !_!.%%2))) else if %%%%C == Exit: (exit /b %%%%D) else echo %%%%B" > $@
 
 {$(S)}.c.obj:
 	$(CCWRAP) $(CC) /c $(CFLAGS) $(WIN_CFLAGS) $(S)\$*.c
@@ -553,6 +552,7 @@ clean:
 	if exist *.map del *.map
 	if exist *.dep del *.dep
 	if exist *.cdep del *.cdep
+	if exist cl-wrap.cmd del cl-wrap.cmd
 	if exist moc_*.cpp del moc_*.cpp
 	if exist qrc_*.cpp del qrc_*.cpp
 	if exist ui_*.h del ui_*.h
