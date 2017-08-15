@@ -7,6 +7,8 @@
 	(TEXTBOX_MARGINS):  Adjust scaling of textbox margin to be more like
 	what the qt terminal does (ie. much smaller).
 
+	* term/metapost.trm:  Missing check for EAM_BOXED_TEXT.
+
 2017-08-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/grahics.c src/graphics.h(rgbscale) demo/image.dem demo/image2.dem:

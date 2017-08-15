@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: metapost.trm,v 1.47 2015/11/30 02:54:02 sfeam Exp $
+ * $Id: metapost.trm,v 1.47.2.1 2017/08/08 04:07:13 sfeam Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -1024,17 +1024,21 @@ TERM_TABLE_START(mp_driver)
     MP_linetype, MP_put_text, MP_text_angle,
     MP_justify_text, MP_point, MP_arrow, MP_set_font, MP_pointsize,
     TERM_BINARY|TERM_CAN_CLIP|TERM_CAN_DASH|TERM_IS_LATEX,	/*flags*/ 
-    0, 0, MP_boxfill, MP_linewidth
+    0, 0, MP_boxfill, MP_linewidth,
 #ifdef USE_MOUSE
-    , 0, 0, 0, 0, 0		/* no mouse support for metapost */
+    0, 0, 0, 0, 0,		/* no mouse support for metapost */
 #endif
-    , MP_make_palette,
+    MP_make_palette,
     MP_previous_palette,	/* write grestore */
     MP_set_color,
     MP_filled_polygon,
-    NULL,NULL,NULL,NULL,NULL,NULL,
-    0,
-    NULL,NULL,NULL,
+    NULL, NULL, NULL, NULL, NULL, NULL,
+    0.0,
+    NULL,
+#ifdef EAM_BOXED_TEXT
+    NULL,
+#endif
+    NULL,
     MP_dashtype
 TERM_TABLE_END(mp_driver)
 #undef LAST_TERM
