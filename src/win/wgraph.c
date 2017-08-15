@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.274 2017/07/31 19:45:27 markisch Exp $
+ * $Id: wgraph.c,v 1.275 2017/08/15 13:39:22 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -1967,8 +1967,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	   as on screen */
 	if ((GetDeviceCaps(hdc, TECHNOLOGY) == DT_RASPRINTER)) {
 		HDC hdc_screen = GetDC(NULL);
-		lw_scale = (double) GetDeviceCaps(hdc, VERTRES) /
-		           (double) GetDeviceCaps(hdc_screen, VERTRES);
+		lw_scale = (double) GetDeviceCaps(hdc, LOGPIXELSX) /
+		           (double) GetDeviceCaps(hdc_screen, LOGPIXELSY);
 		line_width *= lw_scale;
 		ReleaseDC(NULL, hdc_screen);
 		/* Does the printer support AlphaBlend with transparency (const alpha)? */
