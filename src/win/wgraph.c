@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.255.2.6 2017/07/11 07:13:14 markisch Exp $
+ * $Id: wgraph.c,v 1.255.2.7 2017/08/15 14:03:10 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -3258,10 +3258,7 @@ CopyPrint(LPGW lpgw)
 	docInfo.cbSize = sizeof(DOCINFO);
 	docInfo.lpszDocName = lpgw->Title;
 
-	if (StartDoc(printer, &docInfo) > 0) {
-		StartPage(printer);
-		SetMapMode(printer, MM_TEXT);
-		SetBkMode(printer, OPAQUE);
+	if (StartDoc(printer, &docInfo) > 0 && StartPage(printer) > 0) {
 #ifdef HAVE_GDIPLUS
 #ifndef HAVE_D2D11
 		if (lpgw->gdiplus || lpgw->d2d) {
@@ -3273,6 +3270,8 @@ CopyPrint(LPGW lpgw)
 		} else 
 #endif
 		{
+			SetMapMode(printer, MM_TEXT);
+			SetBkMode(printer, OPAQUE);
 			DestroyFonts(lpgw);
 			MakeFonts(lpgw, &rect, printer);
 			DestroyPens(lpgw);
@@ -3283,8 +3282,14 @@ CopyPrint(LPGW lpgw)
 			MakeFonts(lpgw, &rect, hdc);
 			ReleaseDC(hwnd, hdc);
 		}
-		if (EndPage(printer) > 0)
-			EndDoc(printer);
+		if (EndPage(printer) <= 0) {
+			fputs("Error when finalising the print page. Aborting.\n", stderr);
+			AbortDoc(printer);
+		} else if (EndDoc(printer) <= 0) {
+			fputs("Error: Could not end printer document.\n", stderr);
+		}
+	} else {
+		fputs("Error: Unable to start printer document.\n", stderr);
 	}
 	if (!pr.bUserAbort) {
 		EnableWindow(hwnd, TRUE);

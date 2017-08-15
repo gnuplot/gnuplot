@@ -1,3 +1,8 @@
+2017-08-15  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c (CopyPrint):  Check return values of GDI print API
+	function calls.
+
 2017-08-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/grahics.c src/graphics.h(rgbscale) demo/image.dem demo/image2.dem:
@@ -244,7 +249,7 @@
 
 2017-06-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/win/wgraph.c: Fix incorrect determination of the size of the-fly
+	* src/win/wgraph.c: Fix incorrect determination of the size of the
 	toolbar and the statusbar.
 
 	* src/win/wgdiplus.cpp:  We still need to indicate that text can be
