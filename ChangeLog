@@ -1,3 +1,14 @@
+Release 5.0.7
+
+2017-08-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxtterminal/wxt_gui.cpp:  Build testing under Cygwin failed
+	because of gtk2->gtk3 api change.  We fixed this in 5.2, so back-port
+	that fix for 5.0.7 also.  
+	1) Replace handle->window with gtk_widget_get_window(handle).
+	2) gdk_window_foreign_new() (used only by --enable-raise-console) no
+	longer exists. Make this code conditional on (GTK_MAJOR_VERSION == 2).
+
 2017-08-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	Tag 5_0_7

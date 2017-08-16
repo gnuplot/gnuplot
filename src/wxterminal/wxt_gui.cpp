@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.128.2.30 2017/03/02 18:24:53 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.128.2.31 2017/03/04 08:20:41 markisch Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -1481,7 +1481,7 @@ static void wxt_check_for_anchors(unsigned int x, unsigned int y)
  * to prevent focus stealing) and is inconsistent with global bindings mechanism ) */
 void wxtPanel::RaiseConsoleWindow()
 {
-#ifdef USE_GTK
+#if defined(USE_GTK) && (GTK_MAJOR_VERSION == 2)
 	char *window_env;
 	unsigned long windowid = 0;
 	/* retrieve XID of gnuplot window */
@@ -3120,7 +3120,7 @@ void wxt_raise_window(wxt_window_t* window, bool force)
 		 * Refresh() also must be called, otherwise
 		 * the raise won't happen immediately */
 		window->frame->panel->Refresh(false);
-		gdk_window_raise(window->frame->GetHandle()->window);
+		gdk_window_raise(gtk_widget_get_window(window->frame->GetHandle()));
 #else
 #ifdef __WXMSW__
 		// Only restore the window if it is iconized.  In particular
@@ -3138,7 +3138,7 @@ void wxt_lower_window(wxt_window_t* window)
 {
 #ifdef USE_GTK
 	window->frame->panel->Refresh(false);
-	gdk_window_lower(window->frame->GetHandle()->window);
+	gdk_window_lower(gtk_widget_get_window(window->frame->GetHandle()));
 #else
 	window->frame->Lower();
 #endif /* USE_GTK */

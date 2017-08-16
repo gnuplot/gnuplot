@@ -24,6 +24,7 @@ Changes in 5.0.7
 * FIX incorrect, possibly empty, command string was saved for previous fit
 * FIX 2D images with logscale axes could fail (segfault)
 * FIX nested iteration containing an empty range
+* FIX allow 64-bit Cygwin build using gtk3 for wxt terminal
 
 Changes in 5.0.6
 ================
