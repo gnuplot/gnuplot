@@ -3,6 +3,9 @@
 	* src/datafile.c (df_open): Expand leading ~ in filename for binary data
 	files just as for text files.
 
+	* src/plot2d.c src/graph3d.c src/wxterminal/gp_cairo.c:  Add harmless
+	initializations to silence compiler warnings.
+
 2017-08-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/msvc/Makefile:  Eliminate the separate wrapper script for builds of

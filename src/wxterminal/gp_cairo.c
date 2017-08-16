@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.100 2017/07/14 19:16:28 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.101 2017/07/24 07:54:55 markisch Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -938,6 +938,7 @@ void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string,
 		case LEFT:
 			box_x = box_origin_x;
 			break;
+		default:
 		case CENTRE:
 			box_x = box_origin_x - delta;
 			break;
@@ -1647,6 +1648,7 @@ void gp_cairo_enhanced_finish(plot_struct *plot, int x, int y)
 		case LEFT:
 			box_x = box_origin_x;
 			break;
+		default:
 		case CENTRE:
 			box_x = box_origin_x - delta;
 			break;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.447 2017/08/08 04:30:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.448 2017/08/09 18:00:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1899,7 +1899,7 @@ eval_plots()
     char orig_dummy_var[MAX_ID_LEN+1];
 
     int nbins = 0;
-    double binlow, binhigh, binwidth;
+    double binlow = 0, binhigh = 0, binwidth = 0;
 
     double newhist_start = 0.0;
     int histogram_sequence = -1;
