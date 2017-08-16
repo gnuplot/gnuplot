@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.344.2.2 2017/07/20 18:32:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.344.2.3 2017/07/24 21:48:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1141,6 +1141,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 		duplication=TRUE;
 		break;
 	    }
+	    gp_expand_tilde(&df_filename);
 	    df_binary_file = TRUE;
 	    /* Up to the time of adding the general binary code, only matrix
 	     * binary for 3d was defined.  So, use matrix binary by default.
