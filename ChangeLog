@@ -6,6 +6,10 @@
 	must be in the range [0:255], as they are for png, jpeg, etc.  Later
 	we may add an autoscaling option for user-supplied color values.
 
+	* term/x11.trm src/qtterminal/qt_term.cpp:
+	If the outboard driver cannot be started, point the user to
+	environmental variable GNUPLOT_DRIVER_DIR.
+
 2017-08-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_open): Expand leading ~ in filename for binary data

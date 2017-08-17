@@ -255,6 +255,7 @@ void execGnuplotQt()
 #endif
 	} else {
 		fprintf(stderr, "Could not start gnuplot_qt with path %s\n", filename.toUtf8().data());
+		fprintf(stderr, "Did you set environmental variable GNUPLOT_DRIVER_DIR?\n");
 	}
 }
 
