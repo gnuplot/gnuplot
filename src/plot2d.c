@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.448 2017/08/09 18:00:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.449 2017/08/17 18:05:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2788,16 +2788,8 @@ eval_plots()
 		    boxplot_range_fiddling(this_plot);
 		if (this_plot->plot_style == IMPULSES)
 		    impulse_range_fiddling(this_plot);
-
-		if (this_plot->plot_style == RGBIMAGE || this_plot->plot_style == RGBA_IMAGE) {
-		    if (CB_AXIS.autoscale & AUTOSCALE_MIN)
-			CB_AXIS.min = 0;
-		    if (CB_AXIS.autoscale & AUTOSCALE_MAX)
-			CB_AXIS.max = 255;
-		}
-		if (polar) {
+		if (polar)
 		    polar_range_fiddling(this_plot);
-		}
 
 		/* sort */
 		switch (this_plot->plot_smooth) {

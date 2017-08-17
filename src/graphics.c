@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.562 2017/08/01 01:19:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.563 2017/08/02 19:27:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4851,9 +4851,9 @@ process_image(void *plot, t_procimg_action action)
 		    if (pixel_planes == IC_PALETTE) {
 			image[i_sub_image++] = cb2gray( points[i_image].CRD_COLOR );
 		    } else {
-			image[i_sub_image++] = cb2gray( points[i_image].CRD_R );
-			image[i_sub_image++] = cb2gray( points[i_image].CRD_G );
-			image[i_sub_image++] = cb2gray( points[i_image].CRD_B );
+			image[i_sub_image++] = points[i_image].CRD_R / 255.0;
+			image[i_sub_image++] = points[i_image].CRD_G / 255.0;
+			image[i_sub_image++] = points[i_image].CRD_B / 255.0;
 			if (pixel_planes == IC_RGBA)
 			    image[i_sub_image++] = points[i_image].CRD_A;
 		    }
@@ -5054,9 +5054,9 @@ process_image(void *plot, t_procimg_action action)
 			    }
 			    set_color( cb2gray(points[i_image].CRD_COLOR) );
 			} else {
-			    int r = cb2gray(points[i_image].CRD_R) * 255. + 0.5;
-			    int g = cb2gray(points[i_image].CRD_G) * 255. + 0.5;
-			    int b = cb2gray(points[i_image].CRD_B) * 255. + 0.5;
+			    int r = points[i_image].CRD_R + 0.5;
+			    int g = points[i_image].CRD_G + 0.5;
+			    int b = points[i_image].CRD_B + 0.5;
 			    int rgblt = (r << 16) + (g << 8) + b;
 			    set_rgbcolor_var(rgblt);
 			}

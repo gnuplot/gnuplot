@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.271 2017/08/05 01:23:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.272 2017/08/08 04:30:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1829,13 +1829,6 @@ eval_3dplots()
 		/* This reserves a second color for the back of a hidden3d surface */
 		if (hidden3d && hiddenBacksideLinetypeOffset != 0)
 		    line_num++;
-	    }
-
-	    if (this_plot->plot_style == RGBIMAGE || this_plot->plot_style == RGBA_IMAGE) {
-		if (CB_AXIS.autoscale & AUTOSCALE_MIN)
-		    CB_AXIS.min = 0;
-		if (CB_AXIS.autoscale & AUTOSCALE_MAX)
-		    CB_AXIS.max = 255;
 	    }
 
 	    /* now get the data... having to think hard here...
