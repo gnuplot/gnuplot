@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1101 2017/07/31 01:32:10 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1103 2017/07/31 22:40:40 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7147,6 +7147,10 @@ Ffigure_fenceplot
       set yrange [1:100]
       splot sample [u=30:70][v=0:50] '++' using 1:2:(u*v) lt 3, \
             [u=40:80][v=30:60] '++' using (u):(v):(u*sqrt(v)) lt 4
+
+ The range specifiers for sampling on u and v can include an explicit sampling
+ interval to control the number and spacing of samples:
+      splot sample [u=30:70:1][v=0:50:5] '++' using 1:2:(func($1,$2))
 
 3 for loops in plot command
 ?commands plot for

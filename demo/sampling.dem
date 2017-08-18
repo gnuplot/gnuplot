@@ -117,3 +117,32 @@ splot '++' using 1:2:($1*25.*sin($2/10)), \
 pause -1 "Hit <cr> to continue"
 
 reset
+
+unset key
+set view map
+set xrange [ 20:100 ]
+set yrange [ 0:80 ]
+set size ratio 1.0
+radius(x,y) = 10 * sqrt((x-50)**2 + (y-50)**2)
+alpha(x,y) = radius(x,y) > 255 ? 0 : 255-radius(x,y)
+set title "3D custom sampling on u and v using pseudofile '++'"
+
+splot sample [u=25:75:1][v=25:75:4] '++' \
+      using 1:2:0:(u*4-50):(v*4-50):(255*sin(u*v/2500.)):(alpha(u,v)) with rgbalpha, \
+      [u=25:75:4][v=25:75:1] '++' \
+      using (u+20):(v-20):0:(u*4-50):(v*4-50):(255*sin(u*v/2500.)):(alpha(u,v)) with rgbalpha
+
+pause -1 "Hit <cr> to continue"
+
+set title "2D custom sampling on u and v using pseudofile '++'"
+plot sample [u=25:75:1][v=25:75:4] '++' \
+      using 1:2:(u*4-50):(v*4-50):(255*sin(u*v/2500.)):(alpha(u,v)) with rgbalpha, \
+      [u=25:75:4][v=25:75:1] '++' \
+      using (u+20):(v-20):(u*4-50):(v*4-50):(255*sin(u*v/2500.)):(alpha(u,v)) with rgbalpha
+
+pause -1 "Hit <cr> to continue"
+
+reset
+
+
+

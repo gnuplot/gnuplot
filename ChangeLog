@@ -1,7 +1,13 @@
 2017-08-18  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/graphics.c (process_image):  Limit alpha channel value to 255
+	* src/graphics.c (process_image):  Limit alpha channel range to [0:255]
 	in "with rgbalpha pixels".
+
+	* src/axis.c src/datafile.c src/plot2d.c src/plot3d.c src/graphics.c
+	demo/sampling.dem docs/gnuplot.doc:
+	Allow explicit sampling interval in the range statements associated with
+	pseudofile '++' in both 2D and 3D.  Example:
+	plot sample range [u=0:127][v=0:127] '++' using 1:2:(F(u,v)) with image
 
 2017-08-17  Dima Kogan  <dima@secretsauce.net>
 

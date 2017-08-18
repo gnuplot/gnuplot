@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.565 2017/08/18 05:59:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.566 2017/08/18 15:06:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4582,8 +4582,8 @@ process_image(void *plot, t_procimg_action action)
 			    break;
 	    L = p_count / K;
 	}
-	fprintf(stderr, "No dimension information for %d pixels total. Try %d x %d\n",
-		p_count, L, K);
+	FPRINTF((stderr, "No dimension information for %d pixels total. Trying %d x %d\n",
+		p_count, L, K));
     }
 
     grid_corner[0] = 0;
@@ -5062,7 +5062,7 @@ process_image(void *plot, t_procimg_action action)
 			}
 			if (pixel_planes == IC_RGBA) {
 			    int alpha = points[i_image].CRD_A * 100./255.;
-			    if (alpha == 0)
+			    if (alpha <= 0)
 				goto skip_pixel;
 			    if (alpha > 100)
 				alpha = 100;
