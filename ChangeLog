@@ -1,3 +1,7 @@
+2017-08-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (process_image):  Limit alpha channel value to 255.
+
 2017-08-17  Dima Kogan  <dima@secretsauce.net>
 
 	* src/plot2d.c src/plot3d.c src/graphics.c (process_image):

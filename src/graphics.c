@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.563 2017/08/02 19:27:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.564 2017/08/18 01:48:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5064,6 +5064,8 @@ process_image(void *plot, t_procimg_action action)
 			    int alpha = points[i_image].CRD_A * 100./255.;
 			    if (alpha == 0)
 				goto skip_pixel;
+			    if (alpha > 255)
+				alpha = 255;
 			    if (term->flags & TERM_ALPHA_CHANNEL)
 				corners[0].style = FS_TRANSPARENT_SOLID + (alpha<<4);
 			}
