@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.29 2017/07/21 17:49:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.30 2017/08/01 00:56:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tabulate.c */
@@ -401,8 +401,12 @@ print_3dtable(int pcount)
 	case IMPULSES:
 	case DOTS:
 	case VECTOR:
-	case IMAGE:
 	    break;
+	case IMAGE:
+	case RGBIMAGE:
+	case RGBA_IMAGE:
+	    break;
+
 	default:
 	    fprintf(stderr, "Tabular output of this 3D plot style not implemented\n");
 	    continue;
@@ -422,11 +426,22 @@ print_3dtable(int pcount)
 			curve, icrvs->p_count);
 		print_line(line);
 		len = sprintf(line, "# x y z");
-		if (this_plot->plot_style == VECTOR) {
+		tail = NULL;  /* Just to shut up a compiler warning */
+
+		switch (this_plot->plot_style) {
+		case VECTOR:
 		    tail = icrvs->next->points;
 		    len = strappend(&line, &size, len, " delta_x delta_y delta_z");
-		} else {
-		    tail = NULL;  /* Just to shut up a compiler warning */
+		    break;
+		case IMAGE:
+		    len = strappend(&line, &size, len, "  pixel");
+		    break;
+		case RGBIMAGE:
+		case RGBA_IMAGE:
+		    len = strappend(&line, &size, len, "  red green blue alpha");
+		    break;
+		default:
+		    break;
 		}
 
 		strappend(&line, &size, len, " type");
@@ -447,6 +462,12 @@ print_3dtable(int pcount)
 			tail++;
 		    } else if (this_plot->plot_style == IMAGE) {
 			snprintf(buffer, BUFFERSIZE, "%g ", point->CRD_COLOR);
+			len = strappend(&line, &size, len, buffer);
+		    } else if (this_plot->plot_style == RGBIMAGE
+			   ||  this_plot->plot_style == RGBA_IMAGE) {
+			snprintf(buffer, BUFFERSIZE, "%4d %4d %4d %4d ", 
+			        (int)point->CRD_R, (int)point->CRD_G,
+			        (int)point->CRD_B, (int)point->CRD_A);
 			len = strappend(&line, &size, len, buffer);
 		    }
 		    snprintf(buffer, BUFFERSIZE, "%c",

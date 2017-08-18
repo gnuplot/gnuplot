@@ -9,6 +9,8 @@
 	pseudofile '++' in both 2D and 3D.  Example:
 	plot sample range [u=0:127][v=0:127] '++' using 1:2:(F(u,v)) with image
 
+	* src/tabulate.c:  Handle splot with rgbimage, rgbalpha
+
 2017-08-17  Dima Kogan  <dima@secretsauce.net>
 
 	* src/plot2d.c src/plot3d.c src/graphics.c (process_image):
