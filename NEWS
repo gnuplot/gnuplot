@@ -1,10 +1,11 @@
 Changes since 5.2.rc4
 ====================
+* NEW user-defined dashtypes in metapost terminal
+* CHANGE allow explicit sample interval for u and v using pseudofile '++'
 * FIX reconcile aspect ratio flags from "set view map" and "set view equal xy"
 * FIX "set key fixed" should be ignored in the case of "set view map"
 * FIX GPVAL_* variables were not being updated in "set table" mode
 * FIX evaluation of nested iteration containing an empty range
-* NEW user-defined dashtypes in metapost terminal
 
 Changes in 5.2.rc3
 ==================
@@ -72,7 +73,7 @@ Changes and new features in 5.2
 * NEW    wxt supports saving graph as EMF on Windows
 * NEW    wxt supports printing on Windows
 * NEW    dumb suports ANSI colors and filled polygons
-* NEW Optional sampling interval in range specifier for pseudofile '+'
+* NEW Optional sampling interval in range specifiers for pseudofiles '+' '++'
 * NEW gnuplot on Windows
 *        converts Unicode (BMP) input to current `set encoding`, including UTF-8
 *        is system DPI aware

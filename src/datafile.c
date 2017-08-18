@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.344.2.3 2017/07/24 21:48:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.344.2.4 2017/08/16 23:28:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -5404,8 +5404,7 @@ df_generate_pseudodata()
 	/* (March 2017) THIS IS A CHANGE
 	 * Sample on u and v rather than on x and y.
 	 * This decouples the sampling range from the plot range.
-	 * FIXME: We don't yet support nonlinear u or v.
-	 * FIXME: plot3d range check fails to recognize that autoscaled log x/y is OK.
+	 * Allow explicit sampling interval in the range specifiers for u and v.
 	 */
 	AXIS_INDEX u_axis = U_AXIS;
 	AXIS_INDEX v_axis = V_AXIS;
@@ -5438,15 +5437,27 @@ df_generate_pseudodata()
 		}
 	    }
 
-	    if (hidden3d) {
+
+	    if ((axis_array[u_axis].range_flags & RANGE_SAMPLED)
+	    &&  (axis_array[u_axis].SAMPLE_INTERVAL != 0)) {
+		u_step = axis_array[u_axis].SAMPLE_INTERVAL;
+		nusteps = floor( (u_max - u_min) / u_step ) + 1;
+	    } else if (hidden3d) {
 		 u_step = (u_max - u_min) / (iso_samples_1 - 1);
 		 nusteps = iso_samples_1;
 	    } else {
 		 u_step = (u_max - u_min) / (samples_1 - 1);
 		 nusteps = samples_1;
 	    }
-	    v_isostep = (v_max - v_min) / (iso_samples_2 - 1);
-	    nvsteps = iso_samples_2;
+
+	    if ((axis_array[v_axis].range_flags & RANGE_SAMPLED)
+	    &&  (axis_array[v_axis].SAMPLE_INTERVAL != 0)) {
+		v_isostep = axis_array[v_axis].SAMPLE_INTERVAL;
+		nvsteps = floor( (v_max - v_min) / v_isostep ) + 1;
+	    } else {
+		v_isostep = (v_max - v_min) / (iso_samples_2 - 1);
+		nvsteps = iso_samples_2;
+	    }
 	}
 
 	/* wrap at end of each line */

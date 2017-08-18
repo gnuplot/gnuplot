@@ -38,7 +38,7 @@ FEATURES INTRODUCED IN VERSION 5.2
 	o "with points" and "with linespoints" accept `pointtype variable`
 	o hidden3d now treats 'image' and 'rgbimage' as occluding rectangles
 	o "smooth fnormal" plots normalized frequency
-	o Optional sampling interval in range specifier for pseudofile '+'
+	o allow sampling interval in range specifiers for pseudofiles '+' '++'
 
 * NEW polar mode improvements and extensions
 	o "set [m]ttics" places theta tics and labels on perimeter of polar grid

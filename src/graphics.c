@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.554.2.4 2017/07/02 23:08:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.554.2.5 2017/08/18 16:05:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4583,8 +4583,8 @@ process_image(void *plot, t_procimg_action action)
 			    break;
 	    L = p_count / K;
 	}
-	fprintf(stderr, "No dimension information for %d pixels total. Try %d x %d\n",
-		p_count, L, K);
+	FPRINTF((stderr, "No dimension information for %d pixels total. Trying %d x %d\n",
+		p_count, L, K));
     }
 
     grid_corner[0] = 0;

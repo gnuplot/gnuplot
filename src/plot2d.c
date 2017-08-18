@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.430.2.8 2017/08/08 04:30:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.430.2.9 2017/08/09 18:00:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2062,16 +2062,33 @@ eval_plots()
 #endif
 	    t_colorspec fillcolor = DEFAULT_COLORSPEC;
 
-	    int sample_range_token;		/* Only used by function plots */
-	    t_value original_value_sample_var;	/* Only used by data plots */
+	    /* CHANGE: Aug 2017
+	     * Allow sampling both u and v so that it is possible to do
+	     * plot sample [u=min:max:inc] [v=min:max:inc] '++' ... with image
+	     */
+	    t_value original_value_sample_var, original_value_sample_var2;
+	    int sample_range_token, v_range_token;
 
 	    plot_num++;
 
 	    /* Check for a sampling range. */
 	    init_sample_range(axis_array + FIRST_X_AXIS);
 	    sample_range_token = parse_range(SAMPLE_AXIS);
-	    if (sample_range_token != 0)
+	    v_range_token = 0;
+	    if (sample_range_token != 0) {
 		axis_array[SAMPLE_AXIS].range_flags |= RANGE_SAMPLED;
+		/* If the sample was specifically on u we need to check v also */
+		if (equals(sample_range_token, "u")) {
+		    axis_array[U_AXIS].min = axis_array[SAMPLE_AXIS].min;
+		    axis_array[U_AXIS].max = axis_array[SAMPLE_AXIS].max;
+		    axis_array[U_AXIS].autoscale = axis_array[SAMPLE_AXIS].autoscale;
+		    axis_array[U_AXIS].SAMPLE_INTERVAL = axis_array[SAMPLE_AXIS].SAMPLE_INTERVAL;
+		    axis_array[U_AXIS].range_flags = axis_array[SAMPLE_AXIS].range_flags;
+		    v_range_token = parse_range(V_AXIS);
+		    if (v_range_token != 0)
+			axis_array[V_AXIS].range_flags |= RANGE_SAMPLED;
+		}
+	    }
 
 	    was_definition = FALSE;
 
@@ -2113,13 +2130,19 @@ eval_plots()
 		    this_plot->sample_var = add_udv(sample_range_token);
 		else
 		    this_plot->sample_var = add_udv_by_name(c_dummy_var[0]);
+		if (v_range_token > 0)
+		    this_plot->sample_var2 = add_udv(v_range_token);
+		else
+		    this_plot->sample_var2 = add_udv_by_name(c_dummy_var[1]);
 
 		if (this_plot->sample_var->udv_value.type == ARRAY)
 		    int_error(NO_CARET, "name conflict: dummy variable cannot be array");
 
-		/* Save prior value of sample variable so we can restore it later */
+		/* Save prior value of sample variables so we can restore them later */
 		original_value_sample_var = this_plot->sample_var->udv_value;
+		original_value_sample_var2 = this_plot->sample_var2->udv_value;
 		this_plot->sample_var->udv_value.type = NOTDEFINED;
+		this_plot->sample_var2->udv_value.type = NOTDEFINED;
 
 		/* Not sure this is necessary */
 		Gcomplex(&(this_plot->sample_var->udv_value), 0.0, 0.0);
@@ -2885,9 +2908,11 @@ eval_plots()
 		this_plot->token = c_token;
 		tp_ptr = &(this_plot->next);
 
-	    /* restore original value of sample variable */
-	    if (name_str)
+	    /* restore original value of sample variables */
+	    if (name_str) {
 		this_plot->sample_var->udv_value = original_value_sample_var;
+		this_plot->sample_var2->udv_value = original_value_sample_var2;
+	    }
 
 	} /* !is_defn */
 

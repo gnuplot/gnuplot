@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.263.2.2 2017/07/29 16:30:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.263.2.3 2017/08/08 04:30:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1398,6 +1398,7 @@ eval_3dplots()
 		axis_array[U_AXIS].min = axis_array[SAMPLE_AXIS].min;
 		axis_array[U_AXIS].max = axis_array[SAMPLE_AXIS].max;
 		axis_array[U_AXIS].autoscale = axis_array[SAMPLE_AXIS].autoscale;
+		axis_array[U_AXIS].SAMPLE_INTERVAL = axis_array[SAMPLE_AXIS].SAMPLE_INTERVAL;
 	    }
 	    v_sample_range_token = parse_range(V_AXIS);
 
@@ -1407,6 +1408,10 @@ eval_3dplots()
 	     */
 	    if (u_sample_range_token > 0)
 		axis_array[SAMPLE_AXIS].range_flags |= RANGE_SAMPLED;
+	    if (u_sample_range_token > 0 && axis_array[U_AXIS].SAMPLE_INTERVAL != 0)
+		axis_array[U_AXIS].range_flags |= RANGE_SAMPLED;
+	    if (v_sample_range_token > 0 && axis_array[V_AXIS].SAMPLE_INTERVAL != 0)
+		axis_array[V_AXIS].range_flags |= RANGE_SAMPLED;
 
 	    /* Allow replacement of the dummy variables in a function */
 	    if (u_sample_range_token > 0)
