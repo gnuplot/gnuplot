@@ -1,6 +1,7 @@
 2017-08-18  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/graphics.c (process_image):  Limit alpha channel value to 255.
+	* src/graphics.c (process_image):  Limit alpha channel value to 255
+	in "with rgbalpha pixels".
 
 2017-08-17  Dima Kogan  <dima@secretsauce.net>
 
