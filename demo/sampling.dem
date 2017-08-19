@@ -1,7 +1,7 @@
-# 27 Mar 2017
-# Each of these plot commands failed on some version between
-# 5.0 and 5.1 (March 2017).  I collect them here to use as
-# unit tests for continued success of the code added to repair breakage.
+# 18 Aug 2017
+# Each of these plot commands failed on some version between 5.0 and 5.3.
+# I collect them here to use as unit tests for continued success
+# of the code added to repair breakage.
 #
 # Usage:  call 'sampling.dem' <testno>
 #
@@ -126,6 +126,7 @@ set size ratio 1.0
 radius(x,y) = 10 * sqrt((x-50)**2 + (y-50)**2)
 alpha(x,y) = radius(x,y) > 255 ? 0 : 255-radius(x,y)
 set title "3D custom sampling on u and v using pseudofile '++'"
+print "test 10: splot '++' with explicit sampling intervals"
 
 splot sample [u=25:75:1][v=25:75:4] '++' \
       using 1:2:0:(u*4-50):(v*4-50):(255*sin(u*v/2500.)):(alpha(u,v)) with rgbalpha, \
@@ -135,6 +136,8 @@ splot sample [u=25:75:1][v=25:75:4] '++' \
 pause -1 "Hit <cr> to continue"
 
 set title "2D custom sampling on u and v using pseudofile '++'"
+print "test 10: plot '++' with explicit sampling intervals"
+
 plot sample [u=25:75:1][v=25:75:4] '++' \
       using 1:2:(u*4-50):(v*4-50):(255*sin(u*v/2500.)):(alpha(u,v)) with rgbalpha, \
       [u=25:75:4][v=25:75:1] '++' \
@@ -143,6 +146,4 @@ plot sample [u=25:75:1][v=25:75:4] '++' \
 pause -1 "Hit <cr> to continue"
 
 reset
-
-
 
