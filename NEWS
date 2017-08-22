@@ -2,6 +2,7 @@ Changes since 5.2.rc4
 ====================
 * NEW user-defined dashtypes in metapost terminal
 * CHANGE allow explicit sample interval for u and v using pseudofile '++'
+* CHANGE decouple cbrange from color components in "with rgbimage"
 * FIX reconcile aspect ratio flags from "set view map" and "set view equal xy"
 * FIX "set key fixed" should be ignored in the case of "set view map"
 * FIX GPVAL_* variables were not being updated in "set table" mode

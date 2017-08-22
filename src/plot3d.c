@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.263.2.3 2017/08/08 04:30:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.263.2.4 2017/08/19 00:32:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -790,7 +790,7 @@ get_3ddata(struct surface_points *this_plot)
 	struct coordinate GPHUGE *cphead = NULL; /* Only for VECTOR plots */
 	double x, y, z;
 	double xtail, ytail, ztail;
-	double zlow, zhigh;
+	double zlow = VERYLARGE, zhigh = -VERYLARGE;
 	double color = VERYLARGE;
 	int pm3d_color_from_column = FALSE;
 #define color_from_column(x) pm3d_color_from_column = x
@@ -1402,10 +1402,6 @@ eval_3dplots()
 	    }
 	    v_sample_range_token = parse_range(V_AXIS);
 
-	    /* EXPERIMENTAL: allow sampling interval in range
-	     * Preliminary version in df_generate_pseudodata is hard-coded for
-	     * SAMPLE_AXIS only so it does not work for '++'.
-	     */
 	    if (u_sample_range_token > 0)
 		axis_array[SAMPLE_AXIS].range_flags |= RANGE_SAMPLED;
 	    if (u_sample_range_token > 0 && axis_array[U_AXIS].SAMPLE_INTERVAL != 0)
@@ -1843,13 +1839,6 @@ eval_3dplots()
 		/* This reserves a second color for the back of a hidden3d surface */
 		if (hidden3d && hiddenBacksideLinetypeOffset != 0)
 		    line_num++;
-	    }
-
-	    if (this_plot->plot_style == RGBIMAGE || this_plot->plot_style == RGBA_IMAGE) {
-		if (CB_AXIS.autoscale & AUTOSCALE_MIN)
-		    CB_AXIS.min = 0;
-		if (CB_AXIS.autoscale & AUTOSCALE_MAX)
-		    CB_AXIS.max = 255;
 	    }
 
 	    /* now get the data... having to think hard here...
