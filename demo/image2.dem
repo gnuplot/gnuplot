@@ -127,13 +127,13 @@ print ""
 set title "Close up of pixels having grid points (0,0), (0,2), (2,0) and (2,2)"
 set xrange [-1.5:3.5]
 set yrange [-1.5:3.5]
-set cbrange [0:1]
+# As of version 5.2, RGB color components are always in the range [0:255]
 unset key
 plot '-' with rgbimage, '-' with points pt 7 ps 2 lt -1
-0 0 0.0 0.0 0.5
-0 2 0.0 0.5 0.0
-2 0 0.0 0.5 0.0
-2 2 0.0 0.0 0.5
+0 0   0   0 127
+0 2   0 127   0
+2 0   0 127   0
+2 2   0   0 127
 e
 0 0
 0 2
@@ -457,8 +457,9 @@ print ""
 set title "Binary data specified at the command line, intended for use through pipe"
 set xrange [-1.5:3.5]
 set yrange [-1.5:3.5]
-set cbrange [0:1]
-plot '-' binary endian=little array=(2,2) dx=2 format="%float" using 1:2:3 with rgbimage,\
+# The binary values are in the range [0.0:1.0] but
+# as of version 5.2, RGB color components are always in the range [0:255]
+plot '-' binary endian=little array=(2,2) dx=2 format="%float" using ($1*255.):($2*255.):($3*255.) with rgbimage,\
      '-' binary endian=little record=4 format="%char" using 1:2 with points pt 7 ps 2 lt -1
            ?       ?           ?               ?    
 pause -1 "Hit return to continue"

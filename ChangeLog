@@ -1,8 +1,8 @@
 2017-08-22  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/grahics.c src/graphics.h (rgbscale) demo/image.dem:
-	Since we have decoupled cbrange from rgbimage, the example in image.dem
-	needs to change accordingly.  Add a placeholder macro rgbscale(colorval)
+	* src/grahics.c src/graphics.h(rgbscale) demo/image.dem demo/image2.dem:
+	Since we have decoupled cbrange from rgbimage, the image demos need
+	to change accordingly.  Add a placeholder macro rgbscale(colorval)
 	that for now only enforces that color components are in [0:255] but
 	can later be replaced with an actual scaling routine.
 
