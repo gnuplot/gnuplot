@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.451 2017/08/18 19:34:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.452 2017/08/19 15:47:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -3453,48 +3453,33 @@ parametric_fixup(struct curve_points *start_plot, int *plot_num)
 	     */
 
 	    for (i = 0; i < yp->p_count; ++i) {
+		double x, y;
 		if (polar) {
 		    double r = yp->points[i].y;
 		    double t = xp->points[i].y;
-		    double x, y;
-
 		    /* Convert from polar to cartesian coordinate and check ranges */
 		    /* FIXME: The old in-line conversion checked R_AXIS.max agains fabs(r).
 		     * That's not what polar_to_xy() is currently doing.
 		     */
 		    if (polar_to_xy(t, r, &x, &y, TRUE) == OUTRANGE)
 			yp->points[i].type = OUTRANGE;
-
-		    if (boxwidth >= 0 && boxwidth_is_absolute) {
-			coord_type dmy_type = INRANGE;
-			STORE_WITH_LOG_AND_UPDATE_RANGE( yp->points[i].xlow, x - boxwidth/2, dmy_type, xp->x_axis,
-							 xp->noautoscale, NOOP, NOOP );
-			dmy_type = INRANGE;
-			STORE_WITH_LOG_AND_UPDATE_RANGE( yp->points[i].xhigh, x + boxwidth/2, dmy_type, xp->x_axis,
-							 xp->noautoscale, NOOP, NOOP );
-		    }
-		    /* we hadn't done logs when we stored earlier */
-		    STORE_WITH_LOG_AND_UPDATE_RANGE(yp->points[i].x, x, yp->points[i].type, xp->x_axis,
-		    				 xp->noautoscale, NOOP, NOOP);
-		    STORE_WITH_LOG_AND_UPDATE_RANGE(yp->points[i].y, y, yp->points[i].type, xp->y_axis,
-		    				 xp->noautoscale, NOOP, NOOP);
 		} else {
-		    double x = xp->points[i].y;
-		    double y = yp->points[i].y;
+		    x = xp->points[i].y;
+		    y = yp->points[i].y;
 
-		    if (boxwidth >= 0 && boxwidth_is_absolute) {
-			coord_type dmy_type = INRANGE;
-			STORE_WITH_LOG_AND_UPDATE_RANGE( yp->points[i].xlow, x - boxwidth/2, dmy_type, yp->x_axis,
-							 xp->noautoscale, NOOP, NOOP );
-			dmy_type = INRANGE;
-			STORE_WITH_LOG_AND_UPDATE_RANGE( yp->points[i].xhigh, x + boxwidth/2, dmy_type, yp->x_axis,
-							 xp->noautoscale, NOOP, NOOP );
-		    }
-		    STORE_WITH_LOG_AND_UPDATE_RANGE(yp->points[i].x, x, yp->points[i].type, yp->x_axis,
-		    				 xp->noautoscale, NOOP, NOOP);
-		    STORE_WITH_LOG_AND_UPDATE_RANGE(yp->points[i].y, y, yp->points[i].type, yp->y_axis,
-		    				 xp->noautoscale, NOOP, NOOP);
 		}
+		if (boxwidth >= 0 && boxwidth_is_absolute) {
+		    coord_type dmy_type = INRANGE;
+		    STORE_WITH_LOG_AND_UPDATE_RANGE( yp->points[i].xlow, x - boxwidth/2, dmy_type, yp->x_axis,
+					     xp->noautoscale, NOOP, NOOP);
+		    dmy_type = INRANGE;
+		    STORE_WITH_LOG_AND_UPDATE_RANGE( yp->points[i].xhigh, x + boxwidth/2, dmy_type, yp->x_axis,
+					     xp->noautoscale, NOOP, NOOP );
+		}
+		STORE_WITH_LOG_AND_UPDATE_RANGE(yp->points[i].x, x, yp->points[i].type, xp->x_axis,
+		    			     xp->noautoscale, NOOP, NOOP);
+		STORE_WITH_LOG_AND_UPDATE_RANGE(yp->points[i].y, y, yp->points[i].type, xp->y_axis,
+		    			     xp->noautoscale, NOOP, NOOP);
 	    }
 
 	    /* move xp to head of free list */
