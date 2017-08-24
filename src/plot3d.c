@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.273 2017/08/18 01:48:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.274 2017/08/18 19:34:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -691,20 +691,17 @@ grid_nongrid_data(struct surface_points *this_plot)
 	    if (dgrid3d_mode != DGRID3D_SPLINES && !dgrid3d_kdensity)
                z = z / w;
             
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(points->z, z, 
-					    points->type, z_axis,
-					    this_plot->noautoscale,
-					    NOOP, continue);
+	    STORE_AND_UPDATE_RANGE(points->z, z, points->type, z_axis,
+				   this_plot->noautoscale, continue);
             
 	    if (this_plot->pm3d_color_from_column)
 		int_error(NO_CARET, 
 			  "Gridding of the color column is not implemented");
 	    else {
-		COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(points->CRD_COLOR, z, 
-						      points->type, 
-						      COLOR_AXIS, 
-						      this_plot->noautoscale,
-						      NOOP, continue);
+		coord_type dummy_type = points->type;
+		STORE_AND_UPDATE_RANGE( points->CRD_COLOR, z, dummy_type, 
+					COLOR_AXIS, 
+					this_plot->noautoscale, continue);
 	    }
 	}
     }
@@ -1054,17 +1051,21 @@ get_3ddata(struct surface_points *this_plot)
 #undef color_from_column
 
 
-	    /* Adjust for logscales. Set min/max and point types. Store in cp.
-	     * The macro cannot use continue, as it is wrapped in a loop.
+	    /* The STORE_AND_UPDATE_RANGE macro cannot use "continue" as 
+	     * an action statement because it is wrapped in a loop.
 	     * I regard this as correct goto use
 	     */
 	    cp->type = INRANGE;
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->x, x, cp->type, x_axis, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->y, y, cp->type, y_axis, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
+	    STORE_AND_UPDATE_RANGE(cp->x, x, cp->type, x_axis, this_plot->noautoscale,
+				goto come_here_if_undefined);
+	    STORE_AND_UPDATE_RANGE(cp->y, y, cp->type, y_axis, this_plot->noautoscale,
+				goto come_here_if_undefined);
 	    if (this_plot->plot_style == VECTOR) {
 		cphead->type = INRANGE;
-		STORE_WITH_LOG_AND_UPDATE_RANGE(cphead->x, xtail, cphead->type, x_axis, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
-		STORE_WITH_LOG_AND_UPDATE_RANGE(cphead->y, ytail, cphead->type, y_axis, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
+		STORE_AND_UPDATE_RANGE(cphead->x, xtail, cphead->type, x_axis,
+				this_plot->noautoscale, goto come_here_if_undefined);
+		STORE_AND_UPDATE_RANGE(cphead->y, ytail, cphead->type, y_axis,
+				this_plot->noautoscale, goto come_here_if_undefined);
 	    }
 
 	    if (dgrid3d) {
@@ -1076,36 +1077,45 @@ get_3ddata(struct surface_points *this_plot)
 		if (this_plot->plot_style == VECTOR)
 		    cphead->z = ztail;
 	    } else {
+		coord_type dummy_type;
 
-		/* EAM Sep 2008 - Otherwise z=Nan or z=Inf or DF_MISSING fails	*/
-		/* to set CRD_COLOR at all, since the z test bails to a goto. 	*/
+		/* Without this,  z=Nan or z=Inf or DF_MISSING fails to set
+		 * CRD_COLOR at all, since the z test bails to a goto.
+		 */
 		if (this_plot->plot_style == IMAGE) {
 		    cp->CRD_COLOR = (pm3d_color_from_column) ? color : z;
 		}
 
 		/* Version 5: cp->z=0 in the UNDEF_ACTION recovers what	version 4 did */
-		STORE_WITH_LOG_AND_UPDATE_RANGE(cp->z, z, cp->type, z_axis,
-				this_plot->noautoscale, NOOP,
+		STORE_AND_UPDATE_RANGE(cp->z, z, cp->type, z_axis,
+				this_plot->noautoscale,
 				cp->z=0;goto come_here_if_undefined);
 
 		if (this_plot->plot_style == ZERRORFILL) {
-		    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_ZLOW, zlow, cp->type, z_axis, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
-		    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_ZHIGH, zhigh, cp->type, z_axis, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
+		    STORE_AND_UPDATE_RANGE(cp->CRD_ZLOW, zlow, cp->type, z_axis,
+				this_plot->noautoscale, goto come_here_if_undefined);
+		    STORE_AND_UPDATE_RANGE(cp->CRD_ZHIGH, zhigh, cp->type, z_axis,
+				this_plot->noautoscale, goto come_here_if_undefined);
 		}
 
 		if (this_plot->plot_style == VECTOR)
-		    STORE_WITH_LOG_AND_UPDATE_RANGE(cphead->z, ztail, cphead->type, z_axis, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
+		    STORE_AND_UPDATE_RANGE(cphead->z, ztail, cphead->type, z_axis,
+				this_plot->noautoscale, goto come_here_if_undefined);
 
 		if (this_plot->lp_properties.l_type == LT_COLORFROMCOLUMN)
 		    cp->CRD_COLOR = color;
 
 		if (pm3d_color_from_column) {
-		    COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, color, cp->type, COLOR_AXIS, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
 		    if (this_plot->plot_style == VECTOR)
 			cphead->CRD_COLOR = color;
 		} else {
-		    COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, z, cp->type, COLOR_AXIS, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
+		    color = z;
 		}
+
+		dummy_type = cp->type;
+		STORE_AND_UPDATE_RANGE(cp->CRD_COLOR, color, dummy_type,
+			    COLOR_AXIS, this_plot->noautoscale,
+			    goto come_here_if_undefined);
 	    }
 
 	    /* At this point we have stored the point coordinates. Now we need to copy */
@@ -1259,11 +1269,12 @@ calculate_set_of_isolines(
 
 	    temp = real(&a);
 	    points[i].type = INRANGE;
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(points[i].z, temp, points[i].type,
-					    value_axis, FALSE, NOOP, NOOP);
+	    STORE_AND_UPDATE_RANGE(points[i].z, temp, points[i].type,
+					    value_axis, FALSE, NOOP);
 	    if (do_update_color) {
-		COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(points[i].CRD_COLOR, temp, points[i].type, 
-					    COLOR_AXIS, FALSE, NOOP, NOOP);
+		coord_type dummy_type = points[i].type;
+		STORE_AND_UPDATE_RANGE( points[i].CRD_COLOR, temp, dummy_type,
+					COLOR_AXIS, FALSE, NOOP);
 	    }
 	}
 	(*this_iso)->p_count = num_sam_to_use;

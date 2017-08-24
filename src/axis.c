@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.237 2017/08/09 04:45:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.238 2017/08/18 19:34:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -896,7 +896,7 @@ setup_tics(struct axis *this, int max)
 
     /*  Apply constraints on autoscaled axis if requested:
      *  The range is _expanded_ here only.  Limiting the range is done
-     *  in the macro STORE_WITH_LOG_AND_UPDATE_RANGE() of axis.h  */
+     *  in the macro STORE_AND_UPDATE_RANGE() of axis.h  */
     if (this->autoscale & AUTOSCALE_MIN) {
       	if (this->min_constraint & CONSTRAINT_UPPER) {
 	    if (this->min > this->min_ub)

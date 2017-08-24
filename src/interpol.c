@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.61 2017/08/01 01:19:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.62 2017/08/01 01:30:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -135,15 +135,14 @@ static char *RCSid() { return RCSid("$Id: interpol.c,v 1.61 2017/08/01 01:19:37 
  */
 
 
-/* store VALUE or log(VALUE) in STORE, set TYPE as appropriate Do
- * OUT_ACTION or UNDEF_ACTION as appropriate. Adjust range provided
+/* store VALUE in STORE, set TYPE to INRANGE/OUTRANGE
+ * Do UNDEF_ACTION as appropriate. Adjust range provided
  * type is INRANGE (ie dont adjust y if x is outrange). VALUE must not
  * be same as STORE */
-/* FIXME 20010610: UNDEF_ACTION is completely unused ??? Furthermore,
- * this is so similar to STORE_WITH_LOG_AND_UPDATE_RANGE() from axis.h
+/* FIXME 20010610: 
+ * this is so similar to STORE_AND_UPDATE_RANGE() from axis.h
  * that the two should probably be merged.  */
-#define STORE_AND_FIXUP_RANGE(store, value, type, min, max, auto,	\
-			      out_action, undef_action)			\
+#define STORE_AND_FIXUP_RANGE(store, value, type, min, max, auto)	\
 do {									\
     store=value;							\
     if (type != INRANGE)						\
@@ -153,8 +152,6 @@ do {									\
 	   (min) = (value);						\
        else {								\
 	   (type) = OUTRANGE;						\
-	   out_action;							\
-	   break;							\
        }								\
     }									\
     if ((value) > (max)) {						\
@@ -162,15 +159,13 @@ do {									\
 	   (max) = (value);						\
        else {								\
 	   (type) = OUTRANGE;						\
-	   out_action;							\
        }								\
     }									\
 } while(0)
 
-#define UPDATE_RANGE(TEST,OLD,NEW,AXIS)		\
-do {						\
-    if (TEST)					\
-	(OLD) = NEW;	\
+#define UPDATE_RANGE(TEST,OLD,NEW) \
+do {				   \
+    if (TEST) (OLD) = NEW;	   \
 } while(0)
 
 #define spline_coeff_size 4
@@ -336,8 +331,8 @@ do_kdensity(
 	/* now we have to store the points and adjust the ranges */
 	dest[i].type = INRANGE;
 	dest[i].x = x;
-	STORE_WITH_LOG_AND_UPDATE_RANGE( dest[i].y, y, dest[i].type, y_axis,
-				cp->noautoscale, NOOP, NOOP);
+	STORE_AND_UPDATE_RANGE( dest[i].y, y, dest[i].type, y_axis,
+				cp->noautoscale, NOOP);
 	dest[i].xlow = dest[i].xhigh = dest[i].x;
 	dest[i].ylow = dest[i].yhigh = dest[i].y;
 	dest[i].z = -1;
@@ -474,8 +469,8 @@ do_bezier(
 	/* now we have to store the points and adjust the ranges */
 
 	dest[i].type = INRANGE;
-	STORE_AND_FIXUP_RANGE(dest[i].x, x, dest[i].type, ixmin, ixmax, X_AXIS.autoscale, NOOP, continue);
-	STORE_AND_FIXUP_RANGE(dest[i].y, y, dest[i].type, iymin, iymax, Y_AXIS.autoscale, NOOP, NOOP);
+	STORE_AND_FIXUP_RANGE(dest[i].x, x, dest[i].type, ixmin, ixmax, X_AXIS.autoscale);
+	STORE_AND_FIXUP_RANGE(dest[i].y, y, dest[i].type, iymin, iymax, Y_AXIS.autoscale);
 
 	dest[i].xlow = dest[i].xhigh = dest[i].x;
 	dest[i].ylow = dest[i].yhigh = dest[i].y;
@@ -483,10 +478,10 @@ do_bezier(
 	dest[i].z = -1;
     }
 
-    UPDATE_RANGE(ixmax > sxmax, X_AXIS.max, ixmax, x_axis);
-    UPDATE_RANGE(ixmin < sxmin, X_AXIS.min, ixmin, x_axis);
-    UPDATE_RANGE(iymax > symax, Y_AXIS.max, iymax, y_axis);
-    UPDATE_RANGE(iymin < symin, Y_AXIS.min, iymin, y_axis);
+    UPDATE_RANGE(ixmax > sxmax, X_AXIS.max, ixmax);
+    UPDATE_RANGE(ixmin < sxmin, X_AXIS.min, ixmin);
+    UPDATE_RANGE(iymax > symax, Y_AXIS.max, iymax);
+    UPDATE_RANGE(iymin < symin, Y_AXIS.min, iymin);
 }
 
 /*
@@ -902,8 +897,8 @@ do_cubic(
 	}
 
 	dest[i].type = INRANGE;
-	STORE_AND_FIXUP_RANGE(dest[i].x, x, dest[i].type, ixmin, ixmax, X_AXIS.autoscale, NOOP, continue);
-	STORE_AND_FIXUP_RANGE(dest[i].y, y, dest[i].type, iymin, iymax, Y_AXIS.autoscale, NOOP, NOOP);
+	STORE_AND_FIXUP_RANGE(dest[i].x, x, dest[i].type, ixmin, ixmax, X_AXIS.autoscale);
+	STORE_AND_FIXUP_RANGE(dest[i].y, y, dest[i].type, iymin, iymax, Y_AXIS.autoscale);
 
 	dest[i].xlow = dest[i].xhigh = dest[i].x;
 	dest[i].ylow = dest[i].yhigh = dest[i].y;
@@ -912,10 +907,10 @@ do_cubic(
 
     }
 
-    UPDATE_RANGE(ixmax > sxmax, X_AXIS.max, ixmax, x_axis);
-    UPDATE_RANGE(ixmin < sxmin, X_AXIS.min, ixmin, x_axis);
-    UPDATE_RANGE(iymax > symax, Y_AXIS.max, iymax, y_axis);
-    UPDATE_RANGE(iymin < symin, Y_AXIS.min, iymin, y_axis);
+    UPDATE_RANGE(ixmax > sxmax, X_AXIS.max, ixmax);
+    UPDATE_RANGE(ixmin < sxmin, X_AXIS.min, ixmin);
+    UPDATE_RANGE(iymax > symax, Y_AXIS.max, iymax);
+    UPDATE_RANGE(iymin < symin, Y_AXIS.min, iymin);
 
 }
 
@@ -960,18 +955,18 @@ do_freq(
 
 	this[i].type = INRANGE;
 
-	STORE_AND_FIXUP_RANGE(this[i].x, x, this[i].type, ixmin, ixmax, X_AXIS.autoscale, NOOP, continue);
-	STORE_AND_FIXUP_RANGE(this[i].y, y, this[i].type, iymin, iymax, Y_AXIS.autoscale, NOOP, NOOP);
+	STORE_AND_FIXUP_RANGE(this[i].x, x, this[i].type, ixmin, ixmax, X_AXIS.autoscale);
+	STORE_AND_FIXUP_RANGE(this[i].y, y, this[i].type, iymin, iymax, Y_AXIS.autoscale);
 
 	this[i].xlow = this[i].xhigh = this[i].x;
 	this[i].ylow = this[i].yhigh = this[i].y;
 	this[i].z = -1;
     }
 
-    UPDATE_RANGE(ixmax > sxmax, X_AXIS.max, ixmax, x_axis);
-    UPDATE_RANGE(ixmin < sxmin, X_AXIS.min, ixmin, x_axis);
-    UPDATE_RANGE(iymax > symax, Y_AXIS.max, iymax, y_axis);
-    UPDATE_RANGE(iymin < symin, Y_AXIS.min, iymin, y_axis);
+    UPDATE_RANGE(ixmax > sxmax, X_AXIS.max, ixmax);
+    UPDATE_RANGE(ixmin < sxmin, X_AXIS.min, ixmin);
+    UPDATE_RANGE(iymax > symax, Y_AXIS.max, iymax);
+    UPDATE_RANGE(iymin < symin, Y_AXIS.min, iymin);
 }
 
 
@@ -1228,34 +1223,19 @@ cp_implode(struct curve_points *cp)
 		cp->points[j].yhigh = suy / (double) k;
 		cp->points[j].ylow = sly / (double) k;
 		cp->points[j].z = weight / (double) k;
-		/* HBB 20000405: I wanted to use STORE_AND_FIXUP_RANGE
-		 * here, but won't: it assumes we want to modify the
-		 * range, and that the range is given in 'input'
-		 * coordinates.  For logarithmic axes, the overhead
-		 * would be larger than the possible gain, so write it
-		 * out explicitly, instead:
-		 * */
+		/* HBB 20000405: I wanted to use STORE_AND_FIXUP_RANGE here,
+		 * but won't: it assumes we want to modify the range, and
+		 * that the range is given in 'input' coordinates. 
+		 */
 		cp->points[j].type = INRANGE;
 		if (! all_inrange) {
-		    if (X_AXIS.log) {
-			if (x <= -VERYLARGE) {
-			    cp->points[j].type = OUTRANGE;
-			    goto is_outrange;
-			}
-		    }
 		    if (((x < X_AXIS.min) && !(X_AXIS.autoscale & AUTOSCALE_MIN))
-			|| ((x > X_AXIS.max) && !(X_AXIS.autoscale & AUTOSCALE_MAX))) {
+		    ||  ((x > X_AXIS.max) && !(X_AXIS.autoscale & AUTOSCALE_MAX))) {
 			cp->points[j].type = OUTRANGE;
 			goto is_outrange;
 		    }
-		    if (Y_AXIS.log) {
-			if (y <= -VERYLARGE) {
-			    cp->points[j].type = OUTRANGE;
-			    goto is_outrange;
-			}
-		    }
 		    if (((y < Y_AXIS.min) && !(Y_AXIS.autoscale & AUTOSCALE_MIN))
-			|| ((y > Y_AXIS.max) && !(Y_AXIS.autoscale & AUTOSCALE_MAX)))
+		    ||  ((y > Y_AXIS.max) && !(Y_AXIS.autoscale & AUTOSCALE_MAX)))
 			cp->points[j].type = OUTRANGE;
 		is_outrange:
 		    ;
@@ -1282,25 +1262,13 @@ cp_implode(struct curve_points *cp)
 	    cp->points[j].z = weight / (double) k;
 	    cp->points[j].type = INRANGE;
 	    if (! all_inrange) {
-		    if (X_AXIS.log) {
-			if (x <= -VERYLARGE) {
-			    cp->points[j].type = OUTRANGE;
-			    goto is_outrange2;
-			}
-		    }
 		    if (((x < X_AXIS.min) && !(X_AXIS.autoscale & AUTOSCALE_MIN))
-			|| ((x > X_AXIS.max) && !(X_AXIS.autoscale & AUTOSCALE_MAX))) {
+		    ||  ((x > X_AXIS.max) && !(X_AXIS.autoscale & AUTOSCALE_MAX))) {
 			cp->points[j].type = OUTRANGE;
 			goto is_outrange2;
 		    }
-		    if (Y_AXIS.log) {
-			if (y <= -VERYLARGE) {
-			    cp->points[j].type = OUTRANGE;
-			    goto is_outrange2;
-			}
-		    }
 		    if (((y < Y_AXIS.min) && !(Y_AXIS.autoscale & AUTOSCALE_MIN))
-			|| ((y > Y_AXIS.max) && !(Y_AXIS.autoscale & AUTOSCALE_MAX)))
+		    ||  ((y > Y_AXIS.max) && !(Y_AXIS.autoscale & AUTOSCALE_MAX)))
 			cp->points[j].type = OUTRANGE;
 		is_outrange2:
 		    ;
@@ -1417,8 +1385,8 @@ mcs_interp(struct curve_points *plot)
 	/* FIXME:  Log x?  autoscale x? */
 	new_points[i].x = x;
 	new_points[i].type = INRANGE;
-	STORE_WITH_LOG_AND_UPDATE_RANGE(new_points[i].y, y, new_points[i].type,
-		plot->y_axis, plot->noautoscale, NOOP, NOOP);
+	STORE_AND_UPDATE_RANGE(new_points[i].y, y, new_points[i].type,
+		plot->y_axis, plot->noautoscale, NOOP);
     }
 
     /* Replace original data with the interpolated curve */

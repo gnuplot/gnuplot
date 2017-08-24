@@ -1,3 +1,14 @@
+2017-08-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c src/axis.h src/graphics.c src/interpol.c src/plot2d.c
+	src/plot3d.c: Revise macro name STORE_WITH_LOG_AND_UPDATE_RANGE to
+	STORE_AND_UPDATE_RANGE since we no longer handle log scaling at the
+	time data is stored.  Take this opportunity to remove and unused
+	parameter (OUT_ACTION) from the macro. Go back to using the same
+	macro for the COLOR_AXIS that we use for all other axes.
+	This is intended solely to make the code easier to understand;
+	there is no change in the code actually executed.
+
 2017-08-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (parametric_fixup):  Consolidate redundant code blocks

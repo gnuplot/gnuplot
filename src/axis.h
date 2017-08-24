@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.174 2017/08/01 22:13:42 sfeam Exp $
+ * $Id: axis.h,v 1.175 2017/08/03 19:45:02 sfeam Exp $
  *
  */
 
@@ -463,18 +463,17 @@ do {									\
     (store) = get_num_or_time(this_axis);				\
 } while(0)
 
-/* store VALUE in STORE, set TYPE as appropriate
+/* store VALUE in STORE, set TYPE to INRANGE/OUTRANGE/UNDEFINED
  * VALUE must not be same as STORE
  * Version 5: OK to store infinities or NaN
- * Do OUT_ACTION or UNDEF_ACTION as appropriate
+ * Do UNDEF_ACTION as appropriate
  * adjust range provided type is INRANGE (ie dont adjust y if x is outrange
  * NOAUTOSCALE is per-plot property, whereas AUTOSCALE_XXX is per-axis.
  * Note: see the particular implementation for COLOR AXIS below.
  */
 
-#define ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, TYPE, AXIS,  \
-					       NOAUTOSCALE, OUT_ACTION,   \
-					       UNDEF_ACTION)              \
+#define ACTUAL_STORE_AND_UPDATE_RANGE(STORE, VALUE, TYPE, AXIS,           \
+					NOAUTOSCALE, UNDEF_ACTION)        \
 do {									  \
     struct axis *axis = AXIS;						  \
     double curval = (VALUE);						  \
@@ -491,7 +490,6 @@ do {									  \
 	    break;							  \
 	} else if (curval == 0.0) {					  \
 	    TYPE = OUTRANGE;						  \
-	    OUT_ACTION;							  \
 	    break;							  \
 	}								  \
     }									  \
@@ -508,13 +506,11 @@ do {									  \
 		if (axis->min_lb > curval) {				  \
 		    axis->min = axis->min_lb;				  \
 		    TYPE = OUTRANGE;					  \
-		    OUT_ACTION;						  \
 		    break;						  \
 		}							  \
 	    }								  \
 	} else if (curval != axis->max) {				  \
 	    TYPE = OUTRANGE;						  \
-	    OUT_ACTION;							  \
 	    break;							  \
 	}								  \
     }									  \
@@ -526,13 +522,11 @@ do {									  \
 		if (axis->max_ub < curval) {		 		  \
 		    axis->max = axis->max_ub;				  \
 		    TYPE =OUTRANGE;					  \
-		    OUT_ACTION;						  \
 		    break;						  \
 		}							  \
 	    }								  \
 	} else if (curval != axis->min) {				  \
 	    TYPE = OUTRANGE;						  \
-	    OUT_ACTION;							  \
 	}								  \
     }									  \
     /* Only update data min/max if the point is INRANGE Jun 2016 */	  \
@@ -545,23 +539,11 @@ do {									  \
 } while(0)
 
 /* normal calls go though this macro */
-#define STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, TYPE, AXIS, NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION)	 \
+#define STORE_AND_UPDATE_RANGE(STORE, VALUE, TYPE, AXIS, NOAUTOSCALE, UNDEF_ACTION)	 \
  if (AXIS != NO_AXIS) \
- ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, TYPE, (&axis_array[AXIS]), NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION)
+ ACTUAL_STORE_AND_UPDATE_RANGE(STORE, VALUE, TYPE, (&axis_array[AXIS]), NOAUTOSCALE, UNDEF_ACTION)
 
-/* Implementation of the above for the color axis. It should not change
- * the type of the point (out-of-range color is plotted with the color
- * of the min or max color value).
- */
-#define COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, TYPE, AXIS,	  \
-			       NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION)	  \
-{									  \
-    coord_type c_type_tmp = TYPE;					  \
-    ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, c_type_tmp, &axis_array[AXIS],	  \
-					   NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION); \
-}
-
-/* #define NOOP (0) caused many warnings from gcc 3.2 */
+/* Use NOOP for UNDEF_ACTION if no action is wanted */
 #define NOOP ((void)0)
 
 /* HBB 20000506: new macro to automatically build initializer lists

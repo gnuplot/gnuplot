@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.567 2017/08/18 19:34:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.568 2017/08/23 00:54:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4605,11 +4605,11 @@ process_image(void *plot, t_procimg_action action)
 
 	    /* Update range and store value back into itself. */
 	    dummy_type = INRANGE;
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(x, x, dummy_type, image_x_axis,
-				((struct curve_points *)plot)->noautoscale, NOOP, x = -VERYLARGE);
+	    STORE_AND_UPDATE_RANGE(x, x, dummy_type, image_x_axis,
+				((struct curve_points *)plot)->noautoscale, x = -VERYLARGE);
 	    dummy_type = INRANGE;
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(y, y, dummy_type, image_y_axis,
-				((struct curve_points *)plot)->noautoscale, NOOP, y = -VERYLARGE);
+	    STORE_AND_UPDATE_RANGE(y, y, dummy_type, image_y_axis,
+				((struct curve_points *)plot)->noautoscale, y = -VERYLARGE);
 	}
 	return;
     }
