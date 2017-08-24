@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1103 2017/07/31 22:40:40 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1104 2017/08/18 19:34:06 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -913,24 +913,12 @@ C  need @ in table, so end and restart the table !
  the default files. See `postscript prologue`.
 2 Expressions
 ?expressions
+?division
  In general, any mathematical expression accepted by C, FORTRAN, Pascal, or
  BASIC is valid.  The precedence of these operators is determined by the
  specifications of the C programming language.  White space (spaces and tabs)
  is ignored inside expressions.
 
- Complex constants are expressed as {<real>,<imag>}, where <real> and <imag>
- must be numerical constants.  For example, {3,2} represents 3 + 2i; {0,1}
- represents 'i' itself.  The curly braces are explicitly required here.
-
-=octal
-=hexadecimal
- Integer constants are interpreted via the C library routine strtoll().
- This means that constants beginning with "0" are interpreted as octal,
- and constants beginning with "0x" or "0X" are interpreted as hexadecimal.
-
- Floating point constants are interpreted via the C library routine atof().
-
-=division
  Note that gnuplot uses both "real" and "integer" arithmetic, like FORTRAN and
  C.  Integers are entered as "1", "-10", etc; reals as "1.0", "-10.0", "1e1",
  3.5e-1, etc.  The most important difference between the two forms is in
@@ -938,16 +926,13 @@ C  need @ in table, so end and restart the table !
  not: 5.0/2.0 = 2.5.  In mixed expressions, integers are "promoted" to reals
  before evaluation: 5/2e0 = 2.5.  The result of division of a negative integer
  by a positive one may vary among compilers.  Try a test like "print -5/2" to
- determine if your system chooses -2 or -3 as the answer.
+ determine if your system always rounds down (-5/2 yields -3) or always rounds
+ toward zero (-5/2 yields -2).
 
  The integer expression "1/0" may be used to generate an "undefined" flag,
  which causes a point to ignored.  Or you can use the pre-defined variable NaN
  to achieve the same result.  See `using` for an example.
 =NaN
-
- The real and imaginary parts of complex expressions are always real, whatever
- the form in which they are entered: in {3,2} the "3" and "2" are reals, not
- integers.
 
  Gnuplot can also perform simple operations on strings and string variables.
  For example, the expression ("A" . "B" eq "AB") evaluates as true, illustrating
@@ -965,6 +950,33 @@ C  need @ in table, so end and restart the table !
  The syntax "string"[beg:end] is exactly equivalent to calling the built-in
  string-valued function substr("string",beg,end), except that you cannot
  omit either beg or end from the function call.
+3 Constants
+?constants
+?expressions constants
+?octal
+?hexadecimal
+?complex
+ Integer constants are interpreted via the C library routine strtoll().
+ This means that constants beginning with "0" are interpreted as octal,
+ and constants beginning with "0x" or "0X" are interpreted as hexadecimal.
+
+ Floating point constants are interpreted via the C library routine atof().
+
+ Complex constants are expressed as {<real>,<imag>}, where <real> and <imag>
+ must be numerical constants.  For example, {3,2} represents 3 + 2i; {0,1}
+ represents 'i' itself.  The curly braces are explicitly required here.
+
+ String constants consist of any sequence of characters enclosed either in
+ single quotes or double quotes. The distinction between single and double
+ quotes is important.  See `quotes`.
+
+ Examples:
+      1 -10 0xffaabb        # integer constants
+      1.0 -10. 1e1 3.5e-1   # floating point constants
+      {1.2, -3.4}           # complex constant
+      "Line 1\nLine 2"      # string constant (\n is expanded to newline)
+      '123\n456'            # string constant (\ and n are ordinary characters)
+
 3 Functions
 ?expressions functions
  Arguments to math functions in `gnuplot` can be integer, real, or complex
@@ -3226,9 +3238,9 @@ Ffigure_newsyntax
  processing of the quoted text depends on the choice of quote marks.
 
  Backslash processing of special characters like \n (newline) and
- \345 (octal character code) is performed for double-quoted strings.  In
- single-quoted strings, backslashes are just ordinary characters.  To get
- a single-quote (ascii 39) in a single-quoted string, it has to be doubled.
+ \345 (octal character code) is performed only for double-quoted strings.
+ In single-quoted strings, backslashes are just ordinary characters.  To get
+ a single-quote (ascii 39) in a single-quoted string, it must be doubled.
  Thus the strings "d\" s' b\\" and 'd" s'' b\' are completely equivalent.
 
  Text justification is the same for each line of a multi-line string.

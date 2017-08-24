@@ -8,7 +8,7 @@
 	* src/axis.c src/axis.h src/graphics.c src/interpol.c src/plot2d.c
 	src/plot3d.c: Revise macro name STORE_WITH_LOG_AND_UPDATE_RANGE to
 	STORE_AND_UPDATE_RANGE since we no longer handle log scaling at the
-	time data is stored.  Take this opportunity to remove and unused
+	time data is stored.  Take this opportunity to remove an unused
 	parameter (OUT_ACTION) from the macro. Go back to using the same
 	macro for the COLOR_AXIS that we use for all other axes.
 	This is intended solely to make the code easier to understand;
@@ -25,8 +25,8 @@
 2017-08-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/grahics.c src/graphics.h (rgbscale) demo/image.dem:
-	Since we have decoupled cbrange from rgbimage, the example in image.dem
-	needs to change accordingly.  Add a placeholder macro rgbscale(colorval)
+	Since cbrange is now decoupled from rgbimage, the image and image2 demos
+	need to change accordingly.  Add a placeholder macro rgbscale(colorval)
 	that for now only enforces that color components are in [0:255] but
 	can later be replaced with an actual scaling routine.
 
