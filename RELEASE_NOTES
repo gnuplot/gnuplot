@@ -1,14 +1,16 @@
 		GNUPLOT Version 5.2 Release Notes
 		=================================
 
-This is a pre-release testing copy of gnuplot version 5.2.
 Please see the ChangeLog file for a complete list of changes made during the
-course of development from 5.0 to 5.2.
+course of development from 5.0 to 5.2.  Thank you to everyone who provided
+feedback and testing on the release candidates for this version.
 
-Release Notes date: 22-Aug-2017
+Release Notes date: 28-Aug-2017
 
-CHANGES SINCE rc3
-=================
+CHANGES SINCE FIRST RELEASE CANDIDATE
+=====================================
+-final
+
 * NEW user-defined dashtypes in metapost terminal
 * CHANGE allow explicit sample interval for u and v using pseudofile '++'
 * CHANGE decouple cbrange from color components in "with rgbimage"
@@ -16,14 +18,14 @@ CHANGES SINCE rc3
 * FIX GPVAL_* variables were not being updated in "set table" mode
 * FIX evaluation of nested iteration containing an empty range
 
-CHANGES SINCE rc2
-=================
+-rc3
+
 * NEW: revised "plot with table" can handle string-valued output columns
 * CHANGE: revised pipe support on Windows when built with MinGW-64 or MSVC
 * FIX: minor bugs in use of gnuplot variables by "fit" command
 
-CHANGES SINCE rc1
-=================
+-rc2
+
 * FIX: terminal initialization must complete before executing ~/.gnuplot
 * FIX: incorrect clipping of polar border and raxis
 * FIX: add sanity checks to detect and handle various types of bad input data
@@ -128,6 +130,8 @@ Other minor changes
 * support for space-in-x11-raises-KDE3-konsole is now a configure option
 * don't use loadpath to choose output directory for "save"
 * GNUTERM may contain terminal options in addition to bare terminal name
+* RGB color components of "with rgbimage" are always in the range [0:255]
+  (i.e. not affected by "set cbrange")
 
 
 ONLINE DEMO PLOTS
@@ -140,10 +144,12 @@ Demo plots illustrating new and old features are online at
 KNOWN ISSUES
 ============
 
-* wxt terminal on linux: If you configure in the wxt terminal you may need
+* If you configure in the wxt terminal on linux you may need
   to manually set the environmental variable TERMLIBS during configuration:
-    TERMLIBS="-lX11"  ./configure
-  Some people have reported runtime problems when the wxt terminal uses 
+
+    * TERMLIBS="-lX11"  ./configure
+
+* Some people have reported runtime problems when the wxt terminal uses 
   wxgtk library versions 3.0.x.  If you have the option of linking against
   wxgtk version 2.8 instead, this may be a better choice.
 
@@ -255,7 +261,7 @@ Options for generating interactive plots for web display
 Installation
 ------------
 
-You can download a source tarball for gnuplot version 5.2.rc3 from the 
+You can download a source tarball for gnuplot version 5.2.0 from the 
 gnuplot development site on SourceForge.
 	http://sourceforge.net/projects/gnuplot
 
@@ -263,7 +269,7 @@ Installation instructions are available in the source itself; the short
 version for linux/unix-like systems is to unpack the tarball and then
 <PRE>
 build it:
-      cd gnuplot-5.2.rc3 ; ./configure ; make
+      cd gnuplot-5.2.0 ; ./configure ; make
 test it:
       make check
 install it:
