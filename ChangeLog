@@ -1,3 +1,8 @@
+2017-08-28  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/mingw/Makefile:  Fix target name of generated dependencies
+	for pipe and console targets.
+
 2017-08-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c src/axis.h src/graphics.c src/interpol.c src/plot2d.c

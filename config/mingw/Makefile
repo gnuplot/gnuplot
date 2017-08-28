@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.83 2017/08/12 06:41:29 markisch Exp $
+# $Id: Makefile,v 1.84 2017/08/13 05:12:21 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 #
@@ -581,25 +581,25 @@ WINOBJS_WGNUPLOT = wtext.$(O) screenbuf.$(O) wmenu.$(O) wredirect.$(O)
 # default rules
 .SUFFIXES: .exe .o .co .po .c .lib .def
 .c.o:
-	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PLAIN) -MMD -MT '$*.$o' -MF $*.d -o $@ $<
+	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PLAIN) -MMD -MT '$*.o' -MF $*.d -o $@ $<
 %.o: $W/%.c
-	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PLAIN) -MMD -MT '$*.$o' -MF $*.d -o $@ $<
+	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PLAIN) -MMD -MT '$*.o' -MF $*.d -o $@ $<
 %.o: $W/%.cpp
-	$(CXX) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PLAIN) $(CXXFLAGS) -MMD -MT '$*.$o' -MF $*.d -o $@ $<
+	$(CXX) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PLAIN) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
 
 .c.po:
-	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PIPES) -MMD -MT '$*.$po' -MF $*.pd -o $@ $<
+	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PIPES) -MMD -MT '$*.po' -MF $*.pd -o $@ $<
 %.po: $W/%.c
-	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PIPES) -MMD -MT '$*.$po' -MF $*.pd -o $@ $<
+	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PIPES) -MMD -MT '$*.po' -MF $*.pd -o $@ $<
 %.po: $W/%.cpp
-	$(CXX) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PIPES) $(CXXFLAGS) -MMD -MT '$*.$po' -MF $*.d -o $@ $<
+	$(CXX) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PIPES) $(CXXFLAGS) -MMD -MT '$*.po' -MF $*.d -o $@ $<
 
 .c.co:
-	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_CONSOLE) -MMD -MT '$*.$co' -MF $*.cd -o $@ $<
+	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_CONSOLE) -MMD -MT '$*.co' -MF $*.cd -o $@ $<
 %.co: $W/%.c
-	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_CONSOLE) -MMD -MT '$*.$co' -MF $*.cd -o $@ $<
+	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_CONSOLE) -MMD -MT '$*.co' -MF $*.cd -o $@ $<
 %.co: $W/%.cpp
-	$(CXX) -c $(CFLAGS) $(EXTRA_CPPFLAGS_CONSOLE) $(CXXFLAGS) -MMD -MT '$*.$co' -MF $*.d -o $@ $<
+	$(CXX) -c $(CFLAGS) $(EXTRA_CPPFLAGS_CONSOLE) $(CXXFLAGS) -MMD -MT '$*.co' -MF $*.d -o $@ $<
 
 %.lib: %.def
 ifndef M32
@@ -660,11 +660,11 @@ wgplt_res.o: $(W)/wgnuplot.rc $(W)/wgnuplib.rc $(W)/wresourc.h $(W)/texticon.ico
 	$(RES2COFF)
 
 term.o: term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
-	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PLAIN) $(TERMFLAGS) -MMD -MT '$*.$o' -MF $*.d -o $@ $<
+	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PLAIN) $(TERMFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
 term.po: term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
-	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PIPES) $(TERMFLAGS) -MMD -MT '$*.$po' -MF $*.pd -o $@ $<
+	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PIPES) $(TERMFLAGS) -MMD -MT '$*.po' -MF $*.pd -o $@ $<
 term.co: term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
-	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_CONSOLE) $(TERMFLAGS) -MMD -MT '$*.$co' -MF $*.cd -o $@ $<
+	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_CONSOLE) $(TERMFLAGS) -MMD -MT '$*.co' -MF $*.cd -o $@ $<
 
 ifndef RELEASE
 timestamp.h: $(TOP)/ChangeLog
@@ -685,25 +685,25 @@ $(OBJS_PIPES):  config.h $(VERSIONING)
 $(OBJS_CONSOLE): config.h $(VERSIONING)
 
 wxt_gui.o: $(S)/wxterminal/wxt_gui.cpp $(S)/wxterminal/wxt_gui.h
-	$(CXX) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PLAIN) $(CXXFLAGS) $(CAIRO_CFLAGS) -MMD -MT '$*.$o' -MF $*.d -o $@ $<
+	$(CXX) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PLAIN) $(CXXFLAGS) $(CAIRO_CFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
 wxt_gui.po: $(S)/wxterminal/wxt_gui.cpp $(S)/wxterminal/wxt_gui.h
-	$(CXX) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PIPES) $(CXXFLAGS) $(CAIRO_CFLAGS) -MMD -MT '$*.$po' -MF $*.pd -o $@ $<
+	$(CXX) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PIPES) $(CXXFLAGS) $(CAIRO_CFLAGS) -MMD -MT '$*.po' -MF $*.pd -o $@ $<
 wxt_gui.co: $(S)/wxterminal/wxt_gui.cpp $(S)/wxterminal/wxt_gui.h
-	$(CXX) -c $(CFLAGS) $(EXTRA_CPPFLAGS_CONSOLE) $(CXXFLAGS) $(CAIRO_CFLAGS) -MMD -MT '$*.$co' -MF $*.cd -o $@ $<
+	$(CXX) -c $(CFLAGS) $(EXTRA_CPPFLAGS_CONSOLE) $(CXXFLAGS) $(CAIRO_CFLAGS) -MMD -MT '$*.co' -MF $*.cd -o $@ $<
 
 gp_cairo.o: $(S)/wxterminal/gp_cairo.c $(S)/wxterminal/gp_cairo.h
-	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PLAIN) $(PANGOCAIRO_CFLAGS) -MMD -MT '$*.$o' -MF $*.d -o $@ $<
+	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PLAIN) $(PANGOCAIRO_CFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
 gp_cairo.po: $(S)/wxterminal/gp_cairo.c $(S)/wxterminal/gp_cairo.h
-	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PIPES) $(PANGOCAIRO_CFLAGS) -MMD -MT '$*.$po' -MF $*.pd -o $@ $<
+	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PIPES) $(PANGOCAIRO_CFLAGS) -MMD -MT '$*.po' -MF $*.pd -o $@ $<
 gp_cairo.co: $(S)/wxterminal/gp_cairo.c $(S)/wxterminal/gp_cairo.h
-	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_CONSOLE) $(PANGOCAIRO_CFLAGS) -MMD -MT '$*.$co' -MF $*.cd -o $@ $<
+	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_CONSOLE) $(PANGOCAIRO_CFLAGS) -MMD -MT '$*.co' -MF $*.cd -o $@ $<
 
 qt_term.o: $(S)/qtterminal/qt_term.cpp $(S)/qtterminal/qt_term.h
-	$(CXX) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PLAIN) $(CXXFLAGS) -MMD -MT '$*.$o' -MF $*.d -o $@ $<
+	$(CXX) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PLAIN) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
 qt_term.po: $(S)/qtterminal/qt_term.cpp $(S)/qtterminal/qt_term.h
-	$(CXX) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PIPES) $(CXXFLAGS) -MMD -MT '$*.$po' -MF $*.pd -o $@ $<
+	$(CXX) -c $(CFLAGS) $(EXTRA_CPPFLAGS_PIPES) $(CXXFLAGS) -MMD -MT '$*.po' -MF $*.pd -o $@ $<
 qt_term.co: $(S)/qtterminal/qt_term.cpp $(S)/qtterminal/qt_term.h
-	$(CXX) -c $(CFLAGS) $(EXTRA_CPPFLAGS_CONSOLE) $(CXXFLAGS) -MMD -MT '$*.$co' -MF $*.cd -o $@ $<
+	$(CXX) -c $(CFLAGS) $(EXTRA_CPPFLAGS_CONSOLE) $(CXXFLAGS) -MMD -MT '$*.co' -MF $*.cd -o $@ $<
 
 # Call the Qt resource compiler
 qrc_QtGnuplotResource.cpp: $(S)/qtterminal/QtGnuplotResource.qrc
