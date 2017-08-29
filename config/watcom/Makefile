@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.17.2.1 2017/06/20 22:08:43 sfeam Exp $
+# $Id: Makefile,v 1.17.2.2 2017/08/29 13:18:34 markisch Exp $
 #
 # GNUPLOT Makefile OpenWatcom 1.3 on Win32
 
@@ -133,8 +133,8 @@ LDLIBS += LIBRARY d2d1.lib LIBRARY dwrite.lib
 # -j  : char is signed
 # -aa : allow non-const initializers for locals
 # -d2 : debug information
-WCFLAGS = -zlf -ei -zq -I$(S);$(W) -zm -bm -5r -sg -orilt -j -aa -d2 $(CPPFLAGS) $(OPTS)
-WPPFLAGS = -zlf -ei -zq -I$(S);$(W) -zm -bm -5r -sg -orilt -j -d2 $(CPPFLAGS) $(OPTS)
+WCFLAGS = -zlf -ei -zq -I$(S);$(W) -zm -bm -5r -sg -orilt -aa -d2 $(CPPFLAGS) $(OPTS)
+WPPFLAGS = -zlf -ei -zq -I$(S);$(W) -zm -bm -5r -sg -orilt -d2 $(CPPFLAGS) $(OPTS)
 # removed: -za99
 
 # ...and here.
