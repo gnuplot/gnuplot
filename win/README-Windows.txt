@@ -47,27 +47,19 @@ are dual-licensed.
 gnuplot binaries
 ----------------
 
-* wgnuplot.exe:  GUI version and the default gnuplot executable. As of version 5 
-  it emulates pipe functionality.
+* wgnuplot.exe:  GUI version and the default gnuplot executable.
   
-* wgnuplot_pipes.exe:  Variant with full pipe functionality at the expense of
-  an additional console window.
-
 * gnuplot.exe:  Text (console) mode version of the gnuplot executable with full
-  pipe functionality as it is common on other platforms. In contrast to
-  wgnuplot.exe, this program can also accept commands on stdin (standard input)
-  and print messages on stdout (standard output). It replaces pgnuplot.exe and
-  is recommended to be used with 3rd party applications using gnuplot as graph
-  engine, like e.g. Octave (www.octave.org).
-
-* pgnuplot.exe:  This helper program is no longer shipped with binary package.
-  Use gnuplot.exe instead.
+  pipe functionality as on other platforms. In contrast to wgnuplot.exe, this
+  program can also accept commands on stdin (standard input) and print messages
+  on stdout (standard output). It replaces a program pgnuplot.exe used by some
+  earlier gnuplot versions.  gnuplot.exe can be used as a graph engine by 
+  3rd party applications like Octave (www.octave.org).
 
 * runtime library files
   Runtime library files (e.g. freetype6.dll) that are required for gnuplot
   are included in the package.  Licenses of these runtime libraries can be
   found in the 'license' directory.
-
 
 Interactive Terminals
 ---------------------
@@ -213,4 +205,4 @@ for an up-to-date bug tracking system.
 
 --------------------------------------------------------------------------------
 
-The gnuplot team, June 2017
+The gnuplot team, August 2017
