@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.6.2.6 2017/07/30 08:20:35 markisch Exp $
+ * $Id: wd2d.cpp,v 1.6.2.7 2017/08/29 11:45:16 markisch Exp $
  */
 
 /*
@@ -51,6 +51,11 @@ extern "C" {
 
 // FIXME: only one copy!
 #define GWOPMAX 4096
+
+#ifndef __WATCOMC__
+// MSVC and MinGW64 have the __uuidof() special function
+# define HAVE_UUIDOF
+#endif
 
 #define MINMAX(a,val,b) (((val) <= (a)) ? (a) : ((val) <= (b) ? (val) : (b)))
 const int pattern_num = 8;
@@ -109,21 +114,29 @@ d2dInit(void)
 
 	// Create D2D factory
 	if (g_pDirect2dFactory == NULL) {
-#ifdef D2DDEBUG
 		D2D1_FACTORY_OPTIONS options;
 		ZeroMemory(&options, sizeof(D2D1_FACTORY_OPTIONS));
+#ifdef D2DDEBUG
 		options.debugLevel = D2D1_DEBUG_LEVEL_INFORMATION;
-		hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory), &options, (void **) &g_pDirect2dFactory);
-#else
-		hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &g_pDirect2dFactory);
 #endif
+		hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED,
+#ifdef HAVE_UUIDOF
+				__uuidof(g_pDirect2dFactory),
+#else
+				IID_ID2D1Factory,
+#endif
+				&options, reinterpret_cast<void **>(&g_pDirect2dFactory));
 	}
 
 	// Create a DirectWrite factory
 	if (SUCCEEDED(hr) && g_pDWriteFactory == NULL) {
 		hr = DWriteCreateFactory(
 			DWRITE_FACTORY_TYPE_SHARED,
+#ifdef HAVE_UUIDOF
 			__uuidof(g_pDWriteFactory),
+#else
+			IID_IDWriteFactory,
+#endif
 			reinterpret_cast<IUnknown **>(&g_pDWriteFactory)
 		);
 	}
