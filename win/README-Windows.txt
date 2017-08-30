@@ -57,7 +57,7 @@ gnuplot binaries
   3rd party applications like Octave (www.octave.org).
 
 * runtime library files
-  Runtime library files (e.g. freetype6.dll) that are required for gnuplot
+  Runtime library files (e.g. libfreetype-6.dll) that are required for gnuplot
   are included in the package.  Licenses of these runtime libraries can be
   found in the 'license' directory.
 
