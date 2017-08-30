@@ -2,6 +2,8 @@
 
 	* win/README-Windows.txt:  Update as per advice from Tatsuro Matsuoka.
 
+	* docs/gnuplot.doc:  Expand section on real/int/hex/octal constants.
+
 	* src/command.c src/datablock.c src/datablock.h src/internal.c
 	src/parse.c src/util.c:  Extend array syntax to named datablocks.
 	|$DATABLOCK| gives the number of lines in the block.
