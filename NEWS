@@ -1,6 +1,7 @@
 Changes since 5.2.rc4
 ====================
 * NEW user-defined dashtypes in metapost terminal
+* NEW datablock contents may be accessed as an indexed array of strings
 * CHANGE allow explicit sample interval for u and v using pseudofile '++'
 * CHANGE decouple cbrange from color components in "with rgbimage"
 * FIX reconcile aspect ratio flags from "set view map" and "set view equal xy"

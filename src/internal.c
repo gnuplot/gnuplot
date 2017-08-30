@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.96.2.1 2017/06/14 00:42:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.96.2.2 2017/07/15 03:59:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -42,6 +42,7 @@ static char *RCSid() { return RCSid("$Id: internal.c,v 1.96.2.1 2017/06/14 00:42
 #include "util.h"	/* for int_error() */
 #include "gp_time.h"	/* for str(p|f)time */
 #include "command.h"	/* for do_system_func */
+#include "datablock.h"	/* for datablock_size() */
 #include "variable.h"	/* for locale handling */
 #include "parse.h"	/* for string_result_only */
 
@@ -1317,18 +1318,25 @@ f_index(union argument *arg)
     (void) pop(&index);
     (void) pop(&array);
 
-    if (array.type != ARRAY)
-	int_error(NO_CARET, "internal error: attempt to index non-array variable");
-
     if (index.type == INTGR)
 	i = index.v.int_val;
     else if (index.type == CMPLX)
 	i = floor(index.v.cmplx_val.real);
 
-    if (i <= 0 || i > array.v.value_array[0].v.int_val) 
-	int_error(NO_CARET, "array index out of range");
+    if (array.type == ARRAY) {
+	if (i <= 0 || i > array.v.value_array[0].v.int_val) 
+	    int_error(NO_CARET, "array index out of range");
+	push( &array.v.value_array[i] );
 
-    push( &array.v.value_array[i] );
+    } else if (array.type == DATABLOCK) {
+	i--;	/* line numbers run from 1 to nlines */
+	if (i < 0 || i >= datablock_size(&array))
+	    int_error(NO_CARET, "datablock index out of range");
+	push( Gstring(&array, array.v.data_array[i]) );
+    }
+
+    else
+	int_error(NO_CARET, "internal error: attempt to index a scalar variable");
 }
 
 /*
@@ -1338,13 +1346,18 @@ void
 f_cardinality(union argument *arg)
 {
     struct value array;
+    int size;
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&array);
 
-    if (array.type != ARRAY)
-	int_error(NO_CARET, "internal error: cardinality of a non-array variable");
+    if (array.type == ARRAY)
+	size = array.v.value_array[0].v.int_val;
+    else if (array.type == DATABLOCK)
+	size = datablock_size(&array);
+    else
+	int_error(NO_CARET, "internal error: cardinality of a scalar variable");
 
-    push(Ginteger(&array, array.v.value_array[0].v.int_val));
+    push(Ginteger(&array, size));
 }
 
 /* Magic number! */

@@ -1,5 +1,5 @@
 /*
- * $Id: datablock.c,v 1.8 2016/03/18 05:43:54 sfeam Exp $
+ * $Id: datablock.c,v 1.8.2.1 2017/06/05 20:40:28 sfeam Exp $
  */
 /* GNUPLOT - datablock.c */
 
@@ -198,22 +198,28 @@ gpfree_datablock(struct value *datablock_value)
     datablock_value->v.data_array = NULL;
 }
 
-
-/* resize or allocate a datablock; allocate memory in chuncks */
-static int
-enlarge_datablock(struct value *datablock_value, int extra)
+/* count number of lines in a datablock */
+int
+datablock_size(struct value *datablock_value)
 {
     char **dataline;
     int nlines = 0;
-    int osize, nsize;
-    const int blocksize = 512;
 
-    /* count number of lines in datablock */
     dataline = datablock_value->v.data_array;
     if (dataline) {
 	while (*dataline++)
 	    nlines++;
     }
+    return nlines;
+}
+
+/* resize or allocate a datablock; allocate memory in chuncks */
+static int
+enlarge_datablock(struct value *datablock_value, int extra)
+{
+    int osize, nsize;
+    const int blocksize = 512;
+    int nlines = datablock_size(datablock_value);
 
     /* reserve space in multiples of blocksize */
     osize = ((nlines+1 + blocksize-1) / blocksize) * blocksize; 

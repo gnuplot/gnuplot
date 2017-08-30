@@ -1,4 +1,16 @@
-2017-08-15  Bastian Maerkisch  <bmaerkisch@web.de>
+2017-08-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* win/README-Windows.txt:  Update as per advice from Tatsuro Matsuoka.
+
+	* src/command.c src/datablock.c src/datablock.h src/internal.c
+	src/parse.c src/util.c:  Extend array syntax to named datablocks.
+	|$DATABLOCK| gives the number of lines in the block.
+	$DATABLOCK[n] returns line n as a string.  Back-ported from 5.3
+
+	* demo/stringvar.dem:  Use the new syntax to avoid creating a temporary
+	file during execution of the demo.
+
+2017-08-29  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (CopyPrint):  Check return values of GDI print API
 	function calls.
@@ -24,7 +36,7 @@
 
 2017-08-22  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/grahics.c src/graphics.h(rgbscale) demo/image.dem demo/image2.dem:
+	* src/graphics.c src/graphics.h demo/image.dem demo/image2.dem:
 	Since we have decoupled cbrange from rgbimage, the image demos need
 	to change accordingly.  Add a placeholder macro rgbscale(colorval)
 	that for now only enforces that color components are in [0:255] but

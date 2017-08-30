@@ -5,34 +5,17 @@ Please see the ChangeLog file for a complete list of changes made during the
 course of development from 5.0 to 5.2.  Thank you to everyone who provided
 feedback and testing on the release candidates for this version.
 
-Release Notes date: 28-Aug-2017
+Release Notes date: 30-Aug-2017
 
-CHANGES SINCE FIRST RELEASE CANDIDATE
+CHANGES SINCE FINAL RELEASE CANDIDATE
 =====================================
--final
-
 * NEW user-defined dashtypes in metapost terminal
+* NEW datablock contents may be accessed as an indexed array of strings
 * CHANGE allow explicit sample interval for u and v using pseudofile '++'
 * CHANGE decouple cbrange from color components in "with rgbimage"
 * FIX reconcile aspect ratio flags from "set view map" and "set view equal xy"
 * FIX GPVAL_* variables were not being updated in "set table" mode
 * FIX evaluation of nested iteration containing an empty range
-
--rc3
-
-* NEW: revised "plot with table" can handle string-valued output columns
-* CHANGE: revised pipe support on Windows when built with MinGW-64 or MSVC
-* FIX: minor bugs in use of gnuplot variables by "fit" command
-
--rc2
-
-* FIX: terminal initialization must complete before executing ~/.gnuplot
-* FIX: incorrect clipping of polar border and raxis
-* FIX: add sanity checks to detect and handle various types of bad input data
-       or command syntax found by fuzz-testing
-* FIX: windows terminal (various minor tweaks)
-* FIX: if 'fit' was invoked inside a bracketed clause, the string containing
-       the command was mishandled.
 
 
 FEATURES INTRODUCED IN VERSION 5.2
@@ -46,6 +29,7 @@ FEATURES INTRODUCED IN VERSION 5.2
 	o hidden3d now treats 'image' and 'rgbimage' as occluding rectangles
 	o "smooth fnormal" plots normalized frequency
 	o allow sampling interval in range specifiers for pseudofiles '+' '++'
+	o "plot with table" can handle string-valued output columns
 
 * NEW polar mode improvements and extensions
 	o "set [m]ttics" places theta tics and labels on perimeter of polar grid
