@@ -1,3 +1,10 @@
+2017-08-31  Martin Saturka  <kvutza@users.sf.net>
+
+	* src/mousecmn.h src/mouse.c:  Bind the < and > keys to change the
+	current azimuth setting while mousing 3D plots.
+	(EAM) add an internal flag "Opt-" so that you can bind a hotkey for
+	which the Alt and Ctrl modifiers are optional rather than required.
+
 2017-08-28  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/mingw/Makefile:  Fix target name of generated dependencies

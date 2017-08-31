@@ -1,5 +1,5 @@
 /*
- * $Id: mousecmn.h,v 1.18 2014/12/14 19:39:38 markisch Exp $
+ * $Id: mousecmn.h,v 1.19 2016/09/28 14:46:18 markisch Exp $
  */
 
 /* GNUPLOT - mousecnm.h */
@@ -78,8 +78,11 @@ enum {
 
 
 /* the status of the shift, ctrl and alt keys
-*/
-enum { Mod_Shift = (1), Mod_Ctrl = (1 << 1), Mod_Alt = (1 << 2) };
+ * Mod_Opt is used by the "bind" mechanism to indicate that the
+ * Ctrl or Alt key is allowed but not required
+ */
+enum { Mod_Shift = (1), Mod_Ctrl = (1 << 1), Mod_Alt = (1 << 2),
+       Mod_Opt = (1 << 3) };
 
 /* the below depends on the ascii character set lying in the
  * range from 0 to 255 (below 1000) */
