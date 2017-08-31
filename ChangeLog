@@ -1,3 +1,8 @@
+2017-08-31  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/term-ja.diff docs/faq-ja.tex docs/gnuplot-ja.doc:
+	Update Japanese documentation for 5.2 release
+
 2017-08-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* win/README-Windows.txt win/README-Windows-jp.txt:  Update and
