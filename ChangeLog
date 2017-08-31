@@ -1,8 +1,7 @@
 2017-08-30  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* win/README-Windows.txt:  Update as per advice from Tatsuro Matsuoka.
-	* win/README-Windows-jp.txt:  updated translation courtesy of
-	Tatsuro Matsuoka and Shigeharu Takeno.
+	* win/README-Windows.txt win/README-Windows-jp.txt:  Update and
+	translation courtesy of Tatsuro Matsuoka and Shigeharu Takeno.
 
 	* docs/gnuplot.doc:  Expand section on real/int/hex/octal constants.
 
