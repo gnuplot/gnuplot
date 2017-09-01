@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.102 2017/06/14 07:43:39 markisch Exp $
+ * $Id: winmain.c,v 1.103 2017/07/29 08:35:44 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -124,11 +124,12 @@ char *authors[]={
 void WinExit(void);
 static void WinCloseHelp(void);
 int CALLBACK ShutDown();
+static BOOL WINAPI ConsoleHandler(DWORD dwType);
 #ifdef WGP_CONSOLE
 static int ConsolePutS(const char *str);
 static int ConsolePutCh(int ch);
-static BOOL WINAPI ConsoleHandler(DWORD dwType);
 #endif
+
 
 static void
 CheckMemory(LPTSTR str)
@@ -608,9 +609,10 @@ main(int argc, char **argv)
 	GetConsoleMode(handle, &mode);
 	SetConsoleMode(handle, mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
     }
+#endif
+
     // set console mode handler to catch "abort" signals
     SetConsoleCtrlHandler(ConsoleHandler, TRUE);
-#endif
 
     gp_atexit(WinExit);
 
@@ -972,7 +974,8 @@ fake_popen(const char * command, const char * type)
     char tmpfile[MAX_PATH];
     DWORD ret;
 
-    if (type == NULL) return NULL;
+    if (type == NULL)
+	return NULL;
 
     pipe_type = NUL;
     if (pipe_filename != NULL)
@@ -1228,6 +1231,7 @@ ConsolePutCh(int ch)
     }
     return ch;
 }
+#endif
 
 
 /* This is called by the system to signal various events. 
@@ -1239,13 +1243,19 @@ ConsoleHandler(DWORD dwType)
     case CTRL_CLOSE_EVENT:
     case CTRL_LOGOFF_EVENT:
     case CTRL_SHUTDOWN_EVENT: {
+#ifdef WGP_CONSOLE
 	HANDLE h;
 	INPUT_RECORD rec;
 	DWORD written;
+#endif
 
 	// NOTE: returning from this handler terminates the application.
 	// Instead, we signal the main thread to clean up and exit and
 	// then idle by sleeping.
+#ifndef WGP_CONSOLE
+	// close the main window to exit gnuplot
+	PostMessage(textwin.hWndParent, WM_CLOSE, 0, 0);
+#else
 	terminate_flag = TRUE;
 	// send ^D to main thread input queue
 	h = GetStdHandle(STD_INPUT_HANDLE);
@@ -1255,6 +1265,7 @@ ConsoleHandler(DWORD dwType)
 	rec.Event.KeyEvent.wRepeatCount = 1;
 	rec.Event.KeyEvent.uChar.AsciiChar = 004;
 	WriteConsoleInput(h, &rec, 1, &written);
+#endif
 	// give the main thread time to exit
 	Sleep(10000);
 	return TRUE;
@@ -1264,7 +1275,6 @@ ConsoleHandler(DWORD dwType)
     }
     return FALSE;
 }
-#endif
 
 
 /* public interface to printer routines : Windows PRN emulation

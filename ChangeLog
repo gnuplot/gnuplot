@@ -1,3 +1,9 @@
+2017-09-01  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/winmain.c (ConsoleHandler):  Install the console handler
+	also for wgnuplot and wgnuplot_pipes.  Avoids segfaults when closing
+	the wgnuplot_pipes console window or the caca terminal console window.
+
 2017-08-31  Martin Saturka  <kvutza@users.sf.net>
 
 	* src/mousecmn.h src/mouse.c:  Bind the < and > keys to change the
@@ -185,7 +191,7 @@
 	* config/watcom/Makefile:  Avoid expanding macros when extending the
 	list of objects to build.
 
-	* config/ming/Makefile:  Strip decorations when creating a 32bit
+	* config/mingw/Makefile:  Strip decorations when creating a 32bit
 	library by using the -k option of dlltool. Revert the incorrect
 	redirection change made on 2017-07-27.
 	Bug #1942
