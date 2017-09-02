@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1104 2017/08/18 19:34:06 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1105 2017/08/30 20:30:12 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7070,6 +7070,9 @@ Ffigure_fenceplot
  Ranges specified on the `plot` or `splot` command line affect only that one
  graph; use the `set xrange`, `set yrange`, etc., commands to change the
  default ranges for future graphs.
+
+ The use of on-the-fly range specifiers in a plot command may not yield
+ the expected result for linked axes (see `set link`).
 
  For time data you must provide the range in quotes, using the same format
  used to read time from the datafile.  See `set timefmt`.

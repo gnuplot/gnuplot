@@ -1,3 +1,12 @@
+2017-09-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (parse_range eval_link_function) docs/gnuplot.doc:
+	Attempt to handle the case of linked axes (x+x2 or y+y2) and an in-line
+	range specifier in the plot statement.  This fix only addresses simple
+	cases, such as
+	    set link x2;  plot [x=min:max] something-using-x2 axes x2y1
+	Recommend to use separate "set xrange ... set yrange ..." instead.
+
 2017-09-01  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/winmain.c (ConsoleHandler):  Install the console handler

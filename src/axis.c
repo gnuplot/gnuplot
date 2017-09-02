@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.238 2017/08/18 19:34:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.239 2017/08/24 23:32:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -2229,12 +2229,8 @@ char *c, *cfmt;
     free(cfmt);
 }
 
-/*
- * EAM Nov 2012
- * This routine used to be macros PARSE_RANGE, PARSE_NAMED_RANGE
- */
-
 /* Accepts a range of the form [MIN:MAX] or [var=MIN:MAX]
+ * Loads new limiting values into axis->min axis->max 
  * Returns
  *	 0 = no range spec present
  *	-1 = range spec with no attached variable name
@@ -2259,6 +2255,18 @@ parse_range(AXIS_INDEX axis)
 	    AXIS *primary = this_axis->linked_to_primary;
 	    primary->min = eval_link_function(primary, this_axis->min);
 	    primary->max = eval_link_function(primary, this_axis->max);
+	}
+
+	/* DEBUG 2 Sep 2017
+	 * This handles (imperfectly) the problem case
+	 *    set link x2 via f(x) inv g(x)
+	 *    plot [x=min:max][] something that involves x2
+	 * Other cases of in-line range changes on a linked axis may fail
+	 */
+	else if (this_axis->linked_to_secondary) {
+	    AXIS *secondary = this_axis->linked_to_secondary;
+	    if (secondary->link_udf != NULL && secondary->link_udf->at != NULL)
+		clone_linked_axes(this_axis, secondary);
 	}
 
 	if (axis == SAMPLE_AXIS || axis == T_AXIS || axis == U_AXIS || axis == V_AXIS) {
@@ -2361,6 +2369,10 @@ eval_link_function(struct axis *axis, double raw_coord)
 	}
     }
 
+    /* This handles the case "set link x2" with no via/inverse mapping */
+    if (link_udf == NULL || link_udf->at == NULL)
+	return raw_coord;
+
     if (abs(axis->index) == FIRST_Y_AXIS || abs(axis->index) == SECOND_Y_AXIS)
 	dummy_var = 1;
     else
@@ -2368,9 +2380,6 @@ eval_link_function(struct axis *axis, double raw_coord)
     link_udf->dummy_values[1-dummy_var].type = INVALID_NAME;
 
     Gcomplex(&link_udf->dummy_values[dummy_var], raw_coord, 0.0);
-
-    if (link_udf->at == NULL)
-	int_error(NO_CARET,"corrupt axis link");
 
     evaluate_at(link_udf->at, &a);
 
