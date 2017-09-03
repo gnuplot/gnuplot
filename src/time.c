@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: time.c,v 1.31 2015/10/22 16:16:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: time.c,v 1.32 2017/07/14 19:16:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - time.c */
@@ -37,8 +37,8 @@ static char *RCSid() { return RCSid("$Id: time.c,v 1.31 2015/10/22 16:16:52 sfea
 
 /* This module either adds a routine gstrptime() to read a formatted time,
  * augmenting the standard suite of time routines provided by ansi,
- * or it completely replaces the whole lot with a new set of routines,
- * which count time relative to the year 2000. Default is to use the
+ * or it completely replaces the whole lot with a new set of routines
+ * which count time relative to the EPOCH date. Default is to use the
  * new routines. Define USE_SYSTEM_TIME to use the system routines, at your
  * own risk. One problem in particular is that not all systems allow
  * the time with integer value 0 to be represented symbolically, which
@@ -95,8 +95,8 @@ gdysize(int yr)
 
 
 /* new strptime() and gmtime() to allow time to be read as 24 hour,
- * and spaces in the format string. time is converted to seconds from
- * year 2000.... */
+ * and spaces in the format string. time is converted to seconds from 
+ * the EPOCH date */
 
 char *
 gstrptime(char *s, char *fmt, struct tm *tm, double *usec)
@@ -538,12 +538,15 @@ xstrftime(
 			/* Set flag in case minutes come next */
 			if (fulltime < 0) {
 			    CHECK_SPACE(1);	/* the minus sign */
-			    sign_printed = TRUE;
 			    *s++ = '-';
 			    l++;
 			}
+			sign_printed = TRUE;
 			/* +/- integral hour truncated toward zero */
 			sprintf(s, "%0*d", w, (int)floor(fabs(fulltime/3600.)));
+
+			/* Subtract the hour component from the total */
+			fulltime -= sgn(fulltime) * 3600. * floor(fabs(fulltime/3600.));
 			break;
 		    case 'M':
 			/* +/- fractional minutes (not wrapped at 60m) */
@@ -554,19 +557,20 @@ xstrftime(
 			    break;
 			}
 			/* +/- integral minute truncated toward zero */
-			tminute = floor(60. * (fabs(fulltime/3600.) - floor(fabs(fulltime/3600.))));
-			if (fulltime < 0) {
-			    if (!sign_printed) {
-				sign_printed = TRUE;
+			tminute = floor((fabs(fulltime/60.)));
+			if (fulltime < 0 && !sign_printed) {
 				*s++ = '-';
 				l++;
-			    }
 			}
+			sign_printed = TRUE;
 			FORMAT_STRING(1, 2, tminute);	/* %02d */
+
+			/* Subtract the minute component from the total */
+			fulltime -= sgn(fulltime) * 60. * floor(fabs(fulltime/60.));
 			break;
 		    case 'S':
 			/* +/- fractional seconds */
-			tsecond = floor(60. * (fabs(fulltime/60.) - floor(fabs(fulltime/60.))));
+			tsecond = floor(fabs(fulltime));
 			if (fulltime < 0) {
 			    if (usec > 0)
 				usec = 1.0 - usec;
