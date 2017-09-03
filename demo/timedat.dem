@@ -1,5 +1,5 @@
 #
-# $Id: timedat.dem,v 1.12 2014/11/07 00:16:46 sfeam Exp $
+# $Id: timedat.dem,v 1.13 2015/10/23 21:23:39 sfeam Exp $
 #
 
 set title "Fsteps plot\nwith date and time as x-values"
@@ -58,5 +58,17 @@ set tmargin at screen .6
 plot x notitle
 
 pause -1 "Hit return to continue"
+
+t = -3672.5
+print 't = ',t
+print 'print strftime("%.2tM == %.2tS", t)' , "	", strftime("%.2tM min == %.2tS sec", t)
+print 'print strftime("%tM:%.2tS", t)  ' , "	", strftime("%tM:%.2tS", t)
+print 'print strftime("%tH:%tM:%.2tS", t)' , "	", strftime("%tH:%tM:%.2tS", t)
+
+t = 3672.5
+print 't = ',t
+print 'print strftime("%.2tM == %.2tS", t)' , "	", strftime("%.2tM min == %.2tS sec", t)
+print 'print strftime("%tM:%.2tS", t)  ' , "	", strftime("%tM:%.2tS", t)
+print 'print strftime("%tH:%tM:%.2tS", t)' , "	", strftime("%tH:%tM:%.2tS", t)
 
 reset

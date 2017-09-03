@@ -8,6 +8,7 @@ Changes since 5.2.rc4
 * FIX "set key fixed" should be ignored in the case of "set view map"
 * FIX GPVAL_* variables were not being updated in "set table" mode
 * FIX evaluation of nested iteration containing an empty range
+* FIX bug in variant time_spec formats %tH %tM (undesired wrapping)
 
 Changes in 5.2.rc3
 ==================

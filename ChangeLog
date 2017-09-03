@@ -2,6 +2,10 @@
 
 	* PATCHLEVEL src/version.c:  Update versioning for 5.2 release
 
+	* src/time.c (xstrftime):  The variant format specs for time
+	%tH %tM did not behave as documented in that hours wrapped at 24 and
+	minutes at 60 if a decimal precision modifier was not present.
+
 2017-09-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (parse_range eval_link_function) docs/gnuplot.doc:
