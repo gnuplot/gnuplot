@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.ac,v 1.36 2017/07/17 05:40:45 sfeam Exp $
+dnl $Id: configure.ac,v 1.37 2017/08/01 00:56:20 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -1134,18 +1134,18 @@ if test "${enable_qt}" = yes ; then
     PKG_CHECK_MODULES_NOFAIL(QT, [QtCore >= 4.5 QtGui >= 4.5 QtNetwork >= 4.5 QtSvg >= 4.5])
     if test $pkg_failed != no; then
       enable_qt_ok=no
-      AC_MSG_WARN([The Qt terminal will not be compiled.])
+      AC_MSG_RESULT([The Qt terminal will not be compiled.])
     else
       QT4LOC=`$PKG_CONFIG --variable=exec_prefix QtCore`
       UIC=`$PKG_CONFIG --variable=uic_location QtCore`
       MOC=`$PKG_CONFIG --variable=moc_location QtCore`
       RCC=`$PKG_CONFIG --variable=rcc_location QtCore`
       LRELEASE=`$PKG_CONFIG --variable=lrelease_location QtCore`
-      AC_MSG_WARN([The Qt terminal will use Qt4.])
+      AC_MSG_RESULT([The Qt terminal will use Qt4.])
       QTVER="4"
     fi
   else
-    AC_MSG_WARN([The Qt terminal will use Qt5.])
+    AC_MSG_RESULT([The Qt terminal will use Qt5.])
     QTVER="5"
   fi
 fi
