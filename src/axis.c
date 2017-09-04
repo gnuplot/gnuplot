@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.239 2017/08/24 23:32:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.240 2017/09/03 03:35:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -2302,7 +2302,7 @@ parse_skip_range()
 void
 clone_linked_axes(AXIS *axis1, AXIS *axis2)
 {
-    double testmin, testmax;
+    double testmin, testmax, scale;
     TBOOLEAN suspect = FALSE;
 
     memcpy(axis2, axis1, AXIS_CLONE_SIZE);
@@ -2316,18 +2316,33 @@ clone_linked_axes(AXIS *axis1, AXIS *axis2)
 	axis2->min = eval_link_function(axis2, axis1->min);
 	axis2->max = eval_link_function(axis2, axis1->max);
 
-    /* Confirm that the inverse mapping actually works, at least at the endpoints */
+	/* Confirm that the inverse mapping actually works, at least at the endpoints.
+
+	We makes sure that inverse_f( f(x) ) = x at the edges of our plot
+	bounds, and if not, we throw a warning, and we try to be robust to
+	numerical-precision errors causing false-positive warnings. We look at
+	the error relative to a scaling:
+
+	   (inverse_f( f(x) ) - x) / scale
+
+	where the scale is the mean of (x(min edge of plot), x(max edge of
+	plot)). I.e. we only care about errors that are large on the scale of
+	the plot bounds we're looking at.
+	*/
+
 	if (isnan(axis2->set_min) || isnan(axis2->set_max))
 	    suspect = TRUE;
 	testmin = eval_link_function(axis1, axis2->set_min);
 	testmax = eval_link_function(axis1, axis2->set_max);
+	scale = (fabs(axis1->set_min) + fabs(axis1->set_max))/2.0;
+
 	if (isnan(testmin) || isnan(testmax))
 	    suspect = TRUE;
 	if (fabs(testmin - axis1->set_min) != 0
-	&&  fabs((testmin - axis1->set_min) / testmin) > 1.e-6)
+	&&  fabs((testmin - axis1->set_min) / scale) > 1.e-6)
 	    suspect = TRUE;
 	if (fabs(testmax - axis1->set_max) != 0
-	&&  fabs((testmax - axis1->set_max) / testmax) > 1.e-6)
+	&&  fabs((testmax - axis1->set_max) / scale) > 1.e-6)
 	    suspect = TRUE;
 
 	if (suspect) {
@@ -2339,8 +2354,21 @@ clone_linked_axes(AXIS *axis1, AXIS *axis2)
 		goto inverse_function_sanity_check;
 	    }
 	    int_warn(NO_CARET, "could not confirm linked axis inverse mapping function");
-	    fprintf(stderr,"\tmin: %g inv(via(min)): %g", axis1->set_min, testmin);
-	    fprintf(stderr,"  max: %g inv(via(max)): %g\n", axis1->set_max, testmax);
+	    fprintf(stderr, "\t");
+	    fprintf(stderr, "axis1: (set_min,min,testmin) = (%g,%g,%g); ",
+		    axis1->set_min,
+		    axis1->min,
+		    testmin);
+	    fprintf(stderr, "axis1: (set_max,max,testmax) = (%g,%g,%g); ",
+		    axis1->set_max,
+		    axis1->max,
+		    testmax);
+	    fprintf(stderr, "axis2: (set_min,min) = (%g,%g); ",
+		    axis1->set_min,
+		    axis1->min);
+	    fprintf(stderr, "axis2: (set_max,max) = (%g,%g)\n",
+		    axis1->set_max,
+		    axis1->max);
 	}
 }
 

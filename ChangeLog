@@ -1,3 +1,9 @@
+2017-09-04  Dima Kogan  <dima@secretsauce.net>
+
+	* src/axis.c (clone_linked_axes):  When sanity checking the via/inverse
+	mapping functions for linked or nonlinear axes, adjust the allowable
+	difference by a scale factor related to the axis range.
+
 2017-09-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c src/tables.c src/tables.h src/unset.c src/util.c
