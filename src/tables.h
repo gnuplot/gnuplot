@@ -1,5 +1,5 @@
 /*
- * $Id: tables.h,v 1.102 2017/02/14 21:49:17 sfeam Exp $
+ * $Id: tables.h,v 1.103 2017/05/20 01:27:30 sfeam Exp $
  */
 
 /* GNUPLOT - tables.h */
@@ -116,7 +116,8 @@ enum set_id {
     S_RTICS, S_RRANGE, S_RAXIS, S_RLABEL, S_PAXIS, S_TTICS, S_MTTICS, 
 
     S_ZERO, S_ZEROAXIS, S_XZEROAXIS, S_X2ZEROAXIS, S_YZEROAXIS, S_Y2ZEROAXIS,
-    S_ZZEROAXIS
+    S_ZZEROAXIS,
+    S_DEBUG
 };
 
 enum set_hidden3d_id {

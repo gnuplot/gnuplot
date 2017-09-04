@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.566 2017/08/01 01:07:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.567 2017/08/05 15:35:37 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -269,6 +269,12 @@ set_command()
 	    break;
 	case S_DGRID3D:
 	    set_dgrid3d();
+	    break;
+	case S_DEBUG:
+	    /* Developer-only option (not in user documentation) */
+	    /* Does nothing in normal use */
+	    c_token++;
+	    debug = int_expression();
 	    break;
 	case S_DECIMALSIGN:
 	    set_decimalsign();

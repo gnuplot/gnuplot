@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.255 2017/07/05 18:31:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.256 2017/08/01 00:56:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -218,6 +218,10 @@ unset_command()
 	break;
     case S_DGRID3D:
 	unset_dgrid3d();
+	break;
+    case S_DEBUG:
+	debug = 0;
+	c_token++;
 	break;
     case S_DUMMY:
 	unset_dummy();
