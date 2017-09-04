@@ -4,6 +4,9 @@
 	mapping functions for linked or nonlinear axes, adjust the allowable
 	difference by a scale factor related to the axis range.
 
+	* configure.ac:  Add $LIBRARIES_FOR_X to WX_LIBS so that it pickes
+	up -lX11 as required by wxgtk3
+
 2017-09-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c src/tables.c src/tables.h src/unset.c src/util.c

@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.ac,v 1.37 2017/08/01 00:56:20 sfeam Exp $
+dnl $Id: configure.ac,v 1.38 2017/09/04 05:57:38 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -980,7 +980,7 @@ fi
 
 if test "${enable_wxwidgets_ok}" = yes ; then
   WX_CXXFLAGS="`$WX_CONFIG --cxxflags | sed 's/-fno-exceptions//'` $CAIROPANGO_CFLAGS"
-  WX_LIBS="`$WX_CONFIG --libs` $CAIROPANGO_LIBS"
+  WX_LIBS="`$WX_CONFIG --libs` $CAIROPANGO_LIBS $LIBRARIES_FOR_X"
 
   dnl Check for fork(), used for the 'persist' effect
   AC_FUNC_FORK
