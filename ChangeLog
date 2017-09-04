@@ -1,3 +1,13 @@
+2017-09-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c src/axis.h src/datafile.c src/gp_time.h src/gp_types.h
+	src/internal.c src/time.c demo/timedat.dem docs/gnuplot.doc:
+	Gnuplot already supports relative time format specifiers %tH %tM %tS
+	for output via strftime() and in the time format for axis tic labels.
+	Now we add the same format specifiers as an option for input via
+	strptime().  They can also be used to read data fields containing 
+	degrees/minutes/seconds.
+
 2017-09-04  Dima Kogan  <dima@secretsauce.net>
 
 	* src/axis.c (clone_linked_axes):  When sanity checking the via/inverse

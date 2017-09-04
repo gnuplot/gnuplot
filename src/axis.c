@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.240 2017/09/03 03:35:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.241 2017/09/04 21:36:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1677,7 +1677,7 @@ get_num_or_time(struct axis *axis)
 	struct tm tm;
 	double usec;
 	char *ss = try_to_get_string();
-	if (gstrptime(ss,timefmt,&tm,&usec))
+	if (gstrptime(ss, timefmt, &tm,&usec, &value) == DT_TIMEDATE)
 	    value = (double) gtimegm(&tm) + usec;
 	free(ss);
     } else {

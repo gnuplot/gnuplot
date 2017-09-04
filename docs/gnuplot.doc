@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1105 2017/08/30 20:30:12 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1106 2017/09/03 03:35:30 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -14088,6 +14088,10 @@ Ffigure_multiple_keys
  If the xtics are left in the default state (`set xtics numeric`) the coordinate
  will be reported as a decimal number of degrees, and `format` will be assumed
  to contain normal numeric format specifiers rather than the special set above.
+
+ To output degrees/minutes/seconds in a context other than axis tics, such as
+ placing labels on a map, you can use the relative time format specifiers
+ %tH %tM %tS for strptime.  See `time_specifiers`, `strptime`.
 4 xtics rangelimited
 ?set xtics rangelimited
 ?xtics rangelimited
