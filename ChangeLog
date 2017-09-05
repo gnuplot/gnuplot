@@ -1,4 +1,4 @@
-2017-09-04  Ethan A Merritt  <merritt@u.washington.edu>
+2017-09-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c src/axis.h src/datafile.c src/gp_time.h src/gp_types.h
 	src/internal.c src/time.c demo/timedat.dem docs/gnuplot.doc:
