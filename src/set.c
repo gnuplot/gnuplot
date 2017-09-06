@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.558.2.2 2017/08/02 01:45:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.558.2.3 2017/08/12 06:55:45 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -110,7 +110,7 @@ static void set_margin __PROTO((t_position *));
 static void set_minus_sign __PROTO((void));
 static void set_micro __PROTO((void));
 static void set_missing __PROTO((void));
-static void set_separator __PROTO((void));
+static void set_separator __PROTO((char **));
 static void set_datafile_commentschars __PROTO((void));
 static void set_monochrome __PROTO((void));
 #ifdef USE_MOUSE
@@ -375,7 +375,7 @@ set_command()
 	    if (almost_equals(++c_token,"miss$ing"))
 		set_missing();
 	    else if (almost_equals(c_token,"sep$arators"))
-		set_separator();
+		set_separator(&df_separators);
 	    else if (almost_equals(c_token,"com$mentschars"))
 		set_datafile_commentschars();
 	    else if (almost_equals(c_token,"bin$ary"))
@@ -2881,11 +2881,11 @@ set_minus_sign()
 }
 
 static void
-set_separator()
+set_separator(char **xx_separators)
 {
     c_token++;
-    free(df_separators);
-    df_separators = NULL;
+    free(*xx_separators);
+    *xx_separators = NULL;
 
     if (END_OF_COMMAND)
 	return;
@@ -2893,12 +2893,12 @@ set_separator()
     if (almost_equals(c_token, "white$space")) {
 	c_token++;
     } else if (equals(c_token, "comma")) {
-	df_separators = gp_strdup(",");
+	*xx_separators = gp_strdup(",");
 	c_token++;
     } else if (equals(c_token, "tab") || equals(c_token, "\'\\t\'")) {
-	df_separators = gp_strdup("\t");
+	*xx_separators = gp_strdup("\t");
 	c_token++;
-    } else if (!(df_separators = try_to_get_string())) {
+    } else if (!(*xx_separators = try_to_get_string())) {
 	int_error(c_token, "expected \"<separator_char>\"");
     }
 }
@@ -4845,6 +4845,10 @@ set_table()
 	if (!(table_outfile = fopen(tablefile, (append ? "a" : "w"))))
 	   os_error(filename_token, "cannot open table output file");
 	free(tablefile);
+    }
+
+    if (almost_equals(c_token,"sep$arator")) {
+	set_separator(&table_sep);
     }
 
     table_mode = TRUE;
