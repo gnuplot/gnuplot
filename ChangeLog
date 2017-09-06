@@ -1,3 +1,27 @@
+2017-09-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	Several additions already in 5.3 but held back from 5.2 during -rc testing
+
+	* src/set.c (set_separator) src/show.c (show_table):  New command option
+	    set table {separator {comma|tab|whitespace|"<char>"}}
+	allows "plot with table" to create csv files.
+
+	* src/tabulate.c:  Handle splot with rgbimage, rgbalpha
+
+	* src/graphics.h src/graphics.c src/graph3d.c:  The 2D routine
+	attach_title_to_plot() can be shared by the 3D code in order to support
+	"splot ... with lines title at {beg|end}".
+
+	* src/qtterminal/QtGnuplotScene.cpp":
+	 QtAlign::foo properties are bit definitions, not integers
+
+2017-09-06  Martin Saturka  <kvutza@users.sf.net>
+
+	* src/mousecmn.h src/mouse.c:  Bind the < and > keys to change the
+	current azimuth setting while mousing 3D plots.
+	(EAM) add an internal flag "Opt-" so that you can bind a hotkey for
+	which the Alt and Ctrl modifiers are optional rather than required.
+
 Release 5.2.0
 
 2017-09-03  Ethan A Merritt  <merritt@u.washington.edu>

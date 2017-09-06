@@ -1,5 +1,11 @@
-Changes since 5.2.rc4
-====================
+Changes in 5.2.1
+================
+* NEW set table separator {tab|comma|"char"}
+* NEW hotkey for changing azimuth in 3D plots with mousing
+* NEW splot ... with lines title at {beg|end}
+
+Changes in 5.2.0
+================
 * NEW user-defined dashtypes in metapost terminal
 * NEW datablock contents may be accessed as an indexed array of strings
 * CHANGE allow explicit sample interval for u and v using pseudofile '++'
