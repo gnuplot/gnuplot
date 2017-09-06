@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.198 2017/04/01 18:09:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.199 2017/05/16 03:22:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -183,6 +183,7 @@ static void UpdateStatuslineWithMouseSetting __PROTO((mouse_setting_t * ms));
 
 static void event_keypress __PROTO((struct gp_event_t * ge, TBOOLEAN current));
 static void ChangeView __PROTO((int x, int z));
+static void ChangeAzimuth __PROTO((int x));
 static void event_buttonpress __PROTO((struct gp_event_t * ge));
 static void event_buttonrelease __PROTO((struct gp_event_t * ge));
 static void event_motion __PROTO((struct gp_event_t * ge));
@@ -224,6 +225,8 @@ static char *builtin_rotate_right __PROTO((struct gp_event_t * ge));
 static char *builtin_rotate_up __PROTO((struct gp_event_t * ge));
 static char *builtin_rotate_left __PROTO((struct gp_event_t * ge));
 static char *builtin_rotate_down __PROTO((struct gp_event_t * ge));
+static char *builtin_azimuth_left __PROTO((struct gp_event_t * ge));
+static char *builtin_azimuth_right __PROTO((struct gp_event_t * ge));
 static char *builtin_cancel_zoom __PROTO((struct gp_event_t * ge));
 static char *builtin_zoom_in_around_mouse __PROTO((struct gp_event_t * ge));
 static char *builtin_zoom_out_around_mouse __PROTO((struct gp_event_t * ge));
@@ -1354,6 +1357,26 @@ builtin_rotate_down(struct gp_event_t *ge)
 }
 
 static char *
+builtin_azimuth_left(struct gp_event_t *ge)
+{
+    if (!ge)
+	return "`rotate azimuth left in 3d`; <ctrl> faster";
+    if (is_3d_plot)
+	ChangeAzimuth(-1);
+    return (char *) 0;
+}
+
+static char *
+builtin_azimuth_right(struct gp_event_t *ge)
+{
+    if (!ge)
+	return "`rotate azimuth right in 3d`; <ctrl> faster";
+    if (is_3d_plot)
+	ChangeAzimuth(1);
+    return (char *) 0;
+}
+
+static char *
 builtin_cancel_zoom(struct gp_event_t *ge)
 {
     if (!ge) {
@@ -1488,6 +1511,31 @@ ChangeView(int x, int z)
 	recalc_statusline();
     }
 }
+
+static void
+ChangeAzimuth(int x)
+{
+    /* Can't use Mod_Shift because keyboards differ on the */
+    /* shift status of the < and > keys. */
+    if (modifier_mask & Mod_Ctrl)
+	x *= 10;
+
+    if (x) {
+	azimuth += x;
+	if (azimuth < 0)
+	    azimuth += 360;
+	if (azimuth > 360)
+	    azimuth -= 360;
+
+	fill_gpval_float("GPVAL_VIEW_AZIMUTH", azimuth);
+    }
+
+    if (display_ipc_commands())
+	fprintf(stderr, "changing azimuth to %f.\n", azimuth);
+
+    do_save_3dplot(first_3dplot, plot3d_num, 0 /* not quick */ );
+}
+
 
 int is_mouse_outside_plot(void)
 {
@@ -2453,6 +2501,8 @@ bind_install_default_bindings()
     bind_append("Up", (char *) 0, builtin_rotate_up);
     bind_append("Left", (char *) 0, builtin_rotate_left);
     bind_append("Down", (char *) 0, builtin_rotate_down);
+    bind_append("Opt-<", (char *) 0, builtin_azimuth_left);
+    bind_append("Opt->", (char *) 0, builtin_azimuth_right);
     bind_append("Escape", (char *) 0, builtin_cancel_zoom);
 }
 
@@ -2512,6 +2562,9 @@ bind_scan_lhs(bind_t * out, const char *in)
 	} else if (!strncasecmp(ptr, "shift-", 6)) {
 	    out->modifier |= Mod_Shift;
 	    ptr += 6;
+	} else if (!strncasecmp(ptr, "opt-", 4)) {
+	    out->modifier |= Mod_Opt;
+	    ptr += 4;
 	} else if (NO_KEY != (itmp = lookup_key(ptr, &len))) {
 	    out->key = itmp;
 	    ptr += len;
@@ -2580,6 +2633,9 @@ bind_matches(const bind_t * a, const bind_t * b)
 
     if (a->key == b->key && a_mod == b_mod)
 	return 1;
+    else if (a->key == b->key && (b->modifier & Mod_Opt))
+	/* Mod_Opt means both Alt and Ctrl are optional */
+	return 2;
     else
 	return 0;
 }
