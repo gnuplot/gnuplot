@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.242 2017/09/05 20:18:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.243 2017/09/10 03:40:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -2226,49 +2226,58 @@ int
 parse_range(AXIS_INDEX axis)
 {
     struct axis *this_axis = &axis_array[axis];
+    int dummy_token = -1;
 
-    if (equals(c_token, "[")) {
-	int dummy_token = -1;
-	c_token++;
-	/* If the range starts with "[var=" return the token of the named variable. */
-	if (isletter(c_token) && equals(c_token + 1, "=")) {
-		dummy_token = c_token;
-		c_token += 2;
-	}
-	this_axis->autoscale =
-		load_range(this_axis, &this_axis->min, &this_axis->max, this_axis->autoscale);
-	if (this_axis->linked_to_primary) {
-	    AXIS *primary = this_axis->linked_to_primary;
-	    primary->min = eval_link_function(primary, this_axis->min);
-	    primary->max = eval_link_function(primary, this_axis->max);
-	}
-
-	/* DEBUG 2 Sep 2017
-	 * This handles (imperfectly) the problem case
-	 *    set link x2 via f(x) inv g(x)
-	 *    plot [x=min:max][] something that involves x2
-	 * Other cases of in-line range changes on a linked axis may fail
-	 */
-	else if (this_axis->linked_to_secondary) {
-	    AXIS *secondary = this_axis->linked_to_secondary;
-	    if (secondary->link_udf != NULL && secondary->link_udf->at != NULL)
-		clone_linked_axes(this_axis, secondary);
-	}
-
-	if (axis == SAMPLE_AXIS || axis == T_AXIS || axis == U_AXIS || axis == V_AXIS) {
-	    this_axis->SAMPLE_INTERVAL = 0;
-	    if (equals(c_token, ":")) {
-		c_token++;
-		this_axis->SAMPLE_INTERVAL = real_expression();
-	    }
-	}
-
-	if (!equals(c_token, "]"))
-	    int_error(c_token, "']' expected");
-	c_token++;
-	return dummy_token;
-    } else
+    /* No range present */
+    if (!equals(c_token, "["))
 	return 0;
+
+    /* Empty brackets serve as a place holder */
+    if (equals(c_token, "[]")) {
+	c_token += 2;
+	return 0;
+    }
+
+    /* If the range starts with "[var=" return the token of the named variable. */
+    c_token++;
+    if (isletter(c_token) && equals(c_token + 1, "=")) {
+	dummy_token = c_token;
+	c_token += 2;
+    }
+
+    this_axis->autoscale = load_range(this_axis, &this_axis->min, &this_axis->max,
+					this_axis->autoscale);
+
+    /* Nonlinear axis - find the linear range equivalent */
+    if (this_axis->linked_to_primary) {
+	AXIS *primary = this_axis->linked_to_primary;
+	clone_linked_axes(this_axis, primary);
+    }
+
+    /* This handles (imperfectly) the problem case
+     *    set link x2 via f(x) inv g(x)
+     *    plot [x=min:max][] something that involves x2
+     * Other cases of in-line range changes on a linked axis may fail
+     */
+    else if (this_axis->linked_to_secondary) {
+	AXIS *secondary = this_axis->linked_to_secondary;
+	if (secondary->link_udf != NULL && secondary->link_udf->at != NULL)
+	    clone_linked_axes(this_axis, secondary);
+    }
+
+    if (axis == SAMPLE_AXIS || axis == T_AXIS || axis == U_AXIS || axis == V_AXIS) {
+	this_axis->SAMPLE_INTERVAL = 0;
+	if (equals(c_token, ":")) {
+	    c_token++;
+	    this_axis->SAMPLE_INTERVAL = real_expression();
+	}
+    }
+
+    if (!equals(c_token, "]"))
+	int_error(c_token, "']' expected");
+    c_token++;
+
+    return dummy_token;
 }
 
 /* Called if an in-line range is encountered while inside a zoom command */
