@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.223.2.3 2017/08/19 00:32:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.223.2.4 2017/09/03 03:38:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -208,12 +208,8 @@ axis_unlog_interval(struct axis *axis, double *min, double *max, TBOOLEAN checkr
 void
 axis_invert_if_requested(struct axis *axis)
 {
-    if (((axis->range_flags & RANGE_IS_REVERSED))
-    &&  (axis->autoscale != 0) &&  (axis->max > axis->min) ) {
-	double temp = axis->min;
-	axis->min = axis->max;
-	axis->max = temp;
-    }
+    if (((axis->range_flags & RANGE_IS_REVERSED)) &&  (axis->autoscale != 0))
+	reorder_if_necessary(axis->min, axis->max);
 }
 
 
@@ -1125,16 +1121,12 @@ gen_tics(struct axis *this, tic_callback callback)
 	double user;		/* in user co-ords */
 	double start, step, end;
 	int    nsteps;
-	double lmin = this->min, lmax = this->max;
 	double internal_min, internal_max;	/* to allow for rounding errors */
 	double ministart = 0, ministep = 1, miniend = 1;	/* internal or user - depends on step */
+	double lmin = this->min, lmax = this->max;
 
-	if (lmax < lmin) {
-	    /* hmm - they have set reversed range for some reason */
-	    double temp = lmin;
-	    lmin = lmax;
-	    lmax = temp;
-	}
+	reorder_if_necessary(lmin, lmax);
+
 	/* {{{  choose start, step and end */
 	switch (def->type) {
 	case TIC_SERIES:
@@ -1165,6 +1157,7 @@ gen_tics(struct axis *this, tic_callback callback)
 	    if (nonlinear(this)) {
 		lmin = this->linked_to_primary->min;
 		lmax = this->linked_to_primary->max;
+		reorder_if_necessary(lmin, lmax);
 		this->ticstep = make_tics(this->linked_to_primary, 20);
 		/* It may be that we _always_ want ticstep = 1.0 */
 		if (this->ticstep < 1.0)
@@ -1195,15 +1188,8 @@ gen_tics(struct axis *this, tic_callback callback)
 	}
 	/* }}} */
 
-	/* {{{  ensure ascending order */
-	if (end < start) {
-	    double temp;
-	    temp = end;
-	    end = start;
-	    start = temp;
-	}
+	reorder_if_necessary(start, end);
 	step = fabs(step);
-	/* }}} */
 
 	if ((minitics != MINI_OFF) && (this->miniticscale != 0)) {
 	    FPRINTF((stderr,"axis.c: %d  start = %g end = %g step = %g base = %g\n", 

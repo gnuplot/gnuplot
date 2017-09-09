@@ -1,3 +1,11 @@
+2017-09-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c( gen_tics ) src/axis.h( reorder_if_necessary ):
+	New macro to reorder the min/max of axis ranges (but could be used
+	elsewhere).  If the mapping function of linked axes inverts the
+	axis direction, tics were not being generated because min > max.
+	E.g. set link x2 via 100-x inv 100-x; set x2tics; plot [50:40] x
+
 2017-09-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	Several additions already in 5.3 but held back from 5.2 during -rc testing
