@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.176 2017/08/24 23:32:42 sfeam Exp $
+ * $Id: axis.h,v 1.177 2017/09/05 20:18:58 sfeam Exp $
  *
  */
 
@@ -621,5 +621,10 @@ double eval_link_function __PROTO((AXIS *, double));
      ticlevel == 1 ? axis->miniticscale : \
      ticlevel < MAX_TICLEVEL ? ticscale[ticlevel] : \
      0)
+
+/* convenience macro to make sure min < max */
+#define reorder_if_necessary( min, max ) \
+do { if (max < min) { double temp = min; min = max; max = temp; } \
+} while (0)
 
 #endif /* GNUPLOT_AXIS_H */
