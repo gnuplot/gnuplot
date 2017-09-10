@@ -1,10 +1,15 @@
-2017-09-09  Ethan A Merritt  <merritt@u.washington.edu>
+2017-09-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c( gen_tics ) src/axis.h( reorder_if_necessary ):
 	New macro to reorder the min/max of axis ranges (but could be used
 	elsewhere).  If the mapping function of linked axes inverts the
 	axis direction, tics were not being generated because min > max.
 	E.g. set link x2 via 100-x inv 100-x; set x2tics; plot [50:40] x
+
+	* src/graphics.c (plot_border) src/boundary.c (boundary):
+	Range-limited axes were not accounting for nonlinear or linked axes.
+	Space reserved for long axis tic labels were making the same mistake.
+	Bug #1965
 
 2017-09-06  Ethan A Merritt  <merritt@u.washington.edu>
 
