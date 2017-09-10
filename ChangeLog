@@ -1,4 +1,4 @@
-2017-09-09  Ethan A Merritt  <merritt@u.washington.edu>
+2017-09-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c( gen_tics ) src/axis.h( reorder_if_necessary ):
 	New macro to reorder the min/max of axis ranges (but could be used
@@ -9,6 +9,11 @@
 	* src/axis.c (parse_range):  Refactor parse_range() to handle
 	in-line ranges for linked or nonlinear axes.
 	Bug #1964
+
+	* src/graphics.c (plot_border) src/boundary.c (boundary):
+	Range-limited axes were not accounting for nonlinear or linked axes.
+	Space reserved for long axis tic labels were making the same mistake.
+	Bug #1965
 
 2017-09-05  Ethan A Merritt  <merritt@u.washington.edu>
 

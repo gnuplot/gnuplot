@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.568 2017/08/23 00:54:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.569 2017/08/24 23:32:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3870,8 +3870,9 @@ plot_border()
 	(*term->move) (plot_bounds.xleft, plot_bounds.ytop);
 
 	if (border_west && axis_array[FIRST_Y_AXIS].ticdef.rangelimited) {
-		max = AXIS_MAP(FIRST_Y_AXIS,axis_array[FIRST_Y_AXIS].data_max);
-		min = AXIS_MAP(FIRST_Y_AXIS,axis_array[FIRST_Y_AXIS].data_min);
+		y_axis = FIRST_Y_AXIS;
+		max = map_y(axis_array[FIRST_Y_AXIS].data_max);
+		min = map_y(axis_array[FIRST_Y_AXIS].data_min);
 		(*term->move) (plot_bounds.xleft, max);
 		(*term->vector) (plot_bounds.xleft, min);
 		(*term->move) (plot_bounds.xleft, plot_bounds.ybot);
@@ -3882,8 +3883,9 @@ plot_border()
 	}
 
 	if (border_south && axis_array[FIRST_X_AXIS].ticdef.rangelimited) {
-		max = AXIS_MAP(FIRST_X_AXIS,axis_array[FIRST_X_AXIS].data_max);
-		min = AXIS_MAP(FIRST_X_AXIS,axis_array[FIRST_X_AXIS].data_min);
+		x_axis = FIRST_X_AXIS;
+		max = map_x(axis_array[FIRST_X_AXIS].data_max);
+		min = map_x(axis_array[FIRST_X_AXIS].data_min);
 		(*term->move) (min, plot_bounds.ybot);
 		(*term->vector) (max, plot_bounds.ybot);
 		(*term->move) (plot_bounds.xright, plot_bounds.ybot);
@@ -3894,8 +3896,9 @@ plot_border()
 	}
 
 	if (border_east && axis_array[SECOND_Y_AXIS].ticdef.rangelimited) {
-		max = AXIS_MAP(SECOND_Y_AXIS,axis_array[SECOND_Y_AXIS].data_max);
-		min = AXIS_MAP(SECOND_Y_AXIS,axis_array[SECOND_Y_AXIS].data_min);
+		y_axis = SECOND_Y_AXIS;
+		max = map_y(axis_array[SECOND_Y_AXIS].data_max);
+		min = map_y(axis_array[SECOND_Y_AXIS].data_min);
 		(*term->move) (plot_bounds.xright, min);
 		(*term->vector) (plot_bounds.xright, max);
 		(*term->move) (plot_bounds.xright, plot_bounds.ytop);
@@ -3906,8 +3909,9 @@ plot_border()
 	}
 
 	if (border_north && axis_array[SECOND_X_AXIS].ticdef.rangelimited) {
-		max = AXIS_MAP(SECOND_X_AXIS,axis_array[SECOND_X_AXIS].data_max);
-		min = AXIS_MAP(SECOND_X_AXIS,axis_array[SECOND_X_AXIS].data_min);
+		x_axis = SECOND_X_AXIS;
+		max = map_x(axis_array[SECOND_X_AXIS].data_max);
+		min = map_x(axis_array[SECOND_X_AXIS].data_min);
 		(*term->move) (max, plot_bounds.ytop);
 		(*term->vector) (min, plot_bounds.ytop);
 		(*term->move) (plot_bounds.xright, plot_bounds.ytop);

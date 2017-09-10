@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.49 2017/02/14 21:49:17 sfeam Exp $
+ * $Id: boundary.c,v 1.50 2017/03/09 07:10:52 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -532,7 +532,7 @@ boundary(struct curve_points *plots, int count)
 		    axis_array[FIRST_X_AXIS].set_min,
 		    axis_array[FIRST_X_AXIS].set_max)) {
 			xx = axis_log_value_checked(FIRST_X_AXIS, tic->position, "xtic");
-		        xx = AXIS_MAP(FIRST_X_AXIS, xx);
+			xx = map_x(xx);
 			xx += (axis_array[FIRST_X_AXIS].tic_rotate) ? length : length /2;
 			if (maxrightlabel < xx)
 			    maxrightlabel = xx;
