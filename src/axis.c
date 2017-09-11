@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.243 2017/09/10 03:40:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.244 2017/09/10 03:49:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -197,7 +197,8 @@ void
 axis_invert_if_requested(struct axis *axis)
 {
     if (((axis->range_flags & RANGE_IS_REVERSED)) &&  (axis->autoscale != 0))
-	reorder_if_necessary(axis->min, axis->max);
+	/* NB: The whole point of this is that we want max < min !!! */
+	reorder_if_necessary(axis->max, axis->min);
 }
 
 
