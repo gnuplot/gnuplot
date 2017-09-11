@@ -13,6 +13,10 @@
 	plotted using
 	    set rgbmax 1.0;   plot 'imagedata' with rgbimage
 
+	* src/graphics.c (map_position_double):  It is pointless to test for
+	logscale in the "else" clause of an "if" statement that handles 
+	nonlinear axes.
+
 2017-09-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c( gen_tics ) src/axis.h( reorder_if_necessary ):
@@ -27,7 +31,7 @@
 
 	* src/graphics.c (plot_border) src/boundary.c (boundary):
 	Range-limited axes were not accounting for nonlinear or linked axes.
-	Space reserved for long axis tic labels were making the same mistake.
+	Space reserved for long axis tic labels made the same mistake.
 	Bug #1965
 
 2017-09-05  Ethan A Merritt  <merritt@u.washington.edu>

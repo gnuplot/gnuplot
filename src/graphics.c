@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.570 2017/09/10 21:41:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.571 2017/09/11 20:13:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3691,8 +3691,7 @@ map_position_double(
 		xx = eval_link_function(primary, pos->x);
 		*x = axis_map(primary, xx);
 	    } else {
-		xx = axis_log_value_checked(index, pos->x, what);
-		*x = AXIS_MAP(index, xx);
+		*x = axis_map(this_axis, xx);
 	    }
 	    break;
 	}
@@ -3735,8 +3734,7 @@ map_position_double(
 		yy = eval_link_function(primary, pos->y);
 		*y = axis_map(primary, yy);
 	    } else {
-		yy = axis_log_value_checked(index, pos->y, what);
-		*y = AXIS_MAP(index, yy);
+		*y = axis_map(this_axis, yy);
 	    }
 	    break;
 	}
