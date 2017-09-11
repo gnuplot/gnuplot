@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.256 2017/08/01 00:56:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.257 2017/09/04 18:02:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -410,6 +410,9 @@ unset_command()
 		unset_tics(&parallel_axis[i-1]);
 	    c_token++;
 	}
+	break;
+    case S_RGBMAX:
+	rgbmax = 255;
 	break;
     case S_SAMPLES:
 	unset_samples();
@@ -1950,6 +1953,7 @@ reset_command()
 
     unset_size();
     aspect_ratio = 0.0;		/* don't force it */
+    rgbmax = 255;
 
     unset_origin();
     unset_timestamp();

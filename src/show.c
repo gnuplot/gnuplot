@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.390 2017/07/24 07:54:52 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.391 2017/09/04 18:02:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -124,6 +124,7 @@ static void show_palette_colornames __PROTO((void));
 static void show_colorbox __PROTO((void));
 static void show_pointsize __PROTO((void));
 static void show_pointintervalbox __PROTO((void));
+static void show_rgbmax __PROTO((void));
 static void show_encoding __PROTO((void));
 static void show_decimalsign __PROTO((void));
 static void show_fit __PROTO((void));
@@ -386,6 +387,9 @@ show_command()
 	break;
     case S_POINTSIZE:
 	show_pointsize();
+	break;
+    case S_RGBMAX:
+	show_rgbmax();
 	break;
     case S_DECIMALSIGN:
 	show_decimalsign();
@@ -805,6 +809,7 @@ show_all()
     show_pm3d();
     show_pointsize();
     show_pointintervalbox();
+    show_rgbmax();
     show_encoding();
     show_decimalsign();
     show_fit();
@@ -2536,6 +2541,14 @@ show_pointintervalbox()
 {
     SHOW_ALL_NL;
     fprintf(stderr, "\tpointintervalbox is %g\n", pointintervalbox);
+}
+
+/* process 'show rgbmax' command */
+static void
+show_rgbmax()
+{
+    SHOW_ALL_NL;
+    fprintf(stderr, "\tRGB image color components are in range [0:%g]\n", rgbmax);
 }
 
 
