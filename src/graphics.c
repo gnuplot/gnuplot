@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.571 2017/09/11 20:13:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.572 2017/09/12 03:44:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3686,12 +3686,11 @@ map_position_double(
 	    AXIS_INDEX index = (pos->scalex == first_axes) ? FIRST_X_AXIS : SECOND_X_AXIS;
 	    AXIS *this_axis = &axis_array[index];
 	    AXIS *primary = this_axis->linked_to_primary;
-	    double xx;
 	    if (primary && primary->link_udf->at) {
-		xx = eval_link_function(primary, pos->x);
+		double xx = eval_link_function(primary, pos->x);
 		*x = axis_map(primary, xx);
 	    } else {
-		*x = axis_map(this_axis, xx);
+		*x = axis_map(this_axis, pos->x);
 	    }
 	    break;
 	}
@@ -3729,12 +3728,11 @@ map_position_double(
 	    AXIS_INDEX index = (pos->scaley == first_axes) ? FIRST_Y_AXIS : SECOND_Y_AXIS;
 	    AXIS *this_axis = &axis_array[index];
 	    AXIS *primary = this_axis->linked_to_primary;
-	    double yy;
 	    if (primary && primary->link_udf->at) {
-		yy = eval_link_function(primary, pos->y);
+		double yy = eval_link_function(primary, pos->y);
 		*y = axis_map(primary, yy);
 	    } else {
-		*y = axis_map(this_axis, yy);
+		*y = axis_map(this_axis, pos->y);
 	    }
 	    break;
 	}
