@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.263.2.4 2017/08/19 00:32:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.263.2.5 2017/08/23 01:00:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -548,11 +548,9 @@ grid_nongrid_data(struct surface_points *this_plot)
     struct iso_curve *icrv, *oicrv, *oicrvs;
     
     /* these are only needed for thin_plate_splines */
-    double *xx, *yy, *zz, *b;
+    double *xx = NULL, *yy = NULL, *zz = NULL, *b = NULL;
     int numpoints = 0;
 
-    xx = NULL; /* save to call free() on NULL if xx has never been used */
-    
     /* Compute XY bounding box on the original data. */
     /* FIXME HBB 20010424: Does this make any sense? Shouldn't we just
      * use whatever the x and y ranges have been found to be, and

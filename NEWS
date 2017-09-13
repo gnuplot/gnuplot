@@ -3,6 +3,7 @@ Changes in 5.2.1
 * NEW set table separator {tab|comma|"char"}
 * NEW hotkey for changing azimuth in 3D plots with mousing
 * NEW splot ... with lines title at {beg|end}
+* FIX allow mixed use of in-key plot titles and manually placed titles
 
 Changes in 5.2.0
 ================
