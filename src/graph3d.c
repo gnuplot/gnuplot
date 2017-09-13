@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.369 2017/08/05 17:02:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.370 2017/08/17 18:05:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -997,9 +997,9 @@ do_3dplot(
 
 	    /* User-specified key locations can use the 2D code */
 	    if (this_plot->title_position) {
+		xl_prev = xl;
+		yl_prev = yl;
 		if (this_plot->title_position->scalex != character) {
-		    xl_prev = xl;
-		    yl_prev = yl;
 		    map3d_position(this_plot->title_position, &xl, &yl, "key sample");
 		    xl -=  (key->just == GPKEY_LEFT) ? key_text_left : key_text_right;
 		} else { 
@@ -1215,15 +1215,15 @@ do_3dplot(
 
 	    }			/* switch(plot-style) key sample */
 
-	    /* move down one line in the key... */
-	    if (lkey)
-		NEXT_KEY_LINE();
-
-	    /* but not if the plot title was drawn somewhere else */
+	    /* If the title went somewhere other than the key,
+	     * restore the previous key position.
+	     * Else move down one line in the key.
+	     */
 	    if (this_plot->title_position) {
 		xl = xl_prev;
 		yl = yl_prev;
-	    }
+	    } else if (lkey)
+		NEXT_KEY_LINE();
 
 	    /* Draw contours for previous surface */
 	    if (draw_contour && this_plot->contours != NULL) {

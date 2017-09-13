@@ -7,6 +7,7 @@ Changes not in 5.2
 * CHANGE special case optimization of nonlinear code to speed up logscale
 * CHANGE windows terminal can print using Direct2D
 * CHANGE windows Direct2D backend supports pattern fill
+* FIX allow mixed use of in-key plot titles and manually placed titles
 
 New features, changes and fixes in gnuplot version 5.2
 ======================================================

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.572 2017/09/12 03:44:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.573 2017/09/12 15:16:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -704,12 +704,14 @@ do_plot(struct curve_points *plots, int pcount)
 	    ignore_enhanced(this_plot->title_no_enhanced);
 		/* don't write filename or function enhanced */
 	    if (localkey && this_plot->title && !this_plot->title_is_suppressed) {
-		if (!this_plot->title_position) {
+		/* If title is "at {end|beg}" do not draw it in the key */
+		if (!this_plot->title_position
+		||  this_plot->title_position->scalex != character) {
 		    key_count++;
 		    if (key->invert)
 			yl = key->bounds.ybot + yl_ref + key_entry_height/2 - yl;
+		    do_key_sample(this_plot, key, this_plot->title, xl, yl);
 		}
-		do_key_sample(this_plot, key, this_plot->title, xl, yl);
 	    }
 	    ignore_enhanced(FALSE);
 	}

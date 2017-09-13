@@ -1,3 +1,11 @@
+2017-09-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c src/graph3d.c: The "title at {beg|end|<position>}"
+	options were originally intended as an alternative to the normal key,
+	so preservation of the key layout was not a concern. This patch allows
+	you to mix custom-placed titles with in-key titles in the same plot.
+	Bug #1967
+
 2017-09-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c src/graphics.h src/set.c src/tables.c src/tables.h
