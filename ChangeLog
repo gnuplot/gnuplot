@@ -1,3 +1,14 @@
+2017-09-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c src/plot3d.c:  Starting in version 5, NaN and UNDEFINED
+	input data points count toward the total number of points read.  This
+	caused the test for "no points read" to not terminate iterations of the
+	form  "for [i=min:*] ..." on the first missing file or invalid spec.
+	To prevent runaway iteration we now test for "no INRANGE points read in".
+
+	* src/graph3d.c src/datafile.c:  Add initializers for variables to
+	silence compiler warnings.
+
 2017-09-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c src/graph3d.c: The "title at {beg|end|<position>}"
