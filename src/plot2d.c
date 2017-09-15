@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.430.2.10 2017/08/19 00:32:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.430.2.11 2017/08/23 01:01:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2798,6 +2798,19 @@ eval_plots()
 		    goto SKIPPED_EMPTY_FILE;
 		}
 
+		/* Sep 2017 - Check for all points bad or out of range  */
+		/* (normally harmless but must not cause infinite loop) */
+		if (forever_iteration(plot_iterator)) {
+		    int n, ninrange = 0;
+		    for (n=0; n<this_plot->p_count; n++)
+			if (this_plot->points[n].type == INRANGE)
+			    ninrange++;
+		    if (ninrange == 0) {
+			this_plot->plot_type = NODATA;
+			goto SKIPPED_EMPTY_FILE;
+		    }
+		}
+
 		/* If we are to bin the data, do that first */
 		if (this_plot->plot_smooth == SMOOTH_BINS) {
 		    make_bins(this_plot, nbins, binlow, binhigh, binwidth);
@@ -2920,7 +2933,7 @@ eval_plots()
 	if (empty_iteration(plot_iterator) && this_plot)
 	    this_plot->plot_type = NODATA;
 	if (forever_iteration(plot_iterator) && (this_plot->plot_type == NODATA)) {
-	    FPRINTF((stderr,"Ending * iteration at %d\n",plot_iterator->iteration));
+	    fprintf(stderr,"Ending * iteration at %d\n",plot_iterator->iteration);
 	    ;
 	} else if (forever_iteration(plot_iterator) && (this_plot->plot_type == FUNC)) {
 	    int_error(NO_CARET,"unbounded iteration in function plot");

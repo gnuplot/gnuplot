@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.263.2.5 2017/08/23 01:00:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.263.2.6 2017/09/13 23:01:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -93,6 +93,9 @@ static double splines_kernel __PROTO((double h));
 static void thin_plate_splines_setup __PROTO(( struct iso_curve *old_iso_crvs, double **p_xx, int *p_numpoints ));
 static double qnorm __PROTO(( double dist_x, double dist_y, int q ));
 static double pythag __PROTO(( double dx, double dy ));
+
+/* helper function to detect empty data sets */
+static void count_3dpoints __PROTO((struct surface_points *plot, int *nt, int *ni, int *nu));
 
 /* helper functions for parsing */
 static void load_contour_label_options __PROTO((struct text_label *contour_label));
@@ -1881,12 +1884,24 @@ eval_3dplots()
 		    this_plot->token = this_token;
 
 		    df_return = get_3ddata(this_plot);
+
 		    /* for second pass */
 		    this_plot->token = c_token;
 		    this_plot->iteration = plot_iterator ? plot_iterator->iteration : 0;
 
 		    if (this_plot->num_iso_read == 0)
 			this_plot->plot_type = NODATA;
+
+		    /* Sep 2017 - Check for all points bad or out of range  */
+		    /* (normally harmless but must not cause infinite loop) */
+		    if (forever_iteration(plot_iterator)) {
+			int ntotal, ninrange, nundefined;
+			count_3dpoints(this_plot, &ntotal, &ninrange, &nundefined);
+			if (ninrange == 0) {
+			    this_plot->plot_type = NODATA;
+			    goto SKIPPED_EMPTY_FILE;
+			}
+		    }
 
 		    if (this_plot != first_dataset)
 			/* copy (explicit) "with pm3d at ..." option from the first dataset in the file */
@@ -2468,3 +2483,26 @@ static void load_contour_label_options (struct text_label *contour_label)
     lp->flags |= LP_SHOW_POINTS;
     lp_parse(lp, LP_ADHOC, TRUE);
 }
+
+/* Count the number of data points but do nothing with them */
+static void
+count_3dpoints(struct surface_points *plot, int *ntotal, int *ninrange, int *nundefined)
+{
+    int i;
+    struct iso_curve *icrvs = plot->iso_crvs;
+    *ntotal = *ninrange = *nundefined = 0;
+
+    while (icrvs) {
+	struct coordinate GPHUGE *point;
+	for (i = 0; i < icrvs->p_count; i++) {
+	    point = &(icrvs->points[i]);
+	    (*ntotal)++;
+	    if (point->type == INRANGE)
+		(*ninrange)++;
+	    if (point->type == UNDEFINED)
+		(*nundefined)++;
+	}
+	icrvs = icrvs->next;
+    }
+}
+
