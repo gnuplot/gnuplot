@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.344.2.4 2017/08/16 23:28:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.344.2.5 2017/08/19 00:32:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2141,6 +2141,7 @@ df_readascii(double v[], int max)
 		    struct value a;
 		    TBOOLEAN timefield = FALSE;
 		    /* no dummy values to set up prior to... */
+		    a.type = NOTDEFINED;
 		    evaluate_inside_using = TRUE;
 		    evaluate_at(use_spec[output].at, &a);
 		    evaluate_inside_using = FALSE;
@@ -2678,7 +2679,26 @@ f_columnhead(union argument *arg)
     if (column_for_key_title < 0 || column_for_key_title > 9999)
 	column_for_key_title = 0;
     snprintf(placeholder+11, 6, "%4d@", column_for_key_title);
-    push(Gstring(&a, placeholder));
+
+    /* The program could be in either of two states, depending on where
+     * the call to columnheader(N) appeared. 
+     * 1) called from a using spec;  we already read the header line
+     */
+    if (df_column) {
+	if ((0 < column_for_key_title && column_for_key_title <= df_max_cols)
+	&&  (df_column && df_column[column_for_key_title-1].header))
+	    push(Gstring(&a, df_column[column_for_key_title-1].header));
+	else
+	    push(Gstring(&a, placeholder));
+    } else {
+
+    /* 2) called from 'title columnheader(N)'
+     *    We have not yet read from the file so we don't know the actual header.
+     *    Instead we return a placeholder that will be expanded later
+     */
+	push(Gstring(&a, placeholder));
+    }
+
 }
 
 
