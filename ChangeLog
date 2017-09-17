@@ -1,3 +1,7 @@
+2017-09-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (parse_label_options):  Memory leak.
+
 2017-09-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c src/plot3d.c:  Starting in version 5, NaN and UNDEFINED
@@ -27,7 +31,7 @@
 
 	* src/graphics.c (plot_border) src/boundary.c (boundary):
 	Range-limited axes were not accounting for nonlinear or linked axes.
-	Space reserved for long axis tic labels were making the same mistake.
+	Space reserved for long axis tic labels made the same mistake.
 	Bug #1965
 
 2017-09-06  Ethan A Merritt  <merritt@u.washington.edu>
