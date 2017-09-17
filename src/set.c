@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.568 2017/09/04 18:02:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.569 2017/09/11 20:13:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -6420,8 +6420,10 @@ parse_label_options( struct text_label *this_label, int ndim)
 	    this_label->rotate = rotate;
 	if (set_layer)
 	    this_label->layer = layer;
-	if (set_font)
+	if (set_font) {
+	    free(this_label->font);
 	    this_label->font = font;
+	}
 	if (set_textcolor)
 	    this_label->textcolor = textcolor;
 	if ((loc_lp.flags & LP_NOT_INITIALIZED) == 0)
