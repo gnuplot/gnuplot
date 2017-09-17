@@ -5,6 +5,7 @@ Changes in 5.2.1
 * NEW splot ... with lines title at {beg|end}
 * FIX allow mixed use of in-key plot titles and manually placed titles
 * FIX prevent runaway iterations of the form   plot for [i=start:*] ...
+* FIX handle in-line range limits for linked or nonlinear axes
 
 Changes in 5.2.0
 ================
