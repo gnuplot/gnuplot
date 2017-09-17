@@ -2,6 +2,8 @@
 
 	* src/set.c (parse_label_options):  Memory leak.
 
+	* src/graph3d.c src/plot3d.c:  Initialize to prevent compilere warnings.
+
 2017-09-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c src/plot3d.c:  Starting in version 5, NaN and UNDEFINED

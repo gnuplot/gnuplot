@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.370 2017/08/17 18:05:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.371 2017/09/13 22:59:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -623,7 +623,7 @@ do_3dplot(
     struct termentry *t = term;
     int surface;
     struct surface_points *this_plot = NULL;
-    int xl, yl;
+    int xl = 0, yl = 0;
     int xl_save, yl_save;
     int xl_prev = 0, yl_prev = 0;
     transform_matrix mat;
