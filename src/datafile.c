@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.354 2017/09/15 18:35:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.355 2017/09/18 22:24:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -116,6 +116,7 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.354 2017/09/15 18:35:57
 #include "misc.h"
 #include "parse.h"
 #include "plot.h"
+#include "plot2d.h" /* For reevaluate_plot_title() */
 #include "readline.h"
 #include "util.h"
 #include "breaders.h"
@@ -2862,7 +2863,6 @@ df_set_key_title(struct curve_points *plot)
     &&  histogram_opts.type == HT_STACKED_IN_TOWERS) {
 	/* In this case it makes no sense to treat key titles in the usual */
 	/* way, so we assume that it is supposed to be an xtic label.      */
-	/* FIXME EAM - This style should default to notitle!               */
 	double xpos = plot->histogram_sequence + plot->histogram->start;
 	add_tic_user(&axis_array[FIRST_X_AXIS], df_key_title, xpos, -1);
 	free(df_key_title);
@@ -2872,15 +2872,7 @@ df_set_key_title(struct curve_points *plot)
 
     /* What if there was already a title specified? */
     if (df_plot_title_at) {
-	struct value a;
-	evaluate_inside_using = TRUE;
-	evaluate_at(df_plot_title_at, &a);
-	evaluate_inside_using = FALSE;
-	if (a.type == STRING) {
-	    free(plot->title);
-	    plot->title = a.v.string_val;
-	} else
-	    int_warn(NO_CARET, "\ttitle did not evaluate to a string!?\n");
+	reevaluate_plot_title(plot);
 	return;
     }
 
