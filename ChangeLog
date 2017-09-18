@@ -19,6 +19,10 @@
 	* src/graph3d.c src/datafile.c:  Add initializers for variables to
 	silence compiler warnings.
 
+	* src/datafile.c (f_columnhead):  columnhead(N) invoked inside a using
+	specifier now returns the actual column header.
+	See Bug #1968
+
 2017-09-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c src/graph3d.c: The "title at {beg|end|<position>}"
