@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.455 2017/08/24 23:32:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.456 2017/09/15 18:34:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1277,16 +1277,17 @@ images:
     current_plot->p_count = i;
     cp_extend(current_plot, i); /* shrink to fit */
 
-    /* Last chance to substitute input values for placeholders in plot title */
-    df_set_key_title(current_plot);
-
     df_close();
 
     /* We are finished reading user input; return to C locale for internal use */
     reset_numeric_locale();
 
+    /* Deferred evaluation of plot title now that we know column headers */
+    reevaluate_plot_title(current_plot);
+
     return ngood;                   /* 0 indicates an 'empty' file */
 }
+
 
 /* called by get_data for each point */
 static void
@@ -2085,6 +2086,9 @@ eval_plots()
 		/* Only relevant to "with table" */
 		free_at(table_filter_at);
 		table_filter_at = NULL;
+
+		/* Mechanism for defered evaluation of plot title */
+		free_at(df_plot_title_at);
 
 		/* up to MAXDATACOLS cols */
 		df_set_plot_mode(MODE_PLOT);    /* Needed for binary datafiles */
@@ -2912,7 +2916,7 @@ eval_plots()
 	if (empty_iteration(plot_iterator) && this_plot)
 	    this_plot->plot_type = NODATA;
 	if (forever_iteration(plot_iterator) && (this_plot->plot_type == NODATA)) {
-	    fprintf(stderr,"Ending * iteration at %d\n",plot_iterator->iteration);
+	    FPRINTF((stderr,"Ending * iteration at %d\n",plot_iterator->iteration));
 	    ;
 	} else if (forever_iteration(plot_iterator) && (this_plot->plot_type == FUNC)) {
 	    int_error(NO_CARET,"unbounded iteration in function plot");
@@ -3548,12 +3552,35 @@ parse_plot_title(struct curve_points *this_plot, char *xtitle, char *ytitle, TBO
 	} else if (equals(c_token,"at")) {
 	    *set_title = FALSE;
 	} else {
-	    char *temp;
-	    evaluate_inside_using = TRUE;
-	    temp = try_to_get_string();
-	    evaluate_inside_using = FALSE;
-	    if (!this_plot->title_is_suppressed && !(this_plot->title = temp))
-		    int_error(c_token, "expecting \"title\" for plot");
+	    int save_token = c_token;
+
+	    /* If the command is "plot ... notitle <optional title text>" */
+	    /* we can throw the result away now that we have stepped over it  */
+	    if (this_plot->title_is_suppressed) {
+		char *skip = try_to_get_string();
+		free(skip);
+
+	    /* Create an action table that can generate the title later */
+	    } else { 
+		free_at(df_plot_title_at);
+		df_plot_title_at = perm_at();
+
+		/* We can evaluate the title for a function plot immediately */
+		/* FIXME: or this code could go into eval_plots() so that    */
+		/*        function and data plots are treated the same way.  */
+		if (this_plot->plot_type == FUNC || this_plot->plot_type == FUNC3D) {
+		    struct value a;
+		    evaluate_at(df_plot_title_at, &a);
+		    if (a.type == STRING) {
+			free(this_plot->title);
+			this_plot->title = a.v.string_val;
+		    } else {
+			int_warn(save_token, "expecting string for title");
+		    }
+		    free_at(df_plot_title_at);
+		    df_plot_title_at = NULL;
+		}
+	    }
 	}
 	if (equals(c_token,"at")) {
 	    int save_token = ++c_token;
@@ -3594,4 +3621,20 @@ parse_plot_title(struct curve_points *this_plot, char *xtitle, char *ytitle, TBO
 	this_plot->title_no_enhanced = TRUE;
     }
 
+}
+
+void
+reevaluate_plot_title(struct curve_points *this_plot)
+{
+    struct value a;
+
+    if (df_plot_title_at) {
+	evaluate_inside_using = TRUE;
+	evaluate_at(df_plot_title_at, &a);
+	evaluate_inside_using = FALSE;
+	if (a.type == STRING) {
+	    free(this_plot->title);
+	    this_plot->title = a.v.string_val;
+	}
+    }
 }

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.276 2017/09/15 18:34:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.277 2017/09/18 03:55:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1210,6 +1210,9 @@ get_3ddata(struct surface_points *this_plot)
 	this_iso->next = new_icrvs;
     }
 
+    /* Deferred evaluation of plot title now that we know column headers */
+    reevaluate_plot_title( (struct curve_points *)this_plot );
+
     return retval;
 }
 
@@ -1467,6 +1470,10 @@ eval_3dplots()
 		this_plot->plot_type = DATA3D;
 		this_plot->plot_style = data_style;
 		eof_during_iteration = FALSE;
+
+		/* Mechanism for deferred evaluation of plot title */
+		free_at(df_plot_title_at);
+		df_plot_title_at = NULL;
 
 		df_set_plot_mode(MODE_SPLOT);
 		specs = df_open(name_str, MAXDATACOLS, (struct curve_points *)this_plot);

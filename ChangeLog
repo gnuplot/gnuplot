@@ -1,3 +1,19 @@
+2017-09-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (f_columnhead df_set_key_title) src/datafile.h
+	src/eval.h src/parse.c (create_call_columnhead) src/parse.h
+	src/plot2d.h src/plot2d.c (reevaluate_plot_title) src/plot3d.c:
+
+	Defer evaluation of "plot ... title <string-expression>" until after
+	data is read in.  This is important mostly for the case where the plot
+	title contains text taken from a data column header.  We can now drop
+	an imperfect workaround that initially stored the title as
+	@COLUMNHEADXXXX@ and then later replaced the placeholder text with
+	the real column header text.
+	Bug #1968
+
+	* demo/columnhead.dem demo/html/*:  Add a demo for the new capability.
+
 2017-09-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (parse_label_options):  Memory leak.

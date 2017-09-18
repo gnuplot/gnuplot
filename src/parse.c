@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.115 2017/08/10 20:43:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.116 2017/08/11 04:47:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -315,6 +315,24 @@ create_call_column_at(char *string)
     at->actions[0].arg.v_arg.type = STRING;
     at->actions[0].arg.v_arg.v.string_val = string;
     at->actions[1].index = COLUMN;
+    at->actions[1].arg.j_arg = 0;
+
+    return (at);
+}
+
+/* Create an action table that describes a call to columnhead(-1). */
+/* This is substituted for the bare keyword "colummhead" */
+struct at_type *
+create_call_columnhead()
+{
+    struct at_type *at = gp_alloc(sizeof(int) + 2*sizeof(struct at_entry),"");
+
+    at->a_count = 2;
+    at->actions[0].index = PUSHC;
+    at->actions[0].arg.j_arg = 3;	/* FIXME - magic number! */
+    at->actions[0].arg.v_arg.type = INTGR;
+    at->actions[0].arg.v_arg.v.int_val = -1;
+    at->actions[1].index = COLUMNHEAD;
     at->actions[1].arg.j_arg = 0;
 
     return (at);

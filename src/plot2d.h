@@ -1,5 +1,5 @@
 /*
- * $Id: plot2d.h,v 1.20 2017/01/14 06:23:22 sfeam Exp $
+ * $Id: plot2d.h,v 1.21 2017/02/19 19:11:07 sfeam Exp $
  */
 
 /* GNUPLOT - plot2d.h */
@@ -66,5 +66,6 @@ struct text_label *store_label __PROTO((struct text_label *, struct coordinate *
 					int i, char * string, double colorval));
 void parse_plot_title __PROTO((struct curve_points *this_plot, 
 					char *xtitle, char *ytitle, TBOOLEAN *set_title));
+void reevaluate_plot_title __PROTO((struct curve_points *this_plot));
 
 #endif /* GNUPLOT_PLOT2D_H */

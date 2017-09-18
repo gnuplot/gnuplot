@@ -124,6 +124,7 @@
     <li><a href="array.html">arrays</a></li>
     <li><a href="fenceplot.html">fence plots</a></li>
     <li><a href="gantt.html">Gantt chart</a></li>
+    <li><a href="columnhead.html">points labeled by origin</a></li>
     <li><a href="heatmaps.html">2D and 3D heat maps</a></li>
     <li><a href="solar_path.html">solar path diagram</a></li>
     <li><a href="violinplot.html">violin plot</a></li>
@@ -220,7 +221,7 @@
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated March 2017</i>
+    <i>This page generated September 2017</i>
     </td>
 
     <td>

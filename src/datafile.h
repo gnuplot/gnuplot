@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.53 2017/06/01 23:23:43 sfeam Exp $
+ * $Id: datafile.h,v 1.54 2017/07/20 18:04:18 sfeam Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -130,6 +130,7 @@ extern TBOOLEAN df_warn_on_missing_columnheader;
 
 /* Used by plot title columnhead, stats name columnhead */
 extern char *df_key_title;
+extern struct at_type *df_plot_title_at;
 
 /* Prototypes of functions exported by datafile.c */
 

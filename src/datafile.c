@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.353 2017/09/05 20:18:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.354 2017/09/15 18:35:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -296,7 +296,9 @@ static TBOOLEAN df_tabulate_strings = FALSE;	/* used only by TABLESTYLE */
 #define NO_COLUMN_HEADER (-99)  /* some value that can never be a real column */
 static int column_for_key_title = NO_COLUMN_HEADER;
 static TBOOLEAN df_already_got_headers = FALSE;
-char *df_key_title = NULL;     /* filled in from column header if requested */
+
+char *df_key_title = NULL;		/* filled in from column header if requested */
+struct at_type *df_plot_title_at;	/* used for deferred evaluation of plot title */
 
 
 /* Binary *read* variables used by df_readbinary().
@@ -2628,7 +2630,6 @@ f_stringcolumn(union argument *arg)
 void
 f_columnhead(union argument *arg)
 {
-    static char placeholder[] = "@COLUMNHEAD0000@";
     struct value a;
 
     if (!evaluate_inside_using)
@@ -2637,29 +2638,38 @@ f_columnhead(union argument *arg)
     (void) arg;                 /* avoid -Wunused warning */
     (void) pop(&a);
     column_for_key_title = (int) real(&a);
+
+    /* This handles the case:    plot ... using (column("FOO")) ... title columnhead
+     * FIXME: Why can't create_call_columnhead() dummy up the real column
+     *        rather than loading -1 and requiring that we retrieve via df_key_title?
+     */
+    if (column_for_key_title == -1) {
+	push(Gstring(&a, df_key_title));
+	return;
+    }
+
     if (column_for_key_title < 0 || column_for_key_title > 9999)
 	column_for_key_title = 0;
-    snprintf(placeholder+11, 6, "%4d@", column_for_key_title);
 
-    /* The program could be in either of two states, depending on where
-     * the call to columnheader(N) appeared. 
+    /* Sep 2017 - It used to be that the program could be in either of two states,
+     * depending on where the call to columnheader(N) appeared. 
      * 1) called from a using spec;  we already read the header line
+     *    This means that df_column points to a structure containing column headers
+     * 2) called from 'title columnheader(N)'; we have not yet read the header line
+     *    and df_column == NULL
+     * Now we defer evaluation of the title via df_title_at, so case 2 never happens.
      */
     if (df_column) {
 	if ((0 < column_for_key_title && column_for_key_title <= df_max_cols)
-	&&  (df_column && df_column[column_for_key_title-1].header))
+	&&  (df_column[column_for_key_title-1].header))
 	    push(Gstring(&a, df_column[column_for_key_title-1].header));
-	else
-	    push(Gstring(&a, placeholder));
+	else {
+	    static char unknown_column[2] = {0,0};
+	    push(Gstring(&a, &unknown_column[0]));
+	}
     } else {
-
-    /* 2) called from 'title columnheader(N)'
-     *    We have not yet read from the file so we don't know the actual header.
-     *    Instead we return a placeholder that will be expanded later
-     */
-	push(Gstring(&a, placeholder));
+/* DEBUG */ int_error(NO_CARET,"Internal error: df_column[] not initialized\n");
     }
-
 }
 
 
@@ -2839,7 +2849,7 @@ expect_string(const char column)
 }
 
 /*
- * Load plot title for key box from the string found earlier by df_readline.
+ * Load plot title used in key box from the string found earlier by df_readline.
  * Called from get_data().
  */
 void
@@ -2861,35 +2871,28 @@ df_set_key_title(struct curve_points *plot)
     }
 
     /* What if there was already a title specified? */
-    if (plot->title && !plot->title_is_filename) {
-	int columnhead;
-	char *placeholder = strstr(plot->title, "@COLUMNHEAD");
-
-	while (placeholder) {
-	    char *newtitle = gp_alloc(strlen(plot->title) + df_longest_columnhead, "plot title");
-	    char *trailer = NULL;
-	    columnhead = strtol(placeholder+11, &trailer, 0);
-	    *placeholder = '\0';
-	    if (trailer && *trailer == '@')
-		trailer++;
-	    sprintf(newtitle, "%s%s%s", plot->title,
-		    (columnhead <= 0) ? df_key_title :
-		    (columnhead <= df_no_cols) ? df_column[columnhead-1].header : "",
-		    trailer ? trailer : "");
+    if (df_plot_title_at) {
+	struct value a;
+	evaluate_inside_using = TRUE;
+	evaluate_at(df_plot_title_at, &a);
+	evaluate_inside_using = FALSE;
+	if (a.type == STRING) {
 	    free(plot->title);
-	    plot->title = newtitle;
-	    placeholder = strstr(newtitle, "@COLUMNHEAD");
-	}
+	    plot->title = a.v.string_val;
+	} else
+	    int_warn(NO_CARET, "\ttitle did not evaluate to a string!?\n");
 	return;
     }
+
+    /* "notitle <whatever-the-title-would-have-been>" */
     if (plot->title_is_suppressed)
 	return;
-    if (plot->title)
-	free(plot->title);
 
-    plot->title_no_enhanced = !keyT.enhanced;
+    /* Note: I think we can only get here for histogram labels */
+    free(plot->title);
     plot->title = df_key_title;
     df_key_title = NULL;
+    plot->title_no_enhanced = !keyT.enhanced;
 }
 
 /*
@@ -2917,8 +2920,16 @@ df_set_key_title_columnhead(struct curve_points *plot)
 	    column_for_key_title = use_spec[1].column;
     }
     /* This results from  plot 'foo' using (column("name")) title columnhead */
-    if (column_for_key_title == NO_COLUMN_HEADER)
-	plot->title = gp_strdup("@COLUMNHEAD-1@");
+    /* FIXME:  builds on top of older circuitous method
+     * - here we dummy up a call to columnhead(-1)
+     * - somewhere else the real columnhead is stored in df_key_title
+     * - when columnhead(-1) is evaluated, it returns the content of df_key_title
+     * Why can't we dummy up columhead(real column) and skip the intermediate step?
+     */
+    if (column_for_key_title == NO_COLUMN_HEADER) {
+	free_at(df_plot_title_at);
+	df_plot_title_at = create_call_columnhead();
+    }
 }
 
 char *
