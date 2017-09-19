@@ -1,3 +1,12 @@
+2017-09-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/cairo.trm (cairotrm_init cairotrm_reset):  Valgrind complained
+	that calling cairo_destroy(plot.cr) on exit triggered multiple reads 
+	of previously-freed data.  It seems preferable to not call it on exit.
+	It does make sense to call it if the terminal has been closed and then
+	reopened.  So we fix the ordering of code in cairotrm_init that
+	frees the old plot.cr before reinitializing a new one.
+
 2017-09-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (f_columnhead df_set_key_title) src/datafile.h

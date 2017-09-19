@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.78 2016/09/12 17:47:30 markisch Exp $
+ * $Id: cairo.trm,v 1.79 2017/05/07 19:20:52 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -653,15 +653,15 @@ void cairotrm_init()
 	if (ISCAIROLATEX && !outstr)
 	    os_error(c_token, "cairolatex terminal cannot write to standard output");
 
+	/* We no longer do this in cairotrm_reset() */
+	if (plot.cr)
+	    cairo_destroy(plot.cr);
+
 	/* initialisations */
 	gp_cairo_initialize_plot(&plot);
 	plot.device_xmax = (double) cairo_params->width;
 	plot.device_ymax = (double) cairo_params->height;
 	plot.dashlength = cairo_params->dash_length;
-
-	/* is supposed to be done in cairotrm_reset */
-	if ( plot.cr )
-		cairo_destroy(plot.cr);
 
 	if (!strcmp(term->name,"pdfcairo")) {
 		/* Output can either be a file or stdout */
@@ -973,8 +973,13 @@ void cairotrm_text()
 /* sent when gnuplot exits and when the terminal or the output change.*/
 void cairotrm_reset()
 {
-	/* finish the document */
-	cairo_destroy(plot.cr);
+	/* Sep 2017
+	 * valgrind complains that this triggers reads of already-freed data.
+	 * It is unclear whether that is a real problem, but it is also unclear
+	 * that anything is gained by explicit cleanup when we are about to exit.
+	 * Let's try skipping it and see if anyone notices.
+	 */
+	/* cairo_destroy(plot.cr); */
 
 #ifdef PSLATEX_DRIVER
 	/* finish latex output */
