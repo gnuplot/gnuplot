@@ -1,0 +1,27 @@
+#
+# - Demonstrates use of columnhead(N) in a using specifier.
+# - Demonstrates delayed evaluation of columnhead(N) in plot title
+# - Demonstrates failure of 5.0 and 5.2.0 to terminate open-ended iteration
+#   at the front of a plot command.
+#
+
+$DATA << EOD
+aA	bB	cC	dD
+4	8	6	7
+8	5	7	3
+3	8	4	6
+1	2	9	10
+EOD
+
+set key box autotitle columnhead width 2 samplen 0
+set key title "Columns"
+set offset 1,1,1,1
+set xlabel "Line in data file"
+set ylabel "Column values"
+set title "Point labels show which column they came from"
+set xtics 1,1,4 format "line %.0g"
+
+plot for [col=1:*] $DATA using (1+$0):(column(col)):(columnhead(col)[2:2]) with labels title columnhead(col)[2:2]
+pause -1
+
+reset
