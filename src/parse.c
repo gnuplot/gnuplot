@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.116 2017/08/11 04:47:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.117 2017/09/18 22:24:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -509,6 +509,8 @@ parse_array_assignment_expression()
 
 	/* Quick check for the most common false positives */
 	/* i.e. other constructs that begin with "name["   */
+	if (equals(c_token,"sum") && equals(c_token+3, "="))
+	    return 0;
 	if (equals(c_token+3, ":"))
 	    return 0;
 	if (equals(c_token+3, "]") && !equals(c_token+4, "="))
@@ -528,7 +530,8 @@ parse_array_assignment_expression()
 	c_token += 2;
 	parse_expression();
 
-	/* If this wasn't really an array element assignment, back out */
+	/* If this wasn't really an array element assignment, back out. */
+	/* NB: Depending on what we just parsed, this may leak memory.  */
 	if (!equals(c_token, "]") || !equals(c_token+1, "=")) {
 	    c_token = save_token;
 	    at->a_count = save_action;

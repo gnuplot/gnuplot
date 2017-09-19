@@ -8,7 +8,7 @@
 # This could, for example, depend on data from other columns in the input.
 #
 
-set title "Clustered bar graph with individual colors\nspecified vis plotstyle 'boxes'"
+set title "Clustered bar graph with individual colors\nspecified via plotstyle 'boxes'"
 set title  boxed offset 0,-3 font ",15"
 set style fill solid border lt -1
 set style textbox opaque noborder

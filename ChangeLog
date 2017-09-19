@@ -7,6 +7,8 @@
 	reopened.  So we fix the ordering of code in cairotrm_init that
 	frees the old plot.cr before reinitializing a new one.
 
+	* src/parse.c (parse_array_assignment):  Memory leak.
+
 2017-09-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (f_columnhead df_set_key_title) src/datafile.h
