@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1084.2.13 2017/08/30 20:28:04 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1084.2.14 2017/09/03 03:38:37 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -12930,13 +12930,15 @@ Ffigure_multiple_keys
  rather than creating an actual plot on the current terminal. The flag character
  is "i" if the point is in the active range, "o" if it is out-of-range, or "u"
  if it is undefined.  The data format is determined by the format of the axis
- tickmarks (see `set format`), and the columns are separated by single spaces.
+ tickmarks (see `set format`). Columns are by default separated by whitespace.
+ See `with table` for a description of how to write a table to a csv file.
  This can be useful if you want to generate contours and then save them for
  further use.  The same method can be used to save interpolated data
  (see `set samples` and `set dgrid3d`).
 
  Syntax:
        set table {"outfile" | $datablock} {append}
+                 {separator {space|tab|comma|"<char>"}
        plot <whatever>
        unset table
 
@@ -12972,6 +12974,12 @@ Ffigure_multiple_keys
 
       plot <file> using ("File 1"):1:2:3 with table
       plot <file> using (sprintf("%4.2f",$1)) : (sprintf("%4.2f",$3)) with table
+
+=csv
+ To create a csv file use
+      set table "tab.csv" separator comma
+      plot <foo> using 1:2:3:4 with table
+
 3 terminal
 ?commands set terminal
 ?commands show terminal
