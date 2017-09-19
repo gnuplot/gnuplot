@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1107 2017/09/05 20:18:58 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1108 2017/09/11 20:13:24 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -199,6 +199,11 @@ C
  Version 5.3 is the current development version. New features introduced here
  will generally not appear in a supported release until version 5.4. Details
  may change before that.
+
+#start
+#bcreation of csv files using `set table separator {tab|comma|"char"}`
+##See `plot with table`.
+#end
 3 Features introduced in version 5.2
 ?Features introduced in version 5.2
 4 New plot styles and style options
@@ -13013,6 +13018,7 @@ Ffigure_multiple_keys
       plot <file> using ("File 1"):1:2:3 with table
       plot <file> using (sprintf("%4.2f",$1)) : (sprintf("%4.2f",$3)) with table
 
+=csv
  To create a csv file use
       set table "tab.csv" separator comma
       plot <foo> using 1:2:3:4 with table
