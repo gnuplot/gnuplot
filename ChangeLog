@@ -9,6 +9,8 @@
 
 	* src/parse.c (parse_array_assignment):  Memory leak.
 
+	* src/interpol.c:  Dead code.
+
 2017-09-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (f_columnhead df_set_key_title) src/datafile.h

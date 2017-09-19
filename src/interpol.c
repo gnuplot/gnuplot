@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.62 2017/08/01 01:30:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.63 2017/08/24 23:32:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -887,14 +887,9 @@ do_cubic(
 	/* Evaluate cubic spline polynomial */
 	y = ((sc[l][3] * temp + sc[l][2]) * temp + sc[l][1]) * temp + sc[l][0];
 
-	/* With logarithmic y axis, we need to convert from linear to
-         * log scale now. */
-	if (Y_AXIS.log) {
-	    if (y > 0.)
-		y = y;
-	    else
+	/* With logarithmic y axis, we need to convert from linear to log scale now */
+	if (Y_AXIS.log && y <= 0)
 		y = symin - (symax - symin);
-	}
 
 	dest[i].type = INRANGE;
 	STORE_AND_FIXUP_RANGE(dest[i].x, x, dest[i].type, ixmin, ixmax, X_AXIS.autoscale);
