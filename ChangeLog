@@ -11,6 +11,8 @@
 
 	* src/interpol.c:  Dead code.
 
+	* src/Makefile.am:  Fix recipe for building qt embed_example
+
 2017-09-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (f_columnhead df_set_key_title) src/datafile.h
