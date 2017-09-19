@@ -2,6 +2,8 @@
 
 	* src/parse.c (parse_array_assignment):  Memory leak.
 
+	* src/Makefile.am:  Fix recipe for building qt embed_example
+
 2017-09-17  KH Moriyama  <khmoriym@users.sf.net>
 
 	* src/axis.c (parse_range):  Backport from 5.3 - modify parse_range()
