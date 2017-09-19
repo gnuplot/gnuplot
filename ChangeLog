@@ -1,3 +1,7 @@
+2017-09-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/parse.c (parse_array_assignment):  Memory leak.
+
 2017-09-17  KH Moriyama  <khmoriym@users.sf.net>
 
 	* src/axis.c (parse_range):  Backport from 5.3 - modify parse_range()
