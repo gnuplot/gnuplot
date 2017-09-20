@@ -1,3 +1,7 @@
+2017-09-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/cairo.trm (cairotrm_reset):  Revert change.
+
 2017-09-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/cairo.trm (cairotrm_init cairotrm_reset):  Valgrind complained
@@ -6,6 +10,8 @@
 	It does make sense to call it if the terminal has been closed and then
 	reopened.  So we fix the ordering of code in cairotrm_init that
 	frees the old plot.cr before reinitializing a new one.
+	REVERT: This change caused some cairo installations to close pdf output
+	file without proper termination of the contents.
 
 	* src/parse.c (parse_array_assignment):  Memory leak.
 

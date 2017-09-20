@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.79 2017/05/07 19:20:52 sfeam Exp $
+ * $Id: cairo.trm,v 1.80 2017/09/19 20:15:10 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -973,13 +973,8 @@ void cairotrm_text()
 /* sent when gnuplot exits and when the terminal or the output change.*/
 void cairotrm_reset()
 {
-	/* Sep 2017
-	 * valgrind complains that this triggers reads of already-freed data.
-	 * It is unclear whether that is a real problem, but it is also unclear
-	 * that anything is gained by explicit cleanup when we are about to exit.
-	 * Let's try skipping it and see if anyone notices.
-	 */
-	/* cairo_destroy(plot.cr); */
+	if (plot.cr)
+		cairo_destroy(plot.cr);
 
 #ifdef PSLATEX_DRIVER
 	/* finish latex output */
