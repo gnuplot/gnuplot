@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.80 2017/09/19 20:15:10 sfeam Exp $
+ * $Id: cairo.trm,v 1.81 2017/09/21 18:22:12 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -653,7 +653,7 @@ void cairotrm_init()
 	if (ISCAIROLATEX && !outstr)
 	    os_error(c_token, "cairolatex terminal cannot write to standard output");
 
-	/* We no longer do this in cairotrm_reset() */
+	/* We no longer rely on this having been done in cairotrm_reset() */
 	if (plot.cr)
 	    cairo_destroy(plot.cr);
 
@@ -975,6 +975,7 @@ void cairotrm_reset()
 {
 	if (plot.cr)
 		cairo_destroy(plot.cr);
+	plot.cr = NULL;
 
 #ifdef PSLATEX_DRIVER
 	/* finish latex output */

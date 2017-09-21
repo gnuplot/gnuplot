@@ -1,3 +1,7 @@
+2017-09-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/cairo.trm (cairotrm_reset):  Still trying to get this right.
+
 2017-09-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/cairo.trm (cairotrm_reset):  Revert change.
