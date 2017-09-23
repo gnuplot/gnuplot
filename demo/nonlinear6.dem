@@ -1,0 +1,21 @@
+#
+# Logscale axis tic placement has always been problematic.
+# This demo exercises both automatic tic placement and
+# user-specified tic series.
+#
+set log y
+set log y2
+set tics nomirror
+set border 11
+set key center title "rangelimited tics" samplen -1
+
+set xrange [1:15000]
+
+set ytics 10 logscale rangelimit
+set y2tics auto rangelimit
+
+plot sample [x=2:14000] x axes x1y1 title "set ytics 10", \
+            [x=2:14000] x axes x1y2 title "set y2tics auto"
+
+pause -1 "<cr> to continue"
+reset
