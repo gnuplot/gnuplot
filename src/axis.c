@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.223.2.6 2017/09/11 03:40:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.223.2.7 2017/09/18 03:47:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1144,6 +1144,18 @@ gen_tics(struct axis *this, tic_callback callback)
 		    end = step * ceil(lmax / step);
 		else
 		    end = axis_do_log(this, def->def.series.end);
+		if (def->logscaling) {
+		    /* This emulates earlier gnuplot versions in handling
+		     *     set log y; set ytics 10
+		     */
+		    step  = eval_link_function(this->linked_to_primary, step);
+		    end   = eval_link_function(this->linked_to_primary, end);
+		    start = eval_link_function(this->linked_to_primary, start);
+		    if (!(start > this->linked_to_primary->min))
+			start = this->linked_to_primary->min;
+		    lmin = this->linked_to_primary->min;
+		    lmax = this->linked_to_primary->max;
+		}
 	    } else {
 		start = def->def.series.start;
 		step = def->def.series.incr;
@@ -1326,7 +1338,9 @@ gen_tics(struct axis *this, tic_callback callback)
 		internal = tic;
 		user = tic;
 	    } else if (nonlinear(this)) {
-		if (def->type == TIC_COMPUTED)
+		if (def->type == TIC_SERIES && def->logscaling)
+		    user = eval_link_function(this->linked_to_primary->linked_to_secondary, tic);
+		else if (def->type == TIC_COMPUTED)
 		    user = eval_link_function(this->linked_to_primary->linked_to_secondary, tic);
 		else
 		    user = tic;
@@ -1396,7 +1410,9 @@ gen_tics(struct axis *this, tic_callback callback)
 			}
 
 			/* This is where we finally decided to put the tic mark */
-			if (nonlinear(this) && (def->type == TIC_COMPUTED))
+			if (nonlinear(this) && (def->type == TIC_SERIES && def->logscaling))
+			    position = user;
+			else if (nonlinear(this) && (def->type == TIC_COMPUTED))
 			    position = user;
 			else
 			    position = internal;
@@ -1429,8 +1445,9 @@ gen_tics(struct axis *this, tic_callback callback)
 		    if (this->tictype == DT_TIMEDATE) {
 			mtic_user = time_tic_just(this->timelevel - 1, internal + mplace);
 			mtic_internal = mtic_user;
-		    } else if (nonlinear(this) && (def->type == TIC_COMPUTED)) {
-			/* FIXME: make up for bad calculation of ministart/ministep/miniend */
+		    } else if ((nonlinear(this) && (def->type == TIC_COMPUTED))
+			   ||  (nonlinear(this) && (def->type == TIC_SERIES && def->logscaling))) {
+			/* Make up for bad calculation of ministart/ministep/miniend */
 			double this_major = eval_link_function(this, internal);
 			double next_major = eval_link_function(this, internal+step);
 			mtic_user = this_major + mplace/miniend * (next_major - this_major);	

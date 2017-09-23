@@ -6,6 +6,7 @@ Changes in 5.2.1
 * FIX allow mixed use of in-key plot titles and manually placed titles
 * FIX prevent runaway iterations of the form   plot for [i=start:*] ...
 * FIX handle in-line range limits for linked or nonlinear axes
+* FIX restore pre-5.2 interpretation of logscaled tic increment as a multiplier
 
 Changes in 5.2.0
 ================

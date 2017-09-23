@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1084.2.14 2017/09/03 03:38:37 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1084.2.15 2017/09/19 18:37:42 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -13858,6 +13858,7 @@ Ffigure_multiple_keys
                   | ({"<label>"} <pos> {<level>} {,{"<label>"}...) }
                  {format "formatstring"} {font "name{,<size>}"} {{no}enhanced}
                  { numeric | timedate | geographic }
+                 {{no}logscale}
                  { rangelimited }
                  { textcolor <colorspec> }
        unset xtics
@@ -13911,10 +13912,32 @@ Ffigure_multiple_keys
  being displayed;  otherwise it has no effect.  Any previously specified tic
  frequency or position {and labels} are retained.
 
- Positions of the tics are calculated automatically by default or if the
- `autofreq` option is given; otherwise they may be specified in either of
- two forms:
+ Tic positions are calculated automatically by default or if the `autofreq`
+ option is given. 
 
+ A series of tic positions can be specified by giving either a tic interval
+ alone, or a start point, interval, and end point (see `xtics series`).
+
+ Individual tic positions can be specified individually by providing an
+ eplicit list of positions, where each position may have an associated
+ text label. See `xtics list`.
+ 
+ However they are specified, tics will only be plotted when in range.
+
+ Format (or omission) of the tic labels is controlled by `set format`, unless
+ the explicit text of a label is included in the `set xtics ("<label>")` form.
+
+ Minor (unlabeled) tics can be added automatically by the `set mxtics`
+ command, or at explicit positions by the `set xtics ("" <pos> 1, ...)` form.
+
+ The appearance of the tics (line style, line width etc.) is determined by the
+ border line (see `set border`), even if the tics are drawn at the axes.
+4 xtics series
+?set xtics series
+?xtics series
+ Syntax
+      set xtics <incr>
+      set xtics <start>, <incr>, <end>
  The implicit <start>, <incr>, <end> form specifies that a series of tics will
  be plotted on the axis between the values <start> and <end> with an increment
  of <incr>.  If <end> is not given, it is assumed to be infinity.  The
@@ -13951,13 +13974,22 @@ Ffigure_multiple_keys
  Make tics at 1, 100, 1e4, 1e6, 1e8.
        set logscale x; set xtics 1,100,1e8
 
- The explicit ("<label>" <pos> <level>, ...) form allows arbitrary tic
+4 xtics list
+?set xtics list
+?set xtics add
+?xtics list
+?xtics add
+ Syntax
+      set xtics {add} ("label1" <pos1> <level1>, "label2" <pos2> <level2>, ...) 
+
+ The explicit ("label" <pos> <level>, ...) form allows arbitrary tic
  positions or non-numeric tic labels.  In this form, the tics do not
  need to be listed in numerical order.  Each tic has a
- position, optionally with a label.  Note that the label is
- a string enclosed by quotes.  It may be a constant string, such as
- "hello", may contain formatting information for converting the
- position into its label, such as "%3f clients", or may be empty, "".
+ position, optionally with a label.
+
+ The label is a string enclosed by quotes or a string-valued expression.
+ It may contain formatting information for converting the position into its
+ label, such as "%3f clients", or it may be the empty string "".
  See `set format` for more information.  If no string is given, the
  default label (numerical) is used.
 
@@ -13990,17 +14022,6 @@ Ffigure_multiple_keys
 
  This will automatically generate tic marks every 0.5 along x, but will
  also add an explicit labeled tic mark at pi.
-
- However they are specified, tics will only be plotted when in range.
-
- Format (or omission) of the tic labels is controlled by `set format`, unless
- the explicit text of a label is included in the `set xtics ("<label>")` form.
-
- Minor (unlabeled) tics can be added automatically by the `set mxtics`
- command, or at explicit positions by the `set xtics ("" <pos> 1, ...)` form.
-
- The appearance of the tics (line style, line width etc.) is determined by the
- border line (see `set border`), even if the tics are drawn at the axes.
 4 xtics timedata
 ?set xtics timedata
 ?xtics timedata tics
@@ -14061,6 +14082,26 @@ Ffigure_multiple_keys
  If the xtics are left in the default state (`set xtics numeric`) the coordinate
  will be reported as a decimal number of degrees, and `format` will be assumed
  to contain normal numeric format specifiers rather than the special set above.
+4 xtics logscale
+?set xtics logscale
+?xtics logscale
+=logscale
+ If the `logscale` attribute is set for a tic series along a log-scaled axis,
+ the tic interval is interpreted as a multiplicative factor rather than a
+ constant. For example:
+      # generate a series of tics at y=20 y=200 y=2000 y=20000
+      set log y
+      set ytics 20, 10, 50000 logscale
+ Note that no tic is placed at y=50000 because it is not in the series 2*10^x.
+ If the logscale property is disabled, the tic increment will be treated as
+ an additive constant even for a log-scaled axis.  For example:
+      # generate a series of tics at y=20 y=40 y=60 ... y=200
+      set log y
+      set yrange [20:200]
+      set ytics 20 nologscale
+ The `logscale` attribute is set automatically by the `set log` command,
+ so normally you do not need this keyword unless you want to force a 
+ constant tic interval as in the second example above.
 4 xtics rangelimited
 ?set xtics rangelimited
 ?xtics rangelimited

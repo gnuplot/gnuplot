@@ -1,3 +1,15 @@
+2017-09-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (gen_tics) docs/gnuplot.doc demo/nonlinear6.dem:
+	Revise documentation of "set xtics" to include examples and description
+	of logscale keyword.  Restore pre-5.2 behaviour that for log-scaled axes
+	the increment in "set xtics {start,} incr {,end}" is interpreted as a
+	multiplicative factor rather than a constant interval.  However this is
+	only true if the "logscale" attribute is set for axis tics.
+	New demo nonlinear6.dem exercises this feature and also shows the use of
+	"set tics rangelimit" with log-scaled axes.
+	Bug #1971
+
 2017-09-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/parse.c (parse_array_assignment):  Memory leak.
