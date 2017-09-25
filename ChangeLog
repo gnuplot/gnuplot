@@ -1,3 +1,10 @@
+2017-09-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c:  smoothing options csplines|acsplines|bezier|sbezier
+	failed to recheck inrange/outrange after smoothing.  Example failure:
+	    plot [0:4][4:0] '+' using 1:1 smooth bezier w lines
+	Bugfix
+
 Release 5.0.7
 
 2017-08-16  Ethan A Merritt  <merritt@u.washington.edu>
