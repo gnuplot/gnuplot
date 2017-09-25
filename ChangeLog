@@ -5,6 +5,14 @@
 	    plot [0:4][4:0] '+' using 1:1 smooth bezier w lines
 	Bugfix
 
+	* src/interpol.c (mcs_interp):  The previous implementation of monotonic
+	cubic splines did not guarantee that the original points were included
+	in the set of generated points used to draw the resulting curve.  This
+	meant that the curve might not pass through all points.  Now we merge
+	the original points with the set of evenly sampled points.
+	Thanks to K Antal for identifying and demonstrating the problem.
+	Patch/Bug #1972
+
 2017-09-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (gen_tics) docs/gnuplot.doc demo/nonlinear6.dem:

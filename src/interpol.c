@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.57 2017/02/24 19:51:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.58 2017/03/16 18:16:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -1351,9 +1351,10 @@ mcs_interp(struct curve_points *plot)
     int i;
 
     /* These will track the resulting smoothed curve */
-    /* V5: Try to ensure that the sampling is fine enough to pass through the original points */
+    /* Larger number of samples gives smoother curve (no surprise!) */
     int Nsamp = (samples_1 > 2*N) ? samples_1 : 2*N;
-    struct coordinate *new_points = gp_alloc((Nsamp+1) * sizeof(coordinate), "mcs");
+    int Ntot = N + Nsamp;
+    struct coordinate *new_points = gp_alloc((Ntot) * sizeof(coordinate), "mcs");
     double sxmin = AXIS_LOG_VALUE(plot->x_axis, X_AXIS.min);
     double sxmax = AXIS_LOG_VALUE(plot->x_axis, X_AXIS.max);
     double xstart, xend, xstep;
@@ -1361,6 +1362,20 @@ mcs_interp(struct curve_points *plot)
     xstart = GPMAX(p[0].x, sxmin);
     xend = GPMIN(p[N-1].x, sxmax);
     xstep = (xend - xstart) / (Nsamp - 1);
+
+    /* Load output x coords for sampling */
+    for (i=0; i<N; i++)
+       new_points[i].x = p[i].x;
+    for ( ; i<Ntot; i++)
+       new_points[i].x = xstart + (i-N)*xstep;
+    /* Sort output x coords */
+    qsort(new_points, Ntot, sizeof(struct coordinate), compare_points);
+    /* Displace any collisions */
+    for (i=1; i<Ntot-1; i++) {
+       double delta = new_points[i].x - new_points[i-1].x;
+       if (new_points[i+1].x - new_points[i].x < delta/1000.)
+	   new_points[i].x -= delta/2.;
+    }
 
     /* Calculate spline coefficients */
 #define DX	xlow
@@ -1398,8 +1413,8 @@ mcs_interp(struct curve_points *plot)
     }
 
     /* Use the coefficients C1, C2, C3 to interpolate over the requested range */
-    for (i = 0; i < Nsamp; i++) {
-	double x = xstart + i * xstep;
+    for (i = 0; i < Ntot; i++) {
+	double x = new_points[i].x;
 	double y;
 	TBOOLEAN exact = FALSE;
 
@@ -1429,9 +1444,9 @@ mcs_interp(struct curve_points *plot)
 	    }
 	}
 
-	/* FIXME:  Log x?  autoscale x? */
-	new_points[i].x = x;
 	new_points[i].type = INRANGE;
+	STORE_WITH_LOG_AND_UPDATE_RANGE(new_points[i].x, x, new_points[i].type,
+		plot->x_axis, plot->noautoscale, NOOP, NOOP);
 	STORE_WITH_LOG_AND_UPDATE_RANGE(new_points[i].y, y, new_points[i].type,
 		plot->y_axis, plot->noautoscale, NOOP, NOOP);
     }
@@ -1439,8 +1454,8 @@ mcs_interp(struct curve_points *plot)
     /* Replace original data with the interpolated curve */
     free(p);
     plot->points = new_points;
-    plot->p_count = Nsamp;
-    plot->p_max = Nsamp + 1;
+    plot->p_count = Ntot;
+    plot->p_max = Ntot + 1;
 
 #undef DX
 #undef SLOPE
