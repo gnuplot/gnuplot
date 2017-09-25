@@ -1,5 +1,5 @@
 #
-# $Id: timedat.dem,v 1.13 2015/10/23 21:23:39 sfeam Exp $
+# $Id: timedat.dem,v 1.13.2.1 2017/09/03 23:32:22 sfeam Exp $
 #
 
 set title "Fsteps plot\nwith date and time as x-values"
@@ -59,6 +59,8 @@ plot x notitle
 
 pause -1 "Hit return to continue"
 
+print "\nRelative time output (strftime(), axis labels)"
+
 t = -3672.5
 print 't = ',t
 print 'print strftime("%.2tM == %.2tS", t)' , "	", strftime("%.2tM min == %.2tS sec", t)
@@ -70,5 +72,11 @@ print 't = ',t
 print 'print strftime("%.2tM == %.2tS", t)' , "	", strftime("%.2tM min == %.2tS sec", t)
 print 'print strftime("%tM:%.2tS", t)  ' , "	", strftime("%tM:%.2tS", t)
 print 'print strftime("%tH:%tM:%.2tS", t)' , "	", strftime("%tH:%tM:%.2tS", t)
+
+print "\nRelative time input (strptime(), data files)"
+
+print 'print strptime("%tH:%tM:%tS", "-1:01:12.50")', "\t", strptime("%tH:%tM:%tS", "-1:01:12.50")
+print 'print strptime("    %tM:%tS", "-61:12.50")', "\t", strptime("    %tM:%tS", "-61:12.50")
+print 'print strptime("        %tS", "-3672.50")', "\t", strptime("        %tS", "-3672.50")
 
 reset

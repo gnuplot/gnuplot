@@ -1,5 +1,5 @@
 /*
- * $Id: gp_time.h,v 1.8 2010/07/01 16:50:33 sfeam Exp $
+ * $Id: gp_time.h,v 1.9 2013/04/05 18:36:53 sfeam Exp $
  */
 
 /* GNUPLOT - gp_time.h */
@@ -41,6 +41,7 @@
 
 #include "syscfg.h"
 #include "stdfn.h"
+#include "gp_types.h"
 
 /* Define the zero point for internal storage of time+date as some number of seconds */
 /* Through gnuplot version 4.6 this was taken as 1-jan-2000, i.e. 30 years off from  */
@@ -70,7 +71,7 @@
 /* Prototypes of functions exported by time.c */
 
 /* string to *tm */
-char * gstrptime __PROTO((char *, char *, struct tm *, double *));
+td_type gstrptime __PROTO((char *, char *, struct tm *, double *, double *));
 
 /* seconds to string */
 size_t gstrftime __PROTO((char *, size_t, const char *, double));

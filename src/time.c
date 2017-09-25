@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: time.c,v 1.31 2015/10/22 16:16:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: time.c,v 1.31.2.1 2017/09/03 23:32:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - time.c */
@@ -94,15 +94,27 @@ gdysize(int yr)
 }
 
 
-/* new strptime() and gmtime() to allow time to be read as 24 hour,
- * and spaces in the format string. time is converted to seconds from 
- * the EPOCH date */
+/* gstrptime() interprets a time_spec format string
+ * and fills in a time structure that can be passed to gmtime() to
+ * recover number of seconds from the EPOCH date.
+ * Return value:
+ * DT_TIMEDATE	indicates "normal" format elements corresponding to
+ *		a date that is returned in tm, with fractional seconds
+ *		returned in usec
+ * DT_DMS	indicates relative time format elements were encountered
+ *		(tH tM tS).  The relative time in seconds is returned
+ *		in reltime.
+ * DT_BAD	time format could not be interpreted
+ *
+ * parameters and return values revised for gnuplot version 5.3
+ */
 
-char *
-gstrptime(char *s, char *fmt, struct tm *tm, double *usec)
+td_type
+gstrptime(char *s, char *fmt, struct tm *tm, double *usec, double *reltime)
 {
     int yday = 0;
     TBOOLEAN sanity_check_date = FALSE;
+    TBOOLEAN reltime_formats = FALSE;
 
     tm->tm_mday = 1;
     tm->tm_mon = tm->tm_hour = tm->tm_min = tm->tm_sec = 0;
@@ -136,6 +148,12 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec)
     if (strstr(fmt,"%m") || strstr(fmt,"%B") || strstr(fmt,"%b")) {
 	tm->tm_mon = -1;
 	sanity_check_date = TRUE;
+    }
+    /* Relative time formats tH tM tS cannot be mixed with date formats */
+    if (strstr(fmt,"%t")) {
+	reltime_formats = TRUE;
+	*reltime = 0.0;
+	sanity_check_date = FALSE;
     }
 
 
@@ -253,6 +271,30 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec)
 		    ufraction = atof(fraction);
 		if (ufraction < 1.)		/* Filter out e.g. 123.456e7 */
 		    *usec = ufraction;
+		*reltime = when;		/* not used unless return DT_DMS */
+		break;
+	    }
+
+	case 't':
+	    /* Relative time formats tH tM tS */
+	    {
+		double cont = 0;
+		fmt++;
+		if (*fmt == 'H') {
+		    cont = 3600. * strtod(s, &s);
+		} else if (*fmt == 'M') {
+		    cont = 60. * strtod(s, &s);
+		} else if (*fmt == 'S') {
+		    cont = strtod(s, &s);
+		} else {
+		    return DT_BAD;
+		}
+		if (*reltime < 0)
+		    *reltime -= fabs(cont);
+		else
+		    *reltime += cont;
+		/* FIXME:  reltime > 0 && cont < 0 should be disallowed */
+		/* FIXME:  leading precision field should be accepted but ignored */
 		break;
 	    }
 
@@ -260,6 +302,11 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec)
 	    int_warn(DATAFILE, "Bad time format in string");
 	}
 	fmt++;
+    }
+
+    /* Relative times are easy.  Just return the value in reltime */
+    if (reltime_formats) {
+	return DT_DMS;
     }
 
     FPRINTF((stderr, "read date-time : %02d/%02d/%d:%02d:%02d:%02d\n", tm->tm_mday, tm->tm_mon + 1, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
@@ -297,8 +344,7 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec)
 	if (yday) {
 
 	    if (tm->tm_yday < 0) {
-		// int_error(DATAFILE, "Illegal day of year");
-		return (NULL);
+		return DT_BAD;
 	    }
 
 	    /* we just set month to jan, day to yday, and let the
@@ -310,12 +356,10 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec)
 	    tm->tm_mday = tm->tm_yday + 1;
 	}
 	if (tm->tm_mon < 0) {
-	    // int_error(DATAFILE, "illegal month");
-	    return (NULL);
+	    return DT_BAD;
 	}
 	if (tm->tm_mday < 1) {
-	    // int_error(DATAFILE, "illegal day of month");
-	    return (NULL);
+	    return DT_BAD;
 	}
 	if (tm->tm_mon > 11) {
 	    tm->tm_year += tm->tm_mon / 12;
@@ -331,7 +375,7 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec)
 	    }
 	}
     }
-    return (s);
+    return DT_TIMEDATE;
 }
 
 size_t

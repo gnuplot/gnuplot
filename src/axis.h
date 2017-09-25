@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.166.2.1 2017/07/29 16:30:14 sfeam Exp $
+ * $Id: axis.h,v 1.166.2.2 2017/09/10 03:40:14 sfeam Exp $
  *
  */
 
@@ -105,13 +105,6 @@ typedef enum en_ticseries_type {
     TIC_MONTH,   		/* print out month names ((mo-1)%12)+1 */
     TIC_DAY      		/* print out day of week */
 } t_ticseries_type;
-
-typedef enum {
-    DT_NORMAL=0,		/* default; treat values as pure numeric */
-    DT_TIMEDATE,		/* old datatype */
-    DT_DMS,			/* degrees minutes seconds */
-    DT_UNINITIALIZED
-} td_type;
 
 /* Defines one ticmark for TIC_USER style.
  * If label==NULL, the value is printed with the usual format string.

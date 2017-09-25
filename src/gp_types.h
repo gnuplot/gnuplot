@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.72 2016/08/17 19:38:16 sfeam Exp $
+ * $Id: gp_types.h,v 1.73 2016/11/05 21:21:07 sfeam Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -196,6 +196,15 @@ typedef enum lp_class {
 	LP_ADHOC  = 2,	/* lp_style_type used for single purpose */
 	LP_NOFILL = 3	/* special treatment of fillcolor */
 } lp_class;
+
+/* Classes of time data */
+typedef enum {
+    DT_NORMAL=0,		/* default; treat values as pure numeric */
+    DT_TIMEDATE,		/* old datatype */
+    DT_DMS,			/* degrees minutes seconds */
+    DT_UNINITIALIZED,
+    DT_BAD			/* something went wrong (e.g. in gstrptime) */
+} td_type;
 
 /*
  * Introduction of nonlinear axes makes it possible for an axis-mapping function

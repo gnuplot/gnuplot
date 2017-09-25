@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.96.2.2 2017/07/15 03:59:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.96.2.3 2017/08/30 18:37:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1701,14 +1701,14 @@ f_strptime(union argument *arg)
 
 
     /* string -> time_tm  plus extra fractional second */
-    gstrptime(val.v.string_val, fmt.v.string_val, &time_tm, &usec);
-
-    /* time_tm -> result */
-    result = gtimegm(&time_tm);
+    if (gstrptime(val.v.string_val, fmt.v.string_val, &time_tm, &usec, &result)
+	    == DT_TIMEDATE) {
+	/* time_tm -> result */
+	result = gtimegm(&time_tm);
+	/* Add back any extra fractional second */
+	result += usec;
+    }
     FPRINTF((stderr," strptime result = %g seconds \n", result));
-
-    /* Add back any extra fractional second */
-    result += usec;
 
     gpfree_string(&val);
     gpfree_string(&fmt);

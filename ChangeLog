@@ -13,6 +13,18 @@
 	Thanks to K Antal for identifying and demonstrating the problem.
 	Patch/Bug #1972
 
+	* src/axis.c src/axis.h src/datafile.c src/gp_time.h src/gp_types.h
+	src/internal.c src/time.c demo/timedat.dem docs/gnuplot.doc:
+	Gnuplot already supports relative time format specifiers %tH %tM %tS
+	for output via strftime() and in the time format for axis tic labels.
+	Now we add the same format specifiers as an option for input via
+	strptime().  They can also be used to read data fields containing 
+	degrees/minutes/seconds.
+	relative time formats for input (this patch)
+	    print strptime("%tM:%tS", "-61:12.50")
+	    -3672.5
+	"normal" time formats don't work for this purpose (prints "0").
+
 2017-09-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (gen_tics) docs/gnuplot.doc demo/nonlinear6.dem:
