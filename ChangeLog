@@ -8,6 +8,10 @@
 	* src/gadgets.h src/graphics.c src/misc.c src/plot2d.c src/set.c
 	src/tables.h:  Rework parsing and handling of filledcurve options.
 
+	* src/command.c (array_command):  Allow size of an array to be
+	determined automatically from the number of initializers. E.g.
+	    array A = ["a","b","c"]
+
 2017-09-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c:  smoothing options csplines|acsplines|bezier|sbezier

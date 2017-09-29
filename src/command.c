@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.361 2017/08/01 00:56:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.362 2017/08/09 18:00:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -733,18 +733,20 @@ lower_command(void)
 
 /*
  * Arrays are declared using the syntax
- *    array A[size]
+ *    array A[size] { = [ element, element, ... ] }
  * where size is an integer and space is reserved for elements A[1] through A[size]
- * The size itself is stored in A[0].v.int_val.
+ * The size itself is stored in A[0].v.int_val.A
+ * The list of initial values is optional.
+ * Any element that is not initialized is set to NOTDEFINED.
  *
  * Elements in an existing array can be accessed like any other gnuplot variable.
  * Each element can be one of INTGR, CMPLX, STRING.
- * When the array is declared all elements are set to NOTDEFINED.
  */
 void
 array_command()
 {
-    int nsize = 0;
+    int nsize = 0;	/* Size of array when we leave */
+    int est_size = 0;	/* Estimated size */
     struct udvt_entry *array;
     struct value *A;
     int i;
@@ -755,12 +757,24 @@ array_command()
     array = add_udv(c_token);
     gpfree_array(&array->udv_value);
     gpfree_string(&array->udv_value);
-
-    if (!equals(++c_token,"["))
-	int_error(c_token, "expecting array[size]");
     c_token++;
-    nsize = int_expression();
-    if (!equals(c_token++,"]") || nsize <= 0)
+
+    if (equals(c_token, "[")) {
+	c_token++;
+	nsize = int_expression();
+	if (!equals(c_token++,"]"))
+	    int_error(c_token-1, "expecting array[size>0]");
+    } else if (equals(c_token, "=") && equals(c_token+1, "[")) {
+	/* Estimate size of array by counting commas in the initializer */
+	for ( i = c_token+2; i < num_tokens; i++) {
+	    if (equals(i,",") || equals(i,"]"))
+		est_size++;
+	    if (equals(i,"]"))
+		break;
+	}
+	nsize = est_size;
+    }
+    if (nsize <= 0)
 	int_error(c_token-1, "expecting array[size>0]");
 
     array->udv_value.v.value_array = gp_alloc((nsize+1) * sizeof(t_value), "array_command");
@@ -775,6 +789,7 @@ array_command()
 
     /* Initializer syntax:   array A[10] = [x,y,z,,"foo",] */
     if (equals(c_token, "=")) {
+	int initializers = 0;
 	if (!equals(++c_token, "["))
 	    int_error(c_token, "expecting Array[size] = [x,y,...]");
 	c_token++;
@@ -782,10 +797,12 @@ array_command()
 	    if (equals(c_token, "]"))
 		break;
 	    if (equals(c_token, ",")) {
+		initializers++;
 		c_token++;
 		continue;
 	    }
 	    const_express(&A[i]);
+	    initializers++;
 	    if (equals(c_token, "]"))
 		break;
 	    if (equals(c_token, ","))
@@ -794,6 +811,9 @@ array_command()
 		int_error(c_token, "expecting Array[size] = [x,y,...]");
 	}
 	c_token++;
+	/* If the size is determined by the number of initializers */
+	if (A[0].v.int_val == 0)
+	    A[0].v.int_val = initializers;
     }
 
     return;
