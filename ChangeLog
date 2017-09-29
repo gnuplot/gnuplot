@@ -1,3 +1,10 @@
+2017-09-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.h src/axis.c (axis_set_scale_and_range):  Incorrect use
+	of unsigned parameters caused terminal scaling to fail if the axis 
+	range was inverted. The error was introduced by converting from a
+	macro to a subroutine in the run-up to 5.2.
+
 2017-09-25  Dima Kogan  <dima@secretsauce.net>
 
 	* src/axis.c (clone_linked_axes):  When sanity checking the via/inverse
