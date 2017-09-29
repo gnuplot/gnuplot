@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.177 2017/09/05 20:18:58 sfeam Exp $
+ * $Id: axis.h,v 1.178 2017/09/10 03:40:01 sfeam Exp $
  *
  */
 
@@ -570,7 +570,7 @@ double quantize_normal_tics __PROTO((double, int));
 void setup_tics __PROTO((struct axis *, int));
 void gen_tics __PROTO((struct axis *, tic_callback));
 void axis_output_tics __PROTO((AXIS_INDEX, int *, AXIS_INDEX, tic_callback));
-void axis_set_scale_and_range __PROTO((struct axis *axis, unsigned int lower, unsigned int upper));
+void axis_set_scale_and_range __PROTO((struct axis *axis, int lower, int upper));
 void axis_draw_2d_zeroaxis __PROTO((AXIS_INDEX, AXIS_INDEX));
 TBOOLEAN some_grid_selected __PROTO((void));
 void add_tic_user __PROTO((struct axis *, char *, double, int));

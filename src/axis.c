@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.245 2017/09/11 03:40:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.246 2017/09/23 04:48:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1585,7 +1585,7 @@ axis_output_tics(
 
 /* {{{ axis_set_scale_and_range() */
 void
-axis_set_scale_and_range(struct axis *axis, unsigned int lower, unsigned int upper)
+axis_set_scale_and_range(struct axis *axis, int lower, int upper)
 {
     axis->term_scale = (upper - lower) / (axis->max - axis->min);
     axis->term_lower = lower;
