@@ -1,3 +1,10 @@
+2018-09-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c (array_command):  Allow size of an array to be
+	determined automatically from the number of initializers. E.g.
+	    array A = ["a","b","c"]
+	Backport from 5.3
+
 2018-09-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c src/plot2d.c:  Fix regressions in 5.2 polar plot mode.
