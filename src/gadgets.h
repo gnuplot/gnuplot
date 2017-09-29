@@ -246,8 +246,7 @@ typedef enum en_key_sample_positioning {
 } t_key_sample_positioning;
 
 typedef struct {
-    int opt_given; /* option given / not given (otherwise default) */
-    int closeto;   /* from list FILLEDCURVES_CLOSED, ... */
+    enum filledcurves_opts_id closeto;	/* from list FILLEDCURVES_CLOSED, ... */
     double at;	   /* value for FILLEDCURVES_AT... */
     double aty;	   /* the other value for FILLEDCURVES_ATXY */
     int oneside;   /* -1 if fill below bound only; +1 if fill above bound only */

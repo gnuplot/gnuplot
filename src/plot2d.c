@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.457 2017/09/18 22:24:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.458 2017/09/25 16:44:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -969,7 +969,8 @@ get_data(struct curve_points *current_plot)
 		    /* fall through */
 
 		case FILLEDCURVES:
-		    current_plot->filledcurves_options.closeto = FILLEDCURVES_BETWEEN;
+		    if (current_plot->filledcurves_options.closeto == FILLEDCURVES_DEFAULT)
+			current_plot->filledcurves_options.closeto = FILLEDCURVES_BETWEEN;
 		    store2d_point(current_plot, i++, v[0], v[1], v[0], v[0],
 				  v[1], v[2], -1.0);
 		    break;
@@ -2081,7 +2082,7 @@ eval_plots()
 		this_plot->plot_type = DATA;
 		this_plot->plot_style = data_style;
 		this_plot->plot_smooth = SMOOTH_NONE;
-		this_plot->filledcurves_options.opt_given = 0;
+		this_plot->filledcurves_options.closeto = FILLEDCURVES_DEFAULT;
 
 		/* Only relevant to "with table" */
 		free_at(table_filter_at);
@@ -2132,7 +2133,7 @@ eval_plots()
 		}
 		this_plot->plot_type = FUNC;
 		this_plot->plot_style = func_style;
-		this_plot->filledcurves_options.opt_given = 0;
+		this_plot->filledcurves_options.closeto = FILLEDCURVES_DEFAULT;
 		end_token = c_token - 1;
 	    }                   /* end of IS THIS A FILE OR A FUNC block */
 

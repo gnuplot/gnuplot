@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.569 2017/09/11 20:13:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.570 2017/09/17 18:54:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4615,7 +4615,7 @@ set_style()
 	data_style = get_style();
 	if (data_style == FILLEDCURVES) {
 	    get_filledcurves_style_options(&filledcurves_opts_data);
-	    if (!filledcurves_opts_data.opt_given) /* default value */
+	    if (filledcurves_opts_func.closeto == FILLEDCURVES_DEFAULT)
 		filledcurves_opts_data.closeto = FILLEDCURVES_CLOSED;
 	}
 	break;
@@ -4632,7 +4632,7 @@ set_style()
 		func_style = temp_style;
 	    if (func_style == FILLEDCURVES) {
 		get_filledcurves_style_options(&filledcurves_opts_func);
-		if (!filledcurves_opts_func.opt_given) /* default value */
+		if (filledcurves_opts_func.closeto == FILLEDCURVES_DEFAULT)
 		    filledcurves_opts_func.closeto = FILLEDCURVES_CLOSED;
 	    }
 	    break;

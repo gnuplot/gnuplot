@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.573 2017/09/12 15:16:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.574 2017/09/13 22:59:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -796,7 +796,17 @@ do_plot(struct curve_points *plots, int pcount)
 		break;
 
 	    case FILLEDCURVES:
-		if (this_plot->filledcurves_options.closeto == FILLEDCURVES_BETWEEN) {
+		if (this_plot->filledcurves_options.closeto == FILLEDCURVES_DEFAULT) {
+		    if (this_plot->plot_type == DATA)
+			memcpy(&this_plot->filledcurves_options,
+				 &filledcurves_opts_data, sizeof(filledcurves_opts));
+		    else
+			memcpy(&this_plot->filledcurves_options,
+				&filledcurves_opts_func, sizeof(filledcurves_opts));
+		}
+		if (this_plot->filledcurves_options.closeto == FILLEDCURVES_BETWEEN
+		||  this_plot->filledcurves_options.closeto == FILLEDCURVES_ABOVE
+		||  this_plot->filledcurves_options.closeto == FILLEDCURVES_BELOW) {
 		    plot_betweencurves(this_plot);
 		} else if (!this_plot->plot_smooth &&
 		   (this_plot->filledcurves_options.closeto == FILLEDCURVES_ATY1
@@ -1245,16 +1255,6 @@ plot_filledcurves(struct curve_points *plot)
 	return;
     }
 
-    if (!plot->filledcurves_options.opt_given) {
-	/* no explicitly given filledcurves option for the current plot =>
-	   use the default for data or function, respectively
-	*/
-	if (plot->plot_type == DATA)
-	    memcpy(&plot->filledcurves_options, &filledcurves_opts_data, sizeof(filledcurves_opts));
-	else
-	    memcpy(&plot->filledcurves_options, &filledcurves_opts_func, sizeof(filledcurves_opts));
-    }
-
     /* clip the "at" coordinate to the drawing area */
     switch (plot->filledcurves_options.closeto) {
 	case FILLEDCURVES_ATX1:
@@ -1275,6 +1275,8 @@ plot_filledcurves(struct curve_points *plot)
 			axis_array[FIRST_X_AXIS].min, axis_array[FIRST_X_AXIS].max);
 	    cliptorange(plot->filledcurves_options.aty,
 			axis_array[FIRST_Y_AXIS].min, axis_array[FIRST_Y_AXIS].max);
+	    break;
+	default:
 	    break;
     }
 

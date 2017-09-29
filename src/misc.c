@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.212 2017/04/19 06:20:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.213 2017/07/25 21:48:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -781,47 +781,43 @@ get_style()
 }
 
 /* Parse options for style filledcurves and fill fco accordingly.
- * If no option given, then set fco->opt_given to 0.
+ * If no option given, set it to FILLEDCURVES_DEFAULT.
  */
 void
 get_filledcurves_style_options(filledcurves_opts *fco)
 {
-    int p;
-    p = lookup_table(&filledcurves_opts_tbl[0], c_token);
+    enum filledcurves_opts_id p;
+    fco->closeto = FILLEDCURVES_DEFAULT;
+    fco->oneside = 0;
 
-    if (p == FILLEDCURVES_ABOVE) {
-	fco->oneside = 1;
-	p = lookup_table(&filledcurves_opts_tbl[0], ++c_token);
-    } else if (p == FILLEDCURVES_BELOW) {
-	fco->oneside = -1;
-	p = lookup_table(&filledcurves_opts_tbl[0], ++c_token);
-    } else
-	fco->oneside = 0;
+    while ((p = lookup_table(&filledcurves_opts_tbl[0], c_token)) != -1) {
+	fco->closeto = p;
+	c_token++;
 
-    if (p == -1) {
-	fco->opt_given = 0;
-	return;			/* no option given */
-    } else
-	fco->opt_given = 1;
+	if (p == FILLEDCURVES_ABOVE) {
+	    fco->oneside = 1;
+	    continue;
+	} else if (p == FILLEDCURVES_BELOW) {
+	    fco->oneside = -1;
+	    continue;
+	} 
 
-    c_token++;
-
-    fco->closeto = p;
-    fco->at = 0;
-    if (!equals(c_token, "="))
-	return;
-    /* parameter required for filledcurves x1=... and friends */
-    if (p < FILLEDCURVES_ATXY)
-	fco->closeto += 4;
-    c_token++;
-    fco->at = real_expression();
-    if (p != FILLEDCURVES_ATXY)
-	return;
-    /* two values required for FILLEDCURVES_ATXY */
-    if (!equals(c_token, ","))
-	int_error(c_token, "syntax is xy=<x>,<y>");
-    c_token++;
-    fco->aty = real_expression();
+	fco->at = 0;
+	if (!equals(c_token, "="))
+	    return;
+	/* parameter required for filledcurves x1=... and friends */
+	if (p < FILLEDCURVES_ATXY)
+	    fco->closeto += 4;
+	c_token++;
+	fco->at = real_expression();
+	if (p != FILLEDCURVES_ATXY)
+	    return;
+	/* two values required for FILLEDCURVES_ATXY */
+	if (!equals(c_token, ","))
+	    int_error(c_token, "syntax is xy=<x>,<y>");
+	c_token++;
+	fco->aty = real_expression();
+    }
     return;
 }
 
@@ -831,7 +827,7 @@ get_filledcurves_style_options(filledcurves_opts *fco)
 void
 filledcurves_options_tofile(filledcurves_opts *fco, FILE *fp)
 {
-    if (!fco->opt_given)
+    if (fco->closeto == FILLEDCURVES_DEFAULT)
 	return;
     if (fco->oneside)
 	fputs(fco->oneside > 0 ? "above " : "below ", fp);
