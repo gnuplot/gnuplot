@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.189.2.26 2017/05/22 12:29:11 markisch Exp $
+ * $Id: wgraph.c,v 1.189.2.27 2017/05/25 18:23:03 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -890,6 +890,9 @@ GetPlotRectInMM(LPGW lpgw, LPRECT rect, HDC hdc)
 	int iWidthMM, iHeightMM, iWidthPels, iHeightPels;
 
 	GetPlotRect (lpgw, rect);
+	rect->right -= rect->left;
+	rect->bottom -= rect->top;
+	rect->left = rect->top = 0;
 
 	/* Taken from
 	http://msdn.microsoft.com/en-us/library/dd183519(VS.85).aspx
@@ -3101,8 +3104,8 @@ SaveAsEMF(LPGW lpgw)
 
 	Ofn.lStructSize = sizeof(OPENFILENAME);
 	Ofn.hwndOwner = hwnd;
-	Ofn.lpstrInitialDir = (LPSTR)NULL;
-	Ofn.lpstrFilter = (LPCTSTR) "Enhanced Metafile (*.EMF)\0*.EMF\0All Files (*.*)\0*.*\0";
+	Ofn.lpstrInitialDir = NULL;
+	Ofn.lpstrFilter = "Enhanced Metafile (*.EMF)\0*.EMF\0All Files (*.*)\0*.*\0";
 	Ofn.lpstrCustomFilter = lpstrCustomFilter;
 	Ofn.nMaxCustFilter = 255;
 	Ofn.nFilterIndex = 1;   /* start with the *.emf filter */
@@ -3125,15 +3128,18 @@ SaveAsEMF(LPGW lpgw)
 		/* get the context */
 		hdc = GetDC(hwnd);
 		GetPlotRect(lpgw, &rect);
+		rect.right -= rect.left;
+		rect.bottom -= rect.top;
+		rect.left = rect.top = 0;
 		GetPlotRectInMM(lpgw, &mfrect, hdc);
 
 		/* temporarily disable antialiasing */
 		antialiasing = lpgw->antialiasing;
 		lpgw->antialiasing = FALSE;
 
-		hmf = CreateEnhMetaFile(hdc, Ofn.lpstrFile, &mfrect, (LPCTSTR)NULL);
+		hmf = CreateEnhMetaFile(hdc, Ofn.lpstrFile, &mfrect, NULL);
 		/* Always create EMF files using GDI only! */
-		drawgraph(lpgw, hmf, (LPRECT) &rect);
+		drawgraph(lpgw, hmf, &rect);
 		hemf = CloseEnhMetaFile(hmf);
 
 		lpgw->antialiasing = antialiasing;
@@ -3192,6 +3198,9 @@ CopyClip(LPGW lpgw)
 	/* OK, bitmap done, now create an enhanced Metafile context
 	 * and redraw the whole plot into that.
 	 */
+	rect.right -= rect.left;
+	rect.bottom -= rect.top;
+	rect.left = rect.top = 0;
 	{
 		/* make copy of window's main status struct for modification */
 		GW gwclip = *lpgw;
@@ -3205,9 +3214,9 @@ CopyClip(LPGW lpgw)
 
 		GetPlotRectInMM(lpgw, &mfrect, hdc);
 
-		hmf = CreateEnhMetaFile(hdc, (LPCTSTR)NULL, &mfrect, (LPCTSTR)NULL);
+		hmf = CreateEnhMetaFile(hdc, NULL, &mfrect, NULL);
 		/* Always create EMF files using GDI only! */
-		drawgraph(&gwclip, hmf, (LPRECT) &rect);
+		drawgraph(&gwclip, hmf, &rect);
 		hemf = CloseEnhMetaFile(hmf);
 
 		DestroyFonts(&gwclip);
