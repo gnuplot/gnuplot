@@ -1,3 +1,12 @@
+2017-10-01  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/winmain.c|h src/command.c:  For wgnuplot, open or attach to a
+	console when executing system commands so we can its the output.  That
+	in my option eliminates the last benefit of wgnuplot_pipes over
+	wgnuplot.  Note that the process terminates if the new console is
+	closed, just as is the case with wgnuplot_pipes, but the console is
+	only opened when actually required.
+
 2017-09-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h src/axis.c (axis_set_scale_and_range):  Incorrect use

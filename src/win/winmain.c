@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.103 2017/07/29 08:35:44 markisch Exp $
+ * $Id: winmain.c,v 1.104 2017/09/01 05:21:01 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -1082,6 +1082,7 @@ fake_pclose(FILE *stream)
 }
 #endif
 
+
 #ifdef WGP_CONSOLE
 
 DWORD WINAPI
@@ -1463,6 +1464,22 @@ WinMessageLoop(void)
 	DispatchMessage(&msg);
     }
 }
+
+
+#ifndef WGP_CONSOLE
+void
+WinOpenConsole(void)
+{
+    /* Try to attach to an existing console window. */
+    if (AttachConsole(ATTACH_PARENT_PROCESS) == 0) {
+	if (GetLastError() != ERROR_ACCESS_DENIED) {
+	    /* Open new console if we are are not attached to one already.
+	       Note that closing this console window will end wgnuplot, too. */
+	    AllocConsole();
+	}
+    }
+}
+#endif
 
 
 void

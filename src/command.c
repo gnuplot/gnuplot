@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.362 2017/08/09 18:00:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.363 2017/09/29 19:38:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -124,12 +124,12 @@ int thread_rl_RetCode = -1; /* return code from readline in a thread */
 #ifdef _WIN32
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>
-# ifdef __MSC__
+# ifdef _MSC_VER
 #  include <malloc.h>
 #  include <direct.h>          /* getcwd() */
 # else
 #  include <alloc.h>
-# endif				/* !MSC */
+# endif
 # include <htmlhelp.h>
 # include "win/winmain.h"
 #endif /* _WIN32 */
@@ -3090,6 +3090,10 @@ do_system(const char *cmd)
     if (!cmd)
 	return;
     restrict_popen();
+#if defined(_WIN32) && !defined(WGP_CONSOLE)
+    /* Open a console so we can see the command's output */
+    WinOpenConsole();
+#endif
 #if defined(_WIN32) && !defined(__WATCOMC__)
     {
 	LPWSTR wcmd = UnicodeText(cmd, encoding);
