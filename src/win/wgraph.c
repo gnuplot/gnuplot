@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.255.2.8 2017/08/29 11:38:16 markisch Exp $
+ * $Id: wgraph.c,v 1.255.2.9 2017/08/29 11:45:16 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -948,6 +948,9 @@ GetPlotRectInMM(LPGW lpgw, LPRECT rect, HDC hdc)
 	int iWidthMM, iHeightMM, iWidthPels, iHeightPels;
 
 	GetPlotRect (lpgw, rect);
+	rect->right -= rect->left;
+	rect->bottom -= rect->top;
+	rect->left = rect->top = 0;
 
 	/* Taken from
 	http://msdn.microsoft.com/en-us/library/dd183519(VS.85).aspx
@@ -3013,6 +3016,9 @@ SaveAsEMF(LPGW lpgw)
 		/* get the context */
 		hdc = GetDC(hwnd);
 		GetPlotRect(lpgw, &rect);
+		rect.right -= rect.left;
+		rect.bottom -= rect.top;
+		rect.left = rect.top = 0;
 		GetPlotRectInMM(lpgw, &mfrect, hdc);
 
 		switch (Ofn.nFilterIndex) {
@@ -3088,6 +3094,9 @@ CopyClip(LPGW lpgw)
 	/* OK, bitmap done, now create an enhanced Metafile context
 	 * and redraw the whole plot into that.
 	 */
+	rect.right -= rect.left;
+	rect.bottom -= rect.top;
+	rect.left = rect.top = 0;
 #ifdef HAVE_GDIPLUS
 	if (lpgw->gdiplus) {
 		hemf = clipboard_gdiplus(lpgw, hdc, &rect);
