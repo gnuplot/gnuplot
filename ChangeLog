@@ -1,3 +1,7 @@
+2017-10-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm:  Report number of frames in completed animation sequence.
+
 2017-10-01  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c:  Make sure that the bounding rectangle of emf data
