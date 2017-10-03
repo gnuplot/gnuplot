@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.189 2016/12/06 05:17:18 sfeam Exp $
+ * $Id: gd.trm,v 1.190 2017/07/24 07:54:55 markisch Exp $
  */
 
 /* GNUPLOT -- gd.trm */
@@ -1218,9 +1218,9 @@ PNG_reset()
 #ifdef GIF_ANIMATION
     if (png_state.animate && !strncmp(term->name,"gif",3)) {
 	gdImageGifAnimEnd(gpoutfile);
+	fprintf(stderr,"%d frames in animation sequence\n", png_state.frame_count);
 	png_state.frame_count = 0;
 	png_state.animate = FALSE;
-	fprintf(stderr,"End of animation sequence\n");
     }
 #endif
 }

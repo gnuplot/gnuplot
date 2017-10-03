@@ -1,3 +1,7 @@
+2017-10-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm:  Report number of frames in completed animation sequence.
+
 2017-10-01  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/winmain.c|h src/command.c:  For wgnuplot, open or attach to a
