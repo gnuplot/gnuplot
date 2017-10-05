@@ -1,3 +1,10 @@
+2017-10-05  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wd2d.cpp:  Enable color font support.  This enables colored
+	emojis, which can be used e.g. as point symbols.  Due to the default
+	font-fallback to "Segoe UI Emoji", this might lead to unexpected
+	results if a plot relied on non-colored character fallbacks.
+
 2017-10-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm:  Report number of frames in completed animation sequence.

@@ -1,5 +1,5 @@
 /*
- * $Id: wd2d.cpp,v 1.32 2017/07/31 19:36:05 markisch Exp $
+ * $Id: wd2d.cpp,v 1.33 2017/08/05 20:04:56 markisch Exp $
  */
 
 /*
@@ -71,6 +71,11 @@ extern "C" {
 # define HAVE_UUIDOF
 #endif
 
+// Note: This may or may not be declared in an enum in SDK headers.
+//       Unfortunalely we cannot test for the SDK version here, so we always define it
+//       ourselves.  MinGW headers currently do define that anyway. 
+# define D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT static_cast<D2D1_DRAW_TEXT_OPTIONS>(0x00000004)
+
 #define MINMAX(a,val,b) (((val) <= (a)) ? (a) : ((val) <= (b) ? (val) : (b)))
 const int pattern_num = 8;
 const float textbox_width = 3000.f;
@@ -88,6 +93,7 @@ static IWICImagingFactory * g_wicFactory = NULL;
 // All graph windows share a common DC render target
 static ID2D1DCRenderTarget * g_pRenderTarget = NULL;
 #endif
+static bool bHaveColorFonts = false;
 
 static HRESULT d2dCreateStrokeStyle(D2D1_DASH_STYLE dashStyle, BOOL rounded, ID2D1StrokeStyle **ppStrokeStyle);
 static HRESULT d2dCreateStrokeStyle(const FLOAT * dashes, UINT dashesCount, BOOL rounded, ID2D1StrokeStyle **ppStrokeStyle);
@@ -131,7 +137,6 @@ inline void SafeRelease(Interface **ppInterfaceToRelease)
 
 /* Internal state of enhanced text processing.
 */
-
 static struct {
 	ID2D1RenderTarget * pRenderTarget;
 	IDWriteTextFormat * pWriteTextFormat;
@@ -367,6 +372,17 @@ d2dInit(LPGW lpgw)
 			hr = d2dCreateDeviceSwapChainBitmap(lpgw);
 #endif
 #endif
+
+		// Test for Windows 8.1 or later (version >= 6.3).
+		// We don't use versionhelpers.h as this is not available for OpenWatcom.
+		// Note: We should rather do a feature test here.
+		OSVERSIONINFO versionInfo;
+		ZeroMemory(&versionInfo, sizeof(OSVERSIONINFO));
+		versionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+		GetVersionEx(&versionInfo);
+		if ((versionInfo.dwMajorVersion > 6) || 
+			((versionInfo.dwMajorVersion == 6) && (versionInfo.dwMajorVersion == 3)))
+			bHaveColorFonts = true;
 	}
 	return hr;
 }
@@ -866,9 +882,13 @@ EnhancedPutText(int x, int y, char * text)
 	if (enhstate.lpgw->angle != 0)
 		pRenderTarget->SetTransform(D2D1::Matrix3x2F::Rotation(-enhstate.lpgw->angle, D2D1::Point2F(x, y)));
 	const float align_ofs = 0.;
+	D2D1_DRAW_TEXT_OPTIONS options = D2D1_DRAW_TEXT_OPTIONS_NONE;
+	if (bHaveColorFonts)
+		options = D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT;
 	pRenderTarget->DrawText(textw, static_cast<UINT32>(wcslen(textw)), enhstate_d2d.pWriteTextFormat,
-							 D2D1::RectF(x + align_ofs, y - enhstate.lpgw->tmAscent,
-										 x + align_ofs + textbox_width, 8888), enhstate_d2d.pBrush);
+							D2D1::RectF(x + align_ofs, y - enhstate.lpgw->tmAscent,
+										x + align_ofs + textbox_width, 8888),
+							enhstate_d2d.pBrush, options);
 	if (enhstate.lpgw->angle != 0)
 		pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
 
@@ -1571,10 +1591,13 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 				if (textw) {
 					if (lpgw->angle != 0)
 						pRenderTarget->SetTransform(D2D1::Matrix3x2F::Rotation(-lpgw->angle, D2D1::Point2F(xdash + hshift, ydash + vshift)));
-
+					D2D1_DRAW_TEXT_OPTIONS options = D2D1_DRAW_TEXT_OPTIONS_NONE;
+					if (bHaveColorFonts)
+						options = D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT;
 					pRenderTarget->DrawText(textw, static_cast<UINT32>(wcslen(textw)), pWriteTextFormat,
-											 D2D1::RectF(xdash + hshift + align_ofs, ydash + vshift,
-														 xdash + hshift + align_ofs + textbox_width, 8888), pSolidBrush);
+											D2D1::RectF(xdash + hshift + align_ofs, ydash + vshift,
+														xdash + hshift + align_ofs + textbox_width, 8888),
+											pSolidBrush, options);
 					if (lpgw->angle != 0)
 						pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
 
@@ -2372,7 +2395,7 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 	}
 #endif
 
-	// TODO: some of these resource are device independent and could be preserved
+	// TODO: some of these resources are device independent and could be preserved
 	SafeRelease(&pSolidBrush);
 	SafeRelease(&pSolidFillBrush);
 	SafeRelease(&pPatternFillBrush);
