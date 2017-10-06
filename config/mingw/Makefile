@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.85 2017/08/29 04:47:14 markisch Exp $
+# $Id: Makefile,v 1.86 2017/10/06 07:23:19 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 #
@@ -46,7 +46,7 @@ VARIANT = PLAIN
 # Set-up your compiler environment
 #
 # Define if you are using MSYS2/MinGW64 instead of MSYS/MinGW
-#MINGW64=1
+MINGW64=1
 # Define if you want a 32bit version (even using a 64bit compiler)
 #M32=1
 # Define if you use clang instead of gcc, requires MINGW64
@@ -156,7 +156,7 @@ CERF=1
 #GNUREADLINE=1
 
 # Uncomment if you want to use Direct2D 1.1 (Windows 8 and Windows 7 Platform Update)
-#DIRECT2D11=1
+DIRECT2D11=1
 
 
 # Below you can adapt paths according to your software setup:
