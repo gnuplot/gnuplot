@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.64 2017/07/24 07:54:52 markisch Exp $
+ * $Id: syscfg.h,v 1.65 2017/07/29 08:35:44 markisch Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -257,11 +257,23 @@ FILE * win_popen(const char *filename, const char *mode);
 #define GPHUGE /* nothing */
 #define GPFAR /* nothing */
 
+#if defined(HAVE_SYS_TYPES_H)
+# include <sys/types.h>
+# if defined(HAVE_SYS_WAIT_H)
+#  include <sys/wait.h>
+# endif
+#endif
+
+#if !defined(WEXITSTATUS)
+# if defined(_WIN32)
+#  define WEXITSTATUS(stat_val) (stat_val)
+# else
+#  define WEXITSTATUS(stat_val) ((unsigned int)(stat_val) >> 8)
+# endif
+#endif
+
 /* LFS support */
 #if !defined(HAVE_FSEEKO) || !defined(HAVE_OFF_T)
-# if defined(HAVE_SYS_TYPES_H)
-#   include <sys/types.h>
-# endif
 # if defined(_MSC_VER)
 #   define off_t __int64
 # elif defined(__MINGW32__)

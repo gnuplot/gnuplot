@@ -1,3 +1,14 @@
+2017-10-06  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/command.c: Move WEXITSTATUS fall-back definition away from here.
+
+	* src/syscfg.h: Include <sys/wait.h>, if it exists.
+	(WEXITSTATUS): Provide fall-back definition, if none in
+	<sys/wait.h>.  Move MS Windows specific replacement from command.c
+	to here.
+
+	* configure.ac: Add call to AC_HEADER_SYS_WAIT
+
 2017-10-06  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/mingw/Makefile:  Add helpfiles to "all" target, including
@@ -38,8 +49,8 @@
 
 2017-09-29  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/axis.h src/axis.c (axis_set_scale_and_range):  Incorrect use
-	of unsigned parameters caused terminal scaling to fail if the axis 
+	* src/axis.h src/axis.c (axis_set_scale_and_range): Incorrect use
+	of unsigned parameters caused terminal scaling to fail if the axis
 	range was inverted. The error was introduced by converting from a
 	macro to a subroutine in the run-up to 5.2.
 

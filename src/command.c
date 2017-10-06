@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.363 2017/09/29 19:38:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.364 2017/10/01 09:01:57 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -3620,10 +3620,6 @@ do_system_func(const char *cmd, char **output)
 #endif /* VMS || PIPES */
 
 }
-
-#if defined(_WIN32) && !defined(WEXITSTATUS)
-#define WEXITSTATUS(error) (error)
-#endif
 
 static int
 report_error(int ierr)
