@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.84 2017/08/13 05:12:21 markisch Exp $
+# $Id: Makefile,v 1.85 2017/08/29 04:47:14 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 #
@@ -547,7 +547,7 @@ EXTRA_CPPFLAGS_PIPES += -DPIPES
 TARGETS_CONSOLE = gnuplot.exe
 EXTRA_CPPFLAGS_CONSOLE += -DWGP_CONSOLE -DPIPES
 
-DEFAULT_TARGETS = $(VERSIONING) config.h $(TARGETS_$(VARIANT)) $(QT_TARGET) $(HELPFILE)
+DEFAULT_TARGETS = $(VERSIONING) config.h $(TARGETS_$(VARIANT)) $(QT_TARGET)
 
 default: $(DEFAULT_TARGETS)
 
@@ -563,11 +563,11 @@ docs: gnuplot.pdf tutorial.pdf ps_symbols.pdf ps_fontfile_doc.pdf ps_guide.pdf
 
 help: $(HELPFILE)
 
-support: $(M)bf_test.exe $(QT_TRANSLATION) demo_plugin.dll $(LUATARGETS)
-
 ja: $(HELPFILEJA)
 
-all: $(DEFAULT_TARGETS) $(TARGETS_PLAIN) $(TARGETS_PIPES) $(TARGETS_CONSOLE) support docs
+support: $(M)bf_test.exe $(QT_TRANSLATION) demo_plugin.dll $(LUATARGETS)
+
+all: $(DEFAULT_TARGETS) $(TARGETS_PLAIN) $(TARGETS_PIPES) $(TARGETS_CONSOLE) help ja support docs
 
 
 # include the 'core makefile template'
