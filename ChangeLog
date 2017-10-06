@@ -10,6 +10,12 @@
 	* config/mingw/Makefile:  Add a note that secure APIs are required
 	(pointed out by Allin Cottrell on the mailing list).
 
+	* config/msvc/Makefile:  Build and install support files for the
+	lua/tikz terminal.
+
+	src/win/wgnuplot.mnu:  Add menu items to edit gnuplot.ini and
+	wgnuplot.ini to 'Help' menu.
+
 2017-10-05  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wd2d.cpp:  Enable color font support.  This enables colored

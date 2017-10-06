@@ -112,7 +112,7 @@
 		Fsteps
 			with fsteps
 		Histeps
-			with histeps		
+			with histeps
 	[EndMenu]
 	[Menu]
 	with Style (compound)
@@ -725,6 +725,13 @@ Fu&nctions
 		help [INPUT]Help Topic?{ENTER}
 	&Windows
 		help windows{ENTER}
+	--
+	&Options
+		[OPTIONS]
+	&Edit wgnuplot.ini
+		!start notepad %APPDATA%\wgnuplot.ini{ENTER}
+	Edit &gnuplot.ini
+		!start notepad %APPDATA%\gnuplot.ini{ENTER}
 	--
 	&About
 		[ABOUT]
