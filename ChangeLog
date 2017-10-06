@@ -7,6 +7,9 @@
 	Note that building using Mingw32 currently does not work anyway
 	due to missing headers libraries for newer Windows APIs.
 
+	* config/mingw/Makefile:  Add a note that secure APIs are required
+	(pointed out by Allin Cottrell on the mailing list).
+
 2017-10-05  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wd2d.cpp:  Enable color font support.  This enables colored

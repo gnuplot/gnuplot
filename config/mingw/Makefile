@@ -1,10 +1,12 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.86 2017/10/06 07:23:19 markisch Exp $
+# $Id: Makefile,v 1.87 2017/10/06 07:28:39 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 #
 # Note: Currently MinGW cannot be used to compile gnuplot unless
 #       libraries / headers are updated.
+# Note that Mingw-w64 needs to be configured with --enable-secure-api, and
+#       MINGW_HAS_SECURE_API must be defined in _mingw.h.
 #
 # See http://www.mingw.org or http://msys2.github.io/ for more details.
 
