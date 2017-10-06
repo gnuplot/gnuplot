@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.41 2017/08/10 15:31:23 markisch Exp $
+# $Id: Makefile,v 1.42 2017/08/15 14:24:22 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2010 or newer
 
@@ -102,6 +102,9 @@ GNUPLOT_JS_DIR = share\\js
 
 # Similarly for scripts used by the lua terminal
 GNUPLOT_LUA_DIR = share\\lua
+
+# Install will put TeX files here:
+GNUPLOT_TEX_DIR = share\\texmf\\tex
 
 # directory for Qt translation files
 GNUPLOT_QT_DIR = share\\qt
@@ -525,6 +528,16 @@ wgnuplot.res :  $(W)wgnuplot.rc $(W)wgnuplib.rc $(W)wresourc.h $(W)grpicon.ico $
 	$(RC) /l 0x409 /fowgnuplot.res /I $(W) /d "NDEBUG" /d WIN32 /d NO_MANIFEST $(W)wgnuplot.rc
 
 
+# generate LUA TeX support files and terminal help
+!IF "$(LUA)" == "1"
+gnuplot-lua-tikz.sty: $(T)/lua/gnuplot-tikz.lua
+	lua $** style
+
+gnuplot-tikz.help: $(T)/lua/gnuplot-tikz.lua
+	lua $** termhelp > $@
+!ENDIF
+
+
 # build windows help file
 $(HELPFILE): doc2html.exe $(D)gnuplot.doc gnuplot.exe
 	doc2html $(D)gnuplot.doc $(D)windows\\ 
@@ -532,7 +545,7 @@ $(HELPFILE): doc2html.exe $(D)gnuplot.doc gnuplot.exe
 	cmd /c "cd $(D) & $(HHC) windows\wgnuplot.hhp & exit /b 0"
 	if exist $(D)windows\wgnuplot.chm copy $(D)windows\wgnuplot.chm .
 
-doc2html.exe: $(D)windows\doc2html.c $(D)termdoc.c $(D)xref.c version.obj $(CORETERM)
+doc2html.exe: $(D)windows\doc2html.c $(D)termdoc.c $(D)xref.c version.obj $(CORETERM) $(LUA_HELP)
 	$(CC) $(CFLAGS) /F 5000 /W1 /I. $(VERSION_CPPFLAGS) /DWINDOWS_NO_GUI /I$(D) /I$(T) -Fedoc2html.exe $(D)windows\doc2html.c $(D)termdoc.c $(D)xref.c version.obj
 
 
@@ -582,6 +595,8 @@ veryclean: clean
 	if exist $(M)fit.log del $(M)fit.log
 	if exist $(M)soundfit.par del $(M)soundfit.par
 	if exist config.h del config.h
+	if exist gnuplot-lua-tikz.sty del gnuplot-lua-tikz.sty
+	-del gnuplot-lua-tikz.tex gnuplot-lua-tikz-common.tex t-gnuplot-lua-tikz.tex
 
 install:
 	if not exist $(DESTDIR) mkdir $(DESTDIR)
@@ -621,6 +636,19 @@ install:
 	xcopy /Y $(TOP)\demo $(DESTDIR)\demo
 	if not exist $(DESTDIR)\demo\games mkdir $(DESTDIR)\demo\games
 	xcopy /Y $(TOP)\demo\games $(DESTDIR)\demo\games
+	-mkdir -p $(DESTDIR)\$(GNUPLOT_TEX_DIR)\generic\gnuplot
+	-mkdir -p $(DESTDIR)\$(GNUPLOT_TEX_DIR)\plain\gnuplot
+	-mkdir -p $(DESTDIR)\$(GNUPLOT_TEX_DIR)\latex\gnuplot
+	-mkdir -p $(DESTDIR)\$(GNUPLOT_TEX_DIR)\context\gnuplot
+	cp -p $(TOP)\share\LaTeX\README $(DESTDIR)\$(GNUPLOT_TEX_DIR)\latex\gnuplot
+	cp -p $(TOP)\share\LaTeX\gnuplot.cfg $(DESTDIR)\$(GNUPLOT_TEX_DIR)\latex\gnuplot
+!IF "$(LUA)" == "1"
+	cp -p $(TOP)\term\lua\gnuplot-tikz.lua $(DESTDIR)\$(GNUPLOT_LUA_DIR)
+	cp -p gnuplot-lua-tikz.sty $(DESTDIR)\$(GNUPLOT_TEX_DIR)\latex\gnuplot
+	cp -p gnuplot-lua-tikz.tex $(DESTDIR)\$(GNUPLOT_TEX_DIR)\plain\gnuplot
+	cp -p t-gnuplot-lua-tikz.tex $(DESTDIR)\$(GNUPLOT_TEX_DIR)\context\gnuplot
+	cp -p gnuplot-lua-tikz-common.tex $(DESTDIR)\$(GNUPLOT_TEX_DIR)\generic\gnuplot
+!ENDIF
 
 zip:
 	$(MAKE) DESTDIR=.\gnuplot install
