@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.430.2.12 2017/09/15 18:40:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.430.2.13 2017/09/25 16:44:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2739,11 +2739,7 @@ eval_plots()
 		
 		/* Reset flags to auto-scale X axis to contents of data set */
 		if (!(uses_axis[x_axis] & USES_AXIS_FOR_DATA) && X_AXIS.autoscale) {
-		    struct axis *scaling_axis;
-		    if (x_axis == SECOND_X_AXIS && !X_AXIS.linked_to_primary)
-		    	scaling_axis = &axis_array[SECOND_X_AXIS];
-		    else
-		    	scaling_axis = &axis_array[FIRST_X_AXIS];
+		    struct axis *scaling_axis = &axis_array[this_plot->x_axis];
 		    if (scaling_axis->autoscale & AUTOSCALE_MIN)
 			scaling_axis->min = VERYLARGE;
 		    if (scaling_axis->autoscale & AUTOSCALE_MAX)
@@ -2978,18 +2974,25 @@ eval_plots()
 		    axis_array[FIRST_X_AXIS].max = 10;
 	}
 
-	/* check that xmin -> xmax is not too small */
-	axis_checked_extend_empty_range(FIRST_X_AXIS, "x range is invalid");
+	if (uses_axis[FIRST_X_AXIS] & USES_AXIS_FOR_DATA) {
+	    /* check that x1min -> x1max is not too small */
+	    axis_checked_extend_empty_range(FIRST_X_AXIS, "x range is invalid");
+	}
 
 	if (uses_axis[SECOND_X_AXIS] & USES_AXIS_FOR_DATA) {
 	    /* check that x2min -> x2max is not too small */
 	    axis_checked_extend_empty_range(SECOND_X_AXIS, "x2 range is invalid");
 	} else if (axis_array[SECOND_X_AXIS].autoscale) {
 	    /* copy x1's range */
-	    if (axis_array[SECOND_X_AXIS].autoscale & AUTOSCALE_MIN)
-		axis_array[SECOND_X_AXIS].min = axis_array[FIRST_X_AXIS].min;
-	    if (axis_array[SECOND_X_AXIS].autoscale & AUTOSCALE_MAX)
-		axis_array[SECOND_X_AXIS].max = axis_array[FIRST_X_AXIS].max;
+	    /* FIXME:  merge both cases into update_secondary_axis_range */
+	    if (axis_array[SECOND_X_AXIS].linked_to_primary) {
+		update_secondary_axis_range(&axis_array[FIRST_X_AXIS]);
+	    } else {
+		if (axis_array[SECOND_X_AXIS].autoscale & AUTOSCALE_MIN)
+		    axis_array[SECOND_X_AXIS].min = axis_array[FIRST_X_AXIS].min;
+		if (axis_array[SECOND_X_AXIS].autoscale & AUTOSCALE_MAX)
+		    axis_array[SECOND_X_AXIS].max = axis_array[FIRST_X_AXIS].max;
+	    }
 	}
     }
     if (some_functions) {
@@ -3316,40 +3319,45 @@ eval_plots()
 	if (first_plot->plot_type == NODATA)
 	    int_error(NO_CARET,"No data in plot");
 
+    /* gnuplot version 5.0 always used x1 to track autoscaled range
+     * regardless of whether x1 or x2 was used to plot the data. 
+     * In version 5.2 we track the x1/x2 axis data limits separately.
+     * However if x1 and x2 are linked to each other we must now
+     * reconcile their data limits before plotting.
+     */
+    if (uses_axis[FIRST_X_AXIS] && uses_axis[SECOND_X_AXIS]) {
+	AXIS *primary = &axis_array[FIRST_X_AXIS];
+	AXIS *secondary = &axis_array[SECOND_X_AXIS];
+	reconcile_linked_axes(primary, secondary);
+    }
+    if (uses_axis[FIRST_Y_AXIS] && uses_axis[SECOND_Y_AXIS]) {
+	AXIS *primary = &axis_array[FIRST_Y_AXIS];
+	AXIS *secondary = &axis_array[SECOND_Y_AXIS];
+	reconcile_linked_axes(primary, secondary);
+    }
+
     if (uses_axis[FIRST_X_AXIS]) {
 	if (axis_array[FIRST_X_AXIS].max == -VERYLARGE ||
 	    axis_array[FIRST_X_AXIS].min == VERYLARGE)
 	    int_error(NO_CARET, "all points undefined!");
-	axis_revert_and_unlog_range(FIRST_X_AXIS);
+    } else {
+	assert(uses_axis[SECOND_X_AXIS]);
     }
     if (uses_axis[SECOND_X_AXIS]) {
 	if (axis_array[SECOND_X_AXIS].max == -VERYLARGE ||
 	    axis_array[SECOND_X_AXIS].min == VERYLARGE)
 	    int_error(NO_CARET, "all points undefined!");
-	axis_revert_and_unlog_range(SECOND_X_AXIS);
     } else {
-	/* FIXME: If this triggers, doesn't it clobber linked axes? */
 	assert(uses_axis[FIRST_X_AXIS]);
-	if (axis_array[SECOND_X_AXIS].autoscale & AUTOSCALE_MIN)
-	    axis_array[SECOND_X_AXIS].min = axis_array[FIRST_X_AXIS].min;
-	if (axis_array[SECOND_X_AXIS].autoscale & AUTOSCALE_MAX)
-	    axis_array[SECOND_X_AXIS].max = axis_array[FIRST_X_AXIS].max;
-	if (! axis_array[SECOND_X_AXIS].autoscale)
-	    axis_revert_and_unlog_range(SECOND_X_AXIS);
     }
-    if (! uses_axis[FIRST_X_AXIS]) {
-	assert(uses_axis[SECOND_X_AXIS]);
-	if (axis_array[FIRST_X_AXIS].autoscale & AUTOSCALE_MIN)
-	    axis_array[FIRST_X_AXIS].min = axis_array[SECOND_X_AXIS].min;
-	if (axis_array[FIRST_X_AXIS].autoscale & AUTOSCALE_MAX)
-	    axis_array[FIRST_X_AXIS].max = axis_array[SECOND_X_AXIS].max;
-    }
+    axis_revert_and_unlog_range(FIRST_X_AXIS);
+    axis_revert_and_unlog_range(SECOND_X_AXIS);
 
+    /* For nonlinear axes, but must also be compatible with "set link x".   */
     /* min/max values were tracked during input for the visible axes.       */
     /* Now we use them to update the corresponding shadow (nonlinear) ones. */
-	update_primary_axis_range(&axis_array[FIRST_X_AXIS]);
-	update_primary_axis_range(&axis_array[SECOND_X_AXIS]);
-
+    update_primary_axis_range(&axis_array[FIRST_X_AXIS]);
+    update_primary_axis_range(&axis_array[SECOND_X_AXIS]);
 
     if (this_plot && this_plot->plot_style == TABLESTYLE) {
 	/* the y axis range has no meaning in this case */
@@ -3366,6 +3374,7 @@ eval_plots()
 	axis_checked_extend_empty_range(SECOND_Y_AXIS, "all points y2 value undefined!");
 	axis_revert_and_unlog_range(SECOND_Y_AXIS);
     } else {
+	/* FIXME:  probably unneeded our wrong since adding reconcile_linked_axes */
 	/* else we want to copy y2 range */
 	assert(uses_axis[FIRST_Y_AXIS]);
 	if (axis_array[SECOND_Y_AXIS].autoscale & AUTOSCALE_MIN)
@@ -3378,6 +3387,7 @@ eval_plots()
 	    axis_revert_and_unlog_range(SECOND_Y_AXIS);
     }
     if (! uses_axis[FIRST_Y_AXIS]) {
+	/* FIXME:  probably unneeded our wrong since adding reconcile_linked_axes */
 	assert(uses_axis[SECOND_Y_AXIS]);
 	if (axis_array[FIRST_Y_AXIS].autoscale & AUTOSCALE_MIN)
 	    axis_array[FIRST_Y_AXIS].min = axis_array[SECOND_Y_AXIS].min;
@@ -3635,3 +3645,4 @@ parse_plot_title(struct curve_points *this_plot, char *xtitle, char *ytitle, TBO
     }
 
 }
+

@@ -9,6 +9,7 @@ Changes in 5.2.1
 * FIX handle in-line range limits for linked or nonlinear axes
 * FIX restore pre-5.2 interpretation of logscaled tic increment as a multiplier
 * FIX recheck inrange/outrange points after spline or bezier smoothing
+* FIX autoscaling of plots with linked axes where data is plotted on x2 or y2
 
 Changes in 5.2.0
 ================
