@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1110 2017/09/23 04:48:04 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1111 2017/10/03 23:42:41 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2559,14 +2559,21 @@ Ffigure_newsyntax
 
 ?scope
 =scope
- The scope of an iteration variable is private to that iteration.
+ With one exception, gnuplot variables are global.
+ There is a single, persistent, list of active variables indexed by name.  
+ Assignment to a variable creates or replaces an entry in that list.
+ The only way to remove a variable from that list is the `undefine` command.
+
+ The single exception to this is the variable used in an iteration specifier.
+ The scope of the iteration variable is private to that iteration.
  You cannot permanently change the value of the iteration variable inside the
  iterated clause.  If the iteration variable has a value prior to iteration,
  that value will be retained or restored at the end of the iteration.
- E.g. the following clause will iterate 10 times, after which i is again "A".
+ For example, the following commands will print 1 2 3 4 5 6 7 8 9 10 A.
 
       i = "A"
-      do for [i=1:10] { i=10 }
+      do for [i=1:10] { print i; i=10; }
+      print i
 
 2 linetypes, colors, and styles
 ?linetypes
