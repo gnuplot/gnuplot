@@ -1,3 +1,20 @@
+2017-10-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (reconcile_linked_axes) src/axis.h src/plot2d.c:
+	gnuplot version 5.0 always tracked the autoscale range on the primary
+	axis (x1 or y1) of a linked pair, even if the data was actually plotted
+	on x2 or y2.  In verison 5.2 we track the data range on x1 x2 y1 y2
+	separately.  This caused breakage wherever the program assumed the
+	autoscale range on x1 (or y1) was always current.  Worse, it would
+	propagate that range onto the secondary axis, possibly overwriting the
+	correct range.  Now we introduce a new routine reconcile_linked_axes()
+	that merges the min/max values from e.g. x1 and x2 so that the 
+	autoscaled range covers input data plotted on either axis.
+	Bug #1973
+
+	* demo/linked_autoscale.dem: Exercise the new code (fails on previous
+	gnuplot versions).
+
 2017-10-06  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/command.c: Move WEXITSTATUS fall-back definition away from here.

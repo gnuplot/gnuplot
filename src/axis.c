@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.246 2017/09/23 04:48:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.247 2017/09/29 19:02:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -2487,19 +2487,65 @@ extend_primary_ticrange(AXIS *axis)
 
 /*
  * As data is read in or functions evaluated, the min/max values are tracked
- * for the visible axes but not for the primary (linear) axes.
- * This routine fills in the primary min/max from the linked secondary axis.
+ * for the secondary (visible) axes but not for the linked primary (linear) axis.
+ * This routine fills in the primary min/max from the secondary axis.
  */
 void
 update_primary_axis_range(struct axis *secondary)
 {
     struct axis *primary = secondary->linked_to_primary;
 
-    if (nonlinear(secondary)) {
+    if (primary != NULL) {
+	/* nonlinear axis (secondary is visible; primary is hidden) */
 	primary->min = eval_link_function(primary, secondary->min);
 	primary->max = eval_link_function(primary, secondary->max);
 	primary->data_min = eval_link_function(primary, secondary->data_min);
 	primary->data_max = eval_link_function(primary, secondary->data_max);
+    }
+}
+
+/*
+ * Same thing but in the opposite direction.  We read in data on the primary axis
+ * and want the autoscaling on a linked secondary axis to match.
+ */
+void
+update_secondary_axis_range(struct axis *primary)
+{
+    struct axis *secondary = primary->linked_to_secondary;
+
+    if (secondary != NULL) {
+       secondary->min = eval_link_function(secondary, primary->min);
+       secondary->max = eval_link_function(secondary, primary->max);
+       secondary->data_min = eval_link_function(secondary, primary->data_min);
+       secondary->data_max = eval_link_function(secondary, primary->data_max);
+    }
+}
+
+/*
+ * gnuplot version 5.0 always maintained autoscaled range on x1
+ * specifically, transforming from x2 coordinates if necessary.
+ * In version 5.2 we track the x1 and x2 axis data limits separately.
+ * However if x1 and x2 are linked to each other we must reconcile
+ * their data limits before plotting.
+ */
+void
+reconcile_linked_axes(AXIS *primary, AXIS *secondary)
+{
+    double dummy;
+    int inrange = INRANGE;
+    if ((primary->autoscale & AUTOSCALE_BOTH) != AUTOSCALE_NONE
+    &&  primary->linked_to_secondary) {
+	double min_2_into_1 = eval_link_function(primary, secondary->data_min);
+	double max_2_into_1 = eval_link_function(primary, secondary->data_max);
+
+	/* Merge secondary min/max into primary data range */
+	ACTUAL_STORE_AND_UPDATE_RANGE(dummy, min_2_into_1, inrange, primary, FALSE, NOOP);
+	ACTUAL_STORE_AND_UPDATE_RANGE(dummy, max_2_into_1, inrange, primary, FALSE, NOOP);
+	(void)dummy;	/* Otherwise the compiler complains about an unused variable */
+
+	/* Take the result back the other way to update secondary */
+	secondary->min = eval_link_function(secondary, primary->min);
+	secondary->max = eval_link_function(secondary, primary->max);
     }
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.178 2017/09/10 03:40:01 sfeam Exp $
+ * $Id: axis.h,v 1.179 2017/09/29 19:02:23 sfeam Exp $
  *
  */
 
@@ -595,6 +595,8 @@ void clone_linked_axes __PROTO((AXIS *axis1, AXIS *axis2));
 AXIS *get_shadow_axis __PROTO((AXIS *axis));
 void extend_primary_ticrange __PROTO((AXIS *axis));
 void update_primary_axis_range __PROTO((struct axis *secondary));
+void update_secondary_axis_range __PROTO((struct axis *primary));
+void reconcile_linked_axes __PROTO((AXIS *primary, AXIS *secondary));
 
 int map_x __PROTO((double value));
 int map_y __PROTO((double value));
