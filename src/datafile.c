@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.344.2.6 2017/09/15 18:40:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.344.2.7 2017/09/25 19:59:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -5385,8 +5385,10 @@ df_generate_pseudodata()
 
 	    /* If the axis is nonlinear we do the sampling on the primary   */
 	    /* (hidden) axis so that the samples are evenly spaced.         */
+	    /* The extra test allows sampling on x2 after "set link x2"     */
 	    /* NB: This means "t" is in the hidden linear coordinate space. */
-	    if nonlinear(&X_AXIS) {
+	    if (X_AXIS.linked_to_primary != NULL && X_AXIS.link_udf->at
+	    &&  X_AXIS.linked_to_primary != &axis_array[FIRST_X_AXIS]) {
 		AXIS *primary = X_AXIS.linked_to_primary;
 		t_min = eval_link_function(primary, t_min);
 		t_max = eval_link_function(primary, t_max);
