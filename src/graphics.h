@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.72 2017/08/23 00:54:52 sfeam Exp $
+ * $Id: graphics.h,v 1.73 2017/09/11 20:13:24 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -43,6 +43,10 @@
 #include "gadgets.h"
 #include "term_api.h"
 
+#ifndef AXIS_INDEX
+#include "axis.h"
+#endif
+
 /* types defined for 2D plotting */
 
 typedef struct curve_points {
@@ -76,9 +80,9 @@ typedef struct curve_points {
     int boxplot_factors;	/* Only used if plot_style == BOXPLOT */
     int p_max;			/* how many points are allocated */
     int p_count;		/* count of points in points */
-    int x_axis;			/* FIRST_X_AXIS or SECOND_X_AXIS */
-    int y_axis;			/* FIRST_Y_AXIS or SECOND_Y_AXIS */
-    int z_axis;			/* same as either x_axis or y_axis, for 5-column plot types */
+    AXIS_INDEX x_axis;		/* FIRST_X_AXIS or SECOND_X_AXIS */
+    AXIS_INDEX y_axis;		/* FIRST_Y_AXIS or SECOND_Y_AXIS */
+    AXIS_INDEX z_axis;		/* same as either x_axis or y_axis, for 5-column plot types */
     int current_plotno;		/* Only used by "pn" option of linespoints */
     int n_par_axes;		/* Only used for parallel axis plots */
     double **z_n;		/* Only used for parallel axis plots */

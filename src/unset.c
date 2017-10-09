@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.257 2017/09/04 18:02:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.258 2017/09/11 20:13:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -721,7 +721,7 @@ unset_autoscale()
     } else {
 	/* HBB 20000506: parse axis name, and unset the right element
 	 * of the array: */
-	int axis = lookup_table(axisname_tbl, c_token);
+	AXIS_INDEX axis = lookup_table(axisname_tbl, c_token);
 	if (axis >= 0) {
 	    axis_array[axis].set_autoscale = AUTOSCALE_NONE;
 	c_token++;

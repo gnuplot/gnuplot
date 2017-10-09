@@ -5,6 +5,9 @@
 	"set link x2 via f(x) inv g(x)" (primary axis x1).
 	Bug #1973
 
+	* src/graphics.h src/unset.c:  We have an enum AXIS_INDEX. Use it.
+	(mostly to aid debugging; shouldn't affect code generation).
+
 2017-10-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (reconcile_linked_axes) src/axis.h src/plot2d.c:
