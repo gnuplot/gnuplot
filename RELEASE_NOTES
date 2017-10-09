@@ -16,6 +16,7 @@ CHANGES IN 5.2.1
 * NEW hotkey for changing azimuth in 3D plots with mousing
 * NEW titles for "splot .. with lines" can be placed at {beg|end} of plotted line
 * NEW Rework gstrptime() to handle relative time formats tH tM tS
+* NEW command 'set rgbmax <value>' controls interpretation of input RGB values
 * CHANGE restore pre-5.2 interpretation of logscaled tic increment as a multiplier
 * CHANGE allow mixed use of in-key plot titles and manually placed titles
 * FIX autoscaling of plots with spline or bezier smoothing

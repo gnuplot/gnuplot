@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.554.2.9 2017/09/10 21:41:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.554.2.10 2017/09/13 23:01:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -72,6 +72,9 @@ double bar_size = 1.0;
 int    bar_layer = LAYER_FRONT;
 struct lp_style_type bar_lp;
 
+/* 'set rgbmax {0|255}' */
+double rgbmax = 255;
+
 /* key placement is calculated in boundary, so we need file-wide variables
  * To simplify adjustments to the key, we set all these once [depends on
  * key->reverse] and use them throughout.
@@ -133,6 +136,8 @@ static void plot_circles __PROTO((struct curve_points *plot));
 static void plot_ellipses __PROTO((struct curve_points *plot));
 static void do_rectangle __PROTO((int dimensions, t_object *this_object, fill_style_type *fillstyle));
 #endif
+
+static double rgbscale __PROTO((double rawvalue));
 
 static void draw_polar_circle __PROTO((double place));
 
@@ -4460,6 +4465,18 @@ check_for_variable_color(struct curve_points *plot, double *colorvalue)
 	return TRUE;
     } else
 	return FALSE;
+}
+
+/* rgbscale
+ * RGB image color components are normally in the range [0:255] but some
+ * data conventions may use [0:1] instead.  This does the conversion.
+ */
+static double
+rgbscale( double component )
+{
+    if (rgbmax != 255.)
+	component = 255. * component/rgbmax;
+    return component > 255 ? 255 : component < 0 ? 0 : component;
 }
 
 /* process_image:

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1084.2.18 2017/10/03 23:42:33 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1084.2.19 2017/10/08 19:10:57 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4063,12 +4063,17 @@ Ffigure_scaled_image
  values for the red, green, and blue components.  Thus 5D data (x,y,r,g,b) is
  needed for `plot` and 6D data (x,y,z,r,g,b) for `splot`.  The individual red,
  green, and blue components are assumed to lie in the range [0:255].
+ This matches the convention used in PNG and JPEG files (see `binary filetype`).
+ However some data files use an alternative convention in which RGB components
+ are floating point values in the range [0:1]. To use the `rgbimage` style with
+ such data, first use the command `set rgbmax 1.0`.
 
  The `rgbalpha` style handles input pixels that contain alpha channel 
  (transparency) information in addition to the red, green, and blue components.
  Thus 6D data (x,y,r,g,b,a) is needed for `plot` and 7D data (x,y,z,r,g,b,a)
  for `splot`.  The r, g, b, and alpha components are assumed to lie in the range
- [0:255].
+ [0:255].  To plot data for which RGBA components are floating point values in
+ the range [0:1], first use the command `set rgbmax 1.0`.
 3 transparency
 ?image transparency
 ?transparency
@@ -12218,6 +12223,20 @@ Ffigure_multiple_keys
  at the center of the polar plot to indicate that the plot lines and axes do
  not reach 0.  The axis line is drawn using the same line type as the plot
  border.  See `polar`, `rrange`, `rtics`, `rlabel`, `set grid`.
+3 rgbmax
+?commands set rgbmax
+?set rgbmax
+?rgbmax
+?unset rgbmax
+=rgbimage
+ Syntax:
+      set rgbmax {1.0 | 255}
+      unset rgbmax
+ The red/green/blue color components of an rgbimage plot are by default
+ interpreted as integers in the range [0:255].  `set rgbmax 1.0` tells the
+ program that data values used to generate the color components of a plot
+ with `rgbimage` or `rgbalpha` are floating point values in the range [0:1].
+ `unset rgbmax` returns to the default integer range [0:255].
 3 rlabel
 ?commands set rlabel
 ?rlabel

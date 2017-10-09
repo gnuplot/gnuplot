@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.327 2017/02/14 21:49:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.328 2017/04/20 00:07:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -633,6 +633,8 @@ set encoding %s\n\
     if (aspect_ratio_3D)
 	fprintf(fp, "\nset view  %s", aspect_ratio_3D == 2 ? "equal xy" :
 			aspect_ratio_3D == 3 ? "equal xyz": "");
+
+    fprintf(fp, "\nset rgbmax %g", rgbmax);
 
     fprintf(fp, "\n\
 set samples %d, %d\n\

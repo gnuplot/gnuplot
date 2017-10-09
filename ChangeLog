@@ -5,6 +5,19 @@
 	"set link x2 via f(x) inv g(x)" (primary axis x1).
 	Bug #1973
 
+	* src/graphics.c src/graphics.h src/set.c src/tables.c src/tables.h
+	src/unset.c src/show.c src/save.c demo/image2.dem docs/gnuplot.doc:
+
+	The default interpretation of RGB color components on input is that
+	they are integer values in the range [0:255].  This matches the 
+	content of PNG and JPEG files. Since the interpretation of RGB color
+	components has been decoupled from the palette range limits controlled
+	by "set cbrange", data using some other RGB convention must be rescaled.
+	This patch introduces a new command `set rgbmax`.  The primary use is
+	so that data using the convention that color components are floating
+	point values in the range [0:1] can be plotted using
+	    set rgbmax 1.0;   plot 'imagedata' with rgbimage
+
 2017-10-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (reconcile_linked_axes) src/axis.h src/plot2d.c:

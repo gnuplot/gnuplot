@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.70.2.1 2017/08/23 01:01:37 sfeam Exp $
+ * $Id: graphics.h,v 1.70.2.2 2017/09/06 18:37:56 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -96,6 +96,9 @@ extern double bar_size;
 extern int bar_layer;
 extern struct lp_style_type bar_lp;
 
+/* 'set rgbmax {0|255}' */
+extern double rgbmax;
+
 /* function prototypes */
 
 void do_plot __PROTO((struct curve_points *, int));
@@ -111,11 +114,6 @@ typedef enum en_procimg_action {
     IMG_UPDATE_AXES,
     IMG_UPDATE_CORNERS
 } t_procimg_action;
-
-/* Place-holder for a routine that scales RGB color components to fit [0:255]
- * For now we just enforce the range limits with no scaling
- */
-#define rgbscale(c) (c>255. ? 255. : c<0 ? 0. : c)
 
 void process_image __PROTO((void *plot, t_procimg_action action));
 TBOOLEAN check_for_variable_color __PROTO((struct curve_points *plot, double *colorvalue));

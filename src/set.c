@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.558.2.4 2017/09/06 18:33:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.558.2.5 2017/09/17 18:54:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -132,6 +132,7 @@ static void set_object __PROTO((void));
 static void set_obj __PROTO((int, int));
 #endif
 static void set_psdir __PROTO((void));
+static void set_rgbmax __PROTO((void));
 static void set_samples __PROTO((void));
 static void set_size __PROTO((void));
 static void set_style __PROTO((void));
@@ -449,6 +450,9 @@ set_command()
 #endif
 	case S_SAMPLES:
 	    set_samples();
+	    break;
+	case S_RGBMAX:
+	    set_rgbmax();
 	    break;
 	case S_SIZE:
 	    set_size();
@@ -4530,6 +4534,18 @@ set_obj(int tag, int obj_type)
 
 }
 #endif
+
+static void
+set_rgbmax()
+{
+    c_token++;
+    if (END_OF_COMMAND)
+	rgbmax = 255;
+    else
+	rgbmax = real_expression();
+    if (rgbmax <= 0)
+	rgbmax = 255;
+}
 
 /* process 'set samples' command */
 static void
