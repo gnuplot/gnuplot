@@ -1,21 +1,25 @@
-		GNUPLOT Version 5.2 Release Notes
-		=================================
+		GNUPLOT Version 5.2.1 Release Notes
+		===================================
+
+These release notes are for version 5.2 patchlevel 1 (5.2.1).
+This release contains bug-fixes, a few changes back-ported from the
+development version, and a few new features.
 
 Please see the ChangeLog file for a complete list of changes made during the
-course of development from 5.0 to 5.2.  Thank you to everyone who provided
-feedback and testing on the release candidates for this version.
+course of development from 5.0 to 5.2.
 
-Release Notes date: 30-Aug-2017
+Release Notes date: 10-Oct-2017
 
-CHANGES SINCE FINAL RELEASE CANDIDATE
-=====================================
-* NEW user-defined dashtypes in metapost terminal
-* NEW datablock contents may be accessed as an indexed array of strings
-* CHANGE allow explicit sample interval for u and v using pseudofile '++'
-* CHANGE decouple cbrange from color components in "with rgbimage"
-* FIX reconcile aspect ratio flags from "set view map" and "set view equal xy"
-* FIX GPVAL_* variables were not being updated in "set table" mode
-* FIX evaluation of nested iteration containing an empty range
+CHANGES IN 5.2.1
+================
+* NEW set table separator {tab|comma|"char"} allows creation of csv files
+* NEW hotkey for changing azimuth in 3D plots with mousing
+* NEW titles for "splot .. with lines" can be placed at {beg|end} of plotted line
+* NEW Rework gstrptime() to handle relative time formats tH tM tS
+* CHANGE restore pre-5.2 interpretation of logscaled tic increment as a multiplier
+* CHANGE allow mixed use of in-key plot titles and manually placed titles
+* FIX autoscaling of plots with spline or bezier smoothing
+* FIX autoscaling of plots with linked axes where data is plotted on x2 or y2
 
 
 FEATURES INTRODUCED IN VERSION 5.2
@@ -245,7 +249,7 @@ Options for generating interactive plots for web display
 Installation
 ------------
 
-You can download a source tarball for gnuplot version 5.2.0 from the 
+You can download a source tarball for gnuplot version 5.2.1 from the 
 gnuplot development site on SourceForge.
 	http://sourceforge.net/projects/gnuplot
 
@@ -253,7 +257,7 @@ Installation instructions are available in the source itself; the short
 version for linux/unix-like systems is to unpack the tarball and then
 <PRE>
 build it:
-      cd gnuplot-5.2.0 ; ./configure ; make
+      cd gnuplot-5.2.1 ; ./configure ; make
 test it:
       make check
 install it:
@@ -278,11 +282,14 @@ There is also an gnuplot discussion forum on usenet group
 
 Development
 -----------
-Gnuplot development is ongoing. The development branch on SourceForge
-contains preliminary implementations of new features.
-The source for version 5.2 is held in a separate branch of the CVS repository
-tagged as "branch-5-2-stable".  Development continues in the main branch using
-the version number 5.3 (odd minor number), for eventual release as stable
-version 5.4 (even minor number).  Bugfixes to version 5.2 will appear in
-patchlevel releases 5.2.1, 5.2.2, etc., approximately twice a year or
-as needed to correct a serious problem.
+Gnuplot development is ongoing. The development branch contains preliminary
+implementations of new features.  The current development version is 5.3
+(odd minor number) and will eventually be released as version 5.4 (even 
+minor number).  Bugfixes to version 5.2 will appear in patchlevel releases
+5.2.1, 5.2.2, etc., approximately twice a year or as needed to correct a
+serious problem.
+
+At the time of writing both the released and development source trees are
+hosted as a CVS repository on SourceForge, but will probably be migrated
+to git in the near future.
+
