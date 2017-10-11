@@ -9,6 +9,7 @@ Changes in 5.2.1
 * FIX prevent runaway iterations of the form   plot for [i=start:*] ...
 * FIX handle in-line range limits for linked or nonlinear axes
 * FIX restore pre-5.2 interpretation of logscaled tic increment as a multiplier
+* FIX logscale tic placement is closer to that of versions before 5.2.0
 * FIX recheck inrange/outrange points after spline or bezier smoothing
 * FIX autoscaling of plots with linked axes where data is plotted on x2 or y2
 * FIX sampling on x2 if linked to x1;  e.g. plot sample [t=1:5:1] '+' axes x2y1
