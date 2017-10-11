@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.247 2017/09/29 19:02:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.248 2017/10/09 00:49:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1107,14 +1107,16 @@ gen_tics(struct axis *this, tic_callback callback)
 		else
 		    end = def->def.series.end;
 		if (def->logscaling) {
-		    /* This emulates earlier gnuplot versions in handling
+		    /* This tries to emulate earlier gnuplot versions in handling
 		     *     set log y; set ytics 10
+		     * FIXME: but it doesn't do a good job of it
 		     */
 		    step  = eval_link_function(this->linked_to_primary, step);
 		    end   = eval_link_function(this->linked_to_primary, end);
-		    start = eval_link_function(this->linked_to_primary, start);
-		    if (!(start > this->linked_to_primary->min))
-			start = this->linked_to_primary->min;
+		    if (start <= 0)
+			start = step;
+		    else
+			start = eval_link_function(this->linked_to_primary, start);
 		    lmin = this->linked_to_primary->min;
 		    lmax = this->linked_to_primary->max;
 		}
