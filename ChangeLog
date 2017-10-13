@@ -1,3 +1,11 @@
+2017-10-13  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/pm3d.c (pm3d_draw_one pm3d_plot): Move call of term->layer() with
+	TERM_LAYER_BEGIN_PM3D_MAP and TERM_LAYER_END_PM3D_MAP from pm3d_draw_one
+	to pm3d_plot in order to avoid insertion of line commands between the
+	%pm3d_map_begin and pm3d surface commands in the postscript file
+	which broke the pm3dCompress.awk and pm3dConvertToImage.awk scripts.
+
 2017-10-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (gen_tics): The start point for log-scale tic placement

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.117 2017/02/17 23:55:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.118 2017/08/01 00:56:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -466,6 +466,10 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
     /* return if the terminal does not support filled polygons */
     if (!term->filled_polygon)
 	return;
+
+    /* for pm3dCompress.awk and pm3dConvertToImage.awk */
+    if (pm3d.direction != PM3D_DEPTH)
+	term->layer(TERM_LAYER_BEGIN_PM3D_MAP);
 
     switch (at_which_z) {
     case PM3D_AT_BASE:
@@ -1010,7 +1014,12 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
     }
     /* free memory allocated by scan_array */
     free(scan_array);
+
+    /* for pm3dCompress.awk and pm3dConvertToImage.awk */
+    if (pm3d.direction != PM3D_DEPTH)
+	term->layer(TERM_LAYER_END_PM3D_MAP);
 }				/* end of pm3d splotting mode */
+
 
 #ifdef PM3D_CONTOURS
 /*
@@ -1107,10 +1116,6 @@ pm3d_draw_one(struct surface_points *plot)
 	light[1] = sin(-DEG2RAD*pm3d_shade.rot_x);
     }
 
-    /* for pm3dCompress.awk */
-    if (pm3d.direction != PM3D_DEPTH)
-	term->layer(TERM_LAYER_BEGIN_PM3D_MAP);
-
     for (; where[i]; i++) {
 	pm3d_plot(plot, where[i]);
     }
@@ -1130,10 +1135,6 @@ pm3d_draw_one(struct surface_points *plot)
 	    filled_color_contour_plot(plot, CONTOUR_BASE);
     }
 #endif
-
-    /* for pm3dCompress.awk */
-    if (pm3d.direction != PM3D_DEPTH)
-	term->layer(TERM_LAYER_END_PM3D_MAP);
 }
 
 
