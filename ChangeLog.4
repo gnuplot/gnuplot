@@ -2,13 +2,13 @@
 
 	* Branchpoint for 5.0 (cvs tag -b branch-5-0-stable)
 
-2014-08-20 Ethan A Merritt  <merritt@u.washington.edu>
+2014-08-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/gp_cairo.c:  Distinct empirical scale factors for
 	dashlength used by pngcairo, pdfcairo, and wxt.
 	* term/emf.trm:  Scale dashlength with current linewidth.
 
-2014-08-18 Ethan A Merritt  <merritt@u.washington.edu>
+2014-08-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (place_arrows) src/graph3d.c (place_arrows3d):
 	Only invoke the arrowheads only code if there really is an arrowhead.
@@ -28,7 +28,7 @@
 	(%.o): Use pattern rules to build Qt source files.  Much simpler
 	than spelling it out long hand for every single source file.
 
-2014-08-15 Ethan A Merritt  <merritt@u.washington.edu>
+2014-08-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/bf_test.c src/Makefile.am src/binary.* (removed)
 	config/makefile.os2 config/makefile.dj2 config/makefile.cyg
@@ -64,18 +64,18 @@
 	previously used fonts to speed up the search for a new target font.
 	Now we add an equivalent for multi-byte font search.
 
-2014-08-14 Ethan A Merritt  <merritt@u.washington.edu>
+2014-08-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (do_rectangle) src/graph3d.c (map3d_position_r)
 	demo/rectangle.dem:  Fix y extent and clipping of rectangles with
 	negative y coord or inverted axes.
 	Bug #1462
 
-2014-08-05 Ethan A Merritt  <merritt@u.washington.edu>
+2014-08-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c (event_buttonpress):  Remove extraneous event_reset.
 
-2014-08-02 Ethan A Merritt  <merritt@u.washington.edu>
+2014-08-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (parse_colorspec):  Apply user-defined line colors
 	to text color also.
@@ -86,14 +86,14 @@
 	rather than a dynamically allocated string.  This fixes memory
 	leakage that happened whenever a linetype using dashes was discarded.
 
-2014-08-01 Ethan A Merritt  <merritt@u.washington.edu>
+2014-08-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c (event_buttonpress):  Trap mouse button click on
 	press rather than on release so that "pause mouse {button1|any}"
 	takes precedence over a key binding to the mouse button.
 	Bugfix
 
-2014-07-30 Ethan A Merritt  <merritt@u.washington.edu>
+2014-07-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm:  Remove misleading mention of -noevents.  This is a
 	command line option for gnuplot_x11, not for gnuplot itself.
@@ -107,17 +107,17 @@
 	the current terminal scale (oversampling, etc) as GPVAL_TERM_SCALE.
 	Bug #1291
 
-2014-07-28 Allin Cottrell  <cottrell@wfu.edu>
+2014-07-28  Allin Cottrell  <cottrell@wfu.edu>
 
 	* src/syscfg.h:  Report 32/64 bit Windows build in version string
 
-2014-07-28 Ethan A Merritt  <merritt@u.washington.edu>
+2014-07-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/gp_cairo.c:  Do not pass a linewidth of zero to the
 	cairo library.  The linewidth of LT_AXIS is now set in the core code,
 	do not further reduce it in gp_cairo_stroke().
 
-2014-07-25 Ethan A Merritt  <merritt@u.washington.edu>
+2014-07-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c: Scale x11 dashlength with linewidth.
 
@@ -126,7 +126,7 @@
 	* src/mouse.c src/mouse.h src/set.c src/show.c docs/gnuplot.doc:
 	New command 'set mouse zoomfactors <xfactor>,<yfactor>'
 
-2014-07-22 Ethan A Merritt  <merritt@u.washington.edu>
+2014-07-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gp_types.h src/plot2d.c (store2d_point):
 	INRANGE/OUTRANGE refer to points that are inside/outside the plot
@@ -142,7 +142,7 @@
 
 	* demo/poldat.dem:  Make sure trange includes the whole plot.
 
-2014-07-18 Ethan A Merritt  <merritt@u.washington.edu>
+2014-07-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* demo/Makefile.am.in: Do not create a symlink to GNUPLOT_X11 in the
 	build directory during "make check". This was probably intended to 
@@ -151,14 +151,14 @@
 	and then running "make check" twice.
 	Bugfix
 
-2014-07-14 Ethan A Merritt  <merritt@u.washington.edu>
+2014-07-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c src/save.c src/set.c src/gadgets.h:
 	Continue to recognize "set style increment user" even though it has
 	been deprecated in favor of "set linetype".
 	Bug #1411 (not really a bug)
 
-2014-07-12 Ethan A Merritt  <merritt@u.washington.edu>
+2014-07-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/parse.c (check_for_iteration):  Fix failure to detect some loop
 	[start:end:increment] combinations that should be executed only once
@@ -239,7 +239,7 @@
 	from a pipe.
 	See Bug #1322
 
-2014-06-15  Akira Kakuto <kakuto@fuk.kindai.ac.jp>
+2014-06-15  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
 
 	* src/binary.c src/datafile.h src/syscfg.h:  LFS support on Windows
 	for MSVC and MinGW.
@@ -274,7 +274,7 @@
 	structure if we were called from fit rather than plot.
 	Bug #1427
 
-2014-06-12  Christoph Bersch <usenet@bersch.net>
+2014-06-12  Christoph Bersch  <usenet@bersch.net>
 
 	* term/lua.trm term/lua/gnuplot-tikz.lua:
 	Scale dashlength with linewidth.
@@ -310,11 +310,11 @@
 	Add an empirical scale factor to the dashlength*linewidth computation to
 	make the resulting patterns closer in total size to the built-in ones.
 
-2014-06-10  Christoph Bersch <usenet@bersch.net>
+2014-06-10  Christoph Bersch  <usenet@bersch.net>
 
 	* term/post.trm term/svg.trm:  Scale dashlength with linewidth.
 
-2014-06-09  Daniel J Sebald <daniel.sebald@ieee.org>
+2014-06-09  Daniel J Sebald  <daniel.sebald@ieee.org>
 
 	* src/qtterminal/QtGnuplotWidget.cpp (processEvent):  Always "resize"
 	the initial plot to its own size.  This may work around strangeness on
@@ -439,7 +439,7 @@
 	* src/gplt_x11.c:
 	Grey out key entries when corresponding plot is toggled off.
 
-2014-05-29  Akira Kakuto <kakuto@fuk.kindai.ac.jp>
+2014-05-29  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
 
 	* term/caca.trm:  Modify nominal codepage to accommodate CJK Windows.
 
@@ -970,7 +970,7 @@
 
 	* demo/all.dem:  Add varcolor.dem to the test set.
 
-2014-04-06  Christoph Bersch <usenet@bersch.net>
+2014-04-06  Christoph Bersch  <usenet@bersch.net>
 
 	* src/graphics.c (fill_between):  It is no longer necessary to clip in
 	this routine because the component quadrilaterals will be clipped later.
@@ -1080,7 +1080,7 @@
 	* config/mingw/Makefile:  Fix non-numeric version number due to
 	patchlevel "alpha".
 
-2014-03-29  Christoph Bersch <usenet@bersch.net>
+2014-03-29  Christoph Bersch  <usenet@bersch.net>
 
 	* src/multiplot.h src/multiplot.c demo/layout.dem docs/gnuplot.doc:
 	New autolayout options for multiplot:
@@ -1445,7 +1445,7 @@
 	* src/wxterminal/gp_cairo.c: Implement boldface and italic markup for
 	cairo terminals.
 
-2014-03-08  Christoph Bersch <usenet@bersch.net>
+2014-03-08  Christoph Bersch  <usenet@bersch.net>
 
 	* src/set.c src/boundary.c: Allow changing textcolor of the timestamp.
 
@@ -1801,7 +1801,7 @@
 	scene has to manage.
 	Patch #651
 
-2014-01-30  Jon Gjengset <jon@thesquareplanet.com>
+2014-01-30  Jon Gjengset  <jon@thesquareplanet.com>
 
 	* src/gp_types.h src/interpol.c src/interpol.h src/plot2d.c
 	src/tables.c docs/gnuplot.doc:  New smoothing option "unwrap" adjusts
@@ -1974,7 +1974,7 @@
 	    set table "table.dat"
 	    plot FOO using 1:2:3:4:5:($6+$7):8:9:10 with table
 
-2014-01-08  Thomas Bleher <tbleher@gmx.de>
+2014-01-08  Thomas Bleher  <tbleher@gmx.de>
 
 	* config/msvc/Makefile:  Add configuration option for compiling the qt
 	terminal on Windows/MSVC.  Note that the terminal itself does not work
@@ -2011,7 +2011,7 @@
 	* src/win/winmain.c (ConsoleGetch):  Remap Shift-Tab key-code in
 	console mode, too.
 
-2014-01-03  Christoph Bersch <usenet@bersch.net>
+2014-01-03  Christoph Bersch  <usenet@bersch.net>
 
 	* src/gadgets.c (clip_polygon):  Handle the case of a NULL clipping box,
 	possible for terminal types that do external clipping (e.g. epslatex).
@@ -2222,7 +2222,7 @@
 	* src/qtterminal/qt_term.cpp (qt_options):  qt structure has not yet
 	been initialized at the time qt_options is first called.
 
-2013-12-11  Thomas Bleher <tbleher@gmx.de>
+2013-12-11  Thomas Bleher  <tbleher@gmx.de>
 
 	* src/qtterminal/QtGnuplotScene.cpp src/qtterminal/QtGnuplotWidget.*
  	src/qtterminal/QtGnuplotWindow.*:
@@ -2244,7 +2244,7 @@
 	* src/util.c (gprintf):  C compiler in SJIS locale does not like
 	in-line UTF-8 string constants.
 
-2013-11-22  Christoph Bersch <usenet@bersch.net>
+2013-11-22  Christoph Bersch  <usenet@bersch.net>
 
 	* src/axis.h (ALL_AXES = -1) src/unset.c (unset_tics):
 	unset_tics() requires a defined ENUM parameter.
@@ -2308,7 +2308,7 @@
 	in persist mode.  Revise the timing code for responding to mouse button
 	press/release (needed for Qt5).
 
-2013-10-26  Thomas Bleher <tbleher@gmx.de>
+2013-10-26  Thomas Bleher  <tbleher@gmx.de>
 
 	* src/qtterminal/qt_term.cpp:  Change the Qt terminal to only create its
 	data when initialized (to avoid the Static Initialization Order Fiasco)
@@ -2325,7 +2325,7 @@
 	to include enhanced text as well as non-enhanced text.
 	Bugfix. 
 
-2013-10-25  Thomas Bleher <tbleher@gmx.de>
+2013-10-25  Thomas Bleher  <tbleher@gmx.de>
 
 	* src/stdfn.c(gp_atexit gp_exit) src/stdfn.h src/command.c(exit_command)
 	src/plot.c(main) src/qtterminal/qt_term.cpp src/win/winmain.c
@@ -2389,7 +2389,7 @@
 	does not need to zero the current input line, and hasn't needed to since
 	lf_push/lf_pop were introduced 5 years ago.
 
-2013-10-18  Christoph Bersch <usenet@bersch.net>
+2013-10-18  Christoph Bersch  <usenet@bersch.net>
 
 	* src/gadgets.h  src/graphics.c  src/graphics.h src/save.c src/set.c 
 	demo/all.dem demo/clipobject.dem docs/gnuplot.doc:
@@ -2474,7 +2474,7 @@
 	* src/gadgets.c src/gadgets.h:  There are no longer any external callers
 	of clip_line(), so make it local to gadgets.
 
-2013-10-01  Christoph Bersch <usenet@bersch.net>
+2013-10-01  Christoph Bersch  <usenet@bersch.net>
 
 	* src/plot2d.c (store_label):  Plots with labels should accept variable
 	color both for the label text and for the associated point symbol.
@@ -2602,7 +2602,7 @@
 	* src/plot.c (init_constants) src/plot.h src/unset.c:  "reset session"
 	reinitializes variables NaN and pi since bad user code can clobber them.
 
-2013-09-11  Christoph Bersch <usenet@bersch.net>
+2013-09-11  Christoph Bersch  <usenet@bersch.net>
 
 	* src/set.c src/unset.c: Sanity check "set style increment foo" command,
 	reset to default on "reset" command.
@@ -2666,7 +2666,7 @@
 	'reset' command restores default mouse settings, warns on bogus 
 	options, no longer accepts 'x' or similar axis options
 
-2013-08-28  Christoph Bersch <usenet@bersch.net>
+2013-08-28  Christoph Bersch  <usenet@bersch.net>
 
 	* src/save.c (save_set_all): Emit a "unset object" command before
 	saving objects.  Bug #1251
@@ -2736,7 +2736,7 @@
 
 	* src/term.c (test_term): "test" was not respecting "set origin".
 
-2013-08-20  Kyle <elconquistador@users.sourceforge.net>
+2013-08-20  Kyle  <elconquistador@users.sourceforge.net>
 
 	* src/fit.c (regress): The value of chisq was corrupted in the process
 	of scaling the parameter errors.  This isn't a problem by itself, but a
@@ -2749,7 +2749,7 @@
 	* src/set.c src/tables.c src/tables.h src/unset.c src/axis.c src/show.c
 	src/save.c docs/gnuplot.doc:  Support minor tics on polar axis.
 
-2013-08-20  Jon Gjengset <jon@thesquareplanet.com>
+2013-08-20  Jon Gjengset  <jon@thesquareplanet.com>
 
 	* src/term_api.h src/gplt_x11.c src/mouse.c term/x11.trm term/qt.trm
 	term/wxt.trm term/README src/wxterminal/wxt_gui.cpp
@@ -2833,13 +2833,13 @@
 	It's cheap. People use it. It doesn't conflict with anything else.
 	There seems little reason to carry along extra code to disable it.
 
-2013-08-09  Christoph Bersch <usenet@bersch.net>
+2013-08-09  Christoph Bersch  <usenet@bersch.net>
 
 	* src/gadgets.c src/misc.c src/save.c src/term_api.h src/term.c:
 	New arrow style option "fixed" disables the re-sizing of arrow heads
 	for short arrows.
 
-2013-08-08  Christoph Bersch <usenet@bersch.net>
+2013-08-08  Christoph Bersch  <usenet@bersch.net>
 
 	* src/gadgets.c (draw_clip_polygon):  Sometimes the clipping status of
 	the current point and the line segment it is supposedly the end of do
@@ -3077,7 +3077,7 @@
 	for use at the top level command line.
 	Bug #1246
 
-2013-06-28  Christoph Bersch <usenet@bersch.net>
+2013-06-28  Christoph Bersch  <usenet@bersch.net>
 
 	* src/gadgets.c(clip_polygon): Use a temporary copy of the input 
 	vertices rather than overwriting them during clipping.
@@ -3290,7 +3290,7 @@
 	* docs/doc2tex.c docs/gnuplot.doc:
 	Tweak page layout of the document produced by 'make pdffigures'.
 
-2013-05-27  Thomas Mattison  <mattison <at> phas.ubc.ca>
+2013-05-27  Thomas Mattison   <mattison <at> phas.ubc.ca>
 
 	* src/fit.c (regress):  Update all user variables after the fit converges
 	or aborts in order to always return the "best" set. Patchset #230.
@@ -3315,7 +3315,7 @@
 	also was off by one in the fillstyle used.  "set style increment user"
 	caused an off-by-one error in the choice of initial line style.
 
-2013-05-22  Christoph Bersch <usenet@bersch.net>
+2013-05-22  Christoph Bersch  <usenet@bersch.net>
 
 	* src/gadgets.c(draw_clip_polygon) src/term.c(do_arc):
 	Fix polygon clipping code when intersections are degenerate.
@@ -3465,7 +3465,7 @@
 	* src/set.c: Remove order dependence of hypertext/point type options.
 	Initialize entire text_label structure when allocated.
 
-2013-05-09  Thomas Mattison  <mattison <at> phas.ubc.ca>
+2013-05-09  Thomas Mattison   <mattison <at> phas.ubc.ca>
 
 	* src/fit.c|h src/save.c src/show.c src/set.c src/unset.c
 	docs/gnuplot.doc:  New convergence criterion. The new simpler criterion
@@ -3495,7 +3495,7 @@
 	* src/datafile.c:  Valgrind found a case where df_column[foo].position
 	had never been initialized.  Boom.
 
-2013-05-08  Thomas Mattison  <mattison <at> phas.ubc.ca>
+2013-05-08  Thomas Mattison   <mattison <at> phas.ubc.ca>
 
 	* src/fit.c (marquardt):  Zero-change in chisquare is now "BETTER"
 	rather than "WORSE" to avoid extra iterations which would only
@@ -3625,7 +3625,7 @@
 	of lisp files gnuplot-gui.elc and gnuplot.elc, packaging of file
 	figure_missing.pdf.
 
-2013-04-25  Christoph Bersch <usenet@bersch.net>
+2013-04-25  Christoph Bersch  <usenet@bersch.net>
 
 	* src/gadgets.c src/gadgets.h src/graphics.c src/term.c:
 	Implement the Sutherland-Hodgman algorithm for clipping a general
@@ -3635,7 +3635,7 @@
 	* src/graphics.c (plot_filledcurves finish_filled_curve):
 	Use new polygon clipping code for filledcurves.
 
-2013-04-24  Thomas Mattison  <mattison <at> phas.ubc.ca>
+2013-04-24  Thomas Mattison   <mattison <at> phas.ubc.ca>
 
 	* src/fit.c:  Optional one-line progress reports. Move code to output
 	status reports and final results to new routines.
@@ -3887,7 +3887,7 @@
 	Issue a warning if a requested column header is not found in the
 	data file being plotted.  Document that an exact match is required.
 
-2013-03-12  Carl Michal <michal@phas.ubc.ca>
+2013-03-12  Carl Michal  <michal@phas.ubc.ca>
 
 	* src/fit.c src/fit.h src/save.c src/set.c src/show.c src/unset.c:
 	"set fit [no]prescale" optionally normalizes fit parameters before
@@ -4227,7 +4227,7 @@
 	* term/emf.trm: Adjust vertical centering of characters to match
 	current font size.
 
-2012-12-27  Daniel J Sebald <daniel.sebald@ieee.org>
+2012-12-27  Daniel J Sebald  <daniel.sebald@ieee.org>
 
 	* configure.in:  Repair shell syntax used to control the definition
 	of CC and CXX for cross-building.
@@ -4927,7 +4927,7 @@
 	* src/axis.h (from Hans-Bernhard Broeker)
 	#define AXIS_CLONE_SIZE offsetof(AXIS, linked_to_primary)
 
-2012-08-27  Mojca Miklavec <mojca.miklavec.lists@gmail.com>
+2012-08-27  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* src/gp_types.h:  Remove superfluous comma from enum declaration.
 
@@ -4962,7 +4962,7 @@
 	  such command.
 	- Bessel functions Jn and Yn by convention use a capital letter. 
 
-2012-08-23  Thomas Gaillard <tgaillard@users.sourceforge.net>
+2012-08-23  Thomas Gaillard  <tgaillard@users.sourceforge.net>
 
 	* src/interpol.c:  Mean and sigma of kernel density function were
 	incorrectly calculated.
@@ -4985,7 +4985,7 @@
 	announced 10+ years ago.   s/(` (/`(/
 	While here, clean out some old cruft from the directory.
 
-2012-08-07  Mojca Miklavec <mojca.miklavec.lists@gmail.com>
+2012-08-07  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* term/aquaterm.trm:  Revised test for transparency support to match
 	the implementation in AquaTerm version 1.1.1
@@ -5532,7 +5532,7 @@
 	If the color scheme is "lc variable", take the color of key sample from
 	the first point in the data set.
 
-2012-05-06  Anton Gladky <gladky.anton@gmail.com>
+2012-05-06  Anton Gladky  <gladky.anton@gmail.com>
 
 	* src/command.c: Fix segfault in initial check of history when using
 	--with-readline=bsd
@@ -5637,7 +5637,7 @@
 
 	* src/set.c: Fix incorrect test for error return from iconv().
 
-2012-04-24  Mojca Miklavec <mojca.miklavec.lists@gmail.com>
+2012-04-24  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* term/aquaterm.trm:  Clip images to bounding box. Reset line type
 	at the start of each plot.
@@ -5812,7 +5812,7 @@
 	hold rotated x and x2 tic labels.
 	Bug #3482491
 
-2012-03-12 Bastian Maerkisch  <bmaerkisch@web.de>
+2012-03-12  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* win/gnuplot.iss: Bump version number of installer to 4.7.
 
@@ -5867,7 +5867,7 @@
 
 	* README README.1ST INSTALL TODO FAQ.pdf:  Update text for version 4.6
 
-2012-02-29  Mojca Miklavec <mojca.miklavec.lists@gmail.com>
+2012-02-29  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* src/wxterminal/wxt_gui.cpp (OnMouseWheel): wxWidgets 2.9 supports 
 	horizontal mouse scrolling.
@@ -5962,7 +5962,7 @@
 	* gplt_x11.c (gpXStoreName):  Provide a name string for both
 	WM_NAME and WM_ICON_NAME.
 
-2012-01-17  Jérôme Lodewyck <lodewyck@users.sourceforge.net>
+2012-01-17  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
 	* configure.in src/Makefile.am src/qtterminal/Makefile.am
 	src/qtterminal/QtGnuplotApplication.cpp
@@ -5978,7 +5978,7 @@
 	the previous plot in user accessible variables GPVAL_TERM_XSIZE,
 	GPVAL_TERM_YSIZE.
 
-2012-01-15  Mojca Miklavec <mojca.miklavec.lists@gmail.com>
+2012-01-15  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* src/mouse.c (event_buttonpress): Treat mouse buttons 6/7 as
 	left/right scroll events (e.g. from fingers on a touchpad).
@@ -5987,7 +5987,7 @@
 	horizontal scroll events through to gnuplot core as mouse events
 	6/7.
 
-2012-01-15 Bastian Maerkisch  <bmaerkisch@web.de>
+2012-01-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/config.mgw: Sync with configure.
 
@@ -6036,7 +6036,7 @@
 	really a pipe, close it with pclose() rather than fclose().
 	Bug #3470351
 
-2012-01-07  Jérôme Lodewyck <lodewyck@users.sourceforge.net>
+2012-01-07  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
 	* src/qtterminal/QtGnuplotScene.cpp: Normalize the zoom rectangle to avoid
 	redrawing artifacts

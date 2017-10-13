@@ -23,13 +23,13 @@
 	branch first, and only after testing be added or back-ported to the
 	stable branch.
 
-2014-08-20 Ethan A Merritt  <merritt@u.washington.edu>
+2014-08-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/gp_cairo.c:  Distinct empirical scale factors for
 	dashlength used by pngcairo, pdfcairo, and wxt.
 	* term/emf.trm:  Scale dashlength with current linewidth.
 
-2014-08-18 Ethan A Merritt  <merritt@u.washington.edu>
+2014-08-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (place_arrows) src/graph3d.c (place_arrows3d):
 	Only invoke the arrowheads only code if there really is an arrowhead.
@@ -49,7 +49,7 @@
 	(%.o): Use pattern rules to build Qt source files.  Much simpler
 	than spelling it out long hand for every single source file.
 
-2014-08-15 Ethan A Merritt  <merritt@u.washington.edu>
+2014-08-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/bf_test.c src/Makefile.am src/binary.* (removed)
 	config/makefile.os2 config/makefile.dj2 config/makefile.cyg
@@ -85,18 +85,18 @@
 	previously used fonts to speed up the search for a new target font.
 	Now we add an equivalent for multi-byte font search.
 
-2014-08-14 Ethan A Merritt  <merritt@u.washington.edu>
+2014-08-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (do_rectangle) src/graph3d.c (map3d_position_r)
 	demo/rectangle.dem:  Fix y extent and clipping of rectangles with
 	negative y coord or inverted axes.
 	Bug #1462
 
-2014-08-05 Ethan A Merritt  <merritt@u.washington.edu>
+2014-08-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c (event_buttonpress):  Remove extraneous event_reset.
 
-2014-08-02 Ethan A Merritt  <merritt@u.washington.edu>
+2014-08-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (parse_colorspec):  Apply user-defined line colors
 	to text color also.
@@ -107,14 +107,14 @@
 	rather than a dynamically allocated string.  This fixes memory
 	leakage that happened whenever a linetype using dashes was discarded.
 
-2014-08-01 Ethan A Merritt  <merritt@u.washington.edu>
+2014-08-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c (event_buttonpress):  Trap mouse button click on
 	press rather than on release so that "pause mouse {button1|any}"
 	takes precedence over a key binding to the mouse button.
 	Bugfix
 
-2014-07-30 Ethan A Merritt  <merritt@u.washington.edu>
+2014-07-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm:  Remove misleading mention of -noevents.  This is a
 	command line option for gnuplot_x11, not for gnuplot itself.
@@ -128,17 +128,17 @@
 	the current terminal scale (oversampling, etc) as GPVAL_TERM_SCALE.
 	Bug #1291
 
-2014-07-28 Allin Cottrell  <cottrell@wfu.edu>
+2014-07-28  Allin Cottrell  <cottrell@wfu.edu>
 
 	* src/syscfg.h:  Report 32/64 bit Windows build in version string
 
-2014-07-28 Ethan A Merritt  <merritt@u.washington.edu>
+2014-07-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/gp_cairo.c:  Do not pass a linewidth of zero to the
 	cairo library.  The linewidth of LT_AXIS is now set in the core code,
 	do not further reduce it in gp_cairo_stroke().
 
-2014-07-25 Ethan A Merritt  <merritt@u.washington.edu>
+2014-07-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c: Scale x11 dashlength with linewidth.
 
@@ -147,7 +147,7 @@
 	* src/mouse.c src/mouse.h src/set.c src/show.c docs/gnuplot.doc:
 	New command 'set mouse zoomfactors <xfactor>,<yfactor>'
 
-2014-07-22 Ethan A Merritt  <merritt@u.washington.edu>
+2014-07-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gp_types.h src/plot2d.c (store2d_point):
 	INRANGE/OUTRANGE refer to points that are inside/outside the plot
@@ -163,7 +163,7 @@
 
 	* demo/poldat.dem:  Make sure trange includes the whole plot.
 
-2014-07-18 Ethan A Merritt  <merritt@u.washington.edu>
+2014-07-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* demo/Makefile.am.in: Do not create a symlink to GNUPLOT_X11 in the
 	build directory during "make check". This was probably intended to
@@ -172,14 +172,14 @@
 	and then running "make check" twice.
 	Bugfix
 
-2014-07-14 Ethan A Merritt  <merritt@u.washington.edu>
+2014-07-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c src/save.c src/set.c src/gadgets.h:
 	Continue to recognize "set style increment user" even though it has
 	been deprecated in favor of "set linetype".
 	Bug #1411 (not really a bug)
 
-2014-07-12 Ethan A Merritt  <merritt@u.washington.edu>
+2014-07-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/parse.c (check_for_iteration):  Fix failure to detect some loop
 	[start:end:increment] combinations that should be executed only once
@@ -260,7 +260,7 @@
 	from a pipe.
 	See Bug #1322
 
-2014-06-15  Akira Kakuto <kakuto@fuk.kindai.ac.jp>
+2014-06-15  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
 
 	* src/binary.c src/datafile.h src/syscfg.h:  LFS support on Windows
 	for MSVC and MinGW.
@@ -295,7 +295,7 @@
 	structure if we were called from fit rather than plot.
 	Bug #1427
 
-2014-06-12  Christoph Bersch <usenet@bersch.net>
+2014-06-12  Christoph Bersch  <usenet@bersch.net>
 
 	* term/lua.trm term/lua/gnuplot-tikz.lua:
 	Scale dashlength with linewidth.
@@ -331,11 +331,11 @@
 	Add an empirical scale factor to the dashlength*linewidth computation to
 	make the resulting patterns closer in total size to the built-in ones.
 
-2014-06-10  Christoph Bersch <usenet@bersch.net>
+2014-06-10  Christoph Bersch  <usenet@bersch.net>
 
 	* term/post.trm term/svg.trm:  Scale dashlength with linewidth.
 
-2014-06-09  Daniel J Sebald <daniel.sebald@ieee.org>
+2014-06-09  Daniel J Sebald  <daniel.sebald@ieee.org>
 
 	* src/qtterminal/QtGnuplotWidget.cpp (processEvent):  Always "resize"
 	the initial plot to its own size.  This may work around strangeness on
@@ -460,7 +460,7 @@
 	* src/gplt_x11.c:
 	Grey out key entries when corresponding plot is toggled off.
 
-2014-05-29  Akira Kakuto <kakuto@fuk.kindai.ac.jp>
+2014-05-29  Akira Kakuto  <kakuto@fuk.kindai.ac.jp>
 
 	* term/caca.trm:  Modify nominal codepage to accommodate CJK Windows.
 
@@ -991,7 +991,7 @@
 
 	* demo/all.dem:  Add varcolor.dem to the test set.
 
-2014-04-06  Christoph Bersch <usenet@bersch.net>
+2014-04-06  Christoph Bersch  <usenet@bersch.net>
 
 	* src/graphics.c (fill_between):  It is no longer necessary to clip in
 	this routine because the component quadrilaterals will be clipped later.
@@ -1101,7 +1101,7 @@
 	* config/mingw/Makefile:  Fix non-numeric version number due to
 	patchlevel "alpha".
 
-2014-03-29  Christoph Bersch <usenet@bersch.net>
+2014-03-29  Christoph Bersch  <usenet@bersch.net>
 
 	* src/multiplot.h src/multiplot.c demo/layout.dem docs/gnuplot.doc:
 	New autolayout options for multiplot:

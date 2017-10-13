@@ -1430,7 +1430,7 @@ when gnuplot 4.0 was released
  	Changed from unsigned char to straight char, to silence a compiler
  	warning.
 
-2003-08-29 Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+2003-08-29  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* configure.in (--with-pdf): Moved check for pdflib.h so it only
  	gets done if -lpdf itself was found.
@@ -1547,7 +1547,7 @@ when gnuplot 4.0 was released
 	* docs/gnuplot.doc demo/mousevariables.dem: Document new mousing
 	behaviour and provide a sample script that uses it.
 
-2003-07-22  Jaime Reed <jaime2003@users.sourceforge.net>
+2003-07-22  Jaime Reed  <jaime2003@users.sourceforge.net>
 
 	* src/parse.c src/eval.h src/eval.c src/standard.c src/standard.h
 	src/internal.c src/internal.h configure.in:  Create a new builtin
@@ -2044,7 +2044,7 @@ when gnuplot 4.0 was released
 	* demo/vector.dem: Use set term push/pop to avoid screen terminal
  	dependency.
 	
-2003-03-17  Leo Brewin <leo.brewin@sci.monash.edu.au>
+2003-03-17  Leo Brewin  <leo.brewin@sci.monash.edu.au>
 
 	* term/pdf.trm: Tell pdflib to use its built-in font metrics for
  	Symbol and ZapfDingbats fonts, since not all hosts have these.
@@ -2136,7 +2136,7 @@ when gnuplot 4.0 was released
  	RCS date tag, which caused it to be updated every time ChangeLog
  	was checked in.
 	
-2003-02-19  John Bollinger <bbands@yahoo.com>
+2003-02-19  John Bollinger  <bbands@yahoo.com>
 
 	* config/makefile.nt (default): Build pgnuplot.exe, too.
 	(pgnuplot.exe): New rule to build the piping helper program.
@@ -2444,7 +2444,7 @@ when gnuplot 4.0 was released
  	Update -D... symbols for the changed syntax of gd/png/jpeg/gif
  	checks.
 	
-2003-01-07  Mike Kay <Mike.Kay@noaa.gov>
+2003-01-07  Mike Kay  <Mike.Kay@noaa.gov>
 
 	* src/axis.h src/color.c src/gadgets.c src/gadgets.h src/graph3d.c
  	src/graphics.c src/save.c src/set.c src/show.c src/unset.c: Allow
@@ -3023,7 +3023,7 @@ when gnuplot 4.0 was released
 
 	* config/makefile.os2: config.h is in src/.
 
-2002-09-24  Hans Olav Eggestad <hans.olav.eggestad@jordforsk.no>
+2002-09-24  Hans Olav Eggestad  <hans.olav.eggestad@jordforsk.no>
 
 	* src/save.c: Consolidate dump of data and function plot styles.
 
@@ -3997,7 +3997,7 @@ when gnuplot 4.0 was released
 	* docs/gnuplot.doc (zeroaxis): Add some examples to make the
  	syntax more transparent for newbies.
 
-2002-03-21  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+2002-03-21  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* config/makefile.os2 src/os2/gclient.c: Get it to build again.
 
@@ -4182,7 +4182,7 @@ when gnuplot 4.0 was released
 	declarations here from ansichek.h. Define fallbacks for
 	GP_EXCEPTION_NAME and GP_MATHERR.
 
-2002-03-06  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+2002-03-06  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* config/makefile.os2: Finally get it to build again.
 	Drop third set of compiler/etc. flags. Use ../config.h,
@@ -4211,7 +4211,7 @@ when gnuplot 4.0 was released
 
 	* term/x11.trm: Remove reference to ipc.h.
 
-2002-03-04  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+2002-03-04  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 	* config/config.os2 config/makefile.os2: Some fixes to
 	get it build again (#define PROTOTYPES, TERMFLAGS updated)
 
@@ -4468,7 +4468,7 @@ when gnuplot 4.0 was released
 
 	* config/makefile.mgw: Added -DNO_SETVBUF; removed backslashes.
 
-2002-02-19  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+2002-02-19  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* config/makefile.os2 src/gplt_x11.c term/x11.trm: Some fixes for X11
 	stuff on OS/2 (make it build again and fix search for application
@@ -4529,7 +4529,7 @@ when gnuplot 4.0 was released
 	is just  'a.dat'  instead of the current  'a.dat' binary  while for
 	'a.dat' binary using 2:1:3  all 4 words as now.
 
-2002-02-15  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+2002-02-15  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* src/command.c src/plot.c src/os2/dialogs.c src/os2/gclient.c
 	src/os2/gnupmdrv.c src/os2/gnupmdrv.h: Clean up procedure to find 
@@ -4647,7 +4647,7 @@ when gnuplot 4.0 was released
 	* term/x11.trm (X11_options): Kill some more erroneous commas in X11 
 	terminal option string.  Thanks to Don Taber, again.
 
-2002-02-13 Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+2002-02-13  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	The 'decimalsign' patch by Harald Harders. Posted to SF.net, edited 
 	by me before inclusion.
@@ -5086,7 +5086,7 @@ when gnuplot 4.0 was released
 	(make_auto_time_minitics): Added cast to int to quell unsigned
  	comparison warning.
 
-2001-12-04  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+2001-12-04  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* src/fit.c: Fix buffer overflows regarding env vars used for
  	fitting.
@@ -5098,7 +5098,7 @@ when gnuplot 4.0 was released
 
 	* src/show.c (show_command): Dito.
 
-2001-12-01  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+2001-12-01  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* src/eval.c src/fit.c src/plot.c src/os2/gclient.c
 	config/makefile.os2: Abandon EMX non-standard signal processing
@@ -5238,7 +5238,7 @@ when gnuplot 4.0 was released
 	(do_plot): Remove local variable `scaling' which used to be passed
  	to boundary(), where it wasn't used anyway.
 
-2001-10-11  Dick Crawford <crawford@arete.com>
+2001-10-11  Dick Crawford  <crawford@arete.com>
 
 	* term/post.trm (PS_header): Old PostScript linewidth patch for
  	dotted axis linetype finally brought into 3.8 branch. Affects
@@ -5356,7 +5356,7 @@ when gnuplot 4.0 was released
 	* src/win/wgraph.c: Dynamically allocate enough memory for a
 	polygon with many corners (fixes 'plot with filledcurves').
 
-2001-09-19  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+2001-09-19  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* INSTALL docs/gnuplot.doc: Fix old URLs (use gnuplot.org now);
 	add hyperlinks. Move pointers to frontends for gnuplot.
@@ -5364,7 +5364,7 @@ when gnuplot 4.0 was released
 	* configure configure.in docs/Makefile.in: Let configure 
 	check for even more utils which we use. Always check for emacs.
 
-2001-09-18  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+2001-09-18  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* src/readline.c: Fix Gnuplot-readline implementation to
 	distinguish between VIO and xterm on OS/2.
@@ -5374,7 +5374,7 @@ when gnuplot 4.0 was released
 
 	* src/getcolor.c: Drop duplicate #includes.
 
-2001-09-18  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+2001-09-18  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* config/makefile.os2: Various updates/fixes/new targets, ...
 
@@ -5416,7 +5416,7 @@ when gnuplot 4.0 was released
 	* src/util.c: Add #include "datafile.h" to pull in prototype of
 	J. Van Zandt's new df_showdata() function.
 
-2001-09-18  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+2001-09-18  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* configure.in docs/Makefile.in: Check for PlainTeX, dvips as
 	well.
@@ -5427,17 +5427,17 @@ when gnuplot 4.0 was released
 	Remove "non-commercial" clause by permission of the original
 	author, Jos van der Woude.
 
-2001-09-18  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+2001-09-18  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* lisp/Makefile.in lisp/configure.in lisp/configure: Some more
 	checks; get additional targets to work.
 
-2001-09-18  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+2001-09-18  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* doc/.cvsignore docs/psdoc/.cvsignorelisp/.cvsignore: Add missing
 	entries.
 
-2001-09-17  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+2001-09-17  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* config/makefile.os2: Add missing dependency.
 
@@ -5461,21 +5461,21 @@ when gnuplot 4.0 was released
 	* src/util.c: display file data using function rather than
 	macro. 
 
-2001-09-13  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+2001-09-13  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* term/post.trm: Replace code like "if (float f)" at
 	least by a still questionable boolean expression
 
-2001-09-11  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+2001-09-11  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* term/gif.trm: Fix a C++ comment. We are still using C89!
 
-2001-09-05  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+2001-09-05  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* term/epslatex.trm term/svg.trm: Two no-op changes to
 	make gcc happy and remove (bogus) compiler warnings
 
-2001-09-08 Petr Mikulik  <mikulik@physics.muni.cz>
+2001-09-08  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gnuplot.doc src/gp_types.h src/graphics.c src/save.c
 	src/show.c src/tables.c term/post.trm NEWS: Implemented plotting
@@ -5490,20 +5490,20 @@ when gnuplot 4.0 was released
 	vertices passed into X11_filled_polygon(). This should be properly 
 	fixed by an X11 programmer according to the hint therein.
 
-2001-09-07 Petr Mikulik  <mikulik@physics.muni.cz>
+2001-09-07  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/mouse.c: Use %g format instead of %f when placing labels by
 	mouse.
 
-2001-09-06 Petr Mikulik  <mikulik@physics.muni.cz>
+2001-09-06  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/internal.c: matherr(exception) unsupported by mingw compiler.
 
-2001-09-05  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+2001-09-05  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* .cvsignore docs/.cvsignore: Add entries
 
-2001-09-05  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+2001-09-05  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* src/Makefile.am tutorial/Makefile.am: fixes to make
 	automake 1.5 happy. Should work as well with automake 1.4.
@@ -6142,7 +6142,7 @@ when gnuplot 4.0 was released
 	* src/hidden3d.c (split_line_at_ratio) [PM3D]: Fill in field
 	`real_z', too.
 
-2001-06-28  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+2001-06-28  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* term/x11.trm: More verbose error message if X11 driver
 	can't be started
@@ -7471,7 +7471,7 @@ when gnuplot 4.0 was released
 	* src/gpexecute.inc(gpe_init,gpe_push): Use malloc() instead of
 	gp_alloc() to avoid linking with additional modules.
 
-2000-11-03  Hans-Bernhard Broeker  <broeker@acaxp6.physik.rwth-aachen.de>
+2000-11-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/syscfg.h: repeated block of code moved to here.  JMP_BUF:
  	new #define. Will be sigjmp_buf, if HAVE_SIGSETJMP
@@ -7483,7 +7483,7 @@ when gnuplot 4.0 was released
 	(command_line_env): make it type JMP_BUF
 	(RexxInterface): make local variable keep_env type JMP_BUF
 	
-2000-11-03  Hans-Bernhard Broeker  <broeker@acaxp6.physik.rwth-aachen.de>
+2000-11-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/emf.trm (EMF_text): replace fgetpos() call by ftell()
 
@@ -7949,7 +7949,7 @@ when gnuplot 4.0 was released
 	Note: not implemented for TeX-like terminals, which draw arrows
 	by their own method.
 
-2000-07-26 Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+2000-07-26  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/axis.h (STORE_WITH_LOG_AND_UPDATE_RANGE): don't store
 	if AXIS argument is -1, which means 'invalid'.
@@ -8275,7 +8275,7 @@ when gnuplot 4.0 was released
 	different settings for different terminals. Noted by Peter Maunz
 	<Peter.Maunz@mpq.mpg.de>.
 
-2000-04-14  Nigel Nunn <nNunn@ausport.gov.au>
+2000-04-14  Nigel Nunn  <nNunn@ausport.gov.au>
 
 	* src/command.c(pause_command): Fix `pause' command on Win32.
 
@@ -8320,7 +8320,7 @@ when gnuplot 4.0 was released
 	* src/interpol.c(cp_implode): 'smooth unique' does not correctly
 	check inrange/outrange conditions.
 
-2000-04-04  Pieter-Tjerk de Boer <ptdeboer@cs.utwente.nl>
+2000-04-04  Pieter-Tjerk de Boer  <ptdeboer@cs.utwente.nl>
 
 	* src/graph3d.c(do_3dplot): Fix division by zero error caused
 	by using variables before initialisation.
@@ -8333,7 +8333,7 @@ when gnuplot 4.0 was released
 
 	* term/hp26.trm(HP26_flush): Add cast in compact_slope() call.
 
-2000-03-31  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+2000-03-31  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* src/gplt_x11.c(handle_selection_event): Fix compiler warning, use
 	FPRINTF macro.
@@ -8425,7 +8425,7 @@ when gnuplot 4.0 was released
 	* made quite a few of the mouse.c functions static and
 	removed prototypes for these from mouse.h.
 
-2000-03-17  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+2000-03-17  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* fixed fit.c for the crash:
 	  f(x) = a*sin(x) + b*x+c; fit f(x) 'a' via a,b,c,d
@@ -8480,7 +8480,7 @@ when gnuplot 4.0 was released
 
 	* removed the contents of `src/unused'
 
-2000-03-02  Pieter-Tjerk de Boer <ptdeboer@cs.utwente.nl>
+2000-03-02  Pieter-Tjerk de Boer  <ptdeboer@cs.utwente.nl>
 
         * fixed updating of ruler position when autoscale is enabled:
         use min_array[...] etc. instead of xmin etc. in recalc_ruler_pos().
@@ -8508,7 +8508,7 @@ when gnuplot 4.0 was released
         * added a few if (X11_ipc) to term/x11.trm to prevent segfaults
 	if the connection to the outboard driver was not established yet.
 
-2000-02-25  Pieter-Tjerk de Boer <ptdeboer@cs.utwente.nl>
+2000-02-25  Pieter-Tjerk de Boer  <ptdeboer@cs.utwente.nl>
 
         * put #ifdef USE_MOUSE around use of EventHandler() in src/gplt_x11.c,
         to make it compile without mouse again.
@@ -8526,7 +8526,7 @@ when gnuplot 4.0 was released
 	`set mouse labels' command. (see help mouse)
 	(both changes were suggested by Pieter-Tjerk de Boer)
 
-2000-02-18 Pieter-Tjerk de Boer <ptdeboer@cs.utwente.nl>
+2000-02-18  Pieter-Tjerk de Boer  <ptdeboer@cs.utwente.nl>
 
         * gplt_x11 now catches the EnterWindow event, to immediately show
         correct coordinates and zoombox when the mouse enters the window.
@@ -8535,13 +8535,13 @@ when gnuplot 4.0 was released
 
         * removed some unused code in gplt_x11.c
 
-2000-02-15 Pieter-Tjerk de Boer <ptdeboer@cs.utwente.nl>
+2000-02-15  Pieter-Tjerk de Boer  <ptdeboer@cs.utwente.nl>
 
 	* term/pslatex.trm: Don't put pslatex's postscript code into
 	the preamble, otherwise, if several pictures are present, only
 	the settings for the last picture are present.
 
-2000-02-14 Pieter-Tjerk de Boer <ptdeboer@cs.utwente.nl>
+2000-02-14  Pieter-Tjerk de Boer  <ptdeboer@cs.utwente.nl>
 
 	* src/unset.c: Repair defunct 'unset [xyz]tics' commands.
 
@@ -8559,7 +8559,7 @@ when gnuplot 4.0 was released
 
 	* term/pc.trm: Small change in the help section.
 
-2000-02-10  Pieter-Tjerk de Boer <ptdeboer@cs.utwente.nl>
+2000-02-10  Pieter-Tjerk de Boer  <ptdeboer@cs.utwente.nl>
 
 	* term/pslatex.trm: Fix segfault.
 
@@ -8573,13 +8573,13 @@ when gnuplot 4.0 was released
 	but we leaves these files alone for the time being for backwards
 	compatibility.
 
-2000-02-06  Thomas Henlich  <...>
+2000-02-06  Thomas Henlich  <thenlich@users.sourceforge.net>
 
 	* term/post.trm: Some programs complain about "Symbol-Oblique".
 	Use "Symbol" instead, because "Symbol-Oblique" is really just a
 	transformed "Symbol" font.
 
-2000-02-04  Thomas Henlich  <...>
+2000-02-04  Thomas Henlich  <thenlich@users.sourceforge.net>
 
 	* term/post.trm: Provides an oblique symbol font, e.g.
 	set xlabel 'b' "Symbol-Oblique" gives an oblique (slanted) beta

@@ -22,7 +22,7 @@ This is the ChangeLog covering gnuplot development between November 2006
 	* src/tabulate.c:  Fix tabular output of log scale data.
 	Bug #2849166
 
-2009-10-09  Thomas Sefzick <thse@users.sourceforge.net>
+2009-10-09  Thomas Sefzick  <thse@users.sourceforge.net>
 
 	* term/latex.trm:  Add an option for rotated text in the old latex
 	terminal.  'set term latex rotate' enables it and turns off the 
@@ -63,7 +63,7 @@ This is the ChangeLog covering gnuplot development between November 2006
 	If GNUPLOT_LIB is not defined, set it to ..
 	Bug #2868958
 
-2009-10-06  Tatsuro Matsuoka <tmacchant3@yahoo.co.jp>
+2009-10-06  Tatsuro Matsuoka  <tmacchant3@yahoo.co.jp>
 
 	* config/makeile.mgw:  Override the -mwindows compilation flag 
 	provided by wx-config.
@@ -140,7 +140,7 @@ This is the ChangeLog covering gnuplot development between November 2006
 	* src/win/wpause.c src/wxterminal/gp_cairo.c:  Fix ambiguous syntax and
 	bad format statement that generates compiler warnings.
 
-2009-08-30  Tatsuro Matsuoka <tmacchant3@yahoo.co.jp>
+2009-08-30  Tatsuro Matsuoka  <tmacchant3@yahoo.co.jp>
 
 	* config/makeile.mgw:  The cairo terminals need gp_cairo_helpers also.
 
@@ -150,12 +150,12 @@ This is the ChangeLog covering gnuplot development between November 2006
 	inclusion of pngcairo and pdfcairo terminals. 
 	EAM - Share a CAIROLIBS flag for use by both WXT and CAIROTERMS.
 
-2009-08-28  jpsa <john-aldridge@users.sourceforge.net>
+2009-08-28  jpsa  <john-aldridge@users.sourceforge.net>
 
 	* src/win/wgraph.c:   Use printer open method recommended by 
 	Microsoft knowledge base article 240082.
 
-2009-08-28  Alexander Täschner <taschna@users.sourceforge.net>
+2009-08-28  Alexander Täschner  <taschna@users.sourceforge.net>
 
 	* src/win/winmain.c:  Avoid buffer overflow in MyPrintF and MyFPrintF.
 
@@ -240,7 +240,7 @@ This is the ChangeLog covering gnuplot development between November 2006
 
 	* docs/gnuplot.doc:  Expand section on newhistogram command.
 
-2009-08-04  Jérôme Lodewyck <lodewyck@users.sourceforge.net>
+2009-08-04  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
 	* configure.in: Remove unwanted spaces.
 
@@ -257,7 +257,7 @@ This is the ChangeLog covering gnuplot development between November 2006
 	labels in case one is supposed to replace the auto-generated label.
 	The actual label replacement is only implemented for 2D plots.
 
-2009-08-01  Jérôme Lodewyck <lodewyck@users.sourceforge.net>
+2009-08-01  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
 	* qtterminal/QtGnuplotWindow.cpp qtterminal/QtGnuplotEvent.cpp qt_term.cpp:
 	Close the current plot window when [ctrl+]q is pressed.
@@ -279,11 +279,11 @@ This is the ChangeLog covering gnuplot development between November 2006
 	* src/qtterminal/Makefile.am: Add additional files to the list of
 	things to be placed in the distribution package.
 
-2009-07-30  Jérôme Lodewyck <lodewyck@users.sourceforge.net>
+2009-07-30  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
 	* configue.in: Fix a compile error when the Qt terminal is disabled.
 
-2009-07-29  Jérôme Lodewyck <lodewyck@users.sourceforge.net>
+2009-07-29  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 	* configue.in src/Makefile.am: better check for Qt tools
 	moc uic and lrelease.
 
@@ -292,17 +292,17 @@ This is the ChangeLog covering gnuplot development between November 2006
 	* src/datafile.c (df_readascii): Handle xticlabels() in the case of
 	histograms with errorbars.  Bugfix
 
-2009-07-28  Jérôme Lodewyck <lodewyck@users.sourceforge.net>
+2009-07-28  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
 	* qtterminal/po/qtgnuplot_ja.ts: Japanese translation. patch 2828290
 
-2009-07-28  Jérôme Lodewyck <lodewyck@users.sourceforge.net>
+2009-07-28  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
 	* qtterminal/qt_term.cpp: When consecutive motion events are received,
 	only process the last one.
 	* src/Makefile.am: Fix make rules for embed_example
 
-2009-07-27  Jérôme Lodewyck <lodewyck@users.sourceforge.net>
+2009-07-27  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
 	* qtterminal/qt_term.cpp qtterminal/QtGnuplot.pro qtterminal/po/*:
 	Add an internationalization framework and a french translation.
@@ -321,7 +321,7 @@ This is the ChangeLog covering gnuplot development between November 2006
 	vertices are specified in plot coordinates (i.e. not screen or graph
 	coordinates).
 
-2009-07-24  Jérôme Lodewyck <lodewyck@users.sourceforge.net>
+2009-07-24  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
 	* qtterminal/qt_term.cpp: use locale config macros
 
@@ -357,7 +357,7 @@ This is the ChangeLog covering gnuplot development between November 2006
 	from the Z coordinate, then also use Z to auto-scale cbrange.
 	Bug #2133407
 
-2009-07-19  Jérôme Lodewyck <lodewyck@users.sourceforge.net>
+2009-07-19  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
 	Add a Qt terminal, which can either act as a standalone interactive
 	terminal window or be embedded in an external Qt application.
@@ -488,7 +488,7 @@ This is the ChangeLog covering gnuplot development between November 2006
 	plot border.  Skip them entirely.  Same problem for whiskerbars.
 	Bugs #2807571 #2812572
 
-2009-06-21  Thomas Sefzick <thse@users.sourceforge.net>
+2009-06-21  Thomas Sefzick  <thse@users.sourceforge.net>
 
 	* term/gd.trm: The background color requested in "set term png..."
 	was not being used in truecolor png output.
@@ -618,7 +618,7 @@ This is the ChangeLog covering gnuplot development between November 2006
 	UTF-8 environment.  This is not something we can fix.
 	Bug #2790153
 
-2009-05-30  Thomas Sefzick <thse@users.sourceforge.net>
+2009-05-30  Thomas Sefzick  <thse@users.sourceforge.net>
 
 	* src/graph3d.c (do_3dplot):  Adjust position of 3D plot with
 	'set view equal xyz' so that the center of rotation is at the center
@@ -1718,7 +1718,7 @@ This is the ChangeLog covering gnuplot development between November 2006
 	Add a command line option -e to execute specified commands:
 	gnuplot   file1.in   -e "reset"   file2.in
 
-2008-10-06  Juergen Wieferink <wieferink@freenet.de>
+2008-10-06  Juergen Wieferink  <wieferink@freenet.de>
 
 	* src/set.c (set_palette_defined): Allow string variables and
 	expressions in "set palette defined". SF #2149065
@@ -1849,7 +1849,7 @@ This is the ChangeLog covering gnuplot development between November 2006
 	to be both simpler and more powerful than adding iteration as a special
 	case for axis ticks. E.g.:   unset for [i=100:200] label i
 
-2008-09-06  Juergen Wieferink <wieferink@freenet.de>
+2008-09-06  Juergen Wieferink  <wieferink@freenet.de>
 
 	* src/term.c (enhanced_recursion):  Add curly braces {} to the list of
 	characters that must be escaped in postscript enhanced mode.
@@ -1905,7 +1905,7 @@ This is the ChangeLog covering gnuplot development between November 2006
 	be freed immediately after copying. This should fix memory leaks both in
 	the new eval_command() and the existing call in pop_terminal().
 
-2008-08-12  Juergen Wieferink <wieferink@freenet.de>
+2008-08-12  Juergen Wieferink  <wieferink@freenet.de>
 
 	* src/misc.h src/misc.c: Make lf_push() and lf_pop() global.
 
@@ -1922,7 +1922,7 @@ This is the ChangeLog covering gnuplot development between November 2006
 	<home> keys will do something useful.
 	Bug #1556607
 
-2008-08-06  Benjamin <lindnerb@users.sourceforge.net>
+2008-08-06  Benjamin Lindner <lindnerb@users.sourceforge.net>
 
 	* term/post.trm: Fix parsing error for option "palfuncparam".
 	Bug #2039912
@@ -5063,13 +5063,13 @@ This is the ChangeLog covering gnuplot development between November 2006
 
 	* src/wxterminal/gp_cairo.c: Fix and complete debugging messages.
 
-2007-03-21 Daniel Sebald  <daniel.sebald@ieee.org>
+2007-03-21  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/graphics.c (boundary): The change of 2007-02-25 overlooked the
 	2D plots having palettes that also required setup_tics(COLOR_AXIS,).
 	Bug #1684789
 
-2007-03-16 Bastian Maerkisch  <bmaerkisch@web.de>
+2007-03-16  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/winmain.c (appdata_directory): Prevent segfault if no
 	directory is given and the environmental variable APPDATA is not set.

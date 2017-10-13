@@ -15,7 +15,7 @@ November 2009 (4.4-rc1) and November 2011 (split off 4.6 stable branch)
 	* term/js/gnuplot_svg.js: Try to correct for coordinate offset due to
 	scrollbars.  The fix is unfortunately browser specific.
 
-2011-11-22  Peter <plotter@piments.com>
+2011-11-22  Peter  <plotter@piments.com>
 
 	* term/svg.trm: "standalone" option includes gnuplot_svg.js mousing
 	support directly in the output *.svg file rather than linking to it
@@ -170,7 +170,7 @@ November 2009 (4.4-rc1) and November 2011 (split off 4.6 stable branch)
 	terminal driver cairolatex.
 	Patch #3413095
 
-2011-11-06  Mojca Miklavec <mojca.miklavec.lists@gmail.com>
+2011-11-06  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	Add a context terminal, which creates output suitable for ConTeXt.
 
@@ -432,7 +432,7 @@ November 2009 (4.4-rc1) and November 2011 (split off 4.6 stable branch)
 	two different directory separators into account and does not change
 	its argument.
 
-2011-09-16  Peter Hedwig <peter@affenbande.org>
+2011-09-16  Peter Hedwig  <peter@affenbande.org>
 
 	* term/lua/gnuplot-tikz.lua:  Modify the commands used for rgb color 
 	selection so that they are compatible with context as well as tikz.
@@ -755,7 +755,7 @@ November 2009 (4.4-rc1) and November 2011 (split off 4.6 stable branch)
 	splot structure, since otherwise linetype definitions would overwrite
 	it. 
 
-2011-07-23  Adam Strzelecki <ono@users.sourceforge.net>
+2011-07-23  Adam Strzelecki  <ono@users.sourceforge.net>
 
 	* src/wxterminal/wxt_gui.cpp src/wxterminal/wxt_gui.h m4/apple.m4:
 	OSX support for wxt terminal.  For OSX, switch to using single-threaded
@@ -763,7 +763,7 @@ November 2009 (4.4-rc1) and November 2011 (split off 4.6 stable branch)
 	Add -framework ApplicationServices to the apple-specific
 	configuration flags.
 
-2011-07-23  Mojca Miklavec <mojca.miklavec.lists@gmail.com>
+2011-07-23  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* m4/apple.m4:  Replace -laquaterm with -Wl,-framework -Wl,AquaTerm
 	which is supposed to make the Macports version of aquaterm install
@@ -775,7 +775,7 @@ November 2009 (4.4-rc1) and November 2011 (split off 4.6 stable branch)
 	Revise iteration-over-plot mechanism to handle edge cases of nested
 	iteration correctly.
 
-2011-07-20  Peter Hedwig <peter@affenbande.org>
+2011-07-20  Peter Hedwig  <peter@affenbande.org>
 
 	* term/lua/gnuplot-tikz.lua:  Point types 10 and 11 were upside down.
 	Bug #3368877
@@ -1448,7 +1448,7 @@ November 2009 (4.4-rc1) and November 2011 (split off 4.6 stable branch)
 	character 127 instead of ^D, but keep old behaviour of deleting current
 	character on platforms Windows, MSDOS and OS/2. SF Bug #3285571
 
-2011-04-13  Peter Hedwig <peter@affenbande.org>
+2011-04-13  Peter Hedwig  <peter@affenbande.org>
 
 	* term/lua/gnuplot-tikz.lua:  Fix "charsize" option.
 
@@ -1976,7 +1976,7 @@ November 2009 (4.4-rc1) and November 2011 (split off 4.6 stable branch)
 	(O): Missing macro needed for makefile.all.
 	(linkopt1.msw, gnuplot.exe): Add recently needed library msimg32.
 
-2011-03-03  Peter Hedwig <peter@affenbande.org>
+2011-03-03  Peter Hedwig  <peter@affenbande.org>
 
 	* term/lua.trm:  If the cairo terminal is not available to make a
 	bitmap image, use libgd instead.
@@ -2043,13 +2043,13 @@ November 2009 (4.4-rc1) and November 2011 (split off 4.6 stable branch)
 
 	* docs/gnuplot-ja.doc:  sync to docs version 1.651
 
-2011-02-24  Peter Hedwig <peter@affenbande.org>
+2011-02-24  Peter Hedwig  <peter@affenbande.org>
 
 	* term/lua/gnuplot-tikz.lua term/lua.trm:  Make full bitmap
 	support conditional on HAVE_CAIROPDF.  Necessary in order to
 	build lua without the cairo terminals.
 
-2011-02-24  Hans-Bernhard Broeker <broeker@physik.rwth-aachen.de>
+2011-02-24  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* share/LaTeX/Makefile.am (${lua_files}): Missing $(top_srcdir)
 	broke out-of-source-tree build.
@@ -2082,7 +2082,7 @@ November 2009 (4.4-rc1) and November 2011 (split off 4.6 stable branch)
 	select ClearType or Proof quality depending on OS version to
 	improve rendering quality
 
-2011-02-21  Peter Hedwig <peter@affenbande.org>
+2011-02-21  Peter Hedwig  <peter@affenbande.org>
 
 	* term/lua/gnuplot-tikz.help term/lua/gnuplot-tikz.lua
 	term/lua/NEWS term/lua/README term/lua/TODO term/lua.trm:
@@ -2296,7 +2296,7 @@ November 2009 (4.4-rc1) and November 2011 (split off 4.6 stable branch)
 	* src/plot2d.c (eval_plots):  Minimum value of polar axis always
 	auto-scales to 0 (already documented but implementation lacked).
 
-2011-01-10  David Kuehling <dvdkhlng@gmx.de>
+2011-01-10  David Kuehling  <dvdkhlng@gmx.de>
 
 	* term/linux.trm:  Makes linux.trm work with all SVGAlib video modes,
 	not only 16 and 256-color modes.
@@ -2304,7 +2304,7 @@ November 2009 (4.4-rc1) and November 2011 (split off 4.6 stable branch)
 	* src/term.c (init_terminal):  Correct the auto-selection of terminal
 	type vgagl or linux.  Only select vgagl if lib3dkit is present.
 
-2011-01-08  Hans-Bernhard Broeker <broeker@physik.rwth-aachen.de>
+2011-01-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/internal.c (f_time): Don't use a local variable of the same
 	name as a function you're trying to call.
@@ -2365,7 +2365,7 @@ November 2009 (4.4-rc1) and November 2011 (split off 4.6 stable branch)
 	* src/win/wgraph.c (drawgraph): Selecting linetype 16 caused
 	corruption of the color and pen assignments in mono mode.
 
-2010-12-14  Hans-Bernhard Broeker <broeker@physik.rwth-aachen.de>
+2010-12-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/watcom/Makefile, config/watcom/config.h: New version of
 	Makefiles for OpenWatcom that builds outside the src tree.
@@ -3370,18 +3370,18 @@ November 2009 (4.4-rc1) and November 2011 (split off 4.6 stable branch)
 
 	* src/syscfg.h: Tweaked version of _bool support for Sun/Solaris
 
-2010-05-06  Ethan A Merritt  <merritt@u.washington.edu
+2010-05-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/cairo.trm (cairotrm_graphics): Handle the special case of
 	streaming pdfcairo output to stdout.  (Requires cairo version >=
 	1.2) Bug #578311
 
-2010-05-05  Ethan A Merritt  <merritt@u.washington.edu
+2010-05-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm src/term.c: Move a global declaration out of post.trm so
 	that gnuplot can be built without including the postscript terminal.
 
-2010-05-02  Thomas Sefzick <thse@users.sourceforge.net>
+2010-05-02  Thomas Sefzick  <thse@users.sourceforge.net>
 
 	* src/gadgets.h src/graphics.c src/save.c src/set.c set/show.c
 	src/tables.c src/tables.h docs/gnuplot.doc:
@@ -3390,7 +3390,7 @@ November 2009 (4.4-rc1) and November 2011 (split off 4.6 stable branch)
 	automatic layout of items in the figure legend. Implemented for 2D
 	plots only.
 
-2010-05-02  Ethan A Merritt  <merritt@u.washington.edu
+2010-05-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in src/save.c src/set.c src/show.c src/unset.c src/fit.c
 	src/fit.h docs/gnuplot.doc config/config.os2 config/config.wc
@@ -3403,7 +3403,7 @@ November 2009 (4.4-rc1) and November 2011 (split off 4.6 stable branch)
 	* src/misc.c (lp_parse): "lc variable" was being lost in some cases.
 	Bugfix
 
-2010-04-24  Ethan A Merritt  <merritt@u.washington.edu
+2010-04-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* config.mgw config.cyg config.os2:  Enable HIDDEN_QUADTREE by default.
 	Tracker item #2990173
@@ -3415,12 +3415,12 @@ November 2009 (4.4-rc1) and November 2011 (split off 4.6 stable branch)
 	"smooth cummulative" with automatic normalization to the range
 	[0:1].
 
-2010-04-12  Ethan A Merritt  <merritt@u.washington.edu
+2010-04-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm: Correct a typo that leads to serious problems with
 	font size and placement (introduced by the fontscale code).
 
-2010-04-04  Ethan A Merritt  <merritt@u.washington.edu
+2010-04-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/cairo.trm: The cairo terminals were forgetting fontscale
 	after the initial application.
@@ -3430,12 +3430,12 @@ November 2009 (4.4-rc1) and November 2011 (split off 4.6 stable branch)
 	a segfault on certain enhanced text strings.
 	Bug #2947223
 
-2010-03-28  Ethan A Merritt  <merritt@u.washington.edu
+2010-03-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: State explicitly that the timefmt %y interprets
 	a 2 digit year number as being in the range 1969-2068.
 
-2010-03-24  Ethan A Merritt  <merritt@u.washington.edu
+2010-03-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/tgif.trm (text_angle): Handle text rotation -270 same as +90.
 	Bugfix
@@ -3445,7 +3445,7 @@ November 2009 (4.4-rc1) and November 2011 (split off 4.6 stable branch)
 	* term/js/gnuplot_mouse.js (mouse_update):
 	Repaint current canvas before each incremental update of the zoom box.
 
-2010-03-22  Ethan A Merritt  <merritt@u.washington.edu
+2010-03-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (lp_parse): Re-write the lp_parse() routine to prevent the
 	loading of a user-defined linetype from undoing other linestyle 
@@ -3463,7 +3463,7 @@ November 2009 (4.4-rc1) and November 2011 (split off 4.6 stable branch)
 	* Provide Humlicek's approximation to the Voigt/Faddeeva function
 	  voigt(x,y) = \frac{y}{\pi} \int{\frac{e^{t^2}}{(x-t)^2+y^2}}dt
 
-2010-03-20  Ethan A Merritt  <merritt@u.washington.edu
+2010-03-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* NEWS src/hidden3d.c src/plot3d.c src/graph3d.c docs/gnuplot.doc:
 
@@ -3472,12 +3472,12 @@ November 2009 (4.4-rc1) and November 2011 (split off 4.6 stable branch)
 	follow this, drawing instead from zmin.  Now the 3D code always draws
 	impulses from z=0 just as the 2D code always draws from y=0.
 
-2010-03-18  Ethan A Merritt  <merritt@u.washington.edu
+2010-03-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc:  Add index entries and update description of mouse
 	scrolling and hotkeys.
 
-2010-03-17  Ethan A Merritt  <merritt@u.washington.edu
+2010-03-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* plot.c (main): Initialize c_token to a legal value at the start of
 	interactive input.
@@ -3491,7 +3491,7 @@ November 2009 (4.4-rc1) and November 2011 (split off 4.6 stable branch)
 	size up or down in parallel with scaling the output page up or down.
 	This is mostly relevant for hardcopy output or embedded figures.
 
-2010-03-14  Ethan A Merritt  <merritt@u.washington.edu
+2010-03-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* INSTALL config/README config/makefile.amg config/makefile.ami
 	config/makefile.dj2 config/makefile.unx config/term_pc.h configure.in
@@ -3516,7 +3516,7 @@ November 2009 (4.4-rc1) and November 2011 (split off 4.6 stable branch)
 	* src/pm3d.c src/tables.c src/term.c term/gd.trm term/pm.trm
 	term/post.trm: Remove bits of dead code.
 
-2010-03-13  Ethan A Merritt  <merritt@u.washington.edu
+2010-03-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* config/makefile.286 config/makefile.msc config/makefile.msw
 	config/makefile.tc config/makefile.wc config/makefile.unx
@@ -3584,7 +3584,7 @@ November 2009 (4.4-rc1) and November 2011 (split off 4.6 stable branch)
 
 	* src/Makefile.am:  Fix broken target "make clean"
 
-2010-03-04  Thomas Sefzick <thse@users.sourceforge.net>
+2010-03-04  Thomas Sefzick  <thse@users.sourceforge.net>
 
 	* src/svg.trm:  Make sure to reset ENHsvg_string_state after each use.
 
@@ -3835,7 +3835,7 @@ November 2009 (4.4-rc1) and November 2011 (split off 4.6 stable branch)
 	the environmental variable GNUPLOT_PS_DIR.
 	Bug #2933345
 
-2010-01-15  Christoph Junghans <ottxor@users.sourceforge.net>
+2010-01-15  Christoph Junghans  <ottxor@users.sourceforge.net>
 
 	* configure.in src/Makefile.am demo/Makefile.am.in:
 	"make check" needs help if we did ./configure --program-suffix=FOO
@@ -3956,7 +3956,7 @@ November 2009 (4.4-rc1) and November 2011 (split off 4.6 stable branch)
 	correct. This should be done only once on first entry before setting
 	the terminal options.
 
-2009-12-30  Thomas Sefzick <thse@users.sourceforge.net>
+2009-12-30  Thomas Sefzick  <thse@users.sourceforge.net>
 
 	* src/graph3d.c: Fix incorrect color assignment of contour lines when
 	'set style increment user' is set.
@@ -3969,7 +3969,7 @@ November 2009 (4.4-rc1) and November 2011 (split off 4.6 stable branch)
 	Allow an optional 6th column in CANDLESTICKS style that specifies the
 	width of each individual candle.
 
-2009-12-24  Thomas Sefzick <thse@users.sourceforge.net>
+2009-12-24  Thomas Sefzick  <thse@users.sourceforge.net>
 
 	* src/tabulate.c src/time.c:
 	Support the "%s" format specifier to strftime as per the unix man page.
@@ -3987,7 +3987,7 @@ November 2009 (4.4-rc1) and November 2011 (split off 4.6 stable branch)
 	revising the definition of CC_FOR_BUILD, but I don't know if this
 	will break cross-compilation again.
 
-2009-12-24  Robert Schwebel <r.schwebel@pengutronix.de>
+2009-12-24  Robert Schwebel  <r.schwebel@pengutronix.de>
 
 	* configure.in docs/Makefile.in:
 	When cross compiling gnuplot, build the documentation generation tools
@@ -4114,18 +4114,18 @@ November 2009 (4.4-rc1) and November 2011 (split off 4.6 stable branch)
 
 	* src/show.c (show_version): Less info help lines.
 
-2009-11-14  Philipp K. Janert <janert@ieee.org>
+2009-11-14  Philipp K. Janert  <janert@ieee.org>
 
 	* src/command.c (undefine_command): Added support for wildcards in
 	variable names.
 
 	* docs/gnuplot.doc: Associated documentation.
 
-2009-11-12  Thomas Sefzick <thse@users.sourceforge.net>
+2009-11-12  Thomas Sefzick  <thse@users.sourceforge.net>
 
 	* term/canvas.trm:  Fix initialization failure on non-unix platforms.
 
-2009-11-11 Petr Mikulik  <mikulik@physics.muni.cz>
+2009-11-11  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gnuplot.doc: Updated introduction.
 
