@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1084.2.19 2017/10/08 19:10:57 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1084.2.20 2017/10/10 03:55:43 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4066,14 +4066,14 @@ Ffigure_scaled_image
  This matches the convention used in PNG and JPEG files (see `binary filetype`).
  However some data files use an alternative convention in which RGB components
  are floating point values in the range [0:1]. To use the `rgbimage` style with
- such data, first use the command `set rgbmax 1.0`.
+ such data, the color component values must be rescaled to the range [0:255].
 
  The `rgbalpha` style handles input pixels that contain alpha channel 
  (transparency) information in addition to the red, green, and blue components.
  Thus 6D data (x,y,r,g,b,a) is needed for `plot` and 7D data (x,y,z,r,g,b,a)
  for `splot`.  The r, g, b, and alpha components are assumed to lie in the range
  [0:255].  To plot data for which RGBA components are floating point values in
- the range [0:1], first use the command `set rgbmax 1.0`.
+ the range [0:1] you must rescale the components to lie in the range [0:255].
 3 transparency
 ?image transparency
 ?transparency
@@ -12237,6 +12237,10 @@ Ffigure_multiple_keys
  program that data values used to generate the color components of a plot
  with `rgbimage` or `rgbalpha` are floating point values in the range [0:1].
  `unset rgbmax` returns to the default integer range [0:255].
+
+ Warning: This command is EXPERIMENTAL. Details may change.
+ In particular, future gnuplot versions may implement rgbmax as a per-file
+ or per-plot property rather than a global setting.
 3 rlabel
 ?commands set rlabel
 ?rlabel
