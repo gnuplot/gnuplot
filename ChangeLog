@@ -1,3 +1,5 @@
+Release 5.2.1
+
 2017-10-13  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/pm3d.c (pm3d_draw_one pm3d_plot): Move call of term->layer() with
