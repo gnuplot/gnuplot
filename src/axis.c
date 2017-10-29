@@ -2557,34 +2557,52 @@ reconcile_linked_axes(AXIS *primary, AXIS *secondary)
  * transform to get back to the primary coordinate system before mapping.
  */
 
-int
-map_x(double value)
+double
+map_x_double(double value)
 {
     if (axis_array[x_axis].linked_to_primary) {
 	AXIS *primary = axis_array[x_axis].linked_to_primary;
 	if (primary->link_udf->at) {
 	    value = eval_link_function(primary, value);
 	    if (undefined)
-		return intNaN;
-	    return axis_map(primary, value);
+		return nan("");
+	    return axis_map_double(primary, value);
 	}
     }
-    return AXIS_MAP(x_axis, value);
+    return AXIS_MAP_DOUBLE(x_axis, value);
 }
 
 int
-map_y(double value)
+map_x(double value)
+{
+    double x = map_x_double(value);
+    if(isnan(x)) return intNaN;
+
+    return axis_map_toint(x);
+}
+
+double
+map_y_double(double value)
 {
     if (axis_array[y_axis].linked_to_primary) {
 	AXIS *primary = axis_array[y_axis].linked_to_primary;
 	if (primary->link_udf->at) {
 	    value = eval_link_function(primary, value);
 	    if (undefined)
-		return intNaN;
-	    return axis_map(primary, value);
+		return nan("");
+	    return axis_map_double(primary, value);
 	}
     }
-    return AXIS_MAP(y_axis, value);
+    return AXIS_MAP_DOUBLE(y_axis, value);
+}
+
+int
+map_y(double value)
+{
+    double y = map_y_double(value);
+    if(isnan(y)) return intNaN;
+
+    return axis_map_toint(y);
 }
 
 /*

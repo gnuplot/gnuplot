@@ -382,12 +382,16 @@ extern struct axis THETA_AXIS;
 /* -------- macros using these variables: */
 
 /* Macros to map from user to terminal coordinates and back */
-#define AXIS_MAP(axis, variable) axis_map(    &axis_array[axis], variable)
-#define AXIS_MAPBACK(axis, pos) axis_mapback(&axis_array[axis], pos)
+#define AXIS_MAP(axis, variable)        axis_map(        &axis_array[axis], variable)
+#define AXIS_MAP_DOUBLE(axis, variable) axis_map_double( &axis_array[axis], variable)
+#define AXIS_MAPBACK(axis, pos)         axis_mapback(    &axis_array[axis], pos)
 
 /* Same thing except that "axis" is a pointer, not an index */
-#define axis_map(axis, variable)		\
-    (int) ((axis)->term_lower + ((variable) - (axis)->min) * (axis)->term_scale + 0.5)
+#define axis_map_double(axis, variable)         \
+    ((axis)->term_lower + ((variable) - (axis)->min) * (axis)->term_scale)
+#define axis_map_toint(x) (int)( (x) + 0.5 )
+#define axis_map(axis, variable) axis_map_toint( axis_map_double(axis, variable) )
+
 #define axis_mapback(axis, pos) \
     (((double)(pos) - (axis)->term_lower)/(axis)->term_scale + (axis)->min)
 
@@ -590,6 +594,9 @@ void reconcile_linked_axes __PROTO((AXIS *primary, AXIS *secondary));
 
 int map_x __PROTO((double value));
 int map_y __PROTO((double value));
+
+double map_x_double __PROTO((double value));
+double map_y_double __PROTO((double value));
 
 coord_type polar_to_xy __PROTO(( double theta, double r, double *x, double *y, TBOOLEAN update));
 double polar_radius __PROTO((double r));
