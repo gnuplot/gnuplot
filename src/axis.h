@@ -382,19 +382,14 @@ extern struct axis THETA_AXIS;
 /* -------- macros using these variables: */
 
 /* Macros to map from user to terminal coordinates and back */
-#define AXIS_MAP(axis, variable)		\
-  (int) ((axis_array[axis].term_lower)		\
-	 + ((variable) - axis_array[axis].min)	\
-	 * axis_array[axis].term_scale + 0.5)
-#define AXIS_MAPBACK(axis, pos)						   \
-  (((double)(pos)-axis_array[axis].term_lower)/axis_array[axis].term_scale \
-   + axis_array[axis].min)
+#define AXIS_MAP(axis, variable) axis_map(    &axis_array[axis], variable)
+#define AXIS_MAPBACK(axis, pos) axis_mapback(&axis_array[axis], pos)
 
 /* Same thing except that "axis" is a pointer, not an index */
 #define axis_map(axis, variable)		\
     (int) ((axis)->term_lower + ((variable) - (axis)->min) * (axis)->term_scale + 0.5)
 #define axis_mapback(axis, pos) \
-    (((double)(pos) - axis->term_lower)/axis->term_scale + axis->min)
+    (((double)(pos) - (axis)->term_lower)/(axis)->term_scale + (axis)->min)
 
 
 /* April 2015:  I'm not 100% sure, but I believe there is no longer
