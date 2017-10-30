@@ -1,3 +1,8 @@
+2017-10-30  Achim Gratz  <Stromeko@nexgo.de>
+	
+	* configure.ac:  The configury supposedly tries to find TEXDIR via
+	kpsexpand, but that code never got run if $prefix is set.  Now it is.
+
 2017-10-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm:  Raise the limit on number of relative moves before
