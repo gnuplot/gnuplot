@@ -3,6 +3,11 @@
 	* docs/gnuplot.doc src/gadgets.c:  Trivial typos and out-of-date
 	comments.  Fix index entries for help section on piped data.
 
+	* plot2d.c (eval_plots):  Fix a regression causing an empty range on
+	log-scale y axis to error out rather than auto-extending the axis range.
+	Extension can be handled by the same routine used for linear axes.
+	Bug #1978
+
 Release 5.2.1
 
 2017-10-13  Petr Mikulik  <mikulik@physics.muni.cz>

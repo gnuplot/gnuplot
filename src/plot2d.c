@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.430.2.13 2017/09/25 16:44:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.430.2.14 2017/10/09 01:06:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -3363,12 +3363,14 @@ eval_plots()
 	/* the y axis range has no meaning in this case */
 	;
     } else if (uses_axis[FIRST_Y_AXIS] && nonlinear(&axis_array[FIRST_Y_AXIS])) {
+	axis_checked_extend_empty_range(FIRST_Y_AXIS, "all points y value undefined!");
 	update_primary_axis_range(&axis_array[FIRST_Y_AXIS]);
     } else if (uses_axis[FIRST_Y_AXIS]) {
 	axis_checked_extend_empty_range(FIRST_Y_AXIS, "all points y value undefined!");
 	axis_revert_and_unlog_range(FIRST_Y_AXIS);
     }
     if (uses_axis[SECOND_Y_AXIS] && axis_array[SECOND_Y_AXIS].linked_to_primary) {
+	axis_checked_extend_empty_range(SECOND_Y_AXIS, "all points y2 value undefined!");
 	update_primary_axis_range(&axis_array[SECOND_Y_AXIS]);
     } else if (uses_axis[SECOND_Y_AXIS]) {
 	axis_checked_extend_empty_range(SECOND_Y_AXIS, "all points y2 value undefined!");
