@@ -1,3 +1,17 @@
+2017-10-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.c (draw_clip_arrow):  Do not call term->arrow() if the
+	entire arrow is out of range.
+
+	* src/graphics.c (plot_vectors):  The code for 2D  "plot with vectors"
+	is redundant.  Replace the core of it with a call to draw_clip_arrow().
+
+	* src/boundary.c (do_key_sample):  Illustrate revision of a
+	draw_clip_arrow() call site to use (double) rather than (int)
+	parameters.  The only reason for this is to allow draw_clip_arrow()
+	itself to switch to (double) parameters if we decide that is useful,
+	e.g. to handle arrows with length approaching zero.
+
 2017-10-13  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/pm3d.c (pm3d_draw_one pm3d_plot): Move call of term->layer() with
