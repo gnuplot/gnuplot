@@ -1,3 +1,8 @@
+2017-10-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* RELEASE_NOTES NEWS src/version.c demo/image2.dem:
+	Bring CVS files up date with the contents of the 5.2.1 tarball.
+
 2017-10-30  Achim Gratz  <Stromeko@nexgo.de>
 	
 	* configure.ac:  The configury supposedly tries to find TEXDIR via

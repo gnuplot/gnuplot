@@ -8,7 +8,7 @@ development version, and a few new features.
 Please see the ChangeLog file for a complete list of changes made during the
 course of development from 5.0 to 5.2.
 
-Release Notes date: 10-Oct-2017
+Release Notes date: 30-Oct-2017
 
 CHANGES IN 5.2.1
 ================
@@ -21,6 +21,10 @@ CHANGES IN 5.2.1
 * CHANGE allow mixed use of in-key plot titles and manually placed titles
 * FIX autoscaling of plots with spline or bezier smoothing
 * FIX autoscaling of plots with linked axes where data is plotted on x2 or y2
+* FIX "with filledcurves below y=foo" mishandled the case of y value exactly = foo
+* FIX [windows] repair breakage of stderr/stdout redirection to console
+* FIX postscript terminal artifacts when drawing dot/dash circles
+* FIX handle empty range on logscale y axis as a warning, not an error
 
 
 FEATURES INTRODUCED IN VERSION 5.2
@@ -291,6 +295,6 @@ minor number).  Bugfixes to version 5.2 will appear in patchlevel releases
 serious problem.
 
 At the time of writing both the released and development source trees are
-hosted as a CVS repository on SourceForge, but will probably be migrated
-to git in the near future.
+hosted as a CVS repository on SourceForge, but are in the process of 
+conversion to git.
 
