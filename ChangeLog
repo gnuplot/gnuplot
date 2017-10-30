@@ -1,3 +1,8 @@
+2017-10-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc src/gadgets.c:  Trivial typos and out-of-date
+	comments.  Fix index entries for help section on piped data.
+
 Release 5.2.1
 
 2017-10-13  Petr Mikulik  <mikulik@physics.muni.cz>

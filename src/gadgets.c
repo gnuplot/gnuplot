@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.137.2.1 2017/06/01 22:51:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.137.2.2 2017/06/13 05:39:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -45,7 +45,6 @@ static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.137.2.1 2017/06/01 22:51
 #include "pm3d.h"
 
 /* This file contains mainly a collection of global variables that
- * used to be in 'set.c', where they didn't really belong. They
  * describe the status of several parts of the gnuplot plotting engine
  * that are used by both 2D and 3D plots, and thus belong neither to
  * graphics.c nor graph3d.c, alone. This is not a very clean solution,
