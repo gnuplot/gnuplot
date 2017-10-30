@@ -6,6 +6,9 @@
 	dot/dash pattern.
 	Bug #1987
 
+	* src/axis.c (gen_tics):  `set log x; set xtics foo` would always place
+	the first axis tic at foo rather than at (foo / base^N) for suitable N.
+
 2017-10-30  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/winmain.c (ConsolePutS, ConsolePutCh):  Use standard file IO
