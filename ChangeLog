@@ -1,3 +1,11 @@
+2017-10-31  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/context.trm: In OS/2, LINEJOIN constants are defined in os2emx.h.
+
+	* config/config.os2: Define int32_t as int.
+
+	* src/command.c: Define WEXITSTATUS empty for both Windows and OS/2.
+
 2017-10-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* RELEASE_NOTES NEWS src/version.c demo/image2.dem:
