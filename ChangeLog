@@ -1,5 +1,10 @@
 2017-10-31  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/command.c (is_history_command): Remove use of isblank() to support
+	older compilers.
+
+2017-10-31  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* term/context.trm: In OS/2, LINEJOIN constants are defined in os2emx.h.
 
 	* config/config.os2: Define int32_t as int.

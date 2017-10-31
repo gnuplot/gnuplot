@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.354.2.3 2017/08/30 18:37:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.354.2.4 2017/10/31 13:35:09 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -3135,11 +3135,11 @@ is_history_command(const char *line)
     const char str[] = "hi$story";
 
     /* skip leading whitespace */
-    while (isblank((unsigned char) line[start]))
+    while (line[start]==' ' || line[start]=='\t')
 	start++;
 
     /* find end of "token" */
-    while ((line[start + length] != NUL) && !isblank((unsigned char) line[start + length]))
+    while ((line[start + length] != NUL) && !(line[start + length]==' ' || line[start + length]=='\t'))
 	length++;
 
     for (i = 0; i < length + after; i++) {
