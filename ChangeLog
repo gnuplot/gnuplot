@@ -72,10 +72,10 @@ Release 5.2.1
 
 2017-10-11  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/axis.c (gen_tics): The start point for log-scale could not lie
-	outside the axis range (e.g. start at 1 for axis range [5:50]).
-	Remove this restriction.  Still not perfect backwards compatibility
-	with log-scale tic placement in earlier versions.
+	* src/axis.c (gen_tics): The start point for log-scale tic placement
+	could not lie outside the axis range (e.g. start at 1 for axis range
+	[5:50]).  Remove this restriction.  Still not perfect backwards
+	compatibility with log-scale tic placement in earlier versions.
 
 2017-10-09  Ethan A Merritt  <merritt@u.washington.edu>
 
