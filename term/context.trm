@@ -1,5 +1,5 @@
 /*
- * $Id: context.trm,v 1.8 2013/06/22 17:26:32 sfeam Exp $
+ * $Id: context.trm,v 1.9 2014/01/30 05:50:52 sfeam Exp $
  */
 
 /* GNUPLOT - context.trm */
@@ -243,7 +243,11 @@ static int CONTEXT_ang = 0;
 /* left/middle/right text justification */
 static enum JUSTIFY CONTEXT_justify = LEFT;
 
+#ifdef OS2 /* same constants are defined in os2emx.h */
+enum LINEJOIN { LINEJOIN_MITER=LINEJOIN_MITRE, _LINEJOIN_ROUND=LINEJOIN_ROUND, _LINEJOIN_BEVEL=LINEJOIN_BEVEL };
+#else
 enum LINEJOIN { LINEJOIN_MITER, LINEJOIN_ROUND, LINEJOIN_BEVEL };
+#endif
 enum LINECAP  { LINECAP_BUTT, LINECAP_ROUND, LINECAP_SQUARE };
 
 /* whether points are drawn with metapost or typeset with TeX (easy configurable) */
