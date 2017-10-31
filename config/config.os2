@@ -665,4 +665,5 @@
 #endif
 
 #define strtoll _strtoll
+#define int32_t int
 
