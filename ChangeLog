@@ -1,3 +1,8 @@
+2017-10-31  Dima Kogan  <dima@secretsauce.net>
+
+	* configure.in:  Add $LIBRARIES_FOR_X to WX_LIBS so that configuration
+	 of Makefiles includes -lX11 as required by wxgtk3
+
 2017-10-31  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/command.c (is_history_command): Remove use of isblank() to support
