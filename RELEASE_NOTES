@@ -25,6 +25,7 @@ CHANGES IN 5.2.1
 * FIX [windows] repair breakage of stderr/stdout redirection to console
 * FIX postscript terminal artifacts when drawing dot/dash circles
 * FIX handle empty range on logscale y axis as a warning, not an error
+* FIX set xrange [explicit_min:*] for stacked histograms
 
 
 FEATURES INTRODUCED IN VERSION 5.2

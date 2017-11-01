@@ -1,4 +1,4 @@
-Changes in 5.2.1
+Changes in 5.2.2
 ================
 * NEW set table separator {tab|comma|"char"} allows creation of csv files
 * NEW hotkey for changing azimuth in 3D plots with mousing
@@ -14,6 +14,7 @@ Changes in 5.2.1
 * FIX autoscaling of plots with linked axes where data is plotted on x2 or y2
 * FIX sampling on x2 if linked to x1;  e.g. plot sample [t=1:5:1] '+' axes x2y1
 * FIX empty range on logscale y axis is handled by auto-extending the range
+* FIX autoscaling xrange of stacked histograms
 
 Changes in 5.2.0
 ================
