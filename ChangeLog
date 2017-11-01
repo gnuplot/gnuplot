@@ -1,3 +1,10 @@
+2017-11-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (histogram_range_fiddling):  For stacked histograms,
+	autoscaling did not distinguish between 'set xrange [*:*]' and 
+	'set xrange [explicit_min:*]', always resetting min to -1.
+	Bugfix
+
 2017-10-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c (draw_clip_arrow):  Do not call term->arrow() if the
