@@ -5,6 +5,9 @@
 	'set xrange [explicit_min:*]', always resetting min to -1.
 	Bugfix
 
+	* RELEASE_NOTES NEWS PATCHLEVEL configure.ac src/version.c
+	Bump version to 5.2.2 (but not yet tagged)
+
 2017-10-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c: Fix #define breakage

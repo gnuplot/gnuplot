@@ -1,17 +1,17 @@
-		GNUPLOT Version 5.2.1 Release Notes
+		GNUPLOT Version 5.2.2 Release Notes
 		===================================
 
-These release notes are for version 5.2 patchlevel 1 (5.2.1).
+These release notes are for version 5.2 patchlevel 1 (5.2.2).
 This release contains bug-fixes, a few changes back-ported from the
 development version, and a few new features.
 
 Please see the ChangeLog file for a complete list of changes made during the
 course of development from 5.0 to 5.2.
 
-Release Notes date: 30-Oct-2017
+Release Notes date: 01-Nov-2017
 
-CHANGES IN 5.2.1
-================
+CHANGES SINCE 5.2.0
+===================
 * NEW set table separator {tab|comma|"char"} allows creation of csv files
 * NEW hotkey for changing azimuth in 3D plots with mousing
 * NEW titles for "splot .. with lines" can be placed at {beg|end} of plotted line
@@ -25,7 +25,7 @@ CHANGES IN 5.2.1
 * FIX [windows] repair breakage of stderr/stdout redirection to console
 * FIX postscript terminal artifacts when drawing dot/dash circles
 * FIX handle empty range on logscale y axis as a warning, not an error
-* FIX set xrange [explicit_min:*] for stacked histograms
+* FIX allow set xrange [explicit_min:*] for stacked histograms
 
 
 FEATURES INTRODUCED IN VERSION 5.2
