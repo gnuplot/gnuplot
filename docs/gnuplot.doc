@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1084.2.21 2017/10/14 00:00:11 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1084.2.22 2017/10/30 23:16:11 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6651,7 +6651,8 @@ Ffigure_fenceplot
 ?plot datafile piped-data
 ?plot piped-data
 ?piped-data
-=pipe
+?pipes
+=pipes
  On systems with a popen function, the datafile can be piped through a shell
  command by starting the file name with a '<'.  For example,
 

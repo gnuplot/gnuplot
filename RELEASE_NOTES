@@ -19,6 +19,7 @@ CHANGES SINCE 5.2.0
 * NEW command 'set rgbmax <value>' controls interpretation of input RGB values
 * CHANGE restore pre-5.2 interpretation of logscaled tic increment as a multiplier
 * CHANGE allow mixed use of in-key plot titles and manually placed titles
+* CHANGE more documentation on use of pipes to input data
 * FIX autoscaling of plots with spline or bezier smoothing
 * FIX autoscaling of plots with linked axes where data is plotted on x2 or y2
 * FIX "with filledcurves below y=foo" mishandled the case of y value exactly = foo
@@ -255,7 +256,7 @@ Options for generating interactive plots for web display
 Installation
 ------------
 
-You can download a source tarball for gnuplot version 5.2.1 from the 
+You can download a source tarball for gnuplot version 5.2.2 from the 
 gnuplot development site on SourceForge.
 	http://sourceforge.net/projects/gnuplot
 
@@ -263,7 +264,7 @@ Installation instructions are available in the source itself; the short
 version for linux/unix-like systems is to unpack the tarball and then
 <PRE>
 build it:
-      cd gnuplot-5.2.1 ; ./configure ; make
+      cd gnuplot-5.2.2 ; ./configure ; make
 test it:
       make check
 install it:
