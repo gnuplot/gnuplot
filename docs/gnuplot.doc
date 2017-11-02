@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.1111 2017/10/03 23:42:41 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.1112 2017/10/08 19:10:41 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -935,8 +935,8 @@ C  need @ in table, so end and restart the table !
  toward zero (-5/2 yields -2).
 
  The integer expression "1/0" may be used to generate an "undefined" flag,
- which causes a point to ignored.  Or you can use the pre-defined variable NaN
- to achieve the same result.  See `using` for an example.
+ which causes a point to be ignored.  Or you can use the pre-defined variable
+ NaN to achieve the same result.  See `using` for an example.
 =NaN
 
  Gnuplot can also perform simple operations on strings and string variables.
@@ -6596,11 +6596,13 @@ Ffigure_fenceplot
  The bandwidth used in the previous plot is stored in variable 
  GPVAL_KDENSITY_BANDWIDTH.
 4 special-filenames
+?special-filenames
 ?commands plot datafile special-filenames
 ?plot datafile special-filenames
 ?plot special-filenames
 ?datafile special-filenames
-?special-filenames
+?special-filenames ++
+?special-filenames +
 ?+
 ?++
  There are a few filenames that have a special meaning:  '', '-', '+' and '++'.
@@ -6634,7 +6636,6 @@ Ffigure_fenceplot
 
        plot $MYDATA, [t=-3:25:1] '+' using (t):(f(t)) 
 
-?special-filenames ++
  The pseudo-file '++' returns 2 columns of data forming a regular grid of [u,v]
  coordinates with the number of points along u controlled by `set samples` and
  the number of points along v controlled by `set isosamples`.  You must set
@@ -6672,6 +6673,13 @@ Ffigure_fenceplot
  (If you use both `'-'` and `''` on the same `plot` command, you'll need to
  have two sets of inline data, as in the example above.)
 
+4 piped-data
+?commands plot datafile piped-data
+?plot datafile piped-data
+?plot piped-data
+?piped-data
+?pipes
+=pipes
  On systems with a popen function, the datafile can be piped through a shell
  command by starting the file name with a '<'.  For example,
 
