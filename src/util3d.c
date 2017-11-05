@@ -921,7 +921,7 @@ draw3d_line_unconditional(
     struct lp_style_type *lp,
     t_colorspec color)
 {
-    unsigned int x1, y1, x2, y2;
+    double x1, y1, x2, y2;
     struct lp_style_type ls = *lp;
 
     /* HBB 20020312: v2 can be NULL, if this call is coming from
@@ -931,8 +931,8 @@ draw3d_line_unconditional(
 	return;
     }
 
-    TERMCOORD(v1, x1, y1);
-    TERMCOORD(v2, x2, y2);
+    TERMCOORD_DOUBLE(v1, x1, y1);
+    TERMCOORD_DOUBLE(v2, x2, y2);
 
     /* Replace original color with the one passed in */
     ls.pm3d_color = color;

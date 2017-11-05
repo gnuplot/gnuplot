@@ -62,6 +62,11 @@ typedef vertex GPHUGE * p_vertex;
 
 
 /* Maps from normalized space to terminal coordinates */
+#define TERMCOORD_DOUBLE(v,xvar,yvar)           \
+{						\
+    xvar = ((double)(int)((v)->x * xscaler)) + xmiddle;	\
+    yvar = ((double)(int)((v)->y * yscaler)) + ymiddle;	\
+}
 #define TERMCOORD(v,xvar,yvar)			\
 {						\
     xvar = ((int)((v)->x * xscaler)) + xmiddle;	\

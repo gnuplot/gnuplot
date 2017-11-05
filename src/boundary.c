@@ -1242,7 +1242,7 @@ do_key_sample(
 	double x2 = xl + key_sample_right;
 	double y2 = yl;
 	apply_head_properties(&(this_plot->arrow_properties));
-	draw_clip_arrow((int)x1, (int)y1, (int)x2, (int)y2,
+	draw_clip_arrow(x1, y1, x2, y2,
 			this_plot->arrow_properties.head);
 
     } else if (this_plot->lp_properties.l_type == LT_NODRAW) {

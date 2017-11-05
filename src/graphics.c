@@ -124,7 +124,7 @@ static void ttick_callback __PROTO((struct axis *, double place, char *text, int
 
 static int histeps_compare __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
 
-static void get_arrow __PROTO((struct arrow_def* arrow, int* sx, int* sy, int* ex, int* ey));
+static void get_arrow __PROTO((struct arrow_def* arrow, double* sx, double* sy, double* ex, double* ey));
 static void map_position_double __PROTO((struct position* pos, double* x, double* y, const char* what));
 
 #ifdef EAM_OBJECTS
@@ -164,20 +164,17 @@ static TBOOLEAN boxplot_factor_sort_required;
 static void
 get_arrow(
     struct arrow_def *arrow,
-    int* sx, int* sy,
-    int* ex, int* ey)
+    double* sx, double* sy,
+    double* ex, double* ey)
 {
-    double sx_d, sy_d, ex_d, ey_d;
-    map_position_double(&arrow->start, &sx_d, &sy_d, "arrow");
-    *sx = (int)(sx_d);
-    *sy = (int)(sy_d);
+    map_position_double(&arrow->start, sx, sy, "arrow");
     if (arrow->type == arrow_end_relative) {
 	/* different coordinate systems:
 	 * add the values in the drivers coordinate system.
 	 * For log scale: relative coordinate is factor */
-	map_position_r(&arrow->end, &ex_d, &ey_d, "arrow");
-	*ex = (int)(ex_d + sx_d);
-	*ey = (int)(ey_d + sy_d);
+	map_position_r(&arrow->end, ex, ey, "arrow");
+	*ex += *sx;
+	*ey += *sy;
     } else if (arrow->type == arrow_end_oriented) {
 	double aspect = (double)term->v_tic / (double)term->h_tic;
 	double radius;
@@ -187,13 +184,16 @@ get_arrow(
 	    aspect = 1.;
 #endif
 	map_position_r(&arrow->end, &radius, NULL, "arrow");
-	*ex = *sx + cos(DEG2RAD * arrow->angle) * radius;
-	*ey = *sy + sin(DEG2RAD * arrow->angle) * radius * aspect;
+	*ex = ((int)*sx) + cos(DEG2RAD * arrow->angle) * radius;
+	*ey = ((int)*sy) + sin(DEG2RAD * arrow->angle) * radius * aspect;
     } else {
-	map_position_double(&arrow->end, &ex_d, &ey_d, "arrow");
-	*ex = (int)(ex_d);
-	*ey = (int)(ey_d);
+	map_position_double(&arrow->end, ex, ey, "arrow");
     }
+
+    *sx = (double)(int)(*sx);
+    *sy = (double)(int)(*sy);
+    *ex = (double)(int)(*ex);
+    *ey = (double)(int)(*ey);
 }
 
 static void
@@ -304,17 +304,17 @@ place_arrows(int layer)
     for (this_arrow = first_arrow;
 	 this_arrow != NULL;
 	 this_arrow = this_arrow->next) {
-	int sx, sy, ex, ey;
+	double dsx, dsy, dex, dey;
 
 	if (this_arrow->arrow_properties.layer != layer)
 	    continue;
 	if (this_arrow->type == arrow_end_undefined)
 	    continue;
-	get_arrow(this_arrow, &sx, &sy, &ex, &ey);
+	get_arrow(this_arrow, &dsx, &dsy, &dex, &dey);
 
 	term_apply_lp_properties(&(this_arrow->arrow_properties.lp_properties));
 	apply_head_properties(&(this_arrow->arrow_properties));
-	draw_clip_arrow(sx, sy, ex, ey, this_arrow->arrow_properties.head);
+	draw_clip_arrow(dsx, dsy, dex, dey, this_arrow->arrow_properties.head);
     }
     term_apply_lp_properties(&border_lp);
     clip_area = clip_save;
@@ -2445,11 +2445,11 @@ plot_vectors(struct curve_points *plot)
 	check_for_variable_color(plot, &plot->varcolor[i]);
 
 	/* draw_clip_arrow does the hard work for us */
-	x1 = map_x(points[0].x);
-	y1 = map_y(points[0].y);
-	x2 = map_x(points[1].x);
-	y2 = map_y(points[1].y);
-	draw_clip_arrow(x1, y1, x2, y2, ap.head);
+	draw_clip_arrow((double)(int)(map_x_double(points[0].x) + 0.5),
+                        (double)(int)(map_y_double(points[0].y) + 0.5),
+                        (double)(int)(map_x_double(points[1].x) + 0.5),
+                        (double)(int)(map_y_double(points[1].y) + 0.5),
+                        ap.head);
     }
 
     clip_area = clip_save;

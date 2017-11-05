@@ -156,7 +156,7 @@ static TBOOLEAN can_pm3d = FALSE;
 static void key_text __PROTO((int xl, int yl, char *text));
 static void check3d_for_variable_color __PROTO((struct surface_points *plot, struct coordinate *point));
 
-static TBOOLEAN get_arrow3d __PROTO((struct arrow_def*, int*, int*, int*, int*));
+static TBOOLEAN get_arrow3d __PROTO((struct arrow_def*, double*, double*, double*, double*));
 static void place_arrows3d __PROTO((int));
 static void place_labels3d __PROTO((struct text_label * listhead, int layer));
 static int map3d_getposition __PROTO((struct position* pos, const char* what, double* xpos, double* ypos, double* zpos));
@@ -508,19 +508,19 @@ boundary3d(struct surface_points *plots, int count)
 static TBOOLEAN
 get_arrow3d(
     struct arrow_def* arrow,
-    int* sx, int* sy,
-    int* ex, int* ey)
+    double* dsx, double* dsy,
+    double* dex, double* dey)
 {
-    map3d_position(&(arrow->start), sx, sy, "arrow");
+    map3d_position_double(&(arrow->start), dsx, dsy, "arrow");
 
     if (arrow->type == arrow_end_relative) {
-	map3d_position_r(&(arrow->end), ex, ey, "arrow");
-	*ex += *sx;
-	*ey += *sy;
+	map3d_position_r_double(&(arrow->end), dex, dey, "arrow");
+	*dex += *dsx;
+	*dey += *dsy;
     } else if (arrow->type == arrow_end_oriented) {
 	double aspect = (double)term->v_tic / (double)term->h_tic;
 	double radius;
-	int junkw, junkh;
+	double junkw, junkh;
 
 #ifdef _WIN32
 	if (strcmp(term->name, "windows") == 0)
@@ -528,12 +528,12 @@ get_arrow3d(
 #endif
 	if (arrow->end.scalex != screen && arrow->end.scalex != character && !splot_map)
 	    return FALSE;
-	map3d_position_r(&arrow->end, &junkw, &junkh, "arrow");
+	map3d_position_r_double(&arrow->end, &junkw, &junkh, "arrow");
 	radius = junkw;
-	*ex = *sx + cos(DEG2RAD * arrow->angle) * radius;
-	*ey = *sy + sin(DEG2RAD * arrow->angle) * radius * aspect;
+	*dex = *dsx + cos(DEG2RAD * arrow->angle) * radius;
+	*dey = *dsy + sin(DEG2RAD * arrow->angle) * radius * aspect;
     } else {
-	map3d_position(&(arrow->end), ex, ey, "arrow");
+	map3d_position_double(&(arrow->end), dex, dey, "arrow");
     }
 
     return TRUE;
@@ -584,14 +584,14 @@ place_arrows3d(int layer)
 
     for (this_arrow = first_arrow; this_arrow != NULL;
 	 this_arrow = this_arrow->next) {
-	int sx, sy, ex, ey;
+	double dsx, dsy, dex, dey;
 
 	if (this_arrow->arrow_properties.layer != layer)
 	    continue;
-	if (get_arrow3d(this_arrow, &sx, &sy, &ex, &ey)) {
+	if (get_arrow3d(this_arrow, &dsx, &dsy, &dex, &dey)) {
 	    term_apply_lp_properties(&(this_arrow->arrow_properties.lp_properties));
 	    apply_head_properties(&(this_arrow->arrow_properties));
-	    draw_clip_arrow(sx, sy, ex, ey, this_arrow->arrow_properties.head);
+	    draw_clip_arrow(dsx, dsy, dex, dey, this_arrow->arrow_properties.head);
 	} else {
 	    FPRINTF((stderr,"place_arrows3d: skipping out-of-bounds arrow\n"));
 	}
@@ -3092,6 +3092,20 @@ map3d_position_r(
     int *x, int *y,
     const char *what)
 {
+    double xx, yy;
+    map3d_position_r_double(pos,
+                            &xx, &yy,
+                            what);
+    *x = xx;
+    *y = yy;
+}
+
+void
+map3d_position_r_double(
+    struct position *pos,
+    double *xx, double *yy,
+    const char *what)
+{
     double xpos = pos->x;
     double ypos = pos->y;
     double zpos = (splot_map) ? Z_AXIS.min : pos->z;
@@ -3099,10 +3113,9 @@ map3d_position_r(
     /* startpoint in graph coordinates */
     if (map3d_getposition(pos, what, &xpos, &ypos, &zpos) == 0) {
 	int xoriginlocal, yoriginlocal;
-	double xx, yy;
-	map3d_xy_double(xpos, ypos, zpos, &xx, &yy);
-	*x = xx;
-	*y = yy;
+	map3d_xy_double(xpos, ypos, zpos, xx, yy);
+        *xx = (double)(int)(*xx);
+        *yy = (double)(int)(*yy);
 	if (pos->scalex == graph)
 	    xpos = X_AXIS.min;
 	else
@@ -3118,12 +3131,12 @@ map3d_position_r(
 	else
 	    zpos = 0;
 	map3d_xy(xpos, ypos, zpos, &xoriginlocal, &yoriginlocal);
-	*x -= xoriginlocal;
-	*y -= yoriginlocal;
+	*xx -= xoriginlocal;
+	*yy -= yoriginlocal;
     } else {
     /* endpoint `screen' or 'character' coordinates */
-	*x = xpos;
-	*y = ypos;
+	*xx = (double)(int)xpos;
+	*yy = (double)(int)ypos;
     }
     return;
 }
@@ -3392,7 +3405,7 @@ plot3d_vectors(struct surface_points *plot)
 	if (heads[i].type == INRANGE && tails[i].type == INRANGE) {
 	    map3d_xy_double(tails[i].x, tails[i].y, tails[i].z, &x1, &y1);
 	    map3d_xy_double(heads[i].x, heads[i].y, heads[i].z, &x2, &y2);
-	    draw_clip_arrow((int)x1, (int)y1, (int)x2, (int)y2, ap.head);
+	    draw_clip_arrow(x1, y1, x2, y2, ap.head);
 
 	/* "set clip two" - both ends out of range */
 	} else if (heads[i].type != INRANGE && tails[i].type != INRANGE) {
@@ -3402,7 +3415,7 @@ plot3d_vectors(struct surface_points *plot)
 	    two_edge3d_intersect(&tails[i], &heads[i], lx, ly, lz);
 	    map3d_xy_double(lx[0], ly[0], lz[0], &x1, &y1);
 	    map3d_xy_double(lx[1], ly[1], lz[1], &x2, &y2);
-	    draw_clip_arrow((int)x1, (int)y1, (int)x2, (int)y2, ap.head);
+	    draw_clip_arrow(x1, y1, x2, y2, ap.head);
 
 	/* "set clip one" - one end out of range */
 	} else if (clip_lines1) {
@@ -3415,7 +3428,7 @@ plot3d_vectors(struct surface_points *plot)
 		map3d_xy_double(clip_x, clip_y, clip_z, &x1, &y1);
 		map3d_xy_double(heads[i].x, heads[i].y, heads[i].z, &x2, &y2);
 	    }
-	    draw_clip_arrow((int)x1, (int)y1, (int)x2, (int)y2, ap.head);
+	    draw_clip_arrow(x1, y1, x2, y2, ap.head);
 	}
     }
 }

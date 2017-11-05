@@ -303,9 +303,14 @@ draw_clip_polygon(int points, gpiPoint *p)
 }
 
 void
-draw_clip_arrow( int sx, int sy, int ex, int ey, t_arrow_head head)
+draw_clip_arrow( double dsx, double dsy, double dex, double dey, t_arrow_head head)
 {
     struct termentry *t = term;
+
+    int sx = (int)(double)(dsx);
+    int sy = (int)(double)(dsy);
+    int ex = (int)(double)(dex);
+    int ey = (int)(double)(dey);
 
     /* Don't draw head if the arrow itself is clipped */
     if (clip_point(sx,sy))
