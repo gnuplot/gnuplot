@@ -707,10 +707,10 @@ set isosamples %d, %d\n\
     fputs("set cntrparam levels ", fp);
     switch (contour_levels_kind) {
     case LEVELS_AUTO:
-	fprintf(fp, "auto %d\n", contour_levels);
+	fprintf(fp, "auto %d", contour_levels);
 	break;
     case LEVELS_INCREMENTAL:
-	fprintf(fp, "incremental %g,%g,%g\n",
+	fprintf(fp, "incremental %g,%g,%g",
 		contour_levels_list[0], contour_levels_list[1],
 		contour_levels_list[0] + contour_levels_list[1] * contour_levels);
 	break;
@@ -720,9 +720,10 @@ set isosamples %d, %d\n\
 	    fprintf(fp, "discrete %g", contour_levels_list[0]);
 	    for (i = 1; i < contour_levels; i++)
 		fprintf(fp, ",%g ", contour_levels_list[i]);
-	    fputc('\n', fp);
 	}
     }
+    fprintf(fp, " %ssorted\n", contour_sortlevels ? "" : "un");
+    fprintf(fp, "set cntrparam firstlinetype %d\n", contour_firstlinetype);
     fprintf(fp, "\
 set cntrparam points %d\n\
 set size ratio %g %g,%g\n\

@@ -74,6 +74,8 @@ extern t_contour_levels_kind contour_levels_kind;
 extern int contour_levels;
 extern int contour_order;
 extern int contour_pts;
+extern int contour_firstlinetype;
+extern TBOOLEAN contour_sortlevels;
 
 /* storage for z levels to draw contours at */
 extern dynarray dyn_contour_levels_list;

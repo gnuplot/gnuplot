@@ -56,6 +56,8 @@ t_contour_levels_kind contour_levels_kind = LEVELS_AUTO;
 int contour_levels = DEFAULT_CONTOUR_LEVELS;
 int contour_order = DEFAULT_CONTOUR_ORDER;
 int contour_pts = DEFAULT_NUM_APPROX_PTS;
+int contour_firstlinetype = -1;
+TBOOLEAN contour_sortlevels = FALSE;
 
 /* storage for z levels to draw contours at */
 dynarray dyn_contour_levels_list;
@@ -187,6 +189,20 @@ static void eval_bspline __PROTO((double t, cntr_struct *p_cntr,
 static double fetch_knot __PROTO((TBOOLEAN contr_isclosed, int num_of_points,
 				  int order, int i));
 
+static int
+reverse_sort(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)
+{
+    double const *p1 = arg2;
+    double const *p2 = arg1;
+
+    if (*p1 > *p2)
+	return 1;
+    if (*p1 < *p2)
+	return -1;
+    return 0;
+}
+
+
 /*
  * Entry routine to this whole set of contouring module.
  */
@@ -195,6 +211,7 @@ contour(int num_isolines, struct iso_curve *iso_lines)
 {
     int i;
     int num_of_z_levels;	/* # Z contour levels. */
+    double *zlist;
     poly_struct *p_polys, *p_poly;
     edge_struct *p_edges, *p_edge;
     double z = 0;
@@ -237,6 +254,9 @@ contour(int num_isolines, struct iso_curve *iso_lines)
 	z0 = floor(z_min / dz) * dz;
 	num_of_z_levels = (int) floor((z_max - z0) / dz);
     }
+
+    /* Build a list of contour levels */
+    zlist = gp_alloc(num_of_z_levels * sizeof(double), NULL);
     for (i = 0; i < num_of_z_levels; i++) {
 	switch (contour_levels_kind) {
 	case LEVELS_AUTO:
@@ -252,6 +272,15 @@ contour(int num_isolines, struct iso_curve *iso_lines)
 	    z = contour_levels_list[i];
 	    break;
 	}
+	zlist[i] = z;
+    }
+    /* Sort the list high-to-low if requested */
+    if (contour_sortlevels)
+	qsort(zlist, num_of_z_levels, sizeof(double), reverse_sort);
+
+    /* Create contour line for each z value in the list */
+    for (i = 0; i < num_of_z_levels; i++) {
+	z = zlist[i];
 	contour_level = z;
 	save_contour_list = contour_list;
 	gen_contours(p_edges, z, x_min, x_max, y_min, y_max);
@@ -265,6 +294,7 @@ contour(int num_isolines, struct iso_curve *iso_lines)
     }
 
     /* Free all contouring related temporary data. */
+    free(zlist);
     while (p_polys) {
 	p_poly = p_polys->next;
 	free(p_polys);

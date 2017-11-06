@@ -51,6 +51,7 @@
 #include "alloc.h"
 #include "axis.h"
 #include "command.h"
+#include "contour.h"
 #include "gadgets.h"
 #include "hidden3d.h"
 #include "misc.h"
@@ -1246,22 +1247,27 @@ do_3dplot(
 			    set_color( cb2gray( z2cb(cntrs->z) ) );
 			else {
 			    struct lp_style_type ls = thiscontour_lp_properties;
-			    if (thiscontour_lp_properties.l_type == LT_COLORFROMCOLUMN) {
-		    		thiscontour_lp_properties.l_type = 0;
-			    }
+			    int contour_linetype;
 			    ic++;	/* Increment linetype used for contour */
-			    if (prefer_line_styles) {
-				lp_use_properties(&ls, this_plot->hidden3d_top_linetype + ic);
-			    } else {
-				/* The linetype itself is passed to hidden3d processing */
-				/* EAM Apr 2015 - not sure why this is "ic -1" but otherwise */
-				/* hidden3d contours are colored off by one (Bug #1603).     */
-				thiscontour_lp_properties.l_type = 
-					this_plot->hidden3d_top_linetype + ic -1;
-				/* otherwise the following would be sufficient */
-				load_linetype(&ls, this_plot->hidden3d_top_linetype + ic);
-			    }
+
+			    /* First contour line type defaults to surface linetype + 1  */
+			    /* but can be changed using 'set cntrparams firstlinetype N' */
+			    if (contour_firstlinetype > 0)
+				contour_linetype = contour_firstlinetype + ic - 2;
+			    else
+				contour_linetype = this_plot->hidden3d_top_linetype + ic;
+
+			    /* hidden3d processing looks directly at l_type */
+			    /* for other purposes the line color is set by load_linetype */
+			    if (hidden3d)
+				thiscontour_lp_properties.l_type = contour_linetype - 1;
+			    load_linetype(&ls, contour_linetype);
+
 			    thiscontour_lp_properties.pm3d_color = ls.pm3d_color;
+			    thiscontour_lp_properties.l_width = ls.l_width
+							      * this_plot->lp_properties.l_width;
+			    thiscontour_lp_properties.d_type = ls.d_type;
+			    thiscontour_lp_properties.custom_dash_pattern = ls.custom_dash_pattern;
 			    term_apply_lp_properties(&thiscontour_lp_properties);
 			}
 
