@@ -11821,7 +11821,7 @@ Ffigure_multiple_keys
                     | functions <R>,<G>,<B>
                   }
                   { cubehelix {start <val>} {cycles <val>} {saturation <val>} }
-                  { model { RGB | HSV | CMY | YIQ | XYZ } }
+                  { model { RGB | HSV | CMY | XYZ } }
                   { positive | negative }
                   { nops_allcF | ps_allcF }
                   { maxcolors <maxcolors> }
@@ -11897,7 +11897,7 @@ Ffigure_multiple_keys
 
  RGB color space might not be the most useful color space to work in.  For that
  reason you may change the color space with `model` to one of `RGB`, `HSV`,
- `CMY`, `YIQ` and `XYZ`.  Using color names for `set palette defined` tables
+ `CMY`, and `XYZ`.  Using color names for `set palette defined` tables
  and a color space other than RGB will result in funny colors.  All explanation
  have been written for RGB color space, so please note, that `R` can be `H`,
  `C`, `Y`, or `X`, depending on the actual color space (`G` and `B`
@@ -11906,11 +11906,8 @@ Ffigure_multiple_keys
  All values for all color spaces are limited to [0,1].
 
  RGB stands for Red, Green and Blue;  CMY stands for Cyan, Magenta and Yellow;
- HSV stands for Hue, Saturation, and Value;  YIQ is the color model used by
- the U.S. Commercial Color Television Broadcasting, it is basically an RGB
- recoding with downward compatibility for black and white television;
- XYZ are the three primary colors of the color model defined by the 'Commission
- Internationale de l'Eclairage' (CIE).
+ HSV stands for Hue, Saturation, and Value;  XYZ are the three primary colors of
+ the CIE color model defined by the 'Commission Internationale de l'Eclairage'.
  For more information on color models see:
 ^ <a href="http://en.wikipedia.org/wiki/Color_space">
            http://en.wikipedia.org/wiki/Color_space

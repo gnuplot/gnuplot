@@ -165,12 +165,6 @@ splot f(x)
 pause -1 "Hit return to continue"
 
 
-set palette model YIQ rgbformulae 7,5,15
-set title "set palette model YIQ rgbformulae 7,5,15"
-splot f(x)
-pause -1 "Hit return to continue"
-
-
 set palette model HSV rgbformulae 3,2,2
 set title "set palette model HSV rrgbformulae 3,2,2"
 splot f(x)
