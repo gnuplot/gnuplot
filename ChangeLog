@@ -13,6 +13,12 @@
 	consistent ascending order.
 	Bugs #1603 #1612
 
+	* src/graph3d.c (do_3dplot):  It could be that you want contour lines to
+	opt out of hidden3d processing, e.g. because it messes up dashed lines.
+	Since the low-level routines that draw the contour line segments look
+	only at the global "hidden3d" flag, we must save/clear/restore this flag
+	if the individual plot is marked "nohidden" (plot->opt_out_of_hidden3d).
+
 2017-11-06  Achim Gratz <Stromeko@nexgo.de>
 
 	* configure.ac:  The configury supposedly tried to find TEXDIR via
