@@ -1,7 +1,9 @@
-# A generic rotation routine for the gnuplot view.  In the commands
+# A generic rotation routine for the gnuplot demos.  In the commands
 # that load this file, the following should be defined:
 #
 # iteration_count:  set iteration_count=0
+#
+# iteration_delay:  pause between frames of iteration (defaults to 0.1 sec)
 #
 # limit_iterations:  if set to a nonzero value, it'll stop after that
 #     many iterations; if zero value, continues indefinitely
@@ -26,11 +28,16 @@
 #                by somewhat large steps. Now, it tumbles back and forth
 #                smoothly.
 #   - ?. ?. ?    ?:  Initial recursive script
+#     Nov 2017	Switch to version 5 iteration syntax rather than reread
+#		Add timed pause
 
-iteration_count=iteration_count+1
-if ((!limit_iterations) || (iteration_count<=limit_iterations)) \
-  set view xview(xrot),zview(zrot); \
-  replot; \
-  zrot=(zrot+zrot_delta)%360; \
-  xrot=(xrot+xrot_delta)%360; \
-  reread
+if (!(exists("iteration_delay"))) iteration_delay = 0.1
+
+while ((!limit_iterations) || (iteration_count<=limit_iterations)) {
+    set view xview(xrot), zview(zrot)
+    replot
+    zrot = (zrot+zrot_delta) % 360
+    xrot = (xrot+xrot_delta) % 360
+    iteration_count = iteration_count + 1
+    pause iteration_delay
+}
