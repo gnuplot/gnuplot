@@ -191,9 +191,9 @@ load "timedat.dem"
 load "gantt.dem"
 reset
 
-print "******************** file animate.dem ********************"
-load "animate.dem"
-reset
+# print "******************** file animate.dem ********************"
+# load "animate.dem"
+# reset
 
 print "********************** file rainbow.dem *********************"
 load "rainbow.dem"
@@ -314,6 +314,7 @@ reset
 print "********************** file histograms.dem *********************"
 load "histograms.dem"
 load "histograms2.dem"
+load "label_stacked_histograms.dem"
 reset
 
 print "********************** file array.dem *********************"

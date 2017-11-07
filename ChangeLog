@@ -3,6 +3,12 @@
 	* term/lua.trm term/lua/gnuplot-tikz.lua:  Restore version information
 	(mangled during cvs->git conversion).
 
+	* demo/gnuplot.rot:  Use version 5 syntax for iteration
+
+	* demo/label_stacked_histograms.dem:  New demo from <theozh@gmail.com>
+
+	* demo/all.dem:  Call new demo, skip [slow-ish] animation by default.
+
 2017-11-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/getcolor.c src/getcolor.h src/save.c src/show.c src/tables.c
