@@ -2790,9 +2790,16 @@ set_logscale()
 		dummy = "x"; break;
 	    }
 
-	    /* Avoid a warning message trigger by default axis range [-10:10] */
+	    /* Avoid a warning message triggered by default axis range [-10:10] */
 	    if (axis_array[axis].set_min <= 0 && axis_array[axis].set_max > 0)
 		axis_array[axis].set_min = 0.1;
+
+	    /* Also forgive negative axis limits if we are currently autoscaling */
+	    if ((axis_array[axis].set_autoscale != AUTOSCALE_NONE)
+	    &&  (axis_array[axis].set_min <= 0 || axis_array[axis].set_max <= 0)) {
+		axis_array[axis].set_min = 0.1;
+		axis_array[axis].set_max = 10.;
+	    }
 
 	    if (newbase == 10.) {
 		sprintf(command, "set nonlinear %s via log10(%s) inv 10**%s",
