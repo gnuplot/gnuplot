@@ -1,3 +1,9 @@
+2017-11-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_logscale):  If the axis is currently autoscaled and
+	the range limits still hold non-positive values from a previous state,
+	reset them to [0.1 : 10.].
+
 2017-11-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.ac src/syscfg.h src/command.c:
