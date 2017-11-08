@@ -42,3 +42,6 @@ soundfit.par
 stamp-h
 stamp-h1
 *.tmp
+make.log
+docs/figures.*
+docs/pdf_figures
