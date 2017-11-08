@@ -45,3 +45,4 @@ stamp-h1
 make.log
 docs/figures.*
 docs/pdf_figures
+share/Gnuplot
