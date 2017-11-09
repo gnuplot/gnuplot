@@ -1,3 +1,11 @@
+2017-11-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm:  Raise the maximum number of relative moves before a
+	stroke so that a full circle as drawn by do_arc() does not glitch due
+	to insertion of a "stroke xx yy M" sequence that resets the dot/dash
+	pattern.
+	Bug #1987
+
 2017-11-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c(eval_plots):  Fix a regression.
