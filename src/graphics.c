@@ -1420,7 +1420,9 @@ plot_betweencurves(struct curve_points *plot)
 
 		if ((x1-xmid)*(xmid-x2) > 0)
 		    finish=2;
-	    } else if ((yu1-yl1)*(yu2-yl2) < 0) {
+	    } else if ((yu1-yl1) == 0 && (yu2-yl2) == 0) {
+		/* nothing */
+	    } else if ((yu1-yl1)*(yu2-yl2) <= 0) {
 	        /* Cheap test for intersection in the general case */
 	        xmid = (x1*(yl2-yu2) + x2*(yu1-yl1))
 		     / ((yu1-yl1) + (yl2-yu2));

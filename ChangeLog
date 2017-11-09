@@ -3,6 +3,12 @@
 	* src/axis.c (gen_tics):  `set log x; set xtics foo` would always place
 	the first axis tic at foo rather than at (foo / base^N) for suitable N.
 
+	* src/graphics.c (plot_betweencurves):
+		plot 'foo with filledcurves below y=bar
+	would fail to identify "below" regions where the y value of the
+	start or end data point was exactly (foo[x] == bar).
+	Bug #1983
+
 2017-11-06  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/winmain.c (ConsolePutS, ConsolePutCh):  Use standard file IO
