@@ -1,3 +1,11 @@
+2017-11-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c(eval_plots):  Fix a regression.
+	Emply y range for logscale y errors out rather than auto-extending the
+	range with a warning. Extension can be handled by the same routine
+	used for linear axes.
+	Bug #1978
+
 2017-11-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc src/gadgets.c:  Remove obsolete comments and trivial

@@ -3341,12 +3341,14 @@ eval_plots()
 	/* the y axis range has no meaning in this case */
 	;
     } else if (uses_axis[FIRST_Y_AXIS] && nonlinear(&axis_array[FIRST_Y_AXIS])) {
+	axis_checked_extend_empty_range(FIRST_Y_AXIS, "all points y value undefined!");
 	update_primary_axis_range(&axis_array[FIRST_Y_AXIS]);
     } else if (uses_axis[FIRST_Y_AXIS]) {
 	axis_checked_extend_empty_range(FIRST_Y_AXIS, "all points y value undefined!");
 	axis_check_range(FIRST_Y_AXIS);
     }
     if (uses_axis[SECOND_Y_AXIS] && axis_array[SECOND_Y_AXIS].linked_to_primary) {
+	axis_checked_extend_empty_range(SECOND_Y_AXIS, "all points y2 value undefined!");
 	update_primary_axis_range(&axis_array[SECOND_Y_AXIS]);
     } else if (uses_axis[SECOND_Y_AXIS]) {
 	axis_checked_extend_empty_range(SECOND_Y_AXIS, "all points y2 value undefined!");
