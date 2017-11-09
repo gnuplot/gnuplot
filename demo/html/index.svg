@@ -131,6 +131,7 @@ on mouse-coordinate tracking.
     <li><a href="fenceplot.html">fence plots</a></li>
     <li><a href="gantt.html">Gantt chart</a></li>
     <li><a href="columnhead.html">points labeled by origin</a></li>
+    <li><a href="label_stacked_histograms.html">label stacked histogram</a></li>
     <li><a href="heatmaps.html">2D and 3D heat maps</a></li>
     <li><a href="solar_path.html">solar path diagram</a></li>
     <li><a href="violinplot.html">violin plot</a></li>
@@ -198,7 +199,7 @@ on mouse-coordinate tracking.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated September 2017</i>
+    <i>This page generated November 2017</i>
     </td>
 
     <td>
