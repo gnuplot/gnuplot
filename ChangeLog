@@ -1,3 +1,10 @@
+2017-11-06  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/winmain.c (ConsolePutS, ConsolePutCh):  Use standard file IO
+	instead of Console API to enable word-wrapping on Windows 10 and to
+	allow for redirection of stdout/stderr.
+	Bug #1985
+
 2017-11-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm:  Raise the maximum number of relative moves before a

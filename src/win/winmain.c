@@ -1207,9 +1207,12 @@ static int
 ConsolePutS(const char *str)
 {
     LPWSTR wstr = UnicodeText(str, encoding);
-    HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
-    WriteConsoleW(h, wstr, wcslen(wstr), NULL, NULL);
-    //fputws(wstr, stdout);
+    // Use standard file IO instead of Console API
+    // to enable word-wrapping on Windows 10 and
+    // allow for redirection of stdout/stderr.
+    //HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+    //WriteConsoleW(h, wstr, wcslen(wstr), NULL, NULL);
+    fputws(wstr, stdout);
     free(wstr);
     return 0;
 }
@@ -1218,13 +1221,17 @@ ConsolePutS(const char *str)
 static int
 ConsolePutCh(int ch)
 {
-    WCHAR w[3];
+    WCHAR w[4];
     int count;
 
     MultiByteAccumulate(ch, w, &count);
     if (count > 0) {
-	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
-	WriteConsoleW(h, w, count, NULL, NULL);
+	// Use standard file IO instead of Console API
+	// to enable word-wrapping on Windows 10.
+	//HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+	//WriteConsoleW(h, w, count, NULL, NULL);
+	w[count] = 0;
+	fputws(w, stdout);
     }
     return ch;
 }
