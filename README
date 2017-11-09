@@ -1,15 +1,14 @@
 
 The Gnuplot Plotting Utility
-****************************
+============================
 
  Gnuplot is a command-line driven interactive function plotting utility
 for linux, OSX, MSWin, VMS, and many other platforms.  The software is
 copyrighted but freely distributed (i.e., you don't have to pay for it).
-It was originally intended as graphical program to allow scientists
-and students to visualize mathematical functions and data.  Gnuplot
-supports many different types of terminals, plotters, and printers
-(including many color devices, and pseudo-devices like LaTeX) and is
-easily extensible to include new devices.  
+It was originally written to allow scientists and students to visualize
+mathematical functions and data.  Gnuplot supports many different types
+of terminals, plotters, and printers (including pseudo-devices like
+LaTeX) and is easily extensible to include new devices.  
 
  The "GNU" in gnuplot is NOT related to the Free Software Foundation,
 the naming is just a coincidence (and a long story; see the gnuplot FAQ
@@ -57,9 +56,8 @@ more or less out of the box on any system which has the GNU C compiler gcc
 or other ANSI-compliant C compiler.  Some specific [optional] drivers are
 written in C++ or lua.
 
-
 Help and Bug Reports
-********************
+====================
 
  Your primary place to go searching for help with gnuplot should
 be the project's webpage.  At the time of this writing, that's
@@ -75,33 +73,25 @@ page, also at SourceForge:
 don't ask them for help or information about gnuplot; also, please
 don't ask us about GNU stuff.
 
- Please note that all bug reports should include the machine you are
-using, the operating system and it's version, plotting devices, and
-the version of gnuplot that you are running.  If you could add such
-information to any messages on the Usenet newsgroup or the other
-mailing lists and trackers, that'd be nice, too.
-
+ All bug reports should include the version of gnuplot you are using,
+the operating system and version you are running it on, and the output
+device (gnuplot's "terminal") that you are plotting to.  It helps a lot
+to provide a simple script, possibly with data, that reproducibly 
+demonstrates the problem you are reporting.
  
 Usenet
 ======
 
  Additional help can be obtained from the USENET newsgroup
 
-        comp.graphics.apps.gnuplot.
-
- This newsgroup is the first place to ask for routine help.  It used to be
-gatewayed bi-directionally to the info-gnuplot mailing list, but that
-had to be stopped when we moved the mailing lists off Dartmouth.
-
+        comp.graphics.apps.gnuplot
 
 Mailing Lists
 =============
 
- As of gnuplot-4.0, the gnuplot mailing lists have moved away from
-their old home at Dartmouth College (thanks, guys!) to the project's
-general new development site provided by SourceForge.net.  To 
-subscribe to these new mailing lists, use the Web Interface provided
-by SourceForge.net:
+ The gnuplot mailing lists are currently operated through the general
+development site on SourceForge.net.  Subscribe to mailing lists via
+the web interface at
 	
 	http://sourceforge.net/mail/?group_id=2055
 
@@ -126,11 +116,10 @@ development web site at SourceForge.net instead of this mailing list.
 
  If you found a fix already, pleast post it in "diff -c" or "diff -u"
 format done against the most current official version of gnuplot or
-the latest alpha or beta release of the next version.  All major
-modifications should include documentation and, if new features were
-added, a demo file.  Finally, it is much easier to integrate smaller
-stepwise modifications rather than one gigantic diff file which
-represented months of changes.  
+a snapshot of the current development source.  Major modifications should
+include documentation and, if new features were added, a demo file.
+Finally, it is much easier to integrate smaller stepwise modifications
+rather than one gigantic diff file which represents months of changes.  
 
  There are separate tracking systems for Feature Requests and proposed
 patches that implement new features, also hosted at SourceForge.  
@@ -138,20 +127,6 @@ patches that implement new features, also hosted at SourceForge.
  Discussions about plans for new features or other significant changes
 should be announced and discussed on the developers' mailing list,
 gnuplot-beta, which is also hosted by SourceForge.net.
-
-
-Where to get updates to gnuplot
-===============================
-
- Congratulations on getting this version of gnuplot! Unfortunately, it
-may not be the most recent version ("you never know where this version
-has been!"). You can be sure that it IS the most recent version by
-checking one of the official distribution sites, guaranteed to be kept
-up to date (of course, if you got this file from one of those sites,
-you don't need to check!).
-
- To hear automatically about future releases (and other gnuplot news),
-read the newsgroup; see above.
 
 ----
 

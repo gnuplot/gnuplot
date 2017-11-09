@@ -26,7 +26,7 @@ selects the set of terminal drivers to be compiled in.
    The recommended way to configure both of these is the GNU-style
 "./configure" script described below and described further in INSTALL.gnu.
 This script is provided as part of the distributed source package, but if you
-are using sources downloaded directly from a CVS repository you may need to
+are using sources downloaded directly from a code repository you may need to
 regenerate it using the preliminary script "./prepare".
 
   The ./configure script inspects your system to see what support libraries
