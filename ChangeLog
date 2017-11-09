@@ -1,3 +1,8 @@
+2017-11-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (gen_tics):  `set log x; set xtics foo` would always place
+	the first axis tic at foo rather than at (foo / base^N) for suitable N.
+
 2017-11-06  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/winmain.c (ConsolePutS, ConsolePutCh):  Use standard file IO

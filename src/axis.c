@@ -1105,14 +1105,16 @@ gen_tics(struct axis *this, tic_callback callback)
 		if (def->logscaling) {
 		    /* This tries to emulate earlier gnuplot versions in handling
 		     *     set log y; set ytics 10
-		     * FIXME: but it doesn't do a good job of it
 		     */
+		    if (start <= 0) {
+			start = step;
+			while (start > this->linked_to_primary->min)
+			    start -= step;
+		    } else {
+			start = eval_link_function(this->linked_to_primary, start);
+		    }
 		    step  = eval_link_function(this->linked_to_primary, step);
 		    end   = eval_link_function(this->linked_to_primary, end);
-		    if (start <= 0)
-			start = step;
-		    else
-			start = eval_link_function(this->linked_to_primary, start);
 		    lmin = this->linked_to_primary->min;
 		    lmax = this->linked_to_primary->max;
 		}
