@@ -1,5 +1,10 @@
 2017-11-06  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* term/lua.trm term/lua/gnuplot-tikz.lua:  Restore version information
+	(mangled during cvs->git conversion).
+
+2017-11-06  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* src/getcolor.c src/getcolor.h src/save.c src/show.c src/tables.c
 	term/context.trm term/post.trm docs/gnuplot.doc demo/pm3dcolors.dem:
 

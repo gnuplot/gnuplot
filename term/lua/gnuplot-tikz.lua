@@ -74,9 +74,8 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
--- pgf.REVISION = string.sub("$Rev: 102 $",7,-3)
--- pgf.REVISION_DATE = string.gsub("$Date: 2016/07/22 21:03:49 $",
---                                "$Date: ([0-9]+).([0-9]+).([0-9]+) .*","%1/%2/%3")
+pgf.REVISION = string.sub("$Rev: 103 $",7,-3)
+pgf.REVISION_DATE = "Date: 2016/07/22 21:03:49"
 
 pgf.styles = {}
 
@@ -262,7 +261,7 @@ pgf.write_graph_begin = function (font, noenv)
   end
   gp.write(string.format("%s[gnuplot%s]\n", gfx.format[gfx.opt.tex_format].begintikzpicture, global_opt))
   gp.write(string.format("%%%% generated with GNUPLOT %sp%s (%s; terminal rev. %s, script rev. %s)\n",
-      term.gp_version, term.gp_patchlevel, _VERSION, string.sub(term.lua_term_revision,7,-3), pgf.REVISION))
+      term.gp_version, term.gp_patchlevel, _VERSION, string.sub(term.lua_term_revision,7,-2), pgf.REVISION))
   if not gfx.opt.notimestamp then
     gp.write(string.format("%%%% %s\n", os.date()))
   end

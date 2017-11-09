@@ -37,6 +37,7 @@
 
 #include "driver.h"
 
+#define LUA_TERM_REVISION "$Rev: Nov 2017$"
 
 #ifdef TERM_REGISTER
 register_term(lua)
@@ -542,8 +543,8 @@ LUA_set_term_vars() {
   lua_pushstring(L, gnuplot_patchlevel);
   lua_setfield(L, luaterm, "gp_patchlevel");
   /* set term.patchlevel */
-  // lua_pushstring(L, LUA_TERM_REVISON);
-  // lua_setfield(L, luaterm, "lua_term_revision");
+  lua_pushstring(L, LUA_TERM_REVISION);
+  lua_setfield(L, luaterm, "lua_term_revision");
   /* set term.lua_ident */
   lua_pushstring(L, LUA_RELEASE);
   lua_setfield(L, luaterm, "lua_ident");
