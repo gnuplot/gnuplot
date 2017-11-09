@@ -144,11 +144,11 @@ if test "$with_latex" = yes; then
     [texdir is not given and there is no kpsexpand, please tell where to install])
   dnl texdir has priority
   if test "$TEXDIR" = "no"; then
-    if test "x$prefix" != "xNONE"; then
-      TEXDIR=${prefix}/share/texmf
-    else
-      TEXDIR=`$KPSEXPAND '$TEXMFLOCAL'`
-      if test "x$TEXDIR" = "x" -o "$TEXDIR" = "\$TEXMFLOCAL"; then
+    TEXDIR=`$KPSEXPAND '$TEXMFLOCAL'`
+    if test "x$TEXDIR" = "x" -o "$TEXDIR" = "\$TEXMFLOCAL"; then
+      if test "x$prefix" != "xNONE"; then
+        TEXDIR=${prefix}/share/texmf
+      else
         TEXDIR=${ac_default_prefix}/share/texmf
       fi
     fi
