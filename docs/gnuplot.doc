@@ -1975,7 +1975,9 @@ C ... and restart the table:
  parentheses may be used to change the order of operation.  Thus -2**2 = -4,
  but (-2)**2 = 4.
 
- The factorial operator returns a real number to allow a greater range.
+ The factorial operator returns an integer when N! is sufficiently small
+ (N <= 20 for 64-bit integers). It returns a floating point approximation
+ for larger values of N.
 
 ?cardinality
  This operator returns the number of elements |A| when applied to array A.

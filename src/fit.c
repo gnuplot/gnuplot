@@ -269,7 +269,7 @@ static void log_axis_restriction __PROTO((FILE *log_f, int param,
 			    double min, double max, int autoscale, char *name));
 static void print_function_definitions(struct at_type *at, FILE * device);
 static TBOOLEAN is_empty __PROTO((char *s));
-static int getivar __PROTO((const char *varname));
+static intgr_t getivar __PROTO((const char *varname));
 static double getdvar __PROTO((const char *varname));
 static double createdvar __PROTO((char *varname, double value));
 static void setvar __PROTO((char *varname, double value));
@@ -1419,12 +1419,12 @@ setvarcovar(char *varname1, char *varname2, double value)
 /*****************************************************************
     Get integer variable value
 *****************************************************************/
-static int
+static intgr_t
 getivar(const char *varname)
 {
     struct udvt_entry * v = get_udv_by_name((char *)varname);
     if ((v != NULL) && (v->udv_value.type != NOTDEFINED))
-	return real_int(&(v->udv_value));
+	return (intgr_t)real(&(v->udv_value));
     else
 	return 0;
 }

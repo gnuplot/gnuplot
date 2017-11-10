@@ -704,7 +704,7 @@ f_int(union argument *arg)
 	push(Gcomplex(&a, not_a_number(), 0.0));
 	undefined = TRUE;
     } else
-	push(Ginteger(&a, (int)foo));
+	push(Ginteger(&a, (intgr_t)foo));
 }
 
 #define BAD_DEFAULT default: int_error(NO_CARET, "internal error : argument neither INT or CMPLX")
@@ -826,7 +826,7 @@ f_floor(union argument *arg)
 	push(&a);
 	break;
     case CMPLX:
-	push(Ginteger(&a, (int) floor(a.v.cmplx_val.real)));
+	push(Ginteger(&a, (intgr_t) floor(a.v.cmplx_val.real)));
 	break;
     BAD_DEFAULT;
     }
@@ -845,7 +845,7 @@ f_ceil(union argument *arg)
 	push(&a);
 	break;
     case CMPLX:
-	push(Ginteger(&a, (int) ceil(a.v.cmplx_val.real)));
+	push(Ginteger(&a, (intgr_t) ceil(a.v.cmplx_val.real)));
 	break;
     BAD_DEFAULT;
     }

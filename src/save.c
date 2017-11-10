@@ -136,7 +136,7 @@ save_variables__sub(FILE *fp)
 	if (udv->udv_value.type != NOTDEFINED) {
 	    if (udv->udv_value.type == ARRAY) {
 		fprintf(fp,"array %s[%d] = ", udv->udv_name,
-			udv->udv_value.v.value_array[0].v.int_val);
+			(int)(udv->udv_value.v.value_array[0].v.int_val));
 		save_array_content(fp, udv->udv_value.v.value_array);
 	    } else if (strncmp(udv->udv_name,"GPVAL_",6)
 		 && strncmp(udv->udv_name,"MOUSE_",6)
@@ -1053,7 +1053,7 @@ set origin %g,%g\n",
 	    fprintf(fp, " limit_abs %g", epsilon_abs);
 
 	v = get_udv_by_name((char *)FITMAXITER);
-	i = ((v != NULL) && (v->udv_value.type != NOTDEFINED)) ? real_int(&(v->udv_value)) : -1;
+	i = ((v != NULL) && (v->udv_value.type != NOTDEFINED)) ? real(&(v->udv_value)) : -1;
 	if (i > 0)
 	    fprintf(fp, " maxiter %i", i);
 

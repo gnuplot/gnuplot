@@ -168,7 +168,7 @@ prepare_call(int calltype)
 				int_error(save_token, "Unrecognized argument type");
 				break;
 			case INTGR:	
-				sprintf(val_as_string, "%d", a.v.int_val);
+				sprintf(val_as_string, PLD, a.v.int_val);
 				call_args[call_argc] = gp_strdup(val_as_string);
 				break;
 		    } 

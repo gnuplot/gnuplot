@@ -137,12 +137,11 @@ double gp_exp __PROTO((double x));
 
 /* HBB 20010726: Moved these here, from util.h. */
 double real __PROTO((struct value *));
-int real_int __PROTO((struct value *val));
 double imag __PROTO((struct value *));
 double magnitude __PROTO((struct value *));
 double angle __PROTO((struct value *));
 struct value * Gcomplex __PROTO((struct value *, double, double));
-struct value * Ginteger __PROTO((struct value *, int));
+struct value * Ginteger __PROTO((struct value *, intgr_t));
 struct value * Gstring __PROTO((struct value *, char *));
 struct value * pop_or_convert_from_string __PROTO((struct value *));
 struct value * gpfree_string __PROTO((struct value *a));
@@ -173,7 +172,7 @@ void clear_udf_list __PROTO((void));
 void update_gpval_variables __PROTO((int from_plot_command));
 /* note: the routines below work for any variable name, not just those beginning GPVAL_ */
 void fill_gpval_string __PROTO((char *var, const char *value));
-void fill_gpval_integer __PROTO((char *var, int value));
+void fill_gpval_integer __PROTO((char *var, intgr_t value));
 void fill_gpval_float __PROTO((char *var, double value));
 void fill_gpval_complex __PROTO((char *var, double areal, double aimag));
 

@@ -210,6 +210,7 @@ AC_CHECK_HEADERS(dirent.h errno.h float.h langinfo.h limits.h locale.h math.h \
   sys/bsdtypes.h sys/ioctl.h sys/param.h sys/select.h sys/socket.h \
   sys/stat.h sys/systeminfo.h sys/timeb.h sys/utsname.h \
   libc.h malloc.h poll.h sgtty.h termios.h values.h dirent.h \
+  inttypes.h \
   dlfcn.h dl.h
 )
 

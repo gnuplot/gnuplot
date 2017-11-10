@@ -616,7 +616,7 @@ gprintf_value(
 	    t[2] = *format;
 	    t[3] = '\0';
 	    snprintf(dest, remaining_space, temp, 
-		     v->type == INTGR ? v->v.int_val : (int)real(v));
+		     v->type == INTGR ? v->v.int_val : (intgr_t)real(v));
 	    break;
 	    /*}}} */
 	    /*{{{  e, f and g */
@@ -1605,7 +1605,7 @@ value_to_str(struct value *val, TBOOLEAN need_quotes)
 
     switch (val->type) {
     case INTGR:
-	sprintf(s[j], "%d", val->v.int_val);
+	sprintf(s[j], PLD, val->v.int_val);
 	break;
     case CMPLX:
 	if (isnan(val->v.cmplx_val.real))
@@ -1647,7 +1647,7 @@ value_to_str(struct value *val, TBOOLEAN need_quotes)
 	}
     case ARRAY:
 	{
-	sprintf(s[j], "<%d element array>", val->v.value_array->v.int_val);
+	sprintf(s[j], "<%d element array>", (int)(val->v.value_array->v.int_val));
 	break;
 	}
     case NOTDEFINED:

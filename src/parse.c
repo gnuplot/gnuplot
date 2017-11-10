@@ -117,10 +117,10 @@ convert(struct value *val_ptr, int t_num)
 }
 
 
-int
+intgr_t
 int_expression()
 {
-    return (int)real_expression();
+    return (intgr_t)real_expression();
 }
 
 double

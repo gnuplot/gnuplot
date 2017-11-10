@@ -279,6 +279,29 @@ FILE * win_popen(const char *filename, const char *mode);
 # endif
 #endif
 
+/*
+ * Support for 64-bit integer arithmetic
+ */
+
+#ifdef HAVE_INTTYPES_H
+				/* NB: inttypes.h includes stdint.h */
+#include <inttypes.h>		/* C99 type definitions */
+typedef int64_t intgr_t;	/* Allows evaluation with 64-bit integer arithmetic */
+typedef uint64_t uintgr_t;	/* Allows evaluation with 64-bit integer arithmetic */
+#define PLD "%ld"
+#define INTGR_MAX INT64_MAX
+#define INTGR_MIN INT64_MIN
+#define LARGEST_GUARANTEED_NONOVERFLOW 9.22337203685477478e+18
+#else
+typedef int intgr_t;		/* no C99 types available */
+typedef unsigned uintgr_t;	/* no C99 types available */
+#define PLD "%d"
+#define INTGR_MAX INT_MAX
+#define INTGR_MIN INT_MIN
+#define LARGEST_GUARANTEED_NONOVERFLOW INT_MAX
+#endif
+
+
 typedef double coordval;
 
 /* This is the maximum number of arguments in a user-defined function.

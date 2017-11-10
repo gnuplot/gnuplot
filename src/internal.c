@@ -239,15 +239,22 @@ f_calln(union argument *x)
 }
 
 
+/* Evaluate expression   sum [i=beg:end] f(i)
+ * Return an integer if f(i) are all integral, complex otherwise.
+ * This is a change from versions 5.0 and 5.2 which always returned
+ * a complex value.
+ */
 void
 f_sum(union argument *arg)
 {
     struct value beg, end, varname; /* [<var> = <start>:<end>] */
     udft_entry *udf;                /* function to evaluate */
     udvt_entry *udv;                /* iteration variable */
-    struct value ret;               /* result */
-    struct value z;
+    struct value result;            /* result */
+    struct value f_i;
     int i;
+    long long llsum = 0;	    /* integer sum */
+    TBOOLEAN integer_terms = TRUE;
 
     (void) pop(&end);
     (void) pop(&beg);
@@ -255,34 +262,51 @@ f_sum(union argument *arg)
 
     if (beg.type != INTGR || end.type != INTGR)
         int_error(NO_CARET, "range specifiers of sum must have integer values");
-    if (varname.type != STRING)
-        int_error(NO_CARET, "internal error: f_sum expects argument (varname) of type string.");
-
-    udv = get_udv_by_name(varname.v.string_val);
-    if (!udv)
-        int_error(NO_CARET, "internal error: f_sum could not access iteration variable.");
+    if ((varname.type != STRING) || !(udv = get_udv_by_name(varname.v.string_val)))
+        int_error(NO_CARET, "internal error: lost iteration variable for summation");
+    gpfree_string(&varname);
 
     udf = arg->udf_arg;
     if (!udf)
-        int_error(NO_CARET, "internal error: f_sum could not access summation coefficient function");
+        int_error(NO_CARET, "internal error: lost expression to be evaluated during summation");
 
-    Gcomplex(&ret, 0, 0);
+    Gcomplex(&result, 0, 0);
     for (i=beg.v.int_val; i<=end.v.int_val; ++i) {
         double x, y;
 
         /* calculate f_i = f() with user defined variable i */
         Ginteger(&udv->udv_value, i);
         execute_at(udf->at);
+        pop(&f_i);
 
-        pop(&z);
-        x = real(&ret) + real(&z);
-        y = imag(&ret) + imag(&z);
-        Gcomplex(&ret, x, y);
+        x = real(&result) + real(&f_i);
+        y = imag(&result) + imag(&f_i);
+        Gcomplex(&result, x, y);
+
+	if (!integer_terms)
+	    continue;
+
+	/* Check for integer overflow */
+	/* FIXME:  
+	 * Direct test on integer overflow would be better than testing
+	 * the floating point equivalent.
+	 */
+	if ((x > LARGEST_GUARANTEED_NONOVERFLOW)
+	||  (x < -LARGEST_GUARANTEED_NONOVERFLOW))
+	    integer_terms = FALSE;
+
+	/* So long as the individual terms are integral */
+	/* keep an integer sum as well.			*/
+	if (integer_terms && f_i.type == INTGR)
+	    llsum += f_i.v.int_val;
+	else
+	    integer_terms = FALSE;
     }
 
-    gpfree_string(&varname);
-
-    push(Gcomplex(&z, real(&ret), imag(&ret)));
+    if (!integer_terms)
+	push(&result);
+    else
+	push(Ginteger(&result, llsum));
 }
 
 
@@ -689,7 +713,7 @@ f_leftshift(union argument *arg)
     case INTGR:
 	switch (b.type) {
 	case INTGR:
-	    (void) Ginteger(&result, (unsigned)(a.v.int_val) << b.v.int_val);
+	    (void) Ginteger(&result, (uintgr_t)(a.v.int_val) << b.v.int_val);
 	    break;
 	default:
 	    BADINT_DEFAULT
@@ -715,7 +739,7 @@ f_rightshift(union argument *arg)
     case INTGR:
 	switch (b.type) {
 	case INTGR:
-	    (void) Ginteger(&result, (unsigned)(a.v.int_val) >> b.v.int_val);
+	    (void) Ginteger(&result, (uintgr_t)(a.v.int_val) >> b.v.int_val);
 	    break;
 	default:
 	    BADINT_DEFAULT
@@ -839,8 +863,12 @@ f_mult(union argument *arg)
     case INTGR:
 	switch (b.type) {
 	case INTGR:
+	    /* FIXME:
+	     * This test is not reliable because (double) does not have enough
+	     * precision to accurately compare against 64-bit INTGR_MAX
+	     */
 	    product = (double)a.v.int_val * (double)b.v.int_val;
-	    if (fabs(product) >= (double)INT_MAX)
+	    if (fabs(product) >= (double)INTGR_MAX)
 		(void) Gcomplex(&result, product, 0.0);
 	    else
 		(void) Ginteger(&result, a.v.int_val * b.v.int_val);
@@ -993,7 +1021,7 @@ void
 f_power(union argument *arg)
 {
     struct value a, b, result;
-    int i, t;
+    int i; 
     double mag, ang;
 
     (void) arg;			/* avoid -Wunused warning */
@@ -1009,18 +1037,36 @@ f_power(union argument *arg)
 		    undefined = TRUE;
 		(void) Ginteger(&result, b.v.int_val == 0 ? 1 : 0);
 		break;
-	    }
-	    /* EAM Oct 2009 - avoid integer overflow by switching to double */
-	    mag = pow((double)a.v.int_val,(double)b.v.int_val);
-	    if (mag > (double)INT_MAX  ||  b.v.int_val < 0) {
-		(void) Gcomplex(&result, mag, 0.0);
+	    } else if (b.v.int_val == 0) {
+		(void) Ginteger(&result, 1);
+		break;
+	    } else if (b.v.int_val > 0) {
+		/* DEBUG - deal with overflow by empirical check */
+		intgr_t tprev, t;
+		intgr_t tmag = labs(a.v.int_val);
+		tprev = t = 1;
+		for (i = 0; i < b.v.int_val; i++) {
+		    tprev = t;
+		    t *= tmag;
+		    if (t < tprev)
+			goto integer_power_overflow;
+		}
+		if (a.v.int_val < 0) {
+		    if ((0x1 & b.v.int_val) == 0x1)
+			t = -t;
+		}
+		(void) Ginteger(&result, t);
 		break;
 	    }
-	    t = 1;
-	    /* this ought to use bit-masks and squares, etc */
-	    for (i = 0; i < b.v.int_val; i++)
-		t *= a.v.int_val;
-	    (void) Ginteger(&result, t);
+	    integer_power_overflow:
+#if (1)
+	    /* result of integer overflow is undefined */
+	    undefined = TRUE;
+#else
+	    /* switch to double if overflow */
+	    mag = pow((double)a.v.int_val,(double)b.v.int_val);
+	    (void) Gcomplex(&result, mag, 0.0);
+#endif
 	    break;
 	case CMPLX:
 	    if (a.v.int_val == 0) {
@@ -1126,25 +1172,26 @@ void
 f_factorial(union argument *arg)
 {
     struct value a;
-    int i;
-    double val = 0.0;
+    intgr_t i;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);		/* find a! (factorial) */
 
-    switch (a.type) {
-    case INTGR:
-	val = 1.0;
-	for (i = a.v.int_val; i > 1; i--)	/*fpe's should catch overflows */
-	    val *= i;
-	break;
-    default:
+    if (a.type != INTGR)
 	int_error(NO_CARET, "factorial (!) argument must be an integer");
-	return;			/* avoid gcc -Wall warning about val */
+
+    if (((sizeof(int) == sizeof(intgr_t)) && a.v.int_val <= 12)
+    ||  a.v.int_val <= 20) {
+	intgr_t ival = 1;
+	for (i = a.v.int_val; i > 1; i--)
+	    ival *= i;
+	push(Ginteger(&a, ival));
+    } else {
+	double val = 1.0;
+	for (i = a.v.int_val; i > 1; i--)
+	    val *= i;
+	push(Gcomplex(&a, val, 0.0));
     }
-
-    push(Gcomplex(&a, val, 0.0));
-
 }
 
 /*
@@ -1522,16 +1569,21 @@ f_sprintf(union argument *arg)
 	/* Use the format to print next arg */
 	switch(spec_type) {
 	case INTGR:
-	    snprintf(outpos,bufsize-(outpos-buffer),
-		     next_start, (int)real(next_param));
+	    if (next_param->type == INTGR)
+		snprintf(outpos, bufsize-(outpos-buffer), next_start, next_param->v.int_val);
+	    else if (real(next_param) >= 9007199254740992.)	/* 2**53 */
+		snprintf(outpos, bufsize-(outpos-buffer), "NaN");
+	    else
+		snprintf(outpos, bufsize-(outpos-buffer), next_start,
+			(intgr_t)real(next_param));
 	    break;
 	case CMPLX:
-	    snprintf(outpos,bufsize-(outpos-buffer),
-		     next_start, real(next_param));
+	    snprintf(outpos, bufsize-(outpos-buffer), next_start,
+		     real(next_param));
 	    break;
 	case STRING:
-	    snprintf(outpos,bufsize-(outpos-buffer),
-		next_start, next_param->v.string_val);
+	    snprintf(outpos, bufsize-(outpos-buffer), next_start,
+		     next_param->v.string_val);
 	    break;
 	default:
 	    int_error(NO_CARET,"internal error: invalid spec_type");
@@ -1744,9 +1796,9 @@ f_time(union argument *arg)
     (void) arg; /* Avoid compiler warnings */
     pop(&val); 
     
-    switch (val.type) {
+    switch(val.type) {
 	case INTGR:
-	    push(Ginteger(&val, (int) time_now));
+	    push(Ginteger(&val, (intgr_t) time_now));
 	    break;
 	case CMPLX:
 	    push(Gcomplex(&val, time_now, 0.0));
@@ -1775,10 +1827,11 @@ sprintf_specifier(const char* format)
     const char string_spec[]  = "s";
     const char real_spec[]    = "aAeEfFgG";
     const char int_spec[]     = "cdiouxX";
-    /* The following characters are used for use of invalid types */
-    const char illegal_spec[] = "hlLqjzZtCSpn";
+    /* The following characters are used to reject invalid formats */
+    const char illegal_spec[] = "hqjzZtCSpn";
+    const char lL_spec[] = "lL";
 
-    int string_pos, real_pos, int_pos, illegal_pos;
+    int string_pos, real_pos, int_pos, lmod_pos, illegal_pos;
 
     /* check if really format specifier */
     if (format[0] != '%')
@@ -1788,21 +1841,23 @@ sprintf_specifier(const char* format)
     string_pos  = strcspn(format, string_spec);
     real_pos    = strcspn(format, real_spec);
     int_pos     = strcspn(format, int_spec);
+    lmod_pos    = strcspn(format, lL_spec);
     illegal_pos = strcspn(format, illegal_spec);
 
     if ( illegal_pos < int_pos && illegal_pos < real_pos
 	 && illegal_pos < string_pos )
 	int_error(NO_CARET,
 		  "sprintf_specifier: used with invalid format specifier\n");
-    else if ( string_pos < real_pos && string_pos < int_pos )
+    if ( string_pos < real_pos && string_pos < int_pos )
 	return STRING;
-    else if ( real_pos < int_pos )
+    if ( lmod_pos < real_pos && lmod_pos < int_pos-2 )
+	int_error(NO_CARET, "sprintf_specifier: too many L modifiers");
+    if ( real_pos < int_pos )
 	return CMPLX;
-    else if ( int_pos < strlen(format) )
+    if ( int_pos < strlen(format) )
 	return INTGR;
-    else
-	int_error(NO_CARET,
-		  "sprintf_specifier: no format specifier\n");
+    
+    int_error(NO_CARET, "sprintf_specifier: no format specifier\n");
 
     return INTGR; /* Can't happen, but the compiler doesn't realize that */
 }

@@ -130,10 +130,6 @@ double strtod();
 # endif /* VMS */
 #endif /* HAVE_STDLIB_H */
 
-#ifdef HAVE_STDINT_H
-#include <stdint.h>
-#endif
-
 /* Deal with varargs functions */
 #if defined(HAVE_VFPRINTF) || defined(HAVE_DOPRNT)
 # ifdef STDC_HEADERS

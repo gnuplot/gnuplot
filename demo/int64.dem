@@ -1,0 +1,49 @@
+#
+# Unit tests for evaluation using 64bit integers
+#
+print "Unit tests for evaluation with 64-bit integer arithmetic"
+print ""
+MAXINT32 = 0x40000000 << 1
+if (MAXINT32 < 0) {
+    print "    This copy of gnuplot does not support 64-bit integer arithmetic"
+    exit
+}
+
+array A[1] = [ int(2**40) ]
+F = 12345678910.
+C = 12345678910
+L1 = 0x10000000000
+L4 = 0x40000000000
+L5 = 0x50000000000
+sumI = sum [i=1:10] 1234567891
+sumF = sum [i=1:10] 1234567891.
+
+set print $INT
+print sumI
+set print $FLOAT
+print sumF
+unset print
+
+print "12345678910 prints as       ", 12345678910
+print "sum [i=1:10] 1234567891 =   ", sumI
+print "print 2**63 produces         ", 2**63
+print "print 2**62<<1 produces     ", 2**62<<1
+print "sprintf(\"%lx\", 2**62<<1)     ", sprintf("%lx", 2**62<<1)
+print "sprintf(\"%lx\", 2**63)        ", sprintf("%lx", 2**63)
+print "gprintf(\"0x%x\", 2**62<<1)  ", gprintf("0x%x", 2**62<<1)
+print "gprintf(\"0x%x\", 2**63)     ", gprintf("0x%x", 2**63)
+print "gprintf(\"0x%x\", (2**62<<1)+1)       ", gprintf("0x%x", (2**62<<1) + 1)
+print "gprintf(\"0x%x\", 2**53 | (2**53-1))  ", gprintf("0x%x", (2**53 | (2**53-1)))
+print ""
+print "F      = 12345678910."
+print "int(F) = ", int(F)
+print "(real(int(F)) == F		",  (real(int(F)) == F) ? "yes" : " no"
+print "Sum int-expr == Sum float-expr	", (sumI == sumF) ? "yes" : "no"
+print "printed sums are equal		", ($INT[1] eq $FLOAT[1]) ? "yes" : " no"
+print "Sum int-expr is int		", (strstrt($INT[1],".")) ? " no" : "yes"
+print "Logical bitwise & 		", ((L4 & L5) == L4) ? "OK" : " no"
+print "Logical bitwise | 		", ((L1 | L4) == L5) ? "OK" : " no"
+print "Logical bitwise ^ 		", ((L1 ^ L5) == L4) ? "OK" : " no"
+print "Logical bitshift <<		", (L1 << 2 == L4) ? "OK" : " no"
+print "Logical bitshift >>		", (L4 >> 2 == L1) ? "OK" : " no"
+

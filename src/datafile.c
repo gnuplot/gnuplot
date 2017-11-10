@@ -1561,7 +1561,7 @@ plot_option_index()
 	}
 	if (equals(c_token, ":")) {
 	    ++c_token;
-	    df_index_step = abs(int_expression());
+	    df_index_step = int_expression();
 	    if (df_index_step < 1)
 		int_error(c_token, "Index step must be positive");
 	}

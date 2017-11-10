@@ -1,3 +1,23 @@
+2018-01-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.ac src/datafile.c src/eval.* src/fit.c src/gp_types.h 
+	src/internal.c src/misc.c src/parse.* src/save.c src/set.c src/show.c 
+	src/standard.c src/stdfn.h src/syscfg.h src/util.c term/canvas.trm 
+	term/svg.trm demo/int64.dem docs/gnuplot.doc:
+
+	Add support for 64-bit integer arithmetic
+
+	Add 64-bit integer support throughout gnuplot's internal expression
+	evaluation routines.  All arithmetic and logical operations now use
+	64-bit arithmetic if the platform supports it.  INTGR variables are now
+	typedef intgr_t, which is either int64_t (if the platform supports it)
+	or int.
+
+	Arithmetic operations on integers return INTGR if possible
+	(this is a CHANGE).  E.g.  The factorial operator returns an integer
+	when N! is sufficiently small (N <= 20 for 64-bit integers).
+	It returns a floating point approximation for larger values of N.
+
 2018-01-11  Ulrich Müller  <udalricus@users.sf.net>
 
 	* configure.ac src/term.h:  Configuration option  --with-regis
@@ -23,7 +43,7 @@
 
 	* src/gadgets.* src/graphics.c src/save.c src/set.c src/show.c
 	src/unset.c:   New command "set clip radial" for polar plot with lines
-    
+   
 	Radial clipping to the bounding circle of a polar plot still depends on
 	the existing criteria "set clip {one|two}".
 	   set polar; set rrange [0:RMAX]
@@ -964,7 +984,7 @@
 
 2017-07-16  Ethan A Merritt  <merritt@u.washington.edu>
 
- 	* config/config.cyg config/config.mgw config/config.nt config/config.os2
+	* config/config.cyg config/config.mgw config/config.nt config/config.os2
 	config/config.oww configure.ac src/internal.c term/post.trm:
 	snprintf() is now required.  Remove vestigial tests for HAVE_SNPRINTF.
 

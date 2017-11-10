@@ -756,7 +756,7 @@ disp_at(struct at_type *curr_at, int level)
 	    fprintf(stderr, " +%d\n", arg->j_arg);
 	    break;
 	case DOLLARS:
-	    fprintf(stderr, " %d\n", arg->v_arg.v.int_val);
+	    fprintf(stderr, " %d\n", (int)(arg->v_arg.v.int_val));
 	    break;
 	default:
 	    (void) putc('\n', stderr);
@@ -1086,7 +1086,8 @@ show_version(FILE *fp)
 
 	c_token++;
 	fprintf(stderr, "\nCompile options:\n%s", compile_options);
-	fprintf(stderr, "    MAX_PARALLEL_AXES=%d\n\n", MAX_PARALLEL_AXES);
+	fprintf(stderr, "    MAX_PARALLEL_AXES=%d\n", MAX_PARALLEL_AXES);
+	fprintf(stderr, "    %d-bit integer arithmetic\n\n",(int)sizeof(intgr_t)*8);
 
 #ifdef X11
 	{
@@ -2666,9 +2667,9 @@ show_fit()
     fprintf(stderr, "\n");
 
     v = get_udv_by_name((char *)FITMAXITER);
-    if ((v != NULL) && (v->udv_value.type != NOTDEFINED) && (real_int(&(v->udv_value)) > 0))
+    if ((v != NULL) && (v->udv_value.type != NOTDEFINED) && (real(&(v->udv_value)) > 0))
 	fprintf(stderr, "\tfit will stop after a maximum of %i iterations\n",
-	        real_int(&(v->udv_value)));
+	        (int)real(&(v->udv_value)));
     else
 	fprintf(stderr, "\tfit has no limit in the number of iterations\n");
 

@@ -1078,7 +1078,7 @@ svg_mouse_param( char *gp_name, const char *js_name)
     if ((udv = add_udv_by_name(gp_name))) {
 	if (udv->udv_value.type == INTGR) {
 	    fprintf(gpoutfile, "gnuplot_svg.%s = ", js_name);
-	    fprintf(gpoutfile, "%d", udv->udv_value.v.int_val);
+	    fprintf(gpoutfile, PLD, udv->udv_value.v.int_val);
 	    fprintf(gpoutfile, "\n");
 	} else if (udv->udv_value.type == CMPLX) {
 	    fprintf(gpoutfile, "gnuplot_svg.%s = %g;\n",

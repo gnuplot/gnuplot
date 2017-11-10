@@ -276,25 +276,6 @@ real(struct value *val)
 }
 
 
-/* returns the real part of val, converted to int if necessary */
-int
-real_int(struct value *val)
-{
-    switch (val->type) {
-    case INTGR:
-	return val->v.int_val;
-    case CMPLX:
-	return (int) val->v.cmplx_val.real;
-    case STRING:
-	return atoi(val->v.string_val);
-    default:
-	int_error(NO_CARET, "unknown type in real_int()");
-    }
-    /* NOTREACHED */
-    return 0;
-}
-
-
 /* returns the imag part of val */
 double
 imag(struct value *val)
@@ -392,7 +373,7 @@ Gcomplex(struct value *a, double realpart, double imagpart)
 
 
 struct value *
-Ginteger(struct value *a, int i)
+Ginteger(struct value *a, intgr_t i)
 {
     a->type = INTGR;
     a->v.int_val = i;
@@ -516,9 +497,9 @@ pop_or_convert_from_string(struct value *v)
 
 	if (*(v->v.string_val)
 	&&  strspn(v->v.string_val,"0123456789 ") == strlen(v->v.string_val)) {
-	    int i = atoi(v->v.string_val);
+	    long long li = atoll(v->v.string_val);
 	    gpfree_string(v);
-	    Ginteger(v, i);
+	    Ginteger(v, li);
 	} else {
 	    double d = strtod(v->v.string_val,&eov);
 	    if (v->v.string_val == eov) {
@@ -887,7 +868,7 @@ fill_gpval_string(char *var, const char *stringvalue)
 }
 
 void
-fill_gpval_integer(char *var, int value)
+fill_gpval_integer(char *var, intgr_t value)
 {
     struct udvt_entry *v = add_udv_by_name(var);
     if (!v)
@@ -1128,7 +1109,7 @@ gp_word(char *string, int i)
     struct value a;
 
     push(Gstring(&a, string));
-    push(Ginteger(&a, i));
+    push(Ginteger(&a, (intgr_t)i));
     f_word((union argument *)NULL);
     pop(&a);
 

@@ -71,7 +71,7 @@ extern TBOOLEAN string_result_only;
 
 /* Prototypes of exported functions in parse.c */
 
-int int_expression __PROTO(());
+intgr_t int_expression __PROTO(());
 double real_expression __PROTO(());
 void parse_reset_after_error __PROTO(());
 struct value * const_string_express __PROTO((struct value *valptr));

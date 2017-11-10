@@ -143,7 +143,7 @@ struct cmplx {
 typedef struct value {
     enum DATA_TYPES type;
     union {
-	int int_val;
+	intgr_t int_val;
 	struct cmplx cmplx_val;
 	char *string_val;
 	char **data_array;
