@@ -1,3 +1,9 @@
+2017-11-11  Hans-Bernhard Broeker  <broeker@users.sourceforge.net>
+
+	* prepare (AUTOMAKE): Remove permission fix-up commands, in favour
+	of letting git handle this.
+	* missing, config/djconfig.sh: Set permissions to executable.
+
 2017-11-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_logscale):  If the axis is currently autoscaled and
