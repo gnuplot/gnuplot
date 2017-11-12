@@ -184,16 +184,11 @@ get_arrow(
 	    aspect = 1.;
 #endif
 	map_position_r(&arrow->end, &radius, NULL, "arrow");
-	*ex = ((int)*sx) + cos(DEG2RAD * arrow->angle) * radius;
-	*ey = ((int)*sy) + sin(DEG2RAD * arrow->angle) * radius * aspect;
+	*ex = *sx + cos(DEG2RAD * arrow->angle) * radius;
+	*ey = *sy + sin(DEG2RAD * arrow->angle) * radius * aspect;
     } else {
 	map_position_double(&arrow->end, ex, ey, "arrow");
     }
-
-    *sx = (double)(int)(*sx);
-    *sy = (double)(int)(*sy);
-    *ex = (double)(int)(*ex);
-    *ey = (double)(int)(*ey);
 }
 
 static void
@@ -2445,10 +2440,10 @@ plot_vectors(struct curve_points *plot)
 	check_for_variable_color(plot, &plot->varcolor[i]);
 
 	/* draw_clip_arrow does the hard work for us */
-	draw_clip_arrow((double)(int)(map_x_double(points[0].x) + 0.5),
-                        (double)(int)(map_y_double(points[0].y) + 0.5),
-                        (double)(int)(map_x_double(points[1].x) + 0.5),
-                        (double)(int)(map_y_double(points[1].y) + 0.5),
+	draw_clip_arrow(map_x_double(points[0].x),
+                        map_y_double(points[0].y),
+                        map_x_double(points[1].x),
+                        map_y_double(points[1].y),
                         ap.head);
     }
 

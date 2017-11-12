@@ -3114,8 +3114,6 @@ map3d_position_r_double(
     if (map3d_getposition(pos, what, &xpos, &ypos, &zpos) == 0) {
 	int xoriginlocal, yoriginlocal;
 	map3d_xy_double(xpos, ypos, zpos, xx, yy);
-        *xx = (double)(int)(*xx);
-        *yy = (double)(int)(*yy);
 	if (pos->scalex == graph)
 	    xpos = X_AXIS.min;
 	else
@@ -3135,8 +3133,8 @@ map3d_position_r_double(
 	*yy -= yoriginlocal;
     } else {
     /* endpoint `screen' or 'character' coordinates */
-	*xx = (double)(int)xpos;
-	*yy = (double)(int)ypos;
+	*xx = xpos;
+	*yy = ypos;
     }
     return;
 }
