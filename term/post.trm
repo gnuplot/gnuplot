@@ -105,8 +105,6 @@ TERM_PUBLIC void PS_put_text __PROTO((unsigned int x, unsigned int y, const char
 TERM_PUBLIC int PS_text_angle __PROTO((int ang));
 TERM_PUBLIC int PS_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void PS_point __PROTO((unsigned int x, unsigned int y, int number));
-TERM_PUBLIC void PS_arrow __PROTO(( unsigned int sx, unsigned int sy,
-    unsigned int ex, unsigned int ey, int head));
 TERM_PUBLIC int PS_set_font __PROTO((const char * font));
 TERM_PUBLIC void PS_fillbox __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height));
 TERM_PUBLIC void PS_linewidth __PROTO((double linewidth)); /* JFi [linewidth] */
@@ -3289,27 +3287,6 @@ TERM_PUBLIC void PS_previous_palette()
 }
 
 
-/*
- * The reason for having a PostScript-specific wrapper for do_arrow
- * is that post.trm draws dotted lines for monochrome output, and
- * dotted arrowheads are ugly.  So in that case we call do_arrow twice,
- * the second time to retrace the head with the line style forced to solid.
- */
-TERM_PUBLIC void PS_arrow (
-    unsigned int sx, unsigned int sy,
-    unsigned int ex, unsigned int ey,
-    int head)
-{
-    do_arrow( sx, sy, ex, ey, head );
-    if (!ps_params->solid && head != 0) {
-	PS_FLUSH_PATH;
-	fputs("gsave [] 0 setdash\n", gppsfile);
-	do_arrow( sx, sy, ex, ey, -head );
-	PS_FLUSH_PATH;
-	fputs("grestore\n", gppsfile);
-    }
-}
-
 static void
 delete_ps_fontfile(struct ps_fontfile_def *prev, struct ps_fontfile_def *this)
 {
@@ -4389,7 +4366,7 @@ TERM_TABLE_START(post_driver)
     PS_VTIC, PS_HTIC, PS_options, PS_init, PS_reset, 
     PS_text, null_scale, PS_graphics, PS_move, PS_vector, 
     PS_linetype, PS_put_text, PS_text_angle, 
-    PS_justify_text, PS_point, PS_arrow, PS_set_font, PS_pointsize,
+    PS_justify_text, PS_point, do_arrow, PS_set_font, PS_pointsize,
     TERM_BINARY|TERM_IS_POSTSCRIPT|TERM_CAN_CLIP|TERM_CAN_DASH|TERM_MONOCHROME|TERM_LINEWIDTH|TERM_FONTSCALE|TERM_POINTSCALE, 
     0 /*suspend*/, 0 /*resume*/, PS_fillbox, PS_linewidth
 #ifdef USE_MOUSE

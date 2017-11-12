@@ -1124,7 +1124,7 @@ TERM_TABLE_START(pslatex_driver)
     PS_VTIC, PS_HTIC, PS_options, PS_init, PSLATEX_reset,
     PSTEX_text, null_scale, PS_graphics, PS_move,
     PS_vector, PS_linetype, PSTEX_put_text, PS_text_angle,
-    PS_justify_text, PS_point, PS_arrow, set_font_null,
+    PS_justify_text, PS_point, do_arrow, set_font_null,
     PS_pointsize, TERM_CAN_CLIP|TERM_IS_LATEX /*flags */ , 0 /*suspend */
     , 0 /*resume */ ,
     PS_fillbox, PS_linewidth
@@ -1149,7 +1149,7 @@ TERM_TABLE_START(pstex_driver)
     PS_VTIC, PS_HTIC, PS_options, PS_init, PSLATEX_reset,
     PSTEX_text, null_scale, PS_graphics, PS_move,
     PS_vector, PS_linetype, PSTEX_put_text, PS_text_angle,
-    PS_justify_text, PS_point, PS_arrow, set_font_null,
+    PS_justify_text, PS_point, do_arrow, set_font_null,
     PS_pointsize, TERM_CAN_CLIP|TERM_IS_LATEX /*flags */ , 0 /*suspend */
     , 0 /*resume */ ,
     PS_fillbox, PS_linewidth

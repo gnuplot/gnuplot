@@ -1,3 +1,14 @@
+2017-11-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm term/pslatex.trm:  The postscript terminals have had a
+	private routine PS_arrow that calls do_arrow() twice, once as-is and a
+	second time with linetype forced to solid. This was supposed to trigger
+	only if the terminal was in "dashed" mode, so that arrowheads were not
+	dashed. In version 5 the test doesn't work and so so the second call
+	was always made. Furthermore if the no-dashed-arrowheads restriction is
+	to be kept, all terminals need it.  Remove PS_arrow() and shift the
+	postscript terminals back to using do_arrow().
+
 2017-11-11  Hans-Bernhard Broeker  <broeker@users.sourceforge.net>
 
 	* prepare (AUTOMAKE): Remove permission fix-up commands, in favour
