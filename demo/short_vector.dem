@@ -1,0 +1,18 @@
+#
+# arrowheads with "fixed" size can be drawn even for vectors
+# whose length approaches zero.
+#
+set title "fixed size arrowheads for very short vectors"
+unset key
+unset colorbox
+set xrange [-6:6]
+set yrange [-6:6]
+
+vec_x(x,y) = ( lEn = sqrt(x*x+y*y), (10.**(lEn-7)) * x / lEn )
+vec_y(x,y) = ( lEn = sqrt(x*x+y*y), (10.**(lEn-7)) * y / lEn )
+
+plot sample [u=-5:5:1][v=-5:5:1] '++' using 1:2:(vec_x(u,v)):(vec_y(u,v)):(lEn) \
+     with vectors size screen 0.01,20 filled fixed lc palette z
+
+pause -1 "<cr> to continue"
+reset

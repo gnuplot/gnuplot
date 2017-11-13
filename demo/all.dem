@@ -259,16 +259,20 @@ if (GPVAL_TERM eq "postscript") {
 }
 reset
 
-print "********************** file arrowstyle.dem *********************"
-load "arrowstyle.dem"
-reset
-
 print "********************** file dashtypes.dem *********************"
 load "dashtypes.dem"
 reset
 
+print "********************** file arrowstyle.dem *********************"
+load "arrowstyle.dem"
+reset
+
 print "********************** file vector.dem *********************"
 load "vector.dem"
+reset
+
+print "********************** file short_vector.dem *********************"
+load "short_vector.dem"
 reset
 
 print "********************** file tics.dem *********************"
