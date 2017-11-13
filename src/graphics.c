@@ -1008,7 +1008,7 @@ plot_impulses(struct curve_points *plot, int yaxis_x, int xaxis_y)
 
     for (i = 0; i < plot->p_count; i++) {
 
-        if (plot->points[i].type == UNDEFINED)
+	if (plot->points[i].type == UNDEFINED)
 	    continue;
 
 	if (!polar && !inrange(plot->points[i].x, X_AXIS.min, X_AXIS.max))
@@ -1341,7 +1341,7 @@ plot_betweencurves(struct curve_points *plot)
     /* there are possibly 2 side points plus one extra to specify above/below */
     max_corners_needed = plot->p_count * 2 + 3;
     if (max_corners_needed > corners_allocated) {
-        corners_allocated = max_corners_needed;
+	corners_allocated = max_corners_needed;
 	corners = gp_realloc(corners, corners_allocated*sizeof(gpiPoint), "betweencurves vertices");
     }
     /*
@@ -1354,8 +1354,8 @@ plot_betweencurves(struct curve_points *plot)
 
 	/* This isn't really testing for undefined points, it is looking */
 	/* for blank lines. If there is one then start a new fill area.  */
-        if (plot->points[i].type == UNDEFINED)
-            continue;
+	if (plot->points[i].type == UNDEFINED)
+	    continue;
 
 	if (points == 0) {
 	    istart=i;
@@ -1373,7 +1373,7 @@ plot_betweencurves(struct curve_points *plot)
 	yl1 = plot->points[i].y;
 	yu1 = plot->points[i].yhigh;
 	if (i+1 >= plot->p_count || plot->points[i+1].type == UNDEFINED)
-            finish=1;
+	    finish=1;
 	else {
 	    finish=0;
 	    x2  = plot->points[i+1].x;
@@ -1404,9 +1404,9 @@ plot_betweencurves(struct curve_points *plot)
 	if (!finish) {
 	    /* EAM 19-July-2007  Special case for polar plots. */
 	    if (polar) {
-	        /* Find intersection of the two lines.                   */
-	        /* Probably could use this code in the general case too. */
-	        double A = (yl2-yl1) / (x2-x1);
+		/* Find intersection of the two lines.                   */
+		/* Probably could use this code in the general case too. */
+		double A = (yl2-yl1) / (x2-x1);
 		double C = (yu2-yu1) / (xu2-xu1);
 		double b = yl1 - x1 * A;
 		double d = yu1 - xu1 * C;
@@ -1418,8 +1418,8 @@ plot_betweencurves(struct curve_points *plot)
 	    } else if ((yu1-yl1) == 0 && (yu2-yl2) == 0) {
 		/* nothing */
 	    } else if ((yu1-yl1)*(yu2-yl2) <= 0) {
-	        /* Cheap test for intersection in the general case */
-	        xmid = (x1*(yl2-yu2) + x2*(yu1-yl1))
+		/* Cheap test for intersection in the general case */
+		xmid = (x1*(yl2-yu2) + x2*(yu1-yl1))
 		     / ((yu1-yl1) + (yl2-yu2));
 		ymid = yu1 + (yu2-yu1)*(xmid-x1)/(x2-x1);
 
@@ -1435,7 +1435,7 @@ plot_betweencurves(struct curve_points *plot)
 
 	if (finish) {
 	    for (j = i; j >= istart; j--) {
-	        corners[points].x = map_x(plot->points[j].xhigh);
+		corners[points].x = map_x(plot->points[j].xhigh);
 		corners[points].y = map_y(plot->points[j].yhigh);
 		points++;
 	    }
@@ -2125,7 +2125,7 @@ plot_points(struct curve_points *plot)
 	int pcountin = 0;
 	for (i = 0; i < plot->p_count; i++) {
 	    if (plot->points[i].type == INRANGE) pcountin++;
-        }
+	}
 	if (pcountin > number) {
 	    if (number > 1)
 		interval = (float)(pcountin-1)/(float)(number-1);
@@ -2406,7 +2406,6 @@ static void
 plot_vectors(struct curve_points *plot)
 {
     int i;
-    int x1, y1, x2, y2;
     struct coordinate points[2];
     arrow_style_type ap;
     BoundingBox *clip_save = clip_area;
@@ -2440,11 +2439,9 @@ plot_vectors(struct curve_points *plot)
 	check_for_variable_color(plot, &plot->varcolor[i]);
 
 	/* draw_clip_arrow does the hard work for us */
-	draw_clip_arrow(map_x_double(points[0].x),
-                        map_y_double(points[0].y),
-                        map_x_double(points[1].x),
-                        map_y_double(points[1].y),
-                        ap.head);
+	draw_clip_arrow(map_x_double(points[0].x), map_y_double(points[0].y),
+			map_x_double(points[1].x), map_y_double(points[1].y),
+			ap.head);
     }
 
     clip_area = clip_save;
@@ -4274,14 +4271,14 @@ do_ellipse( int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping )
 
     /* Calculate the vertices */
     for (i=0, angle = 0.0; i<=segments; i++, angle += ang_inc) {
-        /* Given that the (co)sines of same sequence of angles
-         * are calculated every time - shouldn't they be precomputed
-         * and put into a table? */
+	/* Given that the (co)sines of same sequence of angles
+	 * are calculated every time - shouldn't they be precomputed
+	 * and put into a table? */
 	    pos.x = A * cosO * cos(angle) - B * sinO * sin(angle);
 	    pos.y = A * sinO * cos(angle) + B * cosO * sin(angle);
 	    if (!do_own_mapping) {
-	        xoff = pos.x;
-	        yoff = pos.y;
+		xoff = pos.x;
+		yoff = pos.y;
 
 	    } else if (dimensions == 2) {
 		switch (e->type) {

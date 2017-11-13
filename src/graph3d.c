@@ -3093,9 +3093,7 @@ map3d_position_r(
     const char *what)
 {
     double xx, yy;
-    map3d_position_r_double(pos,
-                            &xx, &yy,
-                            what);
+    map3d_position_r_double(pos, &xx, &yy, what);
     *x = xx;
     *y = yy;
 }
