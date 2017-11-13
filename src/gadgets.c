@@ -302,6 +302,11 @@ draw_clip_polygon(int points, gpiPoint *p)
     }
 }
 
+/*
+ * arrow is specified in terminal coordinates
+ * but we use double rather than int so that the precision is sufficient
+ * to orient and draw the arrow head correctly even for very short vectors.
+ */
 void
 draw_clip_arrow( double dsx, double dsy, double dex, double dey, t_arrow_head head)
 {
@@ -320,8 +325,39 @@ draw_clip_arrow( double dsx, double dsy, double dex, double dey, t_arrow_head he
 
     /* clip_line returns 0 if the whole thing is out of range */
     if (clip_line(&sx, &sy, &ex, &ey))
-	(*t->arrow)((unsigned int)sx, (unsigned int)sy,
-		    (unsigned int)ex, (unsigned int)ey, head);
+    {
+	/* draw the body of the vector (rounding errors are a problem) */
+	if (abs(ex-sx) > 1 || abs(ey-sy) > 1)
+	    (*t->arrow)(sx, sy, ex, ey, SHAFT_ONLY | head);
+
+	/* if we're not supposed to be drawing any heads, we're done */
+	if ((head & BOTH_HEADS) == NOHEAD)
+	    return;
+
+	/* If this is truly a 0-vector, then we CAN'T draw the head */
+	/* because the orientation of the head is indeterminate     */
+	if (dsx == dex && dsy == dey)
+	    return;
+
+	/* If the head size is fixed we are free to change the length of */
+	/* very short vectors so that the orientation is accurate.	 */
+	if (curr_arrow_headfixedsize) {
+	    /* Direction vector in (dex,dey). I need to convert this to integers
+	     * with a scale that's large-enough to give me good angular resolution,
+	     * but small-enough to not overflow the data type.
+	     */
+	    double rescale = 1000. / GPMAX( fabs(dex-dsx), fabs(dey-dsy) );
+	    int newlenx = (dex - dsx) * rescale;
+	    int newleny = (dey - dsy) * rescale;
+
+	    if (head & END_HEAD)
+		(*t->arrow)(ex - newlenx, ey - newleny, ex, ey, END_HEAD|HEADS_ONLY);
+	    if (head & BACKHEAD)
+		(*t->arrow)(sx, sy, sx + newlenx, sy + newleny, BACKHEAD|HEADS_ONLY);
+	} else {
+	    (*t->arrow)(sx, sy, ex, ey, head|HEADS_ONLY);
+	}
+    }
 }
 
 /* Clip the given line to drawing coords defined by BoundingBox.
