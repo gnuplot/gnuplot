@@ -1053,17 +1053,19 @@ do_arrow(
 	    head_points[3].y = ey + y2;
 	    head_points[4].x = ex + xm;
 	    head_points[4].y = ey + ym;
-	    if (curr_arrow_headfilled >= AS_FILLED) {
-		/* draw filled forward arrow head */
-		head_points->style = FS_OPAQUE;
-		if (t->filled_polygon)
-		    (*t->filled_polygon) (5, head_points);
-	    }
-	    /* draw outline of forward arrow head */
-	    if (curr_arrow_headfilled == AS_NOFILL) {
-		draw_clip_polygon(3, head_points+1);
-	    } else if (curr_arrow_headfilled != AS_NOBORDER) {
-		draw_clip_polygon(5, head_points);
+	    if (!((headstyle & SHAFT_ONLY))) {
+		if (curr_arrow_headfilled >= AS_FILLED) {
+		    /* draw filled forward arrow head */
+		    head_points->style = FS_OPAQUE;
+		    if (t->filled_polygon)
+			(*t->filled_polygon) (5, head_points);
+		}
+		/* draw outline of forward arrow head */
+		if (curr_arrow_headfilled == AS_NOFILL) {
+		    draw_clip_polygon(3, head_points+1);
+		} else if (curr_arrow_headfilled != AS_NOBORDER) {
+		    draw_clip_polygon(5, head_points);
+		}
 	    }
 	}
 
@@ -1079,17 +1081,19 @@ do_arrow(
 	    head_points[3].y = sy - y2;
 	    head_points[4].x = sx - xm;
 	    head_points[4].y = sy - ym;
-	    if (curr_arrow_headfilled >= AS_FILLED) {
-		/* draw filled backward arrow head */
-		head_points->style = FS_OPAQUE;
-		if (t->filled_polygon)
-		    (*t->filled_polygon) (5, head_points);
-	    }
-	    /* draw outline of backward arrow head */
-	    if (curr_arrow_headfilled == AS_NOFILL) {
-		draw_clip_polygon(3, head_points+1);
-	    } else if (curr_arrow_headfilled != AS_NOBORDER) {
-		draw_clip_polygon(5, head_points);
+	    if (!((headstyle & SHAFT_ONLY))) {
+		if (curr_arrow_headfilled >= AS_FILLED) {
+		    /* draw filled backward arrow head */
+		    head_points->style = FS_OPAQUE;
+		    if (t->filled_polygon)
+			(*t->filled_polygon) (5, head_points);
+		}
+		/* draw outline of backward arrow head */
+		if (curr_arrow_headfilled == AS_NOFILL) {
+		    draw_clip_polygon(3, head_points+1);
+		} else if (curr_arrow_headfilled != AS_NOBORDER) {
+		    draw_clip_polygon(5, head_points);
+		}
 	    }
 	}
     }
