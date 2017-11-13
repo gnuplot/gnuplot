@@ -149,11 +149,14 @@ typedef struct lp_style_type {	/* contains all Line and Point properties */
 	{0, LT_BLACK, 0, DASHTYPE_CUSTOM, 0, 0, 1.2 /*linewidth*/, PTSZ_DEFAULT, DEFAULT_P_CHAR, BLACK_COLORSPEC, {{16.,8.,2.,5.,2.,5.,2.,8.},{0,0,0,0,0,0,0,0}}} \
 }
 
+/* Note:  These are interpreted as bit flags, not ints */
 typedef enum e_arrow_head {
 	NOHEAD = 0,
 	END_HEAD = 1,
 	BACKHEAD = 2,
-	BOTH_HEADS = 3
+	BOTH_HEADS = 3,
+	HEADS_ONLY = 4,
+	SHAFT_ONLY = 8
 } t_arrow_head;
 
 extern const char *arrow_head_names[4];
@@ -298,7 +301,7 @@ typedef struct TERMENTRY {
     int (*text_angle) __PROTO((int));
     int (*justify_text) __PROTO((enum JUSTIFY));
     void (*point) __PROTO((unsigned int, unsigned int, int));
-    void (*arrow) __PROTO((unsigned int, unsigned int, unsigned int, unsigned int, int));
+    void (*arrow) __PROTO((unsigned int, unsigned int, unsigned int, unsigned int, int headstyle));
     int (*set_font) __PROTO((const char *font));
     void (*pointsize) __PROTO((double)); /* change pointsize */
     int flags;

@@ -224,7 +224,7 @@ static void null_linewidth __PROTO((double));
 static void do_point __PROTO((unsigned int x, unsigned int y, int number));
 static void do_pointsize __PROTO((double size));
 static void line_and_point __PROTO((unsigned int x, unsigned int y, int number));
-static void do_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
+static void do_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int headstyle));
 static void null_dashtype __PROTO((int type, t_dashtype *custom_dash_pattern));
 
 static int null_text_angle __PROTO((int ang));
@@ -982,8 +982,6 @@ do_arrow(
     gpiPoint head_points[5];
     int xm = 0, ym = 0;
     BoundingBox *clip_save;
-    t_arrow_head head = (t_arrow_head)((headstyle < 0) ? -headstyle : headstyle);
-	/* negative headstyle means draw heads only, no shaft */
 
     /* The arrow shaft was clipped already in do_clip_arrow() but we still */
     /* need to clip the head here. */
@@ -997,7 +995,7 @@ do_arrow(
      * Draw no head for arrows with length = 0, or, to be more specific,
      * length < DBL_EPSILON, because len_arrow will almost always be != 0.
      */
-    if ((head != NOHEAD) && fabs(len_arrow) >= DBL_EPSILON) {
+    if ((headstyle & BOTH_HEADS) != NOHEAD && fabs(len_arrow) >= DBL_EPSILON) {
 	int x1, y1, x2, y2;
 	if (curr_arrow_headlength <= 0) {
 	    /* An arrow head with the default size and angles */
@@ -1044,7 +1042,7 @@ do_arrow(
 	    ym = (int) (dy2 + backlen*effective_length * sin( phi + beta ));
 	}
 
-	if ((head & END_HEAD) && !clip_point(ex, ey)) {
+	if ((headstyle & END_HEAD) && !clip_point(ex, ey)) {
 	    head_points[0].x = ex + xm;
 	    head_points[0].y = ey + ym;
 	    head_points[1].x = ex + x1;
@@ -1070,7 +1068,7 @@ do_arrow(
 	}
 
 	/* backward arrow head */
-	if ((head & BACKHEAD) && !clip_point(sx,sy)) {
+	if ((headstyle & BACKHEAD) && !clip_point(sx,sy)) {
 	    head_points[0].x = sx - xm;
 	    head_points[0].y = sy - ym;
 	    head_points[1].x = sx - x1;
@@ -1096,24 +1094,24 @@ do_arrow(
 	}
     }
 
-    /* Draw the line for the arrow. */
-    if (headstyle >= 0) {
-	if ((head & BACKHEAD)
-	&&  (fabs(len_arrow) >= DBL_EPSILON) && (curr_arrow_headfilled != AS_NOFILL) ) {
-	    sx -= xm;
-	    sy -= ym;
-	}
-	if ((head & END_HEAD)
-	&&  (fabs(len_arrow) >= DBL_EPSILON) && (curr_arrow_headfilled != AS_NOFILL) ) {
-	    ex += xm;
-	    ey += ym;
-	}
-	draw_clip_line(sx, sy, ex, ey);
+    /* Adjust the length of the shaft so that it doesn't overlap the head */
+    if ((headstyle & BACKHEAD)
+    &&  (fabs(len_arrow) >= DBL_EPSILON) && (curr_arrow_headfilled != AS_NOFILL) ) {
+	sx -= xm;
+	sy -= ym;
     }
+    if ((headstyle & END_HEAD)
+    &&  (fabs(len_arrow) >= DBL_EPSILON) && (curr_arrow_headfilled != AS_NOFILL) ) {
+	ex += xm;
+	ey += ym;
+    }
+
+    /* Draw the line for the arrow. */
+    if (!((headstyle & HEADS_ONLY)))
+	draw_clip_line(sx, sy, ex, ey);
 
     /* Restore previous clipping box */
     clip_area = clip_save;
-
 }
 
 #ifdef EAM_OBJECTS

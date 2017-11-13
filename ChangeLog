@@ -1,3 +1,9 @@
+2017-11-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.c (do_clip_arrow) src/gadgets.h src/term.c src/term_api.h:
+	Don't misuse the bitfield t_arrow_style by treating it as an integer.
+	Instead add bitflags HEADS_ONLY SHAFT_ONLY.
+
 2017-11-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm term/pslatex.trm:  The postscript terminals have had a

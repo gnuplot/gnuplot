@@ -303,7 +303,7 @@ draw_clip_polygon(int points, gpiPoint *p)
 }
 
 void
-draw_clip_arrow( int sx, int sy, int ex, int ey, int head)
+draw_clip_arrow( int sx, int sy, int ex, int ey, t_arrow_head head)
 {
     struct termentry *t = term;
 
