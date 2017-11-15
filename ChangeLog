@@ -1,3 +1,15 @@
+2017-11-12  Dima Kogan  <dima@secretsauce.net>
+
+	* src/axis.c src/axis.h src/boundary.c src/gadgets.c src/gadgets.h
+	src/graph3d.c src/graph3d.h src/graphics.c src/util3d.c src/util3d.h:
+
+	Series of patches to track vector endpoints, and 3D coordinates in
+	general, keeping a floating point representation of terminal coordinates
+	rather than integer.  This keeps sufficient precision for very short
+	vectors that the arrowhead can be drawn accurately even as the length
+	approaches zero. The routine draw_clip_arrow() becomes the one and only
+	caller of term->arrow().  All 2D and 3D vectors and arrows use it.
+
 2017-11-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c (do_clip_arrow) src/gadgets.h src/term.c src/term_api.h:
