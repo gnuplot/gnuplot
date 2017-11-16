@@ -1,3 +1,5 @@
+Release 5.2.2
+
 2017-11-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_logscale):  If the axis is currently autoscaled and
