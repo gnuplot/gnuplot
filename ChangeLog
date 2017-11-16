@@ -1,3 +1,15 @@
+===============================================================================
+If you are seeing this you must have obtained a snapshot of gnuplot development
+from the development cvs repository on sourceforge.net.  This is out of date!
+As of December 2017 the development source has moved to using git rather than
+cvs.  For the forseeable future gnuplot release tarballs and other files will
+continue to be distributed from
+
+	http://gnuplot.sourceforge.net
+
+Please check there to obtain the current version or more information.
+===============================================================================
+
 2017-11-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc src/gadgets.c:  Remove obsolete comments and trivial
