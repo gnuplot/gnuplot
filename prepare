@@ -14,9 +14,6 @@ AUTOCONF=${AUTOCONF:-autoconf}
 AUTOHEADER=${AUTOHEADER:-autoheader}
 AUTOMAKE=${AUTOMAKE:-automake}
 
-exelist="configure configure.vms depcomp install-sh missing mkinstalldirs config/djconfig.sh"
-
-chmod 755 $exelist >/dev/null 2>&1
 chmod og-w docs/* >/dev/null 2>&1
 
 # Clean up
