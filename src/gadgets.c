@@ -252,8 +252,7 @@ draw_clip_line(int x1, int y1, int x2, int y2)
     struct termentry *t = term;
 
     if (!clip_line(&x1, &y1, &x2, &y2))
-	/* clip_line() returns zero --> segment completely outside
-	 * bounding box */
+	/* clip_line() returns zero if segment completely outside bounding box */
 	return;
 
     (*t->move) (x1, y1);
@@ -317,11 +316,11 @@ draw_clip_arrow( int sx, int sy, int ex, int ey, int head)
 	head &= ~BACKHEAD;
     if (clip_point(ex,ey))
 	head &= ~END_HEAD;
-    clip_line(&sx, &sy, &ex, &ey);
 
-    /* Call terminal routine to draw the clipped arrow */
-    (*t->arrow)((unsigned int)sx, (unsigned int)sy,
-		(unsigned int)ex, (unsigned int)ey, head);
+    /* clip_line returns 0 if the whole thing is out of range */
+    if (clip_line(&sx, &sy, &ex, &ey))
+	(*t->arrow)((unsigned int)sx, (unsigned int)sy,
+		    (unsigned int)ex, (unsigned int)ey, head);
 }
 
 /* Clip the given line to drawing coords defined by BoundingBox.
@@ -427,11 +426,6 @@ clip_line(int *x1, int *y1, int *x2, int *y2)
 	    *y2 = y_intr[1];
 	}
     } else if (pos1) {		/* Only x1/y1 was out - update only it */
-	/* Nov 2010: When clip_line() and draw_clip_line() were consolidated in */
-	/* 2000, the test below was the only point of difference between them.  */
-	/* Unfortunately, the wrong version was kept. Now I change it back.     */
-	/* The effect of the wrong version (>= rather than >) was that a line   */
-	/* from ymin to ymax+eps was clipped to ymin,ymin rather than ymin,ymax */
 	if (dx * (*x2 - x_intr[0]) + dy * (*y2 - y_intr[0]) > 0) {
 	    *x1 = x_intr[0];
 	    *y1 = y_intr[0];

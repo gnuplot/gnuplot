@@ -2414,16 +2414,17 @@ plot_vectors(struct curve_points *plot)
 {
     int i;
     int x1, y1, x2, y2;
-    struct termentry *t = term;
     struct coordinate points[2];
-    double ex, ey;
-    double lx[2], ly[2];
     arrow_style_type ap;
+    BoundingBox *clip_save = clip_area;
 
     /* Normally this is only necessary once because all arrows equal */
     ap = plot->arrow_properties;
     term_apply_lp_properties(&ap.lp_properties);
     apply_head_properties(&ap);
+
+    /* Clip to plot */
+    clip_area = &plot_bounds;
 
     for (i = 0; i < plot->p_count; i++) {
 
@@ -2445,58 +2446,15 @@ plot_vectors(struct curve_points *plot)
 	/* variable color read from extra data column. */
 	check_for_variable_color(plot, &plot->varcolor[i]);
 
-	if (inrange(points[1].x, X_AXIS.min, X_AXIS.max)
-	    && inrange(points[1].y, Y_AXIS.min, Y_AXIS.max)) {
-	    /* to inrange */
-	    points[1].type = INRANGE;
-	    x2 = map_x(points[1].x);
-	    y2 = map_y(points[1].y);
-	    if (points[0].type == INRANGE) {
-		x1 = map_x(points[0].x);
-		y1 = map_y(points[0].y);
-		(*t->arrow) (x1, y1, x2, y2, ap.head);
-	    } else if (points[0].type == OUTRANGE) {
-		/* from outrange to inrange */
-		if (clip_lines1) {
-		    edge_intersect(points, 1, &ex, &ey);
-		    x1 = map_x(ex);
-		    y1 = map_y(ey);
-		    if (ap.head & END_HEAD)
-			(*t->arrow) (x1, y1, x2, y2, END_HEAD);
-		    else
-			(*t->arrow) (x1, y1, x2, y2, NOHEAD);
-		}
-	    }
-	} else {
-	    /* to outrange */
-	    points[1].type = OUTRANGE;
-	    if (points[0].type == INRANGE) {
-		/* from inrange to outrange */
-		if (clip_lines1) {
-		    x1 = map_x(points[0].x);
-		    y1 = map_y(points[0].y);
-		    edge_intersect(points, 1, &ex, &ey);
-		    x2 = map_x(ex);
-		    y2 = map_y(ey);
-		    if (ap.head & BACKHEAD)
-			(*t->arrow) (x2, y2, x1, y1, BACKHEAD);
-		    else
-			(*t->arrow) (x1, y1, x2, y2, NOHEAD);
-		}
-	    } else if (points[0].type == OUTRANGE) {
-		/* from outrange to outrange */
-		if (clip_lines2) {
-		    if (two_edge_intersect(points, 1, lx, ly)) {
-			x1 = map_x(lx[0]);
-			y1 = map_y(ly[0]);
-			x2 = map_x(lx[1]);
-			y2 = map_y(ly[1]);
-			(*t->arrow) (x1, y1, x2, y2, NOHEAD);
-		    }
-		}
-	    }
-	}
+	/* draw_clip_arrow does the hard work for us */
+	x1 = map_x(points[0].x);
+	y1 = map_y(points[0].y);
+	x2 = map_x(points[1].x);
+	y2 = map_y(points[1].y);
+	draw_clip_arrow(x1, y1, x2, y2, ap.head);
     }
+
+    clip_area = clip_save;
 }
 
 

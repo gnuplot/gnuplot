@@ -1,3 +1,12 @@
+2017-11-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	graphics.c (plot_vectors):
+	The code for drawing 2D  "plot ... with vectors" is redundant.
+	Replace the core of it with a call to draw_clip_arrow().
+
+	gadgets.c (draw_clip_arrow):
+	Do not call term->arrow() if the entire arrow is out of range.
+
 2017-11-16  Hans-Bernhard Broeker  <broeker@users.sourceforge.net>
 
 	* prepare (AUTOMAKE): Remove permission fix-up commands, in favour
