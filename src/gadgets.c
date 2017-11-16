@@ -112,7 +112,7 @@ struct arrow_def *first_arrow = NULL;
 /* Pointer to first object instance in linked list */
 struct object *first_object = NULL;
 /* Pointer to array of grid walls */
-struct object grid_wall[5] = {WALL_Y0, WALL_X0, WALL_Z0, WALL_Y1, WALL_X1};
+struct object grid_wall[5] = {WALL_Y0, WALL_X0, WALL_Y1, WALL_X1, WALL_Z0};
 #endif
 
 /* 'set title' status */
@@ -945,26 +945,26 @@ init_gadgets()
    int i;
    static t_position y0_wall_corners[5] = WALL_Y0_CORNERS;
    static t_position x0_wall_corners[5] = WALL_X0_CORNERS;
-   static t_position z0_wall_corners[5] = WALL_Z0_CORNERS;
    static t_position y1_wall_corners[5] = WALL_Y1_CORNERS;
    static t_position x1_wall_corners[5] = WALL_X1_CORNERS;
+   static t_position z0_wall_corners[5] = WALL_Z0_CORNERS;
    for (i=0; i<4; i++)
        grid_wall[i].next = &grid_wall[i+1];
 
-   grid_wall[0].o.polygon.vertex = y0_wall_corners;
-   grid_wall[1].o.polygon.vertex = x0_wall_corners;
-   grid_wall[2].o.polygon.vertex = z0_wall_corners;
-   grid_wall[3].o.polygon.vertex = y1_wall_corners;
-   grid_wall[4].o.polygon.vertex = x1_wall_corners;
-   grid_wall[0].lp_properties.pm3d_color.type = TC_RGB;
-   grid_wall[1].lp_properties.pm3d_color.type = TC_RGB;
-   grid_wall[2].lp_properties.pm3d_color.type = TC_RGB;
-   grid_wall[3].lp_properties.pm3d_color.type = TC_RGB;
-   grid_wall[4].lp_properties.pm3d_color.type = TC_RGB;
-   grid_wall[0].lp_properties.pm3d_color.lt = WALL_Y_COLOR;
-   grid_wall[1].lp_properties.pm3d_color.lt = WALL_X_COLOR;
-   grid_wall[2].lp_properties.pm3d_color.lt = WALL_Z_COLOR;
-   grid_wall[3].lp_properties.pm3d_color.lt = WALL_Y_COLOR;
-   grid_wall[4].lp_properties.pm3d_color.lt = WALL_X_COLOR;
+   grid_wall[WALL_Y0_TAG].o.polygon.vertex = y0_wall_corners;
+   grid_wall[WALL_X0_TAG].o.polygon.vertex = x0_wall_corners;
+   grid_wall[WALL_Y1_TAG].o.polygon.vertex = y1_wall_corners;
+   grid_wall[WALL_X1_TAG].o.polygon.vertex = x1_wall_corners;
+   grid_wall[WALL_Z0_TAG].o.polygon.vertex = z0_wall_corners;
+   grid_wall[WALL_Y0_TAG].lp_properties.pm3d_color.type = TC_RGB;
+   grid_wall[WALL_X0_TAG].lp_properties.pm3d_color.type = TC_RGB;
+   grid_wall[WALL_Y1_TAG].lp_properties.pm3d_color.type = TC_RGB;
+   grid_wall[WALL_X1_TAG].lp_properties.pm3d_color.type = TC_RGB;
+   grid_wall[WALL_Z0_TAG].lp_properties.pm3d_color.type = TC_RGB;
+   grid_wall[WALL_Y0_TAG].lp_properties.pm3d_color.lt = WALL_Y_COLOR;
+   grid_wall[WALL_X0_TAG].lp_properties.pm3d_color.lt = WALL_X_COLOR;
+   grid_wall[WALL_Y1_TAG].lp_properties.pm3d_color.lt = WALL_Y_COLOR;
+   grid_wall[WALL_X1_TAG].lp_properties.pm3d_color.lt = WALL_X_COLOR;
+   grid_wall[WALL_Z0_TAG].lp_properties.pm3d_color.lt = WALL_Z_COLOR;
 #endif
 }

@@ -589,11 +589,11 @@ extern struct object default_ellipse;
 	{0, LT_BLACK, 0, DASHTYPE_SOLID, 0, 0, 1.0, 0.0, DEFAULT_P_CHAR, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}, \
 	{.polygon = {0, NULL} } }
 
-#define WALL_Y0_TAG 1
-#define WALL_X0_TAG 2
-#define WALL_Z0_TAG 3
-#define WALL_Y1_TAG 4
-#define WALL_X1_TAG 5
+#define WALL_Y0_TAG 0
+#define WALL_X0_TAG 1
+#define WALL_Y1_TAG 2
+#define WALL_X1_TAG 3
+#define WALL_Z0_TAG 4
 #define WALL_Y0_CORNERS { {graph, graph, graph, 0, 0, 0}, \
 		{graph, graph, graph, 0, 0, 1}, {graph, graph, graph, 1, 0, 1},	\
 		{graph, graph, graph, 1, 0, 0}, {graph, graph, graph, 0, 0, 0} }

@@ -4555,26 +4555,64 @@ set_obj(int tag, int obj_type)
 static void
 set_wall()
 {
+    t_object *this_object = NULL;
+
     c_token++;
     if (almost_equals(c_token, "y0")) {
-	grid_wall[0].layer = LAYER_FRONTBACK;
+	this_object = &grid_wall[WALL_Y0_TAG];
+	this_object->layer = LAYER_FRONTBACK;
 	c_token++;
     } else if (almost_equals(c_token, "x0")) {
-	grid_wall[1].layer = LAYER_FRONTBACK;
-	c_token++;
-    } else if (almost_equals(c_token, "z0")) {
-	grid_wall[2].layer = LAYER_FRONTBACK;
+	this_object = &grid_wall[WALL_X0_TAG];
+	this_object->layer = LAYER_FRONTBACK;
 	c_token++;
     } else if (almost_equals(c_token, "y1")) {
-	grid_wall[3].layer = LAYER_FRONTBACK;
+	this_object = &grid_wall[WALL_Y1_TAG];
+	this_object->layer = LAYER_FRONTBACK;
 	c_token++;
     } else if (almost_equals(c_token, "x1")) {
-	grid_wall[4].layer = LAYER_FRONTBACK;
+	this_object = &grid_wall[WALL_X1_TAG];
+	this_object->layer = LAYER_FRONTBACK;
+	c_token++;
+    } else if (almost_equals(c_token, "z0")) {
+	this_object = &grid_wall[WALL_Z0_TAG];
+	this_object->layer = LAYER_FRONTBACK;
 	c_token++;
     } else if (END_OF_COMMAND) {
-	grid_wall[0].layer = LAYER_FRONTBACK;
-	grid_wall[1].layer = LAYER_FRONTBACK;
-	grid_wall[2].layer = LAYER_FRONTBACK;
+	grid_wall[WALL_Y0_TAG].layer = LAYER_FRONTBACK;
+	grid_wall[WALL_X0_TAG].layer = LAYER_FRONTBACK;
+	grid_wall[WALL_Z0_TAG].layer = LAYER_FRONTBACK;
+    }
+
+    /* Now parse the style options */
+    while (this_object && !END_OF_COMMAND) {
+	lp_style_type lptmp;
+	int save_token = c_token;
+
+	/* fill style */
+	parse_fillstyle(&this_object->fillstyle, this_object->fillstyle.fillstyle,
+		this_object->fillstyle.filldensity, this_object->fillstyle.fillpattern,
+		this_object->fillstyle.border_color);
+
+	/* fill color */
+	if (equals(c_token,"fc") || almost_equals(c_token,"fillc$olor")) {
+	    this_object->lp_properties.l_type = LT_BLACK; /* Anything but LT_DEFAULT */
+	    parse_colorspec(&this_object->lp_properties.pm3d_color, TC_RGB);
+	    continue;
+	}
+
+	/* Line properties (for the object border if the fillstyle has one.  */
+	/* LP_NOFILL means don't eat fillcolor here since at is set by "fc". */
+	lptmp = this_object->lp_properties;
+	lp_parse(&lptmp, LP_NOFILL, FALSE);
+	if (c_token != save_token) {
+	    this_object->lp_properties.l_width = lptmp.l_width;
+	    this_object->lp_properties.d_type = lptmp.d_type;
+	    this_object->lp_properties.custom_dash_pattern = lptmp.custom_dash_pattern;
+	    continue;
+	}
+	if (c_token == save_token)
+	    int_error(c_token, "unrecognized option");
     }
 }
 #endif
