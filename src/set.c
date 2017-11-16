@@ -126,6 +126,7 @@ static void set_print __PROTO((void));
 #ifdef EAM_OBJECTS
 static void set_object __PROTO((void));
 static void set_obj __PROTO((int, int));
+static void set_wall __PROTO((void));
 #endif
 static void set_psdir __PROTO((void));
 static void set_rgbmax __PROTO((void));
@@ -448,6 +449,9 @@ set_command()
 #ifdef EAM_OBJECTS
 	case S_OBJECT:
 	    set_object();
+	    break;
+	case S_WALL:
+	    set_wall();
 	    break;
 #endif
 	case S_SAMPLES:
@@ -4463,6 +4467,11 @@ set_obj(int tag, int obj_type)
 	    this_object->layer = LAYER_BEHIND;
 	    c_token++;
 	    continue;
+	} else if (equals(c_token,"fb")) {
+	    /* Not documented.  Used by test code for grid walls */
+	    this_object->layer = LAYER_FRONTBACK;
+	    c_token++;
+	    continue;
 	} else if (almost_equals(c_token,"def$ault")) {
 	    if (tag < 0) {
 		int_error(c_token,
@@ -4541,6 +4550,32 @@ set_obj(int tag, int obj_type)
     if (got_center && got_corners)
 	int_error(NO_CARET,"Inconsistent options");
 
+}
+
+static void
+set_wall()
+{
+    c_token++;
+    if (almost_equals(c_token, "y0")) {
+	grid_wall[0].layer = LAYER_FRONTBACK;
+	c_token++;
+    } else if (almost_equals(c_token, "x0")) {
+	grid_wall[1].layer = LAYER_FRONTBACK;
+	c_token++;
+    } else if (almost_equals(c_token, "z0")) {
+	grid_wall[2].layer = LAYER_FRONTBACK;
+	c_token++;
+    } else if (almost_equals(c_token, "y1")) {
+	grid_wall[3].layer = LAYER_FRONTBACK;
+	c_token++;
+    } else if (almost_equals(c_token, "x1")) {
+	grid_wall[4].layer = LAYER_FRONTBACK;
+	c_token++;
+    } else if (END_OF_COMMAND) {
+	grid_wall[0].layer = LAYER_FRONTBACK;
+	grid_wall[1].layer = LAYER_FRONTBACK;
+	grid_wall[2].layer = LAYER_FRONTBACK;
+    }
 }
 #endif
 

@@ -93,6 +93,7 @@ static void delete_object __PROTO((struct object * prev, struct object * this));
 static void unset_style_rectangle __PROTO(());
 static void unset_style_circle __PROTO(());
 static void unset_style_ellipse __PROTO(());
+static void unset_wall __PROTO((int which));
 #endif
 static void unset_loadpath __PROTO((void));
 static void unset_locale __PROTO((void));
@@ -391,6 +392,10 @@ unset_command()
 #ifdef EAM_OBJECTS
     case S_OBJECT:
 	unset_object();
+	break;
+    case S_WALL:
+	for (i=0; i<5; i++)
+	    unset_wall(i);
 	break;
 #endif
     case S_RTICS:
@@ -1939,6 +1944,8 @@ reset_command()
     polar_grid_angle = 0;
     grid_layer = LAYER_BEHIND;
     grid_tics_in_front = FALSE;
+    for (i=0; i<5; i++)
+	unset_wall(i);
 
     SET_REFRESH_OK(E_REFRESH_NOT_OK, 0);
 
@@ -2027,5 +2034,10 @@ unset_style_ellipse()
     struct object foo = DEFAULT_ELLIPSE_STYLE;
     default_ellipse = foo;
     return;
+}
+static void
+unset_wall(int which)
+{
+    grid_wall[which].layer = LAYER_BEHIND;
 }
 #endif

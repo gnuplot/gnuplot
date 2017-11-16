@@ -496,6 +496,8 @@ main(int argc, char **argv)
 	   to properly handle keyboard input. */
 	init_encoding();
 #endif
+	init_gadgets();
+
 	/* April 2017: Now that error handling is in place, it is safe parse
 	 * GNUTERM during terminal initialization.
 	 * atexit processing is done in reverse order. We want

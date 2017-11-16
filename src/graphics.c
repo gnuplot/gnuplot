@@ -370,7 +370,7 @@ place_objects(struct object *listhead, int layer, int dimensions)
 	struct lp_style_type lpstyle;
 	struct fill_style_type *fillstyle;
 
-	if (this_object->layer != layer)
+	if (this_object->layer != layer && this_object->layer != LAYER_FRONTBACK)
 	    continue;
 
 	/* Extract line and fill style, but don't apply it yet */
@@ -458,11 +458,22 @@ place_objects(struct object *listhead, int layer, int dimensions)
 
 	case OBJ_POLYGON:
 	{
-	    do_polygon(dimensions, &this_object->o.polygon, style, this_object->clip);
+	    /* Polygons have an extra option LAYER_FRONTBACK that matches
+	     * FRONT or BACK depending on which way the polygon faces
+	     */
+	    int facing = LAYER_BEHIND;	/* This will be ignored */
+	    if (this_object->layer == LAYER_FRONTBACK) {
+		if ((layer == LAYER_FRONT) || (layer == LAYER_BACK))
+		    facing = layer;
+		else
+		    break;
+	    }
+
+	    do_polygon(dimensions, &this_object->o.polygon, style, this_object->clip, facing);
 
 	    /* Retrace the border if the style requests it */
 	    if (need_fill_border(fillstyle))
-		do_polygon(dimensions, &this_object->o.polygon, 0, this_object->clip);
+		do_polygon(dimensions, &this_object->o.polygon, 0, this_object->clip, facing);
 
 	    break;
 	}
@@ -587,7 +598,7 @@ do_plot(struct curve_points *plots, int pcount)
     if (is_plot_with_colorbox() && color_box.layer == LAYER_BACK)
 	    draw_color_smooth_box(MODE_PLOT);
 
-    /* And rectangles */
+    /* Fixed objects */
     place_objects( first_object, LAYER_BACK, 2);
 
     /* PLACE LABELS */
@@ -4342,7 +4353,7 @@ do_ellipse( int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping )
 }
 
 void
-do_polygon( int dimensions, t_polygon *p, int style, t_clip_object clip )
+do_polygon( int dimensions, t_polygon *p, int style, t_clip_object clip, int facing )
 {
     static gpiPoint *corners = NULL;
     static gpiPoint *clpcorn = NULL;
@@ -4364,6 +4375,20 @@ do_polygon( int dimensions, t_polygon *p, int style, t_clip_object clip )
 	/* Any vertex given in screen coords will disable clipping */
 	if (p->vertex[nv].scalex == screen || p->vertex[nv].scaley == screen)
 	    clip = OBJ_NOCLIP;
+    }
+
+    /* Do we require this polygon to face front or back? */
+    if (dimensions == 3 && facing >= 0) {
+	double v1[2], v2[2], cross_product;
+	v1[0] = corners[1].x - corners[0].x;
+	v1[1] = corners[1].y - corners[0].y;
+	v2[0] = corners[p->type-2].x - corners[0].x;
+	v2[1] = corners[p->type-2].y - corners[0].y;
+	cross_product = v1[0]*v2[1] - v1[1]*v2[0];
+	if (facing == LAYER_FRONT && cross_product > 0)
+	    return;
+	if (facing == LAYER_BACK && cross_product < 0)
+	    return;
     }
 
     if (clip == OBJ_NOCLIP)

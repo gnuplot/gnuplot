@@ -171,8 +171,8 @@ typedef struct object {
     struct object *next;
     int tag;
     int layer;			/* behind or back or front */
-    int object_type;		/* OBJ_RECTANGLE */
-    t_clip_object clip;         
+    int object_type;		/* e.g. OBJ_RECTANGLE */
+    t_clip_object clip;
     fill_style_type fillstyle;
     lp_style_type lp_properties;
     union o {t_rectangle rectangle; t_circle circle; t_ellipse ellipse; t_polygon polygon;} o;
@@ -447,6 +447,7 @@ extern struct pa_style parallel_axis_style;
 
 #ifdef EAM_OBJECTS
 extern struct object *first_object;
+extern struct object grid_wall[];
 #endif
 
 extern text_label title;
@@ -530,14 +531,17 @@ extern TBOOLEAN volatile_data;
 extern int current_x11_windowid;
 
 /* Plot layer definitions are collected here. */
-/* Someday they might actually be used.       */
 #define LAYER_BEHIND     -1
 #define LAYER_BACK        0
 #define LAYER_FRONT       1
 #define LAYER_FOREGROUND  2	/* not currently used */
+#define LAYER_FRONTBACK   4	/* used only by grid walls */
 #define LAYER_PLOTLABELS 99
 
 /* Functions exported by gadgets.c */
+
+/* initialization (called once on program entry */
+void init_gadgets __PROTO((void));
 
 /* moved here from util3d: */
 void draw_clip_line __PROTO((int, int, int, int));
@@ -585,6 +589,50 @@ extern struct object default_ellipse;
 	{0, LT_BLACK, 0, DASHTYPE_SOLID, 0, 0, 1.0, 0.0, DEFAULT_P_CHAR, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}, \
 	{.polygon = {0, NULL} } }
 
+#define WALL_Y0_TAG 1
+#define WALL_X0_TAG 2
+#define WALL_Z0_TAG 3
+#define WALL_Y1_TAG 4
+#define WALL_X1_TAG 5
+#define WALL_Y0_CORNERS { {graph, graph, graph, 0, 0, 0}, \
+		{graph, graph, graph, 0, 0, 1}, {graph, graph, graph, 1, 0, 1},	\
+		{graph, graph, graph, 1, 0, 0}, {graph, graph, graph, 0, 0, 0} }
+#define WALL_X0_CORNERS { {graph, graph, graph, 0, 0, 0}, \
+		{graph, graph, graph, 0, 1, 0},	{graph, graph, graph, 0, 1, 1}, \
+		{graph, graph, graph, 0, 0, 1}, {graph, graph, graph, 0, 0, 0} }
+#define WALL_Y1_CORNERS { {graph, graph, graph, 0, 1, 0}, \
+		{graph, graph, graph, 1, 1, 0}, {graph, graph, graph, 1, 1, 1},	\
+		{graph, graph, graph, 0, 1, 1}, {graph, graph, graph, 0, 1, 0} }
+#define WALL_X1_CORNERS { {graph, graph, graph, 1, 0, 0}, \
+		{graph, graph, graph, 1, 0, 1},	{graph, graph, graph, 1, 1, 1}, \
+		{graph, graph, graph, 1, 1, 0}, {graph, graph, graph, 1, 0, 0} }
+#define WALL_Z0_CORNERS { {graph, graph, graph, 0, 0, 0}, \
+		{graph, graph, graph, 1, 0, 0}, {graph, graph, graph, 1, 1, 0}, \
+		{graph, graph, graph, 0, 1, 0},	{graph, graph, graph, 0, 0, 0} }
+#define WALL_Y_COLOR 0xcdb79e
+#define WALL_X_COLOR 0x228b22
+#define WALL_Z_COLOR 0xa0b6cd
+
+#define WALL_Y0 { NULL, WALL_Y0_TAG, LAYER_FRONTBACK, OBJ_POLYGON, OBJ_CLIP, \
+	{FS_TRANSPARENT_SOLID, 50, 0, BLACK_COLORSPEC}, \
+	DEFAULT_LP_STYLE_TYPE, \
+	{.polygon = {5, NULL} } }
+#define WALL_Y1 { NULL, WALL_Y1_TAG, LAYER_FRONTBACK, OBJ_POLYGON, OBJ_CLIP, \
+	{FS_TRANSPARENT_SOLID, 50, 0, BLACK_COLORSPEC}, \
+	DEFAULT_LP_STYLE_TYPE, \
+	{.polygon = {5, NULL} } }
+#define WALL_X0 { NULL, WALL_X0_TAG, LAYER_FRONTBACK, OBJ_POLYGON, OBJ_CLIP, \
+	{FS_TRANSPARENT_SOLID, 50, 0, BLACK_COLORSPEC}, \
+	DEFAULT_LP_STYLE_TYPE, \
+	{.polygon = {5, NULL} } }
+#define WALL_X1 { NULL, WALL_X1_TAG, LAYER_FRONTBACK, OBJ_POLYGON, OBJ_CLIP, \
+	{FS_TRANSPARENT_SOLID, 50, 0, BLACK_COLORSPEC}, \
+	DEFAULT_LP_STYLE_TYPE, \
+	{.polygon = {5, NULL} } }
+#define WALL_Z0 { NULL, WALL_Z0_TAG, LAYER_FRONTBACK, OBJ_POLYGON, OBJ_CLIP, \
+	{FS_TRANSPARENT_SOLID, 50, 0, BLACK_COLORSPEC}, \
+	DEFAULT_LP_STYLE_TYPE, \
+	{.polygon = {5, NULL} } }
 #endif
 
 /* filledcurves style options set by 'set style [data|func] filledcurves opts' */

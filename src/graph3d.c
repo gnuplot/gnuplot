@@ -864,6 +864,9 @@ do_3dplot(
     if (!quick && can_pm3d && is_plot_with_colorbox() && color_box.layer == LAYER_BACK)
 	draw_color_smooth_box(MODE_SPLOT);
 
+    /* Grid walls */
+    place_objects(grid_wall, LAYER_BACK, 3);
+
     /* Add 'back' rectangles */
     place_objects(first_object, LAYER_BACK, 3);
 
@@ -1396,6 +1399,9 @@ do_3dplot(
 
     /* Add 'front' rectangles */
     place_objects(first_object, LAYER_FRONT, 3);
+
+    /* Grid walls */
+    place_objects(grid_wall, LAYER_FRONT, 3);
 
     /* PLACE LABELS */
     place_labels3d(first_label, LAYER_FRONT);

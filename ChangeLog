@@ -1,3 +1,21 @@
+2017-11-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.h src/graphics.c src/graphics.h src/set.c demo/3DBox.dem:
+	Trial implementation and demo for grid walls.
+
+	Each wall is a solid-fill areas that lies on the xy xz or yz plane in
+	a 3D plot.  I.e. it is one side of the brick that bounds the plot volume.
+	Panels use neither pm3d nor hidden3d code.  Instead they add a two-state
+	"layer" to polygon objects.  For testing purposes this is activated by
+	    "set object N polygon fb"
+	The intent should be clear from walls.dem.  Spin the view around
+	and notice that the walls do not act like normal objects.
+	
+	The intent is to control the properties (color, etc) of each wall
+	using the new command
+	    set wall {x0|y0|z0|x1|y1} {<various properties>}
+	As of this version all you can do is set/unset them
+
 2017-11-12  Dima Kogan  <dima@secretsauce.net>
 
 	* src/axis.c src/axis.h src/boundary.c src/gadgets.c src/gadgets.h

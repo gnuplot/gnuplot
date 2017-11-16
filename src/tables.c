@@ -256,6 +256,7 @@ const struct gen_table set_tbl[] =
     { "pr$int", S_PRINT },
     { "psdir", S_PSDIR },
     { "obj$ect", S_OBJECT },
+    { "wall$s", S_WALL },
     { "rgbmax", S_RGBMAX },
     { "sa$mples", S_SAMPLES },
     { "si$ze", S_SIZE },

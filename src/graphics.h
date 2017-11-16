@@ -122,7 +122,7 @@ TBOOLEAN check_for_variable_color __PROTO((struct curve_points *plot, double *co
 #ifdef EAM_OBJECTS
 void place_objects __PROTO((struct object *listhead, int layer, int dimensions));
 void do_ellipse __PROTO((int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping ));
-void do_polygon __PROTO((int dimensions, t_polygon *p, int style, t_clip_object clip ));
+void do_polygon __PROTO((int dimensions, t_polygon *p, int style, t_clip_object clip, int facing ));
 #else
 #define place_objects(listhead,layer,dimensions) /* void() */
 #endif
