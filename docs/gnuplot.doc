@@ -11426,373 +11426,6 @@ Ffigure_multiple_keys
 
  On MSDOS machines, `set output "PRN"` will direct the output to the default
  printer.  On VMS, output can be sent directly to any spooled device.
-3 parametric
-?commands set parametric
-?commands unset parametric
-?commands show parametric
-?set parametric
-?unset parametric
-?show parametric
-?parametric
-?noparametric
- The `set parametric` command changes the meaning of `plot` (`splot`) from
- normal functions to parametric functions.  The command `unset parametric`
- restores the plotting style to normal, single-valued expression plotting.
-
- Syntax:
-       set parametric
-       unset parametric
-       show parametric
-
- For 2D plotting, a parametric function is determined by a pair of parametric
- functions operating on a parameter.  An example of a 2D parametric function
- would be `plot sin(t),cos(t)`, which draws a circle (if the aspect ratio is
- set correctly---see `set size`).  `gnuplot` will display an error message if
- both functions are not provided for a parametric `plot`.
-
- For 3D plotting, the surface is described as x=f(u,v), y=g(u,v), z=h(u,v).
- Therefore a triplet of functions is required.  An example of a 3D parametric
- function would be `cos(u)*cos(v),cos(u)*sin(v),sin(u)`, which draws a sphere.
- `gnuplot` will display an error message if all three functions are not
- provided for a parametric `splot`.
-
- The total set of possible plots is a superset of the simple f(x) style plots,
- since the two functions can describe the x and y values to be computed
- separately.  In fact, plots of the type t,f(t) are equivalent to those
- produced with f(x) because the x values are computed using the identity
- function.  Similarly, 3D plots of the type u,v,f(u,v) are equivalent to
- f(x,y).
-
- Note that the order the parametric functions are specified is xfunction,
- yfunction (and zfunction) and that each operates over the common parametric
- domain.
-
- Also, the `set parametric` function implies a new range of values.  Whereas
- the normal f(x) and f(x,y) style plotting assume an xrange and yrange (and
- zrange), the parametric mode additionally specifies a trange, urange, and
- vrange.  These ranges may be set directly with `set trange`, `set urange`,
- and `set vrange`, or by specifying the range on the `plot` or `splot`
- commands.  Currently the default range for these parametric variables is
- [-5:5].  Setting the ranges to something more meaningful is expected.
-3 paxis
-?commands set paxis
-?set paxis
-?show paxis
- Syntax:
-       set paxis <axisno> {range <range-options> | tics <tic-options>}
-       show paxis <axisno> {range | tics}
- The `set paxis` command is equivalent to the `set xrange` and `set xtics`
- commands except that it acts on one of the axes p1, p2, ... used in parallel
- axis plots.  See `parallelaxes`, `set xrange`, and `set xtics`.
- The normal options to the range and tics commands are accepted although not
- all options make sense for parallel axis plots.
-3 plot
-?commands show plot
-?show plot
- The `show plot` command shows the current plotting command as it results
- from the last `plot` and/or `splot` and possible subsequent `replot` commands.
-
- In addition, the `show plot add2history` command adds this current plot
- command into the `history`. It is useful if you have used `replot` to add
- more curves to the current plot and you want to edit the whole command now.
-3 pm3d
-?commands set pm3d
-?commands show pm3d
-?set pm3d
-?show pm3d
-?pm3d
- pm3d is an `splot` style for drawing palette-mapped 3d and 4d data as
- color/gray maps and surfaces.  It uses an algorithm that allows plotting
- gridded as well as non-gridded data without preprocessing, even when the data
- scans do not have the same number of points.
-
- Syntax (the options can be given in any order):
-       set pm3d {
-                  { at <position> }
-                  { interpolate <steps/points in scan, between scans> }
-                  { scansautomatic | scansforward | scansbackward | depthorder }
-                  { flush { begin | center | end } }
-                  { ftriangles | noftriangles }
-                  { clip1in | clip4in }
-                  { corners2color
-                    { mean|geomean|harmean|rms|median|min|max|c1|c2|c3|c4 }
-                  }
-                  { {no}lighting {primary <fraction>} {specular <fraction>}}
-                  { hidden3d {<linestyle>} | nohidden3d }
-                  { implicit | explicit }
-                  { map }
-                }
-       show pm3d
-       unset pm3d
-
- A pm3d color surface is drawn if the splot command specifies `with pm3d`,  
- if the data or function `style` is set to pm3d globally, or if the pm3d mode is
- `set pm3d implicit`.  In the latter two cases, the pm3d surface is draw in
- addition to the mesh produced by the style specified in the plot command. E.g.
-       splot 'fred.dat' with lines, 'lola.dat' with lines
- would draw both a mesh of lines and a pm3d surface for each data set.
- If the option `explicit` is on (or `implicit` is off) only plots specified
- by the `with pm3d` attribute are plotted with a pm3d surface, e.g.:
-       splot 'fred.dat' with lines, 'lola.dat' with pm3d
- would plot 'fred.dat' with lines (only) and 'lola.dat' with a pm3d surface.
-
- On gnuplot start-up, the mode is `explicit`. For historical and compatibility
- reasons, the commands `set pm3d;` (i.e. no options) and `set pm3d at X ...`
- (i.e.  `at` is the first option) change the mode to `implicit`.
- The command `set pm3d;` sets other options to their default state.
-
- If you set the default data or function style to `pm3d`, e.g.:
-       set style data pm3d
- then the options `implicit` and `explicit` have no effect.
-
- Note that when plotting several plots, they are plotted in the order given
- on the command line. This can be of interest especially for filled surfaces
- which can overwrite and therefore hide part of earlier plots.
-
- The pm3d coloring can be drawn at any or all of three different positions,
- `top`, `bottom`, or `surface`. See `pm3d position`.
- The following command draws three color surfaces at different altitudes:
-       set border 4095
-       set pm3d at s
-       splot 10*x with pm3d at b, x*x-y*y, x*x+y*y with pm3d at t
-
- See also help for `set palette`, `set cbrange`, `set colorbox`, 
- and definitely the demo file `demo/pm3d.dem`.
-4 algorithm
-?pm3d algorithm
-
- Let us first describe how a map/surface is drawn.  The input data come from an
- evaluated function or from an `splot data file`.  Each surface consists of a
- sequence of separate scans (isolines).  The pm3d algorithm fills the region
- between two neighbouring points in one scan with another two points in the
- next scan by a gray (or color) according to z-values (or according to an
- additional 'color' column, see help for `using`) of these 4 corners; by default
- the 4 corner values are averaged, but this can be changed by the option
- `corners2color`.  In order to get a reasonable surface, the neighbouring scans
- should not cross and the number of points in the neighbouring scans should not
- differ too much; of course, the best plot is with scans having same number of
- points.  There are no other requirements (e.g. the data need not be gridded).
- Another advantage is that the pm3d algorithm does not draw anything outside of
- the input (measured or calculated) region.
-
- Surface coloring works with the following input data:
-
- 1. splot of function or of data file with one or three data columns: The
- gray/color scale is obtained by mapping the averaged (or `corners2color`)
- z-coordinate of the four corners of the above-specified quadrangle into the
- range [min_color_z,max_color_z] of `zrange` or `cbrange` providing a gray value
- in the range [0:1].  This value can be used directly as the gray for gray maps.
- The normalized gray value can be further mapped into a color---see `set palette`
- for the complete description.
-
- 2. splot of data file with two or four data columns: The gray/color value is
- obtained by using the last-column coordinate instead of the z-value, thus
- allowing the color and the z-coordinate be mutually independent.  This can be
- used for 4d data drawing.
-
- Other notes:
-
- 1. The term 'scan' referenced above is used more among physicists than the
- term 'iso_curve' referenced in gnuplot documentation and sources.  You measure
- maps recorded one scan after another scan, that's why.
-
- 2. The 'gray' or 'color' scale is a linear mapping of a continuous variable
- onto a smoothly varying palette of colors. The mapping is shown in a
- rectangle next to the main plot. This documentation refers to this as a
- "colorbox", and refers to the indexing variable as lying on the colorbox axis.
- See `set colorbox`, `set cbrange`.
-4 lighting
-?lighting
-?pm3d lighting
-?pm3d nolighting
-?set pm3d lighting
- By default the colors assigned to pm3d objects are not dependent on orientation
- or viewing angle. This state corresponds to `set pm3d nolighting`.
- The command `set pm3d lighting` selects a simple lighting model consisting of a
- single fixed source of illumination contributing 50% of the overall lighting.
- The strength of this light relative to the ambient illumination can be adjusted
- by `set pm3d lighting primary <fraction>`.  Inclusion of specular highlighting
- can be adjusted by setting a fractional contribution:
-      set pm3d lighting primary 0.50 specular 0.0   # no highlights
-      set pm3d lighting primary 0.50 specular 0.6   # strong highlights
-4 position
-?pm3d position
-?set pm3d position
- Color surface can be drawn at the base or top (then it is a gray/color planar
- map) or at z-coordinates of surface points (gray/color surface).  This is
- defined by the `at` option with a string of up to 6 combinations of `b`, `t`
- and `s`. For instance, `at b` plots at bottom only, `at st` plots firstly
- surface and then top map, while `at bstbst` will never by seriously used.
-
- Colored quadrangles are plotted one after another.  When plotting surfaces
- (`at s`), the later quadrangles overlap (overdraw) the previous ones.
- (Gnuplot is not virtual reality tool to calculate intersections of filled
- polygon meshes.)  You may try to switch between `scansforward` and
- `scansbackward` to force the first scan of the data to be plotted first or
- last.  The default is `scansautomatic` where gnuplot makes a guess about scans
- order.  On the other hand, the `depthorder` option completely reorders the
- quadrangles. The rendering is performed after a depth sorting, which allows to
- visualize even complicated surfaces; see `pm3d depthorder` for more details.
-4 scanorder
-?pm3d scanorder
-?pm3d depthorder
-?pm3d flush
-?pm3d ftriangles
-?set pm3d scanorder
-?set pm3d depthorder
-?set pm3d flush
-?set pm3d ftriangles
-?depthorder
-=flush
-=scansforward
-=scansbackward
-=scansautomatic
-=depthorder
-=ftriangles
- By default the quadrangles making up a pm3d solid surface are rendered in the
- order they are encountered along the surface grid points.  This order may be
- controlled by the options `scansautomatic`|`scansforward`|`scansbackward`.
- These scan options are not in general compatible with hidden-surface removal.
-
- If two successive scans do not have same number of points, then it has to be
- decided whether to start taking points for quadrangles from the beginning of
- both scans (`flush begin`), from their ends (`flush end`) or to center them
- (`flush center`).  Note, that `flush (center|end)` are incompatible with
- `scansautomatic`: if you specify `flush center` or `flush end` and
- `scansautomatic` is set, it is silently switched to `scansforward`.
-
- If two subsequent scans do not have the same number of points, the option
- `ftriangles` specifies whether color triangles are drawn at the scan tail(s)
- where there are not enough points in either of the scans. This can be used to
- draw a smooth map boundary.
-
- Gnuplot does not do true hidden surface removal for solid surfaces, but often
- it is sufficient to render the component quadrangles in order from furthest
- to closest.  This mode may be selected using the options
-       set pm3d depthorder hidden3d
- The `depthorder` option orders the solid quadrangles; the `hidden3d` option
- similarly orders the bounding lines (if drawn).  Note that the global option
- `set hidden3d` does not affect pm3d surfaces.
-
-4 clipping
-?pm3d clipping
-?set pm3d clipping
- Clipping with respect to x, y coordinates of quadrangles can be done in two
- ways.  `clip1in`: all 4 points of each quadrangle must be defined and at least
- 1 point of the quadrangle must lie in the x and y ranges.  `clip4in`: all 4
- points of each quadrangle must lie in the x and y ranges.
-
-4 color_assignment
-?pm3d color_assignment
- `3 columns of data (x,y,z)`:
-
- The coloring setup as well as the color box drawing are determined by
- `set palette`.  There can be only one palette for the current plot.  Drawing
- of several surfaces with different palettes can be achieved by `multiplot`
- with fixed `origin` and `size`; don't forget to use `set palette maxcolors`
- when your terminal is running out of available colors.
-
- There is a single gray/color value associated to each drawn pm3d quadrangle
- (it contains a solid color, not a gradient).  The value is calculated from
- z-coordinates the four corners according to `corners2color <option>`.
- `4 columns of data (x,y,z,color)`:
-
- If a fourth column of data is provided, it is normally interpreted as a 
- separate palette-mapped gray value. The coloring of individual quadrangles
- works as above, except that the color value is distinct from the z value.
- As a separate coloring option, the fourth data column may provide instead
- an RGB color. See `rgbcolor variable`. In this case the plotting command
- must be
-
-       splot ... using 1:2:3:4 with pm3d lc rgb variable
-
- Another drawing algorithm, which would draw quadrangles around a given node
- by taking corners from averaged (x,y)-coordinates of its surrounding 4 nodes
- while using node's color, could be implemented in the future. This is already
- done for drawing images (2D grids) via `image` and `rgbimage` styles.
-
- Notice that ranges of z-values and color-values for surfaces are adjustable
- independently by `set zrange`, `set cbrange`, as well as `set log` for z or
- cb.  Maps can be adjusted by the cb-axis only; see also `set view map` and
- `set colorbox`.
-4 corners2color
-?pm3d corners2color
-?set pm3d corners2color
-?corners2color
-=mean
-=geomean
-=harmean
-=median
-=min
-=max
-=rms
- The color of each quadrangle in a pm3d surface is assigned based on the color
- values of its four bounding vertices.
- The options 'mean' (default), 'geomean', 'harmean, 'rms', and 'median' produce
- various kinds of surface color smoothing, while options 'min' and 'max' choose
- minimal or maximal value, respectively. This may not be desired for pixel
- images or for maps with sharp and intense peaks, in which case the options
- 'c1', 'c2', 'c3' or 'c4' can be used instead to assign the quadrangle color
- based on the z-coordinate of only one corner.  Some experimentation may be
- needed to determine which corner corresponds to 'c1', as the orientation
- depends on the drawing direction.  Because the pm3d algorithm does not extend
- the colored surface outside the range of the input data points, the 'c<j>'
- coloring options will result in pixels along two edges of the grid not
- contributing to the color of any quadrangle.  For example, applying the pm3d
- algorithm to the 4x4 grid of data points in script `demo/pm3d.dem` (please have
- a look) produces only (4-1)x(4-1)=9 colored rectangles.
-4 border
-?set pm3d hidden3d
-?pm3d hidden3d
-?set pm3d border
-?pm3d border
- The option `set pm3d border {line-properties}` draws bounding lines around each
- quadrangle as it is rendered. Normally this is used in conjunction with the
- `depthorder` option to approximate hidden line removal.
- Note that the global option `set hidden3d` has no effect on pm3d plots.
- Default line properties (color, width) optionally follow the keyword `border`.
- These defaults can be overridden later in an splot command.
-
- Example of recommended usage:
-
-       set pm3d at s depthorder border lw 0.2 lt black
-       unset hidden3d
-       unset surf
-       splot x*x+y*y linecolor rgb "blue"   # otherwise it would be black
-
- NB: The deprecated option `set pm3d hidden3d N` is still accepted. It is 
- equivalent to `set pm3d border ls N`.
-
-4 interpolate
-?set pm3d interpolate
-?pm3d interpolate
- The option `interpolate m,n` will interpolate between grid points to generate
- a finer mesh.  For data files, this smooths the color surface and enhances the
- contrast of spikes in the surface.  When working with functions, interpolation
- makes little sense.  It would usually make more sense to increase `samples` and
- `isosamples`.
-
- For positive m and n, each quadrangle or triangle is interpolated m-times and
- n-times in the respective direction.  For negative m and n, the interpolation
- frequency is chosen so that there will be at least |m| and |n| points drawn;
- you can consider this as a special gridding function.
-
- Note: `interpolate 0,0`, will automatically choose an optimal number of
- interpolated surface points.
-
- Note: Currently color interpolation is always linear, even if corners2color
- is set to a nonlinear scheme such as the geometric mean.
-4 deprecated_options
-?set pm3d deprecated_options
-?pm3d deprecated_options
-?set pm3d map
-?pm3d map
-?map
- There used to be an option {transparent|solid} to this command.  Now
- you get the same effect from `set grid {front|layerdefault}`, respectively.
-
- The old command `set pm3d map` is equivalent to `set pm3d at b;
- set view map scale 1.0; set style data pm3d; set style func pm3d;`
 3 palette
 ?commands set palette
 ?commands show palette
@@ -12054,7 +11687,7 @@ Ffigure_multiple_keys
 ?set palette cubehelix
 ?cubehelix
  The "cubehelix" option defines a family of palettes in which color (hue) varies
- along the standard color wheel while at the same time the net intensity 
+ along the standard color wheel while at the same time the net intensity
  increases monotonically as the gray value goes from 0 to 1.
        D A Green (2011) http://arxiv.org/abs/1108.5083
  `start` defines the starting point along the color wheel in radians.
@@ -12155,6 +11788,373 @@ Ffigure_multiple_keys
      awk -f pm3dCompress.awk thefile.ps >smallerfile.ps
      awk -f pm3dConvertToImage.awk thefile.ps >smallerfile.ps
 
+3 parametric
+?commands set parametric
+?commands unset parametric
+?commands show parametric
+?set parametric
+?unset parametric
+?show parametric
+?parametric
+?noparametric
+ The `set parametric` command changes the meaning of `plot` (`splot`) from
+ normal functions to parametric functions.  The command `unset parametric`
+ restores the plotting style to normal, single-valued expression plotting.
+
+ Syntax:
+       set parametric
+       unset parametric
+       show parametric
+
+ For 2D plotting, a parametric function is determined by a pair of parametric
+ functions operating on a parameter.  An example of a 2D parametric function
+ would be `plot sin(t),cos(t)`, which draws a circle (if the aspect ratio is
+ set correctly---see `set size`).  `gnuplot` will display an error message if
+ both functions are not provided for a parametric `plot`.
+
+ For 3D plotting, the surface is described as x=f(u,v), y=g(u,v), z=h(u,v).
+ Therefore a triplet of functions is required.  An example of a 3D parametric
+ function would be `cos(u)*cos(v),cos(u)*sin(v),sin(u)`, which draws a sphere.
+ `gnuplot` will display an error message if all three functions are not
+ provided for a parametric `splot`.
+
+ The total set of possible plots is a superset of the simple f(x) style plots,
+ since the two functions can describe the x and y values to be computed
+ separately.  In fact, plots of the type t,f(t) are equivalent to those
+ produced with f(x) because the x values are computed using the identity
+ function.  Similarly, 3D plots of the type u,v,f(u,v) are equivalent to
+ f(x,y).
+
+ Note that the order the parametric functions are specified is xfunction,
+ yfunction (and zfunction) and that each operates over the common parametric
+ domain.
+
+ Also, the `set parametric` function implies a new range of values.  Whereas
+ the normal f(x) and f(x,y) style plotting assume an xrange and yrange (and
+ zrange), the parametric mode additionally specifies a trange, urange, and
+ vrange.  These ranges may be set directly with `set trange`, `set urange`,
+ and `set vrange`, or by specifying the range on the `plot` or `splot`
+ commands.  Currently the default range for these parametric variables is
+ [-5:5].  Setting the ranges to something more meaningful is expected.
+3 paxis
+?commands set paxis
+?set paxis
+?show paxis
+ Syntax:
+       set paxis <axisno> {range <range-options> | tics <tic-options>}
+       show paxis <axisno> {range | tics}
+ The `set paxis` command is equivalent to the `set xrange` and `set xtics`
+ commands except that it acts on one of the axes p1, p2, ... used in parallel
+ axis plots.  See `parallelaxes`, `set xrange`, and `set xtics`.
+ The normal options to the range and tics commands are accepted although not
+ all options make sense for parallel axis plots.
+3 plot
+?commands show plot
+?show plot
+ The `show plot` command shows the current plotting command as it results
+ from the last `plot` and/or `splot` and possible subsequent `replot` commands.
+
+ In addition, the `show plot add2history` command adds this current plot
+ command into the `history`. It is useful if you have used `replot` to add
+ more curves to the current plot and you want to edit the whole command now.
+3 pm3d
+?commands set pm3d
+?commands show pm3d
+?set pm3d
+?show pm3d
+?pm3d
+ pm3d is an `splot` style for drawing palette-mapped 3d and 4d data as
+ color/gray maps and surfaces.  It uses an algorithm that allows plotting
+ gridded as well as non-gridded data without preprocessing, even when the data
+ scans do not have the same number of points.
+
+ Syntax (the options can be given in any order):
+       set pm3d {
+                  { at <position> }
+                  { interpolate <steps/points in scan, between scans> }
+                  { scansautomatic | scansforward | scansbackward | depthorder }
+                  { flush { begin | center | end } }
+                  { ftriangles | noftriangles }
+                  { clip1in | clip4in }
+                  { corners2color
+                    { mean|geomean|harmean|rms|median|min|max|c1|c2|c3|c4 }
+                  }
+                  { {no}lighting {primary <fraction>} {specular <fraction>}}
+                  { hidden3d {<linestyle>} | nohidden3d }
+                  { implicit | explicit }
+                  { map }
+                }
+       show pm3d
+       unset pm3d
+
+ A pm3d color surface is drawn if the splot command specifies `with pm3d`,
+ if the data or function `style` is set to pm3d globally, or if the pm3d mode is
+ `set pm3d implicit`.  In the latter two cases, the pm3d surface is draw in
+ addition to the mesh produced by the style specified in the plot command. E.g.
+       splot 'fred.dat' with lines, 'lola.dat' with lines
+ would draw both a mesh of lines and a pm3d surface for each data set.
+ If the option `explicit` is on (or `implicit` is off) only plots specified
+ by the `with pm3d` attribute are plotted with a pm3d surface, e.g.:
+       splot 'fred.dat' with lines, 'lola.dat' with pm3d
+ would plot 'fred.dat' with lines (only) and 'lola.dat' with a pm3d surface.
+
+ On gnuplot start-up, the mode is `explicit`. For historical and compatibility
+ reasons, the commands `set pm3d;` (i.e. no options) and `set pm3d at X ...`
+ (i.e.  `at` is the first option) change the mode to `implicit`.
+ The command `set pm3d;` sets other options to their default state.
+
+ If you set the default data or function style to `pm3d`, e.g.:
+       set style data pm3d
+ then the options `implicit` and `explicit` have no effect.
+
+ Note that when plotting several plots, they are plotted in the order given
+ on the command line. This can be of interest especially for filled surfaces
+ which can overwrite and therefore hide part of earlier plots.
+
+ The pm3d coloring can be drawn at any or all of three different positions,
+ `top`, `bottom`, or `surface`. See `pm3d position`.
+ The following command draws three color surfaces at different altitudes:
+       set border 4095
+       set pm3d at s
+       splot 10*x with pm3d at b, x*x-y*y, x*x+y*y with pm3d at t
+
+ See also help for `set palette`, `set cbrange`, `set colorbox`,
+ and definitely the demo file `demo/pm3d.dem`.
+4 algorithm
+?pm3d algorithm
+
+ Let us first describe how a map/surface is drawn.  The input data come from an
+ evaluated function or from an `splot data file`.  Each surface consists of a
+ sequence of separate scans (isolines).  The pm3d algorithm fills the region
+ between two neighbouring points in one scan with another two points in the
+ next scan by a gray (or color) according to z-values (or according to an
+ additional 'color' column, see help for `using`) of these 4 corners; by default
+ the 4 corner values are averaged, but this can be changed by the option
+ `corners2color`.  In order to get a reasonable surface, the neighbouring scans
+ should not cross and the number of points in the neighbouring scans should not
+ differ too much; of course, the best plot is with scans having same number of
+ points.  There are no other requirements (e.g. the data need not be gridded).
+ Another advantage is that the pm3d algorithm does not draw anything outside of
+ the input (measured or calculated) region.
+
+ Surface coloring works with the following input data:
+
+ 1. splot of function or of data file with one or three data columns: The
+ gray/color scale is obtained by mapping the averaged (or `corners2color`)
+ z-coordinate of the four corners of the above-specified quadrangle into the
+ range [min_color_z,max_color_z] of `zrange` or `cbrange` providing a gray value
+ in the range [0:1].  This value can be used directly as the gray for gray maps.
+ The normalized gray value can be further mapped into a color---see `set palette`
+ for the complete description.
+
+ 2. splot of data file with two or four data columns: The gray/color value is
+ obtained by using the last-column coordinate instead of the z-value, thus
+ allowing the color and the z-coordinate be mutually independent.  This can be
+ used for 4d data drawing.
+
+ Other notes:
+
+ 1. The term 'scan' referenced above is used more among physicists than the
+ term 'iso_curve' referenced in gnuplot documentation and sources.  You measure
+ maps recorded one scan after another scan, that's why.
+
+ 2. The 'gray' or 'color' scale is a linear mapping of a continuous variable
+ onto a smoothly varying palette of colors. The mapping is shown in a
+ rectangle next to the main plot. This documentation refers to this as a
+ "colorbox", and refers to the indexing variable as lying on the colorbox axis.
+ See `set colorbox`, `set cbrange`.
+4 lighting
+?lighting
+?pm3d lighting
+?pm3d nolighting
+?set pm3d lighting
+ By default the colors assigned to pm3d objects are not dependent on orientation
+ or viewing angle. This state corresponds to `set pm3d nolighting`.
+ The command `set pm3d lighting` selects a simple lighting model consisting of a
+ single fixed source of illumination contributing 50% of the overall lighting.
+ The strength of this light relative to the ambient illumination can be adjusted
+ by `set pm3d lighting primary <fraction>`.  Inclusion of specular highlighting
+ can be adjusted by setting a fractional contribution:
+      set pm3d lighting primary 0.50 specular 0.0   # no highlights
+      set pm3d lighting primary 0.50 specular 0.6   # strong highlights
+4 position
+?pm3d position
+?set pm3d position
+ Color surface can be drawn at the base or top (then it is a gray/color planar
+ map) or at z-coordinates of surface points (gray/color surface).  This is
+ defined by the `at` option with a string of up to 6 combinations of `b`, `t`
+ and `s`. For instance, `at b` plots at bottom only, `at st` plots firstly
+ surface and then top map, while `at bstbst` will never by seriously used.
+
+ Colored quadrangles are plotted one after another.  When plotting surfaces
+ (`at s`), the later quadrangles overlap (overdraw) the previous ones.
+ (Gnuplot is not virtual reality tool to calculate intersections of filled
+ polygon meshes.)  You may try to switch between `scansforward` and
+ `scansbackward` to force the first scan of the data to be plotted first or
+ last.  The default is `scansautomatic` where gnuplot makes a guess about scans
+ order.  On the other hand, the `depthorder` option completely reorders the
+ quadrangles. The rendering is performed after a depth sorting, which allows to
+ visualize even complicated surfaces; see `pm3d depthorder` for more details.
+4 scanorder
+?pm3d scanorder
+?pm3d depthorder
+?pm3d flush
+?pm3d ftriangles
+?set pm3d scanorder
+?set pm3d depthorder
+?set pm3d flush
+?set pm3d ftriangles
+?depthorder
+=flush
+=scansforward
+=scansbackward
+=scansautomatic
+=depthorder
+=ftriangles
+ By default the quadrangles making up a pm3d solid surface are rendered in the
+ order they are encountered along the surface grid points.  This order may be
+ controlled by the options `scansautomatic`|`scansforward`|`scansbackward`.
+ These scan options are not in general compatible with hidden-surface removal.
+
+ If two successive scans do not have same number of points, then it has to be
+ decided whether to start taking points for quadrangles from the beginning of
+ both scans (`flush begin`), from their ends (`flush end`) or to center them
+ (`flush center`).  Note, that `flush (center|end)` are incompatible with
+ `scansautomatic`: if you specify `flush center` or `flush end` and
+ `scansautomatic` is set, it is silently switched to `scansforward`.
+
+ If two subsequent scans do not have the same number of points, the option
+ `ftriangles` specifies whether color triangles are drawn at the scan tail(s)
+ where there are not enough points in either of the scans. This can be used to
+ draw a smooth map boundary.
+
+ Gnuplot does not do true hidden surface removal for solid surfaces, but often
+ it is sufficient to render the component quadrangles in order from furthest
+ to closest.  This mode may be selected using the options
+       set pm3d depthorder hidden3d
+ The `depthorder` option orders the solid quadrangles; the `hidden3d` option
+ similarly orders the bounding lines (if drawn).  Note that the global option
+ `set hidden3d` does not affect pm3d surfaces.
+
+4 clipping
+?pm3d clipping
+?set pm3d clipping
+ Clipping with respect to x, y coordinates of quadrangles can be done in two
+ ways.  `clip1in`: all 4 points of each quadrangle must be defined and at least
+ 1 point of the quadrangle must lie in the x and y ranges.  `clip4in`: all 4
+ points of each quadrangle must lie in the x and y ranges.
+
+4 color_assignment
+?pm3d color_assignment
+ `3 columns of data (x,y,z)`:
+
+ The coloring setup as well as the color box drawing are determined by
+ `set palette`.  There can be only one palette for the current plot.  Drawing
+ of several surfaces with different palettes can be achieved by `multiplot`
+ with fixed `origin` and `size`; don't forget to use `set palette maxcolors`
+ when your terminal is running out of available colors.
+
+ There is a single gray/color value associated to each drawn pm3d quadrangle
+ (it contains a solid color, not a gradient).  The value is calculated from
+ z-coordinates the four corners according to `corners2color <option>`.
+ `4 columns of data (x,y,z,color)`:
+
+ If a fourth column of data is provided, it is normally interpreted as a 
+ separate palette-mapped gray value. The coloring of individual quadrangles
+ works as above, except that the color value is distinct from the z value.
+ As a separate coloring option, the fourth data column may provide instead
+ an RGB color. See `rgbcolor variable`. In this case the plotting command
+ must be
+
+       splot ... using 1:2:3:4 with pm3d lc rgb variable
+
+ Another drawing algorithm, which would draw quadrangles around a given node
+ by taking corners from averaged (x,y)-coordinates of its surrounding 4 nodes
+ while using node's color, could be implemented in the future. This is already
+ done for drawing images (2D grids) via `image` and `rgbimage` styles.
+
+ Notice that ranges of z-values and color-values for surfaces are adjustable
+ independently by `set zrange`, `set cbrange`, as well as `set log` for z or
+ cb.  Maps can be adjusted by the cb-axis only; see also `set view map` and
+ `set colorbox`.
+4 corners2color
+?pm3d corners2color
+?set pm3d corners2color
+?corners2color
+=mean
+=geomean
+=harmean
+=median
+=min
+=max
+=rms
+ The color of each quadrangle in a pm3d surface is assigned based on the color
+ values of its four bounding vertices.
+ The options 'mean' (default), 'geomean', 'harmean, 'rms', and 'median' produce
+ various kinds of surface color smoothing, while options 'min' and 'max' choose
+ minimal or maximal value, respectively. This may not be desired for pixel
+ images or for maps with sharp and intense peaks, in which case the options
+ 'c1', 'c2', 'c3' or 'c4' can be used instead to assign the quadrangle color
+ based on the z-coordinate of only one corner.  Some experimentation may be
+ needed to determine which corner corresponds to 'c1', as the orientation
+ depends on the drawing direction.  Because the pm3d algorithm does not extend
+ the colored surface outside the range of the input data points, the 'c<j>'
+ coloring options will result in pixels along two edges of the grid not
+ contributing to the color of any quadrangle.  For example, applying the pm3d
+ algorithm to the 4x4 grid of data points in script `demo/pm3d.dem` (please have
+ a look) produces only (4-1)x(4-1)=9 colored rectangles.
+4 border
+?set pm3d hidden3d
+?pm3d hidden3d
+?set pm3d border
+?pm3d border
+ The option `set pm3d border {line-properties}` draws bounding lines around each
+ quadrangle as it is rendered. Normally this is used in conjunction with the
+ `depthorder` option to approximate hidden line removal.
+ Note that the global option `set hidden3d` has no effect on pm3d plots.
+ Default line properties (color, width) optionally follow the keyword `border`.
+ These defaults can be overridden later in an splot command.
+
+ Example of recommended usage:
+
+       set pm3d at s depthorder border lw 0.2 lt black
+       unset hidden3d
+       unset surf
+       splot x*x+y*y linecolor rgb "blue"   # otherwise it would be black
+
+ NB: The deprecated option `set pm3d hidden3d N` is still accepted. It is 
+ equivalent to `set pm3d border ls N`.
+
+4 interpolate
+?set pm3d interpolate
+?pm3d interpolate
+ The option `interpolate m,n` will interpolate between grid points to generate
+ a finer mesh.  For data files, this smooths the color surface and enhances the
+ contrast of spikes in the surface.  When working with functions, interpolation
+ makes little sense.  It would usually make more sense to increase `samples` and
+ `isosamples`.
+
+ For positive m and n, each quadrangle or triangle is interpolated m-times and
+ n-times in the respective direction.  For negative m and n, the interpolation
+ frequency is chosen so that there will be at least |m| and |n| points drawn;
+ you can consider this as a special gridding function.
+
+ Note: `interpolate 0,0`, will automatically choose an optimal number of
+ interpolated surface points.
+
+ Note: Currently color interpolation is always linear, even if corners2color
+ is set to a nonlinear scheme such as the geometric mean.
+4 deprecated_options
+?set pm3d deprecated_options
+?pm3d deprecated_options
+?set pm3d map
+?pm3d map
+?map
+ There used to be an option {transparent|solid} to this command.  Now
+ you get the same effect from `set grid {front|layerdefault}`, respectively.
+
+ The old command `set pm3d map` is equivalent to `set pm3d at b;
+ set view map scale 1.0; set style data pm3d; set style func pm3d;`
 3 pointintervalbox
 ?commands set pointintervalbox
 ?set pointintervalbox
