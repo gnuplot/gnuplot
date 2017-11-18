@@ -1,3 +1,17 @@
+2017-11-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/getcolor.c src/getcolor.h src/save.c src/show.c src/tables.c
+	term/context.trm term/post.trm docs/gnuplot.doc demo/pm3dcolors.dem:
+
+	Remove vestigial implementation of YIQ colorspace.
+	The YIQ colorspace option for "set palette" was incorrectly implemented
+	back in the mists of time.  E.g. the parsing code enforces color
+	component range [0:1] but YIQ coefficients can be negative; syntax for
+	"set palette defined" is incompatible with negative values; YIQ_2_RGB
+	 uses incorrect transformation matrix.  No user interface to YIQ_2_RGB
+	was provided.  Thanks to Isao MORI <orios814@users.sf.net> for pointing
+	out the various fundamental flaws.
+
 2017-11-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	graphics.c (plot_vectors):

@@ -930,7 +930,6 @@ set origin %g,%g\n",
 	case C_MODEL_RGB: fputs( "RGB ", fp ); break;
 	case C_MODEL_HSV: fputs( "HSV ", fp ); break;
 	case C_MODEL_CMY: fputs( "CMY ", fp ); break;
-	case C_MODEL_YIQ: fputs( "YIQ ", fp ); break;
 	case C_MODEL_XYZ: fputs( "XYZ ", fp ); break;
       }
       fputs( "\nset palette ", fp );

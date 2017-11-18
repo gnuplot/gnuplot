@@ -2957,10 +2957,6 @@ make_color_model_code()
 	"  } ifelse} def\n",
 	"/Constrain {\n",
 	"  dup 0 lt {0 exch pop}{dup 1 gt {1 exch pop} if} ifelse} def\n",
-	"/YIQ2RGB {\n",
-	"  3 copy -1.702 mul exch -1.105 mul add add Constrain 4 1 roll\n",
-	"  3 copy -0.647 mul exch -0.272 mul add add Constrain 5 1 roll\n",
-	"  0.621 mul exch -0.956 mul add add Constrain 3 1 roll } def\n",
 	"/CMY2RGB {",
 	"  1 exch sub exch 1 exch sub 3 2 roll 1 exch sub 3 1 roll exch } def\n",
 	"/XYZ2RGB {",
@@ -3013,9 +3009,6 @@ write_color_space(t_sm_palette *palette)
 	break;
     case C_MODEL_CMY:
 	fputs("(CMY)", gppsfile);
-	break;
-    case C_MODEL_YIQ:
-	fputs("(YIQ)", gppsfile);
 	break;
     case C_MODEL_XYZ:
 	fputs("(XYZ)", gppsfile);
