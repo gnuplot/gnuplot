@@ -1,5 +1,4 @@
 #!/bin/bash
-# $Id: $
 #
 # Description:
 # This script is a part of gnuplot. From config.{?|??|???} files it

@@ -1,7 +1,3 @@
-/*
- * $Id: gp_types.h,v 1.73 2016/11/05 21:21:07 sfeam Exp $
- */
-
 /* GNUPLOT - gp_types.h */
 
 /*[

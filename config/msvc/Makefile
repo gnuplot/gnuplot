@@ -1,6 +1,4 @@
 #
-# $Id: Makefile,v 1.42 2017/08/15 14:24:22 markisch Exp $
-#
 # GNUPLOT Makefile Microsoft Visual C++ 2010 or newer
 
 # In order to do parallel builds you can use the nmake replacement jom,

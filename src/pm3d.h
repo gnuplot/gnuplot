@@ -1,7 +1,3 @@
-/*
- * $Id: pm3d.h,v 1.36 2016/11/29 22:56:39 sfeam Exp $
- */
-
 /* GNUPLOT - pm3d.h */
 
 /*[

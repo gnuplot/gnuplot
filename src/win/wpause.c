@@ -1,7 +1,3 @@
-/*
- * $Id: wpause.c,v 1.36 2016/05/18 08:22:30 markisch Exp $
- */
-
 /* GNUPLOT - win/wpause.c */
 /*[
  * Copyright 1992, 1993, 1998, 2004   Russell Lang

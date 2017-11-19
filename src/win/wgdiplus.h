@@ -1,8 +1,4 @@
 /*
- * $Id: wgdiplus.h,v 1.11 2016/11/18 18:06:28 markisch Exp $
- */
-
-/*
 Copyright (c) 2011 Bastian Maerkisch. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are

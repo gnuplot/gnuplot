@@ -1,7 +1,3 @@
-/*
- * $Id: boundary.h,v 1.1 2013/02/28 05:47:41 sfeam Exp $
- */
-
 #ifndef GNUPLOT_BOUNDARY_H
 # define GNUPLOT_BOUNDARY_H
 #include "syscfg.h"

@@ -1,6 +1,4 @@
 #
-# $Id: makefile.vms,v 1.16 2013/10/25 03:10:28 sfeam Exp $
-#
 # GNUPLOT Makefile for VMS
 #
 # use with the MAKE that was posted by Tony Ivanov (tony@gvgpvd.GVG.TEK.COM)

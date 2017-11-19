@@ -1,6 +1,4 @@
 #
-# $Id: airfoil.dem,v 1.9 2004/09/28 06:06:10 sfeam Exp $
-#
 # This demo shows how to use bezier splines to define NACA four
 # series airfoils and complex variables to define Joukowski
 # Airfoils.  It will be expanded after overplotting in implemented

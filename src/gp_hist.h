@@ -1,7 +1,3 @@
-/*
- * $Id: gp_hist.h,v 1.16 2016/05/25 21:28:39 markisch Exp $
- */
-
 /* GNUPLOT - gp_hist.h */
 
 /*[

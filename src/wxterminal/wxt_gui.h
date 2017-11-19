@@ -1,7 +1,3 @@
-/*
- * $Id: wxt_gui.h,v 1.59 2016/10/08 16:23:05 markisch Exp $
- */
-
 /* GNUPLOT - wxt_gui.h */
 
 /*[

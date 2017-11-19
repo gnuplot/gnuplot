@@ -1,8 +1,3 @@
-/*
- * $Id: doc2x.h,v 1.7 1999/11/15 22:23:06 lhecking Exp $
- *
- */
-
 /* GNUPLOT - doc2x.h */
 
 /*[

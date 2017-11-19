@@ -1,7 +1,3 @@
-#ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.175 2017/06/01 22:55:58 sfeam Exp $"); }
-#endif
-
 /* GNUPLOT - plot.c */
 
 /*[

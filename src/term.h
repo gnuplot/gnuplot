@@ -1,7 +1,3 @@
-/*
- * $Id: term.h,v 1.73 2017/05/22 20:36:56 sfeam Exp $
- */
-
 /* GNUPLOT - term.h */
 
 /*[

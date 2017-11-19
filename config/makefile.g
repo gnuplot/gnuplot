@@ -1,6 +1,4 @@
 #
-# $Id: makefile.g,v 1.6 2004/04/13 17:23:30 broeker Exp $
-#
 # GNUPLOT Makefile for GRASS, a geographic information system. 
 #
 # To compile, make modifications below (if necessary) then

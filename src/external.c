@@ -1,6 +1,3 @@
-/*
- * $Id: external.c,v 1.2 2016/05/08 13:19:44 markisch Exp $
- */
 /* GNUPLOT - external.c */
 
 /*[

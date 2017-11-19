@@ -1,7 +1,4 @@
 /*
- * $Id: jitter.c,v 1.3 2015/10/29 19:24:55 sfeam Exp $
- */
-/*
  * This file contains routines used to support the "set jitter" option.
  * This plot mode was inspired by the appearance of "beeswarm" plots produced
  * by R, but I do not know to what extent the algorithms used are the same.

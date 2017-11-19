@@ -1,7 +1,3 @@
-/*
- * $Id: command.h,v 1.71 2016/02/07 22:15:36 sfeam Exp $
- */
-
 /* GNUPLOT - command.h */
 
 /*[

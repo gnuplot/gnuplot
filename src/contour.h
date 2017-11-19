@@ -1,7 +1,3 @@
-/*
- * $Id: contour.h,v 1.8 2004/07/01 17:10:04 broeker Exp $
- */
-
 /* GNUPLOT - contour.h */
 
 /*[

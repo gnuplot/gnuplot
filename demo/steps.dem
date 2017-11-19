@@ -1,6 +1,3 @@
-#
-# $Id: $
-#
 # This file will serve as the datafile used in demonstrating the 
 # "plot with steps" option.   Here is a gnuplot input file
 # which uses "plot with steps", inverse error function, normal

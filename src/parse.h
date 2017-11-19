@@ -1,7 +1,3 @@
-/*
- * $Id: parse.h,v 1.39 2017/04/19 06:20:45 sfeam Exp $
- */
-
 /* GNUPLOT - parse.h */
 
 /*[

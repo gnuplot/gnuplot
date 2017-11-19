@@ -1,7 +1,3 @@
-/*
- * $Id: wtext.h,v 1.20 2016/08/09 11:46:46 markisch Exp $
- */
-
 /* GNUPLOT - win/wtext.h */
 
 /*[

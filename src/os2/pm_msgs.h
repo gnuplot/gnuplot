@@ -1,7 +1,3 @@
-/*
- * $Id: pm_msgs.h,v 1.3 2005/08/07 09:43:33 mikulik Exp $
- */
-
 /* GNUPLOT - pm_msgs.h */
 
 /*[

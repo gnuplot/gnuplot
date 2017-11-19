@@ -1,7 +1,3 @@
-/*
- * $Id: wxt_term.h,v 1.29 2015/07/13 17:54:44 sfeam Exp $
- */
-
 /* GNUPLOT - wxt_term.h */
 
 /*[

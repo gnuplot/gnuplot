@@ -1,7 +1,3 @@
-/*
- * $Id: interpol.h,v 1.10 2015/06/26 20:51:18 sfeam Exp $
- */
-
 /* GNUPLOT - interpol.h */
 
 /*[

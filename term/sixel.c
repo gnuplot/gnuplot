@@ -1,6 +1,4 @@
 /*
-   $Id: sixel.c,v 1.4 2017/07/14 19:16:29 sfeam Exp $
-
    This code was originally written by kmiya@culti and obtained as a
    tar archive sixel.tar.gz dated 06-Dec-2014 from
    http://nanno.dip.jp/softlib/man/rlogin/#REGWIND

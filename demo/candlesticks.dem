@@ -1,7 +1,3 @@
-#
-# $Id: candlesticks.dem,v 1.4 2005/03/30 06:02:45 sfeam Exp $
-#
-
 reset
 #
 set xrange [0:11]

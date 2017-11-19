@@ -1,7 +1,3 @@
-/*
- * $Id: getcolor.h,v 1.10 2010/10/06 00:19:50 sfeam Exp $
- */
-
 /* GNUPLOT - getcolor.h */
 
 /* Routines + constants for mapping interval [0,1] into another [0,1] to be

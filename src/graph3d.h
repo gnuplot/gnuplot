@@ -1,7 +1,3 @@
-/*
- * $Id: graph3d.h,v 1.53 2016/11/05 21:21:07 sfeam Exp $
- */
-
 /* GNUPLOT - graph3d.h */
 
 /*[

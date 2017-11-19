@@ -1,6 +1,4 @@
 #
-# $Id: bivariat.dem,v 1.8 2006/07/06 21:52:19 sfeam Exp $
-#
 # This demo is very slow and requires unusually large stack size.
 # Do not attempt to run this demo under MSDOS.
 #

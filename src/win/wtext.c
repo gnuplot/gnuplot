@@ -1,7 +1,3 @@
-/*
- * $Id: wtext.c,v 1.75 2017/01/06 16:07:20 markisch Exp $
- */
-
 /* GNUPLOT - win/wtext.c */
 /*[
  * Copyright 1992, 1993, 1998, 2004   Russell Lang

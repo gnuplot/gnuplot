@@ -1,7 +1,3 @@
-/*
- * $Id: matrix.h,v 1.12 2013/06/02 14:50:24 markisch Exp $
- */
-
 /* GNUPLOT - matrix.h */
 
 /*  NOTICE: Change of Copyright Status

@@ -1,6 +1,3 @@
-#
-# $Id: vector.dem,v 1.12 2009/10/31 05:24:18 sfeam Exp $
-#
 # This file demonstrates
 # -1- saving contour lines as a gnuplottable datablock
 # -2- plotting a vector field on the same graph

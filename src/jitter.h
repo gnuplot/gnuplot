@@ -1,6 +1,3 @@
-/*
- * $Id: jitter.h,v 1.0 2015/09/13 19:30:52 sfeam Exp $
- */
 #ifndef GNUPLOT_JITTER_H
 # define GNUPLOT_JITTER_H
 

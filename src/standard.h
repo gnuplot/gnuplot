@@ -1,7 +1,3 @@
-/*
- * $Id: standard.h,v 1.12 2008/03/30 03:03:48 sfeam Exp $
- */
-
 /* GNUPLOT - standard.h */
 
 /*[

@@ -1,7 +1,3 @@
-/*
- * $Id: tables.h,v 1.105 2017/09/11 20:13:24 sfeam Exp $
- */
-
 /* GNUPLOT - tables.h */
 
 /*[

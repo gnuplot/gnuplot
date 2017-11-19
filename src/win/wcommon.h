@@ -1,7 +1,3 @@
-/*
- * $Id: wcommon.h,v 1.32 2017/06/24 09:15:38 markisch Exp $
- */
-
 /* GNUPLOT - wcommon.h */
 
 /*[

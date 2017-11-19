@@ -1,7 +1,3 @@
-/*
- * $Id: datafile.h,v 1.54 2017/07/20 18:04:18 sfeam Exp $
- */
-
 /* GNUPLOT - datafile.h */
 
 /*[

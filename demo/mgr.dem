@@ -1,6 +1,3 @@
-#
-# $Id: mgr.dem,v 1.11 2016/11/05 22:07:21 sfeam Exp $
-#
 print "Watch some  cubic splines"
 set samples 50
 set xlabel "Angle (deg)"

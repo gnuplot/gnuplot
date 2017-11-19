@@ -1,7 +1,3 @@
-/*
- * $Id: national.h,v 1.4 2000/10/31 19:59:31 joze Exp $
- */
-
 /* GNUPLOT - national.h */
 
 /*[

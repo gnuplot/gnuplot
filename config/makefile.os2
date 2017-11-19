@@ -1,6 +1,4 @@
 #
-# $Id: makefile.os2,v 1.56 2014/12/28 13:10:42 markisch Exp $
-#
 # GNUPLOT Makefile for use on OS/2 2.x (and above)
 # using emx 0.9 (and above) and GNU make
 #

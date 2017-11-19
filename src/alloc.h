@@ -1,7 +1,3 @@
-/*
- * $Id: alloc.h,v 1.13 2014/04/04 19:11:17 sfeam Exp $
- */
-
 /* GNUPLOT - alloc.h */
 
 /*[

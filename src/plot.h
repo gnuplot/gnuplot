@@ -1,7 +1,3 @@
-/*
- * $Id: plot.h,v 1.55 2014/01/04 02:55:06 markisch Exp $
- */
-
 /* GNUPLOT - plot.h */
 
 /*[

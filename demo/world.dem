@@ -1,7 +1,3 @@
-#
-# $Id: world.dem,v 1.11 2014/10/05 00:33:15 sfeam Exp $
-#
-#
 set title "Gnuplot Correspondences\ngeographic coordinate system"
 unset key
 set xrange [-180:180]

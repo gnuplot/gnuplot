@@ -1,7 +1,3 @@
-/*
- * $Id: tabulate.h,v 1.3 2017/07/20 18:04:18 sfeam Exp $
- */
-
 /* GNUPLOT - tabulate.h */
 
 #ifndef GNUPLOT_TABULATE_H

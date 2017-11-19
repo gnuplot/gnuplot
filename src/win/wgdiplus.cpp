@@ -1,8 +1,4 @@
 /*
- * $Id: wgdiplus.cpp,v 1.69 2017/07/31 19:30:19 markisch Exp $
- */
-
-/*
 Copyright (c) 2011-2017 Bastian Maerkisch. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,

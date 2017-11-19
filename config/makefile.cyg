@@ -1,8 +1,5 @@
 # Hey, Emacs, this is a -*- Makefile -*-
 #
-# $Id: makefile.cyg,v 1.37 2013/06/24 13:45:12 markisch Exp $
-#
-#
 # GNUPLOT Makefile for Cygwin on WinNT and Win95/98/2000
 #
 # To compile gnuplot for WinXX:

@@ -1,7 +1,3 @@
-#ifndef lint
-static char *RCSid() { return RCSid("$Id: termdoc.c,v 1.14 2004/04/13 17:23:36 broeker Exp $"); }
-#endif
-
 /* GNUPLOT - termdoc.c */
 
 /*[

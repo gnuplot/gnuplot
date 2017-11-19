@@ -1,6 +1,3 @@
-#
-# $Id: polar.dem,v 1.8 2010/11/19 05:15:03 sfeam Exp $
-#
 # Various ways of plotting functions in polar coordinates
 #
 unset border

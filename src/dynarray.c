@@ -1,7 +1,3 @@
-#ifndef lint
-static char *RCSid() { return RCSid("$Id: dynarray.c,v 1.12 2015/04/23 20:10:02 sfeam Exp $"); }
-#endif
-
 /*[
  * Copyright 1999, 2004   Hans-Bernhard Broeker
  *

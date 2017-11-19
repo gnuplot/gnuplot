@@ -1,6 +1,4 @@
 /*
- * $Id$
- *
  * Redirect C++ output streams to wgnuplot text window
  * (Caveat: does not compile with OpenWatcom)
  *

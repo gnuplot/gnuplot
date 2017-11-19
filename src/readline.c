@@ -1,7 +1,3 @@
-#ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.77 2017/05/20 16:43:19 markisch Exp $"); }
-#endif
-
 /* GNUPLOT - readline.c */
 
 /*[

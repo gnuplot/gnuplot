@@ -1,7 +1,3 @@
-/*
- * $Id: misc.h,v 1.41 2014/04/25 00:22:23 sfeam Exp $
- */
-
 /* GNUPLOT - misc.h */
 
 /*[

@@ -1,8 +1,4 @@
 /*
- * $Id: wd2d.h,v 1.6 2017/06/27 19:06:11 markisch Exp $
- */
-
-/*
 Copyright (c) 2017 Bastian Maerkisch. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are

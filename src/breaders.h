@@ -1,7 +1,3 @@
-/*
- * $Id: breaders.h,v 1.4 2008/03/14 02:56:22 sfeam Exp $
- */
-
 /* GNUPLOT - binedf.h */
 
 /*[

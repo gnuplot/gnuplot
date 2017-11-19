@@ -35,12 +35,6 @@
   This software is provided "as is" without express or implied warranty
   to the extent permitted by applicable law.
 
-
-
-  $Date: 2015/12/31 21:03:49 $
-  $Author: sfeam $
-  $Rev: 100 $
-
 ]]--
 
 
@@ -80,9 +74,9 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
-pgf.REVISION = string.sub("$Rev: 102 $",7,-3)
-pgf.REVISION_DATE = string.gsub("$Date: 2016/07/22 21:03:49 $",
-                                "$Date: ([0-9]+).([0-9]+).([0-9]+) .*","%1/%2/%3")
+-- pgf.REVISION = string.sub("$Rev: 102 $",7,-3)
+-- pgf.REVISION_DATE = string.gsub("$Date: 2016/07/22 21:03:49 $",
+--                                "$Date: ([0-9]+).([0-9]+).([0-9]+) .*","%1/%2/%3")
 
 pgf.styles = {}
 

@@ -1,6 +1,3 @@
-#
-# $Id: stat.inc,v 1.2 2001/09/18 11:12:05 lhecking Exp $
-#
 # Library of Statistical Functions version 3.0
 #
 # Copyright (c) 1991, 1992 Jos van der Woude, jvdwoude@hut.nl

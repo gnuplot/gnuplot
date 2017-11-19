@@ -1,7 +1,3 @@
-/*
- * $Id: readline.h,v 1.11 2008/12/12 21:06:13 sfeam Exp $
- */
-
 /* GNUPLOT - readline.h */
 
 /*[

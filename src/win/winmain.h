@@ -1,7 +1,3 @@
-/*
- * $Id: winmain.h,v 1.20 2016/08/06 13:22:50 markisch Exp $
- */
-
 /* GNUPLOT - win/winmain.h */
 
 /*[

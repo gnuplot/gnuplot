@@ -1,7 +1,3 @@
-#ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.257 2017/04/01 21:03:11 sfeam Exp $"); }
-#endif
-
 #define MOUSE_ALL_WINDOWS 1
 
 /* GNUPLOT - gplt_x11.c */

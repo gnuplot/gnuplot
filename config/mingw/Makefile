@@ -1,5 +1,4 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.87 2017/10/06 07:28:39 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 #

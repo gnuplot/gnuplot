@@ -1,7 +1,3 @@
-/*
- * $Id: screenbuf.h,v 1.3 2016/05/06 13:17:24 markisch Exp $
- */
-
 /* GNUPLOT - screenbuf.h */
 
 /*

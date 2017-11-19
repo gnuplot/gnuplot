@@ -1,7 +1,3 @@
-/*
- * $Id: internal.h,v 1.26 2016/02/07 22:15:36 sfeam Exp $
- */
-
 /* GNUPLOT - internal.h */
 
 /*[

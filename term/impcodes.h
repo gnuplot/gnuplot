@@ -1,7 +1,3 @@
-/*
- * $Id: impcodes.h,v 1.1.1.1 1998/04/15 19:16:49 lhecking Exp $
- */
-
 /* This file is used only by imagen.trm */
 
 /*

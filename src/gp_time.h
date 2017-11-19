@@ -1,7 +1,3 @@
-/*
- * $Id: gp_time.h,v 1.9 2013/04/05 18:36:53 sfeam Exp $
- */
-
 /* GNUPLOT - gp_time.h */
 
 /*[

@@ -1,6 +1,4 @@
-/* Hello, Emacs, this is -*-C-*-
- * $Id: vgagl.trm,v 1.23 2013/08/24 03:33:35 sfeam Exp $
- */
+/* Hello, Emacs, this is -*-C-*- */
 
 #if defined(USE_MOUSE)
 /* GNUPLOT - vgagl.trm */

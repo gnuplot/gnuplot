@@ -1,7 +1,3 @@
-/*
- * $Id: wprinter.c,v 1.25 2017/01/21 14:40:45 markisch Exp $
- */
-
 /* GNUPLOT - win/wprinter.c */
 /*[
  * Copyright 1992, 1993, 1998, 2004   Maurice Castro, Russell Lang

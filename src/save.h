@@ -1,7 +1,3 @@
-/*
- * $Id: save.h,v 1.29 2016/07/23 03:34:41 sfeam Exp $
- */
-
 /* GNUPLOT - save.h */
 
 /*[

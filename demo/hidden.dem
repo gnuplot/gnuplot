@@ -1,6 +1,4 @@
 #
-# $Id: hidden.dem,v 1.6 2003/10/17 15:02:21 mikulik Exp $
-#
 #
 set samples 20
 set isosamples 20

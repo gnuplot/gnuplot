@@ -1,7 +1,3 @@
-/*
- * $Id: gp_cairo.c,v 1.101 2017/07/24 07:54:55 markisch Exp $
- */
-
 /* GNUPLOT - gp_cairo.c */
 
 /*[
