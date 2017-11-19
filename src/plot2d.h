@@ -1,7 +1,3 @@
-/*
- * $Id: plot2d.h,v 1.21 2017/02/19 19:11:07 sfeam Exp $
- */
-
 /* GNUPLOT - plot2d.h */
 
 /*[

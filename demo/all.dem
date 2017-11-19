@@ -1,6 +1,3 @@
-#
-# $Id: all.dem,v 1.79 2017/01/11 04:13:58 sfeam Exp $
-#
 # Executes all demos (OK, MOST demos) in this directory.
 # This serves as a series of unit tests for non-interactive capabilities.
 #

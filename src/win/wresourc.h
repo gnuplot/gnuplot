@@ -1,7 +1,3 @@
-/*
- * $Id: wresourc.h,v 1.22 2016/08/10 17:52:27 markisch Exp $
- */
-
 /* GNUPLOT - win/wresourc.h */
 
 /*[

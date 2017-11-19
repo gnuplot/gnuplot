@@ -1,7 +1,3 @@
-/*
- * $Id: stats.h,v 1.5 2009/11/15 18:34:44 v923z Exp $
- */
-
 /* GNUPLOT - stats.h */
 
 #ifndef GNUPLOT_STAT_H

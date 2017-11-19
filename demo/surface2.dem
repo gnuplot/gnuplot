@@ -1,6 +1,3 @@
-#
-# $Id: surface2.dem,v 1.3 1999/06/10 20:01:46 lhecking Exp $
-#
 set parametric
 set isosamples 50,10
 set hidden

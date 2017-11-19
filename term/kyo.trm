@@ -1,7 +1,4 @@
-/* Hello, Emacs, this is -*-C-*-
- * $Id: kyo.trm,v 1.11 2006/07/07 03:51:22 sfeam Exp $
- *
- */
+/* Hello, Emacs, this is -*-C-*- */
 
 /* Prescribe (KYOCERA) driver - Michael Waldor */
 

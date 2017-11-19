@@ -1,7 +1,3 @@
-/*
- * $Id$
- */
-
 /* GNUPLOT - gp_cairo_helpers.h */
 
 /*[

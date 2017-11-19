@@ -1,6 +1,3 @@
-#
-# $Id: simple.dem,v 1.5 2011/08/19 21:01:41 sfeam Exp $
-#
 # Requires data files "[123].dat" from this directory,
 # so change current working directory to this directory before running.
 # gnuplot> set term <term-type>

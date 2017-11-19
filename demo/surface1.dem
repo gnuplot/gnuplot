@@ -1,6 +1,3 @@
-#
-# $Id: surface1.dem,v 1.14 2016/11/14 19:59:23 sfeam Exp $
-#
 set title "3D surface from a grid (matrix) of Z values"
 set xrange [-0.5:4.5]
 set yrange [-0.5:4.5]

@@ -1,7 +1,3 @@
-/*
- * $Id: color.h,v 1.39 2013/09/25 22:21:26 sfeam Exp $
- */
-
 /* GNUPLOT - color.h */
 
 /* invert the gray for negative figure (default is positive) */

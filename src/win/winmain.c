@@ -1,7 +1,3 @@
-/*
- * $Id: winmain.c,v 1.104 2017/09/01 05:21:01 markisch Exp $
- */
-
 /* GNUPLOT - win/winmain.c */
 /*[
  * Copyright 1992, 1993, 1998, 2004   Maurice Castro, Russell Lang

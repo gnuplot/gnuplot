@@ -1,5 +1,4 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.21 2017/08/03 05:57:28 markisch Exp $
 #
 # GNUPLOT Makefile OpenWatcom 1.3 on Win32
 

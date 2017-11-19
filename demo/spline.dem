@@ -1,6 +1,4 @@
 #
-# $Id: spline.dem,v 1.5 2003/10/28 05:35:54 sfeam Exp $
-#
 # Some curve plotting using common cubic polynomial basis function for cagd.
 #
 #				Gershon Elber, Aug. 1992

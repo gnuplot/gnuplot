@@ -1,7 +1,3 @@
-/*
- * $Id: gp_cairo.h,v 1.21 2013/05/19 23:46:34 sfeam Exp $
- */
-
 /* GNUPLOT - gp_cairo.h */
 
 /*[

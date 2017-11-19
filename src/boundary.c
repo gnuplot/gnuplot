@@ -1,7 +1,3 @@
-/*
- * $Id: boundary.c,v 1.51 2017/09/10 21:41:52 sfeam Exp $
- */
-
 /* GNUPLOT - boundary.c */
 
 /*[

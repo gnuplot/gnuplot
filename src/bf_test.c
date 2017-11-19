@@ -1,8 +1,3 @@
-#ifndef lint
-static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.13 2014/08/22 04:12:18 sfeam Exp $"); }
-#endif
-
-
 /*
  * This program creates some binary data files used by the demo
  * binary.dem to exercise gnuplot's binary input routines.

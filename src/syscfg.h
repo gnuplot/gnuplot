@@ -1,7 +1,3 @@
-/*
- * $Id: syscfg.h,v 1.65 2017/07/29 08:35:44 markisch Exp $
- */
-
 /* GNUPLOT - syscfg.h */
 
 /*[

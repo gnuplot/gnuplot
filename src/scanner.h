@@ -1,7 +1,3 @@
-/*
- * $Id: scanner.h,v 1.7 2011/06/19 22:10:37 sfeam Exp $
- */
-
 /* GNUPLOT - scanner.h */
 
 /*[

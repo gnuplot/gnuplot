@@ -1,8 +1,3 @@
-/*
- * $Id: xref.h,v 1.3 2000/11/02 19:05:10 lhecking Exp $
- *
- */
-
 /* GNUPLOT - xref.h */
 
 /*[

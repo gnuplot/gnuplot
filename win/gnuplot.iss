@@ -1,7 +1,5 @@
 ﻿;
 
-; $Id: gnuplot.iss,v 1.17 2017/06/20 19:29:42 sfeam Exp $
-
 ;
 
 ; GNUPLOT - gnuplot.iss

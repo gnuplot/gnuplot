@@ -1,6 +1,3 @@
-#
-# $Id: contours.dem,v 1.17 2013/06/27 19:37:13 sfeam Exp $
-#
 set samples 20
 set isosamples 21
 set xlabel "X axis"

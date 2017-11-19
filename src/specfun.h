@@ -1,7 +1,3 @@
-/*
- * $Id: specfun.h,v 1.12 2013/05/08 03:57:54 markisch Exp $
- */
-
 /* GNUPLOT - specfun.h */
 
 /*[

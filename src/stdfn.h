@@ -1,7 +1,3 @@
-/*
- * $Id: stdfn.h,v 1.57 2017/07/29 08:48:07 markisch Exp $
- */
-
 /* GNUPLOT - stdfn.h */
 
 /*[

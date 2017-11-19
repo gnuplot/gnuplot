@@ -1,7 +1,3 @@
-/*
- * $Id: wgnuplib.h,v 1.97 2017/07/08 11:20:13 markisch Exp $
- */
-
 /* GNUPLOT - win/wgnuplib.h */
 
 /*[

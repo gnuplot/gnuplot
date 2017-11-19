@@ -1,7 +1,3 @@
-#ifndef lint
-static char *RCSid() { return RCSid("$Id: wgnuplib.c,v 1.13 2017/01/06 16:07:19 markisch Exp $"); }
-#endif
-
 /* GNUPLOT - win/wgnuplib.c */
 /*[
  * Copyright 1992, 1993, 1998, 2004   Russell Lang

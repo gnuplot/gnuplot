@@ -1,7 +1,3 @@
-/*
- * $Id: dynarray.h,v 1.6 2001/02/15 18:13:23 broeker Exp $
- */
-
 /* GNUPLOT - dynarray.h */
 
 /*[

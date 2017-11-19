@@ -1,6 +1,3 @@
-#
-# $Id: mousevariables.dem,v 1.7 2005/01/12 00:34:09 sfeam Exp $
-#
 # Demonstrate use of user variables 
 # MOUSE_BUTTON MOUSE_X MOUSE_Y MOUSE_X2 MOUSE_Y2
 # and built-in function exists("<varname>")

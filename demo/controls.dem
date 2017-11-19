@@ -1,6 +1,4 @@
 #
-# $Id: controls.dem,v 1.2 1999/08/17 15:31:54 lhecking Exp $
-#
 # warning:  this demo is SLOW on PCs without math coprocessors!
 #
 # From _Automatic_Control_Systems_, fourth ed., figure 6-14

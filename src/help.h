@@ -1,7 +1,3 @@
-/*
- * $Id: help.h,v 1.7 2000/11/01 18:57:32 broeker Exp $
- */
-
 /* GNUPLOT - help.h */
 
 /*[

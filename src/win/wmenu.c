@@ -1,7 +1,3 @@
-/*
- * $Id: wmenu.c,v 1.40 2017/01/21 14:41:55 markisch Exp $Id: wmenu.c,v 1.40 2017/01/21 14:41:55 markisch Exp $
- */
-
 /* GNUPLOT - win/wmenu.c */
 /*[
  * Copyright 1992, 1993, 1998, 2004   Maurice Castro, Russell Lang

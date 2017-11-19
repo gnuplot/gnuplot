@@ -1,7 +1,3 @@
-/*
- * $Id: fit.h,v 1.31 2015/02/26 18:43:58 sfeam Exp $
- */
-
 /* GNUPLOT - fit.h */
 
 /*  NOTICE: Change of Copyright Status

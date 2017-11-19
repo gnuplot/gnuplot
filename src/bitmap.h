@@ -1,7 +1,3 @@
-/*
- * $Id: bitmap.h,v 1.13 2004/04/13 17:23:52 broeker Exp $
- */
-
 /* GNUPLOT - bitmap.h */
 
 /*[

@@ -1,6 +1,4 @@
 # Hey, Emacs, this is a -*- Makefile -*- #
-# $Id: Makefile,v 1.10 2014/08/18 03:49:06 sfeam Exp $
-#
 #
 # GNUPLOT Makefile for Cygwin on WinNT and Win95/98/2000
 #

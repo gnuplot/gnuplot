@@ -1,7 +1,3 @@
-/*
- * $Id: eval.h,v 1.51 2016/09/19 04:40:30 sfeam Exp $
- */
-
 /* GNUPLOT - eval.h */
 
 /*[

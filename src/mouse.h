@@ -1,7 +1,3 @@
-/*
- * $Id: mouse.h,v 1.25 2014/04/28 21:16:13 sfeam Exp $
- */
-
 /* GNUPLOT - mouse.h */
 
 /*[

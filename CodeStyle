@@ -1,5 +1,3 @@
-$Id: CodeStyle,v 1.9 2001/02/01 17:56:04 broeker Exp $
-
 The following things have be observed when writing new code for gnuplot:
 (this file is currently under construction)  Some of the following is
 just personal bug-bears, so dont take any offense if something I

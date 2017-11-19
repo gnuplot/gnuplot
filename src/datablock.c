@@ -1,6 +1,3 @@
-/*
- * $Id: datablock.c,v 1.8 2016/03/18 05:43:54 sfeam Exp $
- */
 /* GNUPLOT - datablock.c */
 
 /*[

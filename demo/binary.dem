@@ -1,6 +1,3 @@
-#
-# $Id: binary.dem,v 1.4 1999/11/08 19:19:11 lhecking Exp $
-#
 set style data lines
 set hidden3d
 set title "Hidden line removal of explicit binary surfaces"

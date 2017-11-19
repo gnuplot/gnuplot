@@ -1,7 +1,3 @@
-/*
- * $Id: wgraph.c,v 1.275 2017/08/15 13:39:22 markisch Exp $
- */
-
 /* GNUPLOT - win/wgraph.c */
 /*[
  * Copyright 1992, 1993, 1998, 2004   Maurice Castro, Russell Lang

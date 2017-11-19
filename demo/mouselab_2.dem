@@ -1,6 +1,4 @@
 #
-# $Id: mouselab_2.dem,v 1.0 2006/06/22 00:34:09 sfeam Exp $
-#
 # Wait for keystroke in plot window
 #
 pause mouse key

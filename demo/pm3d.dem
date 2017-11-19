@@ -1,6 +1,3 @@
-#
-# $Id: pm3d.dem,v 1.21 2011/10/08 00:07:40 sfeam Exp $
-#
 # demo for pm3d splotting
 #
 # This demo can be directly used if your default terminal supports pm3d, 

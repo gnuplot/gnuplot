@@ -1,7 +1,3 @@
-#ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.204 2017/08/01 01:07:20 sfeam Exp $"); }
-#endif
-
 /* GNUPLOT - mouse.c */
 
 /* driver independent mouse part. */

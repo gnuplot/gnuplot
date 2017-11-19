@@ -1,7 +1,3 @@
-/*
- * $Id: graphics.h,v 1.73 2017/09/11 20:13:24 sfeam Exp $
- */
-
 /* GNUPLOT - graphics.h */
 
 /*[

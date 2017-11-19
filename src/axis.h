@@ -1,8 +1,3 @@
-/*
- * $Id: axis.h,v 1.179 2017/09/29 19:02:23 sfeam Exp $
- *
- */
-
 /*[
  * Copyright 2000, 2004   Thomas Williams, Colin Kelley
  *

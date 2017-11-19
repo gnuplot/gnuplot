@@ -1,7 +1,3 @@
-/*
- * $Id: util.h,v 1.53 2017/07/07 00:02:33 sfeam Exp $
- */
-
 /* GNUPLOT - util.h */
 
 /*[

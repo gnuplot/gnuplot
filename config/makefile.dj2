@@ -1,5 +1,4 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.dj2,v 1.23 2014/09/23 22:09:16 sfeam Exp $
 #
 # GNUPLOT Makefile for DJGPP version 2 on DOS
 #
@@ -10,8 +9,6 @@
 #
 # AUTHORS : several ... including Edzer Pebesma <pebesma@metoor.frw.uva.nl>
 #           last mod. by Hans-Bernhard Broeker <broeker@physik.rwth-aachen.de>
-# DATE of last mod: $Date: 2014/09/23 22:09:16 $
-#
 # 
 # removed atari reference and added binary demo bf_test
 # cleaned up the building of doc and binary test files

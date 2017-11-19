@@ -1,7 +1,3 @@
-/*
- * $Id: variable.h,v 1.17 2008/03/18 00:16:33 sfeam Exp $
- */
-
 /* GNUPLOT - variable.h */
 
 /*[

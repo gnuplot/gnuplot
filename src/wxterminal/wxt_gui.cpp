@@ -1,7 +1,3 @@
-/*
- * $Id: wxt_gui.cpp,v 1.169 2017/03/02 01:22:07 sfeam Exp $
- */
-
 /* GNUPLOT - wxt_gui.cpp */
 
 /*[

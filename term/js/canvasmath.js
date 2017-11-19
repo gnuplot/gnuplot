@@ -1,6 +1,3 @@
-/*
- * $Id: canvasmath.js,v 1.10 2012/11/16 03:47:31 sfeam Exp $
- */
 // The canvastext.js code was released to the public domain by Jim Studt, 2007.
 // He may keep some sort of up to date copy at http://www.federated.com/~jim/canvastext/
 // Mar 2009 Ethan A Merritt (EAM) Modify code to work in non-ascii environments.

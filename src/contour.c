@@ -1,7 +1,3 @@
-#ifndef lint
-static char *RCSid() { return RCSid("$Id: contour.c,v 1.36 2017/06/15 05:36:03 sfeam Exp $"); }
-#endif
-
 /* GNUPLOT - contour.c */
 
 /*[

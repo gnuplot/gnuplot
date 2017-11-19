@@ -1,7 +1,3 @@
-#ifndef lint
-static char *RCSid() { return RCSid("$Id: gpexecute.c,v 1.17 2010/08/31 12:57:32 mikulik Exp $"); }
-#endif
-
 /* GNUPLOT - gpexecute.c */
 
 /*[

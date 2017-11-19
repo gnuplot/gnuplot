@@ -1,7 +1,3 @@
-#
-# $Id: multiaxis.dem,v 1.1 2007/06/09 07:54:32 mikulik Exp $
-#
-
 # Use the 3rd plot of the electronics demo to show off
 # the use of multiple x and y axes in the same plot.
 # 

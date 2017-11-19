@@ -1,7 +1,3 @@
-/*
- * $Id: post.h,v 1.11 2010/03/18 04:52:53 sfeam Exp $
- */
-
 /* GNUPLOT - post.h */
 
 /*[

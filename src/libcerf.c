@@ -1,7 +1,4 @@
 /*
- * $Id: libcerf.c,v 1.0 2013/07/12 18:11:05 sfeam Exp $
- */
-/*
  * Complex error function (cerf) and related special functions from libcerf.
  * libcerf itself uses the C99 _Complex mechanism for decribing complex
  * numbers.  This set of wrapper routines converts back and forth from 

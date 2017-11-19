@@ -1,7 +1,3 @@
-#ifndef lint
-static char *RCSid() { return RCSid("$Id: matrix.c,v 1.13 2014/02/28 10:20:53 markisch Exp $"); }
-#endif
-
 /*  NOTICE: Change of Copyright Status
  *
  *  The author of this module, Carsten Grammes, has expressed in
