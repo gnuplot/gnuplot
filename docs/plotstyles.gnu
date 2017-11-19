@@ -634,6 +634,24 @@ set xtics font ",6"  offset 0,1
 set label 1 font ",10"
 set key font ",9" spacing 0.5
 load demo . 'custom_key.dem'
+reset
+#
+# zerrorfill demo with walls to give added depth
+set output out . 'figure_walls' . ext
+set view 60, 30, 1., 1.5
+set yrange [0.5:5.5]
+set zrange [1:*]
+set log z
+set border 127
+
+set wall x0
+set wall y1
+set wall z0
+set xyplane 0
+unset key
+
+splot for [k=1:5] 'silver.dat' using 1:(k):2:3 with zerror lt black fc lt k title "k = ".k
+reset
 
 # Fence plot
 reset

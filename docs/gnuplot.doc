@@ -13596,6 +13596,26 @@ Ffigure_multiple_keys
  The `set urange` and `set vrange` commands set the parametric ranges used
  to compute x, y, and z values when in `splot` parametric mode.
  Please see `set xrange` for details.
+3 walls
+?commands set walls
+?set walls
+?unset walls
+?walls
+ Syntax:
+      set walls
+      set wall {x0|y0|z0|x1|y1} {<fillstyle>} {fc <fillcolor>}
+
+Ffigure_walls
+ 3D surfaces drawn by `splot` lie within a normalized unit cube regardless
+ of the x y and z axis ranges. The bounding walls of this cube are described by
+ the planes (graph coord x == 0), (graph coord x == 1), etc.  The `set walls`
+ command renders the walls x0 y0 and z0 as solid surfaces.  By default these
+ surfaces are semi-transparent (fillstyle transparent solid 0.5).  You can 
+ customize which walls are drawn and also their individual color and fill style.
+ If you choose to enable walls, you may also want to use `set xyplane 0`.
+ Example:
+
+      set wall z0 solid 1.0 fillcolor "gray"
 3 x2data
 ?commands set x2data
 ?commands show x2data
