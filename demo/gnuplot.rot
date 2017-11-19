@@ -1,5 +1,12 @@
+# HBB: revised open-ended animation routine. Used to just turn
+# round and round by somewhat large steps. Now, it tumbles
+# back and forth smoothly.
+# If 'limit_iterations' is set to a nonzero value, it'll stop after that
+# many iterations (iteration_count=0 has to be set before this
+# script is called)
 zrot=(zrot+10)%360
 xrot=(xrot+17)%180
-set view xrot,zrot
+set view (50.+30.*sin(xrot/180.*pi)),60.+45.*sin(zrot/180.*pi)
 replot
-reread
+iteration_count=iteration_count+1
+if ((!limit_iterations) || (iteration_count<=limit_iterations)) reread
