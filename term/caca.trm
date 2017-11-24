@@ -195,6 +195,7 @@ static caca_canvas_t * CACA_suspend_cv = NULL;
 static TBOOLEAN CACA_windowed = FALSE; /* graphics output in different window*/
 static TBOOLEAN CACA_exportonly = FALSE; /* no output to screen but to file */
 static TBOOLEAN CACA_processing_events = FALSE; /* flag processing of events in CACA_text() */
+static TBOOLEAN CACA_nosuspend; /* no suspend for null and raw drivers */
 #ifdef _WIN32
 static unsigned CACA_codepage = 0;
 static unsigned TMP_codepage;
@@ -442,6 +443,12 @@ CACA_options()
 					}
 				}
 
+				/* raw and null drivers may not _suspend() */
+				if (strcmp(CACA_driver, "null") == 0 || strcmp(CACA_driver, "raw") == 0)
+					CACA_nosuspend = TRUE;
+				else
+					CACA_nosuspend = FALSE;
+
 				if (CACA_exportonly)
 					term->flags &= ~TERM_NO_OUTPUTFILE;
 				else
@@ -571,7 +578,7 @@ CACA_refresh(void)
 {
 	CACA_HYPERTEXT * hypertext = CACA_hypertext_list;
 
-	if ((CACA_dp == NULL) || CACA_exportonly)
+	if ((CACA_dp == NULL) || (CACA_cv == NULL) || CACA_exportonly)
 		return;
 
 	/* copy graph to screen canvas */
@@ -682,13 +689,13 @@ CACA_check_resize()
 {
 	caca_event_t ev;
 
-	if ((CACA_dp == NULL) || CACA_exportonly)
+	if ((CACA_dp == NULL) || (CACA_cv == NULL) || CACA_exportonly)
 		return;
 
 	if (caca_get_event(CACA_dp, CACA_EVENT_RESIZE, &ev, 100)) {
 		FPRINTF((stderr, "CACA: resize event detected in check_resize().\n"));
-		term->xmax = CACA_xmax = caca_get_event_resize_width(&ev) - 1;
-		term->ymax = CACA_ymax = caca_get_event_resize_height(&ev) - 1 - CACA_status_height;
+		term->xmax = CACA_xmax = GPMAX(caca_get_event_resize_width(&ev) - 1, 1);
+		term->ymax = CACA_ymax = GPMAX(caca_get_event_resize_height(&ev) - 1 - CACA_status_height, 1);
 		caca_set_canvas_size(CACA_cv, term->xmax + 1, term->ymax + 1);
 		CACA_update_options();
 		CACA_refresh();
@@ -696,8 +703,8 @@ CACA_check_resize()
 	           (caca_get_canvas_height(CACA_screen_cv) != term->ymax + 1 + CACA_status_height)) {
 		/* Did we miss a resize event? */
 		FPRINTF((stderr, "CACA: missed resize event in check_resize().\n"));
-		term->xmax = CACA_xmax = caca_get_canvas_width(CACA_screen_cv) - 1;
-		term->ymax = CACA_ymax = caca_get_canvas_height(CACA_screen_cv) - 1 - CACA_status_height;
+		term->xmax = CACA_xmax = GPMAX(caca_get_canvas_width(CACA_screen_cv) - 1, 1);
+		term->ymax = CACA_ymax = GPMAX(caca_get_canvas_height(CACA_screen_cv) - 1 - CACA_status_height, 1);
 		caca_set_canvas_size(CACA_cv, term->xmax + 1, term->ymax + 1);
 		CACA_update_options();
 		CACA_refresh();
@@ -750,8 +757,10 @@ CACA_init_display(void)
 		caca_set_display_title(CACA_dp,
 			(CACA_title != NULL) ? CACA_title : "gnuplot: caca terminal");
 		CACA_screen_cv = caca_get_canvas(CACA_dp);
-		term->xmax = CACA_xmax = caca_get_canvas_width(CACA_screen_cv) - 1;
-		term->ymax = CACA_ymax = caca_get_canvas_height(CACA_screen_cv) - 1 - CACA_status_height;
+		term->xmax = CACA_xmax = GPMAX(caca_get_canvas_width(CACA_screen_cv) - 1, 1);
+		term->ymax = CACA_ymax = GPMAX(caca_get_canvas_height(CACA_screen_cv) - 1 - CACA_status_height, 1);
+		if (CACA_xmax <= 1 || CACA_ymax <= 1)
+			int_error(NO_CARET, "caca:  canvas too small");
 		CACA_update_options();
 
 		if ((strcmp(CACA_driver, "x11") == 0) || (strcmp(CACA_driver, "ncurses") == 0)) {
@@ -801,7 +810,9 @@ CACA_init_display(void)
 	FPRINTF((stderr, "CACA_driver = %s, truecolor = %i\n", CACA_driver, CACA_truecolor));
 
 	CACA_cv = caca_create_canvas(term->xmax + 1, term->ymax + 1);
-	caca_set_color_ansi(CACA_cv, !CACA_inverted ? CACA_BLACK : CACA_WHITE, CACA_background);
+	if (CACA_cv != NULL) {
+		caca_set_color_ansi(CACA_cv, !CACA_inverted ? CACA_BLACK : CACA_WHITE, CACA_background);
+	}
 }
 
 
@@ -891,11 +902,14 @@ CACA_graphics()
 TERM_PUBLIC void
 CACA_text()
 {
+	if (CACA_cv == NULL)
+		return;
+
 	if (CACA_dp != NULL)
 		CACA_refresh();
 #ifdef USE_MOUSE
 	process_event(GE_plotdone, 0, 0, 0, 0, 0);
-	if (!CACA_windowed && !CACA_processing_events && !CACA_exportonly) {
+	if (!CACA_windowed && !CACA_processing_events && !CACA_exportonly && !CACA_nosuspend) {
 		/* NOTE: This is a hack to force a call to _graphics() before redrawing.
 		   The vgagl terminal uses the very same trick. */
 		term_graphics = FALSE;
@@ -916,8 +930,10 @@ CACA_text()
 #else
 		void * data = caca_export_memory(CACA_cv, CACA_driver, &bytes);
 #endif
-		fwrite(data, 1, bytes, gpoutfile);
-		free(data);
+		if (data != NULL) {
+			fwrite(data, 1, bytes, gpoutfile);
+			free(data);
+		}
 	}
 #if defined(_WIN32) && !defined(WGP_CONSOLE)
 	/* Raise the console (graph!) window. Beware: */
@@ -938,17 +954,24 @@ static void
 CACA_close_display(void)
 {
 	/* make a copy of the current canvas */
-	if (CACA_dp != NULL) {
-		if (!CACA_windowed) {
+	if ((CACA_dp != NULL) || (CACA_cv != NULL)) {
+		if (!CACA_windowed && !CACA_nosuspend) {
 			if (CACA_suspend_cv != NULL)
 				caca_free_canvas(CACA_suspend_cv);
 			CACA_suspend_cv = caca_create_canvas(CACA_xmax + 1, CACA_ymax + 1 + CACA_status_height);
-			caca_blit(CACA_suspend_cv, 0, 0, CACA_cv, NULL);
+			if (CACA_cv != NULL && CACA_suspend_cv != NULL)
+				caca_blit(CACA_suspend_cv, 0, 0, CACA_cv, NULL);
+
 		}
-		caca_free_canvas(CACA_cv);
-		caca_set_display_title(CACA_dp, "gnuplot");
-		caca_free_display(CACA_dp);
-		CACA_dp = NULL;
+		if (CACA_cv != NULL) {
+			caca_free_canvas(CACA_cv);
+			CACA_cv = NULL;
+		}
+		if (CACA_dp != NULL) {
+			caca_set_display_title(CACA_dp, "gnuplot");
+			caca_free_display(CACA_dp);
+			CACA_dp = NULL;
+		}
 #ifdef _WIN32
 		if (strcmp(CACA_driver, "win32") == 0) {
 #ifndef WGP_CONSOLE
@@ -974,7 +997,7 @@ CACA_close_display(void)
 TERM_PUBLIC void
 CACA_suspend(void)
 {
-	if (CACA_exportonly)
+	if (CACA_exportonly || CACA_nosuspend)
 		return;
 
 	CACA_text();
@@ -986,7 +1009,7 @@ CACA_suspend(void)
 TERM_PUBLIC void
 CACA_resume(void)
 {
-	if (CACA_exportonly)
+	if (CACA_exportonly || CACA_nosuspend)
 		return;
 
 	if (CACA_dp == NULL) {
@@ -1983,8 +2006,9 @@ CACA_process_events(void)
 					break;
 				}
 				case CACA_EVENT_RESIZE: {
-					term->xmax = CACA_xmax = caca_get_event_resize_width(&ev) - 1;
-					term->ymax = CACA_ymax = caca_get_event_resize_height(&ev) - 1 - CACA_status_height;
+					term->xmax = CACA_xmax = GPMAX(caca_get_event_resize_width(&ev) - 1, 1);
+					term->ymax = CACA_ymax = GPMAX(caca_get_event_resize_height(&ev) - 1 - CACA_status_height, 1);
+
 					CACA_update_options();
 					CACA_zoom_or_replot = TRUE;
 					process_event(GE_replot, 0, 0, 0, 0, 0);
