@@ -19,6 +19,10 @@
 	the first keypress after closing the window.
 	Bugfix.
 
+	* term/caca.trm:  Simple bold / italic font support. libcaca supports
+	theses attributes currently only for ncurses, html, html3, bbfr, and
+	troff.
+
 2017-12-25  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* .gitattributes:  ChangeLogs are prone to merge errors.  The GNU tool
