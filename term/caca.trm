@@ -777,6 +777,13 @@ CACA_init_display(void)
 		}
 #ifdef WIN32
 		if (strcmp(CACA_driver, "win32") == 0) {
+			/* Disable quick-edit mode to enable mouse input */
+			HANDLE h = GetStdHandle(STD_INPUT_HANDLE);
+			DWORD mode;
+
+			GetConsoleMode(h, &mode);
+			SetConsoleMode(h, (mode & ~ENABLE_QUICK_EDIT_MODE) | ENABLE_EXTENDED_FLAGS);
+
 			/* On CJK Windows we change the codepage. Not sure why this
 			   solves the display problems, but apparently it works. See bug #1361. */
 			if ((TMP_codepage = GetConsoleOutputCP()) == 932
@@ -2010,7 +2017,6 @@ CACA_process_events(void)
 				case CACA_EVENT_RESIZE: {
 					term->xmax = CACA_xmax = GPMAX(caca_get_event_resize_width(&ev) - 1, 1);
 					term->ymax = CACA_ymax = GPMAX(caca_get_event_resize_height(&ev) - 1 - CACA_status_height, 1);
-
 					CACA_update_options();
 					CACA_zoom_or_replot = TRUE;
 					process_event(GE_replot, 0, 0, 0, 0, 0);

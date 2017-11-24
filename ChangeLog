@@ -8,6 +8,9 @@
 	segfaults when using the raw and null drivers.  Still these won't
 	produce any useful output.
 
+	* term/caca.trm (CACA_init_display):  On Windows, disable the
+	console's quick edit mode to directly enable mouse interaction.
+
 2017-12-25  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* .gitattributes:  ChangeLogs are prone to merge errors.  The GNU tool
