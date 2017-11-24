@@ -206,6 +206,7 @@ static char CACA_pen;		/* current character used to draw point symbols */
 static int CACA_x = -1;		/* current X position */
 static int CACA_y = -1;		/* current Y position */
 static int CACA_ang = 0;	/* current text angle */
+static uint32_t CACA_next_text_attr = 0;	/* next text attribute (bold/italic support) */
 
 /* newpath/closepath support */
 static TBOOLEAN CACA_in_path = FALSE;
@@ -1539,6 +1540,9 @@ CACA_put_text(unsigned int x, unsigned int y, const char *str)
 	if (CACA_skipplot && !CACA_keysample)
 		return;
 
+	if (CACA_next_text_attr != 0)
+		caca_set_attr(CACA_cv, CACA_next_text_attr);
+
 	if (CACA_ang == 0) {
 		/* Speed up the default case. */
 		int len = CACA_put_str(CACA_cv, x, CACA_ymax - y, text);
@@ -1649,6 +1653,11 @@ CACA_put_text(unsigned int x, unsigned int y, const char *str)
 			CACA_update_keybox(CACA_plotno, x, y);
 			CACA_update_keybox(CACA_plotno, xmax, ymax);
 		}
+	}
+
+	if (CACA_next_text_attr != 0) {
+		caca_unset_attr(CACA_cv, CACA_next_text_attr);
+		CACA_next_text_attr = 0;
 	}
 
 	if (text != str)
@@ -2565,6 +2574,21 @@ CACA_modify_plots(unsigned int operations, int plotno)
 }
 
 
+TERM_PUBLIC int
+CACA_set_font(const char *font)
+{
+	if (font == NULL || *font == NUL) {
+		CACA_next_text_attr = 0;
+	} else {
+		/* bold, italic */
+		TBOOLEAN isbold = (strstr(font, ":Bold") != NULL);
+		TBOOLEAN isitalic = (strstr(font, ":Italic") != NULL);
+		CACA_next_text_attr = (isbold ? CACA_BOLD : 0) | (isitalic ? CACA_ITALICS : 0);
+	}
+	return TRUE;
+}
+
+
 /* -------------------------------------------------------------------------
    The "enhanced text" code below is a modified copy of the dumb terminal's
    code written by Ethan Merritt. See dumb.trm for Copyright on this section.
@@ -2611,8 +2635,14 @@ CACA_enhanced_open(
 			CACA_enhanced_overprint = overprint;
 		/* widthflag FALSE means do not update text position after printing */
 			CACA_enhanced_widthflag = widthflag;
-		/* Many drivers will need to do something about font selection here */
-		/* but this driver cannot do anything about it. */
+		/* bold, italic */
+		if (fontname == NULL || *fontname == NUL) {
+			CACA_next_text_attr = 0;
+		} else {
+			TBOOLEAN isbold = (strstr(fontname, ":Bold") != NULL);
+			TBOOLEAN isitalic = (strstr(fontname, ":Italic") != NULL);
+			CACA_next_text_attr = (isbold ? CACA_BOLD : 0) | (isitalic ? CACA_ITALICS : 0);
+		}
 	}
 }
 
@@ -2635,7 +2665,13 @@ CACA_enhanced_flush()
 	/* print the string fragment, perhaps invisibly */
 	/* NB: base expresses offset from current y pos */
 	if (CACA_enhanced_show) {
+		if (CACA_next_text_attr != 0)
+			caca_set_attr(CACA_cv, CACA_next_text_attr);
 		CACA_put_str(CACA_cv, CACA_x, CACA_ymax - (int)(CACA_y + CACA_enhanced_base), str);
+		if (CACA_next_text_attr != 0) {
+			caca_unset_attr(CACA_cv, CACA_next_text_attr);
+			CACA_next_text_attr = 0;
+		}
 #ifdef EAM_BOXED_TEXT
 		if (CACA_boxedtext.boxed) {
 			if (CACA_boxedtext.box.left > CACA_x)
@@ -3362,7 +3398,7 @@ TERM_TABLE_START(caca)
 	CACA_text, null_scale, CACA_graphics,
 	CACA_move, CACA_vector,
 	CACA_linetype, CACA_enhanced_put_text, CACA_text_angle, null_justify_text,
-	CACA_point, CACA_arrow, set_font_null, NULL /* pointsize */,
+	CACA_point, CACA_arrow, CACA_set_font, NULL /* pointsize */,
 	TERM_NO_OUTPUTFILE | TERM_CAN_MULTIPLOT | TERM_BINARY | TERM_ENHANCED_TEXT,
 	CACA_suspend, CACA_resume, CACA_fillbox, NULL /* linewidth */,
 #ifdef USE_MOUSE

@@ -25,6 +25,10 @@
 	the first keypress after closing the window.
 	Bugfix.
 
+	* term/caca.trm:  Simple bold / italic font support. libcaca supports
+	theses attributes currently only for ncurses, html, html3, bbfr, and
+	troff.
+
 2017-11-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.h src/graphics.c src/graphics.h src/set.c demo/3DBox.dem:
