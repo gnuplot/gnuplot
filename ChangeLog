@@ -1,5 +1,11 @@
 2017-12-25  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* term/caca.trm:  The raw and null libcaca drivers don't do anything
+	useful for us.  So don't include them in the list of available drivers
+	shown to the user.
+
+2017-12-25  Bastian Maerkisch  <bmaerkisch@web.de>
+
 	* .gitattributes:  ChangeLogs are prone to merge errors.  The GNU tool
 	 git-merge-changelog has been developed to avoid that and is likely
 	 available in most distributions.  Caveat is that git committers now
