@@ -4,6 +4,10 @@
 	useful for us.  So don't include them in the list of available drivers
 	shown to the user.
 
+	* term/caca.trm:  Various range and null pointer checks to avoid
+	segfaults when using the raw and null drivers.  Still these won't
+	produce any useful output.
+
 2017-12-25  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* .gitattributes:  ChangeLogs are prone to merge errors.  The GNU tool
