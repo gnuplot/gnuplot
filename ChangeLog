@@ -3,6 +3,13 @@
 	* .gitattributes src/os2/4allterm.cmd:  Enforce EOL style or treatment
 	as binary for certain file types.
 
+
+2017-11-24  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* term/caca.trm:  The raw and null libcaca drivers don't do anything
+	useful for us.  So don't include them in the list of available drivers
+	shown to the user.
+
 2017-11-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.h src/graphics.c src/graphics.h src/set.c demo/3DBox.dem:
