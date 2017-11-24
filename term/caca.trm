@@ -2106,8 +2106,8 @@ CACA_waitforinput(int options)
 			return getchar();
 	}
 
-	/* We get here only if the window was closed, e.g. via pressing the 'q' key. */
-	if (CACA_windowed && loop == CACA_quit)
+	/* We get here only if the window was closed previously, e.g. via pressing the 'q' key. */
+	if (CACA_dp == NULL || loop == CACA_quit)
 		return getchar();
 
 	return EOF;
@@ -3475,9 +3475,6 @@ START_HELP(caca)
 "?caca bugs",
 " The `caca` terminal has known bugs and limitations:",
 "",
-" Closing the terminal window by clicking the \"X\" on the title line",
-" does not work correctly. Press \"q\" to close the window.",
-"",
 " Unicode support depends on the driver and the terminal.",
 " Bright background colors may cause blinking.",
 " Modifier keys are not supported for mousing, see `term caca`.",
@@ -3494,6 +3491,8 @@ START_HELP(caca)
 " Illegal utf8 sequences might lead to an endless loop in `libcaca` (now",
 " fixed upstream).",
 " Resizing of Windows console window does not work correctly due to a bug in libcaca.",
+" Closing the terminal window by clicking the \"X\" on the title line",
+" will terminate wgnuplot. Press \"q\" to close the window.",
 " Changing the input focus to the text input window when pressing <space> does",
 " not work reliably in wgnuplot."
 END_HELP(caca)

@@ -20,6 +20,11 @@
 	* term/caca.trm (CACA_process_events):  Failed to change internal
 	canvas size on window resize.  Bugfix.
 
+	* term/caca.trm (CACA_waitforinput):  Correct the check if the caca
+	driver window was closed.  This bug would cause gnuplot to exit on
+	the first keypress after closing the window.
+	Bugfix.
+
 2017-11-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.h src/graphics.c src/graphics.h src/set.c demo/3DBox.dem:
