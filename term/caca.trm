@@ -3438,7 +3438,8 @@ START_HELP(caca)
 " Syntax:",
 "       set terminal caca {{driver | format} {default | <driver> | list}}",
 "                         {color | monochrome}",
-"                         {{no}inverted} {{no}enhanced}",
+"                         {{no}inverted}",
+"                         {enhanced | noenhanced}",
 "                         {background <rgb color>}",
 "                         {title \"<plot window title>\"}",
 "                         {size <width>,<height>}",
@@ -3524,13 +3525,9 @@ START_HELP(caca)
 "",
 " Alignment of enhanced text is wrong if it contains utf8 characters.",
 " gnuplot dies when running from a script when using the \"ncurses\" driver.",
-" Illegal utf8 sequences might lead to an endless loop in `libcaca` (now",
-" fixed upstream).",
 " Resizing of Windows console window does not work correctly due to a bug in libcaca.",
 " Closing the terminal window by clicking the \"X\" on the title line",
-" will terminate wgnuplot. Press \"q\" to close the window.",
-" Changing the input focus to the text input window when pressing <space> does",
-" not work reliably in wgnuplot."
+" will terminate wgnuplot. Press \"q\" to close the window."
 END_HELP(caca)
 #endif /* TERM_HELP */
 
