@@ -2017,6 +2017,7 @@ CACA_process_events(void)
 				case CACA_EVENT_RESIZE: {
 					term->xmax = CACA_xmax = GPMAX(caca_get_event_resize_width(&ev) - 1, 1);
 					term->ymax = CACA_ymax = GPMAX(caca_get_event_resize_height(&ev) - 1 - CACA_status_height, 1);
+					caca_set_canvas_size(CACA_cv, term->xmax + 1, term->ymax + 1);
 					CACA_update_options();
 					CACA_zoom_or_replot = TRUE;
 					process_event(GE_replot, 0, 0, 0, 0, 0);
@@ -3494,7 +3495,7 @@ START_HELP(caca)
 " gnuplot dies when running from a script when using the \"ncurses\" driver.",
 " Illegal utf8 sequences might lead to an endless loop in `libcaca` (now",
 " fixed upstream).",
-" Resizing of x11 windows does not work on some systems.",
+" Resizing of Windows console window does not work correctly due to a bug in libcaca.",
 " Changing the input focus to the text input window when pressing <space> does",
 " not work reliably in wgnuplot."
 END_HELP(caca)
