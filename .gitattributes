@@ -1,0 +1,17 @@
+# *nix shell script
+*.sh	text eol=lf
+# Windows installer file
+*.iss	text eol=crlf
+# OS/2 command files
+*.cmd	text eol=crlf
+# binaries in demo directory
+*.edf	binary
+*.rgb	binary
+*.bin	binary
+# assets
+*.pdf	binary
+*.ico	binary
+*.cur	binary
+*.png	binary
+*.ptr	binary
+

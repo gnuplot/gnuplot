@@ -1,3 +1,8 @@
+2017-12-23  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* .gitattributes src/os2/4allterm.cmd:  Enforce EOL style or treatment
+	as binary for certain file types.
+
 2017-12-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c:  Only terminate polygon with "closepath" if it is
