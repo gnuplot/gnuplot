@@ -1,3 +1,8 @@
+2017-11-25  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* .gitattributes src/os2/4allterm.cmd:  Enforce EOL style or treatment
+	as binary for certain file types.
+
 2017-11-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.h src/graphics.c src/graphics.h src/set.c demo/3DBox.dem:
