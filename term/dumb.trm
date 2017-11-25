@@ -52,6 +52,9 @@
  *   Bastian Maerkisch Nov 2016
  *	ANSI color support.  Filled polygons.
  *
+ *   Bastian Maerkisch Jul 2021
+ *	Filled boxes.
+ *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
  */
@@ -882,12 +885,33 @@ DUMB_set_color(t_colorspec *colorspec)
 #endif
 
 
+TERM_PUBLIC void
+dumb_fillbox(int style, unsigned int x, unsigned int y, unsigned int w, unsigned int h)
+{
+    char save_pen;
+    unsigned ny;
+
+    /* temporarily change pen */
+    save_pen = dumb_pen;
+    dumb_pen = DUMB_FILL_CONST;
+
+    for (ny = y; ny < y + GPMAX(h, 1); ny++) {
+	DUMB_move(x, ny);
+	DUMB_vector(x + GPMAX(w, 1) - 1, ny);
+    }
+
+    /* restore pen */
+    dumb_pen = save_pen;
+}
+
+
 static int
 dumb_float_compare(const void * elem1, const void * elem2)
 {
-	int val = *(float *)elem1 - *(float *)elem2;
-	return (0 < val) - (val < 0);
+    int val = *(float *)elem1 - *(float *)elem2;
+    return (0 < val) - (val < 0);
 }
+
 
 /* adopted copy from caca.trm */
 TERM_PUBLIC void
@@ -975,7 +999,6 @@ dumb_filled_polygon(int points, gpiPoint *corners)
     dumb_pen = save_pen;
 }
 
-
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -987,9 +1010,9 @@ TERM_TABLE_START(dumb_driver)
     DUMB_text, null_scale, DUMB_graphics, DUMB_move, DUMB_vector,
     DUMB_linetype, DUMB_put_text, null_text_angle,
     null_justify_text, DUMB_point, DUMB_arrow, set_font_null,
-    0,				/* pointsize */
+    NULL,				/* pointsize */
     TERM_CAN_MULTIPLOT,
-    NULL, NULL, NULL, NULL,
+    NULL, NULL, dumb_fillbox, NULL,
 #ifdef USE_MOUSE
     NULL, NULL, NULL, NULL, NULL,
 #endif
