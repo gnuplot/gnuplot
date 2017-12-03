@@ -14,4 +14,5 @@
 *.cur	binary
 *.png	binary
 *.ptr	binary
-
+# merge driver for ChangeLogs
+ChangeLog	merge=merge-changelog

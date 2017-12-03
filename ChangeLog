@@ -1,3 +1,11 @@
+2017-12-03  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* .gitattributes:  ChangeLogs are prone to merge errors.  The GNU tool
+	 git-merge-changelog has been developed to avoid that and is likely
+	 available in most distributions.  Caveat is that git committers now
+	 need it to be installed and configured, see e.g.,
+	 https://gnu.wildebeest.org/blog/mjw/2012/03/16/automagically-merging-changelog-files-with-mercurial-or-git/
+
 2017-12-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/caca.trm (CACA_text):  Test for input redirection.  Resolves
