@@ -23,6 +23,8 @@
 	theses attributes currently only for ncurses, html, html3, bbfr, and
 	troff.
 
+	* term/caca.trm:  Add an emacs type modeline.
+
 2017-12-25  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* .gitattributes:  ChangeLogs are prone to merge errors.  The GNU tool
