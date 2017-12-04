@@ -25,6 +25,10 @@
 
 	* term/caca.trm:  Add an emacs type modeline.
 
+	* term/caca.trm (CACA_text):  Test for input redirection.  Resolves
+	hang with slang/ncurses drivers in
+	    gnuplot -e "load 'simple.dem'" < /bin/true
+
 2017-12-25  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* .gitattributes:  ChangeLogs are prone to merge errors.  The GNU tool
