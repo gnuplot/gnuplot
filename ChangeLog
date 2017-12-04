@@ -1,3 +1,10 @@
+2017-12-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.c term/svg.trm:  Create a new path for each polygon.
+	In particular this provides a chance for a change in line properties
+	to take effect.
+	Bug #1995
+
 2017-11-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/getcolor.c src/getcolor.h src/save.c src/show.c src/tables.c

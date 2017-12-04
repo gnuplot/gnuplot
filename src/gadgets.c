@@ -280,6 +280,8 @@ draw_clip_polygon(int points, gpiPoint *p)
     if (!pos1) /* move to first point if it is inside */
 	(*t->move)(x1, y1);
 
+    newpath();
+
     for (i = 1; i < points; i++) {
 	x2 = p[i].x;
 	y2 = p[i].y;
@@ -304,6 +306,8 @@ draw_clip_polygon(int points, gpiPoint *p)
 	if (!(clip_ret == 0 && pos2 == 0))
 	    pos1 = pos2;
     }
+
+    closepath();
 }
 
 void
