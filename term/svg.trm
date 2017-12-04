@@ -1634,23 +1634,27 @@ SVG_set_color(t_colorspec *colorspec)
     SVG_alpha = 0.0;
 
     if (colorspec->type == TC_LT) {
-	SVG_linecolor = SVG_pens[SVG_Pen_RealID (colorspec->lt)].color;
+        if (SVG_linecolor != SVG_pens[SVG_Pen_RealID (colorspec->lt)].color) {
+	    SVG_linecolor = SVG_pens[SVG_Pen_RealID (colorspec->lt)].color;
+	    SVG_PathClose();
+	}
 	SVG_color_mode = TC_LT;
 	return;
-    } else if (colorspec->type == TC_FRAC)
+    } else if (colorspec->type == TC_FRAC) {
 	rgb255maxcolors_from_gray( colorspec->value, &rgb255 );
-    else if (colorspec->type == TC_RGB) {
+    } else if (colorspec->type == TC_RGB) {
 	rgb255.r = colorspec->lt >> 16 & 0xff;
 	rgb255.g = colorspec->lt >> 8 & 0xff;
 	rgb255.b = colorspec->lt & 0xff;
 	SVG_alpha = (double)(colorspec->lt >> 24 & 0xff) / 255.;
-    } else
+    } else {
 	return;
+    }
 
     SVG_color_mode = TC_RGB;
 
     if (rgb255.r != SVG_red || rgb255.g != SVG_green || rgb255.b != SVG_blue) {
-	/* pm3d color has changed. We've to start a new path
+	/* pm3d color has changed. We must start a new path
 	 * with a different line color. This is necessary when
 	 * using "linetype palette". */
 	SVG_PathClose();
