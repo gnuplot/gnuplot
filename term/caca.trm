@@ -923,15 +923,21 @@ CACA_text()
 #ifdef USE_MOUSE
 	process_event(GE_plotdone, 0, 0, 0, 0, 0);
 	if (!CACA_windowed && !CACA_processing_events && !CACA_exportonly && !CACA_nosuspend) {
-		/* NOTE: This is a hack to force a call to _graphics() before redrawing.
-		   The vgagl terminal uses the very same trick. */
-		term_graphics = FALSE;
-		CACA_processing_events = TRUE;
-		while (CACA_process_events() == CACA_loop);
-		/* Clean up remaining console events, as e.g. KEYUP events: */
-		CACA_discard_events();
-		CACA_processing_events = FALSE;
-		term_graphics = TRUE;
+		/* Test for input redirection */
+		if (isatty(fileno(stdin))) {
+			/* NOTE: This is a hack to force a call to _graphics() before redrawing.
+			   The vgagl terminal uses the very same trick. */
+			term_graphics = FALSE;
+			CACA_processing_events = TRUE;
+			while (CACA_process_events() == CACA_loop);
+			/* Clean up remaining console events, as e.g. KEYUP events: */
+			CACA_discard_events();
+			CACA_processing_events = FALSE;
+			term_graphics = TRUE;
+		} else {
+			char c = getchar();
+			CACA_close_display();
+		}
 	}
 #endif
 	/* Save canvas to file. */
@@ -3534,7 +3540,6 @@ START_HELP(caca)
 "       set key width 1 height 1",
 "",
 " Alignment of enhanced text is wrong if it contains utf8 characters.",
-" gnuplot dies when running from a script when using the \"ncurses\" driver.",
 " Resizing of Windows console window does not work correctly due to a bug in",
 " libcaca.",
 " Closing the terminal window by clicking the \"X\" on the title line",

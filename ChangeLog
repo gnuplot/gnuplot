@@ -1,3 +1,9 @@
+2017-12-04  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* term/caca.trm (CACA_text):  Test for input redirection.  Resolves
+	hang with slang/ncurses drivers in 
+	    gnuplot -e "load 'simple.dem'" < /bin/true
+
 2017-12-03  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/caca.trm:  Add an emacs type modeline.
