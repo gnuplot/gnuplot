@@ -966,6 +966,11 @@ CACA_text()
 		}
 	}
 #endif
+#if defined(WGP_CONSOLE)
+	/* libcaca seems to leave stdout in wide mode */
+	fflush(stdout);
+	_setmode(fileno(stdout), _O_TEXT);
+#endif
 }
 
 

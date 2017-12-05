@@ -1,3 +1,9 @@
+﻿2018-02-08  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* term/caca.trm (CACA_text):  libcaca seems to leave the Windows
+	console in wide character mode.  This results in an extra space
+	printed with every character.  We now explicitly reset text mode.
+
 2018-02-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	src/command.c src/datablock.c|h:  This patch splits lines containing
