@@ -5,6 +5,9 @@
 	to take effect.
 	Bug #1995
 
+	* term/latex.trm: Sanity check latex terminal options.
+	Bug #1996
+
 2017-11-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/getcolor.c src/getcolor.h src/save.c src/show.c src/tables.c

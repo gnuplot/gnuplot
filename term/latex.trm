@@ -287,8 +287,13 @@ LATEX_options()
 	    break;
 	case LATEX_OTHER:
 	default:
-	    /* if isannumber? */
-	    LATEX_fontsize = int_expression();
+	    if (isanumber(c_token)) {
+		LATEX_fontsize = int_expression();
+		if (LATEX_fontsize <= 1)
+		    LATEX_fontsize = 10;
+		break;
+	    }
+	    int_error(c_token, "unrecognized option");
 	}
     }
 
@@ -299,7 +304,7 @@ LATEX_options()
     term->h_char = (unsigned int) (LATEX_fontsize * DOTS_PER_INCH / 144);
 
     if (strcmp(LATEX_font, "doc")==0)
-	strncpy(term_options, "(document specific font)",MAX_LINE_LEN);
+	sprintf(term_options, "(document specific font) %d", LATEX_fontsize);
     else
 	sprintf(term_options, "%s %d",
 		LATEX_font[2] == 't' ? "courier" : "roman", LATEX_fontsize);
