@@ -229,7 +229,6 @@ SetFont_gdiplus(Graphics &graphics, LPRECT rect, LPGW lpgw, LPTSTR fontname, int
 		fontname = lpgw->deffontname;
 	if (size == 0)
 		size = lpgw->deffontsize;
-	size *= lpgw->fontscale;
 
 	/* make a local copy */
 	fontname = _tcsdup(fontname);
@@ -237,6 +236,9 @@ SetFont_gdiplus(Graphics &graphics, LPRECT rect, LPGW lpgw, LPTSTR fontname, int
 	/* save current font */
 	_tcscpy(lpgw->fontname, fontname);
 	lpgw->fontsize = size;
+
+	// apply fontscale
+	size *= lpgw->fontscale;
 
 	/* set up font style */
 	INT fontStyle = FontStyleRegular;

@@ -732,7 +732,6 @@ d2dSetFont(ID2D1RenderTarget * pRenderTarget, LPRECT rect, LPGW lpgw, LPTSTR fon
 		fontname = lpgw->deffontname;
 	if (size == 0)
 		size = lpgw->deffontsize;
-	size *= lpgw->fontscale;
 
 	/* make a local copy */
 	fontname = _tcsdup(fontname);
@@ -740,6 +739,9 @@ d2dSetFont(ID2D1RenderTarget * pRenderTarget, LPRECT rect, LPGW lpgw, LPTSTR fon
 	/* save current font */
 	_tcscpy(lpgw->fontname, fontname);
 	lpgw->fontsize = size;
+
+	// apply fontscale
+	size *= lpgw->fontscale;
 
 	/* set up font style */
 	LPTSTR italic, bold;
