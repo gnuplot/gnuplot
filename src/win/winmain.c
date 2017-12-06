@@ -120,7 +120,6 @@ char *authors[]={
 void WinExit(void);
 static void WinCloseHelp(void);
 int CALLBACK ShutDown();
-static BOOL WINAPI ConsoleHandler(DWORD dwType);
 #ifdef WGP_CONSOLE
 static int ConsolePutS(const char *str);
 static int ConsolePutCh(int ch);
@@ -605,10 +604,10 @@ main(int argc, char **argv)
 	GetConsoleMode(handle, &mode);
 	SetConsoleMode(handle, mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
     }
-#endif
 
     // set console mode handler to catch "abort" signals
     SetConsoleCtrlHandler(ConsoleHandler, TRUE);
+#endif
 
     gp_atexit(WinExit);
 
@@ -1481,6 +1480,7 @@ WinOpenConsole(void)
 	    AllocConsole();
 	}
     }
+    SetConsoleCtrlHandler(ConsoleHandler, TRUE);
 }
 #endif
 

@@ -795,6 +795,9 @@ CACA_init_display(void)
 				CACA_codepage = codepage;
 				SetConsoleOutputCP(437);
 			}
+#ifndef WGP_CONSOLE
+			SetConsoleCtrlHandler(ConsoleHandler, TRUE);
+#endif
 		}
 #endif
 	} else if (CACA_exportonly) {

@@ -1,4 +1,9 @@
-﻿2018-02-08  Bastian Maerkisch  <bmaerkisch@web.de>
+2018-02-08  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/winmain.c|h (main, WinOpenConsole)
+	term/caca.trm (CACA_init_display):  Only try to set a console event
+	handler if a console is open.  Otherwise the call would not succeed on
+	some Windows versions.
 
 	* term/caca.trm:  Re-evaluate the console's codepage on every plot.
 

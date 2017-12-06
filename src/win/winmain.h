@@ -68,6 +68,7 @@ TBOOLEAN WinAnyWindowOpen(void);
 void WinPersistTextClose(void);
 void WinMessageLoop(void);
 void WinOpenConsole(void);
+BOOL WINAPI ConsoleHandler(DWORD dwType);
 void WinRaiseConsole(void);
 UINT WinGetCodepage(enum set_encoding_id encoding);
 enum set_encoding_id WinGetEncoding(UINT cp);
