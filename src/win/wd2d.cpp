@@ -377,7 +377,7 @@ d2dInit(LPGW lpgw)
 		versionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 		GetVersionEx(&versionInfo);
 		if ((versionInfo.dwMajorVersion > 6) || 
-			((versionInfo.dwMajorVersion == 6) && (versionInfo.dwMajorVersion == 3)))
+			((versionInfo.dwMajorVersion == 6) && (versionInfo.dwMinorVersion == 3)))
 			bHaveColorFonts = true;
 	}
 	return hr;
