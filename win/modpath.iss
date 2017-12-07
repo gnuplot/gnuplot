@@ -97,7 +97,9 @@ begin
 				if i = 1 then begin
 					newpath := pathArr[i-1];
 				end else begin
-					newpath := newpath + ';' + pathArr[i-1];
+					// BM: skip empty entries
+					if Length(pathArr[i-1]) > 0 then
+						newpath := newpath + ';' + pathArr[i-1];
 				end;
 			end;
 
