@@ -1,0 +1,11 @@
+# http://editorconfig.org/ config file
+
+# topmost file
+root = true
+
+# defaults for C/C++ source files
+[*.{c,h,cpp,trm}]
+indent_style = tab
+indent_size = 4
+tab_width = 8
+trim_trailing_whitespace = true

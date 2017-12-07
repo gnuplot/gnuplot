@@ -1,0 +1,8 @@
+# Project defaults are defined in top directory.
+# Here we just list exceptions.
+
+[{wgraph.c,wgdiplus.cpp,wd2d.cpp,wgnuplib.h,wpause.c}]
+indent_style = tab
+indent_size = tab
+tab_width = 4
+trim_trailing_whitespace = true
