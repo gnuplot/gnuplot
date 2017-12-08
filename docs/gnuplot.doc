@@ -3013,6 +3013,7 @@ Ffigure_newsyntax
  Note: The program can be configured to look first in the current directory,
  but this is not recommended because it is bad security practice.
 2 String constants and string variables
+?string
 ?strings
 ?string variables
  In addition to string constants, most gnuplot commands also accept a string
