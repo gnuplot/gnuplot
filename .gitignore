@@ -38,6 +38,7 @@ config.log
 config.status
 configure
 fit.log
+make.log
 soundfit.par
 stamp-h
 stamp-h1
