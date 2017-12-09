@@ -362,6 +362,10 @@ load "custom_key.dem"
 load "nokey.dem"
 reset
 
+print "********************** file walls.dem *********************"
+load "walls.dem"
+reset
+
 print "********************** file borders.dem *********************"
 load "borders.dem"
 reset

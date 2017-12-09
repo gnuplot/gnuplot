@@ -29,6 +29,7 @@ set obj 1 fb
 set obj 2 fb
 set obj 3 fb
 
+sinc(x) = sin(x)/x
 splot .1 + y* sinc(20*(x-0.5)) with pm3d
 
 pause -1 "<cr> to continue"
