@@ -10,6 +10,7 @@ set urange [1:100]
 set vrange [1:100]
 set xrange [1:100]
 set key opaque box
+set style data line
 
 if (ARGC < 1) ARG1 = 0
 

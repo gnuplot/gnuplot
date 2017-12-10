@@ -92,6 +92,7 @@
     <li><a href="poldat.html">polar data</a></li>
     <li><a href="world.html">cylindrical/spherical</a></li>
     <li><a href="timedat.html">time/date coords</a></li>
+    <li><a href="sampling.html">coord sampling ranges</a></li>
     </ul>
 
     <h4>Binary and Image data </h4>
