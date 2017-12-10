@@ -562,13 +562,13 @@ console: $(TARGETS_CONSOLE)
 
 docs: gnuplot.pdf tutorial.pdf ps_symbols.pdf ps_fontfile_doc.pdf ps_guide.pdf
 
-help: $(HELPFILE)
+helpfile: $(HELPFILE)
 
 ja: $(HELPFILEJA)
 
 support: $(M)bf_test.exe $(QT_TRANSLATION) demo_plugin.dll $(LUATARGETS)
 
-all: $(DEFAULT_TARGETS) $(TARGETS_PLAIN) $(TARGETS_PIPES) $(TARGETS_CONSOLE) help ja support docs
+all: $(DEFAULT_TARGETS) $(TARGETS_PLAIN) $(TARGETS_PIPES) $(TARGETS_CONSOLE) $(HELPFILE) $(HELPFILEJA) support docs
 
 
 # include the 'core makefile template'
