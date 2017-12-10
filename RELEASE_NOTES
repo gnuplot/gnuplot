@@ -95,12 +95,19 @@ with earlier versions.  However changes introduced in version 5 can affect
 the operation of some version 4 scripts.  Please see section
 "Differences from Version 4" in the User Manual.
 
-
 Deprecated commands
 -------------------
 
 The "update" command is still recognized in version 5.2 but is deprecated
 and will be removed in the next version. Use "save fit" instead.
+
+Scope of variables
+------------------
+
+The control variable of an iteration loop is strictly limited in scope
+to the iteration it controls.  The value of any previous variable with
+that name is restored after iteration.  The same is true for an iteration
+associated with a sampling range in a plot or splot command.
 
 Other minor changes
 -------------------
