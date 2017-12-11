@@ -586,6 +586,8 @@ save_set_all(FILE *fp)
 #ifdef EAM_OBJECTS
     fprintf(fp, "unset object\n");
     save_object(fp, 0);
+    fprintf(fp, "unset walls\n");
+    save_walls(fp);
 #endif
 
 #ifdef EAM_BOXED_TEXT
@@ -1831,6 +1833,27 @@ save_object(FILE *fp, int tag)
     }
     if (tag > 0 && !showed)
 	int_error(c_token, "object not found");
+}
+
+/* Save/show special polygon objects created by "set wall" */
+void
+save_walls(FILE *fp)
+{
+    static const char* wall_name[5] = {"y0", "x0", "y1", "x1", "z0"};
+    t_object *this_object;
+    int i, tag;
+
+    for (i = 0; i <= 5; i++) {
+    	this_object = &grid_wall[i];
+	if (this_object->layer == LAYER_FRONTBACK) {
+	    fprintf(fp, "set wall %s ", wall_name[i]);
+	    fprintf(fp, " fc ");
+	    save_pm3dcolor(fp, &this_object->lp_properties.pm3d_color);
+	    fprintf(fp, " fillstyle ");
+	    save_fillstyle(fp, &this_object->fillstyle);
+	}
+
+    }
 }
 
 #endif

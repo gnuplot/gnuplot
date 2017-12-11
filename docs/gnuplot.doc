@@ -13598,7 +13598,9 @@ Ffigure_multiple_keys
  Please see `set xrange` for details.
 3 walls
 ?commands set walls
+?commands show walls
 ?set walls
+?show walls
 ?unset walls
 ?walls
  Syntax:

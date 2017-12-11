@@ -62,6 +62,7 @@ void save_offsets __PROTO((FILE *, char *));
 void save_histogram_opts __PROTO((FILE *fp));
 #ifdef EAM_OBJECTS
 void save_object __PROTO((FILE *, int));
+void save_walls __PROTO((FILE *));
 #endif
 #ifdef EAM_BOXED_TEXT
 void save_style_textbox __PROTO((FILE *));

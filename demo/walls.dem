@@ -2,13 +2,10 @@
 # planes in 3D plots if enabled.
 #
 set title "Test/demo of new feature 'grid walls'"
-set obj 1 polygon from graph 0,0,0 to graph 1,0,0 to graph 1,1,0 to graph 0,1,0
-set obj 2 polygon from graph 0,0,0 to graph 0,1,0 to graph 0,1,1 to graph 0,0,1
-set obj 3 polygon from graph 0,0,0 to graph 0,0,1 to graph 1,0,1 to graph 1,0,0
 
-set obj 1 fs transparent solid 0.5 border -1 fc "slategray"
-set obj 2 fs transparent solid 0.5 border -1 fc "forest-green"
-set obj 3 fs transparent solid 0.5 border -1 fc "bisque"
+set wall z0 fs transparent solid 0.5 border -1 fc "slategray"
+set wall x0 fs transparent solid 0.5 border -1 fc "forest-green"
+set wall y0 fs transparent solid 0.5 border -1 fc "bisque"
 
 set xrange [0:1]
 set yrange [0:1]
@@ -22,12 +19,6 @@ unset xtics
 unset ytics
 
 set view 65, 145
-
-# This is the experimental part
-# may be replaced by something like "set wall {left|right|bottom} ..."
-set obj 1 fb
-set obj 2 fb
-set obj 3 fb
 
 sinc(x) = sin(x)/x
 splot .1 + y* sinc(20*(x-0.5)) with pm3d

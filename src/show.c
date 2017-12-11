@@ -416,6 +416,9 @@ show_command()
 	save_object(stderr,tag);
 #endif
 	break;
+    case S_WALL:
+	save_walls(stderr);
+	break;
     case S_ANGLES:
 	show_angles();
 	break;
