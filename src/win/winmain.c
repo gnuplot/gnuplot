@@ -992,7 +992,7 @@ fake_popen(const char * command, const char * type)
 	LPWSTR wcmd;
 	pipe_type = *type;
 	/* Execute command with redirection of stdout to temporary file. */
-#ifndef __WATCOMC__
+#ifndef HAVE_BROKEN_WSYSTEM
 	cmd = (char *) malloc(strlen(command) + strlen(pipe_filename) + 5);
 	sprintf(cmd, "%s > %s", command, pipe_filename);
 	wcmd = UnicodeText(cmd, encoding);
@@ -1001,7 +1001,7 @@ fake_popen(const char * command, const char * type)
 #else
 	cmd = (char *) malloc(strlen(command) + strlen(pipe_filename) + 15);
 	sprintf(cmd, "cmd /c %s > %s", command, pipe_filename);
-	system(cmd);
+	rc = system(cmd);
 #endif
 	free(cmd);
 	/* Now open temporary file. */
@@ -1043,7 +1043,7 @@ fake_pclose(FILE *stream)
 	char * cmd;
 	LPWSTR wcmd;
 
-#ifndef __WATCOMC__
+#ifndef HAVE_BROKEN_WSYSTEM
 	cmd = (char *) gp_alloc(strlen(pipe_command) + strlen(pipe_filename) + 10, "fake_pclose");
 	/* FIXME: this won't work for binary data. We need a proper `cat` replacement. */
 	sprintf(cmd, "type %s | %s", pipe_filename, pipe_command);
@@ -1053,7 +1053,7 @@ fake_pclose(FILE *stream)
 #else
 	cmd = (char *) gp_alloc(strlen(pipe_command) + strlen(pipe_filename) + 20, "fake_pclose");
 	sprintf(cmd, "cmd/c type %s | %s", pipe_filename, pipe_command);
-	system(cmd);
+	rc = system(cmd);
 #endif
 	free(cmd);
     }

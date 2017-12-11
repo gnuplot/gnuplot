@@ -3090,7 +3090,7 @@ do_system(const char *cmd)
     /* Open a console so we can see the command's output */
     WinOpenConsole();
 #endif
-#if defined(_WIN32) && !defined(__WATCOMC__)
+#if defined(_WIN32) && !defined(HAVE_BROKEN_WSYSTEM)
     {
 	LPWSTR wcmd = UnicodeText(cmd, encoding);
 	ierr = _wsystem(wcmd);
