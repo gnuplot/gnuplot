@@ -65,7 +65,7 @@ int wxt_raise = UNSET;
 int wxt_ctrl = UNSET;
 int wxt_toggle = UNSET;
 int wxt_redraw = UNSET;
-t_linecap wxt_linecap = SQUARE;
+t_linecap wxt_linecap = BUTT;
 /* default text font family: */
 char *wxt_set_fontname = NULL;
 /* default text size*/
@@ -516,7 +516,7 @@ START_HELP(wxt)
 "                      {{no}enhanced}",
 "                      {font <font>} {fontscale <scale>}",
 "                      {title \"title\"}",
-"                      {linewidth <lw>}",
+"                      {linewidth <lw>} {butt|rounded|square}",
 "                      {dashlength <dl>}",
 "                      {{no}persist}",
 "                      {{no}raise}",
