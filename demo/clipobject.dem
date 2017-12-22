@@ -14,6 +14,7 @@ set xrange[-1:1]
 set yrange[-1:1]
 set macros
 fs="fillstyle solid 1.0 border lc rgb 'black' lw 2"
+unset key
 
 set lmargin at screen 0.2
 set rmargin at screen 0.8

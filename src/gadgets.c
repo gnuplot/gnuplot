@@ -270,9 +270,13 @@ draw_clip_polygon(int points, gpiPoint *p)
     int x1, y1, x2, y2;
     int pos1, pos2, clip_ret;
     struct termentry *t = term;
+    TBOOLEAN continuous = TRUE;
 
     if (points <= 1) 
 	return;
+
+    if (p[0].x != p[points-1].x || p[0].y != p[points-1].y)
+	continuous = FALSE;
 
     x1 = p[0].x;
     y1 = p[0].y;
@@ -293,6 +297,9 @@ draw_clip_polygon(int points, gpiPoint *p)
 	    if (pos1) /* first vertex was recalculated, move to new start point */
 		(*t->move)(x1, y1);
 	    (*t->vector)(x2, y2);
+	} else {
+	    /* Path is not continuous; make sure closepath is not called */
+	    continuous = FALSE;
 	}
 
 	x1 = p[i].x;
@@ -307,7 +314,10 @@ draw_clip_polygon(int points, gpiPoint *p)
 	    pos1 = pos2;
     }
 
-    closepath();
+    /* Only call closepath if the polygon is truly closed; otherwise */
+    /* a spurious line connecting the start and end is generated.    */
+    if (continuous)
+	closepath();
 }
 
 void
