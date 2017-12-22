@@ -1,3 +1,10 @@
+2017-12-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* Fix mismatched newpath/closepath and missing stroke in macro for
+	pm3d surface quadrangles.  This could generate a spurious rectangle
+	on the next stroke command.
+	Bug #2005
+
 2017-12-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c term/svg.trm:  Create a new path for each polygon.

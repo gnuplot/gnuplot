@@ -585,7 +585,7 @@ NULL
 
 static const char *prologue_prologue_ps[] = {
 "%\n",
-"% Gnuplot Prolog Version 5.0.2 (Oct 2015)\n",
+"% Gnuplot Prolog Version 5.2 (Dec 2017)\n",
 "%\n",
 "%/SuppressPDFMark true def\n",
 "%\n",
@@ -842,7 +842,7 @@ static const char *prologue_prologue_ps[] = {
 "  ColR ColG ColB setrgbcolor} def\n",
 "/BoxColFill {gsave Rec PolyFill} def\n",
 "/PolyFill {gsave Density fill grestore grestore} def\n",
-"/h {rlineto rlineto rlineto gsave closepath fill grestore} bind def\n",
+"/h {rlineto rlineto rlineto closepath gsave fill grestore stroke} bind def\n",
 "%\n",
 "% PostScript Level 1 Pattern Fill routine for rectangles\n",
 "% Usage: x y w h s a XX PatternFill\n",
