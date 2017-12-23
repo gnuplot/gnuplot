@@ -535,17 +535,17 @@ LONGVERSION := $(MAINVERSION).0
 endif
 FULLVERSION := $(MAINVERSION) patchlevel $(PATCHLEVEL)
 
-TARGETS_PLAIN = wgnuplot.exe wgnuplot.mnu
+TARGETS_PLAIN = $(VERSIONING) config.h wgnuplot.exe wgnuplot.mnu $(QT_TARGET)
 ifndef MINGW64
 	EXTRA_CPPFLAGS_PLAIN += -DUSE_FAKEPIPES
 else
 	EXTRA_CPPFLAGS_PLAIN += -DPIPES
 endif
 
-TARGETS_PIPES = wgnuplot_pipes.exe wgnuplot.mnu
+TARGETS_PIPES = $(VERSIONING) config.h wgnuplot_pipes.exe wgnuplot.mnu $(QT_TARGET)
 EXTRA_CPPFLAGS_PIPES += -DPIPES
 
-TARGETS_CONSOLE = gnuplot.exe
+TARGETS_CONSOLE = $(VERSIONING) config.h gnuplot.exe $(QT_TARGET)
 EXTRA_CPPFLAGS_CONSOLE += -DWGP_CONSOLE -DPIPES
 
 DEFAULT_TARGETS = $(VERSIONING) config.h $(TARGETS_$(VARIANT)) $(QT_TARGET)
