@@ -145,7 +145,19 @@ almost_equals(int t_num, const char *str)
     return (after || str[i] == '$' || str[i] == NUL);
 }
 
+/* Extract one token from the input line */
+char *
+token_to_string(int t)
+{
+    static char *token_string = NULL;
+    int token_length = token[t].length;
 
+    token_string = realloc(token_string, token_length+1);
+    memcpy(token_string, &gp_input_line[token[t].start_index], token_length);
+    token_string[token_length] = '\0';
+
+    return token_string;
+}
 
 int
 isstring(int t_num)

@@ -73,6 +73,7 @@ extern int debug;
 /* Command parsing helpers: */
 int equals __PROTO((int, const char *));
 int almost_equals __PROTO((int, const char *));
+char *token_to_string __PROTO((int));
 int isstring __PROTO((int));
 int isanumber __PROTO((int));
 int isletter __PROTO((int));

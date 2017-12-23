@@ -434,7 +434,8 @@ do_line()
 	    } else if (equals(c_token, "}")) {
 		end_clause();
 	    } else
-		int_error(c_token, "unexpected or unrecognized token");
+		int_error(c_token, "unexpected or unrecognized token: %s",
+		    token_to_string(c_token));
 	}
     }
 
