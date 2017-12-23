@@ -3,6 +3,11 @@
 	* src/gadgets.c:  Only terminate polygon with "closepath" if it is
 	not clipped.  Bug #1995 revisited.
 
+	* term/cairo.trm:  Initial font used in enhanced text processing
+	should be the most recently set font, not the original font from
+	"set term".
+	Bug #1997
+
 2017-12-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/PostScript/prologue.ps term/PostScript/prologues.h:
