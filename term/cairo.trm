@@ -165,6 +165,8 @@ static ps_params_t cairo_epslatex_params = EPSLATEX_PARAMS_DEFAULT;
 #define ISCAIROLATEX (FALSE)
 #endif
 
+char *cairo_enhanced_fontname = NULL;
+
 plot_struct plot;
 
 enum CAIROTRM_id {
@@ -1031,7 +1033,8 @@ void cairotrm_put_text(unsigned int x, unsigned int y, const char * string)
 	* we get stuck in an infinite loop) and try again. */
 
 	while (*(string = enhanced_recursion((char*)string, TRUE, 
-			cairo_params->fontname, plot.fontsize,
+			cairo_enhanced_fontname,
+			plot.fontsize,
 			0.0, TRUE, TRUE, 0))) {
 		cairotrm_enhanced_flush();
 
@@ -1043,10 +1046,14 @@ void cairotrm_put_text(unsigned int x, unsigned int y, const char * string)
 		/* else carry on and process the rest of the string */
 	}
 
-	/* EAM FIXME  Jan 2015 This fixes a "key font gets stuck in bold mode" */
-	/* bug but I don't understand why it is needed. */
+#if 0	/* Dec 2017 additional of separate enhanced_fontname
+	 * should make this unnecessary.
+	 * EAM FIXME: Jan 2015 This fixes a "key font gets stuck in bold mode"
+	 * bug but I don't understand why it is needed.
+	 */
 	gp_cairo_enhanced_open(&plot, cairo_params->fontname, plot.fontsize, 
 				0.0, TRUE, TRUE, 0);
+#endif 
 
 	/* finish */
 	gp_cairo_enhanced_finish(&plot, x, term->ymax - y);
@@ -1095,15 +1102,16 @@ int cairotrm_set_font (const char *font)
 
 	if (font && (*font)) {
 		int sep = strcspn(font,",");
-		if (sep > 0) {
-			fontname = gp_strdup(font);
+		fontname = strdup(font);
+		if (font[sep] == ',') {
+			sscanf(&(font[sep+1]), "%d", &fontsize);
 			fontname[sep] = '\0';
 		}
-		if (font[sep] == ',')
-			sscanf(&(font[sep+1]), "%d", &fontsize);
+	} else {
+		fontname = strdup("");
 	}
 
-	if (!fontname || !(*fontname)) {
+	if ( strlen(fontname) == 0 ) {
 		free(fontname);
 		if ( strlen(cairo_params->fontname) == 0 )
 			fontname = gp_strdup(CAIROTRM_DEFAULT_FONTNAME);
@@ -1123,6 +1131,11 @@ int cairotrm_set_font (const char *font)
 	gp_cairo_set_font(&plot, fontname, fontsize * cairo_params->fontscale);
 	gp_cairo_set_termvar(&plot, &(term->v_char), &(term->h_char));
 
+	/* Enhanced text processing needs to know the new font also */
+	if (*fontname) {
+		free(cairo_enhanced_fontname);
+		cairo_enhanced_fontname = strdup(fontname);
+	}
 	free(fontname);
 
 	/* the returned int is not used anywhere */
