@@ -1841,7 +1841,7 @@ save_walls(FILE *fp)
 {
     static const char* wall_name[5] = {"y0", "x0", "y1", "x1", "z0"};
     t_object *this_object;
-    int i, tag;
+    int i;
 
     for (i = 0; i <= 5; i++) {
     	this_object = &grid_wall[i];
