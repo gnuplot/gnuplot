@@ -1316,9 +1316,8 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
 		fs->fillstyle = i;
 		set_fill = TRUE;
 		c_token++;
-		
-		if (isanumber(c_token) || is_function(c_token)
-                ||  type_udv(c_token) == INTGR || type_udv(c_token) == CMPLX) {
+
+		if (might_be_numeric(c_token)) {
 		    if (fs->fillstyle == FS_SOLID) {
 			/* user sets 0...1, but is stored as an integer 0..100 */
 			fs->filldensity = 100.0 * real_expression() + 0.5;

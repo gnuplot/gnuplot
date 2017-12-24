@@ -1,3 +1,10 @@
+2017-12-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c src/set.c src/util.c src/util.h:
+	new utility routine might_be_numeric() to be called before trying
+	to parse optional numeric value in command
+	Bug #2006
+
 2017-12-23  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* .gitattributes src/os2/4allterm.cmd:  Enforce EOL style or treatment
