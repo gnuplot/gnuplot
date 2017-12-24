@@ -78,6 +78,7 @@ int isstring __PROTO((int));
 int isanumber __PROTO((int));
 int isletter __PROTO((int));
 int is_definition __PROTO((int));
+TBOOLEAN might_be_numeric __PROTO((int));
 void copy_str __PROTO((char *, int, int));
 size_t token_len __PROTO((int));
 void capture __PROTO((char *, int, int, int));

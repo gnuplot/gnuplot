@@ -205,6 +205,22 @@ isletter(int t_num)
 	    (isalpha(c) || (c == '_') || ALLOWED_8BITVAR(c)));
 }
 
+/* Test whether following bit of command line might be parsable as a number.
+ * constant, defined variable, function, ...
+ */
+TBOOLEAN
+might_be_numeric(int t_num)
+{
+    if (END_OF_COMMAND)
+	return FALSE;
+    if (isanumber(t_num) || is_function(t_num))
+	return TRUE;
+    if (type_udv(t_num) == INTGR || type_udv(t_num) == CMPLX || type_udv(t_num) == ARRAY)
+	return TRUE;
+    if (equals(t_num, "("))
+	return TRUE;
+    return FALSE;
+}
 
 /*
  * is_definition() returns TRUE if the next tokens are of the form

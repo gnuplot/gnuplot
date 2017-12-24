@@ -2081,7 +2081,7 @@ set_grid()
 	    axis_array[POLAR_AXIS].gridmajor = TRUE;	/* Enable both circles and radii */
 	    polar_grid_angle = 30*DEG2RAD;
 	    c_token++;
-	    if (isanumber(c_token) || type_udv(c_token) == INTGR || type_udv(c_token) == CMPLX) {
+	    if (might_be_numeric(c_token)) {
 		double ang = real_expression();
 		polar_grid_angle = (ang > 2.*M_PI) ? DEG2RAD*ang : ang2rad*ang;
 	    }
@@ -4777,7 +4777,7 @@ set_style()
 		c_token--;
 	    } else if (almost_equals(c_token,"ang$le")) {
 		c_token++;
-		if (isanumber(c_token) || type_udv(c_token) == INTGR || type_udv(c_token) == CMPLX) {
+		if (might_be_numeric(c_token)) {
 		    default_ellipse.o.ellipse.orientation = real_expression();
 		    c_token--;
 		}
