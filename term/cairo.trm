@@ -106,22 +106,22 @@ typedef struct cairo_params_t {
     float dash_length;
     rgb_color background;
     TBOOLEAN mono;
-    t_linecap linecap;           /* butt/rounded/square linecaps and linejoins */
+    t_linecap linecap;		/* butt/rounded/square linecaps and linejoins */
     TBOOLEAN transparent;
     TBOOLEAN crop;
-    char fontname[MAX_ID_LEN + 1];    /* name of font */
-    int fontsize;                     /* size of font in pts */
-    float fontscale;                  /* modified by this */
+    char *fontname;		/* name of font */
+    int fontsize;		/* size of font in pts */
+    float fontscale;		/* modified by this */
     float width;
     float height;
     float base_linewidth;
     float lw;
     float ps;
-    TBOOLEAN pdf_output;              /* format of the graphics produced by cairolatex */
+    TBOOLEAN pdf_output;	/* format of the graphics produced by cairolatex */
 } cairo_params_t;
 
 #define CAIROEPS_PARAMS_DEFAULT { \
-    CAIROTERM_EPS, INCHES, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, TRUE, FALSE, "", \
+    CAIROTERM_EPS, INCHES, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, TRUE, FALSE, NULL, \
     12, 0.5, 5*72., 3*72., 0.25, 1.0, 1.0, FALSE \
 }
 static cairo_params_t cairoeps_params = CAIROEPS_PARAMS_DEFAULT;
@@ -129,12 +129,12 @@ static const cairo_params_t cairoeps_params_default = CAIROEPS_PARAMS_DEFAULT;
 
 #ifdef HAVE_CAIROEPS
 #define CAIROLATEX_PARAMS_DEFAULT { \
-    CAIROTERM_LATEX, INCHES, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, TRUE, FALSE, "", \
+    CAIROTERM_LATEX, INCHES, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, TRUE, FALSE, NULL, \
     11, 0.6, 5*72., 3*72., 0.25, 1.0, 1.0, FALSE \
 }
 #else
 #define CAIROLATEX_PARAMS_DEFAULT { \
-    CAIROTERM_LATEX, INCHES, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, TRUE, FALSE, "", \
+    CAIROTERM_LATEX, INCHES, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, TRUE, FALSE, NULL, \
     11, 0.6, 5*72., 3*72., 0.25, 1.0, 1.0, TRUE \
 }
 #endif
@@ -142,14 +142,14 @@ static cairo_params_t cairolatex_params = CAIROLATEX_PARAMS_DEFAULT;
 static const cairo_params_t cairolatex_params_default = CAIROLATEX_PARAMS_DEFAULT;
 
 #define CAIROPDF_PARAMS_DEFAULT { \
-    CAIROTERM_PDF, INCHES, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, TRUE, FALSE, "", \
+    CAIROTERM_PDF, INCHES, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, TRUE, FALSE, NULL, \
     12, 0.5, 5*72., 3*72., 0.25, 1.0, 1.0, FALSE \
 }
 static cairo_params_t cairopdf_params = CAIROPDF_PARAMS_DEFAULT;
 static const cairo_params_t cairopdf_params_default = CAIROPDF_PARAMS_DEFAULT;
 
 #define CAIROPNG_PARAMS_DEFAULT { \
-    CAIROTERM_PNG, PIXELS, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, FALSE, FALSE, "", \
+    CAIROTERM_PNG, PIXELS, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, FALSE, FALSE, NULL, \
     12, 1.0, 640., 480., 1.0, 1.0, 1.0, FALSE \
 }
 static cairo_params_t cairopng_params = CAIROPNG_PARAMS_DEFAULT;
@@ -247,7 +247,6 @@ TERM_PUBLIC void cairotrm_options()
 {
 	char *s = NULL;
 	char *font_setting = NULL;
-	int sep;
 	TBOOLEAN duplication = FALSE;
 	TBOOLEAN set_font = FALSE, set_size = FALSE;
 	TBOOLEAN set_capjoin = FALSE;
@@ -288,20 +287,16 @@ TERM_PUBLIC void cairotrm_options()
 			c_token++;
 			if (!(s = try_to_get_string()))
 				int_error(c_token,"font: expecting string");
-			if (!(*s)) {
-				strcpy (cairo_params->fontname, "");
-				cairo_params->fontsize = 0;
-			} else {
-				sep = strcspn(s,",");
-				if (sep > 0) {
-					strncpy(cairo_params->fontname, s, sep);
-					cairo_params->fontname[sep] = '\0';
+			font_setting = gp_strdup(s);
+			if (*s) {
+				char *sep = strchr(s,',');
+				if (sep) {
+					sscanf(sep+1, "%d", &cairo_params->fontsize);
+					*sep = '\0';
 				}
-				if (s[sep] == ',')
-					sscanf(&(s[sep+1]), "%d", &cairo_params->fontsize);
+				free(cairo_params->fontname);
+				cairo_params->fontname = gp_strdup(s);
 			}
-			font_setting = (char*) gp_alloc(strlen(s) + 1,"cairo terminal font");
-			strcpy(font_setting,s);
 			free(s);
 			if (set_font) duplication=TRUE;
 			set_font = TRUE;
@@ -620,7 +615,10 @@ TERM_PUBLIC void cairotrm_options()
 	if (ISCAIROLATEX) {
 		ps_params->color = !cairo_params->mono;
 		ps_params->font[sizeof(ps_params->font) - 1] = '\0';
-		strncpy(ps_params->font, cairo_params->fontname, sizeof(ps_params->font) - 1);
+		if (!cairo_params->fontname)
+			ps_params->font[0] = '\0';
+		else
+			strncpy(ps_params->font, cairo_params->fontname, sizeof(ps_params->font) - 1);
 		ps_params->fontsize = cairo_params->fontsize;
 		ps_params->fontscale = cairo_params->fontscale;
 		if (cairo_params->transparent) {
@@ -1113,7 +1111,7 @@ int cairotrm_set_font (const char *font)
 
 	if ( strlen(fontname) == 0 ) {
 		free(fontname);
-		if ( strlen(cairo_params->fontname) == 0 )
+		if ( !cairo_params->fontname || strlen(cairo_params->fontname) == 0 )
 			fontname = gp_strdup(CAIROTRM_DEFAULT_FONTNAME);
 		else
 			fontname = gp_strdup(cairo_params->fontname);
