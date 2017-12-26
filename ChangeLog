@@ -1,3 +1,11 @@
+2017-12-26  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/Makefile.am config/mingw/Makefile config/msvc/Makefile:
+	Generation of the timestamp relied on the latest date in the ChangeLog.
+	This may no longer be correct.  Instead, we now query git for the last
+	commit date.  Only works for development builds from a git checkout, but
+	for release builds the date is hard-coded in src/version.c.
+
 2017-12-03  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* .gitattributes:  ChangeLogs are prone to merge errors.  The GNU tool

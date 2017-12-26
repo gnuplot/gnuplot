@@ -405,11 +405,12 @@ version.cobj: timestamp.h
 config.h: $(TOP)\config\config.nt
 	copy $(TOP)\config\config.nt config.h
 
-timestamp.h: $(TOP)\ChangeLog
+# Note: Need to adopt the dependency for other branches
+timestamp.h: Makefile $(TOP)\.git\refs\heads\master
 	@echo (Re-)Creating $@
 	@echo #ifndef GNUPLOT_TIMEBASE_H_INCLUDED>$@
 	@echo #define GNUPLOT_TIMEBASE_H_INCLUDED>>$@
-	@cmd /v:on /e:on /c "set n=0&for /f %%a in ($(TOP)\ChangeLog) do @if !n!==0 (echo const char gnuplot_date[] = "%%a";&set n=1)">>$@
+	@for /f "tokens=1" %%a in ('git log -1 --format^=%ci') do @echo const char gnuplot_date[] = "%%a ";>>$@
 	@echo #endif>>$@
 
 wgnuplot.exe: $(OBJS) $(WINOBJS) wgnuplot.res linkopt-w.msw

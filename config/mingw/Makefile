@@ -668,11 +668,12 @@ term.co: term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
 	$(CC) -c $(CFLAGS) $(EXTRA_CPPFLAGS_CONSOLE) $(TERMFLAGS) -MMD -MT '$*.co' -MF $*.cd -o $@ $<
 
 ifndef RELEASE
-timestamp.h: $(TOP)/ChangeLog
+git_current := $(shell cut -c6- $(TOP)/.git/HEAD)
+timestamp.h: $(TOP)/.git/${git_current} Makefile
 	@echo Creating $@
 	@echo "#ifndef GNUPLOT_TIMEBASE_H_INCLUDED" >$@t
 	@echo "#define GNUPLOT_TIMEBASE_H_INCLUDED" >>$@t
-	@head -1 $< | sed -e 's,\(^[0-9-]* \).*$$,const char gnuplot_date[] = "\1";,' >>$@t
+	@echo "const char gnuplot_date[] = \"`git log -1 --format=%ci | cut -b-11`\";" >>$@t
 	@echo "#endif /* GNUPLOT_TIMEBASE_H_INCLUDED */" >> $@t
 	@if cmp -s $@ $@t; then rm -f $@t; else mv $@t $@; fi
 else

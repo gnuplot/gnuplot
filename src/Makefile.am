@@ -105,11 +105,12 @@ endif
 
 DISTCLEANFILES = timestamp.h
 BUILT_SOURCES = timestamp.h
-timestamp.h: $(top_srcdir)/ChangeLog Makefile
+git_current := $(shell cut -c6- $(top_srcdir)/.git/HEAD)
+timestamp.h: $(top_srcdir)/.git/${git_current} Makefile
 	@echo Making $@
 	@echo "#ifndef GNUPLOT_TIMEBASE_H_INCLUDED" >$@t
 	@echo "#define GNUPLOT_TIMEBASE_H_INCLUDED" >>$@t
-	@head -1 $< | sed -e 's,\(^[0-9-]* \).*$$,const char gnuplot_date[] = "\1";,' >>$@t
+	@echo "const char gnuplot_date[] = \"`git log -1 --format=%ci | cut -b-11`\";" >>$@t
 	@echo "#endif /* GNUPLOT_TIMEBASE_H_INCLUDED */" >> $@t
 	@if cmp -s $@ $@t; then rm -f $@t; else mv $@t $@; fi
 
