@@ -1,3 +1,14 @@
+2017-12-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/util.c (print_line_with_error):
+	print_line_with_error() must not alter global gp_input_line or inline_num.
+	If called from int_error() or os_error() this would not matter because the
+	correct values will be reset anyway, but if called from int_warn() this
+	can truncate the current input line and/or print the wrong line number in
+	the warning message.  In particular it can cause premature exit from a
+	bracketed clause.
+	Bug #2007
+
 2017-12-25  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/caca.trm:  The raw and null libcaca drivers don't do anything

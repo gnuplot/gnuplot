@@ -1043,6 +1043,7 @@ static void
 print_line_with_error(int t_num)
 {
     int i;
+    int save_line_num = inline_num;
 
     if (t_num == DATAFILE) {
 	/* Print problem line from data file to the terminal */
@@ -1052,11 +1053,12 @@ print_line_with_error(int t_num)
 
 	/* If the current line was built by concatenation of lines inside */
 	/* a {bracketed clause}, try to reconstruct the true line number  */
-	char *minimal_input_line = gp_input_line;
+	char *copy_of_input_line = gp_strdup(gp_input_line);
+	char *minimal_input_line = copy_of_input_line;
 	char *trunc;
-	while ((trunc = strrchr(gp_input_line, '\n')) != NULL) {
+	while ((trunc = strrchr(copy_of_input_line, '\n')) != NULL) {
 	    int current = (t_num == NO_CARET) ? c_token : t_num;
-	    if (trunc < &gp_input_line[token[current].start_index]) {
+	    if (trunc < &copy_of_input_line[token[current].start_index]) {
 		minimal_input_line = trunc+1;
 		t_num = NO_CARET;
 		break;
@@ -1081,6 +1083,7 @@ print_line_with_error(int t_num)
 	    /* Print token */
 	    fputs("^\n",stderr);
 	}
+	free(copy_of_input_line);
     }
 
     PRINT_SPACES_UNDER_PROMPT;
@@ -1090,6 +1093,8 @@ print_line_with_error(int t_num)
 	    fprintf(stderr, "\"%s\", ", lf_head->name);
 	fprintf(stderr, "line %d: ", inline_num);
     }
+
+    inline_num = save_line_num;
 }
 
 /*
