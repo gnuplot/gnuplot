@@ -2009,7 +2009,7 @@ print_command()
     } while (!END_OF_COMMAND && equals(c_token, ","));
 
     if (dataline != NULL) {
-	append_to_datablock(&print_out_var->udv_value, dataline);
+	append_multiline_to_datablock(&print_out_var->udv_value, dataline);
     } else {
 	(void) putc('\n', print_out);
 	fflush(print_out);
