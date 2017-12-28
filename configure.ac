@@ -503,6 +503,14 @@ if test "$with_readline" != no; then
 	AC_DEFINE(HAVE_READLINE_RESET,1,[ Define if your libreadline has rl_reset_after_signal]),
 	,
         [${TERMLIBS}])
+    AC_SEARCH_LIBS(_rl_signal_handler, readline,
+	AC_DEFINE(HAVE_READLINE_SIGNAL_HANDLER,1,[ Define if your libreadline has _rl_signal_handler]),
+	,
+        [${TERMLIBS}])
+    AC_SEARCH_LIBS(rl_pending_signal, readline,
+	AC_DEFINE(HAVE_READLINE_PENDING_SIGNAL,1,[ Define if your libreadline has rl_pending_signal]),
+	,
+        [${TERMLIBS}])
     # Warning: rl_complete_with_tilde_expansion is an int, not a function.
     # I.e., it is not callable.  AC_CHECK_LIB seems to work anyhow, but...
     AC_SEARCH_LIBS(rl_complete_with_tilde_expansion, readline, , 

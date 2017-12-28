@@ -68,6 +68,7 @@ extern "C" {
 	#include "win/wtext.h"    // for kbhit, getchar
 	#include <io.h>           // for isatty
 #endif
+	#include "readline.h"	// for wrap_readline_signal_handler() to catch ^Z
 	#include <signal.h>
 }
 
@@ -1024,6 +1025,10 @@ int qt_waitforinput(int options)
 						timeout );
 
 		if (n_changed_fds < 0) {
+			if (errno == EINTR) {
+				wrap_readline_signal_handler();
+				continue;
+			}
 			// Display the error message except when Ctrl + C is pressed
 			if (errno != 4)
 				fprintf(stderr, "Qt terminal communication error: select() error %i %s\n", errno, strerror(errno));

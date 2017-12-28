@@ -93,6 +93,7 @@ static char *RCSid() { return RCSid("$Id: term.c,v 1.332.2.3 2017/07/08 00:11:36
 #include "version.h"
 #include "misc.h"
 #include "multiplot.h"
+#include "readline.h"
 
 #ifdef USE_MOUSE
 #include "mouse.h"

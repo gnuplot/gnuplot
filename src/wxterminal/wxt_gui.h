@@ -130,6 +130,8 @@ extern "C" {
 # include "command.h"
 /* for int_error */
 # include "util.h"
+/* for wrap_readline_signal_handler */
+# include "readline.h"
 }
 
 /* if the gtk headers are available, use them to tweak some behaviours */

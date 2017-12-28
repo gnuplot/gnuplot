@@ -907,6 +907,7 @@ AGAIN:
 	    ierr = select(ipc_back_fd + 1, SELECT_TYPE_ARG234 &fds, 0, 0, timeout);
 	    if (ierr < 0 && errno == EINTR) {
 		FD_ZERO(&fds);
+		wrap_readline_signal_handler();
 		continue;
 	    }
 	    if (FD_ISSET(ipc_back_fd, &fds)) {

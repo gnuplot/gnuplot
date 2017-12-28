@@ -1,3 +1,27 @@
+2017-12-28  Rin Okuyama <rokuyama@rk.phys.keio.ac.jp>
+
+	* configure.ac src/readline.* src/term.c src/qtterminal/qt_term.cpp
+	src/wxterminal/wxt_gui.* term/x11.trm:
+	Gnuplot does not suspend immediately by Control-z when it is configured
+	--with-readline=gnu; suspension is triggered by a subsequent input
+	character.
+
+	When SIGTSTP is received, the signal handler of readline sets a flag
+	and just returns. Routines of readline check this flag to invoke the
+	real handler to suspend. Since we replace rl_getc_function by our own
+	routine to catch input from mouse, we should also check this flag to
+	invoke the real handler. Othewise, we cannot suspend until next time
+	routines of readline are used.
+
+	Unfortunately, there is no portable ways to invoke the real handler of
+	readline at the moment. We need to use its internal routine. libreadline
+	will implement a public function for this purpose in a future release.
+
+	EAM: Original patch included the wrapper code directly in x11.trm;
+	I moved it into a separate routine wrap_readline_signal_handler()
+	so that it can be shared by other gnuplot terminals.
+	Bug #2002
+
 2017-12-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util.c (print_line_with_error):

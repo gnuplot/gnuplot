@@ -65,6 +65,10 @@ static char *RCSid() { return RCSid("$Id: readline.c,v 1.76 2016/08/23 00:23:04 
 #include "win/winmain.h"
 #endif
 
+/*
+ * adaptor routine for gnu libreadline
+ * to allow multiplexing terminal and mouse input
+ */
 #if defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
 int
 getc_wrapper(FILE* fp)
@@ -93,6 +97,35 @@ getc_wrapper(FILE* fp)
     }
 }
 #endif /* HAVE_LIBREADLINE || HAVE_LIBEDITLINE */
+
+#if defined(HAVE_LIBREADLINE) && defined(HAVE_READLINE_SIGNAL_HANDLER)
+/*
+ * The signal handler of libreadline sets a flag when SIGTSTP is received
+ * but does not suspend until this flag is checked by other library
+ * routines.  Since gnuplot's term->waitforinput() + getc_wrapper() 
+ * replace these other routines, we must do the test and suspend ourselves.
+ */
+void
+wrap_readline_signal_handler()
+{
+    int sig;
+
+    /* FIXME:	At the moment, there is no portable way to invoke the
+	    signal handler. */
+    extern void _rl_signal_handler(int);
+
+# ifdef HAVE_READLINE_PENDING_SIGNAL
+    sig = rl_pending_signal();
+# else
+    /* XXX: We assume all versions of readline have this... */
+    extern int volatile _rl_caught_signal;
+    sig = _rl_caught_signal;
+# endif
+
+    if (sig) _rl_signal_handler(sig);
+}
+
+#endif /* defined(HAVE_LIBREADLINE) && defined(HAVE_READLINE_SIGNAL_HANDLER) */
 
 
 #ifdef READLINE
