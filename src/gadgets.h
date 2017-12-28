@@ -488,6 +488,7 @@ extern const struct lp_style_type default_border_lp;
 extern TBOOLEAN	clip_lines1;
 extern TBOOLEAN	clip_lines2;
 extern TBOOLEAN	clip_points;
+extern TBOOLEAN	clip_radial;
 
 #define SAMPLES 100		/* default number of samples for a plot */
 extern int samples_1;
@@ -554,6 +555,8 @@ void clip_put_text __PROTO((unsigned int, unsigned int, char *));
 /* moved here from graph3d: */
 void clip_move __PROTO((unsigned int x, unsigned int y));
 void clip_vector __PROTO((unsigned int x, unsigned int y));
+
+void draw_polar_clip_line __PROTO((struct coordinate *beg, struct coordinate *end));
 
 /* Common routines for setting line or text color from t_colorspec */
 void apply_pm3dcolor __PROTO((struct t_colorspec *tc));

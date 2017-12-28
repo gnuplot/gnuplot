@@ -1,3 +1,21 @@
+2017-12-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.* src/graphics.c src/save.c src/set.c src/show.c
+	src/unset.c:   New command "set clip radial" for polar plot with lines
+    
+	Radial clipping two the bounding circle of a polar plot still depends on
+	the existing criteria "set clip {one|two}".
+	   set polar; set rrange [0:RMAX]
+	   set clip two; set clip radial
+	   plot $FOO with lines
+	If two successive points in $FOO are outside the bounding circle
+	(R > RMAX) a clipped portion of the line between them will be drawn.
+	If 'unset clip two' no portion of this line will be drawn.
+	
+	Adds a new routine draw_polar_clip_line() used for "plot ... with lines"
+	in polar mode. Other possible uses are polar plots with vectors,
+	impulses, polygons.
+
 2017-12-28  Rin Okuyama <rokuyama@rk.phys.keio.ac.jp>
 
 	* configure.ac src/readline.* src/term.c src/qtterminal/qt_term.cpp

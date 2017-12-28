@@ -1072,7 +1072,7 @@ plot_lines(struct curve_points *plot)
 	check_for_variable_color(plot, &plot->varcolor[i]);
 
 	switch (plot->points[i].type) {
-	case INRANGE:{
+	case INRANGE:
 
 		x = map_x(plot->points[i].x);
 		y = map_y(plot->points[i].y);
@@ -1090,6 +1090,8 @@ plot_lines(struct curve_points *plot)
 		    /* from outrange to inrange */
 		    if (!clip_lines1) {
 			(*t->move) (x, y);
+		    } else if (polar && clip_radial) {
+			draw_polar_clip_line( &(plot->points[i-1]), &(plot->points[i]) );
 		    } else {
 			edge_intersect(plot->points, i, &ex, &ey);
 			(*t->move) (map_x(ex), map_y(ey));
@@ -1099,31 +1101,35 @@ plot_lines(struct curve_points *plot)
 		    (*t->move) (x, y);
 		    (*t->vector) (x, y);
 		}
-
 		break;
-	    }
-	case OUTRANGE:{
+
+	case OUTRANGE:
 		if (prev == INRANGE) {
 		    /* from inrange to outrange */
 		    if (clip_lines1) {
-			edge_intersect(plot->points, i, &ex, &ey);
-			(*t->vector) (map_x(ex), map_y(ey));
+			if (polar && clip_radial) {
+			    draw_polar_clip_line( &(plot->points[i-1]), &(plot->points[i]) );
+			} else {
+			    edge_intersect(plot->points, i, &ex, &ey);
+			    (*t->vector) (map_x(ex), map_y(ey));
+			}
 		    }
 		} else if (prev == OUTRANGE) {
 		    /* from outrange to outrange */
 		    if (clip_lines2) {
-			if (two_edge_intersect(plot->points, i, lx, ly)) {
+			if (polar && clip_radial) {
+			    draw_polar_clip_line( &(plot->points[i-1]), &(plot->points[i]) );
+			} else if (two_edge_intersect(plot->points, i, lx, ly)) {
 			    (*t->move) (map_x(lx[0]), map_y(ly[0]));
 			    (*t->vector) (map_x(lx[1]), map_y(ly[1]));
 			}
 		    }
 		}
 		break;
-	    }
+
 	default:		/* just a safety */
-	case UNDEFINED:{
+	case UNDEFINED:
 		break;
-	    }
 	}
 	prev = plot->points[i].type;
     }

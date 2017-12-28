@@ -1187,6 +1187,9 @@ set_clip()
     if (END_OF_COMMAND) {
 	/* assuming same as points */
 	clip_points = TRUE;
+    } else if (almost_equals(c_token, "r$adial") || equals(c_token, "polar")) {
+	clip_radial = TRUE;
+	c_token++;
     } else if (almost_equals(c_token, "p$oints")) {
 	clip_points = TRUE;
 	c_token++;

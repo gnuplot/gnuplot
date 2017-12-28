@@ -1294,6 +1294,9 @@ show_clip()
 
     fprintf(stderr, "\t%s lines with both ends out of range (clip two)\n",
 	clip_lines2 ? "clipping" : "not drawing");
+
+    fprintf(stderr, "\t%sclipping lines on polar plot at maximum radius\n",
+	clip_radial ? "" : "not ");
 }
 
 

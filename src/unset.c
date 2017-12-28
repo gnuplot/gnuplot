@@ -799,14 +799,17 @@ unset_clip()
 	clip_points = FALSE;
 	clip_lines1 = FALSE;
 	clip_lines2 = FALSE;
-    } else if (almost_equals(c_token, "p$oints"))
+	clip_radial = FALSE;
+    } else if (almost_equals(c_token, "r$adial") || equals(c_token, "polar"))
+	clip_radial = FALSE;
+    else if (almost_equals(c_token, "p$oints"))
 	clip_points = FALSE;
     else if (almost_equals(c_token, "o$ne"))
 	clip_lines1 = FALSE;
     else if (almost_equals(c_token, "t$wo"))
 	clip_lines2 = FALSE;
     else
-	int_error(c_token, "expecting 'points', 'one', or 'two'");
+	int_error(c_token, "expecting 'points', 'one', 'two', or 'radial'");
     c_token++;
 }
 
@@ -1923,6 +1926,7 @@ reset_command()
     clip_points = FALSE;
     clip_lines1 = TRUE;
     clip_lines2 = FALSE;
+    clip_radial = FALSE;
 
     border_lp = default_border_lp;
     border_layer = LAYER_FRONT;

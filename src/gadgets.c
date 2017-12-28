@@ -149,6 +149,7 @@ const struct lp_style_type background_lp = {0, LT_BACKGROUND, 0, DASHTYPE_SOLID,
 TBOOLEAN clip_lines1 = TRUE;
 TBOOLEAN clip_lines2 = FALSE;
 TBOOLEAN clip_points = FALSE;
+TBOOLEAN clip_radial = FALSE;
 
 static int clip_line __PROTO((int *, int *, int *, int *));
 
@@ -629,6 +630,79 @@ clip_vector(unsigned int x, unsigned int y)
     draw_clip_line(move_pos_x, move_pos_y, x, y);
     move_pos_x = x;
     move_pos_y = y;
+}
+
+/*
+ * draw_polar_clip_line() assumes that the endpoints have already
+ * been categorized as INRANGE/OUTRANGE, and that "set clip radial"
+ * is in effect.
+ */
+void
+draw_polar_clip_line( struct coordinate *beg, struct coordinate *end )
+{
+    double R;			/* radius of limiting circle */
+    double a, b;		/* line expressed as y = a*x + b */
+    double x1, y1, x2, y2;	/* Intersections of line and circle */
+    double Q, Q2;		/* sqrt term of quadratic equation */
+
+    /* Both INRANGE, no clipping needed */
+    if (beg->type == INRANGE && end->type == INRANGE) {
+	(term->move)(map_x(beg->x), map_y(beg->y));
+	(term->vector)(map_x(end->x), map_y(end->y));
+	return;
+    }
+
+    if (R_AXIS.set_max == -VERYLARGE)
+	goto outside;
+    /* FIXME:  logscale and other odd cases not covered by this equation */
+    R = R_AXIS.set_max - R_AXIS.set_min;
+
+    /* Recast line in the form y = a*x + b */
+    a = (end->y - beg->y) / (end->x - beg->x);
+    b = beg->y - beg->x * a;
+
+    /* The line may intersect a circle of radius R in two places */
+    Q2 = 4*a*a*b*b - 4 * (1 + a*a) * (b*b - R*R);
+    if (Q2 < 0)
+	goto outside;
+    Q = sqrt(Q2);
+    x1 = (-2*a*b + Q) / ( 2*(1+a*a));
+    x2 = (-2*a*b - Q) / ( 2*(1+a*a));
+    y1 = a * x1 + b;
+    y2 = a * x2 + b;
+
+    /* If one of the original endpoints was INRANGE then use it */
+    /* rather than the second intersection point.               */
+    if (beg->type == INRANGE) {
+	if (!inrange(x1, beg->x, end->x)) {
+	    x1 = beg->x;
+	    y1 = beg->y;
+	} else {
+	    x2 = beg->x;
+	    y2 = beg->y;
+	}
+    } else if (end->type == INRANGE) {
+	if (!inrange(x1, beg->x, end->x)) {
+	    x1 = end->x;
+	    y1 = end->y;
+	} else {
+	    x2 = end->x;
+	    y2 = end->y;
+	}
+    } else {
+	/* Both OUTRANGE. Are they on the same side of the circle? */
+	if (!inrange(x1, beg->x, end->x))
+	    goto outside;
+    }
+
+    /* Draw the part of the line inside the bounding circle */
+    (term->move)(map_x(x1), map_y(y1));
+    (term->vector)(map_x(x2), map_y(y2));
+
+outside:
+    /* Leave current position at unclipped endpoint */
+    (term->move)(map_x(end->x), map_y(end->y));
+    return;
 }
 
 /* Common routines for setting text or line color from t_colorspec */

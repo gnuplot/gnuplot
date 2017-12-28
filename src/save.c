@@ -236,10 +236,12 @@ save_set_all(FILE *fp)
     fprintf(fp, "\
 %sset clip points\n\
 %sset clip one\n\
-%sset clip two\n",
+%sset clip two\n\
+%sset clip radial\n",
 	    (clip_points) ? "" : "un",
 	    (clip_lines1) ? "" : "un",
-	    (clip_lines2) ? "" : "un"
+	    (clip_lines2) ? "" : "un",
+	    (clip_radial) ? "" : "un"
 	    );
 
     save_bars(fp);
