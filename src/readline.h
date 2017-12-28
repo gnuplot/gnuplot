@@ -57,4 +57,10 @@ char *readline(const char *);
 int getc_wrapper(FILE* fp);
 #endif
 
+#if defined(HAVE_LIBREADLINE) && defined(HAVE_READLINE_SIGNAL_HANDLER)
+void wrap_readline_signal_handler(void);
+#else
+#define wrap_readline_signal_handler()
+#endif
+
 #endif /* GNUPLOT_READLINE_H */

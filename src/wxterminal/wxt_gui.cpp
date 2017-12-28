@@ -3921,6 +3921,10 @@ int wxt_waitforinput(int options)
 					      NULL /* not watching for write-ready */,
 					      NULL /* not watching for exceptions */,
 					      timeout );
+		if (n_changed_fds < 0 && errno == EINTR) {
+			wrap_readline_signal_handler();
+			continue;
+		}
 
 		if (n_changed_fds < 0) {
 			if (paused_for_mouse)

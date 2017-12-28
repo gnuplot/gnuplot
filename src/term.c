@@ -89,6 +89,7 @@
 #include "version.h"
 #include "misc.h"
 #include "multiplot.h"
+#include "readline.h"
 
 #ifdef USE_MOUSE
 #include "mouse.h"
