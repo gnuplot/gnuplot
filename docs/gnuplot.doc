@@ -8255,14 +8255,15 @@ Ffigure_fenceplot
 ?show clip
 ?clip
  Syntax:
-       set clip {points|one|two}
-       unset clip {points|one|two}
+       set clip {points|one|two|radial}
+       unset clip {points|one|two|radial}
        show clip
 
  Default state:
        unset clip points
        set clip one
        unset clip two
+       unset clip radial
 
  Data points whose center lies inside the plot boundaries are normally drawn
  even if the finite size of the point symbol causes it to extend past a boundary
@@ -8278,6 +8279,12 @@ Ffigure_fenceplot
  segments with both endpoints out of range.
  Line segments that lie entirely outside the plot boundaries are never drawn.
 
+ `set clip radial` affects plotting only in polar mode.  It clips lines
+ against the radial bound controlled by `set rrange [0:MAX]`.  This criteria
+ is applied in conjunction with `set clip {one|two}`.  I.e. the portion of a
+ line between two points with R > RMAX that passes through the circle
+ R = RMAX is drawn only if both `clip two` and `clip radial` are set.
+
  Notes:
 
  * `set clip` affects only points and lines produced by plot styles `lines`,
@@ -8288,6 +8295,9 @@ Ffigure_fenceplot
 
  * Object clipping is controlled by the `{clip|noclip}` property of the
  individual object.
+
+ * In the current version of gnuplot, "plot with vectors" in polar mode does
+ not test or clip against the maximum radius.
 
 3 cntrlabel
 ?commands set cntrlabel

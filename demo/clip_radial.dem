@@ -1,0 +1,44 @@
+#
+# Test new code to clip lines in polar plots against the
+# bounding circle set by rrange [0:MAX]
+#
+# Create test data
+reset
+set style data lines
+set sample 50
+set table $DATA
+plot '+' using (360.*rand(0)) : (rand(0))
+unset table
+#
+unset clip radial
+set dummy t, y
+set angles degrees
+set raxis
+set polar
+set rrange [  0.00 : 0.60 ] noreverse nowriteback
+set xrange [ -1.00 : 1.00 ] noreverse nowriteback
+set yrange [ -1.00 : 1.00 ] noreverse nowriteback
+set border polar
+set size square
+#
+set multiplot
+set clip one
+set clip two
+unset clip radial
+unset polar
+plot $DATA using ($2*cos($1)):($2*sin($1)) lw 4 lc "yellow" notitle
+set polar
+set rrange [  0.00 : 0.60 ] noreverse nowriteback
+set xrange [ -1.00 : 1.00 ] noreverse nowriteback
+set yrange [ -1.00 : 1.00 ] noreverse nowriteback
+plot $DATA using 1:2:(sprintf("%d",$0)) with labels notitle
+set clip radial
+set key samplen 2
+set label 1 "set clip radial" right at graph 0.9, graph 0.95
+plot $DATA lt 3 title "set clip 2" at graph 0.9, graph 0.90
+unset clip two
+plot $DATA lt 1 title "unset clip 2" at graph 0.9, graph 0.85
+unset multi
+#
+pause -1 "<cr> to continue"
+reset
