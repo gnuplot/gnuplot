@@ -1,3 +1,11 @@
+2018-01-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c:  When directing x11 output into an existing window,
+	use the same visualid that window already reports.  This fixes a failure
+	to connect gnuplot output to a socket window created by gtk3.
+	Failure and fix both reported by Dima Litvinov.
+	Bug #1980
+
 2017-12-28  Rin Okuyama <rokuyama@rk.phys.keio.ac.jp>
 
 	* configure.ac src/readline.* src/term.c src/qtterminal/qt_term.cpp

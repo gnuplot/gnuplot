@@ -6337,7 +6337,7 @@ pr_window(plot_struct *plot)
 	plot->gheight = gattr.height;
 	if (!plot->window) {
 	    plot->window = XCreateWindow(dpy, plot->external_container, plot->x, plot->y, plot->width,
-					 plot->height, 0, dep, InputOutput, vis, 0, NULL);
+					 plot->height, 0, dep, InputOutput, gattr.visual, 0, NULL);
 		gp_execute_GE_plotdone(plot->window); /* notify main program, send WINDOWID */
 	}
     }
