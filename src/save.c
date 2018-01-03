@@ -1845,7 +1845,7 @@ save_walls(FILE *fp)
     t_object *this_object;
     int i;
 
-    for (i = 0; i <= 5; i++) {
+    for (i = 0; i < 5; i++) {
     	this_object = &grid_wall[i];
 	if (this_object->layer == LAYER_FRONTBACK) {
 	    fprintf(fp, "set wall %s ", wall_name[i]);
