@@ -3263,12 +3263,10 @@ df_bin_default_columns default_style_cols[] = {
     {HISTOGRAMS, 1, 0},
     {IMAGE, 1, 2},
     {RGBIMAGE, 3, 2},
-    {RGBA_IMAGE, 4, 2}
-#ifdef EAM_OBJECTS
-    , {CIRCLES, 2, 1}
-    , {ELLIPSES, 2, 3}
-#endif
-    , {TABLESTYLE, 0, 0}
+    {RGBA_IMAGE, 4, 2},
+    {CIRCLES, 2, 1},
+    {ELLIPSES, 2, 3},
+    {TABLESTYLE, 0, 0}
 };
 
 

@@ -124,7 +124,6 @@ typedef struct arrow_def {
     struct arrow_style_type arrow_properties;
 } arrow_def;
 
-#ifdef EAM_OBJECTS
 /* The object types supported so far are OBJ_RECTANGLE, OBJ_CIRCLE, and OBJ_ELLIPSE */
 typedef struct rectangle {
     int type;			/* 0 = corners;  1 = center + size */
@@ -181,7 +180,6 @@ typedef struct object {
 #define OBJ_CIRCLE (2)
 #define OBJ_ELLIPSE (3)
 #define OBJ_POLYGON (4)
-#endif
 
 /* Datastructure implementing 'set dashtype' */
 struct custom_dashtype_def {
@@ -445,10 +443,8 @@ extern struct arrowstyle_def *first_arrowstyle;
 
 extern struct pa_style parallel_axis_style;
 
-#ifdef EAM_OBJECTS
 extern struct object *first_object;
 extern struct object grid_wall[];
-#endif
 
 extern text_label title;
 
@@ -567,7 +563,6 @@ void do_timelabel __PROTO((unsigned int x, unsigned int y));
 
 extern fill_style_type default_fillstyle;
 
-#ifdef EAM_OBJECTS
 /*       Warning: C89 does not like the union initializers     */
 extern struct object default_rectangle;
 #define DEFAULT_RECTANGLE_STYLE { NULL, -1, 0, OBJ_RECTANGLE, OBJ_CLIP,	\
@@ -636,7 +631,6 @@ extern struct object default_ellipse;
 	{FS_TRANSPARENT_SOLID, 50, 0, BLACK_COLORSPEC}, \
 	DEFAULT_LP_STYLE_TYPE, \
 	{.polygon = {5, NULL} } }
-#endif
 
 /* filledcurves style options set by 'set style [data|func] filledcurves opts' */
 extern filledcurves_opts filledcurves_opts_data;

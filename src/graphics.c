@@ -127,11 +127,9 @@ static int histeps_compare __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
 static void get_arrow __PROTO((struct arrow_def* arrow, double* sx, double* sy, double* ex, double* ey));
 static void map_position_double __PROTO((struct position* pos, double* x, double* y, const char* what));
 
-#ifdef EAM_OBJECTS
 static void plot_circles __PROTO((struct curve_points *plot));
 static void plot_ellipses __PROTO((struct curve_points *plot));
 static void do_rectangle __PROTO((int dimensions, t_object *this_object, fill_style_type *fillstyle));
-#endif
 
 static double rgbscale __PROTO((double rawvalue));
 
@@ -358,7 +356,6 @@ place_labels(struct text_label *listhead, int layer, TBOOLEAN clip)
     }
 }
 
-#ifdef EAM_OBJECTS
 void
 place_objects(struct object *listhead, int layer, int dimensions)
 {
@@ -491,7 +488,6 @@ place_objects(struct object *listhead, int layer, int dimensions)
 
     }
 }
-#endif
 
 /*
  * Apply axis range expansions from "set offsets" command
@@ -864,7 +860,6 @@ do_plot(struct curve_points *plots, int pcount)
 		process_image(this_plot, IMG_PLOT);
 		break;
 
-#ifdef EAM_OBJECTS
 	    case CIRCLES:
 		plot_circles(this_plot);
 		break;
@@ -872,8 +867,6 @@ do_plot(struct curve_points *plots, int pcount)
 	    case ELLIPSES:
 		plot_ellipses(this_plot);
 		break;
-
-#endif
 
 	    case PARALLELPLOT:
 		plot_parallel(this_plot);
@@ -2253,7 +2246,6 @@ plot_points(struct curve_points *plot)
     }
 }
 
-#ifdef EAM_OBJECTS
 /* plot_circles:
  * Plot the curves in CIRCLES style
  */
@@ -2389,7 +2381,6 @@ plot_ellipses(struct curve_points *plot)
     free(e);
     clip_area = clip_save; 
 }
-#endif
 
 /* plot_dots:
  * Plot the curves in DOTS style
@@ -3976,14 +3967,12 @@ place_histogram_titles()
 static void
 place_raxis()
 {
-#ifdef EAM_OBJECTS
     t_object raxis_circle = {
 	NULL, 1, 1, OBJ_CIRCLE,	OBJ_CLIP, /* link, tag, layer (front), object_type, clip */
 	{FS_SOLID, 100, 0, BLACK_COLORSPEC},
 	{0, LT_BACKGROUND, 0, DASHTYPE_AXIS, 0, 0, 0.2, 0.0, DEFAULT_P_CHAR, BACKGROUND_COLORSPEC, DEFAULT_DASHPATTERN},
 	{.circle = {1, {0,0,0,0.,0.,0.}, {graph,0,0,0.02,0.,0.}, 0., 360. }}
     };
-#endif
     int x0,y0, xend,yend;
 
     if (inverted_raxis) {
@@ -3998,11 +3987,9 @@ place_raxis()
     term_apply_lp_properties(&border_lp);
     draw_clip_line(x0,y0,xend,yend);
 
-#ifdef EAM_OBJECTS
     if (!inverted_raxis)
     if (!(R_AXIS.autoscale & AUTOSCALE_MIN) && R_AXIS.set_min != 0)
 	place_objects( &raxis_circle, LAYER_FRONT, 2);
-#endif
 
 }
 
@@ -4140,7 +4127,6 @@ attach_title_to_plot(struct curve_points *this_plot, legend_key *key)
 	JUST_TOP, 0, key->font);
 }
 
-#ifdef EAM_OBJECTS
 void
 do_rectangle( int dimensions, t_object *this_object, fill_style_type *fillstyle )
 {
@@ -4414,7 +4400,6 @@ do_polygon( int dimensions, t_polygon *p, int style, t_clip_object clip, int fac
 
     clip_area = clip_save;
 }
-#endif
 
 TBOOLEAN
 check_for_variable_color(struct curve_points *plot, double *colorvalue)

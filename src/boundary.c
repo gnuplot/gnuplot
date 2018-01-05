@@ -1185,13 +1185,13 @@ do_key_sample(
 	unsigned int w = key_sample_right - key_sample_left;
 	unsigned int h = key_sample_height/2;
 
-#ifdef EAM_OBJECTS
 	if (this_plot->plot_style == CIRCLES && w > 0) {
 	    do_arc(xl + key_point_offset, yl, key_sample_height/4, 0., 360., style, FALSE);
 	    /* Retrace the border if the style requests it */
 	    if (need_fill_border(fs)) {
 	        do_arc(xl + key_point_offset, yl, key_sample_height/4, 0., 360., 0, FALSE);
 	    }
+
 	} else if (this_plot->plot_style == ELLIPSES && w > 0) {
 	    t_ellipse *key_ellipse = (t_ellipse *) gp_alloc(sizeof(t_ellipse),
 	        "cute little ellipse for the key sample");
@@ -1207,9 +1207,8 @@ do_key_sample(
 		do_ellipse(2, key_ellipse, 0, FALSE);
 	    }
 	    free(key_ellipse);
-	} else
-#endif
-	if (w > 0) {    /* All other plot types with fill */
+
+	} else if (w > 0) {    /* All other plot types with fill */
 	    if (style != FS_EMPTY)
 		(*t->fillbox)(style,x,y,w,h);
 

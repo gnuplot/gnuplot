@@ -119,13 +119,9 @@ void process_image __PROTO((void *plot, t_procimg_action action));
 TBOOLEAN check_for_variable_color __PROTO((struct curve_points *plot, double *colorvalue));
 
 
-#ifdef EAM_OBJECTS
 void place_objects __PROTO((struct object *listhead, int layer, int dimensions));
 void do_ellipse __PROTO((int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping ));
 void do_polygon __PROTO((int dimensions, t_polygon *p, int style, t_clip_object clip, int facing ));
-#else
-#define place_objects(listhead,layer,dimensions) /* void() */
-#endif
 
 int filter_boxplot __PROTO((struct curve_points *));
 void attach_title_to_plot __PROTO((struct curve_points *this_plot, legend_key *key));

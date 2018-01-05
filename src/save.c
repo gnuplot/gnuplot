@@ -273,7 +273,6 @@ save_set_all(FILE *fp)
     fprintf(fp, "set style fill ");
     save_fillstyle(fp, &default_fillstyle);
 
-#ifdef EAM_OBJECTS
     /* Default rectangle style */
     fprintf(fp, "set style rectangle %s fc ",
 	    default_rectangle.layer > 0 ? "front" :
@@ -303,7 +302,6 @@ save_set_all(FILE *fp)
 	    fputs("yy\n", fp);
 	    break;
     }
-#endif
 
     if (dgrid3d) {
       if (dgrid3d_mode == DGRID3D_QNORM) {
@@ -585,12 +583,10 @@ save_set_all(FILE *fp)
     fprintf(fp, "set style histogram ");
     save_histogram_opts(fp);
 
-#ifdef EAM_OBJECTS
     fprintf(fp, "unset object\n");
     save_object(fp, 0);
     fprintf(fp, "unset walls\n");
     save_walls(fp);
-#endif
 
 #ifdef EAM_BOXED_TEXT
     fprintf(fp, "set style textbox");
@@ -1577,14 +1573,12 @@ save_data_func_style(FILE *fp, const char *which, enum PLOT_STYLE style)
     case RGBIMAGE:
 	fputs("rgbimage\n", fp);
 	break;
-#ifdef EAM_OBJECTS
 	case CIRCLES:
 	fputs("circles\n", fp);
 	break;
 	case ELLIPSES:
 	fputs("ellipses\n", fp);
 	break;
-#endif
     case SURFACEGRID:
 	fputs("surfaces\n", fp);
 	break;
@@ -1719,8 +1713,6 @@ save_histogram_opts (FILE *fp)
     save_position(fp, &histogram_opts.title.offset, 2, TRUE);
     fprintf(fp, "\n");
 }
-
-#ifdef EAM_OBJECTS
 
 /* Save/show rectangle <tag> (0 means show all) */
 void
@@ -1857,6 +1849,4 @@ save_walls(FILE *fp)
 
     }
 }
-
-#endif
 

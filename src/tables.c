@@ -712,10 +712,8 @@ const struct gen_table plotstyle_tbl[] =
     { "ima$ge", IMAGE },
     { "rgbima$ge", RGBIMAGE },
     { "rgba$lpha", RGBA_IMAGE },
-#ifdef EAM_OBJECTS
     { "cir$cles", CIRCLES },
     { "ell$ipses", ELLIPSES },
-#endif
     { "sur$face", SURFACEGRID },
     { "parallel$axes", PARALLELPLOT },
     { "table", TABLESTYLE },

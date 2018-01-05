@@ -93,11 +93,9 @@ static void show_dummy __PROTO((void));
 static void show_format __PROTO((void));
 static void show_styles __PROTO((const char *name, enum PLOT_STYLE style));
 static void show_style __PROTO((void));
-#ifdef EAM_OBJECTS
 static void show_style_rectangle __PROTO((void));
 static void show_style_circle __PROTO((void));
 static void show_style_ellipse __PROTO((void));
-#endif
 static void show_grid __PROTO((void));
 static void show_raxis __PROTO((void));
 static void show_paxis __PROTO((void));
@@ -409,12 +407,10 @@ show_command()
 	show_psdir();
 	break;
     case S_OBJECT:
-#ifdef EAM_OBJECTS
 	if (almost_equals(c_token,"rect$angle"))
 	    c_token++;
 	CHECK_TAG_GT_ZERO;
 	save_object(stderr,tag);
-#endif
 	break;
     case S_WALL:
 	save_walls(stderr);
@@ -814,9 +810,7 @@ show_all()
     show_fit();
     show_polar();
     show_angles();
-#ifdef EAM_OBJECTS
     save_object(stderr,0);
-#endif
     show_samples();
     show_isosamples();
     show_view();
@@ -1007,9 +1001,7 @@ show_version(FILE *fp)
 		"";
 
 	    const char *plotoptions=
-#ifdef EAM_OBJECTS
 		"+OBJECTS  "
-#endif
 #ifdef USE_STATS
 		"+STATS "
 #else
@@ -1545,7 +1537,6 @@ show_style()
 	show_boxplot();
 	c_token++;
 	break;
-#ifdef EAM_OBJECTS
     case SHOW_STYLE_RECTANGLE:
 	show_style_rectangle();
 	c_token++;
@@ -1558,7 +1549,6 @@ show_style()
 	show_style_ellipse();
 	c_token++;
 	break;
-#endif
     default:
 	/* show all styles */
 	show_styles("Data",data_style);
@@ -1573,17 +1563,14 @@ show_style()
 	save_style_parallel(stderr);
 	show_arrowstyle(0);
 	show_boxplot();
-#ifdef EAM_OBJECTS
 	show_style_rectangle();
 	show_style_circle();
 	show_style_ellipse();
-#endif
 	break;
     }
 #undef CHECK_TAG_GT_ZERO
 }
 
-#ifdef EAM_OBJECTS
 /* called by show_style() - defined for aesthetic reasons */
 static void
 show_style_rectangle()
@@ -1628,7 +1615,6 @@ show_style_ellipse()
 	    break;
     }
 }
-#endif
 
 /* called by show_data() and show_func() */
 static void

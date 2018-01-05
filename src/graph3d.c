@@ -1053,10 +1053,8 @@ do_3dplot(
 	    case CANDLESTICKS:	/* HBB: ditto */
 	    case BOXPLOT:
 	    case FINANCEBARS:
-#ifdef EAM_OBJECTS
 	    case CIRCLES:
 	    case ELLIPSES:
-#endif
 	    case POINTSTYLE:
 	    case DOTS:
 		if (draw_this_surface) {
@@ -1169,10 +1167,8 @@ do_3dplot(
 	    case CANDLESTICKS:	/* HBB: ditto */
 	    case BOXPLOT:
 	    case FINANCEBARS:
-#ifdef EAM_OBJECTS
 	    case CIRCLES:
 	    case ELLIPSES:
-#endif
 	    case POINTSTYLE:
 		if (draw_this_surface)
 		    key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);

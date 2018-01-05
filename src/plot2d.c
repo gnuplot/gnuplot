@@ -564,17 +564,15 @@ get_data(struct curve_points *current_plot)
 	max_cols = 6;
 	break;
 
-#ifdef EAM_OBJECTS
     case CIRCLES:	/* 3 + possible variable color, or 5 + possible variable color */
 	min_cols = 2;
 	max_cols = 6;
 	break;
 
-	case ELLIPSES:
-	    min_cols = 2; /* x, y, major axis, minor axis */
-	    max_cols = 6; /* + optional angle, possible variable color */
-	    break;
-#endif
+    case ELLIPSES:
+	min_cols = 2; /* x, y, major axis, minor axis */
+	max_cols = 6; /* + optional angle, possible variable color */
+	break;
 
     case POINTSTYLE:
     case LINESPOINTS:
@@ -707,12 +705,10 @@ get_data(struct curve_points *current_plot)
 		case YERRORBARS:
 				if (j < 4) int_error(NO_CARET,errmsg);
 				break;
-#ifdef EAM_OBJECTS
 		case CIRCLES: 
 				if (j == 5 || j < 3) int_error(NO_CARET,errmsg);
 				break;
 		case ELLIPSES:
-#endif
 		case BOXES:
 		case POINTSTYLE:
 		case LINESPOINTS:
@@ -903,7 +899,6 @@ get_data(struct curve_points *current_plot)
 				      v[0] - boxwidth / 2, v[0] + boxwidth / 2,
 				      v[1], v[1], 0.0);
 
-#ifdef EAM_OBJECTS
 	    } else if (current_plot->plot_style == CIRCLES) {
 		    /* x, y, default radius, full circle */
 		    store2d_point(current_plot, i++, v[0], v[1], v[0], v[0],
@@ -913,7 +908,6 @@ get_data(struct curve_points *current_plot)
 		    store2d_point(current_plot, i++, v[0], v[1], 0.0, 0.0,
 		    		  0.0, 0.0, DEFAULT_ELLIPSE);
 
-#endif
 	    } else if (current_plot->plot_style == YERRORBARS) {
 		/* x is index, assign number to y */
 		v[2] = v[1];
@@ -1031,7 +1025,6 @@ get_data(struct curve_points *current_plot)
 		    		  v[1], v[1], DEFAULT_BOXPLOT_FACTOR);
 		    break;
 
-#ifdef EAM_OBJECTS
 		case CIRCLES:	/* x, y, radius */
 		    /* by default a full circle is drawn */
 		    /* negative radius means default radius -> set flag in width */
@@ -1043,7 +1036,7 @@ get_data(struct curve_points *current_plot)
 		    store2d_point(current_plot, i++, v[0], v[1], fabs(v[2]), fabs(v[2]),
 		    		  0.0, v[2], (v[2] >= 0) ? 0.0 : DEFAULT_RADIUS);
 		    break;
-#endif
+
 		}               /*inner switch */
 
 	    break;
@@ -1144,12 +1137,10 @@ get_data(struct curve_points *current_plot)
 		break;
 
 
-#ifdef EAM_OBJECTS
 	    case ELLIPSES:	/* x, y, major axis, minor axis, 0 as orientation */
 		store2d_point(current_plot, i++, v[0], v[1], fabs(v[2]), fabs(v[3]),
 				0.0, v[2], ((v[2] >= 0) && (v[3] >= 0)) ? 0.0 : DEFAULT_RADIUS);
 		break;
-#endif
 
 	    }                   /*inner switch */
 
@@ -1182,7 +1173,6 @@ get_data(struct curve_points *current_plot)
 				  v[1], v[1] + v[3], v[4]);
 		    break;
 
-#ifdef EAM_OBJECTS
 		case CIRCLES:	/* x, y, radius, arc begin, arc end */
 		    /* negative radius means default radius -> set flag in width */
 		    store2d_point(current_plot, i++, v[0], v[1], v[0]-v[2], v[0]+v[2],
@@ -1193,7 +1183,6 @@ get_data(struct curve_points *current_plot)
 		    store2d_point(current_plot, i++, v[0], v[1], fabs(v[2]), fabs(v[3]),
 		    		  v[4], v[2], ((v[2] >= 0) && (v[3] >= 0)) ? 0.0 : DEFAULT_RADIUS);
 		    break;
-#endif
 
 		case RGBIMAGE:  /* x_center y_center r_value g_value b_value (rgb) */
 		    goto images;
@@ -1379,7 +1368,6 @@ store2d_point(
 	STORE_AND_UPDATE_RANGE(cp->xhigh, xhigh, dummy_type, current_plot->x_axis,
 				current_plot->noautoscale, cp->xhigh = -VERYLARGE);
 	break;
-#ifdef EAM_OBJECTS
     case CIRCLES:
 	cp->yhigh = yhigh;
 	STORE_AND_UPDATE_RANGE(cp->xlow, xlow, dummy_type, current_plot->x_axis, 
@@ -1422,7 +1410,6 @@ store2d_point(
 	cp->xhigh = xhigh;  /* minor axis */
 	cp->ylow = ylow;    /* orientation */
 	break;
-#endif
 
     default:			/* auto-scale to xlow xhigh ylow yhigh */
 	STORE_AND_UPDATE_RANGE(cp->xlow, xlow, dummy_type, current_plot->x_axis, 
@@ -2017,9 +2004,7 @@ eval_plots()
 	    TBOOLEAN set_fillstyle = FALSE;
 	    TBOOLEAN set_fillcolor = FALSE;
 	    TBOOLEAN set_labelstyle = FALSE;
-#ifdef EAM_OBJECTS
 	    TBOOLEAN set_ellipseaxes_units = FALSE;
-#endif
 	    t_colorspec fillcolor = DEFAULT_COLORSPEC;
 
 	    /* CHANGE: Aug 2017
@@ -2361,7 +2346,6 @@ eval_plots()
 		    }
 		}
 
-#ifdef EAM_OBJECTS
 		/* pick up the special 'units' keyword the 'ellipses' style allows */
 		if (this_plot->plot_style == ELLIPSES) {
 		    int stored_token = c_token;
@@ -2391,7 +2375,6 @@ eval_plots()
 			}
 		    }
 		}
-#endif
 
 		/* Most plot styles accept line and point properties */
 		/* but do not want font or text properties           */
@@ -3211,7 +3194,6 @@ eval_plots()
 			    }
 			    
 			    /* Fill in additional fields needed to draw a circle */
-#ifdef EAM_OBJECTS
 			    if (this_plot->plot_style == CIRCLES) {
 				this_plot->points[i].z = DEFAULT_RADIUS;
 				this_plot->points[i].ylow = 0;
@@ -3220,7 +3202,6 @@ eval_plots()
 				this_plot->points[i].z = DEFAULT_RADIUS;
 				this_plot->points[i].ylow = default_ellipse.o.ellipse.orientation;
 			    }
-#endif
 
 			    STORE_AND_UPDATE_RANGE(this_plot->points[i].y, temp, 
 			    	this_plot->points[i].type, in_parametric ? x_axis : y_axis,

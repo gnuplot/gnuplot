@@ -123,11 +123,9 @@ static void set_pointsize __PROTO((void));
 static void set_pointintervalbox __PROTO((void));
 static void set_polar __PROTO((void));
 static void set_print __PROTO((void));
-#ifdef EAM_OBJECTS
 static void set_object __PROTO((void));
 static void set_obj __PROTO((int, int));
 static void set_wall __PROTO((void));
-#endif
 static void set_psdir __PROTO((void));
 static void set_rgbmax __PROTO((void));
 static void set_samples __PROTO((void));
@@ -446,14 +444,12 @@ set_command()
 	case S_PSDIR:
 	    set_psdir();
 	    break;
-#ifdef EAM_OBJECTS
 	case S_OBJECT:
 	    set_object();
 	    break;
 	case S_WALL:
 	    set_wall();
 	    break;
-#endif
 	case S_SAMPLES:
 	    set_samples();
 	    break;
@@ -4120,7 +4116,6 @@ set_polar()
 	rrange_to_xy();
 }
 
-#ifdef EAM_OBJECTS
 /*
  * Process command     'set object <tag> {rectangle|ellipse|circle|polygon}'
  * set object {tag} rectangle {from <bottom_left> {to|rto} <top_right>}
@@ -4618,7 +4613,6 @@ set_wall()
 	    int_error(c_token, "unrecognized option");
     }
 }
-#endif
 
 static void
 set_rgbmax()
@@ -4744,7 +4738,6 @@ set_style()
     case SHOW_STYLE_ARROW:
 	set_arrowstyle();
 	break;
-#ifdef EAM_OBJECTS
     case SHOW_STYLE_RECTANGLE:
 	c_token++;
 	set_obj(-2, OBJ_RECTANGLE);
@@ -4807,7 +4800,6 @@ set_style()
 	    c_token++;
 	}
 	break;
-#endif
     case SHOW_STYLE_HISTOGRAM:
 	parse_histogramstyle(&histogram_opts,HT_CLUSTERED,histogram_opts.gap);
 	break;

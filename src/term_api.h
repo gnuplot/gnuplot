@@ -512,12 +512,10 @@ TBOOLEAN on_page __PROTO((int x, int y));
 /* Convert a fill style into a backwards compatible packed form */
 int style_from_fill __PROTO((struct fill_style_type *));
 
-#ifdef EAM_OBJECTS
 /* Terminal-independent routine to draw a circle or arc */
 void do_arc __PROTO(( unsigned int cx, unsigned int cy, double radius,
                       double arc_start, double arc_end,
 		      int style, TBOOLEAN wedge));
-#endif
 
 #ifdef LINUXVGA
 void LINUX_setup __PROTO((void));

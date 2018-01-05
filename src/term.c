@@ -1119,7 +1119,6 @@ do_arrow(
     clip_area = clip_save;
 }
 
-#ifdef EAM_OBJECTS
 /* Generic routine for drawing circles or circular arcs.          */
 /* If this feature proves useful, we can add a new terminal entry */
 /* point term->arc() to the API and let terminals either provide  */
@@ -1189,8 +1188,6 @@ do_arc(
 	draw_clip_polygon(segments+1, vertex);
     }
 }
-#endif /* EAM_OBJECTS */
-
 
 
 #define TERM_PROTO

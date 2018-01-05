@@ -108,12 +108,10 @@ struct pa_style parallel_axis_style = DEFAULT_PARALLEL_AXIS_STYLE;
 /* set arrow */
 struct arrow_def *first_arrow = NULL;
 
-#ifdef EAM_OBJECTS
 /* Pointer to first object instance in linked list */
 struct object *first_object = NULL;
 /* Pointer to array of grid walls */
 struct object grid_wall[5] = {WALL_Y0, WALL_X0, WALL_Y1, WALL_X1, WALL_Z0};
-#endif
 
 /* 'set title' status */
 text_label title = EMPTY_LABELSTRUCT;
@@ -178,12 +176,10 @@ TBOOLEAN volatile_data = FALSE;
 
 fill_style_type default_fillstyle = { FS_EMPTY, 100, 0, DEFAULT_COLORSPEC } ;
 
-#ifdef EAM_OBJECTS
 /* Default rectangle style - background fill, black border */
 struct object default_rectangle = DEFAULT_RECTANGLE_STYLE;
 struct object default_circle = DEFAULT_CIRCLE_STYLE;
 struct object default_ellipse = DEFAULT_ELLIPSE_STYLE;
-#endif
 
 /* filledcurves style options */
 filledcurves_opts filledcurves_opts_data = EMPTY_FILLEDCURVES_OPTS;
@@ -1025,7 +1021,6 @@ do_timelabel(unsigned int x, unsigned int y)
 void
 init_gadgets()
 {
-#ifdef EAM_OBJECTS
    int i;
    static t_position y0_wall_corners[5] = WALL_Y0_CORNERS;
    static t_position x0_wall_corners[5] = WALL_X0_CORNERS;
@@ -1050,5 +1045,4 @@ init_gadgets()
    grid_wall[WALL_Y1_TAG].lp_properties.pm3d_color.lt = WALL_Y_COLOR;
    grid_wall[WALL_X1_TAG].lp_properties.pm3d_color.lt = WALL_X_COLOR;
    grid_wall[WALL_Z0_TAG].lp_properties.pm3d_color.lt = WALL_Z_COLOR;
-#endif
 }

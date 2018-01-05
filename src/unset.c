@@ -87,14 +87,12 @@ static void unset_label __PROTO((void));
 static void delete_label __PROTO((struct text_label * prev, struct text_label * this));
 static void unset_linestyle __PROTO((struct linestyle_def **head));
 static void unset_linetype __PROTO((void));
-#ifdef EAM_OBJECTS
 static void unset_object __PROTO((void));
 static void delete_object __PROTO((struct object * prev, struct object * this));
 static void unset_style_rectangle __PROTO(());
 static void unset_style_circle __PROTO(());
 static void unset_style_ellipse __PROTO(());
 static void unset_wall __PROTO((int which));
-#endif
 static void unset_loadpath __PROTO((void));
 static void unset_locale __PROTO((void));
 static void reset_logscale __PROTO((struct axis *));
@@ -389,7 +387,6 @@ unset_command()
     case S_PSDIR:
 	unset_psdir();
 	break;
-#ifdef EAM_OBJECTS
     case S_OBJECT:
 	unset_object();
 	break;
@@ -397,7 +394,6 @@ unset_command()
 	for (i=0; i<5; i++)
 	    unset_wall(i);
 	break;
-#endif
     case S_RTICS:
 	unset_tics(&axis_array[POLAR_AXIS]);
 	break;
@@ -1098,7 +1094,6 @@ unset_linetype()
 	unset_linestyle(&first_perm_linestyle);
 }
 
-#ifdef EAM_OBJECTS
 static void
 unset_object()
 {
@@ -1147,7 +1142,6 @@ delete_object(struct object *prev, struct object *this)
 	free (this);
     }
 }
-#endif
 
 
 /* process 'unset loadpath' command */
@@ -1525,11 +1519,9 @@ unset_style()
 	while (first_linestyle != NULL)
 	    delete_linestyle(&first_linestyle, NULL, first_linestyle);
 	unset_fillstyle();
-#ifdef EAM_OBJECTS
 	unset_style_rectangle();
 	unset_style_circle();
 	unset_style_ellipse();
-#endif
 	unset_histogram();
 	unset_boxplot();
 #ifdef EAM_BOXED_TEXT
@@ -1569,7 +1561,6 @@ unset_style()
 	unset_arrowstyles();
 	c_token++;
 	break;
-#ifdef EAM_OBJECTS
     case SHOW_STYLE_RECTANGLE:
 	unset_style_rectangle();
 	c_token++;
@@ -1582,7 +1573,6 @@ unset_style()
 	unset_style_ellipse();
 	c_token++;
 	break;
-#endif
 #ifdef EAM_BOXED_TEXT
     case SHOW_STYLE_TEXTBOX:
 	unset_textbox_style();
@@ -1853,14 +1843,12 @@ reset_command()
     /* delete linestyles */
     while (first_linestyle != NULL)
 	delete_linestyle(&first_linestyle, NULL, first_linestyle);
-#ifdef EAM_OBJECTS
     /* delete objects */
     while (first_object != NULL)
 	delete_object((struct object *) NULL, first_object);
     unset_style_rectangle();
     unset_style_circle();
     unset_style_ellipse();
-#endif
 
     /* 'polar', 'parametric' and 'dummy' are interdependent, so be
      * sure to keep the order intact */
@@ -2017,7 +2005,6 @@ reset_command()
     interactive = save_interactive;
 }
 
-#ifdef EAM_OBJECTS
 static void
 unset_style_rectangle()
 {
@@ -2044,4 +2031,3 @@ unset_wall(int which)
 {
     grid_wall[which].layer = LAYER_BEHIND;
 }
-#endif
