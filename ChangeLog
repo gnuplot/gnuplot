@@ -1,9 +1,18 @@
+2018-01-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/history.c:  If ./configure --disable-history-file or
+	--without-readline then do not try to build the routine that reads a
+	history file.  Whether --without-readline should really disable
+	history is another question, but that is a configuration issue not a
+	compile issue.
+	Bug #2008
+
 2017-12-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.* src/graphics.c src/save.c src/set.c src/show.c
 	src/unset.c:   New command "set clip radial" for polar plot with lines
     
-	Radial clipping two the bounding circle of a polar plot still depends on
+	Radial clipping to the bounding circle of a polar plot still depends on
 	the existing criteria "set clip {one|two}".
 	   set polar; set rrange [0:RMAX]
 	   set clip two; set clip radial
@@ -12,7 +21,7 @@
 	(R > RMAX) a clipped portion of the line between them will be drawn.
 	If 'unset clip two' no portion of this line will be drawn.
 	
-	Adds a new routine draw_polar_clip_line() used for "plot ... with lines"
+	New routine draw_polar_clip_line() used for "plot ... with lines"
 	in polar mode. Other possible uses are polar plots with vectors,
 	impulses, polygons.
 

@@ -347,6 +347,7 @@ history_search_prefix(const char *string, int direction)
 }
 #endif
 
+#ifdef GNUPLOT_HISTORY
 
 /* routine to read history entries from a file,
  * this complements write_history and is necessary for
@@ -386,6 +387,7 @@ gp_read_history(const char *filename)
 	return errno;
     }
 }
+#endif
 
 
 #ifdef USE_READLINE
