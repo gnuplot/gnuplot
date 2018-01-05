@@ -1,3 +1,12 @@
+2018-01-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/history.c:  If ./configure --disable-history-file or
+	--without-readline then do not try to build the routine that reads a
+	history file.  Whether --without-readline should really disable
+	history is another question, but that is a configuration issue not a
+	compile issue.
+	Bug #2008
+
 2018-01-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c:  When directing x11 output into an existing window,
