@@ -30,12 +30,6 @@
 /* Define to support boxed labels */
 #define EAM_BOXED_TEXT 1
 
-/* Define to allow placement of rectangles and other objects */
-/* Warning: Uses union initializers which earlier versions of VC did not support */
-#if _MSC_VER >= 1900
-# define EAM_OBJECTS 1
-#endif
-
 /* Define if color information should be passed for each vertex. */
 /* #undef EXTENDED_COLOR_SPECS */
 

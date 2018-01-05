@@ -860,16 +860,6 @@ AC_ARG_ENABLE(raise-console,dnl
                 [ Define to treat spacebar like any other keystroke. ])
   fi
 
-dnl rectangles and other objects
-AC_ARG_ENABLE(objects,dnl
-[  --disable-objects       disable rectangles and other objects ],,
-  test -z "$enable_objects" && enable_objects=yes)
-
-  if test "$enable_objects" = yes; then
-  AC_DEFINE(EAM_OBJECTS,1,
-               [ Define to allow placement of rectangles and other objects ])
-  fi
-
 dnl hidden3d compile-time options...
 dnl NOTE: have to check that they're not both turned on --- the code
 dnl doesn't allow that choice.
@@ -1424,12 +1414,6 @@ if test "$enable_raise_console" = yes; then
   AC_MSG_RESULT([  Typing <space> in plot window raises console])
 else
   AC_MSG_RESULT([  Treat <space> in plot window like any other key: yes])
-fi
-
-if test "$enable_objects" = yes; then
-  AC_MSG_RESULT([  Placement of rectangles and other objects: yes ])
-else
-  AC_MSG_RESULT([  Placement of rectangles and other objects: no])
 fi
 
 if test "$with_readline" = no; then
