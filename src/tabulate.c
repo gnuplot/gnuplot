@@ -493,7 +493,7 @@ print_3dtable(int pcount)
 		int count = c->num_pts;
 		struct coordinate *point = c->coords;
 
-		if (c->isNewLevel)
+		if (c->isNewLevel) {
 		    /* don't display count - contour split across chunks */
 		    /* put # in case user wants to use it for a plot */
 		    /* double blank line to allow plot ... index ... */
@@ -501,6 +501,7 @@ print_3dtable(int pcount)
 		    snprintf(line, size, "# Contour %d, label: %s",
 			    number++, c->label);
 		    print_line(line);
+		}
 
 		for (; --count >= 0; ++point) {
 		    line[0] = NUL;
