@@ -1645,7 +1645,7 @@ f_strftime(union argument *arg)
     /* Get time_str */
     length = gstrftime(buffer, buflen, fmtstr, real(&val));
     if (length == 0 || length >= buflen)
-	int_error(NO_CARET, "Resulting string is too long");
+	int_error(NO_CARET, "String produced by time format is too long");
 
     /* Remove trailing space */
     assert(buffer[length-1] == ' ');

@@ -74,7 +74,7 @@ static int gdysize __PROTO((int yr));
 
 static int mndday[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-static size_t xstrftime __PROTO((char *buf, size_t bufsz, const char *fmt, struct tm * tm, double usec, double fulltime));
+static size_t xstrftime __PROTO((char *buf, int bsz, const char *fmt, struct tm * tm, double usec, double fulltime));
 
 /* days in year */
 static int
@@ -391,7 +391,7 @@ gstrftime(char *s, size_t bsz, const char *fmt, double l_clock)
 static size_t
 xstrftime(
     char *str,			/* output buffer */
-    size_t bsz,			/* space available */
+    int bsz,			/* remaining space available in buffer */
     const char *fmt,
     struct tm *tm,
     double usec,
@@ -401,6 +401,9 @@ xstrftime(
     int incr = 0;			/* chars just written */
     char *s = str;
     TBOOLEAN sign_printed = FALSE;
+
+    if (bsz <= 0)
+	return 0;
 
     memset(str, '\0', bsz);
 

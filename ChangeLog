@@ -1,3 +1,10 @@
+2018-01-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/time.c (xstrftime) internal.c (f_strftime):  Protect against
+	buffer overflow from user-supplied time format string.  E.g.
+	    print time(0,"%100tH%D")
+	Bug #2009
+
 2018-01-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/history.c:  If ./configure --disable-history-file or
