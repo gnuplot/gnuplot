@@ -178,7 +178,7 @@
 #endif
 
 /* REGIS graphics language */
-#ifdef VMS
+#if defined(VMS) || defined(HAVE_REGIS)
 # include "regis.trm"
 #endif
 

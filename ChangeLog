@@ -1,3 +1,8 @@
+2018-01-11  Ulrich Müller  <udalricus@users.sf.net>
+
+	* configure.ac src/term.h:  Configuration option  --with-regis
+	to include support for ReGIS terminal driver
+
 2018-01-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/time.c (xstrftime) internal.c (f_strftime):  Protect against

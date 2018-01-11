@@ -1036,6 +1036,13 @@ AS_IF([test "x${with_mif}" = "xyes"],
   AC_DEFINE(HAVE_MIF,1,
           [ Define to include support for mif terminal ],))
 
+dnl ReGIS terminal
+AC_ARG_WITH(regis,dnl
+[  --with-regis                    ReGIS terminal])
+AS_IF([test "x${with_regis}" = "xyes"],
+  AC_DEFINE(HAVE_REGIS,1,
+          [ Define to include support for ReGIS terminal ],))
+
 AC_ARG_WITH(cairo,dnl
 [  --without-cairo      cairo-based terminals (default enabled)],,
   [test -z "${with_cairo}" && with_cairo=yes])
@@ -1327,6 +1334,12 @@ if test "$with_mif" == yes; then
   AC_MSG_RESULT([  mif terminal: yes])
 else
   AC_MSG_RESULT([  mif terminal: no   (use --with-mif to enable)])
+fi
+
+if test "$with_regis" = yes; then
+  AC_MSG_RESULT([  ReGIS terminal: yes])
+else
+  AC_MSG_RESULT([  ReGIS terminal: no (use --with-regis to enable)])
 fi
 
 if test "$is_msdos" = yes; then
