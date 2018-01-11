@@ -1611,7 +1611,7 @@ record()
 	case X11_GR_MAKE_PALETTE:
 	    if (have_pm3d) {
 		char cmapidx[6] = "e";
-		int cm_index;
+		unsigned int cm_index;
 	        cmap_struct *csp;
 		/* Get and process palette */
 		scan_palette_from_buf();
