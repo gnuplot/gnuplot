@@ -237,7 +237,7 @@ axis_name(AXIS_INDEX axis)
 	return "t";
 
     if (axis >= PARALLEL_AXES) {
-	sprintf(name, "paxis %d ", axis-PARALLEL_AXES+1);
+	sprintf(name, "paxis %d ", (axis-PARALLEL_AXES+1) & 0xff);
 	return name;
     }
     if (axis < 0) {
