@@ -3371,6 +3371,7 @@ Ffigure_newsyntax
 2 boxerrorbars
 ?plotting styles boxerrorbars
 ?style boxerrorbars
+?with boxerrorbars
 ?boxerrorbars
  The `boxerrorbars` style is only relevant to 2D data plotting.  It is a
  combination of the `boxes` and `yerrorbars` styles.  It requires 3, 4, or 5
@@ -3399,6 +3400,7 @@ Ffigure_boxerrorbars
 2 boxes
 ?plotting styles boxes
 ?style boxes
+?with boxes
 ?boxes
  The `boxes` style is only relevant to 2D plotting.  It draws a box centered
  about the given x coordinate that extends from the x axis (not from the graph
@@ -3455,6 +3457,7 @@ Ffigure_boxes
 2 boxplot
 ?plotting styles boxplot
 ?style boxplot
+?with boxplot
 ?boxplot
 Ffigure_boxplot
  Boxplots are a common way to represent a statistical distribution of values.
@@ -3506,6 +3509,7 @@ Ffigure_boxplot
 2 boxxyerror
 ?plotting styles boxxyerror
 ?style boxxyerror
+?with boxxyerror
 ?boxxyerror
 Ffigure_boxxyerror
  The `boxxyerror` plot style is only relevant to 2D data plotting.
@@ -3535,6 +3539,7 @@ Ffigure_boxxyerror
 2 candlesticks
 ?plotting styles candlesticks
 ?style candlesticks
+?with candlesticks
 ?candlesticks
 Ffigure_candlesticks
  The `candlesticks` style can be used for 2D data plotting of financial
@@ -3601,6 +3606,7 @@ Ffigure_candlesticks
 2 circles
 ?plotting styles circles
 ?style circles
+?with circles
 ?circles
 Ffigure_circles
  The `circles` style plots a circle with an explicit radius at each data point.
@@ -3643,6 +3649,7 @@ Ffigure_circles
 2 ellipses
 ?plotting styles ellipses
 ?style ellipses
+?with ellipses
 ?ellipses
 Ffigure_ellipses
  The `ellipses` style plots an ellipse at each data point.  This style is
@@ -3697,6 +3704,7 @@ Ffigure_ellipses
 2 dots
 ?plotting styles dots
 ?style dots
+?with dots
 ?dots
 Ffigure_dots
  The `dots` style plots a tiny dot at each point; this is useful for scatter
@@ -3713,6 +3721,7 @@ Ffigure_dots
 2 filledcurves
 ?plotting styles filledcurves
 ?style filledcurves
+?with filledcurves
 ?filledcurves
 Ffigure_filledcurves
  The `filledcurves` style is only used for 2D plotting. It has three variants.
@@ -3786,6 +3795,7 @@ Ffigure_yerrorfill
 2 financebars
 ?plotting styles financebars
 ?style financebars
+?with financebars
 ?financebars
  The `financebars` style is only relevant for 2D data plotting of financial
  data.  It requires 1 x coordinate (usually a date) and 4 y values (prices).
@@ -3808,6 +3818,7 @@ Ffigure_financebars
 2 fsteps
 ?plotting styles fsteps
 ?style fsteps
+?with fsteps
 ?fsteps
 Ffigure_fsteps
  The `fsteps` style is only relevant to 2D plotting.  It connects consecutive
@@ -3823,12 +3834,14 @@ Ffigure_fsteps
 ^ </a>
 2 fillsteps
 ?style fillsteps
+?with fillsteps
 ?fillsteps
  The `fillsteps` style is exactly like `steps` except that the area between
  the curve and y=0 is filled in the current fill style.  See `steps`.
 2 histeps
 ?plotting styles histeps
 ?style histeps
+?with histeps
 ?histeps
 Ffigure_histeps
  The `histeps` style is only relevant to 2D plotting.  It is intended for
@@ -3848,6 +3861,7 @@ Ffigure_histeps
 
 2 histograms
 ?style histograms
+?with histograms
 ?set style histogram
 ?plotting styles histograms
 ?histograms
@@ -3985,7 +3999,7 @@ Ffigure_histcols
 3 newhistogram
 ?newhistogram
 ?histograms newhistogram
-?plotting style histograms newhistogram
+?plotting styles histograms newhistogram
  Syntax:
 
       newhistogram {"<title>" {font "name,size"} {tc <colorspec>}} 
@@ -4042,6 +4056,7 @@ Ffigure_newhist
 2 image
 ?plotting styles image
 ?style image
+?with image
 ?image
 ?rgbimage
 ?rgbalpha
@@ -4114,10 +4129,12 @@ Ffigure_scaled_image
 3 image pixels
 ?plotting styles image pixels
 ?style image pixels
+?with image pixels
 ?image pixels
 ?pixels
 ?plotting styles image failsafe
 ?style image failsafe
+?with image failsafe
 ?image failsafe
 ?failsafe
  Some terminals use device- or library-specific optimizations to render image
@@ -4132,6 +4149,7 @@ Ffigure_scaled_image
 2 impulses
 ?plotting styles impulses
 ?style impulses
+?with impulses
 ?impulses
 Ffigure_impulses
  The `impulses` style displays a vertical line from y=0 to the y value of each
@@ -4147,6 +4165,7 @@ Ffigure_impulses
 2 labels
 ?plotting styles labels
 ?style labels
+?with labels
 ?labels
 Ffigure_labels1
  The `labels` style reads coordinates and text from a data file and places
@@ -4198,6 +4217,7 @@ Ffigure_labels2
 2 lines
 ?plotting styles lines
 ?style lines
+?with lines
 ?lines
 Ffigure_lines
  The `lines` style connects adjacent points with straight line segments.
@@ -4217,7 +4237,9 @@ Ffigure_lines
 2 linespoints
 ?plotting styles linespoints
 ?style linespoints
+?with linespoints
 ?style lp
+?with lp
 ?linespoints
 ?lp
 ?pointinterval
@@ -4244,8 +4266,9 @@ Ffigure_linespoints
  portion of line segment that passes underneath the symbol.
 
 2 parallelaxes
-?plotting style parallelaxes
+?plotting styles parallelaxes
 ?style parallelaxes
+?with parallelaxes
 ?parallelaxes
 Ffigure_parallel
  Parallel axis plots can highlight correlation in a multidimensional data set.
@@ -4265,6 +4288,7 @@ Ffigure_parallel
 2 points
 ?plotting styles points
 ?style points
+?with points
 ?points
 ?point type
 ?pointtype
@@ -4308,6 +4332,7 @@ Ffigure_points
 2 steps
 ?plotting styles steps
 ?style steps
+?with steps
 ?steps
 Ffigure_steps
  The `steps` style is only relevant to 2D plotting.  It connects consecutive
@@ -4325,14 +4350,17 @@ Ffigure_steps
 2 rgbalpha
 ?plotting styles rgbalpha
 ?style rgbalpha
+?with rgbalpha
  See `image`.
 2 rgbimage
 ?plotting styles rgbimage
 ?style rgbimage
+?with rgbimage
  See `image`.
 2 vectors
 ?plotting styles vectors
 ?style vectors
+?with vectors
 ?vectors
 Ffigure_vectors
  The 2D `vectors` style draws a vector from (x,y) to (x+xdelta,y+ydelta).
@@ -4366,6 +4394,7 @@ Ffigure_vectors
 2 xerrorbars
 ?plotting styles xerrorbars
 ?style xerrorbars
+?with xerrorbars
 ?xerrorbars
 Ffigure_xerrorbars
  The `xerrorbars` style is only relevant to 2D data plots.  `xerrorbars` is
@@ -4384,6 +4413,7 @@ Ffigure_xerrorbars
 2 xyerrorbars
 ?plotting styles xyerrorbars
 ?style xyerrorbars
+?with xyerrorbars
 ?xyerrorbars
 Ffigure_xyerrorbars
  The `xyerrorbars` style is only relevant to 2D data plots.  `xyerrorbars` is
@@ -4410,7 +4440,9 @@ Ffigure_xyerrorbars
 ?plotting styles yerrorbars
 ?plotting styles errorbars
 ?style yerrorbars
+?with yerrorbars
 ?style errorbars
+?with errorbars
 ?yerrorbars
 Ffigure_yerrorbars
  The `yerrorbars` (or `errorbars`) style is only relevant to 2D data plots.
@@ -4434,6 +4466,7 @@ Ffigure_yerrorbars
 2 xerrorlines
 ?plotting styles xerrorlines
 ?style xerrorlines
+?with xerrorlines
 ?xerrorlines
 Ffigure_xerrorlines
  The `xerrorlines` style is only relevant to 2D data plots.
@@ -4452,6 +4485,7 @@ Ffigure_xerrorlines
 2 xyerrorlines
 ?plotting styles xyerrorlines
 ?style xyerrorlines
+?with xyerrorlines
 ?xyerrorlines
 Ffigure_xyerrorlines
  The `xyerrorlines` style is only relevant to 2D data plots.
@@ -4479,7 +4513,9 @@ Ffigure_xyerrorlines
 ?plotting styles yerrorlines
 ?plotting styles errorlines
 ?style yerrorlines
+?with yerrorlines
 ?style errorlines
+?with errorlines
 ?yerrorlines
 Ffigure_yerrorlines
  The `yerrorlines` (or `errorlines`) style is only relevant to 2D data
@@ -4502,6 +4538,7 @@ Ffigure_yerrorlines
 2 zerrorfill
 ?plotting styles zerrorfill
 ?style zerrorfill
+?with zerrorfill
 ?zerrorfill
  Syntax:
 
