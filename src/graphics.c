@@ -407,9 +407,7 @@ place_objects(struct object *listhead, int layer, int dimensions)
 		    break;
 		/* radius must not change with rotation */
 		if (e->extent.scalex == first_axes) {
-		    struct axis *axis = &axis_array[FIRST_X_AXIS];
-		    double axis_frac =  e->extent.x / (axis->max - axis->min);
-		    radius = axis_frac * xscaler * surface_scale;
+		    radius = e->extent.x * radius_scaler;
 		} else {
 		    map_position_r(&e->extent, &radius, NULL, "object");
 		}

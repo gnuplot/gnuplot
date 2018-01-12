@@ -177,6 +177,7 @@ static int map3d_getposition __PROTO((struct position* pos, const char* what, do
 
 int xmiddle, ymiddle, xscaler, yscaler;
 double xyscaler;
+double radius_scaler;
 static int ptitl_cnt;
 static int max_ptitl_len;
 static int titlelin;
@@ -495,6 +496,9 @@ boundary3d(struct surface_points *plots, int count)
 
     /* For anything that really wants to be the same on x and y */
     xyscaler = sqrt(xscaler*yscaler);
+
+    /* This one is used to scaled circles in 3D plots */
+    radius_scaler = xscaler * surface_scale / (X_AXIS.max - X_AXIS.min);
 
     /* Set default clipping */
     if (splot_map)

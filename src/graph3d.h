@@ -128,6 +128,7 @@ extern double ceiling_z, base_z; /* made exportable for PM3D */
 extern transform_matrix trans_mat;
 extern double xscale3d, yscale3d, zscale3d;
 extern double xcenter3d, ycenter3d, zcenter3d;
+extern double radius_scaler;
 
 extern t_contour_placement draw_contour;
 extern TBOOLEAN	clabel_onecolor;
