@@ -3610,16 +3610,33 @@ Ffigure_candlesticks
 ?circles
 Ffigure_circles
  The `circles` style plots a circle with an explicit radius at each data point.
- If three columns of data are present, they are interpreted as x, y, radius.
  The radius is always interpreted in the units of the plot's horizontal axis
  (x or x2).  The scale on y and the aspect ratio of the plot are both ignored.
- If only two columns are present, the radius is taken from `set style circle`.
- In this case the radius may be given in graph or screen coordinates.
+ If the radius is not given in a separate column for each point it is taken from 
+ `set style circle`.  In this case the radius may use graph or screen coordinates.
 
- By default a full circle will be drawn.  It is possible to plot arc segments
- instead of full circles by specifying a start and end angle in the 4th and 5th
- columns.  An optional 4th or 6th column can specify per-circle color.
- The start and end angles of the circle segments must be specified in degrees.
+ Many combinations of per-point and previously set properties are possible.
+ For 2D plots these include
+
+     using x:y
+     using x:y:radius
+     using x:y:color
+     using x:y:radius:color
+     using x:y:radius:arc_begin:arc_end
+     using x:y:radius:arc_begin:arc_end:color
+
+ By default a full circle will be drawn.  It is possible to instead plot arc
+ segments by specifying a start and end angle (in degrees) in columns 4 and 5.
+
+ A per-circle color may be provided in the last column of the using specifier.
+ In this case the plot command must include a corresponding variable color
+ term such as `lc variable` or `fillcolor rgb variable`.
+
+ For 3D plots the using specifier must contain
+
+     splot DATA using x:y:z:radius:color
+
+ where the variable color column is options.
  See `set style circle` and `set style fill`.
 
  Examples:
@@ -3671,14 +3688,12 @@ Ffigure_ellipses
  diameters.  The orientation angle defaults to zero.
  If four columns are present, they are interpreted as x, y, major diameter,
  minor diameter.  Note that these are diameters, not radii.
- An optional 5th column may be used to specify the orientation angle 
- in degrees. 
+ An optional 5th column may specify the orientation angle in degrees. 
  The ellipses will also be drawn with their default extent if either of the 
  supplied diameters in the 3-4-5 column form is negative.
 
  In all of the above cases, optional variable color data may be given in an
- additional last (3th, 4th, 5th or 6th) column. See `colorspec` for further
- information.
+ additional last (3th, 4th, 5th or 6th) column. See `colorspec`.
 
  By default, the major diameter is interpreted in the units of the plot's
  horizontal axis (x or x2) while the minor diameter in that of the vertical
