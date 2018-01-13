@@ -1015,6 +1015,18 @@ get_3ddata(struct surface_points *this_plot)
 		    color_from_column(TRUE);
 		}
 
+	    } else if ((this_plot->plot_style == CIRCLES)) {
+		int varcol = 3;
+		/* require 4th column = radius */
+		cp->CRD_PTSIZE = v[varcol++];
+		if (j < varcol)
+		    int_error(NO_CARET, "Not enough input columns");
+		if (j == varcol)
+		    color = this_plot->fill_properties.border_color.lt;
+		else
+		    color = v[varcol];
+		color_from_column(TRUE);
+
 	    } else if (this_plot->plot_style == VECTOR) {
 		/* We already enforced that j >= 6 */
 		xtail = x + v[3];

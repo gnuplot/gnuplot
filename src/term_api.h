@@ -67,6 +67,8 @@
 #define PT_CHARACTER  (-9)
 /* magic point type that indicates true point type comes from a data column */
 #define PT_VARIABLE   (-8)
+/* magic point type that indicates we really want a circle drawn by do_arc() */
+#define PT_CIRCLE     (-7)
 
 /* Constant value passed to (term->text_angle)(ang) to generate vertical
  * text corresponding to old keyword "rotate", which produced the equivalent

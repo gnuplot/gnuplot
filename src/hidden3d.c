@@ -46,6 +46,7 @@
 #include "command.h"
 #include "dynarray.h"
 #include "graph3d.h"
+#include "misc.h"
 #include "tables.h"
 #include "term_api.h"
 #include "util.h"
@@ -1117,6 +1118,13 @@ build_networks(struct surface_points *plots, int pcount)
 	case RGBA_IMAGE:
 	    /* Ignore these */
 	    break;
+	case CIRCLES:
+	    this_plot->lp_properties.flags |= LP_SHOW_POINTS;
+	    this_plot->lp_properties.p_type = PT_CIRCLE;
+	    this_plot->lp_properties.p_size = PTSZ_VARIABLE;
+	    nv += nverts;
+	    ne += nverts; /* a 'phantom edge' per isolated point */
+	    break;
 	case DOTS:
 	    this_plot->lp_properties.flags |= LP_SHOW_POINTS;
 	    this_plot->lp_properties.p_type = -1;
@@ -1661,7 +1669,8 @@ draw_vertex(p_vertex v)
     p_type = v->lp_style->p_type;
 
     TERMCOORD(v, x, y);
-    if ((p_type >= -1 || p_type == PT_CHARACTER || p_type == PT_VARIABLE) && !clip_point(x,y)) {
+    if ((p_type >= -1 || p_type == PT_CHARACTER || p_type == PT_VARIABLE || p_type == PT_CIRCLE)
+    &&  !clip_point(x,y)) {
 	struct t_colorspec *tc = &(v->lp_style->pm3d_color);
 
 	if (v->label)  {
@@ -1684,6 +1693,16 @@ draw_vertex(p_vertex v)
 	    set_color( cb2gray(v->real_z) );
 	else if (tc->type == TC_Z)
 	    set_color( cb2gray(z2cb(v->real_z)) );
+
+	if (p_type == PT_CIRCLE) {
+	    double radius = v->original->CRD_PTSIZE * radius_scaler;
+	    do_arc(x, y, radius, 0., 360., 
+		style_from_fill(&default_fillstyle), FALSE);
+	    if (need_fill_border(&default_fillstyle))
+		do_arc(x, y, radius, 0., 360., 0, FALSE);
+	    v->lp_style = NULL;
+	    return;
+	}
 
 #ifdef HIDDEN3D_VAR_PTSIZE
 	if (v->lp_style->p_size == PTSZ_VARIABLE)

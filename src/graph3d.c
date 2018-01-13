@@ -497,7 +497,7 @@ boundary3d(struct surface_points *plots, int count)
     /* For anything that really wants to be the same on x and y */
     xyscaler = sqrt(xscaler*yscaler);
 
-    /* This one is used to scaled circles in 3D plots */
+    /* This one is used to scale circles in 3D plots */
     radius_scaler = xscaler * surface_scale / (X_AXIS.max - X_AXIS.min);
 
     /* Set default clipping */
@@ -1836,7 +1836,9 @@ plot3d_points(struct surface_points *plot)
 	int colortype = plot->lp_properties.pm3d_color.type;
 
 	/* Apply constant color outside of the loop */
-	if (colortype == TC_RGB)
+	if (plot->plot_style == CIRCLES)
+	    set_rgbcolor_const( plot->fill_properties.border_color.lt );
+	else if (colortype == TC_RGB)
 	    set_rgbcolor_const( plot->lp_properties.pm3d_color.lt );
 
 	for (i = 0; i < icrvs->p_count; i++) {
@@ -1866,8 +1868,20 @@ plot3d_points(struct surface_points *plot)
 		    &&  plot->lp_properties.p_size == PTSZ_VARIABLE)
 			(*t->pointsize)(pointsize * point->CRD_PTSIZE);
 
+		    /* We could dummy up circles as a point of type 7, but this way */
+		    /* the radius can use x-axis coordinates rather than pointsize. */
+		    /* FIXME: track per-plot fillstyle */
+		    if (plot->plot_style == CIRCLES) {
+			double radius = point->CRD_PTSIZE * radius_scaler;
+			do_arc(x, y, radius, 0., 360.,
+				style_from_fill(&default_fillstyle), FALSE);
+			/* Retrace the border if the style requests it */
+			if (need_fill_border(&default_fillstyle))
+			    do_arc(x, y, radius, 0., 360., 0, FALSE);
+		    }
+
 		    /* This code is also used for "splot ... with dots" */
-		    if (plot->plot_style == DOTS) {
+		    else if (plot->plot_style == DOTS) {
 			(*t->point) (x, y, -1);
 		    }
 
