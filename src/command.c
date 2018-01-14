@@ -824,14 +824,18 @@ array_command()
 TBOOLEAN
 is_array_assignment()
 {
-    udvt_entry *udv = add_udv(c_token);
+    udvt_entry *udv;
     struct value newvalue;
     int index;
     TBOOLEAN looks_OK = FALSE;
     int brackets;
 
-    if (!isletter(c_token) || !equals(c_token+1, "["))
+    if (!isletter(c_token))
 	return FALSE;
+    if (!equals(c_token+1, "["))
+	return FALSE;
+
+    udv = add_udv(c_token);
 
     /* There are other legal commands where the 2nd token is [
      * e.g.  "plot [min:max] foo"
