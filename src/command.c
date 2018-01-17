@@ -806,7 +806,7 @@ array_command()
 TBOOLEAN
 is_array_assignment()
 {
-    udvt_entry *udv = add_udv(c_token);
+    udvt_entry *udv;
     struct value newvalue;
     int index;
     TBOOLEAN looks_OK = FALSE;
@@ -836,6 +836,7 @@ is_array_assignment()
     if (!looks_OK)
 	return FALSE;
 
+    udv = add_udv(c_token);
     if (udv->udv_value.type != ARRAY)
 	int_error(c_token, "Not a known array");
 
