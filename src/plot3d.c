@@ -1418,10 +1418,6 @@ eval_3dplots()
 	    }
 	    v_sample_range_token = parse_range(V_AXIS);
 
-	    /* FIXME: allow sampling interval in range clause for '++'
-	     * Current implementation in df_generate_pseudodata() and 
-	     * parse_range() is hard-coded for * SAMPLE_AXIS only.
-	     */
 	    if (u_sample_range_token > 0)
 		axis_array[SAMPLE_AXIS].range_flags |= RANGE_SAMPLED;
 	    if (u_sample_range_token > 0 && axis_array[U_AXIS].SAMPLE_INTERVAL != 0)
@@ -1582,7 +1578,7 @@ eval_3dplots()
 	    else
 		load_linetype(&this_plot->lp_properties, line_num+1);
 
-	    /* FIXME:  We may have cleared these previously? Anyhow it doesn't hurt. */
+	    /* We may have cleared these previously? Anyhow it doesn't hurt. */
 	    this_plot->opt_out_of_hidden3d = FALSE;
 
 	    /* pm 25.11.2001 allow any order of options */

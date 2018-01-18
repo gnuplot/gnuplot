@@ -2981,10 +2981,6 @@ eval_plots()
 	    }
 	}
 
-	/* FIXME HBB 20000430: here and elsewhere, the code explicitly
-	 * assumes that the dummy variables (t, u, v) cannot possibly
-	 * be logscaled in parametric or polar mode. Does this
-	 * *really* hold? */
 	if (parametric || polar) {
 	    t_min = axis_array[T_AXIS].min;
 	    t_max = axis_array[T_AXIS].max;
