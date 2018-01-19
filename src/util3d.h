@@ -44,11 +44,10 @@
 typedef struct vertex {
     coordval x, y, z;		/* vertex coordinates */
     lp_style_type *lp_style;	/* where to find point symbol type (if any) */
-    coordval real_z;
+    coordval real_z;		/* mostly used to track variable color */
     struct text_label *label;
-#ifdef HIDDEN3D_VAR_PTSIZE	/* Needed for variable pointsize, but takes space */
-    struct coordinate *original;
-#endif
+    struct coordinate *original;/* original coordinates of this point */
+				/* used for variable pointsize, pointtype */
 } vertex;
 typedef vertex GPHUGE * p_vertex;
 

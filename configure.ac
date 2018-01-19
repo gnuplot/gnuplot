@@ -882,9 +882,6 @@ AC_ARG_ENABLE(h3d-gridbox,dnl
                [ Define to enable gridbox optimization in hidden3d code.])
    fi])
 
-AC_DEFINE(HIDDEN3D_VAR_PTSIZE,1,
-	[ Define to enable handling point size in hidden3d code.])
-
 
 dnl
 if test ! -f src/graphics.c ; then

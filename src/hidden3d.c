@@ -523,11 +523,9 @@ store_vertex (
     } else
 	thisvert->real_z = point->z;
 
-#ifdef HIDDEN3D_VAR_PTSIZE
     /* Store pointer back to original point */
     /* Needed to support variable pointsize or pointtype */
     thisvert->original = point;
-#endif
 	
     return (thisvert - vlist);
 }
@@ -1704,17 +1702,13 @@ draw_vertex(p_vertex v)
 	    return;
 	}
 
-#ifdef HIDDEN3D_VAR_PTSIZE
 	if (v->lp_style->p_size == PTSZ_VARIABLE)
 	    (term->pointsize)(pointsize * v->original->CRD_PTSIZE);
-#endif
 
 	if (p_type == PT_CHARACTER)
 	    (term->put_text)(x, y, v->lp_style->p_char);
-#ifdef HIDDEN3D_VAR_PTSIZE
 	else if (p_type == PT_VARIABLE)
 	    (term->point)(x, y, (int)(v->original->CRD_PTTYPE) - 1);
-#endif
 	else
 	    (term->point)(x, y, p_type);
 
