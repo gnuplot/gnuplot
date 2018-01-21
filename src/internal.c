@@ -1492,11 +1492,18 @@ f_sprintf(union argument *arg)
 
 	/* Check for %%; print as literal and don't consume a parameter */
 	if (!strncmp(next_start,"%%",2)) {
+	    remaining++;	/* Don't consume a parameter value */
 	    next_start++;
+	    next_length = strcspn(next_start+1,"%") + 1;
+	    prev_pos = outpos - buffer;
+	    while (prev_pos + next_length >= bufsize) {
+		bufsize *= 2;
+		buffer = gp_realloc(buffer, bufsize, "f_sprintf");
+		outpos = buffer + prev_pos;
+	    }
 	    do {
 		*outpos++ = *next_start++;
 	    } while(*next_start && *next_start != '%');
-	    remaining++;
 	    continue;
 	}
 
