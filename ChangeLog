@@ -1,3 +1,10 @@
+2018-01-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/internal.c (f_gprintf):  The count of characters immediately
+	following "%%" in a format statement was not checked against the current
+	buffer length. Remove unsafe alternative code that doesn't use snprintf.
+	Bug #2011
+
 2018-01-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/time.c (xstrftime) internal.c (f_strftime):  Protect against

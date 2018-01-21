@@ -1495,11 +1495,18 @@ f_sprintf(union argument *arg)
 
 	/* Check for %%; print as literal and don't consume a parameter */
 	if (!strncmp(next_start,"%%",2)) {
+	    remaining++;	/* Don't consume a parameter value */
 	    next_start++;
+	    next_length = strcspn(next_start+1,"%") + 1;
+	    prev_pos = outpos - buffer;
+	    while (prev_pos + next_length >= bufsize) {
+		bufsize *= 2;
+		buffer = gp_realloc(buffer, bufsize, "f_sprintf");
+		outpos = buffer + prev_pos;
+	    }
 	    do {
 		*outpos++ = *next_start++;
 	    } while(*next_start && *next_start != '%');
-	    remaining++;
 	    continue;
 	}
 
@@ -1515,7 +1522,6 @@ f_sprintf(union argument *arg)
 	if ( spec_type != STRING && next_param->type == STRING )
 	    int_error(NO_CARET,"f_sprintf: attempt to print string value with numeric format");
 
-#ifdef HAVE_SNPRINTF
 	/* Use the format to print next arg */
 	switch(spec_type) {
 	case INTGR:
@@ -1533,22 +1539,6 @@ f_sprintf(union argument *arg)
 	default:
 	    int_error(NO_CARET,"internal error: invalid spec_type");
 	}
-#else
-	/* FIXME - this is bad; we should dummy up an snprintf equivalent */
-	switch(spec_type) {
-	case INTGR:
-	    sprintf(outpos, next_start, (int)real(next_param));
-	    break;
-	case CMPLX:
-	    sprintf(outpos, next_start, real(next_param));
-	    break;
-	case STRING:
-	    sprintf(outpos, next_start, next_param->v.string_val);
-	    break;
-	default:
-	    int_error(NO_CARET,"internal error: invalid spec_type");
-	}
-#endif
 
 	next_start[next_length] = tempchar;
 	next_start += next_length;
