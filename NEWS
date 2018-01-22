@@ -1,3 +1,10 @@
+Changes in 5.2.3
+================
+* CHANGE drop non-working support for YIQ color space
+* FIX potential buffer overflow in gprintf formats containing %%
+* FIX immediate response to ctrl-Z when libreadline is used for input
+* FIX warning messages inside a bracketed clause could trigger early exit
+
 Changes in 5.2.2
 ================
 * NEW set table separator {tab|comma|"char"} allows creation of csv files
