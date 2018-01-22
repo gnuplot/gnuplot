@@ -1507,8 +1507,9 @@ void qt_options()
 		qt_setPosition = true;
 	}
 
+	termOptions += " font \"" + fontSettings + '"';
+
 	if (set_enhanced) termOptions += qt_optionEnhanced ? " enhanced" : " noenhanced";
-	                  termOptions += " font \"" + fontSettings + '"';
 	if (set_linewidth) termOptions += " linewidth " + QString::number(qt_optionLineWidth);
 	if (set_dashlength) termOptions += " dashlength " + QString::number(qt_optionDashLength);
 	if (set_widget)   termOptions += " widget \"" + qt_option->Widget + '"';

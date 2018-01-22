@@ -258,9 +258,9 @@ color_components_from_gray(double gray, rgb_color *color)
 	color->r = gray + a * (-0.14861 * cos(phi) + 1.78277 * sin(phi));
 	color->g = gray + a * (-0.29227 * cos(phi) - 0.90649 * sin(phi));
 	color->b = gray + a * ( 1.97294 * cos(phi));
-	if (color->r > 1.0) color->r = 1.0; if (color->r < 0.0) color->r = 0.0;
-	if (color->g > 1.0) color->g = 1.0; if (color->g < 0.0) color->g = 0.0;
-	if (color->b > 1.0) color->b = 1.0; if (color->b < 0.0) color->b = 0.0;
+	color->r = clip_to_01(color->r);
+	color->g = clip_to_01(color->g);
+	color->b = clip_to_01(color->b);
 	}	
 	break;
     }
