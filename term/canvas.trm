@@ -14,7 +14,7 @@
  *
  * Additions
  *   Ethan A Merritt, Jan 2009
- *	CANVAS_set_color(), CANVAS_make_palette(), CANVAS_fillbox(), fillstyles, 
+ *	CANVAS_set_color(), CANVAS_make_palette(), CANVAS_fillbox(), fillstyles,
  *	CANVAS_point(), CANVAS_pointsize()
  *	"name <foo>" option to create only a callable javascript file foo.js
  *	"fsize <F>" option to select font size (default remains 10.0)
@@ -84,7 +84,7 @@ TERM_PUBLIC void ENHCANVAS_FLUSH __PROTO((void));
 TERM_PUBLIC void ENHCANVAS_put_text __PROTO((unsigned int, unsigned int, const char *));
 
 #define CANVAS_OVERSAMPLE	10.
-#define CANVAS_XMAX		(600 * CANVAS_OVERSAMPLE) 
+#define CANVAS_XMAX		(600 * CANVAS_OVERSAMPLE)
 #define CANVAS_YMAX 		(400 * CANVAS_OVERSAMPLE)
 #define CANVASVTIC		(10  * CANVAS_OVERSAMPLE)
 #define CANVASHTIC		(10  * CANVAS_OVERSAMPLE)
@@ -147,7 +147,7 @@ static struct {
 } canvas_state;
 
 enum CANVAS_case {
-    CANVAS_SIZE, CANVAS_FONT, CANVAS_FSIZE, 
+    CANVAS_SIZE, CANVAS_FONT, CANVAS_FSIZE,
     CANVAS_NAME, CANVAS_STANDALONE, CANVAS_TITLE,
     CANVAS_LINEWIDTH, CANVAS_MOUSING, CANVAS_JSDIR, CANVAS_ENH, CANVAS_NOENH,
     CANVAS_FONTSCALE, CANVAS_SOLID, CANVAS_DASHED, CANVAS_DASHLENGTH,
@@ -278,7 +278,7 @@ CANVAS_options()
 	    break;
 
 	case CANVAS_FONT:
-	/* FIXME: See note at CANVAS_set_font() */ 
+	/* FIXME: See note at CANVAS_set_font() */
 	    free(canvas_font_name);
 	    if (!(canvas_font_name = try_to_get_string()))
 		int_error(c_token,"font: expecting string");
@@ -350,7 +350,7 @@ CANVAS_options()
 	    canvas_background = parse_color_name();
 	    sprintf(CANVAS_background," rgb(%03d,%03d,%03d)",
 		(canvas_background >> 16) & 0xff,
-		(canvas_background >> 8) & 0xff, 
+		(canvas_background >> 8) & 0xff,
 		canvas_background & 0xff);
 	    break;
 
@@ -365,11 +365,11 @@ CANVAS_options()
 
     if (canvas_dashlength_factor != 1.0)
 	sprintf(term_options + strlen(term_options), " dashlength %3.1f", canvas_dashlength_factor);
-    sprintf(term_options + strlen(term_options), 
-	canvas_linecap == ROUNDED ? " rounded" : 
+    sprintf(term_options + strlen(term_options),
+	canvas_linecap == ROUNDED ? " rounded" :
 	canvas_linecap == SQUARE ? " square" : " butt");
     sprintf(term_options + strlen(term_options), " size %d,%d", (int)(term->xmax/CANVAS_OVERSAMPLE), (int)(term->ymax/CANVAS_OVERSAMPLE));
-    sprintf(term_options + strlen(term_options), "%s fsize %g lw %g", 
+    sprintf(term_options + strlen(term_options), "%s fsize %g lw %g",
 	term->put_text == ENHCANVAS_put_text ? " enhanced" : "",
 	canvas_font_size, canvas_linewidth);
     sprintf(term_options + strlen(term_options), " fontscale %g", canvas_fontscale);
@@ -417,7 +417,7 @@ CANVAS_graphics()
      */
     if (CANVAS_scriptdir == NULL) {
 #ifdef GNUPLOT_JS_DIR
-# if defined(_WIN32)
+# if defined(_WIN32) || defined(MSDOS)
 	CANVAS_scriptdir = RelativePathToGnuplot(GNUPLOT_JS_DIR);
 # else /* !_WIN32 */
 	/* use hardcoded _absolute_ path */
@@ -630,7 +630,7 @@ CANVAS_text()
 	    MOUSE_PARAM("GPVAL_X_MAX", "gnuplot.plot_axis_xmax");
 	}
 	/* FIXME: Should this inversion be done at a higher level? */
-	if (is_3d_plot && splot_map) { 
+	if (is_3d_plot && splot_map) {
 	    MOUSE_PARAM("GPVAL_Y_MAX", "gnuplot.plot_axis_ymin");
 	    MOUSE_PARAM("GPVAL_Y_MIN", "gnuplot.plot_axis_ymax");
 	} else {
@@ -649,7 +649,7 @@ CANVAS_text()
 	    MOUSE_PARAM("GPVAL_X2_MAX", "gnuplot.plot_axis_x2max");
 	} else
 	    fprintf(gpoutfile, "gnuplot.plot_axis_x2min = \"none\"\n");
-	if (axis_array[SECOND_X_AXIS].linked_to_primary 
+	if (axis_array[SECOND_X_AXIS].linked_to_primary
 	&&  axis_array[FIRST_X_AXIS].link_udf->at) {
 	    fprintf(gpoutfile, "gnuplot.x2_mapping = function(x) { return x; };");
 	    fprintf(gpoutfile, "  // replace returned value with %s\n",
@@ -660,7 +660,7 @@ CANVAS_text()
 	    MOUSE_PARAM("GPVAL_Y2_MAX", "gnuplot.plot_axis_y2max");
 	} else
 	    fprintf(gpoutfile, "gnuplot.plot_axis_y2min = \"none\"\n");
-	if (axis_array[SECOND_Y_AXIS].linked_to_primary 
+	if (axis_array[SECOND_Y_AXIS].linked_to_primary
 	&&  axis_array[FIRST_Y_AXIS].link_udf->at) {
 	    fprintf(gpoutfile, "gnuplot.y2_mapping = function(y) { return y; };");
 	    fprintf(gpoutfile, "  // replace returned value with %s\n",
@@ -888,7 +888,7 @@ CANVAS_linetype(int linetype)
 	" rgb(255,000,000)", /* red */
 	" rgb(000,171,000)", /* green */
 	" rgb(000,000,225)", /* blue */
-        " rgb(190,000,190)", /* purple */ 
+        " rgb(190,000,190)", /* purple */
 	" rgb(000,255,255)", /* cyan */
 	" rgb(021,117,069)", /* pine green*/
 	" rgb(000,000,148)", /* navy */
@@ -1306,7 +1306,7 @@ CANVAS_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, 
 		x1, canvas_ymax - (y1+height), width, height);
 }
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 CANVAS_layer(t_termlayer layer)
 {
     char *basename = (CANVAS_name) ? CANVAS_name : "gp";
@@ -1485,7 +1485,7 @@ static int canvas_strwidth(char *s)
 	else if (encoding != S_ENC_UTF8) s++;
 	else if ((*s & 0xE0) == 0xC0) s += 2;
 	else if ((*s & 0xF0) == 0xE0) s += 3;
-	else s += 4; 
+	else s += 4;
 	width += 18;	/* Assumed average width for UTF8 characters */
 	if (s > end) break;
     }
@@ -1595,12 +1595,12 @@ ENHCANVAS_put_text(unsigned int x, unsigned int y, const char *str)
 
 #ifdef WRITE_PNG_IMAGE
 TERM_PUBLIC void
-CANVAS_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecolor color_mode) 
+CANVAS_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecolor color_mode)
 {
     char *image_file;
     char *base_name = CANVAS_name ? CANVAS_name : "gp";
     canvas_imagefile *thisimage = NULL;
-   
+
     /* Write the image to a png file */
     image_file = gp_alloc(strlen(base_name)+16, "CANVAS_image");
     sprintf(image_file, "%s_image_%02d.png", base_name, ++CANVAS_imageno);
@@ -1609,7 +1609,7 @@ CANVAS_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_image
     /* Map it onto the terminals coordinate system. */
     fprintf(gpoutfile, "gnuplot.ZI(%s_image_%02d, %d, %d, %d, %d, %d, %d);\n",
 	base_name, CANVAS_imageno, m, n,
-	corner[0].x, canvas_ymax - corner[0].y, 
+	corner[0].x, canvas_ymax - corner[0].y,
 	corner[1].x, canvas_ymax - corner[1].y);
 
     /* Maintain a linked list of imageno|filename pairs */
@@ -1632,7 +1632,7 @@ TERM_TABLE_START(canvas_driver)
     CANVASVTIC, CANVASHTIC, CANVAS_options, CANVAS_init, CANVAS_reset,
     CANVAS_text, null_scale, CANVAS_graphics, CANVAS_move, CANVAS_vector,
     CANVAS_linetype, CANVAS_put_text, CANVAS_text_angle,
-    CANVAS_justify_text, CANVAS_point, do_arrow, 
+    CANVAS_justify_text, CANVAS_point, do_arrow,
     CANVAS_set_font,
     CANVAS_pointsize,
     TERM_CAN_MULTIPLOT|TERM_ALPHA_CHANNEL|TERM_LINEWIDTH|TERM_CAN_DASH,
@@ -1654,7 +1654,7 @@ TERM_TABLE_START(canvas_driver)
     , CANVAS_hypertext
 #ifdef EAM_BOXED_TEXT
     , NULL			/* boxed text */
-#endif 
+#endif
     , NULL			/* modify_plots */
     , CANVAS_dashtype
 TERM_TABLE_END(canvas_driver)

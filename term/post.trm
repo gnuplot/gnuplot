@@ -72,7 +72,7 @@
  * operator.  It supports PostScript Type1 fonts that use glyph names according
  * to the Adobe Glyph List For New Fonts.
  *
- * Christoph Bersch Nov 2011 (cvs Apr 2013): Add support for Level 3 /FlateDecode 
+ * Christoph Bersch Nov 2011 (cvs Apr 2013): Add support for Level 3 /FlateDecode
  * filter for plotstyle 'with image'.
  *
  * Ethan Merritt Sep 2016:  Support rotatation of boxed text, including text
@@ -355,7 +355,7 @@ static const char * ENHPS_header[] = {
 
 /* get the width of the text */
 /* HH 2005-07-24 - Add in a special case overprint 3 = save, 4 = restore
- * also for estimation of string width. This is done by interposing an 
+ * also for estimation of string width. This is done by interposing an
  * additional value on the stack. between XYsave and XYrestore,
  * this number is increased by the strings. By pop'ing this number, all
  * strings between XYsave and XYrestore are ignored. */
@@ -557,7 +557,7 @@ enum PS_id {
     PS_SIMPLEX, PS_DUPLEX, PS_DEFAULTPLEX,
     PS_ROUNDED, PS_NOROUNDED, PS_CLIP, PS_NOCLIP, PS_FONTFILE, PS_NOFONTFILES,
     PS_PALFUNCPARAM,
-    PS_LEVEL1, PS_LEVELDEFAULT, PS_LEVEL3, PS_FONT, PS_FONTSCALE, 
+    PS_LEVEL1, PS_LEVELDEFAULT, PS_LEVEL3, PS_FONT, PS_FONTSCALE,
     PSLATEX_ROTATE, PSLATEX_NOROTATE, PSLATEX_AUXFILE, PSLATEX_NOAUXFILE,
     PSLATEX_OLDSTYLE, PSLATEX_NEWSTYLE, EPSLATEX_HEADER, EPSLATEX_NOHEADER,
     PS_SIZE,
@@ -679,7 +679,7 @@ PS_options()
 		break;
 	    }
 	    c_token++;
-	    if (!END_OF_COMMAND) 
+	    if (!END_OF_COMMAND)
 		goto PS_options_error;
 	}
     }
@@ -996,7 +996,7 @@ PS_options()
 		int_error(c_token, "Font filename expected");
 	    } else {
 		TBOOLEAN filename_doubled = FALSE;
-		struct ps_fontfile_def *curr_ps_fontfile = 
+		struct ps_fontfile_def *curr_ps_fontfile =
 		    ps_params->first_fontfile;
 		struct ps_fontfile_def *prev_ps_fontfile = NULL;
 		struct ps_fontfile_def *new_ps_fontfile =
@@ -1112,7 +1112,7 @@ PS_options()
 		    int_error(c_token-1,"allowed deviation must be < 1");
 	    }
 	    break;
-	
+
 	case PS_SIZE:
 	    {
 	    float xmax_t, ymax_t;
@@ -1128,7 +1128,7 @@ PS_options()
 	    eps_explicit_y = 2 * term->ymax;
 	    break;
 	    }
-	
+
 	case PS_FONT:
 	    c_token++;
 	    /* Fall through to attempt to read font name */
@@ -1249,9 +1249,9 @@ PS_options()
     strcat(term_options,tmp_term_options);
 
     if (ps_params->background.r >= 0) {
-	sprintf(tmp_term_options, "   background \"#%02x%02x%02x\" \\\n", 
-		(int)(255 * ps_params->background.r), 
-		(int)(255 * ps_params->background.g), 
+	sprintf(tmp_term_options, "   background \"#%02x%02x%02x\" \\\n",
+		(int)(255 * ps_params->background.r),
+		(int)(255 * ps_params->background.g),
 		(int)(255 * ps_params->background.b));
 	strcat(term_options, tmp_term_options);
     } else {
@@ -1328,7 +1328,7 @@ static unsigned int ps_common_xoff, ps_common_yoff;
  * If you define ADOBE_ENCODING_NAMES, then it will instead use the glyph names from the
  * file aglfn.txt.  Names in the range 0x0100 - 0x01FF correspond to those used by the
  * Latin1 encoding scheme.  This unicode code page deliberately uses the same character
- * mapping as Latin1.  Adobe also recommends names for many characters outside this 
+ * mapping as Latin1.  Adobe also recommends names for many characters outside this
  * range, but not all fonts adhere to this.  You can substitute a different aglfn.txt
  * file at run time if you want to use a different scheme.
  */
@@ -1704,8 +1704,8 @@ end\n\
 	    ps_params->rounded ? "true" : "false",
 	    ps_params->clipped ? "true" : "false",
 	    PS_LW*ps_params->linewidth_factor,	/* line width */
-	    ps_params->background.r, 
-	    ps_params->background.g, 
+	    ps_params->background.r,
+	    ps_params->background.g,
 	    ps_params->background.b, /* background color, used only if all components >= 0 */
 	    (int)(t->v_char)/(-3),	/* shift for vertical centring */
 	    PS_SC*1.0,	/* dash length */
@@ -1720,10 +1720,10 @@ end\n\
     newpath %d %d moveto %d %d lineto %d %d lineto %d %d lineto closepath\n\
     clip\n\
   } if\n\
-} def\n", 
-	    xoff + bb_xmin, yoff + bb_ymin, 
-	    xoff + bb_xmax, yoff + bb_ymin, 
-	    xoff + bb_xmax, yoff + bb_ymax, 
+} def\n",
+	    xoff + bb_xmin, yoff + bb_ymin,
+	    xoff + bb_xmax, yoff + bb_ymin,
+	    xoff + bb_xmax, yoff + bb_ymax,
 	    xoff + bb_xmin, yoff + bb_ymax);
 
     /* Dump the body of the prologue */
@@ -1891,7 +1891,7 @@ PS_init()
 		   ps_params->xoff, ps_params->yoff,
 		   xmin_t, ymin_t, xmax_t, ymax_t,
 		   (term->put_text == ENHPS_put_text) ? ENHPS_header : NULL);
-    
+
     /* Keep track of whether we have written the enhanced text dictionary yet */
     ENHPS_initialized = (term->put_text == ENHPS_put_text) ? 2 : 1;
 }
@@ -2029,7 +2029,7 @@ PS_dashtype(int type, t_dashtype *custom_dash_type)
 		PS_FLUSH_PATH;
 		fprintf(gppsfile, "[");
 		for (i = 0; i < DASHPATTERN_LENGTH && custom_dash_type->pattern[i] > 0; i++) {
-		    fprintf(gppsfile, "%.1f dl%d ", 
+		    fprintf(gppsfile, "%.1f dl%d ",
 			custom_dash_type->pattern[i] * empirical_scale, i%2 + 1);
 		}
 		fprintf(gppsfile, "] 0 setdash\n");
@@ -2665,7 +2665,7 @@ ENHPS_WRITEC(int c)
 	static TBOOLEAN in_sjis = FALSE;
 
 	fputc(c, gppsfile);
-	if (in_sjis || (c & 0x80)) {  
+	if (in_sjis || (c & 0x80)) {
 	    /* shige: This may remain original string instead octal bytes. */
 	    if (in_sjis) {
 		in_sjis = 0;
@@ -2675,7 +2675,7 @@ ENHPS_WRITEC(int c)
 		in_sjis = TRUE;
 	    }
 	}
-	
+
     } else
 
     /* Single byte character */
@@ -2882,7 +2882,7 @@ ENHPS_boxed_text __PROTO((unsigned int x, unsigned int y, int option))
 	 * Once to update the bounding box,
 	 * then rotate,
 	 * the a second time to actually draw the string
-	 */ 
+	 */
 	PS_in_textbox = 1;
 	break;
     case TEXTBOX_OUTLINE:
@@ -3251,7 +3251,7 @@ TERM_PUBLIC void PS_filled_polygon (int points, gpiPoint *corners)
 	}
 
 	switch(style) {
-	
+
 	case FS_SOLID:
 	case FS_TRANSPARENT_SOLID:
 	    filldens = (fillpar) / 100.0;
@@ -3262,7 +3262,7 @@ TERM_PUBLIC void PS_filled_polygon (int points, gpiPoint *corners)
 	    else
 		fprintf(gppsfile, " %.2f PolyFill\n", filldens);
 	    break;
-	    
+
 	case FS_TRANSPARENT_PATTERN:
 	    fprintf(gppsfile," /TransparentPatterns true def\n");
 	case FS_PATTERN:
@@ -3333,9 +3333,9 @@ PS_encode85(unsigned long tuple4, unsigned char *tuple5)
 }
 
 /* Use libgd2 or libcairo to save bitmap images with deflate compression
-   and PNG predictors. 
+   and PNG predictors.
 
-   We prefer libgd over libcairo, because it supports bit packing if the 
+   We prefer libgd over libcairo, because it supports bit packing if the
    image contains e.g. only 4 bit gray depth.
 
    libgd does not support gray scale images out of the box, like we need
@@ -3349,17 +3349,17 @@ PS_encode85(unsigned long tuple4, unsigned char *tuple5)
 */
 #ifdef HAVE_DEFLATE_ENCODER
 /* structure to store PNG image bytes */
-typedef struct 
+typedef struct
 {
     unsigned char *buffer;  /* the buffer which holds the png data */
     size_t size;            /* the current total buffer size */
     size_t length;          /* the used buffer length */
 } png_buffer_encode_t;
 
-/* Grab an unsigned 32 bit integer from a buffer in big-endian format. 
+/* Grab an unsigned 32 bit integer from a buffer in big-endian format.
    Code copied directly from libpng.h. */
 static unsigned int
-png_get_uint(unsigned char *buf) 
+png_get_uint(unsigned char *buf)
 {
     unsigned int i = ((unsigned int)(*buf) << 24) +
 	((unsigned int)(*(buf + 1)) << 16) +
@@ -3368,9 +3368,9 @@ png_get_uint(unsigned char *buf)
    return (i);
 }
 
-/* Extract and concatenate all IDAT chunks. 
+/* Extract and concatenate all IDAT chunks.
 
-'encoded_image' contains the complete PNG image which has 'image_size' bytes. 
+'encoded_image' contains the complete PNG image which has 'image_size' bytes.
 We need only the IDAT chunks, which are extracted and moved to the beginning
 of the 'encoded_image' buffer. The overall size of the IDAT chunks is returned
 by the function. */
@@ -3411,8 +3411,8 @@ png_extract_idat_chunks(unsigned char *encoded_image, int image_size)
 
 static void
 write_png_image_to_buffer(unsigned M, unsigned N, coordval *image, t_imagecolor color_mode,
-			  int bits_per_component, int max_colors, double cscale, 
-			  png_buffer_encode_t *png_buffer) 
+			  int bits_per_component, int max_colors, double cscale,
+			  png_buffer_encode_t *png_buffer)
 {
     gdImagePtr png_img;
     int m, n, pixel;
@@ -3489,14 +3489,14 @@ write_png_image_to_buffer(unsigned M, unsigned N, coordval *image, t_imagecolor 
 /* use libcairo only if libgd is not available. This may increase the output file size. */
 
 static cairo_status_t
-write_png_data_to_buffer(void *png_ptr, const unsigned char *data, unsigned int length) 
+write_png_data_to_buffer(void *png_ptr, const unsigned char *data, unsigned int length)
 {
     png_buffer_encode_t *p = (png_buffer_encode_t *)png_ptr;
     size_t new_size, new_length;
     new_length = p->length + length;
-    
+
     if (new_length > p->size) {
-	/* increase the buffer by the standard size of an IDAT chunk including 
+	/* increase the buffer by the standard size of an IDAT chunk including
 	   the chunk name, length and CRC */
 	new_size = p->size + 8192 + 12;
 	if (new_length > new_size) {
@@ -3512,8 +3512,8 @@ write_png_data_to_buffer(void *png_ptr, const unsigned char *data, unsigned int 
 
 static void
 write_png_image_to_buffer(unsigned M, unsigned N, coordval *image, t_imagecolor color_mode,
-			  int bits_per_component, int max_colors, double cscale, 
-			  png_buffer_encode_t *png_buffer) 
+			  int bits_per_component, int max_colors, double cscale,
+			  png_buffer_encode_t *png_buffer)
 {
     unsigned char *image255;
     cairo_surface_t *image_surface;
@@ -3551,7 +3551,7 @@ write_png_image_to_buffer(unsigned M, unsigned N, coordval *image, t_imagecolor 
 	int gray_tmp;
 	image255_ptr = image255;
 
-	for (n = 0; n < M * N; n++) { 
+	for (n = 0; n < M * N; n++) {
 	    gray_tmp = (int) ((*image++) * max_colors);
 	    if (gray_tmp  > (max_colors - 1)) {
 		gray_tmp = max_colors - 1;
@@ -3563,13 +3563,13 @@ write_png_image_to_buffer(unsigned M, unsigned N, coordval *image, t_imagecolor 
 
     /* now create the actual image surface from the data in 'image255' */
     image_surface = cairo_image_surface_create_for_data(image255, format, M, N, stride);
-    cairo_stat = cairo_surface_write_to_png_stream(image_surface, 
-						   (cairo_write_func_t)write_png_data_to_buffer, 
+    cairo_stat = cairo_surface_write_to_png_stream(image_surface,
+						   (cairo_write_func_t)write_png_data_to_buffer,
 						   png_buffer);
     cairo_surface_destroy(image_surface);
     free(image255);
-    if (cairo_stat != CAIRO_STATUS_SUCCESS) {	
-	int_error(NO_CARET, "GNUPLOT(post.trm): could not write cairo png image to buffer: %s.", 
+    if (cairo_stat != CAIRO_STATUS_SUCCESS) {
+	int_error(NO_CARET, "GNUPLOT(post.trm): could not write cairo png image to buffer: %s.",
 		  cairo_status_to_string(cairo_stat));
     }
 }
@@ -3579,12 +3579,12 @@ write_png_image_to_buffer(unsigned M, unsigned N, coordval *image, t_imagecolor 
 
 /* Encode the image using first deflate compression with PNG predictors
    followed by ASCII85 encoding to avoid potential problems with some
-   characters contained in the binary stream (e.g 0x04, 0x13 etc). 
+   characters contained in the binary stream (e.g 0x04, 0x13 etc).
    Some programs like dvips understand DSC like %%BeginBinary which could
    be used to mark the binary data, but other programs do not.
 */
 static unsigned char *
-PS_encode_png_image(unsigned int M, unsigned int N, coordval *image, 
+PS_encode_png_image(unsigned int M, unsigned int N, coordval *image,
 		    t_imagecolor color_mode, int bits_per_component,
 		    int max_colors, double cscale, int *return_num_bytes)
 {
@@ -3636,7 +3636,7 @@ PS_encode_png_image(unsigned int M, unsigned int N, coordval *image,
 	    }
 	}
     }
-    /* see if there are some trailing bytes which do not make a complete 4-tuple. 
+    /* see if there are some trailing bytes which do not make a complete 4-tuple.
        These must be handled separately. */
     n = (*return_num_bytes - j);
     if (n > 0) {
@@ -3853,7 +3853,7 @@ PS_encode_image(unsigned int M, unsigned int N, coordval *image, t_imagecolor co
     }
 
     *return_num_bytes = (encoded_image_ptr - encoded_image);
-    assert(*return_num_bytes <= max_encoded_bytes); 
+    assert(*return_num_bytes <= max_encoded_bytes);
     return encoded_image;
 }
 
@@ -3871,11 +3871,11 @@ print_five_operand_image(unsigned int M, unsigned int N, gpiPoint *corner, t_ima
     fprintf(gppsfile, "%s%d %d %d\n", space, M, N, bits_per_component);
     fprintf(gppsfile, "%s[ %d 0 0 %d 0 0 ]\n", space, M, N);
     if (ps_params->level1) {
-	fprintf(gppsfile, "/imagebuf %d string def\n", 
+	fprintf(gppsfile, "/imagebuf %d string def\n",
 		(M*N*bits_per_component*((color_mode == IC_RGB /* && ps_params->color */) ? 3 : 1) + 7)/8);
 	fputs("{currentfile imagebuf readhexstring pop}\n", gppsfile);
     } else if (ps_params->level3) {
-	fprintf(gppsfile, "  currentfile /ASCII85Decode filter << /Predictor 15 /BitsPerComponent %d /Colors %d /Columns %d  >> /FlateDecode filter\n", 
+	fprintf(gppsfile, "  currentfile /ASCII85Decode filter << /Predictor 15 /BitsPerComponent %d /Colors %d /Columns %d  >> /FlateDecode filter\n",
 		bits_per_component, (color_mode == IC_RGB) ? 3 : 1, M);
     } else {
 	fprintf(gppsfile, "  currentfile /ASCII85Decode filter\n");
@@ -3962,10 +3962,10 @@ PS_image (unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_i
 					    &num_encoded_bytes);
     else
 #endif
-	encoded_image = PS_encode_image(M, N, image, color_mode, 
+	encoded_image = PS_encode_image(M, N, image, color_mode,
 					bits_per_component, max_colors, cscale,
 					(ps_params->level1 ? PS_ASCII_HEX : PS_ASCII85), &num_encoded_bytes);
-    
+
 
     fputs("%%%%BeginImage\n", gppsfile);
 
@@ -4100,7 +4100,7 @@ PS_skip_image(int bytes, int x0, int y0, int dx, int dy) {
 }
 
 
-/* Feb 2010 - Search order for prolog and other files 
+/* Feb 2010 - Search order for prolog and other files
  * 1) current setting of "set psdir <dir>"
  * 2) environmental variable GNUPLOT_PS_DIR
  * 3) hard-coded path selected at build time
@@ -4117,14 +4117,14 @@ PS_open_prologue_file(char *name)
     /* Allocate and load default directory into ps_prologue_dir.　*/
     /* FIXME:  Why should we have to recalculate this every time? */
 #ifdef GNUPLOT_PS_DIR
-#   if defined(_WIN32)
+#   if defined(_WIN32) || defined(MSDOS)
 	ps_prologue_dir = RelativePathToGnuplot(GNUPLOT_PS_DIR);
 #   elif defined(OS2)
 	const ULONG bufsiz = 1024;
 	CHAR exepath[bufsiz];
 	PPIB ppib;
 	ULONG rc;
-	
+
 	rc = DosGetInfoBlocks(NULL, &ppib);
 	if (!rc)
 		rc = DosQueryModuleName(ppib->pib_hmte, bufsiz, (PCHAR) &exepath);
@@ -4247,7 +4247,7 @@ PS_dump_header_to_file(char *name)
 }
 #endif
 
-    
+
 static void
 PS_dump_prologue_file(char *name)
 {
@@ -4270,7 +4270,7 @@ PS_load_glyphlist()
     int  len;
     char glyph_name[32];
     FILE *prologue_fd = PS_open_prologue_file("aglfn.txt");
-    
+
     if (!prologue_fd)
 	return;
 
@@ -4285,7 +4285,7 @@ PS_load_glyphlist()
 	/* This is controlled by 'set term post adobeglyphnames'.             */
 	if (code >= 0x0100 && !ps_params->adobeglyphnames)
 	    continue;
-	
+
 	next++;
 	len = strchr(next,';') - next;
 	strncpy(glyph_name, next, len);
@@ -4331,19 +4331,19 @@ PS_layer(t_termlayer syncpoint)
 
 	default:
 		break;
-	
+
 	case TERM_LAYER_BEFORE_PLOT:
 		fprintf(gppsfile, "%% Begin plot #%d\n", ++plotno);
 		break;
-	
+
 	case TERM_LAYER_AFTER_PLOT:
 		fprintf(gppsfile, "%% End plot #%d\n", plotno);
 		break;
-	
+
 	case TERM_LAYER_BEGIN_PM3D_MAP:
 		fprintf(gppsfile, "%%pm3d_map_begin\n");
 		break;
-	
+
 	case TERM_LAYER_END_PM3D_MAP:
 		fprintf(gppsfile, "%%pm3d_map_end\n");
 		break;
@@ -4351,11 +4351,11 @@ PS_layer(t_termlayer syncpoint)
 	case TERM_LAYER_BEGIN_BORDER:
 		PS_border = TRUE;
 		break;
-	
+
 	case TERM_LAYER_END_BORDER:
 		PS_border = FALSE;
 		break;
-	
+
 	case TERM_LAYER_RESET:
 		plotno = 0;
 		break;
@@ -4370,12 +4370,12 @@ PS_layer(t_termlayer syncpoint)
 TERM_TABLE_START(post_driver)
     "postscript",
     "PostScript graphics, including EPSF embedded files (*.eps)",
-    PS_XMAX, PS_YMAX, PS_VCHAR, PS_HCHAR, 
-    PS_VTIC, PS_HTIC, PS_options, PS_init, PS_reset, 
-    PS_text, null_scale, PS_graphics, PS_move, PS_vector, 
-    PS_linetype, PS_put_text, PS_text_angle, 
+    PS_XMAX, PS_YMAX, PS_VCHAR, PS_HCHAR,
+    PS_VTIC, PS_HTIC, PS_options, PS_init, PS_reset,
+    PS_text, null_scale, PS_graphics, PS_move, PS_vector,
+    PS_linetype, PS_put_text, PS_text_angle,
     PS_justify_text, PS_point, do_arrow, PS_set_font, PS_pointsize,
-    TERM_BINARY|TERM_IS_POSTSCRIPT|TERM_CAN_CLIP|TERM_CAN_DASH|TERM_MONOCHROME|TERM_LINEWIDTH|TERM_FONTSCALE|TERM_POINTSCALE, 
+    TERM_BINARY|TERM_IS_POSTSCRIPT|TERM_CAN_CLIP|TERM_CAN_DASH|TERM_MONOCHROME|TERM_LINEWIDTH|TERM_FONTSCALE|TERM_POINTSCALE,
     0 /*suspend*/, 0 /*resume*/, PS_fillbox, PS_linewidth
 #ifdef USE_MOUSE
     , 0, 0, 0, 0, 0 /* no mouse support for postscript */

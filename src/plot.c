@@ -138,10 +138,10 @@ extern int X11_args __PROTO((int, char **)); /* FIXME: defined in term/x11.trm *
 #endif
 
 /* patch to get home dir, see command.c */
-#ifdef DJGPP
-# include <dir.h>               /* MAXPATH */
-char HelpFile[MAXPATH];
-#endif /*   - DJL */
+#ifdef MSDOS
+char HelpFile[PATH_MAX];
+static char progpath[PATH_MAX] = "";
+#endif
 
 /* a longjmp buffer to get back to the command line */
 static JMP_BUF command_line_env;
@@ -307,16 +307,33 @@ main(int argc, char **argv)
     malloc_debug(7);
 #endif
 
-/* get helpfile from home directory */
-#ifdef __DJGPP__
+/* init progpath and get helpfile from executable directory */
+#ifdef MSDOS
     {
 	char *s;
-	strcpy(HelpFile, argv[0]);
-	for (s = HelpFile; *s; s++)
-	    if (*s == DIRSEP1)
-		*s = DIRSEP2;	/* '\\' to '/' */
-	strcpy(strrchr(HelpFile, DIRSEP2), "/gnuplot.gih");
-    }			/* Add also some "paranoid" tests for '\\':  AP */
+
+	safe_strncpy(progpath, argv[0], sizeof(progpath));
+	/* convert '\\' to '/' */
+	for (s = progpath; *s != NUL; s++)
+	    if (*s == DIRSEP2)
+		*s = DIRSEP1;
+	/* cut program name */
+	s = strrchr(progpath, DIRSEP1);
+	if (s != NULL)
+	    s++;
+	else
+	    s = progpath;
+	*s = NUL;
+	/* init HelpFile */
+	strcpy(HelpFile, progpath);
+	strcat(HelpFile, "gnuplot.gih");
+	/* remove trailing "bin/" from progpath */
+	if ((s != NULL) && (s - progpath >= 4)) {
+	    s -= 4;
+	    if (strncasecmp(s, "bin", 3) == 0)
+		*s = NUL;
+	}
+    }
 #endif /* DJGPP */
 
 #ifdef VMS
@@ -770,7 +787,7 @@ load_rcfile(int where)
 
     if (where == 0) {
 #ifdef GNUPLOT_SHARE_DIR
-# if defined(_WIN32)
+# if defined(_WIN32) || defined(MSDOS)
 	rcfile = RelativePathToGnuplot(GNUPLOT_SHARE_DIR "\\gnuplotrc");
 # else
 	rcfile = (char *) gp_alloc(strlen(GNUPLOT_SHARE_DIR) + 1 + strlen("gnuplotrc") + 1, "rcfile");
@@ -1044,3 +1061,23 @@ restrict_popen()
     if (!successful_initialization)
 	int_error(NO_CARET,"Pipes and shell commands not permitted during initialization");
 }
+
+
+#ifdef MSDOS
+/* retrieve path relative to gnuplot executable */
+char *
+RelativePathToGnuplot(const char * path)
+{
+    char * rel_path, *s;
+
+    rel_path = (char * ) gp_alloc(strlen(progpath) + strlen(path) + 1, "RelativePathToGnuplot");
+    strcpy(rel_path, progpath);
+    /* progpath is guaranteed to have a trailing slash */
+    strcat(rel_path, path);
+    /* convert slashes to backslashes */
+    for (s = rel_path;*s != NUL; s++)
+	if (*s == DIRSEP2)
+	    *s = DIRSEP1;
+    return rel_path;
+}
+#endif

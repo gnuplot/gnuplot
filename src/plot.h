@@ -91,4 +91,9 @@ void cancel_history __PROTO((void));
 #define cancel_history()  {}
 #endif
 
+#ifdef MSDOS
+/* retrieve path relative to gnuplot executable */
+char * RelativePathToGnuplot(const char * path);
+#endif
+
 #endif /* GNUPLOT_PLOT_H */

@@ -61,7 +61,7 @@
  *
  * Transition to SVG 2.0
  *   remove DTD
- *   remove option "fontfile" and references to SVG fonts 
+ *   remove option "fontfile" and references to SVG fonts
  */
 
 /*
@@ -302,7 +302,7 @@ SVG_PathOpen ()
 {
     if (!SVG_pathIsOpen) {
 	SVG_GroupFilledClose();
-	    
+
 	fputs ("\t<path ", gpoutfile);
 
 	/* Line color */
@@ -319,7 +319,7 @@ SVG_PathOpen ()
 	/* Other patterns were selected by a previous call to SVG_dashtype */
 	else if (SVG_dashpattern)
 	    fprintf(gpoutfile, "stroke-dasharray='%s' ", SVG_dashpattern);
-	
+
 	/* RGBA */
 	if (SVG_alpha != 0.0)
 	    fprintf(gpoutfile, "opacity='%4.2f' ", 1.0 - SVG_alpha);
@@ -656,7 +656,7 @@ SVG_options ()
 		SVG_linewidth_factor = 1.0;
 	    continue;
 	}
-									
+
 	if (almost_equals(c_token, "dashl$ength") || equals(c_token, "dl")) {
 	    c_token++;
 	    SVG_dashlength = real_expression();
@@ -664,13 +664,13 @@ SVG_options ()
 		SVG_dashlength = 1.0;
 	    continue;
 	}
-									
+
 	if (almost_equals (c_token, "round$ed")) {
 	    c_token++;
 	    SVG_linecap = ROUNDED;
 	    continue;
 	}
-									
+
 	if (equals (c_token, "square")) {
 	    c_token++;
 	    SVG_linecap = SQUARE;
@@ -694,7 +694,7 @@ SVG_options ()
 	    SVG_background = parse_color_name();
 	    continue;
 	}
-									
+
 	int_error(c_token, "unrecognized terminal option");
     }
 
@@ -893,9 +893,9 @@ SVG_write_preamble ()
  */
     if (SVG_scriptdir == NULL) {
 #ifdef GNUPLOT_JS_DIR
-# if defined(_WIN32)
+# if defined(_WIN32) || defined(MSDOS)
 	SVG_scriptdir = RelativePathToGnuplot(GNUPLOT_JS_DIR);
-# else /* !_WIN32 */
+# else
 	/* use hardcoded _absolute_ path */
 	SVG_scriptdir = gp_strdup(GNUPLOT_JS_DIR);
 # endif
@@ -906,7 +906,7 @@ SVG_write_preamble ()
 
 #if !defined(VMS)
     len = strlen(SVG_scriptdir);
-# if defined(_WIN32)
+# if defined(_WIN32) || defined(MSDOS)
     if (*SVG_scriptdir && SVG_scriptdir[len-1] != '\\' && SVG_scriptdir[len-1] != '/') {
 	SVG_scriptdir = gp_realloc(SVG_scriptdir, len+2, "jsdir");
 	if (SVG_scriptdir[len-1] == '\\') /* use backslash if used in jsdir, otherwise slash */
@@ -1582,7 +1582,7 @@ SVG_set_font (const char *font)
 	SVG_fontStyleCur = SVG_fontStyleDef;
 	SVG_fontWeightCur = SVG_fontWeightDef;
     } else {
-	char *bold, *italic; 
+	char *bold, *italic;
 	int sep;
 
 	if (!((bold = strstr(font," bold"))))
@@ -1833,11 +1833,11 @@ SVG_layer(t_termlayer syncpoint)
 ------------------------------------------------------------------------------------------------------------------------------------*/
 #ifdef WRITE_PNG_IMAGE
 TERM_PUBLIC void
-SVG_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecolor color_mode) 
+SVG_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecolor color_mode)
 {
     /* Map image onto the terminal's coordinate system. */
     fprintf(gpoutfile, "<image x='%.*f' y='%.*f' width='%.*f' height='%.*f' preserveAspectRatio='none' ",
-	    PREC, X(corner[0].x), PREC, Y(corner[0].y), 
+	    PREC, X(corner[0].x), PREC, Y(corner[0].y),
 	    PREC, X(corner[1].x) - X(corner[0].x), PREC, Y(corner[1].y) - Y(corner[0].y));
 
     /* Feb 2017 - always embed images */
@@ -1853,7 +1853,7 @@ SVG_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecol
 	char *image_file;
         char *base_name = SVG_name ? SVG_name : "gp";
 	int wpiresult;
-   
+
         image_file = gp_alloc(strlen(base_name)+16, "SVG_image");
         sprintf(image_file, "%s_image_%02d.png", base_name, ++SVG_imageno);
         wpiresult = write_png_image(m, n, image, color_mode, image_file);
@@ -1861,7 +1861,7 @@ SVG_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecol
 	/* Reference the png image file */
 	fprintf(gpoutfile, "xlink:href='%s_image_%02d.png'/>\n",
 		base_name, SVG_imageno);
-	
+
 	free(image_file);
 
 	if (wpiresult != 0)
@@ -1894,11 +1894,11 @@ ENHsvg_OPEN(
      */
     switch (overprint) {
     case 2:
-	/* FIXME: If there are multiple overprint characters, 
+	/* FIXME: If there are multiple overprint characters,
          *        they all get piled on top of one another.
 	 */
 	ENHsvg_FLUSH();
-	fprintf(gpoutfile, "<tspan dx=\"-%.1fem\" dy=\"%.1fpx\">", 
+	fprintf(gpoutfile, "<tspan dx=\"-%.1fem\" dy=\"%.1fpx\">",
 		0.5 * ENHsvg_charcount, ENHsvg_base-base);
 	ENHsvg_base = base;
 	ENHsvg_x_offset = 0.0;
@@ -2162,7 +2162,7 @@ SVG_boxed_text(unsigned int x, unsigned int y, int option)
     }
 }
 #endif
-	
+
 #undef Y
 #undef X
 #undef PREC

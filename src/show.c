@@ -1115,9 +1115,9 @@ show_version(FILE *fp)
 #ifndef _WIN32
 	    char *helpfile = NULL;
 	    if ((helpfile = getenv("GNUHELP")) == NULL)
-# ifndef __DJGPP__
+# ifndef MSDOS
 		helpfile = HELPFILE;
-# else /* DJGPP */
+# else
 		helpfile = HelpFile;
 # endif
 	fprintf(stderr, "HELPFILE           = \"%s\"\n", helpfile);

@@ -85,7 +85,7 @@ extern struct udft_entry *dummy_func;
 # define STDOUT 1
 #endif
 
-#if defined(MSDOS) && defined(DJGPP)
+#ifdef MSDOS
 extern char HelpFile[];         /* patch for do_help  - AP */
 #endif /* MSDOS */
 

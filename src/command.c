@@ -2986,7 +2986,7 @@ help_command()
 	/* if can't find environment variable then just use HELPFILE */
 
 /* patch by David J. Liu for getting GNUHELP from home directory */
-#  ifdef __DJGPP__
+#  ifdef MSDOS
 	help_ptr = HelpFile;
 #  else
 	help_ptr = HELPFILE;
