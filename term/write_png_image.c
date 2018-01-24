@@ -76,27 +76,6 @@ piecemeal_write_base64_data (const unsigned char *data, unsigned int length, bas
   return 0;
 }
 
-static int
-write_base64_data (const unsigned char *data, unsigned int length, FILE *out) {
-  base64s *b64;
-  int retval = 0;
-
-  b64 = gp_alloc(sizeof(base64s), "base64s");
-  if (b64 == NULL)
-    return 1;
-
-  init_base64_state_data (b64, out);
-
-  if (piecemeal_write_base64_data (data, length, b64) != 0)
-    retval = 1;
-  else
-    retval = piecemeal_write_base64_data_finish (b64);
-
-  free(b64);
-
-  return retval;
-}
-
 #ifdef HAVE_CAIROPDF
 
 #include "cairo-pdf.h"
@@ -250,6 +229,27 @@ write_png_image (unsigned M, unsigned N, coordval *image, t_imagecolor color_mod
 }
 
 static int
+write_base64_data (const unsigned char *data, unsigned int length, FILE *out) {
+  base64s *b64;
+  int retval = 0;
+
+  b64 = gp_alloc(sizeof(base64s), "base64s");
+  if (b64 == NULL)
+    return 1;
+
+  init_base64_state_data (b64, out);
+
+  if (piecemeal_write_base64_data (data, length, b64) != 0)
+    retval = 1;
+  else
+    retval = piecemeal_write_base64_data_finish (b64);
+
+  free(b64);
+
+  return retval;
+}
+
+static int
 write_png_base64_image (unsigned M, unsigned N, coordval *image, t_imagecolor color_mode, FILE *out) {
   gdImagePtr im;
   void *pngdata;
@@ -272,6 +272,6 @@ write_png_base64_image (unsigned M, unsigned N, coordval *image, t_imagecolor co
 
   return retval;
 }
-#endif
-#endif
-#endif
+#endif /* HAVE_CAIRO_PDF */
+#endif /* WRITE_PNG_IMAGE */
+#endif /* TERM_BODY */
