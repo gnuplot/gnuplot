@@ -1585,6 +1585,13 @@ eval_3dplots()
 	    while (!END_OF_COMMAND || !checked_once) {
 		int save_token = c_token;
 
+		/* Allow this plot not to affect autoscaling */
+		if (almost_equals(c_token, "noauto$scale")) {
+		    c_token++;
+		    this_plot->noautoscale = TRUE;
+		    continue;
+		}
+
 		/* deal with title */
 		parse_plot_title((struct curve_points *)this_plot, xtitle, ytitle, &set_title);
 		if (save_token != c_token)
