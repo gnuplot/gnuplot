@@ -342,6 +342,9 @@ extern int grid_layer;
 /* Whether to draw the axis tic labels and tic marks in front of everything else */
 extern TBOOLEAN grid_tics_in_front;
 
+/* Whether to draw vertical grid lines in 3D */
+extern TBOOLEAN grid_vertical_lines;
+
 /* Whether or not to draw a separate polar axis in polar mode */
 extern TBOOLEAN raxis;
 
