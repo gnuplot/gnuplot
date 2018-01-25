@@ -1207,9 +1207,23 @@ set_cntrparam()
 	contour_order = DEFAULT_CONTOUR_ORDER;
 	contour_levels = DEFAULT_CONTOUR_LEVELS;
 	contour_levels_kind = LEVELS_AUTO;
-    } else if (almost_equals(c_token, "p$oints")) {
+	contour_firstlinetype = 0;
+	return;
+    }
+
+    while (!END_OF_COMMAND) {
+    if (almost_equals(c_token, "p$oints")) {
 	c_token++;
 	contour_pts = int_expression();
+    } else if (almost_equals(c_token, "first$linetype")) {
+	c_token++;
+	contour_firstlinetype = int_expression();
+    } else if (almost_equals(c_token, "sort$ed")) {
+	c_token++;
+	contour_sortlevels = TRUE;
+    } else if (almost_equals(c_token, "unsort$ed")) {
+	c_token++;
+	contour_sortlevels = FALSE;
     } else if (almost_equals(c_token, "li$near")) {
 	c_token++;
 	contour_kind = CONTOUR_KIND_LINEAR;
@@ -1291,6 +1305,7 @@ set_cntrparam()
 	contour_order = order;
     } else
 	int_error(c_token, "expecting 'linear', 'cubicspline', 'bspline', 'points', 'levels' or 'order'");
+    }
 }
 
 /* process 'set cntrlabel' command */

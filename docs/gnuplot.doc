@@ -8315,57 +8315,88 @@ Ffigure_fenceplot
                                   | discrete <z1> {,<z2>{,<z3>...}}
                                   | incremental <start>, <incr> {,<end>}
                                 }
+                         {{un}sorted}
+                         {firstlinetype N}
                        }
                      }
        show contour
 
  This command has two functions.  First, it sets the values of z for which
- contour points are to be determined (by linear interpolation between data
- points or function isosamples.)  Second, it controls the way contours are
- drawn between the points determined to be of equal z.  <n> should be an
- integral constant expression and <z1>, <z2> ... any constant expressions.
- The parameters are:
+ contours are to be determined.  The number of contour levels <n> should be an
+ integral constant expression. <z1>, <z2> ... are real-valued expressions.
+ Second, it controls the appearance of the individual contour lines.
 
- `linear`, `cubicspline`, `bspline`---Controls type of approximation or
+ Keywords controlling the smoothness of contour lines:
+
+ `linear`, `cubicspline`, `bspline`--- Controls type of approximation or
  interpolation.  If `linear`, then straight line segments connect points of
  equal z magnitude.  If `cubicspline`, then piecewise-linear contours are
  interpolated between the same equal z points to form somewhat smoother
  contours, but which may undulate.  If `bspline`, a guaranteed-smoother curve
  is drawn, which only approximates the position of the points of equal-z.
 
- `points`---Eventually all drawings are done with piecewise-linear strokes.
+ `points`--- Eventually all drawings are done with piecewise-linear strokes.
  This number controls the number of line segments used to approximate the
  `bspline` or `cubicspline` curve.  Number of cubicspline or bspline
  segments (strokes) = `points` * number of linear segments.
 
- `order`---Order of the bspline approximation to be used.  The bigger this
+ `order`--- Order of the bspline approximation to be used.  The bigger this
  order is, the smoother the resulting contour.  (Of course, higher order
  bspline curves will move further away from the original piecewise linear
  data.)  This option is relevant for `bspline` mode only.  Allowed values are
  integers in the range from 2 (linear) to 10.
 
- `levels`--- Selection of contour levels,  controlled by `auto` (default),
- `discrete`, `incremental`, and <n>, number of contour levels.
+ Keywords controlling the selection of contour levels:
 
- For `auto`, <n> specifies a nominal number of levels; the actual number will
- be adjusted to give simple labels. If the surface is bounded by zmin and zmax,
- contours will be generated at integer multiples of dz between zmin and zmax,
- where dz is 1, 2, or 5 times some power of ten (like the step between two
- tic marks).
+ `levels auto`--- This is the default. <n> specifies a nominal number of levels;
+ the actual number will be adjusted to give simple labels. If the surface is
+ bounded by zmin and zmax, contours will be generated at integer multiples
+ of dz between zmin and zmax, where dz is 1, 2, or 5 times some power of ten
+ (like the step between two tic marks).
 
- For `levels discrete`, contours will be generated at z = <z1>, <z2> ... as
+ `levels discrete`--- Contours will be generated at z = <z1>, <z2> ... as
  specified; the number of discrete levels sets the number of contour levels.
  In `discrete` mode, any `set cntrparam levels <n>` are ignored.
 
- For `incremental`, contours are generated at values of z beginning at <start>
- and increasing by <increment>, until the number of contours is reached. <end>
- is used to determine the number of contour levels, which will be changed by
- any subsequent `set cntrparam levels <n>`.  If the z axis is logarithmic,
+ `levels incremental`--- Contours are generated at values of z beginning at
+ <start> and increasing by <increment>, until the number of contours is reached.
+ <end> is used to determine the number of contour levels, which will be changed
+ by any subsequent `set cntrparam levels <n>`.  If the z axis is logarithmic,
  <increment> will be interpreted as a factor, just like in `set ztics`.
 
- If the command `set cntrparam` is given without any arguments specified,  the
- defaults are used: linear, 5 points, order 4, 5 auto levels.
+ Keywords controlling the assignment of linetype to contours:
 
+ By default the contours are generated in the reverse order specified
+ (`unsorted`).  Thus `set cntrparam levels increment 0, 10, 100` will create
+ 11 contours levels starting with 100 and ending with 0.  Adding the keyword
+ `sorted` re-orders the contours by increasing numerical value, which in this
+ case would mean the first contour is drawn at 0.
+
+ By default contours are drawn using successive linetypes starting with the
+ next linetype after that used for the corresponding surface.
+ Thus `splot x*y lt 5` would use lt 6 for the first contour generated.
+ If `hidden3d` mode is active then each surface uses two linetypes.  In this
+ case using default settings would cause the first contour to use the same
+ linetype as the hidden surface, which is undesirable.  This can be avoided
+ in either of two ways.
+ (1) Use `set hidden3d offset N` to change the linetype used for the hidden
+ surface.  A good choice would be `offset -1` since that will avoid all the
+ contour linetypes.
+ (2) Use the `set cntrparam firstlinetype N` option to specify a block of
+ linetypes used for contour lines independent of whatever was used for the
+ surface.  This is particularly useful if you want to customize the set of
+ contour linetypes.  N <= 0 restores the default.
+
+ If the command `set cntrparam` is given without any arguments specified
+ all options are reset to the default:
+       set cntrparam order 4 points 5
+       set cntrparam levels auto 5 unsorted 
+       set cntrparam firstlinetype 0
+
+4 Examples
+?commands set cntrparam examples
+?set cntrparam examples
+?cntrparam examples
  Examples:
        set cntrparam bspline
        set cntrparam points 7
@@ -8386,6 +8417,18 @@ Ffigure_fenceplot
 
  To set the start and increment while retaining the number of levels:
        set cntrparam levels incremental 100,50
+
+ To define and use a customized block of contour linetypes
+       set linetype 100 lc "red" dt '....'
+       do for [L=101:199] {
+           if (L%10 == 0) {
+               set linetype L lc "black" dt solid lw 2
+           } else {
+               set linetype L lc "gray" dt solid lw 1
+           }
+       }
+       set cntrparam firstlinetype 100
+       set cntrparam sorted levels incremental 0, 1, 100
 
  See also `set contour` for control of where the contours are drawn, and
  `set cntrlabel` for control of the format of the contour labels and linetypes.

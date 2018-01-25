@@ -1360,6 +1360,11 @@ show_contour()
 		contour_format, clabel_font ? clabel_font : "");
 	fprintf(stderr, "\ton-plot labels placed at segment %d with interval %d\n",
 		clabel_start, clabel_interval);
+	if (contour_firstlinetype > 0)
+		fprintf(stderr, "\tfirst contour linetype will be %d\n", contour_firstlinetype);
+	else
+		fprintf(stderr, "\tfirst contour linetype will be chosen automatically\n");
+	fprintf(stderr, "\tcontour levels will be %ssorted\n", contour_sortlevels ? "" : "un");
     }
 }
 

@@ -1,5 +1,20 @@
 2018-01-25  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/contour.c src/contour.h src/graph3d.c src/save.c src/set.c
+	src/show.c src/unset.c docs/gnuplot.doc demo/custom_contours.dem:
+
+	New options for customizing contour lines
+		set cntrparam {firstlinetype N} {{un}sorted}
+	The 'firstlinetype' option allows you to set linetype properties for
+	a block of linetypes, including dot-dash patterns,  and then specify
+	that these customized linetypes be used to generate contour lines.
+	In this case you probably want to also use the other new keyword
+	'sorted' because by default contour lines are not generated in
+	consistent ascending order.
+	Bugs #1603 #1612
+
+2018-01-25  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* src/axis.* src/graph3d.c src/save.c src/set.c src/show.c src/unset.c:
 	New command "set grid {no}vertical" includes vertical grid lines in the
 	xz and yz planes corresponding to the major and minor x/y tic locations

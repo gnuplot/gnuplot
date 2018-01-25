@@ -815,6 +815,8 @@ unset_cntrparam()
     contour_order = DEFAULT_CONTOUR_ORDER;
     contour_levels = DEFAULT_CONTOUR_LEVELS;
     contour_levels_kind = LEVELS_AUTO;
+    contour_firstlinetype = 0;
+    contour_sortlevels = FALSE;
 }
 
 /* process 'unset cntrlabel' command */
