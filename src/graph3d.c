@@ -2671,7 +2671,7 @@ xtick_callback(
 	double which_face = (surface_rot_x > 90 && surface_rot_x < 270) ? xaxis_y : other_end;
 	(t->layer)(TERM_LAYER_BEGIN_GRID);
 	map3d_xyz(place, which_face, Z_AXIS.min, &v4);
-	map3d_xyz(place, which_face, Z_AXIS.max, &v5);
+	map3d_xyz(place, which_face, ceiling_z, &v5);
 	draw3d_line(&v4, &v5, &grid);
 	(t->layer)(TERM_LAYER_END_GRID);
     }
@@ -2803,7 +2803,7 @@ ytick_callback(
 	double which_face = (surface_rot_x > 90 && surface_rot_x < 270) ? yaxis_x : other_end;
 	(t->layer)(TERM_LAYER_BEGIN_GRID);
 	map3d_xyz(which_face, place, Z_AXIS.min, &v4);
-	map3d_xyz(which_face, place, Z_AXIS.max, &v5);
+	map3d_xyz(which_face, place, ceiling_z, &v5);
 	draw3d_line(&v4, &v5, &grid);
 	(t->layer)(TERM_LAYER_END_GRID);
     }
