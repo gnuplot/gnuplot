@@ -944,6 +944,7 @@ unset_grid()
 	axis_array[i].gridminor = FALSE;
     }
     polar_grid_angle = 0;
+    grid_vertical_lines = FALSE;
 }
 
 

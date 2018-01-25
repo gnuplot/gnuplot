@@ -9581,6 +9581,7 @@ Ffigure_missing
                 {{no}{m}cbtics}
                 {polar {<angle>}}
                 {layerdefault | front | back}
+                {{no}vertical}
                 {<line-properties-major> {, <line-properties-minor>}}
        unset grid
        show grid
@@ -9616,6 +9617,10 @@ Ffigure_missing
  hidden line removal machinery instead. These options actually affect
  not only the grid, but also the lines output by `set border` and the
  various ticmarks (see `set xtics`).
+
+ In 3D plots grid lines at x- and y- axis tic positions are by default drawn
+ only on the base plane parallel to z=0.  The `vertical` keyword activates
+ drawing grid lines in the xz and yz planes also, running from zmin to zmax.
 
  Z grid lines are drawn on the bottom of the plot.  This looks better if a
  partial box is drawn around the plot---see `set border`.

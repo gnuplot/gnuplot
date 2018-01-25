@@ -1683,6 +1683,8 @@ show_grid()
     fprintf(stderr, "\n\tMinor grid drawn with");
     save_linetype(stderr, &(mgrid_lp), FALSE);
     fputc('\n', stderr);
+    if (grid_vertical_lines)
+	fprintf(stderr, "\tVertical grid lines in 3D plots\n");
     if (polar_grid_angle)
 	fprintf(stderr, "\tGrid radii drawn every %f %s\n",
 		polar_grid_angle / ang2rad,

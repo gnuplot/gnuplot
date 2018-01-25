@@ -379,7 +379,9 @@ save_set_all(FILE *fp)
 	fputs("\n", fp);
 #undef SAVE_GRID
 
-	fprintf(fp, "set grid %s  ", (grid_layer==-1) ? "layerdefault" : ((grid_layer==0) ? "back" : "front"));
+	fprintf(fp, "set grid %s%s  ",
+		(grid_vertical_lines) ? "vertical " : "",
+		(grid_layer==-1) ? "layerdefault" : ((grid_layer==0) ? "back" : "front"));
 	save_linetype(fp, &grid_lp, FALSE);
 	fprintf(fp, ", ");
 	save_linetype(fp, &mgrid_lp, FALSE);

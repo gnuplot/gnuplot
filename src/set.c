@@ -2073,6 +2073,12 @@ set_grid()
 	} else if (equals(c_token,"front")) {
 	    grid_layer = LAYER_FRONT;
 	    c_token++;
+	} else if (almost_equals(c_token,"vert$ical")) {
+	    grid_vertical_lines = TRUE;
+	    c_token++;
+	} else if (almost_equals(c_token,"novert$ical")) {
+	    grid_vertical_lines = FALSE;
+	    c_token++;
 	} else if (almost_equals(c_token,"layerd$efault")
 		|| equals(c_token, "behind")) {
 	    grid_layer = LAYER_BEHIND;

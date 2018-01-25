@@ -1,3 +1,12 @@
+2018-01-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.* src/graph3d.c src/save.c src/set.c src/show.c src/unset.c:
+	New command "set grid {no}vertical" includes vertical grid lines in the
+	xz and yz planes corresponding to the major and minor x/y tic locations
+	already drawn in the xy plane.  Lines extend from zmin to the top of
+	the plot box, i.e. not all the way to the base plane.
+	Affects only 3D plots.
+
 2018-01-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/internal.c (f_gprintf):  The count of characters immediately

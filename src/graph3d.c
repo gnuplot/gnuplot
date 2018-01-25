@@ -2642,6 +2642,16 @@ xtick_callback(
 	draw3d_line(&v1, &v3, &grid);
 	(t->layer)(TERM_LAYER_END_GRID);
     }
+    /* Vertical grid lines (in yz plane) */
+    if (grid_vertical_lines && grid.l_type > LT_NODRAW) {
+	vertex v4, v5;
+	double which_face = (surface_rot_x > 90 && surface_rot_x < 270) ? xaxis_y : other_end;
+	(t->layer)(TERM_LAYER_BEGIN_GRID);
+	map3d_xyz(place, which_face, Z_AXIS.min, &v4);
+	map3d_xyz(place, which_face, ceiling_z, &v5);
+	draw3d_line(&v4, &v5, &grid);
+	(t->layer)(TERM_LAYER_END_GRID);
+    }
     if ((X_AXIS.ticmode & TICS_ON_AXIS)
 	&& !Y_AXIS.log
 	&& inrange (0.0, Y_AXIS.min, Y_AXIS.max)
@@ -2762,6 +2772,16 @@ ytick_callback(
 	(t->layer)(TERM_LAYER_BEGIN_GRID);
 	map3d_xyz(other_end, place, base_z, &v3);
 	draw3d_line(&v1, &v3, &grid);
+	(t->layer)(TERM_LAYER_END_GRID);
+    }
+    /* Vertical grid lines (in xz plane) */
+    if (grid_vertical_lines && grid.l_type > LT_NODRAW) {
+	vertex v4, v5;
+	double which_face = (surface_rot_x > 90 && surface_rot_x < 270) ? yaxis_x : other_end;
+	(t->layer)(TERM_LAYER_BEGIN_GRID);
+	map3d_xyz(which_face, place, Z_AXIS.min, &v4);
+	map3d_xyz(which_face, place, ceiling_z, &v5);
+	draw3d_line(&v4, &v5, &grid);
 	(t->layer)(TERM_LAYER_END_GRID);
     }
     if (Y_AXIS.ticmode & TICS_ON_AXIS
