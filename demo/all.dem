@@ -176,6 +176,7 @@ reset
 
 print "******************** file contours.dem ********************"
 load "contours.dem"
+load "custom_contours.dem"
 reset
 
 print "******************** file multimsh.dem ********************"

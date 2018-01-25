@@ -74,6 +74,7 @@ Here are samples of PNG output from some of the demos.
     <li><a href="surface1.html">surfaces 1</a></li>
     <li><a href="surface2.html">surfaces 2</a></li>
     <li><a href="contours.html">contours</a></li>
+    <li><a href="custom_contours.html">custom contour lines</a></li>
     <li><a href="singulr.html">singularities</a></li>
     <li><a href="hidden.html">hidden surfaces</a></li>
     <li><a href="pm3d.html">pm3d coloring</a></li>
@@ -198,7 +199,7 @@ Here are samples of PNG output from some of the demos.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated November 2017</i>
+    <i>This page generated January 2018</i>
     </td>
 
     <td>
