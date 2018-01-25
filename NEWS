@@ -1,6 +1,7 @@
 Changes in 5.2.3
 ================
 * NEW "set grid {no}vertical" adds grid lines in the xz and xz planes
+* NEW "set cntrparam {firstlinetype N} {{un}sorted}"
 * CHANGE drop non-working support for YIQ color space
 * FIX potential buffer overflow in gprintf formats containing %%
 * FIX immediate response to ctrl-Z when libreadline is used for input
