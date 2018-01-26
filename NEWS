@@ -1,16 +1,31 @@
 Changes not in 5.2
 ==================
-* NEW set table separator {tab|comma|"char"}
 * NEW plot ... with table if <expression>
+* NEW "set walls" command to show xy xz and yz planes in 3D plots
+* NEW "set clip radial" for line segments in polar mode plots
+* NEW "splot ... with circles"
+* NEW internal support for appending to existing arrays (not user-visible)
 * CHANGE remove deprecated command "update"
 * CHANGE remove deprecated option "thru"
 * CHANGE special case optimization of nonlinear code to speed up logscale
 * CHANGE windows terminal can print using Direct2D
 * CHANGE windows terminal supports color fonts (Direct2D)
+* CHANGE arrow head size can be decoupled from arrow size
 * FIX allow mixed use of in-key plot titles and manually placed titles
+* FIX open/close path for polygons
 
-New features, changes and fixes in gnuplot version 5.2
-======================================================
+New features introduced to 5.2 in patchlevel releases
+=====================================================
+* NEW "set grid {no}vertical" adds grid lines in the xz and xz planes
+* NEW "set cntrparam {firstlinetype N} {{un}sorted}"
+* NEW set table separator {tab|comma|"char"} allows creation of csv files
+* NEW hotkey for changing azimuth in 3D plots with mousing
+* NEW splot ... with lines title at {beg|end}
+* NEW Rework gstrptime() to handle relative time formats tH tM tS
+* NEW command "set rgbmax <value>" controls interpretation of input RGB values
+
+New features, changes and fixes in gnuplot version 5.2 (initial release)
+========================================================================
 * NEW plot styles
 * NEW    splot ... using <x>:<y>:<z>:<zlow>:<zhigh> with zerrorfill
 * NEW    "set jitter" allows creation of bee swarm plots
