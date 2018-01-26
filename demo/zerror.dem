@@ -7,7 +7,8 @@ set xyplane at 1
 set log z
 set key opaque box height 1 at screen .9, .8
 set border 127
-set grid z
+set grid x y z vertical
+set grid lt 1 lw 0.75 lc "grey"
 
 set title "splot with zerrorfill (no depth sorting)"
 splot for [k=1:5] 'silver.dat' using 1:(k):2:3 with zerror lt black fc lt k title "k = ".k
