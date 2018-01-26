@@ -65,6 +65,7 @@ struct udft_entry *first_udf = NULL;
 struct udvt_entry **udv_user_head;
 
 TBOOLEAN undefined;
+enum int64_overflow overflow_handling = INT64_OVERFLOW_TO_FLOAT;
 
 /* The stack this operates on */
 static struct value stack[STACK_DEPTH];

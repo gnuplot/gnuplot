@@ -703,6 +703,10 @@ f_int(union argument *arg)
     if (a.type == NOTDEFINED || isnan(foo)) {
 	push(Gcomplex(&a, not_a_number(), 0.0));
 	undefined = TRUE;
+    } else if (fabs(foo) > LARGEST_GUARANTEED_NONOVERFLOW) {
+	if (overflow_handling == INT64_OVERFLOW_UNDEFINED)
+	    undefined = TRUE;
+	push(Gcomplex(&a, not_a_number(), 0.0));
     } else
 	push(Ginteger(&a, (intgr_t)foo));
 }
@@ -818,15 +822,25 @@ void
 f_floor(union argument *arg)
 {
     struct value a;
+    double foo;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
+
     switch (a.type) {
     case INTGR:
 	push(&a);
 	break;
     case CMPLX:
-	push(Ginteger(&a, (intgr_t) floor(a.v.cmplx_val.real)));
+	foo = a.v.cmplx_val.real;
+	/* Note: this test catches NaN also */
+	if (!(fabs(foo) < LARGEST_GUARANTEED_NONOVERFLOW)) {
+	    if (overflow_handling == INT64_OVERFLOW_UNDEFINED)
+		undefined = TRUE;
+	    push(Gcomplex(&a, not_a_number(), 0.0));
+	} else {
+	    push(Ginteger(&a, (intgr_t) floor(foo)));
+	}
 	break;
     BAD_DEFAULT;
     }
@@ -837,15 +851,25 @@ void
 f_ceil(union argument *arg)
 {
     struct value a;
+    double foo;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
+
     switch (a.type) {
     case INTGR:
 	push(&a);
 	break;
     case CMPLX:
-	push(Ginteger(&a, (intgr_t) ceil(a.v.cmplx_val.real)));
+	foo = a.v.cmplx_val.real;
+	/* Note: this test catches NaN also */
+	if (!(fabs(foo) < LARGEST_GUARANTEED_NONOVERFLOW)) {
+	    if (overflow_handling == INT64_OVERFLOW_UNDEFINED)
+		undefined = TRUE;
+	    push(Gcomplex(&a, not_a_number(), 0.0));
+	} else {
+	    push(Ginteger(&a, (intgr_t) ceil(foo)));
+	}
 	break;
     BAD_DEFAULT;
     }

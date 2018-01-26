@@ -738,8 +738,11 @@ init_session()
 	/* Undefine any previously-used variables */
 	del_udv_by_name("",TRUE);
 
-	/* Restore default colors before loadin local preferences */
+	/* Restore default colors before loading local preferences */
 	set_colorsequence(1);
+
+	/* Reset program variables not handled by 'reset' */
+	overflow_handling = INT64_OVERFLOW_TO_FLOAT;
 
 	/* Make sure all variables start in the same state 'reset'
 	 * would set them to.

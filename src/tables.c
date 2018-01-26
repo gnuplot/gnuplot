@@ -242,6 +242,7 @@ const struct gen_table set_tbl[] =
     { "of$fsets", S_OFFSETS },
     { "or$igin", S_ORIGIN },
     { "o$utput", SET_OUTPUT },
+    { "overflow", S_OVERFLOW },
     { "pa$rametric", S_PARAMETRIC },
     { "pm$3d", S_PM3D },
     { "pal$ette", S_PALETTE },

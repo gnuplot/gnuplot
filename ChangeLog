@@ -1,5 +1,70 @@
 2018-01-26  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/eval.* src/internal.c src/plot.c src/set.c src/show.c
+	src/standard.c src/tables.* src/unset.c demo/overflow.dem:
+
+	Overflow handling for 64-bit integer arithmetic
+
+	Syntax:
+	      set overflow {float | NaN | undefined}
+	      unset overflow
+
+	Gnuplot now supports 64-bit integer arithmetic.
+	This means that for values from 2^53 to 2^63 (roughly 10^16 to 10^19)
+	integer evaluation preserves more precision than evaluation using
+	IEEE 754 floating point arithmetic.  However unlike the IEEE floating
+	point representation, which sacrifices precision to span a total range
+	of roughly [-10^307 : 10^307], integer operations that result in values
+	outside the range [-2^63 : 2^63] overflow.  The 'set overflow' command
+	lets you control what happens in case of overflow.
+
+	`set overflow` is the same as `set overflow float`. It causes the
+	result to be returned as a real number rather than as an integer.
+	This is the default.
+
+	The command `unset overflow` causes integer arithmetic overflow to be
+	ignored. No error is shown.  You may want this if your platform allows
+	only 32-bit integer arithmetic and you want to approximate the behaviour
+	of gnuplot versions prior to 5.3.
+
+	The `reset` command does not affect the state of overflow handling.
+
+	Earlier gnuplot versions were limited to 32-bit arithmetic and ignored
+	integer overflow.  Note, however, that some built-in operators did not
+	use integer arithemetic at all, even when given integer arguments. This
+	included the exponentiation operator N**M and the summation operator
+	(see `summation`).  These operations now return an integer value when
+	given integer arguments, making them potentially susceptible to overflow
+	and thus affected by the state of `set overflow`.
+
+	set overflow float
+	------------------
+	If an integer arithmetic expression overflows the limiting range,
+	[-2^63 : 2^63] for 64-bit integers, the result is returned as a
+	floating point value instead.  This is not treated as an error.
+	Example:
+	      gnuplot> set overflow float
+	      gnuplot> A = 2**62 - 1;  print A, A+A, A+A+A
+	      4611686018427387903 9223372036854775806 1.38350580552822e+19
+
+	set overflow NaN
+	----------------
+	If an integer arithmetic expression overflows the limiting range,
+	[-2^63 : 2^63] for 64-bit integers, the result is returned as NaN
+	(Not a Number).  This is not treated as an error.
+	Example:
+	      gnuplot> set overflow NaN
+	      gnuplot> print 10**18, 10**19
+	      1000000000000000000 NaN
+
+	set overflow undefined
+	----------------------
+	If an integer arithmetic expression overflows the limiting range,
+	[-2^63 : 2^63] for 64-bit integers, the result is undefined.
+	This is treated as an error.
+
+2018-01-26  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* configure.ac src/datafile.c src/eval.* src/fit.c src/gp_types.h 
 	src/internal.c src/misc.c src/parse.* src/save.c src/set.c src/show.c 
 	src/standard.c src/stdfn.h src/syscfg.h src/util.c term/canvas.trm 
@@ -43,7 +108,7 @@
 
 	* src/gadgets.* src/graphics.c src/save.c src/set.c src/show.c
 	src/unset.c:   New command "set clip radial" for polar plot with lines
-   
+
 	Radial clipping to the bounding circle of a polar plot still depends on
 	the existing criteria "set clip {one|two}".
 	   set polar; set rrange [0:RMAX]

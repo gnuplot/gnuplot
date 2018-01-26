@@ -196,11 +196,30 @@ C
 ?new
  Version 5.3 is the current development version. New features introduced here
  will generally not appear in a supported release until version 5.4. Details
- may change before that.
+ may change before that.  However some features developed for 5.3 may be 
+ back-ported for inclusion in incremental patch-level releases of the stable
+ version 5.2.x.
 
+4 Support for 64-bit integer arithmetic
 #start
-#bcreation of csv files using `set table separator {tab|comma|"char"}`
+#bAll evaluation of expressions and functions uses 64-integer arithmetic if
+##supported by the platform.
+#bInteger overflow is detected and handled according to user preference.
+##See `overflow`.
+#end
+
+4 New commands and command options
+?new commands
+#start
+#bNew options for drawing the xy xz and yz planes in 3D plots.
+##See `set walls`, `set grid vertical`.
+#b`set table separator {tab|comma|"char"}` can be used to create csv files.
 ##See `plot with table`.
+#b`set rgbmax <value>` controls interpretation of input RGB values.
+#bnew formats descriptors tH tM tS handle relative times (interval lengths)
+#bPlot style `with circles` can be using in 3D plots.
+#bCustomized contour line types
+##See `set cntrparam`
 #end
 3 Features introduced in version 5.2
 ?Features introduced in version 5.2
@@ -252,7 +271,7 @@ C
 ## nonlinear axis where the paired functions are log(x) and exp(x).
 #end
 4 New commands and command options
-?new commands
+?new commands in 5.2
 #start
 #b Inside the bracketed clause of an iteration, `continue` jumps immediately
 ## to the next iteration, `break` immediately exits from the iteration
@@ -7700,9 +7719,10 @@ Ffigure_fenceplot
  restore the default settings after executing a loaded command file, or to
  return to a defined state after lots of settings have been changed.
 
- The following are _not_ affected by `reset`.
+ The following are _not_ affected by `reset`:
       `set term` `set output` `set loadpath` `set fontpath` `set linetype`
       `set encoding` `set decimalsign` `set locale` `set psdir` `set fit`
+      `set overflow`
 
  Note that `reset` does not necessarily return settings to the state they
  were in at program entry, because the default values may have been altered by
@@ -9700,6 +9720,7 @@ Ffigure_missing
 ?commands unset grid
 ?commands show grid
 ?set grid
+?set grid vertical
 ?unset grid
 ?show grid
 ?grid
@@ -11496,6 +11517,91 @@ Ffigure_multiple_keys
 
  On MSDOS machines, `set output "PRN"` will direct the output to the default
  printer.  On VMS, output can be sent directly to any spooled device.
+3 overflow
+?overflow
+?commands set overflow
+?commands unset overflow
+?set overflow
+?unset overflow
+?show overflow
+ Syntax:
+      set overflow {float | NaN | undefined}
+      unset overflow
+
+ This version of gnuplot supports 64-bit integer arithmetic.
+ This means that for values from 2^53 to 2^63 (roughly 10^16 to 10^19)
+ integer evaluation preserves more precision than evaluation using IEEE 754
+ floating point arithmetic.  However unlike the IEEE floating point
+ representation, which sacrifices precision to span a total range of
+ roughly [-10^307 : 10^307], integer operations that result in values outside
+ the range [-2^63 : 2^63] overflow.  The 'set overflow' command lets you
+ control what happens in case of overflow.  See options below.
+
+ `set overflow` is the same as `set overflow float`. It causes the result to be
+ returned as a real number rather than as an integer. This is the default.
+
+ The command `unset overflow` causes integer arithmetic overflow to be ignored.
+ No error is shown.  This may be desirable if your platform allows only 32-bit
+ integer arithmetic and you want to approximate the behaviour of gnuplot
+ versions prior to 5.3.
+
+ The `reset` command does not affect the state of overflow handling.
+
+ Earlier gnuplot versions were limited to 32-bit arithmetic and ignored
+ integer overflow.  Note, however, that some built-in operators did not
+ use integer arithemetic at all, even when given integer arguments. This
+ included the exponentiation operator N**M and the summation operator
+ (see `summation`).  These operations now return an integer value when
+ given integer arguments, making them potentially susceptible to overflow
+ and thus affected by the state of `set overflow`.
+4 float
+?set overflow float
+?overflow float
+ If an integer arithmetic expression overflows the limiting range,
+ [-2^63 : 2^63] for 64-bit integers, the result is returned as a floating
+ point value instead.  This is not treated as an error.
+ Example:
+      gnuplot> set overflow float
+      gnuplot> A = 2**62 - 1;  print A, A+A, A+A+A
+      4611686018427387903 9223372036854775806 1.38350580552822e+19
+4 NaN
+?set overflow NaN
+?overflow NaN
+?overflow nan
+ If an integer arithmetic expression overflows the limiting range,
+ [-2^63 : 2^63] for 64-bit integers, the result is returned as NaN
+ (Not a Number).  This is not treated as an error.
+ Example:
+      gnuplot> set overflow NaN
+      gnuplot> print 10**18, 10**19
+      1000000000000000000 NaN
+4 undefined
+?set overflow undefined
+?overflow undefined
+ If an integer arithmetic expression overflows the limiting range,
+ [-2^63 : 2^63] for 64-bit integers, the result is undefined.
+ This is treated as an error.
+ Example:
+      gnuplot> set overflow undefined
+      gnuplot> A = 10**19
+                   ^
+               undefined value
+4 affected operations
+?set overflow affected_operations
+?overflow affected_operations
+ The `set overflow` state affects the arithmetic operators
+      + - * / **
+ and the built-in summation operation `sum`.
+
+ All of these operations will return an integer result if all of the arguments
+ are integers, so long as no overflow occurs during evaluation.
+
+ The `set overflow` state does not affect logical or bit operations
+      << >>  | ^ &
+
+ If overflow occurs at any point during the course of evaluating of a summation
+ `set overflow float` will cause the result to be returned as a real number even
+ if the final sum is within the range of integer representation.
 3 palette
 ?commands set palette
 ?commands show palette

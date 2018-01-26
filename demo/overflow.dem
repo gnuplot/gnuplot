@@ -1,0 +1,46 @@
+#
+# Various tests of integer arithmetic overflow
+#
+A = 2**62
+print "A = 2**62"
+
+unset overflow
+print ""
+print "unset overflow"
+print "print A, A+A, -3*A"
+print A, A+A, -3*A
+
+set overflow
+print ""
+print "set overflow"
+print "print A, A+A, -3*A"
+print A, A+A, -3*A
+
+set overflow NaN
+print ""
+print "set overflow NaN"
+print "print A, A+A, -3*A"
+print A, A+A, -3*A
+
+print ""
+print "==========================================="
+print " difficult overflow detection for products "
+print "==========================================="
+
+print "set overflow"; set overflow; show overflow
+B = (2**62-1) << 1
+print "B = (2**62-1) << 1"
+print "print B, B+1, B+2, B+3"
+print B, B+1, B+2, B+3
+
+print ""
+print "B/3 = ", B/3
+print "print 3074457345618258602 * 3 :  ", 3074457345618258602 * 3, "   Should be OK"
+print "print 3074457345618258603 * 3 :  ", 3074457345618258603 * 3, "   Should overflow"
+
+print ""
+print "print (B-510), int(real(B-510))","\t", (B-510), int(real(B-510))
+print "print (B-511), int(real(B-511))","\t", (B-511), int(real(B-511))
+print ""
+print "So any product > 9.22337203685477478e+18 "
+print "may or may not have overflowed and needs additional tests"

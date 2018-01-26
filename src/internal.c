@@ -250,15 +250,19 @@ f_sum(union argument *arg)
     struct value beg, end, varname; /* [<var> = <start>:<end>] */
     udft_entry *udf;                /* function to evaluate */
     udvt_entry *udv;                /* iteration variable */
-    struct value result;            /* result */
+    struct value result;            /* accummulated sum */
     struct value f_i;
     int i;
-    long long llsum = 0;	    /* integer sum */
+    intgr_t llsum;		    /* integer sum */
     TBOOLEAN integer_terms = TRUE;
 
     (void) pop(&end);
     (void) pop(&beg);
     (void) pop(&varname);
+
+    /* Initialize sum to 0 */
+    Gcomplex(&result, 0, 0);
+    llsum = 0;
 
     if (beg.type != INTGR || end.type != INTGR)
         int_error(NO_CARET, "range specifiers of sum must have integer values");
@@ -270,7 +274,6 @@ f_sum(union argument *arg)
     if (!udf)
         int_error(NO_CARET, "internal error: lost expression to be evaluated during summation");
 
-    Gcomplex(&result, 0, 0);
     for (i=beg.v.int_val; i<=end.v.int_val; ++i) {
         double x, y;
 
@@ -283,30 +286,34 @@ f_sum(union argument *arg)
         y = imag(&result) + imag(&f_i);
         Gcomplex(&result, x, y);
 
+	if (f_i.type != INTGR)
+	    integer_terms = FALSE;
 	if (!integer_terms)
 	    continue;
 
-	/* Check for integer overflow */
-	/* FIXME:  
-	 * Direct test on integer overflow would be better than testing
-	 * the floating point equivalent.
-	 */
-	if ((x > LARGEST_GUARANTEED_NONOVERFLOW)
-	||  (x < -LARGEST_GUARANTEED_NONOVERFLOW))
-	    integer_terms = FALSE;
-
 	/* So long as the individual terms are integral */
 	/* keep an integer sum as well.			*/
-	if (integer_terms && f_i.type == INTGR)
-	    llsum += f_i.v.int_val;
-	else
+	llsum += f_i.v.int_val;
+
+	/* Check for integer overflow */
+	if (overflow_handling == INT64_OVERFLOW_IGNORE)
+	    continue;
+	if (sgn(result.v.cmplx_val.real) != sgn(llsum))  {
 	    integer_terms = FALSE;
+	    if (overflow_handling == INT64_OVERFLOW_TO_FLOAT)
+		continue;
+	    if (overflow_handling == INT64_OVERFLOW_UNDEFINED)
+		undefined = TRUE;
+	    if (overflow_handling == INT64_OVERFLOW_NAN)
+		Gcomplex(&result, not_a_number(), 0.0);
+	    break;
+	}
     }
 
-    if (!integer_terms)
-	push(&result);
-    else
+    if (integer_terms)
 	push(Ginteger(&result, llsum));
+    else
+	push(&result);
 }
 
 
@@ -757,6 +764,7 @@ void
 f_plus(union argument *arg)
 {
     struct value a, b, result;
+    double temp;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&b);
@@ -767,6 +775,23 @@ f_plus(union argument *arg)
 	case INTGR:
 	    (void) Ginteger(&result, a.v.int_val +
 			    b.v.int_val);
+	    /* Check for overflow */
+	    if (overflow_handling == INT64_OVERFLOW_IGNORE)
+		break;
+	    temp = (double)(a.v.int_val) + (double)(b.v.int_val);
+	    if (sgn(temp) != sgn(result.v.int_val))
+		switch (overflow_handling) {
+		    case INT64_OVERFLOW_TO_FLOAT:
+			    Gcomplex(&result, temp, 0.0);
+			break;
+		    case INT64_OVERFLOW_UNDEFINED:
+			undefined = TRUE;
+		    case INT64_OVERFLOW_NAN:
+			Gcomplex(&result, not_a_number(), 0.0);
+			break;
+		    default:
+			break;
+		}
 	    break;
 	case CMPLX:
 	    (void) Gcomplex(&result, a.v.int_val +
@@ -805,6 +830,7 @@ void
 f_minus(union argument *arg)
 {
     struct value a, b, result;
+    double temp;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&b);
@@ -815,6 +841,23 @@ f_minus(union argument *arg)
 	case INTGR:
 	    (void) Ginteger(&result, a.v.int_val -
 			    b.v.int_val);
+	    /* Check for overflow */
+	    if (overflow_handling == INT64_OVERFLOW_IGNORE)
+		break;
+	    temp = (double)(a.v.int_val) - (double)(b.v.int_val);
+	    if (sgn(temp) != sgn(result.v.int_val))
+		switch (overflow_handling) {
+		    case INT64_OVERFLOW_TO_FLOAT:
+			    Gcomplex(&result, temp, 0.0);
+			break;
+		    case INT64_OVERFLOW_UNDEFINED:
+			undefined = TRUE;
+		    case INT64_OVERFLOW_NAN:
+			Gcomplex(&result, not_a_number(), 0.0);
+			break;
+		    default:
+			break;
+		}
 	    break;
 	case CMPLX:
 	    (void) Gcomplex(&result, a.v.int_val -
@@ -853,7 +896,8 @@ void
 f_mult(union argument *arg)
 {
     struct value a, b, result;
-    double product;
+    double float_product;
+    intgr_t int_product;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&b);
@@ -863,15 +907,24 @@ f_mult(union argument *arg)
     case INTGR:
 	switch (b.type) {
 	case INTGR:
-	    /* FIXME:
-	     * This test is not reliable because (double) does not have enough
-	     * precision to accurately compare against 64-bit INTGR_MAX
+	    /* FIXME: The test for overflow is complicated because (double)
+	     * does not have enough precision to simply compare against 
+	     * 64-bit INTGR_MAX.
 	     */
-	    product = (double)a.v.int_val * (double)b.v.int_val;
-	    if (fabs(product) >= (double)INTGR_MAX)
-		(void) Gcomplex(&result, product, 0.0);
-	    else
-		(void) Ginteger(&result, a.v.int_val * b.v.int_val);
+	    int_product = a.v.int_val * b.v.int_val;
+	    float_product = (double)a.v.int_val * (double)b.v.int_val;
+	    if ((fabs(float_product) > 2*LARGEST_GUARANTEED_NONOVERFLOW)
+		|| ((fabs(float_product) > LARGEST_GUARANTEED_NONOVERFLOW)
+		    && (sgn(float_product) != sgn(int_product)))) {
+		if (overflow_handling == INT64_OVERFLOW_UNDEFINED)
+		    undefined = TRUE;
+		if (overflow_handling == INT64_OVERFLOW_NAN)
+		    float_product = not_a_number();
+		(void) Gcomplex(&result, float_product, 0.0);
+		break;
+	    }
+	    /* The simple case (no overflow) */
+	    (void) Ginteger(&result, int_product);
 	    break;
 	case CMPLX:
 	    (void) Gcomplex(&result, a.v.int_val *
@@ -1058,15 +1111,18 @@ f_power(union argument *arg)
 		(void) Ginteger(&result, t);
 		break;
 	    }
-	    integer_power_overflow:
-#if (1)
-	    /* result of integer overflow is undefined */
-	    undefined = TRUE;
-#else
-	    /* switch to double if overflow */
-	    mag = pow((double)a.v.int_val,(double)b.v.int_val);
-	    (void) Gcomplex(&result, mag, 0.0);
-#endif
+	integer_power_overflow:
+	    if (overflow_handling == INT64_OVERFLOW_NAN) {
+		/* result of integer overflow is NaN */
+		(void) Gcomplex(&result, not_a_number(), 0.0); 
+	    } else if (overflow_handling == INT64_OVERFLOW_UNDEFINED) {
+		/* result of integer overflow is undefined */
+		undefined = TRUE;
+	    } else {
+		/* switch to double if overflow */
+		mag = pow((double)a.v.int_val,(double)b.v.int_val);
+		(void) Gcomplex(&result, mag, 0.0);
+	    }
 	    break;
 	case CMPLX:
 	    if (a.v.int_val == 0) {

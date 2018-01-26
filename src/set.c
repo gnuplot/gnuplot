@@ -115,6 +115,7 @@ static void set_mouse __PROTO((void));
 static void set_offsets __PROTO((void));
 static void set_origin __PROTO((void));
 static void set_output __PROTO((void));
+static void set_overflow __PROTO((void));
 static void set_parametric __PROTO((void));
 static void set_pm3d __PROTO((void));
 static void set_palette __PROTO((void));
@@ -416,6 +417,9 @@ set_command()
 	    break;
 	case SET_OUTPUT:
 	    set_output();
+	    break;
+	case S_OVERFLOW:
+	    set_overflow();
 	    break;
 	case S_PARAMETRIC:
 	    set_parametric();
@@ -3271,6 +3275,24 @@ set_psdir()
 	gp_expand_tilde(&PS_psdir);
     } else
 	int_error(c_token, "expecting filename");
+}
+
+/* process 'set overflow' command */
+static void
+set_overflow()
+{
+    c_token++;
+
+    if (END_OF_COMMAND || equals(c_token, "float"))
+    	overflow_handling = INT64_OVERFLOW_TO_FLOAT;
+    else if (equals(c_token, "undefined"))
+	overflow_handling = INT64_OVERFLOW_UNDEFINED;
+    else if (equals(c_token,"NaN") || equals(c_token,"nan"))
+	overflow_handling = INT64_OVERFLOW_NAN;
+    else
+    	int_error(c_token,"unrecognized option");
+    if (!END_OF_COMMAND)
+	c_token++;
 }
 
 /* process 'set parametric' command */

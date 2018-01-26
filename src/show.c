@@ -107,6 +107,7 @@ static void show_logscale __PROTO((void));
 static void show_offsets __PROTO((void));
 static void show_margin __PROTO((void));
 static void show_output __PROTO((void));
+static void show_overflow __PROTO((void));
 static void show_parametric __PROTO((void));
 static void show_pm3d __PROTO((void));
 static void show_palette __PROTO((void));
@@ -358,6 +359,9 @@ show_command()
 
     case SET_OUTPUT:
 	show_output();
+	break;
+    case S_OVERFLOW:
+	show_overflow();
 	break;
     case S_PARAMETRIC:
 	show_parametric();
@@ -2107,6 +2111,19 @@ show_psdir()
 #endif
 }
 
+/* process 'show overflow' command */
+static void
+show_overflow()
+{
+    fprintf(stderr, "\t64-bit integer overflow %s\n",
+	overflow_handling == INT64_OVERFLOW_UNDEFINED
+	? "is treated as an undefined value" :
+	overflow_handling == INT64_OVERFLOW_NAN
+	? "is treated as NaN (not a number)" :
+	overflow_handling == INT64_OVERFLOW_TO_FLOAT
+	? "becomes a floating point value"
+	: "is ignored");
+}
 
 /* process 'show parametric' command */
 static void

@@ -360,6 +360,9 @@ unset_command()
     case SET_OUTPUT:
 	unset_output();
 	break;
+    case S_OVERFLOW:
+	overflow_handling = INT64_OVERFLOW_IGNORE;
+	break;
     case S_PARAMETRIC:
 	unset_parametric();
 	break;

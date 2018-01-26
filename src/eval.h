@@ -68,6 +68,11 @@ enum operators {
 #define is_jump(operator) \
     ((operator) >=(int)JUMP && (operator) <(int)SF_START)
 
+enum int64_overflow {
+    INT64_OVERFLOW_IGNORE=0, INT64_OVERFLOW_TO_FLOAT, \
+    INT64_OVERFLOW_UNDEFINED, INT64_OVERFLOW_NAN
+};
+
 /* user-defined function table entry */
 typedef struct udft_entry {
     struct udft_entry *next_udf; /* pointer to next udf in linked list */
@@ -130,6 +135,8 @@ extern struct udvt_entry udv_pi; /* 'pi' variable */
 extern struct udvt_entry *udv_NaN; /* 'NaN' variable */
 extern struct udvt_entry **udv_user_head; /* first udv that can be deleted */
 extern TBOOLEAN undefined;
+
+extern enum int64_overflow overflow_handling;
 
 /* Prototypes of functions exported by eval.c */
 
