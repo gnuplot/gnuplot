@@ -164,7 +164,10 @@
 /* #undef HAVE_INDEX */
 
 /* Define to 1 if you have the <inttypes.h> header file. */
-/* #undef HAVE_INTTYPES_H */
+/* Available since VS 2013 */ 
+#if _MSC_VER >= 1800
+# define HAVE_INTTYPES_H 1
+#endif
 
 /* Define if you want to use kpsexpand (TeX). */
 /* #undef HAVE_KPSEXPAND */
@@ -173,7 +176,10 @@
 /* #undef HAVE_LANGINFO_H */
 
 /* Define to 1 if you have the `lgamma' function. */
-/* #undef HAVE_LGAMMA */
+/* Available since VS 2013, but we also need signgam */ 
+#if _MSC_VER >= 1800
+/* # define HAVE_LGAMMA */
+#endif
 
 /* Define if you have the caca library. */
 /* #undef HAVE_LIBCACA */
@@ -624,13 +630,16 @@
 #define GP_INLINE __inline
 #define GP_EXCEPTION_NAME _exception
 #define GP_MATHERR _matherr
+
 /* no longer needed with VS2015: */
 #if _MSC_VER < 1900
 # define isnan _isnan
 #endif
 #define ftruncate _chsize
-#define strtoll _strtoi64
-#define isblank isspace
+#if _MSC_VER < 1800
+# define strtoll _strtoi64
+# define isblank isspace
+#endif
 #if _MSC_VER <= 1800
 # define va_copy(dest, src) (dest = src)
 #endif
