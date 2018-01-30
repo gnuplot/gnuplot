@@ -6,6 +6,7 @@ Changes in 5.2.3
 * FIX potential buffer overflow in gprintf formats containing %%
 * FIX immediate response to ctrl-Z when libreadline is used for input
 * FIX warning messages inside a bracketed clause could trigger early exit
+* FIX canvas terminal: apply both color and alpha channel to points and lines
 
 Changes in 5.2.2
 ================
