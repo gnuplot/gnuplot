@@ -38,6 +38,10 @@
  *	Handle image data by storing it in a parallel PNG file
  *   Ethan A Merritt, Mar 2012
  *	Hypertext
+ *   Ethan A Merritt, Jan 2018
+ *	Always apply new color, including alpha channel, to both strokeStyle
+ *	and fillStyle. This allows the terminal to honor RGBA colors for
+ *	lines and points (added to core code in version 4.6)
  *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
@@ -136,8 +140,8 @@ static canvas_imagefile *imagelist = NULL;
 static struct {
     int  previous_linewidth;
     double alpha;		/* alpha channel */
-    char color[18];		/* rgb(rrr,ggg,bbb) */
-    char previous_color[18];	/* rgb(rrr,ggg,bbb) */
+    char color[24];		/* rgba(rrr,ggg,bbb,aaaa) */
+    char previous_color[24];	/* rgba(rrr,ggg,bbb,aaaa) */
     char previous_fill[24];	/* rgba(rrr,ggg,bbb,aaaa) */
     int  plotno;		/* Which plot are we in? */
 } canvas_state;
@@ -344,7 +348,7 @@ CANVAS_options()
 
 	case CANVAS_BACKGROUND:
 	    canvas_background = parse_color_name();
-	    sprintf(CANVAS_background,"rgb(%03d,%03d,%03d)",
+	    sprintf(CANVAS_background," rgb(%03d,%03d,%03d)",
 		(canvas_background >> 16) & 0xff,
 		(canvas_background >> 8) & 0xff, 
 		canvas_background & 0xff);
@@ -403,7 +407,7 @@ CANVAS_graphics()
     canvas_state.previous_linewidth = -1;
     canvas_state.previous_color[0] = '\0';
     canvas_state.previous_fill[0] = '\0';
-    strcpy(canvas_state.color,"rgb(000,000,000)");
+    strcpy(canvas_state.color,"rgba(000,000,000,0.00)");
     canvas_state.plotno = 0;
 
     /*
@@ -574,7 +578,7 @@ CANVAS_graphics()
 
     fprintf(gpoutfile,
 	    "CanvasTextFunctions.enable(ctx);\n"
-	    "ctx.strokeStyle = \"rgb(215,215,215)\";\n"
+	    "ctx.strokeStyle = \" rgb(215,215,215)\";\n"
 	    "ctx.lineWidth = %.1g;\n\n",
 	canvas_linewidth
     );
@@ -858,23 +862,23 @@ CANVAS_linetype(int linetype)
     /* NB: These values are manipulated as numbers; */
     /* it does not work to give only the color name */
     static const char * pen_type[17] = {
-	"rgb(255,255,255)", /* should be background */
-	"rgb(000,000,000)", /* black */
-	"rgb(160,160,160)", /* grey */
-	"rgb(255,000,000)", /* red */
-	"rgb(000,171,000)", /* green */
-	"rgb(000,000,225)", /* blue */
-        "rgb(190,000,190)", /* purple */ 
-	"rgb(000,255,255)", /* cyan */
-	"rgb(021,117,069)", /* pine green*/
-	"rgb(000,000,148)", /* navy */
-	"rgb(255,153,000)", /* orange */
-	"rgb(000,153,161)", /* green blue*/
-	"rgb(214,214,069)", /* olive*/
-	"rgb(163,145,255)", /* cornflower*/
-	"rgb(255,204,000)", /* gold*/
-	"rgb(214,000,120)", /* mulberry*/
-	"rgb(171,214,000)", /* green yellow*/
+	" rgb(255,255,255)", /* should be background */
+	" rgb(000,000,000)", /* black */
+	" rgb(160,160,160)", /* grey */
+	" rgb(255,000,000)", /* red */
+	" rgb(000,171,000)", /* green */
+	" rgb(000,000,225)", /* blue */
+        " rgb(190,000,190)", /* purple */ 
+	" rgb(000,255,255)", /* cyan */
+	" rgb(021,117,069)", /* pine green*/
+	" rgb(000,000,148)", /* navy */
+	" rgb(255,153,000)", /* orange */
+	" rgb(000,153,161)", /* green blue*/
+	" rgb(214,214,069)", /* olive*/
+	" rgb(163,145,255)", /* cornflower*/
+	" rgb(255,204,000)", /* gold*/
+	" rgb(214,000,120)", /* mulberry*/
+	" rgb(171,214,000)", /* green yellow*/
     };
 
     /* FIXME if (linetype == canvas_line_type) return; */
@@ -1124,14 +1128,15 @@ CANVAS_set_color(t_colorspec *colorspec)
 
     CANVAS_finish();
 
-    sprintf(canvas_state.color,"rgb(%03d,%03d,%03d)", rgb255.r, rgb255.g, rgb255.b);
+    /* Jan 2017: Always allow for alpha channel */
+    sprintf(canvas_state.color,"rgba(%03d,%03d,%03d,%4.2f)",
+	    rgb255.r, rgb255.g, rgb255.b, 1.0 - canvas_state.alpha);
+    /* Jan 2017: Apply color to BOTH strokeStyle and fillStyle */
     if (strcmp(canvas_state.color, canvas_state.previous_color)) {
-	if (canvas_state.alpha > 0)
-	    fprintf(gpoutfile, "ctx.strokeStyle = \"rgba(%11.11s,%4.2f)\";\n",
-			&canvas_state.color[4], 1.0 - canvas_state.alpha);
-	else
-	    fprintf(gpoutfile, "ctx.strokeStyle = \"%s\";\n", canvas_state.color);
+	fprintf(gpoutfile, "ctx.strokeStyle = \"%s\";\n", canvas_state.color);
+	fprintf(gpoutfile, "ctx.fillStyle = \"%s\";\n", canvas_state.color);
 	strcpy(canvas_state.previous_color, canvas_state.color);
+	strcpy(canvas_state.previous_fill, canvas_state.color);
     }
     canvas_line_type = LT_UNDEFINED;
 }
@@ -1154,7 +1159,7 @@ CANVAS_fillstyle(int style)
     switch (style & 0xf) {
 	case FS_TRANSPARENT_SOLID:
 		sprintf(fillcolor,"rgba(%11.11s,%4.2f)%c",
-			&canvas_state.color[4], density, '\0');
+			&canvas_state.color[5], density, '\0');
 		break;
 	case FS_EMPTY:
 		strcpy(fillcolor,"rgba(255,255,255,0.00)");
@@ -1195,17 +1200,17 @@ CANVAS_fillstyle(int style)
 	case FS_SOLID:
 		if (canvas_state.alpha > 0) {
 		    sprintf(fillcolor,"rgba(%11.11s,%4.2f)%c",
-			&canvas_state.color[4], 1.0 - canvas_state.alpha, '\0');
+			&canvas_state.color[5], 1.0 - canvas_state.alpha, '\0');
 		} else if (density == 1) {
 		    strcpy(fillcolor,canvas_state.color);
 		} else {
-		    int r = atoi(&canvas_state.color[4]);
-		    int g = atoi(&canvas_state.color[8]);
-		    int b = atoi(&canvas_state.color[12]);
+		    int r = atoi(&canvas_state.color[5]);
+		    int g = atoi(&canvas_state.color[9]);
+		    int b = atoi(&canvas_state.color[13]);
 		    r = (float)r*density + 255.*(1.-density);
 		    g = (float)g*density + 255.*(1.-density);
 		    b = (float)b*density + 255.*(1.-density);
-		    sprintf(fillcolor,"rgb(%3d,%3d,%3d)%c", r, g, b, '\0');
+		    sprintf(fillcolor," rgb(%3d,%3d,%3d)%c", r, g, b, '\0');
 		}
 		break;
 	default:

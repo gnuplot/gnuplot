@@ -1,3 +1,13 @@
+2018-01-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.trm:  Always apply term->set_color(), including optional
+	alpha channel, to both strokeStyle and fillStyle.  This allows the
+	canvas terminal to honor RGBA colors for points and lines as well as
+	for area fill. Other terminals got this fix way back in version 4.6.
+	This change does not affect the javascript support routines so there
+	should be no backward-compatability issues.
+	Bug #2013
+
 2018-01-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/eval.* src/internal.c src/plot.c src/set.c src/show.c
