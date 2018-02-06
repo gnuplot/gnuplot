@@ -13036,11 +13036,15 @@ Ffigure_multiple_keys
  Data block names start with '$', see also `inline data`. You must explicitly
  `unset table` in order to go back to normal plotting on the current terminal.
 
- See also `plot with table`.
+ The `separator` character can be used to output csv (comma separated value)
+ files.  This mode only affects plot style `with table`.  See `plot with table`.
 
 4 plot with table
 ?plot with table
 ?with table
+?csv
+ This discussion applies only to the special plot style `with table`.
+
  To avoid any style-dependent processing of the input data being tabulated
  (smoothing, errorbar expansion, secondary range checking, etc), or to increase
  the number of columns that can be tabulated, use the keyword "table" instead of
