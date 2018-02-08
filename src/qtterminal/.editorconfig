@@ -1,0 +1,8 @@
+# Project defaults are defined in top directory.
+# Here we just list exceptions.
+
+[*.{h,cpp,qrc}]
+indent_style = tab
+indent_size = tab
+tab_width = 4
+trim_trailing_whitespace = true

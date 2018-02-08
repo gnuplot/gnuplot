@@ -1,0 +1,14 @@
+# Project defaults are defined in top directory.
+# Here we just list exceptions.
+
+[{caca.trm,cairo.trm,context.trm,win.trm,wxt.trm}]
+indent_style = tab
+indent_size = tab
+tab_width = 4
+trim_trailing_whitespace = true
+
+[{lua.trm,write_png_image.c}]
+indent_style = space
+indent_size = 2
+tab_width = 8
+trim_trailing_whitespace = true
