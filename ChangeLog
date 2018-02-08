@@ -1,3 +1,11 @@
+2018-02-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm:
+	The combination "set term svg mousing background 'black'" set the
+	background to white instead.
+
+2018-02-08  Bastian Maerkisch  <bmaerkisch@web.de>
+
 2018-02-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/winmain.c|h (main, WinOpenConsole)
@@ -13,7 +21,7 @@
 
 2018-02-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	src/command.c src/datablock.c|h:  This patch splits lines containing
+	* src/command.c src/datablock.c|h:  This patch splits lines containing
 	newline characters into multiple lines when the target of a print
 	command is a datablock.  That way we can e.g. get a datablock with
 	names of files on Windows:
