@@ -1,5 +1,7 @@
 ﻿2018-02-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* term/caca.trm:  Re-evaluate the console's codepage on every plot.
+
 	* term/caca.trm (CACA_text):  libcaca seems to leave the Windows
 	console in wide character mode.  This results in an extra space
 	printed with every character.  We now explicitly reset text mode.

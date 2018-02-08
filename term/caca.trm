@@ -203,7 +203,6 @@ static TBOOLEAN CACA_processing_events = FALSE; /* flag processing of events in 
 static TBOOLEAN CACA_nosuspend; /* no suspend for null and raw drivers */
 #ifdef _WIN32
 static unsigned CACA_codepage = 0;
-static unsigned TMP_codepage;
 #endif
 
 /* drawing */
@@ -784,16 +783,16 @@ CACA_init_display(void)
 			/* Disable quick-edit mode to enable mouse input */
 			HANDLE h = GetStdHandle(STD_INPUT_HANDLE);
 			DWORD mode;
+			unsigned codepage;
 
 			GetConsoleMode(h, &mode);
 			SetConsoleMode(h, (mode & ~ENABLE_QUICK_EDIT_MODE) | ENABLE_EXTENDED_FLAGS);
 
 			/* On CJK Windows we change the codepage. Not sure why this
 			   solves the display problems, but apparently it works. See bug #1361. */
-			if ((TMP_codepage = GetConsoleOutputCP()) == 932
-				|| TMP_codepage == 936
-				|| TMP_codepage == 950) {
-				CACA_codepage = TMP_codepage;
+			codepage = GetConsoleOutputCP();
+			if (codepage == 932 || codepage == 936 || codepage == 950) {
+				CACA_codepage = codepage;
 				SetConsoleOutputCP(437);
 			}
 		}
@@ -1002,8 +1001,10 @@ CACA_close_display(void)
 			FreeConsole(); /* close the console window */
 #endif
 			/* Revert to previous codepage if necessary */
-			if (CACA_codepage != 0)
+			if (CACA_codepage != 0) {
 				SetConsoleOutputCP(CACA_codepage);
+				CACA_codepage = 0;
+			}
 		}
 #ifndef WGP_CONSOLE
 		WinPersistTextClose();
