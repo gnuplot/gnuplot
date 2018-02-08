@@ -959,7 +959,7 @@ SVG_write_preamble ()
 	fprintf(gpoutfile,"<rect x=\"%d\" y=\"%d\" width=\"%d\" height=\"%d\"",
 		0, 0, (int)(term->xmax/SVG_SCALE), (int)(term->ymax/SVG_SCALE));
 	fprintf(gpoutfile," fill=\"#%06x\" stroke=\"black\" stroke-width=\"1\"\n",
-		SVG_background>0 ? SVG_background : 0xffffff);
+		SVG_background >= 0 ? SVG_background : 0xffffff);
 	fprintf(gpoutfile,"onclick=\"gnuplot_svg.toggleCoordBox(evt)\"  onmousemove=\"gnuplot_svg.moveCoordBox(evt)\"/>\n");
 	fprintf(gpoutfile,"\n<!-- Also track mouse when it is on a plot element -->\n");
 	fprintf(gpoutfile,"<g id=\"gnuplot_canvas\" onclick=\"gnuplot_svg.toggleCoordBox(evt)\" onmousemove=\"gnuplot_svg.moveCoordBox(evt)\">\n\n");
