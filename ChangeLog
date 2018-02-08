@@ -1,3 +1,13 @@
+2018-02-08  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	src/command.c src/datablock.c|h:  This patch splits lines containing
+	newline characters into multiple lines when the target of a print
+	command is a datablock.  That way we can e.g. get a datablock with
+	names of files on Windows:
+		set print $d; print system("dir /a-d /b *"); unset print;
+		print |$d|
+	Patch #754
+
 2018-01-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm:  Always apply term->set_color(), including optional

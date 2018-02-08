@@ -241,3 +241,41 @@ append_to_datablock(struct value *datablock_value, const char *line)
     datablock_value->v.data_array[nlines] = (char *) line;
     datablock_value->v.data_array[nlines + 1] = NULL;
 }
+
+
+/* append multiple lines which are separated by linebreaks to a datablock */
+void
+append_multiline_to_datablock(struct value *datablock_value, const char *lines)
+{
+    char * l = (char *) lines;
+    char * p;
+    TBOOLEAN inquote = FALSE;
+    TBOOLEAN escaped = FALSE;
+
+    /* handle lines with line-breaks, one at a time;
+       take care of quoted strings
+     */
+    p = l;
+    while (*p != NUL) {
+	if (*p == '\'' && !escaped)
+	    inquote = !inquote;
+	else if (*p == '\\' && !escaped)
+	    escaped = TRUE;
+	else if (*p == '\n' && !inquote) {
+	    *p = NUL;
+	    append_to_datablock(datablock_value, strdup(l));
+	    l = p + 1;
+	} else
+	    escaped = FALSE;
+        p++;
+    }
+    if (l == lines) {
+	/* no line-breaks, just a single line */
+	append_to_datablock(datablock_value, l);
+    } else {
+	if (strlen(l) > 0) /* remainder after last line-break */
+	    append_to_datablock(datablock_value, strdup(l));
+	/* we allocated new sub-strings, free the original */
+	free((char *) lines);
+    }
+}
