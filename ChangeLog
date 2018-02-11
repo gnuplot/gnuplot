@@ -1,3 +1,8 @@
+2018-02-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/multiplot.c:  Allow multiplot title to use full range of 
+	label properties (textcolor, boxed, offset, ...)
+
 2018-02-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm:

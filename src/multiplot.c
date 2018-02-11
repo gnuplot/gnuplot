@@ -48,6 +48,7 @@ static char *RCSid() { return RCSid("$Id: multiplot.c,v 1.5 2016/06/09 19:34:25 
 #include "gadgets.h"
 #include "graphics.h"
 #include "parse.h"
+#include "setshow.h"
 #include "util.h"
 
 
@@ -122,7 +123,7 @@ static struct {
     double prev_xsize, prev_ysize, prev_xoffset, prev_yoffset;
     t_position prev_lmargin, prev_rmargin, prev_tmargin, prev_bmargin;
 			   /* values before 'set multiplot layout' */
-    text_label title;    /* goes above complete set of plots */
+    text_label title;      /* goes above complete set of plots */
     double title_height;   /* fractional height reserved for title */
 } mp_layout = MP_LAYOUT_DEFAULT;
 
@@ -243,33 +244,12 @@ multiplot_start()
 
 	if (almost_equals(c_token, "ti$tle")) {
 	    c_token++;
-	    mp_layout.title.text = try_to_get_string();
+	    parse_label_options(&mp_layout.title, 2);
+	    if (!END_OF_COMMAND)
+		mp_layout.title.text = try_to_get_string();
+	    parse_label_options(&mp_layout.title, 2);
  	    continue;
-       }
-
-       if (equals(c_token, "font")) {
-	    c_token++;
-	    mp_layout.title.font = try_to_get_string();
-	    continue;
 	}
-
-        if (almost_equals(c_token,"enh$anced")) {
-            mp_layout.title.noenhanced = FALSE;
-            c_token++;
-            continue;
-        }
-
-        if (almost_equals(c_token,"noenh$anced")) {
-            mp_layout.title.noenhanced = TRUE;
-            c_token++;
-            continue;
-        }
-        
-	if (equals(c_token,"boxed")) {
-            mp_layout.title.boxed = 1;
-            c_token++;
-            continue;
-        }
 
 	if (almost_equals(c_token, "lay$out")) {
 	    if (mp_layout.auto_layout)
@@ -278,9 +258,8 @@ multiplot_start()
 		mp_layout.auto_layout = TRUE;
 
 	    c_token++;
-	    if (END_OF_COMMAND) {
+	    if (END_OF_COMMAND)
 		int_error(c_token,"expecting '<num_cols>,<num_rows>'");
-	    }
 
 	    /* read row,col */
 	    mp_layout.num_rows = int_expression();
