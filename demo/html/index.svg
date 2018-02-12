@@ -53,7 +53,7 @@ on mouse-coordinate tracking.
     <ul>
     <li><a href="approximate.html">approximation</a></li>
     <li><font color=gray>complex trig functions</font></li>
-    <li><a href="cerf.html">complex error function</font></li>
+    <li><a href="cerf.html">complex error function</a></li>
     <li><a href="prob2.html">probability</a></li>
     <li><a href="prob.html">probability (more)</a></li>
     <li><a href="random.html">random numbers</a></li>
@@ -184,8 +184,11 @@ on mouse-coordinate tracking.
 	    	<embed src="showcase_plot.svg" type="image/svg+xml" width=500 height=350 class="float-right">
 	    </td></tr>
 	    <tr> <td width=50></td><td>
-		Click on the plot to enable mouse tracking.
-	    	Click on the figure legend to toggle plot elements on/off.
+		Left click to enable mouse tracking <br>
+		Drag with left mouse <br>
+		Zoom with mouse wheel <br>
+		Right click to reset plot <br>
+	    	Click on the figure legend text to toggle plot elements on/off 
 	    </td><td>
 		<a href="http://validator.w3.org/check?uri=referer"><img
 		src="http://www.w3.org/Icons/valid-svg11"
@@ -202,7 +205,7 @@ on mouse-coordinate tracking.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated January 2018</i>
+    <i>This page generated February 2018</i>
     </td>
 
     <td>

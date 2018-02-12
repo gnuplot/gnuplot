@@ -102,7 +102,7 @@ print STDERR $name, "\n";
 
 # Start processing
 	print OUT "<table><tr><td valign=top>\n";
-	print OUT "<embed src=\"$name.$plot.svg\" type=\"image/svg+xml\" width=600 height=400 class=\"float-right\">\n";
+	print OUT "<object data=\"$name.$plot.svg\" type=\"image/svg+xml\" width=600 height=400 class=\"float-right\"/>\n";
 	print OUT "</td><td>\n";
 
 
@@ -118,7 +118,7 @@ print STDERR $name, "\n";
 			print OUT "</pre></td></tr></table>\n<br clear=all>\n<hr>\n";
 			$plot++;
 			print OUT "<table class=\"noborder\"><tr><td>\n";
-			print OUT "<embed src=\"$name.$plot.svg\" type=\"image/svg+xml\" width=600 height=400 class=\"float-right\">\n";
+			print OUT "<object data=\"$name.$plot.svg\" type=\"image/svg+xml\" width=600 height=400 class=\"float-right\"/>\n";
 			print OUT "</td><td valign=top>\n";
 
 			print OUT "<pre>\n";
