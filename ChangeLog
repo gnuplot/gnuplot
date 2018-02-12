@@ -1,10 +1,27 @@
+2018-02-11  Marko Karjalainen  <markokarjalainen@kolumbus.fi>
+
+	* term/js/gnuplot_svg.js:  Revise javascript support for mouse and keyboard
+	interaction with svg output
+
+	Mouse:
+	   left click toggle mouse tracking, drag plot
+	   right click reset mouse zoom and pan
+	   wheel zoom/unzoom
+	Keyboard:
+	   arrows (event may be stolen by browser)
+	   +/- zoom/unzoom
+	   Home reset mouse zoom and pan
+	   # toggle grid
+
+	Keyboard events are not passed to elements included by <embed src=foo>.
+	Keyboard events must be forwarded separately to elements included by
+	<object data=foo>.
+
 2018-02-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm:
 	The combination "set term svg mousing background 'black'" set the
 	background to white instead.
-
-2018-02-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
 2018-02-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
