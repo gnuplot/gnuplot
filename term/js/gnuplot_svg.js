@@ -16,7 +16,7 @@ function cursorPoint(evt) {
 
 var gnuplot_svg = {};
 
-gnuplot_svg.version = "9 February 2018";
+gnuplot_svg.version = "13 February 2018";
 
 gnuplot_svg.SVGDoc = null;
 gnuplot_svg.SVGRoot = null;
@@ -587,6 +587,9 @@ gnuplot_svg.interactiveInit = function (svgElement) {
         pan: function (direction) {
             setViewBox(pan(direction));
             return this;
-        }
+        },
+	reset: function () {
+	    setViewBox(resetValue);
+	}
     };
 };
