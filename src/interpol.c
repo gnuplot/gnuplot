@@ -1168,7 +1168,7 @@ cp_implode(struct curve_points *cp)
     int first_point, num_points;
     int i, j, k;
     double x = 0., y = 0., sux = 0., slx = 0., suy = 0., sly = 0.;
-    double weight; /* used for acsplines */
+    double weight = 1.0; /* used for acsplines */
     TBOOLEAN all_inrange = FALSE;
 
     x_axis = cp->x_axis;

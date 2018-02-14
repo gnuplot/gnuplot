@@ -2112,7 +2112,7 @@ fit_command()
     if (isstringvalue(c_token)) {	/* It's a parameter *file* */
 	TBOOLEAN fixed;
 	double tmp_par;
-	char c, *s;
+	char c='\0', *s;
 	char sstr[MAX_LINE_LEN + 1];
 	FILE *f;
 
