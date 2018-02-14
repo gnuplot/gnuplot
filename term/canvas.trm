@@ -1215,7 +1215,7 @@ CANVAS_fillstyle(int style)
 		break;
 	default:
 		/* Use current color, wherever it came from */
-		sprintf(fillcolor,"%s%c",canvas_state.color,'\0');
+		memcpy(fillcolor, canvas_state.color, sizeof(fillcolor));
     }
 
     return fillcolor;
