@@ -6,6 +6,9 @@
 	change mapping of key box area to plot number.
 	Bug #2021
 
+	* term/svg.trm:  Apply current color to dots.
+	Bug #2022
+
 2018-02-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/multiplot.c:  Allow multiplot title to use full range of 

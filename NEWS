@@ -3,10 +3,13 @@ Changes in 5.2.3
 * NEW "set grid {no}vertical" adds grid lines in the xz and xz planes
 * NEW "set cntrparam {firstlinetype N} {{un}sorted}"
 * CHANGE drop non-working support for YIQ color space
+* CHANGE expand \n characters when printing into a datablock
 * FIX potential buffer overflow in gprintf formats containing %%
 * FIX immediate response to ctrl-Z when libreadline is used for input
 * FIX warning messages inside a bracketed clause could trigger early exit
 * FIX canvas terminal: apply both color and alpha channel to points and lines
+* FIX svg terminal: apply current color to dots
+* FIX qt terminal: include "notitle" plots in accounting for toggle operations
 
 Changes in 5.2.2
 ================
