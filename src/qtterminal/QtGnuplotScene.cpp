@@ -163,6 +163,8 @@ void QtGnuplotScene::flushCurrentPointsItem()
 void QtGnuplotScene::update_key_box(const QRectF rect)
 {
 	if (m_currentPlotNumber > m_key_boxes.count()) {
+		// DEBUG Feb 2018 should no longer trigger
+		// because m_key_box insertion is done in layer code for GEAfterPlot
 		m_key_boxes.insert(m_currentPlotNumber, QtGnuplotKeybox(rect));
 	} else if (m_key_boxes[m_currentPlotNumber-1].isEmpty()) {
 		// Retain the visible/hidden flag when re-initializing the Keybox
@@ -498,6 +500,13 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 			// Store it in an ordered list so we can toggle it by index
 			m_plot_group.insert(m_currentPlotNumber, newgroup);
 		} 
+
+		if (m_currentPlotNumber >= m_key_boxes.count()) {
+			QRectF empty( QPointF(0,0), QPointF(0,0));
+			m_key_boxes.insert(m_currentPlotNumber,  empty);
+			m_key_boxes[m_currentPlotNumber-1].resetStatus();
+		}
+
 		m_currentPlotNumber = 0;
 	}
 	else if (type == GEPlotNumber) 
@@ -522,7 +531,6 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		enum QtGnuplotModPlots ops = (enum QtGnuplotModPlots) ops_i;
 
 		/* FIXME: This shouldn't happen, but it does. */
-		/* Failure to reset lists after multiplot??   */
 		if (i > m_plot_group.count())
 		    i = m_plot_group.count();
 
