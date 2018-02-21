@@ -987,7 +987,7 @@ SVG_write_preamble ()
     fprintf (gpoutfile,
 	     "\n"
 	     /* dot: */
-	     "\t<circle id='gpDot' r='0.5' stroke-width='0.5'/>\n"
+	     "\t<circle id='gpDot' r='0.5' stroke-width='0.5' stroke='currentColor'/>\n"
 	     /*  0 plus */
 	     "\t<path id='gpPt0' stroke-width='%.3f' stroke='currentColor' d='M-1,0 h2 M0,-1 v2'/>\n"
 	     /*  1 X */
