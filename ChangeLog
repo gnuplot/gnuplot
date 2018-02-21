@@ -1,3 +1,11 @@
+2018-02-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/QtGnuplotScene.cpp: include "notitle" plots in
+	accounting for toggle commands.  Plots can be toggled by number even if
+	they do not appear in the key.  Inclusion of "notitle" plots must not
+	change mapping of key box area to plot number.
+	Bug #2021
+
 2018-02-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/multiplot.c:  Allow multiplot title to use full range of 
