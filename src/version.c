@@ -40,9 +40,9 @@ const char gnuplot_patchlevel[] = "0";
 #ifdef DEVELOPMENT_VERSION
 #include "timestamp.h"
 #else
-const char gnuplot_date[] = "2017-06-10 ";
+const char gnuplot_date[] = "2018-02-22 ";
 #endif
-const char gnuplot_copyright[] = "Copyright (C) 1986-1993, 1998, 2004, 2007-2017";
+const char gnuplot_copyright[] = "Copyright (C) 1986-1993, 1998, 2004, 2007-2018";
 
 const char faq_location[] = FAQ_LOCATION;
 
