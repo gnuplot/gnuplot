@@ -16,6 +16,7 @@ pause -1 "Hit return to continue"
 reset
 unset key
 set border
+set xzeroaxis
 set yzeroaxis
 set xtics
 set ytics
@@ -51,7 +52,6 @@ unset arrow
 #
 # plot a '3D version using cylindrical coordinate system' of the world.
 set title "3D version using cylindrical coordinate system"
-set ticslevel 0.0
 set view 70,40,0.8,1.2
 set view equal xy
 set mapping cylindrical
@@ -60,6 +60,10 @@ set samples 32
 set isosamples 13
 set urange [-180:180]
 set vrange [-90:90]
+set zrange [-90:90]
+set xyplane at -110
+set ztics 30
+
 splot cos(u),sin(u),v with lines lc rgb "cyan" ,\
 'world.dat' with lines lc rgb "blue" lw 2, 'world.cor' with points lt 1 pt 2
 pause -1 "Hit return to continue"

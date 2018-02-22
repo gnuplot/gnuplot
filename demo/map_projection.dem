@@ -1,0 +1,56 @@
+# Map projections are nonlinear transforms (λ,φ) -> (x,y)
+#	where	λ = longitude	φ = latitude
+
+# "Winkel tripel" map projection (Oswald Winkel 1874-1953)
+# This is the arithmetic mean of an equirectangular projection and the
+# Aitoff projection.
+# Note: mouse tracking does *not* report longitude, latitude
+
+set title "'{/:Bold Winkel tripel}' map projection"
+
+π = pi
+φ1 = acos(2./π)
+sinc(x) = (x==0) ? 1.0 : sin(x) / x
+α(λ,φ) = acos(cos(φ) * cos(λ/2.))
+x_W3(λ, φ) = 0.5 * (λ*cos(φ1) + (2*cos(φ)*sin(λ/2.))/sinc(α(λ,φ)))
+y_W3(λ, φ) = 0.5 * (φ + sin(φ)/sinc(α(λ,φ)))
+
+set key top right at screen 0.98, 0.95 samplen 0.3
+set angle degrees
+unset xtics
+unset ytics
+unset border
+set lmargin 1
+set rmargin 1
+set size ratio 0.5
+
+set xrange [-180:180]
+set yrange [-90:90]
+
+plot for [λ=-180:180:10] [φ=-90:90] '+' using (x_W3(λ,φ)):(y_W3(λ,φ)) with lines lc "cyan" lw .5 notitle, \
+     for [φ = -90:90:30] [λ=-180:180:10] '+' using (x_W3(λ,φ)):(y_W3(λ,φ)) with lines lc "cyan" lw .5 notitle, \
+     'world.dat' using (x_W3($1,$2)):(y_W3($1,$2)) with filledcurve fc "brown" title "fill", \
+     'world.dat' using (x_W3($1,$2)):(y_W3($1,$2)) with lines lc "black" title "outline"
+
+pause -1 "<cr> to continue"
+
+
+# Hammer equal-area projection (Ernst Hammer 1892)
+# Note: mouse tracking does *not* report longitude, latitude
+
+set title "{/:Bold Hammer} equal-area map projection"
+
+x_Hammer(λ, φ) = (2*sqrt(2)*cos(φ)*sin(λ/2)) / sqrt(1.0 + cos(φ)*cos(λ/2))
+y_Hammer(λ, φ) = sqrt(2)*sin(φ) / sqrt(1.0 + cos(φ)*cos(λ/2))
+
+set xrange [-π : π]
+set yrange [-π/2 : π/2]
+
+plot for [λ=-180:180:10] [φ=-90:90] '+' using (x_Hammer(λ,φ)):(y_Hammer(λ,φ)) with lines lc "cyan" lw .5 notitle, \
+     for [φ = -90:90:30] [λ=-180:180:10] '+' using (x_Hammer(λ,φ)):(y_Hammer(λ,φ)) with lines lc "cyan" lw .5 notitle, \
+     'world.dat' using (x_Hammer($1,$2)):(y_Hammer($1,$2)) with filledcurve fc "brown" title "fill", \
+     'world.dat' using (x_Hammer($1,$2)):(y_Hammer($1,$2)) with lines lc "black" title "outline"
+
+pause -1 "<cr> to continue"
+
+reset
