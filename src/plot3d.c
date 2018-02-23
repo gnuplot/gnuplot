@@ -1559,6 +1559,9 @@ eval_3dplots()
 	    else
 		load_linetype(&this_plot->lp_properties, line_num+1);
 
+	    /* FIXME:  We may have cleared these previously? Anyhow it doesn't hurt. */
+	    this_plot->opt_out_of_hidden3d = FALSE;
+
 	    /* pm 25.11.2001 allow any order of options */
 	    while (!END_OF_COMMAND || !checked_once) {
 		int save_token = c_token;
@@ -1820,9 +1823,6 @@ eval_3dplots()
 		if ((this_plot->plot_style & PLOT_STYLE_HAS_POINT)
 		&&  (this_plot->lp_properties.p_size == PTSZ_VARIABLE))
 		    this_plot->lp_properties.p_size = 1;
-	    }
-	    if (this_plot->plot_style == LINES) {
-		this_plot->opt_out_of_hidden3d = FALSE;
 	    }
 
 	    if (crnt_param == 0

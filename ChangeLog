@@ -1,3 +1,11 @@
+2018-02-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c src/plot3d.c:  You might want contour lines to opt out
+	of hidden3d processing, e.g. because it messes up dashed lines.  Since
+	the low-level routines that draw the contour line segments look only at
+	the global "hidden3d" flag, we must save/clear/restore this flag if the
+	individual plot is marked "nohidden".
+
 2018-02-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_set_key_title_columnhead):  Handle the case

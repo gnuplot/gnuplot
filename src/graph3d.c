@@ -1231,13 +1231,10 @@ do_3dplot(
 		struct gnuplot_contours *cntrs = this_plot->contours;
 		struct lp_style_type thiscontour_lp_properties;
 		static char *thiscontour_label = NULL;
+		TBOOLEAN save_hidden3d;
 		int ic = 1;	/* ic will index the contour linetypes */
 
 		thiscontour_lp_properties = this_plot->lp_properties;
-		/* EAM April 2015 - Disabled this, but I'm not really sure */
-		/* Maybe this is now a dashtype correction?                */
-		/* thiscontour_lp_properties.l_type += (hidden3d ? 1 : 0); */
-
 		term_apply_lp_properties(&(thiscontour_lp_properties));
 
 		while (cntrs) {
@@ -1323,7 +1320,11 @@ do_3dplot(
 			/* treat all the above like 'lines' */
 		    case LINES:
 		    case PM3DSURFACE:
+			save_hidden3d = hidden3d;
+			if (this_plot->opt_out_of_hidden3d)
+			    hidden3d = FALSE;
 			cntr3d_lines(cntrs, &thiscontour_lp_properties);
+			hidden3d = save_hidden3d;
 			break;
 
 		    case LINESPOINTS:

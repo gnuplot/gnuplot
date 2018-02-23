@@ -4,6 +4,7 @@ Changes in 5.2.3
 * NEW "set cntrparam {firstlinetype N} {{un}sorted}"
 * CHANGE drop non-working support for YIQ color space
 * CHANGE expand \n characters when printing into a datablock
+* CHANGE allow contour plots to opt out of hidden3d processing
 * FIX potential buffer overflow in gprintf formats containing %%
 * FIX immediate response to ctrl-Z when libreadline is used for input
 * FIX warning messages inside a bracketed clause could trigger early exit
