@@ -1,3 +1,9 @@
+2018-02-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_set_key_title_columnhead):  Handle the case
+	    stats FOO using 'namedcolumn' name columnhead
+	Bug #2023
+
 2018-02-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/QtGnuplotScene.cpp: include "notitle" plots in

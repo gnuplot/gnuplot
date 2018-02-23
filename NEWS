@@ -10,6 +10,7 @@ Changes in 5.2.3
 * FIX canvas terminal: apply both color and alpha channel to points and lines
 * FIX svg terminal: apply current color to dots
 * FIX qt terminal: include "notitle" plots in accounting for toggle operations
+* FIX stats FOO using 'namedcolumn' name columnhead
 
 Changes in 5.2.2
 ================
