@@ -67,6 +67,9 @@
 #ifdef HAVE_LANGINFO_H
 #include <langinfo.h>
 #endif
+#ifdef USE_MOUSE
+#include "mouse.h"
+#endif
 
 static palette_color_mode pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_NONE;
 
@@ -3060,7 +3063,10 @@ set_mouse()
 		mouse_setting.fmt = mouse_fmt_default;
 	} else if (almost_equals(c_token, "mo$useformat")) {
 	    ++c_token;
-	    if (isstringvalue(c_token) && (ctmp = try_to_get_string())) {
+	    if (equals(c_token, "function")) {
+		c_token++;
+		int_error(c_token, "mouseformat function not yet supported");
+	    } else if (isstringvalue(c_token) && (ctmp = try_to_get_string())) {
 		free(mouse_alt_string);
 		mouse_alt_string = ctmp;
 		if (!strlen(mouse_alt_string)) {

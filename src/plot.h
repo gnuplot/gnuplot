@@ -38,10 +38,6 @@
 #include "syscfg.h"
 #include "gp_types.h"
 
-#ifdef USE_MOUSE
-# include "mouse.h"
-#endif
-
 /* Type definitions */
 
 /* Variables of plot.c needed by other modules: */

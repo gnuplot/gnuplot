@@ -10837,7 +10837,7 @@ Ffigure_multiple_keys
                  {noruler | ruler {at x,y}}
                  {polardistance{deg|tan} | nopolardistance}
                  {format <string>}
-                 {mouseformat <int>/<string>}
+                 {mouseformat <int> | <string> | function <f(x,y)>}
                  {{no}labels {"labeloptions"}}
                  {{no}zoomjump} {{no}verbose}
        unset mouse
@@ -10878,20 +10878,31 @@ Ffigure_multiple_keys
  which copies the current mouse position to the `clipboard` on some terminals.
  The default value is 300 ms.  Setting the value to 0 ms triggers the copy on
  a single click.
-4 mouseformat
+4 format
 ?set mouse format
-?set mouse mouseformat
 ?mouse format
-?mouseformat
  The `set mouse format` command specifies a format string for sprintf() which
  determines how the mouse cursor [x,y] coordinates are printed to the plot
  window and to the clipboard.  The default is "% #g".
 
- `set mouse mouseformat` is used for formatting the text on Button1 and Button2
- actions -- copying the coordinates to the clipboard and temporarily annotating
- the mouse position. An integer argument selects one of the format options in
- the table below. A string argument is used as a format for sprintf() in option
- 6 and should contain two float specifiers.
+ This setting is superceded by "set mouse mouseformat".
+4 mouseformat
+?set mouse mouseformat
+?mouseformat
+ Syntax:
+      set mouse mouseformat i
+      set mouse mouseformat "custom format"
+      set mouse mouseformat function string_valued_function(x, y)
+ This command controls the format used to report the current mouse position.
+ An integer argument selects one of the format options in the table below.
+ A string argument is used as a format for sprintf() in option 7 and should
+ contain two float specifiers.
+
+ Use of a custom function returning a string is EXPERIMENTAL.
+ It allows readout of coordinate systems in which inverse mapping from screen
+ coordinates to plot coordinates requires joint consideration of both x and y.
+ See for example the map_projection demo.
+
  Example:
       `set mouse mouseformat "mouse x,y = %5.2g, %10.3f"`.
  Use `set mouse mouseformat ""` to turn this string off again.

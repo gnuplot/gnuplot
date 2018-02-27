@@ -46,6 +46,7 @@
 #define _MOUSE_C		/* FIXME HBB 20010207: violates Codestyle */
 #ifdef USE_MOUSE		/* comment out whole file, otherwise... */
 
+#include "eval.h"		/* for mouse_readout_function */
 #include "mouse.h"
 #include "pm3d.h"
 #include "alloc.h"
@@ -73,6 +74,7 @@
 
 /********************** variables ***********************************************************/
 char mouse_fmt_default[] = "% #g";
+udft_entry mouse_readout_function = {NULL, "mouse_readout_function", NULL, NULL, 2 /*dummy_values[]*/};
 
 mouse_setting_t default_mouse_setting = DEFAULT_MOUSE_SETTING;
 mouse_setting_t         mouse_setting = DEFAULT_MOUSE_SETTING;
@@ -294,27 +296,17 @@ stpcpy(char *s, const char *p)
 # endif
 
 
-/* main job of transformation, which is not device dependent
-*/
+/*
+ * Transform mouse coordinates to graph coordinates
+ * TODO:
+ *	Some mechanism for transforming both x/y jointly, e.g. for map projections
+ */
 static void
 MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double *y2)
 {
-    if (!is_3d_plot) {
-	if (plot_bounds.xright == plot_bounds.xleft)
-	    *x = *x2 = VERYLARGE;	/* protection */
-	else {
-	    *x = AXIS_MAPBACK(FIRST_X_AXIS, xx);
-	    *x2 = AXIS_MAPBACK(SECOND_X_AXIS, xx);
-	}
-	if (plot_bounds.ytop == plot_bounds.ybot)
-	    *y = *y2 = VERYLARGE;	/* protection */
-	else {
-	    *y = AXIS_MAPBACK(FIRST_Y_AXIS, yy);
-	    *y2 = AXIS_MAPBACK(SECOND_Y_AXIS, yy);
-	}
-	FPRINTF((stderr, "POS: xx=%i, yy=%i  =>  x=%g  y=%g\n", xx, yy, *x, *y));
-
-    } else {
+    AXIS *secondary;
+    
+    if (is_3d_plot) {
 	/* for 3D plots, we treat the mouse position as if it is
 	 * in the bottom plane, i.e., the plane of the x and y axis */
 	/* note: at present, this projection is only correct if
@@ -355,52 +347,57 @@ MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double 
 	}
 
 	*x2 = *y2 = VERYLARGE;	/* protection */
+	return;
     }
-    /*
-       Note: there is plot_bounds.xleft+0.5 in "#define map_x" in graphics.c, which
-       makes no major impact here. It seems that the mistake of the real
-       coordinate is at about 0.5%, which corresponds to the screen resolution.
-       It would be better to round the distance to this resolution, and thus
-       *x = xmin + rounded-to-screen-resolution (xdistance)
-     */
+
+    /* 2D plot */
+    if (plot_bounds.xright == plot_bounds.xleft)
+	*x = *x2 = VERYLARGE;	/* protection */
+    else {
+	*x = AXIS_MAPBACK(FIRST_X_AXIS, xx);
+	*x2 = AXIS_MAPBACK(SECOND_X_AXIS, xx);
+    }
+    if (plot_bounds.ytop == plot_bounds.ybot)
+	*y = *y2 = VERYLARGE;	/* protection */
+    else {
+	*y = AXIS_MAPBACK(FIRST_Y_AXIS, yy);
+	*y2 = AXIS_MAPBACK(SECOND_Y_AXIS, yy);
+    }
+    FPRINTF((stderr, "POS: xx=%i, yy=%i  =>  x=%g  y=%g\n", xx, yy, *x, *y));
 
     /* If x2 or y2 is linked to a primary axis via mapping function, apply it now */
-    if (!is_3d_plot) {
-	AXIS *secondary = &axis_array[SECOND_X_AXIS];
-	if (secondary->linked_to_primary && secondary->link_udf->at)
-	    *x2 = eval_link_function(secondary, *x);
-	secondary = &axis_array[SECOND_Y_AXIS];
-	if (secondary->linked_to_primary && secondary->link_udf->at)
-	    *y2 = eval_link_function(secondary, *y);
-    }
+    /* FIXME:  this triggers on both linked x1/x2 and on nonlinear x2 */
+    secondary = &axis_array[SECOND_X_AXIS];
+    if (nonlinear(secondary))
+	*x2 = eval_link_function(secondary, *x);
+    secondary = &axis_array[SECOND_Y_AXIS];
+    if (nonlinear(secondary))
+	*y2 = eval_link_function(secondary, *y);
 
     /* If x or y is linked to a (hidden) primary axis, it's a bit more complicated */
-    if (!is_3d_plot) {
-	AXIS *secondary;
-	secondary = &axis_array[FIRST_X_AXIS];
-	if (secondary->linked_to_primary
-	&&  secondary->linked_to_primary->index == -FIRST_X_AXIS) {
-	    *x = axis_mapback(secondary->linked_to_primary, xx);
-	    *x = eval_link_function(secondary, *x);
-	}
-	secondary = &axis_array[FIRST_Y_AXIS];
-	if (secondary->linked_to_primary
-	&&  secondary->linked_to_primary->index == -FIRST_Y_AXIS) {
-	    *y = axis_mapback(secondary->linked_to_primary, yy);
-	    *y = eval_link_function(secondary, *y);
-	}
-	secondary = &axis_array[SECOND_X_AXIS];
-	if (secondary->linked_to_primary
-	&&  secondary->linked_to_primary->index == -SECOND_X_AXIS) {
-	    *x2 = axis_mapback(secondary->linked_to_primary, xx);
-	    *x2 = eval_link_function(secondary, *x2);
-	}
-	secondary = &axis_array[SECOND_Y_AXIS];
-	if (secondary->linked_to_primary
-	&&  secondary->linked_to_primary->index == -SECOND_Y_AXIS) {
-	    *y2 = axis_mapback(secondary->linked_to_primary, yy);
-	    *y2 = eval_link_function(secondary, *y2);
-	}
+    secondary = &axis_array[FIRST_X_AXIS];
+    if (secondary->linked_to_primary
+    &&  secondary->linked_to_primary->index == -FIRST_X_AXIS) {
+	*x = axis_mapback(secondary->linked_to_primary, xx);
+	*x = eval_link_function(secondary, *x);
+    }
+    secondary = &axis_array[FIRST_Y_AXIS];
+    if (secondary->linked_to_primary
+    &&  secondary->linked_to_primary->index == -FIRST_Y_AXIS) {
+	*y = axis_mapback(secondary->linked_to_primary, yy);
+	*y = eval_link_function(secondary, *y);
+    }
+    secondary = &axis_array[SECOND_X_AXIS];
+    if (secondary->linked_to_primary
+    &&  secondary->linked_to_primary->index == -SECOND_X_AXIS) {
+	*x2 = axis_mapback(secondary->linked_to_primary, xx);
+	*x2 = eval_link_function(secondary, *x2);
+    }
+    secondary = &axis_array[SECOND_Y_AXIS];
+    if (secondary->linked_to_primary
+    &&  secondary->linked_to_primary->index == -SECOND_Y_AXIS) {
+	*y2 = axis_mapback(secondary->linked_to_primary, yy);
+	*y2 = eval_link_function(secondary, *y2);
     }
 }
 
@@ -475,36 +472,34 @@ GetAnnotateString(char *s, double x, double y, int mode, char *fmt)
 	}
     } else if (mode == MOUSE_COORDINATES_REAL1) {
 	sprintf(s, xy_format(), x, y);	/* w/o brackets */
-    } else if (mode == MOUSE_COORDINATES_ALT && (fmt || polar)) {
-	if (polar) {
-	    double r;
-	    double phi = atan2(y,x);
-	    double rmin = (R_AXIS.autoscale & AUTOSCALE_MIN) ? 0.0 : R_AXIS.set_min;
-	    double theta = phi / DEG2RAD;
+    } else if ((mode == MOUSE_COORDINATES_ALT) && polar) {
+	double r;
+	double phi = atan2(y,x);
+	double rmin = (R_AXIS.autoscale & AUTOSCALE_MIN) ? 0.0 : R_AXIS.set_min;
+	double theta = phi / DEG2RAD;
 
-	    /* Undo "set theta" */
-	    theta = (theta - theta_origin) * theta_direction;
-	    if (theta > 180.)
-		theta = theta - 360.;
+	/* Undo "set theta" */
+	theta = (theta - theta_origin) * theta_direction;
+	if (theta > 180.)
+	    theta = theta - 360.;
 
-	    if (nonlinear(&R_AXIS))
-		r = eval_link_function(&R_AXIS, x/cos(phi) + R_AXIS.linked_to_primary->min);
-	    else if (R_AXIS.log)
-		r = rmin + x/cos(phi);
-	    else if (inverted_raxis)
-		r = rmin - x/cos(phi);
-	    else
-		r = rmin + x/cos(phi);
+	if (nonlinear(&R_AXIS))
+	    r = eval_link_function(&R_AXIS, x/cos(phi) + R_AXIS.linked_to_primary->min);
+	else if (R_AXIS.log)
+	    r = rmin + x/cos(phi);
+	else if (inverted_raxis)
+	    r = rmin - x/cos(phi);
+	else
+	    r = rmin + x/cos(phi);
 
-	    if (fmt)
-		sprintf(s, fmt, theta, r);
-	    else {
-		sprintf(s, "theta: %.1f%s  r: %g", theta, degree_sign, r);
-	    }
-	} else {
-	    sprintf(s, fmt, x, y);	/* user defined format */
-	}
+	if (fmt)
+	    sprintf(s, fmt, theta, r);
+	else
+	    sprintf(s, "theta: %.1f%s  r: %g", theta, degree_sign, r);
+    } else if ((mode == MOUSE_COORDINATES_ALT) && fmt) {
+	sprintf(s, fmt, x, y);	/* user defined format */
     } else {
+	/* Default format ("set mouse mouseformat" is not active) */
 	sprintf(s, xy_format(), x, y);	/* usual x,y values */
     }
     return s + strlen(s);

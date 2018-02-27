@@ -51,6 +51,9 @@
 #include "util.h"
 #include "variable.h"
 #include "pm3d.h"
+#ifdef USE_MOUSE
+#include "mouse.h"
+#endif
 
 static void unset_all_tics __PROTO((void));
 static void unset_angles __PROTO((void));

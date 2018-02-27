@@ -88,6 +88,7 @@ typedef struct mouse_setting_t {
 extern mouse_setting_t default_mouse_setting;
 extern mouse_setting_t mouse_setting;
 extern char mouse_fmt_default[];
+extern udft_entry mouse_readout_function;
 
 /* enum of GP_ -keycodes has moved to mousecmn.h so that it can be
  * accessed by standalone terminals too */
@@ -174,15 +175,12 @@ enum {
     MOUSE_COORDINATES_REAL = 0,
     MOUSE_COORDINATES_REAL1, /* w/o brackets */
     MOUSE_COORDINATES_FRACTIONAL,
-#if 0
-    MOUSE_COORDINATES_PIXELS,
-    MOUSE_COORDINATES_SCREEN,
-#endif
     MOUSE_COORDINATES_TIMEFMT,
     MOUSE_COORDINATES_XDATE,
     MOUSE_COORDINATES_XTIME,
     MOUSE_COORDINATES_XDATETIME,
-    MOUSE_COORDINATES_ALT    /* alternative format as specified by the user */
+    MOUSE_COORDINATES_ALT,    /* alternative format as specified by the user */
+    MOUSE_COORDINATES_FUNCTION
 };
 
 /* FIXME HBB 20010207: Codestyle violation: these should be in mouse.c! */

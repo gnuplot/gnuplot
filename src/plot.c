@@ -58,13 +58,8 @@
 # include <os2.h>
 #endif /* OS2 */
 
-#ifdef USE_MOUSE
-# include "mouse.h" /* for mouse_setting */
-# include "gpexecute.h"
-#endif
-
 /* on OS/2 this is needed even without USE_MOUSE */
-#if defined(OS2_IPC) && !defined(USE_MOUSE)
+#if defined(OS2_IPC)
 # include "gpexecute.h"
 #endif
 
