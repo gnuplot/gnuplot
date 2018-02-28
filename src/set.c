@@ -3064,8 +3064,15 @@ set_mouse()
 	} else if (almost_equals(c_token, "mo$useformat")) {
 	    ++c_token;
 	    if (equals(c_token, "function")) {
-		c_token++;
-		int_error(c_token, "mouseformat function not yet supported");
+		int start_token = ++c_token;
+		if (!END_OF_COMMAND || !mouse_readout_function.at)  {
+		    free_at(mouse_readout_function.at);
+		    mouse_readout_function.at = perm_at();
+		    m_capture(&mouse_readout_function.definition, start_token, c_token-1);
+		}
+		/* FIXME:  wants sanity check that this is a string-valued */
+		/*         function with parameters x and y */
+		mouse_mode = MOUSE_COORDINATES_FUNCTION;
 	    } else if (isstringvalue(c_token) && (ctmp = try_to_get_string())) {
 		free(mouse_alt_string);
 		mouse_alt_string = ctmp;

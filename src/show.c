@@ -3176,13 +3176,17 @@ show_mouse()
 	} else {
 	    fprintf(stderr, "\tdouble click resolution is off\n");
 	}
-	fprintf(stderr, "\tformatting numbers with \"%s\"\n",
-	    mouse_setting.fmt);
-	fprintf(stderr, "\tformat for Button 2 is %d\n", (int) mouse_mode);
-	if (mouse_alt_string) {
-	    fprintf(stderr, "\talternative format for Button 2 is '%s'\n",
+	if (mouse_mode == MOUSE_COORDINATES_FUNCTION)
+	    fprintf(stderr, "\tcoordinate readout via mouseformat function %s\n",
+		mouse_readout_function.definition);
+	else if (mouse_mode == MOUSE_COORDINATES_ALT)
+	    fprintf(stderr, "\tcoordinate readout via mouseformat '%s'\n",
 		mouse_alt_string);
-	}
+	else
+	    fprintf(stderr, "\tcoordinate readout via mouseformat %d\n",
+		(int)mouse_mode);
+	fprintf(stderr, "\tformat for individual coordinates is '%s'\n",
+	    mouse_setting.fmt);
 	if (mouse_setting.label) {
 	    fprintf(stderr, "\tButton 2 draws persistent labels with options \"%s\"\n",
 		mouse_setting.labelopts);

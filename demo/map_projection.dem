@@ -4,7 +4,9 @@
 # "Winkel tripel" map projection (Oswald Winkel 1874-1953)
 # This is the arithmetic mean of an equirectangular projection and the
 # Aitoff projection.
+
 # Note: mouse tracking does *not* report longitude, latitude
+unset mouse
 
 set title "'{/:Bold Winkel tripel}' map projection"
 
@@ -36,12 +38,20 @@ pause -1 "<cr> to continue"
 
 
 # Hammer equal-area projection (Ernst Hammer 1892)
-# Note: mouse tracking does *not* report longitude, latitude
 
 set title "{/:Bold Hammer} equal-area map projection"
 
 x_Hammer(λ, φ) = (2*sqrt(2)*cos(φ)*sin(λ/2)) / sqrt(1.0 + cos(φ)*cos(λ/2))
 y_Hammer(λ, φ) = sqrt(2)*sin(φ) / sqrt(1.0 + cos(φ)*cos(λ/2))
+
+# Note: To have mouse tracking report coordinates that correspond to the
+# map projection, we must define an inverse function dependent on both
+# screen x and screen y.
+#
+Z(x,y) = sqrt( 1.0 - (x/4)**2 - (y/2)**2 )
+lon(x,y) = 2. * atan( x*Z(x,y) / (4*Z(x,y)**2 - 2) )
+lat(x,y) = asin(Z(x,y)*y)
+set mouse mouseformat function sprintf("Longitude %.2f Latitude %.2f", lon(x,y), lat(x,y))
 
 set xrange [-π : π]
 set yrange [-π/2 : π/2]

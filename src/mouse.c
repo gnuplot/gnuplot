@@ -298,8 +298,6 @@ stpcpy(char *s, const char *p)
 
 /*
  * Transform mouse coordinates to graph coordinates
- * TODO:
- *	Some mechanism for transforming both x/y jointly, e.g. for map projections
  */
 static void
 MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double *y2)
@@ -498,6 +496,23 @@ GetAnnotateString(char *s, double x, double y, int mode, char *fmt)
 	    sprintf(s, "theta: %.1f%s  r: %g", theta, degree_sign, r);
     } else if ((mode == MOUSE_COORDINATES_ALT) && fmt) {
 	sprintf(s, fmt, x, y);	/* user defined format */
+    } else if (mode == MOUSE_COORDINATES_FUNCTION) {
+	/* EXPERIMENTAL !!! */
+	t_value original_x, original_y;
+	struct value readout;
+	struct udvt_entry *plot_x = add_udv_by_name("x");
+	struct udvt_entry *plot_y = add_udv_by_name("y");
+	original_x = plot_x->udv_value;
+	original_y = plot_y->udv_value;
+	Gcomplex(&(plot_x->udv_value), x, 0);
+	Gcomplex(&(plot_y->udv_value), y, 0);
+	evaluate_at(mouse_readout_function.at, &readout);
+	plot_x->udv_value = original_x;
+	plot_y->udv_value = original_y;
+	if (readout.type != STRING)
+	    int_error(NO_CARET, "mouseformat function did not return a string");
+	sprintf(s, readout.v.string_val);
+	gpfree_string(&readout);
     } else {
 	/* Default format ("set mouse mouseformat" is not active) */
 	sprintf(s, xy_format(), x, y);	/* usual x,y values */
