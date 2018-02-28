@@ -16,7 +16,7 @@ function cursorPoint(evt) {
 
 var gnuplot_svg = {};
 
-gnuplot_svg.version = "13 February 2018";
+gnuplot_svg.version = "27 February 2018";
 
 gnuplot_svg.SVGDoc = null;
 gnuplot_svg.SVGRoot = null;
@@ -390,8 +390,10 @@ gnuplot_svg.convert_to_DMS = function (x) {
 
 gnuplot_svg.interactiveInit = function (svgElement) {
 
-    var offset = svgElement.createSVGPoint();
+    var dragOffset = {'x' : 0, 'y' : 0};
 
+    var dragChange = svgElement.createSVGPoint();
+    
     var dragTimeout = null;
 
     var dragEnabled = false;
@@ -463,7 +465,7 @@ gnuplot_svg.interactiveInit = function (svgElement) {
     window.addEventListener('keydown', function (evt) {
 
         // Not capture event from inputs
-	// body = svg inline in page, svg = plain svg file, window = delegated events to object
+        // body = svg inline in page, svg = plain svg file, window = delegated events to object
         if (evt.target.nodeName != 'BODY' && evt.target.nodeName != 'svg' && evt.target != window) {
             return true;
         }
@@ -516,7 +518,7 @@ gnuplot_svg.interactiveInit = function (svgElement) {
     // Save move relative start position
     svgElement.addEventListener('mousedown', function (evt) {
 
-        offset = cursorPoint(evt);
+        dragOffset = {'x' : evt.clientX,  'y' : evt.clientY};
 
         // Delay for moving, so not move accidentally if only click
         dragTimeout = setTimeout(function () {
@@ -538,12 +540,20 @@ gnuplot_svg.interactiveInit = function (svgElement) {
     svgElement.addEventListener('mousemove', function (evt) {
         if (evt.buttons == 1 && dragEnabled) {
 
+            // Position change
+            dragChange.x = evt.clientX - dragOffset.x;
+            dragChange.y = evt.clientY - dragOffset.y;
+
+            // Set current mouse position
+            dragOffset.x = evt.clientX;
+            dragOffset.y = evt.clientY;
+
+            dragChange.matrixTransform(svgElement.getScreenCTM().inverse());
+
             var viewBoxValues = getViewBox();
 
-            // Position to move
-            var loc = cursorPoint(evt);
-            viewBoxValues[0] -= loc.x - offset.x;
-            viewBoxValues[1] -= loc.y - offset.y;
+            viewBoxValues[0] -= dragChange.x;
+            viewBoxValues[1] -= dragChange.y;
 
             setViewBox(viewBoxValues);
         }
@@ -588,8 +598,9 @@ gnuplot_svg.interactiveInit = function (svgElement) {
             setViewBox(pan(direction));
             return this;
         },
-	reset: function () {
-	    setViewBox(resetValue);
-	}
+        reset: function () {
+        	setViewBox(resetValue);
+        	return this;
+        }
     };
 };
