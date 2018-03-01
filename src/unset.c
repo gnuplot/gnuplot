@@ -104,9 +104,7 @@ static void unset_margin __PROTO((t_position *));
 static void unset_missing __PROTO((void));
 static void unset_micro __PROTO((void));
 static void unset_minus_sign __PROTO((void));
-#ifdef USE_MOUSE
 static void unset_mouse __PROTO((void));
-#endif
 
 static void unset_month_day_tics __PROTO((AXIS_INDEX));
 static void unset_minitics __PROTO((struct axis *));
@@ -341,11 +339,9 @@ unset_command()
     case S_MONOCHROME:
 	unset_monochrome();
 	break;
-#ifdef USE_MOUSE
     case S_MOUSE:
 	unset_mouse();
 	break;
-#endif
     case S_MULTIPLOT:
 	term_end_multiplot();
 	break;
@@ -1259,18 +1255,18 @@ unset_missing()
     missing_val = NULL;
 }
 
-#ifdef USE_MOUSE
 /* process 'unset mouse' command */
 static void
 unset_mouse()
 {
+#ifdef USE_MOUSE
     mouse_setting.on = 0;
 #ifdef OS2
     PM_update_menu_items();
 #endif
     UpdateStatusline(); /* wipe status line */
-}
 #endif
+}
 
 /* process 'unset mxtics' command */
 static void

@@ -161,9 +161,7 @@ static void show_datafile __PROTO((void));
 static void show_table __PROTO((void));
 static void show_micro __PROTO((void));
 static void show_minus_sign __PROTO((void));
-#ifdef USE_MOUSE
 static void show_mouse __PROTO((void));
-#endif
 static void show_plot __PROTO((void));
 static void show_variables __PROTO((void));
 
@@ -581,11 +579,9 @@ show_command()
     case S_TABLE:
 	show_table();
 	break;
-#ifdef USE_MOUSE
     case S_MOUSE:
 	show_mouse();
 	break;
-#endif
     case S_PLOT:
 	show_plot();
 #if defined(USE_READLINE)
@@ -3140,11 +3136,11 @@ show_table()
 	fprintf(stderr, "\ttable mode is off\n");
 }
 
-#ifdef USE_MOUSE
 /* process 'show mouse' command */
 static void
 show_mouse()
 {
+#ifdef USE_MOUSE
     SHOW_ALL_NL;
     if (mouse_setting.on) {
 	fprintf(stderr, "\tmouse is on\n");
@@ -3186,8 +3182,10 @@ show_mouse()
     } else {
 	fprintf(stderr, "\tmouse is off\n");
     }
+#else  /* USE_MOUSE */
+    int_warn(NO_CARET, "this copy of gnuplot has no mouse support");
+#endif /* USE_MOUSE */
 }
-#endif
 
 /* process 'show plot' command */
 static void
