@@ -1821,7 +1821,7 @@ reset_command()
 #endif
 
     if (!(END_OF_COMMAND)) {
-	int_warn(c_token, "invalid option, expecting 'bind' or 'errorstate'");
+	int_warn(c_token, "invalid option, expecting 'session', 'bind' or 'errorstate'");
 	while (!(END_OF_COMMAND))
 	    c_token++;
     }
