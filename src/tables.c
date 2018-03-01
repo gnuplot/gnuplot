@@ -218,9 +218,7 @@ const struct gen_table set_tbl[] =
 
     { "micro", S_MICRO },
     { "minus$sign", S_MINUS_SIGN },
-#ifdef USE_MOUSE
     { "mo$use", S_MOUSE },
-#endif
     { "mono$chrome", S_MONOCHROME },
     { "multi$plot", S_MULTIPLOT },
 

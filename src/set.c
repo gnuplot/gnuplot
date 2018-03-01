@@ -112,9 +112,7 @@ static void set_missing __PROTO((void));
 static void set_separator __PROTO((char **));
 static void set_datafile_commentschars __PROTO((void));
 static void set_monochrome __PROTO((void));
-#ifdef USE_MOUSE
 static void set_mouse __PROTO((void));
-#endif
 static void set_offsets __PROTO((void));
 static void set_origin __PROTO((void));
 static void set_output __PROTO((void));
@@ -401,11 +399,9 @@ set_command()
 	    } else
 		int_error(c_token,"expecting datafile modifier");
 	    break;
-#ifdef USE_MOUSE
 	case S_MOUSE:
 	    set_mouse();
 	    break;
-#endif
 	case S_MONOCHROME:
 	    set_monochrome();
 	    break;
@@ -2994,10 +2990,10 @@ set_monochrome()
 	int_error(c_token, "unrecognized option");
 }
 
-#ifdef USE_MOUSE
 static void
 set_mouse()
 {
+#ifdef USE_MOUSE
     char *ctmp;
 
     c_token++;
@@ -3138,8 +3134,11 @@ set_mouse()
 #ifdef OS2
     PM_update_menu_items();
 #endif
+#else /* USE_MOUSE */
+    c_token++;
+    int_warn(NO_CARET, "this copy of gnuplot has no mouse support");
+#endif /* USE_MOUSE */
 }
-#endif
 
 /* process 'set offsets' command */
 static void
