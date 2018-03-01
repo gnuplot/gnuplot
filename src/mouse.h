@@ -42,8 +42,8 @@
 #define _HAVE_MOUSE_H
 
 #include "mousecmn.h"
-
 #include "syscfg.h"
+#include "eval.h"
 
 /* Zoom queue
 */
