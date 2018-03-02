@@ -570,8 +570,10 @@ define()
     } else {
 	/* variable ! */
 	char *varname = gp_input_line + token[c_token].start_index;
-	if (!strncmp(varname, "GPVAL_", 6) || !strncmp(varname, "MOUSE_", 6))
-	    int_error(c_token, "Cannot set internal variables GPVAL_ and MOUSE_");
+	if (!strncmp(varname, "GPVAL_", 6)
+	||  !strncmp(varname, "GPFUN_", 6)
+	||  !strncmp(varname, "MOUSE_", 6))
+	    int_error(c_token, "Cannot set internal variables GPVAL_ GPFUN_ MOUSE_");
 	start_token = c_token;
 	c_token += 2;
 	udv = add_udv(start_token);

@@ -139,6 +139,7 @@ save_variables__sub(FILE *fp)
 			(int)(udv->udv_value.v.value_array[0].v.int_val));
 		save_array_content(fp, udv->udv_value.v.value_array);
 	    } else if (strncmp(udv->udv_name,"GPVAL_",6)
+		 && strncmp(udv->udv_name,"GPFUN_",6)
 		 && strncmp(udv->udv_name,"MOUSE_",6)
 		 && strncmp(udv->udv_name,"$",1)
 		 && (strncmp(udv->udv_name,"ARG",3) || (strlen(udv->udv_name) != 4))
