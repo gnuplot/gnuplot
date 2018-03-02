@@ -10896,7 +10896,7 @@ Ffigure_multiple_keys
  This command controls the format used to report the current mouse position.
  An integer argument selects one of the format options in the table below.
  A string argument is used as a format for sprintf() in option 7 and should
- contain two float specifiers.
+ contain two float specifiers, one for x and one for y.
 
  Use of a custom function returning a string is EXPERIMENTAL.
  It allows readout of coordinate systems in which inverse mapping from screen
@@ -10916,7 +10916,8 @@ Ffigure_multiple_keys
   4   x = date        y = axis           [31. 12. 1999, 2.45]
   5   x = time        y = axis           [23:59, 2.45]
   6   x = date time   y = axis           [31. 12. 1999 23:59, 2.45]
-  7   format from `set mouse mouseformat`, e.g. "mouse x,y = 1.23,     2.450"
+  7   format from `set mouse mouseformat <format-string>`
+  8   format from `set mouse mouseformat function <func>`
 4 scrolling
 ?set mouse scrolling
 ?mouse scrolling

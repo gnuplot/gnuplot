@@ -3084,16 +3084,17 @@ set_mouse()
 	    } else {
 		int itmp = int_expression();
 		if (itmp >= MOUSE_COORDINATES_REAL
-		    && itmp <= MOUSE_COORDINATES_ALT) {
-		    if (MOUSE_COORDINATES_ALT == itmp && !mouse_alt_string) {
+		&&  itmp <= MOUSE_COORDINATES_FUNCTION) {
+		    if (MOUSE_COORDINATES_ALT == itmp && !mouse_alt_string)
 			fprintf(stderr,
 			    "please 'set mouse mouseformat <fmt>' first.\n");
-		    } else {
+		    else if (MOUSE_COORDINATES_FUNCTION == itmp && mouse_readout_function.at == NULL)
+			fprintf(stderr,
+			    "please 'set mouse mouseformat function <f(x,y)>' first.\n");
+		    else
 			mouse_mode = itmp;
-		    }
 		} else {
-		    fprintf(stderr, "should be: %d <= mouseformat <= %d\n",
-			MOUSE_COORDINATES_REAL, MOUSE_COORDINATES_ALT);
+		    int_warn(c_token-1, "not a valid mouseformat");
 		}
 	    }
 	} else if (almost_equals(c_token, "noru$ler")) {

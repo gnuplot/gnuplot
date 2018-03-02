@@ -830,16 +830,21 @@ static void
 incr_mousemode(const int amount)
 {
     long int old = mouse_mode;
+    TBOOLEAN found_a_new_one = FALSE;
+
     mouse_mode += amount;
-    if (MOUSE_COORDINATES_ALT == mouse_mode && !(mouse_alt_string || polar))
-	mouse_mode += amount;	/* stepping over */
-    if (mouse_mode > MOUSE_COORDINATES_ALT) {
-	mouse_mode = MOUSE_COORDINATES_REAL1;
-    } else if (mouse_mode <= MOUSE_COORDINATES_REAL) {
-	mouse_mode = MOUSE_COORDINATES_ALT;
-	if (!(mouse_alt_string || polar))
-	    mouse_mode--;	/* stepping over */
-    }
+    while (!found_a_new_one) {
+	if (MOUSE_COORDINATES_ALT == mouse_mode && !(mouse_alt_string || polar))
+	    mouse_mode += amount;	/* stepping over */
+	else if (MOUSE_COORDINATES_FUNCTION == mouse_mode && mouse_readout_function.at == NULL)
+	    mouse_mode += amount;	/* stepping over */
+	else if (mouse_mode > MOUSE_COORDINATES_FUNCTION)
+	    mouse_mode = MOUSE_COORDINATES_REAL1;
+	else if (mouse_mode <= MOUSE_COORDINATES_REAL)
+	    mouse_mode = MOUSE_COORDINATES_FUNCTION;
+	else
+	    found_a_new_one = TRUE;
+	}
     UpdateStatusline();
     if (display_ipc_commands())
 	fprintf(stderr, "switched mouse format from %ld to %ld\n", old, mouse_mode);
