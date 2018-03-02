@@ -143,6 +143,8 @@ static void unset_all_zeroaxes __PROTO((void));
 static void unset_axislabel_or_title __PROTO((text_label *));
 static void unset_axislabel __PROTO((AXIS_INDEX));
 
+static void reset_mouse __PROTO((void));
+
 /******** The 'unset' command ********/
 void
 unset_command()
@@ -1801,6 +1803,7 @@ reset_command()
 	clear_udf_list();
 	init_constants();
 	init_session();
+	reset_mouse();
 	return;
     }
 
@@ -2033,4 +2036,19 @@ static void
 unset_wall(int which)
 {
     grid_wall[which].layer = LAYER_BEHIND;
+}
+
+/* Invoked by "reset session".  There is no command line "reset mouse" */
+static void
+reset_mouse()
+{
+#ifdef USE_MOUSE
+    free_at(mouse_readout_function.at);  /* sets to NULL */
+    free(mouse_readout_function.definition);
+    mouse_readout_function.definition = NULL;
+    free(mouse_alt_string);
+    mouse_alt_string = NULL;
+    mouse_mode = MOUSE_COORDINATES_REAL;
+    mouse_setting = default_mouse_setting;
+#endif
 }
