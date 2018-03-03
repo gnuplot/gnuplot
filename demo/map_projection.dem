@@ -5,7 +5,7 @@
 # This is the arithmetic mean of an equirectangular projection and the
 # Aitoff projection.
 
-# Note: mouse tracking does *not* report longitude, latitude
+# Note: mouse tracking would not correctly report longitude, latitude
 unset mouse
 
 set title "'{/:Bold Winkel tripel}' map projection"
@@ -36,8 +36,9 @@ plot for [λ=-180:180:10] [φ=-90:90] '+' using (x_W3(λ,φ)):(y_W3(λ,φ)) with
 
 pause -1 "<cr> to continue"
 
-
+#
 # Hammer equal-area projection (Ernst Hammer 1892)
+#
 
 set title "{/:Bold Hammer} equal-area map projection"
 
@@ -62,5 +63,46 @@ plot for [λ=-180:180:10] [φ=-90:90] '+' using (x_Hammer(λ,φ)):(y_Hammer(λ,�
      'world.dat' using (x_Hammer($1,$2)):(y_Hammer($1,$2)) with lines lc "black" title "outline"
 
 pause -1 "<cr> to continue"
+
+#
+# Albers equal-area conic projection
+# Heinrich C. Albers 1805
+#
+
+set title "{/:Bold Albers} equal-area conic projection"
+
+set auto
+φ0 = 0.
+φ1 = 0.
+φ2 = 60.
+λ0 = 0.
+n = 0.5 * (sin(φ1) + sin(φ2))
+θ(λ) = n*(λ-λ0)
+C = cos(φ1)**2 + 2*n*sin(φ1)
+ρ(φ) = sqrt(C - 2*n*sin(φ)) / n
+ρ0 = ρ(φ0)
+
+x_Albers(λ, φ) = ρ(φ) * sin(θ(λ))
+y_Albers(λ, φ) = ρ0 - ρ(φ)*cos(θ(λ))
+
+clip(south) = south < -60. ? NaN : south
+
+#
+# inverse functions for map readout
+#
+lon(x,y) = atan( x/(ρ0-y) ) / n
+lat(x,y) = asin( (C - n*n*(x**2 + (ρ0-y)**2)) / (2*n) )
+mouse_readout(x,y) = sprintf("Longitude %.2f Latitude %.2f", lon(x,y), lat(x,y))
+set mouse mouseformat function mouse_readout(x,y)
+
+plot for [λ=-180:180:10] [φ=-60:90] '+' using (x_Albers(λ,φ)):(y_Albers(λ,φ)) with lines lc "cyan" lw .5 notitle, \
+     for [φ = -60:90:10] [λ=-180:180:10] '+' using (x_Albers(λ,φ)):(y_Albers(λ,φ)) with lines lc "cyan" lw .5 notitle, \
+     'world.dat' using (x_Albers($1,clip($2))):(y_Albers($1,clip($2))) with filledcurve fc "brown" title "fill", \
+     'world.dat' using (x_Albers($1,clip($2))):(y_Albers($1,clip($2))) with lines lc "black" title "outline"
+
+pause -1 "<cr> to continue"
+
+# return mouse readout to default state
+set mouse mouseformat 0
 
 reset
