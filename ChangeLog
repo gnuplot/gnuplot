@@ -1,3 +1,11 @@
+2018-03-03  Ethan A Merritt  <merritt@u.washington.edu>
+	* src/axis.c (eval_link_function):
+	Executing the general case nonlinear axis mapping functions via a
+	dynamically interpreted action table is slower than in-line evaluation.
+	In the special case of log-scaled axes we can short-circuit the 
+	general case evaluation by an immediate call to the log or exp function.
+	microbenchmark speedup 25%
+
 2018-02-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c src/plot3d.c:  You might want contour lines to opt out

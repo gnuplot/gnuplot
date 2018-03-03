@@ -2486,6 +2486,25 @@ eval_link_function(struct axis *axis, double raw_coord)
     int dummy_var;
     struct value a;
 
+#if defined(NONLINEAR_AXES) && (NONLINEAR_AXES > 0)
+    /* Special case to speed up evaluation of log scaling
+     * benchmark timing results
+     * v4.6 (old-style logscale)	42.7 u 42.7 total
+     * v5.1 (generic nonlinear)	57.5 u 66.2 total
+     * v5.1 (optimized nonlinear)	42.1 u 42.2 total
+     */
+    if (axis->log) {
+	if (axis->linked_to_secondary) {
+	    if (raw_coord <= 0)
+		return not_a_number();
+	    else
+		return log(raw_coord) / axis->log_base;
+	} else if (axis->linked_to_primary) {
+	    return exp(raw_coord * axis->log_base);
+	}
+    }
+#endif
+
     /* This handles the case "set link x2" with no via/inverse mapping */
     if (link_udf == NULL || link_udf->at == NULL)
 	return raw_coord;
