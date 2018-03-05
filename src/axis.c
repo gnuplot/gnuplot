@@ -2469,6 +2469,7 @@ get_shadow_axis(AXIS *axis)
  * This is necessary if we are to reproduce the old logscaling.
  * Extend the tic range on an independent log-scaled axis to the
  * nearest power of 10.
+ * Transfer the new limits over to the user-visible secondary axis.
  */
 void
 extend_primary_ticrange(AXIS *axis)
@@ -2478,11 +2479,15 @@ extend_primary_ticrange(AXIS *axis)
     if (axis->ticdef.logscaling) {
 	/* NB: "zero" is the minimum non-zero value from "set zero" */
 	if ((primary->autoscale & AUTOSCALE_MIN)
-	||  fabs(primary->min - floor(primary->min)) < zero)
+	||  fabs(primary->min - floor(primary->min)) < zero) {
 	    primary->min = floor(primary->min);
+	    axis->min = eval_link_function(axis, primary->min);
+	}
 	if ((primary->autoscale & AUTOSCALE_MAX)
-	||  fabs(primary->max - ceil(primary->max)) < zero)
+	||  fabs(primary->max - ceil(primary->max)) < zero) {
 	    primary->max = ceil(primary->max);
+	    axis->max = eval_link_function(axis, primary->max);
+	}
     }
 }
 
