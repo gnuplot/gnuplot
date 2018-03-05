@@ -1170,12 +1170,14 @@ SVG_text ()
 
 	this_axis = &axis_array[FIRST_X_AXIS];
 	fprintf(gpoutfile, "gnuplot_svg.plot_logaxis_x = %d;\n",
-		(mouse_mode == MOUSE_COORDINATES_FUNCTION || is_nonlinear(this_axis)) ? -1 :
-		this_axis->log ? 1: 0);
+		this_axis->log ? 1
+		: (mouse_mode == MOUSE_COORDINATES_FUNCTION || is_nonlinear(this_axis)) ? -1
+		: 0);
 	this_axis = &axis_array[FIRST_Y_AXIS];
 	fprintf(gpoutfile, "gnuplot_svg.plot_logaxis_y = %d;\n",
-		(mouse_mode == MOUSE_COORDINATES_FUNCTION || is_nonlinear(this_axis)) ? -1 :
-		this_axis->log ? 1: 0);
+		this_axis->log ? 1
+		: (mouse_mode == MOUSE_COORDINATES_FUNCTION || is_nonlinear(this_axis)) ? -1
+		: 0);
 	if (polar)
 	    fprintf(gpoutfile, "gnuplot_svg.plot_logaxis_r = %d;\n",
 		axis_array[POLAR_AXIS].log ? 1: 0);
