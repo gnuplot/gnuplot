@@ -21,7 +21,6 @@ set ylabel "y"
 Rosenbrock(x,y) = (1-x)**2 + 100*(y - x**2)**2
 u = 0.0
 x = 0.0
-GPFUN_Rosenbrock = "Rosenbrock(x,y) = (1-x)**2 + 100*(y - x**2)**2"
 
 # Achieves same effect as
 #    set log z
