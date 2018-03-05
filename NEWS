@@ -13,6 +13,7 @@ Changes in 5.2.3
 * FIX svg terminal: apply current color to dots
 * FIX qt terminal: include "notitle" plots in accounting for toggle operations
 * FIX stats FOO using 'namedcolumn' name columnhead
+* FIX svg terminal: point plot empty title produced spurious mousing directive
 
 Changes in 5.2.2
 ================
