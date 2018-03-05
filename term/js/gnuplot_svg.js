@@ -16,7 +16,7 @@ function cursorPoint(evt) {
 
 var gnuplot_svg = {};
 
-gnuplot_svg.version = "27 February 2018";
+gnuplot_svg.version = "04 March 2018";
 
 gnuplot_svg.SVGDoc = null;
 gnuplot_svg.SVGRoot = null;
@@ -85,7 +85,12 @@ gnuplot_svg.updateCoordBox = function (t, evt) {
 
     var plotcoord = gnuplot_svg.mouse2plot(p.x, p.y);
 
-    if (gnuplot_svg.plot_timeaxis_x == "DMS" || gnuplot_svg.plot_timeaxis_y == "DMS") {
+    if (isNaN(plotcoord.x) || isNaN(plotcoord.y)) {
+	// nonlinear axis or custom function mapping [x,y] to plot coordinates
+	label_x = "not ";
+	label_y = "supported";
+
+    } else if (gnuplot_svg.plot_timeaxis_x == "DMS" || gnuplot_svg.plot_timeaxis_y == "DMS") {
         if (gnuplot_svg.plot_timeaxis_x == "DMS") {
             label_x = gnuplot_svg.convert_to_DMS(x);
         }
@@ -113,8 +118,7 @@ gnuplot_svg.updateCoordBox = function (t, evt) {
             + ("0" + (month + 1)).slice(-2) + "/"
             + year;
         label_y = plotcoord.y.toFixed(2);
-    }
-    else if (gnuplot_svg.plot_timeaxis_x == "Time") {
+    } else if (gnuplot_svg.plot_timeaxis_x == "Time") {
         gnuplot_svg.axisdate.setTime(1000 * plotcoord.x);
         var hour = gnuplot_svg.axisdate.getUTCHours();
         var minute = gnuplot_svg.axisdate.getUTCMinutes();
@@ -325,7 +329,10 @@ gnuplot_svg.mouse2plot = function (mousex, mousey) {
     var ploty = mousey - gnuplot_svg.plot_ybot;
     var x, y;
 
-    if (gnuplot_svg.plot_logaxis_x !== 0) {
+    if (gnuplot_svg.plot_logaxis_x < 0) {
+	// nonlinear axis or custom mapping function
+	x = NaN;
+    } else if (gnuplot_svg.plot_logaxis_x !== 0) {
         x = Math.log(gnuplot_svg.plot_axis_xmax)
             - Math.log(gnuplot_svg.plot_axis_xmin);
         x = x * (plotx / (gnuplot_svg.plot_xmax - gnuplot_svg.plot_xmin))
@@ -335,7 +342,9 @@ gnuplot_svg.mouse2plot = function (mousex, mousey) {
         x = gnuplot_svg.plot_axis_xmin + (plotx / (gnuplot_svg.plot_xmax - gnuplot_svg.plot_xmin)) * (gnuplot_svg.plot_axis_xmax - gnuplot_svg.plot_axis_xmin);
     }
 
-    if (gnuplot_svg.plot_logaxis_y !== 0) {
+    if (gnuplot_svg.plot_logaxis_y < 0) {
+	y = NaN;
+    } else if (gnuplot_svg.plot_logaxis_y !== 0) {
         y = Math.log(gnuplot_svg.plot_axis_ymax)
             - Math.log(gnuplot_svg.plot_axis_ymin);
         y = y * (ploty / (gnuplot_svg.plot_ytop - gnuplot_svg.plot_ybot))

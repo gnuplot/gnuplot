@@ -1,4 +1,4 @@
-    gnuplot.mouse_version = " 17 February 2017";
+    gnuplot.mouse_version = " 04 March 2018";
 
 // Mousing code for use with gnuplot's 'canvas' terminal driver.
 // The functions defined here assume that the javascript plot produced by
@@ -134,7 +134,10 @@ gnuplot.mouse_update = function(e)
   var axis_ymin = (gnuplot.zoomed) ? gnuplot.zoom_axis_ymin : gnuplot.plot_axis_ymin;
   var axis_ymax = (gnuplot.zoomed) ? gnuplot.zoom_axis_ymax : gnuplot.plot_axis_ymax;
 
-    if (gnuplot.plot_logaxis_x != 0) {
+    if (gnuplot.plot_logaxis_x < 0) {
+	// nonlinear axis or custom mapping function
+	x = NaN;
+    } else if (gnuplot.plot_logaxis_x != 0) {
 	x = Math.log(axis_xmax) - Math.log(axis_xmin);
 	x = x * (gnuplot.plotx / (gnuplot.plot_xmax-gnuplot.plot_xmin)) + Math.log(axis_xmin);
 	x = Math.exp(x);
@@ -142,7 +145,9 @@ gnuplot.mouse_update = function(e)
 	x =  axis_xmin + (gnuplot.plotx / (gnuplot.plot_xmax-gnuplot.plot_xmin)) * (axis_xmax - axis_xmin);
     }
 
-    if (gnuplot.plot_logaxis_y != 0) {
+    if (gnuplot.plot_logaxis_y < 0) {
+	y = NaN;
+    } else if (gnuplot.plot_logaxis_y != 0) {
 	y = Math.log(axis_ymax) - Math.log(axis_ymin);
 	y = y * (-gnuplot.ploty / (gnuplot.plot_ytop-gnuplot.plot_ybot)) + Math.log(axis_ymin);
 	y = Math.exp(y);
@@ -177,11 +182,15 @@ gnuplot.mouse_update = function(e)
     label_x = "ang= " + polar.ang.toPrecision(4);
     label_y = "R= " + polar.r.toPrecision(4);
   } else {
-    if (typeof(gnuplot.plot_timeaxis_x) == "string" && gnuplot.plot_timeaxis_x != "")
+    if (isNaN(x))
+      label_x = "";
+    else if (typeof(gnuplot.plot_timeaxis_x) == "string" && gnuplot.plot_timeaxis_x != "")
       label_x = gnuplot.datafmt(x);
     else
       label_x = x.toPrecision(4);
-    if (typeof(gnuplot.plot_timeaxis_y) == "string" && gnuplot.plot_timeaxis_y != "")
+    if (isNaN(y))
+      label_y = "";
+    else if (typeof(gnuplot.plot_timeaxis_y) == "string" && gnuplot.plot_timeaxis_y != "")
       label_y = gnuplot.datafmt(y);
     else
       label_y = y.toPrecision(4);
@@ -361,11 +370,15 @@ gnuplot.saveclick = function (event)
   if (button == "LEFT") {
     ctx.strokeStyle="black";
     ctx.strokeRect(gnuplot.mousex, gnuplot.mousey, 1, 1);
-    if (typeof(gnuplot.plot_timeaxis_x) == "string" && gnuplot.plot_timeaxis_x != "")
+    if (gnuplot.plot_logaxis_x < 0)
+      label_x = "";
+    else if (typeof(gnuplot.plot_timeaxis_x) == "string" && gnuplot.plot_timeaxis_x != "")
       label_x = gnuplot.datafmt(x);
     else
       label_x = x.toPrecision(4);
-    if (typeof(gnuplot.plot_timeaxis_y) == "string" && gnuplot.plot_timeaxis_y != "")
+    if (gnuplot.plot_logaxis_y < 0)
+      label_y = "";
+    else if (typeof(gnuplot.plot_timeaxis_y) == "string" && gnuplot.plot_timeaxis_y != "")
       label_y = gnuplot.datafmt(y);
     else
       label_y = y.toPrecision(4);

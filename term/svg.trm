@@ -1097,6 +1097,7 @@ SVG_text ()
     SVG_GroupClose ();
 
     if (SVG_mouseable) {
+	struct axis *this_axis;
 
 	fprintf(gpoutfile, "\n<script type=\"text/javascript\"><![CDATA[\n");
 	fprintf(gpoutfile, "// plot boundaries and axis scaling information for mousing \n");
@@ -1149,21 +1150,36 @@ SVG_text ()
 	    fprintf(gpoutfile, "gnuplot_svg.plot_axis_y2min = \"none\"\n");
 #undef MOUSE_PARAM
 
+	/*
+	 * Note:
+	 * Offline mousing cannot automatically deal with
+	 * (1) nonlinear axes other than logscale
+	 * (2) [x,y]->plot_coordinates as specified by mouse_mode 8
+	 *		'set mouse mouseformat function <foo>'
+	 *     Both of these states are noted by gnuplot_svg.plot_logaxis_* < 0
+	 *     Linked axes that happen to be nonlinear are incorrectly treated as linear
+	 * (3) generic user-specified coordinate format (mouse_alt_string)
+	 *      	'set mouse mouseformat "foo"'
+	 *     Special case mouse_alt_string formats recognized by gnuplot_svg.js are
+	 *     "Time", "Date", and "DateTime".
+	 * FIXME: This all needs to be documented somewhere!
+	 */
+#       define is_nonlinear(axis) ((axis)->linked_to_primary != NULL \
+                         && (axis)->link_udf->at != NULL \
+			 && (axis)->index == -((axis)->linked_to_primary->index))
+
+	this_axis = &axis_array[FIRST_X_AXIS];
 	fprintf(gpoutfile, "gnuplot_svg.plot_logaxis_x = %d;\n",
-		axis_array[FIRST_X_AXIS].log ? 1: 0);
+		(mouse_mode == MOUSE_COORDINATES_FUNCTION || is_nonlinear(this_axis)) ? -1 :
+		this_axis->log ? 1: 0);
+	this_axis = &axis_array[FIRST_Y_AXIS];
 	fprintf(gpoutfile, "gnuplot_svg.plot_logaxis_y = %d;\n",
-		axis_array[FIRST_Y_AXIS].log ? 1: 0);
+		(mouse_mode == MOUSE_COORDINATES_FUNCTION || is_nonlinear(this_axis)) ? -1 :
+		this_axis->log ? 1: 0);
 	if (polar)
 	    fprintf(gpoutfile, "gnuplot_svg.plot_logaxis_r = %d;\n",
 		axis_array[POLAR_AXIS].log ? 1: 0);
 
-	/*
-	 * Note: mouse_alt_string is set by 'set mouse mouseformat "foo"'
-	 * The only strings currently recognized by gnuplot_svg.js are
-	 * "Time", "Date", and "DateTime" but the user could modify
-	 * gnuplot_svg.js to recognize additional formats.
-	 * FIXME: This all needs to be documented somewhere!
-	 */
 	if (axis_array[FIRST_X_AXIS].datatype == DT_TIMEDATE) {
 	    fprintf(gpoutfile, "gnuplot_svg.plot_axis_xmin = %.3f;\n",
 		axis_array[FIRST_X_AXIS].min);
