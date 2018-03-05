@@ -14,6 +14,7 @@ Changes in 5.2.3
 * FIX qt terminal: include "notitle" plots in accounting for toggle operations
 * FIX stats FOO using 'namedcolumn' name columnhead
 * FIX svg terminal: point plot empty title produced spurious mousing directive
+* FIX tweak logscale tic range limits and minor tic generation intervals
 
 Changes in 5.2.2
 ================

@@ -1,4 +1,15 @@
+2018-03-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (extend_primary_ticrange):
+	This routine exists only to emulate the old behaviour (i.e. prior to
+	nonlinear axis code) of autoscaled logscale axes.
+	If it extends the range on the primary axis, this change must also be
+	propagated to the secondary (user-visible) axis.  Otherwise the reported
+	axis min/max are not correct.
+	Bugfix for log-scale mousing in canvas terminal.
+
 2018-03-03  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* src/axis.c (eval_link_function):
 	Executing the general case nonlinear axis mapping functions via a
 	dynamically interpreted action table is slower than in-line evaluation.
