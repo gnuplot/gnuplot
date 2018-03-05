@@ -384,7 +384,6 @@ unset ytics
 set ttics ("0" 0, "π/2" 90, "π" 180, "3π/2" 270)
 set rrange [ 0.1 : 4.0 ]
 butterfly(x)=exp(cos(x))-2*cos(4*x)+sin(x/12)**5
-GPFUN_butterfly = "butterfly(x)=exp(cos(x))-2*cos(4*x)+sin(x/12)**5"
 plot 3.+sin(t)*cos(5*t) with filledcurve above r=2.5 notitle, \
      3.+sin(t)*cos(5*t) with line
 
