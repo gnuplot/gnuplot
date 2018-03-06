@@ -208,18 +208,26 @@ C
 ##See `overflow`.
 #end
 
+4 New plot styles and style options
+#start
+#bPlot style `with circles` can be used in 3D plots.
+#bCustomized contour line types. See `set cntrparam`.
+#end
+
 4 New commands and command options
 ?new commands
 #start
-#bNew options for drawing the xy xz and yz planes in 3D plots.
+#bNew options for showing the xy xz and yz planes in 3D plots.
 ##See `set walls`, `set grid vertical`.
 #b`set table separator {tab|comma|"char"}` can be used to create csv files.
 ##See `plot with table`.
 #b`set rgbmax <value>` controls interpretation of input RGB values.
-#bnew formats descriptors tH tM tS handle relative times (interval lengths)
-#bPlot style `with circles` can be using in 3D plots.
-#bCustomized contour line types
-##See `set cntrparam`
+#bnew formats descriptors tH tM tS handle relative times (interval lengths).
+##See `time_specifiers`.
+#bArray size can be implicit if initializer is present, e.g. `Array A = [1,2,3]`.
+#bOptional radial clipping of line segments in polar mode. See `set clip`.
+#bUser-specified translation of mouse coordinates (EXPERIMENTAL).
+##See map_projection demo.
 #end
 3 Features introduced in version 5.2
 ?Features introduced in version 5.2
