@@ -1237,7 +1237,7 @@ gen_tics(struct axis *this, tic_callback callback)
 		    ministart = ministep = step / this->mtic_freq;
 		    miniend = step;
  		}
-	    } else if (nonlinear(this) && this->log) {
+	    } else if (nonlinear(this) && this->ticdef.logscaling) {
 		/* FIXME: Not sure this works for all values of step */
 		ministart = ministep = step / (this->base - 1);
 		miniend = step;
