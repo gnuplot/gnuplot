@@ -522,7 +522,7 @@ print_3dtable(int pcount)
 static char *
 expand_newline(const char *in)
 {
-    char *tmpstr = (char *) gp_alloc(2 * strlen(in), "enl");
+    char *tmpstr = (char *) gp_alloc(2 * strlen(in) + 1, "enl");
     const char *s = in;
     char *t = tmpstr;
     do {
