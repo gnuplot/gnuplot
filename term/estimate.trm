@@ -135,7 +135,7 @@ ENHest_put_text(unsigned int x, unsigned int y, const char *str)
     ENHest_plaintext_pos = 0;
 
     /* If no enhanced text processing is needed, strlen() is sufficient */
-    if (ignore_enhanced_text || !strpbrk(str, "{}^_@&~\n")) {
+    if (ignore_enhanced_text || (!strpbrk(str, "{}^_@&~\n") && !contains_unicode(str))) {
 	if (encoding == S_ENC_UTF8)
 	    term->xmax = strwidth_utf8(str);
 	else

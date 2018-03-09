@@ -1329,9 +1329,14 @@ parse_esc(char *instr)
 		    *t++ = '\\';
 		    *t++ = *s++;
 		}
+	    } else if (s[0] == 'U' && s[1] == '+') {
+		/* Unicode escape:  \U+hhhh
+		 * Keep backslash; translation will be handled elsewhere.
+		 */
+		*t++ = '\\';
 	    }
 	} else if (df_separators && *s == '\"' && *(s+1) == '\"') {
-	/* EAM Mar 2003 - For parsing CSV strings with quoted quotes */
+	    /* For parsing CSV strings with quoted quotes */
 	    *t++ = *s++; s++;
 	} else {
 	    *t++ = *s++;

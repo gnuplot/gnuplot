@@ -100,6 +100,11 @@ long mouse_mode = 0;
 char* mouse_alt_string = NULL;
 #endif
 
+/* Contains a convenient routine for converting Unicode code point to UTF-8 */
+#ifdef HAVE_LIBFONTCONFIG
+#include <fontconfig/fontconfig.h>
+#endif
+
 #ifdef _WIN32
 # include "win/winmain.h"
 # include "win/wcommon.h"
@@ -2478,6 +2483,28 @@ enhanced_recursion(
 	    /*}}}*/
 
 	case '\\'  :
+
+	    /*     Unicode represented as \U+hhhhh where hhhhh is hexadecimal code point.
+	     *     For UTF-8 encoding we translate hhhhh to a UTF-8 byte sequence and
+	     *     output the bytes one by one.
+	     *     FIXME: non-utf8 environments not yet supported.
+	     *     Note that MSWin for example might prefer to do nothing here and convert
+	     *     to wchar representation when the string reaches EnchancedPutText for output.
+	     */
+#ifdef HAVE_LIBFONTCONFIG
+	    if (p[1] == 'U' && p[2] == '+' && (encoding == S_ENC_UTF8)) {
+		unsigned int codepoint;
+		unsigned char utf8char[8];
+		int i, length;
+		sscanf(&(p[3]), "%5x", &codepoint);
+		length = FcUcs4ToUtf8(codepoint, utf8char);
+		p += (codepoint > 0xFFFF) ? 7 : 6;
+		for (i=0; i<length; i++)
+		    (term->enhanced_writec)(utf8char[i]);
+		break;
+	    }
+#endif
+
 	    /*{{{  Enhanced mode always uses \xyz as an octal character representation
 		   but each terminal type must give us the actual output format wanted.
 		   pdf.trm wants the raw character code, which is why we use strtol();

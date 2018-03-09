@@ -1,0 +1,28 @@
+#
+# Exercise use of unicode escape sequences (not yet supported by all terminals)
+#
+set border 0
+unset tics
+
+set title "Illustrate use of unicode escape sequences" font "serif,15"
+
+set label 1 at screen 0.1, screen 0.8 font "serif,15"
+set label 2 at screen 0.1, screen 0.7 font "serif,15"
+set label 3 at screen 0.1, screen 0.6 font "serif,15"
+set label 4 at screen 0.1, screen 0.5 font "serif,15"
+set label 5 at screen 0.1, screen 0.4 font "serif,15"
+set label 6 at screen 0.1, screen 0.3 font "serif,15"
+set label 7 at screen 0.1, screen 0.2 font "serif,15"
+
+set label 1 "unicode \\\\U+221E : \U+221E   Infinity"
+set label 2 "unicode \\\\U+210F : \U+210F   Planck constant h-bar"
+set label 3 "unicode \\\\U+222C : \U+222C   Double integral"
+set label 4 "unicode \\\\U+03F5 : \U+03F5   Greek lunate epsilon"
+set label 5 "unicode \\\\U+7403 : \U+7403   CJK unified ideograph 'sphere'"
+set label 6 "\\{a\\\\U+0361\\}b        : {a\U+0361}b   Ligature tie (combining)"
+set label 7 "v\\\\U+20D7           : v\U+20D7    Combining right arrow above"
+
+plot [0:1][0:1] -1 notitle
+
+pause -1 "<cr> to continue"
+reset

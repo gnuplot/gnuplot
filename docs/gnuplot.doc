@@ -229,6 +229,14 @@ C
 #bUser-specified translation of mouse coordinates (EXPERIMENTAL).
 ##See map_projection demo.
 #end
+
+4 Other new features
+#start
+#bEnhanced text mode accepts \U+xxxx (xxxx is a 4 or 5 character hexadecimal)
+##as representing a Unicode code point that is converted to the corresponding
+##UTF-8 byte sequence on output. EXPERIMENTAL (implementation may change)
+#end
+
 3 Features introduced in version 5.2
 ?Features introduced in version 5.2
 4 New plot styles and style options
@@ -782,6 +790,7 @@ C
    {/Times*2 abc}              print abc in font Times at twice current size
    {/Times:Italic abc}         print abc in font Times with style italic
    {/Arial:Bold=20 abc}        print abc in boldface Arial font size 20 
+   \U+         \U+221E         Unicode point U+221E (INFINITY)
 #\begin{tabular}{|clll|} \hline
 #\multicolumn{4}{|c|}{Enhanced Text Control Codes} \\ \hline
 #Control & Example & Result & Explanation \\ \hline
@@ -795,6 +804,7 @@ C
 #\verb| | & \verb|{/Times*2 abc}| & \Large{\rm abc} & print abc in font Times at twice current size\\
 #\verb| | & \verb|{/Times:Italic abc}| & {\it abc} & print abc in font Times with style italic\\
 #\verb| | & \verb|{/Arial:Bold=20 abc}| & \Large\textsf{\textbf{abc}} & print abc in boldface Arial font size 20\\
+#\verb|\U+| & \verb|\U+221E| & $\infty$ & Unicode point U+221E INFINITY\\
 %c c l .
 C ugly - doc2ms uses @ for column separator, but here we
 C  need @ in table, so end and restart the table !
@@ -870,13 +880,19 @@ C  need @ in table, so end and restart the table !
  special syntax within either string.  You can, of course, use control
  characters by escaping them (see below), such as '~a{\^}'
 
- You can specify special symbols numerically by giving a character code in
- octal, e.g. {/Symbol \245} is the symbol for infinity in the Adobe Symbol font.
- This does not work for multibyte encodings like UTF-8, however.  In a UTF-8
- environment, you should be able to enter multibyte sequences implicitly by
- typing or otherwise selecting the character you want.
-
  You can escape control characters using \, e.g.,  \\, \{, and so on.
+
+ The \ character is also used to escape single byte character codes or
+ Unicode entry points.  The form \ooo (where ooo is a 3 character octal value)
+ can be used to index a known character code in specific font encoding.
+ For example the Adobe Symbol font uses a custom encoding in which octal 0245 
+ represents the symbol for infinity.  You could specify this by explicitly
+ giving the font name and the character code "{/Symbol \245}".
+
+ Similarly you can specify a character by its Unicode code point as \U+hhhh,
+ where hhhh is the 4 or 5 character hexadecimal code point.
+ This will be converted to a UTF-8 byte sequence on output if appropriate.
+ See `set encoding`, `utf8`.
 
  Note that strings in double-quotes are parsed differently than those enclosed
  in single-quotes.  The major difference is that backslashes may need to be

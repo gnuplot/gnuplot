@@ -65,6 +65,12 @@
 #  include "estimate.trm"	/* used for enhanced text processing */
 # endif
 
+/* Unicode escape sequences (\U+hhhh) are handling by the enhanced text code.
+ * Various terminals check every string to see whether it needs enhanced text
+ * processing. This macro allows them to include a check for the presence of
+ * unicode escapes.
+ */
+#define contains_unicode(S) strstr(S, "\\U+")
 
 /* Define SHORT_TERMLIST to select a few terminals. It is easier
  * to define the macro and list desired terminals in this section.

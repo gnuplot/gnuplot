@@ -2143,7 +2143,7 @@ ENHGD_put_text(unsigned int x, unsigned int y, const char *str)
     /* if there are no magic characters, we should just be able
      * punt the string to PNG_put_text()
      */
-    if (!strpbrk(str, "{}^_@&~")) {
+    if (!strpbrk(str, "{}^_@&~") && !contains_unicode(str)) {
 	/* FIXME: do something to ensure default font is selected */
 	PNG_put_text(x,y,str);
 	return;
