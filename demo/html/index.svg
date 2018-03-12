@@ -92,6 +92,7 @@ on mouse-coordinate tracking.
     <h4>Coordinate and<br> axis transforms</h4>
     <ul>
     <li><a href="linkedaxes.html">linked axes</a></li>
+    <li><a href="nonlinear2.html">logscale axes</a></li>
     <li><a href="nonlinear3.html">nonlinear axes</a></li>
     <li><a href="nonlinear1.html">broken axes</a></li>
     <li><a href="ttics.html">polar coords</a></li>
@@ -207,7 +208,7 @@ on mouse-coordinate tracking.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated February 2018</i>
+    <i>This page generated March 2018</i>
     </td>
 
     <td>

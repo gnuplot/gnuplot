@@ -5,7 +5,7 @@
 # This is the arithmetic mean of an equirectangular projection and the
 # Aitoff projection.
 
-# Note: mouse tracking would not correctly report longitude, latitude
+# Note: mouse tracking does not correctly report longitude, latitude
 unset mouse
 
 set title "'{/:Bold Winkel tripel}' map projection"
