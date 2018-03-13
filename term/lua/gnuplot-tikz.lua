@@ -74,8 +74,8 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
-pgf.REVISION = string.sub("$Rev: 103 $",7,-3)
-pgf.REVISION_DATE = "Date: 2016/07/22 21:03:49"
+pgf.REVISION = "105"
+pgf.REVISION_DATE = "2018/03/13 18:43:00"
 
 pgf.styles = {}
 
@@ -1549,7 +1549,7 @@ gfx.check_dashtype = function()
     if type(gfx.dashtype_idx) == type(1) then
       if gfx.dashtype_idx == -1 or gfx.dashtype_idx == -2 then
         pgf.set_dashtype(pgf.styles.dashtypes_axes[math.abs(gfx.dashtype_idx)][1])
-      elseif gfx.dashtype_idx > 0 then
+      elseif gfx.dashtype_idx >= 0 then
         pgf.set_dashtype(pgf.styles.dashtypes[(gfx.dashtype_idx % #pgf.styles.dashtypes) + 1][1])
       end
     else
