@@ -35,12 +35,6 @@
   This software is provided "as is" without express or implied warranty
   to the extent permitted by applicable law.
 
-
-
-  $Date: 2015/12/31 21:03:49 $
-  $Author: sfeam $
-  $Rev: 100 $
-
 ]]--
 
 
@@ -80,9 +74,8 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
-pgf.REVISION = string.sub("$Rev: 102 $",7,-3)
-pgf.REVISION_DATE = string.gsub("$Date: 2016/07/22 21:03:49 $",
-                                "$Date: ([0-9]+).([0-9]+).([0-9]+) .*","%1/%2/%3")
+pgf.REVISION = "105"
+pgf.REVISION_DATE = "2018/03/13 18:43:00"
 
 pgf.styles = {}
 
@@ -268,7 +261,7 @@ pgf.write_graph_begin = function (font, noenv)
   end
   gp.write(string.format("%s[gnuplot%s]\n", gfx.format[gfx.opt.tex_format].begintikzpicture, global_opt))
   gp.write(string.format("%%%% generated with GNUPLOT %sp%s (%s; terminal rev. %s, script rev. %s)\n",
-      term.gp_version, term.gp_patchlevel, _VERSION, string.sub(term.lua_term_revision,7,-3), pgf.REVISION))
+      term.gp_version, term.gp_patchlevel, _VERSION, string.sub(term.lua_term_revision,7,-2), pgf.REVISION))
   if not gfx.opt.notimestamp then
     gp.write(string.format("%%%% %s\n", os.date()))
   end
@@ -1556,7 +1549,7 @@ gfx.check_dashtype = function()
     if type(gfx.dashtype_idx) == type(1) then
       if gfx.dashtype_idx == -1 or gfx.dashtype_idx == -2 then
         pgf.set_dashtype(pgf.styles.dashtypes_axes[math.abs(gfx.dashtype_idx)][1])
-      elseif gfx.dashtype_idx > 0 then
+      elseif gfx.dashtype_idx >= 0 then
         pgf.set_dashtype(pgf.styles.dashtypes[(gfx.dashtype_idx % #pgf.styles.dashtypes) + 1][1])
       end
     else
