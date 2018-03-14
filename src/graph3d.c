@@ -1209,12 +1209,15 @@ do_3dplot(
 		break;
 
 	    case ZERRORFILL:
+		apply_pm3dcolor(&this_plot->fill_properties.border_color);
 		key_sample_fill(xl, yl, &this_plot->fill_properties);
 		term_apply_lp_properties(&this_plot->lp_properties);
 		key_sample_line(xl, yl);
 		break;
 
 	    case BOXES:
+		apply_pm3dcolor(&this_plot->lp_properties.pm3d_color);
+		check3d_for_variable_color(this_plot, this_plot->iso_crvs->points);
 		key_sample_fill(xl, yl, &this_plot->fill_properties);
 		break;
 
@@ -3253,7 +3256,6 @@ key_sample_fill(int xl, int yl, struct fill_style_type *fs)
     if (!(term->fillbox))
 	return;
     (term->layer)(TERM_LAYER_BEGIN_KEYSAMPLE);
-    apply_pm3dcolor(&fs->border_color);
     if (w > 0)
 	(term->fillbox)(style,x,y,w,h);
     (term->layer)(TERM_LAYER_END_KEYSAMPLE);
