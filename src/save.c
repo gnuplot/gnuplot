@@ -270,6 +270,7 @@ save_set_all(FILE *fp)
     else
 	fprintf(fp, "set boxwidth %g %s\n", boxwidth,
 		(boxwidth_is_absolute) ? "absolute" : "relative");
+    fprintf(fp, "set boxdepth %g\n", boxdepth > 0 ? boxdepth : 0.0);
 
     fprintf(fp, "set style fill ");
     save_fillstyle(fp, &default_fillstyle);

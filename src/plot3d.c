@@ -68,6 +68,7 @@ double dgrid3d_x_scale = 1.0;
 double dgrid3d_y_scale = 1.0;
 TBOOLEAN dgrid3d = FALSE;
 TBOOLEAN dgrid3d_kdensity = FALSE;
+double boxdepth = 0.0;
 
 /* static prototypes */
 

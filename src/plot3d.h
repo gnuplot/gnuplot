@@ -58,6 +58,7 @@ extern double dgrid3d_x_scale;
 extern double dgrid3d_y_scale;
 extern TBOOLEAN	dgrid3d;
 extern TBOOLEAN dgrid3d_kdensity;
+extern double boxdepth;
 
 /* prototypes from plot3d.c */
 

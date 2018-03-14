@@ -386,6 +386,9 @@ void pm3d_depth_queue_flush(void)
 		if (i == 0 || out.z > z)
 		    z = out.z;
 
+		/* 3D boxes want to be sorted on z of the base, not the mean z */
+		/* if (pm3d.direction == PM3D_DEPTH1) break; */
+
 #ifdef EXTENDED_COLOR_SPECS
 		gpiPtr->x = (unsigned int) ((out.x * xscaler / w) + xmiddle);
 		gpiPtr->y = (unsigned int) ((out.y * yscaler / w) + ymiddle);
@@ -1151,13 +1154,18 @@ pm3d_add_quadrangle(struct surface_points *plot, gpdPoint corners[4])
     q = quadrangles + current_quadrangle++;
     memcpy(q->corners, corners, 4*sizeof(gpdPoint));
 
+    /* FIXME: Apply lighting model if (pm3d_shade.strength > 0) */
+    /* FIXME: color_from_rgbvar need only be set once per plot */
     if (plot->pm3d_color_from_column) {
+	/* This is the usual path for 'splot with boxes' */
 	q->gray = plot->lp_properties.pm3d_color.lt;
-	color_from_rgbvar = TRUE;		/* FIXME: set once for the whole plot */
+	color_from_rgbvar = TRUE;
     } else if (plot->lp_properties.pm3d_color.type == TC_Z) {
-	q->gray = cb2gray(corners[1].z);	/* used only by 3D boxes */
+	/* This is a special case for 'splot with boxes lc palette z' */
+	q->gray = cb2gray(corners[1].z);
 	color_from_rgbvar = FALSE;
     } else {
+	/* This is the usual [only?] path for 'splot with zerror' */
 	q->border_color = &plot->fill_properties.border_color;
 	q->gray = PM3D_USE_BORDER_COLOR_INSTEAD_OF_GRAY;
     }

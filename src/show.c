@@ -222,6 +222,7 @@ show_command()
 	show_border();
 	break;
     case S_BOXWIDTH:
+    case S_BOXDEPTH:
 	show_boxwidth();
 	break;
     case S_CLIP:
@@ -1206,6 +1207,7 @@ show_boxwidth()
 	fprintf(stderr, "\tboxwidth is %g %s\n", boxwidth,
 		(boxwidth_is_absolute) ? "absolute" : "relative");
     }
+    fprintf(stderr, "\tboxdepth is %g\n", boxdepth);
 }
 
 /* process 'show boxplot' command */

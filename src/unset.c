@@ -65,6 +65,7 @@ static void unset_autoscale __PROTO((void));
 static void unset_bars __PROTO((void));
 static void unset_border __PROTO((void));
 static void unset_boxplot __PROTO((void));
+static void unset_boxdepth __PROTO((void));
 static void unset_boxwidth __PROTO((void));
 static void unset_fillstyle __PROTO((void));
 static void unset_clip __PROTO((void));
@@ -192,6 +193,9 @@ unset_command()
 	break;
     case S_BORDER:
 	unset_border();
+	break;
+    case S_BOXDEPTH:
+	unset_boxdepth();
 	break;
     case S_BOXWIDTH:
 	unset_boxwidth();
@@ -767,6 +771,14 @@ unset_boxplot()
 {
     boxplot_style defstyle = DEFAULT_BOXPLOT_STYLE;
     boxplot_opts = defstyle;
+}
+
+
+/* process 'unset boxdepth' command */
+static void
+unset_boxdepth()
+{
+    boxdepth = 0.0;
 }
 
 
@@ -1915,6 +1927,7 @@ reset_command()
     unset_timefmt();
 
     unset_boxplot();
+    unset_boxdepth();
     unset_boxwidth();
 
     clip_points = FALSE;

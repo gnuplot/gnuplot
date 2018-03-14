@@ -3525,17 +3525,22 @@ plot3d_zerrorfill(struct surface_points *plot)
 
 /*
  * 3D version of plot with boxes.
- * The boxes are drawn as pm3d rectangles, so depth-cueing, if needed
+ * The boxes are drawn as pm3d rectangles. This means that depth-cueing
  * must be done with "set pm3d depth" rather than with "set hidden3d".
- * Note:  I tried drawing real boxes (4 sides + top) but the extensive
- * overlap of z ranges makes z-based depth ordering fail badly.
+ * By default only a flat rectangle is drawn.  "set boxdepth <depth>"
+ * changes this to draw real boxes (4 sides + top).  Unfortunately the
+ * extensive overlap of z ranges makes the use of mean z value by
+ * the existing depthorder sorting come out badly.
+ * FIXME: alternative sorting option is needed.
+ * FIXME: the sides and top would benefit from either shading or
+ *        use of an alternate color (maybe the fillstyle border color?)
  */
 static void
 plot3d_boxes(struct surface_points *plot)
 {
     int i;			/* point index */
     double dxl, dxh;		/* rectangle extent along X axis */
-    double dy;			/* rectangle position along Y axis */
+    double dyl, dyh;		/* rectangle extent along Y axis */
     double zbase, dz;		/* box base and height */
     fill_style_type save_fillstyle;
 
@@ -3552,20 +3557,28 @@ plot3d_boxes(struct surface_points *plot)
 
 	    dxh = points[i].xhigh;
 	    dxl = points[i].xlow;
-	    dy  = points[i].y;
+	    dyl = points[i].y;
+	    dyh = points[i].y;
 	    dz = points[i].z;
+
+	    /* Box is out of range on y */
+	    if ((dyl > Y_AXIS.min && dyl > Y_AXIS.max)
+	    ||  (dyl < Y_AXIS.min && dyl < Y_AXIS.max))
+		continue;
+
+	    if (boxdepth > 0) {
+		dyl -= boxdepth / 2.;
+		dyh += boxdepth / 2.;
+		cliptorange(dyl, Y_AXIS.min, Y_AXIS.max);
+		cliptorange(dyh, Y_AXIS.min, Y_AXIS.max);
+	    }
 
 	    /* clip to border */
 	    cliptorange(dxl, X_AXIS.min, X_AXIS.max);
 	    cliptorange(dxh, X_AXIS.min, X_AXIS.max);
-	    cliptorange(dy, Y_AXIS.min, Y_AXIS.max);
 
 	    /* Entire box is out of range on x */
 	    if (dxl == dxh && (dxl == X_AXIS.min || dxl == X_AXIS.max))
-		continue;
-
-	    /* Entire box is out of range on y */
-	    if (dy < Y_AXIS.min || dy > Y_AXIS.max)
 		continue;
 
 	    zbase = 0;
@@ -3575,15 +3588,42 @@ plot3d_boxes(struct surface_points *plot)
 	    if (plot->pm3d_color_from_column)
 		plot->lp_properties.pm3d_color.lt =  points[i].CRD_COLOR;
 
-	    /* Construct and store single pm3d rectangle */
+	    /* Construct and store single pm3d rectangle (front of box) */
 	    /* Z	corner1	corner2	*/
 	    /* 0	corner0 corner3 */
 	    corner[0].x = corner[1].x = dxl;
 	    corner[2].x = corner[3].x = dxh;
-	    corner[0].y = corner[1].y = corner[2].y = corner[3].y = dy;
+	    corner[0].y = corner[1].y = corner[2].y = corner[3].y = dyl;
 	    corner[0].z = corner[3].z = zbase;
 	    corner[1].z = corner[2].z = dz;
 	    pm3d_add_quadrangle(plot, corner);
+
+	    /* The normal case is to draw the front only (boxdepth = 0) */
+	    if (boxdepth <= 0)
+		continue;
+
+	    /* Back side of the box */
+	    corner[0].y = corner[1].y = corner[2].y = corner[3].y = dyh;
+	    pm3d_add_quadrangle(plot, corner);
+
+	    /* Left side of box */
+	    corner[2].x = corner[3].x = dxl;
+	    corner[0].y = corner[1].y = dyl;
+	    corner[0].z = corner[3].z = zbase;
+	    corner[1].z = corner[2].z = dz;
+	    pm3d_add_quadrangle(plot, corner);
+
+	    /* Right side of box */
+	    corner[0].x = corner[1].x = corner[2].x = corner[3].x = dxh;
+	    pm3d_add_quadrangle(plot, corner);
+
+	    /* Top of box */
+	    corner[0].x = corner[1].x = dxl;
+	    corner[0].y = corner[3].y = dyl;
+	    corner[1].y = corner[2].y = dyh;
+	    corner[0].z = corner[3].z = dz;
+	    pm3d_add_quadrangle(plot, corner);
+
 	}	/* loop over points */
 
 	icrvs = icrvs->next;

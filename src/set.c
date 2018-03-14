@@ -80,6 +80,7 @@ static void set_autoscale __PROTO((void));
 static void set_bars __PROTO((void));
 static void set_border __PROTO((void));
 static void set_boxplot __PROTO((void));
+static void set_boxdepth __PROTO((void));
 static void set_boxwidth __PROTO((void));
 static void set_clabel __PROTO((void));
 static void set_clip __PROTO((void));
@@ -236,6 +237,9 @@ set_command()
 	    break;
 	case S_BORDER:
 	    set_border();
+	    break;
+	case S_BOXDEPTH:
+	    set_boxdepth();
 	    break;
 	case S_BOXWIDTH:
 	    set_boxwidth();
@@ -1138,6 +1142,15 @@ set_boxplot()
 
 }
 
+/* process 'set boxdepth' command (used by splot with boxes) */
+static void
+set_boxdepth()
+{
+    c_token++;
+    boxdepth = 0.0;
+    if (!END_OF_COMMAND)
+    	boxdepth = real_expression();
+}
 
 /* process 'set boxwidth' command */
 static void
