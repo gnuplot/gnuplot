@@ -211,6 +211,7 @@ C
 4 New plot styles and style options
 #start
 #bPlot style `with circles` can be used in 3D plots.
+#bPlot style `with boxes` can be used in 3D plots.
 #bCustomized contour line types. See `set cntrparam`.
 #end
 
@@ -3447,31 +3448,39 @@ Ffigure_boxerrorbars
 ?style boxes
 ?with boxes
 ?boxes
- The `boxes` style is only relevant to 2D plotting.  It draws a box centered
- about the given x coordinate that extends from the x axis (not from the graph
- border) to the given y coordinate.  It uses 2 or 3 columns of basic data.
- Additional input columns may be used to provide information such as
- variable line or fill color (see `rgbcolor variable`).
+ In 2D plots the `boxes` style draws a rectangle centered about the given
+ x coordinate that extends from the x axis, i.e. from y=0 not from the graph
+ border, to the given y coordinate.  The width of the box can be provided in
+ an additional input column or controlled by `set boxwidth`.  Otherwise each
+ box extends to touch the adjacent boxes.
+
+ In 3D plots the `boxes` style draws a box centered at the given [x,y]
+ coordinate that extends from the plane at z=0 to the given z coordinate.
+ The width of the box on x can be provided in a separate input column or via
+ `set boxwidth`.  The depth of the box on y is controlled by `set boxdepth`.
+ Boxes do not automatically expand to touch each other as in 2D plots.
+3 2D boxes
+?style boxes 2D
+?boxes 2D
+
+ `plot with boxes` uses 2 or 3 columns of basic data.  Additional input columns
+ may be used to provide information such as variable line or fill color.
+ See `rgbcolor variable`.
 
       2 columns:  x  y
       3 columns:  x  y  x_width
 
 Ffigure_boxes
  The width of the box is obtained in one of three ways.  If the input data has a
- third column, this will be used to set the width of the box.  If not, if a
- width has been set using the `set boxwidth` command, this will be used.
- If neither of these is available, the width of each box will be calculated
- automatically so that it touches the adjacent boxes.
+ third column, this will be used to set the box width.  Otherwise if a width has
+ been set using the `set boxwidth` command, this will be used.  If neither of
+ these is available, the width of each box will be calculated so that it touches
+ the adjacent boxes.
 
  The interior of the boxes is drawn according to the current fillstyle.
- See `set style fill` for details.  Alternatively a new fillstyle
- may be specified in the plot command.
- For fillstyle `empty` the box is not filled.
- For fillstyle `solid` the box is filled with a solid rectangle of the
- current drawing color. An optional fillstyle parameter controls the fill density;
- it runs from 0 (background color) to 1 (current drawing color).
- For fillstyle `pattern` the box is filled in the current drawing color with
- a pattern.
+ Alternatively a fillstyle may be specified in the plot command.
+ See `set style fill`.
+ If no fillcolor is given in the plot command, the current line color is used.
 
  Examples:
 
@@ -3491,13 +3500,46 @@ Ffigure_boxes
  Any additional plots would cycle through the patterns supported by the
  terminal driver.
 
- To specify explicit fillstyles for each dataset:
+ To specify explicit fillstyles and fillcolors for each dataset:
 
-      plot 'file1' with boxes fs solid 0.25, \
-           'file2' with boxes fs solid 0.50, \
-           'file3' with boxes fs solid 0.75, \
+      plot 'file1' with boxes fs solid 0.25 fc 'cyan', \
+           'file2' with boxes fs solid 0.50 fc 'blue', \
+           'file3' with boxes fs solid 0.75 fc 'magenta', \
            'file4' with boxes fill pattern 1, \
            'file5' with boxes fill empty
+3 3D boxes
+?style boxes 3D
+?boxes 3D
+
+ `splot with boxes` requires at least 3 columns of input data.  Additional
+ input columns may be used to provide information such as box width or
+ fill color.
+
+      3 columns:  x  y  z
+      4 columns:  x  y  z  [x_width or color]
+      5 columns:  x  y  z  x_width  color
+
+ The last column is used as a color only if the splot command specifies a
+ variable color mode.  Examples
+
+      splot 'blue_boxes.dat' using 1:2:3 fc "blue"
+      splot 'rgb_boxes.dat' using 1:2:3:4 fc rgb variable
+      splot 'category_boxes.dat' using 1:2:3:4:5 lc variable
+
+ In the first example all boxes are blue and have the width previously set
+ by `set boxwidth`.  In the second example the box width is still taken from
+ `set boxwidth` because the 4th column is interpreted as a 24-bit RGB color.
+ The third example command reads box width from column 4 and interprets the
+ value in column 5 as an integer linetype from which the color is derived.
+
+ By default boxes have no thickness; they consist of a single rectangle at the
+ specified y coordinate.  You can change this to a true box with four sides and
+ a top by setting a non-zero extent on y.  See `set boxdepth`.
+
+ 3D boxes are processed as pm3d quadrangles rather than as surfaces. Because of
+ this the front/back order of drawing is not affected by `set hidden3d`.
+ For best results use a combition of `set pm3d depthorder base` and
+ `set pm3d lighting`.  See `set pm3d`.
 
 2 boxplot
 ?plotting styles boxplot
@@ -8303,6 +8345,14 @@ Ffigure_fenceplot
 
  To set the box width to an absolute value of 2 use
        set boxwidth 2 absolute
+3 boxdepth
+?commands set boxdepth
+?commands show boxdepth
+?set boxdepth
+?show boxdepth
+?boxdepth
+ The `set boxdepth` command affects only 3D plots created by `splot with boxes`.
+ It sets the extent of each box along the y axis, i.e. its thickness.
 3 color
 ?commands set color
 ?set color
@@ -12084,7 +12134,8 @@ Ffigure_multiple_keys
        set pm3d {
                   { at <position> }
                   { interpolate <steps/points in scan, between scans> }
-                  { scansautomatic | scansforward | scansbackward | depthorder }
+                  { scansautomatic | scansforward | scansbackward
+                                   | depthorder {base} }
                   { flush { begin | center | end } }
                   { ftriangles | noftriangles }
                   { clip1in | clip4in }
@@ -12247,6 +12298,17 @@ Ffigure_multiple_keys
  The `depthorder` option orders the solid quadrangles; the `hidden3d` option
  similarly orders the bounding lines (if drawn).  Note that the global option
  `set hidden3d` does not affect pm3d surfaces.
+
+ The `depthorder` option by itself tends to produce bad results when
+ applied to the long thin rectangles generated by `splot with boxes`.
+ It works better to add the keyword `base`, which performs the depth sort
+ using the intersection of the box with the plane at z=0.  This type of
+ plot is further improved by adding a lighing model.
+ Example:
+      set pm3d depthorder base
+      set pm3d lighting
+      set boxdepth 0.4
+      splot $DATA using 1:2:3 with boxes
 
 4 clipping
 ?pm3d clipping

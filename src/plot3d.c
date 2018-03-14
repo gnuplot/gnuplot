@@ -777,6 +777,7 @@ get_3ddata(struct surface_points *this_plot)
 	struct coordinate GPHUGE *cp;
 	struct coordinate GPHUGE *cphead = NULL; /* Only for VECTOR plots */
 	double x, y, z;
+	double xlow = 0, xhigh = 0;
 	double xtail, ytail, ztail;
 	double zlow = VERYLARGE, zhigh = -VERYLARGE;
 	double color = VERYLARGE;
@@ -1053,6 +1054,28 @@ get_3ddata(struct surface_points *this_plot)
 		color_from_column(FALSE);
 		track_pm3d_quadrangles = TRUE;
 
+	    } else if (this_plot->plot_style == BOXES) {
+		/* Pop last using value to use as variable color */
+		if (this_plot->fill_properties.border_color.type == TC_RGB
+		&&  this_plot->fill_properties.border_color.value < 0) {
+		    color_from_column(TRUE);
+		    color = v[--j];
+		} else if (this_plot->lp_properties.l_type == LT_COLORFROMCOLUMN) {
+		    struct lp_style_type lptmp;
+		    color_from_column(TRUE);
+		    load_linetype(&lptmp, (int)v[--j]);
+		    color = lptmp.pm3d_color.lt;
+		}
+
+		if (j >= 4) {
+		    xlow = x - v[3]/2.;
+		    xhigh = x + v[3]/2.;
+		} else {
+		    xlow = x - boxwidth/2.;
+		    xhigh = x + boxwidth/2.;;
+		}
+		track_pm3d_quadrangles = TRUE;
+
 	    } else {	/* all other plot styles */
 		if (j >= 4) {
 		    color = v[3];
@@ -1109,6 +1132,11 @@ get_3ddata(struct surface_points *this_plot)
 				this_plot->noautoscale, goto come_here_if_undefined);
 		}
 
+		if (this_plot->plot_style == BOXES) {
+		    STORE_AND_UPDATE_RANGE(cp->xlow, xlow, cp->type, x_axis, this_plot->noautoscale, goto come_here_if_undefined);
+		    STORE_AND_UPDATE_RANGE(cp->xhigh, xhigh, cp->type, x_axis, this_plot->noautoscale, goto come_here_if_undefined);
+		}
+
 		if (this_plot->plot_style == VECTOR)
 		    STORE_AND_UPDATE_RANGE(cphead->z, ztail, cphead->type, z_axis,
 				this_plot->noautoscale, goto come_here_if_undefined);
@@ -1147,6 +1175,7 @@ get_3ddata(struct surface_points *this_plot)
 	come_here_if_undefined:
 	    /* some may complain, but I regard this as the correct use of goto */
 	    ++xdatum;
+
 	}			/* end of whileloop - end of surface */
 
 	/* We are finished reading user input; return to C locale for internal use */
@@ -1760,6 +1789,12 @@ eval_3dplots()
 		/* Some plots have a fill style as well */
 		if ((this_plot->plot_style & PLOT_STYLE_HAS_FILL) && !set_fillstyle){
 		    int stored_token = c_token;
+		    if (equals(c_token,"fs") || almost_equals(c_token,"fill$style")) {
+			parse_fillstyle(&this_plot->fill_properties,
+				default_fillstyle.fillstyle, default_fillstyle.filldensity,
+				1, this_plot->lp_properties.pm3d_color);
+			set_fillstyle = TRUE;
+		    }
 		    if (equals(c_token,"fc") || almost_equals(c_token,"fillc$olor")) {
 			parse_colorspec(&this_plot->fill_properties.border_color, TC_RGB);
 			set_fillstyle = TRUE;
@@ -1971,7 +2006,10 @@ eval_3dplots()
 		df_close();
 
 		/* Plot-type specific range-fiddling */
-		if (this_plot->plot_style == IMPULSES && !axis_array[FIRST_Z_AXIS].log) {
+		if (!axis_array[FIRST_Z_AXIS].log
+		&&  (this_plot->plot_style == IMPULSES
+		    || this_plot->plot_style == BOXES))
+		{
 		    if (axis_array[FIRST_Z_AXIS].autoscale & AUTOSCALE_MIN) {
 			if (axis_array[FIRST_Z_AXIS].min > 0)
 			    axis_array[FIRST_Z_AXIS].min = 0;

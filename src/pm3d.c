@@ -1136,7 +1136,7 @@ pm3d_draw_one(struct surface_points *plot)
 
 /*
  * Add one pm3d quadrangle to the mix.
- * Called by zerrorfill().
+ * Called by zerrorfill() and by plot3d_boxes().
  */
 void
 pm3d_add_quadrangle(struct surface_points *plot, gpdPoint corners[4])
@@ -1145,12 +1145,22 @@ pm3d_add_quadrangle(struct surface_points *plot, gpdPoint corners[4])
 
     if (allocated_quadrangles < current_quadrangle + plot->iso_crvs->p_count) {
 	allocated_quadrangles += 2 * plot->iso_crvs->p_count;
-	quadrangles = (quadrangle*)gp_realloc(quadrangles, allocated_quadrangles * sizeof (quadrangle), "pm3d_plot->quadrangles");
+	quadrangles = gp_realloc(quadrangles,
+		allocated_quadrangles * sizeof(quadrangle), "pm3d_add_quadrangle");
     }
     q = quadrangles + current_quadrangle++;
     memcpy(q->corners, corners, 4*sizeof(gpdPoint));
-    q->border_color = &plot->fill_properties.border_color;
-    q->gray = PM3D_USE_BORDER_COLOR_INSTEAD_OF_GRAY;
+
+    if (plot->pm3d_color_from_column) {
+	q->gray = plot->lp_properties.pm3d_color.lt;
+	color_from_rgbvar = TRUE;		/* FIXME: set once for the whole plot */
+    } else if (plot->lp_properties.pm3d_color.type == TC_Z) {
+	q->gray = cb2gray(corners[1].z);	/* used only by 3D boxes */
+	color_from_rgbvar = FALSE;
+    } else {
+	q->border_color = &plot->fill_properties.border_color;
+	q->gray = PM3D_USE_BORDER_COLOR_INSTEAD_OF_GRAY;
+    }
 }
 
 /* Display an error message for the routine get_pm3d_at_option() below.

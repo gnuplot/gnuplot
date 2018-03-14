@@ -116,8 +116,8 @@ static void plot3d_impulses __PROTO((struct surface_points * plot));
 static void plot3d_lines __PROTO((struct surface_points * plot));
 static void plot3d_points __PROTO((struct surface_points * plot));
 static void plot3d_zerrorfill __PROTO((struct surface_points * plot));
+static void plot3d_boxes __PROTO((struct surface_points * plot));
 static void plot3d_vectors __PROTO((struct surface_points * plot));
-/* no pm3d for impulses */
 static void plot3d_lines_pm3d __PROTO((struct surface_points * plot));
 static void get_surface_cbminmax __PROTO((struct surface_points *plot, double *cbmin, double *cbmax));
 static void cntr3d_impulses __PROTO((struct gnuplot_contours * cntr,
@@ -965,6 +965,7 @@ do_3dplot(
      * really deserves this warning. But don't show it too often --- only if it
      * is a single surface in the plot.
      */
+    if (plots->plot_style != BOXES)
     if (pcount == 1 && plots->num_iso_read == 1 && can_pm3d &&
 	(plots->plot_style == PM3DSURFACE || PM3D_IMPLICIT == pm3d.implicit))
 	    fprintf(stderr, "  Warning: Single isoline (scan) is not enough for a pm3d plot.\n\t   Hint: Missing blank lines in the data file? See 'help pm3d' and FAQ.\n");
@@ -1029,7 +1030,6 @@ do_3dplot(
 	    /* First draw the graph plot itself */
 	    if (!key_pass)
 	    switch (this_plot->plot_style) {
-	    case BOXES:		/* can't do boxes in 3d yet so use impulses */
 	    case FILLEDCURVES:	/* same, but maybe we could dummy up ZERRORFILL? */
 	    case IMPULSES:
 		if (!hidden3d)
@@ -1089,6 +1089,13 @@ do_3dplot(
 		plot3d_lines(this_plot);
 		break;
 
+	    case BOXES:
+		if (term->filled_polygon)
+		    plot3d_boxes(this_plot);
+		else
+		    plot3d_impulses(this_plot);
+		break;
+
 	    case PM3DSURFACE:
 		if (draw_this_surface) {
 		    if (can_pm3d && PM3D_IMPLICIT != pm3d.implicit) {
@@ -1140,7 +1147,6 @@ do_3dplot(
 	    if (lkey
 	    &&  (!this_plot->title_position || this_plot->title_position->scalex != character))
 	    switch (this_plot->plot_style) {
-	    case BOXES:	/* can't do boxes in 3d yet so use impulses */
 	    case FILLEDCURVES:
 	    case IMPULSES:
 		if (!(hidden3d && draw_this_surface))
@@ -1206,6 +1212,10 @@ do_3dplot(
 		key_sample_fill(xl, yl, &this_plot->fill_properties);
 		term_apply_lp_properties(&this_plot->lp_properties);
 		key_sample_line(xl, yl);
+		break;
+
+	    case BOXES:
+		key_sample_fill(xl, yl, &this_plot->fill_properties);
 		break;
 
 	    case PLOT_STYLE_NONE:
@@ -1278,7 +1288,6 @@ do_3dplot(
 			    case IMPULSES:
 			    case LINES:
 			    case LINESPOINTS:
-			    case BOXES:
 			    case FILLEDCURVES:
 			    case VECTOR:
 			    case STEPS:
@@ -1462,15 +1471,10 @@ plot3d_impulses(struct surface_points *plot)
 	    switch (points[i].type) {
 	    case INRANGE:
 		{
+		    double z = 0.0;
 		    map3d_xy(points[i].x, points[i].y, points[i].z, &x, &y);
-
-		    if (inrange(0.0, Z_AXIS.min, Z_AXIS.max)) {
-			map3d_xy(points[i].x, points[i].y, 0.0, &xx0, &yy0);
-		    } else if (inrange(Z_AXIS.min, 0.0, points[i].z)) {
-			map3d_xy(points[i].x, points[i].y, Z_AXIS.min, &xx0, &yy0);
-		    } else {
-			map3d_xy(points[i].x, points[i].y, Z_AXIS.max, &xx0, &yy0);
-		    }
+		    cliptorange(z, Z_AXIS.min, Z_AXIS.max);
+		    map3d_xy(points[i].x, points[i].y, z, &xx0, &yy0);
 
 		    clip_move(xx0, yy0);
 		    clip_vector(x, y);
@@ -3516,6 +3520,88 @@ plot3d_zerrorfill(struct surface_points *plot)
 	pm3d_depth_queue_flush();
 
 }
+
+/*
+ * 3D version of plot with boxes.
+ * The boxes are drawn as pm3d rectangles, so depth-cueing, if needed
+ * must be done with "set pm3d depth" rather than with "set hidden3d".
+ * Note:  I tried drawing real boxes (4 sides + top) but the extensive
+ * overlap of z ranges makes z-based depth ordering fail badly.
+ */
+static void
+plot3d_boxes(struct surface_points *plot)
+{
+    int i;			/* point index */
+    double dxl, dxh;		/* rectangle extent along X axis */
+    double dy;			/* rectangle position along Y axis */
+    double zbase, dz;		/* box base and height */
+    fill_style_type save_fillstyle;
+
+    struct iso_curve *icrvs = plot->iso_crvs;
+    gpdPoint corner[4];
+
+    while (icrvs) {
+	struct coordinate *points = icrvs->points;
+
+	for (i = 0; i < icrvs->p_count; i++) {
+
+	    if (points[i].type == UNDEFINED)
+		continue;
+
+	    dxh = points[i].xhigh;
+	    dxl = points[i].xlow;
+	    dy  = points[i].y;
+	    dz = points[i].z;
+
+	    /* clip to border */
+	    cliptorange(dxl, X_AXIS.min, X_AXIS.max);
+	    cliptorange(dxh, X_AXIS.min, X_AXIS.max);
+	    cliptorange(dy, Y_AXIS.min, Y_AXIS.max);
+
+	    /* Entire box is out of range on x */
+	    if (dxl == dxh && (dxl == X_AXIS.min || dxl == X_AXIS.max))
+		continue;
+
+	    /* Entire box is out of range on y */
+	    if (dy < Y_AXIS.min || dy > Y_AXIS.max)
+		continue;
+
+	    zbase = 0;
+	    cliptorange(zbase, Z_AXIS.min, Z_AXIS.max);
+
+	    /* Copy variable color value into plot header for pm3d_add_quadrangle */
+	    if (plot->pm3d_color_from_column)
+		plot->lp_properties.pm3d_color.lt =  points[i].CRD_COLOR;
+
+	    /* Construct and store single pm3d rectangle */
+	    /* Z	corner1	corner2	*/
+	    /* 0	corner0 corner3 */
+	    corner[0].x = corner[1].x = dxl;
+	    corner[2].x = corner[3].x = dxh;
+	    corner[0].y = corner[1].y = corner[2].y = corner[3].y = dy;
+	    corner[0].z = corner[3].z = zbase;
+	    corner[1].z = corner[2].z = dz;
+	    pm3d_add_quadrangle(plot, corner);
+	}	/* loop over points */
+
+	icrvs = icrvs->next;
+    }
+
+    /* The only way to get the pm3d flush code to see our fill style */
+    /* is to temporarily copy it to the global fillstyle.            */
+    save_fillstyle = default_fillstyle;
+    default_fillstyle = plot->fill_properties;
+
+    /* By default we write out each set of boxes as it is seen.      */
+    /* To depth-sort the boxes we must let them accummulate and then */
+    /* sort them together with all other pm3d elements to draw later */
+    if (pm3d.direction != PM3D_DEPTH)
+	pm3d_depth_queue_flush();
+
+    /* Restore global fillstyle */
+    default_fillstyle = save_fillstyle;
+}
+
 
 static void
 check3d_for_variable_color(struct surface_points *plot, struct coordinate *point)
