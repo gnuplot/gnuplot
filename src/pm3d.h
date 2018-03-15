@@ -107,6 +107,7 @@ typedef struct {
   char ftriangles;   	/* 0/1 (don't) draw flushing triangles */
   char clip;		/* 1in, 4in */
   pm3d_scandir direction;
+  TBOOLEAN base_sort;	/* default: depth sort by mean Z;  true: use Z at base */
   PM3D_IMPL_MODE implicit;
 			/* 1: [default] draw ALL surfaces with pm3d
 			   0: only surfaces specified with 'with pm3d' */
@@ -152,6 +153,7 @@ void pm3d_depth_queue_flush __PROTO((void));
 void pm3d_reset __PROTO((void));
 void pm3d_draw_one __PROTO((struct surface_points* plots));
 void pm3d_add_quadrangle __PROTO((struct surface_points* plot, gpdPoint *corners));
+void pm3d_init_lighting_model __PROTO((void));
 double z2cb_with_logs __PROTO((double z));
 double cb2gray __PROTO((double cb));
 void

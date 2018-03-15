@@ -3547,6 +3547,9 @@ plot3d_boxes(struct surface_points *plot)
     struct iso_curve *icrvs = plot->iso_crvs;
     gpdPoint corner[4];
 
+    if (pm3d_shade.strength > 0)
+	pm3d_init_lighting_model();
+
     while (icrvs) {
 	struct coordinate *points = icrvs->points;
 
@@ -3629,16 +3632,19 @@ plot3d_boxes(struct surface_points *plot)
 	icrvs = icrvs->next;
     }
 
-    /* The only way to get the pm3d flush code to see our fill style */
-    /* is to temporarily copy it to the global fillstyle.            */
+    /* FIXME The only way to get the pm3d flush code to see our fill */
+    /* style is to temporarily copy it to the global fillstyle.      */
     save_fillstyle = default_fillstyle;
     default_fillstyle = plot->fill_properties;
 
-    /* By default we write out each set of boxes as it is seen.      */
-    /* To depth-sort the boxes we must let them accummulate and then */
-    /* sort them together with all other pm3d elements to draw later */
-    if (pm3d.direction != PM3D_DEPTH)
+    /* By default we write out each set of boxes as it is seen.  */
+    /* The other option is to let them accummulate and then sort */
+    /* them together with all other pm3d elements to draw later. */
+    if (pm3d.direction != PM3D_DEPTH) {
+	pm3d.base_sort = TRUE;
 	pm3d_depth_queue_flush();
+	pm3d.base_sort = FALSE;
+    }
 
     /* Restore global fillstyle */
     default_fillstyle = save_fillstyle;

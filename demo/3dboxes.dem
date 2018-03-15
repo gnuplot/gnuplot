@@ -5,6 +5,7 @@ set boxwidth 0.4 abs
 set xyplane at 0
 set grid z vertical lw 1.0
 set yrange [0:6]
+set view 59, 24
 
 rgbfudge(x) = x*51*32768 + (11-x)*51*128 + int(abs(5.5-x)*510/9.)
 ti(col) = sprintf("%d",col)
@@ -13,37 +14,41 @@ set title '3D Boxes'
 splot for [col=5:4:-1] 'candlesticks.dat' using 1:(col):col \
       with boxes title ti(col)
 
-pause -1 "<cr> to continue"
+pause -1 "hit return to continue"
 
 set title 'lc variable (from column 1)'
 splot for [col=5:4:-1] 'candlesticks.dat' using 1:(col):col:1 \
       with boxes title ti(col) lc variable
 
-pause -1 "<cr> to continue"
+pause -1 "hit return to continue"
 
 set title 'lc rgb variable'
 splot for [col=5:4:-1] 'candlesticks.dat' using 1:(col):(col*column(col)):(rgbfudge($1)) \
       with boxes title ti(col) lc rgb variable
 
-pause -1 "<cr> to continue"
+pause -1 "hit return to continue"
 
-set title 'transparent boxes'
-set style fill transparent solid 0.5
-splot for [col=5:4:-1] 'candlesticks.dat' using 1:(col):(col*column(col)):(rgbfudge($1)) \
-      with boxes title ti(col) fc rgb variable
+set title "transparent boxes with imperfect depth sorting"
+unset key
+set style fill transparent solid 0.7
+set pm3d depthorder
+set grid x y z vertical
+splot for [col=1:5] 'candlesticks.dat' using 1:(col):(col*column(col)):(rgbfudge($1)) \
+      with boxes fc rgb variable
 
-pause -1 "<cr> to continue"
+pause -1 "hit return to continue"
 
-set title 'in-line fill style'
-set style fill transparent solid 1.0
-splot for [col=5:4:-1] 'candlesticks.dat' using 1:(col):(col*column(col)) \
-      with boxes title ti(col) fs transparent solid 0.7
+set title "give the boxes a 3D depth and correct depth sorting"
+set style fill solid
+set boxdepth 0.3
+set pm3d depthorder base
+replot
 
-pause -1 "<cr> to continue"
+pause -1 "hit return to continue"
 
-set title 'in-line fill style with variable fill color'
-set style fill transparent solid 0.5
-splot for [col=5:4:-1] 'candlesticks.dat' using 1:(col):(col*column(col)):(rgbfudge($1)) \
-      with boxes title ti(col) fs transparent solid 0.7 fc rgb variable
+set title 'Full treatment: 3D boxes with pm3d depth sorting and lighting'
+set pm3d lighting
+replot
 
-pause -1 "<cr> to continue"
+pause -1 "hit return to continue"
+reset

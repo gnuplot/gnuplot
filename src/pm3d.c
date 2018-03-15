@@ -41,9 +41,10 @@ pm3d_struct pm3d = {
     "s",			/* where[6] */
     PM3D_FLUSH_BEGIN,		/* flush */
     0,				/* no flushing triangles */
-    PM3D_SCANS_AUTOMATIC,	/* scans direction is determined automatically */
     PM3D_CLIP_4IN,		/* clipping: all 4 points in ranges */
-    PM3D_EXPLICIT,		/* implicit */
+    PM3D_SCANS_AUTOMATIC,	/* scan direction is determined automatically */
+    FALSE,			/* depth sort using mean z (false) or base z (true) */
+    PM3D_EXPLICIT,		/* use pm3d only if asked */
     PM3D_WHICHCORNER_MEAN,	/* color from which corner(s) */
     1,				/* interpolate along scanline */
     1,				/* interpolate between scanlines */
@@ -78,6 +79,7 @@ static void pm3d_plot __PROTO((struct surface_points *, int));
 static void pm3d_option_at_error __PROTO((void));
 static void pm3d_rearrange_part __PROTO((struct iso_curve *, const int, struct iso_curve ***, int *));
 static int apply_lighting_model __PROTO(( struct coordinate *, struct coordinate *, struct coordinate *, struct coordinate *, double gray ));
+static void illuminate_one_quadrangle __PROTO(( quadrangle *q ));
 
 static TBOOLEAN color_from_rgbvar = FALSE;
 static double light[3];
@@ -380,15 +382,13 @@ void pm3d_depth_queue_flush(void)
 #endif
 
 	    for (i = 0; i < 4; i++, gpdPtr++) {
-
-		map3d_xyz(gpdPtr->x, gpdPtr->y, gpdPtr->z, &out);
-
+		/* 3D boxes want to be sorted on z of the base, not the mean z */
+		if (pm3d.base_sort)
+		    map3d_xyz(gpdPtr->x, gpdPtr->y, 0.0, &out);
+		else
+		    map3d_xyz(gpdPtr->x, gpdPtr->y, gpdPtr->z, &out);
 		if (i == 0 || out.z > z)
 		    z = out.z;
-
-		/* 3D boxes want to be sorted on z of the base, not the mean z */
-		/* if (pm3d.direction == PM3D_DEPTH1) break; */
-
 #ifdef EXTENDED_COLOR_SPECS
 		gpiPtr->x = (unsigned int) ((out.x * xscaler / w) + xmiddle);
 		gpiPtr->y = (unsigned int) ((out.y * yscaler / w) + ymiddle);
@@ -1080,8 +1080,9 @@ pm3d_reset()
     strcpy(pm3d.where, "s");
     pm3d.flush = PM3D_FLUSH_BEGIN;
     pm3d.ftriangles = 0;
-    pm3d.direction = PM3D_SCANS_AUTOMATIC;
     pm3d.clip = PM3D_CLIP_4IN;
+    pm3d.direction = PM3D_SCANS_AUTOMATIC;
+    pm3d.base_sort = FALSE;
     pm3d.implicit = PM3D_EXPLICIT;
     pm3d.which_corner_color = PM3D_WHICHCORNER_MEAN;
     pm3d.interp_i = 1;
@@ -1109,11 +1110,8 @@ pm3d_draw_one(struct surface_points *plot)
 	return;
 
     /* Initialize lighting model */
-    if (pm3d_shade.strength > 0) {
-	light[0] = cos(-DEG2RAD*pm3d_shade.rot_x)*cos(-(DEG2RAD*pm3d_shade.rot_z+90));
-	light[2] = cos(-DEG2RAD*pm3d_shade.rot_x)*sin(-(DEG2RAD*pm3d_shade.rot_z+90));
-	light[1] = sin(-DEG2RAD*pm3d_shade.rot_x);
-    }
+    if (pm3d_shade.strength > 0)
+	pm3d_init_lighting_model();
 
     for (; where[i]; i++) {
 	pm3d_plot(plot, where[i]);
@@ -1154,12 +1152,14 @@ pm3d_add_quadrangle(struct surface_points *plot, gpdPoint corners[4])
     q = quadrangles + current_quadrangle++;
     memcpy(q->corners, corners, 4*sizeof(gpdPoint));
 
-    /* FIXME: Apply lighting model if (pm3d_shade.strength > 0) */
+    /* FIXME: move lighting model into a subroutine */
     /* FIXME: color_from_rgbvar need only be set once per plot */
     if (plot->pm3d_color_from_column) {
 	/* This is the usual path for 'splot with boxes' */
 	q->gray = plot->lp_properties.pm3d_color.lt;
 	color_from_rgbvar = TRUE;
+	if (pm3d_shade.strength > 0)
+	    illuminate_one_quadrangle(q);
     } else if (plot->lp_properties.pm3d_color.type == TC_Z) {
 	/* This is a special case for 'splot with boxes lc palette z' */
 	q->gray = cb2gray(corners[1].z);
@@ -1309,6 +1309,37 @@ TBOOLEAN
 is_plot_with_colorbox()
 {
     return plot_has_palette && (color_box.where != SMCOLOR_BOX_NO);
+}
+
+/*
+ * Must be called before trying to apply lighting model
+ */
+void
+pm3d_init_lighting_model()
+{
+    light[0] = cos(-DEG2RAD*pm3d_shade.rot_x)*cos(-(DEG2RAD*pm3d_shade.rot_z+90));
+    light[2] = cos(-DEG2RAD*pm3d_shade.rot_x)*sin(-(DEG2RAD*pm3d_shade.rot_z+90));
+    light[1] = sin(-DEG2RAD*pm3d_shade.rot_x);
+}
+
+/*
+ * Layer on layer of coordinate conventions
+ */
+static void
+illuminate_one_quadrangle( quadrangle *q )
+{
+    struct coordinate c1, c2, c3, c4;
+    vertex vtmp;
+
+    map3d_xyz(q->corners[0].x, q->corners[0].y, q->corners[0].z, &vtmp);
+    c1.x = vtmp.x; c1.y = vtmp.y; c1.z = vtmp.z;
+    map3d_xyz(q->corners[1].x, q->corners[1].y, q->corners[1].z, &vtmp);
+    c2.x = vtmp.x; c2.y = vtmp.y; c2.z = vtmp.z;
+    map3d_xyz(q->corners[2].x, q->corners[2].y, q->corners[2].z, &vtmp);
+    c3.x = vtmp.x; c3.y = vtmp.y; c3.z = vtmp.z;
+    map3d_xyz(q->corners[3].x, q->corners[3].y, q->corners[3].z, &vtmp);
+    c4.x = vtmp.x; c4.y = vtmp.y; c4.z = vtmp.z;
+    q->gray = apply_lighting_model( &c1, &c2, &c3, &c4, q->gray);
 }
 
 /*

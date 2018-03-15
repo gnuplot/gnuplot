@@ -873,7 +873,7 @@ set origin %g,%g\n",
     case PM3D_SCANS_AUTOMATIC: fputs("scansautomatic\n", fp); break;
     case PM3D_SCANS_FORWARD: fputs("scansforward\n", fp); break;
     case PM3D_SCANS_BACKWARD: fputs("scansbackward\n", fp); break;
-    case PM3D_DEPTH: fputs("depthorder\n", fp); break;
+    case PM3D_DEPTH: fprintf(fp, "depthorder %s\n", pm3d.base_sort ? "base" : ""); break;
     }
     fprintf(fp, "set pm3d interpolate %d,%d", pm3d.interp_i, pm3d.interp_j);
     fputs(" flush ", fp);

@@ -3998,6 +3998,12 @@ set_pm3d()
 		continue;
 	    case S_PM3D_DEPTH: /* "dep$thorder" */
 		pm3d.direction = PM3D_DEPTH;
+		if (equals(c_token+1, "base")) {
+		    pm3d.base_sort = TRUE;
+		    c_token++;
+		} else {
+		    pm3d.base_sort = FALSE;
+		}
 		continue;
 	    /* flush scans: left, right or center */
 	    case S_PM3D_FLUSH:  /* "fl$ush" */
