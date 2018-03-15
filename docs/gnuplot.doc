@@ -3538,8 +3538,10 @@ Ffigure_boxes
 
  3D boxes are processed as pm3d quadrangles rather than as surfaces. Because of
  this the front/back order of drawing is not affected by `set hidden3d`.
- For best results use a combition of `set pm3d depthorder base` and
- `set pm3d lighting`.  See `set pm3d`.
+ Similarly if you want each box face to have a border you must use
+`set pm3d border lc black` rather than `set style fill border lc black`.
+ See `set pm3d`.  For best results use a combition of `set pm3d depthorder base`
+ and `set pm3d lighting`.
 
 2 boxplot
 ?plotting styles boxplot

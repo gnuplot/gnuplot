@@ -1,11 +1,16 @@
 # 
 # splot with boxes
+# Note: 3D boxes are implemented via the pm3d code so for commands
+# with both a pm3d and a non-pm3d variant you must use the former.
+#   "set pm3d depthorder" rather than "set hidden3d"
+#   "set pm3d border lc black" rather than "set style fill border lc black"
 #
 set boxwidth 0.4 abs
 set xyplane at 0
 set grid z vertical lw 1.0
 set yrange [0:6]
 set view 59, 24
+set pm3d border lc black
 
 rgbfudge(x) = x*51*32768 + (11-x)*51*128 + int(abs(5.5-x)*510/9.)
 ti(col) = sprintf("%d",col)
@@ -42,6 +47,7 @@ set title "give the boxes a 3D depth and correct depth sorting"
 set style fill solid
 set boxdepth 0.3
 set pm3d depthorder base
+set walls z0
 replot
 
 pause -1 "hit return to continue"
