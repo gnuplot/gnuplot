@@ -1306,6 +1306,9 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
 		set_fill = TRUE;
 		c_token++;
 
+		if (!transparent)
+			fs->filldensity = 100;
+
 		if (might_be_numeric(c_token)) {
 		    if (fs->fillstyle == FS_SOLID) {
 			/* user sets 0...1, but is stored as an integer 0..100 */
