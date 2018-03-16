@@ -882,18 +882,7 @@ C  need @ in table, so end and restart the table !
  characters by escaping them (see below), such as '~a{\^}'
 
  You can escape control characters using \, e.g.,  \\, \{, and so on.
-
- The \ character is also used to escape single byte character codes or
- Unicode entry points.  The form \ooo (where ooo is a 3 character octal value)
- can be used to index a known character code in specific font encoding.
- For example the Adobe Symbol font uses a custom encoding in which octal 0245 
- represents the symbol for infinity.  You could specify this by explicitly
- giving the font name and the character code "{/Symbol \245}".
-
- Similarly you can specify a character by its Unicode code point as \U+hhhh,
- where hhhh is the 4 or 5 character hexadecimal code point.
- This will be converted to a UTF-8 byte sequence on output if appropriate.
- See `set encoding`, `utf8`.
+ See `escape sequences` below.
 
  Note that strings in double-quotes are parsed differently than those enclosed
  in single-quotes.  The major difference is that backslashes may need to be
@@ -904,6 +893,33 @@ C  need @ in table, so end and restart the table !
 ^ <a href="http://www.gnuplot.info/demo/enhanced_utf8.html">
  `enhanced_utf8.dem`
 ^ </a>
+
+3 Escape sequences
+?escape sequences
+?enhanced text escape sequences
+?unicode
+ The backslash character \ is used to escape single byte character codes or
+ Unicode entry points.
+
+ The form \ooo (where ooo is a 3 character octal value) can be used to index a
+ known character code in a specific font encoding.  For example the Adobe Symbol
+ font uses a custom encoding in which octal 245 represents the infinity symbol.
+ You could embed this in an enhanced text string by giving the font name and the
+ character code "{/Symbol \245}".  This is mostly useful for the PostScript
+ terminal, which cannot easily handle UTF-8 encoding.
+
+ You can specify a character by its Unicode code point as \U+hhhh, where hhhh
+ is the 4 or 5 character hexadecimal code point. For example the code point for
+ the infinity symbol is \U+221E.  This will be converted to a UTF-8 byte
+ sequence on output if appropriate.  In a UTF-8 environment this mechanism
+ is not needed for printable special characters since they are handled in a
+ text string like any other character. However it is useful for combining forms
+ or supplemental diacritical marks (e.g. an arrow over a letter to represent
+ a vector).  See `set encoding`, `utf8`, and the
+^ <a href="http://www.gnuplot.info/demo_5.3/unicode.html">
+ online unicode demo.
+^ </a>
+
 2 Environment
 ?environment
  A number of shell environment variables are understood by `gnuplot`.  None of
@@ -2404,8 +2420,10 @@ C ... and restart the table:
 
  Although it is possible to include non-alphabetic symbols by temporarily
  switching to a special font, e.g. the Adobe Symbol font, the preferred method
- is now to specify the unicode entry point for the desired symbols using their
- UTF-8 encoding.  See `encoding` and `locale`.
+ is now to choose UTF-8 encoding and treat the symbol like any other character.
+ Alternatively you can specify the unicode entry point for the desired symbol
+ as an escape sequence in enhanced text mode.
+ See `encoding`, `unicode`, `locale`, and `escape sequences`.
 
 3 cairo (pdfcairo, pngcairo, epscairo, wxt terminals)
 ?fonts cairo
@@ -3477,7 +3495,7 @@ Ffigure_boxes
  these is available, the width of each box will be calculated so that it touches
  the adjacent boxes.
 
- The interior of the boxes is drawn according to the current fillstyle.
+ The box interiors are drawn using the current fillstyle.
  Alternatively a fillstyle may be specified in the plot command.
  See `set style fill`.
  If no fillcolor is given in the plot command, the current line color is used.
@@ -3532,16 +3550,17 @@ Ffigure_boxes
  The third example command reads box width from column 4 and interprets the
  value in column 5 as an integer linetype from which the color is derived.
 
- By default boxes have no thickness; they consist of a single rectangle at the
- specified y coordinate.  You can change this to a true box with four sides and
- a top by setting a non-zero extent on y.  See `set boxdepth`.
+ By default boxes have no thickness; they consist of a single rectangle parallel
+ to the xz plane at the specified y coordinate.  You can change this to a true
+ box with four sides and a top by setting a non-zero extent on y.
+ See `set boxdepth`.
 
  3D boxes are processed as pm3d quadrangles rather than as surfaces. Because of
  this the front/back order of drawing is not affected by `set hidden3d`.
  Similarly if you want each box face to have a border you must use
-`set pm3d border lc black` rather than `set style fill border lc black`.
- See `set pm3d`.  For best results use a combition of `set pm3d depthorder base`
- and `set pm3d lighting`.
+ `set pm3d border` rather than `set style fill border`.  See `set pm3d`.
+ For best results use a combition of `set pm3d depthorder base` and
+ `set pm3d lighting`.
 
 2 boxplot
 ?plotting styles boxplot
@@ -3594,7 +3613,7 @@ Ffigure_boxplot
 
  These default properties may be changed using the `set style boxplot` command.
  See `set style boxplot`, `bars`, `boxwidth`, `fillstyle`, `candlesticks`.
-
+#TeX \newpage
 2 boxxyerror
 ?plotting styles boxxyerror
 ?style boxxyerror
@@ -3624,7 +3643,6 @@ Ffigure_boxxyerror
  The interior of the boxes is drawn according to the current fillstyle.
  See `set style fill` and `boxes` for details.  Alternatively a new fillstyle
  may be specified in the plot command.
-#TeX \newpage
 2 candlesticks
 ?plotting styles candlesticks
 ?style candlesticks
@@ -3691,7 +3709,6 @@ Ffigure_candlesticks
    plot 'stat.dat' using 1:3:2:6:5 with candlesticks whiskerbars 0.5
 
  See `set boxwidth`, `set errorbars`, `set style fill`, and `boxplot`.
-#TeX \newpage
 2 circles
 ?plotting styles circles
 ?style circles
@@ -3805,6 +3822,7 @@ Ffigure_ellipses
      plot 'data' using 1:2:3:4:(0):0 with ellipses
 
  See also `set object ellipse`, `set style ellipse` and `fillstyle`.
+#TeX \newpage
 2 dots
 ?plotting styles dots
 ?style dots
@@ -4709,6 +4727,7 @@ Ffigure_mapcontours
  onto a 2D surface by projecting the plot along the Z axis.  See `set view map`.
  This plot mode can be used to generate contour plots and heat maps. This figure
  shows contours plotted once with plot style `lines`, once with style `labels`.
+#TeX \newpage
 2 Polar plots
 =polar
 Ffigure_polar
