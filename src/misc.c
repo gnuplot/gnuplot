@@ -1287,6 +1287,7 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
 
 	if (almost_equals(c_token, "trans$parent")) {
 	    transparent = TRUE;
+	    fs->filldensity = 50;
 	    c_token++;
 	    continue;
 	}
