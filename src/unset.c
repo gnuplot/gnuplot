@@ -1443,7 +1443,6 @@ unset_pm3d()
     /* reset styles, required to 'plot something' after e.g. 'set pm3d map' */
     if (data_style == PM3DSURFACE) data_style = POINTSTYLE;
     if (func_style == PM3DSURFACE) func_style = LINES;
-    pm3d.border.l_type = LT_NODRAW;
 }
 
 

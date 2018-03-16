@@ -36,20 +36,7 @@ TBOOLEAN track_pm3d_quadrangles;
 /*
   Global options for pm3d algorithm (to be accessed by set / show).
 */
-
-pm3d_struct pm3d = {
-    "s",			/* where[6] */
-    PM3D_FLUSH_BEGIN,		/* flush */
-    0,				/* no flushing triangles */
-    PM3D_CLIP_4IN,		/* clipping: all 4 points in ranges */
-    PM3D_SCANS_AUTOMATIC,	/* scan direction is determined automatically */
-    FALSE,			/* depth sort using mean z (false) or base z (true) */
-    PM3D_EXPLICIT,		/* use pm3d only if asked */
-    PM3D_WHICHCORNER_MEAN,	/* color from which corner(s) */
-    1,				/* interpolate along scanline */
-    1,				/* interpolate between scanlines */
-    DEFAULT_LP_STYLE_TYPE	/* for the border */
-};
+pm3d_struct pm3d;	/* Initialized via init_session->reset_command->reset_pm3d */
 
 lighting_model pm3d_shade;
 
@@ -1087,6 +1074,7 @@ pm3d_reset()
     pm3d.which_corner_color = PM3D_WHICHCORNER_MEAN;
     pm3d.interp_i = 1;
     pm3d.interp_j = 1;
+    pm3d.border = default_pm3d_border;
     pm3d.border.l_type = LT_NODRAW;
 
     pm3d_shade.strength = 0.0;

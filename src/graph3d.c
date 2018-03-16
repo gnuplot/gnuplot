@@ -3547,8 +3547,12 @@ plot3d_boxes(struct surface_points *plot)
     struct iso_curve *icrvs = plot->iso_crvs;
     gpdPoint corner[4];
 
+    /* These initializations are normally done via pm3d_plot()
+     * but 3D boxes are drawn in a parallel code path.
+     */
     if (pm3d_shade.strength > 0)
 	pm3d_init_lighting_model();
+    pm3d_border_lp = pm3d.border;
 
     while (icrvs) {
 	struct coordinate *points = icrvs->points;
