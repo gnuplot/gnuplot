@@ -866,7 +866,7 @@ ENHAQUA_put_text(unsigned int x, unsigned int y, const char str[])
   if (!strlen(str))
     return;
 
-  if (ignore_enhanced_text || !strpbrk(str, "{}^_@&~")) {
+  if (ignore_enhanced_text || (!strpbrk(str, "{}^_@&~") && !contains_unicode(str))) {
     AQUA_put_text(x,y,str);
     return;
   }
