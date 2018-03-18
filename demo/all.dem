@@ -367,6 +367,10 @@ print "********************** file walls.dem *********************"
 load "walls.dem"
 reset
 
+print "********************** file boxes3d.dem *********************"
+load "boxes3d.dem"
+reset
+
 print "********************** file borders.dem *********************"
 load "borders.dem"
 reset
