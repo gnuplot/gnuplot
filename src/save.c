@@ -599,7 +599,6 @@ save_set_all(FILE *fp)
 
     save_offsets(fp, "set offsets");
 
-    /* FIXME */
     fprintf(fp, "\
 set pointsize %g\n\
 set pointintervalbox %g\n\

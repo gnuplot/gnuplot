@@ -555,9 +555,9 @@ gprintf_value(
     char *dest  = &tempdest[0];
     char *limit = &tempdest[MAX_LINE_LEN];
     static double log10_of_1024; /* to avoid excess precision comparison in check of connection %b -- %B */
-    
+
     log10_of_1024 = log10(1024);
-    
+
 #define remaining_space (size_t)(limit-dest)
 
     *dest = '\0';
@@ -1010,17 +1010,6 @@ gprintf_value(
     } /* for ever */
 
 done:
-
-#if (0)
-    /* Oct 2013 - Not safe because it fails to recognize LaTeX macros.	*/
-    /* For LaTeX terminals, if the user has not already provided a   	*/
-    /* format in math mode, wrap whatever we got by default in $...$ 	*/
-    if (((term->flags & TERM_IS_LATEX)) && !strchr(tempdest, '$')) {
-	*(outstring++) = '$';
-	strcat(tempdest, "$");
-	count -= 2;
-    }
-#endif
 
     /* Copy as much as fits */
     safe_strncpy(outstring, tempdest, count);

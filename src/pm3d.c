@@ -1140,7 +1140,6 @@ pm3d_add_quadrangle(struct surface_points *plot, gpdPoint corners[4])
     q = quadrangles + current_quadrangle++;
     memcpy(q->corners, corners, 4*sizeof(gpdPoint));
 
-    /* FIXME: move lighting model into a subroutine */
     /* FIXME: color_from_rgbvar need only be set once per plot */
     if (plot->pm3d_color_from_column) {
 	/* This is the usual path for 'splot with boxes' */
@@ -1280,7 +1279,7 @@ set_plot_with_palette(int plot_num, int plot_mode)
 	if (TC_USES_PALETTE(this_object->lp_properties.pm3d_color.type))
 	    return;
     }
-    
+
 #undef TC_USES_PALETTE
 
     /* Palette with continuous colors is not used. */

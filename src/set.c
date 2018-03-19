@@ -4114,7 +4114,6 @@ set_pm3d()
 	if (PM3D_SCANS_AUTOMATIC == pm3d.direction
 	    && PM3D_FLUSH_BEGIN != pm3d.flush) {
 	    pm3d.direction = PM3D_SCANS_FORWARD;
-	    /* FIXME: Why isn't this combination supported? */
 	    FPRINTF((stderr, "pm3d: `scansautomatic' and `flush %s' are incompatible\n",
 		PM3D_FLUSH_END == pm3d.flush ? "end": "center"));
 	}

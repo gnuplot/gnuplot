@@ -618,10 +618,10 @@ set ytics nomirror rangelimited scale 0
 unset key
 
 set multiplot layout 1, 2 
-set jitter over 0.5 spread 1.9
+set jitter over 0.5 spread 1.6 swarm
 set title "swarm (default)"
-plot $data using 1:2:1 with points pt 6 lc variable
-set jitter over 0.5 spread 1.9 square
+plot $data using 1:2:1 with points pt 6 ps 0.8 lc variable
+set jitter over 0.5 spread 1.6 square
 set title "square"
 replot
 unset multiplot

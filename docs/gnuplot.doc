@@ -11382,7 +11382,7 @@ Ffigure_multiple_keys
  given individual style properties. Circles, ellipses, and polygons  inherit the
  fill style from `set style fill`.  Objects to be drawn in 2D plots may be 
  defined in any combination of axis, graph, polar, or screen coordinates.
- 
+
  Object specifications in 3D plots cannot use graph coordinates.
  Rectangles and ellipses in 3D plots are limited to screen coordinates.
 
@@ -14350,7 +14350,7 @@ Ffigure_walls
  Individual tic positions can be specified individually by providing an
  eplicit list of positions, where each position may have an associated
  text label. See `xtics list`.
- 
+
  However they are specified, tics will only be plotted when in range.
 
  Format (or omission) of the tic labels is controlled by `set format`, unless

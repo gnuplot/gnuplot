@@ -895,26 +895,6 @@ ExecuteMacro(char *argv, int namelength)
     rxArgStr = &argv[namelength];
     RXSTRPTR(rxRc) = NULL;
 
-#if 0
-    /*
-       C-like calling of function: program name is first
-       parameter.
-       In REXX you would have to use
-       Parse Arg param0, param1
-       to get the program name in param0 and the arguments in param1.
-
-       Some versions before gnuplot 3.7pl1 used a similar approach but
-       passed program name and arguments in a single string:
-       (==> Parse Arg param0 param1)
-     */
-
-    MAKERXSTRING(rxArg[0], pszName, strlen(pszName));
-    rxArgCount++;
-    if (*rxArgStr) {
-	MAKERXSTRING(rxArg[1], rxArgStr, strlen(rxArgStr));
-	rxArgCount++;
-    }
-#else
     /*
        REXX standard calling (gnuplot 3.7pl1 and above):
        The program name is not supplied and so all actual arguments
@@ -927,7 +907,6 @@ ExecuteMacro(char *argv, int namelength)
 	MAKERXSTRING(rxArg[0], rxArgStr, strlen(rxArgStr));
 	rxArgCount++;
     }
-#endif
 
     CallFromRexx = TRUE;
     rc = RexxStart(

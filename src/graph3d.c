@@ -3525,15 +3525,10 @@ plot3d_zerrorfill(struct surface_points *plot)
 
 /*
  * 3D version of plot with boxes.
- * The boxes are drawn as pm3d rectangles. This means that depth-cueing
- * must be done with "set pm3d depth" rather than with "set hidden3d".
  * By default only a flat rectangle is drawn.  "set boxdepth <depth>"
- * changes this to draw real boxes (4 sides + top).  Unfortunately the
- * extensive overlap of z ranges makes the use of mean z value by
- * the existing depthorder sorting come out badly.
- * FIXME: alternative sorting option is needed.
- * FIXME: the sides and top would benefit from either shading or
- *        use of an alternate color (maybe the fillstyle border color?)
+ * changes this to draw real boxes (4 sides + top).
+ * The boxes are drawn as pm3d rectangles. This means that depth-cueing
+ * must be done with "set pm3d depth base" rather than with "set hidden3d".
  */
 static void
 plot3d_boxes(struct surface_points *plot)
