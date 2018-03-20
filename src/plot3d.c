@@ -1072,8 +1072,9 @@ get_3ddata(struct surface_points *this_plot)
 		    xlow = x - v[3]/2.;
 		    xhigh = x + v[3]/2.;
 		} else {
-		    xlow = x - boxwidth/2.;
-		    xhigh = x + boxwidth/2.;;
+		    double width = (boxwidth > 0) ? boxwidth : 1.0;
+		    xlow = x - width/2.;
+		    xhigh = x + width/2.;;
 		}
 		track_pm3d_quadrangles = TRUE;
 
