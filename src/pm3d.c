@@ -1151,6 +1151,8 @@ pm3d_add_quadrangle(struct surface_points *plot, gpdPoint corners[4])
 	/* This is a special case for 'splot with boxes lc palette z' */
 	q->gray = cb2gray(corners[1].z);
 	color_from_rgbvar = FALSE;
+	if (pm3d_shade.strength > 0)
+	    illuminate_one_quadrangle(q);
     } else {
 	/* This is the usual [only?] path for 'splot with zerror' */
 	q->border_color = &plot->fill_properties.border_color;
