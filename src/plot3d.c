@@ -2218,6 +2218,7 @@ eval_3dplots()
     if (nonlinear(&axis_array[FIRST_X_AXIS])) {
 	/* Transfer observed data or function ranges back to primary axes */
 	update_primary_axis_range(&axis_array[FIRST_X_AXIS]);
+	extend_primary_ticrange(&axis_array[FIRST_X_AXIS]);
 	axis_check_empty_nonlinear(&axis_array[FIRST_X_AXIS]);
     } else {
 	axis_checked_extend_empty_range(FIRST_X_AXIS, "All points x value undefined");
@@ -2226,6 +2227,7 @@ eval_3dplots()
     if (nonlinear(&axis_array[FIRST_Y_AXIS])) {
 	/* Transfer observed data or function ranges back to primary axes */
 	update_primary_axis_range(&axis_array[FIRST_Y_AXIS]);
+	extend_primary_ticrange(&axis_array[FIRST_Y_AXIS]);
 	axis_check_empty_nonlinear(&axis_array[FIRST_Y_AXIS]);
     } else {
 	axis_checked_extend_empty_range(FIRST_Y_AXIS, "All points y value undefined");
