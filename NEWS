@@ -6,6 +6,7 @@ Changes not in 5.2
 * NEW "set clip radial" for line segments in polar mode plots
 * NEW "splot ... with circles"
 * NEW internal support for appending to existing arrays (not user-visible)
+* NEW largely extended pcl5 terminal supports PCL5e/PCL5c printers
 * EXPERIMENTAL "set mouse mouseformat function <stringval_from_xy(x,y)>"
 * CHANGE remove deprecated command "update"
 * CHANGE remove deprecated option "thru"

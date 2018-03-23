@@ -231,6 +231,12 @@ C
 ##See map_projection demo.
 #end
 
+4 New terminals and terminal options
+#start
+#b The `pcl5` terminal has been extended to support PCL5e/PCL5c printers and
+## many modern gnuplot features.
+#end
+
 4 Other new features
 #start
 #bEnhanced text mode accepts \U+xxxx (xxxx is a 4 or 5 character hexadecimal)
@@ -332,6 +338,7 @@ C
 #b The `tkcanvas` terminal has been rewritten to support many more modern gnuplot
 ## features, as well as new languages. (Since 5.0.3)
 #end
+
 4 Other new features
 #start
 #b An additional rotation angle `azimuth` affects the orientation of 3D plots.
