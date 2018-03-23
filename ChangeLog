@@ -1,3 +1,26 @@
+2018-03-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/color.c (draw_color_smooth_box):
+	Default colorbox position in "set view map" mode should match 2D mode.
+	The previous algorithm failed to allow for logscale or other nonlinear
+	x axis settings, perturbing the width of the colorbox.
+	Bug #2029
+
+	* src/plot3d.c: emulate logscale axis range extension of pre-v5 splot
+	The routine extend_primary_ticrange() emulates the old behaviour
+	(i.e. prior to nonlinear axis code) of autoscaled logscaled axes.
+	It extends the range of the plot to include the next tic at either end.
+	We were already calling it for 2D plots; now we call it for 3D plots
+	as well.
+	Bug #2029
+
+	* src/command.c (splot_map_activate/deactivate):
+	'set view map' and 'set pm3d map' both flip the direction of the y
+	axis so that the layout matches a 2D plot.  In the case of a nonlinear
+	y axis, in particular 'set log y', this means we have to flip the
+	linked primary axis as well.
+	Bug #2029
+
 2018-03-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (extend_primary_ticrange):

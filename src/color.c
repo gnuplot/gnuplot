@@ -596,20 +596,13 @@ draw_color_smooth_box(int plot_mode)
 
     } else { /* color_box.where == SMCOLOR_BOX_DEFAULT */
 	if (plot_mode == MODE_SPLOT && !splot_map) {
-	    /* HBB 20031215: new code.  Constants fixed to what the result
-	     * of the old code in default view (set view 60,30,1,1)
-	     * happened to be. Somebody fix them if they're not right! */
+	    /* general 3D plot */
 	    color_box.bounds.xleft = xmiddle + 0.709 * xscaler;
 	    color_box.bounds.xright   = xmiddle + 0.778 * xscaler;
 	    color_box.bounds.ybot = ymiddle - 0.147 * yscaler;
 	    color_box.bounds.ytop   = ymiddle + 0.497 * yscaler;
-
-	} else if (is_3d_plot) {
-	    /* MWS 09-Dec-05, make color box full size for splot maps. */
-	    double dx = (X_AXIS.max - X_AXIS.min);
-	    map3d_xy(X_AXIS.max + dx * 0.025, Y_AXIS.min, base_z, &color_box.bounds.xleft, &color_box.bounds.ybot);
-	    map3d_xy(X_AXIS.max + dx * 0.075, Y_AXIS.max, ceiling_z, &color_box.bounds.xright, &color_box.bounds.ytop);
-	} else { /* 2D plot */
+	} else {
+	    /* 2D plot (including splot map) */
 	    struct position default_origin = {graph,graph,graph, 1.025, 0, 0};
 	    struct position default_size = {graph,graph,graph, 0.05, 1.0, 0};
 	    double xtemp, ytemp;
