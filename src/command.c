@@ -2666,13 +2666,28 @@ static float splot_map_surface_rot_x;
 static float splot_map_surface_rot_z;
 static float splot_map_surface_scale;
 
+/* utility routine for splot_map_activate/deactivate */
+static void
+flip_y_axis()
+{
+    struct axis *yaxis = &axis_array[FIRST_Y_AXIS];
+    double temp = yaxis->min;
+    yaxis->min = yaxis->max;
+    yaxis->max = temp;
+    if (yaxis->linked_to_primary) {
+	yaxis = yaxis->linked_to_primary;
+	temp = yaxis->min;
+	yaxis->min = yaxis->max;
+	yaxis->max = temp;
+    }
+}
+
 /* This routine is called at the beginning of 'splot'. It sets up some splot
  * parameters needed to present the 'set view map'.
  */
 void
 splot_map_activate()
 {
-    double temp;
     if (splot_map_active)
 	return;
     splot_map_active = 1;
@@ -2686,9 +2701,7 @@ splot_map_activate()
     /* version 4 had constant value surface_scale = 1.3 */
     surface_scale = 1.425 * mapview_scale;
     /* The Y axis runs backwards from a normal 2D plot */
-    temp = axis_array[FIRST_Y_AXIS].min;
-    axis_array[FIRST_Y_AXIS].min = axis_array[FIRST_Y_AXIS].max;
-    axis_array[FIRST_Y_AXIS].max = temp;
+    flip_y_axis();
 }
 
 
@@ -2698,7 +2711,6 @@ splot_map_activate()
 void
 splot_map_deactivate()
 {
-    double temp;
     if (!splot_map_active)
 	return;
     splot_map_active = 0;
@@ -2707,9 +2719,7 @@ splot_map_deactivate()
     surface_rot_z = splot_map_surface_rot_z;
     surface_scale = splot_map_surface_scale;
     /* The Y axis runs backwards from a normal 2D plot */
-    temp = axis_array[FIRST_Y_AXIS].min;
-    axis_array[FIRST_Y_AXIS].min = axis_array[FIRST_Y_AXIS].max;
-    axis_array[FIRST_Y_AXIS].max = temp;
+    flip_y_axis();
 }
 
 
