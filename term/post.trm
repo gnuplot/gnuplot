@@ -3184,7 +3184,7 @@ TERM_PUBLIC void PS_set_color (t_colorspec *colorspec)
 	double g = (double)((colorspec->lt >> 8 ) & 255) / 255.;
 	double b = (double)(colorspec->lt & 255) / 255.;
 	PS_FLUSH_PATH;
-	fprintf(gppsfile, "%3.2f %3.2f %3.2f C ",r,g,b);
+	fprintf(gppsfile, "%3.2f %3.2f %3.2f C\n",r,g,b);
     }
 
     if (colorspec->type != TC_FRAC)
