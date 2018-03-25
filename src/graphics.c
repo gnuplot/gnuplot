@@ -1059,19 +1059,16 @@ plot_lines(struct curve_points *plot)
 	/* rgb variable  -  color read from data column */
 	check_for_variable_color(plot, &plot->varcolor[i]);
 
+	x = map_x(plot->points[i].x);
+	y = map_y(plot->points[i].y);
+
+	/* map_x or map_y can hit NaN during eval_link_function(), in which */
+	/* case the coordinate value is garbage and undefined is TRUE.      */
+	if (invalid_coordinate(x,y))
+	    plot->points[i].type = UNDEFINED;
+
 	switch (plot->points[i].type) {
-	case INRANGE:{
-
-		x = map_x(plot->points[i].x);
-		y = map_y(plot->points[i].y);
-
-		/* map_x or map_y can hit NaN during eval_link_function(), in which */
-		/* case the coordinate value is garbage and undefined is TRUE.      */
-		if (invalid_coordinate(x,y))
-		    plot->points[i].type = UNDEFINED;
-		if (plot->points[i].type == UNDEFINED)
-		    break;
-
+	case INRANGE:
 		if (prev == INRANGE) {
 		    (*t->vector) (x, y);
 		} else if (prev == OUTRANGE) {
@@ -1079,23 +1076,24 @@ plot_lines(struct curve_points *plot)
 		    if (!clip_lines1) {
 			(*t->move) (x, y);
 		    } else {
-			edge_intersect(plot->points, i, &ex, &ey);
-			(*t->move) (map_x(ex), map_y(ey));
+			if (edge_intersect(plot->points, i, &ex, &ey))
+			    (*t->move) (map_x(ex), map_y(ey));
+			else
+			    (*t->move) (x, y);
 			(*t->vector) (x, y);
 		    }
 		} else {	/* prev == UNDEFINED */
 		    (*t->move) (x, y);
 		    (*t->vector) (x, y);
 		}
-
 		break;
-	    }
-	case OUTRANGE:{
+
+	case OUTRANGE:
 		if (prev == INRANGE) {
 		    /* from inrange to outrange */
 		    if (clip_lines1) {
-			edge_intersect(plot->points, i, &ex, &ey);
-			(*t->vector) (map_x(ex), map_y(ey));
+			if (edge_intersect(plot->points, i, &ex, &ey))
+			    (*t->vector) (map_x(ex), map_y(ey));
 		    }
 		} else if (prev == OUTRANGE) {
 		    /* from outrange to outrange */
@@ -1107,11 +1105,10 @@ plot_lines(struct curve_points *plot)
 		    }
 		}
 		break;
-	    }
+
 	default:		/* just a safety */
-	case UNDEFINED:{
+	case UNDEFINED:
 		break;
-	    }
 	}
 	prev = plot->points[i].type;
     }
@@ -3036,13 +3033,15 @@ plot_boxplot(struct curve_points *plot)
 }
 
 
-/* FIXME
- * there are LOADS of == style double comparisons in here!
- */
-/* single edge intersection algorithm */
-/* Given two points, one inside and one outside the plot, return
- * the point where an edge of the plot intersects the line segment defined
- * by the two points.
+/* Given two successive data points, one inside and one outside the plot,
+ * return the point where an edge of the plot intersects the line segment
+ * connecting the two points.
+ * Return value bit field: LEFT_EDGE RIGHT_EDGE TOP_EDGE BOTTOM_EDGE
+ *                      0: zero-length segment (don't draw it)
+ * FIXME:
+ *	This was written assuming linear axes (pre-v5 logscale treatment
+ *	stored already-logged values so the axis acted as if were linear).
+ *	It is currently always wrong for nonlinear axes, including logscale.
  */
 static int
 edge_intersect(
@@ -3057,9 +3056,7 @@ edge_intersect(
     double x, y;		/* possible intersection point */
 
     if (points[i].type == INRANGE) {
-	/* swap points around so that ix/ix/iz are INRANGE and
-	 * ox/oy/oz are OUTRANGE
-	 */
+	/* swap points so that ix/ix/iz are INRANGE and ox/oy/oz are OUTRANGE */
 	x = ix;
 	ix = ox;
 	ox = x;
@@ -3067,13 +3064,13 @@ edge_intersect(
 	iy = oy;
 	oy = y;
     }
-    /* nasty degenerate cases, effectively drawing to an infinity point (?)
-     * cope with them here, so don't process them as a "real" OUTRANGE point
-     *
+
+    /* Nasty degenerate cases, effectively drawing to an infinity point (?).
      * If more than one coord is -VERYLARGE, then can't ratio the "infinities"
      * so drop out by returning the INRANGE point.
-     *
-     * Obviously, only need to test the OUTRANGE point (coordinates) */
+     * We only need to test the OUTRANGE point 
+     * FIXME:  not sure this case can happen in version 5.
+     */
     if (ox == -VERYLARGE || oy == -VERYLARGE) {
 	*ex = ix;
 	*ey = iy;
@@ -3091,8 +3088,8 @@ edge_intersect(
 	*ey = Y_AXIS.min;
 	return BOTTOM_EDGE;
     }
-    /*
-     * Can't have case (ix == ox && iy == oy) as one point
+
+    /* Can't have case (ix == ox && iy == oy) as one point
      * is INRANGE and one point is OUTRANGE.
      */
     if (iy == oy) {
@@ -3164,14 +3161,11 @@ edge_intersect(
 	}
     }
 
-    /* If we reach here, the inrange point is on the edge, and
-     * the line segment from the outrange point does not cross any
-     * other edges to get there. In this case, we return the inrange
-     * point as the 'edge' intersection point. This will basically draw
-     * line.
+    /* If we reach here, either the outrange point is UNDEFINED
+     * or the inrange point is on an edge and the line segment from the
+     * outrange point does not cross any other edges to get there.
+     * The zero value return indicates no line should be drawn.
      */
-    *ex = ix;
-    *ey = iy;
     return 0;
 }
 
@@ -3185,6 +3179,7 @@ edge_intersect(
  * to draw (zero intersections), and TRUE when there is something to
  * draw (the one-point case is a degenerate of the two-point case and we do
  * not distinguish it - we draw it anyway).
+ * FIXME:  Assumes linear axis scaling
  */
 static TBOOLEAN			/* any intersection? */
 two_edge_intersect(

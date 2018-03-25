@@ -1,3 +1,12 @@
+2018-03-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_lines edge_intersect):  Handle clipping of line
+	segment between INRANGE->UNDEFINED points.  Previously we checked for
+	UNDEFINED->INRANGE but failed to consider INRANGE->UNDEFINED.
+	In either case it should return zero, indicating that no clipped line
+	is possible.
+	Bug #2030
+
 2018-03-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/color.c (draw_color_smooth_box):
