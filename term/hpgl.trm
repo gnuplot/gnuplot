@@ -1734,13 +1734,13 @@ HPGL2_filled_diamond(int x, int y, int htic, int vtic)
 {
     HPGL2_move(x - htic, y);
     HPGL2_end_poly();
-    fprintf(gpoutfile, "PM0;\n");
+    fputs("PM0;\n", gpoutfile);
     HPGL2_vector(x, y - vtic);
     HPGL2_vector(x + htic, y);
     HPGL2_vector(x, y + vtic);
     HPGL2_vector(x - htic, y);
     HPGL2_end_poly();
-    fprintf(gpoutfile, "PM2;FP;\n");
+    fputs("PM2;FP;\n", gpoutfile);
 }
 
 static void
@@ -1828,12 +1828,12 @@ HPGL2_point(unsigned int x, unsigned int y, int number)
 	    case 8:		/* solid triangle 1 */
 		HPGL2_move(x, y + (3 * vtic / 4));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM0;\n");
+		fputs("PM0;\n", gpoutfile);
 		HPGL2_vector(x - (3 * sqrt(3) * htic / 8), y - (3 * vtic / 8));
 		HPGL2_vector(x + (3 * sqrt(3) * htic / 8), y - (3 * vtic / 8));
 		HPGL2_vector(x, y + (3 * vtic / 4));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM2;FP;EP;\n");
+		fputs("PM2;FP;EP;\n", gpoutfile);
 		break;
 	    case 9:		/* hollow triangle 2 */
 		HPGL2_move(x, y - (3 * vtic / 4));
@@ -1845,12 +1845,12 @@ HPGL2_point(unsigned int x, unsigned int y, int number)
 	    case 10:		/* solid triangle 2 */
 		HPGL2_move(x, y - (3 * vtic / 4));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM0;\n");
+		fputs("PM0;\n", gpoutfile);
 		HPGL2_vector(x - (3 * sqrt(3) * htic / 8), y + (3 * vtic / 8));
 		HPGL2_vector(x + (3 * sqrt(3) * htic / 8), y + (3 * vtic / 8));
 		HPGL2_vector(x, y - (3 * vtic / 4));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM2;FP;EP;\n");
+		fputs("PM2;FP;EP;\n", gpoutfile);
 		break;
 	    case 11:		/* hollow diamond 1 */
 		HPGL2_diamond(x, y, (3 * htic / 4), (3 * vtic / 4));
@@ -1866,10 +1866,10 @@ HPGL2_point(unsigned int x, unsigned int y, int number)
 	    case 14:		/* solid pentagon */
 		HPGL2_move(x, y + (3 * vtic / 4));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM0;\n");
+		fputs("PM0;\n", gpoutfile);
 		HPGL2_pentagon(x, y, htic, vtic);
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM2;FP;EP;\n");
+		fputs("PM2;FP;EP;\n", gpoutfile);
 		break;
 	    case 15:		/* hollow circle 2 */
 		HPGL2_move(x, y + vtic);
@@ -2096,13 +2096,13 @@ HPGL2_point(unsigned int x, unsigned int y, int number)
 		HPGL2_diamond(x, y, htic2, vtic2);
 		HPGL2_move(x + (htic2 / 2), y + (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM0;\n");
+		fputs("PM0;\n", gpoutfile);
 		HPGL2_vector(x, y + vtic2);
 		HPGL2_vector(x - (htic2 / 2), y + (vtic2 / 2));
 		HPGL2_vector(x, y);
 		HPGL2_vector(x + (htic2 / 2), y + (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM2;FP;EP;\n");
+		fputs("PM2;FP;EP;\n", gpoutfile);
 		break;
 	    case 49:		/* semisolid diamond 2 */
 		htic2 = htic * M_SQRT2;
@@ -2113,13 +2113,13 @@ HPGL2_point(unsigned int x, unsigned int y, int number)
 		HPGL2_vector(x, y + vtic2);
 		HPGL2_vector(x - (htic2 / 2), y + (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM0;\n");
+		fputs("PM0;\n", gpoutfile);
 		HPGL2_vector(x - htic2, y);
 		HPGL2_vector(x - (htic2 / 2), y - (vtic2 / 2));
 		HPGL2_vector(x, y);
 		HPGL2_vector(x - (htic2 / 2), y + (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM2;FP;EP;\n");
+		fputs("PM2;FP;EP;\n", gpoutfile);
 		break;
 	    case 50:		/* semisolid diamond 3 */
 		htic2 = htic * M_SQRT2;
@@ -2129,13 +2129,13 @@ HPGL2_point(unsigned int x, unsigned int y, int number)
 		HPGL2_vector(x + htic2, y);
 		HPGL2_vector(x + (htic2 / 2), y + (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM0;\n");
+		fputs("PM0;\n", gpoutfile);
 		HPGL2_vector(x - (htic2 / 2), y - (vtic2 / 2));
 		HPGL2_vector(x - htic2, y);
 		HPGL2_vector(x, y + vtic2);
 		HPGL2_vector(x + (htic2 / 2), y + (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM2;FP;EP;\n");
+		fputs("PM2;FP;EP;\n", gpoutfile);
 		break;
 	    case 51:		/* semisolid diamond 4 */
 		htic2 = htic * M_SQRT2;
@@ -2146,13 +2146,13 @@ HPGL2_point(unsigned int x, unsigned int y, int number)
 		HPGL2_vector(x - htic2, y);
 		HPGL2_vector(x - (htic2 / 2), y - (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM0;\n");
+		fputs("PM0;\n", gpoutfile);
 		HPGL2_vector(x, y);
 		HPGL2_vector(x + (htic2 / 2), y - (vtic2 / 2));
 		HPGL2_vector(x, y - vtic2);
 		HPGL2_vector(x - (htic2 / 2), y - (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM2;FP;EP;\n");
+		fputs("PM2;FP;EP;\n", gpoutfile);
 		break;
 	    case 52:		/* semisolid diamond 5 */
 		htic2 = htic * M_SQRT2;
@@ -2161,24 +2161,24 @@ HPGL2_point(unsigned int x, unsigned int y, int number)
 		HPGL2_vector(x - htic2, y);
 		HPGL2_vector(x - (htic2 / 2), y - (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM0;\n");
+		fputs("PM0;\n", gpoutfile);
 		HPGL2_vector(x, y);
 		HPGL2_vector(x + (htic2 / 2), y - (vtic2 / 2));
 		HPGL2_vector(x, y - vtic2);
 		HPGL2_vector(x - (htic2 / 2), y - (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM2;FP;EP;\n");
+		fputs("PM2;FP;EP;\n", gpoutfile);
 		HPGL2_move(x + (htic2 / 2), y - (vtic2 / 2));
 		HPGL2_vector(x + htic2, y);
 		HPGL2_vector(x + (htic2 / 2), y + (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM0;\n");
+		fputs("PM0;\n", gpoutfile);
 		HPGL2_vector(x, y + vtic2);
 		HPGL2_vector(x - (htic2 / 2), y + (vtic2 / 2));
 		HPGL2_vector(x, y);
 		HPGL2_vector(x + (htic2 / 2), y + (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM2;FP;EP;\n");
+		fputs("PM2;FP;EP;\n", gpoutfile);
 		break;
 	    case 53:		/* semisolid diamond 6 */
 		htic2 = htic * M_SQRT2;
@@ -2188,13 +2188,13 @@ HPGL2_point(unsigned int x, unsigned int y, int number)
 		HPGL2_vector(x, y + vtic2);
 		HPGL2_vector(x - (htic2 / 2), y + (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM0;\n");
+		fputs("PM0;\n", gpoutfile);
 		HPGL2_vector(x - htic2, y);
 		HPGL2_vector(x, y - vtic2);
 		HPGL2_vector(x + (htic2 / 2), y - (vtic2 / 2));
 		HPGL2_vector(x - (htic2 / 2), y + (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM2;FP;EP;\n");
+		fputs("PM2;FP;EP;\n", gpoutfile);
 		break;
 	    case 54:		/* semisolid diamond 7 */
 		htic2 = htic * M_SQRT2;
@@ -2203,7 +2203,7 @@ HPGL2_point(unsigned int x, unsigned int y, int number)
 		HPGL2_vector(x + htic2, y);
 		HPGL2_vector(x + (htic2 / 2), y + (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM0;\n");
+		fputs("PM0;\n", gpoutfile);
 		HPGL2_vector(x, y + vtic2);
 		HPGL2_vector(x - htic2, y);
 		HPGL2_vector(x, y - vtic2);
@@ -2211,7 +2211,7 @@ HPGL2_point(unsigned int x, unsigned int y, int number)
 		HPGL2_vector(x, y);
 		HPGL2_vector(x + (htic2 / 2), y + (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM2;FP;EP;\n");
+		fputs("PM2;FP;EP;\n", gpoutfile);
 		break;
 	    case 55:		/* semisolid diamond 8 */
 		htic2 = htic * M_SQRT2;
@@ -2222,13 +2222,13 @@ HPGL2_point(unsigned int x, unsigned int y, int number)
 		HPGL2_vector(x, y - vtic2);
 		HPGL2_vector(x + (htic2 / 2), y - (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM0;\n");
+		fputs("PM0;\n", gpoutfile);
 		HPGL2_vector(x, y);
 		HPGL2_vector(x + (htic2 / 2), y + (vtic2 / 2));
 		HPGL2_vector(x + htic2, y);
 		HPGL2_vector(x + (htic2 / 2), y - (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM2;FP;EP;\n");
+		fputs("PM2;FP;EP;\n", gpoutfile);
 		break;
 	    case 56:		/* semisolid diamond 9 */
 		htic2 = htic * M_SQRT2;
@@ -2238,13 +2238,13 @@ HPGL2_point(unsigned int x, unsigned int y, int number)
 		HPGL2_vector(x, y - vtic2);
 		HPGL2_vector(x + (htic2 / 2), y - (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM0;\n");
+		fputs("PM0;\n", gpoutfile);
 		HPGL2_vector(x - (htic2 / 2), y + (vtic2 / 2));
 		HPGL2_vector(x, y + vtic2);
 		HPGL2_vector(x + htic2, y);
 		HPGL2_vector(x + (htic2 / 2), y - (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM2;FP;EP;\n");
+		fputs("PM2;FP;EP;\n", gpoutfile);
 		break;
 	    case 57:		/* semisolid diamond 10 */
 		htic2 = htic * M_SQRT2;
@@ -2253,24 +2253,24 @@ HPGL2_point(unsigned int x, unsigned int y, int number)
 		HPGL2_vector(x, y + vtic2);
 		HPGL2_vector(x - (htic2 / 2), y + (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM0;\n");
+		fputs("PM0;\n", gpoutfile);
 		HPGL2_vector(x, y);
 		HPGL2_vector(x - (htic2 / 2), y - (vtic2 / 2));
 		HPGL2_vector(x - htic2, y);
 		HPGL2_vector(x - (htic2 / 2), y + (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM2;FP;EP;\n");
+		fputs("PM2;FP;EP;\n", gpoutfile);
 		HPGL2_move(x - (htic2 / 2), y - (vtic2 / 2));
 		HPGL2_vector(x, y - vtic2);
 		HPGL2_vector(x + (htic2 / 2), y - (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM0;\n");
+		fputs("PM0;\n", gpoutfile);
 		HPGL2_vector(x, y);
 		HPGL2_vector(x + (htic2 / 2), y + (vtic2 / 2));
 		HPGL2_vector(x + htic2, y);
 		HPGL2_vector(x + (htic2 / 2), y - (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM2;FP;EP;\n");
+		fputs("PM2;FP;EP;\n", gpoutfile);
 		break;
 	    case 58:		/* semisolid diamond 11 */
 		htic2 = htic * M_SQRT2;
@@ -2279,7 +2279,7 @@ HPGL2_point(unsigned int x, unsigned int y, int number)
 		HPGL2_vector(x, y - vtic2);
 		HPGL2_vector(x + (htic2 / 2), y - (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM0;\n");
+		fputs("PM0;\n", gpoutfile);
 		HPGL2_vector(x, y);
 		HPGL2_vector(x - (htic2 / 2), y - (vtic2 / 2));
 		HPGL2_vector(x - htic2, y);
@@ -2287,7 +2287,7 @@ HPGL2_point(unsigned int x, unsigned int y, int number)
 		HPGL2_vector(x + htic2, y);
 		HPGL2_vector(x + (htic2 / 2), y - (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM2;FP;EP;\n");
+		fputs("PM2;FP;EP;\n", gpoutfile);
 		break;
 	    case 59:		/* semisolid diamond 12 */
 		htic2 = htic * M_SQRT2;
@@ -2297,13 +2297,13 @@ HPGL2_point(unsigned int x, unsigned int y, int number)
 		HPGL2_vector(x - htic2, y);
 		HPGL2_vector(x - (htic2 / 2), y - (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM0;\n");
+		fputs("PM0;\n", gpoutfile);
 		HPGL2_vector(x + (htic2 / 2), y + (vtic2 / 2));
 		HPGL2_vector(x + htic2, y);
 		HPGL2_vector(x, y - vtic2);
 		HPGL2_vector(x - (htic2 / 2), y - (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM2;FP;EP;\n");
+		fputs("PM2;FP;EP;\n", gpoutfile);
 		break;
 	    case 60:		/* semisolid diamond 13 */
 		htic2 = htic * M_SQRT2;
@@ -2312,7 +2312,7 @@ HPGL2_point(unsigned int x, unsigned int y, int number)
 		HPGL2_vector(x - htic2, y);
 		HPGL2_vector(x - (htic2 / 2), y - (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM0;\n");
+		fputs("PM0;\n", gpoutfile);
 		HPGL2_vector(x, y - vtic2);
 		HPGL2_vector(x + htic2, y);
 		HPGL2_vector(x, y + vtic2);
@@ -2320,7 +2320,7 @@ HPGL2_point(unsigned int x, unsigned int y, int number)
 		HPGL2_vector(x, y);
 		HPGL2_vector(x - (htic2 / 2), y - (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM2;FP;EP;\n");
+		fputs("PM2;FP;EP;\n", gpoutfile);
 		break;
 	    case 61:		/* semisolid diamond 14 */
 		htic2 = htic * M_SQRT2;
@@ -2329,7 +2329,7 @@ HPGL2_point(unsigned int x, unsigned int y, int number)
 		HPGL2_vector(x, y + vtic2);
 		HPGL2_vector(x - (htic2 / 2), y + (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM0;\n");
+		fputs("PM0;\n", gpoutfile);
 		HPGL2_vector(x - htic2, y);
 		HPGL2_vector(x, y - vtic2);
 		HPGL2_vector(x + htic2, y);
@@ -2337,17 +2337,17 @@ HPGL2_point(unsigned int x, unsigned int y, int number)
 		HPGL2_vector(x, y);
 		HPGL2_vector(x - (htic2 / 2), y + (vtic2 / 2));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM2;FP;EP;\n");
+		fputs("PM2;FP;EP;\n", gpoutfile);
 		break;
 	    case 62:		/* solid diamond 2 */
 		htic2 = htic * M_SQRT2;
 		vtic2 = vtic * M_SQRT2;
 		HPGL2_move(x - htic2, y);
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM0;\n");
+		fputs("PM0;\n", gpoutfile);
 		HPGL2_diamond(x, y, htic2, vtic2);
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM2;FP;EP;\n");
+		fputs("PM2;FP;EP;\n", gpoutfile);
 		break;
 	    case 63:		/* hollow square 3 */
 		HPGL2_move(x - (3 * htic / 4), y - (3 * vtic / 4));
@@ -2390,7 +2390,7 @@ HPGL2_point(unsigned int x, unsigned int y, int number)
 	    case 71:		/* opaque triangle 1 */
 		HPGL2_move(x, y + (3 * vtic / 4));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM0;\n");
+		fputs("PM0;\n", gpoutfile);
 		HPGL2_vector(x - (3 * sqrt(3) * htic / 8), y - (3 * vtic / 8));
 		HPGL2_vector(x + (3 * sqrt(3) * htic / 8), y - (3 * vtic / 8));
 		HPGL2_vector(x, y + (3 * vtic / 4));
@@ -2400,7 +2400,7 @@ HPGL2_point(unsigned int x, unsigned int y, int number)
 	    case 72:		/* opaque triangle 2 */
 		HPGL2_move(x, y - (3 * vtic / 4));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM0;\n");
+		fputs("PM0;\n", gpoutfile);
 		HPGL2_vector(x - (3 * sqrt(3) * htic / 8), y + (3 * vtic / 8));
 		HPGL2_vector(x + (3 * sqrt(3) * htic / 8), y + (3 * vtic / 8));
 		HPGL2_vector(x, y - (3 * vtic / 4));
@@ -2410,7 +2410,7 @@ HPGL2_point(unsigned int x, unsigned int y, int number)
 	    case 73:		/* opaque diamond */
 		HPGL2_move(x - (3 * htic / 4), y);
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM0;\n");
+		fputs("PM0;\n", gpoutfile);
 		HPGL2_diamond(x, y, (3 * htic / 4), (3 * vtic / 4));
 		HPGL2_end_poly();
 		fprintf(gpoutfile, "PM2;FT;TR0;SP0;FP;SP%d;EP;TR;\n", HPGL2_pen);
@@ -2418,7 +2418,7 @@ HPGL2_point(unsigned int x, unsigned int y, int number)
 	    case 74:		/* opaque pentagon */
 		HPGL2_move(x, y + (3 * vtic / 4));
 		HPGL2_end_poly();
-		fprintf(gpoutfile, "PM0;\n");
+		fputs("PM0;\n", gpoutfile);
 		HPGL2_pentagon(x, y, htic, vtic);
 		HPGL2_end_poly();
 		fprintf(gpoutfile, "PM2;FT;TR0;SP0;FP;SP%d;EP;TR;\n", HPGL2_pen);
