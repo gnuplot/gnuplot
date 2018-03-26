@@ -73,10 +73,10 @@
  *   change option defaults to 8 pens (PCL5c spec), letter size, and pspoints;
  *   filled polygons and filled boxes; palette and RGB colors;
  *   explicit vertical center alignment of text instead of relying on font
- *   metric guess; rotate text by arbitrary angles; request font "symbol set
+ *   metric guess; rotate text by arbitrary angles; request font "symbol set"
  *   according to current encoding; bold/italic font support; UTF-8 encoding;
  *   ignore case/spaces/underscores in font names; more (typical) fonts;
- *   permit some alternative font alias from non-HP vendors.
+ *   permit some alternative font alias from non-HP vendors; enhanced text;
  *   variable line width; optional rounded line ends and joins;
  *   version 5 dashed lines, including custom dash types; optimized point
  *   symbols; linewidth/pointsize/fontscale options;
@@ -129,6 +129,11 @@ TERM_PUBLIC void HPGL2_fillbox(int style, unsigned int x1, unsigned int y1, unsi
 TERM_PUBLIC void HPGL2_filled_polygon(int points, gpiPoint *corners);
 TERM_PUBLIC void HPGL2_set_color(t_colorspec *colorspec);
 TERM_PUBLIC int HPGL2_make_palette(t_sm_palette *palette);
+TERM_PUBLIC void HPGL2_enh_put_text(unsigned int x, unsigned int y, const char str[]);
+TERM_PUBLIC void HPGL2_enh_open(char * fontname, double fontsize,
+			double base, TBOOLEAN widthflag, TBOOLEAN showflag,
+			int overprint);
+TERM_PUBLIC void HPGL2_enh_flush(void);
 #define GOT_HPGL_PROTO
 #endif /* TERM_PROTO */
 
@@ -231,9 +236,11 @@ TERM_PUBLIC int HPGL2_make_palette(t_sm_palette *palette);
 #endif
 
 /*
- * Prototypes
+ * Local Prototypes
  */
 
+static void HPGL2_put_text_here(const char *str, TBOOLEAN centeralign);
+static int HPGL2_set_font_size(const char *font, double size);
 static int HPGL2_map_encoding();
 static void HPGL2_end_poly();
 static void HPGL2_dot(int x, int y);
@@ -643,6 +650,16 @@ static double HPGL2_point_size_current = 0; /* current pointsize */
 static double HPGL2_is_italic = FALSE;
 static double HPGL2_is_bold = FALSE;
 static enum JUSTIFY HPGL2_justification = LEFT;
+/* enhanced text */
+static double HPGL2_base;	/* distance above initial baseline */
+static double HPGL2_base_save;	/* saved baseline for overprint=3/4 */
+static TBOOLEAN HPGL2_sizeonly;	/* first pass for right/center aligned text */
+static TBOOLEAN HPGL2_opened_string;
+static TBOOLEAN HPGL2_show;
+static int HPGL2_overprint;
+static TBOOLEAN HPGL2_widthflag;
+static float HPGL2_enh_fontscale = 1;
+
 
 /*
  * The subroutines, grouped by function for different versions.
@@ -691,6 +708,7 @@ static TBOOLEAN HPGL2_rounded = FALSE;
 enum PCL_id {
     HPGL2_COLOR,
     HPGL2_FONT, HPGL2_SIZE,
+    HPGL2_ENHANCED, HPGL2_NOENHANCED,
     HPGL2_NOPSPOINTS, HPGL2_PSPOINTS,
     HPGL2_ROUNDED, HPGL2_NOROUNDED,
     HPGL2_LINEWIDTH, HPGL2_POINTSIZE, HPGL2_FONTSCALE,
@@ -717,6 +735,8 @@ static struct gen_table PCL_opts[] =
     { "po$rtrait", PCL_PORTRAIT },
     { "la$ndscape", PCL_LANDSCAPE },
     { "size", HPGL2_SIZE },
+    { "enh$anced", HPGL2_ENHANCED },
+    { "noenh$anced", HPGL2_NOENHANCED },
     { NULL, PCL_INVALID }
 };
 
@@ -847,6 +867,16 @@ PCL_options()
 	    if (HPGL2_fontscale <= 0)
 		HPGL2_fontscale = 1.;
 	    break;
+	case HPGL2_ENHANCED:
+	    c_token++;
+	    term->flags |= TERM_ENHANCED_TEXT;
+	    term->put_text = HPGL2_enh_put_text;
+	    break;
+	case HPGL2_NOENHANCED:
+	    c_token++;
+	    term->flags &= ~TERM_ENHANCED_TEXT;
+	    term->put_text = HPGL2_put_text;
+	    break;
 	case PCL_LANDSCAPE:
 	    c_token++;
 	    PCL_landscape = TRUE;
@@ -934,11 +964,12 @@ PCL_options()
 	}
     }
 
-    sprintf(term_options,  "%s size %s "
+    sprintf(term_options,  "%senhanced %s size %s "
                            "%s %d "
                            "font \"%s, %.1f\" "
                            "%s %s "
                            "linewidth %.1f pointsize %.1f fontscale %.1f",
+	    (term->flags & TERM_ENHANCED_TEXT) ? "" : "no",
 	    PCL_mode.name, PCL_dim,
 	    "color", HPGL2_numpen,
 	    HPGL2_font->name,
@@ -1268,6 +1299,13 @@ HPGL2_put_text(unsigned int x, unsigned int y, const char *str)
  */
     HPGL2_move(x, y);
     HPGL2_end_poly();
+
+    HPGL2_put_text_here(str, TRUE);
+}
+
+static void
+HPGL2_put_text_here(const char *str, TBOOLEAN centeralign)
+{
 /*
  * Print the text string
  */
@@ -1276,10 +1314,13 @@ HPGL2_put_text(unsigned int x, unsigned int y, const char *str)
 	/* Unfortunately UTF-8 output is only documented in PCL mode, but not in HP-GL/2 mode.
 	   Hence, we switch back to PCL for this, set font properties etc. and print the text.
 	   Regrettably, text output is very limited: no vertical center alignment, no arbitrary
-	   angle and text justification only with tricks.  Color not implemented (yet).
+	   angle and text justification only with tricks.
 	 */
-	/* aim to correct vertical justification, may or may not be "OK" for current font */
-	fputs("CP0,-0.3\n", gpoutfile);
+	/* Aim to correct vertical alignment, may or may not be "OK" for current font.
+  	   This is not required for enhanced text since there we do baseline alignment
+	   in HPGL/2 mode, too. */
+	if (centeralign)
+	    fputs("CP0,-0.3\n", gpoutfile);
 	/* PCL mode, current HP-GL/2 position */
 	fputs("\033%1A", gpoutfile);
 	/* Symbol Set 18N=UTF-8 */
@@ -1325,8 +1366,22 @@ HPGL2_put_text(unsigned int x, unsigned int y, const char *str)
 	    fprintf(gpoutfile, "\033*v1oT\033&a%dP", HPGL_ang % 360);
 	    break;
 	}
+	/* Color palettes are preserved when switching from and to PCL,
+	   so we can just refer to the HP-GL/2 pen to set the PCL color. */
+	fprintf(gpoutfile, "\033*v%dS", HPGL2_pen);
+	/* If this is the first of two passes of enhanced mode printing,
+	   only move the cursor */
+	if (HPGL2_sizeonly)
+	    fputs("\033*vo1T", gpoutfile);
+	/* Here comes the actual text... */
 	fputs(str, gpoutfile);
-	fputs("\033%1B\n", gpoutfile);  // HP-GL/2 mode, current PCL position
+	if (HPGL2_sizeonly)
+	    fputs("\033*v1oT", gpoutfile);
+	/* HP-GL/2 mode, current PCL position */
+	fputs("\033%1B\n", gpoutfile);
+	/* restore baseline */
+	if (centeralign)
+	    fputs("CP0,0.3\n", gpoutfile);
     } else {
 	fprintf(gpoutfile, "LB%s\003\n", str);
     }
@@ -1496,6 +1551,7 @@ HPGL2_text_angle(int ang)
     while (ang < 0) {
 	ang += 360;
     }
+    ang %= 360;
     HPGL_ang = ang;
     switch (ang) {
     case 0: 			/* Horizontal */
@@ -1506,6 +1562,9 @@ HPGL2_text_angle(int ang)
 	break;
     case 90:			/* Vertical Up */
 	fputs("DI0,1", gpoutfile);
+	break;
+    case 180:
+	fputs("DI-1,0", gpoutfile);
 	break;
     case 270:			/* Vertical Down */
 	fputs("DI0,-1", gpoutfile);
@@ -1577,42 +1636,56 @@ HPGL2_justify_text(enum JUSTIFY just)
 TERM_PUBLIC int
 HPGL2_set_font(const char *font)
 {
-    struct termentry *t = term;
     char name[MAX_ID_LEN + 1];
-    int i, sep, int_size;
+    int sep;
+    int int_size;
     double size;
-    TBOOLEAN italic = FALSE;
-    TBOOLEAN bold = FALSE;
-    char *p;
 
     if (font == NULL)
 	font = "";
 
-    HPGL2_end_poly();
-
-/* determine font, use default from options if invalid */
     sep = strcspn(font, ",");
     strncpy(name, font, sizeof(name));
+
     if (sep < sizeof(name))
 	name[sep] = NUL;
-    if ((p = strstr(font, ":Italic")) != NULL) {
-	italic = TRUE;
-	name[p - font] = NUL;
-    }
-    if ((p = strstr(font, ":Bold")) != NULL) {
-	bold = TRUE;
-	name[p - font] = NUL;
-    }
-    for (i = 0; i < HPGL2_FONTS && !almost_equal_string(name, HPGL2_font_table[i].compare) && !almost_equal_string(name, HPGL2_font_table[i].alt); i++);
-    if (i >= HPGL2_FONTS)
-	i = HPGL2_font_num;
+
 /* determine font size, use default from options if invalid */
     int_size = 0;
+    /* FIXME: use strtod instead */
     sscanf(&(font[sep + 1]), "%d", &int_size);
     if (int_size > 0)
 	size = int_size;
     else
 	size = HPGL2_point_size;
+
+    return HPGL2_set_font_size(name, size);
+}
+
+static int
+HPGL2_set_font_size(const char *font, double size)
+{
+    struct termentry *t = term;
+    int i;
+    TBOOLEAN italic = FALSE;
+    TBOOLEAN bold = FALSE;
+    char *p1, *p2;
+    double scale = HPGL2_fontscale * HPGL2_enh_fontscale;
+
+    HPGL2_end_poly();
+
+/* determine font, use default from options if invalid */
+    if ((p1 = strstr(font, ":Italic")) != NULL)
+	italic = TRUE;
+    if ((p2 = strstr(font, ":Bold")) != NULL)
+	bold = TRUE;
+    if (p1 != NULL)
+	*p1 = NUL;
+    if (p2 != NULL)
+	*p2 = NUL;
+    for (i = 0; i < HPGL2_FONTS && !almost_equal_string(font, HPGL2_font_table[i].compare) && !almost_equal_string(font, HPGL2_font_table[i].alt); i++);
+    if (i >= HPGL2_FONTS)
+	i = HPGL2_font_num;
 /* apply font changes only if necessary */
     if (size == HPGL2_point_size_current && i == HPGL2_font_num_current &&
         italic == HPGL2_is_italic && bold == HPGL2_is_bold)
@@ -1622,15 +1695,15 @@ HPGL2_set_font(const char *font)
     HPGL2_point_size_current = size;
     HPGL2_is_italic = italic;
     HPGL2_is_bold = bold;
-    t->v_char = (int) HPGL_PUPI * HPGL2_point_size_current * HPGL2_fontscale / 72;
+    t->v_char = (int) HPGL_PUPI * HPGL2_point_size_current * scale / 72;
     t->h_char = t->v_char * 2 / 3;
     fprintf(gpoutfile, "SD1,%d,2,%d,", HPGL2_map_encoding(), HPGL2_font->spacing);
     if (HPGL2_font->spacing) {
 	HPGL2_font->height = HPGL2_point_size_current;
-	fprintf(gpoutfile, "4,%.1f,", HPGL2_font->height * HPGL2_fontscale);
+	fprintf(gpoutfile, "4,%.1f,", HPGL2_font->height * scale);
     } else {
 	HPGL2_font->pitch = 72 * 3 / (HPGL2_point_size_current * 2);
-	fprintf(gpoutfile, "3,%.1f,", HPGL2_font->pitch * HPGL2_fontscale);
+	fprintf(gpoutfile, "3,%.1f,", HPGL2_font->pitch * scale);
     }
     fprintf(gpoutfile, "5,%d,6,%d,7,%d;SS;\n",
 	italic ? HPGL2_font->italic : HPGL2_font->posture,
@@ -2954,6 +3027,210 @@ HPGL2_make_palette(t_sm_palette *palette)
     return 0;
 }
 
+TERM_PUBLIC void
+HPGL2_enh_put_text(unsigned int x, unsigned int y, const char str[])
+{
+    enum JUSTIFY just = HPGL2_justification;
+    int angle = HPGL_ang;
+    char * fontname = (char *) HPGL2_font->name;
+    double fontsize = HPGL2_point_size_current;
+    int pass, num_passes;
+    const char * original_str = str;
+
+    if (!strlen(str))
+	return;
+
+    if (fontsize == 0.)
+	fontsize = HPGL2_DEF_POINT;
+
+    /* If no enhanced text processing is needed, we can use the plain  */
+    /* vanilla put_text() routine instead of this fancy recursive one. */
+    if (ignore_enhanced_text || (!strpbrk(str, "{}^_@&~") && !contains_unicode(str))) {
+	HPGL2_put_text(x, y, str);
+	return;
+    }
+
+    HPGL2_move(x,y);
+    HPGL2_end_poly();
+
+    /* Align with baseline */
+    fputs("LO1", gpoutfile);
+    /* Adjust baseline position: */
+    fputs("CP0,-0.3\n", gpoutfile);
+
+    /* Set up global variables needed by enhanced_recursion() */
+    enhanced_fontscale = 1.0;
+    HPGL2_opened_string = FALSE;
+    HPGL2_base = 0.;
+    strncpy(enhanced_escape_format, "%c", sizeof(enhanced_escape_format));
+
+    /* Text justification requires two passes. During the first pass we */
+    /* don't draw anything, we just move the "cursor".                  */
+    /* Without justification one pass is enough.                        */
+    if (HPGL2_justification == LEFT) {
+	num_passes = 1;
+	HPGL2_sizeonly = FALSE;
+    } else {
+	num_passes = 2;
+	HPGL2_sizeonly = TRUE;
+	/* Draw "upside-down" */
+	HPGL2_text_angle(HPGL_ang + 180);
+	if (just == CENTRE) {
+	    /* set font size to half */
+	    HPGL2_enh_fontscale = 0.5;
+	    HPGL2_point_size_current = -1;
+	    HPGL2_set_font_size(fontname, fontsize);
+	}
+	/* print invisibly: white pen, no outline, transparent fill */
+	fputs("SP0CF2TR\n", gpoutfile);
+	/* We actually print everything left to right. */
+	HPGL2_justification = LEFT;
+    }
+
+    for (pass = 1; pass <= num_passes; pass++) {
+	/* Set the recursion going. We say to keep going until a
+	 * closing brace, but we don't really expect to find one.
+	 * If the return value is not the nul-terminator of the
+	 * string, that can only mean that we did find an unmatched
+	 * closing brace in the string. We increment past it (else
+	 * we get stuck in an infinite loop) and try again.
+	 */
+	while (*(str = enhanced_recursion(str, TRUE,
+				fontname, fontsize,
+				0.0, TRUE, TRUE, 0))) {
+	    term->enhanced_flush();
+	    if (!*++str)
+		break; /* end of string */
+	    /* else carry on and process the rest of the string */
+	}
+
+	/* In order to do text justification we need to do a second pass */
+	if (num_passes == 2 && pass == 1) {
+	    /* do the actual printing in the next pass */
+	    HPGL2_sizeonly = FALSE;
+	    /* revert to normal text direction */
+	    HPGL2_text_angle(angle);
+	    /* print visibly with normal pen and filling */
+	    fprintf(gpoutfile, "SP%dCF\n", HPGL2_pen);
+	    if (just == CENTRE) {
+		/* restore font size to normal */
+		HPGL2_enh_fontscale = 1.;
+		HPGL2_point_size_current = -1;
+		HPGL2_set_font_size(fontname, fontsize);
+	    }
+	}
+	str = original_str;
+    }
+
+    /* restore text alignment */
+    HPGL2_justify_text(LEFT);
+    HPGL2_lost = TRUE;
+
+    /* restore font */
+    HPGL2_enh_fontscale = 1.;
+    HPGL2_set_font("");
+}
+
+TERM_PUBLIC void
+HPGL2_enh_open(char * fontname, double fontsize,
+			double base, TBOOLEAN widthflag, TBOOLEAN showflag,
+			int overprint)
+{
+    const int scale = 0.9 * HPGL_PUPI / 72.; /* scaling of base offset */
+
+    /* There are two special cases:
+     * overprint = 3 means save current position
+     * overprint = 4 means restore saved position
+     */
+    /* Note: saving current position only possible in PCL mode */
+    if (overprint == 3) {
+	/* PCL mode; push position; restore HP-GL/2 mode */
+	fputs("\033%1A\033&f0S\033%1B\n", gpoutfile);
+	HPGL2_base_save = HPGL2_base;
+	return;
+    } else if (overprint == 4) {
+	/* PCL mode; pop position; restore HP-GL/2 mode */
+	fputs("\033%1A\033&f1S\033%1B\n", gpoutfile);
+	HPGL2_base = HPGL2_base_save;
+	return;
+    }
+
+    if (!HPGL2_opened_string) {
+	double base_shift;
+
+	/* Start new text fragment */
+	HPGL2_opened_string = TRUE;
+	enhanced_cur_text = enhanced_text;
+	/* Keep track of whether we are supposed to show this string */
+	HPGL2_show = showflag;
+	/* 0/1/2  no overprint / 1st pass / 2nd pass */
+	HPGL2_overprint = overprint;
+	/* widthflag FALSE means do not update text position after printing */
+	/* Note: Currently, this is only set by overprinting, which handled already. */
+	HPGL2_widthflag = widthflag;
+
+	/* Select font */
+	if ((fontname != NULL) && (strlen(fontname) > 0))
+	    HPGL2_set_font_size(fontname, fontsize);
+
+	/* base is distance above initial baseline.  Scale change in base to
+	   printer units, so we can do relative moves. */
+	base_shift = (base - HPGL2_base) * scale;
+	fprintf(gpoutfile, "PR%d,%d",
+		(int) (-sin(HPGL_ang * M_PI / 180.) * base_shift),
+		(int) ( cos(HPGL_ang * M_PI / 180.) * base_shift));
+	HPGL2_base = base;
+    }
+}
+
+TERM_PUBLIC
+void HPGL2_enh_flush(void)
+{
+    if (!HPGL2_opened_string)
+	return;
+    *enhanced_cur_text = '\0';
+
+    /* print the string fragment, perhaps invisibly */
+    if (!HPGL2_show && !HPGL2_sizeonly) {
+	fputs("SP0TRCF2;\n", gpoutfile); 	/* draw invisibly */
+	HPGL2_put_text_here(enhanced_text, FALSE);
+	fprintf(gpoutfile, "SP%dCF;\n", HPGL2_pen);
+    } else {
+	HPGL2_put_text_here(enhanced_text, FALSE);
+    }
+
+    if (HPGL2_sizeonly) {
+	/* nothing more to do */
+    } else if (HPGL2_overprint == 1) {
+	/* Overprinting without knowing font metrics requires
+	   some tricks.
+	   Note: does currently not work for UTF-8 text.
+	*/
+	double fontsize = HPGL2_point_size;
+	const char * name = HPGL2_font->name;
+
+	/* Save current position after the "underprinted" text */
+	fputs("\033%1A\033&f0S\033%1B\n", gpoutfile);
+	/* locate center of the first string by moving the cursor
+	using half font size in the opposite direction */
+	HPGL2_enh_fontscale *= 0.5;
+	HPGL2_point_size_current = -1;
+	HPGL2_set_font_size(name, fontsize);
+	HPGL2_text_angle(HPGL_ang + 180);
+	/* Print text, switch to center alignment */
+	fprintf(gpoutfile, "SP0CF2LB%s\003SP%dCFLO5", enhanced_text, HPGL2_pen);
+	HPGL2_text_angle(HPGL_ang + 180);
+	HPGL2_enh_fontscale *= 2;
+	HPGL2_point_size_current = -1;
+	HPGL2_set_font_size(name, fontsize);
+    } else if (HPGL2_overprint == 2) {
+	/* restore position to the end of the first string,
+	   set left justification */
+	fputs("\033%1A\033&f1S\033%1B\nLO1", gpoutfile);
+    }
+    HPGL2_opened_string = FALSE;
+}
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -2972,9 +3249,10 @@ TERM_TABLE_START(pcl5_driver)
     PCL_XMAX, PCL_YMAX, HPGL2_VCHAR, HPGL2_HCHAR,
     PCL_VTIC, PCL_HTIC, PCL_options, PCL_init, PCL_reset,
     PCL_text, null_scale, PCL_graphics, HPGL2_move, HPGL2_vector,
-    HPGL2_linetype, HPGL2_put_text, HPGL2_text_angle,
+    HPGL2_linetype, HPGL2_enh_put_text, HPGL2_text_angle,
     HPGL2_justify_text, HPGL2_point, do_arrow, HPGL2_set_font, HPGL2_pointsize,
-    TERM_CAN_DASH | TERM_LINEWIDTH | TERM_POINTSCALE | TERM_FONTSCALE, // Flags
+    TERM_CAN_DASH | TERM_LINEWIDTH | TERM_POINTSCALE |
+    TERM_FONTSCALE | TERM_ENHANCED_TEXT,
     NULL, NULL, /* suspend/resume */
     HPGL2_fillbox,
     HPGL2_linewidth,
@@ -2984,8 +3262,8 @@ TERM_TABLE_START(pcl5_driver)
     HPGL2_make_palette, 0, /* previous_palette */
     HPGL2_set_color,
     HPGL2_filled_polygon,
-    NULL, NULL, NULL, /* enhanced text */
     NULL, /* image */
+    HPGL2_enh_open, HPGL2_enh_flush, do_enh_writec,
     NULL, NULL, /* layer, path */
     0.,
     NULL, /* hypertext */
@@ -3042,11 +3320,11 @@ START_HELP(pcl5)
 "?terminal pcl5",
 "?term pcl5",
 "?pcl5",
-" The `pcl5` driver supports PCL5e/PCL5c printers.  It uses the HP-GL/2",
-" vector format.",
+" The `pcl5` driver supports PCL5e/PCL5c printers.  It (mostly) uses the"
+" HP-GL/2 vector format.",
 "",
 " Syntax:",
-"       set terminal pcl5 {<mode>}",
+"       set terminal pcl5 {<mode>} {{no}enhanced}",
 "           {size <plotsize> | size <width>{unit},<height>{unit}}",
 "           {font \"<fontname>,<size>\"} {pspoints | nopspoints}",
 "           {fontscale <scale>} {pointsize <scale>} {linewidth <scale}",
@@ -3097,12 +3375,15 @@ START_HELP(pcl5)
 " Limitations:",
 "",
 " This terminal does not support alpha transparency. Transparent filling is",
-" emulated using shading patterns.",
-" Boxed and enhanced text are currently not implemented.",
+" emulated using shading patterns. Boxed text is not implemented.",
 "",
 " The support for UTF-8 is limited.  Lacking the label mode for UTF-8 output",
 " in HP-GL/2, the driver reverts to PCL for strings containing 8bit characters.",
-" UTF-8 text is limited to black color and angles of 0, 90, 180, and 270",
-" degrees. Also vertical alignment might be off depending on the font."
+" UTF-8 text is limited to angles of 0, 90, 180, and 270 degrees. Also vertical"
+" alignment might be off depending on the font.",
+"",
+" Some enhanced text features (phantom box, overprinting) require using PCL",
+" features in addition to HP-GL/2. This conforms to the specs but may not",
+" work with your printer or software."
 END_HELP(pcl5)
 #endif /* TERM_HELP */
