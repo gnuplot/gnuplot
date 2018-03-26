@@ -16,6 +16,7 @@ Changes in 5.2.3
 * FIX svg terminal: point plot empty title produced spurious mousing directive
 * FIX tweak logscale tic range limits and minor tic generation intervals
 * FIX clipping of INRANGE->UNDEFINED line segments
+* FIX polar mode "with yerrorbars" error bars are radial, not vertical
 
 Changes in 5.2.2
 ================

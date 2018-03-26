@@ -1765,7 +1765,10 @@ plot_bars(struct curve_points *plot)
 
 	    /* By here everything has been mapped */
 	    /* First draw the main part of the error bar */
-	    draw_clip_line(xM, ylowM, xM, yhighM);
+	    if (polar) /* only relevant to polar mode "with yerrorbars" */
+		draw_clip_line(xlowM, ylowM, xhighM, yhighM);
+	    else
+		draw_clip_line(xM, ylowM, xM, yhighM);
 
 	    /* Even if error bars are dotted, the end lines are always solid */
 	    if ((bar_lp.flags & LP_ERRORBAR_SET) != 0)

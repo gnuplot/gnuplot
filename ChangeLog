@@ -1,3 +1,10 @@
+2018-03-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c demo/poldat.dem:  yerrorbars in polar mode were being
+	drawn as purely vertical rather than radial.  Add a yerrorbars test
+	case to poldat.dem.
+	Bug #2031
+
 2018-03-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_lines edge_intersect):  Handle clipping of line
