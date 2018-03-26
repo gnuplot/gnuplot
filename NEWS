@@ -5,8 +5,10 @@ Changes not in 5.2
 * NEW "set walls" command to show xy xz and yz planes in 3D plots
 * NEW "set clip radial" for line segments in polar mode plots
 * NEW "splot ... with circles"
-* NEW internal support for appending to existing arrays (not user-visible)
+* NEW "splot ... with boxes"
+* NEW unicode escape sequences \U+hhhh
 * NEW largely extended pcl5 terminal supports PCL5e/PCL5c printers
+* EXPERIMENTAL internal support for appending to existing arrays
 * EXPERIMENTAL "set mouse mouseformat function <stringval_from_xy(x,y)>"
 * CHANGE remove deprecated command "update"
 * CHANGE remove deprecated option "thru"
