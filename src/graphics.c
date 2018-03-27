@@ -1059,13 +1059,16 @@ plot_lines(struct curve_points *plot)
 	/* rgb variable  -  color read from data column */
 	check_for_variable_color(plot, &plot->varcolor[i]);
 
-	x = map_x(plot->points[i].x);
-	y = map_y(plot->points[i].y);
-
-	/* map_x or map_y can hit NaN during eval_link_function(), in which */
-	/* case the coordinate value is garbage and undefined is TRUE.      */
-	if (invalid_coordinate(x,y))
-	    plot->points[i].type = UNDEFINED;
+	/* Only map and plot the point if it is well-behaved (not UNDEFINED).
+	 * Note that map_x or map_y can hit NaN during eval_link_function(),
+	 * in which case the coordinate value is garbage so we set UNDEFINED.
+	 */
+	if (plot->points[i].type != UNDEFINED) {
+	    x = map_x(plot->points[i].x);
+	    y = map_y(plot->points[i].y);
+	    if (invalid_coordinate(x,y))
+		plot->points[i].type = UNDEFINED;
+	}
 
 	switch (plot->points[i].type) {
 	case INRANGE:
