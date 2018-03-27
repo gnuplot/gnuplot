@@ -26,7 +26,7 @@ selects the set of terminal drivers to be compiled in.
    The recommended way to configure both of these is the GNU-style
 "./configure" script described below and described further in INSTALL.gnu.
 This script is provided as part of the distributed source package, but if you
-are using sources downloaded directly from a CVS repository you may need to
+are using sources downloaded directly from a git snapshot you may need to
 regenerate it using the preliminary script "./prepare".
 
   The ./configure script inspects your system to see what support libraries
@@ -255,6 +255,12 @@ wxt terminal:
 VMS
 ---
 
+   We used to test-build gnuplot pre-releases on VMS, but this has not been
+the case since about version 4.6.  The old guidelines are included below but
+may be of only historical interest. If you have successfully built version 5 
+on VMS please drop us a note, particularly if there were any changes you
+needed to make it work.  
+
    John Hasstedt <John.Hasstedt@sunysb.edu> has written configure.vms,
 a command file that creates the necessary make and option files to build
 gnuplot.  See the file for instructions on using it.  If you have problems
@@ -452,23 +458,6 @@ whenever you re-run configure.
   -D__EXTENSIONS__ is needed. Otherwise, non-declared functions not
   returning int will be assumed to return int, with possibly
   dangerous consequences. Especially scpecfun.c is vulnerable here.
-
- - HP-UX 10.x and above
-   GCC has known problems on this platform if configured to use HP's
-  assembler. The telltale symptom are tic labels all ending up at
-  position 0.0. So either make sure you use a GCC configured to use
-  GNU as, or use HP's ANSI cc (the unbundled one).
-
- - Alpha CPUs
-   The Alpha family of CPUs exhibits somewhat unusual behaviour in the
-  case of floating point exceptions.  In default mode, it doesn't comply
-  to IEEE floating point standards very well, leading to crashes of the
-  whole program because of a floating point exception in certain cases.
-  In order to avoid these, you may want to turn on IEEE compatibility
-  mode in your compiler flags. For DEC cc, the relevant option is
-  `-ieee', for GCC, it's `-mieee'.  The configure script tries to
-  automatically detect this situation and apply the flag, but you may want
-  to double-check it.
 
  - SunOS / Solaris
   There are known issues with regard to compiler support for Booleans.

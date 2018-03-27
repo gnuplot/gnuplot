@@ -40,11 +40,11 @@ static char *RCSid() { return RCSid("$Id: version.c,v 1.114.2.11 2017/10/31 04:4
 
 
 const char gnuplot_version[] = "5.2";
-const char gnuplot_patchlevel[] = "2";
+const char gnuplot_patchlevel[] = "3alpha";
 #ifdef DEVELOPMENT_VERSION
 #include "timestamp.h"
 #else
-const char gnuplot_date[] = "2018-02-22 ";
+const char gnuplot_date[] = "2018-03-27 ";
 #endif
 const char gnuplot_copyright[] = "Copyright (C) 1986-1993, 1998, 2004, 2007-2018";
 

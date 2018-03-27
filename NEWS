@@ -6,17 +6,23 @@ Changes in 5.2.3
 * CHANGE expand \n characters when printing into a datablock
 * CHANGE allow contour plots to opt out of hidden3d processing
 * CHANGE special-case code to speed up handling of logscale axes
+* CHANGE do not write GPFUN_* variables to "save" output file
+* CHANGE default to density 100 for "set fs solid", 50 for "set fs transparent"
 * FIX potential buffer overflow in gprintf formats containing %%
 * FIX immediate response to ctrl-Z when libreadline is used for input
 * FIX warning messages inside a bracketed clause could trigger early exit
+* FIX tweak logscale tic range limits and minor tic generation intervals
+* FIX stats FOO using 'namedcolumn' name columnhead
+* FIX clipping of INRANGE->UNDEFINED line segments
+* FIX use of logscale y axis in "set view map" or "set pm3d map" modes
+* FIX placement of colorbox in "set view map" mode
+* FIX autoscaled axis range of logscale axes in "set view map" mode
+* FIX polar mode "with yerrorbars" error bars are radial, not vertical
 * FIX canvas terminal: apply both color and alpha channel to points and lines
 * FIX svg terminal: apply current color to dots
 * FIX qt terminal: include "notitle" plots in accounting for toggle operations
-* FIX stats FOO using 'namedcolumn' name columnhead
 * FIX svg terminal: point plot empty title produced spurious mousing directive
-* FIX tweak logscale tic range limits and minor tic generation intervals
-* FIX clipping of INRANGE->UNDEFINED line segments
-* FIX polar mode "with yerrorbars" error bars are radial, not vertical
+* FIX tikz terminal: failed to recognize dashtype 1
 
 Changes in 5.2.2
 ================

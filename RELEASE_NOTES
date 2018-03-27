@@ -1,17 +1,43 @@
-		GNUPLOT Version 5.2.2 Release Notes
+		GNUPLOT Version 5.2.3 Release Notes
 		===================================
 
-These release notes are for version 5.2 patchlevel 1 (5.2.2).
+These release notes are for version 5.2 patchlevel 3 (5.2.3).
 This release contains bug-fixes, a few changes back-ported from the
 development version, and a few new features.
 
 Please see the ChangeLog file for a complete list of changes made during the
 course of development from 5.0 to 5.2.
 
-Release Notes date: 01-Nov-2017
+Release Notes date: 27-Mar-2018
 
-CHANGES SINCE 5.2.0
-===================
+CHANGES IN 5.2.3
+================
+* NEW "set grid {no}vertical" adds grid lines in the xz and xz planes
+* NEW "set cntrparam {firstlinetype N} {{un}sorted}"
+* CHANGE drop non-working support for YIQ color space
+* CHANGE expand \n characters when printing into a datablock
+* CHANGE allow contour plots to opt out of hidden3d processing
+* CHANGE special-case code to speed up handling of logscale axes
+* CHANGE do not write GPFUN_* variables to "save" output file
+* CHANGE default to density 100 for "set fs solid", 50 for "set fs transparent"
+* FIX potential buffer overflow in gprintf formats containing %%
+* FIX immediate response to ctrl-Z when libreadline is used for input
+* FIX warning messages inside a bracketed clause could trigger early exit
+* FIX tweak logscale tic range limits and minor tic generation intervals
+* FIX stats FOO using 'namedcolumn' name columnhead
+* FIX clipping of INRANGE->UNDEFINED line segments
+* FIX use of logscale y axis in "set view map" or "set pm3d map" modes
+* FIX placement of colorbox in "set view map" mode
+* FIX autoscaled axis range of logscale axes in "set view map" mode
+* FIX polar mode "with yerrorbars" error bars are radial, not vertical
+* FIX canvas terminal: apply both color and alpha channel to points and lines
+* FIX svg terminal: apply current color to dots
+* FIX qt terminal: include "notitle" plots in accounting for toggle operations
+* FIX svg terminal: point plot empty title produced spurious mousing directive
+* FIX tikz terminal: failed to recognize dashtype 1
+
+CHANGES IN 5.2.2
+================
 * NEW set table separator {tab|comma|"char"} allows creation of csv files
 * NEW hotkey for changing azimuth in 3D plots with mousing
 * NEW titles for "splot .. with lines" can be placed at {beg|end} of plotted line
@@ -166,8 +192,7 @@ KNOWN ISSUES
   In particular point types 1 and 2 appear unbalanced due to shading.
 
 * You can configure support for both wxt and qt into the same gnuplot
-  executable, but only one of these two output modes can be used in any
-  given gnuplot session.
+  executable, but only one of these can be used in any given gnuplot session.
 
 * The gnuplot build system is not very good at figuring out where to find
   or install LaTeX-related files.  This can affect use of the lua/tikz
@@ -196,9 +221,6 @@ The TeX tutorial produced by --with-tutorial is horribly out of date.
 ./configure --enable-backwards-compatibility will allow use of some
 deprecated syntax from old gnuplot versions.  However the result of
 using these deprecated commands may not match the old version output.
-
-Terminal drivers for Next/Openstep and Sun workstations are no longer
-included.  Legacy terminal for coreldraw is no longer built by default.
 
 
 Configuration options for interactive use
@@ -254,8 +276,6 @@ Options for generating interactive plots for web display
 
 - Mouseable output for display on the web can be created using either 
   the canvas terminal (HTML5 2D canvas element) or the svg terminal.
-  Both allow zooming, toggling plot elements on/off, and user-scriptable
-  hot keys.
 
 			OTHER NOTES
 			===========
@@ -263,7 +283,7 @@ Options for generating interactive plots for web display
 Installation
 ------------
 
-You can download a source tarball for gnuplot version 5.2.2 from the 
+You can download a source tarball for gnuplot version 5.2.3 from the 
 gnuplot development site on SourceForge.
 	http://sourceforge.net/projects/gnuplot
 
@@ -271,7 +291,7 @@ Installation instructions are available in the source itself; the short
 version for linux/unix-like systems is to unpack the tarball and then
 <PRE>
 build it:
-      cd gnuplot-5.2.2 ; ./configure ; make
+      cd gnuplot-5.2.3 ; ./configure ; make
 test it:
       make check
 install it:
@@ -302,8 +322,4 @@ implementations of new features.  The current development version is 5.3
 minor number).  Bugfixes to version 5.2 will appear in patchlevel releases
 5.2.1, 5.2.2, etc., approximately twice a year or as needed to correct a
 serious problem.
-
-At the time of writing both the released and development source trees are
-hosted as a CVS repository on SourceForge, but are in the process of 
-conversion to git.
 
