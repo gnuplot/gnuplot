@@ -938,6 +938,7 @@ void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string,
 		case LEFT:
 			box_x = box_origin_x;
 			break;
+		default:
 		case CENTRE:
 			box_x = box_origin_x - delta;
 			break;
@@ -1646,6 +1647,7 @@ void gp_cairo_enhanced_finish(plot_struct *plot, int x, int y)
 		case LEFT:
 			box_x = box_origin_x;
 			break;
+		default:
 		case CENTRE:
 			box_x = box_origin_x - delta;
 			break;
