@@ -617,6 +617,9 @@ AXIS * extend_parallel_axis __PROTO((int ));
 /* Evaluate the function linking a secondary axis to its primary axis */
 double eval_link_function __PROTO((AXIS *, double));
 
+/* For debugging */
+void dump_axis_range __PROTO((AXIS *axis));
+
 /* macro for tic scale, used in all tic_callback functions */
 #define tic_scale(ticlevel, axis) \
     (ticlevel <= 0 ? axis->ticscale : \

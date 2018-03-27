@@ -2368,21 +2368,8 @@ clone_linked_axes(AXIS *axis1, AXIS *axis2)
 		goto inverse_function_sanity_check;
 	    }
 	    int_warn(NO_CARET, "could not confirm linked axis inverse mapping function");
-	    fprintf(stderr, "\t");
-	    fprintf(stderr, "axis1: (set_min,min,testmin) = (%g,%g,%g); ",
-		    axis1->set_min,
-		    axis1->min,
-		    testmin);
-	    fprintf(stderr, "axis1: (set_max,max,testmax) = (%g,%g,%g); ",
-		    axis1->set_max,
-		    axis1->max,
-		    testmax);
-	    fprintf(stderr, "axis2: (set_min,min) = (%g,%g); ",
-		    axis1->set_min,
-		    axis1->min);
-	    fprintf(stderr, "axis2: (set_max,max) = (%g,%g)\n",
-		    axis1->set_max,
-		    axis1->max);
+	    dump_axis_range(axis1);
+	    dump_axis_range(axis2);
 	}
 }
 
@@ -2696,4 +2683,20 @@ polar_radius(double r)
     double px, py;
     polar_to_xy(0.0, r, &px, &py, FALSE);
     return sqrt(px*px + py*py);
+}
+
+/*
+ * Print current axis range values to terminal.
+ * Mostly for debugging.
+ */
+void
+dump_axis_range(struct axis *axis) 
+{
+    if (!axis) return;
+    fprintf(stderr, "    %10.10s axis min/max %10g %10g data_min/max %10g %10g\n",
+	axis_name(axis->index), axis->min, axis->max,
+	axis->data_min, axis->data_max);
+    fprintf(stderr, "                set_min/max %10g %10g \t link:\t %s\n",
+	axis->set_min, axis->set_max,
+	axis->linked_to_primary ? axis_name(axis->linked_to_primary->index) : "none");
 }
