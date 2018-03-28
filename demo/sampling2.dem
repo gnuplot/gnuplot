@@ -1,0 +1,34 @@
+#
+# Illustrate the difference between setting a function range
+# and setting a sampling range.  The function uses the plot's
+# primary x axis (which may be the linear hidden axis underlying
+# logscaled x).  The number of samples is taken from "set sample".
+# Sample data points from '+' are generated on a temporary linear axis.
+# The sampling interval is optional.
+#
+set title "Sampling one dimension in 2D"
+set xrange [1:1000]
+set yrange [1:1000]
+set log xy
+set sample 5
+
+set label 1 at 2,5   "default # samples" tc lt 1
+set label 2 at 20,5  "sample increment" tc lt 2
+set label 3 at 200,5 "function range" tc lt 3
+
+plot sample [t=1:10] '+' using 1:($1*10.) with lp pt 7, \
+     [t=10:100:10] '+' using (t):(t) with points pt 7, \
+     [100:1000] x/10. with linespoints pt 7
+
+pause -1 "Hit return to continue"
+unset label
+
+# Equivalent in 3D
+set title "Sampling one dimension in 3D"
+set view map
+set grid x y lt black
+splot sample [t=10:100:10] '+' using (t):(t):(t) with points lc palette
+
+pause -1 "Hit return to continue"
+
+reset

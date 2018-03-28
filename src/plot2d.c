@@ -2017,7 +2017,7 @@ eval_plots()
 	    plot_num++;
 
 	    /* Check for a sampling range. */
-	    init_sample_range(axis_array + FIRST_X_AXIS);
+	    init_sample_range(axis_array + FIRST_X_AXIS, DATA);
 	    sample_range_token = parse_range(SAMPLE_AXIS);
 	    v_range_token = 0;
 	    if (sample_range_token != 0) {
@@ -3027,7 +3027,7 @@ eval_plots()
 
 		/* Check for a sampling range. */
 		/* Only relevant to function plots, and only needed in second pass. */
-		init_sample_range(axis_array + x_axis);
+		init_sample_range(axis_array + x_axis, FUNC);
 		sample_range_token = parse_range(SAMPLE_AXIS);
 		dummy_func = &plot_func;
 

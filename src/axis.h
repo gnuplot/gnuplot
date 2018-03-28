@@ -610,7 +610,7 @@ void save_autoscaled_ranges __PROTO((AXIS *, AXIS *));
 void restore_autoscaled_ranges __PROTO((AXIS *, AXIS *));
 
 char * axis_name __PROTO((AXIS_INDEX));
-void init_sample_range __PROTO((AXIS *axis));
+void init_sample_range __PROTO((AXIS *axis, enum PLOT_TYPE plot_type));
 void init_parallel_axis __PROTO((AXIS *, AXIS_INDEX));
 AXIS * extend_parallel_axis __PROTO((int ));
 

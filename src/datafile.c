@@ -5334,17 +5334,22 @@ df_generate_pseudodata()
 		t_max = X_AXIS.max;
 	    }
 
-	    /* If the axis is nonlinear we do the sampling on the primary   */
-	    /* (hidden) axis so that the samples are evenly spaced.         */
-	    /* The extra test allows sampling on x2 after "set link x2"     */
-	    /* NB: This means "t" is in the hidden linear coordinate space. */
-	    if (X_AXIS.linked_to_primary != NULL && X_AXIS.link_udf->at
-	    &&  X_AXIS.linked_to_primary != &axis_array[FIRST_X_AXIS]) {
-		AXIS *primary = X_AXIS.linked_to_primary;
-		t_min = eval_link_function(primary, t_min);
-		t_max = eval_link_function(primary, t_max);
-	    } else  {
-		check_log_limits(&X_AXIS, t_min, t_max);
+	    if ((axis_array[SAMPLE_AXIS].range_flags & RANGE_SAMPLED)) {
+		/* Nothing special */
+		;
+	    } else {
+		/* If the axis is nonlinear we do the sampling on the primary   */
+		/* (hidden) axis so that the samples are evenly spaced.         */
+		/* The extra test allows sampling on x2 after "set link x2"     */
+		/* NB: This means "t" is in the hidden linear coordinate space. */
+		if (X_AXIS.linked_to_primary != NULL && X_AXIS.link_udf->at
+		&&  X_AXIS.linked_to_primary != &axis_array[FIRST_X_AXIS]) {
+		    AXIS *primary = X_AXIS.linked_to_primary;
+		    t_min = eval_link_function(primary, t_min);
+		    t_max = eval_link_function(primary, t_max);
+		} else  {
+		    check_log_limits(&X_AXIS, t_min, t_max);
+		}
 	    }
 
 	    if (t_step == 0)	/* always true unless explicit sample interval was given */
@@ -5358,15 +5363,15 @@ df_generate_pseudodata()
 	    /* This is the case of an explicit sampling range */
 	    if (!inrange(t, t_min, t_max))
 		return NULL;
+
 	} else {
 	    /* This is the usual case */
 	    if (df_pseudorecord >= samples_1)
 		return NULL;
-	}
-
-	if (nonlinear(&X_AXIS)) {
-	    AXIS *visible = X_AXIS.linked_to_primary->linked_to_secondary;
-            t = eval_link_function(visible, t);
+	    if (nonlinear(&X_AXIS)) {
+		AXIS *visible = X_AXIS.linked_to_primary->linked_to_secondary;
+		t = eval_link_function(visible, t);
+	    }
 	}
 
 	/* This allows commands of the form

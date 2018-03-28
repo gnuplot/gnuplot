@@ -1773,13 +1773,15 @@ unset_axislabel(AXIS_INDEX axis)
 /*
  * Free dynamic fields in an axis structure so that it can be safely deleted
  * or reinitialized.  Doesn't free the axis structure itself.
+ * SAMPLE_AXIS is an exception because its link pointers are only copies of
+ * those in the real axis being sampled.
  */
 static void
 free_axis_struct(struct axis *this_axis)
 {
 	free(this_axis->formatstring);
 	free(this_axis->ticfmt);
-	if (this_axis->link_udf) {
+	if (this_axis->link_udf && this_axis->index != SAMPLE_AXIS) {
 	    free(this_axis->link_udf->at);
 	    free(this_axis->link_udf->definition);
 	    free(this_axis->link_udf);

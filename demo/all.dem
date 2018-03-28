@@ -96,6 +96,11 @@ print "******************** file violinplot.dem ********************"
 load "violinplot.dem"
 reset
 
+print "******************** file sampling.dem ********************"
+load "sampling.dem"
+load "sampling2.dem"
+reset
+
 print "******************** file multiplt.dem ********************"
 load "multiplt.dem"
 load "layout.dem"

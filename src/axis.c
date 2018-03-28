@@ -249,12 +249,20 @@ axis_name(AXIS_INDEX axis)
 }
 
 void
-init_sample_range(AXIS *axis)
+init_sample_range(AXIS *axis, enum PLOT_TYPE plot_type)
 {
     axis_array[SAMPLE_AXIS].range_flags = 0;
     axis_array[SAMPLE_AXIS].min = axis->min;
     axis_array[SAMPLE_AXIS].max = axis->max;
-    axis_array[SAMPLE_AXIS].linked_to_primary = axis->linked_to_primary;
+    axis_array[SAMPLE_AXIS].set_min = axis->set_min;
+    axis_array[SAMPLE_AXIS].set_max = axis->set_max;
+    /* Functions are sampled along the x or y plot axis */
+    /* Data is drawn from pseudofile '+', assumed to be linear */
+    /* NB:  link_udf MUST NEVER BE FREED as it is only a copy */
+    if (plot_type == FUNC) {
+	axis_array[SAMPLE_AXIS].linked_to_primary = axis->linked_to_primary;
+	axis_array[SAMPLE_AXIS].link_udf = axis->link_udf;
+    }
 }
 
 /* 
