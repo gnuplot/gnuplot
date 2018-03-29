@@ -1967,11 +1967,43 @@ ENHsvg_OPEN(
 TERM_PUBLIC void
 ENHsvg_FLUSH()
 {
-    if (ENHsvg_opened_string) {
-	ENHsvg_opened_string = FALSE;
-	*enhanced_cur_text = '\0';
-	fprintf(gpoutfile, "%s</tspan>", enhanced_text);
+    char *s = enhanced_text;
+    int i;
+
+    if (!ENHsvg_opened_string)
+	return;
+
+    ENHsvg_opened_string = FALSE;
+    *enhanced_cur_text = '\0';
+    enhanced_cur_text = enhanced_text;
+
+    /* DEBUG - expand unicode escape sequences \U+ABCD into &#xABCD;
+     * Triggers in two cases that I know of
+     * 1) encoding is not UTF-8  (probably should not happen for svg)
+     * 2) one too many backslashes in a single-quoted string
+     * We can't just substitute &#x for \U+ in place because the
+     * xml convention requires a trailing semicolon also.
+     * FIXME: this incorrectly handles the case where a legal hex character
+     * immediately follows a 4-char hex unicode entry point
+     * (e.g. the ab ligature in the unicode.dem).
+     */
+    while ((s = strstr(enhanced_cur_text, "\\U+")) != NULL) {
+	*s = '\0';
+	fputs(enhanced_cur_text, gpoutfile);	/* everything up to the escape */
+	fputs("&#x", gpoutfile);		/* xml escape sequence */
+	s += 3;					/* start of hex codepoint */
+	for (i=0; i<5; i++, s++) {		/* copy up to 5 hex characters */
+	    if (strchr("01234567890ABCDEFabcdef", *s))
+		fputc(*s, gpoutfile);
+	    else
+		break;
+	}
+	fputs(";", gpoutfile);			/* end of xml escape sequence */
+	enhanced_cur_text = s;
     }
+
+    fputs(enhanced_cur_text, gpoutfile);	/* everything after the escape[s] */
+    fputs("</tspan>", gpoutfile);
 }
 
 TERM_PUBLIC void
