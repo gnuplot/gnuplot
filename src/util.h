@@ -129,6 +129,7 @@ char *getusername __PROTO((void));
 
 TBOOLEAN contains8bit __PROTO((const char *s));
 TBOOLEAN utf8toulong __PROTO((unsigned long * wch, const char ** str));
+int ucs4toutf8 __PROTO((uint32_t codepoint, unsigned char *utf8char));
 TBOOLEAN is_sjis_lead_byte(char c);
 size_t strlen_utf8 __PROTO((const char *s));
 size_t strlen_sjis(const char *s);

@@ -2483,32 +2483,46 @@ enhanced_recursion(
 	    /*}}}*/
 
 	case '\\'  :
+	    /*{{{  various types of escape sequences, some context-dependent */
 
 	    /*     Unicode represented as \U+hhhhh where hhhhh is hexadecimal code point.
 	     *     For UTF-8 encoding we translate hhhhh to a UTF-8 byte sequence and
 	     *     output the bytes one by one.
-	     *     FIXME: non-utf8 environments not yet supported.
-	     *     Note that MSWin for example might prefer to do nothing here and convert
-	     *     to wchar representation when the string reaches EnchancedPutText for output.
 	     */
+	    if (p[1] == 'U' && p[2] == '+') {
+		if (encoding == S_ENC_UTF8) {
+		    uint32_t codepoint;
+		    unsigned char utf8char[8];
+		    int i, length;
+		    sscanf(&(p[3]), "%5x", &codepoint);
+
 #ifdef HAVE_LIBFONTCONFIG
-	    if (p[1] == 'U' && p[2] == '+' && (encoding == S_ENC_UTF8)) {
-		unsigned int codepoint;
-		unsigned char utf8char[8];
-		int i, length;
-		sscanf(&(p[3]), "%5x", &codepoint);
-		length = FcUcs4ToUtf8(codepoint, utf8char);
-		p += (codepoint > 0xFFFF) ? 7 : 6;
-		for (i=0; i<length; i++)
-		    (term->enhanced_writec)(utf8char[i]);
+		    length = FcUcs4ToUtf8(codepoint, utf8char);
+#else
+		    length = ucs4toutf8(codepoint, utf8char);
+#endif
+		    p += (codepoint > 0xFFFF) ? 7 : 6;
+		    for (i=0; i<length; i++)
+			(term->enhanced_writec)(utf8char[i]);
+		    break;
+		}
+
+	    /*     FIXME: non-utf8 environments not yet supported.
+	     *     Note that some terminals may have an alternative way to handle unicode
+	     *     escape sequences that is not dependent on encoding.
+	     *     E.g. svg and html output could convert to xml sequences &#xhhhh;
+	     *     For these cases we must retain the leading backslash so that the
+	     *     unicode escape sequence can be recognized by the terminal driver.
+	     */
+		(term->enhanced_writec)(p[0]);
 		break;
 	    }
-#endif
 
-	    /*{{{  Enhanced mode always uses \xyz as an octal character representation
-		   but each terminal type must give us the actual output format wanted.
-		   pdf.trm wants the raw character code, which is why we use strtol();
-		   most other terminal types want some variant of "\\%o". */
+	    /* Enhanced mode always uses \xyz as an octal character representation
+	     * but each terminal type must give us the actual output format wanted.
+	     * pdf.trm wants the raw character code, which is why we use strtol();
+	     * most other terminal types want some variant of "\\%o".
+	     */
 	    if (p[1] >= '0' && p[1] <= '7') {
 		char *e, escape[16], octal[4] = {'\0','\0','\0','\0'};
 
@@ -2524,10 +2538,12 @@ enhanced_recursion(
 		    (term->enhanced_writec)(*e);
 		}
 		break;
-	    /* This was the original (prior to version 4) enhanced text code specific */
-	    /* to the reserved characters of PostScript.  Some of it was mis-applied  */
-	    /* to other terminal types until fixed in Mar 2012.                       */
-	    } else if (term->flags & TERM_IS_POSTSCRIPT) {
+	    }
+
+	    /* This was the original (prior to version 4) enhanced text code specific
+	     * to the reserved characters of PostScript.
+	     */
+	    if (term->flags & TERM_IS_POSTSCRIPT) {
 		if (p[1]=='\\' || p[1]=='(' || p[1]==')') {
 		    (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
 		    (term->enhanced_writec)('\\');
@@ -2538,10 +2554,11 @@ enhanced_recursion(
 		    break;
 		}
 	    }
+
+	    /* Step past the backslash character in the input stream */
 	    ++p;
 
-	    /* HBB 20030122: Avoid broken output if there's a \
-	     * exactly at the end of the line */
+	    /* HBB: Avoid broken output if there's a \ exactly at the end of the line */
 	    if (*p == '\0') {
 		int_warn(NO_CARET, "enhanced text parser -- spurious backslash");
 		break;
@@ -2555,8 +2572,11 @@ enhanced_recursion(
 		break;
 	    }
 
-	    /* just go and print it (fall into the 'default' case) */
+	    /* print the character following the backslash
+	     * (fall through to the 'default' case)
+	     */
 	    /*}}}*/
+
 	default:
 	    /*{{{  print it */
 	    (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);

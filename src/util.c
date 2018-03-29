@@ -1462,6 +1462,39 @@ utf8toulong (unsigned long * wch, const char ** str)
   return FALSE;
 }
 
+
+/*
+ * Convert unicode codepoint to UTF-8
+ * returns number of bytes in the UTF-8 representation
+ */
+int
+ucs4toutf8(uint32_t codepoint, unsigned char *utf8char)
+{
+    int length = 0;
+
+    if (codepoint <= 0x7F) {
+	utf8char[0] = codepoint;
+	length = 1;
+    } else if (codepoint <= 0x7FF) {
+	utf8char[0] = 0xC0 | (codepoint >> 6);            /* 110xxxxx */
+	utf8char[1] = 0x80 | (codepoint & 0x3F);          /* 10xxxxxx */
+	length = 2;
+    } else if (codepoint <= 0xFFFF) {
+	utf8char[0] = 0xE0 | (codepoint >> 12);           /* 1110xxxx */
+	utf8char[1] = 0x80 | ((codepoint >> 6) & 0x3F);   /* 10xxxxxx */
+	utf8char[2] = 0x80 | (codepoint & 0x3F);          /* 10xxxxxx */
+	length = 3;
+    } else if (codepoint <= 0x10FFFF) {
+	utf8char[0] = 0xF0 | (codepoint >> 18);           /* 11110xxx */
+	utf8char[1] = 0x80 | ((codepoint >> 12) & 0x3F);  /* 10xxxxxx */
+	utf8char[2] = 0x80 | ((codepoint >> 6) & 0x3F);   /* 10xxxxxx */
+	utf8char[3] = 0x80 | (codepoint & 0x3F);          /* 10xxxxxx */
+	length = 4;
+    }
+
+    return length;
+}
+
 /*
  * Returns number of (possibly multi-byte) characters in a UTF-8 string
  */
@@ -1679,4 +1712,3 @@ num_to_str(double r)
 
     return s[j];
 }
-
