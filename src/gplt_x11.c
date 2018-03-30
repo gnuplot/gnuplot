@@ -515,7 +515,6 @@ static int gpXTextExtents __PROTO((XFontStruct *, char *, int, XCharStruct *));
 static void gpXSetFont __PROTO((Display *, GC, Font));
 static void gpXDrawImageString __PROTO((Display *, Drawable, GC, int, int, const char *, int));
 static void gpXDrawString __PROTO((Display *, Drawable, GC, int, int, const char *, int));
-static void gpXFreeFont __PROTO((Display *, XFontStruct *));
 static XFontStruct *gpXLoadQueryFont __PROTO((Display *, char *));
 static char *gpFallbackFont __PROTO((void));
 static int gpXGetFontascent __PROTO((XFontStruct *cfont));
@@ -5724,23 +5723,6 @@ void gpXDrawString (Display *disp, Drawable d, GC gc, int x, int y,
     XDrawString(disp, d, gc, x, y, str, len);
 }
 
-void gpXFreeFont(Display *disp, XFontStruct *cfont)
-{
-#ifndef USE_X11_MULTIBYTE
-    if (cfont)
-	XFreeFont(disp, cfont);
-#else
-    if (font) {
-	XFreeFont(disp, font);
-	font=NULL;
-    }
-    if (mbfont) {
-	XFreeFontSet(disp, mbfont);
-	mbfont=NULL;
-    }
-#endif
-}
-
 XFontStruct *gpXLoadQueryFont (Display *disp, char *fontname)
 {
 #ifndef USE_X11_MULTIBYTE
@@ -5878,7 +5860,7 @@ clear_used_font_list() {
     while (fontlist.next) {
 	f = fontlist.next;
 #ifndef USE_X11_MULTIBYTE
-	gpXFreeFont(dpy, f->font);
+	if (f->font) XFreeFont(disp, f->font);
 #else
 	if (f->font) XFreeFont(dpy, f->font);
 	if (f->mbfont) XFreeFontSet(dpy, f->mbfont);
