@@ -937,7 +937,7 @@ CACA_text()
 			CACA_processing_events = FALSE;
 			term_graphics = TRUE;
 		} else {
-			char c = getchar();
+			(void) getchar();
 			CACA_close_display();
 		}
 	}
