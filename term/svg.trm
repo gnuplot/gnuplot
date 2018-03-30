@@ -1993,7 +1993,7 @@ ENHsvg_FLUSH()
 	fputs("&#x", gpoutfile);		/* xml escape sequence */
 	s += 3;					/* start of hex codepoint */
 	for (i=0; i<5; i++, s++) {		/* copy up to 5 hex characters */
-	    if (strchr("01234567890ABCDEFabcdef", *s))
+	    if (*s && strchr("01234567890ABCDEFabcdef", *s))
 		fputc(*s, gpoutfile);
 	    else
 		break;
