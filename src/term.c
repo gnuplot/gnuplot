@@ -2644,7 +2644,8 @@ enh_err_check(const char *str)
 int
 estimate_strlen(char *text)
 {
-int len;
+    int len;
+    char *s;
 
     if ((term->flags & TERM_IS_LATEX))
 	len = strlen_tex(text);
@@ -2664,6 +2665,13 @@ int len;
     else
 #endif
 	len = strlen(text);
+
+    /* Assume that unicode escape sequences  \U+xxxx will generate a single character */
+    s = ENHest_plaintext;
+    while ((s = contains_unicode(s)) != NULL) {
+	len -= 6;
+	s += 6;
+    }
 
     return len;
 }
