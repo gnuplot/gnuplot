@@ -748,11 +748,12 @@ WIN_put_text(unsigned int x, unsigned int y, const char *str)
 {
 	WIN_flush_line(&WIN_poly);
 
-	if ((str == NULL) || !strlen(str)) return;
+	if ((str == NULL) || !strlen(str))
+		return;
 
 	/* If no enhanced text processing is needed, we can use the plain  */
 	/* vanilla put_text() routine instead of this fancy recursive one. */
-	if (!(term->flags & TERM_ENHANCED_TEXT) || ignore_enhanced_text || !strpbrk(str, "{}^_@&~"))
+	if (!(term->flags & TERM_ENHANCED_TEXT) || ignore_enhanced_text || (!strpbrk(str, "{}^_@&~") && !contains_unicode(str)))
 		GraphOp(graphwin, W_put_text, x, y, str);
 	else
 		GraphOp(graphwin, W_enhanced_text, x, y, str);
