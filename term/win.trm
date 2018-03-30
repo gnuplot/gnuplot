@@ -223,7 +223,10 @@ WIN_options()
 	TBOOLEAN set_linewidth = FALSE, set_size = FALSE;
 	TBOOLEAN set_position = FALSE, set_number = FALSE;
 	TBOOLEAN set_wsize = FALSE, set_rounded = FALSE;
-	TBOOLEAN set_docked = FALSE, set_layout = FALSE;
+	TBOOLEAN set_docked = FALSE;
+#ifndef WGP_CONSOLE
+	TBOOLEAN set_layout = FALSE;
+#endif
 	TBOOLEAN set_pointscale = FALSE;
 	TBOOLEAN color, dashed, rounded;
 	COLORREF background;
@@ -447,7 +450,9 @@ WIN_options()
 				dock_cols = 1;
 				fprintf(stderr, "Warning: layout requires at least one column.\n");
 			}
+#ifndef WGP_CONSOLE
 			set_layout = TRUE;
+#endif
 			break;
 		case WIN_OTHER:
 		default:
@@ -506,10 +511,8 @@ WIN_options()
 		graphwin->Size.y = win_height;
 	}
 #ifdef WGP_CONSOLE
-	if (set_docked && WIN_docked) {
-		fputs("Warning: option `docked` ignored for console mode gnuplot.\n", stderr);
-		WIN_docked = FALSE;
-	}
+	if (set_docked && WIN_docked)
+		WIN_docked = FALSE; /* silently ignore docked option for console mode gnuplot */
 #endif
 	if (!WIN_docked) {
 		if (set_docked)
