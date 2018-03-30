@@ -1208,9 +1208,6 @@ fi
 dnl translation tools
 AM_CONDITIONAL(HAVE_LRELEASE, test "${LRELEASE}" != no)
 
-AC_SEARCH_LIBS(FcUcs4ToUtf8, [fontconfig],
-  AC_DEFINE(HAVE_LIBFONTCONFIG,1,[ used for unicode codepoint->utf8 conversion ]),,)
-
 AC_ARG_VAR(DIST_CONTACT,[Contact address for modified and binary distributed gnuplot versions])
 if test -n "${DIST_CONTACT}"; then
   AC_DEFINE_UNQUOTED([DIST_CONTACT],["$DIST_CONTACT"],[Contact address for modified and binary distributed gnuplot versions])

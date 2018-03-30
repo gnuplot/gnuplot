@@ -100,11 +100,6 @@ long mouse_mode = 0;
 char* mouse_alt_string = NULL;
 #endif
 
-/* Contains a convenient routine for converting Unicode code point to UTF-8 */
-#ifdef HAVE_LIBFONTCONFIG
-#include <fontconfig/fontconfig.h>
-#endif
-
 #ifdef _WIN32
 # include "win/winmain.h"
 # include "win/wcommon.h"
@@ -2494,13 +2489,9 @@ enhanced_recursion(
 		    uint32_t codepoint;
 		    unsigned char utf8char[8];
 		    int i, length;
-		    sscanf(&(p[3]), "%5x", &codepoint);
 
-#ifdef HAVE_LIBFONTCONFIG
-		    length = FcUcs4ToUtf8(codepoint, utf8char);
-#else
+		    sscanf(&(p[3]), "%5x", &codepoint);
 		    length = ucs4toutf8(codepoint, utf8char);
-#endif
 		    p += (codepoint > 0xFFFF) ? 7 : 6;
 		    for (i=0; i<length; i++)
 			(term->enhanced_writec)(utf8char[i]);
