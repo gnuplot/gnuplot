@@ -2651,18 +2651,18 @@ estimate_strlen(char *text)
 	FPRINTF((stderr,"Estimating length %d height %g for enhanced text string \"%s\"\n",
 		len, (double)(term->ymax)/10., text));
 	term = tsave;
+	/* Assume that unicode escape sequences  \U+xxxx will generate a single character */
+	/* ENHest_plaintext is filled in by the put_text() call to estimate.trm           */
+	s = ENHest_plaintext;
+	while ((s = contains_unicode(s)) != NULL) {
+	    len -= 6;
+	    s += 6;
+	}
     } else if (encoding == S_ENC_UTF8)
 	len = strwidth_utf8(text);
     else
 #endif
 	len = strlen(text);
-
-    /* Assume that unicode escape sequences  \U+xxxx will generate a single character */
-    s = ENHest_plaintext;
-    while ((s = contains_unicode(s)) != NULL) {
-	len -= 6;
-	s += 6;
-    }
 
     return len;
 }
