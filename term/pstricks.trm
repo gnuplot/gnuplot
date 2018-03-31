@@ -49,13 +49,6 @@
  *		(gisli@liapunov.eecs.umich.edu) to create a new version.
  *		Should also work with TeX as well as LaTeX.
  *
- *		If you have PSTricks version 0.91, #define OLD_PST to
- *		get the right dots.
- *
- *		Added a really ugly hack (enabled by default) to print
- *		"nice" numbers for axis labels.  This should really be at
- *		a higher level in the code, but I'm lazy right now.
- *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
  */
@@ -66,14 +59,18 @@
  *  eepic and latex driver. You need pstricks.sty, and, of course, a printer
  *  that understands PostScript.  Ghostscript understands Postscript too.
  *
- *  PSTricks is available via anonymous ftp from the /pub directory
- *  at Princeton.EDU.  This driver definitely does not come close to
- *  using the full capability of the PSTricks package.
+ *  PSTricks is available at
+ *     http://tug.org/PSTricks/
+ *  This driver definitely does not come close to using the full capability
+ *  of the PSTricks package.
  */
 /*
  * adapted to the new terminal layout by Stefan Bodewig (Dec. 1995)
  *
  * adapted to support pm3d by Tim Piessens and Petr Mikulik (Jan. 2003)
+ *
+ * remove "hacktext" option since this is functionality is provided by
+ * the %H format. (BM, March 2018)
  */
 
 #include "driver.h"
@@ -112,7 +109,6 @@ TERM_PUBLIC void PSTRICKS_filled_polygon __PROTO((int, gpiPoint *));
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
 static void PSTRICKS_endline __PROTO((void));
-static char *PSTRICKS_hack_text __PROTO((const char *s));
 
 static float PSTRICKS_posx;
 static float PSTRICKS_posy;
@@ -127,7 +123,7 @@ static int PSTRICKS_color = 0;
 #else
 static char PSTRICKS_color_str[16] = "";
 #endif
-static int PSTRICKS_palette_set = FALSE;
+static TBOOLEAN PSTRICKS_palette_set = FALSE;
 static int PSTRICKS_palette_size = 128;
 
 #define	PSTRICKS_TINY_DOT	0.00025		/* A tiny dot */
@@ -181,22 +177,22 @@ static int PSTRICKS_linecount = 0;
  * Handle options
  */
 
-static int PST_hack_text = TRUE;	/* Hack text on */
 static int PST_unit_plot = FALSE;	/* Unit-sized plot off */
 
 TERM_PUBLIC void
 PSTRICKS_options()
 {
     if (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "no$hacktext")) {
-	    PST_hack_text = FALSE;
-	    c_token++;
-	} else if (almost_equals(c_token, "u$nit")) {
+	if (almost_equals(c_token, "u$nit")) {
 	    PST_unit_plot = TRUE;
+	    c_token++;
+	} else if (almost_equals(c_token, "nou$nit")) {
+	    PST_unit_plot = FALSE;
 	    c_token++;
 	}
     }
 }
+
 
 TERM_PUBLIC void
 PSTRICKS_init()
@@ -231,19 +227,11 @@ PSTRICKS_graphics()
 
     /* Define point objects */
 
-#ifdef	OLD_PST
-    /* PSTricks version 0.91 had x and diamond dot types */
-    fputs("\
-\\newpsobject(PST@Diamond}{psdots}{linewidth=.001,linestyle=solid,dotstyle=diamond}\n\
-\\newpsobject(PST@Filldiamond}{psdots}{linewidth=.001,linestyle=solid,dotstyle=diamond*}\n\
-\\newpsobject{PST@Cross}{psdots}{linewidth=.001,linestyle=solid,dotstyle=x}\n", gpoutfile);
-#else
     /* Newer versions use rotated plus and square to get the x and diamond dots */
     fputs("\
 \\newpsobject{PST@Diamond}{psdots}{linewidth=.001,linestyle=solid,dotstyle=square,dotangle=45}\n\
 \\newpsobject{PST@Filldiamond}{psdots}{linewidth=.001,linestyle=solid,dotstyle=square*,dotangle=45}\n\
 \\newpsobject{PST@Cross}{psdots}{linewidth=.001,linestyle=solid,dotstyle=+,dotangle=45}\n", gpoutfile);
-#endif
 
     fputs("\
 \\newpsobject{PST@Plus}{psdots}{linewidth=.001,linestyle=solid,dotstyle=+}\n\
@@ -297,15 +285,14 @@ PSTRICKS_linetype(int linetype)
 {
     PSTRICKS_endline();
 
-    if (linetype >= PSTRICKS_NUMLINES - 2)
-	linetype %= (PSTRICKS_NUMLINES - 2);
+    if (linetype >= PSTRICKS_NUMLINES + LT_BLACK)
+	linetype %= (PSTRICKS_NUMLINES + LT_BLACK);
 
-    if (linetype < -2)
+    if (linetype < LT_BLACK)
 	linetype = LT_BLACK;
 
     PSTRICKS_type = linetype;
 }
-
 
 
 TERM_PUBLIC void
@@ -370,6 +357,7 @@ PSTRICKS_vector(unsigned ux, unsigned uy)
     fprintf(gpoutfile, "(%.4f,%.4f)\n", PSTRICKS_posx, PSTRICKS_posy);
 }
 
+
 static void
 PSTRICKS_endline()
 {
@@ -397,97 +385,6 @@ PSTRICKS_arrow(
     PSTRICKS_posy = ey / PSTRICKS_YMAX;
 }
 
-/*
- * A really ugly hack!!!
- *
- * This function takes an input string and hacks it up.  If the
- * input string starts with a number, it converts the number into a
- * TeX style number including exponential notation.  Thus, if
- * the input is the string "3.14159e3 is a number", then
- * the output is "$3.14159\cdot 10^{3}$ is a number", so that TeX
- * will produce something nice.
- *
- * This is basically meant for producing axis labels that look nice.
- *
- * What a hack!
- */
-
-
-static char *
-PSTRICKS_hack_text(const char *s)
-{
-    double value;
-    char *ends;
-    static char hack[BUFSIZ];
-
-    /*
-     * Does the string start with a number?
-     */
-
-    value = strtod(s, &ends);
-    (void)value;
-
-    if (s == ends) {
-	/*
-	 * This doesn't start a number, so just copy the string over
-	 */
-
-	strcpy(hack, s);
-    } else {
-	char *ptr;
-
-	/*
-	 * We have a number!  Check to see if the number
-	 * is in scientific notation
-	 */
-
-	safe_strncpy(hack, s, ends - s + 1);
-	/* hack[ends - s] = '\0'; */
-
-	ptr = strchr(hack, 'e');
-	if (ptr == NULL) {
-	    ptr = strchr(hack, 'E');
-	}
-	if (ptr != NULL) {
-	    /*
-	     * Exponential notation!  Let's get the mantissa and exponent separately
-	     */
-
-	    double man_val;
-	    int expo_val;
-
-	    *ptr = NUL;
-
-	    man_val = atof(hack);
-	    expo_val = atoi(ptr + 1);
-
-	    if (man_val == 0) {
-		sprintf(hack, "0");
-	    } else if (man_val == 1) {
-		sprintf(hack, "$10^{%d}$", expo_val);
-	    } else if (man_val == (int) man_val) {
-		if (expo_val == 1) {
-		    sprintf(hack, "$%d$", (int) man_val);
-		} else {
-		    sprintf(hack, "$%d \\times 10^{%d}$", (int) man_val, expo_val);
-		}
-	    } else {
-		if (expo_val == 1) {
-		    sprintf(hack, "$%f$", man_val);
-		} else {
-		    sprintf(hack, "$%f \\times 10^{%d}$", man_val, expo_val);
-		}
-	    }
-	}
-	/*
-	 * Copy anything that's left of the string
-	 */
-
-	strcat(hack, ends);
-    }
-
-    return hack;
-}
 
 TERM_PUBLIC void
 PSTRICKS_put_text(unsigned int x, unsigned int y, const char str[])
@@ -517,8 +414,11 @@ PSTRICKS_put_text(unsigned int x, unsigned int y, const char str[])
 	switch (PSTRICKS_angle) {
 	case 0:
 	    break;
-	case 1:
+	case 90:
 	    fputs("{L}", gpoutfile);
+	    break;
+	default:
+	    fprintf(gpoutfile, "{%i}", PSTRICKS_angle);
 	    break;
 	}
 
@@ -527,34 +427,30 @@ PSTRICKS_put_text(unsigned int x, unsigned int y, const char str[])
 	fprintf(gpoutfile, "(%.4f,%.4f)",
 		x / PSTRICKS_XMAX,
 		y / PSTRICKS_YMAX);
-	if (PST_hack_text) {
-	    char *hack;
-
-	    /* Hack leading numbers to something nice for TeX */
-
-	    hack = PSTRICKS_hack_text(str);
-	    fprintf(gpoutfile, "{%s}\n", hack);
-	} else {
-	    fprintf(gpoutfile, "{%s}\n", str);
-	}
+	fprintf(gpoutfile, "{%s}\n", str);
     }
 }
-
 
 
 TERM_PUBLIC int
 PSTRICKS_justify_text(enum JUSTIFY mode)
 {
     PSTRICKS_justify = mode;
-    return (TRUE);
+    return TRUE;
 }
+
 
 TERM_PUBLIC int
 PSTRICKS_text_angle(int ang)
 {
-    PSTRICKS_angle = (ang ? 1 : 0);
-    return (TRUE);
+    PSTRICKS_angle = ang;
+    while (PSTRICKS_angle < 0)
+	PSTRICKS_angle += 360;
+    while (PSTRICKS_angle > 360)
+	PSTRICKS_angle -= 360;
+    return TRUE;
 }
+
 
 TERM_PUBLIC void
 PSTRICKS_reset()
@@ -565,10 +461,10 @@ PSTRICKS_reset()
 
 
 TERM_PUBLIC int
-PSTRICKS_make_palette (t_sm_palette *palette)
+PSTRICKS_make_palette(t_sm_palette *palette)
 {
     /* Query to determine palette size */
-    if (palette==NULL) {
+    if (palette == NULL) {
 	return PSTRICKS_palette_size;
     }
 
@@ -588,11 +484,11 @@ PSTRICKS_make_palette (t_sm_palette *palette)
 		/* Color palette */
 		double r, g, b;
 		for (i=0; i < sm_palette.colors; i++) {
-		    /* round to 3 digits to avoid sth like 1e-7 in %g below */
+		    /* round to 3 digits */
 		    r = 1e-3 * (int)(palette->color[i].r * 1000);
 		    g = 1e-3 * (int)(palette->color[i].g * 1000);
 		    b = 1e-3 * (int)(palette->color[i].b * 1000);
-		    fprintf(gpoutfile, "\\newrgbcolor{PST@COLOR%d}{%g %g %g}\n", i, r, g, b);
+		    fprintf(gpoutfile, "\\newrgbcolor{PST@COLOR%d}{%f %f %f}\n", i, r, g, b);
 		}
 	    }
     }
@@ -603,7 +499,7 @@ PSTRICKS_make_palette (t_sm_palette *palette)
 
 
 TERM_PUBLIC void
-PSTRICKS_set_color (t_colorspec *colorspec)
+PSTRICKS_set_color(t_colorspec *colorspec)
 {
     int new_color;
     double gray = colorspec->value;
@@ -626,7 +522,7 @@ PSTRICKS_set_color (t_colorspec *colorspec)
 
 
 TERM_PUBLIC void
-PSTRICKS_filled_polygon (int points, gpiPoint *corners)
+PSTRICKS_filled_polygon(int points, gpiPoint *corners)
 {
     int i;
 
@@ -648,7 +544,6 @@ PSTRICKS_filled_polygon (int points, gpiPoint *corners)
 
 
 #ifdef TERM_TABLE
-
 TERM_TABLE_START(pstricks_driver)
     "pstricks", "LaTeX picture environment with PSTricks macros",
     PSTRICKS_XMAX, PSTRICKS_YMAX, PSTRICKS_VCHAR, PSTRICKS_HCHAR,
@@ -656,11 +551,12 @@ TERM_TABLE_START(pstricks_driver)
     PSTRICKS_text, null_scale, PSTRICKS_graphics, PSTRICKS_move, PSTRICKS_vector,
     PSTRICKS_linetype, PSTRICKS_put_text, PSTRICKS_text_angle,
     PSTRICKS_justify_text, PSTRICKS_point, PSTRICKS_arrow, set_font_null, 0,
-    TERM_BINARY /*flags*/, 0 /*suspend*/, 0 /*resume*/, 0 , 0
+    TERM_BINARY | TERM_IS_LATEX /*flags*/, 0 /*suspend*/, 0 /*resume*/,
+    0 /* fillbox */, 0 /* linewidth */,
 #ifdef USE_MOUSE
-    , 0, 0, 0, 0, 0
+    0, 0, 0, 0, 0,
 #endif
-     , PSTRICKS_make_palette, 0,  PSTRICKS_set_color, PSTRICKS_filled_polygon
+    PSTRICKS_make_palette, 0, PSTRICKS_set_color, PSTRICKS_filled_polygon
 TERM_TABLE_END(pstricks_driver)
 
 #undef LAST_TERM
@@ -668,6 +564,7 @@ TERM_TABLE_END(pstricks_driver)
 
 #endif /* TERM_TABLE */
 #endif /* TERM_PROTO_ONLY */
+
 
 #ifdef TERM_HELP
 START_HELP(pstricks)
@@ -683,14 +580,18 @@ START_HELP(pstricks)
 " You need \"pstricks.sty\", and, of course, a printer that understands",
 " PostScript, or a converter such as Ghostscript.",
 "",
-" PSTricks is available via anonymous ftp from the /pub directory at",
-" Princeton.edu.  This driver definitely does not come close to using the full",
+" PSTricks is available at",
+"^ <a href=\"http://tug.org/PSTricks/\">",
+"           http://tug.org/PSTricks/.",
+"^ </a>",
+" This driver definitely does not come close to using the full",
 " capability of the PSTricks package.",
 "",
 " Syntax:",
-"       set terminal pstricks {hacktext | nohacktext} {unit | nounit}",
+"       set terminal pstricks {{no}unit}",
 "",
-" The first option invokes an ugly hack that gives nicer numbers; the second",
-" has to do with plot scaling.  The defaults are `hacktext` and `nounit`."
+" The `unit` has to do with plot scaling, the default is `nounit`."
+" The old `hacktext` option has been replaced by the new default"
+" format, see `format`."
 END_HELP(pstricks)
 #endif /* TERM_HELP */
