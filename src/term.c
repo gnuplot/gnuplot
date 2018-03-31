@@ -90,6 +90,7 @@
 #include "misc.h"
 #include "multiplot.h"
 #include "readline.h"
+#include "encoding.h"
 
 #ifdef USE_MOUSE
 #include "mouse.h"
@@ -654,7 +655,7 @@ term_apply_lp_properties(struct lp_style_type *lp)
     /* linetype < 0 (e.g. LT_BACKGROUND, LT_NODRAW) means some special */
     /* category that will be handled directly by term->linetype().     */
     /* linetype > 0 is now redundant. It used to encode both a color   */
-    /* and a dash pattern.  Now we have separate mechanisms for those. */ 
+    /* and a dash pattern.  Now we have separate mechanisms for those. */
     if (LT_COLORFROMCOLUMN < lt && lt < 0)
 	(*term->linetype) (lt);
     else if (term->set_color == null_set_color) {
@@ -1226,7 +1227,7 @@ null_justify_text(enum JUSTIFY just)
 }
 
 
-/* 
+/*
  * Deprecated terminal function (pre-version 3)
  */
 static int
@@ -1773,7 +1774,7 @@ test_term()
     (*t->linetype) (LT_BLACK);
     if (t->flags & TERM_ENHANCED_TEXT) {
 	char *tmptext1 =   "Enhanced text:   {x@_{0}^{n+1}}";
-	char *tmptext2 = "&{Enhanced text:  }{/:Bold Bold}{/:Italic  Italic}";  
+	char *tmptext2 = "&{Enhanced text:  }{/:Bold Bold}{/:Italic  Italic}";
 	(*t->put_text) (x0 + xmax_t * 0.5, y0 + ymax_t * 0.40, tmptext1);
 	(*t->put_text) (x0 + xmax_t * 0.5, y0 + ymax_t * 0.35, tmptext2);
 	(*t->set_font)("");
@@ -1900,11 +1901,11 @@ test_term()
     yl = ymax_t / 25;
     x = x0 + xmax_t * .3;
     y = y0 + yl;
-    
+
     for (i=0; i<5; i++) {
  	(*t->linewidth) (1.0);
 	(*t->linetype) (LT_SOLID);
-	(*t->dashtype) (i, NULL); 
+	(*t->dashtype) (i, NULL);
 	(*t->set_color)(&black);
 	(*t->move) (x, y); (*t->vector) (x+xl, y);
 	sprintf(label,"  dt %1d", i+1);
@@ -2667,7 +2668,7 @@ estimate_strlen(char *text)
     return len;
 }
 
-/* 
+/*
  * Use estimate.trm to mock up a non-enhanced approximation of the
  * original string.
  */
@@ -3011,7 +3012,7 @@ strlen_tex(const char *str)
 
 /* The check for asynchronous events such as hotkeys and mouse clicks is
  * normally done in term->waitforinput() while waiting for the next input
- * from the command line.  If input is currently coming from a file or 
+ * from the command line.  If input is currently coming from a file or
  * pipe instead, as with a "load" command, then this path would not be
  * triggered automatically and these events would back up until input
  * returned to the command line.  These code paths can explicitly call

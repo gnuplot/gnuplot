@@ -68,6 +68,7 @@
 #include "setshow.h"
 #include "version.h"
 #include "command.h"
+#include "encoding.h"
 #include "winmain.h"
 #include "wtext.h"
 #include "wcommon.h"
@@ -249,7 +250,7 @@ GetDllVersion(LPCTSTR lpszDllName)
 }
 
 
-BOOL 
+BOOL
 IsWindowsXPorLater(void)
 {
     OSVERSIONINFO versionInfo;
@@ -1237,7 +1238,7 @@ ConsolePutCh(int ch)
 #endif
 
 
-/* This is called by the system to signal various events. 
+/* This is called by the system to signal various events.
    Note that it is executed in a separate thread.  */
 BOOL WINAPI
 ConsoleHandler(DWORD dwType)

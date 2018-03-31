@@ -53,6 +53,7 @@
 #include "gp_hist.h"
 #include "plot.h"
 #include "util.h"
+#include "encoding.h"
 #include "term_api.h"
 #ifdef HAVE_WCHAR_H
 #include <wchar.h>
@@ -98,7 +99,7 @@ getc_wrapper(FILE* fp)
 /*
  * The signal handler of libreadline sets a flag when SIGTSTP is received
  * but does not suspend until this flag is checked by other library
- * routines.  Since gnuplot's term->waitforinput() + getc_wrapper() 
+ * routines.  Since gnuplot's term->waitforinput() + getc_wrapper()
  * replace these other routines, we must do the test and suspend ourselves.
  */
 void
@@ -272,7 +273,7 @@ static int ansi_getc __PROTO((void));
 static int win_getch(void);
 #  else
     /* The wgnuplot text window will suppress intermediate
-       screen updates in 'suspend' mode and only redraw the 
+       screen updates in 'suspend' mode and only redraw the
        input line after 'resume'. */
 #   define SUSPENDOUTPUT TextSuspend(&textwin)
 #   define RESUMEOUTPUT TextResume(&textwin)
@@ -1113,14 +1114,14 @@ readline(const char *prompt)
 	    default:
 		break;
 	    }
-	} 
+	}
 
 	} else {  /* search-mode */
 #ifdef VERASE
 	    if (cur_char == term_chars[VERASE]) {	/* ^H */
 		delete_backward();
 		do_search(-1);
-	    } else 
+	    } else
 #endif /* VERASE */
 	    {
 	    switch (cur_char) {
@@ -1232,7 +1233,7 @@ switch_prompt(const char * old_prompt, const char * new_prompt)
     putc('\r', stderr);
     fputs(new_prompt, stderr);
     cur_pos = 0;
-    
+
     /* erase remainder of previous prompt */
     len = GPMAX((int)strlen(old_prompt) - (int)strlen(new_prompt), 0);
     for (i = 0; i < len; i++)
