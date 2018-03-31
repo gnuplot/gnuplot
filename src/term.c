@@ -2480,6 +2480,7 @@ enhanced_recursion(
 
 	case '\\'  :
 	    /*{{{  various types of escape sequences, some context-dependent */
+	    (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
 
 	    /*     Unicode represented as \U+hhhhh where hhhhh is hexadecimal code point.
 	     *     For UTF-8 encoding we translate hhhhh to a UTF-8 byte sequence and
@@ -2518,7 +2519,6 @@ enhanced_recursion(
 	    if (p[1] >= '0' && p[1] <= '7') {
 		char *e, escape[16], octal[4] = {'\0','\0','\0','\0'};
 
-		(term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
 		octal[0] = *(++p);
 		if (p[1] >= '0' && p[1] <= '7') {
 		    octal[1] = *(++p);
@@ -2537,10 +2537,8 @@ enhanced_recursion(
 	     */
 	    if (term->flags & TERM_IS_POSTSCRIPT) {
 		if (p[1]=='\\' || p[1]=='(' || p[1]==')') {
-		    (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
 		    (term->enhanced_writec)('\\');
 		} else if (strchr("^_@&~{}",p[1]) == NULL) {
-		    (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
 		    (term->enhanced_writec)('\\');
 		    (term->enhanced_writec)('\\');
 		    break;
@@ -2559,14 +2557,13 @@ enhanced_recursion(
 	    /* SVG requires an escaped '&' to be passed as something else */
 	    /* FIXME: terminal-dependent code does not belong here */
 	    if (*p == '&' && encoding == S_ENC_DEFAULT && !strcmp(term->name, "svg")) {
-		(term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
 		(term->enhanced_writec)('\376');
 		break;
 	    }
 
-	    /* print the character following the backslash
-	     * (fall through to the 'default' case)
-	     */
+	    /* print the character following the backslash */
+	    (term->enhanced_writec)(*p);
+	    break;
 	    /*}}}*/
 
 	default:
@@ -2649,8 +2646,6 @@ estimate_strlen(char *text)
 	term = &ENHest;
 	term->put_text(0,0,text);
 	len = term->xmax;
-	FPRINTF((stderr,"Estimating length %d height %g for enhanced text string \"%s\"\n",
-		len, (double)(term->ymax)/10., text));
 	term = tsave;
 	/* Assume that unicode escape sequences  \U+xxxx will generate a single character */
 	/* ENHest_plaintext is filled in by the put_text() call to estimate.trm           */
@@ -2659,6 +2654,9 @@ estimate_strlen(char *text)
 	    len -= 6;
 	    s += 6;
 	}
+	FPRINTF((stderr,"Estimating length %d height %g for enhanced text \"%s\"",
+		len, (double)(term->ymax)/10., text));
+	FPRINTF((stderr,"  plain text \"%s\"\n", ENHest_plaintext));
     } else if (encoding == S_ENC_UTF8)
 	len = strwidth_utf8(text);
     else
