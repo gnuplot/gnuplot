@@ -197,7 +197,7 @@ static int CONTEXT_posx;
 static int CONTEXT_posy;
 /* remembers where we started the path:
  * if we finish it in the same point, the path is closed with --cycle
- * 
+ *
  * After I implemented this, the functionality has been added to gnuplot core
  * and PostScript terminal uses it, but to be on the safe side,
  * I prefer not to add last-minute patches which could potentially break something.
@@ -718,7 +718,9 @@ CONTEXT_init()
 {
 	time_t now;
 	char timebuffer[100];
+#ifdef WRITE_PNG_IMAGE
 	int i;
+#endif
 
 	time(&now);
 
@@ -732,7 +734,7 @@ CONTEXT_init()
 	CONTEXT_image_counter = 0;
 	/* the default is to use inline images */
 	CONTEXT_images = CONTEXT_IMAGES_INLINE;
-	
+
 	/* only if external images are both requested and supported, we switch to them (double paranoia) */
 	/* delete the stored filename first */
 	if (CONTEXT_image_filename) {
@@ -822,13 +824,13 @@ CONTEXT_init()
 		 * options *
 		 *---------*/
 		fprintf(gpoutfile, "\\setupGNUPLOTterminal\n   [context]\n   [");
-		
+
 		/* color (gp_use_color): yes/no (true/false)
 		 * default: yes
 		 * - doesn't do anything useful yet;
 		 *   and besides that, it's already set in \setupcolors[state=start] */
 		/* fprintf(gpoutfile, "    color=%s, %% *yes* | no\n", CONTEXT_params.color ? "yes" : "no"); */
-		
+
 		/* linejoin: mitered/rounded/beveled
 		 * default: mitered */
 		fprintf(gpoutfile, "linejoin=");
@@ -838,7 +840,7 @@ CONTEXT_init()
 			case LINEJOIN_BEVEL: fprintf(gpoutfile, "beveled"); break;
 		}
 		fprintf(gpoutfile, ", %% *mitered* | rounded | beveled\n");
-		
+
 		/* linecap: butt/rounded/squared
 		 * default: butt */
 		fprintf(gpoutfile, "    linecap=");
@@ -848,13 +850,13 @@ CONTEXT_init()
 			case LINECAP_SQUARE: fprintf(gpoutfile, "squared"); break;
 		}
 		fprintf(gpoutfile, ", %% *butt* | rounded | squared\n");
-		
+
 		/* dashed (gp_use_dashed): yes/no (true/false)
 		 * default: yes */
 		fprintf(gpoutfile, "    dashed=%s, %% *yes* | no\n", CONTEXT_params.dashed ? "yes" : "no");
 		/* dashlength (gp_scale_dashlength): 1.0 */
 		fprintf(gpoutfile, "    dashlength=%g, %% scaling factor for dash lengths\n", CONTEXT_params.scale_dashlength);
-		
+
 		/* linewidth (gp_scale_linewidth): 1.0 */
 		fprintf(gpoutfile, "    linewidth=%g, %% scaling factor for line widths (1.0 means 0.5bp)\n", CONTEXT_params.scale_linewidth);
 
@@ -862,7 +864,7 @@ CONTEXT_init()
 		/* written out just for reference - it's commented out since it needs to be part of graphic
 		   and affects estimation of label sizes */
 		fprintf(gpoutfile, "    %%fontscale=%g, %% scaling factor for text labels\n", CONTEXT_params.scale_text);
-		
+
 		/* points (gp_points_with): metapost/tex (gp_points_with_metapost/gp_points_with_tex)
 		 * default: metapost */
 		fprintf(gpoutfile, "    points=%s, %% *metapost* | tex (Should points be drawn with MetaPost or TeX?)\n",
@@ -995,7 +997,7 @@ CONTEXT_graphics()
 	if (is_plot_with_palette()) {
 		CONTEXT_write_palette(CONTEXT_old_palette);
 	}
-	
+
 	/* needed, otherwise the first linetype(-2) would be ignored */
 	CONTEXT_old_linetype = -3;
 	/* different initializations - not really needed, but they cannot hurt */
@@ -1020,11 +1022,11 @@ CONTEXT_endpath()
 	if (CONTEXT_path_is_dot) {
 		fprintf(gpoutfile, "gp_dot(%.3fa,%.3fa);\n", 0.001*CONTEXT_posx, 0.001*CONTEXT_posy);
 		CONTEXT_path_is_dot = 0;
-	
+
 	/* cyclic path, so let's end it with "--cycle" */
 	} else if ((CONTEXT_posx == CONTEXT_path_start_x) && (CONTEXT_posy == CONTEXT_path_start_y)) {
 		fputs("--cycle;\ngp_draw(p);\n", gpoutfile);
-	
+
 	/* regular non-cyclic path */
 	} else {
 		fprintf(gpoutfile, "--(%.3fa,%.3fa);\ngp_draw(p);\n", 0.001*CONTEXT_posx, 0.001*CONTEXT_posy);
@@ -1281,7 +1283,7 @@ CONTEXT_arrow (unsigned int sx, unsigned int sy, unsigned int ex, unsigned int e
 
 
 /* ------------------------
- * CONTEXT_fontstring_parse 
+ * CONTEXT_fontstring_parse
  * ------------------------
  *
  * Parses from_string, which is divided by commas (,)
@@ -1379,7 +1381,7 @@ CONTEXT_set_font(const char *font)
 		CONTEXT_fontsize = CONTEXT_fontsize_explicit;
 
 		snprintf(tmp_fontstring, sizeof(tmp_fontstring), ",%gpt", CONTEXT_fontsize_explicit);
-		strncat(CONTEXT_font_explicit, tmp_fontstring, 
+		strncat(CONTEXT_font_explicit, tmp_fontstring,
                         sizeof(CONTEXT_font_explicit) - strlen(CONTEXT_font_explicit)-1);
 		tmp_fontstring[MAX_ID_LEN] = NUL;
 
@@ -1414,7 +1416,7 @@ CONTEXT_pointsize(double pointsize)
 	 *   if (pointsize < 0)
 	 *      pointsize = 1;
 	 */
-	
+
 	if (CONTEXT_old_pointsize != pointsize) {
 		/* close and draw the current path first */
 		if (CONTEXT_path_count > 0)
@@ -1441,7 +1443,7 @@ CONTEXT_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width,
 	/* create a new path */
 	fprintf(gpoutfile, "p := unitsquare xyscaled (%.3fa,%.3fa) shifted (%.3fa,%.3fa);\n", 0.001*width, 0.001*height, 0.001*x1, 0.001*y1);
 	/* fprintf(gpoutfile, "p := gp_rect ((%.3fa,%.3fa),(%.3fa,%.3fa));\n", 0.001*x1, 0.001*y1, 0.001*width, 0.001*height); */
-	
+
 	/* fills the box according to the "style"
 	 * the code went out of this routine because of undocumented behaviour
 	 * that also the filled_polygon should paint with patterns ... */
@@ -1473,7 +1475,7 @@ CONTEXT_fill(int style)
 	int density;
 	int pattern;
 
-	/* used in FS_[TRANSPARENT_]SOLID --> fill with intensity according to filldensity 
+	/* used in FS_[TRANSPARENT_]SOLID --> fill with intensity according to filldensity
 	   it extracts a percentage out of "style" */
 	density = (style >> 4);
 	if (density < 0)
@@ -1529,7 +1531,7 @@ CONTEXT_linewidth(double linewidth)
 {
 	if (linewidth < 0)
 		linewidth = 1.0;
-	
+
 	if (CONTEXT_old_linewidth != linewidth) {
 		/* close and draw the current path first */
 		if (CONTEXT_path_count > 0)
@@ -1549,7 +1551,7 @@ static void
 CONTEXT_write_palette_gradient(gradient_struct *gradient, int cnt)
 {
 	int i;
-	
+
 	/* i-th color */
 	fprintf(gpoutfile, "colors(");
 	for (i = 0; i < cnt; i++) {
@@ -1557,7 +1559,7 @@ CONTEXT_write_palette_gradient(gradient_struct *gradient, int cnt)
 		    fprintf(gpoutfile, ",");
 		fprintf(gpoutfile, "(%.3g,%.3g,%.3g)", gradient[i].col.r, gradient[i].col.g, gradient[i].col.b);
 	}
-	
+
 	/* position of the i-th color */
 	fprintf(gpoutfile, ");positions(");
 	for (i = 0; i < cnt; i++) {
@@ -1642,7 +1644,7 @@ CONTEXT_make_palette(t_sm_palette *palette)
 
 	/* save the palette */
 	CONTEXT_old_palette = palette;
-	
+
 	return 0;
 }
 
@@ -1784,10 +1786,10 @@ CONTEXT_filled_polygon(int points, gpiPoint *corners)
    along rows finishing in the lower right corner.  If 'color_mode' is
    IC_PALETTE, the terminal is to use palette lookup to generate color
    information.  In this scenario the size of 'image' is M*N.  If
-   'color_mode' is IC_RGB, successive bytes of the data structure are 
+   'color_mode' is IC_RGB, successive bytes of the data structure are
    interpreted as RGB components of a single pixel.  In this scenario
    the size of 'image' is 3*M*N.  The data appears in RGB triples, i.e.,
-   image[0] = R(1,1), image[1] = G(1,1), image[2] = B(1,1), 
+   image[0] = R(1,1), image[1] = G(1,1), image[2] = B(1,1),
    image[3] = R(1,2), image[4] = G(1,2), ..., image[3*M*N-1] = B(M,N).
    The mode IC_RGBA is similar except that four values red, green, blue,
    alpha per pixel are passed to the terminal in the image structure.
