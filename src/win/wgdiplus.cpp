@@ -338,7 +338,7 @@ EnhancedSetFont()
 static unsigned
 EnhancedTextLength(char * text)
 {
-	LPWSTR textw = UnicodeText(enhanced_text, enhstate.lpgw->encoding);
+	LPWSTR textw = UnicodeTextWithEscapes(enhanced_text, enhstate.lpgw->encoding);
 	RectF box;
 	enhstate_gdiplus.graphics->MeasureString(textw, -1, enhstate_gdiplus.font, PointF(0, 0), enhstate_gdiplus.stringformat, &box);
 	free(textw);
@@ -349,7 +349,7 @@ EnhancedTextLength(char * text)
 static void
 EnhancedPutText(int x, int y, char * text)
 {
-	LPWSTR textw = UnicodeText(text, enhstate.lpgw->encoding);
+	LPWSTR textw = UnicodeTextWithEscapes(text, enhstate.lpgw->encoding);
 	Graphics *g = enhstate_gdiplus.graphics;
 	if (enhstate.lpgw->angle == 0) {
 		PointF pointF(x, y + enhstate.lpgw->tmDescent);

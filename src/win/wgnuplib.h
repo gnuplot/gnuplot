@@ -58,7 +58,7 @@ extern "C" {
 /* #define DEFAULT_CHARSET ANSI_CHARSET */
 # define MoveTo(hdc,x,y) MoveToEx(hdc,x,y,(LPPOINT)NULL);
 
-/* printf format for TCHAR arguments */ 
+/* printf format for TCHAR arguments */
 #ifdef UNICODE
 # define TCHARFMT "%ls"
 #else
@@ -277,10 +277,10 @@ struct GWOPBLK {			/* kept in local memory */
 enum win_pointtypes {
 	W_invalid_pointtype = 0,
 	W_dot = 10,
-	W_plus, W_cross, W_star, 
+	W_plus, W_cross, W_star,
 	W_box, W_fbox,
-	W_circle, W_fcircle, 
-	W_itriangle, W_fitriangle, 
+	W_circle, W_fcircle,
+	W_itriangle, W_fitriangle,
 	W_triangle, W_ftriangle,
 	W_diamond, W_fdiamond,
 	W_pentagon, W_fpentagon,
@@ -292,7 +292,7 @@ enum win_pointtypes {
 /* ops */
 enum win_draw_commands {
 	W_endoflist = 0,
-	W_point = 9, 
+	W_point = 9,
 	W_pointsize = 30,
 	W_setcolor,
 	W_polyline, W_line_type, W_dash_type, W_line_width,
@@ -506,6 +506,7 @@ void Graph_set_clipboard(LPGW lpgw, LPCSTR s);
 void GraphEnhancedOpen(char *fontname, double fontsize, double base,
     TBOOLEAN widthflag, TBOOLEAN showflag, int overprint);
 void GraphEnhancedFlush(void);
+LPWSTR UnicodeTextWithEscapes(LPCSTR str, enum set_encoding_id encoding);
 
 void WIN_update_options __PROTO((void));
 

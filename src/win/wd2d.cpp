@@ -68,8 +68,8 @@ extern "C" {
 #endif
 
 // Note: This may or may not be declared in an enum in SDK headers.
-//       Unfortunalely we cannot test for the SDK version here, so we always define it
-//       ourselves.  MinGW headers currently do define that anyway. 
+//       Unfortunately, we cannot test for the SDK version here, so we always define it
+//       ourselves.  MinGW headers currently do define that anyway.
 # define D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT static_cast<D2D1_DRAW_TEXT_OPTIONS>(0x00000004)
 
 #define MINMAX(a,val,b) (((val) <= (a)) ? (a) : ((val) <= (b) ? (val) : (b)))
@@ -376,7 +376,7 @@ d2dInit(LPGW lpgw)
 		ZeroMemory(&versionInfo, sizeof(OSVERSIONINFO));
 		versionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 		GetVersionEx(&versionInfo);
-		if ((versionInfo.dwMajorVersion > 6) || 
+		if ((versionInfo.dwMajorVersion > 6) ||
 			((versionInfo.dwMajorVersion == 6) && (versionInfo.dwMinorVersion == 3)))
 			bHaveColorFonts = true;
 	}
@@ -863,7 +863,7 @@ EnhancedSetFont()
 static unsigned
 EnhancedTextLength(char * text)
 {
-	LPWSTR textw = UnicodeText(enhanced_text, enhstate.lpgw->encoding);
+	LPWSTR textw = UnicodeTextWithEscapes(enhanced_text, enhstate.lpgw->encoding);
 	D2D1_SIZE_F size;
 	d2dMeasureText(enhstate_d2d.pRenderTarget, textw, enhstate_d2d.pWriteTextFormat, &size);
 	free(textw);
@@ -875,7 +875,7 @@ static void
 EnhancedPutText(int x, int y, char * text)
 {
 	ID2D1RenderTarget * pRenderTarget = enhstate_d2d.pRenderTarget;
-	LPWSTR textw = UnicodeText(text, enhstate.lpgw->encoding);
+	LPWSTR textw = UnicodeTextWithEscapes(text, enhstate.lpgw->encoding);
 
 	if (enhstate.lpgw->angle != 0)
 		pRenderTarget->SetTransform(D2D1::Matrix3x2F::Rotation(-enhstate.lpgw->angle, D2D1::Point2F(x, y)));
