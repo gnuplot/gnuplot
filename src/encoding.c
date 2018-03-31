@@ -39,7 +39,8 @@
 # include <windows.h>
 #endif
 
-static enum set_encoding_id map_codepage_to_encoding(unsigned int cp);
+static enum set_encoding_id map_codepage_to_encoding __PROTO((unsigned int cp));
+static TBOOLEAN utf8_getmore __PROTO((unsigned long * wch, const char **str, int nbytes));
 
 
 /*

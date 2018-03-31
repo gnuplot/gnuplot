@@ -85,7 +85,6 @@ int debug = 0;
 
 static void mant_exp __PROTO((double, double, TBOOLEAN, double *, int *, const char *));
 static void parse_sq __PROTO((char *));
-static TBOOLEAN utf8_getmore __PROTO((unsigned long * wch, const char **str, int nbytes));
 static char *utf8_strchrn __PROTO((const char *s, int N));
 static char *num_to_str(double r);
 
