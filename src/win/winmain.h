@@ -71,7 +71,6 @@ void WinOpenConsole(void);
 BOOL WINAPI ConsoleHandler(DWORD dwType);
 void WinRaiseConsole(void);
 UINT WinGetCodepage(enum set_encoding_id encoding);
-enum set_encoding_id WinGetEncoding(UINT cp);
 LPWSTR UnicodeText(LPCSTR str, enum set_encoding_id encoding);
 LPSTR AnsiText(LPCWSTR strw,  enum set_encoding_id encoding);
 void MultiByteAccumulate(BYTE ch, LPWSTR wstr, int * count);

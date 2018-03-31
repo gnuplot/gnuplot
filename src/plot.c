@@ -45,6 +45,7 @@
 #include "util.h"
 #include "variable.h"
 #include "version.h"
+#include "encoding.h"
 
 #include <signal.h>
 #include <setjmp.h>

@@ -108,8 +108,4 @@ typedef struct lf_state_struct {
 }  LFS;
 extern LFS *lf_head;
 
-/* encoding stuff */
-enum set_encoding_id encoding_from_locale(void);
-void init_encoding(void);
-
 #endif /* GNUPLOT_MISC_H */

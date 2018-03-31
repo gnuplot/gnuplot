@@ -44,20 +44,17 @@
 #include "setshow.h"
 #ifdef _WIN32
 # include <fcntl.h>
-# if defined(__WATCOMC__) || defined(__MSC__)
+# if defined(__WATCOMC__) || defined(_MSC_VER)
 #  include <io.h>        /* for setmode() */
 # endif
 #endif
 #if defined(HAVE_DIRENT_H) && !defined(_WIN32)
+/* Note: The Windows versions of opendir() and friends are in stdfn.c.
+ * OpenWatcom actually has them in direct.h, but we prefer the built-in
+ * variants as they handle encodings.
+ */
 # include <sys/types.h>
 # include <dirent.h>
-#endif
-#ifdef _WIN32
-/* Windows version of opendir() and friends are in stdfn.c */
-/* Note: OpenWatcom has them in direct.h, but we prefer
-         the built-in variants as they handle encodings.
-*/
-# include "win/winmain.h"
 #endif
 
 static char *recursivefullname __PROTO((const char *path, const char *filename, TBOOLEAN recursive));
@@ -167,11 +164,11 @@ prepare_call(int calltype)
 			default:
 				int_error(save_token, "Unrecognized argument type");
 				break;
-			case INTGR:	
+			case INTGR:
 				sprintf(val_as_string, PLD, a.v.int_val);
 				call_args[call_argc] = gp_strdup(val_as_string);
 				break;
-		    } 
+		    }
 
 		/* old (pre version 5) style wrapping of bare tokens as strings */
 		/* is still useful for passing unquoted numbers */
@@ -384,13 +381,13 @@ load_file(FILE *fp, char *name, int calltype)
 			left = gp_input_line_len - start;
 			continue;
 		    }
-		    
+
 		    more = FALSE;
 		}
 
 	    }
 	}
-	
+
 	/* If we hit a 'break' or 'continue' statement in the lines just processed */
 	if (iteration_early_exit())
 	    continue;
@@ -486,7 +483,7 @@ lf_pop()
     }
     free(lf->name);
     free(lf->cmdline);
-    
+
     lf_head = lf->prev;
     free(lf);
     return (TRUE);
@@ -796,7 +793,7 @@ get_filledcurves_style_options(filledcurves_opts *fco)
 	} else if (p == FILLEDCURVES_BELOW) {
 	    fco->oneside = -1;
 	    continue;
-	} 
+	}
 
 	fco->at = 0;
 	if (!equals(c_token, "="))
@@ -861,7 +858,7 @@ need_fill_border(struct fill_style_type *fillstyle)
     /* Wants a border in a new color */
     if (p.pm3d_color.type != TC_DEFAULT)
 	apply_pm3dcolor(&p.pm3d_color);
-    
+
     return TRUE;
 }
 
@@ -876,7 +873,7 @@ parse_dashtype(struct t_dashtype *dt)
     /* Erase any previous contents */
     memset(dt, 0, sizeof(struct t_dashtype));
 
-    /* Fill in structure based on keyword ... */ 
+    /* Fill in structure based on keyword ... */
     if (equals(c_token, "solid")) {
 	res = DASHTYPE_SOLID;
 	c_token++;
@@ -908,7 +905,7 @@ parse_dashtype(struct t_dashtype *dt)
     } else if ((dash_str = try_to_get_string())) {
 #define DSCALE 10.
 	while (dash_str[j] && (k < DASHPATTERN_LENGTH || dash_str[j] == ' ')) {
-	    /* .      Dot with short space 
+	    /* .      Dot with short space
 	     * -      Dash with regular space
 	     * _      Long dash with regular space
 	     * space  Don't add new dash, just increase last space */
@@ -965,7 +962,7 @@ int
 lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_point)
 {
     /* keep track of which options were set during this call */
-    int set_lt = 0, set_pal = 0, set_lw = 0; 
+    int set_lt = 0, set_pal = 0, set_lw = 0;
     int set_pt = 0, set_ps  = 0, set_pi = 0;
     int set_pn = 0;
     int set_dt = 0;
@@ -974,16 +971,16 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
     /* EAM Mar 2010 - We don't want properties from a user-defined default
      * linetype to override properties explicitly set here.  So fill in a
      * local lp_style_type as we go and then copy over the specifically
-     * requested properties on top of the default ones.                                           
+     * requested properties on top of the default ones.
      */
     struct lp_style_type newlp = *lp;
-	
+
     if ((destination_class == LP_ADHOC)
     && (almost_equals(c_token, "lines$tyle") || equals(c_token, "ls"))) {
 	c_token++;
 	lp_use_properties(lp, int_expression());
-    } 
-    
+    }
+
     while (!END_OF_COMMAND) {
 
 	/* This special case is to flag an attemp to "set object N lt <lt>",
@@ -1202,7 +1199,7 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
 	    c_token++;
 	    tmp = parse_dashtype(&newlp.custom_dash_pattern);
 	    /* Pull the dashtype from the list of already defined dashtypes, */
-	    /* but only if it we didn't get an explicit one back from parse_dashtype */ 
+	    /* but only if it we didn't get an explicit one back from parse_dashtype */
 	    if (tmp == DASHTYPE_AXIS)
 		lp->l_type = LT_AXIS;
 	    if (tmp >= 0)
@@ -1248,8 +1245,8 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
     if (set_dt) {
 	lp->d_type = newlp.d_type;
 	lp->custom_dash_pattern = newlp.custom_dash_pattern;
-    }	
-		
+    }
+
 
     return new_lt;
 }
@@ -1263,7 +1260,7 @@ const struct gen_table fs_opt_tbl[] = {
 };
 
 void
-parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int def_pattern, 
+parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int def_pattern,
 		t_colorspec def_bordertype)
 {
     TBOOLEAN set_fill = FALSE;
@@ -1638,7 +1635,7 @@ arrow_parse(
 	    /* invalid backangle --> default of 90.0 degrees */
 	    if (arrow->head_backangle <= arrow->head_angle)
 		arrow->head_backangle = 90.0;
-	    
+
 	    /* Assume adjustable size but check for 'fixed' instead */
 	    arrow->head_fixedsize = FALSE;
 	    continue;
@@ -1690,59 +1687,4 @@ get_image_options(t_image *image)
 	image->fallback = TRUE;
     }
 
-}
-
-
-enum set_encoding_id
-encoding_from_locale(void)
-{
-    char *l = NULL;
-    enum set_encoding_id encoding = S_ENC_INVALID;
-
-#if defined(_WIN32)
-#ifdef HAVE_LOCALE_H
-    char * cp_str;
-
-    l = setlocale(LC_CTYPE, "");
-    /* preserve locale string, skip language information */
-    cp_str = strchr(l, '.');
-    if (cp_str) {
-	unsigned cp;
-
-	cp_str++; /* Step past the dot in, e.g., German_Germany.1252 */
-	cp = strtoul(cp_str, NULL, 10);
-
-	if (cp != 0) {
-	    enum set_encoding_id newenc = WinGetEncoding(cp);
-	    encoding = newenc;
-	}
-    }
-#endif
-    /* get encoding from currently active codepage */
-    if (encoding == S_ENC_INVALID) {
-#ifndef WGP_CONSOLE
-	encoding = WinGetEncoding(GetACP());
-#else
-	encoding = WinGetEncoding(GetConsoleCP());
-#endif
-    }
-#elif defined(HAVE_LOCALE_H)
-    l = setlocale(LC_CTYPE, "");
-    if (l && (strstr(l, "utf") || strstr(l, "UTF")))
-	encoding = S_ENC_UTF8;
-    if (l && (strstr(l, "sjis") || strstr(l, "SJIS") || strstr(l, "932")))
-	encoding = S_ENC_SJIS;
-    /* FIXME: "set encoding locale" supports only sjis and utf8 on non-Windows systems */
-#endif
-    return encoding;
-}
-
-
-void
-init_encoding(void)
-{
-    encoding = encoding_from_locale();
-    if (encoding == S_ENC_INVALID)
-	encoding = S_ENC_DEFAULT;
-    init_special_chars();
 }

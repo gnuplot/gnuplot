@@ -31,11 +31,16 @@
 #ifndef GNUPLOT_ENCODING_H
 #define GNUPLOT_ENCODING_H
 
+void init_encoding(void);
+enum set_encoding_id encoding_from_locale(void);
+
 TBOOLEAN contains8bit(const char *s);
+
 TBOOLEAN utf8toulong(unsigned long * wch, const char ** str);
 int ucs4toutf8(uint32_t codepoint, unsigned char *utf8char);
-TBOOLEAN is_sjis_lead_byte(char c);
 size_t strlen_utf8(const char *s);
+
+TBOOLEAN is_sjis_lead_byte(char c);
 size_t strlen_sjis(const char *s);
 
 #endif

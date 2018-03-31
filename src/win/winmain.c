@@ -1544,39 +1544,6 @@ WinGetCodepage(enum set_encoding_id encoding)
 }
 
 
-enum set_encoding_id
-WinGetEncoding(UINT cp)
-{
-    enum set_encoding_id encoding;
-
-    /* The code below is the inverse to the code found in UnicodeText().
-       For a list of code page identifiers see
-       http://msdn.microsoft.com/en-us/library/dd317756%28v=vs.85%29.aspx
-    */
-    switch (cp) {
-    case 437:   encoding = S_ENC_CP437; break;
-    case 850:   encoding = S_ENC_CP850; break;
-    case 852:   encoding = S_ENC_CP852; break;
-    case 932:   encoding = S_ENC_SJIS; break;
-    case 950:   encoding = S_ENC_CP950; break;
-    case 1250:  encoding = S_ENC_CP1250; break;
-    case 1251:  encoding = S_ENC_CP1251; break;
-    case 1252:  encoding = S_ENC_CP1252; break;
-    case 1254:  encoding = S_ENC_CP1254; break;
-    case 20866: encoding = S_ENC_KOI8_R; break;
-    case 21866: encoding = S_ENC_KOI8_U; break;
-    case 28591: encoding = S_ENC_ISO8859_1; break;
-    case 28592: encoding = S_ENC_ISO8859_2; break;
-    case 28599: encoding = S_ENC_ISO8859_9; break;
-    case 28605: encoding = S_ENC_ISO8859_15; break;
-    case 65001: encoding = S_ENC_UTF8; break;
-    default:
-	encoding = S_ENC_DEFAULT;
-    }
-    return encoding;
-}
-
-
 LPWSTR
 UnicodeText(LPCSTR str, enum set_encoding_id encoding)
 {

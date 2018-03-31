@@ -70,6 +70,7 @@
 #ifdef USE_MOUSE
 #include "mouse.h"
 #endif
+#include "encoding.h"
 
 static palette_color_mode pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_NONE;
 

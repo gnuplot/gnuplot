@@ -31,7 +31,125 @@
 ]*/
 
 #include "syscfg.h"
+#include "term_api.h"
 #include "encoding.h"
+#include "setshow.h"  /* init_special_chars */
+#ifdef _WIN32
+# define WIN32_LEAN_AND_MEAN
+# include <windows.h>
+#endif
+
+static enum set_encoding_id map_codepage_to_encoding(unsigned int cp);
+
+
+/*
+ * encoding functions
+ */
+
+void
+init_encoding(void)
+{
+    encoding = encoding_from_locale();
+    if (encoding == S_ENC_INVALID)
+	encoding = S_ENC_DEFAULT;
+    init_special_chars();
+}
+
+enum set_encoding_id
+encoding_from_locale(void)
+{
+    char *l = NULL;
+    enum set_encoding_id encoding = S_ENC_INVALID;
+
+#if defined(_WIN32) || defined(MSDOS)
+#ifdef HAVE_LOCALE_H
+    char * cp_str;
+
+    l = setlocale(LC_CTYPE, "");
+    /* preserve locale string, skip language information */
+    if ((l != NULL) && (cp_str = strchr(l, '.')) != NULL) {
+	unsigned cp;
+
+	cp_str++; /* Step past the dot in, e.g., German_Germany.1252 */
+	cp = strtoul(cp_str, NULL, 10);
+
+	if (cp != 0)
+	    encoding = map_codepage_to_encoding(cp);
+    }
+#endif
+#ifdef _WIN32
+    /* get encoding from currently active codepage */
+    if (encoding == S_ENC_INVALID) {
+#ifndef WGP_CONSOLE
+	encoding = map_codepage_to_encoding(GetACP());
+#else
+	encoding = map_codepage_to_encoding(GetConsoleCP());
+#endif
+    }
+#endif
+#elif defined(HAVE_LOCALE_H)
+    if (encoding == S_ENC_INVALID) {
+	l = setlocale(LC_CTYPE, "");
+	if (l && (strstr(l, "utf") || strstr(l, "UTF")))
+	    encoding = S_ENC_UTF8;
+	if (l && (strstr(l, "sjis") || strstr(l, "SJIS") || strstr(l, "932")))
+	    encoding = S_ENC_SJIS;
+	if (l && (strstr(l, "850") || strstr(l, "858")))
+	    encoding = S_ENC_CP850;
+	if (l && (strstr(l, "437")))
+	    encoding = S_ENC_CP437;
+	if (l && (strstr(l, "852")))
+	    encoding = S_ENC_CP852;
+	if (l && (strstr(l, "1250")))
+	    encoding = S_ENC_CP1250;
+	if (l && (strstr(l, "1251")))
+	    encoding = S_ENC_CP1251;
+	if (l && (strstr(l, "1252")))
+	    encoding = S_ENC_CP1252;
+	if (l && (strstr(l, "1254")))
+	    encoding = S_ENC_CP1254;
+	if (l && (strstr(l, "950")))
+	    encoding = S_ENC_CP950;
+	/* FIXME: "set encoding locale" has only limited support on non-Windows systems */
+    }
+#endif
+    return encoding;
+}
+
+
+static enum set_encoding_id
+map_codepage_to_encoding(unsigned int cp)
+{
+    enum set_encoding_id encoding;
+
+    /* The code below is the inverse to the code found in WinGetCodepage().
+       For a list of code page identifiers see
+       http://msdn.microsoft.com/en-us/library/dd317756%28v=vs.85%29.aspx
+    */
+    switch (cp) {
+    case 437:   encoding = S_ENC_CP437; break;
+    case 850:
+    case 858:   encoding = S_ENC_CP850; break;  /* 850 with Euro sign */
+    case 852:   encoding = S_ENC_CP852; break;
+    case 932:   encoding = S_ENC_SJIS; break;
+    case 950:   encoding = S_ENC_CP950; break;
+    case 1250:  encoding = S_ENC_CP1250; break;
+    case 1251:  encoding = S_ENC_CP1251; break;
+    case 1252:  encoding = S_ENC_CP1252; break;
+    case 1254:  encoding = S_ENC_CP1254; break;
+    case 20866: encoding = S_ENC_KOI8_R; break;
+    case 21866: encoding = S_ENC_KOI8_U; break;
+    case 28591: encoding = S_ENC_ISO8859_1; break;
+    case 28592: encoding = S_ENC_ISO8859_2; break;
+    case 28599: encoding = S_ENC_ISO8859_9; break;
+    case 28605: encoding = S_ENC_ISO8859_15; break;
+    case 65001: encoding = S_ENC_UTF8; break;
+    default:
+	encoding = S_ENC_DEFAULT;
+    }
+    return encoding;
+}
+
 
 TBOOLEAN contains8bit(const char *s)
 {
@@ -41,6 +159,11 @@ TBOOLEAN contains8bit(const char *s)
     }
     return FALSE;
 }
+
+
+/*
+ * UTF-8 functions
+ */
 
 #define INVALID_UTF8 0xfffful
 
@@ -162,6 +285,10 @@ strlen_utf8(const char *s)
     return j;
 }
 
+
+/*
+ * S-JIS functions
+ */
 
 TBOOLEAN
 is_sjis_lead_byte(char c)
