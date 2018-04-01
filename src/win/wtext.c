@@ -43,9 +43,6 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
-#ifndef __MSC__
-# include <mem.h>
-#endif
 #include <sys/stat.h>
 
 #define STRICT
@@ -626,7 +623,7 @@ TextPutCh(LPTW lptw, BYTE ch)
     int count = 0;
 
     MultiByteAccumulate(ch, w, &count);
-    if (count == 1) { 
+    if (count == 1) {
 	/* FIXME: we only handle UCS-2: one double-byte only */
 	TextPutChW(lptw, w[0]);
     }
@@ -1193,7 +1190,7 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
     case WM_SIZE:
 	/* Vista sets the window size to 0,0 when Windows-D is pressed */
-	if (lParam > 0) { 
+	if (lParam > 0) {
 	    unsigned width = LOWORD(lParam);
 	    unsigned height = HIWORD(lParam) - lptw->StatusHeight;
 
@@ -2318,7 +2315,7 @@ DockedGraphSize(LPTW lptw, SIZE *size, BOOL newwindow)
     height = rect.bottom - rect.top - lptw->StatusHeight;
 
     // Are we about to create a new window?
-    if (newwindow) 
+    if (newwindow)
 	lptw->nDocked++;
 
     // Only determine the (future) layout now

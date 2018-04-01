@@ -104,13 +104,7 @@ char* mouse_alt_string = NULL;
 #ifdef _WIN32
 # include "win/winmain.h"
 # include "win/wcommon.h"
-# ifdef __MSC__
-#  include <malloc.h>
-#  include <io.h>
-# else
-#  include <alloc.h>
-# endif                         /* MSC */
-#endif /* _WIN32 */
+#endif
 
 static int termcomp __PROTO((const generic * a, const generic * b));
 

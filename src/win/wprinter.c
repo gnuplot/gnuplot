@@ -52,9 +52,6 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <tchar.h>
-#ifndef __MSC__
-# include <mem.h>
-#endif
 #include "wgnuplib.h"
 #include "wresourc.h"
 #include "wcommon.h"
@@ -66,7 +63,7 @@ HGLOBAL hDevMode = NULL;
 static GP_LPPRINT PrintFind(HDC hdc);
 
 
-/* COM object for PrintDlgEx callbacks, implemented in C 
+/* COM object for PrintDlgEx callbacks, implemented in C
 */
 typedef struct {
     IPrintDialogCallback callback;
@@ -121,7 +118,7 @@ InitDone(IPrintDialogCallback * This)
     return S_FALSE;
 }
 
-static HRESULT STDMETHODCALLTYPE 
+static HRESULT STDMETHODCALLTYPE
 SelectionChange(IPrintDialogCallback * This)
 {
     /* the user has selected a different printer */
@@ -182,9 +179,9 @@ static IPrintDialogCallbackVtbl IPrintDialogCallback_Vtbl = {
 };
 
 static IObjectWithSiteVtbl IObjectWithSite_Vtbl = {
-    (HRESULT(STDMETHODCALLTYPE *)(IObjectWithSite *, const IID *const, void **)) QueryInterface, 
+    (HRESULT(STDMETHODCALLTYPE *)(IObjectWithSite *, const IID *const, void **)) QueryInterface,
     (ULONG (STDMETHODCALLTYPE *)(IObjectWithSite *)) AddRef,
-    (ULONG (STDMETHODCALLTYPE *)(IObjectWithSite *)) Release, 
+    (ULONG (STDMETHODCALLTYPE *)(IObjectWithSite *)) Release,
     SetSite,
     GetSite
 };
@@ -312,7 +309,7 @@ PrintSizeDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 	    return TRUE;
 	}
 	case PSN_SETACTIVE: /* display: intialize according to printer */
-	    if (lpr->psize.x < 0 || lpr->bDriverChanged) {  
+	    if (lpr->psize.x < 0 || lpr->bDriverChanged) {
 		/* FIXME: also if settings changed (paper size, orientation) */
 		IPrintDialogServices * services = (IPrintDialogServices *) lpr->services;
 
@@ -360,7 +357,7 @@ PrintSizeDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 		    free(lpPrinterName);
 		    free(lpPortName);
 		    free(lpDevMode);
-		} 
+		}
 	    }
 	    if (lpr->psize.x < 0) {
 		/* something went wrong */
@@ -506,8 +503,8 @@ DumpPrinter(HWND hwnd, LPTSTR szAppName, LPTSTR szFileName)
     pd.nCopies = 1;
     pd.nStartPage = START_PAGE_GENERAL;
 
-    /* Replace the additional options in the lower part of the dialog with 
-     * a hint to change print options via terminal options. 
+    /* Replace the additional options in the lower part of the dialog with
+     * a hint to change print options via terminal options.
      */
     pd.lpPrintTemplateName = TEXT("PrintDlgExSelect");
     pd.hInstance = graphwin->hInstance;
@@ -553,7 +550,7 @@ DumpPrinter(HWND hwnd, LPTSTR szAppName, LPTSTR szFileName)
 		    int ret;
 		    DWORD dwBytesWritten;
 
-		    ret = WritePrinter(printer, buf, count, &dwBytesWritten); 
+		    ret = WritePrinter(printer, buf, count, &dwBytesWritten);
 		    ldone += count;
 		    if (dwBytesWritten > 0) {
 			wsprintf(pcdone, TEXT("%d%% done"), (int)(ldone * 100 / lsize));
@@ -563,7 +560,7 @@ DumpPrinter(HWND hwnd, LPTSTR szAppName, LPTSTR szFileName)
 			SetWindowText(GetDlgItem(pr.hDlgPrint, CANCEL_PCDONE), TEXT("Error writing to printer!"));
 			pr.bUserAbort  = TRUE;
 		    }
-    
+
 		    /* handle window messages */
 		    PrintAbortProc(printer, 0);
 		}

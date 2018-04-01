@@ -108,7 +108,7 @@
 # define GNUPLOT_HISTORY_FILE "~\\gnuplot_history"
 /* Flags for windows.h:
    Minimal required platform is Windows 7, see
-   https://msdn.microsoft.com/en-us/library/windows/desktop/aa383745.aspx 
+   https://msdn.microsoft.com/en-us/library/windows/desktop/aa383745.aspx
 */
 #ifndef NTDDI_VERSION
 # define NTDDI_VERSION NTDDI_WIN7
@@ -230,11 +230,6 @@ FILE * win_popen(const char *filename, const char *mode);
 #ifdef __WATCOMC__
 # define GP_EXCEPTION_NAME _exception
 #endif
-
-#ifdef __MSC__
-# include <direct.h> /* for getcwd() */
-#endif
-
 
 
 #if defined(alliant)

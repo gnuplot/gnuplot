@@ -269,8 +269,8 @@ gp_strnicmp(const char *s1, const char *s2, size_t n)
 #endif /* !HAVE_STRNICMP */
 
 
-#ifndef HAVE_STRNLEN    
-size_t 
+#ifndef HAVE_STRNLEN
+size_t
 strnlen(const char *str, size_t n)
 {
     const char * stop = (char *)memchr(str, '\0', n);
@@ -280,7 +280,7 @@ strnlen(const char *str, size_t n)
 
 
 #ifndef HAVE_STRNDUP
-char * 
+char *
 strndup(const char * str, size_t n)
 {
     char * ret = NULL;
@@ -371,7 +371,7 @@ ms_snprintf(char *str, size_t size, const char * format, ...)
 double
 not_a_number(void)
 {
-#if defined (__MSC__) || defined (DJGPP) || defined(__DJGPP__) || defined(__MINGW32__)
+#if defined (_MSC_VER) || defined (DJGPP) || defined(__DJGPP__) || defined(__MINGW32__)
 	unsigned long lnan[2]={0xffffffff, 0x7fffffff};
     return *( double* )lnan;
 #else
@@ -539,7 +539,7 @@ gp_opendir(const char *name)
 	    dir->name = UnicodeText(mbname, encoding);
 	    free(mbname);
 
-	    if ((dir->name != NULL) && 
+	    if ((dir->name != NULL) &&
 		((dir->handle = (long) _wfindfirst(dir->name, &dir->info)) != -1)) {
 		dir->result.d_name = NULL;
 	    } else { /* rollback */
@@ -589,7 +589,7 @@ gp_readdir(DIR *dir)
     if (dir && dir->handle != -1) {
 	if (!dir->result.d_name || _wfindnext(dir->handle, &dir->info) != -1) {
 	    result         = &dir->result;
-	    WideCharToMultiByte(WinGetCodepage(encoding), 0, 
+	    WideCharToMultiByte(WinGetCodepage(encoding), 0,
 				dir->info.name, sizeof(dir->info.name) / sizeof(wchar_t),
 				dir->info_mbname, sizeof(dir->info_mbname) / sizeof(char),
 				NULL, 0);
