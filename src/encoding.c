@@ -37,9 +37,9 @@
 #ifdef _WIN32
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>
+static enum set_encoding_id map_codepage_to_encoding __PROTO((unsigned int cp));
 #endif
 
-static enum set_encoding_id map_codepage_to_encoding __PROTO((unsigned int cp));
 static TBOOLEAN utf8_getmore __PROTO((unsigned long * wch, const char **str, int nbytes));
 
 
@@ -118,6 +118,7 @@ encoding_from_locale(void)
 }
 
 
+#ifdef _WIN32
 static enum set_encoding_id
 map_codepage_to_encoding(unsigned int cp)
 {
@@ -150,7 +151,7 @@ map_codepage_to_encoding(unsigned int cp)
     }
     return encoding;
 }
-
+#endif
 
 TBOOLEAN contains8bit(const char *s)
 {
