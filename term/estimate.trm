@@ -185,7 +185,7 @@ ENHest_writec(int c)
 	    ENHest_fragment_width += ENHest_fontsize;
 	    /* [most] characters above 0x3000 are square CJK glyphs, */
 	    /* which are wider than western characters.              */
-	    if ((unsigned int)c >= 0xec)
+	    if ((unsigned char)c >= 0xec)
 		ENHest_fragment_width += ENHest_fontsize;
 	}
     } else
