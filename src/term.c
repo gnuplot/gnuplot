@@ -2676,11 +2676,17 @@ estimate_plaintext(char *enhancedtext)
 void
 ignore_enhanced(TBOOLEAN flag)
 {
-    /* Force a return to the default font */
+#if (0)
+    /* Apr 2018: This code was introduced long ago (2005; Bug #266) to address
+     * a glitch in the postscript terminal that left the last-used font in
+     * an enhanced text string active afterwards.
+     * We now deal with this in ENHPS_put_text() instead.
+     */
     if (flag && !ignore_enhanced_text) {
 	ignore_enhanced_text = TRUE;
 	term->set_font("");
     }
+#endif
     ignore_enhanced_text = flag;
 }
 
