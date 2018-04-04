@@ -5720,7 +5720,9 @@ set_tic_prop(struct axis *this_axis)
 	    } else if (equals(c_token,"format")) {
 		char *format;
 		++c_token;
-		if (!((format = try_to_get_string())))
+		if (END_OF_COMMAND)
+		    format = gp_strdup(DEF_FORMAT);
+		else if (!((format = try_to_get_string())))
 		    int_error(c_token,"expected format");
 		free(this_axis->formatstring);
 		this_axis->formatstring  = format;
