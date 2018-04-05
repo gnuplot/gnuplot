@@ -40,20 +40,6 @@
 #include "alloc.h"
 #include "util.h"	/* for int_error() */
 
-#ifndef GP_FARMALLOC
-# ifdef FARALLOC
-#  define GP_FARMALLOC(size) farmalloc ((size))
-#  define GP_FARREALLOC(p,size) farrealloc ((p), (size))
-# else
-#  ifdef MALLOC_ZERO_RETURNS_ZERO
-#   define GP_FARMALLOC(size) malloc ((size_t)((size==0)?1:size))
-#  else
-#   define GP_FARMALLOC(size) malloc ((size_t)(size))
-#  endif
-#  define GP_FARREALLOC(p,size) realloc ((p), (size_t)(size))
-# endif
-#endif
-
 /* gp_alloc:
  * allocate memory
  * This is a protected version of malloc. It causes an int_error
@@ -67,7 +53,7 @@ gp_alloc(size_t size, const char *message)
 {
     char *p;			/* the new allocation */
 
-	p = GP_FARMALLOC(size);	/* try again */
+	p = malloc(size);	/* try again */
 	if (p == NULL) {
 	    /* really out of memory */
 	    if (message != NULL) {
@@ -95,7 +81,7 @@ gp_realloc(generic *p, size_t size, const char *message)
     if (!p)
 	return gp_alloc(size, message);
 
-    res = GP_FARREALLOC(p, size);
+    res = realloc(p, size);
     if (res == (char *) NULL) {
 	if (message != NULL) {
 	    int_error(NO_CARET, "out of memory for %s", message);
@@ -107,18 +93,3 @@ gp_realloc(generic *p, size_t size, const char *message)
     return (res);
 }
 
-
-#ifdef FARALLOC
-void
-gpfree(generic *p)
-{
-#ifdef _Windows
-    HGLOBAL hGlobal = GlobalHandle(p);
-    GlobalUnlock(hGlobal);
-    GlobalFree(hGlobal);
-#else
-    farfree(p);
-#endif
-}
-
-#endif
