@@ -246,7 +246,6 @@ FILE * win_popen(const char *filename, const char *mode);
 
 /* BM 20110904: remnant of huge memory model support */
 #define GPHUGE /* nothing */
-#define GPFAR /* nothing */
 
 #if defined(HAVE_SYS_TYPES_H)
 # include <sys/types.h>

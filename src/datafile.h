@@ -261,7 +261,7 @@ typedef struct df_binary_file_record_struct {
     double scan_cen_or_ori[3];        /* vector representing center or origin, x/y/z */
 
     /* *** Do not modify outside of datafile.c!!! *** */
-    char GPFAR *memory_data;
+    char *memory_data;
 } df_binary_file_record_struct;
 
 extern df_binary_file_record_struct *df_bin_record;

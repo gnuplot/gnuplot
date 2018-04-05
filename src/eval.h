@@ -128,7 +128,7 @@ struct at_type {
 
 /* Variables of eval.c needed by other modules: */
 
-extern const struct ft_entry GPFAR ft[]; /* The table of builtin functions */
+extern const struct ft_entry ft[]; /* The table of builtin functions */
 extern struct udft_entry *first_udf; /* user-def'd functions */
 extern struct udvt_entry *first_udv; /* user-def'd variables */
 extern struct udvt_entry udv_pi; /* 'pi' variable */

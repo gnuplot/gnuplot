@@ -76,7 +76,7 @@ static int jump_offset;		/* to be modified by 'jump' operators */
 
 /* The table of built-in functions */
 /* These must strictly parallel enum operators in eval.h */
-const struct ft_entry GPFAR ft[] =
+const struct ft_entry ft[] =
 {
     /* internal functions: */
     {"push",  f_push},

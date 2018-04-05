@@ -170,7 +170,7 @@ typedef struct {
 } tpic_point_info;
 
 /* POINTS */
-static /*GPFAR */ tpic_point_info GPFAR tpic_point[] =
+static tpic_point_info tpic_point[] =
 {
     {tpic_white, tpic_medium, tpic_diamond},
     {tpic_none, tpic_medium, tpic_plus},
@@ -214,7 +214,7 @@ typedef struct {
 } tpic_line_info;
 
 /* LINES */
-static /*GPFAR */ tpic_line_info GPFAR tpic_line[] =
+static tpic_line_info tpic_line[] =
 {
     {tpic_medium, tpic_nosize, tpic_solid},	/* -2 border */
     {tpic_small, tpic_small, tpic_dashed},	/* -1 axes */
@@ -293,7 +293,7 @@ static int tpic_numlines;
 TERM_PUBLIC void
 TPIC_init()
 {
-    static char GPFAR tpic1[] = "\
+    static char tpic1[] = "\
 %% GNUPLOT: LaTeX picture using tpic \\specials\n\
 %%          with %d point types and %d line types\n\
 %% Options: pointsize = %d, linewidth = %d, interval = %f\n\
@@ -333,7 +333,7 @@ TPIC_graphics()
 {
     register struct termentry *t = term;
     int left, right, top, bottom;	/* margins */
-    static char GPFAR begin[] = "%s\\begin{picture}(%d,%d)(%d,%d)%% %s\n";
+    static char begin[] = "%s\\begin{picture}(%d,%d)(%d,%d)%% %s\n";
 
     fprintf(gpoutfile, begin, "", t->xmax, t->ymax, 0, 0, "");
 

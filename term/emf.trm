@@ -1013,7 +1013,7 @@ EMF_dashtype (int type, t_dashtype *custom_dash_type)
 TERM_PUBLIC void 
 EMF_linecolor(int linecolor)
 {
-    static long GPFAR color_table_data[] =
+    static long color_table_data[] =
     {
 	RGB(255, 0, 0),		/* red */
 	RGB(0, 255, 0),		/* green */

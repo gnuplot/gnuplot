@@ -154,7 +154,7 @@ static size_units latex_explicit_units = INCHES;
 /* POINTS */
 #define LATEX_POINT_TYPES 15	/* we supply more point types */
 
-static const char GPFAR *GPFAR LATEX_points[] = {
+static const char * LATEX_points[] = {
     "\\makebox(0,0){$+$}",
     "\\makebox(0,0){$\\times$}",
     "\\makebox(0,0){$\\ast$}",
@@ -180,7 +180,7 @@ static float LATEX_dotspace = 0;	/* current dotspace of line in points */
 static struct {
     float size;			/* size of dot, or thick of line in points */
     float dotspace;		/* inter-dot space in points; 0 for lines */
-} GPFAR LATEX_lines[] =
+} LATEX_lines[] =
 
 {
     {0.4, 0.0},			/* thin solid line */
@@ -211,7 +211,7 @@ static void EMTEX_solid_line __PROTO((int x1, int x2, int y1, int y2));
 /* except negatives - they are handled specially */
 static struct vslope {
     int dx, dy;
-} GPFAR LATEX_slopes[] =
+} LATEX_slopes[] =
 
 {
     {1, 1},

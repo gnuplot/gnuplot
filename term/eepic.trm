@@ -132,7 +132,7 @@ static float eepic_ysize = 3.0;
 /* POINTS */
 static int eepic_num_point_types[] = { 12, 10, 8 };
 static int eepic_pointsize = 0;
-static const char GPFAR *GPFAR EEPIC_points[][12] =
+static const char * EEPIC_points[][12] =
 {
 	{
 		"\\makebox(0,0){$\\Diamond$}",
@@ -170,7 +170,7 @@ static const char GPFAR *GPFAR EEPIC_points[][12] =
 static int eepic_numlines[] = { 5, 7, 8 };	/* number of linetypes below */
 #define EEPIC_MAX_NUMLINES 8				/* max of eepic_numlines[] */
 static int eepic_lineset = 0;
-static char GPFAR *GPFAR EEPIC_lines[][EEPIC_MAX_NUMLINES] =
+static char * EEPIC_lines[][EEPIC_MAX_NUMLINES] =
 {
 	{
 		"\\thicklines \\path",	/* -2 border */
@@ -207,7 +207,7 @@ static int EEPIC_linecount = 0;	/* number of points in line so far */
 
 #define EEPIC_NUM_COLORS 7
 static int eepic_color = 0;
-static char GPFAR *GPFAR eepic_colors[EEPIC_NUM_COLORS] =
+static char * eepic_colors[EEPIC_NUM_COLORS] =
 {
 	"\\color{black}\n",	/* border and axes (must be black!) */
 	"\\color{red}\n",

@@ -307,7 +307,7 @@ static FILE *PS_open_prologue_file __PROTO((char *));
 static void PS_dump_prologue_file __PROTO((char *));
 static void PS_load_glyphlist __PROTO((void));
 
-static const char GPFAR * GPFAR OldEPSL_linetypes[] = {
+static const char * OldEPSL_linetypes[] = {
 /* Line Types */
 "% Redefine line types to match old epslatex driver\n",
 "/LTw { PL [] 1 setgray } def\n", /* background (assumed white) */
@@ -320,7 +320,7 @@ static const char GPFAR * GPFAR OldEPSL_linetypes[] = {
 NULL
 };
 
-static const char GPFAR * GPFAR ENHPS_header[] = {
+static const char * ENHPS_header[] = {
 /* For MFshow and MFwidth the tos is an array with the string and font info:  */
 /*	[<fontname (a string)> <fontsize> <vertical offset> <width significant?> <printed?> <overprint> <text string>]  */
 /* EAM Mar 2004 - Add in a special case overprint 3 = save, overprint 4 = restore */
@@ -386,7 +386,7 @@ NULL
 };
 
 #ifdef EAM_BOXED_TEXT
-    static const char GPFAR psi4[] = "\
+    static const char psi4[] = "\
 %%\n\
 %% Support for boxed text - Ethan A Merritt Sep 2016\n%%\n\
 /InitTextBox { userdict /TBy2 3 -1 roll put userdict /TBx2 3 -1 roll put\n\
@@ -1581,12 +1581,12 @@ PS_common_init(
     unsigned int bb_xmax, unsigned int bb_ymax, /* bounding box */
     const char **dict) /* extra entries for the dictionary */
 {
-    static const char GPFAR psi1[] = "\
+    static const char psi1[] = "\
 %%%%Creator: gnuplot %s patchlevel %s\n\
 %%%%CreationDate: %s\n\
 %%%%DocumentFonts: %s\n";
 
-    static const char GPFAR psi2[] = "\
+    static const char psi2[] = "\
 %%%%EndComments\n\
 %%%%BeginProlog\n\
 /gnudict 256 dict def\ngnudict begin\n\
@@ -1624,7 +1624,7 @@ PS_common_init(
 /hpt hpt_ def\n\
 /vpt vpt_ def\n";
 
-    static const char GPFAR psi3[] = "\
+    static const char psi3[] = "\
 Level1 SuppressPDFMark or \n\
 {} {\n\
 /SDict 10 dict def\n\
@@ -2409,7 +2409,7 @@ PS_set_font(const char *font)
 TERM_PUBLIC void
 PS_point(unsigned int x, unsigned int y, int number)
 {
-    static const char GPFAR * GPFAR pointFNS[] = {
+    static const char * pointFNS[] = {
 	"Pnt",  "Pls",   "Crs",    "Star",
 	"Box",  "BoxF",  "Circle", "CircleF",
 	"TriU", "TriUF", "TriD",   "TriDF",
@@ -2430,7 +2430,7 @@ PS_point(unsigned int x, unsigned int y, int number)
 	"DiaE", "PentE", "BoxW",   "CircW",
 	"TriUW","TriDW", "DiaW",   "PentW"
     };
-    static const char GPFAR * GPFAR pointFNS_OldEPSL[] = {
+    static const char * pointFNS_OldEPSL[] = {
 	"Pnt",  "Dia",   "Circle", "Pls",
 	"Crs",  "Box",   "DiaF",   "CircleF",
 	"BoxF"

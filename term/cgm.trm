@@ -187,7 +187,7 @@ static struct cgm_properties
 static int cgm_user_color_count = 0;
 static int cgm_user_color_max = 0;
 static int cgm_smooth_colors = 0;
-static int GPFAR *cgm_user_color_table = (int GPFAR*)0;
+static int *cgm_user_color_table = (int *)0;
 static int cgm_maximum_color_index = 255;	/* Size of color table we will write */
 
 struct fontdata {
@@ -604,7 +604,7 @@ CGM_graphics()
 					    * 6=positive/negative
 					    * slope crosshatch */
 
-    static int GPFAR elements_list_data[] =
+    static int elements_list_data[] =
     {
 	0,			/* will be set to # elements in this list */
 	0, 1,			/* Begin Metafile */

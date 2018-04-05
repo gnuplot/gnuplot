@@ -112,7 +112,7 @@ static double TEXDRAW_xscale = 1.0, TEXDRAW_yscale = 1.0;
 /* POINTS */
 #define TEXDRAW_POINT_TYPES 12	/* we supply more point types */
 
-static const char GPFAR *GPFAR TEXDRAW_points[] = {
+static const char * TEXDRAW_points[] = {
     "\\rmove(0 4)\\htext{$\\Diamond$}",
     "\\htext{$+$}",
     "\\rmove(0 4)\\htext{$\\Box$}",
@@ -162,7 +162,7 @@ TEXDRAW_init()
 TERM_PUBLIC void
 TEXDRAW_graphics()
 {
-    static char GPFAR tdg1[] = "\
+    static char tdg1[] = "\
 \\begin{texdraw}\n\
 \\normalsize\n\
 \\ifx\\pathDEFINED\\relax\\else\\let\\pathDEFINED\\relax\n\

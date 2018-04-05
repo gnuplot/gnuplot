@@ -115,7 +115,7 @@ static unsigned int b_lasty;	/* last pixel set - used by b_line */
 
 
 /* 5x9 font, bottom row first, left pixel in lsb */
-const char_row GPFAR fnt5x9[FNT_CHARS][FNT5X9_VBITS] = {
+const char_row fnt5x9[FNT_CHARS][FNT5X9_VBITS] = {
   /* */  {000000,000000,000000,000000,000000,000000,000000,000000,000000},
   /*!*/  {000000,000000,0x0004,000000,0x0004,0x0004,0x0004,0x0004,0x0004},
   /*"*/  {000000,000000,000000,000000,000000,000000,0x000a,0x000a,0x000a},
@@ -215,7 +215,7 @@ const char_row GPFAR fnt5x9[FNT_CHARS][FNT5X9_VBITS] = {
 };
 
 /* 9x17 font, bottom row first, left pixel in lsb */
-const char_row GPFAR fnt9x17[FNT_CHARS][FNT9X17_VBITS] = {
+const char_row fnt9x17[FNT_CHARS][FNT9X17_VBITS] = {
   /* */  {000000,000000,000000,000000,000000,000000,000000,000000,000000,
           000000,000000,000000,000000,000000,000000,000000,000000},
   /*!*/  {000000,000000,000000,000000,0x0010,000000,000000,000000,0x0010,
@@ -411,7 +411,7 @@ const char_row GPFAR fnt9x17[FNT_CHARS][FNT9X17_VBITS] = {
 };
 
 /* 13x25 font, bottom row first, left pixel in lsb */
-const char_row GPFAR fnt13x25[FNT_CHARS][FNT13X25_VBITS] = {
+const char_row fnt13x25[FNT_CHARS][FNT13X25_VBITS] = {
   /* */  {000000,000000,000000,000000,000000,000000,000000,000000,000000,
           000000,000000,000000,000000,000000,000000,000000,000000,000000,
           000000,000000,000000,000000,000000,000000,000000},

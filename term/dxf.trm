@@ -153,7 +153,7 @@ DXF_graphics()
 {
     register struct termentry *t = term;
     int i;
-    static char GPFAR dxfi1[] = "\
+    static char dxfi1[] = "\
 999\n\
 %% GNUPLOT: dxf file for AutoCad\n\
   0\nSECTION\n  2\nHEADER\n\
@@ -176,7 +176,7 @@ DXF_graphics()
   9\n$MENU\n  1\nacad\n\
   0\nENDSEC\n\
   0\nSECTION\n  2\nTABLES\n";
-    static char GPFAR dxfi2[] = "\
+    static char dxfi2[] = "\
 0\nTABLE\n  2\nLTYPE\n 70\n    %d\n\
 0\nLTYPE\n  2\nCONTINUOUS\n 70\n    64\n\
   3\nSolid line\n 72\n    65\n 73\n      0\n 40\n0.0\n\
