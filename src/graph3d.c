@@ -128,7 +128,7 @@ static void cntr3d_points __PROTO((struct gnuplot_contours * cntr,
 				   struct lp_style_type * lp));
 static void cntr3d_labels __PROTO((struct gnuplot_contours * cntr, char * leveltext,
 				   struct text_label * label));
-static void check_corner_height __PROTO((struct coordinate GPHUGE * point,
+static void check_corner_height __PROTO((struct coordinate * point,
 					 double height[2][2], double depth[2][2]));
 static void setup_3d_box_corners __PROTO((void));
 static void draw_3d_graphbox __PROTO((struct surface_points * plot,
@@ -1465,7 +1465,7 @@ plot3d_impulses(struct surface_points *plot)
 	set_rgbcolor_const(plot->lp_properties.pm3d_color.lt);
 
     while (icrvs) {
-	struct coordinate GPHUGE *points = icrvs->points;
+	struct coordinate *points = icrvs->points;
 
 	for (i = 0; i < icrvs->p_count; i++) {
 
@@ -1545,7 +1545,7 @@ plot3d_lines(struct surface_points *plot)
     int x, y, xx0, yy0;	/* point in terminal coordinates */
     double clip_x, clip_y, clip_z;
     struct iso_curve *icrvs = plot->iso_crvs;
-    struct coordinate GPHUGE *points;
+    struct coordinate *points;
     TBOOLEAN rgb_from_column;
 
     /* These are handled elsewhere.  */
@@ -1663,7 +1663,7 @@ plot3d_lines_pm3d(struct surface_points *plot)
     int i, set, scan;
     int x, y, xx0, yy0;	/* point in terminal coordinates */
     double clip_x, clip_y, clip_z;
-    struct coordinate GPHUGE *points;
+    struct coordinate *points;
     enum coord_type prev = UNDEFINED;
     double z;
 
@@ -1839,7 +1839,7 @@ plot3d_points(struct surface_points *plot)
     }
 
     while (icrvs) {
-	struct coordinate GPHUGE *point;
+	struct coordinate *point;
 	int colortype = plot->lp_properties.pm3d_color.type;
 
 	/* Apply constant color outside of the loop */
@@ -2085,7 +2085,7 @@ cntr3d_labels(struct gnuplot_contours *cntr, char *level_text, struct text_label
  */
 static void
 check_corner_height(
-    struct coordinate GPHUGE *p,
+    struct coordinate *p,
     double height[2][2], double depth[2][2])
 {
     if (p->type != INRANGE)
@@ -3273,7 +3273,7 @@ get_surface_cbminmax(struct surface_points *plot, double *cbmin, double *cbmax)
     TBOOLEAN color_from_column = plot->pm3d_color_from_column; /* just a shortcut */
     coordval cb;
     struct iso_curve *icrvs = plot->iso_crvs;
-    struct coordinate GPHUGE *points;
+    struct coordinate *points;
 
     *cbmin = VERYLARGE;
     *cbmax = -VERYLARGE;
@@ -3420,8 +3420,8 @@ plot3d_vectors(struct surface_points *plot)
     int i;
     double x1, y1, x2, y2;
     arrow_style_type ap;
-    struct coordinate GPHUGE *tails = plot->iso_crvs->points;
-    struct coordinate GPHUGE *heads = plot->iso_crvs->next->points;
+    struct coordinate *tails = plot->iso_crvs->points;
+    struct coordinate *heads = plot->iso_crvs->next->points;
 
     /* Only necessary once, unless variable arrow style */
     ap = plot->arrow_properties;

@@ -83,7 +83,7 @@ typedef struct curve_points {
     int n_par_axes;		/* Only used for parallel axis plots */
     double **z_n;		/* Only used for parallel axis plots */
     double *varcolor;		/* Only used if plot has variable color */
-    struct coordinate GPHUGE *points;
+    struct coordinate *points;
 } curve_points;
 
 /* externally visible variables of graphics.h */

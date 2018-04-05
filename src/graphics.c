@@ -83,8 +83,8 @@ static double largest_polar_circle;
 /*}}} */
 
 /* Status information for stacked histogram plots */
-static struct coordinate GPHUGE *stackheight = NULL;	/* top of previous row */
-static int stack_count;					/* points actually used */
+static struct coordinate *stackheight = NULL;	/* top of previous row */
+static int stack_count;				/* points actually used */
 static void place_histogram_titles __PROTO((void));
 
 /*{{{  static fns and local macros */
@@ -115,8 +115,8 @@ static void plot_steps __PROTO((struct curve_points * plot));	/* JG */
 static void plot_fsteps __PROTO((struct curve_points * plot));	/* HOE */
 static void plot_histeps __PROTO((struct curve_points * plot));	/* CAC */
 
-static int edge_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey));
-static TBOOLEAN two_edge_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
+static int edge_intersect __PROTO((struct coordinate * points, int i, double *ex, double *ey));
+static TBOOLEAN two_edge_intersect __PROTO((struct coordinate * points, int i, double *lx, double *ly));
 
 static void ytick2d_callback __PROTO((struct axis *, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels));
 static void xtick2d_callback __PROTO((struct axis *, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels));
@@ -1894,7 +1894,7 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 	    stack_count = 0;
 	if (!stackheight) {
 	    stackheight = gp_alloc(
-				newsize * sizeof(struct coordinate GPHUGE),
+				newsize * sizeof(struct coordinate),
 				"stackheight array");
 	    for (i = 0; i < newsize; i++) {
 		stackheight[i].yhigh = 0;
@@ -1903,7 +1903,7 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 	    stack_count = newsize;
 	} else if (stack_count < newsize) {
 	    stackheight = gp_realloc( stackheight,
-				newsize * sizeof(struct coordinate GPHUGE),
+				newsize * sizeof(struct coordinate),
 				"stackheight array");
 	    for (i = stack_count; i < newsize; i++) {
 		stackheight[i].yhigh = 0;
@@ -3049,7 +3049,7 @@ plot_boxplot(struct curve_points *plot)
  */
 static int
 edge_intersect(
-    struct coordinate GPHUGE *points, /* the points array */
+    struct coordinate *points,	/* the points array */
     int i,			/* line segment from point i-1 to point i */
     double *ex, double *ey)	/* the point where it crosses an edge */
 {
@@ -3187,7 +3187,7 @@ edge_intersect(
  */
 static TBOOLEAN			/* any intersection? */
 two_edge_intersect(
-    struct coordinate GPHUGE *points, /* the points array */
+    struct coordinate *points, /* the points array */
     int i,			/* line segment from point i-1 to point i */
     double *lx, double *ly)	/* lx[2], ly[2]: points where it crosses edges */
 {
@@ -4461,7 +4461,7 @@ void
 process_image(void *plot, t_procimg_action action)
 {
 
-    struct coordinate GPHUGE *points;
+    struct coordinate *points;
     int p_count;
     int i;
     double p_start_corner[2], p_end_corner[2]; /* Points used for computing hyperplane. */

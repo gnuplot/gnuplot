@@ -261,7 +261,7 @@ eval_kdensity (
     ) {
 
     unsigned int i;
-    struct coordinate GPHUGE *this_points = (cp->points) + first_point;
+    struct coordinate *this_points = (cp->points) + first_point;
   
     double y, Z;
     double avg, sigma;
@@ -393,7 +393,7 @@ eval_bezier(
     double *c)			/* Bezier coefficient array */
 {
     unsigned int n = num_points - 1;
-    struct coordinate GPHUGE *this_points;
+    struct coordinate *this_points;
 
     this_points = (cp->points) + first_point;
 
@@ -578,7 +578,7 @@ cp_approx_spline(
     spline_coeff *sc;
     five_diag *m;
     double *r, *x, *h, *xp, *yp;
-    struct coordinate GPHUGE *this_points;
+    struct coordinate *this_points;
     int i;
 
     x_axis = plot->x_axis;
@@ -703,7 +703,7 @@ cp_tridiag(struct curve_points *plot, int first_point, int num_points)
     spline_coeff *sc;
     tri_diag *m;
     double *r, *x, *h, *xp, *yp;
-    struct coordinate GPHUGE *this_points;
+    struct coordinate *this_points;
     int i;
 
     x_axis = plot->x_axis;
@@ -832,7 +832,7 @@ do_cubic(
     double xdiff, temp, x, y;
     double xstart, xend;	/* Endpoints of the sampled x range */
     int i, l;
-    struct coordinate GPHUGE *this_points;
+    struct coordinate *this_points;
 
     /* min and max in internal (eg logged) co-ordinates. We update
      * these, then update the external extrema in user co-ordinates
@@ -922,7 +922,7 @@ do_freq(
     int i;
     int x_axis = plot->x_axis;
     int y_axis = plot->y_axis;
-    struct coordinate GPHUGE *this;
+    struct coordinate *this;
 
     /* min and max in internal (eg logged) co-ordinates. We update
      * these, then update the external extrema in user co-ordinates

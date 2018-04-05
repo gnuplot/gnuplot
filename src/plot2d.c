@@ -87,7 +87,7 @@ TBOOLEAN boxwidth_is_absolute  = TRUE;
 static double histogram_rightmost = 0.0;    /* Highest x-coord of histogram so far */
 static text_label histogram_title;          /* Subtitle for this histogram */
 static int stack_count = 0;                 /* counter for stackheight */
-static struct coordinate GPHUGE *stackheight = NULL; /* Scratch space for y autoscale */
+static struct coordinate *stackheight = NULL; /* Scratch space for y autoscale */
 
 /* function implementations */
 
@@ -106,7 +106,7 @@ cp_alloc(int num)
 
     cp->p_max = (num >= 0 ? num : 0);
     if (num > 0)
-	cp->points = (struct coordinate GPHUGE *)
+	cp->points = (struct coordinate *)
 	    gp_alloc(num * sizeof(struct coordinate), "curve points");
 
     /* Initialize various fields */
@@ -329,7 +329,7 @@ refresh_bounds(struct curve_points *first_plot, int nplots)
 	}
 
 	for (i=0; i<this_plot->p_count; i++) {
-	    struct coordinate GPHUGE *point = &this_plot->points[i];
+	    struct coordinate *point = &this_plot->points[i];
 
 	    if (point->type == UNDEFINED)
 		continue;
@@ -393,7 +393,7 @@ get_data(struct curve_points *current_plot)
     int ngood;
     int max_cols, min_cols;    /* allowed range of column numbers */
     int storetoken = current_plot->token;
-    struct coordinate GPHUGE *cp;
+    struct coordinate *cp;
     double v[MAXDATACOLS];
     memset(v, 0, sizeof(v));
 
@@ -1285,7 +1285,7 @@ store2d_point(
     double ylow, double yhigh,
     double width)               /* BOXES widths: -1 -> autocalc, 0 ->  use xlow/xhigh */
 {
-    struct coordinate GPHUGE *cp = &(current_plot->points[i]);
+    struct coordinate *cp = &(current_plot->points[i]);
     coord_type dummy_type = INRANGE;   /* sometimes we dont care about outranging */
     TBOOLEAN excluded_range = FALSE;
 
@@ -1615,7 +1615,7 @@ histogram_range_fiddling(struct curve_points *plot)
 		if (plot->histogram_sequence == 0) {
 		    if (stackheight)
 			free(stackheight);
-		    stackheight = gp_alloc( plot->p_count * sizeof(struct coordinate GPHUGE),
+		    stackheight = gp_alloc( plot->p_count * sizeof(struct coordinate),
 					    "stackheight array");
 		    for (stack_count=0; stack_count < plot->p_count; stack_count++) {
 			stackheight[stack_count].yhigh = 0;
@@ -1623,7 +1623,7 @@ histogram_range_fiddling(struct curve_points *plot)
 		    }
 		} else if (plot->p_count > stack_count) {
 		    stackheight = gp_realloc( stackheight,
-					    plot->p_count * sizeof(struct coordinate GPHUGE),
+					    plot->p_count * sizeof(struct coordinate),
 					    "stackheight array");
 		    for ( ; stack_count < plot->p_count; stack_count++) {
 			stackheight[stack_count].yhigh = 0;

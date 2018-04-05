@@ -93,7 +93,7 @@ extend_dynarray(dynarray *this, long increment)
 /* Get pointer to the element one past the current end of the dynamic
  * array. Resize it if necessary. Returns a pointer-to-void to that
  * element. */
-void GPHUGE *
+void *
 nextfrom_dynarray(dynarray *this)
 {
     if (!this->v)

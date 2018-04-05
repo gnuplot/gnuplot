@@ -49,7 +49,7 @@ typedef struct vertex {
     struct coordinate *original;/* original coordinates of this point */
 				/* used for variable pointsize, pointtype */
 } vertex;
-typedef vertex GPHUGE * p_vertex;
+typedef vertex * p_vertex;
 
 
 /* Utility macros for vertices: */

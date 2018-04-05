@@ -260,7 +260,7 @@ filled_quadrangle(gpdPoint * corners)
    to 2D terminal coordinates, then draws filled polygon
  */
 void
-filled_polygon_common(int points, struct coordinate GPHUGE * coords, TBOOLEAN fixed, double z)
+filled_polygon_common(int points, struct coordinate * coords, TBOOLEAN fixed, double z)
 {
     int i;
     double x, y;
@@ -287,7 +287,7 @@ filled_polygon_common(int points, struct coordinate GPHUGE * coords, TBOOLEAN fi
 }
 
 void
-filled_polygon_3dcoords(int points, struct coordinate GPHUGE * coords)
+filled_polygon_3dcoords(int points, struct coordinate * coords)
 {
     filled_polygon_common(points, coords, FALSE, 0.0);
 }
@@ -297,7 +297,7 @@ filled_polygon_3dcoords(int points, struct coordinate GPHUGE * coords)
    fixed (base_z, for instance) to 2D terminal coordinates, then draws filled polygon
  */
 void
-filled_polygon_3dcoords_zfixed(int points, struct coordinate GPHUGE * coords, double z)
+filled_polygon_3dcoords_zfixed(int points, struct coordinate * coords, double z)
 {
     filled_polygon_common(points, coords, TRUE, z);
 }

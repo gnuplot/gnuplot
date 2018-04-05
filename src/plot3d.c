@@ -347,7 +347,7 @@ refresh_3dbounds(struct surface_points *first_plot, int nplots)
 	for ( this_curve = this_plot->iso_crvs; this_curve; this_curve = this_curve->next) {
 
 	for (i=0; i<this_curve->p_count; i++) {
-	    struct coordinate GPHUGE *point = &this_curve->points[i];
+	    struct coordinate *point = &this_curve->points[i];
 
 	    if (point->type == UNDEFINED)
 		continue;
@@ -433,7 +433,7 @@ thin_plate_splines_setup( struct iso_curve *old_iso_crvs,
      * ones, as we copy them */
     numpoints = 0;
     for (oicrv = old_iso_crvs; oicrv != NULL; oicrv = oicrv->next) {
-        struct coordinate GPHUGE *opoints = oicrv->points;
+        struct coordinate *opoints = oicrv->points;
         
         for (k = 0; k < oicrv->p_count; k++, opoints++) {
             /* HBB 20010424: avoid crashing for undefined input */
@@ -559,7 +559,7 @@ grid_nongrid_data(struct surface_points *this_plot)
     xmin = xmax = old_iso_crvs->points[0].x;
     ymin = ymax = old_iso_crvs->points[0].y;
     for (icrv = old_iso_crvs; icrv != NULL; icrv = icrv->next) {
-	struct coordinate GPHUGE *points = icrv->points;
+	struct coordinate *points = icrv->points;
         
 	for (i = 0; i < icrv->p_count; i++, points++) {
 	    /* HBB 20010424: avoid crashing for undefined input */
@@ -594,7 +594,7 @@ grid_nongrid_data(struct surface_points *this_plot)
     }
     
     for (i = 0, x = xmin; i < dgrid3d_col_fineness; i++, x += dx) {
-	struct coordinate GPHUGE *points;
+	struct coordinate *points;
 
 	icrv = iso_alloc(dgrid3d_row_fineness + 1);
 	icrv->p_count = dgrid3d_row_fineness;
@@ -618,7 +618,7 @@ grid_nongrid_data(struct surface_points *this_plot)
                 z = z + b[numpoints + 1] * x + b[numpoints + 2] * y;
 	    } else { /* everything, except splines */
                 for (oicrv = old_iso_crvs; oicrv != NULL; oicrv = oicrv->next) {
-                    struct coordinate GPHUGE *opoints = oicrv->points;
+                    struct coordinate *opoints = oicrv->points;
                     for (k = 0; k < oicrv->p_count; k++, opoints++) {
                         
                         if (dgrid3d_mode == DGRID3D_QNORM) {
@@ -775,8 +775,8 @@ get_3ddata(struct surface_points *this_plot)
     {
 	/*{{{  read surface from text file */
 	struct iso_curve *local_this_iso = iso_alloc(samples_1);
-	struct coordinate GPHUGE *cp;
-	struct coordinate GPHUGE *cphead = NULL; /* Only for VECTOR plots */
+	struct coordinate *cp;
+	struct coordinate *cphead = NULL; /* Only for VECTOR plots */
 	double x, y, z;
 	double xlow = 0, xhigh = 0;
 	double xtail, ytail, ztail;
@@ -1272,7 +1272,7 @@ calculate_set_of_isolines(
     int num_sam_to_use)
 {
     int i, j;
-    struct coordinate GPHUGE *points = (*this_iso)->points;
+    struct coordinate *points = (*this_iso)->points;
     int do_update_color = (!parametric || (parametric && value_axis == FIRST_Z_AXIS));
 
     for (j = 0; j < num_iso_to_use; j++) {
@@ -2503,9 +2503,9 @@ parametric_3dfixup(struct surface_points *start_plot, int *plot_num)
 	    assert(INRANGE < OUTRANGE && OUTRANGE < UNDEFINED);
 
 	    while (zicrvs) {
-		struct coordinate GPHUGE *xpoints = xicrvs->points;
-		struct coordinate GPHUGE *ypoints = yicrvs->points;
-		struct coordinate GPHUGE *zpoints = zicrvs->points;
+		struct coordinate *xpoints = xicrvs->points;
+		struct coordinate *ypoints = yicrvs->points;
+		struct coordinate *zpoints = zicrvs->points;
 
 		for (i = 0; i < zicrvs->p_count; ++i) {
 		    zpoints[i].x = xpoints[i].z;
@@ -2561,7 +2561,7 @@ count_3dpoints(struct surface_points *plot, int *ntotal, int *ninrange, int *nun
     *ntotal = *ninrange = *nundefined = 0;
 
     while (icrvs) {
-	struct coordinate GPHUGE *point;
+	struct coordinate *point;
 	for (i = 0; i < icrvs->p_count; i++) {
 	    point = &(icrvs->points[i]);
 	    (*ntotal)++;

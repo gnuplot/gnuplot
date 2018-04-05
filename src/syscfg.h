@@ -244,9 +244,6 @@ FILE * win_popen(const char *filename, const char *mode);
 /* HBB 20000416: stuff moved from plot.h to here. It's system-dependent,
  * so it belongs here, IMHO */
 
-/* BM 20110904: remnant of huge memory model support */
-#define GPHUGE /* nothing */
-
 #if defined(HAVE_SYS_TYPES_H)
 # include <sys/types.h>
 # if defined(HAVE_SYS_WAIT_H)

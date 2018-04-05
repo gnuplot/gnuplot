@@ -82,11 +82,11 @@ iso_alloc(int num)
     ip->p_max = (num >= 0 ? num : 0);
     ip->p_count = 0;
     if (num > 0) {
-	ip->points = (struct coordinate GPHUGE *)
+	ip->points = (struct coordinate *)
 	    gp_alloc(num * sizeof(struct coordinate), "iso curve points");
 	memset(ip->points, 0, num * sizeof(struct coordinate));
     } else
-	ip->points = (struct coordinate GPHUGE *) NULL;
+	ip->points = (struct coordinate *) NULL;
     ip->next = NULL;
     return (ip);
 }
@@ -103,19 +103,19 @@ iso_extend(struct iso_curve *ip, int num)
 
     if (num > 0) {
 	if (ip->points == NULL) {
-	    ip->points = (struct coordinate GPHUGE *)
+	    ip->points = (struct coordinate *)
 		gp_alloc(num * sizeof(struct coordinate), "iso curve points");
 	} else {
-	    ip->points = (struct coordinate GPHUGE *)
+	    ip->points = (struct coordinate *)
 		gp_realloc(ip->points, num * sizeof(struct coordinate), "expanding curve points");
 	}
 	if (num > ip->p_max)
 	    memset( &(ip->points[ip->p_max]), 0, (num - ip->p_max) * sizeof(struct coordinate));
 	ip->p_max = num;
     } else {
-	if (ip->points != (struct coordinate GPHUGE *) NULL)
+	if (ip->points != (struct coordinate *) NULL)
 	    free(ip->points);
-	ip->points = (struct coordinate GPHUGE *) NULL;
+	ip->points = (struct coordinate *) NULL;
 	ip->p_max = 0;
     }
 }

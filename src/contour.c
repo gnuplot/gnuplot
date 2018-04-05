@@ -84,7 +84,7 @@ typedef enum en_edge_position {
 
 typedef struct edge_struct {
     struct poly_struct *poly[2]; /* Each edge belongs to up to 2 polygons */
-    struct coordinate GPHUGE *vertex[2]; /* The two extreme points of this edge. */
+    struct coordinate *vertex[2]; /* The two extreme points of this edge. */
     struct edge_struct *next;	/* To chain lists */
     TBOOLEAN is_active;		/* is edge is 'active' at certain Z level? */
     t_edge_position position;	/* position of edge in mesh */
@@ -143,8 +143,8 @@ static void calc_min_max __PROTO((int num_isolines,
 				  double *zz_min,
 				  double *xx_max, double *yy_max,
 				  double *zz_max));
-static edge_struct *add_edge __PROTO((struct coordinate GPHUGE *point0,
-					     struct coordinate GPHUGE *point1,
+static edge_struct *add_edge __PROTO((struct coordinate *point0,
+					     struct coordinate *point1,
 					     edge_struct
 					     **p_edge,
 					     edge_struct **pe_tail));
@@ -588,7 +588,7 @@ gen_triangle(
     int i, j, grid_x_max = iso_lines->p_count;
     edge_struct *p_edge1, *p_edge2, *edge0, *edge1, *edge2, *pe_tail, *pe_tail2, *pe_temp;
     poly_struct *pp_tail;
-    struct coordinate GPHUGE *p_vrtx1, GPHUGE * p_vrtx2;
+    struct coordinate *p_vrtx1, * p_vrtx2;
 
     (*p_polys) = pp_tail = NULL;	/* clear lists */
     (*p_edges) = pe_tail = NULL;
@@ -728,7 +728,7 @@ calc_min_max(
     double *xx_max, double *yy_max, double *zz_max) /* min/max values in/out */
 {
     int i, j, grid_x_max;
-    struct coordinate GPHUGE *vertex;
+    struct coordinate *vertex;
 
     grid_x_max = iso_lines->p_count;	/* number of vertices per iso_line */
 
@@ -773,8 +773,8 @@ calc_min_max(
  */
 static edge_struct *
 add_edge(
-    struct coordinate GPHUGE *point0,	/* 2 vertices input */
-    struct coordinate GPHUGE *point1,
+    struct coordinate *point0,	/* 2 vertices input */
+    struct coordinate *point1,
     edge_struct **p_edge, /* pointers to edge list in/out */
     edge_struct **pe_tail)
 {

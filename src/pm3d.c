@@ -421,7 +421,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
     int go_over_pts, max_pts;
     int are_ftriangles, ftriangles_low_pt = -999, ftriangles_high_pt = -999;
     struct iso_curve *scanA, *scanB;
-    struct coordinate GPHUGE *pointsA, *pointsB;
+    struct coordinate *pointsA, *pointsB;
     struct iso_curve **scan_array;
     int scan_array_n;
     double avgC, gray = 0;
@@ -556,7 +556,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 #if 0
     /* debugging: this loop prints properties of all scans */
     for (scan = 0; scan < this_plot->num_iso_read; scan++) {
-	struct coordinate GPHUGE *points;
+	struct coordinate *points;
 	scanA = scan_array[scan];
 	printf("\n#IsoCurve = scan nb %d, %d points\n#x y z type(in,out,undef)\n", scan, scanA->p_count);
 	for (i = 0, points = scanA->points; i < scanA->p_count; i++) {

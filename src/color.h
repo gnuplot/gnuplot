@@ -246,14 +246,13 @@ void filled_quadrangle __PROTO((gpdPoint *corners));
    Makes mapping from real 3D coordinates, passed as coords array,
    to 2D terminal coordinates, then draws filled polygon
 */
-/* HBB 20010216: added 'GPHUGE' attribute */
-void filled_polygon_3dcoords __PROTO((int points, struct coordinate GPHUGE *coords));
+void filled_polygon_3dcoords __PROTO((int points, struct coordinate *coords));
 
 /*
    Makes mapping from real 3D coordinates, passed as coords array, but at z coordinate
    fixed (base_z, for instance) to 2D terminal coordinates, then draws filled polygon
 */
-void filled_polygon_3dcoords_zfixed __PROTO((int points, struct coordinate GPHUGE *coords, double z));
+void filled_polygon_3dcoords_zfixed __PROTO((int points, struct coordinate *coords, double z));
 
 /*
   Draw colour smooth box

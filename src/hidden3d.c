@@ -174,7 +174,7 @@ typedef struct edge {
     struct lp_style_type *lp;	/* line/point style attributes */
     long next;			/* index of next edge in z-sorted list */
 } edge;
-typedef edge GPHUGE *p_edge;
+typedef edge *p_edge;
 
 
 /* One triangle of the surface mesh(es). */
@@ -193,7 +193,7 @@ typedef struct mesh_triangle {
     unsigned long ybits;	/* y coverage mask of bounding box */
 #endif
 } mesh_triangle;
-typedef mesh_triangle GPHUGE *p_polygon;
+typedef mesh_triangle *p_polygon;
 
 #if HIDDEN3D_GRIDBOX
 # define UINT_BITS (CHAR_BIT * sizeof(unsigned int))
@@ -248,7 +248,7 @@ typedef struct qtreelist {
     long p;			/* the polygon */
     long next;			/* next element in this chain */
 } qtreelist;
-typedef qtreelist GPHUGE *p_qtreelist;
+typedef qtreelist *p_qtreelist;
 
 /* The quadtree algorithm sorts the objects into lists indexed by x/y.     */
 /* The number of cells in x and y direction has a huge effect on run time. */
@@ -280,7 +280,7 @@ static dynarray qtree;
 #endif /* HIDDEN3D_QUADTREE*/
 
 /* Prototypes for internal functions of this module. */
-static long int store_vertex __PROTO((struct coordinate GPHUGE *point,
+static long int store_vertex __PROTO((struct coordinate *point,
 				      lp_style_type *lp_style, TBOOLEAN color_from_column));
 static long int make_edge __PROTO((long int vnum1, long int vnum2,
 				   struct lp_style_type *lp,
@@ -505,7 +505,7 @@ do {									\
 
 static long int
 store_vertex (
-    struct coordinate GPHUGE * point,
+    struct coordinate * point,
     lp_style_type *lp_style,
     TBOOLEAN color_from_column)
 {
@@ -1219,7 +1219,7 @@ build_networks(struct surface_points *plots, int pcount)
 	    for (crv = 0, icrvs = this_plot->iso_crvs;
 		 icrvs;
 		 crv++, icrvs = icrvs->next) {
-		struct coordinate GPHUGE *points = icrvs->points;
+		struct coordinate *points = icrvs->points;
 		long int previousvertex = -1;
 
 		/* To handle labels we must look inside a separate list */
@@ -1342,7 +1342,7 @@ build_networks(struct surface_points *plots, int pcount)
 	for (crv = 0, icrvs = this_plot->iso_crvs;
 	     icrvs;
 	     crv++, icrvs = icrvs->next) {
-	    struct coordinate GPHUGE *points = icrvs->points;
+	    struct coordinate *points = icrvs->points;
 
 	    for (i = 0; i < icrvs->p_count; i++) {
 		long int thisvertex, basevertex;

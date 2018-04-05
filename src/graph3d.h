@@ -67,7 +67,7 @@ typedef double transform_matrix[4][4]; /* HBB 990826: added */
 
 typedef struct gnuplot_contours {
     struct gnuplot_contours *next;
-    struct coordinate GPHUGE *coords;
+    struct coordinate *coords;
     char isNewLevel;
     char label[32];
     int num_pts;
@@ -78,7 +78,7 @@ typedef struct iso_curve {
     struct iso_curve *next;
     int p_max;			/* how many points are allocated */
     int p_count;			/* count of points in points */
-    struct coordinate GPHUGE *points;
+    struct coordinate *points;
 } iso_curve;
 
 typedef struct surface_points {
