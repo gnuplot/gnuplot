@@ -130,6 +130,11 @@ int thread_rl_RetCode = -1; /* return code from readline in a thread */
 # include "win/winmain.h"
 #endif /* _WIN32 */
 
+#ifdef DJGPP
+# include <pc.h>		/* getkey() */
+# define useconds_t unsigned
+#endif
+
 #ifdef VMS
 int vms_vkid;			/* Virtual keyboard id */
 int vms_ktid;			/* key table id, for translating keystrokes */
@@ -865,7 +870,7 @@ is_array_assignment()
 
 #ifdef ARRAY_APPEND
     /* NB: EXPERIMENTAL (and undocumented!) special case
-     * Array[$] = New 
+     * Array[$] = New
      * appends a new value to the end of an existing array.
      * Otherwise we replace the value of an existing array entry.
      */
@@ -916,7 +921,7 @@ bind_command()
     }
 
     /* get left hand side: the key or key sequence
-     * either (1) entire sequence is in quotes 
+     * either (1) entire sequence is in quotes
      * or (2) sequence goes until the first whitespace
      */
     if (END_OF_COMMAND) {
@@ -1390,7 +1395,7 @@ do_command()
 }
 
 /* process commands of the form 'while (foo) {...}' */
-/* FIXME:  For consistency there should be an iterator associated 
+/* FIXME:  For consistency there should be an iterator associated
  * with this statement.
  */
 void
@@ -1809,7 +1814,23 @@ pause_command()
 	    term->waitforinput(0);
 	} else
 #endif /* USE_MOUSE */
+#ifdef DJGPP
+	{
+	    int junk;
+	    /* cannot use EAT_INPUT_WITH here */
+	    do {
+		/* We use getkey() since with DJGPP 2.05 and gcc 7.2,
+		   getchar() requires two keystrokes. */
+		junk = getkey();
+		/* Check if Ctrl-C was pressed */
+		if (junk == 0x03)
+		    bail_to_command_line();
+	    } while (junk != EOF && junk != '\n' && junk != '\r');
+	    fputc('\n', stderr);
+	}
+#else
 	    EAT_INPUT_WITH(fgetc(stdin));
+#endif
 
 #endif /* !(_WIN32 || OS2) */
     }
@@ -3662,7 +3683,7 @@ report_error(int ierr)
     else
 	reported_error = WEXITSTATUS(ierr);
 
-    fill_gpval_integer("GPVAL_SYSTEM_ERRNO", reported_error); 
+    fill_gpval_integer("GPVAL_SYSTEM_ERRNO", reported_error);
     if (reported_error == 127)
 	fill_gpval_string("GPVAL_SYSTEM_ERRMSG", "command not found or shell failed");
     else
