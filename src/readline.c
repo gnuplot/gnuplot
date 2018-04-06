@@ -1469,6 +1469,7 @@ msdos_getch()
     int c;
 
 #ifdef DJGPP
+    /* no need to handle mouse input here: it's done in term->text() */
     int ch = getkey();
     c = (ch & 0xff00) ? 0 : ch & 0xff;
 #elif defined (OS2)
@@ -1519,6 +1520,9 @@ msdos_getch()
 	    break;
 	case 83:		/* Delete */
 	    c = 0177;
+	    break;
+	case 15:		/* BackTab / Shift-Tab */
+	    c = 034;	/* FS: remap to non-standard code for tab-completion */
 	    break;
 	default:
 	    c = 0;
