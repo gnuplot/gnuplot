@@ -361,7 +361,7 @@ term_set_output(char *dest)
 #if defined(PIPES)
 	if (*dest == '|') {
 	    restrict_popen();
-#ifdef _WIN32
+#if defined(_WIN32 ) || defined(MSDOS)
 	    if (term && (term->flags & TERM_BINARY))
 		f = popen(dest + 1, "wb");
 	    else
