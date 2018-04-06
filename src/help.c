@@ -42,6 +42,9 @@ void OutLine(const char *M){fputs(M,stderr);}
 #include "alloc.h"
 #include "plot.h"
 #include "util.h"
+#ifdef __DJGPP__
+# include <pc.h>
+#endif
 
 /*
  ** help -- help subsystem that understands defined keywords
@@ -663,11 +666,15 @@ StartOutput()
     /* fall through to built-in pager */
 #endif
 
-    /* buit-in dumb pager: use the line count provided by the terminal */
+    /* built-in dumb pager: use the line count provided by the terminal */
     line_count = getenv("LINES");
 
     if (line_count != NULL)
 	screensize = (int) strtol(line_count, NULL, 0);
+#ifdef __DJGPP__
+    if (line_count == NULL)
+	screensize = ScreenRows();
+#endif
     if (line_count == NULL || screensize < 3)
 	screensize = SCREENSIZE;
 
@@ -693,7 +700,7 @@ OutLine(const char *line)
     /* leave room for prompt line */
     if (pagelines >= screensize - 2) {
 	fputs("Press return for more: ", stderr);
-#if defined(_WIN32)
+#if defined(_WIN32) || defined(MSDOS)
 	do
 	    c = getchar();
 	while (c != EOF && c != '\n' && c != '\r');
@@ -729,7 +736,7 @@ OutLine_InternalPager(const char *line)
     /* leave room for prompt line */
     if (pagelines >= screensize - 2) {
 	fputs("Press return for more: ", stderr);
-#if defined(_WIN32)
+#if defined(_WIN32) || defined(MSDOS)
 	do
 	    c = getchar();
 	while (c != EOF && c != '\n' && c != '\r');
