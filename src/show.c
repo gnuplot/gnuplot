@@ -1114,11 +1114,14 @@ show_version(FILE *fp)
 	{
 #ifndef _WIN32
 	    char *helpfile = NULL;
-
 	    if ((helpfile = getenv("GNUHELP")) == NULL)
+# ifndef __DJGPP__
 		helpfile = HELPFILE;
-	    fprintf(stderr, "HELPFILE           = \"%s\"\n", helpfile);
-#else
+# else /* DJGPP */
+		helpfile = HelpFile;
+# endif
+	fprintf(stderr, "HELPFILE           = \"%s\"\n", helpfile);
+#else /* _WIN32 */
 	    fprintf(stderr, "HELPFILE           = \"" TCHARFMT "\"\n", winhelpname);
 #endif
 	}
@@ -1187,7 +1190,7 @@ show_border()
 	fprintf(stderr, "\tborder is not drawn\n");
     else {
 	fprintf(stderr, "\tborder %d (0x%X) is drawn in %s layer with\n\t ",
-	    draw_border, draw_border, 
+	    draw_border, draw_border,
 	    border_layer == LAYER_BEHIND ? "behind" : border_layer == LAYER_BACK ? "back" : "front");
 	save_linetype(stderr, &border_lp, FALSE);
 	fputc('\n',stderr);
@@ -1386,7 +1389,7 @@ show_dashtype(int tag)
 	}
     }
     if (tag > 0 && !showed)
-	int_error(c_token, "dashtype not found");	
+	int_error(c_token, "dashtype not found");
 }
 
 
@@ -1450,7 +1453,7 @@ show_dummy()
 {
     int i;
     SHOW_ALL_NL;
-   
+
     fputs("\tdummy variables are ", stderr);
     for (i=0; i<MAX_NUM_VAR; i++) {
 	if (*set_dummy_var[i] == '\0') {
@@ -2598,7 +2601,7 @@ show_micro()
 {
     SHOW_ALL_NL;
 
-    fprintf(stderr, "\tmicro character for output is %s \n", 
+    fprintf(stderr, "\tmicro character for output is %s \n",
     	(use_micro && micro) ? micro : "u");
 }
 
@@ -2825,7 +2828,7 @@ show_history()
 #ifndef GNUPLOT_HISTORY
     fprintf(stderr, "\tThis copy of gnuplot was not built to use a command history file\n");
 #endif
-    fprintf(stderr, "\t history size %d%s,  %s,  %s\n", 
+    fprintf(stderr, "\t history size %d%s,  %s,  %s\n",
 		gnuplot_history_size, gnuplot_history_size<0 ? "(unlimited)" : "",
 		history_quiet ? "quiet" : "numbers",
 		history_full ? "full" : "suppress duplicates");
@@ -2917,7 +2920,7 @@ show_mtics(struct axis *axis)
     case MINI_DEFAULT:
 	fprintf(stderr, "\
 \tminor %stics are off for linear scales\n\
-\tminor %stics are computed automatically for log scales\n", 
+\tminor %stics are computed automatically for log scales\n",
 	name, name);
 	break;
     case MINI_AUTO:
@@ -3354,7 +3357,7 @@ show_arrowstyle(int tag)
 		    fprintf(stderr," (default length and angles)");
 		}
 
-		fprintf(stderr, 
+		fprintf(stderr,
 		    (this_arrowstyle->arrow_properties.head_fixedsize) ? " fixed\n" : "\n");
 	    }
 	}
@@ -3416,7 +3419,7 @@ show_ticdefp(struct axis *this_axis)
     } else
         fputs("justified automatically, ", stderr);
     fprintf(stderr, "format \"%s\"", ticfmt);
-    fprintf(stderr, "%s", 
+    fprintf(stderr, "%s",
 	this_axis->tictype == DT_DMS ? " geographic" :
 	this_axis->tictype == DT_TIMEDATE ? " timedate" :
 	"");
