@@ -5604,7 +5604,7 @@ set_tic_prop(struct axis *this_axis)
     char *cmdptr = NULL, *sfxptr = NULL;
     AXIS_INDEX axis = this_axis->index;
 
-    if (almost_equals(c_token, "tic$s"))
+    if (almost_equals(c_token, "tic$s") && (axis < PARALLEL_AXES))
 	all_axes = TRUE;
 
     if (axis < NUMBER_OF_MAIN_VISIBLE_AXES) {
