@@ -165,6 +165,8 @@ const struct ft_entry GPFAR ft[] =
     {"exp",  f_exp},
     {"log10",  f_log10},
     {"log",  f_log},
+    {"besi0",  f_besi0},
+    {"besi1",  f_besi1},
     {"besj0",  f_besj0},
     {"besj1",  f_besj1},
     {"besjn",  f_besjn},

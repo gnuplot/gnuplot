@@ -75,6 +75,8 @@ void f_log10 __PROTO((union argument *x));
 void f_log __PROTO((union argument *x));
 void f_floor __PROTO((union argument *x));
 void f_ceil __PROTO((union argument *x));
+void f_besi0 __PROTO((union argument *x));
+void f_besi1 __PROTO((union argument *x));
 void f_besj0 __PROTO((union argument *x));
 void f_besj1 __PROTO((union argument *x));
 void f_besjn __PROTO((union argument *x));
