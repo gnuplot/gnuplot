@@ -2054,45 +2054,55 @@ set_format()
 }
 
 
-/* process 'set grid' command */
+/* helper function for 'set grid' command */
+static TBOOLEAN
+grid_match(AXIS_INDEX axis, char *string)
+{
+    if (almost_equals(c_token, string+2)) {
+	if (string[2] == 'm')
+	    axis_array[axis].gridminor = TRUE;
+	else
+	    axis_array[axis].gridmajor = TRUE;
+	++c_token;
+	return TRUE;
+    } else if (almost_equals(c_token, string)) {
+	if (string[2] == 'm')
+	    axis_array[axis].gridminor = FALSE;
+	else
+	    axis_array[axis].gridmajor = FALSE;
+	++c_token;
+	return TRUE;
+    }
+    return FALSE;
+}
 
+
+/* process 'set grid' command */
 static void
 set_grid()
 {
     TBOOLEAN explicit_change = FALSE;
     c_token++;
-#define	GRID_MATCH(axis, string)				\
-	    if (almost_equals(c_token, string+2)) {		\
-		if (string[2] == 'm')				\
-		    axis_array[axis].gridminor = TRUE;		\
-		else						\
-		    axis_array[axis].gridmajor = TRUE;		\
-		explicit_change = TRUE;				\
-		++c_token;					\
-	    } else if (almost_equals(c_token, string)) {	\
-		if (string[2] == 'm')				\
-		    axis_array[axis].gridminor = FALSE;		\
-		else						\
-		    axis_array[axis].gridmajor = FALSE;		\
-		explicit_change = TRUE;				\
-		++c_token;					\
-	    }
     while (!END_OF_COMMAND) {
-	GRID_MATCH(FIRST_X_AXIS, "nox$tics")
-	else GRID_MATCH(FIRST_Y_AXIS, "noy$tics")
-	else GRID_MATCH(FIRST_Z_AXIS, "noz$tics")
-	else GRID_MATCH(SECOND_X_AXIS, "nox2$tics")
-	else GRID_MATCH(SECOND_Y_AXIS, "noy2$tics")
-	else GRID_MATCH(FIRST_X_AXIS, "nomx$tics")
-	else GRID_MATCH(FIRST_Y_AXIS, "nomy$tics")
-	else GRID_MATCH(FIRST_Z_AXIS, "nomz$tics")
-	else GRID_MATCH(SECOND_X_AXIS, "nomx2$tics")
-	else GRID_MATCH(SECOND_Y_AXIS, "nomy2$tics")
-	else GRID_MATCH(COLOR_AXIS, "nocb$tics")
-	else GRID_MATCH(COLOR_AXIS, "nomcb$tics")
-	else GRID_MATCH(POLAR_AXIS, "nor$tics")
-	else GRID_MATCH(POLAR_AXIS, "nomr$tics")
-	else if (almost_equals(c_token,"po$lar")) {
+
+	explicit_change = grid_match(FIRST_X_AXIS, "nox$tics")
+		||  grid_match(FIRST_Y_AXIS, "noy$tics")
+		||  grid_match(FIRST_Z_AXIS, "noz$tics")
+		||  grid_match(SECOND_X_AXIS, "nox2$tics")
+		||  grid_match(SECOND_Y_AXIS, "noy2$tics")
+		||  grid_match(FIRST_X_AXIS, "nomx$tics")
+		||  grid_match(FIRST_Y_AXIS, "nomy$tics")
+		||  grid_match(FIRST_Z_AXIS, "nomz$tics")
+		||  grid_match(SECOND_X_AXIS, "nomx2$tics")
+		||  grid_match(SECOND_Y_AXIS, "nomy2$tics")
+		||  grid_match(COLOR_AXIS, "nocb$tics")
+		||  grid_match(COLOR_AXIS, "nomcb$tics")
+		||  grid_match(POLAR_AXIS, "nor$tics")
+		||  grid_match(POLAR_AXIS, "nomr$tics");
+
+	if (explicit_change) {
+	    continue;
+	} else if (almost_equals(c_token,"po$lar")) {
 	    /* Dec 2016 - zero or negative disables radial grid lines */
 	    axis_array[POLAR_AXIS].gridmajor = TRUE;	/* Enable both circles and radii */
 	    polar_grid_angle = 30*DEG2RAD;
