@@ -166,7 +166,7 @@ static void load_tic_series __PROTO((struct axis * axis));
 static void set_linestyle __PROTO((struct linestyle_def **head, lp_class destination_class));
 static void set_arrowstyle __PROTO((void));
 static int assign_arrowstyle_tag __PROTO((void));
-static int set_tic_prop __PROTO((struct axis *));
+static void set_tic_prop __PROTO((struct axis *));
 static void set_mttics __PROTO((struct axis *this_axis));
 
 static void check_palette_grayscale __PROTO((void));
@@ -2018,7 +2018,7 @@ set_format()
     }
 
     if (END_OF_COMMAND) {
-	for (axis = FIRST_AXES; axis <= POLAR_AXIS; axis++) {
+	for (axis = FIRST_AXES; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++) {
 	    if (set_for_axis[axis]) {
 		free(axis_array[axis].formatstring);
 		axis_array[axis].formatstring = gp_strdup(DEF_FORMAT);
@@ -2042,7 +2042,7 @@ set_format()
 	c_token++;
     }
 
-    for (axis = FIRST_AXES; axis <= POLAR_AXIS; axis++) {
+    for (axis = FIRST_AXES; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++) {
 	if (set_for_axis[axis]) {
 	    free(axis_array[axis].formatstring);
 	    axis_array[axis].formatstring = gp_strdup(format);
@@ -5161,148 +5161,41 @@ set_theta()
 static void
 set_tics()
 {
-    unsigned int i = 0;
-    TBOOLEAN axisset = FALSE;
-    TBOOLEAN mirror_opt = FALSE; /* set to true if (no)mirror option specified) */
+    int i;
+    TBOOLEAN global_opt = FALSE;
+    int save_token = c_token;
 
-    ++c_token;
-
-    if (END_OF_COMMAND) {
-	for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
-	    axis_array[i].tic_in = TRUE;
-    }
-
+    /* There are a few options that set_tic_prop doesn't handle */
+    /* because they are global rather than per-axis.            */
     while (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "ax$is")) {
-	    axisset = TRUE;
-	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
-		axis_array[i].ticmode &= ~TICS_ON_BORDER;
-		axis_array[i].ticmode |= TICS_ON_AXIS;
-	    }
-	    ++c_token;
-	} else if (almost_equals(c_token, "bo$rder")) {
-	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
-		axis_array[i].ticmode &= ~TICS_ON_AXIS;
-		axis_array[i].ticmode |= TICS_ON_BORDER;
-	    }
-	    ++c_token;
-	} else if (almost_equals(c_token, "mi$rror")) {
-	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
-		axis_array[i].ticmode |= TICS_MIRROR;
-    	    mirror_opt = TRUE;
-	    ++c_token;
-	} else if (almost_equals(c_token, "nomi$rror")) {
-	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
-		axis_array[i].ticmode &= ~TICS_MIRROR;
-	    mirror_opt = TRUE;
-	    ++c_token;
-	} else if (almost_equals(c_token,"in$wards")) {
-	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
-		axis_array[i].tic_in = TRUE;
-	    ++c_token;
-	} else if (almost_equals(c_token,"out$wards")) {
-	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
-		axis_array[i].tic_in = FALSE;
-	    ++c_token;
+	if (equals(c_token, "front")) {
+	    grid_tics_in_front = TRUE;
+	    global_opt = TRUE;
+	} else if (equals(c_token, "back")) {
+	    grid_tics_in_front = FALSE;
+	    global_opt = TRUE;
 	} else if (almost_equals(c_token, "sc$ale")) {
 	    set_ticscale();
-	} else if (almost_equals(c_token, "ro$tate")) {
-	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
-		axis_array[i].tic_rotate = TEXT_VERTICAL;
-	    }
-	    ++c_token;
-	    if (equals(c_token, "by")) {
-		int langle;
-		++c_token;
-		langle = int_expression();
-		for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
-		    axis_array[i].tic_rotate = langle;
-	    }
-	} else if (almost_equals(c_token, "noro$tate")) {
-	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
-		axis_array[i].tic_rotate = 0;
-	    ++c_token;
-	} else if (almost_equals(c_token, "l$eft")) {
-	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
-		axis_array[i].tic_pos = LEFT;
-		axis_array[i].manual_justify = TRUE;
-	    }
-	    c_token++;
-	} else if (almost_equals(c_token, "c$entre")
-		|| almost_equals(c_token, "c$enter")) {
-	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
-		axis_array[i].tic_pos = CENTRE;
-		axis_array[i].manual_justify = TRUE;
-	    }
-	    c_token++;
-	} else if (almost_equals(c_token, "ri$ght")) {
-	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
-		axis_array[i].tic_pos = RIGHT;
-		axis_array[i].manual_justify = TRUE;
-	    }
-	    c_token++;
-	} else if (almost_equals(c_token, "autoj$ustify")) {
-	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
-		axis_array[i].manual_justify = FALSE;
-	    c_token++;
-	} else if (almost_equals(c_token, "off$set")) {
-	    struct position lpos;
-	    ++c_token;
-	    get_position_default(&lpos, character, 3);
-	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
-		axis_array[i].ticdef.offset = lpos;
-	} else if (almost_equals(c_token, "nooff$set")) {
-	    ++c_token;
-	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
-		axis_array[i].ticdef.offset = default_offset;
-	} else if (almost_equals(c_token, "format")) {
-	    set_format();
-	} else if (almost_equals(c_token, "enh$anced")) {
-	    ++c_token;
-	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
-		axis_array[i].ticdef.enhanced = TRUE;
-	} else if (almost_equals(c_token, "noenh$anced")) {
-	    ++c_token;
-	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
-		axis_array[i].ticdef.enhanced = FALSE;
-	} else if (almost_equals(c_token, "f$ont")) {
-	    ++c_token;
-	    /* Make sure they've specified a font */
-	    if (!isstringvalue(c_token))
-		int_error(c_token,"expected font");
-	    else {
-		char *lfont = try_to_get_string();
-		for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
-		    free(axis_array[i].ticdef.font);
-		    axis_array[i].ticdef.font = gp_strdup(lfont);
-		}
-		free(lfont);
-	    }
-	} else if (equals(c_token,"tc") ||
-		   almost_equals(c_token,"text$color")) {
-	    struct t_colorspec lcolor;
-	    parse_colorspec(&lcolor, TC_FRAC);
-	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
-		axis_array[i].ticdef.textcolor = lcolor;
-	} else if (equals(c_token,"front")) {
-	    grid_tics_in_front = TRUE;
-	    ++c_token;
-	} else if (equals(c_token,"back")) {
-	    grid_tics_in_front = FALSE;
-	    ++c_token;
-	} else if (!END_OF_COMMAND) {
-	    int_error(c_token, "extraneous arguments in set tics");
+	    global_opt = TRUE;
 	}
+	c_token++;
     }
 
-    /* if tics are off and not set by axis, reset to default (border) */
-    for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
-	if (((axis_array[i].ticmode & TICS_MASK) == NO_TICS) && (!axisset)) {
-	    if ((i == SECOND_X_AXIS) || (i == SECOND_Y_AXIS))
-		continue; /* don't switch on secondary axes by default */
-	    axis_array[i].ticmode = TICS_ON_BORDER;
-	    if ((mirror_opt == FALSE) && ((i == FIRST_X_AXIS) || (i == FIRST_Y_AXIS) || (i == COLOR_AXIS))) {
-		axis_array[i].ticmode |= TICS_MIRROR;
+    /* Otherwise we iterate over axes and apply the options to each */
+    for (i = 0; i < NUMBER_OF_MAIN_VISIBLE_AXES; i++) {
+	c_token = save_token;
+	set_tic_prop( &axis_array[i] );
+    }
+
+    /* if tics are off, reset to default (border) */
+    if (END_OF_COMMAND || global_opt) {
+	for (i = 0; i < NUMBER_OF_MAIN_VISIBLE_AXES; ++i) {
+	    if ((axis_array[i].ticmode & TICS_MASK) == NO_TICS) {
+		if ((i == SECOND_X_AXIS) || (i == SECOND_Y_AXIS))
+		    continue; /* don't switch on secondary axes by default */
+		axis_array[i].ticmode = TICS_ON_BORDER;
+		if ((i == FIRST_X_AXIS) || (i == FIRST_Y_AXIS) || (i == COLOR_AXIS))
+		    axis_array[i].ticmode |= TICS_MIRROR;
 	    }
 	}
     }
@@ -5335,7 +5228,7 @@ set_ticscale()
 	} else {
 	    lminiticscale = 0.5 * lticscale;
 	}
-	for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
+	for (i = 0; i < NUMBER_OF_MAIN_VISIBLE_AXES; ++i) {
 	    axis_array[i].ticscale = lticscale;
 	    axis_array[i].miniticscale = lminiticscale;
 	}
@@ -5703,13 +5596,16 @@ set_allzeroaxis()
 }
 
 /* Implements 'set tics' 'set xtics' 'set ytics' etc */
-static int
+static void
 set_tic_prop(struct axis *this_axis)
 {
-    int match = 0;		/* flag, set by matching a tic command */
+    TBOOLEAN all_axes = FALSE;	/* distinguish the global command "set tics" */
     char nocmd[12];		/* fill w/ "no"+axis_name+suffix */
     char *cmdptr = NULL, *sfxptr = NULL;
     AXIS_INDEX axis = this_axis->index;
+
+    if (almost_equals(c_token, "tic$s"))
+	all_axes = TRUE;
 
     if (axis < NUMBER_OF_MAIN_VISIBLE_AXES) {
 	(void) strcpy(nocmd, "no");
@@ -5721,11 +5617,11 @@ set_tic_prop(struct axis *this_axis)
     if (axis == THETA_AXIS.index)
 	cmdptr = "ttics";
 
-    if (almost_equals(c_token, cmdptr) || axis >= PARALLEL_AXES) {
+    /* This loop handles all cases except "set no{axisname}" */
+    if (almost_equals(c_token, cmdptr) || all_axes || axis >= PARALLEL_AXES) {
 	TBOOLEAN axisset = FALSE;
 	TBOOLEAN mirror_opt = FALSE; /* set to true if (no)mirror option specified) */
 	this_axis->ticdef.def.mix = FALSE;
-	match = 1;
 	++c_token;
 	do {
 	    if (almost_equals(c_token, "ax$is")) {
@@ -5764,6 +5660,13 @@ set_tic_prop(struct axis *this_axis)
 			this_axis->miniticscale = real_expression();
 		    } else
 			this_axis->miniticscale = 0.5 * this_axis->ticscale;
+		    /* Global "set tics scale" allows additional levels */
+		    if (all_axes) {
+			while (equals(c_token, ",")) {
+			    ++c_token;
+			    (void) real_expression();
+			}
+		    }
 		}
 	    } else if (almost_equals(c_token, "ro$tate")) {
 		this_axis->tic_rotate = TEXT_VERTICAL;
@@ -5862,10 +5765,17 @@ set_tic_prop(struct axis *this_axis)
 	    } else if (equals(c_token,"add")) {
 		++c_token;
 		this_axis->ticdef.def.mix = TRUE;
+	    } else if (all_axes && (equals(c_token,"front") || equals(c_token,"back"))) {
+		/* only relevant to global command set_tics() and will be applied there */
+		++c_token;
 	    } else if (!END_OF_COMMAND) {
 		load_tics(this_axis);
 	    }
 	} while (!END_OF_COMMAND);
+
+	/* "set tics" will take care of restoring proper defaults */
+	if (all_axes)
+	    return;
 
 	/* if tics are off and not set by axis, reset to default (border) */
 	if (((this_axis->ticmode & TICS_MASK) == NO_TICS) && (!axisset)) {
@@ -5882,12 +5792,11 @@ set_tic_prop(struct axis *this_axis)
 
     /* The remaining command options cannot work for parametric or parallel axes */
     if (axis >= NUMBER_OF_MAIN_VISIBLE_AXES)
-	return match;
+	return;
 
     if (almost_equals(c_token, nocmd)) {	/* NOSTRING */
 	this_axis->ticmode &= ~TICS_MASK;
 	c_token++;
-	match = 1;
     }
 
 /* other options */
@@ -5900,16 +5809,13 @@ set_tic_prop(struct axis *this_axis)
 	}
 	this_axis->ticdef.type = TIC_MONTH;
 	++c_token;
-	match = 1;
     }
     if (almost_equals(c_token, nocmd)) {	/* NOMONTH */
 	this_axis->ticdef.type = TIC_COMPUTED;
 	++c_token;
-	match = 1;
     }
     (void) strcpy(sfxptr, "d$tics");	/* DAYS */
     if (almost_equals(c_token, cmdptr)) {
-	match = 1;
 	if (!this_axis->ticdef.def.mix) {
 	    free_marklist(this_axis->ticdef.def.user);
 	    this_axis->ticdef.def.user = NULL;
@@ -5920,7 +5826,6 @@ set_tic_prop(struct axis *this_axis)
     if (almost_equals(c_token, nocmd)) {	/* NODAYS */
 	this_axis->ticdef.type = TIC_COMPUTED;
 	++c_token;
-	match = 1;
     }
     *cmdptr = 'm';
     (void) strcpy(cmdptr + 1, axis_name(axis));
@@ -5928,7 +5833,6 @@ set_tic_prop(struct axis *this_axis)
 
     if (almost_equals(c_token, cmdptr)) {
 	c_token++;
-	match = 1;
 	if (END_OF_COMMAND) {
 	    this_axis->minitics = MINI_AUTO;
 	} else if (almost_equals(c_token, "def$ault")) {
@@ -5948,9 +5852,8 @@ set_tic_prop(struct axis *this_axis)
     if (almost_equals(c_token, nocmd)) {	/* NOMINI */
 	this_axis->minitics = MINI_OFF;
 	c_token++;
-	match = 1;
     }
-    return (match);
+    return;
 }
 
 /*
