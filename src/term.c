@@ -1531,7 +1531,7 @@ void
 init_terminal()
 {
     char *term_name = DEFAULTTERM;
-#if (defined(MSDOS) && !defined(_WIN32)) || defined(SUN) || defined(X11)
+#if defined(__BEOS__) || defined(X11)
     char *env_term = NULL;      /* from TERM environment var */
 #endif
 #ifdef X11
