@@ -1,7 +1,3 @@
-#ifndef lint
-static char *RCSid() { return RCSid("$Id: multiplot.c,v 1.5 2016/06/09 19:34:25 sfeam Exp $"); }
-#endif
-
 /* GNUPLOT - term.c */
 
 /*[

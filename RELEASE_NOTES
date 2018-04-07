@@ -323,3 +323,7 @@ minor number).  Bugfixes to version 5.2 will appear in patchlevel releases
 5.2.1, 5.2.2, etc., approximately twice a year or as needed to correct a
 serious problem.
 
+Note: development has recently moved from cvs to git. Most of the files
+in the 5.2.3 source distribution still contain a cvs version identifier
+$RCSid and date, but these are not current if the file has been changed
+since the move to git.
