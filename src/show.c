@@ -1991,6 +1991,19 @@ show_position(struct position *pos, int ndim)
 }
 
 
+/* helper function for "show log" */
+static int
+show_log(struct axis *axis)
+{
+    if (axis->log) {
+	fprintf(stderr, " %s", axis_name(axis->index));
+	if (axis->base != 10.)
+	    fprintf(stderr, " (base %g)", axis->base);
+	return 1;
+    } 
+    return 0;
+}
+
 /* process 'show logscale' command */
 static void
 show_logscale()
@@ -1998,29 +2011,15 @@ show_logscale()
     int count = 0;
 
     SHOW_ALL_NL;
-
-#define SHOW_LOG(axis)							\
-    {									\
-	if (axis_array[axis].log) 					\
-	    fprintf(stderr, "%s %s (base %g)",				\
-		    !count++ ? "\tlogscaling" : " and",			\
-		    axis_name(axis),axis_array[axis].base);	\
-    }
-    SHOW_LOG(FIRST_X_AXIS );
-    SHOW_LOG(FIRST_Y_AXIS );
-    SHOW_LOG(FIRST_Z_AXIS );
-    SHOW_LOG(SECOND_X_AXIS);
-    SHOW_LOG(SECOND_Y_AXIS);
-    SHOW_LOG(COLOR_AXIS );
-    SHOW_LOG(POLAR_AXIS );
-#undef SHOW_LOG
-
-    if (count == 0)
-	fputs("\tno logscaling\n", stderr);
-    else if (count == 1)
-	fputs(" only\n", stderr);
-    else
-	putc('\n', stderr);
+    fprintf(stderr, "\tlogscaling on ");
+    count += show_log(&axis_array[FIRST_X_AXIS] );
+    count += show_log(&axis_array[FIRST_Y_AXIS] );
+    count += show_log(&axis_array[FIRST_Z_AXIS] );
+    count += show_log(&axis_array[SECOND_X_AXIS]);
+    count += show_log(&axis_array[SECOND_Y_AXIS]);
+    count += show_log(&axis_array[COLOR_AXIS] );
+    count += show_log(&axis_array[POLAR_AXIS] );
+    fputs(count ? "\n" : "none\n", stderr);
 }
 
 
