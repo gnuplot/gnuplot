@@ -3031,7 +3031,7 @@ Ffigure_newsyntax
        plot 'data.4' title graph(4)
 
  Since integers are promoted to strings when operated on by the string
- concatenation operator, the following method also works:
+ concatenation operator ('.' character), the following method also works:
 
        N = 4
        plot 'data.'.N title "Title for plot #".N
@@ -11458,6 +11458,7 @@ Ffigure_multiple_keys
  commands.  Currently the default range for these parametric variables is
  [-5:5].  Setting the ranges to something more meaningful is expected.
 3 paxis
+?paxis
 ?commands set paxis
 ?set paxis
 ?show paxis
