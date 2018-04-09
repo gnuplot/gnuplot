@@ -180,7 +180,7 @@ enum {
     MOUSE_COORDINATES_XTIME,
     MOUSE_COORDINATES_XDATETIME,
     MOUSE_COORDINATES_ALT,    /* alternative format as specified by the user */
-    MOUSE_COORDINATES_FUNCTION
+    MOUSE_COORDINATES_FUNCTION = 8 /* value needed in term.c even if no USE_MOUSE */
 };
 
 /* FIXME HBB 20010207: Codestyle violation: these should be in mouse.c! */

@@ -99,6 +99,7 @@
 /* even if the interactive gnuplot session itself cannot.      */
 long mouse_mode = 0;
 char* mouse_alt_string = NULL;
+#define MOUSE_COORDINATES_FUNCTION 8	/* Normally an enum in mouse.h */
 #endif
 
 #ifdef _WIN32
