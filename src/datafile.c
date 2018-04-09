@@ -5325,6 +5325,9 @@ df_generate_pseudodata()
 	    } else if (parametric || polar) {
 		t_min = axis_array[T_AXIS].min;
 		t_max = axis_array[T_AXIS].max;
+	    } else if (axis_array[T_AXIS].autoscale == AUTOSCALE_NONE) {
+		t_min = axis_array[T_AXIS].min;
+		t_max = axis_array[T_AXIS].max;
 	    } else {
 		if (axis_array[FIRST_X_AXIS].max == -VERYLARGE)
 		    axis_array[FIRST_X_AXIS].max = 10;

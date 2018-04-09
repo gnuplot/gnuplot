@@ -6802,8 +6802,12 @@ Ffigure_fenceplot
  plot can only have a single y (or z) value associated with each sampled point.
  The pseudo-file '+' treats the sampled points as column 1, and allows
  additional column values to be specified via a `using` specification, just as
- for a true input file. By default samples are generated over the full range as
- set by `set xrange`, with the sampling controlled via `set samples`.
+ for a true input file. The number of samples is controlled via `set samples`.
+ By default samples are generated over the range given by `set trange`, or if 
+ trange has not been set than over the full range of `set xrange`.
+
+ Note: The use of trange is a change from previous gnuplot versions. It allows
+ the sampling range to differ from the x axis range.
 
        plot '+' using ($1):(sin($1)):(sin($1)**2) with filledcurves 
 
