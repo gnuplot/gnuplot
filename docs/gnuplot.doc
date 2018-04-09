@@ -13788,9 +13788,14 @@ Ffigure_multiple_keys
 ?set trange
 ?show trange
 ?trange
- The `set trange` command sets the parametric range used to compute x and y
- values when in parametric or polar modes.  Please see `set xrange` for
- details.
+ Syntax:    set trange [tmin:tmax]
+ The range of the parametric variable t is useful in three contexts.
+ 1) In parametric mode `plot` commands it limits the range of sampling
+    for both generating functions.  See `set parametric`, `set samples`.
+ 2) In polar mode `plot` commands it limits or defines the range of the
+    angular parameter theta. See `polar`.
+ 3) In `plot` or `splot` commands using 1-dimensional sampled data via
+    the pseudofile "+".  See `sampling 1D`, `special-filenames`.
 3 ttics
 ?commands set ttics
 ?commands show ttics
@@ -13814,9 +13819,11 @@ Ffigure_multiple_keys
 ?set urange
 ?show urange
 ?urange
- The `set urange` and `set vrange` commands set the parametric ranges used
- to compute x, y, and z values when in `splot` parametric mode.
- Please see `set xrange` for details.
+ Syntax:     set urange [umin:umax]
+ The range of the parametric variables u and v is useful in two contexts.
+ 1) `splot` in parametric mode. See `set parametric`, `set isosamples`.
+ 2) generating 2-dimension sampled data for either `plot` or `splot` using the
+ pseudofile "++". See `sampling 2D`.
 3 variables
 ?commands show variables
 ?show variables all
@@ -13919,9 +13926,11 @@ Ffigure_multiple_keys
 ?set vrange
 ?show vrange
 ?vrange
- The `set urange` and `set vrange` commands set the parametric ranges used
- to compute x, y, and z values when in `splot` parametric mode.
- Please see `set xrange` for details.
+ Syntax:     set vrange [vmin:vmax]
+ The range of the parametric variables u and v is useful in two contexts.
+ 1) `splot` in parametric mode. See `set parametric`, `set isosamples`.
+ 2) generating 2-dimension sampled data for either `plot` or `splot` using the
+ pseudofile "++". See `sampling 2D`.
 3 walls
 ?commands set walls
 ?commands show walls

@@ -19,6 +19,7 @@ Changes not in 5.2
 * CHANGE windows terminal supports color fonts (Direct2D)
 * CHANGE arrow head size can be decoupled from arrow size
 * CHANGE allow array size to be determined automatically from initializer
+* CHANGE apply trange to sampling on pseudofile '+'
 * FIX allow mixed use of in-key plot titles and manually placed titles
 * FIX open/close path for polygons
 
