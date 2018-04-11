@@ -1126,7 +1126,7 @@ do_arrow(
 
 void
 do_arc(
-    unsigned int cx, unsigned int cy, /* Center */
+    int cx, int cy, /* Center */
     double radius, /* Radius */
     double arc_start, double arc_end, /* Limits of arc in degress */
     int style, TBOOLEAN wedge)

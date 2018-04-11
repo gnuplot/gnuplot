@@ -515,7 +515,7 @@ int style_from_fill __PROTO((struct fill_style_type *));
 
 #ifdef EAM_OBJECTS
 /* Terminal-independent routine to draw a circle or arc */
-void do_arc __PROTO(( unsigned int cx, unsigned int cy, double radius,
+void do_arc __PROTO(( int cx, int cy, double radius,
                       double arc_start, double arc_end,
 		      int style, TBOOLEAN wedge));
 #endif
