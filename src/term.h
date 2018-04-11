@@ -49,7 +49,7 @@
  * pslatex and epslatex support is now provided by the combination of
  * post.trm and pslatex.trm.  You cannot build pslatex without post.
  * Both drivers are selected by default, but you can disable them below.
- * 
+ *
  * Enhanced text support is pretty much required for all terminals now.
  * If you build without GP_ENH_EST text layout will be degraded.
  */
@@ -108,11 +108,11 @@
 
 
 /****************************************************************************/
-/* MS-DOS and Windows */
-#if defined(MSDOS) || defined(_WIN32)
+/* MS-DOS */
+#if defined(MSDOS)
 
 /* MSDOS with emx-gcc compiler */
-# if defined(MSDOS) && defined(__EMX__)
+# if defined(__EMX__)
    /* Vesa-Cards */
 #  define EMXVESA
 #  include "emxvga.trm"
@@ -123,19 +123,19 @@
 #  include "djsvga.trm"
 # endif
 
-/* All other Compilers */
-# ifndef _WIN32
-#  ifdef PC
-/* uncomment the next line to include SuperVGA support */
-#   define BGI_NAME "svga256"	/* the name of the SVGA.BGI for Borland C */
-/* this also triggers the inclusion of Super VGA support */
-#   include "pc.trm"		/* all PC types except MS WINDOWS */
-#  endif
-# else				/* _WIN32 */
-#  include "win.trm"		/* MS-Windows */
-# endif				/* _WIN32 */
-#endif /* MSDOS || _WIN32 */
+/* MSDOS with OpenWatcom compiler */
+# if defined(__WATCOMC__)
+#  include "pc.trm"
+# endif
+
+#endif /* MSDOS */
 /****************************************************************************/
+
+/* Windows */
+#ifdef _WIN32
+/* Windows GDI/GDI+/Direct2D */
+# include "win.trm"
+#endif
 
 /* Apple Mac OS X */
 #ifdef HAVE_FRAMEWORK_AQUATERM
