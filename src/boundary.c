@@ -1180,10 +1180,10 @@ do_key_sample(
     if (this_plot->plot_style & PLOT_STYLE_HAS_FILL && t->fillbox) {
 	struct fill_style_type *fs = &this_plot->fill_properties;
 	int style = style_from_fill(fs);
-	unsigned int x = xl + key_sample_left;
-	unsigned int y = yl - key_sample_height/4;
-	unsigned int w = key_sample_right - key_sample_left;
-	unsigned int h = key_sample_height/2;
+	int x = xl + key_sample_left;
+	int y = yl - key_sample_height/4;
+	int w = key_sample_right - key_sample_left;
+	int h = key_sample_height/2;
 
 	if (this_plot->plot_style == CIRCLES && w > 0) {
 	    do_arc(xl + key_point_offset, yl, key_sample_height/4, 0., 360., style, FALSE);
@@ -1415,8 +1415,8 @@ draw_titles()
 
     /* YLABEL */
     if (axis_array[FIRST_Y_AXIS].label.text) {
-	unsigned int x = ylabel_x;
-	unsigned int y = (plot_bounds.ytop + plot_bounds.ybot) / 2;
+	int x = ylabel_x;
+	int y = (plot_bounds.ytop + plot_bounds.ybot) / 2;
 	x += t->h_char;
 	axis_array[FIRST_Y_AXIS].label.pos = CENTRE;
 	write_label(x, y, &(axis_array[FIRST_Y_AXIS].label));
@@ -1425,8 +1425,8 @@ draw_titles()
 
     /* Y2LABEL */
     if (axis_array[SECOND_Y_AXIS].label.text) {
-	unsigned int x = y2label_x;
-	unsigned int y = (plot_bounds.ytop + plot_bounds.ybot) / 2;
+	int x = y2label_x;
+	int y = (plot_bounds.ytop + plot_bounds.ybot) / 2;
 	if (axis_array[SECOND_Y_AXIS].label.rotate) {
 	    x += 2 * t->h_char;
 	    axis_array[SECOND_Y_AXIS].label.pos = CENTRE;
@@ -1441,7 +1441,7 @@ draw_titles()
     if (axis_array[FIRST_X_AXIS].label.text) {
 	struct text_label *label = &axis_array[FIRST_X_AXIS].label;
 	double tmpx, tmpy;
-	unsigned int x, y;
+	int x, y;
 	map_position_r(&(label->offset), &tmpx, &tmpy, "xlabel");
 
 	x = (plot_bounds.xright + plot_bounds.xleft) / 2;
@@ -1455,7 +1455,7 @@ draw_titles()
     /* PLACE TITLE */
     if (title.text) {
 	double tmpx, tmpy;
-	unsigned int x, y;
+	int x, y;
 	map_position_r(&(title.offset), &tmpx, &tmpy, "doplot");
 	/* we worked out y-coordinate in boundary(), including the y offset */
 	x = title_x;
@@ -1468,7 +1468,7 @@ draw_titles()
 
     /* X2LABEL */
     if (axis_array[SECOND_X_AXIS].label.text) {
-	unsigned int x, y;
+	int x, y;
 	/* we worked out y-coordinate in boundary() */
 	x = (plot_bounds.xright + plot_bounds.xleft) / 2;
 	y = x2label_y - t->v_char / 2;
@@ -1478,7 +1478,7 @@ draw_titles()
 
     /* RLABEL */
     if (axis_array[POLAR_AXIS].label.text) {
-	unsigned int x, y;
+	int x, y;
 
 	/* This assumes we always have a horizontal R axis */
 	x = map_x(polar_radius(R_AXIS.max) / 2.0);

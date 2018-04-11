@@ -377,8 +377,8 @@ void pm3d_depth_queue_flush(void)
 		if (i == 0 || out.z > z)
 		    z = out.z;
 #ifdef EXTENDED_COLOR_SPECS
-		gpiPtr->x = (unsigned int) ((out.x * xscaler / w) + xmiddle);
-		gpiPtr->y = (unsigned int) ((out.y * yscaler / w) + ymiddle);
+		gpiPtr->x = ((out.x * xscaler / w) + xmiddle);
+		gpiPtr->y = ((out.y * yscaler / w) + ymiddle);
 		gpiPtr++;
 #endif
 	    }

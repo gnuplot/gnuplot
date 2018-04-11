@@ -2471,7 +2471,7 @@ plot_f_bars(struct curve_points *plot)
     struct termentry *t = term;
     double x;			/* position of the bar */
     double ylow, yhigh, yclose, yopen;	/* the ends of the bars */
-    unsigned int xM, ylowM, yhighM;	/* the mapped version of above */
+    int xM, ylowM, yhighM;	/* the mapped version of above */
     TBOOLEAN low_inrange, high_inrange;
     int tic = GPMAX(ERRORBARTIC/2,1);
 
@@ -2522,15 +2522,15 @@ plot_f_bars(struct curve_points *plot)
 	(*t->move) (xM, ylowM);
 	(*t->vector) (xM, yhighM);	/* draw the main bar */
 	/* draw the open tic */
-	(*t->move) ((unsigned int) (xM - bar_size * tic), map_y(yopen));
+	(*t->move) ((xM - bar_size * tic), map_y(yopen));
 	(*t->vector) (xM, map_y(yopen));
 	/* draw the close tic */
-	(*t->move) ((unsigned int) (xM + bar_size * tic), map_y(yclose));
+	(*t->move) ((xM + bar_size * tic), map_y(yclose));
 	(*t->vector) (xM, map_y(yclose));
 
 	/* Draw a bar at the median (stored in xhigh) */
 	if (plot->plot_style == BOXPLOT) {
-	    unsigned int ymedian = map_y(plot->points[i].xhigh);
+	    int ymedian = map_y(plot->points[i].xhigh);
 	    (*t->move) (xM - bar_size * tic, ymedian);
 	    (*t->vector) (xM + bar_size * tic, ymedian);
 	}
@@ -2696,10 +2696,10 @@ plot_c_bars(struct curve_points *plot)
 	if (term->fillbox && !skip_box) {
 	    int style = style_from_fill(&plot->fill_properties);
 	    if ((style != FS_EMPTY) || (yopen > yclose)) {
-		unsigned int x = xlowM;
-		unsigned int y = ymin;
-		unsigned int w = (xhighM-xlowM);
-		unsigned int h = (ymax-ymin);
+		int x = xlowM;
+		int y = ymin;
+		int w = (xhighM-xlowM);
+		int h = (ymax-ymin);
 
 		if (style == FS_EMPTY && plot->plot_style != BOXPLOT)
 		    style = FS_OPAQUE;
@@ -2754,7 +2754,7 @@ plot_c_bars(struct curve_points *plot)
 	/* Some users prefer bars at the end of the whiskers */
 	if (plot->plot_style == BOXPLOT
 	||  plot->arrow_properties.head == BOTH_HEADS) {
-	    unsigned int d;
+	    int d;
 	    if (plot->plot_style == BOXPLOT) {
 		if (bar_size < 0)
 		    d = 0;
@@ -3943,7 +3943,7 @@ static void
 place_histogram_titles()
 {
     histogram_style *hist = &histogram_opts;
-    unsigned int x, y;
+    int x, y;
 
     while ((hist = hist->next)) {
 	if (hist->title.text && *(hist->title.text)) {

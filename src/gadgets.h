@@ -545,12 +545,11 @@ void draw_clip_line __PROTO((int, int, int, int));
 void draw_clip_polygon __PROTO((int , gpiPoint *));
 void draw_clip_arrow __PROTO((double, double, double, double, t_arrow_head));
 void clip_polygon __PROTO((gpiPoint *, gpiPoint *, int , int *));
-int clip_point __PROTO((unsigned int, unsigned int));
-void clip_put_text __PROTO((unsigned int, unsigned int, char *));
+int clip_point __PROTO((int, int));
 
 /* moved here from graph3d: */
-void clip_move __PROTO((unsigned int x, unsigned int y));
-void clip_vector __PROTO((unsigned int x, unsigned int y));
+void clip_move __PROTO((int x, int y));
+void clip_vector __PROTO((int x, int y));
 
 void draw_polar_clip_line __PROTO((struct coordinate *beg, struct coordinate *end));
 
@@ -559,7 +558,7 @@ void apply_pm3dcolor __PROTO((struct t_colorspec *tc));
 void reset_textcolor __PROTO((const struct t_colorspec *tc));
 
 /* Timestamp code shared by 2D and 3D */
-void do_timelabel __PROTO((unsigned int x, unsigned int y));
+void do_timelabel __PROTO((int x, int y));
 
 extern fill_style_type default_fillstyle;
 
@@ -655,7 +654,7 @@ void apply_head_properties __PROTO((struct arrow_style_type *arrow_properties));
 void free_labels __PROTO((struct text_label *tl));
 
 void get_offsets __PROTO((struct text_label *this_label, int *htic, int *vtic));
-void write_label __PROTO((unsigned int x, unsigned int y, struct text_label *label));
+void write_label __PROTO((int x, int y, struct text_label *label));
 int label_width __PROTO((const char *, int *));
 
 #endif /* GNUPLOT_GADGETS_H */

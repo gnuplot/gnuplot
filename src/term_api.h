@@ -487,7 +487,7 @@ void term_check_multiplot_okay __PROTO((TBOOLEAN));
 void init_monochrome __PROTO((void));
 struct termentry *change_term __PROTO((const char *name, int length));
 
-void write_multiline __PROTO((unsigned int, unsigned int, char *, JUSTIFY, VERT_JUSTIFY, int, const char *));
+void write_multiline __PROTO((int, int, char *, JUSTIFY, VERT_JUSTIFY, int, const char *));
 int estimate_strlen __PROTO((char *));
 char *estimate_plaintext __PROTO((char *));
 void list_terms __PROTO((void));

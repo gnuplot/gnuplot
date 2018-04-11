@@ -219,7 +219,7 @@ textbox_style textbox_opts = DEFAULT_TEXTBOX_STYLE;
  * 0 is returned if inside.
  */
 int
-clip_point(unsigned int x, unsigned int y)
+clip_point(int x, int y)
 {
     int ret_val = 0;
 
@@ -611,17 +611,17 @@ clip_polygon(gpiPoint *in, gpiPoint *out, int in_length, int *out_length)
 }
 
 /* Two routines to emulate move/vector sequence using line drawing routine. */
-static unsigned int move_pos_x, move_pos_y;
+static int move_pos_x, move_pos_y;
 
 void
-clip_move(unsigned int x, unsigned int y)
+clip_move(int x, int y)
 {
     move_pos_x = x;
     move_pos_y = y;
 }
 
 void
-clip_vector(unsigned int x, unsigned int y)
+clip_vector(int x, int y)
 {
     draw_clip_line(move_pos_x, move_pos_y, x, y);
     move_pos_x = x;
@@ -869,7 +869,7 @@ get_offsets(
  * This routine is used for both 2D and 3D plots.
  */
 void
-write_label(unsigned int x, unsigned int y, struct text_label *this_label)
+write_label(int x, int y, struct text_label *this_label)
 {
 	int htic, vtic;
 	int justify = JUST_TOP;	/* This was the 2D default; 3D had CENTRE */
@@ -1002,7 +1002,7 @@ label_width(const char *str, int *lines)
  * Here so that it can be shared by the 2D and 3D code
  */
 void
-do_timelabel(unsigned int x, unsigned int y)
+do_timelabel(int x, int y)
 {
     struct text_label temp = timelabel;
     char str[MAX_LINE_LEN+1];

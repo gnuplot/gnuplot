@@ -902,7 +902,7 @@ map3d_xy_double(
 static GP_INLINE void
 draw3d_point_unconditional(p_vertex v, struct lp_style_type *lp)
 {
-    unsigned int x, y;
+    int x, y;
 
     TERMCOORD(v, x, y);
     /* Jul 2010 EAM - is it safe to overwrite like this? Make a copy instead? */
@@ -994,7 +994,7 @@ static vertex polyline3d_previous_vertex;
 void
 polyline3d_start(p_vertex v1)
 {
-    unsigned int x1, y1;
+    int x1, y1;
 
     polyline3d_previous_vertex = *v1;
     if (hidden3d && draw_surface)

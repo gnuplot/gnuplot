@@ -1658,7 +1658,7 @@ sort_polys_by_z()
 static void
 draw_vertex(p_vertex v)
 {
-    unsigned int x, y;
+    int x, y;
     int p_type;
 
     if (v->lp_style == NULL)

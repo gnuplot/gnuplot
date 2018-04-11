@@ -749,7 +749,7 @@ term_check_multiplot_okay(TBOOLEAN f_interactive)
 
 void
 write_multiline(
-    unsigned int x, unsigned int y,
+    int x, int y,
     char *text,
     JUSTIFY hor,                /* horizontal ... */
     VERT_JUSTIFY vert,          /* ... and vertical just - text in hor direction despite angle */

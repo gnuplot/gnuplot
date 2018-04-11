@@ -832,7 +832,7 @@ do_3dplot(
 
     /* PLACE TITLE */
     if (title.text != 0) {
-	unsigned int x, y;
+	int x, y;
 	if (splot_map) { /* case 'set view map' */
 	    int map_x1, map_y1, map_x2, map_y2;
 	    int tics_len = 0;
@@ -844,11 +844,11 @@ do_3dplot(
 	    map3d_xy(X_AXIS.max, Y_AXIS.max, base_z, &map_x2, &map_y2);
 	    /* Distance between the title base line and graph top line or the upper part of
 	       tics is as given by character height: */
-	    x = (unsigned int) ((map_x1 + map_x2) / 2);
-	    y = (unsigned int) (map_y1 + tics_len + (titlelin + 0.5) * (t->v_char));
+	    x = ((map_x1 + map_x2) / 2);
+	    y = (map_y1 + tics_len + (titlelin + 0.5) * (t->v_char));
 	} else { /* usual 3d set view ... */
-	    x = (unsigned int) ((plot_bounds.xleft + plot_bounds.xright) / 2);
-	    y = (unsigned int) (plot_bounds.ytop + titlelin * (t->h_char));
+	    x = (plot_bounds.xleft + plot_bounds.xright) / 2;
+	    y = (plot_bounds.ytop + titlelin * (t->h_char));
 	}
 
 	/* NB: write_label applies text color but does not reset it */
@@ -858,7 +858,7 @@ do_3dplot(
 
     /* PLACE TIMELABEL */
     if (timelabel.text) {
-	unsigned int x, y;
+	int x, y;
 	x = t->v_char;
 	y = timelabel_bottom ? page_bounds.ybot : page_bounds.ytop;
 	do_timelabel(x,y);
@@ -2094,8 +2094,8 @@ check_corner_height(
      * absolute terms. */
     if ((fabs(p->x - X_AXIS.min) < zero || fabs(p->x - X_AXIS.max) < zero) &&
 	(fabs(p->y - Y_AXIS.min) < zero || fabs(p->y - Y_AXIS.max) < zero)) {
-	unsigned int x = MAP_HEIGHT_X(p->x);
-	unsigned int y = MAP_HEIGHT_Y(p->y);
+	int x = MAP_HEIGHT_X(p->x);
+	int y = MAP_HEIGHT_Y(p->y);
 	if (height[x][y] < p->z)
 	    height[x][y] = p->z;
 	if (depth[x][y] > p->z)
@@ -2266,10 +2266,10 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		 * rectangle */
 		double height[2][2];
 		double depth[2][2];
-		unsigned int zaxis_i = MAP_HEIGHT_X(zaxis_x);
-		unsigned int zaxis_j = MAP_HEIGHT_Y(zaxis_y);
-		unsigned int back_i = MAP_HEIGHT_X(back_x);
-		unsigned int back_j = MAP_HEIGHT_Y(back_y);
+		int zaxis_i = MAP_HEIGHT_X(zaxis_x);
+		int zaxis_j = MAP_HEIGHT_Y(zaxis_y);
+		int back_i = MAP_HEIGHT_X(back_x);
+		int back_j = MAP_HEIGHT_Y(back_y);
 
 		height[0][0] = height[0][1]
 		    = height[1][0] = height[1][1] = base_z;
@@ -2400,7 +2400,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		(surface_rot_x > 90 && FRONTGRID != whichgrid) ||
 		splot_map) {
 
-	    unsigned int x1, y1;
+	    int x1, y1;
 
 	    if (splot_map) { /* case 'set view map' */
 		/* copied from xtick_callback(): baseline of tics labels */
@@ -2412,7 +2412,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		    v2.y -= tic_unity * t->v_tic * X_AXIS.ticscale;
 		TERMCOORD(&v2, x1, y1);
 		/* Default displacement with respect to baseline of tics labels */
-		y1 -= (unsigned int) ((1.5) * t->v_char);
+		y1 -= (1.5 * t->v_char);
 	    } else { /* usual 3d set view ... */
 		if (X_AXIS.label.tag == ROTATE_IN_3D_LABEL_TAG) {
 		    double ang, angx0, angx1, angy0, angy1;
@@ -2486,7 +2486,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	    if ((surface_rot_x <= 90 && BACKGRID != whichgrid) ||
 		(surface_rot_x > 90 && FRONTGRID != whichgrid) ||
 		splot_map) {
-		unsigned int x1, y1;
+		int x1, y1;
 		int save_rotate = Y_AXIS.label.rotate;
 
 		if (splot_map) { /* case 'set view map' */
@@ -2511,7 +2511,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 			gen_tics(&axis_array[FIRST_Y_AXIS], widest_tic_callback);
 		    }
 		    /* Default displacement with respect to baseline of tics labels */
-		    x1 -= (unsigned int) ((0.5 + widest_tic_strlen) * t->h_char);
+		    x1 -= (0.5 + widest_tic_strlen) * t->h_char;
 		} else { /* usual 3d set view ... */
 		    if (Y_AXIS.label.tag == ROTATE_IN_3D_LABEL_TAG) {
 			double ang, angx0, angx1, angy0, angy1;
@@ -2720,7 +2720,7 @@ xtick_callback(
     /* Draw tic label */
     if (text) {
 	int just;
-	unsigned int x2, y2;
+	int x2, y2;
 	int angle;
 	int offsetx, offsety;
 
@@ -2852,7 +2852,7 @@ ytick_callback(
     /* Draw tic label */
     if (text) {
 	int just;
-	unsigned int x2, y2;
+	int x2, y2;
 	int angle;
 	int offsetx, offsety;
 
@@ -2956,7 +2956,7 @@ ztick_callback(
     draw3d_line(&v1, &v2, &border_lp);
 
     if (text) {
-	unsigned int x1, y1;
+	int x1, y1;
 	int offsetx, offsety;
 
 	/* Skip label if we've already written a user-specified one here */
@@ -3248,10 +3248,10 @@ static void
 key_sample_fill(int xl, int yl, struct fill_style_type *fs)
 {
     int style = style_from_fill(fs);
-    unsigned int x = xl + key_sample_left;
-    unsigned int y = yl - key_entry_height/4;
-    unsigned int w = key_sample_right - key_sample_left;
-    unsigned int h = key_entry_height/2;
+    int x = xl + key_sample_left;
+    int y = yl - key_entry_height/4;
+    int w = key_sample_right - key_sample_left;
+    int h = key_entry_height/2;
 
     if (!(term->fillbox))
 	return;
