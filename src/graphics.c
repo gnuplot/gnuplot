@@ -297,7 +297,7 @@ place_arrows(int layer)
     for (this_arrow = first_arrow;
 	 this_arrow != NULL;
 	 this_arrow = this_arrow->next) {
-	double dsx, dsy, dex, dey;
+	double dsx=0, dsy=0, dex=0, dey=0;
 
 	if (this_arrow->arrow_properties.layer != layer)
 	    continue;
@@ -3625,7 +3625,7 @@ map_position(
     int *x, int *y,
     const char *what)
 {
-    double xx, yy;
+    double xx=0, yy=0;
     map_position_double(pos, &xx, &yy, what);
     *x = xx;
     *y = yy;
@@ -3643,6 +3643,7 @@ map_position_double(
     switch (pos->scalex) {
     case first_axes:
     case second_axes:
+    default:
 	{
 	    AXIS_INDEX index = (pos->scalex == first_axes) ? FIRST_X_AXIS : SECOND_X_AXIS;
 	    AXIS *this_axis = &axis_array[index];
@@ -3685,6 +3686,7 @@ map_position_double(
     switch (pos->scaley) {
     case first_axes:
     case second_axes:
+    default:
 	{
 	    AXIS_INDEX index = (pos->scaley == first_axes) ? FIRST_Y_AXIS : SECOND_Y_AXIS;
 	    AXIS *this_axis = &axis_array[index];
