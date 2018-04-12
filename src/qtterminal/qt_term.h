@@ -83,7 +83,7 @@ void qt_set_color(t_colorspec *colorspec);
 void qt_filled_polygon(int n, gpiPoint * corners);
 void qt_image(unsigned int M, unsigned int N, coordval * image, gpiPoint * corner, t_imagecolor color_mode);
 void qt_enhanced_open(char* fontname, double fontsize, double base, TBOOLEAN widthflag, TBOOLEAN showflag, int overprint);
-void qt_enhanced_flush();
+void qt_enhanced_flush(void);
 void qt_enhanced_writec(int c);
 void qt_layer(t_termlayer layer);
 void qt_hypertext(int type, const char *text);

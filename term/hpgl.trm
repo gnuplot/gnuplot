@@ -241,8 +241,8 @@ TERM_PUBLIC void HPGL2_enh_flush(void);
 
 static void HPGL2_put_text_here(const char *str, TBOOLEAN centeralign);
 static int HPGL2_set_font_size(const char *font, double size);
-static int HPGL2_map_encoding();
-static void HPGL2_end_poly();
+static int HPGL2_map_encoding(void);
+static void HPGL2_end_poly(void);
 static void HPGL2_dot(int x, int y);
 static void HPGL2_diamond(int x, int y, int htic, int vtic);
 static void HPGL2_filled_diamond(int x, int y, int htic, int vtic);

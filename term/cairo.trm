@@ -53,7 +53,7 @@ TERM_PUBLIC void cairotrm_linetype __PROTO ((int linetype));
 TERM_PUBLIC void cairotrm_move __PROTO ((unsigned int x, unsigned int y));
 TERM_PUBLIC void cairotrm_vector __PROTO ((unsigned int x, unsigned int y));
 TERM_PUBLIC void cairotrm_put_text __PROTO ((unsigned int x, unsigned int y, const char *str));
-TERM_PUBLIC void cairotrm_enhanced_flush();
+TERM_PUBLIC void cairotrm_enhanced_flush(void);
 TERM_PUBLIC void cairotrm_enhanced_writec(int c);
 TERM_PUBLIC void cairotrm_enhanced_open(char* fontname, double fontsize, double base, TBOOLEAN widthflag, TBOOLEAN showflag, int overprint);
 TERM_PUBLIC void cairotrm_reset __PROTO ((void));

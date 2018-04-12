@@ -158,7 +158,7 @@ multiplot_next()
 }
 
 void
-multiplot_previous()
+multiplot_previous(void)
 {
     mp_layout.current_panel--;
     if (mp_layout.auto_layout) {

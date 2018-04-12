@@ -107,7 +107,7 @@ static BYTE *map_buf = NULL;
 
 
 static void
-PutFlash()
+PutFlash(void)
 {
     int n;
 
@@ -178,7 +178,7 @@ PutPalet(gdImagePtr im, int idx)
 
 
 static void
-PutCr()
+PutCr(void)
 {
     fputs("$\n", out_fp);
     /* x = 0; */
@@ -186,7 +186,7 @@ PutCr()
 
 
 static void
-PutLf()
+PutLf(void)
 {
     /* DECGNL Graphics Next Line */
     fputs("-\n", out_fp);
@@ -199,7 +199,7 @@ PutLf()
 
 
 static void
-NodeFree()
+NodeFree(void)
 {
     SixNode *np;
 

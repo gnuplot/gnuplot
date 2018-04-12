@@ -371,7 +371,7 @@ gp_gdImageFilledPolygon(gdImagePtr im, gdPointPtr p, int n, int c)
    down the file.
 */
 static void
-image_do_crop ()
+image_do_crop (void)
 {
     if (png_state.flags & PNG_USE_CROP) {
 	int x, y, x1, y1, x2, y2, flag;

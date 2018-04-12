@@ -82,7 +82,7 @@ int wxt_make_palette(t_sm_palette *palette);
 void wxt_set_color(t_colorspec *colorspec);
 void wxt_filled_polygon(int n, gpiPoint * corners);
 
-void wxt_enhanced_flush();
+void wxt_enhanced_flush(void);
 void wxt_enhanced_writec(int c);
 void wxt_enhanced_open(char* fontname, double fontsize, double base, TBOOLEAN widthflag, TBOOLEAN showflag, int overprint);
 

@@ -166,7 +166,7 @@ static char last_error_msg[MAX_LINE_LEN+1] = "";
  *  the plot's bounding box
  */
 static int
-LUA_GP_get_boundingbox() {
+LUA_GP_get_boundingbox(lua_State *L) {
   lua_newtable (L);
   lua_pushstring (L, "xleft");
   lua_pushinteger(L, plot_bounds.xleft);
@@ -478,7 +478,7 @@ static const luaL_reg gp_methods[] = {
 
 
 static void
-LUA_register_gp_fnc ()
+LUA_register_gp_fnc (void)
 {
 #if LUA_VERSION_NUM > 501
   LUA_register(L, LUA_GP_FNC, gp_methods);
@@ -535,7 +535,7 @@ LUA_get_term_vars(void) {
 }
 
 static void
-LUA_set_term_vars() {
+LUA_set_term_vars(void) {
   /* set term.version */
   lua_pushstring(L, gnuplot_version);
   lua_setfield(L, luaterm, "gp_version");

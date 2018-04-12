@@ -2689,7 +2689,7 @@ static float splot_map_surface_scale;
 
 /* utility routine for splot_map_activate/deactivate */
 static void
-flip_y_axis()
+flip_y_axis(void)
 {
     struct axis *yaxis = &axis_array[FIRST_Y_AXIS];
     double temp = yaxis->min;

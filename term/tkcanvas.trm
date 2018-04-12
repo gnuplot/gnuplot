@@ -207,7 +207,7 @@ static void TK_put_noenhanced_text(unsigned int x, unsigned int y, const char *s
 static void TK_put_enhanced_text(unsigned int x, unsigned int y, const char *str);
 static void TK_rectangle(int x1, int y1, int x2, int y2, char * color, char * stipple);
 static void TK_add_path_point(int x, int y); /* add a new point to current path or line */
-static void TK_flush_line(); /* finish a poly-line */
+static void TK_flush_line(void); /* finish a poly-line */
 
 
 enum TK_id {

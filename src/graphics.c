@@ -491,7 +491,7 @@ place_objects(struct object *listhead, int layer, int dimensions)
  * Apply axis range expansions from "set offsets" command
  */
 static void
-adjust_offsets()
+adjust_offsets(void)
 {
     double b = boff.scaley == graph ? fabs(Y_AXIS.max - Y_AXIS.min)*boff.y : boff.y;
     double t = toff.scaley == graph ? fabs(Y_AXIS.max - Y_AXIS.min)*toff.y : toff.y;
