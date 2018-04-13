@@ -346,8 +346,8 @@ START_HELP(dospc)
 "?dospc",
 " Note: legacy terminal.",
 " The `dospc` terminal driver supports PCs with arbitrary graphics boards,",
-" which will be automatically detected. Uses the OpenWatcom graphics library.",
-" To enforce a particular VGA graphics mode set the environment variable",
-" PCTRM to one of S640, S800, S1024, S1280, or S1600".
+" which will be automatically detected. It uses the OpenWatcom graphics",
+" library. To select a particular VGA graphics mode set the environment",
+" variable PCTRM to one of S640, S800, S1024, S1280, or S1600."
 END_HELP(dospc)
 #endif /* TERM_HELP */
