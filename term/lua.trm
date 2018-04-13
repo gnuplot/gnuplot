@@ -1,6 +1,6 @@
 /*
- *  $Id: lua.trm,v 1.33 2016/08/05 05:10:29 markisch Exp $
- *  $Date: 2016/08/05 05:10:29 $
+ *  $Id: lua.trm,v 1.33 2018/04/12 00:00:00 merritt Exp $
+ *  $Date: 2018/04/12 00:00:00 $
  *  $Rev: 99 $
  */
 
@@ -172,7 +172,7 @@ static char last_error_msg[MAX_LINE_LEN+1] = "";
  *  the plot's bounding box
  */
 static int
-LUA_GP_get_boundingbox() {
+LUA_GP_get_boundingbox(lua_State *L) {
   lua_newtable (L);
   lua_pushstring (L, "xleft");
   lua_pushinteger(L, plot_bounds.xleft);

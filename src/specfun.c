@@ -1,7 +1,3 @@
-#ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.53 2013/10/09 02:41:22 sfeam Exp $"); }
-#endif
-
 /* GNUPLOT - specfun.c */
 
 /*[
@@ -3040,8 +3036,7 @@ double polevl(), p1evl(), sin(), cos();
 #endif
 
 int 
-airy( x, ai, aip, bi, bip )
-double x, *ai, *aip, *bi, *bip;
+airy( double x, double *ai, double *aip, double *bi, double *bip )
 {
     double z, zz, t, f, g, uf, ug, k, zeta, theta;
     int domflg;
