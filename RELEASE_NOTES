@@ -8,7 +8,7 @@ development version, and a few new features.
 Please see the ChangeLog file for a complete list of changes made during the
 course of development from 5.0 to 5.2.
 
-Release Notes date: 27-Mar-2018
+Release Notes date: 11-Apr-2018
 
 CHANGES IN 5.2.3
 ================
@@ -30,6 +30,7 @@ CHANGES IN 5.2.3
 * FIX placement of colorbox in "set view map" mode
 * FIX autoscaled axis range of logscale axes in "set view map" mode
 * FIX polar mode "with yerrorbars" error bars are radial, not vertical
+* FIX clipping of circles whose center is offscreen to the left or bottom
 * FIX canvas terminal: apply both color and alpha channel to points and lines
 * FIX svg terminal: apply current color to dots
 * FIX qt terminal: include "notitle" plots in accounting for toggle operations

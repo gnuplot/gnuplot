@@ -1,3 +1,23 @@
+2018-04-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/specfun.c (airy) term/lua.trm (LUA_GP_get_boundingbox):
+	Function declaration corrected to follow C prototype standard.
+
+2018-04-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term_api.h src/term.c (do_arc):  Use signed rather than unsigned
+	terminal coordinates in do_arc().  This allows clipping of circles or
+	arcs whose center is off-screen on the left or botton (negative x or y
+	coordinate).  Previously the wrap-around of unsigned [cx,cy] caused
+	these to be treated as very far off-screen in the positive direction
+	and clipping failed to notice that portions of the arc could be visible.
+	Bug #2035
+
+2018-04-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/estimate.trm:  Incorrect cast in ENHest_writec caused all 3+
+	byte UTF-8 sequences in enhanced text to be estimated as double-width.
+
 2018-03-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c demo/poldat.dem:  yerrorbars in polar mode were being
