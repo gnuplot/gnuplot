@@ -83,19 +83,38 @@
 #define PNT68 0.6796875
 #define SQRT_TWO 1.41421356237309504880168872420969809	/* JG */
 
-/* Prefer lgamma */
-#ifndef GAMMA
+/* Because of a historical screwup in naming, the C language "gamma" function
+ * was really ln(gamma).  Linux chose to provide this as "lgamma", but kept
+ * "gamma" as an alias for compatibility.  Then BSD did the sensible thing and
+ * used "gamma" to mean, well, gamma.  So much for compatibility.
+ * Anyhow, we don't need to perpetuate the confusion.
+ * We follow the c99 convention that "lgamma" is ln(gamma) and
+ * "tgamma" is the true gamma function.
+ * Except we use macros LGAMMA and TGAMMA
+ */
+
+/* Use lgamma if present, otherwise look for confusion-era "gamma" */
+#ifndef LGAMMA
 # ifdef HAVE_LGAMMA
-#  define GAMMA(x) lgamma (x)
+#  define LGAMMA(x) lgamma (x)
 # elif defined(HAVE_GAMMA)
-#  define GAMMA(x) gamma (x)
+#  define LGAMMA(x) gamma (x)
 # else
-#  undef GAMMA
+#  undef LGAMMA
 # endif
 #endif
 
-#if defined(GAMMA) && !HAVE_DECL_SIGNGAM
+#if defined(LGAMMA) && !HAVE_DECL_SIGNGAM
 extern int signgam;		/* this is not always declared in math.h */
+#endif
+
+/* Use tgamma if present, otherwise use exp(ln(gamma)) */
+#ifndef TGAMMA
+# ifdef HAVE_TGAMMA
+#  define TGAMMA(x) tgamma (x)
+# else
+#  define TGAMMA(x) gp_exp(LGAMMA(x))
+# endif
 #endif
 
 /* Local function declarations, not visible outside this file */
@@ -117,7 +136,7 @@ static double airy_pos __PROTO((double x));
 static double humlik __PROTO((double x, double y));
 #endif
 static double expint __PROTO((double n, double x));
-#ifndef GAMMA
+#ifndef LGAMMA
 static int ISNAN __PROTO((double x));
 static int ISFINITE __PROTO((double x));
 static double lngamma __PROTO((double z));
@@ -293,9 +312,9 @@ p1evl(double x, const double coef[], int N)
     return (ans);
 }
 
-#ifndef GAMMA
+#ifndef LGAMMA
 
-/* Provide GAMMA function for those who do not already have one */
+/* Provide lgamma function for those who do not already have one */
 
 int             sgngam;
 
@@ -548,11 +567,11 @@ lngamma(double x)
     return (q);
 }
 
-#define GAMMA(x) lngamma ((x))
+#define LGAMMA(x) lngamma ((x))
 /* HBB 20030816: must override name of sgngam so f_gamma() uses it */
 #define signgam sgngam
 
-#endif /* !GAMMA */
+#endif /* !LGAMMA */
 
 /*
  * Make all the following internal routines f_whatever() perform
@@ -629,12 +648,9 @@ void f_gamma(union argument *arg)
     struct value a;
 
     (void) arg;				/* avoid -Wunused warning */
-    y = GAMMA(real(pop(&a)));
-    if (y > E_MAXEXP) {
-	undefined = TRUE;
-	push(Ginteger(&a, 0));
-    } else
-	push(Gcomplex(&a, signgam * gp_exp(y), 0.0));
+    y = TGAMMA(real(pop(&a)));
+    /* FIXME check for overflow via math_error if HAVE_TGAMMA */
+    push(Gcomplex(&a, y, 0.0));
 }
 
 void f_lgamma(union argument *arg)
@@ -642,7 +658,7 @@ void f_lgamma(union argument *arg)
     struct value a;
 
     (void) arg;				/* avoid -Wunused warning */
-    push(Gcomplex(&a, GAMMA(real(pop(&a))), 0.0));
+    push(Gcomplex(&a, LGAMMA(real(pop(&a))), 0.0));
 }
 
 #ifndef BADRAND
@@ -921,8 +937,8 @@ confrac(double a, double b, double x)
     int j;
 
     /* Set up continued fraction expansion evaluation. */
-    Ahi = gp_exp(GAMMA(Apb) + a * log(x) + b * log(1.0 - x) -
-		 GAMMA(a + 1.0) - GAMMA(b));
+    Ahi = gp_exp(LGAMMA(Apb) + a * log(x) + b * log(1.0 - x) -
+		 LGAMMA(a + 1.0) - LGAMMA(b));
 
     /*
      * Continued fraction loop begins here. Evaluation continues until
@@ -1002,7 +1018,7 @@ igamma(double a, double x)
 	return 1.0;
 
     /* Check value of factor arg */
-    arg = a * log(x) - x - GAMMA(a + 1.0);
+    arg = a * log(x) - x - LGAMMA(a + 1.0);
     /* HBB 20031006: removed a spurious check here */
     arg = gp_exp(arg);
 
