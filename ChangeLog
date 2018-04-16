@@ -1,7 +1,28 @@
+2018-04-15  Miroslav Sulc <msulc@users.sourceforge.net>
+
+	* src/eval.c src/specfun.c src/specfun.h:
+
+	Add function besin(n,x), modified Bessel function of order n for
+	integer n.  The code is based on that for iv(v, x) as implemented in
+	scipy (from numpy). Accuracy was tested by comparing output from
+	scipy and gnuplot.  The underlying function iv(v,x) accepts fractional v
+	but does not converge well for non-integer values.  Thus besin(n,x)
+	limits the domain to integer n.
+
+2018-04-06  Miroslav Sulc <msulc@users.sourceforge.net>
+
+	* src/eval.c src/standard.c src/standard.h:
+
+	Add functions besi0(x) besi1(x), modified Bessel functions of order
+	0 and 1.  The code is adapted from the cephes library
+	 http://www.netlib.org/cephes/index.html
+	claimed accuracy is 6e-16 for besi0()  2e-15 for besi1() using
+	IEEE double precision floating point.
+
 2018-02-11  Marko Karjalainen  <markokarjalainen@kolumbus.fi>
 
-	* term/js/gnuplot_svg.js:  Revise javascript support for mouse and keyboard
-	interaction with svg output
+	* term/js/gnuplot_svg.js:  Revise javascript support for mouse and
+	keyboard interaction with svg output
 
 	Mouse:
 	   left click toggle mouse tracking, drag plot

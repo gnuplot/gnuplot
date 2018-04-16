@@ -10,6 +10,7 @@ Changes not in 5.2
 * NEW largely extended pcl5 terminal supports PCL5e/PCL5c printers
 * NEW order N Bessel functions of 1st and 2nd kind (besjn besyn)
 * NEW modified Bessel functions I0 (besi0) and I1 (besi1)
+* NEW modified Bessel function of order n (besin)
 * EXPERIMENTAL internal support for appending to existing arrays
 * EXPERIMENTAL "set mouse mouseformat function <stringval_from_xy(x,y)>"
 * CHANGE remove deprecated command "update"

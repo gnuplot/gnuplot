@@ -194,6 +194,7 @@ const struct ft_entry ft[] =
     {"lambertw",  f_lambertw}, /* HBB, from G.Kuhnle 20001107 */
     {"airy",  f_airy},         /* janert, 20090905 */
     {"expint",  f_expint},     /* Jim Van Zandt, 20101010 */
+    {"besin",  f_besin},
 
 #ifdef HAVE_LIBCERF
     {"cerf", f_cerf},		/* complex error function */

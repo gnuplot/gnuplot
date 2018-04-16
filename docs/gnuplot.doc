@@ -1084,9 +1084,10 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>besjn(n,x)</td>    <td>int,real</td>    <td><i>J</i><sub>n</sub> Bessel function of <i>x</i> in radians</td></tr>
 ^<tr>    <td>besy0(x)</td>    <td>int or real</td>    <td><i>Y</i><sub>0</sub> Bessel function of <i>x</i> in radians</td></tr>
 ^<tr>    <td>besy1(x)</td>    <td>int or real</td>    <td><i>Y</i><sub>1</sub> Bessel function of <i>x</i> in radians</td></tr>
-^<tr>    <td>besyn(n,x)</td>    <td>int,real</td>    <td><i>Y</i><sub>n</sub> Bessel function of <i>x</i> in radians</td></tr>
-^<tr>    <td>besi0(n,x)</td>    <td>real</td>    <td>Modified Bessel function of order 0, <i>x</i> in radians</td></tr>
-^<tr>    <td>besi1(n,x)</td>    <td>real</td>    <td>Modified Bessel function of order 1, <i>x</i> in radians</td></tr>
+^<tr>    <td>besyn(n,x)</td>   <td>int,real</td>    <td><i>Y</i><sub>n</sub> Bessel function of <i>x</i> in radians</td></tr>
+^<tr>    <td>besi0(n,x)</td>   <td>real</td>    <td>Modified Bessel function of order 0, <i>x</i> in radians</td></tr>
+^<tr>    <td>besi1(n,x)</td>   <td>real</td>    <td>Modified Bessel function of order 1, <i>x</i> in radians</td></tr>
+^<tr>    <td>besin(n,x)</td>   <td>int,real</td><td>Modified Bessel function of order n, <i>x</i> in radians</td></tr>
 ^<tr>    <td>ceil(x)</td>    <td>any</td>    <td>&lceil;<i>x</i>&rceil;, smallest integer not less than <i>x</i> (real part)</td></tr>
 ^<tr>    <td>cos(x)</td>    <td>radians</td>    <td>cos <i>x</i>, cosine of <i>x</i></td></tr>
 ^<tr>    <td>cosh(x)</td>    <td>any</td>    <td>cosh <i>x</i>, hyperbolic cosine of <i>x</i> in radians</td></tr>
@@ -1372,6 +1373,13 @@ C marker below is used to signal this to doc2html:
 %besi1(x)@real@ Modified Bessel function of order 1, $x$ in radians
  The `besi1(x)` function is the modified Bessel function or order 1.
  `besi1` expects its argument to be in radians.
+4 besin
+?expressions functions besin
+?besin
+#besin(n,x) &int, real & Modified Bessel function of order n, $x$ in radians \\
+%besin(x)@int,real@ Modified Bessel function of order n, $x$ in radians
+ `besin(n,x)` is the modified Bessel function or order n for integer n and
+ x in radians.
 4 ceil
 ?expressions functions ceil
 ?ceil

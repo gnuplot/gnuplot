@@ -59,6 +59,7 @@ void f_inverse_erf __PROTO((union argument *x));
 void f_lambertw __PROTO((union argument *x));
 void f_airy __PROTO((union argument *x));
 void f_expint __PROTO((union argument *x));
+void f_besin __PROTO((union argument *x));
 
 #ifndef HAVE_LIBCERF
 void f_voigt __PROTO((union argument *x));
