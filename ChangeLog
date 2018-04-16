@@ -1,3 +1,12 @@
+2018-04-16  Miroslav Sulc <msulc@users.sourceforge.net>
+
+	* src/internal.c (f_div cmplx_divide):  Avoid overflow during complex
+	division (actually all floating point division).
+	Use formula 5.4.5 from Numerical Recipes 2nd Edition to prevent
+	avoidable overflow, underflow, and/or loss of precision.
+	E.g. the result of 1.e200/1.e200 is 1.0 rather than NaN, and
+	1/1.e200 is 1.e-200 rather than 0.
+
 2018-04-15  Miroslav Sulc <msulc@users.sourceforge.net>
 
 	* src/eval.c src/specfun.c src/specfun.h:

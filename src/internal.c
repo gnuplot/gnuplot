@@ -964,12 +964,46 @@ f_mult(union argument *arg)
     push(&result);
 }
 
+/*
+ * Implements formula (5.4.5) from Numerical Recipes (2nd edition),
+ * section "Complex Arithmetic".
+ * The expression (a + i*b)/(c + i*d) is evaluated as
+ *
+ * [a + b(d/c)] + i[b − a(d/c)] / [c + d(d/c)] for |c| >= |d|
+ *
+ * and
+ *
+ * [a(c/d) + b] + i[b(c/d) − a] / [c(c/d) + d] for |c| <  |d|
+ *
+ */
+void
+cmplx_divide(double a, double b, double c, double d, struct value *result)
+{
+    double f1, f2, denom;
+
+    if (fabs(c) + fabs(d)) {
+	if(fabs(c) >= fabs(d)) {
+	    f1 = 1;
+	    f2 = d / c;
+	} else {
+	    f1 = c / d;
+	    f2 = 1;
+	}
+	denom = c * f1 + d * f2;
+
+	(void) Gcomplex(result,
+		(a * f1 + b * f2) / denom,
+		(b * f1 - a * f2) / denom);
+    } else {
+	(void) Gcomplex(result, 0.0, 0.0);
+	undefined = TRUE;
+    }
+}
 
 void
 f_div(union argument *arg)
 {
     struct value a, b, result;
-    double square;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&b);
@@ -988,19 +1022,10 @@ f_div(union argument *arg)
 	    }
 	    break;
 	case CMPLX:
-	    square = b.v.cmplx_val.real *
-		b.v.cmplx_val.real +
-		b.v.cmplx_val.imag *
-		b.v.cmplx_val.imag;
-	    if (square)
-		(void) Gcomplex(&result, a.v.int_val *
-				b.v.cmplx_val.real / square,
-				-a.v.int_val *
-				b.v.cmplx_val.imag / square);
-	    else {
-		(void) Gcomplex(&result, 0.0, 0.0);
-		undefined = TRUE;
-	    }
+	    cmplx_divide(
+		(double)a.v.int_val, 0.0,
+		b.v.cmplx_val.real, b.v.cmplx_val.imag,
+		&result);
 	    break;
 	default:
 	    BAD_TYPE(b.type)
@@ -1009,35 +1034,16 @@ f_div(union argument *arg)
     case CMPLX:
 	switch (b.type) {
 	case INTGR:
-	    if (b.v.int_val)
-		(void) Gcomplex(&result, a.v.cmplx_val.real /
-				b.v.int_val,
-				a.v.cmplx_val.imag /
-				b.v.int_val);
-	    else {
-		(void) Gcomplex(&result, 0.0, 0.0);
-		undefined = TRUE;
-	    }
+	    cmplx_divide(
+		a.v.cmplx_val.real, a.v.cmplx_val.imag,
+		(double)b.v.int_val, 0.0,
+		&result);
 	    break;
 	case CMPLX:
-	    square = b.v.cmplx_val.real *
-		b.v.cmplx_val.real +
-		b.v.cmplx_val.imag *
-		b.v.cmplx_val.imag;
-	    if (square)
-		(void) Gcomplex(&result, (a.v.cmplx_val.real *
-					  b.v.cmplx_val.real +
-					  a.v.cmplx_val.imag *
-					  b.v.cmplx_val.imag) / square,
-				(a.v.cmplx_val.imag *
-				 b.v.cmplx_val.real -
-				 a.v.cmplx_val.real *
-				 b.v.cmplx_val.imag) /
-				square);
-	    else {
-		(void) Gcomplex(&result, 0.0, 0.0);
-		undefined = TRUE;
-	    }
+	    cmplx_divide(
+		a.v.cmplx_val.real, a.v.cmplx_val.imag,
+		b.v.cmplx_val.real, b.v.cmplx_val.imag,
+		&result);
 	    break;
 	default:
 	    BAD_TYPE(b.type)
