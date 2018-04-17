@@ -113,7 +113,8 @@ extern int signgam;		/* this is not always declared in math.h */
 # ifdef HAVE_TGAMMA
 #  define TGAMMA(x) tgamma (x)
 # else
-#  define TGAMMA(x) gp_exp(LGAMMA(x))
+   static double temp_gamma;
+#  define TGAMMA(x) (temp_gamma=LGAMMA(x), signgam * gp_exp(temp_gamma))
 # endif
 #endif
 
