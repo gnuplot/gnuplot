@@ -1462,6 +1462,13 @@ change_term(const char *origname, int length)
 	length = 8;
     }
 #endif
+#ifdef HAVE_LIBGD
+    /* To allow "set term sixel" as short for "set term sixelgd" */
+    if (!strncmp(origname,"sixel",5)) {
+	name = "sixelgd";
+	length = 7;
+    }
+#endif
 
     for (i = 0; i < TERMCOUNT; i++) {
 	if (!strncmp(name, term_tbl[i].name, length)) {

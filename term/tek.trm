@@ -37,7 +37,7 @@
  *
  * This terminal driver supports:
  *  tek40xx, bitgraph, kermit_color_tek40xx, kermit_mono_tek40xx, selanar
- *  sixel, ln03plus, xterm
+ *  sixeltek, ln03plus, xterm
  *
  * AUTHORS
  *   Colin Kelley, Thomas Williams, Russell Lang
@@ -132,7 +132,7 @@ register_term(km_tek40)
 register_term(selanar)
 #endif
 #ifdef SIXEL
-register_term(sixel)
+register_term(sixeltek)
 #endif
 #ifdef BITGRAPH
 register_term(bitgraph)
@@ -1485,7 +1485,7 @@ TERM_TABLE_END(selanar_driver)
 
 #ifdef SIXEL
 TERM_TABLE_START(sixel_driver)
-    "sixel", "Sixel Graphics",
+    "sixeltek", "Sixel output using bitmap graphics",
     SIXEL_XMAX, SIXEL_YMAX, SIXEL_VCHAR, SIXEL_HCHAR,
     SIXEL_VTIC, SIXEL_HTIC, SIXEL_options, SIXEL_init, SIXEL_reset,
     SIXEL_text, null_scale, SIXEL_graphics, SIXEL_move, SIXEL_vector,
@@ -1578,14 +1578,14 @@ START_HELP(tek40)
 "?selanar",
 #endif
 #ifdef SIXEL
-"?commands set terminal sixel",
-"?set terminal sixel",
-"?set term sixel",
-"?terminal sixel",
-"?term sixel",
-"?sixel",
+"?commands set terminal sixeltek",
+"?set terminal sixeltek",
+"?set term sixeltek",
+"?terminal sixeltek",
+"?term sixeltek",
+"?sixeltek",
 " Syntax:",
-"    set terminal sixel {<fontsize>} {color|mono} {size <x>,<y>}",
+"    set terminal sixeltek {<fontsize>} {color|mono} {size <x>,<y>}",
 "",
 " The `sixel` output format was originally used by DEC terminals and printers.",
 " For use with xterm emulation, xterm must be compiled/configured with",

@@ -2992,7 +2992,7 @@ START_HELP(sixelgd)
 "?sixelgd",
 " Syntax:",
 "       set terminal sixelgd",
-"              {{no}enhanced}",
+"              {{no}enhanced} {{no}truecolor}",
 "              {{no}transparent} {rounded|butt}",
 "              {linewidth <lw>} {dashlength <dl>}",
 "              {tiny | small | medium | large | giant}",
@@ -3040,7 +3040,7 @@ START_HELP(sixelgd)
 " The terminal has been sucessfully tested with the xterm, mlterm and mintty",
 " terminals.  The later two support the `truecolor` mode using 256 sixel",
 " colors out of box. Distributed copies of xterm may or may not have been",
-" configured to support sixel graphics and 256 colors."
+" configured to support sixel graphics and may be limited to 16 colors."
 END_HELP(sixelgd)
 #endif /* TERM_HELP */
 #endif /* WITH_GD_SIXEL */
