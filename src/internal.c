@@ -1631,6 +1631,24 @@ f_sprintf(union argument *arg)
 	/* Use the format to print next arg */
 	switch(spec_type) {
 	case INTGR:
+	    /* Format %d %x etc with no preceding l or L */
+	    if (next_param->type == INTGR) {
+		/* On some platforms (e.g. big-endian Solaris 10) trying to print
+		 * a 64-bit int with %d will use the wrong 32 bits.  Fail.
+		 * We try to accomodate this by converting to a 32-bit int if it fits.
+		 * If it doesn't fit, print "NaN".
+		 * FIXME: An alternative would be to dissect the format and insert
+		 * {__PRI64_PREFIX} before the operative specifier d/i/x/o/u.
+		 */
+		int int32_val = next_param->v.int_val;
+		if ((intgr_t)int32_val == next_param->v.int_val)
+		    snprintf(outpos, bufsize-(outpos-buffer), next_start, int32_val);
+		else
+		    snprintf(outpos, bufsize-(outpos-buffer), "NaN");
+		break;
+	    }
+	case LFORMAT_INTGR:
+	    /* Format %ld %llx etc */
 	    if (next_param->type == INTGR)
 		snprintf(outpos, bufsize-(outpos-buffer), next_start, next_param->v.int_val);
 	    else if (real(next_param) >= 9007199254740992.)	/* 2**53 */
@@ -1916,8 +1934,12 @@ sprintf_specifier(const char* format)
 	int_error(NO_CARET, "sprintf_specifier: too many L modifiers");
     if ( real_pos < int_pos )
 	return CMPLX;
-    if ( int_pos < strlen(format) )
-	return INTGR;
+    if ( int_pos < strlen(format) ) {
+	if ( lmod_pos < int_pos )
+	    return LFORMAT_INTGR;
+	else
+	    return INTGR;
+    }
     
     int_error(NO_CARET, "sprintf_specifier: no format specifier\n");
 
