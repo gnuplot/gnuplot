@@ -1631,20 +1631,31 @@ f_sprintf(union argument *arg)
 	/* Use the format to print next arg */
 	switch(spec_type) {
 	case INTGR:
+#if         (INTGR_MAX == INT_MAX)
+	    /* This build deals only with 32-bit integers */
+	    snprintf(outpos, bufsize-(outpos-buffer), next_start, (int)real(next_param));
+	    break;
+#else
 	    /* Format %d %x etc with no preceding l or L */
 	    if (next_param->type == INTGR) {
 		/* On some platforms (e.g. big-endian Solaris 10) trying to print
 		 * a 64-bit int with %d will use the wrong 32 bits.  Fail.
 		 * We try to accomodate this by converting to a 32-bit int if it fits.
-		 * If it doesn't fit, print "NaN".
-		 * FIXME: An alternative would be to dissect the format and insert
-		 * {__PRI64_PREFIX} before the operative specifier d/i/x/o/u.
+		 * If it overflows, insert __PRI64_PREFIX before the operative format specifier.
 		 */
 		int int32_val = next_param->v.int_val;
 		if ((intgr_t)int32_val == next_param->v.int_val)
 		    snprintf(outpos, bufsize-(outpos-buffer), next_start, int32_val);
-		else
-		    snprintf(outpos, bufsize-(outpos-buffer), "NaN");
+		else {
+		    /* add appropriate prefix to existing integer format spec */
+		    int int_spec_pos = strcspn(next_start, "diouxX");
+		    char *newformat = gp_alloc(strlen(next_start) + strlen(__PRI64_PREFIX) + 1, NULL);
+		    strncpy(newformat, next_start, int_spec_pos);
+		    strncpy(newformat+int_spec_pos, __PRI64_PREFIX, strlen(__PRI64_PREFIX)+1);
+		    strcat(newformat, next_start+int_spec_pos);
+		    snprintf(outpos, bufsize-(outpos-buffer), newformat, next_param->v.int_val);
+		    free(newformat);
+		}
 		break;
 	    }
 	case LFORMAT_INTGR:
@@ -1657,6 +1668,7 @@ f_sprintf(union argument *arg)
 		snprintf(outpos, bufsize-(outpos-buffer), next_start,
 			(intgr_t)real(next_param));
 	    break;
+#endif
 	case CMPLX:
 	    snprintf(outpos, bufsize-(outpos-buffer), next_start,
 		     real(next_param));
@@ -1666,7 +1678,7 @@ f_sprintf(union argument *arg)
 		     next_param->v.string_val);
 	    break;
 	default:
-	    int_error(NO_CARET,"internal error: invalid spec_type");
+	    int_error(NO_CARET,"internal error: invalid format specifier");
 	}
 
 	next_start[next_length] = tempchar;

@@ -289,7 +289,7 @@ typedef unsigned uintgr_t;	/* no C99 types available */
 #define PLD "%d"
 #define INTGR_MAX INT_MAX
 #define INTGR_MIN INT_MIN
-#define LARGEST_GUARANTEED_NONOVERFLOW INT_MAX
+#define LARGEST_GUARANTEED_NONOVERFLOW (double)(INT_MAX)
 #endif
 
 
