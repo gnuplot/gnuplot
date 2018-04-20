@@ -1547,7 +1547,6 @@ f_sprintf(union argument *arg)
     struct value a[10], *args;
     struct value num_params;
     struct value result;
-    char *buffer;
     int bufsize;
     char *next_start, *outpos, tempchar;
     int next_length;
@@ -1556,6 +1555,8 @@ f_sprintf(union argument *arg)
     int i, remaining;
     int nargs = 0;
     enum DATA_TYPES spec_type;
+    char *buffer = NULL;
+    char *error_return_message = NULL;
 
     /* Retrieve number of parameters from top of stack */
     (void) arg;
@@ -1570,8 +1571,10 @@ f_sprintf(union argument *arg)
 	pop(&args[i]);  /* pop next argument */
 
     /* Make sure we got a format string of some sort */
-    if (args[nargs-1].type != STRING)
-	int_error(NO_CARET,"First parameter to sprintf must be a format string");
+    if (args[nargs-1].type != STRING) {
+	error_return_message = "First parameter to sprintf must be a format string";
+	goto f_sprintf_error_return;
+    }
 
     /* Allocate space for the output string. If this isn't */
     /* long enough we can reallocate a larger space later. */
@@ -1624,12 +1627,18 @@ f_sprintf(union argument *arg)
 	spec_type = sprintf_specifier(next_start);
 
 	/* string value <-> numerical value check */
-	if ( spec_type == STRING && next_param->type != STRING )
-	    int_error(NO_CARET,"f_sprintf: attempt to print numeric value with string format");
-	if ( spec_type != STRING && next_param->type == STRING )
-	    int_error(NO_CARET,"f_sprintf: attempt to print string value with numeric format");
-	if ( spec_type == INVALID_NAME)
-	    int_error(NO_CARET,"f_sprintf: unsupported or invalid format specifier");
+	if ( spec_type == STRING && next_param->type != STRING ) {
+	    error_return_message = "f_sprintf: attempt to print numeric value with string format";
+	    goto f_sprintf_error_return;
+	}
+	if ( spec_type != STRING && next_param->type == STRING ) {
+	    error_return_message = "f_sprintf: attempt to print string value with numeric format";
+	    goto f_sprintf_error_return;
+	}
+	if ( spec_type == INVALID_NAME) {
+	    error_return_message = "f_sprintf: unsupported or invalid format specifier";
+	    goto f_sprintf_error_return;
+	}
 
 	/* Use the format to print next arg */
 	switch(spec_type) {
@@ -1690,7 +1699,9 @@ f_sprintf(union argument *arg)
 		     next_start, next_param->v.string_val);
 	    break;
 	default:
-	    int_error(NO_CARET,"internal error: invalid format specifier");
+	    error_return_message = "internal error: invalid format specifier";
+	    goto f_sprintf_error_return;
+	    break;
 	}
 
 	next_start[next_length] = tempchar;
@@ -1724,8 +1735,11 @@ f_sprintf(union argument *arg)
     }
     *outpos = '\0';
 
-    FPRINTF((stderr," snprintf result = \"%s\"\n",buffer));
     push(Gstring(&result, buffer));
+
+f_sprintf_error_return:
+
+    /* Free all locally allocated memory before returning */
     free(buffer);
 
     /* Free any strings from parameters we have now used */
@@ -1737,6 +1751,9 @@ f_sprintf(union argument *arg)
 
     /* Return to C locale for internal use */
     reset_numeric_locale();
+
+    if (error_return_message)
+	int_error(NO_CARET, error_return_message);
 }
 
 /* EAM July 2004 - Gnuplot's own string formatting conventions.
