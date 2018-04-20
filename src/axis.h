@@ -399,15 +399,6 @@ extern struct axis THETA_AXIS;
     (((double)(pos) - (axis)->term_lower)/(axis)->term_scale + (axis)->min)
 
 
-/* April 2015:  I'm not 100% sure, but I believe there is no longer
- * any need to treat 2D and 3D axis initialization differently
- */
-#define AXIS_INIT3D(axis, islog_override, infinite) \
-        axis_init((&axis_array[axis]), infinite)
-
-#define AXIS_INIT2D(axis, infinite) \
-        axis_init((&axis_array[axis]), infinite)
-
 /* AXIS_INIT2D_REFRESH and AXIS_UPDATE2D_REFRESH(axis) are for volatile data */
 #define AXIS_INIT2D_REFRESH(axis, infinite)				\
 do {									\

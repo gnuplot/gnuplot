@@ -239,13 +239,13 @@ plot3drequest()
 	strcpy(set_dummy_var[1], "v");
     }
 
-    /* put stuff into arrays to simplify access */
-    AXIS_INIT3D(FIRST_X_AXIS, 0, 0);
-    AXIS_INIT3D(FIRST_Y_AXIS, 0, 0);
-    AXIS_INIT3D(FIRST_Z_AXIS, 0, 1);
-    AXIS_INIT3D(U_AXIS, 1, 0);
-    AXIS_INIT3D(V_AXIS, 1, 0);
-    AXIS_INIT3D(COLOR_AXIS, 0, 1);
+    /* initialize the arrays from the 'set' scalars */
+    axis_init(&axis_array[FIRST_X_AXIS], FALSE);
+    axis_init(&axis_array[FIRST_Y_AXIS], FALSE);
+    axis_init(&axis_array[FIRST_Z_AXIS], TRUE);
+    axis_init(&axis_array[U_AXIS], FALSE);
+    axis_init(&axis_array[V_AXIS], FALSE);
+    axis_init(&axis_array[COLOR_AXIS], TRUE);
 
     /* Nonlinear mapping of x or y via linkage to a hidden primary axis. */
     /* The user set autoscale for the visible axis; apply it also to the hidden axis. */
