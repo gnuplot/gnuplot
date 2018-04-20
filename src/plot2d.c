@@ -1,7 +1,3 @@
-#ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.430.2.15 2017/10/30 23:45:27 sfeam Exp $"); }
-#endif
-
 /* GNUPLOT - plot2d.c */
 
 /*[
@@ -3120,14 +3116,14 @@ eval_plots()
 			if (axis_array[SAMPLE_AXIS].linked_to_primary) {
 			    AXIS *vis = axis_array[SAMPLE_AXIS].linked_to_primary->linked_to_secondary;
 			    t = eval_link_function(vis, t_min + i * t_step);
-			} else
+			} else {
 			    t = t_min + i * t_step;
 
-			/* Zero is often a special point in a function domain.	*/
-			/* Make sure we don't miss it due to round-off error.	*/
-			/* NB: This is a stricter test than CheckZero(). 	*/
-			if ((fabs(t) < 1.e-9) && (fabs(t_step) > 1.e-6))
-			    t = 0.0;
+			    /* Zero is often a special point in a function domain. */
+			    /* Make sure we don't miss it due to round-off error.  */
+			    if ((fabs(t) < 1.e-9) && (fabs(t_step) > 1.e-6))
+				t = 0.0;
+			}
 
 			/* parametric/polar => NOT a log quantity */
 			x = (!parametric && !polar)

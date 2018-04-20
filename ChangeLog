@@ -1,3 +1,13 @@
+2018-04-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c: Do not "snap" a sampled point of a function domain to 0
+	for non-linear x axis.  The original motivation for this was to assure
+	that coarse samples spanning x=0 would evaluate the sampled function at
+	exactly f(0).  However this makes no sense for nonlinear axes,
+	expecially log axes, because the sampling is actually being done on the
+	hidden axis not the visible axis where x=0.
+	Bug #2040
+
 2018-04-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/specfun.c (airy) term/lua.trm (LUA_GP_get_boundingbox):
