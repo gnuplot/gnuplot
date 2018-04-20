@@ -27,10 +27,10 @@ unset print
 print "12345678910 prints as       ", 12345678910
 print "sum [i=1:10] 1234567891 =   ", sumI
 print "sprintf(\"%d\", sum)          ", sprintf("%d",sumI)
-print "sprintf(\"%ld\", sum)         ", sprintf("%ld",sumI)
-print "sprintf(\"%lld\", sum)        ", sprintf("%lld",sumI)
 print "print 2**63 produces         ", 2**63
 print "print 2**62<<1 produces     ", 2**62<<1
+print "sprintf(\"%d\", 2**62<<1)      ", sprintf("%d", 2**62<<1)
+print "sprintf(\"%u\", 2**62<<1)      ", sprintf("%u", 2**62<<1)
 print "sprintf(\"%x\", 2**62<<1)      ", sprintf("%x", 2**62<<1)
 print "sprintf(\"%x\", 2**63)         ", sprintf("%x", 2**63)
 print "gprintf(\"0x%x\", 2**62<<1)           ", gprintf("0x%x", 2**62<<1)

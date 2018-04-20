@@ -1534,7 +1534,8 @@ f_word(union argument *arg)
 #undef RETURN_WORD_COUNT
 
 
-/* EAM July 2004  (revised to dynamic buffer July 2005)
+/* EAM July 2004
+ * revised to handle 64-bit integers April 2018
  * There are probably an infinite number of things that can
  * go wrong if the user mis-matches arguments and format strings
  * in the call to sprintf, but I hope none will do worse than
@@ -1627,55 +1628,66 @@ f_sprintf(union argument *arg)
 	    int_error(NO_CARET,"f_sprintf: attempt to print numeric value with string format");
 	if ( spec_type != STRING && next_param->type == STRING )
 	    int_error(NO_CARET,"f_sprintf: attempt to print string value with numeric format");
+	if ( spec_type == INVALID_NAME)
+	    int_error(NO_CARET,"f_sprintf: unsupported or invalid format specifier");
 
 	/* Use the format to print next arg */
 	switch(spec_type) {
 	case INTGR:
+	    {
 #if         (INTGR_MAX == INT_MAX)
 	    /* This build deals only with 32-bit integers */
 	    snprintf(outpos, bufsize-(outpos-buffer), next_start, (int)real(next_param));
 	    break;
 #else
-	    /* Format %d %x etc with no preceding l or L */
-	    if (next_param->type == INTGR) {
-		/* On some platforms (e.g. big-endian Solaris 10) trying to print
-		 * a 64-bit int with %d will use the wrong 32 bits.  Fail.
-		 * We try to accomodate this by converting to a 32-bit int if it fits.
-		 * If it overflows, insert __PRI64_PREFIX before the operative format specifier.
-		 */
-		int int32_val = next_param->v.int_val;
-		if ((intgr_t)int32_val == next_param->v.int_val)
-		    snprintf(outpos, bufsize-(outpos-buffer), next_start, int32_val);
-		else {
-		    /* add appropriate prefix to existing integer format spec */
-		    int int_spec_pos = strcspn(next_start, "diouxX");
-		    char *newformat = gp_alloc(strlen(next_start) + strlen(__PRI64_PREFIX) + 1, NULL);
-		    strncpy(newformat, next_start, int_spec_pos);
-		    strncpy(newformat+int_spec_pos, __PRI64_PREFIX, strlen(__PRI64_PREFIX)+1);
-		    strcat(newformat, next_start+int_spec_pos);
-		    snprintf(outpos, bufsize-(outpos-buffer), newformat, next_param->v.int_val);
-		    free(newformat);
-		}
-		break;
-	    }
-	case LFORMAT_INTGR:
-	    /* Format %ld %llx etc */
+	    intgr_t int64_val;	/* The parameter value we are trying to print */
+	    int int32_val;	/* Copy of int64_val for sufficiently small values */
+
 	    if (next_param->type == INTGR)
-		snprintf(outpos, bufsize-(outpos-buffer), next_start, next_param->v.int_val);
-	    else if (real(next_param) >= 9007199254740992.)	/* 2**53 */
-		snprintf(outpos, bufsize-(outpos-buffer), "NaN");
-	    else
-		snprintf(outpos, bufsize-(outpos-buffer), next_start,
-			(intgr_t)real(next_param));
+		int64_val = next_param->v.int_val;
+	    else /* FIXME: loses precision above 9007199254740992. */
+		int64_val = (intgr_t)real(next_param);
+
+	    /* On some platforms (e.g. big-endian Solaris) trying to print a
+	     * 64-bit int with %d or %x etc will fail due to using the wrong 32 bits.
+	     * We try to accomodate this by converting to a 32-bit int if possible.
+	     * If this overflows, replace the original format with the C99 64-bit
+	     * equivalent as defined in <inttypes.h>.
+	     */
+	    int32_val = int64_val;
+	    if ((intgr_t)int32_val == int64_val)
+		snprintf(outpos, bufsize-(outpos-buffer), next_start, int32_val);
+	    else {
+		/* Substitute an appropriate 64-bit format for the original one. */
+		/* INTGR return from sprintf_specifier() guarantees int_spec_post != NULL */
+		int int_spec_pos = strcspn(next_start, "diouxX");
+		char *newformat = gp_alloc(strlen(next_start) + strlen(PRId64) + 1, NULL);
+		char *new_int_spec;
+		strncpy(newformat, next_start, int_spec_pos);
+		switch (next_start[int_spec_pos]) {
+		    default:
+		    case 'd': new_int_spec = PRId64; break;
+		    case 'i': new_int_spec = PRIi64; break;
+		    case 'o': new_int_spec = PRIo64; break;
+		    case 'u': new_int_spec = PRIu64; break;
+		    case 'x': new_int_spec = PRIx64; break;
+		    case 'X': new_int_spec = PRIX64; break;
+		}
+		strncpy(newformat+int_spec_pos, new_int_spec, strlen(new_int_spec)+1);
+		strcat(newformat, next_start+int_spec_pos+1);
+		snprintf(outpos, bufsize-(outpos-buffer), newformat, int64_val);
+		free(newformat);
+	    }
 	    break;
 #endif
+	    }
 	case CMPLX:
-	    snprintf(outpos, bufsize-(outpos-buffer), next_start,
-		     real(next_param));
+	    snprintf(outpos, bufsize-(outpos-buffer),
+		     next_start, real(next_param));
 	    break;
 	case STRING:
-	    snprintf(outpos, bufsize-(outpos-buffer), next_start,
-		     next_param->v.string_val);
+	    snprintf(outpos, bufsize-(outpos-buffer),
+		     next_start, next_param->v.string_val);
 	    break;
 	default:
 	    int_error(NO_CARET,"internal error: invalid format specifier");
@@ -1725,7 +1737,6 @@ f_sprintf(union argument *arg)
 
     /* Return to C locale for internal use */
     reset_numeric_locale();
-
 }
 
 /* EAM July 2004 - Gnuplot's own string formatting conventions.
@@ -1920,10 +1931,9 @@ sprintf_specifier(const char* format)
     const char real_spec[]    = "aAeEfFgG";
     const char int_spec[]     = "cdiouxX";
     /* The following characters are used to reject invalid formats */
-    const char illegal_spec[] = "hqjzZtCSpn";
-    const char lL_spec[] = "lL";
+    const char illegal_spec[] = "hlLqjzZtCSpn";
 
-    int string_pos, real_pos, int_pos, lmod_pos, illegal_pos;
+    int string_pos, real_pos, int_pos, illegal_pos;
 
     /* check if really format specifier */
     if (format[0] != '%')
@@ -1933,29 +1943,19 @@ sprintf_specifier(const char* format)
     string_pos  = strcspn(format, string_spec);
     real_pos    = strcspn(format, real_spec);
     int_pos     = strcspn(format, int_spec);
-    lmod_pos    = strcspn(format, lL_spec);
     illegal_pos = strcspn(format, illegal_spec);
 
     if ( illegal_pos < int_pos && illegal_pos < real_pos
 	 && illegal_pos < string_pos )
-	int_error(NO_CARET,
-		  "sprintf_specifier: used with invalid format specifier\n");
+	return INVALID_NAME;
     if ( string_pos < real_pos && string_pos < int_pos )
 	return STRING;
-    if ( lmod_pos < real_pos && lmod_pos < int_pos-2 )
-	int_error(NO_CARET, "sprintf_specifier: too many L modifiers");
     if ( real_pos < int_pos )
 	return CMPLX;
-    if ( int_pos < strlen(format) ) {
-	if ( lmod_pos < int_pos )
-	    return LFORMAT_INTGR;
-	else
-	    return INTGR;
-    }
+    if ( int_pos < strlen(format) )
+	return INTGR;
     
-    int_error(NO_CARET, "sprintf_specifier: no format specifier\n");
-
-    return INTGR; /* Can't happen, but the compiler doesn't realize that */
+    return INVALID_NAME;
 }
 
 

@@ -49,8 +49,8 @@ enum DATA_TYPES {
 	ARRAY,
 	NOTDEFINED,	/* exists, but value is currently undefined */
 	INVALID_VALUE,	/* used only for error return by external functions */
-	INVALID_NAME,	/* used only to trap errors in linked axis function definition */
-	LFORMAT_INTGR	/* used only as a return from sprintf_specifier() */
+	INVALID_NAME	/* used only to trap errors in linked axis function definition */
+			/* or a format specifier that does not match a variable type */
 };
 
 enum MODE_PLOT_TYPE {
