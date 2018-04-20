@@ -1,8 +1,3 @@
-/*
- * $Id: axis.h,v 1.166.2.4 2017/09/29 19:02:17 sfeam Exp $
- *
- */
-
 /*[
  * Copyright 2000, 2004   Thomas Williams, Colin Kelley
  *
@@ -441,15 +436,6 @@ extern struct axis THETA_AXIS;
     (axis->log ? axis_undo_log(axis,coordinate): (coordinate))
 
 #endif /* (NONLINEAR_AXES > 0) */
-
-/* April 2015:  I'm not 100% sure, but I believe there is no longer
- * any need to treat 2D and 3D axis initialization differently
- */
-#define AXIS_INIT3D(axis, islog_override, infinite) \
-        axis_init((&axis_array[axis]), infinite)
-
-#define AXIS_INIT2D(axis, infinite) \
-        axis_init((&axis_array[axis]), infinite)
 
 /* AXIS_INIT2D_REFRESH and AXIS_UPDATE2D_REFRESH(axis) are for volatile data */
 #define AXIS_INIT2D_REFRESH(axis, infinite)				\

@@ -212,12 +212,12 @@ axis_invert_if_requested(struct axis *axis)
 
 
 void
-axis_init(AXIS *this_axis, TBOOLEAN infinite)
+axis_init(AXIS *this_axis, TBOOLEAN reset_autoscale)
 {
     this_axis->autoscale = this_axis->set_autoscale;
-    this_axis->min = (infinite && (this_axis->set_autoscale & AUTOSCALE_MIN))
+    this_axis->min = (reset_autoscale && (this_axis->set_autoscale & AUTOSCALE_MIN))
 	? VERYLARGE : this_axis->set_min;
-    this_axis->max = (infinite && (this_axis->set_autoscale & AUTOSCALE_MAX))
+    this_axis->max = (reset_autoscale && (this_axis->set_autoscale & AUTOSCALE_MAX))
 	? -VERYLARGE : this_axis->set_max;
     this_axis->data_min = VERYLARGE;
     this_axis->data_max = -VERYLARGE;

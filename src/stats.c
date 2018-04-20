@@ -1,7 +1,3 @@
-#ifndef lint
-static char *RCSid() { return RCSid("$Id: stats.c,v 1.32 2016/09/06 19:42:57 sfeam Exp $"); }
-#endif
-
 /* GNUPLOT - stats.c */
 
 /*
@@ -768,8 +764,8 @@ statsrequest(void)
     c_token++;
 
     /* Parse ranges */
-    AXIS_INIT2D(FIRST_X_AXIS, 0);
-    AXIS_INIT2D(FIRST_Y_AXIS, 0);
+    axis_init(&axis_array[FIRST_X_AXIS], FALSE);
+    axis_init(&axis_array[FIRST_Y_AXIS], FALSE);
     parse_range(FIRST_X_AXIS);
     parse_range(FIRST_Y_AXIS);
 

@@ -225,17 +225,16 @@ plotrequest()
     if (parametric && strcmp(set_dummy_var[0], "u") == 0)
 	strcpy(set_dummy_var[0], "t");
 
-    /* initialise the arrays from the 'set' scalars */
-
-    AXIS_INIT2D(FIRST_X_AXIS, 0);
-    AXIS_INIT2D(FIRST_Y_AXIS, 1);
-    AXIS_INIT2D(SECOND_X_AXIS, 0);
-    AXIS_INIT2D(SECOND_Y_AXIS, 1);
-    AXIS_INIT2D(T_AXIS, 0);
-    AXIS_INIT2D(U_AXIS, 0);
-    AXIS_INIT2D(V_AXIS, 0);
-    AXIS_INIT2D(POLAR_AXIS, 1);
-    AXIS_INIT2D(COLOR_AXIS, 1);
+    /* initialize the arrays from the 'set' scalars */
+    axis_init(&axis_array[FIRST_X_AXIS], FALSE);
+    axis_init(&axis_array[FIRST_Y_AXIS], TRUE);
+    axis_init(&axis_array[SECOND_X_AXIS], FALSE);
+    axis_init(&axis_array[SECOND_Y_AXIS], TRUE);
+    axis_init(&axis_array[T_AXIS], FALSE);
+    axis_init(&axis_array[U_AXIS], FALSE);
+    axis_init(&axis_array[V_AXIS], FALSE);
+    axis_init(&axis_array[POLAR_AXIS], TRUE);
+    axis_init(&axis_array[COLOR_AXIS], TRUE);
 
 #ifdef NONLINEAR_AXES
     /* Nonlinear mapping of x or y via linkage to a hidden primary axis. */
@@ -3337,6 +3336,7 @@ eval_plots()
 	if (axis_array[FIRST_X_AXIS].max == -VERYLARGE ||
 	    axis_array[FIRST_X_AXIS].min == VERYLARGE)
 	    int_error(NO_CARET, "all points undefined!");
+	axis_revert_and_unlog_range(FIRST_X_AXIS);
     } else {
 	assert(uses_axis[SECOND_X_AXIS]);
     }
@@ -3344,11 +3344,10 @@ eval_plots()
 	if (axis_array[SECOND_X_AXIS].max == -VERYLARGE ||
 	    axis_array[SECOND_X_AXIS].min == VERYLARGE)
 	    int_error(NO_CARET, "all points undefined!");
+	axis_revert_and_unlog_range(SECOND_X_AXIS);
     } else {
 	assert(uses_axis[FIRST_X_AXIS]);
     }
-    axis_revert_and_unlog_range(FIRST_X_AXIS);
-    axis_revert_and_unlog_range(SECOND_X_AXIS);
 
     /* For nonlinear axes, but must also be compatible with "set link x".   */
     /* min/max values were tracked during input for the visible axes.       */
