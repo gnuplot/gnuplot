@@ -505,11 +505,14 @@ parse_array_assignment_expression()
 
 	/* Quick check for the most common false positives */
 	/* i.e. other constructs that begin with "name["   */
-	if (equals(c_token,"sum") && equals(c_token+3, "="))
-	    return 0;
-	if (equals(c_token+3, ":"))
-	    return 0;
+	/* FIXME: quicker than the full test below, but do we care? */
 	if (equals(c_token+3, "]") && !equals(c_token+4, "="))
+	    return 0;
+	if (equals(c_token+3, ":"))	/* substring s[foo:baz] */
+	    return 0;
+
+	/* Is this really a known array name? */
+	if (type_udv(c_token) != ARRAY)
 	    return 0;
 
 	/* Save state of the action table and the command line */
