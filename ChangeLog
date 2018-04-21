@@ -1,5 +1,9 @@
 2018-04-20  Ethan A Merritt  <merritt@u.washington.edu>
 
+	Bump version to 5.2.3
+
+2018-04-20  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* src/plot2d.c: Do not "snap" a sampled point of a function domain to 0
 	for non-linear x axis.  The original motivation for this was to assure
 	that coarse samples spanning x=0 would evaluate the sampled function at
