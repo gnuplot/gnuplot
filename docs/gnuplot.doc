@@ -1085,8 +1085,8 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>besy0(x)</td>    <td>int or real</td>    <td><i>Y</i><sub>0</sub> Bessel function of <i>x</i> in radians</td></tr>
 ^<tr>    <td>besy1(x)</td>    <td>int or real</td>    <td><i>Y</i><sub>1</sub> Bessel function of <i>x</i> in radians</td></tr>
 ^<tr>    <td>besyn(n,x)</td>   <td>int,real</td>    <td><i>Y</i><sub>n</sub> Bessel function of <i>x</i> in radians</td></tr>
-^<tr>    <td>besi0(n,x)</td>   <td>real</td>    <td>Modified Bessel function of order 0, <i>x</i> in radians</td></tr>
-^<tr>    <td>besi1(n,x)</td>   <td>real</td>    <td>Modified Bessel function of order 1, <i>x</i> in radians</td></tr>
+^<tr>    <td>besi0(x)</td>   <td>real</td>    <td>Modified Bessel function of order 0, <i>x</i> in radians</td></tr>
+^<tr>    <td>besi1(x)</td>   <td>real</td>    <td>Modified Bessel function of order 1, <i>x</i> in radians</td></tr>
 ^<tr>    <td>besin(n,x)</td>   <td>int,real</td><td>Modified Bessel function of order n, <i>x</i> in radians</td></tr>
 ^<tr>    <td>ceil(x)</td>    <td>any</td>    <td>&lceil;<i>x</i>&rceil;, smallest integer not less than <i>x</i> (real part)</td></tr>
 ^<tr>    <td>cos(x)</td>    <td>radians</td>    <td>cos <i>x</i>, cosine of <i>x</i></td></tr>
@@ -1694,7 +1694,7 @@ C marker below is used to signal this to doc2html:
  `strlen("string")` returns the number of characters in a string taking into
  account the current encoding.  If the current encoding supports multibyte
  characters (SJIS UTF8), this may be less than the number of bytes in the string.
- If the string contains multibyte UTF8 characters but the current encoding is set
+ If the string contains multibyte UTF8 characters but the current encoding is
  set to something other than UTF8, strlen("utf8string") will return a value that
  is larger than the actual number of characters.
 4 strstrt
@@ -3590,7 +3590,7 @@ Ffigure_boxes
  this the front/back order of drawing is not affected by `set hidden3d`.
  Similarly if you want each box face to have a border you must use
  `set pm3d border` rather than `set style fill border`.  See `set pm3d`.
- For best results use a combition of `set pm3d depthorder base` and
+ For best results use a combination of `set pm3d depthorder base` and
  `set pm3d lighting`.
 
 2 boxplot
@@ -10607,7 +10607,7 @@ Ffigure_multiple_keys
 
  everywhere that uses lt 1 will now get a thick blue line.  This includes
  uses such as the definition of a temporary linestyle derived from the base
- linetype 1.  Similary lt 2 will now produce a think green line.
+ linetype 1.  Similarly lt 2 will now produce a thick green line.
 
  This mechanism can be used to define a set of personal preferences for the
  sequence of lines used in gnuplot.  The recommended way to do this is to add
@@ -11015,7 +11015,7 @@ Ffigure_multiple_keys
  determines how the mouse cursor [x,y] coordinates are printed to the plot
  window and to the clipboard.  The default is "% #g".
 
- This setting is superceded by "set mouse mouseformat".
+ This setting is superseded by "set mouse mouseformat".
 4 mouseformat
 ?set mouse mouseformat
 ?mouseformat
@@ -11676,7 +11676,7 @@ Ffigure_multiple_keys
  floating point arithmetic.  However unlike the IEEE floating point
  representation, which sacrifices precision to span a total range of
  roughly [-10^307 : 10^307], integer operations that result in values outside
- the range [-2^63 : 2^63] overflow.  The 'set overflow' command lets you
+ the range [-2^63 : 2^63] overflow.  The `set overflow` command lets you
  control what happens in case of overflow.  See options below.
 
  `set overflow` is the same as `set overflow float`. It causes the result to be
@@ -14409,7 +14409,7 @@ Ffigure_walls
 4 xtics series
 ?set xtics series
 ?xtics series
- Syntax
+ Syntax:
       set xtics <incr>
       set xtics <start>, <incr>, <end>
  The implicit <start>, <incr>, <end> form specifies that a series of tics will
@@ -14453,7 +14453,7 @@ Ffigure_walls
 ?set xtics add
 ?xtics list
 ?xtics add
- Syntax
+ Syntax:
       set xtics {add} ("label1" <pos1> <level1>, "label2" <pos2> <level2>, ...) 
 
  The explicit ("label" <pos> <level>, ...) form allows arbitrary tic
