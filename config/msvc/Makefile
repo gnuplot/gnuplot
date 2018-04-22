@@ -247,7 +247,7 @@ D2DLIBS = d3d11.lib dxguid.lib prntvpt.lib
 
 
 HELPFILE = wgnuplot.chm
-!IF "$(PLATFORM)" == "X64"
+!IF ("$(PLATFORM)" == "X64") || ("$(PLATFORM)" == "x64")
 #HHC=""%%PROGRAMFILES(X86)%%\HTML Help Workshop\hhc""
 HHC="C:\Program Files (x86)\HTML Help Workshop\hhc"
 !ELSE
@@ -257,7 +257,7 @@ HHC="$(PROGRAMFILES)\HTML Help Workshop\hhc"
 !IF "$(PROCESSOR_ARCHITECTURE)" == "ALPHA"
 MACHINE = $(PROCESSOR_ARCHITECTURE)
 !ELSE
-!IF "$(PLATFORM)" == "X64"
+!IF ("$(PLATFORM)" == "X64") || ("$(PLATFORM)" == "x64")
 MACHINE = X64
 MANIFEST = wgnuplot.exe.manifest64
 !ELSE
@@ -651,7 +651,7 @@ install:
 
 zip:
 	$(MAKE) DESTDIR=.\gnuplot install
-!IF "$(PLATFORM)" == "X64"
+!IF ("$(PLATFORM)" == "X64") || ("$(PLATFORM)" == "x64")
 	zip -mro9 gp530-msvc-win64.zip gnuplot
 !ELSE
 	zip -mro9 gp530-msvc-win32.zip gnuplot
