@@ -1177,11 +1177,18 @@ cp_implode(struct curve_points *cp)
     first_point = 0;
     while ((num_points = next_curve(cp, &first_point)) > 0) {
 	k = 0;
-	for (i = first_point; i < first_point + num_points; i++) {
-	    /* HBB 20020801: don't try to use undefined datapoints */
-	    if (cp->points[i].type == UNDEFINED)
+	TBOOLEAN last_point = FALSE;
+
+	for (i = first_point; i <= first_point + num_points; i++) {
+
+	    if (i == first_point + num_points) {
+		if (k == 0)
+		    break;
+		last_point = TRUE;
+	    }
+	    if (!last_point && cp->points[i].type == UNDEFINED)
 	        continue;
-	    if (!k) {
+	    if (k == 0) {
 		x = cp->points[i].x;
 		y = cp->points[i].y;
 		sux = cp->points[i].xhigh;
@@ -1191,7 +1198,7 @@ cp_implode(struct curve_points *cp)
 		weight = cp->points[i].z;
 		all_inrange = (cp->points[i].type == INRANGE);
 		k = 1;
-	    } else if (cp->points[i].x == x) {
+	    } else if (!last_point && cp->points[i].x == x) {
 		y += cp->points[i].y;
 		sux += cp->points[i].xhigh;
 		slx += cp->points[i].xlow;
@@ -1238,39 +1245,9 @@ cp_implode(struct curve_points *cp)
 	    } /* else (same x position) */
 	} /* for(points in curve) */
 
-	if (k) {
-	    cp->points[j].x = x;
-	    if ( cp->plot_smooth == SMOOTH_FREQUENCY ||
-		 cp->plot_smooth == SMOOTH_FREQUENCY_NORMALISED ||
-		 cp->plot_smooth == SMOOTH_CUMULATIVE ||
-		 cp->plot_smooth == SMOOTH_CUMULATIVE_NORMALISED)
-		k = 1;
-	    cp->points[j].y = y /= (double) k;
-	    cp->points[j].xhigh = sux / (double) k;
-	    cp->points[j].xlow = slx / (double) k;
-	    cp->points[j].yhigh = suy / (double) k;
-	    cp->points[j].ylow = sly / (double) k;
-	    cp->points[j].z = weight / (double) k;
-	    cp->points[j].type = INRANGE;
-	    if (! all_inrange) {
-		    if (((x < X_AXIS.min) && !(X_AXIS.autoscale & AUTOSCALE_MIN))
-		    ||  ((x > X_AXIS.max) && !(X_AXIS.autoscale & AUTOSCALE_MAX))) {
-			cp->points[j].type = OUTRANGE;
-			goto is_outrange2;
-		    }
-		    if (((y < Y_AXIS.min) && !(Y_AXIS.autoscale & AUTOSCALE_MIN))
-		    ||  ((y > Y_AXIS.max) && !(Y_AXIS.autoscale & AUTOSCALE_MAX)))
-			cp->points[j].type = OUTRANGE;
-		is_outrange2:
-		    ;
-	    }
-	    j++;		/* next valid entry */
-	}
-
 	/* FIXME: Monotonic cubic splines support only a single curve per data set */
-	if (j < cp->p_count && cp->plot_smooth == SMOOTH_MONOTONE_CSPLINE) {
+	if (j < cp->p_count && cp->plot_smooth == SMOOTH_MONOTONE_CSPLINE)
 	    break;
-	}
 
 	/* insert invalid point to separate curves */
 	if (j < cp->p_count) {
