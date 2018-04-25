@@ -50,7 +50,7 @@ extern "C" {
 #else
 #define putch(ch)  ConsolePutCh(ch)
 #endif
- 
+
 #undef  getch
 #ifndef WGP_CONSOLE
 #define getch()  MyGetCh()
@@ -134,7 +134,7 @@ void RedirectOutputStreams(int init);
 
 #ifdef WGP_CONSOLE
 
-int ConsoleGetch();
+int ConsoleGetch(void);
 
 #endif /* WGP_CONSOLE */
 

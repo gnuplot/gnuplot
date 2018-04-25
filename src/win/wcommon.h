@@ -58,7 +58,7 @@ extern "C" {
 extern DWORD GetDllVersion(LPCTSTR lpszDllName);
 extern BOOL IsWindowsXPorLater(void);
 extern char *appdata_directory(void);
-extern FILE *open_printer();
+extern FILE *open_printer(void);
 extern void close_printer(FILE *outfile);
 extern BOOL cp_changed;
 extern UINT cp_input;

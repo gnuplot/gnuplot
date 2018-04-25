@@ -120,7 +120,7 @@ char *authors[]={
 
 void WinExit(void);
 static void WinCloseHelp(void);
-int CALLBACK ShutDown();
+int CALLBACK ShutDown(void);
 #ifdef WGP_CONSOLE
 static int ConsolePutS(const char *str);
 static int ConsolePutCh(int ch);
@@ -150,7 +150,7 @@ Pause(LPSTR str)
 
 
 void
-kill_pending_Pause_dialog()
+kill_pending_Pause_dialog(void)
 {
     if (!pausewin.bPause) /* no Pause dialog displayed */
 	return;
@@ -202,7 +202,7 @@ WinExit(void)
 
 /* call back function from Text Window WM_CLOSE */
 int CALLBACK
-ShutDown()
+ShutDown(void)
 {
     /* First chance for wgnuplot to close help system. */
     WinCloseHelp();
@@ -335,7 +335,7 @@ WinCloseHelp(void)
 
 
 static LPTSTR
-GetLanguageCode()
+GetLanguageCode(void)
 {
     static TCHAR lang[6] = TEXT("");
 
@@ -758,19 +758,19 @@ MyPutCh(int ch)
 
 #ifndef WGP_CONSOLE
 int
-MyKBHit()
+MyKBHit(void)
 {
     return TextKBHit(&textwin);
 }
 
 int
-MyGetCh()
+MyGetCh(void)
 {
     return TextGetCh(&textwin);
 }
 
 int
-MyGetChE()
+MyGetChE(void)
 {
     return TextGetChE(&textwin);
 }
@@ -1101,7 +1101,7 @@ stdin_pipe_reader(LPVOID param)
 
 
 int
-ConsoleGetch()
+ConsoleGetch(void)
 {
     int fd = _fileno(stdin);
     HANDLE h;
@@ -1140,7 +1140,7 @@ ConsoleGetch()
 
 
 int
-ConsoleReadCh()
+ConsoleReadCh(void)
 {
     const int max_input = 8;
     static char console_input[8];
@@ -1289,7 +1289,7 @@ ConsoleHandler(DWORD dwType)
 static char win_prntmp[MAX_PRT_LEN+1];
 
 FILE *
-open_printer()
+open_printer(void)
 {
     char *temp;
 
@@ -1342,7 +1342,7 @@ close_printer(FILE *outfile)
 
 
 void
-screen_dump()
+screen_dump(void)
 {
     if (term == NULL) {
 	int_error(c_token, "");
@@ -1613,7 +1613,7 @@ win_popen(const char *filename, const char *mode)
 
 
 UINT
-GetDPI()
+GetDPI(void)
 {
     HDC hdc_screen = GetDC(NULL);
     if (hdc_screen) {

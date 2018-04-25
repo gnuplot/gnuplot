@@ -455,10 +455,10 @@ typedef struct {
 	int totaldesc;       /* total height below center line */
 	double res_scale;    /* scaling due to different resolution (printers) */
 	int shift;           /* baseline alignment */
-	void (* set_font)();
+	void (* set_font)(void);
 	unsigned (* text_length)(char *);
 	void (* put_text)(int , int, char *);
-	void (* cleanup)();
+	void (* cleanup)(void);
 } enhstate_struct;
 extern enhstate_struct enhstate;
 
