@@ -31,8 +31,12 @@
 #ifndef GNUPLOT_ENCODING_H
 #define GNUPLOT_ENCODING_H
 
+#include "term_api.h"
+
 void init_encoding(void);
 enum set_encoding_id encoding_from_locale(void);
+
+const char * latex_input_encoding(enum set_encoding_id encoding);
 
 TBOOLEAN contains8bit(const char *s);
 

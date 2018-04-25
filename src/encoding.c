@@ -58,6 +58,7 @@ init_encoding(void)
     init_special_chars();
 }
 
+
 enum set_encoding_id
 encoding_from_locale(void)
 {
@@ -155,6 +156,67 @@ map_codepage_to_encoding(unsigned int cp)
 }
 #endif
 
+
+const char *
+latex_input_encoding(enum set_encoding_id encoding)
+{
+    const char * inputenc = NULL;
+
+    switch(encoding) {
+    case S_ENC_DEFAULT:
+	break;
+    case S_ENC_ISO8859_1:
+	inputenc = "latin1";
+	break;
+    case S_ENC_ISO8859_2:
+	inputenc = "latin2";
+	break;
+    case S_ENC_ISO8859_9:	/* ISO8859-9 is Latin5 */
+	inputenc = "latin5";
+	break;
+    case S_ENC_ISO8859_15:	/* ISO8859-15 is Latin9 */
+	inputenc = "latin9";
+	break;
+    case S_ENC_CP437:
+	inputenc = "cp437de";
+	break;
+    case S_ENC_CP850:
+	inputenc = "cp850";
+	break;
+    case S_ENC_CP852:
+	inputenc = "cp852";
+	break;
+    case S_ENC_CP1250:
+	inputenc = "cp1250";
+	break;
+    case S_ENC_CP1251:
+	inputenc = "cp1251";
+	break;
+    case S_ENC_CP1252:
+	inputenc = "cp1252";
+	break;
+    case S_ENC_KOI8_R:
+	inputenc = "koi8-r";
+	break;
+    case S_ENC_KOI8_U:
+	inputenc = "koi8-u";
+	break;
+    case S_ENC_UTF8:
+	/* utf8x (not utf8) is needed to pick up degree and micro signs */
+	inputenc = "utf8x";
+	break;
+    case S_ENC_INVALID:
+	int_error(NO_CARET, "invalid input encoding used");
+	break;
+    default:
+	/* do nothing */
+	break;
+    }
+
+    return inputenc;
+}
+
+
 TBOOLEAN contains8bit(const char *s)
 {
     while (*s) {
@@ -198,6 +260,7 @@ utf8_getmore (unsigned long * wch, const char **str, int nbytes)
     }
     return TRUE;
 }
+
 
 /* Convert UTF-8 multibyte sequence from string to unsigned long character.
 Returns TRUE on success.
@@ -274,6 +337,7 @@ ucs4toutf8(uint32_t codepoint, unsigned char *utf8char)
 
     return length;
 }
+
 
 /*
 * Returns number of (possibly multi-byte) characters in a UTF-8 string

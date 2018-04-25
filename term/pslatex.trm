@@ -38,7 +38,7 @@
  * This file supplies the terminal drivers:
  *     pslatex  -- LaTeX with embedded postscript
  *     pstex    -- plain TeX with embedded postscript
- *     epslatex -- LaTeX using \includegraphics, postscript part in an 
+ *     epslatex -- LaTeX using \includegraphics, postscript part in an
  *                 external file
  * Some routines are also used by terminal drivers
  *     cairolatex
@@ -61,7 +61,7 @@
  *              terminals.
  *      27 May 2004:
  *              - epslatex patch updated for gnuplot 4.0
- *      
+ *
  *  Harald Harders (h.harders@tu-bs.de), 2005-02-08:
  *  - Merged functionality of postscript, pslatex, pstex, and
  *    epslatex terminals. Therefore deleted epslatex.trm.
@@ -428,60 +428,9 @@ EPSLATEX_common_init()
         os_error(c_token,
                  "epslatex terminal cannot write to standard output");
     if (gpoutfile) {
-        char *inputenc = NULL;
+        const char * inputenc = latex_input_encoding(encoding);
 
         fprintf(gpoutfile, "%% GNUPLOT: LaTeX picture with Postscript\n");
-
-        switch(encoding) {
-        case S_ENC_DEFAULT:
-            break;
-        case S_ENC_ISO8859_1:
-            inputenc = "latin1";
-            break;
-        case S_ENC_ISO8859_2:
-            inputenc = "latin2";
-            break;
-        case S_ENC_ISO8859_9:	/* ISO8859-9 is Latin5 */
-            inputenc = "latin5";
-            break;
-        case S_ENC_ISO8859_15:	/* ISO8859-15 is Latin9 */
-            inputenc = "latin9";
-            break;
-        case S_ENC_CP437:
-            inputenc = "cp437de";
-            break;
-        case S_ENC_CP850:
-            inputenc = "cp850";
-            break;
-        case S_ENC_CP852:
-            inputenc = "cp852";
-            break;
-        case S_ENC_CP1250:
-            inputenc = "cp1250";
-            break;
-        case S_ENC_CP1251:
-            inputenc = "cp1251";
-            break;
-        case S_ENC_CP1252:
-            inputenc = "cp1252";
-            break;
-        case S_ENC_KOI8_R:
-            inputenc = "koi8-r";
-            break;
-        case S_ENC_KOI8_U:
-            inputenc = "koi8-u";
-            break;
-	case S_ENC_UTF8:
-	    /* utf8x (not utf8) is needed to pick up degree and micro signs */
-	    inputenc = "utf8x";
-	    break;
-        case S_ENC_INVALID:
-            int_error(NO_CARET, "invalid input encoding used");
-            break;
-        default:
-            /* do nothing */
-            break;
-        }
 
 	/* Clear previous state */
 	tex_previous_colorspec.type = -1;
@@ -511,7 +460,7 @@ EPSLATEX_common_init()
                 }
             }
         }
-            
+
         if (ps_params->epslatex_standalone) {
             fprintf(gpoutfile, "\
 \\documentclass{minimal}\n\
@@ -603,7 +552,7 @@ EPSLATEX_common_init()
         }
 
         fputs("\\begingroup\n", gpoutfile);
-        
+
         if (inputenc && encoding != S_ENC_UTF8)
             fprintf(gpoutfile, "\
   %% Encoding inside the plot.  In the header of your document, this encoding\n\
@@ -663,7 +612,7 @@ EPSLATEX_common_init()
                 (ps_params->color?"true":"false"),
                 (ps_params->blacktext?"true":"false") );
 
-        /* use \expandafter\def\csname LT0\endcsname{...} 
+        /* use \expandafter\def\csname LT0\endcsname{...}
          * instead of \def\LT0{...} because digits may not be part of
          * \... sequences */
         fputs("\
@@ -769,7 +718,7 @@ EPSLATEX_put_text(unsigned int x, unsigned int y, const char *str)
 	    fprintf(gpoutfile, "\t\\advance\\gptboxwidth by %d\\fboxsep\n",
 		(int)(2. * PSLATEX_xmargin + 0.5));
 	    fprintf(gpoutfile,
-		"      \\savebox{\\gptboxtext}{\\parbox[c][\\totalheight+%d\\fboxsep]{\\gptboxwidth}{\\centering{%s}}}\n", 
+		"      \\savebox{\\gptboxtext}{\\parbox[c][\\totalheight+%d\\fboxsep]{\\gptboxwidth}{\\centering{%s}}}\n",
 		(int)(2. * PSLATEX_ymargin + 0.5), str);
 	    PSLATEX_xbox = x;
 	    PSLATEX_ybox = y;
@@ -869,7 +818,7 @@ EPSLATEX_set_color(t_colorspec *colorspec)
     /* Fancy footwork to deal with mono/grayscale plots */
     if (ISCAIROTERMINAL) {
         cairotrm_set_color(colorspec);
-    } else 
+    } else
 #endif
     {
 	/* Filter out duplicate requests */
@@ -955,7 +904,7 @@ EPSLATEX_layer(t_termlayer syncpoint)
 	if (!ISCAIROTERMINAL)
 	    fprintf(gppsfile, "%% Begin plot #%d\n", ++plotno);
 	break;
-    
+
     case TERM_LAYER_AFTER_PLOT:
 	PS_linetype(LT_UNDEFINED);	/* Forces a stroke and resets linetype */
 	if (!ISCAIROTERMINAL)
@@ -998,7 +947,7 @@ EPSLATEX_layer(t_termlayer syncpoint)
 	if (gppsfile && (gppsfile != gpoutfile))
 	    fprintf(gppsfile, "%%pm3d_map_begin\n");
 	break;
-    
+
     case TERM_LAYER_END_PM3D_MAP:
 	if (!ISCAIROTERMINAL)
 	if (gppsfile && (gppsfile != gpoutfile))
@@ -1011,7 +960,7 @@ EPSLATEX_layer(t_termlayer syncpoint)
 }
 
 #ifdef EAM_BOXED_TEXT
-TERM_PUBLIC void 
+TERM_PUBLIC void
 EPSLATEX_boxed_text(unsigned int x, unsigned int y, int option)
 {
     if (!gpoutfile)
