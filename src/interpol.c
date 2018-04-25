@@ -135,7 +135,7 @@
  * Do UNDEF_ACTION as appropriate. Adjust range provided
  * type is INRANGE (ie dont adjust y if x is outrange). VALUE must not
  * be same as STORE */
-/* FIXME 20010610: 
+/* FIXME 20010610:
  * this is so similar to STORE_AND_UPDATE_RANGE() from axis.h
  * that the two should probably be merged.  */
 #define STORE_AND_FIXUP_RANGE(store, value, type, min, max, auto)	\
@@ -170,7 +170,7 @@ typedef double five_diag[5];
 
 static int next_curve __PROTO((struct curve_points * plot, int *curve_start));
 static int num_curves __PROTO((struct curve_points * plot));
-static double eval_kdensity __PROTO((struct curve_points *cp, 
+static double eval_kdensity __PROTO((struct curve_points *cp,
 				   int first_point, int num_points, double x));
 static void do_kdensity __PROTO((struct curve_points *cp, int first_point,
 				 int num_points, struct coordinate *dest));
@@ -237,7 +237,7 @@ num_curves(struct curve_points *plot)
 }
 
 
-/* PKJ - May 2008 
+/* PKJ - May 2008
    kdensity (short for Kernel Density) builds histograms using
    "Kernel Density Estimation" using Gaussian Kernels.
    Check: L. Wassermann: "All of Statistics" for example.
@@ -245,7 +245,7 @@ num_curves(struct curve_points *plot)
    The implementation is based closely on the implementation for Bezier
    curves, except for the way the actual interpolation is generated.
 
-   EAM Feb 2015 - Revise to handle logscaled y axis and to 
+   EAM Feb 2015 - Revise to handle logscaled y axis and to
    pass in an actual x coordinate rather than a fraction of the min/max range.
    NB: This code does not deal with logscaled x axis.
    FIXME: It's silly to recalculate the mean/stddev/bandwidth every time.
@@ -253,7 +253,7 @@ num_curves(struct curve_points *plot)
 
 /* eval_kdensity is a modification of eval_bezier */
 static double
-eval_kdensity ( 
+eval_kdensity (
     struct curve_points *cp,
     int first_point,	/* where to start in plot->points (to find x-range) */
     int num_points,	/* to determine end in plot->points */
@@ -262,7 +262,7 @@ eval_kdensity (
 
     unsigned int i;
     struct coordinate *this_points = (cp->points) + first_point;
-  
+
     double y, Z;
     double avg, sigma;
     double bandwidth, default_bandwidth;
@@ -275,7 +275,7 @@ eval_kdensity (
     }
     avg /= (double)num_points;
     sigma = sqrt( sigma/(double)num_points - avg*avg ); /* Standard Deviation */
-    
+
     /* This is the optimal bandwidth if the point distribution is Gaussian.
        (Applied Smoothing Techniques for Data Analysis
        by Adrian W, Bowman & Adelchi Azzalini (1997)) */
@@ -299,8 +299,8 @@ eval_kdensity (
 
 /* do_kdensity is based on do_bezier, except for the call to eval_bezier */
 /* EAM Feb 2015: Don't touch xrange, but recalculate y limits  */
-static void 
-do_kdensity( 
+static void
+do_kdensity(
     struct curve_points *cp,
     int first_point,		/* where to start in plot->points */
     int num_points,		/* to determine end in plot->points */
@@ -801,7 +801,7 @@ gen_interp_unwrap(struct curve_points *plot)
 
 	lasty = 0; /* make all plots start the same place */
 	for (j = first_point; j < first_point + num_points; j++) {
-                if (plot->points[j].type == UNDEFINED) 
+                if (plot->points[j].type == UNDEFINED)
                     continue;
 
 		y = plot->points[j].y;
@@ -985,9 +985,9 @@ gen_interp_frequency(struct curve_points *plot)
 	    num_points = next_curve(plot, &first_point);
 
 	    for (j = first_point; j < first_point + num_points; j++) {
-		if (plot->points[j].type == UNDEFINED) 
+		if (plot->points[j].type == UNDEFINED)
 		    continue;
-	    
+
 		y_total += plot->points[j].y;
 	    }
 	    first_point += num_points + 1;
@@ -1005,7 +1005,7 @@ gen_interp_frequency(struct curve_points *plot)
         if (plot->plot_smooth == SMOOTH_CUMULATIVE) {
             y = 0;
             for (j = first_point; j < first_point + num_points; j++) {
-                if (plot->points[j].type == UNDEFINED) 
+                if (plot->points[j].type == UNDEFINED)
                     continue;
 
                 y += plot->points[j].y;
@@ -1024,7 +1024,7 @@ gen_interp_frequency(struct curve_points *plot)
 	    y = 0;
 
 	    for (j = first_point; j < first_point + num_points; j++) {
-		if (plot->points[j].type == UNDEFINED) 
+		if (plot->points[j].type == UNDEFINED)
 		    continue;
 
 		y += plot->points[j].y;
@@ -1093,7 +1093,7 @@ gen_interp(struct curve_points *plot)
 	    free((char *) bc);
 	    break;
 	case SMOOTH_KDENSITY:
-	    do_kdensity( plot, first_point, num_points, 
+	    do_kdensity( plot, first_point, num_points,
 		       new_points + i * (samples_1 + 1));
 	    break;
 	default:		/* keep gcc -Wall quiet */
@@ -1176,8 +1176,8 @@ cp_implode(struct curve_points *cp)
     j = 0;
     first_point = 0;
     while ((num_points = next_curve(cp, &first_point)) > 0) {
-	k = 0;
 	TBOOLEAN last_point = FALSE;
+	k = 0;
 
 	for (i = first_point; i <= first_point + num_points; i++) {
 
@@ -1223,7 +1223,7 @@ cp_implode(struct curve_points *cp)
 		cp->points[j].z = weight / (double) k;
 		/* HBB 20000405: I wanted to use STORE_AND_FIXUP_RANGE here,
 		 * but won't: it assumes we want to modify the range, and
-		 * that the range is given in 'input' coordinates. 
+		 * that the range is given in 'input' coordinates.
 		 */
 		cp->points[j].type = INRANGE;
 		if (! all_inrange) {
@@ -1340,7 +1340,7 @@ mcs_interp(struct curve_points *plot)
 	    exact = TRUE;
 	} else {
 	    int low = 0;
-	    int mid; 
+	    int mid;
 	    int high = N-1;
 	    while (low <= high) {
 		mid = floor((low + high) / 2);
