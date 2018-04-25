@@ -1366,21 +1366,25 @@ draw_enhanced_init(HDC hdc)
 LPWSTR
 UnicodeTextWithEscapes(LPCSTR str, enum set_encoding_id encoding)
 {
-	LPWSTR textw = UnicodeText(str, encoding);
+	LPWSTR p;
+	LPWSTR textw;
 
+	textw = UnicodeText(str, encoding);
 	if (encoding == S_ENC_UTF8)
 		return textw;  // Escapes already handled in core gnuplot
 
-	LPWSTR p = wcsstr(textw, L"\\");
+	p = wcsstr(textw, L"\\");
 	if (p != NULL) {
+		LPWSTR q, r;
+
 		// make a copy of the string
 		LPWSTR w = (LPWSTR) malloc(wcslen(textw) * sizeof(WCHAR));
 		wcsncpy(w, textw, (p - textw));
 
 		// q points at end of new string
-		LPWSTR q = w + (p - textw);
+		q = w + (p - textw);
 		// r is the remaining string to copy
-		LPWSTR r = p;
+		r = p;
 
 		*q = 0;
 		do {
@@ -1411,8 +1415,10 @@ UnicodeTextWithEscapes(LPCSTR str, enum set_encoding_id encoding)
 				}
 			}
 			if (length > 0) {
+				int i;
+
 				p += (codepoint > 0xFFFF) ? 8 : 7;
-				for (int i = 0; i < length; i++, q++)
+				for (i = 0; i < length; i++, q++)
 					*q = wstr[i];
 			} else if (p[1] == '\\') {
 				p++;
