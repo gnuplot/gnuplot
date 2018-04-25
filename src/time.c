@@ -31,15 +31,10 @@
 ]*/
 
 
-/* This module either adds a routine gstrptime() to read a formatted time,
- * augmenting the standard suite of time routines provided by ansi,
- * or it completely replaces the whole lot with a new set of routines
- * which count time relative to the EPOCH date. Default is to use the
- * new routines. Define USE_SYSTEM_TIME to use the system routines, at your
- * own risk. One problem in particular is that not all systems allow
- * the time with integer value 0 to be represented symbolically, which
- * prevents use of relative times.  Also, the system routines do not allow
- * you to read in fractional seconds.
+/* This module provides a set of routines to read or write times using
+ * human-friendly units (hours, days, years, etc).  Unlike similar
+ * ansi routines, these ones support sub-second precision and relative
+ * times.  E.g.   -1.23 seconds is a valid time.
  */
 
 
@@ -62,13 +57,6 @@ read_int(char *s, int nr, int *d)
     return (s);
 }
 
-
-
-#ifndef USE_SYSTEM_TIME
-
-/* a new set of routines to completely replace the ansi ones
- * Use at your own risk
- */
 
 static int gdysize __PROTO((int yr));
 
@@ -818,105 +806,3 @@ ggmtime(struct tm *tm, double l_clock)
     return (0);
 }
 
-
-
-
-#else /* USE_SYSTEM_TIME */
-
-/* define gnu time routines in terms of system time routines */
-
-size_t
-gstrftime(char *buf, size_t bufsz, const char *fmt, double l_clock)
-{
-    time_t t = (time_t) l_clock;
-    return strftime(buf, bufsz, fmt, gmtime(&t));
-}
-
-double
-gtimegm(struct tm *tm)
-{
-    return (double) mktime(tm);
-}
-
-int
-ggmtime(struct tm *tm, double l_clock)
-{
-    time_t t = (time_t) l_clock;
-    struct tm *m = gmtime(&t);
-    *tm = *m;			/* can any non-ansi compilers not do this ? */
-    return 0;
-}
-
-/* supplemental routine gstrptime() to read a formatted time */
-
-char *
-gstrptime(char *s, char *fmt, struct tm *tm)
-{
-    FPRINTF((stderr, "gstrptime(\"%s\", \"%s\")\n", s, fmt));
-
-    /* linux does not appear to like years before 1902
-     * NT complains if its before 1970
-     * initialise fields to midnight, 1st Jan, 1970 (for relative times)
-     */
-    tm->tm_sec = tm->tm_min = tm->tm_hour = 0;
-    tm->tm_mday = 1;
-    tm->tm_mon = 0;
-    tm->tm_year = 70;
-    /* oops - it goes wrong without this */
-    tm->tm_isdst = 0;
-
-    for (; *fmt && *s; ++fmt) {
-	if (*fmt != '%') {
-	    if (*s != *fmt)
-		return s;
-	    ++s;
-	    continue;
-	}
-	assert(*fmt == '%');
-
-	switch (*++fmt) {
-	case 0:
-	    /* uh oh - % is last character in format */
-	    return s;
-	case '%':
-	    /* literal % */
-	    if (*s++ != '%')
-		return s - 1;
-	    continue;
-
-#define NOTHING	/* nothing */
-#define LETTER(L, width, field, extra)		\
-	case L:					\
-	    s=read_int(s,width,&tm->field);	\
-	    extra;				\
-	    continue;
-
-	    LETTER('d', 2, tm_mday, NOTHING);
-	    LETTER('m', 2, tm_mon, NOTHING);
-	    LETTER('y', 2, tm_year, NOTHING);
-	    LETTER('Y', 4, tm_year, tm->tm_year -= 1900);
-	    LETTER('H', 2, tm_hour, NOTHING);
-	    LETTER('M', 2, tm_min, NOTHING);
-	    LETTER('S', 2, tm_sec, NOTHING);
-#undef NOTHING
-#undef LETTER
-
-	default:
-	    int_error(DATAFILE, "incorrect time format character");
-	}
-    }
-
-    FPRINTF((stderr, "Before mktime : %d/%d/%d:%d:%d:%d\n", tm->tm_mday, tm->tm_mon, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
-    /* mktime range-checks the time */
-
-    if (mktime(tm) == -1) {
-	FPRINTF((stderr, "mktime() was not happy\n"));
-	int_error(DATAFILE, "Invalid date/time [mktime() did not like it]");
-    }
-    FPRINTF((stderr, "After mktime : %d/%d/%d:%d:%d:%d\n", tm->tm_mday, tm->tm_mon, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
-
-    return s;
-}
-
-
-#endif /* USE_SYSTEM_TIME */
