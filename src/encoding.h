@@ -35,6 +35,7 @@
 
 void init_encoding(void);
 enum set_encoding_id encoding_from_locale(void);
+void init_special_chars(void);
 
 const char * latex_input_encoding(enum set_encoding_id encoding);
 

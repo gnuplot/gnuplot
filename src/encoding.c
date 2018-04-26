@@ -33,7 +33,7 @@
 #include "syscfg.h"
 #include "term_api.h"
 #include "encoding.h"
-#include "setshow.h"  /* init_special_chars */
+#include "util.h"
 #ifdef _WIN32
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>
@@ -42,6 +42,9 @@
 #if defined(_WIN32) || defined(MSDOS)
 static enum set_encoding_id map_codepage_to_encoding(unsigned int cp);
 #endif
+static const char * encoding_micro(void);
+static const char * encoding_minus(void);
+static void set_degreesign(char *);
 static TBOOLEAN utf8_getmore(unsigned long * wch, const char **str, int nbytes);
 
 
@@ -118,6 +121,122 @@ encoding_from_locale(void)
     }
 #endif
     return encoding;
+}
+
+
+void
+init_special_chars(void)
+{
+    /* Set degree sign to match encoding */
+    char * l = NULL;
+#ifdef HAVE_LOCALE_H
+    l = setlocale(LC_CTYPE, "");
+#endif
+    set_degreesign(l);
+
+    /* Set minus sign to match encoding */
+    minus_sign = encoding_minus();
+
+    /* Set micro character to match encoding */
+    micro = encoding_micro();
+}
+
+
+/* Encoding-specific character enabled by "set micro" */
+static const char *
+encoding_micro()
+{
+    static const char micro_utf8[4] = {0xC2, 0xB5, 0x0, 0x0};
+    static const char micro_437[2] = {0x96, 0x0};
+    static const char micro_latin1[2] = {0xB5, 0x0};
+    static const char micro_default[2] = {'u', 0x0};
+    switch (encoding) {
+	case S_ENC_UTF8:	return micro_utf8;
+	case S_ENC_CP1250:
+	case S_ENC_CP1251:
+	case S_ENC_CP1252:
+	case S_ENC_CP1254:
+	case S_ENC_ISO8859_1:
+	case S_ENC_ISO8859_9:
+	case S_ENC_ISO8859_15:	return micro_latin1;
+	case S_ENC_CP437:
+	case S_ENC_CP850:	return micro_437;
+	default:		return micro_default;
+    }
+}
+
+
+/* Encoding-specific character enabled by "set minussign" */
+static const char *
+encoding_minus()
+{
+    static const char minus_utf8[4] = {0xE2, 0x88, 0x92, 0x0};
+    static const char minus_1252[2] = {0x96, 0x0};
+    /* NB: This SJIS character is correct, but produces bad spacing if used	*/
+    /*     static const char minus_sjis[4] = {0x81, 0x7c, 0x0, 0x0};		*/
+    switch (encoding) {
+	case S_ENC_UTF8:	return minus_utf8;
+	case S_ENC_CP1252:	return minus_1252;
+	case S_ENC_SJIS:
+	default:		return NULL;
+    }
+}
+
+
+static void
+set_degreesign(char *locale)
+{
+#if defined(HAVE_ICONV) && !(defined _WIN32)
+    char degree_utf8[3] = {'\302', '\260', '\0'};
+    size_t lengthin = 3;
+    size_t lengthout = 8;
+    char *in = degree_utf8;
+    char *out = degree_sign;
+    iconv_t cd;
+
+    if (locale) {
+	/* This should work even if gnuplot doesn't understand the encoding */
+#ifdef HAVE_LANGINFO_H
+	char *cencoding = nl_langinfo(CODESET);
+#else
+	char *cencoding = strchr(locale, '.');
+	if (cencoding)
+	    cencoding++; /* Step past the dot in, e.g., ja_JP.EUC-JP */
+#endif
+	if (cencoding) {
+	    if (strcmp(cencoding,"UTF-8") == 0)
+		strcpy(degree_sign,degree_utf8);
+	    else if ((cd = iconv_open(cencoding, "UTF-8")) == (iconv_t)(-1))
+		int_warn(NO_CARET, "iconv_open failed for %s", cencoding);
+	    else {
+		if (iconv(cd, &in, &lengthin, &out, &lengthout) == (size_t)(-1))
+		    int_warn(NO_CARET, "iconv failed to convert degree sign");
+		iconv_close(cd);
+	    }
+	}
+	return;
+    }
+#else
+    (void)locale; /* -Wunused argument */
+#endif
+
+    /* These are the internally-known encodings */
+    memset(degree_sign, 0, sizeof(degree_sign));
+    switch (encoding) {
+    case S_ENC_UTF8:	degree_sign[0] = '\302'; degree_sign[1] = '\260'; break;
+    case S_ENC_KOI8_R:
+    case S_ENC_KOI8_U:	degree_sign[0] = '\234'; break;
+    case S_ENC_CP437:
+    case S_ENC_CP850:
+    case S_ENC_CP852:	degree_sign[0] = '\370'; break;
+    case S_ENC_SJIS:	break;  /* should be 0x818B */
+    case S_ENC_CP950:	break;  /* should be 0xA258 */
+    /* default applies at least to:
+       ISO8859-1, -2, -9, -15,
+       CP1250, CP1251, CP1252, CP1254
+     */
+    default:		degree_sign[0] = '\260'; break;
+    }
 }
 
 
