@@ -1020,6 +1020,13 @@ AS_IF([test "x${with_bitmap_terminals}" = "xyes"],,
           [ Define to disable terminals that depend on code in bitmap.c ]))
 AM_CONDITIONAL(BUILD_BITMAP, test "${with_bitmap_terminals}" = yes)
 
+dnl  Allow to disable support for tektronix terminal emulators
+AC_ARG_WITH(tektronix,dnl
+[  --without-tektronix      tektronix terminal emulators (default enabled)])
+AS_IF([test "x${with_tektronix}" != "xno"],
+  AC_DEFINE(WITH_TEKTRONIX,1,
+          [ Define to include support for tektronix terminal emulators ],))
+
 dnl  Allow to include gpic terminal
 AC_ARG_WITH(gpic,dnl
 [  --with-gpic                     gpic terminal])
@@ -1274,6 +1281,15 @@ else
 fi
 AC_MSG_RESULT([    epson, nec, okidata, tandy, and seiko dp414 printers])
 AC_MSG_RESULT([    hp500c, hpdj, hpljii, hppj, pbm, sixel, starc])
+AC_MSG_RESULT([])
+
+if test "$with_tektronix" == no; then
+  AC_MSG_RESULT([  tektronix terminal emulators: no ( --with-tektronix to enable)])
+else
+  AC_MSG_RESULT([  tektronix terminal emulators: yes ( --without-tektronix to disable)])
+fi
+AC_MSG_RESULT([    tek410x tek40 vttek xterm kc_tek40 km_tek40 selanar sixeltek bitgraph])
+AC_MSG_RESULT([    note: not needed for sixel graphics output to vt100-series emulators])
 AC_MSG_RESULT([])
 
 if test "$no_x" != yes; then

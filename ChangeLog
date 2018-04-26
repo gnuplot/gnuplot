@@ -1,3 +1,19 @@
+2018-04-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.ac src/term.h:  ./configure --without-tektronix
+	to disable support for various 1970s/80s era terminal emulators.
+	Terminal types included (or not):
+	  tek410x tek40 vttek xterm kc_tek40 km_tek40 selanar sixeltek bitgraph
+	Notes:
+	To actually include some of these it is also necessary to enable
+	the generic bitmap code:
+	  ./configure --with-tektronix --with-bitmap-terminals
+	Unless for some reason you really need to communicate using tektronix
+	terminal graphics protocol, the prefered option is to use a terminal
+	emulator that supports the vt100 series sixel graphics protocol and
+	select the sixelgd terminal in gnuplot.  You do not need the tektronix
+	terminal code for this.
+
 2018-04-16  Miroslav Sulc <msulc@users.sourceforge.net>
 
 	* src/internal.c (f_div cmplx_divide):  Avoid overflow during complex

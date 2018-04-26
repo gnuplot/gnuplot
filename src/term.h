@@ -188,11 +188,13 @@
 # include "regis.trm"
 #endif
 
-/* Tektronix 4106, 4107, 4109 and 420x terminals */
-# include "t410x.trm"
+#ifdef WITH_TEKTRONIX
+    /* Tektronix 4106, 4107, 4109 and 420x terminals */
+#   include "t410x.trm"
 
-/* a Tek 4010 and others including VT-style */
-# include "tek.trm"
+    /* a Tek 4010 and others including VT-style */
+#   include "tek.trm"
+#endif
 
 
 #endif /* !MSDOS && !_WIN32 */
