@@ -96,16 +96,6 @@
  *      added algorithm for approximation csplines
  *      copied point storage and range fix from plot2d.c
  *
- *  Dec 12, 1995 David Denholm
- *      oops - at the time this is called, stored co-ords are
- *      internal (ie maybe log of data) but min/max are in
- *      user co-ordinates.
- *      Work with min and max of internal co-ords, and
- *      check at the end whether external min and max need to
- *      be increased. (since samples_1 is typically 100 ; we
- *      dont want to take more logs than necessary)
- *      Also, need to take into account which axes are active
- *
  *  Jun 30, 1996 Jens Emmerich
  *      implemented handling of UNDEFINED points
  */
@@ -132,9 +122,8 @@
 
 
 /* store VALUE in STORE, set TYPE to INRANGE/OUTRANGE
- * Do UNDEF_ACTION as appropriate. Adjust range provided
- * type is INRANGE (ie dont adjust y if x is outrange). VALUE must not
- * be same as STORE */
+ * Adjust range provided type is INRANGE (ie dont adjust y if x is outrange).
+ * VALUE must not be same as STORE */
 /* FIXME 20010610:
  * this is so similar to STORE_AND_UPDATE_RANGE() from axis.h
  * that the two should probably be merged.  */
@@ -146,16 +135,14 @@ do {									\
     if ((value) < (min)) {						\
        if ((auto) & AUTOSCALE_MIN)					\
 	   (min) = (value);						\
-       else {								\
+       else								\
 	   (type) = OUTRANGE;						\
-       }								\
     }									\
     if ((value) > (max)) {						\
        if ((auto) & AUTOSCALE_MAX)					\
 	   (max) = (value);						\
-       else {								\
+       else								\
 	   (type) = OUTRANGE;						\
-       }								\
     }									\
 } while(0)
 
@@ -487,11 +474,6 @@ do_bezier(
 /*
  * it should be like this, but it doesn't run. If you find out why,
  * contact me: mgr@asgard.bo.open.de or Lars Hanke 2:243/4802.22@fidonet
- *
- * Well, all this had originally been inside contour.c, so maybe links
- * to functions and of contour.c are broken.
- * ***deleted***
- * end of unused entry point to Gershon's code
  *
  */
 
@@ -987,7 +969,6 @@ gen_interp_frequency(struct curve_points *plot)
 	    for (j = first_point; j < first_point + num_points; j++) {
 		if (plot->points[j].type == UNDEFINED)
 		    continue;
-
 		y_total += plot->points[j].y;
 	    }
 	    first_point += num_points + 1;
@@ -1228,15 +1209,10 @@ cp_implode(struct curve_points *cp)
 		cp->points[j].type = INRANGE;
 		if (! all_inrange) {
 		    if (((x < X_AXIS.min) && !(X_AXIS.autoscale & AUTOSCALE_MIN))
-		    ||  ((x > X_AXIS.max) && !(X_AXIS.autoscale & AUTOSCALE_MAX))) {
-			cp->points[j].type = OUTRANGE;
-			goto is_outrange;
-		    }
-		    if (((y < Y_AXIS.min) && !(Y_AXIS.autoscale & AUTOSCALE_MIN))
+		    ||  ((x > X_AXIS.max) && !(X_AXIS.autoscale & AUTOSCALE_MAX))
+		    ||  ((y < Y_AXIS.min) && !(Y_AXIS.autoscale & AUTOSCALE_MIN))
 		    ||  ((y > Y_AXIS.max) && !(Y_AXIS.autoscale & AUTOSCALE_MAX)))
 			cp->points[j].type = OUTRANGE;
-		is_outrange:
-		    ;
 		} /* if (! all inrange) */
 
 		j++;		/* next valid entry */
