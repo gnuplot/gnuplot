@@ -265,7 +265,7 @@ init_sample_range(AXIS *axis, enum PLOT_TYPE plot_type)
     }
 }
 
-/* 
+/*
  * Fill in the starting values for a just-allocated  parallel axis structure
  */
 void
@@ -295,7 +295,7 @@ extend_parallel_axis(int paxis)
     return &parallel_axis[paxis-1];
 }
 
-/* 
+/*
  * Most of the crashes found during fuzz-testing of version 5.1 were a
  * consequence of an axis range being corrupted, i.e. NaN or Inf.
  * Corruption became easier with the introduction of nonlinear axes,
@@ -1176,7 +1176,7 @@ gen_tics(struct axis *this, tic_callback callback)
 	step = fabs(step);
 
 	if ((minitics != MINI_OFF) && (this->miniticscale != 0)) {
-	    FPRINTF((stderr,"axis.c: %d  start = %g end = %g step = %g base = %g\n", 
+	    FPRINTF((stderr,"axis.c: %d  start = %g end = %g step = %g base = %g\n",
 			__LINE__, start, end, step, this->base));
 
 	    /* {{{  figure out ministart, ministep, miniend */
@@ -1381,7 +1381,7 @@ gen_tics(struct axis *this, tic_callback callback)
 			/* Make up for bad calculation of ministart/ministep/miniend */
 			double this_major = eval_link_function(this, internal);
 			double next_major = eval_link_function(this, internal+step);
-			mtic_user = this_major + mplace/miniend * (next_major - this_major);	
+			mtic_user = this_major + mplace/miniend * (next_major - this_major);
 			mtic_internal = eval_link_function(this->linked_to_primary, mtic_user);
 		    } else if (nonlinear(this) && this->log) {
 			mtic_user = internal + mplace;
@@ -1667,7 +1667,7 @@ set_explicit_range(struct axis *this_axis, double newmin, double newmax)
     this_axis->set_min = newmin;
     this_axis->set_autoscale &= ~AUTOSCALE_MIN;
     this_axis->min_constraint = CONSTRAINT_NONE;
-    
+
     this_axis->set_max = newmax;
     this_axis->set_autoscale &= ~AUTOSCALE_MAX;
     this_axis->max_constraint = CONSTRAINT_NONE;
@@ -2243,7 +2243,7 @@ char *c, *cfmt;
 }
 
 /* Accepts a range of the form [MIN:MAX] or [var=MIN:MAX]
- * Loads new limiting values into axis->min axis->max 
+ * Loads new limiting values into axis->min axis->max
  * Returns
  *	 0 = no range spec present
  *	-1 = range spec with no attached variable name
@@ -2566,7 +2566,7 @@ map_x_double(double value)
 	if (primary->link_udf->at) {
 	    value = eval_link_function(primary, value);
 	    if (undefined)
-		return nan("");
+		return not_a_number();
 	    return axis_map_double(primary, value);
 	}
     }
@@ -2590,7 +2590,7 @@ map_y_double(double value)
 	if (primary->link_udf->at) {
 	    value = eval_link_function(primary, value);
 	    if (undefined)
-		return nan("");
+		return not_a_number();
 	    return axis_map_double(primary, value);
 	}
     }
@@ -2698,7 +2698,7 @@ polar_radius(double r)
  * Mostly for debugging.
  */
 void
-dump_axis_range(struct axis *axis) 
+dump_axis_range(struct axis *axis)
 {
     if (!axis) return;
     fprintf(stderr, "    %10.10s axis min/max %10g %10g data_min/max %10g %10g\n",
