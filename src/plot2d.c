@@ -322,10 +322,16 @@ refresh_bounds(struct curve_points *first_plot, int nplots)
 	 * Otherwise test INRANGE/OUTRANGE against previous data limits.
 	 */
 	if (!this_plot->noautoscale) {
-	    if (x_axis->set_autoscale & AUTOSCALE_MIN && x_axis->data_min < x_axis->min)
-		 x_axis->min = x_axis->data_min;
-	    if (x_axis->set_autoscale & AUTOSCALE_MAX && x_axis->data_max > x_axis->max)
-		 x_axis->max = x_axis->data_max;
+	    if (x_axis->set_autoscale & AUTOSCALE_MIN && x_axis->data_min < x_axis->min) {
+		x_axis->min = x_axis->data_min;
+		if (nonlinear(x_axis))
+		    x_axis->linked_to_primary->min = x_axis->linked_to_primary->data_min;
+	    }
+	    if (x_axis->set_autoscale & AUTOSCALE_MAX && x_axis->data_max > x_axis->max) {
+		x_axis->max = x_axis->data_max;
+		if (nonlinear(x_axis))
+		    x_axis->linked_to_primary->max = x_axis->linked_to_primary->data_max;
+	    }
 	}
 
 	for (i=0; i<this_plot->p_count; i++) {
