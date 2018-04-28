@@ -2071,7 +2071,7 @@ refresh_command()
 void
 refresh_request()
 {
-    FPRINTF((stderr,"refresh_request\n"));
+    AXIS_INDEX axis;
 
     if (   ((first_plot == NULL) && (refresh_ok == E_REFRESH_OK_2D))
         || ((first_3dplot == NULL) && (refresh_ok == E_REFRESH_OK_3D))
@@ -2085,30 +2085,24 @@ refresh_request()
 	return;
     }
 
-    /* If the state has been reset to autoscale since the last plot,
-     * initialize the axis limits.
+    /* Restore the axis range/scaling state from original plot
+     * Dima Kogan April 2018
      */
-    AXIS_INIT2D_REFRESH(FIRST_X_AXIS,TRUE);
-    AXIS_INIT2D_REFRESH(FIRST_Y_AXIS,TRUE);
-    AXIS_INIT2D_REFRESH(SECOND_X_AXIS,TRUE);
-    AXIS_INIT2D_REFRESH(SECOND_Y_AXIS,TRUE);
+    for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++) {
+	AXIS *this_axis = &axis_array[axis];
+	if (this_axis->set_autoscale & AUTOSCALE_MIN)
+	    this_axis->set_min = this_axis->writeback_min;
+	else
+	    this_axis->min = this_axis->set_min;
+	if (this_axis->set_autoscale & AUTOSCALE_MAX)
+	    this_axis->set_max = this_axis->writeback_max;
+	else
+	    this_axis->max = this_axis->set_max;
 
-    AXIS_UPDATE2D_REFRESH(T_AXIS);  /* Untested: T and R want INIT2D or UPDATE2D?? */
-    AXIS_UPDATE2D_REFRESH(POLAR_AXIS);
-
-    AXIS_UPDATE2D_REFRESH(FIRST_Z_AXIS);
-    AXIS_UPDATE2D_REFRESH(COLOR_AXIS);
-
-    /* Nonlinear mapping of x or y via linkage to a hidden primary axis */
-    if (nonlinear(&axis_array[FIRST_X_AXIS])) {
-	AXIS *primary = axis_array[FIRST_X_AXIS].linked_to_primary;
-	primary->min = primary->set_min;
-	primary->max = primary->set_max;
-    }
-    if (nonlinear(&axis_array[FIRST_Y_AXIS])) {
-	AXIS *primary = axis_array[FIRST_Y_AXIS].linked_to_primary;
-	primary->min = primary->set_min;
-	primary->max = primary->set_max;
+	if (this_axis->linked_to_secondary)
+	    clone_linked_axes(this_axis, this_axis->linked_to_secondary);
+	else if (this_axis->linked_to_primary)
+	    clone_linked_axes(this_axis, this_axis->linked_to_primary);
     }
 
     if (refresh_ok == E_REFRESH_OK_2D) {

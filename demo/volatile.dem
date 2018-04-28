@@ -1,8 +1,13 @@
 #
 # Unit test for "volatile" "skip" "refresh"
+# If the refreshed plot exactly overlies the orginal it's good.
 #
 set title "Nothing interesting here, just a unit test for volatile, skip, and refresh"
 set style data lines
-splot "whale.dat" skip 5 volatile
+set multiplot
+set tics tc "red"
+splot "whale.dat" skip 5 volatile lw 0.5
+set tics tc "black"
 refresh
+unset multiplot
 reset

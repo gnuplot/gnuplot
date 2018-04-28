@@ -247,6 +247,16 @@ plot3drequest()
     axis_init(&axis_array[V_AXIS], FALSE);
     axis_init(&axis_array[COLOR_AXIS], TRUE);
 
+    /* Always be prepared to restore the autoscaled values on "refresh"
+     * Dima Kogan April 2018
+     * FIXME: Could we fold this into axis_init?
+     */
+    for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++) {
+	AXIS *this_axis = &axis_array[axis];
+	if (this_axis->set_autoscale != AUTOSCALE_NONE)
+	    this_axis->range_flags |= RANGE_WRITEBACK;
+    }
+
     /* Nonlinear mapping of x or y via linkage to a hidden primary axis. */
     /* The user set autoscale for the visible axis; apply it also to the hidden axis. */
     for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++) {

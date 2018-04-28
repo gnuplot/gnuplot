@@ -398,29 +398,6 @@ extern struct axis THETA_AXIS;
 #define axis_mapback(axis, pos) \
     (((double)(pos) - (axis)->term_lower)/(axis)->term_scale + (axis)->min)
 
-
-/* AXIS_INIT2D_REFRESH and AXIS_UPDATE2D_REFRESH(axis) are for volatile data */
-#define AXIS_INIT2D_REFRESH(axis, infinite)				\
-do {									\
-    AXIS *this = axis_array + axis;					\
-									\
-    this->autoscale = this->set_autoscale;				\
-    this->min = (infinite && (this->set_autoscale & AUTOSCALE_MIN))	\
-	? VERYLARGE : this->set_min;		\
-    this->max = (infinite && (this->set_autoscale & AUTOSCALE_MAX))	\
-	? -VERYLARGE : this->set_max;		\
-    this->log_base = this->log ? log(this->base) : 0;			\
-} while(0)
-
-#define AXIS_UPDATE2D_REFRESH(axis)					\
-do {									\
-    AXIS *this_axis = axis_array + axis;				\
-    if ((this_axis->set_autoscale & AUTOSCALE_MIN) == 0)		\
-	this_axis->min = this_axis->set_min;	\
-    if ((this_axis->set_autoscale & AUTOSCALE_MAX) == 0)		\
-	this_axis->max = this_axis->set_max;	\
-} while (0)
-
 /* Simplest form of autoscaling (no check on autoscale constraints).
  * Used by refresh_bounds() and refresh_3dbounds().
  */
