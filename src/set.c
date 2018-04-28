@@ -61,12 +61,6 @@
 #include "pm3d.h"
 #include "getcolor.h"
 #include <ctype.h>
-#ifdef HAVE_ICONV
-#include <iconv.h>
-#endif
-#ifdef HAVE_LANGINFO_H
-#include <langinfo.h>
-#endif
 #ifdef USE_MOUSE
 #include "mouse.h"
 #endif
@@ -176,9 +170,6 @@ static void parse_histogramstyle __PROTO((histogram_style *hs,
 		t_histogram_type def_type, int def_gap));
 static void set_style_parallel __PROTO((void));
 static void parse_lighting_options __PROTO((void));
-
-static const char *encoding_micro __PROTO((void));
-static const char *encoding_minus __PROTO((void));
 
 static const struct position default_position
 	= {first_axes, first_axes, first_axes, 0., 0., 0.};

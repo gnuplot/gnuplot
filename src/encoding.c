@@ -34,6 +34,14 @@
 #include "term_api.h"
 #include "encoding.h"
 #include "util.h"
+
+#ifdef HAVE_ICONV
+#include <iconv.h>
+#endif
+#ifdef HAVE_LANGINFO_H
+#include <langinfo.h>
+#endif
+
 #ifdef _WIN32
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>
