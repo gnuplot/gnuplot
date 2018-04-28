@@ -322,7 +322,7 @@ LUA_GP_term_out(lua_State *L) {
       do
         c = tos_getch();
       while (c != '\x04' && c != '\r' && c != '\n');
-#elif defined(_WIN32)
+#elif defined(_WIN32) || defined(MSDOS)
       do
         c = getchar();
       while (c != EOF && c != '\n' && c != '\r');
