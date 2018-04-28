@@ -214,14 +214,16 @@ FILE * win_popen(const char *filename, const char *mode);
 # define __PROTO(proto) ()
 #endif
 
-/* DOS/Windows stuff. Moved here from command.c */
+/* DOS stuff */
 #if defined(MSDOS)
-# ifdef DJGPP
+# ifdef __DJGPP__
 #  include <dos.h>
 #  include <dir.h>              /* HBB: for setdisk() */
-# else
+# elif defined(__WATCOMC__)
+#  include <dos.h>
+#  include <direct.h>
 #  include <process.h>
-# endif                         /* !DJGPP */
+# endif                         /* !__DJGPP__ */
 #endif /* MSDOS */
 
 /* Watcom's compiler; this should probably be somewhere

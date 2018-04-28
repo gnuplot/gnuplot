@@ -43,7 +43,7 @@
 #include "setshow.h"		/* for conv_text() */
 #include "tabulate.h"		/* for table_mode */
 #include "encoding.h"
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(__WATCOMC__)
 # include <io.h>		/* for _access */
 #endif
 #if defined(HAVE_DIRENT_H) && !defined(_WIN32)
