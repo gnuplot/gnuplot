@@ -1,11 +1,11 @@
 #
-# GNUPLOT Makefile for Watcom C
+# GNUPLOT Makefile for OpenWatcom C
 #
 # Modified from the TurboC makefile by Aurel Gabris
 # Heavily modified and updated for OpenWatcom 1.2 by HBB
 #
-# the makefile does longer depends on a linker options file.
-# this file will be created as needed.                          (AL 07/17/92)
+# The makefile does no longer depend on a linker options file.
+# It will be created as needed.                          (AL 07/17/92)
 
 # where to place gnuplot.gih helpfile
 HELPFILE = gnuplot.gih
@@ -15,7 +15,8 @@ CC = wcc386
 CL = wcl386
 LINK = wlink
 
-!ifdef __LOADDLL__
+# Does not seem to work here. Re-enable by removing "NO" below
+!ifdef NO__LOADDLL__
 !  loaddll wcc      wccd
 !  loaddll wccaxp   wccdaxp
 !  loaddll wcc386   wccd386
@@ -38,9 +39,8 @@ M=..\demo\
 !include makefile.awc
 
 # -DHAVE_CONFIG_H: do the configuration #defines the (now) usual way
-# -DREADLINE to use the history/line editing capability. If you want this
-#    capability add -DREADLINE to CFLAGS
-CPPFLAGS=-DHAVE_CONFIG_H -UMSDOS -DDOS386 -DDOS386 -DDOS32 -DPC
+CPPFLAGS=-DHAVE_CONFIG_H -DMSDOS -DPC -D__DOS__
+# was: -UMSDOS -DDOS386 -DDOS32
 
 # -w0 means ignore warnings and do not report them
 # -d1{+} means include line numbers for debugger
@@ -53,12 +53,12 @@ CPPFLAGS=-DHAVE_CONFIG_H -UMSDOS -DDOS386 -DDOS386 -DDOS32 -DPC
 #      a           -> relax aliasing constraints
 #      f           -> generate traceable stack frames as needed
 #           The selection of the optimization flags include some wizardry.
-#           Thus omiting any flags from the above two, may result in run-time
+#           Thus omitting any flags from the above two, may result in run-time
 #           errors.
 #      m           -> generate inline 80x87 code for math functions
 #      d           -> disable all optimizations (Watch out!)
 # option {stack=n} sets stack size to n
-CFLAGS = -zq -m$(MODEL) -d2 -zm -omaf -fpi -fp3 -I. $(CPPFLAGS)
+CFLAGS = -zq -m$(MODEL) -d2 -zm -omaf -fpi -fp3 -I. -bt=dos4g $(CPPFLAGS)
 DOC2XXX_FLAGS = -I$(D) -I$(T) $(CFLAGS) 
 TERMFLAGS =
 
@@ -72,19 +72,20 @@ all: gnuplot.exe $(HELPFILE) $(BINFILES) .SYMBOLIC
 # use linkopt.wc to avoid command-line overflow
 
 gnuplot.exe: config.h $(OBJS) .PRECIOUS
-	$(LINK) @<<linkopt.wc
-system dos4g 
-OPTION stack=100000
-DEBUG WATCOM ALL
+        $(LINK) @<<linkopt.wc $(LDLIBS)
+SYSTEM dos4g
+OPTION STACK=512K
+DEBUG ALL
+OPTION quiet
+FILE {
+ $(OBJS)
+}
 OPTION SYMFILE
 OPTION MAP
+NAME $^&
 OPTION ELIMINATE
-OPTION QUIET
-NAME gnuplot 
-file {
-$(OBJS)
-}
 <<
+
 
 # default rules
 

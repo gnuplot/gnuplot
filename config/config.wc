@@ -1,26 +1,26 @@
 /* config.h for makefile.wc */
         
 /* gnuplot feature enablers */
-#define BINARY_DATA_FILE	1
-#define GP_ENH_EST		1
-#define GP_ISVAR		1
-#define GP_MACROS		1
-#define HIDDEN3D_QUADTREE	1
-#define USE_ULIG_FILLEDBOXES	   1
-#define USE_ULIG_RELATIVE_BOXWIDTH 1
+#define EAM_OBJECTS             1
+#define HIDDEN3D_QUADTREE       1
+#define USE_STATS               1
+#define EAM_BOXED_TEXT          1
 
-
+#define READLINE                1
+#define GNUPLOT_HISTORY         1
 
 #undef NO_GIH
-#define READLINE
 #define GP_INLINE __inline
-#define NEAR near
 
 #define PROTOTYPES              1
 #define RETSIGTYPE              void
 #undef STAT_MACROS_BROKEN
 #define STDC_HEADERS            1
 
+/* enable LFN support (if available) */
+#ifndef __WATCOM_LFN__
+# define __WATCOM_LFN__
+#endif
 
 #undef HAVE_DIRENT_H
 #define HAVE_ERRNO_H            1
@@ -36,7 +36,7 @@
 #undef HAVE_SYS_SELECT_H
 #undef HAVE_SYS_SOCKET_H
 #define HAVE_SYS_STAT_H         1
-#define HAVE_SYS_TIME_H         1
+//#define HAVE_SYS_TIME_H         1
 #define HAVE_SYS_TIMEB_H        1
 #define HAVE_SYS_TYPES_H        1
 #undef HAVE_TERMIOS_H
@@ -65,5 +65,16 @@
 #define HAVE_STRSTR             1
 #define HAVE_TIME_T_IN_TIME_H   1
 #define HAVE_VFPRINTF           1
+#define HAVE_STDBOOL_H          1
 
+#if __WATCOMC__ > 1290
+# define HAVE_ERF
+# define HAVE_ERFC
+#endif
 
+#define __STDC_WANT_LIB_EXT1__ 1
+#define strnlen strnlen_s
+#define ftruncate _chsize
+#define _fcloseall fcloseall
+#define mktemp _mktemp
+#define wcsnicmp _wcsnicmp
