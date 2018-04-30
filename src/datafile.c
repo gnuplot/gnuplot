@@ -993,6 +993,7 @@ initialize_use_spec()
 	    free_at(use_spec[i].at);
 	    use_spec[i].at = NULL;  /* no expression */
 	}
+	use_spec[i].depends_on_column = -1;  /* we don't know of any dependence */
 	df_axis[i] = NO_AXIS; /* no timefmt for this output column */
     }
 }
@@ -1610,15 +1611,29 @@ plot_option_using(int max_using)
 		/* do not increment c+token ; let while() find the : */
 
 	    } else if (equals(c_token, "(")) {
+		int i;
+		struct use_spec_s *spec = &use_spec[df_no_use_specs];
+
 		fast_columns = 0;       /* corey@cac */
 		dummy_func = NULL;      /* no dummy variables active */
-		/* this will match ()'s: */
 		at_highest_column_used = NO_COLUMN_HEADER;
-		use_spec[df_no_use_specs].at = perm_at();
+
+		spec->at = perm_at();
 		if (no_cols < at_highest_column_used)
 		    no_cols = at_highest_column_used;
+
+		/* Try to detect dependence on a particular column so that
+		 * if it contains a "missing value" placeholder we can skip
+		 * evaluation altogether.
+		 */
+		for (i = 0; i < spec->at->a_count; i++) {
+		    if (spec->at->actions[i].index == DOLLARS)
+			spec->depends_on_column = (int)spec->at->actions[i].arg.v_arg.v.int_val;
+		}
+
 		/* Catch at least the simplest case of 'autotitle columnhead' using an expression */
-		use_spec[df_no_use_specs++].column = at_highest_column_used;
+		spec->column = at_highest_column_used;
+		df_no_use_specs++;
 
 	    /* It would be nice to handle these like any other      */
 	    /* internal function via perm_at() but it doesn't work. */
@@ -2093,15 +2108,29 @@ df_readascii(double v[], int max)
 		if (use_spec[output].at) {
 		    struct value a;
 		    TBOOLEAN timefield = FALSE;
-		    /* no dummy values to set up prior to... */
+
+		    /* Don't try to evaluate an expression that depends on a
+		     * data field value that is missing.
+		     */
+		    if (use_spec[output].depends_on_column > 0) {
+			if (df_column[use_spec[output].depends_on_column-1].good == DF_MISSING) {
+			    FPRINTF((stderr,
+				"df_readascii: skipping evaluation that uses missing value in $%d\n",
+				use_spec[output].depends_on_column));
+			    v[output] = not_a_number();
+			    return_value = DF_MISSING;
+			    continue;
+			}
+		    }
+
 		    a.type = NOTDEFINED;
 		    evaluate_inside_using = TRUE;
 		    evaluate_at(use_spec[output].at, &a);
 		    evaluate_inside_using = FALSE;
-		    /* If column N contains the "missing" flag and is referenced by */
-		    /* using N then we caught it already.  Here we are checking for */
-		    /* indirect references like using ($N) or using "header_of_N".  */
-		    /* It does not catch deeper evaluations like using (2*f($N)).   */
+		    /* If column N contains the "missing" flag and is referenced by
+		     * 'using N' or 'using (func($N)) then we caught it already.
+		     * Here we check for indirect references like 'using "header_of_N"'.
+		     */
 		    if ((a.type == CMPLX) && isnan(a.v.cmplx_val.real)
 		    && (a.v.cmplx_val.imag == DF_MISSING)) {
 			return_value = DF_MISSING;

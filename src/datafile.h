@@ -155,6 +155,7 @@ struct use_spec_s {
     int column;
     int expected_type;
     struct at_type *at;
+    int depends_on_column;
 };
 
 
