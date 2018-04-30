@@ -2,6 +2,7 @@ Changes in 5.2.4
 ================
 
 * FIX font-handling bug; line-spacing of previous font still in effect
+* CHANGE generalize the test for missing data flag in input data
 
 Changes in 5.2.3
 ================

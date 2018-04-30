@@ -8686,13 +8686,13 @@ Ffigure_missing
 ^ <a href="http://www.gnuplot.info/demo/mgr.html">
  imageNaN demo.
 ^ </a>
- As of version 5.0.6 this is also true for the missing value flag.
- Earlier versions failed to recognize the missing value flag if the plot
- command specified `using ($N)` rather than `using N`.  Note, however, that
- even in current gnuplot using a "missing" value for computation will result
- in NaN. I.e. a `missing` string in either columns 1 or 2 will cause
- `using ($1+$2)` to evaluate as NaN.  If you nevertheless want to treat this
- as missing data, use the command `set datafile missing NaN`.
+ Similarly gnuplot now notices the missing value flag in column N whether
+ the plot command specifies `using N` or `using ($N)` or `using (func($N))`.
+ However if the "missing" value is encountered during evaluation of some more
+ complicated expression, e.g. `using (column(strcol(1))`, it may evaluate to
+ NaN and be treated as invalid data rather than as a missing data point.
+ If you nevertheless want to treat this as missing data, use the command
+ `set datafile missing NaN`.
 4 set datafile separator
 ?set datafile separator
 ?show datafile separator

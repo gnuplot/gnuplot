@@ -1,7 +1,3 @@
-/*
- * $Id: datafile.h,v 1.52 2016/08/19 16:51:58 sfeam Exp $
- */
-
 /* GNUPLOT - datafile.h */
 
 /*[
@@ -162,6 +158,7 @@ struct use_spec_s {
     int column;
     int expected_type;
     struct at_type *at;
+    int depends_on_column;
 };
 
 

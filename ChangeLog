@@ -1,5 +1,20 @@
 2018-05-05  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/datafile.c src/datafile.h:  Skip evaluation of expressions in
+	a 'using" specifier that depend on a missing data value.  The presence
+	of a "missing" flag in the input is easy to detect if it is encountered
+	in place of a bare number ('using N'), but if it is encountered while
+	evaluating an expression ('using (func($N))') then the function may
+	exit via int_error() before the missing value can be flagged for the
+	calling code.  Now we pre-screen expressions in a using spec for the
+	presence of "$N" and note this dependence in a new field
+	use_spec->depends_on_column.  During data input if that field is
+	non-zero the corresponding column can be checked for a missing value
+	flag before evaluating the expression.
+	Bug #2042
+
+2018-05-05  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* src/term.c term/post.trm: Move postscript-specific fix from
 	ignore_enhanced() into ENHPS_put_text().
 
