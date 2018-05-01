@@ -901,7 +901,7 @@ PSTRICKS_set_color(t_colorspec *colorspec)
 #ifdef PSTRICKS_SHORTER_FILE
 	PSTRICKS_color = new_color;
 #endif
-	sprintf(PSTRICKS_color_str, "PST@COLOR%d", new_color);
+	snprintf(PSTRICKS_color_str, sizeof(PSTRICKS_color_str), "PST@COLOR%d", new_color);
 	PSTRICKS_save_color(PSTRICKS_color_str);
 	break;
     case TC_RGB: {
