@@ -2113,7 +2113,8 @@ df_readascii(double v[], int max)
 		     * data field value that is missing.
 		     */
 		    if (use_spec[output].depends_on_column > 0) {
-			if (df_column[use_spec[output].depends_on_column-1].good == DF_MISSING) {
+			if ((use_spec[output].depends_on_column > df_no_cols)
+			||  df_column[use_spec[output].depends_on_column-1].good == DF_MISSING) {
 			    FPRINTF((stderr,
 				"df_readascii: skipping evaluation that uses missing value in $%d\n",
 				use_spec[output].depends_on_column));
