@@ -112,6 +112,7 @@ TERM_PUBLIC void SVG_hypertext __PROTO((int, const char *));
 
 #ifdef WRITE_PNG_IMAGE
 TERM_PUBLIC void SVG_image __PROTO((unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecolor color_mode));
+static int SVG_imageno = 0;
 #endif
 
 #define SVG_SCALE	10.	/* Coordinates accuracy is 1/SVG_SCALE pixel */
@@ -184,7 +185,6 @@ static struct SVG_PEN SVG_pens[16];	/* pen descriptors*/
 static int SVG_fillPattern = -1; /* active fill pattern (-1 == undefined) */
 static unsigned int SVG_fillPatternIndex = 0;
 static int SVG_background = -1;
-static int SVG_imageno = 0;
 static int SVG_plotno = 0;
 static TBOOLEAN SVG_gridline = FALSE;
 static TBOOLEAN SVG_hasgrid = FALSE;
