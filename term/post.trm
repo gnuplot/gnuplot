@@ -270,8 +270,8 @@ static void PS_skip_image __PROTO((int bytes, int x0, int y0, int dx, int dy));
 static void PS_dump_header_to_file __PROTO((char *name));
 #endif
 
-static float ps_fontsize;
-static float ps_fontsize_previous;
+static float ps_fontsize = 14.;
+static float ps_fontsize_previous = -1.;
 
 /* for enhanced mode, we keep a separate font name and size, which
  * is restored to the default value on font of ""

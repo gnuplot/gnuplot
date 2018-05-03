@@ -536,12 +536,15 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 	needed_quadrangles *= (interp_i > 1) ? interp_i : 1;
 	needed_quadrangles *= (interp_j > 1) ? interp_j : 1;
 
-	while (current_quadrangle + needed_quadrangles >= allocated_quadrangles) {
-	    FPRINTF((stderr, "allocated_quadrangles = %d current = %d needed = %d\n",
-		allocated_quadrangles, current_quadrangle, needed_quadrangles));
-	    allocated_quadrangles = needed_quadrangles + 2*allocated_quadrangles;	
-	    quadrangles = (quadrangle*)gp_realloc(quadrangles, 
-			allocated_quadrangles * sizeof (quadrangle), "pm3d_plot->quadrangles");
+	if (needed_quadrangles > 0) {
+	    while (current_quadrangle + needed_quadrangles >= allocated_quadrangles) {
+		FPRINTF((stderr, "allocated_quadrangles = %d current = %d needed = %d\n",
+		    allocated_quadrangles, current_quadrangle, needed_quadrangles));
+		allocated_quadrangles = needed_quadrangles + 2*allocated_quadrangles;
+		quadrangles = (quadrangle*)gp_realloc(quadrangles,
+			    allocated_quadrangles * sizeof (quadrangle),
+			    "pm3d_plot->quadrangles");
+	    }
 	}
     }
     /* pm3d_rearrange_scan_array(this_plot, (struct iso_curve***)0, (int*)0, &scan_array, &invert); */

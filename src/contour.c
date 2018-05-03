@@ -253,6 +253,8 @@ contour(int num_isolines, struct iso_curve *iso_lines)
 	dz = quantize_normal_tics(dz, ((int) contour_levels + 1) * 2);
 	z0 = floor(z_min / dz) * dz;
 	num_of_z_levels = (int) floor((z_max - z0) / dz);
+	if (num_of_z_levels <= 0)
+	    return NULL;
     }
 
     /* Build a list of contour levels */
