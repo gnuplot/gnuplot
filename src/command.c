@@ -112,7 +112,6 @@ int thread_rl_Running = 0;  /* running status */
 int thread_rl_RetCode = -1; /* return code from readline in a thread */
 #endif /* OS2_IPC */
 
-
 #ifndef _WIN32
 # include "help.h"
 #endif
@@ -130,9 +129,13 @@ int thread_rl_RetCode = -1; /* return code from readline in a thread */
 # include "win/winmain.h"
 #endif /* _WIN32 */
 
-#ifdef DJGPP
+#ifdef __DJGPP__
 # include <pc.h>		/* getkey() */
 # define useconds_t unsigned
+#endif
+
+#ifdef __WATCOMC__
+# include <conio.h>		/* for getch() */
 #endif
 
 #ifdef VMS
@@ -1814,14 +1817,18 @@ pause_command()
 	    term->waitforinput(0);
 	} else
 #endif /* USE_MOUSE */
-#ifdef DJGPP
+#ifdef MSDOS
 	{
 	    int junk;
 	    /* cannot use EAT_INPUT_WITH here */
 	    do {
+#ifdef __DJGPP__
 		/* We use getkey() since with DJGPP 2.05 and gcc 7.2,
 		   getchar() requires two keystrokes. */
 		junk = getkey();
+#else
+		junk = getch();
+#endif
 		/* Check if Ctrl-C was pressed */
 		if (junk == 0x03)
 		    bail_to_command_line();
@@ -3273,11 +3280,11 @@ do_shell()
     if (user_shell) {
 #  if defined(_WIN32)
 	if (WinExec(user_shell, SW_SHOWNORMAL) <= 32)
-#  elif defined(DJGPP)
+#  elif defined(__DJGPP__)
 	if (system(user_shell) == -1)
 #  else
 	if (spawnl(P_WAIT, user_shell, NULL) == -1)
-#  endif /* !(_WIN32 || DJGPP) */
+#  endif /* !(_WIN32 || __DJGPP__) */
 	    os_error(NO_CARET, "unable to spawn shell");
     }
 }
@@ -3323,7 +3330,7 @@ do_shell()
 /* read from stdin, everything except VMS */
 
 # ifndef USE_READLINE
-#  if defined(MSDOS) && !defined(__EMX__) && !defined(DJGPP)
+#  if defined(MSDOS) && !defined(__EMX__) && !defined(__DJGPP__)
 
 /* if interactive use console IO so CED will work */
 
