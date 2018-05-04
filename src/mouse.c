@@ -303,7 +303,7 @@ static void
 MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double *y2)
 {
     AXIS *secondary;
-    
+
     if (is_3d_plot) {
 	/* for 3D plots, we treat the mouse position as if it is
 	 * in the bottom plane, i.e., the plane of the x and y axis */
@@ -331,7 +331,7 @@ MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double 
 		+ ((double) xx) / axis3d_y_dx * (axis_array[FIRST_Y_AXIS].max -
 						 axis_array[FIRST_Y_AXIS].min);
 	} else if (axis3d_y_dy != 0) {
-	    if (splot_map) 
+	    if (splot_map)
 		*y = axis_array[FIRST_Y_AXIS].max
 		    + ((double) yy) / axis3d_y_dy * (axis_array[FIRST_Y_AXIS].min -
 						     axis_array[FIRST_Y_AXIS].max);
@@ -1112,7 +1112,7 @@ builtin_nearest_log(struct gp_event_t *ge)
 	if (mouse_x > plot_bounds.xright - (plot_bounds.xright - plot_bounds.xleft) / 4
 	&&  mouse_y > plot_bounds.ybot && mouse_y < plot_bounds.ytop)
 	    change_y2 = TRUE;
-	
+
 	if (change_x1)
 	    do_string(axis_array[FIRST_X_AXIS].log ? "unset log x" : "set log x");
 	if (change_y1)
@@ -1123,7 +1123,7 @@ builtin_nearest_log(struct gp_event_t *ge)
 	    do_string(axis_array[SECOND_Y_AXIS].log ? "unset log y2" : "set log y2");
 	if (!change_x1 && !change_y1 && splot_map)
 	    do_string_replot( Z_AXIS.log ? "unset log z" : "set log z");
-	
+
 	if (change_x1 || change_y1 || change_x2 || change_y2)
 	    do_string_replot("");
     }
@@ -1417,8 +1417,8 @@ event_keypress(struct gp_event_t *ge, TBOOLEAN current)
     keypress.modifier = modifier_mask;
 
     /*
-     * On 'pause mouse keypress' in active window export current keypress 
-     * and mouse coords to user variables. A key with 'bind all' terminates 
+     * On 'pause mouse keypress' in active window export current keypress
+     * and mouse coords to user variables. A key with 'bind all' terminates
      * a pause even from non-active windows.
      * Ignore NULL keypress.
      *
@@ -1558,7 +1558,7 @@ int is_mouse_outside_plot(void)
  * combination of the current limits.
  */
 static double
-rescale(int AXIS, double w1, double w2) 
+rescale(int AXIS, double w1, double w2)
 {
     double newlimit;
     struct axis *axis = &axis_array[AXIS];
@@ -1677,7 +1677,7 @@ rescale_around_mouse(double *newmin, double *newmax, int AXIS, double mouse_pos,
 	axmin = eval_link_function(primary, axmin);
 	axmax = eval_link_function(primary, axmax);
 	mouse_pos = eval_link_function(primary, mouse_pos);
-    } 
+    }
 
   *newmin = mouse_pos + (axmin - mouse_pos) * scale;
   *newmax = mouse_pos + (axmax - mouse_pos) * scale;
@@ -1697,7 +1697,7 @@ zoom_in_X(int zoom_key)
         /* zoom in (X axis only) */
         double w1 = (zoom_key=='+') ? 23./25. : 23./21.;
         double w2 = (zoom_key=='+') ?  2./25. : -2./21.;
-        zoom_rescale_xyx2y2(w1,w2, 1,0, w1,w2, 1,0,  w2,w1, 0,1, w2,w1, 0,1, 
+        zoom_rescale_xyx2y2(w1,w2, 1,0, w1,w2, 1,0,  w2,w1, 0,1, w2,w1, 0,1,
                             (zoom_key=='+' ? "zoom in X" : "zoom out X"));
     } else {
         double xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max;
@@ -1874,19 +1874,19 @@ event_buttonpress(struct gp_event_t *ge)
 	/* Ctrl+Shift+wheel up or Squeeze (not implemented) */
 	if ((modifier_mask & Mod_Ctrl) && (modifier_mask & Mod_Shift))
 	    do_zoom_in_X();
-	
+
 	/* Ctrl+wheel up or Ctrl+stroke */
 	else if ((modifier_mask & Mod_Ctrl))
 	    do_zoom_in_around_mouse();
 
 	/* Horizontal stroke (button 6) or Shift+wheel up */
-	else if (b == 6 || (modifier_mask & Mod_Shift)) 
+	else if (b == 6 || (modifier_mask & Mod_Shift))
 	    do_zoom_scroll_left();
-	
+
 	/* Wheel up (no modifier keys) */
 	else
 	    do_zoom_scroll_up();
-	
+
     } else if (((b == 5) || (b == 7)) && /* 5 - wheel down, 7 - wheel right */
 	       (!replot_disabled || (E_REFRESH_NOT_OK != refresh_ok))	/* Use refresh if available */
 	       && !(paused_for_mouse & PAUSE_BUTTON3)) {
@@ -1894,19 +1894,19 @@ event_buttonpress(struct gp_event_t *ge)
 	/* Ctrl+Shift+wheel down or Unsqueeze (not implemented) */
 	if ((modifier_mask & Mod_Ctrl) && (modifier_mask & Mod_Shift))
 	    do_zoom_out_X();
-	
+
 	/* Ctrl+wheel down or Ctrl+stroke */
 	else if ((modifier_mask & Mod_Ctrl))
 	    do_zoom_out_around_mouse();
 
 	/* Horizontal stroke (button 7) or Shift+wheel down */
-	else if (b == 7 || (modifier_mask & Mod_Shift)) 
+	else if (b == 7 || (modifier_mask & Mod_Shift))
 	    do_zoom_scroll_right();
-	
+
 	/* Wheel down (no modifier keys) */
 	else
 	    do_zoom_scroll_down();
-	
+
     } else if (ALMOST2D) {
         if (!setting_zoom_region) {
 	    if (1 == b) {
@@ -1918,7 +1918,7 @@ event_buttonpress(struct gp_event_t *ge)
 		}
 	    } else if (2 == b) {
 		/* not bound in 2d graphs */
-	    } else if (3 == b && 
+	    } else if (3 == b &&
 	    	(!replot_disabled || (E_REFRESH_NOT_OK != refresh_ok))	/* Use refresh if available */
 		&& !(paused_for_mouse & PAUSE_BUTTON3)) {
 		/* start zoom; but ignore it when
@@ -2289,7 +2289,7 @@ event_reset(struct gp_event_t *ge)
 	/* This hack is necessary on some systems in order to prevent one  */
 	/* character of input from being swallowed when the plot window is */
 	/* closed. But which systems, exactly?                             */
-	if (term && (!strncmp("x11",term->name,3) 
+	if (term && (!strncmp("x11",term->name,3)
 		 || !strncmp("wxt",term->name,3)
 		 || !strncmp("qt",term->name,2)))
 	    ungetc('\n',stdin);
@@ -2421,6 +2421,40 @@ do_event(struct gp_event_t *ge)
 
     replot_disabled = FALSE;	/* enable replot again */
 }
+
+
+/* convenience wrapper for do_event();
+   returns TRUE if it ends pause mouse;
+   currently used by caca.trm, djsvga.trm, and pc.trm */
+TBOOLEAN
+exec_event(char type, int mx, int my, int par1, int par2, int winid)
+{
+    struct gp_event_t ge;
+
+    ge.type = type;
+    ge.mx = mx;
+    ge.my = my;
+    ge.par1 = par1;
+    ge.par2 = par2;
+    ge.winid = winid;
+
+    do_event(&ge);
+
+    /* end pause mouse? */
+    if ((type == GE_buttonrelease) && (paused_for_mouse & PAUSE_CLICK) &&
+	(((par1 == 1) && (paused_for_mouse & PAUSE_BUTTON1)) ||
+	 ((par1 == 2) && (paused_for_mouse & PAUSE_BUTTON2)) ||
+	 ((par1 == 3) && (paused_for_mouse & PAUSE_BUTTON3)))) {
+	paused_for_mouse = 0;
+	return TRUE;
+    }
+    if ((type == GE_keypress) && (paused_for_mouse & PAUSE_KEYSTROKE) && (par1 != NUL)) {
+	paused_for_mouse = 0;
+	return TRUE;
+    }
+    return FALSE;
+}
+
 
 static void
 do_save_3dplot(struct surface_points *plots, int pcount, int quick)
@@ -2994,7 +3028,7 @@ static void
 put_label(char *label, double x, double y)
 {
     char cmd[0xff];
-    sprintf(cmd, "set label \"%s\" at %g,%g %s", label, x, y, 
+    sprintf(cmd, "set label \"%s\" at %g,%g %s", label, x, y,
 	mouse_setting.labelopts ? mouse_setting.labelopts : "point pt 1");
     do_string_replot(cmd);
 }
@@ -3003,7 +3037,7 @@ put_label(char *label, double x, double y)
 /* routine required by pm.trm: fill in information needed for (un)checking
    menu items in the Presentation Manager terminal
 */
-void 
+void
 PM_set_gpPMmenu __PROTO((struct t_gpPMmenu * gpPMmenu))
 {
     gpPMmenu->use_mouse = mouse_setting.on;

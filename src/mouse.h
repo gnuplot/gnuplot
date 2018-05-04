@@ -199,6 +199,7 @@ void update_ruler __PROTO((void));
 void set_ruler __PROTO((TBOOLEAN on, int mx, int my));
 void UpdateStatusline __PROTO((void));
 void do_event __PROTO((struct gp_event_t *ge));
+TBOOLEAN exec_event(char type, int mx, int my, int par1, int par2, int winid); /* wrapper for do_event() */
 int plot_mode __PROTO((int mode));
 void event_reset __PROTO((struct gp_event_t *ge));
 

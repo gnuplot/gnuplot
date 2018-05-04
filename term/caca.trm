@@ -148,9 +148,6 @@ static uint8_t CACA_rgb_to_ansi(uint32_t color); /* Convert RGB to ANSI backgrou
 static char const * CACA_get_color_name(uint8_t color); /* Find name of nearest matching predefined color */
 static char * CACA_encode_text(const char *str); /* map strings according to current encoding */
 
-#ifdef USE_MOUSE
-static TBOOLEAN process_event(char type, int mx, int my, int par1, int par2, int winid); /* wrapper for do_event() */
-#endif
 static int gp_kbhit(void); /* kbhit() implementation */
 
 
@@ -923,7 +920,7 @@ CACA_text()
 	if (CACA_dp != NULL)
 		CACA_refresh();
 #ifdef USE_MOUSE
-	process_event(GE_plotdone, 0, 0, 0, 0, 0);
+	exec_event(GE_plotdone, 0, 0, 0, 0, 0);
 	if (!CACA_windowed && !CACA_processing_events && !CACA_exportonly && !CACA_nosuspend) {
 		/* Test for input redirection */
 		if (isatty(fileno(stdin))) {
@@ -1938,7 +1935,7 @@ CACA_process_events(void)
 						CACA_zoom_to.y = my;
 						CACA_refresh();
 					}
-					process_event(GE_motion, mx, my, 0, 0, 0);
+					exec_event(GE_motion, mx, my, 0, 0, 0);
 					/* FPRINTF((stderr, "CACA: mouse move: pos = %i, %i\n", mx, my)); */
 					break;
 				}
@@ -1958,12 +1955,12 @@ CACA_process_events(void)
 								FPRINTF((stderr, "CACA: hide plot #%i: %i\n", i, CACA_hideplot[i]));
 								/* If something changed, replot and do not pass this event on to the core. */
 								CACA_zoom_or_replot = TRUE;
-								process_event(GE_replot, 0, 0, 0, 0, 0);
+								exec_event(GE_replot, 0, 0, 0, 0, 0);
 								break;
 							}
 						}
 					}
-					if (process_event(GE_buttonpress, mx, my, button, 0, 0))
+					if (exec_event(GE_buttonpress, mx, my, button, 0, 0))
 						loop = CACA_endpause;
 					FPRINTF((stderr, "CACA: mouse press: button = %i, pos = %i, %i\n", button, mx, my));
 					break;
@@ -1974,7 +1971,7 @@ CACA_process_events(void)
 					unsigned long event_time = CACA_event_time();
 					timestamp = event_time - last_event_time;
 					last_event_time = event_time;
-					if (process_event(GE_buttonrelease, mx, my, button, timestamp, 0))
+					if (exec_event(GE_buttonrelease, mx, my, button, timestamp, 0))
 						loop = CACA_endpause;
 					FPRINTF((stderr, "CACA: mouse release: button = %i, pos = %i, %i time = %lu\n", button, mx, my, timestamp));
 					break;
@@ -1991,7 +1988,7 @@ CACA_process_events(void)
 						case ' ':
 							if (CACA_windowed) {
 #ifdef DISABLE_SPACE_RAISES_CONSOLE
-								if (process_event(GE_keypress, mx, my, key, 0, 0))
+								if (exec_event(GE_keypress, mx, my, key, 0, 0))
 									loop = CACA_endpause;
 #else
 # ifdef _WIN32
@@ -2000,7 +1997,7 @@ CACA_process_events(void)
 # else
 								/* FIXME: raising terminal window not implemented */
 								/* gp_raise_console(); */
-								if (process_event(GE_keypress, mx, my, key, 0, 0))
+								if (exec_event(GE_keypress, mx, my, key, 0, 0))
 									loop = CACA_endpause;
 # endif
 #endif
@@ -2015,7 +2012,7 @@ CACA_process_events(void)
 						case GP_BackSpace:
 						case GP_Delete:
 							if (CACA_windowed) {
-								if (process_event(GE_keypress, mx, my, key, 0, 0))
+								if (exec_event(GE_keypress, mx, my, key, 0, 0))
 									loop = CACA_endpause;
 							} else {
 								CACA_close_display();
@@ -2036,7 +2033,7 @@ CACA_process_events(void)
 							/* No equivalent special key available */
 							break;
 						default:
-							if (process_event(GE_keypress, mx, my, key, 0, 0))
+							if (exec_event(GE_keypress, mx, my, key, 0, 0))
 								loop = CACA_endpause;
 					}
 					break;
@@ -2047,7 +2044,7 @@ CACA_process_events(void)
 					caca_set_canvas_size(CACA_cv, term->xmax + 1, term->ymax + 1);
 					CACA_update_options();
 					CACA_zoom_or_replot = TRUE;
-					process_event(GE_replot, 0, 0, 0, 0, 0);
+					exec_event(GE_replot, 0, 0, 0, 0, 0);
 					CACA_refresh();
 					FPRINTF((stderr, "CACA: resize event: %i x %i\n", CACA_xmax  + 1, CACA_ymax + 1 + CACA_status_height));
 					break;
@@ -2589,7 +2586,7 @@ CACA_modify_plots(unsigned int operations, int plotno)
 	if (changed) {
 		/* Replot only if something changed. */
 		CACA_zoom_or_replot = TRUE;
-		process_event(GE_replot, 0, 0, 0, 0, 0);
+		exec_event(GE_replot, 0, 0, 0, 0, 0);
 	}
 }
 
@@ -3339,38 +3336,6 @@ CACA_get_color_name(uint8_t color)
    ------------------------------------------------------------------------- */
 
 #ifdef USE_MOUSE
-/* convenience wrapper for do_event() */
-static TBOOLEAN
-process_event(char type, int mx, int my, int par1, int par2, int winid)
-{
-    struct gp_event_t ge;
-
-    ge.type = type;
-    ge.mx = mx;
-    ge.my = my;
-    ge.par1 = par1;
-    ge.par2 = par2;
-    ge.winid = winid;
-    do_event(&ge);
-
-    /* FIXME: IMHO changing paused_for_mouse in terminal code is bad design. */
-    /* end pause mouse? */
-    if ((type == GE_buttonrelease) && (paused_for_mouse & PAUSE_CLICK) &&
-	    (((par1 == 1) && (paused_for_mouse & PAUSE_BUTTON1)) ||
-	     ((par1 == 2) && (paused_for_mouse & PAUSE_BUTTON2)) ||
-	     ((par1 == 3) && (paused_for_mouse & PAUSE_BUTTON3)))) {
-	    paused_for_mouse = 0;
-	    return TRUE;
-    }
-    if ((type == GE_keypress) && (paused_for_mouse & PAUSE_KEYSTROKE) && (par1 != NUL)) {
-	    paused_for_mouse = 0;
-	    return TRUE;
-    }
-    return FALSE;
-}
-#endif
-
-
 static int
 gp_kbhit(void)
 {
@@ -3406,7 +3371,7 @@ gp_kbhit(void)
 # endif
 #endif
 }
-
+#endif
 
 #endif /* TERM_BODY */
 
