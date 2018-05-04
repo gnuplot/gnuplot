@@ -404,7 +404,7 @@ char * gp_basename __PROTO((char *path));
     documentation for any purpose is hereby granted without fee, provided
     that this copyright and permissions notice appear in all copies and
     derivatives.
-    
+
     This software is supplied "as is" without express or implied warranty.
 
     But that said, if there are any problems please get in touch.
@@ -430,8 +430,13 @@ void gp_rewinddir(GPDIR *);
 #elif defined(HAVE_DIRENT_H)
 # include <sys/types.h>
 # include <dirent.h>
+#elif defined(__WATCOMC__)
+# include <direct.h>
 #endif /* !HAVE_DIRENT_H && _WIN32 */
 
+#if defined(HAVE_DIRENT_H) || defined(_WIN32) || defined(__WATCOMC__)
+# define HAVE_DIRENT
+#endif
 
 /* Misc. defines */
 
@@ -511,7 +516,7 @@ void gp_rewinddir(GPDIR *);
 #endif
 /* HBB 2012-03-18: clang brings its own <limits.h>, which lacks PATH_MAX,
  * and on top of that, Cygwin's MAXPATHLEN is defined by reference to PATH_MAX.
- * So even though clang sees a #defined MAXPATHLEN, there's still no 
+ * So even though clang sees a #defined MAXPATHLEN, there's still no
  * definition available OA*/
 #ifndef PATH_MAX
 # if !defined(MAXPATHLEN) || (MAXPATHLEN <= 0)

@@ -48,14 +48,6 @@
 #  include <io.h>        /* for setmode() */
 # endif
 #endif
-#if defined(HAVE_DIRENT_H) && !defined(_WIN32)
-/* Note: The Windows versions of opendir() and friends are in stdfn.c.
- * OpenWatcom actually has them in direct.h, but we prefer the built-in
- * variants as they handle encodings.
- */
-# include <sys/types.h>
-# include <dirent.h>
-#endif
 
 static char *recursivefullname __PROTO((const char *path, const char *filename, TBOOLEAN recursive));
 static void prepare_call __PROTO((int calltype));
@@ -624,7 +616,7 @@ recursivefullname(const char *path, const char *filename, TBOOLEAN recursive)
     }
 
     if (recursive) {
-#if defined HAVE_DIRENT_H || defined(_WIN32)
+#if defined(HAVE_DIRENT)
 	DIR *dir;
 	struct dirent *direntry;
 	struct stat buf;

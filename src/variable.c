@@ -186,7 +186,7 @@ loadpath_handler(int action, char *path)
 	    /* skip over '\0' */
 	    p += strlen(p) + 1;
 	}
-	if (p >= limit) 
+	if (p >= limit)
 	    limit = p = NULL;
 	return p;
 	break;
@@ -336,7 +336,7 @@ fontpath_handler(int action, char *path)
 		/* convert all PATHSEPs to \0 */
 		PATHSEP_TO_NUL(fontpath);
 	    }
-#if defined(HAVE_DIRENT_H) || defined(_WIN32)
+#if defined(HAVE_DIRENT)
 	    else {
 		/* set hardcoded paths */
 		const struct path_table *curr_fontpath = fontpath_tbl;
@@ -452,7 +452,7 @@ fontpath_handler(int action, char *path)
 		if (fontpath)
 		    PATHSEP_TO_NUL(fontpath);
 	    }
-#endif /* HAVE_DIRENT_H */
+#endif /* HAVE_DIRENT */
 
 	}			/* else: already initialised; int_warn (?) */
 	/* point to env portion of fontpath */
@@ -610,7 +610,7 @@ locale_handler(int action, char *newlocale)
 	fprintf(stderr, "\tlocale is \"%s\"\n", current_locale);
 #endif
 	break;
-    
+
     case ACTION_GET:
     default:
 	break;

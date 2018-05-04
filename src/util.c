@@ -46,10 +46,6 @@
 #if defined(_MSC_VER) || defined(__WATCOMC__)
 # include <io.h>		/* for _access */
 #endif
-#if defined(HAVE_DIRENT_H) && !defined(_WIN32)
-# include <sys/types.h>
-# include <dirent.h>
-#endif
 
 /* Exported (set-table) variables */
 
@@ -1341,7 +1337,7 @@ parse_esc(char *instr)
 TBOOLEAN
 existdir(const char *name)
 {
-#if defined(HAVE_DIRENT_H ) || defined(_WIN32)
+#if defined(HAVE_DIRENT)
     DIR *dp;
     if ((dp = opendir(name)) == NULL)
 	return FALSE;

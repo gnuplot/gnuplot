@@ -349,7 +349,7 @@ static void step_forward __PROTO((void));
 static void delete_forward __PROTO((void));
 static void delete_backward __PROTO((void));
 static int char_seqlen __PROTO((void));
-#if defined(HAVE_DIRENT_H) || defined(_WIN32)
+#if defined(HAVE_DIRENT)
 static char *fn_completion(size_t anchor_pos, int direction);
 static void tab_completion(TBOOLEAN forward);
 #endif
@@ -630,7 +630,7 @@ extend_cur_line()
 }
 
 
-#if defined(HAVE_DIRENT_H) || defined(_WIN32)
+#if defined(HAVE_DIRENT)
 static char *
 fn_completion(size_t anchor_pos, int direction)
 {
@@ -818,7 +818,7 @@ tab_completion(TBOOLEAN forward)
     last_completion_len = completion_len;
 }
 
-#endif /* HAVE_DIRENT_H || _WIN32 */
+#endif /* HAVE_DIRENT */
 
 
 char *
@@ -1018,7 +1018,7 @@ readline(const char *prompt)
 		    step_forward();
 		}
 		break;
-#if defined(HAVE_DIRENT_H) || defined(_WIN32)
+#if defined(HAVE_DIRENT)
 	    case 011:		/* ^I / TAB */
 		tab_completion(TRUE); /* next tab completion */
 		break;
