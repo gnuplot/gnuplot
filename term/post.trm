@@ -2830,6 +2830,14 @@ ENHPS_put_text(unsigned int x, unsigned int y, const char *str)
 	fputs("grestore\n", gppsfile);
     ps_path_count = 0;
     PS_relative_ok = FALSE;
+
+    /* Apr 2018: Unlike other terminals, this leaves the last-used font
+     * in the enhanced text string active.  For a long time we dealt with
+     * this by calling term->set_font("") in ignore_enhanced(), but that
+     * introduces other side effects and has no benefit (I think!) for 
+     * other terminals.  Try doing it here instead.
+     */
+    PS_set_font("");
 }
 
 static void

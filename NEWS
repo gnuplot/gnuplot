@@ -1,3 +1,8 @@
+Changes in 5.2.4
+================
+
+* FIX font-handling bug; line-spacing of previous font still in effect
+
 Changes in 5.2.3
 ================
 * NEW "set grid {no}vertical" adds grid lines in the xz and xz planes

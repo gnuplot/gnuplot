@@ -1,3 +1,17 @@
+2018-05-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c term/post.trm: Move postscript-specific fix from
+	ignore_enhanced() into ENHPS_put_text().
+
+	Bug #266 (from 2005) noted that the postscript terminal left whatever
+	font was last used in an enhanced text string active afterwards.
+	The fix at the time was to force all non-enhanced strings to reset the
+	font by putting a call term->set_font("") in ignore_enhanced.
+	This had other side effects (Bug #2033) and was only ever useful for
+	postscript output, so move the font reset into the postscript terminal.
+
+2018-05-04  Release 5.2.3
+
 2018-04-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	Bump version to 5.2.3
