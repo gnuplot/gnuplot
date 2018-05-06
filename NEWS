@@ -1,8 +1,10 @@
 Changes in 5.2.4
 ================
 
-* FIX font-handling bug; line-spacing of previous font still in effect
 * CHANGE generalize the test for missing data flag in input data
+* CHANGE "set []range writeback" is now essentially always in effect
+* FIX re-implement "refresh" command to use autoscale writeback/restore
+* FIX font-handling bug; line-spacing of previous font still in effect
 
 Changes in 5.2.3
 ================

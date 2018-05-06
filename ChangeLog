@@ -1,3 +1,20 @@
+2018-05-05  Dima Kogan  <dima@secretsauce.net>
+
+	* src/axis.h src/command.c src/plot2d.c src/plot3d.c:
+
+	Rework the "refresh" command to use autoscaled axis writeback/restore.
+	This mechanism replaces AXIS_INIT2D_REFRESH and AXIS_UPDATE2D_REFRESH.
+	"set xrange writeback" is now essentially always in effect.
+	"set xrange restore" still works as before.
+	Fixes buggy refresh of logscale inline data.
+	Fixes buggy axis ranges on refresh of splot with volatile data
+	(volatile.dem now highlights the error if you run previous code).
+
+	FIXME:  The new method works by always setting the WRITEBACK axis range
+	flag during plot commands.  Conceiveably some existing script depends on
+	a sequence of commands that includes "set xrange nowriteback" but I
+	do not know if there is a real-world example of that.
+
 2018-05-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c src/datafile.h:  Skip evaluation of expressions in

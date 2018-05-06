@@ -236,6 +236,16 @@ plotrequest()
     axis_init(&axis_array[POLAR_AXIS], TRUE);
     axis_init(&axis_array[COLOR_AXIS], TRUE);
 
+    /* Always be prepared to restore the autoscaled values on "refresh"
+     * Dima Kogan April 2018
+     * FIXME: Could we fold this into axis_init?
+     */
+    for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++) {
+	AXIS *this_axis = &axis_array[axis];
+	if (this_axis->set_autoscale != AUTOSCALE_NONE)
+	    this_axis->range_flags |= RANGE_WRITEBACK;
+    }
+
 #ifdef NONLINEAR_AXES
     /* Nonlinear mapping of x or y via linkage to a hidden primary axis. */
     /* The user set autoscale for the visible axis; apply it also to the hidden axis. */
@@ -314,19 +324,6 @@ refresh_bounds(struct curve_points *first_plot, int nplots)
 	    if (x_axis->set_autoscale || y_axis->set_autoscale)
 		process_image(this_plot, IMG_UPDATE_AXES);
 	    continue;
-	}
-
-	/* FIXME: I don't think this test does what the comment says. */
-	/*
-	 * If the state has been set to autoscale since the last plot,
-	 * mark everything INRANGE and re-evaluate the axis limits now.
-	 * Otherwise test INRANGE/OUTRANGE against previous data limits.
-	 */
-	if (!this_plot->noautoscale) {
-	    if (x_axis->set_autoscale & AUTOSCALE_MIN && x_axis->data_min < x_axis->min)
-		 x_axis->min = axis_log_value(x_axis, x_axis->data_min);
-	    if (x_axis->set_autoscale & AUTOSCALE_MAX && x_axis->data_max > x_axis->max)
-		 x_axis->max = axis_log_value(x_axis, x_axis->data_max);
 	}
 
 	for (i=0; i<this_plot->p_count; i++) {
