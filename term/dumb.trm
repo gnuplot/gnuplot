@@ -620,7 +620,7 @@ DUMB_put_text(unsigned int x, unsigned int y, const char *str)
 {
     int i, length;
 
-    if ((unsigned int) y > dumb_ymax)
+    if (y > dumb_ymax)
 	return;
 
     length = gp_strlen(str);
@@ -746,7 +746,7 @@ ENHdumb_FLUSH()
 
 	/* print the string fragment, perhaps invisibly */
 	/* NB: base expresses offset from current y pos */
-	if (ENHdumb_show) {
+	if (ENHdumb_show && y < dumb_ymax) {
 #ifdef DUMB_UTF8
 	    for (i = 0; i < len && x < dumb_xmax; i++, x++) {
 		utf8_copy_one( (char *)(&DUMB_PIXEL(x, y)), gp_strchrn(str,i));

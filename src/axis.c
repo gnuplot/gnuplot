@@ -1689,9 +1689,10 @@ get_num_or_time(struct axis *axis)
     &&  (axis->datatype == DT_TIMEDATE) && isstringvalue(c_token)) {
 	struct tm tm;
 	double usec;
-	char *ss = try_to_get_string();
-	if (gstrptime(ss, timefmt, &tm,&usec, &value) == DT_TIMEDATE)
-	    value = (double) gtimegm(&tm) + usec;
+	char *ss;
+	if ((ss = try_to_get_string()))
+	    if (gstrptime(ss, timefmt, &tm,&usec, &value) == DT_TIMEDATE)
+		value = (double) gtimegm(&tm) + usec;
 	free(ss);
     } else {
 	value = real_expression();
