@@ -1167,6 +1167,8 @@ PS_options()
 		set_fontsize = TRUE;
 		/* We have font size specified */
 		ps_params->fontsize = real_expression();
+		if (ps_params->fontsize <= 0)
+		    ps_params->fontsize = 14;
 	    }
 	    break;
 	}
