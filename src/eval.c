@@ -388,7 +388,7 @@ struct value *
 Gstring(struct value *a, char *s)
 {
     a->type = STRING;
-    a->v.string_val = s;
+    a->v.string_val = s ? s : strdup("");
     return (a);
 }
 
