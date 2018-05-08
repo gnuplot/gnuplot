@@ -628,7 +628,7 @@ DUMB_put_text(unsigned int x, unsigned int y, const char *str)
 	x = GPMAX(0, dumb_xmax - length);
 
 #ifdef DUMB_UTF8
-    for (i = 0; i < length; i++, x++) {
+    for (i = 0; i < length && x < dumb_xmax; i++, x++) {
 	utf8_copy_one( (char *)(&DUMB_PIXEL(x, y)), gp_strchrn(str,i));
 #ifndef NO_DUMB_COLOR_SUPPORT
 	memcpy(&dumb_colors[dumb_xmax * y + x], &dumb_color, sizeof(t_colorspec));
