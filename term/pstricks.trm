@@ -238,6 +238,7 @@ static int PSTRICKS_linecount = 0;
 
 
 /* ARROWS */
+static TBOOLEAN PST_psarrows = TRUE;
 static double PSTRICKS_arrowwidth = -1.;
 static double PSTRICKS_arrowlength = -1.;
 static double PSTRICKS_arrowinset = -1.;
@@ -278,6 +279,7 @@ enum PSTRICKS_id { PSTRICKS_DEFAULTOPTIONS,
 	PSTRICKS_BLACKTEXT, PSTRICKS_COLORTEXT,
 	PSTRICKS_ROUNDED, PSTRICKS_BUTT,
 	PSTRICKS_LINEWIDTH, PSTRICKS_POINTSCALE,
+	PSTRICKS_PSARROWS, PSTRICKS_GPARROWS,
 	PSTRICKS_BACKGROUND,
 	PSTRICKS_OTHER };
 
@@ -299,6 +301,8 @@ static struct gen_table PSTRICKS_opts[] =
     { "linew$idth", PSTRICKS_LINEWIDTH },
     { "points$cale", PSTRICKS_POINTSCALE },
     { "ps", PSTRICKS_POINTSCALE },
+    { "psarrows", PSTRICKS_PSARROWS },
+    { "gparrows", PSTRICKS_GPARROWS },
     { NULL, PSTRICKS_OTHER }
 };
 
@@ -396,6 +400,14 @@ PSTRICKS_options()
 	    PSTRICKS_background.b = (double)( background        & 0xff) / 255.;
 	    break;
 	}
+	case PSTRICKS_GPARROWS:
+	    c_token++;
+	    PST_psarrows = FALSE;
+	    break;
+	case PSTRICKS_PSARROWS:
+	    c_token++;
+	    PST_psarrows = TRUE;
+	    break;
 	default:
 	    int_error(c_token, "Unknown terminal option");
 	}
@@ -410,7 +422,8 @@ PSTRICKS_options()
 
     // update terminal option string
     snprintf(term_options, MAX_LINE_LEN + 1,
-	"%s %s linewidth %.1f pointscale %.1f %s background \"#%02x%02x%02x\" %s",
+	"%s %s linewidth %.1f pointscale %.1f %s "
+	"background \"#%02x%02x%02x\" %sarrows %s",
 	PST_unit_plot ? "unit" : size_str,
 	PST_rounded ? "rounded" : "butt",
 	PSTRICKS_lw_scale, PSTRICKS_ps,
@@ -418,6 +431,7 @@ PSTRICKS_options()
 	(int) floor(PSTRICKS_background.r * 255 + 0.5),
 	(int) floor(PSTRICKS_background.g * 255 + 0.5),
 	(int) floor(PSTRICKS_background.b * 255 + 0.5),
+	PST_psarrows ? "ps" : "gp",
 	PST_standalone ? "standalone" : "input");
 }
 
@@ -718,6 +732,11 @@ PSTRICKS_arrow(
     /* Note:  we cannot handle curr_arrow_headfilled, HEADS_ONLY, and SHAFT_ONLY */
     PSTRICKS_endline();
     PSTRICKS_apply_linecolor();
+
+    if (!PST_psarrows) {
+	do_arrow(sx, sy, ex, ey, head);
+	return;
+    }
 
     if (curr_arrow_headlength <= 0) {
 	double def_length = PSTRICKS_HTIC;
@@ -1296,6 +1315,7 @@ START_HELP(pstricks)
 "                      {blacktext | colortext | colourtext}",
 "                      {linewidth <lw>} {rounded|butt}",
 "                      {pointscale <ps>}",
+"                      {psarrows|gparrows}",
 "                      {background <rgbcolor>}",
 "",
 " The `unit` option produces a plot with internal dimensions 1x1. The default",
@@ -1313,6 +1333,10 @@ START_HELP(pstricks)
 "",
 " `linewidth` and `pointscale` scale the width of lines and the size of point",
 " symbols, respectively.",
+"",
+" `psarrows` draws `arrow`s using PSTricks commands which are shorter but do not",
+" offer all options. `gparrows` selects drawing arring arrows using gnuplot's",
+" own routine for full functionality instead.",
 "",
 " The old `hacktext` option has been replaced by the new default format (%h),",
 " see `format specifiers`.",
