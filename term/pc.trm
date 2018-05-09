@@ -3,7 +3,7 @@
 /* GNUPLOT - pc.trm */
 
 /*[
- * Copyright 1990 - 1993, 1998, 2004
+ * Copyright 1990 - 1993, 1998, 2004, 2018
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -46,6 +46,7 @@
  * AUTHORS
  *  Colin Kelley, Thomas Williams, William Wilson, Russell Lang
  *  modified by David J. Liu (liu@csb.yale.edu) for version 3.6
+ *  extended by Bastian Maerkisch for version 5.3
  *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
@@ -62,23 +63,42 @@ register_term(dospc)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void PC_text __PROTO((void));
-TERM_PUBLIC void PC_reset __PROTO((void));
-TERM_PUBLIC void PC_init __PROTO((void));
-TERM_PUBLIC void PC_graphics __PROTO((void));
-TERM_PUBLIC void PC_linetype __PROTO((int linetype));
-TERM_PUBLIC void PC_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void PC_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void PC_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
-TERM_PUBLIC int PC_text_angle __PROTO((int ang));
-TERM_PUBLIC int PC_justify_text __PROTO((enum JUSTIFY ang));
+TERM_PUBLIC void PC_options(void);
+TERM_PUBLIC void PC_init(void);
+TERM_PUBLIC void PC_graphics(void);
+TERM_PUBLIC void PC_text(void);
+TERM_PUBLIC void PC_reset(void);
+TERM_PUBLIC void PC_suspend(void);
+TERM_PUBLIC void PC_resume(void);
+TERM_PUBLIC void PC_linetype(int linetype);
+TERM_PUBLIC void PC_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void PC_vector(unsigned int x, unsigned int y);
+TERM_PUBLIC void PC_put_text(unsigned int x, unsigned int y, const char *str);
+TERM_PUBLIC void PC_enhanced_put_text(unsigned int x, unsigned int y, const char str[]);
+TERM_PUBLIC void PC_enhanced_open(char * fontname, double fontsize,
+					double base, TBOOLEAN widthflag, TBOOLEAN showflag, int overprint);
+TERM_PUBLIC void PC_enhanced_flush(void);
+TERM_PUBLIC int PC_text_angle(int ang);
+TERM_PUBLIC int PC_set_font(const char *font);
+TERM_PUBLIC void PC_pointsize(double size);
+TERM_PUBLIC int PC_justify_text(enum JUSTIFY ang);
+TERM_PUBLIC void PC_set_color(t_colorspec *colorspec);
+TERM_PUBLIC int PC_make_palette(t_sm_palette *palette);
+TERM_PUBLIC void PC_fillbox(int fillstyle, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height);
+TERM_PUBLIC void PC_filled_polygon(int npoints, gpiPoint *corners);
+#ifdef EAM_BOXED_TEXT
+TERM_PUBLIC void PC_boxed_text(unsigned int x, unsigned int y, int option);
+#endif
+TERM_PUBLIC void PC_dashtype(int type, t_dashtype *custom_dash_pattern);
 
+/* All of these values are place holders only.  They will be re-determined
+   in init or graphics. */
 #define PC_HCHAR FNT5X9_HCHAR
 #define PC_VCHAR FNT5X9_VCHAR
 #define PC_HTIC 5
 #define PC_VTIC 4
-#define PC_XMAX 100		/* These two entries are just place holders. */
-#define PC_YMAX 100		/* The actual values will be found in init.  */
+#define PC_XMAX 100
+#define PC_YMAX 100
 #endif /* TERM_PROTO */
 
 #ifndef TERM_PROTO_ONLY
@@ -89,39 +109,223 @@ TERM_PUBLIC int PC_justify_text __PROTO((enum JUSTIFY ang));
 #include <conio.h>		/* for getch() */
 #include <graph.h>
 
-static unsigned int pattern[] ={ 0xffff, 0x0f0f, 0xffff, 0xaaaa, 0x3333, 0x3f3f, 0x0f0f };
-static int vga_color[] ={ 7, 8, 2, 3, 4, 5, 9, 14, 12, 15, 13, 10, 11, 1, 6 };
 
-static int pc_driver, pc_mode;
-static TBOOLEAN graphics_on = FALSE, pc_graphics = FALSE;
-static int startx, starty, pc_lastx, pc_lasty, pc_colors;
-static int pc_angle, pc_hjustify, pc_vjustify, pc_text_size, pc_text_dir, pc_corscreen = -1;
+static void _settextang(int ang);
+static void PC_save_text(void);
+static void PC_restore_text(void);
+static long PC_set_rgb_color(int r, int g, int b);
+static int PC_translate_key(int key, int * mod);
+static int PC_int_compare(const void * elem1, const void * elem2);
 
 
-enum {
-    HORIZ_DIR, VERT_DIR
+#if 0
+/* old color sequence */
+static int vga_color[] = { 7, 8, 2, 3, 4, 5, 9, 14, 12, 15, 13, 10, 11, 1, 6 };
+/* old dash pattern sequence */
+static unsigned int pc_dash_pattern[] = { 0xffff, 0x0f0f, 0xffff, 0xaaaa, 0x3333, 0x3f3f, 0x0f0f };
+#else
+/* classic color sequence */
+static int vga_color[15] = { 7, 8,  4, 2, 1, 5, 3,  6, 14, 9, 12, 10, 11, 13, 15 };
+/* "standard" dash pattern sequence:  solid, dash, dash/dot, dash/dot/dot */
+static unsigned int pc_dash_pattern[] = { 0xffff, 0xf0f0, 0xffff, 0xf0f0, 0xcccc, 0xfc30, 0xfccc };
+#endif
+
+/* Fill pattern copied from bitmap.c */
+#define pc_fill_pattern_num 8
+static unsigned char pc_fill_pattern_bitmaps[pc_fill_pattern_num][8] = {
+    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } /* no fill */
+   ,{ 0x82, 0x44, 0x28, 0x10, 0x28, 0x44, 0x82, 0x01 } /* cross-hatch      (1) */
+   ,{ 0x88, 0x55, 0x22, 0x55, 0x88, 0x55, 0x22, 0x55 } /* double crosshatch(2) */
+   ,{ 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff } /* solid fill       (3) */
+   ,{ 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 } /* diagonal stripes (4) */
+   ,{ 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 } /* diagonal stripes (5) */
+   ,{ 0x11, 0x11, 0x22, 0x22, 0x44, 0x44, 0x88, 0x88 } /* diagonal stripes (6) */
+   ,{ 0x88, 0x88, 0x44, 0x44, 0x22, 0x22, 0x11, 0x11 } /* diagonal stripes (7) */
 };
+#define pc_shading_pattern_num 5
+static unsigned char pc_shading_pattern_bitmap[pc_shading_pattern_num][8] = {
+    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, /* no fill */
+    { 0x88, 0x22, 0x44, 0x11, 0x88, 0x22, 0x44, 0x11 }, /* 25% shade */
+    { 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA }, /* 50% shade */
+    { 0xEE, 0xBB, 0xDD, 0x77, 0xEE, 0xBB, 0xDD, 0xEE }, /* 75% shade */
+    { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff }  /* solid fill */
+};
+
+/* graphics mode */
+static int pc_driver, pc_mode;
+static TBOOLEAN graphics_on = FALSE;
+static TBOOLEAN pc_graphics = FALSE;
+static pc_lastx, pc_lasty, pc_colors;
+static TBOOLEAN pc_processing_events = FALSE;
+
+/* graphics / text image */
+static char * pc_image = NULL;
+static char * pc_text_image = NULL;
+static int pc_text_cols, pc_text_rows;
+static struct rccoord pc_text_pos;
+
+/* lines */
+static int startx, starty;
+static int pc_linewidth;
+static float pc_linewidth_scale = 1.;
+
+/* points */
+static float pc_pointscale = 1.;
+
+/* text */
+static int pc_hjustify, pc_vjustify, pc_text_dir;
+
+/* nominal font size */
+#define PC_DEFAULT_FONTSIZE 18
+static float pc_fontsize;
+static float pc_font_aspect;
+static float pc_fontscale = 1.;
+
+/* colors */
+static rgb255_color pc_background_rgb = { 0, 0, 0 };
+static int pc_background = 0;
+/* reserved palette entries for default colors */
+#define pc_pal_ofs 16
+/* first palette slot for rgb colors */
+#define pc_rgb_pal_ofs 144
+static short pc_rgbcolors = 0;
+static struct {
+    short n, r, g, b;
+} pc_rgbcolor[256 - pc_rgb_pal_ofs];
+
+/* boxed text */
+#ifdef EAM_BOXED_TEXT
+static TBOOLEAN pc_boxing = FALSE;
+static struct xycoord pc_boxed_extent[4];
+#endif
+
 
 static void
 _settextang(int ang)
 {
-    if (ang == HORIZ_DIR) {
+    while (ang < 0) ang += 360;
+    ang %= 360;
+
+    switch (ang) {
+    case 0:
 	_settextorient(1, 0);
-    } else {
+	break;
+    case 45:
+	_settextorient(1, 1);
+	break;
+    case 90:
 	_settextorient(0, 1);
+	break;
+    case 270:
+	_settextorient(0, -1);
+	break;
+    default:
+	_settextorient(cos(DEG2RAD * ang) * 255, sin(DEG2RAD * ang) * 255);
     }
 }
 
-void
-PC_setup()
-{				/* called from the beginning of main() */
+
+enum PC_id {
+    PC_ENH, PC_NOENH,
+    PC_LINEWIDTH, PC_POINTSIZE, PC_FONTSCALE,
+    PC_BACKGROUND,
+    PC_INVALID
+};
+
+static struct gen_table pc_opts[] =
+{
+    { "enh$anced", PC_ENH },
+    { "noe$nhanced", PC_NOENH },
+    { "lw", PC_LINEWIDTH },
+    { "linew$idth", PC_LINEWIDTH },
+    { "ps", PC_POINTSIZE },
+    { "points$ize", PC_POINTSIZE },
+    { "fs", PC_FONTSCALE },
+    { "fonts$cale", PC_FONTSCALE },
+    { "backg$round", PC_BACKGROUND },
+    { NULL, PC_INVALID }
+};
+
+
+TERM_PUBLIC void
+PC_options(void)
+{
+    int i;
+
+    while (!END_OF_COMMAND) {
+	switch (lookup_table(pc_opts, c_token)) {
+	case PC_ENH:
+	    c_token++;
+	    term->put_text = PC_enhanced_put_text;
+	    term->flags |= TERM_ENHANCED_TEXT;
+	    break;
+	case PC_NOENH:
+	    c_token++;
+	    term->put_text = PC_put_text;
+	    term->flags &= ~TERM_ENHANCED_TEXT;
+	    break;
+	case PC_LINEWIDTH:
+	    c_token++;
+	    pc_linewidth_scale =  real_expression();
+	    if (pc_linewidth_scale <= 0)
+		pc_linewidth_scale = 1.;
+	    break;
+	case PC_POINTSIZE:
+	    c_token++;
+	    pc_pointscale =  real_expression();
+	    if (pc_pointscale <= 0)
+		pc_pointscale = 1.;
+	    break;
+	case PC_FONTSCALE:
+	    c_token++;
+	    pc_fontscale =  real_expression();
+	    if (pc_fontscale <= 0)
+		pc_fontscale = 1.;
+	    break;
+	case PC_BACKGROUND: {
+	    long background;
+
+	    c_token++;
+	    background = parse_color_name();
+	    pc_background_rgb.r = (background >> 16) & 0xff;
+	    pc_background_rgb.g = (background >>  8) & 0xff;
+	    pc_background_rgb.b = (background      ) & 0xff;
+	    break;
+	}
+	default:
+	    int_error(c_token, "unrecognized terminal option");
+	    break;
+	}
+    }
+
+    sprintf_s(term_options, sizeof(term_options),
+	    "%senhanced "
+	    "linewidth %.1f pointsize %.1f fontscale %.1f"
+	    " background \"#%02x%02x%02x\"",
+	    term->flags & TERM_ENHANCED_TEXT ? "" : "no",
+	    pc_linewidth_scale, pc_pointscale, pc_fontscale,
+	    pc_background_rgb.r, pc_background_rgb.g, pc_background_rgb.b
+    );
+}
+
+
+static void
+PC_setup(void)
+{
     int i, t, x, y;
     char pc_modename[9];
     struct videoconfig VC;
+    const char * adaptername[] = {
+	"MDPA", "CGA", "HERCULES", "MCGA", "EGA", "VGA", "SVGA"
+    };
+    short status;
 
-    /* If environment PCTRM is set, try initiate the card/mode.  */
+    if (pc_graphics)
+	return;
 
-    /* special instruction on mode */
+    PC_save_text();
+
+    /* If environment PCTRM is set, try to initialize a specific card/mode.  */
     safe_strncpy(pc_modename, getenv("PCTRM"), 8);
 
     _getvideoconfig(&VC);
@@ -146,6 +350,7 @@ PC_setup()
 	pc_mode = _VRES16COLOR;
 	break;
     case _SVGA:
+	/* TODO: enable 32K, 64K and 16M color modes */
 	if (pc_modename[0] == 'S') {	/* test SVGA resolution */
 	    sscanf(pc_modename, "S%d", &t);
 	    switch (t) {
@@ -174,69 +379,475 @@ PC_setup()
 	return;
     }
     _setvideomode(pc_mode);
+    status = _grstatus();
     _getvideoconfig(&VC);
     pc_lastx = VC.numxpixels - 1;
     pc_lasty = VC.numypixels - 1;
     pc_colors = VC.numcolors;
+
     _setvideomode(_DEFAULTMODE);
+    PC_restore_text();
+
     x = pc_lastx + 1;
     y = pc_lasty + 1;
-    fprintf(stderr, "\tScreen of %d x %d pixels and %d colors.\n",
+    fprintf(stderr, "\t%s screen of %d x %d pixels and %d colors.\n",
+	    adaptername[pc_driver - 1],
 	    x, y, pc_colors);
-    pc_graphics = TRUE;
+    if (status != _GROK) {
+	fprintf(stderr, "\t_setvideomode: status = %d\n", status);
+	pc_driver = 0;
+    } else {
+	pc_graphics = TRUE;
+    }
 }
 
+
 TERM_PUBLIC void
-PC_init()
+PC_init(void)
 {
     struct _fontinfo fi;
 
+    if (!pc_graphics)
+	PC_setup();
+
     if (!pc_graphics) {
-	fputs("Unable to initialize graphics.\n", stderr);
-	term = 0;
+	term = NULL;
+	int_error(NO_CARET, "Unable to initialize dospc graphics.\n");
 	return;
     }
-    /* Double the tic/font sizes. */
-    pc_text_size = (pc_lasty > 590) ? 2 : 1;
-    term->h_char = PC_HCHAR;
-    term->v_char = PC_VCHAR;
-    term->h_tic = PC_HTIC * pc_text_size;
-    term->v_tic = PC_VTIC * pc_text_size;
+
+    /* init terminal: fixed size... */
     term->xmax = pc_lastx + 1;
     term->ymax = pc_lasty + 1;
-
-    _setvideomode(pc_mode);
-    _settextang(HORIZ_DIR);
-    _settextalign(pc_hjustify, pc_vjustify);
-    _setcharsize(pc_text_size * PC_HCHAR, pc_text_size * PC_VCHAR);
-    _getfontinfo(&fi);
-    term->h_char = fi.avgwidth;
-    term->v_char = fi.pixheight * 1.5;
 }
+
 
 TERM_PUBLIC void
-PC_graphics()
+PC_graphics(void)
 {
-    graphics_on = TRUE;
-    _setvideomode(pc_mode);
+    struct textsettings ts;
+
+    if (!graphics_on && !pc_processing_events) {
+	PC_save_text();
+
+	graphics_on = TRUE;
+	_setvideomode(pc_mode);
+    }
+
+    /* init text properties */
+    _settextang(0);
+    PC_justify_text(LEFT);
+    _settextalign(pc_hjustify, pc_vjustify);
+
+    /* save initial font aspect ratio */
+    _gettextsettings(&ts);
+    pc_font_aspect = (float) ts.height / (float) ts.width;
+
+    /* set default font */
+    PC_set_font("");
+    _gettextsettings(&ts);
+    term->h_char = ts.width;
+    term->v_char = 12 * ts.height / 10;   /* reserve some extra line spacing */
+    term->h_tic = term->v_tic = term->v_char / 2.5;
+
+    pc_linewidth = 1;
+    pc_rgbcolors = 0;
+
+    /* set background */
+    pc_background = ((pc_background_rgb.b >> 2) << 16) | ((pc_background_rgb.g >> 2) << 8) | (pc_background_rgb.r >> 2);
+    _setbkcolor(pc_background);
+    _clearscreen(_GCLEARSCREEN);
 }
+
+
+static void
+PC_save_text(void)
+{
+    if (pc_text_image == NULL) {
+	struct videoconfig vc;
+	long size;
+
+	 _getvideoconfig( &vc );
+	pc_text_cols = vc.numtextcols;
+	pc_text_rows = vc.numtextrows;
+	size = 2 * pc_text_cols * pc_text_rows;
+	pc_text_image = gp_alloc(size, "text image");
+    }
+    if (pc_text_image != NULL) {
+	 union REGS  regs;
+
+	/* make a copy of the text memory */
+	char * video = (char *) (int) 0xB8000;
+	int size = 2 * pc_text_cols * pc_text_rows;
+	memcpy(pc_text_image, video, size);
+
+	/* save text cursor position */
+	regs.h.ah = 0x03;
+	regs.h.bh = 0;
+	int386(0x10, &regs, &regs);
+	pc_text_pos.row = regs.h.dh;
+	pc_text_pos.col = regs.h.dl;
+    }
+}
+
+
+static void
+PC_restore_text(void)
+{
+    graphics_on = FALSE;
+    _setvideomode(_DEFAULTMODE);
+
+    if (pc_text_image != NULL) {
+	 union REGS  regs;
+
+	/* restore text memory -*/
+	char * video = (char *) (int) 0xB8000;
+	int size = 2 * pc_text_cols * pc_text_rows;
+	memcpy(video, pc_text_image, size);
+
+	/* restore text cursor position */
+	regs.h.ah = 0x02;
+	regs.h.bh = 0;
+	regs.h.dh = pc_text_pos.row;
+	regs.h.dl = pc_text_pos.col;
+	int386(0x10, &regs, &regs);
+    }
+}
+
+
+/* Mapping tables for special keycodes.  Note that these have to be
+   ordered by the conio key code. */
+
+/* no modifiers */
+static int pc_key_table [][2] = {
+    { 59, GP_F1 },
+    { 60, GP_F2 },
+    { 61, GP_F3 },
+    { 62, GP_F4 },
+    { 63, GP_F5 },
+    { 64, GP_F6 },
+    { 65, GP_F7 },
+    { 66, GP_F8 },
+    { 67, GP_F9 },
+    { 68, GP_F10 },
+    { 71, GP_Home },
+    { 72, GP_Up },
+    { 73, GP_PageUp },
+    { 75, GP_Left },
+    { 77, GP_Right },
+    { 79, GP_End },
+    { 80, GP_Down },
+    { 81, GP_PageDown },
+    { 82, GP_Insert },
+    { 83, GP_Delete },
+    { 133, GP_F11 },
+    { 134, GP_F12 }
+};
+
+/* shift modifier */
+static int pc_shift_key_table [][2] = {
+    { 15, GP_Tab },
+    { 84, GP_F1 },
+    { 85, GP_F2 },
+    { 86, GP_F3 },
+    { 87, GP_F4 },
+    { 88, GP_F5 },
+    { 89, GP_F6 },
+    { 90, GP_F7 },
+    { 91, GP_F8 },
+    { 92, GP_F9 },
+    { 93, GP_F10 },
+    { 135, GP_F11 },
+    { 136, GP_F12 }
+};
+
+/* ctrl modifier */
+static int pc_control_key_table [][2] = {
+    { 94, GP_F1 },
+    { 95, GP_F2 },
+    { 96, GP_F3 },
+    { 97, GP_F4 },
+    { 98, GP_F5 },
+    { 99, GP_F6 },
+    { 100, GP_F7 },
+    { 101, GP_F8 },
+    { 102, GP_F9 },
+    { 103, GP_F10 },
+    { 115, GP_Left },
+    { 116, GP_Right },
+    { 117, GP_End },
+    { 118, GP_PageDown },
+    { 119, GP_Home },
+    { 132, GP_PageUp },
+    { 137, GP_F11 },
+    { 138, GP_F12 },
+    { 141, GP_Up },
+    { 142, GP_KP_Divide },
+    // { 143, GP_KP_Center },
+    { 144, GP_KP_Multiply },
+    { 145, GP_Down },
+    { 146, GP_Insert },
+    { 147, GP_Delete },
+    { 148, GP_Tab },
+    { 149, GP_KP_Subtract },
+    { 150, GP_KP_Add }
+};
+
+/* alt modifier */
+// These code seem to correspond to scan-codes from an US keyboard.
+// There's no remapping according to the locale.
+static int pc_alt_key_table [][2] = {
+    // { GrKey_Alt_Escape, GP_Escape },
+    { 14, GP_BackSpace },
+    { 16, 'q' },
+    { 17, 'w' },
+    { 18, 'e' },
+    { 19, 'r' },
+    { 20, 't' },
+    { 21, 'y' },  // no keyboard remapping...
+    { 22, 'u' },
+    { 23, 'i' },
+    { 24, 'o' },
+    { 25, 'p' },
+    { 26, '[' },
+    { 27, ']' },
+    // { 28, GP_Return },
+    { 30, 'a' },
+    { 31, 's' },
+    { 32, 'd' },
+    { 33, 'f' },
+    { 34, 'g' },
+    { 35, 'h' },
+    { 36, 'j' },
+    { 37, 'k' },
+    { 38, 'l' },
+    { 39, ';' },
+    { 40, '\'' },
+    { 41, '`' },
+    { 43, '\\' },
+    { 44, 'z' },
+    { 45, 'x' },
+    { 46, 'c' },
+    { 47, 'v' },
+    { 48, 'b' },
+    { 49, 'n' },
+    { 50, 'm' },
+    { 51, ',' },
+    { 52, '.' },
+    { 53, '/' },
+    { 74, GP_KP_Divide },
+    // { xx, GP_KP_Multiply },
+    // { 164, GP_KP_Subtract },
+    // { 55, GP_KP_Add },
+    { 104, GP_F1 },
+    { 105, GP_F2 },
+    { 106, GP_F3 },
+    { 107, GP_F4 },
+    { 108, GP_F5 },
+    { 109, GP_F6 },
+    { 110, GP_F7 },
+    { 111, GP_F8 },
+    { 112, GP_F9 },
+    { 113, GP_F10 },
+    // { 116, GP_KP_Enter },
+    { 120, '1' },
+    { 121, '2' },
+    { 122, '3' },
+    { 123, '4' },
+    { 124, '5' },
+    { 125, '6' },
+    { 126, '7' },
+    { 127, '8' },
+    { 128, '9' },
+    { 129, '0' },
+    { 130, '-' },
+    { 131, '=' },
+    { 138, GP_F11 },
+    { 139, GP_F12 },
+    { 151, GP_Home },
+    { 152, GP_Up },
+    { 153, GP_PageUp },
+    { 155, GP_Left },
+    { 157, GP_Right },
+    { 159, GP_End },
+    { 160, GP_Down },
+    { 161, GP_PageDown },
+    { 162, GP_Insert },
+    { 163, GP_Delete },
+    { 165, GP_Tab }
+};
+
+
+static int
+PC_int_compare(const void * elem1, const void * elem2)
+{
+    int val = *(int *)elem1 - *(int *)elem2;
+    return (0 < val) - (val < 0);
+}
+
+
+/* map a PC special key to a gnuplot code */
+static int
+PC_translate_key(int key, int * mod)
+{
+    int (* found)[2];
+
+    /* mapping of some special keys including modifiers */
+    found = bsearch((void *)&key,
+	pc_key_table, sizeof(pc_key_table) / (2 * sizeof(int)), 2 * sizeof(int),
+	&PC_int_compare);
+    if (found == NULL) {
+	found = bsearch((void *)&key,
+	    pc_alt_key_table, sizeof(pc_alt_key_table) / (2 * sizeof(int)), 2 * sizeof(int),
+	    &PC_int_compare);
+	if (found != NULL)
+	    *mod = Mod_Alt;
+    }
+    if (found == NULL) {
+	found = bsearch((void *)&key,
+	    pc_control_key_table, sizeof(pc_control_key_table) / (2 * sizeof(int)), 2 * sizeof(int),
+	    &PC_int_compare);
+	if (found != NULL)
+	    *mod = Mod_Ctrl;
+    }
+    if (found == NULL) {
+	found = bsearch((void *)&key,
+	    pc_shift_key_table, sizeof(pc_shift_key_table) / (2 * sizeof(int)), 2 * sizeof(int),
+	    &PC_int_compare);
+	if (found != NULL)
+	    *mod = Mod_Shift;
+    }
+    return (found != NULL) ? (*found)[1] : -1;
+}
+
+
+TERM_PUBLIC void
+PC_text(void)
+{
+    if (!graphics_on)
+	return;
+
+#ifdef USE_MOUSE
+    /* signal that we are done */
+    exec_event(GE_plotdone, 0, 0, 0, 0, 0);
+
+    if (!pc_processing_events) {
+	/* Hack to let the gnuplot kernel do new plots */
+	term_graphics = FALSE;
+	pc_processing_events = TRUE;
+	while (pc_processing_events) {
+	    int key =  getch();
+	    switch (key) {
+	    case 0: { // extended key
+		int c = getch();
+		int mod = 0;
+
+		key = PC_translate_key(c, &mod);
+		if (key > 0) {
+		    if (mod != 0)
+			exec_event(GE_modifier, 0, 0, mod, 0, 0);
+		    exec_event(GE_keypress, 0, 0, key, 0, 0);
+		    if (mod != 0)
+			exec_event(GE_modifier, 0, 0, 0, 0, 0);
+		} else {
+		    char s[80];
+		    snprintf_s(s, sizeof(s), "extended key: %d ", c);
+		    _outtext(s);
+		}
+		break;
+	    }
+	    case '\r':
+	    case '\n':
+	    case '  ':
+		exec_event(GE_keypress, 0, 0, key, 0, 0);
+		pc_processing_events = FALSE;
+		break;
+	    default:
+		exec_event(GE_keypress, 0, 0, key, 0, 0);
+	    }
+	}
+	pc_processing_events = FALSE;
+	term_graphics = TRUE;
+	PC_restore_text();
+    }
+# else /* !USE_MOUSE */
+    (void) getch();
+    PC_restore_text();
+#endif
+}
+
+
+TERM_PUBLIC void
+PC_reset(void)
+{
+    if (graphics_on)
+	PC_restore_text();
+
+    if (pc_image != NULL) {
+	free(pc_image);
+	pc_image = NULL;
+    }
+
+    if (pc_text_image != NULL) {
+	free(pc_text_image);
+	pc_text_image = NULL;
+    }
+}
+
+
+TERM_PUBLIC void
+PC_suspend(void)
+{
+    if (pc_image == NULL) {
+	long size = _imagesize(0, 0, pc_lastx, pc_lasty);
+	pc_image = gp_alloc(size, "multiplot image");
+    }
+    if (pc_image != NULL)
+	_getimage(0, 0, pc_lastx, pc_lasty, pc_image);
+    PC_text();
+}
+
+
+TERM_PUBLIC void
+PC_resume(void)
+{
+    PC_graphics();
+    if (pc_image != NULL)
+	_putimage(0, 0, pc_image, _GPSET);
+}
+
 
 TERM_PUBLIC void
 PC_linetype(int linetype)
 {
-    if (linetype < -2)
-	linetype = LT_BLACK;
-
     if (pc_colors > 14) {	/* 16 or more colors */
-	if (linetype >= 13)
-	    linetype %= 13;
-	_setcolor(vga_color[linetype + 2]);
+	t_colorspec colorspec;
+
+	colorspec.type = TC_LT;
+	colorspec.lt = linetype;
+	PC_set_color(&colorspec);
+	if (colorspec.lt != LT_AXIS)
+	    _setlinestyle(pc_dash_pattern[0]); // solid line
+	else
+	    _setlinestyle(pc_dash_pattern[1]); // dotted line
     } else {			/* MONO */
+	if (linetype < -2)
+	    linetype = LT_BLACK;
 	if (linetype >= 5)
 	    linetype %= 5;
-	_setlinestyle(pattern[linetype + 2]);
+	_setcolor(1);
+	_setlinestyle(pc_dash_pattern[linetype + 2]);
     }
 }
+
+
+TERM_PUBLIC void
+PC_linewidth(double linewidth)
+{
+    pc_linewidth = (int) (linewidth * pc_linewidth_scale + 0.5);
+    if (pc_linewidth < 1) pc_linewidth = 1;
+}
+
 
 TERM_PUBLIC void
 PC_move(unsigned int x, unsigned int y)
@@ -246,45 +857,45 @@ PC_move(unsigned int x, unsigned int y)
     starty = y;
 }
 
+
 TERM_PUBLIC void
 PC_vector(unsigned int x, unsigned int y)
 {
-    _lineto(x, pc_lasty - y);
+    if (pc_linewidth == 1) {
+	_lineto(x, pc_lasty - y);
+    } else {
+	int i;
+
+	/* Poor man's linewidth:
+	   Note that in most cases the actual linewidth is wrong, there's no
+	   transition between the cases below. And an even linewidth causes a shift
+	   of the line by one pixel.  Still better than nothing. */
+	if (abs(starty - y) >= abs(startx - x)) {
+	    /* "vertical" lines */
+	    for (i = 0; i < pc_linewidth; i++) {
+		_moveto(startx - pc_linewidth/2 + i, pc_lasty - starty);
+		_lineto(x - pc_linewidth/2 + i, pc_lasty - y);
+	    }
+	} else {
+	    /* "horizontal" lines */
+	    for (i = 0; i < pc_linewidth; i++) {
+		_moveto(startx, pc_lasty - starty - pc_linewidth/2 + i);
+		_lineto(x, pc_lasty - y - pc_linewidth/2 + i);
+	    }
+	}
+    }
     startx = x;
     starty = y;
 }
 
-TERM_PUBLIC void
-PC_reset()
-{
-    graphics_on = FALSE;
-    _setvideomode(_DEFAULTMODE);
-}
-
-TERM_PUBLIC void
-PC_text()
-{
-    if (graphics_on) {
-	graphics_on = FALSE;
-	(void) getch();
-	_setvideomode(_DEFAULTMODE);
-    }
-}
 
 TERM_PUBLIC int
 PC_text_angle(int ang)
 {
-    switch (ang) {
-    case 0:
-	pc_text_dir = HORIZ_DIR;
-	break;
-    default:
-    case 1:
-	pc_text_dir = VERT_DIR;
-	break;
-    }
+    pc_text_dir = ang;
     return TRUE;
 }
+
 
 TERM_PUBLIC int
 PC_justify_text(enum JUSTIFY just)
@@ -307,13 +918,604 @@ PC_justify_text(enum JUSTIFY just)
     return 1;
 }
 
+
 TERM_PUBLIC void
 PC_put_text(unsigned int x, unsigned int y, const char *str)
 {
-    _setcharsize(pc_text_size * PC_VCHAR, pc_text_size * PC_HCHAR);
     _settextang(pc_text_dir);
     _settextalign(pc_hjustify, pc_vjustify);
     _grtext(x, pc_lasty - y, (char *) str);
+    if (pc_boxing) {
+	struct xycoord extent[4];
+	int i;
+
+	_gettextextent(x, pc_lasty - y, (char *) str, NULL, extent);
+	// In contrast to the documentation, we find the sequence to be clockwise.
+	pc_boxed_extent[0].xcoord = GPMIN(pc_boxed_extent[0].xcoord, extent[0].xcoord);
+	pc_boxed_extent[1].xcoord = GPMAX(pc_boxed_extent[1].xcoord, extent[1].xcoord);
+	pc_boxed_extent[2].xcoord = GPMAX(pc_boxed_extent[2].xcoord, extent[2].xcoord);
+	pc_boxed_extent[3].xcoord = GPMIN(pc_boxed_extent[3].xcoord, extent[3].xcoord);
+	pc_boxed_extent[0].ycoord = GPMAX(pc_boxed_extent[0].ycoord, extent[0].ycoord);
+	pc_boxed_extent[1].ycoord = GPMAX(pc_boxed_extent[1].ycoord, extent[1].ycoord);
+	pc_boxed_extent[2].ycoord = GPMIN(pc_boxed_extent[2].ycoord, extent[2].ycoord);
+	pc_boxed_extent[3].ycoord = GPMIN(pc_boxed_extent[3].ycoord, extent[3].ycoord);
+    }
+}
+
+
+/* -------------------------------------------------------------------------
+   The "enhanced text" code below is a modified version of Ethan Merritt's
+   original skeleton.
+   ------------------------------------------------------------------------- */
+
+static TBOOLEAN pc_enhanced_opened_string;
+static TBOOLEAN pc_enhanced_show = TRUE;
+static int pc_enhanced_overprint = 0;
+static TBOOLEAN pc_enhanced_widthflag = TRUE;
+static int pc_enhanced_xsave, pc_enhanced_ysave;
+static double pc_enhanced_base;
+static int pc_x;
+static int pc_y;
+static TBOOLEAN pc_sizeonly;
+static double pc_text_sin;
+static double pc_text_cos;
+
+
+TERM_PUBLIC void
+PC_enhanced_open(
+    char *fontname,
+    double fontsize, double base,
+    TBOOLEAN widthflag, TBOOLEAN showflag,
+    int overprint)
+{
+    char font[20];
+
+    /* There are two special cases:
+     * overprint = 3 means save current position
+     * overprint = 4 means restore saved position
+     */
+    if (overprint == 3) {
+	pc_enhanced_xsave = pc_x;
+	pc_enhanced_ysave = pc_y;
+	return;
+    } else if (overprint == 4) {
+	pc_x = pc_enhanced_xsave;
+	pc_y = pc_enhanced_ysave;
+	return;
+    }
+
+    if (!pc_enhanced_opened_string) {
+	pc_enhanced_opened_string = TRUE;
+	/* Start new text fragment */
+	enhanced_cur_text = &enhanced_text[0];
+	/* Keep track of whether we are supposed to show this string */
+	pc_enhanced_show = showflag;
+	/* 0/1/2  no overprint / 1st pass / 2nd pass */
+	pc_enhanced_overprint = overprint;
+	/* widthflag FALSE means do not update text position after printing */
+	pc_enhanced_widthflag = widthflag;
+	/* Select font */
+	sprintf_s(font, sizeof(font), ",%.1f", fontsize);
+	PC_set_font(font);
+	/* Scale fractional font height to vertical units of display */
+	pc_enhanced_base = base * term->v_char / (PC_DEFAULT_FONTSIZE * pc_fontscale) / 1.2;
+	/* draw text left to right, align with baseline */
+	_settextalign(_LEFT, _BASE);
+    }
+}
+
+
+TERM_PUBLIC void
+PC_enhanced_flush(void)
+{
+    char *str = enhanced_text;	/* The fragment to print */
+    int len;
+    int width = 0;
+    int height = 0;
+    struct xycoord concat;
+    struct xycoord extent[4];
+
+    if (!pc_enhanced_opened_string)
+	return;
+    *enhanced_cur_text = NUL;
+
+    /* calculate length of string first */
+    _settextang(0);
+    _gettextextent(pc_x, pc_lasty - pc_y, str, &concat, extent);
+    len = concat.xcoord - pc_x;
+    width = len * pc_text_cos;
+    height = len * pc_text_sin;
+    _settextang(pc_text_dir);
+
+    /* print the string fragment, perhaps invisibly */
+    /* NB: base expresses offset from current y pos */
+    if (pc_enhanced_show && !pc_sizeonly) {
+	int base_x = - pc_enhanced_base * pc_text_sin;
+	int base_y = pc_enhanced_base * pc_text_cos;
+
+	_grtext(pc_x + base_x, pc_lasty - (pc_y + base_y), (char *) str);
+    }
+
+    if (!pc_enhanced_widthflag) {
+	/* don't update position */
+	width = 0;
+	height = 0;
+    }
+    if (pc_sizeonly) {
+	/* This is the first pass for justified printing.        */
+	/* We just adjust the starting position for the second pass. */
+	if (pc_hjustify == _RIGHT) {
+	    pc_x -= width;
+	    pc_y -= height;
+	} else if (pc_hjustify == _CENTER) {
+	    pc_x -= width / 2;
+	    pc_y -= height / 2;
+	}
+	/* nothing to do for LEFT justified text */
+    } else if (pc_enhanced_overprint == 1) {
+	/* Save current position */
+	pc_enhanced_xsave = pc_x + width;
+	pc_enhanced_ysave = pc_y + height;
+	/* First pass of overprint, leave position in center of fragment */
+	pc_x += width / 2;
+	pc_y += height / 2;
+    } else if (pc_enhanced_overprint == 2) {
+	/* Restore current position,                          */
+	/* this sets the position behind the overprinted text */
+	pc_x = pc_enhanced_xsave;
+	pc_y = pc_enhanced_ysave;
+    } else {
+	/* Normal case is to update position to end of fragment */
+	pc_x += width;
+	pc_y += height;
+    }
+    pc_enhanced_opened_string = FALSE;
+}
+
+
+TERM_PUBLIC void
+PC_enhanced_put_text(unsigned int x, unsigned int y, const char *str)
+{
+    const char * original_string = str;
+    unsigned int pass, num_passes;
+    int shift_x, shift_y;
+
+    /* If no enhanced text processing is needed, we can use the plain  */
+    /* vanilla put_text() routine instead of this fancy recursive one. */
+    if (ignore_enhanced_text || !strpbrk(str, "{}^_@&~")) {
+	PC_put_text(x, y, str);
+	return;
+    }
+
+    /* Set up global variables needed by enhanced_recursion() */
+    enhanced_fontscale = 1.0;
+    pc_enhanced_opened_string = FALSE;
+    safe_strncpy(enhanced_escape_format, "%c", sizeof(enhanced_escape_format));
+
+    // save sin/cos of text angle
+    pc_text_sin = sin(DEG2RAD * pc_text_dir);
+    pc_text_cos = cos(DEG2RAD * pc_text_dir);
+
+    // determine base line shift
+    {
+	struct xycoord concat_center;
+	struct xycoord concat_base;
+	struct xycoord extent_center[4];
+	struct xycoord extent_base[4];
+	int shift;
+
+	_settextang(0);
+	_settextalign(_LEFT, _BASE);
+	_gettextextent(x, pc_lasty - y, "XX", &concat_base, extent_base);
+	_settextalign(_LEFT, _CENTER);
+	_gettextextent(x, pc_lasty - y, "XX", &concat_center, extent_center);
+	_settextang(pc_text_dir);
+	shift = (extent_base[3].ycoord - extent_center[3].ycoord) / 2;
+	shift_y = pc_text_cos * shift;
+	shift_x = -pc_text_sin * shift;
+    }
+    pc_x = x + shift_x;
+    pc_y = y + shift_y;
+
+    /* Text justification requires two passes. During the first pass we */
+    /* don't draw anything, we just measure the space it will take.     */
+    /* Without justification one pass is enough                         */
+    if (pc_hjustify == _LEFT) {
+	num_passes = 1;
+	pc_sizeonly = FALSE;
+    } else {
+	num_passes = 2;
+	pc_sizeonly = TRUE;
+    }
+
+    for (pass = 1; pass <= num_passes; pass++) {
+	/* Set the recursion going. We say to keep going until a
+	 * closing brace, but we don't really expect to find one.
+	 * If the return value is not the nul-terminator of the
+	 * string, that can only mean that we did find an unmatched
+	 * closing brace in the string. We increment past it (else
+	 * we get stuck in an infinite loop) and try again.
+	 */
+	while (*(str = enhanced_recursion(str, TRUE,
+			"", PC_DEFAULT_FONTSIZE,
+			0.0, TRUE, TRUE, 0))) {
+	    PC_enhanced_flush();
+	    /* I think we can only get here if *str == '}' */
+	    enh_err_check(str);
+	    if (!*++str)
+		    break; /* end of string */
+	    /* else carry on and process the rest of the string */
+	}
+
+	/* In order to do text justification we need to do a second pass
+	 * that uses information stored during the first pass, see
+	 * PC_enhanced_flush().
+	 */
+	if (pass == 1) {
+	    /* do the actual printing in the next pass */
+	    pc_sizeonly = FALSE;
+	    str = original_string;
+	}
+    }
+
+    PC_set_font("");
+}
+
+
+TERM_PUBLIC int
+PC_set_font(const char *font)
+{
+    float size = PC_DEFAULT_FONTSIZE;
+
+    if (font != NULL && font[0] != 0) {
+	char * sep = strchr(font, ',');
+	if (sep != NULL) {
+	    size = atof(sep + 1);
+	}
+    }
+
+    /* estimate font size in pixels */
+    {
+	float aspect = (float) (pc_lastx + 1) / (float) (pc_lasty + 1);
+	float d = 14; /* assumed monitor size in inches */
+	float height = sqrt(d * d / (aspect * aspect + 1));
+	float res = (pc_lasty + 1) / height;
+	float fheight = res * size / 72. * pc_fontscale;
+	float fwidth = fheight / pc_font_aspect;
+	_setcharsize(fheight, fwidth);
+    }
+    pc_fontsize = size;
+    return TRUE;
+}
+
+
+TERM_PUBLIC void
+PC_pointsize(double size)
+{
+    term_pointsize = pc_pointscale * (size >= 0 ? size : 1);
+}
+
+
+static long
+PC_set_rgb_color(int r, int g, int b)
+{
+    int closest_n = 0, closest_d = INT_MAX;
+    int i, d;
+
+    /* limited RGB range */
+    r >>= 2;
+    g >>= 2;
+    b >>= 2;
+
+    /* look-up color match */
+    for (i = 0; i < pc_rgbcolors; i++) {
+	d = abs(pc_rgbcolor[i].r - r) + abs(pc_rgbcolor[i].g - g) + abs(pc_rgbcolor[i].b - b);
+	if (d == 0)
+	    break;
+	if (d < closest_d) {
+	    closest_d = d;
+	    closest_n = pc_rgbcolor[i].n;
+	}
+    }
+    /* allocate new slot */
+    if (d != 0) {
+	if (pc_rgbcolors >= (256 - pc_rgb_pal_ofs)) {
+	    /* list full, choose closest match */
+	    return closest_n;
+	}
+	i = pc_rgbcolors;
+	pc_rgbcolors++;
+
+	pc_rgbcolor[i].n = pc_rgb_pal_ofs + i;
+	pc_rgbcolor[i].r = r;
+	pc_rgbcolor[i].g = g;
+	pc_rgbcolor[i].b = b;
+
+	_remappalette(pc_rgbcolor[i].n, r + (g << 8) + (b << 16));
+    }
+    return pc_rgbcolor[i].n;
+}
+
+
+TERM_PUBLIC void
+PC_set_color(t_colorspec *colorspec)
+{
+    switch (colorspec->type) {
+    case TC_LT: {
+	int linetype = colorspec->lt;
+
+	if (pc_colors < 14) {
+	    if (linetype == LT_BACKGROUND)
+		_setcolor(0);
+	    else
+		_setcolor(1);
+	    break;
+	}
+
+	switch (linetype) {
+	case LT_BACKGROUND:
+	    _setcolor(0);
+	    break;
+	case LT_BLACK:
+	    /* do we have a dark background? */
+	    if ((pc_background_rgb.r + pc_background_rgb.g + pc_background_rgb.b) <= 0x7f) {
+		_setcolor(vga_color[0]);
+	    } else {
+		if (pc_colors > 16) {
+		    long color = PC_set_rgb_color(0, 0, 0);
+		    _setcolor(color);
+		} else {
+		    _setcolor(8);
+		}
+	    }
+	    break;
+	case LT_AXIS:
+	    if ((pc_background_rgb.r + pc_background_rgb.g + pc_background_rgb.b) <= 0x7f)
+		_setcolor(vga_color[1]);
+	    else
+		_setcolor(vga_color[0]);
+	    break;
+	default:
+	    // default case
+	    if (linetype >= 13)
+		linetype %= 13;
+	    if (linetype < -2)
+		linetype = LT_BLACK;
+	    _setcolor(vga_color[linetype + 2]);
+	}
+	break;
+    }
+    case TC_RGB: {
+	unsigned int rgb = colorspec->lt;
+	/* color range is 0..63 */
+	int r = ((rgb >> 16) & 0xff);
+	int g = ((rgb >>  8) & 0xff);
+	int b = ( rgb        & 0xff);
+
+	if (pc_colors > 256) {
+	    _setcolor(((b >> 2) << 16) | ((g >> 2) << 8) | (r >> 2));
+	} else if (pc_colors > 14) {
+	    int color = PC_set_rgb_color(r, g, b);
+	    _setcolor(color);
+	}
+	break;
+    }
+    case TC_FRAC: {
+	float gray = colorspec->value;
+	if (pc_colors == 256) {
+	    _setcolor(gray * (pc_rgb_pal_ofs - pc_pal_ofs) + pc_pal_ofs);
+	}
+	break;
+    }
+    }
+}
+
+
+TERM_PUBLIC int
+PC_make_palette(t_sm_palette *palette)
+{
+    int i;
+
+    if (pc_colors == 256) {
+	if (palette == NULL)
+	    return pc_rgb_pal_ofs - pc_pal_ofs;
+
+	for (i = 0; i < palette->colors; i++) {
+	    long color =
+		((long) (palette->color[i].r * 63)      ) |
+		((long) (palette->color[i].g * 63) <<  8) |
+		((long) (palette->color[i].b * 63) << 16);
+	    _remappalette(i + pc_pal_ofs, color);
+	}
+	return pc_rgb_pal_ofs - pc_pal_ofs;
+    } else if (pc_colors > 256) {
+	return 0;
+
+    }
+    return 1;
+}
+
+
+TERM_PUBLIC void
+PC_fillbox(int fillstyle, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height)
+{
+    /* fillpar:
+     * - solid   : 0 - 100
+     * - pattern : 0 - 100
+     */
+    int fillpar = fillstyle >> 4;
+    int style = fillstyle & 0xf;
+    int x2 = x1 + width - 1;
+    short y2 = y1 + height - 1;
+
+    switch (style) {
+	case FS_EMPTY: { /* fill with background color */
+	    short color = _getcolor();
+	    _setfillmask(NULL);
+	    _setcolor(0);
+	    _rectangle(_GFILLINTERIOR, x1, pc_lasty - y1, x2, pc_lasty - y2);
+	    _setcolor(color);
+	    return;  /* we're done */
+	}
+	case FS_DEFAULT: /* solid fill */
+	    _setfillmask(NULL);
+	    break;
+	case FS_SOLID: /* shaded fill */
+	    if (fillpar < 100) {
+		short color = _getcolor();
+		_setfillmask(NULL);
+		_setcolor(0);
+		_rectangle(_GFILLINTERIOR, x1, pc_lasty - y1, x2, pc_lasty - y2);
+		_setcolor(color);
+	    }
+	    /* fall through */
+	case FS_TRANSPARENT_SOLID:
+	    if (fillpar == 100) {
+		_setfillmask(NULL);
+	    } else {
+		int steps = 100 / (pc_shading_pattern_num - 1);
+		int i = (fillpar + steps / 2) / steps;
+		_setfillmask(pc_shading_pattern_bitmap[i]);
+	    }
+	    break;
+	case FS_PATTERN: { /* pattern fill */
+	    short color = _getcolor();
+	    _setfillmask(NULL);
+	    _setcolor(0);
+	    _rectangle(_GFILLINTERIOR, x1, pc_lasty - y1, x2, pc_lasty - y2);
+	    _setcolor(color);
+	    /* fall through */
+	}
+	case FS_TRANSPARENT_PATTERN:
+	    fillpar %= pc_fill_pattern_num;
+	    _setfillmask(pc_fill_pattern_bitmaps[fillpar]);
+	    break;
+	default:
+	    /* should never happen */
+	    break;
+    }
+    _rectangle(_GFILLINTERIOR, x1, pc_lasty - y1, x2, pc_lasty - y2);
+}
+
+
+TERM_PUBLIC void
+PC_filled_polygon(int npoints, gpiPoint *corners)
+{
+    int fillpar = corners->style >> 4;
+    int style = corners->style & 0xf;
+    struct xycoord * points;
+    int i;
+
+    points = malloc(sizeof(struct xycoord) * npoints);
+    for (i = 0; i < npoints; i++) {
+	points[i].xcoord = corners[i].x;
+	points[i].ycoord = pc_lasty - corners[i].y;
+    }
+
+    switch (style) {
+	case FS_EMPTY: { /* fill with background color */
+	    short color = _getcolor();
+	    _setfillmask(NULL);
+	    _setcolor(0);
+	    _polygon(_GFILLINTERIOR, npoints, points);
+	    free(points);
+	    _setcolor(color);
+	    return; /* we're done */
+	}
+	case FS_DEFAULT: /* solid fill */
+	    _setfillmask(NULL);
+	    break;
+	case FS_SOLID: /* shaded fill */
+	    if (fillpar < 100) {
+		short color = _getcolor();
+		_setfillmask(NULL);
+		_setcolor(0);
+		_polygon(_GFILLINTERIOR, npoints, points);
+		_setcolor(color);
+	    }
+	    /* fall through */
+	case FS_TRANSPARENT_SOLID:
+	    if (fillpar == 100) {
+		_setfillmask(NULL);
+	    } else {
+		int steps = 100 / (pc_shading_pattern_num - 1);
+		int i = (fillpar + steps / 2) / steps;
+		_setfillmask(pc_shading_pattern_bitmap[i]);
+	    }
+	    break;
+	case FS_PATTERN: { /* pattern fill */
+	    short color = _getcolor();
+	    _setfillmask(NULL);
+	    _setcolor(0);
+	    _polygon(_GFILLINTERIOR, npoints, points);
+	    _setcolor(color);
+	    /* fall through */
+	}
+	case FS_TRANSPARENT_PATTERN:
+	    fillpar %= pc_fill_pattern_num;
+	    _setfillmask(pc_fill_pattern_bitmaps[fillpar]);
+	    break;
+	default:
+	    /* should never happen */
+	    break;
+    }
+
+    _polygon(_GFILLINTERIOR, npoints, points);
+    free(points);
+}
+
+
+#ifdef EAM_BOXED_TEXT
+TERM_PUBLIC void
+PC_boxed_text(unsigned int x, unsigned int y, int option)
+{
+    switch (option) {
+    case TEXTBOX_INIT: {
+	pc_boxing = TRUE;
+	pc_boxed_extent[0].xcoord = pc_boxed_extent[3].xcoord = SHRT_MAX;
+	pc_boxed_extent[1].xcoord = pc_boxed_extent[2].xcoord = 0;
+	pc_boxed_extent[0].ycoord = pc_boxed_extent[1].ycoord = 0;
+	pc_boxed_extent[2].ycoord = pc_boxed_extent[3].ycoord = SHRT_MAX;
+	break;
+    }
+    case TEXTBOX_OUTLINE:
+	// TODO: apply text margins
+	_polygon(_GBORDER, 4, pc_boxed_extent);
+	break;
+    case TEXTBOX_BACKGROUNDFILL:
+	// TODO: apply text margins
+	_polygon(_GFILLINTERIOR, 4, pc_boxed_extent);
+	break;
+    case TEXTBOX_MARGINS:
+	/* Change the text margins */
+	break;
+    case TEXTBOX_FINISH:
+	pc_boxing = FALSE;
+	break;
+    default:
+	break;
+    }
+}
+#endif
+
+
+TERM_PUBLIC void
+PC_dashtype(int type, t_dashtype *custom_dash_pattern)
+{
+    if (type >= 0) { /* predefined linetype */
+	type = type % 5;
+	_setlinestyle(pc_dash_pattern[type + 2]);
+    } else switch (type) {
+	case DASHTYPE_AXIS:
+	    _setlinestyle(pc_dash_pattern[1]);
+	    break;
+	case DASHTYPE_SOLID:
+	    _setlinestyle(pc_dash_pattern[0]);
+	    break;
+	case DASHTYPE_CUSTOM:
+	    /* Unsupported */
+	    break;
+    }
 }
 
 #endif /* TERM_BODY */
@@ -323,10 +1525,32 @@ PC_put_text(unsigned int x, unsigned int y, const char *str)
 TERM_TABLE_START(dospc_driver)
     "dospc", "IBM PC/Clone running DOS",
     PC_XMAX, PC_YMAX, PC_VCHAR, PC_HCHAR,
-    PC_VTIC, PC_HTIC, options_null, PC_init, PC_reset,
+    PC_VTIC, PC_HTIC, PC_options, PC_init, PC_reset,
     PC_text, null_scale, PC_graphics, PC_move, PC_vector,
-    PC_linetype, PC_put_text, PC_text_angle,
-    PC_justify_text, line_and_point, do_arrow, set_font_null
+    PC_linetype, PC_enhanced_put_text, PC_text_angle,
+    PC_justify_text, do_point, do_arrow, PC_set_font,
+    PC_pointsize,
+    TERM_NO_OUTPUTFILE | TERM_CAN_MULTIPLOT | TERM_CAN_DASH | TERM_ENHANCED_TEXT |
+    TERM_LINEWIDTH | TERM_FONTSCALE | TERM_POINTSCALE,
+    PC_suspend, PC_resume,
+    PC_fillbox,
+    PC_linewidth, /* linewidth */
+#ifdef USE_MOUSE
+    NULL, NULL, NULL, NULL, NULL,
+#endif
+    PC_make_palette, NULL, /* palette */
+    PC_set_color,
+    PC_filled_polygon,
+    NULL, /* image */
+    PC_enhanced_open, PC_enhanced_flush, do_enh_writec,
+    NULL, NULL, /* layer , path */
+    0,
+    NULL,
+#ifdef EAM_BOXED_TEXT
+    PC_boxed_text,
+#endif
+    NULL,
+    PC_dashtype
 TERM_TABLE_END(dospc_driver)
 
 #undef LAST_TERM
@@ -347,7 +1571,21 @@ START_HELP(dospc)
 " Note: legacy terminal.",
 " The `dospc` terminal driver supports PCs with arbitrary graphics boards,",
 " which will be automatically detected. It uses the OpenWatcom graphics",
-" library. To select a particular VGA graphics mode set the environment",
-" variable PCTRM to one of S640, S800, S1024, S1280, or S1600."
+" library.",
+"",
+" Syntax:",
+"       set terminal dospc",
+"           {{no}{enhanced}}",
+"           {fontscale <scale>} {pointsize <scale>} {linewidth <scale}",
+"           {background <rgbcolor>",
+"",
+" Line widths, and point and font sizes can be scaled using the `linewidth`,",
+" `pointscale`, or `fontscale` options, respectively.",
+"",
+" `background` sets the background color (default: black). It is only supported",
+" with adapters with 16 or more colors.",
+"",
+" To select a particular (S)VGA graphics mode, set the environment",
+" variable PCTRM to one of S640, S800, S1024, S1280, or S1600.",
 END_HELP(dospc)
 #endif /* TERM_HELP */

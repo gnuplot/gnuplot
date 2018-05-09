@@ -280,10 +280,6 @@ main(int argc, char **argv)
     }
 #endif
 
-#if defined(MSDOS) && defined(__WATCOMC__)
-    PC_setup();
-#endif
-
 /* HBB: Seems this isn't needed any more for DJGPP V2? */
 /* HBB: disable all floating point exceptions, just keep running... */
 #if defined(DJGPP) && (DJGPP!=2)

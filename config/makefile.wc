@@ -39,7 +39,7 @@ M=..\demo\
 !include makefile.awc
 
 # -DHAVE_CONFIG_H: do the configuration #defines the (now) usual way
-CPPFLAGS=-DHAVE_CONFIG_H -DMSDOS -DPC -D__DOS__
+CPPFLAGS=-DHAVE_CONFIG_H -DMSDOS -D__DOS__
 # was: -UMSDOS -DDOS386 -DDOS32
 
 # -w0 means ignore warnings and do not report them

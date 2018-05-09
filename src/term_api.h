@@ -523,10 +523,6 @@ void do_arc __PROTO(( int cx, int cy, double radius,
 void LINUX_setup __PROTO((void));
 #endif
 
-#ifdef PC
-void PC_setup __PROTO((void));
-#endif
-
 #ifdef VMS
 void vms_reset();
 #endif
