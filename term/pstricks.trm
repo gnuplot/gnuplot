@@ -76,7 +76,7 @@
  * version 5 linetype support, filled boxes, pattern fill, variable
  * point size and line width, point symbols in line with other terminals,
  * boxed text, more arrow features, standalone (LaTeX) mode (including
- * text encoding support).  (BM, March/April 2018)
+ * text encoding support), transparency.  (BM, March/April 2018)
  *
  */
 
@@ -151,16 +151,17 @@ static enum JUSTIFY PSTRICKS_justify = LEFT;
 static int PSTRICKS_angle = 0;
 
 /* if 1 below, then the file size is shorter thanks to a macro for polygon */
-#define PSTRICKS_SHORTER_FILE 1
+/* FIXME: This feature is broken, deactivate for now */
+//#define PSTRICKS_SHORTER_FILE 1
 
 static int PSTRICKS_color_type = TC_DEFAULT;
-#ifdef PSTRICKS_SHORTER_FILE
 static int PSTRICKS_color = 0;
-#endif
 static char PSTRICKS_color_str[16] = "";
 static TBOOLEAN PSTRICKS_palette_set = FALSE;
 static int PSTRICKS_palette_size = 128;
 static rgb_color PSTRICKS_rgbcolor;
+static double PSTRICKS_alpha = 1.;
+static double PSTRICKS_alpha_old = 1.;
 
 /* POINTS */
 #define	PSTRICKS_TINY_DOT	0.00025		/* A tiny dot */
@@ -895,6 +896,11 @@ PSTRICKS_apply_linecolor(void)
 	strcpy(PSTRICKS_old_linecolor, PSTRICKS_linecolor);
 	fprintf(gpoutfile, "\\psset{linecolor=%s}\n", PSTRICKS_linecolor);
     }
+    if (PSTRICKS_alpha != PSTRICKS_alpha_old) {
+	/* We set the opacity of lines and fills. Required for transparent symbols. */
+	fprintf(gpoutfile, "\\psset{strokeopacity=%0.2f,opacity=%0.2f}\n", PSTRICKS_alpha, PSTRICKS_alpha);
+	PSTRICKS_alpha_old = PSTRICKS_alpha;
+    }
 }
 
 
@@ -914,19 +920,19 @@ PSTRICKS_set_color(t_colorspec *colorspec)
 	    fputs("pstricks: Palette used before set!\n", stderr);
 	    fputs("% ERROR: Palette used before set!\n", gpoutfile);
 	}
-#ifdef PSTRICKS_SHORTER_FILE
 	PSTRICKS_color = new_color;
-#endif
 	snprintf(PSTRICKS_color_str, sizeof(PSTRICKS_color_str), "PST@COLOR%d", new_color);
 	PSTRICKS_save_color(PSTRICKS_color_str);
+	PSTRICKS_alpha = 1.;
 	break;
     case TC_RGB: {
 	int red, green, blue;
-	double r, g, b;
+	double r, g, b, alpha;
 
 	red   = (colorspec->lt >> 16) & 0xff;
 	green = (colorspec->lt >>  8) & 0xff;
 	blue  = (colorspec->lt      ) & 0xff;
+	alpha = (double) (255 - ((colorspec->lt >> 24) & 0xff)) / 255;
 	/* round to 3 digits */
 	r = 1e-3 * (int)(red   / 255. * 1000);
 	g = 1e-3 * (int)(green / 255. * 1000);
@@ -944,6 +950,7 @@ PSTRICKS_set_color(t_colorspec *colorspec)
 	    PSTRICKS_rgbcolor.g = g;
 	    PSTRICKS_rgbcolor.b = b;
 	}
+	PSTRICKS_alpha = alpha;
 	break;
     }
     case TC_LT:
@@ -955,6 +962,7 @@ PSTRICKS_set_color(t_colorspec *colorspec)
 	    PSTRICKS_color = colorspec->lt % PSTRICKS_NUMCOLORS;
 	    PSTRICKS_save_color(PSTRICKS_colors[PSTRICKS_color]);
 	}
+	PSTRICKS_alpha = 1.;
 	break;
     }
 }
@@ -964,16 +972,27 @@ TERM_PUBLIC void
 PSTRICKS_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height)
 {
     int pattern = style >> 4;
+    int frac = style >> 4;
     const char * stylestr = "solid";
     const char * colorstr = "fillcolor";
     char patfill[80];
+    char opacity[80] = "";
+    char fraction[80] = "";
 
     PSTRICKS_endline();
 
     switch (style & 0x0f) {
     case FS_SOLID:
+	// color already set
+	if (frac != 100)
+	    snprintf(fraction, sizeof(fraction), "!%d", frac);
+	if (PSTRICKS_alpha != 1.)
+	    snprintf(opacity, sizeof(opacity), ",opacity=%0.2f", PSTRICKS_alpha);
+	break;
     case FS_TRANSPARENT_SOLID:
-	// already set
+	// color already set
+	if (frac != 100)
+	    snprintf(opacity, sizeof(opacity), ",opacity=%0.2f", (double) frac / 100.);
 	break;
     case FS_PATTERN:
     case FS_TRANSPARENT_PATTERN:
@@ -993,16 +1012,16 @@ PSTRICKS_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width
     fprintf(gpoutfile, "\\psframe[linestyle=none,fillstyle=%s", stylestr);
     if (PSTRICKS_color_type == TC_FRAC) {
 #ifdef PSTRICKS_SHORTER_FILE
-	fprintf(gpoutfile, ",%s=PST@COLOR%d]", colorstr, PSTRICKS_color);
+	fprintf(gpoutfile, "%s,%s=PST@COLOR%d%s]", opacity, colorstr, PSTRICKS_color, fraction);
 #else
-	fprintf(gpoutfile, ",%s=%s]", colorstr, PSTRICKS_color_str);
+	fprintf(gpoutfile, "%s,%s=%s%s]", opacity, colorstr, PSTRICKS_color_str, fraction);
 #endif
     } else if (PSTRICKS_color_type == TC_RGB) {
-	fprintf(gpoutfile, ",%s=c]", colorstr);
+	fprintf(gpoutfile, "%s,%s=c%s]", opacity, colorstr, fraction);
     } else if (PSTRICKS_color_type == TC_LT) {
-	fprintf(gpoutfile, ",%s=%s]", colorstr, PSTRICKS_colors[PSTRICKS_color]);
+	fprintf(gpoutfile, "%s,%s=%s%s]", opacity, colorstr, PSTRICKS_colors[PSTRICKS_color], fraction);
     } else {  // e.g. TC_DEFAULT
-	fputs("]", gpoutfile);
+	fprintf(gpoutfile, "%s]", opacity);
     }
     fprintf(gpoutfile, "(%.4g,%.4g)(%.4g,%.4g)\n",
 	PSTRICKS_map_x(x1), PSTRICKS_map_y(y1),
@@ -1015,17 +1034,28 @@ PSTRICKS_filled_polygon(int points, gpiPoint *corners)
 {
     int style = corners->style;
     int pattern = style >> 4;
+    int frac = style >> 4;
     const char * stylestr = "solid";
     const char * colorstr = "fillcolor";
     char patfill[80];
+    char opacity[80] = "";
+    char fraction[80] = "";
     int i;
 
     PSTRICKS_endline();
 
     switch (style & 0x0f) {
     case FS_SOLID:
+	// color already set
+	if (frac != 100)
+	    snprintf(fraction, sizeof(fraction), "!%d", frac);
+	if (PSTRICKS_alpha != 1.)
+	    snprintf(opacity, sizeof(opacity), ",opacity=%0.2f", PSTRICKS_alpha);
+	break;
     case FS_TRANSPARENT_SOLID:
-	// already set
+	// color already set
+	if (frac != 100)
+	    snprintf(opacity, sizeof(opacity), ",opacity=%0.2f", (double) frac / 100.);
 	break;
     case FS_PATTERN:
     case FS_TRANSPARENT_PATTERN:
@@ -1047,14 +1077,14 @@ PSTRICKS_filled_polygon(int points, gpiPoint *corners)
 	/* using a macro for an abbreviation */
 	fprintf(gpoutfile, "\\polypmIIId{%d}", PSTRICKS_color);
 #else
-	fprintf(gpoutfile, "\\pspolygon[linestyle=none,fillstyle=%s,%s=%s]", stylestr, colorstr, PSTRICKS_color_str);
+	fprintf(gpoutfile, "\\pspolygon[linestyle=none,fillstyle=%s%s,%s=%s%s]", stylestr, opacity, colorstr, PSTRICKS_color_str, fraction);
 #endif
     } else if (PSTRICKS_color_type == TC_RGB) {
-	fprintf(gpoutfile, "\\pspolygon[linestyle=none,fillstyle=%s,%s=c]", stylestr, colorstr);
+	fprintf(gpoutfile, "\\pspolygon[linestyle=none,fillstyle=%s%s,%s=c%s]", stylestr, opacity, colorstr, fraction);
     } else if (PSTRICKS_color_type == TC_LT) {
-	fprintf(gpoutfile, "\\pspolygon[linestyle=none,fillstyle=%s,%s=%s]", stylestr, colorstr, PSTRICKS_colors[PSTRICKS_color]);
+	fprintf(gpoutfile, "\\pspolygon[linestyle=none,fillstyle=%s%s,%s=%s%s]", stylestr, opacity, colorstr, PSTRICKS_colors[PSTRICKS_color], fraction);
     } else {
-	fprintf(gpoutfile, "\\pspolygon[linestyle=none,fillstyle=%s]", stylestr);
+	fprintf(gpoutfile, "\\pspolygon[linestyle=none,fillstyle=%s%s]", stylestr, opacity);
     }
     for (i = 0; i < points; i++) {
 	if (i % 8 == 7) /* up to 8 corners per line */
@@ -1150,7 +1180,7 @@ TERM_TABLE_START(pstricks_driver)
     PSTRICKS_text, null_scale, PSTRICKS_graphics, PSTRICKS_move, PSTRICKS_vector,
     PSTRICKS_linetype, PSTRICKS_put_text, PSTRICKS_text_angle,
     PSTRICKS_justify_text, PSTRICKS_point, PSTRICKS_arrow, set_font_null, PSTRICKS_pointsize,
-    TERM_BINARY | TERM_IS_LATEX /*flags*/,
+    TERM_BINARY | TERM_IS_LATEX | TERM_CAN_DASH | TERM_ALPHA_CHANNEL,
     0 /*suspend*/, 0 /*resume*/,
     PSTRICKS_fillbox, PSTRICKS_linewidth,
 #ifdef USE_MOUSE
@@ -1219,6 +1249,8 @@ START_HELP(pstricks)
 " butt caps and mitered joins and is the default.",
 "",
 " The old `hacktext` option has been replaced by the new default format (%h),",
-" see `format specifiers`."
+" see `format specifiers`.",
+"",
+" Transparency requires support by Ghostscript or conversion to PDF."
 END_HELP(pstricks)
 #endif /* TERM_HELP */
