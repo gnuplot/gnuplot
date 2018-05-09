@@ -145,6 +145,7 @@ static float PSTRICKS_size_y = 3.f;
 static float PSTRICKS_posx;
 static float PSTRICKS_posy;
 
+
 /* TEXT */
 static TBOOLEAN PST_colortext = FALSE;
 static enum JUSTIFY PSTRICKS_justify = LEFT;
@@ -162,6 +163,8 @@ static int PSTRICKS_palette_size = 128;
 static rgb_color PSTRICKS_rgbcolor;
 static double PSTRICKS_alpha = 1.;
 static double PSTRICKS_alpha_old = 1.;
+static TBOOLEAN PSTRICKS_have_bg;
+static rgb_color PSTRICKS_background = { 1., 1., 1. };
 
 /* POINTS */
 #define	PSTRICKS_TINY_DOT	0.00025		/* A tiny dot */
@@ -271,6 +274,7 @@ enum PSTRICKS_id { PSTRICKS_DEFAULTOPTIONS,
 	PSTRICKS_STANDALONE, PSTRICKS_INPUT,
 	PSTRICKS_BLACKTEXT, PSTRICKS_COLORTEXT,
 	PSTRICKS_ROUNDED, PSTRICKS_BUTT,
+	PSTRICKS_BACKGROUND,
 	PSTRICKS_OTHER };
 
 static struct gen_table PSTRICKS_opts[] =
@@ -286,6 +290,7 @@ static struct gen_table PSTRICKS_opts[] =
     { "colourt$ext", PSTRICKS_COLORTEXT },
     { "round$ed", PSTRICKS_ROUNDED },
     { "butt", PSTRICKS_BUTT },
+    { "backg$round", PSTRICKS_BACKGROUND },
     { NULL, PSTRICKS_OTHER }
 };
 
@@ -361,6 +366,16 @@ PSTRICKS_options()
 	    PST_rounded = TRUE;
 	    c_token++;
 	    break;
+	case PSTRICKS_BACKGROUND: {
+	    int background;
+
+	    c_token++;
+	    background = parse_color_name();
+	    PSTRICKS_background.r = (double)((background >> 16) & 0xff) / 255.;
+	    PSTRICKS_background.g = (double)((background >>  8) & 0xff) / 255.;
+	    PSTRICKS_background.b = (double)( background        & 0xff) / 255.;
+	    break;
+	}
 	default:
 	    int_error(c_token, "Unknown terminal option");
 	}
@@ -374,10 +389,13 @@ PSTRICKS_options()
     }
 
     // update terminal option string
-    snprintf(term_options, MAX_LINE_LEN + 1, "%s %s %s %s",
+    snprintf(term_options, MAX_LINE_LEN + 1, "%s %s %s background \"#%02x%02x%02x\" %s",
 	PST_unit_plot ? "unit" : size_str,
 	PST_rounded ? "rounded" : "butt",
 	PST_colortext ? "colortext" : "blacktext",
+	(int) floor(PSTRICKS_background.r * 255 + 0.5),
+	(int) floor(PSTRICKS_background.g * 255 + 0.5),
+	(int) floor(PSTRICKS_background.b * 255 + 0.5),
 	PST_standalone ? "standalone" : "input");
 }
 
@@ -417,6 +435,8 @@ PSTRICKS_init()
 TERM_PUBLIC void
 PSTRICKS_graphics()
 {
+    char background[80] = "";
+
     if (PST_standalone) {
 	fputs("\\begin{figure}\n", gpoutfile);
     }
@@ -462,22 +482,33 @@ PSTRICKS_graphics()
 \\catcode`@=12\n\n\
 \\fi\n", gpoutfile);
 
+    /* background color */
+    PSTRICKS_have_bg = FALSE;
+    if (PSTRICKS_background.r != 1. || PSTRICKS_background.g != 1. || PSTRICKS_background.b != 1.) {
+	PSTRICKS_have_bg = TRUE;
+	fprintf(gpoutfile, "\\newrgbcolor{PST@BGCOLOR}{%f %f %f}\n",
+	    PSTRICKS_background.r, PSTRICKS_background.g, PSTRICKS_background.b);
+	safe_strncpy(background, "[bgcolor=PST@BGCOLOR]", sizeof(background));
+    }
+
     /* Set the scaled plot size, if it's not a unit plot */
     if (!PST_unit_plot) {
 	// Choose 5in as unit for historical reasons only.
 	fputs("\\psset{unit=5.0in}\n", gpoutfile);
 	fprintf(gpoutfile, "\
-\\pspicture(%f,%f)(%f,%f)\n\
+\\pspicture%s(%f,%f)(%f,%f)\n\
 \\ifx\\nofigs\\undefined\n\
 \\catcode`@=11\n\n",
+	    background,
 	    0., 0.,
 	    PSTRICKS_size_x / 5., PSTRICKS_size_y / 5.
 	);
     } else {
 	fprintf(gpoutfile, "\
-\\pspicture(%f,%f)(%f,%f)\n\
+\\pspicture%s(%f,%f)(%f,%f)\n\
 \\ifx\\nofigs\\undefined\n\
 \\catcode`@=11\n\n",
+	    background,
 	    0., 0., 1., 1.
 	);
     }
@@ -1000,7 +1031,9 @@ PSTRICKS_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width
 	stylestr = (char *) PSTRICKS_patterns[pattern % PSTRICKS_NUMPATTERN];
 	if (pattern != 0)
 	    colorstr = "hatchcolor";
-	sprintf(patfill, stylestr, (style & 0x0f) == FS_PATTERN ? "*" : "");
+	snprintf(patfill, sizeof(patfill), stylestr, (style & 0x0f) == FS_PATTERN ? "*" : "");
+	if ((style & 0x0f) == FS_PATTERN && PSTRICKS_have_bg)
+	    strncat(patfill, ",fillcolor=PST@BGCOLOR", sizeof(patfill));
 	stylestr = patfill;
 	break;
     case FS_EMPTY:
@@ -1063,7 +1096,9 @@ PSTRICKS_filled_polygon(int points, gpiPoint *corners)
 	stylestr = (char *) PSTRICKS_patterns[pattern % PSTRICKS_NUMPATTERN];
 	if (pattern != 0)
 	    colorstr = "hatchcolor";
-	sprintf(patfill, stylestr, (style & 0x0f) == FS_PATTERN ? "*" : "");
+	snprintf(patfill, sizeof(patfill), stylestr, (style & 0x0f) == FS_PATTERN ? "*" : "");
+	if ((style & 0x0f) == FS_PATTERN && PSTRICKS_have_bg)
+	    strncat(patfill, ",fillcolor=PST@BGCOLOR", sizeof(patfill));
 	stylestr = patfill;
 	break;
     case FS_EMPTY:
@@ -1235,6 +1270,7 @@ START_HELP(pstricks)
 "                      {standalone | include}",
 "                      {blacktext | colortext | colourtext}",
 "                      {rounded|butt}",
+"                      {background <rgbcolor>}",
 "",
 " The `unit` option produces a plot with internal dimensions 1x1. The default",
 " is a plot of `size 5in,3in`.",
