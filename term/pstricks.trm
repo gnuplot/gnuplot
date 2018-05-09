@@ -243,7 +243,8 @@ static const char * PSTRICKS_patterns[] = {
     "crosshatch%s", "crosshatch%s,hatchsep=2.5pt",
     "solid",
     "vlines%s", "hlines%s",
-    "vlines%s,hatchsep=2.5pt", "hlines%s,hatchsep=2.5pt"
+    "vlines%s,hatchsep=2.5pt", "hlines%s,hatchsep=2.5pt",
+    "dots*", "penrose%s"
 };
 #define PSTRICKS_NUMPATTERN (sizeof(PSTRICKS_patterns) / sizeof(char *))
 
