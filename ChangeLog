@@ -1,3 +1,11 @@
+2018-05-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/boundary.c src/graph3d.c:  Consistent placement of timestamp at
+	true bottom of page.  In 2D plots move the key box upwards if necessary
+	to clear the timestamp (earlier versions moved the timestamp up instead).
+	In 3D plots always place the timestamp at the true page bottom (this
+	reverts the placement that that used in version 5.0).
+
 2018-05-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	Various sanity checks and variable initializations added to prevent
