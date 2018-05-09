@@ -509,22 +509,21 @@ PSTRICKS_map_y(int y)
 TERM_PUBLIC void
 PSTRICKS_linetype(int linetype)
 {
-    int color = linetype;
-
     PSTRICKS_endline();
 
-    if (linetype >= PSTRICKS_NUMLINES + LT_BLACK)
-	linetype %= (PSTRICKS_NUMLINES + LT_BLACK);
-    if (linetype < LT_BLACK)
-	linetype = LT_BLACK;
-    PSTRICKS_type = linetype;
+    /* all lines except for axis default to solid */
+    if (linetype == LT_AXIS)
+	PSTRICKS_type = -1;
+    else
+	PSTRICKS_type = 0;
 
-    if (color < 0) {
+    /* negative line types are all black */
+    if (linetype < 0) {
 	PSTRICKS_color_type = TC_DEFAULT;
 	PSTRICKS_save_color("black");
     } else {
 	PSTRICKS_color_type = TC_LT;
-	PSTRICKS_color = color % PSTRICKS_NUMCOLORS;
+	PSTRICKS_color = linetype % PSTRICKS_NUMCOLORS;
 	PSTRICKS_save_color(PSTRICKS_colors[PSTRICKS_color]);
     }
 }
