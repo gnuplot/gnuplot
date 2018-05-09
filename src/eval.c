@@ -1,7 +1,3 @@
-#ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.146 2017/05/05 06:09:32 sfeam Exp $"); }
-#endif
-
 /* GNUPLOT - eval.c */
 
 /*[
@@ -405,7 +401,7 @@ struct value *
 Gstring(struct value *a, char *s)
 {
     a->type = STRING;
-    a->v.string_val = s;
+    a->v.string_val = s ? s : strdup("");
     return (a);
 }
 

@@ -5,6 +5,7 @@ Changes in 5.2.4
 * CHANGE "set []range writeback" is now essentially always in effect
 * FIX re-implement "refresh" command to use autoscale writeback/restore
 * FIX font-handling bug; line-spacing of previous font still in effect
+* FIX post, dumb terminals: early fontsize initialization
 
 Changes in 5.2.3
 ================

@@ -2049,8 +2049,8 @@ cntr3d_labels(struct gnuplot_contours *cntr, char *level_text, struct text_label
 /* map xmin | xmax to 0 | 1 and same for y
  * 0.1 avoids any rounding errors
  */
-#define MAP_HEIGHT_X(x) ( (int) (((x)-X_AXIS.min)/(X_AXIS.max-X_AXIS.min)+0.1) )
-#define MAP_HEIGHT_Y(y) ( (int) (((y)-Y_AXIS.min)/(Y_AXIS.max-Y_AXIS.min)+0.1) )
+#define MAP_HEIGHT_X(x) ( ((x)-X_AXIS.min)/(X_AXIS.max-X_AXIS.min) > 0.9 ? 1 : 0 )
+#define MAP_HEIGHT_Y(y) ( ((y)-Y_AXIS.min)/(Y_AXIS.max-Y_AXIS.min) > 0.9 ? 1 : 0 )
 
 /* if point is at corner, update height[][] and depth[][]
  * we are still assuming that extremes of surfaces are at corners,

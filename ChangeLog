@@ -1,3 +1,13 @@
+2018-05-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	Various sanity checks and variable initializations added to prevent
+	crashes found by fuzzing.
+
+	graph3d.c: revise MAP_HEIGHT macro to guarantee result is either 0 or 1
+	eval.c: revise Gstring to never store a STRING value with a NULL pointer
+	dumb.trm: guard against text output to out-of-range character cells
+	post.trm: guard against fontsize ever being set to zero
+
 2018-05-05  Dima Kogan  <dima@secretsauce.net>
 
 	* src/axis.h src/command.c src/plot2d.c src/plot3d.c:
