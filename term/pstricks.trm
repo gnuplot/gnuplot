@@ -133,6 +133,9 @@ static inline double PSTRICKS_map_y(int y);
 static void PSTRICKS_save_color(const char * color);
 static void PSTRICKS_apply_linecolor(void);
 
+/* mode */
+static TBOOLEAN PST_standalone = FALSE;
+
 /* plot size */
 static TBOOLEAN PST_unit_plot = FALSE;	/* Unit-sized plot off */
 static size_units PSTRICKS_explicit_units = INCHES;
@@ -204,6 +207,9 @@ static const char *PSTRICKS_colors[] = {
     "yellow"
 };
 
+/* line caps and joins */
+static TBOOLEAN PST_rounded = FALSE;
+
 /* current line type */
 static int PSTRICKS_type;
 
@@ -262,6 +268,7 @@ enum PSTRICKS_id { PSTRICKS_DEFAULTOPTIONS,
 	PSTRICKS_UNIT, PSTRICKS_NOUNIT,
 	PSTRICKS_STANDALONE, PSTRICKS_INPUT,
 	PSTRICKS_BLACKTEXT, PSTRICKS_COLORTEXT,
+	PSTRICKS_ROUNDED, PSTRICKS_BUTT,
 	PSTRICKS_OTHER };
 
 static struct gen_table PSTRICKS_opts[] =
@@ -272,14 +279,13 @@ static struct gen_table PSTRICKS_opts[] =
     { "nou$nit", PSTRICKS_NOUNIT },
     { "stand$alone", PSTRICKS_STANDALONE },
     { "inp$ut", PSTRICKS_INPUT },
-    {"b$lacktext", PSTRICKS_BLACKTEXT},
-    {"colort$ext", PSTRICKS_COLORTEXT},
-    {"colourt$ext", PSTRICKS_COLORTEXT},
+    { "b$lacktext", PSTRICKS_BLACKTEXT },
+    { "colort$ext", PSTRICKS_COLORTEXT },
+    { "colourt$ext", PSTRICKS_COLORTEXT },
+    { "round$ed", PSTRICKS_ROUNDED },
+    { "butt", PSTRICKS_BUTT },
     { NULL, PSTRICKS_OTHER }
 };
-
-
-static TBOOLEAN PST_standalone = FALSE;
 
 
 TERM_PUBLIC void
@@ -345,6 +351,14 @@ PSTRICKS_options()
 	    PST_colortext = FALSE;
 	    c_token++;
 	    break;
+	case PSTRICKS_BUTT:
+	    PST_rounded = FALSE;
+	    c_token++;
+	    break;
+	case PSTRICKS_ROUNDED:
+	    PST_rounded = TRUE;
+	    c_token++;
+	    break;
 	default:
 	    int_error(c_token, "Unknown terminal option");
 	}
@@ -358,8 +372,10 @@ PSTRICKS_options()
     }
 
     // update terminal option string
-    snprintf(term_options, MAX_LINE_LEN + 1, "%s %s",
+    snprintf(term_options, MAX_LINE_LEN + 1, "%s %s %s %s",
 	PST_unit_plot ? "unit" : size_str,
+	PST_rounded ? "rounded" : "butt",
+	PST_colortext ? "colortext" : "blacktext",
 	PST_standalone ? "standalone" : "input");
 }
 
@@ -473,6 +489,7 @@ PSTRICKS_graphics()
     strcpy(PSTRICKS_linecolor, "black");
     PSTRICKS_lw = 1;
     PSTRICKS_arrowwidth = PSTRICKS_arrowlength = PSTRICKS_arrowinset = -1;
+    fprintf(gpoutfile, "\\psset{linecap=%d,linejoin=%d}\n", PST_rounded ? 1 : 0, PST_rounded ? 1 : 2);
 }
 
 
@@ -1186,8 +1203,9 @@ START_HELP(pstricks)
 "                      {unit | size <XX>{unit},<YY>{unit}}",
 "                      {standalone | include}",
 "                      {blacktext | colortext | colourtext}",
+"                      {rounded|butt}",
 "",
-" The `unit` option produces a plot with internal dimensions 1x1. The default"
+" The `unit` option produces a plot with internal dimensions 1x1. The default",
 " is a plot of `size 5in,3in`.",
 "",
 " `standalone` produces a LaTeX file with possibly multiple plots, ready",
@@ -1196,6 +1214,9 @@ START_HELP(pstricks)
 "",
 " `blacktext` forces all text to be written in black. `colortext` enables",
 " colored text. The default is `blacktext`.",
+"",
+" `rounded` sets line caps and line joins to be rounded.  `butt` is the sets",
+" butt caps and mitered joins and is the default.",
 "",
 " The old `hacktext` option has been replaced by the new default format (%h),",
 " see `format specifiers`."
