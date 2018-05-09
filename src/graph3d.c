@@ -860,7 +860,9 @@ do_3dplot(
     if (timelabel.text) {
 	int x, y;
 	x = t->v_char;
-	y = timelabel_bottom ? page_bounds.ybot : page_bounds.ytop;
+	y = timelabel_bottom
+	  ? yoffset * Y_AXIS.max + t->v_char
+	  : plot_bounds.ytop - t->v_char;
 	do_timelabel(x,y);
     }
 

@@ -227,9 +227,12 @@ boundary(struct curve_points *plots, int count)
 	if (vertical_timelabel) {
 	    timelabel_textheight = timelabel_textwidth * t->v_char;
 	    timelabel_textwidth = (timelin + 1.5) * t->h_char;
+	    timelabel.place.y = 0;
 	} else {
 	    timelabel_textheight = timelin * t->v_char;
 	    timelabel_textwidth = timelabel_textwidth * t->h_char;
+	    /* save textheight for use in do_key_bounds() */
+	    timelabel.place.y = timelabel_textheight;
 	}
     }
 
@@ -848,6 +851,8 @@ do_key_bounds(legend_key *key)
 	} else if (key->margin == GPKEY_BMARGIN) {
 	    /* align bottom first since bmargin may be manual */
 	    key->bounds.ybot = yoffset * t->ymax + t->v_tic;
+	    if (timelabel.rotate == 0 && timelabel_bottom && timelabel.place.y > 0)
+		key->bounds.ybot += (int)(timelabel.place.y);
 	    key->bounds.ytop = key->bounds.ybot + key_height;
 	} else {
 	    if (key->vpos == JUST_TOP) {
