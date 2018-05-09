@@ -1044,6 +1044,9 @@ PSTRICKS_filled_polygon(int points, gpiPoint *corners)
 	    fputs("\n", gpoutfile);
 	fprintf(gpoutfile,"(%.4g,%.4g)", PSTRICKS_map_x(corners[i].x), PSTRICKS_map_y(corners[i].y));
     }
+    /* make sure that polygons are closed - avoids spurious artifacts */
+    if ((corners[0].x != corners[points - 1].x) || (corners[0].y != corners[points - 1].y))
+	fprintf(gpoutfile,"(%.4g,%.4g)", PSTRICKS_map_x(corners[0].x), PSTRICKS_map_y(corners[0].y));
     fputs("\n\n", gpoutfile);
 }
 
