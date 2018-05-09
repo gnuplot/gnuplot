@@ -168,7 +168,8 @@ static rgb_color PSTRICKS_background = { 1., 1., 1. };
 
 /* POINTS */
 #define	PSTRICKS_TINY_DOT	0.00025		/* A tiny dot */
-double PST_pointsize;
+static double PST_pointsize;
+static double PSTRICKS_ps = 1.;
 static const char *PSTRICKS_points[] = {
     "\\PST@Plus",
     "\\PST@Cross",
@@ -222,7 +223,9 @@ static char PSTRICKS_old_linecolor[24] = "black";
 /* new line color */
 static char PSTRICKS_linecolor[24] = "black";
 
+/* line width */
 static double PSTRICKS_lw;
+static double PSTRICKS_lw_scale = 1.;
 
 /* are we in the middle of a line */
 static TBOOLEAN PSTRICKS_inline = FALSE;
@@ -274,6 +277,7 @@ enum PSTRICKS_id { PSTRICKS_DEFAULTOPTIONS,
 	PSTRICKS_STANDALONE, PSTRICKS_INPUT,
 	PSTRICKS_BLACKTEXT, PSTRICKS_COLORTEXT,
 	PSTRICKS_ROUNDED, PSTRICKS_BUTT,
+	PSTRICKS_LINEWIDTH, PSTRICKS_POINTSCALE,
 	PSTRICKS_BACKGROUND,
 	PSTRICKS_OTHER };
 
@@ -291,6 +295,10 @@ static struct gen_table PSTRICKS_opts[] =
     { "round$ed", PSTRICKS_ROUNDED },
     { "butt", PSTRICKS_BUTT },
     { "backg$round", PSTRICKS_BACKGROUND },
+    { "lw", PSTRICKS_LINEWIDTH },
+    { "linew$idth", PSTRICKS_LINEWIDTH },
+    { "points$cale", PSTRICKS_POINTSCALE },
+    { "ps", PSTRICKS_POINTSCALE },
     { NULL, PSTRICKS_OTHER }
 };
 
@@ -366,6 +374,18 @@ PSTRICKS_options()
 	    PST_rounded = TRUE;
 	    c_token++;
 	    break;
+	case PSTRICKS_LINEWIDTH:
+	    c_token++;
+	    PSTRICKS_lw_scale = real_expression();
+	    if (PSTRICKS_lw_scale < 0.0)
+		PSTRICKS_lw_scale = 1.0;
+	    break;
+	case PSTRICKS_POINTSCALE:
+	    c_token++;
+	    PSTRICKS_ps = real_expression();
+	    if (PSTRICKS_ps < 0.0)
+		PSTRICKS_ps = 1.0;
+	    break;
 	case PSTRICKS_BACKGROUND: {
 	    int background;
 
@@ -389,9 +409,11 @@ PSTRICKS_options()
     }
 
     // update terminal option string
-    snprintf(term_options, MAX_LINE_LEN + 1, "%s %s %s background \"#%02x%02x%02x\" %s",
+    snprintf(term_options, MAX_LINE_LEN + 1,
+	"%s %s linewidth %.1f pointscale %.1f %s background \"#%02x%02x%02x\" %s",
 	PST_unit_plot ? "unit" : size_str,
 	PST_rounded ? "rounded" : "butt",
+	PSTRICKS_lw_scale, PSTRICKS_ps,
 	PST_colortext ? "colortext" : "blacktext",
 	(int) floor(PSTRICKS_background.r * 255 + 0.5),
 	(int) floor(PSTRICKS_background.g * 255 + 0.5),
@@ -769,6 +791,7 @@ PSTRICKS_arrow(
 TERM_PUBLIC void
 PSTRICKS_pointsize(double pointsize)
 {
+    pointsize *= PSTRICKS_ps;
     if (PST_pointsize != pointsize) {
 	PSTRICKS_endline();
 	if (pointsize != 0.)
@@ -864,6 +887,7 @@ PSTRICKS_reset()
 TERM_PUBLIC void
 PSTRICKS_linewidth(double linewidth)
 {
+	linewidth *= PSTRICKS_lw_scale;
     if (linewidth * 0.0015 != PSTRICKS_lw) {
 	PSTRICKS_endline();
 	PSTRICKS_lw = linewidth * 0.0015;
@@ -1216,7 +1240,8 @@ TERM_TABLE_START(pstricks_driver)
     PSTRICKS_text, null_scale, PSTRICKS_graphics, PSTRICKS_move, PSTRICKS_vector,
     PSTRICKS_linetype, PSTRICKS_put_text, PSTRICKS_text_angle,
     PSTRICKS_justify_text, PSTRICKS_point, PSTRICKS_arrow, set_font_null, PSTRICKS_pointsize,
-    TERM_BINARY | TERM_IS_LATEX | TERM_CAN_DASH | TERM_ALPHA_CHANNEL,
+    TERM_BINARY | TERM_IS_LATEX | TERM_CAN_DASH | TERM_ALPHA_CHANNEL |
+    TERM_LINEWIDTH | TERM_POINTSCALE,
     0 /*suspend*/, 0 /*resume*/,
     PSTRICKS_fillbox, PSTRICKS_linewidth,
 #ifdef USE_MOUSE
@@ -1269,7 +1294,8 @@ START_HELP(pstricks)
 "                      {unit | size <XX>{unit},<YY>{unit}}",
 "                      {standalone | include}",
 "                      {blacktext | colortext | colourtext}",
-"                      {rounded|butt}",
+"                      {linewidth <lw>} {rounded|butt}",
+"                      {pointscale <ps>}",
 "                      {background <rgbcolor>}",
 "",
 " The `unit` option produces a plot with internal dimensions 1x1. The default",
@@ -1284,6 +1310,9 @@ START_HELP(pstricks)
 "",
 " `rounded` sets line caps and line joins to be rounded.  `butt` is the sets",
 " butt caps and mitered joins and is the default.",
+"",
+" `linewidth` and `pointscale` scale the width of lines and the size of point",
+" symbols, respectively.",
 "",
 " The old `hacktext` option has been replaced by the new default format (%h),",
 " see `format specifiers`.",
