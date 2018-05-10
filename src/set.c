@@ -2041,6 +2041,7 @@ set_hidden3d()
     c_token++;
     set_hidden3doptions();
     hidden3d = TRUE;
+    SET_REFRESH_OK(E_REFRESH_NOT_OK,0);
 }
 
 
