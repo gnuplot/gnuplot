@@ -3,7 +3,7 @@
 /* GNUPLOT - texdraw.trm */
 
 /*[
- * Copyright 1990 - 1993, 1998, 2004
+ * Copyright 1990 - 1993, 1998, 2004, 2018
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -43,6 +43,8 @@
  *   clipper@csd.uwo.ca
  *   January 20, 1992
  *
+ *   Bastian Maerkisch
+ *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
  */
@@ -63,6 +65,7 @@ register_term(texdraw)
 TERM_PUBLIC void TEXDRAW_init(void);
 TERM_PUBLIC void TEXDRAW_graphics(void);
 TERM_PUBLIC void TEXDRAW_text(void);
+TERM_PUBLIC void TEXDRAW_reset(void);
 TERM_PUBLIC void TEXDRAW_linetype(int linetype);
 TERM_PUBLIC void TEXDRAW_move(unsigned int x, unsigned int y);
 TERM_PUBLIC void TEXDRAW_point(unsigned int x, unsigned int y, int number);
@@ -73,7 +76,6 @@ TERM_PUBLIC void TEXDRAW_arrow(unsigned int sx, unsigned int sy,
 TERM_PUBLIC void TEXDRAW_put_text(unsigned int x, unsigned int y, const char str[]);
 TERM_PUBLIC int TEXDRAW_justify_text(enum JUSTIFY mode);
 TERM_PUBLIC int TEXDRAW_text_angle(int ang);
-TERM_PUBLIC void TEXDRAW_reset(void);
 
 #define TEXDRAW_PTS_PER_INCH (72.27)
 /* resolution of printer we expect to use */
@@ -95,7 +97,10 @@ TERM_PUBLIC void TEXDRAW_reset(void);
 
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
+
+/* terminate any line in progress */
 static void TEXDRAW_endline(void);
+
 static unsigned int TEXDRAW_posx;
 static unsigned int TEXDRAW_posy;
 static enum JUSTIFY TEXDRAW_justify = LEFT;
@@ -142,8 +147,6 @@ static int TEXDRAW_last_type = 0;
 static int TEXDRAW_type;
 /* are we in the middle of a line */
 static TBOOLEAN TEXDRAW_inline = FALSE;
-/* terminate any line in progress */
-static void TEXDRAW_endline(void);
 /* number of points in line so far */
 static int TEXDRAW_linecount = 0;
 /* max value for linecount */
@@ -154,11 +157,13 @@ static char TEXDRAW_arrow_type;
 static int TEXDRAW_arrow_length;
 static int TEXDRAW_arrow_width;
 
+
 TERM_PUBLIC void
 TEXDRAW_init()
 {
     fputs("%% GNUPLOT: LaTeX using TEXDRAW macros\n", gpoutfile);
 }
+
 
 TERM_PUBLIC void
 TEXDRAW_graphics()
@@ -186,12 +191,22 @@ TEXDRAW_graphics()
     TEXDRAW_arrow_width = -1;
 }
 
+
 TERM_PUBLIC void
 TEXDRAW_text()
 {
     TEXDRAW_endline();
     fputs("\\end{texdraw}\n", gpoutfile);
 }
+
+
+TERM_PUBLIC void
+TEXDRAW_reset()
+{
+    TEXDRAW_endline();
+    TEXDRAW_posx = TEXDRAW_posy = 0;
+}
+
 
 TERM_PUBLIC void
 TEXDRAW_linetype(int linetype)
@@ -204,6 +219,7 @@ TEXDRAW_linetype(int linetype)
     TEXDRAW_type = linetype > -2 ? linetype : LT_BLACK;
 }
 
+
 TERM_PUBLIC void
 TEXDRAW_move(unsigned int x, unsigned int y)
 {
@@ -212,6 +228,7 @@ TEXDRAW_move(unsigned int x, unsigned int y)
     TEXDRAW_posx = x;
     TEXDRAW_posy = y;
 }
+
 
 TERM_PUBLIC void
 TEXDRAW_point(unsigned int x, unsigned int y, int number)
@@ -232,6 +249,7 @@ TEXDRAW_point(unsigned int x, unsigned int y, int number)
 	     TEXDRAW_TINY_DOT :
 	     TEXDRAW_points[number % TEXDRAW_POINT_TYPES]));
 }
+
 
 TERM_PUBLIC void
 TEXDRAW_vector(unsigned int ux, unsigned int uy)
@@ -267,6 +285,7 @@ TEXDRAW_vector(unsigned int ux, unsigned int uy)
     TEXDRAW_posy = uy;
 }
 
+
 static void
 TEXDRAW_endline()
 {
@@ -275,6 +294,7 @@ TEXDRAW_endline()
 	TEXDRAW_inline = FALSE;
     }
 }
+
 
 TERM_PUBLIC void
 TEXDRAW_arrow(
@@ -351,6 +371,7 @@ TEXDRAW_arrow(
     TEXDRAW_posy = ey;
 }
 
+
 TERM_PUBLIC void
 TEXDRAW_put_text(unsigned int x, unsigned int y, const char str[])
 {
@@ -387,18 +408,12 @@ TEXDRAW_justify_text(enum JUSTIFY mode)
     return (TRUE);
 }
 
+
 TERM_PUBLIC int
 TEXDRAW_text_angle(int ang)
 {
     TEXDRAW_angle = ang;
     return (TRUE);
-}
-
-TERM_PUBLIC void
-TEXDRAW_reset()
-{
-    TEXDRAW_endline();
-    TEXDRAW_posx = TEXDRAW_posy = 0;
 }
 
 #endif /* TERM_BODY */
