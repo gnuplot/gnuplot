@@ -67,6 +67,8 @@ TERM_PUBLIC void TEXDRAW_graphics(void);
 TERM_PUBLIC void TEXDRAW_text(void);
 TERM_PUBLIC void TEXDRAW_reset(void);
 TERM_PUBLIC void TEXDRAW_linetype(int linetype);
+TERM_PUBLIC void TEXDRAW_dashtype(int dt, t_dashtype *custom_dash_pattern);
+TERM_PUBLIC void TEXDRAW_set_color(t_colorspec *colorspec);
 TERM_PUBLIC void TEXDRAW_linewidth(double linewidth);
 TERM_PUBLIC void TEXDRAW_move(unsigned int x, unsigned int y);
 TERM_PUBLIC void TEXDRAW_point(unsigned int x, unsigned int y, int number);
@@ -133,13 +135,20 @@ static const char * TEXDRAW_points[] = {
 
 /* LINES */
 #define TEXDRAW_NUMLINES 5	/* number of linetypes below */
-
 static const int TEXDRAW_lines[] = {
     2,				/* -2 border */
     1,				/* -1 axes   */
     2,				/*  0 solid  */
     2,				/*  1 solid  */
     2,				/*  2 solid  */
+};
+
+#define TEXDRAW_NUMPAT 5
+static const int TEXDRAW_dashpat[][6] = {
+    { 10, 6, 0, 0, 0, 0 },
+    {  4, 8, 0, 0, 0, 0 },
+    { 10, 6, 4, 6, 0, 0 },
+    { 10, 6, 4, 6, 4, 6 },
 };
 
 /* The line type selected most recently */
@@ -155,6 +164,9 @@ static int TEXDRAW_linecount = 0;
 /* linewidth scale factor */
 static double TEXDRAW_lw;
 static double TEXDRAW_last_lw;
+/* dashtype */
+static int TEXDRAW_dt;
+
 
 /* ARROWS */
 static char TEXDRAW_arrow_type;
@@ -222,6 +234,54 @@ TEXDRAW_linetype(int linetype)
 	linetype %= (TEXDRAW_NUMLINES - 2);
 
     TEXDRAW_type = linetype > -2 ? linetype : LT_BLACK;
+
+    if (linetype == LT_AXIS)
+	TEXDRAW_dashtype(DASHTYPE_AXIS, NULL);
+    else
+	TEXDRAW_dashtype(DASHTYPE_SOLID, NULL);
+}
+
+
+TERM_PUBLIC void
+TEXDRAW_dashtype(int dt, t_dashtype *custom_dash_pattern)
+{
+    TEXDRAW_endline();
+
+    if (dt == DASHTYPE_SOLID) {
+	dt = 0;
+    } else if (dt == DASHTYPE_AXIS) {
+	dt = 2;
+    } else if (dt > 0) {
+	dt %= TEXDRAW_NUMPAT;
+    }
+
+    if (dt == TEXDRAW_dt)
+	return;
+
+    if (dt == 0) {
+	fputs("\\lpatt ()\n", gpoutfile);
+	TEXDRAW_dt = 0;
+    } else if (dt > 0) {
+	int i;
+
+	fputs("\\lpatt (", gpoutfile);
+	for (i = 0; i < 6; i++) {
+	    if (TEXDRAW_dashpat[dt - 1][i] == 0)
+		break;
+	    fprintf(gpoutfile, "%d ", (int) (TEXDRAW_dashpat[dt - 1][i] * TEXDRAW_lw));
+	}
+	fputs(")\n", gpoutfile);
+	TEXDRAW_dt = dt;
+    } else if (dt == DASHTYPE_CUSTOM) {
+	/* not supported (yet) */
+    }
+}
+
+TERM_PUBLIC void
+TEXDRAW_set_color(t_colorspec *colorspec)
+{
+    /* Users can choose any color as long as it is black.
+       Enables dash patterns. */
 }
 
 
@@ -445,7 +505,22 @@ TERM_TABLE_START(texdraw_driver)
     TERM_IS_LATEX,
     0 /*suspend*/, 0 /*resume*/,
     0 /* fillbox */,
-    TEXDRAW_linewidth
+    TEXDRAW_linewidth,
+#ifdef USE_MOUSE
+    0, 0, 0, 0, 0,
+#endif
+    0, 0, /* palette */
+    TEXDRAW_set_color,
+    0 /* filled_polygon */,
+    0, /* image */
+    0, 0, 0, /* enhanced text */
+    0, /* layer */
+    0, /* path */
+    0.0, /* scale (unused) */
+    0, /* hypertext */
+    0,
+    0,
+    TEXDRAW_dashtype
 TERM_TABLE_END(texdraw_driver)
 
 #undef LAST_TERM
