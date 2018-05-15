@@ -448,18 +448,11 @@ TEXDRAW_arrow(
 TERM_PUBLIC void
 TEXDRAW_put_text(unsigned int x, unsigned int y, const char str[])
 {
-    char text;
-
     TEXDRAW_endline();
 
     fprintf(gpoutfile, "\\move (%d %d)",
 	    (int) ((double) x * TEXDRAW_xscale),
 	    (int) ((double) y * TEXDRAW_yscale));
-
-    if (!TEXDRAW_angle)
-	text = 'h';
-    else
-	text = 'v';
 
     if (TEXDRAW_last_justify != TEXDRAW_justify) {
 	TEXDRAW_last_justify = TEXDRAW_justify;
@@ -470,7 +463,13 @@ TEXDRAW_put_text(unsigned int x, unsigned int y, const char str[])
 	else if (TEXDRAW_justify == RIGHT)
 	    fputs("\\textref h:R v:C ", gpoutfile);
     }
-    fprintf(gpoutfile, "\\%ctext{%s}\n", text, str);
+
+    if (TEXDRAW_angle == 0)
+	fprintf(gpoutfile, "\\htext{%s}\n", str);
+    else if(TEXDRAW_angle == 90)
+	fprintf(gpoutfile, "\\vtext{%s}\n", str);
+    else
+	fprintf(gpoutfile, "\\rtext td:%d {%s}\n", TEXDRAW_angle, str);
 }
 
 
@@ -485,6 +484,8 @@ TEXDRAW_justify_text(enum JUSTIFY mode)
 TERM_PUBLIC int
 TEXDRAW_text_angle(int ang)
 {
+    while (ang < 0) ang += 360;
+    ang %= 360;
     TEXDRAW_angle = ang;
     return (TRUE);
 }
