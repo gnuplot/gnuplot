@@ -67,6 +67,7 @@ TERM_PUBLIC void TEXDRAW_graphics(void);
 TERM_PUBLIC void TEXDRAW_text(void);
 TERM_PUBLIC void TEXDRAW_reset(void);
 TERM_PUBLIC void TEXDRAW_linetype(int linetype);
+TERM_PUBLIC void TEXDRAW_linewidth(double linewidth);
 TERM_PUBLIC void TEXDRAW_move(unsigned int x, unsigned int y);
 TERM_PUBLIC void TEXDRAW_point(unsigned int x, unsigned int y, int number);
 TERM_PUBLIC void TEXDRAW_vector(unsigned int ux, unsigned int uy);
@@ -134,11 +135,11 @@ static const char * TEXDRAW_points[] = {
 #define TEXDRAW_NUMLINES 5	/* number of linetypes below */
 
 static const int TEXDRAW_lines[] = {
-    4,				/* -2 border */
-    3,				/* -1 axes */
-    3,				/*  0 solid thin  */
-    4,				/*  1 solid thick */
-    6,				/*  2 solid Thick */
+    2,				/* -2 border */
+    1,				/* -1 axes   */
+    2,				/*  0 solid  */
+    2,				/*  1 solid  */
+    2,				/*  2 solid  */
 };
 
 /* The line type selected most recently */
@@ -151,6 +152,9 @@ static TBOOLEAN TEXDRAW_inline = FALSE;
 static int TEXDRAW_linecount = 0;
 /* max value for linecount */
 #define TEXDRAW_LINEMAX 5
+/* linewidth scale factor */
+static double TEXDRAW_lw;
+static double TEXDRAW_last_lw;
 
 /* ARROWS */
 static char TEXDRAW_arrow_type;
@@ -186,6 +190,7 @@ TEXDRAW_graphics()
     TEXDRAW_last_type = 0;
     TEXDRAW_type = 0;
     TEXDRAW_posx = TEXDRAW_posy = 0;
+    TEXDRAW_lw = TEXDRAW_last_lw = 1.;
     TEXDRAW_arrow_type = 0;
     TEXDRAW_arrow_length = -1;
     TEXDRAW_arrow_width = -1;
@@ -217,6 +222,13 @@ TEXDRAW_linetype(int linetype)
 	linetype %= (TEXDRAW_NUMLINES - 2);
 
     TEXDRAW_type = linetype > -2 ? linetype : LT_BLACK;
+}
+
+
+TERM_PUBLIC void
+TEXDRAW_linewidth(double linewidth)
+{
+    TEXDRAW_lw = linewidth;
 }
 
 
@@ -258,11 +270,12 @@ TEXDRAW_vector(unsigned int ux, unsigned int uy)
 	TEXDRAW_inline = TRUE;
 
 	/* Start a new line. This depends on line type */
-	if (TEXDRAW_type != TEXDRAW_last_type) {
-	    if (TEXDRAW_lines[TEXDRAW_type + 2] != TEXDRAW_lines[TEXDRAW_last_type + 2])
+	if ((TEXDRAW_type != TEXDRAW_last_type) || (TEXDRAW_last_lw != TEXDRAW_lw)) {
+	    if (TEXDRAW_lines[TEXDRAW_type + 2] * TEXDRAW_lw != TEXDRAW_lines[TEXDRAW_last_type + 2] * TEXDRAW_last_lw)
 		fprintf(gpoutfile, "\\linewd %d\n",
-			TEXDRAW_lines[TEXDRAW_type + 2]);
+			(int) (TEXDRAW_lines[TEXDRAW_type + 2] * TEXDRAW_lw + 0.5));
 	    TEXDRAW_last_type = TEXDRAW_type;
+	    TEXDRAW_last_lw = TEXDRAW_lw;
 	}
 	fprintf(gpoutfile, "\\path (%d %d)",
 		(int) ((double) TEXDRAW_posx * TEXDRAW_xscale),
@@ -427,8 +440,12 @@ TERM_TABLE_START(texdraw_driver)
     TEXDRAW_VTIC, TEXDRAW_HTIC, options_null, TEXDRAW_init, TEXDRAW_reset,
     TEXDRAW_text, null_scale, TEXDRAW_graphics, TEXDRAW_move, TEXDRAW_vector,
     TEXDRAW_linetype, TEXDRAW_put_text, TEXDRAW_text_angle,
-    TEXDRAW_justify_text, TEXDRAW_point, TEXDRAW_arrow, set_font_null, do_pointsize,
-    TERM_IS_LATEX
+    TEXDRAW_justify_text, TEXDRAW_point, TEXDRAW_arrow, set_font_null,
+    do_pointsize,
+    TERM_IS_LATEX,
+    0 /*suspend*/, 0 /*resume*/,
+    0 /* fillbox */,
+    TEXDRAW_linewidth
 TERM_TABLE_END(texdraw_driver)
 
 #undef LAST_TERM
