@@ -1553,8 +1553,8 @@ static void wxt_check_for_anchors(unsigned int x, unsigned int y)
 	int i;
 	TBOOLEAN refresh = FALSE;
 	for (i=0; i<wxt_n_anchors; i++) {
-		if ((abs((int)x - (int)wxt_anchors[i].x) < wxt_anchors[i].size)
-		&&  (abs((int)y - (int)wxt_anchors[i].y) < wxt_anchors[i].size)) {
+		if ((abs((int)x - (int)wxt_anchors[i].x) < (int)wxt_anchors[i].size)
+		&&  (abs((int)y - (int)wxt_anchors[i].y) < (int)wxt_anchors[i].size)) {
 			refresh = TRUE;
 		}
 	}
