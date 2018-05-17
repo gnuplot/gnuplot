@@ -1,0 +1,67 @@
+#
+# Unit test for clipping line segments when one or both axes is non-linear.
+# Prior to gnuplot 5 clipping of logscale data used linear interpolation
+# of logged coordinates.  This broke in gnuplot 5.2.0 with the switch to
+# implement log scaling using the generic nonlinear axis code.
+# The clipping code was amended in version 5.2.4 to do the interpolation
+# in the linear coordinate space of the linked primary axes instead.
+# See bugs #2030 and #2046
+#
+$DATA << EOD
+0.000	1.14554e-001
+0.500	2.21061e-002
+1.000	1.31707e-003
+1.500	3.91069e-005
+2.000	6.14934e-007
+EOD
+
+# To test clipping with both axes nonlinear uncomment the line below
+# set nonlinear x via x**2 inv sqrt(x)
+
+set grid xtics ytics mytics                
+set mytics 5
+set key right top
+set logscale y 
+set logscale y2
+set format y "10^{%L}"
+set format y2 "10^{%L}"
+set yrange [1.e-6 : 1.]
+set clip two
+
+set multiplot
+set tics nomirror
+unset xtics
+set ytics tc "plum"
+set tmargin at screen 0.9
+set bmargin at screen 0.3
+set lmargin at screen 0.1
+set rmargin at screen 0.9
+
+plot $DATA using 1:2 with lp lc "plum" lw 3 title "clip one"
+
+set bmargin at screen 0.2
+set  yrange [1.e-7 : 1.]
+set y2range [1.e-7 : 1.]
+
+set y2tics nomirror
+set xtics
+unset ytics
+set key title " "
+set title "Bug #2046 - incorrect clipped line segments for logscale coordinates"
+
+plot $DATA using 1:2 axes x1y2 with lp lc "black" title "no clipping"
+
+set  yrange [1.e-6 : 1.e-5]
+set tmargin at screen 0.4
+set bmargin at screen 0.3
+set key left
+unset y2tics
+unset title
+unset xtics
+
+plot $DATA using 1:2 with lp lc "orange" lw 3 title "clip two"
+
+unset multiplot
+
+pause -1 "<return> to continue"
+reset

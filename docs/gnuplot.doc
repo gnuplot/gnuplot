@@ -8476,11 +8476,12 @@ Ffigure_fenceplot
  though the point center is inside the boundaries of a 2D plot.
  Data points whose center lies outside the plot boundaries are never drawn.
 
- Normally a line segment in a plot is not drawn if either end of the segment
- lies outside the plot boundaries (i.e. xrange and yrange).
- `set clip one` causes `gnuplot` to draw also the in-range portion of line
- segments with one endpoint out of range.
- `set clip two` causes `gnuplot` to draw also the in-range portion of line
+ `unset clip` causes a line segment in a plot not to be drawn if either end of
+ that segment lies outside the plot boundaries (i.e. xrange and yrange).
+
+ `set clip one` causes `gnuplot` to draw the in-range portion of line
+ segments with one endpoint in range and one endpoint out of range.
+ `set clip two` causes `gnuplot` to draw the in-range portion of line
  segments with both endpoints out of range.
  Line segments that lie entirely outside the plot boundaries are never drawn.
 

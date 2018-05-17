@@ -3053,11 +3053,15 @@ edge_intersect(
     int i,			/* line segment from point i-1 to point i */
     double *ex, double *ey)	/* the point where it crosses an edge */
 {
+    struct axis *xaxis = &axis_array[x_axis];
+    struct axis *yaxis = &axis_array[y_axis];
+
     double ix = points[i - 1].x;
     double iy = points[i - 1].y;
     double ox = points[i].x;
     double oy = points[i].y;
     double x, y;		/* possible intersection point */
+    int return_code;
 
     if (points[i].type == INRANGE) {
 	/* swap points so that ix/ix/iz are INRANGE and ox/oy/oz are OUTRANGE */
@@ -3069,28 +3073,15 @@ edge_intersect(
 	oy = y;
     }
 
-    /* Nasty degenerate cases, effectively drawing to an infinity point (?).
-     * If more than one coord is -VERYLARGE, then can't ratio the "infinities"
-     * so drop out by returning the INRANGE point.
-     * We only need to test the OUTRANGE point 
-     * FIXME:  not sure this case can happen in version 5.
+    /* May 2018 - This 0 return replaces very old code of dubious validity.
+     * -VERYLARGE isn't a real coordinate, it was a flag used by old code
+     * that could not store UNDEFINED or NaN.
+     * It is not clear this condition can ever happen in gnuplot 5.
      */
     if (ox == -VERYLARGE || oy == -VERYLARGE) {
 	*ex = ix;
 	*ey = iy;
-
-	if (ox == -VERYLARGE) {
-	    /* can't get a direction to draw line, so simply
-	     * return INRANGE point */
-	    if (oy == -VERYLARGE)
-		return LEFT_EDGE|BOTTOM_EDGE;
-
-	    *ex = X_AXIS.min;
-	    return LEFT_EDGE;
-	}
-	/* obviously oy is -VERYLARGE and ox != -VERYLARGE */
-	*ey = Y_AXIS.min;
-	return BOTTOM_EDGE;
+	return 0;
     }
 
     /* Can't have case (ix == ox && iy == oy) as one point
@@ -3101,66 +3092,86 @@ edge_intersect(
 	/* assume inrange(iy, Y_AXIS.min, Y_AXIS.max) */
 	*ey = iy;		/* == oy */
 
-	if (inrange(X_AXIS.max, ix, ox) && X_AXIS.max != ix) {
-	    *ex = X_AXIS.max;
+	if (inrange(xaxis->max, ix, ox) && xaxis->max != ix) {
+	    *ex = xaxis->max;
 	    return RIGHT_EDGE;
 	}
-	if (inrange(X_AXIS.min, ix, ox) && X_AXIS.min != ix) {
-	    *ex = X_AXIS.min;
+	if (inrange(xaxis->min, ix, ox) && xaxis->min != ix) {
+	    *ex = xaxis->min;
 	    return LEFT_EDGE;
 	}
 
     } else if (ix == ox) {
 	/* vertical line */
-	/* assume inrange(ix, X_AXIS.min, X_AXIS.max) */
+	/* assume inrange(ix, xaxis->min, xaxis->max) */
 	*ex = ix;		/* == ox */
 
-	if (inrange(Y_AXIS.max, iy, oy) && Y_AXIS.max != iy) {
-	    *ey = Y_AXIS.max;
+	if (inrange(yaxis->max, iy, oy) && yaxis->max != iy) {
+	    *ey = yaxis->max;
 	    return TOP_EDGE;
 	}
-	if (inrange(Y_AXIS.min, iy, oy) && Y_AXIS.min != iy) {
-	    *ey = Y_AXIS.min;
+	if (inrange(yaxis->min, iy, oy) && yaxis->min != iy) {
+	    *ey = yaxis->min;
 	    return BOTTOM_EDGE;
 	}
 
     } else {
 	/* slanted line of some kind */
 
-	/* does it intersect Y_AXIS.min edge */
-	if (inrange(Y_AXIS.min, iy, oy) && Y_AXIS.min != iy && Y_AXIS.min != oy) {
-	    x = ix + (Y_AXIS.min - iy) * ((ox - ix) / (oy - iy));
-	    if (inrange(x, X_AXIS.min, X_AXIS.max)) {
+	/* If x or y is a non-linear axis, do the interpolation using the
+	 * linked linear (hidden primary) axis instead.
+	 * The test for index < 0 distinguishes a nonlinear axis from
+	 * linked x/x2 or y/y2.
+	 */
+	if (xaxis->linked_to_primary && xaxis->linked_to_primary->index < 0) {
+	    xaxis = xaxis->linked_to_primary;
+	    ix = eval_link_function(xaxis, ix);
+	    ox = eval_link_function(xaxis, ox);
+	}
+	if (yaxis->linked_to_primary && yaxis->linked_to_primary->index < 0) {
+	    yaxis = yaxis->linked_to_primary;
+	    iy = eval_link_function(yaxis, iy);
+	    oy = eval_link_function(yaxis, oy);
+	}
+
+	/* does it intersect yaxis->min edge? */
+	if (inrange(yaxis->min, iy, oy) && yaxis->min != iy && yaxis->min != oy) {
+	    x = ix + (yaxis->min - iy) * ((ox - ix) / (oy - iy));
+	    if (inrange(x, xaxis->min, xaxis->max)) {
 		*ex = x;
-		*ey = Y_AXIS.min;
-		return BOTTOM_EDGE;		/* yes */
+		*ey = yaxis->min;
+		return_code = BOTTOM_EDGE;
+		goto nonlinear_intersect_return;
 	    }
 	}
-	/* does it intersect Y_AXIS.max edge */
-	if (inrange(Y_AXIS.max, iy, oy) && Y_AXIS.max != iy && Y_AXIS.max != oy) {
-	    x = ix + (Y_AXIS.max - iy) * ((ox - ix) / (oy - iy));
-	    if (inrange(x, X_AXIS.min, X_AXIS.max)) {
+	/* does it intersect yaxis->max edge? */
+	if (inrange(yaxis->max, iy, oy) && yaxis->max != iy && yaxis->max != oy) {
+	    x = ix + (yaxis->max - iy) * ((ox - ix) / (oy - iy));
+	    if (inrange(x, xaxis->min, xaxis->max)) {
 		*ex = x;
-		*ey = Y_AXIS.max;
-		return TOP_EDGE;		/* yes */
+		*ey = yaxis->max;
+		return_code = TOP_EDGE;
+		goto nonlinear_intersect_return;
 	    }
 	}
-	/* does it intersect X_AXIS.min edge */
-	if (inrange(X_AXIS.min, ix, ox) && X_AXIS.min != ix && X_AXIS.min != ox) {
-	    y = iy + (X_AXIS.min - ix) * ((oy - iy) / (ox - ix));
-	    if (inrange(y, Y_AXIS.min, Y_AXIS.max)) {
-		*ex = X_AXIS.min;
+	/* does it intersect xaxis->min edge? */
+	if (inrange(xaxis->min, ix, ox) && xaxis->min != ix && xaxis->min != ox) {
+	    y = iy + (xaxis->min - ix) * ((oy - iy) / (ox - ix));
+	    if (inrange(y, yaxis->min, yaxis->max)) {
+		*ex = xaxis->min;
 		*ey = y;
-		return LEFT_EDGE;
+		return_code =  LEFT_EDGE;
+		goto nonlinear_intersect_return;
 	    }
 	}
-	/* does it intersect X_AXIS.max edge */
-	if (inrange(X_AXIS.max, ix, ox) && X_AXIS.max != ix && X_AXIS.max != ox) {
-	    y = iy + (X_AXIS.max - ix) * ((oy - iy) / (ox - ix));
-	    if (inrange(y, Y_AXIS.min, Y_AXIS.max)) {
-		*ex = X_AXIS.max;
+	/* does it intersect xaxis->max edge? */
+	if (inrange(xaxis->max, ix, ox) && xaxis->max != ix && xaxis->max != ox) {
+	    y = iy + (xaxis->max - ix) * ((oy - iy) / (ox - ix));
+	    if (inrange(y, yaxis->min, yaxis->max)) {
+		*ex = xaxis->max;
 		*ey = y;
-		return RIGHT_EDGE;
+		return_code = RIGHT_EDGE;
+		goto nonlinear_intersect_return;
 	    }
 	}
     }
@@ -3171,6 +3182,17 @@ edge_intersect(
      * The zero value return indicates no line should be drawn.
      */
     return 0;
+
+nonlinear_intersect_return:
+
+    /* If we calculated the intersection using the linear end of a
+     * nonlinear axis, transform back to the nonlinear coordinate system.
+     */
+    if (xaxis->index < 0)
+	*ex = eval_link_function(xaxis->linked_to_secondary, *ex);
+    if (yaxis->index < 0)
+	*ey = eval_link_function(yaxis->linked_to_secondary, *ey);
+    return return_code;
 }
 
 
@@ -3191,8 +3213,6 @@ two_edge_intersect(
     int i,			/* line segment from point i-1 to point i */
     double *lx, double *ly)	/* lx[2], ly[2]: points where it crosses edges */
 {
-    /* global X_AXIS.min, X_AXIS.max, Y_AXIS.min, X_AXIS.max */
-    int count;
     double ix = points[i - 1].x;
     double iy = points[i - 1].y;
     double ox = points[i].x;
@@ -3201,85 +3221,27 @@ two_edge_intersect(
     double swap;
     double t_min, t_max;
 
-    /* nasty degenerate cases, effectively drawing to an infinity
-     * point (?)  cope with them here, so don't process them as a
-     * "real" OUTRANGE point
+    /* The axes in use for the current plot (x or x2, y or y2) */
+    struct axis *xaxis = &axis_array[x_axis];
+    struct axis *yaxis = &axis_array[y_axis];
 
-     * If more than one coord is -VERYLARGE, then can't ratio the
-     * "infinities" so drop out by returning FALSE */
+    /* May 2018 - Remove old code treating -VERYLARGE as an indicator for -Inf.
+     * Why did it not do the same for +Inf?
+     * What sense did it make given that -VERYLARGE was actually a flag
+     * indicating UNDEFINED or NaN?
+     * It may not be possible to hit this in version 5 anyhow, but it we do
+     * hit it we silently ignore the line.
+     */
+    if (ix == -VERYLARGE || iy == -VERYLARGE || ox == -VERYLARGE || oy == -VERYLARGE)
+	return FALSE;
 
-    count = 0;
-    if (ix == -VERYLARGE)
-	count++;
-    if (ox == -VERYLARGE)
-	count++;
-    if (iy == -VERYLARGE)
-	count++;
-    if (oy == -VERYLARGE)
-	count++;
-
-    /* either doesn't pass through graph area *or* can't ratio
-     * infinities to get a direction to draw line, so simply
-     * return(FALSE) */
-    if (count > 1) {
-	return (FALSE);
-    }
-
-    if (ox == -VERYLARGE || ix == -VERYLARGE) {
-	/* Horizontal line */
-	if (ix == -VERYLARGE) {
-	    /* swap points so ix/iy don't have a -VERYLARGE component */
-	    swap = ix;
-	    ix = ox;
-	    ox = swap;
-	    swap = iy;
-	    iy = oy;
-	    oy = swap;
-	}
-	/* check actually passes through the graph area */
-	if (ix > GPMAX(X_AXIS.max, X_AXIS.min)
-	    && inrange(iy, Y_AXIS.min, Y_AXIS.max)) {
-	    lx[0] = X_AXIS.min;
-	    ly[0] = iy;
-
-	    lx[1] = X_AXIS.max;
-	    ly[1] = iy;
-	    return (TRUE);
-	} else {
-	    return (FALSE);
-	}
-    }
-    if (oy == -VERYLARGE || iy == -VERYLARGE) {
-	/* Vertical line */
-	if (iy == -VERYLARGE) {
-	    /* swap points so ix/iy don't have a -VERYLARGE component */
-	    swap = ix;
-	    ix = ox;
-	    ox = swap;
-	    swap = iy;
-	    iy = oy;
-	    oy = swap;
-	}
-	/* check actually passes through the graph area */
-	if (iy > GPMAX(Y_AXIS.min, Y_AXIS.max)
-	    && inrange(ix, X_AXIS.min, X_AXIS.max)) {
-	    lx[0] = ix;
-	    ly[0] = Y_AXIS.min;
-
-	    lx[1] = ix;
-	    ly[1] = Y_AXIS.max;
-	    return (TRUE);
-	} else {
-	    return (FALSE);
-	}
-    }
     /*
      * Special horizontal/vertical, etc. cases are checked and remaining
      * slant lines are checked separately.
      *
      * The slant line intersections are solved using the parametric form
      * of the equation for a line, since if we test x/y min/max planes explicitly
-     * then e.g. a  line passing through a corner point (X_AXIS.min,Y_AXIS.min)
+     * then e.g. a  line passing through a corner point (xaxis->min,yaxis->min)
      * actually intersects 2 planes and hence further tests would be required
      * to anticipate this and similar situations.
      */
@@ -3294,17 +3256,17 @@ two_edge_intersect(
     if (ix == ox) {
 	/* line parallel to y axis */
 
-	/* x coord must be in range, and line must span both Y_AXIS.min and Y_AXIS.max */
-	/* note that spanning Y_AXIS.min implies spanning Y_AXIS.max, as both points OUTRANGE */
-	if (!inrange(ix, X_AXIS.min, X_AXIS.max)) {
+	/* x coord must be in range, and line must span both yaxis->min and yaxis->max */
+	/* note that spanning yaxis->min implies spanning yaxis->max, as both points OUTRANGE */
+	if (!inrange(ix, xaxis->min, xaxis->max)) {
 	    return (FALSE);
 	}
-	if (inrange(Y_AXIS.min, iy, oy)) {
+	if (inrange(yaxis->min, iy, oy)) {
 	    lx[0] = ix;
-	    ly[0] = Y_AXIS.min;
+	    ly[0] = yaxis->min;
 
 	    lx[1] = ix;
-	    ly[1] = Y_AXIS.max;
+	    ly[1] = yaxis->max;
 	    return (TRUE);
 	} else
 	    return (FALSE);
@@ -3313,22 +3275,37 @@ two_edge_intersect(
 	/* already checked case (ix == ox && iy == oy) */
 
 	/* line parallel to x axis */
-	/* y coord must be in range, and line must span both X_AXIS.min and X_AXIS.max */
-	/* note that spanning X_AXIS.min implies spanning X_AXIS.max, as both points OUTRANGE */
-	if (!inrange(iy, Y_AXIS.min, Y_AXIS.max)) {
+	/* y coord must be in range, and line must span both xaxis->min and xaxis->max */
+	/* note that spanning xaxis->min implies spanning xaxis->max, as both points OUTRANGE */
+	if (!inrange(iy, yaxis->min, yaxis->max)) {
 	    return (FALSE);
 	}
-	if (inrange(X_AXIS.min, ix, ox)) {
-	    lx[0] = X_AXIS.min;
+	if (inrange(xaxis->min, ix, ox)) {
+	    lx[0] = xaxis->min;
 	    ly[0] = iy;
 
-	    lx[1] = X_AXIS.max;
+	    lx[1] = xaxis->max;
 	    ly[1] = iy;
 	    return (TRUE);
 	} else
 	    return (FALSE);
     }
-    /* nasty 2D slanted line in an xy plane */
+
+    /* Do the interpolation in linear coordinate space.
+     * This means switching the the primary (hidden) linear partner axis
+     * of nonlinear x or y.  The test for index < 0 distinguishes a 
+     * nonlinear axis from linked x/x2 or y/y2.
+     */
+    if (xaxis->linked_to_primary && xaxis->linked_to_primary->index < 0) {
+	xaxis = xaxis->linked_to_primary;
+	ix = eval_link_function(xaxis, ix);
+	ox = eval_link_function(xaxis, ox);
+    }
+    if (yaxis->linked_to_primary && yaxis->linked_to_primary->index < 0) {
+	yaxis = yaxis->linked_to_primary;
+	iy = eval_link_function(yaxis, iy);
+	oy = eval_link_function(yaxis, oy);
+    }
 
     /* From here on, it's essentially the classical Cyrus-Beck, or
      * Liang-Barsky algorithm for line clipping to a rectangle */
@@ -3343,16 +3320,16 @@ two_edge_intersect(
        diff_y = (oy - iy);
      */
 
-    t[0] = (X_AXIS.min - ix) / (ox - ix);
-    t[1] = (X_AXIS.max - ix) / (ox - ix);
+    t[0] = (xaxis->min - ix) / (ox - ix);
+    t[1] = (xaxis->max - ix) / (ox - ix);
     if (t[0] > t[1]) {
 	swap = t[0];
 	t[0] = t[1];
 	t[1] = swap;
     }
 
-    t[2] = (Y_AXIS.min - iy) / (oy - iy);
-    t[3] = (Y_AXIS.max - iy) / (oy - iy);
+    t[2] = (yaxis->min - iy) / (oy - iy);
+    t[3] = (yaxis->max - iy) / (oy - iy);
     if (t[2] > t[3]) {
 	swap = t[2];
 	t[2] = t[3];
@@ -3374,18 +3351,23 @@ two_edge_intersect(
     /*
      * Can only have 0 or 2 intersection points -- only need test one coord
      */
-    /* FIXME: this is UGLY. Need an 'almost_inrange()' function */
-    if (inrange(lx[0],
-		(X_AXIS.min - 1e-5 * (X_AXIS.max - X_AXIS.min)),
-		(X_AXIS.max + 1e-5 * (X_AXIS.max - X_AXIS.min)))
-	&& inrange(ly[0],
-		   (Y_AXIS.min - 1e-5 * (Y_AXIS.max - Y_AXIS.min)),
-		   (Y_AXIS.max + 1e-5 * (Y_AXIS.max - Y_AXIS.min))))
-    {
+    /* FIXME: we need an 'almost_inrange()' function */
+    if (!inrange(lx[0], xaxis->min, xaxis->max)
+    ||  !inrange(ly[0], yaxis->min, yaxis->max))
+	return (FALSE);
 
-	return (TRUE);
+    /* Transform intersection points back to nonlinear coordinate system
+     * if necessary.
+     */
+    if (xaxis->index < 0) {
+	lx[0] = eval_link_function(xaxis->linked_to_secondary, lx[0]);
+	lx[1] = eval_link_function(xaxis->linked_to_secondary, lx[1]);
     }
-    return (FALSE);
+    if (yaxis->index < 0) {
+	ly[0] = eval_link_function(yaxis->linked_to_secondary, ly[0]);
+	ly[1] = eval_link_function(yaxis->linked_to_secondary, ly[1]);
+    }
+    return (TRUE);
 }
 
 
