@@ -1,3 +1,9 @@
+2018-05-16  Miroslav Sulc <msulc@users.sourceforge.net>
+
+	* src/misc.c: Support ARGC/ARGV parameter convention for "call".
+	I.e. string variables ARG1 ARG2 ... are also accessible as
+	ARGV[1] ARGV[2] ... ARGV[ARGC].
+
 2018-05-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/boundary.c src/graph3d.c:  Consistent placement of timestamp at

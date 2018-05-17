@@ -1,6 +1,6 @@
 Changes in 5.2.4
 ================
-
+* NEW "call" parameters ARG1, ARG2, ... are also present as ARGV[1]...ARGV[ARGC]
 * CHANGE generalize the test for missing data flag in input data
 * CHANGE "set []range writeback" is now essentially always in effect
 * CHANGE consistent placement of timestamp at true bottom of page

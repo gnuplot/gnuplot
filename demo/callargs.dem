@@ -32,4 +32,5 @@ if (ARGC == 0) {
     print "ARG6 (string variable) came through as ", ARG6
     print "     words(ARG6) = ", words(ARG6)
     print "ARG7 (expression) came through as ", ARG7
+    if (exists("ARGV")) { print "ARGV = ", ARGV }
 }

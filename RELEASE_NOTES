@@ -1,18 +1,27 @@
-		GNUPLOT Version 5.2.3 Release Notes
+		GNUPLOT Version 5.2.4 Release Notes
 		===================================
 
-These release notes are for version 5.2 patchlevel 3 (5.2.3).
+These release notes are for version 5.2 patchlevel 3 (5.2.4).
 This release contains bug-fixes, a few changes back-ported from the
 development version, and a few new features.
 
 Please see the ChangeLog file for a complete list of changes made during the
 course of development from 5.0 to 5.2.
 
-Release Notes date: 11-Apr-2018
+Release Notes date: 16-May-2018
+
+CHANGES IN 5.2.4
+================
+* NEW "call" parameters ARG1, ARG2, ... are also present as ARGV[1]...ARGV[ARGC]
+* CHANGE missing data flag in input data applies to using (func($N))
+* CHANGE "set []range writeback" is now essentially always in effect
+* CHANGE consistent placement of timestamp at true bottom of page
+* FIX re-implement "refresh" command to use autoscale writeback/restore
+* FIX font-handling bug; line-spacing of previous font still in effect
 
 CHANGES IN 5.2.3
 ================
-* NEW "set grid {no}vertical" adds grid lines in the xz and xz planes
+* NEW "set grid {no}vertical" adds grid lines in the xz and yz planes
 * NEW "set cntrparam {firstlinetype N} {{un}sorted}"
 * CHANGE drop non-working support for YIQ color space
 * CHANGE expand \n characters when printing into a datablock

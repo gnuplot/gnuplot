@@ -391,11 +391,12 @@ C
  such as `set xrange [0:1]`.  If you want to reverse the direction of the
  x axis in such a case, say instead `set xrange [1:0]`.
 
- * The `call` command is implemented by providing a set of variables ARGC,
- ARG0, ..., ARG9. ARG0 holds the name of the script file being executed.
- ARG1 to ARG9 are string variables and thus may either be referenced directly
- or expanded as macros, e.g. @ARG1.  The older convention for referencing
- call parameters as tokens $0 ... $9 is deprecated.
+ * The `call` command is provides a set of variables ARGC, ARG0, ..., ARG9.
+ ARG0 holds the name of the script file being executed.  ARG1 to ARG9 are string
+ variables and thus may either be referenced directly or expanded as macros,
+ e.g. @ARG1.  The contents of ARG0 ... ARG9 may alternatively be accessed as
+ array elements ARGV[0] ... ARGV[ARGC].  An older gnuplot convention of
+ referencing call parameters as tokens $0 ... $9 is deprecated.  
 
  * The optional bandwidth for the kernel density smoothing option is taken from
  a keyword rather than a data column.  See `smooth kdensity`.

@@ -134,10 +134,11 @@ save_variables__sub(FILE *fp)
 
     while (udv) {
 	if (udv->udv_value.type != NOTDEFINED) {
-	    if (udv->udv_value.type == ARRAY) {
-		fprintf(fp,"array %s[%d] = ", udv->udv_name,
+	    if ((udv->udv_value.type == ARRAY)
+		&& strncmp(udv->udv_name,"ARGV",4)) {
+		    fprintf(fp,"array %s[%d] = ", udv->udv_name,
 			udv->udv_value.v.value_array[0].v.int_val);
-		save_array_content(fp, udv->udv_value.v.value_array);
+		    save_array_content(fp, udv->udv_value.v.value_array);
 	    } else if (strncmp(udv->udv_name,"GPVAL_",6)
 		 && strncmp(udv->udv_name,"GPFUN_",6)
 		 && strncmp(udv->udv_name,"MOUSE_",6)
