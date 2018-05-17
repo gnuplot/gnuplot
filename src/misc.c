@@ -130,7 +130,10 @@ static void
 prepare_call(int calltype)
 {
     struct udvt_entry *udv;
+    struct value *ARGV;
     int argindex;
+    int argv_size;
+
     if (calltype == 2) {
 	call_argc = 0;
 	while (!END_OF_COMMAND && call_argc <= 9) {
@@ -192,14 +195,31 @@ prepare_call(int calltype)
     /* New-style has ARG0 = script-name, ARG1 ... ARG9 and ARGC */
     udv = add_udv_by_name("ARGC");
     Ginteger(&(udv->udv_value), call_argc);
+
     udv = add_udv_by_name("ARG0");
     gpfree_string(&(udv->udv_value));
     Gstring(&(udv->udv_value), gp_strdup(lf_head->name));
+
+    udv = add_udv_by_name("ARGV");
+    gpfree_array(&(udv->udv_value));
+    gpfree_string(&(udv->udv_value));
+
+    argv_size = MIN(call_argc, 9);
+    udv->udv_value.type = ARRAY;
+    ARGV = udv->udv_value.v.value_array = gp_alloc((argv_size + 1) * sizeof(t_value), "array_command");
+    ARGV[0].v.int_val = argv_size;
+
     for (argindex = 1; argindex <= 9; argindex++) {
-	char *arg = gp_strdup(call_args[argindex-1]);
+	char *arg = call_args[argindex-1];
+
 	udv = add_udv_by_name(argname[argindex]);
 	gpfree_string(&(udv->udv_value));
-	Gstring(&(udv->udv_value), arg ? arg : gp_strdup(""));
+	Gstring(&(udv->udv_value), arg ? gp_strdup(arg) : gp_strdup(""));
+
+	if (argindex <= argv_size) {
+	    gpfree_string(&ARGV[argindex]);
+	    Gstring(&ARGV[argindex], arg ? gp_strdup(arg) : gp_strdup(""));
+	}
     }
 }
 
@@ -437,11 +457,13 @@ lf_pop()
 	if ((udv = get_udv_by_name("ARGC"))) {
 	    Ginteger(&(udv->udv_value), call_argc);
 	}
+
 	if ((udv = get_udv_by_name("ARG0"))) {
 	    gpfree_string(&(udv->udv_value));
 	    Gstring(&(udv->udv_value),
 		(lf->prev && lf->prev->name) ? gp_strdup(lf->prev->name) : gp_strdup(""));
 	}
+
 	for (argindex = 1; argindex <= 9; argindex++) {
 	    if ((udv = get_udv_by_name(argname[argindex]))) {
 		gpfree_string(&(udv->udv_value));
@@ -451,6 +473,24 @@ lf_pop()
 		    Gstring(&(udv->udv_value), gp_strdup(call_args[argindex-1]));
 	    }
 	}
+
+	if ((udv = get_udv_by_name("ARGV")) && udv->udv_value.type == ARRAY) {
+	    struct value *ARGV;
+	    int argv_size = MIN(call_argc, 9);
+
+	    gpfree_array(&(udv->udv_value));
+	    udv->udv_value.type = ARRAY;
+	    ARGV = udv->udv_value.v.value_array = gp_alloc((argv_size + 1) * sizeof(t_value), "array_command");
+	    ARGV[0].v.int_val = argv_size;
+
+	    for (argindex = 1; argindex <= argv_size; argindex++) {
+		if (!call_args[argindex - 1])
+		    ARGV[argindex].type = NOTDEFINED;
+		else
+		    Gstring(&ARGV[argindex], gp_strdup(call_args[argindex-1]));
+	    }
+	}
+
     }
 
     interactive = lf->interactive;
