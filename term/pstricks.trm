@@ -157,7 +157,7 @@ static int PSTRICKS_angle = 0;
 
 static int PSTRICKS_color_type = TC_DEFAULT;
 static int PSTRICKS_color = 0;
-static char PSTRICKS_color_str[16] = "";
+static char PSTRICKS_color_str[24] = "";
 static TBOOLEAN PSTRICKS_palette_set = FALSE;
 static int PSTRICKS_palette_size = 128;
 static rgb_color PSTRICKS_rgbcolor;
