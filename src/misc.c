@@ -204,7 +204,7 @@ prepare_call(int calltype)
     gpfree_array(&(udv->udv_value));
     gpfree_string(&(udv->udv_value));
 
-    argv_size = MIN(call_argc, 9);
+    argv_size = GPMIN(call_argc, 9);
     udv->udv_value.type = ARRAY;
     ARGV = udv->udv_value.v.value_array = gp_alloc((argv_size + 1) * sizeof(t_value), "array_command");
     ARGV[0].v.int_val = argv_size;
@@ -476,7 +476,7 @@ lf_pop()
 
 	if ((udv = get_udv_by_name("ARGV")) && udv->udv_value.type == ARRAY) {
 	    struct value *ARGV;
-	    int argv_size = MIN(call_argc, 9);
+	    int argv_size = GPMIN(call_argc, 9);
 
 	    gpfree_array(&(udv->udv_value));
 	    udv->udv_value.type = ARRAY;
