@@ -216,10 +216,8 @@ prepare_call(int calltype)
 	gpfree_string(&(udv->udv_value));
 	Gstring(&(udv->udv_value), arg ? gp_strdup(arg) : gp_strdup(""));
 
-	if (argindex <= argv_size) {
-	    gpfree_string(&ARGV[argindex]);
+	if (argindex <= argv_size)
 	    Gstring(&ARGV[argindex], arg ? gp_strdup(arg) : gp_strdup(""));
-	}
     }
 }
 
