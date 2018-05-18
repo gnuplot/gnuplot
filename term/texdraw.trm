@@ -68,7 +68,6 @@ TERM_PUBLIC void TEXDRAW_text(void);
 TERM_PUBLIC void TEXDRAW_reset(void);
 TERM_PUBLIC void TEXDRAW_linetype(int linetype);
 TERM_PUBLIC void TEXDRAW_dashtype(int dt, t_dashtype *custom_dash_pattern);
-TERM_PUBLIC void TEXDRAW_set_color(t_colorspec *colorspec);
 TERM_PUBLIC void TEXDRAW_linewidth(double linewidth);
 TERM_PUBLIC void TEXDRAW_move(unsigned int x, unsigned int y);
 TERM_PUBLIC void TEXDRAW_point(unsigned int x, unsigned int y, int number);
@@ -79,6 +78,13 @@ TERM_PUBLIC void TEXDRAW_arrow(unsigned int sx, unsigned int sy,
 TERM_PUBLIC void TEXDRAW_put_text(unsigned int x, unsigned int y, const char str[]);
 TERM_PUBLIC int TEXDRAW_justify_text(enum JUSTIFY mode);
 TERM_PUBLIC int TEXDRAW_text_angle(int ang);
+TERM_PUBLIC void TEXDRAW_set_color(t_colorspec *colorspec);
+TERM_PUBLIC int TEXDRAW_make_palette(t_sm_palette *);
+TERM_PUBLIC void TEXDRAW_set_color(t_colorspec *);
+TERM_PUBLIC void TEXDRAW_fillbox(int style,
+					unsigned int x1, unsigned int y1,
+					unsigned int width, unsigned int height);
+TERM_PUBLIC void TEXDRAW_filled_polygon(int points, gpiPoint *corners);
 
 #define TEXDRAW_PTS_PER_INCH (72.27)
 /* resolution of printer we expect to use */
@@ -103,6 +109,9 @@ TERM_PUBLIC int TEXDRAW_text_angle(int ang);
 
 /* terminate any line in progress */
 static void TEXDRAW_endline(void);
+
+/* determine gray level according to fillstyle */
+static double TEXDRAW_fill_gray(int style);
 
 static unsigned int TEXDRAW_posx;
 static unsigned int TEXDRAW_posy;
@@ -167,11 +176,14 @@ static double TEXDRAW_last_lw;
 /* dashtype */
 static int TEXDRAW_dt;
 
-
 /* ARROWS */
 static char TEXDRAW_arrow_type;
 static int TEXDRAW_arrow_length;
 static int TEXDRAW_arrow_width;
+
+/* GRAY LEVEL */
+static double TEXDRAW_gray;
+static double TEXDRAW_last_gray;
 
 
 TERM_PUBLIC void
@@ -203,6 +215,7 @@ TEXDRAW_graphics()
     TEXDRAW_type = 0;
     TEXDRAW_posx = TEXDRAW_posy = 0;
     TEXDRAW_lw = TEXDRAW_last_lw = 1.;
+    TEXDRAW_gray = TEXDRAW_last_gray = 0.;
     TEXDRAW_arrow_type = 0;
     TEXDRAW_arrow_length = -1;
     TEXDRAW_arrow_width = -1;
@@ -277,12 +290,6 @@ TEXDRAW_dashtype(int dt, t_dashtype *custom_dash_pattern)
     }
 }
 
-TERM_PUBLIC void
-TEXDRAW_set_color(t_colorspec *colorspec)
-{
-    /* Users can choose any color as long as it is black.
-       Enables dash patterns. */
-}
 
 
 TERM_PUBLIC void
@@ -336,6 +343,12 @@ TEXDRAW_vector(unsigned int ux, unsigned int uy)
 			(int) (TEXDRAW_lines[TEXDRAW_type + 2] * TEXDRAW_lw + 0.5));
 	    TEXDRAW_last_type = TEXDRAW_type;
 	    TEXDRAW_last_lw = TEXDRAW_lw;
+	}
+	if (TEXDRAW_gray != TEXDRAW_last_gray) {
+		// FIXME: We don't set the line color just yet: it cannot be applied to
+		// point symbols.
+		// fprintf(gpoutfile, "\\setgray %0.2f\n", TEXDRAW_gray);
+		TEXDRAW_last_gray = TEXDRAW_gray;
 	}
 	fprintf(gpoutfile, "\\path (%d %d)",
 		(int) ((double) TEXDRAW_posx * TEXDRAW_xscale),
@@ -490,6 +503,110 @@ TEXDRAW_text_angle(int ang)
     return (TRUE);
 }
 
+
+TERM_PUBLIC int
+TEXDRAW_make_palette(t_sm_palette *palette)
+{
+    return 0;  /* claim continuous colors */
+}
+
+
+TERM_PUBLIC void
+TEXDRAW_set_color(t_colorspec *colorspec)
+{
+    /* Users can choose any color as long as it is black.
+       Enables dash patterns. */
+    switch (colorspec->type) {
+    case TC_FRAC:
+	TEXDRAW_gray = colorspec->value;
+	break;
+    case TC_RGB: {
+	int red, green, blue;
+
+	red   = (colorspec->lt >> 16) & 0xff;
+	green = (colorspec->lt >>  8) & 0xff;
+	blue  = (colorspec->lt      ) & 0xff;
+	TEXDRAW_gray = (red * 0.30 + green * 0.59 + blue * 0.11) / 255;
+	break;
+    }
+    case TC_LT:
+	/* any line type is black for now */
+	TEXDRAW_gray = 0.;
+	break;
+    default:
+	break;
+    }
+}
+
+
+static double
+TEXDRAW_fill_gray(int style)
+{
+    double gray = TEXDRAW_gray;
+    int pattern = style >> 4;
+    int frac = style >> 4;
+    static const double TEXDRAW_pat_gray[4] = {
+	1.0, 0.5, 0.8, 0.0
+    };
+
+    switch (style & 0x0f) {
+    case FS_SOLID:
+    case FS_TRANSPARENT_SOLID:
+	if (frac < 100)
+	    gray *= frac / 100.;
+	break;
+    case FS_PATTERN:
+    case FS_TRANSPARENT_PATTERN:
+	gray = TEXDRAW_pat_gray[pattern % 4];
+	break;
+    case FS_EMPTY:
+	gray = 1.0;
+	break;
+    case FS_DEFAULT:
+    default:
+	break;
+    }
+    return gray;
+}
+
+
+TERM_PUBLIC void
+TEXDRAW_fillbox(int style,
+		unsigned int x1, unsigned int y1,
+		unsigned int width, unsigned int height)
+{
+    double gray;
+
+    TEXDRAW_endline();
+    gray = TEXDRAW_fill_gray(style);
+
+    // outline box using relative moves
+    fprintf(gpoutfile, "\\move (%d %d)", x1, y1);
+    fprintf(gpoutfile, "\\rlvec (%d %d)", width, 0);
+    fprintf(gpoutfile, "\\rlvec (%d %d)", 0, height);
+    fprintf(gpoutfile, "\\rlvec (%d %d)", -width, 0);
+    // the polygon is closed automatically by fill
+    fprintf(gpoutfile, "\\ifill f:%0.2f\n", gray);
+}
+
+
+TERM_PUBLIC void
+TEXDRAW_filled_polygon(int points, gpiPoint *corners)
+{
+    double gray;
+    int i;
+
+    TEXDRAW_endline();
+    gray = TEXDRAW_fill_gray(corners->style);
+
+    // outline polygon
+    fprintf(gpoutfile, "\\move (%d %d)", corners[0].x, corners[0].y);
+    for (i = 1; i < points; i++)
+	fprintf(gpoutfile, "\\lvec (%d %d)", corners[i].x, corners[i].y);
+    // fill polygon
+    fprintf(gpoutfile, "\\ifill f:%0.2f\n", gray);
+}
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -503,16 +620,16 @@ TERM_TABLE_START(texdraw_driver)
     TEXDRAW_linetype, TEXDRAW_put_text, TEXDRAW_text_angle,
     TEXDRAW_justify_text, TEXDRAW_point, TEXDRAW_arrow, set_font_null,
     do_pointsize,
-    TERM_IS_LATEX,
+    TERM_IS_LATEX | TERM_MONOCHROME,
     0 /*suspend*/, 0 /*resume*/,
-    0 /* fillbox */,
+    TEXDRAW_fillbox,
     TEXDRAW_linewidth,
 #ifdef USE_MOUSE
     0, 0, 0, 0, 0,
 #endif
-    0, 0, /* palette */
+    TEXDRAW_make_palette, 0,
     TEXDRAW_set_color,
-    0 /* filled_polygon */,
+    TEXDRAW_filled_polygon,
     0, /* image */
     0, 0, 0, /* enhanced text */
     0, /* layer */
@@ -541,7 +658,11 @@ START_HELP(texdraw)
 "?term texdraw",
 "?texdraw",
 " The `texdraw` terminal driver supports the LaTeX texdraw environment.  It is",
-" intended for use with \"texdraw.sty\" and \"texdraw.tex\" in the texdraw package.",
+" intended for use with \"texdraw.sty\" and \"texdraw.tex\" of the texdraw package,",
+" see https://www.ctan.org/tex-archive/graphics/texdraw/ .",
+"",
+" Note: Graphics are in grayscale only. Text is always black. Boxes and polygons",
+" are filled using solid gray levels only. Patterns are not available.",
 "",
 " Points, among other things, are drawn using the LaTeX commands \"\\Diamond\" and",
 " \"\\Box\".  These commands no longer belong to the LaTeX2e core; they are included",
