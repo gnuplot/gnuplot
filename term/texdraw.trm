@@ -397,6 +397,11 @@ TEXDRAW_graphics()
 	    TEXDRAW_lines[2],
 	    TEXDRAW_rounded ? 1 : 0, TEXDRAW_rounded ? 1 : 0
 	   );
+
+    /* enforce bounding box */
+    fprintf(gpoutfile, "\\move (%d %d) \\rmove (%d 0) \\rmove (0 %d)\n",
+                term->xmax, term->ymax, -term->xmax, -term->ymax);
+
     TEXDRAW_last_type = 0;
     TEXDRAW_type = 0;
     TEXDRAW_posx = TEXDRAW_posy = 0;
