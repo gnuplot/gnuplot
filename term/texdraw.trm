@@ -70,6 +70,7 @@ TERM_PUBLIC void TEXDRAW_linetype(int linetype);
 TERM_PUBLIC void TEXDRAW_dashtype(int dt, t_dashtype *custom_dash_pattern);
 TERM_PUBLIC void TEXDRAW_linewidth(double linewidth);
 TERM_PUBLIC void TEXDRAW_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void TEXDRAW_pointsize(double size);
 TERM_PUBLIC void TEXDRAW_point(unsigned int x, unsigned int y, int number);
 TERM_PUBLIC void TEXDRAW_vector(unsigned int ux, unsigned int uy);
 TERM_PUBLIC void TEXDRAW_arrow(unsigned int sx, unsigned int sy,
@@ -185,11 +186,190 @@ static int TEXDRAW_arrow_width;
 static double TEXDRAW_gray;
 static double TEXDRAW_last_gray;
 
+/* OPTIONS */
+static TBOOLEAN TEXDRAW_standalone = FALSE;
+static TBOOLEAN TEXDRAW_rounded = TRUE;
+static TBOOLEAN TEXDRAW_colortext = FALSE;
+static TBOOLEAN TEXDRAW_psarrows = TRUE;
+static TBOOLEAN TEXDRAW_texpoints = TRUE;
+static size_units TEXDRAW_explicit_units = INCHES;
+static double TEXDRAW_size_x = 5.;
+static double TEXDRAW_size_y = 3.;
+static double TEXDRAW_lw_scale = 1.;
+static double TEXDRAW_ps = 1.;
+
+/* option names */
+enum TEXDRAW_id { TEXDRAW_DEFAULT,
+	TEXDRAW_SIZE,
+	TEXDRAW_STANDALONE, TEXDRAW_INPUT,
+	TEXDRAW_BLACKTEXT, TEXDRAW_COLORTEXT,
+	TEXDRAW_ROUNDED, TEXDRAW_BUTT,
+	TEXDRAW_LINEWIDTH, TEXDRAW_POINTSCALE,
+	TEXDRAW_PSARROWS, TEXDRAW_GPARROWS,
+	TEXDRAW_TEXPOINTS, TEXDRAW_GPPOINTS,
+	TEXDRAW_BACKGROUND,
+	TEXDRAW_OTHER };
+
+static struct gen_table TEXDRAW_opts[] =
+{
+    { "def$ault", TEXDRAW_DEFAULT },
+    { "size", TEXDRAW_SIZE },
+    { "stand$alone", TEXDRAW_STANDALONE },
+    { "inp$ut", TEXDRAW_INPUT },
+    { "b$lacktext", TEXDRAW_BLACKTEXT },
+    { "colort$ext", TEXDRAW_COLORTEXT },
+    { "colourt$ext", TEXDRAW_COLORTEXT },
+    { "round$ed", TEXDRAW_ROUNDED },
+    { "butt", TEXDRAW_BUTT },
+    // { "backg$round", TEXDRAW_BACKGROUND },
+    { "lw", TEXDRAW_LINEWIDTH },
+    { "linew$idth", TEXDRAW_LINEWIDTH },
+    { "points$cale", TEXDRAW_POINTSCALE },
+    { "ps", TEXDRAW_POINTSCALE },
+    { "psarrows", TEXDRAW_PSARROWS },
+    { "gparrows", TEXDRAW_GPARROWS },
+    { "texpoints", TEXDRAW_TEXPOINTS },
+    { "gppoints", TEXDRAW_GPPOINTS },
+    { NULL, TEXDRAW_OTHER }
+};
+
+
+TERM_PUBLIC void
+TEXDRAW_options()
+{
+    char size_str[80] = "";
+
+    while (!END_OF_COMMAND) {
+	switch ((enum TEXDRAW_id) lookup_table(&TEXDRAW_opts[0], c_token)) {
+	case TEXDRAW_DEFAULT:
+	    TEXDRAW_standalone = FALSE;
+	    TEXDRAW_rounded = TRUE;
+	    TEXDRAW_colortext = TRUE;
+	    TEXDRAW_psarrows = TRUE;
+	    TEXDRAW_texpoints = TRUE;
+	    TEXDRAW_lw_scale = TEXDRAW_ps = 1.;
+	    TEXDRAW_size_x = 5 ;
+	    TEXDRAW_size_y = 3.;
+	    term->xmax = TEXDRAW_size_x * DOTS_PER_INCH;
+	    term->ymax = TEXDRAW_size_y * DOTS_PER_INCH;
+	    term->v_char = TEXDRAW_VCHAR;
+	    term->v_tic = TEXDRAW_VTIC;
+	    break;
+	case TEXDRAW_SIZE: {
+	    float width, height;
+
+	    c_token++;
+	    TEXDRAW_explicit_units = parse_term_size(&width, &height, INCHES);
+	    TEXDRAW_size_x = width / gp_resolution;
+	    TEXDRAW_size_y = height / gp_resolution;
+	    term->xmax = TEXDRAW_size_x * DOTS_PER_INCH;
+	    term->ymax = TEXDRAW_size_y * DOTS_PER_INCH;
+	    term->v_char = TEXDRAW_VCHAR;
+	    term->v_tic = TEXDRAW_VTIC;
+	    break;
+	}
+	case TEXDRAW_STANDALONE:
+	    TEXDRAW_standalone = TRUE;
+	    c_token++;
+	    break;
+	case TEXDRAW_INPUT:
+	    TEXDRAW_standalone = FALSE;
+	    c_token++;
+	    break;
+	case TEXDRAW_COLORTEXT:
+	    TEXDRAW_colortext = TRUE;
+	    c_token++;
+	    break;
+	case TEXDRAW_BLACKTEXT:
+	    TEXDRAW_colortext = FALSE;
+	    c_token++;
+	    break;
+	case TEXDRAW_BUTT:
+	    TEXDRAW_rounded = FALSE;
+	    c_token++;
+	    break;
+	case TEXDRAW_ROUNDED:
+	    TEXDRAW_rounded = TRUE;
+	    c_token++;
+	    break;
+	case TEXDRAW_LINEWIDTH:
+	    c_token++;
+	    TEXDRAW_lw_scale = real_expression();
+	    if (TEXDRAW_lw_scale < 0.0)
+		TEXDRAW_lw_scale = 1.0;
+	    break;
+	case TEXDRAW_POINTSCALE:
+	    c_token++;
+	    TEXDRAW_ps = real_expression();
+	    if (TEXDRAW_ps < 0.0)
+		TEXDRAW_ps = 1.0;
+	    break;
+	// case TEXDRAW_BACKGROUND: {
+	    // int background;
+	    // int red, green, blue;
+
+	    // c_token++;
+	    // background = parse_color_name();
+	    // red   = (double)((background >> 16) & 0xff);
+	    // green = (double)((background >>  8) & 0xff);
+	    // blue  = (double)( background        & 0xff);
+	    // TODO: gray
+	    // break;
+	// }
+	case TEXDRAW_GPARROWS:
+	    c_token++;
+	    TEXDRAW_psarrows = FALSE;
+	    break;
+	case TEXDRAW_PSARROWS:
+	    c_token++;
+	    TEXDRAW_psarrows = TRUE;
+	    break;
+	case TEXDRAW_GPPOINTS:
+	    c_token++;
+	    TEXDRAW_texpoints = FALSE;
+	    break;
+	case TEXDRAW_TEXPOINTS:
+	    c_token++;
+	    TEXDRAW_texpoints = TRUE;
+	    break;
+	default:
+	    int_error(c_token, "Unknown terminal option");
+	}
+    }
+
+    if (TEXDRAW_explicit_units == INCHES)
+	snprintf(size_str, sizeof(size_str), "size %.2fin, %.2fin", TEXDRAW_size_x, TEXDRAW_size_y);
+    else if (TEXDRAW_explicit_units == CM)
+	snprintf(size_str, sizeof(size_str), "size %.2fcm, %.2fcm", TEXDRAW_size_x * 2.54, TEXDRAW_size_y * 2.54);
+
+    // update terminal option string
+    snprintf(term_options, MAX_LINE_LEN + 1,
+	"%s linewidth %.1f pointscale %.1f %stext "
+	// "background \"#%02x%02x%02x\" "
+	"%sarrows %spoints %s",
+	TEXDRAW_rounded ? "rounded" : "butt",
+	TEXDRAW_lw_scale, TEXDRAW_ps,
+	TEXDRAW_colortext ? "color" : "black",
+	// background
+	TEXDRAW_psarrows ? "ps" : "gp",
+	TEXDRAW_texpoints ? "tex" : "gp",
+	TEXDRAW_standalone ? "standalone" : "input");
+}
+
 
 TERM_PUBLIC void
 TEXDRAW_init()
 {
     fputs("%% GNUPLOT: LaTeX using TEXDRAW macros\n", gpoutfile);
+    if (TEXDRAW_standalone) {
+	fputs(
+"\\documentclass[a4paper,10pt]{article}\n"\
+"\\usepackage{texdraw}\n"\
+"\\usepackage{latexsym}\n"\
+"\\usepackage{xcolor}\n"
+"\\begin{document}\n",
+	    gpoutfile);
+    }
 }
 
 
@@ -207,10 +387,16 @@ TEXDRAW_graphics()
 \\drawdim pt\n\
 \\setunitscale %2.2f\n\
 \\linewd %d\n\
-\\textref h:L v:C\n";
+\\textref h:L v:C\n\
+\\writeps{%d setlinecap} \\writeps{%d setlinejoin}\n";
+
+    if (TEXDRAW_standalone)
+	fputs("\\begin{figure}\n", gpoutfile);
     fprintf(gpoutfile, tdg1,
 	    TEXDRAW_scalefactor,
-	    TEXDRAW_lines[2]);
+	    TEXDRAW_lines[2],
+	    TEXDRAW_rounded ? 1 : 0, TEXDRAW_rounded ? 1 : 0
+	   );
     TEXDRAW_last_type = 0;
     TEXDRAW_type = 0;
     TEXDRAW_posx = TEXDRAW_posy = 0;
@@ -219,6 +405,7 @@ TEXDRAW_graphics()
     TEXDRAW_arrow_type = 0;
     TEXDRAW_arrow_length = -1;
     TEXDRAW_arrow_width = -1;
+    TEXDRAW_justify = TEXDRAW_last_justify = LEFT;
 }
 
 
@@ -226,7 +413,10 @@ TERM_PUBLIC void
 TEXDRAW_text()
 {
     TEXDRAW_endline();
+    // fputs("\\drawbb\n", gpoutfile);
     fputs("\\end{texdraw}\n", gpoutfile);
+    if (TEXDRAW_standalone)
+	fputs("\\end{figure}\n\n", gpoutfile);
 }
 
 
@@ -235,6 +425,9 @@ TEXDRAW_reset()
 {
     TEXDRAW_endline();
     TEXDRAW_posx = TEXDRAW_posy = 0;
+
+    if (TEXDRAW_standalone)
+	fputs("\\end{document}\n", gpoutfile);
 }
 
 
@@ -295,7 +488,7 @@ TEXDRAW_dashtype(int dt, t_dashtype *custom_dash_pattern)
 TERM_PUBLIC void
 TEXDRAW_linewidth(double linewidth)
 {
-    TEXDRAW_lw = linewidth;
+    TEXDRAW_lw = linewidth * TEXDRAW_lw_scale;
 }
 
 
@@ -310,9 +503,22 @@ TEXDRAW_move(unsigned int x, unsigned int y)
 
 
 TERM_PUBLIC void
+TEXDRAW_pointsize(double size)
+{
+    // We can only scale gnuplot's native point types
+    term_pointsize = (size >= 0 ? size * TEXDRAW_ps : 1);
+}
+
+
+TERM_PUBLIC void
 TEXDRAW_point(unsigned int x, unsigned int y, int number)
 {
     TEXDRAW_move(x, y);
+
+    if (!TEXDRAW_texpoints) {
+	do_point(x, y, number);
+	return;
+    }
 
     /* Print the character defined by 'number'; number < 0 means
      * to use a dot, otherwise one of the defined points. */
@@ -345,9 +551,7 @@ TEXDRAW_vector(unsigned int ux, unsigned int uy)
 	    TEXDRAW_last_lw = TEXDRAW_lw;
 	}
 	if (TEXDRAW_gray != TEXDRAW_last_gray) {
-		// FIXME: We don't set the line color just yet: it cannot be applied to
-		// point symbols.
-		// fprintf(gpoutfile, "\\setgray %0.2f\n", TEXDRAW_gray);
+		fprintf(gpoutfile, "\\setgray %0.2f\n", TEXDRAW_gray);
 		TEXDRAW_last_gray = TEXDRAW_gray;
 	}
 	fprintf(gpoutfile, "\\path (%d %d)",
@@ -395,7 +599,7 @@ TEXDRAW_arrow(
     int width = (0.08 * 72 / TEXDRAW_scalefactor + 0.5);
 
     // Texdraw cannot only draw vector heads, fall back to built-in code.
-    if (head & HEADS_ONLY) {
+    if (!TEXDRAW_psarrows || (head & HEADS_ONLY)) {
 	do_arrow(sx, sy, ex, ey, head);
 	return;
     }
@@ -461,6 +665,7 @@ TEXDRAW_arrow(
 TERM_PUBLIC void
 TEXDRAW_put_text(unsigned int x, unsigned int y, const char str[])
 {
+    char colorstr[80] = "";
     TEXDRAW_endline();
 
     fprintf(gpoutfile, "\\move (%d %d)",
@@ -477,12 +682,14 @@ TEXDRAW_put_text(unsigned int x, unsigned int y, const char str[])
 	    fputs("\\textref h:R v:C ", gpoutfile);
     }
 
+    if (TEXDRAW_colortext && TEXDRAW_gray != 0)
+	snprintf(colorstr, sizeof(colorstr), "\\color{black!%d!}", 100 - (int) (TEXDRAW_gray * 100));
     if (TEXDRAW_angle == 0)
-	fprintf(gpoutfile, "\\htext{%s}\n", str);
+	fprintf(gpoutfile, "\\htext{%s%s}\n", colorstr, str);
     else if(TEXDRAW_angle == 90)
-	fprintf(gpoutfile, "\\vtext{%s}\n", str);
+	fprintf(gpoutfile, "\\vtext{%s%s}\n", colorstr, str);
     else
-	fprintf(gpoutfile, "\\rtext td:%d {%s}\n", TEXDRAW_angle, str);
+	fprintf(gpoutfile, "\\rtext td:%d {%s%s}\n", TEXDRAW_angle, colorstr, str);
 }
 
 
@@ -615,12 +822,12 @@ TERM_TABLE_START(texdraw_driver)
     "texdraw",
     "LaTeX texdraw environment",
     TEXDRAW_XMAX, TEXDRAW_YMAX, TEXDRAW_VCHAR, TEXDRAW_HCHAR,
-    TEXDRAW_VTIC, TEXDRAW_HTIC, options_null, TEXDRAW_init, TEXDRAW_reset,
+    TEXDRAW_VTIC, TEXDRAW_HTIC, TEXDRAW_options, TEXDRAW_init, TEXDRAW_reset,
     TEXDRAW_text, null_scale, TEXDRAW_graphics, TEXDRAW_move, TEXDRAW_vector,
     TEXDRAW_linetype, TEXDRAW_put_text, TEXDRAW_text_angle,
     TEXDRAW_justify_text, TEXDRAW_point, TEXDRAW_arrow, set_font_null,
-    do_pointsize,
-    TERM_IS_LATEX | TERM_MONOCHROME,
+    TEXDRAW_pointsize,
+    TERM_IS_LATEX | TERM_LINEWIDTH | TERM_POINTSCALE | TERM_MONOCHROME,
     0 /*suspend*/, 0 /*resume*/,
     TEXDRAW_fillbox,
     TEXDRAW_linewidth,
@@ -658,8 +865,17 @@ START_HELP(texdraw)
 "?term texdraw",
 "?texdraw",
 " The `texdraw` terminal driver supports the LaTeX texdraw environment.  It is",
-" intended for use with \"texdraw.sty\" and \"texdraw.tex\" of the texdraw package,",
+" intended for use with the texdraw package,",
 " see https://www.ctan.org/tex-archive/graphics/texdraw/ .",
+"",
+"       set terminal texdraw",
+"                      {size <XX>{unit},<YY>{unit}}",
+"                      {standalone | input}",
+"                      {blacktext | colortext | colourtext}",
+"                      {linewidth <lw>} {rounded | butt}",
+"                      {pointscale <ps>}",
+"                      {psarrows | gparrows} {texpoints | gppoints}",
+// "                      {background <rgbcolor>}",
 "",
 " Note: Graphics are in grayscale only. Text is always black. Boxes and polygons",
 " are filled using solid gray levels only. Patterns are not available.",
@@ -669,6 +885,23 @@ START_HELP(texdraw)
 " in the latexsym package, which is part of the base distribution and thus part",
 " of any LaTeX implementation.  Please do not forget to use this package.",
 "",
-" It has no options."
+" `standalone` produces a LaTeX file with possibly multiple plots, ready",
+" to be compiled.  The default is `input` to produce a TeX file which can",
+" be included.",
+"",
+" `blacktext` forces all text to be written in black. `colortext` enables",
+" \"colored\" text. The default is `blacktext` and \"color\" means grayscale",
+" really.",
+"",
+" `rounded` sets line caps and line joins to be rounded; `butt` sets butt",
+" caps and mitered joins and is the default.",
+"",
+" `linewidth` and `pointscale` scale the width of lines and the size of point",
+" symbols, respectively. `pointscale`only applies to `gppoints`.",
+"",
+" `psarrows` draws `arrow`s using TeXdraw commands which are shorter but do not",
+" offer all options. `gparrows` selects drawing drawing arrows using gnuplot's",
+" own routine for full functionality instead.  Similarly, `texpoints`, and ",
+" `gppoints` select LaTeX symbols or gnuplot's point drawing routines."
 END_HELP(texdraw)
 #endif /* TERM_HELP */
