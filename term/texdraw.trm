@@ -197,6 +197,7 @@ static double TEXDRAW_size_x = 5.;
 static double TEXDRAW_size_y = 3.;
 static double TEXDRAW_lw_scale = 1.;
 static double TEXDRAW_ps = 1.;
+static double TEXDRAW_background = 1.;
 
 /* option names */
 enum TEXDRAW_id { TEXDRAW_DEFAULT,
@@ -221,7 +222,7 @@ static struct gen_table TEXDRAW_opts[] =
     { "colourt$ext", TEXDRAW_COLORTEXT },
     { "round$ed", TEXDRAW_ROUNDED },
     { "butt", TEXDRAW_BUTT },
-    // { "backg$round", TEXDRAW_BACKGROUND },
+    { "backg$round", TEXDRAW_BACKGROUND },
     { "lw", TEXDRAW_LINEWIDTH },
     { "linew$idth", TEXDRAW_LINEWIDTH },
     { "points$cale", TEXDRAW_POINTSCALE },
@@ -238,6 +239,7 @@ TERM_PUBLIC void
 TEXDRAW_options()
 {
     char size_str[80] = "";
+    int bg;
 
     while (!END_OF_COMMAND) {
 	switch ((enum TEXDRAW_id) lookup_table(&TEXDRAW_opts[0], c_token)) {
@@ -248,6 +250,7 @@ TEXDRAW_options()
 	    TEXDRAW_psarrows = TRUE;
 	    TEXDRAW_texpoints = TRUE;
 	    TEXDRAW_lw_scale = TEXDRAW_ps = 1.;
+	    TEXDRAW_background = 1.;
 	    TEXDRAW_size_x = 5 ;
 	    TEXDRAW_size_y = 3.;
 	    term->xmax = TEXDRAW_size_x * DOTS_PER_INCH;
@@ -304,18 +307,18 @@ TEXDRAW_options()
 	    if (TEXDRAW_ps < 0.0)
 		TEXDRAW_ps = 1.0;
 	    break;
-	// case TEXDRAW_BACKGROUND: {
-	    // int background;
-	    // int red, green, blue;
+	case TEXDRAW_BACKGROUND: {
+	    int background;
+	    int red, green, blue;
 
-	    // c_token++;
-	    // background = parse_color_name();
-	    // red   = (double)((background >> 16) & 0xff);
-	    // green = (double)((background >>  8) & 0xff);
-	    // blue  = (double)( background        & 0xff);
-	    // TODO: gray
-	    // break;
-	// }
+	    c_token++;
+	    background = parse_color_name();
+	    red   = (double)((background >> 16) & 0xff);
+	    green = (double)((background >>  8) & 0xff);
+	    blue  = (double)( background        & 0xff);
+	    TEXDRAW_background = (red * 0.30 + green * 0.59 + blue * 0.11) / 255;
+	    break;
+	}
 	case TEXDRAW_GPARROWS:
 	    c_token++;
 	    TEXDRAW_psarrows = FALSE;
@@ -343,14 +346,15 @@ TEXDRAW_options()
 	snprintf(size_str, sizeof(size_str), "size %.2fcm, %.2fcm", TEXDRAW_size_x * 2.54, TEXDRAW_size_y * 2.54);
 
     // update terminal option string
+    bg = TEXDRAW_background * 255;
     snprintf(term_options, MAX_LINE_LEN + 1,
 	"%s linewidth %.1f pointscale %.1f %stext "
-	// "background \"#%02x%02x%02x\" "
+	"background \"#%02x%02x%02x\" "
 	"%sarrows %spoints %s",
 	TEXDRAW_rounded ? "rounded" : "butt",
 	TEXDRAW_lw_scale, TEXDRAW_ps,
 	TEXDRAW_colortext ? "color" : "black",
-	// background
+	bg, bg, bg,
 	TEXDRAW_psarrows ? "ps" : "gp",
 	TEXDRAW_texpoints ? "tex" : "gp",
 	TEXDRAW_standalone ? "standalone" : "input");
@@ -398,9 +402,15 @@ TEXDRAW_graphics()
 	    TEXDRAW_rounded ? 1 : 0, TEXDRAW_rounded ? 1 : 0
 	   );
 
-    /* enforce bounding box */
-    fprintf(gpoutfile, "\\move (%d %d) \\rmove (%d 0) \\rmove (0 %d)\n",
-                term->xmax, term->ymax, -term->xmax, -term->ymax);
+    if (TEXDRAW_background == 1.) {
+	/* enforce bounding box */
+	fprintf(gpoutfile, "\\move (0 0) \\rmove (%d %d)\n",
+		    term->xmax, term->ymax);
+    } else {
+	fprintf(gpoutfile, "\\move (0 0) \\rlvec (%d 0) \\rlvec (0 %d) \\rlvec (%d 0) \\ifill f:%0.2f\n",
+		    term->xmax, term->ymax, -term->xmax,
+		    TEXDRAW_background);
+    }
 
     TEXDRAW_last_type = 0;
     TEXDRAW_type = 0;
@@ -880,7 +890,7 @@ START_HELP(texdraw)
 "                      {linewidth <lw>} {rounded | butt}",
 "                      {pointscale <ps>}",
 "                      {psarrows | gparrows} {texpoints | gppoints}",
-// "                      {background <rgbcolor>}",
+"                      {background <rgbcolor>}",
 "",
 " Note: Graphics are in grayscale only. Text is always black. Boxes and polygons",
 " are filled using solid gray levels only. Patterns are not available.",
