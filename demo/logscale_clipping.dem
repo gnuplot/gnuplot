@@ -46,7 +46,7 @@ set y2range [1.e-7 : 1.]
 set y2tics nomirror
 set xtics
 unset ytics
-set key title " "
+set key title "  "
 set title "Bug #2046 - incorrect clipped line segments for logscale coordinates"
 
 plot $DATA using 1:2 axes x1y2 with lp lc "black" title "no clipping"
@@ -54,12 +54,15 @@ plot $DATA using 1:2 axes x1y2 with lp lc "black" title "no clipping"
 set  yrange [1.e-6 : 1.e-5]
 set tmargin at screen 0.4
 set bmargin at screen 0.3
-set key left
+set key bottom left notitle
 unset y2tics
 unset title
 unset xtics
 
-plot $DATA using 1:2 with lp lc "orange" lw 3 title "clip two"
+plot $DATA using 1:2 with lp lc "orange" lw 3 title "clip two", \
+'-' using 1:2:3:4 with vectors lc "red" lw 2 title "vector"
+1.48  3.91069e-005	0.500  -3.8492e-5
+e
 
 unset multiplot
 
