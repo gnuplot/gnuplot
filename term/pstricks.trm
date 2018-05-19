@@ -558,7 +558,7 @@ PSTRICKS_graphics()
     strcpy(PSTRICKS_linecolor, "black");
     PSTRICKS_lw = 1;
     PSTRICKS_arrowwidth = PSTRICKS_arrowlength = PSTRICKS_arrowinset = -1;
-    fprintf(gpoutfile, "\\psset{linecap=%d,linejoin=%d}\n", PST_rounded ? 1 : 0, PST_rounded ? 1 : 2);
+    fprintf(gpoutfile, "\\psset{linecap=%d,linejoin=%d}\n", PST_rounded ? 1 : 0, PST_rounded ? 1 : 0);
 }
 
 
