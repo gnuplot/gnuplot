@@ -241,17 +241,19 @@ clip_point(int x, int y)
  *   This routine uses the cohen & sutherland bit mapping for fast clipping -
  * see "Principles of Interactive Computer Graphics" Newman & Sproull page 65.
  */
-void
+int
 draw_clip_line(int x1, int y1, int x2, int y2)
 {
     struct termentry *t = term;
+    int state;
 
-    if (!clip_line(&x1, &y1, &x2, &y2))
-	/* clip_line() returns zero if segment completely outside bounding box */
-	return;
+    state = clip_line(&x1, &y1, &x2, &y2);
+    if (state != 0) {
+	(*t->move) (x1, y1);
+	(*t->vector) (x2, y2);
+    }
 
-    (*t->move) (x1, y1);
-    (*t->vector) (x2, y2);
+    return state;
 }
 
 /* Draw a contiguous line path which may be clipped. Compared to

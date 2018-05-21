@@ -1079,10 +1079,14 @@ plot_lines(struct curve_points *plot)
 		    } else if (polar && clip_radial) {
 			draw_polar_clip_line( &(plot->points[i-1]), &(plot->points[i]) );
 		    } else {
-			(*t->move) (x, y);
-			draw_clip_line( map_x(plot->points[i-1].x),
-					map_y(plot->points[i-1].y),
-					x, y);
+			if (!draw_clip_line( map_x(plot->points[i-1].x),
+					     map_y(plot->points[i-1].y),
+					     x, y)) {
+			    /* This is needed if clip_line() doesn't agree that	*/
+			    /* the current point is INRANGE, i.e. it is on the	*/
+			    /*  border or just outside depending on rounding.	*/
+			    (*t->move)(x, y);
+			}
 		    }
 		} else {	/* prev == UNDEFINED */
 		    (*t->move) (x, y);

@@ -541,7 +541,7 @@ extern int current_x11_windowid;
 void init_gadgets __PROTO((void));
 
 /* moved here from util3d: */
-void draw_clip_line __PROTO((int, int, int, int));
+int draw_clip_line __PROTO((int, int, int, int));
 void draw_clip_polygon __PROTO((int , gpiPoint *));
 void draw_clip_arrow __PROTO((double, double, double, double, t_arrow_head));
 void clip_polygon __PROTO((gpiPoint *, gpiPoint *, int , int *));
