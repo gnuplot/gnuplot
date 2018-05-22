@@ -677,6 +677,8 @@ draw_polar_clip_line( struct coordinate *beg, struct coordinate *end )
 	vertical = TRUE;
 	y1 = sqrt(R*R - x1*x1);
 	y2 = -y1;
+	if (!inrange(y1,beg->y,end->y) && !inrange(y2,beg->y,end->y))
+	    goto outside;
     }
 
     /* If one of the original endpoints was INRANGE then use it */
