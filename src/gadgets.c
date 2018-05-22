@@ -642,6 +642,7 @@ draw_polar_clip_line( struct coordinate *beg, struct coordinate *end )
     double a, b;		/* line expressed as y = a*x + b */
     double x1, y1, x2, y2;	/* Intersections of line and circle */
     double Q, Q2;		/* sqrt term of quadratic equation */
+    TBOOLEAN vertical = FALSE;	/* flag for degenerate case */
 
     /* Both INRANGE, no clipping needed */
     if (beg->type == INRANGE && end->type == INRANGE) {
@@ -652,26 +653,38 @@ draw_polar_clip_line( struct coordinate *beg, struct coordinate *end )
 
     if (R_AXIS.set_max == -VERYLARGE)
 	goto outside;
-    /* FIXME:  logscale and other odd cases not covered by this equation */
     R = R_AXIS.set_max - R_AXIS.set_min;
 
-    /* Recast line in the form y = a*x + b */
-    a = (end->y - beg->y) / (end->x - beg->x);
-    b = beg->y - beg->x * a;
-
-    /* The line may intersect a circle of radius R in two places */
-    Q2 = 4*a*a*b*b - 4 * (1 + a*a) * (b*b - R*R);
-    if (Q2 < 0)
-	goto outside;
-    Q = sqrt(Q2);
-    x1 = (-2*a*b + Q) / ( 2*(1+a*a));
-    x2 = (-2*a*b - Q) / ( 2*(1+a*a));
-    y1 = a * x1 + b;
-    y2 = a * x2 + b;
+    /* FIXME:  logscale and other odd cases are not covered by this equation */
+    if (fabs(beg->x - end->x) > ZERO) {
+	/* Recast line in the form y = a*x + b */
+	a = (end->y - beg->y) / (end->x - beg->x);
+	b = beg->y - beg->x * a;
+	/* the line may intersect a circle of radius R in two places */
+	Q2 = 4*a*a*b*b - 4 * (1 + a*a) * (b*b - R*R);
+	if (Q2 < 0)
+	    goto outside;
+	Q = sqrt(Q2);
+	x1 = (-2*a*b + Q) / ( 2*(1+a*a));
+	x2 = (-2*a*b - Q) / ( 2*(1+a*a));
+	y1 = a * x1 + b;
+	y2 = a * x2 + b;
+    } else {
+	/* degenerate case (vertical line) */
+	x1 = x2 = beg->x;
+	if (fabs(x1) > R)
+	    goto outside;
+	vertical = TRUE;
+	y1 = sqrt(R*R - x1*x1);
+	y2 = -y1;
+    }
 
     /* If one of the original endpoints was INRANGE then use it */
     /* rather than the second intersection point.               */
-    if (beg->type == INRANGE) {
+    if (vertical) {
+	y1 = GPMIN(y1, GPMAX(beg->y, end->y));
+	y2 = GPMAX(y2, GPMIN(beg->y, end->y));
+    } else if (beg->type == INRANGE) {
 	if (!inrange(x1, beg->x, end->x)) {
 	    x1 = beg->x;
 	    y1 = beg->y;
