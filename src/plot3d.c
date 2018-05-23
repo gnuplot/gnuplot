@@ -354,44 +354,55 @@ refresh_3dbounds(struct surface_points *first_plot, int nplots)
 	    continue;
 	}
 
-	for ( this_curve = this_plot->iso_crvs; this_curve; this_curve = this_curve->next) {
+	for (this_curve = this_plot->iso_crvs; this_curve; this_curve = this_curve->next) {
 
-	for (i=0; i<this_curve->p_count; i++) {
-	    struct coordinate *point = &this_curve->points[i];
-
-	    if (point->type == UNDEFINED)
-		continue;
+	    /* VECTOR plots consume two ico_crvs structures, one for heads and one for tails.
+	     * Only the first one has the true point count; the second one claims zero.
+	     * FIXME: Maybe we should change this?
+	     */
+	    int n_points;
+	    if (this_plot->plot_style == VECTOR)
+		n_points = this_plot->iso_crvs->p_count;
 	    else
-		point->type = INRANGE;
+		n_points = this_curve->p_count;
 
-	    /* If the state has been set to autoscale since the last plot,
-	     * mark everything INRANGE and re-evaluate the axis limits now.
-	     * Otherwise test INRANGE/OUTRANGE against previous axis limits.
-	     */
+	    for (i=0; i<n_points; i++) {
+		struct coordinate *point = &this_curve->points[i];
 
-	    /* This autoscaling logic is parallel to that in
-	     * refresh_bounds() in plot2d.c
-	     */
-	    if (!this_plot->noautoscale) {
-		autoscale_one_point(x_axis, point->x);
-		autoscale_one_point(y_axis, point->y);
-	    }
-	    if (!inrange(point->x, x_axis->min, x_axis->max)
-	    ||  !inrange(point->y, y_axis->min, y_axis->max)) {
-		point->type = OUTRANGE;
-		continue;
-	    }
-	    if (!this_plot->noautoscale) {
-		autoscale_one_point(z_axis, point->z);
-	    }
-	    if (!inrange(point->z, z_axis->min, z_axis->max)) {
-		point->type = OUTRANGE;
-		continue;
-	    }
-	}	/* End of this curve */
-	}
+		if (point->type == UNDEFINED)
+		    continue;
+		else
+		    point->type = INRANGE;
 
-    }	/* End of this plot */
+		/* If the state has been set to autoscale since the last plot,
+		 * mark everything INRANGE and re-evaluate the axis limits now.
+		 * Otherwise test INRANGE/OUTRANGE against previous axis limits.
+		 */
+
+		/* This autoscaling logic is parallel to that in
+		 * refresh_bounds() in plot2d.c
+		 */
+		if (!this_plot->noautoscale) {
+		    autoscale_one_point(x_axis, point->x);
+		    autoscale_one_point(y_axis, point->y);
+		}
+		if (!inrange(point->x, x_axis->min, x_axis->max)
+		||  !inrange(point->y, y_axis->min, y_axis->max)) {
+		    point->type = OUTRANGE;
+		    continue;
+		}
+		if (!this_plot->noautoscale) {
+		    autoscale_one_point(z_axis, point->z);
+		}
+		if (!inrange(point->z, z_axis->min, z_axis->max)) {
+		    point->type = OUTRANGE;
+		    continue;
+		}
+
+	    }	/* End of points in this curve */
+	}   /* End of curves in this plot */
+
+    }	/* End of plots in this splot command */
 
     /* handle 'reverse' ranges */
     axis_check_range(FIRST_X_AXIS);
