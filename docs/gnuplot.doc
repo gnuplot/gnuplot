@@ -6362,9 +6362,9 @@ Ffigure_fenceplot
 ?plot acsplines
 ?smooth acsplines
 ?acsplines
- The `acsplines` option approximates the data with a "natural smoothing spline".
- After the data are made monotonic in x (see `smooth unique`), a curve is
- piecewise constructed from segments of cubic polynomials whose coefficients
+ The `smooth acsplines` option approximates the data with a natural smoothing
+ spline.  After the data are made monotonic in x (see `smooth unique`), a curve
+ is piecewise constructed from segments of cubic polynomials whose coefficients
  are found by fitting to the individual data points weighted by the value,
  if any, given in the third column of the using spec.  The default is equivalent
  to
@@ -6393,7 +6393,7 @@ Ffigure_fenceplot
 ?plot bezier
 ?smooth bezier
 ?bezier
- The `bezier` option approximates the data with a Bezier curve of degree n
+ The `smooth bezier` option approximates the data with a Bezier curve of degree n
  (the number of data points) that connects the endpoints.
 5 bins
 ?data-file smooth bins
@@ -6411,8 +6411,8 @@ Ffigure_fenceplot
 ?plot csplines
 ?smooth csplines
 ?csplines
- The `csplines` option connects consecutive points by natural cubic splines
- after rendering the data monotonic (see `smooth unique`).
+ The `smooth csplines` option connects consecutive points by natural cubic
+ splines after rendering the data monotonic (see `smooth unique`).
 5 mcsplines
 ?commands plot datafile smooth mcsplines
 ?plot datafile smooth mcsplines
@@ -6422,9 +6422,9 @@ Ffigure_fenceplot
 ?plot mcsplines
 ?smooth mcsplines
 ?mcsplines
- The `mcsplines` option connects consecutive points by cubic splines constrained
- such that the smoothed function preserves the monotonicity and convexity of the
- original data points.  This reduces the effect of outliers.
+ The `smooth mcsplines` option connects consecutive points by cubic splines
+ constrained such that the smoothed function preserves the monotonicity and
+ convexity of the original data points.  This reduces the effect of outliers.
  FN Fritsch & RE Carlson (1980) "Monotone Piecewise Cubic Interpolation",
  SIAM Journal on Numerical Analysis 17: 238–246.
 5 sbezier
@@ -6436,8 +6436,8 @@ Ffigure_fenceplot
 ?plot sbezier
 ?smooth sbezier
 ?sbezier
- The `sbezier` option first renders the data monotonic (`unique`) and then
- applies the `bezier` algorithm.
+ The `smooth sbezier` option first renders the data monotonic (`unique`) and
+ then applies the `bezier` algorithm.
 5 unique
 ?commands plot datafile smooth unique
 ?plot datafile smooth unique
@@ -6447,7 +6447,7 @@ Ffigure_fenceplot
 ?plot unique
 ?smooth unique
 ?unique
- The `unique` option makes the data monotonic in x; points with the same
+ The `smooth unique` option makes the data monotonic in x; points with the same
  x-value are replaced by a single point having the average y-value.  The
  resulting points are then connected by straight line segments.
 5 unwrap
@@ -6459,11 +6459,11 @@ Ffigure_fenceplot
 ?plot unwrap
 ?smooth unwrap
 ?unwrap
- The `unwrap` option modifies the input data so that any two successive
- points will not differ by more than pi; a point whose y value is
- outside this range will be incremented or decremented by multiples of
- 2pi until it falls within pi of the previous point. This operation is
- useful for making wrapped phase measurements continuous over time.
+ The `smooth unwrap` option modifies the input data so that any two successive
+ points will not differ by more than pi; a point whose y value is outside this
+ range will be incremented or decremented by multiples of 2pi until it falls
+ within pi of the previous point. This operation is useful for making wrapped
+ phase measurements continuous over time.
 5 frequency
 ?commands plot datafile smooth frequency
 ?plot datafile smooth frequency
@@ -6474,8 +6474,8 @@ Ffigure_fenceplot
 ?smooth frequency
 ?frequency
 =histogram
- The `frequency` option makes the data monotonic in x; points with the same
- x-value are replaced by a single point having the summed y-values.
+ The `smooth frequency` option makes the data monotonic in x; points with the
+ same x-value are replaced by a single point having the summed y-values.
  To plot a histogram of the number of data values in equal size bins,
  set the y-value to 1.0 so that the sum is a count of occurrences in that bin.
  This is done implicitly if only a single column is provided.
@@ -6497,8 +6497,8 @@ Ffigure_fenceplot
 ?plot fnormal
 ?smooth fnormal
 ?fnormal
- The `fnormal` option work just like the `frequency` option, but produces a
- normalized histogram. It makes the data monotonic in x and normalises the
+ The `smooth fnormal` option work just like the `frequency` option, but produces
+ a normalized histogram. It makes the data monotonic in x and normalises the
  y-values so they all sum to 1. Points with the same x-value are replaced by a
  single point containing the sumed y-values. To plot a histogram of the number
  of data values in equal size bins, set the y-value to 1.0 so that the sum is a
@@ -6517,8 +6517,8 @@ Ffigure_fenceplot
 ?plot cumulative
 ?smooth cumulative
 ?cumulative
- The `cumulative` option makes the data monotonic in x; points with the same
- x-value are replaced by a single point containing the cumulative sum of 
+ The `smooth cumulative` option makes the data monotonic in x; points with the
+ same x-value are replaced by a single point containing the cumulative sum of 
  y-values of all data points with lower x-values (i.e. to the left of the
  current data point). This can be used to obtain a cumulative distribution 
  function from data.
@@ -6535,14 +6535,13 @@ Ffigure_fenceplot
 ?plot cnormal
 ?smooth cnormal
 ?cnormal
- The `cnormal` option makes the data monotonic in x and normalises the
- y-values onto the range [0:1].  Points with the same x-value are
- replaced by a single point containing the cumulative sum of y-values
- of all data points with lower x-values (i.e. to the left of the
- current data point) divided by the total sum of all y-values. This can
- be used to obtain a normalised cumulative distribution function from
- data (useful when comparing sets of samples with differing numbers of
- members).
+ The `smooth cnormal` option makes the data monotonic in x and normalises the
+ y-values onto the range [0:1].  Points with the same x-value are replaced by
+ a single point containing the cumulative sum of y-values of all data points
+ with lower x-values (i.e. to the left of the current data point) divided by
+ the total sum of all y-values. This can be used to obtain a normalised
+ cumulative distribution function from data (useful when comparing sets of
+ samples with differing numbers of members).
  See also
 ^ <a href="http://www.gnuplot.info/demo/smooth.html">
  smooth.dem
@@ -6557,8 +6556,8 @@ Ffigure_fenceplot
 ?plot kdensity
 ?smooth kdensity
 ?kdensity
- The `kdensity` option is a way to plot a kernel density estimate (which is a
- smooth histogram) for a random collection of points, using Gaussian kernels.
+ The `smooth kdensity` option is a way to plot a kernel density estimate
+ (a smooth histogram) for a random collection of points, using Gaussian kernels.
  A Gaussian is placed at the location of each point in the first column and
  the sum of all these Gaussians is plotted as a function. The value in the
  second column is taken as weight of the Gaussian. To obtain a normalized
