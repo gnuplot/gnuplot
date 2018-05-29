@@ -126,7 +126,7 @@ static int PSTRICKS_angle = 0;
 #define PSTRICKS_SHORTER_FILE 1
 
 #ifdef PSTRICKS_SHORTER_FILE
-static int PSTRICKS_color = 0;
+static int PSTRICKS_color;
 #else
 static char PSTRICKS_color_str[16] = "";
 #endif
@@ -281,6 +281,11 @@ PSTRICKS_graphics()
 	    (xoffset + xsize),
 	    (yoffset + ysize)
     );
+#ifdef PSTRICKS_SHORTER_FILE
+    PSTRICKS_color = -1;
+#else
+    PSTRICKS_color_str[0] = 0;
+#endif
 }
 
 
@@ -634,10 +639,16 @@ PSTRICKS_filled_polygon (int points, gpiPoint *corners)
     int i;
 
 #ifdef PSTRICKS_SHORTER_FILE
-    /* using a macro for an abbreviation */
-    fprintf(gpoutfile, "\\polypmIIId{%d}", PSTRICKS_color);
+    if (PSTRICKS_color != -1) {
+	/* using a macro for an abbreviation */
+	fprintf(gpoutfile, "\\polypmIIId{%d}", PSTRICKS_color);
+    } else {
+	/* no palette color set; use black to fill */
+	fputs("\\pspolygon[linestyle=none,fillstyle=solid,fillcolor=black]", gpoutfile);
+    }
 #else
-    fprintf(gpoutfile, "\\pspolygon[linestyle=none,fillstyle=solid,fillcolor=%s]", PSTRICKS_color_str);
+    fprintf(gpoutfile, "\\pspolygon[linestyle=none,fillstyle=solid,fillcolor=%s]", 
+	PSTRICKS_color_str[0] ? PSTRICKS_color_str : "black");
 #endif
     for (i=0; i < points; i++) {
 	if (i % 8 == 7) /* up to 8 corners per line */
