@@ -109,6 +109,10 @@ TERM_PUBLIC void TPIC_filled_polygon(int points, gpiPoint *corners);
 TERM_PUBLIC void TPIC_fillbox(int style,
 		unsigned int x1, unsigned int y1,
 		unsigned int width, unsigned int height);
+TERM_PUBLIC void PICT2E_filled_polygon(int points, gpiPoint *corners);
+TERM_PUBLIC void PICT2E_fillbox(int style,
+		unsigned int x1, unsigned int y1,
+		unsigned int width, unsigned int height);
 
 #ifdef EEPIC
 TERM_PUBLIC void EEPIC_move(unsigned int x, unsigned int y);
@@ -191,6 +195,11 @@ static float LATEX_lw;
 static float LATEX_dotspace = 0;	/* current dotspace of line in points */
 #define LATEX_DOT_SPACE 4.0
 #define LATEX_THIN_LINE 0	/* the thinnest solid line type */
+#define LATEX_LINEMAX 100	/* max value for linecount */
+static TBOOLEAN LATEX_inline;	/* are we in the middle of a line */
+static int LATEX_linecount = 0;	/* number of points in line so far */
+static unsigned int LATEX_path[LATEX_LINEMAX][2];		/* point stack */
+
 
 static void LATEX_endline(void);
 
@@ -208,7 +217,7 @@ static void EMTEX_solid_line(int x1, int x2, int y1, int y2);
 
 static void tpic_startline(void);
 static void tpic_endline(void);
-static void tpic_pushpath(unsigned int x, unsigned int y);
+static void LATEX_pushpath(unsigned int x, unsigned int y);
 static void tpic_scanpath(void);
 static void tpic_fill(int style);
 static void tpic_path(int x, int y);
@@ -229,9 +238,10 @@ static const tpic_linestyle tpic_pattern[7] = {
 	tpic_solid, tpic_dashed, tpic_dashed_sdot, tpic_dashed_ddot, tpic_dotted
 };
 static tpic_linestyle tpic_linetype = tpic_solid;	/* current line type */
-#define TPIC_LINEMAX 100	/* max value for linecount */
-static TBOOLEAN tpic_inline = FALSE;	/* are we in the middle of a line */
-static int tpic_linecount = 0;	/* number of points in line so far */
+
+static void PICT2E_solid_line(int x1, int x2, int y1, int y2);
+static void PICT2E_endline(void);
+static int PICT2E_fill(int style);
 
 
 /* ARROWS */
@@ -284,7 +294,7 @@ static struct gen_table LATEX_opts[] =
     { "emtex", LATEX_EMTEX },
     { "tpic", LATEX_TPIC },
     // { "eepic", LATEX_EEPIC },
-    // { "pict2e", LATEX_PICT2E },
+    { "pict2e", LATEX_PICT2E },
     { NULL, LATEX_OTHER }
 };
 
@@ -313,6 +323,12 @@ LATEX_options()
 	    c_token++;
 	    break;
 	case LATEX_PICT2E:
+	    LATEX_mode = cmd;
+	    // Solid fill is supported
+	    term->filled_polygon = PICT2E_filled_polygon;
+	    term->fillbox = PICT2E_fillbox;
+	    c_token++;
+	    break;
 	case LATEX_EEPIC:
 	    LATEX_mode = cmd;
 	    // Filling is supported
@@ -442,6 +458,9 @@ LATEX_init()
     case LATEX_TPIC:
 	fputs("% GNUPLOT: LaTeX picture with tpic specials\n", gpoutfile);
 	break;
+    case LATEX_PICT2E:
+	fputs("% GNUPLOT: LaTeX2e picture (pict2e)\n", gpoutfile);
+	break;
     default:
 	;
     }
@@ -478,6 +497,7 @@ LATEX_graphics()
     LATEX_size = 0;
     latex_color[0] = 0;
     LATEX_linetype(LT_AXIS);
+    LATEX_inline = FALSE;
 }
 
 
@@ -516,6 +536,8 @@ LATEX_linesize(int linetype)
 		-size / 2, size, size);
 	if (LATEX_mode == LATEX_EMTEX)		/* change line width */
 	    fprintf(gpoutfile, "\\special{em:linewidth %.1fpt}%%\n", size);
+	else if (LATEX_mode == LATEX_PICT2E)
+	    fprintf(gpoutfile, "\\linethickness{%.1fpt}%%\n", size);
     }
     LATEX_size = size;
     LATEX_dotsize = size / LATEX_UNIT;
@@ -629,9 +651,31 @@ LATEX_endline(void)
     case LATEX_TPIC:
 	tpic_endline();
 	break;
+    case LATEX_EEPIC:
+	if (LATEX_inline) {
+	    LATEX_inline = FALSE;
+	    fputs("\n", gpoutfile);
+	}
+	break;
+    case LATEX_PICT2E:
+	PICT2E_endline();
+	LATEX_flushdot();
+	break;
     default:
 	;
     }
+}
+
+
+static void
+LATEX_pushpath(unsigned int x, unsigned int y)
+{
+    if (LATEX_linecount < LATEX_LINEMAX) {
+	LATEX_path[LATEX_linecount][0] = x;
+	LATEX_path[LATEX_linecount][1] = y;
+	LATEX_linecount++;
+    }
+    return;
 }
 
 
@@ -652,15 +696,21 @@ LATEX_vector(unsigned int ux, unsigned int uy)
 	    LATEX_dot_line(LATEX_posx, (int) ux, LATEX_posy, (int) uy);
 	break;
     case LATEX_TPIC:
-	if (!tpic_inline) {
+	if (!LATEX_inline) {
 	    tpic_startline();
-	} else if (tpic_linecount >= TPIC_LINEMAX) {
+	} else if (LATEX_linecount >= LATEX_LINEMAX) {
 	    /* Even though we are in the middle of a path, we may start a new path
 	       command once in a while; if they are too long, latex will choke. */
 	    tpic_endline();
 	    tpic_startline();
 	}
-	tpic_pushpath(ux, uy);
+	LATEX_pushpath(ux, uy);
+	break;
+    case LATEX_PICT2E:
+	if (LATEX_dotspace == 0.0)
+	    PICT2E_solid_line(LATEX_posx, (int) ux, LATEX_posy, (int) uy);
+	else
+	    LATEX_dot_line(LATEX_posx, (int) ux, LATEX_posy, (int) uy);
 	break;
     default:
 	;
@@ -958,6 +1008,26 @@ best_latex_arrow(
 	head |= END_HEAD;
     }
 
+    if (LATEX_mode == LATEX_PICT2E) {
+	// pict2e has no restriction on slope
+	int dx = ex - sx;
+	int dy = ey - sy;
+	float len = sqrt(dx * dx + dy * dy);
+	dx /= len / 100.;
+	dy /= len / 100.;
+	// TODO: divide by GCD
+	fprintf(gpoutfile, "\\put(%d,%d){\\%s(%d,%d){%d}}\n",
+		sx, sy, head ? "vector" : "line",
+		dx, dy,
+		dx != 0 ? ABS(ex - sx) : ABS(ey - sy));
+	if (head & BACKHEAD) {
+	    fprintf(gpoutfile, "\\put(%d,%d){\\vector(%d,%d){0}}\n",
+		    sx, sy,
+		    -dx, -dy);
+	}
+	return;
+    }
+
     if (dx == 0) {
 	/* vertical arrow */
 	fprintf(gpoutfile, "\\put(%d,%d){\\%s(0,%d){%d}}\n",
@@ -1051,6 +1121,8 @@ LATEX_put_text(unsigned int x, unsigned int y, const char str[])
     /* ignore empty strings */
     if (str[0] == NUL)
 	return;
+
+    LATEX_endline();
 
     if (!latex_rotate)
     for (flag = FALSE, i = 0; str[i] && !flag;)
@@ -1161,7 +1233,7 @@ LATEX_set_color(t_colorspec *colorspec)
 }
 
 
-/* EMTEX  special routines */
+/* EMTEX special routines */
 
 static void
 EMTEX_solid_line(int x1, int x2, int y1, int y2)
@@ -1176,17 +1248,19 @@ EMTEX_solid_line(int x1, int x2, int y1, int y2)
     LATEX_moved = FALSE;
 }
 
+
 /* tpic special routines */
+
 static int tpic_linewidth = 6;	/* min line thickness (in milli-inches) */
 static double tpic_interval = 0.05;	/* min dot & dash intervals (in inches) */
 
 static void
 tpic_startline()
 {				/* private */
-    tpic_inline = TRUE;
+    LATEX_inline = TRUE;
     tpic_pen(tpic_linewidth * LATEX_lw);
-    tpic_linecount = 0;
-    tpic_pushpath(LATEX_posx, LATEX_posy);
+    LATEX_linecount = 0;
+    LATEX_pushpath(LATEX_posx, LATEX_posy);
     return;
 }
 
@@ -1195,7 +1269,7 @@ tpic_endline()
 {				/* private */
     double interval = 1;
 
-    if (tpic_inline) {
+    if (LATEX_inline) {
 	tpic_scanpath();	/* draw actually */
 	/* TODO: dash interval */
 	interval = tpic_interval;
@@ -1220,21 +1294,7 @@ tpic_endline()
 	    tpic_dottedflush(interval / 3);
 	    break;
 	}
-	tpic_inline = FALSE;
-    }
-    return;
-}
-
-/* private: stack functions */
-static unsigned int pathpoint[TPIC_LINEMAX][2];		/* point stack */
-
-static void
-tpic_pushpath(unsigned int x, unsigned int y)
-{
-    if (tpic_linecount < TPIC_LINEMAX) {
-	pathpoint[tpic_linecount][0] = x;
-	pathpoint[tpic_linecount][1] = y;
-	tpic_linecount++;
+	LATEX_inline = FALSE;
     }
     return;
 }
@@ -1244,8 +1304,8 @@ tpic_scanpath()
 {
     int i;
 
-    for (i = 0; i < tpic_linecount; i++)
-	tpic_abspath(pathpoint[i][0], pathpoint[i][1]);
+    for (i = 0; i < LATEX_linecount; i++)
+	tpic_abspath(LATEX_path[i][0], LATEX_path[i][1]);
     return;
 }
 
@@ -1285,7 +1345,7 @@ tpic_fill(int style)
 }
 
 
-static void
+TERM_PUBLIC void
 TPIC_fillbox(int style,
 		unsigned int x1, unsigned int y1,
 		unsigned int width, unsigned int height)
@@ -1340,7 +1400,7 @@ tpic_abspath(unsigned int x, unsigned int y)
 static void
 tpic_path(int x, int y)
 {
-    // need handle coordinate transform only here
+    // need to handle coordinate transform only here
     fprintf(gpoutfile, "\\special{pa %d %d}",
 	(int) (x / (TPIC_UNIT * DOTS_PER_INCH)),
 	(int) (y / (TPIC_UNIT * DOTS_PER_INCH)));
@@ -1390,6 +1450,162 @@ tpic_dashedflush(double interval)
     return;
 }
 
+
+/* PICT2E special routines */
+
+static void
+PICT2E_endline(void)
+{
+    if (LATEX_inline) {
+	int i;
+
+	if (LATEX_linecount == 2)
+	    fputs("\\Line", gpoutfile);
+	else
+	    fputs("\\polyline", gpoutfile);
+	for (i = 0; i < LATEX_linecount; i++)
+	    fprintf(gpoutfile, "(%d,%d)", LATEX_path[i][0], LATEX_path[i][1]);
+	fputs("\n", gpoutfile);
+
+	LATEX_inline = FALSE;
+	LATEX_linecount = 0;
+    }
+}
+
+
+static void
+PICT2E_solid_line(int x1, int x2, int y1, int y2)
+{
+    if (!LATEX_inline)
+	LATEX_pushpath(x1, y1);
+
+    LATEX_inline = TRUE;
+    LATEX_pushpath(x2, y2);
+
+    if (LATEX_linecount == LATEX_LINEMAX) {
+	PICT2E_endline();
+	LATEX_pushpath(x2, y2);
+    }
+
+    LATEX_posx = x2;
+    LATEX_posy = y2;
+}
+
+typedef enum  { pict2e_no_fill, pict2e_fill, pict2e_fill_and_restore} pict2e_fill_cmds;
+
+static int
+PICT2E_fill(int style)
+{
+    TBOOLEAN fill = pict2e_fill;
+    int opt = style >> 4;
+
+    switch (style & 0xf) {
+    case FS_SOLID:
+    case FS_TRANSPARENT_SOLID:
+	if (latex_use_color) {
+	    if (opt != 100) {
+		fputs("\\colorlet{pict2ecol}{.}", gpoutfile); // save current color
+		fprintf(gpoutfile, "\\color{.!%d}\n", opt);
+		fill = pict2e_fill_and_restore;
+	    } else {
+		fill = pict2e_fill;
+	    }
+	} else if (opt < 50) {
+	    fill = pict2e_no_fill;
+	}
+	break;
+    case FS_PATTERN:
+    case FS_TRANSPARENT_PATTERN:
+	if (latex_use_color) {
+	    fputs("\\colorlet{pict2ecol}{.}", gpoutfile); // save current color
+	    opt %= 4;
+	    if (opt == 0)
+		fprintf(gpoutfile, "\\color{white}\n", opt);
+	    else if (opt == 1)
+		fprintf(gpoutfile, "\\color{.!50}\n", opt);
+	    else if (opt == 2)
+		fprintf(gpoutfile, "\\color{.!20}\n", opt);
+	    else if (opt == 3)
+		fprintf(gpoutfile, "\\color{black}\n", opt);
+	    fill = pict2e_fill_and_restore;
+	} else {
+	    if ((opt % 2) == 0)
+		fill = pict2e_no_fill;
+	    else
+		fill = pict2e_fill;
+	}
+	break;
+    case FS_EMPTY:
+	if (latex_use_color) {
+	    fputs("\\colorlet{pict2ecol}{.}", gpoutfile); // save current color
+	    fprintf(gpoutfile, "\\color{white}\n", opt);
+	    fill = pict2e_fill_and_restore;
+	} else {
+	    fill = pict2e_no_fill;
+	}
+	break;
+    case FS_DEFAULT:
+    default:
+	/* use currently active color */
+	fill = pict2e_fill;
+	break;
+    }
+    return fill;
+}
+
+
+TERM_PUBLIC void
+PICT2E_fillbox(int style,
+		unsigned int x1, unsigned int y1,
+		unsigned int width, unsigned int height)
+{
+    int ret;
+
+    if (LATEX_inline) {
+	fputs("\n", gpoutfile);
+	LATEX_inline = FALSE;
+    }
+
+    if ((ret = PICT2E_fill(style)) == pict2e_no_fill)
+	return;
+
+    // outline box, must be closed
+    fprintf(gpoutfile, "\\polygon*(%d,%d)(%d,%d)(%d,%d)(%d,%d)(%d,%d)\n",
+	x1, y1,
+	x1 + width, y1,
+	x1 + width, y1 + height,
+	x1, y1 + height,
+	x1, y1);
+
+    if (latex_use_color && (ret == pict2e_fill_and_restore))
+	fputs("\\color{pict2ecol}\n", gpoutfile); // restore color
+}
+
+
+TERM_PUBLIC void
+PICT2E_filled_polygon(int points, gpiPoint *corners)
+{
+    int i, ret;
+
+    if (LATEX_inline) {
+	fputs("\n", gpoutfile);
+	LATEX_inline = FALSE;
+    }
+
+    if ((ret = PICT2E_fill(corners->style)) == pict2e_no_fill)
+	return;
+
+    fprintf(gpoutfile, "\\polygon*(%d,%d)", corners[0].x, corners[0].y);
+    for (i = 0; i < points; i++)
+	fprintf(gpoutfile, "(%d,%d)", corners[i].x, corners[i].y);
+    // make sure the path is closed
+    if ((corners[0].x != corners[points - 1].x) || (corners[0].y != corners[points - 1].y))
+	fprintf(gpoutfile, "(%d,%d)", corners[0].x, corners[0].y);
+    fputs("\n", gpoutfile);
+
+    if (latex_use_color && (ret == pict2e_fill_and_restore))
+	fputs("\\color{pict2ecol}\n", gpoutfile); // restore color
+}
 
 #endif /* TERM_BODY */
 #endif /* TERM_PROTO_ONLY */
@@ -1454,12 +1670,18 @@ START_HELP(latex)
 "?terminal tpic",
 "?term tpic",
 "?tpic",
+"?commands set terminal pict2e",
+"?set terminal pict2e",
+"?set term pict2e",
+"?terminal pict2e",
+"?term pict2e",
+"?pict2e",
 " The `latex` terminal supports the LaTeX picture environment, including",
 " different variants which overcome the limitations of the original concerning",
 " line drawing and area filling.",
 "",
 " Syntax:",
-"       set terminal latex {latex | emtex | tpic}",
+"       set terminal latex {latex | emtex | tpic | pict2e}",
 "                    {default | {courier|roman} {<fontsize>}}",
 "                    {size <XX>{unit}, <YY>{unit}} {rotate | norotate}",
 "                    {color | monochrome}",
@@ -1468,7 +1690,9 @@ START_HELP(latex)
 " rather severe limitations. `emtex` uses emTeX \\special commands to overcome",
 " some of them. `tpic` uses tpic \\specials. These need to be supported by",
 " your DVI driver. `emtex` and `tpic` \\specials are supported by dvips and",
-" xelatex, but not pdflatex.",
+" xelatex, but not pdflatex. `pict2e` uses the LaTeX2e variant of the picture",
+" environment.  You need to add \"\\usepackage{pict2e}\" to your file. This is",
+" the recommended variant.",
 "",
 " By default the plot will inherit font settings from the embedding document.",
 " You have the option of forcing either Courier (cmtt) or Roman (cmr) fonts",
