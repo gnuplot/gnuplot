@@ -3,7 +3,7 @@
 /* GNUPLOT - latex.trm */
 
 /*[
- * Copyright 1990 - 1993, 1998, 2004
+ * Copyright 1990 - 1993, 1998, 2004, 2018
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -82,39 +82,30 @@
 
 #ifdef TERM_REGISTER
 register_term(latex)
-#ifdef EMTEX
-register_term(emtex)
-#endif
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void LATEX_options __PROTO((void));
-TERM_PUBLIC void LATEX_init __PROTO((void));
-TERM_PUBLIC void LATEX_graphics __PROTO((void));
-TERM_PUBLIC void LATEX_text __PROTO((void));
-TERM_PUBLIC void LATEX_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
-TERM_PUBLIC void LATEX_linetype __PROTO((int linetype));
-TERM_PUBLIC void LATEX_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void LATEX_point __PROTO((unsigned int x, unsigned int y, int number));
-TERM_PUBLIC void LATEX_vector __PROTO((unsigned int ux, unsigned int uy));
-TERM_PUBLIC void LATEX_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
-TERM_PUBLIC int LATEX_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC int LATEX_text_angle __PROTO((int ang));
-TERM_PUBLIC void LATEX_reset __PROTO((void));
-TERM_PUBLIC void LATEX_fillbox __PROTO((int style, unsigned int x1, unsigned int y1,
-					unsigned int width, unsigned int height));
+TERM_PUBLIC void LATEX_options(void);
+TERM_PUBLIC void LATEX_init(void);
+TERM_PUBLIC void LATEX_graphics(void);
+TERM_PUBLIC void LATEX_text(void);
+TERM_PUBLIC void LATEX_put_text(unsigned int x, unsigned int y, const char str[]);
+TERM_PUBLIC void LATEX_linetype(int linetype);
+TERM_PUBLIC void LATEX_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void LATEX_point(unsigned int x, unsigned int y, int number);
+TERM_PUBLIC void LATEX_vector(unsigned int ux, unsigned int uy);
+TERM_PUBLIC void LATEX_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head);
+TERM_PUBLIC int LATEX_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC int LATEX_text_angle(int ang);
+TERM_PUBLIC void LATEX_reset(void);
+TERM_PUBLIC void LATEX_fillbox(int style, unsigned int x1, unsigned int y1,
+					unsigned int width, unsigned int height);
 TERM_PUBLIC int LATEX_make_palette(t_sm_palette *palette);
 TERM_PUBLIC void LATEX_set_color(t_colorspec *colorspec);
 
-#ifdef EMTEX
-TERM_PUBLIC void EMTEX_init __PROTO((void));
-TERM_PUBLIC void EMTEX_reset __PROTO((void));
-TERM_PUBLIC void EMTEX_text __PROTO((void));
-#endif
-
 #ifdef EEPIC
-TERM_PUBLIC void EEPIC_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void EEPIC_vector __PROTO((unsigned int ux, unsigned int uy));
+TERM_PUBLIC void EEPIC_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void EEPIC_vector(unsigned int ux, unsigned int uy);
 #endif
 
 #define TINY_STEP 0.5		/* tiny steps for high quality lines */
@@ -205,19 +196,16 @@ static struct {
 };
 
 /* for drawing dotted and solid lines */
-static void LATEX_dot_line __PROTO((int x1, int x2, int y1, int y2));
-static void LATEX_solid_line __PROTO((int x1, int x2, int y1, int y2));
-static void LATEX_rule __PROTO((int code, double x, double y, double width, double height));
-static void LATEX_flushdot __PROTO((void));
+static void LATEX_dot_line(int x1, int x2, int y1, int y2);
+static void LATEX_solid_line(int x1, int x2, int y1, int y2);
+static void LATEX_rule(int code, double x, double y, double width, double height);
+static void LATEX_flushdot(void);
 #define LATEX_flushrule() LATEX_rule(2, 0.,0.,0.,0.)	/* flush old rule */
 static TBOOLEAN LATEX_moved = TRUE;	/* pen is up after move */
 static float LATEX_dotsize;	/* size of LATEX_DOT in units */
 static TBOOLEAN LATEX_needsdot = FALSE;		/* does dotted line need termination? */
 
-#ifdef EMTEX
-static TBOOLEAN emtex = FALSE;		/* not currently using emtex */
-static void EMTEX_solid_line __PROTO((int x1, int x2, int y1, int y2));
-#endif
+static void EMTEX_solid_line(int x1, int x2, int y1, int y2);
 
 /* ARROWS */
 /* the set of non-vertical/non-horizontal LaTeX vector slopes */
@@ -242,15 +230,17 @@ static struct vslope {
 };
 
 /* figure out the best arrow */
-static void best_latex_arrow __PROTO((int, int, int, int, int, int));
+static void best_latex_arrow(int, int, int, int, int, int);
 
 enum LATEX_id {
     LATEX_COURIER, LATEX_ROMAN, LATEX_DEFAULT,
     LATEX_SIZE,
     LATEX_ROTATE, LATEX_NOROTATE,
     LATEX_COLOR, LATEX_MONOCHROME,
+    LATEX_LATEX, LATEX_EMTEX, LATEX_TPIC, LATEX_EEPIC, LATEX_PICT2E,
     LATEX_OTHER
 };
+enum LATEX_id LATEX_mode = LATEX_LATEX;
 
 static struct gen_table LATEX_opts[] =
 {
@@ -263,6 +253,11 @@ static struct gen_table LATEX_opts[] =
     { "color", LATEX_COLOR },
     { "colour", LATEX_COLOR },
     { "mono$chrome", LATEX_MONOCHROME },
+    { "latex", LATEX_LATEX },
+    { "emtex", LATEX_EMTEX },
+    // { "tpic", LATEX_TPIC },
+    // { "eepic", LATEX_EEPIC },
+    // { "pict2e", LATEX_PICT2E },
     { NULL, LATEX_OTHER }
 };
 
@@ -273,7 +268,22 @@ LATEX_options()
     latex_explicit_size = FALSE;
 
     while (!END_OF_COMMAND) {
-	switch(lookup_table(&LATEX_opts[0],c_token)) {
+	enum LATEX_id cmd = (enum LATEX_id) lookup_table(&LATEX_opts[0], c_token);
+	switch (cmd) {
+	case LATEX_LATEX:
+	case LATEX_EMTEX:
+	    LATEX_mode = cmd;
+	    // These do no support filled polygons
+	    term->filled_polygon = NULL;
+	    c_token++;
+	    break;
+	case LATEX_PICT2E:
+	case LATEX_EEPIC:
+	case LATEX_TPIC:
+	    LATEX_mode = cmd;
+	    // These do support filled polygons
+	    c_token++;
+	    break;
 	case LATEX_COURIER:
 	    strcpy(LATEX_font, "cmtt");
 	    c_token++;
@@ -337,6 +347,26 @@ LATEX_options()
 	sprintf(term_options, "%s %d",
 		LATEX_font[2] == 't' ? "courier" : "roman", LATEX_fontsize);
 
+    switch (LATEX_mode) {
+    case LATEX_LATEX:
+	sprintf(&(term_options[strlen(term_options)]), " latex");
+	break;
+    case LATEX_EMTEX:
+	sprintf(&(term_options[strlen(term_options)]), " emtex");
+	break;
+    case LATEX_TPIC:
+	sprintf(&(term_options[strlen(term_options)]), " tpic");
+	break;
+    case LATEX_EEPIC:
+	sprintf(&(term_options[strlen(term_options)]), " eepic");
+	break;
+    case LATEX_PICT2E:
+	sprintf(&(term_options[strlen(term_options)]), " pict2e");
+	break;
+    default:
+	;
+    }
+
     if (latex_explicit_size) {
 	if (latex_explicit_units == CM)
 	    sprintf(&(term_options[strlen(term_options)]), "size %.2fcm, %.2fcm ",
@@ -365,21 +395,25 @@ LATEX_options()
 TERM_PUBLIC void
 LATEX_init()
 {
-#ifdef EMTEX
-    emtex = FALSE;
-#endif
     LATEX_posx = LATEX_posy = 0;
     latex_use_color = LATEX_use_color;
 
+    switch (LATEX_mode) {
+    case LATEX_LATEX:
+	fputs("% GNUPLOT: LaTeX picture\n", gpoutfile);
+	break;
+    case LATEX_EMTEX:
+	fputs("% GNUPLOT: LaTeX picture with emtex specials\n", gpoutfile);
+	break;
+    default:
+	;
+    }
     fprintf(gpoutfile, "\
-%% GNUPLOT: LaTeX picture\n\
 \\setlength{\\unitlength}{%fpt}\n\
 \\ifx\\plotpoint\\undefined\\newsavebox{\\plotpoint}\\fi\n",
 	    LATEX_UNIT);
-
-    LATEX_linetype(LT_AXIS);
-    LATEX_size = 0;
 }
+
 
 TERM_PUBLIC void
 LATEX_graphics()
@@ -404,16 +438,28 @@ LATEX_graphics()
 		LATEX_font, LATEX_fontsize);
     }
     LATEX_lw = 1;
+    LATEX_size = 0;
     latex_color[0] = 0;
+    LATEX_linetype(LT_AXIS);
 }
 
 
 TERM_PUBLIC void
 LATEX_text()
 {
-    LATEX_flushrule();
-    LATEX_flushdot();
+    if (LATEX_mode == LATEX_LATEX) {
+	LATEX_flushrule();
+	LATEX_flushdot();
+    }
     fputs("\\end{picture}\n", gpoutfile);
+    LATEX_posx = LATEX_posy = 0;	/* current position */
+    LATEX_moved = TRUE;		/* pen is up after move */
+}
+
+
+TERM_PUBLIC void
+LATEX_reset()
+{
     LATEX_posx = LATEX_posy = 0;	/* current position */
     LATEX_moved = TRUE;		/* pen is up after move */
 }
@@ -427,9 +473,7 @@ LATEX_linesize(int linetype)
     if (linetype >= LATEX_LINE_TYPES)
 	linetype %= LATEX_LINE_TYPES;
 
-#ifdef EMTEX
-    if (!emtex)
-#endif
+    if (LATEX_mode == LATEX_LATEX)
 	LATEX_flushrule();
     LATEX_flushdot();
 
@@ -444,10 +488,8 @@ LATEX_linesize(int linetype)
 	fprintf(gpoutfile,
 		"\\sbox{\\plotpoint}{\\rule[%.3fpt]{%.3fpt}{%.3fpt}}%%\n",
 		-size / 2, size, size);
-#ifdef EMTEX
-	if (emtex)		/* change line width */
+	if (LATEX_mode == LATEX_EMTEX)		/* change line width */
 	    fprintf(gpoutfile, "\\special{em:linewidth %.1fpt}%%\n", size);
-#endif
     }
     LATEX_size = size;
     LATEX_dotsize = size / LATEX_UNIT;
@@ -506,19 +548,24 @@ LATEX_vector(unsigned int ux, unsigned int uy)
 {
     if (LATEX_dotspace == 0.0) {
 	/* solid line */
-#ifdef EMTEX
-	if (emtex)
-	    EMTEX_solid_line(LATEX_posx, (int) ux, LATEX_posy, (int) uy);
-	else
-#endif
+	switch (LATEX_mode) {
+	case LATEX_LATEX:
 	    LATEX_solid_line(LATEX_posx, (int) ux, LATEX_posy, (int) uy);
-    } else
+	case LATEX_EMTEX:
+	    EMTEX_solid_line(LATEX_posx, (int) ux, LATEX_posy, (int) uy);
+	    break;
+	default:
+	    ;
+	}
+    } else {
 	/* dotted line */
 	LATEX_dot_line(LATEX_posx, (int) ux, LATEX_posy, (int) uy);
+    }
 
     LATEX_posx = ux;
     LATEX_posy = uy;
 }
+
 
 static void
 LATEX_solid_line(int x1, int x2, int y1, int y2)
@@ -614,6 +661,7 @@ LATEX_solid_line(int x1, int x2, int y1, int y2)
     }
 }
 
+
 /* Draw a \rule. Width or height may be negative; we can correct.
  * The rule is never output immediately. The previous rule is output
  * as-is if code is 0, and the previous rule is
@@ -682,6 +730,7 @@ LATEX_rule(
     }
 }
 
+
 static void
 LATEX_dot_line(int x1, int x2, int y1, int y2)
 {
@@ -748,6 +797,7 @@ LATEX_dot_line(int x1, int x2, int y1, int y2)
     LATEX_moved = FALSE;
 }
 
+
 static void
 LATEX_flushdot()
 {
@@ -756,6 +806,7 @@ LATEX_flushdot()
 		LATEX_posx, LATEX_posy, LATEX_DOT);
     LATEX_needsdot = FALSE;
 }
+
 
 TERM_PUBLIC void
 LATEX_arrow(
@@ -768,6 +819,7 @@ LATEX_arrow(
     LATEX_posx = ex;
     LATEX_posy = ey;
 }
+
 
 static void
 best_latex_arrow(
@@ -852,12 +904,11 @@ best_latex_arrow(
 	    }
 	} else {
 	    /* we draw the line the usual way, with thin lines */
-#ifdef EMTEX
-	    if (emtex) {
+	    if (LATEX_mode == LATEX_EMTEX) {
 		LATEX_linesize(LATEX_THIN_LINE);
 		EMTEX_solid_line(sx, ex, sy, ey);
-	    } else
-#endif
+	    } else {
+
 	    if (who == 1) {
 		LATEX_linesize(LATEX_THIN_LINE);
 		LATEX_solid_line(sx, ex, sy, ey);
@@ -868,6 +919,8 @@ best_latex_arrow(
 		EEPIC_vector(ex, ey);
 	    }
 #endif /* EEPIC */
+	    }
+
 	    /* and then draw arrowheads (a short vector) there */
 	    if (head & END_HEAD) {
 		fprintf(gpoutfile, "\\put(%d,%d){\\vector(%d,%d){0}}\n",
@@ -882,6 +935,7 @@ best_latex_arrow(
 	}
     }
 }
+
 
 TERM_PUBLIC void
 LATEX_put_text(unsigned int x, unsigned int y, const char str[])
@@ -913,12 +967,14 @@ LATEX_put_text(unsigned int x, unsigned int y, const char str[])
     	fprintf (gpoutfile, "}");
 }
 
+
 TERM_PUBLIC int
 LATEX_justify_text(enum JUSTIFY mode)
 {
     latex_justify = mode;
     return (TRUE);
 }
+
 
 TERM_PUBLIC int
 LATEX_text_angle(int ang)
@@ -930,13 +986,6 @@ LATEX_text_angle(int ang)
        'real' text rotation using '\rotatebox' */
     latex_angle = ang;
     return (TRUE);
-}
-
-TERM_PUBLIC void
-LATEX_reset()
-{
-    LATEX_posx = LATEX_posy = 0;	/* current position */
-    LATEX_moved = TRUE;		/* pen is up after move */
 }
 
 
@@ -1008,36 +1057,7 @@ LATEX_set_color(t_colorspec *colorspec)
 }
 
 
-#ifdef EMTEX
-
-TERM_PUBLIC void
-EMTEX_init()
-{
-    emtex = TRUE;
-    LATEX_posx = LATEX_posy = 0;
-    fprintf(gpoutfile, "\
-%% GNUPLOT: LaTeX picture with emtex specials\n\
-\\setlength{\\unitlength}{%fpt}\n\
-\\ifx\\plotpoint\\undefined\\newsavebox{\\plotpoint}\\fi\n",
-	    LATEX_UNIT);
-    LATEX_linetype(LT_AXIS);
-}
-
-
-TERM_PUBLIC void
-EMTEX_reset()
-{
-    emtex = FALSE;
-    LATEX_posx = LATEX_posy = 0;
-}
-
-
-TERM_PUBLIC void
-EMTEX_text()
-{
-    fputs("\\end{picture}\n", gpoutfile);
-}
-
+/* EMTEX  special routines */
 
 static void
 EMTEX_solid_line(int x1, int x2, int y1, int y2)
@@ -1051,9 +1071,6 @@ EMTEX_solid_line(int x1, int x2, int y1, int y2)
     LATEX_posy = y2;
     LATEX_moved = FALSE;
 }
-
-
-#endif /* EMTEX */
 
 #endif /* TERM_BODY */
 #endif /* TERM_PROTO_ONLY */
@@ -1082,29 +1099,6 @@ TERM_TABLE_END(latex_driver)
 #define LAST_TERM latex_driver
 
 
-#ifdef EMTEX
-TERM_TABLE_START(emtex_driver)
-    "emtex", "LaTeX picture environment with emTeX specials",
-    LATEX_XMAX, LATEX_YMAX, LATEX_VCHAR, LATEX_HCHAR,
-    LATEX_VTIC, LATEX_HTIC, LATEX_options, EMTEX_init, EMTEX_reset,
-    EMTEX_text, null_scale, LATEX_graphics, LATEX_move, LATEX_vector,
-    LATEX_linetype, LATEX_put_text, LATEX_text_angle,
-    LATEX_justify_text, LATEX_point, LATEX_arrow, set_font_null,
-    NULL, /* pointsize */
-    TERM_IS_LATEX | TERM_MONOCHROME, /* flags */
-    NULL, NULL, /* suspend, resume */
-    LATEX_fillbox, LATEX_linewidth,
-#ifdef USE_MOUSE
-    NULL, NULL, NULL, NULL, NULL,
-#endif
-    LATEX_make_palette, 0,
-    LATEX_set_color
-TERM_TABLE_END(emtex_driver)
-
-#undef LAST_TERM
-#define LAST_TERM emtex_driver
-
-#endif /* EMTEX */
 #endif /* TERM_TABLE */
 
 
@@ -1123,10 +1117,19 @@ START_HELP(latex)
 "?terminal latex",
 "?term latex",
 "?latex",
+" The `latex` terminal supports the LaTeX picture environment, including",
+" different variants which overcome the limitations of the original concerning",
+" line drawing and area filling.",
+"",
 " Syntax:",
-"       set terminal {latex | emtex} {default | {courier|roman} {<fontsize>}}",
+"       set terminal latex {latex | emtex}",
+"                    {default | {courier|roman} {<fontsize>}}",
 "                    {size <XX>{unit}, <YY>{unit}} {rotate | norotate}",
 "                    {color | monochrome}",
+"",
+" The `latex` option selects the original picture environment, which has some",
+" rather severe limitations. `emtex` uses emTeX \\special commands to overcome",
+" some of them.",
 "",
 " By default the plot will inherit font settings from the embedding document.",
 " You have the option of forcing either Courier (cmtt) or Roman (cmr) fonts",

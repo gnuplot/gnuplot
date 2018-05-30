@@ -349,7 +349,6 @@
 #endif /* NO_BITMAP_SUPPORT */
 
 /* TeX related terminals */
-#define EMTEX
 #define EEPIC
 
 /* latex and emtex */
