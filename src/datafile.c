@@ -1250,9 +1250,10 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 		  "duplicated or contradicting arguments in datafile options");
 
     /* Check for auto-generation of key title from column header  */
-    /* Mar 2009:  This may no longer be the best place for this!  */
     if ((&keyT)->auto_titles == COLUMNHEAD_KEYTITLES) {
 	if (df_no_use_specs == 1)
+	    column_for_key_title = use_spec[0].column;
+	else if (plot && plot->plot_style == HISTOGRAMS)
 	    column_for_key_title = use_spec[0].column;
 	else if (plot && plot->plot_type == DATA3D)
 	    column_for_key_title = use_spec[2].column;
@@ -2929,6 +2930,8 @@ df_set_key_title_columnhead(struct curve_points *plot)
 	column_for_key_title = int_expression();
     } else {
 	if (!plot) /* stats "name" option rather than plot title */
+	    column_for_key_title = use_spec[0].column;
+	else if (plot->plot_style == HISTOGRAMS)
 	    column_for_key_title = use_spec[0].column;
 	else if (df_no_use_specs == 1)
 	    column_for_key_title = use_spec[0].column;
