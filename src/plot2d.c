@@ -1074,15 +1074,8 @@ get_data(struct curve_points *current_plot)
 
 	case IMAGE:
 	{   /* x y color_value */
-	    coord_type dummy_type;
-	    store2d_point(current_plot, i, v[0], v[1],
+	    store2d_point(current_plot, i++, v[0], v[1],
 			  v[0], v[0], v[1], v[1], v[2]);
-	    cp = &(current_plot->points[i]);
-/* FIXME:   this stuff should be done in store2d_point */
-	    dummy_type = cp->type;
-	    STORE_AND_UPDATE_RANGE(cp->CRD_COLOR, v[2], dummy_type,
-			COLOR_AXIS, current_plot->noautoscale, NOOP);
-	    i++;
 	    break;
 	}
 
@@ -1343,6 +1336,11 @@ store2d_point(
 	cp->xlow = xlow;    /* major axis */
 	cp->xhigh = xhigh;  /* minor axis */
 	cp->ylow = ylow;    /* orientation */
+	break;
+
+    case IMAGE:
+	STORE_AND_UPDATE_RANGE(cp->CRD_COLOR, width, dummy_type,
+				COLOR_AXIS, current_plot->noautoscale, NOOP);
 	break;
 
     default:			/* auto-scale to xlow xhigh ylow yhigh */
