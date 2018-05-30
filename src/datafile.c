@@ -1273,6 +1273,8 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     if ((&keyT)->auto_titles == COLUMNHEAD_KEYTITLES) {
 	if (df_no_use_specs == 1)
 	    column_for_key_title = use_spec[0].column;
+	else if (plot && plot->plot_style == HISTOGRAMS)
+	    column_for_key_title = use_spec[0].column;
 	else if (plot && plot->plot_type == DATA3D)
 	    column_for_key_title = use_spec[2].column;
 	else
@@ -2985,6 +2987,8 @@ df_set_key_title_columnhead(struct curve_points *plot)
 	    return;
 	}
 	if (df_no_use_specs == 1)
+	    column_for_key_title = use_spec[0].column;
+	else if (plot->plot_style == HISTOGRAMS)
 	    column_for_key_title = use_spec[0].column;
 	else if (plot->plot_type == DATA3D)
 	    column_for_key_title = use_spec[2].column;
