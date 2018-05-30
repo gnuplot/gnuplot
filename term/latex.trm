@@ -38,9 +38,12 @@
  * This terminal driver supports:
  *   LaTeX pictures (latex).
  *   LaTeX pictures with emTeX specials (emtex).
+ *   LaTeX picture with  tpic \specials (version 2.2).
  *
  * AUTHORS
  *   David Kotz, Russell Lang
+ *   Oh-Yeah?   3 Sep. 1992 (tpic)
+ *   Bastian Maerkisch
  *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
@@ -102,6 +105,10 @@ TERM_PUBLIC void LATEX_fillbox(int style, unsigned int x1, unsigned int y1,
 					unsigned int width, unsigned int height);
 TERM_PUBLIC int LATEX_make_palette(t_sm_palette *palette);
 TERM_PUBLIC void LATEX_set_color(t_colorspec *colorspec);
+TERM_PUBLIC void TPIC_filled_polygon(int points, gpiPoint *corners);
+TERM_PUBLIC void TPIC_fillbox(int style,
+		unsigned int x1, unsigned int y1,
+		unsigned int width, unsigned int height);
 
 #ifdef EEPIC
 TERM_PUBLIC void EEPIC_move(unsigned int x, unsigned int y);
@@ -122,6 +129,9 @@ TERM_PUBLIC void EEPIC_vector(unsigned int ux, unsigned int uy);
 #define LATEX_VTIC (5*DOTS_PER_INCH/72)		/* (5 pts) */
 #define LATEX_HCHAR (DOTS_PER_INCH*53/10/72)	/* (5.3 pts) */
 #define LATEX_VCHAR (DOTS_PER_INCH*11/72)	/* (11 pts) */
+
+/* tpic \specials unit in inches (1 milli-inch) */
+#define TPIC_UNIT 0.001
 #endif
 
 
@@ -195,6 +205,8 @@ static struct {
     {1.0, 10.0},		/* thick widely dotted line */
 };
 
+static void LATEX_endline(void);
+
 /* for drawing dotted and solid lines */
 static void LATEX_dot_line(int x1, int x2, int y1, int y2);
 static void LATEX_solid_line(int x1, int x2, int y1, int y2);
@@ -206,6 +218,30 @@ static float LATEX_dotsize;	/* size of LATEX_DOT in units */
 static TBOOLEAN LATEX_needsdot = FALSE;		/* does dotted line need termination? */
 
 static void EMTEX_solid_line(int x1, int x2, int y1, int y2);
+
+static void tpic_startline(void);
+static void tpic_endline(void);
+static void tpic_pushpath(unsigned int x, unsigned int y);
+static void tpic_scanpath(void);
+static void tpic_fill(int style);
+static void tpic_path(int x, int y);
+static void tpic_flush(void);
+static void tpic_abspath(unsigned int x, unsigned int y);	/* absolute coord */
+static void tpic_shade(double grayscale);
+static void tpic_pen(int thickness);
+static void tpic_dottedflush(double interval);
+static void tpic_dashedflush(double interval);
+
+typedef enum {
+    tpic_solid, tpic_dotted, tpic_dashed,
+    tpic_dashed_sdot, tpic_dashed_ddot
+} tpic_linestyle;
+
+static tpic_linestyle tpic_linetype = tpic_solid;	/* current line type */
+#define TPIC_LINEMAX 100	/* max value for linecount */
+static TBOOLEAN tpic_inline = FALSE;	/* are we in the middle of a line */
+static int tpic_linecount = 0;	/* number of points in line so far */
+
 
 /* ARROWS */
 /* the set of non-vertical/non-horizontal LaTeX vector slopes */
@@ -255,7 +291,7 @@ static struct gen_table LATEX_opts[] =
     { "mono$chrome", LATEX_MONOCHROME },
     { "latex", LATEX_LATEX },
     { "emtex", LATEX_EMTEX },
-    // { "tpic", LATEX_TPIC },
+    { "tpic", LATEX_TPIC },
     // { "eepic", LATEX_EEPIC },
     // { "pict2e", LATEX_PICT2E },
     { NULL, LATEX_OTHER }
@@ -275,13 +311,20 @@ LATEX_options()
 	    LATEX_mode = cmd;
 	    // These do no support filled polygons
 	    term->filled_polygon = NULL;
+	    term->fillbox = LATEX_fillbox;
+	    c_token++;
+	    break;
+	case LATEX_TPIC:
+	    LATEX_mode = cmd;
+	    // Filling is supported
+	    term->filled_polygon = TPIC_filled_polygon;
+	    term->fillbox = TPIC_fillbox;
 	    c_token++;
 	    break;
 	case LATEX_PICT2E:
 	case LATEX_EEPIC:
-	case LATEX_TPIC:
 	    LATEX_mode = cmd;
-	    // These do support filled polygons
+	    // Filling is supported
 	    c_token++;
 	    break;
 	case LATEX_COURIER:
@@ -405,6 +448,9 @@ LATEX_init()
     case LATEX_EMTEX:
 	fputs("% GNUPLOT: LaTeX picture with emtex specials\n", gpoutfile);
 	break;
+    case LATEX_TPIC:
+	fputs("% GNUPLOT: LaTeX picture with tpic specials\n", gpoutfile);
+	break;
     default:
 	;
     }
@@ -447,10 +493,7 @@ LATEX_graphics()
 TERM_PUBLIC void
 LATEX_text()
 {
-    if (LATEX_mode == LATEX_LATEX) {
-	LATEX_flushrule();
-	LATEX_flushdot();
-    }
+    LATEX_endline();
     fputs("\\end{picture}\n", gpoutfile);
     LATEX_posx = LATEX_posy = 0;	/* current position */
     LATEX_moved = TRUE;		/* pen is up after move */
@@ -473,9 +516,7 @@ LATEX_linesize(int linetype)
     if (linetype >= LATEX_LINE_TYPES)
 	linetype %= LATEX_LINE_TYPES;
 
-    if (LATEX_mode == LATEX_LATEX)
-	LATEX_flushrule();
-    LATEX_flushdot();
+    LATEX_endline();
 
     /* Find the new desired line thickness. */
     /* negative linetypes (for axes) use a thin line */
@@ -493,6 +534,7 @@ LATEX_linesize(int linetype)
     }
     LATEX_size = size;
     LATEX_dotsize = size / LATEX_UNIT;
+    /* TODO: implement dashstyle for LATEX/EMTEX */
     LATEX_dotspace = (linetype >= 0) ? LATEX_lines[linetype].dotspace : 0;
     LATEX_moved = TRUE;		/* reset */
 }
@@ -503,12 +545,20 @@ LATEX_linetype(int linetype)
 {
     t_colorspec colorspec;
 
+    LATEX_endline();
+
     /* save values for set_color */
     colorspec.type = TC_LT;
     colorspec.lt = linetype;
 
     LATEX_linesize(linetype);
     LATEX_set_color(&colorspec);
+
+    if (linetype == LT_AXIS)
+	tpic_linetype = tpic_dashed;
+    else
+	tpic_linetype = tpic_solid;
+    /* TODO: implement dashstyle for TPIC */
 }
 
 
@@ -522,7 +572,7 @@ LATEX_linewidth(double linewidth)
 TERM_PUBLIC void
 LATEX_move(unsigned int x, unsigned int y)
 {
-    LATEX_flushdot();
+    LATEX_endline();
 
     LATEX_posx = x;
     LATEX_posy = y;
@@ -543,23 +593,52 @@ LATEX_point(unsigned int x, unsigned int y, int number)
 }
 
 
+static void
+LATEX_endline(void)
+{
+    switch (LATEX_mode) {
+    case LATEX_LATEX:
+	LATEX_flushrule();
+	LATEX_flushdot();
+	break;
+    case LATEX_TPIC:
+	tpic_endline();
+	break;
+    default:
+	;
+    }
+}
+
+
 TERM_PUBLIC void
 LATEX_vector(unsigned int ux, unsigned int uy)
 {
-    if (LATEX_dotspace == 0.0) {
-	/* solid line */
-	switch (LATEX_mode) {
-	case LATEX_LATEX:
+    switch (LATEX_mode) {
+    case LATEX_LATEX:
+	if (LATEX_dotspace == 0.0)
 	    LATEX_solid_line(LATEX_posx, (int) ux, LATEX_posy, (int) uy);
-	case LATEX_EMTEX:
+	else
+	    LATEX_dot_line(LATEX_posx, (int) ux, LATEX_posy, (int) uy);
+	break;
+    case LATEX_EMTEX:
+	if (LATEX_dotspace == 0.0)
 	    EMTEX_solid_line(LATEX_posx, (int) ux, LATEX_posy, (int) uy);
-	    break;
-	default:
-	    ;
+	else
+	    LATEX_dot_line(LATEX_posx, (int) ux, LATEX_posy, (int) uy);
+	break;
+    case LATEX_TPIC:
+	if (!tpic_inline) {
+	    tpic_startline();
+	} else if (tpic_linecount >= TPIC_LINEMAX) {
+	    /* Even though we are in the middle of a path, we may start a new path
+	       command once in a while; if they are too long, latex will choke. */
+	    tpic_endline();
+	    tpic_startline();
 	}
-    } else {
-	/* dotted line */
-	LATEX_dot_line(LATEX_posx, (int) ux, LATEX_posy, (int) uy);
+	tpic_pushpath(ux, uy);
+	break;
+    default:
+	;
     }
 
     LATEX_posx = ux;
@@ -1072,6 +1151,221 @@ EMTEX_solid_line(int x1, int x2, int y1, int y2)
     LATEX_moved = FALSE;
 }
 
+/* tpic special routines */
+static int tpic_linewidth = 6;	/* min line thickness (in milli-inches) */
+static double tpic_interval = 0.1;	/* min dot & dash intervals (in inches) */
+
+static void
+tpic_startline()
+{				/* private */
+    tpic_inline = TRUE;
+    tpic_pen(tpic_linewidth * LATEX_lw);
+    tpic_linecount = 0;
+    tpic_pushpath(LATEX_posx, LATEX_posy);
+    return;
+}
+
+static void
+tpic_endline()
+{				/* private */
+    double interval = 1;
+
+    if (tpic_inline) {
+	tpic_scanpath();	/* draw actually */
+	/* TODO: dash interval */
+	interval = tpic_interval;
+	switch (tpic_linetype) {
+	case tpic_solid:
+	    tpic_flush();
+	    break;
+	case tpic_dotted:
+	    tpic_dottedflush(interval);
+	    break;
+	case tpic_dashed:
+	    tpic_dashedflush(interval);
+	    break;
+	case tpic_dashed_sdot:	/* dashed with single dots in between */
+	    tpic_dashedflush(interval);
+	    tpic_scanpath();	/* draw again */
+	    tpic_dottedflush(interval / 2);
+	    break;
+	case tpic_dashed_ddot:	/* dashed with double dots in between */
+	    tpic_dashedflush(interval);
+	    tpic_scanpath();	/* draw again */
+	    tpic_dottedflush(interval / 3);
+	    break;
+	}
+	tpic_inline = FALSE;
+    }
+    return;
+}
+
+/* private: stack functions */
+static unsigned int pathpoint[TPIC_LINEMAX][2];		/* point stack */
+
+static void
+tpic_pushpath(unsigned int x, unsigned int y)
+{
+    if (tpic_linecount < TPIC_LINEMAX) {
+	pathpoint[tpic_linecount][0] = x;
+	pathpoint[tpic_linecount][1] = y;
+	tpic_linecount++;
+    }
+    return;
+}
+
+static void
+tpic_scanpath()
+{
+    int i;
+
+    for (i = 0; i < tpic_linecount; i++)
+	tpic_abspath(pathpoint[i][0], pathpoint[i][1]);
+    return;
+}
+
+static void
+tpic_fill(int style)
+{
+    int opt = style >> 4;
+
+    // FIXME: need color code? gray level?
+
+    // fill polygon
+    switch (style & 0xf) {
+    case FS_SOLID:
+    case FS_TRANSPARENT_SOLID:
+	tpic_shade((style >> 4) / 100.);
+	break;
+    case FS_PATTERN:
+    case FS_TRANSPARENT_PATTERN:
+	opt %= 4;
+	if (opt == 0)
+	    fputs("\\special{wh}", gpoutfile);
+	else if (opt == 1)
+	    tpic_shade(0.4);
+	else if (opt == 2)
+	    tpic_shade(0.2);
+	else
+	    fputs("\\special{bk}", gpoutfile);
+	break;
+    case FS_EMPTY:
+	fputs("\\special{wh}", gpoutfile);
+	break;
+    case FS_DEFAULT:
+    default:
+	tpic_shade(0.2);
+	break;
+    }
+}
+
+
+static void
+TPIC_fillbox(int style,
+		unsigned int x1, unsigned int y1,
+		unsigned int width, unsigned int height)
+{
+    tpic_endline();
+    tpic_fill(style);
+
+    // outline box, must be closed
+    tpic_path(x1, y1 - height);
+    tpic_path(x1 + width, y1 - height);
+    tpic_path(x1 + width, y1);
+    tpic_path(x1, y1);
+    tpic_path(x1, y1 - height);
+
+    // fill polygon
+    fputs("\\special{ip}%\n", gpoutfile);
+}
+
+
+TERM_PUBLIC void
+TPIC_filled_polygon(int points, gpiPoint *corners)
+{
+    int i;
+
+    tpic_endline();
+    tpic_fill(corners->style);
+
+    // outline polygon
+    for (i = 0; i < points; i++)
+	tpic_abspath(corners[i].x, corners[i].y);
+
+    // make sure the path is closed
+    if ((corners[0].x != corners[points - 1].x) || (corners[0].y != corners[points - 1].y))
+	tpic_abspath(corners[0].x, term->ymax - corners[0].y);
+
+    // fill polygon
+    fputs("\\special{ip}%\n", gpoutfile);
+}
+
+/* private: draw lines */
+
+static void
+tpic_abspath(unsigned int x, unsigned int y)
+{
+    tpic_path(x, -y);
+    fputs("%\n", gpoutfile);
+    return;
+}
+
+/* private: tpic primitive functions */
+
+static void
+tpic_path(int x, int y)
+{
+    // need handle coordinate transform only here
+    fprintf(gpoutfile, "\\special{pa %d %d}",
+	(int) (x / (TPIC_UNIT * DOTS_PER_INCH)),
+	(int) (y / (TPIC_UNIT * DOTS_PER_INCH)));
+    return;
+}
+
+static void
+tpic_flush()
+{
+    fputs("\\special{fp}%\n", gpoutfile);
+    return;
+}
+
+static void
+tpic_arc(int radius)
+{
+    /* actually, draw a full circle */
+    fprintf(gpoutfile, "\\special{ar 0 0 %d %d 0 7}", radius, radius);
+    return;
+}
+
+static void
+tpic_shade(double grayscale)
+{
+    fprintf(gpoutfile, "\\special{sh %f}", grayscale);
+    return;
+}
+
+static void
+tpic_pen(int thickness)
+{
+    fprintf(gpoutfile, "\\special{pn %d}", thickness);
+    return;
+}
+
+static void
+tpic_dottedflush(double interval)
+{
+    fprintf(gpoutfile, "\\special{dt %f}%%\n", interval);
+    return;
+}
+
+static void
+tpic_dashedflush(double interval)
+{
+    fprintf(gpoutfile, "\\special{da %f}%%\n", interval);
+    return;
+}
+
+
 #endif /* TERM_BODY */
 #endif /* TERM_PROTO_ONLY */
 
@@ -1105,31 +1399,39 @@ TERM_TABLE_END(latex_driver)
 #ifdef TERM_HELP
 START_HELP(latex)
 "1 latex",
-"?commands set terminal emtex",
-"?set terminal emtex",
-"?set term emtex",
-"?terminal emtex",
-"?term emtex",
-"?emtex",
 "?commands set terminal latex",
 "?set terminal latex",
 "?set term latex",
 "?terminal latex",
 "?term latex",
 "?latex",
+"?commands set terminal emtex",
+"?set terminal emtex",
+"?set term emtex",
+"?terminal emtex",
+"?term emtex",
+"?emtex",
+"?commands set terminal tpic",
+"?set terminal tpic",
+"?set term tpic",
+"?terminal tpic",
+"?term tpic",
+"?tpic",
 " The `latex` terminal supports the LaTeX picture environment, including",
 " different variants which overcome the limitations of the original concerning",
 " line drawing and area filling.",
 "",
 " Syntax:",
-"       set terminal latex {latex | emtex}",
+"       set terminal latex {latex | emtex | tpic}",
 "                    {default | {courier|roman} {<fontsize>}}",
 "                    {size <XX>{unit}, <YY>{unit}} {rotate | norotate}",
 "                    {color | monochrome}",
 "",
 " The `latex` option selects the original picture environment, which has some",
 " rather severe limitations. `emtex` uses emTeX \\special commands to overcome",
-" some of them.",
+" some of them. `tpic` uses tpic \\specials. These need to be supported by",
+" your DVI driver. `emtex` and `tpic` \\specials are supported by dvips and",
+" xelatex, but not pdflatex.",
 "",
 " By default the plot will inherit font settings from the embedding document.",
 " You have the option of forcing either Courier (cmtt) or Roman (cmr) fonts",

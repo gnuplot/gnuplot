@@ -351,7 +351,7 @@
 /* TeX related terminals */
 #define EEPIC
 
-/* latex and emtex */
+/* latex / emtex / tpic */
 #include "latex.trm"
 
 /* latex/tex with picture in postscript */
@@ -361,9 +361,6 @@
 
 /* EEPIC-extended LaTeX driver, for EEPIC users */
 #include "eepic.trm"
-
-/* TPIC specials for TeX */
-#include "tpic.trm"
 
 /* LaTeX picture environment with PSTricks macros */
 #include "pstricks.trm"
