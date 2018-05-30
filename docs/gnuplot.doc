@@ -7559,10 +7559,10 @@ Ffigure_fenceplot
 
  where <style> is one of
 
-      lines        dots       steps     errorbars     xerrorbar    xyerrorlines
-      points       impulses   fsteps    errorlines    xerrorlines  yerrorbars
-      linespoints  labels     histeps   financebars   xyerrorbars  yerrorlines
-      surface      vectors    parallelaxes
+      lines        dots       steps     xerrorbar    xyerrorbars
+      points       impulses   fsteps    xerrorlines  xyerrorlines
+      linespoints  labels     histeps   yerrorbars
+      financebars  surface    vectors   yerrorlines  parallelaxes
  or
       boxes         boxplot        ellipses       histograms  rgbalpha
       boxerrorbars  candlesticks   filledcurves   image       rgbimage

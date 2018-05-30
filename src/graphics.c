@@ -2360,16 +2360,14 @@ plot_ellipses(struct curve_points *plot)
 	    }
 
 	    if (plot->points[i].z <= DEFAULT_RADIUS) {
-		/*memcpy(&(e->extent), &default_ellipse.o.ellipse.extent, sizeof(t_position));*/
-		/*e->extent.x = default_ellipse.o.ellipse.extent.x;
-		e->extent.y = default_ellipse.o.ellipse.extent.y;*/
-		map_position_r(&default_ellipse.o.ellipse.extent, &e->extent.x, &e->extent.y, "ellipse");
+		map_position_r(&default_ellipse.o.ellipse.extent,
+				&e->extent.x, &e->extent.y, "ellipse");
 	    }
 
-	    if (plot->points[i].z == DEFAULT_ELLIPSE)
-		e->orientation = default_ellipse.o.ellipse.orientation;
-	    else
-		e->orientation = plot->points[i].ylow;
+	    /* May 2018 - default orientation used to be signalled by
+	     * DEFAULT_ELLIPSE rather than passed in explicitly
+	     */
+	    e->orientation = plot->points[i].ylow;
 
 	    /* rgb variable  -  color read from data column */
 	    if (!check_for_variable_color(plot, &plot->varcolor[i]) && withborder)
