@@ -189,21 +189,8 @@ static void LATEX_linesize(int linetype);
 static float LATEX_size = 0;	/* current thick of line in points */
 static float LATEX_lw;
 static float LATEX_dotspace = 0;	/* current dotspace of line in points */
-#define LATEX_LINE_TYPES 6	/* number of line types below */
+#define LATEX_DOT_SPACE 4.0
 #define LATEX_THIN_LINE 0	/* the thinnest solid line type */
-static struct {
-    float size;			/* size of dot, or thick of line in points */
-    float dotspace;		/* inter-dot space in points; 0 for lines */
-} LATEX_lines[] =
-
-{
-    {0.4, 0.0},			/* thin solid line */
-    {0.4, 5.0},			/* thin dotted line */
-    {0.8, 0.0},			/* thick solid line */
-    {1.0, 5.0},			/* thick dotted line */
-    {1.2, 0.0},			/* Thick solid line */
-    {1.0, 10.0},		/* thick widely dotted line */
-};
 
 static void LATEX_endline(void);
 
@@ -236,7 +223,11 @@ typedef enum {
     tpic_solid, tpic_dotted, tpic_dashed,
     tpic_dashed_sdot, tpic_dashed_ddot
 } tpic_linestyle;
-
+static const int tpic_num_pat = 5;
+static const tpic_linestyle tpic_pattern[7] = {
+	tpic_solid, tpic_dashed,
+	tpic_solid, tpic_dashed, tpic_dashed_sdot, tpic_dashed_ddot, tpic_dotted
+};
 static tpic_linestyle tpic_linetype = tpic_solid;	/* current line type */
 #define TPIC_LINEMAX 100	/* max value for linecount */
 static TBOOLEAN tpic_inline = FALSE;	/* are we in the middle of a line */
@@ -513,16 +504,10 @@ LATEX_linesize(int linetype)
 {
     float size;
 
-    if (linetype >= LATEX_LINE_TYPES)
-	linetype %= LATEX_LINE_TYPES;
-
     LATEX_endline();
 
     /* Find the new desired line thickness. */
-    /* negative linetypes (for axes) use a thin line */
-    size = (linetype >= 0 ? LATEX_lines[linetype].size
-	    : LATEX_lines[LATEX_THIN_LINE].size);
-    size *= LATEX_lw;
+    size = LATEX_lw * 0.4;
 
     /* If different from current size, redefine \plotpoint */
     if (size != LATEX_size) {
@@ -534,8 +519,6 @@ LATEX_linesize(int linetype)
     }
     LATEX_size = size;
     LATEX_dotsize = size / LATEX_UNIT;
-    /* TODO: implement dashstyle for LATEX/EMTEX */
-    LATEX_dotspace = (linetype >= 0) ? LATEX_lines[linetype].dotspace : 0;
     LATEX_moved = TRUE;		/* reset */
 }
 
@@ -554,11 +537,53 @@ LATEX_linetype(int linetype)
     LATEX_linesize(linetype);
     LATEX_set_color(&colorspec);
 
-    if (linetype == LT_AXIS)
+    /* all but axis lines are solid by default */
+    if (linetype == LT_AXIS) {
 	tpic_linetype = tpic_dashed;
-    else
+	LATEX_dotspace = LATEX_DOT_SPACE;
+    } else {
 	tpic_linetype = tpic_solid;
-    /* TODO: implement dashstyle for TPIC */
+	LATEX_dotspace = 0.0;
+    }
+}
+
+
+TERM_PUBLIC void
+LATEX_dashtype(int dt, t_dashtype *custom_dash_pattern)
+{
+    switch (LATEX_mode) {
+    case LATEX_LATEX:
+    case LATEX_EMTEX:
+    case LATEX_PICT2E:
+	if (dt >= 0) {
+	    int linetype = dt % 3;
+	    LATEX_dotspace = LATEX_DOT_SPACE * linetype;
+	} else if (dt == DASHTYPE_SOLID) {
+	    LATEX_dotspace = 0.0;
+	} else if (dt == DASHTYPE_AXIS) {
+	    LATEX_dotspace = LATEX_DOT_SPACE;
+	} else if (dt == DASHTYPE_CUSTOM) {
+	    /* not supported */
+	}
+	break;
+    case LATEX_TPIC:
+	if (dt >= 0) {
+	    if (dt >= tpic_num_pat + LT_BLACK)
+		dt %= (tpic_num_pat + LT_BLACK);
+	    tpic_linetype = tpic_pattern[dt - LT_BLACK];
+	} else if (dt == DASHTYPE_SOLID) {
+	    tpic_linetype= tpic_pattern[0];
+	} else if (dt == DASHTYPE_AXIS) {
+	    tpic_linetype =  tpic_pattern[1];
+	} else if (dt == DASHTYPE_CUSTOM) {
+	    /* not supported */
+	}
+	break;
+    case LATEX_EEPIC:
+	break;
+    default:
+	;
+    }
 }
 
 
@@ -1153,7 +1178,7 @@ EMTEX_solid_line(int x1, int x2, int y1, int y2)
 
 /* tpic special routines */
 static int tpic_linewidth = 6;	/* min line thickness (in milli-inches) */
-static double tpic_interval = 0.1;	/* min dot & dash intervals (in inches) */
+static double tpic_interval = 0.05;	/* min dot & dash intervals (in inches) */
 
 static void
 tpic_startline()
@@ -1386,7 +1411,19 @@ TERM_TABLE_START(latex_driver)
     NULL, NULL, NULL, NULL, NULL,
 #endif
     LATEX_make_palette, 0,
-    LATEX_set_color
+    LATEX_set_color,
+    0 /* filled_polygon */,
+    0, /* image */
+    0, 0, 0, /* enhanced text */
+    0, /* layer */
+    0, /* path */
+    0.0, /* scale (unused) */
+    0, /* hypertext */
+#ifdef EAM_BOXED_TEXT
+    0,
+#endif
+    0,
+    LATEX_dashtype
 TERM_TABLE_END(latex_driver)
 
 #undef LAST_TERM
