@@ -2483,6 +2483,12 @@ eval_link_function(struct axis *axis, double raw_coord)
     int dummy_var;
     struct value a;
 
+    /* A test for if (undefined) is allowed only immediately following
+     * either evalute_at() or eval_link_function().  Both must clear it
+     * on entry so that the value on return reflects what really happened.
+     */
+    undefined = FALSE;
+
 #if defined(NONLINEAR_AXES) && (NONLINEAR_AXES > 0)
     /* Special case to speed up evaluation of log scaling
      * benchmark timing results

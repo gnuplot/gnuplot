@@ -79,6 +79,7 @@ void
 eval_reset_after_error()
 {
     recursion_depth = 0;
+    undefined = FALSE;
 }
 
 void
