@@ -64,7 +64,14 @@ struct udft_entry *first_udf = NULL;
 /* pointer to first udv users can delete */
 struct udvt_entry **udv_user_head;
 
+/* Various abnormal conditions during evaluation of an action table
+ * (the stored form of an expression) are signalled by setting
+ * undefined = TRUE.
+ * NB:  A test for  "if (undefined)"  is only valid immediately
+ * following a call to evaluate_at() or eval_link_function().
+ */
 TBOOLEAN undefined;
+
 enum int64_overflow overflow_handling = INT64_OVERFLOW_TO_FLOAT;
 
 /* The stack this operates on */
@@ -670,7 +677,12 @@ execute_at(struct at_type *at_ptr)
 void
 evaluate_at(struct at_type *at_ptr, struct value *val_ptr)
 {
+    /* A test for if (undefined) is allowed only immediately following
+     * evalute_at() or eval_link_function().  Both must clear it on entry
+     * so that the value on return reflects what really happened.
+     */
     undefined = FALSE;
+
     errno = 0;
     reset_stack();
 
