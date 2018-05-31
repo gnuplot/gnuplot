@@ -38,12 +38,15 @@
  * This terminal driver supports:
  *   LaTeX pictures (latex).
  *   LaTeX pictures with emTeX specials (emtex).
- *   LaTeX picture with  tpic \specials (version 2.2).
+ *   LaTeX pictures with tpic \specials (version 2.2).
+ *   LaTeX pictures with eepic macros.
+ *   LaTeX2e pciture (pict2e).
  *
  * AUTHORS
- *   David Kotz, Russell Lang
+ *   David Kotz, Russell Lang (latex/emtex)
  *   Oh-Yeah?   3 Sep. 1992 (tpic)
- *   Bastian Maerkisch
+ *   David Kotz (eepic)
+ *   Bastian Maerkisch (pict2e)
  *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
@@ -81,6 +84,18 @@
 /* T.Sefzick Oct 2009 - rotate text when option 'rotated' is given.
  * needs graphics or graphicx package.
  */
+
+/* B. Maerkisch May 2018 - merge the very similar latex, emtex, tpic
+ * and eepic terminals into one.  Add a new variant for the LaTeX2e
+ * pict2e package. Point symbols, color and text functions are
+ * identical for all variants. Only line drawing (vector/dashtype/
+ * linewidth) and filled polygons and boxes differ.
+ * This merge makes line types and point symbols equal for all variants,
+ * i.e. specialities of the eepic and tpic variants are lost. This is OK
+ * though since v5 now gives you the possibility to redefine line types
+ * at will.
+ */
+
 #include "driver.h"
 
 #ifdef TERM_REGISTER
@@ -105,19 +120,19 @@ TERM_PUBLIC void LATEX_fillbox(int style, unsigned int x1, unsigned int y1,
 					unsigned int width, unsigned int height);
 TERM_PUBLIC int LATEX_make_palette(t_sm_palette *palette);
 TERM_PUBLIC void LATEX_set_color(t_colorspec *colorspec);
-TERM_PUBLIC void TPIC_filled_polygon(int points, gpiPoint *corners);
 TERM_PUBLIC void TPIC_fillbox(int style,
 		unsigned int x1, unsigned int y1,
 		unsigned int width, unsigned int height);
-TERM_PUBLIC void PICT2E_filled_polygon(int points, gpiPoint *corners);
+TERM_PUBLIC void TPIC_filled_polygon(int points, gpiPoint *corners);
+TERM_PUBLIC void EEPIC_fillbox(int style,
+		unsigned int x1, unsigned int y1,
+		unsigned int width, unsigned int height);
+TERM_PUBLIC void EEPIC_filled_polygon(int points, gpiPoint *corners);
 TERM_PUBLIC void PICT2E_fillbox(int style,
 		unsigned int x1, unsigned int y1,
 		unsigned int width, unsigned int height);
+TERM_PUBLIC void PICT2E_filled_polygon(int points, gpiPoint *corners);
 
-#ifdef EEPIC
-TERM_PUBLIC void EEPIC_move(unsigned int x, unsigned int y);
-TERM_PUBLIC void EEPIC_vector(unsigned int ux, unsigned int uy);
-#endif
 
 #define TINY_STEP 0.5		/* tiny steps for high quality lines */
 
@@ -159,8 +174,7 @@ static size_units latex_explicit_units = INCHES;
 #define LATEX_TINY_DOT "\\rule{1pt}{1pt}"	/* for dots plot style */
 
 /* COLORS */
-static TBOOLEAN LATEX_use_color = FALSE; /* LATEX terminal option */
-static TBOOLEAN latex_use_color;  /* option used by LATEX_set_color */
+static TBOOLEAN latex_use_color = FALSE; /* LATEX terminal option */
 static char latex_color[32] = "";
 #define LATEX_num_colors 6
 static const char * LATEX_lt_colors[] = {
@@ -169,33 +183,32 @@ static const char * LATEX_lt_colors[] = {
 
 /* POINTS */
 #define LATEX_POINT_TYPES 15	/* we supply more point types */
-
-static const char * LATEX_points[] = {
-    "\\makebox(0,0){$+$}",
-    "\\makebox(0,0){$\\times$}",
-    "\\makebox(0,0){$\\ast$}",
-    "\\raisebox{-.8pt}{\\makebox(0,0){$\\Box$}}",
-    "\\makebox(0,0){$\\blacksquare$}",
-    "\\makebox(0,0){$\\circ$}",
-    "\\makebox(0,0){$\\bullet$}",
-    "\\makebox(0,0){$\\triangle$}",
-    "\\makebox(0,0){$\\blacktriangle$}",
-    "\\makebox(0,0){$\\triangledown$}",
-    "\\makebox(0,0){$\\blacktriangledown$}",
-    "\\makebox(0,0){$\\lozenge$}",
-    "\\makebox(0,0){$\\blacklozenge$}",
-    "\\makebox(0,0){$\\heartsuit$}",
-    "\\makebox(0,0){$\\spadesuit$}",
+static int LATEX_pointsize = 0;
+static const char * LATEX_points[LATEX_POINT_TYPES] = {
+    "\\makebox(0,0){$%s+$}",
+    "\\makebox(0,0){$%s\\times$}",
+    "\\makebox(0,0){$%s\\ast$}",
+    "\\raisebox{-.8pt}{\\makebox(0,0){$%s\\Box$}}",
+    "\\makebox(0,0){$%s\\blacksquare$}",
+    "\\makebox(0,0){$%s\\circ$}",
+    "\\makebox(0,0){$%s\\bullet$}",
+    "\\makebox(0,0){$%s\\triangle$}",
+    "\\makebox(0,0){$%s\\blacktriangle$}",
+    "\\makebox(0,0){$%s\\triangledown$}",
+    "\\makebox(0,0){$%s\\blacktriangledown$}",
+    "\\makebox(0,0){$%s\\lozenge$}",
+    "\\makebox(0,0){$%s\\blacklozenge$}",
+    "\\makebox(0,0){$%s\\heartsuit$}",
+    "\\makebox(0,0){$%s\\spadesuit$}"
 };
 
 /* LINES */
-static void LATEX_linesize(int linetype);
+static void LATEX_linesize(void);
 static float LATEX_size = 0;	/* current thick of line in points */
 static float LATEX_lw;
 static float LATEX_dotspace = 0;	/* current dotspace of line in points */
-#define LATEX_DOT_SPACE 4.0
-#define LATEX_THIN_LINE 0	/* the thinnest solid line type */
-#define LATEX_LINEMAX 100	/* max value for linecount */
+#define LATEX_DOT_SPACE 3.0
+#define LATEX_LINEMAX 50	/* max value for linecount */
 static TBOOLEAN LATEX_inline;	/* are we in the middle of a line */
 static int LATEX_linecount = 0;	/* number of points in line so far */
 static unsigned int LATEX_path[LATEX_LINEMAX][2];		/* point stack */
@@ -227,6 +240,21 @@ static void tpic_shade(double grayscale);
 static void tpic_pen(int thickness);
 static void tpic_dottedflush(double interval);
 static void tpic_dashedflush(double interval);
+
+const char * EEPIC_line;
+#define EEPIC_NUM_PAT 7
+static const char * EEPIC_dashpat[EEPIC_NUM_PAT] = {
+    "\\path",	/* -2 border */
+    "\\drawline[-50]",	/* -1 axes */
+    "\\path",	/*  0 solid thin  */
+    "\\dashline[90]{10}",
+    "\\dottedline{10}",
+    "\\dashline[60]{20}",
+    "\\dottedline{20}"
+};
+static void EEPIC_draw_line(int x1, int x2, int y1, int y2);
+static void EEPIC_fill(int style); /* fill command for boxes and polygons */
+
 
 typedef enum {
     tpic_solid, tpic_dotted, tpic_dashed,
@@ -267,13 +295,19 @@ static struct vslope {
 };
 
 /* figure out the best arrow */
-static void best_latex_arrow(int, int, int, int, int, int);
+static void best_latex_arrow(int, int, int, int, int);
 
 enum LATEX_id {
     LATEX_COURIER, LATEX_ROMAN, LATEX_DEFAULT,
+    LATEX_NORMAL, LATEX_SMALL, LATEX_TINY,
     LATEX_SIZE,
+    // LATEX_STANDALONE, LATEX_INPUT,
     LATEX_ROTATE, LATEX_NOROTATE,
     LATEX_COLOR, LATEX_MONOCHROME,
+    // LATEX_LINEWIDTH, LATEX_POINTSCALE,
+    // LATEX_TEXARROWS, LATEX_GPARROWS,
+    // LATEX_TEXPOINTS, LATEX_GPPOINTS,
+    // LATEX_BACKGROUND,
     LATEX_LATEX, LATEX_EMTEX, LATEX_TPIC, LATEX_EEPIC, LATEX_PICT2E,
     LATEX_OTHER
 };
@@ -285,15 +319,29 @@ static struct gen_table LATEX_opts[] =
     { "r$oman", LATEX_ROMAN },
     { "d$efault", LATEX_DEFAULT },
     { "si$ze", LATEX_SIZE },
+    // { "stand$alone", LATEX_STANDALONE },
+    // { "inp$ut", LATEX_INPUT },
     { "rot$ate", LATEX_ROTATE },
     { "no$rotate", LATEX_NOROTATE },
     { "color", LATEX_COLOR },
     { "colour", LATEX_COLOR },
     { "mono$chrome", LATEX_MONOCHROME },
+    // { "backg$round", LATEX_BACKGROUND },
+    // { "lw", LATEX_LINEWIDTH },
+    // { "linew$idth", LATEX_LINEWIDTH },
+    // { "points$cale", LATEX_POINTSCALE },
+    // { "ps", LATEX_POINTSCALE },
+    // { "texarrows", LATEX_TEXARROWS },
+    // { "gparrows", LATEX_GPARROWS },
+    // { "texpoints", LATEX_TEXPOINTS },
+    // { "gppoints", LATEX_GPPOINTS },
+    { "norm$al", LATEX_NORMAL },
+    { "s$mall", LATEX_SMALL },
+    { "t$iny", LATEX_TINY },
     { "latex", LATEX_LATEX },
     { "emtex", LATEX_EMTEX },
     { "tpic", LATEX_TPIC },
-    // { "eepic", LATEX_EEPIC },
+    { "eepic", LATEX_EEPIC },
     { "pict2e", LATEX_PICT2E },
     { NULL, LATEX_OTHER }
 };
@@ -332,6 +380,8 @@ LATEX_options()
 	case LATEX_EEPIC:
 	    LATEX_mode = cmd;
 	    // Filling is supported
+	    term->filled_polygon = EEPIC_filled_polygon;
+	    term->fillbox = EEPIC_fillbox;
 	    c_token++;
 	    break;
 	case LATEX_COURIER:
@@ -351,8 +401,8 @@ LATEX_options()
 	    c_token++;
 	    latex_explicit_size = TRUE;
 	    latex_explicit_units = parse_term_size(&xmax_t, &ymax_t, INCHES);
-	    term->xmax = xmax_t * DOTS_PER_INCH/72;
-	    term->ymax = ymax_t * DOTS_PER_INCH/72;
+	    term->xmax = xmax_t * DOTS_PER_INCH / 72;
+	    term->ymax = ymax_t * DOTS_PER_INCH / 72;
 	    break;
 	}
 	case LATEX_ROTATE:
@@ -364,13 +414,25 @@ LATEX_options()
 	    c_token++;
 	    break;
 	case LATEX_COLOR:
-	    LATEX_use_color = TRUE;
+	    latex_use_color = TRUE;
 	    term->flags &= ~TERM_MONOCHROME;
 	    c_token++;
 	    break;
 	case LATEX_MONOCHROME:
-	    LATEX_use_color = FALSE;
+	    latex_use_color = FALSE;
 	    term->flags |= TERM_MONOCHROME;
+	    c_token++;
+	    break;
+	case LATEX_NORMAL:
+	    LATEX_pointsize = 0;
+	    c_token++;
+	    break;
+	case LATEX_SMALL:
+	    LATEX_pointsize = 1;
+	    c_token++;
+	    break;
+	case LATEX_TINY:
+	    LATEX_pointsize = 2;
 	    c_token++;
 	    break;
 	case LATEX_OTHER:
@@ -420,12 +482,12 @@ LATEX_options()
     if (latex_explicit_size) {
 	if (latex_explicit_units == CM)
 	    sprintf(&(term_options[strlen(term_options)]), "size %.2fcm, %.2fcm ",
-		2.54*(float)term->xmax/(DOTS_PER_INCH),
-		2.54*(float)term->ymax/(DOTS_PER_INCH));
+		2.54 * (float)term->xmax / (DOTS_PER_INCH),
+		2.54 * (float)term->ymax / (DOTS_PER_INCH));
 	else
 	    sprintf(&(term_options[strlen(term_options)]), "size %.2fin, %.2fin ",
-		(float)term->xmax/(DOTS_PER_INCH),
-		(float)term->ymax/(DOTS_PER_INCH));
+		(float)term->xmax / (DOTS_PER_INCH),
+		(float)term->ymax / (DOTS_PER_INCH));
     }
 
     if (latex_rotate) {
@@ -434,20 +496,20 @@ LATEX_options()
 	sprintf(&(term_options[strlen(term_options)]), " norotate");
     }
 
-    if (LATEX_use_color) {
+    if (latex_use_color) {
 	sprintf(&(term_options[strlen(term_options)]), " color");
     } else {
 	sprintf(&(term_options[strlen(term_options)]), " monochrome");
     }
+
+    sprintf(term_options + strlen(term_options),
+	LATEX_pointsize == 1 ? " small" : (LATEX_pointsize == 2 ? " tiny" : " normal"));
 }
 
 
 TERM_PUBLIC void
 LATEX_init()
 {
-    LATEX_posx = LATEX_posy = 0;
-    latex_use_color = LATEX_use_color;
-
     switch (LATEX_mode) {
     case LATEX_LATEX:
 	fputs("% GNUPLOT: LaTeX picture\n", gpoutfile);
@@ -457,6 +519,9 @@ LATEX_init()
 	break;
     case LATEX_TPIC:
 	fputs("% GNUPLOT: LaTeX picture with tpic specials\n", gpoutfile);
+	break;
+    case LATEX_EEPIC:
+	fputs("% GNUPLOT: LaTeX picture using EEPIC macros\n", gpoutfile);
 	break;
     case LATEX_PICT2E:
 	fputs("% GNUPLOT: LaTeX2e picture (pict2e)\n", gpoutfile);
@@ -474,30 +539,35 @@ LATEX_init()
 TERM_PUBLIC void
 LATEX_graphics()
 {
-    int xscale, yscale;
-
     /* set size of canvas */
     if (!latex_explicit_size) {
 	term->xmax = LATEX_XMAX;
 	term->ymax = LATEX_YMAX;
     }
 
-    /* bounding box */
-    xscale = xsize * term->xmax;
-    yscale = ysize * term->ymax;
-
-    fprintf(gpoutfile, "\\begin{picture}(%d,%d)(0,0)\n", xscale, yscale);
+    fprintf(gpoutfile, "\\begin{picture}(%d,%d)(0,0)\n",
+	    term->xmax, term->ymax);
     if (strcmp(LATEX_font, "doc") != 0) {
         fprintf(gpoutfile, "\
 \\font\\gnuplot=%s10 at %dpt\n\
 \\gnuplot\n",
 		LATEX_font, LATEX_fontsize);
     }
+    // if (eepic_fontsize_set) {
+	// float x = term->v_char * EEPIC_UNIT + 0.5;
+	// fprintf(gpoutfile, "\\fontsize{%d}{%g}\\selectfont\n",
+		// (int) x,  1.2 * x );
+    // } else {
+	// fprintf(gpoutfile,"\\footnotesize\n" );
+    // }
     LATEX_lw = 1;
     LATEX_size = 0;
     latex_color[0] = 0;
     LATEX_linetype(LT_AXIS);
     LATEX_inline = FALSE;
+    LATEX_linecount = 0;
+    EEPIC_line = "\\path";
+    LATEX_posx = LATEX_posy = 0;
 }
 
 
@@ -520,7 +590,7 @@ LATEX_reset()
 
 
 static void
-LATEX_linesize(int linetype)
+LATEX_linesize(void)
 {
     float size;
 
@@ -536,6 +606,8 @@ LATEX_linesize(int linetype)
 		-size / 2, size, size);
 	if (LATEX_mode == LATEX_EMTEX)		/* change line width */
 	    fprintf(gpoutfile, "\\special{em:linewidth %.1fpt}%%\n", size);
+	else if (LATEX_mode == LATEX_EEPIC)
+	    fprintf(gpoutfile, "\\allinethickness{%.1fpt}\n", size);
 	else if (LATEX_mode == LATEX_PICT2E)
 	    fprintf(gpoutfile, "\\linethickness{%.1fpt}%%\n", size);
     }
@@ -556,16 +628,18 @@ LATEX_linetype(int linetype)
     colorspec.type = TC_LT;
     colorspec.lt = linetype;
 
-    LATEX_linesize(linetype);
+    LATEX_linesize();
     LATEX_set_color(&colorspec);
 
     /* all but axis lines are solid by default */
     if (linetype == LT_AXIS) {
-	tpic_linetype = tpic_dashed;
 	LATEX_dotspace = LATEX_DOT_SPACE;
+	tpic_linetype = tpic_dashed;
+	EEPIC_line = EEPIC_dashpat[1]; // dashed line
     } else {
-	tpic_linetype = tpic_solid;
 	LATEX_dotspace = 0.0;
+	tpic_linetype = tpic_solid;
+	EEPIC_line = EEPIC_dashpat[2]; // solid line
     }
 }
 
@@ -602,6 +676,17 @@ LATEX_dashtype(int dt, t_dashtype *custom_dash_pattern)
 	}
 	break;
     case LATEX_EEPIC:
+	if (dt >= 0) {
+	    if (dt >= EEPIC_NUM_PAT + LT_BLACK)
+		dt %= (EEPIC_NUM_PAT + LT_BLACK);
+	    EEPIC_line = EEPIC_dashpat[dt - LT_BLACK];
+	} else if (dt == DASHTYPE_SOLID) {
+	    EEPIC_line = EEPIC_dashpat[0];
+	} else if (dt == DASHTYPE_AXIS) {
+	    EEPIC_line = EEPIC_dashpat[1];
+	} else if (dt == DASHTYPE_CUSTOM) {
+	    /* not supported */
+	}
 	break;
     default:
 	;
@@ -630,13 +715,17 @@ LATEX_move(unsigned int x, unsigned int y)
 TERM_PUBLIC void
 LATEX_point(unsigned int x, unsigned int y, int number)
 {
+    const char * size[] = { "", "\\scriptstyle", "\\scriptscriptstyle" };
+    char point[80];
+
     LATEX_move(x, y);
 
     /* Print the character defined by 'number'; number < 0 means
        to use a dot, otherwise one of the defined points. */
+    if (number >= 0)
+	snprintf(point, sizeof(point), LATEX_points[number % LATEX_POINT_TYPES], size[LATEX_pointsize]);
     fprintf(gpoutfile, "\\put(%d,%d){%s}\n", x, y,
-	    (number < 0 ? LATEX_TINY_DOT
-	     : LATEX_points[number % LATEX_POINT_TYPES]));
+	    (number < 0 ? LATEX_TINY_DOT : point));
 }
 
 
@@ -705,6 +794,9 @@ LATEX_vector(unsigned int ux, unsigned int uy)
 	    tpic_startline();
 	}
 	LATEX_pushpath(ux, uy);
+	break;
+    case LATEX_EEPIC:
+	EEPIC_draw_line(LATEX_posx, (int) ux, LATEX_posy, (int) uy);
 	break;
     case LATEX_PICT2E:
 	if (LATEX_dotspace == 0.0)
@@ -968,7 +1060,8 @@ LATEX_arrow(
     unsigned int ex, unsigned int ey,
     int head)
 {
-    best_latex_arrow(sx, sy, ex, ey, 1, head);
+    // This mostly converts the parameters to signed.
+    best_latex_arrow(sx, sy, ex, ey, head);
 
     LATEX_posx = ex;
     LATEX_posy = ey;
@@ -978,7 +1071,6 @@ LATEX_arrow(
 static void
 best_latex_arrow(
     int sx, int sy, int ex, int ey, /* start and end points */
-    int who,			/* 1=LATEX, 2=EEPIC */
     int head)
 {
     int dx = ex - sx;
@@ -1078,21 +1170,13 @@ best_latex_arrow(
 	    }
 	} else {
 	    /* we draw the line the usual way, with thin lines */
+	    LATEX_linesize();
 	    if (LATEX_mode == LATEX_EMTEX) {
-		LATEX_linesize(LATEX_THIN_LINE);
 		EMTEX_solid_line(sx, ex, sy, ey);
+	    } if (LATEX_mode == LATEX_EEPIC) {
+		EEPIC_draw_line(sx, ex, sy, ey);
 	    } else {
-
-	    if (who == 1) {
-		LATEX_linesize(LATEX_THIN_LINE);
 		LATEX_solid_line(sx, ex, sy, ey);
-	    }
-#ifdef EEPIC
-	    else {
-		EEPIC_move(sx, sy);
-		EEPIC_vector(ex, ey);
-	    }
-#endif /* EEPIC */
 	    }
 
 	    /* and then draw arrowheads (a short vector) there */
@@ -1451,6 +1535,107 @@ tpic_dashedflush(double interval)
 }
 
 
+/* EEPIC special routines */
+
+static void
+EEPIC_draw_line(int x1, int x2, int y1, int y2)
+{
+    if (!LATEX_inline) {
+	LATEX_inline = TRUE;
+
+	/* Start a new line. This depends on line type */
+	fprintf(gpoutfile, "%s(%u,%u)",
+		EEPIC_line,
+		x1, y1);
+	LATEX_linecount = 1;
+    } else {
+	/* Even though we are in middle of a path,
+	 * we may want to start a new path command.
+	 * If they are too long then latex will choke.
+	 */
+	if (LATEX_linecount++ >= LATEX_LINEMAX) {
+	    fprintf(gpoutfile, "\n%s(%u,%u)",
+		    EEPIC_line,
+		    x1, y1);
+	    LATEX_linecount = 1;
+	}
+    }
+    fprintf(gpoutfile, "(%u,%u)", x2, y2);
+}
+
+
+static void
+EEPIC_fill(int style)
+{
+    int opt = style >> 4;
+
+    /* TODO: According to the documentation, we could use
+       \texture commands to change the filling of \shade */
+    // fill polygon
+    switch (style & 0xf) {
+    case FS_SOLID:
+    case FS_TRANSPARENT_SOLID:
+	/* We allow at least black, white and gray fills */
+	fputs("\\blacken", gpoutfile);
+	break;
+    case FS_PATTERN:
+    case FS_TRANSPARENT_PATTERN:
+	opt %= 3;
+	if (opt == 0)
+	    fputs("\\whiten", gpoutfile);
+	else if (opt == 1)
+	    fputs("\\shade", gpoutfile);
+	else
+	    fputs("\\blacken", gpoutfile);
+	break;
+    case FS_EMPTY:
+	fputs("\\whiten", gpoutfile);
+	break;
+    case FS_DEFAULT:
+    default:
+	fputs("\\shade", gpoutfile);
+	break;
+    }
+}
+
+
+TERM_PUBLIC void
+EEPIC_fillbox(int style,
+		unsigned int x1, unsigned int y1,
+		unsigned int width, unsigned int height)
+{
+    LATEX_endline();
+
+    // fill polygon
+    EEPIC_fill(style);
+    // outline box
+    fprintf(gpoutfile, "\\path(%d,%d)(%d,%d)(%d,%d)(%d,%d)(%d,%d)\n",
+	x1, y1,
+	x1 + width, y1,
+	x1 + width, y1 + height,
+	x1, y1 + height,
+	x1, y1);
+
+}
+
+
+TERM_PUBLIC void
+EEPIC_filled_polygon(int points, gpiPoint *corners)
+{
+    int i;
+
+    LATEX_endline();
+
+    // fill polygon
+    EEPIC_fill(corners->style);
+    // outline polygon
+    fprintf(gpoutfile, "\\path(%d,%d)", corners[0].x, corners[0].y);
+    for (i = 1; i < points; i++)
+	fprintf(gpoutfile, "(%d,%d)", corners[i].x, corners[i].y);
+    fputs("\n", gpoutfile);
+}
+
+
 /* PICT2E special routines */
 
 static void
@@ -1561,10 +1746,7 @@ PICT2E_fillbox(int style,
 {
     int ret;
 
-    if (LATEX_inline) {
-	fputs("\n", gpoutfile);
-	LATEX_inline = FALSE;
-    }
+    PICT2E_endline();
 
     if ((ret = PICT2E_fill(style)) == pict2e_no_fill)
 	return;
@@ -1587,10 +1769,7 @@ PICT2E_filled_polygon(int points, gpiPoint *corners)
 {
     int i, ret;
 
-    if (LATEX_inline) {
-	fputs("\n", gpoutfile);
-	LATEX_inline = FALSE;
-    }
+    PICT2E_endline();
 
     if ((ret = PICT2E_fill(corners->style)) == pict2e_no_fill)
 	return;
@@ -1613,14 +1792,14 @@ PICT2E_filled_polygon(int points, gpiPoint *corners)
 #ifdef TERM_TABLE
 
 TERM_TABLE_START(latex_driver)
-    "latex", "LaTeX picture environment",
+    "latex", "LaTeX picture environment (latex/emtex/tpic/eepic/pict2e variants)",
     LATEX_XMAX, LATEX_YMAX, LATEX_VCHAR, LATEX_HCHAR,
     LATEX_VTIC, LATEX_HTIC, LATEX_options, LATEX_init, LATEX_reset,
     LATEX_text, null_scale, LATEX_graphics, LATEX_move, LATEX_vector,
     LATEX_linetype, LATEX_put_text, LATEX_text_angle,
     LATEX_justify_text, LATEX_point, LATEX_arrow, set_font_null,
     NULL, /* pointsize */
-    TERM_IS_LATEX | TERM_MONOCHROME, /* flags */
+    TERM_IS_LATEX | TERM_CAN_DASH | TERM_MONOCHROME, /* flags */
     NULL, NULL, /* suspend, resume */
     LATEX_fillbox, LATEX_linewidth,
 #ifdef USE_MOUSE
@@ -1670,6 +1849,12 @@ START_HELP(latex)
 "?terminal tpic",
 "?term tpic",
 "?tpic",
+"?commands set terminal eepic",
+"?set terminal eepic",
+"?set term eepic",
+"?terminal eepic",
+"?term eepic",
+"?eepic",
 "?commands set terminal pict2e",
 "?set terminal pict2e",
 "?set term pict2e",
@@ -1681,25 +1866,27 @@ START_HELP(latex)
 " line drawing and area filling.",
 "",
 " Syntax:",
-"       set terminal latex {latex | emtex | tpic | pict2e}",
+"       set terminal latex {latex | emtex | tpic | eepic | pict2e}",
 "                    {default | {courier|roman} {<fontsize>}}",
 "                    {size <XX>{unit}, <YY>{unit}} {rotate | norotate}",
 "                    {color | monochrome}",
+"                    {small | tiny | normal}",
 "",
 " The `latex` option selects the original picture environment, which has some",
 " rather severe limitations. `emtex` uses emTeX \\special commands to overcome",
 " some of them. `tpic` uses tpic \\specials. These need to be supported by",
-" your DVI driver. `emtex` and `tpic` \\specials are supported by dvips and",
-" xelatex, but not pdflatex. `pict2e` uses the LaTeX2e variant of the picture",
-" environment.  You need to add \"\\usepackage{pict2e}\" to your file. This is",
-" the recommended variant.",
+" your DVI driver. emTeX and tpic \\specials are supported by dvips and",
+" xelatex, but not pdflatex. `eepic` uses macros of the `eepic` and `epic`",
+" package. These also emit tpic \\specials. Alternatively, you can use it",
+" with the `bxeepic` and `pict2e` packages. `pict2e` uses the LaTeX2e variant",
+" of the picture environment directly.  You need to add \"\\usepackage{pict2e}\"",
+" to your file. This is the recommended variant.",
 "",
 " By default the plot will inherit font settings from the embedding document.",
 " You have the option of forcing either Courier (cmtt) or Roman (cmr) fonts",
 " instead. In this case you may also specify a fontsize.",
 " Unless your driver is capable of building fonts at any size (e.g. dvips),",
 " stick to the standard 10, 11 and 12 point sizes.",
-"",
 " METAFONT users beware: METAFONT does not like odd sizes.",
 "",
 " All drivers for LaTeX offer a special way of controlling text positioning:",
@@ -1720,13 +1907,13 @@ START_HELP(latex)
 " changes this to whatever the user requests. By default the X and Y sizes",
 " are taken to be in inches, but other units are possible (currently only cm).",
 "",
-" If `rotate` is specified, rotated text, especially a rotated y-axis label,",
-" is possible (the packages graphics or graphicx are needed). The 'stacked'",
-" y-axis label mechanism is then deactivated.",
+" `rotate` will enable true rotated text. Otherwise, rotated text at 90 degrees",
+" will be typeset with letters stacked above each other. If you use this option",
+" you must include \\usepackage{graphicx} in the preamble.",
 "",
-" The option `color` enables color, while `monochrome` uses only black and white",
-" drawing elements. You need to load the color or xcolor package in the preamble",
-" of your latex document.",
+" `color` causes gnuplot to produce \\color{...} commands so that the graphs are",
+" colored. Using this option, you must include \\usepackage{color} (or xcolor)",
+" in the preamble of your latex document.",
 "",
 " Examples:",
 " About label positioning:",

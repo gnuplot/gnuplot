@@ -348,9 +348,6 @@
 
 #endif /* NO_BITMAP_SUPPORT */
 
-/* TeX related terminals */
-#define EEPIC
-
 /* latex / emtex / tpic */
 #include "latex.trm"
 
@@ -358,9 +355,6 @@
 #ifdef PSLATEX_DRIVER
 #include "pslatex.trm"
 #endif
-
-/* EEPIC-extended LaTeX driver, for EEPIC users */
-#include "eepic.trm"
 
 /* LaTeX picture environment with PSTricks macros */
 #include "pstricks.trm"
