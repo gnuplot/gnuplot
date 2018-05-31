@@ -4,9 +4,11 @@ Changes in 5.2.4
 * CHANGE generalize the test for missing data flag in input data
 * CHANGE "set []range writeback" is now essentially always in effect
 * CHANGE consistent placement of timestamp at true bottom of page
+* FIX spurious evaluation of logscale coordinates as UNDEFINED
+* FIX column header title assignments for histogram with errorbars
 * FIX re-implement "refresh" command to use autoscale writeback/restore
 * FIX font-handling bug; line-spacing of previous font still in effect
-* FIX post, dumb terminals: early fontsize initialization
+* FIX post, svg, dumb terminals: early fontsize initialization
 
 Changes in 5.2.3
 ================

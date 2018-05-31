@@ -1,3 +1,36 @@
+2018-05-31  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (eval_link_function) src/eval.c src/internal.c:
+	Prevent spurious evaluation of logscale axis values as UNDEFINED.
+	Various abnormal conditions during evaluation of an action table are
+	signalled by setting undefined=TRUE.  The code can check this flag
+	immediately after calling evaluate_at().  Routines map_x() and map_y()
+	improperly tested the flag after calling eval_link_function(), which
+	worked in the general case because eval_link_function itself calls
+	evaluate_at().  However the shortcut code to speed up logscale
+	transforms returns without calling evaluate_at() and thus did not
+	reset the undefined flag.  Enabling this shortcut in 5.2.3 introduced
+	a regression where successive calls to map axis coordinates all
+	returned with the undefined flag incorrectly set to TRUE.
+	
+	Now we reset the undefined flag explicitly in eval_link_function() so
+	that it is valid to test it immediately after a call to either
+	eval_link_function() or evaluate_at().
+	
+	Bug #2050
+
+2018-05-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c:  Use of "autotitle columnhead" with plot style
+	histogram errorbars requires taking the title from column 1 rather
+	than column 2.
+
+2018-05-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot3d.c:  refresh_3dbounds must check both head and tail of each
+	vector for OUTRANGE.
+	Bug #1948
+
 2018-05-16  Miroslav Sulc <msulc@users.sourceforge.net>
 
 	* src/misc.c: Support ARGC/ARGV parameter convention for "call".
