@@ -1,23 +1,33 @@
 		GNUPLOT Version 5.2.4 Release Notes
 		===================================
 
-These release notes are for version 5.2 patchlevel 3 (5.2.4).
-This release contains bug-fixes, a few changes back-ported from the
-development version, and a few new features.
+These release notes are for version 5.2 patchlevel 4 (5.2.4).
+
+This release contains
+- a fix for a serious regression in 5.2.3 (spurious evaluation of logscale
+  coordinates as UNDEFINED)
+- re-implementation of the "refresh" command to correct regressions in
+  5.2.0 through 5.2.3
+- sanity checks for several invalid command sequences found by fuzzing
+- several minor bug-fixes
+- two recent minor changes back-ported from the development version
 
 Please see the ChangeLog file for a complete list of changes made during the
 course of development from 5.0 to 5.2.
 
-Release Notes date: 16-May-2018
+Release Notes date: 31-May-2018
 
 CHANGES IN 5.2.4
 ================
 * NEW "call" parameters ARG1, ARG2, ... are also present as ARGV[1]...ARGV[ARGC]
-* CHANGE missing data flag in input data applies to using (func($N))
+* CHANGE generalize the test for missing data flag in input data
 * CHANGE "set []range writeback" is now essentially always in effect
 * CHANGE consistent placement of timestamp at true bottom of page
+* FIX spurious evaluation of logscale coordinates as UNDEFINED
+* FIX column header title assignments for histogram with errorbars
 * FIX re-implement "refresh" command to use autoscale writeback/restore
 * FIX font-handling bug; line-spacing of previous font still in effect
+* FIX post, svg, dumb terminals: early fontsize initialization
 
 CHANGES IN 5.2.3
 ================
@@ -333,7 +343,7 @@ minor number).  Bugfixes to version 5.2 will appear in patchlevel releases
 5.2.1, 5.2.2, etc., approximately twice a year or as needed to correct a
 serious problem.
 
-Note: development has recently moved from cvs to git. Most of the files
-in the 5.2.3 source distribution still contain a cvs version identifier
+Note: development has recently moved from cvs to git. Many of the files
+in the 5.2.4 source distribution still contain a cvs version identifier
 $RCSid and date, but these are not current if the file has been changed
 since the move to git.
