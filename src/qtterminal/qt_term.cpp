@@ -201,23 +201,30 @@ static double qt_max_neg_base = 0.0;
 /* ------------------------------------------------------
  * Helpers
  * ------------------------------------------------------*/
+// Adjust for the mismatch of real coords 0->ymax and pixel coords [0:ymax-1]
+#ifndef QT_YBASE
+#define QT_YBASE 1
+#endif
 
 // Convert gnuplot coordinates into floating point term coordinates
 QPointF qt_termCoordF(int x, int y)
 {
-	return QPointF(double(x)/qt_oversamplingF, double(int(term->ymax) - y)/qt_oversamplingF);
+	return QPointF(double(x)/qt_oversamplingF,
+			double(int(term->ymax) - QT_YBASE - y)/qt_oversamplingF);
 }
 
 // The same, but with coordinates clipped to the nearest pixel
 QPoint qt_termCoord(int x, int y)
 {
-	return QPoint(qRound(double(x)/qt_oversamplingF), qRound(double(term->ymax - y)/qt_oversamplingF));
+	return QPoint(qRound(double(x)/qt_oversamplingF),
+			qRound(double(term->ymax - QT_YBASE - y)/qt_oversamplingF));
 }
 
 // Inverse of the previous function
 QPoint qt_gnuplotCoord(int x, int y)
 {
-	return QPoint(x*qt_oversampling, int(term->ymax) - y*qt_oversampling);
+	return QPoint(x*qt_oversampling,
+			int(term->ymax) - QT_YBASE - y*qt_oversampling);
 }
 
 #ifndef GNUPLOT_QT
