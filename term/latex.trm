@@ -103,6 +103,8 @@ TERM_PUBLIC int LATEX_text_angle __PROTO((int ang));
 TERM_PUBLIC void LATEX_reset __PROTO((void));
 TERM_PUBLIC void LATEX_fillbox __PROTO((int style, unsigned int x1, unsigned int y1,
 					unsigned int width, unsigned int height));
+TERM_PUBLIC int LATEX_make_palette(t_sm_palette *palette);
+TERM_PUBLIC void LATEX_set_color(t_colorspec *colorspec);
 
 #ifdef EMTEX
 TERM_PUBLIC void EMTEX_init __PROTO((void));
@@ -151,6 +153,15 @@ static size_units latex_explicit_units = INCHES;
 #define LATEX_DOT "\\usebox{\\plotpoint}"
 #define LATEX_TINY_DOT "\\rule{1pt}{1pt}"	/* for dots plot style */
 
+/* COLORS */
+static TBOOLEAN LATEX_use_color = FALSE; /* LATEX terminal option */
+static TBOOLEAN latex_use_color;  /* option used by LATEX_set_color */
+static char latex_color[32] = "";
+#define LATEX_num_colors 6
+static const char * LATEX_lt_colors[] = {
+    "red", "green", "blue", "magenta", "cyan", "yellow"
+};
+
 /* POINTS */
 #define LATEX_POINT_TYPES 15	/* we supply more point types */
 
@@ -173,6 +184,7 @@ static const char * LATEX_points[] = {
 };
 
 /* LINES */
+static void LATEX_linesize(int linetype);
 static float LATEX_size = 0;	/* current thick of line in points */
 static float LATEX_lw;
 static float LATEX_dotspace = 0;	/* current dotspace of line in points */
@@ -232,7 +244,13 @@ static struct vslope {
 /* figure out the best arrow */
 static void best_latex_arrow __PROTO((int, int, int, int, int, int));
 
-enum LATEX_id { LATEX_COURIER, LATEX_ROMAN, LATEX_DEFAULT, LATEX_SIZE, LATEX_ROTATE, LATEX_NOROTATE, LATEX_OTHER };
+enum LATEX_id {
+    LATEX_COURIER, LATEX_ROMAN, LATEX_DEFAULT,
+    LATEX_SIZE,
+    LATEX_ROTATE, LATEX_NOROTATE,
+    LATEX_COLOR, LATEX_MONOCHROME,
+    LATEX_OTHER
+};
 
 static struct gen_table LATEX_opts[] =
 {
@@ -242,6 +260,9 @@ static struct gen_table LATEX_opts[] =
     { "si$ze", LATEX_SIZE },
     { "rot$ate", LATEX_ROTATE },
     { "no$rotate", LATEX_NOROTATE },
+    { "color", LATEX_COLOR },
+    { "colour", LATEX_COLOR },
+    { "mono$chrome", LATEX_MONOCHROME },
     { NULL, LATEX_OTHER }
 };
 
@@ -265,8 +286,7 @@ LATEX_options()
 	    strcpy(LATEX_font, "doc");
 	    c_token++;
 	    break;
-	case LATEX_SIZE:
-	    {
+	case LATEX_SIZE: {
 	    float xmax_t = 5., ymax_t = 3.;
 	    c_token++;
 	    latex_explicit_size = TRUE;
@@ -274,13 +294,23 @@ LATEX_options()
 	    term->xmax = xmax_t * DOTS_PER_INCH/72;
 	    term->ymax = ymax_t * DOTS_PER_INCH/72;
 	    break;
-	    }
+	}
 	case LATEX_ROTATE:
 	    latex_rotate = TRUE;
 	    c_token++;
 	    break;
 	case LATEX_NOROTATE:
 	    latex_rotate = FALSE;
+	    c_token++;
+	    break;
+	case LATEX_COLOR:
+	    LATEX_use_color = TRUE;
+	    term->flags &= ~TERM_MONOCHROME;
+	    c_token++;
+	    break;
+	case LATEX_MONOCHROME:
+	    LATEX_use_color = FALSE;
+	    term->flags |= TERM_MONOCHROME;
 	    c_token++;
 	    break;
 	case LATEX_OTHER:
@@ -324,6 +354,11 @@ LATEX_options()
 	sprintf(&(term_options[strlen(term_options)]), " norotate");
     }
 
+    if (LATEX_use_color) {
+	sprintf(&(term_options[strlen(term_options)]), " color");
+    } else {
+	sprintf(&(term_options[strlen(term_options)]), " monochrome");
+    }
 }
 
 
@@ -334,6 +369,7 @@ LATEX_init()
     emtex = FALSE;
 #endif
     LATEX_posx = LATEX_posy = 0;
+    latex_use_color = LATEX_use_color;
 
     fprintf(gpoutfile, "\
 %% GNUPLOT: LaTeX picture\n\
@@ -368,6 +404,7 @@ LATEX_graphics()
 		LATEX_font, LATEX_fontsize);
     }
     LATEX_lw = 1;
+    latex_color[0] = 0;
 }
 
 
@@ -381,8 +418,9 @@ LATEX_text()
     LATEX_moved = TRUE;		/* pen is up after move */
 }
 
-TERM_PUBLIC void
-LATEX_linetype(int linetype)
+
+static void
+LATEX_linesize(int linetype)
 {
     float size;
 
@@ -415,6 +453,20 @@ LATEX_linetype(int linetype)
     LATEX_dotsize = size / LATEX_UNIT;
     LATEX_dotspace = (linetype >= 0) ? LATEX_lines[linetype].dotspace : 0;
     LATEX_moved = TRUE;		/* reset */
+}
+
+
+TERM_PUBLIC void
+LATEX_linetype(int linetype)
+{
+    t_colorspec colorspec;
+
+    /* save values for set_color */
+    colorspec.type = TC_LT;
+    colorspec.lt = linetype;
+
+    LATEX_linesize(linetype);
+    LATEX_set_color(&colorspec);
 }
 
 
@@ -802,12 +854,12 @@ best_latex_arrow(
 	    /* we draw the line the usual way, with thin lines */
 #ifdef EMTEX
 	    if (emtex) {
-		LATEX_linetype(LATEX_THIN_LINE);
+		LATEX_linesize(LATEX_THIN_LINE);
 		EMTEX_solid_line(sx, ex, sy, ey);
 	    } else
 #endif
 	    if (who == 1) {
-		LATEX_linetype(LATEX_THIN_LINE);
+		LATEX_linesize(LATEX_THIN_LINE);
 		LATEX_solid_line(sx, ex, sy, ey);
 	    }
 #ifdef EEPIC
@@ -905,6 +957,57 @@ int width, unsigned int height)
 }
 
 
+TERM_PUBLIC int
+LATEX_make_palette(t_sm_palette *palette)
+{
+    return 0;  /* we can do continuous colors */
+}
+
+
+TERM_PUBLIC void
+LATEX_set_color(t_colorspec *colorspec)
+{
+    char colorstr[32];
+
+    if (!latex_use_color)
+	return;
+
+    switch (colorspec->type) {
+    case TC_RGB: {
+	double r = (double)((colorspec->lt >> 16 ) & 255) / 255.;
+	double g = (double)((colorspec->lt >> 8 ) & 255) / 255.;
+	double b = (double)(colorspec->lt & 255) / 255.;
+
+	snprintf(colorstr, sizeof(colorstr), "\\color[rgb]{%3.2f,%3.2f,%3.2f}\n", r, g, b);
+	break;
+    }
+    case TC_LT: {
+	int linetype = colorspec->lt;
+	const char * colorname;
+
+	if (linetype < 0 || !latex_use_color)
+	    colorname = "black";
+	else
+	    colorname = LATEX_lt_colors[linetype % LATEX_num_colors];
+	snprintf(colorstr, sizeof(colorstr), "\\color{%s}\n", colorname);
+	break;
+    }
+    case TC_FRAC: {
+	rgb_color color;
+
+	rgb1_from_gray(colorspec->value, &color);
+	snprintf(colorstr, sizeof(colorstr), "\\color[rgb]{%3.2f,%3.2f,%3.2f}", color.r, color.g, color.b);
+    }
+    }
+
+    if (strcmp(colorstr, latex_color) != 0) {
+	strcpy(latex_color, colorstr);
+	if (latex_use_color)
+	    fputs(colorstr, gpoutfile);
+    }
+}
+
+
 #ifdef EMTEX
 
 TERM_PUBLIC void
@@ -964,14 +1067,15 @@ TERM_TABLE_START(latex_driver)
     LATEX_text, null_scale, LATEX_graphics, LATEX_move, LATEX_vector,
     LATEX_linetype, LATEX_put_text, LATEX_text_angle,
     LATEX_justify_text, LATEX_point, LATEX_arrow, set_font_null,
-    NULL,      /* pointsize */
-    TERM_IS_LATEX,         /* flags */
+    NULL, /* pointsize */
+    TERM_IS_LATEX | TERM_MONOCHROME, /* flags */
     NULL, NULL, /* suspend, resume */
     LATEX_fillbox, LATEX_linewidth,
 #ifdef USE_MOUSE
     NULL, NULL, NULL, NULL, NULL,
 #endif
-    NULL /* Color stuff */
+    LATEX_make_palette, 0,
+    LATEX_set_color
 TERM_TABLE_END(latex_driver)
 
 #undef LAST_TERM
@@ -986,14 +1090,15 @@ TERM_TABLE_START(emtex_driver)
     EMTEX_text, null_scale, LATEX_graphics, LATEX_move, LATEX_vector,
     LATEX_linetype, LATEX_put_text, LATEX_text_angle,
     LATEX_justify_text, LATEX_point, LATEX_arrow, set_font_null,
-    NULL,      /* pointsize */
-    TERM_IS_LATEX,         /* flags */
+    NULL, /* pointsize */
+    TERM_IS_LATEX | TERM_MONOCHROME, /* flags */
     NULL, NULL, /* suspend, resume */
     LATEX_fillbox, LATEX_linewidth,
 #ifdef USE_MOUSE
     NULL, NULL, NULL, NULL, NULL,
 #endif
-    NULL /* Color stuff */
+    LATEX_make_palette, 0,
+    LATEX_set_color
 TERM_TABLE_END(emtex_driver)
 
 #undef LAST_TERM
@@ -1021,6 +1126,7 @@ START_HELP(latex)
 " Syntax:",
 "       set terminal {latex | emtex} {default | {courier|roman} {<fontsize>}}",
 "                    {size <XX>{unit}, <YY>{unit}} {rotate | norotate}",
+"                    {color | monochrome}",
 "",
 " By default the plot will inherit font settings from the embedding document.",
 " You have the option of forcing either Courier (cmtt) or Roman (cmr) fonts",
@@ -1048,9 +1154,13 @@ START_HELP(latex)
 " changes this to whatever the user requests. By default the X and Y sizes",
 " are taken to be in inches, but other units are possible (currently only cm).",
 "",
-" If 'rotate' is specified, rotated text, especially a rotated y-axis label,",
+" If `rotate` is specified, rotated text, especially a rotated y-axis label,",
 " is possible (the packages graphics or graphicx are needed). The 'stacked'",
 " y-axis label mechanism is then deactivated.",
+"",
+" The option `color` enables color, while `monochrome` uses only black and white",
+" drawing elements. You need to load the color or xcolor package in the preamble",
+" of your latex document.",
 "",
 " Examples:",
 " About label positioning:",
