@@ -174,6 +174,7 @@ static const char * LATEX_points[] = {
 
 /* LINES */
 static float LATEX_size = 0;	/* current thick of line in points */
+static float LATEX_lw;
 static float LATEX_dotspace = 0;	/* current dotspace of line in points */
 #define LATEX_LINE_TYPES 6	/* number of line types below */
 #define LATEX_THIN_LINE 0	/* the thinnest solid line type */
@@ -366,6 +367,7 @@ LATEX_graphics()
 \\gnuplot\n",
 		LATEX_font, LATEX_fontsize);
     }
+    LATEX_lw = 1;
 }
 
 
@@ -395,9 +397,9 @@ LATEX_linetype(int linetype)
 
     /* Find the new desired line thickness. */
     /* negative linetypes (for axes) use a thin line */
-    /* only relevant for drawing axes/border in 3d */
     size = (linetype >= 0 ? LATEX_lines[linetype].size
 	    : LATEX_lines[LATEX_THIN_LINE].size);
+    size *= LATEX_lw;
 
     /* If different from current size, redefine \plotpoint */
     if (size != LATEX_size) {
@@ -414,6 +416,14 @@ LATEX_linetype(int linetype)
     LATEX_dotspace = (linetype >= 0) ? LATEX_lines[linetype].dotspace : 0;
     LATEX_moved = TRUE;		/* reset */
 }
+
+
+TERM_PUBLIC void
+LATEX_linewidth(double linewidth)
+{
+    LATEX_lw = linewidth;
+}
+
 
 TERM_PUBLIC void
 LATEX_move(unsigned int x, unsigned int y)
@@ -921,7 +931,7 @@ TERM_TABLE_START(latex_driver)
     NULL,      /* pointsize */
     TERM_IS_LATEX,         /* flags */
     NULL, NULL, /* suspend, resume */
-    LATEX_fillbox, NULL, /* linewidth */
+    LATEX_fillbox, LATEX_linewidth,
 #ifdef USE_MOUSE
     NULL, NULL, NULL, NULL, NULL,
 #endif
@@ -943,7 +953,7 @@ TERM_TABLE_START(emtex_driver)
     NULL,      /* pointsize */
     TERM_IS_LATEX,         /* flags */
     NULL, NULL, /* suspend, resume */
-    LATEX_fillbox, NULL, /* linewidth */
+    LATEX_fillbox, LATEX_linewidth,
 #ifdef USE_MOUSE
     NULL, NULL, NULL, NULL, NULL,
 #endif
