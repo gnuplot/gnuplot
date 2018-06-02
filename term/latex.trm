@@ -735,16 +735,41 @@ best_latex_arrow(
        * a slope that is close, we draw a bent arrow.
      */
 
+    if ((head & BOTH_HEADS) == BACKHEAD) {
+	/* we need to draw only the backhead,
+	  so we exchange start and stop coordinates */
+	int tx = ex;
+	int ty = ey;
+	ex = sx;
+	ey = sy;
+	sx = tx;
+	sy = ty;
+	dx *= -1;
+	dy *= -1;
+	head &= ~BOTH_HEADS;
+	head |= END_HEAD;
+    }
+
     if (dx == 0) {
 	/* vertical arrow */
 	fprintf(gpoutfile, "\\put(%d,%d){\\%s(0,%d){%d}}\n",
-		sx, sy, head ? "vector" : "line",
+		sx, sy, head & END_HEAD ? "vector" : "line",
 		sign(ey - sy), ABS(ey - sy));
+	if (head & BACKHEAD) {
+	    /* overlay a reversed arrow */
+	    fprintf(gpoutfile, "\\put(%d,%d){\\vector(0,%d){0}}\n",
+		    sx, sy, -1 * sign(ey - sy));
+	}
     } else if (dy == 0) {
 	/* horizontal arrow */
 	fprintf(gpoutfile, "\\put(%d,%d){\\%s(%d,0){%d}}\n",
-		sx, sy, head ? "vector" : "line",
+		sx, sy, head & END_HEAD ? "vector" : "line",
 		sign(ex - sx), ABS(ex - sx));
+	if (head & BACKHEAD) {
+	    /* overlay a reversed arrow */
+	    fprintf(gpoutfile, "\\put(%d,%d){\\vector(%d,0){0}}\n",
+		    sx, sy, -1 * sign(ex - sx));
+	}
     } else {
 	/* Slanted arrow. We'll give it a try.
 	 * we try to find the closest-slope arrowhead.
@@ -763,12 +788,17 @@ best_latex_arrow(
 
 	/* now we have the best slope arrow */
 	/* maybe it's exactly the right slope! */
-	if (minerror == 0.0)	/* unlikely but possible */
+	if (minerror == 0.0) {	/* unlikely but possible */
 	    fprintf(gpoutfile, "\\put(%d,%d){\\%s(%d,%d){%d}}\n",
 		    sx, sy, head ? "vector" : "line",
 		    bestslope->dx * sign(ex - sx), bestslope->dy * sign(ey - sy),
 		    ABS(ex - sx));
-	else {
+	    if (head & BACKHEAD) {
+		fprintf(gpoutfile, "\\put(%d,%d){\\vector(%d,%d){0}}\n",
+			sx, sy,
+			-1 * bestslope->dx * sign(ex - sx), -1 * bestslope->dy * sign(ey - sy));
+	    }
+	} else {
 	    /* we draw the line the usual way, with thin lines */
 #ifdef EMTEX
 	    if (emtex) {
@@ -786,11 +816,17 @@ best_latex_arrow(
 		EEPIC_vector(ex, ey);
 	    }
 #endif /* EEPIC */
-	    /* and then draw an arrowhead (a short vector) there */
-	    if (head)
+	    /* and then draw arrowheads (a short vector) there */
+	    if (head & END_HEAD) {
 		fprintf(gpoutfile, "\\put(%d,%d){\\vector(%d,%d){0}}\n",
 			ex, ey,
 			bestslope->dx * sign(ex - sx), bestslope->dy * sign(ey - sy));
+	    }
+	    if (head & BACKHEAD) {
+		fprintf(gpoutfile, "\\put(%d,%d){\\vector(%d,%d){0}}\n",
+			sx, sy,
+			-1 * bestslope->dx * sign(ex - sx), -1 * bestslope->dy * sign(ey - sy));
+	    }
 	}
     }
 }
