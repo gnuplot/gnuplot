@@ -101,7 +101,7 @@ TERM_PUBLIC void LATEX_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned
 TERM_PUBLIC int LATEX_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC int LATEX_text_angle __PROTO((int ang));
 TERM_PUBLIC void LATEX_reset __PROTO((void));
-TERM_PUBLIC void LATEX_fillbox __PROTO((int style, unsigned int x1, unsigned int y1, 
+TERM_PUBLIC void LATEX_fillbox __PROTO((int style, unsigned int x1, unsigned int y1,
 					unsigned int width, unsigned int height));
 
 #ifdef EMTEX
@@ -927,7 +927,7 @@ TERM_TABLE_START(latex_driver)
 #endif
     NULL /* Color stuff */
 TERM_TABLE_END(latex_driver)
- 
+
 #undef LAST_TERM
 #define LAST_TERM latex_driver
 
@@ -940,7 +940,14 @@ TERM_TABLE_START(emtex_driver)
     EMTEX_text, null_scale, LATEX_graphics, LATEX_move, LATEX_vector,
     LATEX_linetype, LATEX_put_text, LATEX_text_angle,
     LATEX_justify_text, LATEX_point, LATEX_arrow, set_font_null,
-    NULL, TERM_IS_LATEX
+    NULL,      /* pointsize */
+    TERM_IS_LATEX,         /* flags */
+    NULL, NULL, /* suspend, resume */
+    LATEX_fillbox, NULL, /* linewidth */
+#ifdef USE_MOUSE
+    NULL, NULL, NULL, NULL, NULL,
+#endif
+    NULL /* Color stuff */
 TERM_TABLE_END(emtex_driver)
 
 #undef LAST_TERM
