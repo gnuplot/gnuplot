@@ -205,19 +205,6 @@ static void EEPIC_endline __PROTO((void)); /* terminate any line in progress */
 static int EEPIC_linecount = 0;	/* number of points in line so far */
 #define EEPIC_LINEMAX 50	/* max value for linecount */
 
-#define EEPIC_NUM_COLORS 7
-static int eepic_color = 0;
-static char * eepic_colors[EEPIC_NUM_COLORS] =
-{
-	"\\color{black}\n",	/* border and axes (must be black!) */
-	"\\color{red}\n",
-	"\\color{blue}\n",
-	"\\color{green}\n",
-	"\\color{magenta}\n",
-	"\\color{cyan}\n",
-	"\\color{yellow}\n"
-};
-
 /* ARROWS */
 /* we use the same code as for LATEX */
 /* figure out the best arrow */
@@ -227,10 +214,10 @@ TERM_PUBLIC void
 EEPIC_init()
 {
     EEPIC_posx = EEPIC_posy = 0;
-	EEPIC_type = 0;
-	EEPIC_linecount = 0;
-	EEPIC_inline = FALSE;
-	eepic_color = 0;
+    EEPIC_type = 0;
+    EEPIC_linecount = 0;
+    EEPIC_inline = FALSE;
+    latex_use_color = eepic_color_on;
     fprintf(gpoutfile, "\
 %% GNUPLOT: LaTeX picture using EEPIC macros\n\
 \\setlength{\\unitlength}{%fpt}\n",
@@ -275,21 +262,14 @@ EEPIC_linetype(int linetype)
     EEPIC_endline();
 
     EEPIC_type = linetype % (eepic_numlines[eepic_lineset] - 2);
+    {
+	t_colorspec colorspec;
 
-	if ( eepic_color_on )
-	{
-		eepic_color = linetype;
-		if ( eepic_color < 0 )
-			eepic_color = 0;
-		else
-		{
-			eepic_color %= EEPIC_NUM_COLORS - 1;
-			eepic_color += 1;
-		}
-		fputs( eepic_colors[eepic_color], gpoutfile );
-	}
+	colorspec.type = TC_LT;
+	colorspec.lt = linetype;
+	LATEX_set_color(&colorspec);
+    }
 }
-
 
 
 TERM_PUBLIC void
@@ -494,12 +474,16 @@ EEPIC_options()
 	    eepic_color_on = TRUE;
 	    eepic_lineset = 2;
 	    c_token++;
-	} else if (almost_equals(c_token, "r$otate")) {
-	    eepic_true_rotate = TRUE;
+	} else if (almost_equals(c_token, "mono$chrome")) {
+	    eepic_color_on = FALSE;
+	    eepic_lineset = 0;
 	    c_token++;
 	} else if (almost_equals(c_token, "da$shed")) {
 	    if (! eepic_color_on)
 		eepic_lineset = 1;	/* ignore when color is on */
+	    c_token++;
+	} else if (almost_equals(c_token, "r$otate")) {
+	    eepic_true_rotate = TRUE;
 	    c_token++;
 	} else if (equals(c_token, "size")) {
 	    c_token++;
@@ -528,6 +512,11 @@ EEPIC_options()
 	} else
 	    int_error(c_token, "unrecognized option");
     } /* while(command) */
+
+    if (eepic_color_on)
+	term->flags &= ~TERM_MONOCHROME;
+    else
+	term->flags |= TERM_MONOCHROME;
 
     sprintf(term_options, "%s%s%s%s",
 	    eepic_color_on ? " color" : "",
@@ -559,10 +548,27 @@ TERM_TABLE_START(eepic_driver)
     EEPIC_linetype, EEPIC_put_text, EEPIC_text_angle,
     EEPIC_justify_text, EEPIC_point, EEPIC_arrow, set_font_null,
     0, /* pointsize */
-    0, /* flags */
+    TERM_IS_LATEX, /* flags */
     0, 0, /* suspend, resume */
     0, /* fillbox */
-    0  /* linewidth */
+    0,  /* linewidth */
+#ifdef USE_MOUSE
+    0, 0, 0, 0, 0,
+#endif
+    LATEX_make_palette, 0,
+    LATEX_set_color,
+    0,
+    0, /* image */
+    0, 0, 0, /* enhanced text */
+    0, /* layer */
+    0, /* path */
+    0.0, /* scale (unused) */
+    0, /* hypertext */
+#ifdef EAM_BOXED_TEXT
+    0,
+#endif
+    0,
+    0 /* dashtype */
 TERM_TABLE_END(eepic_driver)
 
 #undef LAST_TERM
@@ -591,12 +597,11 @@ START_HELP(eepic)
 " dvips and dvipdfm do support the \"tpic\" \\specials.",
 "",
 " Syntax:",
-"    set terminal eepic {default} {color|dashed} {rotate} {size XX,YY}",
+"    set terminal eepic {default} {color|monochrome|dashed}",
+"                       {rotate} {size XX,YY}",
 "                       {small|tiny|<fontsize>}",
 "",
-" Options:",
-" You can give options in any order you wish.",
-" 'color' causes gnuplot to produce \\color{...} commands so that the graphs are",
+" `color` causes gnuplot to produce \\color{...} commands so that the graphs are",
 " colored. Using this option, you must include \\usepackage{color} in the preamble",
 " of your latex document.",
 " 'dashed' will allow dashed line types; without this option, only solid lines",
