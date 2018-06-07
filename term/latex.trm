@@ -37,10 +37,10 @@
  *
  * This terminal driver supports:
  *   LaTeX pictures (latex).
- *   LaTeX pictures with emTeX specials (emtex).
+ *   LaTeX pictures with emTeX \specials (emtex).
  *   LaTeX pictures with tpic \specials (version 2.2).
  *   LaTeX pictures with eepic macros.
- *   LaTeX2e pciture (pict2e).
+ *   LaTeX2e picture (pict2e).
  *
  * AUTHORS
  *   David Kotz, Russell Lang (latex/emtex)
@@ -352,36 +352,28 @@ LATEX_options()
 {
     latex_explicit_size = FALSE;
 
+    // Backward compatibility with previous terminal names
+    c_token--; // see how we got here
+    // Note that we cannot test for "latex". That's the generic terminal name
+    if (equals(c_token, "emtex"))
+	LATEX_mode = LATEX_EMTEX;
+    else if (equals(c_token, "tpic"))
+	LATEX_mode = LATEX_TPIC;
+    else if (equals(c_token, "eepic"))
+	LATEX_mode = LATEX_EEPIC;
+    else if (equals(c_token, "pict2e"))
+	LATEX_mode = LATEX_PICT2E;
+    c_token++;
+
     while (!END_OF_COMMAND) {
 	enum LATEX_id cmd = (enum LATEX_id) lookup_table(&LATEX_opts[0], c_token);
 	switch (cmd) {
 	case LATEX_LATEX:
 	case LATEX_EMTEX:
-	    LATEX_mode = cmd;
-	    // These do no support filled polygons
-	    term->filled_polygon = NULL;
-	    term->fillbox = LATEX_fillbox;
-	    c_token++;
-	    break;
 	case LATEX_TPIC:
-	    LATEX_mode = cmd;
-	    // Filling is supported
-	    term->filled_polygon = TPIC_filled_polygon;
-	    term->fillbox = TPIC_fillbox;
-	    c_token++;
-	    break;
+	case LATEX_EEPIC:
 	case LATEX_PICT2E:
 	    LATEX_mode = cmd;
-	    // Solid fill is supported
-	    term->filled_polygon = PICT2E_filled_polygon;
-	    term->fillbox = PICT2E_fillbox;
-	    c_token++;
-	    break;
-	case LATEX_EEPIC:
-	    LATEX_mode = cmd;
-	    // Filling is supported
-	    term->filled_polygon = EEPIC_filled_polygon;
-	    term->fillbox = EEPIC_fillbox;
 	    c_token++;
 	    break;
 	case LATEX_COURIER:
@@ -445,6 +437,29 @@ LATEX_options()
 	    }
 	    int_error(c_token, "unrecognized option");
 	}
+    }
+
+    // Select box and polygon fill functions
+    switch (LATEX_mode) {
+    case LATEX_LATEX:
+    case LATEX_EMTEX:
+	term->filled_polygon = NULL;  // not available
+	term->fillbox = LATEX_fillbox;
+	break;
+    case LATEX_TPIC:
+	term->filled_polygon = TPIC_filled_polygon;
+	term->fillbox = TPIC_fillbox;
+	break;
+    case LATEX_EEPIC:
+	term->filled_polygon = EEPIC_filled_polygon;
+	term->fillbox = EEPIC_fillbox;
+	break;
+    case LATEX_PICT2E:
+	term->filled_polygon = PICT2E_filled_polygon;
+	term->fillbox = PICT2E_fillbox;
+	break;
+    default:
+	;
     }
 
     /* tell gnuplot core about char. sizes. Horizontal spacing
@@ -1823,7 +1838,6 @@ TERM_TABLE_END(latex_driver)
 
 #undef LAST_TERM
 #define LAST_TERM latex_driver
-
 
 #endif /* TERM_TABLE */
 
