@@ -115,9 +115,6 @@ static void plot_steps __PROTO((struct curve_points * plot));	/* JG */
 static void plot_fsteps __PROTO((struct curve_points * plot));	/* HOE */
 static void plot_histeps __PROTO((struct curve_points * plot));	/* CAC */
 
-static int edge_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey));
-static TBOOLEAN two_edge_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
-
 static void ytick2d_callback __PROTO((struct axis *, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels));
 static void xtick2d_callback __PROTO((struct axis *, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels));
 static void ttick_callback __PROTO((struct axis *, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels));
@@ -1040,11 +1037,9 @@ static void
 plot_lines(struct curve_points *plot)
 {
     int i;			/* point index */
-    int x, y;			/* point in terminal coordinates */
+    int x, y;			/* current point in terminal coordinates */
     struct termentry *t = term;
     enum coord_type prev = UNDEFINED;	/* type of previous point */
-    double ex, ey;		/* an edge point */
-    double lx[2], ly[2];	/* two edge points */
 
     /* If all the lines are invisible, don't bother to draw them */
     if (plot->lp_properties.l_type == LT_NODRAW)
@@ -1075,11 +1070,10 @@ plot_lines(struct curve_points *plot)
 		    if (!clip_lines1) {
 			(*t->move) (x, y);
 		    } else {
-			if (edge_intersect(plot->points, i, &ex, &ey))
-			    (*t->move) (map_x(ex), map_y(ey));
-			else
-			    (*t->move) (x, y);
-			(*t->vector) (x, y);
+			(*t->move) (x, y);
+			draw_clip_line( map_x(plot->points[i-1].x),
+					map_y(plot->points[i-1].y),
+					x, y);
 		    }
 		} else {	/* prev == UNDEFINED */
 		    (*t->move) (x, y);
@@ -1091,16 +1085,16 @@ plot_lines(struct curve_points *plot)
 		if (prev == INRANGE) {
 		    /* from inrange to outrange */
 		    if (clip_lines1) {
-			if (edge_intersect(plot->points, i, &ex, &ey))
-			    (*t->vector) (map_x(ex), map_y(ey));
+			draw_clip_line( map_x(plot->points[i-1].x),
+					map_y(plot->points[i-1].y),
+					x, y);
 		    }
 		} else if (prev == OUTRANGE) {
 		    /* from outrange to outrange */
 		    if (clip_lines2) {
-			if (two_edge_intersect(plot->points, i, lx, ly)) {
-			    (*t->move) (map_x(lx[0]), map_y(ly[0]));
-			    (*t->vector) (map_x(lx[1]), map_y(ly[1]));
-			}
+			draw_clip_line( map_x(plot->points[i-1].x),
+					map_y(plot->points[i-1].y),
+					x, y);
 		    }
 		}
 		break;
@@ -3032,358 +3026,6 @@ plot_boxplot(struct curve_points *plot)
     plot->points = save_points;
     plot->p_count = saved_p_count;
     }
-}
-
-
-/* Given two successive data points, one inside and one outside the plot,
- * return the point where an edge of the plot intersects the line segment
- * connecting the two points.
- * Return value bit field: LEFT_EDGE RIGHT_EDGE TOP_EDGE BOTTOM_EDGE
- *                      0: zero-length segment (don't draw it)
- * FIXME:
- *	This was written assuming linear axes (pre-v5 logscale treatment
- *	stored already-logged values so the axis acted as if were linear).
- *	It is currently always wrong for nonlinear axes, including logscale.
- */
-static int
-edge_intersect(
-    struct coordinate GPHUGE *points, /* the points array */
-    int i,			/* line segment from point i-1 to point i */
-    double *ex, double *ey)	/* the point where it crosses an edge */
-{
-    double ix = points[i - 1].x;
-    double iy = points[i - 1].y;
-    double ox = points[i].x;
-    double oy = points[i].y;
-    double x, y;		/* possible intersection point */
-
-    if (points[i].type == INRANGE) {
-	/* swap points so that ix/ix/iz are INRANGE and ox/oy/oz are OUTRANGE */
-	x = ix;
-	ix = ox;
-	ox = x;
-	y = iy;
-	iy = oy;
-	oy = y;
-    }
-
-    /* Nasty degenerate cases, effectively drawing to an infinity point (?).
-     * If more than one coord is -VERYLARGE, then can't ratio the "infinities"
-     * so drop out by returning the INRANGE point.
-     * We only need to test the OUTRANGE point 
-     * FIXME:  not sure this case can happen in version 5.
-     */
-    if (ox == -VERYLARGE || oy == -VERYLARGE) {
-	*ex = ix;
-	*ey = iy;
-
-	if (ox == -VERYLARGE) {
-	    /* can't get a direction to draw line, so simply
-	     * return INRANGE point */
-	    if (oy == -VERYLARGE)
-		return LEFT_EDGE|BOTTOM_EDGE;
-
-	    *ex = X_AXIS.min;
-	    return LEFT_EDGE;
-	}
-	/* obviously oy is -VERYLARGE and ox != -VERYLARGE */
-	*ey = Y_AXIS.min;
-	return BOTTOM_EDGE;
-    }
-
-    /* Can't have case (ix == ox && iy == oy) as one point
-     * is INRANGE and one point is OUTRANGE.
-     */
-    if (iy == oy) {
-	/* horizontal line */
-	/* assume inrange(iy, Y_AXIS.min, Y_AXIS.max) */
-	*ey = iy;		/* == oy */
-
-	if (inrange(X_AXIS.max, ix, ox) && X_AXIS.max != ix) {
-	    *ex = X_AXIS.max;
-	    return RIGHT_EDGE;
-	}
-	if (inrange(X_AXIS.min, ix, ox) && X_AXIS.min != ix) {
-	    *ex = X_AXIS.min;
-	    return LEFT_EDGE;
-	}
-
-    } else if (ix == ox) {
-	/* vertical line */
-	/* assume inrange(ix, X_AXIS.min, X_AXIS.max) */
-	*ex = ix;		/* == ox */
-
-	if (inrange(Y_AXIS.max, iy, oy) && Y_AXIS.max != iy) {
-	    *ey = Y_AXIS.max;
-	    return TOP_EDGE;
-	}
-	if (inrange(Y_AXIS.min, iy, oy) && Y_AXIS.min != iy) {
-	    *ey = Y_AXIS.min;
-	    return BOTTOM_EDGE;
-	}
-
-    } else {
-	/* slanted line of some kind */
-
-	/* does it intersect Y_AXIS.min edge */
-	if (inrange(Y_AXIS.min, iy, oy) && Y_AXIS.min != iy && Y_AXIS.min != oy) {
-	    x = ix + (Y_AXIS.min - iy) * ((ox - ix) / (oy - iy));
-	    if (inrange(x, X_AXIS.min, X_AXIS.max)) {
-		*ex = x;
-		*ey = Y_AXIS.min;
-		return BOTTOM_EDGE;		/* yes */
-	    }
-	}
-	/* does it intersect Y_AXIS.max edge */
-	if (inrange(Y_AXIS.max, iy, oy) && Y_AXIS.max != iy && Y_AXIS.max != oy) {
-	    x = ix + (Y_AXIS.max - iy) * ((ox - ix) / (oy - iy));
-	    if (inrange(x, X_AXIS.min, X_AXIS.max)) {
-		*ex = x;
-		*ey = Y_AXIS.max;
-		return TOP_EDGE;		/* yes */
-	    }
-	}
-	/* does it intersect X_AXIS.min edge */
-	if (inrange(X_AXIS.min, ix, ox) && X_AXIS.min != ix && X_AXIS.min != ox) {
-	    y = iy + (X_AXIS.min - ix) * ((oy - iy) / (ox - ix));
-	    if (inrange(y, Y_AXIS.min, Y_AXIS.max)) {
-		*ex = X_AXIS.min;
-		*ey = y;
-		return LEFT_EDGE;
-	    }
-	}
-	/* does it intersect X_AXIS.max edge */
-	if (inrange(X_AXIS.max, ix, ox) && X_AXIS.max != ix && X_AXIS.max != ox) {
-	    y = iy + (X_AXIS.max - ix) * ((oy - iy) / (ox - ix));
-	    if (inrange(y, Y_AXIS.min, Y_AXIS.max)) {
-		*ex = X_AXIS.max;
-		*ey = y;
-		return RIGHT_EDGE;
-	    }
-	}
-    }
-
-    /* If we reach here, either the outrange point is UNDEFINED
-     * or the inrange point is on an edge and the line segment from the
-     * outrange point does not cross any other edges to get there.
-     * The zero value return indicates no line should be drawn.
-     */
-    return 0;
-}
-
-
-/* double edge intersection algorithm */
-/* Given two points, both outside the plot, return
- * the points where an edge of the plot intersects the line segment defined
- * by the two points. There may be zero, one, two, or an infinite number
- * of intersection points. (One means an intersection at a corner, infinite
- * means overlaying the edge itself). We return FALSE when there is nothing
- * to draw (zero intersections), and TRUE when there is something to
- * draw (the one-point case is a degenerate of the two-point case and we do
- * not distinguish it - we draw it anyway).
- * FIXME:  Assumes linear axis scaling
- */
-static TBOOLEAN			/* any intersection? */
-two_edge_intersect(
-    struct coordinate GPHUGE *points, /* the points array */
-    int i,			/* line segment from point i-1 to point i */
-    double *lx, double *ly)	/* lx[2], ly[2]: points where it crosses edges */
-{
-    /* global X_AXIS.min, X_AXIS.max, Y_AXIS.min, X_AXIS.max */
-    int count;
-    double ix = points[i - 1].x;
-    double iy = points[i - 1].y;
-    double ox = points[i].x;
-    double oy = points[i].y;
-    double t[4];
-    double swap;
-    double t_min, t_max;
-
-    /* nasty degenerate cases, effectively drawing to an infinity
-     * point (?)  cope with them here, so don't process them as a
-     * "real" OUTRANGE point
-
-     * If more than one coord is -VERYLARGE, then can't ratio the
-     * "infinities" so drop out by returning FALSE */
-
-    count = 0;
-    if (ix == -VERYLARGE)
-	count++;
-    if (ox == -VERYLARGE)
-	count++;
-    if (iy == -VERYLARGE)
-	count++;
-    if (oy == -VERYLARGE)
-	count++;
-
-    /* either doesn't pass through graph area *or* can't ratio
-     * infinities to get a direction to draw line, so simply
-     * return(FALSE) */
-    if (count > 1) {
-	return (FALSE);
-    }
-
-    if (ox == -VERYLARGE || ix == -VERYLARGE) {
-	/* Horizontal line */
-	if (ix == -VERYLARGE) {
-	    /* swap points so ix/iy don't have a -VERYLARGE component */
-	    swap = ix;
-	    ix = ox;
-	    ox = swap;
-	    swap = iy;
-	    iy = oy;
-	    oy = swap;
-	}
-	/* check actually passes through the graph area */
-	if (ix > GPMAX(X_AXIS.max, X_AXIS.min)
-	    && inrange(iy, Y_AXIS.min, Y_AXIS.max)) {
-	    lx[0] = X_AXIS.min;
-	    ly[0] = iy;
-
-	    lx[1] = X_AXIS.max;
-	    ly[1] = iy;
-	    return (TRUE);
-	} else {
-	    return (FALSE);
-	}
-    }
-    if (oy == -VERYLARGE || iy == -VERYLARGE) {
-	/* Vertical line */
-	if (iy == -VERYLARGE) {
-	    /* swap points so ix/iy don't have a -VERYLARGE component */
-	    swap = ix;
-	    ix = ox;
-	    ox = swap;
-	    swap = iy;
-	    iy = oy;
-	    oy = swap;
-	}
-	/* check actually passes through the graph area */
-	if (iy > GPMAX(Y_AXIS.min, Y_AXIS.max)
-	    && inrange(ix, X_AXIS.min, X_AXIS.max)) {
-	    lx[0] = ix;
-	    ly[0] = Y_AXIS.min;
-
-	    lx[1] = ix;
-	    ly[1] = Y_AXIS.max;
-	    return (TRUE);
-	} else {
-	    return (FALSE);
-	}
-    }
-    /*
-     * Special horizontal/vertical, etc. cases are checked and remaining
-     * slant lines are checked separately.
-     *
-     * The slant line intersections are solved using the parametric form
-     * of the equation for a line, since if we test x/y min/max planes explicitly
-     * then e.g. a  line passing through a corner point (X_AXIS.min,Y_AXIS.min)
-     * actually intersects 2 planes and hence further tests would be required
-     * to anticipate this and similar situations.
-     */
-
-    /*
-     * Can have case (ix == ox && iy == oy) as both points OUTRANGE
-     */
-    if (ix == ox && iy == oy) {
-	/* but as only define single outrange point, can't intersect graph area */
-	return (FALSE);
-    }
-    if (ix == ox) {
-	/* line parallel to y axis */
-
-	/* x coord must be in range, and line must span both Y_AXIS.min and Y_AXIS.max */
-	/* note that spanning Y_AXIS.min implies spanning Y_AXIS.max, as both points OUTRANGE */
-	if (!inrange(ix, X_AXIS.min, X_AXIS.max)) {
-	    return (FALSE);
-	}
-	if (inrange(Y_AXIS.min, iy, oy)) {
-	    lx[0] = ix;
-	    ly[0] = Y_AXIS.min;
-
-	    lx[1] = ix;
-	    ly[1] = Y_AXIS.max;
-	    return (TRUE);
-	} else
-	    return (FALSE);
-    }
-    if (iy == oy) {
-	/* already checked case (ix == ox && iy == oy) */
-
-	/* line parallel to x axis */
-	/* y coord must be in range, and line must span both X_AXIS.min and X_AXIS.max */
-	/* note that spanning X_AXIS.min implies spanning X_AXIS.max, as both points OUTRANGE */
-	if (!inrange(iy, Y_AXIS.min, Y_AXIS.max)) {
-	    return (FALSE);
-	}
-	if (inrange(X_AXIS.min, ix, ox)) {
-	    lx[0] = X_AXIS.min;
-	    ly[0] = iy;
-
-	    lx[1] = X_AXIS.max;
-	    ly[1] = iy;
-	    return (TRUE);
-	} else
-	    return (FALSE);
-    }
-    /* nasty 2D slanted line in an xy plane */
-
-    /* From here on, it's essentially the classical Cyrus-Beck, or
-     * Liang-Barsky algorithm for line clipping to a rectangle */
-    /*
-       Solve parametric equation
-
-       (ix, iy) + t (diff_x, diff_y)
-
-       where 0.0 <= t <= 1.0 and
-
-       diff_x = (ox - ix);
-       diff_y = (oy - iy);
-     */
-
-    t[0] = (X_AXIS.min - ix) / (ox - ix);
-    t[1] = (X_AXIS.max - ix) / (ox - ix);
-    if (t[0] > t[1]) {
-	swap = t[0];
-	t[0] = t[1];
-	t[1] = swap;
-    }
-
-    t[2] = (Y_AXIS.min - iy) / (oy - iy);
-    t[3] = (Y_AXIS.max - iy) / (oy - iy);
-    if (t[2] > t[3]) {
-	swap = t[2];
-	t[2] = t[3];
-	t[3] = swap;
-    }
-
-    t_min = GPMAX(GPMAX(t[0], t[2]), 0.0);
-    t_max = GPMIN(GPMIN(t[1], t[3]), 1.0);
-
-    if (t_min > t_max)
-	return (FALSE);
-
-    lx[0] = ix + t_min * (ox - ix);
-    ly[0] = iy + t_min * (oy - iy);
-
-    lx[1] = ix + t_max * (ox - ix);
-    ly[1] = iy + t_max * (oy - iy);
-
-    /*
-     * Can only have 0 or 2 intersection points -- only need test one coord
-     */
-    /* FIXME: this is UGLY. Need an 'almost_inrange()' function */
-    if (inrange(lx[0],
-		(X_AXIS.min - 1e-5 * (X_AXIS.max - X_AXIS.min)),
-		(X_AXIS.max + 1e-5 * (X_AXIS.max - X_AXIS.min)))
-	&& inrange(ly[0],
-		   (Y_AXIS.min - 1e-5 * (Y_AXIS.max - Y_AXIS.min)),
-		   (Y_AXIS.max + 1e-5 * (Y_AXIS.max - Y_AXIS.min))))
-    {
-
-	return (TRUE);
-    }
-    return (FALSE);
 }
 
 

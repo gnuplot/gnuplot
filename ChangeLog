@@ -1,3 +1,26 @@
+2018-06-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_lines):
+
+	Until now there have been two code paths to clip line segments to the
+	portion within a bounding box (usually the plot boundaries).
+	Plot styles "lines" and "linespoints" clip in the coordinate space
+	of the plot axes via routines edge_intersect() and two_edge_intersect().
+	Originally these routines had other callers as well, but those have all
+	been rewritten.  Most of them first transform into terminal coordinates
+	and then use draw_clip_line().  This split has led to clipping bugs that
+	affected only some objects or plot conditions, e.g.
+	Bugs #2030 #2046.
+	
+	Now we convert the routine graphics.c (plot_lines) to clip in terminal
+	coordinate space using draw_clip_line().  This leaves no remaining
+	callers of the edge_intersect routines, so remove them.
+	
+	Output before and after this change is not pixel-for-pixel identical
+	because the calculated intersection of a line with the bounding box
+	boundary comes out differ due to rounding when we are working in
+	terminal coordinates (int) rather than plot coordinates (double).
+
 2018-06-01  Release 5.2.4
 
 	Released earlier than usual in order to correct regressions in 5.2.3
