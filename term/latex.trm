@@ -311,7 +311,7 @@ enum LATEX_id {
     LATEX_LATEX, LATEX_EMTEX, LATEX_TPIC, LATEX_EEPIC, LATEX_PICT2E,
     LATEX_OTHER
 };
-enum LATEX_id LATEX_mode = LATEX_LATEX;
+enum LATEX_id LATEX_mode = LATEX_PICT2E;
 
 static struct gen_table LATEX_opts[] =
 {
@@ -339,6 +339,7 @@ static struct gen_table LATEX_opts[] =
     { "s$mall", LATEX_SMALL },
     { "t$iny", LATEX_TINY },
     { "latex", LATEX_LATEX },
+    { "legacy", LATEX_LATEX },
     { "emtex", LATEX_EMTEX },
     { "tpic", LATEX_TPIC },
     { "eepic", LATEX_EEPIC },
@@ -476,7 +477,7 @@ LATEX_options()
 
     switch (LATEX_mode) {
     case LATEX_LATEX:
-	sprintf(&(term_options[strlen(term_options)]), " latex");
+	sprintf(&(term_options[strlen(term_options)]), " legacy");
 	break;
     case LATEX_EMTEX:
 	sprintf(&(term_options[strlen(term_options)]), " emtex");
@@ -1880,13 +1881,13 @@ START_HELP(latex)
 " line drawing and area filling.",
 "",
 " Syntax:",
-"       set terminal latex {latex | emtex | tpic | eepic | pict2e}",
+"       set terminal latex {legacy | emtex | tpic | eepic | pict2e}",
 "                    {default | {courier|roman} {<fontsize>}}",
 "                    {size <XX>{unit}, <YY>{unit}} {rotate | norotate}",
 "                    {color | monochrome}",
 "                    {small | tiny | normal}",
 "",
-" The `latex` option selects the original picture environment, which has some",
+" The `legacy` option selects the original picture environment, which has some",
 " rather severe limitations. `emtex` uses emTeX \\special commands to overcome",
 " some of them. `tpic` uses tpic \\specials. These need to be supported by",
 " your DVI driver. emTeX and tpic \\specials are supported by dvips and",
@@ -1894,7 +1895,7 @@ START_HELP(latex)
 " package. These also emit tpic \\specials. Alternatively, you can use it",
 " with the `bxeepic` and `pict2e` packages. `pict2e` uses the LaTeX2e variant",
 " of the picture environment directly.  You need to add \"\\usepackage{pict2e}\"",
-" to your file. This is the recommended variant.",
+" to your file. This is the recommended and default variant.",
 "",
 " By default the plot will inherit font settings from the embedding document.",
 " You have the option of forcing either Courier (cmtt) or Roman (cmr) fonts",
