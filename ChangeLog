@@ -1,3 +1,7 @@
+2018-06-01  Release 5.2.4
+
+	Released earlier than usual in order to correct regressions in 5.2.3
+
 2018-05-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (eval_link_function) src/eval.c src/internal.c:
