@@ -2115,12 +2115,16 @@ void wxt_graphics()
 
 	/* set or refresh terminal size according to the window size */
 	/* oversampling_scale is updated in gp_cairo_initialize_context */
-	term->xmax = (unsigned int) wxt_current_plot->device_xmax*wxt_current_plot->oversampling_scale;
-	term->ymax = (unsigned int) wxt_current_plot->device_ymax*wxt_current_plot->oversampling_scale;
-	wxt_current_plot->xmax = term->xmax;
-	wxt_current_plot->ymax = term->ymax;
+	wxt_current_plot->xmax = wxt_current_plot->device_xmax*wxt_current_plot->oversampling_scale;
+	wxt_current_plot->ymax = wxt_current_plot->device_ymax*wxt_current_plot->oversampling_scale;
 	/* initialize encoding */
 	wxt_current_plot->encoding = encoding;
+
+	/* Adjust for the mismatch of floating point coordinate range 0->max	*/
+	/* and integer terminal pixel coordinates [0:max-1].			*/
+	term->xmax = (wxt_current_plot->device_xmax - 1) * wxt_current_plot->oversampling_scale;
+	term->ymax = (wxt_current_plot->device_ymax - 1) * wxt_current_plot->oversampling_scale;
+	term->tscale = wxt_current_plot->oversampling_scale;
 
 	wxt_MutexGuiLeave();
 
