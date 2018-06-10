@@ -887,11 +887,12 @@ FIG_arrow(
     FIG_poly_clean(FIG_polyvec_stat);
     cap_style = (FIG_line.style==DOTTED_LINE)? CAP_ROUND : FIG_line.cap_style;
     fprintf(gpoutfile, "%d %d %d %d %d %d %d %d %d %9.3f %d %d %d %d %d %d\n",
-	    O_POLYLINE, FIG_line.type, FIG_type, FIG_thickness,
+	    O_POLYLINE, FIG_line.type, FIG_type,
+	    (head & HEADS_ONLY) ? 0 : FIG_thickness,
 	    FIG_color, FIG_color, FIG_linedepth,
 	    FIG_line.pen_style, FIG_line.fill_style, FIG_spacing,
 	    FIG_line.join_style, cap_style, FIG_line.radius,
-	    head ? 1 : 0, head==2 ? 1 : 0, 2);
+	    (head & END_HEAD) ? 1 : 0, (head & BACKHEAD) ? 1 : 0, 2);
 
     /* arrow head(s) */
     if (head) {
@@ -899,7 +900,7 @@ FIG_arrow(
 	unsigned int headfillparameter = 0;
 
 	/* arrow head size */
-	if (curr_arrow_headlength==0) {
+	if (curr_arrow_headlength == 0) {
 	    awidth  = (double) (term->h_tic / 2 + 1);
 	    aheight = (double) term->h_tic;
 	} else {
@@ -921,11 +922,12 @@ FIG_arrow(
 	    headfillparameter = 0;
 
 	/* forward head */
-	fprintf(gpoutfile, "%d %d %.3f %.3f %.3f\n",
-		headbackangleparameter, headfillparameter,
-		1.0, awidth, aheight);
+	if ((head & END_HEAD))
+	    fprintf(gpoutfile, "%d %d %.3f %.3f %.3f\n",
+		    headbackangleparameter, headfillparameter,
+		    1.0, awidth, aheight);
 	/* backward head */
-	if (head==2)
+	if ((head & BACKHEAD))
 	    fprintf(gpoutfile, "%d %d %.3f %.3f %.3f\n",
 		    headbackangleparameter,  headfillparameter,
 		    1.0, awidth, aheight);
