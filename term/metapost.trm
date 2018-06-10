@@ -516,7 +516,9 @@ ptpath4 = ptpath8:= fullcircle;\n\
 ptpath5 = ptpath9 := (0,1/2)--(-1/2,-1/2)--(1/2,-1/2)--cycle;\n\
 \n\
 def linetype expr n =\n\
-  currentcolor:= if colorlines : col[n] else: black fi;\n\
+  if n > -3 :\n\
+      currentcolor:= if colorlines : col[n] else: black fi;\n\
+  fi\n\
   currentdash:= if dashedlines : lt[n] else: dashpattern(on 1) fi;\n\
   if n = -1 :\n\
       drawoptions(withcolor currentcolor withpen (currentpen scaled .5));\n\
@@ -527,6 +529,7 @@ enddef;\n\
 \n\
 % dash patterns\n\
 picture lt[];\n\
+lt[-3]:=dashpattern(off 1 on 0);\n\
 lt[-2]:=lt[-1]:=lt0:=dashpattern(on 1);\n\
 lt1=dashpattern(on 2 off 2); % dashes\n\
 lt2=dashpattern(on 2 off 2 on 0.2 off 2); %dash-dot\n\
@@ -699,17 +702,31 @@ TERM_PUBLIC void
 MP_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head)
 {
     MP_move(sx, sy);
-    if (head) {
+
+    if ((head & HEADS_ONLY))
+	MP_linetype(LT_NODRAW);
+    if ((head & BOTH_HEADS) == BOTH_HEADS) {
 	fprintf(gpoutfile, "%s (%.1fa,%.1fb)--(%.1fa,%.1fb);\n",
-		head == 1 ? "drawarrow" : "drawdblarrow",
+		"drawdblarrow",
 		sx / 10.0, sy / 10.0, ex / 10.0, ey / 10.0);
-    } else if ((sx != ex) || (sy != ey)) {
+    } else if ((head & END_HEAD)) {
+	if (head & HEADS_ONLY) fprintf(gpoutfile, "linetype -3;\n");
+	fprintf(gpoutfile, "%s (%.1fa,%.1fb)--(%.1fa,%.1fb);\n",
+		"drawarrow",
+		sx / 10.0, sy / 10.0, ex / 10.0, ey / 10.0);
+    } else if ((head & BACKHEAD)) {
+	fprintf(gpoutfile, "%s (%.1fa,%.1fb)--(%.1fa,%.1fb);\n",
+		"drawarrow",
+		ex / 10.0, ey / 10.0, sx / 10.0, sy / 10.0);
+    } else if (!(head & HEADS_ONLY) && ((sx != ex) || (sy != ey))) {
 	fprintf(gpoutfile, "draw (%.1fa,%.1fb)--(%.1fa,%.1fb);\n",
 		sx / 10.0, sy / 10.0, ex / 10.0, ey / 10.0);
-    }	/* else: arrow with no length and no head = sound of one hand clapping? */
+    }
+    if ((head & HEADS_ONLY))
+	MP_linetype(MP_oldline);
+
     MP_posx = ex;
     MP_posy = ey;
-
 }
 
 TERM_PUBLIC void
@@ -886,7 +903,8 @@ MP_set_color(t_colorspec *colorspec)
     double gray = colorspec->value;
     rgb_color color;
 
-    /* remeber that we changed the color, needed to reset color in MP_linetype()*/
+    /* remember that we changed the color, needed to reset color in MP_linetype()*/
+    /* FIXME: only set this if the color really did change (compare to previous color) */
     MP_color_changed = 1;
 
     if (MP_inline)
