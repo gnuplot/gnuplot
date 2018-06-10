@@ -339,10 +339,17 @@ draw_clip_arrow( double dsx, double dsy, double dex, double dey, t_arrow_head he
 	head &= ~END_HEAD;
 
     /* clip_line returns 0 if the whole thing is out of range */
-    if (clip_line(&sx, &sy, &ex, &ey))
-    {
+    if (!clip_line(&sx, &sy, &ex, &ey))
+	return;
+
+    /* Special case code for short vectors */
+    /* Most terminals are OK with using this code for long vectors also.	*/
+    /* However some terminals (e.g. tikz) look terrible because the shaft of a	*/
+    /* long vector overruns the head when the head is drawn with HEADS_ONLY.	*/
+    /* FIXME:  this is a very ad hoc definition of "short".			*/
+    if (abs(ex-sx) < 25 && abs(ey-sy) < 25) {
 	/* draw the body of the vector (rounding errors are a problem) */
-	if (abs(ex-sx) > 1 || abs(ey-sy) > 1)
+	if (!((t->flags & TERM_IS_LATEX)))
 	    (*t->arrow)(sx, sy, ex, ey, SHAFT_ONLY | head);
 
 	/* if we're not supposed to be drawing any heads, we're done */
@@ -372,6 +379,9 @@ draw_clip_arrow( double dsx, double dsy, double dex, double dey, t_arrow_head he
 	} else {
 	    (*t->arrow)(sx, sy, ex, ey, head|HEADS_ONLY);
 	}
+    } else {
+	/* The normal case, draw the whole thing at once */
+	(*t->arrow)(sx, sy, ex, ey, head);
     }
 }
 

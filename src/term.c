@@ -980,7 +980,7 @@ do_arrow(
     int xm = 0, ym = 0;
     BoundingBox *clip_save;
 
-    /* The arrow shaft was clipped already in do_clip_arrow() but we still */
+    /* The arrow shaft was clipped already in draw_clip_arrow() but we still */
     /* need to clip the head here. */
     clip_save = clip_area;
     if (term->flags & TERM_CAN_CLIP)

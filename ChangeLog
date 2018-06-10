@@ -1,3 +1,16 @@
+2018-06-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.c (draw_clip_arrow) term/lua.trm term/lua/gnuplot-tikz.lua
+
+	Some terminals that provide a private term->arrow function were
+	adversely affected by addition of flag HEADS_ONLY in commit ad80fe530.
+	
+	This commit does two things.
+	1) It teaches the tikz terminal about HEADS_ONLY so that the short
+	   vector variant works correctly.
+	2) The core routine draw_clip_arrow only uses the 2-step drawing process
+	   for vectors that are short (for a rather ad hoc definition of "short").
+
 2018-05-16  Miroslav Sulc <msulc@users.sourceforge.net>
 
 	* src/misc.c: Support ARGC/ARGV parameter convention for "call".

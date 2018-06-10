@@ -74,8 +74,8 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
-pgf.REVISION = "105"
-pgf.REVISION_DATE = "2018/03/13 18:43:00"
+pgf.REVISION = "106"
+pgf.REVISION_DATE = "2018/06/09 11:39:00"
 
 pgf.styles = {}
 
@@ -1378,8 +1378,10 @@ gfx.TEXT_ANCHOR = {
   ["right"]  = "gp node right"
 }
 
-gfx.HEAD_STR = {"", "->", "<-", "<->"}
-
+-- expand bit patterns to integers
+gfx.HEAD_STR = {"", "->", "<-", "<->", 
+                ",draw opacity=0", "->,draw opacity=0", "<-,draw opacity=0", "<->,draw opacity=0",
+		""}
 
 -- conversion factors in `cm'
 gfx.units = {

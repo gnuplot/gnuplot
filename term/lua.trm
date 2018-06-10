@@ -565,7 +565,7 @@ LUA_set_term_vars(void) {
   lua_setfield(L, luaterm, "TERM_INIT_ON_REPLOT");
   lua_pushinteger(L, TERM_IS_POSTSCRIPT);     /* post, next, pslatex, etc        */
   lua_setfield(L, luaterm, "TERM_IS_POSTSCRIPT");
-  lua_pushinteger(L, TERM_IS_LATEX);     /* post, next, pslatex, etc        */
+  lua_pushinteger(L, TERM_IS_LATEX);
   lua_setfield(L, luaterm, "TERM_IS_LATEX");
   lua_pushinteger(L, TERM_ENHANCED_TEXT);     /* enhanced text mode is enabled   */
   lua_setfield(L, luaterm, "TERM_ENHANCED_TEXT");
