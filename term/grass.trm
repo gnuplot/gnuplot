@@ -74,8 +74,6 @@ TERM_PUBLIC int GRASS_text_angle __PROTO((int ang));
 TERM_PUBLIC int GRASS_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void GRASS_point __PROTO((unsigned int x, unsigned int y, int point));
 TERM_PUBLIC int GRASS_set_font __PROTO((const char *font));
-/* TERM_PUBLIC void GRASS_set_pointsize __PROTO((double size)); */
-TERM_PUBLIC void GRASS_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
 #endif /* TERM_PROTO */
 
 #ifndef TERM_PROTO_ONLY
@@ -582,26 +580,6 @@ romans,romant,scriptc,scripts */
   return TRUE;
 }
 
-#ifdef GRASS_POINTSIZE
-/* HBB FIXME 20040619: argument type wrong, but luckily unused anyway... */
-TERM_PUBLIC void
-GRASS_set_pointsize(double *size)
-{
-  return;
-}
-#endif /* GRASS_POINTSIZE */
-
-/* need to fix */
-TERM_PUBLIC void
-GRASS_arrow(
-    unsigned int sx, unsigned int sy,
-    unsigned int ex, unsigned int ey,
-    int head)
-{
-  do_arrow (sx, sy, ex, ey, 1);
-  return;
-}
-
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -611,7 +589,7 @@ TERM_TABLE_START(grass_driver)
     GRASS_VTIC, GRASS_HTIC, GRASS_options, GRASS_init, GRASS_reset,
     GRASS_text, null_scale, GRASS_graphics, GRASS_move, GRASS_vector,
     GRASS_linetype, GRASS_put_text, GRASS_text_angle,
-    GRASS_justify_text, GRASS_point, GRASS_arrow, GRASS_set_font
+    GRASS_justify_text, GRASS_point, do_arrow, GRASS_set_font
 TERM_TABLE_END(grass_driver)
 
 
