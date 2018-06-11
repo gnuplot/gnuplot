@@ -661,7 +661,8 @@ DUMB_arrow(
     else dumb_pen = '.';
     dumb_x = sx;
     dumb_y = sy;
-    DUMB_vector(ex, ey);
+    if (!(head & HEADS_ONLY))
+	DUMB_vector(ex, ey);
 
     /* Arrow head */
     if (head != NOHEAD) {
