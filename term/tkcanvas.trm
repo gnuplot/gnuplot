@@ -114,7 +114,9 @@ TERM_PUBLIC void TK_put_text(unsigned int x, unsigned int y, const char *str);
 TERM_PUBLIC void TK_reset(void);
 TERM_PUBLIC int  TK_justify_text(enum JUSTIFY);
 TERM_PUBLIC void TK_point(unsigned int, unsigned int, int);
+#if 0
 TERM_PUBLIC void TK_arrow(unsigned int, unsigned int, unsigned int, unsigned int, int);
+#endif
 TERM_PUBLIC int  TK_set_font(const char *font);
 TERM_PUBLIC void TK_enhanced_open(char * fontname, double fontsize,
 				  double base, TBOOLEAN widthflag, TBOOLEAN showflag, int overprint);
@@ -1551,6 +1553,7 @@ TK_point(unsigned int x, unsigned int y, int point)
 }
 
 
+#if (0) /* private arrow routine does not handle HEAD_ONLY */
 static char *tk_line_arrow[TK_LANG_MAX] = {
   /* Tcl */
     " -arrow %s",
@@ -1584,8 +1587,8 @@ static char *tk_line_arrowshape[TK_LANG_MAX] = {
 TERM_PUBLIC
 void TK_arrow(unsigned int usx, unsigned int usy, unsigned int uex, unsigned int uey, int head)
 {
-    /* NOHEAD = 0, END_HEAD = 1, BACKHEAD = 2, BOTH_HEADS = 3 */
-    const char * arrow[BOTH_HEADS + 1] = { "none", "last", "first", "both" };
+    /* NOHEAD = 0, END_HEAD = 1, BACKHEAD = 2, BOTH_HEADS = 3, HEADS_ONLY = 4 */
+    const char * arrow[4] = { "none", "last", "first", "both" };
     /* NOTE: we really need integer arguments. Why are the arguments unsigned in the first place? */
     int sx = (int) usx;
     int sy = (int) usy;
@@ -1594,7 +1597,6 @@ void TK_arrow(unsigned int usx, unsigned int usy, unsigned int uex, unsigned int
 
     TK_flush_line();
     if (curr_arrow_headfilled >= AS_FILLED) { /* AS_FILLED, AS_NOBORDER */
-	assert(abs(head) <= BOTH_HEADS);
 
 	fputs(tk_line_segment_start[tk_script_language], gpoutfile);
 	fprintf(gpoutfile, tk_poly_point[tk_script_language], sx, TK_YMAX - sy);
@@ -1613,7 +1615,7 @@ void TK_arrow(unsigned int usx, unsigned int usy, unsigned int uex, unsigned int
 	    if (length <= 1) length = 2;
 	    if (tiplen < 1) tiplen = 1;
 
-	    fprintf(gpoutfile, tk_line_arrow[tk_script_language], arrow[abs(head)]);
+	    fprintf(gpoutfile, tk_line_arrow[tk_script_language], arrow[ (head & BOTH_HEADS) ]);
 	    fprintf(gpoutfile, tk_line_arrowshape[tk_script_language], length, tiplen, width);
 	} else if (head != NOHEAD) {
 	    double dx = sx - ex;
@@ -1624,7 +1626,7 @@ void TK_arrow(unsigned int usx, unsigned int usy, unsigned int uex, unsigned int
 	    int length = (int) (COS15 * head_coeff);
 	    int width  = (int) (SIN15 * head_coeff);
 
-	    fprintf(gpoutfile, tk_line_arrow[tk_script_language], arrow[abs(head)]);
+	    fprintf(gpoutfile, tk_line_arrow[tk_script_language], arrow[ (head & BOTH_HEADS) ]);
 	    fprintf(gpoutfile, tk_line_arrowshape[tk_script_language], length, length, width);
 	}
 	if (tk_dashpattern[0] != NUL)
@@ -1636,6 +1638,7 @@ void TK_arrow(unsigned int usx, unsigned int usy, unsigned int uex, unsigned int
 	do_arrow(sx, sy, ex, ey, head);
     }
 }
+#endif
 
 
 static char *tk_endblock[TK_LANG_MAX] = {
@@ -2103,7 +2106,7 @@ TERM_TABLE_START(tkcanvas)
     TK_options, TK_init, TK_reset,
     TK_text, null_scale, TK_graphics, TK_move, TK_vector,
     TK_linetype, TK_put_text, null_text_angle,
-    TK_justify_text, TK_point, TK_arrow, TK_set_font,
+    TK_justify_text, TK_point, do_arrow, TK_set_font,
     NULL /* set_pointsize */,
     TERM_CAN_MULTIPLOT |  TERM_ENHANCED_TEXT,
     /* FIXME: Options not yet implemented */
