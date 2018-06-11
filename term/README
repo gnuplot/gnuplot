@@ -51,7 +51,7 @@ struct TERMENTRY {
     int (*justify_text) __PROTO((enum JUSTIFY));
     void (*point) __PROTO((unsigned int, unsigned int,int));
     void (*arrow) __PROTO((unsigned int, unsigned int, unsigned int,
-                           unsigned int, TBOOLEAN));
+                           unsigned int, int));
    int (*set_font) __PROTO((const char *font));  /* "font,size" */
    void (*pointsize) __PROTO((double pointsize));
    int flags;                       /* various flags */
@@ -297,7 +297,8 @@ pointsize() function will be called.
 
 
 _arrow(sx,sy,ex,ey,head)  Called to draw an arrow from (sx,sy) to (ex,ey).
-A head is drawn on the arrow if head = TRUE.
+"head" is a bitfield controlling where/if arrowheads are drawn:
+    END_HEAD | BACKHEAD | BOTH_HEADS | HEADS_ONLY
 An _arrow() function called do_arrow() is provided in term.c which will
 draw arrows using the _move() and _vector() functions.  
 Drivers should use do_arrow unless it causes problems.
@@ -516,7 +517,7 @@ routines are made:
          _enhanced_open(fontname,fontsize,base,width,show,overprint)
 	 _enhanced_writec(char)
 	 _enhanced_flush()
-      _arrow(sx,sy,ex,ey)
+      _arrow(sx,sy,ex,ey, head)
       _image(M,N,image,corner,color_mode)
     _text()
     _graphics()
