@@ -704,13 +704,12 @@ MP_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int
     MP_move(sx, sy);
 
     if ((head & HEADS_ONLY))
-	MP_linetype(LT_NODRAW);
+	fprintf(gpoutfile, "currentdash:=lt[%d];\n", LT_NODRAW);
     if ((head & BOTH_HEADS) == BOTH_HEADS) {
 	fprintf(gpoutfile, "%s (%.1fa,%.1fb)--(%.1fa,%.1fb);\n",
 		"drawdblarrow",
 		sx / 10.0, sy / 10.0, ex / 10.0, ey / 10.0);
     } else if ((head & END_HEAD)) {
-	if (head & HEADS_ONLY) fprintf(gpoutfile, "linetype -3;\n");
 	fprintf(gpoutfile, "%s (%.1fa,%.1fb)--(%.1fa,%.1fb);\n",
 		"drawarrow",
 		sx / 10.0, sy / 10.0, ex / 10.0, ey / 10.0);
@@ -723,7 +722,7 @@ MP_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int
 		sx / 10.0, sy / 10.0, ex / 10.0, ey / 10.0);
     }
     if ((head & HEADS_ONLY))
-	MP_linetype(MP_oldline);
+	fprintf(gpoutfile, "currentdash:=lt[%d];\n", MP_oldline);
 
     MP_posx = ex;
     MP_posy = ey;
