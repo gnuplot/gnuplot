@@ -7990,7 +7990,7 @@ Ffigure_fenceplot
        set arrow {<tag>} from <position> length <coord> angle <ang>
        set arrow <tag> arrowstyle | as <arrow_style>
        set arrow <tag> {nohead | head | backhead | heads}
-                       {size <headlength>,<headangle>{,<backangle>}}
+                       {size <headlength>,<headangle>{,<backangle>}} {fixed}
                        {filled | empty | nofilled | noborder}
                        {front | back}
                        {linestyle | ls <line_style>}
@@ -12817,7 +12817,7 @@ Ffigure_multiple_keys
 
  Syntax:
        set style arrow <index> default
-       set style arrow <index> {nohead | head | heads}
+       set style arrow <index> {nohead | head | backhead | heads}
                                {size <length>,<angle>{,<backangle>} {fixed}}
                                {filled | empty | nofilled | noborder}
                                {front | back}
