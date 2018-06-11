@@ -643,10 +643,16 @@ DUMB_put_text(unsigned int x, unsigned int y, const char *str)
 
 TERM_PUBLIC void
 DUMB_arrow(
-    unsigned int sx, unsigned int sy,
-    unsigned int ex, unsigned int ey,
+    unsigned int usx, unsigned int usy,
+    unsigned int uex, unsigned int uey,
     int head)	/* mostly ignored */
 {
+    /* we have GOT to ditch this unsigned coord madness! */
+    int sx = (int)(usx);
+    int sy = (int)(usy);
+    int ex = (int)(uex);
+    int ey = (int)(uey);
+
     char saved_pen;
     char saved_x;
     char saved_y;
@@ -664,8 +670,18 @@ DUMB_arrow(
     if (!(head & HEADS_ONLY))
 	DUMB_vector(ex, ey);
 
+    /* Arrow tail */
+    if ((head & BACKHEAD)) {
+	char tailsym;
+	if (ex > sx) tailsym = '<';
+	else if (ex < sx) tailsym = '>';
+	else if (ey > sy) tailsym = 'v';
+	else tailsym = '^';
+	dumb_set_pixel(sx, sy, tailsym);
+    }
+
     /* Arrow head */
-    if (head != NOHEAD) {
+    if ((head & END_HEAD)) {
 	char headsym;
 	if (ex > sx) headsym = '>';
 	else if (ex < sx) headsym = '<';
