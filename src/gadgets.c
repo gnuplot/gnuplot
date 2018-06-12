@@ -331,6 +331,7 @@ draw_clip_arrow( double dsx, double dsy, double dex, double dey, t_arrow_head he
     int sy = axis_map_toint(dsy);
     int ex = axis_map_toint(dex);
     int ey = axis_map_toint(dey);
+    int dx, dy;
 
     /* Don't draw head if the arrow itself is clipped */
     if (clip_point(sx,sy))
@@ -347,10 +348,14 @@ draw_clip_arrow( double dsx, double dsy, double dex, double dey, t_arrow_head he
     /* However some terminals (e.g. tikz) look terrible because the shaft of a	*/
     /* long vector overruns the head when the head is drawn with HEADS_ONLY.	*/
     /* FIXME:  this is a very ad hoc definition of "short".			*/
-    if (abs(ex-sx) < 25 && abs(ey-sy) < 25) {
+    dx = abs(ex-sx);
+    dy = abs(ey-sy);
+    if (dx < 25 && dy < 25) {
+
 	/* draw the body of the vector (rounding errors are a problem) */
-	if (!((t->flags & TERM_IS_LATEX)))
-	    (*t->arrow)(sx, sy, ex, ey, SHAFT_ONLY | head);
+	if (dx > 1 || dy > 1)
+	    if (!((t->flags & TERM_IS_LATEX)))
+		(*t->arrow)(sx, sy, ex, ey, SHAFT_ONLY | head);
 
 	/* if we're not supposed to be drawing any heads, we're done */
 	if ((head & BOTH_HEADS) == NOHEAD)
