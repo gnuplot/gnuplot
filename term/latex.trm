@@ -804,21 +804,33 @@ best_latex_arrow(
 
     if (dx == 0) {
 	/* vertical arrow */
-	fprintf(gpoutfile, "\\put(%d,%d){\\%s(0,%d){%d}}\n",
-		sx, sy, head & END_HEAD ? "vector" : "line",
-		sign(ey - sy), ABS(ey - sy));
+	if (head & HEADS_ONLY) {
+	    if (head & END_HEAD) /* draw arrow head only */
+		fprintf(gpoutfile, "\\put(%d,%d){\\vector(0,%d){0}}\n",
+		    ex, ey, sign(ey - sy));
+	} else {
+	    fprintf(gpoutfile, "\\put(%d,%d){\\%s(0,%d){%d}}\n",
+		    sx, sy, head & END_HEAD ? "vector" : "line",
+		    sign(ey - sy), ABS(ey - sy));
+	}
 	if (head & BACKHEAD) {
-	    /* overlay a reversed arrow */
+	    /* overlay a reversed arrow of zero length */
 	    fprintf(gpoutfile, "\\put(%d,%d){\\vector(0,%d){0}}\n",
 		    sx, sy, -1 * sign(ey - sy));
 	}
     } else if (dy == 0) {
 	/* horizontal arrow */
-	fprintf(gpoutfile, "\\put(%d,%d){\\%s(%d,0){%d}}\n",
-		sx, sy, head & END_HEAD ? "vector" : "line",
-		sign(ex - sx), ABS(ex - sx));
+	if (head & HEADS_ONLY) {
+	    if (head & END_HEAD) /* draw arrow head only */
+		fprintf(gpoutfile, "\\put(%d,%d){\\vector(%d,0){0}}\n",
+		    ex, ey, sign(ex - sx));
+	} else {
+	    fprintf(gpoutfile, "\\put(%d,%d){\\%s(%d,0){%d}}\n",
+		    sx, sy, head & END_HEAD ? "vector" : "line",
+		    sign(ex - sx), ABS(ex - sx));
+	}
 	if (head & BACKHEAD) {
-	    /* overlay a reversed arrow */
+	    /* overlay a reversed arrow of zero length */
 	    fprintf(gpoutfile, "\\put(%d,%d){\\vector(%d,0){0}}\n",
 		    sx, sy, -1 * sign(ex - sx));
 	}
@@ -841,10 +853,17 @@ best_latex_arrow(
 	/* now we have the best slope arrow */
 	/* maybe it's exactly the right slope! */
 	if (minerror == 0.0) {	/* unlikely but possible */
-	    fprintf(gpoutfile, "\\put(%d,%d){\\%s(%d,%d){%d}}\n",
-		    sx, sy, head ? "vector" : "line",
-		    bestslope->dx * sign(ex - sx), bestslope->dy * sign(ey - sy),
-		    ABS(ex - sx));
+	    if (head & HEADS_ONLY) {
+		if (head & END_HEAD) /* draw arrow head only */
+		    fprintf(gpoutfile, "\\put(%d,%d){\\vector(%d,%d){0}}\n",
+			ex, ey,
+			bestslope->dx * sign(ex - sx), bestslope->dy * sign(ey - sy));
+	    } else {
+		fprintf(gpoutfile, "\\put(%d,%d){\\%s(%d,%d){%d}}\n",
+			sx, sy, head ? "vector" : "line",
+			bestslope->dx * sign(ex - sx), bestslope->dy * sign(ey - sy),
+			ABS(ex - sx));
+	    }
 	    if (head & BACKHEAD) {
 		fprintf(gpoutfile, "\\put(%d,%d){\\vector(%d,%d){0}}\n",
 			sx, sy,
@@ -852,22 +871,24 @@ best_latex_arrow(
 	    }
 	} else {
 	    /* we draw the line the usual way, with thin lines */
+	    if ((head & HEADS_ONLY) == 0) {
 #ifdef EMTEX
-	    if (emtex) {
-		LATEX_linesize(LATEX_THIN_LINE);
-		EMTEX_solid_line(sx, ex, sy, ey);
-	    } else
+		if (emtex) {
+		    LATEX_linesize(LATEX_THIN_LINE);
+		    EMTEX_solid_line(sx, ex, sy, ey);
+		} else
 #endif
-	    if (who == 1) {
-		LATEX_linesize(LATEX_THIN_LINE);
-		LATEX_solid_line(sx, ex, sy, ey);
-	    }
+		if (who == 1) {
+		    LATEX_linesize(LATEX_THIN_LINE);
+		    LATEX_solid_line(sx, ex, sy, ey);
+		}
 #ifdef EEPIC
-	    else {
-		EEPIC_move(sx, sy);
-		EEPIC_vector(ex, ey);
-	    }
+		else {
+		    EEPIC_move(sx, sy);
+		    EEPIC_vector(ex, ey);
+		}
 #endif /* EEPIC */
+	    }
 	    /* and then draw arrowheads (a short vector) there */
 	    if (head & END_HEAD) {
 		fprintf(gpoutfile, "\\put(%d,%d){\\vector(%d,%d){0}}\n",
