@@ -151,11 +151,14 @@ static int TEXDRAW_linecount = 0;
 /* max value for linecount */
 #define TEXDRAW_LINEMAX 5
 
+/* ARROWS */
+static char TEXDRAW_arrow_type;
+static int TEXDRAW_arrow_length;
+static int TEXDRAW_arrow_width;
+
 TERM_PUBLIC void
 TEXDRAW_init()
 {
-    TEXDRAW_posx = TEXDRAW_posy = 0;
-    TEXDRAW_linetype(-1);
     fputs("%% GNUPLOT: LaTeX using TEXDRAW macros\n", gpoutfile);
 }
 
@@ -179,6 +182,10 @@ TEXDRAW_graphics()
 	    TEXDRAW_lines[2]);
     TEXDRAW_last_type = 0;
     TEXDRAW_type = 0;
+    TEXDRAW_posx = TEXDRAW_posy = 0;
+    TEXDRAW_arrow_type = 0;
+    TEXDRAW_arrow_length = -1;
+    TEXDRAW_arrow_width = -1;
 }
 
 TERM_PUBLIC void
@@ -278,17 +285,70 @@ TEXDRAW_arrow(
     int head)
 {
     char text;
+    char type = 'T'; // empty triangle
+    // These are the default arrow sizes:
+    int tiplen = (0.16 * 72 / TEXDRAW_scalefactor + 0.5);
+    int width = (0.08 * 72 / TEXDRAW_scalefactor + 0.5);
 
-    if (head)
-	text = 'a';
+    // Texdraw cannot only draw vector heads, fall back to built-in code.
+    if (head & HEADS_ONLY) {
+	do_arrow(sx, sy, ex, ey, head);
+	return;
+    }
+
+    switch (curr_arrow_headfilled) {
+	case AS_NOFILL:
+	    type = 'V'; // open V-shape
+	    break;
+	case AS_FILLED:
+	case AS_NOBORDER:
+	    type = 'F'; // filled triangle
+	    break;
+	case AS_EMPTY:
+	    type = 'W'; // white filled triangle
+	    break;
+    }
+
+    if (curr_arrow_headlength > 0) {
+	width  = sin(curr_arrow_headangle * DEG2RAD) * curr_arrow_headlength;
+	tiplen = cos(curr_arrow_headangle * DEG2RAD) * curr_arrow_headlength;
+	if ((curr_arrow_headbackangle - curr_arrow_headangle) <= 15)
+	    type = 'V'; // open V-shape
+    }
+
+    if (TEXDRAW_arrow_type != type) {
+	fprintf(gpoutfile, "\\arrowheadtype t:%c\n", type);
+	TEXDRAW_arrow_type = type;
+    }
+    if ((TEXDRAW_arrow_length != tiplen) || (TEXDRAW_arrow_width != width)) {
+	fprintf(gpoutfile, "\\arrowheadsize l:%d w:%d\n", tiplen, width);
+	TEXDRAW_arrow_length = tiplen;
+	TEXDRAW_arrow_width = width;
+    }
+
+    if ((head & BOTH_HEADS) != 0)
+	text = 'a';	// line with arrow
     else
-	text = 'l';
-    fprintf(gpoutfile, "\\move (%d %d)\\%cvec (%d %d)",
+	text = 'l';	// simple line
+
+    if ((head & END_HEAD) != 0 || (head & BOTH_HEADS) == 0) {
+	fprintf(gpoutfile, "\\move (%d %d)\\%cvec (%d %d)\n",
 	    (int) ((double) sx * TEXDRAW_xscale),
 	    (int) ((double) sy * TEXDRAW_yscale),
 	    text,
 	    (int) ((double) ex * TEXDRAW_xscale),
 	    (int) ((double) ey * TEXDRAW_yscale));
+    }
+    /* draw back-heads by drawing an arrow in the opposite direction */
+    if ((head & BACKHEAD) != 0) {
+	fprintf(gpoutfile, "\\move (%d %d)\\%cvec (%d %d)\n",
+	    (int) ((double) ex * TEXDRAW_xscale),
+	    (int) ((double) ey * TEXDRAW_yscale),
+	    text,
+	    (int) ((double) sx * TEXDRAW_xscale),
+	    (int) ((double) sy * TEXDRAW_yscale));
+    }
+
     TEXDRAW_posx = ex;
     TEXDRAW_posy = ey;
 }
@@ -354,7 +414,8 @@ TERM_TABLE_START(texdraw_driver)
     TEXDRAW_VTIC, TEXDRAW_HTIC, options_null, TEXDRAW_init, TEXDRAW_reset,
     TEXDRAW_text, null_scale, TEXDRAW_graphics, TEXDRAW_move, TEXDRAW_vector,
     TEXDRAW_linetype, TEXDRAW_put_text, TEXDRAW_text_angle,
-    TEXDRAW_justify_text, TEXDRAW_point, TEXDRAW_arrow, set_font_null
+    TEXDRAW_justify_text, TEXDRAW_point, TEXDRAW_arrow, set_font_null, do_pointsize,
+    TERM_IS_LATEX
 TERM_TABLE_END(texdraw_driver)
 
 #undef LAST_TERM
