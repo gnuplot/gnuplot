@@ -313,7 +313,9 @@
 #include "svg.trm"
 
 /* x11 tgif tool */
+#ifdef HAVE_TGIF
 #include "tgif.trm"
+#endif
 
 /* tcl/tk with perl extensions */
 #include "tkcanvas.trm"

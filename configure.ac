@@ -1034,6 +1034,13 @@ AS_IF([test "x${with_gpic}" = "xyes"],
   AC_DEFINE(HAVE_GPIC,1,
           [ Define to include support for gpic terminal ],))
 
+dnl  Allow to include tgif terminal
+AC_ARG_WITH(tgif,dnl
+[  --with-tgif                     tgif terminal])
+AS_IF([test "x${with_tgif}" = "xyes"],
+  AC_DEFINE(HAVE_TGIF,1,
+          [ Define to include support for tgif terminal ],))
+
 dnl  Allow to include mif (FrameMaker 3) terminal
 AC_ARG_WITH(mif,dnl
 [  --with-mif                     mif terminal (FrameMaker 3)])
@@ -1269,9 +1276,9 @@ AC_MSG_RESULT([])
 
 AC_MSG_RESULT([  Standalone terminals: yes (always builtin)])
 AC_MSG_RESULT([    canvas, cgm, context, dumb, dxf, eepic, emf, emtex,])
-AC_MSG_RESULT([    epslatex, fig, hpgl, latex, metafont, metapost, mif, pcl5,])
+AC_MSG_RESULT([    epslatex, fig, hpgl, latex, metafont, metapost, pcl5,])
 AC_MSG_RESULT([    postscript, pslatex, pstex, pstricks, qms, svg,])
-AC_MSG_RESULT([    tek40xx, tek410x, texdraw, tgif, tkcanvas, tpic, vttek])
+AC_MSG_RESULT([    tek40xx, tek410x, texdraw, tkcanvas, tpic, vttek])
 AC_MSG_RESULT([])
 
 if test "$with_bitmap_terminals" == yes; then
@@ -1342,6 +1349,12 @@ if test "$with_gpic" == yes; then
   AC_MSG_RESULT([  gpic terminal: yes])
 else
   AC_MSG_RESULT([  gpic terminal: no   (use --with-gpic to enable)])
+fi
+
+if test "$with_tgif" == yes; then
+  AC_MSG_RESULT([  tgif terminal: yes])
+else
+  AC_MSG_RESULT([  tgif terminal: no   (use --with-tgif to enable)])
 fi
 
 if test "$with_mif" == yes; then
@@ -1423,7 +1436,7 @@ fi
 
 AC_MSG_RESULT([])
 AC_MSG_RESULT([  Additional platform-specific or older terminals omitted by default:])
-AC_MSG_RESULT([   gpic, mif (FrameMaker 3), hp2623a, hp2648, imagen, kyocera ])
+AC_MSG_RESULT([   gpic, tgif, mif (FrameMaker 3), hp2623a, hp2648, imagen, kyocera ])
 AC_MSG_RESULT([   pm (makefile.os2), be (BeOS), svga (MSDOS/djgpp)])
 AC_MSG_RESULT([   windows (several options)])
 
