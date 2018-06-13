@@ -970,7 +970,7 @@ recheck_ranges(struct curve_points *plot)
     int i;			/* point index */
 
     for (i = 0; i < plot->p_count; i++) {
-	if (plot->noautoscale) {
+	if (plot->noautoscale && plot->points[i].type != UNDEFINED) {
 	    plot->points[i].type = INRANGE;
 	    if (!inrange(plot->points[i].x, axis_array[plot->x_axis].min, axis_array[plot->x_axis].max))
 		plot->points[i].type = OUTRANGE;
