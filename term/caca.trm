@@ -1691,8 +1691,9 @@ CACA_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, i
 	if (CACA_skipplot && !CACA_keysample)
 		return;
 
-	CACA_draw_thin_line(CACA_cv, sx, CACA_ymax - sy, ex, CACA_ymax - ey);
-	if (head) {
+	if ((head & HEADS_ONLY) == 0)
+		CACA_draw_thin_line(CACA_cv, sx, CACA_ymax - sy, ex, CACA_ymax - ey);
+	if ((head && BOTH_HEADS) != 0) {
 		wchar_t const * heads;
 		int dx = ex - sx;
 		int dy = ey - sy;
@@ -1720,7 +1721,10 @@ CACA_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, i
 			}
 #endif
 		}
-		CACA_put_transparent_char(CACA_cv, ex, CACA_ymax - ey, heads[idx]);
+		if (head & END_HEAD)
+			CACA_put_transparent_char(CACA_cv, ex, CACA_ymax - ey, heads[idx]);
+		if (head & BACKHEAD)
+			CACA_put_transparent_char(CACA_cv, sx, CACA_ymax - sy, heads[(idx + 4) % 8]);
 	}
 }
 
