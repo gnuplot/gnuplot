@@ -1006,7 +1006,9 @@ LATEX_set_color(t_colorspec *colorspec)
 	int linetype = colorspec->lt;
 	const char * colorname;
 
-	if (linetype < 0 || !latex_use_color)
+	if (linetype == LT_BACKGROUND)
+	    colorname = "white";
+	else if (linetype < 0 || !latex_use_color)
 	    colorname = "black";
 	else
 	    colorname = LATEX_lt_colors[linetype % LATEX_num_colors];
@@ -1017,7 +1019,7 @@ LATEX_set_color(t_colorspec *colorspec)
 	rgb_color color;
 
 	rgb1_from_gray(colorspec->value, &color);
-	snprintf(colorstr, sizeof(colorstr), "\\color[rgb]{%3.2f,%3.2f,%3.2f}", color.r, color.g, color.b);
+	snprintf(colorstr, sizeof(colorstr), "\\color[rgb]{%3.2f,%3.2f,%3.2f}\n", color.r, color.g, color.b);
     }
     }
 
