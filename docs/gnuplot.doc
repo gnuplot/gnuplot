@@ -6253,14 +6253,14 @@ Ffigure_fenceplot
  ignored when automatically determining axis range limits.
 
  TEXT DATA FILES:
+ 
+ Each non-empty line in a data file describes one data point, except that
+ records beginning with `#` (and also with `!` on VMS) will be treated as
+ comments and ignored.
 
- Data files should contain at least one data point per record (`using`
- can select one data point from the record). Records beginning with `#`
- (and also with `!` on VMS) will be treated as comments and ignored.
- Each data point represents an (x,y) pair. For `plot`s with error bars or
- error bars with lines (see `errorbars` or `errorlines`),
- each data point is (x,y,ydelta), (x,y,ylow,yhigh),
- (x,y,xdelta), (x,y,xlow,xhigh), or (x,y,xlow,xhigh,ylow,yhigh).
+ Depending on the plot style and options selected, from one to eight values
+ are read from each line and associated with a single data point.
+ See `using`.
 
  In all cases, the numbers of each record of a data file must be separated
  by white space (one or more blanks or tabs) unless a format specifier is
@@ -6273,17 +6273,17 @@ Ffigure_fenceplot
  letter e or E.  The fortran exponential specifiers d, D, q, and Q may also
  be used if the command `set datafile fortran` is in effect.
 
- Only one column (the y value) need be provided.  If x is omitted, `gnuplot`
- provides integer values starting at 0.
-
- In datafiles, blank records (records with no characters other than blanks and
- a newline and/or carriage return) are significant.
-
+ Blank records in a data file are significant.
  Single blank records designate discontinuities in a `plot`; no line will join
  points separated by a blank records (if they are plotted with a line style).
-
  Two blank records in a row indicate a break between separate data sets.
  See `index`.
+
+ Extra lines at the start of a data file may be explicitly ignored using the
+ `skip` keyword in the plot command. A single additional line containing text
+ column headers may be present.  It is skipped automatically if the plot command
+ refers to column headers, otherwise you may need to skip it explicitly.
+ See `skip`, `columnhead`, `autotitle columnhead`.
 
  If autoscaling has been enabled (`set autoscale`), the axes are automatically
  extended to include all datapoints, with a whole number of tic marks if tics
@@ -6303,9 +6303,9 @@ Ffigure_fenceplot
        19 19
        e
 
- To avoid this, you can use the `fixmin`/`fixmax` feature of the
- `set autoscale` command, which turns off the automatic extension of the
- axis range up to the next tic mark.
+ To avoid this, you can use the `noextend` modifier of the `set autoscale`
+ or `set [axis]range` commands. This turns off extension of the axis range to
+ include the next tic mark.
 
  Label coordinates and text can also be read from a data file (see `labels`).
 4 bins
@@ -14199,6 +14199,7 @@ Ffigure_walls
 ?commands show xrange
 ?set xrange
 ?show xrange
+?set range
 ?writeback
 ?restore
 ?xrange

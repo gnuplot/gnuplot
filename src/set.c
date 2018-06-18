@@ -871,6 +871,10 @@ set_autoscale_axis(struct axis *this)
 	this->min_constraint = CONSTRAINT_NONE;
 	this->max_constraint = CONSTRAINT_NONE;
 	++c_token;
+	if (almost_equals(c_token, "noext$end")) {
+	    this->set_autoscale |= AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX;
+	    ++c_token;
+	}
 	return TRUE;
     }
     sprintf(keyword, "%smi$n", name);

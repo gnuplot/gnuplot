@@ -1301,6 +1301,8 @@ save_position(FILE *fp, struct position *pos, int ndim, TBOOLEAN offset)
 void
 save_prange(FILE *fp, struct axis *this_axis)
 {
+    TBOOLEAN noextend = FALSE;
+
     fprintf(fp, "set %srange [ ", axis_name(this_axis->index));
     if (this_axis->set_autoscale & AUTOSCALE_MIN) {
 	if (this_axis->min_constraint & CONSTRAINT_LOWER ) {
@@ -1339,6 +1341,13 @@ save_prange(FILE *fp, struct axis *this_axis)
 	return;
     }
 
+    if ((this_axis->set_autoscale & AUTOSCALE_FIXMIN)
+    &&  (this_axis->set_autoscale & AUTOSCALE_FIXMAX)) {
+	fprintf(fp, " noextend");
+	noextend = TRUE;
+    }
+    
+
     if (this_axis->set_autoscale && fp == stderr) {
 	/* add current (hidden) range as comments */
 	fputs("  # (currently [", fp);
@@ -1353,7 +1362,7 @@ save_prange(FILE *fp, struct axis *this_axis)
     } else
 	putc('\n', fp);
 
-    if (fp != stderr) {
+    if (!noextend && (fp != stderr)) {
 	if (this_axis->set_autoscale & (AUTOSCALE_FIXMIN))
 	    fprintf(fp, "set autoscale %sfixmin\n", axis_name(this_axis->index));
 	if (this_axis->set_autoscale & AUTOSCALE_FIXMAX)
