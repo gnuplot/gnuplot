@@ -816,7 +816,7 @@ wgnuplot-ja.chm: $(JASRC) doc2html-ja.exe \
 	-$(HHC) $(JADW)wgnuplot.hhp
 	cp $(JADW)wgnuplot.chm $(HELPFILEJA)
 
-doc2html.exe: $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c version.o $(LUA_HELP)
+doc2html.exe: $(CORETERM) $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c version.o $(LUA_HELP)
 	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI \
 	    -DVERSION_MAJOR='"$(MAINVERSION)"' -DPATCHLEVEL='"$(PATCHLEVEL)"' \
 	    $(CFLAGS) -I. -I$(D:/=) -I$(T:/=) \
