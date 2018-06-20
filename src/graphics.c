@@ -2469,7 +2469,9 @@ plot_f_bars(struct curve_points *plot)
     struct termentry *t = term;
     double x;			/* position of the bar */
     double ylow, yhigh, yclose, yopen;	/* the ends of the bars */
+    double ymedian;
     int xM, ylowM, yhighM;	/* the mapped version of above */
+    int yopenM, ycloseM, ymedianM;
     TBOOLEAN low_inrange, high_inrange;
     int tic = GPMAX(ERRORBARTIC/2,1);
 
@@ -2489,6 +2491,7 @@ plot_f_bars(struct curve_points *plot)
 	ylow = plot->points[i].ylow;
 	yclose = plot->points[i].z;
 	yopen = plot->points[i].y;
+	ymedian = plot->points[i].xhigh;
 
 	high_inrange = inrange(yhigh, Y_AXIS.min, Y_AXIS.max);
 	low_inrange = inrange(ylow, Y_AXIS.min, Y_AXIS.max);
@@ -2516,22 +2519,18 @@ plot_f_bars(struct curve_points *plot)
 	/* variable color read from extra data column. June 2010 */
 	check_for_variable_color(plot, &plot->varcolor[i]);
 
-	/* by here everything has been mapped */
-	(*t->move) (xM, ylowM);
-	(*t->vector) (xM, yhighM);	/* draw the main bar */
-	/* draw the open tic */
-	(*t->move) ((xM - bar_size * tic), map_y(yopen));
-	(*t->vector) (xM, map_y(yopen));
-	/* draw the close tic */
-	(*t->move) ((xM + bar_size * tic), map_y(yclose));
-	(*t->vector) (xM, map_y(yclose));
+	yopenM = map_y(yopen);
+	ycloseM = map_y(yclose);
+	ymedianM = map_y(ymedian);
 
-	/* Draw a bar at the median (stored in xhigh) */
-	if (plot->plot_style == BOXPLOT) {
-	    int ymedian = map_y(plot->points[i].xhigh);
-	    (*t->move) (xM - bar_size * tic, ymedian);
-	    (*t->vector) (xM + bar_size * tic, ymedian);
-	}
+	/* draw the main bar, open tic, close tic */
+	draw_clip_line(xM, ylowM, xM, yhighM);
+	draw_clip_line(xM - bar_size * tic, yopenM, xM, yopenM);
+	draw_clip_line(xM + bar_size * tic, ycloseM, xM, ycloseM);
+
+	/* Draw a bar at the median */
+	if (plot->plot_style == BOXPLOT)
+	    draw_clip_line(xM - bar_size * tic, ymedianM, xM + bar_size * tic, ymedianM);
     }
 }
 
@@ -2556,7 +2555,6 @@ plot_c_bars(struct curve_points *plot)
     enum coord_type prev = UNDEFINED;			/* type of previous point */
     TBOOLEAN low_inrange, high_inrange;
     TBOOLEAN open_inrange, close_inrange;
-    TBOOLEAN median_inrange;
     int tic = GPMAX(ERRORBARTIC/2,1);
 
     for (i = 0; i < plot->p_count; i++) {
@@ -2589,7 +2587,6 @@ plot_c_bars(struct curve_points *plot)
 
 	high_inrange = inrange(yhigh, axis_array[y_axis].min, axis_array[y_axis].max);
 	low_inrange = inrange(ylow, axis_array[y_axis].min, axis_array[y_axis].max);
-	median_inrange = inrange(ymed, axis_array[y_axis].min, axis_array[y_axis].max);
 
 	/* compute the plot position of yhigh */
 	if (high_inrange)
@@ -2723,10 +2720,9 @@ plot_c_bars(struct curve_points *plot)
 	}
 
 	/* BOXPLOT wants a median line also, which is stored in xhigh */
-	if (plot->plot_style == BOXPLOT && median_inrange) {
-	    int ymedianM = map_y(plot->points[i].xhigh);
-	    (*t->move)   (xlowM,  ymedianM);
-	    (*t->vector) (xhighM, ymedianM);
+	if (plot->plot_style == BOXPLOT) {
+	    int ymedianM = map_y(ymed);
+	    draw_clip_line(xlowM,  ymedianM, xhighM, ymedianM);
 	}
 
 	/* Through 4.2 gnuplot would indicate (open > close) by drawing     */
@@ -2747,10 +2743,8 @@ plot_c_bars(struct curve_points *plot)
 	}
 
 	/* Draw whiskers */
-	(*t->move)   (xM, ylowM);
-	(*t->vector) (xM, ymin);
-	(*t->move)   (xM, ymax);
-	(*t->vector) (xM, yhighM);
+	draw_clip_line(xM, ylowM, xM, ymin);
+	draw_clip_line(xM, ymax, xM, yhighM);
 
 	/* Some users prefer bars at the end of the whiskers */
 	if (plot->plot_style == BOXPLOT
@@ -2766,14 +2760,8 @@ plot_c_bars(struct curve_points *plot)
 		d = (frac <= 0) ? 0 : (xhighM-xlowM)*(1.-frac)/2.;
 	    }
 
-	    if (high_inrange) {
-		(*t->move)   (xlowM+d, yhighM);
-		(*t->vector) (xhighM-d, yhighM);
-	    }
-	    if (low_inrange) {
-		(*t->move)   (xlowM+d, ylowM);
-		(*t->vector) (xhighM-d, ylowM);
-	    }
+	    draw_clip_line(xlowM+d, yhighM, xhighM-d, yhighM);
+	    draw_clip_line(xlowM+d, ylowM, xhighM-d, ylowM);
 	}
 
 	prev = plot->points[i].type;
