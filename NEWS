@@ -1,6 +1,7 @@
 Changes in 5.2.5
 ================
 * FIX clipping of plot "with lines" when axes are nonlinear (regression from 5.0)
+* FIX clipping of all elements in finanacebars/candlesticks/boxplots
 
 Changes in 5.2.4
 ================

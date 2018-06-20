@@ -1,3 +1,9 @@
+2018-06-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_f_bars plot_c_bars): Clip all elements of
+	candlesticks/financebars/boxplots against plot limits.
+	Bug #2056
+
 2018-06-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_lines):
