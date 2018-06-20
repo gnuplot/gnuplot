@@ -2544,12 +2544,13 @@ plot_c_bars(struct curve_points *plot)
     struct termentry *t = term;
     int i;
     double x;						/* position of the bar */
-    double dxl, dxr, ylow, yhigh, yclose, yopen;	/* the ends of the bars */
+    double dxl, dxr, ylow, yhigh, yclose, yopen, ymed;	/* the ends of the bars */
     int xlowM, xhighM, xM, ylowM, yhighM;		/* mapped version of above */
     int ymin, ymax;					/* clipped to plot extent */
     enum coord_type prev = UNDEFINED;			/* type of previous point */
     TBOOLEAN low_inrange, high_inrange;
     TBOOLEAN open_inrange, close_inrange;
+    TBOOLEAN median_inrange;
     int tic = GPMAX(ERRORBARTIC/2,1);
 
     for (i = 0; i < plot->p_count; i++) {
@@ -2570,6 +2571,7 @@ plot_c_bars(struct curve_points *plot)
 	ylow = plot->points[i].ylow;
 	yclose = plot->points[i].z;
 	yopen = plot->points[i].y;
+	ymed = plot->points[i].xhigh;
 
 	/* HBB 20010928: To make code match the documentation, ensure
 	 * yhigh is actually higher than ylow */
@@ -2581,6 +2583,7 @@ plot_c_bars(struct curve_points *plot)
 
 	high_inrange = inrange(yhigh, axis_array[y_axis].min, axis_array[y_axis].max);
 	low_inrange = inrange(ylow, axis_array[y_axis].min, axis_array[y_axis].max);
+	median_inrange = inrange(ymed, axis_array[y_axis].min, axis_array[y_axis].max);
 
 	/* compute the plot position of yhigh */
 	if (high_inrange)
@@ -2714,7 +2717,7 @@ plot_c_bars(struct curve_points *plot)
 	}
 
 	/* BOXPLOT wants a median line also, which is stored in xhigh */
-	if (plot->plot_style == BOXPLOT) {
+	if (plot->plot_style == BOXPLOT && median_inrange) {
 	    int ymedianM = map_y(plot->points[i].xhigh);
 	    (*t->move)   (xlowM,  ymedianM);
 	    (*t->vector) (xhighM, ymedianM);
