@@ -143,7 +143,7 @@ static int LATEX_fontsize = 10;
 static char LATEX_font[MAX_ID_LEN+1] = "doc";
 static enum JUSTIFY latex_justify = LEFT;
 static int latex_angle = 0;
-static TBOOLEAN latex_rotate = FALSE;
+static TBOOLEAN latex_rotate = TRUE;  // change of default in version 5.3
 
 static TBOOLEAN latex_explicit_size = FALSE;
 static size_units latex_explicit_units = INCHES;
@@ -529,8 +529,9 @@ LATEX_solid_line(int x1, int x2, int y1, int y2)
     float offset, length;
     int code;			/* possibly combine with previous rule */
 
-    /* we draw a solid line using the current line thickness (size) */
-    /* we do it with lots of \\rules */
+    /* We draw a solid line using the current line thickness (size). */
+    /* If the rotate option is not active, we do it with lots of \rules, */
+    /* otherwise we use a single \rule and \rotatebox. */
 
     if (x1 == x2 && y1 == y2) {	/* zero-length line - just a dot */
 	if (LATEX_moved) {
@@ -545,12 +546,45 @@ LATEX_solid_line(int x1, int x2, int y1, int y2)
 	    LATEX_rule(code, (double) x1, (double) y1,
 		       LATEX_dotsize, (double) y2 - y1);
 	else if (y1 == y2)	/* horizontal line - special case */
-	    LATEX_rule(code, (double) x1, (double) y1, (double) x2 - x1,
-		       LATEX_dotsize);
+	    LATEX_rule(code, (double) x1, (double) y1,
+		       (double) x2 - x1, LATEX_dotsize);
 	else {
 	    dx = (float) x2 - x1;
 	    dy = (float) y2 - y1;
 	    slope = dy / dx;
+
+	    /* Draw a line with the correct angle by rotating a \rule.
+	       This yields much better results, but requires driver
+	       \specials, which are available with both ps and pdf
+	       output.  According to a suggestion by Mojca Miklavec.
+	     */
+	    if (latex_rotate) {
+		double angle;
+		double length;
+
+		// Only works for angles -90...90, but I not understand why.
+		if (x2 < x1) {
+		    x = x1; x1 = x2; x2 = x; dx *= -1;
+		    y = y1; y1 = y2; y2 = y; dy *= -1;
+		}
+		angle = atan2(dy, dx) / DEG2RAD;
+		if (angle < 0)
+		    angle += 360;
+		length = sqrt(dx * dx + dy * dy) + 1;
+
+		fprintf(gpoutfile,
+		    "\\put(%.1f,%.1f){" \
+			"\\rotatebox{%.2f}{" \
+			    "\\rule[%.3fpt]{%.3fpt}{%.3fpt}" \
+		    "}}\n",
+		    (double) x1, // - dx/length * LATEX_dotsize / 2,
+		    (double) y1, // - dy/length * LATEX_dotsize / 2,
+		    angle, - LATEX_dotsize * LATEX_UNIT / 2,
+		    length * LATEX_UNIT,
+		    LATEX_dotsize * LATEX_UNIT);
+		return;
+	    }
+
 	    if (ABS(slope) <= 1.0) {
 		/* longer than high */
 		x = GPMIN(ABS(dx), (0.25 + 1.0 / ABS(slope)) * LATEX_dotsize);
@@ -916,22 +950,22 @@ LATEX_put_text(unsigned int x, unsigned int y, const char str[])
 	return;
 
     if (!latex_rotate)
-    for (flag = FALSE, i = 0; str[i] && !flag;)
-	flag = (str[i++] == '\\') && (str[i++] == '\\');
+	for (flag = FALSE, i = 0; str[i] && !flag;)
+	    flag = (str[i++] == '\\') && (str[i++] == '\\');
 
     fprintf(gpoutfile, "\\put(%d,%d)", x, y);
     if (latex_rotate && latex_angle)
-    	fprintf (gpoutfile, "{\\rotatebox{%d}", latex_angle);
-    if ((str[0] == '{') || (str[0] == '[')) {
+	fprintf(gpoutfile, "{\\rotatebox{%d}", latex_angle);
+    if ((str[0] == '{') || (str[0] == '['))
 	fprintf(gpoutfile, "{\\makebox(0,0)%s}\n", str);
-    } else if (flag)
+    else if (flag)
 	fprintf(gpoutfile, "{\\makebox(0,0)%s{\\shortstack{%s}}}\n",
 		justify[latex_justify], str);
     else
 	fprintf(gpoutfile, "{\\makebox(0,0)%s{%s}}\n",
 		justify[latex_justify], str);
     if (latex_rotate && latex_angle)
-    	fprintf (gpoutfile, "}");
+	fprintf (gpoutfile, "}");
 }
 
 TERM_PUBLIC int
@@ -944,11 +978,10 @@ LATEX_justify_text(enum JUSTIFY mode)
 TERM_PUBLIC int
 LATEX_text_angle(int ang)
 {
-    /* we can't really write text vertically, but this will
-       put the ylabel centred at the left of the plot, and
-       then we'll make a \shortstack */
-    /* latex_angle is not used elsewhere, so we use it for
-       'real' text rotation using '\rotatebox' */
+    /* Without the rotate option, we can't write text vertically,
+       but we will put the ylabel centred at the left of the plot,
+       and then we'll make a \shortstack.  With the rotate option,
+       we do 'real' text rotation using '\rotatebox'. */
     latex_angle = ang;
     return (TRUE);
 }
@@ -1179,7 +1212,8 @@ START_HELP(latex)
 "",
 " If `rotate` is specified, rotated text, especially a rotated y-axis label,",
 " is possible (the packages graphics or graphicx are needed). The 'stacked'",
-" y-axis label mechanism is then deactivated.",
+" y-axis label mechanism is then deactivated. This will also significantly",
+" improve the quality of line drawing, and is default since version 5.3.",
 "",
 " The option `color` enables color, while `monochrome` uses only black and white",
 " drawing elements. You need to load the color or xcolor package in the preamble",
