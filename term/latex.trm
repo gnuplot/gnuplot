@@ -942,30 +942,25 @@ TERM_PUBLIC void
 LATEX_put_text(unsigned int x, unsigned int y, const char str[])
 {
     static const char *justify[] = { "[l]", "", "[r]" };
-    TBOOLEAN flag = FALSE;
-    int i;
 
     /* ignore empty strings */
     if (str[0] == NUL)
 	return;
 
-    if (!latex_rotate)
-	for (flag = FALSE, i = 0; str[i] && !flag;)
-	    flag = (str[i++] == '\\') && (str[i++] == '\\');
-
     fprintf(gpoutfile, "\\put(%d,%d)", x, y);
     if (latex_rotate && latex_angle)
 	fprintf(gpoutfile, "{\\rotatebox{%d}", latex_angle);
     if ((str[0] == '{') || (str[0] == '['))
-	fprintf(gpoutfile, "{\\makebox(0,0)%s}\n", str);
-    else if (flag)
-	fprintf(gpoutfile, "{\\makebox(0,0)%s{\\shortstack{%s}}}\n",
+	fprintf(gpoutfile, "{\\makebox(0,0)%s}", str);
+    else if (!latex_rotate && strstr(str, "\\") !=  NULL)
+	fprintf(gpoutfile, "{\\makebox(0,0)%s{\\shortstack{%s}}}",
 		justify[latex_justify], str);
     else
-	fprintf(gpoutfile, "{\\makebox(0,0)%s{%s}}\n",
+	fprintf(gpoutfile, "{\\makebox(0,0)%s{%s}}",
 		justify[latex_justify], str);
     if (latex_rotate && latex_angle)
-	fprintf (gpoutfile, "}");
+	fputs("}", gpoutfile);
+    fputs("\n", gpoutfile);
 }
 
 TERM_PUBLIC int
