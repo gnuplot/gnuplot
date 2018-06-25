@@ -143,7 +143,7 @@ static int LATEX_fontsize = 10;
 static char LATEX_font[MAX_ID_LEN+1] = "doc";
 static enum JUSTIFY latex_justify = LEFT;
 static int latex_angle = 0;
-static TBOOLEAN latex_rotate = TRUE;  // change of default in version 5.3
+static TBOOLEAN latex_rotate = FALSE;
 
 static TBOOLEAN latex_explicit_size = FALSE;
 static size_units latex_explicit_units = INCHES;
