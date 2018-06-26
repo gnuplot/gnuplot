@@ -1119,24 +1119,7 @@ TK_put_noenhanced_text(unsigned int x, unsigned int y, const char *str)
 
     TK_flush_line();
     if (tk_script_language == TK_LANG_TCL) {
-	/* Have to escape several characters: []{}"$; */
-	for (i = 0; str[i] != '\0'; i++) {
-	    if ((str[i] == '[') || (str[i] == ']') ||
-		(str[i] == '{') || (str[i] == '}') ||
-		(str[i] == '$') || (str[i] == ';'))
-		newsize++;
-	    newsize++;
-	}
-	quoted_str = (char *) gp_alloc(newsize + 1, "TK_put_text: quoted string");
-
-	for (i = 0, newsize = 0; str[i] != '\0'; i++) {
-	    if ((str[i] == '[') || (str[i] == ']') ||
-		(str[i] == '{') || (str[i] == '}') ||
-		(str[i] == '$') || (str[i] == ';'))
-		quoted_str[newsize++] = '\\';
-	    quoted_str[newsize++] = str[i];
-	}
-	quoted_str[newsize] = '\0';
+	quoted_str = escape_reserved_chars(str, "[]{}$;");
     }
     if ((tk_script_language == TK_LANG_REXX) ||
 	(tk_script_language == TK_LANG_RUBY) ||

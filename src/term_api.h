@@ -549,4 +549,7 @@ void closepath __PROTO((void));
  */
 void check_for_mouse_events __PROTO((void));
 
+/* shared routined to add backslash in front of reserved characters */
+char *escape_reserved_chars __PROTO((const char *str, const char *reserved));
+
 #endif /* GNUPLOT_TERM_API_H */
