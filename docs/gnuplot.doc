@@ -244,6 +244,13 @@ C
 ##UTF-8 byte sequence on output. EXPERIMENTAL (implementation may change)
 #end
 
+4 Changes
+#start
+#bImaginary values returned by the using specifier of a 2D plot are treated as
+##undefined values (NaN) rather than as real(value).  This was always true for
+##function plots and 3D data plots.  E.g. the following two plots are equivalent.
+##plot [-1:1] sqrt(x); plot [-1:1] '+' using 1:(sqrt($1)
+#end
 3 Features introduced in version 5.2
 ?Features introduced in version 5.2
 4 New plot styles and style options
@@ -1021,12 +1028,29 @@ C  need @ in table, so end and restart the table !
  The syntax "string"[beg:end] is exactly equivalent to calling the built-in
  string-valued function substr("string",beg,end), except that you cannot
  omit either beg or end from the function call.
+3 Complex arithmetic
+?complex arithmetic
+?complex
+ Arithmetic operations and most built-in functions support the use of complex
+ arguments.  Complex constants are expressed as {<real>,<imag>}, where <real>
+ and <imag> must be numerical constants.  Thus {0,1} represents 'i'.
+ The real and imaginary components of complex value x can be extracted as
+ real(x) and imag(x). The modulus is given by abs(x).
+
+ Gnuplot's standard 2D and 3D plot styles can plot only real values; if you 
+ need to plot a complex-valued function f(x) with non-zero imaginary components
+ you must choose between plotting real(f(x)) or abs(f(x)).  For examples of
+ representing complex values using color, see the 
+^ <a href="http://www.gnuplot.info/demo/complex_trig.html">
+ complex trigonometric function demos (complex_trig.dem)
+^ </a>
+
 3 Constants
 ?constants
 ?expressions constants
 ?octal
 ?hexadecimal
-?complex
+?complex constants
  Integer constants are interpreted via the C library routine strtoll().
  This means that constants beginning with "0" are interpreted as octal,
  and constants beginning with "0x" or "0X" are interpreted as hexadecimal.
@@ -6283,7 +6307,7 @@ Ffigure_fenceplot
  `skip` keyword in the plot command. A single additional line containing text
  column headers may be present.  It is skipped automatically if the plot command
  refers to column headers, otherwise you may need to skip it explicitly.
- See `skip`, `columnhead`, `autotitle columnhead`.
+ See `skip`, `columnhead`, `autotitle columnheader`.
 
  If autoscaling has been enabled (`set autoscale`), the axes are automatically
  extended to include all datapoints, with a whole number of tic marks if tics
@@ -10279,6 +10303,8 @@ Ffigure_missing
 ?set key autotitle
 ?key autotitle
 ?autotitle
+?autotitle columnheader
+?key autotitle columnheader
  `set key autotitle` causes each plot to be identified in the key by the name
  of the data file or function used in the plot command. This is the default.
  `set key noautotitle` disables the automatic generation of plot titles.

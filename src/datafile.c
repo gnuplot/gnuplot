@@ -2139,7 +2139,10 @@ df_readascii(double v[], int max)
 			v[output] = not_a_number();
 			continue;
 		    }
-		    if (undefined) {
+
+		    /* June 2018: CHANGE.  For consistency with function plots,	*/
+		    /* treat imaginary result as UNDEFINED.			*/
+		    if (undefined || (a.type == CMPLX && fabs(imag(&a) > zero))) {
 			return_value = DF_UNDEFINED;
 			v[output] = not_a_number();
 			continue;
@@ -5181,9 +5184,14 @@ df_readbinary(double v[], int max)
 			    df_tokens[output] = df_stringexpression[output] = s;
 			}
 			gpfree_string(&a);
-		    }
-		    else
+		    } else if (a.type == CMPLX && (fabs(imag(&a)) > zero)) {
+			/* June 2018: CHANGE. For consistency with function plots, */
+			/* imaginary results are treated as UNDEFINED.		   */
+			v[output] = not_a_number();
+			return DF_UNDEFINED;
+		    } else {
 			v[output] = real(&a);
+		    }
 
 		} else if (column == DF_SCAN_PLANE) {
 		    if ((df_current_plot->plot_style == IMAGE)
