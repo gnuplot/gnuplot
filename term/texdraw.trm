@@ -385,8 +385,7 @@ TERM_PUBLIC void
 TEXDRAW_graphics()
 {
     static char tdg1[] = "\
-\\begin{texdraw}\n\
-\\normalsize\n\
+\\btexdraw\n\
 \\ifx\\pathDEFINED\\relax\\else\\let\\pathDEFINED\\relax\n\
  \\def\\QtGfr{\\ifx (\\TGre \\let\\YhetT\\cpath\\else\\let\\YhetT\\relax\\fi\\YhetT}\n\
  \\def\\path (#1 #2){\\move (#1 #2)\\futurelet\\TGre\\QtGfr}\n\
@@ -433,7 +432,7 @@ TEXDRAW_text()
 {
     TEXDRAW_endline();
     // fputs("\\drawbb\n", gpoutfile);
-    fputs("\\end{texdraw}\n", gpoutfile);
+    fputs("\\etexdraw\n", gpoutfile);
     if (TEXDRAW_standalone)
 	fputs("\\end{figure}\n\n", gpoutfile);
 }
@@ -889,7 +888,7 @@ START_HELP(texdraw)
 "?terminal texdraw",
 "?term texdraw",
 "?texdraw",
-" The `texdraw` terminal driver supports the LaTeX texdraw environment.  It is",
+" The `texdraw` terminal driver supports the (La)TeX texdraw environment.  It is",
 " intended for use with the texdraw package,",
 " see https://www.ctan.org/tex-archive/graphics/texdraw/ .",
 "",
@@ -909,7 +908,8 @@ START_HELP(texdraw)
 " \"\\Box\".  These commands no longer belong to the LaTeX2e core; they are included",
 " in the latexsym package, which is part of the base distribution and thus part",
 " of any LaTeX implementation.  Please do not forget to use this package.",
-" Other point types use symbols from the amssymb package.",
+" Other point types use symbols from the amssymb package. For compatibility with",
+" plain TeX you need to specify the `gppoints` option.",
 "",
 " `standalone` produces a LaTeX file with possibly multiple plots, ready",
 " to be compiled.  The default is `input` to produce a TeX file which can",
