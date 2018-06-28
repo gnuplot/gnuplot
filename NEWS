@@ -2,6 +2,8 @@ Changes in 5.2.5
 ================
 * FIX clipping of plot "with lines" when axes are nonlinear (regression from 5.0)
 * FIX clipping of all elements in finanacebars/candlesticks/boxplots
+* FIX strange interaction of "noautoscale" with blank data lines
+* CHANGE equivalent slope constraint for mcs splines at both ends of the range
 
 Changes in 5.2.4
 ================

@@ -1392,7 +1392,14 @@ mcs_interp(struct curve_points *plot)
 	p[i].DX = p[i+1].x - p[i].x;
 	p[i].SLOPE = (p[i+1].y - p[i].y) / p[i].DX;
     }
-    p[N-1].SLOPE = 0;
+
+    /* The SIAM paper only mentions setting the final slope to zero if the
+     * calculation is otherwise ill-behaved (how would one detect that?).
+     * Retaining the data-derived slope makes the handling at the two ends
+     * of the data range consistent. See Bug #2055
+     */
+    /* p[N-1].SLOPE = 0; */
+    p[N-1].SLOPE = p[N-2].SLOPE;
 
     p[0].C1 = p[0].SLOPE;
     for (i = 0; i < N-1; i++) {

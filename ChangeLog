@@ -1,3 +1,13 @@
+2018-06-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/interpol.c (mcs_interp):  The Fritsch-Carlson monotonic spline
+	algorithm leaves indeterminate what slope constraint to use at the first
+	and last data points.  Previously the first point used the input slope
+	but the last point used zero slope.  This is valid, but difference in
+	treatment of the two ends is unexpected.  Now we use the input slope
+	at both ends.
+	Bug #2055
+
 2018-06-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_f_bars plot_c_bars): Clip all elements of
