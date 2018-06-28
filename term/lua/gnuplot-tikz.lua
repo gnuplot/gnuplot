@@ -596,7 +596,7 @@ f_context:write([[
 %%
 \usemodule[tikz]
 
-\usetikzlibrary[arrows,patterns,plotmarks,backgrounds]
+\usetikzlibrary[arrows,patterns,plotmarks,backgrounds,fit]
 
 \edef\tikzatcode{\the\catcode`\@}
 \edef\tikzbarcode{\the\catcode`\|}
@@ -626,13 +626,13 @@ f_tex:write([[
 %%  plain TeX wrapper for gnuplot-tikz style file
 %%
 \input tikz.tex
-\usetikzlibrary{arrows,patterns,plotmarks,backgrounds}
+\usetikzlibrary{arrows,patterns,plotmarks,backgrounds,fit}
 
 \edef\tikzatcode{\the\catcode`\@}
 \catcode`\@=11
 
 ]])
-f_tex:write("\\input "..name_common.."\n\n")
+f_tex:write("\\input "..name_common.."\n")
 f_tex:write([[
 
 \catcode`\@=\tikzatcode
