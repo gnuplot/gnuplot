@@ -948,12 +948,29 @@ C  need @ in table, so end and restart the table !
  The syntax "string"[beg:end] is exactly equivalent to calling the built-in
  string-valued function substr("string",beg,end), except that you cannot
  omit either beg or end from the function call.
+3 Complex arithmetic
+?complex arithmetic
+?complex
+ Arithmetic operations and most built-in functions support the use of complex
+ arguments.  Complex constants are expressed as {<real>,<imag>}, where <real>
+ and <imag> must be numerical constants.  Thus {0,1} represents 'i'.
+ The real and imaginary components of complex value x can be extracted as
+ real(x) and imag(x). The modulus is given by abs(x).
+
+ Gnuplot's standard 2D and 3D plot styles can plot only real values; if you 
+ need to plot a complex-valued function f(x) with non-zero imaginary components
+ you must choose between plotting real(f(x)) or abs(f(x)).  For examples of
+ representing complex values using color, see the 
+^ <a href="http://www.gnuplot.info/demo/complex_trig.html">
+ complex trigonometric function demos (complex_trig.dem)
+^ </a>
+
 3 Constants
 ?constants
 ?expressions constants
 ?octal
 ?hexadecimal
-?complex
+?complex constants
  Integer constants are interpreted via the C library routine strtoll().
  This means that constants beginning with "0" are interpreted as octal,
  and constants beginning with "0x" or "0X" are interpreted as hexadecimal.

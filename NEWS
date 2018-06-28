@@ -4,6 +4,7 @@ Changes in 5.2.5
 * FIX clipping of all elements in finanacebars/candlesticks/boxplots
 * FIX strange interaction of "noautoscale" with blank data lines
 * CHANGE equivalent slope constraint for mcs splines at both ends of the range
+* CHANGE treat imaginary values plotted from a using spec as UNDEFINED (NaN)
 
 Changes in 5.2.4
 ================

@@ -3128,13 +3128,14 @@ eval_plots()
 			(void) Gcomplex(&plot_func.dummy_values[0], x, 0.0);
 			evaluate_at(plot_func.at, &a);
 
+			/* Imaginary values are treated as UNDEFINED */
 			if (undefined || (fabs(imag(&a)) > zero)) {
 			    this_plot->points[i].type = UNDEFINED;
 			    continue;
-			} else {
-			    /* Jan 2010 - initialize all fields! */
-			    memset(&this_plot->points[i], 0, sizeof(struct coordinate));
 			}
+
+			/* Jan 2010 - initialize all fields! */
+			memset(&this_plot->points[i], 0, sizeof(struct coordinate));
 
 			temp = real(&a);
 
