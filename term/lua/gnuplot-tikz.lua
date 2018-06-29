@@ -74,8 +74,8 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
-pgf.REVISION = "106"
-pgf.REVISION_DATE = "2018/06/09 11:39:00"
+pgf.REVISION = "107"
+pgf.REVISION_DATE = "2018/06/29 00:58:15"
 
 pgf.styles = {}
 
