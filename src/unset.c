@@ -41,6 +41,7 @@
 #include "hidden3d.h"
 #include "jitter.h"
 #include "misc.h"
+#include "multiplot.h"
 #include "parse.h"
 #include "plot.h"
 #include "plot2d.h"
@@ -2003,6 +2004,10 @@ reset_command()
 #ifdef USE_MOUSE
     mouse_setting = default_mouse_setting;
 #endif
+
+    /* restore previous multiplot offset and margins */
+    if (multiplot)
+	multiplot_reset();
 
     unset_missing();
     free(df_separators);
