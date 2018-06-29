@@ -5,6 +5,7 @@ Changes in 5.2.5
 * FIX strange interaction of "noautoscale" with blank data lines
 * CHANGE equivalent slope constraint for mcs splines at both ends of the range
 * CHANGE treat imaginary values plotted from a using spec as UNDEFINED (NaN)
+* CHANGE allow "reset" between plots in a multiplot layout
 
 Changes in 5.2.4
 ================

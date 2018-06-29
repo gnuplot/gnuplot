@@ -1,3 +1,9 @@
+2018-06-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/multiplot.c src/multiplot.h src/unset.c:  The "reset" command
+	should not perturb current multiplot status.  This allows a reset
+	between plots in a multiplot.
+
 2018-06-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/interpol.c (mcs_interp):  The Fritsch-Carlson monotonic spline

@@ -150,10 +150,7 @@ multiplot_next()
 		}
 	    }
 	}
-	if (mp_layout.auto_layout_margins)
-	    mp_layout_margins_and_spacing();
-	else
-	    mp_layout_size_and_offset();
+	multiplot_reset();
     }
 }
 
@@ -183,10 +180,7 @@ multiplot_previous()
 		}
 	    }
 	}
-	if (mp_layout.auto_layout_margins)
-	    mp_layout_margins_and_spacing();
-	else
-	    mp_layout_size_and_offset();
+	multiplot_reset();
     }
 }
 
@@ -452,10 +446,7 @@ multiplot_start()
 	mp_layout.title_height = 0.0;
     }
 
-    if (mp_layout.auto_layout_margins)
-	mp_layout_margins_and_spacing();
-    else
-	mp_layout_size_and_offset();
+    multiplot_reset();
 }
 
 void
@@ -494,6 +485,15 @@ multiplot_end()
 }
 
 /* Helper function for multiplot auto layout to issue size and offset cmds */
+void
+multiplot_reset()
+{
+    if (mp_layout.auto_layout_margins)
+	mp_layout_margins_and_spacing();
+    else
+	mp_layout_size_and_offset();
+}
+
 static void
 mp_layout_size_and_offset(void)
 {
