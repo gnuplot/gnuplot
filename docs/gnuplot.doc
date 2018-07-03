@@ -6387,9 +6387,11 @@ Ffigure_fenceplot
 ?every
  The `every` keyword allows a periodic sampling of a data set to be plotted.
 
- In the discussion a "point" is a datum defined by a single record in the file;
- a "block" of data is a set of consecutive records with blank lines before and
- after the block.
+ For ordinary files a "point" single record (line); a "block" of data is a set
+ of consecutive records with blank lines before and after the block.
+
+ For matrix data a "block" and "point" correspond to "row" and "column".
+ See `matrix every`.
 
  Syntax:
        plot 'file' every {<point_incr>}
@@ -15185,6 +15187,23 @@ Ffigure_walls
 
  These triplets are then converted into `gnuplot` iso-curves and then
  `gnuplot` proceeds in the usual manner to do the rest of the plotting.
+5 every
+?datafile matrix every
+?matrix every
+ The `every` keyword has special meaning when used with matrix data.
+ Rather than applying to blocks of single points, it applies to rows and
+ column values.
+ Syntax:
+       plot 'file' every {<column_incr>}
+                           {:{<row_incr>}
+                             {:{<start_column>}
+                               {:{<start_row>}
+                                 {:{<end_column>}
+                                   {:<end_row>}}}}}
+ Examples:
+       plot 'file' matrix every :::N::N     # plot all values in row N of matrix
+       plot 'file' matrix every ::3::7:     # plot columns 3 to 7 of all rows
+       plot 'file' matrix every ::3:2:7:4   # submatrix of columns 3-7 rows 2-4
 5 examples
 ?commands plot datafile matrix examples
 ?commands splot datafile matrix examples
