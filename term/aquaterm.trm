@@ -153,6 +153,9 @@ static int AQUA_dashPatterns[AQUA_DASH_PATTERNS][6] = {
 
 /* Helper functions */
 static NSString* AQUA_convert_using_encoding __PROTO((const char *string));
+static void get_font_name_and_size
+	    __PROTO((const char *s, char **name, double *size));
+static void set_font_size __PROTO((double size));
 
 /*
  * ----------------------------------------------------------------
@@ -212,26 +215,42 @@ AQUA_options()
     }
 
     if (almost_equals(c_token, "fn$ame") || almost_equals(c_token, "font"))  {
-        char *comma;
+	char *name;
+	double size;
+
         c_token++;
     
 	if (!(s = try_to_get_string()))
 	    int_error(c_token,"expecting font specifier");
-        comma = strrchr(s, ',');
-	if (comma && (1 == sscanf(comma+1, "%lf", &AQUA_fontSizeCur)))
-	    *comma = '\0';
-	if (*s)
-	    strncpy(AQUA_fontNameCur, s, sizeof(AQUA_fontNameCur));
+
+	get_font_name_and_size(s, &name, &size);
 	free(s);
+
+	if (name)
+	    strncpy(AQUA_fontNameDef, name, sizeof(AQUA_fontNameDef));
+	strncpy(AQUA_fontNameCur, AQUA_fontNameDef, sizeof(AQUA_fontNameCur));
+	[adapter setFontname:AQUA_convert_using_encoding(AQUA_fontNameCur)];
+
+	if (size > 0)
+	    AQUA_fontSizeDef = size;
+	AQUA_fontSizeCur = AQUA_fontSizeDef;
+	set_font_size(AQUA_fontSizeCur);
+
 	continue;
     }
 
     if (almost_equals(c_token, "fs$ize")) {
+	double size;
+
 	c_token++;
 
 	if (END_OF_COMMAND)
 	    int_error(c_token,"expecting font size");
-	AQUA_fontSizeCur = real_expression();
+
+	if ((size = real_expression()) > 0)
+	    AQUA_fontSizeDef = size;
+	AQUA_fontSizeCur = AQUA_fontSizeDef;
+	set_font_size(AQUA_fontSizeCur);
 	continue;
     }
 
@@ -353,6 +372,42 @@ AQUA_convert_using_encoding(const char *string)
   return translatedString?translatedString:@"";
 }
 
+/*
+ * get font name and size from string 'name,size'
+ *   If name is missing, NULL is returned in *name.
+ *   If size is missing, -1 is returned in *size.
+ */
+static void
+get_font_name_and_size(const char *s, char **name, double *size)
+{
+    static char buf[MAX_ID_LEN + 1];
+    char *comma;
+    *name = NULL;
+    *size = -1;
+
+    if (!s || !*s)
+	return;
+
+    strncpy(buf, s, sizeof(buf));
+
+    if ((comma = strchr(buf, ','))) {
+	*comma = '\0';
+	sscanf(comma+1, "%lf", size);
+    }
+    if (strlen(buf) > 0)
+	*name = buf;
+}
+
+/* set font size, and reset h_char, v_char */
+static void
+set_font_size(double size)
+{
+    [adapter setFontsize:size];
+
+    term->h_char = (int) (size * 0.6 * AQUA_RESOLUTION);
+    term->v_char = (int) (size * 1.5 * AQUA_RESOLUTION);
+}
+
 TERM_PUBLIC void
 AQUA_init()
 {
@@ -382,10 +437,7 @@ AQUA_init()
   term->ymax = AQUA_ySize;
   /* set current font*/
   [adapter setFontname:AQUA_convert_using_encoding(AQUA_fontNameCur)];
-  [adapter setFontsize:AQUA_fontSizeCur];
-  /* set h_char, v_char*/
-  term->h_char = (int) (AQUA_fontSizeCur * 0.6 * AQUA_RESOLUTION);
-  term->v_char = (int) (AQUA_fontSizeCur * 1.5 * AQUA_RESOLUTION);
+  set_font_size(AQUA_fontSizeCur);  /* this also sets v_char and h_char */
   /* set h_tic, v_tic*/
   term->h_tic = term->v_char / 3;
   term->v_tic = term->v_char / 3;
@@ -551,30 +603,27 @@ AQUA_text_angle (int angle)
 TERM_PUBLIC int
 AQUA_set_font(const char *font) /* "font,size" */
 {
-  /* Obtain default fontname and fontsize. If these are invalid, AquaTerm will handle it. */
-  NSString *fontFace = AQUA_convert_using_encoding(AQUA_fontNameCur);
-  float fontSize = AQUA_fontSizeCur;
+    char *name;
+    double size;
   
-  if (strlen(font) > 0) {
-    /* Try to split the non-empty string into array parts (as string objects) */
-    NSArray *parts = [AQUA_convert_using_encoding(font) componentsSeparatedByString:@","];
-    /* Check that we have both non-empty name and size, otherwise stay with defaults */
-    if ([parts count] > 0 && ![[parts objectAtIndex:0] isEqualToString:@""] ) {
-      fontFace = [parts objectAtIndex:0]; /* fontname */
-      if ([parts count] > 1 && ![[parts objectAtIndex:1] isEqualToString:@""] ) {
-        fontSize = [[parts objectAtIndex:1] floatValue]; /* Convert (optional) 2nd string object (fontsize) to float */ 
-      }   
-    }
-  }
+    get_font_name_and_size(font, &name, &size);
 
-  LOG(@"Setting:(%@,%f)", fontFace, fontSize);
-  [adapter setFontname:fontFace];
-  [adapter setFontsize:fontSize];
+    if (name)
+	strncpy(AQUA_fontNameCur, name, sizeof(AQUA_fontNameCur));
+    else
+	strncpy(AQUA_fontNameCur, AQUA_fontNameDef, sizeof(AQUA_fontNameCur));
 
-  term->h_char = (int) (fontSize * 0.6 * AQUA_RESOLUTION);
-  term->v_char = (int) (fontSize * 1.5 * AQUA_RESOLUTION);
+    if (size > 0)
+	AQUA_fontSizeCur = size;
+    else
+	AQUA_fontSizeCur = AQUA_fontSizeDef;
 
-  return (TRUE);
+    NSString *fontFace = AQUA_convert_using_encoding(AQUA_fontNameCur);
+    LOG(@"Setting:(%@,%f)", fontFace, (float)AQUA_fontSizeCur);
+    [adapter setFontname:fontFace];
+    set_font_size(AQUA_fontSizeCur);
+
+    return (TRUE);
 }
 
 TERM_PUBLIC void
