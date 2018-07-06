@@ -649,7 +649,7 @@ get_data(struct curve_points *current_plot)
 	}
 
 	/* Assume range is OK; we will check later */
-	current_plot->points[i].type = (j == 0) ? NOTDEFINED : INRANGE;
+	current_plot->points[i].type = (j == 0) ? UNDEFINED : INRANGE;
 
 	/* First handle all the special cases (j <= 0) */
 	switch (j) {
