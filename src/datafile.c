@@ -2186,7 +2186,7 @@ df_readascii(double v[], int max)
 
 		    /* June 2018: CHANGE.  For consistency with function plots,	*/
 		    /* treat imaginary result as UNDEFINED.			*/
-		    if (undefined || (a.type == CMPLX && fabs(imag(&a) > zero))) {
+		    if (undefined || (a.type == CMPLX && fabs(imag(&a)) > zero)) {
 			return_value = DF_UNDEFINED;
 			v[output] = not_a_number();
 			continue;
