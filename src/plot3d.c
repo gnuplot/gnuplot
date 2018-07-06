@@ -1038,7 +1038,7 @@ get_3ddata(struct surface_points *this_plot)
 		    color_from_column(TRUE);
 		}
 
-	    } else if ((this_plot->plot_style == CIRCLES)) {
+	    } else if (this_plot->plot_style == CIRCLES) {
 		int varcol = 3;
 		/* require 4th column = radius */
 		cp->CRD_PTSIZE = v[varcol++];

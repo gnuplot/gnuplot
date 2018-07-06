@@ -511,7 +511,7 @@ GetAnnotateString(char *s, double x, double y, int mode, char *fmt)
 	plot_y->udv_value = original_y;
 	if (readout.type != STRING)
 	    int_error(NO_CARET, "mouseformat function did not return a string");
-	sprintf(s, readout.v.string_val);
+	sprintf(s, "%s", readout.v.string_val);
 	gpfree_string(&readout);
     } else {
 	/* Default format ("set mouse mouseformat" is not active) */

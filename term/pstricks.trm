@@ -1076,7 +1076,7 @@ PSTRICKS_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width
 	    colorstr = "hatchcolor";
 	snprintf(patfill, sizeof(patfill), stylestr, (style & 0x0f) == FS_PATTERN ? "*" : "");
 	if ((style & 0x0f) == FS_PATTERN && PSTRICKS_have_bg)
-	    strncat(patfill, ",fillcolor=PST@BGCOLOR", sizeof(patfill));
+	    strncat(patfill, ",fillcolor=PST@BGCOLOR", sizeof(patfill)-strlen(patfill)-1);
 	stylestr = patfill;
 	break;
     case FS_EMPTY:
@@ -1141,7 +1141,7 @@ PSTRICKS_filled_polygon(int points, gpiPoint *corners)
 	    colorstr = "hatchcolor";
 	snprintf(patfill, sizeof(patfill), stylestr, (style & 0x0f) == FS_PATTERN ? "*" : "");
 	if ((style & 0x0f) == FS_PATTERN && PSTRICKS_have_bg)
-	    strncat(patfill, ",fillcolor=PST@BGCOLOR", sizeof(patfill));
+	    strncat(patfill, ",fillcolor=PST@BGCOLOR", sizeof(patfill)-strlen(patfill)-1);
 	stylestr = patfill;
 	break;
     case FS_EMPTY:
