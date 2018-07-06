@@ -982,7 +982,11 @@ cmplx_divide(double a, double b, double c, double d, struct value *result)
 {
     double f1, f2, denom;
 
-    if (fabs(c) + fabs(d)) {
+    /* The common case of pure real numbers has no spurious overflow */
+    if (b == 0 && d == 0 && c != 0) {
+	(void) Gcomplex(result, a/c, 0.0);
+
+    } else if (fabs(c) + fabs(d)) {
 	if(fabs(c) >= fabs(d)) {
 	    f1 = 1;
 	    f2 = d / c;
