@@ -195,7 +195,7 @@ static struct x11opt {
 
 static FILE *X11_ipc = (FILE *) 0;
 #ifdef PIPE_IPC
-#define X11_ipc_back_fd ipc_back_fd
+static SELECT_TYPE_ARG1 ipc_back_fd = IPC_BACK_CLOSED;
 #endif
 
 /* reserve a minimum 10 driver opts */

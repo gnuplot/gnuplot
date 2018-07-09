@@ -173,10 +173,6 @@ const char *arrow_head_names[4] =
     {"nohead", "head", "backhead", "heads"};
 
 enum { IPC_BACK_UNUSABLE = -2, IPC_BACK_CLOSED = -1 };
-#ifdef PIPE_IPC
-/* HBB 20020225: currently not used anywhere outside term.c */
-static SELECT_TYPE_ARG1 ipc_back_fd = IPC_BACK_CLOSED;
-#endif
 
 /* resolution in dpi for converting pixels to size units */
 int gp_resolution = 72;
