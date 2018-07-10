@@ -1029,20 +1029,21 @@ EPSLATEX_boxed_text(unsigned int x, unsigned int y, int option)
 	PSLATEX_inbox = FALSE;
 	break;
     case TEXTBOX_OUTLINE:
-	fprintf(gpoutfile, "\t\\settowidth{\\gptboxwidth}{\\usebox{\\gptboxtext}}\n");
-	fprintf(gpoutfile, "\t\\advance\\gptboxwidth by 2\\fboxsep\n");
+	fputs("\t\\settowidth{\\gptboxwidth}{\\usebox{\\gptboxtext}}\n", gpoutfile);
+	fputs("\t\\advance\\gptboxwidth by 2\\fboxsep\n", gpoutfile);
 	fprintf(gpoutfile, "\t\\put(%d,%d)", PSLATEX_xbox, PSLATEX_ybox);
 	switch (ps_justify) {
 	case LEFT:
-	    fprintf(gpoutfile, "{\\framebox[\\gptboxwidth][c]{\\usebox{\\gptboxtext}}}\n");
+	    fputs("{\\makebox(0,0)[l]", gpoutfile);
+	    fputs("{\\framebox[\\gptboxwidth]{\\usebox{\\gptboxtext}}}}\n", gpoutfile);
 	    break;
 	case CENTRE:
-	    fprintf(gpoutfile, "{\\makebox[0.5\\width][r]");
-	    fprintf(gpoutfile, "{\\framebox[\\gptboxwidth][c]{\\usebox{\\gptboxtext}}}}\n");
+	    fputs("{\\makebox(0,0)", gpoutfile);
+	    fputs("{\\framebox[\\gptboxwidth][c]{\\usebox{\\gptboxtext}}}}\n", gpoutfile);
 	    break;
 	case RIGHT:
-	    fprintf(gpoutfile, "{\\makebox[-\\width][c]");
-	    fprintf(gpoutfile, "{\\framebox[\\gptboxwidth][c]{\\usebox{\\gptboxtext}}}}\n");
+	    fputs("{\\makebox(0,0)[r]", gpoutfile);
+	    fputs("{\\framebox[\\gptboxwidth][r]{\\usebox{\\gptboxtext}}}}\n", gpoutfile);
 	    break;
 	}
 	PSLATEX_inbox = FALSE;
@@ -1053,21 +1054,20 @@ EPSLATEX_boxed_text(unsigned int x, unsigned int y, int option)
 	    fprintf(gpoutfile, "        %s\n", tex_rgb_colordef);
 	    tex_color_synced = TRUE;
 	}
-	/* FIXME: I have zero idea why CENTER requires r while RIGHT requires c */
 	fprintf(gpoutfile, "\t\\put(%d,%d)", PSLATEX_xbox, PSLATEX_ybox);
 	switch (ps_justify) {
 	case LEFT:
-	    fputs("{{", gpoutfile);
+	    fputs("{\\makebox(0,0)[l]{", gpoutfile);
 	    break;
 	case CENTRE:
-	    fputs("{\\makebox[0.5\\width][r]{", gpoutfile);
+	    fputs("{\\makebox(0,0){", gpoutfile);
 	    break;
 	case RIGHT:
-	    fputs("{\\makebox[-\\width][c]{", gpoutfile);
+	    fputs("{\\makebox(0,0)[r]{", gpoutfile);
 	    break;
 	}
 	if (PSLATEX_opacity < 1.0)
-	    fprintf(gpoutfile,"\\transparent{%.2f}",PSLATEX_opacity);
+	    fprintf(gpoutfile, "\\transparent{%.2f}", PSLATEX_opacity);
 	fputs("\\colorbox{tbcol}{\\usebox{\\gptboxtext}}}}\n", gpoutfile);
 	break;
     case TEXTBOX_MARGINS:
