@@ -402,13 +402,13 @@ TERM_PUBLIC void cairotrm_options()
 			break;
 		case CAIROTRM_CROP:
 			c_token++;
-			if ((cairo_params->terminal == CAIROTERM_PNG) || 
+			if ((cairo_params->terminal == CAIROTERM_PNG) ||
 			    (cairo_params->terminal == CAIROTERM_EPS))
 			    cairo_params->crop = TRUE;
 			break;
 		case CAIROTRM_NOCROP:
 			c_token++;
-			if ((cairo_params->terminal == CAIROTERM_PNG) || 
+			if ((cairo_params->terminal == CAIROTERM_PNG) ||
 			    (cairo_params->terminal == CAIROTERM_EPS))
 			    cairo_params->crop = FALSE;
 			break;
@@ -543,12 +543,12 @@ TERM_PUBLIC void cairotrm_options()
 
 	/* Save options back into options string in normalized format */
 	if (cairo_params->transparent)
-		strncat(term_options, ISCAIROLATEX ? " nobackground" : " transparent", 
+		strncat(term_options, ISCAIROLATEX ? " nobackground" : " transparent",
 			sizeof(term_options) - strlen(term_options)-1);
 	else {
-		sprintf(tmp_term_options, " background \"#%02x%02x%02x\"", 
-			(int)(255 * cairo_params->background.r), 
-			(int)(255 * cairo_params->background.g), 
+		sprintf(tmp_term_options, " background \"#%02x%02x%02x\"",
+			(int)(255 * cairo_params->background.r),
+			(int)(255 * cairo_params->background.g),
 			(int)(255 * cairo_params->background.b));
 		strcat(term_options, tmp_term_options);
 	}
@@ -594,8 +594,8 @@ TERM_PUBLIC void cairotrm_options()
 	}
 
 	if (set_capjoin) {
-		strncat(term_options, 
-			cairo_params->linecap == ROUNDED ? " rounded" 
+		strncat(term_options,
+			cairo_params->linecap == ROUNDED ? " rounded"
 			: cairo_params->linecap == BUTT ? " butt"
 			: " square",
 			sizeof(term_options)-strlen(term_options)-1);
@@ -647,7 +647,7 @@ void cairotrm_init()
 	FPRINTF((stderr,"Init\n"));
 
 	/* do a sanity check for once */
-	if (strcmp(term->name, "epscairo") && strcmp(term->name, "cairolatex") && 
+	if (strcmp(term->name, "epscairo") && strcmp(term->name, "cairolatex") &&
 	    strcmp(term->name, "pdfcairo") && strcmp(term->name, "pngcairo"))
 		int_error(c_token,"Unrecognized cairo terminal");
 
@@ -672,7 +672,7 @@ void cairotrm_init()
 #endif
 		/* Redirection to a printer on Windows requires the use of gpoutfile
 		   via the cairostream_write callback.
-		*/ 
+		*/
 		    surface = cairo_pdf_surface_create_for_stream(
 			(cairo_write_func_t)cairostream_write, cairostream_error,
 				plot.device_xmax /*double width_in_points*/,
@@ -749,7 +749,7 @@ void cairotrm_init()
 				(cairo_write_func_t)cairostream_write, cairostream_error,
 				plot.device_xmax /*double width_in_points*/,
 				plot.device_ymax /*double height_in_points*/);
-		} 
+		}
 #ifdef HAVE_CAIROEPS
 		else {
 			surface = cairo_ps_surface_create_for_stream(
@@ -926,7 +926,7 @@ cairopng_write_cropped_image(cairo_surface_t *surface)
   const int padding = 10;
   int clip_width = GPMIN(x2 - x1 + padding, width);
   int clip_height = GPMIN(y2 - y1 + padding, height);
-  cairo_surface_t *clip = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 
+  cairo_surface_t *clip = cairo_image_surface_create(CAIRO_FORMAT_ARGB32,
   			clip_width, clip_height);
   cairo_t *clip_cr = cairo_create(clip);
   cairo_set_source_surface(clip_cr, surface,
@@ -1033,7 +1033,7 @@ void cairotrm_put_text(unsigned int x, unsigned int y, const char * string)
 	* closing brace in the string. We increment past it (else
 	* we get stuck in an infinite loop) and try again. */
 
-	while (*(string = enhanced_recursion((char*)string, TRUE, 
+	while (*(string = enhanced_recursion((char*)string, TRUE,
 			cairo_enhanced_fontname,
 			plot.fontsize,
 			0.0, TRUE, TRUE, 0))) {
@@ -1052,9 +1052,9 @@ void cairotrm_put_text(unsigned int x, unsigned int y, const char * string)
 	 * EAM FIXME: Jan 2015 This fixes a "key font gets stuck in bold mode"
 	 * bug but I don't understand why it is needed.
 	 */
-	gp_cairo_enhanced_open(&plot, cairo_params->fontname, plot.fontsize, 
+	gp_cairo_enhanced_open(&plot, cairo_params->fontname, plot.fontsize,
 				0.0, TRUE, TRUE, 0);
-#endif 
+#endif
 
 	/* finish */
 	gp_cairo_enhanced_finish(&plot, x, term->ymax - y);
@@ -1074,7 +1074,7 @@ void cairotrm_enhanced_writec(int c)
 
 void cairotrm_enhanced_open(char* fontname, double fontsize, double base, TBOOLEAN widthflag, TBOOLEAN showflag, int overprint)
 {
-	gp_cairo_enhanced_open(&plot, fontname, fontsize, 
+	gp_cairo_enhanced_open(&plot, fontname, fontsize,
 				base, widthflag, showflag, overprint);
 }
 
@@ -1087,10 +1087,9 @@ void cairotrm_linetype(int lt)
 	gp_cairo_set_linestyle(&plot,  GP_CAIRO_SOLID);
 
 	if (cairo_params->mono && lt >= -1)
-	    gp_cairo_set_color(&plot, gp_cairo_linetype2color( -1 ), 0.0);
+		gp_cairo_set_color(&plot, gp_cairo_linetype2color( -1 ), 0.0);
 	else
-	    gp_cairo_set_color(&plot, gp_cairo_linetype2color( lt ), 0.0);
-
+		gp_cairo_set_color(&plot, gp_cairo_linetype2color( lt ), 0.0);
 }
 
 
@@ -1142,7 +1141,7 @@ int cairotrm_set_font (const char *font)
 	/* the returned int is not used anywhere */
 	return 1;
 }
-	
+
 
 int cairotrm_justify_text(enum JUSTIFY mode)
 {
@@ -1317,7 +1316,7 @@ TERM_TABLE_START (epscairo_driver)
     , NULL /* hypertext */
 #ifdef EAM_BOXED_TEXT
     , cairotrm_boxed_text
-#endif 
+#endif
     , NULL /* modify_plots */
     , cairotrm_dashtype
 TERM_TABLE_END (epscairo_driver)
@@ -1334,7 +1333,7 @@ TERM_TABLE_START(cairolatex_driver)
     1 /* vtic */ , 1 /* htic */ ,
     cairotrm_options, cairotrm_init, cairotrm_reset, cairotrm_text, null_scale, cairotrm_graphics,
     cairotrm_move, cairotrm_vector,
-    cairotrm_linetype, EPSLATEX_put_text, 
+    EPSLATEX_linetype, EPSLATEX_put_text,
     PS_text_angle, PS_justify_text,
     cairotrm_point, do_arrow, cairotrm_set_font,
     cairotrm_pointsize,
@@ -1343,7 +1342,7 @@ TERM_TABLE_START(cairolatex_driver)
 #ifdef USE_MOUSE
     0, 0, 0, 0, 0, /* no mouse support for postscript */
 #endif
-    cairotrm_make_palette, 0 /* cairotrm_previous_palette */, 
+    cairotrm_make_palette, 0 /* cairotrm_previous_palette */,
     EPSLATEX_set_color, cairotrm_filled_polygon,
     cairotrm_image,
     0, 0, 0, /* Enhanced text mode not used */
@@ -1352,7 +1351,7 @@ TERM_TABLE_START(cairolatex_driver)
     , NULL /* hypertext */
 #ifdef EAM_BOXED_TEXT
     , EPSLATEX_boxed_text
-#endif 
+#endif
     , NULL /* modify_plots */
     , cairotrm_dashtype
 TERM_TABLE_END(cairolatex_driver)
@@ -1383,7 +1382,7 @@ TERM_TABLE_START (pdfcairo_driver)
     , NULL /* hypertext */
 #ifdef EAM_BOXED_TEXT
     , cairotrm_boxed_text
-#endif 
+#endif
     , NULL /* modify_plots */
     , cairotrm_dashtype
 TERM_TABLE_END (pdfcairo_driver)
@@ -1414,7 +1413,7 @@ TERM_TABLE_START (pngcairo_driver)
     , NULL /* hypertext */
 #ifdef EAM_BOXED_TEXT
     , cairotrm_boxed_text
-#endif 
+#endif
     , NULL /* modify_plots */
     , cairotrm_dashtype
 TERM_TABLE_END (pngcairo_driver)

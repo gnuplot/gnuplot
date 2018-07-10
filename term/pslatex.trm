@@ -135,7 +135,8 @@ static TBOOLEAN tex_color_synced = FALSE;
 /* support for cairolatex */
 #ifdef HAVE_CAIROPDF
 #define ISCAIROTERMINAL ((strcmp(term->name, "cairolatex") == 0))
-TERM_PUBLIC void cairotrm_set_color __PROTO ((t_colorspec *colorspec));
+TERM_PUBLIC void cairotrm_set_color(t_colorspec *colorspec);
+TERM_PUBLIC void cairotrm_linetype(int lt);
 #else
 #define ISCAIROTERMINAL (FALSE)
 #endif
@@ -936,7 +937,13 @@ EPSLATEX_linetype(int linetype)
 {
     t_colorspec tempcol = {TC_LT, 0, 0.0};
     tempcol.lt = linetype;
-    PS_linetype(linetype);
+
+#ifdef HAVE_CAIROPDF
+    if (ISCAIROTERMINAL)
+	cairotrm_linetype(linetype);
+    else
+#endif
+	PS_linetype(linetype);
 
     /* This leads to redundant *.eps output */
     EPSLATEX_set_color(&tempcol);
