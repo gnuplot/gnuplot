@@ -568,7 +568,7 @@ pipes:
 	$(MAKE) TARGET=wgnuplot_pipes.exe default
 
 docs:
-	$(MAKE) TARGET=gnuplot.exe gnuplot.pdf tutorial.pdf \
+	$(MAKE) TARGET=gnuplot.exe gnuplot.pdf \
 		ps_symbols.pdf ps_fontfile_doc.pdf ps_guide.pdf
 
 support: $(HELPFILE) $(M)bf_test.exe $(QT_TARGET) $(QT_TRANSLATION) demo_plugin.dll $(LUATARGETS) $(HELPFILEJA)
@@ -912,7 +912,7 @@ tutorial.pdf: $(TUT)/eg1.plt $(TUT)/eg2.plt $(TUT)/eg3.plt $(TUT)/eg4.plt \
 #ifdef LUA
 	GNUPLOT_LIB=$(TUT) GNUPLOT_LUA_DIR=$(T)lua ./$(TARGET) test_tikz.plt
 #endif
-	# run latex twice to get refernces right
+	# run latex twice to get references right
 	TEXINPUTS=.:$(TUT) latex tutorial.tex
 	TEXINPUTS=.:$(TUT) latex tutorial.tex
 	dvipdfm tutorial.dvi
@@ -956,7 +956,7 @@ veryclean: clean
 	$(RM) gnuplot_qt.exe qtgnuplot_*.qm
 	$(RM) $(HELPFILE) $(HELPFILEJA) wgnuplot.chw wgnuplot.gid wgnuplot.mnu
 	$(RM) gnuplot.ps gnuplot.pdf
-	$(RM) tutorial.pdf
+	-$(RM) tutorial.pdf
 	$(RM) ps_fontfile_doc.pdf ps_fontfile_doc.ps ps_guide.pdf
 	$(RM) ps_symbols.ps ps_symbols.pdf
 	$(RM) $(M)binary[123] $(M)fit.log $(M)soundfit.par
@@ -1035,7 +1035,7 @@ endif
 	mkdir -p $(DESTDIR)/docs
 	-cp -p gnuplot.pdf $(DESTDIR)/docs/
 	cp -p $(TOP)/FAQ.pdf $(DESTDIR)/docs/
-	-cp -p tutorial.pdf $(DESTDIR)/docs/
+	#-cp -p tutorial.pdf $(DESTDIR)/docs/
 	mkdir -p $(DESTDIR)/docs/psdoc
 	cp -p $(D)psdoc/ps_file.doc $(DESTDIR)/docs/psdoc/ps_file_doc.txt
 	cp -p $(D)psdoc/ps_guide.ps $(DESTDIR)/docs/psdoc/
