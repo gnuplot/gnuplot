@@ -212,6 +212,7 @@ C
 #start
 #bPlot style `with circles` can be used in 3D plots.
 #bPlot style `with boxes` can be used in 3D plots.
+#bPm3d surfaces can have individual fillstyle and fillcolor
 #bCustomized contour line types. See `set cntrparam`.
 #end
 

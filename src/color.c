@@ -49,6 +49,7 @@ static void draw_inside_color_smooth_box_postscript __PROTO((void));
 static void draw_inside_color_smooth_box_bitmap __PROTO((void));
 static void cbtick_callback __PROTO((struct axis *, double place, char *text, int ticlevel,
 			struct lp_style_type grid, struct ticmark *userlabels));
+static void ifilled_quadrangle __PROTO((gpiPoint* icorners));
 
 
 
@@ -200,13 +201,15 @@ set_rgbcolor_const(unsigned int rgbvalue)
     apply_pm3dcolor(&color);
 }
 
-void
+static void
 ifilled_quadrangle(gpiPoint* icorners)
 {
-    if (default_fillstyle.fillstyle == FS_EMPTY)
-	icorners->style = FS_OPAQUE;
-    else
-	icorners->style = style_from_fill(&default_fillstyle);
+    if (icorners->style == 0) {
+	if (default_fillstyle.fillstyle == FS_EMPTY)
+	    icorners->style = FS_OPAQUE;
+	else
+	    icorners->style = style_from_fill(&default_fillstyle);
+    }
     term->filled_polygon(4, icorners);
 
     if (pm3d.border.l_type != LT_NODRAW) {
@@ -228,12 +231,12 @@ ifilled_quadrangle(gpiPoint* icorners)
 }
 
 
-/* Wrapper that expand 4 corners with [x,y] only (gpdPoint) to
- * use gpiPoint instead [x,y,style].  The current code does not fill in
- * the style fields.
+/* The pm3d code works with gpdPoint data structures (double: x,y,z,color)
+ * term->filled_polygon and term->image want gpiPoint data (int: x,y,style)
+ * This routine converts from gpdPoint to gpiPoint
  */
 void
-filled_quadrangle(gpdPoint * corners)
+filled_quadrangle(gpdPoint *corners, int fillstyle)
 {
     int i;
     double x, y;
@@ -243,7 +246,7 @@ filled_quadrangle(gpdPoint * corners)
 	icorners[i].x = x;
 	icorners[i].y = y;
     }
-
+    icorners[0].style = fillstyle;
     ifilled_quadrangle(icorners);
 }
 

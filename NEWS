@@ -6,7 +6,7 @@ Changes not in 5.2
 * NEW "set clip radial" for line segments in polar mode plots
 * NEW "splot ... with circles"
 * NEW "splot ... with boxes"
-* NEW per-plot fillcolor for pm3d surfaces
+* NEW per-plot fillcolor and fillstyle for pm3d surfaces
 * NEW unicode escape sequences \U+hhhh
 * NEW order N Bessel functions of 1st and 2nd kind (besjn besyn)
 * NEW modified Bessel functions I0 (besi0) and I1 (besi1)

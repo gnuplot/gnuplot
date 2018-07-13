@@ -216,17 +216,11 @@ void set_color __PROTO(( double gray ));
 void set_rgbcolor_var __PROTO(( unsigned int rgbvalue ));
 void set_rgbcolor_const __PROTO(( unsigned int rgbvalue ));
 
-void ifilled_quadrangle __PROTO((gpiPoint* icorners));
-
 /*
-   The routine above for 4 points explicitly
+   Maps from real 3D coordinates to 2D terminal coordinates
+   then draws filled polygon
 */
-void filled_quadrangle __PROTO((gpdPoint *corners));
-
-/*
-   Makes mapping from real 3D coordinates, passed as coords array,
-   to 2D terminal coordinates, then draws filled polygon
-*/
+void filled_quadrangle __PROTO((gpdPoint *corners, int fillstyle));
 void filled_polygon_3dcoords __PROTO((int points, struct coordinate *coords));
 
 /*

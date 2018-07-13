@@ -48,6 +48,7 @@ typedef struct {
 	t_colorspec *border_color;
 	unsigned int rgb_color;
     } qcolor;
+    int fillstyle; /* from plot->fill_properties */
 } quadrangle;
 
 #define PM3D_USE_BORDER_COLOR_INSTEAD_OF_GRAY -12345
@@ -389,7 +390,7 @@ void pm3d_depth_queue_flush(void)
 	    else
 		set_color(qp->gray);
 
-	    filled_quadrangle(qp->corners);
+	    filled_quadrangle(qp->corners, qp->fillstyle);
 	}
     }
 
@@ -418,12 +419,14 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
     gpdPoint **bl_point = NULL; /* used for bilinear interpolation */
     TBOOLEAN color_from_column = FALSE;
     TBOOLEAN color_from_fillcolor = FALSE;
+    int plot_fillstyle;
 
     /* should never happen */
     if (this_plot == NULL)
 	return;
 
     /* just a shortcut */
+    plot_fillstyle = style_from_fill(&this_plot->fill_properties);
     color_from_column = this_plot->pm3d_color_from_column;
     color_from_rgbvar = FALSE;
 
@@ -935,6 +938,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 				qp->gray = gray;
 				qp->qcolor.border_color = &this_plot->lp_properties.pm3d_color;
 			    }
+			    qp->fillstyle = plot_fillstyle;
 			    current_quadrangle++;
 			} else {
 			    if (pm3d_shade.strength > 0 || color_from_rgbvar)
@@ -945,13 +949,13 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 				corners[0].z = corners[1].z = corners[2].z = corners[3].z = base_z;
 			    else if (at_which_z == PM3D_AT_TOP)
 				corners[0].z = corners[1].z = corners[2].z = corners[3].z = ceiling_z;
-			    filled_quadrangle(corners);
+			    filled_quadrangle(corners, plot_fillstyle);
 			}
 		    }
 		}
 	    } else { /* thus (interp_i == 1 && interp_j == 1) */
 		if (pm3d.direction != PM3D_DEPTH) {
-		    filled_quadrangle(corners);
+		    filled_quadrangle(corners, plot_fillstyle);
 		} else {
 		    /* copy quadrangle */
 		    quadrangle* qp = quadrangles + current_quadrangle;
@@ -963,6 +967,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			qp->gray = gray;
 			qp->qcolor.border_color = &this_plot->lp_properties.pm3d_color;
 		    }
+		    qp->fillstyle = plot_fillstyle;
 		    current_quadrangle++;
 		}
 	    } /* interpolate between points */
@@ -1048,6 +1053,7 @@ pm3d_add_quadrangle(struct surface_points *plot, gpdPoint corners[4])
     }
     q = quadrangles + current_quadrangle++;
     memcpy(q->corners, corners, 4*sizeof(gpdPoint));
+    q->fillstyle = 0;	/* Should this be style_from_fill(&plot->fill_properties)? */
 
     /* FIXME: color_from_rgbvar need only be set once per plot */
     if (plot->pm3d_color_from_column) {
