@@ -44,10 +44,14 @@ typedef struct {
     double gray;
     double z; /* maximal z value after rotation to graph coordinate system */
     gpdPoint corners[4];
-    t_colorspec *border_color;	/* Only used by depthorder processing */
+    union { /* Only used by depthorder processing */
+	t_colorspec *border_color;
+	unsigned int rgb_color;
+    } qcolor;
 } quadrangle;
 
 #define PM3D_USE_BORDER_COLOR_INSTEAD_OF_GRAY -12345
+#define PM3D_USE_RGB_COLOR_INSTEAD_OF_GRAY -12346
 
 static int allocated_quadrangles = 0;
 static int current_quadrangle = 0;
@@ -377,8 +381,10 @@ void pm3d_depth_queue_flush(void)
 
 	    /* set the color */
 	    if (qp->gray == PM3D_USE_BORDER_COLOR_INSTEAD_OF_GRAY)
-		apply_pm3dcolor(qp->border_color);
-	    else if (color_from_rgbvar || pm3d_shade.strength > 0)
+		apply_pm3dcolor(qp->qcolor.border_color);
+	    else if (qp->gray == PM3D_USE_RGB_COLOR_INSTEAD_OF_GRAY)
+		set_rgbcolor_var(qp->qcolor.rgb_color);
+	    else if (pm3d_shade.strength > 0)
 		set_rgbcolor_var((unsigned int)qp->gray);
 	    else
 		set_color(qp->gray);
@@ -410,15 +416,17 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
     gpdPoint corners[4];
     int interp_i, interp_j;
     gpdPoint **bl_point = NULL; /* used for bilinear interpolation */
+    TBOOLEAN color_from_column = FALSE;
+
+    /* should never happen */
+    if (this_plot == NULL)
+	return;
 
     /* just a shortcut */
-    TBOOLEAN color_from_column = this_plot->pm3d_color_from_column;
+    color_from_column = this_plot->pm3d_color_from_column;
 
     color_from_rgbvar = (this_plot->lp_properties.pm3d_color.type == TC_RGB
 			&&  this_plot->lp_properties.pm3d_color.value == -1);
-
-    if (this_plot == NULL)
-	return;
 
     /* Apply and save the user-requested line properties */
     pm3d_border_lp = this_plot->lp_properties;
@@ -904,8 +912,13 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			    /* copy quadrangle */
 			    quadrangle* qp = quadrangles + current_quadrangle;
 			    memcpy(qp->corners, corners, 4 * sizeof (gpdPoint));
-			    qp->gray = gray;
-			    qp->border_color = &this_plot->lp_properties.pm3d_color;
+			    if (color_from_rgbvar) {
+				qp->gray = PM3D_USE_RGB_COLOR_INSTEAD_OF_GRAY;
+				qp->qcolor.rgb_color = (unsigned int)gray;
+			    } else {
+				qp->gray = gray;
+				qp->qcolor.border_color = &this_plot->lp_properties.pm3d_color;
+			    }
 			    current_quadrangle++;
 			} else {
 			    if (pm3d_shade.strength > 0 || color_from_rgbvar)
@@ -927,8 +940,13 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		    /* copy quadrangle */
 		    quadrangle* qp = quadrangles + current_quadrangle;
 		    memcpy(qp->corners, corners, 4 * sizeof (gpdPoint));
-		    qp->gray = gray;
-		    qp->border_color = &this_plot->lp_properties.pm3d_color;
+		    if (color_from_rgbvar) {
+			qp->gray = PM3D_USE_RGB_COLOR_INSTEAD_OF_GRAY;
+			qp->qcolor.rgb_color = (unsigned int)gray;
+		    } else {
+			qp->gray = gray;
+			qp->qcolor.border_color = &this_plot->lp_properties.pm3d_color;
+		    }
 		    current_quadrangle++;
 		}
 	    } /* interpolate between points */
@@ -1030,7 +1048,7 @@ pm3d_add_quadrangle(struct surface_points *plot, gpdPoint corners[4])
 	    illuminate_one_quadrangle(q);
     } else {
 	/* This is the usual [only?] path for 'splot with zerror' */
-	q->border_color = &plot->fill_properties.border_color;
+	q->qcolor.border_color = &plot->fill_properties.border_color;
 	q->gray = PM3D_USE_BORDER_COLOR_INSTEAD_OF_GRAY;
     }
 }
