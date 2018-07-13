@@ -1,3 +1,8 @@
+2018-07-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gp_types.h src/plot3d.c src/pm3d.c:  Allow per-plot fillcolor
+	pm3d surfaces "splot ... with pm3d fillcolor <rgbvalue>".
+
 2018-07-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/pm3d.c src/color.c:  Remove undocumented EXPERIMENTAL option

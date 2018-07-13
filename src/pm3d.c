@@ -417,6 +417,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
     int interp_i, interp_j;
     gpdPoint **bl_point = NULL; /* used for bilinear interpolation */
     TBOOLEAN color_from_column = FALSE;
+    TBOOLEAN color_from_fillcolor = FALSE;
 
     /* should never happen */
     if (this_plot == NULL)
@@ -424,9 +425,16 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 
     /* just a shortcut */
     color_from_column = this_plot->pm3d_color_from_column;
+    color_from_rgbvar = FALSE;
 
-    color_from_rgbvar = (this_plot->lp_properties.pm3d_color.type == TC_RGB
-			&&  this_plot->lp_properties.pm3d_color.value == -1);
+    if (this_plot->lp_properties.pm3d_color.type == TC_RGB
+    &&  this_plot->lp_properties.pm3d_color.value == -1)
+	color_from_rgbvar = TRUE;
+
+    if (this_plot->fill_properties.border_color.type == TC_RGB) {
+	color_from_rgbvar = TRUE;
+	color_from_fillcolor = TRUE;
+    }
 
     /* Apply and save the user-requested line properties */
     pm3d_border_lp = this_plot->lp_properties;
@@ -676,6 +684,9 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		    cb2 = pointsA[i1].CRD_COLOR;
 		    cb3 = pointsB[ii].CRD_COLOR;
 		    cb4 = pointsB[ii1].CRD_COLOR;
+		} else if (color_from_fillcolor) {
+		    /* color is set by "fc <rgbvalue>" */
+		    cb1 = cb2 = cb3 = cb4 = this_plot->fill_properties.border_color.lt;
 		} else {
 		    cb1 = z2cb(pointsA[i].z);
 		    cb2 = z2cb(pointsA[i1].z);
@@ -878,10 +889,15 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			    case PM3D_WHICHCORNER_C4: avgC = cb4; break;
 			}
 
-			if (color_from_rgbvar) /* we were given an explicit color */
-				gray = avgC;
-			else /* transform z value to gray, i.e. to interval [0,1] */
-				gray = cb2gray(avgC);
+			if (color_from_fillcolor)
+			    /* color is set by "fc <rgbval>" */
+			    gray = this_plot->fill_properties.border_color.lt;
+			else if (color_from_rgbvar)
+			    /* we were given an explicit color */
+			    gray = avgC;
+			else
+			    /* transform z value to gray, i.e. to interval [0,1] */
+			    gray = cb2gray(avgC);
 
 			/* apply lighting model */
 			if (pm3d_shade.strength > 0) {
@@ -1036,10 +1052,14 @@ pm3d_add_quadrangle(struct surface_points *plot, gpdPoint corners[4])
     /* FIXME: color_from_rgbvar need only be set once per plot */
     if (plot->pm3d_color_from_column) {
 	/* This is the usual path for 'splot with boxes' */
-	q->gray = plot->lp_properties.pm3d_color.lt;
 	color_from_rgbvar = TRUE;
-	if (pm3d_shade.strength > 0)
+	if (pm3d_shade.strength > 0) {
+	    q->gray = plot->lp_properties.pm3d_color.lt;
 	    illuminate_one_quadrangle(q);
+	} else {
+	    q->qcolor.rgb_color = plot->lp_properties.pm3d_color.lt;
+	    q->gray = PM3D_USE_RGB_COLOR_INSTEAD_OF_GRAY;
+	}
     } else if (plot->lp_properties.pm3d_color.type == TC_Z) {
 	/* This is a special case for 'splot with boxes lc palette z' */
 	q->gray = cb2gray(corners[1].z);

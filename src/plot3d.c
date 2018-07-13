@@ -1818,6 +1818,8 @@ eval_3dplots()
 				1, this_plot->lp_properties.pm3d_color);
 			set_fillstyle = TRUE;
 		    }
+		    if (this_plot->plot_style == PM3DSURFACE)
+			this_plot->fill_properties.border_color.type = TC_DEFAULT;
 		    if (equals(c_token,"fc") || almost_equals(c_token,"fillc$olor")) {
 			parse_colorspec(&this_plot->fill_properties.border_color, TC_RGB);
 			set_fillstyle = TRUE;
@@ -1893,7 +1895,8 @@ eval_3dplots()
 	    }
 
 	    /* No fillcolor given; use the line color for fill also */
-	    if ((this_plot->plot_style & PLOT_STYLE_HAS_FILL) && !set_fillstyle)
+	    if (((this_plot->plot_style & PLOT_STYLE_HAS_FILL) && !set_fillstyle)
+	    &&  !(this_plot->plot_style == PM3DSURFACE))
 		this_plot->fill_properties.border_color
 		    = this_plot->lp_properties.pm3d_color;
 
