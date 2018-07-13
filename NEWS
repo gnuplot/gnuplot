@@ -26,6 +26,7 @@ Changes not in 5.2
 * CHANGE apply trange to sampling on pseudofile '+'
 * CHANGE move tgif terminal to "legacy" status; build only if configured
 * CHANGE imaginary values from the using spec of a 2D plot are treated as NaN
+* CHANGE remove compile option EXTENDED_COLOR_SPECS used only by vgagl.trm
 * FIX allow mixed use of in-key plot titles and manually placed titles
 * FIX open/close path for polygons
 

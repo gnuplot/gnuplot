@@ -800,8 +800,6 @@ if test "$with_linux_vga" = yes; then
             [dnl success! If we're here, all checks for
              dnl the vgagl terminal driver succeeded.
              AC_DEFINE(THREEDKIT,1,[ Define if the 3dkit libray is present. ])
-             AC_DEFINE(EXTENDED_COLOR_SPECS,1,
-                       [ Define if color information should be passed for each vertex. ])
              VGAGLLIB="-l3dkit -lvgagl"
              with_vgagl=yes
             ],dnl <-- 3dkit.h found

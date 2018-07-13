@@ -1,3 +1,14 @@
+2018-07-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.ac src/color.c src/color.h src/pm3d.c:
+
+	Remove support for compile option EXTENDED_COLOR_SPECS.
+	This was used only by vgagl.trm but required maintaining a separate
+	code path for coloring pm3d quadrangles for all terminals.  This
+	alternative code path did not know about new pm3d color options and
+	may no longer work at all.  Removing the conditional code breaks
+	vgagl.trm, which can be fixed later.
+
 2018-06-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c (draw_clip_arrow) term/lua.trm term/lua/gnuplot-tikz.lua

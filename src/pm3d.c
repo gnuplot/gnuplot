@@ -44,9 +44,6 @@ typedef struct {
     double gray;
     double z; /* maximal z value after rotation to graph coordinate system */
     gpdPoint corners[4];
-#ifdef EXTENDED_COLOR_SPECS
-    gpiPoint icorners[4];
-#endif
     t_colorspec *border_color;	/* Only used by depthorder processing */
 } quadrangle;
 
@@ -353,10 +350,6 @@ void pm3d_depth_queue_flush(void)
 	quadrangle* qp;
 	quadrangle* qe;
 	gpdPoint* gpdPtr;
-#ifdef EXTENDED_COLOR_SPECS
-	gpiPoint* gpiPtr;
-	double w = trans_mat[3][3];
-#endif
 	vertex out;
 	double z = 0; /* assignment keeps the compiler happy */
 	int i;
@@ -364,9 +357,6 @@ void pm3d_depth_queue_flush(void)
 	for (qp = quadrangles, qe = quadrangles + current_quadrangle; qp != qe; qp++) {
 
 	    gpdPtr = qp->corners;
-#ifdef EXTENDED_COLOR_SPECS
-	    gpiPtr = qp->icorners;
-#endif
 
 	    for (i = 0; i < 4; i++, gpdPtr++) {
 		/* 3D boxes want to be sorted on z of the base, not the mean z */
@@ -376,11 +366,6 @@ void pm3d_depth_queue_flush(void)
 		    map3d_xyz(gpdPtr->x, gpdPtr->y, gpdPtr->z, &out);
 		if (i == 0 || out.z > z)
 		    z = out.z;
-#ifdef EXTENDED_COLOR_SPECS
-		gpiPtr->x = ((out.x * xscaler / w) + xmiddle);
-		gpiPtr->y = ((out.y * yscaler / w) + ymiddle);
-		gpiPtr++;
-#endif
 	    }
 
 	    qp->z = z; /* maximal z value of all four corners */
@@ -398,11 +383,7 @@ void pm3d_depth_queue_flush(void)
 	    else
 		set_color(qp->gray);
 
-#ifdef EXTENDED_COLOR_SPECS
-	    ifilled_quadrangle(qp->icorners);
-#else
 	    filled_quadrangle(qp->corners);
-#endif
 	}
     }
 
@@ -428,9 +409,6 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
     double cb1, cb2, cb3, cb4;
     gpdPoint corners[4];
     int interp_i, interp_j;
-#ifdef EXTENDED_COLOR_SPECS
-    gpiPoint icorners[4];
-#endif
     gpdPoint **bl_point = NULL; /* used for bilinear interpolation */
 
     /* just a shortcut */
@@ -678,10 +656,6 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 	    }
 
 	    if ((interp_i <= 1 && interp_j <= 1) || pm3d.direction == PM3D_DEPTH) {
-
-#ifdef EXTENDED_COLOR_SPECS
-	      if ((term->flags & TERM_EXTENDED_COLOR) == 0)
-#endif
 	      {
 		/* Get the gray as the average of the corner z- or gray-positions
 		   (note: log scale is already included). The average is calculated here
@@ -796,40 +770,6 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		    corners[3].c = pointsA[i1].CRD_COLOR;
 		}
 	    }
-#ifdef EXTENDED_COLOR_SPECS
-	    if ((term->flags & TERM_EXTENDED_COLOR)) {
-		if (color_from_column) {
-		    icorners[0].z = pointsA[i].CRD_COLOR;
-		    icorners[1].z = pointsB[ii].CRD_COLOR;
-		    icorners[2].z = pointsB[ii1].CRD_COLOR;
-		    icorners[3].z = pointsA[i1].CRD_COLOR;
-		} else {
-		    /* the target wants z and gray value */
-		    icorners[0].z = pointsA[i].z;
-		    icorners[1].z = pointsB[ii].z;
-		    icorners[2].z = pointsB[ii1].z;
-		    icorners[3].z = pointsA[i1].z;
-		}
-		for (i = 0; i < 4; i++) {
-		    icorners[i].spec.gray =
-			cb2gray( color_from_column ? icorners[i].z : z2cb(icorners[i].z) );
-		}
-	    }
-	    if (pm3d.direction == PM3D_DEPTH) {
-		/* copy quadrangle */
-		quadrangle* qp = quadrangles + current_quadrangle;
-
-		memcpy(qp->corners, corners, 4 * sizeof (gpdPoint));
-		qp->gray = gray;
-		for (i = 0; i < 4; i++) {
-		    qp->icorners[i].z = icorners[i].z;
-		    qp->icorners[i].spec.gray = icorners[i].spec.gray;
-		}
-		current_quadrangle++;
-
-	    } else
-    		filled_quadrangle(corners, icorners);
-#else
 	    if (interp_i > 1 || interp_j > 1) {
 		/* Interpolation is enabled.
 		 * interp_i is the # of points along scan lines
@@ -992,7 +932,6 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		    current_quadrangle++;
 		}
 	    } /* interpolate between points */
-#endif
 	} /* loop quadrangles over points of two subsequent scans */
     } /* loop over scans */
 

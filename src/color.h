@@ -46,21 +46,10 @@ typedef struct t_colorspec {
 #define BLACK_COLORSPEC {TC_LT, LT_BLACK, 0.0}
 #define BACKGROUND_COLORSPEC {TC_LT, LT_BACKGROUND, 0.0}
 
-#ifdef EXTENDED_COLOR_SPECS
-typedef struct {
-    double gray;
-    /* to be extended */
-} colorspec_t;
-#endif
-
 /* EAM July 2004 - Disentangle polygon support and PM3D support  */
 /* a point (with integer coordinates) for use in polygon drawing */
 typedef struct {
     int x, y;
-#ifdef EXTENDED_COLOR_SPECS
-    double z;
-    colorspec_t spec;
-#endif
     int style;
 } gpiPoint;
 
@@ -205,10 +194,6 @@ typedef struct {
 
 extern t_sm_palette sm_palette;
 
-#ifdef EXTENDED_COLOR_SPECS
-extern int supply_extended_color_specs;
-#endif
-
 
 /* ROUTINES */
 
@@ -236,11 +221,7 @@ void ifilled_quadrangle __PROTO((gpiPoint* icorners));
 /*
    The routine above for 4 points explicitly
 */
-#ifdef EXTENDED_COLOR_SPECS
-void filled_quadrangle __PROTO((gpdPoint *corners, gpiPoint* icorners));
-#else
 void filled_quadrangle __PROTO((gpdPoint *corners));
-#endif
 
 /*
    Makes mapping from real 3D coordinates, passed as coords array,

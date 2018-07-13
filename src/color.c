@@ -232,19 +232,12 @@ ifilled_quadrangle(gpiPoint* icorners)
  * This is the only routine which supportes extended
  * color specs currently.
  */
-#ifdef EXTENDED_COLOR_SPECS
-void
-filled_quadrangle(gpdPoint * corners, gpiPoint * icorners)
-#else
 void
 filled_quadrangle(gpdPoint * corners)
-#endif
 {
     int i;
     double x, y;
-#ifndef EXTENDED_COLOR_SPECS
     gpiPoint icorners[4];
-#endif
     for (i = 0; i < 4; i++) {
 	map3d_xy_double(corners[i].x, corners[i].y, corners[i].z, &x, &y);
 	icorners[i].x = x;
@@ -273,11 +266,6 @@ filled_polygon_common(int points, struct coordinate * coords, TBOOLEAN fixed, do
 	icorners[i].x = x;
 	icorners[i].y = y;
     }
-#ifdef EXTENDED_COLOR_SPECS
-    if ((term->flags & TERM_EXTENDED_COLOR)) {
-	icorners[0].spec.gray = -1;	/* force solid color */
-    }
-#endif
     if (default_fillstyle.fillstyle == FS_EMPTY)
 	icorners->style = FS_OPAQUE;
     else
@@ -414,10 +402,6 @@ draw_inside_color_smooth_box_bitmap()
 	    corners[0].x = corners[3].x = xy;
 	    corners[1].x = corners[2].x = GPMIN(xy_to,xy2+1);
 	}
-#ifdef EXTENDED_COLOR_SPECS
-	if ((term->flags & TERM_EXTENDED_COLOR))
-	    corners[0].spec.gray = -1;	/* force solid color */
-#endif
 	/* print the rectangle with the given colour */
 	if (default_fillstyle.fillstyle == FS_EMPTY)
 	    corners->style = FS_OPAQUE;
