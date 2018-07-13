@@ -1,5 +1,12 @@
 2018-07-12  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/pm3d.c src/color.c:  Remove undocumented EXPERIMENTAL option
+	PM3D_CONTOURS.  There are serious problems with the approach such
+	that it is probably no useful as a starting point for coding
+	solid-fill contours.
+
+2018-07-12  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* configure.ac src/color.c src/color.h src/pm3d.c:
 
 	Remove support for compile option EXTENDED_COLOR_SPECS.

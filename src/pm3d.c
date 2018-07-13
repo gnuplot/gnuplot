@@ -949,57 +949,6 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 }				/* end of pm3d splotting mode */
 
 
-#ifdef PM3D_CONTOURS
-/*
- *  Now the implementation of the filled color contour plot
-*/
-static void
-filled_color_contour_plot(struct surface_points *this_plot, int contours_where)
-{
-    double gray;
-    struct gnuplot_contours *cntr;
-
-    /* just a shortcut */
-    TBOOLEAN color_from_column = this_plot->pm3d_color_from_column;
-
-    if (this_plot == NULL || this_plot->contours == NULL)
-	return;
-    if (contours_where != CONTOUR_SRF && contours_where != CONTOUR_BASE)
-	return;
-
-    /* return if the terminal does not support filled polygons */
-    if (!term->filled_polygon)
-	return;
-
-    /* TODO: CHECK FOR NUMBER OF POINTS IN CONTOUR: IF TOO SMALL, THEN IGNORE! */
-    cntr = this_plot->contours;
-    while (cntr) {
-	printf("# Contour: points %i, z %g, label: %s\n", cntr->num_pts, cntr->coords[0].z, (cntr->label) ? cntr->label : "<no>");
-	if (cntr->isNewLevel) {
-	    printf("\t...it isNewLevel\n");
-	    /* contour split across chunks */
-	    /* fprintf(gpoutfile, "\n# Contour %d, label: %s\n", number++, c->label); */
-	    /* What is the color? */
-	    /* get the z-coordinate */
-	    /* transform contour z-coordinate value to gray, i.e. to interval [0,1] */
-	    if (color_from_column)
-		gray = cb2gray(cntr->coords[0].CRD_COLOR);
-	    else
-		gray = cb2gray( z2cb(cntr->coords[0].z) );
-	    set_color(gray);
-	}
-	/* draw one countour */
-	if (contours_where == CONTOUR_SRF)	/* at CONTOUR_SRF */
-	    filled_polygon_3dcoords(cntr->num_pts, cntr->coords);
-	else			/* at CONTOUR_BASE */
-	    filled_polygon_3dcoords_zfixed(cntr->num_pts, cntr->coords, base_z);
-	/* next contour */
-	cntr = cntr->next;
-    }
-}				/* end of filled color contour plot splot mode */
-#endif
-
-
 /*
  * unset pm3d for the reset command
  */
@@ -1046,22 +995,6 @@ pm3d_draw_one(struct surface_points *plot)
     for (; where[i]; i++) {
 	pm3d_plot(plot, where[i]);
     }
-
-#ifdef PM3D_CONTOURS
-    if (strchr(where, 'C') != NULL) {
-	/* !!!!! FILLED COLOR CONTOURS, *UNDOCUMENTED*
-	   !!!!! LATER CHANGE TO STH LIKE
-	   !!!!!   (if_filled_contours_requested)
-	   !!!!!      ...
-	   Currently filled color contours do not work because gnuplot generates
-	   open contour lines, i.e. not closed on the graph boundary.
-	 */
-	if (draw_contour & CONTOUR_SRF)
-	    filled_color_contour_plot(plot, CONTOUR_SRF);
-	if (draw_contour & CONTOUR_BASE)
-	    filled_color_contour_plot(plot, CONTOUR_BASE);
-    }
-#endif
 }
 
 
@@ -1134,7 +1067,6 @@ get_pm3d_at_option(char *pm3d_where)
     pm3d_where[ token[c_token].length ] = 0;
     /* verify the parameter */
     for (c = pm3d_where; *c; c++) {
-	if (*c != 'C') /* !!!!! CONTOURS, UNDOCUMENTED, THIS LINE IS TEMPORARILY HERE !!!!! */
 	    if (*c != PM3D_AT_BASE && *c != PM3D_AT_TOP && *c != PM3D_AT_SURFACE) {
 		pm3d_option_at_error();
 		return 1;
