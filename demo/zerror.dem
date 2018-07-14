@@ -34,7 +34,7 @@ unset ytics
 set title "fence plot constructed with zerrorfill" 
 set xlabel "X axis"  rotate parallel 
 set ylabel "Y axis" rotate parallel
-set pm3d depthorder
+set pm3d depthorder base
 sinc(u,v) = sin(sqrt(u**2+v**2)) / sqrt(u**2+v**2)
 
 set style fill  transparent solid 0.75 noborder
