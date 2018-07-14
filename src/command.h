@@ -98,7 +98,7 @@ extern char HelpFile[];         /* patch for do_help  - AP */
 #endif
 
 /* Include code to support deprecated "call" syntax. */
-#ifdef BACKWARDS_COMPATIBLE
+#if (1) /* Deprecated */
 #define OLD_STYLE_CALL_ARGS
 #endif
 

@@ -4810,7 +4810,6 @@ set_style()
 	break;
 #endif
     case SHOW_STYLE_INCREMENT:
-#if TRUE || defined(BACKWARDS_COMPATIBLE)
 	c_token++;
 	if (END_OF_COMMAND || almost_equals(c_token,"def$ault"))
 	    prefer_line_styles = FALSE;
@@ -4819,7 +4818,6 @@ set_style()
 	else
 	    int_error(c_token,"unrecognized option");
 	c_token++;
-#endif
 	break;
     case SHOW_STYLE_BOXPLOT:
 	set_boxplot();

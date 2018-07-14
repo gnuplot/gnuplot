@@ -185,10 +185,8 @@ struct object default_ellipse = DEFAULT_ELLIPSE_STYLE;
 filledcurves_opts filledcurves_opts_data = EMPTY_FILLEDCURVES_OPTS;
 filledcurves_opts filledcurves_opts_func = EMPTY_FILLEDCURVES_OPTS;
 
-#if TRUE || defined(BACKWARDS_COMPATIBLE)
 /* Prefer line styles over plain line types */
 TBOOLEAN prefer_line_styles = FALSE;
-#endif
 
 /* If current terminal claims to be monochrome, don't try to send it colors */
 #define monochrome_terminal ((t->flags & TERM_MONOCHROME) != 0)

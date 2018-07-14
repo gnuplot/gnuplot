@@ -800,6 +800,8 @@ if test "$with_linux_vga" = yes; then
             [dnl success! If we're here, all checks for
              dnl the vgagl terminal driver succeeded.
              AC_DEFINE(THREEDKIT,1,[ Define if the 3dkit libray is present. ])
+             AC_DEFINE(EXTENDED_COLOR_SPECS,1,
+                       [ Define if color information should be passed for each vertex. ])
              VGAGLLIB="-l3dkit -lvgagl"
              with_vgagl=yes
             ],dnl <-- 3dkit.h found
@@ -1089,12 +1091,12 @@ AC_ARG_ENABLE(stats,dnl
    )
 
 dnl Enable parsing of deprecated syntax
-AC_ARG_ENABLE(backwards-compatibility,dnl
-[  --enable-backwards-compatibility       enable deprecated syntax ],
-  [if test "$enableval" = yes; then
-    AC_DEFINE(BACKWARDS_COMPATIBLE,1,
-               [ Define to allow use of certain deprecated syntax. ])
-  fi])
+dnl AC_ARG_ENABLE(backwards-compatibility,dnl
+dnl [  --enable-backwards-compatibility       enable deprecated syntax ],
+dnl   [if test "$enableval" = yes; then
+dnl     AC_DEFINE(BACKWARDS_COMPATIBLE,1,
+dnl                [ Define to allow use of certain deprecated syntax. ])
+dnl   fi])
 
 dnl Qt terminal
 
@@ -1515,11 +1517,11 @@ else
   fi
 fi
 
-if test "$enable_backwards_compatibility" = yes; then
-  AC_MSG_RESULT([  Allow deprecated syntax: yes])
-else
-  AC_MSG_RESULT([  Allow deprecated syntax: no (use --enable-backwards-compatibility)])
-fi
+dnl if test "$enable_backwards_compatibility" = yes; then
+dnl   AC_MSG_RESULT([  Allow deprecated syntax: yes])
+dnl else
+dnl   AC_MSG_RESULT([  Allow deprecated syntax: no (use --enable-backwards-compatibility)])
+dnl fi
 
 if test "$enable_stats" != no; then
   AC_MSG_RESULT([  Statistical summary of data ("stats" command): yes])

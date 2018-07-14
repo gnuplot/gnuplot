@@ -1997,9 +1997,7 @@ reset_command()
 #ifdef EAM_BOXED_TEXT
     unset_textbox_style();
 #endif
-#ifdef BACKWARDS_COMPATIBLE
     prefer_line_styles = FALSE;
-#endif
 
 #ifdef USE_MOUSE
     mouse_setting = default_mouse_setting;

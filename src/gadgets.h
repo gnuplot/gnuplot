@@ -636,11 +636,8 @@ extern filledcurves_opts filledcurves_opts_data;
 extern filledcurves_opts filledcurves_opts_func;
 
 /* Prefer line styles over plain line types */
-#if TRUE || defined(BACKWARDS_COMPATIBLE)
+/* Mostly for backwards compatibility */
 extern TBOOLEAN prefer_line_styles;
-#else
-#define prefer_line_styles FALSE
-#endif
 
 extern histogram_style histogram_opts;
 

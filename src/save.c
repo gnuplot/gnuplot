@@ -548,9 +548,10 @@ save_set_all(FILE *fp)
 	}
 	fprintf(fp, "\n");
     }
-#if TRUE || defined(BACKWARDS_COMPATIBLE)
-    fprintf(fp, "set style increment %s\n", prefer_line_styles ? "userstyles" : "default");
-#endif
+
+    /* Mostly for backwards compatibility */
+    if (prefer_line_styles)
+	fprintf(fp, "set style increment userstyles\n");
     fputs("unset style line\n", fp);
     for (this_linestyle = first_linestyle; this_linestyle != NULL;
 	 this_linestyle = this_linestyle->next) {
@@ -558,7 +559,7 @@ save_set_all(FILE *fp)
 	save_linetype(fp, &(this_linestyle->lp_properties), TRUE);
 	fprintf(fp, "\n");
     }
-	/* TODO save "set linetype" as well, or instead */ 
+
     fputs("unset style arrow\n", fp);
     for (this_arrowstyle = first_arrowstyle; this_arrowstyle != NULL;
 	 this_arrowstyle = this_arrowstyle->next) {
