@@ -220,7 +220,6 @@ void set_rgbcolor_const __PROTO(( unsigned int rgbvalue ));
    Maps from real 3D coordinates to 2D terminal coordinates
    then draws filled polygon
 */
-void filled_quadrangle __PROTO((gpdPoint *corners, int fillstyle));
 void filled_polygon_3dcoords __PROTO((int points, struct coordinate *coords));
 
 /*

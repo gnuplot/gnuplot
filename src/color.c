@@ -49,8 +49,6 @@ static void draw_inside_color_smooth_box_postscript __PROTO((void));
 static void draw_inside_color_smooth_box_bitmap __PROTO((void));
 static void cbtick_callback __PROTO((struct axis *, double place, char *text, int ticlevel,
 			struct lp_style_type grid, struct ticmark *userlabels));
-static void ifilled_quadrangle __PROTO((gpiPoint* icorners));
-
 
 
 /* *******************************************************************
@@ -200,56 +198,6 @@ set_rgbcolor_const(unsigned int rgbvalue)
     color.value = 0;	/* 0 flags that this is a constant color */
     apply_pm3dcolor(&color);
 }
-
-static void
-ifilled_quadrangle(gpiPoint* icorners)
-{
-    if (icorners->style == 0) {
-	if (default_fillstyle.fillstyle == FS_EMPTY)
-	    icorners->style = FS_OPAQUE;
-	else
-	    icorners->style = style_from_fill(&default_fillstyle);
-    }
-    term->filled_polygon(4, icorners);
-
-    if (pm3d.border.l_type != LT_NODRAW) {
-	int i;
-
-	/* LT_DEFAULT means draw border in current color */
-	/* FIXME: currently there is no obvious way to set LT_DEFAULT  */
-	if (pm3d.border.l_type != LT_DEFAULT) {
-	    /* It should be sufficient to set only the color, but for some */
-	    /* reason this causes the svg terminal to lose the fill type.  */
-	    term_apply_lp_properties(&pm3d_border_lp);
-	}
-
-	term->move(icorners[0].x, icorners[0].y);
-	for (i = 3; i >= 0; i--) {
-	    term->vector(icorners[i].x, icorners[i].y);
-	}
-    }
-}
-
-
-/* The pm3d code works with gpdPoint data structures (double: x,y,z,color)
- * term->filled_polygon and term->image want gpiPoint data (int: x,y,style)
- * This routine converts from gpdPoint to gpiPoint
- */
-void
-filled_quadrangle(gpdPoint *corners, int fillstyle)
-{
-    int i;
-    double x, y;
-    gpiPoint icorners[4];
-    for (i = 0; i < 4; i++) {
-	map3d_xy_double(corners[i].x, corners[i].y, corners[i].z, &x, &y);
-	icorners[i].x = x;
-	icorners[i].y = y;
-    }
-    icorners[0].style = fillstyle;
-    ifilled_quadrangle(icorners);
-}
-
 
 /*
    Draw colour smooth box

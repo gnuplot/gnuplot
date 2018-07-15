@@ -135,7 +135,7 @@ extern lighting_model pm3d_shade;
 /* Used to initialize `set pm3d border` */
 extern struct lp_style_type default_pm3d_border;
 
-/* Used by routine filled_quadrangle() in color.c */
+/* Used by routine filled_quadrangle() */
 extern struct lp_style_type pm3d_border_lp;
 extern TBOOLEAN track_pm3d_quadrangles;
 
