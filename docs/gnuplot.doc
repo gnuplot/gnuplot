@@ -2749,12 +2749,14 @@ Ffigure_newsyntax
 ?linecolor
 ?tc
 ?textcolor
+=fillcolor
  Many commands allow you to specify a linetype with an explicit color.
 
  Syntax:
 
        ... {linecolor | lc} {"colorname" | <colorspec> | <n>}
        ... {textcolor | tc} {<colorspec> | {linetype | lt} <n>}
+       ... {fillcolor | fc} {<colorspec> | linetype <n> | linestyle <n>}
 
  where <colorspec> has one of the following forms:
 
@@ -12257,9 +12259,9 @@ Ffigure_multiple_keys
        set style data pm3d
  then the options `implicit` and `explicit` have no effect.
 
- Note that when plotting several plots, they are plotted in the order given
- on the command line. This can be of interest especially for filled surfaces
- which can overwrite and therefore hide part of earlier plots.
+ Note that pm3d plots are plotted sequentially in the order given in the
+ splot command. Thus earlier plots may be obscured by later plots.
+ To avoid this you can use the `depthorder` scan option.
 
  The pm3d coloring can be drawn at any or all of three different positions,
  `top`, `bottom`, or `surface`. See `pm3d position`.
@@ -12361,6 +12363,8 @@ Ffigure_multiple_keys
 =scansautomatic
 =depthorder
 =ftriangles
+      set pm3d {scansautomatic | scansforward | scansbackward | depthorder}
+
  By default the quadrangles making up a pm3d solid surface are rendered in the
  order they are encountered along the surface grid points.  This order may be
  controlled by the options `scansautomatic`|`scansforward`|`scansbackward`.
@@ -12407,37 +12411,26 @@ Ffigure_multiple_keys
 
 4 color_assignment
 ?pm3d color_assignment
- `3 columns of data (x,y,z)`:
+ The default pm3d coloring assigns an individual color to each quadrangle of
+ the surface grid.  For alternative coloring schems that assign uniform color to
+ the entire surface, see `pm3d fillcolor`.
 
- The coloring setup as well as the color box drawing are determined by
- `set palette`.  There can be only one palette for the current plot.  Drawing
- of several surfaces with different palettes can be achieved by `multiplot`
- with fixed `origin` and `size`; don't forget to use `set palette maxcolors`
- when your terminal is running out of available colors.
+ A single gray/color value (i.e. not a gradient) is assigned to each quadrangle.
+ This value is calculated from the z-coordinates the four quadrangle corners
+ according to `corners2color <option>`.  The value is then used to select a
+ color from the current palette.  See `set palette`.
+ It is not possible to change palettes inside a single `splot` command.
 
- There is a single gray/color value associated to each drawn pm3d quadrangle
- (it contains a solid color, not a gradient).  The value is calculated from
- z-coordinates the four corners according to `corners2color <option>`.
- `4 columns of data (x,y,z,color)`:
-
- If a fourth column of data is provided, it is normally interpreted as a 
- separate palette-mapped gray value. The coloring of individual quadrangles
- works as above, except that the color value is distinct from the z value.
+ If a fourth column of data is provided, the coloring of individual quadrangles
+ works as above except that the color value is distinct from the z value.
  As a separate coloring option, the fourth data column may provide instead
  an RGB color. See `rgbcolor variable`. In this case the plotting command
  must be
 
        splot ... using 1:2:3:4 with pm3d lc rgb variable
 
- Another drawing algorithm, which would draw quadrangles around a given node
- by taking corners from averaged (x,y)-coordinates of its surrounding 4 nodes
- while using node's color, could be implemented in the future. This is already
- done for drawing images (2D grids) via `image` and `rgbimage` styles.
-
  Notice that ranges of z-values and color-values for surfaces are adjustable
- independently by `set zrange`, `set cbrange`, as well as `set log` for z or
- cb.  Maps can be adjusted by the cb-axis only; see also `set view map` and
- `set colorbox`.
+ independently by `set zrange`, `set cbrange`, `set log z`, `set log cb`, etc.
 4 corners2color
 ?pm3d corners2color
 ?set pm3d corners2color
@@ -12485,7 +12478,30 @@ Ffigure_multiple_keys
 
  NB: The deprecated option `set pm3d hidden3d N` is still accepted. It is 
  equivalent to `set pm3d border ls N`.
+4 fillcolor
+?pm3d fillcolor
+      splot FOO with pm3d fillcolor <colorspec>
 
+ Plot style `with pm3d` accepts an optional fillcolor in the splot command.
+ This single specification is applied to the entire pm3d surface.
+ See `colorspec`.  Most fillcolor specifications will result in a single
+ solid color, which is hard to interpret visually unless there is also a
+ lighting model present to distinguish surface components based on orientation.
+ See `pm3d lighting`.
+
+ There are a few special cases.  `with pm3d fillcolor palette` would produce
+ the same result as the default pm3d palette-based coloring, and is therefore
+ not a useful option. `with pm3d fillcolor linestyle N` is more interesting.
+ This variant assigns distinct colors to the top and bottom of the pm3d
+ surface, similar to the color scheme used by gnuplot's `hidden3d` mode.
+ Linestyle N is used for the top surface; linestyle N+1 for the bottom surface.
+ Note that "top" and "bottom" depend on the scan order, so that the colors are
+ inverted for `pm3d scansbackwards` as compared to `pm3d scansforward`.
+ This coloring option works best with `pm3d depthorder`, however, which
+ unfortunately does not allow you to control the scan order so you may have
+ to instead swap the colors defined for linestyles N and N+1.
+
+ EXPERIMENTAL - details may change before this appears in a release version.
 4 interpolate
 ?set pm3d interpolate
 ?pm3d interpolate

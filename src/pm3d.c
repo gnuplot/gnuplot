@@ -73,6 +73,8 @@ static void illuminate_one_quadrangle __PROTO(( quadrangle *q ));
 static void filled_quadrangle __PROTO((gpdPoint *corners, int fillstyle));
 static void ifilled_quadrangle __PROTO((gpiPoint *corners));
 
+static int pm3d_side __PROTO(( struct coordinate *p0, struct coordinate *p1, struct coordinate *p2));
+
 static TBOOLEAN color_from_rgbvar = FALSE;
 static double light[3];
 
@@ -437,7 +439,8 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
     &&  this_plot->lp_properties.pm3d_color.value == -1)
 	color_from_rgbvar = TRUE;
 
-    if (this_plot->fill_properties.border_color.type == TC_RGB) {
+    if (this_plot->fill_properties.border_color.type == TC_RGB 
+    ||  this_plot->fill_properties.border_color.type == TC_LINESTYLE) {
 	color_from_rgbvar = TRUE;
 	color_from_fillcolor = TRUE;
     }
@@ -693,6 +696,16 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		} else if (color_from_fillcolor) {
 		    /* color is set by "fc <rgbvalue>" */
 		    cb1 = cb2 = cb3 = cb4 = this_plot->fill_properties.border_color.lt;
+		    /* EXPERIMENTAL
+		     * pm3d fc linestyle N generates
+		     * top/bottom color difference as with hidden3d
+		     */
+		    if (this_plot->fill_properties.border_color.type == TC_LINESTYLE) {
+			struct lp_style_type style;
+			int side = pm3d_side( &pointsA[i], &pointsA[i1], &pointsB[ii]);
+			lp_use_properties(&style, side < 0 ? cb1 + 1 : cb1);
+			cb1 = cb2 = cb3 = cb4 = style.pm3d_color.lt;
+		    }
 		} else {
 		    cb1 = z2cb(pointsA[i].z);
 		    cb2 = z2cb(pointsA[i1].z);
@@ -895,15 +908,26 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			    case PM3D_WHICHCORNER_C4: avgC = cb4; break;
 			}
 
-			if (color_from_fillcolor)
+			if (color_from_fillcolor) {
 			    /* color is set by "fc <rgbval>" */
 			    gray = this_plot->fill_properties.border_color.lt;
-			else if (color_from_rgbvar)
+			    /* EXPERIMENTAL
+			     * pm3d fc linestyle N generates
+			     * top/bottom color difference as with hidden3d
+			     */
+			    if (this_plot->fill_properties.border_color.type == TC_LINESTYLE) {
+				struct lp_style_type style;
+				int side = pm3d_side( &pointsA[i], &pointsB[ii], &pointsB[ii1]);
+				lp_use_properties(&style, side < 0 ? gray + 1 : gray);
+				gray = style.pm3d_color.lt;
+			    }
+			} else if (color_from_rgbvar) {
 			    /* we were given an explicit color */
 			    gray = avgC;
-			else
+			} else {
 			    /* transform z value to gray, i.e. to interval [0,1] */
 			    gray = cb2gray(avgC);
+			}
 
 			/* apply lighting model */
 			if (pm3d_shade.strength > 0) {
@@ -1407,3 +1431,30 @@ filled_quadrangle(gpdPoint *corners, int fillstyle)
     ifilled_quadrangle(icorners);
 }
 
+/* EXPERIMENATAL
+ * returns 1 for top of pm3d surface towards the viewer
+ *        -1 for bottom of pm3d surface towards the viewer
+ * NB: the ordering of the quadrangle vertices depends on the scan direction.
+ *     In the case of depth ordering, the user does not have good control
+ *     over this.
+ */
+static int
+pm3d_side( struct coordinate *p0, struct coordinate *p1, struct coordinate *p2)
+{
+    struct vertex v[3];
+    double u0, u1, v0, v1;
+
+    /* Apply current view rotation to corners of this quadrangle */
+    map3d_xyz(p0->x, p0->y, p0->z, &v[0]);
+    map3d_xyz(p1->x, p1->y, p1->z, &v[1]);
+    map3d_xyz(p2->x, p2->y, p2->z, &v[2]);
+
+    /* projection of two adjacent edges */
+    u0 = v[1].x - v[0].x;
+    u1 = v[1].y - v[0].y;
+    v0 = v[2].x - v[0].x;
+    v1 = v[2].y - v[0].y;
+
+    /* cross-product */
+    return sgn(u0*v1 - u1*v0);
+}
