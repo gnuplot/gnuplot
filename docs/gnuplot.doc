@@ -4515,7 +4515,7 @@ Ffigure_yerrorlines
 
  If there are multiple curves in the splot command each new curve may occlude
  all previous curves.  To get proper depth sorting so that curves can only be
- occluded by curves closer to the viewer, use the command `set pm3d depthorder`.
+ occluded by curves closer to the viewer, use `set pm3d depthorder base`.
  Unfortunately this causes all the filled areas to be drawn after all of the
  corresponding lines of z values.  In order to see both the lines and the
  depth-sorted fill areas you probably will need to make the fill areas 

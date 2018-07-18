@@ -393,7 +393,10 @@ void pm3d_depth_queue_flush(void)
 
 	    for (i = 0; i < 4; i++, gpdPtr++) {
 
-		map3d_xyz(gpdPtr->x, gpdPtr->y, gpdPtr->z, &out);
+		if (pm3d.base_sort)
+		    map3d_xyz(gpdPtr->x, gpdPtr->y, 0.0, &out);
+		else
+		    map3d_xyz(gpdPtr->x, gpdPtr->y, gpdPtr->z, &out);
 
 		if (i == 0 || out.z > z)
 		    z = out.z;
@@ -1097,6 +1100,7 @@ pm3d_reset()
     pm3d.interp_j = 1;
     pm3d.border = default_pm3d_border;
     pm3d.border.l_type = LT_NODRAW;
+    pm3d.base_sort = FALSE;
 
     pm3d_shade.strength = 0.0;
     pm3d_shade.spec = 0.0;

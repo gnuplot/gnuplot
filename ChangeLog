@@ -1,3 +1,10 @@
+2018-07-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/p3md.c src/pm3d.h save.c set.c:  Backport from 5.3
+	New option 'set pm3d depthorder base' sorts pm3d quadrangles on the
+	depth of the projected intersection  of the quadrangle with the base
+	plane z=0.  Useful for fence plots drawn with zerror.
+
 2018-06-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/multiplot.c src/multiplot.h src/unset.c:  The "reset" command

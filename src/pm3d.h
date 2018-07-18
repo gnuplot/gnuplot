@@ -111,6 +111,7 @@ typedef struct {
   char ftriangles;   	/* 0/1 (don't) draw flushing triangles */
   char clip;		/* 1in, 4in */
   pm3d_scandir direction;
+  TBOOLEAN base_sort;	/* default: depth sort by mean z;   true: use z=0.0 */
   PM3D_IMPL_MODE implicit;
 			/* 1: [default] draw ALL surfaces with pm3d
 			   0: only surfaces specified with 'with pm3d' */

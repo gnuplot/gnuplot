@@ -1,12 +1,14 @@
 Changes in 5.2.5
 ================
+* NEW "set pm3d depthorder base" sorts pm3d quadrangles by projecting to z=0
+* CHANGE equivalent slope constraint for mcs splines at both ends of the range
+* CHANGE treat imaginary values plotted from a using spec as UNDEFINED (NaN)
+* CHANGE allow "reset" between plots in a multiplot layout
 * FIX clipping of plot "with lines" when axes are nonlinear (regression from 5.0)
 * FIX clipping of all elements in finanacebars/candlesticks/boxplots
 * FIX strange interaction of "noautoscale" with blank data lines
 * FIX alignment of boxed text to center for eps/cairolatex
-* CHANGE equivalent slope constraint for mcs splines at both ends of the range
-* CHANGE treat imaginary values plotted from a using spec as UNDEFINED (NaN)
-* CHANGE allow "reset" between plots in a multiplot layout
+* FIX aqua terminal font changes in enhanced text mode
 
 Changes in 5.2.4
 ================
