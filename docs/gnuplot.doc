@@ -12483,11 +12483,10 @@ Ffigure_multiple_keys
       splot FOO with pm3d fillcolor <colorspec>
 
  Plot style `with pm3d` accepts an optional fillcolor in the splot command.
- This single specification is applied to the entire pm3d surface.
- See `colorspec`.  Most fillcolor specifications will result in a single
- solid color, which is hard to interpret visually unless there is also a
- lighting model present to distinguish surface components based on orientation.
- See `pm3d lighting`.
+ This specification is applied to the entire pm3d surface.  See `colorspec`.
+ Most fillcolor specifications will result in a single solid color, which is
+ hard to interpret visually unless there is also a lighting model present to
+ distinguish surface components based on orientation.  See `pm3d lighting`.
 
  There are a few special cases.  `with pm3d fillcolor palette` would produce
  the same result as the default pm3d palette-based coloring, and is therefore
