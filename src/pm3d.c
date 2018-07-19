@@ -1359,15 +1359,20 @@ apply_lighting_model( struct coordinate *v0, struct coordinate *v1,
 	reflect[2] /= t;
 	
 	dot_prod = -reflect[2];
-	if (dot_prod < 0.0)
-	    dot_prod = 0;
 
 	/* old-style Phong equation; no need for bells or whistles */
-	spec_fact = pow(dot_prod, pm3d_shade.Phong);
+	spec_fact = pow(fabs(dot_prod), pm3d_shade.Phong);
 
-	tmp_r += pm3d_shade.spec*spec_fact;
-	tmp_g += pm3d_shade.spec*spec_fact;
-	tmp_b += pm3d_shade.spec*spec_fact;
+	/* White spotlight from direction phi,psi */
+	if (dot_prod > 0) {
+	    tmp_r += pm3d_shade.spec * spec_fact;
+	    tmp_g += pm3d_shade.spec * spec_fact;
+	    tmp_b += pm3d_shade.spec * spec_fact;
+	}
+	/* EXPERIMENTAL: Red spotlight from underneath */
+	if (dot_prod < 0 && pm3d_shade.spec2 > 0) {
+	    tmp_r += pm3d_shade.spec2 * spec_fact;
+	}
     }
 
     tmp_r = clip_to_01(tmp_r);

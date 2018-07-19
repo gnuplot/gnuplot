@@ -1,0 +1,40 @@
+# Compare hidden3d and pm3d methods for handling hidden surface removal
+
+unset border
+set dummy u, v
+unset key
+set view 225, 206, 1.25, 0.50
+unset xtics
+unset ytics
+unset ztics
+unset colorbox
+
+set parametric
+set dummy u,v
+set urange [ -3.14159 : 3.14159 ] noreverse nowriteback
+set vrange [ 0.250000 : 3.14159 ] noreverse nowriteback
+set isosamples 50, 20
+
+set multiplot layout 1,2 margins .05,.95,.2,.8 spacing 0.05
+
+set title "hidden3d 2-color surface"
+set hidden3d back offset 1
+
+splot (cos(u)+.5*cos(u)*cos(v))*(1.+sin(11.*u)/10.), \
+      (sin(u)+.5*sin(u)*cos(v))*(1.+sin(11.*u)/10.), \
+      0.5*sin(v) with lines lt 3
+
+set title "pm3d 2-color surface"
+set pm3d depthorder
+set pm3d interpolate 1,1 # border linecolor rgb "#a0a0f0"  linewidth 0.500
+set pm3d lighting primary 0.33 specular 0.2 spec2 0.3
+set isosamples 200,200
+
+splot (cos(u)+.5*cos(u)*cos(v))*(1.+sin(11.*u)/10.), \
+      (sin(u)+.5*sin(u)*cos(v))*(1.+sin(11.*u)/10.), \
+      0.5*sin(v) with pm3d fc ls 3
+
+unset multiplot
+
+pause -1 "<return> to continue"
+reset

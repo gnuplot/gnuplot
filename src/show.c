@@ -2512,8 +2512,10 @@ show_pm3d()
 	fprintf(stderr,"\n");
     }
     if (pm3d_shade.strength > 0) {
-	fprintf(stderr,"\tlighting primary component %g specular component %g\n",
+	fprintf(stderr,"\tlighting primary component %g specular component %g",
 		pm3d_shade.strength, pm3d_shade.spec);
+	fprintf(stderr," second spot contribution %g\n",
+		pm3d_shade.spec2);
     }
     fprintf(stderr,"\tsteps for bilinear interpolation: %d,%d\n",
 	 pm3d.interp_i, pm3d.interp_j);

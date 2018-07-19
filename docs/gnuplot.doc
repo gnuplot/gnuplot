@@ -12240,7 +12240,9 @@ Ffigure_multiple_keys
                   { corners2color
                     { mean|geomean|harmean|rms|median|min|max|c1|c2|c3|c4 }
                   }
-                  { {no}lighting {primary <fraction>} {specular <fraction>}}
+                  { {no}lighting
+                    {primary <fraction>} {specular <fraction>} {spec2 <fraction>}
+                  }
                   { hidden3d {<linestyle>} | nohidden3d }
                   { implicit | explicit }
                   { map }
@@ -12338,6 +12340,17 @@ Ffigure_multiple_keys
  can be adjusted by setting a fractional contribution:
       set pm3d lighting primary 0.50 specular 0.0   # no highlights
       set pm3d lighting primary 0.50 specular 0.6   # strong highlights
+ Solid-color pm3d surfaces tend to look very flat without specular highlights.
+ Since the highlights from a single source only affect one side of the surface,
+ a second spotlight source may be desirable to add specular highlights from the
+ opposite direction.  This is controlled by "spec2 <contribution>".
+ EXPERIMENTAL (details may change): The second spotlight is a pure red light
+ source that by default contributes nothing (spec2 0.0). 
+ See also hidden_compare.dem
+^ <a href="http://www.gnuplot.info/demo_5.3/hidden_compare.html">
+ (comparison of hidden3d and pm3d treatment of solid-color surfaces)
+^ </a>
+ and
 4 position
 ?pm3d position
 ?set pm3d position

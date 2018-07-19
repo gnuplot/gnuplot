@@ -128,6 +128,7 @@ typedef struct lighting_model {
   int rot_z;		/* illumination angle */
   int rot_x;		/* illumination angle */
   TBOOLEAN fixed;	/* TRUE means the light does not rotate */
+  double spec2;		/* 2nd specular contribution from red spotlight on opposite side */
 } lighting_model;
 
 extern lighting_model pm3d_shade;

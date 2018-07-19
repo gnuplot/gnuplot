@@ -909,7 +909,8 @@ set origin %g,%g\n",
     if (pm3d_shade.strength <= 0)
 	fputs("set pm3d nolighting\n",fp);
     else
-	fprintf(fp, "set pm3d lighting primary %g specular %g\n", pm3d_shade.strength, pm3d_shade.spec);
+	fprintf(fp, "set pm3d lighting primary %g specular %g spec2 %g\n",
+		pm3d_shade.strength, pm3d_shade.spec, pm3d_shade.spec2);
 
     /*
      *  Save palette information

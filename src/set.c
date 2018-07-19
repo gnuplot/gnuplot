@@ -6457,6 +6457,7 @@ parse_lighting_options()
     pm3d_shade.rot_x = 45;	/* illumination angle */
     pm3d_shade.rot_z = -45;	/* illumination angle */
     pm3d_shade.fixed = TRUE;	/* TRUE means the light does not rotate */
+    pm3d_shade.spec2 = 0.0;	/* red specular highlights on back surface */
 
     /* This is what you get from simply "set pm3d lighting" */
     pm3d_shade.strength = 0.5;	/* contribution of primary light source */
@@ -6474,6 +6475,13 @@ parse_lighting_options()
 	    c_token++;
 	    pm3d_shade.spec = real_expression();
 	    pm3d_shade.spec = clip_to_01(pm3d_shade.spec);
+	    continue;
+	}
+
+	if (equals(c_token,"spec2")) {
+	    c_token++;
+	    pm3d_shade.spec2 = real_expression();
+	    pm3d_shade.spec2 = clip_to_01(pm3d_shade.spec2);
 	    continue;
 	}
 
