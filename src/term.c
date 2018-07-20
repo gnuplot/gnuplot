@@ -966,7 +966,7 @@ do_arrow(
     int ey = (int)uey;
 
     struct termentry *t = term;
-    float len_tic = ((double) (t->h_tic + t->v_tic)) / 2.0;
+    double len_tic = ((double) (t->h_tic + t->v_tic)) / 2.0;
     /* average of tic sizes */
     /* (dx,dy) : vector from end to start */
     double dx = sx - ex;
@@ -1885,7 +1885,7 @@ test_term()
     y = y0 + yl;
 
     for (i=1; i<7; i++) {
-	(*t->linewidth) ((float)(i)); (*t->linetype)(LT_BLACK);
+	(*t->linewidth) ((double)(i)); (*t->linetype)(LT_BLACK);
 	(*t->move) (x, y); (*t->vector) (x+xl, y);
 	sprintf(label,"  lw %1d", i);
 	(*t->put_text) (x+xl, y, label);
@@ -1917,7 +1917,7 @@ test_term()
     y = y0;
     xl = xmax_t / 40;
     yl = ymax_t / 8;
-    (*t->linewidth) ((float)(1));
+    (*t->linewidth) (1.0);
     (*t->linetype)(LT_BLACK);
     (*t->justify_text) (CENTRE);
     (*t->put_text)(x+xl*7, y + yl+t->v_char*1.5, "pattern fill");
@@ -2249,7 +2249,7 @@ enhanced_recursion(
     }
 
     while (*p) {
-	float shift;
+	double shift;
 
 	/*
 	 * EAM Jun 2009 - treating bytes one at a time does not work for multibyte
@@ -2305,7 +2305,7 @@ enhanced_recursion(
 		const char *end_of_fontname = NULL;
 		char *localfontname = NULL;
 		char ch;
-		float f = fontsize, ovp;
+		double f = fontsize, ovp;
 
 		/* Mar 2014 - this will hold "fontfamily{:Italic}{:Bold}" */
 		char *styledfontname = NULL;
@@ -2320,7 +2320,7 @@ enhanced_recursion(
 		/* get vertical offset (if present) for overprinted text */
 		if (overprint == 2) {
 		    char *end;
-		    ovp = (float)strtod(p,&end);
+		    ovp = strtod(p,&end);
 		    p = end;
 		    if (term->flags & TERM_IS_POSTSCRIPT)
 			base = ovp*f;
@@ -2347,7 +2347,7 @@ enhanced_recursion(
 			    char *end;
 			    p++;
 			    ENH_DEBUG(("Calling strtod(\"%s\") ...", p));
-			    f = (float)strtod(p, &end);
+			    f = strtod(p, &end);
 			    p = end;
 			    ENH_DEBUG(("Returned %.1f and \"%s\"\n", f, p));
 
@@ -2362,7 +2362,7 @@ enhanced_recursion(
 			    char *end;
 			    p++;
 			    ENH_DEBUG(("Calling strtod(\"%s\") ...", p));
-			    f = (float)strtod(p, &end);
+			    f = strtod(p, &end);
 			    p = end;
 			    ENH_DEBUG(("Returned %.1f and \"%s\"\n", f, p));
 

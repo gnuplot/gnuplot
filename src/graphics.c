@@ -2141,7 +2141,7 @@ plot_points(struct curve_points *plot)
 	}
 	if (pcountin > number) {
 	    if (number > 1)
-		interval = (float)(pcountin-1)/(float)(number-1);
+		interval = (double)(pcountin-1)/(double)(number-1);
 	    else
 		interval = pcountin;
 	    /* offset the first point drawn so that successive plots are more distinct */

@@ -322,14 +322,14 @@ boundary3d(struct surface_points *plots, int count)
     key_col_wth = (max_ptitl_len + 4) * t->h_char + key_sample_width;
 
     if (lmargin.scalex == screen)
-	plot_bounds.xleft = lmargin.x * (float)t->xmax + 0.5;
+	plot_bounds.xleft = lmargin.x * (double)t->xmax + 0.5;
     else if (lmargin.x >= 0)
-	plot_bounds.xleft = lmargin.x * (float)t->h_char + 0.5;
+	plot_bounds.xleft = lmargin.x * (double)t->h_char + 0.5;
     else
 	plot_bounds.xleft = t->h_char * 2 + t->h_tic;
 
     if (rmargin.scalex == screen)
-	plot_bounds.xright = rmargin.x * (float)t->xmax + 0.5;
+	plot_bounds.xright = rmargin.x * (double)t->xmax + 0.5;
     else /* No tic label on the right side, so ignore rmargin */
 	plot_bounds.xright = xsize * t->xmax - t->h_char * 2 - t->h_tic;
 
@@ -374,9 +374,9 @@ boundary3d(struct surface_points *plots, int count)
      * xformat || yformat || xlabel || ylabel */
 
     if (bmargin.scalex == screen)
-	plot_bounds.ybot = bmargin.x * (float)t->ymax + 0.5;
+	plot_bounds.ybot = bmargin.x * (double)t->ymax + 0.5;
     else if (splot_map && bmargin.x >= 0)
-	plot_bounds.ybot = (float)t->v_char * bmargin.x;
+	plot_bounds.ybot = (double)t->v_char * bmargin.x;
     else
 	plot_bounds.ybot = t->v_char * 2.5 + 1;
 
@@ -394,7 +394,7 @@ boundary3d(struct surface_points *plots, int count)
     }
 
     if (tmargin.scalex == screen)
-	plot_bounds.ytop = tmargin.x * (float)t->ymax + 0.5;
+	plot_bounds.ytop = tmargin.x * (double)t->ymax + 0.5;
     else /* FIXME: Why no provision for tmargin in terms of character height? */
 	plot_bounds.ytop = ysize * t->ymax - t->v_char * (titlelin + 1.5) - 1;
 

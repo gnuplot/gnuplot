@@ -472,7 +472,7 @@ PNG_FillTransparent(int fillpar)
     int red   = (png_state.rgb >> 16) & 0xff;
     int green = (png_state.rgb >> 8) & 0xff;
     int blue  = png_state.rgb & 0xff;
-    int alpha = 127 * (float)(100-fillpar) / 100.;
+    int alpha = 127 * (double)(100-fillpar) / 100.;
 
     return  gdImageColorExactAlpha(png_state.image, red, green, blue, alpha);
 }
@@ -1048,8 +1048,8 @@ PNG_options()
 		png_state.default_ttffont, png_state.default_ttfsize*png_state.fontscale,
 		0.0, 0, 0, "f00000000g");
 	if (!err) {
-	    term->h_char = .11 * (float)(brect[2] - brect[0]) + 0.5;
-	    term->v_char = 1.1 * (float)(brect[1] - brect[7]) + 0.5;
+	    term->h_char = .11 * (double)(brect[2] - brect[0]) + 0.5;
+	    term->v_char = 1.1 * (double)(brect[1] - brect[7]) + 0.5;
 	}
     }
 #endif
@@ -1957,8 +1957,8 @@ PNG_set_font(const char *fontname)
 		0.0, 0, 0, "f00000000g");
 	}
 	if (!err) {
-	    term->h_char = .11 * (float)(brect[2] - brect[0]) + 0.5;
-	    term->v_char = 1.1 * (float)(brect[1] - brect[7]) + 0.5;
+	    term->h_char = .11 * (double)(brect[2] - brect[0]) + 0.5;
+	    term->v_char = 1.1 * (double)(brect[1] - brect[7]) + 0.5;
 	}
     }
 #endif
