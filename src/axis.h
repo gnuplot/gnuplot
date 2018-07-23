@@ -421,79 +421,20 @@ do {									\
     (store) = get_num_or_time(this_axis);				\
 } while(0)
 
-/* store VALUE in STORE, set TYPE to INRANGE/OUTRANGE/UNDEFINED
- * VALUE must not be same as STORE
- * Version 5: OK to store infinities or NaN
- * Do UNDEF_ACTION as appropriate
- * adjust range provided type is INRANGE (ie dont adjust y if x is outrange
- * NOAUTOSCALE is per-plot property, whereas AUTOSCALE_XXX is per-axis.
- * Note: see the particular implementation for COLOR AXIS below.
+
+/*
+ * Gradually replacing extremely complex macro ACTUAL_STORE_AND_UPDATE_RANGE
+ * (called 50+ times) with a subroutine. The original logic was that in-line
+ * code was faster than calls to a subroutine, but on current hardware it is
+ * better to have one cached copy than to have 50 separate uncached copies.
  */
 
 #define ACTUAL_STORE_AND_UPDATE_RANGE(STORE, VALUE, TYPE, AXIS,           \
 					NOAUTOSCALE, UNDEF_ACTION)        \
 do {									  \
-    struct axis *axis = AXIS;						  \
-    double curval = (VALUE);						  \
-    STORE = curval;							  \
-    if (! (curval > -VERYLARGE && curval < VERYLARGE)) {		  \
-	TYPE = UNDEFINED;						  \
-	UNDEF_ACTION;							  \
-	break;								  \
-    }									  \
-    if (axis->log) {							  \
-	if (curval < 0.0) {						  \
-	    TYPE = UNDEFINED;						  \
-	    UNDEF_ACTION;						  \
-	    break;							  \
-	} else if (curval == 0.0) {					  \
-	    TYPE = OUTRANGE;						  \
-	    break;							  \
-	}								  \
-    }									  \
-    if (NOAUTOSCALE)							  \
-	break;  /* this plot is not being used for autoscaling */	  \
-    if (TYPE != INRANGE)						  \
-	break;  /* don't set y range if x is outrange, for example */	  \
-    if (   (curval < axis->min)						  \
-        && ((curval <= axis->max) || (axis->max == -VERYLARGE))		  \
-       ) {								  \
-	if (axis->autoscale & AUTOSCALE_MIN)	{			  \
-	    axis->min = curval;						  \
-	    if (axis->min_constraint & CONSTRAINT_LOWER) {		  \
-		if (axis->min_lb > curval) {				  \
-		    axis->min = axis->min_lb;				  \
-		    TYPE = OUTRANGE;					  \
-		    break;						  \
-		}							  \
-	    }								  \
-	} else if (curval != axis->max) {				  \
-	    TYPE = OUTRANGE;						  \
-	    break;							  \
-	}								  \
-    }									  \
-    if ( curval > axis->max						  \
-    &&  (curval >= axis->min || axis->min == VERYLARGE)) {		  \
-	if (axis->autoscale & AUTOSCALE_MAX)	{			  \
-	    axis->max = curval;						  \
-	    if (axis->max_constraint & CONSTRAINT_UPPER) {		  \
-		if (axis->max_ub < curval) {		 		  \
-		    axis->max = axis->max_ub;				  \
-		    TYPE =OUTRANGE;					  \
-		    break;						  \
-		}							  \
-	    }								  \
-	} else if (curval != axis->min) {				  \
-	    TYPE = OUTRANGE;						  \
-	}								  \
-    }									  \
-    /* Only update data min/max if the point is INRANGE Jun 2016 */	  \
-    if (TYPE == INRANGE) { 						  \
-	if (axis->data_min > curval)					  \
-	    axis->data_min = curval;					  \
-	if (axis->data_max < curval)					  \
-	    axis->data_max = curval;					  \
-    }									  \
+    if (store_and_update_range( &(STORE), VALUE, &(TYPE), AXIS, NOAUTOSCALE) == UNDEFINED) { \
+	UNDEF_ACTION;\
+    } \
 } while(0)
 
 /* normal calls go though this macro */
@@ -503,6 +444,8 @@ do {									  \
 
 /* Use NOOP for UNDEF_ACTION if no action is wanted */
 #define NOOP ((void)0)
+
+
 
 /* HBB 20000506: new macro to automatically build initializer lists
  * for arrays of AXIS_ARRAY_SIZE=11 equal elements */
@@ -521,6 +464,8 @@ typedef void (*tic_callback) __PROTO((struct axis *, double, char *, int,
 				struct lp_style_type, struct ticmark *));
 
 /* ------------ functions exported by axis.c */
+coord_type store_and_update_range __PROTO((double *store, double curval, coord_type *type,
+				struct axis *axis, TBOOLEAN noautoscale));
 t_autoscale load_range __PROTO((struct axis *, double *, double *, t_autoscale));
 void check_log_limits __PROTO((struct axis *, double, double));
 void axis_invert_if_requested __PROTO((struct axis *));

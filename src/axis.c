@@ -2715,3 +2715,78 @@ dump_axis_range(struct axis *axis)
 	axis->set_min, axis->set_max,
 	axis->linked_to_primary ? axis_name(axis->linked_to_primary->index) : "none");
 }
+
+
+/*
+ * This routine replaces macro ACTUAL_STORE_AND_UPDATE_RANGE().
+ *
+ * Version 5: OK to store infinities or NaN
+ * Return UNDEFINED so that caller can take action if desired.
+ */
+coord_type
+store_and_update_range(
+    double *store,
+    double curval,
+    coord_type *type,
+    struct axis *axis,
+    TBOOLEAN noautoscale)
+{
+    *store = curval;
+    if (! (curval > -VERYLARGE && curval < VERYLARGE)) {
+	*type = UNDEFINED;
+	return UNDEFINED;
+    }
+    if (axis->log) {
+	if (curval < 0.0) {
+	    *type = UNDEFINED;
+	    return UNDEFINED;
+	} else if (curval == 0.0) {
+	    *type = OUTRANGE;
+	    return OUTRANGE;
+	}
+    }
+    if (noautoscale)
+	return 0;  /* this plot is not being used for autoscaling */
+    if (*type != INRANGE)
+	return 0;  /* don't set y range if x is outrange, for example */
+    if (   (curval < axis->min)
+        && ((curval <= axis->max) || (axis->max == -VERYLARGE))
+       ) {
+	if (axis->autoscale & AUTOSCALE_MIN)	{
+	    axis->min = curval;
+	    if (axis->min_constraint & CONSTRAINT_LOWER) {
+		if (axis->min_lb > curval) {
+		    axis->min = axis->min_lb;
+		    *type = OUTRANGE;
+		    return OUTRANGE;
+		}
+	    }
+	} else if (curval != axis->max) {
+	    *type = OUTRANGE;
+	    return OUTRANGE;
+	}
+    }
+    if ( curval > axis->max
+    &&  (curval >= axis->min || axis->min == VERYLARGE)) {
+	if (axis->autoscale & AUTOSCALE_MAX)	{
+	    axis->max = curval;
+	    if (axis->max_constraint & CONSTRAINT_UPPER) {
+		if (axis->max_ub < curval) {
+		    axis->max = axis->max_ub;
+		    *type = OUTRANGE;
+		    return OUTRANGE;
+		}
+	    }
+	} else if (curval != axis->min) {
+	    *type = OUTRANGE;
+	}
+    }
+    /* Only update data min/max if the point is INRANGE Jun 2016 */
+    if (*type == INRANGE) {
+	if (axis->data_min > curval)
+	    axis->data_min = curval;
+	if (axis->data_max < curval)
+	    axis->data_max = curval;
+    }
+    return 0;
+}
