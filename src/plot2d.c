@@ -1151,7 +1151,7 @@ get_data(struct curve_points *current_plot)
 				v[0], v[0], 0.0);
 	    /* The parallel axis data is stored in separate arrays */
 	    for (iaxis = 0; iaxis < current_plot->n_par_axes; iaxis++) {
-		int dummy_type = INRANGE;
+		coord_type dummy_type = INRANGE;
 		ACTUAL_STORE_AND_UPDATE_RANGE( current_plot->z_n[iaxis][i],
 			v[iaxis], dummy_type, &parallel_axis[iaxis],
 			current_plot->noautoscale, NOOP );

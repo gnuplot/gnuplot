@@ -2540,7 +2540,7 @@ void
 reconcile_linked_axes(AXIS *primary, AXIS *secondary)
 {
     double dummy;
-    int inrange = INRANGE;
+    coord_type inrange = INRANGE;
     if ((primary->autoscale & AUTOSCALE_BOTH) != AUTOSCALE_NONE
     &&  primary->linked_to_secondary) {
 	double min_2_into_1 = eval_link_function(primary, secondary->data_min);
