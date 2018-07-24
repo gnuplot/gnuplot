@@ -6,7 +6,6 @@
  * Copyright: open source as much as possible
  *
  * What is here: global variables and routines for the pm3d splotting mode.
- * This file is included only if PM3D is defined.
  *
 ]*/
 

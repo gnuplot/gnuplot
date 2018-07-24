@@ -854,7 +854,7 @@ dumb_float_compare(const void * elem1, const void * elem2)
 {
 	int val = *(float *)elem1 - *(float *)elem2;
 	return (0 < val) - (val < 0);
-};
+}
 
 /* adopted copy from caca.trm */
 TERM_PUBLIC void

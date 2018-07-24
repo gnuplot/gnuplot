@@ -376,8 +376,9 @@ eval_bezier(
 }
 
 /*
- * generate a new set of coordinates representing the bezier curve and
- * set it to the plot
+ * Generate a new set of coordinates representing the bezier curve.
+ * Note that these are sampled evenly across the x range (from "set samples N")
+ * rather than corresponding to x values of the original data points.
  */
 
 static void
@@ -391,22 +392,13 @@ do_bezier(
     int i;
     coordval x, y;
 
-    /* min and max in internal (eg logged) co-ordinates. We update
-     * these, then update the external extrema in user co-ordinates
-     * at the end.
-     */
-
-
     x_axis = cp->x_axis;
     y_axis = cp->y_axis;
-
 
     for (i = 0; i < samples_1; i++) {
 	eval_bezier(cp, first_point, num_points,
 		    (double) i / (double) (samples_1 - 1),
 		    &x, &y, bc);
-
-	/* now we have to store the points and adjust the ranges */
 
 	dest[i].type = INRANGE;
 
@@ -415,7 +407,6 @@ do_bezier(
 
 	dest[i].xlow = dest[i].xhigh = dest[i].x;
 	dest[i].ylow = dest[i].yhigh = dest[i].y;
-
 	dest[i].z = -1;
     }
 
@@ -770,14 +761,8 @@ do_cubic(
     int i, l;
     struct coordinate *this_points;
 
-    /* min and max in internal (eg logged) co-ordinates. We update
-     * these, then update the external extrema in user co-ordinates
-     * at the end.
-     */
-
     x_axis = plot->x_axis;
     y_axis = plot->y_axis;
-
 
     this_points = (plot->points) + first_point;
 
@@ -799,6 +784,7 @@ do_cubic(
 	return;
     }
 #endif
+
     xdiff = (xend - xstart) / (samples_1 - 1);
 
     for (i = 0; i < samples_1; i++) {
@@ -813,13 +799,6 @@ do_cubic(
 	/* Evaluate cubic spline polynomial */
 	y = ((sc[l][3] * temp + sc[l][2]) * temp + sc[l][1]) * temp + sc[l][0];
 
-#if (0)
-	/* FIXME:  This is outdated in version 5, right? */
-	/* With logarithmic y axis, we need to convert from linear to log scale now */
-	if (Y_AXIS.log && y <= 0)
-		y = symin - (symax - symin);
-#endif
-
 	dest[i].type = INRANGE;
 
 	ACTUAL_STORE_AND_UPDATE_RANGE(dest[i].x, x, dest[i].type, &X_AXIS, X_AXIS.autoscale, NOOP);
@@ -827,9 +806,7 @@ do_cubic(
 
 	dest[i].xlow = dest[i].xhigh = dest[i].x;
 	dest[i].ylow = dest[i].yhigh = dest[i].y;
-
 	dest[i].z = -1;
-
     }
 
 
@@ -854,22 +831,15 @@ do_freq(
     int y_axis = plot->y_axis;
     struct coordinate *this;
 
-    /* min and max in internal (eg logged) co-ordinates. We update
-     * these, then update the external extrema in user co-ordinates
-     * at the end.
-     */
-
-
-
     this = (plot->points) + first_point;
 
     for (i=0; i<num_points; i++) {
-
 	x = this[i].x;
 	y = this[i].y;
 
 	this[i].type = INRANGE;
 
+	/* Overkill.  All we really want to do is update the x and y range */
 	ACTUAL_STORE_AND_UPDATE_RANGE(this[i].x, x, this[i].type, &X_AXIS, X_AXIS.autoscale, NOOP);
 	ACTUAL_STORE_AND_UPDATE_RANGE(this[i].y, y, this[i].type, &Y_AXIS, Y_AXIS.autoscale, NOOP);
 
@@ -961,7 +931,6 @@ gen_interp_frequency(struct curve_points *plot)
 	    }
         }
 
-
         do_freq(plot, first_point, num_points);
         first_point += num_points + 1;
     }
@@ -1032,17 +1001,8 @@ gen_interp(struct curve_points *plot)
 
 /*
  * sort_points
- *
- * sort data succession for further evaluation by plot_splines, etc.
- * This routine is mainly introduced for compilers *NOT* supporting the
- * UNIX qsort() routine. You can then easily replace it by more convenient
- * stuff for your compiler.
- * (MGR 1992)
  */
 
-/* HBB 20010720: To avoid undefined behaviour that would be caused by
- * casting functions pointers around, changed arguments to what
- * qsort() *really* wants */
 static int
 compare_points(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)
 {
@@ -1064,8 +1024,6 @@ sort_points(struct curve_points *plot)
     first_point = 0;
     while ((num_points = next_curve(plot, &first_point)) > 0) {
 	/* Sort this set of points, does qsort handle 1 point correctly? */
-	/* HBB 20010720: removed casts -- they don't help a thing, but
-	 * may hide problems */
 	qsort(plot->points + first_point, num_points,
 	      sizeof(struct coordinate), compare_points);
 	first_point += num_points;

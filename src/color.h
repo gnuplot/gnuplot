@@ -217,18 +217,6 @@ void set_rgbcolor_var __PROTO(( unsigned int rgbvalue ));
 void set_rgbcolor_const __PROTO(( unsigned int rgbvalue ));
 
 /*
-   Maps from real 3D coordinates to 2D terminal coordinates
-   then draws filled polygon
-*/
-void filled_polygon_3dcoords __PROTO((int points, struct coordinate *coords));
-
-/*
-   Makes mapping from real 3D coordinates, passed as coords array, but at z coordinate
-   fixed (base_z, for instance) to 2D terminal coordinates, then draws filled polygon
-*/
-void filled_polygon_3dcoords_zfixed __PROTO((int points, struct coordinate *coords, double z));
-
-/*
   Draw colour smooth box
 */
 void draw_color_smooth_box __PROTO((int plot_mode));

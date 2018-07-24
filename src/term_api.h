@@ -392,23 +392,6 @@ enum set_encoding_id {
    S_ENC_INVALID
 };
 
-/* HBB 20020225: this stuff used to be in a separate header, ipc.h,
- * but I strongly disliked the way that was done */
-
-/*
- * There are the following types of interprocess communication from
- * (gnupmdrv, gnuplot_x11) => gnuplot:
- *	OS2_IPC  ... the OS/2 shared memory + event semaphores approach
- *	PIPE_IPC ... communication by using bidirectional pipe
- */
-
-
-/*
- * OS2_IPC: gnuplot's terminals communicate with it by shared memory + event
- * semaphores => the code in gpexecute.c is used, and nothing more from here.
- */
-
-
 /* options handling */
 enum { UNSET = -1, no = 0, yes = 1 };
 

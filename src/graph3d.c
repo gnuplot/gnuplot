@@ -347,7 +347,6 @@ boundary3d(struct surface_points *plots, int count)
 	    /* calculate max no cols, limited by label-length */
 	    key_cols = (int) (plot_bounds.xright - plot_bounds.xleft)
 		     / ((max_ptitl_len + 4) * t->h_char + key_sample_width);
-	    /* HBB 991019: fix division by zero problem */
 	    if (key_cols == 0)
 		key_cols = 1;
 	    key_rows = (int) ((ptitl_cnt - 1)/ key_cols) + 1;
@@ -406,7 +405,6 @@ boundary3d(struct surface_points *plots, int count)
 	i = (int) (plot_bounds.ytop - plot_bounds.ybot) / t->v_char - 1 - ktitle_lines;
 	if (i > key->maxrows && key->maxrows > 0)
 	    i = key->maxrows;
-	/* HBB 20030321: div by 0 fix like above */
 	if (i == 0)
 	    i = 1;
 	if (ptitl_cnt > i) {
@@ -459,17 +457,17 @@ boundary3d(struct surface_points *plots, int count)
     xscaler = ((plot_bounds.xright - plot_bounds.xleft) * 4L) / 7L;
     yscaler = ((plot_bounds.ytop - plot_bounds.ybot) * 4L) / 7L;
 
-    /* EAM Aug 2006 - Allow explicit control via set {}margin screen */
+    /* Allow explicit control via set {}margin screen */
     if (tmargin.scalex == screen || bmargin.scalex == screen)
 	yscaler = (plot_bounds.ytop - plot_bounds.ybot) / surface_scale;
     if (rmargin.scalex == screen || lmargin.scalex == screen)
 	xscaler = (plot_bounds.xright - plot_bounds.xleft) / surface_scale;
 
-    /* EAM Jul 2010 - prevent infinite loop or divide-by-zero if scaling is bad */
+    /* prevent infinite loop or divide-by-zero if scaling is bad */
     if (yscaler == 0) yscaler = 1;
     if (xscaler == 0) xscaler = 1;
 
-    /* HBB 20011011: 'set size {square|ratio}' for splots */
+    /* 'set size {square|ratio}' for splots */
     if (splot_map && aspect_ratio != 0.0) {
 	double current_aspect_ratio;
 
@@ -812,8 +810,7 @@ do_3dplot(
 	plot_bounds.ytop = map_y1;
     }
 
-    /* Mar 2009 - This is a change!
-     * Define the clipping area in 3D to lie between the left-most and
+    /* Define the clipping area in 3D to lie between the left-most and
      * right-most graph box edges.  This is introduced for the benefit of
      * zooming in the canvas terminal.  It may or may not make any practical
      * difference for other terminals.  If it causes problems, then we will need
@@ -1950,9 +1947,9 @@ cntr3d_impulses(struct gnuplot_contours *cntr, struct lp_style_type *lp)
     }
 }
 
-/* cntr3d_lines: Plot a surface contour in LINES style */
-/* HBB NEW 20031218: changed to use move/vector() style polyline
- * drawing. Gets rid of variable "previous_vertex" */
+/* cntr3d_lines:
+ * Plot a surface contour in LINES style
+ */
 static void
 cntr3d_lines(struct gnuplot_contours *cntr, struct lp_style_type *lp)
 {
