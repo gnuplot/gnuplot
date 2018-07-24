@@ -114,43 +114,6 @@
  * names in plot.h
  */
 
-
-/*
- * IMHO, code is getting too cluttered with repeated chunks of
- * code. Some macros to simplify, I hope.
- */
-
-
-/* store VALUE in STORE, set TYPE to INRANGE/OUTRANGE
- * Adjust range provided type is INRANGE (ie dont adjust y if x is outrange).
- * VALUE must not be same as STORE */
-/* FIXME 20010610:
- * this is so similar to STORE_AND_UPDATE_RANGE() from axis.h
- * that the two should probably be merged.  */
-#define STORE_AND_FIXUP_RANGE(store, value, type, min, max, auto)	\
-do {									\
-    store=value;							\
-    if (type != INRANGE)						\
-	break;  /* don't set y range if x is outrange, for example */	\
-    if ((value) < (min)) {						\
-       if ((auto) & AUTOSCALE_MIN)					\
-	   (min) = (value);						\
-       else								\
-	   (type) = OUTRANGE;						\
-    }									\
-    if ((value) > (max)) {						\
-       if ((auto) & AUTOSCALE_MAX)					\
-	   (max) = (value);						\
-       else								\
-	   (type) = OUTRANGE;						\
-    }									\
-} while(0)
-
-#define UPDATE_RANGE(TEST,OLD,NEW) \
-do {				   \
-    if (TEST) (OLD) = NEW;	   \
-} while(0)
-
 #define spline_coeff_size 4
 typedef double spline_coeff[spline_coeff_size];
 typedef double five_diag[5];
@@ -433,16 +396,10 @@ do_bezier(
      * at the end.
      */
 
-    double ixmin, ixmax, iymin, iymax;
-    double sxmin, sxmax, symin, symax;	/* starting values of above */
 
     x_axis = cp->x_axis;
     y_axis = cp->y_axis;
 
-    ixmin = sxmin = X_AXIS.min;
-    ixmax = sxmax = X_AXIS.max;
-    iymin = symin = Y_AXIS.min;
-    iymax = symax = Y_AXIS.max;
 
     for (i = 0; i < samples_1; i++) {
 	eval_bezier(cp, first_point, num_points,
@@ -452,8 +409,9 @@ do_bezier(
 	/* now we have to store the points and adjust the ranges */
 
 	dest[i].type = INRANGE;
-	STORE_AND_FIXUP_RANGE(dest[i].x, x, dest[i].type, ixmin, ixmax, X_AXIS.autoscale);
-	STORE_AND_FIXUP_RANGE(dest[i].y, y, dest[i].type, iymin, iymax, Y_AXIS.autoscale);
+
+	ACTUAL_STORE_AND_UPDATE_RANGE(dest[i].x, x, dest[i].type, &X_AXIS, X_AXIS.autoscale, NOOP);
+	ACTUAL_STORE_AND_UPDATE_RANGE(dest[i].y, y, dest[i].type, &Y_AXIS, Y_AXIS.autoscale, NOOP);
 
 	dest[i].xlow = dest[i].xhigh = dest[i].x;
 	dest[i].ylow = dest[i].yhigh = dest[i].y;
@@ -461,10 +419,6 @@ do_bezier(
 	dest[i].z = -1;
     }
 
-    UPDATE_RANGE(ixmax > sxmax, X_AXIS.max, ixmax);
-    UPDATE_RANGE(ixmin < sxmin, X_AXIS.min, ixmin);
-    UPDATE_RANGE(iymax > symax, Y_AXIS.max, iymax);
-    UPDATE_RANGE(iymin < symin, Y_AXIS.min, iymin);
 }
 
 /*
@@ -820,16 +774,10 @@ do_cubic(
      * these, then update the external extrema in user co-ordinates
      * at the end.
      */
-    double ixmin, ixmax, iymin, iymax;
-    double sxmin, sxmax, symin, symax;	/* starting values of above */
 
     x_axis = plot->x_axis;
     y_axis = plot->y_axis;
 
-    ixmin = sxmin = X_AXIS.min;
-    ixmax = sxmax = X_AXIS.max;
-    iymin = symin = Y_AXIS.min;
-    iymax = symax = Y_AXIS.max;
 
     this_points = (plot->points) + first_point;
 
@@ -841,8 +789,8 @@ do_cubic(
     xstart = this_points[0].x;
     xend = this_points[num_points - 1].x;
 #else
-    xstart = GPMAX(this_points[0].x, sxmin);
-    xend = GPMIN(this_points[num_points - 1].x, sxmax);
+    xstart = GPMAX(this_points[0].x, X_AXIS.min);
+    xend = GPMIN(this_points[num_points - 1].x, X_AXIS.max);
 
     if (xstart >= xend) {
 	/* This entire segment lies outside the current x range. */
@@ -865,13 +813,17 @@ do_cubic(
 	/* Evaluate cubic spline polynomial */
 	y = ((sc[l][3] * temp + sc[l][2]) * temp + sc[l][1]) * temp + sc[l][0];
 
+#if (0)
+	/* FIXME:  This is outdated in version 5, right? */
 	/* With logarithmic y axis, we need to convert from linear to log scale now */
 	if (Y_AXIS.log && y <= 0)
 		y = symin - (symax - symin);
+#endif
 
 	dest[i].type = INRANGE;
-	STORE_AND_FIXUP_RANGE(dest[i].x, x, dest[i].type, ixmin, ixmax, X_AXIS.autoscale);
-	STORE_AND_FIXUP_RANGE(dest[i].y, y, dest[i].type, iymin, iymax, Y_AXIS.autoscale);
+
+	ACTUAL_STORE_AND_UPDATE_RANGE(dest[i].x, x, dest[i].type, &X_AXIS, X_AXIS.autoscale, NOOP);
+	ACTUAL_STORE_AND_UPDATE_RANGE(dest[i].y, y, dest[i].type, &Y_AXIS, Y_AXIS.autoscale, NOOP);
 
 	dest[i].xlow = dest[i].xhigh = dest[i].x;
 	dest[i].ylow = dest[i].yhigh = dest[i].y;
@@ -880,10 +832,6 @@ do_cubic(
 
     }
 
-    UPDATE_RANGE(ixmax > sxmax, X_AXIS.max, ixmax);
-    UPDATE_RANGE(ixmin < sxmin, X_AXIS.min, ixmin);
-    UPDATE_RANGE(iymax > symax, Y_AXIS.max, iymax);
-    UPDATE_RANGE(iymin < symin, Y_AXIS.min, iymin);
 
 }
 
@@ -911,13 +859,7 @@ do_freq(
      * at the end.
      */
 
-    double ixmin, ixmax, iymin, iymax;
-    double sxmin, sxmax, symin, symax;	/* starting values of above */
 
-    ixmin = sxmin = X_AXIS.min;
-    ixmax = sxmax = X_AXIS.max;
-    iymin = symin = Y_AXIS.min;
-    iymax = symax = Y_AXIS.max;
 
     this = (plot->points) + first_point;
 
@@ -928,18 +870,14 @@ do_freq(
 
 	this[i].type = INRANGE;
 
-	STORE_AND_FIXUP_RANGE(this[i].x, x, this[i].type, ixmin, ixmax, X_AXIS.autoscale);
-	STORE_AND_FIXUP_RANGE(this[i].y, y, this[i].type, iymin, iymax, Y_AXIS.autoscale);
+	ACTUAL_STORE_AND_UPDATE_RANGE(this[i].x, x, this[i].type, &X_AXIS, X_AXIS.autoscale, NOOP);
+	ACTUAL_STORE_AND_UPDATE_RANGE(this[i].y, y, this[i].type, &Y_AXIS, Y_AXIS.autoscale, NOOP);
 
 	this[i].xlow = this[i].xhigh = this[i].x;
 	this[i].ylow = this[i].yhigh = this[i].y;
 	this[i].z = -1;
     }
 
-    UPDATE_RANGE(ixmax > sxmax, X_AXIS.max, ixmax);
-    UPDATE_RANGE(ixmin < sxmin, X_AXIS.min, ixmin);
-    UPDATE_RANGE(iymax > symax, Y_AXIS.max, iymax);
-    UPDATE_RANGE(iymin < symin, Y_AXIS.min, iymin);
 }
 
 
