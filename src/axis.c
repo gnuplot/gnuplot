@@ -2547,8 +2547,8 @@ reconcile_linked_axes(AXIS *primary, AXIS *secondary)
 	double max_2_into_1 = eval_link_function(primary, secondary->data_max);
 
 	/* Merge secondary min/max into primary data range */
-	ACTUAL_STORE_AND_UPDATE_RANGE(dummy, min_2_into_1, inrange, primary, FALSE, NOOP);
-	ACTUAL_STORE_AND_UPDATE_RANGE(dummy, max_2_into_1, inrange, primary, FALSE, NOOP);
+	store_and_update_range(&dummy, min_2_into_1, &inrange, primary, FALSE);
+	store_and_update_range(&dummy, max_2_into_1, &inrange, primary, FALSE);
 	(void)dummy;	/* Otherwise the compiler complains about an unused variable */
 
 	/* Take the result back the other way to update secondary */
@@ -2718,7 +2718,7 @@ dump_axis_range(struct axis *axis)
 
 
 /*
- * This routine replaces macro ACTUAL_STORE_AND_UPDATE_RANGE().
+ * This routine replaces former macro ACTUAL_STORE_AND_UPDATE_RANGE().
  *
  * Version 5: OK to store infinities or NaN
  * Return UNDEFINED so that caller can take action if desired.

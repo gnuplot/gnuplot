@@ -277,8 +277,8 @@ do_kdensity(
 	/* now we have to store the points and adjust the ranges */
 	dest[i].type = INRANGE;
 	dest[i].x = x;
-	STORE_AND_UPDATE_RANGE( dest[i].y, y, dest[i].type, y_axis,
-				cp->noautoscale, NOOP);
+	store_and_update_range( &dest[i].y, y, &dest[i].type, &Y_AXIS,
+				cp->noautoscale );
 	dest[i].xlow = dest[i].xhigh = dest[i].x;
 	dest[i].ylow = dest[i].yhigh = dest[i].y;
 	dest[i].z = -1;
@@ -402,8 +402,8 @@ do_bezier(
 
 	dest[i].type = INRANGE;
 
-	ACTUAL_STORE_AND_UPDATE_RANGE(dest[i].x, x, dest[i].type, &X_AXIS, X_AXIS.autoscale, NOOP);
-	ACTUAL_STORE_AND_UPDATE_RANGE(dest[i].y, y, dest[i].type, &Y_AXIS, Y_AXIS.autoscale, NOOP);
+	store_and_update_range(&dest[i].x, x, &dest[i].type, &X_AXIS, X_AXIS.autoscale);
+	store_and_update_range(&dest[i].y, y, &dest[i].type, &Y_AXIS, Y_AXIS.autoscale);
 
 	dest[i].xlow = dest[i].xhigh = dest[i].x;
 	dest[i].ylow = dest[i].yhigh = dest[i].y;
@@ -801,8 +801,8 @@ do_cubic(
 
 	dest[i].type = INRANGE;
 
-	ACTUAL_STORE_AND_UPDATE_RANGE(dest[i].x, x, dest[i].type, &X_AXIS, X_AXIS.autoscale, NOOP);
-	ACTUAL_STORE_AND_UPDATE_RANGE(dest[i].y, y, dest[i].type, &Y_AXIS, Y_AXIS.autoscale, NOOP);
+	store_and_update_range(&dest[i].x, x, &dest[i].type, &X_AXIS, X_AXIS.autoscale);
+	store_and_update_range(&dest[i].y, y, &dest[i].type, &Y_AXIS, Y_AXIS.autoscale);
 
 	dest[i].xlow = dest[i].xhigh = dest[i].x;
 	dest[i].ylow = dest[i].yhigh = dest[i].y;
@@ -840,8 +840,8 @@ do_freq(
 	this[i].type = INRANGE;
 
 	/* Overkill.  All we really want to do is update the x and y range */
-	ACTUAL_STORE_AND_UPDATE_RANGE(this[i].x, x, this[i].type, &X_AXIS, X_AXIS.autoscale, NOOP);
-	ACTUAL_STORE_AND_UPDATE_RANGE(this[i].y, y, this[i].type, &Y_AXIS, Y_AXIS.autoscale, NOOP);
+	store_and_update_range(&this[i].x, x, &this[i].type, &X_AXIS, X_AXIS.autoscale);
+	store_and_update_range(&this[i].y, y, &this[i].type, &Y_AXIS, Y_AXIS.autoscale);
 
 	this[i].xlow = this[i].xhigh = this[i].x;
 	this[i].ylow = this[i].yhigh = this[i].y;
@@ -1247,8 +1247,9 @@ mcs_interp(struct curve_points *plot)
 	else
 	    new_points[i].type = OUTRANGE;
 	/* FIXME:  simpler test for outrange would be sufficient */
-	STORE_AND_UPDATE_RANGE(new_points[i].y, y, new_points[i].type,
-		plot->y_axis, plot->noautoscale, NOOP);
+	y_axis = plot->y_axis;
+	store_and_update_range(&new_points[i].y, y, &new_points[i].type,
+		&Y_AXIS, plot->noautoscale);
     }
 
     /* Replace original data with the interpolated curve */

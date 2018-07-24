@@ -427,20 +427,17 @@ do {									\
  * (called 50+ times) with a subroutine. The original logic was that in-line
  * code was faster than calls to a subroutine, but on current hardware it is
  * better to have one cached copy than to have 50 separate uncached copies.
+ *
+ * The difference between STORE_AND_UPDATE_RANGE and store_and_update_range
+ * is that the former takes an axis index and the latter an axis pointer.
  */
-
-#define ACTUAL_STORE_AND_UPDATE_RANGE(STORE, VALUE, TYPE, AXIS,           \
-					NOAUTOSCALE, UNDEF_ACTION)        \
-do {									  \
-    if (store_and_update_range( &(STORE), VALUE, &(TYPE), AXIS, NOAUTOSCALE) == UNDEFINED) { \
-	UNDEF_ACTION;\
+#define STORE_AND_UPDATE_RANGE(STORE, VALUE, TYPE, AXIS, NOAUTOSCALE, UNDEF_ACTION)	 \
+ if (AXIS != NO_AXIS) do { \
+    if (store_and_update_range( &(STORE), VALUE, &(TYPE), (&axis_array[AXIS]), NOAUTOSCALE) \
+        == UNDEFINED) { \
+	UNDEF_ACTION; \
     } \
 } while(0)
-
-/* normal calls go though this macro */
-#define STORE_AND_UPDATE_RANGE(STORE, VALUE, TYPE, AXIS, NOAUTOSCALE, UNDEF_ACTION)	 \
- if (AXIS != NO_AXIS) \
- ACTUAL_STORE_AND_UPDATE_RANGE(STORE, VALUE, TYPE, (&axis_array[AXIS]), NOAUTOSCALE, UNDEF_ACTION)
 
 /* Use NOOP for UNDEF_ACTION if no action is wanted */
 #define NOOP ((void)0)
