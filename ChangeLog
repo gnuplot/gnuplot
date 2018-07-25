@@ -1,3 +1,14 @@
+2018-07-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/pm3d.c:  Backport from 5.3
+	The flag controlling treatment of rgb colors was manipulated as if it
+	were a per-plot flag, but "set pm3d depthorder" merges all pm3d plots
+	together.  This meant that if some plots used a color column and some
+	did not, the depth-sorted combition colored some plots incorrectly.
+	Now we move the flag into the individual colored quadrangles by using
+	a magic grey value PM3D_USE_RGB_COLOR_INSTEAD_OF_GRAY.
+	Bug #2066
+
 2018-07-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/p3md.c src/pm3d.h save.c set.c:  Backport from 5.3
