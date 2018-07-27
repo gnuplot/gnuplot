@@ -1014,6 +1014,11 @@ do_3dplot(
 
 	    if (lkey
 	    &&  (!this_plot->title_position || this_plot->title_position->scalex != character)) {
+		char *title = this_plot->title;
+
+		if (this_plot->title_is_automated && (term->flags & TERM_IS_LATEX))
+		    title = texify_title(title, this_plot->plot_type);
+
 		if (key->textcolor.type != TC_DEFAULT)
 		    /* Draw key text in same color as key title */
 		    apply_pm3dcolor(&key->textcolor);
@@ -1021,7 +1026,7 @@ do_3dplot(
 		    /* Draw key text in black */
 		    (*t->linetype)(LT_BLACK);
 		ignore_enhanced(this_plot->title_no_enhanced);
-		key_text(xl, yl, this_plot->title);
+		key_text(xl, yl, title);
 		ignore_enhanced(FALSE);
 	    }
 	    term_apply_lp_properties(&(this_plot->lp_properties));

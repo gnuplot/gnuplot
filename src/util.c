@@ -1559,3 +1559,24 @@ num_to_str(double r)
 
     return s[j];
 }
+
+/* Auto-generated titles need modification to be compatible with LaTeX.
+ * For example filenames may contain underscore characters or dollar signs.
+ * Function plots auto-generate a copy of the function or expression,
+ * which probably looks better in math mode.
+ * We could perhaps go further and texify syntax such as a**b -> a^b
+ */
+char *
+texify_title(char *str, int plot_type)
+{
+    static char *latex_title = NULL;
+
+	if (plot_type == DATA || plot_type == DATA3D) {
+	    latex_title = escape_reserved_chars(str,"#$%^&_{}\\");
+	} else {
+	    latex_title = gp_realloc(latex_title, strlen(str) + 4, NULL);
+	    sprintf(latex_title, "$%s$", str);
+	}
+
+    return latex_title;
+}

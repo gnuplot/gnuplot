@@ -1162,6 +1162,10 @@ do_key_sample(
 	/* Draw key text in black */
 	(*t->linetype)(LT_BLACK);
 
+    if (this_plot->title_is_automated && (t->flags & TERM_IS_LATEX)) {
+	title = texify_title(title, this_plot->plot_type);
+    }
+
     if (key->just == GPKEY_LEFT) {
 	write_multiline(xl + key_text_left, yl, title, LEFT, JUST_CENTRE, 0, key->font);
     } else {

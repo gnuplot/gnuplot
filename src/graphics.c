@@ -3714,6 +3714,7 @@ void
 attach_title_to_plot(struct curve_points *this_plot, legend_key *key)
 {
     struct coordinate *points;
+    char *title;
     int npoints;
     int index, x, y;
     TBOOLEAN is_3D;
@@ -3762,7 +3763,11 @@ attach_title_to_plot(struct curve_points *this_plot, legend_key *key)
 	/* Draw key text in black */
 	(*term->linetype)(LT_BLACK);
 
-    write_multiline(x, y, this_plot->title,
+    title = this_plot->title;
+    if (this_plot->title_is_automated && (term->flags & TERM_IS_LATEX))
+	title = texify_title(title, this_plot->plot_type);
+
+    write_multiline(x, y, title,
     	(JUSTIFY)this_plot->title_position->y,
 	JUST_TOP, 0, key->font);
 }

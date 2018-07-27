@@ -2414,14 +2414,14 @@ eval_plots()
 	    }
 
 	    /* set default values for title if this has not been specified */
-	    this_plot->title_is_filename = FALSE;
+	    this_plot->title_is_automated = FALSE;
 	    if (!set_title) {
 		this_plot->title_no_enhanced = TRUE; /* filename or function cannot be enhanced */
 		if (key->auto_titles == FILENAME_KEYTITLES) {
 		    m_capture(&(this_plot->title), start_token, end_token);
 		    if (in_parametric)
 			xtitle = this_plot->title;
-		    this_plot->title_is_filename = TRUE;
+		    this_plot->title_is_automated = TRUE;
 		} else if (xtitle != NULL)
 		    xtitle[0] = '\0';
 	    }

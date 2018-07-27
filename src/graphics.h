@@ -53,7 +53,7 @@ typedef struct curve_points {
     char *title;		/* plot title, a.k.a. key entry */
     t_position *title_position;	/* title at {beginning|end|<xpos>,<ypos>} */
     TBOOLEAN title_no_enhanced;	/* don't typeset title in enhanced mode */
-    TBOOLEAN title_is_filename;	/* TRUE if title was auto-generated from filename */
+    TBOOLEAN title_is_automated;/* TRUE if title was auto-generated */
     TBOOLEAN title_is_suppressed;/* TRUE if 'notitle' was specified */
     TBOOLEAN noautoscale;	/* ignore data from this plot during autoscaling */
     struct lp_style_type lp_properties;

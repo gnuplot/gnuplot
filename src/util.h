@@ -134,6 +134,8 @@ size_t strappend(char **dest, size_t *size, size_t len, const char *src);
 
 char *value_to_str(struct value *val, TBOOLEAN need_quotes);
 
+char *texify_title(char *title, int plot_type);
+
 /* To disallow 8-bit characters in variable names, set this to */
 /* #define ALLOWED_8BITVAR(c) FALSE */
 #define ALLOWED_8BITVAR(c) ((c)&0x80)
