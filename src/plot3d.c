@@ -1496,7 +1496,7 @@ eval_3dplots()
 	    name_str = string_or_express(NULL);
 	    dummy_func = NULL;
 	    if (name_str) {
-		/*{{{  data file to plot */
+		/* data file to plot */
 		if (parametric && crnt_param != 0)
 		    int_error(c_token, "previous parametric function not fully specified");
 
@@ -1558,23 +1558,19 @@ eval_3dplots()
 
 		/* this_plot->token is temporary, for errors in get_3ddata() */
 
+		/* NB: df_axis is used only for timedate data and 3D cbticlabels */
 		if (specs < 3) {
-		    if (axis_array[FIRST_X_AXIS].datatype == DT_TIMEDATE) {
+		    if (axis_array[FIRST_X_AXIS].datatype == DT_TIMEDATE)
 			int_error(c_token, "Need full using spec for x time data");
-		    }
-		    if (axis_array[FIRST_Y_AXIS].datatype == DT_TIMEDATE) {
+		    if (axis_array[FIRST_Y_AXIS].datatype == DT_TIMEDATE)
 			int_error(c_token, "Need full using spec for y time data");
-		    }
 		}
 		df_axis[0] = FIRST_X_AXIS;
 		df_axis[1] = FIRST_Y_AXIS;
 		df_axis[2] = FIRST_Z_AXIS;
 
-		/*}}} */
-
 	    } else {		/* function to plot */
 
-		/*{{{  function */
 		++plot_num;
 		if (parametric) {
 		    /* Rotate between x/y/z axes */
@@ -1608,7 +1604,6 @@ eval_3dplots()
 		/* ignore it for now */
 		some_functions = TRUE;
 		end_token = c_token - 1;
-		/*}}} */
 
 	    }			/* end of IS THIS A FILE OR A FUNC block */
 

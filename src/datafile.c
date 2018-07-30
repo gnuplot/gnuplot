@@ -2059,7 +2059,10 @@ df_readascii(double v[], int max)
 			    break;
 			case CT_CBTICLABEL:
 			    axis = COLOR_AXIS;
-			    axcol = 3;
+			    if (df_axis[2] == FIRST_Z_AXIS)
+				axcol = 2;
+			    else
+				axcol = df_no_use_specs - 1;
 			    break;
 		    }
 		    /* Trap special case of only a single 'using' column */
@@ -5315,7 +5318,10 @@ df_readbinary(double v[], int max)
 			break;
 		    case CT_CBTICLABEL:
 			axis = COLOR_AXIS;
-			axcol = 2;
+			if (df_axis[2] == FIRST_Z_AXIS)
+			    axcol = 2;
+			else
+			    axcol = df_no_use_specs - 1;
 			break;
 		}
 		if (a.type == STRING) {

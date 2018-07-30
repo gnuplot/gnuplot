@@ -605,8 +605,6 @@ get_data(struct curve_points *current_plot)
 	break;
     case SMOOTH_ACSPLINES:
 	max_cols = 3;
-	current_plot->z_axis = FIRST_Z_AXIS;
-	df_axis[2] = FIRST_Z_AXIS;
 	break;
     default:
 	if (df_no_use_specs > 2)
@@ -2644,7 +2642,8 @@ eval_plots()
 		    if (specs < 1)
 			int_error(c_token, "Need using spec for y time data");
 		}
-		/* need other cols, but I'm lazy */
+
+		/* NB: df_axis is used only for timedate data and 3D cbticlabels */
 		df_axis[0] = x_axis;
 		df_axis[1] = y_axis;
 
