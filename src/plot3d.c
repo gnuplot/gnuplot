@@ -1136,8 +1136,11 @@ get_3ddata(struct surface_points *this_plot)
 
 	    /* At this point we have stored the point coordinates. Now we need to copy */
 	    /* x,y,z into the text_label structure and add the actual text string.     */
-	    if (this_plot->plot_style == LABELPOINTS)
-		store_label(this_plot->labels, cp, xdatum, df_tokens[3], color);
+	    if (this_plot->plot_style == LABELPOINTS) {
+		/* Aug 2018: only store INRANGE labels. This is a CHANGE. */
+		if (cp->type == INRANGE)
+		    store_label(this_plot->labels, cp, xdatum, df_tokens[3], color);
+	    }
 
 	    if (this_plot->plot_style == RGBIMAGE || this_plot->plot_style == RGBA_IMAGE) {
 		/* We will autoscale the RGB components to  a total range [0:255]
