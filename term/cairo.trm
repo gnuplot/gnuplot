@@ -38,6 +38,7 @@
  *	Peter Danenberg - crop for PNGs
  *	René Haber - added epscairo terminal
  *	Bastian Maerkisch - cairolatex terminal
+ *	Henri Menke - add png option for graphics output
  */
 
 #ifdef TERM_REGISTER
@@ -91,6 +92,40 @@ TERM_PUBLIC void cairotrm_dashtype __PROTO ((int type, t_dashtype *custom_dash_p
 static cairo_status_t cairostream_write __PROTO ((void *closure, unsigned char *data, unsigned int length));
 static int cairostream_error[1];
 
+/* Terminal id */
+enum CAIROTRM_id {
+    CAIROTRM_FONT,
+    CAIROTRM_FONTSCALE,
+    CAIROTRM_ENHANCED,
+    CAIROTRM_NOENHANCED,
+    CAIROTRM_SIZE,
+    CAIROTRM_ROUNDED,
+    CAIROTRM_BUTT,
+    CAIROTRM_SQUARE,
+    CAIROTRM_LINEWIDTH,
+    CAIROTRM_DASHED,
+    CAIROTRM_SOLID,
+    CAIROTRM_MONO,
+    CAIROTRM_COLOR,
+    CAIROTRM_DASHLENGTH,
+    CAIROTRM_TRANSPARENT,
+    CAIROTRM_NOTRANSPARENT,
+    CAIROTRM_CROP,
+    CAIROTRM_NOCROP,
+    CAIROTRM_BACKGROUND,
+    CAIROTRM_POINTSCALE,
+    CAIROLATEX_STANDALONE,
+    CAIROLATEX_INPUT,
+    CAIROLATEX_HEADER,
+    CAIROLATEX_NOHEADER,
+    CAIROLATEX_BLACKTEXT,
+    CAIROLATEX_COLORTEXT,
+    CAIROLATEX_EPS,
+    CAIROLATEX_PDF,
+    CAIROLATEX_PNG,
+    CAIROTRM_OTHER
+};
+
 /* Terminal type of postscript dialect */
 enum CAIRO_TERMINALTYPE {
     CAIROTERM_EPS, CAIROTERM_PDF, CAIROTERM_PNG, CAIROTERM_LATEX
@@ -117,7 +152,7 @@ typedef struct cairo_params_t {
     float base_linewidth;
     float lw;
     float ps;
-    TBOOLEAN pdf_output;	/* format of the graphics produced by cairolatex */
+    enum CAIROTRM_id output;	/* format of the graphics produced by cairolatex */
 } cairo_params_t;
 
 #define CAIROEPS_PARAMS_DEFAULT { \
@@ -169,38 +204,6 @@ char *cairo_enhanced_fontname = NULL;
 
 plot_struct plot;
 
-enum CAIROTRM_id {
-    CAIROTRM_FONT,
-    CAIROTRM_FONTSCALE,
-    CAIROTRM_ENHANCED,
-    CAIROTRM_NOENHANCED,
-    CAIROTRM_SIZE,
-    CAIROTRM_ROUNDED,
-    CAIROTRM_BUTT,
-    CAIROTRM_SQUARE,
-    CAIROTRM_LINEWIDTH,
-    CAIROTRM_DASHED,
-    CAIROTRM_SOLID,
-    CAIROTRM_MONO,
-    CAIROTRM_COLOR,
-    CAIROTRM_DASHLENGTH,
-    CAIROTRM_TRANSPARENT,
-    CAIROTRM_NOTRANSPARENT,
-    CAIROTRM_CROP,
-    CAIROTRM_NOCROP,
-    CAIROTRM_BACKGROUND,
-    CAIROTRM_POINTSCALE,
-    CAIROLATEX_STANDALONE,
-    CAIROLATEX_INPUT,
-    CAIROLATEX_HEADER,
-    CAIROLATEX_NOHEADER,
-    CAIROLATEX_BLACKTEXT,
-    CAIROLATEX_COLORTEXT,
-    CAIROLATEX_EPS,
-    CAIROLATEX_PDF,
-    CAIROTRM_OTHER
-};
-
 static struct gen_table cairotrm_opts[] = {
     {"fontscale",   CAIROTRM_FONTSCALE},
     {"f$ont",   CAIROTRM_FONT},
@@ -236,6 +239,7 @@ static struct gen_table cairotrm_opts[] = {
     {"colourt$ext", CAIROLATEX_COLORTEXT},
     {"eps", CAIROLATEX_EPS},
     {"pdf", CAIROLATEX_PDF},
+    {"png", CAIROLATEX_PNG},
     {NULL, CAIROTRM_OTHER}
 };
 
@@ -479,7 +483,7 @@ TERM_PUBLIC void cairotrm_options()
 				int_error(c_token,
 					  "extraneous argument in set terminal %s",term->name);
 #ifdef HAVE_CAIROEPS
-			cairo_params->pdf_output = FALSE;
+			cairo_params->output = CAIROLATEX_EPS;
 #else
 			int_error(c_token, "eps output not supported");
 #endif
@@ -489,7 +493,14 @@ TERM_PUBLIC void cairotrm_options()
 			if (!ISCAIROLATEX)
 				int_error(c_token,
 					  "extraneous argument in set terminal %s",term->name);
-			cairo_params->pdf_output = TRUE;
+			cairo_params->output = CAIROLATEX_PDF;
+			c_token++;
+			break;
+		case CAIROLATEX_PNG:
+			if (!ISCAIROLATEX)
+				int_error(c_token,
+					  "extraneous argument in set terminal %s",term->name);
+			cairo_params->output = CAIROLATEX_PNG;
 			c_token++;
 			break;
 #endif /* PSLATEX_DRIVER */
@@ -520,8 +531,20 @@ TERM_PUBLIC void cairotrm_options()
 
 #ifdef PSLATEX_DRIVER
 	if (ISCAIROLATEX) {
-		sprintf(tmp_term_options, " %s %s",
-		    cairo_params->pdf_output ? "pdf" : "eps",
+		const char * output = "";
+		switch (cairo_params->output) {
+		default:
+		case CAIROLATEX_PDF:
+			output = "pdf";
+			break;
+		case CAIROLATEX_EPS:
+			output = "eps";
+			break;
+		case CAIROLATEX_PNG:
+			output = "png";
+			break;
+		}
+		sprintf(tmp_term_options, " %s %s", output,
 			ps_params->epslatex_standalone ? "standalone" : "input");
 		strcat(term_options, tmp_term_options);
 		if (epslatex_header)
@@ -737,21 +760,29 @@ void cairotrm_init()
 #endif /* HAVE_CAIROEPS */
 #ifdef PSLATEX_DRIVER
 	else if (ISCAIROLATEX) {
-		EPSLATEX_reopen_output(cairo_params->pdf_output ? "pdf" : "eps");
-
 		/* Output can only go to a stream */
-		if (cairo_params->pdf_output) {
+		switch (cairo_params->output) {
+		default:
+		case CAIROLATEX_PDF:
+			EPSLATEX_reopen_output("pdf");
 			surface = cairo_pdf_surface_create_for_stream(
-				(cairo_write_func_t)cairostream_write, cairostream_error,
-				plot.device_xmax /*double width_in_points*/,
-				plot.device_ymax /*double height_in_points*/);
-		}
+					(cairo_write_func_t)cairostream_write, cairostream_error,
+					plot.device_xmax /*double width_in_points*/,
+					plot.device_ymax /*double height_in_points*/);
+			break;
+		case CAIROLATEX_PNG:
+			EPSLATEX_reopen_output("png");
+			surface = cairo_image_surface_create( CAIRO_FORMAT_ARGB32,
+					plot.device_xmax /*double width_in_points*/,
+					plot.device_ymax /*double height_in_points*/);
+			break;
 #ifdef HAVE_CAIROEPS
-		else {
+		case CAIROLATEX_EPS:
+			EPSLATEX_reopen_output("eps");
 			surface = cairo_ps_surface_create_for_stream(
-				(cairo_write_func_t)cairostream_write, cairostream_error,
-				plot.device_xmax /*double width_in_points*/,
-				plot.device_ymax /*double height_in_points*/);
+				    (cairo_write_func_t)cairostream_write, cairostream_error,
+				    plot.device_xmax /*double width_in_points*/,
+				    plot.device_ymax /*double height_in_points*/);
 			cairo_ps_surface_set_eps(surface, TRUE);
 #if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1,11,1)
 			{
@@ -764,16 +795,29 @@ void cairotrm_init()
 				cairo_ps_surface_dsc_comment(surface, bb);
 			}
 #endif
-		}
+		    break;
 #endif
-		/* it is up to the pdf viewer to do the hinting */
-		plot.hinting = 0;
-		/* disable OPERATOR_SATURATE, not implemented in cairo pdf backend,
-		 * results in bitmap fallback. However, polygons are drawn with seams
-		 * between each other. */
-		plot.polygons_saturate = FALSE;
-		/* Empirical correction to make pdf output look more like wxt and png */
-		plot.dashlength /= 2;
+		}
+
+		switch (cairo_params->output) {
+		case CAIROLATEX_PNG:
+			/* png is bitmapped, let's do the full hinting */
+			plot.hinting = 100;
+			/* png is produced by cairo "image" backend, which has full support
+			 * of OPERATOR_SATURATE */
+			plot.polygons_saturate = TRUE;
+			break;
+		default:
+			/* it is up to the pdf viewer to do the hinting */
+			plot.hinting = 0;
+			/* disable OPERATOR_SATURATE, not implemented in cairo pdf backend,
+			 * results in bitmap fallback. However, polygons are drawn with seams
+			 * between each other. */
+			plot.polygons_saturate = FALSE;
+			/* Empirical correction to make pdf output look more like wxt and png */
+			plot.dashlength /= 2;
+			break;
+		}
 	}
 #endif
 
@@ -956,14 +1000,16 @@ void cairotrm_text()
 	/* finish the page - cairo_destroy still has to be called for the whole documentation
 	 * to be written */
 	cairo_show_page(plot.cr);
-	if (!strcmp(term->name,"pngcairo")) {
-	    cairo_surface_t *surface = cairo_get_target(plot.cr);
-	    if (cairo_params->crop) {
-		cairopng_write_cropped_image(surface);
-	    } else {
-		cairo_surface_write_to_png_stream(surface,
-			(cairo_write_func_t)cairostream_write, cairostream_error);
-	    }
+	if (strcmp(term->name, "pngcairo") == 0 ||
+		(strcmp(term->name, "cairolatex") == 0 &&
+		cairo_params->output == CAIROLATEX_PNG)) {
+		cairo_surface_t *surface = cairo_get_target(plot.cr);
+		if (cairo_params->crop) {
+			cairopng_write_cropped_image(surface);
+		} else {
+			cairo_surface_write_to_png_stream(surface,
+				(cairo_write_func_t)cairostream_write, cairostream_error);
+		}
 	}
 
 	FPRINTF((stderr,"status = %s\n",cairo_status_to_string(cairo_status(plot.cr))));
@@ -1448,13 +1494,13 @@ START_HELP(cairolatex)
 "?set term cairolatex",
 "?term cairolatex",
 "?cairolatex",
-" The `cairolatex` terminal device generates encapsulated PostScript (*.eps) or",
-" PDF output using the cairo and pango support libraries and uses LaTeX for",
-" text output using the same routines as the `epslatex` terminal.",
+" The `cairolatex` terminal device generates encapsulated PostScript (*.eps),",
+" PDF, or PNG output using the cairo and pango support libraries and uses LaTeX",
+" for text output using the same routines as the `epslatex` terminal.",
 "",
 " Syntax:",
 "       set terminal cairolatex",
-"                      {eps | pdf}",
+"                      {eps | pdf | png}",
 "                      {standalone | input}",
 "                      {blacktext | colortext | colourtext}",
 "                      {header <header> | noheader}",
@@ -1468,7 +1514,7 @@ START_HELP(cairolatex)
 " `terminal pdfcairo` but transfers the texts to LaTeX instead of including",
 " them in the graph. For reference of options not explained here see `pdfcairo`.",
 "",
-" `eps` and `pdf` select the type of graphics output. Use `eps` with",
+" `eps`, `pdf`, or `png` select the type of graphics output. Use `eps` with",
 " latex/dvips and `pdf` for pdflatex.",
 "",
 " `blacktext` forces all text to be written in black even in color mode;",
