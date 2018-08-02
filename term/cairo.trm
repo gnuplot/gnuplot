@@ -772,9 +772,10 @@ void cairotrm_init()
 			break;
 		case CAIROLATEX_PNG:
 			EPSLATEX_reopen_output("png");
-			surface = cairo_image_surface_create( CAIRO_FORMAT_ARGB32,
-					plot.device_xmax /*double width_in_points*/,
-					plot.device_ymax /*double height_in_points*/);
+			/* We manually scale up to 300 dpi instead of the default 72 dpi */
+			surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32,
+					(int)floor(plot.device_xmax * 300. / 72.) /*double width_in_points*/,
+					(int)floor(plot.device_ymax * 300. / 72.) /*double height_in_points*/);
 			break;
 #ifdef HAVE_CAIROEPS
 		case CAIROLATEX_EPS:
@@ -799,21 +800,19 @@ void cairotrm_init()
 #endif
 		}
 
+		/* disable OPERATOR_SATURATE, not implemented in cairo pdf backend,
+		 * results in bitmap fallback. However, polygons are drawn with seams
+		 * between each other. */
+		plot.polygons_saturate = FALSE;
+
 		switch (cairo_params->output) {
 		case CAIROLATEX_PNG:
 			/* png is bitmapped, let's do the full hinting */
 			plot.hinting = 100;
-			/* png is produced by cairo "image" backend, which has full support
-			 * of OPERATOR_SATURATE */
-			plot.polygons_saturate = TRUE;
 			break;
 		default:
 			/* it is up to the pdf viewer to do the hinting */
 			plot.hinting = 0;
-			/* disable OPERATOR_SATURATE, not implemented in cairo pdf backend,
-			 * results in bitmap fallback. However, polygons are drawn with seams
-			 * between each other. */
-			plot.polygons_saturate = FALSE;
 			/* Empirical correction to make pdf output look more like wxt and png */
 			plot.dashlength /= 2;
 			break;
@@ -845,6 +844,12 @@ void cairotrm_graphics()
 	/* update the window scale factor first, cairo needs it */
 	plot.xscale = 1.0;
 	plot.yscale = 1.0;
+
+	/* We manually scale up to 300 dpi instead of the default 72 dpi */
+	if (ISCAIROLATEX && cairo_params->output == CAIROLATEX_PNG) {
+		plot.xscale = 300. / 72.;
+		plot.yscale = 300. / 72.;
+	}
 
 	/* update graphics state properties */
 	plot.linecap = cairo_params->linecap;

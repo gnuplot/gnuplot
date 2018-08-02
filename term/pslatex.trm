@@ -159,10 +159,12 @@ PSLATEX_reset()
         if (gpoutfile) {
 	    fprintf(gpoutfile, "\
     \\gplbacktext\n\
-    \\put(0,0){\\includegraphics{%s}}%%\n\
+    \\put(0,0){\\includegraphics[width={%.2fbp},height={%.2fbp}]{%s}}%%\n\
     \\gplfronttext\n\
   \\end{picture}%%\n\
-\\endgroup\n", pslatex_auxname);
+\\endgroup\n", term->xmax * xsize / (2.0*PS_SC),
+               term->ymax * ysize / (2.0*PS_SC),
+               pslatex_auxname);
             if (ps_params->epslatex_standalone)
                 fputs("\\end{document}\n", gpoutfile);
         }
