@@ -118,6 +118,11 @@ typedef struct plot_struct {
 	/* either GP_CAIRO_SCALE or 1, depending on rendering */
 	int oversampling_scale;
 
+	/* The caiolatex performs upsampling of the canvas to achieve
+	 * higher pixel density.  We have to account for that when
+	 * applying OPERATOR_SATURATE. */
+	double upsampling_rate;
+
 	/* handle vertical/horizontal lines properly */
 	double current_x, current_y;
 	double orig_current_x, orig_current_y;

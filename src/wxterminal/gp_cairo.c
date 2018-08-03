@@ -192,6 +192,8 @@ void gp_cairo_initialize_plot(plot_struct *plot)
 	plot->oversampling = TRUE;
 	plot->oversampling_scale = GP_CAIRO_SCALE;
 
+	plot->upsampling_rate = 1.0;
+
 	plot->linecap = BUTT;
 
 	plot->hinting = 100;
@@ -481,8 +483,8 @@ void gp_cairo_end_polygon(plot_struct *plot)
 	context_sav = plot->cr;
 	surface = cairo_surface_create_similar(cairo_get_target(plot->cr),
                                              CAIRO_CONTENT_COLOR_ALPHA,
-                                             plot->device_xmax*SCALE,
-                                             plot->device_ymax*SCALE);
+                                             plot->device_xmax*plot->upsampling_rate*SCALE,
+                                             plot->device_ymax*plot->upsampling_rate*SCALE);
 	context = cairo_create(surface);
 	cairo_set_operator(context,CAIRO_OPERATOR_SATURATE);
 	if (plot->antialiasing)
