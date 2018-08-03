@@ -162,8 +162,8 @@ PSLATEX_reset()
     \\put(0,0){\\includegraphics[width={%.2fbp},height={%.2fbp}]{%s}}%%\n\
     \\gplfronttext\n\
   \\end{picture}%%\n\
-\\endgroup\n", term->xmax * xsize / (2.0*PS_SC),
-               term->ymax * ysize / (2.0*PS_SC),
+\\endgroup\n", 1 + term->xmax * xsize / (2.0*PS_SC),
+               1 + term->ymax * ysize / (2.0*PS_SC),
                pslatex_auxname);
             if (ps_params->epslatex_standalone)
                 fputs("\\end{document}\n", gpoutfile);
