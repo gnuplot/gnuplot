@@ -354,8 +354,7 @@ AC_ARG_WITH(gihdir,dnl
 
 dnl The Linux console driver
 AC_ARG_WITH(linux-vga,dnl
-[  --with-linux-vga        use the Linux SVGA console driver
-                          (requires /usr/lib/libvga)],,
+[  --with-linux-vga        (DEPRECATED) linux SVGA console driver],,
   test -z "$with_linux_vga" && with_linux_vga=no)
 
 dnl check for installed linux vgalib
@@ -1324,9 +1323,9 @@ else
 fi
 
 if test "$with_linux_vga" = yes; then
-    AC_MSG_RESULT([  linux terminal (vga console): yes])
+    AC_MSG_RESULT([  DEPRECATED linux terminal (vga console): yes])
   if test "$with_vgagl" = yes; then
-    AC_MSG_RESULT([  vgagl terminal ((s)vga console): yes])
+    AC_MSG_RESULT([  DEPRECATED vgagl terminal ((s)vga console): yes])
   else
     AC_MSG_RESULT([  vgagl terminal ((s)vga console): no (requires vgagl)])
   fi

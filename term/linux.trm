@@ -458,6 +458,7 @@ START_HELP(linux)
 "?terminal linux",
 "?term linux",
 "?linux",
+" DEPRECATED (will be removed in next gnuplot release).",
 " The `linux` driver has no additional options to specify.  It looks at the",
 " environment variable GSVGAMODE for the default mode; if not set, it uses",
 " 1024x768x256 as default mode or, if that is not possible, 640x480x16",
