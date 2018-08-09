@@ -158,17 +158,6 @@
 /* Terminals for various Unix platforms                                    */
 /***************************************************************************/
 
-/* Linux VGA */
-#ifdef LINUXVGA
-# include "linux.trm"
-
-/* Linux VGAGL */
-# if defined(VGAGL) && defined (THREEDKIT)
-#  include "vgagl.trm"
-# endif
-#endif /* LINUXVGA */
-
-
 /* VAX Windowing System requires UIS libraries */
 #ifdef UIS
 # include "vws.trm"

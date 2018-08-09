@@ -333,23 +333,6 @@ AC_ARG_WITH(gihdir,dnl
   GIHDIR="$withval",
   GIHDIR="$pkgdatadir/$VERSION_MAJOR")
 
-dnl The Linux console driver
-AC_ARG_WITH(linux-vga,dnl
-[  --with-linux-vga        use the Linux SVGA console driver
-                          (requires /usr/lib/libvga)],,
-  test -z "$with_linux_vga" && with_linux_vga=no)
-
-dnl check for installed linux vgalib
-if test "$with_linux_vga" = yes; then
-  AC_MSG_CHECKING(for linux vga library)
-  AC_CHECK_LIB(vga, vga_init,
-    [AC_DEFINE(LINUXVGA,1,
-               [ Define if this is a Linux system with SuperVGA library. ])
-     LINUXSUID='chown root $(bindir)/gnuplot; chmod u+s $(bindir)/gnuplot'
-     TERMLIBS="-lvga $TERMLIBS"],
-    with_linux_vga=no)
-fi
-
 dnl TODO: simplify, get rid of GGI_SUPPORT
 dnl new ggi driver
 GGI_SUPPORT=no
@@ -782,58 +765,6 @@ if test "$enable_x11_external" = yes; then
   AC_DEFINE(EXTERNAL_X11_WINDOW,1,[ Define if you want to supply pre-existing X11 windows. ])
 fi
 
-dnl check for installed linux vgagl lib if
-dnl both linux_vga is defined.
-if test "$with_linux_vga" = yes; then
-  _LIBS="$LIBS"
-  dnl make sure LIBS contains -lvga
-  LIBS="$TERMLIBS $LIBS"
-  AC_MSG_CHECKING(for the vgagl library)
-  AC_CHECK_LIB(vgagl, gl_hline,
-    [LIBS="-lvgagl $LIBS"
-     AC_CHECK_HEADERS(vgagl.h,
-      [AC_DEFINE(VGAGL,1,[ Define if the vgagl libray is present. ])
-       dnl yup, we've the libvgagl.
-       dnl check now, if lib3dkit is found.
-       AC_CHECK_LIB(3dkit, gl_striangle,
-         [AC_CHECK_HEADERS(3dkit.h,
-            [dnl success! If we're here, all checks for
-             dnl the vgagl terminal driver succeeded.
-             AC_DEFINE(THREEDKIT,1,[ Define if the 3dkit libray is present. ])
-             AC_DEFINE(EXTENDED_COLOR_SPECS,1,
-                       [ Define if color information should be passed for each vertex. ])
-             VGAGLLIB="-l3dkit -lvgagl"
-             with_vgagl=yes
-            ],dnl <-- 3dkit.h found
-            [with_vgagl=no
-             AC_MSG_RESULT([unable to find 3dkit.h])
-            ]dnl <-- 3dkit.h not found
-          )
-         ],dnl <-- 3dkit is present
-         [
-          with_vgagl=no
-          AC_MSG_RESULT([unable to find lib3dkit])
-         ]dnl <-- 3dkit is not present
-       )
-      ],dnl <-- vgagl.h is present
-      [
-       with_vgagl=no
-       AC_MSG_RESULT([unable to find vgagl.h])
-      ]dnl <-- vgagl.h is not present
-     )
-    ],dnl <-- libvgagl was found
-    [with_vgagl=no
-     AC_MSG_RESULT([unable to find libvgagl])
-    ]dnl <-- libvgagl was not found
-  )
-  dnl restore LIBS
-  LIBS="$_LIBS"
-else
-  with_vgagl=no
-fi
-
-TERMLIBS="$VGAGLLIB $TERMLIBS"
-
 dnl labels with boxes around them
 AC_ARG_ENABLE(boxed_text,dnl
 [  --disable-boxed-text    disable support for boxed labels],,
@@ -1226,7 +1157,6 @@ AC_SUBST(VERSION)
 AC_SUBST(PATCHLEVEL)
 AC_SUBST(GIHDIR)
 AC_SUBST(TEXDIR)
-AC_SUBST(LINUXSUID)
 AC_SUBST(TERMLIBS)
 AC_SUBST(TERMXLIBS)
 AC_SUBST(TUTORIAL)
@@ -1291,18 +1221,6 @@ AC_MSG_RESULT([    note: not needed for sixel graphics output to vt100-series em
 
 AC_MSG_RESULT([])
 AC_MSG_RESULT([  Platform-specific, legacy, or specialized terminals omitted by default:])
-if test "$with_linux_vga" = yes; then
-    AC_MSG_RESULT([    linux terminal (vga console): yes])
-  if test "$with_vgagl" = yes; then
-    AC_MSG_RESULT([    vgagl terminal ((s)vga console): yes])
-  else
-    AC_MSG_RESULT([    vgagl terminal ((s)vga console): no (requires vgagl)])
-  fi
-  AC_MSG_RESULT([      SECURITY NOTICE: SVGAlib requires that gnuplot is installed suid root!])
-else
-  AC_MSG_RESULT([    linux terminal (vga console): no (use --with-linux-vga to enable)])
-  AC_MSG_RESULT([    vgagl terminal ((s)vga console): no (use --with-linux-vga to enable)])
-fi
 
 if test "$GGI_SUPPORT" = yes; then
   if test "$ac_cv_header_ggi_xmi_h" = yes; then
@@ -1311,7 +1229,7 @@ if test "$GGI_SUPPORT" = yes; then
     AC_MSG_RESULT([    ggi terminal: yes (without pm3d support, requires libxmi)])
   fi
 else
-  AC_MSG_RESULT([    ggi terminal: no (use --with-ggi to enable, requires libggi)])
+  AC_MSG_RESULT([    ggi terminal:  no   (use --with-ggi to enable, requires libggi)])
 fi
 
 if test "$with_gpic" == yes; then
@@ -1335,7 +1253,7 @@ fi
 if test "$with_regis" = yes; then
   AC_MSG_RESULT([    ReGIS terminal: yes])
 else
-  AC_MSG_RESULT([    ReGIS terminal: no (use --with-regis to enable)])
+  AC_MSG_RESULT([    ReGIS terminal: no  (use --with-regis to enable)])
 fi
 
 if test "$is_msdos" = yes; then
@@ -1349,7 +1267,7 @@ fi
 if test "$with_caca" = yes; then
   AC_MSG_RESULT([    caca terminal: yes (EXPERIMENTAL)])
 else
-  AC_MSG_RESULT([    caca terminal: no (use --with-caca to enable)])
+  AC_MSG_RESULT([    caca terminal:  no   (use --with-caca to enable)])
 fi
 
 if test "$gnuplot_framework_AquaTerm" = yes; then

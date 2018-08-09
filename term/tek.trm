@@ -1592,6 +1592,9 @@ START_HELP(tek40)
 " \"--enable-sixel-graphics\" and started with \"-ti 340\" on the command line.",
 " Menu option \"sixelScrolling\" should be selected. xterm/vt340 emulation",
 " limits plots to 16 simultaneous colors, but other emulators may permit more.",
+"",
+" Note that gnuplot also supports another sixel output terminal, sixelgd,",
+" that offers more options and features."
 #endif
 #ifdef BITGRAPH
 "?commands set terminal bitgraph",

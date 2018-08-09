@@ -1,3 +1,11 @@
+2018-08-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/linux.trm term/vgagl.trm term/linux-vgagl.trm:
+	Remove linux and vgagl terminals and configuration option 
+	--with-linux-vga.   Add a place holder linux-vgagl.trm that provides a
+	documentation section recommending yaft + sixel graphics as an 
+	alternative way to run gnuplot from the linux console.
+
 2018-07-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gp_types.h src/plot3d.c src/pm3d.c:  Allow per-plot fillcolor
