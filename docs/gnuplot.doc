@@ -3285,6 +3285,10 @@ Ffigure_newsyntax
 
       A = "c=1"; @A   # will not expand to c=1
 
+ Macro expansion inside a bracketed iteration occurs before the loop is
+ executed; i.e. @A will always act as the original value of A even if A itself
+ is reassigned inside the loop.
+
  For execution of complete commands the `evaluate` command may also be handy.
 3 String variables, macros, and command line substitution
 ?mixing_macros_backquotes
