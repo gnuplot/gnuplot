@@ -903,6 +903,9 @@ write_label(int x, int y, struct text_label *this_label)
 {
 	int htic, vtic;
 	int justify = JUST_TOP;	/* This was the 2D default; 3D had CENTRE */
+#ifdef EAM_BOXED_TEXT
+	textbox_style *textbox = NULL;
+#endif
 
 	apply_pm3dcolor(&(this_label->textcolor));
 	ignore_enhanced(this_label->noenhanced);
@@ -921,12 +924,13 @@ write_label(int x, int y, struct text_label *this_label)
 	    /* A normal label (always print text) */
 	    get_offsets(this_label, &htic, &vtic);
 #ifdef EAM_BOXED_TEXT
+	    if (this_label->boxed < 0)
+		textbox = &textbox_opts;
+	    if (this_label->boxed > 0)
+		int_warn(NO_CARET, "multiple textbox styles not yet supported");
 	    /* Initialize the bounding box accounting */
-	    if ((this_label->boxed && term->boxed_text)
-	    &&  (textbox_opts.opaque || !textbox_opts.noborder))
-	    {
+	    if (textbox && term->boxed_text && (textbox->opaque || !textbox->noborder))
 		(*term->boxed_text)(x + htic, y + vtic, TEXTBOX_INIT);
-	    }
 #endif
 	    if (this_label->rotate && (*term->text_angle) (this_label->rotate)) {
 		write_multiline(x + htic, y + vtic, this_label->text,
@@ -939,21 +943,20 @@ write_label(int x, int y, struct text_label *this_label)
 	    }
 	}
 #ifdef EAM_BOXED_TEXT
-	if ((this_label->boxed && term->boxed_text)
-	&&  (textbox_opts.opaque || !textbox_opts.noborder))
+	if (textbox && term->boxed_text && (textbox->opaque || !textbox->noborder))
 	{
 
 	    /* Adjust the bounding box margins */
-	    (*term->boxed_text)((int)(textbox_opts.xmargin * 100.),
-		(int)(textbox_opts.ymargin * 100.), TEXTBOX_MARGINS);
+	    (*term->boxed_text)((int)(textbox->xmargin * 100.),
+		(int)(textbox->ymargin * 100.), TEXTBOX_MARGINS);
 
 	    /* Blank out the box and reprint the label */
-	    if (textbox_opts.opaque) {
-		apply_pm3dcolor(&textbox_opts.fillcolor);
+	    if (textbox->opaque) {
+		apply_pm3dcolor(&textbox->fillcolor);
 		(*term->boxed_text)(0,0, TEXTBOX_BACKGROUNDFILL);
 		apply_pm3dcolor(&(this_label->textcolor));
 		/* Init for each of fill and border */
-		if (!textbox_opts.noborder)
+		if (!textbox->noborder)
 		    (*term->boxed_text)(x + htic, y + vtic, TEXTBOX_INIT);
 		if (this_label->rotate && (*term->text_angle) (this_label->rotate)) {
 		    write_multiline(x + htic, y + vtic, this_label->text,
@@ -967,9 +970,9 @@ write_label(int x, int y, struct text_label *this_label)
 	    }
 
 	    /* Draw the bounding box */
-	    if (!textbox_opts.noborder) {
-		(*term->linewidth)(textbox_opts.linewidth);
-		apply_pm3dcolor(&textbox_opts.border_color);
+	    if (!textbox->noborder) {
+		(*term->linewidth)(textbox->linewidth);
+		apply_pm3dcolor(&textbox->border_color);
 		(*term->boxed_text)(0,0, TEXTBOX_OUTLINE);
 	    }
 

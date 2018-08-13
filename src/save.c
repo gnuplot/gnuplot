@@ -1238,20 +1238,22 @@ save_style_parallel(FILE *fp)
 void
 save_style_textbox(FILE *fp)
 {
+    textbox_style *textbox = &textbox_opts;
+
     fprintf(fp, " %s margins %4.1f, %4.1f",
-	    textbox_opts.opaque ? "opaque": "transparent",
-	    textbox_opts.xmargin, textbox_opts.ymargin);
-    if (textbox_opts.opaque) {
+	    textbox->opaque ? "opaque": "transparent",
+	    textbox->xmargin, textbox->ymargin);
+    if (textbox->opaque) {
 	fprintf(fp, " fc ");
-	save_pm3dcolor(fp, &(textbox_opts.fillcolor));
+	save_pm3dcolor(fp, &(textbox->fillcolor));
     }
-    if (textbox_opts.noborder) {
+    if (textbox->noborder) {
 	fprintf(fp, " noborder");
     } else {
 	fprintf(fp, " border ");
-	save_pm3dcolor(fp, &(textbox_opts.border_color));
+	save_pm3dcolor(fp, &(textbox->border_color));
     }
-    fprintf(fp, " linewidth %4.1f", textbox_opts.linewidth);
+    fprintf(fp, " linewidth %4.1f", textbox->linewidth);
     fputs("\n",fp);
 }
 #endif

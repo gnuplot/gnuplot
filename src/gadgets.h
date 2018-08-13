@@ -83,7 +83,7 @@ typedef struct text_label {
     enum JUSTIFY pos;		/* left/center/right horizontal justification */
     int rotate;
     int layer;
-    int boxed;			/* EAM_BOXED_TEXT */
+    int boxed;			/* 0 no box;  -1 default box props;  >0 boxstyle */
     char *text;
     char *font;			/* Entry font added by DJL */
     struct t_colorspec textcolor;

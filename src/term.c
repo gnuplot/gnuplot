@@ -1739,16 +1739,17 @@ test_term()
     if (TRUE) {
 	struct text_label sample = EMPTY_LABELSTRUCT;
 	struct textbox_style save_opts = textbox_opts;
+	textbox_style *textbox = &textbox_opts;
 	sample.text = "12345678901234567890";
 	sample.pos = CENTRE;
-	sample.boxed = 1;
-	textbox_opts.opaque = TRUE;
-	textbox_opts.noborder = TRUE;
-	textbox_opts.fillcolor.type = TC_RGB;
-	textbox_opts.fillcolor.lt = 0xccccee;
+	sample.boxed = -1;
+	textbox->opaque = TRUE;
+	textbox->noborder = TRUE;
+	textbox->fillcolor.type = TC_RGB;
+	textbox->fillcolor.lt = 0xccccee;
 	/* disable extra space around text */
-	textbox_opts.xmargin = 0;
-	textbox_opts.ymargin = 0;
+	textbox->xmargin = 0;
+	textbox->ymargin = 0;
 
 	(*t->linetype) (LT_SOLID);
 	write_label(xmax_t/2, ymax_t/2, &sample);

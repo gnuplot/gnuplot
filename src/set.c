@@ -4758,56 +4758,59 @@ set_style()
 	break;
 #ifdef EAM_BOXED_TEXT
     case SHOW_STYLE_TEXTBOX:
+    {
+	textbox_style *textbox = &textbox_opts;
 	c_token++;
 	while (!END_OF_COMMAND) {
 	    if (almost_equals(c_token,"op$aque")) {
-		textbox_opts.opaque = TRUE;
+		textbox->opaque = TRUE;
 		c_token++;
 	    } else if (almost_equals(c_token,"trans$parent")) {
-		textbox_opts.opaque = FALSE;
+		textbox->opaque = FALSE;
 		c_token++;
 	    } else if (almost_equals(c_token,"mar$gins")) {
 		struct value a;
 		c_token++;
 		if (END_OF_COMMAND) {
-		    textbox_opts.xmargin = 1.;
-		    textbox_opts.ymargin = 1.;
+		    textbox->xmargin = 1.;
+		    textbox->ymargin = 1.;
 		    break;
 		}
-		textbox_opts.xmargin = real(const_express(&a));
-		if (textbox_opts.xmargin < 0)
-		    textbox_opts.xmargin = 0;
+		textbox->xmargin = real(const_express(&a));
+		if (textbox->xmargin < 0)
+		    textbox->xmargin = 0;
 		if (!equals(c_token++,",") || END_OF_COMMAND)
 		    break;
-		textbox_opts.ymargin = real(const_express(&a));
-		if (textbox_opts.ymargin < 0)
-		    textbox_opts.ymargin = 0;
+		textbox->ymargin = real(const_express(&a));
+		if (textbox->ymargin < 0)
+		    textbox->ymargin = 0;
 	    } else if (almost_equals(c_token,"fillc$olor") || equals(c_token,"fc")) {
-		parse_colorspec(&textbox_opts.fillcolor, TC_RGB);
+		parse_colorspec(&textbox->fillcolor, TC_RGB);
 	    } else if (almost_equals(c_token,"nobo$rder")) {
 		c_token++;
-		textbox_opts.noborder = TRUE;
-		textbox_opts.border_color.type = TC_LT;
-		textbox_opts.border_color.lt = LT_NODRAW;
+		textbox->noborder = TRUE;
+		textbox->border_color.type = TC_LT;
+		textbox->border_color.lt = LT_NODRAW;
 	    } else if (almost_equals(c_token,"bo$rdercolor")) {
 		c_token++;
-		textbox_opts.noborder = FALSE;
-		textbox_opts.border_color.type = TC_LT;
-		textbox_opts.border_color.lt = LT_BLACK;
+		textbox->noborder = FALSE;
+		textbox->border_color.type = TC_LT;
+		textbox->border_color.lt = LT_BLACK;
 		if (END_OF_COMMAND)
 		    continue;
 		if (equals(c_token,"lt"))
 		    c_token--;
-		parse_colorspec(&textbox_opts.border_color, TC_RGB);
+		parse_colorspec(&textbox->border_color, TC_RGB);
 	    } else if (almost_equals(c_token,"linew$idth") || equals(c_token,"lw")) {
 		c_token++;
-		textbox_opts.linewidth = real_expression();
-		if (textbox_opts.linewidth < 0)
-		    textbox_opts.linewidth = 1.0;
+		textbox->linewidth = real_expression();
+		if (textbox->linewidth < 0)
+		    textbox->linewidth = 1.0;
 	    } else
 		int_error(c_token,"unrecognized option");
 	}
 	break;
+    }
 #endif
     case SHOW_STYLE_INCREMENT:
 	c_token++;
@@ -6286,7 +6289,7 @@ parse_label_options( struct text_label *this_label, int ndim)
 
 #ifdef EAM_BOXED_TEXT
 	if (equals(c_token, "boxed")) {
-	    this_label->boxed = 1;
+	    this_label->boxed = -1;
 	    c_token++;
 	    continue;
 	} else if (equals(c_token, "noboxed")) {
