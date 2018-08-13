@@ -992,7 +992,7 @@ static void
 unset_textbox_style()
 {
     textbox_style foo = DEFAULT_TEXTBOX_STYLE;
-    textbox_opts = foo;
+    textbox_opts[0] = foo;
 }
 #endif
 

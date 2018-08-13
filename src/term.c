@@ -1738,8 +1738,8 @@ test_term()
 #ifdef EAM_BOXED_TEXT
     if (TRUE) {
 	struct text_label sample = EMPTY_LABELSTRUCT;
-	struct textbox_style save_opts = textbox_opts;
-	textbox_style *textbox = &textbox_opts;
+	struct textbox_style save_opts = textbox_opts[0];
+	textbox_style *textbox = &textbox_opts[0];
 	sample.text = "12345678901234567890";
 	sample.pos = CENTRE;
 	sample.boxed = -1;
@@ -1753,7 +1753,7 @@ test_term()
 
 	(*t->linetype) (LT_SOLID);
 	write_label(xmax_t/2, ymax_t/2, &sample);
-	textbox_opts = save_opts;
+	textbox_opts[0] = save_opts;
 
 	sample.boxed = 0;
 	sample.text = "true vs. estimated text dimensions";

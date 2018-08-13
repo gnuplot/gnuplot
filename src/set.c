@@ -4759,7 +4759,7 @@ set_style()
 #ifdef EAM_BOXED_TEXT
     case SHOW_STYLE_TEXTBOX:
     {
-	textbox_style *textbox = &textbox_opts;
+	textbox_style *textbox = &textbox_opts[0];
 	c_token++;
 	while (!END_OF_COMMAND) {
 	    if (almost_equals(c_token,"op$aque")) {
@@ -4779,11 +4779,13 @@ set_style()
 		textbox->xmargin = real(const_express(&a));
 		if (textbox->xmargin < 0)
 		    textbox->xmargin = 0;
-		if (!equals(c_token++,",") || END_OF_COMMAND)
-		    break;
-		textbox->ymargin = real(const_express(&a));
-		if (textbox->ymargin < 0)
-		    textbox->ymargin = 0;
+		textbox->ymargin = textbox->xmargin;
+		if (equals(c_token,",")) {
+		    c_token++;
+		    textbox->ymargin = real(const_express(&a));
+		    if (textbox->ymargin < 0)
+			textbox->ymargin = 0;
+		}
 	    } else if (almost_equals(c_token,"fillc$olor") || equals(c_token,"fc")) {
 		parse_colorspec(&textbox->fillcolor, TC_RGB);
 	    } else if (almost_equals(c_token,"nobo$rder")) {

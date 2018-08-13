@@ -1238,7 +1238,7 @@ save_style_parallel(FILE *fp)
 void
 save_style_textbox(FILE *fp)
 {
-    textbox_style *textbox = &textbox_opts;
+    textbox_style *textbox = &textbox_opts[0];
 
     fprintf(fp, " %s margins %4.1f, %4.1f",
 	    textbox->opaque ? "opaque": "transparent",

@@ -199,7 +199,7 @@ boxplot_style boxplot_opts = DEFAULT_BOXPLOT_STYLE;
 int current_x11_windowid = 0;
 
 #ifdef EAM_BOXED_TEXT
-textbox_style textbox_opts = DEFAULT_TEXTBOX_STYLE;
+textbox_style textbox_opts[1];	/* Expand to support multiple textbox styles */
 #endif
 
 /*****************************************************************/
@@ -925,7 +925,7 @@ write_label(int x, int y, struct text_label *this_label)
 	    get_offsets(this_label, &htic, &vtic);
 #ifdef EAM_BOXED_TEXT
 	    if (this_label->boxed < 0)
-		textbox = &textbox_opts;
+		textbox = &textbox_opts[0];
 	    if (this_label->boxed > 0)
 		int_warn(NO_CARET, "multiple textbox styles not yet supported");
 	    /* Initialize the bounding box accounting */
