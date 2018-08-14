@@ -1355,27 +1355,27 @@ C marker below is used to signal this to doc2html:
 4 besj1
 ?expressions functions besj1
 ?besj1
-#besj1(x) & int or real & $J_{1}$ Bessel function of $x$ in radians \\
+# besj1(x) & int or real & $J_{1}$ Bessel function of $x$ in radians \\
 %besj1(x)@int or real@$J sub 1$ Bessel function of $x$ in radians
  The `besj1(x)` function returns the J1st Bessel function of its argument.
  `besj1` expects its argument to be in radians.
 4 besjn
 ?expressions functions besjn
 ?besjn
-#besjn(n,x) & int, real & $J_{n}$ Bessel function of $x$ in radians \\
+# besjn(n,x) & int, real & $J_{n}$ Bessel function of $x$ in radians \\
 %besjn(n,x)@int,real@$J sub n$ Bessel function of $x$ in radians
  The `besjn(n,x)` functions returns the Jn Bessel function of x in radians.
 4 besy0
 ?expressions functions besy0
 ?besy0
-#besy0(x) & int or real & $Y_{0}$ Bessel function of $x$ in radians \\
+# besy0(x) & int or real & $Y_{0}$ Bessel function of $x$ in radians \\
 %besy0(x)@int or real@$Y sub 0$ Bessel function of $x$ in radians
  The `besy0(x)` function returns the Y0th Bessel function of its argument.
  `besy0` expects its argument to be in radians.
 4 besy1
 ?expressions functions besy1
 ?besy1
-#besy1(x) & int or real & $Y_{1}$ Bessel function of $x$ in radians \\
+# besy1(x) & int or real & $Y_{1}$ Bessel function of $x$ in radians \\
 %besy1(x)@int or real@$Y sub 1$ Bessel function of $x$ in radians
  The `besy1(x)` function returns the Y1st Bessel function of its argument.
  `besy1` expects its argument to be in radians.
@@ -8292,20 +8292,20 @@ Ffigure_fenceplot
             4096   polar       no effect
 #\begin{tabular}{|c|c|c|} \hline
 #\multicolumn{3}{|c|}{Graph Border Encoding} \\ \hline \hline
-#Bit & plot & splot \\ \hline
-#1 & bottom & bottom left front \\
-#2 & left & bottom left back \\
-#4 & top & bottom right front \\
-#8 & right & bottom right back \\
-#16 & no effect & left vertical \\
-#32 & no effect & back vertical \\
-#64 & no effect & right vertical \\
-#128 & no effect & front vertical \\
-#256 & no effect & top left back \\
-#512 & no effect & top right back \\
-#1024 & no effect & top left front \\
-#2048 & no effect & top right front \\
-#4096 & polar & no effect \\
+# Bit & plot & splot \\ \hline
+# 1 & bottom & bottom left front \\
+# 2 & left & bottom left back \\
+# 4 & top & bottom right front \\
+# 8 & right & bottom right back \\
+# 16 & no effect & left vertical \\
+# 32 & no effect & back vertical \\
+# 64 & no effect & right vertical \\
+# 128 & no effect & front vertical \\
+# 256 & no effect & top left back \\
+# 512 & no effect & top right back \\
+# 1024 & no effect & top left front \\
+# 2048 & no effect & top right front \\
+# 4096 & polar & no effect \\
 %c c c .
 %Bit@plot@splot
 %_
