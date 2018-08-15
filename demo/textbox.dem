@@ -6,16 +6,18 @@ unset ylabel
 set bmargin  3
 unset key
 
-set multiplot layout 1,2
 
-set style textbox opaque border lc "blue"
+set style textbox 1 opaque border lc "blue"
+set style textbox 2 opaque margins 6,1.5 fc "grey75" border lc black
+
+set multiplot layout 1,2
 set title "textboxes with blue border"
 plot 'table.dat' using 0:2 title column with lines lw 3,  \
-     ''          using 0:2:2 with labels center boxed notitle column
+     ''          using 0:2:2 with labels center boxed bs 1 notitle column
 
-set style textbox opaque margins 6,1.5 fc "grey75" border lc black
 set title "larger textboxes with grey fill"
-replot
+plot 'table.dat' using 0:2 title column with lines lw 3,  \
+     ''          using 0:2:2 with labels center boxed bs 2 notitle column
 
 unset multiplot
 

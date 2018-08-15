@@ -509,8 +509,11 @@ save_set_all(FILE *fp)
 	}
 	save_position(fp, &this_label->offset, 3, TRUE);
 #ifdef EAM_BOXED_TEXT
-	if (this_label->boxed)
+	if (this_label->boxed) {
 	    fprintf(fp," boxed ");
+	    if (this_label->boxed > 1)
+		fprintf(fp,"bs %d ",this_label->boxed);
+	}
 #endif
 	fputc('\n', fp);
     }
@@ -595,7 +598,6 @@ save_set_all(FILE *fp)
     save_walls(fp);
 
 #ifdef EAM_BOXED_TEXT
-    fprintf(fp, "set style textbox");
     save_style_textbox(fp);
 #endif
 
@@ -1238,23 +1240,28 @@ save_style_parallel(FILE *fp)
 void
 save_style_textbox(FILE *fp)
 {
-    textbox_style *textbox = &textbox_opts[0];
-
-    fprintf(fp, " %s margins %4.1f, %4.1f",
-	    textbox->opaque ? "opaque": "transparent",
-	    textbox->xmargin, textbox->ymargin);
-    if (textbox->opaque) {
-	fprintf(fp, " fc ");
-	save_pm3dcolor(fp, &(textbox->fillcolor));
+    int bs;
+    for (bs = 0; bs < NUM_TEXTBOX_STYLES; bs++) {
+	textbox_style *textbox = &textbox_opts[bs];
+	if (textbox->linewidth <= 0)
+	    continue;
+	fprintf(fp, "set style textbox %d ", bs+1);
+	fprintf(fp, " %s margins %4.1f, %4.1f",
+		textbox->opaque ? "opaque": "transparent",
+		textbox->xmargin, textbox->ymargin);
+	if (textbox->opaque) {
+	    fprintf(fp, " fc ");
+	    save_pm3dcolor(fp, &(textbox->fillcolor));
+	}
+	if (textbox->noborder) {
+	    fprintf(fp, " noborder");
+	} else {
+	    fprintf(fp, " border ");
+	    save_pm3dcolor(fp, &(textbox->border_color));
+	}
+	fprintf(fp, " linewidth %4.1f", textbox->linewidth);
+	fputs("\n",fp);
     }
-    if (textbox->noborder) {
-	fprintf(fp, " noborder");
-    } else {
-	fprintf(fp, " border ");
-	save_pm3dcolor(fp, &(textbox->border_color));
-    }
-    fprintf(fp, " linewidth %4.1f", textbox->linewidth);
-    fputs("\n",fp);
 }
 #endif
 

@@ -992,7 +992,13 @@ static void
 unset_textbox_style()
 {
     textbox_style foo = DEFAULT_TEXTBOX_STYLE;
-    textbox_opts[0] = foo;
+    int i;
+
+    for (i=0; i<NUM_TEXTBOX_STYLES; i++) {
+	textbox_opts[i] = foo;
+	if (i>0)
+	    textbox_opts[i].linewidth = 0.;
+    }
 }
 #endif
 

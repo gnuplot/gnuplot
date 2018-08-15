@@ -642,7 +642,9 @@ extern TBOOLEAN prefer_line_styles;
 extern histogram_style histogram_opts;
 
 #ifdef EAM_BOXED_TEXT
-extern textbox_style textbox_opts[];
+/* TODO: linked list rather than fixed size array */
+#define NUM_TEXTBOX_STYLES 4
+extern textbox_style textbox_opts[NUM_TEXTBOX_STYLES];
 #endif
 
 void default_arrow_style __PROTO((struct arrow_style_type *arrow));

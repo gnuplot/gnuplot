@@ -17,6 +17,7 @@ Changes not in 5.2
 * NEW extended dospc terminal (DOS / OpenWatcom)
 * EXPERIMENTAL internal support for appending to existing arrays
 * EXPERIMENTAL "set mouse mouseformat function <stringval_from_xy(x,y)>"
+* EXPERIMENTAL multiple textbox styles
 * CHANGE remove deprecated command "update"
 * CHANGE remove deprecated option "thru"
 * CHANGE special case optimization of nonlinear code to speed up logscale

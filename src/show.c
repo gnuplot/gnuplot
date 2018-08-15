@@ -1772,8 +1772,11 @@ show_label(int tag)
 	    }
 
 #ifdef EAM_BOXED_TEXT
-	    if (this_label->boxed)
+	    if (this_label->boxed) {
 		fprintf(stderr," boxed");
+		if (this_label->boxed > 1)
+		    fprintf(stderr," bs %d",this_label->boxed);
+	    }
 #endif
 
 	    /* Entry font added by DJL */
@@ -2809,7 +2812,6 @@ show_histogram()
 static void
 show_textbox()
 {
-    fprintf(stderr, "\ttextbox style");
     save_style_textbox(stderr);
 }
 #endif

@@ -4760,6 +4760,7 @@ set_style()
     case SHOW_STYLE_TEXTBOX:
     {
 	textbox_style *textbox = &textbox_opts[0];
+	int tag = 0;
 	c_token++;
 	while (!END_OF_COMMAND) {
 	    if (almost_equals(c_token,"op$aque")) {
@@ -4806,11 +4807,22 @@ set_style()
 	    } else if (almost_equals(c_token,"linew$idth") || equals(c_token,"lw")) {
 		c_token++;
 		textbox->linewidth = real_expression();
-		if (textbox->linewidth < 0)
-		    textbox->linewidth = 1.0;
+	    } else if (!tag) {
+		tag = int_expression();
+		if (tag > NUM_TEXTBOX_STYLES)
+		    int_error(NO_CARET,"only %d textbox styles supported\n", NUM_TEXTBOX_STYLES);
+		if (tag > 0)
+		    textbox = &textbox_opts[tag-1];
 	    } else
 		int_error(c_token,"unrecognized option");
+
+	    /* only check for tag as first option */
+	    if (!tag)
+		tag = -1;
 	}
+	/* sanity checks */
+	if (textbox->linewidth <= 0)
+	    textbox->linewidth = 1.0;
 	break;
     }
 #endif
@@ -6291,10 +6303,15 @@ parse_label_options( struct text_label *this_label, int ndim)
 
 #ifdef EAM_BOXED_TEXT
 	if (equals(c_token, "boxed")) {
-	    this_label->boxed = -1;
+	    int tag = -1;
 	    c_token++;
+	    if (equals(c_token, "bs")) {
+		c_token++;
+		tag = int_expression() % (NUM_TEXTBOX_STYLES+1);
+	    }
+	    this_label->boxed = tag;
 	    continue;
-	} else if (equals(c_token, "noboxed")) {
+	} else if (almost_equals(c_token, "nobox$ed")) {
 	    this_label->boxed = 0;
 	    c_token++;
 	    continue;

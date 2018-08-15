@@ -10477,7 +10477,7 @@ Ffigure_multiple_keys
                  {textcolor <colorspec>}
                  {point <pointstyle> | nopoint}
                  {offset <offset>}
-                 {boxed}
+                 {nobox} {boxed {bs <boxstyle>}}
                  {hypertext}
        unset label {<tag>}
        show label
@@ -12870,7 +12870,7 @@ Ffigure_multiple_keys
        set style histogram <histogram style options>
        set style line <n> <linestyle>
        set style rectangle <object options> <linestyle> <fillstyle>
-       set style textbox {opaque|transparent} {{no}border} {fillcolor}
+       set style textbox {<n>} {opaque|transparent} {{no}border} {fillcolor}
 
 4 set style arrow
 ?commands set style arrow
@@ -13381,9 +13381,9 @@ Ffigure_multiple_keys
 ?textbox
 ?boxed
 
- Syntax: set style textbox {opaque|transparent}
+ Syntax: set style textbox {<bs>}
+                           {opaque|transparent} {fillcolor <color>}
                            {{no}border {<bordercolor>}}{linewidth <lw>}
-                           {fillcolor <color>}
                            {margins <xmargin>,<ymargin>}
 
  This command controls the appearance of labels with the attribute 'boxed'.
@@ -13391,6 +13391,18 @@ Ffigure_multiple_keys
  Note: The current implementation is experimental; details may change.
  Implementation for some terminals (svg, latex) is incomplete.
  Most terminals cannot place a box correctly around rotated text.
+
+ Four textbox styles can be defined.  If no boxstyle index <bs> is given, the
+ default is to use bs 1.
+ Example:
+
+      # default style (bs 1) has only a black border
+      set style textbox transparent border lc "black"
+      # style 2 (bs 2) has a light blue background with no border
+      set style textbox 2 opaque fc "light-cyan" noborder
+      set label 1 "I'm in a box" boxed bs 1
+      set label 2 "I'm blue" boxed bs 2
+
 3 surface
 ?commands set surface
 ?commands unset surface
