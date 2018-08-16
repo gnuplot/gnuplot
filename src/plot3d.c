@@ -1156,8 +1156,18 @@ get_3ddata(struct surface_points *this_plot)
 		}
 
 		if (this_plot->plot_style == BOXES) {
-		    STORE_AND_UPDATE_RANGE(cp->xlow, xlow, cp->type, x_axis, this_plot->noautoscale, goto come_here_if_undefined);
-		    STORE_AND_UPDATE_RANGE(cp->xhigh, xhigh, cp->type, x_axis, this_plot->noautoscale, goto come_here_if_undefined);
+		    STORE_AND_UPDATE_RANGE(cp->xlow, xlow, cp->type, x_axis,
+				this_plot->noautoscale, goto come_here_if_undefined);
+		    STORE_AND_UPDATE_RANGE(cp->xhigh, xhigh, cp->type, x_axis,
+				this_plot->noautoscale, goto come_here_if_undefined);
+		    /* autoscale on y without losing color information stored in CRD_COLOR */
+		    if (boxdepth > 0) {
+			double dummy;
+			STORE_AND_UPDATE_RANGE(dummy, y - boxdepth, cp->type, y_axis,
+				this_plot->noautoscale, NULL);
+			STORE_AND_UPDATE_RANGE(dummy, y + boxdepth, cp->type, y_axis,
+				this_plot->noautoscale, NULL);
+		    }
 		}
 
 		if (this_plot->plot_style == VECTOR)
