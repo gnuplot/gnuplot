@@ -1168,14 +1168,19 @@ get_3ddata(struct surface_points *this_plot)
 			STORE_AND_UPDATE_RANGE(dummy, y + boxdepth, cp->type, y_axis,
 				this_plot->noautoscale, NULL);
 		    }
+		    /* We converted linetype colors (lc variable) to RGB colors on input.
+		     * Other plot style do not do this.
+		     * When we later call check3d_for_variable_color it needs to know this.
+		     */
+		    if (this_plot->lp_properties.l_type == LT_COLORFROMCOLUMN) {
+			this_plot->lp_properties.pm3d_color.type = TC_RGB;
+			this_plot->lp_properties.pm3d_color.value = -1.0;
+		    }
 		}
 
 		if (this_plot->plot_style == VECTOR)
 		    STORE_AND_UPDATE_RANGE(cphead->z, ztail, cphead->type, z_axis,
 				this_plot->noautoscale, goto come_here_if_undefined);
-
-		if (this_plot->lp_properties.l_type == LT_COLORFROMCOLUMN)
-		    cp->CRD_COLOR = color;
 
 		if (pm3d_color_from_column) {
 		    if (this_plot->plot_style == VECTOR)

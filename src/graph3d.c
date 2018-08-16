@@ -3672,13 +3672,8 @@ check3d_for_variable_color(struct surface_points *plot, struct coordinate *point
 	    set_color( cb2gray( z2cb(point->z) ) );
 	break;
     case TC_LINESTYLE:	/* color from linestyle in data column */
-	if (plot->pm3d_color_from_column) {
-	    set_rgbcolor_var( (unsigned int)point->CRD_COLOR );
-	} else {
-	    /* FIXME: not sure it is possible to end up here */
-	    plot->lp_properties.pm3d_color.lt = (int)(point->CRD_COLOR);
-	    apply_pm3dcolor(&(plot->lp_properties.pm3d_color));
-	}
+	plot->lp_properties.pm3d_color.lt = (int)(point->CRD_COLOR);
+	apply_pm3dcolor(&(plot->lp_properties.pm3d_color));
 	break;
     default:
 	/* The other cases were taken care of already */
