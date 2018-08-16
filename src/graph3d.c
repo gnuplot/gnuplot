@@ -3659,27 +3659,26 @@ check3d_for_variable_color(struct surface_points *plot, struct coordinate *point
 {
     int colortype = plot->lp_properties.pm3d_color.type;
 
-    TBOOLEAN rgb_from_column = plot->pm3d_color_from_column
-			&& plot->lp_properties.pm3d_color.type == TC_RGB
-			&& plot->lp_properties.pm3d_color.value < 0.0;
-
     switch( colortype ) {
     case TC_RGB:
-	if (rgb_from_column)
+	if (plot->pm3d_color_from_column && plot->lp_properties.pm3d_color.value < 0.0)
 	    set_rgbcolor_var( (unsigned int)point->CRD_COLOR );
 	break;
     case TC_Z:
     case TC_DEFAULT:   /* pm3d mode assumes this is default */
-	if (can_pm3d) {
-	    if (plot->pm3d_color_from_column)
-		set_color( cb2gray(point->CRD_COLOR) );
-	    else
-		set_color( cb2gray( z2cb(point->z) ) );
-	}
+	if (plot->pm3d_color_from_column)
+	    set_color( cb2gray(point->CRD_COLOR) );
+	else
+	    set_color( cb2gray( z2cb(point->z) ) );
 	break;
     case TC_LINESTYLE:	/* color from linestyle in data column */
-	plot->lp_properties.pm3d_color.lt = (int)(point->CRD_COLOR);
-	apply_pm3dcolor(&(plot->lp_properties.pm3d_color));
+	if (plot->pm3d_color_from_column) {
+	    set_rgbcolor_var( (unsigned int)point->CRD_COLOR );
+	} else {
+	    /* FIXME: not sure it is possible to end up here */
+	    plot->lp_properties.pm3d_color.lt = (int)(point->CRD_COLOR);
+	    apply_pm3dcolor(&(plot->lp_properties.pm3d_color));
+	}
 	break;
     default:
 	/* The other cases were taken care of already */
