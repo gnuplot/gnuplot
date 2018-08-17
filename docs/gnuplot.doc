@@ -9881,7 +9881,7 @@ Ffigure_missing
 =beeswarm
  Syntax:
        set jitter {overlap <yposition>} {spread <factor>} {wrap <limit>}
-                  {swarm|square}
+                  {swarm|square|vertical}
  Examples:
        set jitter                    # jitter points within 1 character width
        set jitter overlap 1.5        # jitter points within 1.5 character width
@@ -9900,6 +9900,8 @@ Ffigure_missing
  The optional keyword `square` adjusts the y coordinate of displaced points
  in addition to their x coordinate so that the points lie in distinct layers
  separated by at least the `overlap` distance.
+
+ To jitter along y (only) rather than along x, use keyword `vertical`.
 
  The maximum displacement (in character units) can be limited using the `wrap`
  keyword.

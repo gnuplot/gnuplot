@@ -2177,12 +2177,23 @@ plot_points(struct curve_points *plot)
 	    if (plot->points[i].type == UNDEFINED)
 		continue;
 
-	    /* Apply jitter offsets.                                    */
-	    /* The jitter x offset is a multiple of character width.    */
-	    /* The jitter y offset is in the original coordinate system.*/
+	    /* Apply jitter offsets.
+	     * Swarm jitter x offset is a multiple of character width.
+	     * Swarm jitter y offset is in the original coordinate system.
+	     * vertical jitter y offset is a multiple of character heights.
+	     */
 	    if (jitter.spread > 0) {
 		x += plot->points[i].xhigh * 0.7 * t->h_char;
-		y = map_y(plot->points[i].y + plot->points[i].yhigh);
+		switch (jitter.style) {
+		    case JITTER_ON_Y:
+			y += plot->points[i].yhigh * 0.7 * t->v_char;
+			break;
+		    case JITTER_SWARM:
+		    case JITTER_SQUARE:
+		    default:
+			y = map_y(plot->points[i].y + plot->points[i].yhigh);
+			break;
+		}
 	    }
 
 	    /* do clipping if necessary */

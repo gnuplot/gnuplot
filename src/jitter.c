@@ -144,11 +144,17 @@ jitter_points(struct curve_points *plot)
 			xjit -= jitter.limit;
 	    if ((j & 01) != 0)
 		    xjit = -xjit;
-
 	    plot->points[i+j].xhigh = xjit;
 
 	    if (jitter.style == JITTER_SQUARE)
 		plot->points[i+j].yhigh = plot->points[i].y - plot->points[i+j].y;
+
+	    /* Displace points on y instead of x */
+	    if (jitter.style == JITTER_ON_Y) {
+		plot->points[i+j].yhigh = xjit;
+		plot->points[i+j].xhigh = 0;
+	    }
+
 	}
         i += j;
     }
@@ -194,6 +200,9 @@ set_jitter()
 	} else if (equals(c_token, "wrap")) {
 	    c_token++;
 	    jitter.limit = real_expression();
+	} else if (almost_equals(c_token, "vert$ical")) {
+	    c_token++;
+	    jitter.style = JITTER_ON_Y;
 	} else
 	    int_error(c_token, "unrecognized keyword");
     }
@@ -208,10 +217,11 @@ show_jitter()
 	return;
     }
     fprintf(stderr, "\toverlap criterion  %g %s coords\n", jitter.overlap.x, coord_msg[jitter.overlap.scalex]);
-    fprintf(stderr, "\tspread multiplier on x: %g\n", jitter.spread);
+    fprintf(stderr, "\tspread multiplier on x (or y): %g\n", jitter.spread);
     if (jitter.limit > 0)
 	fprintf(stderr, "\twrap at %g character widths\n", jitter.limit);
-    fprintf(stderr, "\tstyle: %s\n", jitter.style == JITTER_SQUARE ? "square" : "swarm");
+    fprintf(stderr, "\tstyle: %s\n", jitter.style == JITTER_SQUARE ? "square" :
+			jitter.style == JITTER_ON_Y ? "vertical" : "swarm");
 }
 
 /* process 'unset jitter' command */
@@ -231,6 +241,7 @@ save_jitter(FILE *fp)
 	fprintf(fp, "set jitter overlap %s%g",
 		jitter.overlap.scalex == character ? "" : coord_msg[jitter.overlap.scalex], jitter.overlap.x);
 	fprintf(fp, "  spread %g  wrap %g", jitter.spread, jitter.limit);
-	fprintf(fp, jitter.style == JITTER_SQUARE ? " square\n" : "\n");
+	fprintf(fp, jitter.style == JITTER_SQUARE ? " square\n" :
+		    jitter.style == JITTER_ON_Y ? " vertical\n" : "\n");
     }
 }

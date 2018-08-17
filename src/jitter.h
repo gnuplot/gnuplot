@@ -16,7 +16,8 @@
 enum jitterstyle {
     JITTER_DEFAULT = 0,
     JITTER_SWARM,
-    JITTER_SQUARE
+    JITTER_SQUARE,
+    JITTER_ON_Y
     };
 
 typedef struct {

@@ -1,5 +1,10 @@
 2018-08-26  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/graphics.c src/jitter.c src/jitter.h:   New jitter option
+	'set jitter vertical' jitters y coordinate rather than x coordinate.
+
+2018-08-26  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* src/graphics.c:  Make "with image pixels" work on terminals that
 	support term->fillbox but not term->filled_polygon.
 	I.e. 2D images with axes parallel to x and y are ok.

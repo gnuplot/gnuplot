@@ -100,5 +100,21 @@ plot $random using (int($1)%20):2:(10+int($1)) notitle  pt 7 ps 1 lc var
 unset multiplot
 
 pause -1 'Hit <cr> to continue'
+
 reset
 
+array data[34] = [ 1, 1, 1, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 7, 7, 8, 8, 8, 8, 8, 8, 8 ]
+
+set title "Jitter style option\nvertical"
+set jitter vertical spread 0.2
+
+set xrange [0:9]
+set yrange [0:2]
+set ytics ("1.0" 1.0) nomirror
+set xtics nomirror
+set border 3
+
+plot data using 2:(1.0) with points pt '-' font "/:Bold"
+
+pause -1 "Hit <cr> to continue"
+reset
