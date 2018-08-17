@@ -1602,12 +1602,13 @@ histogram_range_fiddling(struct curve_points *plot)
 		/* FIXME: Rather than trying to reproduce the layout along X */
 		/* we should just track the actual xmin/xmax as we go.       */
 		if (axis_array[FIRST_X_AXIS].set_autoscale) {
-		    if ((axis_array[FIRST_X_AXIS].set_autoscale & AUTOSCALE_MIN))
+		    if ((axis_array[FIRST_X_AXIS].set_autoscale & AUTOSCALE_MIN)) {
 			xlow = -1.0;
+			if (axis_array[FIRST_X_AXIS].min > xlow)
+			    axis_array[FIRST_X_AXIS].min = xlow;
+		    }
 		    xhigh = plot->histogram_sequence;
 		    xhigh += plot->histogram->start + 1.0;
-		    if (axis_array[FIRST_X_AXIS].min > xlow)
-			axis_array[FIRST_X_AXIS].min = xlow;
 		    if (axis_array[FIRST_X_AXIS].max != xhigh)
 			axis_array[FIRST_X_AXIS].max  = xhigh;
 		}
