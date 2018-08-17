@@ -438,6 +438,8 @@ DUMB_text()
 		memcpy(&dumb_prev_color, color, sizeof(t_colorspec));
 		break;
 	    }
+	    default:
+		break;
 	    }
 #endif
 #ifdef DUMB_UTF8

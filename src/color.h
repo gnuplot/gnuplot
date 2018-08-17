@@ -26,21 +26,24 @@ of palettes between terminals and making palette routines.
 # include "config.h"
 #endif
 
+typedef enum colortype {
+	TC_DEFAULT	= 0,	/* Use default color, set separately */
+	TC_LT		= 1,	/* Use the color of linetype <n> */
+	TC_LINESTYLE	= 2,	/* Use the color of line style <n> */
+	TC_RGB		= 3,	/* Explicit RGB triple provided by user */
+	TC_CB		= 4,	/* "palette cb <value>" */
+	TC_FRAC		= 5,	/* "palette frac <value> */
+	TC_Z		= 6,	/* "palette z" */
+	TC_VARIABLE	= 7	/* only used for "tc", never "lc" */
+} colortype;
+
 /* Generalized pm3d-compatible color specifier
  * Supplements basic linetype choice */
 typedef struct t_colorspec {
-    int type;			/* TC_<type> definitions below */
+    colortype type;		/* TC_<type> definitions below */
     int lt;			/* used for TC_LT, TC_LINESTYLE and TC_RGB */
     double value;		/* used for TC_CB and TC_FRAC */
 } t_colorspec;
-#define	TC_DEFAULT	0	/* Use default color, set separately */
-#define	TC_LT		1	/* Use the color of linetype <n> */
-#define	TC_LINESTYLE	2	/* Use the color of line style <n> */
-#define	TC_RGB		3	/* Explicit RGB triple provided by user */
-#define	TC_CB		4	/* "palette cb <value>" */
-#define	TC_FRAC		5	/* "palette frac <value> */
-#define	TC_Z		6	/* "palette z" */
-#define	TC_VARIABLE	7	/* only used for "tc", never "lc" */
 
 #define DEFAULT_COLORSPEC {TC_DEFAULT, 0, 0.0}
 #define BLACK_COLORSPEC {TC_LT, LT_BLACK, 0.0}

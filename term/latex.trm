@@ -1048,7 +1048,10 @@ LATEX_set_color(t_colorspec *colorspec)
 
 	rgb1_from_gray(colorspec->value, &color);
 	snprintf(colorstr, sizeof(colorstr), "\\color[rgb]{%3.2f,%3.2f,%3.2f}\n", color.r, color.g, color.b);
+	break;
     }
+    default:
+	break;
     }
 
     if (strcmp(colorstr, latex_color) != 0) {

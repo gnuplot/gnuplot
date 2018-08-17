@@ -3016,6 +3016,8 @@ HPGL2_set_color(t_colorspec *colorspec)
 		(int)color.r, (int)color.g, (int)color.b);
 	break;
     }
+    default:
+	break;
     }
 }
 

@@ -794,6 +794,8 @@ apply_pm3dcolor(struct t_colorspec *tc)
 	case TC_FRAC:
 		set_color(sm_palette.positive == SMPAL_POSITIVE ?  tc->value : 1-tc->value);
 		break;
+	default:
+		break; /* cannot happen */
     }
 }
 

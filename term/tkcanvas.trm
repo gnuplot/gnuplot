@@ -646,6 +646,8 @@ TK_color(t_colorspec *colorspec)
 	    snprintf(tmp_color, sizeof(tk_color), "#%02x%02x%02x", red, green, blue);
 	    break;
 	}
+    default:
+	    break;
     }
 
     if (strcmp(tk_color, tmp_color) != 0) {
