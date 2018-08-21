@@ -438,14 +438,14 @@ thin_plate_splines_setup( struct iso_curve *old_iso_crvs,
     
     numpoints = 0;
     for (oicrv = old_iso_crvs; oicrv != NULL; oicrv = oicrv->next) {
-        numpoints += oicrv->p_count;
+	numpoints += oicrv->p_count;
     }
     xx = gp_alloc(sizeof(xx[0]) * (numpoints + 3) * (numpoints + 8),
-                  "thin plate splines in dgrid3d");
+		  "thin plate splines in dgrid3d");
     /* the memory needed is not really (n+3)*(n+8) for now,
        but might be if I take into account errors ... */
     K = gp_alloc(sizeof(K[0]) * (numpoints + 3),
-                 "matrix : thin plate splines 2d");
+		 "matrix : thin plate splines 2d");
     yy = xx + numpoints;
     zz = yy + numpoints;
     b = zz + numpoints;
@@ -454,35 +454,35 @@ thin_plate_splines_setup( struct iso_curve *old_iso_crvs,
      * ones, as we copy them */
     numpoints = 0;
     for (oicrv = old_iso_crvs; oicrv != NULL; oicrv = oicrv->next) {
-        struct coordinate *opoints = oicrv->points;
-        
-        for (k = 0; k < oicrv->p_count; k++, opoints++) {
-            /* HBB 20010424: avoid crashing for undefined input */
-            if (opoints->type == UNDEFINED)
-                continue;
-            xx[numpoints] = opoints->x;
-            yy[numpoints] = opoints->y;
-            zz[numpoints] = opoints->z;
-            numpoints++;
-        }
+	struct coordinate *opoints = oicrv->points;
+	
+	for (k = 0; k < oicrv->p_count; k++, opoints++) {
+	    /* HBB 20010424: avoid crashing for undefined input */
+	    if (opoints->type == UNDEFINED)
+		continue;
+	    xx[numpoints] = opoints->x;
+	    yy[numpoints] = opoints->y;
+	    zz[numpoints] = opoints->z;
+	    numpoints++;
+	}
     }
     
     for (i = 0; i < numpoints + 3; i++) {
-        K[i] = b + (numpoints + 3) * (i + 1);
+	K[i] = b + (numpoints + 3) * (i + 1);
     }
     
     for (i = 0; i < numpoints; i++) {
-        for (j = i + 1; j < numpoints; j++) {
-            double dx = xx[i] - xx[j], dy = yy[i] - yy[j];
-            K[i][j] = K[j][i] = -splines_kernel(sqrt(dx * dx + dy * dy));
-        }
-        K[i][i] = 0.0;		/* here will come the weights for errors */
-        b[i] = zz[i];
+	for (j = i + 1; j < numpoints; j++) {
+	    double dx = xx[i] - xx[j], dy = yy[i] - yy[j];
+	    K[i][j] = K[j][i] = -splines_kernel(sqrt(dx * dx + dy * dy));
+	}
+	K[i][i] = 0.0;		/* here will come the weights for errors */
+	b[i] = zz[i];
     }
     for (i = 0; i < numpoints; i++) {
-        K[i][numpoints] = K[numpoints][i] = 1.0;
-        K[i][numpoints + 1] = K[numpoints + 1][i] = xx[i];
-        K[i][numpoints + 2] = K[numpoints + 2][i] = yy[i];
+	K[i][numpoints] = K[numpoints][i] = 1.0;
+	K[i][numpoints + 1] = K[numpoints + 1][i] = xx[i];
+	K[i][numpoints + 2] = K[numpoints + 2][i] = yy[i];
     }
     b[numpoints] = 0.0;
     b[numpoints + 1] = 0.0;
@@ -516,29 +516,29 @@ qnorm( double dist_x, double dist_y, int q )
     double dist = 0.0;
     switch (q) {
     case 1:
-        dist = dist_x + dist_y;
-        break;
+	dist = dist_x + dist_y;
+	break;
     case 2:
-        dist = dist_x * dist_x + dist_y * dist_y;
-        break;
+	dist = dist_x * dist_x + dist_y * dist_y;
+	break;
     case 4:
-        dist = dist_x * dist_x + dist_y * dist_y;
-        dist *= dist;
-        break;
+	dist = dist_x * dist_x + dist_y * dist_y;
+	dist *= dist;
+	break;
     case 8:
-        dist = dist_x * dist_x + dist_y * dist_y;
-        dist *= dist;
-        dist *= dist;
-        break;
+	dist = dist_x * dist_x + dist_y * dist_y;
+	dist *= dist;
+	dist *= dist;
+	break;
     case 16:
-        dist = dist_x * dist_x + dist_y * dist_y;
-        dist *= dist;
-        dist *= dist;
-        dist *= dist;
-        break;
+	dist = dist_x * dist_x + dist_y * dist_y;
+	dist *= dist;
+	dist *= dist;
+	dist *= dist;
+	break;
     default:
-        dist = pow(dist_x, (double)q ) + pow(dist_y, (double)q );
-        break;
+	dist = pow(dist_x, (double)q ) + pow(dist_y, (double)q );
+	break;
     }
     return dist;
 }
@@ -614,10 +614,10 @@ grid_nongrid_data(struct surface_points *this_plot)
     this_plot->has_grid_topology = TRUE;
     
     if (dgrid3d_mode == DGRID3D_SPLINES) {
-        thin_plate_splines_setup( old_iso_crvs, &xx, &numpoints );
-        yy = xx + numpoints;
-        zz = yy + numpoints;
-        b  = zz + numpoints;
+	thin_plate_splines_setup( old_iso_crvs, &xx, &numpoints );
+	yy = xx + numpoints;
+	zz = yy + numpoints;
+	b  = zz + numpoints;
     }
     
     for (i = 0, x = xmin; i < dgrid3d_col_fineness; i++, x += dx) {
@@ -638,74 +638,73 @@ grid_nongrid_data(struct surface_points *this_plot)
 	    points->type = INRANGE;
 
 	    if (dgrid3d_mode == DGRID3D_SPLINES) {
-                z = b[numpoints];
-                for (k = 0; k < numpoints; k++) {
-                    double dx = xx[k] - x, dy = yy[k] - y;
-                    z = z - b[k] * splines_kernel(sqrt(dx * dx + dy * dy));
-                }
-                z = z + b[numpoints + 1] * x + b[numpoints + 2] * y;
+		z = b[numpoints];
+		for (k = 0; k < numpoints; k++) {
+		    double dx = xx[k] - x, dy = yy[k] - y;
+		    z = z - b[k] * splines_kernel(sqrt(dx * dx + dy * dy));
+		}
+		z = z + b[numpoints + 1] * x + b[numpoints + 2] * y;
 	    } else { /* everything, except splines */
-                for (oicrv = old_iso_crvs; oicrv != NULL; oicrv = oicrv->next) {
-                    struct coordinate *opoints = oicrv->points;
-                    for (k = 0; k < oicrv->p_count; k++, opoints++) {
-                        
-                        if (dgrid3d_mode == DGRID3D_QNORM) {
-                            double dist = qnorm( fabs(opoints->x - x),
-                                                 fabs(opoints->y - y),
-                                                 dgrid3d_norm_value );
+		for (oicrv = old_iso_crvs; oicrv != NULL; oicrv = oicrv->next) {
+		    struct coordinate *opoints = oicrv->points;
+		    for (k = 0; k < oicrv->p_count; k++, opoints++) {
 
-                            if (dist == 0.0) {
-                                /* HBB 981209: revised flagging as undefined */
-                                /* Supporting all those infinities on various
-                                 * platforms becomes tiresome, 
-                                 * to say the least :-(
-                                 * Let's just return the first z where this 
-                                 * happens unchanged, and be done with this,
-                                 * period. */
-                                points->type = UNDEFINED;
-                                z = opoints->z;
+			if (dgrid3d_mode == DGRID3D_QNORM) {
+			    double dist = qnorm( fabs(opoints->x - x),
+						 fabs(opoints->y - y),
+						 dgrid3d_norm_value );
+
+			    if (dist == 0.0) {
+				/* HBB 981209: revised flagging as undefined */
+				/* Supporting all those infinities on various
+				 * platforms becomes tiresome, 
+				 * to say the least :-(
+				 * Let's just return the first z where this 
+				 * happens unchanged, and be done with this,
+				 * period. */
+				points->type = UNDEFINED;
+				z = opoints->z;
 				c = opoints->CRD_COLOR;
-                                w = 1.0;
-                                break;	/* out of inner loop */
-                            } else {
-                                z += opoints->z / dist;
-                                c += opoints->CRD_COLOR / dist;
-                                w += 1.0/dist;
-                            }
+				w = 1.0;
+				break;	/* out of inner loop */
+			    } else {
+				z += opoints->z / dist;
+				c += opoints->CRD_COLOR / dist;
+				w += 1.0/dist;
+			    }
 
-                        } else { /* ALL else: not spline, not qnorm! */
-                            double weight = 0.0;                       
-                            double dist=pythag((opoints->x-x)/dgrid3d_x_scale, 
-                                               (opoints->y-y)/dgrid3d_y_scale);
+			} else { /* ALL else: not spline, not qnorm! */
+			    double weight = 0.0;
+			    double dist=pythag((opoints->x-x)/dgrid3d_x_scale, 
+					       (opoints->y-y)/dgrid3d_y_scale);
 
-                            if (dgrid3d_mode == DGRID3D_GAUSS) {
-                                weight = exp( -dist*dist );
-                            } else if (dgrid3d_mode == DGRID3D_CAUCHY) {
-                                weight = 1.0/(1.0 + dist*dist );
-                            } else if (dgrid3d_mode == DGRID3D_EXP) {
-                                weight = exp( -dist );
-                            } else if (dgrid3d_mode == DGRID3D_BOX) {
-                                weight = (dist<1.0) ? 1.0 : 0.0;
-                            } else if (dgrid3d_mode == DGRID3D_HANN) {
-                                if (dist < 1.0) {
-                                    weight = 0.5*(1-cos(2.0*M_PI*dist));
-                                }
-                            }
-                            z += opoints->z * weight;
-                            c += opoints->CRD_COLOR * weight;
-                            w += weight;
-                        }
-                    }
-                    
-                    /* PKJ: I think this is only relevant for qnorm */
-                    if (points->type != INRANGE)
-                        break;	/* out of the second-inner loop as well ... */
-                }
+			    if (dgrid3d_mode == DGRID3D_GAUSS) {
+				weight = exp( -dist*dist );
+			    } else if (dgrid3d_mode == DGRID3D_CAUCHY) {
+				weight = 1.0/(1.0 + dist*dist );
+			    } else if (dgrid3d_mode == DGRID3D_EXP) {
+				weight = exp( -dist );
+			    } else if (dgrid3d_mode == DGRID3D_BOX) {
+				weight = (dist<1.0) ? 1.0 : 0.0;
+			    } else if (dgrid3d_mode == DGRID3D_HANN) {
+				if (dist < 1.0)
+				    weight = 0.5*(1-cos(2.0*M_PI*dist));
+			    }
+			    z += opoints->z * weight;
+			    c += opoints->CRD_COLOR * weight;
+			    w += weight;
+			}
+		    }
+		    
+		    /* PKJ: I think this is only relevant for qnorm */
+		    if (points->type != INRANGE)
+			break;	/* out of the second-inner loop as well ... */
+		}
 	    } /* endif( dgrid3d_mode == DGRID3D_SPLINES ) */
-                 
-              /* Now that we've escaped the loops safely, we know that we
-               * do have a good value in z and w, so we can proceed just as
-               * if nothing had happened at all. Nice, isn't it? */
+		 
+	      /* Now that we've escaped the loops safely, we know that we
+	       * do have a good value in z and w, so we can proceed just as
+	       * if nothing had happened at all. Nice, isn't it? */
 	    points->type = INRANGE;
 	    points->x = x;
 	    points->y = y;
@@ -723,10 +722,10 @@ grid_nongrid_data(struct surface_points *this_plot)
 		z = z / w;
 		c = c / w;
 	    }
-            
+	    
 	    STORE_AND_UPDATE_RANGE(points->z, z, points->type, z_axis,
 				   this_plot->noautoscale, continue);
-            
+	    
 	    if (!this_plot->pm3d_color_from_column)
 		c = z;
 	    dummy_type = points->type;
