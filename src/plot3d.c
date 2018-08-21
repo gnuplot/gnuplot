@@ -561,6 +561,8 @@ grid_nongrid_data(struct surface_points *this_plot)
 {
     int i, j, k;
     double x, y, z, w, dx, dy, xmin, xmax, ymin, ymax;
+    double c;
+    coord_type dummy_type;
     struct iso_curve *old_iso_crvs = this_plot->iso_crvs;
     struct iso_curve *icrv, *oicrv, *oicrvs;
     
@@ -568,8 +570,12 @@ grid_nongrid_data(struct surface_points *this_plot)
     double *xx = NULL, *yy = NULL, *zz = NULL, *b = NULL;
     int numpoints = 0;
 
-    xx = NULL; /* save to call free() on NULL if xx has never been used */
-    
+    /* Version 5.3 - allow gridding of separate color column so long as
+     * we don't need to generate splines for it
+     */
+    if (this_plot->pm3d_color_from_column && dgrid3d_mode == DGRID3D_SPLINES)
+	int_error(NO_CARET, "Spline gridding of a separate color column is not implemented");
+
     /* Compute XY bounding box on the original data. */
     /* FIXME HBB 20010424: Does this make any sense? Shouldn't we just
      * use whatever the x and y ranges have been found to be, and
@@ -581,7 +587,7 @@ grid_nongrid_data(struct surface_points *this_plot)
     ymin = ymax = old_iso_crvs->points[0].y;
     for (icrv = old_iso_crvs; icrv != NULL; icrv = icrv->next) {
 	struct coordinate *points = icrv->points;
-        
+
 	for (i = 0; i < icrv->p_count; i++, points++) {
 	    /* HBB 20010424: avoid crashing for undefined input */
 	    if (points->type == UNDEFINED)
@@ -625,6 +631,7 @@ grid_nongrid_data(struct surface_points *this_plot)
 
 	for (j=0, y=ymin; j<dgrid3d_row_fineness; j++, y+=dy, points++) {
 	    z = w = 0.0;
+	    c = 0.0;
 
 	    /* as soon as ->type is changed to UNDEFINED, break out of
 	     * two inner loops! */
@@ -657,10 +664,12 @@ grid_nongrid_data(struct surface_points *this_plot)
                                  * period. */
                                 points->type = UNDEFINED;
                                 z = opoints->z;
+				c = opoints->CRD_COLOR;
                                 w = 1.0;
                                 break;	/* out of inner loop */
                             } else {
                                 z += opoints->z / dist;
+                                c += opoints->CRD_COLOR / dist;
                                 w += 1.0/dist;
                             }
 
@@ -683,6 +692,7 @@ grid_nongrid_data(struct surface_points *this_plot)
                                 }
                             }
                             z += opoints->z * weight;
+                            c += opoints->CRD_COLOR * weight;
                             w += weight;
                         }
                     }
@@ -709,25 +719,23 @@ grid_nongrid_data(struct surface_points *this_plot)
 	    ||  (y > axis_array[y_axis].max && !(axis_array[y_axis].autoscale & AUTOSCALE_MAX)))
 		points->type = OUTRANGE;
 
-	    if (dgrid3d_mode != DGRID3D_SPLINES && !dgrid3d_kdensity)
-               z = z / w;
+	    if (dgrid3d_mode != DGRID3D_SPLINES && !dgrid3d_kdensity) {
+		z = z / w;
+		c = c / w;
+	    }
             
 	    STORE_AND_UPDATE_RANGE(points->z, z, points->type, z_axis,
 				   this_plot->noautoscale, continue);
             
-	    if (this_plot->pm3d_color_from_column)
-		int_error(NO_CARET, 
-			  "Gridding of the color column is not implemented");
-	    else {
-		coord_type dummy_type = points->type;
-		STORE_AND_UPDATE_RANGE( points->CRD_COLOR, z, dummy_type, 
-					COLOR_AXIS, 
-					this_plot->noautoscale, continue);
-	    }
+	    if (!this_plot->pm3d_color_from_column)
+		c = z;
+	    dummy_type = points->type;
+	    STORE_AND_UPDATE_RANGE( points->CRD_COLOR, c, dummy_type, COLOR_AXIS, 
+				    this_plot->noautoscale, continue);
 	}
     }
     
-    free(xx); /* save to call free on NULL pointer if splines not used */
+    free(xx); /* safe to call free on NULL pointer if splines not used */
     
     /* Delete the old non grid data. */
     for (oicrvs = old_iso_crvs; oicrvs != NULL;) {
@@ -1126,13 +1134,9 @@ get_3ddata(struct surface_points *this_plot)
 	    }
 
 	    if (dgrid3d) {
-		/* HBB 20010424: in dgrid3d mode, delay log() taking
-		 * and scaling until after the dgrid process. Only for
-		 * z, not for x and y, so we can layout the newly
-		 * created created grid more easily. */
+		/* No point in auto-scaling before we re-grid the data */
 		cp->z = z;
-		if (this_plot->plot_style == VECTOR)
-		    cphead->z = ztail;
+		cp->CRD_COLOR = (pm3d_color_from_column) ? color : z;
 	    } else {
 		coord_type dummy_type;
 

@@ -1,3 +1,9 @@
+2018-08-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot3d.c:  Allow dgrid3d re-gridding to include palette color
+	information from a separate input data column, so long as the dgrid3d
+	option is not "splines".
+
 2018-08-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/linux.trm term/vgagl.trm term/linux-vgagl.trm:
