@@ -134,6 +134,11 @@ double pointintervalbox = 1.0;
 /* used for filled points */
 t_colorspec background_fill = BACKGROUND_COLORSPEC;
 
+/* box width (automatic) for plot style "with boxes" */
+double   boxwidth              = -1.0;
+/* whether box width is absolute (default) or relative */
+TBOOLEAN boxwidth_is_absolute  = TRUE;
+
 /* set border */
 int draw_border = 31;	/* The current settings */
 int user_border = 31;	/* What the user last set explicitly */

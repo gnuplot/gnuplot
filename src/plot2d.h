@@ -44,9 +44,6 @@
 
 extern struct curve_points *first_plot;
 
-extern double boxwidth;
-extern TBOOLEAN boxwidth_is_absolute;
-
 /* prototypes from plot2d.c */
 
 void plotrequest __PROTO((void));

@@ -79,11 +79,6 @@ static void add_tics_boxplot_factors __PROTO((struct curve_points *plot));
 struct curve_points *first_plot = NULL;
 static struct udft_entry plot_func;
 
-/* box width (automatic) */
-double   boxwidth              = -1.0;
-/* whether box width is absolute (default) or relative */
-TBOOLEAN boxwidth_is_absolute  = TRUE;
-
 static double histogram_rightmost = 0.0;    /* Highest x-coord of histogram so far */
 static text_label histogram_title;          /* Subtitle for this histogram */
 static int stack_count = 0;                 /* counter for stackheight */

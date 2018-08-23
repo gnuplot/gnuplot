@@ -425,6 +425,9 @@ extern float yoffset;		/* y origin setting */
 extern float aspect_ratio;	/* 1.0 for square */
 extern int aspect_ratio_3D;	/* 2 for equal scaling of x and y; 3 for z also */
 
+extern double boxwidth;
+extern TBOOLEAN boxwidth_is_absolute;
+
 /* plot border autosizing overrides, in characters (-1: autosize) */
 extern t_position lmargin, bmargin, rmargin, tmargin;
 #define DEFAULT_MARGIN_POSITION {character, character, character, -1, -1, -1}

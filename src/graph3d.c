@@ -3572,9 +3572,10 @@ plot3d_boxes(struct surface_points *plot)
 	    ||  (dyl < Y_AXIS.min && dyl < Y_AXIS.max))
 		continue;
 
-	    if (boxdepth > 0) {
-		dyl -= boxdepth / 2.;
-		dyh += boxdepth / 2.;
+	    if (boxdepth != 0) {
+		double depth = (boxdepth > 0) ? boxdepth : boxwidth * yscaler/xscaler;
+		dyl -= depth / 2.;
+		dyh += depth / 2.;
 		cliptorange(dyl, Y_AXIS.min, Y_AXIS.max);
 		cliptorange(dyh, Y_AXIS.min, Y_AXIS.max);
 	    }
@@ -3605,7 +3606,7 @@ plot3d_boxes(struct surface_points *plot)
 	    pm3d_add_quadrangle(plot, corner);
 
 	    /* The normal case is to draw the front only (boxdepth = 0) */
-	    if (boxdepth <= 0)
+	    if (boxdepth == 0)
 		continue;
 
 	    /* Back side of the box */
