@@ -52,7 +52,7 @@
 #if !defined(__MINGW64_VERSION_MAJOR)
 /*
  * FIXME: This is almost certainly out of date on linux, since the matherr
- * mechanism has been replaced by math_error() and supposedly is only 
+ * mechanism has been replaced by math_error() and supposedly is only
  * enabled via an explicit declaration #define _SVID_SOURCE.
  */
 /*
@@ -203,7 +203,7 @@ f_calln(union argument *x)
     (void) pop(&num_params);
 
     if (num_params.v.int_val != udf->dummy_num)
-	int_error(NO_CARET, "function %s requires %d variable%c", 
+	int_error(NO_CARET, "function %s requires %d variable%c",
 	    udf->udf_name, udf->dummy_num, (udf->dummy_num == 1)?'\0':'s');
 
     /* if there are more parameters than the function is expecting */
@@ -266,26 +266,26 @@ f_sum(union argument *arg)
     llsum = 0;
 
     if (beg.type != INTGR || end.type != INTGR)
-        int_error(NO_CARET, "range specifiers of sum must have integer values");
+	int_error(NO_CARET, "range specifiers of sum must have integer values");
     if ((varname.type != STRING) || !(udv = get_udv_by_name(varname.v.string_val)))
-        int_error(NO_CARET, "internal error: lost iteration variable for summation");
+	int_error(NO_CARET, "internal error: lost iteration variable for summation");
     gpfree_string(&varname);
 
     udf = arg->udf_arg;
     if (!udf)
-        int_error(NO_CARET, "internal error: lost expression to be evaluated during summation");
+	int_error(NO_CARET, "internal error: lost expression to be evaluated during summation");
 
     for (i=beg.v.int_val; i<=end.v.int_val; ++i) {
-        double x, y;
+	double x, y;
 
-        /* calculate f_i = f() with user defined variable i */
-        Ginteger(&udv->udv_value, i);
-        execute_at(udf->at);
-        pop(&f_i);
+	/* calculate f_i = f() with user defined variable i */
+	Ginteger(&udv->udv_value, i);
+	execute_at(udf->at);
+	pop(&f_i);
 
-        x = real(&result) + real(&f_i);
-        y = imag(&result) + imag(&f_i);
-        Gcomplex(&result, x, y);
+	x = real(&result) + real(&f_i);
+	y = imag(&result) + imag(&f_i);
+	Gcomplex(&result, x, y);
 
 	if (f_i.type != INTGR)
 	    integer_terms = FALSE;
@@ -909,7 +909,7 @@ f_mult(union argument *arg)
 	switch (b.type) {
 	case INTGR:
 	    /* FIXME: The test for overflow is complicated because (double)
-	     * does not have enough precision to simply compare against 
+	     * does not have enough precision to simply compare against
 	     * 64-bit INTGR_MAX.
 	     */
 	    int_product = a.v.int_val * b.v.int_val;
@@ -1085,7 +1085,7 @@ void
 f_power(union argument *arg)
 {
     struct value a, b, result;
-    int i; 
+    int i;
     double mag, ang;
 
     (void) arg;			/* avoid -Wunused warning */
@@ -1125,7 +1125,7 @@ f_power(union argument *arg)
 	integer_power_overflow:
 	    if (overflow_handling == INT64_OVERFLOW_NAN) {
 		/* result of integer overflow is NaN */
-		(void) Gcomplex(&result, not_a_number(), 0.0); 
+		(void) Gcomplex(&result, not_a_number(), 0.0);
 	    } else if (overflow_handling == INT64_OVERFLOW_UNDEFINED) {
 		/* result of integer overflow is undefined */
 		undefined = TRUE;
@@ -1435,7 +1435,7 @@ f_index(union argument *arg)
 	i = floor(index.v.cmplx_val.real);
 
     if (array.type == ARRAY) {
-	if (i <= 0 || i > array.v.value_array[0].v.int_val) 
+	if (i <= 0 || i > array.v.value_array[0].v.int_val)
 	    int_error(NO_CARET, "array index out of range");
 	push( &array.v.value_array[i] );
 
@@ -1772,7 +1772,7 @@ f_gprintf(union argument *arg)
     char *buffer;
     int length;
     double base = 10.;
- 
+
     /* Retrieve parameters from top of stack */
     (void) arg;
     pop(&val);
@@ -1879,13 +1879,13 @@ f_strptime(union argument *arg)
     push(Gcomplex(&val, result, 0.0));
 }
 
-/* Get current system time in seconds since 2000 
- * The type of the value popped from the stack 
+/* Get current system time in seconds since 2000
+ * The type of the value popped from the stack
  * determines what is returned.
  * If integer, the result is also an integer.
- * If real (complex), the result is also real, 
+ * If real (complex), the result is also real,
  * with microsecond precision (if available).
- * If string, it is assumed to be a format string, 
+ * If string, it is assumed to be a format string,
  * and it is passed to strftime to get a formatted time string.
  */
 void
@@ -1919,8 +1919,8 @@ f_time(union argument *arg)
 #endif
 
     (void) arg; /* Avoid compiler warnings */
-    pop(&val); 
-    
+    pop(&val);
+
     switch(val.type) {
 	case INTGR:
 	    push(Ginteger(&val, (intgr_t) time_now));
@@ -1976,7 +1976,7 @@ sprintf_specifier(const char* format)
 	return CMPLX;
     if ( int_pos < strlen(format) )
 	return INTGR;
-    
+
     return INVALID_NAME;
 }
 
@@ -2000,7 +2000,7 @@ f_system(union argument *arg)
     FPRINTF((stderr," f_system input = \"%s\"\n", val.v.string_val));
 
     ierr = do_system_func(val.v.string_val, &output);
-    fill_gpval_integer("GPVAL_ERRNO", ierr); 
+    fill_gpval_integer("GPVAL_ERRNO", ierr);
 
     /* chomp result */
     output_len = strlen(output);
@@ -2026,7 +2026,7 @@ f_assign(union argument *arg)
     (void) pop(&b);	/* new value */
     (void) pop(&index);	/* index (only used if this is an array assignment) */
     (void) pop(&a);	/* name of variable */
-    
+
     if (a.type != STRING)
 	int_error(NO_CARET, "attempt to assign to something other than a named variable");
     if (!strncmp(a.v.string_val,"GPVAL_",6) || !strncmp(a.v.string_val,"MOUSE_",6))

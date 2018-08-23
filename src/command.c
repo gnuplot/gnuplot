@@ -283,7 +283,7 @@ static char *input_line_SharedMem = NULL;
 
 #if defined(OS2_IPC) && defined(USE_MOUSE)
 	ULONG u;
-        if (thread_rl_Running == 0) {
+	if (thread_rl_Running == 0) {
 	    int res = _beginthread(thread_read_line,NULL,32768,NULL);
 	    if (res == -1)
 		fputs("error command.c could not begin thread\n",stderr);
@@ -301,7 +301,7 @@ static char *input_line_SharedMem = NULL;
 		return (0);
 	    }
 	    if (*input_line_SharedMem &&
-	        strstr(input_line_SharedMem,"plot") != NULL &&
+		strstr(input_line_SharedMem,"plot") != NULL &&
 		(strcmp(term->name,"pm") && strcmp(term->name,"x11"))) {
 		/* avoid plotting if terminal is not PM or X11 */
 		fprintf(stderr,"\n\tCommand(s) ignored for other than PM and X11 terminals\a\n");
@@ -362,7 +362,7 @@ do_line()
     /* Strip off trailing comment */
     FPRINTF((stderr,"doline( \"%s\" )\n", gp_input_line));
     if (strchr(inlptr, '#')) {
-        num_tokens = scanner(&gp_input_line, &gp_input_line_len);
+	num_tokens = scanner(&gp_input_line, &gp_input_line_len);
 	if (gp_input_line[token[num_tokens].start_index] == '#')
 	    gp_input_line[token[num_tokens].start_index] = NUL;
     }
@@ -616,8 +616,8 @@ undefine_command()
     c_token++;               /* consume the command name */
 
     while (!END_OF_COMMAND) {
-        /* copy next var name into key */
-        copy_str(key, c_token, MAX_ID_LEN);
+	/* copy next var name into key */
+	copy_str(key, c_token, MAX_ID_LEN);
 
 	/* Peek ahead - must do this, because a '*' is returned as a
 	   separate token, not as part of the 'key' */
@@ -629,7 +629,7 @@ undefine_command()
 	else if (*key == '$')
 	    copy_str(&key[1], ++c_token, MAX_ID_LEN-1);
 
-        /* ignore internal variables */
+	/* ignore internal variables */
 	if (strncmp(key, "GPVAL_", 6) && strncmp(key, "MOUSE_", 6))
 	    del_udv_by_name( key, wildcard );
 
@@ -962,13 +962,13 @@ bind_command()
     if (END_OF_COMMAND) {
 	; /* Fall through */
     } else if (isstringvalue(c_token) && (rhs = try_to_get_string())) {
-        FPRINTF((stderr,"Got bind quoted rhs = \"%s\"\n",rhs));
+	FPRINTF((stderr,"Got bind quoted rhs = \"%s\"\n",rhs));
     } else {
 	int save_token = c_token;
 	while (!END_OF_COMMAND)
 	    c_token++;
 	m_capture( &rhs, save_token, c_token-1 );
-        FPRINTF((stderr,"Got bind unquoted rhs = \"%s\"\n",rhs));
+	FPRINTF((stderr,"Got bind unquoted rhs = \"%s\"\n",rhs));
     }
 
     /* bind_process() will eventually free lhs / rhs ! */
@@ -1754,9 +1754,9 @@ pause_command()
 	    }
 
 	    if (end_condition)
-	        paused_for_mouse = end_condition;
+		paused_for_mouse = end_condition;
 	    else
-	        paused_for_mouse = PAUSE_CLICK;
+		paused_for_mouse = PAUSE_CLICK;
 
 	    /* Set the pause mouse return codes to -1 */
 	    current = add_udv_by_name("MOUSE_KEY");
@@ -1959,7 +1959,7 @@ print_set_output(char *name, TBOOLEAN datablock, TBOOLEAN append_p)
 	    if (!append_p)
 		gpfree_datablock(&print_out_var->udv_value);
 	    if (print_out_var->udv_value.type != DATABLOCK)
-	        print_out_var->udv_value.v.data_array = NULL;
+		print_out_var->udv_value.v.data_array = NULL;
 	} else {
 	    print_out_var->udv_value.v.data_array = NULL;
 	}
@@ -2105,7 +2105,7 @@ refresh_request()
     AXIS_INDEX axis;
 
     if (   ((first_plot == NULL) && (refresh_ok == E_REFRESH_OK_2D))
-        || ((first_3dplot == NULL) && (refresh_ok == E_REFRESH_OK_3D))
+	|| ((first_3dplot == NULL) && (refresh_ok == E_REFRESH_OK_3D))
 	|| (!*replot_line && (refresh_ok == E_REFRESH_NOT_OK))
        )
 	int_error(NO_CARET, "no active plot; cannot refresh");
@@ -3468,7 +3468,7 @@ read_line(const char *prompt, int start)
     do {
 	/* grab some input */
 	if (gp_get_string(gp_input_line + start, gp_input_line_len - start,
-                         ((more) ? ">" : prompt))
+		         ((more) ? ">" : prompt))
 	    == (char *) NULL)
 	{
 	    /* end-of-file */
@@ -3488,9 +3488,8 @@ read_line(const char *prompt, int start)
 	    if (last >= 0) {
 		if (gp_input_line[last] == '\n') {	/* remove any newline */
 		    gp_input_line[last] = NUL;
-		    if (last > 0 && gp_input_line[last-1] == '\r') {
-		        gp_input_line[--last] = NUL;
-		    }
+		    if (last > 0 && gp_input_line[last-1] == '\r')
+			gp_input_line[--last] = NUL;
 		    /* Watch out that we don't backup beyond 0 (1-1-1) */
 		    if (last > 0)
 			--last;
@@ -3533,7 +3532,7 @@ string_expand_macros()
 }
 
 #define COPY_CHAR gp_input_line[o++] = *c; \
-                  after_backslash = FALSE;
+		  after_backslash = FALSE;
 int
 expand_1level_macros()
 {
@@ -3587,21 +3586,21 @@ expand_1level_macros()
 		break;
 
 	case '"':
-                if (!after_backslash)
+		if (!after_backslash)
 		    in_dquote = !in_dquote;
 		COPY_CHAR; break;
 	case '\'':
 		in_squote = !in_squote;
 		COPY_CHAR; break;
-        case '\\':
-                if (in_dquote)
-                    after_backslash = !after_backslash;
-                gp_input_line[o++] = *c; break;
+	case '\\':
+		if (in_dquote)
+		    after_backslash = !after_backslash;
+		gp_input_line[o++] = *c; break;
 	case '#':
 		if (!in_squote && !in_dquote)
 		    in_comment = TRUE;
 	default :
-	        COPY_CHAR; break;
+		COPY_CHAR; break;
 	}
     }
     gp_input_line[o] = '\0';

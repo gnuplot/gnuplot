@@ -422,8 +422,7 @@ axis_checked_extend_empty_range(AXIS_INDEX axis, const char *mesg)
 		fprintf(stderr, "adjusting to [%g:%g]\n",
 		    this_axis->min, this_axis->max);
 	} else {
-	    /* user has explicitly set the range (to something empty)
-               ==> we're in trouble */
+	    /* user has explicitly set the range (to something empty) */
 	    int_error(NO_CARET, "Can't plot with an empty %s range!",
 		      axis_name(axis));
 	}
@@ -810,7 +809,7 @@ quantize_time_tics(struct axis *axis, double tic, double xr, int guide)
     }
     if (tic > 3600) {
 	/* turn tic into units of days */
-        tic = quantize_duodecimal_tics(xr / DAY_SEC, guide12) * DAY_SEC;
+	tic = quantize_duodecimal_tics(xr / DAY_SEC, guide12) * DAY_SEC;
 	if (tic >= DAY_SEC)
 	    axis->timelevel = TIMELEVEL_DAYS;
     }
@@ -921,9 +920,9 @@ setup_tics(struct axis *this, int max)
     if (ticdef->type == TIC_SERIES) {
 	this->ticstep = tic = ticdef->def.series.incr;
 	autoextend_min = autoextend_min
-	                 && (ticdef->def.series.start == -VERYLARGE);
+			 && (ticdef->def.series.start == -VERYLARGE);
 	autoextend_max = autoextend_max
-	                 && (ticdef->def.series.end == VERYLARGE);
+			 && (ticdef->def.series.end == VERYLARGE);
     } else if (ticdef->type == TIC_COMPUTED) {
 	this->ticstep = tic = make_tics(this, max);
     } else {
@@ -1722,10 +1721,10 @@ load_one_range(struct axis *this_axis, double *a, t_autoscale *autoscale, t_auto
     } else {
 	/*  this _might_ be autoscaling with constraint or fixed value */
 	/*  The syntax of '0 < *...' confuses the parser as he will try to
-            include the '<' as a comparison operator in the expression.
-            Setting scanning_range_in_progress will stop the parser from
-            trying to build an action table if he finds '<' followed by '*'
-            (which would normaly trigger a 'invalid expression'),  */
+	    include the '<' as a comparison operator in the expression.
+	    Setting scanning_range_in_progress will stop the parser from
+	    trying to build an action table if he finds '<' followed by '*'
+	    (which would normaly trigger a 'invalid expression'),  */
 	scanning_range_in_progress = TRUE;
 	number = get_num_or_time(this_axis);
 	scanning_range_in_progress = FALSE;
@@ -1751,8 +1750,8 @@ load_one_range(struct axis *this_axis, double *a, t_autoscale *autoscale, t_auto
 		c_token++;
 	    } else {
 		int_error(c_token, "malformed range with constraint");
-            }
-        } else if (equals(c_token, ">")) {
+	    }
+	} else if (equals(c_token, ">")) {
 	    int_error(c_token, "malformed range with constraint (use '<' only)");
 	} else {
 	    /*  no autoscaling-with-lower-bound but simple fixed value only  */
@@ -1765,7 +1764,7 @@ load_one_range(struct axis *this_axis, double *a, t_autoscale *autoscale, t_auto
 		this_axis->max_ub = 0;  /*  dummy entry  */
 	    }
 	    *a = number;
-        }
+	}
     }
 
     if (*autoscale & which) {
@@ -2749,9 +2748,8 @@ store_and_update_range(
 	return 0;  /* this plot is not being used for autoscaling */
     if (*type != INRANGE)
 	return 0;  /* don't set y range if x is outrange, for example */
-    if (   (curval < axis->min)
-        && ((curval <= axis->max) || (axis->max == -VERYLARGE))
-       ) {
+    if ((curval < axis->min)
+    &&  ((curval <= axis->max) || (axis->max == -VERYLARGE))) {
 	if (axis->autoscale & AUTOSCALE_MIN)	{
 	    axis->min = curval;
 	    if (axis->min_constraint & CONSTRAINT_LOWER) {
