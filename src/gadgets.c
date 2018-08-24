@@ -933,8 +933,8 @@ write_label(int x, int y, struct text_label *this_label)
 #ifdef EAM_BOXED_TEXT
 	    if (this_label->boxed < 0)
 		textbox = &textbox_opts[0];
-	    if (this_label->boxed > 0)
-		textbox = &textbox_opts[this_label->boxed - 1];
+	    else if (this_label->boxed > 0)
+		textbox = &textbox_opts[this_label->boxed];
 	    /* Initialize the bounding box accounting */
 	    if (textbox && term->boxed_text && (textbox->opaque || !textbox->noborder))
 		(*term->boxed_text)(x + htic, y + vtic, TEXTBOX_INIT);

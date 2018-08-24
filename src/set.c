@@ -4809,10 +4809,10 @@ set_style()
 		textbox->linewidth = real_expression();
 	    } else if (!tag) {
 		tag = int_expression();
-		if (tag > NUM_TEXTBOX_STYLES)
-		    int_error(NO_CARET,"only %d textbox styles supported\n", NUM_TEXTBOX_STYLES);
+		if (tag >= NUM_TEXTBOX_STYLES)
+		    int_error(NO_CARET,"only %d textbox styles supported\n", NUM_TEXTBOX_STYLES-1);
 		if (tag > 0)
-		    textbox = &textbox_opts[tag-1];
+		    textbox = &textbox_opts[tag];
 	    } else
 		int_error(c_token,"unrecognized option");
 
@@ -6307,7 +6307,7 @@ parse_label_options( struct text_label *this_label, int ndim)
 	    c_token++;
 	    if (equals(c_token, "bs")) {
 		c_token++;
-		tag = int_expression() % (NUM_TEXTBOX_STYLES+1);
+		tag = int_expression() % (NUM_TEXTBOX_STYLES);
 	    }
 	    this_label->boxed = tag;
 	    continue;

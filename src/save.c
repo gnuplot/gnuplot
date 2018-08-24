@@ -511,7 +511,7 @@ save_set_all(FILE *fp)
 #ifdef EAM_BOXED_TEXT
 	if (this_label->boxed) {
 	    fprintf(fp," boxed ");
-	    if (this_label->boxed > 1)
+	    if (this_label->boxed > 0)
 		fprintf(fp,"bs %d ",this_label->boxed);
 	}
 #endif
@@ -1245,7 +1245,9 @@ save_style_textbox(FILE *fp)
 	textbox_style *textbox = &textbox_opts[bs];
 	if (textbox->linewidth <= 0)
 	    continue;
-	fprintf(fp, "set style textbox %d ", bs+1);
+	fprintf(fp, "set style textbox ");
+	if (bs > 0)
+	    fprintf(fp,"%d ", bs);
 	fprintf(fp, " %s margins %4.1f, %4.1f",
 		textbox->opaque ? "opaque": "transparent",
 		textbox->xmargin, textbox->ymargin);

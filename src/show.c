@@ -1774,7 +1774,7 @@ show_label(int tag)
 #ifdef EAM_BOXED_TEXT
 	    if (this_label->boxed) {
 		fprintf(stderr," boxed");
-		if (this_label->boxed > 1)
+		if (this_label->boxed > 0)
 		    fprintf(stderr," bs %d",this_label->boxed);
 	    }
 #endif

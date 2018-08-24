@@ -13394,15 +13394,15 @@ Ffigure_multiple_keys
  Implementation for some terminals (svg, latex) is incomplete.
  Most terminals cannot place a box correctly around rotated text.
 
- Four textbox styles can be defined.  If no boxstyle index <bs> is given, the
- default is to use bs 1.
+ Three numbered textbox styles can be defined.  If no boxstyle index <bs>
+ is given, the default (unnumbered) style is changed.
  Example:
 
-      # default style (bs 1) has only a black border
+      # default style has only a black border
       set style textbox transparent border lc "black"
       # style 2 (bs 2) has a light blue background with no border
       set style textbox 2 opaque fc "light-cyan" noborder
-      set label 1 "I'm in a box" boxed bs 1
+      set label 1 "I'm in a box" boxed
       set label 2 "I'm blue" boxed bs 2
 
 3 surface
