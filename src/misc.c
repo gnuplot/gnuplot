@@ -1264,10 +1264,10 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
 	lp->p_size = newlp.p_size;
     if (set_pi) {
 	lp->p_interval = newlp.p_interval;
-        lp->p_number = 0;
+	lp->p_number = 0;
     }
     if (set_pn) {
-        lp->p_number = newlp.p_number;
+	lp->p_number = newlp.p_number;
 	lp->p_interval = 0;
     }
     if (newlp.l_type == LT_COLORFROMCOLUMN)
@@ -1390,7 +1390,7 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
     if (transparent) {
 	if (fs->fillstyle == FS_SOLID)
 	    fs->fillstyle = FS_TRANSPARENT_SOLID;
-        else if (fs->fillstyle == FS_PATTERN)
+	else if (fs->fillstyle == FS_PATTERN)
 	    fs->fillstyle = FS_TRANSPARENT_PATTERN;
     }
 }

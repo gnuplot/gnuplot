@@ -191,22 +191,22 @@ scanner(char **expressionp, size_t *expressionlenp)
 		    expression[current + 1] = NUL;
 		    break;
 		} else if (quote == '\"'
-                           && expression[current] == '\\'
-			   && expression[current + 1]) {
+			&& expression[current] == '\\'
+			&& expression[current + 1]) {
 		    current++;
 		    token[t_num].length += 2;
 		} else if (quote == '\"' && expression[current] == '`') {
 		    substitute(expressionp, expressionlenp, current);
 		    expression = *expressionp;	/* it might have moved */
 		    current--;
-                } else if (quote == '\'' 
-                           && expression[current+1] == '\''
-                           && expression[current+2] == '\'') {
-                    /* look ahead: two subsequent single quotes 
-                     * -> take them in
-                     */
-                    current += 2;
-                    token[t_num].length += 3;
+		} else if (quote == '\'' 
+			&& expression[current+1] == '\''
+			&& expression[current+2] == '\'') {
+		    /* look ahead: two subsequent single quotes 
+		     * -> take them in
+		     */
+		    current += 2;
+		    token[t_num].length += 3;
 		} else
 		    token[t_num].length++;
 	    }

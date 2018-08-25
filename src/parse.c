@@ -231,7 +231,7 @@ string_or_express(struct at_type **atptr)
     for (i = 0; i < at->a_count; i++) {
 	enum operators op_index = at->actions[i].index;
 	if ( op_index == PUSHD1 || op_index == PUSHD2 || op_index == PUSHD
-                || op_index == SUM ) {
+	||   op_index == SUM ) {
 	    has_dummies = TRUE;
 	    break;
 	}
@@ -699,7 +699,7 @@ parse_primary_expression()
 		add_action(call_type)->udf_arg = add_udf(tok);
 	    }
 	} else if (equals(c_token, "sum") && equals(c_token+1, "[")) {
-            parse_sum_expression();
+	    parse_sum_expression();
 	/* dummy_func==NULL is a flag to say no dummy variables active */
 	} else if (dummy_func) {
 	    if (equals(c_token, c_dummy_var[0])) {
@@ -1157,7 +1157,7 @@ parse_sum_expression()
 
     /* <var> */
     if (!isletter(c_token))
-        int_error(c_token, errormsg);
+	int_error(c_token, errormsg);
     /* create a user defined variable and pass it to f_sum via PUSHC, since the
      * argument of f_sum is already used by the udf */
     m_capture(&varname, c_token, c_token);
@@ -1167,21 +1167,21 @@ parse_sum_expression()
     c_token++;
 
     if (!equals(c_token, "="))
-        int_error(c_token, errormsg);
+	int_error(c_token, errormsg);
     c_token++;
 
     /* <start> */
     parse_expression();
 
     if (!equals(c_token, ":"))
-        int_error(c_token, errormsg);
+	int_error(c_token, errormsg);
     c_token++;
 
     /* <end> */
     parse_expression();
 
     if (!equals(c_token, "]"))
-        int_error(c_token, errormsg);
+	int_error(c_token, errormsg);
     c_token++;
 
     /* parse <expr> and convert it to a new action table. */
@@ -1199,7 +1199,7 @@ parse_sum_expression()
     udf->definition = NULL;
     udf->dummy_num = 0;
     for (i = 0; i < MAX_NUM_VAR; i++)
-        (void) Ginteger(&(udf->dummy_values[i]), 0);
+	Ginteger(&(udf->dummy_values[i]), 0);
 
     /* 3. restore environment */
     at = save_at;
