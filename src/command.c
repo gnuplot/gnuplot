@@ -3531,8 +3531,9 @@ string_expand_macros()
 	    int_error(NO_CARET, "Macros nested too deeply");
 }
 
-#define COPY_CHAR gp_input_line[o++] = *c; \
-		  after_backslash = FALSE;
+#define COPY_CHAR do {gp_input_line[o++] = *c; \
+		  after_backslash = FALSE; } while (0)
+
 int
 expand_1level_macros()
 {
