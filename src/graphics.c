@@ -4569,7 +4569,9 @@ process_image(void *plot, t_procimg_action action)
 	struct {double x; double y; double z;} delta_grid[2], delta_pixel[2];
 	int j, i_image;
 
-	if (!term->filled_polygon)
+	/* If the pixels are rectangular we will call term->fillbox   */
+	/* non-rectangular pixels must be treated as general polygons */
+	if (!term->filled_polygon && !rectangular_image)
 	    int_error(NO_CARET, "This terminal does not support filled polygons");
 
 	(term->layer)(TERM_LAYER_BEGIN_IMAGE);
