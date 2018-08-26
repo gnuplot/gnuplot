@@ -4569,7 +4569,9 @@ process_image(void *plot, t_procimg_action action)
 	int j, i_image;
 	TBOOLEAN log_axes = (X_AXIS.log || Y_AXIS.log);
 
-	if (!term->filled_polygon)
+	/* If the pixels are rectangular we will call term->fillbox   */
+	/* non-rectangular pixels must be treated as general polygons */
+	if (!term->filled_polygon && !rectangular_image)
 	    int_error(NO_CARET, "This terminal does not support filled polygons");
 
 	(term->layer)(TERM_LAYER_BEGIN_IMAGE);

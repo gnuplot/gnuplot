@@ -1,3 +1,11 @@
+2018-08-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c:  Make "with image pixels" work on terminals that
+	support term->fillbox but not term->filled_polygon.
+	I.e. 2D images with axes parallel to x and y are ok.
+	This was always the intent, but the test for rectangular images was
+	missing in the "with image pixels" case.
+
 2018-08-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot3d.c: Clip 3D splot with labels to show only INRANGE points.
