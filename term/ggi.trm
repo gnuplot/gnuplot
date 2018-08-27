@@ -200,6 +200,7 @@ static ggi_visual_t GGIvisual = (ggi_visual_t)0;
 static ggi_pixel GGIborderColor;
 static ggi_pixel GGIaxisColor;
 static ggi_pixel GGIblack;
+static ggi_pixel GGIbackground;
 static ggi_pixel GGIcolors[7];
 #define GGI_PM3D_COLORS 240
 static const int ggi_pm3d_colors = GGI_PM3D_COLORS;
@@ -260,6 +261,7 @@ GGI_line_colors()
     color.r = 0x8888; color.g = 0x8888; color.b = 0x8888; GGIgray    = ggiMapColor(GGIvisual,&color);
 
     GGIborderColor = GGIwhite;
+    GGIbackground  = GGIblack;
     GGIaxisColor   = GGIgray;
     GGIcolors[0]   = GGIred;
     GGIcolors[1]   = GGIgreen;
@@ -395,13 +397,13 @@ TERM_PUBLIC void GGI_init()
 	fprintf(stderr, "\n");
     }
 
+
 #ifdef USE_MOUSE
     /* must come before GGI_set_size() */
     ggiGetCharSize(GGIvisual, &GGI_font_width, &GGI_font_height);
 #endif
 
     GGI_set_size();
-
 
 #ifdef USE_MOUSE
     ggiSetReadFrame(GGIvisual, 0);
@@ -1221,8 +1223,6 @@ GGI_waitforinput(int options)
 	int fd = fileno(stdin);
 	int i, j;
 	do {
-	    int n;
-
 	    ggi_event_mask mask = emAll; /* TODO: choose a more selective mask */
 	    ggiSetEventMask(GGIvisual, mask);
 
@@ -1249,7 +1249,7 @@ GGI_waitforinput(int options)
 		GGI_needs_update = 0;
 	    }
 
-	    n = ggiEventSelect(GGIvisual, &mask, fd + 1,
+	    ggiEventSelect(GGIvisual, &mask, fd + 1,
 		SELECT_TYPE_ARG234 &fds, 0, 0, (struct timeval*)0);
 
 	    if (mask) {

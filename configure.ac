@@ -333,7 +333,7 @@ AC_ARG_WITH(gihdir,dnl
   GIHDIR="$withval",
   GIHDIR="$pkgdatadir/$VERSION_MAJOR")
 
-dnl TODO: simplify, get rid of GGI_SUPPORT
+dnl TODO: simplify, update ggi support
 dnl new ggi driver
 GGI_SUPPORT=no
 AC_ARG_WITH(ggi,dnl
@@ -348,7 +348,7 @@ AC_ARG_WITH(ggi,dnl
      AC_CHECK_LIB(ggi,ggiInit,
        [TERMLIBS="-lggi $TERMLIBS"
         AC_DEFINE(USE_GGI_DRIVER,1,
-                  [ Define if you want to use the experimental ggi driver. ])
+                  [ Define this to build the General Graphics Interface (ggi) driver. ])
         GGI_SUPPORT=yes
         dnl check if libggiwmh and ggi/wmh.h are found
         AC_CHECK_LIB(ggiwmh,ggiWmhInit,
