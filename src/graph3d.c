@@ -221,6 +221,10 @@ static double back_x, back_y;
 static double right_x, right_y;
 static double front_x, front_y;
 
+/* There is a global flag splot_map for projection onto xy plane. */
+/* These are for projections onto the xz or yz plane */
+static TBOOLEAN xz_projection, yz_projection;
+
 #ifdef USE_MOUSE
 int axis3d_o_x, axis3d_o_y, axis3d_x_dx, axis3d_x_dy, axis3d_y_dx, axis3d_y_dy;
 #endif
@@ -702,6 +706,20 @@ do_3dplot(
 	int_error(NO_CARET,"y_min3d should not equal y_max3d!");
     if (Z_AXIS.min == Z_AXIS.max)
 	int_error(NO_CARET,"z_min3d should not equal z_max3d!");
+
+    /* Special case projections of the xz or yz plane */
+    /* Place x or y axis to the left of the plot */
+    if (!splot_map && (surface_rot_x == 90 || surface_rot_x == 270)) {
+	if (surface_rot_z ==  0 || surface_rot_z == 180) {
+	    base_z = floor_z;
+	    xz_projection = TRUE;
+	} else if (surface_rot_z == 90 || surface_rot_z == 270) {
+	    base_z = ceiling_z;
+	    yz_projection = TRUE;
+	}
+    } else {
+	xz_projection = yz_projection = FALSE;
+    }
 
     term_start_plot();
     (term->layer)(TERM_LAYER_3DPLOT);
@@ -2386,6 +2404,10 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	map3d_xyz(mid_x, xaxis_y, base_z, &v0);
 	map3d_xyz(mid_x, other_end, base_z, &v1);
 
+	/* Unusual case: 2D projection of the xz plane */
+	if (!splot_map && xz_projection)
+	    map3d_xyz(mid_x, xaxis_y, Z_AXIS.max+Z_AXIS.min-base_z, &v1);
+
 	tic_unitx = (v1.x - v0.x) / xyscaler;
 	tic_unity = (v1.y - v0.y) / xyscaler;
 	tic_unitz = (v1.z - v0.z) / xyscaler;
@@ -2434,7 +2456,10 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		    map3d_xyz(mid_x, xaxis_y, base_z, &v1);
 		}
 
-		if (X_AXIS.ticmode & TICS_ON_AXIS) {
+		if (xz_projection) {
+		    v1.x -= 4. * t->h_tic * tic_unitx;
+		    v1.y -= 4. * t->h_tic * tic_unity;
+		} else if (X_AXIS.ticmode & TICS_ON_AXIS) {
 		    v1.x += 2. * t->h_tic * ((X_AXIS.tic_in) ? 1.0 : -1.0) * tic_unitx;
 		    v1.y += 2. * t->h_tic * ((X_AXIS.tic_in) ? 1.0 : -1.0) * tic_unity;
 		} else {
@@ -2473,6 +2498,10 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 
 	map3d_xyz(yaxis_x, mid_y, base_z, &v0);
 	map3d_xyz(other_end, mid_y, base_z, &v1);
+
+	/* Unusual case: 2D projection of the yz plane */
+	if (!splot_map && yz_projection)
+	    map3d_xyz(yaxis_x, mid_y, Z_AXIS.max+Z_AXIS.min-base_z, &v1);
 
 	tic_unitx = (v1.x - v0.x) / xyscaler;
 	tic_unity = (v1.y - v0.y) / xyscaler;
@@ -2536,7 +2565,10 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 			map3d_xyz(yaxis_x, mid_y, base_z, &v1);
 		    }
 
-		    if (Y_AXIS.ticmode & TICS_ON_AXIS) {
+		    if (yz_projection) {
+			v1.x -= 4. * t->h_tic * tic_unitx;
+			v1.y -= 4. * t->h_tic * tic_unity;
+		    } else if (Y_AXIS.ticmode & TICS_ON_AXIS) {
 			v1.x += 2. * t->h_tic * ((Y_AXIS.tic_in) ? 1.0 : -1.0) * tic_unitx;
 			v1.y += 2. * t->h_tic * ((Y_AXIS.tic_in) ? 1.0 : -1.0) * tic_unity;
 		    } else {
@@ -2634,7 +2666,10 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	} else {
 	    map3d_xyz(zaxis_x, zaxis_y, mid_z, &v1);
 	    TERMCOORD(&v1, x, y);
-	    x -= 7 * t->h_char;
+	    if (fabs(azimuth) > 80)
+		y += 2 * sgn(azimuth) * t->v_char;
+	    else
+		x -= 7 * t->h_char;
 	}
 
 	if (Z_AXIS.label.tag == ROTATE_IN_3D_LABEL_TAG) {
@@ -2743,8 +2778,8 @@ xtick_callback(
 	/* get offset */
 	map3d_position_r(&(this_axis->ticdef.offset), &offsetx, &offsety, "xtics");
 
-	/* allow manual justification of tick labels, but only for "set view map" */
-	if (splot_map && this_axis->manual_justify)
+	/* allow manual justification of tick labels, but only for projections */
+	if ((splot_map || xz_projection) && this_axis->manual_justify)
 	    just = this_axis->tic_pos;
 	else if (tic_unitx * xscaler < -0.9)
 	    just = LEFT;
@@ -2875,8 +2910,8 @@ ytick_callback(
 	/* get offset */
 	map3d_position_r(&(this_axis->ticdef.offset), &offsetx, &offsety, "ytics");
 
-	/* allow manual justification of tick labels, but only for "set view map" */
-	if (splot_map && this_axis->manual_justify)
+	/* allow manual justification of tick labels, but only for projections */
+	if ((splot_map || yz_projection) && this_axis->manual_justify)
 	    just = this_axis->tic_pos;
 	else if (tic_unitx * xscaler < -0.9)
 	    just = (this_axis->index == FIRST_Y_AXIS) ? LEFT : RIGHT;
@@ -2961,6 +2996,7 @@ ztick_callback(
 
     if (text) {
 	int x1, y1;
+	int just;
 	int offsetx, offsety;
 
 	/* Skip label if we've already written a user-specified one here */
@@ -2977,18 +3013,31 @@ ztick_callback(
 
 	/* get offset */
 	map3d_position_r(&(this_axis->ticdef.offset), &offsetx, &offsety, "ztics");
-
 	TERMCOORD(&v1, x1, y1);
-	x1 -= (term->h_tic) * 2;
-	if (!this_axis->tic_in)
-	    x1 -= (term->h_tic) * this_axis->ticscale;
+
+	if (fabs(azimuth) > 80) {
+	    /* Z axis is (nearly) horizontal */
+	    y1 += sgn(azimuth) * (term->v_tic) * 2;
+	} else {
+	    /* the normal case */
+	    x1 -= (term->h_tic) * 2;
+	    if (!this_axis->tic_in)
+		x1 -= (term->h_tic) * this_axis->ticscale;
+	}
+
+	/* allow manual justification of tick labels, but only for projections */
+	if ((xz_projection || yz_projection) && this_axis->manual_justify)
+	    just = this_axis->tic_pos;
+	else
+	    just = RIGHT;
+
 	/* User-specified different color for the tics text */
 	if (this_axis->ticdef.textcolor.type == TC_Z)
 	    this_axis->ticdef.textcolor.value = place;
 	if (this_axis->ticdef.textcolor.type != TC_DEFAULT)
 	    apply_pm3dcolor(&(this_axis->ticdef.textcolor));
 	ignore_enhanced(!this_axis->ticdef.enhanced);
-	write_multiline(x1+offsetx, y1+offsety, text, RIGHT, JUST_CENTRE,
+	write_multiline(x1+offsetx, y1+offsety, text, just, JUST_CENTRE,
 			0, this_axis->ticdef.font);
 	ignore_enhanced(FALSE);
 	term_apply_lp_properties(&border_lp);
