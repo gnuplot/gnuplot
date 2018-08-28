@@ -1,3 +1,13 @@
+2018-08-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c: Adjust axis tick and axis placement in 3D projections
+	onto the xz or yz plane.  2D projection onto the xy plane is handled as
+	a special case by "set view map".  Projections onto the xz or yz plane
+	also need special treatment so that the x and y axis ticks are drawn in
+	the plane of the graph rather than invisibly perpendicular.
+	Customize placement of x and y axis labels for xz and yz projections.
+	Azimuth +/-90 requires offset of z tic labels along y rather than x.
+
 2018-08-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c src/jitter.c src/jitter.h:   New jitter option
