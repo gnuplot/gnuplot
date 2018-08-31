@@ -710,7 +710,7 @@ boundary(struct curve_points *plots, int count)
 	    plot_bounds.ybot += xtic_textheight;
     }
 
-    /* EAM - FIXME
+    /*
      * Notwithstanding all these fancy calculations, plot_bounds.ytop must always be above plot_bounds.ybot
      */
     if (plot_bounds.ytop < plot_bounds.ybot) {

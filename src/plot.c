@@ -902,10 +902,7 @@ ExecuteMacro(char *argv, int namelength)
 
     if (namelength >= sizeof(pszName))
 	return 1;
-    /* FIXME HBB 20010121: 3rd argument doesn't make sense. Either
-     * this should be sizeof(pszName), or it shouldn't use
-     * safe_strncpy(), here */
-    safe_strncpy(pszName, argv, namelength + 1);
+    safe_strncpy(pszName, argv, sizeof(pszName));
     rxArgStr = &argv[namelength];
     RXSTRPTR(rxRc) = NULL;
 
@@ -976,10 +973,7 @@ RexxInterface(PRXSTRING rxCmd, PUSHORT pusErr, PRXSTRING rxRc)
 	/* Set variable gp_input_line.
 	   Watch out for line length of NOT_ZERO_TERMINATED strings ! */
 	cmdlen = rxCmd->strlength + 1;
-	/* FIXME HBB 20010121: 3rd argument doesn't make sense. Either
-	 * this should be gp_input_line_len, or it shouldn't use
-	 * safe_strncpy(), here */
-	safe_strncpy(gp_input_line, rxCmd->strptr, cmdlen);
+	safe_strncpy(gp_input_line, rxCmd->strptr, gp_input_line_len);
 	gp_input_line[cmdlen] = NUL;
 	rc = do_line();
 	*pusErr = RXSUBCOM_OK;

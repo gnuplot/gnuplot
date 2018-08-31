@@ -36,7 +36,6 @@ t_sm_palette sm_palette;  /* initialized in plot.c on program entry */
 
 /* Copy of palette previously in use.
  * Exported so that change_term() can invalidate contents
- * FIXME: better naming 
  */
 static t_sm_palette prev_palette = {
 	-1, -1, -1, -1, -1, -1, -1, -1,

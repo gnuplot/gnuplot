@@ -307,8 +307,6 @@ draw_clip_polygon(int points, gpiPoint *p)
 	/* The end point and the line do not necessarily have the same
 	 * status. The end point can be 'inside', but the whole line is
 	 * 'outside'. Do not update pos1 in this case.  Bug #1268.
-	 * FIXME: This is papering over an inconsistency in coordinate
-	 * calculation somewhere else!
 	 */
 	if (!(clip_ret == 0 && pos2 == 0))
 	    pos1 = pos2;

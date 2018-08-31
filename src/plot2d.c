@@ -233,7 +233,6 @@ plotrequest()
 
     /* Always be prepared to restore the autoscaled values on "refresh"
      * Dima Kogan April 2018
-     * FIXME: Could we fold this into axis_init?
      */
     for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++) {
 	AXIS *this_axis = &axis_array[axis];
@@ -3382,7 +3381,7 @@ parametric_fixup(struct curve_points *start_plot, int *plot_num)
 		    double r = yp->points[i].y;
 		    double t = xp->points[i].y;
 		    /* Convert from polar to cartesian coordinate and check ranges */
-		    /* FIXME: The old in-line conversion checked R_AXIS.max agains fabs(r).
+		    /* Note: The old in-line conversion checked R_AXIS.max agains fabs(r).
 		     * That's not what polar_to_xy() is currently doing.
 		     */
 		    if (polar_to_xy(t, r, &x, &y, TRUE) == OUTRANGE)

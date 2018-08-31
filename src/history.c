@@ -503,7 +503,6 @@ history_find(char *cmd)
 #endif
 
     /* Anchored backward search for prefix */
-    /* FIXME: the built-in readline version used to ignore leading spaces */
     if (history_search_prefix(cmd, -1) == 0)
 	return current_history()->line;
     return NULL;
