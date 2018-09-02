@@ -2404,13 +2404,6 @@ clone_linked_axes(AXIS *axis1, AXIS *axis2)
     double testmin, testmax, scale;
     TBOOLEAN suspect = FALSE;
 
-    /* DEBUG: This sanity check is only here for debugging */
-    if (axis1 != axis2->linked_to_primary && axis1 != axis2->linked_to_secondary) {
-	fprintf(stderr, "clone_linked_axes called for axes that are not linked\n");
-	/* No linkage, so nothing to do here */
-	return;
-    }
-
     memcpy(axis2, axis1, AXIS_CLONE_SIZE);
     if (axis2->link_udf == NULL || axis2->link_udf->at == NULL)
 	return;
