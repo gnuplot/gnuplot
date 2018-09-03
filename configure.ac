@@ -350,6 +350,10 @@ AC_ARG_WITH(ggi,dnl
         AC_DEFINE(USE_GGI_DRIVER,1,
                   [ Define this to build the General Graphics Interface (ggi) driver. ])
         GGI_SUPPORT=yes
+	dnl check for customized libxmi (xmiInit not in normal libxmi)
+        AC_CHECK_LIB(xmi,xmiInit,
+          [TERMLIBS="-lxmi $TERMLIBS"
+           AC_CHECK_HEADERS(ggi/xmi.h)])
         dnl check if libggiwmh and ggi/wmh.h are found
         AC_CHECK_LIB(ggiwmh,ggiWmhInit,
           [TERMLIBS="-lggiwmh $TERMLIBS"
@@ -357,20 +361,6 @@ AC_ARG_WITH(ggi,dnl
              AC_MSG_WARN([found ggiwmh library but not ggi/wmh.h
 please add path to ggi/wmh.h to CPPFLAGS in Makefile]))
           ])])
-   fi])
-
-AC_ARG_WITH(xmi,dnl
-[  --with-xmi[=DIR]          ggi's xmi support for pm3d (EXPERIMENTAL)],
-  [if test "$withval" != no -a "$GGI_SUPPORT" = yes; then
-     if test -d $withval/include; then
-       CPPFLAGS="$CPPFLAGS -I$withval/include"
-     fi
-     if test -d $withval/lib; then
-       LDFLAGS="$LDFLAGS -L$withval/lib"
-     fi
-     AC_CHECK_LIB(xmi,xmiInit,
-       [TERMLIBS="-lxmi $TERMLIBS"
-        AC_CHECK_HEADERS(ggi/xmi.h)])
    fi])
 
 dnl Use builtin readline or GNU readline or NetBSD editline
@@ -1226,7 +1216,7 @@ if test "$GGI_SUPPORT" = yes; then
   if test "$ac_cv_header_ggi_xmi_h" = yes; then
     AC_MSG_RESULT([    ggi terminal: yes (with pm3d support)])
   else
-    AC_MSG_RESULT([    ggi terminal: yes (without pm3d support, requires libxmi)])
+    AC_MSG_RESULT([    ggi terminal: yes (no pm3d support, requires ggi xmi library)])
   fi
 else
   AC_MSG_RESULT([    ggi terminal:  no   (use --with-ggi to enable, requires libggi)])
