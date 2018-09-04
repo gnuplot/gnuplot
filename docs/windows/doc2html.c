@@ -499,15 +499,16 @@ process_line(char *line, FILE *b, FILE *c, FILE *d)
 #else
 		/* split contents manually */
                 if (!startpage) {
-		    char newfile[PATH_MAX];
+		    char newfile[PATH_MAX] = "";
 
                     /* close current file */
 		    footer(b);
 		    fclose(b);
 
                     /* open new file */
-                    sprintf(newfile, "%s%s.html", path, location);
-                    /* fprintf(stderr, "%s\n", newfile); */
+		    strcat(newfile,path);
+		    strncat(newfile,location,PATH_MAX-strlen(newfile)-6);
+		    strcat(newfile,".html");
                     if (!(b = fopen(newfile, "w"))) {
                         fprintf(stderr, "%s: Can't open %s for writing\n",
                             "doc2html", newfile);

@@ -3027,7 +3027,7 @@ remove_label(int x, int y)
 static void
 put_label(char *label, double x, double y)
 {
-    char cmd[0xff];
+    char cmd[512];
     sprintf(cmd, "set label \"%s\" at %g,%g %s", label, x, y,
 	mouse_setting.labelopts ? mouse_setting.labelopts : "point pt 1");
     do_string_replot(cmd);
