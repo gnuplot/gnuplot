@@ -1026,10 +1026,10 @@ if test "${enable_wxwidgets_ok}" = yes ; then
     WX_LIBS="$WX_LIBS $GTK_LIBS"
   fi
 
-  dnl The user can force single-threaded mode
-  AC_ARG_WITH(wx-single-threaded, dnl
-  [--with-wx-single-threaded   do not use multithreaded wxgtk even if available],
-  WX_CXXFLAGS="$WX_CXXFLAGS -DWXT_MONOTHREADED", 
+  dnl Default to single-threaded
+  AC_ARG_WITH(wx-multithreaded, dnl
+  [--with-wx-multithreaded  use multithreaded wxgtk (known problems, not recommended)],
+  , WX_CXXFLAGS="$WX_CXXFLAGS -DWXT_MONOTHREADED"
   )
 
   CPPFLAGS="$CPPFLAGS $CAIROPANGO_CFLAGS"
@@ -1402,8 +1402,8 @@ else
 fi
 
 if test "$enable_wxwidgets_ok" = yes; then
-  if test "$with_wx_single_threaded" = yes; then
-    AC_MSG_RESULT([  wxt terminal: yes (single-threaded)])
+  if test "$with_wx_multithreaded" = yes; then
+    AC_MSG_RESULT([  wxt terminal: yes (multithreaded)])
   else
     AC_MSG_RESULT([  wxt terminal: yes ])
   fi

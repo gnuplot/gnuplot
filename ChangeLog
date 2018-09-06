@@ -1,3 +1,16 @@
+2018-09-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.ac:  Switch the default configuration for wxt terminal to
+	./configure --without-wx-multithreaded.  On my current linux machines,
+	enabling wxgtk multithreading produces an unusable binary.  Possibly
+	also relevant to the locale corruption reported in Bug #2069.
+
+	* src/util.c src/wxterminal/wxt_gui.cpp:  Always set numeric locale to
+	C following int_error() or wxt terminal initialization.  This may or
+	may not catch asynchronous corruption of the program locale by another
+	thread.
+	Bug #2069
+
 2018-08-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c: Adjust axis tick and axis placement in 3D projections

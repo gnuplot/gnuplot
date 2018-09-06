@@ -790,8 +790,11 @@ void wxtFrame::OnConfig( wxCommandEvent& WXUNUSED( event ) )
 /* toolbar event : Help */
 void wxtFrame::OnHelp( wxCommandEvent& WXUNUSED( event ) )
 {
-	wxMessageBox( wxString(wxT("You are using an interactive terminal ")
-		wxT("based on wxWidgets for the interface, Cairo ")
+	wxMessageBox( wxString(wxT("You are using an interactive terminal based on ")
+#ifdef WXT_MULTITHREADED
+		wxT("multithreaded ")
+#endif
+		wxT("wxWidgets for the interface, Cairo ")
 		wxT("for the drawing facilities, and Pango for the text layouts.\n")
 		wxT("Please note that toolbar icons in the terminal ")
 		wxT("don't reflect the whole range of mousing ")
