@@ -768,7 +768,7 @@ CACA_init_display(void)
 		if ((strcmp(CACA_driver, "x11") == 0) || (strcmp(CACA_driver, "ncurses") == 0)) {
 			/* NOTE: The ncurses and x11 backends change LC_ALL. We try to
 			(partially) revert this again: */
-			setlocale(LC_TIME, current_locale != NULL ? current_locale : "C");
+			setlocale(LC_TIME, time_locale != NULL ? time_locale : "C");
 			setlocale(LC_NUMERIC, numeric_locale != NULL ? numeric_locale : "C");
 		}
 		if (strcmp(CACA_driver, "slang") == 0) {
