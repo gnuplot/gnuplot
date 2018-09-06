@@ -2586,7 +2586,6 @@ f_column(union argument *arg)
 void
 df_reset_after_error()
 {
-    reset_numeric_locale();
     evaluate_inside_using = FALSE;
 }
 

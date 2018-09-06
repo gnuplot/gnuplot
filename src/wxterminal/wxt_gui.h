@@ -114,20 +114,13 @@
 #endif
 
 extern "C" {
-/* for interactive */
-# include "plot.h"
-/* for stdfn.h, JUSTIFY, encoding, *term definition, color.h */
-# include "term_api.h"
-/* for do_event declaration */
-# include "mouse.h"
-/* for rgb functions */
-# include "getcolor.h"
-/* for paused_for_mouse, PAUSE_BUTTON1 and friends */
-# include "command.h"
-/* for int_error */
-# include "util.h"
-/* for wrap_readline_signal_handler */
-# include "readline.h"
+#include "plot.h"	/* for interactive */
+#include "term_api.h"	/* for stdfn.h, JUSTIFY, encoding, *term definition, color.h */
+#include "mouse.h"	/* for do_event declaration */
+#include "getcolor.h"	/* for rgb functions */
+#include "command.h"	/* for paused_for_mouse, PAUSE_BUTTON1 and friends */
+#include "util.h"	/* for int_error, locale */
+#include "readline.h"	/* for wrap_readline_signal_handler */
 }
 
 /* if the gtk headers are available, use them to tweak some behaviours */
