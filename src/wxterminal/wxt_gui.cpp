@@ -2067,11 +2067,8 @@ void wxt_init()
 #ifdef HAVE_LOCALE_H
 	/* when wxGTK was initialised above, GTK+ also set the locale of the
 	 * program itself;  we must revert it */
-	if (wxt_status == STATUS_UNINITIALIZED) {
-		extern char *current_locale;
-		setlocale(LC_NUMERIC, "C");
-		setlocale(LC_TIME, current_locale);
-	}
+	setlocale(LC_NUMERIC, "C");
+	setlocale(LC_TIME, current_locale);
 #endif
 
 	/* accept the following commands from gnuplot */

@@ -1192,6 +1192,9 @@ common_error_exit()
     plot_iterator = cleanup_iteration(plot_iterator);
     scanning_range_in_progress = FALSE;
     inside_zoom = FALSE;
+#ifdef HAVE_LOCALE_H
+    setlocale(LC_NUMERIC, "C");
+#endif
 
     /* Load error state variables */
     update_gpval_variables(2);

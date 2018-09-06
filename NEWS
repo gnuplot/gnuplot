@@ -11,6 +11,7 @@ Changes in 5.2.5
 * FIX clipping of all elements in finanacebars/candlesticks/boxplots
 * FIX clipping of 3D splot "with labels"
 * FIX strange interaction of "noautoscale" with blank data lines
+* FIX rare case of incorrect internal numeric locale despite reset in int_error()
 * FIX alignment of boxed text to center for eps/cairolatex
 * FIX incompatibility of "pm3d depthorder" and rgb color taken from data column
 * FIX aqua terminal font changes in enhanced text mode
