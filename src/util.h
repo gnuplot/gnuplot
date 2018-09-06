@@ -53,7 +53,7 @@ extern TBOOLEAN screen_ok;
 /* decimal sign */
 extern char *decimalsign;
 extern char *numeric_locale;	/* LC_NUMERIC */
-extern char *current_locale;	/* LC_TIME */
+extern char *time_locale;	/* LC_TIME */
 
 /* degree sign */
 extern char degree_sign[8];

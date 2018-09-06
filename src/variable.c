@@ -561,21 +561,21 @@ locale_handler(int action, char *newlocale)
     switch(action) {
     case ACTION_CLEAR:
     case ACTION_INIT:
-	free(current_locale);
+	free(time_locale);
 #ifdef HAVE_LOCALE_H
 	setlocale(LC_TIME, "");
 	setlocale(LC_CTYPE, "");
-	current_locale = gp_strdup(setlocale(LC_TIME,NULL));
+	time_locale = gp_strdup(setlocale(LC_TIME,NULL));
 #else
-	current_locale = gp_strdup(INITIAL_LOCALE);
+	time_locale = gp_strdup(INITIAL_LOCALE);
 #endif
 	break;
 
     case ACTION_SET:
 #ifdef HAVE_LOCALE_H
 	if (setlocale(LC_TIME, newlocale)) {
-	    free(current_locale);
-	    current_locale = gp_strdup(setlocale(LC_TIME,NULL));
+	    free(time_locale);
+	    time_locale = gp_strdup(setlocale(LC_TIME,NULL));
 	} else {
 	    int_error(c_token, "Locale not available");
 	}
@@ -595,8 +595,8 @@ locale_handler(int action, char *newlocale)
 	    strftime(abbrev_month_names[i], sizeof(abbrev_month_names[i]), "%b", &tm);
 	}
 #else
-	current_locale = gp_realloc(current_locale, strlen(newlocale) + 1, "locale");
-	strcpy(current_locale, newlocale);
+	time_locale = gp_realloc(time_locale, strlen(newlocale) + 1, "locale");
+	strcpy(time_locale, newlocale);
 #endif /* HAVE_LOCALE_H */
 	break;
 
@@ -607,7 +607,7 @@ locale_handler(int action, char *newlocale)
 	fprintf(stderr, "\tgnuplot LC_TIME    %s\n", setlocale(LC_TIME,NULL));
 	fprintf(stderr, "\tgnuplot LC_NUMERIC %s\n", numeric_locale ? numeric_locale : "C");
 #else
-	fprintf(stderr, "\tlocale is \"%s\"\n", current_locale);
+	fprintf(stderr, "\tlocale is \"%s\"\n", time_locale);
 #endif
 	break;
 
@@ -616,6 +616,6 @@ locale_handler(int action, char *newlocale)
 	break;
     }
 
-    return current_locale;
+    return time_locale;
 }
 

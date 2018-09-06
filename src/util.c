@@ -65,7 +65,7 @@ TBOOLEAN use_minus_sign = FALSE;
 char *numeric_locale = NULL;
 
 /* Holds the name of the current LC_TIME as set by "set locale" */
-char *current_locale = NULL;
+char *time_locale = NULL;
 
 const char *current_prompt = NULL; /* to be set by read_line() */
 

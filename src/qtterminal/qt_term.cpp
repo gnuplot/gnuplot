@@ -451,7 +451,7 @@ void qt_init()
 	// The creation of a QApplication mangled our locale settings
 #ifdef HAVE_LOCALE_H
 	setlocale(LC_NUMERIC, "C");
-	setlocale(LC_TIME, current_locale);
+	setlocale(LC_TIME, time_locale);
 #endif
 
 	qt->out.setVersion(QDataStream::Qt_4_4);

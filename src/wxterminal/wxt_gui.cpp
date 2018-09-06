@@ -2064,9 +2064,8 @@ void wxt_init()
 	/* when wxGTK was initialised above, GTK+ also set the locale of the
 	 * program itself;  we must revert it */
 	if (wxt_status == STATUS_UNINITIALIZED) {
-		extern char *current_locale;
 		setlocale(LC_NUMERIC, "C");
-		setlocale(LC_TIME, current_locale);
+		setlocale(LC_TIME, time_locale);
 	}
 #endif
 
