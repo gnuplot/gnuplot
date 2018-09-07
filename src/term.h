@@ -296,7 +296,7 @@
 #endif
 
 /* QMS laser printers */
-#include "qms.trm"
+/* #include "qms.trm" */
 
 /* W3C Scalable Vector Graphics file */
 #include "svg.trm"

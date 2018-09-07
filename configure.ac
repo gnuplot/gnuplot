@@ -1188,7 +1188,7 @@ AC_MSG_RESULT([])
 AC_MSG_RESULT([  Standalone terminals: yes (included by default)])
 AC_MSG_RESULT([    canvas, cgm, context, dumb, dxf, eepic, emf, emtex,])
 AC_MSG_RESULT([    epslatex, fig, hpgl, latex, metafont, metapost, pcl5,])
-AC_MSG_RESULT([    postscript, pslatex, pstex, pstricks, qms, svg,])
+AC_MSG_RESULT([    postscript, pslatex, pstex, pstricks, svg,])
 AC_MSG_RESULT([    texdraw, tkcanvas, tpic])
 AC_MSG_RESULT([])
 
@@ -1268,7 +1268,7 @@ fi
 
 AC_MSG_RESULT([])
 AC_MSG_RESULT([  Other terminals that can be enabled but have no ./configure option:])
-AC_MSG_RESULT([    hp2623a, hp2648, imagen, kyocera ])
+AC_MSG_RESULT([    hp2623a, hp2648, imagen, kyocera, qms ])
 AC_MSG_RESULT([    pm (makefile.os2), be (BeOS), svga (MSDOS/djgpp), windows])
 
 dnl These are the most common interactive terminal options
