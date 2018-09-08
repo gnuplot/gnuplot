@@ -487,6 +487,14 @@ term_initialise()
 	FPRINTF((stderr, "- calling term->init()\n"));
 	(*term->init) ();
 	term_initialised = TRUE;
+#ifdef HAVE_LOCALE_H
+	/* This is here only from an abundance of caution (a.k.a. paranoia).
+	 * Some terminals (wxt qt caca) are known to change the locale when
+	 * initialized.  Others have been implicated (gd).  Rather than trying
+	 * to catch all such offenders one by one, cover for all of them here.
+	 */
+	setlocale(LC_NUMERIC, "C");
+#endif
     }
 }
 
