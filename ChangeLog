@@ -5,10 +5,10 @@
 	enabling wxgtk multithreading produces an unusable binary.  Possibly
 	also relevant to the locale corruption reported in Bug #2069.
 
-	* src/util.c src/wxterminal/wxt_gui.cpp:  Always set numeric locale to
-	C following int_error() or wxt terminal initialization.  This may or
-	may not catch asynchronous corruption of the program locale by another
-	thread.
+	* src/util.c src/wxterminal/wxt_gui.cpp sec/term.c:  Always set numeric
+	locale to C following int_error() or terminal initialization.  This may
+	or may not catch asynchronous corruption of the program locale by
+	another thread or misbehaving library.
 	Bug #2069
 
 2018-08-29  Ethan A Merritt  <merritt@u.washington.edu>
