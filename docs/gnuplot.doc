@@ -5027,7 +5027,6 @@ Ffigure_fenceplot
 ?exit
       exit
       exit message "error message text"
-      exit status <integer error code>
 
  The commands `exit` and `quit`, as well as the END-OF-FILE character (usually
  Ctrl-D) terminate input from the current input stream: terminal session, pipe,
@@ -5045,11 +5044,6 @@ Ffigure_fenceplot
  In interactive mode it prints the error message and returns to the command
  line, breaking out of all nested loops or calls.  In non-interactive mode
  the program will exit.
-
- When gnuplot exits to the controlling shell, the return value is not usually
- informative. This variant of the command allows you to return a specific value.
-
-      exit status <value>
 
  See help for `batch/interactive` for more details.
 2 fit
