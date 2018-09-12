@@ -9,6 +9,7 @@ Changes in 5.2.5
 * CHANGE placement of axis and tic labels in 3D projections on to xz or yz plane
 * CHANGE default to ./configure --without-wx-multithreading
 * FIX polar mode "set trange" was assumed to use radians, now it tracks "set angle"
+* FIX clip polar grid lines and ticks to x/y range limits
 * FIX clipping of plot "with lines" when axes are nonlinear (regression from 5.0)
 * FIX clipping of all elements in finanacebars/candlesticks/boxplots
 * FIX clipping of 3D splot "with labels"

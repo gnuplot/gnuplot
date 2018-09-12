@@ -1,3 +1,13 @@
+2018-09-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c src/plot2d.c:  Fix regressions in 5.2 polar plot mode.
+	trange was always interpreted as being in radians; now it tracks either
+	radians or degrees according to 'set angle'.
+	Clip radial grid lines and tick marks to current xrange and yrange.
+	Either show or don't show crossbar on radial error bars (no partial
+	clipping).
+	Bug #2072
+
 2018-09-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.ac:  Switch the default configuration for wxt terminal to
