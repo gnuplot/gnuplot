@@ -1039,7 +1039,7 @@ set_border()
 	    border_layer = LAYER_BEHIND;
 	    c_token++;
 	} else if (equals(c_token,"polar")) {
-	    draw_border |= 4096;
+	    draw_border |= 0x1000;
 	    c_token++;
 	} else {
 	    int save_token = c_token;

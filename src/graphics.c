@@ -225,7 +225,8 @@ place_grid(int layer)
     x_axis = FIRST_X_AXIS;
     y_axis = FIRST_Y_AXIS;
 
-    clip_area = &canvas;
+    /* Sep 2018: polar grid is clipped to x/y range limits */
+    clip_area = &plot_bounds;
 
     /* POLAR GRID circles */
     if (R_AXIS.ticmode && (raxis || polar)) {
@@ -1807,14 +1808,21 @@ plot_bars(struct curve_points *plot)
 		    y2 = ylowM - (bar_size * tic * cos(slope));
 
 		    /* draw the bottom tic */
-		    draw_clip_line(x1, y1, x2, y2);
+		    if (!clip_point(xlowM,ylowM)) {
+			(*t->move)(x1, y1);
+			(*t->vector)(x2, y2);
+		    }
 
 		    x1 += xhighM - xlowM;
 		    x2 += xhighM - xlowM;
 		    y1 += yhighM - ylowM;
 		    y2 += yhighM - ylowM;
+
 		    /* draw the top tic */
-		    draw_clip_line(x1, y1, x2, y2);
+		    if (!clip_point(xhighM,yhighM)) {
+			(*t->move)(x1, y1);
+			(*t->vector)(x2, y2);
+		    }
 		}
 	    }
 	}	/* for loop */
@@ -3250,10 +3258,9 @@ ttick_callback(
 	yu = map_y( (1.-delta) * sin_t);
     }
 
-    term->move(xl,yl);
-    term->vector(xu,yu);
+    draw_clip_line(xl, yl, xu, yu);
 
-    if (text) {
+    if (text && !clip_point(xu, yu)) {
 	if (this_axis->ticdef.textcolor.type != TC_DEFAULT)
 	    apply_pm3dcolor(&(this_axis->ticdef.textcolor));
 	/* The only rotation angle that makes sense is the angle being labeled */
@@ -3537,10 +3544,10 @@ plot_border()
 	    closepath();
 
 	/* Polar border.  FIXME: Should this be limited to known R_AXIS.max? */
-	if ((draw_border & 4096) != 0) {
+	if ((draw_border & 0x1000) != 0) {
 	    lp_style_type polar_border = border_lp;
 	    BoundingBox *clip_save = clip_area;
-	    clip_area = &canvas;
+	    clip_area = &plot_bounds;
 
 	    /* Full-width circular border is visually too heavy compared to the edges */
 	    polar_border.l_width = polar_border.l_width / 2.;
