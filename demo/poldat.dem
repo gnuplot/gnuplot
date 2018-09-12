@@ -512,6 +512,7 @@ pause -1 "Hit return to continue"
 reset
 
 set polar
+set angle degree
 set grid polar 15. lt -1 dt 0 lw 0.5
 set border 0
 set logscale r 10
@@ -520,14 +521,14 @@ set size square
 set noxtics
 set noytics
 set rrange [.5 : 19]
-set trange [pi/2 : 2*pi]
+set trange [90 : 360]
 set rtics axis scale 0.5,0 nomirror rotate by -270  offset 0, 0.7
 set rtics (2,5,10,15)
 set key opaque box samplen 0.75
-set title "log scale polar axis" 
+set title "log scale polar axis, trange in degrees" 
 #
 set style data impulse
-plot 'silver.dat' using ($1/100.):3:0 lc var lw 2 title 'silver.dat'
+plot 'silver.dat' using ($1*1.8/pi):3:0 lc var lw 2 title 'silver.dat'
 
 pause -1 "Hit return to continue"
 
