@@ -1328,7 +1328,7 @@ store2d_point(
     dummy_type = cp->type;
 
     if (polar) {
-	double theta = x * ang2rad;
+	double theta = x;
 	AXIS *theta_axis = &axis_array[T_AXIS];
 
 	/* "x" is really the polar angle theta,	so check it against trange. */
