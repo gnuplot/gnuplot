@@ -1,0 +1,47 @@
+#
+# Demonstrate using xrange and yrange to isolate polar quadrants
+#
+set polar
+set grid r polar 30
+set grid lt black lw .3
+unset xtics
+set ytics axis
+set ytics 2
+set border 0
+set size square
+
+unset title
+unset key
+
+set rrange [0:6.1]
+set ttics 0,30 format "%g".GPVAL_DEGREE_SIGN font ":Italic"
+set mttics 3
+
+set multiplot layout 2,2 title "Polar Quadrants"
+
+set xrange [-6.5:0]
+set yrange [0:6.5]
+set ytics offset 4
+plot t lt 3 lw 2, -t lt 4 lw 2
+
+set xrange [0:6.5]
+set yrange [0:6.5]
+set ytics offset -1 
+replot
+
+set rtics offset 0,2
+set xrange [-6.5:0]
+set yrange [-6.5:0]
+set ytics offset 4
+replot
+
+set xrange [0:6.5]
+set yrange [-6.5:0]
+set ytics offset -1
+replot
+
+unset multiplot
+
+pause -1 "<cr> to continue"
+
+reset
