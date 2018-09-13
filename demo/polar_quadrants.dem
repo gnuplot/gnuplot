@@ -4,6 +4,7 @@
 set polar
 set grid r polar 30
 set grid lt black lw .3
+set tics scale 0.5
 unset xtics
 set ytics axis
 set ytics 2

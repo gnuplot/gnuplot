@@ -97,6 +97,7 @@ Here are samples of PNG output from some of the demos.
     <li><a href="ttics.html">polar coords</a></li>
     <li><a href="polar.html">polar functions</a></li>
     <li><a href="poldat.html">polar data</a></li>
+    <li><a href="polar_quadrants.html">polar quadrants</a></li>
     <li><a href="world.html">cylindrical/spherical</a></li>
     <li><a href="timedat.html">time/date coords</a></li>
     <li><a href="sampling.html">coord sampling ranges</a></li>
@@ -204,7 +205,7 @@ Here are samples of PNG output from some of the demos.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated March 2018</i>
+    <i>This page generated September 2018</i>
     </td>
 
     <td>
