@@ -5005,13 +5005,15 @@ Ffigure_fenceplot
 2 evaluate
 ?commands evaluate
 ?evaluate
- The `evaluate` command executes the commands given as an argument string.
+ The `evaluate` command executes gnuplot commands from a string, a string
+ expression, or a datablock containing strings.
  Newline characters are not allowed within the string.
 
  Syntax:
-       eval <string expression>
+       evaluate <string expression>
+       evaluate $DATABLOCK
 
- This is especially useful for a repetition of similar commands.
+ This is especially useful for repetition of similar commands.
 
  Example:
        set_label(x, y, text) \
@@ -5020,8 +5022,10 @@ Ffigure_fenceplot
        eval set_label(2., 1., 'two/one')
        eval set_label(1., 2., 'one/two')
 
- Please see `substitution macros` for another way to execute commands
- from a string.
+ Evaluation of a datablock is EXPERIMENTAL (implementation details may change
+ before this feature appears in a supported release).
+
+ See `substitution macros` for another way to execute commands from a string.
 2 exit
 ?commands exit
 ?exit
