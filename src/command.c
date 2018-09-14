@@ -1051,6 +1051,13 @@ exit_command()
     if (equals(c_token+1,"gnuplot"))
 	gp_exit(EXIT_SUCCESS);
 
+    if (equals(c_token+1,"status")) {
+	int status;
+	c_token += 2;
+	status = int_expression();
+	gp_exit(status);
+    }	
+
     /* exit error 'error message'  returns to the top command line */
     if (equals(c_token+1,"error")) {
 	c_token += 2;
