@@ -554,7 +554,7 @@ int clip_point __PROTO((int, int));
 void clip_move __PROTO((int x, int y));
 void clip_vector __PROTO((int x, int y));
 
-void draw_polar_clip_line __PROTO((struct coordinate *beg, struct coordinate *end));
+void draw_polar_clip_line __PROTO((double, double, double, double));
 
 /* Common routines for setting line or text color from t_colorspec */
 void apply_pm3dcolor __PROTO((struct t_colorspec *tc));

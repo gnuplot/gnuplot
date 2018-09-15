@@ -1048,12 +1048,17 @@ plot_lines(struct curve_points *plot)
     int x, y;			/* current point in terminal coordinates */
     struct termentry *t = term;
     enum coord_type prev = UNDEFINED;	/* type of previous point */
+    double xprev = 0.0;
+    double yprev = 0.0;
+    double xnow, ynow;
 
     /* If all the lines are invisible, don't bother to draw them */
     if (plot->lp_properties.l_type == LT_NODRAW)
 	return;
 
     for (i = 0; i < plot->p_count; i++) {
+	xnow = plot->points[i].x;
+	ynow = plot->points[i].y;
 
 	/* rgb variable  -  color read from data column */
 	check_for_variable_color(plot, &plot->varcolor[i]);
@@ -1063,8 +1068,8 @@ plot_lines(struct curve_points *plot)
 	 * in which case the coordinate value is garbage so we set UNDEFINED.
 	 */
 	if (plot->points[i].type != UNDEFINED) {
-	    x = map_x(plot->points[i].x);
-	    y = map_y(plot->points[i].y);
+	    x = map_x(xnow);
+	    y = map_y(ynow);
 	    if (invalid_coordinate(x,y))
 		plot->points[i].type = UNDEFINED;
 	}
@@ -1078,16 +1083,13 @@ plot_lines(struct curve_points *plot)
 		    if (!clip_lines1) {
 			(*t->move) (x, y);
 		    } else if (polar && clip_radial) {
-			draw_polar_clip_line( &(plot->points[i-1]), &(plot->points[i]) );
+			draw_polar_clip_line(xprev, yprev, xnow, ynow );
 		    } else {
-			if (!draw_clip_line( map_x(plot->points[i-1].x),
-					     map_y(plot->points[i-1].y),
-					     x, y)) {
+			if (!draw_clip_line( map_x(xprev), map_y(yprev), x, y))
 			    /* This is needed if clip_line() doesn't agree that	*/
 			    /* the current point is INRANGE, i.e. it is on the	*/
 			    /*  border or just outside depending on rounding.	*/
 			    (*t->move)(x, y);
-			}
 		    }
 		} else {	/* prev == UNDEFINED */
 		    (*t->move) (x, y);
@@ -1099,24 +1101,18 @@ plot_lines(struct curve_points *plot)
 		if (prev == INRANGE) {
 		    /* from inrange to outrange */
 		    if (clip_lines1) {
-			if (polar && clip_radial) {
-			    draw_polar_clip_line( &(plot->points[i-1]), &(plot->points[i]) );
-			} else {
-			    draw_clip_line( map_x(plot->points[i-1].x),
-					    map_y(plot->points[i-1].y),
-					    x, y);
-			}
+			if (polar && clip_radial)
+			    draw_polar_clip_line(xprev, yprev, xnow, ynow );
+			else
+			    draw_clip_line( map_x(xprev), map_y(yprev), x, y);
 		    }
 		} else if (prev == OUTRANGE) {
 		    /* from outrange to outrange */
 		    if (clip_lines2) {
-			if (polar && clip_radial) {
-			    draw_polar_clip_line( &(plot->points[i-1]), &(plot->points[i]) );
-			} else {
-			    draw_clip_line( map_x(plot->points[i-1].x),
-					    map_y(plot->points[i-1].y),
-					    x, y);
-			}
+			if (polar && clip_radial)
+			    draw_polar_clip_line(xprev, yprev, xnow, ynow );
+			else
+			    draw_clip_line( map_x(xprev), map_y(yprev), x, y);
 		    }
 		}
 		break;
@@ -1126,6 +1122,8 @@ plot_lines(struct curve_points *plot)
 		break;
 	}
 	prev = plot->points[i].type;
+	xprev = xnow;
+	yprev = ynow;
     }
 }
 

@@ -652,30 +652,32 @@ clip_vector(int x, int y)
  * is in effect.
  */
 void
-draw_polar_clip_line( struct coordinate *beg, struct coordinate *end )
+draw_polar_clip_line( double xbeg, double ybeg, double xend, double yend)
 {
     double R;			/* radius of limiting circle */
     double a, b;		/* line expressed as y = a*x + b */
     double x1, y1, x2, y2;	/* Intersections of line and circle */
     double Q, Q2;		/* sqrt term of quadratic equation */
     TBOOLEAN vertical = FALSE;	/* flag for degenerate case */
-
-    /* Both INRANGE, no clipping needed */
-    if (beg->type == INRANGE && end->type == INRANGE) {
-	(term->move)(map_x(beg->x), map_y(beg->y));
-	(term->vector)(map_x(end->x), map_y(end->y));
-	return;
-    }
+    TBOOLEAN beg_inrange, end_inrange;
 
     if (R_AXIS.set_max == -VERYLARGE)
 	goto outside;
     R = R_AXIS.set_max - R_AXIS.set_min;
 
+    /* If both endpoints are inside the limiting circle, draw_clip_line suffices */
+    beg_inrange = (xbeg*xbeg + ybeg*ybeg) <= R*R;
+    end_inrange = (xend*xend + yend*yend) <= R*R;
+    if (beg_inrange && end_inrange) {
+	draw_clip_line(map_x(xbeg), map_y(ybeg), map_x(xend), map_y(yend));
+	return;
+    }
+
     /* FIXME:  logscale and other odd cases are not covered by this equation */
-    if (fabs(beg->x - end->x) > ZERO) {
+    if (fabs(xbeg - xend) > ZERO) {
 	/* Recast line in the form y = a*x + b */
-	a = (end->y - beg->y) / (end->x - beg->x);
-	b = beg->y - beg->x * a;
+	a = (yend - ybeg) / (xend - xbeg);
+	b = ybeg - xbeg * a;
 	/* the line may intersect a circle of radius R in two places */
 	Q2 = 4*a*a*b*b - 4 * (1 + a*a) * (b*b - R*R);
 	if (Q2 < 0)
@@ -687,50 +689,51 @@ draw_polar_clip_line( struct coordinate *beg, struct coordinate *end )
 	y2 = a * x2 + b;
     } else {
 	/* degenerate case (vertical line) */
-	x1 = x2 = beg->x;
+	x1 = x2 = xbeg;
 	if (fabs(x1) > R)
 	    goto outside;
 	vertical = TRUE;
 	y1 = sqrt(R*R - x1*x1);
 	y2 = -y1;
-	if (!inrange(y1,beg->y,end->y) && !inrange(y2,beg->y,end->y))
+	if (!inrange(y1,ybeg,yend) && !inrange(y2,ybeg,yend))
 	    goto outside;
     }
 
     /* If one of the original endpoints was INRANGE then use it */
     /* rather than the second intersection point.               */
     if (vertical) {
-	y1 = GPMIN(y1, GPMAX(beg->y, end->y));
-	y2 = GPMAX(y2, GPMIN(beg->y, end->y));
-    } else if (beg->type == INRANGE) {
-	if (!inrange(x1, beg->x, end->x)) {
-	    x1 = beg->x;
-	    y1 = beg->y;
+	y1 = GPMIN(y1, GPMAX(ybeg, yend));
+	y2 = GPMAX(y2, GPMIN(ybeg, yend));
+    } else if (beg_inrange) {
+	if (!inrange(x1, xbeg, xend)) {
+	    x1 = xbeg;
+	    y1 = ybeg;
 	} else {
-	    x2 = beg->x;
-	    y2 = beg->y;
+	    x2 = xbeg;
+	    y2 = ybeg;
 	}
-    } else if (end->type == INRANGE) {
-	if (!inrange(x1, beg->x, end->x)) {
-	    x1 = end->x;
-	    y1 = end->y;
+    } else if (end_inrange) {
+	if (!inrange(x1, xbeg, xend)) {
+	    x1 = xend;
+	    y1 = yend;
 	} else {
-	    x2 = end->x;
-	    y2 = end->y;
+	    x2 = xend;
+	    y2 = yend;
 	}
     } else {
 	/* Both OUTRANGE. Are they on the same side of the circle? */
-	if (!inrange(x1, beg->x, end->x))
+	if (!inrange(x1, xbeg, xend))
 	    goto outside;
     }
 
     /* Draw the part of the line inside the bounding circle */
     (term->move)(map_x(x1), map_y(y1));
     (term->vector)(map_x(x2), map_y(y2));
+    /* fall through */
 
 outside:
     /* Leave current position at unclipped endpoint */
-    (term->move)(map_x(end->x), map_y(end->y));
+    (term->move)(map_x(xend), map_y(yend));
     return;
 }
 
