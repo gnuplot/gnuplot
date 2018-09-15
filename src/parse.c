@@ -586,12 +586,6 @@ parse_primary_expression()
 		add_action(PUSH)->udv_arg = datablock_udv;
 	    } else
 		int_error(c_token, "Column number or datablock line expected");
-	} else if (equals(c_token,"N")) {
-	    /* $N == pseudocolumn -3 means "last column" */
-	    c_token++;
-	    Ginteger(&a, -3);
-	    at_highest_column_used = -3;
-	    add_action(DOLLARS)->v_arg = a;
 	} else {
 	    convert(&a, c_token++);
 	    if (a.type != INTGR || a.v.int_val < 0)
@@ -629,22 +623,6 @@ parse_primary_expression()
 	    enum operators whichfunc = is_builtin_function(c_token);
 	    struct value num_params;
 	    num_params.type = INTGR;
-
-#if (1)	    /* DEPRECATED */
-	    if (whichfunc && (strcmp(ft[whichfunc].f_name,"defined")==0)) {
-		/* Deprecated syntax:   if (defined(foo)) ...  */
-		/* New syntax:          if (exists("foo")) ... */
-		struct udvt_entry *udv = add_udv(c_token+2);
-		union argument *foo = add_action(PUSHC);
-		foo->v_arg.type = INTGR;
-		if (udv->udv_value.type == NOTDEFINED)
-		    foo->v_arg.v.int_val = 0;
-		else
-		    foo->v_arg.v.int_val = 1;
-		c_token += 4;  /* skip past "defined ( <foo> ) " */
-		return;
-	    }
-#endif
 
 	    if (whichfunc) {
 		c_token += 2;	/* skip fnc name and '(' */

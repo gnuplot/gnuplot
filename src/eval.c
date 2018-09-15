@@ -190,7 +190,6 @@ const struct ft_entry ft[] =
     {"rand",  f_rand},
     {"floor",  f_floor},
     {"ceil",  f_ceil},
-    {"defined", f_exists},	/* DEPRECATED syntax defined(foo) */
 
     {"norm",  f_normal},	/* XXX-JG */
     {"inverf",  f_inverse_erf},	/* XXX-JG */

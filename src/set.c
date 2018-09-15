@@ -5173,20 +5173,15 @@ set_xyplane()
 	xyplane.absolute = TRUE;
 	return;
     } else if (!almost_equals(c_token,"rel$ative")) {
+	/* deprecated syntax */
 	c_token--;
-	/* int_warn(NO_CARET, "deprecated syntax"); */
     }
     set_ticslevel();
 }
 
 
 /* Process 'set timefmt' command */
-/* HBB 20000507: changed this to a per-axis setting. I.e. you can now
- * have separate timefmt parse strings, different axes */
-/* V5 Oct 2014: But that was never documented, and makes little sense since
- * the input format is a property of the data file, not the graph axis.
- * Revert to a single global default timefmt as documented.
- * If the default is not sufficient, use timecolumn(N,"format") on input.
+/* V5: fallback default if timecolumn(N,"format") not used during input.
  * Use "set {axis}tics format" to control the output format.
  */
 static void
