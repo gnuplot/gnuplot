@@ -259,13 +259,22 @@ bail_to_command_line()
 
 #if defined(_WIN32)
 int
-gnu_main(int argc, char **argv)
+gnu_main(int argc_orig, char **argv)
 #else
 int
-main(int argc, char **argv)
+main(int argc_orig, char **argv)
 #endif
 {
     int i;
+
+    /* We want the current value of argc to persist across a LONGJMP from int_error().
+     * Without this the compiler may put it on the stack, which LONGJMP clobbers.
+     * Here we try make it a volatile variable that optimization will not affect.
+     * Why do we not have to do the same for argv?   I don't know.
+     * But the test cases that broke with generic argc seem fine with generic argv.
+     */
+    static volatile int argc;
+    argc = argc_orig;
 
 #ifdef LINUXVGA
     LINUX_setup();		/* setup VGA before dropping privilege DBT 4/5/99 */
@@ -584,8 +593,6 @@ main(int argc, char **argv)
 	/* entering the loop again from the top finds them messed up.  */
 	/* If we reenter the loop via a goto then there is some hope   */
 	/* that code reordering does not hurt us.                      */
-	/* NB: the test for interactive means that execution from a    */
-	/* pipe will not continue after an error. Do we want this?     */
 	if (reading_from_dash && interactive)
 	    goto RECOVER_FROM_ERROR_IN_DASH;
 	reading_from_dash = FALSE;
@@ -621,14 +628,15 @@ RECOVER_FROM_ERROR_IN_DASH:
 		interactive = FALSE;
 
 	    } else if (strcmp(*argv, "-e") == 0) {
+		int save_state = interactive;
 		--argc; ++argv;
 		if (argc <= 0) {
 		    fprintf(stderr, "syntax:  gnuplot -e \"commands\"\n");
 		    return 0;
 		}
 		interactive = FALSE;
-		noinputfiles = FALSE;
 		do_string(*argv);
+		interactive = save_state;
 
 	    } else if (!strncmp(*argv, "-d", 2) || !strcmp(*argv, "--default-settings")) {
 		/* Ignore this; it already had its effect */
