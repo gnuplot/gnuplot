@@ -1,21 +1,40 @@
-		GNUPLOT Version 5.2.4 Release Notes
+		GNUPLOT Version 5.2.5 Release Notes
 		===================================
 
-These release notes are for version 5.2 patchlevel 4 (5.2.4).
-
-This release contains
-- a fix for a serious regression in 5.2.3 (spurious evaluation of logscale
-  coordinates as UNDEFINED)
-- re-implementation of the "refresh" command to correct regressions in
-  5.2.0 through 5.2.3
-- sanity checks for several invalid command sequences found by fuzzing
-- several minor bug-fixes
-- two recent minor changes back-ported from the development version
+These release notes are for version 5.2 patchlevel 5 (5.2.5).
+This release contains bug-fixes, a few changes back-ported from the
+development version, and a few new features.  The most notable fixes improve
+the clipping of lines or other plot elements that would otherwise extend beyond
+the edges of the plot. 
 
 Please see the ChangeLog file for a complete list of changes made during the
 course of development from 5.0 to 5.2.
 
-Release Notes date: 31-May-2018
+Release Notes date: 23-September-2018
+
+
+CHANGES IN 5.2.5
+================
+
+* NEW "set pm3d depthorder base" sorts pm3d quadrangles by projecting to z=0
+* NEW "set jitter vertical" displaces y coordinate rather than x coordinate
+* NEW array size can be determined automatically from the initializer
+* CHANGE equivalent slope constraint for mcs splines at both ends of the range
+* CHANGE treat imaginary values plotted from a using spec as UNDEFINED (NaN)
+* CHANGE allow "reset" between plots in a multiplot layout
+* CHANGE Deprecate linux and vgagl terminals (to be removed in 5.3)
+* CHANGE placement of axis and tic labels in 3D projections on to xz or yz plane
+* CHANGE default to ./configure --without-wx-multithreading
+* FIX parametric function plots did not work with logscale x (regression in 5.2.0-4)
+* FIX polar mode "set trange" was assumed to use radians, now it tracks "set angle"
+* FIX clip polar grid lines and ticks to x/y range limits
+* FIX clipping of plot "with lines" when axes are nonlinear (regression from 5.0)
+* FIX clipping of all elements in finanacebars/candlesticks/boxplots
+* FIX clipping of 3D splot "with labels"
+* FIX strange interaction of "noautoscale" with blank data lines
+* FIX alignment of boxed text to center for eps/cairolatex
+* FIX incompatibility of "pm3d depthorder" and rgb color taken from data column
+* FIX aqua terminal font changes in enhanced text mode
 
 CHANGES IN 5.2.4
 ================

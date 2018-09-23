@@ -41,8 +41,9 @@
 
 	* configure.ac:  Switch the default configuration for wxt terminal to
 	./configure --without-wx-multithreaded.  On my current linux machines,
-	enabling wxgtk multithreading produces an unusable binary.  Possibly
-	also relevant to the locale corruption reported in Bug #2069.
+	enabling wxgtk multithreading produces an unusable binary.  Others have
+	reported consistent problems.
+	Bug #1885
 
 	* src/util.c src/wxterminal/wxt_gui.cpp sec/term.c:  Always set numeric
 	locale to C following int_error() or terminal initialization.  This may
