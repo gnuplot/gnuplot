@@ -626,6 +626,7 @@ RECOVER_FROM_ERROR_IN_DASH:
 		while (!com_line());
 		reading_from_dash = FALSE;
 		interactive = FALSE;
+		noinputfiles = FALSE;
 
 	    } else if (strcmp(*argv, "-e") == 0) {
 		int save_state = interactive;
@@ -635,6 +636,7 @@ RECOVER_FROM_ERROR_IN_DASH:
 		    return 0;
 		}
 		interactive = FALSE;
+		noinputfiles = FALSE;
 		do_string(*argv);
 		interactive = save_state;
 
@@ -671,9 +673,10 @@ RECOVER_FROM_ERROR_IN_DASH:
     }
 
     /* take commands from stdin */
-    if (noinputfiles)
+    if (noinputfiles) {
 	while (!com_line())
 	    ctrlc_flag = FALSE; /* reset asynchronous Ctrl-C flag */
+    }
 
 #ifdef _WIN32
     /* On Windows, handle 'persist' by keeping the main input loop running (windows/wxt), */
