@@ -134,6 +134,14 @@ prepare_call(int calltype)
     int argindex;
     int argv_size;
 
+    /* call_args[] will hold arguments as strings.
+     * argval[] will be a private copy of numeric arguments as udvs.
+     * Later we will fill ARGV[] from one or the other.
+     */
+    struct value argval[9];
+    for (argindex = 0; argindex < 9; argindex++)
+	argval[argindex].type = NOTDEFINED;
+
     if (calltype == 2) {
 	call_argc = 0;
 	while (!END_OF_COMMAND && call_argc <= 9) {
@@ -146,11 +154,15 @@ prepare_call(int calltype)
 		    call_args[call_argc] = gp_strdup(add_udv(c_token)->udv_value.v.string_val);
 		    c_token++;
 
-		/* Evaluates a parenthesized expression and store the result in a string */
-		} else if (equals(c_token, "(")) {
+		/* Evaluate a parenthesized expression or a bare numeric user variable
+		 * and store the result in a string
+		 */
+		} else if (equals(c_token, "(")
+			|| (type_udv(c_token) == INTGR || type_udv(c_token) == CMPLX)) {
 		    char val_as_string[32];
 		    struct value a;
 		    const_express(&a);
+		    argval[call_argc] = a;
 		    switch(a.type) {
 			case CMPLX: /* FIXME: More precision? Some way to provide a format? */
 				sprintf(val_as_string, "%g", a.v.cmplx_val.real);
@@ -165,11 +177,17 @@ prepare_call(int calltype)
 				break;
 		    }
 
-		/* old (pre version 5) style wrapping of bare tokens as strings */
-		/* is still useful for passing unquoted numbers */
+		/* Old (pre version 5) style wrapping of bare tokens as strings
+		 * is still used for storing numerical constants ARGn but not ARGV[n]
+		 */
 		} else {
+		    double temp;
+		    char *endptr;
 		    m_capture(&call_args[call_argc], c_token, c_token);
 		    c_token++;
+		    temp = strtod(call_args[call_argc], &endptr);
+		    if (endptr != call_args[call_argc] && *endptr == '\0')
+			Gcomplex(&argval[call_argc], temp, 0.0);
 		}
 	    }
 	    call_argc++;
@@ -191,8 +209,10 @@ prepare_call(int calltype)
 	call_argc = 0;
     }
 
-    /* Old-style "call" arguments were referenced as $0 ... $9 and $# */
-    /* New-style has ARG0 = script-name, ARG1 ... ARG9 and ARGC */
+    /* Old-style "call" arguments were referenced as $0 ... $9 and $#.
+     * New-style has ARG0 = script-name, ARG1 ... ARG9 and ARGC
+     * Version 5.3 adds ARGV[n]
+     */
     udv = add_udv_by_name("ARGC");
     Ginteger(&(udv->udv_value), call_argc);
 
@@ -210,14 +230,18 @@ prepare_call(int calltype)
     ARGV[0].v.int_val = argv_size;
 
     for (argindex = 1; argindex <= 9; argindex++) {
-	char *arg = call_args[argindex-1];
+	char *argstring = call_args[argindex-1];
 
 	udv = add_udv_by_name(argname[argindex]);
 	gpfree_string(&(udv->udv_value));
-	Gstring(&(udv->udv_value), arg ? gp_strdup(arg) : gp_strdup(""));
+	Gstring(&(udv->udv_value), argstring ? gp_strdup(argstring) : gp_strdup(""));
 
-	if (argindex <= argv_size)
-	    Gstring(&ARGV[argindex], arg ? gp_strdup(arg) : gp_strdup(""));
+	if (argindex > argv_size)
+	    continue;
+	if (argval[argindex-1].type == NOTDEFINED)
+	    Gstring(&ARGV[argindex], gp_strdup(udv->udv_value.v.string_val));
+	else
+	    ARGV[argindex] = argval[argindex-1];
     }
 }
 
@@ -281,7 +305,7 @@ expand_call_args(void)
 #endif /* OLD_STYLE_CALL_ARGS */
 
 /*
- * load_file() is called from
+ * calltype indicates whether load_file() is called from
  * (1) the "load" command, no arguments substitution is done
  * (2) the "call" command, arguments are substituted for $0, $1, etc.
  * (3) on program entry to load initialization files (acts like "load")

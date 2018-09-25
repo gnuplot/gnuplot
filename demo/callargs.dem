@@ -13,11 +13,12 @@ if (ARGC == 0) {
     BAZ = 5.67
     NOTAFUNCTION = "a string"
     print "Now exercise the call mechanism at line ", GPVAL_LINENO
-    call ARG0 1.23e4 "string constant" FOO BAZ "3 + log(BAZ)" NOTAFUNCTION (1+3+4)
+    call ARG0 1.23e4 "string constant" FOO BAZ "3 + log(BAZ)" NOTAFUNCTION (1+3+4) pi
 } else {
+    FOO = 1
     print "\n\tTest whether this copy of gnuplot also supports deprecated"
     print "\tcall parameter syntax "."$"."0 "."$"."1 "."$"."2 "."etc: "
-    print "\t\t", exists("$3") ? "yes" : "no"
+    print "\t\t", exists("$2") ? "yes" : "no"
     show variable ARG
     print "ARG1 (numerical constant) came through as ", ARG1
     print "     @ARG1 = ", @ARG1
@@ -32,5 +33,6 @@ if (ARGC == 0) {
     print "ARG6 (string variable) came through as ", ARG6
     print "     words(ARG6) = ", words(ARG6)
     print "ARG7 (expression) came through as ", ARG7
+    print "ARG8 (pi) came through as ", ARG8
     if (exists("ARGV")) { print "ARGV = ", ARGV }
 }
