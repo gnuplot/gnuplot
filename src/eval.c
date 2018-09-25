@@ -722,7 +722,8 @@ evaluate_at(struct at_type *at_ptr, struct value *val_ptr)
 	 * E.g. load_one_range()
 	 */
 	val_ptr->type = NOTDEFINED;
-	int_error(NO_CARET, "evaluate_at: unsupported array operation");
+	if (!string_result_only)
+	    int_error(NO_CARET, "evaluate_at: unsupported array operation");
     }
 }
 
