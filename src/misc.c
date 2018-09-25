@@ -145,6 +145,14 @@ prepare_call(int calltype)
     int argindex;
     int argv_size;
 
+    /* call_args[] will hold arguments as strings.
+     * argval[] will be a private copy of numeric arguments as udvs.
+     * Later we will fill ARGV[] from one or the other.
+     */
+    struct value argval[9];
+    for (argindex = 0; argindex < 9; argindex++)
+	argval[argindex].type = NOTDEFINED;
+
     if (calltype == 2) {
 	call_argc = 0;
 	while (!END_OF_COMMAND && call_argc <= 9) {
@@ -157,11 +165,15 @@ prepare_call(int calltype)
 		    call_args[call_argc] = gp_strdup(add_udv(c_token)->udv_value.v.string_val);
 		    c_token++;
 
-		/* Evaluates a parenthesized expression and store the result in a string */
-		} else if (equals(c_token, "(")) {
+		/* Evaluate a parenthesized expression or a bare numeric user variable
+		 * and store the result in a string
+		 */
+		} else if (equals(c_token, "(")
+			|| (type_udv(c_token) == INTGR || type_udv(c_token) == CMPLX)) {
 		    char val_as_string[32];
 		    struct value a;
 		    const_express(&a);
+		    argval[call_argc] = a;
 		    switch(a.type) {
 			case CMPLX: /* FIXME: More precision? Some way to provide a format? */
 				sprintf(val_as_string, "%g", a.v.cmplx_val.real);
@@ -176,11 +188,17 @@ prepare_call(int calltype)
 				break;
 		    } 
 
-		/* old (pre version 5) style wrapping of bare tokens as strings */
-		/* is still useful for passing unquoted numbers */
+		/* Old (pre version 5) style wrapping of bare tokens as strings
+		 * is still used for storing numerical constants ARGn but not ARGV[n]
+		 */
 		} else {
+		    double temp;
+		    char *endptr;
 		    m_capture(&call_args[call_argc], c_token, c_token);
 		    c_token++;
+		    temp = strtod(call_args[call_argc], &endptr);
+		    if (endptr != call_args[call_argc] && *endptr == '\0')
+			Gcomplex(&argval[call_argc], temp, 0.0);
 		}
 	    }
 	    call_argc++;
@@ -202,9 +220,10 @@ prepare_call(int calltype)
 	call_argc = 0;
     }
 
-    /* Old-style "call" arguments were referenced as $0 ... $9 and $# */
-    /* New-style has ARG0 = script-name, ARG1 ... ARG9 and ARGC */
-    /* FIXME:  If we defined these on entry, we could use get_udv* here */
+    /* Old-style "call" arguments were referenced as $0 ... $9 and $#.
+     * New-style has ARG0 = script-name, ARG1 ... ARG9 and ARGC
+     * Version 5.2.4 adds ARGV[n]
+     */
     udv = add_udv_by_name("ARGC");
     Ginteger(&(udv->udv_value), call_argc);
 
@@ -218,18 +237,22 @@ prepare_call(int calltype)
 
     argv_size = GPMIN(call_argc, 9);
     udv->udv_value.type = ARRAY;
-    ARGV = udv->udv_value.v.value_array = gp_alloc((argv_size + 1) * sizeof(t_value), "array_command");
+    ARGV = udv->udv_value.v.value_array = gp_alloc((argv_size + 1) * sizeof(t_value), "array state");
     ARGV[0].v.int_val = argv_size;
 
     for (argindex = 1; argindex <= 9; argindex++) {
-	char *arg = call_args[argindex-1];
+	char *argstring = call_args[argindex-1];
 
 	udv = add_udv_by_name(argname[argindex]);
 	gpfree_string(&(udv->udv_value));
-	Gstring(&(udv->udv_value), arg ? gp_strdup(arg) : gp_strdup(""));
+	Gstring(&(udv->udv_value), argstring ? gp_strdup(argstring) : gp_strdup(""));
 
-	if (argindex <= argv_size)
-	    Gstring(&ARGV[argindex], arg ? gp_strdup(arg) : gp_strdup(""));
+	if (argindex > argv_size)
+	    continue;
+	if (argval[argindex-1].type == NOTDEFINED)
+	    Gstring(&ARGV[argindex], gp_strdup(udv->udv_value.v.string_val));
+	else
+	    ARGV[argindex] = argval[argindex-1];
     }
 }
 
@@ -293,7 +316,7 @@ expand_call_args(void)
 #endif /* OLD_STYLE_CALL_ARGS */
 
 /*
- * load_file() is called from
+ * calltype indicates whether load_file() is called from
  * (1) the "load" command, no arguments substitution is done
  * (2) the "call" command, arguments are substituted for $0, $1, etc.
  * (3) on program entry to load initialization files (acts like "load")
@@ -486,19 +509,13 @@ lf_pop()
 
 	if ((udv = get_udv_by_name("ARGV")) && udv->udv_value.type == ARRAY) {
 	    struct value *ARGV;
-	    int argv_size = GPMIN(call_argc, 9);
+	    int argv_size = lf->argv[0].v.int_val;
 
 	    gpfree_array(&(udv->udv_value));
 	    udv->udv_value.type = ARRAY;
-	    ARGV = udv->udv_value.v.value_array = gp_alloc((argv_size + 1) * sizeof(t_value), "array_command");
-	    ARGV[0].v.int_val = argv_size;
-
-	    for (argindex = 1; argindex <= argv_size; argindex++) {
-		if (!call_args[argindex - 1])
-		    ARGV[argindex].type = NOTDEFINED;
-		else
-		    Gstring(&ARGV[argindex], gp_strdup(call_args[argindex-1]));
-	    }
+	    ARGV = udv->udv_value.v.value_array = gp_alloc((argv_size + 1) * sizeof(t_value), "array state");
+	    for (argindex = 0; argindex <= argv_size; argindex++)
+		ARGV[argindex] = lf->argv[argindex];
 	}
 
     }
@@ -560,9 +577,16 @@ lf_push(FILE *fp, char *name, char *cmdline)
 
     /* Call arguments are irrelevant if invoked from do_string_and_free */
     if (cmdline == NULL) {
+	struct udvt_entry *udv;
+	/* Save ARG0 through ARG9 */
 	for (argindex = 0; argindex < 10; argindex++) {
 	    lf->call_args[argindex] = call_args[argindex];
 	    call_args[argindex] = NULL;	/* initially no args */
+	}
+	/* Save ARGV[] */
+	if ((udv = get_udv_by_name("ARGV")) && udv->udv_value.type == ARRAY) {
+	    for (argindex = 0; argindex <= call_argc; argindex++)
+		lf->argv[argindex] = udv->udv_value.v.value_array[argindex];
 	}
     }
     lf->depth = lf_head ? lf_head->depth+1 : 0;	/* recursion depth */

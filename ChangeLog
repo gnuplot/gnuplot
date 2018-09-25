@@ -1,3 +1,16 @@
+2018-09-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c:  Resolve inconsistency in the type/content of arguments
+	to "call".  Now ARG1, ARG2, ... are always strings.
+	ARGV[1] ... are complex for numerical arguments, strings otherwise.
+	Thus after a call
+	    call 'routine_1.gp'  1 pi "title"
+	The three arguments are available inside routine_1.gp as follows
+	    ARG1 = "1"         ARGV[1] = 1.0
+	    ARG2 = "3.14159"   ARGV[2] = 3.14159265358979... 
+	    ARG3 = "title"     ARGV[3] = "title"
+	Bug #2073
+
 2018-09-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (array_command):  Allow size of an array to be
