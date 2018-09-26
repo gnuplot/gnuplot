@@ -2404,6 +2404,11 @@ clone_linked_axes(AXIS *axis1, AXIS *axis2)
     double testmin, testmax, scale;
     TBOOLEAN suspect = FALSE;
 
+    if (axis1 != axis2->linked_to_primary && axis1 != axis2->linked_to_secondary) {
+	/* No linkage, so nothing to do here */
+	return;
+    }
+
     memcpy(axis2, axis1, AXIS_CLONE_SIZE);
     if (axis2->link_udf == NULL || axis2->link_udf->at == NULL)
 	return;
