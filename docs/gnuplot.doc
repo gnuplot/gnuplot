@@ -4887,10 +4887,35 @@ Ffigure_fenceplot
  Any existing contents of the ARG variables are saved and restored across a
  `call` command.
 
- Because the parameters are stored in ordinary string variables, they may be
- dereferenced by macro expansion (analogous to the old-style deprecated syntax).
- However in many cases it is more natural to use them as you would any other
- variable.
+ Because the parameters ARG1 ... ARG9 are stored in ordinary string variables
+ they may be dereferenced by macro expansion (analogous to the older deprecated
+ syntax).  However in many cases it is more natural to use them as you would any
+ other variable.
+
+ In parallel the the string parameters ARG1 ... ARG9 the passed parameters are
+ stored in an array ARGV[9].  See `argv`.
+
+3 argv[ ]
+?argv
+?ARGV
+?call argv
+?call ARGV
+ When a gnuplot script is entered via the `call` command any parameters passed
+ by the caller are available via two mechanisms.  Each parameter is stored as a
+ string in variables ARG1, ARG2, ... ARG9.  Each parameter is also stored as one
+ element of the array ARGV[9]. Numerical values are stored as complex variables.
+ All other values are stored as strings.  Thus after a call 
+
+      call 'routine_1.gp'  1 pi "title"
+
+ The three arguments are available inside routine_1.gp as follows
+
+      ARG1 = "1"         ARGV[1] = 1.0
+      ARG2 = "3.14159"   ARGV[2] = 3.14159265358979... 
+      ARG3 = "title"     ARGV[3] = "title"
+
+ In this example ARGV[1] and ARGV[2] have the full precision of a floating point
+ variable.  ARG2 lost precision in being stored as a string using format "%g".
 3 Example
 ?call example
 ?commands call example
