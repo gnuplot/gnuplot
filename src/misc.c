@@ -226,7 +226,7 @@ prepare_call(int calltype)
 
     argv_size = GPMIN(call_argc, 9);
     udv->udv_value.type = ARRAY;
-    ARGV = udv->udv_value.v.value_array = gp_alloc((argv_size + 1) * sizeof(t_value), "array_command");
+    ARGV = udv->udv_value.v.value_array = gp_alloc((argv_size + 1) * sizeof(t_value), "array state");
     ARGV[0].v.int_val = argv_size;
 
     for (argindex = 1; argindex <= 9; argindex++) {
@@ -498,19 +498,13 @@ lf_pop()
 
 	if ((udv = get_udv_by_name("ARGV")) && udv->udv_value.type == ARRAY) {
 	    struct value *ARGV;
-	    int argv_size = GPMIN(call_argc, 9);
+	    int argv_size = lf->argv[0].v.int_val;
 
 	    gpfree_array(&(udv->udv_value));
 	    udv->udv_value.type = ARRAY;
-	    ARGV = udv->udv_value.v.value_array = gp_alloc((argv_size + 1) * sizeof(t_value), "array_command");
-	    ARGV[0].v.int_val = argv_size;
-
-	    for (argindex = 1; argindex <= argv_size; argindex++) {
-		if (!call_args[argindex - 1])
-		    ARGV[argindex].type = NOTDEFINED;
-		else
-		    Gstring(&ARGV[argindex], gp_strdup(call_args[argindex-1]));
-	    }
+	    ARGV = udv->udv_value.v.value_array = gp_alloc((argv_size + 1) * sizeof(t_value), "array state");
+	    for (argindex = 0; argindex <= argv_size; argindex++)
+		ARGV[argindex] = lf->argv[argindex];
 	}
 
     }
@@ -572,9 +566,16 @@ lf_push(FILE *fp, char *name, char *cmdline)
 
     /* Call arguments are irrelevant if invoked from do_string_and_free */
     if (cmdline == NULL) {
+	struct udvt_entry *udv;
+	/* Save ARG0 through ARG9 */
 	for (argindex = 0; argindex < 10; argindex++) {
 	    lf->call_args[argindex] = call_args[argindex];
 	    call_args[argindex] = NULL;	/* initially no args */
+	}
+	/* Save ARGV[] */
+	if ((udv = get_udv_by_name("ARGV")) && udv->udv_value.type == ARRAY) {
+	    for (argindex = 0; argindex <= call_argc; argindex++)
+		lf->argv[argindex] = udv->udv_value.v.value_array[argindex];
 	}
     }
     lf->depth = lf_head ? lf_head->depth+1 : 0;	/* recursion depth */
