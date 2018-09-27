@@ -3062,7 +3062,8 @@ eval_plots()
 
 		/* Check for a sampling range. */
 		/* Only relevant to function plots, and only needed in second pass. */
-		init_sample_range(axis_array + x_axis);
+		if (!parametric)
+		    init_sample_range(axis_array + x_axis);
 		sample_range_token = parse_range(SAMPLE_AXIS);
 		dummy_func = &plot_func;
 
@@ -3111,12 +3112,13 @@ eval_plots()
 			double x, temp;
 			struct value a;
 			double t = t_min + i * t_step;
-			if (axis_array[SAMPLE_AXIS].linked_to_primary) {
+
+			if (parametric) {
+			    /* SAMPLE_AXIS is not relevant in parametric mode */
+			} else if (axis_array[SAMPLE_AXIS].linked_to_primary) {
 			    AXIS *vis = axis_array[SAMPLE_AXIS].linked_to_primary->linked_to_secondary;
 			    t = eval_link_function(vis, t_min + i * t_step);
 			} else {
-			    t = t_min + i * t_step;
-
 			    /* Zero is often a special point in a function domain. */
 			    /* Make sure we don't miss it due to round-off error.  */
 			    if ((fabs(t) < 1.e-9) && (fabs(t_step) > 1.e-6))
@@ -3147,12 +3149,10 @@ eval_plots()
 			this_plot->points[i].type = INRANGE;
 
 			if (parametric) {
-			    /* we cannot do range-checking now, since for
-			     * the x function we did not know which axes
-			     * we were using
-			     * DO NOT TAKE LOGS YET - do it in parametric_fixup
+			    /* The syntax is plot x, y XnYnaxes
+			     * so we do not know the actual plot axes until
+			     * the y plot and cannot do range-checking now.
 			     */
-			    /* ignored, actually... */
 			    this_plot->points[i].x = t;
 			    this_plot->points[i].y = temp;
 			    if (boxwidth >= 0 && boxwidth_is_absolute )
@@ -3480,10 +3480,9 @@ parametric_fixup(struct curve_points *start_plot, int *plot_num)
 
 	    assert(xp->p_count == yp->p_count);
 
-	    /* because syntax is   plot x(t), y(t) axes ..., only
+	    /* IMPORTANT: because syntax is   plot x(t), y(t) XnYnaxes ..., only
 	     * the y function axes are correct
 	     */
-
 
 	    /*
 	     * Go through all the points assigning the y's from xp to be

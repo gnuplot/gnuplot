@@ -1,3 +1,12 @@
+2018-09-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c:  Fix regression in parametric plots with logscale x.
+	The check for logscaling in parametric plots was incorrectly made
+	against SAMPLE_AXIS rather than T_AXIS (not that we support logscale T).
+	So logscale x caused sample variable t to become 10^t.
+	This error was present in 5.2.0 through 5.2.4
+	Bug #2074
+
 2018-09-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c:  Resolve inconsistency in the type/content of arguments

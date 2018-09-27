@@ -11,6 +11,7 @@ Changes in 5.2.5
 * CHANGE Deprecate linux and vgagl terminals (to be removed in 5.3)
 * CHANGE placement of axis and tic labels in 3D projections on to xz or yz plane
 * CHANGE default to ./configure --without-wx-multithreading
+* FIX parametric plots did not work with logscale x (regression in 5.2.0-5.2.4)
 * FIX polar mode "set trange" was assumed to use radians, now it tracks "set angle"
 * FIX clip polar grid lines and ticks to x/y range limits
 * FIX clipping of plot "with lines" when axes are nonlinear (regression from 5.0)
