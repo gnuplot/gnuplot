@@ -155,7 +155,7 @@ prepare_call(int calltype)
 
     if (calltype == 2) {
 	call_argc = 0;
-	while (!END_OF_COMMAND && call_argc <= 9) {
+	while (!END_OF_COMMAND && call_argc < 9) {
 	    call_args[call_argc] = try_to_get_string();
 	    if (!call_args[call_argc]) {
 		int save_token = c_token;
