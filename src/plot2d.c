@@ -3113,7 +3113,7 @@ eval_plots()
 			struct value a;
 			double t = t_min + i * t_step;
 
-			if (parametric) {
+			if (parametric || polar) {
 			    /* SAMPLE_AXIS is not relevant in parametric mode */
 			} else if (axis_array[SAMPLE_AXIS].linked_to_primary) {
 			    AXIS *vis = axis_array[SAMPLE_AXIS].linked_to_primary->linked_to_secondary;
