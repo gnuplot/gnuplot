@@ -2520,7 +2520,6 @@ START_HELP(x11)
 "?set terminal x11 command-line-options",
 "?set term x11 command-line-options",
 "?x11 command-line-options",
-"?command-line-options",
 " In addition to the X Toolkit options, the following options may be specified",
 " on the command line when starting `gnuplot` or as resources in your",
 " \".Xdefaults\" file (note that `raise` and `persist` can be overridden",
