@@ -2343,7 +2343,7 @@ eval_3dplots()
 	update_primary_axis_range(&axis_array[FIRST_Z_AXIS]);
 	extend_primary_ticrange(&axis_array[FIRST_Z_AXIS]);
     } else {
-	axis_checked_extend_empty_range(FIRST_Z_AXIS, splot_map ? NULL : "All points y value undefined");
+	axis_checked_extend_empty_range(FIRST_Z_AXIS, splot_map ? NULL : "All points z value undefined");
 	axis_check_range(FIRST_Z_AXIS);
     }
 
