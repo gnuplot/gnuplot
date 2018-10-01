@@ -149,7 +149,7 @@ static void boundary3d __PROTO((struct surface_points * plots, int count));
 
 /* put entries in the key */
 static void key_sample_line __PROTO((int xl, int yl));
-static void key_sample_point __PROTO((int xl, int yl, int pointtype));
+static void key_sample_point __PROTO((struct surface_points *this_plot, int xl, int yl, int pointtype));
 static void key_sample_line_pm3d __PROTO((struct surface_points *plot, int xl, int yl));
 static void key_sample_point_pm3d __PROTO((struct surface_points *plot, int xl, int yl, int pointtype));
 static void key_sample_fill __PROTO((int xl, int yl, struct surface_points *this_plot));
@@ -1202,7 +1202,7 @@ do_3dplot(
 	    case LABELPOINTS:
 		if ((this_plot->labels->lp_properties.flags & LP_SHOW_POINTS)) {
 		    term_apply_lp_properties(&this_plot->labels->lp_properties);
-		    key_sample_point(xl, yl, this_plot->labels->lp_properties.p_type);
+		    key_sample_point(this_plot, xl, yl, this_plot->labels->lp_properties.p_type);
 		}
 		break;
 
@@ -1310,10 +1310,10 @@ do_3dplot(
 				key_sample_line(xl, yl);
 				break;
 			    case POINTSTYLE:
-				key_sample_point(xl, yl, this_plot->lp_properties.p_type);
+				key_sample_point(this_plot, xl, yl, this_plot->lp_properties.p_type);
 				break;
 			    case DOTS:
-				key_sample_point(xl, yl, -1);
+				key_sample_point(this_plot, xl, yl, -1);
 				break;
 			    default:
 				break;
@@ -3249,7 +3249,7 @@ key_sample_line(int xl, int yl)
 }
 
 static void
-key_sample_point(int xl, int yl, int pointtype)
+key_sample_point(struct surface_points *this_plot, int xl, int yl, int pointtype)
 {
     BoundingBox *clip_save = clip_area;
 
@@ -3260,8 +3260,16 @@ key_sample_point(int xl, int yl, int pointtype)
 	clip_area = &canvas;
 
     (term->layer)(TERM_LAYER_BEGIN_KEYSAMPLE);
-    if (!clip_point(xl + key_point_offset, yl))
-	(*term->point) (xl + key_point_offset, yl, pointtype);
+    if (!clip_point(xl + key_point_offset, yl)) {
+	if (pointtype == PT_CHARACTER && this_plot) {
+	    apply_pm3dcolor(&(this_plot->labels->textcolor));
+	    (*term->put_text) (xl + key_point_offset, yl,
+			       this_plot->lp_properties.p_char);
+	    apply_pm3dcolor(&(this_plot->lp_properties.pm3d_color));
+	} else {
+	    (*term->point) (xl + key_point_offset, yl, pointtype);
+	}
+    }
     (term->layer)(TERM_LAYER_END_KEYSAMPLE);
 
     clip_area = clip_save;
@@ -3402,7 +3410,7 @@ key_sample_point_pm3d(
 	if (plot->lp_properties.l_type == LT_COLORFROMCOLUMN)
 		lp_use_properties(&lptmp, (int)(plot->iso_crvs->points[0].CRD_COLOR));
 	apply_pm3dcolor(&lptmp.pm3d_color);
-	key_sample_point(xl,yl,pointtype);
+	key_sample_point(plot, xl, yl, pointtype);
 	return;
     }
 
