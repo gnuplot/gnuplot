@@ -573,6 +573,7 @@ lf_push(FILE *fp, char *name, char *cmdline)
 	    call_args[argindex] = NULL;	/* initially no args */
 	}
 	/* Save ARGV[] */
+	lf->argv[0].v.int_val = 0;
 	if ((udv = get_udv_by_name("ARGV")) && udv->udv_value.type == ARRAY) {
 	    for (argindex = 0; argindex <= call_argc; argindex++)
 		lf->argv[argindex] = udv->udv_value.v.value_array[argindex];
