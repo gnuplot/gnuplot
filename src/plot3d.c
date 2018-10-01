@@ -1748,6 +1748,11 @@ eval_3dplots()
 			    set_labelstyle = TRUE;
 			    continue;
 			}
+		    } else if (this_plot->lp_properties.p_type == PT_CHARACTER) {
+			if  (equals(c_token, ","))
+			    break;
+			else
+			    continue;
 		    }
 		}
 
@@ -2257,7 +2262,7 @@ eval_3dplots()
 	update_primary_axis_range(&axis_array[FIRST_Z_AXIS]);
 	extend_primary_ticrange(&axis_array[FIRST_Z_AXIS]);
     } else {
-	axis_checked_extend_empty_range(FIRST_Z_AXIS, splot_map ? NULL : "All points y value undefined");
+	axis_checked_extend_empty_range(FIRST_Z_AXIS, splot_map ? NULL : "All points z value undefined");
 	axis_revert_and_unlog_range(FIRST_Z_AXIS);
     }
 
