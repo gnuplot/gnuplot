@@ -1908,9 +1908,8 @@ eval_plots()
 	    newhist_pattern = fs.fillpattern;
 	    if (!equals(c_token,","))
 		int_error(c_token,"syntax error");
-	} else
 
-	if (is_definition(c_token)) {
+	} else if (is_definition(c_token)) {
 	    define();
 	    if (equals(c_token,","))
 		c_token++;
@@ -2024,9 +2023,19 @@ eval_plots()
 		/* include modifiers in default title */
 		this_plot->token = end_token = c_token - 1;
 
-	    } else {
+	    } else if (equals(c_token, "keyentry")) {
+		c_token++;
+		if (*tp_ptr)
+		    this_plot = *tp_ptr;
+		else {          /* no memory malloc()'d there yet */
+		    this_plot = cp_alloc(MIN_CRV_POINTS);
+		    *tp_ptr = this_plot;
+		}
+		this_plot->plot_type = KEYENTRY;
+		this_plot->plot_style = LABELPOINTS;
+		this_plot->token = end_token = c_token - 1;
 
-		/* function to plot */
+	    } else { /* function to plot */
 
 		some_functions = TRUE;
 		if (parametric) /* working on x parametric function */
@@ -2203,7 +2212,7 @@ eval_plots()
 		    if (this_plot->plot_style == IMAGE
 		    ||  this_plot->plot_style == RGBIMAGE
 		    ||  this_plot->plot_style == RGBA_IMAGE) {
-			if (this_plot->plot_type == FUNC)
+			if (this_plot->plot_type != DATA)
 			    int_error(c_token, "This plot style is only for data files");
 			else
 			    get_image_options(&this_plot->image_properties);
@@ -2663,7 +2672,7 @@ eval_plots()
 	    /* Image plots require 2 input dimensions */
 	    if (this_plot->plot_style == IMAGE
 	    ||  this_plot->plot_style == RGBIMAGE ||  this_plot->plot_style == RGBA_IMAGE) {
-		if (!strcmp(df_filename,"+"))
+		if (!df_filename || !strcmp(df_filename,"+"))
 		    int_error(NO_CARET, "image plots need more than 1 coordinate dimension ");
 	    }
 
@@ -2962,6 +2971,8 @@ eval_plots()
 
 		if (almost_equals(c_token, "newhist$ogram")) {
 		    /* Make sure this isn't interpreted as a function */
+		    name_str = "";
+		} else if (equals(c_token, "keyentry")) {
 		    name_str = "";
 		} else {
 		    /* Allow replacement of the dummy variable in a function */
@@ -3478,7 +3489,8 @@ parse_plot_title(struct curve_points *this_plot, char *xtitle, char *ytitle, TBO
 		/* We can evaluate the title for a function plot immediately */
 		/* FIXME: or this code could go into eval_plots() so that    */
 		/*        function and data plots are treated the same way.  */
-		if (this_plot->plot_type == FUNC || this_plot->plot_type == FUNC3D) {
+		if (this_plot->plot_type == FUNC || this_plot->plot_type == FUNC3D
+		||  this_plot->plot_type == KEYENTRY) {
 		    struct value a;
 		    evaluate_at(df_plot_title_at, &a);
 		    if (a.type == STRING) {

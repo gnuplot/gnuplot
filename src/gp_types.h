@@ -58,7 +58,7 @@ enum MODE_PLOT_TYPE {
 };
 
 enum PLOT_TYPE {
-	FUNC, DATA, FUNC3D, DATA3D, NODATA
+	FUNC, DATA, FUNC3D, DATA3D, NODATA, KEYENTRY
 };
 
 /* we explicitly assign values to the types, such that we can

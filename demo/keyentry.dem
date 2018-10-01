@@ -1,0 +1,41 @@
+#
+# Demonstrate use of "keyentry" elements to build a key
+#
+set key title "Key made with explicit \n{/:Italic keyentry} elements"
+set key box reverse Left right samplen 2
+
+plot keyentry with points pt '¶' title "points", \
+     keyentry with lp title "lp", \
+     keyentry with yerrorbars title "yerrorbars", \
+     keyentry with xyerrorlines title "xyerrorlines", \
+     keyentry with circles fs solid fc "dark-red" title "circles", \
+     keyentry with ellipses title "ellipses", \
+sin(x)/x lc "grey" dt '.-' lw 3 title "normal plot", \
+     keyentry with boxerrorbars title "boxerrorbars", \
+     keyentry with boxplot fs pattern 1 title "boxplot", \
+     keyentry with labels point pt 4 title "labels", \
+     keyentry with vectors title "vectors"
+
+pause -1 "<cr> to continue"
+
+#
+# Same for 3D plots
+#
+set hidden3d
+set key title "Key made with explicit \n{/:Italic keyentry} elements"
+set key box reverse Left right opaque
+unset colorbox
+
+splot keyentry with points pt '¶' title "points", \
+     keyentry with lp title "lp", \
+     keyentry with zerrorfill title "zerrorfill", \
+     keyentry with circles fs solid fc "grey" title "circles", \
+(1.-(x**2+y**2)/100.) title "normal plot" lc "grey", \
+     keyentry with boxes title "boxes", \
+     keyentry with labels point pt 4 title "labels", \
+     keyentry with vectors title "vectors", \
+     keyentry with pm3d title "pm3d"
+
+pause -1 "<cr> to continue"
+
+reset

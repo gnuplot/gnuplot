@@ -1590,6 +1590,20 @@ eval_3dplots()
 		df_axis[1] = FIRST_Y_AXIS;
 		df_axis[2] = FIRST_Z_AXIS;
 
+	    } else if (equals(c_token, "keyentry")) {
+		c_token++;
+		plot_num++;
+		if (*tp_3d_ptr)
+		    this_plot = *tp_3d_ptr;
+		else {		/* no memory malloc()'d there yet */
+		    /* Allocate enough isosamples and samples */
+		    this_plot = sp_alloc(0, 0, 0, 0);
+		    *tp_3d_ptr = this_plot;
+		}
+		this_plot->plot_type = KEYENTRY;
+		this_plot->plot_style = LABELPOINTS;
+		this_plot->token = end_token = c_token - 1;
+
 	    } else {		/* function to plot */
 
 		++plot_num;
@@ -2244,7 +2258,9 @@ eval_3dplots()
 		dummy_func = &plot_func;
 		name_str = string_or_express(&at_ptr);
 
-		if (!name_str) {                /* func to plot */
+		if (equals(c_token, "keyentry")) {
+
+		} else if (!name_str) {                /* func to plot */
 		    /*{{{  evaluate function */
 		    struct iso_curve *this_iso = this_plot->iso_crvs;
 		    int num_sam_to_use, num_iso_to_use;

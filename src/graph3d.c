@@ -68,6 +68,7 @@
 static int key_entry_height;	/* bigger of t->v_char, pointsize*t->v_tick */
 static int key_title_height;
 static int key_title_extra;	/* allow room for subscript/superscript */
+static int key_title_width;
 
 /* is contouring wanted ? */
 t_contour_placement draw_contour = CONTOUR_NONE;
@@ -151,7 +152,7 @@ static void key_sample_line __PROTO((int xl, int yl));
 static void key_sample_point __PROTO((struct surface_points *this_plot, int xl, int yl, int pointtype));
 static void key_sample_line_pm3d __PROTO((struct surface_points *plot, int xl, int yl));
 static void key_sample_point_pm3d __PROTO((struct surface_points *plot, int xl, int yl, int pointtype));
-static void key_sample_fill __PROTO((int xl, int yl, struct fill_style_type *fs));
+static void key_sample_fill __PROTO((int xl, int yl, struct surface_points *this_plot));
 static TBOOLEAN can_pm3d = FALSE;
 static void key_text __PROTO((int xl, int yl, char *text));
 static void check3d_for_variable_color __PROTO((struct surface_points *plot, struct coordinate *point));
@@ -304,7 +305,7 @@ boundary3d(struct surface_points *plots, int count)
 {
     legend_key *key = &keyT;
     struct termentry *t = term;
-    int ytlen, i;
+    int i;
 
     titlelin = 0;
 
@@ -317,12 +318,13 @@ boundary3d(struct surface_points *plots, int count)
 	/* is this reasonable ? */
 	key_entry_height = t->v_char * key->vert_factor;
     }
-    /* count max_len key and number keys (plot-titles and contour labels) with len > 0 */
+
+    /* Approximate width of titles is used to determine number of rows, cols
+     * The actual widths will be recalculated later
+     */
     max_ptitl_len = find_maxl_keys3d(plots, count, &ptitl_cnt);
-    ytlen = label_width(key->title.text, &i) - (key->swidth + 2);
+    key_title_width = label_width(key->title.text, &i) * t->h_char;
     ktitle_lines = i;
-    if (ytlen > max_ptitl_len)
-	max_ptitl_len = ytlen;
     key_col_wth = (max_ptitl_len + 4) * t->h_char + key_sample_width;
 
     if (lmargin.scalex == screen)
@@ -420,7 +422,7 @@ boundary3d(struct surface_points *plots, int count)
     if (key->visible)
     if ((key->region == GPKEY_AUTO_EXTERIOR_LRTBC || key->region == GPKEY_AUTO_EXTERIOR_MARGIN)
 	&& key->margin == GPKEY_RMARGIN) {
-	int key_width = key_col_wth * (key_cols - 1) + key_col_wth - 2 * t->h_char;
+	int key_width = key_col_wth * key_cols - 2 * t->h_char;
 	if (rmargin.scalex != screen)
 	    plot_bounds.xright -= key_width;
     }
@@ -428,7 +430,7 @@ boundary3d(struct surface_points *plots, int count)
     if (key->visible)
     if ((key->region == GPKEY_AUTO_EXTERIOR_LRTBC || key->region == GPKEY_AUTO_EXTERIOR_MARGIN)
 	&& key->margin == GPKEY_LMARGIN) {
-	int key_width = key_col_wth * (key_cols - 1) + key_col_wth - 2 * t->h_char;
+	int key_width = key_col_wth * key_cols - 2 * t->h_char;
 	if (lmargin.scalex != screen)
 	    plot_bounds.xleft += key_width;
     }
@@ -656,7 +658,7 @@ do_3dplot(
 
     /* In the case of a nonlinear z axis this points to the linear version */
     /* that shadows it.  Otherwise it just points to FIRST_Z_AXIS.         */
-    primary_z = (nonlinear(&Z_AXIS)) ? Z_AXIS.linked_to_primary : &Z_AXIS; 
+    primary_z = (nonlinear(&Z_AXIS)) ? Z_AXIS.linked_to_primary : &Z_AXIS;
 
     /* absolute or relative placement of xyplane along z */
     if (nonlinear(&Z_AXIS)) {
@@ -1009,7 +1011,7 @@ do_3dplot(
 	    /* Sync point for start of new curve (used by svg, post, ...) */
 	    (term->layer)(TERM_LAYER_BEFORE_PLOT);
 
-	    if (!key_pass)
+	    if (!key_pass && this_plot->plot_type != KEYENTRY)
 	    if (can_pm3d && PM3D_IMPLICIT == pm3d.implicit)
 		pm3d_draw_one(this_plot);
 
@@ -1024,7 +1026,7 @@ do_3dplot(
 		if (this_plot->title_position->scalex != character) {
 		    map3d_position(this_plot->title_position, &xl, &yl, "key sample");
 		    xl -=  (key->just == GPKEY_LEFT) ? key_text_left : key_text_right;
-		} else { 
+		} else {
 		    /* Option to label the end of the curve on the plot itself */
 		    attach_title_to_plot((struct curve_points *)this_plot, key);
 		}
@@ -1050,7 +1052,7 @@ do_3dplot(
 	    term_apply_lp_properties(&(this_plot->lp_properties));
 
 	    /* First draw the graph plot itself */
-	    if (!key_pass)
+	    if (!key_pass && this_plot->plot_type != KEYENTRY)
 	    switch (this_plot->plot_style) {
 	    case FILLEDCURVES:	/* same, but maybe we could dummy up ZERRORFILL? */
 	    case IMPULSES:
@@ -1199,7 +1201,6 @@ do_3dplot(
 	    case CANDLESTICKS:	/* HBB: ditto */
 	    case BOXPLOT:
 	    case FINANCEBARS:
-	    case CIRCLES:
 	    case ELLIPSES:
 	    case POINTSTYLE:
 		if (draw_this_surface)
@@ -1232,15 +1233,17 @@ do_3dplot(
 
 	    case ZERRORFILL:
 		apply_pm3dcolor(&this_plot->fill_properties.border_color);
-		key_sample_fill(xl, yl, &this_plot->fill_properties);
+		key_sample_fill(xl, yl, this_plot);
 		term_apply_lp_properties(&this_plot->lp_properties);
 		key_sample_line(xl, yl);
 		break;
 
 	    case BOXES:
+	    case CIRCLES:
 		apply_pm3dcolor(&this_plot->lp_properties.pm3d_color);
-		check3d_for_variable_color(this_plot, this_plot->iso_crvs->points);
-		key_sample_fill(xl, yl, &this_plot->fill_properties);
+		if (this_plot->iso_crvs)
+		    check3d_for_variable_color(this_plot, this_plot->iso_crvs->points);
+		key_sample_fill(xl, yl, this_plot);
 		break;
 
 	    case PLOT_STYLE_NONE:
@@ -2308,7 +2311,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		    int count;
 		    int iso;
 
-		    if (plot->plot_type == NODATA)
+		    if (plot->plot_type == NODATA || plot->plot_type == KEYENTRY)
 			continue;
 		    if (plot->plot_type == DATA3D) {
 			if (!plot->has_grid_topology)
@@ -3306,8 +3309,9 @@ key_sample_point(struct surface_points *this_plot, int xl, int yl, int pointtype
 }
 
 static void
-key_sample_fill(int xl, int yl, struct fill_style_type *fs)
+key_sample_fill(int xl, int yl, struct surface_points *this_plot)
 {
+    struct fill_style_type *fs = &this_plot->fill_properties;
     int style = style_from_fill(fs);
     int x = xl + key_sample_left;
     int y = yl - key_entry_height/4;
@@ -3317,8 +3321,17 @@ key_sample_fill(int xl, int yl, struct fill_style_type *fs)
     if (!(term->fillbox))
 	return;
     (term->layer)(TERM_LAYER_BEGIN_KEYSAMPLE);
-    if (w > 0)
+
+    if (this_plot->plot_style == CIRCLES) {
+	do_arc(x+w/2, yl, key_entry_height/4, 0., 360., style, FALSE);
+	/* Retrace the border if the style requests it */
+	if (need_fill_border(fs))
+	    do_arc(x+w/2, yl, key_entry_height/4, 0., 360., 0, FALSE);
+
+    } else if (w > 0) {
 	(term->fillbox)(style,x,y,w,h);
+    }
+
     (term->layer)(TERM_LAYER_END_KEYSAMPLE);
 }
 
@@ -3536,7 +3549,7 @@ plot3d_vectors(struct surface_points *plot)
     }
 }
 
-/* 
+/*
  * splot with zerrorfill
  * This 3D style is similar to a 2D filledcurves plot between two lines.
  * Put together a list of the component quadrangles using the data structures
@@ -3772,6 +3785,10 @@ do_3dkey_layout(legend_key *key, int *xinkey, int *yinkey)
     key_width = key_col_wth * (key_cols - 1) + key_size_right + key_size_left;
     key_height = key_title_height + key_title_extra
 		+ key_entry_height * key_rows + key->height_fix * t->v_char;
+
+    /* Make room for extra long title */
+    if (key_width < key_title_width)
+	key_width = key_title_width;
 
     /* Now that we know the size of the key, we can position it as requested */
     if (key->region == GPKEY_USER_PLACEMENT) {

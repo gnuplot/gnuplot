@@ -228,6 +228,10 @@ C
 ##See `time_specifiers`.
 #bArray size can be implicit if initializer is present, e.g. `Array A = [1,2,3]`.
 #bOptional radial clipping of line segments in polar mode. See `set clip`.
+#bExtra lines to customize the key can be added by substituting `keyentry` in
+## place of a filename or function in `plot` and `splot` commands.
+##This produces a line in the key without generating a corresponding plot.
+##See `keyentry`.
 #bUser-specified translation of mouse coordinates (EXPERIMENTAL).
 ##See map_projection demo.
 #end
@@ -5941,6 +5945,7 @@ Ffigure_fenceplot
        plot-element:
             {<iteration>}
             <definition> | {sampling-range} <function> | <data source>
+                         | keyentry
             {axes <axes>} {<title-spec>}
             {with <style>}
 
@@ -10305,15 +10310,13 @@ Ffigure_missing
  borders.  Entering `set key default` returns the key to its default
  configuration.
 
- The key is drawn as a sequence of lines, with one plot described on each
- line.  On the right-hand side (or the left-hand side, if `reverse` is
- selected) of each line is a representation that attempts to mimic the way the
- curve is plotted.  On the other side of each line is the text description
- (the line title), obtained from the `plot` command.  The lines are vertically
- arranged so that an imaginary straight line divides the left- and right-hand
- sides of the key.  It is the coordinates of the top of this line that are
- specified with the `set key` command.  In a `plot`, only the x and y
- coordinates are used to specify the line position.
+ Each plot is represented in the key by a single line containing a line or
+ symbol or shape representing the plot style and a corresponding title.
+ Using the keyword `notitle` in the plot command will suppress generation of
+ the line.  Contour plots generated additional entries in the key, one for
+ each contour (see `cntrlabel`). You can add extra lines to the key by inserting
+ a dummy plot command that uses the keyword `keyentry` rather than a filename
+ or a function.  See `keyentry`.
 
  When using the TeX/LaTeX group of terminals or terminals in which formatting
  information is embedded in the string, `gnuplot` can only estimate the width
@@ -10341,7 +10344,6 @@ Ffigure_missing
  If `splot` is being used to draw contours, by default a separate key entry is
  generated for each contour level with a distinct line type.
  To modify this see `set cntrlabel`.
-
 4 key examples
 ?set key examples
 ?key examples
@@ -10361,6 +10363,23 @@ Ffigure_missing
  This places the key in the bottom left corner, left-justifies the text,
  gives it a title, and draws a box around it in linetype 3:
        set key left bottom Left title 'Legend' box 3
+
+Ffigure_keyentry
+4 extra key entries
+?key entries
+?keyentry
+ Normally each plot autogenerates a single line entry in the key.  If you need
+ more control over what appears in the key you can use the `keyentry` keyword
+ in the `plot` or `splot` coommand to insert extra lines.  Instead of providing
+ a filename or function to plot, use `keyentry` as a placeholder followed by
+ plot style information (used to generate a key symbol) and a title.
+ Example:
+      plot $HEATMAP matrix with image notitle, \
+           keyentry with boxes fc palette cb 0 title "no effect", \
+           keyentry with boxes fc palette cb 1 title "threshold", \
+           keyentry with boxes fc palette cb 3 title "typical range", \
+           keyentry with labels nopoint title "as reported in [12]", \
+           keyentry with boxes fc palette cb 5 title "strong effect"
 4 key autotitle
 ?commands set key autotitle
 ?set key autotitle
@@ -15122,6 +15141,7 @@ Ffigure_walls
        splot {<ranges>}
              {<iteration>}
              <function> | {{<file name> | <datablock name>} {datafile-modifiers}}
+                        | keyentry
              {<title-spec>} {with <style>}
              {, {definitions{,}} <function> ...}
 

@@ -1046,7 +1046,7 @@ build_networks(struct surface_points *plots, int pcount)
 	long int crvlen;
 	
 	/* Quietly skip empty plots */
-	if (this_plot->plot_type == NODATA)
+	if (this_plot->plot_type == NODATA || this_plot->plot_type == KEYENTRY)
 	    continue;
 
 	crvlen = this_plot->iso_crvs->p_count;
@@ -1166,7 +1166,7 @@ build_networks(struct surface_points *plots, int pcount)
 	lp = &(this_plot->lp_properties);
 
 	/* Quietly skip empty plots */
-	if (this_plot->plot_type == NODATA)
+	if (this_plot->plot_type == NODATA || this_plot->plot_type == KEYENTRY)
 	    continue;
 
 	/* Allow individual plots to opt out of hidden3d calculations */
