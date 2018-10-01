@@ -1822,6 +1822,11 @@ eval_3dplots()
 			    set_labelstyle = TRUE;
 			    continue;
 			}
+		    } else if (this_plot->lp_properties.p_type == PT_CHARACTER) {
+			if  (equals(c_token, ","))
+			    break;
+			else
+			    continue;
 		    }
 		}
 
