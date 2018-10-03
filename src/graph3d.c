@@ -68,6 +68,7 @@
 static int key_entry_height;	/* bigger of t->v_char, pointsize*t->v_tick */
 static int key_title_height;
 static int key_title_extra;	/* allow room for subscript/superscript */
+static int key_title_width;
 
 /* is contouring wanted ? */
 t_contour_placement draw_contour = CONTOUR_NONE;
@@ -303,7 +304,7 @@ boundary3d(struct surface_points *plots, int count)
 {
     legend_key *key = &keyT;
     struct termentry *t = term;
-    int ytlen, i;
+    int i;
 
     titlelin = 0;
 
@@ -316,12 +317,13 @@ boundary3d(struct surface_points *plots, int count)
 	/* is this reasonable ? */
 	key_entry_height = t->v_char * key->vert_factor;
     }
-    /* count max_len key and number keys (plot-titles and contour labels) with len > 0 */
+
+    /* Approximate width of titles is used to determine number of rows, cols
+     * The actual widths will be recalculated later
+     */
     max_ptitl_len = find_maxl_keys3d(plots, count, &ptitl_cnt);
-    ytlen = label_width(key->title.text, &i) - (key->swidth + 2);
+    key_title_width = label_width(key->title.text, &i) - (key->swidth + 2);
     ktitle_lines = i;
-    if (ytlen > max_ptitl_len)
-	max_ptitl_len = ytlen;
     key_col_wth = (max_ptitl_len + 4) * t->h_char + key_sample_width;
 
     if (lmargin.scalex == screen)
@@ -3605,6 +3607,10 @@ do_3dkey_layout(legend_key *key, int *xinkey, int *yinkey)
     key_width = key_col_wth * (key_cols - 1) + key_size_right + key_size_left;
     key_height = key_title_height + key_title_extra
 		+ key_entry_height * key_rows + key->height_fix * t->v_char;
+
+    /* Make room for extra long title */
+    if (key_width < key_title_width)
+	key_width = key_title_width;
 
     /* Now that we know the size of the key, we can position it as requested */
     if (key->region == GPKEY_USER_PLACEMENT) {
