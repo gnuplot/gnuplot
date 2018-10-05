@@ -195,9 +195,6 @@ num_curves(struct curve_points *plot)
    The implementation is based closely on the implementation for Bezier
    curves, except for the way the actual interpolation is generated.
 
-   EAM Feb 2015 - Revise to handle logscaled y axis and to
-   pass in an actual x coordinate rather than a fraction of the min/max range.
-   NB: This code does not deal with logscaled x axis.
    FIXME: It's silly to recalculate the mean/stddev/bandwidth every time.
 */
 
@@ -264,7 +261,7 @@ do_kdensity(
     y_axis = cp->y_axis;
 
     if (X_AXIS.log)
-	int_error(NO_CARET, "kdensity cannot handle logscale x axis");
+	int_warn(NO_CARET, "kdensity components are Gaussian on x, not log(x)");
     sxmin = X_AXIS.min;
     sxmax = X_AXIS.max;
 
