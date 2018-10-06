@@ -3599,8 +3599,15 @@ parse_plot_title(struct curve_points *this_plot, char *xtitle, char *ytitle, TBO
 	    evaluate_inside_using = TRUE;
 	    temp = try_to_get_string();
 	    evaluate_inside_using = FALSE;
-	    if (!this_plot->title_is_suppressed && !(this_plot->title = temp))
+	    if (!this_plot->title_is_suppressed) {
+		if (!temp)
 		    int_error(c_token, "expecting \"title\" for plot");
+		if (this_plot->plot_style == HISTOGRAMS
+		&&  histogram_opts.type == HT_STACKED_IN_TOWERS)
+		    df_key_title = temp;
+		else
+		    this_plot->title = temp;
+	    }
 	}
 	if (equals(c_token,"at")) {
 	    int save_token = ++c_token;

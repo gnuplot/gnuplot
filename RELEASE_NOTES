@@ -3,7 +3,7 @@
 
 These release notes are for version 5.2 patchlevel 5 (5.2.5).
 This release contains bug-fixes, a few changes back-ported from the
-development version, and a few new features.  The most notable fixes are
+development version, and three new features.  The most notable fixes are
 (1) improved clipping of lines or other plot elements that would otherwise
 extend beyond the edges of the plot. 
 (2) in versions 5.2.0 through 5.2.4 function plots in parametric and polar
@@ -12,7 +12,7 @@ modes did not work with logscale x axis.
 Please see the ChangeLog file for a complete list of changes made during the
 course of development from 5.0 to 5.2.
 
-Release Notes date: 01-October-2018
+Release Notes date: 06-October-2018
 
 
 CHANGES IN 5.2.5
@@ -21,6 +21,7 @@ CHANGES IN 5.2.5
 * NEW "set pm3d depthorder base" sorts pm3d quadrangles by projecting to z=0
 * NEW "set jitter vertical" displaces y coordinate rather than x coordinate
 * NEW array size can be determined automatically from the initializer
+* CHANGE place titles along x axis in plots with columnstacked histograms
 * CHANGE equivalent slope constraint for mcs splines at both ends of the range
 * CHANGE treat imaginary values plotted from a using spec as UNDEFINED (NaN)
 * CHANGE allow "reset" between plots in a multiplot layout

@@ -2600,7 +2600,7 @@ f_column(union argument *arg)
     } else
 	column = (int) real(&a);
 
-    if (column == -2)
+    if (column == -2)		/* pseudocolumn -2 means "index" */
 	push(Ginteger(&a, df_current_index));
     else if (column == -1)
 	push(Ginteger(&a, line_count));
@@ -2678,10 +2678,8 @@ f_stringcolumn(union argument *arg)
     if (column == -3)	/* pseudocolumn -3 means "last column" */
 	column = df_no_cols;
 
-    if (column == -2) {
-	char temp_string[32];
-	sprintf(temp_string, "%d", df_current_index);
-	push(Gstring(&a, temp_string ));
+    if (column == -2) {	/* pseudocolumn -2 means "index" */
+	push(Gstring(&a, indexname));
     } else if (column == -1) {
 	char temp_string[32];
 	sprintf(temp_string, "%d", line_count);

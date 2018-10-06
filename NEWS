@@ -3,6 +3,7 @@ Changes in 5.2.5
 * NEW "set pm3d depthorder base" sorts pm3d quadrangles by projecting to z=0
 * NEW "set jitter vertical" displaces y coordinate rather than x coordinate
 * NEW array size can be determined automatically from the initializer
+* CHANGE place titles along x axis in plots with columnstacked histograms
 * CHANGE equivalent slope constraint for mcs splines at both ends of the range
 * CHANGE numerical arguments to "call" are stored in ARG1..ARGn as strings
 * CHANGE numerical arguments to "call" are stored in ARGV[n] as complex
