@@ -3557,6 +3557,12 @@ reevaluate_plot_title(struct curve_points *this_plot)
 	if (a.type == STRING) {
 	    free(this_plot->title);
 	    this_plot->title = a.v.string_val;
+	    /* Special case where the "title" is used as a tic label */
+	    if (this_plot->plot_style == HISTOGRAMS
+	    &&  histogram_opts.type == HT_STACKED_IN_TOWERS) {
+		double xpos = this_plot->histogram_sequence + this_plot->histogram->start;
+		add_tic_user(&axis_array[FIRST_X_AXIS], this_plot->title, xpos, -1);
+	    }
 	}
     }
 }

@@ -2637,10 +2637,8 @@ f_stringcolumn(union argument *arg)
     if (column == -3)	/* pseudocolumn -3 means "last column" */
 	column = df_no_cols;
 
-    if (column == -2) {
-	char temp_string[32];
-	sprintf(temp_string, "%d", df_current_index);
-	push(Gstring(&a, temp_string ));
+    if (column == -2)	/* pseudocolumn -2 means "index" */ {
+	push(Gstring(&a, indexname));
     } else if (column == -1) {
 	char temp_string[32];
 	sprintf(temp_string, "%d", line_count);
@@ -2654,7 +2652,7 @@ f_stringcolumn(union argument *arg)
 	push(&a);               /* any objection to this ? */
     } else {
 	char *temp_string = df_parse_string_field(df_column[column-1].position);
-	push(Gstring(&a, temp_string ? temp_string : ""));
+	push(Gstring(&a, temp_string ));
 	free(temp_string);
     }
 }
@@ -2893,8 +2891,10 @@ df_set_key_title(struct curve_points *plot)
 
     if (plot->plot_style == HISTOGRAMS
     &&  histogram_opts.type == HT_STACKED_IN_TOWERS) {
-	/* In this case it makes no sense to treat key titles in the usual */
-	/* way, so we assume that it is supposed to be an xtic label.      */
+	/* In this case it makes no sense to treat key titles in the usual
+	 * way, so we assume that it is supposed to be an xtic label.
+	 */
+	/* Only for "plot ... title columnhead" */
 	double xpos = plot->histogram_sequence + plot->histogram->start;
 	add_tic_user(&axis_array[FIRST_X_AXIS], df_key_title, xpos, -1);
 	free(df_key_title);
