@@ -202,37 +202,37 @@ C
 
 4 Support for 64-bit integer arithmetic
 #start
-#bAll evaluation of expressions and functions uses 64-integer arithmetic if
+#b All evaluation of expressions and functions uses 64-integer arithmetic if
 ##supported by the platform.
-#bInteger overflow is detected and handled according to user preference.
+#b Integer overflow is detected and handled according to user preference.
 ##See `overflow`.
 #end
 
 4 New plot styles and style options
 #start
-#bPlot style `with circles` can be used in 3D plots.
-#bPlot style `with boxes` can be used in 3D plots.
-#bPm3d surfaces can have individual fillstyle and fillcolor
-#bCustomized contour line types. See `set cntrparam`.
+#b Plot style `with circles` can be used in 3D plots.
+#b Plot style `with boxes` can be used in 3D plots.
+#b Pm3d surfaces can have individual fillstyle and fillcolor
+#b Customized contour line types. See `set cntrparam`.
 #end
 
 4 New commands and command options
 ?new commands
 #start
-#bNew options for showing the xy xz and yz planes in 3D plots.
+#b New options for showing the xy xz and yz planes in 3D plots.
 ##See `set walls`, `set grid vertical`.
-#b`set table separator {tab|comma|"char"}` can be used to create csv files.
+#b `set table separator {tab|comma|"char"}` can be used to create csv files.
 ##See `plot with table`.
-#b`set rgbmax <value>` controls interpretation of input RGB values.
-#bnew formats descriptors tH tM tS handle relative times (interval lengths).
+#b `set rgbmax <value>` controls interpretation of input RGB values.
+#b new formats descriptors tH tM tS handle relative times (interval lengths).
 ##See `time_specifiers`.
-#bArray size can be implicit if initializer is present, e.g. `Array A = [1,2,3]`.
-#bOptional radial clipping of line segments in polar mode. See `set clip`.
-#bExtra lines to customize the key can be added by substituting `keyentry` in
+#b Array size can be implicit if initializer is present, e.g. `Array A = [1,2,3]`.
+#b Optional radial clipping of line segments in polar mode. See `set clip`.
+#b Extra lines to customize the key can be added by substituting `keyentry` in
 ## place of a filename or function in `plot` and `splot` commands.
 ##This produces a line in the key without generating a corresponding plot.
 ##See `keyentry`.
-#bUser-specified translation of mouse coordinates (EXPERIMENTAL).
+#b User-specified translation of mouse coordinates (EXPERIMENTAL).
 ##See map_projection demo.
 #end
 
@@ -244,14 +244,14 @@ C
 
 4 Other new features
 #start
-#bEnhanced text mode accepts \U+xxxx (xxxx is a 4 or 5 character hexadecimal)
+#b Enhanced text mode accepts \U+xxxx (xxxx is a 4 or 5 character hexadecimal)
 ##as representing a Unicode code point that is converted to the corresponding
 ##UTF-8 byte sequence on output. EXPERIMENTAL (implementation may change)
 #end
 
 4 Changes
 #start
-#bImaginary values returned by the using specifier of a 2D plot are treated as
+#b Imaginary values returned by the using specifier of a 2D plot are treated as
 ##undefined values (NaN) rather than as real(value).  This was always true for
 ##function plots and 3D data plots.  E.g. the following two plots are equivalent.
 ##plot [-1:1] sqrt(x); plot [-1:1] '+' using 1:(sqrt($1)
@@ -1364,7 +1364,7 @@ C marker below is used to signal this to doc2html:
 4 besj0
 ?expressions functions besj0
 ?besj0
-#besj0(x) & int or real &  $J_{0}$ Bessel function of $x$ in radians \\
+# besj0(x) & int or real &  $J_{0}$ Bessel function of $x$ in radians \\
 %besj0(x)@int or real@$J sub 0$ Bessel function of $x$ in radians
  The `besj0(x)` function returns the J0th Bessel function of its argument.
  `besj0` expects its argument to be in radians.
@@ -1398,27 +1398,27 @@ C marker below is used to signal this to doc2html:
 4 besyn
 ?expressions functions besyn
 ?besyn
-#besyn(n,x) & int, real & $Y_{n}$ Bessel function of $x$ in radians \\
+# besyn(n,x) & int, real & $Y_{n}$ Bessel function of $x$ in radians \\
 %besyn(n,x)@int,real@$Y sub n$ Bessel function of $x$ in radians
  The `besyn(n,x)` functions returns the Yn Bessel function of x in radians.
 4 besi0
 ?expressions functions besi0
 ?besi0
-#besi0(x) &real & Modified Bessel function of order 0, $x$ in radians \\
+# besi0(x) &real & Modified Bessel function of order 0, $x$ in radians \\
 %besi0(x)@real@ Modified Bessel function of order 0, $x$ in radians
  The `besi0(x)` function is the modified Bessel function or order 0.
  `besi0` expects its argument to be in radians.
 4 besi1
 ?expressions functions besi1
 ?besi1
-#besi1(x) &real & Modified Bessel function of order 1, $x$ in radians \\
+# besi1(x) &real & Modified Bessel function of order 1, $x$ in radians \\
 %besi1(x)@real@ Modified Bessel function of order 1, $x$ in radians
  The `besi1(x)` function is the modified Bessel function or order 1.
  `besi1` expects its argument to be in radians.
 4 besin
 ?expressions functions besin
 ?besin
-#besin(n,x) &int, real & Modified Bessel function of order n, $x$ in radians \\
+# besin(n,x) &int, real & Modified Bessel function of order n, $x$ in radians \\
 %besin(x)@int,real@ Modified Bessel function of order n, $x$ in radians
  `besin(n,x)` is the modified Bessel function or order n for integer n and
  x in radians.
@@ -6240,7 +6240,7 @@ Ffigure_fenceplot
  Sometimes the scanning directions in a binary datafile are not consistent with
  that assumed by gnuplot.  These keywords can flip the scanning direction along
  dimensions x, y, z.
-5 origin
+5 origin=
 ?binary keywords origin
 ?binary origin
  When gnuplot generates coordinates based upon transposition and flip, it
