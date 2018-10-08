@@ -1516,6 +1516,10 @@ plot_steps(struct curve_points *plot)
 		    if (xr == xl && (xr == xleft || xr == xright))
 			break;
 
+		    /* Some terminals fail to completely color the join between boxes */
+		    if (style == FS_OPAQUE)
+			draw_clip_line(xl, yprev, xl, y0);
+
 		    if (yprev - y0 < 0)
 			(*t->fillbox)(style, xl, yprev, (xr-xl), y0-yprev);
 		    else

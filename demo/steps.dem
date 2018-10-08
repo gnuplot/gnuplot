@@ -15,11 +15,16 @@ set title "Histogram built from unsorted data by 'smooth frequency'"
 set ylabel 'counts per bin'
 set xlabel 'bins'
 plot 'hemisphr.dat' u (floor($1*20)):(1) smooth frequency with histeps
-unset xlabel
-unset ylabel
+
+pause -1 "Hit return to see the same plot with fillsteps"
+set style fill solid 1.0
+plot 'hemisphr.dat' u (floor($1*20)):(1) smooth freq with fillsteps title "with fillsteps"
 
 pause -1 "Hit return for normal distribution function."
+
 set title "Normal Distribution Function"
+unset xlabel
+unset ylabel
 plot [-3:3][0:1] norm(x)
 
 pause -1 "Hit return for inverse error function."
