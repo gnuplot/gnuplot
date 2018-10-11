@@ -287,12 +287,13 @@ typedef struct boxplot_style {
     TBOOLEAN outliers;
     int pointtype;
     int plotstyle;	/* CANDLESTICKS or FINANCEBARS */
+    double median_linewidth;
     double separation;	/* of boxplots if there are more than one factors */
     t_boxplot_factor_labels labels;	/* Which axis to put the tic labels if there are factors */
     TBOOLEAN sort_factors;	/* Sort factors in alphabetical order? */
 } boxplot_style;
 extern boxplot_style boxplot_opts;
-#define DEFAULT_BOXPLOT_STYLE { 0, 1.5, TRUE, 6, CANDLESTICKS, 1.0, BOXPLOT_FACTOR_LABELS_AUTO, FALSE }
+#define DEFAULT_BOXPLOT_STYLE { 0, 1.5, TRUE, 6, CANDLESTICKS, -1.0, 1.0, BOXPLOT_FACTOR_LABELS_AUTO, FALSE }
 
 #ifdef EAM_BOXED_TEXT
 typedef struct textbox_style {
