@@ -6,7 +6,8 @@
  * Ethan A Merritt - July 2013
  */
 
-#include "syscfg.h"
+#include "gp_types.h"
+
 #ifdef HAVE_LIBCERF
 #include <complex.h>	/* C99 _Complex */
 #include <cerf.h>	/* libcerf library header */
