@@ -71,6 +71,7 @@ NF = words(factors)
 set xtic ("" 1)
 set for [i=1:NF] xtics add (word(factors,i) i) 
 set style boxplot nooutliers
+set style boxplot medianlinewidth 2.5
 
 t(x) = x/1.e6
 filter(col, factor_col, level) = (strcol(factor_col) eq word(factors, level)) ? t(column(col)) : 1/0

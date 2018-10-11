@@ -1115,6 +1115,10 @@ set_boxplot()
 		int_error(c_token-1,"expecting 'x', 'x2', 'auto' or 'off'");
 	    c_token++;
 	}
+	else if (almost_equals(c_token, "median$linewidth")) {
+	    c_token++;
+	    boxplot_opts.median_linewidth = real_expression();
+	}
 	else if (almost_equals(c_token, "so$rted")) {
 	    boxplot_opts.sort_factors = TRUE;
 	    c_token++;

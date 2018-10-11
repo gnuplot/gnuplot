@@ -1,3 +1,7 @@
+Changes in 5.2.6
+================
+* NEW "set style boxplot medianlinewidth <lw>"
+
 Changes in 5.2.5
 ================
 * NEW "set pm3d depthorder base" sorts pm3d quadrangles by projecting to z=0

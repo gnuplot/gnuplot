@@ -2428,8 +2428,10 @@ eval_plots()
 		    else
 			load_linetype(&lp, line_num+1);
 
-		    if (this_plot->plot_style == BOXPLOT)
+		    if (this_plot->plot_style == BOXPLOT) {
 			lp.p_type = boxplot_opts.pointtype;
+			lp.p_size = PTSZ_DEFAULT;
+		    }
 
 		    new_lt = lp_parse(&lp, LP_ADHOC,
 				     this_plot->plot_style & PLOT_STYLE_HAS_POINT);
@@ -2557,8 +2559,10 @@ eval_plots()
 		else
 		    load_linetype(&this_plot->lp_properties, line_num+1);
 
-		if (this_plot->plot_style == BOXPLOT)
+		if (this_plot->plot_style == BOXPLOT) {
 		    this_plot->lp_properties.p_type = boxplot_opts.pointtype;
+		    this_plot->lp_properties.p_size = PTSZ_DEFAULT;
+		}
 
 		lp_parse(&this_plot->lp_properties, LP_ADHOC,
 			 this_plot->plot_style & PLOT_STYLE_HAS_POINT);

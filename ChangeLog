@@ -1,3 +1,18 @@
+2018-10-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.h src/graphics.c src/plot2d.c src/set.c demo/boxplot.dem:
+	New command option 'set style boxplot medianlinewidth <lw>'
+	can be used to emphasize the position of the median.
+
+2018-10-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/libcerf.c:  Version 1.7 of libcerf introduced a conflicting
+	definition of "cmplx". Fortunately it is nice enough to handle the
+	conflict if detected, but that means our definition of cmplx in
+	cp_types.h must come before inclusion of cerf.h.
+
+2018-10-06  Release 5.2.5
+
 2018-09-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c:  Fix regression in parametric plots with logscale x.

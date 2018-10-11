@@ -2736,8 +2736,10 @@ plot_c_bars(struct curve_points *plot)
 	    closepath();
 	}
 
-	/* BOXPLOT wants a median line also, which is stored in xhigh */
-	if (plot->plot_style == BOXPLOT) {
+	/* BOXPLOT wants a median line also, which is stored in xhigh. */
+	/* If no special style has been assigned for the median line   */
+	/* draw it now, otherwise wait until later.                    */
+	if (plot->plot_style == BOXPLOT && boxplot_opts.median_linewidth < 0) {
 	    int ymedianM = map_y(ymed);
 	    draw_clip_line(xlowM,  ymedianM, xhighM, ymedianM);
 	}
@@ -2779,6 +2781,15 @@ plot_c_bars(struct curve_points *plot)
 
 	    draw_clip_line(xlowM+d, yhighM, xhighM-d, yhighM);
 	    draw_clip_line(xlowM+d, ylowM, xhighM-d, ylowM);
+	}
+
+	/* BOXPLOT wants a median line also, which is stored in xhigh. */
+	/* If a special linewidth has been assigned draw it now.       */
+	if (plot->plot_style == BOXPLOT && boxplot_opts.median_linewidth > 0) {
+	    int ymedianM = map_y(ymed);
+	    (*t->linewidth) (boxplot_opts.median_linewidth);
+	    draw_clip_line(xlowM,  ymedianM, xhighM, ymedianM);
+	    (*t->linewidth) (plot->lp_properties.l_width);
 	}
 
 	prev = plot->points[i].type;

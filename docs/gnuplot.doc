@@ -12582,6 +12582,7 @@ Ffigure_multiple_keys
        set style boxplot {range <r> | fraction <f>}
                          {{no}outliers} {pointtype <p>}
                          {candlesticks | financebars}
+                         {medianlinewidth <width>}
                          {separation <x>}
                          {labels off | auto | x | x2}
                          {sorted | unsorted}
@@ -12610,6 +12611,11 @@ Ffigure_multiple_keys
 
  By default boxplots are drawn in a style similar to candlesticks, but you have
  the option of using instead a style similar to finance bars.
+
+ A crossbar indicating the median is drawn using the same line type as box
+ boundary.  If you want a thicker line for the median
+       set style boxplot medianlinewidth 2.0
+ If you want no median line, set this to 0.
 
  If the using specification for a boxplot contains a fourth column, the values
  in that column will be interpreted as the discrete leveles of a factor 
