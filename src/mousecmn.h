@@ -157,7 +157,9 @@ enum { /* other special keys */
     GP_F11,
     GP_F12,
     GP_Cancel,
-    GP_Button1,
+    GP_Button1,	/* Buttons must come last */
+    GP_Button2,
+    GP_Button3,
     GP_LAST_KEY
 };
 

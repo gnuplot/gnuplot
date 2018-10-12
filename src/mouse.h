@@ -166,6 +166,8 @@ static char* special_keys[] = {
     "F12",
     "Close",
     "Button1",
+    "Button2",
+    "Button3",
     "GP_LAST_KEY",
     (char*) 0 /* must be the last line */
 };

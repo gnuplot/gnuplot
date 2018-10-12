@@ -3036,7 +3036,7 @@ Ffigure_newsyntax
      ctrl-alt-a != ctrl-alt-A
 
  List of modifiers (alt == meta):
-     ctrl, alt, shift (only valid for Button1)
+     ctrl, alt, shift (only valid for Button1 Button2 Button3)
 
  List of supported special keys:
 
@@ -3054,7 +3054,7 @@ Ffigure_newsyntax
 
  The following are window events rather than actual keys
 
-    "Button1" "Close"
+    "Button1" "Button2" "Button3" "Close"
 
  See also help for `mouse`.
 4 bind space

@@ -179,6 +179,7 @@ static void ZoomUnzoom __PROTO((void));
 static void incr_mousemode __PROTO((const int amount));
 static void UpdateStatuslineWithMouseSetting __PROTO((mouse_setting_t * ms));
 
+static bind_t * get_binding __PROTO((struct gp_event_t * ge, TBOOLEAN current));
 static void event_keypress __PROTO((struct gp_event_t * ge, TBOOLEAN current));
 static void ChangeView __PROTO((int x, int z));
 static void ChangeAzimuth __PROTO((int x));
@@ -1391,6 +1392,55 @@ builtin_cancel_zoom(struct gp_event_t *ge)
     return (char *) 0;
 }
 
+/* Check whether this event is bound to a command.
+ * If so return a pointer to the binding, otherwise return NULL.
+ */
+static bind_t *
+get_binding(struct gp_event_t *ge, TBOOLEAN current)
+{
+    int c, par2;
+    bind_t *ptr;
+    bind_t keypress;
+
+
+    if (ge->type == GE_buttonpress || ge->type == GE_buttonrelease) {
+	int b = ge->par1;
+	c = (b == 3) ? GP_Button3 : (b == 2) ? GP_Button2 : GP_Button1;
+	par2 = 0;
+    } else {
+	c = ge->par1;
+	if ((modifier_mask & Mod_Shift) && ((c & 0xff) == 0))
+	    c = toupper(c);
+	par2 = ge->par2;
+    }
+
+    if (!bindings)
+	bind_install_default_bindings();
+
+    bind_clear(&keypress);
+    keypress.key = c;
+    keypress.modifier = modifier_mask;
+
+    for (ptr = bindings; ptr; ptr = ptr->next) {
+	if (bind_matches(&keypress, ptr)) {
+	    /* Always honor keys set with "bind all" */
+	    if (ptr->allwindows && ptr->command)
+		return ptr;
+	    /* But otherwise ignore inactive windows */
+	    else if (!current)
+		break;
+	    /* Let user defined bindings overwrite the builtin bindings */
+	    else if ((par2 & 1) == 0 && ptr->command)
+		return ptr;
+	    else if (ptr->builtin)
+		return ptr;
+	    else
+		FPRINTF((stderr, "%s:%d protocol error\n", __FILE__, __LINE__));
+	}
+    }
+    return NULL;
+}
+
 static void
 event_keypress(struct gp_event_t *ge, TBOOLEAN current)
 {
@@ -1398,19 +1448,14 @@ event_keypress(struct gp_event_t *ge, TBOOLEAN current)
     int c, par2;
     bind_t *ptr;
     bind_t keypress;
+    struct udvt_entry *keywin;
 
     c = ge->par1;
+    if ((modifier_mask & Mod_Shift) && ((c & 0xff) == 0))
+	c = toupper(c);
     par2 = ge->par2;
     x = ge->mx;
     y = ge->my;
-
-    if (!bindings) {
-	bind_install_default_bindings();
-    }
-
-    if ((modifier_mask & Mod_Shift) && ((c & 0xff) == 0)) {
-	c = toupper(c);
-    }
 
     bind_clear(&keypress);
     keypress.key = c;
@@ -1432,39 +1477,23 @@ event_keypress(struct gp_event_t *ge, TBOOLEAN current)
 	return;
     }
 
-    for (ptr = bindings; ptr; ptr = ptr->next) {
-	if (bind_matches(&keypress, ptr)) {
-	    struct udvt_entry *keywin;
-	    if ((keywin = add_udv_by_name("MOUSE_KEY_WINDOW"))) {
-		Ginteger(&keywin->udv_value, ge->winid);
-	    }
-	    /* Always honor keys set with "bind all" */
-	    if (ptr->allwindows && ptr->command) {
-		if (current)
-		    load_mouse_variables(x, y, FALSE, c);
-		else
-		    /* FIXME - Better to clear MOUSE_[XY] than to set it wrongly. */
-		    /*         This may be worth a separate subroutine.           */
-		    load_mouse_variables(0, 0, FALSE, c);
-		do_string(ptr->command);
-		/* Treat as a current event after we return to x11.trm */
-		ge->type = GE_keypress;
-		break;
-	    /* But otherwise ignore inactive windows */
-	    } else if (!current) {
-		break;
-	    /* Let user defined bindings overwrite the builtin bindings */
-	    } else if ((par2 & 1) == 0 && ptr->command) {
-		do_string(ptr->command);
-		break;
-	    } else if (ptr->builtin) {
-		ptr->builtin(ge);
-	    } else {
-		fprintf(stderr, "%s:%d protocol error\n", __FILE__, __LINE__);
-	    }
-	}
-    }
+    if (!(ptr = get_binding(ge, current)))
+	return;
 
+    if ((keywin = add_udv_by_name("MOUSE_KEY_WINDOW")))
+	Ginteger(&keywin->udv_value, ge->winid);
+
+    if (current)
+	load_mouse_variables(x, y, FALSE, c);
+    else
+	load_mouse_variables(0, 0, FALSE, c);
+
+    if (ptr->allwindows && ptr->command)
+	do_string(ptr->command);
+    else if ((par2 & 1) == 0 && ptr->command)
+	do_string(ptr->command);
+    else if (ptr->builtin)
+	ptr->builtin(ge);
 }
 
 
@@ -1908,17 +1937,25 @@ event_buttonpress(struct gp_event_t *ge)
 	    do_zoom_scroll_down();
 
     } else if (ALMOST2D) {
+	/* "pause button1" or "pause any" takes precedence over key bindings */
+	if (1 == b) {
+	    if (paused_for_mouse & PAUSE_BUTTON1) {
+		load_mouse_variables(mouse_x, mouse_y, TRUE, b);
+		trap_release = TRUE;	/* Don't trigger on release also */
+		return;
+	    }
+	}
+
+	/* In 2D mouse buttons 1-3 are available for "bind" commands */
+	if (b == 1 || b == 2 || b == 3) {
+	    if (get_binding(ge, TRUE)) {
+		event_keypress(ge, TRUE);
+		return;
+	    }
+	}
+
 	if (!setting_zoom_region) {
-	    if (1 == b) {
-		/* "pause button1" or "pause any" takes precedence over key bindings */
-		if (paused_for_mouse & PAUSE_BUTTON1) {
-		    load_mouse_variables(mouse_x, mouse_y, TRUE, b);
-		    trap_release = TRUE;	/* Don't trigger on release also */
-		    return;
-		}
-	    } else if (2 == b) {
-		/* not bound in 2d graphs */
-	    } else if (3 == b &&
+	    if (3 == b &&
 	    	(!replot_disabled || (E_REFRESH_NOT_OK != refresh_ok))	/* Use refresh if available */
 		&& !(paused_for_mouse & PAUSE_BUTTON3)) {
 		/* start zoom; but ignore it when
@@ -1959,14 +1996,13 @@ event_buttonpress(struct gp_event_t *ge)
 		    fprintf(stderr, "starting zoom region.\n");
 		}
 	    }
+
 	} else {
+	    /* complete zoom (any button finishes zooming) */
 
-	    /* complete zoom (any button
-	     * finishes zooming.) */
-
-	    /* the following variables are used to check,
-	     * if the box is big enough to be considered
-	     * as zoom box. */
+	    /* the following variables are used to check if the box
+	     * is big enough to be considered as zoom box.
+	     */
 	    int dist_x = setting_zoom_x - mouse_x;
 	    int dist_y = setting_zoom_y - mouse_y;
 	    int dist = sqrt((double)(dist_x * dist_x + dist_y * dist_y));
@@ -2045,12 +2081,19 @@ event_buttonrelease(struct gp_event_t *ge)
 
     button &= ~(1 << b);	/* remove button */
 
-    if (setting_zoom_region) {
+    if (setting_zoom_region)
 	return;
-    }
+
+    /* FIXME:  This mechanism may no longer be needed */
     if (TRUE == trap_release) {
 	trap_release = FALSE;
 	return;
+    }
+
+    /* binding takes precedence over default action */
+    if (b == 1 || b == 2 || b == 3) {
+	if (get_binding(ge, TRUE))
+	    return;
     }
 
     MousePosToGraphPosReal(mouse_x, mouse_y, &real_x, &real_y, &real_x2, &real_y2);
@@ -2060,8 +2103,9 @@ event_buttonrelease(struct gp_event_t *ge)
 
     if (ALMOST2D) {
 	char s0[256];
-	if (b == 1 && term->set_clipboard && ((doubleclick <= mouse_setting.doubleclick)
-					      || !mouse_setting.doubleclick)) {
+
+	if (b == 1 && term->set_clipboard
+	&&  ((doubleclick <= mouse_setting.doubleclick) || !mouse_setting.doubleclick)) {
 
 	    /* put coordinates to clipboard. For 3d plots this takes
 	     * only place, if the user didn't drag (rotate) the plot */
@@ -2074,8 +2118,8 @@ event_buttonrelease(struct gp_event_t *ge)
 		}
 	    }
 	}
-	if (b == 2) {
 
+	if (b == 2) {
 	    /* draw temporary annotation or label. For 3d plots this is
 	     * only done if the user didn't drag (scale) the plot */
 
@@ -2121,15 +2165,6 @@ event_buttonrelease(struct gp_event_t *ge)
     /* Export current mouse coords to user-accessible variables also */
     load_mouse_variables(mouse_x, mouse_y, TRUE, b);
     UpdateStatusline();
-
-    /* In 2D mouse button 1 is available for "bind" commands */
-    if (!is_3d_plot && (b == 1)) {
-	int save = ge->par1;
-	ge->par1 = GP_Button1;
-	ge->par2 = 0;
-	event_keypress(ge, TRUE);
-	ge->par1 = save;	/* needed for "pause mouse" */
-    }
 }
 
 
@@ -2647,8 +2682,8 @@ bind_matches(const bind_t * a, const bind_t * b)
     int a_mod = a->modifier;
     int b_mod = b->modifier;
 
-    /* discard Shift modifier (except for mouse button) */
-    if (a->key != GP_Button1) {
+    /* discard Shift modifier (except for mouse buttons) */
+    if (a->key < GP_Button1) {
 	a_mod &= (Mod_Ctrl | Mod_Alt);
 	b_mod &= (Mod_Ctrl | Mod_Alt);
     }
