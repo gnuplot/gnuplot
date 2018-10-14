@@ -3788,9 +3788,7 @@ void wxtPanel::wxt_cairo_free_platform_context()
 /* process one event, returns true if it ends the pause */
 bool wxt_process_one_event(struct gp_event_t *event)
 {
-	FPRINTF2((stderr,"Processing event\n"));
 	do_event( event );
-	FPRINTF2((stderr,"Event processed\n"));
 	if (event->type == GE_buttonrelease && (paused_for_mouse & PAUSE_CLICK)) {
 		int button = event->par1;
 		if (button == 1 && (paused_for_mouse & PAUSE_BUTTON1))
@@ -3852,7 +3850,7 @@ bool wxt_exec_event(int type, int mx, int my, int par1, int par2, wxWindowID id)
 	return true;
 #elif defined(WXT_MONOTHREADED)
 	if (wxt_process_one_event(&event))
-	    ungetc('\n',stdin);
+	    if (debug == 44) ungetc('\n',stdin);
 	return true;
 #else
 	if (!wxt_handling_persist)
@@ -4006,21 +4004,28 @@ int wxt_waitforinput(int options)
 	}
 
 	while (wxTheApp) {
-	  // Loop with timeout of 10ms until stdin is ready to read,
-	  // while also handling window events.
-	  wxt_yield = 1;
-	  wxTheApp->Yield();
-	  wxt_yield = 0;
+		// Loop with timeout of 10ms until stdin is ready to read,
+		// while also handling window events.
+		int retval;
+		int was_paused_for_mouse = paused_for_mouse;
 
-	  struct timeval tv;
-	  fd_set read_fd;
-	  tv.tv_sec = 0;
-	  tv.tv_usec = 10000;
-	  FD_ZERO(&read_fd);
-	  FD_SET(0, &read_fd);
-	  if (select(1, &read_fd, NULL, NULL, &tv) != -1 && FD_ISSET(0, &read_fd))
-	    if (!paused_for_mouse)
-		break;
+		wxt_yield = 1;
+		wxTheApp->Yield();
+		wxt_yield = 0;
+
+		struct timeval tv;
+		fd_set read_fd;
+		tv.tv_sec = 0;
+		tv.tv_usec = 10000;
+		FD_ZERO(&read_fd);
+		FD_SET(0, &read_fd);
+		retval = select(1, &read_fd, NULL, NULL, &tv);
+		if (retval == -1)
+			int_error(NO_CARET, "input select error");
+		else if (retval)
+			return getchar();
+		else if (was_paused_for_mouse && !paused_for_mouse)
+			return '\0';
 	}
 	return getchar();
 #endif
