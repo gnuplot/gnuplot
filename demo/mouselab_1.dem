@@ -13,6 +13,8 @@ replot
 # Get mouse position and first character of label
 #
 pause mouse key
+if (MOUSE_KEY == 27) exit
+
 LABEL = MOUSE_CHAR
 LABEL_X = MOUSE_X
 LABEL_Y = MOUSE_Y
