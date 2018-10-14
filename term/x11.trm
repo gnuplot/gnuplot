@@ -954,6 +954,11 @@ AGAIN:
 			    return '\0';
 			}
 		    }
+		    if (ge.type == GE_reset) {
+			/* Error or window close */
+			paused_for_mouse = 0;
+			return '\0';
+		    }
 		}
 	    } else if (options == TERM_ONLY_CHECK_MOUSING) {
 		return '\0';
