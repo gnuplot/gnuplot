@@ -888,7 +888,8 @@ AGAIN:
 	    int ierr;
 	    struct timeval *timeout = NULL;
 	    FD_ZERO(&fds);
-	    FD_SET(fd, &fds);
+	    if (!paused_for_mouse)
+		FD_SET(fd, &fds);
 	    FD_SET(ipc_back_fd, &fds);
 
 	    /* When taking input from the console, we are willing to wait here	*/
