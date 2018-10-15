@@ -427,6 +427,11 @@ bool qt_processTermEvent(gp_event_t* event)
 		paused_for_mouse = 0;
 		return true;
 	}
+	if ((event->type == GE_reset))
+	{
+		paused_for_mouse = 0;
+		return true;
+	}
 
 	return false;
 }
