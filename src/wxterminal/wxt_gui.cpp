@@ -4004,7 +4004,7 @@ int wxt_waitforinput(int options)
 	}
 
 	while (wxTheApp) {
-		// Loop with timeout of 10ms until stdin is ready to read,
+		// Loop with timeout of 50ms until stdin is ready to read,
 		// while also handling window events.
 		int retval;
 		int was_paused_for_mouse = paused_for_mouse;
@@ -4016,16 +4016,18 @@ int wxt_waitforinput(int options)
 		struct timeval tv;
 		fd_set read_fd;
 		tv.tv_sec = 0;
-		tv.tv_usec = 10000;
+		tv.tv_usec = 50000;
 		FD_ZERO(&read_fd);
 		FD_SET(0, &read_fd);
 		retval = select(1, &read_fd, NULL, NULL, &tv);
 		if (retval == -1)
 			int_error(NO_CARET, "input select error");
-		else if (retval)
-			return getchar();
 		else if (was_paused_for_mouse && !paused_for_mouse)
 			return '\0';
+		else if (paused_for_mouse)	/* Spin loop */
+			usleep(50000);
+		else if (retval)
+			return getchar();
 	}
 	return getchar();
 #endif
