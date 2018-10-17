@@ -471,7 +471,7 @@ void init_monochrome __PROTO((void));
 struct termentry *change_term __PROTO((const char *name, int length));
 
 void write_multiline __PROTO((int, int, char *, JUSTIFY, VERT_JUSTIFY, int, const char *));
-int estimate_strlen __PROTO((char *));
+int estimate_strlen __PROTO((const char *));
 char *estimate_plaintext __PROTO((char *));
 void list_terms __PROTO((void));
 char* get_terminals_names __PROTO((void));

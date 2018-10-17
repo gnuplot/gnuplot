@@ -1689,6 +1689,7 @@ eval_3dplots()
 		    if ((this_plot->plot_type == FUNC3D) &&
 			((this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
 			|| (this_plot->plot_style == LABELPOINTS && !draw_contour)
+			|| (this_plot->plot_style == VECTOR)
 			)) {
 			int_warn(c_token-1, "This style cannot be used to plot a surface defined by a function");
 			this_plot->plot_style = POINTSTYLE;

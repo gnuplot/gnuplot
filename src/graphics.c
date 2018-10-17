@@ -2895,6 +2895,9 @@ plot_boxplot(struct curve_points *plot)
     if (levels == 0)
 	levels = 1;
 
+    if (!save_points || saved_p_count == 0)
+	return;
+
     /* The entire collection of points was already sorted in filter_boxplot()
      * called from boxplot_range_fiddling().  That sort used the category
      * (a.k.a. "factor" a.k.a. "level") as a primary key and the y value as

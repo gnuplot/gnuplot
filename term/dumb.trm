@@ -796,12 +796,20 @@ ENHdumb_FLUSH()
 TERM_PUBLIC void
 ENHdumb_put_text(unsigned int x, unsigned int y, const char *str)
 {
+    int length;
+
     /* If no enhanced text processing is needed, we can use the plain  */
     /* vanilla put_text() routine instead of this fancy recursive one. */
     if (ignore_enhanced_text || (!strpbrk(str, "{}^_@&~") && !contains_unicode(str))) {
 	DUMB_put_text(x,y,str);
 	return;
     }
+
+    length = estimate_strlen(str);
+    if (x + length > dumb_xmax)
+	x = GPMAX(0, dumb_xmax - length);
+    if (y > dumb_ymax)
+	return;
 
     /* Set up global variables needed by enhanced_recursion() */
     enhanced_fontscale = 1.0;

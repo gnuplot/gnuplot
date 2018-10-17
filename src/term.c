@@ -2638,7 +2638,7 @@ enh_err_check(const char *str)
  * developed later they can be slotted into this one call site.
  */
 int
-estimate_strlen(char *text)
+estimate_strlen(const char *text)
 {
     int len;
     char *s;
