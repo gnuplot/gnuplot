@@ -1601,6 +1601,7 @@ eval_3dplots()
 		    if ((this_plot->plot_type == FUNC3D) &&
 			((this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
 			|| (this_plot->plot_style == LABELPOINTS && !draw_contour)
+			|| (this_plot->plot_style == VECTOR)
 			)) {
 			int_warn(c_token-1, "This style cannot be used to plot a surface defined by a function");
 			this_plot->plot_style = POINTSTYLE;
@@ -2309,6 +2310,8 @@ eval_3dplots()
 	    ||  this_plot->plot_style == IMAGE
 	    ||  this_plot->plot_style == RGBIMAGE
 	    ||  this_plot->plot_style == RGBA_IMAGE)
+		continue;
+	    if (this_plot->plot_type == NODATA)
 		continue;
 
 	    /* Allow individual surfaces to opt out of contouring */

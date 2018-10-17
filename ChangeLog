@@ -1,3 +1,17 @@
+2018-10-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* datafile.c (df_open): "stats 'foo.dat' noautoscale"
+	* graphics.c (plot_boxplot): bail early on empty data set
+	* graphics.c (process_image): cannot clip if there is no bounding box
+	* plot3d.c: "with vectors" style is not possible for a function splot
+	* plot3d.c: cannot contour a plot with NODATA
+	* term.c (estimate_strlen): mark string parameter as (const char *)
+	* dumb.trm (ENHdumb_put_text): range-check (x,y) coords of enhanced text
+	* post.trm (PS_options): Sanity check font size must be < 1000.
+	* svg.trm (ENHsvg_writec): split output text into buffer-sized chunks
+
+	Corner-case bugs found by afl-fuzz
+
 2018-10-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.h src/graphics.c src/plot2d.c src/set.c demo/boxplot.dem:

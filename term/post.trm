@@ -1174,6 +1174,10 @@ PS_options()
 	}
     }
 
+    /* Sanity check on fontsize */
+    if (ps_params->fontsize > 1000.)
+	ps_params->fontsize = 100.;
+
     switch (ps_params->terminal) {
     case PSTERM_POSTSCRIPT:
 	ps_fontsize = ps_params->fontsize;

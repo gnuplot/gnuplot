@@ -2891,6 +2891,9 @@ plot_boxplot(struct curve_points *plot)
     if (levels == 0)
 	levels = 1;
 
+    if (!save_points || saved_p_count == 0)
+	return;
+
     /* The entire collection of points was already sorted in filter_boxplot()
      * called from boxplot_range_fiddling().  That sort used the category
      * (a.k.a. "factor" a.k.a. "level") as a primary key and the y value as
@@ -4716,7 +4719,8 @@ process_image(void *plot, t_procimg_action action)
 				    }
 			    }
 			    /* Clip rectangle if necessary */
-			    if (rectangular_image && term->fillbox && corners_in_view < 4) {
+			    if (rectangular_image && term->fillbox
+			    &&  (corners_in_view < 4) && clip_area) {
 				if (corners[i_corners].x < clip_area->xleft)
 				    corners[i_corners].x = clip_area->xleft;
 				if (corners[i_corners].x > clip_area->xright)

@@ -1,7 +1,3 @@
-/*
- * $Id: term_api.h,v 1.151 2017/02/01 04:30:23 sfeam Exp $
- */
-
 /* GNUPLOT - term_api.h */
 
 /*[
@@ -487,7 +483,7 @@ void init_monochrome __PROTO((void));
 struct termentry *change_term __PROTO((const char *name, int length));
 
 void write_multiline __PROTO((unsigned int, unsigned int, char *, JUSTIFY, VERT_JUSTIFY, int, const char *));
-int estimate_strlen __PROTO((char *));
+int estimate_strlen __PROTO((const char *));
 char *estimate_plaintext __PROTO((char *));
 void list_terms __PROTO((void));
 char* get_terminals_names __PROTO((void));

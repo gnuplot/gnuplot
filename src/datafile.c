@@ -1256,7 +1256,8 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	/* Allow this plot not to affect autoscaling */
 	if (almost_equals(c_token, "noauto$scale")) {
 	    c_token++;
-	    plot->noautoscale = TRUE;
+	    if (plot)
+		plot->noautoscale = TRUE;
 	    continue;
 	}
 

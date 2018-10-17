@@ -2046,6 +2046,10 @@ ENHsvg_writec(int c)
 		*enhanced_cur_text++ = c;
 		break;
     }
+
+    /* Split output stream into chunks rather than overflow the buffer */
+    if ((enhanced_cur_text - enhanced_text) >= sizeof(enhanced_text)-1)
+	ENHsvg_FLUSH();
 }
 
 TERM_PUBLIC void
