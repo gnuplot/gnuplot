@@ -4690,7 +4690,8 @@ process_image(void *plot, t_procimg_action action)
 				    corners[i_corners].y = map_y(p_corners[i_corners].y);
 			    }
 			    /* Clip rectangle if necessary */
-			    if (rectangular_image && term->fillbox && corners_in_view < 4) {
+			    if (rectangular_image && term->fillbox
+			    &&  (corners_in_view < 4) &&  clip_area) {
 				if (corners[i_corners].x < clip_area->xleft)
 				    corners[i_corners].x = clip_area->xleft;
 				if (corners[i_corners].x > clip_area->xright)

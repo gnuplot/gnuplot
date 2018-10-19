@@ -2413,6 +2413,8 @@ eval_3dplots()
 	    ||  this_plot->plot_style == RGBIMAGE
 	    ||  this_plot->plot_style == RGBA_IMAGE)
 		continue;
+	    if (this_plot->plot_type == NODATA)
+		continue;
 
 	    /* Allow individual surfaces to opt out of contouring */
 	    if (this_plot->opt_out_of_contours)
