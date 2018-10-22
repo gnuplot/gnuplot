@@ -1,3 +1,5 @@
+/* Hello, Emacs, this is -*-C-*- */
+
 /* GNUPLOT - x11.trm */
 
 /*[
@@ -886,7 +888,8 @@ AGAIN:
 	    int ierr;
 	    struct timeval *timeout = NULL;
 	    FD_ZERO(&fds);
-	    FD_SET(fd, &fds);
+	    if (!paused_for_mouse)
+		FD_SET(fd, &fds);
 	    FD_SET(ipc_back_fd, &fds);
 
 	    /* When taking input from the console, we are willing to wait here	*/
@@ -951,6 +954,11 @@ AGAIN:
 			    paused_for_mouse = 0;
 			    return '\0';
 			}
+		    }
+		    if (ge.type == GE_reset) {
+			/* Error or window close */
+			paused_for_mouse = 0;
+			return '\0';
 		    }
 		}
 	    } else if (options == TERM_ONLY_CHECK_MOUSING) {
@@ -2518,7 +2526,6 @@ START_HELP(x11)
 "?set terminal x11 command-line-options",
 "?set term x11 command-line-options",
 "?x11 command-line-options",
-"?command-line-options",
 " In addition to the X Toolkit options, the following options may be specified",
 " on the command line when starting `gnuplot` or as resources in your",
 " \".Xdefaults\" file (note that `raise` and `persist` can be overridden",
