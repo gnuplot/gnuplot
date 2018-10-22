@@ -294,6 +294,19 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec, double *reltime)
 		break;
 	    }
 
+	case 'a':		/* weekday name (ignored) */
+	case 'A':		/* weekday name (ignored) */
+	    while (isalpha(*s))
+		s++;
+	    break;
+	case 'w':		/* one or two digit weekday number (ignored) */
+	case 'W':		/* one or two digit week number (ignored) */
+	    if (isdigit(*s))
+		s++;
+	    if (isdigit(*s))
+		s++;
+	    break;
+
 	default:
 	    int_warn(DATAFILE, "Bad time format in string");
 	}
