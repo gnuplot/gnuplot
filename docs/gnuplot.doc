@@ -9416,8 +9416,8 @@ Ffigure_missing
 
 @start table - first is interactive cleartext form
        Format       Explanation
-       %a           abbreviated name of day of the week
-       %A           full name of day of the week
+       %a           short name of day of the week (ignored on input)
+       %A           full name of day of the week (ignored on input)
        %b or %h     abbreviated name of the month
        %B           full name of the month
        %d           day of the month, 01--31
@@ -9437,8 +9437,8 @@ Ffigure_missing
        %S           second, integer 00--60 on output, (double) on input
        %T           shorthand for "%H:%M:%S" (only output)
        %U           week of the year (week starts on Sunday)
-       %w           day of the week, 0--6 (Sunday = 0)
-       %W           week of the year (week starts on Monday)
+       %w           day of the week, 0--6 (Sunday = 0) (ignored on input)
+       %W           week of the year (week starts on Monday) (ignored on input)
        %y           year, 0-68 for 2000-2068, 69-99 for 1969-1999
        %Y           year, 4-digit
 #\begin{tabular}{|cl|} \hline
