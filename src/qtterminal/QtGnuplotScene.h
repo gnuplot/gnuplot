@@ -70,6 +70,7 @@ public:
 	virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
 	virtual void wheelEvent(QGraphicsSceneWheelEvent* event);
 	virtual void keyPressEvent(QKeyEvent* event);
+	virtual void keyReleaseEvent(QKeyEvent* event);
 	void processEvent(QtGnuplotEventType type, QDataStream& in);
 
 private:

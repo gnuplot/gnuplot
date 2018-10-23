@@ -1034,6 +1034,10 @@ void QtGnuplotScene::keyPressEvent(QKeyEvent* event)
 			case Qt::Key_F12        : key = GP_F12        ; break;
 		}
 
+	// The <tab> key is special.  We will catch it on keyRelease.
+	if (key == GP_Tab)
+		key = 0;
+
 	if (key >= 0)
 		live = m_eventHandler->postTermEvent(GE_keypress,
 			int(m_lastMousePos.x()), int(m_lastMousePos.y()), key, 0, m_widget);
@@ -1062,6 +1066,22 @@ void QtGnuplotScene::keyPressEvent(QKeyEvent* event)
 	}
 
 	QGraphicsScene::keyPressEvent(event);
+}
+
+/*
+ * Qt swallows the keyPress events from <tab> because it is used to
+ * cycle focus among a set of widgets. The documented methods for bypassing
+ * this focus-related theft are beyond my comprehension.  So instead we
+ * catch the key release event (for <tab> only) and pretend it was a press.
+ */
+void QtGnuplotScene::keyReleaseEvent(QKeyEvent* event)
+{
+	if (Qt::Key_Tab == event->key())
+		m_eventHandler->postTermEvent(GE_keypress,
+			int(m_lastMousePos.x()), int(m_lastMousePos.y()),
+			GP_Tab, 0, m_widget);
+
+	QGraphicsScene::keyReleaseEvent(event);
 }
 
 double QtGnuplotScene::sceneToGraph(int axis, double coord) const
