@@ -3706,13 +3706,14 @@ set_palette()
 	    }
 	    case S_PALETTE_MODEL: { /* "mo$del" */
 		int model;
-
 		++c_token;
 		if (END_OF_COMMAND)
 		    int_error( c_token, "expected color model" );
 		model = lookup_table(&color_model_tbl[0],c_token);
 		if (model == -1)
 		    int_error(c_token,"unknown color model");
+		if (model == C_MODEL_XYZ)
+		    int_warn(c_token,"CIE/XYZ not supported");
 		sm_palette.cmodel = model;
 		continue;
 	    }

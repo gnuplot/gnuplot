@@ -11881,7 +11881,7 @@ Ffigure_multiple_keys
                     | functions <R>,<G>,<B>
                   }
                   { cubehelix {start <val>} {cycles <val>} {saturation <val>} }
-                  { model { RGB | HSV | CMY | XYZ } }
+                  { model { RGB | HSV | CMY } }
                   { positive | negative }
                   { nops_allcF | ps_allcF }
                   { maxcolors <maxcolors> }
@@ -11956,22 +11956,22 @@ Ffigure_multiple_keys
  palette.
 
  RGB color space might not be the most useful color space to work in.  For that
- reason you may change the color space with `model` to one of `RGB`, `HSV`,
- `CMY`, and `XYZ`.  Using color names for `set palette defined` tables
- and a color space other than RGB will result in funny colors.  All explanation
- have been written for RGB color space, so please note, that `R` can be `H`,
- `C`, `Y`, or `X`, depending on the actual color space (`G` and `B`
- accordingly).
+ reason you may change the color space `model` to one of `RGB`, `HSV`, `CMY`.
+ Using color names for `set palette defined` tables and a color space other than
+ RGB will result in funny colors.  All explanation have been written for
+ RGB color space, so please note, that `R` can be `H`, `C`, `Y`, or `X`,
+ depending on the actual color space (`G` and `B` accordingly).
 
  All values for all color spaces are limited to [0,1].
 
- RGB stands for Red, Green and Blue;  CMY stands for Cyan, Magenta and Yellow;
- HSV stands for Hue, Saturation, and Value;  XYZ are the three primary colors of
- the CIE color model defined by the 'Commission Internationale de l'Eclairage'.
+ RGB stands for Red, Green, Blue;  CMY stands for Cyan, Magenta, Yellow;
+ HSV stands for Hue, Saturation, Value.
  For more information on color models see:
 ^ <a href="http://en.wikipedia.org/wiki/Color_space">
            http://en.wikipedia.org/wiki/Color_space
 ^ </a>
+ Note: Earlier gnuplot versions accepted YIQ and XYZ color space models also,
+ but the implementation was never complete or correct.
 
 4 rgbformulae
 ?commands set palette rgbformulae
@@ -12035,8 +12035,7 @@ Ffigure_multiple_keys
  as color space.  Use `show colornames` for a list of known color names.
 
  Please note, that even if written as <r>, this might actually be the
- <H> component in HSV color space or <X> in CIE-XYZ space, or ...
- depending on the selected color model.
+ <H> component in HSV color space depending on the selected color model.
 
  The <gray> values have to form an ascending sequence of real numbers; the
  sequence will be automatically rescaled to [0,1].
@@ -12095,7 +12094,7 @@ Ffigure_multiple_keys
        set palette model HSV functions gray, 1, 1
 
  A nice black to gold palette:
-       set palette model XYZ functions gray**0.35, gray**0.5, gray**0.8
+       set palette model RGB functions 1.1*gray**0.25, gray**0.75, 0
 
  A gamma-corrected black and white palette
        gamma = 2.2

@@ -484,7 +484,7 @@ const struct gen_table color_model_tbl[] =
     { "RGB", C_MODEL_RGB },
     { "HSV", C_MODEL_HSV },
     { "CMY", C_MODEL_CMY },
-    { "XYZ", C_MODEL_XYZ },
+    { "XYZ", C_MODEL_XYZ },	/* Obsolete */
     { NULL,  -1 }
 };
 
