@@ -1,3 +1,17 @@
+2018-10-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/getcolor.c src/save.c src/set.c src/show.c src/tables.c
+	demo/pm3dcolors.dem:
+
+	Remove broken support for CIE/XYZ color space.  As reported by 
+	Risto A. Paju, the XYZ->RGB transformation in getcolor.c is not correct.
+	Furthermore it has never been correct.  As with the YIQ color space
+	support removed a while ago, the transformation matrix was apparently
+	never checked and hence any script that relied on it never produced
+	correct output.
+	Replace the black->gold palette example with an RGB space equivalent.
+	Bug #2078
+
 2018-10-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* datafile.c (df_open): "stats 'foo.dat' noautoscale"

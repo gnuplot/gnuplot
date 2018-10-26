@@ -2,6 +2,7 @@ Changes in 5.2.6
 ================
 * NEW "set style boxplot medianlinewidth <lw>"
 * FIX various corner-case bugs found by fuzzing
+* CHANGE drop non-working support for CIE/XYZ color space
 * CHANGE strptime ignores content read with format a/A/w/W
 
 Changes in 5.2.5

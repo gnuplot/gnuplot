@@ -39,7 +39,6 @@ static int interpolate_color_from_gray __PROTO((double, rgb_color *));
 static double get_max_dev __PROTO((rgb_color *colors, int j, double limit));
 static int is_extremum __PROTO((rgb_color left,rgb_color mid,rgb_color right));
 static void CMY_2_RGB __PROTO((rgb_color *color));
-static void CIEXYZ_2_RGB __PROTO((rgb_color *color));
 static void HSV_2_RGB __PROTO((rgb_color *color));
 
 
@@ -296,9 +295,6 @@ rgb1_from_gray(double gray, rgb_color *color)
 	break;
     case C_MODEL_CMY:
 	CMY_2_RGB(color);
-	break;
-    case C_MODEL_XYZ:
-	CIEXYZ_2_RGB(color);
 	break;
     }
 }
@@ -783,19 +779,6 @@ CMY_2_RGB(rgb_color *col)
     col->r = CONSTRAIN(1.0 - c);
     col->g = CONSTRAIN(1.0 - m);
     col->b = CONSTRAIN(1.0 - y);
-}
-
-static void
-CIEXYZ_2_RGB(rgb_color *col)
-{
-    double x,y,z;
-    
-    x = col->r;
-    y = col->g;
-    z = col->b;
-    col->r = CONSTRAIN( 1.9100 * x - 0.5338 * y - 0.2891 * z);
-    col->g = CONSTRAIN(-0.9844 * x + 1.9990 * y - 0.0279 * z);
-    col->b = CONSTRAIN( 0.0585 * x - 0.1187 * y - 0.9017 * z);
 }
 
 static void

@@ -156,12 +156,6 @@ splot f(x)
 pause -1 "Hit return to continue"
 
 
-set palette model XYZ rgbformulae 7,5,15
-set title "set palette model XYZ rgbformulae 7,5,15"
-splot f(x)
-pause -1 "Hit return to continue"
-
-
 set palette model CMY rgbformulae 7,5,15
 set title "set palette model CMY rgbformulae 7,5,15"
 splot f(x)
@@ -205,12 +199,6 @@ pause -1 "Hit return to continue"
 
 set palette rgbformulae 7,5,15
 set title 'set palette rgbformulae 7,5,15'
-splot f(x)
-pause -1 "Hit return to continue"
-
-
-set palette model XYZ functions gray**0.35, gray**0.5, gray**0.8
-set title 'set palette model XYZ functions model XYZ  gray**0.35, gray**0.5, gray**0.8'
 splot f(x)
 pause -1 "Hit return to continue"
 

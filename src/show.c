@@ -2381,7 +2381,6 @@ show_palette()
 	case C_MODEL_RGB: fputs( "RGB\n", stderr ); break;
 	case C_MODEL_HSV: fputs( "HSV\n", stderr ); break;
 	case C_MODEL_CMY: fputs( "CMY\n", stderr ); break;
-	case C_MODEL_XYZ: fputs( "XYZ\n", stderr ); break;
 	}
 	fprintf(stderr,"\tgamma is %.4g\n", sm_palette.gamma );
 	return;
