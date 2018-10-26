@@ -12312,6 +12312,7 @@ Ffigure_multiple_keys
                     {primary <fraction>} {specular <fraction>} {spec2 <fraction>}
                   }
                   { hidden3d {<linestyle>} | nohidden3d }
+		  { border {<linestyle-options}}
                   { implicit | explicit }
                   { map }
                 }
