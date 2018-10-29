@@ -11531,6 +11531,7 @@ Ffigure_multiple_keys
                   }
                   { {no}lighting {primary <fraction>} {specular <fraction>}}
                   { hidden3d {<linestyle>} | nohidden3d }
+                  { {no}border {<linestyle options>} }
                   { implicit | explicit }
                   { map }
                 }
