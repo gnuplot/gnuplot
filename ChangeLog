@@ -1,3 +1,13 @@
+2018-10-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/wxt_gui.cpp: monothreaded wxt terminal needs a mutex
+	to prevent recursion.  When a new plot window is created,
+	e.g. 'set term wxt <new_id>', creation of the new window must lock out
+	other operations otherwise the new window request is sent again and an
+	infinite recursion can result.  Since we don't have a new window yet I
+	can't use the window mutex, so I hard-wired one named wxt_interlock.
+	Does not affect multithreaded wxt or windows.
+
 2018-10-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/getcolor.c src/save.c src/set.c src/show.c src/tables.c

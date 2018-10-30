@@ -161,7 +161,8 @@ wxtAnchorPoint wxt_display_anchor = {0,0,0};
 #endif
 
 #if defined(WXT_MONOTHREADED) && !defined(_WIN32)
-static int wxt_yield = 0;	/* used in wxt_waitforinput() */
+static int wxt_yield = 0;		/* used in wxt_waitforinput() */
+static TBOOLEAN wxt_interlock = FALSE;	/* used to prevent recursive OnCreateWindow */
 #endif
 
 char *wxt_enhanced_fontname = NULL;
@@ -276,6 +277,7 @@ bool wxtApp::OnInit()
 	GetCurrentProcess(&PSN);
 	TransformProcessType(&PSN, kProcessTransformToForegroundApplication);
 #endif
+	static TBOOLEAN image_handlers_loaded = FALSE;
 
 	/* Usually wxWidgets apps create their main window here.
 	 * However, in the context of multiple plot windows, the same code is written in wxt_init().
@@ -289,7 +291,11 @@ bool wxtApp::OnInit()
 	icon.AddIcon(wxIcon(icon64x64_xpm));
 
 	/* we load the image handlers, needed to copy the plot to clipboard, and to load icons */
-	::wxInitAllImageHandlers();
+	/* Only load once (else wxt 3.0 complains noisily) */
+	if (!image_handlers_loaded) {
+	    ::wxInitAllImageHandlers();
+	    image_handlers_loaded = TRUE;
+	}
 
 #ifdef __WXMSW__
 	/* allow the toolbar to display properly png icons with an alpha channel */
@@ -381,6 +387,9 @@ void wxtApp::OnCreateWindow( wxCommandEvent& event )
 	wxt_window_t *window = (wxt_window_t*) event.GetClientData();
 
 	FPRINTF((stderr,"wxtApp::OnCreateWindow\n"));
+#if defined(WXT_MONOTHREADED) && !defined(_WIN32)
+	wxt_interlock = TRUE;
+#endif
 	window->frame = new wxtFrame( window->title, window->id );
 	window->frame->Show(true);
 	FPRINTF((stderr,"new plot window opened\n"));
@@ -396,6 +405,9 @@ void wxtApp::OnCreateWindow( wxCommandEvent& event )
 	/* tell the other thread we have finished */
 	wxMutexLocker lock(*(window->mutex));
 	window->condition->Broadcast();
+#if defined(WXT_MONOTHREADED) && !defined(_WIN32)
+	wxt_interlock = FALSE;
+#endif
 }
 
 /* wrapper for AddPendingEvent or ProcessEvent */
@@ -1952,8 +1964,12 @@ void wxt_init()
 
 	/* open a new plot window if it does not exist */
 	if ( wxt_current_window == NULL ) {
-		FPRINTF((stderr,"opening a new plot window\n"));
 
+		FPRINTF((stderr,"opening a new plot window\n"));
+#if defined(WXT_MONOTHREADED) && !defined(_WIN32)
+		if (wxt_interlock)
+		    return;
+#endif
 		/* create a new plot window and show it */
 		wxt_window_t window;
 		window.id = wxt_window_number;
@@ -1974,6 +1990,10 @@ void wxt_init()
 #ifdef WXT_MULTITHREADED
 		window.mutex->Lock();
 #endif /* WXT_MULTITHREADED */
+#if defined(WXT_MONOTHREADED) && !defined(_WIN32)
+		wxt_status = STATUS_UNINITIALIZED;
+#endif
+
 		wxt_MutexGuiEnter();
 		dynamic_cast<wxtApp*>(wxTheApp)->SendEvent( event );
 		wxt_MutexGuiLeave();
