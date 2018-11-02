@@ -1174,9 +1174,11 @@ PS_options()
 	}
     }
 
-    /* Sanity check on fontsize */
+    /* Sanity checks on fontsize */
     if (ps_params->fontsize > 1000.)
 	ps_params->fontsize = 100.;
+    if (ps_params->fontsize <= 0)
+	ps_params->fontsize = 14.;
 
     switch (ps_params->terminal) {
     case PSTERM_POSTSCRIPT:
@@ -1193,6 +1195,7 @@ PS_options()
 	    ps_fontsize = 20; /* default: 10pt */
 	break;
     }
+
     term->v_char = (unsigned int)(ps_fontsize*PS_SCF);
     if (ps_params->oldstyle)
 	term->h_char = (unsigned int)(ps_fontsize*PS_SCF*5/10);
@@ -2388,6 +2391,9 @@ PS_set_font(const char *font)
     name[sep] = NUL;
     for (i=0; i<sep; i++)
 	if (name[i] == ' ') name[i] = '-';
+
+    if (size <= 0)
+	size = ps_fontsize_previous;
 
     /* If TeX is doing the font handling, we don't need to */
     /* write anything into the postscript stream */
@@ -4120,7 +4126,7 @@ PS_open_prologue_file(char *name)
     char *ps_prologue_env;
     FILE *prologue_fd;
 
-    /* Allocate and load default directory into ps_prologue_dir.　*/
+    /* Allocate and load default directory into ps_prologue_dir.  */
     /* FIXME:  Why should we have to recalculate this every time? */
 #ifdef GNUPLOT_PS_DIR
 #   if defined(_WIN32) || defined(MSDOS)
