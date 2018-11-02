@@ -271,7 +271,7 @@ static void PS_dump_header_to_file __PROTO((char *name));
 #endif
 
 static float ps_fontsize = 14.;
-static float ps_fontsize_previous = 0.;
+static float ps_fontsize_previous = -1.;
 
 /* for enhanced mode, we keep a separate font name and size, which
  * is restored to the default value on font of ""
@@ -435,7 +435,7 @@ static struct PS_FontName {
 	struct PS_FontName *next;
 } *PS_DocFonts = NULL;
 
-static char PS_default_font[MAX_ID_LEN+1] = {'H','e','l','v','e','t','i','c','a',',','1','4','\0'};
+static char PS_default_font[2*MAX_ID_LEN] = {'H','e','l','v','e','t','i','c','a',',','1','4','\0'};
 
 /* given a font, look in store to see if it is there already
  * if so, return NULL. If not, reencode it if allowed to, otherwise
@@ -1174,9 +1174,11 @@ PS_options()
 	}
     }
 
-    /* Sanity check on fontsize */
+    /* Sanity checks on fontsize */
     if (ps_params->fontsize > 1000.)
 	ps_params->fontsize = 100.;
+    if (ps_params->fontsize <= 0.)
+	ps_params->fontsize = 14.;
 
     switch (ps_params->terminal) {
     case PSTERM_POSTSCRIPT:
@@ -1198,7 +1200,7 @@ PS_options()
 	term->h_char = (unsigned int)(ps_fontsize*PS_SCF*5/10);
     else
 	term->h_char = (unsigned int)(ps_fontsize*PS_SCF*6/10);
-    sprintf(PS_default_font,"%s,%g",ps_params->font,ps_fontsize);
+    sprintf(PS_default_font,"%s,%.2g",ps_params->font,ps_fontsize);
 
     if (ps_params->terminal == PSTERM_POSTSCRIPT) {
 	if (ps_params->first_fontfile) {
@@ -2389,6 +2391,9 @@ PS_set_font(const char *font)
     for (i=0; i<sep; i++)
 	if (name[i] == ' ') name[i] = '-';
 
+    if (size <= 0)
+	size = ps_fontsize_previous;
+
     /* If TeX is doing the font handling, we don't need to */
     /* write anything into the postscript stream */
     if (ps_params->terminal == PSTERM_POSTSCRIPT) {
@@ -3206,7 +3211,7 @@ TERM_PUBLIC void PS_set_color (t_colorspec *colorspec)
 	double g = (double)((colorspec->lt >> 8 ) & 255) / 255.;
 	double b = (double)(colorspec->lt & 255) / 255.;
 	PS_FLUSH_PATH;
-	fprintf(gppsfile, "%3.2f %3.2f %3.2f C ",r,g,b);
+	fprintf(gppsfile, "%3.2f %3.2f %3.2f C\n",r,g,b);
     }
 
     if (colorspec->type != TC_FRAC)
@@ -4149,7 +4154,7 @@ PS_open_prologue_file(char *name)
     char *ps_prologue_env;
     FILE *prologue_fd;
 
-    /* Allocate and load default directory into ps_prologue_dir.　*/
+    /* Allocate and load default directory into ps_prologue_dir.  */
     /* FIXME:  Why should we have to recalculate this every time? */
 #ifdef GNUPLOT_PS_DIR
 #   if defined(_WIN32)
