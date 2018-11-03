@@ -162,6 +162,10 @@ static void place_arrows3d __PROTO((int));
 static void place_labels3d __PROTO((struct text_label * listhead, int layer));
 static int map3d_getposition __PROTO((struct position* pos, const char* what, double* xpos, double* ypos, double* zpos));
 
+static void flip_projection_axis __PROTO((struct axis *axis));
+static void splot_map_activate __PROTO((void));
+static void splot_map_deactivate __PROTO((void));
+
 # define f_max(a,b) GPMAX((a),(b))
 # define f_min(a,b) GPMIN((a),(b))
 # define i_inrange(z,a,b) inrange((z),(a),(b))
@@ -3873,3 +3877,60 @@ do_3dkey_layout(legend_key *key, int *xinkey, int *yinkey)
     /* Center the key entries vertically, allowing for requested extra space */
     *yinkey -= (key->height_fix * t->v_char) / 2;
 }
+
+
+/*
+ * Support routines for "set view map"
+ */
+static int splot_map_active = 0;
+static float splot_map_surface_rot_x;
+static float splot_map_surface_rot_z;
+static float splot_map_surface_scale;
+
+static void
+flip_projection_axis(struct axis *axis)
+{
+    double temp = axis->min;
+    axis->min = axis->max;
+    axis->max = temp;
+    if (axis->linked_to_primary) {
+	axis = axis->linked_to_primary;
+	temp = axis->min;
+	axis->min = axis->max;
+	axis->max = temp;
+    }
+}
+
+void
+splot_map_activate()
+{
+    if (splot_map_active)
+	return;
+    splot_map_active = 1;
+    /* save current values */
+    splot_map_surface_rot_x = surface_rot_x;
+    splot_map_surface_rot_z = surface_rot_z ;
+    splot_map_surface_scale = surface_scale;
+    /* set new values */
+    surface_rot_x = 180;
+    surface_rot_z = 0;
+    /* version 4 had constant value surface_scale = 1.3 */
+    surface_scale = 1.425 * mapview_scale;
+    /* The Y axis runs backwards from a normal 2D plot */
+    flip_projection_axis(&axis_array[FIRST_Y_AXIS]);
+}
+
+void
+splot_map_deactivate()
+{
+    if (!splot_map_active)
+	return;
+    splot_map_active = 0;
+    /* restore the original values */
+    surface_rot_x = splot_map_surface_rot_x;
+    surface_rot_z = splot_map_surface_rot_z;
+    surface_scale = splot_map_surface_scale;
+    /* The Y axis runs backwards from a normal 2D plot */
+    flip_projection_axis(&axis_array[FIRST_Y_AXIS]);
+}
+

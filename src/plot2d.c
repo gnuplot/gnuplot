@@ -213,10 +213,6 @@ plotrequest()
 
     is_3d_plot = FALSE;
 
-    /* Deactivate if 'set view map' is still running after the previous 'splot': */
-    /* EAM Jan 2012 - this should no longer be necessary, but it doesn't hurt. */
-    splot_map_deactivate();
-
     if (parametric && strcmp(set_dummy_var[0], "u") == 0)
 	strcpy(set_dummy_var[0], "t");
 
