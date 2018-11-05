@@ -179,6 +179,10 @@ print "******************** file azimuth.dem ********************"
 load "azimuth.dem"
 reset
 
+print "******************** file projection.dem ******************"
+load "projection.dem"
+reset
+
 print "******************** file contours.dem ********************"
 load "contours.dem"
 load "custom_contours.dem"

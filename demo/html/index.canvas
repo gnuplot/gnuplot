@@ -11,8 +11,8 @@
 
 <h2 align=center>Gnuplot 5.3 demos (HTML canvas terminal)<br>
     See also the demo output for the
-    <a href="http://gnuplot.sourceforge.net/demo_cvs/">PNG</a> and
-    <a href="http://gnuplot.sourceforge.net/demo_svg_cvs/">SVG</a> terminals.
+    <a href="http://gnuplot.sourceforge.net/demo_5.3/">PNG</a> and
+    <a href="http://gnuplot.sourceforge.net/demo_svg_5.3/">SVG</a> terminals.
 </h2>
 <canvas id="warning" width=1 height=1>
     <div class='box'><h2>Your browser may not support the HTML 5 canvas element</h2></div>
@@ -78,6 +78,7 @@
     <li><a href="pm3d.html">pm3d coloring</a></li>
     <li><a href="hidden2.html">pm3d hidden surfaces</a></li>
     <li><a href="world2.html">3D mapping</a></li>
+    <li><a href="projection.html">2D projection of 3D surface</a></li>
     <li><a href="zerror.html">shaded error region</a></li>
     <li><a href="azimuth.html">azimuth</a></li>
     <li><a href="boxes3d.html">boxes</a></li>
@@ -229,7 +230,7 @@
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated September 2018</i>
+    <i>This page generated November 2018</i>
     </td>
 
     <td>

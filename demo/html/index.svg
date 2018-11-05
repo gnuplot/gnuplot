@@ -10,8 +10,8 @@
 <h2 align=center>
     Gnuplot Version 5.3 demos (SVG terminal)<br>
     See also the demo output for the 
-       <a href="../demo_cvs/">PNG</a> and
-       <a href="../demo_canvas_cvs/">canvas</a> terminals.
+       <a href="../demo_5.3/">PNG</a> and
+       <a href="../demo_canvas_5.3/">canvas</a> terminals.
 </h2>
 
 <p>
@@ -83,6 +83,7 @@ on mouse-coordinate tracking.
     <li><a href="pm3d.html">pm3d coloring</a></li>
     <li><a href="hidden2.html">pm3d hidden surfaces</a></li>
     <li><a href="world2.html">3D mapping</a></li>
+    <li><a href="projection.html">2D projection of 3D surface</a></li>
     <li><a href="zerror.html">shaded error region</a></li>
     <li><a href="azimuth.html">azimuth</a></li>
     <li><a href="boxes3d.html">boxes</a></li>
@@ -211,7 +212,7 @@ on mouse-coordinate tracking.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated September 2018</i>
+    <i>This page generated November 2018</i>
     </td>
 
     <td>
@@ -219,7 +220,7 @@ on mouse-coordinate tracking.
     <li><a href="http://sourceforge.net/projects/gnuplot/">
 	Gnuplot development pages on SourceForge</a></li>
     <li>On-line documentation in
-	<a href="http://gnuplot.sourceforge.net/docs_cvs/gnuplot.pdf">PDF</a></li>
+	<a href="http://gnuplot.sourceforge.net/docs_5.3/gnuplot.pdf">PDF</a></li>
     </ul>
     </td>
     

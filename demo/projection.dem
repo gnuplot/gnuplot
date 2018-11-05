@@ -15,7 +15,7 @@ set pm3d implicit at s
 set pm3d depthorder
 set pm3d border linecolor rgb "black"  linewidth 0.500 dashtype solid
 
-set multiplot layout 2,2
+set multiplot layout 2,2 title "2D projections of a 3D surface" font "/:Bold"
 
 set title "general view      "
 set view 60, 160, 1, 1.2
