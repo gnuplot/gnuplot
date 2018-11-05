@@ -1690,6 +1690,8 @@ static void
 unset_view()
 {
     splot_map = FALSE;
+    xz_projection = FALSE;
+    yz_projection = FALSE;
     aspect_ratio_3D = 0;
     surface_rot_z = 30.0;
     surface_rot_x = 60.0;

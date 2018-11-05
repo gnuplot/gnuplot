@@ -2759,9 +2759,14 @@ show_view()
     if (splot_map == TRUE) {
 	fprintf(stderr,"map scale %g\n", mapview_scale);
 	return;
-    }
-    fprintf(stderr, "%g rot_x, %g rot_z, %g scale, %g scale_z\n",
+    } else if (xz_projection) {
+	fprintf(stderr,"xz projection\n");
+    } else if (yz_projection) {
+	fprintf(stderr,"yz projection\n");
+    } else {
+	fprintf(stderr, "%g rot_x, %g rot_z, %g scale, %g scale_z\n",
 		surface_rot_x, surface_rot_z, surface_scale, surface_zscale);
+    }
     fprintf(stderr,"\t\t%s axes are %s\n",
 		aspect_ratio_3D == 2 ? "x/y" : aspect_ratio_3D == 3 ? "x/y/z" : "",
 		aspect_ratio_3D >= 2 ? "on the same scale" : "independently scaled");

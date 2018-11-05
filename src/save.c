@@ -627,6 +627,10 @@ set encoding %s\n\
     fputs("set view ", fp);
     if (splot_map == TRUE)
 	fprintf(fp, "map scale %g", mapview_scale);
+    else if (xz_projection)
+	fprintf(fp, "projection xz");
+    else if (yz_projection)
+	fprintf(fp, "projection yz");
     else {
 	fprintf(fp, "%g, %g, %g, %g",
 	    surface_rot_x, surface_rot_z, surface_scale, surface_zscale);

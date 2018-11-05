@@ -95,8 +95,12 @@ float surface_lscale = 0.0;
 float mapview_scale = 1.0;
 float azimuth = 0.0;
 
-/* Set by 'set view map': */
-int splot_map = FALSE;
+/* These indicate projection onto the xy, xz or yz plane
+ * as requested by 'set view map' or 'set view projection'
+ */
+TBOOLEAN splot_map = FALSE;
+TBOOLEAN xz_projection = FALSE;
+TBOOLEAN yz_projection = FALSE;
 
 /* position of the base plane, as given by 'set ticslevel' or 'set xyplane' */
 t_xyplane xyplane = { 0.5, FALSE };
@@ -226,9 +230,10 @@ static double back_x, back_y;
 static double right_x, right_y;
 static double front_x, front_y;
 
-/* There is a global flag splot_map for projection onto xy plane. */
-/* These are for projections onto the xz or yz plane */
-static TBOOLEAN xz_projection, yz_projection;
+/* The global flags splot_map, xz_projection, and yz_projection are specific views.
+ * These flag the more general case of looking down the x or y axis
+ */
+static TBOOLEAN xz_plane, yz_plane;
 
 #ifdef USE_MOUSE
 int axis3d_o_x, axis3d_o_y, axis3d_x_dx, axis3d_x_dy, axis3d_y_dx, axis3d_y_dy;
@@ -643,8 +648,18 @@ do_3dplot(
     AXIS *primary_z;
 
     /* Initiate transformation matrix using the global view variables. */
-    if (splot_map)
+    if (splot_map) {
 	splot_map_activate();
+    } else if (xz_projection) {
+	surface_rot_x = 270.;
+	surface_rot_z = 0.;
+	surface_scale = 1.425 * mapview_scale;
+    } else if (yz_projection) {
+	surface_rot_x = 90.;
+	surface_rot_z = 90.;
+	surface_scale = 1.425 * mapview_scale;
+	flip_projection_axis(&axis_array[FIRST_Z_AXIS]);
+    }
     mat_rot_z(surface_rot_z, trans_mat);
     mat_rot_x(surface_rot_x, mat);
     mat_mult(trans_mat, trans_mat, mat);
@@ -715,16 +730,16 @@ do_3dplot(
 
     /* Special case projections of the xz or yz plane */
     /* Place x or y axis to the left of the plot */
+    xz_plane = yz_plane = FALSE;
     if (!splot_map && (surface_rot_x == 90 || surface_rot_x == 270)) {
 	if (surface_rot_z ==  0 || surface_rot_z == 180) {
+	    xz_plane = TRUE;
 	    base_z = floor_z;
-	    xz_projection = TRUE;
-	} else if (surface_rot_z == 90 || surface_rot_z == 270) {
-	    base_z = ceiling_z;
-	    yz_projection = TRUE;
 	}
-    } else {
-	xz_projection = yz_projection = FALSE;
+	if (surface_rot_z == 90 || surface_rot_z == 270) {
+	    yz_plane = TRUE;
+	    base_z = ceiling_z;
+	}
     }
 
     term_start_plot();
@@ -1476,6 +1491,10 @@ do_3dplot(
 
     if (splot_map)
 	splot_map_deactivate();
+    else if (xz_projection || yz_projection)
+	surface_scale = 1.0;
+    else if (yz_projection)
+	flip_projection_axis(&axis_array[FIRST_Z_AXIS]);
 }
 
 
@@ -2226,9 +2245,74 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	    if ((draw_border & 15) == 15)
 		closepath();
 	}
-    } else
 
-    if (draw_border) {
+    } else if (draw_border && yz_projection) {
+	if (border_layer == current_layer) {
+	    struct axis *yaxis = &axis_array[FIRST_Y_AXIS];
+	    struct axis *zaxis = &axis_array[FIRST_Z_AXIS];
+	    term_apply_lp_properties(&border_lp);
+	    if ((draw_border & 15) == 15)
+		newpath();
+	    map3d_xy(0.0, yaxis->min, zaxis->min, &x, &y);
+	    clip_move(x, y);
+	    map3d_xy(0.0, yaxis->max, zaxis->min, &x, &y);
+	    if (draw_border & 8)
+		clip_vector(x, y);
+	    else
+		clip_move(x, y);
+	    map3d_xy(0.0, yaxis->max, zaxis->max, &x, &y);
+	    if (draw_border & 4)
+		clip_vector(x, y);
+	    else
+		clip_move(x, y);
+	    map3d_xy(0.0, yaxis->min, zaxis->max, &x, &y);
+	    if (draw_border & 2)
+		clip_vector(x, y);
+	    else
+		clip_move(x, y);
+	    map3d_xy(0.0, yaxis->min, zaxis->min, &x, &y);
+	    if (draw_border & 1)
+		clip_vector(x, y);
+	    else
+		clip_move(x, y);
+	    if ((draw_border & 15) == 15)
+		closepath();
+	}
+
+    } else if (draw_border && xz_projection) {
+	if (border_layer == current_layer) {
+	    struct axis *xaxis = &axis_array[FIRST_X_AXIS];
+	    struct axis *zaxis = &axis_array[FIRST_Z_AXIS];
+	    term_apply_lp_properties(&border_lp);
+	    if ((draw_border & 15) == 15)
+		newpath();
+	    map3d_xy(xaxis->min, 0.0, zaxis->min, &x, &y);
+	    clip_move(x, y);
+	    map3d_xy(xaxis->max, 0.0, zaxis->min, &x, &y);
+	    if (draw_border & 2)
+		clip_vector(x, y);
+	    else
+		clip_move(x, y);
+	    map3d_xy(xaxis->max, 0.0, zaxis->max, &x, &y);
+	    if (draw_border & 4)
+		clip_vector(x, y);
+	    else
+		clip_move(x, y);
+	    map3d_xy(xaxis->min, 0.0, zaxis->max, &x, &y);
+	    if (draw_border & 8)
+		clip_vector(x, y);
+	    else
+		clip_move(x, y);
+	    map3d_xy(xaxis->min, 0.0, zaxis->min, &x, &y);
+	    if (draw_border & 1)
+		clip_vector(x, y);
+	    else
+		clip_move(x, y);
+	    if ((draw_border & 15) == 15)
+		closepath();
+	}
+
+    } else if (draw_border) {
 	/* the four corners of the base plane, in normalized view
 	 * coordinates (-1..1) on all three axes. */
 	vertex bl, bb, br, bf;
@@ -2395,7 +2479,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
     /* Draw ticlabels and axis labels */
 
     /* x axis */
-    if (X_AXIS.ticmode || X_AXIS.label.text) {
+    if ((X_AXIS.ticmode || X_AXIS.label.text) && !yz_plane) {
 	vertex v0, v1;
 	double other_end = Y_AXIS.min + Y_AXIS.max - xaxis_y;
 	double mid_x;
@@ -2412,7 +2496,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	map3d_xyz(mid_x, other_end, base_z, &v1);
 
 	/* Unusual case: 2D projection of the xz plane */
-	if (!splot_map && xz_projection)
+	if (!splot_map && xz_plane)
 	    map3d_xyz(mid_x, xaxis_y, Z_AXIS.max+Z_AXIS.min-base_z, &v1);
 
 	tic_unitx = (v1.x - v0.x) / xyscaler;
@@ -2464,8 +2548,8 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		}
 
 		if (xz_projection) {
-		    v1.x -= 4. * t->h_tic * tic_unitx;
-		    v1.y -= 4. * t->h_tic * tic_unity;
+		    v1.x -= 3. * t->h_tic * tic_unitx;
+		    v1.y -= 3. * t->h_tic * tic_unity;
 		} else if (X_AXIS.ticmode & TICS_ON_AXIS) {
 		    v1.x += 2. * t->h_tic * ((X_AXIS.tic_in) ? 1.0 : -1.0) * tic_unitx;
 		    v1.y += 2. * t->h_tic * ((X_AXIS.tic_in) ? 1.0 : -1.0) * tic_unity;
@@ -2490,7 +2574,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
     }
 
     /* y axis */
-    if (Y_AXIS.ticmode || Y_AXIS.label.text) {
+    if ((Y_AXIS.ticmode || Y_AXIS.label.text) && !xz_plane) {
 	vertex v0, v1;
 	double other_end = X_AXIS.min + X_AXIS.max - yaxis_x;
 	double mid_y;
@@ -2507,7 +2591,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	map3d_xyz(other_end, mid_y, base_z, &v1);
 
 	/* Unusual case: 2D projection of the yz plane */
-	if (!splot_map && yz_projection)
+	if (!splot_map && yz_plane)
 	    map3d_xyz(yaxis_x, mid_y, Z_AXIS.max+Z_AXIS.min-base_z, &v1);
 
 	tic_unitx = (v1.x - v0.x) / xyscaler;
@@ -2561,7 +2645,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 			if (ang < -90) ang += 180;
 			if (ang > 90) ang -= 180;
 			Y_AXIS.label.rotate = (ang > 0) ? floor(ang + 0.5) : floor(ang - 0.5);
-		    } else {
+		    } else if (!yz_projection) {
 			/* The 2D default state (ylabel rotate) is not wanted in 3D */
 			Y_AXIS.label.rotate = 0;
 		    }
@@ -2573,8 +2657,8 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		    }
 
 		    if (yz_projection) {
-			v1.x -= 4. * t->h_tic * tic_unitx;
-			v1.y -= 4. * t->h_tic * tic_unity;
+			v1.x -= 3. * t->h_tic * tic_unitx;
+			v1.y -= 3. * t->h_tic * tic_unity;
 		    } else if (Y_AXIS.ticmode & TICS_ON_AXIS) {
 			v1.x += 2. * t->h_tic * ((Y_AXIS.tic_in) ? 1.0 : -1.0) * tic_unitx;
 			v1.y += 2. * t->h_tic * ((Y_AXIS.tic_in) ? 1.0 : -1.0) * tic_unity;

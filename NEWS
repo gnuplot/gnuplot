@@ -6,6 +6,7 @@ Changes not in 5.2
 * NEW "set clip radial" for line segments in polar mode plots
 * NEW "splot ... with circles"
 * NEW "splot ... with boxes"
+* NEW "set view projection {xz|yz}"
 * NEW per-plot fillcolor and fillstyle for pm3d surfaces
 * NEW allow separate color column with dgrid3d surfaces (but not color splines)
 * NEW unicode escape sequences \U+hhhh

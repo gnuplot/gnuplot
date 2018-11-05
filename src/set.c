@@ -5282,14 +5282,21 @@ set_view()
 {
     int i;
     TBOOLEAN was_comma = TRUE;
-    static const char errmsg1[] = "rot_%c must be in [0:%d] degrees range; view unchanged";
+    static const char errmsg1[] = "rot_%c must be in [0:360] degrees range; view unchanged";
     static const char errmsg2[] = "%sscale must be > 0; view unchanged";
     double local_vals[4];
 
     c_token++;
-    if (equals(c_token,"map")) {
+
+    /* 'set view map' establishes projection onto the xy plane */
+    if (equals(c_token,"map")
+    ||  (almost_equals(c_token, "proj$ection") && equals(c_token+1, "xy"))) {
 	splot_map = TRUE;
+	xz_projection = yz_projection = FALSE;
 	mapview_scale = 1.0;
+	azimuth = 0;
+	if (almost_equals(c_token, "proj$ection"))
+	    c_token++;
 	c_token++;
 	if (equals(c_token,"scale")) {
 	    c_token++;
@@ -5304,6 +5311,26 @@ set_view()
 
     if (splot_map == TRUE)
 	splot_map = FALSE; /* default is no map */
+
+    /* 'set view projection {xz|yz} establishes projection onto xz or yz plane */
+    if (almost_equals(c_token, "proj$ection")) {
+	c_token++;
+	xz_projection = yz_projection = FALSE;
+	if (equals(c_token, "xz"))
+	    xz_projection = TRUE;
+	else if (equals(c_token, "yz"))
+	    yz_projection = TRUE;
+	else
+	    int_error(c_token, "expecting xy or xz or yz");
+	c_token++;
+	/* FIXME: should these be deferred to do_3dplot()? */
+	xyplane.z = 0.0;
+	xyplane.absolute = FALSE;
+	azimuth = -90;
+	axis_array[FIRST_Z_AXIS].tic_pos = CENTRE;
+	axis_array[FIRST_Z_AXIS].manual_justify = TRUE;
+	return;
+    }
 
     if (almost_equals(c_token,"equal$_axes")) {
 	c_token++;
@@ -5346,14 +5373,15 @@ set_view()
     }
 
     if (local_vals[0] < 0 || local_vals[0] > 360)
-	int_error(c_token, errmsg1, 'x', 360);
+	int_error(c_token, errmsg1, 'x');
     if (local_vals[1] < 0 || local_vals[1] > 360)
-	int_error(c_token, errmsg1, 'z', 360);
+	int_error(c_token, errmsg1, 'z');
     if (local_vals[2] < 1e-6)
 	int_error(c_token, errmsg2, "");
     if (local_vals[3] < 1e-6)
 	int_error(c_token, errmsg2, "z");
 
+    xz_projection = yz_projection = FALSE;
     surface_rot_x = local_vals[0];
     surface_rot_z = local_vals[1];
     surface_scale = local_vals[2];

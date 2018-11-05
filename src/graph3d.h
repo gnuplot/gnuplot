@@ -150,7 +150,7 @@ extern float surface_zscale;
 extern float surface_lscale;
 extern float mapview_scale;
 extern float azimuth;
-extern int splot_map;
+extern TBOOLEAN splot_map, xz_projection, yz_projection;
 
 typedef struct { 
     double z; 

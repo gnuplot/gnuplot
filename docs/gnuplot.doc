@@ -223,6 +223,9 @@ C
 ##See `set walls`, `set grid vertical`.
 #b `set table separator {tab|comma|"char"}` can be used to create csv files.
 ##See `plot with table`.
+#b New options `set view projection {ixy|xz|yz}` adjust view angles, axis tic
+##and label placement to generate a 2D projection of a 3D splot.
+##`set view projection xy` is equivalent to `set view map`.
 #b `set rgbmax <value>` controls interpretation of input RGB values.
 #b new formats descriptors tH tM tS handle relative times (interval lengths).
 ##See `time_specifiers`.
@@ -4801,11 +4804,11 @@ Ffigure_surface+contours
 Ffigure_mapcontours
 3 2D projection (set view map)
 ?2D projection (set view map)
-?projection
  An important special case of the `splot` command is to map the Z coordinate
- onto a 2D surface by projecting the plot along the Z axis.  See `set view map`.
- This plot mode can be used to generate contour plots and heat maps. This figure
- shows contours plotted once with plot style `lines`, once with style `labels`.
+ onto a 2D surface by projecting the plot along the Z axis onto the xy plane.
+ See `set view map`.  This plot mode is useful for contour plots and heat maps.
+ This figure shows contours plotted once with plot style `lines` and once with
+ style `labels`.
 #TeX \newpage
 2 Polar plots
 =polar
@@ -14027,6 +14030,7 @@ Ffigure_multiple_keys
  Syntax:
        set view <rot_x>{,{<rot_z>}{,{<scale>}{,<scale_z>}}}
        set view map {scale <scale>}
+       set view map projection {xy|xz|yz}
        set view {no}equal {xy|xyz}
        set view azimuth <angle>
        show view
@@ -14081,6 +14085,18 @@ Ffigure_multiple_keys
  By default all three axes are scaled independently to fill the available area.
 
  See also `set xyplane`.
+4 projection
+?set view projection
+?view projection
+?projection
+ Syntax:
+      set view projection {xy|xz|yz}
+ Rotates the view angles of a 3D plot so that one of the primary planes
+ xy, xz, or yz lies in the plane of the plot.  Axis labels and tics positioning
+ is adjusted accordingly;  tics and labels on the third axis are disabled.
+ The plot is scaled up to approximately match the size that 'plot' would
+ generate for the same axis ranges.
+ `set view projection xy` is equivalent to `set view map`.
 3 vrange
 ?commands set vrange
 ?commands show vrange
