@@ -1581,6 +1581,9 @@ save_data_func_style(FILE *fp, const char *which, enum PLOT_STYLE style)
     case VECTOR:
 	fputs("vector\n", fp);
 	break;
+    case ARROWS:
+	fputs("arrows\n", fp);
+	break;
     case FINANCEBARS:
 	fputs("financebars\n", fp);
 	break;

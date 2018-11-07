@@ -1243,7 +1243,7 @@ do_key_sample(
 	    }
 	}
 
-    } else if (this_plot->plot_style == VECTOR && t->arrow) {
+    } else if ((this_plot->plot_style & PLOT_STYLE_HAS_VECTOR) && t->arrow) {
 	double x1 = xl + key_sample_left;
 	double y1 = yl;
 	double x2 = xl + key_sample_right;

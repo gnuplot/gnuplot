@@ -819,6 +819,7 @@ do_plot(struct curve_points *plots, int pcount)
 		break;
 
 	    case VECTOR:
+	    case ARROWS:
 		plot_vectors(this_plot);
 		break;
 	    case FINANCEBARS:
@@ -2436,7 +2437,6 @@ static void
 plot_vectors(struct curve_points *plot)
 {
     int i;
-    struct coordinate points[2];
     arrow_style_type ap;
     BoundingBox *clip_save = clip_area;
 
@@ -2450,16 +2450,42 @@ plot_vectors(struct curve_points *plot)
 
     for (i = 0; i < plot->p_count; i++) {
 
-	points[0] = plot->points[i];
-	if (points[0].type == UNDEFINED)
+	double x0, y0, x1, y1;
+	struct coordinate *tail = &(plot->points[i]);
+
+	if (tail->type == UNDEFINED)
 	    continue;
 
-	points[1].x = plot->points[i].xhigh;
-	points[1].y = plot->points[i].yhigh;
+	/* The only difference between "with vectors" and "with arrows"
+	 * is that vectors already have the head coordinates in xhigh, yhigh
+	 * while arrows need to generate them from length + angle.
+	 */
+	x0 = map_x_double(tail->x);
+	y0 = map_y_double(tail->y);
+	if (plot->plot_style == VECTOR) {
+	    x1 = map_x_double(tail->xhigh);
+	    y1 = map_y_double(tail->yhigh);
+	} else {  /* ARROWS */
+	    double length;
+	    double angle = DEG2RAD * tail->yhigh;
+	    double aspect = (double)term->v_tic / (double)term->h_tic;
+	    if (strcmp(term->name, "windows") == 0)
+		aspect = 1.0;
+	    if (tail->xhigh > 0)
+		/* length > 0 is in x-axis coords */
+		length = map_x_double(tail->x + tail->xhigh) - x0;
+	    else {
+		/* -1 < length < 0 indicates graph coordinates */
+		length = tail->xhigh * (plot_bounds.xright - plot_bounds.xleft);
+		length = fabs(length);
+	    }
+	    x1 = x0 + cos(angle) * length;
+	    y1 = y0 + sin(angle) * length * aspect;
+	}
 
 	/* variable arrow style read from extra data column */
 	if (plot->arrow_properties.tag == AS_VARIABLE) {
-	    int as = plot->points[i].z;
+	    int as = tail->z;
 	    arrow_use_properties(&ap, as);
 	    term_apply_lp_properties(&ap.lp_properties);
 	    apply_head_properties(&ap);
@@ -2469,9 +2495,7 @@ plot_vectors(struct curve_points *plot)
 	check_for_variable_color(plot, &plot->varcolor[i]);
 
 	/* draw_clip_arrow does the hard work for us */
-	draw_clip_arrow(map_x_double(points[0].x), map_y_double(points[0].y),
-			map_x_double(points[1].x), map_y_double(points[1].y),
-			ap.head);
+	draw_clip_arrow(x0, y0, x1, y1, ap.head);
     }
 
     clip_area = clip_save;

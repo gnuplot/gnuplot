@@ -212,6 +212,8 @@ C
 #start
 #b Plot style `with circles` can be used in 3D plots.
 #b Plot style `with boxes` can be used in 3D plots.
+#b 2D plot style `with arrows` is identical to `with vectors` except that each
+## arrow is specified using x:y:length:angle rather than x:y:xdelta:ydelta
 #b Pm3d surfaces can have individual fillstyle and fillcolor
 #b Customized contour line types. See `set cntrparam`.
 #end
@@ -3514,6 +3516,31 @@ Ffigure_newsyntax
  and y in the second.  For more information on how to fine-tune how columns in a
  file are interpreted as plot data, see `using`.
 
+2 arrows 
+?plotting styles arrows
+?style arrows
+?with arrows
+?arrows
+ The 2D `arrows` style draws an arrow with specified length and orientation
+ angle at each point (x,y).  Additional input columns may be used to provide
+ variable (per-datapoint) color information or arrow style.
+ It is identical to the 2D style `with vectors` except that each the arrow
+ head is positioned using length + angle rather than delta_x + delta_y.
+ See `with vectors`.
+
+      4 columns:  x  y  length  angle
+
+ The keywords "with arrows" may be followed by inline arrow style properties,
+ a reference to a predefined arrow style, or `arrowtyle variable` to load the
+ index of the desired arrow style for each arrow from a separate column.
+
+ `length` > 0 is interpreted in x-axis coordinates.
+ -1 < `length` < 0 is interpreted in horizontal graph coordinates; i.e. |length|
+ is a fraction of the total graph width.
+ The program will adjust for differences in x and y scaling or plot aspect ratio
+ so that the visual length is independent of the orientation angle.
+
+ `angle` is always specified in degrees.
 2 boxerrorbars
 ?plotting styles boxerrorbars
 ?style boxerrorbars
@@ -4595,6 +4622,9 @@ Ffigure_vectors
  splot with vectors is supported only for `set mapping cartesian`.
  `set clip one` and `set clip two` affect vectors drawn in 2D.
  See `set clip` and `arrowstyle`.
+
+ See also the 2D plot style `with arrows` that is identical to `with vectors`
+ except that each arrow is specified using x:y:length:angle.
 2 xerrorbars
 ?plotting styles xerrorbars
 ?style xerrorbars
@@ -7644,6 +7674,7 @@ Ffigure_fenceplot
                          {linecolor | lc <colorspec>}
                          {pointtype | pt <point_type>}
                          {pointsize | ps <point_size>}
+                         {arrowstyle | as <arrowstyle_index>}
                          {fill | fs <fillstyle>} {fillcolor | fc <colorspec>}
                          {nohidden3d} {nocontours} {nosurface}
                          {palette}}
@@ -7651,11 +7682,10 @@ Ffigure_fenceplot
 
 
  where <style> is one of
-
-      lines        dots       steps     xerrorbar    xyerrorbars
-      points       impulses   fsteps    xerrorlines  xyerrorlines
-      linespoints  labels     histeps   yerrorbars
-      financebars  surface    vectors   yerrorlines  parallelaxes
+      lines        dots       steps     vectors      yerrorlines
+      points       impulses   fsteps    xerrorbar    xyerrorbars 
+      linespoints  labels     histeps   xerrorlines  xyerrorlines
+      financebars  surface    arrows    yerrorbar    parallelaxes
  or
       boxes         boxplot        ellipses       histograms  rgbalpha
       boxerrorbars  candlesticks   filledcurves   image       rgbimage
@@ -8586,7 +8616,7 @@ Ffigure_fenceplot
  Notes:
 
  * `set clip` affects only points and lines produced by plot styles `lines`,
- `linespoints`, `points`, and `vectors`.
+ `linespoints`, `points`, `arrows`, and `vectors`.
 
  * Clipping of colored quadrangles drawn for `pm3d` maps and surfaces is
  controlled `set pm3d clip1in` and `set pm3d clip4in`.

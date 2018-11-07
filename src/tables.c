@@ -704,6 +704,7 @@ const struct gen_table plotstyle_tbl[] =
     { "fs$teps", FSTEPS },
     { "his$teps", HISTEPS },
     { "vec$tors", VECTOR },
+    { "arrow$s", ARROWS },
     { "fin$ancebars", FINANCEBARS },
     { "can$dlesticks", CANDLESTICKS },
     { "boxplot", BOXPLOT },

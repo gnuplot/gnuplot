@@ -327,7 +327,7 @@ refresh_bounds(struct curve_points *first_plot, int nplots)
 	     */
 	    if (!this_plot->noautoscale) {
 		autoscale_one_point(x_axis, point->x);
-		if (this_plot->plot_style == VECTOR)
+		if (this_plot->plot_style & PLOT_STYLE_HAS_VECTOR)
 		    autoscale_one_point(x_axis, point->xhigh);
 	    }
 	    if (!inrange(point->x, x_axis->min, x_axis->max)) {
@@ -471,6 +471,7 @@ get_data(struct curve_points *current_plot)
 	break;
 
     case VECTOR:	/* x, y, dx, dy, variable color or arrow style */
+    case ARROWS:	/* x, y, len, ang, variable color or arrow style */
 	min_cols = 4;
 	max_cols = 5;
 	break;
@@ -741,6 +742,7 @@ get_data(struct curve_points *current_plot)
 			    if (j != 7 && j != 5) int_error(NO_CARET,errmsg);
 			    break;
 	    case VECTOR:
+	    case ARROWS:
 			    if (j < 5) int_error(NO_CARET,errmsg);
 			    break;
 	    case LABELPOINTS:
@@ -1015,6 +1017,18 @@ get_data(struct curve_points *current_plot)
 	    break;
 	}
 
+	case ARROWS:
+	{   /* 4 columns:	x y len ang [arrowstyle variable] */
+	    coordval xlow  = v[0];
+	    coordval ylow  = v[1];
+	    coordval len = v[2];
+	    coordval ang = v[3];
+	    coordval arrowstyle = (j == 5) ? v[4] : 0.0;
+	    store2d_point(current_plot, i++, v[0], v[1],
+			  xlow, len, ylow, ang, arrowstyle);
+	    break;
+	}
+
 	case CIRCLES:
 	{   /* x y
 	     * x y radius
@@ -1269,6 +1283,7 @@ store2d_point(
     case STEPS:
     case FSTEPS:
     case HISTEPS:
+    case ARROWS:
 	cp->xlow = xlow;
 	cp->xhigh = xhigh;
 	cp->ylow = ylow;
@@ -2253,7 +2268,7 @@ eval_plots()
 		    }
 		}
 
-		if (this_plot->plot_style == VECTOR) {
+		if (this_plot->plot_style & PLOT_STYLE_HAS_VECTOR) {
 		    int stored_token = c_token;
 
 		    if (!set_lpstyle) {
@@ -2428,7 +2443,7 @@ eval_plots()
 
 	    /* Vectors will be drawn using linetype from arrow style, so we
 	     * copy this to overall plot linetype so that the key sample matches */
-	    if (this_plot->plot_style == VECTOR) {
+	    if (this_plot->plot_style & PLOT_STYLE_HAS_VECTOR) {
 		if (!set_lpstyle) {
 		    if (prefer_line_styles)
 			lp_use_properties(&(this_plot->arrow_properties.lp_properties), line_num+1);
