@@ -614,26 +614,24 @@ boundary(struct curve_points *plots, int count)
     }
 
 
-    /* Modify the bounding box to fit the aspect ratio, if any was
-     * given. */
+    /* Modify the bounding box to fit the aspect ratio, if any was given */
     if (aspect_ratio != 0.0) {
 	double current_aspect_ratio;
 
-	if (aspect_ratio < 0
-	    && (X_AXIS.max - X_AXIS.min) != 0.0
-	    ) {
-	    current_aspect_ratio = - aspect_ratio
+	if (aspect_ratio < 0 && (X_AXIS.max - X_AXIS.min) != 0.0) {
+	    current_aspect_ratio = -aspect_ratio
 		* fabs((Y_AXIS.max - Y_AXIS.min) / (X_AXIS.max - X_AXIS.min));
 	} else
 	    current_aspect_ratio = aspect_ratio;
 
-	/* Set aspect ratio if valid and sensible */
-	/* EAM Mar 2008 - fixed borders take precedence over centering */
-	if (current_aspect_ratio >= 0.01 && current_aspect_ratio <= 100.0) {
+	if (current_aspect_ratio < 0.005 || current_aspect_ratio > 2000.0) {
+	    int_warn(NO_CARET, "rejecting extreme aspect ratio");
+	} else {
 	    double current = ((double) (plot_bounds.ytop - plot_bounds.ybot))
 			   / (plot_bounds.xright - plot_bounds.xleft);
 	    double required = (current_aspect_ratio * t->v_tic) / t->h_tic;
 
+	    /* Fixed borders take precedence over centering */
 	    if (current > required) {
 		/* too tall */
 		int old_height = plot_bounds.ytop - plot_bounds.ybot;
@@ -648,6 +646,7 @@ boundary(struct curve_points *plots, int count)
 		}
 
 	    } else {
+		/* too wide */
 		int old_width = plot_bounds.xright - plot_bounds.xleft;
 		int new_width = (plot_bounds.ytop - plot_bounds.ybot) / required;
 		if (lmargin.scalex == screen)
@@ -711,7 +710,8 @@ boundary(struct curve_points *plots, int count)
     }
 
     /*
-     * Notwithstanding all these fancy calculations, plot_bounds.ytop must always be above plot_bounds.ybot
+     * Notwithstanding all these fancy calculations,
+     * plot_bounds.ytop must always be above plot_bounds.ybot
      */
     if (plot_bounds.ytop < plot_bounds.ybot) {
 	int i = plot_bounds.ytop;
@@ -721,8 +721,7 @@ boundary(struct curve_points *plots, int count)
 	FPRINTF((stderr,"boundary: Big problems! plot_bounds.ybot > plot_bounds.ytop\n"));
     }
 
-    /*  compute coordinates for axis labels, title et al
-     *     (some of these may not be used) */
+    /*  compute coordinates for axis labels, title etc */
 
     x2label_y = plot_bounds.ytop + x2label_textheight;
     x2label_y += 0.5 * t->v_char;
