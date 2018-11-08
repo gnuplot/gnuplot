@@ -617,6 +617,7 @@ boundary(struct curve_points *plots, int count)
     /* Modify the bounding box to fit the aspect ratio, if any was given */
     if (aspect_ratio != 0.0) {
 	double current_aspect_ratio;
+	double current, required;
 
 	if (aspect_ratio < 0 && (X_AXIS.max - X_AXIS.min) != 0.0) {
 	    current_aspect_ratio = -aspect_ratio
@@ -624,39 +625,38 @@ boundary(struct curve_points *plots, int count)
 	} else
 	    current_aspect_ratio = aspect_ratio;
 
-	if (current_aspect_ratio < 0.005 || current_aspect_ratio > 2000.0) {
-	    int_warn(NO_CARET, "rejecting extreme aspect ratio");
+	if (current_aspect_ratio < 0.005 || current_aspect_ratio > 2000.0)
+	    int_warn(NO_CARET, "extreme aspect ratio");
+
+	current = ((double) (plot_bounds.ytop - plot_bounds.ybot))
+		/ ((double) (plot_bounds.xright - plot_bounds.xleft));
+	required = (current_aspect_ratio * t->v_tic) / t->h_tic;
+
+	/* Fixed borders take precedence over centering */
+	if (current > required) {
+	    /* too tall */
+	    int old_height = plot_bounds.ytop - plot_bounds.ybot;
+	    int new_height = required * (plot_bounds.xright - plot_bounds.xleft);
+	    if (bmargin.scalex == screen)
+		plot_bounds.ytop = plot_bounds.ybot + new_height;
+	    else if (tmargin.scalex == screen)
+		plot_bounds.ybot = plot_bounds.ytop - new_height;
+	    else {
+		plot_bounds.ybot += (old_height - new_height) / 2;
+		plot_bounds.ytop -= (old_height - new_height) / 2;
+	    }
+
 	} else {
-	    double current = ((double) (plot_bounds.ytop - plot_bounds.ybot))
-			   / (plot_bounds.xright - plot_bounds.xleft);
-	    double required = (current_aspect_ratio * t->v_tic) / t->h_tic;
-
-	    /* Fixed borders take precedence over centering */
-	    if (current > required) {
-		/* too tall */
-		int old_height = plot_bounds.ytop - plot_bounds.ybot;
-		int new_height = required * (plot_bounds.xright - plot_bounds.xleft);
-		if (bmargin.scalex == screen)
-		    plot_bounds.ytop = plot_bounds.ybot + new_height;
-		else if (tmargin.scalex == screen)
-		    plot_bounds.ybot = plot_bounds.ytop - new_height;
-		else {
-		    plot_bounds.ybot += (old_height - new_height) / 2;
-		    plot_bounds.ytop -= (old_height - new_height) / 2;
-		}
-
-	    } else {
-		/* too wide */
-		int old_width = plot_bounds.xright - plot_bounds.xleft;
-		int new_width = (plot_bounds.ytop - plot_bounds.ybot) / required;
-		if (lmargin.scalex == screen)
-		    plot_bounds.xright = plot_bounds.xleft + new_width;
-		else if (rmargin.scalex == screen)
-		    plot_bounds.xleft = plot_bounds.xright - new_width;
-		else {
-		    plot_bounds.xleft += (old_width - new_width) / 2;
-		    plot_bounds.xright -= (old_width - new_width) / 2;
-		}
+	    /* too wide */
+	    int old_width = plot_bounds.xright - plot_bounds.xleft;
+	    int new_width = (plot_bounds.ytop - plot_bounds.ybot) / required;
+	    if (lmargin.scalex == screen)
+		plot_bounds.xright = plot_bounds.xleft + new_width;
+	    else if (rmargin.scalex == screen)
+		plot_bounds.xleft = plot_bounds.xright - new_width;
+	    else {
+		plot_bounds.xleft += (old_width - new_width) / 2;
+		plot_bounds.xright -= (old_width - new_width) / 2;
 	    }
 	}
     }
