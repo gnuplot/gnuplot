@@ -631,9 +631,10 @@ boundary(struct curve_points *plots, int count)
 	} else
 	    current_aspect_ratio = aspect_ratio;
 
-	/* Set aspect ratio if valid and sensible */
-	/* EAM Mar 2008 - fixed borders take precedence over centering */
-	if (current_aspect_ratio >= 0.01 && current_aspect_ratio <= 100.0) {
+	if (current_aspect_ratio < 0.001 || current_aspect_ratio > 1000.0)
+	    int_warn(NO_CARET, "extreme aspect ratio");
+	if (TRUE) {
+	    /* Apply despite the warning */
 	    double current = ((double) (plot_bounds.ytop - plot_bounds.ybot))
 			   / (plot_bounds.xright - plot_bounds.xleft);
 	    double required = (current_aspect_ratio * t->v_tic) / t->h_tic;

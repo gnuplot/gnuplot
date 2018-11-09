@@ -1,3 +1,8 @@
+2018-11-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/boundary.c:  Relax limit on extreme aspect ration of plot and
+	apply the scaling after warning even if the limit is exceeded.
+
 2018-10-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp: monothreaded wxt terminal needs a mutex
