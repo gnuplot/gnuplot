@@ -51,7 +51,7 @@
 /* Type definitions */
 
 typedef enum e_verbosity_level {
-    QUIET, RESULTS, BRIEF, VERBOSE
+    QUIET=1, RESULTS, BRIEF, VERBOSE
 } verbosity_level;
 
 typedef char fixstr[MAX_ID_LEN+1];

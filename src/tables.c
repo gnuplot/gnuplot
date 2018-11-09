@@ -737,6 +737,16 @@ const struct gen_table filledcurves_opts_tbl[] =
     { NULL, -1 }
 };
 
+const struct gen_table fit_verbosity_level[] =
+{
+    { "brief", BRIEF },
+    { "quiet", QUIET },
+    { "noquiet", BRIEF },
+    { "results", RESULTS },
+    { "verbose", VERBOSE },
+    { NULL, -1 }
+};
+
 int
 lookup_table(const struct gen_table *tbl, int find_token)
 {

@@ -219,6 +219,7 @@ extern const struct gen_table color_model_tbl[];
 extern const struct gen_table set_hidden3d_tbl[];
 extern const struct gen_table show_style_tbl[];
 extern const struct gen_table plotstyle_tbl[];
+extern const struct gen_table fit_verbosity_level[];
 
 /* EAM Nov 2008 - this is now dynamic, so we can add colors on the fly */
 extern       struct gen_table *user_color_names_tbl;

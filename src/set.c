@@ -1708,6 +1708,7 @@ set_encoding()
 static void
 set_fit()
 {
+    int key;
     c_token++;
 
     while (!END_OF_COMMAND) {
@@ -1750,20 +1751,8 @@ set_fit()
 	} else if (almost_equals(c_token, "noerrors$caling")) {
 	    fit_errorscaling = FALSE;
 	    c_token++;
-	} else if (equals(c_token, "quiet")) {
-	    fit_verbosity = QUIET;
-	    c_token++;
-	} else if (equals(c_token, "noquiet")) {
-	    fit_verbosity = BRIEF;
-	    c_token++;
-	} else if (equals(c_token, "results")) {
-	    fit_verbosity = RESULTS;
-	    c_token++;
-	} else if (equals(c_token, "brief")) {
-	    fit_verbosity = BRIEF;
-	    c_token++;
-	} else if (equals(c_token, "verbose")) {
-	    fit_verbosity = VERBOSE;
+	} else if ((key = lookup_table(fit_verbosity_level, c_token))) {
+	    fit_verbosity = key;
 	    c_token++;
 	} else if (equals(c_token, "prescale")) {
 	    fit_prescale = TRUE;

@@ -1027,20 +1027,7 @@ set origin %g,%g\n",
 	fprintf(fp, " nologfile");
     else if (fitlogfile)
 	fprintf(fp, " logfile \'%s\'", fitlogfile);
-    switch (fit_verbosity) {
-	case QUIET:
-	    fprintf(fp, " quiet");
-	    break;
-	case RESULTS:
-	    fprintf(fp, " results");
-	    break;
-	case BRIEF:
-	    fprintf(fp, " brief");
-	    break;
-	case VERBOSE:
-	    fprintf(fp, " verbose");
-	    break;
-    }
+    fprintf(fp, " %s", reverse_table_lookup(fit_verbosity_level, fit_verbosity));
     fprintf(fp, " %serrorvariables",
 	fit_errorvariables ? "" : "no");
     fprintf(fp, " %scovariancevariables",
@@ -1515,112 +1502,26 @@ save_pm3dcolor(FILE *fp, const struct t_colorspec *tc)
 void
 save_data_func_style(FILE *fp, const char *which, enum PLOT_STYLE style)
 {
-    switch (style) {
-    case LINES:
-	fputs("lines\n", fp);
-	break;
-    case POINTSTYLE:
-	fputs("points\n", fp);
-	break;
-    case IMPULSES:
-	fputs("impulses\n", fp);
-	break;
-    case LINESPOINTS:
-	fputs("linespoints\n", fp);
-	break;
-    case DOTS:
-	fputs("dots\n", fp);
-	break;
-    case YERRORLINES:
-	fputs("yerrorlines\n", fp);
-	break;
-    case XERRORLINES:
-	fputs("xerrorlines\n", fp);
-	break;
-    case XYERRORLINES:
-	fputs("xyerrorlines\n", fp);
-	break;
-    case YERRORBARS:
-	fputs("yerrorbars\n", fp);
-	break;
-    case XERRORBARS:
-	fputs("xerrorbars\n", fp);
-	break;
-    case XYERRORBARS:
-	fputs("xyerrorbars\n", fp);
-	break;
-    case BOXES:
-	fputs("boxes\n", fp);
-	break;
-    case HISTOGRAMS:
-	fputs("histograms\n", fp);
-	break;
-    case FILLEDCURVES:
-	fputs("filledcurves ", fp);
+    char *answer = strdup(reverse_table_lookup(plotstyle_tbl, style));
+    char *idollar = strchr(answer, '$');
+    if (idollar) {
+	do {
+	    *idollar = *(idollar+1);
+	    idollar++;
+	} while (*idollar);
+
+    }
+    fputs(answer, fp);
+    free(answer);
+
+    if (style == FILLEDCURVES) {
+	fputs(" ", fp);
 	if (!strcmp(which, "data") || !strcmp(which, "Data"))
 	    filledcurves_options_tofile(&filledcurves_opts_data, fp);
 	else
 	    filledcurves_options_tofile(&filledcurves_opts_func, fp);
-	fputc('\n', fp);
-	break;
-    case BOXERROR:
-	fputs("boxerrorbars\n", fp);
-	break;
-    case BOXXYERROR:
-	fputs("boxxyerror\n", fp);
-	break;
-    case STEPS:
-	fputs("steps\n", fp);
-	break;			/* JG */
-    case FSTEPS:
-	fputs("fsteps\n", fp);
-	break;			/* HOE */
-    case HISTEPS:
-	fputs("histeps\n", fp);
-	break;			/* CAC */
-    case VECTOR:
-	fputs("vector\n", fp);
-	break;
-    case ARROWS:
-	fputs("arrows\n", fp);
-	break;
-    case FINANCEBARS:
-	fputs("financebars\n", fp);
-	break;
-    case CANDLESTICKS:
-	fputs("candlesticks\n", fp);
-	break;
-    case BOXPLOT:
-	fputs("boxplot\n", fp);
-	break;
-    case PM3DSURFACE:
-	fputs("pm3d\n", fp);
-	break;
-    case LABELPOINTS:
-	fputs("labels\n", fp);
-	break;
-    case IMAGE:
-	fputs("image\n", fp);
-	break;
-    case RGBIMAGE:
-	fputs("rgbimage\n", fp);
-	break;
-	case CIRCLES:
-	fputs("circles\n", fp);
-	break;
-	case ELLIPSES:
-	fputs("ellipses\n", fp);
-	break;
-    case SURFACEGRID:
-	fputs("surfaces\n", fp);
-	break;
-    case PARALLELPLOT:
-	fputs("parallelaxes\n", fp);
-	break;
-    case PLOT_STYLE_NONE:
-    default:
-	fputs("---error!---\n", fp);
     }
+    fputc('\n', fp);
 }
 
 void
