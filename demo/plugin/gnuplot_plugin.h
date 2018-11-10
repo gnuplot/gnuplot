@@ -1,5 +1,39 @@
+/*
+ * DATA_TYPES and struct value must match definitions in
+ * #include <gp_types.h>
+ */
+#include <inttypes.h>		/* C99 type definitions */
+enum DATA_TYPES {
+	INTGR=1,
+	CMPLX,
+	STRING,
+	DATABLOCK,
+	ARRAY,
+	NOTDEFINED,	/* exists, but value is currently undefined */
+	INVALID_VALUE,	/* used only for error return by external functions */
+	INVALID_NAME	/* used only to trap errors in linked axis function definition */
+};
 
-#include <gp_types.h>
+struct gp_cmplx {
+	double real, imag;
+};
+
+typedef struct value {
+    enum DATA_TYPES type;
+    union {
+	int64_t int_val;
+	struct gp_cmplx cmplx_val;
+	char *string_val;
+	char **data_array;
+	struct value *value_array;
+    } v;
+} t_value;
+
+/*
+ * End of definitions from gp_types.h
+ */
+
+
 
 #ifdef _WIN32
 # define DLLEXPORT __declspec(dllexport)
