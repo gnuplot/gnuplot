@@ -498,31 +498,31 @@ LUA_get_term_vars(void) {
   lua_pop(L, 1);
 
   lua_getfield(L, luaterm, "xmax");
-  term->xmax = (lua_isnumber(L, -1)) ? (unsigned int)lua_tointeger(L, -1) : LUA_XMAX;
+  term->xmax = (lua_isnumber(L, -1)) ? (unsigned int)lua_tonumber(L, -1) : LUA_XMAX;
   lua_pop(L, 1);
 
   lua_getfield(L, luaterm, "ymax");
-  term->ymax = (lua_isnumber(L, -1)) ? (unsigned int)lua_tointeger(L, -1) : LUA_YMAX;
+  term->ymax = (lua_isnumber(L, -1)) ? (unsigned int)lua_tonumber(L, -1) : LUA_YMAX;
   lua_pop(L, 1);
 
   lua_getfield(L, luaterm, "v_char");
-  term->v_char = (lua_isnumber(L, -1)) ? (unsigned int)lua_tointeger(L, -1) : LUA_VCHAR;
+  term->v_char = (lua_isnumber(L, -1)) ? (unsigned int)lua_tonumber(L, -1) : LUA_VCHAR;
   lua_pop(L, 1);
 
   lua_getfield(L, luaterm, "h_char");
-  term->h_char = (lua_isnumber(L, -1)) ? (unsigned int)lua_tointeger(L, -1) : LUA_HCHAR;
+  term->h_char = (lua_isnumber(L, -1)) ? (unsigned int)lua_tonumber(L, -1) : LUA_HCHAR;
   lua_pop(L, 1);
 
   lua_getfield(L, luaterm, "v_tic");
-  term->v_tic = (lua_isnumber(L, -1)) ? (unsigned int)lua_tointeger(L, -1) : LUA_VTIC;
+  term->v_tic = (lua_isnumber(L, -1)) ? (unsigned int)lua_tonumber(L, -1) : LUA_VTIC;
   lua_pop(L, 1);
 
   lua_getfield(L, luaterm, "h_tic");
-  term->h_tic = (lua_isnumber(L, -1)) ? (unsigned int)lua_tointeger(L, -1) : LUA_HTIC;
+  term->h_tic = (lua_isnumber(L, -1)) ? (unsigned int)lua_tonumber(L, -1) : LUA_HTIC;
   lua_pop(L, 1);
 
   lua_getfield(L, luaterm, "flags");
-  term->flags = (lua_isnumber(L, -1)) ? (int)lua_tointeger(L, -1) : TERM_BINARY;
+  term->flags = (lua_isnumber(L, -1)) ? (unsigned int)lua_tonumber(L, -1) : TERM_BINARY;
   lua_pop(L, 1);
 
   lua_getfield(L, luaterm, "tscale");
@@ -854,7 +854,7 @@ LUA_options()
     lua_pushinteger(L, need_init);
     lua_pushinteger(L, tc_off);
     LUA_call_report(lua_pcall(L, 3, 1, tb));
-    lua_term_result = (int)lua_tointeger(L, -1);
+    lua_term_result = (int)lua_tonumber(L, -1);
     lua_pop(L, 1);
     free(opt_str);
   }
@@ -884,7 +884,7 @@ LUA_init()
   LUA_linetype(-1);
   if(LUA_init_luaterm_function("init")) {
     LUA_call_report(lua_pcall(L, 0, 1, tb));
-    lua_term_result = (int)lua_tointeger(L, -1);
+    lua_term_result = (int)lua_tonumber(L, -1);
     lua_pop(L, 1);
   }
 }
@@ -894,7 +894,7 @@ LUA_graphics()
 {
   if(LUA_init_luaterm_function("graphics")) {
     LUA_call_report(lua_pcall(L, 0, 1, tb));
-    lua_term_result = (int)lua_tointeger(L, -1);
+    lua_term_result = (int)lua_tonumber(L, -1);
     lua_pop(L, 1);
   }
 }
@@ -905,7 +905,7 @@ LUA_text()
 {
   if(LUA_init_luaterm_function("text")) {
     LUA_call_report(lua_pcall(L, 0, 1, tb));
-    lua_term_result = (int)lua_tointeger(L, -1);
+    lua_term_result = (int)lua_tonumber(L, -1);
     lua_pop(L, 1);
   }
 }
@@ -917,7 +917,7 @@ LUA_linetype(int linetype)
   if(LUA_init_luaterm_function("linetype")) {
     lua_pushinteger(L, linetype);
     LUA_call_report(lua_pcall(L, 1, 1, tb));
-  	lua_term_result = (int)lua_tointeger(L, -1);
+	lua_term_result = (int)lua_tonumber(L, -1);
 	lua_pop(L, 1);
   }
 }
@@ -942,7 +942,7 @@ LUA_dashtype(int type, t_dashtype *custom_dash_type)
 	    lua_rawseti(L, -2, 1);
 	}
 	LUA_call_report(lua_pcall(L, 2, 1, tb));
-	lua_term_result = (int)lua_tointeger(L, -1);
+	lua_term_result = (int)lua_tonumber(L, -1);
 	lua_pop(L, 1);
     }
 }
@@ -955,7 +955,7 @@ LUA_move(unsigned int x, unsigned int y)
     lua_pushinteger(L, (int)x);
     lua_pushinteger(L, (int)y);
     LUA_call_report(lua_pcall(L, 2, 1, tb));
-  	lua_term_result = (int)lua_tointeger(L, -1);
+	lua_term_result = (int)lua_tonumber(L, -1);
 	lua_pop(L, 1);
   }
 }
@@ -972,7 +972,7 @@ LUA_point(unsigned int x, unsigned int y, int number)
     lua_pushinteger(L, (int)y);
     lua_pushinteger(L, number);
     LUA_call_report(lua_pcall(L, 3, 1, tb));
-  	lua_term_result = (int)lua_tointeger(L, -1);
+	lua_term_result = (int)lua_tonumber(L, -1);
 	lua_pop(L, 1);
   }
 
@@ -986,7 +986,7 @@ LUA_pointsize(double ptsize)
   if(LUA_init_luaterm_function("pointsize")) {
     lua_pushnumber(L, ptsize);
     LUA_call_report(lua_pcall(L, 1, 1, tb));
-    lua_term_result = (int)lua_tointeger(L, -1);
+    lua_term_result = (int)lua_tonumber(L, -1);
     lua_pop(L, 1);
   }
 }
@@ -998,7 +998,7 @@ LUA_vector(unsigned int ux, unsigned int uy)
     lua_pushinteger(L, (int)ux);
     lua_pushinteger(L, (int)uy);
     LUA_call_report(lua_pcall(L, 2, 1, tb));
-  	lua_term_result = (int)lua_tointeger(L, -1);
+	lua_term_result = (int)lua_tonumber(L, -1);
 	lua_pop(L, 1);
   }
 }
@@ -1028,7 +1028,7 @@ LUA_arrow(
     lua_pushnumber(L, curr_arrow_headbackangle);  /* angle in degrees (double)        */
     lua_pushinteger(L, curr_arrow_headfilled);    /* arrow head filled or not         */
     LUA_call_report(lua_pcall(L, 9, 1, tb));
-    lua_term_result = (int)lua_tointeger(L, -1);
+    lua_term_result = (int)lua_tonumber(L, -1);
     lua_pop(L, 1);
   }
 
@@ -1045,7 +1045,7 @@ LUA_put_text(unsigned int x, unsigned int y, const char str[])
     lua_pushinteger(L, (int)y);
     lua_pushstring(L, str);
     LUA_call_report(lua_pcall(L, 3, 1, tb));
-    lua_term_result = (int)lua_tointeger(L, -1);
+    lua_term_result = (int)lua_tonumber(L, -1);
     lua_pop(L, 1);
   }
 }
@@ -1070,7 +1070,7 @@ LUA_justify_text(enum JUSTIFY mode)
     }
     lua_pushstring(L, m);
     LUA_call_report(lua_pcall(L, 1, 1, tb));
-    lua_term_result = (int)lua_tointeger(L, -1);
+    lua_term_result = (int)lua_tonumber(L, -1);
     lua_pop(L, 1);
     return((lua_term_result ? TRUE : FALSE));
   }
@@ -1083,7 +1083,7 @@ LUA_text_angle(int ang)
   if(LUA_init_luaterm_function("text_angle")) {
     lua_pushinteger(L, ang);
     LUA_call_report(lua_pcall(L, 1, 1, tb));
-    lua_term_result = (int)lua_tointeger(L, -1);
+    lua_term_result = (int)lua_tonumber(L, -1);
     lua_pop(L, 1);
     return(((lua_term_result || !ang ) ? TRUE : FALSE));
   }
@@ -1096,14 +1096,14 @@ LUA_set_font(const char *font)
   if(LUA_init_luaterm_function("set_font")) {
     lua_pushstring(L, font);
     LUA_call_report(lua_pcall(L, 1, 1, tb));
-    lua_term_result = (int)lua_tointeger(L, -1);
+    lua_term_result = (int)lua_tonumber(L, -1);
     lua_pop(L, 1);
     if (lua_term_result) {
 	lua_getfield(L, luaterm, "v_char");
-	term->v_char = (lua_isnumber(L, -1)) ? (unsigned int)lua_tointeger(L, -1) : LUA_VCHAR;
+	term->v_char = (lua_isnumber(L, -1)) ? (unsigned int)lua_tonumber(L, -1) : LUA_VCHAR;
 	lua_pop(L, 1);
 	lua_getfield(L, luaterm, "h_char");
-	term->h_char = (lua_isnumber(L, -1)) ? (unsigned int)lua_tointeger(L, -1) : LUA_HCHAR;
+	term->h_char = (lua_isnumber(L, -1)) ? (unsigned int)lua_tonumber(L, -1) : LUA_HCHAR;
 	lua_pop(L, 1);
 	return TRUE;
     }
@@ -1125,7 +1125,7 @@ LUA_boxfill (int style, unsigned int x1,
     lua_pushinteger(L, (int)width);
     lua_pushinteger(L, (int)height);
     LUA_call_report(lua_pcall(L, 6, 1, tb));
-    lua_term_result = (int)lua_tointeger(L, -1);
+    lua_term_result = (int)lua_tonumber(L, -1);
     lua_pop(L, 1);
   }
 }
@@ -1136,7 +1136,7 @@ LUA_linewidth(double width)
   if(LUA_init_luaterm_function("linewidth")) {
     lua_pushnumber(L, width);
     LUA_call_report(lua_pcall(L, 1, 1, tb));
-    lua_term_result = (int)lua_tointeger(L, -1);
+    lua_term_result = (int)lua_tonumber(L, -1);
     lua_pop(L, 1);
   }
 }
@@ -1146,7 +1146,7 @@ LUA_previous_palette(void)
 {
   if(LUA_init_luaterm_function("previous_palette")) {
     LUA_call_report(lua_pcall(L, 0, 1, tb));
-    lua_term_result = (int)lua_tointeger(L, -1);
+    lua_term_result = (int)lua_tonumber(L, -1);
     lua_pop(L, 1);
   }
 }
@@ -1157,7 +1157,7 @@ LUA_reset(void)
 {
   if(LUA_init_luaterm_function("reset")) {
     LUA_call_report(lua_pcall(L, 0, 1, tb));
-    lua_term_result = (int)lua_tointeger(L, -1);
+    lua_term_result = (int)lua_tonumber(L, -1);
     lua_pop(L, 1);
   }
 }
@@ -1167,7 +1167,7 @@ LUA_make_palette (t_sm_palette *palette)
 {
   if(LUA_init_luaterm_function("make_palette")) {
     LUA_call_report(lua_pcall(L, 0, 1, tb));
-    lua_term_result = (int)lua_tointeger(L, -1);
+    lua_term_result = (int)lua_tonumber(L, -1);
     lua_pop(L, 1);
     return(lua_term_result);
   }
@@ -1208,7 +1208,7 @@ LUA_set_color (t_colorspec *colorspec)
     lua_pushnumber(L, color.g);
     lua_pushnumber(L, color.b);
     LUA_call_report(lua_pcall(L, 7, 1, tb));
-    lua_term_result = (int)lua_tointeger(L, -1);
+    lua_term_result = (int)lua_tonumber(L, -1);
     lua_pop(L, 1);
   }
 }
@@ -1233,7 +1233,7 @@ LUA_filled_polygon (int points, gpiPoint *corners)
       lua_rawseti(L, -2 , i+1); /* add "subtable" */
     }
     LUA_call_report(lua_pcall(L, 3, 1, tb));
-    lua_term_result = (int)lua_tointeger(L, -1);
+    lua_term_result = (int)lua_tonumber(L, -1);
     lua_pop(L, 1);
   }
 }
@@ -1274,7 +1274,7 @@ LUA_layer (t_termlayer syncpoint)
     }
     lua_pushstring(L, m);
     LUA_call_report(lua_pcall(L, 1, 1, tb));
-    lua_term_result = (int)lua_tointeger(L, -1);
+    lua_term_result = (int)lua_tonumber(L, -1);
     lua_pop(L, 1);
   }
 }
@@ -1285,7 +1285,7 @@ LUA_path (int path)
   if(LUA_init_luaterm_function("path")) {
     lua_pushinteger(L, path);
     LUA_call_report(lua_pcall(L, 1, 1, tb));
-    lua_term_result = (int)lua_tointeger(L, -1);
+    lua_term_result = (int)lua_tonumber(L, -1);
     lua_pop(L, 1);
   }
 }
@@ -1312,7 +1312,7 @@ LUA_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecol
         idx = strchr(outstr, '\0');
       image_file = (char*)gp_alloc((idx-outstr)+10, "LUA_image");
       strncpy(image_file, outstr, (idx-outstr) + 1);
-      snprintf(image_file+(idx-outstr), 8, ".%02d.png", ++image_cnt);
+      snprintf(image_file+(idx-outstr), 9, ".%03d.png", (unsigned char)(++image_cnt));
 
       write_png_image (m, n, image, color_mode, image_file);
     }
@@ -1371,7 +1371,7 @@ LUA_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecol
       lua_pushnil(L);
     }
     LUA_call_report(lua_pcall(L, 6, 1, tb));
-    lua_term_result = (int)lua_tointeger(L, -1);
+    lua_term_result = (int)lua_tonumber(L, -1);
     lua_pop(L, 1);
   }
 }
@@ -1404,7 +1404,7 @@ LUA_boxed_text __PROTO((unsigned int x, unsigned int y, int option))
 	lua_pushinteger(L, y);
 	lua_pushstring(L, option_str);
 	LUA_call_report(lua_pcall(L, 3, 1, tb));
-	lua_term_result = (int)lua_tointeger(L, -1);
+	lua_term_result = (int)lua_tonumber(L, -1);
 	lua_pop(L, 1);
     }
 }
