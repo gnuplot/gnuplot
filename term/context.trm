@@ -1837,7 +1837,9 @@ CONTEXT_image(unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_image
 	if (CONTEXT_images == CONTEXT_IMAGES_EXTERNAL) {
 #ifdef WRITE_PNG_IMAGE
 		/* we reserved 10 extra bytes, so we can afford images up to 9999 */
-		snprintf(CONTEXT_image_filename + CONTEXT_image_filename_length, 9, "_%02d.png", ++CONTEXT_image_counter);
+		if (CONTEXT_image_counter < 9999)
+			sprintf(CONTEXT_image_filename + CONTEXT_image_filename_length,
+				"_%02d.png", ++CONTEXT_image_counter);
 		write_png_image (M, N, image, color_mode, CONTEXT_image_filename);
 
 		if (is_clipped)
