@@ -37,7 +37,7 @@
 
 #include "driver.h"
 
-#define LUA_TERM_REVISION "$Rev: Nov 2017$"
+#define LUA_TERM_REVISION "$Rev: Nov 2018$"
 
 #ifdef TERM_REGISTER
 register_term(lua)
