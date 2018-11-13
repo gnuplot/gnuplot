@@ -34,6 +34,7 @@
 
 #include "alloc.h"
 #include "command.h"
+#include "datablock.h"
 #include "graphics.h"
 #include "plot.h"
 #include "tables.h"
@@ -311,6 +312,7 @@ expand_call_args(void)
  * (3) on program entry to load initialization files (acts like "load")
  * (4) to execute script files given on the command line (acts like "load")
  * (5) to execute a single script file given with -c (acts like "call")
+ * (6) "load $datablock"
  */
 void
 load_file(FILE *fp, char *name, int calltype)
@@ -320,17 +322,21 @@ load_file(FILE *fp, char *name, int calltype)
     int start, left;
     int more;
     int stop = FALSE;
+    udvt_entry *gpval_lineno = NULL;
+    char **datablock_input_line = NULL;
+
+    /* Support for "load $datablock" */
+    if (calltype == 6)
+	datablock_input_line = get_datablock(name);
+
+    if (!fp && !datablock_input_line)
+	int_error(NO_CARET, "Cannot load input from '%s'", name);
 
     /* Provide a user-visible copy of the current line number in the input file */
-    udvt_entry *gpval_lineno = add_udv_by_name("GPVAL_LINENO");
+    gpval_lineno = add_udv_by_name("GPVAL_LINENO");
     Ginteger(&gpval_lineno->udv_value, 0);
 
     lf_push(fp, name, NULL); /* save state for errors and recursion */
-
-    if (fp == (FILE *) NULL) {
-	int_error(NO_CARET, "Cannot open script file '%s'", name);
-	return; /* won't actually reach here */
-    }
 
     if (fp == stdin) {
 	/* DBT 10-6-98  go interactive if "-" named as load file */
@@ -356,11 +362,26 @@ load_file(FILE *fp, char *name, int calltype)
 
 	/* read one logical line */
 	while (more) {
-	    if (fgets(&(gp_input_line[start]), left, fp) == (char *) NULL) {
-		stop = TRUE;	/* EOF in file */
+	    if (fp && fgets(&(gp_input_line[start]), left, fp) == (char *) NULL) {
+		/* EOF in input file */
+		stop = TRUE;
+		gp_input_line[start] = '\0';
+		more = FALSE;
+	    } else if (!fp && datablock_input_line && (*datablock_input_line == '\0')) {
+		/* End of input datablock */
+		stop = TRUE;
 		gp_input_line[start] = '\0';
 		more = FALSE;
 	    } else {
+		/* Either we successfully read a line from input file fp
+		 * or we are about to copy a line from a datablock.
+		 * Either way we have to process line-ending '\' as a 
+		 * continuation request.
+		 */
+		if (!fp && datablock_input_line) {
+		    strncpy(&(gp_input_line[start]), *datablock_input_line, left);
+		    datablock_input_line++;
+		}
 		inline_num++;
 		gpval_lineno->udv_value.v.int_val = inline_num;	/* User visible copy */
 		len = strlen(gp_input_line) - 1;

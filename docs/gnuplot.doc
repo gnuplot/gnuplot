@@ -239,6 +239,8 @@ C
 ##See `keyentry`.
 #b User-specified translation of mouse coordinates (EXPERIMENTAL).
 ##See map_projection demo.
+#b The `load` command can input commands from a datablock as an alternative to
+## reading them from a file (EXPERIMENTAL).
 #end
 
 4 New terminals and terminal options
@@ -5876,9 +5878,11 @@ Ffigure_fenceplot
  and then executed by the `load` command.  Files being `load`ed may themselves
  contain `load` or `call` commands.  See `comments` for information about
  comments in commands.  To `load` with arguments, see `call`.
+ EXPERIMENTAL: Commands can be read from a datablock rather than a file.
 
  Syntax:
        load "<input-file>"
+       load $datablock
 
  The name of the input file must be enclosed in quotes.
 
