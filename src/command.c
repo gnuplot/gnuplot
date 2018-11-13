@@ -197,9 +197,6 @@ static TBOOLEAN requested_continue = FALSE;
 
 static int command_exit_status = 0;
 
-/* support for 'eval $DATABLOCK' */
-static char **eval_input_line = NULL;
-
 /* support for dynamic size of input line */
 void
 extend_input_line()
@@ -392,19 +389,9 @@ do_line()
 	if (lf_head && lf_head->depth > 0) {
 	    /* This catches the case that we are inside a "load foo" operation
 	     * and therefore requesting interactive input is not an option.
+	     * FIXME: or is it?
 	     */
-	    if (!eval_input_line)
-		int_error(NO_CARET, "Syntax error: missing block terminator }");
-
-	    /* This catches the case that we are inside an "eval $DATABLOCK" */
-	    strcat(gp_input_line,";");
-	    eval_input_line++;
-	    while (gp_input_line_len < strlen(gp_input_line) + strlen(*eval_input_line))
-		extend_input_line();
-	    strcat(gp_input_line,*eval_input_line);
-	    num_tokens = scanner(&gp_input_line, &gp_input_line_len);
-	    if (gp_input_line[token[num_tokens].start_index] == '#')
-		gp_input_line[token[num_tokens].start_index] = NUL;
+	    int_error(NO_CARET, "Syntax error: missing block terminator }");
 	}
 	else if (interactive || noinputfiles) {
 	    /* If we are really in interactive mode and there are unterminated blocks,
@@ -1083,12 +1070,9 @@ eval_command()
     if (equals(c_token, "$") && isletter(c_token+1) && !equals(c_token+2,"[")) {
 	/* Execute successive commands from a datablock */
 	char *datablock_name = parse_datablock_name();
-	eval_input_line = get_datablock(datablock_name);
-	while (eval_input_line && *eval_input_line) {
-	    do_string(*eval_input_line);
-	    eval_input_line++;
-	}
-	eval_input_line = NULL;
+	char **line = get_datablock(datablock_name);
+	while (line && *line)
+	    do_string(*(line++));
     } else {
 	/* Execute a single line command */
 	char *command = try_to_get_string();
