@@ -1066,20 +1066,12 @@ clear_command()
 void
 eval_command()
 {
+    char *command;
     c_token++;
-    if (equals(c_token, "$") && isletter(c_token+1) && !equals(c_token+2,"[")) {
-	/* Execute successive commands from a datablock */
-	char *datablock_name = parse_datablock_name();
-	char **line = get_datablock(datablock_name);
-	while (line && *line)
-	    do_string(*(line++));
-    } else {
-	/* Execute a single line command */
-	char *command = try_to_get_string();
-	if (!command)
-	    int_error(c_token, "Expected command string or datablock name");
-	do_string_and_free(command);
-    }
+    command = try_to_get_string();
+    if (!command)
+	int_error(c_token, "Expected command string");
+    do_string_and_free(command);
 }
 
 
