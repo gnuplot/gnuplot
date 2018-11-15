@@ -3755,7 +3755,7 @@ attach_title_to_plot(struct curve_points *this_plot, legend_key *key)
     int index, x, y;
     TBOOLEAN is_3D;
 
-    if (this_plot->plot_type == NODATA)
+    if (this_plot->plot_type == NODATA || this_plot->plot_type == KEYENTRY)
 	return;
 
     /* This routine handles both 2D and 3D plots */

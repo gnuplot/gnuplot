@@ -1254,7 +1254,7 @@ do_key_sample(
     } else if (this_plot->lp_properties.l_type == LT_NODRAW) {
 	;
 
-    } else if ((this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR) &&  this_plot->plot_type == DATA) {
+    } else if ((this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR) && this_plot->plot_type != FUNC) {
 	/* errors for data plots only */
 	if ((bar_lp.flags & LP_ERRORBAR_SET) != 0)
 	    term_apply_lp_properties(&bar_lp);
@@ -1267,7 +1267,7 @@ do_key_sample(
 	draw_clip_line(xl + key_sample_left, yl, xl + key_sample_right, yl);
     }
 
-    if ((this_plot->plot_type == DATA)
+    if ((this_plot->plot_type == DATA || this_plot->plot_type == KEYENTRY)
 	&& (this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
 	&& (this_plot->plot_style != CANDLESTICKS)
 	&& (bar_size > 0.0)) {

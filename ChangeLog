@@ -1,3 +1,17 @@
+2018-11-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/boundary.c src/gp_types.h src/graph3d.c src/graphics.c
+	src/hidden3d.c src/parse.c src/plot2d.c src/plot3d.c:
+
+	New keyword "keyentry" for both plot and splot commands. This places
+	a line in the key but does not produce a corresponding plot.  The
+	usual line/fill/style/title options control what symbol and text is
+	used in the key entry.
+
+	* demo/custom_key.dem demo/keyentry.dem
+
+	* docs/gnuplot.doc docs/plotstyles.gnu
+
 2018-11-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util.c (print_line_with_error): Each if/else bracketed clause

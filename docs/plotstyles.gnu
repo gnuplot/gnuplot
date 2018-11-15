@@ -219,6 +219,12 @@ plot demo . 'ellipses.dat' u 1:2:3:4:5 with ellipses units xy title "with ellips
 reset
 set output out . 'figure_heatmap' . ext
 set title "2D Heat map from in-line array of values" offset 0,-1
+$HEATMAP << EOD
+5 4 3 1 0
+2 2 0 0 1
+0 0 0 1 0
+0 1 2 4 3
+EOD
 unset key
 set bmargin 1
 set tmargin 3
@@ -231,14 +237,7 @@ set yrange  [3.5:-0.5]
 set x2tics 0,1
 set ytics  0,1
 set palette rgbformula -3,-3,-3
-plot '-' matrix with image
-5 4 3 1 0
-2 2 0 0 1
-0 0 0 1 0
-0 1 2 4 3
-e
-e
-
+plot $HEATMAP matrix with image
 #
 # 3D Plot styles
 # ==============
@@ -362,6 +361,33 @@ plot demo . 'cities.dat' using 5:4:($3 < 5000 ? "-" : CityName(1,3)) with labels
 #
 if (GPVAL_TERM eq "pdfcairo") \
     set term pdfcairo color font fontspec size 3.5,2.0 dashlength 0.2
+
+#
+# Use of `keyentry` to construct a key
+# ====================================
+#
+reset
+set output out . 'figure_keyentry' . ext
+set title "Construct key from custom entries"
+set tics scale 0
+unset xtics
+set xrange  [-0.5:4.5]
+set x2range [-0.5:4.5]
+set yrange  [3.5:-0.5]
+set x2tics 0,1
+set ytics  0,1
+set palette rgbform -7,2,-7
+unset colorbox
+set style fill solid border lc "black"
+set key outside right center reverse Left samplen 1
+set key title "Outcomes" left
+
+plot $HEATMAP matrix with image notitle, \
+    keyentry with boxes fc palette cb 0 title "no effect", \
+    keyentry with boxes fc palette cb 1 title "threshold", \
+    keyentry with boxes fc palette cb 3 title "typical range", \
+    keyentry with labels title "as reported in [12]", \
+    keyentry with boxes fc palette cb 5 title "strong effect"
 
 #
 # Polar plot

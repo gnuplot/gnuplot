@@ -1,5 +1,6 @@
 Changes in 5.2.6
 ================
+* NEW keyword "keyentry" places an entry in the key without actually plotting
 * NEW "set style boxplot medianlinewidth <lw>"
 * CHANGE drop non-working support for CIE/XYZ color space
 * CHANGE strptime ignores content read with format a/A/w/W

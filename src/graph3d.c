@@ -152,7 +152,7 @@ static void key_sample_line __PROTO((int xl, int yl));
 static void key_sample_point __PROTO((int xl, int yl, int pointtype));
 static void key_sample_line_pm3d __PROTO((struct surface_points *plot, int xl, int yl));
 static void key_sample_point_pm3d __PROTO((struct surface_points *plot, int xl, int yl, int pointtype));
-static void key_sample_fill __PROTO((int xl, int yl, struct fill_style_type *fs));
+static void key_sample_fill __PROTO((int xl, int yl, struct surface_points *this_plot));
 static TBOOLEAN can_pm3d = FALSE;
 static void key_text __PROTO((int xl, int yl, char *text));
 static void check3d_for_variable_color __PROTO((struct surface_points *plot, struct coordinate *point));
@@ -1006,7 +1006,7 @@ do_3dplot(
 	    /* Sync point for start of new curve (used by svg, post, ...) */
 	    (term->layer)(TERM_LAYER_BEFORE_PLOT);
 
-	    if (!key_pass)
+	    if (!key_pass && this_plot->plot_type != KEYENTRY)
 	    if (can_pm3d && PM3D_IMPLICIT == pm3d.implicit)
 		pm3d_draw_one(this_plot);
 
@@ -1042,7 +1042,7 @@ do_3dplot(
 	    term_apply_lp_properties(&(this_plot->lp_properties));
 
 	    /* First draw the graph plot itself */
-	    if (!key_pass)
+	    if (!key_pass && this_plot->plot_type != KEYENTRY)
 	    switch (this_plot->plot_style) {
 	    case BOXES:		/* can't do boxes in 3d yet so use impulses */
 	    case FILLEDCURVES:	/* same, but maybe we could dummy up ZERRORFILL? */
@@ -1222,7 +1222,8 @@ do_3dplot(
 		break;
 
 	    case ZERRORFILL:
-		key_sample_fill(xl, yl, &this_plot->fill_properties);
+		apply_pm3dcolor(&this_plot->fill_properties.border_color);
+		key_sample_fill(xl, yl, this_plot);
 		term_apply_lp_properties(&this_plot->lp_properties);
 		key_sample_line(xl, yl);
 		break;
@@ -2281,7 +2282,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		    int count;
 		    int iso;
 
-		    if (plot->plot_type == NODATA)
+		    if (plot->plot_type == NODATA || plot->plot_type == KEYENTRY)
 			continue;
 		    if (plot->plot_type == DATA3D) {
 			if (!plot->has_grid_topology)
@@ -3262,8 +3263,9 @@ key_sample_point(int xl, int yl, int pointtype)
 }
 
 static void
-key_sample_fill(int xl, int yl, struct fill_style_type *fs)
+key_sample_fill(int xl, int yl, struct surface_points *this_plot)
 {
+    struct fill_style_type *fs = &this_plot->fill_properties;
     int style = style_from_fill(fs);
     unsigned int x = xl + key_sample_left;
     unsigned int y = yl - key_entry_height/4;
@@ -3607,6 +3609,10 @@ do_3dkey_layout(legend_key *key, int *xinkey, int *yinkey)
     key_width = key_col_wth * (key_cols - 1) + key_size_right + key_size_left;
     key_height = key_title_height + key_title_extra
 		+ key_entry_height * key_rows + key->height_fix * t->v_char;
+
+    /* Make room for extra long title */
+    if (key_width < key_title_width)
+	key_width = key_title_width;
 
     /* Make room for extra long title */
     if (key_width < key_title_width)

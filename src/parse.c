@@ -212,6 +212,10 @@ string_or_express(struct at_type **atptr)
     if (equals(c_token,"$"))
 	return parse_datablock_name();
 
+    /* special keywords */
+    if (equals(c_token,"keyentry"))
+	return NULL;
+
     if (isstring(c_token) && (str = try_to_get_string()))
 	return str;
 

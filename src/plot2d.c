@@ -2143,9 +2143,19 @@ eval_plots()
 		/* include modifiers in default title */
 		this_plot->token = end_token = c_token - 1;
 
-	    } else {
+	    } else if (equals(c_token, "keyentry")) {
+		c_token++;
+		if (*tp_ptr)
+		    this_plot = *tp_ptr;
+		else {          /* no memory malloc()'d there yet */
+		    this_plot = cp_alloc(MIN_CRV_POINTS);
+		    *tp_ptr = this_plot;
+		}
+		this_plot->plot_type = KEYENTRY;
+		this_plot->plot_style = LABELPOINTS;
+		this_plot->token = end_token = c_token - 1;
 
-		/* function to plot */
+	    } else { /* function to plot */
 
 		some_functions = TRUE;
 		if (parametric) /* working on x parametric function */
@@ -2322,7 +2332,7 @@ eval_plots()
 		    if (this_plot->plot_style == IMAGE
 		    ||  this_plot->plot_style == RGBIMAGE
 		    ||  this_plot->plot_style == RGBA_IMAGE) {
-			if (this_plot->plot_type == FUNC)
+			if (this_plot->plot_type != DATA)
 			    int_error(c_token, "This plot style is only for data files");
 			else
 			    get_image_options(&this_plot->image_properties);
@@ -3073,6 +3083,8 @@ eval_plots()
 
 		if (almost_equals(c_token, "newhist$ogram")) {
 		    /* Make sure this isn't interpreted as a function */
+		    name_str = "";
+		} else if (equals(c_token, "keyentry")) {
 		    name_str = "";
 		} else {
 		    /* Allow replacement of the dummy variable in a function */
