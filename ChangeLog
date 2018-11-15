@@ -1,3 +1,9 @@
+2018-11-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/util.c (print_line_with_error): Each if/else bracketed clause
+	calls lf_push with NULL filename.  To retrieve the filename for error
+	reporting we must unwind the lf stack.
+
 2018-11-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/lua.trm:  Replace lua_tointeger() with lua_tonumber() everywhere.
