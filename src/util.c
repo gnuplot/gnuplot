@@ -1036,7 +1036,7 @@ static void
 print_line_with_error(int t_num)
 {
     int i;
-    int save_line_num = inline_num;
+    int true_line_num = inline_num;
 
     if (t_num == DATAFILE) {
 	/* Print problem line from data file to the terminal */
@@ -1046,6 +1046,7 @@ print_line_with_error(int t_num)
 
 	/* If the current line was built by concatenation of lines inside */
 	/* a {bracketed clause}, try to reconstruct the true line number  */
+	/* FIXME:  This seems to no longer work reliably */
 	char *copy_of_input_line = gp_strdup(gp_input_line);
 	char *minimal_input_line = copy_of_input_line;
 	char *trunc;
@@ -1057,7 +1058,7 @@ print_line_with_error(int t_num)
 		break;
 	    }
 	    *trunc = '\0';
-	    inline_num--;
+	    true_line_num--;
 	}
 
 	if (t_num != NO_CARET) {
@@ -1082,12 +1083,14 @@ print_line_with_error(int t_num)
     PRINT_SPACES_UNDER_PROMPT;
 
     if (!interactive) {
-	if (lf_head && lf_head->name)
-	    fprintf(stderr, "\"%s\", ", lf_head->name);
-	fprintf(stderr, "line %d: ", inline_num);
+	LFS *lf = lf_head;
+	/* Back out of any nested if/else clauses */
+	while (lf && !lf->fp && !lf->name && lf->prev)
+	    lf = lf->prev;
+	if (lf && lf->name)
+	    fprintf(stderr, "\"%s\" ", lf->name);
+	fprintf(stderr, "line %d: ", true_line_num);
     }
-
-    inline_num = save_line_num;
 }
 
 /*
