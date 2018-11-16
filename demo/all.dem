@@ -76,6 +76,10 @@ print "******************** file poldat.dem ********************"
 load "poldat.dem"
 reset
 
+print "******************** file polar_quadrants.dem ********************"
+load "polar_quadrants.dem"
+reset
+
 print "******************** file solar_path.dem ****************"
 load "solar_path.dem"
 reset
@@ -116,6 +120,10 @@ reset
 
 print "******************** file hidden.dem ********************"
 load "hidden.dem"
+reset
+
+print "******************** file hidden_compare.dem ********************"
+load "hidden_compare.dem"
 reset
 
 print "******************** file dgrid3d.dem ********************"
@@ -331,6 +339,9 @@ load "histograms2.dem"
 load "label_stacked_histograms.dem"
 reset
 
+print "********************** file boxclusters.dem *********************"
+load "boxclusters.dem"
+
 print "********************** file array.dem *********************"
 load "array.dem"
 reset
@@ -359,6 +370,10 @@ print "********************** file circles.dem *********************"
 load "circles.dem"
 reset
 
+print "********************** file armillary.dem *********************"
+load "armillary.dem"
+reset
+
 print "********************** file ellipses_style.dem *********************"
 load "ellipses_style.dem"
 reset
@@ -370,6 +385,7 @@ reset
 print "********************** file custom_key.dem *********************"
 load "custom_key.dem"
 load "nokey.dem"
+load "keyentry.dem"
 reset
 
 print "********************** file walls.dem *********************"
@@ -411,6 +427,10 @@ load "nonlinear3.dem"
 load "nonlinear4.dem"
 load "nonlinear5.dem"
 load "nonlinear6.dem"
+reset
+
+print "********************** file map_projection.dem *********************"
+load "map_projection.dem"
 reset
 
 print "********************** file transparent.dem *********************"
