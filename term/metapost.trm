@@ -320,7 +320,7 @@ MP_options()
 	    char *s;
 	    if ((s = try_to_get_string())) {
 		int sep = strcspn(s,",");
-		if (sep > 0) {
+		if (0 < sep && sep < sizeof(MP_fontname)) {
 		    strncpy(MP_fontname, s, sizeof(MP_fontname));
 		    MP_fontname[sep] = '\0';
 		}

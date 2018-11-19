@@ -2956,7 +2956,7 @@ strlen_tex(const char *str)
 	switch (*s) {
 	case '[':
 		while (*s && *s != ']') s++;
-		s++;
+		if (*s) s++;
 		break;
 	case '\\':
 		s++;

@@ -593,7 +593,7 @@ CONTEXT_options()
 			if ((tmp_string = try_to_get_string()) && (tmp_string != NULL)) {
 				CONTEXT_fontstring_parse(tmp_string, tmp_font, MAX_ID_LEN+1, &tmp_fontsize);
 				/* copies font name to parameters */
-				strncpy(CONTEXT_params.font, tmp_font, sizeof(CONTEXT_params.font));
+				safe_strncpy(CONTEXT_params.font, tmp_font, sizeof(CONTEXT_params.font));
 				tmp_font[MAX_ID_LEN] = NUL;
 				free(tmp_string);
 				/* save font size:
@@ -1379,7 +1379,7 @@ CONTEXT_set_font(const char *font)
 
 	/* saves font name & family to CONTEXT_font */
 	CONTEXT_fontstring_parse((char *)font, CONTEXT_font, sizeof(CONTEXT_font), &CONTEXT_fontsize_explicit);
-	strncpy(CONTEXT_font_explicit, CONTEXT_font, sizeof(CONTEXT_font_explicit));
+	safe_strncpy(CONTEXT_font_explicit, CONTEXT_font, sizeof(CONTEXT_font_explicit));
 
 	/* valid fontsize has been provided */
 	if (CONTEXT_fontsize_explicit > 0.) { /* XXX: if valid */

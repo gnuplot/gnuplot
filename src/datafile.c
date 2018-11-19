@@ -5623,10 +5623,13 @@ df_generate_ascii_array_entry()
 	return NULL;
 
     entry = &(df_array->udv_value.v.value_array[df_array_index]);
-    if (entry->type == STRING)
-	sprintf(df_line, "%d \"%s\"", df_array_index, entry->v.string_val);
-    else
-	sprintf(df_line, "%d %g", df_array_index, real(entry));
+    if (entry->type == STRING) {
+	while (max_line_len < strlen(entry->v.string_val))
+	    df_line = gp_realloc(df_line, max_line_len *= 2, "datafile line buffer");
+	snprintf(df_line, max_line_len-1, "%d \"%s\"", df_array_index, entry->v.string_val);
+    } else {
+	snprintf(df_line, max_line_len-1, "%d %g", df_array_index, real(entry));
+    }
 	
     return df_line;
 }

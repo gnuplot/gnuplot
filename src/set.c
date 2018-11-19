@@ -1163,7 +1163,7 @@ set_clabel()
     c_token++;
     clabel_onecolor = FALSE;
     if ((new_format = try_to_get_string())) {
-	strncpy(contour_format, new_format, sizeof(contour_format));
+	safe_strncpy(contour_format, new_format, sizeof(contour_format));
 	free(new_format);
     }
 }
@@ -1319,7 +1319,7 @@ set_cntrlabel()
 	    char *new;
 	    c_token++;
 	    if ((new = try_to_get_string()))
-		strncpy(contour_format,new,sizeof(contour_format));
+		safe_strncpy(contour_format,new,sizeof(contour_format));
 	    free(new);
 	} else if (equals(c_token, "font")) {
 	    char *ctmp;

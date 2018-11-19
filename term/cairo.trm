@@ -295,7 +295,7 @@ TERM_PUBLIC void cairotrm_options()
 				cairo_params->fontsize = 0;
 			} else {
 				sep = strcspn(s,",");
-				if (sep > 0) {
+				if (0 < sep && sep < MAX_ID_LEN) {
 					strncpy(cairo_params->fontname, s, sep);
 					cairo_params->fontname[sep] = '\0';
 				}
