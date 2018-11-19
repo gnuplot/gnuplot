@@ -36,7 +36,7 @@
 
 
 const char gnuplot_version[] = "5.2";
-const char gnuplot_patchlevel[] = "5";
+const char gnuplot_patchlevel[] = "6a";
 #ifdef DEVELOPMENT_VERSION
 #include "timestamp.h"
 #else
