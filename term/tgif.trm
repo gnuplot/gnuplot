@@ -368,7 +368,7 @@ TGIF_options()
 		int sep = strcspn(s,",");
 		if (s[sep] == ',' && (1 == sscanf(&s[sep+1],"%lf",&fontsize)))
 		    uActFontSize =  (int)(fontsize+0.5);
-		if (sep > 0) {
+		if (0 < sep && sep < sizeof(sActFont)) {
 		    strncpy(sActFont, s, sizeof(sActFont));
 		    sActFont[sep] = NUL;
 		}

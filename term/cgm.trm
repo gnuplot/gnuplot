@@ -471,7 +471,7 @@ CGM_options()
 			font_index = 1;
 		    } else
 			free(s);
-		    strncpy(cgm_font, cgm_font_data[font_index-1].name, sizeof(cgm_font));
+		    safe_strncpy(cgm_font, cgm_font_data[font_index-1].name, sizeof(cgm_font));
 
 		} else {
 		      /* the user is specifying the font size */
@@ -828,12 +828,7 @@ CGM_set_font(const char *font)
 
     {
       char *s = cgm_font_data[font_index-1].name;
-
-      len = strlen(s);
-      if (len > 31)
-	len = 31;
-      strncpy(cgm_font, s, len);
-      cgm_font[len] = NUL;
+      safe_strncpy(cgm_font, s, sizeof(cgm_font));
     }
 
     /* set font size */

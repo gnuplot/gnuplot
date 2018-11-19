@@ -790,7 +790,7 @@ EMF_options()
 		*comma = '\0';
 	    }
 	    if (*s)
-		strncpy(emf_defaultfontname, s, sizeof(emf_defaultfontname));
+		safe_strncpy(emf_defaultfontname, s, sizeof(emf_defaultfontname));
 	    free(s);
 	    if (isanumber(c_token)) {
 		emf_defaultfontsize = int_expression();
@@ -1865,7 +1865,7 @@ ENHemf_put_text(unsigned int x, unsigned int y, const char *str)
 
     /* set up the global variables needed by enhanced_recursion() */
     enhanced_fontscale = 1.0;
-    strncpy(enhanced_escape_format,"&#x%2.2x;",sizeof(enhanced_escape_format));
+    safe_strncpy(enhanced_escape_format,"&#x%2.2x;",sizeof(enhanced_escape_format));
 
     ENHemf_opened_string = FALSE;
     ENHemf_overprint = 0;

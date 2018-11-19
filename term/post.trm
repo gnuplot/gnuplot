@@ -1201,7 +1201,7 @@ PS_options()
 	term->h_char = (unsigned int)(ps_fontsize*PS_SCF*5/10);
     else
 	term->h_char = (unsigned int)(ps_fontsize*PS_SCF*6/10);
-    sprintf(PS_default_font,"%s,%.2g",ps_params->font,ps_fontsize);
+    snprintf(PS_default_font, sizeof(PS_default_font)-1, "%s, %.2g", ps_params->font, ps_fontsize);
 
     if (ps_params->terminal == PSTERM_POSTSCRIPT) {
 	if (ps_params->first_fontfile) {

@@ -351,6 +351,9 @@ EEPIC_put_text(unsigned int x, unsigned int y, const char str[])
 {
     int i, l;
 
+    if (*str == '\0')
+	return;
+
     EEPIC_endline();
 
     fprintf(gpoutfile, "\\put(%d,%d)", x, y);
