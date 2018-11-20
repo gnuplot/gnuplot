@@ -331,17 +331,16 @@ load_file(FILE *fp, char *name, int calltype)
     int start, left;
     int more;
     int stop = FALSE;
+    udvt_entry *gpval_lineno = NULL;
+
+    if (fp == (FILE *) NULL)
+	int_error(NO_CARET, "Cannot open script file '%s'", name);
 
     /* Provide a user-visible copy of the current line number in the input file */
-    udvt_entry *gpval_lineno = add_udv_by_name("GPVAL_LINENO");
+    gpval_lineno = add_udv_by_name("GPVAL_LINENO");
     Ginteger(&gpval_lineno->udv_value, 0);
 
     lf_push(fp, name, NULL); /* save state for errors and recursion */
-
-    if (fp == (FILE *) NULL) {
-	int_error(NO_CARET, "Cannot open script file '%s'", name);
-	return; /* won't actually reach here */
-    }
 
     if (fp == stdin) {
 	/* DBT 10-6-98  go interactive if "-" named as load file */
