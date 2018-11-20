@@ -4,7 +4,7 @@ Changes in 5.2.6
 * NEW "set style boxplot medianlinewidth <lw>"
 * CHANGE drop non-working support for CIE/XYZ color space
 * CHANGE strptime ignores content read with format a/A/w/W
-* FIX various corner-case bugs found by fuzzing
+* FIX various corner-case bugs and overruns found by fuzzing
 * FIX revise waitforinput in x11 terminal
 * FIX revise waitforinput and terminal close events in qt terminal
 * FIX revise waitforinput and new window events in monothreaded wxt terminal

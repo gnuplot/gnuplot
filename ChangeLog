@@ -1,3 +1,20 @@
+2018-11-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* various overflow cases found by fuzzing
+	Credits:
+	    Tim Blazytko
+	    Cornelius Aschermann
+	    Sergej Schumilo
+	    Nils Bars
+	
+	Bug 2088: term.c(strlen_tex)
+	Bug 2089: cairo.trm metapost.trm tgif.trm (arbitrarily long font name)
+	Bug 2092: cgm.trm overwrites trailing '\0' in default font name
+	      also context.trm emf.trm
+	Bug 2094: also post.trm
+	Bug 2093: datafile.c expand df_line on input as necessary to hold string data
+	Bug 2095: eepic.trm (EEPIC_put_text) ignore request to print empty string
+
 2018-11-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/boundary.c src/gp_types.h src/graph3d.c src/graphics.c
