@@ -264,7 +264,7 @@ TERM_PUBLIC void wxt_options()
 			if (!(s = try_to_get_string()))
 				int_error(c_token,"title: expecting string");
 			if (*s)
-				strncpy(wxt_title, s, sizeof(wxt_title));
+				safe_strncpy(wxt_title, s, sizeof(wxt_title));
 			free(s);
 			if (set_title) duplication=TRUE;
 			set_title = TRUE;

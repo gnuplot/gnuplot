@@ -1153,8 +1153,7 @@ PS_options()
 			    while (strpbrk(s, "()[]{}| "))
 				*(strpbrk(s, "()[]{}| ")) = '-';
 			}
-			ps_params->font[sizeof(ps_params->font)-1] = '\0';
-			strncpy(ps_params->font, s, sizeof(ps_params->font)-1);
+			safe_strncpy(ps_params->font, s, sizeof(ps_params->font));
 		    }
 		    free(s);
 		} else
@@ -2785,7 +2784,7 @@ ENHPS_put_text(unsigned int x, unsigned int y, const char *str)
     enhanced_max_height = -1000;
     enhanced_min_height = 1000;
     enhanced_fontscale = PS_SCF;
-    strncpy(enhanced_escape_format,"\\%o",sizeof(enhanced_escape_format));
+    safe_strncpy(enhanced_escape_format,"\\%o",sizeof(enhanced_escape_format));
 
     ENHps_opened_string = FALSE;
 

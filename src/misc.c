@@ -1011,7 +1011,7 @@ parse_dashtype(struct t_dashtype *dt)
 	}
 	/* truncate dash_str if we ran out of space in the array representation */
 	dash_str[j] = '\0';
-	strncpy(dt->dstring, dash_str, sizeof(dt->dstring)-1);
+	safe_strncpy(dt->dstring, dash_str, sizeof(dt->dstring));
 	free(dash_str);
 	res = DASHTYPE_CUSTOM;
 
@@ -1202,7 +1202,7 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
 		    /* An alternative mechanism would be to use
 		     * utf8toulong(&newlp.p_char, symbol);
 		     */
-		    strncpy(newlp.p_char, symbol, sizeof(newlp.p_char)-1);
+		    safe_strncpy(newlp.p_char, symbol, sizeof(newlp.p_char));
 		    /* Truncate ascii text to single character */
 		    if ((newlp.p_char[0] & 0x80) == 0)
 			newlp.p_char[1] = '\0';

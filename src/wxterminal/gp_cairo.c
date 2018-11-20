@@ -181,7 +181,7 @@ void gp_cairo_initialize_plot(plot_struct *plot)
 
 	plot->current_x = -1; plot->current_y = -1;
 
-	strncpy(plot->fontname, "", sizeof(plot->fontname));
+	safe_strncpy(plot->fontname, "", sizeof(plot->fontname));
 	plot->fontsize = 1.0;
 	plot->encoding = S_ENC_DEFAULT;
 
@@ -336,7 +336,7 @@ void gp_cairo_set_font(plot_struct *plot, const char *name, int fontsize)
 	} else
 	    plot->fontstyle = PANGO_STYLE_NORMAL;
 
-	strncpy( plot->fontname, fname, sizeof(plot->fontname) );
+	safe_strncpy( plot->fontname, fname, sizeof(plot->fontname) );
 	plot->fontsize = fontsize;
 	free(fname);
 }
@@ -840,7 +840,7 @@ void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string,
 	if (!strcmp(plot->fontname,"Symbol")) {
 		FPRINTF((stderr,"Parsing a Symbol string\n"));
 		string_utf8 = gp_cairo_convert_symbol_to_unicode(plot, string);
-		strncpy(plot->fontname, gp_cairo_default_font(), sizeof(plot->fontname));
+		safe_strncpy(plot->fontname, gp_cairo_default_font(), sizeof(plot->fontname));
 		symbol_font_parsed = TRUE;
 	} else
 #endif /*MAP_SYMBOL*/
@@ -859,7 +859,7 @@ void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string,
 #ifdef MAP_SYMBOL
 	/* restore the Symbol font setting */
 	if (symbol_font_parsed)
-		strncpy(plot->fontname, "Symbol", sizeof(plot->fontname));
+		safe_strncpy(plot->fontname, "Symbol", sizeof(plot->fontname));
 #endif /*MAP_SYMBOL*/
 	pango_font_description_set_size (desc, (int) (plot->fontsize*PANGO_SCALE*plot->oversampling_scale) );
 
@@ -1305,11 +1305,11 @@ void gp_cairo_enhanced_flush(plot_struct *plot)
 		enhanced_text_utf8 = gp_cairo_convert_symbol_to_unicode(plot, gp_cairo_enhanced_string);
 
 		if (!strcmp(plot->fontname,"Symbol")) {
-			strncpy(gp_cairo_enhanced_font,
+			safe_strncpy(gp_cairo_enhanced_font,
 				plot->fontname,
 				sizeof(gp_cairo_enhanced_font));
 		} else {
-			strncpy(gp_cairo_enhanced_font,
+			safe_strncpy(gp_cairo_enhanced_font,
 				gp_cairo_default_font(), sizeof(gp_cairo_enhanced_font));
 		}
 		symbol_font_parsed = TRUE;
@@ -1346,7 +1346,7 @@ void gp_cairo_enhanced_flush(plot_struct *plot)
 		/* adding a blank character with the corresponding shape */
 		gp_cairo_add_shape(save_logical_rect,start);
 
-		strncpy(gp_cairo_save_utf8, "", sizeof(gp_cairo_save_utf8));
+		safe_strncpy(gp_cairo_save_utf8, "", sizeof(gp_cairo_save_utf8));
 		gp_cairo_enhanced_restore_now = FALSE;
 		start++;
 	}
@@ -1391,7 +1391,7 @@ void gp_cairo_enhanced_flush(plot_struct *plot)
 		/* adding a blank character with the corresponding shape */
 		gp_cairo_add_shape(underprinted_logical_rect, start);
 
-		strncpy(gp_cairo_underprinted_utf8, "", sizeof(gp_cairo_underprinted_utf8));
+		safe_strncpy(gp_cairo_underprinted_utf8, "", sizeof(gp_cairo_underprinted_utf8));
 		/* increment the position as we added a character */
 		start++;
 	}
@@ -1501,7 +1501,7 @@ void gp_cairo_enhanced_flush(plot_struct *plot)
 
 #ifdef MAP_SYMBOL
 	if (symbol_font_parsed)
-		strncpy(gp_cairo_enhanced_font, "Symbol", sizeof(gp_cairo_enhanced_font));
+		safe_strncpy(gp_cairo_enhanced_font, "Symbol", sizeof(gp_cairo_enhanced_font));
 #endif /* MAP_SYMBOL */
 
 	g_free(enhanced_text_utf8);
@@ -1542,7 +1542,7 @@ void gp_cairo_enhanced_open(plot_struct *plot, char* fontname, double fontsize, 
 		 */
 		char *save_plot_font = strdup(plot->fontname);
 		gp_cairo_set_font(plot, fontname, plot->fontsize);
-		strncpy(gp_cairo_enhanced_font, plot->fontname, sizeof(gp_cairo_enhanced_font));
+		safe_strncpy(gp_cairo_enhanced_font, plot->fontname, sizeof(gp_cairo_enhanced_font));
 		strcpy(plot->fontname, save_plot_font);
 		free(save_plot_font);
 
@@ -1575,7 +1575,7 @@ void gp_cairo_enhanced_init(plot_struct *plot, int len)
 	gp_cairo_enhanced_overprint = FALSE;
 	gp_cairo_enhanced_showflag = TRUE;
 	gp_cairo_enhanced_fontsize = plot->fontsize*plot->oversampling_scale;
-	strncpy(gp_cairo_enhanced_font, plot->fontname, sizeof(gp_cairo_enhanced_font));
+	safe_strncpy(gp_cairo_enhanced_font, plot->fontname, sizeof(gp_cairo_enhanced_font));
 	gp_cairo_enhanced_AttrList = pango_attr_list_new();
 }
 
@@ -1679,7 +1679,7 @@ void gp_cairo_enhanced_finish(plot_struct *plot, int x, int y)
 	gp_cairo_enhanced_AttrList = NULL;
 	g_clear_object (&layout);
 	cairo_restore(plot->cr);
-	strncpy(gp_cairo_utf8, "", sizeof(gp_cairo_utf8));
+	safe_strncpy(gp_cairo_utf8, "", sizeof(gp_cairo_utf8));
 	free(gp_cairo_enhanced_string);
 }
 

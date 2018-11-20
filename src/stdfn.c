@@ -295,7 +295,6 @@ strndup(const char * str, size_t n)
 
 /* Safe, '\0'-terminated version of strncpy()
  * safe_strncpy(dest, src, n), where n = sizeof(dest)
- * This is basically the old fit.c(copy_max) function
  */
 char *
 safe_strncpy(char *d, const char *s, size_t n)
