@@ -44,6 +44,9 @@
 
 /* Variables of misc.c needed by other modules: */
 
+/* Used by postscript terminal if a font file is found by loadpath_fopen() */
+extern char *loadpath_fontname;
+
 /* these two are global so that plot.c can load them on program entry */
 extern char *call_args[10];
 extern int call_argc;

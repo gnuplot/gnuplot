@@ -62,6 +62,9 @@ int call_argc;
 char *call_args[10] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
 static char *argname[] = {"ARG0","ARG1","ARG2","ARG3","ARG4","ARG5","ARG6","ARG7","ARG8","ARG9"};
 
+/* Used by postscript terminal if a font file is found by loadpath_fopen() */
+char *loadpath_fontname = NULL;
+
 /*
  * iso_alloc() allocates a iso_curve structure that can hold 'num'
  * points.
@@ -639,6 +642,15 @@ loadpath_fopen(const char *filename, const char *mode)
 {
     FILE *fp;
 
+    /* The global copy of fullname is only for the benefit of post.trm's
+     * automatic fontfile conversion via a constructed shell command.
+     * FIXME: There was a Feature Request to export the directory path
+     * in which a loaded file was found to a user-visible variable for the
+     * lifetime of that load.  This is close but without the lifetime.
+     */
+    free(loadpath_fontname);
+    loadpath_fontname = NULL;
+
 #if defined(PIPES)
     if (*filename == '<') {
 	restrict_popen();
@@ -656,7 +668,8 @@ loadpath_fopen(const char *filename, const char *mode)
 	    strcpy(fullname, path);
 	    PATH_CONCAT(fullname, filename);
 	    if ((fp = fopen(fullname, mode)) != NULL) {
-		free(fullname);
+		/* free(fullname); */
+		loadpath_fontname = fullname;
 		fullname = NULL;
 		/* reset loadpath internals!
 		 * maybe this can be replaced by calling get_loadpath with
@@ -666,8 +679,7 @@ loadpath_fopen(const char *filename, const char *mode)
 	    }
 	}
 
-	if (fullname)
-	    free(fullname);
+	free(fullname);
     }
 
 #ifdef _WIN32
