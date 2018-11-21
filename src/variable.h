@@ -87,17 +87,6 @@ char *loadpath_handler __PROTO((int, char *));
 #define clear_loadpath()   loadpath_handler(ACTION_CLEAR,NULL)
 #define dump_loadpath()    loadpath_handler(ACTION_SHOW,NULL)
 
-/* Fontpath related */
-
-char *fontpath_handler __PROTO((int, char *));
-
-#define init_fontpath()    fontpath_handler(ACTION_INIT,NULL)
-#define set_var_fontpath(path) fontpath_handler(ACTION_SET,(path))
-#define get_fontpath()     fontpath_handler(ACTION_GET,NULL)
-#define save_fontpath()    fontpath_handler(ACTION_SAVE,NULL)
-#define clear_fontpath()   fontpath_handler(ACTION_CLEAR,NULL)
-#define dump_fontpath()    fontpath_handler(ACTION_SHOW,NULL)
-
 /* Locale related */
 
 char *locale_handler __PROTO((int, char *));

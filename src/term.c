@@ -125,6 +125,7 @@ FILE *gpoutfile;
 */
 FILE *gppsfile = 0;
 char *PS_psdir = NULL;
+char *PS_fontpath = NULL;
 
 /* true if terminal has been initialized */
 TBOOLEAN term_initialised;

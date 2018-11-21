@@ -50,7 +50,6 @@
 # endif
 #endif
 
-static char *recursivefullname __PROTO((const char *path, const char *filename, TBOOLEAN recursive));
 static void prepare_call __PROTO((int calltype));
 
 /* State information for load_file(), to recover from errors
@@ -677,107 +676,6 @@ loadpath_fopen(const char *filename, const char *mode)
 #endif
     return fp;
 }
-
-
-/* Harald Harders <h.harders@tu-bs.de> */
-static char *
-recursivefullname(const char *path, const char *filename, TBOOLEAN recursive)
-{
-    char *fullname = NULL;
-    FILE *fp;
-
-    /* length of path, dir separator, filename, \0 */
-    fullname = gp_alloc(strlen(path) + 1 + strlen(filename) + 1,
-			"recursivefullname");
-    strcpy(fullname, path);
-    PATH_CONCAT(fullname, filename);
-
-    if ((fp = fopen(fullname, "r")) != NULL) {
-	fclose(fp);
-	return fullname;
-    } else {
-	free(fullname);
-	fullname = NULL;
-    }
-
-    if (recursive) {
-#if defined(HAVE_DIRENT)
-	DIR *dir;
-	struct dirent *direntry;
-	struct stat buf;
-
-	dir = opendir(path);
-	if (dir) {
-	    while ((direntry = readdir(dir)) != NULL) {
-		char *fulldir = (char *) gp_alloc(strlen(path) + 1 + strlen(direntry->d_name) + 1,
-					 "fontpath_fullname");
-		strcpy(fulldir, path);
-#  if defined(VMS)
-		if (fulldir[strlen(fulldir) - 1] == ']')
-		    fulldir[strlen(fulldir) - 1] = '\0';
-		strcpy(&(fulldir[strlen(fulldir)]), ".");
-		strcpy(&(fulldir[strlen(fulldir)]), direntry->d_name);
-		strcpy(&(fulldir[strlen(fulldir)]), "]");
-#  else
-		PATH_CONCAT(fulldir, direntry->d_name);
-#  endif
-		stat(fulldir, &buf);
-		if ((S_ISDIR(buf.st_mode)) &&
-		    (strcmp(direntry->d_name, ".") != 0) &&
-		    (strcmp(direntry->d_name, "..") != 0)) {
-		    fullname = recursivefullname(fulldir, filename, TRUE);
-		    if (fullname != NULL)
-			break;
-		}
-		free(fulldir);
-	    }
-	    closedir(dir);
-	}
-#else
-	int_warn(NO_CARET, "Recursive directory search not supported\n\t('%s!')", path);
-#endif
-    }
-    return fullname;
-}
-
-
-/* may return NULL */
-char *
-fontpath_fullname(const char *filename)
-{
-    FILE *fp;
-    char *fullname = NULL;
-
-#if defined(PIPES)
-    if (*filename == '<') {
-	os_error(NO_CARET, "fontpath_fullname: No Pipe allowed");
-    } else
-#endif /* PIPES */
-    if ((fp = fopen(filename, "r")) == (FILE *) NULL) {
-	/* try 'fontpath' variable */
-	char *tmppath, *path = NULL;
-
-	while ((tmppath = get_fontpath()) != NULL) {
-	    TBOOLEAN subdirs = FALSE;
-	    path = gp_strdup(tmppath);
-	    if (path[strlen(path) - 1] == '!') {
-		path[strlen(path) - 1] = '\0';
-		subdirs = TRUE;
-	    }			/* if */
-	    fullname = recursivefullname(path, filename, subdirs);
-	    if (fullname != NULL) {
-		while (get_fontpath());
-		free(path);
-		break;
-	    }
-	    free(path);
-	}
-    } else
-	fullname = gp_strdup(filename);
-
-    return fullname;
-}
-
 
 /* Push current terminal.
  * Called 1. in main(), just after init_terminal(),

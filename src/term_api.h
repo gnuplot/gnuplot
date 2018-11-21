@@ -428,6 +428,7 @@ extern FILE *gpoutfile;
 */
 extern FILE *gppsfile;
 extern char *PS_psdir;
+extern char *PS_fontpath;	/* just a directory name */
 
 extern TBOOLEAN monochrome;
 extern TBOOLEAN multiplot;

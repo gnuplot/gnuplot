@@ -289,6 +289,7 @@ static void delete_ps_fontfile __PROTO((struct ps_fontfile_def *, struct ps_font
 
 TERM_PUBLIC void PS_load_fontfile __PROTO((struct ps_fontfile_def *,TBOOLEAN));
 TERM_PUBLIC void PS_load_fontfiles __PROTO((TBOOLEAN));
+static char * fontpath_fullname __PROTO((const char *name, const char *dir));
 
 static TBOOLEAN ps_explicit_size = FALSE;
 static size_units ps_explicit_units = INCHES;
@@ -1000,29 +1001,39 @@ PS_options()
 		    ps_params->first_fontfile;
 		struct ps_fontfile_def *prev_ps_fontfile = NULL;
 		struct ps_fontfile_def *new_ps_fontfile =
-		     gp_alloc(sizeof(struct ps_fontfile_def),
-			     "new_ps_fontfile");
+		     gp_alloc(sizeof(struct ps_fontfile_def), "new_ps_fontfile");
 
 		new_ps_fontfile->fontfile_name =
-		    gp_alloc (token_len(c_token),
-			      "new_ps_fontfile->fontfile_name");
+		    gp_alloc (token_len(c_token), "new_ps_fontfile->fontfile_name");
 		gp_expand_tilde(&fontfilename);
 		new_ps_fontfile->fontfile_name = fontfilename;
 		new_ps_fontfile->fontname = NULL;
 		if (!deleteentry) {
 #if defined(PIPES)
-		    if (*(new_ps_fontfile->fontfile_name) != '<') {
-#endif
-			new_ps_fontfile->fontfile_fullname =
-			    fontpath_fullname(new_ps_fontfile->fontfile_name);
-			if (!new_ps_fontfile->fontfile_fullname)
-			    int_error(c_token-1, "Font file '%s' not found",
-				      new_ps_fontfile->fontfile_name);
-#if defined(PIPES)
-		    } else
+		    if (*(new_ps_fontfile->fontfile_name) == '<') {
 			new_ps_fontfile->fontfile_fullname = NULL;
+		    } else
 #endif
+		    {	/* New search order (version 5.3) */
 
+			/* (1) try absolute path or current directory */
+			/* (2) fontpath_fullname will also check loadpath directories */
+			new_ps_fontfile->fontfile_fullname =
+				fontpath_fullname(fontfilename, NULL);
+
+			/* (3) try in directory from "set fontpath" */
+			if (!new_ps_fontfile->fontfile_fullname && PS_fontpath)
+			    new_ps_fontfile->fontfile_fullname =
+				fontpath_fullname(fontfilename, PS_fontpath);
+
+			/* (4) environmental variable GNUPLOT_FONTPATH */
+			if (!new_ps_fontfile->fontfile_fullname)
+			    new_ps_fontfile->fontfile_fullname =
+				fontpath_fullname(fontfilename, getenv("GNUPLOT_FONTPATH"));
+
+			if (!new_ps_fontfile->fontfile_fullname)
+			    int_error(c_token-1, "Font file '%s' not found.\nTry setting GNUPLOT_FONTPATH in the environment or adding a 'set fontpath' command.", fontfilename);
+		    }
 		}
 		new_ps_fontfile->next = NULL;
 
@@ -1464,7 +1475,7 @@ PS_load_fontfile(struct ps_fontfile_def *current_ps_fontfile, TBOOLEAN doload)
 		int_warn(NO_CARET,
 			 "Font file '%s' has unknown extension. Assume it is a pfa file",
 			 current_ps_fontfile->fontfile_name);
-	    ffont = fopen(current_ps_fontfile->fontfile_fullname, "r");
+	    ffont = loadpath_fopen(current_ps_fontfile->fontfile_fullname, "r");
 	    if (!ffont)
 		int_error(NO_CARET, "Font file '%s' not found",
 			  current_ps_fontfile->fontfile_name);
@@ -4374,6 +4385,39 @@ PS_layer(t_termlayer syncpoint)
     }
 }
 
+/*
+ * helper function for set_fontpath
+ * This used to be a much more complicated routine in misc.c that did
+ * a recursive search of subdirectories.  Simplify drastically for 5.3.
+ */
+static char *
+fontpath_fullname(const char *name, const char *dir)
+{
+    char *fullname = NULL;
+    FILE *fp;
+
+    if (!dir) {
+	fullname = gp_strdup(name);
+    } else {
+	fullname = gp_alloc(strlen(dir) + strlen(name) + 4, NULL);
+	sprintf(fullname, "%s%c%s", dir, DIRSEP1, name);
+    }
+    if ((fp = fopen(fullname, "r"))) {
+	/* We're good */
+	fclose(fp);
+    } else if (!dir && (fp = loadpath_fopen(fullname, "r"))) {
+	/* Found it in a loadpath directory */
+	free(fullname);
+	fullname = strdup(loadpath_fontname);
+	fclose(fp);
+    } else {
+	free(fullname);
+	fullname = NULL;
+    }
+
+    return fullname;
+}
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -4766,7 +4810,7 @@ START_HELP(post)
 "       set terminal postscript {landscape | portrait | eps}",
 "                               {enhanced | noenhanced}",
 "                               {defaultplex | simplex | duplex}",
-"                               {fontfile [add | delete] \"<filename>\"",
+"                               {fontfile {add | delete} \"<filename>\"",
 "                                | nofontfiles} {{no}adobeglyphnames}",
 PS_COMMON_OPTS1
 PS_COMMON_OPTS2
@@ -4870,6 +4914,7 @@ PS_COMMON_DOC1
 "?term postscript fontfile",
 "?postscript fontfile",
 "?fontfile",
+"       set term postscript ... fontfile {add|delete} <filename>",
 " The `fontfile` or `fontfile add` option takes one file name as argument",
 " and encapsulates this file into the postscript output in order to make",
 " this font available for text elements (labels, tic marks, titles, etc.).",
@@ -4879,18 +4924,19 @@ PS_COMMON_DOC1
 " The postscript terminal understands some",
 " font file formats: Type 1 fonts in ASCII file format (extension \".pfa\"),",
 " Type 1 fonts in binary file format (extension \".pfb\"), and TrueType",
-" fonts (extension \".ttf\"). Pfa files are understood directly, pfb and ttf",
+" fonts (extension \".ttf\"). pfa files are understood directly, pfb and ttf",
 " files are converted on the fly if appropriate conversion tools are",
 " installed (see below). You have to specify the full filename including the",
 " extension. Each `fontfile` option takes exact one font file name. This",
 " option can be used multiple times in order to include more than one font",
 " file.",
 "",
-" The font file is searched in the working directory and in all directories",
-" listed in the fontpath which is determined by `set fontpath`.",
-" In addition, the fontpath can be set using the environment variable",
-" GNUPLOT_FONTPATH. If this is not set a system dependent default search",
-" list is used. See `set fontpath` for more details.",
+" The search order used to find font files is",
+" (1) absolute pathname or current working directory",
+" (2) any of the directories specified by `set loadpath`",
+" (3) the directory specified by `set fontpath`",
+" (4) the directory given in environmental variable GNUPLOT_FONTPATH.",
+" NB: This is a CHANGE from earlier versions of gnuplot.",
 "",
 " For using the encapsulated font file you have to specify the font name",
 " (which normally is not the same as the file name). When embedding a",

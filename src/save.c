@@ -1009,13 +1009,10 @@ set origin %g,%g\n",
 	fputc('\n', fp);
     }
 
-    fputs("set fontpath ", fp);
-    {
-	char *s;
-	while ((s = save_fontpath()) != NULL)
-	    fprintf(fp, "\"%s\" ", s);
-	fputc('\n', fp);
-    }
+    if (PS_fontpath)
+	fprintf(fp, "set fontpath \"%s\"\n", PS_fontpath);
+    else
+	fprintf(fp, "set fontpath\n");
 
     if (PS_psdir)
 	fprintf(fp, "set psdir \"%s\"\n", PS_psdir);

@@ -2594,40 +2594,14 @@ set_loadpath()
     }
 }
 
-
 /* process 'set fontpath' command */
+/* Apr 2018 (V5.3) simplify this to a single directory */
 static void
 set_fontpath()
 {
-    /* We pick up all fontpath elements here before passing
-     * them on to set_var_fontpath()
-     */
-    char *collect = NULL;
-
     c_token++;
-    if (END_OF_COMMAND) {
-	clear_fontpath();
-    } else while (!END_OF_COMMAND) {
-	char *ss;
-	if ((ss = try_to_get_string())) {
-	    int len = (collect? strlen(collect) : 0);
-	    gp_expand_tilde(&ss);
-	    collect = gp_realloc(collect, len+1+strlen(ss)+1, "tmp fontpath");
-	    if (len != 0) {
-		strcpy(collect+len+1,ss);
-		*(collect+len) = PATHSEP;
-	    }
-	    else
-		strcpy(collect,ss);
-	    free(ss);
-	} else {
-	    int_error(c_token, "expected string");
-	}
-    }
-    if (collect) {
-	set_var_fontpath(collect);
-	free(collect);
-    }
+    free(PS_fontpath);
+    PS_fontpath = try_to_get_string();
 }
 
 

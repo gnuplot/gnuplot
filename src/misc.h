@@ -60,7 +60,6 @@ TBOOLEAN lf_pop __PROTO((void));
 void lf_push __PROTO((FILE *fp, char *name, char *cmdline));
 void load_file_error __PROTO((void));
 FILE *loadpath_fopen __PROTO((const char *, const char *));
-char *fontpath_fullname __PROTO((const char *));
 void push_terminal __PROTO((int is_interactive));
 void pop_terminal __PROTO((void));
 

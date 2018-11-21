@@ -262,6 +262,8 @@ C
 ##undefined values (NaN) rather than as real(value).  This was always true for
 ##function plots and 3D data plots.  E.g. the following two plots are equivalent.
 ##plot [-1:1] sqrt(x); plot [-1:1] '+' using 1:(sqrt($1)
+#b The `set fontpath` command is deprecated. The search path for fonts to be
+## embedded in output from the postscript terminal has been revised.
 #end
 3 Features introduced in version 5.2
 ?Features introduced in version 5.2
@@ -1004,9 +1006,7 @@ C  need @ in table, so end and restart the table !
  set via the environmental variable GNUPLOT_DEFAULT_GDFONT.
 
  The postscript terminal uses its own font search path. It is controlled by
- the environmental variable GNUPLOT_FONTPATH. The format is the same as for
- GNUPLOT_LIB. The contents of GNUPLOT_FONTPATH are appended to the `fontpath`
- variable, but not saved with the `save` and `save set` commands.
+ the `set fontpath` command and the environmental variable GNUPLOT_FONTPATH.
 
  GNUPLOT_PS_DIR is used by the postscript driver to search for external
  prologue files. Depending on the build process, gnuplot contains either a
@@ -9520,41 +9520,30 @@ Ffigure_missing
 ?set fontpath
 ?show fontpath
 ?fontpath
- The `fontpath` setting defines additional locations for font files
- searched when including font files. Currently only the postscript terminal
- supports `fontpath`. If a file cannot be found in the current directory,
- the directories in `fontpath` are tried. Further documentation concerning
- the supported file formats is included in the `terminal postscript` section
- of the documentation.
-
  Syntax:
-       set fontpath {"pathlist1" {"pathlist2"...}}
-       show fontpath
+       set fontpath "/directory/where/my/fonts/live"
+       set term postscript fontfile <filename>
 
- Path names may be entered as single directory names, or as a list of
- path names separated by a platform-specific path separator, eg. colon
- (':') on Unix, semicolon (';') on DOS/Windows/OS/2 platforms.
- The `show fontpath`, `save` and `save set` commands replace the
- platform-specific separator with a space character (' ') for maximum
- portability. If a directory name ends with an exclamation mark ('!') also
- the subdirectories of this directory are searched for font files.
+ [DEPRECATED in version 5.3]
 
- If the environmental variable GNUPLOT_FONTPATH is set, its contents are
- appended to `fontpath`.  If it is not set, a system dependent default value
- is used. It is set by testing several directories for existence when using
- the fontpath the first time. Thus, the first call of `set fontpath`,
- `show fontpath`, `save fontpath`, `plot`, or `splot` with embedded font
- files takes a little more time. If you want to save this time you may
- set the environmental variable GNUPLOT_FONTPATH since probing is switched
- off, then. You can find out which is the default fontpath by using
- `show fontpath`.
+ The `fontpath` directory is relevant only for embedding fonts in
+ postscript output produced by the postscript terminal.
+ It has no effect on other gnuplot terminals.
+ If you are not embedding fonts you do not need this command, and even if you
+ are embedding fonts you only need it for fonts that cannot be found via
+ the other paths below.
 
- `show fontpath` prints the contents of the user-defined fontpath and the
- system fontpath separately.  However, the `save` and `save set` commands
- save only the user-specified parts of `fontpath`.
+ Earlier versions of gnuplot tried to emulate a font manager by tracking
+ multiple directory trees containing fonts.
+ This is now replaced by a search in the following places:
+ (1) an absolute path given in the `set term postscript fontfile` command
+ (2) the current directory
+ (3) any of the directories specified by `set loadpath`
+ (4) the directory specified by `set fontpath`
+ (5) the directory provided in environmental variable GNUPLOT_FONTPATH
 
- For terminal drivers that access fonts by filename via the gd library, the
- font search path is controlled by the environmental variable GDFONTPATH.
+ Note: The search path for fonts specified by filename for the libgd terminals
+ (png gif jpeg sixel) is controlled by environmental variable GDFONTPATH.
 3 format
 ?commands set format
 ?commands show format

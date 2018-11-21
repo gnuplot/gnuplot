@@ -3070,8 +3070,14 @@ show_loadpath()
 static void
 show_fontpath()
 {
+    const char *env_fontpath = getenv("GNUPLOT_FONTPATH");
+
     SHOW_ALL_NL;
-    dump_fontpath();
+    fprintf(stderr, "\tdirectory from 'set fontpath': %s\n",
+	PS_fontpath ? PS_fontpath : "none");
+    fprintf(stderr, "\tenvironmental variable GNUPLOT_FONTPATH: %s\n",
+	env_fontpath ? env_fontpath : "none");
+	
 }
 
 
