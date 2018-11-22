@@ -1,3 +1,16 @@
+2018-11-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/time.c (ggmtime): Allow for round-off error in date conversion
+	
+	The reported case was converting time = -1.75145e-13 seconds
+	Round-off error put this initially in 1969, but counting out seconds
+	per hour/day/month/ put it back at 1970 time 0 described as 1969
+	month 13.  It looks to me that the same error could in principle
+	trigger at any year boundary, so test explicitly for month wrap-around.
+	Bug #2087
+	
+	reported by: Tim Blazytko, Cornelius Aschermann, Sergej Schumilo, Nils Bars
+
 2018-11-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* various overflow cases found by fuzzing

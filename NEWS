@@ -10,6 +10,7 @@ Changes in 5.2.6
 * FIX revise waitforinput and new window events in monothreaded wxt terminal
 * FIX lua.trm compatibility with lua version 5.3
 * FIX error line reporting inside an if/else bracketed clause
+* FIX error in date conversion for times within a nanosecond of a year boundary
 
 Changes in 5.2.5
 ================

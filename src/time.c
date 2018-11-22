@@ -823,6 +823,12 @@ ggmtime(struct tm *tm, double l_clock)
     while (days >= (i = mndday[tm->tm_mon] + (tm->tm_mon == 1 && (gdysize(tm->tm_year) > 365)))) {
 	days -= i;
 	tm->tm_mon++;
+	/* This catches round-off error that initially assigned a date to year N-1 */
+	/* but counting out seconds puts it in the first second of Jan year N.     */
+	if (tm->tm_mon > 11) {
+	    tm->tm_mon = 0;
+	    tm->tm_year++;
+	}
     }
     tm->tm_mday = days + 1;
 
