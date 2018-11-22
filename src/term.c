@@ -563,8 +563,10 @@ term_end_plot()
 	(void) fflush(gpoutfile);
 
 #ifdef USE_MOUSE
-    recalc_statusline();
-    update_ruler();
+    if (term->set_ruler) {
+	recalc_statusline();
+	update_ruler();
+    }
 #endif
 }
 
