@@ -14,6 +14,7 @@
 	Bug 2094: also post.trm
 	Bug 2093: datafile.c expand df_line on input as necessary to hold string data
 	Bug 2095: eepic.trm (EEPIC_put_text) ignore request to print empty string
+	Bug 2096: buffer underrun if input line begins with '\0'
 
 2018-11-15  Ethan A Merritt  <merritt@u.washington.edu>
 
