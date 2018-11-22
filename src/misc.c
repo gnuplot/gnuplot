@@ -386,7 +386,9 @@ load_file(FILE *fp, char *name, int calltype)
 		}
 		inline_num++;
 		gpval_lineno->udv_value.v.int_val = inline_num;	/* User visible copy */
-		len = strlen(gp_input_line) - 1;
+		if ((len = strlen(gp_input_line)) == 0)
+		    continue;
+		--len;
 		if (gp_input_line[len] == '\n') {	/* remove any newline */
 		    gp_input_line[len] = '\0';
 		    /* Look, len was 1-1 = 0 before, take care here! */
