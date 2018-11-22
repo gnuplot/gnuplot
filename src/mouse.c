@@ -547,8 +547,6 @@ xDateTimeFormat(double x, char *b, int mode)
 		tm.tm_hour, tm.tm_min);
 	break;
     case MOUSE_COORDINATES_TIMEFMT:
-	/* FIXME HBB 20000507: timefmt is for *reading* timedata, not
-	 * for writing them! */
 	gstrftime(b, 0xff, timefmt, x);
 	break;
     default:
@@ -557,24 +555,35 @@ xDateTimeFormat(double x, char *b, int mode)
     return b;
 }
 
+/* Format one axis coordinate for output to mouse status or
+ * button 2 label text
+ */
+static char *
+mkstr(char *sp, double x, AXIS_INDEX axis)
+{
+    if (x >= VERYLARGE)
+	return sp;
 
+    if (axis == FIRST_X_AXIS
+	&& (mouse_mode == MOUSE_COORDINATES_XDATE
+	|| mouse_mode == MOUSE_COORDINATES_XTIME
+	|| mouse_mode == MOUSE_COORDINATES_XDATETIME
+	|| mouse_mode == MOUSE_COORDINATES_TIMEFMT)) {
+	/* mouseformats 3 4 5 6 use specific time format for x coord */
+	xDateTimeFormat(x, sp, mouse_mode);
 
-/* HBB 20000507: fixed a construction error. Was using the 'timefmt'
- * string (which is for reading, not writing time data) to output the
- * value. Code is now closer to what setup_tics does. */
-#define MKSTR(sp,x,axis)					\
-do {								\
-    if (x >= VERYLARGE)	break;					\
-    if (axis_array[axis].datatype == DT_TIMEDATE) {		\
-	char *format = copy_or_invent_formatstring(&axis_array[axis]);	\
-	while (strchr(format,'\n'))				\
-	     *(strchr(format,'\n')) = ' ';			\
-	gstrftime(sp, 40, format, x);				\
-    } else {							\
-	sprintf(sp, mouse_setting.fmt ,x);			\
-    }								\
-    sp += strlen(sp);						\
-} while (0)
+    } else if (axis_array[axis].datatype == DT_TIMEDATE) {
+	char *format = copy_or_invent_formatstring(&axis_array[axis]);
+	while (strchr(format,'\n'))
+	    *(strchr(format,'\n')) = ' ';
+	gstrftime(sp, 40, format, x);
+
+    } else {
+	sprintf(sp, mouse_setting.fmt ,x);
+    }
+
+    return (sp + strlen(sp));
+}
 
 
 /* ratio for log, distance for linear */
@@ -901,22 +910,22 @@ UpdateStatuslineWithMouseSetting(mouse_setting_t * ms)
 	sp = s0;
 	if (TICS_ON(axis_array[FIRST_X_AXIS].ticmode)) {
 	    sp = stpcpy(sp, "x=");
-	    MKSTR(sp, real_x, FIRST_X_AXIS);
+	    sp = mkstr(sp, real_x, FIRST_X_AXIS);
 	    *sp++ = ' ';
 	}
 	if (TICS_ON(axis_array[FIRST_Y_AXIS].ticmode)) {
 	    sp = stpcpy(sp, "y=");
-	    MKSTR(sp, real_y, FIRST_Y_AXIS);
+	    sp = mkstr(sp, real_y, FIRST_Y_AXIS);
 	    *sp++ = ' ';
 	}
 	if (TICS_ON(axis_array[SECOND_X_AXIS].ticmode)) {
 	    sp = stpcpy(sp, "x2=");
-	    MKSTR(sp, real_x2, SECOND_X_AXIS);
+	    sp = mkstr(sp, real_x2, SECOND_X_AXIS);
 	    *sp++ = ' ';
 	}
 	if (TICS_ON(axis_array[SECOND_Y_AXIS].ticmode)) {
 	    sp = stpcpy(sp, "y2=");
-	    MKSTR(sp, real_y2, SECOND_Y_AXIS);
+	    sp = mkstr(sp, real_y2, SECOND_Y_AXIS);
 	    *sp++ = ' ';
 	}
 	if (ruler.on) {
@@ -948,8 +957,6 @@ UpdateStatuslineWithMouseSetting(mouse_setting_t * ms)
 	(term->put_tmptext) (0, s0);
     }
 }
-#undef MKSTR
-
 
 void
 recalc_statusline()
