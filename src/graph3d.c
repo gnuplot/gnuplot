@@ -2292,6 +2292,9 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 			iso = iso_samples_2;
 
 		    count = curve->p_count;
+		    if (count == 0)
+			continue;
+
 		    check_corner_height(curve->points, height, depth);
 		    check_corner_height(curve->points + count - 1, height, depth);
 		    while (--iso)
