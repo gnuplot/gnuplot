@@ -2960,7 +2960,7 @@ HPGL2_set_color(t_colorspec *colorspec)
     double gray = colorspec->value;
     int linetype = colorspec->lt;
 
-    FPRINTF(("set_color : %i\n", HPGL2_pentype));
+    FPRINTF((stderr, "set_color : %i\n", HPGL2_pentype));
     HPGL2_end_poly();
 
     switch (colorspec->type) {
