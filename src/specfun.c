@@ -3039,21 +3039,6 @@ static unsigned short APGD[40] = {
 };
 #endif
 
-#if (0) /* gcc -Wstrict-prototypes complains about these prototypes */
-#ifdef ANSIPROT
-extern double fabs ( double );
-extern double exp ( double );
-extern double sqrt ( double );
-extern double polevl ( double, void *, int );
-extern double p1evl ( double, void *, int );
-extern double sin ( double );
-extern double cos ( double );
-#else
-double fabs(), exp(), sqrt();
-double polevl(), p1evl(), sin(), cos();
-#endif
-#endif
-
 int
 airy( double x, double *ai, double *aip, double *bi, double *bip )
 {
