@@ -1167,9 +1167,9 @@ get_3ddata(struct surface_points *this_plot)
 		    if (boxdepth > 0) {
 			double dummy;
 			STORE_AND_UPDATE_RANGE(dummy, y - boxdepth, cp->type, y_axis,
-				this_plot->noautoscale, NULL);
+				this_plot->noautoscale, {});
 			STORE_AND_UPDATE_RANGE(dummy, y + boxdepth, cp->type, y_axis,
-				this_plot->noautoscale, NULL);
+				this_plot->noautoscale, {});
 		    }
 		    /* We converted linetype colors (lc variable) to RGB colors on input.
 		     * Other plot style do not do this.
