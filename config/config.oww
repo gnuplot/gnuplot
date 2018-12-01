@@ -607,6 +607,9 @@
 #define _fcloseall fcloseall
 #define mktemp _mktemp
 #define wcsnicmp _wcsnicmp
+#if __WATCOMC__ <= 1290
+# define trunc(a) (int)(a)
+#endif
 
 /* Warning: _wsystem is broken and hence we do not have Unicode support
             for fake pipe commands nor system commands */
