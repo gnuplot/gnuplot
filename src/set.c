@@ -1751,7 +1751,7 @@ set_fit()
 	} else if (almost_equals(c_token, "noerrors$caling")) {
 	    fit_errorscaling = FALSE;
 	    c_token++;
-	} else if ((key = lookup_table(fit_verbosity_level, c_token))) {
+	} else if ((key = lookup_table(fit_verbosity_level, c_token)) > 0) {
 	    fit_verbosity = key;
 	    c_token++;
 	} else if (equals(c_token, "prescale")) {
