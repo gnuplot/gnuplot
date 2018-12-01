@@ -629,6 +629,9 @@
 #define _fcloseall fcloseall
 #define mktemp _mktemp
 #define wcsnicmp _wcsnicmp
+#if __WATCOMC__ <= 1290
+# define trunc(a) (int)(a)
+#endif
 
 /* gnuplot.gih is not used by wgnuplot */
 #define NO_GIH 1

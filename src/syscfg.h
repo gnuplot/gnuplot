@@ -113,7 +113,9 @@
 /* Fix for broken compiler headers
  * See stdfn.h
  */
-# define S_IFIFO  _S_IFIFO
+# if !defined(__WATCOMC__) || (__WATCOMC__ <= 1290)
+#  define S_IFIFO  _S_IFIFO
+# endif
 # define HOME    "GNUPLOT"
 # define PLOTRC  "gnuplot.ini"
 # define SHELL   "\\command.com"
@@ -149,7 +151,7 @@ FILE * win_popen(const char *filename, const char *mode);
 #endif
 #endif /* _WINDOWS */
 
-#if defined(MSDOS) && !defined(_WIN32)
+#if defined(MSDOS)
 /* should this be here ? */
 # define OS       "MS-DOS"
 # undef HELPFILE
