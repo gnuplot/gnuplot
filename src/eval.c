@@ -248,7 +248,7 @@ static JMP_BUF fpe_env;
 static RETSIGTYPE
 fpe(int an_int)
 {
-#if defined(MSDOS) && !defined(__EMX__) && !defined(DJGPP) && !defined(_WIN32)
+#if defined(MSDOS) && !defined(__EMX__) && !defined(DJGPP)
     /* thanks to lotto@wjh12.UUCP for telling us about this  */
     _fpreset();
 #endif
@@ -555,7 +555,7 @@ push(struct value *x)
 	int array_size = x->v.value_array[0].v.int_val + 1;
 	stack[s_p].v.value_array = gp_alloc(array_size * sizeof(struct value), "push copy of array");
 	memcpy(stack[s_p].v.value_array, x->v.value_array, array_size*sizeof(struct value));
-	for (i=1; i<array_size; i++) 
+	for (i=1; i<array_size; i++)
 	    if (stack[s_p].v.value_array[i].type == STRING) {
 		stack[s_p].v.value_array[i].v.string_val
 		= strdup(stack[s_p].v.value_array[i].v.string_val);
@@ -847,7 +847,7 @@ set_gpval_axis_sth_double(const char *prefix, AXIS_INDEX axis, const char *suffi
     for (cc=s; *cc; cc++)
 	*cc = toupper((unsigned char)*cc); /* make the name uppercase */
     v = add_udv_by_name(s);
-    if (!v) 
+    if (!v)
 	return; /* should not happen */
     Gcomplex(&v->udv_value, value, 0);
 }
@@ -968,9 +968,9 @@ update_gpval_variables(int context)
 	/* in which x/y axes are drawn after 'set view equal xy[z]' */
 	fill_gpval_float("GPVAL_VIEW_XCENT",
 		(double)(canvas.xright+1 - xmiddle)/(double)(canvas.xright+1));
-	fill_gpval_float("GPVAL_VIEW_YCENT", 
+	fill_gpval_float("GPVAL_VIEW_YCENT",
 		1.0 - (double)(canvas.ytop+1 - ymiddle)/(double)(canvas.ytop+1));
-	fill_gpval_float("GPVAL_VIEW_RADIUS", 
+	fill_gpval_float("GPVAL_VIEW_RADIUS",
 		0.5 * surface_scale * xscaler/(double)(canvas.xright+1));
 
 	return;
