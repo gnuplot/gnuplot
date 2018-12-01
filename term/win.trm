@@ -1008,6 +1008,8 @@ WIN_set_color(t_colorspec *colorspec)
 		case TC_LT:
 			GraphOp(graphwin, W_setcolor, colorspec->lt, 0, (void *) &WIN_set_color);
 			break;
+		default:
+			break;
 	}
 	WIN_last_linetype = LT_NODRAW;
 }

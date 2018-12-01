@@ -1309,6 +1309,8 @@ PC_set_color(t_colorspec *colorspec)
 	}
 	break;
     }
+    default:
+	break;
     }
 }
 
