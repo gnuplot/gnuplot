@@ -106,6 +106,10 @@
 # include "be.trm"
 #endif
 
+/* MSDOS with djgpp compiler or _WIN32/Mingw or X11 */
+#if (defined(DJGPP) && (!defined(DJSVGA) || (DJSVGA != 0))) || defined(HAVE_GRX)
+# include "djsvga.trm"
+#endif
 
 /****************************************************************************/
 /* MS-DOS */
@@ -117,11 +121,6 @@
 #  define EMXVESA
 #  include "emxvga.trm"
 # endif				/* MSDOS && EMX */
-
-/* MSDOS with djgpp compiler */
-# if defined(DJGPP) && (!defined(DJSVGA) || (DJSVGA != 0))
-#  include "djsvga.trm"
-# endif
 
 /* MSDOS with OpenWatcom compiler */
 # if defined(__WATCOMC__)
