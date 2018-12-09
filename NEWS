@@ -18,6 +18,7 @@ Changes not in 5.2
 * NEW largely extended pcl5 terminal supports PCL5e/PCL5c printers
 * NEW revised pstricks LaTeX terminal
 * NEW extended dospc terminal (DOS / OpenWatcom)
+* NEW extended svga terminal (DOS / DJGPP)
 * EXPERIMENTAL internal support for appending to existing arrays
 * EXPERIMENTAL "set mouse mouseformat function <stringval_from_xy(x,y)>"
 * EXPERIMENTAL multiple textbox styles

@@ -1,5 +1,4 @@
 /* Hello, Emacs, this is -*-C-*- */
-
 /* GNUPLOT - djsvga.trm */
 
 /*[
@@ -42,15 +41,12 @@
  *  Russell Lang
  *  Edzer Pebesma (gnuplot 3.6: new terminal layout, fonts, grx20)
  *  Hans-Bernhard Broeker (several improvements)
+ *  Bastian Märkisch (palette and RGB colors, dashed lines, enhanced text,
+ *    filled polygons, color and pattern fill, image, terminal options,
+ *    support MGRX fork, text encodings, interactive keyboard / mouse input)
  *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
- */
-
-/* HBB: A new version, called grx21a was released recently. To
- * tell gnuplot you have it, add '-DGRX21' to your compilation flags.
- * Currently, that only enables the drawing of wide lines. Maybe more
- *  to come.
  */
 
 #include "driver.h"
@@ -71,26 +67,39 @@ register_term(djsvga)		/* no ; */
 #define DJSVGA_VTIC 4
 #define DJSVGA_HTIC 4
 
-TERM_PUBLIC void DJSVGA_init __PROTO((void));
-TERM_PUBLIC void DJSVGA_graphics __PROTO((void));
-TERM_PUBLIC void DJSVGA_text __PROTO((void));
-TERM_PUBLIC void DJSVGA_reset __PROTO((void));
-TERM_PUBLIC void DJSVGA_options __PROTO((void));
-TERM_PUBLIC void DJSVGA_linetype __PROTO((int linetype));
-TERM_PUBLIC void DJSVGA_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void DJSVGA_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC int DJSVGA_angle __PROTO((int ang));
-TERM_PUBLIC int DJSVGA_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC void DJSVGA_put_text __PROTO((unsigned int x, unsigned int y,
-					  const char *str));
-TERM_PUBLIC int DJSVGA_set_font __PROTO((const char *fontname));
-TERM_PUBLIC void DJSVGA_suspend __PROTO((void));
-TERM_PUBLIC void DJSVGA_resume __PROTO((void));
-/* clear part of multiplot */
-TERM_PUBLIC void DJSVGA_fillbox __PROTO((int style, unsigned int x1,
+TERM_PUBLIC void DJSVGA_init(void);
+TERM_PUBLIC void DJSVGA_graphics(void);
+TERM_PUBLIC void DJSVGA_text(void);
+TERM_PUBLIC void DJSVGA_reset(void);
+TERM_PUBLIC void DJSVGA_options(void);
+TERM_PUBLIC void DJSVGA_linetype(int linetype);
+TERM_PUBLIC void DJSVGA_dashtype(int type, t_dashtype *custom_dash_pattern);
+TERM_PUBLIC void DJSVGA_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void DJSVGA_vector(unsigned int x, unsigned int y);
+TERM_PUBLIC int DJSVGA_angle(int ang);
+TERM_PUBLIC int DJSVGA_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC void DJSVGA_put_text(unsigned int x, unsigned int y,
+					  const char *str);
+TERM_PUBLIC int DJSVGA_set_font(const char *fontname);
+TERM_PUBLIC void DJSVGA_suspend(void);
+TERM_PUBLIC void DJSVGA_resume(void);
+TERM_PUBLIC void DJSVGA_fillbox(int style, unsigned int x1,
 					 unsigned int y1, unsigned int width,
-					 unsigned int height));
-TERM_PUBLIC void DJSVGA_linewidth __PROTO((double linewidth));
+					 unsigned int height);
+TERM_PUBLIC void DJSVGA_linewidth(double linewidth);
+TERM_PUBLIC void DJSVGA_enhanced_put_text(unsigned int x, unsigned int y, const char str[]);
+TERM_PUBLIC void DJSVGA_enhanced_open(char * fontname, double fontsize,
+					double base, TBOOLEAN widthflag, TBOOLEAN showflag, int overprint);
+TERM_PUBLIC void DJSVGA_enhanced_flush(void);
+
+#ifdef USE_MOUSE
+# if (defined(MGRX_XWIN) || defined(_WIN32))
+TERM_PUBLIC int DJSVGA_waitforinput(int mode); /* only required for xwin and win32 */
+# endif
+TERM_PUBLIC void DJSVGA_put_tmptext(int location, const char str[]);
+TERM_PUBLIC void DJSVGA_set_ruler(int x, int y);
+TERM_PUBLIC void DJSVGA_set_cursor(int action, int x, int y);
+#endif
 
 #define GOT_DJSVGA_PROTO
 #endif /* TERM_PROTO */
@@ -99,26 +108,56 @@ TERM_PUBLIC void DJSVGA_linewidth __PROTO((double linewidth));
 #ifdef TERM_BODY
 
 /* SVGA driver using DJGPP */
-#if (DJGPP==2)
-# define GRX20
-#endif
-#ifdef GRX20
-/* use grx20.h for DJGPP V1 / GRX V2 combo as well */
-# include <grx20.h>
-#else
-# include <grx.h>
-#endif
-#include <pc.h>
 
-static int dj_startx, dj_starty;
+#ifdef DJSVGA_DEBUG
+# undef FPRINTF
+# define FPRINTF(a) fprintf a
+#endif
+
+#ifdef HAVE_MGRX
+# include <mgrx.h>
+# include <mgrxkeys.h>
+#else
+# include <grx20.h>
+# include <grxkeys.h>
+# define GRKBS_ALT GR_KB_ALT
+# define GRKBS_SHIFT GR_KB_SHIFT
+# define GRKBS_CTRL GR_KB_CTRL
+#endif
+#ifdef DJGPP
+# include <pc.h>
+#endif
+#ifdef HAVE_SYS_SELECT_H
+# include <sys/select.h>
+#endif
+
+#if defined(__linux__) && defined(HAVE_MGRX)
+# define MGRX_XWIN
+#endif
+
+#if 0
+/* FIXME: Saving colors causes memory corruption */
+# define DJSVGA_SAVE_COLORS
+#endif
+
+static void DJSVGA_trim_font_string(const char * fontspec,
+    char * fontname, size_t fontnamesize);
+static void DJSVGA_add_path_point(int x, int y); /* add a new point to current path or line */
+static void DJSVGA_flush_line(void); /* finish a poly-line */
+
+#ifdef USE_MOUSE
+static TBOOLEAN grx_check_event(void);
+#endif
+
+
+static TBOOLEAN dj_initialized = FALSE;
 static int dj_xlast, dj_ylast;
 #define DJNUMCOLOR 15
-/* HBB: Let's just use long for GRX1 as well */
 static long dj_color;
 static long svga256color[DJNUMCOLOR] =
    /* old sequence: {7, 8, 2, 3, 4, 5, 9, 14, 12, 15, 13, 10, 11, 1, 6}; */
 {
-   7 /*black*/, 8 /*grey*/, 
+   7 /*black*/, 8 /*grey*/,
 #if 0 /* prefer dark colors */
    4 /*dark red*/, 2 /*dark green*/, 1 /*dark blue*/, 5 /*dark magenta*/, 3 /*dark cyan*/,
    14 /*yellow*/, 15 /*white*/,
@@ -131,26 +170,83 @@ static long svga256color[DJNUMCOLOR] =
    6 /*brown*/
 #endif
 };
-static long dj_colors[DJNUMCOLOR];
-#ifdef GRX20
+static GrColor dj_colors[DJNUMCOLOR];
 /* Save, Restore: for 16 color mode! */
+#ifdef DJSVGA_SAVE_COLORS
 static void *DJSVGA_colorbuf = NULL;
 #endif
 static GrTextOption DJSVGA_TextOption;
-/* HBB: I think we should use GR_NAMEWIDTH (=16), instead of MAX_ID_LEN,
- *   which has nothing to do with GRX at all */
-#ifdef GRX20
-char DJSVGA_fontname[MAX_ID_LEN + 1] = "";
-#else
-char DJSVGA_fontname[MAX_ID_LEN + 1] = "@:pc8x14.fnt";	/* EGA bios font */
-#endif
+
+#define DJSVGAFONTLEN PATH_MAX
+static char DJSVGA_fontname[DJSVGAFONTLEN] = "";
+static char DJSVGA_default_fontname[DJSVGAFONTLEN] = "";
+static GrFont * DJSVGA_default_font = NULL;
+
 static GrContext *DJSVGA_context = 0;	/* save screen for suspend/resume */
+#ifdef DJGPP
 static char *dj_textsave = 0;	/* for text-screen-saving */
 static int dj_cursorx, dj_cursory;
 static int dj_width, dj_height;
-#ifdef GRX21
-static double dj_linewidth;	/* store linewidth assignments here */
 #endif
+static enum JUSTIFY dj_justify;
+static int dj_lastx = 0;
+static int dj_lasty = 0;
+static TBOOLEAN dj_in_path = FALSE;
+#define DJSVGA_MAXPATH 400
+static int dj_path[DJSVGA_MAXPATH][2];
+static int dj_polygon_points = 0;
+static double dj_linewidth;	/* store linewidth assignments here */
+static double dj_lwscale = 1.;
+static double dj_pointscale = 1.;
+static double dj_fontscale = 1.;
+static int dj_dashpatlen = 0;
+static unsigned char dj_dashpat[3*DASHPATTERN_LENGTH] = "";
+/* Fill pattern copied from bitmap.c */
+#define dj_fill_pattern_num 8
+static char dj_fill_pattern_bitmaps[dj_fill_pattern_num][8] ={
+    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } /* no fill */
+   ,{ 0x82, 0x44, 0x28, 0x10, 0x28, 0x44, 0x82, 0x01 } /* cross-hatch      (1) */
+   ,{ 0x88, 0x55, 0x22, 0x55, 0x88, 0x55, 0x22, 0x55 } /* double crosshatch(2) */
+   ,{ 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff } /* solid fill       (3) */
+   ,{ 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 } /* diagonal stripes (4) */
+   ,{ 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 } /* diagonal stripes (5) */
+   ,{ 0x11, 0x11, 0x22, 0x22, 0x44, 0x44, 0x88, 0x88 } /* diagonal stripes (6) */
+   ,{ 0x88, 0x88, 0x44, 0x44, 0x22, 0x22, 0x11, 0x11 } /* diagonal stripes (7) */
+};
+static GrPattern dj_pattern;
+static long dj_background = 0;  /* default to black */
+#ifdef USE_MOUSE
+static char dj_statusline[128] = "";
+static int dj_ruler_x = -1;
+static int dj_ruler_y = -1;
+# ifdef MSDOS
+static TBOOLEAN dj_processing_events = FALSE;
+# endif
+#endif
+
+/* option names */
+enum DJSVGA_id { DJSVGA_DEFAULTOPTIONS,
+	DJSVGA_FONT, DJSVGA_FONTSCALE,
+	DJSVGA_BACKGROUND,
+	DJSVGA_ENH, DJSVGA_NOENH,
+	DJSVGA_LINEWIDTH, DJSVGA_POINTSCALE,
+	DJSVGA_OTHER };
+
+static struct gen_table DJSVGA_opts[] =
+{
+    { "def$ault", DJSVGA_DEFAULTOPTIONS },
+    { "font", DJSVGA_FONT },
+    { "backg$round", DJSVGA_BACKGROUND },
+    { "enh$anced", DJSVGA_ENH },
+    { "noe$nhanced", DJSVGA_NOENH },
+    { "linewidth", DJSVGA_LINEWIDTH },
+    { "lw", DJSVGA_LINEWIDTH },
+    { "pointscale", DJSVGA_POINTSCALE },
+    { "ps", DJSVGA_POINTSCALE},
+    { "fontscale", DJSVGA_FONTSCALE },
+    { "fs", DJSVGA_FONTSCALE },
+    { NULL, DJSVGA_OTHER }
+};
 
 
 TERM_PUBLIC void
@@ -158,28 +254,126 @@ DJSVGA_options()
 {
     char *font = NULL;
 
-    if (!END_OF_COMMAND && ((font = try_to_get_string()))) {
-	strncpy(DJSVGA_fontname, font, MAX_ID_LEN-1);
-	free(font);
+    while (!END_OF_COMMAND) {
+	switch ((enum DJSVGA_id) lookup_table(&DJSVGA_opts[0], c_token)) {
+	case DJSVGA_ENH:
+	    c_token++;
+	    term->put_text = DJSVGA_enhanced_put_text;
+	    term->flags |= TERM_ENHANCED_TEXT;
+	    break;
+	case DJSVGA_NOENH:
+	    c_token++;
+	    term->put_text = DJSVGA_put_text;
+	    term->flags &= ~TERM_ENHANCED_TEXT;
+	    break;
+	case DJSVGA_BACKGROUND:
+	    c_token++;
+	    dj_background = parse_color_name();
+	    break;
+	case DJSVGA_LINEWIDTH:
+	    c_token++;
+	    dj_lwscale = real_expression();
+	    if (dj_lwscale <= 0) dj_lwscale = 1.;
+	    break;
+	case DJSVGA_POINTSCALE:
+	    c_token++;
+	    dj_pointscale = real_expression();
+	    if (dj_pointscale <= 0.0) dj_pointscale = 1.;
+	    break;
+	case DJSVGA_FONTSCALE:
+	    c_token++;
+	    dj_fontscale = real_expression();
+	    if (dj_fontscale <= 0.0) dj_fontscale = 1.;
+	    break;
+	case DJSVGA_FONT:
+	    c_token++;
+	default:
+	    font = try_to_get_string();
+	    if (font != NULL) {
+		DJSVGA_trim_font_string(font, DJSVGA_default_fontname, sizeof(DJSVGA_default_fontname));
+	    } else {
+		int_error(c_token, "Expect font string");
+	    }
+	    break;
+	}
     }
-    sprintf(term_options, "\"%s\"", DJSVGA_fontname);
+    sprintf(term_options,
+	"font \"%s\" "
+	"%senhanced "
+	"background rgb \"#%06lx\" "
+	"linewidth %.1f "
+	"pointscale %.1f "
+	"fontscale %.1f",
+	DJSVGA_default_fontname,
+	term->flags & TERM_ENHANCED_TEXT ? "" : "no",
+	dj_background,
+	dj_lwscale,
+	dj_pointscale,
+	dj_fontscale);
 }
+
+
+#if defined(MGRX_VERSION_API) && (MGRX_VERSION_API >= 0x0110)
+static GP_INLINE char
+mgrx_default_encoding()
+{
+    /* mimic MGRX init */
+#ifdef MSDOS
+    return GRENC_CP437;
+#elif defined(_WIN32)
+    return GRENC_CP1252;
+#else
+    return GRENC_UTF_8;
+#endif
+}
+
+static GP_INLINE char
+mgrx_encoding()
+{
+    switch (encoding) {
+    case S_ENC_CP437:
+	return GRENC_CP437;
+    case S_ENC_CP850:
+	return GRENC_CP850;
+    case S_ENC_CP1252:
+	return GRENC_CP1252;
+    case S_ENC_ISO8859_1:
+	return GRENC_ISO_8859_1;
+    case S_ENC_UTF8:
+	return GRENC_UTF_8;
+    case S_ENC_DEFAULT:
+	return mgrx_default_encoding();
+    default:
+	return mgrx_default_encoding() | 0x80;
+    }
+}
+#endif
+
+
+static GP_INLINE GrFont *
+grx_default_font(void)
+{
+#if defined(MGRX_VERSION_API) && (MGRX_VERSION_API >= 0x0110)
+    return GrGetDefaultFont();
+#else
+    return &GrDefaultFont;
+#endif
+}
+
 
 TERM_PUBLIC void
 DJSVGA_init()
 {
     int i, on, r, g, b, medium = 170, low = 85;
-    GrFont *font = NULL;
 
-#ifdef GRX20
-    font = &GrDefaultFont;
-#endif
+#ifdef DJGPP
     /* HBB: save textscreen contents and cursor-position */
     dj_textsave = gp_alloc(ScreenRows() * ScreenCols() * 2, "djsvga term scrbuf");
     ScreenRetrieve(dj_textsave);
     dj_width = ScreenCols();
     dj_height = ScreenRows();
     ScreenGetCursor(&dj_cursory, &dj_cursorx);
+#endif
     GrSetMode(GR_default_graphics);
     GrSetRGBcolorMode();
     GrResetColors();
@@ -191,144 +385,404 @@ DJSVGA_init()
 	b = (svga256color[i] & 1) ? on : 0;
 	if (svga256color[i] == 8)
 	    r = g = b = low;
-	dj_colors[i] = GrAllocColor(r, g, b);
+	dj_colors[i] = GrAllocColorID(r, g, b);
     }
     /* Get the screen size: */
     dj_xlast = GrMaxX();
     term->xmax = dj_xlast + 1;
     dj_ylast = GrMaxY();
     term->ymax = dj_ylast + 1;
-    /* if GRX 1.x loads an GRX 2.x save'd file: */
-    if (font == NULL && DJSVGA_fontname[0] == '\0')
-	sprintf(DJSVGA_fontname, "@:pc8x14.fnt");
 
-    if (DJSVGA_fontname[0] != '\0')
-	font = GrLoadFont(DJSVGA_fontname);
-    if (font == NULL)
-	font = GrLoadFont("@:pc8x14.fnt");	/* try EGA bios font */
-    if (font == NULL)
-	font = GrLoadFont("@:pc8x16.fnt");	/* try VGA bios font */
-    /*
-     * HBB: There are cases when we reach this point with font still NULL,
-     *   eg. when the GRXFONT env.variable points to the GRX V1 fonts, but
-     *   GRX V2 is used for this program: some fonts will *fail* to load in
-     *   that setup (e.g. cour20b)! So IMHO, there should be some error
-     *   treatment here..., like int_error("Couldn't load font!");
-     */
-    DJSVGA_TextOption.txo_font = font;
-    DJSVGA_TextOption.txo_direct = GR_TEXT_RIGHT;
-    DJSVGA_TextOption.txo_xalign = GR_ALIGN_LEFT;
-    DJSVGA_TextOption.txo_yalign = GR_ALIGN_CENTER;
-    DJSVGA_TextOption.txo_chrtype = GR_BYTE_TEXT;
-    DJSVGA_TextOption.txo_bgcolor.v = GrNOCOLOR;
-#ifndef GRX20
-    DJSVGA_TextOption.txo_xmag = 1;
-    DJSVGA_TextOption.txo_ymag = 1;
-#endif
-    /* HBB: this version should work in all configurations */
-    term->v_char = font->h.height;
-    term->h_char = font->h.width;
-
-#ifdef GRX20
+#ifdef DJSVGA_SAVE_COLORS
     if (DJSVGA_colorbuf == NULL)
 	DJSVGA_colorbuf = (void *) gp_alloc(GrColorSaveBufferSize(), "djsvga term colorbuf");
     GrSaveColors(DJSVGA_colorbuf);
 #endif
+#ifdef MSDOS
     GrSetMode(GR_default_text);
+#endif
+#ifdef DJGPP
     ScreenUpdate(dj_textsave);
     ScreenSetCursor(dj_cursory, dj_cursorx);
+#endif
+#if defined(USE_MOUSE) && !defined(MSDOS)
+# ifdef HAVE_MGRX
+    GrEventInit();
+    GrEventGenExpose(GR_GEN_EXPOSE_NO);  /* no X11 expose events */
+    GrEventGenMmove(GR_GEN_MMOVE_ALWAYS); /* create mouse move events */
+# else
+    GrMouseInit();
+# endif
+#endif
+    dj_initialized = TRUE;
 }
 
-/*
- * HBB: make these two inline, as they're called by other routines
- * inside this module, and -finline-functions (normally switched
- * on by 'gcc -O3') doesn't work for compiling term.c
- */
-__inline__
+
 TERM_PUBLIC void
 DJSVGA_graphics()
 {
-    ScreenRetrieve(dj_textsave);	/* HBB: save text screen contents */
-    ScreenGetCursor(&dj_cursory, &dj_cursorx);
-    GrSetMode(GR_default_graphics);
-#ifdef GRX20
+#ifdef MSDOS
+# ifdef USE_MOUSE
+    if (!dj_processing_events)  /* already in graphics mode? */
+# endif
+    {
+# ifdef DJGPP
+	ScreenRetrieve(dj_textsave);	/* HBB: save text screen contents */
+	ScreenGetCursor(&dj_cursory, &dj_cursorx);
+# endif
+	GrSetMode(GR_default_graphics);
+    }
+#endif
+#ifdef USE_MOUSE
+    DJSVGA_set_cursor(0, 0, 0);
+    GrMouseEraseCursor();
+#endif
+#ifdef DJSVGA_SAVE_COLORS
     GrRestoreColors(DJSVGA_colorbuf);
+#endif
+    GrClearScreen(GrAllocColor2ID(dj_background));
+
+    /* initialize font */
+    DJSVGA_fontname[0] = NUL;  /* enforce init */
+    DJSVGA_default_font = NULL;
+    if (!DJSVGA_set_font("") && DJSVGA_default_fontname[0] != NUL) {
+	fprintf(stderr, "svga error: could not load font \"%s\"\n", DJSVGA_default_fontname);
+    }
+    DJSVGA_TextOption.txo_direct = GR_TEXT_RIGHT;
+    DJSVGA_TextOption.txo_xalign = GR_ALIGN_LEFT;
+    DJSVGA_TextOption.txo_yalign = GR_ALIGN_CENTER;
+#if defined(MGRX_VERSION_API) && (MGRX_VERSION_API >= 0x0110)
+    GrSetUserEncoding(mgrx_encoding() & 0x7f);
+    /* Do not do any conversion if encoding is S_ENC_DEFAULT or unknown to MGRX. */
+    DJSVGA_TextOption.txo_chrtype =
+	((encoding != S_ENC_DEFAULT) && ((mgrx_encoding() & 0x80) == 0)) ?
+	    GrGetChrtypeForUserEncoding() : GR_BYTE_TEXT;
+    DJSVGA_TextOption.txo_bgcolor = GrNOCOLOR;
+    FPRINTF((stderr, "user encoding: %i chartype: %i\n", GrGetUserEncoding(), DJSVGA_TextOption.txo_chrtype));
+#else
+    DJSVGA_TextOption.txo_chrtype = GR_BYTE_TEXT;
+    DJSVGA_TextOption.txo_bgcolor.v = GrNOCOLOR;
+#endif
+    dj_lastx = dj_lasty = 0;
+#ifdef USE_MOUSE
+    dj_statusline[0] = NUL;
+    dj_ruler_x = dj_ruler_y = -1;
+# ifdef MSDOS
+#  ifdef HAVE_MGRX
+    GrEventInit();
+    GrEventGenMmove(GR_GEN_MMOVE_ALWAYS); /* enable mouse move events */
+#  else
+    GrMouseInit();
+#  endif
+# endif
 #endif
 }
 
-__inline__
+
 TERM_PUBLIC void
 DJSVGA_text()
 {
-    (void) getkey();
+#ifdef USE_MOUSE
+    /* signal that we are done */
+    exec_event(GE_plotdone, 0, 0, 0, 0, 0);
+#endif
+#ifdef MSDOS
+# if defined(USE_MOUSE)
+    GrMouseDisplayCursor();
+    if (!dj_processing_events) {
+	/* Hack to let the gnuplot kernel do new plots */
+	term_graphics = FALSE;
+	dj_processing_events = TRUE;
+	while (dj_processing_events)
+	    grx_check_event();
+	dj_processing_events = FALSE;
+	term_graphics = TRUE;
+	GrMouseEraseCursor();
+#  ifdef HAVE_MGRX
+	GrEventUnInit();
+#  else
+	GrMouseUnInit();
+#  endif
+#  if !defined(DJGPP) || defined(HAVE_MGRX)
+	GrSetMode(GR_NC_default_text);
+#  else
+	GrSetMode(GR_width_height_text, dj_width, dj_height);
+#  endif
+#  ifdef DJGPP
+	ScreenUpdate(dj_textsave);	/* HBB: restore text screen */
+	ScreenSetCursor(dj_cursory, dj_cursorx);
+#  endif
+    }
+# else /* !USE_MOUSE */
+#  ifdef DJGPP
+   (void) getkey();
+#  else
+   (void) fgetc(stdin);
+#  endif
+#  ifdef HAVE_MGRX
+    GrEventUnInit();
+#  else
+    GrMouseUnInit();
+#  endif
+#  if !defined(DJGPP) || defined(HAVE_MGRX)
+    GrSetMode(GR_NC_default_text);
+#  else
     GrSetMode(GR_width_height_text, dj_width, dj_height);
+#  endif
+#  ifdef DJGPP
     ScreenUpdate(dj_textsave);	/* HBB: restore text screen */
     ScreenSetCursor(dj_cursory, dj_cursorx);
+#  endif
+# endif
+#else
+    /* win32, xwin */
+    GrMouseDisplayCursor();
+#endif
+    if (DJSVGA_default_font != NULL) {
+	GrUnloadFont(DJSVGA_default_font);
+	DJSVGA_default_font = NULL;
+    }
 }
+
 
 TERM_PUBLIC void
 DJSVGA_reset()
 {
+#ifdef MSDOS
     GrResetColors();
+#endif
+#ifdef DJGPP
     free(dj_textsave);
+#endif
+    dj_polygon_points = 0;
 }
+
 
 TERM_PUBLIC void
 DJSVGA_linetype(int linetype)
 {
+    DJSVGA_flush_line();
+
     if (linetype < -2)
 	linetype = LT_BLACK;
-    if (linetype >= 13)
-	linetype %= 13;
+    if (linetype >= DJNUMCOLOR - 2)
+	linetype %= DJNUMCOLOR - 2;
     /* HBB: set the TextOption color variable right here (faster) */
+#if defined(MGRX_VERSION_API) && (MGRX_VERSION_API >= 0x0110)
+    DJSVGA_TextOption.txo_fgcolor = dj_color = dj_colors[linetype + 2];
+#else
     DJSVGA_TextOption.txo_fgcolor.v = dj_color = dj_colors[linetype + 2];
+#endif
+    if (linetype == LT_AXIS)
+	DJSVGA_dashtype(DASHTYPE_AXIS, NULL);
+    else
+	DJSVGA_dashtype(DASHTYPE_SOLID, NULL);
 }
+
+
+TERM_PUBLIC void
+DJSVGA_dashtype(int type, t_dashtype *custom_dash_pattern)
+{
+    DJSVGA_flush_line();
+
+    if (dj_dashpatlen > 0) {
+	dj_dashpat[0] = NUL;
+	dj_dashpatlen = 0;
+    }
+
+    if (type == DASHTYPE_AXIS) /* map axis dashpattern */
+	type = 1;
+    if (type > 0) {
+	const unsigned char dashstyles[4][8] = {
+	    { 16, 8, 0 },	/* dash */
+	    { 3, 3, 0 },	/* dot */
+	    { 8, 5, 3, 5, 0 }, /* dash dot */
+	    { 8, 4, 3, 4, 3, 4, 0 } /* dash dot dot */
+	};
+	const int dashstyle_len[4] = { 2, 2, 4, 6 };
+	int i;
+
+	type %= 5;
+	if (type > 0) {
+	    dj_dashpatlen = dashstyle_len[type - 1];
+	    /* scale dashpattern with linewidth, which is already set */
+	    for (i = 0; i < dj_dashpatlen; i++)
+		dj_dashpat[i] = dashstyles[type - 1][i] * dj_linewidth;
+	}
+    } else if (type == DASHTYPE_SOLID) {
+	/* nothing to do */
+    } else if (type == DASHTYPE_CUSTOM) {
+	t_dashtype * dash = custom_dash_pattern;
+	int count = 0;
+	int i;
+
+	while ((dash->pattern[count] != 0.) && (count < DASHPATTERN_LENGTH))
+	    count++;
+	dj_dashpatlen = count;
+	for (i = 0; i < dj_dashpatlen; i++)
+	    dj_dashpat[i] = dash->pattern[i] + 0.5f;
+    }
+}
+
+
+TERM_PUBLIC int
+DJSVGA_make_palette(t_sm_palette *palette)
+{
+    return 0;  /* can do RGB colors */
+}
+
+
+TERM_PUBLIC void
+DJSVGA_color(t_colorspec *colorspec)
+{
+    DJSVGA_flush_line();
+
+    switch (colorspec->type) {
+    case TC_LT: {
+	int linetype = colorspec->lt;
+	GrColor color = GrBlack();
+
+	if (linetype == LT_BACKGROUND) {
+	    color = dj_background;
+	} else if (linetype == LT_NODRAW) {
+	    /* can this happen at all? */
+	    FPRINTF((stderr, "Debug:  linetype NODRAW!"));
+	} else {
+	    if (linetype < -2)
+		linetype = LT_BLACK;
+	    if (linetype >= DJNUMCOLOR - 2)
+		linetype %= DJNUMCOLOR - 2;
+	    color = dj_colors[linetype + 2];
+	}
+#if defined(MGRX_VERSION_API) && (MGRX_VERSION_API >= 0x0110)
+	DJSVGA_TextOption.txo_fgcolor = dj_color = color;
+#else
+	DJSVGA_TextOption.txo_fgcolor.v = dj_color = color;
+#endif
+	break;
+    }
+    case TC_FRAC: {
+	rgb255_color rgb255;
+
+	/* Translate palette index to RGB colour */
+	rgb255maxcolors_from_gray(colorspec->value, &rgb255);
+#if defined(MGRX_VERSION_API) && (MGRX_VERSION_API >= 0x0110)
+	DJSVGA_TextOption.txo_fgcolor = dj_color = GrAllocColorID(rgb255.r, rgb255.g, rgb255.b);
+#else
+	DJSVGA_TextOption.txo_fgcolor.v = dj_color = GrAllocColorID(rgb255.r, rgb255.g, rgb255.b);
+#endif
+	break;
+    }
+    case TC_RGB: {
+	uint16_t red, green, blue;
+
+	/* extract color components from colorspec.lt */
+	/* uint16_t alpha = 0xff - ((colorspec->lt >> 24) & 0xff); */
+	red = (colorspec->lt >> 16) & 0xff;
+	green = (colorspec->lt >> 8) & 0xff;
+	blue = (colorspec->lt) & 0xff;
+#if defined(MGRX_VERSION_API) && (MGRX_VERSION_API >= 0x0110)
+	DJSVGA_TextOption.txo_fgcolor = dj_color = GrAllocColorID(red, green, blue);
+#else
+	DJSVGA_TextOption.txo_fgcolor.v = dj_color = GrAllocColorID(red, green, blue);
+#endif
+	break;
+    }
+    default:
+	break;
+    }
+}
+
 
 TERM_PUBLIC void
 DJSVGA_move(unsigned int x, unsigned int y)
 {
-    dj_startx = x;
-    dj_starty = y;
+    /* terminate current path if we move to a disconnected position */
+    if (dj_polygon_points > 0) {
+	if ((dj_path[dj_polygon_points - 1][0] != x) ||
+	    (dj_path[dj_polygon_points - 1][1] != dj_ylast - y)) {
+	    DJSVGA_flush_line();
+	    FPRINTF((stderr, "svga: disconnected path point %i, %i\n", x, dj_ylast - y));
+	} else {
+	    return;
+	}
+    }
+
+    DJSVGA_add_path_point(x, dj_ylast - y);
+    dj_lastx = x;
+    dj_lasty = dj_ylast - y;
 }
 
 
 TERM_PUBLIC void
 DJSVGA_vector(unsigned int x, unsigned int y)
 {
-#ifdef GRX21
-    GrLineOption dj_lineoption =
-    {dj_color, dj_linewidth, 0, ""};
-
-    GrCustomLine(dj_startx, dj_ylast - dj_starty, x, dj_ylast - y, &dj_lineoption);
-#else
-    GrLine(dj_startx, dj_ylast - dj_starty, x, dj_ylast - y, dj_color);
-#endif
-    dj_startx = x;
-    dj_starty = y;
+    if ((x != dj_lastx) || (dj_ylast - y != dj_lasty)) {
+	/* vector without preceding move as e.g. in "with line lc variable" */
+	if (dj_polygon_points == 0)
+	    DJSVGA_add_path_point(dj_lastx, dj_lasty);
+	DJSVGA_add_path_point(x, dj_ylast - y);
+    }
+    dj_lastx = x;
+    dj_lasty = dj_ylast - y;
 }
 
-/*
- * HBB: IMHO, the previous version was seriously flawed. E.g.
- *   in the termentry, _justify_text was pointing to the
- *   null_justify_text dummy routine, so DJSVGA_justify wasn't
- *   ever called at all. I copied the routines from my (now
- *   otherwise pointless) own private driver, djgrx.trm, to
- *   cure that.
- */
+
+static void
+DJSVGA_flush_line(void)
+{
+    GrLineOption dj_lineoption =
+	{ dj_color, dj_linewidth * dj_lwscale,
+	  dj_dashpatlen, dj_dashpatlen != 0 ? dj_dashpat : NULL };
+
+    if (dj_in_path)
+	dj_in_path = FALSE;
+
+    if (dj_polygon_points < 2) {
+	dj_polygon_points = 0;
+	return;
+    }
+
+    /* draw a line segment */
+    if (dj_polygon_points == 2) {
+	GrCustomLine(dj_path[0][0], dj_path[0][1],
+	             dj_path[1][0], dj_path[1][1],
+	             &dj_lineoption);
+    } else {
+	GrCustomPolyLine(dj_polygon_points, dj_path, &dj_lineoption);
+    }
+    dj_polygon_points = 0;
+    dj_in_path = FALSE;
+}
+
+
 TERM_PUBLIC int
 DJSVGA_angle(int ang)
 {
-    if (ang) {
-	DJSVGA_TextOption.txo_direct = GR_TEXT_UP;
-    } else {
+    while (ang < 0)
+	ang += 360;
+    ang %= 360;
+
+    if (ang < 45 || ang > 315)
 	DJSVGA_TextOption.txo_direct = GR_TEXT_RIGHT;
-    }
+    else if (ang < 135)
+	DJSVGA_TextOption.txo_direct = GR_TEXT_UP;
+    else if (ang <= 225)
+	DJSVGA_TextOption.txo_direct = GR_TEXT_LEFT;
+    else if (ang <= 315)
+	DJSVGA_TextOption.txo_direct = GR_TEXT_DOWN;
+
     return TRUE;
 }
+
 
 TERM_PUBLIC int
 DJSVGA_justify_text(enum JUSTIFY mode)
 {
+    /* save for reference in enhanced text processing */
+    dj_justify = mode;
+
+    /* directly set yalign / xalign options */
     if (DJSVGA_TextOption.txo_direct == GR_TEXT_RIGHT) {
 	DJSVGA_TextOption.txo_yalign = GR_ALIGN_CENTER;
 	switch (mode) {
@@ -342,7 +796,7 @@ DJSVGA_justify_text(enum JUSTIFY mode)
 	    DJSVGA_TextOption.txo_xalign = GR_ALIGN_RIGHT;
 	    break;
 	}
-    } else {
+    } else if (DJSVGA_TextOption.txo_direct == GR_TEXT_UP) {
 	DJSVGA_TextOption.txo_xalign = GR_ALIGN_CENTER;
 	switch (mode) {
 	case LEFT:
@@ -355,42 +809,415 @@ DJSVGA_justify_text(enum JUSTIFY mode)
 	    DJSVGA_TextOption.txo_yalign = GR_ALIGN_TOP;
 	    break;
 	}
+    } else if (DJSVGA_TextOption.txo_direct == GR_TEXT_LEFT) {
+	DJSVGA_TextOption.txo_yalign = GR_ALIGN_CENTER;
+	switch (mode) {
+	case LEFT:
+	    DJSVGA_TextOption.txo_xalign = GR_ALIGN_RIGHT;
+	    break;
+	case CENTRE:
+	    DJSVGA_TextOption.txo_xalign = GR_ALIGN_CENTER;
+	    break;
+	case RIGHT:
+	    DJSVGA_TextOption.txo_xalign = GR_ALIGN_LEFT;
+	    break;
+	}
+    } else if (DJSVGA_TextOption.txo_direct == GR_TEXT_DOWN) {
+	DJSVGA_TextOption.txo_xalign = GR_ALIGN_CENTER;
+	switch (mode) {
+	case LEFT:
+	    DJSVGA_TextOption.txo_yalign = GR_ALIGN_TOP;
+	    break;
+	case CENTRE:
+	    DJSVGA_TextOption.txo_yalign = GR_ALIGN_CENTER;
+	    break;
+	case RIGHT:
+	    DJSVGA_TextOption.txo_yalign = GR_ALIGN_BOTTOM;
+	    break;
+	}
     }
     return TRUE;
 }
 
-TERM_PUBLIC int
-DJSVGA_set_font(const char *fontname)
+
+static GP_INLINE void
+DJSVGA_trim_font_string(const char * fontspec,
+    char * fontname, size_t fontnamesize)
 {
-    char *cp;
-    GrFont *font;
-    if (!fontname || !fontname[0])
-	return FALSE;
-    safe_strncpy(DJSVGA_fontname, fontname, sizeof(DJSVGA_fontname));
-    cp = strstr(DJSVGA_fontname, ",");
-    if (cp != NULL)
-	*cp = NUL;
-    font = GrLoadFont(DJSVGA_fontname);
-    /*HBB: if no font found, do *not* report success! */
-    if (font != NULL) {
-	GrUnloadFont(DJSVGA_TextOption.txo_font);
-	DJSVGA_TextOption.txo_font = font;
-	return TRUE;
-    } else {
-	int_error(NO_CARET, "Font not found");
-	return FALSE;
+    char * cp;
+
+    safe_strncpy(fontname, fontspec, fontnamesize);
+    /* ignore font size and attributes */
+    cp = fontname;
+    while (*cp != NUL) {
+	if ((*cp == ',') || ((*cp == ':') && ((cp - fontname) != 1))) {
+	    *cp = NUL;
+	    break;
+	}
+	cp++;
     }
 }
+
+
+GrFont *
+DJSVGA_LoadFont(const char * name)
+{
+    GrFont * font = GrLoadFont((char *) name);
+    if (dj_fontscale != 1. && font != NULL) {
+	GrFont * scaled;
+	int w, h;
+
+	w = font->h.width * dj_fontscale;
+	h = font->h.height * dj_fontscale;
+	scaled = GrBuildConvertedFont(font, GR_FONTCVT_RESIZE, w, h, 0, 0);
+	GrUnloadFont(font);
+	font = scaled;
+    }
+    return font;
+}
+
+
+TERM_PUBLIC int
+DJSVGA_set_font(const char *fontspec)
+{
+    char fontname[DJSVGAFONTLEN];
+    GrFont * font = NULL;
+    int res = FALSE;
+
+    DJSVGA_flush_line();
+
+    if (fontspec != NULL && fontspec[0] != NUL) {
+	DJSVGA_trim_font_string(fontspec, fontname, sizeof(fontname));
+	if (fontname[0] != NUL) {
+	    /* eliminate duplicate font requests */
+	    if (strcmp(fontname, DJSVGA_fontname) == 0)
+		return TRUE;
+	    /* save font info */
+	    safe_strncpy(DJSVGA_fontname, fontname, sizeof(DJSVGA_fontname));
+	    /* try to load font */
+	    font = DJSVGA_LoadFont(DJSVGA_fontname);
+	    res = (font != NULL);
+	}
+    }
+    if (font == NULL) {
+	/* empty fontspec or unsuccessful attempt above resets default font */
+	if (DJSVGA_default_fontname[0] != NUL) {
+	    if (DJSVGA_default_font != NULL) {
+		/* cached result */
+		safe_strncpy(DJSVGA_fontname, DJSVGA_default_fontname, sizeof(DJSVGA_fontname));
+		font = DJSVGA_default_font;
+	    } else {
+		/* eliminate duplicate font requests */
+		if (strcmp(DJSVGA_default_fontname, DJSVGA_fontname) == 0)
+		    return TRUE;
+		/* save font info */
+		safe_strncpy(DJSVGA_fontname, DJSVGA_default_fontname, sizeof(DJSVGA_fontname));
+		font = DJSVGA_LoadFont(DJSVGA_fontname);
+		DJSVGA_default_font = (font != NULL) ? font : grx_default_font();
+	    }
+	    res = !(fontspec != NULL && fontspec[0] != NUL);
+	}
+	if (font == NULL) {
+	    DJSVGA_fontname[0] = NUL;
+	    font = grx_default_font();
+	    /* indicate that we could not load the requested font */
+	    res = FALSE;
+	}
+    }
+    /* handle fontscale for the GRX/MGRX default font */
+    if (font == grx_default_font() && dj_fontscale != 1.) {
+	GrFont * scaled;
+	int w, h;
+
+	w = font->h.width * dj_fontscale;
+	h = font->h.height * dj_fontscale;
+	scaled = GrBuildConvertedFont(font, GR_FONTCVT_RESIZE, w, h, 0, 0);
+	font = scaled;
+	if (DJSVGA_default_font == grx_default_font())
+	    DJSVGA_default_font = scaled;
+    }
+
+    DJSVGA_TextOption.txo_font = font;
+    { /* update hchar / vchar */
+	const char text[] = "0123456789";
+	int len = strlen(text);
+	/* Note: ASCII test string, no need to convert encoding */
+	term->h_char = GrFontStringWidth(DJSVGA_TextOption.txo_font, text, len, GR_BYTE_TEXT) / len;
+	term->v_char = GrFontStringHeight(DJSVGA_TextOption.txo_font, text, len, GR_BYTE_TEXT);
+    }
+    return res;
+}
+
 
 TERM_PUBLIC void
 DJSVGA_put_text(unsigned int x, unsigned int y, const char *str)
 {
-    /* HBB: why isn't font!=NULL ensured elsewhere? Testing it at
-     * this point doesn't really make much sense (we're in graphics
-     * mode, so we can't even print out a useful error message!) */
-    /*if (DJSVGA_TextOption.txo_font != NULL) */
-    GrDrawString(str, strlen(str), x, dj_ylast - y, &DJSVGA_TextOption);
+    DJSVGA_flush_line();
+
+#if defined(MGRX_VERSION_API) && (MGRX_VERSION_API >= 0x0110)
+    /* determine text length in characters automatically according to encoding */
+    GrDrawString((void *)str, 0, x, dj_ylast - y, &DJSVGA_TextOption);
+#else
+    GrDrawString((void *)str, strlen(str), x, dj_ylast - y, &DJSVGA_TextOption);
+#endif
 }
+
+
+/* -------------------------------------------------------------------------
+   The "enhanced text" code below is a modified version of Ethan Merritt's
+   original skeleton.
+   ------------------------------------------------------------------------- */
+
+static TBOOLEAN dj_enhanced_opened_string;
+static TBOOLEAN dj_enhanced_show = TRUE;
+static int dj_enhanced_overprint = 0;
+static TBOOLEAN dj_enhanced_widthflag = TRUE;
+static int dj_enhanced_xsave, dj_enhanced_ysave;
+static double dj_enhanced_base;
+static int dj_x;
+static int dj_y;
+static TBOOLEAN dj_sizeonly;
+
+
+TERM_PUBLIC void
+DJSVGA_enhanced_open(
+    char *fontname,
+    double fontsize, double base,
+    TBOOLEAN widthflag, TBOOLEAN showflag,
+    int overprint)
+{
+    char filename[DJSVGAFONTLEN];
+    GrFont * font = NULL;
+
+    /* There are two special cases:
+     * overprint = 3 means save current position
+     * overprint = 4 means restore saved position
+     */
+    if (overprint == 3) {
+	dj_enhanced_xsave = dj_x;
+	dj_enhanced_ysave = dj_y;
+	return;
+    } else if (overprint == 4) {
+	dj_x = dj_enhanced_xsave;
+	dj_y = dj_enhanced_ysave;
+	return;
+    }
+
+    if (!dj_enhanced_opened_string) {
+	dj_enhanced_opened_string = TRUE;
+	/* Start new text fragment */
+	enhanced_cur_text = &enhanced_text[0];
+	/* Scale fractional font height to vertical units of display */
+	dj_enhanced_base = base * term->v_char;
+	/* Keep track of whether we are supposed to show this string */
+	dj_enhanced_show = showflag;
+	/* 0/1/2  no overprint / 1st pass / 2nd pass */
+	dj_enhanced_overprint = overprint;
+	/* widthflag FALSE means do not update text position after printing */
+	dj_enhanced_widthflag = widthflag;
+	/* Select font */
+	if ((fontname != NULL) && (strlen(fontname) > 0)) {
+	    DJSVGA_trim_font_string(fontname, filename, sizeof(filename));
+	    if (filename[0] == NUL)
+		safe_strncpy(filename, DJSVGA_fontname, sizeof(filename));
+	} else {
+	    safe_strncpy(filename, DJSVGA_fontname, sizeof(filename));
+	}
+	if ((filename[0] != NUL) && (strcmp(DJSVGA_fontname, DJSVGA_default_fontname) != 0)) {
+	    font = DJSVGA_LoadFont(filename);
+	}
+	if (font == NULL) {
+	    if (DJSVGA_default_font != NULL) {
+		font = DJSVGA_default_font;
+	    } else if (DJSVGA_default_fontname[0] != NUL) {
+		font = DJSVGA_LoadFont(DJSVGA_default_fontname);
+	    }
+	}
+	DJSVGA_TextOption.txo_font = (font != NULL) ? font : grx_default_font();
+	{ /* update hchar / vchar */
+	    const char text[] = "0123456789";
+	    int len = strlen(text);
+	    /* Note: ASCII test string, no need to convert encoding */
+	    term->h_char = GrFontStringWidth(DJSVGA_TextOption.txo_font, text, len, GR_BYTE_TEXT) / len;
+	    term->v_char = GrFontStringHeight(DJSVGA_TextOption.txo_font, text, len, GR_BYTE_TEXT);
+	}
+    }
+}
+
+
+TERM_PUBLIC void
+DJSVGA_enhanced_flush()
+{
+    char *str = enhanced_text;	/* The fragment to print */
+    int len;
+    int width = 0;
+    int height = 0;
+
+    if (!dj_enhanced_opened_string)
+	return;
+    *enhanced_cur_text = NUL;
+
+    /* calculate length of string first */
+    len = GrFontStringWidth(DJSVGA_TextOption.txo_font, str, strlen(str), DJSVGA_TextOption.txo_chrtype);
+    switch (DJSVGA_TextOption.txo_direct) {
+    case GR_TEXT_RIGHT:
+	width = len;
+	height = 0;
+	break;
+    case GR_TEXT_LEFT:
+	width = -len;
+	height = 0;
+	break;
+    case GR_TEXT_UP:
+	width = 0;
+	height = len;
+	break;
+    case GR_TEXT_DOWN:
+	width = 0;
+	height = -len;
+	break;
+    }
+
+    /* print the string fragment, perhaps invisibly */
+    /* NB: base expresses offset from current y pos */
+    if (dj_enhanced_show && !dj_sizeonly) {
+	GrTextOption option = DJSVGA_TextOption;
+	int base_x = 0;
+	int base_y = 0;
+	switch (DJSVGA_TextOption.txo_direct) {
+	case GR_TEXT_RIGHT:
+	    option.txo_xalign = GR_ALIGN_LEFT;
+	    option.txo_yalign = GR_ALIGN_CENTER;
+	    base_y = dj_enhanced_base;
+	    break;
+	case GR_TEXT_LEFT:
+	    option.txo_xalign = GR_ALIGN_RIGHT;
+	    option.txo_yalign = GR_ALIGN_CENTER;
+	    base_y = -dj_enhanced_base;
+	    break;
+	case GR_TEXT_UP:
+	    option.txo_xalign = GR_ALIGN_CENTER;
+	    option.txo_yalign = GR_ALIGN_BOTTOM;
+	    base_x = -dj_enhanced_base;
+	    break;
+	case GR_TEXT_DOWN:
+	    option.txo_xalign = GR_ALIGN_CENTER;
+	    option.txo_yalign = GR_ALIGN_TOP;
+	    base_x = dj_enhanced_base;
+	    break;
+	}
+#if defined(MGRX_VERSION_API) && (MGRX_VERSION_API >= 0x0110)
+	/* determine text length in characters automatically according to encoding */
+	GrDrawString(str, 0, dj_x + base_x, dj_ylast - (int)(dj_y + base_y), &option);
+#else
+	GrDrawString(str, strlen(str), dj_x + base_x, dj_ylast - (int)(dj_y + base_y), &option);
+#endif
+    }
+
+    if (!dj_enhanced_widthflag) {
+	/* don't update position */
+	width = 0;
+	height = 0;
+    }
+    if (dj_sizeonly) {
+	/* This is the first pass for justified printing.        */
+	/* We just adjust the starting position for the second pass. */
+	if (dj_justify == RIGHT) {
+	    dj_x -= width;
+	    dj_y -= height;
+	} else if (dj_justify == CENTRE) {
+	    dj_x -= width / 2;
+	    dj_y -= height / 2;
+	}
+	/* nothing to do for LEFT justified text */
+    } else if (dj_enhanced_overprint == 1) {
+	/* Save current position */
+	dj_enhanced_xsave = dj_x + width;
+	dj_enhanced_ysave = dj_y + height;
+	/* First pass of overprint, leave position in center of fragment */
+	dj_x += width / 2;
+	dj_y += height / 2;
+    } else if (dj_enhanced_overprint == 2) {
+	/* Restore current position,                          */
+	/* this sets the position behind the overprinted text */
+	dj_x = dj_enhanced_xsave;
+	dj_y = dj_enhanced_ysave;
+    } else {
+	/* Normal case is to update position to end of fragment */
+	dj_x += width;
+	dj_y += height;
+    }
+    dj_enhanced_opened_string = FALSE;
+}
+
+
+TERM_PUBLIC void
+DJSVGA_enhanced_put_text(unsigned int x, unsigned int y, const char *str)
+{
+    const char * original_string = str;
+    unsigned int pass, num_passes;
+
+    /* If no enhanced text processing is needed, we can use the plain  */
+    /* vanilla put_text() routine instead of this fancy recursive one. */
+    if (ignore_enhanced_text || !strpbrk(str, "{}^_@&~")) {
+	DJSVGA_put_text(x, y, str);
+	return;
+    }
+
+    DJSVGA_flush_line();
+
+    /* Set up global variables needed by enhanced_recursion() */
+    enhanced_fontscale = 1.0;
+    dj_enhanced_opened_string = FALSE;
+    safe_strncpy(enhanced_escape_format, "%c", sizeof(enhanced_escape_format));
+
+    dj_x = x;
+    dj_y = y;
+
+    /* Text justification requires two passes. During the first pass we */
+    /* don't draw anything, we just measure the space it will take.     */
+    /* Without justification one pass is enough                         */
+    if (dj_justify == LEFT) {
+	num_passes = 1;
+	dj_sizeonly = FALSE;
+    } else {
+	num_passes = 2;
+	dj_sizeonly = TRUE;
+    }
+
+    for (pass = 1; pass <= num_passes; pass++) {
+	/* Set the recursion going. We say to keep going until a
+	 * closing brace, but we don't really expect to find one.
+	 * If the return value is not the nul-terminator of the
+	 * string, that can only mean that we did find an unmatched
+	 * closing brace in the string. We increment past it (else
+	 * we get stuck in an infinite loop) and try again.
+	 */
+	while (*(str = enhanced_recursion(str, TRUE,
+			DJSVGA_fontname, 1 /* size */,
+			0.0, TRUE, TRUE, 0))) {
+	    DJSVGA_enhanced_flush();
+	    /* I think we can only get here if *str == '}' */
+	    enh_err_check(str);
+	    if (!*++str)
+		    break; /* end of string */
+	    /* else carry on and process the rest of the string */
+	}
+
+	/* In order to do text justification we need to do a second pass
+	 * that uses information stored during the first pass, see
+	 * GraphEnhancedFlush().
+	 */
+	if (pass == 1) {
+	    /* do the actual printing in the next pass */
+	    dj_sizeonly = FALSE;
+	    str = original_string;
+	}
+    }
+
+    DJSVGA_set_font("");
+}
+
 
 TERM_PUBLIC void
 DJSVGA_suspend()
@@ -400,6 +1227,7 @@ DJSVGA_suspend()
     DJSVGA_text();
 }
 
+
 TERM_PUBLIC void
 DJSVGA_resume()
 {
@@ -408,50 +1236,893 @@ DJSVGA_resume()
     GrDestroyContext(DJSVGA_context);
 }
 
+
+static GrPattern *
+DJSVGA_pattern(int pattern, int style)
+{
+    pattern %= dj_fill_pattern_num;
+    dj_pattern.gp_ispixmap = 0;
+    dj_pattern.gp_bmp_height = 8;
+    dj_pattern.gp_bmp_fgcolor = dj_color;
+    if (style == FS_TRANSPARENT_PATTERN)
+	dj_pattern.gp_bmp_bgcolor = GrNOCOLOR;
+    else
+	dj_pattern.gp_bmp_bgcolor = GrAllocColor2ID(dj_background);
+    dj_pattern.gp_bmp_data = dj_fill_pattern_bitmaps[pattern];
+    return &dj_pattern;
+}
+
+
 TERM_PUBLIC void
 DJSVGA_fillbox(
     int style,
     unsigned int left, unsigned int bottom,
     unsigned int width, unsigned height)
 {
-    if (style >= 13)
-	style %= 13;
-    /* HBB: prize question: should it be 'width-1' instead? */
-    /* HBB: fill with GRX Color '0', which *should* be black : */
-    /* ULIG: the style parameter is now used for the fillboxes style */
-    /* (not implemented here), see the documentation */
+    DJSVGA_flush_line();
 
-    GrFilledBox(left, dj_ylast - bottom, left + width, dj_ylast - bottom - height, 0);
+    switch (style & 0x0f) {
+	case FS_SOLID:
+	case FS_TRANSPARENT_SOLID: {
+	    /* fill with intensity according to density */
+	    GrColor c;
+	    int red, green, blue;
+	    int density = style >> 4;
+	    if (density < 0) density = 0;
+	    if (density > 100) density = 100;
+	    GrQueryColor(dj_color, &red, &green, &blue);
+	    red   = 255 - density * (255 - red) / 100;
+	    green = 255 - density * (255 - green) / 100;
+	    blue  = 255 - density * (255 - blue) / 100;
+	    c = GrAllocColorID(red, green, blue);
+	    GrFilledBox(left, dj_ylast - bottom, left + width - 1, dj_ylast - (bottom + height - 1), c);
+	    break;
+	}
+	case FS_PATTERN:
+	case FS_TRANSPARENT_PATTERN: {
+	    /* fill with pattern */
+	    int pattern = style >> 4;
+	    GrPattern * grpat = DJSVGA_pattern(pattern, style & 0x0f);
+	    GrPatternFilledBox(left, dj_ylast - bottom, left + width - 1, dj_ylast - (bottom + height - 1), grpat);
+	    break;
+	}
+	case FS_DEFAULT:
+	    /* Fill with current color, wherever it came from */
+	    GrFilledBox(left, dj_ylast - bottom, left + width - 1, dj_ylast - (bottom + height - 1), dj_color);
+	    break;
+	case FS_EMPTY:
+	    /* FIXME: Instead of filling with background color, we should not fill at all in this case! */
+	default: {
+	    /* fill with background color */
+	    GrColor color = GrAllocColor2ID(dj_background);
+	    GrFilledBox(left, dj_ylast - bottom, left + width - 1, dj_ylast - (bottom + height - 1), color);
+	}
+    }
 }
+
+
+TERM_PUBLIC void
+DJSVGA_filled_polygon(int npoints, gpiPoint *corners)
+{
+    int style = corners->style;
+    int (* points)[2];
+    int i;
+
+    DJSVGA_flush_line();
+
+    points = (int (*)[2]) malloc(npoints * 2 * sizeof(int));
+    for (i = 0; i < npoints; i++) {
+	points[i][0] = corners[i].x;
+	points[i][1] = dj_ylast - corners[i].y;
+    }
+
+    if (corners[0].x == corners[npoints - 1].x  &&
+	corners[0].y == corners[npoints - 1].y)
+	npoints--;
+
+    switch (style & 0x0f) {
+	case FS_SOLID:
+	case FS_TRANSPARENT_SOLID: {
+	    /* fill with intensity according to density */
+	    GrColor c;
+	    int red, green, blue;
+	    int density = style >> 4;
+	    if (density < 0) density = 0;
+	    if (density > 100 ) density = 100;
+	    if (density > 100) density = 100;
+	    GrQueryColor(dj_color, &red, &green, &blue);
+	    red   = 255 - density * (255 - red) / 100;
+	    green = 255 - density * (255 - green) / 100;
+	    blue  = 255 - density * (255 - blue) / 100;
+	    c = GrAllocColorID(red, green, blue);
+	    /* Warning: drawing convex polygons is faster, so we assume
+	       that all quadrangles are convex, optimising for PM3D. */
+	    if (npoints <= 4)
+		GrFilledConvexPolygon(npoints, points, c);
+	    else
+		GrFilledPolygon(npoints, points, c);
+	    break;
+	}
+	case FS_PATTERN:
+	case FS_TRANSPARENT_PATTERN: {
+	    /* fill with pattern */
+	    int pattern = style >> 4;
+	    GrPattern * grpat = DJSVGA_pattern(pattern, style & 0x0f);
+	    GrPatternFilledPolygon(npoints, points, grpat);
+	    break;
+	}
+	case FS_DEFAULT:
+	    /* Fill with current color, wherever it came from */
+	    GrFilledPolygon(npoints, points, dj_color);
+	    break;
+	case FS_EMPTY:
+	    /* FIXME: Instead of filling with background color, we should not fill at all in this case! */
+	default: {
+	    /* fill with background color */
+	    GrColor color = GrAllocColor2ID(dj_background);
+	    GrFilledPolygon(npoints, points, color);
+	}
+    }
+
+    free(points);
+}
+
+
+TERM_PUBLIC void
+DJSVGA_path(int p)
+{
+    if (p == 0) { /* start new path */
+	DJSVGA_flush_line();
+	dj_in_path = TRUE;
+	dj_polygon_points = 0;
+	FPRINTF((stderr, "svga: newpath\n"));
+    } else if (p == 1) { /* close path */
+	FPRINTF((stderr, "svga: closepath: %i points\n", dj_polygon_points));
+
+	if (dj_polygon_points > 1) {
+	    GrLineOption dj_lineoption =
+		{ dj_color, dj_linewidth * dj_lwscale,
+		  dj_dashpatlen, dj_dashpatlen != 0 ? dj_dashpat : NULL };
+	    GrCustomPolygon(dj_polygon_points, dj_path, &dj_lineoption);
+	}
+	dj_in_path = FALSE;
+	dj_polygon_points = 0;
+    }
+}
+
+
+static void
+DJSVGA_add_path_point(int x, int y)
+{
+    if (dj_polygon_points >= DJSVGA_MAXPATH)
+	DJSVGA_flush_line();
+
+    dj_path[dj_polygon_points][0] = x;
+    dj_path[dj_polygon_points][1] = y;
+    dj_polygon_points++;
+    FPRINTF((stderr, "svga: new polygon point: %i %i\n", x, y));
+}
+
 
 TERM_PUBLIC void
 DJSVGA_linewidth(double linewidth)
 {
-#ifdef GRX21
+    DJSVGA_flush_line();
     dj_linewidth = linewidth;
-#endif
 }
+
+
+TERM_PUBLIC void
+DJSVGA_pointsize(double size)
+{
+    DJSVGA_flush_line();
+    term_pointsize = (size >= 0 ? dj_pointscale * size : 1.);
+}
+
+
+TERM_PUBLIC void
+DJSVGA_image(unsigned int M, unsigned int N, coordval *image,
+	  gpiPoint *corner, t_imagecolor color_mode)
+{
+    GrContext ctxt;
+    GrImage * im = NULL;
+
+    switch (color_mode) {
+    case IC_PALETTE: {
+	uint8_t * data;
+	GrColor * colors;
+	int n;
+
+	FPRINTF((stderr, "DJSVGA_image: palette\n"));
+
+	/* convert image data */
+	data = (uint8_t *) gp_alloc(M * N, "image data");
+	for (n = 0; n < M * N; n++)
+	    data[n] = 255 * image[n];
+
+	/* build color table */
+	colors = (GrColor *) gp_alloc(257 * sizeof(GrColor), "image data");
+	colors[0] = 256; /* first entry denotes number of color table entries */
+	for (n = 0; n < 256; n++) {
+	    rgb255_color rgb255;
+	    rgb255maxcolors_from_gray(n / 255.0, &rgb255);
+	    colors[n + 1] = GrAllocColorID(rgb255.r, rgb255.g, rgb255.b);
+	}
+
+	/* create image */
+	im = GrImageBuild((char *)data, M, N, colors);
+	free(colors);
+	free(data);
+	break;
+    }
+    case IC_RGB:
+    case IC_RGBA: {
+	unsigned m, n;
+	GrColor * line; /* scan line buffer */
+	rgb_color rgb1;
+	rgb255_color rgb255;
+	GrColor color;
+
+	FPRINTF((stderr, "DJSVGA_image: rgb / rgba\n"));
+
+	/* create and fill context */
+	GrCreateContext(M, N, NULL, &ctxt);
+	GrSetContext(&ctxt);
+	line = (GrColor *) gp_alloc(M * sizeof(GrColor), "scan line");
+	if (color_mode == IC_RGB) {
+	    for (n = 0; n < N; n++) {
+		for (m = 0; m < M; m++) {
+		    rgb1.r = image[3 * (n * M + m) + 0];
+		    rgb1.g = image[3 * (n * M + m) + 1];
+		    rgb1.b = image[3 * (n * M + m) + 2];
+		    rgb255_from_rgb1(rgb1, &rgb255);
+		    color = GrAllocColorID(rgb255.r, rgb255.g, rgb255.b);
+		    line[m] = color;
+		}
+		GrPutScanline(0, M -1, n, line, GrWRITE);
+	    }
+	} else {
+	    for (n = 0; n < N; n++) {
+		for (m = 0; m < M; m++) {
+		    coordval alpha;
+		    rgb1.r = image[4 * (n * M + m) + 0];
+		    rgb1.g = image[4 * (n * M + m) + 1];
+		    rgb1.b = image[4 * (n * M + m) + 2];
+		    alpha  = image[4 * (n * M + m) + 3];
+		    /* no alpha support, so we "round" */
+		    if (alpha >= 0.5) {
+			rgb255_from_rgb1(rgb1, &rgb255);
+			color = GrAllocColorID(rgb255.r, rgb255.g, rgb255.b);
+		    } else {
+			color = GrNOCOLOR;
+		    }
+		    line[m] = color;
+		}
+		GrPutScanline(0, M -1, n, line, GrWRITE);
+	    }
+	}
+	free(line);
+	GrSetContext(NULL);
+
+	im = GrImageFromContext(&ctxt);
+	break;
+    }
+    default: /* unknown */
+	FPRINTF((stderr, "DJSVGA_image: unknown\n"));
+	return;
+    }
+
+    if (im != NULL) {
+	/* stretch */
+	GrImage * stretched = GrImageStretch(im, corner[1].x - corner[0].x, abs(corner[0].y - corner[1].y));
+
+	/* display image with clipping */
+	if (stretched != NULL) {
+	    GrSetClipBox(corner[2].x, dj_ylast - corner[2].y, corner[3].x, dj_ylast - corner[3].y);
+	    GrImageDisplay(corner[0].x, dj_ylast - corner[0].y, stretched);
+	    GrResetClipBox();
+	    GrImageDestroy(stretched);
+	}
+	GrImageDestroy(im);
+    }
+
+    /* The context can only be freed after the image! */
+    if ((color_mode == IC_RGB) || (color_mode == IC_RGBA))
+	GrDestroyContext(&ctxt);
+}
+
+
+#ifdef USE_MOUSE
+
+/* Mapping tables for special keycodes.  Note that these have to be
+   ordered by the GRX/MGRX key code. */
+
+/* no modifiers */
+static int grx_key_table [][2] = {
+    { GrKey_F1, GP_F1 },
+    { GrKey_F2, GP_F2 },
+    { GrKey_F3, GP_F3 },
+    { GrKey_F4, GP_F4 },
+    { GrKey_F5, GP_F5 },
+    { GrKey_F6, GP_F6 },
+    { GrKey_F7, GP_F7 },
+    { GrKey_F8, GP_F8 },
+    { GrKey_F9, GP_F9 },
+    { GrKey_F10, GP_F10 },
+    { GrKey_Home, GP_Home },
+    { GrKey_Up, GP_Up },
+    { GrKey_PageUp, GP_PageUp },
+    { GrKey_Left, GP_Left },
+    { GrKey_Right, GP_Right },
+    { GrKey_End, GP_End },
+    { GrKey_Down, GP_Down },
+    { GrKey_PageDown, GP_PageDown },
+    { GrKey_Insert, GP_Insert },
+    { GrKey_Delete, GP_Delete },
+    { GrKey_F11, GP_F11 },
+    { GrKey_F12, GP_F12 }
+};
+
+/* shift modifier */
+static int grx_shift_key_table [][2] = {
+    { GrKey_BackTab, GP_Tab },
+    { GrKey_Shift_F1, GP_F1 },
+    { GrKey_Shift_F2, GP_F2 },
+    { GrKey_Shift_F3, GP_F3 },
+    { GrKey_Shift_F4, GP_F4 },
+    { GrKey_Shift_F5, GP_F5 },
+    { GrKey_Shift_F6, GP_F6 },
+    { GrKey_Shift_F7, GP_F7 },
+    { GrKey_Shift_F8, GP_F8 },
+    { GrKey_Shift_F9, GP_F9 },
+    { GrKey_Shift_F10, GP_F10 },
+    { GrKey_Shift_F11, GP_F11 },
+    { GrKey_Shift_F12, GP_F12 },
+    { GrKey_Shift_Insert, GP_Insert },
+    { GrKey_Shift_Home, GP_Home },
+    { GrKey_Shift_End, GP_End },
+    { GrKey_Shift_PageUp, GP_PageUp },
+    { GrKey_Shift_PageDown, GP_PageDown },
+    { GrKey_Shift_Up, GP_Up },
+    { GrKey_Shift_Down, GP_Down },
+    { GrKey_Shift_Right, GP_Right },
+    { GrKey_Shift_Left, GP_Left }
+};
+
+/* ctrl modifier */
+static int grx_control_key_table [][2] = {
+    { GrKey_Control_At, '@' },
+    { GrKey_Control_F1, GP_F1 },
+    { GrKey_Control_F2, GP_F2 },
+    { GrKey_Control_F3, GP_F3 },
+    { GrKey_Control_F4, GP_F4 },
+    { GrKey_Control_F5, GP_F5 },
+    { GrKey_Control_F6, GP_F6 },
+    { GrKey_Control_F7, GP_F7 },
+    { GrKey_Control_F8, GP_F8 },
+    { GrKey_Control_F9, GP_F9 },
+    { GrKey_Control_F10, GP_F10 },
+    { GrKey_Control_F10, GP_F10 },
+    { GrKey_Control_Left, GP_Left },
+    { GrKey_Control_Right, GP_Right },
+    { GrKey_Control_End, GP_End },
+    { GrKey_Control_PageDown, GP_PageDown },
+    { GrKey_Control_Home, GP_Home },
+    { GrKey_Control_PageUp, GP_PageUp },
+    { GrKey_Control_F11, GP_F11 },
+    { GrKey_Control_F12, GP_F12 },
+    { GrKey_Control_Up, GP_Up },
+    { GrKey_Control_KPDash, GP_KP_Subtract },
+    { GrKey_Control_KPPlus, GP_KP_Add },
+    { GrKey_Control_Down, GP_Down },
+    { GrKey_Control_Insert, GP_Insert },
+    { GrKey_Control_Delete, GP_Delete },
+    { GrKey_Control_Tab, GP_Tab },
+    { GrKey_Control_KPSlash, GP_KP_Divide },
+    { GrKey_Control_KPStar, GP_KP_Multiply }
+};
+
+/* alt modifier */
+// FIXME: these seem to correspond to scan-codes from an US? keyboard
+// FIXME: should the letters be lower or upper case?
+static int grx_alt_key_table [][2] = {
+    { GrKey_Alt_Escape, GP_Escape },
+    { GrKey_Alt_Backspace, GP_BackSpace },
+    { GrKey_Alt_Q, 'q' },
+    { GrKey_Alt_W, 'w' },
+    { GrKey_Alt_E, 'e' },
+    { GrKey_Alt_R, 'r' },
+    { GrKey_Alt_T, 't' },
+    { GrKey_Alt_Y, 'y' },
+    { GrKey_Alt_U, 'u' },
+    { GrKey_Alt_I, 'i' },
+    { GrKey_Alt_O, 'o' },
+    { GrKey_Alt_P, 'p' },
+    { GrKey_Alt_LBracket, '[' },
+    { GrKey_Alt_RBracket, ']' },
+    { GrKey_Alt_Return, GP_Return },
+    { GrKey_Alt_A, 'a' },
+    { GrKey_Alt_S, 's' },
+    { GrKey_Alt_D, 'd' },
+    { GrKey_Alt_F, 'f' },
+    { GrKey_Alt_G, 'g' },
+    { GrKey_Alt_H, 'h' },
+    { GrKey_Alt_J, 'j' },
+    { GrKey_Alt_K, 'k' },
+    { GrKey_Alt_L, 'l' },
+    { GrKey_Alt_Semicolon, ';' },
+    { GrKey_Alt_Quote, '\'' },
+    { GrKey_Alt_Backquote, '`' },
+    { GrKey_Alt_Backslash, '\\' },
+    { GrKey_Alt_Z, 'z' },
+    { GrKey_Alt_X, 'x' },
+    { GrKey_Alt_C, 'c' },
+    { GrKey_Alt_V, 'v' },
+    { GrKey_Alt_B, 'b' },
+    { GrKey_Alt_N, 'n' },
+    { GrKey_Alt_M, 'm' },
+    { GrKey_Alt_Comma, ',' },
+    { GrKey_Alt_Period, '.' },
+    { GrKey_Alt_Slash, '/' },
+    { GrKey_Alt_KPStar, GP_KP_Multiply },
+    { GrKey_Alt_KPMinus, GP_KP_Subtract },
+    { GrKey_Alt_KPPlus, GP_KP_Add },
+    { GrKey_Alt_F1, GP_F1 },
+    { GrKey_Alt_F2, GP_F2 },
+    { GrKey_Alt_F3, GP_F3 },
+    { GrKey_Alt_F4, GP_F4 },
+    { GrKey_Alt_F5, GP_F5 },
+    { GrKey_Alt_F6, GP_F6 },
+    { GrKey_Alt_F7, GP_F7 },
+    { GrKey_Alt_F8, GP_F8 },
+    { GrKey_Alt_F9, GP_F9 },
+    { GrKey_Alt_F10, GP_F11 },
+    { GrKey_Alt_1, '1' },
+    { GrKey_Alt_2, '2' },
+    { GrKey_Alt_3, '3' },
+    { GrKey_Alt_4, '4' },
+    { GrKey_Alt_5, '5' },
+    { GrKey_Alt_6, '6' },
+    { GrKey_Alt_7, '7' },
+    { GrKey_Alt_8, '8' },
+    { GrKey_Alt_9, '9' },
+    { GrKey_Alt_0, '0' },
+    { GrKey_Alt_Dash, '-' },
+    { GrKey_Alt_Equals, '=' },
+    { GrKey_Alt_F11, GP_F11 },
+    { GrKey_Alt_F12, GP_F12 },
+    { GrKey_Alt_KPSlash, GP_KP_Divide },
+    { GrKey_Alt_Tab, GP_Tab },
+    { GrKey_Alt_Enter, GP_Return },
+    { GrKey_Alt_Up, GP_Up },
+    { GrKey_Alt_Left, GP_Left },
+    { GrKey_Alt_Right, GP_Right },
+    { GrKey_Alt_Down, GP_Down },
+    { GrKey_Alt_Insert, GP_Insert },
+    { GrKey_Alt_Delete, GP_Delete },
+    { GrKey_Alt_Home, GP_Home },
+    { GrKey_Alt_End, GP_End },
+    { GrKey_Alt_PageUp, GP_PageUp },
+    { GrKey_Alt_PageDown, GP_PageDown },
+};
+
+static int
+grx_int_compare(const void * elem1, const void * elem2)
+{
+    int val = *(int *)elem1 - *(int *)elem2;
+    return (0 < val) - (val < 0);
+}
+
+/* map a GRX special key to a gnuplot code */
+static int
+grx_translate_key(int key, int kbstat)
+{
+    if (key < 0x100)
+	return key;  /* no need to handle those */
+    else {
+	int (* found)[2];
+
+	/* GRX/MGRX maps some special keys including modifiers */
+	found = bsearch((void *)&key,
+	    grx_key_table, sizeof(grx_key_table) / (2 * sizeof(int)), 2 * sizeof(int),
+	    &grx_int_compare);
+	if ((found == NULL) && (kbstat & GRKBS_ALT)) {
+	    found = bsearch((void *)&key,
+		grx_alt_key_table, sizeof(grx_alt_key_table) / (2 * sizeof(int)), 2 * sizeof(int),
+		&grx_int_compare);
+	}
+	if ((found == NULL) && (kbstat & GRKBS_CTRL)) {
+	    found = bsearch((void *)&key,
+		grx_control_key_table, sizeof(grx_control_key_table) / (2 * sizeof(int)), 2 * sizeof(int),
+		&grx_int_compare);
+	}
+	if ((found == NULL) && (kbstat & GRKBS_SHIFT)) {
+	    found = bsearch((void *)&key,
+		grx_shift_key_table, sizeof(grx_shift_key_table) / (2 * sizeof(int)), 2 * sizeof(int),
+		&grx_int_compare);
+	}
+	return (found != NULL) ? (*found)[1] : -1;
+    }
+}
+
+
+/* map a MGRX modifier status to the gnuplot code */
+static int
+grx_translate_kbstat(int kbstat)
+{
+    int modifier = 0;
+
+    if (kbstat & GRKBS_SHIFT)
+	modifier |= Mod_Shift;
+    if (kbstat & GRKBS_CTRL)
+	modifier |= Mod_Ctrl;
+    if (kbstat & GRKBS_ALT)
+	modifier |= Mod_Alt;
+    return modifier;
+}
+
+
+#ifdef HAVE_MGRX
+static TBOOLEAN
+grx_check_event(void)
+{
+    GrEvent ev;
+    static int last_kbstat = -1;
+    TBOOLEAN ret = FALSE;
+
+    GrEventRead(&ev);
+    switch (ev.type) {
+    case GREV_KEY: {
+	int key;
+
+	FPRINTF((stderr, "Key event: key=%x\n", (unsigned) ev.p1));
+	if (ev.kbstat != last_kbstat) {
+	    int modifier = grx_translate_kbstat(ev.kbstat);
+	    ret = exec_event(GE_modifier, GrMouseInfo->xpos, dj_ylast - GrMouseInfo->ypos, modifier, 0, 0);
+	    last_kbstat = ev.kbstat;
+	}
+	key = grx_translate_key(ev.p1, ev.kbstat);
+	if (key != -1) {
+	    /* FIXME: GrMouseInfo is not documented */
+	    ret = exec_event(GE_keypress, GrMouseInfo->xpos, dj_ylast - GrMouseInfo->ypos, key, 0, 0);
+	} else {
+	    /* FIXME: for debugging only */
+	    printf("Unknown key: %03x code/bytes: %3x\n", (unsigned) ev.p1, (unsigned) ev.p2);
+	}
+	switch (key) {
+#ifdef MSDOS
+	case GP_Return:
+	case GP_Escape:
+	case GP_BackSpace:
+	case GP_Delete:
+	    dj_processing_events = FALSE;
+	    break;
+#endif
+#ifdef _WIN32
+	case ' ':
+	    WinRaiseConsole();
+	    break;
+#endif
+	default:
+	    ;
+	}
+    }
+    case GREV_MOUSE:
+	FPRINTF((stderr, "Mouse event: type=%i time=%i\n", (int) ev.p1, (int) ev.time));
+	if (ev.kbstat != last_kbstat) {
+	    int modifier = grx_translate_kbstat(ev.kbstat);
+	    ret = exec_event(GE_modifier, GrMouseInfo->xpos, dj_ylast - GrMouseInfo->ypos, modifier, 0, 0);
+	    last_kbstat = ev.kbstat;
+	}
+	switch (ev.p1) {
+	case GRMOUSE_LB_PRESSED:
+	    ret = exec_event(GE_buttonpress, ev.p2, dj_ylast - ev.p3,  1, ev.time, 0);
+	    break;
+	case GRMOUSE_MB_PRESSED:
+	    ret = exec_event(GE_buttonpress, ev.p2, dj_ylast - ev.p3,  2, ev.time, 0);
+	    break;
+	case GRMOUSE_RB_PRESSED:
+	    ret = exec_event(GE_buttonpress, ev.p2, dj_ylast - ev.p3,  3, ev.time, 0);
+	    break;
+	case GRMOUSE_LB_RELEASED:
+	    ret = exec_event(GE_buttonrelease, ev.p2, dj_ylast - ev.p3,  1, ev.time, 0);
+	    break;
+	case GRMOUSE_MB_RELEASED:
+	    ret = exec_event(GE_buttonrelease, ev.p2, dj_ylast - ev.p3,  2, ev.time, 0);
+	    break;
+	case GRMOUSE_RB_RELEASED:
+	    ret = exec_event(GE_buttonrelease, ev.p2, dj_ylast - ev.p3,  3, ev.time, 0);
+	    break;
+	case GRMOUSE_B4_PRESSED:
+	    ret = exec_event(GE_buttonpress, ev.p2, dj_ylast - ev.p3,  4, ev.time, 0);
+	    break;
+	case GRMOUSE_B4_RELEASED:
+	    ret = exec_event(GE_buttonrelease, ev.p2, dj_ylast - ev.p3,  4, ev.time, 0);
+	    break;
+	case GRMOUSE_B5_PRESSED:
+	    ret = exec_event(GE_buttonpress, ev.p2, dj_ylast - ev.p3,  5, ev.time, 0);
+	    break;
+	case GRMOUSE_B5_RELEASED:
+	    ret = exec_event(GE_buttonrelease, ev.p2, dj_ylast - ev.p3,  5, ev.time, 0);
+	    break;
+	}
+	break;
+    case GREV_MMOVE:
+	FPRINTF((stderr, "Mouse move event: %i,%i\n", (int) ev.p2, (int) ev.p3));
+	if (ev.kbstat != last_kbstat) {
+	    int modifier = grx_translate_kbstat(ev.kbstat);
+	    ret = exec_event(GE_modifier, GrMouseInfo->xpos, dj_ylast - GrMouseInfo->ypos, modifier, 0, 0);
+	    last_kbstat = ev.kbstat;
+	}
+	ret = exec_event(GE_motion, ev.p2, dj_ylast - ev.p3, 0 /* par1 */, ev.time, 0);
+	break;
+    case GREV_NULL:
+    default:
+	/* ignore - nothing to do */
+	break;
+    }
+    return ret;
+}
+#else
+static TBOOLEAN
+grx_check_event(void)
+{
+    GrMouseEvent ev;
+    static int last_kbstat = -1;
+    TBOOLEAN ret = FALSE;
+    int ev_time = 0;
+
+    GrMouseGetEvent(GR_M_POLL | GR_M_MOTION | GR_M_BUTTON_CHANGE | GR_M_KEYPRESS, &ev);
+    ev_time = ev.dtime;
+    if (ev.flags & GR_M_MOTION) {
+	FPRINTF((stderr, "Mouse move event: %i,%i\n", (int) ev.x, (int) ev.y));
+	if (ev.kbstat != last_kbstat) {
+	    int modifier = grx_translate_kbstat(ev.kbstat);
+	    ret = exec_event(GE_modifier, ev.x, dj_ylast - ev.y, modifier, 0, 0);
+	    last_kbstat = ev.kbstat;
+	}
+	ret = exec_event(GE_motion, ev.x, dj_ylast - ev.y, 0 /* par1 */, ev_time, 0);
+    } else if (ev.flags & GR_M_KEYPRESS) {
+	int key;
+
+	FPRINTF((stderr, "Key event: key=%x\n", (unsigned) ev.key));
+	if (ev.kbstat != last_kbstat) {
+	    int modifier = grx_translate_kbstat(ev.kbstat);
+	    ret = exec_event(GE_modifier, ev.x, dj_ylast - ev.y, modifier, 0, 0);
+	    last_kbstat = ev.kbstat;
+	}
+	key = grx_translate_key(ev.key, ev.kbstat);
+	if (key != -1) {
+	    ret = exec_event(GE_keypress, ev.x, dj_ylast - ev.y, key, 0, 0);
+	} else {
+	    /* FIXME: for debugging only */
+	    printf("Unknown key: %03x code/bytes: %3x\n", (unsigned) ev.x, (unsigned) ev.y);
+	}
+	switch (key) {
+#ifdef MSDOS
+	case GP_Return:
+	case GP_Escape:
+	case GP_BackSpace:
+	case GP_Delete:
+	    dj_processing_events = FALSE;
+	    break;
+#endif
+#ifdef _WIN32
+	case ' ':
+	    WinRaiseConsole();
+	    break;
+#endif
+	default:
+	    ;
+	}
+    } else if (ev.flags & GR_M_BUTTON_DOWN) {
+	if (ev.flags & GR_M_LEFT_DOWN) {
+	    ret = exec_event(GE_buttonpress, ev.x, dj_ylast - ev.y,  1, ev_time, 0);
+	} else if (ev.flags & GR_M_MIDDLE_DOWN) {
+	    ret = exec_event(GE_buttonpress, ev.x, dj_ylast - ev.y,  2, ev_time, 0);
+	} else if (ev.flags & GR_M_RIGHT_DOWN) {
+	    ret = exec_event(GE_buttonpress, ev.x, dj_ylast - ev.y,  3, ev_time, 0);
+	} else if (ev.flags & GR_M_P4_DOWN) {
+	    ret = exec_event(GE_buttonpress, ev.x, dj_ylast - ev.y,  4, ev_time, 0);
+	} else if (ev.flags & GR_M_P5_DOWN) {
+	    ret = exec_event(GE_buttonpress, ev.x, dj_ylast - ev.y,  5, ev_time, 0);
+	}
+    } else if (ev.flags & GR_M_BUTTON_UP) {
+	if (ev.flags & GR_M_LEFT_UP) {
+	    ret = exec_event(GE_buttonrelease, ev.x, dj_ylast - ev.y,  1, ev_time, 0);
+	} else if (ev.flags & GR_M_MIDDLE_UP) {
+	    ret = exec_event(GE_buttonrelease, ev.x, dj_ylast - ev.y,  2, ev_time, 0);
+	} else if (ev.flags & GR_M_RIGHT_UP) {
+	    ret = exec_event(GE_buttonrelease, ev.x, dj_ylast - ev.y,  3, ev_time, 0);
+	} else if (ev.flags & GR_M_P4_UP) {
+	    ret = exec_event(GE_buttonrelease, ev.x, dj_ylast - ev.y,  4, ev_time, 0);
+	} else if (ev.flags & GR_M_P5_UP) {
+	    ret = exec_event(GE_buttonrelease, ev.x, dj_ylast - ev.y,  5, ev_time, 0);
+	}
+    }
+    return ret;
+}
+#endif
+
+
+#if defined(MGRX_XWIN) || defined(_WIN32)
+TERM_PUBLIC int
+DJSVGA_waitforinput(int mode)
+{
+    if (mode == TERM_ONLY_CHECK_MOUSING) {
+	if (dj_initialized)
+	    grx_check_event();
+	return NUL;
+    } else
+#ifdef HAVE_SELECT
+    while (1) {
+	fd_set rfds;
+	struct timeval tv = { 0L, 10000L };
+	int retval;
+
+	/* process events (including X11 "redraw") */
+	if (dj_initialized)
+	    grx_check_event();
+
+	FD_ZERO(&rfds);
+	FD_SET(STDIN_FILENO, &rfds);
+	retval = select(STDIN_FILENO + 1, &rfds, NULL, NULL, &tv);
+	if (FD_ISSET(STDIN_FILENO, &rfds))
+	    return getc(stdin);
+    }
+#else
+# ifdef _WIN32
+#  ifndef WGP_CONSOLE
+    /* win32 */
+    while (1) {
+	if (MsgWaitForMultipleObjects(0, NULL, FALSE, 10, QS_ALLINPUT) != WAIT_TIMEOUT) {
+	    WinMessageLoop();
+	    if (kbhit())
+		return getchar();
+	}
+	if (dj_initialized)
+	    grx_check_event();
+    }
+#  else
+#  endif
+# endif
+#endif
+    return getc(stdin);
+}
+#endif
+
+
+TERM_PUBLIC void
+DJSVGA_put_tmptext(int location, const char str[])
+{
+    int x, y;
+
+    switch (location) {
+    case 0: /* status line */
+	x = 0;
+	y = dj_ylast - 16;
+	if (dj_statusline[0] != NUL)
+	    GrTextXY(x, y, dj_statusline, GrWhite() | GrXOR, GrNOCOLOR);
+	if (str != NULL) {
+	    safe_strncpy(dj_statusline, str, sizeof(dj_statusline));
+	    GrTextXY(x, y, dj_statusline, GrWhite() | GrXOR, GrNOCOLOR);
+	} else {
+	    dj_statusline[0] = NUL;
+	}
+	break;
+    case 1: /* zoom box */
+	break;
+    case 2: /* zoom box */
+	break;
+    }
+}
+
+
+TERM_PUBLIC void
+DJSVGA_set_ruler(int x, int y)
+{
+    if (x >= 0) {  /* switch ruler on */
+	dj_ruler_x = x;
+	dj_ruler_y = y;
+    } else { /* switch ruler off */
+	x = dj_ruler_x;
+	y = dj_ruler_y;
+	dj_ruler_x = dj_ruler_y = -1;
+	DJSVGA_set_cursor(-4, 0, 0);
+    }
+    GrHLine(0, dj_xlast, dj_ylast - y, GrWhite() | GrXOR);
+    GrVLine(x, 0, dj_ylast, GrWhite() | GrXOR);
+}
+
+
+TERM_PUBLIC void
+DJSVGA_set_cursor(int action, int x, int y)
+{
+    FPRINTF((stderr, "set cursor: action=%i pos=%i,%i\n", action, x, y));
+    switch (action) {
+    case -4: /* end line to cursor */
+	GrMouseEraseCursor();
+	GrMouseSetCursorMode(GR_M_CUR_NORMAL);
+	GrMouseDisplayCursor();
+	break;
+    case -3: /* line to cursor */
+	if (dj_ruler_x == -1)
+	    return;
+	GrMouseEraseCursor();
+	GrMouseSetCursorMode(GR_M_CUR_LINE, dj_ruler_x, dj_ylast - dj_ruler_y, GrWhite());
+	GrMouseDisplayCursor();
+	break;
+    case -2: /* warp pointer */
+	GrMouseEraseCursor();
+	GrMouseWarp(x, dj_ylast - y);
+	GrMouseDisplayCursor();
+	break;
+    case -1: /* start zooming */
+	GrMouseEraseCursor();
+	GrMouseSetCursorMode(GR_M_CUR_RUBBER, x, dj_ylast - y, GrWhite());
+	GrMouseDisplayCursor();
+	break;
+    case 0: /* default */
+	GrMouseEraseCursor();
+	GrMouseSetCursorMode(GR_M_CUR_NORMAL);
+#ifdef HAVE_MGRX
+	GrMouseSetInternalCursor(mouse_setting.on ? GR_MCUR_TYPE_CROSS : GR_MCUR_TYPE_ARROW,
+		GrWhite(), GrBlack());
+#endif
+	GrMouseDisplayCursor();
+	break;
+    case 1: /* cursor rotation */
+    case 2: /* cursor scaling  */
+    case 3: /* cursor zoom */
+	/* TODO: implement different cursor shapes */
+	break;
+    }
+}
+#endif
+
+#ifdef DJSVGA_DEBUG
+# undef FPRINTF
+# define FPRINTF(a)
+#endif
 
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
 
-/* HBB: I think \" is more readable than \042. BTW: why is this
- *   option 'documented' here, but not in the Help node? */
 TERM_TABLE_START(djsvga_driver)
-    "svga", "IBM PC/Clone with Super VGA graphics board [\"fontname\"]",
+    "svga", "IBM PC/Clone with Super VGA graphics card",
     DJSVGA_XMAX, DJSVGA_YMAX, DJSVGA_VCHAR, DJSVGA_HCHAR,
     DJSVGA_VTIC, DJSVGA_HTIC,
     DJSVGA_options,
     DJSVGA_init, DJSVGA_reset, DJSVGA_text,
     null_scale, DJSVGA_graphics, DJSVGA_move, DJSVGA_vector,
-    DJSVGA_linetype, DJSVGA_put_text,
+    DJSVGA_linetype, DJSVGA_enhanced_put_text,
     DJSVGA_angle, DJSVGA_justify_text,
     do_point, do_arrow, DJSVGA_set_font,
-    0,				/* no pointsize() */
-    TERM_CAN_MULTIPLOT,
+    DJSVGA_pointsize,
+    TERM_CAN_MULTIPLOT | TERM_NO_OUTPUTFILE | TERM_ENHANCED_TEXT |
+    TERM_LINEWIDTH | TERM_POINTSCALE | TERM_FONTSCALE | TERM_CAN_DASH,
     DJSVGA_suspend, DJSVGA_resume,
-    DJSVGA_fillbox, DJSVGA_linewidth
+    DJSVGA_fillbox, DJSVGA_linewidth,
+#ifdef USE_MOUSE
+#if defined(MGRX_XWIN) || defined(_WIN32)
+    DJSVGA_waitforinput, DJSVGA_put_tmptext, DJSVGA_set_ruler, DJSVGA_set_cursor, 0,
+#else
+    0, DJSVGA_put_tmptext, DJSVGA_set_ruler, DJSVGA_set_cursor, 0,
+#endif
+#endif
+    DJSVGA_make_palette, 0, DJSVGA_color,
+    DJSVGA_filled_polygon,
+    DJSVGA_image,
+    DJSVGA_enhanced_open, DJSVGA_enhanced_flush, do_enh_writec,
+    0 /* layer */, DJSVGA_path,
+    0.0,
+    0 /* hypertext */,
+#ifdef EAM_BOXED_TEXT
+    0,
+#endif
+    0,
+    DJSVGA_dashtype
 TERM_TABLE_END(djsvga_driver)
 
 #undef LAST_TERM
@@ -479,9 +2150,26 @@ START_HELP(svga)
 "?term svga",
 "?svga",
 " Legacy terminal. The `svga` terminal driver supports PCs with SVGA graphics.",
-"  It can only be used if it is compiled with DJGPP.",
+" It is typically only compiled with DJGPP and uses the GRX graphics library.",
+" There is also a variant for Windows 32bit, which is mainly used for",
+" debugging. The underlying library also supports X11, Linux console and SDL,",
+" but these targets are currently not supported.",
 "",
 " Syntax:",
-"       set terminal svga {\"<fontname>\"}"
+"       set terminal svga {font \"<fontname>\"}",
+"                         {{no}enhanced}",
+"                         {background <rgb color>}",
+"                         {linewidth|lw <lw>}",
+"                         {pointscale|ps <scale>}",
+"                         {fontscale|fs <scale>}",
+"",
+" Enhanced text support can be activated using the `enhanced` option,",
+ " see `enhanced text`.  Note that changing the font size in enhanced text is",
+" currently not supported. Hence, super- and subscripts will have the same size.",
+"",
+" The `linewidth` parameter scales the width of lines. The `pointscale`",
+" parameter sets the scale factor for point symbols. You can use `fontscale`",
+" to scale the bitmap font. This might be useful if you have a hi-res display.",
+" Note that integer factors give best results."
 END_HELP(svga)
 #endif /* TERM_HELP */
