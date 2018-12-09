@@ -159,6 +159,13 @@ CERF=1
 # Uncomment if you want to use Direct2D 1.1 (Windows 8 and Windows 7 Platform Update)
 DIRECT2D11=1
 
+# GRX graphics library, for debugging the DJGPP svga terminal
+#GRX=1
+GRXPATH=c:/Source/grx249
+# or, the MGRX fork of GRX
+#MGRX=1
+MGRXPATH=c:/Source/mgrx110
+
 
 # Below you can adapt paths according to your software setup:
 
@@ -475,6 +482,22 @@ endif
 ifdef CACA
 	CFLAGS += -DHAVE_LIBCACA
 	TERMLIBS += -lcaca
+endif
+
+ifdef MGRX
+	CFLAGS += -I$(MGRXPATH)/include -DHAVE_GRX -DHAVE_MGRX
+ifdef M32
+	TERMLIBS += -L$(MGRXPATH)/lib/win32/ -lmgrx -lgdi32 -lfreetype
+else
+	TERMLIBS += -L$(MGRXPATH)/lib/win64/ -lmgrx -lgdi32 -lfreetype
+endif
+else
+ifdef GRX
+ifdef M32
+	CFLAGS += -I$(GRXPATH)/include -DHAVE_GRX
+	TERMLIBS += -L$(GRXPATH)/lib/win32/ -lgrx20 -lgdi32
+endif
+endif
 endif
 
 ifdef ICONV
