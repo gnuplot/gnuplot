@@ -1953,7 +1953,7 @@ sprintf_specifier(const char* format)
     const char real_spec[]    = "aAeEfFgG";
     const char int_spec[]     = "cdiouxX";
     /* The following characters are used to reject invalid formats */
-    const char illegal_spec[] = "hlLqjzZtCSpn";
+    const char illegal_spec[] = "hlLqjzZtCSpn*";
 
     int string_pos, real_pos, int_pos, illegal_pos;
 
