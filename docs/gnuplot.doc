@@ -278,6 +278,11 @@ C
 #start
 #b The `pcl5` terminal has been extended to support PCL5e/PCL5c printers and
 ## many modern gnuplot features.
+#b The `pstricks` terminal has been extended to support many modern gnuplot
+## features including RGB colors and transparency, filled polygons, and boxes.
+#b The previously experimental Direct2D variant of the `windows` terminal
+## replaces the GDI and GDI+ variants. It now supports printing using D2D
+## and color fonts.
 #b The `dospc` and `svga` DOS terminals have been modernized and now support
 ## interactive keyboard and mouse (svga only) input.
 #end

@@ -20,8 +20,8 @@ Changes not in 5.2
 * NEW overflow avoidance extends range of arguments handled by complex division
 * NEW largely extended pcl5 terminal supports PCL5e/PCL5c printers
 * NEW revised pstricks LaTeX terminal
-* NEW extended dospc terminal (DOS / OpenWatcom)
-* NEW extended svga terminal (DOS / DJGPP)
+* NEW extended dospc terminal (DOS32/OpenWatcom)
+* NEW extended svga terminal using the (M)GRX library (DOS32/DJGPP)
 * EXPERIMENTAL internal support for appending to existing arrays
 * EXPERIMENTAL "set mouse mouseformat function <stringval_from_xy(x,y)>"
 * EXPERIMENTAL multiple textbox styles
@@ -41,6 +41,7 @@ Changes not in 5.2
 * CHANGE remove undocumented EXPERIMENTAL option for pm3d filled contours
 * FIX allow mixed use of in-key plot titles and manually placed titles
 * FIX open/close path for polygons
+* FIX several stability issues of the caca terminal
 
 New features introduced to 5.2 in patchlevel releases
 =====================================================
