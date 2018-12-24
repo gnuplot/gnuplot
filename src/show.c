@@ -60,9 +60,11 @@
 #include "term_api.h"
 #include "variable.h"
 #include "version.h"
+#include "voxelgrid.h"
 #ifdef USE_MOUSE
 # include "mouse.h"
 #endif
+
 #include "color.h"
 #include "pm3d.h"
 #include "getcolor.h"
@@ -155,6 +157,7 @@ static void show_timefmt __PROTO((void));
 static void show_locale __PROTO((void));
 static void show_loadpath __PROTO((void));
 static void show_fontpath __PROTO((void));
+static void show_vgrid __PROTO((void));
 static void show_zero __PROTO((void));
 static void show_datafile __PROTO((void));
 static void show_table __PROTO((void));
@@ -576,6 +579,9 @@ show_command()
 	break;
     case S_LOADPATH:
 	show_loadpath();
+	break;
+    case S_VGRID:
+	show_vgrid();
 	break;
     case S_ZERO:
 	show_zero();
@@ -3082,6 +3088,31 @@ show_fontpath()
 	
 }
 
+/* show state of voxel grid */
+static void
+show_vgrid()
+{
+#ifdef VOXEL_GRID_SUPPORT
+    SHOW_ALL_NL;
+    if (!current_vgrid) {
+	fprintf(stderr, "\tno voxel grid\n");
+	return;
+    } else {
+	fprintf(stderr, "\tvoxel grid %d X %d X %d\n",
+		current_vgrid->size, current_vgrid->size, current_vgrid->size);
+    }
+    if (isnan(current_vgrid->vxmin) || isnan(current_vgrid->vxmax) || isnan(current_vgrid->vymin)
+    ||  isnan(current_vgrid->vymax) || isnan(current_vgrid->vzmin) || isnan(current_vgrid->vzmax)) {
+	fprintf(stderr, "\tgrid ranges not set\n");
+    } else {
+	fprintf(stderr, "\tvxrange [%g:%g]  vyrange[%g:%g]  vzrange[%g:%g]\n",
+	    current_vgrid->vxmin, current_vgrid->vxmax, current_vgrid->vymin,
+	    current_vgrid->vymax, current_vgrid->vzmin, current_vgrid->vzmax);
+    }
+#else
+    int_error(NO_CARET, "this gnuplot does not support voxel grids");
+#endif
+}
 
 /* process 'show zero' command */
 static void

@@ -65,6 +65,7 @@
 #include "mouse.h"
 #endif
 #include "encoding.h"
+#include "voxelgrid.h"
 
 static palette_color_mode pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_NONE;
 
@@ -493,6 +494,14 @@ set_command()
 	    break;
 	case S_VIEW:
 	    set_view();
+	    break;
+	case S_VGRID:
+	    set_vgrid();
+	    break;
+	case S_VXRANGE:
+	case S_VYRANGE:
+	case S_VZRANGE:
+	    set_vgrid_range();
 	    break;
 	case S_ZERO:
 	    set_zero();
@@ -5813,7 +5822,6 @@ set_xyzlabel(text_label *label)
     parse_label_options(label, 0);
 
 }
-
 
 /*
  * Change or insert a new linestyle in a list of line styles.

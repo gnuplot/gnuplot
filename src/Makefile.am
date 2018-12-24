@@ -57,7 +57,8 @@ save.h scanner.c scanner.h set.c setshow.h show.c specfun.c specfun.h \
 standard.c standard.h stats.h stats.c stdfn.c stdfn.h syscfg.h tables.c tables.h \
 tabulate.c tabulate.h \
 term_api.h term.c term.h time.c unset.c util.c util.h \
-util3d.c util3d.h variable.c variable.h version.c version.h
+util3d.c util3d.h variable.c variable.h version.c version.h \
+voxelgrid.c voxelgrid.h
 
 gnuplot_LDADD = $(TERMLIBS) $(TERMXLIBS) $(WX_LIBS) $(QT_LIBS)
 

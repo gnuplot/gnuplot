@@ -44,6 +44,7 @@
 #include "util.h"
 #include "version.h"
 #include "term_api.h"
+#include "voxelgrid.h"
 
 #include <signal.h>
 #include <setjmp.h>
@@ -231,6 +232,10 @@ const struct ft_entry ft[] =
     {"value", f_value},		/* retrieve value of variable known by name */
 
     {"hsv2rgb", f_hsv2rgb},	/* color conversion */
+
+#ifdef VOXEL_GRID_SUPPORT
+    {"voxel", f_voxel},		/* extract value of single voxel */
+#endif
 
     {NULL, NULL}
 };

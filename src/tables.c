@@ -40,7 +40,8 @@
 #include "util.h"
 #include "alloc.h"	/* for init_colornames() */
 #include "graph3d.h"	/* for DGRID3D_* options */
-# include "getcolor.h"
+#include "getcolor.h"
+#include "voxelgrid.h"
 
 /* gnuplot commands */
 
@@ -92,6 +93,9 @@ const struct gen_ftable command_ftbl[] =
     { "und$efine", undefine_command },
     { "uns$et", unset_command },
     { "up$date", update_command },
+    { "vclear", vclear_command },
+    { "vfill", vfill_command },
+    { "voxel", voxel_command },
     { "while", while_command },
     { "{", begin_clause },
     { "}", end_clause },
@@ -343,6 +347,11 @@ const struct gen_table set_tbl[] =
     { "tr$ange", S_TRANGE },
     { "ur$ange", S_URANGE },
     { "vr$ange", S_VRANGE },
+
+    { "vgrid", S_VGRID },
+    { "vxr$ange", S_VXRANGE },
+    { "vyr$ange", S_VYRANGE },
+    { "vzr$ange", S_VZRANGE },
 
     { "xzeroa$xis", S_XZEROAXIS },
     { "x2zeroa$xis", S_X2ZEROAXIS },

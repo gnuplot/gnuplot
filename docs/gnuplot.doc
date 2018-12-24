@@ -208,10 +208,23 @@ C
 ##See `overflow`.
 #end
 
+4 Voxel grids
+#start
+#b `set vgrid size N` creates an NxNxN grid of voxels.
+#b `voxel(x,y,z)` can be used in expressions to read or write an individual voxel.
+#b `vfill DATA_SOURCE using x:y:z:radius:(density_function)` acts analogously to
+## a plot command except that instead of plotting it increments voxels near each
+## point in the input data.
+#b `vclear` resets an existing voxel grid to contain all zero values.
+#b voxel values can be used to assign color or other properties in `splot` commands
+## by using the `voxel` function in using specifiers.
+#end
+
 4 New plot styles and style options
 #start
 #b Plot style `with circles` can be used in 3D plots.
 #b Plot style `with boxes` can be used in 3D plots.
+#b Voxel grid values can be referenced in the `using` specifiers for 3D plots.
 #b 2D plot style `with arrows` is identical to `with vectors` except that each
 ## arrow is specified using x:y:length:angle rather than x:y:xdelta:ydelta
 #b pm3d surfaces can have individual fillstyle and fillcolor
@@ -222,7 +235,8 @@ C
 
 4 New commands and command options
 ?new commands
-#start
+#startA
+#b Voxel grid commands. See `set vgrid`, `set vxrange`, `vfill`, `vclear`, `voxel`.
 #b New options for showing the xy xz and yz planes in 3D plots.
 ##See `set walls`, `set grid vertical`.
 #b `set table separator {tab|comma|"char"}` can be used to create csv files.
@@ -15899,7 +15913,7 @@ Ffigure_walls
  versions differ in their handling of piped I/O.  Therefore gnuplot scripts
  using piped output to PDF may work only for some versions of PDFlib.
 
- External library svgalib (used by linux and vgagl driver):
+ External library svgalib (used by deprecated linux and vgagl terminal driver):
  Requires gnuplot to be suid root (bad!) and has many bugs that are specific
  to the video card or graphics driver used in X11.
 
@@ -15909,3 +15923,6 @@ Ffigure_walls
  The locales available, and the level of support for locale features such as
  "thousands' grouping separator", depend on the internationalization support
  provided by your individual machine.
+
+ External library libcerf versions 1.8 1.9 1.10 return incorrect results for
+ the voigt function. Do not use.
