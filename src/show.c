@@ -2495,6 +2495,8 @@ show_pm3d()
 	fputs("at least 1 point of the quadrangle in x,y ranges\n", stderr);
     else
 	fputs( "all 4 points of the quadrangle in x,y ranges\n", stderr);
+    if (pm3d.no_clipcb)
+	fputs( "\t         quadrangles with cb < cbmin will not be drawn\n", stderr);
     if (pm3d.border.l_type == LT_NODRAW) {
 	fprintf(stderr,"\tpm3d quadrangles will have no border\n");
     } else {

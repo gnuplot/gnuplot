@@ -1,3 +1,7 @@
+Changes in 5.2.7
+================
+* NEWS "set pm3d noclipcb" will skip drawing quadrangles with color < cbmin
+
 Changes in 5.2.6
 ================
 * NEW keyword "keyentry" places an entry in the key without actually plotting

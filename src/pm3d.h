@@ -110,6 +110,7 @@ typedef struct {
   char flush;   	/* left, right, center */
   char ftriangles;   	/* 0/1 (don't) draw flushing triangles */
   char clip;		/* 1in, 4in */
+  TBOOLEAN no_clipcb;	/* FALSE: cb<0 treated as 0  TRUE: cb<0 treated as NaN */
   pm3d_scandir direction;
   TBOOLEAN base_sort;	/* default: depth sort by mean z;   true: use z=0.0 */
   PM3D_IMPL_MODE implicit;

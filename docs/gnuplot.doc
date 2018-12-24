@@ -11545,6 +11545,7 @@ Ffigure_multiple_keys
                   { flush { begin | center | end } }
                   { ftriangles | noftriangles }
                   { clip1in | clip4in }
+                  { {no}clipcb }
                   { corners2color
                     { mean|geomean|harmean|rms|median|min|max|c1|c2|c3|c4 }
                   }
@@ -11704,10 +11705,17 @@ Ffigure_multiple_keys
 4 clipping
 ?pm3d clipping
 ?set pm3d clipping
- Clipping with respect to x, y coordinates of quadrangles can be done in two
+?clipcb
+?pm3d clipcb
+?pm3d noclipcb
+?noclipcb
+ pm3d clipping with respect to x, y coordinates of quadrangles can be done two
  ways.  `clip1in`: all 4 points of each quadrangle must be defined and at least
  1 point of the quadrangle must lie in the x and y ranges.  `clip4in`: all 4
  points of each quadrangle must lie in the x and y ranges.
+
+ `clipcb` (default): palette color values < cmbin are clipped to cbmin.
+ `noclipcb`: quadrangles with palette color value < cbmin are not drawn at all.
 
 4 color_assignment
 ?pm3d color_assignment
