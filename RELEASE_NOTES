@@ -1,19 +1,29 @@
-		GNUPLOT Version 5.2.5 Release Notes
+		GNUPLOT Version 5.2.6 Release Notes
 		===================================
 
-These release notes are for version 5.2 patchlevel 5 (5.2.5).
+These release notes are for version 5.2 patchlevel 6 (5.2.6).
 This release contains bug-fixes, a few changes back-ported from the
-development version, and three new features.  The most notable fixes are
-(1) improved clipping of lines or other plot elements that would otherwise
-extend beyond the edges of the plot. 
-(2) in versions 5.2.0 through 5.2.4 function plots in parametric and polar
-modes did not work with logscale x axis.
+development version, and two new features.  The most notable fixes are for
+problems with the "pause mouse" command in the x11, wxt, and qt terminals.
 
 Please see the ChangeLog file for a complete list of changes made during the
 course of development from 5.0 to 5.2.
 
-Release Notes date: 06-October-2018
+Release Notes date: 24-December-2018
 
+Changes in 5.2.6
+================
+* NEW keyword "keyentry" places an entry in the key without actually plotting
+* NEW "set style boxplot medianlinewidth <lw>"
+* CHANGE drop non-working support for CIE/XYZ color space
+* CHANGE strptime ignores content read with format a/A/w/W
+* FIX various corner-case bugs and overruns found by fuzzing
+* FIX revise waitforinput in x11 terminal
+* FIX revise waitforinput and terminal close events in qt terminal
+* FIX revise waitforinput and new window events in monothreaded wxt terminal
+* FIX lua.trm compatibility with lua version 5.3
+* FIX error line reporting inside an if/else bracketed clause
+* FIX error in date conversion for times within a nanosecond of a year boundary
 
 CHANGES IN 5.2.5
 ================

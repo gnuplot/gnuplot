@@ -1,3 +1,8 @@
+2018-12-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/titlepag.tex src/version.c configure.ac RELEASE_NOTES:
+	Bump version to 2.6
+
 2018-11-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/time.c (ggmtime): Allow for round-off error in date conversion
