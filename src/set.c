@@ -3886,6 +3886,12 @@ set_pm3d()
 	    case S_PM3D_CLIP_4IN: /* "clip4$in" */
 		pm3d.clip = PM3D_CLIP_4IN;
 		continue;
+	    case S_PM3D_CLIPCB:
+		pm3d.no_clipcb = FALSE;
+		continue;
+	    case S_PM3D_NOCLIPCB:
+		pm3d.no_clipcb = TRUE;
+		continue;
 	    /* setup everything for plotting a map */
 	    case S_PM3D_MAP: /* "map" */
 		pm3d.where[0] = 'b'; pm3d.where[1] = 0; /* set pm3d at b */

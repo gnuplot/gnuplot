@@ -214,7 +214,9 @@ C
 #b Plot style `with boxes` can be used in 3D plots.
 #b 2D plot style `with arrows` is identical to `with vectors` except that each
 ## arrow is specified using x:y:length:angle rather than x:y:xdelta:ydelta
-#b Pm3d surfaces can have individual fillstyle and fillcolor
+#b pm3d surfaces can have individual fillstyle and fillcolor
+#b pm3d option `noclipcb` causes quadrangles with (palette color value < cbmin)
+## to be skipped rather than being drawn with color clipped to cbmin
 #b Customized contour line types. See `set cntrparam`.
 #end
 
@@ -12328,6 +12330,7 @@ Ffigure_multiple_keys
                   { flush { begin | center | end } }
                   { ftriangles | noftriangles }
                   { clip1in | clip4in }
+                  { {no}clipcb }
                   { corners2color
                     { mean|geomean|harmean|rms|median|min|max|c1|c2|c3|c4 }
                   }
@@ -12518,10 +12521,18 @@ Ffigure_multiple_keys
 4 clipping
 ?pm3d clipping
 ?set pm3d clipping
- Clipping with respect to x, y coordinates of quadrangles can be done in two
- ways.  `clip1in`: all 4 points of each quadrangle must be defined and at least
- 1 point of the quadrangle must lie in the x and y ranges.  `clip4in`: all 4
- points of each quadrangle must lie in the x and y ranges.
+?clipcb
+?pm3d clipcb
+?noclipcb
+?pm3d noclipcb
+ pm3d mode clipping with respect to x, y coordinates of quadrangles can be done
+ in two ways.
+ `clip1in`: all 4 points of each quadrangle must be defined and at least
+ 1 point of the quadrangle must lie in the x and y ranges.
+ `clip4in`: (default) all 4 points of the quadrangle must be in range.
+
+ `clipcb`: (default) palette color values < cbmin are clipped to cbmin.
+ `noclipcb`: quadrangles with palette color value < cbmin are not drawn at all.
 
 4 color_assignment
 ?pm3d color_assignment

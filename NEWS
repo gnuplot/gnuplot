@@ -8,6 +8,7 @@ Changes not in 5.2
 * NEW "splot ... with boxes"
 * NEW "plot ... with arrows"
 * NEW "set view projection {xz|yz}"
+* NEW "set pm3d noclipcb" will skip drawing quadrangles whose color is < cbmin
 * NEW per-plot fillcolor and fillstyle for pm3d surfaces
 * NEW allow separate color column with dgrid3d surfaces (but not color splines)
 * NEW unicode escape sequences \U+hhhh

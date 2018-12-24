@@ -502,6 +502,8 @@ const struct gen_table set_pm3d_tbl[] =
     { "noftr$iangles",	S_PM3D_NOFTRIANGLES },
     { "clip1$in",	S_PM3D_CLIP_1IN },
     { "clip4$in",	S_PM3D_CLIP_4IN },
+    { "clipcb", 	S_PM3D_CLIPCB },
+    { "noclipcb",	S_PM3D_NOCLIPCB },
     { "map", 		S_PM3D_MAP },
     { "bo$rder",	S_PM3D_BORDER },
     { "nobo$rder",	S_PM3D_NOBORDER },

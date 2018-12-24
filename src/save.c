@@ -912,6 +912,10 @@ set origin %g,%g\n",
     }
     fputs("\n", fp);
 
+    fprintf(fp, "set pm3d %s %s\n",
+		pm3d.clip == PM3D_CLIP_1IN ? "clip1in" : "clip4in",
+		pm3d.no_clipcb ? "noclipcb" : "");
+
     if (pm3d_shade.strength <= 0)
 	fputs("set pm3d nolighting\n",fp);
     else

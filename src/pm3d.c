@@ -755,6 +755,10 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		if (isnan(avgC))
 		    continue;
 
+		/* Option to not drawn quadrangles with cb < cbmin */
+		if (pm3d.no_clipcb && (avgC < CB_AXIS.min))
+		    continue;
+
 		if (color_from_rgbvar) /* we were given an RGB color */
 			gray = avgC;
 		else /* transform z value to gray, i.e. to interval [0,1] */
@@ -1024,6 +1028,7 @@ pm3d_reset()
     pm3d.flush = PM3D_FLUSH_BEGIN;
     pm3d.ftriangles = 0;
     pm3d.clip = PM3D_CLIP_4IN;
+    pm3d.no_clipcb = FALSE;
     pm3d.direction = PM3D_SCANS_AUTOMATIC;
     pm3d.base_sort = FALSE;
     pm3d.implicit = PM3D_EXPLICIT;
