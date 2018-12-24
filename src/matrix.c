@@ -232,11 +232,6 @@ Invert_RtR(double **R, double **I, int n)
     }
 }
 
-/* HBB 20010424: Functions that used to be here in matrix.c, but were
- * replaced by others and deleted, later.  But the
- * THIN_PLATE_SPLINES_GRID needed them, later, so they appeared in
- * plot3d.c, where they don't belong --> moved them back here. */
-
 void
 lu_decomp(double **a, int n, int *indx, double *d)
 {

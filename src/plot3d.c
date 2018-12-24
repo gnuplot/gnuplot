@@ -101,8 +101,6 @@ static struct udft_entry plot_func;
 
 int plot3d_num=0;
 
-/* HBB 20000508: moved these functions to the only module that uses them
- * so they can be turned 'static' */
 /*
  * sp_alloc() allocates a surface_points structure that can hold 'num_iso_1'
  * iso-curves with 'num_samp_2' samples and 'num_iso_2' iso-curves with

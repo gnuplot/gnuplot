@@ -409,8 +409,6 @@ gp_stradd(const char *a, const char *b)
     return new;
 }
 
-/* HBB 20020405: moved these functions here from axis.c, where they no
- * longer truly belong. */
 /*{{{  mant_exp - split into mantissa and/or exponent */
 /* HBB 20010121: added code that attempts to fix rounding-induced
  * off-by-one errors in 10^%T and similar output formats */

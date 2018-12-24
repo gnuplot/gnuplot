@@ -343,7 +343,6 @@ sortkeys()
     /* sort the array */
     /* note that it only moves objects of size (two pointers + long + int) */
     /* it moves no strings */
-    /* HBB 20010720: removed superfluous, potentially dangerous casts */
     qsort(keys, keycount, sizeof(KEY), keycomp);
 }
 

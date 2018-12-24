@@ -6366,9 +6366,6 @@ parse_label_options( struct text_label *this_label, int ndim)
 
     } /* while(!END_OF_COMMAND) */
 
-    /* HBB 20011120: this chunk moved here, behind the while()
-     * loop. Only after all options have been parsed it's safe to
-     * overwrite the position if none has been specified. */
     if (!set_position)
 	pos = default_position;
 

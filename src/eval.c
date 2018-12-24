@@ -30,10 +30,6 @@
  * to the extent permitted by applicable law.
 ]*/
 
-/* HBB 20010724: I moved several variables and functions from parse.c
- * to here, because they're involved with *evaluating* functions, not
- * with parsing them: evaluate_at(), fpe(), and fpe_env */
-
 #include "eval.h"
 
 #include "syscfg.h"

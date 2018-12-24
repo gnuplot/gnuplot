@@ -363,7 +363,7 @@ refresh_bounds(struct curve_points *first_plot, int nplots)
 
 
 /* current_plot->token is after datafile spec, for error reporting
- * it will later be moved passed title/with/linetype/pointtype
+ * it will later be moved past title/with/linetype/pointtype
  */
 static int
 get_data(struct curve_points *current_plot)
@@ -3301,21 +3301,14 @@ eval_plots()
 	    axis_array[FIRST_Y_AXIS].max = axis_array[SECOND_Y_AXIS].max;
     }
 
-    /* This call was in boundary(), called from do_plot(), but it caused
-     * logscaling problems if do_plot() itself was called for refresh
-     * rather than for plot/replot.  So we moved it here (June 2014)
-     * and added palette checks (March 2017).
+    /* This call cannot be in boundary(), called from do_plot(), because
+     * it would cause logscaling problems if do_plot() itself was called for
+     * refresh rather than for plot/replot.
      */
     set_plot_with_palette(0, MODE_PLOT);
     if (is_plot_with_palette())
 	set_cbminmax();
 
-    /* the following ~5 lines were moved from the end of the
-     * function to here, as do_plot calles term->text, which
-     * itself might process input events in mouse enhanced
-     * terminals. For redrawing to work, line capturing and
-     * setting the plot_num must already be done before
-     * entering do_plot(). Thu Jan 27 23:56:24 2000 (joze) */
     /* if we get here, all went well, so record this line for replot */
     if (plot_token != -1) {
 	/* note that m_capture also frees the old replot_line */

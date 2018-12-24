@@ -594,10 +594,6 @@ boundary(struct curve_points *plots, int count)
      * use widest_tics until tics are set up. Bit of a downer - let us
      * assume tics are 5 characters wide
      */
-    /* HBB 20001205: moved this block to before aspect_ratio is
-     * applied: setup_tics may extend the ranges, which would distort
-     * the aspect ratio */
-
     setup_tics(&axis_array[FIRST_X_AXIS], 20);
     setup_tics(&axis_array[SECOND_X_AXIS], 20);
 

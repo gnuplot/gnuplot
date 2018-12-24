@@ -1020,7 +1020,6 @@ igamma(double a, double x)
 
     /* Check value of factor arg */
     arg = a * log(x) - x - LGAMMA(a + 1.0);
-    /* HBB 20031006: removed a spurious check here */
     arg = gp_exp(arg);
 
     /* Choose infinite series or continued fraction. */
