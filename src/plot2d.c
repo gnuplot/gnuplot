@@ -1989,6 +1989,8 @@ eval_plots()
 		    int_error(c_token, "previous parametric function not fully specified");
 		if (sample_range_token !=0 && *name_str != '+')
 		    int_warn(sample_range_token, "Ignoring sample range in non-sampled data plot");
+		if (*name_str == '$' && !get_datablock(name_str))
+		    int_error(c_token-1, "cannot plot voxel data");
 
 		if (*tp_ptr)
 		    this_plot = *tp_ptr;

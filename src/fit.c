@@ -93,6 +93,7 @@
 #include "alloc.h"
 #include "axis.h"
 #include "command.h"
+#include "datablock.h"
 #include "datafile.h"
 #include "eval.h"
 #include "gp_time.h"
@@ -1672,6 +1673,10 @@ fit_command()
 	file_name = gp_strdup(file_name);
     else
 	Eexc(token2, "missing filename or datablock");
+
+    /* We accept a datablock but not a voxel grid */
+    if (*file_name == '$' && !get_datablock(file_name))
+	int_error(c_token-1, "cannot fit voxel data");
 
     /* use datafile module to parse the datafile and qualifiers */
     df_set_plot_mode(MODE_QUERY);  /* Does nothing except for binary datafiles */

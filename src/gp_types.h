@@ -47,6 +47,7 @@ enum DATA_TYPES {
 	STRING,
 	DATABLOCK,
 	ARRAY,
+	VOXELGRID,
 	NOTDEFINED,	/* exists, but value is currently undefined */
 	INVALID_VALUE,	/* used only for error return by external functions */
 	INVALID_NAME	/* used only to trap errors in linked axis function definition */
@@ -151,6 +152,7 @@ typedef struct value {
 	char *string_val;
 	char **data_array;
 	struct value *value_array;
+	struct vgrid *vgrid;
     } v;
 } t_value;
 

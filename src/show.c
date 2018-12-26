@@ -3088,27 +3088,36 @@ show_fontpath()
 	
 }
 
-/* show state of voxel grid */
+/* show state of all voxel grids */
 static void
 show_vgrid()
 {
 #ifdef VOXEL_GRID_SUPPORT
+    struct udvt_entry *udv;
+    vgrid *vgrid;
+
     SHOW_ALL_NL;
-    if (!current_vgrid) {
-	fprintf(stderr, "\tno voxel grid\n");
-	return;
-    } else {
-	fprintf(stderr, "\tvoxel grid %d X %d X %d\n",
-		current_vgrid->size, current_vgrid->size, current_vgrid->size);
+    for (udv = first_udv; udv != NULL; udv = udv->next_udv) {
+	if (udv->udv_value.type == VOXELGRID) {
+	    vgrid = udv->udv_value.v.vgrid;
+
+	    fprintf(stderr, "\t%s:", udv->udv_name);
+	    if (vgrid == current_vgrid)
+		fprintf(stderr, "\t(active)");
+	    fprintf(stderr, "\n");
+	    fprintf(stderr, "\t\tsize %d X %d X %d\n",
+		    vgrid->size, vgrid->size, vgrid->size);
+	    if (isnan(vgrid->vxmin) || isnan(vgrid->vxmax) || isnan(vgrid->vymin)
+	    ||  isnan(vgrid->vymax) || isnan(vgrid->vzmin) || isnan(vgrid->vzmax)) {
+		fprintf(stderr, "\t\tgrid ranges not set\n");
+	    } else {
+		fprintf(stderr, "\t\tvxrange [%g:%g]  vyrange[%g:%g]  vzrange[%g:%g]\n",
+		    vgrid->vxmin, vgrid->vxmax, vgrid->vymin,
+		    vgrid->vymax, vgrid->vzmin, vgrid->vzmax);
+	    }
+	}
     }
-    if (isnan(current_vgrid->vxmin) || isnan(current_vgrid->vxmax) || isnan(current_vgrid->vymin)
-    ||  isnan(current_vgrid->vymax) || isnan(current_vgrid->vzmin) || isnan(current_vgrid->vzmax)) {
-	fprintf(stderr, "\tgrid ranges not set\n");
-    } else {
-	fprintf(stderr, "\tvxrange [%g:%g]  vyrange[%g:%g]  vzrange[%g:%g]\n",
-	    current_vgrid->vxmin, current_vgrid->vxmax, current_vgrid->vymin,
-	    current_vgrid->vymax, current_vgrid->vzmin, current_vgrid->vzmax);
-    }
+
 #else
     int_error(NO_CARET, "this gnuplot does not support voxel grids");
 #endif

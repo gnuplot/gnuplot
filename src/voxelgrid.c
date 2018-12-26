@@ -93,6 +93,7 @@
 #include "alloc.h"
 #include "axis.h"
 #include "command.h"
+#include "datablock.h"
 #include "datafile.h"
 #include "eval.h"
 #include "graphics.h"
@@ -156,14 +157,32 @@ check_grid_ranges()
 
 /*
  * Initialize vgrid array
+ * set vgrid <name> {size <N>}
+ * - retrieve existing voxel grid or create a new one
+ * - initialize to N (defaults to N=100 for a new grid)
+ * - set current_vgrid to this grid.
  */
 void
 set_vgrid()
 {
+    struct udvt_entry *grid = NULL;
     int new_size = 100;		/* default size */
+    char *name;
 
-    /* FIXME: maintain a list of vgrids */
-    if (!current_vgrid) {
+    c_token++;
+    if (END_OF_COMMAND || !isletter(c_token+1))
+	int_error(c_token, "syntax: set vgrid $<gridname> {size N}");
+
+    /* Create or recycle a datablock with the requested name */
+    name = parse_datablock_name();
+    grid = add_udv_by_name(name);
+    if (grid->udv_value.type == VOXELGRID) {
+	/* Keep size of existing grid */
+	new_size = grid->udv_value.v.vgrid->size;
+	current_vgrid = grid->udv_value.v.vgrid;
+    } else {
+	/* The only other variable type that starts with a $ is DATABLOCK */
+	gpfree_datablock(&grid->udv_value);
 	current_vgrid = gp_alloc(sizeof(vgrid), "new vgrid");
 	memset(current_vgrid, 0, sizeof(vgrid));
 	current_vgrid->vxmin = not_a_number();
@@ -172,9 +191,10 @@ set_vgrid()
 	current_vgrid->vymax = not_a_number();
 	current_vgrid->vzmin = not_a_number();
 	current_vgrid->vzmax = not_a_number();
+	grid->udv_value.v.vgrid = current_vgrid;
+	grid->udv_value.type = VOXELGRID;
     }
 
-    c_token++;
     if (equals(c_token, "size")) {
 	c_token++;
 	new_size = int_expression();
@@ -184,11 +204,13 @@ set_vgrid()
     if (new_size < 10 || new_size > 256)
 	int_error(NO_CARET, "vgrid size must be an integer between 10 and 256");
 
-    /* Initialize storage for voxel grid */
-    current_vgrid->size = new_size;
-    current_vgrid->vdata = gp_realloc(current_vgrid->vdata,
+    /* Initialize storage for new voxel grid */
+    if (current_vgrid->size != new_size) {
+	current_vgrid->size = new_size;
+	current_vgrid->vdata = gp_realloc(current_vgrid->vdata,
 				    new_size*new_size*new_size*sizeof(t_voxel), "voxel array");
-    memset(current_vgrid->vdata, 0, new_size*new_size*new_size*sizeof(t_voxel));
+	memset(current_vgrid->vdata, 0, new_size*new_size*new_size*sizeof(t_voxel));
+    }
 
     /* Make sure there is a user variable that can be used as a parameter
      * to the function in the 5th spec of "vfill"
@@ -234,17 +256,61 @@ set_vgrid_range()
     }
 }
 
+udvt_entry *
+get_vgrid_by_name(char *name)
+{
+    struct udvt_entry *vgrid = get_udv_by_name(name);
+
+    if (!vgrid || vgrid->udv_value.type != VOXELGRID)
+	return NULL;
+    else 
+	return vgrid;
+}
+
 /*
  * initialize content of voxel grid to all zero
  */
 void
 vclear_command()
 {
+    vgrid *vgrid = current_vgrid;
+
     c_token++;
-    if (current_vgrid && current_vgrid->size && current_vgrid->vdata) {
-	int size = current_vgrid->size;
-	memset(current_vgrid->vdata, 0, size*size*size * sizeof(t_voxel));
+    if (!END_OF_COMMAND && equals(c_token, "$")) {
+	char *name = parse_datablock_name();
+	udvt_entry *vgrid_udv = get_vgrid_by_name(name);
+	if (!vgrid_udv)
+	    int_error(c_token, "no such voxel grid");
+	vgrid = vgrid_udv->udv_value.v.vgrid;
     }
+    if (vgrid && vgrid->size && vgrid->vdata) {
+	int size = vgrid->size;
+	memset(vgrid->vdata, 0, size*size*size * sizeof(t_voxel));
+    }
+}
+
+/* deallocate voxel grid */
+void
+unset_vgrid()
+{
+    struct udvt_entry *grid = NULL;
+    char *name;
+
+    if (END_OF_COMMAND || !equals(c_token,"$"))
+	int_error(c_token, "syntax: unset vgrid $<gridname>");
+
+    /* Look for a datablock with the requested name */
+    name = parse_datablock_name();
+    grid = get_vgrid_by_name(name);
+    if (!grid)
+	int_error(c_token, "no such vgrid");
+
+    if (grid->udv_value.v.vgrid == current_vgrid)
+	current_vgrid = NULL;
+
+    free(grid->udv_value.v.vgrid->vdata);
+    free(grid->udv_value.v.vgrid);
+    grid->udv_value.type = NOTDEFINED;
 }
 
 /*
@@ -404,7 +470,7 @@ vfill(t_voxel *grid)
 
 	/* We will invoke density_function in modify_voxels rather than df_readline */
 	if (use_spec[4].at == NULL)
-	    int_error(NO_CARET, "5th user spec to vfill must be a function");
+	    int_error(NO_CARET, "5th user spec to vfill must be an expression");
 	else {
 	    free_at(density_function);
 	    density_function = use_spec[4].at;
@@ -628,5 +694,6 @@ void set_vgrid_range()   { NO_SUPPORT; }
 void voxel_command()     { NO_SUPPORT; }
 void vfill_command()     { NO_SUPPORT; }
 void vclear_command()    {}
+void unset_vgrid()	 {}
 
 #endif /* no VOXEL_GRID_SUPPORT */

@@ -172,7 +172,7 @@ get_datablock(char *name)
     struct udvt_entry *datablock;
 
     datablock = get_udv_by_name(name);
-    if (!datablock || datablock->udv_value.type == NOTDEFINED
+    if (!datablock || datablock->udv_value.type != DATABLOCK
     ||  datablock->udv_value.v.data_array == NULL)
 	int_error(NO_CARET,"no datablock named %s",name);
 
@@ -279,3 +279,4 @@ append_multiline_to_datablock(struct value *datablock_value, const char *lines)
 	free((char *) lines);
     }
 }
+

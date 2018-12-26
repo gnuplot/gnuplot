@@ -42,6 +42,7 @@
 #include "variable.h"		/* For locale handling */
 #include "setshow.h"		/* for conv_text() */
 #include "tabulate.h"		/* for table_mode */
+#include "voxelgrid.h"
 #include "encoding.h"
 #if defined(_MSC_VER) || defined(__WATCOMC__)
 # include <io.h>		/* for _access */
@@ -1526,6 +1527,12 @@ value_to_str(struct value *val, TBOOLEAN need_quotes)
     case ARRAY:
 	{
 	sprintf(s[j], "<%d element array>", (int)(val->v.value_array->v.int_val));
+	break;
+	}
+    case VOXELGRID:
+	{
+	int N = val->v.vgrid->size;
+	sprintf(s[j], "%d x %d x %d voxel grid", N, N, N);
 	break;
 	}
     case NOTDEFINED:

@@ -1,6 +1,7 @@
 Changes not in 5.2
 ==================
 * NEW support for 64-bit integer arithmetic
+* NEW support for voxel grids
 * NEW plot ... with table if <expression>
 * NEW "set walls" command to show xy xz and yz planes in 3D plots
 * NEW "set clip radial" for line segments in polar mode plots

@@ -29,5 +29,7 @@ void vfill_command __PROTO((void));
 void f_voxel __PROTO((union argument *x));
 void set_vgrid __PROTO((void));
 void set_vgrid_range __PROTO((void));
+void unset_vgrid __PROTO((void));
+udvt_entry *get_vgrid_by_name __PROTO((char *name));
 
 #endif /* VOXELGRID_H */

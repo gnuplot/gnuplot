@@ -27,14 +27,14 @@ unset cbtics
 set cblabel "point density"
 
 # define 100 x 100 x 100 voxel grid
-set vgrid size 100
+set vgrid $vdensity size 100
 
 # load and read back a single voxel
 in = 123.4
 voxel(.11, .22, .33) = in
 out = voxel(.11, .22, .33)
 if (in != out) print "voxel read-back failed"
-vclear
+vclear $vdensity
 
 # fill a spherical region around each point in $random
 vfill $random using 1:2:3:(0.33):(1.0)
@@ -78,5 +78,10 @@ splot '++' using 1:(0):2:(voxel($1,0,$2)) with pm3d, \
       '++' using (0):1:2:(voxel(0,$1,$2)) with pm3d
 
 pause -1 "<cr> to continue"
+
+#
+# release storage space
+#
+unset vgrid $vdensity
 
 reset

@@ -38,6 +38,7 @@
 #include "command.h"
 #include "contour.h"
 #include "datafile.h"
+#include "datablock.h"
 #include "eval.h"
 #include "graph3d.h"
 #include "hidden3d.h"
@@ -49,6 +50,7 @@
 #include "tabulate.h"
 #include "util.h"
 #include "variable.h" /* For locale handling */
+#include "voxelgrid.h"
 
 #include "plot2d.h" /* Only for store_label() */
 
@@ -94,6 +96,10 @@ static void count_3dpoints __PROTO((struct surface_points *plot, int *nt, int *n
 
 /* helper functions for parsing */
 static void load_contour_label_options __PROTO((struct text_label *contour_label));
+
+typedef enum splot_component {
+	SP_FUNCTION, SP_DATAFILE, SP_DATABLOCK, SP_KEYENTRY, SP_VOXELGRID
+} splot_component;
 
 /* the curves/surfaces of the plot */
 struct surface_points *first_3dplot = NULL;
@@ -1460,6 +1466,7 @@ eval_3dplots()
 	} else {
 	    int specs = -1;
 	    struct surface_points *this_plot;
+	    splot_component this_component;
 
 	    char *name_str;
 	    TBOOLEAN duplication = FALSE;
@@ -1510,12 +1517,32 @@ eval_3dplots()
 	    else
 		strcpy(c_dummy_var[1], orig_dummy_v_var);
 
-	    /* Should this be saved in this_plot? */
+	    /* Determine whether this plot component is a
+	     *   function (name_str == NULL)
+	     *   data file (name_str is "filename")
+	     *   datablock (name_str is "$datablock")
+	     *   voxel grid (name_str is "$gridname")
+	     *   key entry (keyword 'keyentry')
+	     */
 	    dummy_func = &plot_func;
 	    name_str = string_or_express(NULL);
 	    dummy_func = NULL;
-	    if (name_str) {
-		/* data file to plot */
+	    if (equals(c_token, "keyentry"))
+		this_component = SP_KEYENTRY;
+	    else if (!name_str)
+		this_component = SP_FUNCTION;
+	    else if ((*name_str == '$') && get_vgrid_by_name(name_str))
+		this_component = SP_VOXELGRID;
+	    else if (*name_str == '$')
+		this_component = SP_DATABLOCK;
+	    else
+		this_component = SP_DATAFILE;
+
+	    switch (this_component) {
+
+	    case SP_DATAFILE:
+	    case SP_DATABLOCK:
+		/* data file or datablock to plot */
 		if (parametric && crnt_param != 0)
 		    int_error(c_token, "previous parametric function not fully specified");
 
@@ -1587,8 +1614,9 @@ eval_3dplots()
 		df_axis[0] = FIRST_X_AXIS;
 		df_axis[1] = FIRST_Y_AXIS;
 		df_axis[2] = FIRST_Z_AXIS;
+		break;
 
-	    } else if (equals(c_token, "keyentry")) {
+	    case SP_KEYENTRY:
 		c_token++;
 		plot_num++;
 		if (*tp_3d_ptr)
@@ -1601,9 +1629,9 @@ eval_3dplots()
 		this_plot->plot_type = KEYENTRY;
 		this_plot->plot_style = LABELPOINTS;
 		this_plot->token = end_token = c_token - 1;
+		break;
 
-	    } else {		/* function to plot */
-
+	    case SP_FUNCTION:
 		++plot_num;
 		if (parametric) {
 		    /* Rotate between x/y/z axes */
@@ -1637,8 +1665,12 @@ eval_3dplots()
 		/* ignore it for now */
 		some_functions = TRUE;
 		end_token = c_token - 1;
+		break;
 
-	    }			/* end of IS THIS A FILE OR A FUNC block */
+	    default:
+		int_error(c_token-1, "unrecognized data source");
+		break;
+	    } /* End of switch(this_component) */
 
 	    /* clear current title, if exist */
 	    if (this_plot->title) {
@@ -1649,7 +1681,7 @@ eval_3dplots()
 	    /* default line and point types */
 	    this_plot->lp_properties.l_type = line_num;
 	    this_plot->lp_properties.p_type = line_num;
-		this_plot->lp_properties.d_type = line_num;
+	    this_plot->lp_properties.d_type = line_num;
 
 	    /* user may prefer explicit line styles */
 	    this_plot->hidden3d_top_linetype = line_num;

@@ -203,19 +203,19 @@ C
 4 Support for 64-bit integer arithmetic
 #start
 #b All evaluation of expressions and functions uses 64-integer arithmetic if
-##supported by the platform.
+## supported by the platform.
 #b Integer overflow is detected and handled according to user preference.
-##See `overflow`.
+## See `overflow`.
 #end
 
 4 Voxel grids
 #start
-#b `set vgrid size N` creates an NxNxN grid of voxels.
+#b `set vgrid $gridname size N` creates an NxNxN grid of voxels.
 #b `voxel(x,y,z)` can be used in expressions to read or write an individual voxel.
-#b `vfill DATA_SOURCE using x:y:z:radius:(density_function)` acts analogously to
+#b `vfill DATA_SOURCE using x:y:z:radius:(<expression>)` acts analogously to
 ## a plot command except that instead of plotting it increments voxels near each
 ## point in the input data.
-#b `vclear` resets an existing voxel grid to contain all zero values.
+#b `vclear $gridname` resets an existing voxel grid to contain all zero values.
 #b voxel values can be used to assign color or other properties in `splot` commands
 ## by using the `voxel` function in using specifiers.
 #end
@@ -235,8 +235,9 @@ C
 
 4 New commands and command options
 ?new commands
-#startA
-#b Voxel grid commands. See `set vgrid`, `set vxrange`, `vfill`, `vclear`, `voxel`.
+#start
+#b Voxel grid commands. See `set vgrid`, `set vxrange`, `vclear`, `vfill`,
+## and `voxel`.
 #b New options for showing the xy xz and yz planes in 3D plots.
 ##See `set walls`, `set grid vertical`.
 #b `set table separator {tab|comma|"char"}` can be used to create csv files.
@@ -1969,8 +1970,16 @@ C marker below is used to signal this to doc2html:
 
 #value("name") & string & returns the value of the named variable.\\
 %value("name")@string@returns the current value of the named variable.
+4 voxel
+?expressions functions voxel
+?voxel
+#voxel(x,y,z) & real & value of the active grid voxel containing point (x,y,z)\\
+%voxel(x,y,z)@real@value of the active grid voxel containing point (x,y,z)
+ The function voxel(x,y,z) returns the value of the voxel in the currently
+ active grid that contains the point (x,y,z).  It may also be used on the
+ left side of an assignment statement to set the value of that voxel.
+ E.g. voxel(x,y,z) = 0.0
 @end table
-
 4 elliptic integrals
 ?elliptic integrals
 =elliptic integrals
@@ -14059,6 +14068,24 @@ Ffigure_multiple_keys
  When the `long` option is given, it also lists the operating system, the
  compilation options used when `gnuplot` was installed, the location of the
  help file, and (again) the useful email addresses.
+3 vgrid
+?commands set vgrid
+?set vgrid
+?unset vgrid
+?show vgrid
+?vgrid
+ Syntax:
+      set vgrid $gridname {size N}
+      unset vgrid $gridname
+      show vgrid
+
+ If the named grid already exists, mark it as active (use it for subsequent
+ `vfill` and `voxel` operations).  If a new size is given, replace the existing
+ content with a zero-filled N x N x N grid.  If a grid with this name does not
+ already exist, allocate an N x N x N grid (default N=100), zero the contents,
+ and mark it as active.  Note that grid names must begin with '$'.
+
+ `show vgrid` lists all currently defined voxel grids.
 3 view
 ?commands set view
 ?commands show view
@@ -14153,6 +14180,27 @@ Ffigure_multiple_keys
  1) `splot` in parametric mode. See `set parametric`, `set isosamples`.
  2) generating 2-dimension sampled data for either `plot` or `splot` using the
  pseudofile "++". See `sampling 2D`.
+3 vxrange
+?commands set vxrange
+?set vxrange
+?vxrange
+ Syntax:      set vxrange [vxmin:vxmax]
+
+ Establishes the range of x coordinates spanned by the active voxel grid.
+ Analogous commands `set vyrange` and `set vzrange` exist for the other two
+ dimensions of the voxel grid.  If no explicit ranges have been set prior to
+ the first `vclear`, `vfill`, or `voxel(x,y,z) = ` command, vmin and vmax
+ will be copied from the current values of `xrange`.
+3 vyrange
+?commands set vyrange
+?set vyrange
+?vyrange
+ See `set vxrange`
+3 vzrange
+?commands set vzrange
+?set vzrange
+?vzrange
+ See `set vxrange`
 3 walls
 ?commands set walls
 ?commands show walls
@@ -15833,6 +15881,44 @@ Ffigure_walls
 ?commands update
 ?update
  Note: This command is DEPRECATED.  Use `save fit` instead.
+2 vclear
+?commands vclear
+?vclear
+ Syntax:
+      vclear {$gridname}
+ Resets the value of all voxels in an existing grid to zero.
+ If no grid name is given, clears the currently active grid.
+2 vfill
+?commands vfill
+?vfill
+ Syntax:
+      vfill FILE using x:y:z:radius:(<expression>)
+
+ The `vfill` command acts analogously to a `plot` command except that instead
+ of creating a plot it modifies voxels in the currently active voxel grid.
+ For each point read from the input file, the voxel containing that point and
+ also all other voxels within a sphere of given radius centered about (x,y,z)
+ are incremented as follows:
+#start
+#b user variable VoxelDistance is set to the distance from (x,y,z) to that
+## voxel's grid coordinates (vx,vy,vz).
+#b The expression provided in the 5th `using` specifier is evaluated.
+## This expression can use the new value of VoxelDistance.
+#b voxel(vx,vy,vz) += result of evaluating <expression>
+#end
+ Example:
+      vfill "file.dat" using 1:2:3:(3.0):(1.0)
+ This command adds 1 to the value of every voxel within a sphere of radius 3.0
+ around each point in file.dat.
+
+ Example:
+      vfill "file.dat" using 1:2:3:4:(VoxelDistance < 1 ? 1 : 1/VoxelDistance)
+ This command modifies all voxels in a sphere whose radius is determined for
+ each point by the content of column 4.  The increment added to a voxel
+ decreases with its distance from the data point.
+
+ Note that `vfill` always increments existing values in the current voxel grid.
+ To reset them to zero, use `vclear`.
 2 While
 ?while
 ?commands while

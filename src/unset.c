@@ -137,7 +137,6 @@ static void unset_ticslevel __PROTO((void));
 static void unset_timefmt __PROTO((void));
 static void unset_timestamp __PROTO((void));
 static void unset_view __PROTO((void));
-static void unset_vgrid __PROTO((void));
 static void unset_zero __PROTO((void));
 static void unset_timedata __PROTO((AXIS_INDEX));
 static void unset_range __PROTO((AXIS_INDEX));
@@ -1706,19 +1705,6 @@ unset_view()
     azimuth = 0.0;
 }
 
-
-/* deallocate voxel grid */
-static void
-unset_vgrid()
-{
-#ifdef VOXEL_GRID_SUPPORT
-    if (current_vgrid) {
-	free(current_vgrid->vdata);
-	current_vgrid = NULL;
-    }
-#endif
-}
-
 /* process 'unset zero' command */
 static void
 unset_zero()
@@ -2004,7 +1990,6 @@ reset_command()
     unset_contour();
     unset_cntrparam();
     unset_cntrlabel();
-    unset_vgrid();
     unset_zero();
     unset_dgrid3d();
     unset_ticslevel();
