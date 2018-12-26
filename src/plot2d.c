@@ -3500,6 +3500,7 @@ parse_plot_title(struct curve_points *this_plot, char *xtitle, char *ytitle, TBO
 		/* FIXME: or this code could go into eval_plots() so that    */
 		/*        function and data plots are treated the same way.  */
 		if (this_plot->plot_type == FUNC || this_plot->plot_type == FUNC3D
+		||  this_plot->plot_type == VOXELDATA
 		||  this_plot->plot_type == KEYENTRY) {
 		    struct value a;
 		    evaluate_at(df_plot_title_at, &a);

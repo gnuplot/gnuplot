@@ -799,6 +799,7 @@ del_udv_by_name(char *key, TBOOLEAN wildcard)
 	    gpfree_array(&(udv_ptr->udv_value));
 	    gpfree_string(&(udv_ptr->udv_value));
 	    gpfree_datablock(&(udv_ptr->udv_value));
+	    gpfree_vgrid(udv_ptr);
 	    udv_ptr->udv_value.type = NOTDEFINED;
 	    break;
 	}
@@ -808,6 +809,7 @@ del_udv_by_name(char *key, TBOOLEAN wildcard)
 	    gpfree_array(&(udv_ptr->udv_value));
 	    gpfree_string(&(udv_ptr->udv_value));
 	    gpfree_datablock(&(udv_ptr->udv_value));
+	    gpfree_vgrid(udv_ptr);
 	    udv_ptr->udv_value.type = NOTDEFINED;
 	    /* no break - keep looking! */
 	}

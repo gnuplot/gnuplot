@@ -209,15 +209,26 @@ C
 #end
 
 4 Voxel grids
+?voxel-grids
+ Gnuplot now supports operations based on 3D grids of voxel data.
+
 #start
 #b `set vgrid $gridname size N` creates an NxNxN grid of voxels.
+#b `set vxrange [vxmin:vxmax]` together with `set vyrange` and `set vzrange`
+## define which region of space the grid occupies.  This may or may not be
+## identical to the xyz range of the plot.
 #b `voxel(x,y,z)` can be used in expressions to read or write an individual voxel.
 #b `vfill DATA_SOURCE using x:y:z:radius:(<expression>)` acts analogously to
 ## a plot command except that instead of plotting it increments voxels near each
 ## point in the input data.
 #b `vclear $gridname` resets an existing voxel grid to contain all zero values.
-#b voxel values can be used to assign color or other properties in `splot` commands
+#b the current contents of one or more voxel grids can be referenced by
+## `splot` commands to assign colors or other properties of plot elements
 ## by using the `voxel` function in using specifiers.
+## See demo `voxel.dem`.
+#b voxel grids can also be plotted by name in `splot` commands, with each voxel
+## above a threshold value being represented as a separate dot or point.
+## See demo `vplot.dem`.
 #end
 
 4 New plot styles and style options
@@ -10247,8 +10258,8 @@ Ffigure_missing
  offset to the coordinates of these superimposed points that spreads them into a
  cluster.  The threshold value for treating the points as being overlapped may
  be specified in character widths or any of the usual coordinate options.
- See `coordinates`.  Jitter affects only 2D plot styles `with points` and
- `with impulses`.
+ See `coordinates`.  Jitter affects 2D plot styles `with points` and
+ `with impulses`.  It also affects 3D plotting of voxel grids.
 
  The default jittering operation displaces points only along x.
  This produces a distinctive pattern sometimes called a "bee swarm plot".
@@ -10266,7 +10277,12 @@ Ffigure_missing
  font size, canvas size, or zoom factor.  To avoid this you can specify the
  overlap criterion in the y axis coordinate system (the `first` keyword) and
  adjust the point size and spread multiplier as appropriate.
- See `coordinates`, `pointsize`, `jitter`.
+ See `coordinates`, `pointsize`.
+
+ `set jitter` is also useful in 3D plots of voxel data.  Because voxel grids
+ are regular lattices of evenly spaced points, many view angles cause points
+ to overlap and/or generate Moiré patterns.  These artifacts can be removed
+ by displacing the symbol drawn at each grid point by a random amount.
 3 key
 ?commands set key
 ?commands unset key
@@ -14086,6 +14102,16 @@ Ffigure_multiple_keys
  and mark it as active.  Note that grid names must begin with '$'.
 
  `show vgrid` lists all currently defined voxel grids.
+ Example output:
+       $vgrid1: (active)
+                size 100 X 100 X 100
+                vxrange [-4:4]  vyrange[-4:4]  vzrange[-4:4]
+                non-zero voxel values:  min 0.061237 max 94.5604
+                number of zero voxels:  992070   (99.21%)
+
+ `unset vgrid $gridname` releases all data structures associated with that
+ voxel grid.
+
 3 view
 ?commands set view
 ?commands show view
@@ -15256,6 +15282,7 @@ Ffigure_walls
        splot {<ranges>}
              {<iteration>}
              <function> | {{<file name> | <datablock name>} {datafile-modifiers}}
+                        | <voxelgridname>
                         | keyentry
              {<title-spec>} {with <style>}
              {, {definitions{,}} <function> ...}
@@ -15264,6 +15291,10 @@ Ffigure_walls
  a data file, or stored previously in a named data block.  Data file names
  are usually provided as a quoted string.  The function can be a mathematical
  expression, or a triple of mathematical expressions in parametric mode.
+
+ A new feature in version 5.3 is that `splot` can operate on voxel data.
+ See `voxel-grids`, `set vgrid`, `vxrange`.  At present voxel grids can only
+ be plotted using styles `with dots` or `with points`.
 
  By default `splot` draws the xy plane completely below the plotted data.
  The offset between the lowest ztic and the xy plane can be changed by `set
@@ -15569,6 +15600,25 @@ Ffigure_walls
  base.  The base projections of the contour lines may be written to a
  file, and then read with `plot`, to take advantage of `plot`'s additional
  formatting capabilities.
+3 voxel-grid
+?commands splot voxel-grid
+?splot voxel-grid
+?voxel-grid
+ Syntax:
+      splot $voxelgridname with {dots|points} {above <threshold>} ...
+
+ Voxel data can be plotted as dots or points using the syntax shown.
+ Color/pointtype/linewidth properties can be appended as usual.
+ A point is drawn for every voxel whose value is greater than the
+ threshold value (default threshold = 0).
+
+ At many view angles the voxel grid points will occlude each other or create
+ Moiré artifacts on the display. These effects can be avoided by introducing
+ jitter so that the displayed dot or point is displaced randomly from the
+ true voxel grid coordinate. See `set jitter`.
+
+ See demo `vplot.dem`.
+
 2 stats (Statistical Summary)
 ?commands stats
 ?stats

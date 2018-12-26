@@ -1572,6 +1572,7 @@ eval_3dplots()
 		this_plot->plot_type = DATA3D;
 		this_plot->plot_style = data_style;
 		eof_during_iteration = FALSE;
+		this_plot->opt_out_of_hidden3d = FALSE;
 
 		/* Mechanism for deferred evaluation of plot title */
 		free_at(df_plot_title_at);
@@ -1632,7 +1633,7 @@ eval_3dplots()
 		break;
 
 	    case SP_FUNCTION:
-		++plot_num;
+		plot_num++;
 		if (parametric) {
 		    /* Rotate between x/y/z axes */
 		    /* +2 same as -1, but beats -ve problem */
@@ -1661,18 +1662,35 @@ eval_3dplots()
 		this_plot->plot_type = FUNC3D;
 		this_plot->has_grid_topology = TRUE;
 		this_plot->plot_style = func_style;
+		this_plot->opt_out_of_hidden3d = FALSE;
 		this_plot->num_iso_read = iso_samples_2;
 		/* ignore it for now */
 		some_functions = TRUE;
 		end_token = c_token - 1;
 		break;
 
+	    case SP_VOXELGRID:
+		plot_num++;
+		if (*tp_3d_ptr)
+		    this_plot = *tp_3d_ptr;
+		else {
+		    /* No actual space is needed since we will not store data */
+		    this_plot = sp_alloc(0, 0, 0, 0);
+		    *tp_3d_ptr = this_plot;
+		}
+		this_plot->vgrid = get_vgrid_by_name(name_str)->udv_value.v.vgrid;
+		this_plot->plot_type = VOXELDATA;
+		this_plot->opt_out_of_hidden3d = TRUE;
+		this_plot->token = end_token = c_token - 1;
+		break;
+
 	    default:
 		int_error(c_token-1, "unrecognized data source");
 		break;
+
 	    } /* End of switch(this_component) */
 
-	    /* clear current title, if exist */
+	    /* clear current title, if it exists */
 	    if (this_plot->title) {
 		free(this_plot->title);
 		this_plot->title = NULL;
@@ -1689,9 +1707,6 @@ eval_3dplots()
 		lp_use_properties(&this_plot->lp_properties, line_num+1);
 	    else
 		load_linetype(&this_plot->lp_properties, line_num+1);
-
-	    /* We may have cleared these previously? Anyhow it doesn't hurt. */
-	    this_plot->opt_out_of_hidden3d = FALSE;
 
 	    /* pm 25.11.2001 allow any order of options */
 	    while (!END_OF_COMMAND || !checked_once) {
@@ -1741,6 +1756,15 @@ eval_3dplots()
 			c_token++;
 			if (get_pm3d_at_option(&this_plot->pm3d_where[0]))
 			    return; /* error */
+			}
+		    }
+
+		    if ((this_plot->plot_type == VOXELDATA)
+		    &&  (this_plot->plot_style == DOTS || this_plot->plot_style == POINTSTYLE)) {
+			this_plot->iso_level = 0.0;
+			if (equals(c_token, "above")) {
+			    c_token++;
+			    this_plot->iso_level = real_expression();
 			}
 		    }
 
@@ -2061,7 +2085,7 @@ eval_3dplots()
 			strcpy(this_plot->pm3d_where, first_dataset->pm3d_where);
 
 		    /* okay, we have read a surface */
-		    ++plot_num;
+		    plot_num++;
 		    tp_3d_ptr = &(this_plot->next_sp);
 		    if (df_return == DF_EOF)
 			break;
@@ -2114,10 +2138,29 @@ eval_3dplots()
 
 		/*}}} */
 
-	    } else {		/* not a data file */
+	    } else if (this_plot->plot_type == FUNC3D
+		   ||  this_plot->plot_type == KEYENTRY
+		   ||  this_plot->plot_type == NODATA) {
 		tp_3d_ptr = &(this_plot->next_sp);
 		this_plot->token = c_token;	/* store for second pass */
 		this_plot->iteration = plot_iterator ? plot_iterator->iteration : 0;
+
+	    } else if (this_plot->plot_type == VOXELDATA){
+		/* voxel data in an active vgrid must already be present */
+		tp_3d_ptr = &(this_plot->next_sp);
+		this_plot->token = c_token;	/* store for second pass */
+		this_plot->iteration = plot_iterator ? plot_iterator->iteration : 0;
+		/* FIXME: I worry that a autoscales b and b autoscales a */
+		autoscale_one_point((&axis_array[FIRST_X_AXIS]), this_plot->vgrid->vxmin);
+		autoscale_one_point((&axis_array[FIRST_X_AXIS]), this_plot->vgrid->vxmax);
+		autoscale_one_point((&axis_array[FIRST_Y_AXIS]), this_plot->vgrid->vymin);
+		autoscale_one_point((&axis_array[FIRST_Y_AXIS]), this_plot->vgrid->vymax);
+		autoscale_one_point((&axis_array[FIRST_Z_AXIS]), this_plot->vgrid->vzmin);
+		autoscale_one_point((&axis_array[FIRST_Z_AXIS]), this_plot->vgrid->vzmax);
+
+	    } else {
+		int_error(NO_CARET, "unexpected plot_type %d at plot3d:%d\n",
+			this_plot->plot_type, __LINE__);
 	    }
 
 	    SKIPPED_EMPTY_FILE:
@@ -2498,7 +2541,7 @@ eval_3dplots()
 		process_image(this_plot, IMG_UPDATE_CORNERS);
 
 		/* Advance over the phantom */
-		++plot_num;
+		plot_num++;
 		this_plot = this_plot->next_sp;
 	    }
 	    this_plot = this_plot->next_sp;
@@ -2519,7 +2562,7 @@ eval_3dplots()
 	plot_token = -1;
 	fill_gpval_string("GPVAL_LAST_PLOT", replot_line);
     }
-/* record that all went well */
+    /* record that all went well */
     plot3d_num=plot_num;
 
     /* perform the plot */

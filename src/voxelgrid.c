@@ -97,6 +97,7 @@
 #include "datafile.h"
 #include "eval.h"
 #include "graphics.h"
+#include "graph3d.h"
 #include "parse.h"
 #include "util.h"
 #include "variable.h"
@@ -104,17 +105,32 @@
 
 #ifdef VOXEL_GRID_SUPPORT
 
-vgrid *current_vgrid = NULL;			/* active voxel grid */
-struct udvt_entry *udv_VoxelDistance = NULL;	/* reserved user variable */
+static vgrid *current_vgrid = NULL;			/* active voxel grid */
+static struct udvt_entry *udv_VoxelDistance = NULL;	/* reserved user variable */
 
 /* Internal prototypes */
 static void vfill( t_voxel *grid );
 static void modify_voxels( t_voxel *grid, double x, double y, double z,
 			    double radius, struct at_type *function );
+static void vgrid_stats( vgrid *vgrid );
 
 /* Purely local bookkeeping */
 static int nvoxels_modified;
 static struct at_type *density_function = NULL;
+
+/*
+ * called on program entry and by "reset session"
+ */
+void
+init_voxelsupport()
+{
+    /* Make sure there is a user variable that can be used as a parameter
+     * to the function in the 5th spec of "vfill".
+     * Scripts can test if (exists("VoxelDistance")) to check for voxel support.
+     */
+    udv_VoxelDistance = add_udv_by_name("VoxelDistance");
+    udv_VoxelDistance->udv_value.type = CMPLX;
+}
 
 /*
  * vx vy vz ranges must be established before the grid can be used
@@ -212,10 +228,6 @@ set_vgrid()
 	memset(current_vgrid->vdata, 0, new_size*new_size*new_size*sizeof(t_voxel));
     }
 
-    /* Make sure there is a user variable that can be used as a parameter
-     * to the function in the 5th spec of "vfill"
-     */
-    udv_VoxelDistance = add_udv_by_name("VoxelDistance");
 }
 
 /*
@@ -256,6 +268,83 @@ set_vgrid_range()
     }
 }
 
+/*
+ * show state of all voxel grids
+ */
+void
+show_vgrid()
+{
+    struct udvt_entry *udv;
+    vgrid *vgrid;
+
+    for (udv = first_udv; udv != NULL; udv = udv->next_udv) {
+	if (udv->udv_value.type == VOXELGRID) {
+	    vgrid = udv->udv_value.v.vgrid;
+
+	    fprintf(stderr, "\t%s:", udv->udv_name);
+	    if (vgrid == current_vgrid)
+		fprintf(stderr, "\t(active)");
+	    fprintf(stderr, "\n");
+	    fprintf(stderr, "\t\tsize %d X %d X %d\n",
+		    vgrid->size, vgrid->size, vgrid->size);
+	    if (isnan(vgrid->vxmin) || isnan(vgrid->vxmax) || isnan(vgrid->vymin)
+	    ||  isnan(vgrid->vymax) || isnan(vgrid->vzmin) || isnan(vgrid->vzmax)) {
+		fprintf(stderr, "\t\tgrid ranges not set\n");
+		continue;
+	    }
+	    fprintf(stderr, "\t\tvxrange [%g:%g]  vyrange[%g:%g]  vzrange[%g:%g]\n",
+		vgrid->vxmin, vgrid->vxmax, vgrid->vymin,
+		vgrid->vymax, vgrid->vzmin, vgrid->vzmax);
+	    vgrid_stats(vgrid);
+	    fprintf(stderr, "\t\tnon-zero voxel values:  min %.2g max %.2g  mean %.2g\n",
+		vgrid->min_value, vgrid->max_value, vgrid->mean_value);
+	    fprintf(stderr, "\t\tnumber of zero voxels:  %d   (%.2f%%)\n",
+		vgrid->nzero,
+		100. * (double)vgrid->nzero / (vgrid->size*vgrid->size*vgrid->size));
+	}
+    }
+}
+
+/*
+ * run through the whole grid
+ * accumulate min/max values
+ * TODO: mean median stddev
+ */
+static void
+vgrid_stats(vgrid *vgrid)
+{
+    double min = VERYLARGE;
+    double max = -VERYLARGE;
+    double sum = 0;		/* FIXME: long double? */
+    int nzero = 0;
+    t_voxel *voxel;
+    int N = vgrid->size;
+    int i;
+
+    for (voxel = vgrid->vdata, i=0; i < N*N*N; voxel++, i++) {
+	if (*voxel == 0) {
+	    nzero++;
+	    continue;
+	}
+	sum += *voxel;
+	if (min > *voxel)
+	    min = *voxel;
+	if (max < *voxel)
+	    max = *voxel;
+    }
+
+    vgrid->min_value = min;
+    vgrid->max_value = max;
+    vgrid->nzero = nzero;
+    vgrid->mean_value = sum / (double)(N*N*N - nzero);
+
+    /* all zeros */
+    if (nzero == N*N*N) {
+	vgrid->min_value = 0;
+	vgrid->max_value = 0;
+    }
+}
+
 udvt_entry *
 get_vgrid_by_name(char *name)
 {
@@ -289,7 +378,23 @@ vclear_command()
     }
 }
 
-/* deallocate voxel grid */
+/*
+ * deallocate storage for a voxel grid
+ */
+void
+gpfree_vgrid(struct udvt_entry *grid)
+{
+    if (grid->udv_value.type != VOXELGRID)
+	return;
+    free(grid->udv_value.v.vgrid->vdata);
+    free(grid->udv_value.v.vgrid);
+    grid->udv_value.v.vgrid = NULL;
+    grid->udv_value.type = NOTDEFINED;
+}
+
+/*
+ * 'unset $vgrid' command
+ */
 void
 unset_vgrid()
 {
@@ -308,9 +413,7 @@ unset_vgrid()
     if (grid->udv_value.v.vgrid == current_vgrid)
 	current_vgrid = NULL;
 
-    free(grid->udv_value.v.vgrid->vdata);
-    free(grid->udv_value.v.vgrid);
-    grid->udv_value.type = NOTDEFINED;
+    gpfree_vgrid(grid);
 }
 
 /*
@@ -392,7 +495,7 @@ f_voxel(union argument *arg)
 
     N = current_vgrid->size;
     voxel = current_vgrid->vdata[ ivx + ivy * N + ivz * N*N ];
-    push( Gcomplex(&a, (double)voxel, 0.0) );
+    push( Gcomplex(&a, voxel, 0.0) );
     return;
 }
 
@@ -650,9 +753,17 @@ modify_voxels( t_voxel *grid, double x, double y, double z,
     /* The iteration covers a cube rather than a sphere */
     evaluate_inside_using = TRUE;
     for (ix = ivx - nvx; ix <= ivx + nvx; ix++) {
+	if (ix < 0 || ix >= N)
+	    continue;
 	for (iy = ivy - nvy; iy <= ivy + nvy; iy++) {
+	    if (iy < 0 || iy >= N)
+		continue;
 	    for (iz = ivz - nvz; iz <= ivz + nvz; iz++) {
-		int index = ix + iy * N + iz * N*N;
+		int index;
+
+		if (iz < 0 || iz >= N)
+		    continue;
+		index = ix + iy * N + iz * N*N;
 		if (index < 0 || index > N*N*N)
 		    continue;
 		voxel = &current_vgrid->vdata[index];
@@ -683,17 +794,23 @@ modify_voxels( t_voxel *grid, double x, double y, double z,
 
     return;
 }
+
 #endif /* VOXEL_GRID_SUPPORT */
 
 #ifndef VOXEL_GRID_SUPPORT
 # define NO_SUPPORT int_error(NO_CARET, "this gnuplot does not support voxel grids")
 
-void check_grid_ranges() { NO_SUPPORT; }
-void set_vgrid()         { NO_SUPPORT; }
-void set_vgrid_range()   { NO_SUPPORT; }
-void voxel_command()     { NO_SUPPORT; }
-void vfill_command()     { NO_SUPPORT; }
-void vclear_command()    {}
-void unset_vgrid()	 {}
+void check_grid_ranges()  { NO_SUPPORT; }
+void set_vgrid()          { NO_SUPPORT; }
+void set_vgrid_range()    { NO_SUPPORT; }
+void show_vgrid()         { NO_SUPPORT; }
+void voxel_command()      { NO_SUPPORT; }
+void vfill_command()      { NO_SUPPORT; }
+void vclear_command()     {}
+void unset_vgrid()	  {}
+void init_voxelsupport()  {}
+
+udvt_entry *get_vgrid_by_name(char *c) { return NULL; }
+void gpfree_vgrid(struct udvt_entry *x) {}
 
 #endif /* no VOXEL_GRID_SUPPORT */

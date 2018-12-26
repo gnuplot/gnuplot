@@ -111,6 +111,9 @@ typedef struct surface_points {
     int has_grid_topology;
     int iteration;		/* needed for tracking iteration */
 
+    struct vgrid *vgrid;	/* used only for voxel plots */
+    double iso_level;		/* used only for voxel plots */
+
     /* Data files only - num of isolines read from file. For functions,  */
     /* num_iso_read is the number of 'primary' isolines (in x direction) */
     int num_iso_read;

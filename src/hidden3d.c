@@ -1049,11 +1049,11 @@ build_networks(struct surface_points *plots, int pcount)
 	if (this_plot->plot_type == NODATA || this_plot->plot_type == KEYENTRY)
 	    continue;
 
-	crvlen = this_plot->iso_crvs->p_count;
-
 	/* Allow individual plots to opt out of hidden3d calculations */
 	if (this_plot->opt_out_of_hidden3d)
 	    continue;
+
+	crvlen = this_plot->iso_crvs->p_count;
 
 	/* register maximal isocurve length. Only necessary for
 	 * grid-topology plots that will create polygons, so I can do

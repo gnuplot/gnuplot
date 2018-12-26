@@ -45,6 +45,7 @@
 #include "util.h"
 #include "variable.h"
 #include "version.h"
+#include "voxelgrid.h"
 #include "encoding.h"
 
 #include <signal.h>
@@ -763,6 +764,9 @@ init_session()
 
 	/* Reset program variables not handled by 'reset' */
 	overflow_handling = INT64_OVERFLOW_TO_FLOAT;
+
+	/* Reset voxel data structures if supported */
+	init_voxelsupport();
 
 	/* Make sure all variables start in the same state 'reset'
 	 * would set them to.

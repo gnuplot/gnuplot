@@ -157,7 +157,6 @@ static void show_timefmt __PROTO((void));
 static void show_locale __PROTO((void));
 static void show_loadpath __PROTO((void));
 static void show_fontpath __PROTO((void));
-static void show_vgrid __PROTO((void));
 static void show_zero __PROTO((void));
 static void show_datafile __PROTO((void));
 static void show_table __PROTO((void));
@@ -3086,41 +3085,6 @@ show_fontpath()
     fprintf(stderr, "\tenvironmental variable GNUPLOT_FONTPATH: %s\n",
 	env_fontpath ? env_fontpath : "none");
 	
-}
-
-/* show state of all voxel grids */
-static void
-show_vgrid()
-{
-#ifdef VOXEL_GRID_SUPPORT
-    struct udvt_entry *udv;
-    vgrid *vgrid;
-
-    SHOW_ALL_NL;
-    for (udv = first_udv; udv != NULL; udv = udv->next_udv) {
-	if (udv->udv_value.type == VOXELGRID) {
-	    vgrid = udv->udv_value.v.vgrid;
-
-	    fprintf(stderr, "\t%s:", udv->udv_name);
-	    if (vgrid == current_vgrid)
-		fprintf(stderr, "\t(active)");
-	    fprintf(stderr, "\n");
-	    fprintf(stderr, "\t\tsize %d X %d X %d\n",
-		    vgrid->size, vgrid->size, vgrid->size);
-	    if (isnan(vgrid->vxmin) || isnan(vgrid->vxmax) || isnan(vgrid->vymin)
-	    ||  isnan(vgrid->vymax) || isnan(vgrid->vzmin) || isnan(vgrid->vzmax)) {
-		fprintf(stderr, "\t\tgrid ranges not set\n");
-	    } else {
-		fprintf(stderr, "\t\tvxrange [%g:%g]  vyrange[%g:%g]  vzrange[%g:%g]\n",
-		    vgrid->vxmin, vgrid->vxmax, vgrid->vymin,
-		    vgrid->vymax, vgrid->vzmin, vgrid->vzmax);
-	    }
-	}
-    }
-
-#else
-    int_error(NO_CARET, "this gnuplot does not support voxel grids");
-#endif
 }
 
 /* process 'show zero' command */

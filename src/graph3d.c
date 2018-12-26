@@ -58,6 +58,7 @@
 #include "term_api.h"
 #include "util3d.h"
 #include "util.h"
+#include "vplot.h"
 
 #include "pm3d.h"
 #include "plot3d.h"
@@ -1070,8 +1071,23 @@ do_3dplot(
 	    }
 	    term_apply_lp_properties(&(this_plot->lp_properties));
 
+	    /* Voxel data is a special case.
+	     * what about hidden3d mode? pm3d?
+	     */
+	    if (!key_pass && this_plot->plot_type == VOXELDATA) {
+		switch (this_plot->plot_style) {
+		default:
+		    /* style should default to DOTS */
+		    this_plot->plot_style = DOTS;
+		case DOTS:
+		case POINTSTYLE:
+		    vplot_points(this_plot, this_plot->iso_level);
+		    break;
+		}
+	    }
+
 	    /* First draw the graph plot itself */
-	    if (!key_pass && this_plot->plot_type != KEYENTRY)
+	    if (!key_pass && this_plot->plot_type != KEYENTRY && this_plot->plot_type != VOXELDATA)
 	    switch (this_plot->plot_style) {
 	    case FILLEDCURVES:	/* same, but maybe we could dummy up ZERRORFILL? */
 	    case IMPULSES:
@@ -1223,6 +1239,12 @@ do_3dplot(
 	    case FINANCEBARS:
 	    case ELLIPSES:
 	    case POINTSTYLE:
+		if (this_plot->plot_type == VOXELDATA) {
+		    if (this_plot->lp_properties.pm3d_color.type == TC_Z)
+			set_color(0.5);
+		    key_sample_point(this_plot, xl, yl, this_plot->lp_properties.p_type);
+		} else
+
 		if (draw_this_surface)
 		    key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
 		break;
@@ -2401,6 +2423,8 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		    int iso;
 
 		    if (plot->plot_type == NODATA || plot->plot_type == KEYENTRY)
+			continue;
+		    if (plot->plot_type == VOXELDATA)
 			continue;
 		    if (plot->plot_type == DATA3D) {
 			if (!plot->has_grid_topology)
