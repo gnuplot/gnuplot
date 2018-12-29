@@ -227,7 +227,7 @@ C
 ##See `set walls`, `set grid vertical`.
 #b `set table separator {tab|comma|"char"}` can be used to create csv files.
 ##See `plot with table`.
-#b New options `set view projection {ixy|xz|yz}` adjust view angles, axis tic
+#b New options `set view projection {xy|xz|yz}` adjust view angles, axis tic
 ##and label placement to generate a 2D projection of a 3D splot.
 ##`set view projection xy` is equivalent to `set view map`.
 #b `set rgbmax <value>` controls interpretation of input RGB values.
@@ -529,7 +529,7 @@ C
  The special filename "-" is indicates that commands are to be read from stdin.
  `Gnuplot` exits after the last file is processed.  If no load files and no
  command strings are specified, `gnuplot` accepts interactive input from stdin.
-3command line options
+3 command line options
 ?command-line-options
 ?batch/interactive command-line-options
  Gnuplot accepts the following options on the command line
@@ -549,7 +549,7 @@ C
  -e "command" tells gnuplot to execute that single command before continuing.
 
  -c is equivalent to -e "call scriptfile ARG1 ARG2 ...". See `call`.
-3Examples
+3 Examples
 ?batch/interactive examples
  To launch an interactive session:
        gnuplot
@@ -3536,8 +3536,8 @@ Ffigure_newsyntax
 
       4 columns:  x  y  length  angle
 
- The keywords "with arrows" may be followed by inline arrow style properties,
- a reference to a predefined arrow style, or `arrowtyle variable` to load the
+ The keywords `with arrows` may be followed by inline arrow style properties,
+ a reference to a predefined arrow style, or `arrowstyle variable` to load the
  index of the desired arrow style for each arrow from a separate column.
 
  `length` > 0 is interpreted in x-axis coordinates.
@@ -4947,7 +4947,7 @@ Ffigure_fenceplot
  syntax).  However in many cases it is more natural to use them as you would any
  other variable.
 
- In parallel the the string parameters ARG1 ... ARG9 the passed parameters are
+ In parallel the string parameters ARG1 ... ARG9 the passed parameters are
  stored in an array ARGV[9].  See `argv`.
 
 3 argv[ ]
@@ -10396,7 +10396,7 @@ Ffigure_keyentry
 ?keyentry
  Normally each plot autogenerates a single line entry in the key.  If you need
  more control over what appears in the key you can use the `keyentry` keyword
- in the `plot` or `splot` coommand to insert extra lines.  Instead of providing
+ in the `plot` or `splot` command to insert extra lines.  Instead of providing
  a filename or function to plot, use `keyentry` as a placeholder followed by
  plot style information (used to generate a key symbol) and a title.
  Example:
@@ -11985,7 +11985,7 @@ Ffigure_multiple_keys
  reason you may change the color space `model` to one of `RGB`, `HSV`, `CMY`.
  Using color names for `set palette defined` tables and a color space other than
  RGB will result in funny colors.  All explanation have been written for
- RGB color space, so please note, that `R` can be `H`, `C`, `Y`, or `X`,
+ RGB color space, so please note, that `R` can be `H`, or `C`,
  depending on the actual color space (`G` and `B` accordingly).
 
  All values for all color spaces are limited to [0,1].
@@ -12445,7 +12445,6 @@ Ffigure_multiple_keys
 ^ <a href="http://www.gnuplot.info/demo_5.3/hidden_compare.html">
  (comparison of hidden3d and pm3d treatment of solid-color surfaces)
 ^ </a>
- and
 4 position
 ?pm3d position
 ?set pm3d position
@@ -12537,7 +12536,7 @@ Ffigure_multiple_keys
 4 color_assignment
 ?pm3d color_assignment
  The default pm3d coloring assigns an individual color to each quadrangle of
- the surface grid.  For alternative coloring schems that assign uniform color to
+ the surface grid.  For alternative coloring schemes that assign uniform color to
  the entire surface, see `pm3d fillcolor`.
 
  A single gray/color value (i.e. not a gradient) is assigned to each quadrangle.
@@ -12620,7 +12619,7 @@ Ffigure_multiple_keys
  surface, similar to the color scheme used by gnuplot's `hidden3d` mode.
  Linestyle N is used for the top surface; linestyle N+1 for the bottom surface.
  Note that "top" and "bottom" depend on the scan order, so that the colors are
- inverted for `pm3d scansbackwards` as compared to `pm3d scansforward`.
+ inverted for `pm3d scansbackward` as compared to `pm3d scansforward`.
  This coloring option works best with `pm3d depthorder`, however, which
  unfortunately does not allow you to control the scan order so you may have
  to instead swap the colors defined for linestyles N and N+1.
