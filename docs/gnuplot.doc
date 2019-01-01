@@ -1,6 +1,6 @@
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
-C Copyright (C) 2004 - 2018 various authors
+C Copyright (C) 2004 - 2019 various authors
 C
 1 gnuplot
 ?gnuplot
@@ -24,7 +24,7 @@ C
 ^  James R. Van Zandt, Alex Woo, Johannes Zellner<br>
 ^</p>
 ^<p align="center">  Copyright (C) 1986 - 1993, 1998 - 2004   Thomas Williams, Colin Kelley<br>
-^     Copyright (C) 2004 - 2018 various authors</p>
+^     Copyright (C) 2004 - 2019 various authors</p>
 ^<p align="center">   Mailing list for comments: <tt>gnuplot-info@lists.sourceforge.net</tt><br>
 ^      Mailing list for bug reports: <tt>gnuplot-bugs@lists.sourceforge.net</tt><br>
 ^      Web access (preferred): <tt>http://sourceforge.net/projects/gnuplot</tt></p>
@@ -10071,7 +10071,7 @@ Ffigure_keyentry
 ?keyentry
  Normally each plot autogenerates a single line entry in the key.  If you need
  more control over what appears in the key you can use the `keyentry` keyword
- in the `plot` or `splot` coommand to insert extra lines.  Instead of providing
+ in the `plot` or `splot` command to insert extra lines.  Instead of providing
  a filename or function to plot, use `keyentry` as a placeholder followed by
  plot style information (used to generate a key symbol) and a title.
  Example:
@@ -11926,7 +11926,7 @@ Ffigure_multiple_keys
  reason you may change the color space `model` to one of `RGB`, `HSV`, `CMY`.
  Using color names for `set palette defined` tables and a color space other than
  RGB will result in funny colors.  All explanation have been written for
- RGB color space, so please note, that `R` can be `H`, `C`, `Y`, or `X`,
+ RGB color space, so please note, that `R` can be `H` or `C`, 
  depending on the actual color space (`G` and `B` accordingly).
 
  All values for all color spaces are limited to [0,1].
