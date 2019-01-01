@@ -198,6 +198,7 @@ const struct gen_table set_tbl[] =
     { "hid$den3d", S_HIDDEN3D },
     { "historysize", S_HISTORYSIZE },	/* Deprecated */
     { "his$tory", S_HISTORY },
+    { "isosurf$ace", S_ISOSURFACE },
     { "is$osamples", S_ISOSAMPLES },
     { "jitter", S_JITTER },
     { "k$ey", S_KEY },
@@ -707,6 +708,7 @@ const struct gen_table plotstyle_tbl[] =
     { "xye$rrorbars", XYERRORBARS },
     { "boxes", BOXES },
     { "hist$ograms", HISTOGRAMS },
+    { "isosurface", ISOSURFACE },
     { "filledc$urves", FILLEDCURVES },
     { "boxer$rorbars", BOXERROR },
     { "boxx$yerrorbars", BOXXYERROR },

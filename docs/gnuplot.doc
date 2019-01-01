@@ -209,7 +209,6 @@ C
 #end
 
 4 Voxel grids
-?voxel-grids
  Gnuplot now supports operations based on 3D grids of voxel data.
 
 #start
@@ -226,16 +225,20 @@ C
 ## `splot` commands to assign colors or other properties of plot elements
 ## by using the `voxel` function in using specifiers.
 ## See demo `voxel.dem`.
-#b voxel grids can also be plotted by name in `splot` commands, with each voxel
-## above a threshold value being represented as a separate dot or point.
+#b voxel grids can also be plotted by name in `splot` commands with plot styles
+## `dots`, `points`, or `isosurface`.
 ## See demo `vplot.dem`.
 #end
 
 4 New plot styles and style options
 #start
+#b `splot $voxelgrid with {dots|points}` marks all voxels whose value is above 
+## a requested threshold level.
+#b `splot $voxelgrid with isosurface` creates a tesselated 3D surface enclosing
+## voxels above a requested threshold level. See `isosurface`.
+#b Voxel grid values can be referenced in the `using` specifiers for 3D plots.
 #b Plot style `with circles` can be used in 3D plots.
 #b Plot style `with boxes` can be used in 3D plots.
-#b Voxel grid values can be referenced in the `using` specifiers for 3D plots.
 #b 2D plot style `with arrows` is identical to `with vectors` except that each
 ## arrow is specified using x:y:length:angle rather than x:y:xdelta:ydelta
 #b pm3d surfaces can have individual fillstyle and fillcolor
@@ -4433,6 +4436,25 @@ Ffigure_impulses
       2 columns:  x  y     # line from [x,0] to [x,y]  (2D)
       3 columns:  x  y  z  # line from [x,y,0] to [x,y,z] (3D)
 
+2 isosurface
+?plotting styles isosurface
+?style isosurface
+?with isosurface
+?isosurface
+Ffigure_isosurface
+ This 3D plot style requires a populated voxel grid (see `set vgrid`, `vfill`).
+ Linear interpolation of voxel grid values is used to estimate fractional grid
+ coordinates corresponding to the requested isolevel.  These points are then 
+ used to generate a tesselated surface.  The facets making up the surface are
+ rendered as pm3d polygons, so the surface coloring, transparency, and border
+ properties are controlled by `set pm3d`.  In general the surface is easier to
+ interpret visually if facets are given a thin border that is darker than the
+ fill color.  By default the tesselation uses a mixture of quadrangles and
+ triangles.  To use triangle only, see `set isosurface`.
+ Example:
+      set style fill solid 0.3
+      set pm3d depthorder border lc "blue" lw 0.2
+      splot $helix with isosurface level 10 fc "cyan"
 2 labels
 ?plotting styles labels
 ?style labels
@@ -10240,6 +10262,17 @@ Ffigure_missing
  assumes that a function sample occurs at each isoline intersection, so
  change in `samples` as well as `isosamples` may be desired when changing
  the resolution of a function surface/contour.
+3 isosurface
+?commands set isosurface
+?commands show isosurface
+?set isosurface
+?show isosurface
+ Syntax:
+      set isosurface {mixed|triangles}
+ Surfaces plotted by the command `splot $voxelgrid with isosurface` are by
+ default constructed from a mixture of quadrangles and triangles.  The use
+ of quadrangles creates a less complicated visual impression.  This is the
+ default.  This command proveds an option to tesselate with only triangles.
 3 jitter
 ?commands set jitter
 ?set jitter
@@ -14110,7 +14143,7 @@ Ffigure_multiple_keys
                 number of zero voxels:  992070   (99.21%)
 
  `unset vgrid $gridname` releases all data structures associated with that
- voxel grid.
+ voxel grid.  The data structures are also released by `reset session`.
 
 3 view
 ?commands set view
@@ -15293,8 +15326,10 @@ Ffigure_walls
  expression, or a triple of mathematical expressions in parametric mode.
 
  A new feature in version 5.3 is that `splot` can operate on voxel data.
- See `voxel-grids`, `set vgrid`, `vxrange`.  At present voxel grids can only
- be plotted using styles `with dots` or `with points`.
+ See `voxel-grids`, `set vgrid`, `vxrange`.  At present voxel grids can be
+ be plotted using styles `with dots`, `with points`, or `with isosurface`.
+ Voxel grid values can also be referenced in the `using` specifiers of other
+ plot styles, for example to assign colors.
 
  By default `splot` draws the xy plane completely below the plotted data.
  The offset between the lowest ztic and the xy plane can be changed by `set
@@ -15602,22 +15637,27 @@ Ffigure_walls
  formatting capabilities.
 3 voxel-grid
 ?commands splot voxel-grid
-?splot voxel-grid
-?voxel-grid
+?splot voxel-grids
+?voxel-grids
  Syntax:
       splot $voxelgridname with {dots|points} {above <threshold>} ...
+      splot $voxelgridname with isosurface {level <threshold>} ...
 
- Voxel data can be plotted as dots or points using the syntax shown.
+ Voxel data can be plotted with dots or points marking individual voxels whose
+ value is above the specified threshold value (default threshold = 0).
  Color/pointtype/linewidth properties can be appended as usual.
- A point is drawn for every voxel whose value is greater than the
- threshold value (default threshold = 0).
 
  At many view angles the voxel grid points will occlude each other or create
  Moiré artifacts on the display. These effects can be avoided by introducing
  jitter so that the displayed dot or point is displaced randomly from the
  true voxel grid coordinate. See `set jitter`.
 
- See demo `vplot.dem`.
+ `with isosurface` will create a tesselated surface in 3D enclosing all voxels
+ with value greater than the requested threshold. The surface placement is
+ adjusted by linear interpolation to pass through the threshold value itself.
+
+ See `set vgrid`, `vfill`.
+ See demos `vplot.dem`, `isosurface.dem`.
 
 2 stats (Statistical Summary)
 ?commands stats
@@ -15941,6 +15981,8 @@ Ffigure_walls
 2 vfill
 ?commands vfill
 ?vfill
+=VoxelDistance
+?VoxelDistance
  Syntax:
       vfill FILE using x:y:z:radius:(<expression>)
 

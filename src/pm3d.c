@@ -1071,11 +1071,21 @@ pm3d_draw_one(struct surface_points *plot)
 /*
  * Add one pm3d quadrangle to the mix.
  * Called by zerrorfill() and by plot3d_boxes().
+ * Also called by vplot_isosurface().
  */
 void
 pm3d_add_quadrangle(struct surface_points *plot, gpdPoint corners[4])
 {
     quadrangle *q;
+
+    /* FIXME: I have no idea how to estimate the number of facets for an isosurface */
+    if (plot->plot_style == ISOSURFACE) {
+	if (allocated_quadrangles < current_quadrangle + 100) {
+	    allocated_quadrangles += 1000.;
+	    quadrangles = gp_realloc(quadrangles,
+		allocated_quadrangles * sizeof(quadrangle), "pm3d_add_quadrangle");
+	}
+    } else
 
     if (allocated_quadrangles < current_quadrangle + plot->iso_crvs->p_count) {
 	allocated_quadrangles += 2 * plot->iso_crvs->p_count;
@@ -1105,8 +1115,14 @@ pm3d_add_quadrangle(struct surface_points *plot, gpdPoint corners[4])
 	    illuminate_one_quadrangle(q);
     } else {
 	/* This is the usual [only?] path for 'splot with zerror' */
+	/* and for 'splot with isosurface' */
 	q->qcolor.border_color = &plot->fill_properties.border_color;
-	q->gray = PM3D_USE_BORDER_COLOR_INSTEAD_OF_GRAY;
+	if (pm3d_shade.strength > 0 && plot->plot_style == ISOSURFACE) {
+	    color_from_rgbvar = TRUE;
+	    q->gray = plot->fill_properties.border_color.lt;
+	    illuminate_one_quadrangle(q);
+	} else
+	    q->gray = PM3D_USE_BORDER_COLOR_INSTEAD_OF_GRAY;
     }
 }
 

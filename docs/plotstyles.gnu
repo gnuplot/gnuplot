@@ -697,6 +697,25 @@ set style fill  solid 0.5 noborder
 splot for [x=-2:2][y=-50:50:3] '+' using (x):($1/100.):(-1):(-1):(sinc($1/10., 1.+2*x)) with zerrorfill
 reset
 
+# Voxel data
+set output out. 'figure_isosurface' . ext
+set title "isosurface generated from voxel data" offset 0,1
+set vgrid $helix size 20
+set vxrange [-2:2]; set vyrange [-2:2]; set vzrange [0:11]
+set xrange [-2:2]; set yrange [-2:2]; set zrange [0:11]
+set xyplane at 0
+set style fill solid 0.3
+set pm3d depthorder border lc "blue" lw 0.2
+set border 0
+unset tics
+set xzeroaxis; set yzeroaxis; set zzeroaxis
+set view 60, 30, 1.6, 1.1
+
+vfill sample [t=0:20] '+'  using (cos($1)):(sin($1)):($1):(0.9):(10.0)
+splot $helix with isosurface level 1.0 lt 3 notitle
+
+unset vgrid $helix
+
 # close last file
 unset outp
 

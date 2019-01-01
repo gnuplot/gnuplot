@@ -1,0 +1,39 @@
+set vgrid $helix size 25
+set vxrange [-2:2]; set vyrange [-2:2]; set vzrange [0:11]
+set xrange [-2:2]; set yrange [-2:2]; set zrange [0:11]
+set xyplane at 0
+set border 0
+set xzeroaxis; set yzeroaxis; set zzeroaxis
+set tics axis nomirror format ""
+
+set style fill transparent solid 0.25
+set pm3d depth border lc "blue" lw .4
+set jitter
+
+splot sample [t=0:20] '+' using (cos($1)):(sin($1)):($1) with lp
+
+pause -1 "<cr> to continue"
+
+set title "Fill voxel grid around the points shown"
+vfill sample [t=0:20] '+'  using (cos($1)):(sin($1)):($1):(0.9):(10.0)
+
+splot sample [t=0:20] '+' using (cos($1)):(sin($1)):($1) with lp notitle, \
+      $helix with points pt 7 ps 0.5 title "voxel grid points"
+
+pause -1 "<cr> to continue"
+
+set title "Draw isosurface enclosing all points"
+
+splot $helix with points pt 7 ps 0.5 notitle, \
+      $helix with isosurface level 1.0 title "isosurface level 1.0" lt 3
+
+pause -1 "<cr> to continue"
+
+set title "isosurface alone"
+set style fill solid 0.3
+
+splot $helix with isosurface level 1.0 title "isosurface level 1.0" lt 3
+
+pause -1 "<cr> to continue"
+reset session
+

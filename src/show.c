@@ -429,6 +429,9 @@ show_command()
     case S_ISOSAMPLES:
 	show_isosamples();
 	break;
+    case S_ISOSURFACE:
+	show_isosurface();
+	break;
     case S_JITTER:
 	show_jitter();
 	break;

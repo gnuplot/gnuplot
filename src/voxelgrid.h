@@ -23,6 +23,10 @@ typedef struct vgrid {
     t_voxel *vdata;	/* points to 3D array of voxels */
 } vgrid;
 
+struct {
+    int tesselation;	/* 0 = mixed  1 = triangles only */
+} isosurface_options;
+
 /* function prototypes */
 void voxel_command __PROTO((void));
 void vclear_command __PROTO((void));
@@ -36,5 +40,7 @@ void gpfree_vgrid __PROTO((struct udvt_entry *grid));
 void unset_vgrid __PROTO((void));
 udvt_entry *get_vgrid_by_name __PROTO((char *name));
 t_voxel voxel __PROTO((double vx, double vy, double vz));
+void set_isosurface __PROTO((void));
+void show_isosurface __PROTO((void));
 
 #endif /* VOXELGRID_H */

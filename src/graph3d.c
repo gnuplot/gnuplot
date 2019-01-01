@@ -1083,6 +1083,9 @@ do_3dplot(
 		case POINTSTYLE:
 		    vplot_points(this_plot, this_plot->iso_level);
 		    break;
+		case ISOSURFACE:
+		    vplot_isosurface(this_plot);
+		    break;
 		}
 	    }
 
@@ -1197,6 +1200,7 @@ do_3dplot(
 		int_error(NO_CARET, "plot style parallelaxes not supported in 3D");
 		break;
 
+	    case ISOSURFACE:
 	    case PLOT_STYLE_NONE:
 	    case TABLESTYLE:
 		/* cannot happen */
@@ -1285,6 +1289,11 @@ do_3dplot(
 		apply_pm3dcolor(&this_plot->lp_properties.pm3d_color);
 		if (this_plot->iso_crvs)
 		    check3d_for_variable_color(this_plot, this_plot->iso_crvs->points);
+		key_sample_fill(xl, yl, this_plot);
+		break;
+
+	    case ISOSURFACE:
+		apply_pm3dcolor(&this_plot->fill_properties.border_color);
 		key_sample_fill(xl, yl, this_plot);
 		break;
 

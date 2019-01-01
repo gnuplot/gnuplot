@@ -301,6 +301,9 @@ set_command()
 	case S_ISOSAMPLES:
 	    set_isosamples();
 	    break;
+	case S_ISOSURFACE:
+	    set_isosurface();
+	    break;
 	case S_JITTER:
 	    set_jitter();
 	    break;

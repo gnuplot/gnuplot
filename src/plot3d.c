@@ -1768,6 +1768,21 @@ eval_3dplots()
 			}
 		    }
 
+		    if  (this_plot->plot_style == ISOSURFACE) {
+			if (this_plot->plot_type == VOXELDATA) {
+			    if (equals(c_token, "level")) {
+				c_token++;
+				this_plot->iso_level = real_expression();
+			    } else {
+				int_error(c_token, "isosurface requires a level");
+			    }
+			} else
+			    int_error(c_token, "isosurface requires a voxel grid");
+
+			this_plot->pm3d_color_from_column = FALSE;
+			track_pm3d_quadrangles = TRUE;
+		    }
+
 		    set_with = TRUE;
 		    continue;
 		}
@@ -2150,7 +2165,7 @@ eval_3dplots()
 		tp_3d_ptr = &(this_plot->next_sp);
 		this_plot->token = c_token;	/* store for second pass */
 		this_plot->iteration = plot_iterator ? plot_iterator->iteration : 0;
-		/* FIXME: I worry that a autoscales b and b autoscales a */
+		/* FIXME: I worry that vxrange autoscales xrange and xrange autoscales vxrange */
 		autoscale_one_point((&axis_array[FIRST_X_AXIS]), this_plot->vgrid->vxmin);
 		autoscale_one_point((&axis_array[FIRST_X_AXIS]), this_plot->vgrid->vxmax);
 		autoscale_one_point((&axis_array[FIRST_Y_AXIS]), this_plot->vgrid->vymin);
@@ -2174,7 +2189,7 @@ eval_3dplots()
 	    }
 
 	    /* restore original value of sample variables */
-	    /* FIXME: sometime this_plot has changed since we save sample_var! */
+	    /* FIXME: somehow this_plot has changed since we saved sample_var! */
 	    if (name_str && this_plot->sample_var) {
 		this_plot->sample_var->udv_value = original_value_u;
 		this_plot->sample_var2->udv_value = original_value_v;

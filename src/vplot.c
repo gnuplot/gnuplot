@@ -65,7 +65,7 @@
  * For point or dot plots
  * 	points are only drawn if voxel value > iso_level (defaults to 0)
  * For isosurface plots
- *	the isosurface is generated for value == iso_level (default ???)
+ *	the isosurface is generated for value == iso_level
  */
 
 #include "gp_types.h"
@@ -77,6 +77,36 @@
 #include "voxelgrid.h"
 #include "vplot.h"
 
+#ifdef VOXEL_GRID_SUPPORT
+
+/*            Data structures for tesselation
+ *            ===============================
+ * We offer a choice of two tesselation tables.
+ * One is Heller's table originally derived for use with marching cubes.
+ * It contains triangles only.
+ * The other contains a mix of quadrangles and triangles.
+ * Near a complicated fold in the surface the quadrangles are an imperfect
+ * approximation of the triangular tesselation.  However for most smooth
+ * surfaces the reduced number of facets from using quadrangles makes the
+ * pm3d rendering look cleaner.
+ */
+#include "marching_cubes.h"
+#include "qt_table.h"
+
+/* the fractional index intersection along each of the cubes's 12 edges */
+static double intersection[12][3];
+
+/* working copy of the corner values for the current cube */
+static t_voxel cornervalue[8];
+
+/* local prototypes */
+static void vertex_interp( int edge_no, int start, int end, t_voxel isolevel );
+static void tesselate_one_cube( struct surface_points *plot,
+					int ix, int iy, int iz );
+
+/*
+ * splot $vgrid with {dots|points} {above <value>}
+ */
 void
 vplot_points (struct surface_points *plot, double level)
 {
@@ -141,7 +171,194 @@ vplot_points (struct surface_points *plot, double level)
 
 }
 
+/*
+ * splot $vgrid with isosurface level <value>
+ */
+
 void
-vplot_isosurface (struct surface_points *plot, double level)
+vplot_isosurface (struct surface_points *plot)
 {
+    int i, j, k;
+    int N = plot->vgrid->size;
+
+    /* These initializations are normally done in pm3d_plot()
+     * isosurfaces do not use that code path.
+     */
+    if (pm3d_shade.strength > 0)
+	pm3d_init_lighting_model();
+    pm3d_border_lp = pm3d.border;
+
+    for (i = 0; i < N-1; i++) {
+	for (j = 0; j < N-1; j++) {
+	    for (k = 0; k < N-1; k++) {
+		tesselate_one_cube( plot, i, j, k );
+	    }
+	}
+    }
 }
+
+
+/*
+ * tesselation algorithm applied to a single voxel.
+ * ix, iy, iz are the indices of the corner nearest [xmin, ymin, zmin].
+ * We will work in index space and convert back to actual graph coordinates
+ * when we have found the triangles (if any) that result from intersections
+ * of the isosurface with this voxel.
+ */
+static void
+tesselate_one_cube( struct surface_points *plot, int ix, int iy, int iz )
+{
+    struct vgrid *vgrid = plot->vgrid;
+    t_voxel isolevel = plot->iso_level;
+    int N = vgrid->size;
+    int ivertex, iedge, it;
+    int corner_flags;			/* bit field */
+    int edge_flags;			/* bit field */
+
+    /* Make a local copy of the values at the cube corners */
+    for (ivertex = 0; ivertex < 8; ivertex++) {
+	int cx = ix + vertex_offset[ivertex][0];
+	int cy = iy + vertex_offset[ivertex][1];
+	int cz = iz + vertex_offset[ivertex][2];
+	cornervalue[ivertex] = vgrid->vdata[cx + cy*N + cz*N*N];
+    }
+
+    /* Flag which vertices are inside the surface and which are outside */
+    corner_flags = 0;
+    if (cornervalue[0] < isolevel) corner_flags |= 1;
+    if (cornervalue[1] < isolevel) corner_flags |= 2;
+    if (cornervalue[2] < isolevel) corner_flags |= 4;
+    if (cornervalue[3] < isolevel) corner_flags |= 8;
+    if (cornervalue[4] < isolevel) corner_flags |= 16;
+    if (cornervalue[5] < isolevel) corner_flags |= 32;
+    if (cornervalue[6] < isolevel) corner_flags |= 64;
+    if (cornervalue[7] < isolevel) corner_flags |= 128;
+
+    /* Look up which edges are affected by this corner pattern */
+    edge_flags = cube_edge_flags[corner_flags];
+
+    /* If no edges are affected (surface does not intersect voxel) we're done */
+    if (edge_flags == 0)
+	return;
+
+    /*
+     * Find the intersection point on each affected edge.
+     * Store in intersection[edge_no][i] as fractional (non-integral) indices.
+     * vertex_interp( edge_no, start_corner, end_corner, isolevel )
+     */
+    if ((edge_flags &    1) != 0) vertex_interp(  0, 0, 1, isolevel);
+    if ((edge_flags &    2) != 0) vertex_interp(  1, 1, 2, isolevel);
+    if ((edge_flags &    4) != 0) vertex_interp(  2, 2, 3, isolevel);
+    if ((edge_flags &    8) != 0) vertex_interp(  3, 3, 0, isolevel);
+    if ((edge_flags &   16) != 0) vertex_interp(  4, 4, 5, isolevel);
+    if ((edge_flags &   32) != 0) vertex_interp(  5, 5, 6, isolevel);
+    if ((edge_flags &   64) != 0) vertex_interp(  6, 6, 7, isolevel);
+    if ((edge_flags &  128) != 0) vertex_interp(  7, 7, 4, isolevel);
+    if ((edge_flags &  256) != 0) vertex_interp(  8, 0, 4, isolevel);
+    if ((edge_flags &  512) != 0) vertex_interp(  9, 1, 5, isolevel);
+    if ((edge_flags & 1024) != 0) vertex_interp( 10, 2, 6, isolevel);
+    if ((edge_flags & 2048) != 0) vertex_interp( 11, 3, 7, isolevel);
+
+    /*
+     * Convert the content of intersection[][] from fractional indices
+     * to plot coordinates
+     */
+    for (iedge = 0; iedge < 12; iedge++) {
+	intersection[iedge][0] =
+	    vgrid->vxmin + ((double)ix + intersection[iedge][0]) * vgrid->vxdelta;
+	intersection[iedge][1] =
+	    vgrid->vymin + ((double)iy + intersection[iedge][1]) * vgrid->vydelta;
+	intersection[iedge][2] =
+	    vgrid->vzmin + ((double)iz + intersection[iedge][2]) * vgrid->vzdelta;
+    }
+
+    if (isosurface_options.tesselation == 0) {
+	/*
+	 * Draw a mixture of quadrangles and triangles
+	 */
+	for (it = 0; it < 3; it++) {
+	    gpdPoint quad[4];	/* The structure expected by gnuplot's pm3d */
+
+	    if (qt_table[corner_flags][4*it] < 0)
+		break;
+
+	    ivertex = qt_table[corner_flags][4*it]; /* first vertex */
+		    quad[0].x = intersection[ivertex][0];
+		    quad[0].y = intersection[ivertex][1];
+		    quad[0].z = intersection[ivertex][2];
+	    ivertex = qt_table[corner_flags][4*it+1]; /* second */
+		    quad[1].x = intersection[ivertex][0];
+		    quad[1].y = intersection[ivertex][1];
+		    quad[1].z = intersection[ivertex][2];
+	    ivertex = qt_table[corner_flags][4*it+2]; /* third */
+		    quad[2].x = intersection[ivertex][0];
+		    quad[2].y = intersection[ivertex][1];
+		    quad[2].z = intersection[ivertex][2];
+	    /* 4th vertex == -1 indicates a triangle */
+	    /* repeat the 3rd vertex to treat it as a degenerate quadrangle */
+	    if (qt_table[corner_flags][4*it+3] >= 0)
+		ivertex = qt_table[corner_flags][4*it+3]; /* fourth */
+		    quad[3].x = intersection[ivertex][0];
+		    quad[3].y = intersection[ivertex][1];
+		    quad[3].z = intersection[ivertex][2];
+
+	    /* Hand off this triangle to the pm3d code */
+	    pm3d_add_quadrangle( plot, quad );
+	}
+
+    } else {
+	/*
+	 * Draw the triangles from a purely triangular tesselation.
+	 * There can be up to four per voxel cube.
+	 */
+	for (it = 0; it < 4; it++) {
+	    gpdPoint quad[4];	/* The structure expected by gnuplot's pm3d */
+
+	    if (triangle_table[corner_flags][3*it] < 0)
+		break;
+
+	    ivertex = triangle_table[corner_flags][3*it]; /* first vertex */
+		    quad[0].x = intersection[ivertex][0];
+		    quad[0].y = intersection[ivertex][1];
+		    quad[0].z = intersection[ivertex][2];
+	    ivertex = triangle_table[corner_flags][3*it+1]; /* second */
+		    quad[1].x = intersection[ivertex][0];
+		    quad[1].y = intersection[ivertex][1];
+		    quad[1].z = intersection[ivertex][2];
+	    ivertex = triangle_table[corner_flags][3*it+2]; /* third */
+		    quad[2].x = intersection[ivertex][0];
+		    quad[2].y = intersection[ivertex][1];
+		    quad[2].z = intersection[ivertex][2];
+	    /* Unfortunately pm3d always wants a quadrangle, so repeat the 3rd vertex */
+		    quad[3] = quad[2];
+
+	    /* Hand off this triangle to the pm3d code */
+	    pm3d_add_quadrangle( plot, quad );
+	}
+    }
+
+}
+
+static void
+vertex_interp( int edge_no, int start, int end, t_voxel isolevel )
+{
+    double fracindex;
+    int i;
+
+    for (i=0; i<3; i++) {
+	if (vertex_offset[end][i] == vertex_offset[start][i])
+	    fracindex = 0;
+	else
+	    fracindex = (vertex_offset[end][i] - vertex_offset[start][i])
+		      * (isolevel - cornervalue[start])
+		      / (cornervalue[end] - cornervalue[start]);
+	intersection[edge_no][i] = vertex_offset[start][i] + fracindex;
+    }
+}
+
+#endif /* VOXEL_GRID_SUPPORT */
+
+#ifndef VOXEL_GRID_SUPPORT
+void vplot_points (struct surface_points *plot, double level) {};
+void vplot_isosurface (struct surface_points *plot) {};
+#endif
