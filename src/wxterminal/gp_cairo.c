@@ -307,12 +307,12 @@ void gp_cairo_set_justify(plot_struct *plot, JUSTIFY mode)
 }
 
 
-void gp_cairo_set_font(plot_struct *plot, const char *name, int fontsize)
+void gp_cairo_set_font(plot_struct *plot, const char *name, float fontsize)
 {
     char *c;
     char *fname;
 
-	FPRINTF((stderr,"set_font \"%s\" %d\n", name,fontsize));
+	FPRINTF((stderr,"set_font \"%s\" %f\n", name,fontsize));
 
 	/* Split out Bold and Italic attributes from font name */
 	fname = strdup(name);

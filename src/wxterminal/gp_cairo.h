@@ -223,7 +223,7 @@ void gp_cairo_set_linestyle(plot_struct *plot, int linestyle);
 void gp_cairo_set_linetype(plot_struct *plot, int linetype);
 void gp_cairo_set_pointsize(plot_struct *plot, double pointsize);
 void gp_cairo_set_justify(plot_struct *plot, JUSTIFY mode);
-void gp_cairo_set_font(plot_struct *plot, const char *name, int fontsize);
+void gp_cairo_set_font(plot_struct *plot, const char *name, float fontsize);
 void gp_cairo_set_linewidth(plot_struct *plot, double linewidth);
 void gp_cairo_set_textangle(plot_struct *plot, double angle);
 

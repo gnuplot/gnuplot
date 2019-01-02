@@ -145,7 +145,7 @@ typedef struct cairo_params_t {
     TBOOLEAN transparent;
     TBOOLEAN crop;
     char *fontname;		/* name of font */
-    int fontsize;		/* size of font in pts */
+    float fontsize;		/* size of font in pts */
     float fontscale;		/* modified by this */
     float width;
     float height;
@@ -295,7 +295,7 @@ TERM_PUBLIC void cairotrm_options()
 			if (*s) {
 				char *sep = strchr(s,',');
 				if (sep) {
-					sscanf(sep+1, "%d", &cairo_params->fontsize);
+					sscanf(sep+1, "%f", &cairo_params->fontsize);
 					*sep = '\0';
 				}
 				free(cairo_params->fontname);
@@ -1152,13 +1152,13 @@ void cairotrm_linetype(int lt)
 int cairotrm_set_font (const char *font)
 {
 	char *fontname = NULL;
-	int fontsize = 0;
+	float fontsize = 0;
 
 	if (font && (*font)) {
 		int sep = strcspn(font,",");
 		fontname = strdup(font);
 		if (font[sep] == ',') {
-			sscanf(&(font[sep+1]), "%d", &fontsize);
+			sscanf(&(font[sep+1]), "%f", &fontsize);
 			fontname[sep] = '\0';
 		}
 	} else {
