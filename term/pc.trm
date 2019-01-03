@@ -595,7 +595,7 @@ static int pc_control_key_table [][2] = {
 };
 
 /* alt modifier */
-// These code seem to correspond to scan-codes from an US keyboard.
+// These codes seem to correspond to scan-codes from an US keyboard.
 // There's no remapping according to the locale.
 static int pc_alt_key_table [][2] = {
     // { GrKey_Alt_Escape, GP_Escape },
@@ -1573,7 +1573,7 @@ START_HELP(dospc)
 "?term dospc",
 "?dospc",
 " Note: legacy terminal.",
-" The `dospc` terminal driver supports PCs with arbitrary graphics boards,",
+" The `dospc` interactive terminal supports PCs with arbitrary graphics boards,",
 " which will be automatically detected. It uses the OpenWatcom graphics",
 " library.",
 "",
@@ -1581,7 +1581,7 @@ START_HELP(dospc)
 "       set terminal dospc",
 "           {{no}{enhanced}}",
 "           {fontscale <scale>} {pointsize <scale>} {linewidth <scale}",
-"           {background <rgbcolor>",
+"           {background <rgbcolor>}",
 "",
 " Line widths, and point and font sizes can be scaled using the `linewidth`,",
 " `pointscale`, or `fontscale` options, respectively.",
@@ -1589,7 +1589,17 @@ START_HELP(dospc)
 " `background` sets the background color (default: black). It is only supported",
 " with adapters with 16 or more colors.",
 "",
+" {`no`}`enhanced` toggles enhanced text mode features like sub-",
+" and superscripts, see `enhanced text` for more information.",
+"",
 " To select a particular (S)VGA graphics mode, set the environment",
-" variable PCTRM to one of S640, S800, S1024, S1280, or S1600."
+" variable PCTRM to one of S640, S800, S1024, S1280, or S1600.",
+" Only 256 color SVGA modes are supported at this time.",
+" For other adapters the resolution will be selected automatically.",
+"",
+" Limitations:",
+" This terminal supports a maximum of 256 colors. Transparency is not",
+" available. Thick lines are approximated very crudely, so expect ugly",
+" output for non-vertical or non-horizontal lines."
 END_HELP(dospc)
 #endif /* TERM_HELP */
