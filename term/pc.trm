@@ -312,13 +312,14 @@ PC_options(void)
 static void
 PC_setup(void)
 {
-    int i, t, x, y;
+    int i, x, y;
     char pc_modename[9];
     struct videoconfig VC;
     const char * adaptername[] = {
 	"MDPA", "CGA", "HERCULES", "MCGA", "EGA", "VGA", "SVGA"
     };
     short status;
+    char * pctrm;
 
     if (pc_graphics)
 	return;
@@ -326,7 +327,11 @@ PC_setup(void)
     PC_save_text();
 
     /* If environment PCTRM is set, try to initialize a specific card/mode.  */
-    safe_strncpy(pc_modename, getenv("PCTRM"), 8);
+    pctrm = getenv("PCTRM");
+    if (pctrm != NULL)
+	safe_strncpy(pc_modename, pctrm, sizeof(pc_modename));
+    else
+	pc_modename[0] = NUL;
 
     _getvideoconfig(&VC);
     if ((pc_driver = VC.adapter) == 0) {
@@ -349,31 +354,43 @@ PC_setup(void)
     case _VGA:
 	pc_mode = _VRES16COLOR;
 	break;
-    case _SVGA:
-	/* TODO: enable 32K, 64K and 16M color modes */
+    case _SVGA: {
+	const static short modes[6] = {
+	    _MRES256COLOR, _VRES256COLOR, _SVRES256COLOR,
+	    _XRES256COLOR, _YRES256COLOR, _ZRES256COLOR
+	};
+	int t, res = 1;
+
 	if (pc_modename[0] == 'S') {	/* test SVGA resolution */
 	    sscanf(pc_modename, "S%d", &t);
+	    /* resolution */
 	    switch (t) {
+	    default:
+	    case 640:
+		res = 1;
+		break;		/* S640  */
 	    case 800:
-		pc_mode = _SVRES256COLOR;
+		res = 2;
 		break;		/* S800  */
 	    case 1024:
-		pc_mode = _XRES256COLOR;
+		res = 3;
 		break;		/* S1024 */
 	    case 1280:
-		pc_mode = _YRES256COLOR;
+		res = 4;
 		break;		/* S1280 */
 	    case 1600:
-		pc_mode = _ZRES256COLOR;
+		res = 5;
 		break;		/* S1600 */
-	    default:
-		t = 640;
-		pc_mode = _VRES256COLOR;	/* 640x480 */
 	    }
-	    while (_setvideomode(pc_mode) == 0)
-		pc_mode--;
+	}
+
+	pc_mode = modes[res];
+	while (_setvideomode(pc_mode) == 0 && res > 0) {
+	    res--;
+	    pc_mode = modes[res];
 	}
 	break;
+    }
     default:
 	fputs("Unable to initialize graphics.\n", stderr);
 	return;
