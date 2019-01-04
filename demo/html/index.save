@@ -62,6 +62,15 @@ Here are samples of PNG output from some of the demos.
     <li><a href="fit.html">Levenberg-Marquardt DLS</a></li>
     </ul>
 
+    <h4>Colors</h4>
+    <ul>
+    <li><a href="varcolor.html">data-dependent coloring</a></li>
+    <li><a href="rgb_variable.html">RGB coloring</a></li>
+    <li><a href="rgba_lines.html">RGB + alpha channel</a></li>
+    <li><a href="pm3dcolors.html">pm3d colors</a></li>
+    <li><a href="pm3dgamma.html">pm3d gamma</a></li>
+    </ul>
+
     <h4>Animation</h4>
     <ul>
     <li><a href="animate2.html">animated gif</a></li>
@@ -89,6 +98,13 @@ Here are samples of PNG output from some of the demos.
     <li><a href="hidden_compare.html">hidden3d v. pm3d</a></li>
     </ul>
 
+    <h4>Volume plots (new!)</h4>
+    <ul>
+    <li><a href="voxel.html">voxel-dependent coloring</a></li>
+    <li><a href="vplot.html">3D representaion of voxels</a></li>
+    <li><a href="isosurface.html">3D isosurface</a></li>
+    </ul>
+
     <h4>Coordinate and<br> axis transforms</h4>
     <ul>
     <li><a href="linkedaxes.html">linked axes</a></li>
@@ -111,15 +127,6 @@ Here are samples of PNG output from some of the demos.
     <li><a href="image2.html">binary and image tricks</a></li>
     <li><a href="rgbalpha.html">RGB + alpha channel</a></li>
     <li><a href="barchart_art.html">bar chart art</a></li>
-    </ul>
-
-    <h4>Colors</h4>
-    <ul>
-    <li><a href="varcolor.html">data-dependent coloring</a></li>
-    <li><a href="rgb_variable.html">RGB coloring</a></li>
-    <li><a href="rgba_lines.html">RGB + alpha channel</a></li>
-    <li><a href="pm3dcolors.html">pm3d colors</a></li>
-    <li><a href="pm3dgamma.html">pm3d gamma</a></li>
     </ul>
 
 </td>
@@ -206,7 +213,7 @@ Here are samples of PNG output from some of the demos.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated November 2018</i>
+    <i>This page generated January 2019</i>
     </td>
 
     <td>

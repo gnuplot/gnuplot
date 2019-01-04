@@ -60,6 +60,9 @@ use HTML::Entities;
 	}
 	print GNUPLOT "set output \"$ARGV[0].$plot.png\"\n";
 
+# suppress animations
+ 	print GNUPLOT "NO_ANIMATION = 1\n";
+
 # find out if gpsavediff is available in current path
 	my $savescripts = T;
 	{local $^W=0; $savescripts = open(FOO, "|gpsavediff") }

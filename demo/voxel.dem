@@ -75,6 +75,8 @@ if (!exists("NO_ANIMATION")) {
 #
 # replot once with all three axis slices
 #
+set title "orthogonal slices through volume\n" \
+         . "using the density values to color the surfaces"
 splot '++' using 1:(0):2:(voxel($1,0,$2)) with pm3d, \
       '++' using 1:2:(0):(voxel($1,$2,0)) with pm3d, \
       '++' using (0):1:2:(voxel(0,$1,$2)) with pm3d

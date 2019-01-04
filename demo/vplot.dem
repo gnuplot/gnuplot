@@ -5,9 +5,7 @@
 if (!exists("VoxelDistance")) exit
 
 set border 0
-set xzeroaxis
-set yzeroaxis
-set zzeroaxis
+set xzeroaxis; set yzeroaxis; set zzeroaxis;
 set label 1 "X" at 4.1, 0, 0
 set label 2 "Y" at 0, 4.1, 0
 set label 3 "Z" at 0, 0, 4.1
@@ -20,29 +18,21 @@ set view 203, 227, 1.75
 set palette cubehelix negative
 set cbrange [0:100]
 
-set xrange [-4:4]
-set yrange [-4:4]
-set zrange [-4:4]
+set xrange [-4:4]; set yrange [-4:4]; set zrange [-4:4]
 
 #
 # Radius 1 spheres around (-1,2,2) and (0,3,2) with values decreasing 
 # linearly with distance from the center
 #
 set vgrid $v122 size 100
-
-set vxrange [-4:4]
-set vyrange [-4:4]
-set vzrange [-4:4]
+set vxrange [-4:4]; set vyrange [-4:4]; set vzrange [-4:4]
 
 vfill '-' using 1:2:3:(1.):(100. * (1. - VoxelDistance))
 -1 2 2
 e
 
 set vgrid $v032 size 100
-
-set vxrange [-4:4]
-set vyrange [-4:4]
-set vzrange [-4:4]
+set vxrange [-4:4]; set vyrange [-4:4]; set vzrange [-4:4]
 
 vfill '-' using 1:2:3:(1.):(100. * (1. - VoxelDistance))
 0 3 2
@@ -54,9 +44,7 @@ e
 # NB: vgrid range is different from the plot range
 #
 set vgrid $v201 size 25
-set vxrange [0:5]
-set vyrange [-2.5:2.5]
-set vzrange [-1:4]
+set vxrange [0:5]; set vyrange [-2.5:2.5]; set vzrange [-1:4]
 vfill '-' using 1:2:3:(2.):(40. * exp(1. - VoxelDistance))
 2 0 1
 e

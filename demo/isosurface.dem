@@ -1,3 +1,9 @@
+#
+# Demo for direct plotting of voxel data
+#    splot $voxelgrid with isosurface
+#
+if (!exists("VoxelDistance")) exit
+
 set vgrid $helix size 25
 set vxrange [-2:2]; set vyrange [-2:2]; set vzrange [0:11]
 set xrange [-2:2]; set yrange [-2:2]; set zrange [0:11]
@@ -5,6 +11,7 @@ set xyplane at 0
 set border 0
 set xzeroaxis; set yzeroaxis; set zzeroaxis
 set tics axis nomirror format ""
+set view 60, 30, 1.6
 
 set style fill transparent solid 0.25
 set pm3d depth border lc "blue" lw .4
@@ -24,7 +31,7 @@ pause -1 "<cr> to continue"
 
 set title "Draw isosurface enclosing all points"
 
-splot $helix with points pt 7 ps 0.5 notitle, \
+splot $helix with points pt 7 ps 0.4 lt 2 notitle, \
       $helix with isosurface level 1.0 title "isosurface level 1.0" lt 3
 
 pause -1 "<cr> to continue"
