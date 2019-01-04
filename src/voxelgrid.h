@@ -35,5 +35,6 @@ void show_vgrid __PROTO((void));
 void gpfree_vgrid __PROTO((struct udvt_entry *grid));
 void unset_vgrid __PROTO((void));
 udvt_entry *get_vgrid_by_name __PROTO((char *name));
+t_voxel voxel __PROTO((double vx, double vy, double vz));
 
 #endif /* VOXELGRID_H */

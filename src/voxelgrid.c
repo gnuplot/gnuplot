@@ -463,16 +463,38 @@ voxel_command()
 }
 
 /*
+ * internal look-up function voxel(x,y,z)
+ */
+t_voxel
+voxel( double vx, double vy, double vz )
+{
+    int ivx, ivy, ivz;
+    int N;
+
+    if (!current_vgrid)
+	return not_a_number();
+
+    if (vx < current_vgrid->vxmin || vx > current_vgrid->vxmax
+    ||  vy < current_vgrid->vymin || vy > current_vgrid->vymax
+    ||  vz < current_vgrid->vzmin || vz > current_vgrid->vzmax)
+	return not_a_number();
+
+    ivx = ceil( (vx - current_vgrid->vxmin) / current_vgrid->vxdelta );
+    ivy = ceil( (vy - current_vgrid->vymin) / current_vgrid->vydelta );
+    ivz = ceil( (vz - current_vgrid->vzmin) / current_vgrid->vzdelta );
+
+    N = current_vgrid->size;
+    return current_vgrid->vdata[ ivx + ivy * N + ivz * N*N ];
+}
+
+/*
  * user-callable retrieval function voxel(x,y,z)
  */
 void
 f_voxel(union argument *arg)
 {
     struct value a;
-    t_voxel voxel;
     double vx, vy, vz;
-    int ivx, ivy, ivz;
-    int N;
 
     (void) arg;			/* avoid -Wunused warning */
     vz = real(pop(&a));
@@ -489,13 +511,7 @@ f_voxel(union argument *arg)
 	return;
     }
 
-    ivx = ceil( (vx - current_vgrid->vxmin) / current_vgrid->vxdelta );
-    ivy = ceil( (vy - current_vgrid->vymin) / current_vgrid->vydelta );
-    ivz = ceil( (vz - current_vgrid->vzmin) / current_vgrid->vzdelta );
-
-    N = current_vgrid->size;
-    voxel = current_vgrid->vdata[ ivx + ivy * N + ivz * N*N ];
-    push( Gcomplex(&a, voxel, 0.0) );
+    push( Gcomplex(&a, voxel(vx, vy, vz), 0.0) );
     return;
 }
 
