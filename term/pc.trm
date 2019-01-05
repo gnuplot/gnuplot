@@ -110,6 +110,9 @@ TERM_PUBLIC void PC_dashtype(int type, t_dashtype *custom_dash_pattern);
 #include <graph.h>
 
 
+// Missing function definition
+_WCRTLINK short _WCI86FAR _settransparency( short trans );
+
 static void _settextang(int ang);
 static void PC_save_text(void);
 static void PC_restore_text(void);
@@ -1382,15 +1385,8 @@ PC_fillbox(int fillstyle, unsigned int x1, unsigned int y1, unsigned int width, 
 	    _setfillmask(NULL);
 	    break;
 	case FS_SOLID: /* shaded fill */
-	    if (fillpar < 100) {
-		short color = _getcolor();
-		_setfillmask(NULL);
-		_setcolor(0);
-		_rectangle(_GFILLINTERIOR, x1, pc_lasty - y1, x2, pc_lasty - y2);
-		_setcolor(color);
-	    }
-	    /* fall through */
 	case FS_TRANSPARENT_SOLID:
+	    _settransparency(style == FS_TRANSPARENT_SOLID ? 1 : 0);
 	    if (fillpar == 100) {
 		_setfillmask(NULL);
 	    } else {
@@ -1399,15 +1395,9 @@ PC_fillbox(int fillstyle, unsigned int x1, unsigned int y1, unsigned int width, 
 		_setfillmask(pc_shading_pattern_bitmap[i]);
 	    }
 	    break;
-	case FS_PATTERN: { /* pattern fill */
-	    short color = _getcolor();
-	    _setfillmask(NULL);
-	    _setcolor(0);
-	    _rectangle(_GFILLINTERIOR, x1, pc_lasty - y1, x2, pc_lasty - y2);
-	    _setcolor(color);
-	    /* fall through */
-	}
+	case FS_PATTERN:
 	case FS_TRANSPARENT_PATTERN:
+	    _settransparency(style == FS_TRANSPARENT_PATTERN ? 1 : 0);
 	    fillpar %= pc_fill_pattern_num;
 	    _setfillmask(pc_fill_pattern_bitmaps[fillpar]);
 	    break;
@@ -1447,15 +1437,8 @@ PC_filled_polygon(int npoints, gpiPoint *corners)
 	    _setfillmask(NULL);
 	    break;
 	case FS_SOLID: /* shaded fill */
-	    if (fillpar < 100) {
-		short color = _getcolor();
-		_setfillmask(NULL);
-		_setcolor(0);
-		_polygon(_GFILLINTERIOR, npoints, points);
-		_setcolor(color);
-	    }
-	    /* fall through */
 	case FS_TRANSPARENT_SOLID:
+	    _settransparency(style == FS_TRANSPARENT_SOLID ? 1 : 0);
 	    if (fillpar == 100) {
 		_setfillmask(NULL);
 	    } else {
@@ -1464,15 +1447,9 @@ PC_filled_polygon(int npoints, gpiPoint *corners)
 		_setfillmask(pc_shading_pattern_bitmap[i]);
 	    }
 	    break;
-	case FS_PATTERN: { /* pattern fill */
-	    short color = _getcolor();
-	    _setfillmask(NULL);
-	    _setcolor(0);
-	    _polygon(_GFILLINTERIOR, npoints, points);
-	    _setcolor(color);
-	    /* fall through */
-	}
+	case FS_PATTERN:
 	case FS_TRANSPARENT_PATTERN:
+	    _settransparency(style == FS_TRANSPARENT_PATTERN ? 1 : 0);
 	    fillpar %= pc_fill_pattern_num;
 	    _setfillmask(pc_fill_pattern_bitmaps[fillpar]);
 	    break;
