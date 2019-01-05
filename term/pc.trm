@@ -186,16 +186,12 @@ static float pc_fontscale = 1.;
 
 /* colors */
 static rgb255_color pc_background_rgb = { 0, 0, 0 };
-static int pc_background = 0;
-/* reserved palette entries for default colors */
-#define pc_pal_ofs 16
-/* first palette slot for rgb colors */
-#define pc_rgb_pal_ofs 144
-static short pc_pal_colors;
-static short pc_rgbcolors;
-static struct {
-    short n, r, g, b;
-} pc_rgbcolor[256 - pc_rgb_pal_ofs];
+static int pc_background = 0;		/* index of background color */
+static short pc_pal_ofs;		/* offset of the palette (if any) */
+static short pc_max_pal_size = 128;	/* maximum palette size; this could be changed by the user */
+static short pc_pal_colors;		/* size of the palette */
+static short pc_rgbcolors;		/* number of allocated colors */
+static rgb255_color pc_rgbcolor[256];
 
 /* boxed text */
 #ifdef EAM_BOXED_TEXT
@@ -472,8 +468,9 @@ PC_graphics(void)
     term->h_tic = term->v_tic = term->v_char / 2.5;
 
     pc_linewidth = 1;
-    pc_rgbcolors = 0;
     pc_pal_colors = 0;
+    /* reserved palette entries for default colors */
+    pc_rgbcolors = 16;
 
     /* set background */
     pc_background = ((pc_background_rgb.b >> 2) << 16) | ((pc_background_rgb.g >> 2) << 8) | (pc_background_rgb.r >> 2);
@@ -798,6 +795,8 @@ PC_text(void)
     (void) getch();
     PC_restore_text();
 #endif
+    if (pc_rgbcolors == 256)
+	printf("\tWarning: number of palette colors exhausted.\n");
 }
 
 
@@ -1241,43 +1240,43 @@ PC_set_rgb_color(int r, int g, int b)
     int i, d;
 
     /* look-up color match */
-    for (i = 0; i < pc_rgbcolors; i++) {
+    for (i = 16; i < pc_rgbcolors; i++) {
 	d = PC_color_dist(pc_rgbcolor[i].r, pc_rgbcolor[i].g, pc_rgbcolor[i].b, r, g, b);
 	if (d == 0)
 	    break;
 	if (d < closest_d) {
 	    closest_d = d;
-	    closest_n = pc_rgbcolor[i].n;
+	    closest_n = i;
 	}
     }
-    /* allocate new slot */
+    /* not found, allocate new slot */
     if (d != 0) {
-	if (pc_rgbcolors >= (256 - pc_rgb_pal_ofs)) {
+	if (pc_rgbcolors == 256) {
 	    /* list full, choose closest match */
 	    return closest_n;
 	}
 
 	i = pc_rgbcolors;
-	pc_rgbcolors++;
-
-	pc_rgbcolor[i].n = pc_rgb_pal_ofs + i;
 	pc_rgbcolor[i].r = r;
 	pc_rgbcolor[i].g = g;
 	pc_rgbcolor[i].b = b;
+	pc_rgbcolors++;
 
 	/* limited RGB range */
 	r >>= 2;
 	g >>= 2;
 	b >>= 2;
-	_remappalette(pc_rgbcolor[i].n, r + (g << 8) + (b << 16));
+	_remappalette(i, r + (g << 8) + (b << 16));
     }
-    return pc_rgbcolor[i].n;
+    return i;
 }
 
 
 TERM_PUBLIC void
 PC_set_color(t_colorspec *colorspec)
 {
+    int color;
+
     switch (colorspec->type) {
     case TC_LT: {
 	int linetype = colorspec->lt;
@@ -1333,15 +1332,24 @@ PC_set_color(t_colorspec *colorspec)
 	if (pc_colors > 256) {
 	    _setcolor(((b >> 2) << 16) | ((g >> 2) << 8) | (r >> 2));
 	} else if (pc_colors > 14) {
-	    int color = PC_set_rgb_color(r, g, b);
+	    color = PC_set_rgb_color(r, g, b);
 	    _setcolor(color);
 	}
 	break;
     }
     case TC_FRAC: {
 	float gray = colorspec->value;
+	rgb255_color rgb255;
+
 	if (pc_colors == 256) {
-	    _setcolor(gray * pc_pal_colors + pc_pal_ofs);
+	    if (pc_pal_colors != 0) {
+		_setcolor(gray * pc_pal_colors + pc_pal_ofs);
+	    } else {
+		// RGB colors or palette full
+		rgb255maxcolors_from_gray(colorspec->value, &rgb255);
+		color = PC_set_rgb_color(rgb255.r, rgb255.g, rgb255.b);
+		_setcolor(color);
+	    }
 	}
 	break;
     }
@@ -1357,18 +1365,29 @@ PC_make_palette(t_sm_palette *palette)
     int i;
 
     if (pc_colors == 256) {
-	if (palette == NULL)
-	    return pc_rgb_pal_ofs - pc_pal_ofs;
+	if (palette == NULL) {
+	    int n = GPMIN(256 - pc_rgbcolors, pc_max_pal_size);
+	    if (n == 0)
+		pc_pal_colors = 0; /* palette is empty */
+	    return n;
+	}
 
+	// new palette starts at the end
+	pc_pal_ofs = pc_rgbcolors;
 	for (i = 0; i < palette->colors; i++) {
 	    long color =
 		((long) (palette->color[i].r * 63)      ) |
 		((long) (palette->color[i].g * 63) <<  8) |
 		((long) (palette->color[i].b * 63) << 16);
+	    // save data
+	    pc_rgbcolor[pc_pal_ofs + i ].r = (palette->color[i].r * 255);
+	    pc_rgbcolor[pc_pal_ofs + i ].g = (palette->color[i].g * 255);
+	    pc_rgbcolor[pc_pal_ofs + i ].b = (palette->color[i].b * 255);
 	    _remappalette(i + pc_pal_ofs, color);
 	}
 	pc_pal_colors = palette->colors;
-	return pc_rgb_pal_ofs - pc_pal_ofs;
+	pc_rgbcolors += pc_pal_colors;
+	return pc_pal_colors;
     } else if (pc_colors > 256) {
 	return 0;
 
