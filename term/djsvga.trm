@@ -1328,7 +1328,6 @@ DJSVGA_filled_polygon(int npoints, gpiPoint *corners)
 	    int red, green, blue;
 	    int density = style >> 4;
 	    if (density < 0) density = 0;
-	    if (density > 100 ) density = 100;
 	    if (density > 100) density = 100;
 	    GrQueryColor(dj_color, &red, &green, &blue);
 	    red   = 255 - density * (255 - red) / 100;
