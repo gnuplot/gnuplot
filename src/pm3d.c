@@ -1120,6 +1120,28 @@ pm3d_add_quadrangle(struct surface_points *plot, gpdPoint corners[4])
 	if (pm3d_shade.strength > 0 && plot->plot_style == ISOSURFACE) {
 	    color_from_rgbvar = TRUE;
 	    q->gray = plot->fill_properties.border_color.lt;
+#if (1)
+	    /* EXPERIMENTAL
+	     * pm3d + fc linestyle N generates top/bottom color difference.
+	     * FIXME: this does not work for tesselation with quads because their
+	     * surface normals are not reliable (quad may not be flat).
+	     */
+	    if (plot->fill_properties.border_color.type == TC_LINESTYLE) {
+		struct lp_style_type style;
+		int cb = plot->fill_properties.border_color.lt;
+		int i, side;
+		struct coordinate v[3];
+		for (i=0; i<3; i++) {
+		    v[i].x = corners[i].x;
+		    v[i].y = corners[i].y;
+		    v[i].z = corners[i].z;
+		}
+		side = pm3d_side( &v[0], &v[1], &v[2] );
+
+		lp_use_properties(&style, side < 0 ? cb + 1 : cb);
+		q->gray = style.pm3d_color.lt;
+	    }
+#endif
 	    illuminate_one_quadrangle(q);
 	} else
 	    q->gray = PM3D_USE_BORDER_COLOR_INSTEAD_OF_GRAY;

@@ -278,6 +278,7 @@ tesselate_one_cube( struct surface_points *plot, int ix, int iy, int iz )
 	 */
 	for (it = 0; it < 3; it++) {
 	    gpdPoint quad[4];	/* The structure expected by gnuplot's pm3d */
+	    int save_lt = plot->fill_properties.border_color.lt;
 
 	    if (qt_table[corner_flags][4*it] < 0)
 		break;
@@ -302,8 +303,15 @@ tesselate_one_cube( struct surface_points *plot, int ix, int iy, int iz )
 		    quad[3].y = intersection[ivertex][1];
 		    quad[3].z = intersection[ivertex][2];
 
-	    /* Hand off this triangle to the pm3d code */
+	    /* Debugging aid: light up all facets of the same class */
+	    if (debug > 0 && debug == corner_flags)
+		plot->fill_properties.border_color.lt = 6+it;
+
+	    /* Hand off this facet to the pm3d code */
 	    pm3d_add_quadrangle( plot, quad );
+
+	    /* only needed for debugging */
+	    plot->fill_properties.border_color.lt = save_lt;
 	}
 
     } else {
@@ -329,7 +337,7 @@ tesselate_one_cube( struct surface_points *plot, int ix, int iy, int iz )
 		    quad[2].x = intersection[ivertex][0];
 		    quad[2].y = intersection[ivertex][1];
 		    quad[2].z = intersection[ivertex][2];
-	    /* Unfortunately pm3d always wants a quadrangle, so repeat the 3rd vertex */
+	    /* pm3d always wants a quadrangle, so repeat the 3rd vertex */
 		    quad[3] = quad[2];
 
 	    /* Hand off this triangle to the pm3d code */
