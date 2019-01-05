@@ -191,7 +191,8 @@ static int pc_background = 0;
 #define pc_pal_ofs 16
 /* first palette slot for rgb colors */
 #define pc_rgb_pal_ofs 144
-static short pc_rgbcolors = 0;
+static short pc_pal_colors;
+static short pc_rgbcolors;
 static struct {
     short n, r, g, b;
 } pc_rgbcolor[256 - pc_rgb_pal_ofs];
@@ -472,6 +473,7 @@ PC_graphics(void)
 
     pc_linewidth = 1;
     pc_rgbcolors = 0;
+    pc_pal_colors = 0;
 
     /* set background */
     pc_background = ((pc_background_rgb.b >> 2) << 16) | ((pc_background_rgb.g >> 2) << 8) | (pc_background_rgb.r >> 2);
@@ -1218,20 +1220,29 @@ PC_pointsize(double size)
 }
 
 
+static GP_INLINE int
+PC_color_dist(int r1, int g1, int b1, int r2, int g2, int b2)
+{
+    // https://www.compuphase.com/cmetric.htm
+    int rm = (r1 + r2) / 2;
+    int dr = r1 - r2;
+    int dg = g1 - g2;
+    int db = b1 - b2;
+    // return (dr * dr) + (dg * dg) + (db * db);
+    return (((512 + rm) * dr * dr) >> 8) + (4 * dg * dg) + (((767 - rm) * db * db) >> 8);
+}
+
+
 static long
 PC_set_rgb_color(int r, int g, int b)
 {
-    int closest_n = 0, closest_d = INT_MAX;
+    int closest_n = 0;
+    int closest_d = INT_MAX;
     int i, d;
-
-    /* limited RGB range */
-    r >>= 2;
-    g >>= 2;
-    b >>= 2;
 
     /* look-up color match */
     for (i = 0; i < pc_rgbcolors; i++) {
-	d = abs(pc_rgbcolor[i].r - r) + abs(pc_rgbcolor[i].g - g) + abs(pc_rgbcolor[i].b - b);
+	d = PC_color_dist(pc_rgbcolor[i].r, pc_rgbcolor[i].g, pc_rgbcolor[i].b, r, g, b);
 	if (d == 0)
 	    break;
 	if (d < closest_d) {
@@ -1245,6 +1256,7 @@ PC_set_rgb_color(int r, int g, int b)
 	    /* list full, choose closest match */
 	    return closest_n;
 	}
+
 	i = pc_rgbcolors;
 	pc_rgbcolors++;
 
@@ -1253,6 +1265,10 @@ PC_set_rgb_color(int r, int g, int b)
 	pc_rgbcolor[i].g = g;
 	pc_rgbcolor[i].b = b;
 
+	/* limited RGB range */
+	r >>= 2;
+	g >>= 2;
+	b >>= 2;
 	_remappalette(pc_rgbcolor[i].n, r + (g << 8) + (b << 16));
     }
     return pc_rgbcolor[i].n;
@@ -1325,7 +1341,7 @@ PC_set_color(t_colorspec *colorspec)
     case TC_FRAC: {
 	float gray = colorspec->value;
 	if (pc_colors == 256) {
-	    _setcolor(gray * (pc_rgb_pal_ofs - pc_pal_ofs) + pc_pal_ofs);
+	    _setcolor(gray * pc_pal_colors + pc_pal_ofs);
 	}
 	break;
     }
@@ -1351,6 +1367,7 @@ PC_make_palette(t_sm_palette *palette)
 		((long) (palette->color[i].b * 63) << 16);
 	    _remappalette(i + pc_pal_ofs, color);
 	}
+	pc_pal_colors = palette->colors;
 	return pc_rgb_pal_ofs - pc_pal_ofs;
     } else if (pc_colors > 256) {
 	return 0;
