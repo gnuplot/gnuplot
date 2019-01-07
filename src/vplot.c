@@ -145,9 +145,9 @@ vplot_points (struct surface_points *plot, double level)
 		vz = vgrid->vzmin + iz * vgrid->vzdelta;
 
 		if (jitter.spread > 0) {
-		    vx += jitter.spread * vgrid->vxdelta * ( (double)(random()/(double)RAND_MAX ) - 0.5);
-		    vy += jitter.spread * vgrid->vydelta * ( (double)(random()/(double)RAND_MAX ) - 0.5);
-		    vz += jitter.spread * vgrid->vzdelta * ( (double)(random()/(double)RAND_MAX ) - 0.5);
+		    vx += jitter.spread * vgrid->vxdelta * ( (double)(rand()/(double)RAND_MAX ) - 0.5);
+		    vy += jitter.spread * vgrid->vydelta * ( (double)(rand()/(double)RAND_MAX ) - 0.5);
+		    vz += jitter.spread * vgrid->vzdelta * ( (double)(rand()/(double)RAND_MAX ) - 0.5);
 		}
 
 		map3d_xy(vx, vy, vz, &x, &y);

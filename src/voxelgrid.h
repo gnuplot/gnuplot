@@ -39,6 +39,7 @@ void show_vgrid __PROTO((void));
 void gpfree_vgrid __PROTO((struct udvt_entry *grid));
 void unset_vgrid __PROTO((void));
 udvt_entry *get_vgrid_by_name __PROTO((char *name));
+void check_grid_ranges __PROTO((void));
 t_voxel voxel __PROTO((double vx, double vy, double vz));
 void set_isosurface __PROTO((void));
 void show_isosurface __PROTO((void));
