@@ -5,6 +5,7 @@ Changes not in 5.2
 * NEW plot ... with table if <expression>
 * NEW "set walls" command to show xy xz and yz planes in 3D plots
 * NEW "set clip radial" for line segments in polar mode plots
+* NEW "splot ... with isosurface"
 * NEW "splot ... with circles"
 * NEW "splot ... with boxes"
 * NEW "plot ... with arrows"

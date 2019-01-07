@@ -60,13 +60,13 @@ if (!exists("NO_ANIMATION")) {
   do for [iz = -35 : 0] {
     z = iz / 10.
     splot '++' using 1:2:(z):(voxel($1,$2,z)) with pm3d
-    pause 0.1
+    ; pause 0.1
   }
   do for [iz = 35 : 0 : -1] {
     z = iz / 10.
     splot '++' using 1:(-z):2:(voxel($1,-z,$2)) with pm3d, \
           '++' using 1:2:(0):(voxel($1,$2,0)) with pm3d
-    pause 0.1
+    ; pause 0.1
   }
 } else {
   print "Skipping animation"

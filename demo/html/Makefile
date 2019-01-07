@@ -78,7 +78,7 @@ animate2.html: $(GNUPLOT_LIB)/animate2.dem ./webify.pl
 
 showcase_plots: complex_trig.html pm3d_lighting.html
 	cp violinplot.5.png showcase_plot_1.png
-	cp pm3d_lighting.2.png showcase_plot_2.png
+	cp voxel.2.png showcase_plot_2.png
 
 %.html: $(GNUPLOT_LIB)/%.dem ./webify.pl
 	./webify.pl $*

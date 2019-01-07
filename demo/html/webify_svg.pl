@@ -77,6 +77,9 @@ print STDERR $name, "\n";
 	}
 	print GNUPLOT "set output \"$name.$plot.svg\"\n";
 
+# suppress animations
+ 	print GNUPLOT "NO_ANIMATION = 1\n";
+
 # find out if gpsavediff is available in current path
 	my $savescripts = T;
 	{local $^W=0; $savescripts = open(FOO, "|gpsavediff") }
