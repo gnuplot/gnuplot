@@ -10269,10 +10269,16 @@ Ffigure_missing
 ?show isosurface
  Syntax:
       set isosurface {mixed|triangles}
+      set isosurface {no}insidecolor <n>
  Surfaces plotted by the command `splot $voxelgrid with isosurface` are by
  default constructed from a mixture of quadrangles and triangles.  The use
  of quadrangles creates a less complicated visual impression.  This is the
  default.  This command proveds an option to tesselate with only triangles.
+
+ By default the inside of an isosurface is drawn in a separate color.
+ The method of choosing that color is the same as for hidden3d surfaces,
+ where an offset <n> is added to the base linetype.  To draw both the inside
+ and outside surfaces in the same color, use `set isosurface noinsidecolor`.
 3 jitter
 ?commands set jitter
 ?set jitter
