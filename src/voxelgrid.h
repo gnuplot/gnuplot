@@ -25,6 +25,7 @@ typedef struct vgrid {
 
 struct {
     int tesselation;	/* 0 = mixed  1 = triangles only */
+    int inside_offset;	/* difference between front/back linetypes */
 } isosurface_options;
 
 /* function prototypes */
