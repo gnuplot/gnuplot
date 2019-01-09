@@ -369,7 +369,7 @@ load_file(FILE *fp, char *name, int calltype)
 		stop = TRUE;
 		gp_input_line[start] = '\0';
 		more = FALSE;
-	    } else if (!fp && datablock_input_line && (*datablock_input_line == '\0')) {
+	    } else if (!fp && datablock_input_line && (*datablock_input_line == NULL)) {
 		/* End of input datablock */
 		stop = TRUE;
 		gp_input_line[start] = '\0';
