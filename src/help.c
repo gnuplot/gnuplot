@@ -45,6 +45,9 @@ void OutLine(const char *M){fputs(M,stderr);}
 #ifdef __DJGPP__
 # include <pc.h>
 #endif
+#if defined(__WATCOMC__) && defined(MSDOS)
+# include <graph.h>
+#endif
 
 /*
  ** help -- help subsystem that understands defined keywords
@@ -668,13 +671,20 @@ StartOutput()
     /* built-in dumb pager: use the line count provided by the terminal */
     line_count = getenv("LINES");
 
+    screensize = SCREENSIZE;
     if (line_count != NULL)
 	screensize = (int) strtol(line_count, NULL, 0);
 #ifdef __DJGPP__
     if (line_count == NULL)
 	screensize = ScreenRows();
+#elif defined(__WATCOMC__) && defined(MSDOS)
+    if (line_count == NULL) {
+	struct videoconfig vc;
+	_getvideoconfig(&vc);
+	screensize = vc.numtextrows;
+    }
 #endif
-    if (line_count == NULL || screensize < 3)
+    if (screensize < 3)
 	screensize = SCREENSIZE;
 
     /* built-in pager */
