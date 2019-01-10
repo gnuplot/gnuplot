@@ -23,10 +23,10 @@ typedef struct vgrid {
     t_voxel *vdata;	/* points to 3D array of voxels */
 } vgrid;
 
-struct {
+typedef struct isosurface_opt{
     int tesselation;	/* 0 = mixed  1 = triangles only */
     int inside_offset;	/* difference between front/back linetypes */
-} isosurface_options;
+} isosurface_opt;
 
 /* function prototypes */
 void voxel_command __PROTO((void));
@@ -44,5 +44,8 @@ void check_grid_ranges __PROTO((void));
 t_voxel voxel __PROTO((double vx, double vy, double vz));
 void set_isosurface __PROTO((void));
 void show_isosurface __PROTO((void));
+
+/* variables */
+extern isosurface_opt isosurface_options;
 
 #endif /* VOXELGRID_H */

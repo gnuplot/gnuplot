@@ -107,6 +107,7 @@
 
 static vgrid *current_vgrid = NULL;			/* active voxel grid */
 static struct udvt_entry *udv_VoxelDistance = NULL;	/* reserved user variable */
+struct isosurface_opt isosurface_options;
 
 /* Internal prototypes */
 static void vfill( t_voxel *grid );
@@ -356,7 +357,7 @@ get_vgrid_by_name(char *name)
 
     if (!vgrid || vgrid->udv_value.type != VOXELGRID)
 	return NULL;
-    else 
+    else
 	return vgrid;
 }
 
