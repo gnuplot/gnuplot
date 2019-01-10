@@ -392,6 +392,8 @@ gpfree_vgrid(struct udvt_entry *grid)
 	return;
     free(grid->udv_value.v.vgrid->vdata);
     free(grid->udv_value.v.vgrid);
+    if (grid->udv_value.v.vgrid == current_vgrid)
+	current_vgrid = NULL;
     grid->udv_value.v.vgrid = NULL;
     grid->udv_value.type = NOTDEFINED;
 }
@@ -413,9 +415,6 @@ unset_vgrid()
     grid = get_vgrid_by_name(name);
     if (!grid)
 	int_error(c_token, "no such vgrid");
-
-    if (grid->udv_value.v.vgrid == current_vgrid)
-	current_vgrid = NULL;
 
     gpfree_vgrid(grid);
 }
