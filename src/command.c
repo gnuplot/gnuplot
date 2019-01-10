@@ -1088,7 +1088,7 @@ exit_command()
 	c_token += 2;
 	status = int_expression();
 	gp_exit(status);
-    }	
+    }
 
     /* exit error 'error message'  returns to the top command line */
     if (equals(c_token+1,"error")) {
@@ -2601,7 +2601,7 @@ changedir(char *path)
     if (isalpha((unsigned char)path[0]) && (path[1] == ':')) {
 	int driveno = toupper((unsigned char)path[0]) - 'A';	/* 0=A, 1=B, ... */
 
-# if defined(__EMX__)
+# if defined(__EMX__) || defined(__WATCOMC__)
 	(void) _chdrive(driveno + 1);
 # elif defined(__DJGPP__)
 	(void) setdisk(driveno);
