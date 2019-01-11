@@ -146,21 +146,21 @@ check_grid_ranges()
 	int_error(NO_CARET, "vgrid must be set before use");
 
     if (isnan(current_vgrid->vxmin) || isnan(current_vgrid->vxmax)) {
-	if (!(axis_array[FIRST_X_AXIS].autoscale & AUTOSCALE_BOTH) == AUTOSCALE_NONE) {
+	if ((axis_array[FIRST_X_AXIS].set_autoscale & AUTOSCALE_BOTH) == AUTOSCALE_NONE) {
 	    current_vgrid->vxmin = axis_array[FIRST_X_AXIS].set_min;
 	    current_vgrid->vxmax = axis_array[FIRST_X_AXIS].set_max;
 	} else
 	    int_error(NO_CARET, "grid limits must be set before use");
     }
     if (isnan(current_vgrid->vymin) || isnan(current_vgrid->vymax)) {
-	if (!(axis_array[FIRST_Y_AXIS].autoscale & AUTOSCALE_BOTH) == AUTOSCALE_NONE) {
+	if ((axis_array[FIRST_Y_AXIS].set_autoscale & AUTOSCALE_BOTH) == AUTOSCALE_NONE) {
 	    current_vgrid->vymin = axis_array[FIRST_Y_AXIS].set_min;
 	    current_vgrid->vymax = axis_array[FIRST_Y_AXIS].set_max;
 	} else
 	    int_error(NO_CARET, "grid limits must be set before use");
     }
     if (isnan(current_vgrid->vzmin) || isnan(current_vgrid->vzmax)) {
-	if (!(axis_array[FIRST_Z_AXIS].autoscale & AUTOSCALE_BOTH) == AUTOSCALE_NONE) {
+	if ((axis_array[FIRST_Z_AXIS].set_autoscale & AUTOSCALE_BOTH) == AUTOSCALE_NONE) {
 	    current_vgrid->vzmin = axis_array[FIRST_Z_AXIS].set_min;
 	    current_vgrid->vzmax = axis_array[FIRST_Z_AXIS].set_max;
 	} else
