@@ -231,6 +231,7 @@ prepare_call(int calltype)
     udv->udv_value.type = ARRAY;
     ARGV = udv->udv_value.v.value_array = gp_alloc((argv_size + 1) * sizeof(t_value), "array state");
     ARGV[0].v.int_val = argv_size;
+    ARGV[0].type = NOTDEFINED;
 
     for (argindex = 1; argindex <= 9; argindex++) {
 	char *argstring = call_args[argindex-1];
@@ -599,9 +600,14 @@ lf_push(FILE *fp, char *name, char *cmdline)
 	}
 	/* Save ARGV[] */
 	lf->argv[0].v.int_val = 0;
+	lf->argv[0].type = NOTDEFINED;
 	if ((udv = get_udv_by_name("ARGV")) && udv->udv_value.type == ARRAY) {
-	    for (argindex = 0; argindex <= call_argc; argindex++)
+	    for (argindex = 0; argindex <= call_argc; argindex++) {
 		lf->argv[argindex] = udv->udv_value.v.value_array[argindex];
+		if (lf->argv[argindex].type == STRING)
+		    lf->argv[argindex].v.string_val =
+			gp_strdup(lf->argv[argindex].v.string_val);
+	    }
 	}
     }
     lf->depth = lf_head ? lf_head->depth+1 : 0;	/* recursion depth */
