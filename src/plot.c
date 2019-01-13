@@ -1,7 +1,3 @@
-#ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.174 2017/05/20 16:43:19 markisch Exp $"); }
-#endif
-
 /* GNUPLOT - plot.c */
 
 /*[
@@ -638,10 +634,11 @@ RECOVER_FROM_ERROR_IN_DASH:
 		    fprintf(stderr, "syntax:  gnuplot -c scriptname args\n");
 		    gp_exit(EXIT_FAILURE);
 		}
-		for (i=0; i<argc; i++)
+		call_argc = GPMIN(9, argc - 1);
+		for (i=0; i<=call_argc; i++) {
 		    /* Need to stash argv[i] somewhere visible to load_file() */
 		    call_args[i] = gp_strdup(argv[i+1]);
-		call_argc = argc - 1;
+		}
 
 		load_file(loadpath_fopen(*argv, "r"), gp_strdup(*argv), 5);
 		gp_exit(EXIT_SUCCESS);
