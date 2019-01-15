@@ -422,8 +422,8 @@ endif
 
 ifdef CAIROLIBS
 	CAIRO_CFLAGS := $(shell pkg-config --cflags cairo | sed s_-Ic:_-I/c_g)
-	PANGOCAIRO_CFLAGS := $(shell pkg-config --cflags pangocairo cairo | sed s_-Ic:_-I/c_g)
-	PANGOCAIRO_LIBS := $(shell pkg-config --libs pangocairo cairo | sed s_-Lc:_-L/c_g)
+	PANGOCAIRO_CFLAGS := $(shell pkg-config --cflags glib-2.0 gobject-2.0 pangocairo cairo | sed s_-Ic:_-I/c_g)
+	PANGOCAIRO_LIBS := $(shell pkg-config --libs glib-2.0 gobject-2.0 pangocairo cairo | sed s_-Lc:_-L/c_g)
 	CAIRO_OBJS := gp_cairo.$(O) gp_cairo_helpers.$(O)
 	TERMFLAGS += $(PANGOCAIRO_CFLAGS)
 endif
