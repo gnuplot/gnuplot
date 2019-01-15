@@ -392,6 +392,12 @@ void wxtApp::OnCreateWindow( wxCommandEvent& event )
 #endif
 	window->frame = new wxtFrame( window->title, window->id );
 	window->frame->Show(true);
+#ifdef __WXMSW__
+	// If gnuplot is invoked "hidden", the very first Show() is ignored.
+	if (!window->frame->IsShown())
+		window->frame->Show(true);
+#endif
+
 	FPRINTF((stderr,"new plot window opened\n"));
 	/* make the panel able to receive keyboard input */
 	window->frame->panel->SetFocus();
@@ -1911,7 +1917,7 @@ void wxt_init()
 		/* the following is done in wxEntry() with wxMSW only */
 		WXDLLIMPEXP_BASE void wxSetInstance(HINSTANCE hInst);
 		wxSetInstance(GetModuleHandle(NULL));
-		wxApp::m_nCmdShow = SW_SHOW;
+		wxApp::m_nCmdShow = SW_SHOWNORMAL;
 #endif
 
 		if (!wxInitialize()) {
@@ -3315,9 +3321,8 @@ void wxt_raise_window(wxt_window_t* window, bool force)
 		gdk_window_raise(gtk_widget_get_window(window->frame->GetHandle()));
 #else
 #ifdef __WXMSW__
-		// Only restore the window if it is iconized.  In particular
-		// leave it alone if it is maximized.
-		if (window->frame->IsIconized())
+		// Only restore the window if it is not maximized.
+		if (!(window->frame->IsMaximized()))
 #endif
 		window->frame->Restore();
 		window->frame->Raise();
