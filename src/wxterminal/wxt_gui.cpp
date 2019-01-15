@@ -392,6 +392,12 @@ void wxtApp::OnCreateWindow( wxCommandEvent& event )
 #endif
 	window->frame = new wxtFrame( window->title, window->id );
 	window->frame->Show(true);
+#ifdef __WXMSW__
+	// If gnuplot is invoked "hidden", the very first Show() is ignored.
+	if (!window->frame->IsShown())
+		window->frame->Show(true);
+#endif
+
 	FPRINTF((stderr,"new plot window opened\n"));
 	/* make the panel able to receive keyboard input */
 	window->frame->panel->SetFocus();
