@@ -763,7 +763,7 @@ GraphStart(LPGW lpgw, double pointsize)
 	if (!lpgw->hWndGraph || !IsWindow(lpgw->hWndGraph))
 		GraphInit(lpgw);
 
-	if (IsIconic(lpgw->hWndGraph))
+	if (IsIconic(lpgw->hWndGraph) || !IsWindowVisible(lpgw->hWndGraph))
 		ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);
 	if (lpgw->graphtotop) {
 		/* HBB NEW 20040221: avoid grabbing the keyboard focus
