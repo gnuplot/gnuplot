@@ -2329,6 +2329,8 @@ eval_3dplots()
 		continue;
 	    if (this_plot->plot_type == NODATA)
 		continue;
+	    if (this_plot->plot_type == KEYENTRY)
+		continue;
 
 	    /* Allow individual surfaces to opt out of contouring */
 	    if (this_plot->opt_out_of_contours)
