@@ -1038,6 +1038,8 @@ do_3dplot(
 	    lkey = (key->visible && this_plot->title && this_plot->title[0]
 				 && !this_plot->title_is_suppressed);
 	    draw_this_surface = (draw_surface && !this_plot->opt_out_of_surface);
+	    if (this_plot->plot_type == KEYENTRY)
+		draw_this_surface = TRUE;
 
 	    /* User-specified key locations can use the 2D code */
 	    if (this_plot->title_position) {
