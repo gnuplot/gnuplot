@@ -1,7 +1,7 @@
 /* config.h for makefile.os2
  *
  * Prepared according to config.h from ./configure and by means of
- * config_strip.sh as of gnuplot 5.0 in November 2014.
+ * config_strip.sh as of gnuplot 5.1 in February 2016.
  */
 
 /* Define to allow use of certain deprecated syntax. */
@@ -64,7 +64,9 @@
 
 /* Define to 1 if you have the declaration of `signgam', and to 0 if you
    don't. */
-/* #undef HAVE_DECL_SIGNGAM */
+#ifdef __KLIBC__
+# define HAVE_DECL_SIGNGAM 1
+#endif
 
 /* Define to 1 if you have the <dirent.h> header file. */
 #define HAVE_DIRENT_H 1
@@ -82,15 +84,20 @@
 /* #undef HAVE_EDITLINE_READLINE_H */
 
 /* Define to 1 if you have the `erf' function. */
-/* #undef HAVE_ERF */
+#ifdef __KLIBC__
+# define HAVE_ERF 1
+#endif
 
 /* Define to 1 if you have the `erfc' function. */
-/* #undef HAVE_ERFC */
+#ifdef __KLIBC__
+# define HAVE_ERFC 1
+#endif
 
 /* Define to 1 if you have the <errno.h> header file. */
 #define HAVE_ERRNO_H 1
 
 /* Define if external function plugins are to be supported. */
+// FIXME: this should be possible
 /* #undef HAVE_EXTERNAL_FUNCTIONS */
 
 /* Define to 1 if you have the `fdopen' function. */
@@ -101,9 +108,6 @@
 
 /* Define to 1 if you have the `fork' function. */
 #define HAVE_FORK 1
-
-/* Define to 1 if you're using the Aquaterm framework on Mac OS X */
-/* #undef HAVE_FRAMEWORK_AQUATERM */
 
 /* Define to 1 if fseeko (and presumably ftello) exists and is declared. */
 /* #undef HAVE_FSEEKO */
@@ -154,7 +158,9 @@
 #define HAVE_INDEX 1
 
 /* Define to 1 if you have the <inttypes.h> header file. */
-/* #undef HAVE_INTTYPES_H */
+#ifdef __KLIBC__
+# define HAVE_INTTYPES_H 1
+#endif
 
 /* Define if you want to use kpsexpand (TeX). */
 /* #undef HAVE_KPSEXPAND */
@@ -162,11 +168,11 @@
 /* Define to 1 if you have the <langinfo.h> header file. */
 /* #undef HAVE_LANGINFO_H */
 
-/* Define to 1 if you have the `isnan' function. */
-#define HAVE_ISNAN 1
-
 /* Define to 1 if you have the `lgamma' function. */
-/* #undef HAVE_LGAMMA */
+#ifdef __KLIBC__
+# define HAVE_LGAMMA 1
+#endif
+
 
 /* Define if you have the caca library. */
 /* #undef HAVE_LIBCACA */
@@ -302,10 +308,14 @@
 #define HAVE_SLEEP 1
 
 /* Define to 1 if stdbool.h conforms to C99. */
-/* #undef HAVE_STDBOOL_H */
+#ifdef __KLIBC__
+# define HAVE_STDBOOL_H 1
+#endif
 
 /* Define to 1 if you have the <stdint.h> header file. */
-/* #undef HAVE_STDINT_H */
+#ifdef __KLIBC__
+# define HAVE_STDINT_H */
+#endif
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 #define HAVE_STDLIB_H 1
@@ -314,7 +324,9 @@
 /* #undef HAVE_STPCPY */
 
 /* Define to 1 if you have the `strcasecmp' function. */
-/* #undef HAVE_STRCASECMP */
+#ifdef __KLIBC__
+# define HAVE_STRCASECMP 1
+#endif
 
 /* Define to 1 if you have the `strchr' function. */
 #define HAVE_STRCHR 1
@@ -341,7 +353,9 @@
 #define HAVE_STRING_H 1
 
 /* Define to 1 if you have the `strncasecmp' function. */
-/* #undef HAVE_STRNCASECMP */
+#ifdef __KLIBC__
+# define HAVE_STRNCASECMP 1
+#endif
 
 /* Define to 1 if you have the `strndup' function. */
 /* #undef HAVE_STRNDUP */
@@ -409,6 +423,9 @@
 /* Define if time_t is declared in time.h. */
 #define HAVE_TIME_T_IN_TIME_H 1
 
+/* Define to 1 if you have the `uname' function. */
+#define HAVE_UNAME 1
+
 /* Define to 1 if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1
 
@@ -431,7 +448,9 @@
 /* #undef HAVE_VGAGL_H */
 
 /* Define to 1 if you have the <wchar.h> header file. */
-/* #undef HAVE_WCHAR_H */
+#ifdef __KLIBC__
+# define HAVE_WCHAR_H 1
+#endif
 
 /* Define to 1 if you have the `wcwidth' function. */
 /* #undef HAVE_WCWIDTH */
@@ -443,7 +462,11 @@
 /* #undef HAVE_WORKING_VFORK */
 
 /* Define to 1 if the system has the type `_Bool'. */
-/* #undef HAVE__BOOL */
+#if __GNUC__ >= 3
+# define HAVE__BOOL 1
+#else
+# define HAVE__BOOL 0
+#endif
 
 /* Define to enable handling point size in hidden3d code. */
 #define HIDDEN3D_VAR_PTSIZE 1
@@ -454,23 +477,23 @@
 /* Define to 1 if malloc(0)==0 */
 /* #undef MALLOC_ZERO_RETURNS_ZERO */
 
-/* Maximum number of parallel axes supported */
-#define MAX_PARALLEL_AXES 7
-
 /* Define if your libreadline has no rl_ding */
-#define MISSING_RL_DING 1
+/* #undef MISSING_RL_DING */
 
 /* Define if your libreadline has no rl_force_update_display */
-#define MISSING_RL_FORCED_UPDATE_DISPLAY 1
+/* #undef MISSING_RL_FORCED_UPDATE_DISPLAY */
 
 /* Define if your libreadline has no rl_complete_with_tilde_expansion */
-#define MISSING_RL_TILDE_EXPANSION 1
+/* #undef MISSING_RL_TILDE_EXPANSION */
 
 /* Define if this is an MSDOS system. */
 /* #undef MSDOS */
 
 /* Define to disable terminals that depend on code in bitmap.c */
 #define NO_BITMAP_SUPPORT 1
+
+/* Define to 1 if your C compiler doesn't accept -c and -o together. */
+/* #undef NO_MINUS_C_MINUS_O */
 
 /* Name of package */
 /* #undef PACKAGE */
@@ -487,11 +510,11 @@
 /* Define to the one symbol short name of this package. */
 /* #undef PACKAGE_TARNAME */
 
-/* Define to the home page for this package. */
-#define PACKAGE_URL ""
-
 /* Define to the version of this package. */
 /* #undef PACKAGE_VERSION */
+
+/* The patch level, a.k.a. micro version number */
+/* #undef PATCHLEVEL */
 
 /* Define if you do have the popen and pclose functions. */
 #define PIPES 1
@@ -503,11 +526,8 @@
 /* #undef QTTERM */
 
 /* Define if you want to use the included readline function. */
-/* I think it must be defined in order the mousing and OS2_IPC work. */
-#define READLINE 1
-
-/* Define as the return type of signal handlers (`int' or `void'). */
-#define RETSIGTYPE void
+/* #undef READLINE */
+/* Don't change it here -- this define is set in config/makefile.os2. */
 
 /* Define to the type of arg 1 for `select'. */
 #define SELECT_TYPE_ARG1 int
@@ -523,9 +543,6 @@
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
-
-/* Define if you want to use the sunview terminal (sun). */
-/* #undef SUN */
 
 /* Define if the 3dkit libray is present. */
 /* #undef THREEDKIT */
@@ -548,39 +565,24 @@
 /* Define to add support for generating a statistical summary of data */
 #define USE_STATS 1
 
-/* Enable extensions on AIX 3, Interix.  */
-#ifndef _ALL_SOURCE
-# define _ALL_SOURCE 1
-#endif
-/* Enable GNU extensions on systems that have them.  */
-#ifndef _GNU_SOURCE
-# define _GNU_SOURCE 1
-#endif
-/* Enable threading extensions on Solaris.  */
-#ifndef _POSIX_PTHREAD_SEMANTICS
-# define _POSIX_PTHREAD_SEMANTICS 1
-#endif
-/* Enable extensions on HP NonStop.  */
-#ifndef _TANDEM_SOURCE
-# define _TANDEM_SOURCE 1
-#endif
-/* Enable general extensions on Solaris.  */
-#ifndef __EXTENSIONS__
-# define __EXTENSIONS__ 1
-#endif
-
-
 /* Define to enable multi-byte font support for x11 */
 /* #undef USE_X11_MULTIBYTE */
 
 /* Version number of package */
 /* #undef VERSION */
 
+/* The main version number */
+/* #undef VERSION_MAJOR */
+
 /* Define if the vgagl libray is present. */
 /* #undef VGAGL */
 
 /* Define if you want the wxwidgets terminal. */
 /* #undef WXWIDGETS */
+/* Don't change it here -- this define is set in config/makefile.os2. */
+
+/* wxWidgets >= 2.9 wants calling program to invoke XInit() */
+/* #undef WX_NEEDS_XINITTHREADS */
 
 /* Define if you are using the X11 window system. */
 /* #undef X11 */
@@ -588,6 +590,20 @@
 
 /* Define to 1 if the X Window System is missing or not being used. */
 /* #undef X_DISPLAY_MISSING */
+
+/* Number of bits in a file offset, on hosts where this is settable. */
+/* #undef _FILE_OFFSET_BITS */
+
+/* Enable GNU extensions on systems that have them.  */
+#ifndef _GNU_SOURCE
+# define _GNU_SOURCE 1
+#endif
+
+/* Define to 1 to make fseeko visible on some hosts (e.g. glibc 2.2). */
+/* #undef _LARGEFILE_SOURCE */
+
+/* Define for large files, on AIX-style hosts. */
+/* #undef _LARGE_FILES */
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */
@@ -601,7 +617,7 @@
 /* Define to `int' if <sys/types.h> does not define. */
 /* #define pid_t int */
 
-/* Define to `unsigned int' if <sys/types.h> does not define. */
+/* Define to `unsigned' if <sys/types.h> does not define. */
 /* #undef size_t */
 
 /* Define as `fork' if `vfork' does not work. */
@@ -645,3 +661,12 @@
 
 #define strtoll _strtoll
 
+/* Some backwards compatibility with EMX */
+#ifndef __KLIBC__
+# define int32_t int
+# define uint32_t unsigned int
+# define isblank(x) isspace(x)
+# define isinf(x) (fpclassify(x) == FP_INFINITE)
+# define atoll _atoll
+# define strlcpy(a, b, c) strcpy(a, b)
+#endif
