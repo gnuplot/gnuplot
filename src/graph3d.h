@@ -170,9 +170,17 @@ extern int iso_samples_2;
 extern int axis3d_o_x, axis3d_o_y, axis3d_x_dx, axis3d_x_dy, axis3d_y_dx, axis3d_y_dy;
 #endif
 
+typedef enum {
+    NORMAL_REPLOT = 0,	/* e.g. "replot" command */
+    AXIS_ONLY_ROTATE,	/* suppress replots during 3D rotation by ctrl-left-mouse */
+    NORMAL_REFRESH,	/* e.g. "refresh" command */
+    QUICK_REFRESH	/* auto-generated refresh during 3D rotation */
+} REPLOT_TYPE;
+    
+
 /* Prototypes from file "graph3d.c" */
 
-void do_3dplot __PROTO((struct surface_points *plots, int pcount, int quick));
+void do_3dplot __PROTO((struct surface_points *plots, int pcount, REPLOT_TYPE quick));
 void map3d_position __PROTO((struct position *pos, int *x, int *y, const char *what));
 void map3d_position_double __PROTO((struct position *pos, double *x, double *y, const char *what));
 void map3d_position_r __PROTO((struct position *pos, int *x, int *y, const char *what));

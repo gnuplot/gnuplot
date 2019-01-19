@@ -633,7 +633,7 @@ void
 do_3dplot(
     struct surface_points *plots,
     int pcount,			/* count of plots in linked list */
-    int quick)		 	/* !=0 means plot only axes etc., for quick rotation */
+    REPLOT_TYPE replot_mode) 	/* replot/refresh/axes-only/quick-refresh */
 {
     struct termentry *t = term;
     int surface;
@@ -804,7 +804,7 @@ do_3dplot(
     }
 
     /* Initialize palette */
-    if (!quick) {
+    if (replot_mode != AXIS_ONLY_ROTATE) {
 	can_pm3d = is_plot_with_palette() && !make_palette()
 		   && ((term->flags & TERM_NULL_SET_COLOR) == 0);
     }
@@ -904,7 +904,8 @@ do_3dplot(
     }
 
     /* Add 'back' color box */
-    if (!quick && can_pm3d && is_plot_with_colorbox() && color_box.layer == LAYER_BACK)
+    if ((replot_mode != AXIS_ONLY_ROTATE)
+    && can_pm3d && is_plot_with_colorbox() && color_box.layer == LAYER_BACK)
 	draw_color_smooth_box(MODE_SPLOT);
 
     /* Grid walls */
@@ -922,7 +923,7 @@ do_3dplot(
     /* Sync point for epslatex text positioning */
     (term->layer)(TERM_LAYER_FRONTTEXT);
 
-    if (hidden3d && draw_surface && !quick) {
+    if (hidden3d && draw_surface && (replot_mode != AXIS_ONLY_ROTATE)) {
 	init_hidden_line_removal();
 	reset_hidden_line_removal();
     }
@@ -981,7 +982,8 @@ do_3dplot(
     /* DRAW SURFACES AND CONTOURS */
 
     if (!key_pass)
-    if (hidden3d && (hidden3d_layer == LAYER_BACK) && draw_surface && !quick) {
+    if (hidden3d && (hidden3d_layer == LAYER_BACK) && draw_surface
+    && (replot_mode != AXIS_ONLY_ROTATE)) {
 	(term->layer)(TERM_LAYER_BEFORE_PLOT);
 	plot3d_hidden(plots, pcount);
 	(term->layer)(TERM_LAYER_AFTER_PLOT);
@@ -1012,12 +1014,16 @@ do_3dplot(
 
     pm3d_order_depth = (can_pm3d && !draw_contour && pm3d.direction == PM3D_DEPTH);
 
+    /* TODO:
+     *   During "refresh" from rotation it would be better to re-use previously
+     *   built quadrangle list rather than clearing and rebuilding it.
+     */
     if (pm3d_order_depth || track_pm3d_quadrangles) {
 	pm3d_depth_queue_clear();
     }
 
     this_plot = plots;
-    if (!quick)
+    if (replot_mode != AXIS_ONLY_ROTATE)
 	for (surface = 0;
 	     surface < pcount;
 	     this_plot = this_plot->next_sp, surface++) {
@@ -1086,7 +1092,10 @@ do_3dplot(
 		    vplot_points(this_plot, this_plot->iso_level);
 		    break;
 		case ISOSURFACE:
-		    vplot_isosurface(this_plot, 1);
+		    if (replot_mode == QUICK_REFRESH)
+			vplot_isosurface(this_plot, 4);
+		    else
+			vplot_isosurface(this_plot, 1);
 		    break;
 		}
 	    }
@@ -1453,7 +1462,8 @@ do_3dplot(
     }
 
     if (!key_pass)
-    if (hidden3d && (hidden3d_layer == LAYER_FRONT) && draw_surface && !quick) {
+    if (hidden3d && (hidden3d_layer == LAYER_FRONT) && draw_surface
+    &&  (replot_mode != AXIS_ONLY_ROTATE)) {
 	(term->layer)(TERM_LAYER_BEFORE_PLOT);
 	plot3d_hidden(plots, pcount);
 	(term->layer)(TERM_LAYER_AFTER_PLOT);
@@ -1484,7 +1494,8 @@ do_3dplot(
     }
 
     /* Add 'front' color box */
-    if (!quick && can_pm3d && is_plot_with_colorbox() && color_box.layer == LAYER_FRONT)
+    if ((replot_mode != AXIS_ONLY_ROTATE)
+    &&  can_pm3d && is_plot_with_colorbox() && color_box.layer == LAYER_FRONT)
 	draw_color_smooth_box(MODE_SPLOT);
 
     /* Add 'front' rectangles */

@@ -2565,13 +2565,6 @@ eval_3dplots()
 	} while (this_plot);
     }
 
-    /* the following ~9 lines were moved from the end of the
-     * function to here, as do_3dplot calles term->text, which
-     * itself might process input events in mouse enhanced
-     * terminals. For redrawing to work, line capturing and
-     * setting the plot3d_num must already be done before
-     * entering do_3dplot(). Thu Jan 27 23:54:49 2000 (joze) */
-
     /* if we get here, all went well, so record the line for replot */
     if (plot_token != -1) {
 	/* note that m_capture also frees the old replot_line */
@@ -2587,7 +2580,7 @@ eval_3dplots()
 	print_3dtable(plot_num);
 
     } else {
-	do_3dplot(first_3dplot, plot_num, 0);
+	do_3dplot(first_3dplot, plot_num, NORMAL_REPLOT);
 
 	/* after do_3dplot(), axis_array[].min and .max
 	 * contain the plotting range actually used (rounded

@@ -187,7 +187,7 @@ static void event_buttonpress __PROTO((struct gp_event_t * ge));
 static void event_buttonrelease __PROTO((struct gp_event_t * ge));
 static void event_motion __PROTO((struct gp_event_t * ge));
 static void event_modifier __PROTO((struct gp_event_t * ge));
-static void do_save_3dplot __PROTO((struct surface_points *, int, int));
+static void do_save_3dplot __PROTO((struct surface_points *, int, REPLOT_TYPE));
 static void load_mouse_variables __PROTO((double, double, TBOOLEAN, int));
 
 static void do_zoom_in_around_mouse __PROTO((void));
@@ -1538,7 +1538,7 @@ ChangeView(int x, int z)
 	fprintf(stderr, "changing view to %f, %f.\n", surface_rot_x, surface_rot_z);
     }
 
-    do_save_3dplot(first_3dplot, plot3d_num, 0 /* not quick */ );
+    do_save_3dplot(first_3dplot, plot3d_num, NORMAL_REPLOT);
 
     if (ALMOST2D) {
 	/* 2D plot, or suitably aligned 3D plot: update statusline */
@@ -1569,7 +1569,7 @@ ChangeAzimuth(int x)
     if (display_ipc_commands())
 	fprintf(stderr, "changing azimuth to %f.\n", azimuth);
 
-    do_save_3dplot(first_3dplot, plot3d_num, 0 /* not quick */ );
+    do_save_3dplot(first_3dplot, plot3d_num, NORMAL_REPLOT);
 }
 
 
@@ -2164,7 +2164,10 @@ event_buttonrelease(struct gp_event_t *ge)
 	if (!!(modifier_mask & Mod_Ctrl) && !needreplot) {
 	    /* redraw the 3d plot if its last redraw was 'quick'
 	     * (only axes) because modifier key was pressed */
-	    do_save_3dplot(first_3dplot, plot3d_num, 0);
+	    do_save_3dplot(first_3dplot, plot3d_num, NORMAL_REPLOT);
+	} else if (b==1) {
+	    /* Needed if the previous plot was QUICK_REFRESH */
+	    do_save_3dplot(first_3dplot, plot3d_num, NORMAL_REPLOT);
 	}
 	if (term->set_cursor)
 	    term->set_cursor((button & (1 << 1)) ? 1 : (button & (1 << 2)) ? 2 : 0,
@@ -2253,7 +2256,8 @@ event_motion(struct gp_event_t *ge)
 		 * then replot while
 		 * disabling further replots until it completes */
 		allowmotion = FALSE;
-		do_save_3dplot(first_3dplot, plot3d_num, !!(modifier_mask & Mod_Ctrl));
+		do_save_3dplot(first_3dplot, plot3d_num,
+			((modifier_mask & Mod_Ctrl) != 0) ? AXIS_ONLY_ROTATE : QUICK_REFRESH);
 		fill_gpval_float("GPVAL_VIEW_ROT_X", surface_rot_x);
 		fill_gpval_float("GPVAL_VIEW_ROT_Z", surface_rot_z);
 		fill_gpval_float("GPVAL_VIEW_SCALE", surface_scale);
@@ -2293,7 +2297,7 @@ event_modifier(struct gp_event_t *ge)
 
     if (modifier_mask == 0 && is_3d_plot && (button & ((1 << 1) | (1 << 2))) && !needreplot) {
 	/* redraw the 3d plot if modifier key released */
-	do_save_3dplot(first_3dplot, plot3d_num, 0);
+	do_save_3dplot(first_3dplot, plot3d_num, NORMAL_REPLOT);
     }
 }
 
@@ -2303,7 +2307,8 @@ event_plotdone()
 {
     if (needreplot) {
 	needreplot = FALSE;
-	do_save_3dplot(first_3dplot, plot3d_num, !!(modifier_mask & Mod_Ctrl));
+	do_save_3dplot(first_3dplot, plot3d_num,
+			((modifier_mask & Mod_Ctrl) != 0) ? AXIS_ONLY_ROTATE : NORMAL_REPLOT);
     } else {
 	allowmotion = TRUE;
     }
@@ -2501,7 +2506,7 @@ exec_event(char type, int mx, int my, int par1, int par2, int winid)
 
 
 static void
-do_save_3dplot(struct surface_points *plots, int pcount, int quick)
+do_save_3dplot(struct surface_points *plots, int pcount, REPLOT_TYPE quick)
 {
     if (!plots || (E_REFRESH_NOT_OK == refresh_ok)) {
 	/* !plots might happen after the `reset' command for example
