@@ -440,10 +440,11 @@ set_isosurface()
 		isosurface_options.inside_offset = 1;
 	    else
 		isosurface_options.inside_offset = int_expression();
-	} else if (equals(c_token, "noin$sidecolor")) {
+	} else if (almost_equals(c_token, "noin$sidecolor")) {
 	    c_token++;
 	    isosurface_options.inside_offset = 0;
-	}
+	} else
+	    int_error(c_token,"unrecognized option");
     }
 }
 
