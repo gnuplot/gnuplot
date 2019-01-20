@@ -93,6 +93,9 @@
 #include "marching_cubes.h"
 #include "qt_table.h"
 
+/* local copy of vertex offsets from voxel corner, scaled by downsampling */
+static int scaled_offset[8][3];
+
 /* the fractional index intersection along each of the cubes's 12 edges */
 static double intersection[12][3];
 
@@ -176,10 +179,18 @@ vplot_points (struct surface_points *plot, double level)
  */
 
 void
-vplot_isosurface (struct surface_points *plot)
+vplot_isosurface (struct surface_points *plot, int downsample)
 {
     int i, j, k;
     int N = plot->vgrid->size;
+
+    /* Apply down-sampling, if any, to the vertex offsets */
+    if (downsample < 1)
+	downsample = 1;
+    for (i=0; i<8; i++) {
+	for (j=0; j<3; j++)
+	    scaled_offset[i][j] = downsample * vertex_offset[i][j];
+    }
 
     /* These initializations are normally done in pm3d_plot()
      * isosurfaces do not use that code path.
@@ -188,9 +199,9 @@ vplot_isosurface (struct surface_points *plot)
 	pm3d_init_lighting_model();
     pm3d_border_lp = pm3d.border;
 
-    for (i = 0; i < N-1; i++) {
-	for (j = 0; j < N-1; j++) {
-	    for (k = 0; k < N-1; k++) {
+    for (i = 0; i < N - downsample; i += downsample) {
+	for (j = 0; j < N - downsample; j += downsample) {
+	    for (k = 0; k < N - downsample; k += downsample) {
 		tesselate_one_cube( plot, i, j, k );
 	    }
 	}
@@ -217,9 +228,9 @@ tesselate_one_cube( struct surface_points *plot, int ix, int iy, int iz )
 
     /* Make a local copy of the values at the cube corners */
     for (ivertex = 0; ivertex < 8; ivertex++) {
-	int cx = ix + vertex_offset[ivertex][0];
-	int cy = iy + vertex_offset[ivertex][1];
-	int cz = iz + vertex_offset[ivertex][2];
+	int cx = ix + scaled_offset[ivertex][0];
+	int cy = iy + scaled_offset[ivertex][1];
+	int cz = iz + scaled_offset[ivertex][2];
 	cornervalue[ivertex] = vgrid->vdata[cx + cy*N + cz*N*N];
     }
 
@@ -359,10 +370,10 @@ vertex_interp( int edge_no, int start, int end, t_voxel isolevel )
 	if (vertex_offset[end][i] == vertex_offset[start][i])
 	    fracindex = 0;
 	else
-	    fracindex = (vertex_offset[end][i] - vertex_offset[start][i])
+	    fracindex = (scaled_offset[end][i] - scaled_offset[start][i])
 		      * (isolevel - cornervalue[start])
 		      / (cornervalue[end] - cornervalue[start]);
-	intersection[edge_no][i] = vertex_offset[start][i] + fracindex;
+	intersection[edge_no][i] = scaled_offset[start][i] + fracindex;
     }
 }
 
@@ -370,5 +381,5 @@ vertex_interp( int edge_no, int start, int end, t_voxel isolevel )
 
 #ifndef VOXEL_GRID_SUPPORT
 void vplot_points (struct surface_points *plot, double level) {};
-void vplot_isosurface (struct surface_points *plot) {};
+void vplot_isosurface (struct surface_points *plot, int downsample) {};
 #endif

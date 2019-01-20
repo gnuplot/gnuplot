@@ -1086,7 +1086,7 @@ do_3dplot(
 		    vplot_points(this_plot, this_plot->iso_level);
 		    break;
 		case ISOSURFACE:
-		    vplot_isosurface(this_plot);
+		    vplot_isosurface(this_plot, 1);
 		    break;
 		}
 	    }
