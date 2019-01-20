@@ -191,8 +191,11 @@ vplot_isosurface (struct surface_points *plot, int downsample)
     int N = plot->vgrid->size;
 
     /* Apply down-sampling, if any, to the vertex offsets */
+    if (downsample > 1)
+	downsample = ceil((double)N / 76.);
     if (downsample < 1)
 	downsample = 1;
+
     for (i=0; i<8; i++) {
 	for (j=0; j<3; j++)
 	    scaled_offset[i][j] = downsample * vertex_offset[i][j];
