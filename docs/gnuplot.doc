@@ -15663,6 +15663,10 @@ Ffigure_walls
  jitter so that the displayed dot or point is displaced randomly from the
  true voxel grid coordinate. See `set jitter`.
 
+ Dense voxel grids can be down-sampled by using the `pointinterval` property
+ (`pi` for short) to reduce the number of points drawn.
+      splot $vgrid with points pointtype 6 pointinterval 2
+
  `with isosurface` will create a tesselated surface in 3D enclosing all voxels
  with value greater than the requested threshold. The surface placement is
  adjusted by linear interpolation to pass through the threshold value itself.

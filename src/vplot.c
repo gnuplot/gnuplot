@@ -121,6 +121,7 @@ vplot_points (struct surface_points *plot, double level)
     t_voxel *voxel;
     int index;
     int x, y;
+    int downsample = plot->lp_properties.p_interval;
 
     /* dots or points only */
     if (plot->lp_properties.p_type == PT_CHARACTER)
@@ -135,6 +136,11 @@ vplot_points (struct surface_points *plot, double level)
     for (ix = 0; ix < N; ix++) {
 	for (iy = 0; iy < N; iy++) {
 	    for (iz = 0; iz < N; iz++) {
+
+		/* The pointinterval property can be used to downsample */
+		if ((downsample > 0)
+		&& (ix % downsample || iy % downsample || iz % downsample))
+		    continue;
 
 		index = ix + iy * N + iz * N*N;
 		voxel = &vgrid->vdata[index];
