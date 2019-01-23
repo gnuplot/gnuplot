@@ -5859,10 +5859,8 @@ clear_used_font_list() {
     struct used_font *f;
     while (fontlist.next) {
 	f = fontlist.next;
-#ifndef USE_X11_MULTIBYTE
-	if (f->font) XFreeFont(disp, f->font);
-#else
 	if (f->font) XFreeFont(dpy, f->font);
+#ifdef USE_X11_MULTIBYTE
 	if (f->mbfont) XFreeFontSet(dpy, f->mbfont);
 #endif
 	free(f->requested_name);
