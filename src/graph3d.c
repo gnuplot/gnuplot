@@ -1902,7 +1902,7 @@ plot3d_points(struct surface_points *plot)
 		    }
 
 		    /* The normal case */
-		    else if (plot->lp_properties.p_type >= 0)
+		    else if (plot->lp_properties.p_type >= -1)
 			(*t->point) (x, y, plot->lp_properties.p_type);
 
 		}
