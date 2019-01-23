@@ -990,13 +990,7 @@ show_version(FILE *fp)
 		"";
 
 	    const char *hiddenline =
-#ifdef HIDDEN3D_QUADTREE
 		"+HIDDEN3D_QUADTREE  "
-#else
-# ifdef HIDDEN3D_GRIDBOX
-		"+HIDDEN3D_GRIDBOX  "
-# endif
-#endif
 		"";
 
 	    const char *plotoptions=

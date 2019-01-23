@@ -764,28 +764,6 @@ AC_ARG_ENABLE(raise-console,dnl
                 [ Define to treat spacebar like any other keystroke. ])
   fi
 
-dnl hidden3d compile-time options...
-dnl NOTE: have to check that they're not both turned on --- the code
-dnl doesn't allow that choice.
-AC_ARG_ENABLE(h3d-quadtree,dnl
-[  --disable-h3d-quadtree  disable quadtree optimization in hidden3d code],,
-  [test -z "${enable_h3d_quadtree}" && enable_h3d_quadtree=yes])
-if test "$enable_h3d_quadtree" = yes; then
-     AC_DEFINE(HIDDEN3D_QUADTREE,1,
-	       [ Define to enable quadtree optimization in hidden3d code.])
-fi
-
-AC_ARG_ENABLE(h3d-gridbox,dnl
-[  --enable-h3d-gridbox    enable gridbox optimization in hidden3d code],
-  [if test "$enable_h3d_quadtree" = yes; then
-     AC_MSG_ERROR(dnl
-[Only one of the hidden3d options quadtree and gridbox may be enabled.])
-   fi
-   if test "$enableval" = yes; then
-     AC_DEFINE(HIDDEN3D_GRIDBOX,1,
-               [ Define to enable gridbox optimization in hidden3d code.])
-   fi])
-
 
 dnl
 if test ! -f src/graphics.c ; then
@@ -1403,16 +1381,6 @@ if test "$with_kpsexpand" = yes; then
   AC_MSG_RESULT([  Use TeX kpsexpand to search for fonts: yes])
 else
   AC_MSG_RESULT([  Use TeX kpsexpand to search for fonts: no (use --with-kpsexpand to enable)])
-fi
-
-if test "$enable_h3d_gridbox" = yes; then
-  AC_MSG_RESULT([  Hidden3d optimization (gridbox/quadtree/none): gridbox])
-else
-  if test "$enable_h3d_quadtree" = no; then
-    AC_MSG_RESULT([  Hidden3d optimization (gridbox/quadtree/none): none])
-  else
-    AC_MSG_RESULT([  Hidden3d optimization (gridbox/quadtree/none): quadtree])
-  fi
 fi
 
 dnl if test "$enable_backwards_compatibility" = yes; then
