@@ -109,9 +109,7 @@ TERM_PUBLIC void ENHX11_OPEN __PROTO((char * fontname, double fontsize,
 				double base, TBOOLEAN widthflag, TBOOLEAN showflag,
 				int overprint));
 TERM_PUBLIC void ENHX11_FLUSH __PROTO((void));
-#ifdef EAM_BOXED_TEXT
 TERM_PUBLIC void ENHX11_boxed_text __PROTO((unsigned int, unsigned int, int));
-#endif
 TERM_PUBLIC void X11_modify_plots __PROTO((unsigned int, int));
 
 /* These are the default terminal sizing parameters. These should match the
@@ -1931,7 +1929,6 @@ X11_filled_polygon(int points, gpiPoint *corners)
     return;
 }
 
-#ifdef EAM_BOXED_TEXT
 TERM_PUBLIC void
 ENHX11_boxed_text(unsigned int x, unsigned int y, int option)
 {
@@ -1956,7 +1953,6 @@ ENHX11_boxed_text(unsigned int x, unsigned int y, int option)
 	break;
     }
 }
-#endif
 
 TERM_PUBLIC void
 X11_modify_plots(unsigned int ops, int plotno)
@@ -2337,9 +2333,7 @@ TERM_TABLE_START(x11_driver)
     , ENHX11_OPEN, ENHX11_FLUSH, do_enh_writec
     , X11_layer
     , NULL, 0.0, NULL /* path, tscale, hypertext */
-#ifdef EAM_BOXED_TEXT
     , ENHX11_boxed_text
-#endif
     , X11_modify_plots
     , X11_dashtype
 TERM_TABLE_END(x11_driver)

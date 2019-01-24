@@ -44,8 +44,6 @@
 #ifndef QTGNUPLOTSCENE_H
 #define QTGNUPLOTSCENE_H
 
-#define EAM_BOXED_TEXT 1
-
 #include "QtGnuplotEvent.h"
 #include "QtGnuplotItems.h"
 

@@ -89,9 +89,7 @@ void wxt_enhanced_open(char* fontname, double fontsize, double base, TBOOLEAN wi
 void wxt_layer(t_termlayer layer);
 void wxt_hypertext(int type, const char *text);
 
-#ifdef EAM_BOXED_TEXT
 void wxt_boxed_text(unsigned int x, unsigned int y, int option);
-#endif
 
 void wxt_modify_plots(unsigned int, int);
 

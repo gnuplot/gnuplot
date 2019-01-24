@@ -69,9 +69,7 @@ TERM_PUBLIC void cairotrm_image __PROTO ((unsigned int M, unsigned int N, coordv
 TERM_PUBLIC int cairotrm_make_palette __PROTO ((t_sm_palette *palette));
 TERM_PUBLIC void cairotrm_set_color __PROTO ((t_colorspec *colorspec));
 TERM_PUBLIC void cairotrm_filled_polygon __PROTO ((int n, gpiPoint * corners));
-#ifdef EAM_BOXED_TEXT
 TERM_PUBLIC void cairotrm_boxed_text __PROTO ((unsigned int x, unsigned int y, int option));
-#endif
 TERM_PUBLIC void cairotrm_dashtype __PROTO ((int type, t_dashtype *custom_dash_pattern));
 #endif /* TERM_PROTO */
 
@@ -1330,14 +1328,12 @@ void cairotrm_image(unsigned int M, unsigned int N, coordval * image, gpiPoint *
 	free(image255);
 }
 
-#ifdef EAM_BOXED_TEXT
 void cairotrm_boxed_text(unsigned int x, unsigned int y, int option)
 {
 	if (option == TEXTBOX_INIT)
 	    y = term->ymax - y;
 	gp_cairo_boxed_text(&plot, x, y, option);
 }
-#endif
 
 void cairotrm_dashtype(int type, t_dashtype *custom_dash_pattern)
 {
@@ -1368,9 +1364,7 @@ TERM_TABLE_START (epscairo_driver)
     , cairotrm_enhanced_open, cairotrm_enhanced_flush, cairotrm_enhanced_writec
     , 0, 0, 1.0
     , NULL /* hypertext */
-#ifdef EAM_BOXED_TEXT
     , cairotrm_boxed_text
-#endif
     , NULL /* modify_plots */
     , cairotrm_dashtype
 TERM_TABLE_END (epscairo_driver)
@@ -1403,9 +1397,7 @@ TERM_TABLE_START(cairolatex_driver)
     EPSLATEX_layer, /* Used to signal front/back text */
     0, 1.0
     , NULL /* hypertext */
-#ifdef EAM_BOXED_TEXT
     , EPSLATEX_boxed_text
-#endif
     , NULL /* modify_plots */
     , cairotrm_dashtype
 TERM_TABLE_END(cairolatex_driver)
@@ -1434,9 +1426,7 @@ TERM_TABLE_START (pdfcairo_driver)
     , cairotrm_enhanced_open, cairotrm_enhanced_flush, cairotrm_enhanced_writec
     , 0, 0, 1.0
     , NULL /* hypertext */
-#ifdef EAM_BOXED_TEXT
     , cairotrm_boxed_text
-#endif
     , NULL /* modify_plots */
     , cairotrm_dashtype
 TERM_TABLE_END (pdfcairo_driver)
@@ -1465,9 +1455,7 @@ TERM_TABLE_START (pngcairo_driver)
     , cairotrm_enhanced_open, cairotrm_enhanced_flush, cairotrm_enhanced_writec
     , 0, 0, 1.0
     , NULL /* hypertext */
-#ifdef EAM_BOXED_TEXT
     , cairotrm_boxed_text
-#endif
     , NULL /* modify_plots */
     , cairotrm_dashtype
 TERM_TABLE_END (pngcairo_driver)

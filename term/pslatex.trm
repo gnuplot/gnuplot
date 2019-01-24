@@ -99,9 +99,7 @@ TERM_PUBLIC void EPSLATEX_common_init __PROTO((void));
 TERM_PUBLIC void EPSLATEX_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC void EPSLATEX_linetype __PROTO((int linetype));
 TERM_PUBLIC void EPSLATEX_layer __PROTO((t_termlayer syncpoint));
-#ifdef EAM_BOXED_TEXT
 TERM_PUBLIC void EPSLATEX_boxed_text __PROTO((unsigned int, unsigned int, int));
-#endif
 
 /* additional LaTeX header information for epslatex terminal */
 TERM_PUBLIC char *epslatex_header = NULL;
@@ -675,7 +673,6 @@ EPSLATEX_common_init()
         fprintf(gpoutfile,"\
     \\setlength{\\unitlength}{%.4fbp}%%\n",
 		1.0 / (2*PS_SC));
-#ifdef EAM_BOXED_TEXT
         fprintf(gpoutfile,"\
     \\ifx\\gptboxheight\\undefined%%\n\
       \\newlength{\\gptboxheight}%%\n\
@@ -684,7 +681,6 @@ EPSLATEX_common_init()
     \\fi%%\n\
     \\setlength{\\fboxrule}{0.5pt}%%\n\
     \\setlength{\\fboxsep}{1pt}%%\n");
-#endif
         fprintf(gpoutfile,"\\begin{picture}(%.2f,%.2f)%%\n",
                 term->xmax * xsize, term->ymax * ysize);
     }
@@ -968,7 +964,6 @@ EPSLATEX_layer(t_termlayer syncpoint)
     }
 }
 
-#ifdef EAM_BOXED_TEXT
 TERM_PUBLIC void
 EPSLATEX_boxed_text(unsigned int x, unsigned int y, int option)
 {
@@ -1034,7 +1029,6 @@ EPSLATEX_boxed_text(unsigned int x, unsigned int y, int option)
 	break;
     }
 }
-#endif
 
 #endif /* TERM_BODY */
 
@@ -1067,9 +1061,7 @@ TERM_TABLE_START(epslatex_driver)
     PS_path,
     0.0,	/* scale */
     0,		/* hypertext */
-#ifdef EAM_BOXED_TEXT
     EPSLATEX_boxed_text,
-#endif
     NULL,
     PS_dashtype
 TERM_TABLE_END(epslatex_driver)

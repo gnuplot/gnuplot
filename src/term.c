@@ -1746,7 +1746,6 @@ test_term()
      * Textbox fill shows true size, surrounding box shows the generic estimate
      * used to reserve space during plot layout.
      */
-#ifdef EAM_BOXED_TEXT
     if (TRUE) {
 	struct text_label sample = EMPTY_LABELSTRUCT;
 	struct textbox_style save_opts = textbox_opts[0];
@@ -1778,7 +1777,6 @@ test_term()
 	(*t->vector) (x0 + xmax_t / 2 - t->h_char * 10, y0 + ymax_t / 2 + t->v_char / 2);
 	closepath();
     }
-#endif
 
     /* Test for enhanced text */
     (*t->linetype) (LT_BLACK);

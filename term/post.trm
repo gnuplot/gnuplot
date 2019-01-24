@@ -133,9 +133,7 @@ static TBOOLEAN ENHps_opened_string = FALSE;  /* try to cut out empty ()'s */
 
 TERM_PUBLIC void PS_layer __PROTO((t_termlayer syncpoint));
 
-#ifdef EAM_BOXED_TEXT
 TERM_PUBLIC void ENHPS_boxed_text __PROTO((unsigned int, unsigned int, int));
-#endif
 static int PS_in_textbox = 0;
 
 #endif /* TERM_PROTO */
@@ -386,7 +384,6 @@ static const char * ENHPS_header[] = {
 NULL
 };
 
-#ifdef EAM_BOXED_TEXT
     static const char psi4[] = "\
 %%\n\
 %% Support for boxed text - Ethan A Merritt Sep 2016\n%%\n\
@@ -412,7 +409,6 @@ NULL
 /TBymargin 20 def\n\
 /Boxing false def\n\
 /textshow { ExtendTextBox Gshow } def\n%%\n";
-#endif
 
 
 /* external/internal prologue files machinery */
@@ -1825,12 +1821,8 @@ end\n\
 	    free(outstr2);
     }
 
-#ifdef EAM_BOXED_TEXT
     /* Define macros supporting boxed text */
     fprintf(gppsfile, psi4);
-#else
-    fputs("/textshow { Gshow } def\n",gppsfile);
-#endif
 
     fputs("end\n", gppsfile);
     fputs("%%EndProlog\n", gppsfile);
@@ -2889,7 +2881,6 @@ if (sm_palette.ps_allcF == 0) { /* print only those 3 used formulae */
 #undef B
 }
 
-#ifdef EAM_BOXED_TEXT
 TERM_PUBLIC void
 ENHPS_boxed_text __PROTO((unsigned int x, unsigned int y, int option))
 {
@@ -2926,7 +2917,6 @@ ENHPS_boxed_text __PROTO((unsigned int x, unsigned int y, int option))
 	break;
     }
 }
-#endif
 
 
 static void
@@ -4447,9 +4437,7 @@ TERM_TABLE_START(post_driver)
     , PS_path
     , PS_SC		/* terminal to pixel coord scale factor */
     , NULL		/* hypertext */
-#ifdef EAM_BOXED_TEXT
     , ENHPS_boxed_text
-#endif
     , NULL		/* modify_plots */
     , PS_dashtype
 TERM_TABLE_END(post_driver)

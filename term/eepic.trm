@@ -567,9 +567,7 @@ TERM_TABLE_START(eepic_driver)
     0, /* path */
     0.0, /* scale (unused) */
     0, /* hypertext */
-#ifdef EAM_BOXED_TEXT
     0,
-#endif
     0,
     0 /* dashtype */
 TERM_TABLE_END(eepic_driver)

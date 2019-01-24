@@ -2892,7 +2892,6 @@ void wxt_set_clipboard(const char s[])
 }
 #endif /*USE_MOUSE*/
 
-#ifdef EAM_BOXED_TEXT
 /* Pass through the boxed text options to cairo */
 void wxt_boxed_text(unsigned int x, unsigned int y, int option)
 {
@@ -2905,7 +2904,6 @@ void wxt_boxed_text(unsigned int x, unsigned int y, int option)
 	temp_command.integer_value = option;
 	wxt_command_push(temp_command);
 }
-#endif
 
 void wxt_modify_plots(unsigned int ops, int plotno)
 {
@@ -3160,11 +3158,9 @@ void wxtPanel::wxt_cairo_exec_command(gp_command command)
 				command.x4, command.y4,
 				command.integer_value, command.integer_value2);
 		return;
-#ifdef EAM_BOXED_TEXT
 	case command_boxed_text :
 		gp_cairo_boxed_text(&plot, command.x1, command.y1, command.integer_value);
 		return;
-#endif /*EAM_BOXED_TEXT */
 	case command_layer :
 		switch (command.integer_value)
 		{

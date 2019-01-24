@@ -63,9 +63,7 @@ TERM_TABLE_START (qt_driver)
     , NULL /* qt_path */
     , 0.0 /* Scale (unused) */
     , qt_hypertext
-#ifdef EAM_BOXED_TEXT
     , qt_boxed_text
-#endif
     , qt_modify_plots
     , qt_dashtype
 TERM_TABLE_END (qt_driver)

@@ -133,9 +133,7 @@ TERM_PUBLIC void ENHGD_OPEN __PROTO((char * fontname, double fontsize,
 			int overprint));
 TERM_PUBLIC void ENHGD_FLUSH __PROTO((void));
 
-#ifdef EAM_BOXED_TEXT
 TERM_PUBLIC void ENHGD_boxed_text __PROTO((unsigned int, unsigned int, int));
-#endif
 
 #include <gd.h>
 /* Include files for bitmap fonts */
@@ -265,12 +263,10 @@ static int PNG_YMAX = GREG_YMAX;
 static const int PNG_POINT_SCALE = 3;
 static int PNG_ps = 3;
 
-#ifdef EAM_BOXED_TEXT
     unsigned int bounding_box[4];
 #define GD_TEXTBOX_MARGIN 1.0
     double bounding_xmargin = GD_TEXTBOX_MARGIN;
     double bounding_ymargin = GD_TEXTBOX_MARGIN;
-#endif
 
 static TBOOLEAN ENHgd_show = TRUE;
 static TBOOLEAN ENHgd_sizeonly = FALSE;
@@ -1737,7 +1733,6 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
 		fprintf(stderr,"gdImageStringFT: %s while printing string %s with font %s\n",
 		    err,string,png_state.ttffont);
 
-#ifdef EAM_BOXED_TEXT
 	    if (!ENHgd_sizeonly) {
 		int xmax = GPMAX(brect[2],brect[6]);
 		int xmin = GPMIN(brect[0],brect[4]);
@@ -1748,7 +1743,6 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
 		if (ymin < bounding_box[1]) bounding_box[1] = ymin;
 		if (ymax > bounding_box[3]) bounding_box[3] = ymax;
 	    }
-#endif
 
 	}
     } else if (png_state.angle != 0) {
@@ -2105,7 +2099,6 @@ ENHGD_FLUSH()
 	fprintf(stderr,"gdImageStringFT: %s while printing string %s with font %s\n",
 	    err,enhanced_text,ENHgd_font);
 
-#ifdef EAM_BOXED_TEXT
     if (!ENHgd_sizeonly) {
 	int xmax = GPMAX(brect[2],brect[6]);
 	int xmin = GPMIN(brect[0],brect[4]);
@@ -2116,7 +2109,6 @@ ENHGD_FLUSH()
 	if (ymin < bounding_box[1]) bounding_box[1] = ymin;
 	if (ymax > bounding_box[3]) bounding_box[3] = ymax;
     }
-#endif
 
     if (ENHgd_overprint == 1) {
 	png_state.x += ((brect[2] - brect[0]))/2;
@@ -2212,7 +2204,6 @@ ENHGD_put_text(unsigned int x, unsigned int y, const char *str)
 
 }
 
-#ifdef EAM_BOXED_TEXT
 TERM_PUBLIC void
 ENHGD_boxed_text(unsigned int x, unsigned int y, int option)
 {
@@ -2259,7 +2250,6 @@ ENHGD_boxed_text(unsigned int x, unsigned int y, int option)
     	break;
     }
 }
-#endif
 
 
 
@@ -2467,9 +2457,7 @@ TERM_TABLE_START(png_driver)
     , NULL		/* path */
     , 0.0		/* tscale */
     , NULL		/* hypertext */
-#ifdef EAM_BOXED_TEXT
     , ENHGD_boxed_text
-#endif
 TERM_TABLE_END(png_driver)
 
 #undef LAST_TERM
@@ -2626,9 +2614,7 @@ TERM_TABLE_START(jpeg_driver)
     , NULL		/* path */
     , 0.0		/* tscale */
     , NULL		/* hypertext */
-#ifdef EAM_BOXED_TEXT
     , ENHGD_boxed_text
-#endif
 TERM_TABLE_END(jpeg_driver)
 
 #undef LAST_TERM
@@ -2781,9 +2767,7 @@ TERM_TABLE_START(gif_driver)
     , NULL		/* path */
     , 0.0		/* tscale */
     , NULL		/* hypertext */
-#ifdef EAM_BOXED_TEXT
     , ENHGD_boxed_text
-#endif
 TERM_TABLE_END(gif_driver)
 
 #undef LAST_TERM
@@ -2969,9 +2953,7 @@ TERM_TABLE_START(sixelgd_driver)
     NULL,		/* path */
     0.0,		/* tscale */
     NULL		/* hypertext */
-#ifdef EAM_BOXED_TEXT
     , ENHGD_boxed_text
-#endif
 TERM_TABLE_END(sixelgd_driver)
 
 #undef LAST_TERM

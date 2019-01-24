@@ -85,9 +85,7 @@ struct TERMENTRY {
     double tscale;
 /* Hypertext support */
     void (*hypertext) __PROTO((int type, const char *text));
-#ifdef EAM_BOXED_TEXT
     void (*boxed_text)__PROTO((unsigned int x, unsigned int y, int option));
-#endif
    void (*modify_plots) __PROTO((unsigned int operations, int plotno));
    
    void (*dashtype) __PROTO((int type, t_dashtype *custom_dash_pattern));

@@ -83,9 +83,7 @@ static void unset_fit __PROTO((void));
 static void unset_grid __PROTO((void));
 static void unset_hidden3d __PROTO((void));
 static void unset_histogram __PROTO((void));
-#ifdef EAM_BOXED_TEXT
 static void unset_textbox_style __PROTO((void));
-#endif
 static void unset_historysize __PROTO((void));
 static void unset_isosamples __PROTO((void));
 static void unset_key __PROTO((void));
@@ -991,7 +989,6 @@ unset_histogram()
     histogram_opts = foo;
 }
 
-#ifdef EAM_BOXED_TEXT
 static void
 unset_textbox_style()
 {
@@ -1004,7 +1001,6 @@ unset_textbox_style()
 	    textbox_opts[i].linewidth = 0.;
     }
 }
-#endif
 
 /* process 'unset historysize' command DEPRECATED */
 static void
@@ -1551,9 +1547,7 @@ unset_style()
 	unset_style_ellipse();
 	unset_histogram();
 	unset_boxplot();
-#ifdef EAM_BOXED_TEXT
 	unset_textbox_style();
-#endif
 	c_token++;
 	return;
     }
@@ -1600,12 +1594,10 @@ unset_style()
 	unset_style_ellipse();
 	c_token++;
 	break;
-#ifdef EAM_BOXED_TEXT
     case SHOW_STYLE_TEXTBOX:
 	unset_textbox_style();
 	c_token++;
 	break;
-#endif
     case SHOW_STYLE_BOXPLOT:
 	unset_boxplot();
 	c_token++;
@@ -2005,9 +1997,7 @@ reset_command()
     df_unset_datafile_binary();
     unset_fillstyle();
     unset_histogram();
-#ifdef EAM_BOXED_TEXT
     unset_textbox_style();
-#endif
     prefer_line_styles = FALSE;
 
 #ifdef USE_MOUSE

@@ -360,13 +360,12 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 			update_key_box(rect);
 		else
 			m_currentGroup.append(textItem);
-#ifdef EAM_BOXED_TEXT
+
 		if (m_inTextBox) {
 			m_currentTextBox |= rect;
 			m_currentBoxRotation = m_textAngle;
 			m_currentBoxOrigin = point;
 		}
-#endif
 	}
 	else if (type == GEEnhancedFlush)
 	{
@@ -410,13 +409,12 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 			update_key_box(rect);
 		else
 			m_currentGroup.append(m_enhanced);
-#ifdef EAM_BOXED_TEXT
+
 		if (m_inTextBox) {
 			m_currentTextBox |= rect;
 			m_currentBoxRotation = m_textAngle;
 			m_currentBoxOrigin = point;
 		}
-#endif
 		m_enhanced = 0;
 	}
 	else if (type == GEImage)
@@ -586,7 +584,6 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		m_currentHypertext.clear();
 		in >> m_currentHypertext;
 	}
-#ifdef EAM_BOXED_TEXT
 	else if (type == GETextBox)
 	{
 		flushCurrentPointsItem();
@@ -644,7 +641,6 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 			break;
 		}
 	}
-#endif
 	else if (type == GEFontMetricRequest)
 	{
 		QFontMetrics metrics(m_font);

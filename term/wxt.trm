@@ -483,9 +483,7 @@ TERM_TABLE_START (wxt_driver)
     , NULL /* no term->path */
     , 0.0 /* Scale (unused) */
     , wxt_hypertext
-#ifdef EAM_BOXED_TEXT
     , wxt_boxed_text
-#endif
     , wxt_modify_plots
     , wxt_dashtype
 TERM_TABLE_END (wxt_driver)

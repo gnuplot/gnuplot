@@ -626,13 +626,11 @@ static int cx = 0, cy = 0;
 static int vchar, hchar;
 
 /* Will hold the bounding box of the previous enhanced text string */
-#ifdef EAM_BOXED_TEXT
     unsigned int bounding_box[4];
     TBOOLEAN boxing = FALSE;
 #define X11_TEXTBOX_MARGIN 2
     int box_xmargin = X11_TEXTBOX_MARGIN;
     int box_ymargin = X11_TEXTBOX_MARGIN;
-#endif
 
 /* Specify negative values as indicator of uninitialized state */
 static double xscale = -1.;
@@ -2297,9 +2295,7 @@ exec_cmd(plot_struct *plot, char *command)
 	/* Enhanced text mode added November 2003 - Ethan A Merritt */
 	int x_offset=0, y_offset=0, v_offset=0;
 	int char_byte_offset;
-#ifdef EAM_BOXED_TEXT
 	unsigned int bb[4];
-#endif
 
 	switch (buffer[1]) {
 
@@ -2307,28 +2303,22 @@ exec_cmd(plot_struct *plot, char *command)
 		    sscanf(buffer+2, "%d %d", &x_offset, &y_offset);
 		    plot->xLast = x_offset - (plot->xLast - x_offset);
 		    plot->yLast = y_offset - (vchar/3) / yscale;
-#ifdef EAM_BOXED_TEXT
 		    bounding_box[0] = bounding_box[2] = X(plot->xLast);
 		    bounding_box[1] = bounding_box[3] = Y(plot->yLast);
-#endif
 		    return;
 	case 'k':	/* Set start for center-justified enhanced text */
 		    sscanf(buffer+2, "%d %d", &x_offset, &y_offset);
 		    plot->xLast = x_offset - 0.5*(plot->xLast - x_offset);
 		    plot->yLast = y_offset - (vchar/3) / yscale;
-#ifdef EAM_BOXED_TEXT
 		    bounding_box[0] = bounding_box[2] = X(plot->xLast);
 		    bounding_box[1] = bounding_box[3] = Y(plot->yLast);
-#endif
 		    return;
 	case 'l':	/* Set start for left-justified enhanced text */
 		    sscanf(buffer+2, "%d %d", &x_offset, &y_offset);
 		    plot->xLast = x_offset;
 		    plot->yLast = y_offset - (vchar/3) / yscale;
-#ifdef EAM_BOXED_TEXT
 		    bounding_box[0] = bounding_box[2] = X(plot->xLast);
 		    bounding_box[1] = bounding_box[3] = Y(plot->yLast);
-#endif
 		    return;
 	case 'o':	/* Enhanced mode print with no update */
 	case 'c':	/* Enhanced mode print with update to center */
@@ -2360,7 +2350,6 @@ exec_cmd(plot_struct *plot, char *command)
 		    plot->xLast = plot->xSave;
 		    plot->yLast = plot->ySave;
 		    return;
-#ifdef EAM_BOXED_TEXT
 	case 'b':	/* Initialize text bounding box */
 		    sscanf(buffer, "Tb%d %d", &x, &y);
 		    bounding_box[0] = bounding_box[2] = X(x);
@@ -2397,7 +2386,6 @@ exec_cmd(plot_struct *plot, char *command)
 		    box_xmargin = X11_TEXTBOX_MARGIN * (double)(x) / 100.;
 		    box_ymargin = X11_TEXTBOX_MARGIN * (double)(y) / 100.;
 		    return;
-#endif
 	default:
 		    sscanf(buffer, "T%d %d%n", &x, &y, &char_byte_offset);
 		    /* extra 1 for the space before the string start */
@@ -2449,7 +2437,6 @@ exec_cmd(plot_struct *plot, char *command)
 	    /* horizontal text */
 	    gpXDrawString(dpy, plot->pixmap, *current_gc,
 		    X(x) + sj, Y(y) + v_offset, str, sl);
-#ifdef EAM_BOXED_TEXT
 	    if (boxing) {
 		/* Request bounding box information for this string */
 		unsigned int bb[4];
@@ -2464,7 +2451,6 @@ exec_cmd(plot_struct *plot, char *command)
 		if (bb[1] < bounding_box[1]) bounding_box[1] = bb[1];
 		if (bb[3] > bounding_box[3]) bounding_box[3] = bb[3];
 	    }
-#endif
 
 	    /* Toggle mechanism */
 	    if (x11_in_key_sample) {

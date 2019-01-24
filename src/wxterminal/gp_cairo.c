@@ -118,7 +118,6 @@ static int avg_vchar = 150;
 static void gp_cairo_fill(plot_struct *plot, int fillstyle, int fillpar);
 static void gp_cairo_fill_pattern(plot_struct *plot, int fillstyle, int fillpar);
 
-#ifdef EAM_BOXED_TEXT
 /* Boxed text support */
 static int bounding_box[4];
 static double bounding_xmargin = 1.0;
@@ -127,7 +126,6 @@ static double box_rotation = 0.0;
 static double box_origin_x;
 static double box_origin_y;
 static TBOOLEAN in_textbox = FALSE;
-#endif
 
 /* array of colors
  * FIXME could be shared with all gnuplot terminals */
@@ -206,9 +204,7 @@ void gp_cairo_initialize_plot(plot_struct *plot)
 
 	plot->interrupt = FALSE;
 
-#ifdef EAM_BOXED_TEXT
 	in_textbox = FALSE;
-#endif
 }
 
 /* set the transformation matrix of the context, and other details */
@@ -926,7 +922,6 @@ void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string,
 	 * Do it by ourselves, or we can get spurious lines on future calls. */
 	cairo_new_path(plot->cr);
 
-#ifdef EAM_BOXED_TEXT
 	if (in_textbox) {
 		box_rotation = -arg;
 		box_origin_x = x1;
@@ -962,7 +957,6 @@ void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string,
 		if (bounding_box[3] < box_y + ink_rect.y + ink_rect.height)
 		    bounding_box[3] = box_y + ink_rect.y + ink_rect.height;
 	}
-#endif
 
 	/* free the layout object */
 	g_clear_object (&layout);
@@ -1636,7 +1630,6 @@ void gp_cairo_enhanced_finish(plot_struct *plot, int x, int y)
 	 * Do it by ourselves, or we can get spurious lines on future calls. */
 	cairo_new_path(plot->cr);
 	
-#ifdef EAM_BOXED_TEXT
 	if (in_textbox) {
 		box_rotation = -arg;
 		box_origin_x = x;
@@ -1672,7 +1665,6 @@ void gp_cairo_enhanced_finish(plot_struct *plot, int x, int y)
 		if (bounding_box[3] < box_y + ink_rect.y + ink_rect.height)
 		    bounding_box[3] = box_y + ink_rect.y + ink_rect.height;
 	}
-#endif
 
 	/* free the layout object */
 	pango_attr_list_unref( gp_cairo_enhanced_AttrList );
@@ -1737,7 +1729,6 @@ void gp_cairo_fill(plot_struct *plot, int fillstyle, int fillpar)
 	}
 }
 
-#ifdef EAM_BOXED_TEXT
 void gp_cairo_boxed_text(plot_struct *plot, int x, int y, int option)
 {
 	int dx, dy;
@@ -1809,7 +1800,6 @@ void gp_cairo_boxed_text(plot_struct *plot, int x, int y, int option)
 		break;
 	}
 }
-#endif
 
 #define PATTERN_SIZE 8
 

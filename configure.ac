@@ -755,16 +755,6 @@ if test "$enable_x11_external" = yes; then
   AC_DEFINE(EXTERNAL_X11_WINDOW,1,[ Define if you want to supply pre-existing X11 windows. ])
 fi
 
-dnl labels with boxes around them
-AC_ARG_ENABLE(boxed_text,dnl
-[  --disable-boxed-text    disable support for boxed labels],,
-  test -z "$enable_boxed_text" && enable_boxed_text=yes)
-
-  if test "$enable_boxed_text" = yes; then
-  AC_DEFINE(EAM_BOXED_TEXT,1,
-               [ Define to support boxed labels ])
-  fi
-
 dnl disable the "space raises console" behaviour
 AC_ARG_ENABLE(raise-console,dnl
 [  --disable-raise-console spacebar in plot window does not raise console],,

@@ -256,7 +256,6 @@ static const char * PSTRICKS_patterns[] = {
 #define PSTRICKS_NUMPATTERN (sizeof(PSTRICKS_patterns) / sizeof(char *))
 
 /*  BOXED TEXT */
-#ifdef EAM_BOXED_TEXT
 static TBOOLEAN PSTRICKS_in_textbox = FALSE;
 static TBOOLEAN PSTRICKS_textbox_fill;
 static TBOOLEAN PSTRICKS_textbox_frame;
@@ -265,7 +264,6 @@ static double PSTRICKS_textbox_x;
 static double PSTRICKS_textbox_y;
 static char * PSTRICKS_textbox_fillcolor;
 static double PSTRICKS_textbox_sep;
-#endif
 
 /*
  * Handle options
@@ -825,12 +823,10 @@ PSTRICKS_put_text(unsigned int x, unsigned int y, const char str[])
 {
     PSTRICKS_endline();
 
-#ifdef EAM_BOXED_TEXT
     if (PSTRICKS_in_textbox && (PSTRICKS_textbox_text == NULL)) {
 	PSTRICKS_textbox_text = strdup(str);
 	return;
     }
-#endif
 
     /* Skip this if the string is empty */
     if (strlen(str) > 0) {
@@ -1179,7 +1175,6 @@ PSTRICKS_filled_polygon(int points, gpiPoint *corners)
 }
 
 
-#ifdef EAM_BOXED_TEXT
 TERM_PUBLIC void
 PSTRICKS_boxed_text(unsigned int x, unsigned int y, int option)
 {
@@ -1248,7 +1243,6 @@ PSTRICKS_boxed_text(unsigned int x, unsigned int y, int option)
 	break;
     }
 }
-#endif
 
 #endif /* TERM_BODY */
 
@@ -1275,9 +1269,7 @@ TERM_TABLE_START(pstricks_driver)
     0, /* path */
     0.0, /* scale (unused) */
     0, /* hypertext */
-#ifdef EAM_BOXED_TEXT
     PSTRICKS_boxed_text,
-#endif
     0,
     PSTRICKS_dashtype
 TERM_TABLE_END(pstricks_driver)

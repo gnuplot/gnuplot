@@ -137,9 +137,7 @@ static void show_hidden3d __PROTO((void));
 static void show_increment __PROTO((void));
 static void show_histogram __PROTO((void));
 static void show_history __PROTO((void));
-#ifdef EAM_BOXED_TEXT
 static void show_textbox __PROTO((void));
-#endif
 static void show_size __PROTO((void));
 static void show_origin __PROTO((void));
 static void show_term __PROTO((void));
@@ -1524,12 +1522,10 @@ show_style()
 	show_histogram();
 	c_token++;
 	break;
-#ifdef EAM_BOXED_TEXT
     case SHOW_STYLE_TEXTBOX:
 	show_textbox();
 	c_token++;
 	break;
-#endif
     case SHOW_STYLE_PARALLEL:
 	save_style_parallel(stderr);
 	c_token++;
@@ -1563,9 +1559,7 @@ show_style()
 	show_fillstyle();
 	show_increment();
 	show_histogram();
-#ifdef EAM_BOXED_TEXT
 	show_textbox();
-#endif
 	save_style_parallel(stderr);
 	show_arrowstyle(0);
 	show_boxplot();
@@ -1779,13 +1773,11 @@ show_label(int tag)
 		show_position(&this_label->offset, 3);
 	    }
 
-#ifdef EAM_BOXED_TEXT
 	    if (this_label->boxed) {
 		fprintf(stderr," boxed");
 		if (this_label->boxed > 0)
 		    fprintf(stderr," bs %d",this_label->boxed);
 	    }
-#endif
 
 	    /* Entry font added by DJL */
 	    fputc('\n', stderr);
@@ -2822,13 +2814,11 @@ show_histogram()
     save_histogram_opts(stderr);
 }
 
-#ifdef EAM_BOXED_TEXT
 static void
 show_textbox()
 {
     save_style_textbox(stderr);
 }
-#endif
 
 /* process 'show history' command */
 static void

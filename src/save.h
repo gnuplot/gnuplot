@@ -62,9 +62,7 @@ void save_offsets __PROTO((FILE *, char *));
 void save_histogram_opts __PROTO((FILE *fp));
 void save_object __PROTO((FILE *, int));
 void save_walls __PROTO((FILE *));
-#ifdef EAM_BOXED_TEXT
 void save_style_textbox __PROTO((FILE *));
-#endif
 void save_style_parallel __PROTO((FILE *));
 void save_data_func_style __PROTO((FILE *, const char *, enum PLOT_STYLE));
 void save_linetype __PROTO((FILE *, lp_style_type *, TBOOLEAN));

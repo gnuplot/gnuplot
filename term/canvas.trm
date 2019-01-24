@@ -1652,9 +1652,7 @@ TERM_TABLE_START(canvas_driver)
     , CANVAS_path		/* path */
     , 1.0			/* Should this be CANVAS_OVERSAMPLE? */
     , CANVAS_hypertext
-#ifdef EAM_BOXED_TEXT
     , NULL			/* boxed text */
-#endif
     , NULL			/* modify_plots */
     , CANVAS_dashtype
 TERM_TABLE_END(canvas_driver)

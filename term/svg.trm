@@ -1025,12 +1025,11 @@ SVG_write_preamble ()
 	     /* NOTE: Fill patterns must be defined after the stroke color has been
 	      * set to use the correct (current) stroke color. Therefore we can't
 	      * define fill patterns here. */
-#ifdef EAM_BOXED_TEXT
 	     "\t<filter id='textbox' filterUnits='objectBoundingBox' x='0' y='0' height='1' width='1'>\n"
 	     "\t  <feFlood flood-color='%s' flood-opacity='1' result='bgnd'/>\n"
 	     "\t  <feComposite in='SourceGraphic' in2='bgnd' operator='atop'/>\n"
 	     "\t</filter>\n"
-#endif
+
 	     "\t<filter id='greybox' filterUnits='objectBoundingBox' x='0' y='0' height='1' width='1'>\n"
 	     "\t  <feFlood flood-color='lightgrey' flood-opacity='1' result='grey'/>\n"
 	     "\t  <feComposite in='SourceGraphic' in2='grey' operator='atop'/>\n"
@@ -1045,9 +1044,7 @@ SVG_write_preamble ()
 	     , stroke_width
 	     , stroke_width
 	     , stroke_width
-#ifdef EAM_BOXED_TEXT
 	     , SVG_pens[0].color
-#endif
 	);
 }
 
@@ -1530,10 +1527,8 @@ SVG_put_text (unsigned int x, unsigned int y, const char *str)
     if (SVG_fontStyleCur && strcmp(SVG_fontStyleCur,"normal"))
 	    fprintf(gpoutfile, " font-style=\"%s\" ", SVG_fontStyleCur);
     fprintf(gpoutfile, " text-anchor=\"%s\"", alignment);
-#ifdef EAM_BOXED_TEXT
     if (SVG_inTextBox)
 	fprintf(gpoutfile, " style='filter:url(#textbox)'");
-#endif
     fprintf(gpoutfile, ">\n");
 
 /* output text (unless the enhanced_text processing is in action) */
@@ -2145,7 +2140,6 @@ SVG_hypertext( int type, const char *text )
     }
 }
 
-#ifdef EAM_BOXED_TEXT
 TERM_PUBLIC void
 SVG_boxed_text(unsigned int x, unsigned int y, int option)
 {
@@ -2165,7 +2159,6 @@ SVG_boxed_text(unsigned int x, unsigned int y, int option)
 	break;
     }
 }
-#endif
 
 #undef Y
 #undef X
@@ -2200,9 +2193,7 @@ TERM_TABLE_START (svg_driver)
    , SVG_path 	/* path */
    , SVG_SCALE	/* pixel oversampling scale */
    , SVG_hypertext	/* hypertext support */
-#ifdef EAM_BOXED_TEXT
    , SVG_boxed_text	/* boxed text labels */
-#endif
    , NULL		/* modify_plots */
    , SVG_dashtype	/* Version 5 dashtype support */
 TERM_TABLE_END (svg_driver)
@@ -2236,9 +2227,7 @@ TERM_TABLE_START (domterm_driver)
    , SVG_path 	/* path */
    , SVG_SCALE	/* pixel oversampling scale */
    , SVG_hypertext	/* hypertext support */
-#ifdef EAM_BOXED_TEXT
    , SVG_boxed_text	/* boxed text labels */
-#endif
    , NULL		/* modify_plots */
    , SVG_dashtype	/* Version 5 dashtype support */
 TERM_TABLE_END (domterm_driver)

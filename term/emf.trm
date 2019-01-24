@@ -1957,9 +1957,7 @@ TERM_TABLE_START(emf_driver)
     , NULL	/* path */
     , 0.0
     , NULL	/* hypertext */
-#ifdef EAM_BOXED_TEXT
     , NULL
-#endif
     , NULL	/* modify_plots */
     , EMF_dashtype
 TERM_TABLE_END(emf_driver)

@@ -78,9 +78,7 @@ TERM_PUBLIC void CACA_enhanced_open(char * fontname, double fontsize,
 					double base, TBOOLEAN widthflag, TBOOLEAN showflag, int overprint);
 TERM_PUBLIC void CACA_enhanced_flush(void);
 TERM_PUBLIC void CACA_hypertext(int type, const char *text);
-#ifdef EAM_BOXED_TEXT
 TERM_PUBLIC void CACA_boxed_text(unsigned int x, unsigned int y, int option);
-#endif
 TERM_PUBLIC void CACA_modify_plots(unsigned int operations, int plotno);
 
 #endif /* TERM_PROTO */
@@ -235,14 +233,12 @@ static const int CACA_status_height = 0;
 #endif
 
 /* boxed text */
-#ifdef EAM_BOXED_TEXT
 static struct s_boxedtext {
 	TBOOLEAN   boxed;
 	CACA_POINT margin;
 	CACA_RECT  box;
 	int        angle;
 } CACA_boxedtext;
-#endif
 
 /* hypertext */
 static CACA_HYPERTEXT * CACA_hypertext_list = NULL;
@@ -1565,7 +1561,6 @@ CACA_put_text(unsigned int x, unsigned int y, const char *str)
 	if (CACA_ang == 0) {
 		/* Speed up the default case. */
 		int len = CACA_put_str(CACA_cv, x, CACA_ymax - y, text);
-#ifdef EAM_BOXED_TEXT
 		if (CACA_boxedtext.boxed) {
 			xpos = x; /* signed */
 			ypos = y;
@@ -1579,7 +1574,6 @@ CACA_put_text(unsigned int x, unsigned int y, const char *str)
 				CACA_boxedtext.box.bottom = ypos;
 			CACA_boxedtext.angle = 0;
 		}
-#endif
 		if (CACA_keysample) {
 			CACA_update_keybox(CACA_plotno, x, y);
 			CACA_update_keybox(CACA_plotno, x + len, y);
@@ -1639,7 +1633,6 @@ CACA_put_text(unsigned int x, unsigned int y, const char *str)
 			}
 		}
 
-#ifdef EAM_BOXED_TEXT
 		if (CACA_boxedtext.boxed) {
 			xpos = x; /* signed */
 			ypos = y;
@@ -1667,7 +1660,6 @@ CACA_put_text(unsigned int x, unsigned int y, const char *str)
 			}
 			CACA_boxedtext.angle = CACA_ang;
 		}
-#endif
 		if (CACA_keysample) {
 			CACA_update_keybox(CACA_plotno, x, y);
 			CACA_update_keybox(CACA_plotno, xmax, ymax);
@@ -2494,7 +2486,6 @@ CACA_hypertext(int type, const char *text)
 }
 
 
-#ifdef EAM_BOXED_TEXT
 void
 CACA_boxed_text(unsigned int x, unsigned int y, int option)
 {
@@ -2555,7 +2546,6 @@ CACA_boxed_text(unsigned int x, unsigned int y, int option)
 		break;
 	}
 }
-#endif
 
 
 TERM_PUBLIC void
@@ -2695,7 +2685,6 @@ CACA_enhanced_flush()
 			caca_unset_attr(CACA_cv, CACA_next_text_attr);
 			CACA_next_text_attr = 0;
 		}
-#ifdef EAM_BOXED_TEXT
 		if (CACA_boxedtext.boxed) {
 			if (CACA_boxedtext.box.left > CACA_x)
 				CACA_boxedtext.box.left = CACA_x;
@@ -2711,7 +2700,6 @@ CACA_enhanced_flush()
 			CACA_update_keybox(CACA_plotno, CACA_x, CACA_y + CACA_enhanced_base);
 			CACA_update_keybox(CACA_plotno, CACA_x + len, CACA_y + CACA_enhanced_base);
 		}
-#endif
 	}
 
 	if (!CACA_enhanced_widthflag)
@@ -3399,9 +3387,7 @@ TERM_TABLE_START(caca)
 	CACA_image,
 	CACA_enhanced_open, CACA_enhanced_flush, do_enh_writec,
 	CACA_layer, CACA_path, 0.0 /* tscale */, CACA_hypertext,
-#ifdef EAM_BOXED_TEXT
 	CACA_boxed_text,
-#endif
 	CACA_modify_plots
 TERM_TABLE_END(caca)
 

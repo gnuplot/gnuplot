@@ -4742,7 +4742,6 @@ set_style()
     case SHOW_STYLE_HISTOGRAM:
 	parse_histogramstyle(&histogram_opts,HT_CLUSTERED,histogram_opts.gap);
 	break;
-#ifdef EAM_BOXED_TEXT
     case SHOW_STYLE_TEXTBOX:
     {
 	textbox_style *textbox = &textbox_opts[0];
@@ -4811,7 +4810,6 @@ set_style()
 	    textbox->linewidth = 1.0;
 	break;
     }
-#endif
     case SHOW_STYLE_INCREMENT:
 	c_token++;
 	if (END_OF_COMMAND || almost_equals(c_token,"def$ault"))
@@ -6309,7 +6307,6 @@ parse_label_options( struct text_label *this_label, int ndim)
 	    }
 	}
 
-#ifdef EAM_BOXED_TEXT
 	if (equals(c_token, "boxed")) {
 	    int tag = -1;
 	    c_token++;
@@ -6324,7 +6321,6 @@ parse_label_options( struct text_label *this_label, int ndim)
 	    c_token++;
 	    continue;
 	}
-#endif
 
 	if (!axis_label && (loc_lp.flags == LP_NOT_INITIALIZED || set_hypertext)) {
 	    if (almost_equals(c_token, "po$int")) {

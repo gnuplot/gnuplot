@@ -1575,7 +1575,6 @@ void qt_hypertext( int type, const char *text )
 		qt->out << GEHypertext << qt->codec->toUnicode(text);
 }
 
-#ifdef EAM_BOXED_TEXT
 void qt_boxed_text(unsigned int x, unsigned int y, int option)
 {
 	if (option == TEXTBOX_MARGINS) {
@@ -1586,7 +1585,6 @@ void qt_boxed_text(unsigned int x, unsigned int y, int option)
 	} else
 	    qt->out << GETextBox << qt_termCoordF(x, y) << option;
 }
-#endif
 
 void qt_modify_plots(unsigned int ops, int plotno)
 {

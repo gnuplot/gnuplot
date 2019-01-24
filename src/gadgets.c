@@ -203,9 +203,7 @@ boxplot_style boxplot_opts = DEFAULT_BOXPLOT_STYLE;
 /* WINDOWID to be filled by terminals running on X11 (x11, wxt, qt, ...) */
 int current_x11_windowid = 0;
 
-#ifdef EAM_BOXED_TEXT
 textbox_style textbox_opts[NUM_TEXTBOX_STYLES];
-#endif
 
 /*****************************************************************/
 /* Routines that deal with global objects defined in this module */
@@ -911,9 +909,7 @@ write_label(int x, int y, struct text_label *this_label)
 {
 	int htic, vtic;
 	int justify = JUST_TOP;	/* This was the 2D default; 3D had CENTRE */
-#ifdef EAM_BOXED_TEXT
 	textbox_style *textbox = NULL;
-#endif
 
 	apply_pm3dcolor(&(this_label->textcolor));
 	ignore_enhanced(this_label->noenhanced);
@@ -931,7 +927,6 @@ write_label(int x, int y, struct text_label *this_label)
 	} else {
 	    /* A normal label (always print text) */
 	    get_offsets(this_label, &htic, &vtic);
-#ifdef EAM_BOXED_TEXT
 	    if (this_label->boxed < 0)
 		textbox = &textbox_opts[0];
 	    else if (this_label->boxed > 0)
@@ -939,7 +934,6 @@ write_label(int x, int y, struct text_label *this_label)
 	    /* Initialize the bounding box accounting */
 	    if (textbox && term->boxed_text && (textbox->opaque || !textbox->noborder))
 		(*term->boxed_text)(x + htic, y + vtic, TEXTBOX_INIT);
-#endif
 	    if (this_label->rotate && (*term->text_angle) (this_label->rotate)) {
 		write_multiline(x + htic, y + vtic, this_label->text,
 				this_label->pos, justify, this_label->rotate,
@@ -950,7 +944,6 @@ write_label(int x, int y, struct text_label *this_label)
 				this_label->pos, justify, 0, this_label->font);
 	    }
 	}
-#ifdef EAM_BOXED_TEXT
 	if (textbox && term->boxed_text && (textbox->opaque || !textbox->noborder))
 	{
 
@@ -986,7 +979,6 @@ write_label(int x, int y, struct text_label *this_label)
 
 	    (*term->boxed_text)(0,0, TEXTBOX_FINISH);
 	}
-#endif
 
 	/* The associated point, if any */
 	/* write_multiline() clips text to on_page; do the same for any point */

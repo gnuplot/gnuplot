@@ -86,9 +86,7 @@ TERM_PUBLIC void PC_set_color(t_colorspec *colorspec);
 TERM_PUBLIC int PC_make_palette(t_sm_palette *palette);
 TERM_PUBLIC void PC_fillbox(int fillstyle, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height);
 TERM_PUBLIC void PC_filled_polygon(int npoints, gpiPoint *corners);
-#ifdef EAM_BOXED_TEXT
 TERM_PUBLIC void PC_boxed_text(unsigned int x, unsigned int y, int option);
-#endif
 TERM_PUBLIC void PC_dashtype(int type, t_dashtype *custom_dash_pattern);
 
 /* All of these values are place holders only.  They will be re-determined
@@ -194,10 +192,8 @@ static short pc_rgbcolors;		/* number of allocated colors */
 static rgb255_color pc_rgbcolor[256];
 
 /* boxed text */
-#ifdef EAM_BOXED_TEXT
 static TBOOLEAN pc_boxing = FALSE;
 static struct xycoord pc_boxed_extent[4];
-#endif
 
 
 static void
@@ -1499,7 +1495,6 @@ PC_filled_polygon(int npoints, gpiPoint *corners)
 }
 
 
-#ifdef EAM_BOXED_TEXT
 TERM_PUBLIC void
 PC_boxed_text(unsigned int x, unsigned int y, int option)
 {
@@ -1530,7 +1525,6 @@ PC_boxed_text(unsigned int x, unsigned int y, int option)
 	break;
     }
 }
-#endif
 
 
 TERM_PUBLIC void
@@ -1580,9 +1574,7 @@ TERM_TABLE_START(dospc_driver)
     NULL, NULL, /* layer , path */
     0,
     NULL,
-#ifdef EAM_BOXED_TEXT
     PC_boxed_text,
-#endif
     NULL,
     PC_dashtype
 TERM_TABLE_END(dospc_driver)

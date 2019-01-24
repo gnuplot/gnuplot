@@ -4,7 +4,6 @@
 #define EAM_OBJECTS             1
 #define HIDDEN3D_QUADTREE       1
 #define USE_STATS               1
-#define EAM_BOXED_TEXT          1
 #define USE_MOUSE               1
 
 #define READLINE                1

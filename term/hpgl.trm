@@ -3269,9 +3269,7 @@ TERM_TABLE_START(pcl5_driver)
     NULL, NULL, /* layer, path */
     0.,
     NULL, /* hypertext */
-#ifdef EAM_BOXED_TEXT
     NULL, /* boxed text */
-#endif
     NULL, /* modify_plots */
     HPGL2_dashtype
 TERM_TABLE_END(pcl5_driver)

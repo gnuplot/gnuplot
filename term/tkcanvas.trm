@@ -130,9 +130,7 @@ TERM_PUBLIC void TK_filled_polygon(int points, gpiPoint *corners);
 TERM_PUBLIC void TK_image(unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecolor color_mode);
 #endif
 TERM_PUBLIC void TK_dashtype(int dt, t_dashtype *custom_dash_pattern);
-#ifdef EAM_BOXED_TEXT
 TERM_PUBLIC void TK_boxed_text(unsigned int x, unsigned int y, int option);
-#endif
 
 /* nominal canvas size */
 #define TK_XMAX 1000
@@ -2053,7 +2051,6 @@ static char *tk_box_finish[TK_LANG_MAX] = {
 };
 
 
-#ifdef EAM_BOXED_TEXT
 TERM_PUBLIC void
 TK_boxed_text(unsigned int x, unsigned int y, int option)
 {
@@ -2079,7 +2076,6 @@ TK_boxed_text(unsigned int x, unsigned int y, int option)
 	break;
     }
 }
-#endif
 
 #endif /* TERM_BODY */
 
@@ -2107,9 +2103,7 @@ TERM_TABLE_START(tkcanvas)
     NULL /* layer */, TK_path,
     0.0,
     NULL /* hypertext */,
-#ifdef EAM_BOXED_TEXT
     TK_boxed_text, 
-#endif
     NULL, TK_dashtype
 TERM_TABLE_END(tkcanvas)
 #undef LAST_TERM

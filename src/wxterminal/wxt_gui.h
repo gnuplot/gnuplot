@@ -306,9 +306,7 @@ typedef enum wxt_gp_command_t {
 	command_image,
 	command_layer,
 	command_hypertext
-#ifdef EAM_BOXED_TEXT
 	,command_boxed_text
-#endif
 	,command_dashtype
 } wxt_gp_command_t;
 

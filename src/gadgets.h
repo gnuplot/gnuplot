@@ -295,7 +295,6 @@ typedef struct boxplot_style {
 extern boxplot_style boxplot_opts;
 #define DEFAULT_BOXPLOT_STYLE { 0, 1.5, TRUE, 6, CANDLESTICKS, -1.0, 1.0, BOXPLOT_FACTOR_LABELS_AUTO, FALSE }
 
-#ifdef EAM_BOXED_TEXT
 typedef struct textbox_style {
     TBOOLEAN opaque;	/* True if the box is background-filled before writing into it */
     TBOOLEAN noborder;	/* True if you want fill only, no lines */
@@ -306,7 +305,6 @@ typedef struct textbox_style {
     t_colorspec fillcolor;	/* only used if opaque is TRUE */
 } textbox_style;
 #define DEFAULT_TEXTBOX_STYLE { FALSE, FALSE, 1.0, 1.0, 1.0, BLACK_COLORSPEC, BACKGROUND_COLORSPEC }
-#endif
 
 /***********************************************************/
 /* Variables defined by gadgets.c needed by other modules. */
@@ -645,11 +643,9 @@ extern TBOOLEAN prefer_line_styles;
 
 extern histogram_style histogram_opts;
 
-#ifdef EAM_BOXED_TEXT
 /* TODO: linked list rather than fixed size array */
 #define NUM_TEXTBOX_STYLES 4
 extern textbox_style textbox_opts[NUM_TEXTBOX_STYLES];
-#endif
 
 void default_arrow_style __PROTO((struct arrow_style_type *arrow));
 void apply_head_properties __PROTO((struct arrow_style_type *arrow_properties));

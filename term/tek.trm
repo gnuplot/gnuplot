@@ -1503,9 +1503,7 @@ TERM_TABLE_START(sixel_driver)
     , NULL
     , 0.
     , NULL
-#ifdef EAM_BOXED_TEXT
     , NULL
-#endif 
     , NULL
     , SIXEL_dashtype
 TERM_TABLE_END(sixel_driver)

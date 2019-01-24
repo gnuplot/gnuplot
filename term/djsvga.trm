@@ -2117,9 +2117,7 @@ TERM_TABLE_START(djsvga_driver)
     0 /* layer */, DJSVGA_path,
     0.0,
     0 /* hypertext */,
-#ifdef EAM_BOXED_TEXT
     0,
-#endif
     0,
     DJSVGA_dashtype
 TERM_TABLE_END(djsvga_driver)

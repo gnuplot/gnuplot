@@ -228,7 +228,6 @@ typedef struct fill_style_type {
     t_colorspec border_color;
 } fill_style_type;
 
-#ifdef EAM_BOXED_TEXT
 /* Options used by the terminal entry point term->boxed_text() */
 typedef enum t_textbox_options {
 	TEXTBOX_INIT = 0,
@@ -238,7 +237,6 @@ typedef enum t_textbox_options {
 	TEXTBOX_FINISH,
 	TEXTBOX_GREY
 } t_textbox_options;
-#endif
 
 typedef enum t_fillstyle { FS_EMPTY, FS_SOLID, FS_PATTERN, FS_DEFAULT,
 			   FS_TRANSPARENT_SOLID, FS_TRANSPARENT_PATTERN }
@@ -371,9 +369,7 @@ typedef struct TERMENTRY {
 /* Pass hypertext for inclusion in the output plot */
     void (*hypertext) __PROTO((int type, const char *text));
 
-#ifdef EAM_BOXED_TEXT
     void (*boxed_text) __PROTO((unsigned int, unsigned int, int));
-#endif
 
     void (*modify_plots) __PROTO((unsigned int operations, int plotno));
 

@@ -508,13 +508,11 @@ save_set_all(FILE *fp)
 	    save_linetype(fp, &(this_label->lp_properties), TRUE);
 	}
 	save_position(fp, &this_label->offset, 3, TRUE);
-#ifdef EAM_BOXED_TEXT
 	if (this_label->boxed) {
 	    fprintf(fp," boxed ");
 	    if (this_label->boxed > 0)
 		fprintf(fp,"bs %d ",this_label->boxed);
 	}
-#endif
 	fputc('\n', fp);
     }
     fputs("unset arrow\n", fp);
@@ -597,9 +595,7 @@ save_set_all(FILE *fp)
     fprintf(fp, "unset walls\n");
     save_walls(fp);
 
-#ifdef EAM_BOXED_TEXT
     save_style_textbox(fp);
-#endif
 
     save_offsets(fp, "set offsets");
 
@@ -1227,7 +1223,6 @@ save_style_parallel(FILE *fp)
     fprintf(fp, "\n");
 }
 
-#ifdef EAM_BOXED_TEXT
 void
 save_style_textbox(FILE *fp)
 {
@@ -1256,7 +1251,6 @@ save_style_textbox(FILE *fp)
 	fputs("\n",fp);
     }
 }
-#endif
 
 void
 save_position(FILE *fp, struct position *pos, int ndim, TBOOLEAN offset)

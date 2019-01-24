@@ -83,9 +83,7 @@ TERM_TABLE_START(xlib_driver)
     , NULL	/* path */
     , 0.0	/* tscale */
     , NULL	/* hypertext */
-#ifdef EAM_BOXED_TEXT
     , ENHX11_boxed_text
-#endif
     , NULL	/* modify_plots */
     , X11_dashtype
 TERM_TABLE_END(xlib_driver)
