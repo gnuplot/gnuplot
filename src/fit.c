@@ -231,6 +231,7 @@ static TBOOLEAN user_stop = FALSE;
 static double *scale_params = 0; /* scaling values for parameters */
 static struct udft_entry func;
 static fixstr *par_name;
+static t_value **par_udv;	/* array of pointers to the "via" variables */
 
 static fixstr *last_par_name = NULL;
 static int last_num_params = 0;
@@ -637,7 +638,7 @@ call_gnuplot(const double *par, double *data)
 
     /* set parameters first */
     for (i = 0; i < num_params; i++)
-	setvar(par_name[i], par[i] * scale_params[i]);
+	Gcomplex(par_udv[i], par[i] * scale_params[i], 0.0);
 
     for (i = 0; i < num_data; i++) {
 	/* calculate fit-function value */
@@ -698,7 +699,7 @@ calc_derivatives(const double *par, double *data, double **deriv)
 
     /* set parameters first */
     for (i = 0; i < num_params; i++)
-	setvar(par_name[i], par[i] * scale_params[i]);
+	Gcomplex(par_udv[i], par[i] * scale_params[i], 0.0);
 
     for (i = 0; i < num_data; i++) { /* loop over data points */
 	for (j = 0, m = 0; j < num_indep; j++) { /* loop over indep. variables */
@@ -772,7 +773,7 @@ fit_interrupt()
 		/* FIXME: Shouldn't we also set FIT_STDFIT etc? */
 		/* set parameters visible to gnuplot */
 		for (i = 0; i < num_params; i++)
-		    setvar(par_name[i], a[i] * scale_params[i]);
+		    Gcomplex(par_udv[i], a[i] * scale_params[i], 0.0);
 		do_string(tmp);
 		free(tmp);
 	    }
@@ -899,7 +900,7 @@ regress_finalize(int iter, double chisq, double last_chisq, double lambda, doubl
        its internal state, the last call_gnuplot may not have been
        at the minimum */
     for (i = 0; i < num_params; i++)
-	setvar(par_name[i], a[i] * scale_params[i]);
+	Gcomplex(par_udv[i], a[i] * scale_params[i], 0.0);
 
     /* Set error and covariance variables to zero, 
        thus making sure they are created. */
@@ -1355,7 +1356,7 @@ get_next_word(char **s, char *subst)
 	tmp++;
     if (*tmp == '\n' || *tmp == '\r' || *tmp == '\0')	/* not found */
 	return NULL;
-    if ((*s = strpbrk(tmp, " =\t\n\r")) == NULL)
+    if ((*s = strpbrk(tmp, " =\t\n\r[")) == NULL)
 	*s = tmp + strlen(tmp);
     *subst = **s;
     *(*s)++ = '\0';
@@ -1380,7 +1381,13 @@ init_fit()
 static void
 setvar(char *varname, double data)
 {
-    /* Despite its name it is actually usable for any variable. */
+    char *c;
+
+    /* Sanitize name to remove square brackets from array variables */
+    for (c = varname; *c; c++) {
+	if (*c == '[' || *c == ']')
+	    *c = '_';
+    }
     fill_gpval_float(varname, data);
 }
 
@@ -1974,7 +1981,7 @@ fit_command()
 	    break;
 	default:	/* June 2013 - allow more than 7 data columns */
 	    if (i<0)
-		int_error(NO_CARET, "unexpected value returned by df_readline");
+		Eex("unexpected value returned by df_readline");
 	    break;
 	}
 	num_points++;
@@ -2110,10 +2117,15 @@ fit_command()
 
     /* allocate arrays for parameter values, names */
     a = vec(max_params);
-    par_name = (fixstr *) gp_alloc((max_params + 1) * sizeof(fixstr),
-				   "fit param");
+    par_name = (fixstr *) gp_alloc((max_params + 1) * sizeof(fixstr), "fit param name");
+    par_udv = gp_realloc(par_udv, (max_params + 1) * sizeof(t_value *), "fit param pointer");
     num_params = 0;
 
+    /*
+     * FIXME: This is all done by character-by-character inspection of the
+     * input line.  If it were wrapped in lf_push()/lf_pop() we could use
+     * the normal gnuplot parsing routines keyed off c_token.
+     */
     if (isstringvalue(c_token)) {	/* It's a parameter *file* */
 	TBOOLEAN fixed;
 	double tmp_par;
@@ -2150,7 +2162,22 @@ fit_command()
 		(void) fclose(f);
 		Eex("syntax error in parameter file");
 	    }
-	    safe_strncpy(par_name[num_params], tmp, sizeof(fixstr));
+	    if (c == '[') {
+		/* Special case: array element */
+		udvt_entry *udv = get_udv_by_name(tmp);
+		int index;
+		if (udv->udv_value.type != ARRAY)
+		    Eex("no such array");
+		if ((1 != sscanf(s, "%d]", &index))
+		||  (index <= 0 || index > udv->udv_value.v.value_array[0].v.int_val))
+		    Eex("bad array index");
+		snprintf(par_name[num_params], sizeof(par_name[0]), "%s[%d]", tmp, index);
+		par_udv[num_params] = &(udv->udv_value.v.value_array[index]);
+	    } else {
+		/* Normal case */
+		safe_strncpy(par_name[num_params], tmp, sizeof(fixstr));
+		par_udv[num_params] = &(add_udv_by_name(tmp)->udv_value);
+	    }
 	    /* next must be '=' */
 	    if (c != '=') {
 		tmp = strchr(s, '=');
@@ -2165,20 +2192,12 @@ fit_command()
 		(void) fclose(f);
 		Eex("syntax error in parameter file");
 	    }
-	    /* make fixed params visible to GNUPLOT */
-	    if (fixed) {
-		/* use parname as temp */
-		setvar(par_name[num_params], tmp_par);
-	    } else {
+	    Gcomplex(par_udv[num_params], tmp_par, 0.0);
+	    /* Fixed parameters are updated but not counted against num_params */
+	    if (!fixed) {
 		if (num_params >= max_params) {
-		    max_params = (max_params * 3) / 2;
-		    if (0
-			|| !redim_vec(&a, max_params)
-			|| !(par_name = (fixstr *) gp_realloc(par_name, (max_params + 1) * sizeof(fixstr), "fit param resize"))
-			) {
-			(void) fclose(f);
-			Eex("Out of memory in fit: too many parameters?");
-		    }
+		    fclose(f);
+		    Eex("too many fit parameters");
 		}
 		a[num_params++] = tmp_par;
 	    }
@@ -2198,19 +2217,36 @@ fit_command()
 	do {
 	    if (!isletter(c_token))
 		Eex("no parameter specified");
-	    capture(par_name[num_params], c_token, c_token, (int) sizeof(par_name[0]));
-	    if (num_params >= max_params) {
-		max_params = (max_params * 3) / 2;
-		if (0
-		    || !redim_vec(&a, max_params)
-		    || !(par_name = (fixstr *) gp_realloc(par_name, (max_params + 1) * sizeof(fixstr), "fit param resize"))
-		    ) {
-		    Eex("Out of memory in fit: too many parameters?");
-		}
+
+	    if (num_params >= max_params)
+		Eex("too many fit parameters");
+
+	    if (equals(c_token+1, "[")) {
+		/* Special case:  via Array[n]
+		 *	created variables will be of the form Array_n_*
+		 */
+		udvt_entry *udv = add_udv(c_token);
+		int index;
+		if (udv->udv_value.type != ARRAY)
+		    Eexc(c_token, "No such array");
+		c_token += 2;
+		index = int_expression();
+		if (index <= 0 || index > udv->udv_value.v.value_array[0].v.int_val)
+		    Eexc(c_token, "array index out of range");
+		if (!equals(c_token, "]"))
+		    Eexc(c_token, "not an array index");
+		snprintf(par_name[num_params], sizeof(par_name[0]), "%s[%d]", udv->udv_name, index);
+		a[num_params] = real( &(udv->udv_value.v.value_array[index]) );
+		par_udv[num_params] = &(udv->udv_value.v.value_array[index]);
+	    } else {
+		/* Normal case: via param_name */
+		capture(par_name[num_params], c_token, c_token, (int) sizeof(par_name[0]));
+		/* create variable if it doesn't exist */
+		a[num_params] = createdvar(par_name[num_params], INITIAL_VALUE);
+		par_udv[num_params] = &(get_udv_by_name(par_name[num_params])->udv_value);
 	    }
-	    /* create variable if it doesn't exist */
-	    a[num_params] = createdvar(par_name[num_params], INITIAL_VALUE);
-	    ++num_params;
+
+	    num_params++;
 	} while (equals(++c_token, ",") && ++c_token);
     }
 
@@ -2389,9 +2425,8 @@ save_fit(FILE *fp)
 			udv->udv_value.v.cmplx_val.real);
     }
 
-    for (k = 0; k < last_num_params; k++) {
-	udv = get_udv_by_name(last_par_name[k]);
-	fprintf(fp, "%-15s = %-22s\n", udv->udv_name, value_to_str(&(udv->udv_value), FALSE));
-    }
+    for (k = 0; k < last_num_params; k++)
+	fprintf(fp, "%-15s = %-22s\n", last_par_name[k], value_to_str(par_udv[k], FALSE));
+
     return;
 }

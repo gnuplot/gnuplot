@@ -67,6 +67,9 @@ m4(f1,f2,f3,f4) = c1*f1 + c2*f2 + c3*f3 + c4*f4
 m5(f1,f2,f3,f4,f5) = c1*f1 + c2*f2 + c3*f3 + c4*f4 + c5*f5
 m6(f1,f2,f3,f4,f5,f6) = c1*f1 + c2*f2 + c3*f3 + c4*f4 + c5*f5 + c6*f6
 
+array A[6] = [1,1,1,1,1,1]
+a6(f1,f2,f3,f4,f5,f6) = A[1]*f1 + A[2]*f2 + A[3]*f3 + A[4]*f4 + A[5]*f5 + A[6]*f6
+
 # 1D fit:
 # basis function in column 1,
 # combination with one component in column 6
@@ -153,7 +156,7 @@ print "5D fit: expected ", k5, " c5 = ", c5
 print "---------------------------------------------------------"
 pause -1 "Hit return to try for a 6D fit"
 
-print "This 6D fit will fail in 4.6 but 4.7 can handle more parameters"
+print "This 6D fit will fail in version 4 but version 5 can handle more parameters"
 # 6D fit:
 # basis functions in columns 1, 2, 3, 4, 5, 11
 # combination with five components in column 12
@@ -175,5 +178,11 @@ print "6D fit: expected ", k5, " c5 = ", c5
 print "6D fit: expected ", k6, " c6 = ", c6
 print "FIT_NDF = ",FIT_NDF," after range filters (expected 14)"
 print "---------------------------------------------------------"
+
+pause -1 "Hit return to try fit with array variables"
+fit [][][][][][-0.2:*] a6(x,y,x2,x3,x4,x5) $fitmulti u 1:2:3:4:5:11:12:(1) via A[1],A[2],A[3],A[4],A[5],A[6]
+print "---------------------------------------------------------"
+show var A_
+print "Array A after 6D fit: ", A
 pause -1 "Hit return to end multidimension fit demo"
 reset
