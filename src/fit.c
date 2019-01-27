@@ -207,6 +207,7 @@ static double lambda_up_factor = LAMBDA_UP_FACTOR;
 static const char fitlogfile_default[] = "fit.log";
 static const char GNUFITLOG[] = "FIT_LOG";
 static FILE *log_f = NULL;
+static FILE *via_f = NULL;
 static TBOOLEAN fit_show_lambda = TRUE;
 static const char *GP_FIXED = "# FIXED";
 static const char *FITSCRIPT = "FIT_SCRIPT";
@@ -373,6 +374,10 @@ error_ex(int t_num, const char *str, ...)
 	fprintf(log_f, "BREAK: %s", buf);
 	fclose(log_f);
 	log_f = NULL;
+    }
+    if (via_f) {
+	fclose(via_f);
+	via_f = NULL;
     }
     free(fit_x);
     free(fit_z);
@@ -775,7 +780,6 @@ fit_interrupt()
 		for (i = 0; i < num_params; i++)
 		    Gcomplex(par_udv[i], a[i] * scale_params[i], 0.0);
 		do_string(tmp);
-		free(tmp);
 	    }
 	}
     }
@@ -792,11 +796,11 @@ getfitscript(void)
     char *tmp;
 
     if (fit_script != NULL)
-	return gp_strdup(fit_script);
+	return fit_script;
     if ((tmp = getenv(FITSCRIPT)) != NULL)
-	return gp_strdup(tmp);
+	return tmp;
     else
-	return gp_strdup(DEFAULT_CMD);
+	return (char *)DEFAULT_CMD;
 }
 
 
@@ -2131,20 +2135,18 @@ fit_command()
 	double tmp_par;
 	char c='\0', *s;
 	char sstr[MAX_LINE_LEN + 1];
-	FILE *f;
 
-	static char *viafile = NULL;
-	free(viafile);			/* Free previous name, if any */
-	viafile = try_to_get_string();
-	if (!viafile || !(f = loadpath_fopen(viafile, "r")))
+	char *viafile = try_to_get_string();
+	if (!viafile || !(via_f = loadpath_fopen(viafile, "r")))
 	    Eex2("could not read parameter-file \"%s\"", viafile);
 	if (!fit_suppress_log)
 	    fprintf(log_f, "fitted parameters and initial values from file: %s\n\n", viafile);
+	free(viafile);			/* Free previous name, if any */
 
 	/* get parameters and values out of file and ignore fixed ones */
 
 	while (TRUE) {
-	    if (!fgets(s = sstr, sizeof(sstr), f))	/* EOF found */
+	    if (!fgets(s = sstr, sizeof(sstr), via_f))	/* EOF found */
 		break;
 	    if ((tmp = strstr(s, GP_FIXED)) != NULL) {	/* ignore fixed params */
 		*tmp = NUL;
@@ -2158,10 +2160,8 @@ fit_command()
 	    if (is_empty(s))
 		continue;
 	    tmp = get_next_word(&s, &c);
-	    if (!legal_identifier(tmp) || strlen(tmp) > MAX_ID_LEN) {
-		(void) fclose(f);
+	    if (!legal_identifier(tmp) || strlen(tmp) > MAX_ID_LEN)
 		Eex("syntax error in parameter file");
-	    }
 	    if (c == '[') {
 		/* Special case: array element */
 		udvt_entry *udv = get_udv_by_name(tmp);
@@ -2181,33 +2181,26 @@ fit_command()
 	    /* next must be '=' */
 	    if (c != '=') {
 		tmp = strchr(s, '=');
-		if (tmp == NULL) {
-		    (void) fclose(f);
+		if (tmp == NULL)
 		    Eex("syntax error in parameter file");
-		}
 		s = tmp + 1;
 	    }
 	    tmp = get_next_word(&s, &c);
-	    if (sscanf(tmp, "%lf", &tmp_par) != 1) {
-		(void) fclose(f);
+	    if (sscanf(tmp, "%lf", &tmp_par) != 1)
 		Eex("syntax error in parameter file");
-	    }
 	    Gcomplex(par_udv[num_params], tmp_par, 0.0);
 	    /* Fixed parameters are updated but not counted against num_params */
 	    if (!fixed) {
-		if (num_params >= max_params) {
-		    fclose(f);
+		if (num_params >= max_params)
 		    Eex("too many fit parameters");
-		}
 		a[num_params++] = tmp_par;
 	    }
 
-	    if ((tmp = get_next_word(&s, &c)) != NULL) {
-		(void) fclose(f);
-		Eex2("syntax error in parameter file %s", viafile);
-	    }
+	    if ((tmp = get_next_word(&s, &c)) != NULL)
+		Eex("syntax error in parameter file");
 	}
-	(void) fclose(f);
+	(void) fclose(via_f);
+	via_f = NULL;
 
     } else {
 	/* not a string after via: it's a variable listing */
