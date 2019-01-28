@@ -46,16 +46,16 @@ register_term(kyo)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void PRE_init __PROTO((void));
-TERM_PUBLIC void KYO_init __PROTO((void));
-TERM_PUBLIC void PRE_graphics __PROTO((void));
-TERM_PUBLIC void PRE_text __PROTO((void));
-TERM_PUBLIC void PRE_linetype __PROTO((int linetype));
-TERM_PUBLIC void PRE_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void PRE_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void PRE_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
-TERM_PUBLIC int PRE_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC void PRE_reset __PROTO((void));
+TERM_PUBLIC void PRE_init(void);
+TERM_PUBLIC void KYO_init(void);
+TERM_PUBLIC void PRE_graphics(void);
+TERM_PUBLIC void PRE_text(void);
+TERM_PUBLIC void PRE_linetype(int linetype);
+TERM_PUBLIC void PRE_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void PRE_vector(unsigned int x, unsigned int y);
+TERM_PUBLIC void PRE_put_text(unsigned int x, unsigned int y, const char *str);
+TERM_PUBLIC int PRE_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC void PRE_reset(void);
 
 #define PRE_XMAX 2567
 #define PRE_YMAX 1815		/* X:Y = sqrt(2) */

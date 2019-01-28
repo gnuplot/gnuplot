@@ -70,16 +70,16 @@ register_term(hpdj)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void HPLJII_options __PROTO((void));
-TERM_PUBLIC void HPLJII_init __PROTO((void));
-TERM_PUBLIC void HPLJII_graphics __PROTO((void));
-TERM_PUBLIC void HPLJII_text __PROTO((void));
-TERM_PUBLIC void HPLJII_linetype __PROTO((int linetype));
-TERM_PUBLIC void HPLJII_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
-TERM_PUBLIC void HPLJII_reset __PROTO((void));
+TERM_PUBLIC void HPLJII_options(void);
+TERM_PUBLIC void HPLJII_init(void);
+TERM_PUBLIC void HPLJII_graphics(void);
+TERM_PUBLIC void HPLJII_text(void);
+TERM_PUBLIC void HPLJII_linetype(int linetype);
+TERM_PUBLIC void HPLJII_put_text(unsigned int x, unsigned int y, const char *str);
+TERM_PUBLIC void HPLJII_reset(void);
 
-TERM_PUBLIC void HPDJ_graphics __PROTO((void));
-TERM_PUBLIC void HPDJ_text __PROTO((void));
+TERM_PUBLIC void HPDJ_graphics(void);
+TERM_PUBLIC void HPDJ_text(void);
 
 /* default values for term_tbl */
 #define HPLJII_75PPI_XMAX (1920/4)
@@ -114,7 +114,7 @@ TERM_PUBLIC void HPDJ_text __PROTO((void));
 #define HPLJII_COURIER fputs("\033(0N\033(s0p10.0h12.0v0s0b3T\033&l6D",gpoutfile)
 
 
-static void HPLJII_putc __PROTO((unsigned int x, unsigned int y, int c, int ang));
+static void HPLJII_putc(unsigned int x, unsigned int y, int c, int ang);
     /* note: c is char, but must be declared int due to an old K&R ANSI-C strict HP cc */
 static int hplj_dpp = 4;
 /* bm_pattern not appropriate for 300ppi graphics */

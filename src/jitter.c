@@ -65,7 +65,7 @@
 
 t_jitter jitter = {{first_axes, first_axes, first_axes, 0.0, 0.0, 0.0}, 0.0, 0.0, JITTER_DEFAULT};
 
-static int compare_xypoints __PROTO((SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2));
+static int compare_xypoints(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2);
 
 static int
 compare_xypoints(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)

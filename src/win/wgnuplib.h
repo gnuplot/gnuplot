@@ -508,7 +508,7 @@ void GraphEnhancedOpen(char *fontname, double fontsize, double base,
 void GraphEnhancedFlush(void);
 LPWSTR UnicodeTextWithEscapes(LPCSTR str, enum set_encoding_id encoding);
 
-void WIN_update_options __PROTO((void));
+void WIN_update_options(void);
 
 
 /* ================================== */

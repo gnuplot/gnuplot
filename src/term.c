@@ -107,7 +107,7 @@ char* mouse_alt_string = NULL;
 # include "win/wcommon.h"
 #endif
 
-static int termcomp __PROTO((const generic * a, const generic * b));
+static int termcomp(const generic * a, const generic * b);
 
 /* Externally visible variables */
 /* the central instance: the current terminal's interface structure */
@@ -211,32 +211,32 @@ static double term_pointsize=1;
 
 /* Internal prototypes: */
 
-static void term_suspend __PROTO((void));
-static void term_close_output __PROTO((void));
+static void term_suspend(void);
+static void term_close_output(void);
 
-static void null_linewidth __PROTO((double));
-static void do_point __PROTO((unsigned int x, unsigned int y, int number));
-static void do_pointsize __PROTO((double size));
-static void line_and_point __PROTO((unsigned int x, unsigned int y, int number));
-static void do_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int headstyle));
-static void null_dashtype __PROTO((int type, t_dashtype *custom_dash_pattern));
+static void null_linewidth(double);
+static void do_point(unsigned int x, unsigned int y, int number);
+static void do_pointsize(double size);
+static void line_and_point(unsigned int x, unsigned int y, int number);
+static void do_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int headstyle);
+static void null_dashtype(int type, t_dashtype *custom_dash_pattern);
 
-static int null_text_angle __PROTO((int ang));
-static int null_justify_text __PROTO((enum JUSTIFY just));
-static int null_scale __PROTO((double x, double y));
-static void null_layer __PROTO((t_termlayer layer));
-static int null_set_font __PROTO((const char *font));
-static void null_set_color __PROTO((struct t_colorspec *colorspec));
-static void options_null __PROTO((void));
-static void graphics_null __PROTO((void));
-static void UNKNOWN_null __PROTO((void));
-static void MOVE_null __PROTO((unsigned int, unsigned int));
-static void LINETYPE_null __PROTO((int));
-static void PUTTEXT_null __PROTO((unsigned int, unsigned int, const char *));
+static int null_text_angle(int ang);
+static int null_justify_text(enum JUSTIFY just);
+static int null_scale(double x, double y);
+static void null_layer(t_termlayer layer);
+static int null_set_font(const char *font);
+static void null_set_color(struct t_colorspec *colorspec);
+static void options_null(void);
+static void graphics_null(void);
+static void UNKNOWN_null(void);
+static void MOVE_null(unsigned int, unsigned int);
+static void LINETYPE_null(int);
+static void PUTTEXT_null(unsigned int, unsigned int, const char *);
 
-static int strlen_tex __PROTO((const char *));
+static int strlen_tex(const char *);
 
-static char *stylefont __PROTO((const char *fontname, TBOOLEAN isbold, TBOOLEAN isitalic));
+static char *stylefont(const char *fontname, TBOOLEAN isbold, TBOOLEAN isitalic);
 
 /* Used by terminals and by shared routine parse_term_size() */
 typedef enum {
@@ -244,7 +244,7 @@ typedef enum {
     INCHES,
     CM
 } size_units;
-static size_units parse_term_size __PROTO((float *xsize, float *ysize, size_units def_units));
+static size_units parse_term_size(float *xsize, float *ysize, size_units def_units);
 
 
 #ifdef VMS

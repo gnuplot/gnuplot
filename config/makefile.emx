@@ -15,7 +15,7 @@ EMXPATH = c:/emx
 # where to place gnuplot.gih helpfile
 HELPFILE = gnuplot.gih
 
-CFLAGS = -c -O2 -DMSDOS -DDOS32 -DPROTOTYPES -DHAVE_STRINGIZE -DREADLINE -DHAVE_STRNICMP
+CFLAGS = -c -O2 -DMSDOS -DDOS32 -DHAVE_STRINGIZE -DREADLINE -DHAVE_STRNICMP
 
 # see other terminal defines in term.h
 TERMFLAGS = -DEMXVGA $(VESA)

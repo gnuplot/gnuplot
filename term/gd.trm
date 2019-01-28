@@ -104,36 +104,36 @@ register_term(png)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void PNG_options __PROTO((void));
-TERM_PUBLIC void PNG_init __PROTO((void));
-TERM_PUBLIC void PNG_graphics __PROTO((void));
-TERM_PUBLIC void PNG_text __PROTO((void));
-TERM_PUBLIC void PNG_linetype __PROTO((int linetype));
-TERM_PUBLIC void PNG_linewidth __PROTO((double linewidth));
-TERM_PUBLIC void PNG_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void PNG_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void PNG_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
-TERM_PUBLIC int PNG_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC void PNG_point __PROTO((unsigned int x, unsigned int y, int number));
-TERM_PUBLIC int PNG_text_angle __PROTO((int ang));
-TERM_PUBLIC void PNG_reset __PROTO((void));
-TERM_PUBLIC int PNG_set_font __PROTO((const char *fontname));
-TERM_PUBLIC void PNG_pointsize __PROTO((double ptsize));
+TERM_PUBLIC void PNG_options(void);
+TERM_PUBLIC void PNG_init(void);
+TERM_PUBLIC void PNG_graphics(void);
+TERM_PUBLIC void PNG_text(void);
+TERM_PUBLIC void PNG_linetype(int linetype);
+TERM_PUBLIC void PNG_linewidth(double linewidth);
+TERM_PUBLIC void PNG_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void PNG_vector(unsigned int x, unsigned int y);
+TERM_PUBLIC void PNG_put_text(unsigned int x, unsigned int y, const char str[]);
+TERM_PUBLIC int PNG_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC void PNG_point(unsigned int x, unsigned int y, int number);
+TERM_PUBLIC int PNG_text_angle(int ang);
+TERM_PUBLIC void PNG_reset(void);
+TERM_PUBLIC int PNG_set_font(const char *fontname);
+TERM_PUBLIC void PNG_pointsize(double ptsize);
 TERM_PUBLIC void PNG_boxfill(int, unsigned int, unsigned int, unsigned int, unsigned int);
 TERM_PUBLIC int PNG_make_palette (t_sm_palette *);
 /* TERM_PUBLIC void PNG_previous_palette (void); */
 TERM_PUBLIC void PNG_set_color (t_colorspec *);
 TERM_PUBLIC void PNG_filled_polygon (int, gpiPoint *);
-TERM_PUBLIC void PNG_image __PROTO((unsigned int, unsigned int, coordval *, gpiPoint *, t_imagecolor));
+TERM_PUBLIC void PNG_image(unsigned int, unsigned int, coordval *, gpiPoint *, t_imagecolor);
 
 /* To support "set term png enhanced" */
-TERM_PUBLIC void ENHGD_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
-TERM_PUBLIC void ENHGD_OPEN __PROTO((char * fontname, double fontsize,
+TERM_PUBLIC void ENHGD_put_text(unsigned int x, unsigned int y, const char str[]);
+TERM_PUBLIC void ENHGD_OPEN(char * fontname, double fontsize,
 			double base, TBOOLEAN widthflag, TBOOLEAN showflag,
-			int overprint));
-TERM_PUBLIC void ENHGD_FLUSH __PROTO((void));
+			int overprint);
+TERM_PUBLIC void ENHGD_FLUSH(void);
 
-TERM_PUBLIC void ENHGD_boxed_text __PROTO((unsigned int, unsigned int, int));
+TERM_PUBLIC void ENHGD_boxed_text(unsigned int, unsigned int, int);
 
 #include <gd.h>
 /* Include files for bitmap fonts */
@@ -172,13 +172,13 @@ static void gp_gdImageFilledPolygon(gdImagePtr, gdPointPtr, int, int);
 # define gp_gdImageFilledPolygon gdImageFilledPolygon 
 #endif
 
-static void PNG_PointX __PROTO((unsigned int, unsigned int));
-static void PNG_PointPlus __PROTO((unsigned int, unsigned int));
+static void PNG_PointX(unsigned int, unsigned int);
+static void PNG_PointPlus(unsigned int, unsigned int);
 static void PNG_Triangle(unsigned int x, unsigned int y, int direction,
-	void (*draw_func)(gdImagePtr, gdPointPtr, int, int));
+			void (*draw_func)(gdImagePtr, gdPointPtr, int, int));
 static void PNG_Diamond(unsigned int x, unsigned int y,
-	void (*draw_func)(gdImagePtr, gdPointPtr, int, int));
-static void PNG_init_brush __PROTO((int));
+			void (*draw_func)(gdImagePtr, gdPointPtr, int, int));
+static void PNG_init_brush(int);
 
 #define GREG_XMAX 640
 #define GREG_YMAX 480
@@ -322,7 +322,7 @@ static double PNG_dashlength_factor = 1.0;
 #ifdef HAVE_ICONV
 #include <iconv.h>
 #endif
-static void gd_iconv __PROTO((char **string));
+static void gd_iconv(char **string);
 
 /* EAM - gdImage structure to hold brushes for linewidth */
 /* We will allocate and initialize these on demand */
@@ -429,9 +429,9 @@ image_do_crop (void)
 }
 
 
-static int PNG_FillSolid __PROTO((int fillpar));
-static int PNG_FillPattern __PROTO((int fillpar));
-static int PNG_FillTransparent __PROTO((int fillpar));
+static int PNG_FillSolid(int fillpar);
+static int PNG_FillPattern(int fillpar);
+static int PNG_FillTransparent(int fillpar);
 
 static int
 PNG_FillSolid(int fillpar)
@@ -2560,7 +2560,7 @@ register_term(jpeg)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void JPEG_text __PROTO((void));
+TERM_PUBLIC void JPEG_text(void);
 #define GOT_NEXT_PROTO
 #endif
 
@@ -2689,7 +2689,7 @@ register_term(gif)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void GIF_text __PROTO((void));
+TERM_PUBLIC void GIF_text(void);
 #define GOT_NEXT_PROTO
 #endif
 

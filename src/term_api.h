@@ -287,36 +287,36 @@ typedef struct TERMENTRY {
     const char *description;
     unsigned int xmax,ymax,v_char,h_char,v_tic,h_tic;
 
-    void (*options) __PROTO((void));
-    void (*init) __PROTO((void));
-    void (*reset) __PROTO((void));
-    void (*text) __PROTO((void));
-    int (*scale) __PROTO((double, double));
-    void (*graphics) __PROTO((void));
-    void (*move) __PROTO((unsigned int, unsigned int));
-    void (*vector) __PROTO((unsigned int, unsigned int));
-    void (*linetype) __PROTO((int));
-    void (*put_text) __PROTO((unsigned int, unsigned int, const char*));
+    void (*options)(void);
+    void (*init)(void);
+    void (*reset)(void);
+    void (*text)(void);
+    int (*scale)(double, double);
+    void (*graphics)(void);
+    void (*move)(unsigned int, unsigned int);
+    void (*vector)(unsigned int, unsigned int);
+    void (*linetype)(int);
+    void (*put_text)(unsigned int, unsigned int, const char*);
     /* the following are optional. set term ensures they are not NULL */
-    int (*text_angle) __PROTO((int));
-    int (*justify_text) __PROTO((enum JUSTIFY));
-    void (*point) __PROTO((unsigned int, unsigned int, int));
-    void (*arrow) __PROTO((unsigned int, unsigned int, unsigned int, unsigned int, int headstyle));
-    int (*set_font) __PROTO((const char *font));
-    void (*pointsize) __PROTO((double)); /* change pointsize */
+    int (*text_angle)(int);
+    int (*justify_text)(enum JUSTIFY);
+    void (*point)(unsigned int, unsigned int, int);
+    void (*arrow)(unsigned int, unsigned int, unsigned int, unsigned int, int headstyle);
+    int (*set_font)(const char *font);
+    void (*pointsize)(double); /* change pointsize */
     int flags;
-    void (*suspend) __PROTO((void)); /* called after one plot of multiplot */
-    void (*resume)  __PROTO((void)); /* called before plots of multiplot */
-    void (*fillbox) __PROTO((int, unsigned int, unsigned int, unsigned int, unsigned int)); /* clear in multiplot mode */
-    void (*linewidth) __PROTO((double linewidth));
+    void (*suspend)(void); /* called after one plot of multiplot */
+    void (*resume) (void); /* called before plots of multiplot */
+    void (*fillbox)(int, unsigned int, unsigned int, unsigned int, unsigned int); /* clear in multiplot mode */
+    void (*linewidth)(double linewidth);
 #ifdef USE_MOUSE
-    int (*waitforinput) __PROTO((int));     /* used for mouse and hotkey input */
-    void (*put_tmptext) __PROTO((int, const char []));   /* draws temporary text; int determines where: 0=statusline, 1,2: at corners of zoom box, with \r separating text above and below the point */
-    void (*set_ruler) __PROTO((int, int));    /* set ruler location; x<0 switches ruler off */
-    void (*set_cursor) __PROTO((int, int, int));   /* set cursor style and corner of rubber band */
-    void (*set_clipboard) __PROTO((const char[]));  /* write text into cut&paste buffer (clipboard) */
+    int (*waitforinput)(int);     /* used for mouse and hotkey input */
+    void (*put_tmptext)(int, const char []);   /* draws temporary text; int determines where: 0=statusline, 1,2: at corners of zoom box, with \r separating text above and below the point */
+    void (*set_ruler)(int, int);    /* set ruler location; x<0 switches ruler off */
+    void (*set_cursor)(int, int, int);   /* set cursor style and corner of rubber band */
+    void (*set_clipboard)(const char[]);  /* write text into cut&paste buffer (clipboard) */
 #endif
-    int (*make_palette) __PROTO((t_sm_palette *palette));
+    int (*make_palette)(t_sm_palette *palette);
     /* 1. if palette==NULL, then return nice/suitable
        maximal number of colours supported by this terminal.
        Returns 0 if it can make colours without palette (like
@@ -326,40 +326,40 @@ typedef struct TERMENTRY {
        3. available: some negative values of max_colors for whatever
        can be useful
      */
-    void (*previous_palette) __PROTO((void));
+    void (*previous_palette)(void);
     /* release the palette that the above routine allocated and get
        back the palette that was active before.
        Some terminals, like displays, may draw parts of the figure
        using their own palette. Those terminals that possess only
        one palette for the whole plot don't need this routine.
      */
-    void (*set_color) __PROTO((t_colorspec *));
+    void (*set_color)(t_colorspec *);
     /* EAM November 2004 - revised to take a pointer to struct rgb_color,
        so that a palette gray value is not the only option for
        specifying color.
      */
-    void (*filled_polygon) __PROTO((int points, gpiPoint *corners));
-    void (*image) __PROTO((unsigned int, unsigned int, coordval *, gpiPoint *, t_imagecolor));
+    void (*filled_polygon)(int points, gpiPoint *corners);
+    void (*image)(unsigned int, unsigned int, coordval *, gpiPoint *, t_imagecolor);
 
 /* Enhanced text mode driver call-backs */
-    void (*enhanced_open) __PROTO((char * fontname, double fontsize,
+    void (*enhanced_open)(char * fontname, double fontsize,
 		double base, TBOOLEAN widthflag, TBOOLEAN showflag,
-		int overprint));
-    void (*enhanced_flush) __PROTO((void));
-    void (*enhanced_writec) __PROTO((int c));
+		int overprint);
+    void (*enhanced_flush)(void);
+    void (*enhanced_writec)(int c);
 
 /* Driver-specific synchronization or other layering commands.
  * Introduced as an alternative to the ugly sight of
  * driver-specific code strewn about in the core routines.
  * As of this point (July 2005) used only by pslatex.trm
  */
-    void (*layer) __PROTO((t_termlayer));
+    void (*layer)(t_termlayer);
 
 /* Begin/End path control.
  * Needed by PostScript-like devices in order to join the endpoints of
  * a polygon cleanly.
  */
-    void (*path) __PROTO((int p));
+    void (*path)(int p);
 
 /* Scale factor for converting terminal coordinates to output
  * pixel coordinates.  Used to provide data for external mousing code.
@@ -367,13 +367,13 @@ typedef struct TERMENTRY {
     double tscale;
 
 /* Pass hypertext for inclusion in the output plot */
-    void (*hypertext) __PROTO((int type, const char *text));
+    void (*hypertext)(int type, const char *text);
 
-    void (*boxed_text) __PROTO((unsigned int, unsigned int, int));
+    void (*boxed_text)(unsigned int, unsigned int, int);
 
-    void (*modify_plots) __PROTO((unsigned int operations, int plotno));
+    void (*modify_plots)(unsigned int operations, int plotno);
 
-    void (*dashtype) __PROTO((int type, t_dashtype *custom_dash_pattern));
+    void (*dashtype)(int type, t_dashtype *custom_dash_pattern);
 
 } TERMENTRY;
 
@@ -454,53 +454,53 @@ extern TBOOLEAN ignore_enhanced_text;
 
 /* Prototypes of functions exported by term.c */
 
-void term_set_output __PROTO((char *));
-void term_initialise __PROTO((void));
-void term_start_plot __PROTO((void));
-void term_end_plot __PROTO((void));
-void term_start_multiplot __PROTO((void));
-void term_end_multiplot __PROTO((void));
-/* void term_suspend __PROTO((void)); */
-void term_reset __PROTO((void));
-void term_apply_lp_properties __PROTO((struct lp_style_type *lp));
-void term_check_multiplot_okay __PROTO((TBOOLEAN));
-void init_monochrome __PROTO((void));
-struct termentry *change_term __PROTO((const char *name, int length));
+void term_set_output(char *);
+void term_initialise(void);
+void term_start_plot(void);
+void term_end_plot(void);
+void term_start_multiplot(void);
+void term_end_multiplot(void);
+/* void term_suspend(void); */
+void term_reset(void);
+void term_apply_lp_properties(struct lp_style_type *lp);
+void term_check_multiplot_okay(TBOOLEAN);
+void init_monochrome(void);
+struct termentry *change_term(const char *name, int length);
 
-void write_multiline __PROTO((int, int, char *, JUSTIFY, VERT_JUSTIFY, int, const char *));
-int estimate_strlen __PROTO((const char *));
-char *estimate_plaintext __PROTO((char *));
-void list_terms __PROTO((void));
-char* get_terminals_names __PROTO((void));
-struct termentry *set_term __PROTO((void));
-void init_terminal __PROTO((void));
-void test_term __PROTO((void));
+void write_multiline(int, int, char *, JUSTIFY, VERT_JUSTIFY, int, const char *);
+int estimate_strlen(const char *);
+char *estimate_plaintext(char *);
+void list_terms(void);
+char* get_terminals_names(void);
+struct termentry *set_term(void);
+void init_terminal(void);
+void test_term(void);
 
 /* Support for enhanced text mode. */
-const char *enhanced_recursion __PROTO((const char *p, TBOOLEAN brace,
-                                         char *fontname, double fontsize,
-                                         double base, TBOOLEAN widthflag,
-                                         TBOOLEAN showflag, int overprint));
-void enh_err_check __PROTO((const char *str));
+const char *enhanced_recursion(const char *p, TBOOLEAN brace,
+                               char *fontname, double fontsize,
+                               double base, TBOOLEAN widthflag,
+                               TBOOLEAN showflag, int overprint);
+void enh_err_check(const char *str);
 /* note: c is char, but must be declared int due to K&R compatibility. */
-void do_enh_writec __PROTO((int c));
+void do_enh_writec(int c);
 /* flag: don't use enhanced output methods --- for output of
  * filenames, which usually looks bad using subscripts */
-void ignore_enhanced __PROTO((TBOOLEAN flag));
+void ignore_enhanced(TBOOLEAN flag);
 
 /* Simple-minded test that point is with drawable area */
-TBOOLEAN on_page __PROTO((int x, int y));
+TBOOLEAN on_page(int x, int y);
 
 /* Convert a fill style into a backwards compatible packed form */
-int style_from_fill __PROTO((struct fill_style_type *));
+int style_from_fill(struct fill_style_type *);
 
 /* Terminal-independent routine to draw a circle or arc */
-void do_arc __PROTO(( int cx, int cy, double radius,
-                      double arc_start, double arc_end,
-		      int style, TBOOLEAN wedge));
+void do_arc( int cx, int cy, double radius,
+             double arc_start, double arc_end,
+	     int style, TBOOLEAN wedge);
 
 #ifdef LINUXVGA
-void LINUX_setup __PROTO((void));
+void LINUX_setup(void);
 #endif
 
 #ifdef VMS
@@ -508,28 +508,28 @@ void vms_reset();
 #endif
 
 #ifdef OS2
-int PM_pause __PROTO((char *));
-void PM_intc_cleanup __PROTO((void));
+int PM_pause(char *);
+void PM_intc_cleanup(void);
 # ifdef USE_MOUSE
-void PM_update_menu_items __PROTO((void));
-void PM_set_gpPMmenu __PROTO((struct t_gpPMmenu * gpPMmenu));
+void PM_update_menu_items(void);
+void PM_set_gpPMmenu(struct t_gpPMmenu * gpPMmenu);
 # endif
 #endif
 
-int load_dashtype __PROTO((struct t_dashtype *dt, int tag));
-void lp_use_properties __PROTO((struct lp_style_type *lp, int tag));
-void load_linetype __PROTO((struct lp_style_type *lp, int tag));
+int load_dashtype(struct t_dashtype *dt, int tag);
+void lp_use_properties(struct lp_style_type *lp, int tag);
+void load_linetype(struct lp_style_type *lp, int tag);
 
 /* Wrappers for term->path() */
-void newpath __PROTO((void));
-void closepath __PROTO((void));
+void newpath(void);
+void closepath(void);
 
 /* Generic wrapper to check for mouse events or hotkeys during
  * non-interactive input (e.g. "load")
  */
-void check_for_mouse_events __PROTO((void));
+void check_for_mouse_events(void);
 
 /* shared routined to add backslash in front of reserved characters */
-char *escape_reserved_chars __PROTO((const char *str, const char *reserved));
+char *escape_reserved_chars(const char *str, const char *reserved);
 
 #endif /* GNUPLOT_TERM_API_H */

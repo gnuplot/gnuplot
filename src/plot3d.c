@@ -74,28 +74,28 @@ double boxdepth = 0.0;
 
 /* static prototypes */
 
-static void calculate_set_of_isolines __PROTO((AXIS_INDEX value_axis, TBOOLEAN cross, struct iso_curve **this_iso,
-					       AXIS_INDEX iso_axis, double iso_min, double iso_step, int num_iso_to_use,
-					       AXIS_INDEX sam_axis, double sam_min, double sam_step, int num_sam_to_use
-					       ));
-static int get_3ddata __PROTO((struct surface_points * this_plot));
-static void eval_3dplots __PROTO((void));
-static void grid_nongrid_data __PROTO((struct surface_points * this_plot));
-static void parametric_3dfixup __PROTO((struct surface_points * start_plot, int *plot_num));
-static struct surface_points * sp_alloc __PROTO((int num_samp_1, int num_iso_1, int num_samp_2, int num_iso_2));
-static void sp_replace __PROTO((struct surface_points *sp, int num_samp_1, int num_iso_1, int num_samp_2, int num_iso_2));
+static void calculate_set_of_isolines(AXIS_INDEX value_axis, TBOOLEAN cross, struct iso_curve **this_iso,
+				      AXIS_INDEX iso_axis, double iso_min, double iso_step, int num_iso_to_use,
+				      AXIS_INDEX sam_axis, double sam_min, double sam_step, int num_sam_to_use
+					       );
+static int get_3ddata(struct surface_points * this_plot);
+static void eval_3dplots(void);
+static void grid_nongrid_data(struct surface_points * this_plot);
+static void parametric_3dfixup(struct surface_points * start_plot, int *plot_num);
+static struct surface_points * sp_alloc(int num_samp_1, int num_iso_1, int num_samp_2, int num_iso_2);
+static void sp_replace(struct surface_points *sp, int num_samp_1, int num_iso_1, int num_samp_2, int num_iso_2);
 
 /* helper functions for grid_nongrid_data() */
-static double splines_kernel __PROTO((double h));
-static void thin_plate_splines_setup __PROTO(( struct iso_curve *old_iso_crvs, double **p_xx, int *p_numpoints ));
-static double qnorm __PROTO(( double dist_x, double dist_y, int q ));
-static double pythag __PROTO(( double dx, double dy ));
+static double splines_kernel(double h);
+static void thin_plate_splines_setup( struct iso_curve *old_iso_crvs, double **p_xx, int *p_numpoints );
+static double qnorm( double dist_x, double dist_y, int q );
+static double pythag( double dx, double dy );
 
 /* helper function to detect empty data sets */
-static void count_3dpoints __PROTO((struct surface_points *plot, int *nt, int *ni, int *nu));
+static void count_3dpoints(struct surface_points *plot, int *nt, int *ni, int *nu);
 
 /* helper functions for parsing */
-static void load_contour_label_options __PROTO((struct text_label *contour_label));
+static void load_contour_label_options(struct text_label *contour_label);
 
 typedef enum splot_component {
 	SP_FUNCTION, SP_DATAFILE, SP_DATABLOCK, SP_KEYENTRY, SP_VOXELGRID

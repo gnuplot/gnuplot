@@ -68,16 +68,16 @@ register_term(tek410x)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void T410X_init __PROTO((void));
-TERM_PUBLIC void T410X_reset __PROTO((void));
-TERM_PUBLIC void T410X_graphics __PROTO((void));
-TERM_PUBLIC void T410X_text __PROTO((void));
-TERM_PUBLIC void T410X_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void T410X_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void T410X_point __PROTO((unsigned int x, unsigned int y, int number));
-TERM_PUBLIC void T410X_linetype __PROTO((int linetype));
-TERM_PUBLIC void T410X_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
-TERM_PUBLIC int T410X_text_angle __PROTO((int ang));
+TERM_PUBLIC void T410X_init(void);
+TERM_PUBLIC void T410X_reset(void);
+TERM_PUBLIC void T410X_graphics(void);
+TERM_PUBLIC void T410X_text(void);
+TERM_PUBLIC void T410X_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void T410X_vector(unsigned int x, unsigned int y);
+TERM_PUBLIC void T410X_point(unsigned int x, unsigned int y, int number);
+TERM_PUBLIC void T410X_linetype(int linetype);
+TERM_PUBLIC void T410X_put_text(unsigned int x, unsigned int y, const char str[]);
+TERM_PUBLIC int T410X_text_angle(int ang);
 #define T410XXMAX 4095
 #define T410XYMAX 3131
 
@@ -89,8 +89,8 @@ TERM_PUBLIC int T410X_text_angle __PROTO((int ang));
 
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
-static void T410X_encode_x_y __PROTO((unsigned int x, unsigned int y));
-static void T410X_encode_int __PROTO((int number));
+static void T410X_encode_x_y(unsigned int x, unsigned int y);
+static void T410X_encode_int(int number);
 
 
 static int T410X_angle = 0;

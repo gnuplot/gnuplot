@@ -66,8 +66,8 @@ static TBOOLEAN debug = FALSE;
 static char path[PATH_MAX];
 static const char name[] = "wgnuplot";
 
-void convert __PROTO((FILE *, FILE *, FILE *, FILE *));
-void process_line __PROTO((char *, FILE *, FILE *, FILE *));
+void convert(FILE *, FILE *, FILE *, FILE *);
+void process_line(char *, FILE *, FILE *, FILE *);
 
 int
 main (int argc, char **argv)

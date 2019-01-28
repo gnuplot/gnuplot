@@ -52,15 +52,15 @@ extern int hiddenBacksideLinetypeOffset;
 
 /* Prototypes of functions exported by hidden3d.c */
 
-void set_hidden3doptions __PROTO((void));
-void show_hidden3doptions __PROTO((void));
-void reset_hidden3doptions __PROTO((void));
-void save_hidden3doptions __PROTO((FILE *fp));
-void init_hidden_line_removal __PROTO((void));
-void reset_hidden_line_removal __PROTO((void));
-void term_hidden_line_removal __PROTO((void));
-void plot3d_hidden __PROTO((struct surface_points *plots, int pcount));
-void draw_line_hidden __PROTO((p_vertex, p_vertex, lp_style_type *));
-void draw_label_hidden __PROTO((p_vertex, lp_style_type *, int, int));
+void set_hidden3doptions(void);
+void show_hidden3doptions(void);
+void reset_hidden3doptions(void);
+void save_hidden3doptions(FILE *fp);
+void init_hidden_line_removal(void);
+void reset_hidden_line_removal(void);
+void term_hidden_line_removal(void);
+void plot3d_hidden(struct surface_points *plots, int pcount);
+void draw_line_hidden(p_vertex, p_vertex, lp_style_type *);
+void draw_label_hidden(p_vertex, lp_style_type *, int, int);
 
 #endif /* GNUPLOT_HIDDEN3D_H */

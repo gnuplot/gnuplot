@@ -22,9 +22,6 @@ dnl configure.in body
 
 dnl Compiler characteristics
 dnl Check for the const and inline keywords and ANSI style stringification
-dnl automake 1.12 dropped support for AM_C_PROTOTYPES and ansi2knr
-dnl But our code still tests for #ifdef PROTOTYPES, so define it here
-AC_DEFINE(PROTOTYPES,1,[Automake 1.12 dropped support for building without prototypes])
 AC_USE_SYSTEM_EXTENSIONS
 AC_PROG_CC
 AC_PROG_CPP

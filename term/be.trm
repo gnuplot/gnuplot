@@ -47,21 +47,21 @@ register_term(be)
 #endif
 
 #ifdef TERM_PROTO
-int BE_args __PROTO((int argc, char *argv[]));
-TERM_PUBLIC void BE_options __PROTO((void));
-TERM_PUBLIC void BE_init __PROTO((void));
-TERM_PUBLIC void BE_graphics __PROTO((void));
-TERM_PUBLIC void BE_text __PROTO((void));
-TERM_PUBLIC void BE_reset __PROTO((void));
-TERM_PUBLIC void BE_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void BE_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void BE_linewidth __PROTO((double lw));
-TERM_PUBLIC void BE_pointsize __PROTO((double ps));
-TERM_PUBLIC void BE_linetype __PROTO((int lt));
-TERM_PUBLIC void BE_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
-TERM_PUBLIC int BE_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC void BE_point __PROTO((unsigned int x, unsigned int y, int number));
-TERM_PUBLIC void BE_fillbox __PROTO((int style, unsigned int x, unsigned y, unsigned int width, unsigned int height));
+int BE_args(int argc, char *argv[]);
+TERM_PUBLIC void BE_options(void);
+TERM_PUBLIC void BE_init(void);
+TERM_PUBLIC void BE_graphics(void);
+TERM_PUBLIC void BE_text(void);
+TERM_PUBLIC void BE_reset(void);
+TERM_PUBLIC void BE_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void BE_vector(unsigned int x, unsigned int y);
+TERM_PUBLIC void BE_linewidth(double lw);
+TERM_PUBLIC void BE_pointsize(double ps);
+TERM_PUBLIC void BE_linetype(int lt);
+TERM_PUBLIC void BE_put_text(unsigned int x, unsigned int y, const char str[]);
+TERM_PUBLIC int BE_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC void BE_point(unsigned int x, unsigned int y, int number);
+TERM_PUBLIC void BE_fillbox(int style, unsigned int x, unsigned y, unsigned int width, unsigned int height);
 #define BE_XMAX 4096
 #define BE_YMAX 4096
 
@@ -80,7 +80,7 @@ TERM_PUBLIC void BE_fillbox __PROTO((int style, unsigned int x, unsigned y, unsi
 /* non-zero if '-display' found on command line */
 int BE_Display = 0;
 
-static void BE_atexit __PROTO((void));
+static void BE_atexit(void);
 
 typedef enum { hasNoArg, hasArg } OptionArg;
 

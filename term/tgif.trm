@@ -79,21 +79,21 @@ register_term(tgif)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void TGIF_options __PROTO((void));
-TERM_PUBLIC void TGIF_init __PROTO((void));
-TERM_PUBLIC void TGIF_reset __PROTO((void));
-TERM_PUBLIC void TGIF_text __PROTO((void));
-TERM_PUBLIC void TGIF_graphics __PROTO((void));
-TERM_PUBLIC void TGIF_move __PROTO((unsigned int ux, unsigned int uy));
-TERM_PUBLIC void TGIF_vector __PROTO((unsigned int ux, unsigned int uy));
-TERM_PUBLIC void TGIF_linetype __PROTO((int linetype));
-TERM_PUBLIC void TGIF_put_text __PROTO((unsigned int ux, unsigned int uy, const char *str));	/* ref point and text */
-TERM_PUBLIC int TGIF_text_angle __PROTO((int ang));
-TERM_PUBLIC int TGIF_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC void TGIF_point __PROTO((unsigned int ux, unsigned int uy, int number));
-TERM_PUBLIC int TGIF_set_font __PROTO((const char *font));
-TERM_PUBLIC void TGIF_set_pointsize __PROTO((double size));
-TERM_PUBLIC void TGIF_set_linewidth __PROTO((double size));
+TERM_PUBLIC void TGIF_options(void);
+TERM_PUBLIC void TGIF_init(void);
+TERM_PUBLIC void TGIF_reset(void);
+TERM_PUBLIC void TGIF_text(void);
+TERM_PUBLIC void TGIF_graphics(void);
+TERM_PUBLIC void TGIF_move(unsigned int ux, unsigned int uy);
+TERM_PUBLIC void TGIF_vector(unsigned int ux, unsigned int uy);
+TERM_PUBLIC void TGIF_linetype(int linetype);
+TERM_PUBLIC void TGIF_put_text(unsigned int ux, unsigned int uy, const char *str);	/* ref point and text */
+TERM_PUBLIC int TGIF_text_angle(int ang);
+TERM_PUBLIC int TGIF_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC void TGIF_point(unsigned int ux, unsigned int uy, int number);
+TERM_PUBLIC int TGIF_set_font(const char *font);
+TERM_PUBLIC void TGIF_set_pointsize(double size);
+TERM_PUBLIC void TGIF_set_linewidth(double size);
 TERM_PUBLIC int TGIF_make_palette (t_sm_palette *);
 TERM_PUBLIC void TGIF_previous_palette (void);
 TERM_PUBLIC void TGIF_set_color (t_colorspec *);
@@ -202,7 +202,7 @@ enum eState {
 };
 static enum eState eTgifState = NEWPOLY;
 
-static void TGIF_flush_poly __PROTO((void));
+static void TGIF_flush_poly(void);
 
 
 

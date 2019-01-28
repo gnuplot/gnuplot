@@ -61,8 +61,8 @@ TBOOLEAN table_mode = FALSE;
 char *table_sep = NULL;
 struct at_type *table_filter_at = NULL;
 
-static char *expand_newline __PROTO((const char *in));
-static TBOOLEAN imploded __PROTO((curve_points *this_plot));
+static char *expand_newline(const char *in);
+static TBOOLEAN imploded(curve_points *this_plot);
 
 static FILE *outfile;
 

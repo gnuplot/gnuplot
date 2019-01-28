@@ -57,9 +57,9 @@
 
 static TBOOLEAN debug = FALSE;
 
-void footnote __PROTO((int, char *, FILE *));
-void convert __PROTO((FILE *, FILE *));
-void process_line __PROTO((char *, FILE *));
+void footnote(int, char *, FILE *);
+void convert(FILE *, FILE *);
+void process_line(char *, FILE *);
 
 int
 main (int argc, char **argv)

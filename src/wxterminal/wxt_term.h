@@ -67,7 +67,7 @@ void wxt_point(unsigned int x, unsigned int y, int pointstyle);
 void wxt_linewidth(double linewidth);
 int wxt_text_angle(int ang);
 void wxt_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height);
-int wxt_set_font __PROTO ((const char *font));
+int wxt_set_font(const char *font);
 void wxt_pointsize(double ptsize);
 void wxt_image(unsigned int M, unsigned int N, coordval * image, gpiPoint * corner, t_imagecolor color_mode);
 
@@ -95,14 +95,14 @@ void wxt_modify_plots(unsigned int, int);
 
 void wxt_dashtype(int type, t_dashtype *custom_dash_pattern);
 
-void wxt_raise_terminal_window __PROTO((int));
-void wxt_raise_terminal_group __PROTO((void));
-void wxt_lower_terminal_window __PROTO((int));
-void wxt_lower_terminal_group __PROTO((void));
-void wxt_close_terminal_window __PROTO((int number));
-void wxt_update_title __PROTO((int number));
-void wxt_update_size __PROTO((int number));
-void wxt_update_position __PROTO((int number));
+void wxt_raise_terminal_window(int);
+void wxt_raise_terminal_group(void);
+void wxt_lower_terminal_window(int);
+void wxt_lower_terminal_group(void);
+void wxt_close_terminal_window(int number);
+void wxt_update_title(int number);
+void wxt_update_size(int number);
+void wxt_update_position(int number);
 TBOOLEAN wxt_active_window_opened(void);
 TBOOLEAN wxt_window_opened(void);
 void wxt_screen_dump(void);

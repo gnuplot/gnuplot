@@ -46,31 +46,31 @@ register_term (pdfcairo)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void cairotrm_options __PROTO ((void));
-TERM_PUBLIC void cairotrm_init __PROTO ((void));
-TERM_PUBLIC void cairotrm_graphics __PROTO ((void));
-TERM_PUBLIC void cairotrm_text __PROTO ((void));
-TERM_PUBLIC void cairotrm_linetype __PROTO ((int linetype));
-TERM_PUBLIC void cairotrm_move __PROTO ((unsigned int x, unsigned int y));
-TERM_PUBLIC void cairotrm_vector __PROTO ((unsigned int x, unsigned int y));
-TERM_PUBLIC void cairotrm_put_text __PROTO ((unsigned int x, unsigned int y, const char *str));
+TERM_PUBLIC void cairotrm_options(void);
+TERM_PUBLIC void cairotrm_init(void);
+TERM_PUBLIC void cairotrm_graphics(void);
+TERM_PUBLIC void cairotrm_text(void);
+TERM_PUBLIC void cairotrm_linetype(int linetype);
+TERM_PUBLIC void cairotrm_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void cairotrm_vector(unsigned int x, unsigned int y);
+TERM_PUBLIC void cairotrm_put_text(unsigned int x, unsigned int y, const char *str);
 TERM_PUBLIC void cairotrm_enhanced_flush(void);
 TERM_PUBLIC void cairotrm_enhanced_writec(int c);
 TERM_PUBLIC void cairotrm_enhanced_open(char* fontname, double fontsize, double base, TBOOLEAN widthflag, TBOOLEAN showflag, int overprint);
-TERM_PUBLIC void cairotrm_reset __PROTO ((void));
-TERM_PUBLIC int cairotrm_justify_text __PROTO ((enum JUSTIFY mode));
-TERM_PUBLIC void cairotrm_point __PROTO ((unsigned int x, unsigned int y, int pointstyle));
-TERM_PUBLIC void cairotrm_linewidth __PROTO ((double linewidth));
-TERM_PUBLIC int cairotrm_text_angle __PROTO ((int ang));
-TERM_PUBLIC void cairotrm_fillbox __PROTO ((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height));
-TERM_PUBLIC int cairotrm_set_font __PROTO ((const char *font));
-TERM_PUBLIC void cairotrm_pointsize __PROTO ((double ptsize));
-TERM_PUBLIC void cairotrm_image __PROTO ((unsigned int M, unsigned int N, coordval * image, gpiPoint * corner, t_imagecolor color_mode));
-TERM_PUBLIC int cairotrm_make_palette __PROTO ((t_sm_palette *palette));
-TERM_PUBLIC void cairotrm_set_color __PROTO ((t_colorspec *colorspec));
-TERM_PUBLIC void cairotrm_filled_polygon __PROTO ((int n, gpiPoint * corners));
-TERM_PUBLIC void cairotrm_boxed_text __PROTO ((unsigned int x, unsigned int y, int option));
-TERM_PUBLIC void cairotrm_dashtype __PROTO ((int type, t_dashtype *custom_dash_pattern));
+TERM_PUBLIC void cairotrm_reset(void);
+TERM_PUBLIC int cairotrm_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC void cairotrm_point(unsigned int x, unsigned int y, int pointstyle);
+TERM_PUBLIC void cairotrm_linewidth(double linewidth);
+TERM_PUBLIC int cairotrm_text_angle(int ang);
+TERM_PUBLIC void cairotrm_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height);
+TERM_PUBLIC int cairotrm_set_font(const char *font);
+TERM_PUBLIC void cairotrm_pointsize(double ptsize);
+TERM_PUBLIC void cairotrm_image(unsigned int M, unsigned int N, coordval * image, gpiPoint * corner, t_imagecolor color_mode);
+TERM_PUBLIC int cairotrm_make_palette(t_sm_palette *palette);
+TERM_PUBLIC void cairotrm_set_color(t_colorspec *colorspec);
+TERM_PUBLIC void cairotrm_filled_polygon(int n, gpiPoint * corners);
+TERM_PUBLIC void cairotrm_boxed_text(unsigned int x, unsigned int y, int option);
+TERM_PUBLIC void cairotrm_dashtype(int type, t_dashtype *custom_dash_pattern);
 #endif /* TERM_PROTO */
 
 #ifndef TERM_PROTO_ONLY
@@ -87,7 +87,7 @@ TERM_PUBLIC void cairotrm_dashtype __PROTO ((int type, t_dashtype *custom_dash_p
 
 #define CAIROTRM_DEFAULT_FONTNAME "Sans"
 
-static cairo_status_t cairostream_write __PROTO ((void *closure, unsigned char *data, unsigned int length));
+static cairo_status_t cairostream_write(void *closure, unsigned char *data, unsigned int length);
 static int cairostream_error[1];
 
 /* Terminal id */

@@ -43,12 +43,12 @@
 /* Variables of interpol.c needed by other modules: */
 
 /* Prototypes of functions exported by interpol.c */
-void gen_interp __PROTO((struct curve_points *plot));
-void gen_interp_unwrap __PROTO((struct curve_points *plot));
-void gen_interp_frequency __PROTO((struct curve_points *plot));
-void mcs_interp __PROTO((struct curve_points *plot));
-void sort_points __PROTO((struct curve_points *plot));
-void cp_implode __PROTO((struct curve_points *cp));
-void make_bins __PROTO((struct curve_points *plot, int nbins, double binlow, double binhigh, double binwidth));
+void gen_interp(struct curve_points *plot);
+void gen_interp_unwrap(struct curve_points *plot);
+void gen_interp_frequency(struct curve_points *plot);
+void mcs_interp(struct curve_points *plot);
+void sort_points(struct curve_points *plot);
+void cp_implode(struct curve_points *cp);
+void make_bins(struct curve_points *plot, int nbins, double binlow, double binhigh, double binwidth);
 
 #endif /* GNUPLOT_INTERPOL_H */

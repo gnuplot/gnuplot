@@ -79,33 +79,31 @@ register_term(cgm)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void CGM_options __PROTO((void));
-TERM_PUBLIC void CGM_init __PROTO((void));
-TERM_PUBLIC void CGM_reset __PROTO((void));
-TERM_PUBLIC void CGM_text __PROTO((void));
-TERM_PUBLIC void CGM_graphics __PROTO((void));
-TERM_PUBLIC void CGM_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void CGM_dashed_vector __PROTO((unsigned int ux, unsigned int uy));
-TERM_PUBLIC void CGM_solid_vector __PROTO((unsigned int ux, unsigned int uy));
-TERM_PUBLIC void CGM_linetype __PROTO((int linetype));
-TERM_PUBLIC void CGM_linecolor __PROTO((int color));
-TERM_PUBLIC void CGM_dashtype __PROTO((int dashtype));
-TERM_PUBLIC void CGM_linewidth __PROTO((double width));
-TERM_PUBLIC void CGM_put_text __PROTO((unsigned int x, unsigned int y,
-				       const char *str));
-TERM_PUBLIC int CGM_text_angle __PROTO((int ang));
-TERM_PUBLIC int CGM_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC int CGM_set_font __PROTO((const char *font));
-TERM_PUBLIC void CGM_point __PROTO((unsigned int x, unsigned int y,
-				    int number));
-TERM_PUBLIC void CGM_fillbox __PROTO((int style, unsigned int x1, unsigned int y1,
-				unsigned int width, unsigned int height));
-TERM_PUBLIC int CGM_make_palette __PROTO((t_sm_palette *palette));
-TERM_PUBLIC void CGM_set_color __PROTO((t_colorspec *));
+TERM_PUBLIC void CGM_options(void);
+TERM_PUBLIC void CGM_init(void);
+TERM_PUBLIC void CGM_reset(void);
+TERM_PUBLIC void CGM_text(void);
+TERM_PUBLIC void CGM_graphics(void);
+TERM_PUBLIC void CGM_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void CGM_dashed_vector(unsigned int ux, unsigned int uy);
+TERM_PUBLIC void CGM_solid_vector(unsigned int ux, unsigned int uy);
+TERM_PUBLIC void CGM_linetype(int linetype);
+TERM_PUBLIC void CGM_linecolor(int color);
+TERM_PUBLIC void CGM_dashtype(int dashtype);
+TERM_PUBLIC void CGM_linewidth(double width);
+TERM_PUBLIC void CGM_put_text(unsigned int x, unsigned int y, const char *str);
+TERM_PUBLIC int CGM_text_angle(int ang);
+TERM_PUBLIC int CGM_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC int CGM_set_font(const char *font);
+TERM_PUBLIC void CGM_point(unsigned int x, unsigned int y, int number);
+TERM_PUBLIC void CGM_fillbox(int style, unsigned int x1, unsigned int y1,
+				unsigned int width, unsigned int height);
+TERM_PUBLIC int CGM_make_palette(t_sm_palette *palette);
+TERM_PUBLIC void CGM_set_color(t_colorspec *);
 
-TERM_PUBLIC void CGM_filled_polygon __PROTO((int points, gpiPoint *corner));
+TERM_PUBLIC void CGM_filled_polygon(int points, gpiPoint *corner);
 
-TERM_PUBLIC void CGM_set_pointsize __PROTO((double size));
+TERM_PUBLIC void CGM_set_pointsize(double size);
 
 #define FATAL(msg) { fprintf(stderr, "%s\nFile %s line %d\n", msg, __FILE__, __LINE__); exit(EXIT_FAILURE); }
 
@@ -127,8 +125,8 @@ TERM_PUBLIC void CGM_set_pointsize __PROTO((double size));
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
 
-static int CGM_find_font __PROTO((const char *name, int len, double *relwidth));
-static int CGM_find_nearest_color __PROTO((t_colorspec *colorspec));
+static int CGM_find_font(const char *name, int len, double *relwidth);
+static int CGM_find_nearest_color(t_colorspec *colorspec);
 
 #include <ctype.h>		/* for isspace() */
 
@@ -276,20 +274,17 @@ static TBOOLEAN cgm_dashed = TRUE;	/* dashed linestyles enabled? */
 static TBOOLEAN cgm_nofontlist_mode = FALSE;	/* omit font list? */
 
 /* prototypes for static functions */
-static void CGM_local_reset __PROTO((void));
-static void CGM_flush_polyline __PROTO((void));
-static void CGM_flush_polygon __PROTO((void));
-static void CGM_write_char_record __PROTO((int class, int cgm_id, int length,
-					   char *data));
-static void CGM_write_code __PROTO((int class, int cgm_id, int length));
-static void CGM_write_int __PROTO((int value));
-static void CGM_write_int_record __PROTO((int class, int cgm_id, int length,
-					  int *data));
-static void CGM_write_mixed_record __PROTO((int class, int cgm_id,
+static void CGM_local_reset(void);
+static void CGM_flush_polyline(void);
+static void CGM_flush_polygon(void);
+static void CGM_write_char_record(int class, int cgm_id, int length, char *data);
+static void CGM_write_code(int class, int cgm_id, int length);
+static void CGM_write_int(int value);
+static void CGM_write_int_record(int class, int cgm_id, int length, int *data);
+static void CGM_write_mixed_record(int class, int cgm_id,
 					    int numint, int *int_data,
-					    int numchar, const char *char_data));
-static void CGM_write_byte_record __PROTO((int class, int cgm_id, int length,
-					   char *data));
+					    int numchar, const char *char_data);
+static void CGM_write_byte_record(int class, int cgm_id, int length, char *data);
 
 enum CGM_id {
     /* cgm mode */

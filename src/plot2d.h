@@ -46,19 +46,19 @@ extern struct curve_points *first_plot;
 
 /* prototypes from plot2d.c */
 
-void plotrequest __PROTO((void));
-void refresh_bounds __PROTO((struct curve_points *first_plot, int nplots));
+void plotrequest(void);
+void refresh_bounds(struct curve_points *first_plot, int nplots);
 
 /* internal and external variables */
-void cp_free __PROTO((struct curve_points *cp));
-void cp_extend __PROTO((struct curve_points *cp, int num));
+void cp_free(struct curve_points *cp);
+void cp_extend(struct curve_points *cp, int num);
 
 #include "gp_types.h"
 #include "gadgets.h"
-struct text_label *store_label __PROTO((struct text_label *, struct coordinate *,
-					int i, char * string, double colorval));
-void parse_plot_title __PROTO((struct curve_points *this_plot, 
-					char *xtitle, char *ytitle, TBOOLEAN *set_title));
-void reevaluate_plot_title __PROTO((struct curve_points *this_plot));
+struct text_label *store_label(struct text_label *, struct coordinate *,
+				int i, char * string, double colorval);
+void parse_plot_title(struct curve_points *this_plot, 
+			char *xtitle, char *ytitle, TBOOLEAN *set_title);
+void reevaluate_plot_title(struct curve_points *this_plot);
 
 #endif /* GNUPLOT_PLOT2D_H */

@@ -7,9 +7,9 @@
 
 /* Routines in tabulate.c needed by other modules: */
 
-void print_table __PROTO((struct curve_points * first_plot, int plot_num));
-void print_3dtable __PROTO((int pcount));
-TBOOLEAN tabulate_one_line __PROTO((double v[], struct value str[], int ncols));
+void print_table(struct curve_points * first_plot, int plot_num);
+void print_3dtable(int pcount);
+TBOOLEAN tabulate_one_line(double v[], struct value str[], int ncols);
 
 extern FILE *table_outfile;
 extern udvt_entry *table_var;

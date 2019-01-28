@@ -44,34 +44,34 @@ register_term(lua)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void LUA_options __PROTO((void));
-TERM_PUBLIC void LUA_init __PROTO((void));
-TERM_PUBLIC void LUA_reset __PROTO((void));
-TERM_PUBLIC void LUA_text __PROTO((void));
+TERM_PUBLIC void LUA_options(void);
+TERM_PUBLIC void LUA_init(void);
+TERM_PUBLIC void LUA_reset(void);
+TERM_PUBLIC void LUA_text(void);
 /* scale */
-TERM_PUBLIC void LUA_graphics __PROTO((void));
-TERM_PUBLIC void LUA_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void LUA_vector __PROTO((unsigned int ux, unsigned int uy));
-TERM_PUBLIC void LUA_linetype __PROTO((int linetype));
-TERM_PUBLIC void LUA_dashtype __PROTO((int type, t_dashtype *custom_dash_type));
-TERM_PUBLIC void LUA_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
-TERM_PUBLIC int  LUA_text_angle __PROTO((int ang));
-TERM_PUBLIC int  LUA_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC void LUA_point __PROTO((unsigned int x, unsigned int y, int number));
-TERM_PUBLIC void LUA_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
-TERM_PUBLIC int  LUA_set_font __PROTO((const char *font));
-TERM_PUBLIC void LUA_pointsize __PROTO((double ptsize));
-TERM_PUBLIC void LUA_boxfill __PROTO((int style, unsigned int x1,
-                                     unsigned int y1, unsigned int width,
-                                     unsigned int height));
-TERM_PUBLIC void LUA_linewidth __PROTO((double width));
-TERM_PUBLIC int  LUA_make_palette __PROTO((t_sm_palette *));
-TERM_PUBLIC void LUA_previous_palette __PROTO((void));
-TERM_PUBLIC void LUA_set_color __PROTO((t_colorspec *));
-TERM_PUBLIC void LUA_filled_polygon __PROTO((int, gpiPoint *));
-TERM_PUBLIC void LUA_image __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
-TERM_PUBLIC void LUA_path __PROTO((int p));
-TERM_PUBLIC void LUA_boxed_text __PROTO((unsigned int, unsigned int, int));
+TERM_PUBLIC void LUA_graphics(void);
+TERM_PUBLIC void LUA_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void LUA_vector(unsigned int ux, unsigned int uy);
+TERM_PUBLIC void LUA_linetype(int linetype);
+TERM_PUBLIC void LUA_dashtype(int type, t_dashtype *custom_dash_type);
+TERM_PUBLIC void LUA_put_text(unsigned int x, unsigned int y, const char str[]);
+TERM_PUBLIC int  LUA_text_angle(int ang);
+TERM_PUBLIC int  LUA_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC void LUA_point(unsigned int x, unsigned int y, int number);
+TERM_PUBLIC void LUA_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head);
+TERM_PUBLIC int  LUA_set_font(const char *font);
+TERM_PUBLIC void LUA_pointsize(double ptsize);
+TERM_PUBLIC void LUA_boxfill(int style, unsigned int x1,
+                             unsigned int y1, unsigned int width,
+                             unsigned int height);
+TERM_PUBLIC void LUA_linewidth(double width);
+TERM_PUBLIC int  LUA_make_palette(t_sm_palette *);
+TERM_PUBLIC void LUA_previous_palette(void);
+TERM_PUBLIC void LUA_set_color(t_colorspec *);
+TERM_PUBLIC void LUA_filled_polygon(int, gpiPoint *);
+TERM_PUBLIC void LUA_image(unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor);
+TERM_PUBLIC void LUA_path(int p);
+TERM_PUBLIC void LUA_boxed_text(unsigned int, unsigned int, int);
 
 /* defaults */
 #define LUA_XMAX 10000.0
@@ -1376,7 +1376,7 @@ LUA_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecol
 
 
 TERM_PUBLIC void
-LUA_boxed_text __PROTO((unsigned int x, unsigned int y, int option))
+LUA_boxed_text(unsigned int x, unsigned int y, int option)
 {
     const char *option_str = "UNKNOWN";
     switch (option) {

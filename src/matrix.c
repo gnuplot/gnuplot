@@ -39,7 +39,7 @@
     internal prototypes
 *****************************************************************/
 
-static GP_INLINE int fsign __PROTO((double x));
+static GP_INLINE int fsign(double x);
 
 /*****************************************************************
     first straightforward vector and matrix allocation functions

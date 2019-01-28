@@ -31,27 +31,27 @@ enum color_models_id {
 
 
 /* main gray --> rgb color mapping */
-void rgb1_from_gray __PROTO(( double gray, rgb_color *color ));
-void rgb255_from_rgb1 __PROTO(( rgb_color rgb1, rgb255_color *rgb255 ));
+void rgb1_from_gray( double gray, rgb_color *color );
+void rgb255_from_rgb1( rgb_color rgb1, rgb255_color *rgb255 );
 /* main gray --> rgb color mapping as above, with take care of palette maxcolors */
-void rgb1maxcolors_from_gray __PROTO(( double gray, rgb_color *color ));
-void rgb255maxcolors_from_gray __PROTO(( double gray, rgb255_color *rgb255 ));
-double quantize_gray __PROTO(( double gray ));
+void rgb1maxcolors_from_gray( double gray, rgb_color *color );
+void rgb255maxcolors_from_gray( double gray, rgb255_color *rgb255 );
+double quantize_gray( double gray );
 
 /* HSV --> RGB user-visible function hsv2rgb(h,s,v) */
-unsigned int hsv2rgb __PROTO(( rgb_color *color ));
+unsigned int hsv2rgb( rgb_color *color );
 
 /* used to (de-)serialize color/gradient information */
-char *gradient_entry_to_str __PROTO(( gradient_struct *gs ));
-void str_to_gradient_entry __PROTO(( char *s, gradient_struct *gs ));
+char *gradient_entry_to_str( gradient_struct *gs );
+void str_to_gradient_entry( char *s, gradient_struct *gs );
 
 /* check if two palettes p1 and p2 differ */
-int palettes_differ __PROTO(( t_sm_palette *p1, t_sm_palette *p2 ));
+int palettes_differ( t_sm_palette *p1, t_sm_palette *p2 );
 
 /* construct minimal gradient to approximate palette */
-gradient_struct *approximate_palette __PROTO(( t_sm_palette *palette, int maxsamples, double allowed_deviation, int *gradient_num ));
+gradient_struct *approximate_palette( t_sm_palette *palette, int maxsamples, double allowed_deviation, int *gradient_num );
 
-double GetColorValueFromFormula __PROTO((int formula, double x));
+double GetColorValueFromFormula(int formula, double x);
 
 extern const char *ps_math_color_formulae[];
 

@@ -61,17 +61,17 @@
 
 /* static prototypes */
 
-static struct curve_points * cp_alloc __PROTO((int num));
-static int get_data __PROTO((struct curve_points *));
-static void store2d_point __PROTO((struct curve_points *, int i, double x, double y, double xlow, double xhigh, double ylow, double yhigh, double width));
-static void eval_plots __PROTO((void));
-static void parametric_fixup __PROTO((struct curve_points * start_plot, int *plot_num));
-static void box_range_fiddling __PROTO((struct curve_points *plot));
-static void boxplot_range_fiddling __PROTO((struct curve_points *plot));
-static void histogram_range_fiddling __PROTO((struct curve_points *plot));
-static void impulse_range_fiddling __PROTO((struct curve_points *plot));
-static int check_or_add_boxplot_factor __PROTO((struct curve_points *plot, char* string, double x));
-static void add_tics_boxplot_factors __PROTO((struct curve_points *plot));
+static struct curve_points * cp_alloc(int num);
+static int get_data(struct curve_points *);
+static void store2d_point(struct curve_points *, int i, double x, double y, double xlow, double xhigh, double ylow, double yhigh, double width);
+static void eval_plots(void);
+static void parametric_fixup(struct curve_points * start_plot, int *plot_num);
+static void box_range_fiddling(struct curve_points *plot);
+static void boxplot_range_fiddling(struct curve_points *plot);
+static void histogram_range_fiddling(struct curve_points *plot);
+static void impulse_range_fiddling(struct curve_points *plot);
+static int check_or_add_boxplot_factor(struct curve_points *plot, char* string, double x);
+static void add_tics_boxplot_factors(struct curve_points *plot);
 
 /* internal and external variables */
 

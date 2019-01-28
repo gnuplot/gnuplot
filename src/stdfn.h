@@ -60,7 +60,7 @@
 # endif
 #else
 # ifndef HAVE_MEMCPY
-char * memcpy __PROTO((char *, char *, size_t));
+char * memcpy(char *, char *, size_t);
 # endif
 #endif /* HAVE_BCOPY */
 
@@ -71,7 +71,7 @@ char * memcpy __PROTO((char *, char *, size_t));
 # ifdef HAVE_INDEX
 #  define strchr index
 # else
-char *strchr __PROTO((const char *, int));
+char *strchr(const char *, int);
 # endif
 # ifdef strrchr
 #  undef strrchr
@@ -81,12 +81,12 @@ char *strchr __PROTO((const char *, int));
 # endif
 #endif
 #ifndef HAVE_STRCSPN
-size_t gp_strcspn __PROTO((const char *, const char *));
+size_t gp_strcspn(const char *, const char *);
 # define strcspn gp_strcspn
 #endif
 
 #ifndef HAVE_STRSTR
-char *strstr __PROTO((const char *, const char *));
+char *strstr(const char *, const char *);
 #endif
 
 #ifndef HAVE_STDLIB_H
@@ -158,7 +158,7 @@ double strtod();
 extern int errno;
 #endif
 #ifndef HAVE_STRERROR
-char *strerror __PROTO((int));
+char *strerror(int);
 extern int sys_nerr;
 extern char *sys_errlist[];
 #endif
@@ -262,8 +262,8 @@ extern char *sys_errlist[];
 #endif
 
 #if defined(PIPES) && defined(VMS)
-FILE *popen __PROTO((char *, char *));
-int pclose __PROTO((FILE *));
+FILE *popen(char *, char *);
+int pclose(FILE *);
 #endif
 
 #ifdef HAVE_FLOAT_H
@@ -306,7 +306,7 @@ int pclose __PROTO((FILE *));
 # ifdef HAVE_STRICMP
 #  define strcasecmp stricmp
 # else
-int gp_stricmp __PROTO((const char *, const char *));
+int gp_stricmp(const char *, const char *);
 #  define strcasecmp gp_stricmp
 # endif
 #endif
@@ -315,17 +315,17 @@ int gp_stricmp __PROTO((const char *, const char *));
 # ifdef HAVE_STRNICMP
 #  define strncasecmp strnicmp
 # else
-int gp_strnicmp __PROTO((const char *, const char *, size_t));
+int gp_strnicmp(const char *, const char *, size_t);
 #  define strncasecmp gp_strnicmp
 # endif
 #endif
 
 #ifndef HAVE_STRNDUP
-char *strndup __PROTO((const char * str, size_t n));
+char *strndup(const char * str, size_t n);
 #endif
 
 #ifndef HAVE_STRNLEN
-size_t strnlen __PROTO((const char *str, size_t n));
+size_t strnlen(const char *str, size_t n);
 #endif
 
 #if defined(_MSC_VER) && (_MSC_VER < 1900)
@@ -371,12 +371,12 @@ char * gp_getcwd(char *path, size_t len);
 #endif
 
 /* Gnuplot replacement for atexit(3) */
-void gp_atexit __PROTO((void (*function)(void)));
+void gp_atexit(void (*function)(void));
 
 /* Gnuplot replacement for exit(3). Calls the functions registered using
  * gp_atexit(). Always use this function instead of exit(3)!
  */
-void gp_exit __PROTO((int status));
+void gp_exit(int status);
 
 /* Calls the cleanup functions registered using gp_atexit().
  * Normally gnuplot should be exited using gp_exit(). In some cases, this is not
@@ -384,9 +384,9 @@ void gp_exit __PROTO((int status));
  * confused because they expect a return statement at the very end. In that
  * case, gp_exit_cleanup() should be called before the return statement.
  */
-void gp_exit_cleanup __PROTO((void));
+void gp_exit_cleanup(void);
 
-char * gp_basename __PROTO((char *path));
+char * gp_basename(char *path);
 
 #ifdef _WIN32
 /*
@@ -587,11 +587,11 @@ void gp_rewinddir(GPDIR *);
 
 /* Prototypes from "stdfn.c" */
 
-char *safe_strncpy __PROTO((char *, const char *, size_t));
+char *safe_strncpy(char *, const char *, size_t);
 #ifndef HAVE_SLEEP
-unsigned int sleep __PROTO((unsigned int));
+unsigned int sleep(unsigned int);
 #endif
 
-double not_a_number __PROTO((void));
+double not_a_number(void);
 
 #endif /* STDFN_H */

@@ -83,23 +83,23 @@ register_term(epslatex)
 #ifdef TERM_PROTO
 /* Common functions for epslatex and ps(la)tex */
 /* All these routines begin with PSLATEX_ */
-TERM_PUBLIC void PSLATEX_reset __PROTO((void));
+TERM_PUBLIC void PSLATEX_reset(void);
 
 /* Functions for ps(la)tex */
 /* All these routines begin with PSTEX_ */
-TERM_PUBLIC void PSTEX_reopen_output __PROTO((void));
-TERM_PUBLIC void PSTEX_common_init __PROTO((void));
-TERM_PUBLIC void PSTEX_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
-TERM_PUBLIC void PSTEX_text __PROTO((void));
+TERM_PUBLIC void PSTEX_reopen_output(void);
+TERM_PUBLIC void PSTEX_common_init(void);
+TERM_PUBLIC void PSTEX_put_text(unsigned int x, unsigned int y, const char *str);
+TERM_PUBLIC void PSTEX_text(void);
 
 /* Functions for epslatex */
 /* All these routines begin with EPSLATEX_ */
-TERM_PUBLIC void EPSLATEX_reopen_output __PROTO((char *));
-TERM_PUBLIC void EPSLATEX_common_init __PROTO((void));
-TERM_PUBLIC void EPSLATEX_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
-TERM_PUBLIC void EPSLATEX_linetype __PROTO((int linetype));
-TERM_PUBLIC void EPSLATEX_layer __PROTO((t_termlayer syncpoint));
-TERM_PUBLIC void EPSLATEX_boxed_text __PROTO((unsigned int, unsigned int, int));
+TERM_PUBLIC void EPSLATEX_reopen_output(char *);
+TERM_PUBLIC void EPSLATEX_common_init(void);
+TERM_PUBLIC void EPSLATEX_put_text(unsigned int x, unsigned int y, const char *str);
+TERM_PUBLIC void EPSLATEX_linetype(int linetype);
+TERM_PUBLIC void EPSLATEX_layer(t_termlayer syncpoint);
+TERM_PUBLIC void EPSLATEX_boxed_text(unsigned int, unsigned int, int);
 
 /* additional LaTeX header information for epslatex terminal */
 TERM_PUBLIC char *epslatex_header = NULL;

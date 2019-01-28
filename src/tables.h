@@ -36,7 +36,7 @@
 #include "syscfg.h"
 
 
-typedef void (*parsefuncp_t) __PROTO((void));
+typedef void (*parsefuncp_t)(void);
 
 struct gen_ftable {
     const char *key;
@@ -232,12 +232,12 @@ extern const struct gen_ftable command_ftbl[];
 extern const struct gen_table filledcurves_opts_tbl[];
 
 /* Function prototypes */
-int lookup_table __PROTO((const struct gen_table *, int));
-parsefuncp_t lookup_ftable __PROTO((const struct gen_ftable *, int));
-int lookup_table_entry __PROTO((const struct gen_table *tbl, const char *search_str));
-int lookup_table_nth __PROTO((const struct gen_table *tbl, const char *search_str));
-int lookup_table_nth_reverse __PROTO((const struct gen_table *tbl, int table_len, const char *search_str));
-const char * reverse_table_lookup __PROTO((const struct gen_table *tbl, int entry));
+int lookup_table(const struct gen_table *, int);
+parsefuncp_t lookup_ftable(const struct gen_ftable *, int);
+int lookup_table_entry(const struct gen_table *tbl, const char *search_str);
+int lookup_table_nth(const struct gen_table *tbl, const char *search_str);
+int lookup_table_nth_reverse(const struct gen_table *tbl, int table_len, const char *search_str);
+const char * reverse_table_lookup(const struct gen_table *tbl, int entry);
 
 
 #endif /* GNUPLT_TABLES_H */

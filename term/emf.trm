@@ -129,38 +129,38 @@ register_term(emf)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void EMF_options __PROTO((void));
-TERM_PUBLIC void EMF_init __PROTO((void));
-TERM_PUBLIC void EMF_reset __PROTO((void));
-TERM_PUBLIC void EMF_text __PROTO((void));
-TERM_PUBLIC void EMF_graphics __PROTO((void));
-TERM_PUBLIC void EMF_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void EMF_dashed_vector __PROTO((unsigned int ux, unsigned int uy));
-TERM_PUBLIC void EMF_solid_vector __PROTO((unsigned int ux, unsigned int uy));
-TERM_PUBLIC void EMF_linetype __PROTO((int linetype));
-TERM_PUBLIC void EMF_dashtype __PROTO((int type, t_dashtype *custom_dash_type));
-TERM_PUBLIC void EMF_linecolor __PROTO((int color));
-TERM_PUBLIC void EMF_load_dashtype __PROTO((int dashtype));
-TERM_PUBLIC void EMF_linewidth __PROTO((double width));
-TERM_PUBLIC void EMF_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
-TERM_PUBLIC int EMF_text_angle __PROTO((int ang));
-TERM_PUBLIC int EMF_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC void EMF_point __PROTO((unsigned int x, unsigned int y, int number));
-TERM_PUBLIC void EMF_set_pointsize __PROTO((double size));
-TERM_PUBLIC int EMF_set_font __PROTO((const char *));
-TERM_PUBLIC int EMF_make_palette __PROTO((t_sm_palette *palette));
-TERM_PUBLIC void EMF_previous_palette __PROTO((void));
-TERM_PUBLIC void EMF_set_color __PROTO((t_colorspec *colorspec));
-TERM_PUBLIC void EMF_filled_polygon __PROTO((int, gpiPoint *));
-TERM_PUBLIC void EMF_fillbox __PROTO((int, unsigned int, unsigned int, unsigned int, unsigned int));
-TERM_PUBLIC void EMF_flush_dashtype __PROTO((void));
+TERM_PUBLIC void EMF_options(void);
+TERM_PUBLIC void EMF_init(void);
+TERM_PUBLIC void EMF_reset(void);
+TERM_PUBLIC void EMF_text(void);
+TERM_PUBLIC void EMF_graphics(void);
+TERM_PUBLIC void EMF_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void EMF_dashed_vector(unsigned int ux, unsigned int uy);
+TERM_PUBLIC void EMF_solid_vector(unsigned int ux, unsigned int uy);
+TERM_PUBLIC void EMF_linetype(int linetype);
+TERM_PUBLIC void EMF_dashtype(int type, t_dashtype *custom_dash_type);
+TERM_PUBLIC void EMF_linecolor(int color);
+TERM_PUBLIC void EMF_load_dashtype(int dashtype);
+TERM_PUBLIC void EMF_linewidth(double width);
+TERM_PUBLIC void EMF_put_text(unsigned int x, unsigned int y, const char *str);
+TERM_PUBLIC int EMF_text_angle(int ang);
+TERM_PUBLIC int EMF_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC void EMF_point(unsigned int x, unsigned int y, int number);
+TERM_PUBLIC void EMF_set_pointsize(double size);
+TERM_PUBLIC int EMF_set_font(const char *);
+TERM_PUBLIC int EMF_make_palette(t_sm_palette *palette);
+TERM_PUBLIC void EMF_previous_palette(void);
+TERM_PUBLIC void EMF_set_color(t_colorspec *colorspec);
+TERM_PUBLIC void EMF_filled_polygon(int, gpiPoint *);
+TERM_PUBLIC void EMF_fillbox(int, unsigned int, unsigned int, unsigned int, unsigned int);
+TERM_PUBLIC void EMF_flush_dashtype(void);
 
 /* Enhanced text support */
-TERM_PUBLIC void ENHemf_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
-TERM_PUBLIC void ENHemf_OPEN __PROTO((char * fontname, double fontsize,
+TERM_PUBLIC void ENHemf_put_text(unsigned int x, unsigned int y, const char *str);
+TERM_PUBLIC void ENHemf_OPEN(char * fontname, double fontsize,
                         double base, TBOOLEAN widthflag, TBOOLEAN showflag,
-			int overprint));
-TERM_PUBLIC void ENHemf_FLUSH __PROTO((void));
+			int overprint);
+TERM_PUBLIC void ENHemf_FLUSH(void);
 
 #undef RGB
 #define RGB(r,g,b) ((long)					\
@@ -424,13 +424,13 @@ static const unsigned char pattern_bitmaps[][PATTERN_BITMAP_LENGTH] = {
 };
 #define pattern_num (sizeof(pattern_bitmaps)/(sizeof(*pattern_bitmaps)))
 
-static void EMF_flush_polyline __PROTO((void));
-static void EMF_flush_polygon __PROTO((void));
-static void EMF_write_byte __PROTO((int)); 
-static void EMF_write_short __PROTO((int)); 
-static void EMF_write_long __PROTO((unsigned long));
-static void EMF_write_float __PROTO((double)); 
-static void EMF_setfont __PROTO((void));
+static void EMF_flush_polyline(void);
+static void EMF_flush_polygon(void);
+static void EMF_write_byte(int); 
+static void EMF_write_short(int); 
+static void EMF_write_long(unsigned long);
+static void EMF_write_float(double); 
+static void EMF_setfont(void);
 
 #define ANSI_CHARSET          0
 #define DEFAULT_CHARSET       1

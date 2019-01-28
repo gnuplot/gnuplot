@@ -18,9 +18,9 @@ register_term(xlib)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void Xlib_init __PROTO((void));
-TERM_PUBLIC void Xlib_text __PROTO((void));
-TERM_PUBLIC void Xlib_reset __PROTO((void));
+TERM_PUBLIC void Xlib_init(void);
+TERM_PUBLIC void Xlib_text(void);
+TERM_PUBLIC void Xlib_reset(void);
 #define GOT_XLIB_PROTO
 #endif
 

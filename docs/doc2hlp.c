@@ -54,8 +54,8 @@
 
 extern TBOOLEAN single_top_level;
 
-void convert __PROTO((FILE *, FILE *));
-void process_line __PROTO((char *, FILE *));
+void convert(FILE *, FILE *);
+void process_line(char *, FILE *);
 
 int
 main (int argc, char **argv)

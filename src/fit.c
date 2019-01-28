@@ -109,9 +109,9 @@
 
 /* Just temporary */
 #if defined(VA_START) && defined(STDC_HEADERS)
-static void Dblfn __PROTO((const char *fmt, ...));
+static void Dblfn(const char *fmt, ...);
 #else
-static void Dblfn __PROTO(());
+static void Dblfn();
 #endif
 #define Dblf  Dblfn
 #define Dblf2 Dblfn
@@ -250,35 +250,34 @@ static udvt_entry *fit_dummy_udvs[MAX_NUM_VAR];
 *****************************************************************/
 
 #if !defined(_WIN32) || defined(WGP_CONSOLE)
-static RETSIGTYPE ctrlc_handle __PROTO((int an_int));
+static RETSIGTYPE ctrlc_handle(int an_int);
 #endif
-static void ctrlc_setup __PROTO((void));
-static marq_res_t marquardt __PROTO((double a[], double **alpha, double *chisq,
-				     double *lambda));
+static void ctrlc_setup(void);
+static marq_res_t marquardt(double a[], double **alpha, double *chisq, double *lambda);
 static void analyze(double a[], double **alpha, double beta[],
 				 double *chisq, double **deriv);
-static void calculate __PROTO((double *zfunc, double **dzda, double a[]));
+static void calculate(double *zfunc, double **dzda, double a[]);
 static void calc_derivatives(const double *par, double *data, double **deriv);
-static TBOOLEAN fit_interrupt __PROTO((void));
-static TBOOLEAN regress __PROTO((double a[]));
+static TBOOLEAN fit_interrupt(void);
+static TBOOLEAN regress(double a[]);
 static void regress_init(void);
 static void regress_finalize(int iter, double chisq, double last_chisq, double lambda, double **covar);
 static void fit_show(int i, double chisq, double last_chisq, double *a,
                           double lambda, FILE * device);
 static void fit_show_brief(int iter, double chisq, double last_chisq, double *parms,
                           double lambda, FILE * device);
-static void show_results __PROTO((double chisq, double last_chisq, double* a, double* dpar, double** corel));
-static void log_axis_restriction __PROTO((FILE *log_f, int param,
-			    double min, double max, int autoscale, char *name));
+static void show_results(double chisq, double last_chisq, double* a, double* dpar, double** corel);
+static void log_axis_restriction(FILE *log_f, int param,
+			    double min, double max, int autoscale, char *name);
 static void print_function_definitions(struct at_type *at, FILE * device);
-static TBOOLEAN is_empty __PROTO((char *s));
-static intgr_t getivar __PROTO((const char *varname));
-static double getdvar __PROTO((const char *varname));
-static double createdvar __PROTO((char *varname, double value));
-static void setvar __PROTO((char *varname, double value));
-static void setvarerr __PROTO((char *varname, double value));
+static TBOOLEAN is_empty(char *s);
+static intgr_t getivar(const char *varname);
+static double getdvar(const char *varname);
+static double createdvar(char *varname, double value);
+static void setvar(char *varname, double value);
+static void setvarerr(char *varname, double value);
 static void setvarcovar(char *varname1, char *varname2, double value);
-static char *get_next_word __PROTO((char **s, char *subst));
+static char *get_next_word(char **s, char *subst);
 
 
 /*****************************************************************
@@ -341,7 +340,7 @@ ctrlc_setup()
 *****************************************************************/
 #if defined(MSDOS)
 
-int getchx __PROTO((void));
+int getchx(void);
 
 int
 getchx()

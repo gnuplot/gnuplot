@@ -129,23 +129,23 @@
 #define NOTSEP (!df_separators || !strchr(df_separators,*s))
 
 /*{{{  static fns */
-static int check_missing __PROTO((char *s));
+static int check_missing(char *s);
 
-static void expand_df_column __PROTO((int));
-static void clear_df_column_headers __PROTO((void));
-static char *df_gets __PROTO((void));
-static int df_tokenise __PROTO((char *s));
-static float *df_read_matrix __PROTO((int *rows, int *columns));
+static void expand_df_column(int);
+static void clear_df_column_headers(void);
+static char *df_gets(void);
+static int df_tokenise(char *s);
+static float *df_read_matrix(int *rows, int *columns);
 
-static void plot_option_every __PROTO((void));
-static void plot_option_index __PROTO((void));
-static void plot_option_using __PROTO((int));
-static TBOOLEAN valid_format __PROTO((const char *));
-static void plot_ticlabel_using __PROTO((int));
-static void add_key_entry __PROTO((char *temp_string, int df_datum));
-static char * df_generate_pseudodata __PROTO((void));
-static char * df_generate_ascii_array_entry __PROTO((void));
-static int df_skip_bytes __PROTO((off_t nbytes));
+static void plot_option_every(void);
+static void plot_option_index(void);
+static void plot_option_using(int);
+static TBOOLEAN valid_format(const char *);
+static void plot_ticlabel_using(int);
+static void add_key_entry(char *temp_string, int df_datum);
+static char * df_generate_pseudodata(void);
+static char * df_generate_ascii_array_entry(void);
+static int df_skip_bytes(off_t nbytes);
 
 /*}}} */
 
@@ -318,24 +318,24 @@ static TBOOLEAN df_nonuniform_matrix;
 static TBOOLEAN df_matrix_columnheaders, df_matrix_rowheaders;
 static int df_plot_mode;
 
-static int df_readascii __PROTO((double [], int));
-static int df_readbinary __PROTO((double [], int));
+static int df_readascii(double [], int);
+static int df_readbinary(double [], int);
 
-static void initialize_use_spec __PROTO((void));
-static void initialize_plot_style __PROTO((struct curve_points *));
+static void initialize_use_spec(void);
+static void initialize_plot_style(struct curve_points *);
 
-static void initialize_binary_vars __PROTO((void));
-static void df_insert_scanned_use_spec __PROTO((int));
-static void adjust_binary_use_spec __PROTO((struct curve_points *));
-static void clear_binary_records __PROTO((df_records_type));
-static void plot_option_binary_format __PROTO((char *));
-static void plot_option_binary __PROTO((TBOOLEAN, TBOOLEAN));
-static void plot_option_array __PROTO((void));
-static TBOOLEAN rotation_matrix_2D __PROTO((double R[][2], double));
-static TBOOLEAN rotation_matrix_3D __PROTO((double P[][3], double *));
-static int token2tuple __PROTO((double *, int));
-static void df_determine_matrix_info __PROTO((FILE *));
-static void df_swap_bytes_by_endianess __PROTO((char *, int, int));
+static void initialize_binary_vars(void);
+static void df_insert_scanned_use_spec(int);
+static void adjust_binary_use_spec(struct curve_points *);
+static void clear_binary_records(df_records_type);
+static void plot_option_binary_format(char *);
+static void plot_option_binary(TBOOLEAN, TBOOLEAN);
+static void plot_option_array(void);
+static TBOOLEAN rotation_matrix_2D(double R[][2], double);
+static TBOOLEAN rotation_matrix_3D(double P[][3], double *);
+static int token2tuple(double *, int);
+static void df_determine_matrix_info(FILE *);
+static void df_swap_bytes_by_endianess(char *, int, int);
 
 typedef enum df_multivalue_type {
     DF_DELTA,
@@ -348,7 +348,7 @@ typedef enum df_multivalue_type {
     DF_PERPENDICULAR,
     DF_SKIP
 } df_multivalue_type;
-static void plot_option_multivalued __PROTO((df_multivalue_type,int));
+static void plot_option_multivalued(df_multivalue_type,int);
 
 char *df_endian[DF_ENDIAN_TYPE_LENGTH] = {
     "little",
@@ -383,7 +383,7 @@ static long long_0x2468 = 0x2468;
 
 
 /* Argument is file's endianess type. */
-static df_byte_read_order_type byte_read_order __PROTO((df_endianess_type));
+static df_byte_read_order_type byte_read_order(df_endianess_type);
 
 /* Logical variables indicating information about data file. */
 TBOOLEAN df_binary_file;
@@ -425,9 +425,9 @@ int df_max_num_bin_records_default = 0, df_num_bin_records_default;
 /* Used to mark the location of a blank line in the original data input file */
 struct coordinate blank_data_line = {UNDEFINED, -999, -999, -999, -999, -999, -999, -999};
 
-static void gpbin_filetype_function __PROTO((void));
-static void raw_filetype_function __PROTO((void));
-static void avs_filetype_function __PROTO((void));
+static void gpbin_filetype_function(void);
+static void raw_filetype_function(void);
+static void avs_filetype_function(void);
 
 static void (*binary_input_function)(void);	/* Will point to one of the above */
 static void auto_filetype_function(void){}	/* Just a placeholder for auto    */

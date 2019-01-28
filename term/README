@@ -34,61 +34,60 @@ struct TERMENTRY {
     const char *description;
     unsigned int xmax,ymax,v_char,h_char,v_tic,h_tic;
 
-    void (*options) __PROTO((void));
-    void (*init) __PROTO((void));
-    void (*reset) __PROTO((void));
-    void (*text) __PROTO((void));
-    int (*scale) __PROTO((double, double));	/* DEPRECATED */
-    void (*graphics) __PROTO((void));
-    void (*move) __PROTO((unsigned int, unsigned int));
-    void (*vector) __PROTO((unsigned int, unsigned int));
-    void (*linetype) __PROTO((int));
-    void (*put_text) __PROTO((unsigned int, unsigned int, const char*));
+    void (*options)(void);
+    void (*init)(void);
+    void (*reset)(void);
+    void (*text)(void);
+    int (*scale)(double, double);	/* DEPRECATED */
+    void (*graphics)(void);
+    void (*move)(unsigned int, unsigned int);
+    void (*vector)(unsigned int, unsigned int);
+    void (*linetype)(int);
+    void (*put_text)(unsigned int, unsigned int, const char*);
 
 /* optional entries */
 
-    int (*text_angle) __PROTO((int));
-    int (*justify_text) __PROTO((enum JUSTIFY));
-    void (*point) __PROTO((unsigned int, unsigned int,int));
-    void (*arrow) __PROTO((unsigned int, unsigned int, unsigned int,
-                           unsigned int, int));
-   int (*set_font) __PROTO((const char *font));  /* "font,size" */
-   void (*pointsize) __PROTO((double pointsize));
+    int (*text_angle)(int);
+    int (*justify_text)(enum JUSTIFY);
+    void (*point)(unsigned int, unsigned int,int);
+    void (*arrow)(unsigned int, unsigned int, unsigned int, unsigned int, int);
+   int (*set_font)(const char *font);  /* "font,size" */
+   void (*pointsize)(double pointsize);
    int flags;                       /* various flags */
-   void (*suspend) __PROTO((void)); /* after one plot of multiplot */
-   void (*resume) __PROTO((void));  /* before subsequent plot of multiplot */
-   void (*fillbox) __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height)); /* clear part of multiplot */
-   void (*linewidth) __PROTO((double linewidth));
+   void (*suspend)(void); /* after one plot of multiplot */
+   void (*resume)(void);  /* before subsequent plot of multiplot */
+   void (*fillbox)(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height); /* clear part of multiplot */
+   void (*linewidth)(double linewidth);
 #ifdef USE_MOUSE
-   int (*waitforinput) __PROTO((int));
-   void (*put_tmptext) __PROTO((int i, const char str[]));
-   void (*set_ruler) __PROTO((int x, int y));
-   void (*set_cursor) __PROTO((int c, int x, int y));
-   void (*set_clipboard) __PROTO((const char s[]));
+   int (*waitforinput)(int);
+   void (*put_tmptext)(int i, const char str[]);
+   void (*set_ruler)(int x, int y);
+   void (*set_cursor)(int c, int x, int y);
+   void (*set_clipboard)(const char s[]);
 #endif
-   int (*make_palette)__PROTO((t_sm_palette *palette));
-   void (*previous_palette) __PROTO(());
-   void (*set_color) __PROTO((t_colorspec *colorspec));
-   void (*filled_polygon) __PROTO((int points, gpiPoint *corners));
-   void (*image) __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
+   int (*make_palette)t_sm_palette *palette);
+   void (*previous_palette)();
+   void (*set_color)(t_colorspec *colorspec);
+   void (*filled_polygon)(int points, gpiPoint *corners);
+   void (*image)(unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor);
 /* Enhanced text mode driver call-backs */
-    void (*enhanced_open) __PROTO((char * fontname, double fontsize,
+    void (*enhanced_open)(char * fontname, double fontsize,
                double base, TBOOLEAN widthflag, TBOOLEAN showflag,
-               int overprint));
-    void (*enhanced_flush) __PROTO((void));
-    void (*enhanced_writec) __PROTO((int c));
+               int overprint);
+    void (*enhanced_flush)(void);
+    void (*enhanced_writec)(int c);
 /* Driver-specific synchronization or other layering commands */
-    void (*layer) __PROTO((t_termlayer syncpoint));
+    void (*layer)(t_termlayer syncpoint);
 /* Path control for end-joins of closed polygons on PostScript-like devices */
-    void (*path) __PROTO((int p));
+    void (*path)(int p);
 /* Scale factor for converting terminal coordinates to output pixels */
     double tscale;
 /* Hypertext support */
-    void (*hypertext) __PROTO((int type, const char *text));
-    void (*boxed_text)__PROTO((unsigned int x, unsigned int y, int option));
-   void (*modify_plots) __PROTO((unsigned int operations, int plotno));
+    void (*hypertext)(int type, const char *text);
+    void (*boxed_text)unsigned int x, unsigned int y, int option);
+   void (*modify_plots)(unsigned int operations, int plotno);
    
-   void (*dashtype) __PROTO((int type, t_dashtype *custom_dash_pattern));
+   void (*dashtype)(int type, t_dashtype *custom_dash_pattern);
 };
 
 One consequence of (1) is that we would like drivers to be backwards
@@ -618,8 +617,8 @@ register_term(regis) /* no ; */
 
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void REGISinit __PROTO((void));
-TERM_PUBLIC void REGISgraphics __PROTO((void));
+TERM_PUBLIC void REGISinit(void);
+TERM_PUBLIC void REGISgraphics(void);
 /* etc */
 #define GOT_REGIS_PROTO
 #endif

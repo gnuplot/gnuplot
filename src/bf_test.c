@@ -27,7 +27,6 @@
 #  endif
 #endif
 
-/* replaces __PROTO() */
 static float function (int p, double x, double y);
 
 typedef struct {

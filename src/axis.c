@@ -164,15 +164,15 @@ static double save_autoscaled_ymin;
 static double save_autoscaled_ymax;
 
 /* --------- internal prototypes ------------------------- */
-static double make_auto_time_minitics __PROTO((t_timelevel, double));
-static double make_tics __PROTO((struct axis *, int));
-static double quantize_time_tics __PROTO((struct axis *, double, double, int));
-static double time_tic_just __PROTO((t_timelevel, double));
-static double round_outward __PROTO((struct axis *, TBOOLEAN, double));
-static TBOOLEAN axis_position_zeroaxis __PROTO((AXIS_INDEX));
-static void load_one_range __PROTO((struct axis *axis, double *a, t_autoscale *autoscale, t_autoscale which ));
-static double quantize_duodecimal_tics __PROTO((double, int));
-static void get_position_type __PROTO((enum position_type * type, AXIS_INDEX *axes));
+static double make_auto_time_minitics(t_timelevel, double);
+static double make_tics(struct axis *, int);
+static double quantize_time_tics(struct axis *, double, double, int);
+static double time_tic_just(t_timelevel, double);
+static double round_outward(struct axis *, TBOOLEAN, double);
+static TBOOLEAN axis_position_zeroaxis(AXIS_INDEX);
+static void load_one_range(struct axis *axis, double *a, t_autoscale *autoscale, t_autoscale which );
+static double quantize_duodecimal_tics(double, int);
+static void get_position_type(enum position_type * type, AXIS_INDEX *axes);
 
 /* ---------------------- routines ----------------------- */
 

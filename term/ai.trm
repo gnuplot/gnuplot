@@ -65,20 +65,20 @@ register_term(aifm)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void AI_init __PROTO((void));
-TERM_PUBLIC void AI_graphics __PROTO((void));
-TERM_PUBLIC void AI_text __PROTO((void));
-TERM_PUBLIC void AI_linetype __PROTO((int linetype));
-TERM_PUBLIC void AI_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void AI_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void AI_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
-TERM_PUBLIC int AI_text_angle __PROTO((int ang));
-TERM_PUBLIC void AI_reset __PROTO((void));
-TERM_PUBLIC void AI_options __PROTO((void));
-TERM_PUBLIC int AI_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC void AI_suspend __PROTO((void));
-TERM_PUBLIC void AI_resume __PROTO((void));
-TERM_PUBLIC int AI_set_font __PROTO((const char *font));
+TERM_PUBLIC void AI_init(void);
+TERM_PUBLIC void AI_graphics(void);
+TERM_PUBLIC void AI_text(void);
+TERM_PUBLIC void AI_linetype(int linetype);
+TERM_PUBLIC void AI_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void AI_vector(unsigned int x, unsigned int y);
+TERM_PUBLIC void AI_put_text(unsigned int x, unsigned int y, const char *str);
+TERM_PUBLIC int AI_text_angle(int ang);
+TERM_PUBLIC void AI_reset(void);
+TERM_PUBLIC void AI_options(void);
+TERM_PUBLIC int AI_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC void AI_suspend(void);
+TERM_PUBLIC void AI_resume(void);
+TERM_PUBLIC int AI_set_font(const char *font);
 
 #define AI_XOFF	50		/* page offset in pts */
 #define AI_YOFF	50

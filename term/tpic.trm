@@ -84,19 +84,19 @@ register_term(tpic)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void TPIC_options __PROTO((void));		/* get size options */
-TERM_PUBLIC void TPIC_init __PROTO((void));
-TERM_PUBLIC void TPIC_reset __PROTO((void));
-TERM_PUBLIC void TPIC_text __PROTO((void));
-TERM_PUBLIC void TPIC_graphics __PROTO((void));
-TERM_PUBLIC void TPIC_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void TPIC_vector __PROTO((unsigned int ux, unsigned int uy));
-TERM_PUBLIC void TPIC_linetype __PROTO((int linetype));
-TERM_PUBLIC void TPIC_put_text __PROTO((unsigned int x, unsigned int y, const char *str));	/* ref point and text */
-TERM_PUBLIC int TPIC_text_angle __PROTO((int ang));
-TERM_PUBLIC int TPIC_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC void TPIC_point __PROTO((unsigned int x, unsigned int y, int number));
-TERM_PUBLIC void TPIC_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
+TERM_PUBLIC void TPIC_options(void);		/* get size options */
+TERM_PUBLIC void TPIC_init(void);
+TERM_PUBLIC void TPIC_reset(void);
+TERM_PUBLIC void TPIC_text(void);
+TERM_PUBLIC void TPIC_graphics(void);
+TERM_PUBLIC void TPIC_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void TPIC_vector(unsigned int ux, unsigned int uy);
+TERM_PUBLIC void TPIC_linetype(int linetype);
+TERM_PUBLIC void TPIC_put_text(unsigned int x, unsigned int y, const char *str);	/* ref point and text */
+TERM_PUBLIC int TPIC_text_angle(int ang);
+TERM_PUBLIC int TPIC_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC void TPIC_point(unsigned int x, unsigned int y, int number);
+TERM_PUBLIC void TPIC_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head);
 
 /* tpic \specials unit in inches (1 milli-inch) */
 #define TPIC_UNIT 0.001
@@ -119,41 +119,41 @@ static double tpic_interval = 0.1;	/* min dot & dash intervals (in inches) */
 
 /* ARROWS: same code as for LATEX */
 /* figure out the best arrow. in latex.trm */
-static void best_latex_arrow __PROTO((int sx, int sy, int ex, int ey, int who, int head));
+static void best_latex_arrow(int sx, int sy, int ex, int ey, int who, int head);
 
 /* all prototypes ... */
-static void tpic_startline __PROTO((void));
-static void tpic_endline __PROTO((void));
-static void tpic_pushpath __PROTO((unsigned int x, unsigned int y));
-static void tpic_scanpath __PROTO((void));
-static void tpic_diamond __PROTO((int size));
-static void tpic_plus __PROTO((int size));
-static void tpic_box __PROTO((int size));
-static void tpic_times __PROTO((int size));
-static void tpic_triangle __PROTO((int size));
-static void tpic_star __PROTO((int size));
-static void tpic_hexagon __PROTO((int size));
-static void tpic_circle __PROTO((int size));
-static void tpic_doublecircle __PROTO((int size));
-static void tpic_vercircle __PROTO((int size));	/* circle with | */
-static void tpic_horcircle __PROTO((int size));	/* circle with - */
-static void tpic_pluscircle __PROTO((int size));	/* circle with + */
-static void tpic_timescircle __PROTO((int size));	/* circle with times */
-static void tpic_starcircle __PROTO((int size));	/* circle with star */
-static void tpic_dotcircle __PROTO((int size));	/* circle with dot (black circle) */
-static void tpic_diamondcircle __PROTO((int size)); /* circle with black diamond */
-static void tpic_boxcircle __PROTO((int size));	/* circle with black box */
-static void tpic_trianglecircle __PROTO((int size));	/* circle with black triangle */
-static void tpic_hexagoncircle __PROTO((int size));	/* circle with black hexagon */
-static void tpic_plustimescircle __PROTO((int size));	/* no more idea ... with plus & times */
-static void tpic_abspath __PROTO((unsigned int x, unsigned int y));	/* absolute coord */
-static void tpic_path __PROTO((int x, int y));
-static void tpic_flush __PROTO((void));
-static void tpic_arc __PROTO((int radius));	/* actually, draw a full circle */
-static void tpic_shade __PROTO((double grayscale));
-static void tpic_pen __PROTO((int thickness));
-static void tpic_dottedflush __PROTO((double interval));
-static void tpic_dashedflush __PROTO((double interval));
+static void tpic_startline(void);
+static void tpic_endline(void);
+static void tpic_pushpath(unsigned int x, unsigned int y);
+static void tpic_scanpath(void);
+static void tpic_diamond(int size);
+static void tpic_plus(int size);
+static void tpic_box(int size);
+static void tpic_times(int size);
+static void tpic_triangle(int size);
+static void tpic_star(int size);
+static void tpic_hexagon(int size);
+static void tpic_circle(int size);
+static void tpic_doublecircle(int size);
+static void tpic_vercircle(int size);	/* circle with | */
+static void tpic_horcircle(int size);	/* circle with - */
+static void tpic_pluscircle(int size);	/* circle with + */
+static void tpic_timescircle(int size);	/* circle with times */
+static void tpic_starcircle(int size);	/* circle with star */
+static void tpic_dotcircle(int size);	/* circle with dot (black circle) */
+static void tpic_diamondcircle(int size); /* circle with black diamond */
+static void tpic_boxcircle(int size);	/* circle with black box */
+static void tpic_trianglecircle(int size);	/* circle with black triangle */
+static void tpic_hexagoncircle(int size);	/* circle with black hexagon */
+static void tpic_plustimescircle(int size);	/* no more idea ... with plus & times */
+static void tpic_abspath(unsigned int x, unsigned int y);	/* absolute coord */
+static void tpic_path(int x, int y);
+static void tpic_flush(void);
+static void tpic_arc(int radius);	/* actually, draw a full circle */
+static void tpic_shade(double grayscale);
+static void tpic_pen(int thickness);
+static void tpic_dottedflush(double interval);
+static void tpic_dashedflush(double interval);
 
 typedef enum {
     tpic_none, tpic_white, tpic_gray, tpic_black
@@ -161,7 +161,7 @@ typedef enum {
 typedef enum {
     tpic_nosize, tpic_small, tpic_medium, tpic_large
 } tpic_size;
-typedef void (*tpic_function) __PROTO((int size));
+typedef void (*tpic_function)(int size);
 
 typedef struct {
     tpic_shadestyle shadestyle;

@@ -71,65 +71,65 @@ extern int debug;
 /* Functions exported by util.c: */
 
 /* Command parsing helpers: */
-int equals __PROTO((int, const char *));
-int almost_equals __PROTO((int, const char *));
-char *token_to_string __PROTO((int));
-int isstring __PROTO((int));
-int isanumber __PROTO((int));
-int isletter __PROTO((int));
-int is_definition __PROTO((int));
-TBOOLEAN might_be_numeric __PROTO((int));
-void copy_str __PROTO((char *, int, int));
-size_t token_len __PROTO((int));
-void capture __PROTO((char *, int, int, int));
-void m_capture __PROTO((char **, int, int));
-void m_quote_capture __PROTO((char **, int, int));
-char *try_to_get_string __PROTO((void));
-void parse_esc __PROTO((char *));
-int type_udv __PROTO((int));
+int equals(int, const char *);
+int almost_equals(int, const char *);
+char *token_to_string(int);
+int isstring(int);
+int isanumber(int);
+int isletter(int);
+int is_definition(int);
+TBOOLEAN might_be_numeric(int);
+void copy_str(char *, int, int);
+size_t token_len(int);
+void capture(char *, int, int, int);
+void m_capture(char **, int, int);
+void m_quote_capture(char **, int, int);
+char *try_to_get_string(void);
+void parse_esc(char *);
+int type_udv(int);
 
-char *gp_stradd __PROTO((const char *, const char *));
+char *gp_stradd(const char *, const char *);
 #define isstringvalue(c_token) (isstring(c_token) || type_udv(c_token)==STRING)
 
 /* HBB 20010726: IMHO this one belongs into alloc.c: */
-char *gp_strdup __PROTO((const char *));
+char *gp_strdup(const char *);
 
-void gprintf __PROTO((char *, size_t, char *, double, double));
-void gprintf_value __PROTO((char *, size_t, char *, double, struct value *));
+void gprintf(char *, size_t, char *, double, double);
+void gprintf_value(char *, size_t, char *, double, struct value *);
 
 /* Error message handling */
 #if defined(VA_START) && defined(STDC_HEADERS)
 #  if defined(__GNUC__)
-    void os_error __PROTO((int, const char *, ...)) __attribute__((noreturn));
-    void int_error __PROTO((int, const char *, ...)) __attribute__((noreturn));
-    void common_error_exit __PROTO((void)) __attribute__((noreturn));
+    void os_error(int, const char *, ...) __attribute__((noreturn));
+    void int_error(int, const char *, ...) __attribute__((noreturn));
+    void common_error_exit(void) __attribute__((noreturn));
 #  elif defined(_MSC_VER)
     __declspec(noreturn) void os_error(int, const char *, ...);
     __declspec(noreturn) void int_error(int, const char *, ...);
     __declspec(noreturn) void common_error_exit();
 #  else
-    void os_error __PROTO((int, const char *, ...));
-    void int_error __PROTO((int, const char *, ...));
-    void common_error_exit __PROTO((void));
+    void os_error(int, const char *, ...);
+    void int_error(int, const char *, ...);
+    void common_error_exit(void);
 #  endif
-void int_warn __PROTO((int, const char *, ...));
+void int_warn(int, const char *, ...);
 #else
-void os_error __PROTO(());
-void int_error __PROTO(());
-void int_warn __PROTO(());
-void common_error_exit __PROTO(());
+void os_error();
+void int_error();
+void int_warn();
+void common_error_exit();
 #endif
 
-void squash_spaces __PROTO((char *s, int remain));
+void squash_spaces(char *s, int remain);
 
-TBOOLEAN existdir __PROTO((const char *));
+TBOOLEAN existdir(const char *);
 TBOOLEAN existfile(const char *);
 
-char *getusername __PROTO((void));
+char *getusername(void);
 
-size_t gp_strlen __PROTO((const char *s));
-char * gp_strchrn __PROTO((const char *s, int N));
-TBOOLEAN streq __PROTO((const char *a, const char *b));
+size_t gp_strlen(const char *s);
+char * gp_strchrn(const char *s, int N);
+TBOOLEAN streq(const char *a, const char *b);
 size_t strappend(char **dest, size_t *size, size_t len, const char *src);
 
 char *value_to_str(struct value *val, TBOOLEAN need_quotes);

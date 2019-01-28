@@ -44,34 +44,30 @@
 
 #define INITIAL_DATA_SIZE (4096)   /* initial size of data arrays */
 
-static int comparator __PROTO(( const void *a, const void *b ));
-static struct file_stats analyze_file __PROTO(( long n, int outofrange, int invalid, int blank, int dblblank, int headers ));
-static struct sgl_column_stats analyze_sgl_column __PROTO(( double *data, long n, long nr ));
-static struct two_column_stats analyze_two_columns __PROTO(( double *x, double *y,
-							     struct sgl_column_stats res_x,
-							     struct sgl_column_stats res_y,
-							     long n ));
+static int comparator( const void *a, const void *b );
+static struct file_stats analyze_file( long n, int outofrange, int invalid, int blank, int dblblank, int headers );
+static struct sgl_column_stats analyze_sgl_column( double *data, long n, long nr );
+static struct two_column_stats analyze_two_columns( double *x, double *y,
+						     struct sgl_column_stats res_x,
+						     struct sgl_column_stats res_y,
+						     long n );
 
-static void ensure_output __PROTO((void));
-static char* fmt __PROTO(( char *buf, double val ));
-static void sgl_column_output_nonformat __PROTO(( struct sgl_column_stats s, char *x ));
-static void file_output __PROTO(( struct file_stats s ));
-static void sgl_column_output __PROTO(( struct sgl_column_stats s, long n ));
-static void two_column_output __PROTO(( struct sgl_column_stats x,
-					struct sgl_column_stats y,
-					struct two_column_stats xy, long n));
+static void ensure_output(void);
+static char* fmt( char *buf, double val );
+static void sgl_column_output_nonformat( struct sgl_column_stats s, char *x );
+static void file_output( struct file_stats s );
+static void sgl_column_output( struct sgl_column_stats s, long n );
+static void two_column_output( struct sgl_column_stats x,
+				struct sgl_column_stats y,
+				struct two_column_stats xy, long n);
 
-static void create_and_set_var __PROTO(( double val, char *prefix,
-					 char *base, char *suffix ));
-static void create_and_set_int_var __PROTO(( int ival, char *prefix,
-					 char *base, char *suffix ));
-static void create_and_store_var __PROTO(( t_value *data, char *prefix,
-					 char *base, char *suffix ));
+static void create_and_set_var( double val, char *prefix, char *base, char *suffix );
+static void create_and_set_int_var( int ival, char *prefix, char *base, char *suffix );
+static void create_and_store_var( t_value *data, char *prefix, char *base, char *suffix );
 
-static void sgl_column_variables __PROTO(( struct sgl_column_stats res,
-					   char *prefix, char *postfix ));
+static void sgl_column_variables( struct sgl_column_stats res, char *prefix, char *postfix );
 
-static TBOOLEAN validate_data __PROTO((double v, AXIS_INDEX ax));
+static TBOOLEAN validate_data(double v, AXIS_INDEX ax);
 
 /* =================================================================
    Data Structures

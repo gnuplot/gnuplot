@@ -64,17 +64,17 @@ register_term(pbm_driver)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void PBM_options __PROTO((void));
-TERM_PUBLIC void PBM_init __PROTO((void));
-TERM_PUBLIC void PBM_reset __PROTO((void));
-TERM_PUBLIC void PBM_setfont __PROTO((void));
-TERM_PUBLIC void PBM_graphics __PROTO((void));
-TERM_PUBLIC void PBM_monotext __PROTO((void));
-TERM_PUBLIC void PBM_graytext __PROTO((void));
-TERM_PUBLIC void PBM_colortext __PROTO((void));
-TERM_PUBLIC void PBM_text __PROTO((void));
-TERM_PUBLIC void PBM_linetype __PROTO((int linetype));
-TERM_PUBLIC void PBM_point __PROTO((unsigned int x, unsigned int y, int point));
+TERM_PUBLIC void PBM_options(void);
+TERM_PUBLIC void PBM_init(void);
+TERM_PUBLIC void PBM_reset(void);
+TERM_PUBLIC void PBM_setfont(void);
+TERM_PUBLIC void PBM_graphics(void);
+TERM_PUBLIC void PBM_monotext(void);
+TERM_PUBLIC void PBM_graytext(void);
+TERM_PUBLIC void PBM_colortext(void);
+TERM_PUBLIC void PBM_text(void);
+TERM_PUBLIC void PBM_linetype(int linetype);
+TERM_PUBLIC void PBM_point(unsigned int x, unsigned int y, int point);
 #endif /* TERM_PROTO */
 
 /* make XMAX and YMAX a multiple of 8 */

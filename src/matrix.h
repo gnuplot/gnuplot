@@ -26,18 +26,18 @@
 
 /******* public functions ******/
 
-double  *vec __PROTO((int n));
-int     *ivec __PROTO((int n));
-double  **matr __PROTO((int r, int c));
-void    free_matr __PROTO((double **m));
-double  *redim_vec __PROTO((double **v, int n));
-void    solve __PROTO((double **a, int n, double **b, int m));
-void    Givens __PROTO((double **C, double *d, double *x, int N, int n));
-void    Invert_RtR __PROTO((double **R, double **I, int n));
+double  *vec(int n);
+int     *ivec(int n);
+double  **matr(int r, int c);
+void    free_matr(double **m);
+double  *redim_vec(double **v, int n);
+void    solve(double **a, int n, double **b, int m);
+void    Givens(double **C, double *d, double *x, int N, int n);
+void    Invert_RtR(double **R, double **I, int n);
 
 /* Functions for use by THIN_PLATE_SPLINES_GRID method */
-void    lu_decomp __PROTO((double **, int, int *, double *));
-void    lu_backsubst __PROTO((double **, int n, int *, double *));
+void    lu_decomp(double **, int, int *, double *);
+void    lu_backsubst(double **, int n, int *, double *);
 
 double   enorm_vec(int n, const double *x);
 double   sumsq_vec(int n, const double *x);

@@ -53,35 +53,34 @@ register_term(canvas_driver)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void CANVAS_options __PROTO((void));
-TERM_PUBLIC void CANVAS_init __PROTO((void));
-TERM_PUBLIC void CANVAS_graphics __PROTO((void));
-TERM_PUBLIC int CANVAS_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC void CANVAS_text __PROTO((void));
-TERM_PUBLIC void CANVAS_reset __PROTO((void));
-TERM_PUBLIC void CANVAS_linetype __PROTO((int linetype));
-TERM_PUBLIC void CANVAS_dashtype __PROTO((int type, t_dashtype *custom_dash_type));
-TERM_PUBLIC void CANVAS_fillbox __PROTO((int style, unsigned int x1, unsigned int y1,
-					unsigned int width, unsigned int height));
-TERM_PUBLIC void CANVAS_linewidth __PROTO((double linewidth));
-TERM_PUBLIC void CANVAS_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void CANVAS_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void CANVAS_point __PROTO((unsigned int x, unsigned int y, int number));
-TERM_PUBLIC void CANVAS_pointsize __PROTO((double size));
-TERM_PUBLIC void CANVAS_put_text __PROTO((unsigned int x, unsigned int y,
-					const char *str));
-TERM_PUBLIC int CANVAS_text_angle __PROTO((int ang));
-TERM_PUBLIC void CANVAS_filled_polygon __PROTO((int, gpiPoint *));
-TERM_PUBLIC void CANVAS_set_color __PROTO((t_colorspec *colorspec));
-TERM_PUBLIC int CANVAS_make_palette __PROTO((t_sm_palette *palette));
-TERM_PUBLIC void CANVAS_layer __PROTO((t_termlayer));
-TERM_PUBLIC void CANVAS_path __PROTO((int));
-TERM_PUBLIC void CANVAS_hypertext __PROTO((int, const char *));
-TERM_PUBLIC int CANVAS_set_font __PROTO((const char *));
+TERM_PUBLIC void CANVAS_options(void);
+TERM_PUBLIC void CANVAS_init(void);
+TERM_PUBLIC void CANVAS_graphics(void);
+TERM_PUBLIC int CANVAS_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC void CANVAS_text(void);
+TERM_PUBLIC void CANVAS_reset(void);
+TERM_PUBLIC void CANVAS_linetype(int linetype);
+TERM_PUBLIC void CANVAS_dashtype(int type, t_dashtype *custom_dash_type);
+TERM_PUBLIC void CANVAS_fillbox(int style, unsigned int x1, unsigned int y1,
+				unsigned int width, unsigned int height);
+TERM_PUBLIC void CANVAS_linewidth(double linewidth);
+TERM_PUBLIC void CANVAS_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void CANVAS_vector(unsigned int x, unsigned int y);
+TERM_PUBLIC void CANVAS_point(unsigned int x, unsigned int y, int number);
+TERM_PUBLIC void CANVAS_pointsize(double size);
+TERM_PUBLIC void CANVAS_put_text(unsigned int x, unsigned int y, const char *str);
+TERM_PUBLIC int CANVAS_text_angle(int ang);
+TERM_PUBLIC void CANVAS_filled_polygon(int, gpiPoint *);
+TERM_PUBLIC void CANVAS_set_color(t_colorspec *colorspec);
+TERM_PUBLIC int CANVAS_make_palette(t_sm_palette *palette);
+TERM_PUBLIC void CANVAS_layer(t_termlayer);
+TERM_PUBLIC void CANVAS_path(int);
+TERM_PUBLIC void CANVAS_hypertext(int, const char *);
+TERM_PUBLIC int CANVAS_set_font(const char *);
 
-TERM_PUBLIC void ENHCANVAS_OPEN __PROTO((char *, double, double, TBOOLEAN, TBOOLEAN, int));
-TERM_PUBLIC void ENHCANVAS_FLUSH __PROTO((void));
-TERM_PUBLIC void ENHCANVAS_put_text __PROTO((unsigned int, unsigned int, const char *));
+TERM_PUBLIC void ENHCANVAS_OPEN(char *, double, double, TBOOLEAN, TBOOLEAN, int);
+TERM_PUBLIC void ENHCANVAS_FLUSH(void);
+TERM_PUBLIC void ENHCANVAS_put_text(unsigned int, unsigned int, const char *);
 
 #define CANVAS_OVERSAMPLE	10.
 #define CANVAS_XMAX		(600 * CANVAS_OVERSAMPLE)

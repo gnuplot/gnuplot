@@ -67,16 +67,16 @@
 /* Prototypes of functions exported by time.c */
 
 /* string to *tm */
-td_type gstrptime __PROTO((char *, char *, struct tm *, double *, double *));
+td_type gstrptime(char *, char *, struct tm *, double *, double *);
 
 /* seconds to string */
-size_t gstrftime __PROTO((char *, size_t, const char *, double));
+size_t gstrftime(char *, size_t, const char *, double);
 
 /* *tm to seconds */
-double gtimegm __PROTO((struct tm *));
+double gtimegm(struct tm *);
 
 /* seconds to *tm */
-int ggmtime __PROTO((struct tm *, double));
+int ggmtime(struct tm *, double);
 
 
 

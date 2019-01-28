@@ -180,11 +180,11 @@ typedef enum {
 
 /* Prototypes from file "graph3d.c" */
 
-void do_3dplot __PROTO((struct surface_points *plots, int pcount, REPLOT_TYPE quick));
-void map3d_position __PROTO((struct position *pos, int *x, int *y, const char *what));
-void map3d_position_double __PROTO((struct position *pos, double *x, double *y, const char *what));
-void map3d_position_r __PROTO((struct position *pos, int *x, int *y, const char *what));
-void map3d_position_r_double __PROTO((struct position *pos, double *x, double *y, const char *what));
+void do_3dplot(struct surface_points *plots, int pcount, REPLOT_TYPE quick);
+void map3d_position(struct position *pos, int *x, int *y, const char *what);
+void map3d_position_double(struct position *pos, double *x, double *y, const char *what);
+void map3d_position_r(struct position *pos, int *x, int *y, const char *what);
+void map3d_position_r_double(struct position *pos, double *x, double *y, const char *what);
 
 
 #endif /* GNUPLOT_GRAPH3D_H */

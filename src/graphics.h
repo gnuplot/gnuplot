@@ -101,13 +101,12 @@ extern double rgbmax;
 
 /* function prototypes */
 
-void do_plot __PROTO((struct curve_points *, int));
-void map_position __PROTO((struct position * pos, int *x, int *y, const char *what));
-void map_position_r __PROTO((struct position* pos, double* x, double* y,
-			     const char* what));
+void do_plot(struct curve_points *, int);
+void map_position(struct position * pos, int *x, int *y, const char *what);
+void map_position_r(struct position* pos, double* x, double* y, const char* what);
 
-void init_histogram __PROTO((struct histogram_style *hist, text_label *title));
-void free_histlist __PROTO((struct histogram_style *hist));
+void init_histogram(struct histogram_style *hist, text_label *title);
+void free_histlist(struct histogram_style *hist);
 
 typedef enum en_procimg_action {
     IMG_PLOT,
@@ -115,15 +114,15 @@ typedef enum en_procimg_action {
     IMG_UPDATE_CORNERS
 } t_procimg_action;
 
-void process_image __PROTO((void *plot, t_procimg_action action));
-TBOOLEAN check_for_variable_color __PROTO((struct curve_points *plot, double *colorvalue));
+void process_image(void *plot, t_procimg_action action);
+TBOOLEAN check_for_variable_color(struct curve_points *plot, double *colorvalue);
 
 
-void place_objects __PROTO((struct object *listhead, int layer, int dimensions));
-void do_ellipse __PROTO((int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping ));
-void do_polygon __PROTO((int dimensions, t_polygon *p, int style, t_clip_object clip, int facing ));
+void place_objects(struct object *listhead, int layer, int dimensions);
+void do_ellipse(int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping );
+void do_polygon(int dimensions, t_polygon *p, int style, t_clip_object clip, int facing );
 
-int filter_boxplot __PROTO((struct curve_points *));
-void attach_title_to_plot __PROTO((struct curve_points *this_plot, legend_key *key));
+int filter_boxplot(struct curve_points *);
+void attach_title_to_plot(struct curve_points *this_plot, legend_key *key);
 
 #endif /* GNUPLOT_GRAPHICS_H */

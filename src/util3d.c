@@ -52,12 +52,12 @@
 #define AXIS_ACTUAL_MAX(axis) GPMAX(axis_array[axis].max, axis_array[axis].min)
 
 /* Prototypes for local functions */
-static void mat_unit __PROTO((transform_matrix mat));
-static GP_INLINE void draw3d_point_unconditional __PROTO((p_vertex, struct lp_style_type *));
+static void mat_unit(transform_matrix mat);
+static GP_INLINE void draw3d_point_unconditional(p_vertex, struct lp_style_type *);
 
-static double map_x3d __PROTO((double));
-static double map_y3d __PROTO((double));
-static double map_z3d __PROTO((double));
+static double map_x3d(double);
+static double map_y3d(double);
+static double map_z3d(double);
 
 static void
 mat_unit(transform_matrix mat)

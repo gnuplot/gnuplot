@@ -109,30 +109,30 @@ register_term(context)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void CONTEXT_options __PROTO((void));
-TERM_PUBLIC void CONTEXT_init __PROTO((void));
-TERM_PUBLIC void CONTEXT_reset __PROTO((void));
-TERM_PUBLIC void CONTEXT_text __PROTO((void));
-TERM_PUBLIC void CONTEXT_graphics __PROTO((void));
-TERM_PUBLIC void CONTEXT_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void CONTEXT_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void CONTEXT_linetype __PROTO((int lt));
-TERM_PUBLIC void CONTEXT_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
+TERM_PUBLIC void CONTEXT_options(void);
+TERM_PUBLIC void CONTEXT_init(void);
+TERM_PUBLIC void CONTEXT_reset(void);
+TERM_PUBLIC void CONTEXT_text(void);
+TERM_PUBLIC void CONTEXT_graphics(void);
+TERM_PUBLIC void CONTEXT_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void CONTEXT_vector(unsigned int x, unsigned int y);
+TERM_PUBLIC void CONTEXT_linetype(int lt);
+TERM_PUBLIC void CONTEXT_put_text(unsigned int x, unsigned int y, const char *str);
 
-TERM_PUBLIC  int CONTEXT_text_angle __PROTO((int ang));
-TERM_PUBLIC  int CONTEXT_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC void CONTEXT_point __PROTO((unsigned int x, unsigned int y, int number));
-TERM_PUBLIC void CONTEXT_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
-TERM_PUBLIC  int CONTEXT_set_font __PROTO((const char *font)); /* "font,size" */
-TERM_PUBLIC void CONTEXT_pointsize __PROTO((double pointsize));
-TERM_PUBLIC void CONTEXT_fillbox __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height)); /* clear part of multiplot */
-TERM_PUBLIC void CONTEXT_fill __PROTO((int style));
-TERM_PUBLIC void CONTEXT_linewidth __PROTO((double linewidth));
-TERM_PUBLIC  int CONTEXT_make_palette __PROTO((t_sm_palette *palette));
-/* TERM_PUBLIC void CONTEXT_previous_palette __PROTO((void)); do we need it? */
-TERM_PUBLIC void CONTEXT_set_color __PROTO((t_colorspec *colorspec));
-TERM_PUBLIC void CONTEXT_filled_polygon __PROTO((int points, gpiPoint *corners));
-TERM_PUBLIC void CONTEXT_image __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
+TERM_PUBLIC  int CONTEXT_text_angle(int ang);
+TERM_PUBLIC  int CONTEXT_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC void CONTEXT_point(unsigned int x, unsigned int y, int number);
+TERM_PUBLIC void CONTEXT_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head);
+TERM_PUBLIC  int CONTEXT_set_font(const char *font); /* "font,size" */
+TERM_PUBLIC void CONTEXT_pointsize(double pointsize);
+TERM_PUBLIC void CONTEXT_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height); /* clear part of multiplot */
+TERM_PUBLIC void CONTEXT_fill(int style);
+TERM_PUBLIC void CONTEXT_linewidth(double linewidth);
+TERM_PUBLIC  int CONTEXT_make_palette(t_sm_palette *palette);
+/* TERM_PUBLIC void CONTEXT_previous_palette(void); do we need it? */
+TERM_PUBLIC void CONTEXT_set_color(t_colorspec *colorspec);
+TERM_PUBLIC void CONTEXT_filled_polygon(int points, gpiPoint *corners);
+TERM_PUBLIC void CONTEXT_image(unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor);
 
 /* Metapost < 1.750 can only deal with numbers between 2^{-16} and 2^12=4069 */
 /* scale is 1cm = 1000 units */
@@ -180,16 +180,16 @@ static const char CONTEXT_term_version[] = "1.0";
 static const char CONTEXT_term_patch[]   = "0";
 static const char CONTEXT_term_date[]    = "2011-11-05";
 
-static void CONTEXT_params_reset __PROTO((void));
+static void CONTEXT_params_reset(void);
 
-static void CONTEXT_adjust_dimensions __PROTO((void));
-static void CONTEXT_fontstring_parse __PROTO((char *from_string, char *to_string, int to_size, double *fontsize));
+static void CONTEXT_adjust_dimensions(void);
+static void CONTEXT_fontstring_parse(char *from_string, char *to_string, int to_size, double *fontsize);
 
-static void CONTEXT_startpath __PROTO((void));
-static void CONTEXT_endpath __PROTO((void));
+static void CONTEXT_startpath(void);
+static void CONTEXT_endpath(void);
 
-static void CONTEXT_write_palette __PROTO((t_sm_palette *palette));
-static void CONTEXT_write_palette_gradient __PROTO((gradient_struct *gradient, int cnt));
+static void CONTEXT_write_palette(t_sm_palette *palette);
+static void CONTEXT_write_palette_gradient(gradient_struct *gradient, int cnt);
 
 /* Each number is divided by 100 (1/100th of a point is drawn) */
 

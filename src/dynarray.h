@@ -45,11 +45,11 @@ typedef struct dynarray {
 } dynarray;
 
 /* Prototypes */
-void init_dynarray __PROTO((dynarray * array, size_t element, long size, long increment));
-void free_dynarray __PROTO((dynarray * array));
-void extend_dynarray __PROTO((dynarray * array, long increment));
-void resize_dynarray __PROTO((dynarray * array, long newsize));
-void *nextfrom_dynarray __PROTO((dynarray * array));
-void droplast_dynarray __PROTO((dynarray * array));
+void init_dynarray(dynarray * array, size_t element, long size, long increment);
+void free_dynarray(dynarray * array);
+void extend_dynarray(dynarray * array, long increment);
+void resize_dynarray(dynarray * array, long newsize);
+void *nextfrom_dynarray(dynarray * array);
+void droplast_dynarray(dynarray * array);
 
 #endif /* DYNARRAY_H */

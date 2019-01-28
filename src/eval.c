@@ -50,7 +50,7 @@
 #include <setjmp.h>
 
 /* Internal prototypes */
-static RETSIGTYPE fpe __PROTO((int an_int));
+static RETSIGTYPE fpe(int an_int);
 
 /* Global variables exported by this module */
 struct udvt_entry udv_pi = { NULL, "pi", {INTGR, {0} } };
@@ -836,10 +836,10 @@ clear_udf_list()
     first_udf = NULL;
 }
 
-static void update_plot_bounds __PROTO((void));
-static void fill_gpval_axis __PROTO((AXIS_INDEX axis));
-static void fill_gpval_sysinfo __PROTO((void));
-static void set_gpval_axis_sth_double __PROTO((const char *prefix, AXIS_INDEX axis, const char *suffix, double value));
+static void update_plot_bounds(void);
+static void fill_gpval_axis(AXIS_INDEX axis);
+static void fill_gpval_sysinfo(void);
+static void set_gpval_axis_sth_double(const char *prefix, AXIS_INDEX axis, const char *suffix, double value);
 
 static void
 set_gpval_axis_sth_double(const char *prefix, AXIS_INDEX axis, const char *suffix, double value)

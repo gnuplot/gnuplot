@@ -46,30 +46,30 @@
 extern const char *coord_msg[];
 
 /* Prototypes of functions exported by save.c */
-void save_functions __PROTO((FILE *fp));
-void save_variables __PROTO((FILE *fp));
-void save_set __PROTO((FILE *fp));
-void save_term __PROTO((FILE *fp));
-void save_all __PROTO((FILE *fp));
-void save_position __PROTO((FILE *, struct position *, int, TBOOLEAN));
-void save_prange __PROTO((FILE *, struct axis *));
-void save_link __PROTO((FILE *, struct axis *));
-void save_nonlinear __PROTO((FILE *, struct axis *));
-void save_textcolor __PROTO((FILE *, const struct t_colorspec *));
-void save_pm3dcolor __PROTO((FILE *, const struct t_colorspec *));
-void save_fillstyle __PROTO((FILE *, const struct fill_style_type *));
-void save_offsets __PROTO((FILE *, char *));
-void save_histogram_opts __PROTO((FILE *fp));
-void save_object __PROTO((FILE *, int));
-void save_walls __PROTO((FILE *));
-void save_style_textbox __PROTO((FILE *));
-void save_style_parallel __PROTO((FILE *));
-void save_data_func_style __PROTO((FILE *, const char *, enum PLOT_STYLE));
-void save_linetype __PROTO((FILE *, lp_style_type *, TBOOLEAN));
-void save_dashtype __PROTO((FILE *, int, const t_dashtype *));
-void save_num_or_time_input __PROTO((FILE *, double x, struct axis *));
-void save_axis_format __PROTO((FILE *fp, AXIS_INDEX axis));
-void save_bars __PROTO((FILE *));
-void save_array_content __PROTO((FILE *, struct value *));
+void save_functions(FILE *fp);
+void save_variables(FILE *fp);
+void save_set(FILE *fp);
+void save_term(FILE *fp);
+void save_all(FILE *fp);
+void save_position(FILE *, struct position *, int, TBOOLEAN);
+void save_prange(FILE *, struct axis *);
+void save_link(FILE *, struct axis *);
+void save_nonlinear(FILE *, struct axis *);
+void save_textcolor(FILE *, const struct t_colorspec *);
+void save_pm3dcolor(FILE *, const struct t_colorspec *);
+void save_fillstyle(FILE *, const struct fill_style_type *);
+void save_offsets(FILE *, char *);
+void save_histogram_opts(FILE *fp);
+void save_object(FILE *, int);
+void save_walls(FILE *);
+void save_style_textbox(FILE *);
+void save_style_parallel(FILE *);
+void save_data_func_style(FILE *, const char *, enum PLOT_STYLE);
+void save_linetype(FILE *, lp_style_type *, TBOOLEAN);
+void save_dashtype(FILE *, int, const t_dashtype *);
+void save_num_or_time_input(FILE *, double x, struct axis *);
+void save_axis_format(FILE *fp, AXIS_INDEX axis);
+void save_bars(FILE *);
+void save_array_content(FILE *, struct value *);
 
 #endif /* GNUPLOT_SAVE_H */

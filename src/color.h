@@ -201,33 +201,33 @@ extern t_sm_palette sm_palette;
 /* ROUTINES */
 
 
-void init_color __PROTO((void));  /* call once to initialize variables */
+void init_color(void);  /* call once to initialize variables */
 
 
 /*
   Make the colour palette. Return 0 on success
   Put number of allocated colours into sm_palette.colors
 */
-int make_palette __PROTO((void));
+int make_palette(void);
 
-void invalidate_palette __PROTO((void));
+void invalidate_palette(void);
 
 /*
    Send current colour to the terminal
 */
-void set_color __PROTO(( double gray ));
-void set_rgbcolor_var __PROTO(( unsigned int rgbvalue ));
-void set_rgbcolor_const __PROTO(( unsigned int rgbvalue ));
+void set_color( double gray );
+void set_rgbcolor_var( unsigned int rgbvalue );
+void set_rgbcolor_const( unsigned int rgbvalue );
 
 /*
   Draw colour smooth box
 */
-void draw_color_smooth_box __PROTO((int plot_mode));
+void draw_color_smooth_box(int plot_mode);
 
 /*
  Support for user-callable routines
 */
-void f_hsv2rgb __PROTO((union argument *));
+void f_hsv2rgb(union argument *);
 
 #endif /* COLOR_H */
 

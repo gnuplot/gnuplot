@@ -265,7 +265,7 @@ edf_filetype_function(void)
 #define GD_PNG 1
 #define GD_GIF 2
 #define GD_JPEG 3
-void gd_filetype_function __PROTO((int filetype));
+void gd_filetype_function(int filetype);
 
 void
 png_filetype_function(void)

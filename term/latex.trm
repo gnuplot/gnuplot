@@ -88,33 +88,33 @@ register_term(emtex)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void LATEX_options __PROTO((void));
-TERM_PUBLIC void LATEX_init __PROTO((void));
-TERM_PUBLIC void LATEX_graphics __PROTO((void));
-TERM_PUBLIC void LATEX_text __PROTO((void));
-TERM_PUBLIC void LATEX_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
-TERM_PUBLIC void LATEX_linetype __PROTO((int linetype));
-TERM_PUBLIC void LATEX_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void LATEX_point __PROTO((unsigned int x, unsigned int y, int number));
-TERM_PUBLIC void LATEX_vector __PROTO((unsigned int ux, unsigned int uy));
-TERM_PUBLIC void LATEX_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
-TERM_PUBLIC int LATEX_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC int LATEX_text_angle __PROTO((int ang));
-TERM_PUBLIC void LATEX_reset __PROTO((void));
-TERM_PUBLIC void LATEX_fillbox __PROTO((int style, unsigned int x1, unsigned int y1,
-					unsigned int width, unsigned int height));
+TERM_PUBLIC void LATEX_options(void);
+TERM_PUBLIC void LATEX_init(void);
+TERM_PUBLIC void LATEX_graphics(void);
+TERM_PUBLIC void LATEX_text(void);
+TERM_PUBLIC void LATEX_put_text(unsigned int x, unsigned int y, const char str[]);
+TERM_PUBLIC void LATEX_linetype(int linetype);
+TERM_PUBLIC void LATEX_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void LATEX_point(unsigned int x, unsigned int y, int number);
+TERM_PUBLIC void LATEX_vector(unsigned int ux, unsigned int uy);
+TERM_PUBLIC void LATEX_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head);
+TERM_PUBLIC int LATEX_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC int LATEX_text_angle(int ang);
+TERM_PUBLIC void LATEX_reset(void);
+TERM_PUBLIC void LATEX_fillbox(int style, unsigned int x1, unsigned int y1,
+				unsigned int width, unsigned int height);
 TERM_PUBLIC int LATEX_make_palette(t_sm_palette *palette);
 TERM_PUBLIC void LATEX_set_color(t_colorspec *colorspec);
 
 #ifdef EMTEX
-TERM_PUBLIC void EMTEX_init __PROTO((void));
-TERM_PUBLIC void EMTEX_reset __PROTO((void));
-TERM_PUBLIC void EMTEX_text __PROTO((void));
+TERM_PUBLIC void EMTEX_init(void);
+TERM_PUBLIC void EMTEX_reset(void);
+TERM_PUBLIC void EMTEX_text(void);
 #endif
 
 #ifdef EEPIC
-TERM_PUBLIC void EEPIC_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void EEPIC_vector __PROTO((unsigned int ux, unsigned int uy));
+TERM_PUBLIC void EEPIC_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void EEPIC_vector(unsigned int ux, unsigned int uy);
 #endif
 
 #define TINY_STEP 0.5		/* tiny steps for high quality lines */
@@ -205,10 +205,10 @@ static struct {
 };
 
 /* for drawing dotted and solid lines */
-static void LATEX_dot_line __PROTO((int x1, int x2, int y1, int y2));
-static void LATEX_solid_line __PROTO((int x1, int x2, int y1, int y2));
-static void LATEX_rule __PROTO((int code, double x, double y, double width, double height));
-static void LATEX_flushdot __PROTO((void));
+static void LATEX_dot_line(int x1, int x2, int y1, int y2);
+static void LATEX_solid_line(int x1, int x2, int y1, int y2);
+static void LATEX_rule(int code, double x, double y, double width, double height);
+static void LATEX_flushdot(void);
 #define LATEX_flushrule() LATEX_rule(2, 0.,0.,0.,0.)	/* flush old rule */
 static TBOOLEAN LATEX_moved = TRUE;	/* pen is up after move */
 static float LATEX_dotsize;	/* size of LATEX_DOT in units */
@@ -216,7 +216,7 @@ static TBOOLEAN LATEX_needsdot = FALSE;		/* does dotted line need termination? *
 
 #ifdef EMTEX
 static TBOOLEAN emtex = FALSE;		/* not currently using emtex */
-static void EMTEX_solid_line __PROTO((int x1, int x2, int y1, int y2));
+static void EMTEX_solid_line(int x1, int x2, int y1, int y2);
 #endif
 
 /* ARROWS */
@@ -242,7 +242,7 @@ static struct vslope {
 };
 
 /* figure out the best arrow */
-static void best_latex_arrow __PROTO((int, int, int, int, int, int));
+static void best_latex_arrow(int, int, int, int, int, int);
 
 enum LATEX_id {
     LATEX_COURIER, LATEX_ROMAN, LATEX_DEFAULT,

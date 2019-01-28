@@ -89,19 +89,19 @@ register_term(mf)
 #define MF_HCHAR (MF_DPI*53/10/72)
 #define MF_VCHAR (MF_DPI*11/72)
 
-TERM_PUBLIC void MF_init __PROTO((void));
-TERM_PUBLIC void MF_graphics __PROTO((void));
-TERM_PUBLIC void MF_text __PROTO((void));
-TERM_PUBLIC int MF_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC int MF_text_angle __PROTO((int ang));
-TERM_PUBLIC void MF_linetype __PROTO((int linetype));
-TERM_PUBLIC void MF_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void MF_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void MF_arrow __PROTO((unsigned int sx, unsigned int sy,
-				   unsigned int ex, unsigned int ey,
-				   int head));
-TERM_PUBLIC void MF_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
-TERM_PUBLIC void MF_reset __PROTO((void));
+TERM_PUBLIC void MF_init(void);
+TERM_PUBLIC void MF_graphics(void);
+TERM_PUBLIC void MF_text(void);
+TERM_PUBLIC int MF_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC int MF_text_angle(int ang);
+TERM_PUBLIC void MF_linetype(int linetype);
+TERM_PUBLIC void MF_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void MF_vector(unsigned int x, unsigned int y);
+TERM_PUBLIC void MF_arrow(unsigned int sx, unsigned int sy,
+			   unsigned int ex, unsigned int ey,
+			   int head);
+TERM_PUBLIC void MF_put_text(unsigned int x, unsigned int y, const char *str);
+TERM_PUBLIC void MF_reset(void);
 
 #define GOT_MF_PROTO
 

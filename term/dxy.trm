@@ -57,15 +57,15 @@ register_term(dxy800a)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void DXY_init __PROTO((void));
-TERM_PUBLIC void DXY_graphics __PROTO((void));
-TERM_PUBLIC void DXY_text __PROTO((void));
-TERM_PUBLIC void DXY_linetype __PROTO((int linetype));
-TERM_PUBLIC void DXY_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void DXY_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void DXY_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
-TERM_PUBLIC int DXY_text_angle __PROTO((int ang));
-TERM_PUBLIC void DXY_reset __PROTO((void));
+TERM_PUBLIC void DXY_init(void);
+TERM_PUBLIC void DXY_graphics(void);
+TERM_PUBLIC void DXY_text(void);
+TERM_PUBLIC void DXY_linetype(int linetype);
+TERM_PUBLIC void DXY_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void DXY_vector(unsigned int x, unsigned int y);
+TERM_PUBLIC void DXY_put_text(unsigned int x, unsigned int y, const char *str);
+TERM_PUBLIC int DXY_text_angle(int ang);
+TERM_PUBLIC void DXY_reset(void);
 
 #define DXY_XMAX 2470
 #define DXY_YMAX 1700

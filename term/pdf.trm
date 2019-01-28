@@ -37,34 +37,34 @@ register_term(pdf)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void PDF_options __PROTO ((void));
-TERM_PUBLIC void PDF_init __PROTO ((void));
-TERM_PUBLIC void PDF_graphics __PROTO ((void));
-TERM_PUBLIC void PDF_text __PROTO ((void));
-TERM_PUBLIC void PDF_linetype __PROTO ((int linetype));
-TERM_PUBLIC void PDF_move __PROTO ((unsigned int x, unsigned int y));
-TERM_PUBLIC void PDF_vector __PROTO ((unsigned int x, unsigned int y));
-TERM_PUBLIC void PDF_put_text __PROTO ((unsigned int x, unsigned int y, const char *str));
-TERM_PUBLIC void PDF_reset __PROTO ((void));
-TERM_PUBLIC int PDF_justify_text __PROTO ((enum JUSTIFY mode));
-TERM_PUBLIC int PDF_text_angle __PROTO ((int ang));
-TERM_PUBLIC void PDF_point __PROTO ((unsigned int x, unsigned int y, int pointstyle));
-TERM_PUBLIC int PDF_set_font __PROTO ((const char *font));
-TERM_PUBLIC void PDF_boxfill __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height));
-TERM_PUBLIC void PDF_linewidth __PROTO ((double linewidth));
-TERM_PUBLIC int PDF_make_palette __PROTO((t_sm_palette *));
-TERM_PUBLIC void PDF_previous_palette __PROTO((void));
-TERM_PUBLIC void PDF_set_color __PROTO((t_colorspec *));
-TERM_PUBLIC void PDF_image __PROTO((unsigned int, unsigned int, coordval *, gpiPoint *, t_imagecolor));
+TERM_PUBLIC void PDF_options(void);
+TERM_PUBLIC void PDF_init(void);
+TERM_PUBLIC void PDF_graphics(void);
+TERM_PUBLIC void PDF_text(void);
+TERM_PUBLIC void PDF_linetype(int linetype);
+TERM_PUBLIC void PDF_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void PDF_vector(unsigned int x, unsigned int y);
+TERM_PUBLIC void PDF_put_text(unsigned int x, unsigned int y, const char *str);
+TERM_PUBLIC void PDF_reset(void);
+TERM_PUBLIC int PDF_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC int PDF_text_angle(int ang);
+TERM_PUBLIC void PDF_point(unsigned int x, unsigned int y, int pointstyle);
+TERM_PUBLIC int PDF_set_font(const char *font);
+TERM_PUBLIC void PDF_boxfill(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height);
+TERM_PUBLIC void PDF_linewidth(double linewidth);
+TERM_PUBLIC int PDF_make_palette(t_sm_palette *);
+TERM_PUBLIC void PDF_previous_palette(void);
+TERM_PUBLIC void PDF_set_color(t_colorspec *);
+TERM_PUBLIC void PDF_image(unsigned int, unsigned int, coordval *, gpiPoint *, t_imagecolor);
 
-TERM_PUBLIC void PDF_filled_polygon __PROTO((int, gpiPoint *));
+TERM_PUBLIC void PDF_filled_polygon(int, gpiPoint *);
 
 /* To support "set term png enhanced" */
-TERM_PUBLIC void ENHPDF_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
-TERM_PUBLIC void ENHPDF_OPEN __PROTO((char * fontname, double fontsize,
+TERM_PUBLIC void ENHPDF_put_text(unsigned int x, unsigned int y, const char *str);
+TERM_PUBLIC void ENHPDF_OPEN(char * fontname, double fontsize,
 			double base, TBOOLEAN widthflag, TBOOLEAN showflag,
-			int overprint));
-TERM_PUBLIC void ENHPDF_FLUSH __PROTO((void));
+			int overprint);
+TERM_PUBLIC void ENHPDF_FLUSH(void);
 
 #define PDF_NUM_POINTTYPES 75	/* number of point symbol types not counting the dot */
 
@@ -121,11 +121,11 @@ static int PDF_fontLeading = 0;	/* estimated current font leading*/
 static int PDF_fontAvWidth = 0;	/* estimated current font char average width*/
 static int PDF_currentFontHandle; /* Needed for exhanced text mode */
 
-static short PDF_Pen_RealID __PROTO ((int));
-static void PDF_PathOpen __PROTO ((void));
-static void PDF_PathClose __PROTO ((void));
-static void PDF_SetFont __PROTO ((void));
-static void PDF_DefinePatterns __PROTO((void));
+static short PDF_Pen_RealID(int);
+static void PDF_PathOpen(void);
+static void PDF_PathClose(void);
+static void PDF_SetFont(void);
+static void PDF_DefinePatterns(void);
 enum { PDF_patterns = 7 };
 static int PDF_patternHandles[PDF_patterns];
 

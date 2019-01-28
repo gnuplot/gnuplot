@@ -78,17 +78,17 @@ extern int b_maskcount;
 
 /* Prototypes from file "bitmap.c" */
 
-unsigned int b_getpixel __PROTO((unsigned int, unsigned int));
-void b_makebitmap __PROTO((unsigned int, unsigned int, unsigned int));
-void b_freebitmap __PROTO((void));
-void b_charsize __PROTO((unsigned int));
-void b_setvalue __PROTO((unsigned int));
+unsigned int b_getpixel(unsigned int, unsigned int);
+void b_makebitmap(unsigned int, unsigned int, unsigned int);
+void b_freebitmap(void);
+void b_charsize(unsigned int);
+void b_setvalue(unsigned int);
 
-void b_setlinetype __PROTO((int));
-void b_move __PROTO((unsigned int, unsigned int));
-void b_vector __PROTO((unsigned int, unsigned int));
-void b_put_text __PROTO((unsigned int, unsigned int, const char *));
-int b_text_angle __PROTO((int));
-void b_boxfill __PROTO((int, unsigned int, unsigned int, unsigned int, unsigned int));
+void b_setlinetype(int);
+void b_move(unsigned int, unsigned int);
+void b_vector(unsigned int, unsigned int);
+void b_put_text(unsigned int, unsigned int, const char *);
+int b_text_angle(int);
+void b_boxfill(int, unsigned int, unsigned int, unsigned int, unsigned int);
 
 #endif /* GNUPLOT_BITMAP_H */

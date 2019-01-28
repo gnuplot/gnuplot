@@ -52,15 +52,12 @@ struct LIST {
 # define EXTERN extern
 #endif
 
-EXTERN void parse __PROTO((FILE * a));
-EXTERN struct LIST *lookup __PROTO((char *));
-EXTERN struct LIST *lkup_by_number __PROTO((int line));
-EXTERN void list_free __PROTO((void));
-EXTERN void refs __PROTO((int l, FILE * f, char *start, char *end, char *format));
+EXTERN void parse(FILE * a);
+EXTERN struct LIST *lookup(char *);
+EXTERN struct LIST *lkup_by_number(int line);
+EXTERN void list_free(void);
+EXTERN void refs(int l, FILE * f, char *start, char *end, char *format);
 
-#ifdef PROTOTYPES
-void *xmalloc __PROTO((size_t size));
-#else
-#endif
+void *xmalloc(size_t size);
 
 #endif /* DOCS_XREF_H */

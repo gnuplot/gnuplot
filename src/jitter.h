@@ -25,10 +25,10 @@ typedef struct {
 } t_jitter;
 extern t_jitter jitter;
 
-extern void jitter_points __PROTO((struct curve_points *plot));
-extern void set_jitter __PROTO(( void ));
-extern void show_jitter __PROTO(( void ));
-extern void unset_jitter __PROTO(( void ));
-extern void save_jitter __PROTO(( FILE * ));
+extern void jitter_points(struct curve_points *plot);
+extern void set_jitter( void );
+extern void show_jitter( void );
+extern void unset_jitter( void );
+extern void save_jitter( FILE * );
 
 #endif

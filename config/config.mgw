@@ -493,9 +493,6 @@
 /* Unix-type of Interprocess Communication is required for mouse support. */
 /* #undef PIPE_IPC */
 
-/* Automake 1.12 dropped support for building without prototypes */
-#define PROTOTYPES 1
-
 /* Define if you want the Qt terminal. */
 /* #undef QTTERM */
 

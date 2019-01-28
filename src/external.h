@@ -70,9 +70,9 @@
 #ifdef HAVE_EXTERNAL_FUNCTIONS
 
 /* Prototypes from file "external.c" */
-void f_calle __PROTO((union argument *x));
-struct at_type *external_at __PROTO((const char *));
-void external_free __PROTO((struct at_type *));
+void f_calle(union argument *x);
+struct at_type *external_at(const char *);
+void external_free(struct at_type *);
 
 #if defined(_WIN32)
 

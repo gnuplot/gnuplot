@@ -116,7 +116,7 @@ extern smg$create_key_table();
  */
 static char *expanded_history_filename;
 
-static void wrapper_for_write_history __PROTO((void));
+static void wrapper_for_write_history(void);
 
 #endif				/* GNUPLOT_HISTORY */
 
@@ -135,7 +135,7 @@ const char *user_shell = NULL;
 static TBOOLEAN successful_initialization = FALSE;
 
 #ifdef X11
-extern int X11_args __PROTO((int, char **)); /* FIXME: defined in term/x11.trm */
+extern int X11_args(int, char **); /* FIXME: defined in term/x11.trm */
 #endif
 
 /* patch to get home dir, see command.c */
@@ -147,9 +147,9 @@ static char progpath[PATH_MAX] = "";
 /* a longjmp buffer to get back to the command line */
 static JMP_BUF command_line_env;
 
-static void load_rcfile __PROTO((int where));
-static RETSIGTYPE inter __PROTO((int anint));
-static void init_memory __PROTO((void));
+static void load_rcfile(int where);
+static RETSIGTYPE inter(int anint);
+static void init_memory(void);
 
 static int exit_status = EXIT_SUCCESS;
 

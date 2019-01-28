@@ -146,18 +146,18 @@ static int keycount = 0;	/* number of keys */
 static FILE *helpfp = NULL;
 static KEY empty_key = {NULL, 0, NULL, 0};
 
-static int LoadHelp __PROTO((char *path));
-static void sortkeys __PROTO((void));
-static int keycomp __PROTO((SORTFUNC_ARGS a, SORTFUNC_ARGS b));
-static LINEBUF *storeline __PROTO((char *text));
-static LINKEY *storekey __PROTO((char *key));
-static KEY *FindHelp __PROTO((char *keyword));
-static TBOOLEAN Ambiguous __PROTO((struct key_s * key, size_t len));
+static int LoadHelp(char *path);
+static void sortkeys(void);
+static int keycomp(SORTFUNC_ARGS a, SORTFUNC_ARGS b);
+static LINEBUF *storeline(char *text);
+static LINKEY *storekey(char *key);
+static KEY *FindHelp(char *keyword);
+static TBOOLEAN Ambiguous(struct key_s * key, size_t len);
 
 /* Help output */
-static void PrintHelp __PROTO((struct key_s * key, TBOOLEAN *subtopics));
-static void ShowSubtopics __PROTO((struct key_s * key, TBOOLEAN *subtopics));
-static void OutLine_InternalPager __PROTO((const char *line));
+static void PrintHelp(struct key_s * key, TBOOLEAN *subtopics);
+static void ShowSubtopics(struct key_s * key, TBOOLEAN *subtopics);
+static void OutLine_InternalPager(const char *line);
 
 #if defined(PIPES)
 static FILE *outfile;		/* for unix pager, if any */

@@ -57,16 +57,16 @@ register_term(hp2623a)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void HP26_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void HP26_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void HP26_init __PROTO((void));
-TERM_PUBLIC void HP26_graphics __PROTO((void));
-TERM_PUBLIC void HP26_text __PROTO((void));
-TERM_PUBLIC void HP26_reset __PROTO((void));
-TERM_PUBLIC int HP26_text_angle __PROTO((int ang));
-TERM_PUBLIC void HP26_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
-TERM_PUBLIC void HP26_linetype __PROTO((int linetype));
-TERM_PUBLIC void HP26_line_and_point __PROTO((unsigned int x, unsigned int y, int number));
+TERM_PUBLIC void HP26_vector(unsigned int x, unsigned int y);
+TERM_PUBLIC void HP26_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void HP26_init(void);
+TERM_PUBLIC void HP26_graphics(void);
+TERM_PUBLIC void HP26_text(void);
+TERM_PUBLIC void HP26_reset(void);
+TERM_PUBLIC int HP26_text_angle(int ang);
+TERM_PUBLIC void HP26_put_text(unsigned int x, unsigned int y, const char *str);
+TERM_PUBLIC void HP26_linetype(int linetype);
+TERM_PUBLIC void HP26_line_and_point(unsigned int x, unsigned int y, int number);
 
 #define HP26_XMAX 512
 #define HP26_YMAX 390
@@ -84,11 +84,11 @@ TERM_PUBLIC void HP26_line_and_point __PROTO((unsigned int x, unsigned int y, in
 #define HP26_XLAST (HP26_XMAX - 1)
 #define HP26_YLAST (HP26_XMAX - 1)
 
-static void HP26_do_point __PROTO((unsigned int x, unsigned int y, int number));
-static struct _HP26_Buffer_Node *BN_create __PROTO((int index, int size, int linetype));
-static void BN_delete __PROTO((struct _HP26_Buffer_Node * the_node));
-static int HP26_flush __PROTO((struct _HP26_Buffer_Node * the_buff));
-static void HP26_handle_overflow __PROTO((void));
+static void HP26_do_point(unsigned int x, unsigned int y, int number);
+static struct _HP26_Buffer_Node *BN_create(int index, int size, int linetype);
+static void BN_delete(struct _HP26_Buffer_Node * the_node);
+static int HP26_flush(struct _HP26_Buffer_Node * the_buff);
+static void HP26_handle_overflow(void);
 
 typedef struct _HP26_Buffer_Node {
     int index;

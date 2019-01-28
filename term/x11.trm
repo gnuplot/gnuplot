@@ -65,52 +65,52 @@ register_term(x11)
 #endif
 
 #ifdef TERM_PROTO
-int X11_args __PROTO((int argc, char *argv[]));
+int X11_args(int argc, char *argv[]);
 
-TERM_PUBLIC void X11_options __PROTO((void));
-TERM_PUBLIC void X11_init __PROTO((void));
-TERM_PUBLIC void X11_graphics __PROTO((void));
-TERM_PUBLIC void X11_text __PROTO((void));
-TERM_PUBLIC int  X11_set_font __PROTO((const char * fontname));
-TERM_PUBLIC void X11_reset __PROTO((void));
-TERM_PUBLIC void X11_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void X11_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void X11_linewidth __PROTO((double lw));
-TERM_PUBLIC void X11_pointsize __PROTO((double ps));
-TERM_PUBLIC void X11_linetype __PROTO((int lt));
-TERM_PUBLIC void X11_dashtype __PROTO((int type, t_dashtype *custom_dash_type));
-TERM_PUBLIC void X11_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
-TERM_PUBLIC int X11_text_angle __PROTO((int i));
-TERM_PUBLIC int X11_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC void X11_point __PROTO((unsigned int x, unsigned int y, int number));
-TERM_PUBLIC void X11_fillbox __PROTO((int style, unsigned int x, unsigned int y, unsigned int width, unsigned int height));
+TERM_PUBLIC void X11_options(void);
+TERM_PUBLIC void X11_init(void);
+TERM_PUBLIC void X11_graphics(void);
+TERM_PUBLIC void X11_text(void);
+TERM_PUBLIC int  X11_set_font(const char * fontname);
+TERM_PUBLIC void X11_reset(void);
+TERM_PUBLIC void X11_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void X11_vector(unsigned int x, unsigned int y);
+TERM_PUBLIC void X11_linewidth(double lw);
+TERM_PUBLIC void X11_pointsize(double ps);
+TERM_PUBLIC void X11_linetype(int lt);
+TERM_PUBLIC void X11_dashtype(int type, t_dashtype *custom_dash_type);
+TERM_PUBLIC void X11_put_text(unsigned int x, unsigned int y, const char str[]);
+TERM_PUBLIC int X11_text_angle(int i);
+TERM_PUBLIC int X11_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC void X11_point(unsigned int x, unsigned int y, int number);
+TERM_PUBLIC void X11_fillbox(int style, unsigned int x, unsigned int y, unsigned int width, unsigned int height);
 
-TERM_PUBLIC void X11_send_endianess __PROTO((void));
+TERM_PUBLIC void X11_send_endianess(void);
 
 # ifdef USE_MOUSE
-TERM_PUBLIC int X11_waitforinput __PROTO((int));
-TERM_PUBLIC void X11_set_ruler __PROTO((int, int));
-TERM_PUBLIC void X11_set_cursor __PROTO((int, int, int));
-TERM_PUBLIC void X11_put_tmptext __PROTO((int, const char str[]));
-TERM_PUBLIC void X11_set_clipboard __PROTO((const char[]));
-TERM_PUBLIC void X11_layer __PROTO((t_termlayer syncpoint));
+TERM_PUBLIC int X11_waitforinput(int);
+TERM_PUBLIC void X11_set_ruler(int, int);
+TERM_PUBLIC void X11_set_cursor(int, int, int);
+TERM_PUBLIC void X11_put_tmptext(int, const char str[]);
+TERM_PUBLIC void X11_set_clipboard(const char[]);
+TERM_PUBLIC void X11_layer(t_termlayer syncpoint);
 # endif
 
-TERM_PUBLIC void X11_update_opts __PROTO((void));
-TERM_PUBLIC int X11_make_palette __PROTO((t_sm_palette *));
-TERM_PUBLIC void X11_set_color __PROTO((t_colorspec *));
-TERM_PUBLIC void X11_filled_polygon __PROTO((int, gpiPoint *));
+TERM_PUBLIC void X11_update_opts(void);
+TERM_PUBLIC int X11_make_palette(t_sm_palette *);
+TERM_PUBLIC void X11_set_color(t_colorspec *);
+TERM_PUBLIC void X11_filled_polygon(int, gpiPoint *);
 
-TERM_PUBLIC void X11_image __PROTO((unsigned int, unsigned int, coordval *, gpiPoint *, t_imagecolor));
+TERM_PUBLIC void X11_image(unsigned int, unsigned int, coordval *, gpiPoint *, t_imagecolor);
 
 /* To support "set term x11 enhanced" */
-TERM_PUBLIC void ENHX11_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
-TERM_PUBLIC void ENHX11_OPEN __PROTO((char * fontname, double fontsize,
+TERM_PUBLIC void ENHX11_put_text(unsigned int x, unsigned int y, const char str[]);
+TERM_PUBLIC void ENHX11_OPEN(char * fontname, double fontsize,
 				double base, TBOOLEAN widthflag, TBOOLEAN showflag,
-				int overprint));
-TERM_PUBLIC void ENHX11_FLUSH __PROTO((void));
-TERM_PUBLIC void ENHX11_boxed_text __PROTO((unsigned int, unsigned int, int));
-TERM_PUBLIC void X11_modify_plots __PROTO((unsigned int, int));
+				int overprint);
+TERM_PUBLIC void ENHX11_FLUSH(void);
+TERM_PUBLIC void ENHX11_boxed_text(unsigned int, unsigned int, int);
+TERM_PUBLIC void X11_modify_plots(unsigned int, int);
 
 /* These are the default terminal sizing parameters. These should match the
    sizes in gplt_x11.c, and both specify 640,450 */
@@ -151,10 +151,10 @@ static char X11_last_font_used[X11_MAX_FONTNAME_LENGTH+1] = {'\01','\0'};
 static char X11_next_font_used[X11_MAX_FONTNAME_LENGTH+1] = {'\0'};
 static enum JUSTIFY X11_last_justification = LEFT;
 
-static void X11_atexit __PROTO((void));
-static void X11_set_default_font __PROTO((void));
+static void X11_atexit(void);
+static void X11_set_default_font(void);
 
-static void transmit_gradient __PROTO((gradient_struct *gradient, int cnt));
+static void transmit_gradient(gradient_struct *gradient, int cnt);
 
 /* Merged the old char X11_opts[] and int X11_optarg[]
  * into one array of structs.
@@ -251,7 +251,7 @@ static TBOOLEAN X11_MOUSE_FEEDBACK = TRUE;
 static TBOOLEAN IPC_LOCK = FALSE;
 #endif
 
-static int parse_driver __PROTO((const char *));
+static int parse_driver(const char *);
 
 static int
 parse_driver(const char *cmd)

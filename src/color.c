@@ -44,10 +44,10 @@ static t_sm_palette prev_palette = {
 
 /* Internal prototype declarations: */
 
-static void draw_inside_color_smooth_box_postscript __PROTO((void));
-static void draw_inside_color_smooth_box_bitmap __PROTO((void));
-static void cbtick_callback __PROTO((struct axis *, double place, char *text, int ticlevel,
-			struct lp_style_type grid, struct ticmark *userlabels));
+static void draw_inside_color_smooth_box_postscript(void);
+static void draw_inside_color_smooth_box_bitmap(void);
+static void cbtick_callback(struct axis *, double place, char *text, int ticlevel,
+			struct lp_style_type grid, struct ticmark *userlabels);
 
 
 /* *******************************************************************

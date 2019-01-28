@@ -70,14 +70,14 @@ register_term(excl)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void EXCL_init __PROTO((void));
-TERM_PUBLIC void EXCL_graphics __PROTO((void));
-TERM_PUBLIC void EXCL_text __PROTO((void));
-TERM_PUBLIC void EXCL_linetype __PROTO((int linetype));
-TERM_PUBLIC void EXCL_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void EXCL_vector __PROTO((unsigned int x2, unsigned int y2));
-TERM_PUBLIC void EXCL_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
-TERM_PUBLIC void EXCL_reset __PROTO((void));
+TERM_PUBLIC void EXCL_init(void);
+TERM_PUBLIC void EXCL_graphics(void);
+TERM_PUBLIC void EXCL_text(void);
+TERM_PUBLIC void EXCL_linetype(int linetype);
+TERM_PUBLIC void EXCL_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void EXCL_vector(unsigned int x2, unsigned int y2);
+TERM_PUBLIC void EXCL_put_text(unsigned int x, unsigned int y, const char str[]);
+TERM_PUBLIC void EXCL_reset(void);
 
 #define EXCL_XMAX 9000
 #define EXCL_YMAX 6500

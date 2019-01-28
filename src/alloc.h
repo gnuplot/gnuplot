@@ -41,7 +41,7 @@
 
 /* prototypes from "alloc.c" */
 
-generic *gp_alloc __PROTO((size_t size, const char *message));
-generic *gp_realloc __PROTO((generic *p, size_t size, const char *message));
+generic *gp_alloc(size_t size, const char *message);
+generic *gp_realloc(generic *p, size_t size, const char *message);
 
 #endif /* GNUPLOT_ALLOC_H */

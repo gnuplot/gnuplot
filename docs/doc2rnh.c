@@ -70,13 +70,13 @@ extern TBOOLEAN single_top_level;
 #define LINE_SKIP		3
 #define DSR_RM		70
 
-void init __PROTO((FILE *));
-void convert __PROTO((FILE *, FILE *));
-void process_line __PROTO((char *, FILE *));
-void section __PROTO((char *, FILE *));
-void putrnh __PROTO((char *, FILE *));
-void putrnh_ __PROTO((char *, FILE *));
-void finish __PROTO((FILE *));
+void init(FILE *);
+void convert(FILE *, FILE *);
+void process_line(char *, FILE *);
+void section(char *, FILE *);
+void putrnh(char *, FILE *);
+void putrnh_(char *, FILE *);
+void finish(FILE *);
 
 static TBOOLEAN intable = FALSE;
 static TBOOLEAN rnh_table = FALSE;

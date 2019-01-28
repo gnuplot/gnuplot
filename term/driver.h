@@ -40,14 +40,14 @@
 
 /* functions provided by term.c */
 
-static void do_point __PROTO((unsigned int x, unsigned int y, int number));
-static void line_and_point __PROTO((unsigned int x, unsigned int y, int number));
-static int null_text_angle __PROTO((int ang));
-static int null_justify_text __PROTO((enum JUSTIFY just));
-static int null_scale __PROTO((double x, double y));
-static void options_null __PROTO((void));
-static void UNKNOWN_null __PROTO((void));
-/* static int set_font_null __PROTO((const char *s));     */ /* unused */
+static void do_point(unsigned int x, unsigned int y, int number);
+static void line_and_point(unsigned int x, unsigned int y, int number);
+static int null_text_angle(int ang);
+static int null_justify_text(enum JUSTIFY just);
+static int null_scale(double x, double y);
+static void options_null(void);
+static void UNKNOWN_null(void);
+/* static int set_font_null(const char *s);     */ /* unused */
 #define set_font_null NULL
 
 extern FILE *gpoutfile;

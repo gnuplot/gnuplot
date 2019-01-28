@@ -48,9 +48,9 @@
 #include "util.h"
 
 
-static void mp_layout_size_and_offset __PROTO((void));
-static void mp_layout_margins_and_spacing __PROTO((void));
-static void mp_layout_set_margin_or_spacing __PROTO((t_position *));
+static void mp_layout_size_and_offset(void);
+static void mp_layout_margins_and_spacing(void);
+static void mp_layout_set_margin_or_spacing(t_position *);
 
 enum set_multiplot_id {
     S_MULTIPLOT_LAYOUT,

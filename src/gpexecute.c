@@ -60,10 +60,10 @@ int pipe_died = 0;
 #endif
 
 #if defined(PIPE_IPC) /* || defined(WIN_IPC) */
-static gpe_fifo_t *gpe_init __PROTO((void));
-static void gpe_push __PROTO((gpe_fifo_t ** base, struct gp_event_t * ge));
-static struct gp_event_t *gpe_front __PROTO((gpe_fifo_t ** base));
-static int gpe_pop __PROTO((gpe_fifo_t ** base));
+static gpe_fifo_t *gpe_init(void);
+static void gpe_push(gpe_fifo_t ** base, struct gp_event_t * ge);
+static struct gp_event_t *gpe_front(gpe_fifo_t ** base);
+static int gpe_pop(gpe_fifo_t ** base);
 #endif /* PIPE_IPC || WIN_IPC */
 
 /*

@@ -58,12 +58,12 @@
 #include "stdfn.h"
 #include "doc2x.h"
 
-void init __PROTO((FILE *));
-void convert __PROTO((FILE *, FILE *));
-void process_line __PROTO((char *, FILE *));
-void section __PROTO((char *, FILE *));
-void puttex __PROTO((char *, FILE *));
-void finish __PROTO((FILE *));
+void init(FILE *);
+void convert(FILE *, FILE *);
+void process_line(char *, FILE *);
+void section(char *, FILE *);
+void puttex(char *, FILE *);
+void finish(FILE *);
 
 static TBOOLEAN intable = FALSE;
 static TBOOLEAN verb = FALSE;

@@ -62,8 +62,8 @@ extern double boxdepth;
 
 /* prototypes from plot3d.c */
 
-void plot3drequest __PROTO((void));
-void refresh_3dbounds __PROTO((struct surface_points *first_plot, int nplots));
-void sp_free __PROTO((struct surface_points *sp));
+void plot3drequest(void);
+void refresh_3dbounds(struct surface_points *first_plot, int nplots);
+void sp_free(struct surface_points *sp);
 
 #endif /* GNUPLOT_PLOT3D_H */

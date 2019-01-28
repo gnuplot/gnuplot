@@ -66,43 +66,43 @@ register_term(windows)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void WIN_options __PROTO((void));
-TERM_PUBLIC void WIN_init __PROTO((void));
-TERM_PUBLIC void WIN_reset __PROTO((void));
-TERM_PUBLIC void WIN_text __PROTO((void));
-TERM_PUBLIC void WIN_graphics __PROTO((void));
-TERM_PUBLIC void WIN_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void WIN_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void WIN_linetype __PROTO((int lt));
+TERM_PUBLIC void WIN_options(void);
+TERM_PUBLIC void WIN_init(void);
+TERM_PUBLIC void WIN_reset(void);
+TERM_PUBLIC void WIN_text(void);
+TERM_PUBLIC void WIN_graphics(void);
+TERM_PUBLIC void WIN_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void WIN_vector(unsigned int x, unsigned int y);
+TERM_PUBLIC void WIN_linetype(int lt);
 TERM_PUBLIC void WIN_dashtype(int type, t_dashtype *custom_dash_pattern);
-TERM_PUBLIC void WIN_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
-TERM_PUBLIC int WIN_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC int WIN_text_angle __PROTO((int ang));
-TERM_PUBLIC void WIN_point __PROTO((unsigned int x, unsigned int y, int number));
-TERM_PUBLIC void WIN_resume __PROTO((void));
-TERM_PUBLIC void WIN_set_pointsize __PROTO((double));
-TERM_PUBLIC void WIN_linewidth __PROTO((double linewidth));
+TERM_PUBLIC void WIN_put_text(unsigned int x, unsigned int y, const char *str);
+TERM_PUBLIC int WIN_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC int WIN_text_angle(int ang);
+TERM_PUBLIC void WIN_point(unsigned int x, unsigned int y, int number);
+TERM_PUBLIC void WIN_resume(void);
+TERM_PUBLIC void WIN_set_pointsize(double);
+TERM_PUBLIC void WIN_linewidth(double linewidth);
 #ifdef USE_MOUSE
-TERM_PUBLIC void WIN_set_ruler __PROTO((int, int));
-TERM_PUBLIC void WIN_set_cursor __PROTO((int, int, int));
-TERM_PUBLIC void WIN_put_tmptext __PROTO((int, const char str[]));
-TERM_PUBLIC void WIN_set_clipboard __PROTO((const char[]));
+TERM_PUBLIC void WIN_set_ruler(int, int);
+TERM_PUBLIC void WIN_set_cursor(int, int, int);
+TERM_PUBLIC void WIN_put_tmptext(int, const char str[]);
+TERM_PUBLIC void WIN_set_clipboard(const char[]);
 # ifdef WGP_CONSOLE
-TERM_PUBLIC int WIN_waitforinput __PROTO((int));
+TERM_PUBLIC int WIN_waitforinput(int);
 # endif
 #endif
-TERM_PUBLIC int WIN_make_palette __PROTO((t_sm_palette *palette));
-TERM_PUBLIC void WIN_set_color __PROTO((t_colorspec *));
-TERM_PUBLIC void WIN_filled_polygon __PROTO((int points, gpiPoint *corners));
-TERM_PUBLIC void WIN_boxfill __PROTO((int, unsigned int, unsigned int, unsigned int, unsigned int));
-TERM_PUBLIC int WIN_set_font __PROTO((const char *font));
-TERM_PUBLIC void WIN_enhanced_open __PROTO((char * fontname, double fontsize,
-					double base, TBOOLEAN widthflag, TBOOLEAN showflag, int overprint));
-TERM_PUBLIC void WIN_enhanced_flush __PROTO((void));
-TERM_PUBLIC void WIN_image __PROTO((unsigned int, unsigned int, coordval *, gpiPoint *, t_imagecolor));
-TERM_PUBLIC void WIN_layer __PROTO((t_termlayer syncpoint));
-TERM_PUBLIC void WIN_hypertext __PROTO((int type, const char * text));
-TERM_PUBLIC void WIN_modify_plots __PROTO((unsigned int operations, int plotno));
+TERM_PUBLIC int WIN_make_palette(t_sm_palette *palette);
+TERM_PUBLIC void WIN_set_color(t_colorspec *);
+TERM_PUBLIC void WIN_filled_polygon(int points, gpiPoint *corners);
+TERM_PUBLIC void WIN_boxfill(int, unsigned int, unsigned int, unsigned int, unsigned int);
+TERM_PUBLIC int WIN_set_font(const char *font);
+TERM_PUBLIC void WIN_enhanced_open(char * fontname, double fontsize,
+				double base, TBOOLEAN widthflag, TBOOLEAN showflag, int overprint);
+TERM_PUBLIC void WIN_enhanced_flush(void);
+TERM_PUBLIC void WIN_image(unsigned int, unsigned int, coordval *, gpiPoint *, t_imagecolor);
+TERM_PUBLIC void WIN_layer(t_termlayer syncpoint);
+TERM_PUBLIC void WIN_hypertext(int type, const char * text);
+TERM_PUBLIC void WIN_modify_plots(unsigned int operations, int plotno);
 
 /* Initialization values - guess now, scale later */
 #define WIN_XMAX (24000)

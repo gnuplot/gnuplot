@@ -250,39 +250,33 @@ static dynarray qtree;
 #define qlist ((p_qtreelist) qtree.v)
 
 /* Prototypes for internal functions of this module. */
-static long int store_vertex __PROTO((struct coordinate *point,
-				      lp_style_type *lp_style, TBOOLEAN color_from_column));
-static long int make_edge __PROTO((long int vnum1, long int vnum2,
-				   struct lp_style_type *lp,
-				   int style, int next));
-static long int store_edge __PROTO((long int vnum1, edge_direction direction,
-				    long int crvlen, struct lp_style_type *lp,
-				    int style));
-static GP_INLINE double eval_plane_equation __PROTO((t_plane p, p_vertex v));
-static GP_INLINE double intersect_line_plane __PROTO((p_vertex v1, p_vertex v2, t_plane p));
-static double intersect_line_line __PROTO((p_vertex v1, p_vertex v2, p_vertex w1, p_vertex w2));
-static int cover_point_poly __PROTO((p_vertex v1, p_vertex v2, double u, p_polygon poly));
-static long int store_polygon __PROTO((long int vnum1,
-				       polygon_direction direction,
-				       long int crvlen));
-static void color_edges __PROTO((long int new_edge, long int old_edge,
-				 long int new_poly, long int old_poly,
-				 int style_above, int style_below));
-static void build_networks __PROTO((struct surface_points * plots,
-				    int pcount));
-static int compare_edges_by_zmin __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
-static int compare_polys_by_zmax __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
-static void sort_edges_by_z __PROTO((void));
-static void sort_polys_by_z __PROTO((void));
-static TBOOLEAN get_plane __PROTO((p_polygon p, t_plane plane));
-static long split_line_at_ratio __PROTO((long int vnum1, long int vnum2, double w));
-static GP_INLINE double area2D __PROTO((p_vertex v1, p_vertex v2,
-					p_vertex v3));
-static void draw_vertex __PROTO((p_vertex v));
-static GP_INLINE void draw_edge __PROTO((p_edge e, p_vertex v1, p_vertex v2));
-static int in_front __PROTO((long int edgenum,
-			     long int vnum1, long int vnum2,
-			     long int *firstpoly));
+static long int store_vertex(struct coordinate *point,
+			      lp_style_type *lp_style, TBOOLEAN color_from_column);
+static long int make_edge(long int vnum1, long int vnum2,
+			   struct lp_style_type *lp,
+			   int style, int next);
+static long int store_edge(long int vnum1, edge_direction direction,
+			    long int crvlen, struct lp_style_type *lp,
+			    int style);
+static GP_INLINE double eval_plane_equation(t_plane p, p_vertex v);
+static GP_INLINE double intersect_line_plane(p_vertex v1, p_vertex v2, t_plane p);
+static double intersect_line_line(p_vertex v1, p_vertex v2, p_vertex w1, p_vertex w2);
+static int cover_point_poly(p_vertex v1, p_vertex v2, double u, p_polygon poly);
+static long int store_polygon(long int vnum1, polygon_direction direction, long int crvlen);
+static void color_edges(long int new_edge, long int old_edge,
+			long int new_poly, long int old_poly,
+			int style_above, int style_below);
+static void build_networks(struct surface_points * plots, int pcount);
+static int compare_edges_by_zmin(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2);
+static int compare_polys_by_zmax(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2);
+static void sort_edges_by_z(void);
+static void sort_polys_by_z(void);
+static TBOOLEAN get_plane(p_polygon p, t_plane plane);
+static long split_line_at_ratio(long int vnum1, long int vnum2, double w);
+static GP_INLINE double area2D(p_vertex v1, p_vertex v2, p_vertex v3);
+static void draw_vertex(p_vertex v);
+static GP_INLINE void draw_edge(p_edge e, p_vertex v1, p_vertex v2);
+static int in_front(long int edgenum, long int vnum1, long int vnum2, long int *firstpoly);
 
 
 /* Set the options for hidden3d. To be called from set.c, when the

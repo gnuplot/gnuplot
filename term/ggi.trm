@@ -79,22 +79,22 @@ static TBOOLEAN GGI_use_whm = 0;
 #   include <ggi/xmi.h>
 #endif
 
-static void GGI_line_colors __PROTO((void));
-TERM_PUBLIC void GGI_graphics __PROTO((void));
-TERM_PUBLIC void GGI_set_size __PROTO((void));
-TERM_PUBLIC void GGI_init __PROTO((void));
-TERM_PUBLIC void GGI_linetype __PROTO((int));
-TERM_PUBLIC void GGI_move __PROTO((unsigned int,unsigned int));
-TERM_PUBLIC void GGI_options __PROTO((void));
-TERM_PUBLIC void GGI_put_text __PROTO((unsigned int,unsigned int, const char*));
-TERM_PUBLIC void GGI_suspend __PROTO((void));
-TERM_PUBLIC void GGI_resume __PROTO((void));
-TERM_PUBLIC void GGI_fillbox __PROTO((int style, unsigned int x, unsigned int y,
-	unsigned int w, unsigned int h));
-TERM_PUBLIC void GGI_close __PROTO((void));
-TERM_PUBLIC void GGI_reset __PROTO((void));
-TERM_PUBLIC void GGI_text __PROTO((void));
-TERM_PUBLIC void GGI_vector __PROTO((unsigned int,unsigned int));
+static void GGI_line_colors(void);
+TERM_PUBLIC void GGI_graphics(void);
+TERM_PUBLIC void GGI_set_size(void);
+TERM_PUBLIC void GGI_init(void);
+TERM_PUBLIC void GGI_linetype(int);
+TERM_PUBLIC void GGI_move(unsigned int,unsigned int);
+TERM_PUBLIC void GGI_options(void);
+TERM_PUBLIC void GGI_put_text(unsigned int,unsigned int, const char*);
+TERM_PUBLIC void GGI_suspend(void);
+TERM_PUBLIC void GGI_resume(void);
+TERM_PUBLIC void GGI_fillbox(int style, unsigned int x, unsigned int y,
+				unsigned int w, unsigned int h);
+TERM_PUBLIC void GGI_close(void);
+TERM_PUBLIC void GGI_reset(void);
+TERM_PUBLIC void GGI_text(void);
+TERM_PUBLIC void GGI_vector(unsigned int,unsigned int);
 
 #ifdef USE_MOUSE
 
@@ -114,38 +114,38 @@ typedef struct {
 } GGI_vertex_t;
 
 TERM_PUBLIC long int GGI_SetTime(const struct timeval* current);
-TERM_PUBLIC int GGI_from_keysym __PROTO((uint32_t keysym));
-TERM_PUBLIC int GGI_from_button __PROTO((uint32_t button));
-TERM_PUBLIC int GGI_y __PROTO((int32_t y));
-TERM_PUBLIC int GGI_dispatch_event __PROTO((const ggi_event* event));
-TERM_PUBLIC int GGI_eventually_update_modifiers __PROTO((const ggi_event* event, const int add));
-TERM_PUBLIC int GGI_waitforinput __PROTO((int));
-TERM_PUBLIC void GGI_draw_ruler __PROTO((void));
-TERM_PUBLIC void GGI_clear_zoombox __PROTO((void));
-TERM_PUBLIC void GGI_draw_zoombox __PROTO((void));
-TERM_PUBLIC void GGI_set_ruler __PROTO((int, int));
-TERM_PUBLIC void GGI_set_cursor __PROTO((int, int, int));
-TERM_PUBLIC void GGI_save_frame_canvas __PROTO((void));
-TERM_PUBLIC void GGI_save_frame_stl __PROTO((void));
-TERM_PUBLIC void GGI_replot __PROTO((void));
-TERM_PUBLIC void GGI_clear __PROTO((const GGI_vertex_t* v, const int tag));
-TERM_PUBLIC void GGI_save_puts __PROTO((GGI_vertex_t* v, const int tag));
-TERM_PUBLIC void GGI_set_vertex __PROTO((GGI_vertex_t* v, const int x, const int y, const char* str, const int tag));
-TERM_PUBLIC void GGI_abort_zooming __PROTO((void));
-TERM_PUBLIC void GGI_put_tmptext __PROTO((int, const char str[]));
-TERM_PUBLIC void GGI_relative __PROTO((int r[2]));
-TERM_PUBLIC void GGI_clear_hline __PROTO((int x1, int x2, int y));
-TERM_PUBLIC void GGI_clear_vline __PROTO((int y1, int y2, int x));
-TERM_PUBLIC void GGI_draw_hline __PROTO((int x1, int x2, int y));
-TERM_PUBLIC void GGI_draw_vline __PROTO((int y1, int y2, int x));
-TERM_PUBLIC void GGI_set_clipboard __PROTO((const char[]));
+TERM_PUBLIC int GGI_from_keysym(uint32_t keysym);
+TERM_PUBLIC int GGI_from_button(uint32_t button);
+TERM_PUBLIC int GGI_y(int32_t y);
+TERM_PUBLIC int GGI_dispatch_event(const ggi_event* event);
+TERM_PUBLIC int GGI_eventually_update_modifiers(const ggi_event* event, const int add);
+TERM_PUBLIC int GGI_waitforinput(int);
+TERM_PUBLIC void GGI_draw_ruler(void);
+TERM_PUBLIC void GGI_clear_zoombox(void);
+TERM_PUBLIC void GGI_draw_zoombox(void);
+TERM_PUBLIC void GGI_set_ruler(int, int);
+TERM_PUBLIC void GGI_set_cursor(int, int, int);
+TERM_PUBLIC void GGI_save_frame_canvas(void);
+TERM_PUBLIC void GGI_save_frame_stl(void);
+TERM_PUBLIC void GGI_replot(void);
+TERM_PUBLIC void GGI_clear(const GGI_vertex_t* v, const int tag);
+TERM_PUBLIC void GGI_save_puts(GGI_vertex_t* v, const int tag);
+TERM_PUBLIC void GGI_set_vertex(GGI_vertex_t* v, const int x, const int y, const char* str, const int tag);
+TERM_PUBLIC void GGI_abort_zooming(void);
+TERM_PUBLIC void GGI_put_tmptext(int, const char str[]);
+TERM_PUBLIC void GGI_relative(int r[2]);
+TERM_PUBLIC void GGI_clear_hline(int x1, int x2, int y);
+TERM_PUBLIC void GGI_clear_vline(int y1, int y2, int x);
+TERM_PUBLIC void GGI_draw_hline(int x1, int x2, int y);
+TERM_PUBLIC void GGI_draw_vline(int y1, int y2, int x);
+TERM_PUBLIC void GGI_set_clipboard(const char[]);
 #endif /* USE_MOUSE */
 
-TERM_PUBLIC int GGI_make_palette __PROTO((t_sm_palette*));
-TERM_PUBLIC void GGI_previous_palette __PROTO((void));
-TERM_PUBLIC void GGI_set_color __PROTO((struct t_colorspec *colorspec));
+TERM_PUBLIC int GGI_make_palette(t_sm_palette*);
+TERM_PUBLIC void GGI_previous_palette(void);
+TERM_PUBLIC void GGI_set_color(struct t_colorspec *colorspec);
 #ifdef ENABLE_XMI
-TERM_PUBLIC void GGI_filled_polygon __PROTO((int, gpiPoint*));
+TERM_PUBLIC void GGI_filled_polygon(int, gpiPoint*);
 #endif
 
 #define GOT_GGI_PROTO

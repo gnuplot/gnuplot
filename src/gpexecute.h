@@ -58,15 +58,15 @@ extern int pausing;
 extern ULONG ppidGnu;
 
 /* forward declarations */
-void gp_post_shared_mem __PROTO((void));
-void gp_execute __PROTO((char *s));
+void gp_post_shared_mem(void);
+void gp_execute(char *s);
 
 #endif /* OS2_IPC */
 
 #ifdef PIPE_IPC
 
 extern int pipe_died;
-RETSIGTYPE pipe_died_handler __PROTO((int signum));
+RETSIGTYPE pipe_died_handler(int signum);
 
 #endif /* PIPE_IPC */
 
@@ -82,6 +82,6 @@ extern int buffered_output_pending;
 #endif /* PIPE_IPC || WIN_IPC */
 
 
-void gp_exec_event __PROTO((char type, int mx, int my, int par1, int par2, int winid));
+void gp_exec_event(char type, int mx, int my, int par1, int par2, int winid);
 
 #endif /* GPEXECUTE_H */

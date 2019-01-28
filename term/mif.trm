@@ -97,21 +97,21 @@ register_term(mif)
 
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void MIF_init __PROTO((void));
-TERM_PUBLIC void MIF_graphics __PROTO((void));
-TERM_PUBLIC void MIF_text __PROTO((void));
-TERM_PUBLIC void MIF_linetype __PROTO((int linetype));
-TERM_PUBLIC void MIF_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void MIF_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void MIF_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
-TERM_PUBLIC int MIF_text_angle __PROTO((int ang));
-TERM_PUBLIC void MIF_reset __PROTO((void));
-TERM_PUBLIC void MIF_options __PROTO((void));
-TERM_PUBLIC int MIF_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC void MIF_point __PROTO((unsigned int x, unsigned int y, int number));
-TERM_PUBLIC void MIF_boxfill __PROTO((int style, unsigned int x1, unsigned int y1,
-	    unsigned int width, unsigned int height));
-TERM_PUBLIC void MIF_filled_polygon __PROTO((int points, gpiPoint* corners));
+TERM_PUBLIC void MIF_init(void);
+TERM_PUBLIC void MIF_graphics(void);
+TERM_PUBLIC void MIF_text(void);
+TERM_PUBLIC void MIF_linetype(int linetype);
+TERM_PUBLIC void MIF_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void MIF_vector(unsigned int x, unsigned int y);
+TERM_PUBLIC void MIF_put_text(unsigned int x, unsigned int y, const char *str);
+TERM_PUBLIC int MIF_text_angle(int ang);
+TERM_PUBLIC void MIF_reset(void);
+TERM_PUBLIC void MIF_options(void);
+TERM_PUBLIC int MIF_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC void MIF_point(unsigned int x, unsigned int y, int number);
+TERM_PUBLIC void MIF_boxfill(int style, unsigned int x1, unsigned int y1,
+	    unsigned int width, unsigned int height);
+TERM_PUBLIC void MIF_filled_polygon(int points, gpiPoint* corners);
 
 /** Coordinates **/
 /* The cast to float is not necessary because we are dividing by a float */
@@ -127,12 +127,12 @@ TERM_PUBLIC void MIF_filled_polygon __PROTO((int points, gpiPoint* corners));
 #define MIF_XLAST (MIF_XMAX - 1)
 #define MIF_YLAST (MIF_YMAX - 1)
 
-static int insert_mif_line __PROTO((double fx, double fy));
-static int proc_group_id __PROTO((int group_id));
-static void free_mif_line __PROTO((void));
-static void put_mif_line __PROTO((void));
-static void MIF_set_font __PROTO((const char *));
-static void mif_put_point __PROTO((unsigned int x, unsigned int y, int np));
+static int insert_mif_line(double fx, double fy);
+static int proc_group_id(int group_id);
+static void free_mif_line(void);
+static void put_mif_line(void);
+static void MIF_set_font(const char *);
+static void mif_put_point(unsigned int x, unsigned int y, int np);
 
 #endif
 
@@ -239,8 +239,8 @@ static struct mpt *mif_point = &(mpt[1]);
 
 
 /** Declaration of routine/s for internal use **/
-static int insert_mif_line __PROTO((double fx, double fy));
-static int proc_group_id __PROTO((int group_id));
+static int insert_mif_line(double fx, double fy);
+static int proc_group_id(int group_id);
 
 enum MIF_id {
     MIF_MONOCHROME, MIF_COLOR, MIF_VECTORS, MIF_POLYLINE, MIF_HELP,

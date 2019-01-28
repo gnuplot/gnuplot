@@ -94,36 +94,36 @@ register_term(pcl5)
 #endif /* TERM_REGISTER */
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void HPGL_options __PROTO((void));
-TERM_PUBLIC void PCL_options __PROTO((void));
-TERM_PUBLIC void HPGL_init __PROTO((void));
-/* TERM_PUBLIC void HPGL2_init __PROTO((void)); */
-TERM_PUBLIC void PCL_init __PROTO((void));
-TERM_PUBLIC void HPGL_graphics __PROTO((void));
-TERM_PUBLIC void HPGL2_graphics __PROTO((void));
-TERM_PUBLIC void PCL_graphics __PROTO((void));
-TERM_PUBLIC void HPGL_text __PROTO((void));
-/* TERM_PUBLIC void HPGL2_text __PROTO((void)); */
-TERM_PUBLIC void PCL_text __PROTO((void));
-TERM_PUBLIC void HPGL_linetype __PROTO((int linetype));
-TERM_PUBLIC void HPGL2_linetype __PROTO((int linetype));
-TERM_PUBLIC void HPGL_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
-TERM_PUBLIC void HPGL2_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
-TERM_PUBLIC void HPGL_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void HPGL_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void HPGL2_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void HPGL2_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void HPGL2_encode __PROTO((int d));
-TERM_PUBLIC int HPGL_text_angle __PROTO((int ang));
-TERM_PUBLIC int HPGL2_text_angle __PROTO((int ang));
-TERM_PUBLIC void HPGL_reset __PROTO((void));
-/* TERM_PUBLIC void HPGL2_reset __PROTO((void)); */
-TERM_PUBLIC void PCL_reset __PROTO((void));
-TERM_PUBLIC int HPGL2_justify_text __PROTO((enum JUSTIFY just));
-TERM_PUBLIC int HPGL2_set_font __PROTO((const char *font));
-TERM_PUBLIC void HPGL2_point __PROTO((unsigned int x, unsigned int y, int number));
-TERM_PUBLIC void HPGL2_neg_point __PROTO((unsigned int x, unsigned int y, int number));
-TERM_PUBLIC void HPGL2_pointsize __PROTO((double size));
+TERM_PUBLIC void HPGL_options(void);
+TERM_PUBLIC void PCL_options(void);
+TERM_PUBLIC void HPGL_init(void);
+/* TERM_PUBLIC void HPGL2_init(void); */
+TERM_PUBLIC void PCL_init(void);
+TERM_PUBLIC void HPGL_graphics(void);
+TERM_PUBLIC void HPGL2_graphics(void);
+TERM_PUBLIC void PCL_graphics(void);
+TERM_PUBLIC void HPGL_text(void);
+/* TERM_PUBLIC void HPGL2_text(void); */
+TERM_PUBLIC void PCL_text(void);
+TERM_PUBLIC void HPGL_linetype(int linetype);
+TERM_PUBLIC void HPGL2_linetype(int linetype);
+TERM_PUBLIC void HPGL_put_text(unsigned int x, unsigned int y, const char *str);
+TERM_PUBLIC void HPGL2_put_text(unsigned int x, unsigned int y, const char *str);
+TERM_PUBLIC void HPGL_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void HPGL_vector(unsigned int x, unsigned int y);
+TERM_PUBLIC void HPGL2_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void HPGL2_vector(unsigned int x, unsigned int y);
+TERM_PUBLIC void HPGL2_encode(int d);
+TERM_PUBLIC int HPGL_text_angle(int ang);
+TERM_PUBLIC int HPGL2_text_angle(int ang);
+TERM_PUBLIC void HPGL_reset(void);
+/* TERM_PUBLIC void HPGL2_reset(void); */
+TERM_PUBLIC void PCL_reset(void);
+TERM_PUBLIC int HPGL2_justify_text(enum JUSTIFY just);
+TERM_PUBLIC int HPGL2_set_font(const char *font);
+TERM_PUBLIC void HPGL2_point(unsigned int x, unsigned int y, int number);
+TERM_PUBLIC void HPGL2_neg_point(unsigned int x, unsigned int y, int number);
+TERM_PUBLIC void HPGL2_pointsize(double size);
 TERM_PUBLIC void HPGL2_linewidth(double linewidth);
 TERM_PUBLIC void HPGL2_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height);
 TERM_PUBLIC void HPGL2_filled_polygon(int points, gpiPoint *corners);

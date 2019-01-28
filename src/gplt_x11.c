@@ -315,17 +315,17 @@ typedef struct plot_struct {
     int plot_number;
 } plot_struct;
 
-static plot_struct *Add_Plot_To_Linked_List __PROTO((int));
-static void Remove_Plot_From_Linked_List __PROTO((Window));
-static plot_struct *Find_Plot_In_Linked_List_By_Number __PROTO((int));
-static plot_struct *Find_Plot_In_Linked_List_By_Window __PROTO((Window));
-static plot_struct *Find_Plot_In_Linked_List_By_CMap __PROTO((cmap_t *));
+static plot_struct *Add_Plot_To_Linked_List(int);
+static void Remove_Plot_From_Linked_List(Window);
+static plot_struct *Find_Plot_In_Linked_List_By_Number(int);
+static plot_struct *Find_Plot_In_Linked_List_By_Window(Window);
+static plot_struct *Find_Plot_In_Linked_List_By_CMap(cmap_t *);
 
 static struct plot_struct *current_plot = NULL;
 static int most_recent_plot_number = 0;
 static struct plot_struct *plot_list_start = NULL;
 
-static void x11_setfill __PROTO((GC *gc, int style));
+static void x11_setfill(GC *gc, int style);
 
 /* information about window/plot to be removed */
 typedef struct plot_remove_struct {
@@ -334,18 +334,18 @@ typedef struct plot_remove_struct {
     int processed;
 } plot_remove_struct;
 
-static void Add_Plot_To_Remove_FIFO_Queue __PROTO((Window));
-static void Process_Remove_FIFO_Queue __PROTO((void));
+static void Add_Plot_To_Remove_FIFO_Queue(Window);
+static void Process_Remove_FIFO_Queue(void);
 
 static struct plot_remove_struct *remove_fifo_queue_start = NULL;
 static int process_remove_fifo_queue = 0;
 
-static cmap_t *Add_CMap_To_Linked_List __PROTO((void));
-static void Remove_CMap_From_Linked_List __PROTO((cmap_t *));
-static cmap_t *Find_CMap_In_Linked_List __PROTO((cmap_t *));
-static int cmaps_differ __PROTO((cmap_t *, cmap_t *));
+static cmap_t *Add_CMap_To_Linked_List(void);
+static void Remove_CMap_From_Linked_List(cmap_t *);
+static cmap_t *Find_CMap_In_Linked_List(cmap_t *);
+static int cmaps_differ(cmap_t *, cmap_t *);
 
-static void clear_used_font_list __PROTO((void));
+static void clear_used_font_list(void);
 
 /* current_cmap always points to a valid colormap.  At start up
  * it is the default colormap.  When a palette command comes
@@ -378,18 +378,18 @@ static char selection[SEL_LEN] = "";
 # define PIXMAP_HEIGHT(plot)  ((plot)->height)
 #endif
 
-static void CmapClear __PROTO((cmap_t *));
-static void RecolorWindow __PROTO((plot_struct *));
-static void FreeColormapList __PROTO((plot_struct *plot));
-static void FreeColors __PROTO((cmap_t *));
-static void ReleaseColormap __PROTO((cmap_t *));
-static unsigned long *ReallocColors __PROTO((cmap_t *, int));
-static void PaletteMake __PROTO((t_sm_palette *));
-static void PaletteSetColor __PROTO((plot_struct *, double));
-static int GetVisual __PROTO((int, Visual **, int *));
-static void scan_palette_from_buf __PROTO((void));
+static void CmapClear(cmap_t *);
+static void RecolorWindow(plot_struct *);
+static void FreeColormapList(plot_struct *plot);
+static void FreeColors(cmap_t *);
+static void ReleaseColormap(cmap_t *);
+static unsigned long *ReallocColors(cmap_t *, int);
+static void PaletteMake(t_sm_palette *);
+static void PaletteSetColor(plot_struct *, double);
+static int GetVisual(int, Visual **, int *);
+static void scan_palette_from_buf(void);
 
-static unsigned short BitMaskDetails __PROTO((unsigned long mask, unsigned short *left_shift, unsigned short *right_shift));
+static unsigned short BitMaskDetails(unsigned long mask, unsigned short *left_shift, unsigned short *right_shift);
 
 TBOOLEAN swap_endian = 0;  /* For binary data. */
 /* Petr's byte swapping routine. */
@@ -421,83 +421,82 @@ char byteswap_char;
     ((char *)x)[1] = ((char *)x)[2]; \
     ((char *)x)[2] = byteswap_char
 
-static void store_command __PROTO((char *, plot_struct *));
-static void prepare_plot __PROTO((plot_struct *));
-static void delete_plot __PROTO((plot_struct *));
+static void store_command(char *, plot_struct *);
+static void prepare_plot(plot_struct *);
+static void delete_plot(plot_struct *);
 
-static int record __PROTO((void));
-static void process_event __PROTO((XEvent *));	/* from Xserver */
-static void process_configure_notify_event __PROTO((XEvent *event, TBOOLEAN isRetry ));
+static int record(void);
+static void process_event(XEvent *);	/* from Xserver */
+static void process_configure_notify_event(XEvent *event, TBOOLEAN isRetry );
 
-static void mainloop __PROTO((void));
+static void mainloop(void);
 
-static void display __PROTO((plot_struct *));
-static void UpdateWindow __PROTO((plot_struct *));
+static void display(plot_struct *);
+static void UpdateWindow(plot_struct *);
 #ifdef USE_MOUSE
-static void gp_execute_GE_plotdone __PROTO((int windowid));
+static void gp_execute_GE_plotdone(int windowid);
 
-static int ErrorHandler __PROTO((Display *, XErrorEvent *));
-static void DrawRuler __PROTO((plot_struct *));
-static void EventuallyDrawMouseAddOns __PROTO((plot_struct *));
-static void DrawBox __PROTO((plot_struct *));
-static void DrawLineToRuler __PROTO((plot_struct *));
-static void AnnotatePoint __PROTO((plot_struct *, int, int, const char[], const char[]));
-static long int SetTime __PROTO((plot_struct *, Time));
-static unsigned long AllocateXorPixel __PROTO((cmap_t *));
-static void GetGCXor __PROTO((plot_struct *, GC *));
-static void GetGCXorDashed __PROTO((plot_struct *, GC *));
-static void EraseCoords __PROTO((plot_struct *));
-static void DrawCoords __PROTO((plot_struct *, const char *));
-static void DisplayCoords __PROTO((plot_struct *, const char *));
+static int ErrorHandler(Display *, XErrorEvent *);
+static void DrawRuler(plot_struct *);
+static void EventuallyDrawMouseAddOns(plot_struct *);
+static void DrawBox(plot_struct *);
+static void DrawLineToRuler(plot_struct *);
+static void AnnotatePoint(plot_struct *, int, int, const char[], const char[]);
+static long int SetTime(plot_struct *, Time);
+static unsigned long AllocateXorPixel(cmap_t *);
+static void GetGCXor(plot_struct *, GC *);
+static void GetGCXorDashed(plot_struct *, GC *);
+static void EraseCoords(plot_struct *);
+static void DrawCoords(plot_struct *, const char *);
+static void DisplayCoords(plot_struct *, const char *);
 
-static TBOOLEAN is_meta __PROTO((KeySym));
+static TBOOLEAN is_meta(KeySym);
 
 #ifndef DISABLE_SPACE_RAISES_CONSOLE
 static unsigned long gnuplotXID = 0; /* WINDOWID of gnuplot */
-static char* getMultiTabConsoleSwitchCommand __PROTO((unsigned long *));
+static char* getMultiTabConsoleSwitchCommand(unsigned long *);
 #endif /* DISABLE_SPACE_RAISES_CONSOLE */
 
-static void x11_initialize_key_boxes __PROTO((plot_struct *plot, int i));
-static void x11_initialize_hidden __PROTO((plot_struct *plot, int i));
-static void x11_update_key_box __PROTO((plot_struct *plot,  unsigned int x, unsigned int y ));
-static int x11_check_for_toggle __PROTO((plot_struct *plot, unsigned int x, unsigned int y));
+static void x11_initialize_key_boxes(plot_struct *plot, int i);
+static void x11_initialize_hidden(plot_struct *plot, int i);
+static void x11_update_key_box(plot_struct *plot,  unsigned int x, unsigned int y );
+static int x11_check_for_toggle(plot_struct *plot, unsigned int x, unsigned int y);
 
 #endif /* USE_MOUSE */
 
-static void DrawRotated __PROTO((plot_struct *, Display *, GC,
-				 int, int, const char *, int));
-static int DrawRotatedErrorHandler __PROTO((Display *, XErrorEvent *));
-static void exec_cmd __PROTO((plot_struct *, char *));
+static void DrawRotated(plot_struct *, Display *, GC, int, int, const char *, int);
+static int DrawRotatedErrorHandler(Display *, XErrorEvent *);
+static void exec_cmd(plot_struct *, char *);
 
-static void reset_cursor __PROTO((Window));
+static void reset_cursor(Window);
 
-static void preset __PROTO((int, char **));
-static char *pr_GetR __PROTO((XrmDatabase, char *));
-static void pr_color __PROTO((cmap_t *));
-static void pr_dashes __PROTO((void));
-static void pr_encoding __PROTO((void));
-static void pr_font __PROTO((char *));
-static void pr_geometry __PROTO((char *));
-static void pr_pointsize __PROTO((void));
-static void pr_width __PROTO((void));
-static void pr_window __PROTO((plot_struct *));
-static void pr_raise __PROTO((void));
-static void pr_replotonresize __PROTO((void));
-static void pr_persist __PROTO((void));
-static void pr_feedback __PROTO((void));
-static void pr_ctrlq __PROTO((void));
-static void pr_fastrotate __PROTO((void));
+static void preset(int, char **);
+static char *pr_GetR(XrmDatabase, char *);
+static void pr_color(cmap_t *);
+static void pr_dashes(void);
+static void pr_encoding(void);
+static void pr_font(char *);
+static void pr_geometry(char *);
+static void pr_pointsize(void);
+static void pr_width(void);
+static void pr_window(plot_struct *);
+static void pr_raise(void);
+static void pr_replotonresize(void);
+static void pr_persist(void);
+static void pr_feedback(void);
+static void pr_ctrlq(void);
+static void pr_fastrotate(void);
 
 #ifdef EXPORT_SELECTION
-static void export_graph __PROTO((plot_struct *));
-static void handle_selection_event __PROTO((XEvent *));
-static void pr_exportselection __PROTO((void));
+static void export_graph(plot_struct *);
+static void handle_selection_event(XEvent *);
+static void pr_exportselection(void);
 #endif
 
 #if defined(USE_MOUSE) && defined(MOUSE_ALL_WINDOWS)
-static void mouse_to_coords __PROTO((plot_struct *, XEvent *,
-			double *, double *, double *, double *));
-static double mouse_to_axis __PROTO((int, axis_scale_t *));
+static void mouse_to_coords(plot_struct *, XEvent *,
+			double *, double *, double *, double *);
+static double mouse_to_axis(int, axis_scale_t *);
 #endif
 
 static char *FallbackFont = "fixed";
@@ -507,17 +506,17 @@ static char *FallbackFontMBUTF = "mbfont:*-medium-r-normal--14-*-iso10646-1";
 # define FontSetSep ';'
 static int usemultibyte = 0;
 static int multibyte_fonts_usable=1;
-static int fontset_transsep __PROTO((char *, char *, int));
+static int fontset_transsep(char *, char *, int);
 #endif /* USE_X11_MULTIBYTE */
-static int gpXTextWidth __PROTO((XFontStruct *, const char *, int));
-static int gpXTextHeight __PROTO((XFontStruct *));
-static int gpXTextExtents __PROTO((XFontStruct *, char *, int, XCharStruct *));
-static void gpXSetFont __PROTO((Display *, GC, Font));
-static void gpXDrawImageString __PROTO((Display *, Drawable, GC, int, int, const char *, int));
-static void gpXDrawString __PROTO((Display *, Drawable, GC, int, int, const char *, int));
-static XFontStruct *gpXLoadQueryFont __PROTO((Display *, char *));
-static char *gpFallbackFont __PROTO((void));
-static int gpXGetFontascent __PROTO((XFontStruct *cfont));
+static int gpXTextWidth(XFontStruct *, const char *, int);
+static int gpXTextHeight(XFontStruct *);
+static int gpXTextExtents(XFontStruct *, char *, int, XCharStruct *);
+static void gpXSetFont(Display *, GC, Font);
+static void gpXDrawImageString(Display *, Drawable, GC, int, int, const char *, int);
+static void gpXDrawString(Display *, Drawable, GC, int, int, const char *, int);
+static XFontStruct *gpXLoadQueryFont(Display *, char *);
+static char *gpFallbackFont(void);
+static int gpXGetFontascent(XFontStruct *cfont);
 
 enum set_encoding_id encoding = S_ENC_DEFAULT; /* EAM - mirrored from core code by 'QE' */
 static char default_font[196] = { '\0' };
@@ -695,7 +694,7 @@ static int polyline_size = 0;
    display() */
 static TBOOLEAN currently_receiving_gr_image = FALSE;
 
-static void gpXStoreName __PROTO((Display *, Window, char *));
+static void gpXStoreName(Display *, Window, char *);
 
 /*
  * Main program
@@ -1206,7 +1205,7 @@ store_command(char *buffer, plot_struct *plot)
 
 #ifndef VMS
 
-static int read_input __PROTO((void));
+static int read_input(void);
 
 /*
  * Handle input.  Use read instead of fgets because stdio buffering
@@ -1262,7 +1261,7 @@ read_input()
     return partial_read;
 }
 
-static void read_input_line __PROTO((void));
+static void read_input_line(void);
 
 /*
  * Handle a whole input line, issuing an error message if a complete
@@ -4447,7 +4446,7 @@ reset_cursor(Window skip_window)
 */
 static int modifier_mask = 0;
 
-static void update_modifiers __PROTO((unsigned int));
+static void update_modifiers(unsigned int);
 
 static void
 update_modifiers(unsigned int state)

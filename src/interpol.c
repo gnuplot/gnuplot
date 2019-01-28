@@ -118,23 +118,23 @@
 typedef double spline_coeff[spline_coeff_size];
 typedef double five_diag[5];
 
-static int next_curve __PROTO((struct curve_points * plot, int *curve_start));
-static int num_curves __PROTO((struct curve_points * plot));
-static double eval_kdensity __PROTO((struct curve_points *cp,
-				   int first_point, int num_points, double x));
-static void do_kdensity __PROTO((struct curve_points *cp, int first_point,
-				 int num_points, struct coordinate *dest));
-static double *cp_binomial __PROTO((int points));
-static void eval_bezier __PROTO((struct curve_points * cp, int first_point,
-				 int num_points, double sr, coordval * px,
-				 coordval *py, double *c));
-static void do_bezier __PROTO((struct curve_points * cp, double *bc, int first_point, int num_points, struct coordinate * dest));
-static int solve_five_diag __PROTO((five_diag m[], double r[], double x[], int n));
-static spline_coeff *cp_approx_spline __PROTO((struct curve_points * plot, int first_point, int num_points));
-static spline_coeff *cp_tridiag __PROTO((struct curve_points * plot, int first_point, int num_points));
-static void do_cubic __PROTO((struct curve_points * plot, spline_coeff * sc, int first_point, int num_points, struct coordinate * dest));
-static void do_freq __PROTO((struct curve_points *plot,	int first_point, int num_points));
-static int compare_points __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
+static int next_curve(struct curve_points * plot, int *curve_start);
+static int num_curves(struct curve_points * plot);
+static double eval_kdensity(struct curve_points *cp,
+			   int first_point, int num_points, double x);
+static void do_kdensity(struct curve_points *cp, int first_point,
+			 int num_points, struct coordinate *dest);
+static double *cp_binomial(int points);
+static void eval_bezier(struct curve_points * cp, int first_point,
+			 int num_points, double sr, coordval * px,
+			 coordval *py, double *c);
+static void do_bezier(struct curve_points * cp, double *bc, int first_point, int num_points, struct coordinate * dest);
+static int solve_five_diag(five_diag m[], double r[], double x[], int n);
+static spline_coeff *cp_approx_spline(struct curve_points * plot, int first_point, int num_points);
+static spline_coeff *cp_tridiag(struct curve_points * plot, int first_point, int num_points);
+static void do_cubic(struct curve_points * plot, spline_coeff * sc, int first_point, int num_points, struct coordinate * dest);
+static void do_freq(struct curve_points *plot,	int first_point, int num_points);
+static int compare_points(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2);
 
 
 /*

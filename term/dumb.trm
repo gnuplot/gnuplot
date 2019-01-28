@@ -62,35 +62,33 @@ register_term(dumb_driver)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void DUMB_options __PROTO((void));
-TERM_PUBLIC void DUMB_init __PROTO((void));
-TERM_PUBLIC void DUMB_graphics __PROTO((void));
-TERM_PUBLIC void DUMB_text __PROTO((void));
-TERM_PUBLIC void DUMB_reset __PROTO((void));
-TERM_PUBLIC void DUMB_linetype __PROTO((int linetype));
-TERM_PUBLIC void DUMB_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void DUMB_point __PROTO((unsigned int x, unsigned int y,
-				     int point));
-TERM_PUBLIC void DUMB_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void DUMB_put_text __PROTO((unsigned int x, unsigned int y,
-					const char *str));
-TERM_PUBLIC void DUMB_arrow __PROTO((unsigned int sx, unsigned int sy,
-				     unsigned int ex, unsigned int ey,
-				     int head));
+TERM_PUBLIC void DUMB_options(void);
+TERM_PUBLIC void DUMB_init(void);
+TERM_PUBLIC void DUMB_graphics(void);
+TERM_PUBLIC void DUMB_text(void);
+TERM_PUBLIC void DUMB_reset(void);
+TERM_PUBLIC void DUMB_linetype(int linetype);
+TERM_PUBLIC void DUMB_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void DUMB_point(unsigned int x, unsigned int y, int point);
+TERM_PUBLIC void DUMB_vector(unsigned int x, unsigned int y);
+TERM_PUBLIC void DUMB_put_text(unsigned int x, unsigned int y, const char *str);
+TERM_PUBLIC void DUMB_arrow(unsigned int sx, unsigned int sy,
+			    unsigned int ex, unsigned int ey,
+			    int head);
 
 #ifndef NO_DUMB_ENHANCED_SUPPORT
 /* To support "set term dumb enhanced" (don't ask why!) */
-TERM_PUBLIC void ENHdumb_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
-TERM_PUBLIC void ENHdumb_OPEN __PROTO((char * fontname, double fontsize,
-	                            double base, TBOOLEAN widthflag, TBOOLEAN showflag,
-				    int overprint));
-TERM_PUBLIC void ENHdumb_FLUSH __PROTO((void));
+TERM_PUBLIC void ENHdumb_put_text(unsigned int x, unsigned int y, const char str[]);
+TERM_PUBLIC void ENHdumb_OPEN(char * fontname, double fontsize,
+	                      double base, TBOOLEAN widthflag, TBOOLEAN showflag,
+			      int overprint);
+TERM_PUBLIC void ENHdumb_FLUSH(void);
 #else
 #define ENHdumb_put_text NULL
 #endif
 #ifndef NO_DUMB_COLOR_SUPPORT
-TERM_PUBLIC int dumb_make_palette __PROTO((t_sm_palette *palette));
-TERM_PUBLIC void dumb_set_color __PROTO((t_colorspec *));
+TERM_PUBLIC int dumb_make_palette(t_sm_palette *palette);
+TERM_PUBLIC void dumb_set_color(t_colorspec *);
 #endif
 
 #define DUMB_XMAX 79
@@ -138,7 +136,7 @@ static int dumb_colormode = 0;
 
 #define DUMB_PIXEL(x,y) dumb_matrix[dumb_xmax*(y)+(x)]
 
-static void dumb_set_pixel __PROTO((int x, int y, int v));
+static void dumb_set_pixel(int x, int y, int v);
 
 enum DUMB_id { DUMB_FEED, DUMB_NOFEED, DUMB_ENH, DUMB_NOENH, 
                DUMB_SIZE, DUMB_ASPECT,

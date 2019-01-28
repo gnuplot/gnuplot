@@ -56,15 +56,15 @@ register_term(hp2648)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void HP2648init __PROTO((void));
-TERM_PUBLIC void HP2648graphics __PROTO((void));
-TERM_PUBLIC void HP2648text __PROTO((void));
-TERM_PUBLIC void HP2648linetype __PROTO((int linetype));
-TERM_PUBLIC void HP2648move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void HP2648vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void HP2648put_text __PROTO((unsigned int x, unsigned int y, const char *str));
-TERM_PUBLIC int HP2648_text_angle __PROTO((int ang));
-TERM_PUBLIC void HP2648reset __PROTO((void));
+TERM_PUBLIC void HP2648init(void);
+TERM_PUBLIC void HP2648graphics(void);
+TERM_PUBLIC void HP2648text(void);
+TERM_PUBLIC void HP2648linetype(int linetype);
+TERM_PUBLIC void HP2648move(unsigned int x, unsigned int y);
+TERM_PUBLIC void HP2648vector(unsigned int x, unsigned int y);
+TERM_PUBLIC void HP2648put_text(unsigned int x, unsigned int y, const char *str);
+TERM_PUBLIC int HP2648_text_angle(int ang);
+TERM_PUBLIC void HP2648reset(void);
 
 #define HP2648XMAX 720
 #define HP2648YMAX 360

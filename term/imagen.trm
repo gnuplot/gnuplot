@@ -65,17 +65,17 @@ register_term(imagen)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void IMAGEN_init __PROTO((void));
-TERM_PUBLIC void IMAGEN_graphics __PROTO((void));
-TERM_PUBLIC void IMAGEN_options __PROTO((void));
-TERM_PUBLIC void IMAGEN_text __PROTO((void));
-TERM_PUBLIC void IMAGEN_linetype __PROTO((int lt));
-TERM_PUBLIC void IMAGEN_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void IMAGEN_vector __PROTO((unsigned int ux, unsigned int uy));
-TERM_PUBLIC int IMAGEN_text_angle __PROTO((int ang));
-TERM_PUBLIC int IMAGEN_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC void IMAGEN_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
-TERM_PUBLIC void IMAGEN_reset __PROTO((void));
+TERM_PUBLIC void IMAGEN_init(void);
+TERM_PUBLIC void IMAGEN_graphics(void);
+TERM_PUBLIC void IMAGEN_options(void);
+TERM_PUBLIC void IMAGEN_text(void);
+TERM_PUBLIC void IMAGEN_linetype(int lt);
+TERM_PUBLIC void IMAGEN_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void IMAGEN_vector(unsigned int ux, unsigned int uy);
+TERM_PUBLIC int IMAGEN_text_angle(int ang);
+TERM_PUBLIC int IMAGEN_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC void IMAGEN_put_text(unsigned int x, unsigned int y, const char str[]);
+TERM_PUBLIC void IMAGEN_reset(void);
 #define IMAGEN_PTS_PER_INCH (300)
 #define IMAGEN_XMAX (IMAGEN_PTS_PER_INCH * 11)	/* 10.0 inches */
 #define IMAGEN_YMAX (IMAGEN_PTS_PER_INCH * 78 / 10)	/* 7.5 inches */
@@ -88,16 +88,16 @@ TERM_PUBLIC void IMAGEN_reset __PROTO((void));
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
 
-static void IM_page __PROTO((void));
-static void IMAGEN_draw_path __PROTO((void));
-static void IMAGEN_setpos __PROTO((int ux, int uy));
-static unsigned char *IMAGEN_cvts __PROTO((unsigned char *str, int *width, int *height));
-static void IMAGEN_putwd __PROTO((unsigned int w));
-static void IMAGEN_createfamily __PROTO((char *c, int sz));
-static void IMAGEN_setfont __PROTO((int sz));
-static void IMP_set_draw_pattern __PROTO((int pattern, int sz));
-static void IMAGEN_mapsinit __PROTO((void));
-static void IMAGEN_createmap __PROTO((int name, unsigned short *map));
+static void IM_page(void);
+static void IMAGEN_draw_path(void);
+static void IMAGEN_setpos(int ux, int uy);
+static unsigned char *IMAGEN_cvts(unsigned char *str, int *width, int *height);
+static void IMAGEN_putwd(unsigned int w);
+static void IMAGEN_createfamily(char *c, int sz);
+static void IMAGEN_setfont(int sz);
+static void IMP_set_draw_pattern(int pattern, int sz);
+static void IMAGEN_mapsinit(void);
+static void IMAGEN_createmap(int name, unsigned short *map);
 
 
 /*

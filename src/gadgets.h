@@ -540,27 +540,27 @@ extern int current_x11_windowid;
 /* Functions exported by gadgets.c */
 
 /* initialization (called once on program entry */
-void init_gadgets __PROTO((void));
+void init_gadgets(void);
 
 /* moved here from util3d: */
-int draw_clip_line __PROTO((int, int, int, int));
-void draw_clip_polygon __PROTO((int , gpiPoint *));
-void draw_clip_arrow __PROTO((double, double, double, double, t_arrow_head));
-void clip_polygon __PROTO((gpiPoint *, gpiPoint *, int , int *));
-int clip_point __PROTO((int, int));
+int draw_clip_line(int, int, int, int);
+void draw_clip_polygon(int , gpiPoint *);
+void draw_clip_arrow(double, double, double, double, t_arrow_head);
+void clip_polygon(gpiPoint *, gpiPoint *, int , int *);
+int clip_point(int, int);
 
 /* moved here from graph3d: */
-void clip_move __PROTO((int x, int y));
-void clip_vector __PROTO((int x, int y));
+void clip_move(int x, int y);
+void clip_vector(int x, int y);
 
-void draw_polar_clip_line __PROTO((double, double, double, double));
+void draw_polar_clip_line(double, double, double, double);
 
 /* Common routines for setting line or text color from t_colorspec */
-void apply_pm3dcolor __PROTO((struct t_colorspec *tc));
-void reset_textcolor __PROTO((const struct t_colorspec *tc));
+void apply_pm3dcolor(struct t_colorspec *tc);
+void reset_textcolor(const struct t_colorspec *tc);
 
 /* Timestamp code shared by 2D and 3D */
-void do_timelabel __PROTO((int x, int y));
+void do_timelabel(int x, int y);
 
 extern fill_style_type default_fillstyle;
 
@@ -647,13 +647,13 @@ extern histogram_style histogram_opts;
 #define NUM_TEXTBOX_STYLES 4
 extern textbox_style textbox_opts[NUM_TEXTBOX_STYLES];
 
-void default_arrow_style __PROTO((struct arrow_style_type *arrow));
-void apply_head_properties __PROTO((struct arrow_style_type *arrow_properties));
+void default_arrow_style(struct arrow_style_type *arrow);
+void apply_head_properties(struct arrow_style_type *arrow_properties);
 
-void free_labels __PROTO((struct text_label *tl));
+void free_labels(struct text_label *tl);
 
-void get_offsets __PROTO((struct text_label *this_label, int *htic, int *vtic));
-void write_label __PROTO((int x, int y, struct text_label *label));
-int label_width __PROTO((const char *, int *));
+void get_offsets(struct text_label *this_label, int *htic, int *vtic);
+void write_label(int x, int y, struct text_label *label);
+int label_width(const char *, int *);
 
 #endif /* GNUPLOT_GADGETS_H */

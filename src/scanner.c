@@ -38,8 +38,8 @@
 
 int curly_brace_count;
 
-static int get_num __PROTO((char str[]));
-static void substitute __PROTO((char **strp, size_t *str_lenp, int current));
+static int get_num(char str[]);
+static void substitute(char **strp, size_t *str_lenp, int current);
 
 #ifdef VMS
 #include <descrip.h>

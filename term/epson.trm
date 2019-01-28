@@ -84,10 +84,10 @@ register_term(dpu414)
 
 #ifdef TERM_PROTO
 
-TERM_PUBLIC void EPSON_reset __PROTO((void));
+TERM_PUBLIC void EPSON_reset(void);
 
 #if defined(EPS180) || defined(EPS60) || defined(EPSONP) || defined(TANDY60) || defined(OKIDATA)
-TERM_PUBLIC void EPSON_init __PROTO((void));
+TERM_PUBLIC void EPSON_init(void);
 
 #if defined(EPS60) || defined(EPSONP) || defined(TANDY60) || defined(OKIDATA)
 #define EPSONVCHAR		FNT5X9_VCHAR
@@ -98,15 +98,15 @@ TERM_PUBLIC void EPSON_init __PROTO((void));
 #ifdef EPSONP
 #define EPSONXMAX	512
 #define EPSONYMAX	384
-TERM_PUBLIC void EPSON_graphics __PROTO((void));
-TERM_PUBLIC void EPSON_text __PROTO((void));
+TERM_PUBLIC void EPSON_graphics(void);
+TERM_PUBLIC void EPSON_text(void);
 #endif /* EPSONP */
 #endif /* four drivers */
 #endif /* all five */
 
 #ifdef EPS180
-TERM_PUBLIC void EPS180_graphics __PROTO((void));
-TERM_PUBLIC void EPS180_text __PROTO((void));
+TERM_PUBLIC void EPS180_graphics(void);
+TERM_PUBLIC void EPS180_text(void);
 #define EPSON180VCHAR		FNT13X25_VCHAR
 #define EPSON180HCHAR		FNT13X25_HCHAR
 #define EPSON180VTIC		18
@@ -120,24 +120,24 @@ TERM_PUBLIC void EPS180_text __PROTO((void));
 /* make the total dimensions 8 inches by 5 inches */
 #define EPS60XMAX	480
 #define EPS60YMAX	360
-TERM_PUBLIC void EPS60_graphics __PROTO((void));
+TERM_PUBLIC void EPS60_graphics(void);
 #ifdef TANDY60
-TERM_PUBLIC void TANDY60_text __PROTO((void));
+TERM_PUBLIC void TANDY60_text(void);
 #endif /* TANDY60 */
 #ifdef OKIDATA
-TERM_PUBLIC void OKIDATA_text __PROTO((void));
+TERM_PUBLIC void OKIDATA_text(void);
 #endif /* OKIDATA */
 #ifdef EPS60
-TERM_PUBLIC void EPS60_text __PROTO((void));
+TERM_PUBLIC void EPS60_text(void);
 #endif /* EPS60 */
 #endif /* all three */
 
 #ifdef NEC
-TERM_PUBLIC void NEC_options __PROTO((void));
-TERM_PUBLIC void NEC_init __PROTO((void));
-TERM_PUBLIC void NEC_graphics __PROTO((void));
-TERM_PUBLIC void NEC_text __PROTO((void));
-TERM_PUBLIC void NEC_linetype __PROTO((int linetype));
+TERM_PUBLIC void NEC_options(void);
+TERM_PUBLIC void NEC_init(void);
+TERM_PUBLIC void NEC_graphics(void);
+TERM_PUBLIC void NEC_text(void);
+TERM_PUBLIC void NEC_linetype(int linetype);
 #define NECXMAX	400
 #define NECYMAX	320
 #define NECVCHAR		FNT5X9_VCHAR
@@ -147,10 +147,10 @@ TERM_PUBLIC void NEC_linetype __PROTO((int linetype));
 #endif /* NEC */
 
 #ifdef STARC
-TERM_PUBLIC void STARC_init __PROTO((void));
-TERM_PUBLIC void STARC_graphics __PROTO((void));
-TERM_PUBLIC void STARC_text __PROTO((void));
-TERM_PUBLIC void STARC_linetype __PROTO((int linetype));
+TERM_PUBLIC void STARC_init(void);
+TERM_PUBLIC void STARC_graphics(void);
+TERM_PUBLIC void STARC_text(void);
+TERM_PUBLIC void STARC_linetype(int linetype);
 #define STARCXMAX	512
 #define STARCYMAX	384
 #define STARCVCHAR		FNT5X9_VCHAR
@@ -160,11 +160,11 @@ TERM_PUBLIC void STARC_linetype __PROTO((int linetype));
 #endif /* STARC */
 
 #ifdef DPU414
-TERM_PUBLIC void DPU414_options __PROTO((void));
-TERM_PUBLIC void DPU414_init __PROTO((void));
-TERM_PUBLIC void DPU414_graphics __PROTO((void));
-TERM_PUBLIC void DPU414_text __PROTO((void));
-TERM_PUBLIC void DPU414_setfont __PROTO((void));
+TERM_PUBLIC void DPU414_options(void);
+TERM_PUBLIC void DPU414_init(void);
+TERM_PUBLIC void DPU414_graphics(void);
+TERM_PUBLIC void DPU414_text(void);
+TERM_PUBLIC void DPU414_setfont(void);
 #define DPU414XMAX	(640)
 #define DPU414YMAX	(480)
 #define DPU414VCHAR	FNT5X9_VCHAR
@@ -196,7 +196,7 @@ EPSON_reset()
 /* On PC, print using 'copy file /b lpt1:', do NOT use 'print' */
 /* EPSON_init changes gpoutfile to binary mode on PC's */
 
-static void epson_dump __PROTO((void));
+static void epson_dump(void);
 
 #define EPSONXLAST (EPSONXMAX - 1)
 #define EPSONYLAST (EPSONYMAX - 1)
@@ -257,8 +257,8 @@ epson_dump()
 
 #ifdef NEC
 
-static void nec_dump __PROTO((void));
-static void nec_draft_dump __PROTO((void));
+static void nec_dump(void);
+static void nec_draft_dump(void);
 
 #define NECXLAST (NECXMAX - 1)
 #define NECYLAST (NECYMAX - 1)
@@ -477,7 +477,7 @@ nec_draft_dump()
 /* On PC, print using 'copy file /b lpt1:', do NOT use 'print' */
 /* STARC_init changes gpoutfile to binary mode on PC's */
 
-static void STARC_dump __PROTO((void));
+static void STARC_dump(void);
 
 #define STARCXLAST (STARCXMAX - 1)
 #define STARCYLAST (STARCYMAX - 1)
@@ -557,7 +557,7 @@ STARC_dump()
 
 #ifdef EPS180
 
-static void eps180_dump __PROTO((void));
+static void eps180_dump(void);
 
 #define EPS180XLAST (EPS180XMAX - 1)
 #define EPS180YLAST (EPS180YMAX - 1)
@@ -611,7 +611,7 @@ eps180_dump()
 
 #ifdef EPS60
 
-static void eps60_dump __PROTO((void));
+static void eps60_dump(void);
 
 #define EPS60XLAST (EPS60XMAX - 1)
 #define EPS60YLAST (EPS60YMAX - 1)
@@ -687,7 +687,7 @@ TANDY60_text()
 
 #ifdef OKIDATA
 
-static void okidata_dump __PROTO((void));
+static void okidata_dump(void);
 
 TERM_PUBLIC void
 OKIDATA_text()
@@ -766,7 +766,7 @@ okidata_dump()
 
 #ifdef DPU414
 
-static void DPU414_dump __PROTO((void));
+static void DPU414_dump(void);
 
 static int DPU414_font = 2; /* medium font */
 static int DPU414_quality = 1; /* normal */

@@ -80,6 +80,6 @@ extern char termdoc_filename[];
 #ifndef DOCS_TERMDOC_MAIN
 extern
 #endif
-       char *get_line __PROTO((char *, int, FILE *));
+       char *get_line(char *, int, FILE *);
 
 #endif /* DOCS_DOC2X_H */

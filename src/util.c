@@ -80,9 +80,9 @@ int debug = 0;
 
 /* internal prototypes */
 
-static void mant_exp __PROTO((double, double, TBOOLEAN, double *, int *, const char *));
-static void parse_sq __PROTO((char *));
-static char *utf8_strchrn __PROTO((const char *s, int N));
+static void mant_exp(double, double, TBOOLEAN, double *, int *, const char *);
+static void parse_sq(char *);
+static char *utf8_strchrn(const char *s, int N);
 static char *num_to_str(double r);
 
 /*

@@ -67,43 +67,43 @@ t_iterator * set_iterator = NULL;
 
 /* Internal prototypes: */
 
-static void convert __PROTO((struct value *, int));
-static void extend_at __PROTO((void));
-static union argument *add_action __PROTO((enum operators sf_index));
-static void parse_expression __PROTO((void));
-static void accept_logical_OR_expression __PROTO((void));
-static void accept_logical_AND_expression __PROTO((void));
-static void accept_inclusive_OR_expression __PROTO((void));
-static void accept_exclusive_OR_expression __PROTO((void));
-static void accept_AND_expression __PROTO((void));
-static void accept_equality_expression __PROTO((void));
-static void accept_relational_expression __PROTO((void));
-static void accept_bitshift_expression __PROTO((void));
-static void accept_additive_expression __PROTO((void));
-static void accept_multiplicative_expression __PROTO((void));
-static void parse_primary_expression __PROTO((void));
-static void parse_conditional_expression __PROTO((void));
-static void parse_logical_OR_expression __PROTO((void));
-static void parse_logical_AND_expression __PROTO((void));
-static void parse_inclusive_OR_expression __PROTO((void));
-static void parse_exclusive_OR_expression __PROTO((void));
-static void parse_AND_expression __PROTO((void));
-static void parse_equality_expression __PROTO((void));
-static void parse_relational_expression __PROTO((void));
-static void parse_bitshift_expression __PROTO((void));
-static void parse_additive_expression __PROTO((void));
-static void parse_multiplicative_expression __PROTO((void));
-static void parse_unary_expression __PROTO((void));
-static void parse_sum_expression __PROTO((void));
-static int  parse_assignment_expression __PROTO((void));
-static int  parse_array_assignment_expression __PROTO((void));
-static int is_builtin_function __PROTO((int t_num));
+static void convert(struct value *, int);
+static void extend_at(void);
+static union argument *add_action(enum operators sf_index);
+static void parse_expression(void);
+static void accept_logical_OR_expression(void);
+static void accept_logical_AND_expression(void);
+static void accept_inclusive_OR_expression(void);
+static void accept_exclusive_OR_expression(void);
+static void accept_AND_expression(void);
+static void accept_equality_expression(void);
+static void accept_relational_expression(void);
+static void accept_bitshift_expression(void);
+static void accept_additive_expression(void);
+static void accept_multiplicative_expression(void);
+static void parse_primary_expression(void);
+static void parse_conditional_expression(void);
+static void parse_logical_OR_expression(void);
+static void parse_logical_AND_expression(void);
+static void parse_inclusive_OR_expression(void);
+static void parse_exclusive_OR_expression(void);
+static void parse_AND_expression(void);
+static void parse_equality_expression(void);
+static void parse_relational_expression(void);
+static void parse_bitshift_expression(void);
+static void parse_additive_expression(void);
+static void parse_multiplicative_expression(void);
+static void parse_unary_expression(void);
+static void parse_sum_expression(void);
+static int  parse_assignment_expression(void);
+static int  parse_array_assignment_expression(void);
+static int is_builtin_function(int t_num);
 
-static void set_up_columnheader_parsing __PROTO((struct at_entry *previous ));
+static void set_up_columnheader_parsing(struct at_entry *previous );
 
-static TBOOLEAN no_iteration __PROTO((t_iterator *));
-static void reevaluate_iteration_limits __PROTO((t_iterator *iter));
-static void reset_iteration __PROTO((t_iterator *iter));
+static TBOOLEAN no_iteration(t_iterator *);
+static void reevaluate_iteration_limits(t_iterator *iter);
+static void reset_iteration(t_iterator *iter);
 
 /* Internal variables: */
 

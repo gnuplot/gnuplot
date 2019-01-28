@@ -42,8 +42,8 @@ register_term (wxt)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void wxt_options __PROTO ((void));
-TERM_PUBLIC void wxt_text_wrapper __PROTO ((void));
+TERM_PUBLIC void wxt_options(void);
+TERM_PUBLIC void wxt_text_wrapper(void);
 #endif /* TERM_PROTO */
 
 #ifndef TERM_PROTO_ONLY

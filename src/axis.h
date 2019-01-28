@@ -457,78 +457,78 @@ do {									\
 #define CheckZero(x,tic) (fabs(x) < ((tic) * SIGNIF) ? 0.0 : (x))
 
 /* Function pointer type for callback functions to generate ticmarks */
-typedef void (*tic_callback) __PROTO((struct axis *, double, char *, int, 
-				struct lp_style_type, struct ticmark *));
+typedef void (*tic_callback) (struct axis *, double, char *, int, 
+			struct lp_style_type, struct ticmark *);
 
 /* ------------ functions exported by axis.c */
-coord_type store_and_update_range __PROTO((double *store, double curval, coord_type *type,
-				struct axis *axis, TBOOLEAN noautoscale));
-t_autoscale load_range __PROTO((struct axis *, double *, double *, t_autoscale));
-void check_log_limits __PROTO((struct axis *, double, double));
-void axis_invert_if_requested __PROTO((struct axis *));
-void axis_check_range __PROTO((AXIS_INDEX));
-void axis_init __PROTO((AXIS *this_axis, TBOOLEAN infinite));
-void set_explicit_range __PROTO((struct axis *axis, double newmin, double newmax));
-double axis_log_value_checked __PROTO((AXIS_INDEX, double, const char *));
-void axis_checked_extend_empty_range __PROTO((AXIS_INDEX, const char *mesg));
-void axis_check_empty_nonlinear __PROTO((struct axis *this_axis));
-char * copy_or_invent_formatstring __PROTO((struct axis *));
-double quantize_normal_tics __PROTO((double, int));
-void setup_tics __PROTO((struct axis *, int));
-void gen_tics __PROTO((struct axis *, tic_callback));
-void axis_output_tics __PROTO((AXIS_INDEX, int *, AXIS_INDEX, tic_callback));
-void axis_set_scale_and_range __PROTO((struct axis *axis, int lower, int upper));
-void axis_draw_2d_zeroaxis __PROTO((AXIS_INDEX, AXIS_INDEX));
-TBOOLEAN some_grid_selected __PROTO((void));
-void add_tic_user __PROTO((struct axis *, char *, double, int));
-double get_num_or_time __PROTO((struct axis *));
-TBOOLEAN bad_axis_range __PROTO((struct axis *axis));
+coord_type store_and_update_range(double *store, double curval, coord_type *type,
+				struct axis *axis, TBOOLEAN noautoscale);
+t_autoscale load_range(struct axis *, double *, double *, t_autoscale);
+void check_log_limits(struct axis *, double, double);
+void axis_invert_if_requested(struct axis *);
+void axis_check_range(AXIS_INDEX);
+void axis_init(AXIS *this_axis, TBOOLEAN infinite);
+void set_explicit_range(struct axis *axis, double newmin, double newmax);
+double axis_log_value_checked(AXIS_INDEX, double, const char *);
+void axis_checked_extend_empty_range(AXIS_INDEX, const char *mesg);
+void axis_check_empty_nonlinear(struct axis *this_axis);
+char * copy_or_invent_formatstring(struct axis *);
+double quantize_normal_tics(double, int);
+void setup_tics(struct axis *, int);
+void gen_tics(struct axis *, tic_callback);
+void axis_output_tics(AXIS_INDEX, int *, AXIS_INDEX, tic_callback);
+void axis_set_scale_and_range(struct axis *axis, int lower, int upper);
+void axis_draw_2d_zeroaxis(AXIS_INDEX, AXIS_INDEX);
+TBOOLEAN some_grid_selected(void);
+void add_tic_user(struct axis *, char *, double, int);
+double get_num_or_time(struct axis *);
+TBOOLEAN bad_axis_range(struct axis *axis);
 
-void save_writeback_all_axes __PROTO((void));
-int  parse_range __PROTO((AXIS_INDEX axis));
-void parse_skip_range __PROTO((void));
-void check_axis_reversed __PROTO((AXIS_INDEX axis));
+void save_writeback_all_axes(void);
+int  parse_range(AXIS_INDEX axis);
+void parse_skip_range(void);
+void check_axis_reversed(AXIS_INDEX axis);
 
 /* set widest_tic_label: length of the longest tics label */
-void widest_tic_callback __PROTO((struct axis *, double place, char *text, int ticlevel,
-			struct lp_style_type grid, struct ticmark *));
+void widest_tic_callback(struct axis *, double place, char *text, int ticlevel,
+			struct lp_style_type grid, struct ticmark *);
 
-void get_position __PROTO((struct position *pos));
-void get_position_default __PROTO((struct position *pos, enum position_type default_type, int ndim));
+void get_position(struct position *pos);
+void get_position_default(struct position *pos, enum position_type default_type, int ndim);
 
-void gstrdms __PROTO((char *label, char *format, double value));
+void gstrdms(char *label, char *format, double value);
 
-void clone_linked_axes __PROTO((AXIS *axis1, AXIS *axis2));
-AXIS *get_shadow_axis __PROTO((AXIS *axis));
-void extend_primary_ticrange __PROTO((AXIS *axis));
-void update_primary_axis_range __PROTO((struct axis *secondary));
-void update_secondary_axis_range __PROTO((struct axis *primary));
-void reconcile_linked_axes __PROTO((AXIS *primary, AXIS *secondary));
+void clone_linked_axes(AXIS *axis1, AXIS *axis2);
+AXIS *get_shadow_axis(AXIS *axis);
+void extend_primary_ticrange(AXIS *axis);
+void update_primary_axis_range(struct axis *secondary);
+void update_secondary_axis_range(struct axis *primary);
+void reconcile_linked_axes(AXIS *primary, AXIS *secondary);
 
-int map_x __PROTO((double value));
-int map_y __PROTO((double value));
+int map_x(double value);
+int map_y(double value);
 
-double map_x_double __PROTO((double value));
-double map_y_double __PROTO((double value));
+double map_x_double(double value);
+double map_y_double(double value);
 
-coord_type polar_to_xy __PROTO(( double theta, double r, double *x, double *y, TBOOLEAN update));
-double polar_radius __PROTO((double r));
+coord_type polar_to_xy( double theta, double r, double *x, double *y, TBOOLEAN update);
+double polar_radius(double r);
 
-void set_cbminmax __PROTO((void));
+void set_cbminmax(void);
 
-void save_autoscaled_ranges __PROTO((AXIS *, AXIS *));
-void restore_autoscaled_ranges __PROTO((AXIS *, AXIS *));
+void save_autoscaled_ranges(AXIS *, AXIS *);
+void restore_autoscaled_ranges(AXIS *, AXIS *);
 
-char * axis_name __PROTO((AXIS_INDEX));
-void init_sample_range __PROTO((AXIS *axis, enum PLOT_TYPE plot_type));
-void init_parallel_axis __PROTO((AXIS *, AXIS_INDEX));
-AXIS * extend_parallel_axis __PROTO((int ));
+char * axis_name(AXIS_INDEX);
+void init_sample_range(AXIS *axis, enum PLOT_TYPE plot_type);
+void init_parallel_axis(AXIS *, AXIS_INDEX);
+AXIS * extend_parallel_axis(int );
 
 /* Evaluate the function linking a secondary axis to its primary axis */
-double eval_link_function __PROTO((AXIS *, double));
+double eval_link_function(AXIS *, double);
 
 /* For debugging */
-void dump_axis_range __PROTO((AXIS *axis));
+void dump_axis_range(AXIS *axis);
 
 /* macro for tic scale, used in all tic_callback functions */
 #define tic_scale(ticlevel, axis) \

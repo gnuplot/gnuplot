@@ -163,99 +163,99 @@ static const int NO_KEY = -1;
 static TBOOLEAN trap_release = FALSE;
 
 /* forward declarations */
-static void alert __PROTO((void));
-static void MousePosToGraphPosReal __PROTO((int xx, int yy, double *x, double *y, double *x2, double *y2));
-static char *xy_format __PROTO((void));
-static char *zoombox_format __PROTO((void));
-static char *GetAnnotateString __PROTO((char *s, double x, double y, int mode, char *fmt));
-static char *xDateTimeFormat __PROTO((double x, char *b, int mode));
-static void GetRulerString __PROTO((char *p, double x, double y));
-static void apply_zoom __PROTO((struct t_zoom * z));
-static void do_zoom __PROTO((double xmin, double ymin, double x2min,
-			     double y2min, double xmax, double ymax, double x2max, double y2max));
-static void ZoomNext __PROTO((void));
-static void ZoomPrevious __PROTO((void));
-static void ZoomUnzoom __PROTO((void));
-static void incr_mousemode __PROTO((const int amount));
-static void UpdateStatuslineWithMouseSetting __PROTO((mouse_setting_t * ms));
+static void alert(void);
+static void MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double *y2);
+static char *xy_format(void);
+static char *zoombox_format(void);
+static char *GetAnnotateString(char *s, double x, double y, int mode, char *fmt);
+static char *xDateTimeFormat(double x, char *b, int mode);
+static void GetRulerString(char *p, double x, double y);
+static void apply_zoom(struct t_zoom * z);
+static void do_zoom(double xmin, double ymin, double x2min,
+		    double y2min, double xmax, double ymax, double x2max, double y2max);
+static void ZoomNext(void);
+static void ZoomPrevious(void);
+static void ZoomUnzoom(void);
+static void incr_mousemode(const int amount);
+static void UpdateStatuslineWithMouseSetting(mouse_setting_t * ms);
 
-static bind_t * get_binding __PROTO((struct gp_event_t * ge, TBOOLEAN current));
-static void event_keypress __PROTO((struct gp_event_t * ge, TBOOLEAN current));
-static void ChangeView __PROTO((int x, int z));
-static void ChangeAzimuth __PROTO((int x));
-static void event_buttonpress __PROTO((struct gp_event_t * ge));
-static void event_buttonrelease __PROTO((struct gp_event_t * ge));
-static void event_motion __PROTO((struct gp_event_t * ge));
-static void event_modifier __PROTO((struct gp_event_t * ge));
-static void do_save_3dplot __PROTO((struct surface_points *, int, REPLOT_TYPE));
-static void load_mouse_variables __PROTO((double, double, TBOOLEAN, int));
+static bind_t * get_binding(struct gp_event_t * ge, TBOOLEAN current);
+static void event_keypress(struct gp_event_t * ge, TBOOLEAN current);
+static void ChangeView(int x, int z);
+static void ChangeAzimuth(int x);
+static void event_buttonpress(struct gp_event_t * ge);
+static void event_buttonrelease(struct gp_event_t * ge);
+static void event_motion(struct gp_event_t * ge);
+static void event_modifier(struct gp_event_t * ge);
+static void do_save_3dplot(struct surface_points *, int, REPLOT_TYPE);
+static void load_mouse_variables(double, double, TBOOLEAN, int);
 
-static void do_zoom_in_around_mouse __PROTO((void));
-static void do_zoom_out_around_mouse __PROTO((void));
-static void do_zoom_in_X __PROTO((void));
-static void do_zoom_out_X __PROTO((void));
-static void do_zoom_scroll_up __PROTO((void));
-static void do_zoom_scroll_down __PROTO((void));
-static void do_zoom_scroll_left __PROTO((void));
-static void do_zoom_scroll_right __PROTO((void));
+static void do_zoom_in_around_mouse(void);
+static void do_zoom_out_around_mouse(void);
+static void do_zoom_in_X(void);
+static void do_zoom_out_X(void);
+static void do_zoom_scroll_up(void);
+static void do_zoom_scroll_down(void);
+static void do_zoom_scroll_left(void);
+static void do_zoom_scroll_right(void);
 
 /* builtins */
-static char *builtin_autoscale __PROTO((struct gp_event_t * ge));
-static char *builtin_toggle_border __PROTO((struct gp_event_t * ge));
-static char *builtin_replot __PROTO((struct gp_event_t * ge));
-static char *builtin_toggle_grid __PROTO((struct gp_event_t * ge));
-static char *builtin_help __PROTO((struct gp_event_t * ge));
-static char *builtin_set_plots_visible __PROTO((struct gp_event_t * ge));
-static char *builtin_set_plots_invisible __PROTO((struct gp_event_t * ge));
-static char *builtin_invert_plot_visibilities __PROTO((struct gp_event_t * ge));
-static char *builtin_toggle_log __PROTO((struct gp_event_t * ge));
-static char *builtin_nearest_log __PROTO((struct gp_event_t * ge));
-static char *builtin_toggle_mouse __PROTO((struct gp_event_t * ge));
-static char *builtin_toggle_ruler __PROTO((struct gp_event_t * ge));
-static char *builtin_decrement_mousemode __PROTO((struct gp_event_t * ge));
-static char *builtin_increment_mousemode __PROTO((struct gp_event_t * ge));
-static char *builtin_toggle_polardistance __PROTO((struct gp_event_t * ge));
-static char *builtin_toggle_verbose __PROTO((struct gp_event_t * ge));
-static char *builtin_toggle_ratio __PROTO((struct gp_event_t * ge));
-static char *builtin_zoom_next __PROTO((struct gp_event_t * ge));
-static char *builtin_zoom_previous __PROTO((struct gp_event_t * ge));
-static char *builtin_unzoom __PROTO((struct gp_event_t * ge));
-static char *builtin_rotate_right __PROTO((struct gp_event_t * ge));
-static char *builtin_rotate_up __PROTO((struct gp_event_t * ge));
-static char *builtin_rotate_left __PROTO((struct gp_event_t * ge));
-static char *builtin_rotate_down __PROTO((struct gp_event_t * ge));
-static char *builtin_azimuth_left __PROTO((struct gp_event_t * ge));
-static char *builtin_azimuth_right __PROTO((struct gp_event_t * ge));
-static char *builtin_cancel_zoom __PROTO((struct gp_event_t * ge));
-static char *builtin_zoom_in_around_mouse __PROTO((struct gp_event_t * ge));
-static char *builtin_zoom_out_around_mouse __PROTO((struct gp_event_t * ge));
+static char *builtin_autoscale(struct gp_event_t * ge);
+static char *builtin_toggle_border(struct gp_event_t * ge);
+static char *builtin_replot(struct gp_event_t * ge);
+static char *builtin_toggle_grid(struct gp_event_t * ge);
+static char *builtin_help(struct gp_event_t * ge);
+static char *builtin_set_plots_visible(struct gp_event_t * ge);
+static char *builtin_set_plots_invisible(struct gp_event_t * ge);
+static char *builtin_invert_plot_visibilities(struct gp_event_t * ge);
+static char *builtin_toggle_log(struct gp_event_t * ge);
+static char *builtin_nearest_log(struct gp_event_t * ge);
+static char *builtin_toggle_mouse(struct gp_event_t * ge);
+static char *builtin_toggle_ruler(struct gp_event_t * ge);
+static char *builtin_decrement_mousemode(struct gp_event_t * ge);
+static char *builtin_increment_mousemode(struct gp_event_t * ge);
+static char *builtin_toggle_polardistance(struct gp_event_t * ge);
+static char *builtin_toggle_verbose(struct gp_event_t * ge);
+static char *builtin_toggle_ratio(struct gp_event_t * ge);
+static char *builtin_zoom_next(struct gp_event_t * ge);
+static char *builtin_zoom_previous(struct gp_event_t * ge);
+static char *builtin_unzoom(struct gp_event_t * ge);
+static char *builtin_rotate_right(struct gp_event_t * ge);
+static char *builtin_rotate_up(struct gp_event_t * ge);
+static char *builtin_rotate_left(struct gp_event_t * ge);
+static char *builtin_rotate_down(struct gp_event_t * ge);
+static char *builtin_azimuth_left(struct gp_event_t * ge);
+static char *builtin_azimuth_right(struct gp_event_t * ge);
+static char *builtin_cancel_zoom(struct gp_event_t * ge);
+static char *builtin_zoom_in_around_mouse(struct gp_event_t * ge);
+static char *builtin_zoom_out_around_mouse(struct gp_event_t * ge);
 #if (0)	/* Not currently used */
-static char *builtin_zoom_scroll_left __PROTO((struct gp_event_t * ge));
-static char *builtin_zoom_scroll_right __PROTO((struct gp_event_t * ge));
-static char *builtin_zoom_scroll_up __PROTO((struct gp_event_t * ge));
-static char *builtin_zoom_scroll_down __PROTO((struct gp_event_t * ge));
-static char *builtin_zoom_in_X __PROTO((struct gp_event_t * ge));
-static char *builtin_zoom_out_X __PROTO((struct gp_event_t * ge));
+static char *builtin_zoom_scroll_left(struct gp_event_t * ge);
+static char *builtin_zoom_scroll_right(struct gp_event_t * ge);
+static char *builtin_zoom_scroll_up(struct gp_event_t * ge);
+static char *builtin_zoom_scroll_down(struct gp_event_t * ge);
+static char *builtin_zoom_in_X(struct gp_event_t * ge);
+static char *builtin_zoom_out_X(struct gp_event_t * ge);
 #endif
 
 /* prototypes for bind stuff
  * which are used only here. */
-static void bind_install_default_bindings __PROTO((void));
-static void bind_clear __PROTO((bind_t * b));
-static int lookup_key __PROTO((char *ptr, int *len));
-static int bind_scan_lhs __PROTO((bind_t * out, const char *in));
-static char *bind_fmt_lhs __PROTO((const bind_t * in));
-static int bind_matches __PROTO((const bind_t * a, const bind_t * b));
-static void bind_display_one __PROTO((bind_t * ptr));
-static void bind_display __PROTO((char *lhs));
-static void bind_all __PROTO((char *lhs));
-static void bind_remove __PROTO((bind_t * b));
-static void bind_append __PROTO((char *lhs, char *rhs, char *(*builtin) (struct gp_event_t * ge)));
-static void recalc_ruler_pos __PROTO((void));
-static void turn_ruler_off __PROTO((void));
-static int nearest_label_tag __PROTO((int x, int y));
-static void remove_label __PROTO((int x, int y));
-static void put_label __PROTO((char *label, double x, double y));
+static void bind_install_default_bindings(void);
+static void bind_clear(bind_t * b);
+static int lookup_key(char *ptr, int *len);
+static int bind_scan_lhs(bind_t * out, const char *in);
+static char *bind_fmt_lhs(const bind_t * in);
+static int bind_matches(const bind_t * a, const bind_t * b);
+static void bind_display_one(bind_t * ptr);
+static void bind_display(char *lhs);
+static void bind_all(char *lhs);
+static void bind_remove(bind_t * b);
+static void bind_append(char *lhs, char *rhs, char *(*builtin) (struct gp_event_t * ge));
+static void recalc_ruler_pos(void);
+static void turn_ruler_off(void);
+static int nearest_label_tag(int x, int y);
+static void remove_label(int x, int y);
+static void put_label(char *label, double x, double y);
 
 /********* functions ********************************************/
 
@@ -283,7 +283,7 @@ alert()
  * prototype (joze) */
 /* HBB 20001109: *BUT* if a prototype is there, this one may easily
  * conflict with it... */
-char *stpcpy __PROTO((char *s, const char *p));
+char *stpcpy(char *s, const char *p);
 
 # ifndef HAVE_STPCPY
 /* handy function for composing strings; note: some platforms may
@@ -3071,7 +3071,7 @@ put_label(char *label, double x, double y)
    menu items in the Presentation Manager terminal
 */
 void
-PM_set_gpPMmenu __PROTO((struct t_gpPMmenu * gpPMmenu))
+PM_set_gpPMmenu(struct t_gpPMmenu * gpPMmenu)
 {
     gpPMmenu->use_mouse = mouse_setting.on;
     if (zoom_now == NULL)

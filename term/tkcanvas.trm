@@ -102,13 +102,13 @@ register_term(tkcanvas)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void TK_options __PROTO((void));
-TERM_PUBLIC void TK_init __PROTO((void));
-TERM_PUBLIC void TK_graphics __PROTO((void));
-TERM_PUBLIC void TK_text __PROTO((void));
-TERM_PUBLIC void TK_linetype __PROTO((int linetype));
-TERM_PUBLIC void TK_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void TK_vector __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void TK_options(void);
+TERM_PUBLIC void TK_init(void);
+TERM_PUBLIC void TK_graphics(void);
+TERM_PUBLIC void TK_text(void);
+TERM_PUBLIC void TK_linetype(int linetype);
+TERM_PUBLIC void TK_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void TK_vector(unsigned int x, unsigned int y);
 TERM_PUBLIC int  TK_text_angle(int ang);
 TERM_PUBLIC void TK_put_text(unsigned int x, unsigned int y, const char *str);
 TERM_PUBLIC void TK_reset(void);

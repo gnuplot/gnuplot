@@ -5,6 +5,6 @@
 
 #include "syscfg.h"
 
-void statsrequest __PROTO((void));
+void statsrequest(void);
 
 #endif /* GNUPLOT_STAT_H */

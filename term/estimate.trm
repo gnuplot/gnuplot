@@ -19,11 +19,10 @@
 #include "driver.h"
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void ENHest_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
-TERM_PUBLIC void ENHest_OPEN __PROTO((char * fontname, double fontsize,
-	                            double base, TBOOLEAN widthflag, TBOOLEAN showflag,
-				    int overprint));
-TERM_PUBLIC void ENHest_FLUSH __PROTO((void));
+TERM_PUBLIC void ENHest_put_text(unsigned int x, unsigned int y, const char str[]);
+TERM_PUBLIC void ENHest_OPEN(char * fontname, double fontsize, double base,
+				TBOOLEAN widthflag, TBOOLEAN showflag, int overprint);
+TERM_PUBLIC void ENHest_FLUSH(void);
 #endif /* TERM_PROTO */
 
 #ifdef TERM_BODY
@@ -46,7 +45,7 @@ static TBOOLEAN ENHest_widthflag = TRUE;
 static double ENHest_base;
 
 /* Internal routines for UTF-8 support */
-static size_t strwidth_utf8 __PROTO((const char *s));
+static size_t strwidth_utf8(const char *s);
 
 TERM_PUBLIC void
 ENHest_OPEN(

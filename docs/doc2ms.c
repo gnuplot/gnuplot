@@ -64,13 +64,13 @@
 
 #define LINE_SKIP		3
 
-void init __PROTO((FILE *, char *));
-void convert __PROTO((FILE *, FILE *));
-void process_line __PROTO((char *, FILE *));
-void section __PROTO((char *, FILE *));
-void putms __PROTO((char *, FILE *));
-void putms_verb __PROTO((char *, FILE *));
-void finish __PROTO((FILE *));
+void init(FILE *, char *);
+void convert(FILE *, FILE *);
+void process_line(char *, FILE *);
+void section(char *, FILE *);
+void putms(char *, FILE *);
+void putms_verb(char *, FILE *);
+void finish(FILE *);
 
 static TBOOLEAN intable = FALSE;
 

@@ -105,104 +105,104 @@ extern char HelpFile[];         /* patch for do_help  - AP */
 /* input data, parsing variables */
 extern int num_tokens, c_token;
 
-void raise_lower_command __PROTO((int));
-void raise_command __PROTO((void));
-void lower_command __PROTO((void));
+void raise_lower_command(int);
+void raise_command(void);
+void lower_command(void);
 #ifdef OS2
-extern void pm_raise_terminal_window __PROTO((void));
-extern void pm_lower_terminal_window __PROTO((void));
+extern void pm_raise_terminal_window(void);
+extern void pm_lower_terminal_window(void);
 #endif
 #ifdef X11
-extern void x11_raise_terminal_window __PROTO((int));
-extern void x11_raise_terminal_group __PROTO((void));
-extern void x11_lower_terminal_window __PROTO((int));
-extern void x11_lower_terminal_group __PROTO((void));
+extern void x11_raise_terminal_window(int);
+extern void x11_raise_terminal_group(void);
+extern void x11_lower_terminal_window(int);
+extern void x11_lower_terminal_group(void);
 #endif
 #ifdef _WIN32
-extern void win_raise_terminal_window __PROTO((int));
-extern void win_raise_terminal_group __PROTO((void));
-extern void win_lower_terminal_window __PROTO((int));
-extern void win_lower_terminal_group __PROTO((void));
+extern void win_raise_terminal_window(int);
+extern void win_raise_terminal_group(void);
+extern void win_lower_terminal_window(int);
+extern void win_lower_terminal_group(void);
 #endif
 #ifdef WXWIDGETS
-extern void wxt_raise_terminal_window __PROTO((int));
-extern void wxt_raise_terminal_group __PROTO((void));
-extern void wxt_lower_terminal_window __PROTO((int));
-extern void wxt_lower_terminal_group __PROTO((void));
+extern void wxt_raise_terminal_window(int);
+extern void wxt_raise_terminal_group(void);
+extern void wxt_lower_terminal_window(int);
+extern void wxt_lower_terminal_group(void);
 #endif
-extern void string_expand_macros __PROTO((void));
+extern void string_expand_macros(void);
 
 #ifdef USE_MOUSE
-void bind_command __PROTO((void));
-void restore_prompt __PROTO((void));
+void bind_command(void);
+void restore_prompt(void);
 #else
 #define bind_command()
 #endif
-void array_command __PROTO((void));
-void break_command __PROTO((void));
-void call_command __PROTO((void));
-void changedir_command __PROTO((void));
-void clear_command __PROTO((void));
-void continue_command __PROTO((void));
-void eval_command __PROTO((void));
-void exit_command __PROTO((void));
-void help_command __PROTO((void));
-void history_command __PROTO((void));
-void do_command __PROTO((void));
-void if_command __PROTO((void));
-void else_command __PROTO((void));
-void import_command __PROTO((void));
-void invalid_command __PROTO((void));
-void link_command __PROTO((void));
-void load_command __PROTO((void));
-void begin_clause __PROTO((void));
-void clause_reset_after_error __PROTO((void));
-void end_clause __PROTO((void));
-void null_command __PROTO((void));
-void pause_command __PROTO((void));
-void plot_command __PROTO((void));
-void print_command __PROTO((void));
-void printerr_command __PROTO((void));
-void pwd_command __PROTO((void));
-void refresh_request __PROTO((void));
-void refresh_command __PROTO((void));
-void replot_command __PROTO((void));
-void reread_command __PROTO((void));
-void save_command __PROTO((void));
-void screendump_command __PROTO((void));
-void splot_command __PROTO((void));
-void stats_command __PROTO((void));
-void system_command __PROTO((void));
-void test_command __PROTO((void));
-void toggle_command __PROTO((void));
-void update_command __PROTO((void));
-void do_shell __PROTO((void));
-void undefine_command __PROTO((void));
-void while_command __PROTO((void));
+void array_command(void);
+void break_command(void);
+void call_command(void);
+void changedir_command(void);
+void clear_command(void);
+void continue_command(void);
+void eval_command(void);
+void exit_command(void);
+void help_command(void);
+void history_command(void);
+void do_command(void);
+void if_command(void);
+void else_command(void);
+void import_command(void);
+void invalid_command(void);
+void link_command(void);
+void load_command(void);
+void begin_clause(void);
+void clause_reset_after_error(void);
+void end_clause(void);
+void null_command(void);
+void pause_command(void);
+void plot_command(void);
+void print_command(void);
+void printerr_command(void);
+void pwd_command(void);
+void refresh_request(void);
+void refresh_command(void);
+void replot_command(void);
+void reread_command(void);
+void save_command(void);
+void screendump_command(void);
+void splot_command(void);
+void stats_command(void);
+void system_command(void);
+void test_command(void);
+void toggle_command(void);
+void update_command(void);
+void do_shell(void);
+void undefine_command(void);
+void while_command(void);
 
 /* Prototypes for functions exported by command.c */
-void extend_input_line __PROTO((void));
-void extend_token_table __PROTO((void));
-int com_line __PROTO((void));
-int do_line __PROTO((void));
-void do_string __PROTO((const char* s));
-void do_string_and_free __PROTO((char* s));
-TBOOLEAN iteration_early_exit __PROTO((void));
+void extend_input_line(void);
+void extend_token_table(void);
+int com_line(void);
+int do_line(void);
+void do_string(const char* s);
+void do_string_and_free(char* s);
+TBOOLEAN iteration_early_exit(void);
 #ifdef USE_MOUSE
-void toggle_display_of_ipc_commands __PROTO((void));
-int display_ipc_commands __PROTO((void));
-void do_string_replot __PROTO((const char* s));
+void toggle_display_of_ipc_commands(void);
+int display_ipc_commands(void);
+void do_string_replot(const char* s);
 #endif
 #ifdef VMS                     /* HBB 990829: used only on VMS */
-void done __PROTO((int status));
+void done(int status);
 #endif
-void define __PROTO((void));
+void define(void);
 
-void replotrequest __PROTO((void)); /* used in command.c & mouse.c */
+void replotrequest(void); /* used in command.c & mouse.c */
 
-void print_set_output __PROTO((char *, TBOOLEAN, TBOOLEAN)); /* set print output file */
-char *print_show_output __PROTO((void)); /* show print output file */
+void print_set_output(char *, TBOOLEAN, TBOOLEAN); /* set print output file */
+char *print_show_output(void); /* show print output file */
 
-int do_system_func __PROTO((const char *cmd, char **output));
+int do_system_func(const char *cmd, char **output);
 
 #endif /* GNUPLOT_COMMAND_H */

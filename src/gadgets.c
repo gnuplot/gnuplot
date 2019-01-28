@@ -154,7 +154,7 @@ TBOOLEAN clip_lines2 = FALSE;
 TBOOLEAN clip_points = FALSE;
 TBOOLEAN clip_radial = FALSE;
 
-static int clip_line __PROTO((int *, int *, int *, int *));
+static int clip_line(int *, int *, int *, int *);
 
 /* set samples */
 int samples_1 = SAMPLES;

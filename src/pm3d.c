@@ -60,20 +60,20 @@ static quadrangle* quadrangles = (quadrangle*)0;
 
 /* Internal prototypes for this module */
 static TBOOLEAN plot_has_palette;
-static double geomean4 __PROTO((double, double, double, double));
-static double harmean4 __PROTO((double, double, double, double));
-static double median4 __PROTO((double, double, double, double));
-static double rms4 __PROTO((double, double, double, double));
-static void pm3d_plot __PROTO((struct surface_points *, int));
-static void pm3d_option_at_error __PROTO((void));
-static void pm3d_rearrange_part __PROTO((struct iso_curve *, const int, struct iso_curve ***, int *));
-static int apply_lighting_model __PROTO(( struct coordinate *, struct coordinate *, struct coordinate *, struct coordinate *, double gray ));
-static void illuminate_one_quadrangle __PROTO(( quadrangle *q ));
+static double geomean4(double, double, double, double);
+static double harmean4(double, double, double, double);
+static double median4(double, double, double, double);
+static double rms4(double, double, double, double);
+static void pm3d_plot(struct surface_points *, int);
+static void pm3d_option_at_error(void);
+static void pm3d_rearrange_part(struct iso_curve *, const int, struct iso_curve ***, int *);
+static int apply_lighting_model( struct coordinate *, struct coordinate *, struct coordinate *, struct coordinate *, double gray );
+static void illuminate_one_quadrangle( quadrangle *q );
 
-static void filled_quadrangle __PROTO((gpdPoint *corners, int fillstyle));
-static void ifilled_quadrangle __PROTO((gpiPoint *corners));
+static void filled_quadrangle(gpdPoint *corners, int fillstyle);
+static void ifilled_quadrangle(gpiPoint *corners);
 
-static int pm3d_side __PROTO(( struct coordinate *p0, struct coordinate *p1, struct coordinate *p2));
+static int pm3d_side( struct coordinate *p0, struct coordinate *p1, struct coordinate *p2);
 
 static TBOOLEAN color_from_rgbvar = FALSE;
 static double light[3];

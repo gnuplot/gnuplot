@@ -94,10 +94,10 @@ unsigned int b_angle;		/* rotation of text */
 int b_maskcount = 0;
 
 /* Local prototypes */
-static void b_putc __PROTO((unsigned int, unsigned int, int, unsigned int));
-static GP_INLINE void b_setpixel __PROTO((unsigned int x, unsigned int y, unsigned int value));
-static GP_INLINE void b_setmaskpixel __PROTO((unsigned int x, unsigned int y, unsigned int value));
-static void b_line __PROTO((unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2));
+static void b_putc(unsigned int, unsigned int, int, unsigned int);
+static GP_INLINE void b_setpixel(unsigned int x, unsigned int y, unsigned int value);
+static GP_INLINE void b_setmaskpixel(unsigned int x, unsigned int y, unsigned int value);
+static void b_line(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2);
 
 /* file-scope variables */
 

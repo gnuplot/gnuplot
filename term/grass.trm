@@ -61,19 +61,19 @@ register_term(grass)
 
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void GRASS_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void GRASS_options __PROTO((void));
-TERM_PUBLIC void GRASS_init __PROTO((void));
-TERM_PUBLIC void GRASS_reset __PROTO((void));
-TERM_PUBLIC void GRASS_graphics __PROTO((void));
-TERM_PUBLIC void GRASS_text __PROTO((void));
-TERM_PUBLIC void GRASS_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void GRASS_linetype __PROTO((int lt));
-TERM_PUBLIC void GRASS_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
-TERM_PUBLIC int GRASS_text_angle __PROTO((int ang));
-TERM_PUBLIC int GRASS_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC void GRASS_point __PROTO((unsigned int x, unsigned int y, int point));
-TERM_PUBLIC int GRASS_set_font __PROTO((const char *font));
+TERM_PUBLIC void GRASS_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void GRASS_options(void);
+TERM_PUBLIC void GRASS_init(void);
+TERM_PUBLIC void GRASS_reset(void);
+TERM_PUBLIC void GRASS_graphics(void);
+TERM_PUBLIC void GRASS_text(void);
+TERM_PUBLIC void GRASS_vector(unsigned int x, unsigned int y);
+TERM_PUBLIC void GRASS_linetype(int lt);
+TERM_PUBLIC void GRASS_put_text(unsigned int x, unsigned int y, const char *str);
+TERM_PUBLIC int GRASS_text_angle(int ang);
+TERM_PUBLIC int GRASS_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC void GRASS_point(unsigned int x, unsigned int y, int point);
+TERM_PUBLIC int GRASS_set_font(const char *font);
 #endif /* TERM_PROTO */
 
 #ifndef TERM_PROTO_ONLY
@@ -104,19 +104,19 @@ TERM_PUBLIC int GRASS_set_font __PROTO((const char *font));
 #define TYPE_FITRIANGLE 9
 #define TYPE_FOCTO 10
 
-static void cont_abs __PROTO((int x, int y));
-static void draw_points_dot __PROTO((int x, int y));
-static void draw_points_diamond __PROTO((int x, int y));
-static void draw_points_box __PROTO((int x, int y));
-static void draw_points_fbox __PROTO((int x, int y));
-static void draw_points_itriangle __PROTO((int x, int y));
-static void draw_points_fitriangle __PROTO((int x, int y));
-static void draw_points_triangle __PROTO((int x, int y));
-static void draw_points_ftriangle __PROTO((int x, int y));
-static void draw_points_plus __PROTO((int x, int y));
-static void draw_points_octo __PROTO((int x, int y));
-static void draw_points_focto __PROTO((int x, int y));
-static void draw_points_x __PROTO((int x, int y));
+static void cont_abs(int x, int y);
+static void draw_points_dot(int x, int y);
+static void draw_points_diamond(int x, int y);
+static void draw_points_box(int x, int y);
+static void draw_points_fbox(int x, int y);
+static void draw_points_itriangle(int x, int y);
+static void draw_points_fitriangle(int x, int y);
+static void draw_points_triangle(int x, int y);
+static void draw_points_ftriangle(int x, int y);
+static void draw_points_plus(int x, int y);
+static void draw_points_octo(int x, int y);
+static void draw_points_focto(int x, int y);
+static void draw_points_x(int x, int y);
 
 static int R__curx, R__cury;
 

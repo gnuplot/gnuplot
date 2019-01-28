@@ -72,7 +72,7 @@ GP_MATHERR( STRUCT_EXCEPTION_P_X )
 }
 #endif
 
-static enum DATA_TYPES sprintf_specifier __PROTO((const char *format));
+static enum DATA_TYPES sprintf_specifier(const char *format);
 
 #define BADINT_DEFAULT int_error(NO_CARET, "error: bit shift applied to non-INT");
 #define BAD_TYPE(type) int_error(NO_CARET, (type==NOTDEFINED) ? "uninitialized user variable" : "internal error : type neither INT nor CMPLX");

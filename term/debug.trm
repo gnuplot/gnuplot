@@ -58,29 +58,29 @@ register_term(debug)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void DEBUG_init __PROTO((void));
-TERM_PUBLIC void DEBUG_graphics __PROTO((void));
-TERM_PUBLIC void DEBUG_text __PROTO((void));
-TERM_PUBLIC void DEBUG_linetype __PROTO((int linetype));
-TERM_PUBLIC void DEBUG_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void DEBUG_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void DEBUG_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
-TERM_PUBLIC void DEBUG_reset __PROTO((void));
-TERM_PUBLIC int DEBUG_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC int DEBUG_text_angle __PROTO((int ang));
-TERM_PUBLIC void DEBUG_point __PROTO((unsigned int x, unsigned int y, int pointstyle));
-TERM_PUBLIC void DEBUG_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
-TERM_PUBLIC int DEBUG_set_font __PROTO((const char *font));
-TERM_PUBLIC void DEBUG_pointsize __PROTO((double pointsize));
-TERM_PUBLIC void DEBUG_suspend __PROTO((void));
-TERM_PUBLIC void DEBUG_resume __PROTO((void));
-TERM_PUBLIC void DEBUG_fillbox __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height));
-TERM_PUBLIC void DEBUG_linewidth __PROTO((double linewidth));
-TERM_PUBLIC void DEBUG_filled_polygon __PROTO((int, gpiPoint *));
-TERM_PUBLIC void DEBUG_set_color __PROTO((t_colorspec *));
-TERM_PUBLIC void DEBUG_layer __PROTO((t_termlayer syncpoint));
-TERM_PUBLIC void DEBUG_path __PROTO((int p));
-TERM_PUBLIC void DEBUG_image __PROTO((unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecolor color_mode));
+TERM_PUBLIC void DEBUG_init(void);
+TERM_PUBLIC void DEBUG_graphics(void);
+TERM_PUBLIC void DEBUG_text(void);
+TERM_PUBLIC void DEBUG_linetype(int linetype);
+TERM_PUBLIC void DEBUG_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void DEBUG_vector(unsigned int x, unsigned int y);
+TERM_PUBLIC void DEBUG_put_text(unsigned int x, unsigned int y, const char *str);
+TERM_PUBLIC void DEBUG_reset(void);
+TERM_PUBLIC int DEBUG_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC int DEBUG_text_angle(int ang);
+TERM_PUBLIC void DEBUG_point(unsigned int x, unsigned int y, int pointstyle);
+TERM_PUBLIC void DEBUG_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head);
+TERM_PUBLIC int DEBUG_set_font(const char *font);
+TERM_PUBLIC void DEBUG_pointsize(double pointsize);
+TERM_PUBLIC void DEBUG_suspend(void);
+TERM_PUBLIC void DEBUG_resume(void);
+TERM_PUBLIC void DEBUG_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height);
+TERM_PUBLIC void DEBUG_linewidth(double linewidth);
+TERM_PUBLIC void DEBUG_filled_polygon(int, gpiPoint *);
+TERM_PUBLIC void DEBUG_set_color(t_colorspec *);
+TERM_PUBLIC void DEBUG_layer(t_termlayer syncpoint);
+TERM_PUBLIC void DEBUG_path(int p);
+TERM_PUBLIC void DEBUG_image(unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecolor color_mode);
 
 
 #define DEBUG_XMAX 512

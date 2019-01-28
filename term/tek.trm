@@ -140,63 +140,63 @@ register_term(bitgraph)
 #endif /* TERM_REGISTER */
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void TEK40init __PROTO((void));
-TERM_PUBLIC void TEK40graphics __PROTO((void));
-TERM_PUBLIC void TEK40text __PROTO((void));
-TERM_PUBLIC void TEK40move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void TEK40vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void TEK40put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
-TERM_PUBLIC void TEK40reset __PROTO((void));
+TERM_PUBLIC void TEK40init(void);
+TERM_PUBLIC void TEK40graphics(void);
+TERM_PUBLIC void TEK40text(void);
+TERM_PUBLIC void TEK40move(unsigned int x, unsigned int y);
+TERM_PUBLIC void TEK40vector(unsigned int x, unsigned int y);
+TERM_PUBLIC void TEK40put_text(unsigned int x, unsigned int y, const char str[]);
+TERM_PUBLIC void TEK40reset(void);
 #ifdef BITGRAPH
-TERM_PUBLIC void BG_text __PROTO((void));
-TERM_PUBLIC void BG_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
+TERM_PUBLIC void BG_text(void);
+TERM_PUBLIC void BG_put_text(unsigned int x, unsigned int y, const char str[]);
 #endif
 #if defined(SELANAR) || defined(BITGRAPH)
-TERM_PUBLIC void TEK40linetype __PROTO((int linetype));
+TERM_PUBLIC void TEK40linetype(int linetype);
 #endif
 #ifdef KERMIT
-TERM_PUBLIC void KTEK40graphics __PROTO((void));
-TERM_PUBLIC void KTEK40Ctext __PROTO((void));
-TERM_PUBLIC void KTEK40Clinetype __PROTO((int linetype));
-TERM_PUBLIC void KTEK40Mlinetype __PROTO((int linetype));
-TERM_PUBLIC void KTEK40reset __PROTO((void));
+TERM_PUBLIC void KTEK40graphics(void);
+TERM_PUBLIC void KTEK40Ctext(void);
+TERM_PUBLIC void KTEK40Clinetype(int linetype);
+TERM_PUBLIC void KTEK40Mlinetype(int linetype);
+TERM_PUBLIC void KTEK40reset(void);
 #endif
 #ifdef SELANAR
-TERM_PUBLIC void SEL_init __PROTO((void));
-TERM_PUBLIC void SEL_graphics __PROTO((void));
-TERM_PUBLIC void SEL_text __PROTO((void));
-TERM_PUBLIC void SEL_reset __PROTO((void));
+TERM_PUBLIC void SEL_init(void);
+TERM_PUBLIC void SEL_graphics(void);
+TERM_PUBLIC void SEL_text(void);
+TERM_PUBLIC void SEL_reset(void);
 #endif
 #ifdef SIXEL
-TERM_PUBLIC void SIXEL_options __PROTO((void));
-TERM_PUBLIC void SIXEL_init __PROTO((void));
-TERM_PUBLIC void SIXEL_reset __PROTO((void));
-TERM_PUBLIC void SIXEL_text __PROTO((void));
-TERM_PUBLIC void SIXEL_setfont __PROTO((void));
-TERM_PUBLIC void SIXEL_graphics __PROTO((void));
-TERM_PUBLIC void SIXEL_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void SIXEL_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void SIXEL_linetype __PROTO((int linetype));
-TERM_PUBLIC void SIXEL_dashtype __PROTO((int type, t_dashtype *custom_dash_type));
-TERM_PUBLIC void SIXEL_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
-TERM_PUBLIC int SIXEL_text_angle __PROTO((int));
-TERM_PUBLIC void SIXEL_fillbox __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height));
-TERM_PUBLIC void SIXEL_linewidth __PROTO((double linewidth));
+TERM_PUBLIC void SIXEL_options(void);
+TERM_PUBLIC void SIXEL_init(void);
+TERM_PUBLIC void SIXEL_reset(void);
+TERM_PUBLIC void SIXEL_text(void);
+TERM_PUBLIC void SIXEL_setfont(void);
+TERM_PUBLIC void SIXEL_graphics(void);
+TERM_PUBLIC void SIXEL_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void SIXEL_vector(unsigned int x, unsigned int y);
+TERM_PUBLIC void SIXEL_linetype(int linetype);
+TERM_PUBLIC void SIXEL_dashtype(int type, t_dashtype *custom_dash_type);
+TERM_PUBLIC void SIXEL_put_text(unsigned int x, unsigned int y, const char str[]);
+TERM_PUBLIC int SIXEL_text_angle(int);
+TERM_PUBLIC void SIXEL_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height);
+TERM_PUBLIC void SIXEL_linewidth(double linewidth);
 TERM_PUBLIC int SIXEL_make_palette (t_sm_palette *);
-TERM_PUBLIC void SIXEL_set_color __PROTO((t_colorspec *colorspec));
-TERM_PUBLIC void SIXEL_filled_polygon __PROTO((int points, gpiPoint *corners));
+TERM_PUBLIC void SIXEL_set_color(t_colorspec *colorspec);
+TERM_PUBLIC void SIXEL_filled_polygon(int points, gpiPoint *corners);
 #endif
-TERM_PUBLIC void VTTEK40init __PROTO((void));
-TERM_PUBLIC void VTTEK40reset __PROTO((void));
-TERM_PUBLIC void VTTEK40linetype __PROTO((int linetype));
-TERM_PUBLIC void VTTEK40put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
-TERM_PUBLIC void XTERM_graphics __PROTO((void));
-TERM_PUBLIC void XTERM_resume __PROTO((void));
-TERM_PUBLIC void XTERM_text __PROTO((void));
-TERM_PUBLIC int  XTERM_set_font __PROTO((const char * fontname));
-TERM_PUBLIC void CTEK_linetype __PROTO((int linetype));
-TERM_PUBLIC void CTEK_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void CTEK_vector __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void VTTEK40init(void);
+TERM_PUBLIC void VTTEK40reset(void);
+TERM_PUBLIC void VTTEK40linetype(int linetype);
+TERM_PUBLIC void VTTEK40put_text(unsigned int x, unsigned int y, const char str[]);
+TERM_PUBLIC void XTERM_graphics(void);
+TERM_PUBLIC void XTERM_resume(void);
+TERM_PUBLIC void XTERM_text(void);
+TERM_PUBLIC int  XTERM_set_font(const char * fontname);
+TERM_PUBLIC void CTEK_linetype(int linetype);
+TERM_PUBLIC void CTEK_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void CTEK_vector(unsigned int x, unsigned int y);
 
 #endif /* TERM_PROTO */
 
@@ -1258,9 +1258,9 @@ LN03Preset()
 /*#define ABS(A) (((A)>=0)? (A):-(A))*/
 #define SIGN(A) (((A) >= 0)? 1:-1)
 
-static void CT_solid_vector __PROTO((int x, int y));
-static void CT_draw_vpoint __PROTO((int x, int y, int last));
-static void CT_pattern_vector __PROTO((int x1, int y1));
+static void CT_solid_vector(int x, int y);
+static void CT_draw_vpoint(int x, int y, int last);
+static void CT_pattern_vector(int x1, int y1);
 
 /* CT_lines are line types defined as bit pattern */
 static unsigned long CT_lines[] =

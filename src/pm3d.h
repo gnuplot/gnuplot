@@ -149,24 +149,23 @@ extern TBOOLEAN track_pm3d_quadrangles;
   Declaration of routines
 ****/
 
-int get_pm3d_at_option __PROTO((char *pm3d_where));
-void pm3d_depth_queue_clear __PROTO((void));
-void pm3d_depth_queue_flush __PROTO((void));
-void pm3d_reset __PROTO((void));
-void pm3d_draw_one __PROTO((struct surface_points* plots));
-void pm3d_add_quadrangle __PROTO((struct surface_points* plot, gpdPoint *corners));
-void pm3d_init_lighting_model __PROTO((void));
-double z2cb_with_logs __PROTO((double z));
-double cb2gray __PROTO((double cb));
-void
-pm3d_rearrange_scan_array __PROTO((struct surface_points* this_plot,
+int get_pm3d_at_option(char *pm3d_where);
+void pm3d_depth_queue_clear(void);
+void pm3d_depth_queue_flush(void);
+void pm3d_reset(void);
+void pm3d_draw_one(struct surface_points* plots);
+void pm3d_add_quadrangle(struct surface_points* plot, gpdPoint *corners);
+void pm3d_init_lighting_model(void);
+double z2cb_with_logs(double z);
+double cb2gray(double cb);
+void pm3d_rearrange_scan_array(struct surface_points* this_plot,
     struct iso_curve*** first_ptr, int* first_n, int* first_invert,
-    struct iso_curve*** second_ptr, int* second_n, int* second_invert));
+    struct iso_curve*** second_ptr, int* second_n, int* second_invert);
 
-void set_plot_with_palette __PROTO((int plot_num, int plot_mode));
+void set_plot_with_palette(int plot_num, int plot_mode);
 
-TBOOLEAN is_plot_with_palette __PROTO((void));
-TBOOLEAN is_plot_with_colorbox __PROTO((void));
+TBOOLEAN is_plot_with_palette(void);
+TBOOLEAN is_plot_with_colorbox(void);
 
 #endif /* PM3D_H */
 

@@ -209,13 +209,6 @@ FILE * win_popen(const char *filename, const char *mode);
 #endif
 /* End fall-through defaults */
 
-/* Need this before any headers are incldued */
-#ifdef PROTOTYPES
-# define __PROTO(proto) proto
-#else
-# define __PROTO(proto) ()
-#endif
-
 /* DOS stuff */
 #if defined(MSDOS)
 # ifdef __DJGPP__
@@ -322,9 +315,9 @@ typedef double coordval;
 #endif
 
 #ifndef SIGFUNC_NO_INT_ARG
-typedef RETSIGTYPE (*sigfunc)__PROTO((int));
+typedef RETSIGTYPE (*sigfunc) (int);
 #else
-typedef RETSIGTYPE (*sigfunc)__PROTO((void));
+typedef RETSIGTYPE (*sigfunc) (void);
 #endif
 
 #ifdef HAVE_SIGSETJMP

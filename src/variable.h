@@ -78,7 +78,7 @@
 
 /* Loadpath related */
 
-char *loadpath_handler __PROTO((int, char *));
+char *loadpath_handler(int, char *);
 
 #define init_loadpath()    loadpath_handler(ACTION_INIT,NULL)
 #define set_var_loadpath(path) loadpath_handler(ACTION_SET,(path))
@@ -89,7 +89,7 @@ char *loadpath_handler __PROTO((int, char *));
 
 /* Locale related */
 
-char *locale_handler __PROTO((int, char *));
+char *locale_handler(int, char *);
 
 #define INITIAL_LOCALE ("C")
 

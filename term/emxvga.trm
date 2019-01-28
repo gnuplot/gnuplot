@@ -61,15 +61,15 @@ register_term(emxvga)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void EMXVGA_init __PROTO((void));
-TERM_PUBLIC void EMXVGA_reset __PROTO((void));
-TERM_PUBLIC void EMXVGA_text __PROTO((void));
-TERM_PUBLIC void EMXVGA_graphics __PROTO((void));
-TERM_PUBLIC void EMXVGA_linetype __PROTO((int));
-TERM_PUBLIC void EMXVGA_move __PROTO((unsigned int, unsigned int));
-TERM_PUBLIC void EMXVGA_vector __PROTO((unsigned int, unsigned int));
-TERM_PUBLIC int EMXVGA_text_angle __PROTO((int));
-TERM_PUBLIC void EMXVGA_put_text __PROTO((unsigned int, unsigned int, const char *));
+TERM_PUBLIC void EMXVGA_init(void);
+TERM_PUBLIC void EMXVGA_reset(void);
+TERM_PUBLIC void EMXVGA_text(void);
+TERM_PUBLIC void EMXVGA_graphics(void);
+TERM_PUBLIC void EMXVGA_linetype(int);
+TERM_PUBLIC void EMXVGA_move(unsigned int, unsigned int);
+TERM_PUBLIC void EMXVGA_vector(unsigned int, unsigned int);
+TERM_PUBLIC int EMXVGA_text_angle(int);
+TERM_PUBLIC void EMXVGA_put_text(unsigned int, unsigned int, const char *);
 #define EMXVGA_VCHAR 8
 #define EMXVGA_HCHAR 8
 #define EMXVGA_VTIC 4
@@ -77,11 +77,11 @@ TERM_PUBLIC void EMXVGA_put_text __PROTO((unsigned int, unsigned int, const char
 #define EMXVGA_XMAX 0		/* These two entries are just place holders. */
 #define EMXVGA_YMAX 0		/* The actual values will be filled in init. */
 #ifdef EMXVESA
-TERM_PUBLIC void EMXVESA_options __PROTO((void));
-TERM_PUBLIC void EMXVESA_init __PROTO((void));
-TERM_PUBLIC void EMXVESA_graphics __PROTO((void));
-TERM_PUBLIC void EMXVESA_text __PROTO((void));
-TERM_PUBLIC void EMXVESA_reset __PROTO((void));
+TERM_PUBLIC void EMXVESA_options(void);
+TERM_PUBLIC void EMXVESA_init(void);
+TERM_PUBLIC void EMXVESA_graphics(void);
+TERM_PUBLIC void EMXVESA_text(void);
+TERM_PUBLIC void EMXVESA_reset(void);
 #endif
 #endif /* TERM_PROTO */
 #ifndef TERM_PROTO_ONLY

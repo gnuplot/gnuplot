@@ -195,19 +195,19 @@ enum {
 #endif
 
 
-void event_plotdone __PROTO((void));
-void recalc_statusline __PROTO((void));
-void update_ruler __PROTO((void));
-void set_ruler __PROTO((TBOOLEAN on, int mx, int my));
-void UpdateStatusline __PROTO((void));
-void do_event __PROTO((struct gp_event_t *ge));
+void event_plotdone(void);
+void recalc_statusline(void);
+void update_ruler(void);
+void set_ruler(TBOOLEAN on, int mx, int my);
+void UpdateStatusline(void);
+void do_event(struct gp_event_t *ge);
 TBOOLEAN exec_event(char type, int mx, int my, int par1, int par2, int winid); /* wrapper for do_event() */
-int plot_mode __PROTO((int mode));
-void event_reset __PROTO((struct gp_event_t *ge));
+int plot_mode(int mode);
+void event_reset(struct gp_event_t *ge);
 
 /* bind prototype(s) */
 
-void bind_process __PROTO((char* lhs, char* rhs, TBOOLEAN allwindows));
-void bind_remove_all __PROTO((void));
+void bind_process(char* lhs, char* rhs, TBOOLEAN allwindows);
+void bind_remove_all(void);
 
 #endif /* !_HAVE_MOUSE_H */

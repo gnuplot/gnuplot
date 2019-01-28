@@ -91,49 +91,49 @@ register_term(post)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void PS_options __PROTO((void));
-TERM_PUBLIC void PS_common_init __PROTO((TBOOLEAN uses_fonts, unsigned int xoff, unsigned int yoff, unsigned int bb_xmin, unsigned int bb_ymin, unsigned int bb_xmax, unsigned int bb_ymax, const char **dict));
-TERM_PUBLIC void PS_init __PROTO((void));
-TERM_PUBLIC void PS_graphics __PROTO((void));
-TERM_PUBLIC void PS_text __PROTO((void));
-TERM_PUBLIC void PS_reset __PROTO((void));
-TERM_PUBLIC void PS_linetype __PROTO((int linetype));
-TERM_PUBLIC void PS_dashtype __PROTO((int type, t_dashtype *custom_dash_type));
-TERM_PUBLIC void PS_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void PS_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void PS_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
-TERM_PUBLIC int PS_text_angle __PROTO((int ang));
-TERM_PUBLIC int PS_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC void PS_point __PROTO((unsigned int x, unsigned int y, int number));
-TERM_PUBLIC int PS_set_font __PROTO((const char * font));
-TERM_PUBLIC void PS_fillbox __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height));
-TERM_PUBLIC void PS_linewidth __PROTO((double linewidth)); /* JFi [linewidth] */
-TERM_PUBLIC void PS_pointsize __PROTO((double ptsize)); /* JFi [pointsize] */
+TERM_PUBLIC void PS_options(void);
+TERM_PUBLIC void PS_common_init(TBOOLEAN uses_fonts, unsigned int xoff, unsigned int yoff, unsigned int bb_xmin, unsigned int bb_ymin, unsigned int bb_xmax, unsigned int bb_ymax, const char **dict);
+TERM_PUBLIC void PS_init(void);
+TERM_PUBLIC void PS_graphics(void);
+TERM_PUBLIC void PS_text(void);
+TERM_PUBLIC void PS_reset(void);
+TERM_PUBLIC void PS_linetype(int linetype);
+TERM_PUBLIC void PS_dashtype(int type, t_dashtype *custom_dash_type);
+TERM_PUBLIC void PS_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void PS_vector(unsigned int x, unsigned int y);
+TERM_PUBLIC void PS_put_text(unsigned int x, unsigned int y, const char *str);
+TERM_PUBLIC int PS_text_angle(int ang);
+TERM_PUBLIC int PS_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC void PS_point(unsigned int x, unsigned int y, int number);
+TERM_PUBLIC int PS_set_font(const char * font);
+TERM_PUBLIC void PS_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height);
+TERM_PUBLIC void PS_linewidth(double linewidth); /* JFi [linewidth] */
+TERM_PUBLIC void PS_pointsize(double ptsize); /* JFi [pointsize] */
 TERM_PUBLIC int PS_make_palette (t_sm_palette *);
 TERM_PUBLIC void PS_previous_palette (void);
 TERM_PUBLIC void PS_set_color (t_colorspec *);
 TERM_PUBLIC void PS_filled_polygon (int, gpiPoint *);
-TERM_PUBLIC void PS_image __PROTO((unsigned int, unsigned int, coordval *, gpiPoint *, t_imagecolor));
+TERM_PUBLIC void PS_image(unsigned int, unsigned int, coordval *, gpiPoint *, t_imagecolor);
 
 /* To support "set term post enhanced" */
-TERM_PUBLIC void ENHPS_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
-TERM_PUBLIC int  ENHPS_set_font __PROTO((const char * font));
-TERM_PUBLIC void ENHPS_OPEN __PROTO((char * fontname, double fontsize,
+TERM_PUBLIC void ENHPS_put_text(unsigned int x, unsigned int y, const char *str);
+TERM_PUBLIC int  ENHPS_set_font(const char * font);
+TERM_PUBLIC void ENHPS_OPEN(char * fontname, double fontsize,
 	    		double base, TBOOLEAN widthflag, TBOOLEAN showflag,
-			int overprint));
-TERM_PUBLIC void ENHPS_FLUSH __PROTO((void));
-TERM_PUBLIC void ENHPS_WRITEC __PROTO((int c));
-static void PS_RememberFont __PROTO((char *fname));
+			int overprint);
+TERM_PUBLIC void ENHPS_FLUSH(void);
+TERM_PUBLIC void ENHPS_WRITEC(int c);
+static void PS_RememberFont(char *fname);
 
-TERM_PUBLIC char *PS_escape_string __PROTO((char *origstr, char *escapelist));
+TERM_PUBLIC char *PS_escape_string(char *origstr, char *escapelist);
 
-TERM_PUBLIC void PS_path __PROTO((int p));
+TERM_PUBLIC void PS_path(int p);
 static TBOOLEAN PS_newpath = FALSE;
 static TBOOLEAN ENHps_opened_string = FALSE;  /* try to cut out empty ()'s */
 
-TERM_PUBLIC void PS_layer __PROTO((t_termlayer syncpoint));
+TERM_PUBLIC void PS_layer(t_termlayer syncpoint);
 
-TERM_PUBLIC void ENHPS_boxed_text __PROTO((unsigned int, unsigned int, int));
+TERM_PUBLIC void ENHPS_boxed_text(unsigned int, unsigned int, int);
 static int PS_in_textbox = 0;
 
 #endif /* TERM_PROTO */
@@ -255,17 +255,17 @@ static const ps_params_t pstex_params_default = PSTEX_PARAMS_DEFAULT;
 
 static ps_params_t *ps_params = &post_params;
 
-static void make_interpolation_code __PROTO((void));
-static void make_color_model_code __PROTO((void));
-static char * save_space __PROTO((double gray));
-static void write_component_array __PROTO((const char *text, gradient_struct *grad, int cnt, int offset));
-static void write_gradient_definition __PROTO((gradient_struct *gradient, int cnt));
-static void write_color_space __PROTO((t_sm_palette *palette));
-static void make_palette_formulae __PROTO((void));
-static void PS_make_header __PROTO((t_sm_palette *palette));
-static void PS_skip_image __PROTO((int bytes, int x0, int y0, int dx, int dy));
+static void make_interpolation_code(void);
+static void make_color_model_code(void);
+static char * save_space(double gray);
+static void write_component_array(const char *text, gradient_struct *grad, int cnt, int offset);
+static void write_gradient_definition(gradient_struct *gradient, int cnt);
+static void write_color_space(t_sm_palette *palette);
+static void make_palette_formulae(void);
+static void PS_make_header(t_sm_palette *palette);
+static void PS_skip_image(int bytes, int x0, int y0, int dx, int dy);
 #ifndef GNUPLOT_PS_DIR
-static void PS_dump_header_to_file __PROTO((char *name));
+static void PS_dump_header_to_file(char *name);
 #endif
 
 static float ps_fontsize = 14.;
@@ -283,11 +283,11 @@ static int ps_path_count = 0; 	/* count of lines in path */
 static int ps_ang = 0;			/* text angle */
 static enum JUSTIFY ps_justify = LEFT;	/* text is flush left */
 
-static void delete_ps_fontfile __PROTO((struct ps_fontfile_def *, struct ps_fontfile_def *));
+static void delete_ps_fontfile(struct ps_fontfile_def *, struct ps_fontfile_def *);
 
-TERM_PUBLIC void PS_load_fontfile __PROTO((struct ps_fontfile_def *,TBOOLEAN));
-TERM_PUBLIC void PS_load_fontfiles __PROTO((TBOOLEAN));
-static char * fontpath_fullname __PROTO((const char *name, const char *dir));
+TERM_PUBLIC void PS_load_fontfile(struct ps_fontfile_def *,TBOOLEAN);
+TERM_PUBLIC void PS_load_fontfiles(TBOOLEAN);
+static char * fontpath_fullname(const char *name, const char *dir);
 
 static TBOOLEAN ps_explicit_size = FALSE;
 static size_units ps_explicit_units = INCHES;
@@ -302,9 +302,9 @@ static TBOOLEAN PS_border = FALSE;
 static char *pslatex_auxname = NULL;
 
 /* Routine to copy pre-existing prolog files into output stream */
-static FILE *PS_open_prologue_file __PROTO((char *));
-static void PS_dump_prologue_file __PROTO((char *));
-static void PS_load_glyphlist __PROTO((void));
+static FILE *PS_open_prologue_file(char *);
+static void PS_dump_prologue_file(char *);
+static void PS_load_glyphlist(void);
 
 static const char * OldEPSL_linetypes[] = {
 /* Line Types */
@@ -2882,7 +2882,7 @@ if (sm_palette.ps_allcF == 0) { /* print only those 3 used formulae */
 }
 
 TERM_PUBLIC void
-ENHPS_boxed_text __PROTO((unsigned int x, unsigned int y, int option))
+ENHPS_boxed_text(unsigned int x, unsigned int y, int option)
 {
     switch (option) {
     case TEXTBOX_INIT:

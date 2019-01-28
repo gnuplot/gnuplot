@@ -58,21 +58,20 @@ register_term(gpic)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void GPIC_options __PROTO((void));
-TERM_PUBLIC void GPIC_init __PROTO((void));
-TERM_PUBLIC void GPIC_graphics __PROTO((void));
-TERM_PUBLIC void GPIC_text __PROTO((void));
-TERM_PUBLIC void GPIC_linetype __PROTO((int linetype));
-TERM_PUBLIC void GPIC_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void GPIC_vector __PROTO((unsigned int ux, unsigned int uy));
-TERM_PUBLIC void GPIC_arrow __PROTO((unsigned int sx, unsigned int sy,
-				     unsigned int ex, unsigned int ey,
-				     int head));
-TERM_PUBLIC void GPIC_put_text __PROTO((unsigned int x, unsigned int y,
-					const char str[]));
-TERM_PUBLIC int GPIC_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC int GPIC_text_angle __PROTO((int ang));
-TERM_PUBLIC void GPIC_reset __PROTO((void));
+TERM_PUBLIC void GPIC_options(void);
+TERM_PUBLIC void GPIC_init(void);
+TERM_PUBLIC void GPIC_graphics(void);
+TERM_PUBLIC void GPIC_text(void);
+TERM_PUBLIC void GPIC_linetype(int linetype);
+TERM_PUBLIC void GPIC_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void GPIC_vector(unsigned int ux, unsigned int uy);
+TERM_PUBLIC void GPIC_arrow(unsigned int sx, unsigned int sy,
+			     unsigned int ex, unsigned int ey,
+			     int head);
+TERM_PUBLIC void GPIC_put_text(unsigned int x, unsigned int y, const char str[]);
+TERM_PUBLIC int GPIC_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC int GPIC_text_angle(int ang);
+TERM_PUBLIC void GPIC_reset(void);
 #define GPIC_DOTS_PER_INCH (300)
 
 /* 5 inches wide by 3 inches high (default) */
@@ -93,7 +92,7 @@ TERM_PUBLIC void GPIC_reset __PROTO((void));
 #define GPIC_UNIT (GPIC_PTS_PER_INCH/GPIC_DOTS_PER_INCH)
 #define GPIC_coord(x) ((float)x)/((float)GPIC_DOTS_PER_INCH)
 
-static void GPIC_close_line __PROTO((void));
+static void GPIC_close_line(void);
 static float GPIC_x, GPIC_y;
 static unsigned int GPIC_ltype;
 static enum JUSTIFY GPIC_justify = LEFT;

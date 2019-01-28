@@ -50,8 +50,8 @@ static double carlson_elliptic_rj(double x,double y,double z,double p);
  * libm does not provide Bessel approximations for i0 and i1
  * so we do not include these in the conditional HAVE_LIBM
  */
-static double ri0 __PROTO((double x));
-static double ri1 __PROTO((double x));
+static double ri0(double x);
+static double ri1(double x);
 
 #ifndef HAVE_LIBM
 
@@ -60,18 +60,18 @@ static double ri1 __PROTO((double x));
  * can't use the functions in libm
  */
 
-static double jzero __PROTO((double x));
-static double pzero __PROTO((double x));
-static double qzero __PROTO((double x));
-static double yzero __PROTO((double x));
-static double rj0 __PROTO((double x));
-static double ry0 __PROTO((double x));
-static double jone __PROTO((double x));
-static double pone __PROTO((double x));
-static double qone __PROTO((double x));
-static double yone __PROTO((double x));
-static double rj1 __PROTO((double x));
-static double ry1 __PROTO((double x));
+static double jzero(double x);
+static double pzero(double x);
+static double qzero(double x);
+static double yzero(double x);
+static double rj0(double x);
+static double ry0(double x);
+static double jone(double x);
+static double pone(double x);
+static double qone(double x);
+static double yone(double x);
+static double rj1(double x);
+static double ry1(double x);
 
 /* The bessel function approximations here are from
  * "Computer Approximations"

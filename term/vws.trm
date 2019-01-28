@@ -55,19 +55,19 @@ register_term(vws)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void VWS_init __PROTO((void));
-TERM_PUBLIC void VWS_reset __PROTO((void));
-TERM_PUBLIC void VWS_graphics __PROTO((void));
-TERM_PUBLIC void VWS_text __PROTO((void));
-TERM_PUBLIC void VWS_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void VWS_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void VWS_linetype __PROTO((int lt));
-TERM_PUBLIC void VWS_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
-TERM_PUBLIC int VWS_text_angle __PROTO((int ang));
-TERM_PUBLIC int VWS_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC void VWS_point __PROTO((unsigned int x, unsigned int y, int point));
-TERM_PUBLIC void VWS_arrow __PROTO((unsigned int sx, unsigned int sy,
-				    unsigned int ex, unsigned int ey, int head));
+TERM_PUBLIC void VWS_init(void);
+TERM_PUBLIC void VWS_reset(void);
+TERM_PUBLIC void VWS_graphics(void);
+TERM_PUBLIC void VWS_text(void);
+TERM_PUBLIC void VWS_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void VWS_vector(unsigned int x, unsigned int y);
+TERM_PUBLIC void VWS_linetype(int lt);
+TERM_PUBLIC void VWS_put_text(unsigned int x, unsigned int y, const char *str);
+TERM_PUBLIC int VWS_text_angle(int ang);
+TERM_PUBLIC int VWS_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC void VWS_point(unsigned int x, unsigned int y, int point);
+TERM_PUBLIC void VWS_arrow(unsigned int sx, unsigned int sy,
+			    unsigned int ex, unsigned int ey, int head);
 
 #define VWS_XMAX 1024
 #define VWS_YMAX 780		/* VAXstation 2000 is 864 */
@@ -79,7 +79,7 @@ TERM_PUBLIC void VWS_arrow __PROTO((unsigned int sx, unsigned int sy,
 
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
-void VWS_resize_ast __PROTO((void));
+void VWS_resize_ast(void);
 
 #include <ssdef.h>
 /* */

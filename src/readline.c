@@ -257,7 +257,7 @@ static char term_chars[NCCS];
 static int term_set = 0;	/* =1 if rl_termio set */
 
 #define special_getc() ansi_getc()
-static int ansi_getc __PROTO((void));
+static int ansi_getc(void);
 #define DEL_ERASES_CURRENT_CHAR
 
 #else /* MSDOS or _WIN32 */
@@ -333,22 +333,22 @@ static const char search_prompt2[] = "': ";
 static struct hist * search_result = NULL;
 static int search_result_width = 0;	/* on-screen width of the search result */
 
-static void fix_line __PROTO((void));
-static void redraw_line __PROTO((const char *prompt));
-static void clear_line __PROTO((const char *prompt));
-static void clear_eoline __PROTO((const char *prompt));
-static void delete_previous_word __PROTO((void));
-static void copy_line __PROTO((char *line));
-static void set_termio __PROTO((void));
-static void reset_termio __PROTO((void));
-static int user_putc __PROTO((int ch));
-static int user_puts __PROTO((char *str));
-static int backspace __PROTO((void));
-static void extend_cur_line __PROTO((void));
-static void step_forward __PROTO((void));
-static void delete_forward __PROTO((void));
-static void delete_backward __PROTO((void));
-static int char_seqlen __PROTO((void));
+static void fix_line(void);
+static void redraw_line(const char *prompt);
+static void clear_line(const char *prompt);
+static void clear_eoline(const char *prompt);
+static void delete_previous_word(void);
+static void copy_line(char *line);
+static void set_termio(void);
+static void reset_termio(void);
+static int user_putc(int ch);
+static int user_puts(char *str);
+static int backspace(void);
+static void extend_cur_line(void);
+static void step_forward(void);
+static void delete_forward(void);
+static void delete_backward(void);
+static int char_seqlen(void);
 #if defined(HAVE_DIRENT)
 static char *fn_completion(size_t anchor_pos, int direction);
 static void tab_completion(TBOOLEAN forward);

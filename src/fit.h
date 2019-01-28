@@ -85,13 +85,13 @@ __declspec(noreturn) void error_ex(int t_num, const char *str, ...);
 #else
 void error_ex(int t_num, const char *str, ...);
 #endif
-void init_fit __PROTO((void));
-void update __PROTO((char *pfile, char *npfile));
-void save_fit __PROTO((FILE *fp));
-void fit_command __PROTO((void));
-size_t wri_to_fil_last_fit_cmd __PROTO((FILE *fp));
-char *getfitlogfile __PROTO((void));
-const char *getfitscript __PROTO((void));
+void init_fit(void);
+void update(char *pfile, char *npfile);
+void save_fit(FILE *fp);
+void fit_command(void);
+size_t wri_to_fil_last_fit_cmd(FILE *fp);
+char *getfitlogfile(void);
+const char *getfitscript(void);
 
 void call_gnuplot(const double *par, double *data);
 TBOOLEAN regress_check_stop(int iter, double chisq, double last_chisq, double lambda);

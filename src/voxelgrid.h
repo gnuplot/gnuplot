@@ -29,21 +29,21 @@ typedef struct isosurface_opt{
 } isosurface_opt;
 
 /* function prototypes */
-void voxel_command __PROTO((void));
-void vclear_command __PROTO((void));
-void vfill_command __PROTO((void));
-void f_voxel __PROTO((union argument *x));
-void init_voxelsupport __PROTO((void));
-void set_vgrid __PROTO((void));
-void set_vgrid_range __PROTO((void));
-void show_vgrid __PROTO((void));
-void gpfree_vgrid __PROTO((struct udvt_entry *grid));
-void unset_vgrid __PROTO((void));
-udvt_entry *get_vgrid_by_name __PROTO((char *name));
-void check_grid_ranges __PROTO((void));
-t_voxel voxel __PROTO((double vx, double vy, double vz));
-void set_isosurface __PROTO((void));
-void show_isosurface __PROTO((void));
+void voxel_command(void);
+void vclear_command(void);
+void vfill_command(void);
+void f_voxel(union argument *x);
+void init_voxelsupport(void);
+void set_vgrid(void);
+void set_vgrid_range(void);
+void show_vgrid(void);
+void gpfree_vgrid(struct udvt_entry *grid);
+void unset_vgrid(void);
+udvt_entry *get_vgrid_by_name(char *name);
+void check_grid_ranges(void);
+t_voxel voxel(double vx, double vy, double vz);
+void set_isosurface(void);
+void show_isosurface(void);
 
 /* variables */
 extern isosurface_opt isosurface_options;

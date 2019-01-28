@@ -51,12 +51,12 @@
 #include "pm3d.h"
 #include "getcolor.h"
 
-static void save_functions__sub __PROTO((FILE *));
-static void save_variables__sub __PROTO((FILE *));
-static void save_tics __PROTO((FILE *, struct axis *));
-static void save_mtics __PROTO((FILE *, struct axis *));
-static void save_zeroaxis __PROTO((FILE *,AXIS_INDEX));
-static void save_set_all __PROTO((FILE *));
+static void save_functions__sub(FILE *);
+static void save_variables__sub(FILE *);
+static void save_tics(FILE *, struct axis *);
+static void save_mtics(FILE *, struct axis *);
+static void save_zeroaxis(FILE *,AXIS_INDEX);
+static void save_set_all(FILE *);
 
 const char *coord_msg[] = {"first ", "second ", "graph ", "screen ", "character ", "polar "};
 /*

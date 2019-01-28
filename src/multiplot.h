@@ -1,5 +1,5 @@
-void multiplot_start __PROTO((void));
-void multiplot_end __PROTO((void));
-void multiplot_next __PROTO((void));
-void multiplot_reset __PROTO((void));
-int multiplot_current_panel __PROTO((void));
+void multiplot_start(void);
+void multiplot_end(void);
+void multiplot_next(void);
+void multiplot_reset(void);
+int multiplot_current_panel(void);

@@ -145,18 +145,18 @@ int vms_ktid;			/* key table id, for translating keystrokes */
 
 
 /* static prototypes */
-static void command __PROTO((void));
-static TBOOLEAN is_array_assignment __PROTO((void));
-static int changedir __PROTO((char *path));
-static char* fgets_ipc __PROTO((char* dest, int len));
-static char* gp_get_string __PROTO((char *, size_t, const char *));
-static int read_line __PROTO((const char *prompt, int start));
-static void do_system __PROTO((const char *));
-static void test_palette_subcommand __PROTO((void));
-static int find_clause __PROTO((int *, int *));
-static int report_error __PROTO((int ierr));
+static void command(void);
+static TBOOLEAN is_array_assignment(void);
+static int changedir(char *path);
+static char* fgets_ipc(char* dest, int len);
+static char* gp_get_string(char *, size_t, const char *);
+static int read_line(const char *prompt, int start);
+static void do_system(const char *);
+static void test_palette_subcommand(void);
+static int find_clause(int *, int *);
+static int report_error(int ierr);
 
-static int expand_1level_macros __PROTO((void));
+static int expand_1level_macros(void);
 
 struct lexical_unit *token;
 int token_table_size;
@@ -3140,7 +3140,7 @@ is_history_command(const char *line)
 
 # ifdef USE_READLINE
 /* keep some compilers happy */
-static char *rlgets __PROTO((char *s, size_t n, const char *prompt));
+static char *rlgets(char *s, size_t n, const char *prompt);
 
 static char *
 rlgets(char *s, size_t n, const char *prompt)

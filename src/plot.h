@@ -58,35 +58,35 @@ extern TBOOLEAN CallFromRexx;
 /* Prototypes of functions exported by plot.c */
 
 #if defined(__GNUC__)
-void bail_to_command_line __PROTO((void)) __attribute__((noreturn));
+void bail_to_command_line(void) __attribute__((noreturn));
 #else
-void bail_to_command_line __PROTO((void));
+void bail_to_command_line(void);
 #endif
 
-void init_constants __PROTO((void));
-void init_session __PROTO((void));
+void init_constants(void);
+void init_session(void);
 
 #if defined(_WIN32)
-int gnu_main __PROTO((int argc, char **argv));
+int gnu_main(int argc, char **argv);
 #endif
 
-void interrupt_setup __PROTO((void));
-void gp_expand_tilde __PROTO((char **));
-void get_user_env __PROTO((void));
+void interrupt_setup(void);
+void gp_expand_tilde(char **);
+void get_user_env(void);
 
 #ifdef LINUXVGA
-void drop_privilege __PROTO((void));
-void take_privilege __PROTO((void));
+void drop_privilege(void);
+void take_privilege(void);
 #endif /* LINUXVGA */
 
 #ifdef OS2
-int ExecuteMacro __PROTO((char *, int));
+int ExecuteMacro(char *, int);
 #endif
 
-void restrict_popen __PROTO((void));
+void restrict_popen(void);
 
 #ifdef GNUPLOT_HISTORY
-void cancel_history __PROTO((void));
+void cancel_history(void);
 #else
 #define cancel_history()  {}
 #endif

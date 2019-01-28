@@ -60,22 +60,20 @@ register_term(texdraw)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void TEXDRAW_init __PROTO((void));
-TERM_PUBLIC void TEXDRAW_graphics __PROTO((void));
-TERM_PUBLIC void TEXDRAW_text __PROTO((void));
-TERM_PUBLIC void TEXDRAW_linetype __PROTO((int linetype));
-TERM_PUBLIC void TEXDRAW_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void TEXDRAW_point __PROTO((unsigned int x, unsigned int y,
-					int number));
-TERM_PUBLIC void TEXDRAW_vector __PROTO((unsigned int ux, unsigned int uy));
-TERM_PUBLIC void TEXDRAW_arrow __PROTO((unsigned int sx, unsigned int sy,
-					unsigned int ex, unsigned int ey,
-					int head));
-TERM_PUBLIC void TEXDRAW_put_text __PROTO((unsigned int x, unsigned int y,
-					   const char str[]));
-TERM_PUBLIC int TEXDRAW_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC int TEXDRAW_text_angle __PROTO((int ang));
-TERM_PUBLIC void TEXDRAW_reset __PROTO((void));
+TERM_PUBLIC void TEXDRAW_init(void);
+TERM_PUBLIC void TEXDRAW_graphics(void);
+TERM_PUBLIC void TEXDRAW_text(void);
+TERM_PUBLIC void TEXDRAW_linetype(int linetype);
+TERM_PUBLIC void TEXDRAW_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void TEXDRAW_point(unsigned int x, unsigned int y, int number);
+TERM_PUBLIC void TEXDRAW_vector(unsigned int ux, unsigned int uy);
+TERM_PUBLIC void TEXDRAW_arrow(unsigned int sx, unsigned int sy,
+				unsigned int ex, unsigned int ey,
+				int head);
+TERM_PUBLIC void TEXDRAW_put_text(unsigned int x, unsigned int y, const char str[]);
+TERM_PUBLIC int TEXDRAW_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC int TEXDRAW_text_angle(int ang);
+TERM_PUBLIC void TEXDRAW_reset(void);
 
 #define TEXDRAW_PTS_PER_INCH (72.27)
 /* resolution of printer we expect to use */
@@ -97,7 +95,7 @@ TERM_PUBLIC void TEXDRAW_reset __PROTO((void));
 
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
-static void TEXDRAW_endline __PROTO((void));
+static void TEXDRAW_endline(void);
 static unsigned int TEXDRAW_posx;
 static unsigned int TEXDRAW_posy;
 static enum JUSTIFY TEXDRAW_justify = LEFT;
@@ -145,7 +143,7 @@ static int TEXDRAW_type;
 /* are we in the middle of a line */
 static TBOOLEAN TEXDRAW_inline = FALSE;
 /* terminate any line in progress */
-static void TEXDRAW_endline __PROTO((void));
+static void TEXDRAW_endline(void);
 /* number of points in line so far */
 static int TEXDRAW_linecount = 0;
 /* max value for linecount */

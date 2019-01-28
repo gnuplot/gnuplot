@@ -27,15 +27,15 @@
  * contain code for calculating colors from gray by user defined functions.
  */
 #ifndef GPLT_X11_MODE
-static int calculate_color_from_formulae __PROTO((double, rgb_color *));
+static int calculate_color_from_formulae(double, rgb_color *);
 #endif
 
-static void color_components_from_gray __PROTO((double gray, rgb_color *color));
-static int interpolate_color_from_gray __PROTO((double, rgb_color *));
-static double get_max_dev __PROTO((rgb_color *colors, int j, double limit));
-static int is_extremum __PROTO((rgb_color left,rgb_color mid,rgb_color right));
-static void CMY_2_RGB __PROTO((rgb_color *color));
-static void HSV_2_RGB __PROTO((rgb_color *color));
+static void color_components_from_gray(double gray, rgb_color *color);
+static int interpolate_color_from_gray(double, rgb_color *);
+static double get_max_dev(rgb_color *colors, int j, double limit);
+static int is_extremum(rgb_color left,rgb_color mid,rgb_color right);
+static void CMY_2_RGB(rgb_color *color);
+static void HSV_2_RGB(rgb_color *color);
 
 
 /* check if two palettes p1 and p2 differ significantly */

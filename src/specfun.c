@@ -119,34 +119,34 @@ extern int signgam;		/* this is not always declared in math.h */
 #endif
 
 /* Local function declarations, not visible outside this file */
-static int mtherr __PROTO((char *, int));
-static double polevl __PROTO((double x, const double coef[], int N));
-static double p1evl __PROTO((double x, const double coef[], int N));
-static double confrac __PROTO((double a, double b, double x));
-static double ibeta __PROTO((double a, double b, double x));
-static double igamma __PROTO((double a, double x));
-static double ranf __PROTO((struct value * init));
-static double inverse_error_func __PROTO((double p));
-static double inverse_normal_func __PROTO((double p));
-static double lambertw __PROTO((double x));
+static int mtherr(char *, int);
+static double polevl(double x, const double coef[], int N);
+static double p1evl(double x, const double coef[], int N);
+static double confrac(double a, double b, double x);
+static double ibeta(double a, double b, double x);
+static double igamma(double a, double x);
+static double ranf(struct value * init);
+static double inverse_error_func(double p);
+static double inverse_normal_func(double p);
+static double lambertw(double x);
 #if (0)	/* Only used by low-precision Airy version */
-static double airy_neg __PROTO(( double x ));
-static double airy_pos __PROTO((double x));
+static double airy_neg( double x );
+static double airy_pos(double x);
 #endif
 #ifndef HAVE_LIBCERF
-static double humlik __PROTO((double x, double y));
+static double humlik(double x, double y);
 #endif
-static double expint __PROTO((double n, double x));
+static double expint(double n, double x);
 #ifndef LGAMMA
-static int ISNAN __PROTO((double x));
-static int ISFINITE __PROTO((double x));
-static double lngamma __PROTO((double z));
+static int ISNAN(double x);
+static int ISFINITE(double x);
+static double lngamma(double z);
 #endif
 #ifndef HAVE_ERF
-static double erf __PROTO((double a));
+static double erf(double a);
 #endif
 #ifndef HAVE_ERFC
-static double erfc __PROTO((double a));
+static double erfc(double a);
 #endif
 
 /* Macros to configure routines taken from CEPHES: */

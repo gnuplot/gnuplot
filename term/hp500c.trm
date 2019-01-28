@@ -70,12 +70,12 @@ register_term(hp500c)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void HP500C_options __PROTO((void));
-TERM_PUBLIC void HP500C_init __PROTO((void));
-TERM_PUBLIC void HP500C_reset __PROTO((void));
-TERM_PUBLIC void HP500C_linetype __PROTO((int linetype));
-TERM_PUBLIC void HP500C_graphics __PROTO((void));
-TERM_PUBLIC void HP500C_text __PROTO((void));
+TERM_PUBLIC void HP500C_options(void);
+TERM_PUBLIC void HP500C_init(void);
+TERM_PUBLIC void HP500C_reset(void);
+TERM_PUBLIC void HP500C_linetype(int linetype);
+TERM_PUBLIC void HP500C_graphics(void);
+TERM_PUBLIC void HP500C_text(void);
 /* default values for term_tbl */
 #define HP500C_75PPI_XMAX (1920/4)
 #define HP500C_75PPI_YMAX (1920/4)
@@ -115,13 +115,10 @@ TERM_PUBLIC void HP500C_text __PROTO((void));
 #define HP500C_COURIER fputs("\033(0N\033(s0p10.0h12.0v0s0b3T\033&l6D",gpoutfile)
 
 
-static int HP_compress __PROTO((unsigned char *op, unsigned char *oe,
-			       unsigned char *cp));
-static unsigned char HP_complement __PROTO((int c));
-static int HP_compress_to_TIFF __PROTO((unsigned char *op, unsigned char *oe,
-				       unsigned char *cp));
-static int HP_nocompress __PROTO((unsigned char *op, unsigned char *oe,
-				 unsigned char *cp));
+static int HP_compress(unsigned char *op, unsigned char *oe, unsigned char *cp);
+static unsigned char HP_complement(int c);
+static int HP_compress_to_TIFF(unsigned char *op, unsigned char *oe, unsigned char *cp);
+static int HP_nocompress(unsigned char *op, unsigned char *oe, unsigned char *cp);
 
 static int hpdj_dpp = 4;
 static int HP_COMP_MODE = 0;

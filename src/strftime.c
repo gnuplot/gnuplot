@@ -69,8 +69,8 @@ char abbrev_day_names[7][8] =
 
 #endif /* TEST_STRFTIME */
 
-static void fill __PROTO((char *from, char **pto, size_t *pmaxsize));
-static void number __PROTO((int num, int pad, char **pto, size_t *pmaxsize));
+static void fill(char *from, char **pto, size_t *pmaxsize);
+static void number(int num, int pad, char **pto, size_t *pmaxsize);
 
 static void
 fill(char *from, char **pto, size_t *pmaxsize)

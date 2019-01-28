@@ -79,39 +79,39 @@ register_term(svg)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void SVG_options __PROTO ((void));
-TERM_PUBLIC void SVG_init __PROTO ((void));
-TERM_PUBLIC void SVG_graphics __PROTO ((void));
-TERM_PUBLIC void SVG_text __PROTO ((void));
-TERM_PUBLIC void SVG_linetype __PROTO ((int linetype));
-TERM_PUBLIC void SVG_dashtype __PROTO ((int type, t_dashtype *custom_dash_type));
-TERM_PUBLIC void SVG_move __PROTO ((unsigned int x, unsigned int y));
-TERM_PUBLIC void SVG_vector __PROTO ((unsigned int x, unsigned int y));
-TERM_PUBLIC void SVG_put_text __PROTO ((unsigned int x, unsigned int y, const char *str));
-TERM_PUBLIC void SVG_reset __PROTO ((void));
-TERM_PUBLIC int SVG_justify_text __PROTO ((enum JUSTIFY mode));
-TERM_PUBLIC int SVG_text_angle __PROTO ((int ang));
-TERM_PUBLIC void SVG_point __PROTO ((unsigned int x, unsigned int y, int pointstyle));
-TERM_PUBLIC int SVG_set_font __PROTO ((const char *font));
-/* TERM_PUBLIC void SVG_pointsize __PROTO((double pointsize)); */
-TERM_PUBLIC void SVG_fillbox __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height));
-TERM_PUBLIC void SVG_linewidth __PROTO ((double linewidth));
-TERM_PUBLIC int SVG_make_palette __PROTO((t_sm_palette *));
-TERM_PUBLIC void SVG_previous_palette __PROTO((void));
-TERM_PUBLIC void SVG_set_color __PROTO((t_colorspec *));
-TERM_PUBLIC void SVG_filled_polygon __PROTO((int, gpiPoint *));
-TERM_PUBLIC void SVG_layer __PROTO((t_termlayer syncpoint));
+TERM_PUBLIC void SVG_options(void);
+TERM_PUBLIC void SVG_init(void);
+TERM_PUBLIC void SVG_graphics(void);
+TERM_PUBLIC void SVG_text(void);
+TERM_PUBLIC void SVG_linetype(int linetype);
+TERM_PUBLIC void SVG_dashtype(int type, t_dashtype *custom_dash_type);
+TERM_PUBLIC void SVG_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void SVG_vector(unsigned int x, unsigned int y);
+TERM_PUBLIC void SVG_put_text(unsigned int x, unsigned int y, const char *str);
+TERM_PUBLIC void SVG_reset(void);
+TERM_PUBLIC int SVG_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC int SVG_text_angle(int ang);
+TERM_PUBLIC void SVG_point(unsigned int x, unsigned int y, int pointstyle);
+TERM_PUBLIC int SVG_set_font(const char *font);
+/* TERM_PUBLIC void SVG_pointsize(double pointsize); */
+TERM_PUBLIC void SVG_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height);
+TERM_PUBLIC void SVG_linewidth(double linewidth);
+TERM_PUBLIC int SVG_make_palette(t_sm_palette *);
+TERM_PUBLIC void SVG_previous_palette(void);
+TERM_PUBLIC void SVG_set_color(t_colorspec *);
+TERM_PUBLIC void SVG_filled_polygon(int, gpiPoint *);
+TERM_PUBLIC void SVG_layer(t_termlayer syncpoint);
 
-TERM_PUBLIC void ENHsvg_OPEN __PROTO((char *, double, double, TBOOLEAN, TBOOLEAN, int));
-TERM_PUBLIC void ENHsvg_FLUSH __PROTO((void));
-TERM_PUBLIC void ENHsvg_put_text __PROTO((unsigned int, unsigned int, const char *));
-TERM_PUBLIC void ENHsvg_writec __PROTO((int));
+TERM_PUBLIC void ENHsvg_OPEN(char *, double, double, TBOOLEAN, TBOOLEAN, int);
+TERM_PUBLIC void ENHsvg_FLUSH(void);
+TERM_PUBLIC void ENHsvg_put_text(unsigned int, unsigned int, const char *);
+TERM_PUBLIC void ENHsvg_writec(int);
 
-TERM_PUBLIC void SVG_path __PROTO((int p));
-TERM_PUBLIC void SVG_hypertext __PROTO((int, const char *));
+TERM_PUBLIC void SVG_path(int p);
+TERM_PUBLIC void SVG_hypertext(int, const char *);
 
 #ifdef WRITE_PNG_IMAGE
-TERM_PUBLIC void SVG_image __PROTO((unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecolor color_mode));
+TERM_PUBLIC void SVG_image(unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecolor color_mode);
 static int SVG_imageno = 0;
 #endif
 
@@ -194,21 +194,21 @@ static double SVG_fontDescent = 0;	/* estimated current font descent*/
 static double SVG_fontLeading = 0;	/* estimated current font leading*/
 static double SVG_fontAvWidth = 0;	/* estimated current font char average width*/
 
-static short SVG_Pen_RealID __PROTO ((int));
-static void SVG_PathOpen __PROTO ((void));
-static void SVG_PathClose __PROTO ((void));
-static void SVG_AddSpaceOrNewline __PROTO ((void));
-static void SVG_GroupOpen __PROTO ((void));
-static void SVG_GroupClose __PROTO ((void));
-static void SVG_SetFont __PROTO ((const char *name, double size));
-static void SVG_GroupFilledOpen __PROTO ((void));
-static void SVG_GroupFilledClose __PROTO ((void));
-static void SVG_StyleColor __PROTO((const char*));
-static void SVG_StyleFillColor __PROTO((void));
-static void SVG_local_reset __PROTO((void));
-static void SVG_DefineFillPattern __PROTO((int fillpat));
-static void SVG_MoveForced __PROTO((unsigned int x, unsigned int y));
-static void SVG_write_preamble __PROTO ((void));
+static short SVG_Pen_RealID(int);
+static void SVG_PathOpen(void);
+static void SVG_PathClose(void);
+static void SVG_AddSpaceOrNewline(void);
+static void SVG_GroupOpen(void);
+static void SVG_GroupClose(void);
+static void SVG_SetFont(const char *name, double size);
+static void SVG_GroupFilledOpen(void);
+static void SVG_GroupFilledClose(void);
+static void SVG_StyleColor(const char*);
+static void SVG_StyleFillColor(void);
+static void SVG_local_reset(void);
+static void SVG_DefineFillPattern(int fillpat);
+static void SVG_MoveForced(unsigned int x, unsigned int y);
+static void SVG_write_preamble(void);
 
 /* Stuff for enhanced text mode */
 static int ENHsvg_string_state = 0;

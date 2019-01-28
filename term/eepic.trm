@@ -80,23 +80,21 @@ register_term(eepic)
 
 #include <ctype.h>
 
-TERM_PUBLIC void EEPIC_init __PROTO((void));
-TERM_PUBLIC void EEPIC_graphics __PROTO((void));
-TERM_PUBLIC void EEPIC_text __PROTO((void));
-TERM_PUBLIC void EEPIC_linetype __PROTO((int linetype));
-TERM_PUBLIC void EEPIC_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void EEPIC_point __PROTO((unsigned int x, unsigned int y,
-				      int number));
-TERM_PUBLIC void EEPIC_vector __PROTO((unsigned int ux, unsigned int uy));
-TERM_PUBLIC void EEPIC_arrow __PROTO((unsigned int sx, unsigned int sy,
-				      unsigned int ex, unsigned int ey,
-				      int head));
-TERM_PUBLIC void EEPIC_put_text __PROTO((unsigned int x, unsigned int y,
-					 const char str[]));
-TERM_PUBLIC int EEPIC_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC int EEPIC_text_angle __PROTO((int ang));
-TERM_PUBLIC void EEPIC_reset __PROTO((void));
-TERM_PUBLIC void EEPIC_options __PROTO((void));
+TERM_PUBLIC void EEPIC_init(void);
+TERM_PUBLIC void EEPIC_graphics(void);
+TERM_PUBLIC void EEPIC_text(void);
+TERM_PUBLIC void EEPIC_linetype(int linetype);
+TERM_PUBLIC void EEPIC_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void EEPIC_point(unsigned int x, unsigned int y, int number);
+TERM_PUBLIC void EEPIC_vector(unsigned int ux, unsigned int uy);
+TERM_PUBLIC void EEPIC_arrow(unsigned int sx, unsigned int sy,
+			      unsigned int ex, unsigned int ey,
+			      int head);
+TERM_PUBLIC void EEPIC_put_text(unsigned int x, unsigned int y, const char str[]);
+TERM_PUBLIC int EEPIC_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC int EEPIC_text_angle(int ang);
+TERM_PUBLIC void EEPIC_reset(void);
+TERM_PUBLIC void EEPIC_options(void);
 
 #define EEPIC_PTS_PER_INCH 72.
 /* resolution of printer we expect to use */
@@ -201,14 +199,14 @@ static char * EEPIC_lines[][EEPIC_MAX_NUMLINES] =
 };
 static int EEPIC_type;		/* current line type */
 static TBOOLEAN EEPIC_inline = FALSE;	/* are we in the middle of a line */
-static void EEPIC_endline __PROTO((void)); /* terminate any line in progress */
+static void EEPIC_endline(void); /* terminate any line in progress */
 static int EEPIC_linecount = 0;	/* number of points in line so far */
 #define EEPIC_LINEMAX 50	/* max value for linecount */
 
 /* ARROWS */
 /* we use the same code as for LATEX */
 /* figure out the best arrow */
-static void best_latex_arrow __PROTO((int sx, int sy, int ex, int ey, int who, int head));
+static void best_latex_arrow(int sx, int sy, int ex, int ey, int who, int head);
 
 TERM_PUBLIC void
 EEPIC_init()

@@ -43,7 +43,7 @@
 #include "util.h"
 #include "variable.h"
 
-static char *read_int __PROTO((char *s, int nr, int *d));
+static char *read_int(char *s, int nr, int *d);
 
 static char *
 read_int(char *s, int nr, int *d)
@@ -58,11 +58,11 @@ read_int(char *s, int nr, int *d)
 }
 
 
-static int gdysize __PROTO((int yr));
+static int gdysize(int yr);
 
 static int mndday[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-static size_t xstrftime __PROTO((char *buf, int bsz, const char *fmt, struct tm * tm, double usec, double fulltime));
+static size_t xstrftime(char *buf, int bsz, const char *fmt, struct tm * tm, double usec, double fulltime);
 
 /* days in year */
 static int

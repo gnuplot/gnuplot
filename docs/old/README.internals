@@ -204,7 +204,7 @@ the PM3D constant.
 
 In plot.h, the following new terminal entries are added into struct TERMENTRY:
 
-int (*make_palette) __PROTO((t_sm_palette *palette));
+int (*make_palette)(t_sm_palette *palette);
     1. If palette==NULL, then return nice/suitable maximal number of colours
     supported by this terminal. Returns 0 if it can make colours without
     palette (like postscript).
@@ -224,7 +224,7 @@ int (*make_palette) __PROTO((t_sm_palette *palette));
     (*) PostScript: continuous colours, as "setrgbcolor" PS command takes the
     triplet of intervals [0,1].
 
-void (*previous_palette) __PROTO((void));	
+void (*previous_palette)(void);	
     Release the palette that the above routine allocated and get back the
     palette that was active before. Some terminals, like displays, may draw
     parts of the figure using their own palette. The terminals possessing only
@@ -235,13 +235,13 @@ void (*previous_palette) __PROTO((void));
     definitions by "gsave"... that's because there are the analytical mapping
     functions gray->RGB defined in the local header.
 
-void (*set_color) __PROTO((double gray));
+void (*set_color)(double gray);
     The value of gray is [0;1]. The terminal uses its color palette or any
     other way to transform in into true gray or to r,g,b. This terminal entry
     remembers (or not) this colour so that it can reuse it for a subsequent
     drawing (for each terminal separately).
 
-void (*filled_polygon) __PROTO((int points, gpiPoint *corners));
+void (*filled_polygon)(int points, gpiPoint *corners);
     The declaration has been made the same as in GIF's gd.h. It fills the given
     polygon according to color set by the previous call to set_color().
 

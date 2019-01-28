@@ -66,7 +66,7 @@ struct LIST *head = NULL;
 struct LIST *keylist = NULL;
 struct LIST *keyhead = NULL;
 
-void dump_list __PROTO((void));
+void dump_list(void);
 
 int maxlevel = 0;		/* how deep are the topics nested? */
 int listitems = 0;		/* number of topics */

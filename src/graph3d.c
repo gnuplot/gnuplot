@@ -117,59 +117,56 @@ double zcenter3d = 0.0;
 
 typedef enum { ALLGRID, FRONTGRID, BACKGRID, BORDERONLY } WHICHGRID;
 
-static void do_3dkey_layout __PROTO((legend_key *key, int *xinkey, int *yinkey));
-static void plot3d_impulses __PROTO((struct surface_points * plot));
-static void plot3d_lines __PROTO((struct surface_points * plot));
-static void plot3d_points __PROTO((struct surface_points * plot));
-static void plot3d_zerrorfill __PROTO((struct surface_points * plot));
-static void plot3d_boxes __PROTO((struct surface_points * plot));
-static void plot3d_vectors __PROTO((struct surface_points * plot));
-static void plot3d_lines_pm3d __PROTO((struct surface_points * plot));
-static void get_surface_cbminmax __PROTO((struct surface_points *plot, double *cbmin, double *cbmax));
-static void cntr3d_impulses __PROTO((struct gnuplot_contours * cntr,
-				     struct lp_style_type * lp));
-static void cntr3d_lines __PROTO((struct gnuplot_contours * cntr,
-				  struct lp_style_type * lp));
-static void cntr3d_points __PROTO((struct gnuplot_contours * cntr,
-				   struct lp_style_type * lp));
-static void cntr3d_labels __PROTO((struct gnuplot_contours * cntr, char * leveltext,
-				   struct text_label * label));
-static void check_corner_height __PROTO((struct coordinate * point,
-					 double height[2][2], double depth[2][2]));
-static void setup_3d_box_corners __PROTO((void));
-static void draw_3d_graphbox __PROTO((struct surface_points * plot,
+static void do_3dkey_layout(legend_key *key, int *xinkey, int *yinkey);
+static void plot3d_impulses(struct surface_points * plot);
+static void plot3d_lines(struct surface_points * plot);
+static void plot3d_points(struct surface_points * plot);
+static void plot3d_zerrorfill(struct surface_points * plot);
+static void plot3d_boxes(struct surface_points * plot);
+static void plot3d_vectors(struct surface_points * plot);
+static void plot3d_lines_pm3d(struct surface_points * plot);
+static void get_surface_cbminmax(struct surface_points *plot, double *cbmin, double *cbmax);
+static void cntr3d_impulses(struct gnuplot_contours * cntr, struct lp_style_type * lp);
+static void cntr3d_lines(struct gnuplot_contours * cntr, struct lp_style_type * lp);
+static void cntr3d_points(struct gnuplot_contours * cntr, struct lp_style_type * lp);
+static void cntr3d_labels(struct gnuplot_contours * cntr, char * leveltext,
+				   struct text_label * label);
+static void check_corner_height(struct coordinate * point,
+					 double height[2][2], double depth[2][2]);
+static void setup_3d_box_corners(void);
+static void draw_3d_graphbox(struct surface_points * plot,
 				      int plot_count,
-				      WHICHGRID whichgrid, int current_layer));
+				      WHICHGRID whichgrid, int current_layer);
 
-static void xtick_callback __PROTO((struct axis *, double place, char *text, int ticlevel,
-			     struct lp_style_type grid, struct ticmark *userlabels));
-static void ytick_callback __PROTO((struct axis *, double place, char *text, int ticlevel,
-			     struct lp_style_type grid, struct ticmark *userlabels));
-static void ztick_callback __PROTO((struct axis *, double place, char *text, int ticlevel,
-			     struct lp_style_type grid, struct ticmark *userlabels));
+static void xtick_callback(struct axis *, double place, char *text, int ticlevel,
+			   struct lp_style_type grid, struct ticmark *userlabels);
+static void ytick_callback(struct axis *, double place, char *text, int ticlevel,
+			   struct lp_style_type grid, struct ticmark *userlabels);
+static void ztick_callback(struct axis *, double place, char *text, int ticlevel,
+			   struct lp_style_type grid, struct ticmark *userlabels);
 
-static int find_maxl_cntr __PROTO((struct gnuplot_contours * contours, int *count));
-static int find_maxl_keys3d __PROTO((struct surface_points *plots, int count, int *kcnt));
-static void boundary3d __PROTO((struct surface_points * plots, int count));
+static int find_maxl_cntr(struct gnuplot_contours * contours, int *count);
+static int find_maxl_keys3d(struct surface_points *plots, int count, int *kcnt);
+static void boundary3d(struct surface_points * plots, int count);
 
 /* put entries in the key */
-static void key_sample_line __PROTO((int xl, int yl));
-static void key_sample_point __PROTO((struct surface_points *this_plot, int xl, int yl, int pointtype));
-static void key_sample_line_pm3d __PROTO((struct surface_points *plot, int xl, int yl));
-static void key_sample_point_pm3d __PROTO((struct surface_points *plot, int xl, int yl, int pointtype));
-static void key_sample_fill __PROTO((int xl, int yl, struct surface_points *this_plot));
+static void key_sample_line(int xl, int yl);
+static void key_sample_point(struct surface_points *this_plot, int xl, int yl, int pointtype);
+static void key_sample_line_pm3d(struct surface_points *plot, int xl, int yl);
+static void key_sample_point_pm3d(struct surface_points *plot, int xl, int yl, int pointtype);
+static void key_sample_fill(int xl, int yl, struct surface_points *this_plot);
 static TBOOLEAN can_pm3d = FALSE;
-static void key_text __PROTO((int xl, int yl, char *text));
-static void check3d_for_variable_color __PROTO((struct surface_points *plot, struct coordinate *point));
+static void key_text(int xl, int yl, char *text);
+static void check3d_for_variable_color(struct surface_points *plot, struct coordinate *point);
 
-static TBOOLEAN get_arrow3d __PROTO((struct arrow_def*, double*, double*, double*, double*));
-static void place_arrows3d __PROTO((int));
-static void place_labels3d __PROTO((struct text_label * listhead, int layer));
-static int map3d_getposition __PROTO((struct position* pos, const char* what, double* xpos, double* ypos, double* zpos));
+static TBOOLEAN get_arrow3d(struct arrow_def*, double*, double*, double*, double*);
+static void place_arrows3d(int);
+static void place_labels3d(struct text_label * listhead, int layer);
+static int map3d_getposition(struct position* pos, const char* what, double* xpos, double* ypos, double* zpos);
 
-static void flip_projection_axis __PROTO((struct axis *axis));
-static void splot_map_activate __PROTO((void));
-static void splot_map_deactivate __PROTO((void));
+static void flip_projection_axis(struct axis *axis);
+static void splot_map_activate(void);
+static void splot_map_deactivate(void);
 
 # define f_max(a,b) GPMAX((a),(b))
 # define f_min(a,b) GPMIN((a),(b))

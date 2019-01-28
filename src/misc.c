@@ -50,7 +50,7 @@
 # endif
 #endif
 
-static void prepare_call __PROTO((int calltype));
+static void prepare_call(int calltype);
 
 /* State information for load_file(), to recover from errors
  * and properly handle recursive load_file calls

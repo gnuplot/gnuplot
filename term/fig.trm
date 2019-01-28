@@ -72,27 +72,27 @@ register_term(fig)
 #endif /* TERM_REGISTER */
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void FIG_options __PROTO((void));
-TERM_PUBLIC void FIG_init __PROTO((void));
-TERM_PUBLIC void FIG_graphics __PROTO((void));
-TERM_PUBLIC void FIG_text __PROTO((void));
-TERM_PUBLIC void FIG_linetype __PROTO((int linetype));
-TERM_PUBLIC void FIG_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void FIG_vector __PROTO((unsigned int ux, unsigned int uy));
-TERM_PUBLIC void FIG_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
-TERM_PUBLIC void FIG_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
-TERM_PUBLIC int FIG_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC int FIG_text_angle __PROTO((int ang));
-TERM_PUBLIC void FIG_pointsize __PROTO((double arg_pointsize));
-TERM_PUBLIC void FIG_linewidth __PROTO((double linewidth));
-TERM_PUBLIC void FIG_reset __PROTO((void));
-TERM_PUBLIC void FIG_lpoint __PROTO((unsigned int x, unsigned int y, int number));
-TERM_PUBLIC void FIG_boxfill __PROTO((int style, unsigned int x, unsigned int y, unsigned int w, unsigned int h));
+TERM_PUBLIC void FIG_options(void);
+TERM_PUBLIC void FIG_init(void);
+TERM_PUBLIC void FIG_graphics(void);
+TERM_PUBLIC void FIG_text(void);
+TERM_PUBLIC void FIG_linetype(int linetype);
+TERM_PUBLIC void FIG_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void FIG_vector(unsigned int ux, unsigned int uy);
+TERM_PUBLIC void FIG_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head);
+TERM_PUBLIC void FIG_put_text(unsigned int x, unsigned int y, const char *str);
+TERM_PUBLIC int FIG_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC int FIG_text_angle(int ang);
+TERM_PUBLIC void FIG_pointsize(double arg_pointsize);
+TERM_PUBLIC void FIG_linewidth(double linewidth);
+TERM_PUBLIC void FIG_reset(void);
+TERM_PUBLIC void FIG_lpoint(unsigned int x, unsigned int y, int number);
+TERM_PUBLIC void FIG_boxfill(int style, unsigned int x, unsigned int y, unsigned int w, unsigned int h);
 TERM_PUBLIC int FIG_make_palette (t_sm_palette *);
 /* TERM_PUBLIC void FIG_previous_palette (void); */
 TERM_PUBLIC void FIG_set_color (t_colorspec *);
 TERM_PUBLIC void FIG_filled_polygon (int, gpiPoint *);
-TERM_PUBLIC void FIG_layer __PROTO((t_termlayer syncpoint));
+TERM_PUBLIC void FIG_layer(t_termlayer syncpoint);
 
 #define GOT_FIG_PROTO
 #endif /* TERM_PROTO */
@@ -228,7 +228,7 @@ static int FIG_palette_offst = 32;	/* Offset from zero for palette colours */
 static int FIG_rgb_color_offset = 32;	/* First user-defined RGB color */
 static int FIG_fill_style = 20;		/* Full saturation */
 
-static void FIG_poly_clean __PROTO((enum FIG_poly_stat fig_stat));
+static void FIG_poly_clean(enum FIG_poly_stat fig_stat);
 
 enum FIG_id {
     FIG_MONOCHROME, FIG_COLOR,

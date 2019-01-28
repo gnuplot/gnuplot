@@ -85,54 +85,54 @@ static double largest_polar_circle;
 /* Status information for stacked histogram plots */
 static struct coordinate *stackheight = NULL;	/* top of previous row */
 static int stack_count;				/* points actually used */
-static void place_histogram_titles __PROTO((void));
+static void place_histogram_titles(void);
 
 /*{{{  static fns and local macros */
-static void recheck_ranges __PROTO((struct curve_points * plot));
-static void plot_border __PROTO((void));
-static void plot_impulses __PROTO((struct curve_points * plot, int yaxis_x, int xaxis_y));
-static void plot_lines __PROTO((struct curve_points * plot));
-static void plot_points __PROTO((struct curve_points * plot));
-static void plot_dots __PROTO((struct curve_points * plot));
-static void plot_bars __PROTO((struct curve_points * plot));
-static void plot_boxes __PROTO((struct curve_points * plot, int xaxis_y));
-static void plot_filledcurves __PROTO((struct curve_points * plot));
-static void finish_filled_curve __PROTO((int, gpiPoint *, struct curve_points *));
-static void plot_betweencurves __PROTO((struct curve_points * plot));
-static void plot_vectors __PROTO((struct curve_points * plot));
-static void plot_f_bars __PROTO((struct curve_points * plot));
-static void plot_c_bars __PROTO((struct curve_points * plot));
-static int compare_ypoints __PROTO((SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2));
-static void plot_boxplot __PROTO((struct curve_points * plot));
+static void recheck_ranges(struct curve_points * plot);
+static void plot_border(void);
+static void plot_impulses(struct curve_points * plot, int yaxis_x, int xaxis_y);
+static void plot_lines(struct curve_points * plot);
+static void plot_points(struct curve_points * plot);
+static void plot_dots(struct curve_points * plot);
+static void plot_bars(struct curve_points * plot);
+static void plot_boxes(struct curve_points * plot, int xaxis_y);
+static void plot_filledcurves(struct curve_points * plot);
+static void finish_filled_curve(int, gpiPoint *, struct curve_points *);
+static void plot_betweencurves(struct curve_points * plot);
+static void plot_vectors(struct curve_points * plot);
+static void plot_f_bars(struct curve_points * plot);
+static void plot_c_bars(struct curve_points * plot);
+static int compare_ypoints(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2);
+static void plot_boxplot(struct curve_points * plot);
 
-static void place_labels __PROTO((struct text_label * listhead, int layer, TBOOLEAN clip));
-static void place_arrows __PROTO((int layer));
-static void place_grid __PROTO((int layer));
-static void place_raxis __PROTO((void));
-static void place_parallel_axes __PROTO((struct curve_points *plots, int pcount, int layer));
+static void place_labels(struct text_label * listhead, int layer, TBOOLEAN clip);
+static void place_arrows(int layer);
+static void place_grid(int layer);
+static void place_raxis(void);
+static void place_parallel_axes(struct curve_points *plots, int pcount, int layer);
 
-static void plot_steps __PROTO((struct curve_points * plot));	/* JG */
-static void plot_fsteps __PROTO((struct curve_points * plot));	/* HOE */
-static void plot_histeps __PROTO((struct curve_points * plot));	/* CAC */
+static void plot_steps(struct curve_points * plot);	/* JG */
+static void plot_fsteps(struct curve_points * plot);	/* HOE */
+static void plot_histeps(struct curve_points * plot);	/* CAC */
 
-static void ytick2d_callback __PROTO((struct axis *, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels));
-static void xtick2d_callback __PROTO((struct axis *, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels));
-static void ttick_callback __PROTO((struct axis *, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels));
+static void ytick2d_callback(struct axis *, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels);
+static void xtick2d_callback(struct axis *, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels);
+static void ttick_callback(struct axis *, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels);
 
-static int histeps_compare __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
+static int histeps_compare(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2);
 
-static void get_arrow __PROTO((struct arrow_def* arrow, double* sx, double* sy, double* ex, double* ey));
-static void map_position_double __PROTO((struct position* pos, double* x, double* y, const char* what));
+static void get_arrow(struct arrow_def* arrow, double* sx, double* sy, double* ex, double* ey);
+static void map_position_double(struct position* pos, double* x, double* y, const char* what);
 
-static void plot_circles __PROTO((struct curve_points *plot));
-static void plot_ellipses __PROTO((struct curve_points *plot));
-static void do_rectangle __PROTO((int dimensions, t_object *this_object, fill_style_type *fillstyle));
+static void plot_circles(struct curve_points *plot);
+static void plot_ellipses(struct curve_points *plot);
+static void do_rectangle(int dimensions, t_object *this_object, fill_style_type *fillstyle);
 
-static double rgbscale __PROTO((double rawvalue));
+static double rgbscale(double rawvalue);
 
-static void draw_polar_circle __PROTO((double place));
+static void draw_polar_circle(double place);
 
-static void plot_parallel __PROTO((struct curve_points *plot));
+static void plot_parallel(struct curve_points *plot);
 
 /* for plotting error bars
  * half the width of error bar tic mark

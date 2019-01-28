@@ -58,10 +58,10 @@
 #define MAX_COL 6
 
 /* From xref.c */
-extern void *xmalloc __PROTO((size_t));
+extern void *xmalloc(size_t);
 
-void convert __PROTO((FILE *, FILE *));
-void process_line __PROTO((char *, FILE *));
+void convert(FILE *, FILE *);
+void process_line(char *, FILE *);
 
 /* malloc's are not being checked ! */
 
