@@ -91,7 +91,7 @@ void save_fit __PROTO((FILE *fp));
 void fit_command __PROTO((void));
 size_t wri_to_fil_last_fit_cmd __PROTO((FILE *fp));
 char *getfitlogfile __PROTO((void));
-char *getfitscript __PROTO((void));
+const char *getfitscript __PROTO((void));
 
 void call_gnuplot(const double *par, double *data);
 TBOOLEAN regress_check_stop(int iter, double chisq, double last_chisq, double lambda);

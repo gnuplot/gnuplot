@@ -771,9 +771,8 @@ fit_interrupt()
 	case 'e':
 	case 'E':{
 		int i;
-		char *tmp;
+		const char *tmp = getfitscript();
 
-		tmp = getfitscript();
 		fprintf(STANDARD, "executing: %s\n", tmp);
 		/* FIXME: Shouldn't we also set FIT_STDFIT etc? */
 		/* set parameters visible to gnuplot */
@@ -790,7 +789,7 @@ fit_interrupt()
 /*****************************************************************
     determine current setting of FIT_SCRIPT
 *****************************************************************/
-char *
+const char *
 getfitscript(void)
 {
     char *tmp;
@@ -800,7 +799,7 @@ getfitscript(void)
     if ((tmp = getenv(FITSCRIPT)) != NULL)
 	return tmp;
     else
-	return (char *)DEFAULT_CMD;
+	return DEFAULT_CMD;
 }
 
 
