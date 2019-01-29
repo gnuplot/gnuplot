@@ -11,7 +11,6 @@ load "gen-random.inc"
 unset key
 rlow = -4.0
 rhigh = 4.0
-set parametric
 set xrange [rlow:rhigh]; set yrange [rlow:rhigh]; set zrange [rlow:rhigh]
 set xtics axis nomirror; set ytics axis nomirror; set ztics axis nomirror;
 set border 0
@@ -27,12 +26,6 @@ set cblabel "point density"
 
 # define 100 x 100 x 100 voxel grid
 set vgrid $vdensity size 100
-
-# load and read back a single voxel
-in = 123.4
-voxel(.11, .22, .33) = in
-out = voxel(.11, .22, .33)
-if (in != out) print "voxel read-back failed"
 vclear $vdensity
 
 # fill a spherical region around each point in $random

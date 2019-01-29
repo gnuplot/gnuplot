@@ -19,6 +19,7 @@ typedef struct vgrid {
     double min_value;
     double max_value;
     double mean_value;
+    double stddev;
     int nzero;
     t_voxel *vdata;	/* points to 3D array of voxels */
 } vgrid;

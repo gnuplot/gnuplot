@@ -301,8 +301,8 @@ show_vgrid()
 		vgrid->vxmin, vgrid->vxmax, vgrid->vymin,
 		vgrid->vymax, vgrid->vzmin, vgrid->vzmax);
 	    vgrid_stats(vgrid);
-	    fprintf(stderr, "\t\tnon-zero voxel values:  min %.2g max %.2g  mean %.2g\n",
-		vgrid->min_value, vgrid->max_value, vgrid->mean_value);
+	    fprintf(stderr, "\t\tnon-zero voxel values:  min %.2g max %.2g  mean %.2g stddev %.2g\n",
+		vgrid->min_value, vgrid->max_value, vgrid->mean_value, vgrid->stddev);
 	    fprintf(stderr, "\t\tnumber of zero voxels:  %d   (%.2f%%)\n",
 		vgrid->nzero,
 		100. * (double)vgrid->nzero / (vgrid->size*vgrid->size*vgrid->size));
@@ -312,19 +312,26 @@ show_vgrid()
 
 /*
  * run through the whole grid
- * accumulate min/max values
- * TODO: mean median stddev
+ * accumulate min/max, mean, and standard deviation of non-zero voxels
+ * TODO: median
  */
 static void
 vgrid_stats(vgrid *vgrid)
 {
     double min = VERYLARGE;
     double max = -VERYLARGE;
-    double sum = 0;		/* FIXME: long double? */
+    double sum = 0;
     int nzero = 0;
     t_voxel *voxel;
     int N = vgrid->size;
     int i;
+
+    /* bookkeeping for standard deviation */
+    double num = 0;
+    double delta = 0;
+    double delta2 = 0;
+    double mean = 0;
+    double mean2 = 0;
 
     for (voxel = vgrid->vdata, i=0; i < N*N*N; voxel++, i++) {
 	if (*voxel == 0) {
@@ -336,12 +343,24 @@ vgrid_stats(vgrid *vgrid)
 	    min = *voxel;
 	if (max < *voxel)
 	    max = *voxel;
+
+	/* standard deviation */
+	num += 1.0;
+	delta = *voxel - mean;
+	mean += delta/num;
+	delta2 = *voxel - mean;
+	mean2 += delta * delta2;
     }
 
     vgrid->min_value = min;
     vgrid->max_value = max;
     vgrid->nzero = nzero;
-    vgrid->mean_value = sum / (double)(N*N*N - nzero);
+    if (num < 2) {
+	vgrid->mean_value = vgrid->stddev = not_a_number();
+    } else {
+	vgrid->mean_value = sum / (double)(N*N*N - nzero);
+	vgrid->stddev = sqrt(mean2 / (num - 1.0));
+    }
 
     /* all zeros */
     if (nzero == N*N*N) {

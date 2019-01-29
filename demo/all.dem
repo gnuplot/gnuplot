@@ -446,11 +446,11 @@ load "pm3d_lighting.dem"
 print "********************** file vplot.dem *********************"
 load "vplot.dem"
 
-print "********************** file voxel.dem *********************"
-load "voxel.dem"
-
 print "********************** file isosurface.dem *********************"
 load "isosurface.dem"
+
+print "********************** file voxel.dem *********************"
+load "voxel.dem"
 
 pause 3
 reset session

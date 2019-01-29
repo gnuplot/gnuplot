@@ -4,7 +4,7 @@
 #
 if (!exists("VoxelDistance")) exit
 
-set vgrid $helix size 25
+set vgrid $helix size 33
 set vxrange [-2:2]; set vyrange [-2:2]; set vzrange [0:11]
 set xrange [-2:2]; set yrange [-2:2]; set zrange [0:11]
 set xyplane at 0
