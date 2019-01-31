@@ -1748,23 +1748,14 @@ unset_all_zeroaxes()
 }
 
 
-/* process 'unset [xyz]{2}label command */
 static void
 unset_axislabel_or_title(text_label *label)
 {
-    struct position default_offset = { character, character, character,
-				       0., 0., 0. };
-    if (label) {
-	free(label->text);
-	label->text = NULL;
-	free(label->font);
-	label->font = NULL;
-	label->offset = default_offset;
-	label->textcolor.type = TC_DEFAULT;
-	label->boxed = 0;
-    }
+    if (label)
+	*label = default_axis_label;
 }
 
+/* process 'unset [xyz]{2}label command */
 static void
 unset_axislabel(AXIS_INDEX axis)
 {
