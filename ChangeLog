@@ -1,3 +1,8 @@
+2019-02-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/unset.c: "unset title" or "reset" resets _all_ title properties
+	Bug #2120
+
 2019-02-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/internal.c src/util.c:  preserve LC_NUMERIC locale inside 'using'
