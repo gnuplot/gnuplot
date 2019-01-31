@@ -1751,8 +1751,11 @@ unset_all_zeroaxes()
 static void
 unset_axislabel_or_title(text_label *label)
 {
-    if (label)
+    if (label) {
+	free(label->text);
+	free(label->font);
 	*label = default_axis_label;
+    }
 }
 
 /* process 'unset [xyz]{2}label command */
