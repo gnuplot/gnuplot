@@ -159,9 +159,9 @@
 			-[INPUT]Arg
 		Plus	+a
 			+[INPUT]Arg
-		One's compliment	~a
+		Ones' complement	~a
 			~[INPUT]Arg
-		Logcial negation	!a
+		Logical negation	!a
 			![INPUT]Arg
 		Factorial	a!
 			[INPUT]Arg[EOS]!
