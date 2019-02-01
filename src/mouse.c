@@ -507,6 +507,7 @@ GetAnnotateString(char *s, double x, double y, int mode, char *fmt)
 	original_y = plot_y->udv_value;
 	Gcomplex(&(plot_x->udv_value), x, 0);
 	Gcomplex(&(plot_y->udv_value), y, 0);
+	readout.type = NOTDEFINED;
 	evaluate_at(mouse_readout_function.at, &readout);
 	plot_x->udv_value = original_x;
 	plot_y->udv_value = original_y;
@@ -874,20 +875,16 @@ static void
 UpdateStatuslineWithMouseSetting(mouse_setting_t * ms)
 {
     char s0[256], *sp;
+    s0[0] = 0;
 
-/* This suppresses mouse coordinate update after a ^C, but I think
- * that the relevant terminals do their own checks anyhow so we
- * we can just let the ones that care silently skip the update
- * while the ones that don't care keep on updating as usual.
- */
-#if (0)
+/* This suppresses mouse coordinate update after a ^C */
     if (!term_initialised)
 	return;
-#endif
 
-    if (!ms->on) {
-	s0[0] = 0;
-    } else if (!ALMOST2D) {
+    if (!ms->on)
+	return;
+
+    if (!ALMOST2D) {
 	char format[0xff];
 	format[0] = '\0';
 	strcat(format, "view: ");
@@ -902,9 +899,8 @@ UpdateStatuslineWithMouseSetting(mouse_setting_t * ms)
     } else if (!TICS_ON(axis_array[SECOND_X_AXIS].ticmode) && !TICS_ON(axis_array[SECOND_Y_AXIS].ticmode)) {
 	/* only first X and Y axis are in use */
 	sp = GetAnnotateString(s0, real_x, real_y, mouse_mode, mouse_alt_string);
-	if (ruler.on) {
+	if (ruler.on)
 	    GetRulerString(sp, real_x, real_y);
-	}
     } else {
 	/* X2 and/or Y2 are in use: use more verbose format */
 	sp = s0;
@@ -953,9 +949,9 @@ UpdateStatuslineWithMouseSetting(mouse_setting_t * ms)
 	}
 	*--sp = 0;		/* delete trailing space */
     }
-    if (term->put_tmptext) {
+
+    if (term->put_tmptext && *s0)
 	(term->put_tmptext) (0, s0);
-    }
 }
 
 void
