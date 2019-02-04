@@ -1019,7 +1019,13 @@ LUA_arrow(
     lua_pushinteger(L, (int)sy);
     lua_pushinteger(L, (int)ex);
     lua_pushinteger(L, (int)ey);
+
+    /* hidden3d uses a non-standard method of indicating NOHEAD */
+    if (curr_arrow_headangle == 0 && curr_arrow_headlength > 0)
+	head = NOHEAD;
+
     lua_pushinteger(L, head);
+
     /*   additional vars  */
     lua_pushinteger(L, curr_arrow_headlength);    /* access head length + angle (int) */
     lua_pushnumber(L, curr_arrow_headangle);      /* angle in degrees (double)        */

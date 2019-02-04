@@ -1151,13 +1151,13 @@ pgf.print_help = function(fwrite)
  for every linetype. The default plotstyle is 'smooth' for every
  linetype >= 1.
 
- By using the 'tikzarrows' option the gnuplot arrow styles defined by
- the user will be mapped to TikZ arrow styles. This is done by 'misusing'
- the angle value of the arrow definition. E.g. an arrow style with the
- angle '7' will be mapped to the TikZ style 'gp arrow 7' ignoring all the
- other given values. By default the TikZ terminal uses the stealth' arrow
- tips for all arrows. To obtain the default gnuplot behaviour please use
- the 'gparrows' option.
+ By default the tikz terminal produces simple LaTeX arrows.
+ To produce arrows in accord with gnuplot's 'arrowstyle' settings,
+ use the 'gparrows' option.  The 'tikzarrows' option is a third alternative
+ that bypasses both of these. Instead the arrowstyle 'angle' parameter is
+ used to index a set of 12 pre-defined TikZ arrow styles.
+ E.g. an arrow style with the angle '7' will be mapped to the TikZ style
+ 'gp arrow 7' ignoring all other arrowstyle settings.
 
  With 'cmykimages' the CMYK color model will be used for inline image data
  instead of the RGB model. All other colors (like line colors etc.) are
@@ -1381,6 +1381,9 @@ gfx.TEXT_ANCHOR = {
 -- expand bit patterns to integers
 gfx.HEAD_STR = {"", "->", "<-", "<->", 
                 ",draw opacity=0", "->,draw opacity=0", "<-,draw opacity=0", "<->,draw opacity=0",
+		""}
+gfx.HEAD90_STR = {"", "-|", "|-", "|-|",
+                ",draw opacity=0", "-|,draw opacity=0", "|-,draw opacity=0", "|-|,draw opacity=0",
 		""}
 
 -- conversion factors in `cm'
@@ -2250,7 +2253,11 @@ term.arrow = function(sx, sy, ex, ey, head, length, angle, backangle, filled)
     gfx.check_linetype()
     gfx.check_dashtype()
     gfx.check_linewidth()
-    pgf.draw_arrow({{sx,sy},{ex,ey}}, gfx.HEAD_STR[head+1], headstyle)
+    if angle == 90 then
+      pgf.draw_arrow({{sx,sy},{ex,ey}}, gfx.HEAD90_STR[head+1], headstyle)
+    else
+      pgf.draw_arrow({{sx,sy},{ex,ey}}, gfx.HEAD_STR[head+1], headstyle)
+    end
     return 1
   end
 end
