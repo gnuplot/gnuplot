@@ -1,5 +1,15 @@
 2019-02-05  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* term/luz.trm term/lua/gnuplot-tikz.lua:
+
+	Make the default tikz arrow routine interpret arrowstyle head angle = 0
+	as "nohead", head angle = 90 as LaTeX arrowhead style '|'.
+	This allows correct handling of hidden3d arrows with style "nohead".
+	tikz options "gparrow" and "tikzarrow" are not affected.
+	Bug #2124.
+
+2019-02-05  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* src/tabulate.c:  'plot with table' assumed that the maximum size of an
 	output column is the maximum width produced by format "%g", but that limit
 	is irrelevant for string output.  Change it to dynamically allocate space

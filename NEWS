@@ -1,7 +1,10 @@
 Changes in 5.2.7
 ================
 * NEW "set pm3d noclipcb" will skip drawing quadrangles with color < cbmin
+* CHANGE splot "with points pt 0" should act like "with dots"
+* CHANGE (tikz) improved default interpretation of gnuplot arrowhead style
 * FIX "plot with table" unnecessarily limited string column output to 60 chars 
+* FIX (windows) make sure graph window is shown even if the program is "hidden"
 
 Changes in 5.2.6
 ================
