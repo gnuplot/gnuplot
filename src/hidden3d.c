@@ -553,10 +553,12 @@ make_edge(
 	thisedge->v1 = vnum1;
 	thisedge->v2 = vnum2;
 	if (lp->p_type == PT_ARROWHEAD) thisedge->style = PT_ARROWHEAD;
+	if (lp->p_type == PT_BACKARROW) thisedge->style = PT_BACKARROW;
     } else {
 	thisedge->v1 = vnum2;
 	thisedge->v2 = vnum1;
 	if (lp->p_type == PT_ARROWHEAD) thisedge->style = PT_BACKARROW;
+	if (lp->p_type == PT_BACKARROW) thisedge->style = PT_ARROWHEAD;
     }
 
     return thisedge - elist;
@@ -1197,6 +1199,8 @@ build_networks(struct surface_points *plots, int pcount)
 
 	if (this_plot->plot_style == VECTOR) {
 	    lp->p_type = PT_ARROWHEAD;
+	    if (this_plot->arrow_properties.head == BACKHEAD)
+		lp->p_type = PT_BACKARROW;
 	    if (this_plot->arrow_properties.head == NOHEAD) {
 		this_plot->arrow_properties.head_length= 1;
 		this_plot->arrow_properties.head_angle = 0;
