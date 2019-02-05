@@ -952,6 +952,8 @@ draw3d_line_unconditional(
 	draw_clip_arrow(x1,y1,x2,y2,END_HEAD);
     else if (lp->p_type == PT_BACKARROW)
 	draw_clip_arrow(x1,y1,x2,y2,BACKHEAD);
+    else if (lp->p_type == PT_BOTHHEADS)
+	draw_clip_arrow(x1,y1,x2,y2,BOTH_HEADS);
     else
 
 	draw_clip_line(x1,y1,x2,y2);

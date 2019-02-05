@@ -44,6 +44,7 @@
 
 #define PT_ARROWHEAD -10
 #define PT_BACKARROW -11
+#define PT_BOTHHEADS -12
 
 /* Variables of hidden3d.c needed by other modules: */
 
