@@ -1,6 +1,7 @@
 Changes in 5.2.7
 ================
-* NEWS "set pm3d noclipcb" will skip drawing quadrangles with color < cbmin
+* NEW "set pm3d noclipcb" will skip drawing quadrangles with color < cbmin
+* FIX "plot with table" unnecessarily limited string column output to 60 chars 
 
 Changes in 5.2.6
 ================

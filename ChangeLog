@@ -1,3 +1,12 @@
+2019-02-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/tabulate.c:  'plot with table' assumed that the maximum size of an
+	output column is the maximum width produced by format "%g", but that limit
+	is irrelevant for string output.  Change it to dynamically allocate space
+	for whatever string is returned by strcol(i).
+
+2019-01-01  Release 5.2.6
+
 2018-12-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/titlepag.tex src/version.c configure.ac RELEASE_NOTES:
