@@ -1,7 +1,3 @@
-#ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.54 2016/05/09 03:32:27 sfeam Exp $"); }
-#endif
-
 /* GNUPLOT - util3d.c */
 
 /*[
@@ -963,6 +959,8 @@ draw3d_line_unconditional(
 	draw_clip_arrow(x1,y1,x2,y2,END_HEAD);
     else if (lp->p_type == PT_BACKARROW)
 	draw_clip_arrow(x1,y1,x2,y2,BACKHEAD);
+    else if (lp->p_type == PT_BOTHHEADS)
+	draw_clip_arrow(x1,y1,x2,y2,BOTH_HEADS);
     else
 
 	draw_clip_line(x1,y1,x2,y2);

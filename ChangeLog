@@ -1,5 +1,12 @@
 2019-02-05  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/hidden3d.c src/hidden3d.h src/util3d.c:
+
+	Repair and complete implementation of arrowstyle settings "backhead"
+	and "heads" in hidden3d mode.
+
+2019-02-05  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* term/luz.trm term/lua/gnuplot-tikz.lua:
 
 	Make the default tikz arrow routine interpret arrowstyle head angle = 0

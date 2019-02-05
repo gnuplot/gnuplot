@@ -1777,21 +1777,30 @@ draw_edge(p_edge e, p_vertex v1, p_vertex v2)
     /* Only the original tip of an arrow should show an arrowhead */
     /* FIXME:  Arrowhead lines are not themselves subject to hidden line removal */
     if (arrow) {
-	if (e->v2 != v2-vlist && e->v1 != v1-vlist) {
+	/* FIXME: e->lp points to this_plot->lp_properties but what we need is */
+	/* a pointer to the immediately following field e->arrow_properties.   */
+	lp_style_type *lp = e->lp;
+	arrow_style_type *as = (arrow_style_type *)(&lp[1]);
+	apply_head_properties(as);
+	if (as->head == BOTH_HEADS)
+	    lptemp.p_type = PT_BOTHHEADS;
+
+	if (e->v2 != v2-vlist && e->v1 != v1-vlist)
 		lptemp.p_type = 0;
-	} else if (e->style == PT_BACKARROW) {
+
+	if (lptemp.p_type == PT_BACKARROW) {
 	    if (e->v2 == v2-vlist && e->v1 != v1-vlist)
 		lptemp.p_type = 0;
-	} else {
+	}
+	if (lptemp.p_type == PT_ARROWHEAD) {
 	    if (e->v1 == v1-vlist && e->v2 != v2-vlist)
 		lptemp.p_type = 0;
 	}
-	if (lptemp.p_type == PT_BACKARROW || lptemp.p_type == PT_ARROWHEAD) {
-	    /* FIXME: e->lp points to this_plot->lp_properties but what we need is */
-	    /* a pointer to the immediately following field e->arrow_properties.   */
-	    lp_style_type *lp = e->lp;
-	    arrow_style_type *as = (arrow_style_type *)(&lp[1]);
-	    apply_head_properties(as);
+	if (lptemp.p_type == PT_BOTHHEADS) {
+	    if (e->v1 == v1-vlist && e->v2 != v2-vlist)
+		lptemp.p_type = PT_BACKARROW;
+	    if (e->v2 == v2-vlist && e->v1 != v1-vlist)
+		lptemp.p_type = PT_ARROWHEAD;
 	}
     }
 
