@@ -596,11 +596,14 @@ tabulate_one_line(double v[MAXDATACOLS], struct value str[MAXDATACOLS], int ncol
 
 	line[0] = NUL;
 	for (col = 0; col < ncols; col++) {
-	    if (str[col].type == STRING)
-		snprintf(buf, sizeof(buf), " %s%c", str[col].v.string_val, sep);
-	    else
+	    if (str[col].type == STRING) {
+		len = strappend(&line, &size, 0, str[col].v.string_val);
+		snprintf(buf, sizeof(buf), " %c", sep);
+		len = strappend(&line, &size, len, buf);
+	    } else {
 		snprintf(buf, sizeof(buf), " %g%c", v[col], sep);
-	    len = strappend(&line, &size, len, buf);
+		len = strappend(&line, &size, len, buf);
+	    }
 	}
 	append_to_datablock(&table_var->udv_value, line);
     }
