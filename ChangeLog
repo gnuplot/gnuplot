@@ -1,3 +1,21 @@
+2019-02-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/internal.c src/util.c:  preserve LC_NUMERIC locale inside 'using'
+	
+	To read input data in the user's preferred locale, the plot, splot, and
+	stats commands set the numeric locale prior to data input and reset it
+	afterwards.  Similarly in order to produce output in the preferred
+	locale, the sprintf and gprintf functions set/reset the numeric locale
+	on entry/exit.  Unfortunately these two policies collide head-on if
+	sprintf or gprintf appears in a 'using' spec.  The set done by sprintf
+	on entry is redundant and the subsequent reset on exit cancels the
+	numeric locale currently in effect for data input.  As a consequence
+	the next data input operation uses the wrong numeric locale.
+	
+	To resolve this we now wrap the set/reset_numeric_locale in sprintf and
+	gprintf with " if (!evaluate_inside_using) ".
+	Bug #2125
+
 2019-02-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/hidden3d.c src/hidden3d.h src/util3d.c:

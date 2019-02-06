@@ -544,7 +544,8 @@ gprintf(
 
     *dest = '\0';
 
-    set_numeric_locale();
+    if (!evaluate_inside_using)
+	set_numeric_locale();
 
     /* Should never happen but fuzzer managed to hit it */
     if (!format)
@@ -913,15 +914,12 @@ gprintf(
 	    }
 	    /*}}} */
 	default:
-	   reset_numeric_locale();
 	   int_error(NO_CARET, "Bad format character");
 	} /* switch */
 	/*}}} */
 
-	if (got_hash && (format != strpbrk(format,"oeEfFgG"))) {
-	   reset_numeric_locale();
+	if (got_hash && (format != strpbrk(format,"oeEfFgG")))
 	   int_error(NO_CARET, "Bad format character");
-	}
 
     /* change decimal '.' to the actual entry in decimalsign */
 	if (decimalsign != NULL) {
@@ -1013,7 +1011,8 @@ done:
     /* Copy as much as fits */
     safe_strncpy(outstring, tempdest, count);
 
-    reset_numeric_locale();
+    if (!evaluate_inside_using)
+	reset_numeric_locale();
 }
 
 /*}}} */
