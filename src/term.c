@@ -2337,7 +2337,7 @@ enhanced_recursion(
 		    else
 			base += ovp*f;
 		}
-		--p;            /* HBB 20001021: bug fix: 10^{2} broken */
+		--p;
 
 		if (*++p == '/') {
 		    /* then parse a fontname, optional fontsize */
@@ -2348,9 +2348,29 @@ enhanced_recursion(
 			    ;   /* do nothing */
 		    }
 		    start_of_fontname = p;
-		    while ((ch = *p) > ' ' && ch != '=' && ch != '*' && ch != '}' && ch != ':')
+
+		    /* Allow font name to be in quotes.
+		     * This makes it possible to handle font names containing spaces.
+		     */
+		    if (*p == '\'' || *p == '"') {
 			++p;
-		    end_of_fontname = p;
+			while (*p != '\0' && *p != '}' && *p != *start_of_fontname)
+			    ++p;
+			if (*p != *start_of_fontname) {
+			    int_warn(NO_CARET, "cannot interpret font name %s", start_of_fontname);
+			    p = start_of_fontname;
+			}
+			start_of_fontname++;
+			end_of_fontname = p++;
+			ch = *p;
+		    } else {
+
+		    /* Normal unquoted font name */
+			while ((ch = *p) > ' ' && ch != '=' && ch != '*' && ch != '}' && ch != ':')
+			    ++p;
+			end_of_fontname = p;
+		    }
+
 		    do {
 			if (ch == '=') {
 			    /* get optional font size */
