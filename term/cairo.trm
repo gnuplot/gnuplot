@@ -112,7 +112,7 @@ typedef struct cairo_params_t {
     TBOOLEAN transparent;
     TBOOLEAN crop;
     char fontname[MAX_ID_LEN + 1];    /* name of font */
-    int fontsize;                     /* size of font in pts */
+    float fontsize;                   /* size of font in pts */
     float fontscale;                  /* modified by this */
     float width;
     float height;
@@ -300,7 +300,7 @@ TERM_PUBLIC void cairotrm_options()
 					cairo_params->fontname[sep] = '\0';
 				}
 				if (s[sep] == ',')
-					sscanf(&(s[sep+1]), "%d", &cairo_params->fontsize);
+					sscanf(&(s[sep+1]), "%f", &cairo_params->fontsize);
 			}
 			font_setting = (char*) gp_alloc(strlen(s) + 1,"cairo terminal font");
 			strcpy(font_setting,s);
@@ -1098,13 +1098,13 @@ void cairotrm_linetype(int lt)
 int cairotrm_set_font (const char *font)
 {
 	char *fontname = NULL;
-	int fontsize = 0;
+	float fontsize = 0;
 
 	if (font && (*font)) {
 		int sep = strcspn(font,",");
 		fontname = strdup(font);
 		if (font[sep] == ',') {
-			sscanf(&(font[sep+1]), "%d", &fontsize);
+			sscanf(&(font[sep+1]), "%f", &fontsize);
 			fontname[sep] = '\0';
 		}
 	} else {
