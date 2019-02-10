@@ -805,13 +805,17 @@ C  need @ in table, so end and restart the table !
  The markup control characers act on the following single character or
  bracketed clause. The bracketed clause may contain a string of characters with
  no additional markup, e.g. 2^{10}, or it may contain additional markup that
- changes font properties. This example illustrates nesting one bracketed clause
- inside another to produce a boldface A with an italic subscript i, all in the
- current font. If the clause introduced by :Normal were omitted the subscript
- would be both italic and boldface.
+ changes font properties.  Font specifiers MUST be preceeded by a '/' character
+ that immediately follows the opening '{'.  If a font name contains spaces it
+ must be enclosed in single or double quotes.
+
+ Examples: The first example illustrates nesting one bracketed clause inside
+ another to produce a boldface A with an italic subscript i, all in the current
+ font.  If the clause introduced by :Normal were omitted the subscript would be
+ both italic and boldface.  The second example illustrates the same markup
+ applied to font "Times New Roman" at 20 point size.
       {/:Bold A_{/:Normal{/:Italic i}}}
- Font specifiers MUST be preceeded by a '/' character that immediately follows
- the opening '{'.
+      {/"Times New Roman":Bold=20 A_{/:Normal{/:Italic i}}}
 
  The phantom box is useful for a@^b_c to align superscripts and subscripts
  but does not work well for overwriting an accent on a letter.  For the latter,

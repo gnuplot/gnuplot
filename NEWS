@@ -5,6 +5,7 @@ Changes in 5.2.7
 * CHANGE (tikz) improved default interpretation of gnuplot arrowhead style
 * CHANGE teach hidden3d to handle double-headed vectors (arrowstyle "heads")
 * CHANGE "unset title" or "reset" resets all title properties to default
+* CHANGE font names passed to enhanced text processing may be in quotes
 * FIX "plot with table" unnecessarily limited string column output to 60 chars 
 * FIX (windows) make sure graph window is shown even if the program is "hidden"
 * FIX hidden3d mode was not correctly dealing with arrowstyle backhead

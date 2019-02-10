@@ -1,3 +1,13 @@
+2019-02-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (enhanced_recursion): Font names passed to enhanced text
+	processing may be in quotes.
+    
+	This allows one to specify fonts whose name contains space characters
+	when constructing a text string with enhanced text markup.
+	E.g.  set title "{/'Times New Roman'=15:Italic A_i}"
+	Bug #2121
+
 2019-02-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/unset.c: "unset title" or "reset" resets _all_ title properties
