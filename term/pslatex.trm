@@ -789,7 +789,8 @@ EPSLATEX_reopen_output(char * ext)
                 sprintf(suffix, "-inc.%s", ext);
             else
                 sprintf(suffix, ".%s", ext);
-            strncpy(&psoutstr[outstrlen - 4], suffix, strlen(suffix) + 1);
+	    psoutstr[outstrlen-4] = '\0';
+	    strcat(psoutstr,suffix);
             /* BM: Need binary output for PDF files. Does this have negative side effects for EPS? */
             gppsfile = fopen(psoutstr, "wb");
         }
@@ -798,9 +799,7 @@ EPSLATEX_reopen_output(char * ext)
                       psoutstr);
 
         /* set the name for the \includegraphics command */
-        pslatex_auxname = gp_alloc(strlen(psoutstr)-3,
-                                   "epslatex TeX filename");
-        strncpy( pslatex_auxname, psoutstr, strlen(psoutstr)-4 );
+	pslatex_auxname = gp_strdup(psoutstr);
         pslatex_auxname[strlen(psoutstr)-4] = '\0';
 
         free(psoutstr);
