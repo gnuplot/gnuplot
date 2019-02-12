@@ -424,6 +424,10 @@ end
 pgf.draw_fill = function(t, pattern, color, saturation, opacity)
   local fill_path = ''
   local fill_style = color
+
+  if #t < 2 then
+    return
+  end
   
   if saturation < 100 then
     fill_style = fill_style .. ",color=.!"..saturation;
