@@ -4873,8 +4873,7 @@ set_table()
 	    append = TRUE;
 	}
 	if (!append || table_var->udv_value.type != DATABLOCK) {
-	    gpfree_datablock(&table_var->udv_value);
-	    gpfree_string(&table_var->udv_value);
+	    free_value(&table_var->udv_value);
 	    table_var->udv_value.type = DATABLOCK;
 	    table_var->udv_value.v.data_array = NULL;
 	}

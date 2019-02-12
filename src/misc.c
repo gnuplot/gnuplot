@@ -224,8 +224,7 @@ prepare_call(int calltype)
     Gstring(&(udv->udv_value), gp_strdup(lf_head->name));
 
     udv = add_udv_by_name("ARGV");
-    gpfree_array(&(udv->udv_value));
-    gpfree_string(&(udv->udv_value));
+    free_value(&(udv->udv_value));
 
     argv_size = GPMIN(call_argc, 9);
     udv->udv_value.type = ARRAY;

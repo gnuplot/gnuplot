@@ -202,8 +202,8 @@ set_vgrid()
 	new_size = grid->udv_value.v.vgrid->size;
 	current_vgrid = grid->udv_value.v.vgrid;
     } else {
-	/* The only other variable type that starts with a $ is DATABLOCK */
-	gpfree_datablock(&grid->udv_value);
+	/* Note: The only other variable type that starts with a $ is DATABLOCK */
+	free_value(&grid->udv_value);
 	current_vgrid = gp_alloc(sizeof(vgrid), "new vgrid");
 	memset(current_vgrid, 0, sizeof(vgrid));
 	current_vgrid->vxmin = not_a_number();

@@ -399,27 +399,29 @@ Gstring(struct value *a, char *s)
     return (a);
 }
 
+/* Common interface for freeing data structures attached to a struct value.
+ * Each of the type-specific routines will ignore values of other types.
+ */
+void
+free_value(struct value *a)
+{
+    gpfree_string(a);
+    gpfree_datablock(a);
+    gpfree_array(a);
+}
+
 /* It is always safe to call gpfree_string with a->type is INTGR or CMPLX.
  * However it would be fatal to call it with a->type = STRING if a->string_val
  * was not obtained by a previous call to gp_alloc(), or has already been freed.
  * Thus 'a->type' is set to NOTDEFINED afterwards to make subsequent calls safe.
  */
-struct value *
+void
 gpfree_string(struct value *a)
 {
     if (a->type == STRING) {
 	free(a->v.string_val);
 	a->type = NOTDEFINED;
     }
-
-    else if (a->type == ARRAY) {
-	/* gpfree_array() is now a separate routine. This is to help find */
-	/* any remaining callers who expect gpfree_string to handle it.   */
-	FPRINTF((stderr,"eval.c:%d hit array in gpfree_string()", __LINE__));
-	a->type = NOTDEFINED;
-    }
-
-    return a;
 }
 
 void
@@ -796,20 +798,16 @@ del_udv_by_name(char *key, TBOOLEAN wildcard)
 
  	/* exact match */
 	else if (!wildcard && !strcmp(key, udv_ptr->udv_name)) {
-	    gpfree_array(&(udv_ptr->udv_value));
-	    gpfree_string(&(udv_ptr->udv_value));
-	    gpfree_datablock(&(udv_ptr->udv_value));
 	    gpfree_vgrid(udv_ptr);
+	    free_value(&(udv_ptr->udv_value));
 	    udv_ptr->udv_value.type = NOTDEFINED;
 	    break;
 	}
 
 	/* wildcard match: prefix matches */
 	else if ( wildcard && !strncmp(key, udv_ptr->udv_name, strlen(key)) ) {
-	    gpfree_array(&(udv_ptr->udv_value));
-	    gpfree_string(&(udv_ptr->udv_value));
-	    gpfree_datablock(&(udv_ptr->udv_value));
 	    gpfree_vgrid(udv_ptr);
+	    free_value(&(udv_ptr->udv_value));
 	    udv_ptr->udv_value.type = NOTDEFINED;
 	    /* no break - keep looking! */
 	}

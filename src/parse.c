@@ -1357,8 +1357,7 @@ check_for_iteration()
 	    }
 	    if (!equals(c_token++, "]"))
 	    	int_error(c_token-1, errormsg);
-	    gpfree_array(&(iteration_udv->udv_value));
-	    gpfree_string(&(iteration_udv->udv_value));
+	    free_value(&(iteration_udv->udv_value));
 	    Ginteger(&(iteration_udv->udv_value), iteration_start);
 	}
 	else if (equals(c_token++, "in")) {
@@ -1374,8 +1373,7 @@ check_for_iteration()
 	    iteration_string = v.v.string_val;
 	    iteration_start = 1;
 	    iteration_end = gp_words(iteration_string);
-	    gpfree_array(&(iteration_udv->udv_value));
-	    gpfree_string(&(iteration_udv->udv_value));
+	    free_value(&(iteration_udv->udv_value));
 	    Gstring(&(iteration_udv->udv_value), gp_word(iteration_string, 1));
 	}
 	else /* Neither [i=B:E] or [s in "foo"] */

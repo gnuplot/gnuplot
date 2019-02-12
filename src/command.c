@@ -587,8 +587,7 @@ define()
 	udv = add_udv(start_token);
 	(void) const_express(&result);
 	/* Prevents memory leak if the variable name is re-used */
-	gpfree_array(&udv->udv_value);
-	gpfree_string(&udv->udv_value);
+	free_value(&udv->udv_value);
 	udv->udv_value = result;
     }
 }
@@ -762,8 +761,7 @@ array_command()
     if (!isletter(++c_token))
 	int_error(c_token, "illegal variable name");
     array = add_udv(c_token);
-    gpfree_array(&array->udv_value);
-    gpfree_string(&array->udv_value);
+    free_value(&array->udv_value);
     c_token++;
 
     if (equals(c_token, "[")) {
