@@ -4054,7 +4054,8 @@ do_polygon( int dimensions, t_polygon *p, int style, t_clip_object clip )
 	int out_length;
 	clip_polygon(corners, clpcorn, nv, &out_length);
 	clpcorn[0].style = style;
-	term->filled_polygon(out_length, clpcorn);
+	if (out_length > 1)
+	    term->filled_polygon(out_length, clpcorn);
 
     } else { /* Just draw the outline? */
  	newpath();
