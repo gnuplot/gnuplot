@@ -7519,6 +7519,7 @@ Ffigure_fenceplot
 ?sampling
 ?commands plot sample
 ?plot sample
+?plot sampling
 =sample
 4 1D sampling (x or t axis)
 ?sampling 1D
