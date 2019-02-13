@@ -84,6 +84,10 @@
 #define INCL_WINSWITCHLIST
 #define INCL_GPIPRIMITIVES
 #include <os2.h>
+/* Warning: the OS/2 headers already define LT_DEFAULT
+            which conflicts with our definition. */
+#undef LT_DEFAULT
+
 #include <string.h>
 #include <stdio.h>
 #include <io.h>
@@ -184,10 +188,9 @@ static LONG rgb_colors[18];
 #define   RGB_PALETTE_SIZE 0    /* size of the 'virtual' palette used for 
 				   translation of index to RGB value */
 
-/* FIXME: increasing GNUBUF circumvents a bug/limitation in BufRead:
-   it cannot read datablocks larger than GNUBUF */
-#define   GNUBUF    131072
-//#define   GNUBUF    2048        /* buffer for gnuplot commands */
+/* FIXME: a large GNUBUF circumvents a bug/limitation in BufRead:
+   it cannot read datablocks larger than GNUBUF. */
+#define   GNUBUF    131072      /* buffer for gnuplot commands */
 #define   PIPEBUF   4096        /* size of pipe buffers */
 #define   CMDALLOC  4096        /* command buffer allocation increment (ints) */
 
@@ -197,7 +200,6 @@ static LONG rgb_colors[18];
 
 #define   DEFLW     50
 
-// ULONG    ppidGnu = 0L;  /* gnuplot pid  */ -- now in gpexecute.c
 static HDC      hdcScreen;
 static HPS      hpsScreen;     /* screen pres. space */
 static int      iSeg = 1;
@@ -210,9 +212,6 @@ static BOOL     bColours = TRUE;
 static BOOL     bShellPos = FALSE;
 static BOOL     bPopFront = TRUE;
 static BOOL     bKeepRatio = TRUE;	//PM
-#if 0
-static BOOL     bNewFont = FALSE;
-#endif
 
 static double   multLineHor  = 1.; /* Horizontal and vertical spacing shifts */
 static double   multLineVert = 0.; /* for multiline prints.		    */
@@ -253,11 +252,8 @@ static ULONG    ulPauseReply = 1;
 static ULONG    ulPauseMode  = PAUSE_DLG;
 
 static HWND     hSysMenu;
+
             /* stuff for screen-draw thread control */
-
-//static HEV      semDrawDone;
-
-            /* thread control */
 
 static TID     tidDraw, tidSpawn;
 
@@ -351,10 +347,6 @@ static void     SelectFont(HPS, char *);
 static void     SwapFont(HPS, char *);
 static void     CopyToClipBrd(HWND);
 static void     ReadGnu(void*);
-static void     EditLineTypes(HWND, HPS, BOOL);
-#if 0
-static void     EditCharCell(HPS, SIZEF*);
-#endif
 static HPS      InitScreenPS(void);
 static int      BufRead(HFILE, void*, int, PULONG);
 static int      GetNewFont(HWND, HPS);
@@ -633,29 +625,17 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	    gp_exec_event(GE_buttonrelease, mx, my, 2, 9999, 0);
 	return 0L;
 
-#if 1
     case WM_BUTTON1UP:
-#else
-    case WM_BUTTON1CLICK:
-#endif
 	if (!IGNORE_MOUSE)
 	    gp_exec_event(GE_buttonrelease, mx, my, 1, 9999, 0);
 	return 0L;
 
-#if 0
     case WM_BUTTON2UP:
-#else
-    case WM_BUTTON2CLICK:
-#endif
 	if (!IGNORE_MOUSE)
 	    gp_exec_event(GE_buttonrelease, mx, my, 3, 9999, 0);
 	return 0L;
 
-#if 1
     case WM_BUTTON3UP:
-#else
-    case WM_BUTTON3CLICK:
-#endif
 	if (!IGNORE_MOUSE)
 	    gp_exec_event(GE_buttonrelease, mx, my, 2, 9999, 0);
 	return 0L;
@@ -685,7 +665,6 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	hApp = WinQueryWindow(hWnd, QW_PARENT); /* temporary assignment.. */
 	hSysMenu = WinWindowFromID(hApp, FID_SYSMENU);
 	/* setup semaphores */
-	/* DosCreateEventSem(NULL, &semDrawDone, 0L, 0L); */
 	/* DosCreateEventSem(NULL, &semStartSeq, 0L, 0L); */
 	DosCreateEventSem(NULL, &semPause, 0L, 0L);
 	DosCreateMutexSem(NULL, &semHpsAccess, 0L, 1L);
@@ -769,7 +748,6 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	    firstcall = 0;
 	}
 	if (!bPopFront) WinSwitchToProgram(hSwitch);
-	/* DosPostEventSem(semDrawDone); */
 	DosReleaseMutexSem(semHpsAccess);
 	return 0;
 
@@ -797,16 +775,8 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 #endif
 	if (usFlag & KC_KEYUP)
 	    return 0L;   /* ignore key release events */
-#if 0
-	{
-	    FILE *ff = fopen("deb", "a");
-	    fprintf(ff, "key = %i c=%c\n", (int) key, (char) key);
-	    fclose(ff);
-	}
-#endif
 
 	switch (key) {
-
 	case VK_SPACE: {
 #ifndef DISABLE_SPACE_RAISES_CONSOLE
 	    /* raise gnuplot's window */
@@ -983,9 +953,6 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 			      pp,
 			      QPF_NOINHERIT) != 0L) {
 	    strcpy(szFontNameSize, pp);
-#if 0
-	    bNewFont = TRUE;
-#endif
 	    WinInvalidateRect(hWnd, NULL, TRUE);
 	}
 	free(pp);
@@ -1151,21 +1118,6 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 }
 
 
-#if 0 /* unused */
-/*
- * Gets the pointer position(in pixels) in the window hWnd
- */
-void
-GetPointerPos(HWND hWnd, PPOINTL p)
-{
-    WinQueryPointerPos(HWND_DESKTOP, p);
-    /* this is position wrt desktop */
-    WinMapWindowPoints(HWND_DESKTOP, hWnd, p, 1);
-    /* pos. wrt our window in pixels */
-}
-#endif
-
-
 /* passing either n(n>=0) or f(when n==-1) */
 void
 SetMouseCoords(HWND hWnd, MPARAM mp1, int n, char *f)
@@ -1213,7 +1165,7 @@ WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	unsigned cmd_length;
 
 	cmd_length = strlen(cmd_prefix) + strlen(helpfile);
-        gnuplot_path = getenv("GNUPLOT");
+	gnuplot_path = getenv("GNUPLOT");
 	if (gnuplot_path != NULL)
 	    cmd_length += strlen(gnuplot_path) + 1;
 
@@ -1284,9 +1236,6 @@ WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 
     case IDM_FONTS:
 	if (GetNewFont(hWnd, hpsScreen)) {
-#if 0
-	    bNewFont = TRUE;
-#endif
 	    WinInvalidateRect(hWnd, NULL, TRUE);
 	}
 	break;
@@ -1328,7 +1277,7 @@ WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	break;
 
     case IDM_CONTINUE:
-	WinPostMsg(hWnd, WM_PAUSEEND,(MPARAM)1L,(MPARAM)0L);
+	WinPostMsg(hWnd, WM_PAUSEEND, (MPARAM)1L, (MPARAM)0L);
 	WinEnableMenuItem(WinWindowFromID(
 			      WinQueryWindow(hWnd, QW_PARENT), FID_MENU),
 			  IDM_CONTINUE,
@@ -1489,16 +1438,12 @@ WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	return 0L;
 
     case IDM_SET_GRID:
-    {
 	gp_exec_event(GE_keypress, mx, my, 'g', 1, 0);
 	return 0L;
-    }
 
     case IDM_SET_LINLOGY:
-    {
 	gp_exec_event(GE_keypress, mx, my, 'l', 1, 0);
 	return 0L;
-    }
 
     case IDM_SET_AUTOSCALE:
 	gp_execute("set autoscale; replot");
@@ -1725,7 +1670,7 @@ QueryIni(HAB hab)
         bPopFront = TRUE;
         ulPauseMode = 1;
     }
-    ulCB = 4*sizeof(float);
+    ulCB = 4 * sizeof(float);
     PrfQueryProfileData(hini, APP_NAME, INIFRAC, &qPrintData.xsize, &ulCB);
     if (PrfQueryProfileSize(hini, APP_NAME, INIPRDRIV, &ulCB)) {
         PDRIVDATA pdriv =(PDRIVDATA) malloc(ulCB);
@@ -1737,7 +1682,7 @@ QueryIni(HAB hab)
     }
     PrfQueryProfileString(hini, APP_NAME, INIPRPR, "",
 			  qPrintData.szPrinterName,
-                          (long) sizeof qPrintData.szPrinterName);
+                          (long) sizeof(qPrintData.szPrinterName));
     PrfQueryProfileString(hini, APP_NAME, INIFONT, INITIAL_FONT,
 			  szFontNameSize, FONTBUF);
     ulCB = sizeof(ulOpts);
@@ -1777,7 +1722,7 @@ QueryIni(HAB hab)
 			      "PRINTER",
 			      ";",
 			      qPrintData.szPrinterName,
-                              (long) sizeof qPrintData.szPrinterName);
+                              (long) sizeof(qPrintData.szPrinterName));
         if ((p=strchr(qPrintData.szPrinterName, ';')) != NULL)
 	    *p = '\0';
     }
@@ -1817,7 +1762,7 @@ SaveIni(HWND hWnd)
         ulOpts[4] =(ULONG)bPopFront;
         PrfWriteProfileData(hini, APP_NAME, INIOPTS, &ulOpts, sizeof(ulOpts));
         PrfWriteProfileData(hini, APP_NAME, INIFRAC, &qPrintData.xsize,
-			    4*sizeof(float));
+			    4 * sizeof(float));
         if (qPrintData.pdriv != NULL)
             PrfWriteProfileData(hini, APP_NAME, INIPRDRIV, qPrintData.pdriv,
 				qPrintData.cbpdriv);
@@ -1913,15 +1858,12 @@ InitScreenPS()
 {
     RECTL   rectClient;
     int     nColour = 0;
+    int     i;
 
     GpiResetPS(hpsScreen, GRES_ATTRS);
-#if 0 /* Use default background color(the original version) */
-    GpiErase(hpsScreen);
-    WinQueryWindowRect(hApp,(PRECTL)&rectClient);
-#else /* PM 14.3.2000: Use always white background */
-    WinQueryWindowRect(hApp,(PRECTL)&rectClient);
-    WinFillRect(hpsScreen,&rectClient,CLR_WHITE);
-#endif
+    /* Always use white background */
+    WinQueryWindowRect(hApp, (PRECTL) &rectClient);
+    WinFillRect(hpsScreen, &rectClient, CLR_WHITE);
     if (bKeepRatio) {
 	double ratio = 1.560;
 	double xs = rectClient.xRight - rectClient.xLeft;
@@ -1932,26 +1874,23 @@ InitScreenPS()
 	} else if (ys < xs/ratio) { /* reduce xs to fit */
 	    rectClient.xRight = rectClient.xLeft +(int)(ys*ratio);
 	}
-    } else
+    } else {
 	/* PM: why this -10? Otherwise the right axis is too close to
 	 * the right border. However, this -10 should be taken into
 	 * account for mousing! Or can it be inside a transformation?
 	 */
 	rectClient.xRight -= 10;
+    }
 
     GpiSetPageViewport(hpsScreen, &rectClient);
     if (!bColours) {
-        int i;
-
 	nColour = 16;
 	alColourTable[0] = 0xFFFFFF;
-	for (i=1; i<nColour; i++)
+	for (i = 1; i < nColour; i++)
 	    alColourTable[i] = 0;
     }
 
     if (bPMPaletteMode) {
-	int i;
-
 	GpiCreateLogColorTable(hpsScreen, LCOL_RESET, LCOLF_CONSECRGB,
 			       0, nColour, alColourTable);
 	if (!lCols_init) { /* Ilya: avoid white line on white background */
@@ -1972,15 +1911,13 @@ InitScreenPS()
 	}
 
 	/* init rgb_colors: simple index translation only */
-	for (i=0; i<18; i++)
+	for (i = 0; i < 18; i++)
 	    rgb_colors[i] = i + CLR_WHITE;
     } else {
 	if (!lCols_init) {
-	    int i;
-
 	    lCols_init = 1;
 	    /* get RGB values of all CLR_xxx constants */
-	    for (i=0; i<18; i++)
+	    for (i = 0; i < 18; i++)
 		rgb_colors[i] = GpiQueryRGBColor(hpsScreen, LCOLOPT_REALIZED, i + CLR_WHITE );
 	}
 
@@ -2009,7 +1946,7 @@ void
 SelectFont(HPS hps, char *szFontNameSize)
 {
     HDC    hdc;
-    FATTRS  fat;
+    FATTRS fat;
     LONG   xDeviceRes, yDeviceRes;
     POINTL ptlFont;
     SIZEF  sizfx;
@@ -2020,7 +1957,7 @@ SelectFont(HPS hps, char *szFontNameSize)
     sscanf(szFontNameSize, "%hd", &shPointSize);
     szFontName = strchr(szFontNameSize, '.') + 1;
 
-    fat.usRecordLength  = sizeof fat;
+    fat.usRecordLength  = sizeof(fat);
     fat.fsSelection     = 0;
     fat.lMatch          = 0;
     fat.idRegistry      = 0;
@@ -2083,12 +2020,6 @@ SelectFont(HPS hps, char *szFontNameSize)
     }
     sizCurFont = sizBaseFont;
     sizCurSubSup = sizBaseSubSup;
-#if 0
-    if (bNewFont) {
-	/* EditCharCell(hps, &sizfx); */
-        bNewFont = FALSE;
-    }
-#endif
 }
 
 
@@ -2131,7 +2062,7 @@ SwapFont(HPS hps, char *szFNS)
         }
 
         if (lcid == 0) {
-	    fat.usRecordLength  = sizeof fat;
+	    fat.usRecordLength  = sizeof(fat);
 	    fat.fsSelection     = 0;
 	    fat.lMatch          = 0;
 	    fat.idRegistry      = 0;
@@ -2313,14 +2244,12 @@ ReadGnu(void* arg)
 		    while (tidDraw != 0) DosSleep(1);
 		}
 		/* wait for access to command list and lock it */
-		/* DosWaitEventSem(semDrawDone, SEM_INDEFINITE_WAIT);                     */
 		/* DosEnterCritSec(); */
 		DosRequestMutexSem(semHpsAccess,(ULONG) SEM_INDEFINITE_WAIT);
 		InitScreenPS();
 		ScalePS(hps);
-		/* DosResetEventSem(semDrawDone, &ulCount); */
 		GpiSetDrawingMode(hps, DM_DRAWANDRETAIN);
-		for (i=1;i<=iSeg;i++)
+		for (i = 1; i <= iSeg; i++)
 		    GpiDeleteSegment(hps, i);
 		iSeg = 1;
 		GpiOpenSegment(hps, iSeg);
@@ -2362,7 +2291,6 @@ ReadGnu(void* arg)
 		GpiCloseSegment(hps);
 		DrawRuler();
 		DisplayStatusLine(hps);
-		/* DosPostEventSem(semDrawDone); */
 		DosReleaseMutexSem(semHpsAccess);
 		WinPostMsg(hApp, WM_GNUPLOT, 0L, 0L);
 		break;
@@ -2375,23 +2303,19 @@ ReadGnu(void* arg)
 			   MPFROM2SHORT(MIA_DISABLED,(USHORT)0));
 
 		/* if we are keeping us on the screen, wait for new connection */
-		if (bServer||bPersist) {
+		if (bServer || bPersist) {
 		    DosDisConnectNPipe(hRead);
 		    goto server;
 		}
 		break;
 
 	    case GR_RESUME :
-	    {
 		/* resume after multiplot */
-		DosRequestMutexSem(semHpsAccess,(ULONG) SEM_INDEFINITE_WAIT);
-		/* DosWaitEventSem(semDrawDone, SEM_INDEFINITE_WAIT); */
+		DosRequestMutexSem(semHpsAccess, (ULONG) SEM_INDEFINITE_WAIT);
 		iSeg++;
-		/* DosResetEventSem(semDrawDone, &ulCount); */
 		GpiSetDrawingMode(hps, DM_DRAWANDRETAIN);
 		GpiOpenSegment(hps, iSeg);
 		break;
-	    }
 
 	    case 's' :
 		/* suspend after multiplot */
@@ -2406,7 +2330,7 @@ ReadGnu(void* arg)
 		    curr_color = GpiQueryColor(hps);
 		    GpiSetColor(hps, pm3d_color);
 		}
-		if (*buff=='M') {
+		if (*buff == GR_MOVE) {
 		    if (bPath) {
 			GpiEndPath(hps);
 			GpiStrokePath(hps, 1, 0);
@@ -2418,12 +2342,12 @@ ReadGnu(void* arg)
 			bPath = TRUE;
 		    }
 		}
-		BufRead(hRead,&ptl.x, 2*sizeof(int), &cbR);
-		if ((*buff=='V') && bDots)
+		BufRead(hRead, &ptl.x, 2 * sizeof(int), &cbR);
+		if ((*buff == GR_DRAW) && bDots)
 		    ptl.x += 5;
-		else if ((*buff=='M') && bDots)
+		else if ((*buff == GR_MOVE) && bDots)
 		    ptl.x -= 5;
-		if (*buff == 'M')
+		if (*buff == GR_MOVE)
 		    LMove(hps, &ptl);
 		else
 		    LLine(hps, &ptl);
@@ -2444,14 +2368,15 @@ ReadGnu(void* arg)
 		    DosEnterCritSec();
 		    szPauseText = malloc(len*sizeof(int));
 		    DosExitCritSec();
-		    BufRead(hRead,szPauseText, len*sizeof(int), &cbR);
+		    BufRead(hRead,szPauseText, len * sizeof(int), &cbR);
 		}
 		if (ulPauseMode != PAUSE_GNU) {
 		    /* pause and wait for semaphore to be cleared */
 		    DosResetEventSem(semPause, &ulPause);
-		    WinPostMsg(hApp, WM_PAUSEPLOT,(MPARAM) szPauseText, 0L);
+		    WinPostMsg(hApp, WM_PAUSEPLOT, (MPARAM) szPauseText, 0L);
 		    DosWaitEventSem(semPause, SEM_INDEFINITE_WAIT);
-		} else { /* gnuplot handles pause */
+		} else {
+		    /* gnuplot handles pause */
 		    ulPauseReply = 2;
 		}
 		DosEnterCritSec();
@@ -2487,10 +2412,10 @@ ReadGnu(void* arg)
                     DosEnterCritSec();
 		    len = (len + sizeof(int) - 1) / sizeof(int);
                     if (len == 0) len = 1; /*?? how about read */
-                    str = malloc(len*sizeof(int));
+                    str = malloc(len * sizeof(int));
 		    *str = '\0';
                     DosExitCritSec();
-                    BufRead(hRead, str, len*sizeof(int), &cbR);
+                    BufRead(hRead, str, len * sizeof(int), &cbR);
 
                     GpiQueryTextBox(hps, strlen(str), str, TXTBOX_COUNT, aptl);
 		    textwidth = aptl[TXTBOX_CONCAT].x;
@@ -2521,7 +2446,6 @@ ReadGnu(void* arg)
                     DosEnterCritSec();
                     free(str);
 		    DosExitCritSec();
-
 		    break;
 		}
 
@@ -2545,12 +2469,12 @@ ReadGnu(void* arg)
                     BufRead(hRead,&len, sizeof(int), &cbR);
 
                     DosEnterCritSec();
-                    len =(len+sizeof(int)-1)/sizeof(int);
+                    len = (len + sizeof(int) - 1) / sizeof(int);
                     if (len == 0) len = 1; /*?? how about read */
-                    str = malloc(len*sizeof(int));
+                    str = malloc(len * sizeof(int));
 		    *str = '\0';
                     DosExitCritSec();
-                    BufRead(hRead, str, len*sizeof(int), &cbR);
+                    BufRead(hRead, str, len * sizeof(int), &cbR);
 		    if (pm3d_color >= 0) {
                         curr_color = GpiQueryColor(hps);
 			GpiSetColor(hps, pm3d_color);
@@ -2705,7 +2629,7 @@ ReadGnu(void* arg)
 		pt.x += w;
 		pt.y += h;
 
-		switch(style & 0xf) {
+		switch (style & 0xf) {
 
 		    case FS_SOLID:
 		    case FS_TRANSPARENT_SOLID:
@@ -2754,7 +2678,6 @@ ReadGnu(void* arg)
 			/* style == 0 or unknown --> fill with background color */
 			GpiSetMix(hps, FM_OVERPAINT);
 			GpiSetBackMix(hps, BM_OVERPAINT);
-			//GpiSetColor(hps, RGB_TRANS(CLR_BACKGROUND));  // fixes 'with boxes' white on white
 			GpiSetPattern(hps, PATSYM_SOLID);
 		    }
 		}
@@ -2781,26 +2704,14 @@ ReadGnu(void* arg)
 	    {
 		int lt;
 
-		BufRead(hRead,&lt, sizeof(int), &cbR);
+		BufRead(hRead, &lt, sizeof(int), &cbR);
 		/* 1: enter point mode, 0: exit */
 		if (bLineTypes) {
-		    if (lt==1)
+		    if (lt == 1)
 			LType(0);
 		    else
 			LType(lOldLine);
-#if 0
-		    if (lt == 1)
-			lOldLine = GpiSetLineType(hps, lLineTypes[0]);
-		    else
-			GpiSetLineType(hps, lOldLine);
-#endif /* 0 */
 		}
-#if 0
-		if (lt == 1)
-		    GpiSetLineWidthGeom(hps, 20);
-		else
-		    GpiSetLineWidthGeom(hps, 50);
-#endif /* 0 */
 		bDots = lt;
 	    }
 	    break;
@@ -2835,7 +2746,7 @@ ReadGnu(void* arg)
 		    free(tmp);
 		    SwapFont(hps, font);
 		    strcpy(szCurrentFontNameSize, font);
-		} /* else(len==0) */
+		}
 		break;
 	    }
 
@@ -2856,7 +2767,7 @@ ReadGnu(void* arg)
 		char *str;
 
 		BufRead(hRead,&len, sizeof(int), &cbR);
-		len =(len + sizeof(int) - 1) / sizeof(int);
+		len = (len + sizeof(int) - 1) / sizeof(int);
 		bWideLines = FALSE; /* reset options */
 #ifdef PM_KEEP_OLD_ENHANCED_TEXT
 		bEnhanced = FALSE;
@@ -2908,14 +2819,14 @@ ReadGnu(void* arg)
 		    break;
 #endif
 		case 'c': /* set codepage */
-		    BufRead(hRead,&codepage, sizeof(codepage), &cbR);
+		    BufRead(hRead, &codepage, sizeof(codepage), &cbR);
 		    break;
 	        case '^': /* raise window */
-		    WinSetWindowPos( hwndFrame, HWND_TOP, 0,0,0,0, SWP_RESTORE|SWP_SHOW|SWP_ACTIVATE|SWP_ZORDER ) ;
-		    WinSetFocus( HWND_DESKTOP, hApp ) ;
+		    WinSetWindowPos(hwndFrame, HWND_TOP, 0,0,0,0, SWP_RESTORE|SWP_SHOW|SWP_ACTIVATE|SWP_ZORDER);
+		    WinSetFocus( HWND_DESKTOP, hApp );
 		    break;
 	        case '_': /* lower window */
-		    WinSetWindowPos( hwndFrame, HWND_BOTTOM, 0,0,0,0, SWP_ZORDER ) ;
+		    WinSetWindowPos(hwndFrame, HWND_BOTTOM, 0,0,0,0, SWP_ZORDER);
 		    break;
 		}
 		break;
@@ -2937,7 +2848,7 @@ ReadGnu(void* arg)
 		BufRead(hRead,&l, sizeof(int), &cbR);
 		if (text_alloc < l)
 		    text = realloc(text, text_alloc = l+10);
-		BufRead(hRead,&text[0], l, &cbR);
+		BufRead(hRead, &text[0], l, &cbR);
 		switch (where) {
 		case 0:
 		    UpdateStatusLine(hps,text);
@@ -3003,18 +2914,12 @@ ReadGnu(void* arg)
 	    }
 
 	    case GR_RELEASE_PALETTE :
-#if 0 /* FIXME: REMOVE THIS ROUTINE COMPLETELY! */
-		if (pm3d_hpal) {
-		    GpiDeletePalette(pm3d_hpal);
-		    pm3d_hpal = 0;
-		}
-		/* GpiSelectPalette(hps, pm3d_hpal_old); */
-#endif
+		/* no need to release the palette again */
 		break;
 
 	    case GR_SET_COLOR :
 	    {
-		/* FIXME: usgage of uchar limits the size of the 'virtual'
+		/* FIXME: usage of uchar limits the size of the 'virtual'
 			  palette to 256 entries. (see also RGB_PALETTE_SIZE) */
 		unsigned char c;
 
@@ -3075,6 +2980,7 @@ ReadGnu(void* arg)
 			GpiMove(hps, &p);
 		}
 		GpiEndArea(hps);
+
 		if (pm3d_color >= 0)
 		    GpiSetColor(hps, curr_color);
 		break;
@@ -3092,7 +2998,7 @@ ReadGnu(void* arg)
 
 		BufRead(hRead, &M, sizeof(M), &cbR);
 		BufRead(hRead, &N, sizeof(N), &cbR);
-		for (i=0; i<4; i++) {
+		for (i = 0; i < 4; i++) {
 		    BufRead(hRead, &(corner[i].x), sizeof(int), &cbR);
 		    BufRead(hRead, &(corner[i].y), sizeof(int), &cbR);
 		}
@@ -3143,11 +3049,11 @@ ReadGnu(void* arg)
 		ile->pbmi = pbmi;
 		ile->image = image;
 		image_list = ile;
-
 		break;
 	    }
 
-	    case SET_RULER : { /* set_ruler(int x, int y) term API: x<0 switches ruler off */
+	    case SET_RULER : /* set_ruler(int x, int y) term API: x<0 switches ruler off */
+	    {
 		int x, y;
 
 		BufRead(hRead, &x, sizeof(x), &cbR);
@@ -3164,7 +3070,8 @@ ReadGnu(void* arg)
 		break;
 	    }
 
-	    case SET_CURSOR : { /* set_cursor(int c, int x, int y) term API */
+	    case SET_CURSOR : /* set_cursor(int c, int x, int y) term API */
+	    {
 		int c, x, y;
 
 		BufRead(hRead, &c, sizeof(x), &cbR);
@@ -3214,7 +3121,8 @@ ReadGnu(void* arg)
 		break;
 	    }
 
-	    case SET_CLIPBOARD : {  /* set_clipboard(const char s[]) term API */
+	    case SET_CLIPBOARD :  /* set_clipboard(const char s[]) term API */
+	    {
 		int len;
 		char *s;
 
@@ -3255,68 +3163,6 @@ ReadGnu(void* arg)
     WinPostMsg(hApp, WM_CLOSE, 0L, 0L);
 }
 
-
-static void
-EditLineTypes(HWND hwnd, HPS hps, BOOL bDashed)
-{
-    int i;
-
-    GpiSetDrawingMode(hps, DM_RETAIN);
-    GpiOpenSegment(hps, iSeg);
-    GpiSetEditMode(hps, SEGEM_REPLACE);
-    for (i=0; i<7; i++) {
-        while (GpiSetElementPointerAtLabel(hps, lLineTypes[i])) {
-            GpiOffsetElementPointer(hps, 1);
-            GpiSetLineType(hps, bDashed?lLineTypes[i]:lLineTypes[0]);
-	}
-        GpiSetElementPointer(hps, 0);
-    }
-    GpiSetEditMode(hps, SEGEM_INSERT);
-    GpiCloseSegment(hps);
-}
-
-
-#if 0
-/*
-** Edit segment to change char cell(font size)
-*/
-static void
-EditCharCell(HPS hps, SIZEF *psize)
-{
-    int i;
-    LONG rl, rc;
-    SIZEF sizH, sizV;
-    int iVert = 0;
-
-    sizH = *psize;
-    sizV.cx = sizH.cy;
-    sizV.cy = sizH.cx;
-    GpiSetDrawingMode(hps, DM_RETAIN);
-    GpiOpenSegment(hps, iSeg);
-    GpiSetEditMode(hps, SEGEM_REPLACE);
-    i=0;
-    while (GpiSetElementPointer(hps, i)) {
-        rc = GpiQueryElementPointer(hps);
-        if (rc != i)
-	    break;
-        rl = GpiQueryElementType(hps, &rc, 0, NULL);
-        if (rc == 0x34 || rc == 0x74) {
-            LONG gdata;
-
-            GpiQueryElement(hps, 5, 4, (PBYTE) &gdata);
-            if (gdata == 0)
-		iVert = 0;
-            else
-		iVert = 1;
-	}
-        else if (rc==0x33 || rc==0x03)
-	    GpiSetCharBox(hps, iVert ? &sizV : &sizH);
-        ++i;
-    }
-    GpiSetEditMode(hps, SEGEM_INSERT);
-    GpiCloseSegment(hps);
-}
-#endif
 
 /*
 ** pull next plot command out of buffer read from GNUPLOT
@@ -3444,6 +3290,9 @@ void SigHandler(int sig)
 
 /* disable debugging info */
 #define TEXT_DEBUG(x) /* fprintf x */ ;
+#if 0
+static FILE *ff;
+#endif
 
 /* process a bit of string, and return the last character used.
  * p is start of string
@@ -3461,7 +3310,6 @@ static int  textlen = 0;
 static BOOL bText = FALSE;
 static int  textwidth = 0;
 static POINTL ptlText;
-static FILE *ff;
 
 static char
 *ParseText(
@@ -3479,18 +3327,6 @@ static char
 		widthflag, showflag));
 
     /* Start each recursion with a clean string */
-#if 0
-    {
-	FILE *ff = fopen("deb","a");
-	int i=textlen;
-
-	for (i=0;i<textlen;i++)
-	    fputc(starttext[i], ff);
-	fputc('\n',ff);
-	fclose(ff);
-    }
-#endif /* 0 */
-
     if (textlen > 0) {
 	GpiQueryTextBox(hps, textlen, starttext, TXTBOX_COUNT, aptl);
 	textwidth += aptl[TXTBOX_BOTTOMRIGHT].x * multLineHor;
@@ -3970,48 +3806,6 @@ DrawRuler()
     /*GpiEndPath(hpsScreen); */
     /*GpiStrokePath(hpsScreen, 1, 0); */
 }
-
-
-#if 0
-/* This routine recalculates mouse/pointer position [mx,my] in [in pixels]
-current window to the real/true [x,y] coordinates of the plotted graph.
-*/
-void
-MousePosToGraphPos(
-    double *x, double *y,
-    HWND hWnd,
-    SHORT mx, SHORT my,
-    ULONG mouse_mode)
-{
-    RECTL rc;
-
-    if (mouse_mode == MOUSE_COORDINATES_PIXELS) {
-	*x = mx;
-	*y = my;
-	return;
-    }
-
-    /* Rectangle where we are moving: viewport, not the full window! */
-    GpiQueryPageViewport(hpsScreen, &rc);
-
-    /* only distance is important */
-    rc.xRight -= rc.xLeft;
-    rc.yTop -= rc.yBottom;
-
-    if (mouse_mode == MOUSE_COORDINATES_SCREEN) {
-	*x =(double) mx / rc.xRight;
-	*y =(double) my / rc.yTop;
-	return;
-    }
-
-    /* px=px(mx); mouse=>gnuplot driver coordinates */
-    *x = mx * 19500.0 / rc.xRight;
-    *y = my * 12500.0 / rc.yTop;
-
-    /* main job of transformation, which is not device dependent */
-    MousePosToGraphPosReal(x, y);
-}
-#endif
 
 
 /*
