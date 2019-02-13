@@ -2628,6 +2628,7 @@ ReadGnu(void* arg)
 		int style;
 		unsigned int x, y, w, h;
 		POINTL pt;
+		LONG curr_color;
 
 		BufRead(hRead,&style, sizeof(style), &cbR);
 		BufRead(hRead,&x, sizeof(x), &cbR);
@@ -2655,7 +2656,7 @@ ReadGnu(void* arg)
 			unsigned pattern;
 
 			pattern = (unsigned) trunc(9*((style >> 4) / 100.0) + 0.5);
-			if (pattern > 10)
+			if (pattern >= 10)
 			    pattern = 9; /* only 10 patterns in list */
 			GpiSetMix(hps, FM_OVERPAINT);
 			GpiSetBackMix(hps, BM_OVERPAINT);
@@ -2692,7 +2693,14 @@ ReadGnu(void* arg)
 			GpiSetPattern(hps, PATSYM_SOLID);
 		    }
 		}
+		/* apply PM3D color if applicable */
+		if (pm3d_color >= 0) {
+		    curr_color = GpiQueryColor(hps);
+		    GpiSetColor(hps, pm3d_color);
+		}
 		GpiBox(hps, DRO_FILL, &pt, 0,0);
+		if (pm3d_color >= 0)
+		    GpiSetColor(hps, curr_color);
 		break;
 	    }
 
