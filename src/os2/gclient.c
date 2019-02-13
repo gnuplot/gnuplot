@@ -3009,7 +3009,7 @@ ReadGnu(void* arg)
 		pbmi->cPlanes = 1;
 		pbmi->cBitCount = 24;
 		pbmi->ulCompression = BCA_UNCOMP;
-		hits = GpiDrawBits(hps, image, pbmi, 4, &points, ROP_SRCCOPY, BBO_IGNORE );
+		hits = GpiDrawBits(hps, image, pbmi, 4, points, ROP_SRCCOPY, BBO_IGNORE);
 
 #if 0
 		if (hits == GPI_ERROR) {
