@@ -814,6 +814,8 @@ get_data(struct curve_points *current_plot)
 	    /* NB: fallback to 1.0 handles (current_plot->plot_smooth == SMOOTH_ACSPLINES) */
 	    coordval var_ps = (j > 2) ? v[2] : 1.0;
 	    coordval var_pt = (j > 3) ? v[3] : v[2];
+	    if (var_pt < 0)
+		var_pt = 0;
 	    store2d_point(current_plot, i++, v[0], v[1],
 				v[0], var_pt, v[1], v[1], var_ps);
 	    break;

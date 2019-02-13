@@ -2252,7 +2252,8 @@ plot_points(struct curve_points *plot)
 
 		/* Print special character rather than drawn symbol */
 		if (pointtype == PT_CHARACTER) {
-		    apply_pm3dcolor(&(plot->labels->textcolor));
+		    if (plot->labels)
+			apply_pm3dcolor(&(plot->labels->textcolor));
 		    (*t->put_text)(x, y, plot->lp_properties.p_char);
 		}
 
