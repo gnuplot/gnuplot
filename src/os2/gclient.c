@@ -2276,12 +2276,12 @@ ReadGnu(void* arg)
 	/* DosPostEventSem(semStartSeq);         // once we've got pidGnu */
 	WinPostMsg(hApp, WM_GPSTART, 0, 0);
 
-
 	hps = hpsScreen;
 	InitScreenPS();
 	while (1) {
-            usErr=BufRead(hRead,buff, 1, &cbR);
-            if (usErr != 0)
+	    buff[0] = 0;
+	    usErr = BufRead(hRead, buff, 1, &cbR);
+	    if (usErr != 0)
 		break;
 
 	    if (breakDrawing) {
@@ -2485,7 +2485,7 @@ ReadGnu(void* arg)
                     BufRead(hRead, &len, sizeof(int), &cbR);
 
                     DosEnterCritSec();
-                    len =(len+sizeof(int)-1)/sizeof(int);
+		    len = (len + sizeof(int) - 1) / sizeof(int);
                     if (len == 0) len = 1; /*?? how about read */
                     str = malloc(len*sizeof(int));
 		    *str = '\0';
@@ -2822,8 +2822,8 @@ ReadGnu(void* arg)
 		    tmp = str = malloc(len * sizeof(int));
 		    BufRead(hRead, str, len * sizeof(int), &cbR);
 		    p = strchr(str, ',');
-		    if (p==NULL)
-			strcpy(font, "10");
+		    if (p == NULL)
+			strcpy(font, "10");  // FIXME: this should be the default size
 		    else {
 			*p = '\0';
 			strcpy(font, p+1);
@@ -2889,7 +2889,8 @@ ReadGnu(void* arg)
 		static int prev_bEnhanced = 0;
 #endif
 
-		BufRead(hRead,&opt, 1, &cbR);
+		opt = 0;
+		BufRead(hRead, &opt, 1, &cbR);
 		switch (opt) {
 #ifdef PM_KEEP_OLD_ENHANCED_TEXT
 		case 'e': /* enhanced mode on, off and restore */
@@ -2953,7 +2954,7 @@ ReadGnu(void* arg)
 	     * GpiCreateLogColorTable and GpiCreatePalette? */
 	    case GR_MAKE_PALETTE :
 	    {
-		unsigned char c;
+		unsigned char c = 0;
 		int smooth_colors;
 		LONG lRetCount;
 
@@ -3018,6 +3019,7 @@ ReadGnu(void* arg)
 		unsigned char c;
 
 		BufRead(hRead, &c, sizeof(c), &cbR);
+		// FIXME: need range checking here
 		if (bPMPaletteMode)
 		    pm3d_color = c + nColors;
 		else
@@ -3726,7 +3728,7 @@ static char
 static void
 CharStringAt(HPS hps, int x, int y, int len, char *str)
 {
-    /* flush any pending graphics(all the XShow routines do this...) */
+    /* flush any pending graphics (all the XShow routines do this...) */
     char *fontname;
     int fontsize;
 
@@ -3734,7 +3736,6 @@ CharStringAt(HPS hps, int x, int y, int len, char *str)
         return;
 
     /* set up the globals */
-
     ptlText.x = x;
     ptlText.y = y;
     bText = TRUE;
