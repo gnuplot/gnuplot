@@ -2588,26 +2588,33 @@ ReadGnu(void* arg)
 		    GpiStrokePath(hps, 1, 0);
 		    bPath = FALSE;
 		}
-		BufRead(hRead,&lt, sizeof(int), &cbR);
+		BufRead(hRead, &lt, sizeof(int), &cbR);
 		/* linetype = -2 axes, -1 border, 0 arrows, all to 0 */
 		col = lt;
-		if (lt == -2)     GpiSetLineWidthGeom(hps, DEFLW*0.85);
-		else if (lt == -1) GpiSetLineWidthGeom(hps, DEFLW*0.6);
-		else GpiSetLineWidthGeom(hps, linewidth);
-		if (lt < 0) lt = 0;
-		lt =(lt%8);
-		col =(col+2)%16;
+		if (lt == LT_AXIS)
+		    GpiSetLineWidthGeom(hps, DEFLW * 0.85);
+		else if (lt == LT_SOLID)
+		    GpiSetLineWidthGeom(hps, DEFLW * 0.6);
+		else
+		    GpiSetLineWidthGeom(hps, linewidth);
+		if (lt > LT_NODRAW) {
+		    if (lt < 0) lt = 0;
+		    lt  = (lt % 8);
+		    col = (col + 2) % 16;
+		} else if (lt == LT_NODRAW) {
+		    lt = 2;  // dots
+		    col = 0; // black
+		} else if (lt == LT_BACKGROUND) {
+		    lt = 0;  // solid
+		    col = 15;  // white
+		}
 		GpiLabel(hps, lLineTypes[lt]);
 		lOldLine = lt;
-		LType((bLineTypes) ? lt : 0);
+		LType(bLineTypes ? lt : 0);
 		/* GpiSetLineType(hps, (bLineTypes) ? lLineTypes[lt] : lLineTypes[0]); */
 		/* maintain some flexibility here in case we don't want
 		 * the model T option */
-		if (bColours)
-		    GpiSetColor(hps, RGB_TRANS(lCols[col]));
-		/* else GpiSetColor(hps, RGB_TRANS(CLR_BLACK)); */
-		else
-		    GpiSetColor(hps, RGB_TRANS(CLR_NEUTRAL));
+		GpiSetColor(hps, RGB_TRANS(bColours ? lCols[col] : CLR_NEUTRAL));
 		pm3d_color = -1; /* switch off using pm3d colours */
 		break;
 	    }
