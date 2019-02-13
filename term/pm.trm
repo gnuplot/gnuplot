@@ -380,11 +380,12 @@ PM_query()
     fflush(PM_pipe);
     rc = DosRead(fileno(PM_pipe), &term->h_char, sizeof(int), &cbR);
     if (term->h_char == 0xABCD) {
-      /* PM we have got greetings from mouseable gnupmdrv */
-      mouseGnupmdrv = 1; /*  thus set mouseGnupmdrv on and reread h_char */
-      rc = DosRead( fileno(PM_pipe), &term->h_char, sizeof(int), &cbR ) ;
-      }
+	/* PM we received greetings from a mouseable gnupmdrv */
+	mouseGnupmdrv = 1; /*  thus set mouseGnupmdrv on and reread h_char */
+	rc = DosRead(fileno(PM_pipe), &term->h_char, sizeof(int), &cbR) ;
+    }
     rc = DosRead(fileno(PM_pipe), &term->v_char, sizeof(int), &cbR);
+    (void) rc;
 }
 
 
@@ -653,6 +654,8 @@ static void PM_query_font(void)
     sscanf( newfont, "%i.%s", &fontsize, PM_font );
     PM_fontsize = (double)fontsize;
     free(newfont);
+
+    (void) rc;
 }
 
 #endif
@@ -703,12 +706,10 @@ PM_pause(char *str)
 {
     int len, rc;
     ULONG cbR;
-    char buf[256];
-    char *bp;
 
     if (PM_pipe == NULL)
 	return 2;
-    bp = buf;
+
     putc(GR_PAUSE, PM_pipe);
     len = strlen(str) + 1;
     fwrite(&len, sizeof(int), 1, PM_pipe);
@@ -719,6 +720,7 @@ PM_pause(char *str)
     }
     fflush(PM_pipe);
     rc = DosRead(fileno(PM_pipe), &len, sizeof(int), &cbR);
+    (void) rc;
     return len;
 }
 
@@ -757,6 +759,7 @@ PM_make_palette(t_sm_palette * palette)
 	putc(0, PM_pipe);
 	fflush(PM_pipe);
 	rc = DosRead(fileno(PM_pipe), &PM_nColors, sizeof(int), &cbR);
+	(void) rc;
 	return PM_nColors;
     }
 
@@ -817,6 +820,8 @@ PM_set_color(t_colorspec *colorspec)
 	putc(GR_SET_RGBCOLOR, PM_pipe);
 	fwrite(&(colorspec->lt), sizeof(int), 1, PM_pipe);
 	/* fflush(PM_pipe); */ /* FIXME: why should that be necessary? */
+	break;
+    default:
 	break;
     }
 }
@@ -1072,6 +1077,7 @@ PM_enhanced_flush()
 	fflush(PM_pipe);
 	rc = DosRead(fileno(PM_pipe), &width, sizeof(int), &cbR);
 	rc = DosRead(fileno(PM_pipe), &height, sizeof(int), &cbR);
+	(void) rc;
 
 	/* update drawing position according to len */
 	if (!ENHpm_widthflag) {
