@@ -104,6 +104,7 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec, double *reltime)
     tm->tm_mon = tm->tm_hour = tm->tm_min = tm->tm_sec = 0;
     /* make relative times work (user-defined tic step) */
     tm->tm_year = ZERO_YEAR;
+    tm->tm_gmtoff = DEFAULT_TZ;
 
     /* Fractional seconds will be returned separately, since
      * there is no slot for the fraction in struct tm.
@@ -292,6 +293,25 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec, double *reltime)
 	    if (isdigit(*s))
 		s++;
 	    if (isdigit(*s))
+		s++;
+	    break;
+	case 'z':		/* timezone offset  */
+	    {
+		int neg = (*s == '-') ? -1 : 1;
+		int off_h, off_m;
+		if (*s == '-' || *s == '+')
+		    s++;
+		s = read_int(s, 2, &off_h);
+		if (*s == ':')
+		    s++;
+		s = read_int(s, 2, &off_m);
+		tm->tm_gmtoff = 3600*off_h + 60*off_m;
+		tm->tm_gmtoff *= neg;
+
+	        break;
+	    }
+	case 'Z':		/* timezone name (ignored) */
+	    while (!isspace(*s))
 		s++;
 	    break;
 
@@ -726,7 +746,7 @@ double
 gtimegm(struct tm *tm)
 {
     int i;
-    /* returns sec from year ZERO_YEAR, defined in gp_time.h */
+    /* returns sec from year ZERO_YEAR in UTC, defined in gp_time.h */
     double dsec = 0.;
 
     if (tm->tm_year < ZERO_YEAR) {
@@ -754,8 +774,11 @@ gtimegm(struct tm *tm)
     dsec *= 60.0;
     dsec += tm->tm_sec;
 
-    FPRINTF((stderr, "broken-down time : %02d/%02d/%d:%02d:%02d:%02d = %g seconds\n", tm->tm_mday, tm->tm_mon + 1, tm->tm_year, tm->tm_hour,
-	     tm->tm_min, tm->tm_sec, dsec));
+    dsec -= tm->tm_gmtoff;
+
+    FPRINTF((stderr, "broken-down time : %02d/%02d/%d:%02d:%02d:%02d:(%02d:%02d) = %g seconds\n",
+	     tm->tm_mday, tm->tm_mon + 1, tm->tm_year, tm->tm_hour,
+	     tm->tm_min, tm->tm_sec, tm->tm_gmtoff / 3600, (tm->tm_gmtoff % 3600) / 60, dsec));
 
     return (dsec);
 }
@@ -776,6 +799,7 @@ ggmtime(struct tm *tm, double l_clock)
     }
 
     tm->tm_year = ZERO_YEAR;
+    tm->tm_gmtoff = DEFAULT_TZ;
     tm->tm_mday = tm->tm_yday = tm->tm_mon = tm->tm_hour = tm->tm_min = tm->tm_sec = 0;
     if (l_clock < 0) {
 	while (l_clock < 0) {
