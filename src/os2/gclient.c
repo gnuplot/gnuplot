@@ -347,6 +347,7 @@ static void     SelectFont(HPS, char *);
 static void     SwapFont(HPS, char *);
 static void     CopyToClipBrd(HWND);
 static void     ReadGnu(void*);
+static void     SetFillStyle(HPS hps, int style);
 static HPS      InitScreenPS(void);
 static int      BufRead(HFILE, void*, int, PULONG);
 static int      GetNewFont(HWND, HPS);
@@ -2626,69 +2627,19 @@ ReadGnu(void* arg)
 		POINTL pt;
 		LONG curr_color;
 
-		BufRead(hRead,&style, sizeof(style), &cbR);
-		BufRead(hRead,&x, sizeof(x), &cbR);
-		BufRead(hRead,&y, sizeof(y), &cbR);
-		BufRead(hRead,&w, sizeof(w), &cbR);
-		BufRead(hRead,&h, sizeof(h), &cbR);
+		BufRead(hRead, &style, sizeof(style), &cbR);
+		BufRead(hRead, &x, sizeof(x), &cbR);
+		BufRead(hRead, &y, sizeof(y), &cbR);
+		BufRead(hRead, &w, sizeof(w), &cbR);
+		BufRead(hRead, &h, sizeof(h), &cbR);
 		pt.x = x;
 		pt.y = y;
 		GpiMove(hpsScreen, &pt);
 		pt.x += w;
 		pt.y += h;
 
-		switch (style & 0xf) {
+		SetFillStyle(hps, style);
 
-		    case FS_SOLID:
-		    case FS_TRANSPARENT_SOLID:
-		    {
-			/* style == 1 --> fill with intensity according to filldensity */
-			static const ULONG patternlist[] = {
-			    PATSYM_NOSHADE, PATSYM_DENSE8, PATSYM_DENSE7,
-			    PATSYM_DENSE6, PATSYM_DENSE5, PATSYM_DENSE4,
-			    PATSYM_DENSE3, PATSYM_DENSE2, PATSYM_DENSE1,
-			    PATSYM_SOLID
-			};
-			unsigned pattern;
-
-			pattern = (unsigned) trunc(9*((style >> 4) / 100.0) + 0.5);
-			if (pattern >= 10)
-			    pattern = 9; /* only 10 patterns in list */
-			GpiSetMix(hps, FM_OVERPAINT);
-			GpiSetBackMix(hps, BM_OVERPAINT);
-			GpiSetPattern(hps, patternlist[pattern]);
-			break;
-		    }
-
-		    case FS_PATTERN:
-		    case FS_TRANSPARENT_PATTERN:
-		    {
-			/* style == 2 --> fill with pattern according to fillpattern */
-			/* the upper 3 nibbles of 'style' contain pattern number */
-			static const ULONG patternlist[] = {
-			    PATSYM_NOSHADE, PATSYM_DIAGHATCH,
-			    PATSYM_HATCH, PATSYM_SOLID,
-			    PATSYM_DIAG4, PATSYM_DIAG2,
-			    PATSYM_DIAG3, PATSYM_DIAG1
-			};
-			unsigned pattern;
-
-			pattern = (style >> 4) % 8;
-			GpiSetMix(hps, FM_OVERPAINT);
-			GpiSetBackMix(hps, BM_OVERPAINT);
-			GpiSetPattern(hps, patternlist[pattern]);
-			break;
-		    }
-
-		    case FS_EMPTY:
-		    default:
-		    {
-			/* style == 0 or unknown --> fill with background color */
-			GpiSetMix(hps, FM_OVERPAINT);
-			GpiSetBackMix(hps, BM_OVERPAINT);
-			GpiSetPattern(hps, PATSYM_SOLID);
-		    }
-		}
 		/* apply PM3D color if applicable */
 		if (pm3d_color >= 0) {
 		    curr_color = GpiQueryColor(hps);
@@ -2971,19 +2922,20 @@ ReadGnu(void* arg)
 
 	    case GR_FILLED_POLYGON :
 	    {
-		int points, x,y, i;
+		int points, x,y, i, style;
 		LONG curr_color;
 		POINTL p;
 
-		BufRead(hRead, &points, sizeof(points), &cbR);
-		GpiSetPattern(hps, PATSYM_SOLID);
-		GpiSetBackMix(hps, BM_OVERPAINT);
+		BufRead(hRead, &style, sizeof(style), &cbR);
+		SetFillStyle(hps, style);
+
 		if (pm3d_color >= 0) {
 		    curr_color = GpiQueryColor(hps);
 		    GpiSetColor(hps, pm3d_color);
 		}
 
 		/* using colours defined in the palette */
+		BufRead(hRead, &points, sizeof(points), &cbR);
 		GpiBeginArea(hps, BA_BOUNDARY | BA_ALTERNATE);
 		for (i = 0; i < points; i++) {
 		    BufRead(hRead, &x, sizeof(x), &cbR);
@@ -3176,6 +3128,69 @@ ReadGnu(void* arg)
     }
     DosDisConnectNPipe(hRead);
     WinPostMsg(hApp, WM_CLOSE, 0L, 0L);
+}
+
+
+static void
+SetFillStyle(HPS hps, int style)
+{
+    switch (style & 0x0f) {
+    case FS_SOLID:
+    case FS_TRANSPARENT_SOLID:
+    {
+	/* style == 1 --> fill with intensity according to filldensity */
+	static const ULONG patternlist[] = {
+	    PATSYM_NOSHADE, PATSYM_DENSE8, PATSYM_DENSE7,
+	    PATSYM_DENSE6, PATSYM_DENSE5, PATSYM_DENSE4,
+	    PATSYM_DENSE3, PATSYM_DENSE2, PATSYM_DENSE1,
+	    PATSYM_SOLID
+	};
+	unsigned pattern;
+
+	pattern = (unsigned) trunc(9  *((style >> 4) / 100.0) + 0.5);
+	if (pattern >= 10)
+	    pattern = 9; /* only 10 patterns in list */
+	GpiSetMix(hps, FM_OVERPAINT);
+	if ((style & 0x0f) == FS_SOLID)
+	    GpiSetBackMix(hps, BM_OVERPAINT);
+	else
+	    GpiSetBackMix(hps, BM_LEAVEALONE);
+	GpiSetPattern(hps, patternlist[pattern]);
+	break;
+    }
+
+    case FS_PATTERN:
+    case FS_TRANSPARENT_PATTERN:
+    {
+	/* style == 2 --> fill with pattern according to fillpattern */
+	/* the upper 3 nibbles of 'style' contain pattern number */
+	static const ULONG patternlist[] = {
+	    PATSYM_NOSHADE, PATSYM_DIAGHATCH,
+	    PATSYM_HATCH, PATSYM_SOLID,
+	    PATSYM_DIAG4, PATSYM_DIAG2,
+	    PATSYM_DIAG3, PATSYM_DIAG1
+	};
+	unsigned pattern;
+
+	pattern = (style >> 4) % 8;
+	GpiSetMix(hps, FM_OVERPAINT);
+	if ((style & 0x0f) == FS_PATTERN)
+	    GpiSetBackMix(hps, BM_OVERPAINT);
+	else
+	    GpiSetBackMix(hps, BM_LEAVEALONE);
+	GpiSetPattern(hps, patternlist[pattern]);
+	break;
+    }
+
+    case FS_EMPTY:
+    default:
+	/* style == 0 or unknown --> fill with background color */
+	GpiSetMix(hps, FM_OVERPAINT);
+	GpiSetBackMix(hps, BM_OVERPAINT);
+	GpiSetPattern(hps, PATSYM_SOLID);
+	break;
+
+    }
 }
 
 
