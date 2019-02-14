@@ -2219,6 +2219,8 @@ plot_points(struct curve_points *plot)
 		if ((plot->plot_style == POINTSTYLE || plot->plot_style == LINESPOINTS)
 		&&  plot->lp_properties.p_type == PT_VARIABLE) {
 		    pointtype = plot->points[i].CRD_PTTYPE - 1;
+		    if (pointtype < -1)
+			pointtype = -1;
 		} else {
 		    pointtype = plot->lp_properties.p_type;
 		}
