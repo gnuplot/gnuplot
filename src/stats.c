@@ -857,7 +857,7 @@ statsrequest(void)
 		    int_error( --c_token, "illegal prefix" );
 
 	    }  else {
-		int_error( c_token, "Unrecognized fit option");
+		int_error( c_token, "Unrecognized stats option");
 	    }
 	}
 
@@ -886,6 +886,12 @@ statsrequest(void)
 		       "Out of memory in stats: too many datapoints (%d)?", max_n );
 		}
 	    } /* if (need to extend storage space) */
+
+	    /* FIXME: ascii "matrix" input from df_readline via df_readbinary does not
+	     * flag NaN values so we must check each returned value here
+	     */
+	    if (df_matrix && (i == 2) && isnan(v[1]))
+		i = DF_UNDEFINED;
 
 	    switch (i) {
 	    case DF_MISSING:

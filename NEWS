@@ -14,6 +14,7 @@ Changes in 5.2.7
 * FIX tikz - request for polygon with 0 vertices could hand terminal
 * FIX lua/tikz - do not attempt to ftruncate output being piped through stdout
 * FIX tkcanvas - do not attempt to ftruncate output being piped through stdout
+* FIX handle NaN values in input stream to "stats FOO matrix"
 
 Changes in 5.2.6
 ================

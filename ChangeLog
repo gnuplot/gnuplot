@@ -1,3 +1,8 @@
+2019-02-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/stats.c: handle NaN values in input stream to "stats FOO matrix"
+	Bug #2129
+
 2019-02-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (enhanced_recursion): Font names passed to enhanced text
