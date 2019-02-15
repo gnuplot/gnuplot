@@ -2440,7 +2440,7 @@ df_determine_matrix_info(FILE *fin)
 	}
 
 	/* Keep reading matrices until file is empty. */
-	while (1) {
+	while (!df_eof) {
 	    if ((matrix = df_read_matrix(&nr, &nc)) != NULL) {
 		int index = df_num_bin_records;
 
