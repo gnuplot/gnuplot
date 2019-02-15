@@ -1,5 +1,16 @@
 2019-02-16  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/datafile.c: Under some circumstances the data input loop for
+	matrix data could issue an extra read at the end of the data stream.
+	For input from a file this was harmless, as once the end of file is hit
+	EOF is returned for all subseqent operations.  However for input from a
+	datablock this extra read caused an illegal access to memory
+	immediately following the last datablock line.
+	Add check for previously having hit end-of-file (last datablock record).
+	Bug #2129
+
+2019-02-16  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* src/tabulate.c: Do not output field separator after last field of
 	lines from "plot with table".  I.e. each line of a tab-separated table
 	containing two values will be "<value1> <tab> <value2> " with no

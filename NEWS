@@ -16,6 +16,7 @@ Changes in 5.2.7
 * FIX lua/tikz - do not attempt to ftruncate output being piped through stdout
 * FIX tkcanvas - do not attempt to ftruncate output being piped through stdout
 * FIX handle NaN values in input stream to "stats FOO matrix"
+* FIX prevent extra read past the end of a datablock holding matrix data
 
 Changes in 5.2.6
 ================
