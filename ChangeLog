@@ -1,5 +1,12 @@
 2019-02-16  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/tabulate.c: Do not output field separator after last field of
+	lines from "plot with table".  I.e. each line of a tab-separated table
+	containing two values will be "<value1> <tab> <value2> " with no
+	trailing <tab>.
+
+2019-02-16  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* src/stats.c: handle NaN values in input stream to "stats FOO matrix"
 	Bug #2129
 

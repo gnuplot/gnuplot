@@ -577,9 +577,11 @@ tabulate_one_line(double v[MAXDATACOLS], struct value str[MAXDATACOLS], int ncol
 	char sep = (table_sep && *table_sep) ? *table_sep : '\t';
 	for (col = 0; col < ncols; col++) {
 	    if (str[col].type == STRING)
-		fprintf(outfile, " %s%c", str[col].v.string_val, sep);
+		fprintf(outfile, " %s", str[col].v.string_val);
 	    else
-		fprintf(outfile, " %g%c", v[col], sep);
+		fprintf(outfile, " %g", v[col]);
+	    if (col < ncols-1)
+		fprintf(outfile, "%c", sep);
 	}
 	fprintf(outfile, "\n");
     } else {
@@ -593,10 +595,12 @@ tabulate_one_line(double v[MAXDATACOLS], struct value str[MAXDATACOLS], int ncol
 	for (col = 0; col < ncols; col++) {
 	    if (str[col].type == STRING) {
 		len = strappend(&line, &size, 0, str[col].v.string_val);
-		snprintf(buf, sizeof(buf), " %c", sep);
-		len = strappend(&line, &size, len, buf);
 	    } else {
-		snprintf(buf, sizeof(buf), " %g%c", v[col], sep);
+		snprintf(buf, sizeof(buf), " %g", v[col]);
+		len = strappend(&line, &size, len, buf);
+	    }
+	    if (col < ncols-1) {
+		snprintf(buf, sizeof(buf), " %c", sep);
 		len = strappend(&line, &size, len, buf);
 	    }
 	}
