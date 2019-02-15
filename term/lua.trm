@@ -873,10 +873,12 @@ LUA_options()
 TERM_PUBLIC void
 LUA_init()
 {
-  fseek(gpoutfile, 0, SEEK_SET);
-  /* ignore compiler warnings here, because `gpoutfile' is already open */
-  if (fflush(gpoutfile) || ftruncate(fileno(gpoutfile), 0))
+  if (gpoutfile != stdout) {
+    fseek(gpoutfile, 0, SEEK_SET);
+    /* ignore compiler warnings here, because `gpoutfile' is already open */
+    if (fflush(gpoutfile) || ftruncate(fileno(gpoutfile), 0))
 	int_warn(NO_CARET, "Error re-writing output file: %s", strerror(errno));
+  }
 
   /* reset image counter */
   image_cnt = 0;

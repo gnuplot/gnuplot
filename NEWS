@@ -12,6 +12,8 @@ Changes in 5.2.7
 * FIX hidden3d mode was not correctly dealing with arrowstyle backhead
 * FIX sprintf in 'using' spec must not clobber numeric locale
 * FIX tikz - request for polygon with 0 vertices could hand terminal
+* FIX lua/tikz - do not attempt to ftruncate output being piped through stdout
+* FIX tkcanvas - do not attempt to ftruncate output being piped through stdout
 
 Changes in 5.2.6
 ================
