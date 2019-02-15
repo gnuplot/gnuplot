@@ -551,10 +551,12 @@ TK_graphics()
     /* Reset to start of output file.  If the user mistakenly tries to	*/
     /* plot again into the same file, it will overwrite the original	*/
     /* rather than corrupting it.					*/
-    fseek(gpoutfile, 0L, SEEK_SET);
-    fflush(gpoutfile);
-    if (ftruncate(fileno(gpoutfile), (off_t)0) != 0)
-	int_error(NO_CARET,"Error re-writing output file: %s", strerror(errno));
+    if (gpoutfile != stdout) {
+	fseek(gpoutfile, 0L, SEEK_SET);
+	fflush(gpoutfile);
+	if (ftruncate(fileno(gpoutfile), (off_t)0) != 0)
+	    int_warn(NO_CARET,"Error re-writing output file: %s", strerror(errno));
+    }
 
     if (!tk_standalone && 
 	((tk_script_language == TK_LANG_PERL) || (tk_script_language == TK_LANG_PERLTKX)))
