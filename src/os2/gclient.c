@@ -131,6 +131,12 @@
 # define DEBUG_COLOR(a)
 #endif
 
+#if 0
+# include "pmprintf.h"
+# define DEBUG_FONT(a) PmPrintf a
+#else
+# define DEBUG_FONT(a)
+#endif
 
 /*==== l o c a l    d a t a ==================================================*/
 
@@ -954,6 +960,7 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 			      pp,
 			      QPF_NOINHERIT) != 0L) {
 	    strcpy(szFontNameSize, pp);
+	    DEBUG_FONT(("WM_PRESPARAMCHANGED: %s", szFontNameSize));
 	    WinInvalidateRect(hWnd, NULL, TRUE);
 	}
 	free(pp);
@@ -1954,6 +1961,7 @@ SelectFont(HPS hps, char *szFontNameSize)
     static LONG lcid = 0L;
     static char *szFontName;
     static short shPointSize;
+    char *p;
 
     sscanf(szFontNameSize, "%hd", &shPointSize);
     szFontName = strchr(szFontNameSize, '.') + 1;
@@ -1969,9 +1977,20 @@ SelectFont(HPS hps, char *szFontNameSize)
     fat.fsFontUse       = FATTR_FONTUSE_OUTLINE |
 	FATTR_FONTUSE_TRANSFORMABLE;
 
-    strcpy(fat.szFacename, szFontName);
+    strlcpy(fat.szFacename, szFontName, FACESIZE);
+    p = strchr(fat.szFacename, ':');
+    if (p != NULL) *p = NUL;
+    if (fat.szFacename[0] == NUL) {
+	p = strchr(szFontNameSize, '.');
+	if (p != NULL)
+	    strlcpy(fat.szFacename, p + 1, FACESIZE);
+    }
+    if (strstr(szFontName, ":Bold"))
+	fat.fsSelection |= FATTR_SEL_BOLD;
+    if (strstr(szFontName, ":Italic"))
+	fat.fsSelection |= FATTR_SEL_ITALIC;
 
-    if (tabFont[0].name !=NULL)
+    if (tabFont[0].name != NULL)
 	free(tabFont[0].name);
     tabFont[0].name = strdup(szFontName);
     tabFont[0].lcid = 10L;
@@ -1980,8 +1999,8 @@ SelectFont(HPS hps, char *szFontNameSize)
     if (lcid != 10L)
 	lcid = 10L;
     else {
-        GpiSetCharSet(hps, 0L);
-        GpiDeleteSetId(hps, lcid);
+	GpiSetCharSet(hps, 0L);
+	GpiDeleteSetId(hps, lcid);
     }
     GpiCreateLogFont(hps, NULL, lcid, &fat);
     GpiSetCharSet(hps, lcid);
@@ -1992,12 +2011,10 @@ SelectFont(HPS hps, char *szFontNameSize)
     DevQueryCaps(hdc, CAPS_VERTICAL_RESOLUTION,   1L, &yDeviceRes);
 
     /* Find desired font size in pixels */
-
     ptlFont.x = 2540L *(long)shPointSize / 72L;
     ptlFont.y = 2540L *(long)shPointSize / 72L;
 
     /* Set the character box */
-
     sizfx.cx = MAKEFIXED(ptlFont.x, 0);
     sizfx.cy = MAKEFIXED(ptlFont.y, 0);
     lVOffset = ptlFont.y;
@@ -2047,34 +2064,47 @@ SwapFont(HPS hps, char *szFNS)
 	GpiSetCharSet(hps, 10);
 	GpiSetCharBox(hps, &sizBaseFont);
     } else {
+	int i;
+
 	sscanf(szFNS, "%hd", &shPointSize);
-        szFontName = strchr(szFNS, '.') + 1;
+	szFontName = strchr(szFNS, '.') + 1;
 
-        {
-            int i;
-
-            lcid = 0;
-            for (i=0; i<itab; i++) {
-                if (strcmp(szFontName, tabFont[i].name) == 0) {
-                    lcid = tabFont[i].lcid;
-                    break;
-		}
+	/* search for previous font */
+	lcid = 0;
+	for (i = 0; i < itab; i++) {
+	    if (strcmp(szFontName, tabFont[i].name) == 0) {
+		lcid = tabFont[i].lcid;
+		break;
 	    }
-        }
+	}
 
         if (lcid == 0) {
+	    char * p;
+
 	    fat.usRecordLength  = sizeof(fat);
 	    fat.fsSelection     = 0;
 	    fat.lMatch          = 0;
 	    fat.idRegistry      = 0;
-	    fat.usCodePage      = codepage; /*GpiQueryCp(hps); */
+	    fat.usCodePage      = codepage;
 	    fat.lMaxBaselineExt = 0;
 	    fat.lAveCharWidth   = 0;
 	    fat.fsType          = 0;
 	    fat.fsFontUse       = FATTR_FONTUSE_OUTLINE |
 		FATTR_FONTUSE_TRANSFORMABLE;
 
-	    strcpy(fat.szFacename, szFontName);
+	    strlcpy(fat.szFacename, szFontName, FACESIZE);
+	    p = strchr(fat.szFacename, ':');
+	    if (p != NULL) *p = NUL;
+	    if (fat.szFacename[0] == NUL) {
+		p = strchr(szFontNameSize, '.');
+		if (p != NULL)
+		    strlcpy(fat.szFacename, p + 1, FACESIZE);
+	    }
+	    if (strstr(szFontName, ":Bold"))
+		fat.fsSelection |= FATTR_SEL_BOLD;
+	    if (strstr(szFontName, ":Italic"))
+		fat.fsSelection |= FATTR_SEL_ITALIC;
+	    DEBUG_FONT(("SwapFont: '%s' - '%s' - '%s', %x", szFNS, szFontName, fat.szFacename, fat.fsSelection));
 
 	    tabFont[itab].name = strdup(szFontName);
 	    lcid = itab+10;
