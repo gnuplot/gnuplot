@@ -138,6 +138,13 @@
 # define DEBUG_FONT(a)
 #endif
 
+#if 0
+# include "pmprintf.h"
+# define DEBUG_LINES(a) PmPrintf a
+#else
+# define DEBUG_LINES(a)
+#endif
+
 /*==== l o c a l    d a t a ==================================================*/
 
 static long lLineTypes[7] = {
@@ -213,7 +220,6 @@ static int      iSeg = 1;
 static HSWITCH hSwitch = 0;    /* switching between windows */
 static SWCNTRL swGnu;
 
-static BOOL     bLineTypes = FALSE;    // true if use dashed linetypes
 static BOOL     bColours = TRUE;
 static BOOL     bShellPos = FALSE;
 static BOOL     bPopFront = TRUE;
@@ -366,7 +372,7 @@ static int      QueryTextBox(HPS, int, char *);
 #endif
 static void     LMove(HPS hps, POINTL *p);
 static void     LLine(HPS hps, POINTL *p);
-static void     LType(int iType);
+static int      LType(int iType);
 
 /* Functions related to the mouse processing */
 static void     TextToClipboard(PCSZ);
@@ -659,7 +665,6 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 
 	/* set initial values */
 	ChangeCheck(hWnd, IDM_LINES_THICK, bWideLines?IDM_LINES_THICK:0);
-	ChangeCheck(hWnd, IDM_LINES_SOLID, bLineTypes?0:IDM_LINES_SOLID);
 	ChangeCheck(hWnd, IDM_COLOURS, bColours?IDM_COLOURS:0);
 	ChangeCheck(hWnd, IDM_FRONT, bPopFront?IDM_FRONT:0);
 	ChangeCheck(hWnd, IDM_KEEPRATIO, bKeepRatio?IDM_KEEPRATIO:0);
@@ -1214,14 +1219,6 @@ WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	WinInvalidateRect(hWnd, NULL, TRUE);
 	break;
 
-    case IDM_LINES_SOLID:
-	/* change line setting */
-	bLineTypes = !bLineTypes;
-	ChangeCheck(hWnd, IDM_LINES_SOLID, bLineTypes?0:IDM_LINES_SOLID);
-	EditLineTypes(hWnd, hpsScreen, bLineTypes);
-	WinInvalidateRect(hWnd, NULL, TRUE);
-	break;
-
     case IDM_COLOURS:
 	/* change colour setting */
 	bColours = !bColours;
@@ -1329,7 +1326,6 @@ WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	WinSendMsg(WinQueryHelpInstance(hWnd),
 		   HM_HELP_INDEX, 0L, 0L);
 	return 0L;
-
 
 	/* Now new mousing stuff: */
 
@@ -1666,14 +1662,12 @@ QueryIni(HAB hab)
     ulCB = sizeof(ulOpts);
     bData = PrfQueryProfileData(hini, APP_NAME, INIOPTS, &ulOpts, &ulCB);
     if (bData) {
-        bLineTypes =(BOOL)ulOpts[0];
         bWideLines =(BOOL)ulOpts[1];
         bColours =(BOOL)ulOpts[2];
         ulPauseMode = ulOpts[3];
         bPopFront =(BOOL)ulOpts[4];
     } else {
-        bLineTypes = FALSE;  /* default values */
-	/*   bWideLines = FALSE; */
+        /*   bWideLines = FALSE; */
         bColours = TRUE;
         bPopFront = TRUE;
         ulPauseMode = 1;
@@ -1763,11 +1757,11 @@ SaveIni(HWND hWnd)
         if (pausedata.pswp != NULL)
             PrfWriteProfileData(hini, APP_NAME, INIPAUSEPOS,
 				pausedata.pswp, sizeof(SWP));
-        ulOpts[0] =(ULONG)bLineTypes;
-        ulOpts[1] =(ULONG)bWideLines;
-        ulOpts[2] =(ULONG)bColours;
+        ulOpts[0] = (ULONG)TRUE;
+        ulOpts[1] = (ULONG)bWideLines;
+        ulOpts[2] = (ULONG)bColours;
         ulOpts[3] = ulPauseMode;
-        ulOpts[4] =(ULONG)bPopFront;
+        ulOpts[4] = (ULONG)bPopFront;
         PrfWriteProfileData(hini, APP_NAME, INIOPTS, &ulOpts, sizeof(ulOpts));
         PrfWriteProfileData(hini, APP_NAME, INIFRAC, &qPrintData.xsize,
 			    4 * sizeof(float));
@@ -2629,24 +2623,51 @@ ReadGnu(void* arg)
 		else
 		    GpiSetLineWidthGeom(hps, linewidth);
 		if (lt > LT_NODRAW) {
-		    if (lt < 0) lt = 0;
-		    lt  = (lt % 8);
 		    col = (col + 2) % 16;
 		} else if (lt == LT_NODRAW) {
-		    lt = 2;  // dots
 		    col = 0; // black
 		} else if (lt == LT_BACKGROUND) {
-		    lt = 0;  // solid
 		    col = 15;  // white
 		}
-		GpiLabel(hps, lLineTypes[lt]);
-		lOldLine = lt;
-		LType(bLineTypes ? lt : 0);
-		/* GpiSetLineType(hps, (bLineTypes) ? lLineTypes[lt] : lLineTypes[0]); */
+		LType(0);
+		/* GpiSetLineType(hps, lLineTypes[lt]); */
 		/* maintain some flexibility here in case we don't want
 		 * the model T option */
 		GpiSetColor(hps, RGB_TRANS(bColours ? lCols[col] : CLR_NEUTRAL));
 		pm3d_color = -1; /* switch off using pm3d colours */
+		break;
+	    }
+
+	    case GR_LTCOLOR:
+	    {
+		int lt, col;
+
+		BufRead(hRead, &lt, sizeof(int), &cbR);
+		col = lt;
+		if (lt > LT_NODRAW) {
+		    col = (col + 2) % 16;
+		} else if (lt == LT_NODRAW) {
+		    col = 0; // black
+		} else if (lt == LT_BACKGROUND) {
+		    col = 15;  // white
+		}
+		GpiSetColor(hps, RGB_TRANS(bColours ? lCols[col] : CLR_NEUTRAL));
+		pm3d_color = -1; /* switch off using pm3d colours */
+		break;
+	    }
+
+	    case SET_DASH :
+	    {
+		int dt = 0;
+
+		DEBUG_LINES(("dash:  %d", dt));
+		BufRead(hRead, &dt, sizeof(int), &cbR);
+		if (dt == DASHTYPE_AXIS) /* map axis dashpattern */
+		    dt = 1;
+		else if (dt == DASHTYPE_SOLID) /* map solid "pattern" */
+		    dt = 0;
+		if (dt >= 0)
+		    LType(dt);
 		break;
 	    }
 
@@ -2711,12 +2732,10 @@ ReadGnu(void* arg)
 
 		BufRead(hRead, &lt, sizeof(int), &cbR);
 		/* 1: enter point mode, 0: exit */
-		if (bLineTypes) {
-		    if (lt == 1)
-			LType(0);
-		    else
-			LType(lOldLine);
-		}
+		if (lt == 1)
+		    lOldLine = LType(0);
+		else
+		    LType(lOldLine);
 		bDots = lt;
 	    }
 	    break;
@@ -3830,15 +3849,18 @@ LLine(HPS hps, POINTL *p)
     }
 }
 
-void
+
+int
 LType(int iType)
 {
+    int prevLtype = iLtype;
     iLinebegin = 1;
     if (iType > 7)
 	iType = 0;
     iLtype = iType;
     iState = 0;
     togo = iPatt[iLtype][0];
+    return prevLtype;
 }
 
 
@@ -4018,11 +4040,11 @@ DrawZoomBox()
     if (!zoombox.on)
 	return;
     GpiSetLineWidth(hpsScreen, LINEWIDTH_NORMAL);
-    GpiSetLineType(hpsScreen,LINETYPE_SHORTDASH);
-    GpiSetMix(hpsScreen,FM_INVERT);
+    GpiSetLineType(hpsScreen, LINETYPE_SHORTDASH);
+    GpiSetMix(hpsScreen, FM_INVERT);
     GpiMove(hpsScreen, &zoombox.from);
-    GpiBox(hpsScreen, DRO_OUTLINE, &zoombox.to, 0,0);
-    GpiSetLineType(hpsScreen,LINETYPE_DEFAULT);
+    GpiBox(hpsScreen, DRO_OUTLINE, &zoombox.to, 0, 0);
+    GpiSetLineType(hpsScreen, LINETYPE_DEFAULT);
 }
 
 /* eof gclient.c */

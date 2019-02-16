@@ -16,11 +16,7 @@ BEGIN
         MENUITEM    "~Print..."   , IDM_PRINT
         MENUITEM    "~Fonts...", IDM_FONTS
         MENUITEM    "~Colours",  IDM_COLOURS,,MIA_CHECKED
-        SUBMENU     "~Lines", IDM_LINES
-        BEGIN
-            MENUITEM  "~Solid", IDM_LINES_SOLID,,MIA_CHECKED
-            MENUITEM  "~Thick", IDM_LINES_THICK
-        END
+        MENUITEM    "~Thick Lines", IDM_LINES_THICK
         SUBMENU     "Pa~use mode", IDM_PAUSEOPT
         BEGIN
             MENUITEM  "~Dialog box", IDM_PAUSEDLG,,MIA_CHECKED

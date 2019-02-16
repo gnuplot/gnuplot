@@ -27,9 +27,7 @@
 #define IDM_OPTIONS           200
 #define IDM_OPTIONMAIN        201
 #define IDM_COLOURS           206
-#define IDM_LINES             207
 #define IDM_LINES_THICK       208
-#define IDM_LINES_SOLID       209
 #define IDM_FRONT             210
 #define IDM_KEEPRATIO         211
 
