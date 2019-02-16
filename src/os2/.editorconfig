@@ -1,14 +1,14 @@
 # Project defaults are defined in top directory.
 # Here we just list exceptions.
 
-[{gclient.c}]
-indent_style = tab
+[*.{h,c}]
+indent_style = space
 indent_size = 4
 tab_width = 8
 trim_trailing_whitespace = true
 
-[*.{h,c}]
-indent_style = space
+[gclient.c]
+indent_style = tab
 indent_size = 4
 tab_width = 8
 trim_trailing_whitespace = true
