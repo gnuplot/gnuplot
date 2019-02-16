@@ -211,7 +211,7 @@ static LONG rgb_colors[18];
 #define   PAUSE_BTN 2           /* pause handled by menu item */
 #define   PAUSE_GNU 3           /* pause handled by Gnuplot */
 
-#define   DEFLW     50
+#define   DEFLW     20
 
 static HDC      hdcScreen;
 static HPS      hpsScreen;     /* screen pres. space */
@@ -2614,14 +2614,8 @@ ReadGnu(void* arg)
 		    bPath = FALSE;
 		}
 		BufRead(hRead, &lt, sizeof(int), &cbR);
-		/* linetype = -2 axes, -1 border, 0 arrows, all to 0 */
 		col = lt;
-		if (lt == LT_AXIS)
-		    GpiSetLineWidthGeom(hps, DEFLW * 0.85);
-		else if (lt == LT_SOLID)
-		    GpiSetLineWidthGeom(hps, DEFLW * 0.6);
-		else
-		    GpiSetLineWidthGeom(hps, linewidth);
+		GpiSetLineWidthGeom(hps, linewidth);
 		if (lt > LT_NODRAW) {
 		    col = (col + 2) % 16;
 		} else if (lt == LT_NODRAW) {
@@ -2720,9 +2714,9 @@ ReadGnu(void* arg)
 		    GpiStrokePath(hps, 1, 0);
 		    bPath = FALSE;
 		}
-		BufRead(hRead,&lw, sizeof(int), &cbR);
-		GpiSetLineWidthGeom(hps, DEFLW*lw/100);
-		linewidth = DEFLW*lw/100;
+		BufRead(hRead, &lw, sizeof(int), &cbR);
+		linewidth = DEFLW * lw / 100;
+		GpiSetLineWidthGeom(hps, linewidth);
 		break;
 	    }
 
