@@ -1719,7 +1719,7 @@ plot_bars(struct curve_points *plot)
 		/* incremented if 'plot new histogram' is encountered.        */
 		int clustersize = plot->histogram->clustersize + histogram_opts.gap;
 		x  += (i-1) * (clustersize - 1) + plot->histogram_sequence;
-		x  += histogram_opts.gap/2;
+		x  += histogram_opts.gap / 2.;
 		x  /= clustersize;
 		x  += plot->histogram->start + 0.5;
 		/* Calculate width also */
@@ -1995,8 +1995,8 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 			int clustersize = plot->histogram->clustersize + histogram_opts.gap;
 			dxl  += (ix-1) * (clustersize - 1) + plot->histogram_sequence;
 			dxr  += (ix-1) * (clustersize - 1) + plot->histogram_sequence;
-			dxl  += histogram_opts.gap/2;
-			dxr  += histogram_opts.gap/2;
+			dxl  += (histogram_opts.gap - 1)/2.;
+			dxr  += (histogram_opts.gap - 1)/2.;
 			dxl  /= clustersize;
 			dxr  /= clustersize;
 			dxl  += plot->histogram->start + 0.5;
