@@ -202,7 +202,7 @@ static LONG rgb_colors[18];
 /* A value of 0 indicates direct rgb colors without palette */
 /* FIXME: gnupmdrv crashes if this is > GNUBUF/4 ! */
 /* FIXME: this must be <= 256 (see PM_SET_COLOR)   */
-#define   RGB_PALETTE_SIZE 0    /* size of the 'virtual' palette used for 
+#define   RGB_PALETTE_SIZE 0    /* size of the 'virtual' palette used for
 				   translation of index to RGB value */
 
 /* FIXME: a large GNUBUF circumvents a bug/limitation in BufRead:
@@ -2145,12 +2145,28 @@ SwapFont(HPS hps, char *szFNS)
     }
 }
 
+
 typedef struct image_list_entry {
     PBITMAPINFO2 pbmi;
     PBYTE image;
     struct image_list_entry *next;
 } image_list_entry;
 static image_list_entry *image_list = NULL;
+
+
+#define FLUSHPATH(hps, where) FlushPath(hps, &bPath, linewidth, color, where)
+inline void
+FlushPath(HPS hps, BOOL * bPath, int linewidth, LONG color, char * where)
+{
+    if (*bPath) {
+	GpiEndPath(hps);
+	GpiSetLineWidthGeom(hps, linewidth);
+	GpiSetColor(hps, color);
+	GpiStrokePath(hps, 1, 0);
+	*bPath = FALSE;
+	// PmPrintf("FlushPath() in %s", where);
+    }
+}
 
 
 /*
@@ -2182,6 +2198,7 @@ ReadGnu(void* arg)
     HPAL pm3d_hpal_old = 0; /* default palette used before make_palette() */
     LONG pm3d_color = 0;    /* current colour (used if it is >0) */
     ULONG *rgbTable = NULL; /* current colour table (this is a 'virtual' palette) */
+    LONG color = 0;
 
     hab = WinInitialize(0);
     DosEnterCritSec();
@@ -2251,7 +2268,7 @@ ReadGnu(void* arg)
 		    POINTL p;
 		    hps = hpsScreen;  /* drawings back to screen */
 		    breakDrawing = 0;
-		    GpiSetColor(hps, RGB_TRANS(CLR_RED)); /* cross the unfinished plot */
+		    GpiSetColor(hps, color = RGB_TRANS(CLR_RED)); /* cross the unfinished plot */
 		    GpiBeginPath(hps, 1);
 		    p.x = p.y = 0; GpiMove(hps, &p);
 		    p.x = 19500; p.y = 12500; GpiLine(hps, &p);
@@ -2312,11 +2329,7 @@ ReadGnu(void* arg)
 		break;
 
 	    case SET_TEXT :     /* leave graphics mode(graph completed) */
-		if (bPath) {
-		    GpiEndPath(hps);
-		    GpiStrokePath(hps, 1, 0);
-		    bPath = FALSE;
-		}
+		FLUSHPATH(hps, "SET_TEXT");
 		GpiCloseSegment(hps);
 		DrawRuler();
 		DisplayStatusLine(hps);
@@ -2360,11 +2373,7 @@ ReadGnu(void* arg)
 		    GpiSetColor(hps, pm3d_color);
 		}
 		if (*buff == GR_MOVE) {
-		    if (bPath) {
-			GpiEndPath(hps);
-			GpiStrokePath(hps, 1, 0);
-			bPath = FALSE;
-		    }
+		    FLUSHPATH(hps, "GR_MOVE");
 		} else {
 		    if (bWideLines/*bWideLines*/ && !bPath) {
 			GpiBeginPath(hps, 1);
@@ -2420,17 +2429,14 @@ ReadGnu(void* arg)
 	    }
 
 	    case GR_ENH_TEXT :  /* write enhanced text */
-		if (bPath) {
-		    GpiEndPath(hps);
-		    GpiStrokePath(hps, 1, 0);
-		    bPath = FALSE;
-		}
 		{
                     unsigned int x, y, len;
 		    unsigned int mode;
 		    int textwidth, textheight;
                     char *str;
                     POINTL aptl[TXTBOX_COUNT];
+
+		    FLUSHPATH(hps, "GR_ENH_TEXT");
 
 		    /* read x, y, mode, len */
 		    BufRead(hRead, &x, sizeof(int), &cbR);
@@ -2480,11 +2486,6 @@ ReadGnu(void* arg)
 
 	    case GR_TEXT :   /* write text */
 		/* read x, y, len */
-		if (bPath) {
-		    GpiEndPath(hps);
-		    GpiStrokePath(hps, 1, 0);
-		    bPath = FALSE;
-		}
 		{
                     unsigned int x, y, len;
 		    int sw;
@@ -2493,9 +2494,11 @@ ReadGnu(void* arg)
 #ifndef PM_KEEP_OLD_ENHANCED_TEXT
                     POINTL aptl[TXTBOX_COUNT];
 #endif
-		    BufRead(hRead,&x, sizeof(int), &cbR);
-                    BufRead(hRead,&y, sizeof(int), &cbR);
-                    BufRead(hRead,&len, sizeof(int), &cbR);
+		    FLUSHPATH(hps, "GR_TEXT");
+
+		    BufRead(hRead, &x, sizeof(int), &cbR);
+		    BufRead(hRead, &y, sizeof(int), &cbR);
+		    BufRead(hRead, &len, sizeof(int), &cbR);
 
                     DosEnterCritSec();
                     len = (len + sizeof(int) - 1) / sizeof(int);
@@ -2529,7 +2532,7 @@ ReadGnu(void* arg)
 		    }
 
 		    ptl.x = (LONG) (x + multLineHor * sw + multLineVert * (lVOffset / 4));
-		    ptl.y = (LONG) (y + multLineVert * sw - multLineHor * (lVOffset / 4));	
+		    ptl.y = (LONG) (y + multLineVert * sw - multLineHor * (lVOffset / 4));
 
 		    GpiSetBackMix(hps, BM_LEAVEALONE);
 
@@ -2560,11 +2563,8 @@ ReadGnu(void* arg)
 		int ta, t1;
 		GRADIENTL grdl;
 
-		if (bPath) {
-		    GpiEndPath(hps);
-		    GpiStrokePath(hps, 1, 0);
-		    bPath = FALSE;
-		}
+		FLUSHPATH(hps, "SET_ANGLE");
+
 		BufRead(hRead, &ta, sizeof(int), &cbR);
 		t1 = ta % 360;
 		if (t1 < 0)
@@ -2612,11 +2612,8 @@ ReadGnu(void* arg)
 	    {
 		int lt, col;
 
-		if (bPath) {
-		    GpiEndPath(hps);
-		    GpiStrokePath(hps, 1, 0);
-		    bPath = FALSE;
-		}
+		FLUSHPATH(hps, "SET_LINE");
+
 		BufRead(hRead, &lt, sizeof(int), &cbR);
 		col = lt;
 		GpiSetLineWidthGeom(hps, linewidth);
@@ -2631,7 +2628,7 @@ ReadGnu(void* arg)
 		/* GpiSetLineType(hps, lLineTypes[lt]); */
 		/* maintain some flexibility here in case we don't want
 		 * the model T option */
-		GpiSetColor(hps, RGB_TRANS(bColours ? lCols[col] : CLR_NEUTRAL));
+		GpiSetColor(hps, color = (RGB_TRANS(bColours ? lCols[col] : CLR_NEUTRAL)));
 		pm3d_color = -1; /* switch off using pm3d colours */
 		break;
 	    }
@@ -2649,7 +2646,7 @@ ReadGnu(void* arg)
 		} else if (lt == LT_BACKGROUND) {
 		    col = 15;  // white
 		}
-		GpiSetColor(hps, RGB_TRANS(bColours ? lCols[col] : CLR_NEUTRAL));
+		GpiSetColor(hps, color = (RGB_TRANS(bColours ? lCols[col] : CLR_NEUTRAL)));
 		pm3d_color = -1; /* switch off using pm3d colours */
 		break;
 	    }
@@ -2676,11 +2673,7 @@ ReadGnu(void* arg)
 		POINTL pt;
 		LONG curr_color;
 
-		if (bPath) {
-		    GpiEndPath(hps);
-		    GpiStrokePath(hps, 1, 0);
-		    bPath = FALSE;
-		}
+		FLUSHPATH(hps, "SET_FILLBOX");
 
 		BufRead(hRead, &style, sizeof(style), &cbR);
 		BufRead(hRead, &x, sizeof(x), &cbR);
@@ -2713,11 +2706,8 @@ ReadGnu(void* arg)
 	    {
 		int lw;
 
-		if (bPath) {
-		    GpiEndPath(hps);
-		    GpiStrokePath(hps, 1, 0);
-		    bPath = FALSE;
-		}
+		FLUSHPATH(hps, "SET_LINEWIDTH");
+
 		BufRead(hRead, &lw, sizeof(int), &cbR);
 		linewidth = DEFLW * lw / 100;
 		GpiSetLineWidthGeom(hps, linewidth);
@@ -2828,7 +2818,8 @@ ReadGnu(void* arg)
 		switch (opt) {
 #ifdef PM_KEEP_OLD_ENHANCED_TEXT
 		case 'e': /* enhanced mode on, off and restore */
-		    BufRead(hRead,&param, 1, &cbR);	    
+		    param = -1;
+		    BufRead(hRead, &param, 1, &cbR);
 		    switch (param) {
 		    case '0': prev_bEnhanced = bEnhanced;
 			bEnhanced = 0;
@@ -2952,7 +2943,8 @@ ReadGnu(void* arg)
 		    pm3d_color = c + nColors;
 		else
 		    pm3d_color = rgbTable[c];
-		DEBUG_COLOR(("GR_SET_COLOR: %i -> 0x%x", (int)c, pm3d_color)); 
+		color = pm3d_color;
+		DEBUG_COLOR(("GR_SET_COLOR: %i -> 0x%x", (int)c, pm3d_color));
 		break;
 	    }
 
@@ -2967,10 +2959,11 @@ ReadGnu(void* arg)
 		    pm3d_color = GpiQueryColorIndex(hps, 0, rgb_color);
 		else
 		    pm3d_color = rgb_color;
+		color = pm3d_color;
 #if 0
 		{
 		int real_rgb = GpiQueryRGBColor(hps, LCOLOPT_REALIZED, pm3d_color);
-		DEBUG_COLOR(( "GR_SET_RGBCOLOR: req = %x  nearest = %x  index = %x", 
+		DEBUG_COLOR(( "GR_SET_RGBCOLOR: req = %x  nearest = %x  index = %x",
 		              rgb_color, real_rgb, pm3d_color ));
 		}
 #endif
@@ -2983,22 +2976,18 @@ ReadGnu(void* arg)
 		LONG curr_color;
 		POINTL p;
 
-		if (bPath) {
-		    GpiEndPath(hps);
-		    GpiStrokePath(hps, 1, 0);
-		    bPath = FALSE;
-		}
+		FLUSHPATH(hps, "GR_FILLED_POLYGON");
 
 		BufRead(hRead, &style, sizeof(style), &cbR);
-		SetFillStyle(hps, style);
+		BufRead(hRead, &points, sizeof(points), &cbR);
 
+		SetFillStyle(hps, style);
+		/* using colours defined in the palette */
 		if (pm3d_color >= 0) {
 		    curr_color = GpiQueryColor(hps);
 		    GpiSetColor(hps, pm3d_color);
 		}
 
-		/* using colours defined in the palette */
-		BufRead(hRead, &points, sizeof(points), &cbR);
 		GpiBeginArea(hps, BA_BOUNDARY | BA_ALTERNATE);
 		for (i = 0; i < points; i++) {
 		    BufRead(hRead, &x, sizeof(x), &cbR);
@@ -3019,7 +3008,7 @@ ReadGnu(void* arg)
 		break;
 	    }
 
-	    case GR_RGB_IMAGE : 
+	    case GR_RGB_IMAGE :
 	    {
 		unsigned int i, M, N, image_size;
 		POINTL corner[4];
@@ -3045,7 +3034,7 @@ ReadGnu(void* arg)
 
 		points[0].x = corner[0].x;
 		points[0].y = corner[1].y;
-		points[1].x = corner[1].x; 
+		points[1].x = corner[1].x;
 		points[1].y = corner[0].y;
 		points[2].x = points[2].y = 0;
 		points[3].x = M;
@@ -3080,7 +3069,7 @@ ReadGnu(void* arg)
 			if (perriBlk->cDetailLevel >= 2)
 				pszErrMsg = ((PSZ)perriBlk) + ((PULONG)pszOffset)[1];
 			DEBUG_IMAGE(("GpiDrawBits code=%x msg=%s", perriBlk->idError, pszErrMsg));
-			// DEBUG_IMAGE(("GpiDrawBits code=%x", perriErrorInfo->idError)); 
+			// DEBUG_IMAGE(("GpiDrawBits code=%x", perriErrorInfo->idError));
 			WinFreeErrorInfo(perriBlk);
 		    }
 		}
