@@ -540,6 +540,16 @@ PM_linetype(int lt)
 }
 
 
+TERM_PUBLIC void
+PM_dashtype(int dt, t_dashtype *custom_dash_pattern)
+{
+    if (dt != DASHTYPE_CUSTOM) {  // cannot handle custom dash patterns
+	putc(SET_DASH, PM_pipe);
+	fwrite(&dt, sizeof(int), 1, PM_pipe);
+    }
+}
+
+
 TERM_PUBLIC int
 PM_text_angle(int ang)
 {
@@ -831,12 +841,12 @@ PM_set_color(t_colorspec *colorspec)
 	}
 	break;
     case TC_LT:
-	PM_linetype(colorspec->lt);
+	putc(GR_LTCOLOR, PM_pipe);
+	fwrite(&(colorspec->lt), sizeof(int), 1, PM_pipe);
 	break;
     case TC_RGB:
 	putc(GR_SET_RGBCOLOR, PM_pipe);
 	fwrite(&(colorspec->lt), sizeof(int), 1, PM_pipe);
-	/* fflush(PM_pipe); */ /* FIXME: why should that be necessary? */
 	break;
     default:
 	break;
@@ -1270,10 +1280,20 @@ TERM_TABLE_START(PM_driver)
     0, /* PM_previous_palette */
     PM_set_color,
     PM_filled_polygon,
-    PM_image
+    PM_image,
 #ifndef PM_OLD_ENHANCED_TEXT
-    , PM_enhanced_open, PM_enhanced_flush, do_enh_writec
+    PM_enhanced_open, PM_enhanced_flush, do_enh_writec,
+#else
+    NULL, NULL, NULL,
 #endif
+    NULL, /* layer */
+    NULL, /* path */
+    0.0, /* scale (unused) */
+    NULL, /* hypertext */
+#ifdef EAM_BOXED_TEXT
+    NULL,
+#endif
+    NULL, PM_dashtype
 TERM_TABLE_END(PM_driver)
 
 #undef LAST_TERM
