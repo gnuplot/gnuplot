@@ -277,14 +277,6 @@ alert()
 # endif
 }
 
-/* always include the prototype. The prototype might even not be
- * declared if the system supports stpcpy(). E.g. on Linux I would
- * have to define __USE_GNU before including string.h to get the
- * prototype (joze) */
-/* HBB 20001109: *BUT* if a prototype is there, this one may easily
- * conflict with it... */
-char *stpcpy(char *s, const char *p);
-
 # ifndef HAVE_STPCPY
 /* handy function for composing strings; note: some platforms may
  * already provide it, how should we handle that? autoconf? -- ptdb */
