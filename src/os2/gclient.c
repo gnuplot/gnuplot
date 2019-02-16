@@ -2627,6 +2627,12 @@ ReadGnu(void* arg)
 		POINTL pt;
 		LONG curr_color;
 
+		if (bPath) {
+		    GpiEndPath(hps);
+		    GpiStrokePath(hps, 1, 0);
+		    bPath = FALSE;
+		}
+
 		BufRead(hRead, &style, sizeof(style), &cbR);
 		BufRead(hRead, &x, sizeof(x), &cbR);
 		BufRead(hRead, &y, sizeof(y), &cbR);
@@ -2925,6 +2931,12 @@ ReadGnu(void* arg)
 		int points, x,y, i, style;
 		LONG curr_color;
 		POINTL p;
+
+		if (bPath) {
+		    GpiEndPath(hps);
+		    GpiStrokePath(hps, 1, 0);
+		    bPath = FALSE;
+		}
 
 		BufRead(hRead, &style, sizeof(style), &cbR);
 		SetFillStyle(hps, style);
