@@ -2764,6 +2764,7 @@ ReadGnu(void* arg)
 		    }
 		    free(str);
 		}
+		/* TODO: Update menu items */
 		break;
 	    }
 
@@ -2978,6 +2979,7 @@ ReadGnu(void* arg)
 		PBYTE image;
 		PBITMAPINFO2 pbmi;
 		POINTL points[4];
+		POINTL clip;
 		LONG hits;
 		image_list_entry *ile;
 
@@ -3002,6 +3004,17 @@ ReadGnu(void* arg)
 		points[3].x = M;
 		points[3].y = N;
 
+		// construct a clip path
+		clip.x = corner[2].x;
+		clip.y = corner[2].y;
+		GpiMove(hps, &clip);
+		GpiBeginPath(hps, 1);
+		clip.x = corner[3].x;
+		clip.y = corner[3].y;
+		GpiBox(hps, DRO_OUTLINE, &clip, 0, 0);
+		GpiEndPath(hps);
+		GpiSetClipPath(hps, 1, SCP_AND);
+
 		pbmi = (PBITMAPINFO2) calloc( sizeof(BITMAPINFOHEADER2), 1 );
 		pbmi->cbFix = sizeof(BITMAPINFOHEADER2);
 		pbmi->cx = M;
@@ -3010,7 +3023,6 @@ ReadGnu(void* arg)
 		pbmi->cBitCount = 24;
 		pbmi->ulCompression = BCA_UNCOMP;
 		hits = GpiDrawBits(hps, image, pbmi, 4, points, ROP_SRCCOPY, BBO_IGNORE);
-
 #if 0
 		if (hits == GPI_ERROR) {
 		    PERRINFO perriBlk = WinGetErrorInfo(hab);
@@ -3026,6 +3038,8 @@ ReadGnu(void* arg)
 		    }
 		}
 #endif
+		// reset clip region
+		GpiSetClipPath(hps, 0, SCP_RESET);
 
 		/* We have to keep the image and the image header in memory since
 		   we use retained graphics */
