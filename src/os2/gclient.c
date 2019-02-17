@@ -2656,6 +2656,9 @@ ReadGnu(void* arg)
 		    GpiSetColor(hps, pm3d_color);
 		}
 		GpiBox(hps, DRO_FILL, &pt, 0,0);
+		/* revert fill style changes */
+		GpiSetBackMix(hps, BM_OVERPAINT);
+		GpiSetPattern(hps, PATSYM_SOLID);
 		if (pm3d_color >= 0)
 		    GpiSetColor(hps, curr_color);
 		break;
@@ -2964,6 +2967,9 @@ ReadGnu(void* arg)
 		}
 		GpiEndArea(hps);
 
+		/* revert fill style changes */
+		GpiSetBackMix(hps, BM_OVERPAINT);
+		GpiSetPattern(hps, PATSYM_SOLID);
 		if (pm3d_color >= 0)
 		    GpiSetColor(hps, curr_color);
 		break;
