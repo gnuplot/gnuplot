@@ -1,6 +1,7 @@
 Changes in 5.2.7
 ================
 * NEW "set pm3d noclipcb" will skip drawing quadrangles with color < cbmin
+* NEW pm - utf8, dashed lines, bold/italic text
 * CHANGE splot "with points pt 0" should act like "with dots"
 * CHANGE (tikz) improved default interpretation of gnuplot arrowhead style
 * CHANGE teach hidden3d to handle double-headed vectors (arrowstyle "heads")
@@ -18,6 +19,7 @@ Changes in 5.2.7
 * FIX tkcanvas - do not attempt to ftruncate output being piped through stdout
 * FIX handle NaN values in input stream to "stats FOO matrix"
 * FIX prevent extra read past the end of a datablock holding matrix data
+* FIX pm - issues in box and polygon fill, (wide) lines, enhanced text, images
 
 Changes in 5.2.6
 ================
