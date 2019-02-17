@@ -470,12 +470,27 @@ PM_graphics()
 #endif
     if (encoding != last_encoding) {
 	int cp;
+	/* A complete list of codepages can be found at
+	 *   http://www.altsan.org/os2/toolkits/uls/codepages.html
+	 */
 	switch (encoding) {
-	    case S_ENC_ISO8859_2: cp = 912; break;
-	    case S_ENC_CP437: cp = 437; break;
-	    case S_ENC_CP850: cp = 850; break;
-	    default: /*  S_ENC_DEFAULT, S_ENC_ISO8859_1 */
-		     cp = 0; break;
+	    case S_ENC_ISO8859_1: cp =  819; break;
+	    case S_ENC_ISO8859_2: cp =  912; break;
+	    case S_ENC_ISO8859_9: cp =  920; break;
+	    case S_ENC_ISO8859_15:cp =  923; break;
+	    case S_ENC_CP437:     cp =  437; break;
+	    case S_ENC_CP850:     cp =  850; break;
+	    case S_ENC_CP852:     cp =  852; break;
+	    case S_ENC_CP950:     cp =  950; break;
+	    case S_ENC_CP1250:    cp = 1250; break;
+	    case S_ENC_CP1251:    cp = 1251; break;
+	    case S_ENC_CP1252:    cp = 1252; break;
+	    case S_ENC_CP1254:    cp = 1254; break;
+	    case S_ENC_KOI8_R:    cp =  878; break;
+	    case S_ENC_SJIS:      cp =  932; break;
+	    case S_ENC_UTF8:      cp = 1208; break;
+	    default: /*  S_ENC_DEFAULT, ... */
+	                          cp = 0; break;
 	};
 	putc(SET_SPECIAL, PM_pipe);
 	putc('c', PM_pipe); /*  set codepage */
