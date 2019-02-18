@@ -297,15 +297,18 @@ main(int argc_orig, char **argv)
 #endif
 
 #if defined(OS2)
-    int rc;
+    {
+	int rc;
 #ifdef OS2_IPC
-    char semInputReadyName[40];
-    sprintf( semInputReadyName, "\\SEM32\\GP%i_Input_Ready", getpid() );
-    rc = DosCreateEventSem(semInputReadyName,&semInputReady,0,0);
-    if (rc != 0)
-      fputs("DosCreateEventSem error\n",stderr);
+	char semInputReadyName[40];
+
+	sprintf(semInputReadyName, "\\SEM32\\GP%i_Input_Ready", getpid());
+	rc = DosCreateEventSem(semInputReadyName, &semInputReady, 0, 0);
+	if (rc != 0)
+	    fputs("DosCreateEventSem error\n", stderr);
 #endif
-    rc = RexxRegisterSubcomExe("GNUPLOT", (PFN) RexxInterface, NULL);
+	rc = RexxRegisterSubcomExe("GNUPLOT", (PFN) RexxInterface, NULL);
+    }
 #endif
 
 /* malloc large blocks, otherwise problems with fragmented mem */
