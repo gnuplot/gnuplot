@@ -33,37 +33,13 @@ printer.
 pulldown menu enables you to select the printer to which
 output is directed.
 
-:h2 res=207. Linetype option
-:i2 refid=mopt. Linetype option
-:p.Selecting the :hp2.Lines:ehp2. menu item from the :hp2.Options:ehp2.
-enables you to choose various options for the lines used for the plots.
-:p.Selecting the :hp2.Thick:ehp2. option of the :hp2.Lines:ehp2.
-menu item toggles the :hp2.thick line:ehp2. option on and off.
-The selection is active if the menu item is checked.
-:p.Selecting the :hp2.Solid:ehp2. option of the :hp2.Lines:ehp2.
-menu item toggles the :hp2.solid line:ehp2. option on and off.
-The selection is active if the menu item is checked.
-:p.If the :hp2.Solid:ehp2. option is not active, curves on graphs will be
-plotted in various styles of broken lines. 
-
 :h2 res=208. Thick line option
 :i2 refid=mopt. Thick line option
-:p.Selecting the :hp2.Thick:ehp2. option of the :hp2.Lines:ehp2.
+:p.Selecting the :hp2.Thick:ehp2. option of the :hp2.Options:ehp2.
 menu item toggles the :hp2.thick line:ehp2. option on and off.
 The selection is active if the menu item is checked.
 :p.The thick line option can give better output on high-resolution
 devices like laser printers.
-
-:h2 res=209. Solid lines option
-:i2 refid=mopt. Solid lines option
-:p.Selecting the :hp2.Solid:ehp2. option of the :hp2.Lines:ehp2.
-menu item toggles the :hp2.solid line:ehp2. option on and off.
-The selection is active if the menu item is checked.
-:p.If the :hp2.Solid:ehp2. option is not active, curves on graphs will be
-plotted in various styles of broken lines. 
-:p.This option can be combined with the :hp2.Colours.:ehp2. option. 
-When a plot is printed on a printer that does not support colour, the 
-:hp2.Solid:ehp2. option is disabled.
 
 :h2 res=206. Colours
 :i2 refid=mopt. Colours
