@@ -75,4 +75,17 @@ print 'print strptime("%tH:%tM:%tS", "-1:01:12.50")', "\t", strptime("%tH:%tM:%t
 print 'print strptime("    %tM:%tS", "-61:12.50")', "\t", strptime("    %tM:%tS", "-61:12.50")
 print 'print strptime("        %tS", "-3672.50")', "\t", strptime("        %tS", "-3672.50")
 
+print "\nTimezones time output (strftime(), axis labels)"
+t = 1550496278
+print 't = ',t
+print 'print strftime("%d/%m/%y\t%H:%M", t)' , "	", strftime("%d/%m/%y\t%H:%M", t)
+print 'print strftime("%d/%m/%y\t%H:%M%z", t)' , "	", strftime("%d/%m/%y\t%H:%M%z", t)
+print 'print strftime("%d/%m/%y\t%H:%M%Z", t)' , "	", strftime("%d/%m/%y\t%H:%M%Z", t)
+
+print "\nTimezones time input (strptime(), data files)"
+print 'print strptime("%d/%m/%y\t%H:%M", "18/02/19\t13:24")', "\t", strptime("%d/%m/%y\t%H:%M", "18/02/19\t13:24")
+print 'print strptime("%d/%m/%y\t%H:%M%z", "18/02/19\t12:24+00:00")', "\t", strptime("%d/%m/%y\t%H:%M%z", "18/02/19\t12:24+00:00")
+print 'print strptime("%d/%m/%y\t%H:%M%z", "18/02/19\t13:24+01:00")', "\t", strptime("%d/%m/%y\t%H:%M%z", "18/02/19\t13:24+01:00")
+print 'print strptime("%d/%m/%y\t%H:%M %Z", "18/02/19\t13:24 CET")', "\t", strptime("%d/%m/%y\t%H:%M %Z", "18/02/19\t13:24 CET")
+print 'print strptime("%d/%m/%y\t%H:%M %Z", "18/02/19\t14:24 CEST")', "\t", strptime("%d/%m/%y\t%H:%M %Z", "18/02/19\t14:24 CEST")
 reset
