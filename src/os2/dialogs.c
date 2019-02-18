@@ -1,7 +1,3 @@
-#ifdef INCRCSDATA
-static char RCSid[]="$Id: dialogs.c,v 1.6 2004/07/01 17:10:09 broeker Exp $" ;
-#endif
-
 /****************************************************************************
 
     PROGRAM: gnupmdrv

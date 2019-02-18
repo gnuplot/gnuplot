@@ -1,7 +1,3 @@
-#ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.51 2010/08/31 12:59:07 mikulik Exp $";
-#endif
-
 /****************************************************************************
 
     PROGRAM: Gnupmdrv
