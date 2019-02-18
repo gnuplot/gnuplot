@@ -57,6 +57,7 @@ TERM_PUBLIC void PM_reset(void);
 TERM_PUBLIC void PM_text(void);
 TERM_PUBLIC void PM_graphics(void);
 TERM_PUBLIC void PM_linetype(int lt);
+TERM_PUBLIC void PM_dashtype(int dt, t_dashtype *custom_dash_pattern);
 TERM_PUBLIC void PM_move(unsigned int x, unsigned int y);
 TERM_PUBLIC void PM_vector(unsigned int x, unsigned int y);
 TERM_PUBLIC int PM_text_angle(int ang);
@@ -1288,10 +1289,9 @@ TERM_TABLE_START(PM_driver)
     NULL, /* path */
     0.0, /* scale (unused) */
     NULL, /* hypertext */
-#ifdef EAM_BOXED_TEXT
-    NULL,
-#endif
-    NULL, PM_dashtype
+    NULL, /* boxed text */
+    NULL, /* modify plots */
+    PM_dashtype
 TERM_TABLE_END(PM_driver)
 
 #undef LAST_TERM
