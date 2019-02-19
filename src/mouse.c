@@ -1457,9 +1457,11 @@ event_keypress(struct gp_event_t *ge, TBOOLEAN current)
 		break;
 	    /* Let user defined bindings overwrite the builtin bindings */
 	    } else if ((par2 & 1) == 0 && ptr->command) {
+		load_mouse_variables(x, y, FALSE, c);
 		do_string(ptr->command);
 		break;
 	    } else if (ptr->builtin) {
+		load_mouse_variables(x, y, FALSE, c);
 		ptr->builtin(ge);
 	    } else {
 		fprintf(stderr, "%s:%d protocol error\n", __FILE__, __LINE__);
