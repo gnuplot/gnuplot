@@ -2199,6 +2199,7 @@ ReadGnu(void* arg)
     LONG pm3d_color = 0;    /* current colour (used if it is >0) */
     ULONG *rgbTable = NULL; /* current colour table (this is a 'virtual' palette) */
     LONG color = 0;
+    int fillstyle = FS_SOLID | (100 << 4);
 
     hab = WinInitialize(0);
     DosEnterCritSec();
@@ -2668,14 +2669,13 @@ ReadGnu(void* arg)
 
 	    case SET_FILLBOX :   /* fill box */
 	    {
-		int style;
 		unsigned int x, y, w, h;
 		POINTL pt;
 		LONG curr_color;
 
 		FLUSHPATH(hps, "SET_FILLBOX");
 
-		BufRead(hRead, &style, sizeof(style), &cbR);
+		BufRead(hRead, &fillstyle, sizeof(fillstyle), &cbR);
 		BufRead(hRead, &x, sizeof(x), &cbR);
 		BufRead(hRead, &y, sizeof(y), &cbR);
 		BufRead(hRead, &w, sizeof(w), &cbR);
@@ -2686,7 +2686,7 @@ ReadGnu(void* arg)
 		pt.x += w;
 		pt.y += h;
 
-		SetFillStyle(hps, style);
+		SetFillStyle(hps, fillstyle);
 
 		/* apply PM3D color if applicable */
 		if (pm3d_color >= 0) {
@@ -2695,6 +2695,7 @@ ReadGnu(void* arg)
 		}
 		GpiBox(hps, DRO_FILL, &pt, 0,0);
 		/* revert fill style changes */
+		fillstyle = FS_SOLID | (100 << 4);
 		GpiSetBackMix(hps, BM_OVERPAINT);
 		GpiSetPattern(hps, PATSYM_SOLID);
 		if (pm3d_color >= 0)
@@ -2974,17 +2975,20 @@ ReadGnu(void* arg)
 	    }
 
 	    case GR_FILLED_POLYGON :
+		BufRead(hRead, &fillstyle, sizeof(fillstyle), &cbR);
+		// fall-through
+
+	    case 'f':  // old filled polygon - without fill style
 	    {
-		int points, x,y, i, style;
+		int points, x,y, i;
 		LONG curr_color;
 		POINTL p;
 
 		FLUSHPATH(hps, "GR_FILLED_POLYGON");
 
-		BufRead(hRead, &style, sizeof(style), &cbR);
 		BufRead(hRead, &points, sizeof(points), &cbR);
 
-		SetFillStyle(hps, style);
+		SetFillStyle(hps, fillstyle);
 		/* using colours defined in the palette */
 		if (pm3d_color >= 0) {
 		    curr_color = GpiQueryColor(hps);
@@ -3004,6 +3008,7 @@ ReadGnu(void* arg)
 		GpiEndArea(hps);
 
 		/* revert fill style changes */
+		fillstyle = FS_SOLID | (100 << 4);
 		GpiSetBackMix(hps, BM_OVERPAINT);
 		GpiSetPattern(hps, PATSYM_SOLID);
 		if (pm3d_color >= 0)
@@ -3218,7 +3223,7 @@ SetFillStyle(HPS hps, int style)
 	};
 	unsigned pattern;
 
-	pattern = (unsigned) trunc(9  *((style >> 4) / 100.0) + 0.5);
+	pattern = (unsigned) trunc(9 * ((style >> 4) / 100.0) + 0.5);
 	if (pattern >= 10)
 	    pattern = 9; /* only 10 patterns in list */
 	GpiSetMix(hps, FM_OVERPAINT);
