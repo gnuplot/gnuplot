@@ -73,7 +73,7 @@
 #define GR_SET_COLOR		'C'
 #define GR_SET_RGBCOLOR		'b'
 #define GR_LTCOLOR		'N'
-#define GR_FILLED_POLYGON	'f'
+#define GR_FILLED_POLYGON	'y' /* 'f' */
 #define GR_IMAGE		'i'
 #define GR_RGB_IMAGE	'I'
 
