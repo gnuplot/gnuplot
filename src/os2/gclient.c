@@ -337,6 +337,7 @@ static SIZEF sizBaseFont;
 
 static struct _ft {
     char *name;
+    int   codepage;
     LONG  lcid;
 } tabFont[256] = {
     {NULL,0L},
@@ -1987,6 +1988,7 @@ SelectFont(HPS hps, char *szFontNameSize)
     if (tabFont[0].name != NULL)
 	free(tabFont[0].name);
     tabFont[0].name = strdup(szFontName);
+    tabFont[0].codepage = codepage;
     tabFont[0].lcid = 10L;
 
     lcid = GpiQueryCharSet(hps);
@@ -2063,10 +2065,11 @@ SwapFont(HPS hps, char *szFNS)
 	sscanf(szFNS, "%hd", &shPointSize);
 	szFontName = strchr(szFNS, '.') + 1;
 
-	/* search for previous font */
+	/* search for previous font with correct encoding */
 	lcid = 0;
 	for (i = 0; i < itab; i++) {
-	    if (strcmp(szFontName, tabFont[i].name) == 0) {
+	    if ((strcmp(szFontName, tabFont[i].name) == 0) &&
+	        (codepage == tabFont[i].codepage)) {
 		lcid = tabFont[i].lcid;
 		break;
 	    }
@@ -2101,6 +2104,7 @@ SwapFont(HPS hps, char *szFNS)
 	    DEBUG_FONT(("SwapFont: '%s' - '%s' - '%s', %x", szFNS, szFontName, fat.szFacename, fat.fsSelection));
 
 	    tabFont[itab].name = strdup(szFontName);
+	    tabFont[itab].codepage = codepage;
 	    lcid = itab+10;
 	    tabFont[itab].lcid = lcid;
 	    ++itab;
@@ -2830,6 +2834,7 @@ ReadGnu(void* arg)
 #endif
 		case 'c': /* set codepage */
 		    BufRead(hRead, &codepage, sizeof(codepage), &cbR);
+		    SelectFont(hps, szFontNameSize);
 		    break;
 	        case '^': /* raise window */
 		    WinSetWindowPos(hwndFrame, HWND_TOP, 0,0,0,0, SWP_RESTORE|SWP_SHOW|SWP_ACTIVATE|SWP_ZORDER);
