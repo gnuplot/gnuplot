@@ -62,6 +62,7 @@
 #include "term_api.h"
 #include "util3d.h"
 #include "hidden3d.h"
+#include "plot.h"	/* for interactive */
 
 #ifdef _WIN32
 # include "win/winmain.h"
@@ -2317,19 +2318,22 @@ event_reset(struct gp_event_t *ge)
 	}
     }
 
+    /* This hack is necessary on some systems in order to prevent one  */
+    /* character of input from being swallowed when the plot window is */
+    /* closed. But which systems, exactly, and in what circumstances?  */
+    if (paused_for_mouse || !interactive) {
+	if (term && (!strncmp("x11",term->name,3)
+		 || !strncmp("wxt",term->name,3)
+		 || !strncmp("qt",term->name,2)))
+	    ungetc('\n',stdin);
+    }
+
     if (paused_for_mouse) {
 	paused_for_mouse = 0;
 #ifdef _WIN32
 	/* close pause message box */
 	kill_pending_Pause_dialog();
 #endif
-	/* This hack is necessary on some systems in order to prevent one  */
-	/* character of input from being swallowed when the plot window is */
-	/* closed. But which systems, exactly?                             */
-	if (term && (!strncmp("x11",term->name,3)
-		 || !strncmp("wxt",term->name,3)
-		 || !strncmp("qt",term->name,2)))
-	    ungetc('\n',stdin);
     }
 
     /* Dummy up a keystroke event so that we can conveniently check for a  */
