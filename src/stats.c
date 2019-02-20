@@ -52,6 +52,9 @@ static struct two_column_stats analyze_two_columns __PROTO(( double *x, double *
 							     struct sgl_column_stats res_y,
 							     long n ));
 
+static void clear_one_var __PROTO(( char *prefix, char *base ));
+static void clear_stats_variables __PROTO(( char *prefix ));
+
 static void ensure_output __PROTO((void));
 static char* fmt __PROTO(( char *buf, double val ));
 static void sgl_column_output_nonformat __PROTO(( struct sgl_column_stats s, char *x ));
@@ -91,6 +94,7 @@ struct file_stats {
     long outofrange;
     long blocks;  /* blocks are separated by double blank lines */
     long columnheaders;
+    int  columns;
 };
 
 struct sgl_column_stats {
@@ -171,6 +175,7 @@ analyze_file( long n, int outofrange, int invalid, int blank, int dblblank, int 
     res.blocks  = dblblank + 1;  /* blocks are separated by dbl blank lines */
     res.outofrange = outofrange;
     res.columnheaders = headers;
+    res.columns = df_last_col;
 
     return res;
 }
@@ -591,6 +596,74 @@ two_column_output( struct sgl_column_stats x,
    ================================================================= */
 
 static void
+clear_one_var( char *prefix, char *base )
+{
+    int len;
+    char *varname;
+
+    len = strlen(prefix) + strlen(base) + 2;
+    varname = (char *)gp_alloc( len, "create_and_set_var" );
+    sprintf( varname, "%s_%s", prefix, base );
+
+    del_udv_by_name(varname, TRUE);
+
+    free( varname );
+}
+
+static void
+clear_stats_variables( char *prefix )
+{
+    /* file variables */
+    clear_one_var( prefix, "records" );
+    clear_one_var( prefix, "invalid" );
+    clear_one_var( prefix, "headers" );
+    clear_one_var( prefix, "blank" );
+    clear_one_var( prefix, "blocks" );
+    clear_one_var( prefix, "outofrange" );
+    clear_one_var( prefix, "columns" );
+
+    /* one column variables */
+    clear_one_var( prefix, "mean" );
+    clear_one_var( prefix, "stddev" );
+    clear_one_var( prefix, "ssd" );
+    clear_one_var( prefix, "skewness" );
+    clear_one_var( prefix, "kurtosis" );
+    clear_one_var( prefix, "adev" );
+    clear_one_var( prefix, "mean_err" );
+    clear_one_var( prefix, "stddev_err" );
+    clear_one_var( prefix, "skewness_err" );
+    clear_one_var( prefix, "kurtosis_err" );
+    clear_one_var( prefix, "sum" );
+    clear_one_var( prefix, "sumsq" );
+    clear_one_var( prefix, "min" );
+    clear_one_var( prefix, "max" );
+    clear_one_var( prefix, "median" );
+    clear_one_var( prefix, "lo_quartile" );
+    clear_one_var( prefix, "up_quartile" );
+    clear_one_var( prefix, "index_min" );
+    clear_one_var( prefix, "index_max" );
+
+    /* matrix variables */
+    clear_one_var( prefix, "index_min_x" );
+    clear_one_var( prefix, "index_min_y" );
+    clear_one_var( prefix, "index_max_x" );
+    clear_one_var( prefix, "index_max_y" );
+    clear_one_var( prefix, "size_x" );
+    clear_one_var( prefix, "size_y" );
+
+    /* two column variables */
+    clear_one_var( prefix, "slope" );
+    clear_one_var( prefix, "intercept" );
+    clear_one_var( prefix, "slope_err" );
+    clear_one_var( prefix, "intercept_err" );
+    clear_one_var( prefix, "correlation" );
+    clear_one_var( prefix, "sumxy" );
+    clear_one_var( prefix, "pos_min_y" );
+    clear_one_var( prefix, "pos_max_y" );
+
+}
+
+static void
 create_and_set_var( double val, char *prefix, char *base, char *suffix )
 {
     t_value data;
@@ -641,7 +714,7 @@ file_variables( struct file_stats s, char *prefix )
     create_and_set_int_var( s.blanks,  prefix, "blank",   "" );
     create_and_set_int_var( s.blocks,  prefix, "blocks",  "" );
     create_and_set_int_var( s.outofrange, prefix, "outofrange", "" );
-    create_and_set_int_var( df_last_col, prefix, "columns", "" );
+    create_and_set_int_var( s.columns, prefix, "columns", "" );
 }
 
 static void
@@ -782,6 +855,8 @@ statsrequest(void)
     free(data_y);
     data_x = vec(max_n);       /* start with max. value */
     data_y = vec(max_n);
+    free(prefix);
+    prefix = NULL;
 
     if ( !data_x || !data_y )
       int_error( NO_CARET, "Internal error: out of memory in stats" );
@@ -846,7 +921,6 @@ statsrequest(void)
 	    } else if ( almost_equals(c_token, "pre$fix")
 		   ||   equals(c_token, "name")) {
 		c_token++;
-		free ( prefix );
 		if (almost_equals(c_token,"col$umnheader")) {
 		    df_set_key_title_columnhead(NULL);
 		    prefix_from_columnhead = TRUE;
@@ -860,6 +934,10 @@ statsrequest(void)
 		int_error( c_token, "Unrecognized stats option");
 	    }
 	}
+
+	/* Clear any previous variables STATS_* so that if we exit early */
+	/* they cannot be mistaken as resulting from the current analysis. */
+	clear_stats_variables(prefix ? prefix : "STATS");
 
 	/* If the user has set an explicit locale for numeric input, apply it */
 	/* here so that it affects data fields read from the input file. */
@@ -988,11 +1066,12 @@ statsrequest(void)
 
     /* Jan 2015: Revised detection and handling of matrix data */
     if (array_data)
-	columns = 1;
+	res_file.columns = columns = 1;
 
     if (df_matrix) {
 	int nc = df_bin_record[df_num_bin_records-1].scan_dim[0];
 	res_y = analyze_sgl_column( data_y, n, nc );
+	res_file.columns = nc;
 	columns = 1;
 
     } else if (columns == 1) {
