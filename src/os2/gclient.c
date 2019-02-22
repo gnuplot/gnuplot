@@ -2954,6 +2954,8 @@ ReadGnu(void* arg)
 		int rgb_color;
 
 		BufRead(hRead, &rgb_color, sizeof(rgb_color), &cbR);
+		/* ignore alpha value */
+		rgb_color &= 0x00ffffff;
 
 		/* Find an approximate color in the current palette */
 		if (bPMPaletteMode)
