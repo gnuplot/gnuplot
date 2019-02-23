@@ -86,7 +86,7 @@ static TBOOLEAN debug = FALSE;
 
 
 int
-main (int argc, char **argv)
+main(int argc, char **argv)
 {
     FILE *infile;
     FILE *outfile;
@@ -336,8 +336,8 @@ process_line(char *line, FILE *b)
 			else
 			    fprintf(b, ":c.%s\n", tableins->col[j]);
 		    tableins = tableins->next;
- 		    /* skip troff 'horizontal rule' command */		    
- 		    if (tableins)
+		    /* skip troff 'horizontal rule' command */
+		    if (tableins)
 			if (tableins->col[0][1] == '_')
 			    tableins = tableins->next;
 		    header = 0;
@@ -363,6 +363,27 @@ process_line(char *line, FILE *b)
 	    break;		/* ignore */
 	}
     case '#':{			/* latex table entry */
+	    if (!intable) {
+		/* Itemized list outside of table */
+		switch (line[1]) {
+		case 's':
+		    (void) fputs(":ol.\n", b);
+		    break;
+		case 'e':
+		    (void) fputs(":eol.\n", b);
+		    break;
+		case 'b':
+		    /* Bullet */
+		    fprintf(b, ":li.%s\n", line2+2);
+		    break;
+		case '#':
+		    /* Continuation of bulleted line */
+		    fprintf(b, "%s\n", line2+2);
+		    break;
+		default:
+		    break;
+		}
+	    }
 	    break;		/* ignore */
 	}
     case '%':{			/* troff table entry */
@@ -404,7 +425,7 @@ process_line(char *line, FILE *b)
 			    fprintf(stderr,"j >= MAX_COL\n");
 			    exit(EXIT_FAILURE);
 			}
-			while (*pt==' ') pt++; /* strip spaces */		
+			while (*pt==' ') pt++; /* strip spaces */
 			strcpy(tableins->col[j], " ");
 			strcat(tableins->col[j], pt);
 			k = strlen(pt);
@@ -416,7 +437,7 @@ process_line(char *line, FILE *b)
 				fprintf(stderr, "Warning: likely overestimating table width (%s)\n", pt);
 			}
 			/* crudely filter out ipf tags:
-			     "&tag." and ":tag." are recognized, 
+			     "&tag." and ":tag." are recognized,
 			     (works since all '&' and ':' characters have already been replaced)
 			*/
 			for (tagend = tagstart = pt; tagstart; ) {
@@ -497,7 +518,7 @@ process_line(char *line, FILE *b)
 #ifdef IPF_MENU_SECTIONS
 	    TBOOLEAN leaf;
 #endif
-	    
+
 	    if (isdigit((int)line[0])) {	/* start of section */
 		if (intable) {
 		    intablebut = TRUE;
@@ -518,12 +539,12 @@ process_line(char *line, FILE *b)
 		klist = lookup(&line2[2]);
 		if (klist != NULL)
 		    k = klist->line;
-		    
+
 		/* end all sections in an empty paragraph to prevent empty sections */
 		/* we therefore do no longer have to start sections with an empty paragraph */
 		if (!startpage)
 		    fprintf(bo, ":p.\n");
-		
+
 		/*if( k<0 ) fprintf(bo,":h%c.", line[0]=='1'?line[0]:line[0]-1);
 		   else */
 
@@ -535,11 +556,11 @@ process_line(char *line, FILE *b)
 		*/
 
 		/* is this section a leaf ? */
-		leaf = TRUE:	
+		leaf = TRUE:
 		if (klist)
 		    if (klist->next)
 			leaf = (klist->next->level <= klist->level);
-		
+
 		/* if not create a reference panel */
 		if (!leaf) {
 		    fprintf(bo, ":h%c res=%d x=left y=top width=20%% height=100%% group=1.%s\n",
@@ -547,21 +568,21 @@ process_line(char *line, FILE *b)
 		    fprintf(bo, ":link auto reftype=hd res=%d.\n", line_count+20000);
 		    fprintf(bo, ":hp2.%s:ehp2.\n.br\n", line2+1);
 		    refs(line_count, bo, NULL, NULL, ":link reftype=hd res=%d.%s:elink.\n.br\n");
-		    fprintf(bo, ":h%c res=%d x=right y=top width=80%% height=100%% group=2 hide.", 
+		    fprintf(bo, ":h%c res=%d x=right y=top width=80%% height=100%% group=2 hide.",
 		            line[0]+1, line_count+20000);
 		}
 		else {
 		    fprintf(bo, ":h%c res=%d x=right y=top width=80%% height=100%% group=2.", line[0], line_count);
 		}
-#else		
+#else
 		fprintf(bo, ":h%c res=%d.", line[0], line_count);
-#endif		
+#endif
 		fprintf(bo, "%s\n", line2+1);	/* title */
-		
+
 		/* add title page */
 		if (startpage)
 		    fprintf(bo, ".im titlepag.ipf\n");
-		    
+
 		para = 0;	/* not in a paragraph */
 		tabl = 0;	/* not in a table     */
 		startpage = 0;
