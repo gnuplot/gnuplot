@@ -2101,3 +2101,33 @@ f_value(union argument *arg)
     }
     push(&result);
 }
+
+/*
+ * remove leading and trailing whitespace from a string variable
+ */
+void
+f_trim(union argument *arg)
+{
+    struct value a;
+    char *s;
+    char *trim;
+
+    (void)pop(&a);
+    if (a.type != STRING)
+	int_error(NO_CARET, nonstring_error);
+
+    /* Trim from front */
+    s = a.v.string_val;
+    while (isspace(*s))
+	s++;
+
+    /* Trim from back */
+    trim = strdup(s);
+    s = &trim[strlen(trim)-1];
+    while ((s > trim) && isspace(*s))
+	*(s--) = '\0';
+
+    free(a.v.string_val);
+    a.v.string_val = trim;
+    push(&a);
+}

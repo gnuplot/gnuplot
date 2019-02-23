@@ -1254,6 +1254,7 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>strftime("timeformat",t)</td>    <td>any</td>    <td>string result from applying gnuplot's time parser</td></tr>
 ^<tr>    <td>strptime("timeformat",s)</td>    <td>string</td>    <td>seconds since year 1970 as given in string s</td></tr>
 ^<tr>    <td>system("command")</td>    <td>string</td>    <td>string containing output stream of shell command</td></tr>
+^<tr>    <td>trim(" string ")</td>    <td>string</td>    <td>string without leading or trailing whitespace</td></tr>
 ^<tr>    <td>word("string",n)</td>    <td>string, int</td>    <td>returns the nth word in "string"</td></tr>
 ^<tr>    <td>words("string")</td>    <td>string</td>    <td>returns the number of words in "string"</td></tr>
 ^</tbody>
@@ -1834,6 +1835,15 @@ C marker below is used to signal this to doc2html:
 
  This can be used to import external functions into gnuplot scripts using
  'f(x) = real(system(sprintf("somecommand %f", x)))'.
+4 trim
+?expressions functions trim
+=trim
+#trim(" string ") & string & string without leading or trailing whitespace \\
+%trim(" string ")@string@string without leading or trailing whitespace
+ `trim("  padded string ") returns the original string stripped of leading
+ and trialing whitespace.  This is useful for string comparisons of input
+ data fields that may contain extra whitespace.
+      plot FOO using 1:( trim(strcol(3)) eq "A" ? $2 : NaN )
 4 word
 =word
 #word("string",n) & string, int & returns the nth word in "string" \\
