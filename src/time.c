@@ -104,7 +104,8 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec, double *reltime)
     tm->tm_mon = tm->tm_hour = tm->tm_min = tm->tm_sec = 0;
     /* make relative times work (user-defined tic step) */
     tm->tm_year = ZERO_YEAR;
-    tm->tm_gmtoff = DEFAULT_TZ;
+
+    init_timezone(tm);
 
     /* Fractional seconds will be returned separately, since
      * there is no slot for the fraction in struct tm.
@@ -295,6 +296,8 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec, double *reltime)
 	    if (isdigit(*s))
 		s++;
 	    break;
+
+#ifdef HAVE_STRUCT_TM_TM_GMTOFF
 	case 'z':		/* timezone offset  */
 	    {
 		int neg = (*s == '-') ? -1 : 1;
@@ -314,6 +317,7 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec, double *reltime)
 	    while (!isspace(*s))
 		s++;
 	    break;
+#endif
 
 	default:
 	    int_warn(DATAFILE, "Bad time format in string");
@@ -774,11 +778,13 @@ gtimegm(struct tm *tm)
     dsec *= 60.0;
     dsec += tm->tm_sec;
 
+#ifdef HAVE_STRUCT_TM_TM_GMTOFF
     dsec -= tm->tm_gmtoff;
 
     FPRINTF((stderr, "broken-down time : %02d/%02d/%d:%02d:%02d:%02d:(%02d:%02d) = %g seconds\n",
 	     tm->tm_mday, tm->tm_mon + 1, tm->tm_year, tm->tm_hour,
 	     tm->tm_min, tm->tm_sec, tm->tm_gmtoff / 3600, (tm->tm_gmtoff % 3600) / 60, dsec));
+#endif
 
     return (dsec);
 }
@@ -799,8 +805,9 @@ ggmtime(struct tm *tm, double l_clock)
     }
 
     tm->tm_year = ZERO_YEAR;
-    tm->tm_gmtoff = DEFAULT_TZ;
     tm->tm_mday = tm->tm_yday = tm->tm_mon = tm->tm_hour = tm->tm_min = tm->tm_sec = 0;
+    init_timezone(tm);
+
     if (l_clock < 0) {
 	while (l_clock < 0) {
 	    int days_in_year = gdysize(--tm->tm_year);

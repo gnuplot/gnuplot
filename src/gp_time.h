@@ -48,13 +48,19 @@
 #define ZERO_YEAR	2000
 #define JAN_FIRST_WDAY 6	/* 1 jan 2000 was a Saturday (cal 1 2000 on unix) */
 #define SEC_OFFS_SYS	946684800.0	/*  zero gnuplot (2000) - zero system (1970) */
-#define DEFAULT_TZ     0        /* offset in seconds relative to UTC, east = positive */
 #else
 #define ZERO_YEAR	1970
 #define JAN_FIRST_WDAY 4	/* 1 jan 1970 was a Thursday (cal 1 1970 on unix) */
 #define SEC_OFFS_SYS	0.0	/* difference between internal and external epochs */
 #define DEFAULT_TZ     0        /* offset in seconds relative to UTC, east = positive */
 #endif
+
+#ifdef HAVE_STRUCT_TM_TM_GMTOFF
+#define init_timezone(tm) tm->tm_gmtoff = DEFAULT_TZ
+#else
+#define init_timezone(tm)
+#endif
+
 
 /* defines used for timeseries, seconds */
 #define YEAR_SEC	31557600.0	/* avg, incl. leap year */

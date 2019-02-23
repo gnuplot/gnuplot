@@ -77,6 +77,11 @@ AC_CHECK_TYPES([off_t])
 AC_FUNC_FSEEKO
 AC_SYS_LARGEFILE
 
+dml timezone support
+AC_CHECK_MEMBERS([struct tm.tm_gmtoff, struct tm.__tm_gmtoff],,,[
+#include <sys/types.h>
+#include <time.h>])
+
 AC_ARG_WITH(libcerf,dnl
 [  --without-libcerf       build without special functions from libcerf (default enabled)],,
   [test -z "${with_libcerf}" && with_libcerf=yes])
