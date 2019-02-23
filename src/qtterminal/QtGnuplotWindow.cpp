@@ -113,6 +113,11 @@ QtGnuplotWindow::QtGnuplotWindow(int id, QtGnuplotEventHandler* eventHandler, QW
 	exportMenu->addAction(exportPngAction);
 	exportAction->setMenu(exportMenu);
 	m_toolBar->addAction(exportAction);
+	QWidget* exportWidget = m_toolBar->widgetForAction(exportAction);
+	QToolButton* exportButton = qobject_cast<QToolButton*>(exportWidget);
+	if (exportButton) {
+		connect(exportAction, SIGNAL(triggered(bool)), exportButton, SLOT(showMenu()));
+	}
 	createAction(tr("Replot")       , 'e', ":/images/replot");
 	createAction(tr("Show grid")    , 'g', ":/images/grid");
 	createAction(tr("Previous zoom"), 'p', ":/images/zoomPrevious");
