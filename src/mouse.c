@@ -1,7 +1,3 @@
-#ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.199 2017/05/16 03:22:26 sfeam Exp $"); }
-#endif
-
 /* GNUPLOT - mouse.c */
 
 /* driver independent mouse part. */
@@ -65,6 +61,7 @@ static char *RCSid() { return RCSid("$Id: mouse.c,v 1.199 2017/05/16 03:22:26 sf
 #include "term_api.h"
 #include "util3d.h"
 #include "hidden3d.h"
+#include "plot.h"	/* for interactive */
 
 #ifdef _Windows
 # include "win/winmain.h"
@@ -2294,19 +2291,22 @@ event_reset(struct gp_event_t *ge)
 	}
     }
 
+    /* This hack is necessary on some systems in order to prevent one  */
+    /* character of input from being swallowed when the plot window is */
+    /* closed. But which systems, exactly, and in what circumstances?  */
+    if (paused_for_mouse || !interactive) {
+	if (term && (!strncmp("x11",term->name,3)
+		 || !strncmp("wxt",term->name,3)
+		 || !strncmp("qt",term->name,2)))
+	    ungetc('\n',stdin);
+    }
+
     if (paused_for_mouse) {
 	paused_for_mouse = 0;
 #ifdef WIN32
 	/* close pause message box */
 	kill_pending_Pause_dialog();
 #endif
-	/* This hack is necessary on some systems in order to prevent one  */
-	/* character of input from being swallowed when the plot window is */
-	/* closed. But which systems, exactly?                             */
-	if (term && (!strncmp("x11",term->name,3) 
-		 || !strncmp("wxt",term->name,3)
-		 || !strncmp("qt",term->name,2)))
-	    ungetc('\n',stdin);
     }
 
     /* Dummy up a keystroke event so that we can conveniently check for a  */

@@ -1,3 +1,18 @@
+2019-02-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/mouse.c (event_reset):
+	When a plot window is closed the main program may receive a GE_reset
+	event.  Under some conditions this causes one character to be dropped
+	from the command input stream.  I do not understand exactly what these
+	conditions are.  Bug #2134 shows that driving gnuplot through a pipe	
+	from tclsh is one such case.  The effect of a dropped character can be
+	mitigated by having the event handler invoke ungetc('\n',stdin), at the
+	risk of an extra blank line of output.  We were doing this already in
+	the specific case of "pause mouse".  Now we extend this to call
+	ungetc() whenever gnuplot thinks it is not being run from a direct
+	terminal session (!isatty(fileno(stdin))).
+	Bug #2134
+
 2019-02-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c: Under some circumstances the data input loop for
