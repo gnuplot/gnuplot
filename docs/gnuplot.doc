@@ -1840,7 +1840,7 @@ C marker below is used to signal this to doc2html:
 =trim
 #trim(" string ") & string & string without leading or trailing whitespace \\
 %trim(" string ")@string@string without leading or trailing whitespace
- `trim("  padded string ") returns the original string stripped of leading
+ trim("  padded string ") returns the original string stripped of leading
  and trialing whitespace.  This is useful for string comparisons of input
  data fields that may contain extra whitespace.
       plot FOO using 1:( trim(strcol(3)) eq "A" ? $2 : NaN )
