@@ -2041,10 +2041,6 @@ print_command()
 	    else
 		disp_value(print_out, &a, FALSE);
 	    need_space = TRUE;
-#ifdef ARRAY_COPY_ON_REFERENCE
-	    /* Prevents memory leakage for ARRAY variables */
-	    gpfree_string(&a);
-#endif
 	}
 
     } while (!END_OF_COMMAND && equals(c_token, ","));

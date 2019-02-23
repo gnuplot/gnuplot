@@ -124,10 +124,6 @@ f_pop(union argument *x)
     pop(&dummy);
     if (dummy.type == STRING)
 	gpfree_string(&dummy);
-#ifdef ARRAY_COPY_ON_REFERENCE
-    if (dummy.type == ARRAY)
-	gpfree_string(&dummy);
-#endif
 }
 
 void

@@ -539,33 +539,6 @@ push(struct value *x)
     /* WARNING - This is a memory leak if the string is not later freed */
     if (x->type == STRING && x->v.string_val)
 	stack[s_p].v.string_val = gp_strdup(x->v.string_val);
-
-#ifdef ARRAY_COPY_ON_REFERENCE
-    /* NOTE: Without this code, any operation during expression evaluation that */
-    /* alters the content of an existing array would potentially corrupt the	*/
-    /* original copy.  E.g. "Array A[3];  B=A" would result in a new variable B	*/
-    /* that points to the same content as the original array A.  This problem	*/
-    /* can be avoided by making a copy of the original array when pushing it on	*/
-    /* the evaluation stack.  Any change or persistance of the copy does not	*/
-    /* corrupt the original.  However there are two penalties from this.   	*/
-    /* (1) Every reference, including retrieval of a single array element, 	*/
-    /* triggers a sequence of copy/evaluate/free so it is very wasteful.  	*/
-    /* (2) The lifetime of the copy is problematic.  Enabling this code in its	*/
-    /* current state will almost certainly reveal memory leaks or double-free	*/
-    /* failures.  Some compromise (detect and allow a simple copy but nothing	*/
-    /* else?) might be possible so this code is left as a starting point.  	*/
-    if (x->type == ARRAY) {
-	int i;
-	int array_size = x->v.value_array[0].v.int_val + 1;
-	stack[s_p].v.value_array = gp_alloc(array_size * sizeof(struct value), "push copy of array");
-	memcpy(stack[s_p].v.value_array, x->v.value_array, array_size*sizeof(struct value));
-	for (i=1; i<array_size; i++)
-	    if (stack[s_p].v.value_array[i].type == STRING) {
-		stack[s_p].v.value_array[i].v.string_val
-		= strdup(stack[s_p].v.value_array[i].v.string_val);
-	    }
-    }
-#endif
 }
 
 
