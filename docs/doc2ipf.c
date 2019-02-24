@@ -318,7 +318,7 @@ process_line(char *line, FILE *b)
 		introffheader = FALSE; /* position is no longer in a troff header */
 		intablebut = FALSE;
 		tableins = &table;
-		fprintf(b, ":table frame=none rules=vert cols=\'");
+		fprintf(b, ":table frame=rules rules=none cols=\'");
 		for (j = 0; j < MAX_COL; j++)
 		    if (tablewidth[j] > 0)
 			fprintf(b, " %d", tablewidth[j]);
@@ -429,7 +429,7 @@ process_line(char *line, FILE *b)
 			strcpy(tableins->col[j], " ");
 			strcat(tableins->col[j], pt);
 			k = strlen(pt);
-			while (pt[k-1]==' ') k--; /* strip spaces */
+			while (k>0 && pt[k-1]==' ') k--; /* strip spaces */
 			/* length calculation is not correct if we have ipf tag replacements! */
 			if (debug) {
 			    if (((strchr(pt, ':')!=NULL) && (strchr(pt, '.')!=NULL)) ||
@@ -450,10 +450,12 @@ process_line(char *line, FILE *b)
 				    k -= tagend - tagstart;
 			    }
 			}
-			k += 2; /* add some space */
-			if (k > tablewidth[j])
-			    tablewidth[j] = k;
-			++j;
+			if (k > 0) {  /* ignore empty slots */
+			    k += 2; /* add some space */
+			    if (k > tablewidth[j])
+				tablewidth[j] = k;
+			    ++j;
+			}
 			tablerow = NULL;
 			if (j > tablecols)
 			    tablecols = j;
