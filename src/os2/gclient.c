@@ -2141,6 +2141,8 @@ SwapFont(HPS hps, char *szFNS)
 	    GpiQueryFontMetrics(hps, sizeof(FONTMETRICS), &fm);
 	    lSubOffset = -fm.lSubscriptYOffset;
 	    lSupOffset = fm.lSuperscriptYOffset;
+	    lCharHeight = fm.lMaxAscender*1.2;
+	    lCharWidth  = fm.lAveCharWidth;
 	}
     }
 }
