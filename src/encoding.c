@@ -47,7 +47,12 @@
 # include <windows.h>
 #endif
 
-#if defined(_WIN32) || defined(MSDOS)
+#ifdef OS2
+# define INCL_DOSNLS
+# include <os2.h>
+#endif
+
+#if defined(_WIN32) || defined(MSDOS) || defined(OS2)
 static enum set_encoding_id map_codepage_to_encoding(unsigned int cp);
 #endif
 static const char * encoding_micro(void);
@@ -76,7 +81,7 @@ encoding_from_locale(void)
     char *l = NULL;
     enum set_encoding_id encoding = S_ENC_INVALID;
 
-#if defined(_WIN32) || defined(MSDOS)
+#if defined(_WIN32) || defined(MSDOS) || defined(OS2)
 #ifdef HAVE_LOCALE_H
     char * cp_str;
 
@@ -100,6 +105,18 @@ encoding_from_locale(void)
 #else
 	encoding = map_codepage_to_encoding(GetConsoleCP());
 #endif
+    }
+#endif
+#ifdef OS2
+    if (encoding == S_ENC_INVALID) {
+	ULONG  cplist[4];
+	ULONG  listsize = sizeof(cplist);
+	ULONG  count;
+	APIRET rc;
+
+	rc = DosQueryCp(listsize, cplist, &count);
+	if (rc == 0 && count > 0)
+	    encoding = map_codepage_to_encoding(cplist[0]);
     }
 #endif
 #elif defined(HAVE_LOCALE_H)
@@ -248,7 +265,7 @@ set_degreesign(char *locale)
 }
 
 
-#if defined(_WIN32) || defined(MSDOS)
+#if defined(_WIN32) || defined(MSDOS) || defined(OS2)
 static enum set_encoding_id
 map_codepage_to_encoding(unsigned int cp)
 {
