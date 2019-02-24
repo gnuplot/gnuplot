@@ -359,8 +359,11 @@ process_line(char *line, FILE *b)
 	    fprintf(b, ":i1.%s", line+1);
 	    break;
 	}
-    case 'F':{			/* latex embedded figure */
-	    break;		/* ignore */
+    case 'F':{			/* embedded figure */
+	    if (1) {
+		fprintf(b, ":artwork align=left name='%s.bmp'.\n", line2+1);
+	    }
+	    break;
 	}
     case '#':{			/* latex table entry */
 	    if (!intable) {

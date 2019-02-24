@@ -35,6 +35,7 @@ gnuplot.op
 gnuplot.tm
 pdffigures.tex
 *.aux
+*.bmp
 *.dvi
 *.log
 *.pdf
