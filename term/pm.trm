@@ -498,6 +498,7 @@ PM_graphics()
 	fflush(PM_pipe);
 	last_encoding = encoding;
     }
+    PM_query();
     PM_mode = SET_GRAPHICS;
 }
 
