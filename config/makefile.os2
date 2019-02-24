@@ -91,6 +91,9 @@ LUA=1
 # NOTE: This cannot be disabled
 MOUSE=1
 
+# Include image in gnuplot.inf
+IMAGEHELP=1
+
 #
 # ****************** End of Configuration section ****************************
 #
@@ -156,6 +159,7 @@ O2 = obj
 
 # Flags for compiler and linker under OS/2
 OS2FLAGS = -DOS2
+TERMFLAGS = -DOS2
 
 # Flags for compiling with EMX/GCC
 # Special note: -ffloat-store is necessary to avoid some strange behaviour
@@ -403,7 +407,9 @@ $(DOCDIR)\gnuplot.pdf: $(DOCDIR)\gnuplot.tex
 	del $(DOCDIR)\gnuplot_3.*
 $(DOCDIR)\gnuplot.tex:  $(DOCDIR)\gnuplot.doc $(DOCDIR)\doc2tex.exe
 	$(DOCDIR)\doc2tex.exe $(DOCDIR)\gnuplot.doc $@
-$(DOCDIR)\gnuplot.inf:  $(DOCDIR)\gnuplot.ipf
+$(DOCDIR)\gnuplot.inf:  $(DOCDIR)\gnuplot.ipf $(DOCDIR)\plotstyles.gnu
+	gnuplot -d -e "set loadpath '../demo'; winhelp=1; cd '$(D)'" plotstyles.gnu
+	cd $(DOCDIR) && plotstyles_cvt.cmd
 #	Cannot use the command
 #	$(IPF_C) /INF $< $@
 #	because IPFC 2.1 does not support this syntax. Use instead:
@@ -481,6 +487,8 @@ clean:
 	if exist $(DEMODIR)\bf_test.exe    del $(DEMODIR)\bf_test.exe
 	if exist $(DOCDIR)\doc2*.exe       del $(DOCDIR)\doc2*.exe
 	if exist $(DOCDIR)\gnuplot.ipf     del $(DOCDIR)\gnuplot.ipf
+	if exist $(DOCDIR)\figure_*.bmp    del $(DOCDIR)\figure_*.bmp
+	if exist $(DOCDIR)\windows\figure_*.png  del $(DOCDIR)\windows\figure_*.png
 	if exist $(DOCDIR)\gnuplot_2*      del $(DOCDIR)\gnuplot_2*
 	if exist $(DOCDIR)\gnuplot_3*      del $(DOCDIR)\gnuplot_3*
 	if exist core                      del core
@@ -500,6 +508,7 @@ veryclean: clean
 	if exist $(DOCDIR)\gnuplot.pdf     del $(DOCDIR)\gnuplot.pdf
 	if exist $(DOCDIR)\gnuplot.rtf     del $(DOCDIR)\gnuplot.rtf
 	if exist $(DOCDIR)\gnuplot.tex     del $(DOCDIR)\gnuplot.tex
+	if exist $(DOCDIR)\gnuplot_tikz.help  del $(DOCDIR)\gnuplot_tikz.help
 	if exist $(DOCDIR)\*.dvi           del $(DOCDIR)\*.dvi
 	if exist $(DOCDIR)\*.log           del $(DOCDIR)\*.log
 	if exist $(DOCDIR)\*.aux           del $(DOCDIR)\*.aux
