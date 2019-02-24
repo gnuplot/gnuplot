@@ -4014,6 +4014,7 @@ gpPMmenu_update()
 #endif
 
     ChangeCheck(hApp, IDM_USEMOUSE, useMouse ? IDM_USEMOUSE:0);
+    ChangeCheck(hApp, IDM_LINES_THICK, bWideLines ? IDM_LINES_THICK:0);
     WinEnableMenuItem(/* can this situation be unzoomed back? */
 	WinWindowFromID(WinQueryWindow(hApp, QW_PARENT), FID_MENU),
 	IDM_MOUSE_UNZOOM,(gpPMmenu.where_zoom_queue & 1) ? TRUE : FALSE);
