@@ -996,9 +996,14 @@ void QtGnuplotScene::keyPressEvent(QKeyEvent* event)
 			case Qt::Key_9        : key = GP_KP_9        ; break;
 		}
 	// ASCII keys
-	else if ((event->key() <= 0xff) && (!event->text().isEmpty()))
-		// event->key() does not respect the case
-		key = event->text()[0].toLatin1();
+	else if (event->key() <= 0xff) {
+		key = event->key();
+		// the core code is supposed handle upper/lower case by
+		// inspecting the Shift modifier, but currently that does not work
+		// so instead we check here for lowercase and pass it as text.
+		if (islower((event->text()[0].toLatin1())))
+			key = event->text()[0].toLatin1();
+	}
 	// Special keys
 	else
 		switch (event->key())
@@ -1076,10 +1081,12 @@ void QtGnuplotScene::keyPressEvent(QKeyEvent* event)
  */
 void QtGnuplotScene::keyReleaseEvent(QKeyEvent* event)
 {
-	if (Qt::Key_Tab == event->key())
+	if (Qt::Key_Tab == event->key()) {
+		updateModifiers();
 		m_eventHandler->postTermEvent(GE_keypress,
 			int(m_lastMousePos.x()), int(m_lastMousePos.y()),
 			GP_Tab, 0, m_widget);
+	}
 
 	QGraphicsScene::keyReleaseEvent(event);
 }
