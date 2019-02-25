@@ -1873,7 +1873,7 @@ record()
 		int scaled_hchar, scaled_vchar;
 		char *c = &(buf[strlen(buf)-1]);
 		while (*c <= ' ') *c-- = '\0';
-		strncpy(default_font, &buf[2], strlen(&buf[2])+1);
+		strncpy(default_font, &buf[2], sizeof(default_font)-1);
 		pr_font(NULL);
 		if (plot) {
 		    double scale = (double)plot->width / 4096.0;
@@ -2283,7 +2283,7 @@ exec_cmd(plot_struct *plot, char *command)
 		/* Save the request default font */
 		c = &(buffer[strlen(buffer)-1]);
 		while (*c <= ' ') *c-- = '\0';
-		strncpy(default_font, &buffer[2], strlen(&buffer[2])+1);
+		strncpy(default_font, &buffer[2], sizeof(default_font)-1);
 		FPRINTF((stderr, "gnuplot_x11: exec_cmd() set default_font to \"%s\"\n", default_font));
 		break;
 	}
