@@ -1362,6 +1362,25 @@ void wxtPanel::OnKeyDownChar( wxKeyEvent &event )
 #define WXK_GPKEYCODE(wxkey,kcode) case wxkey : gp_keycode=kcode; break;
 
 	if (keycode<256) {
+		// event.GetKeyCode() already applied <control> and <shift>
+		// we need to undo that for normal alphabetic characters
+		// before sending the character to event_keypress()
+		if (event.ControlDown() && (1 <= keycode && keycode <= 26))
+
+#ifdef wxHAS_RAW_KEY_CODES
+		    // <ctrl><tab> is distinguishable from <ctrl>i only via
+		    // the raw key code.  There are other weird ones as well,
+		    // but TAB is the one most likely to cause problems.
+		    if (!(keycode == WXK_TAB && ((0xff00 & event.GetRawKeyCode()) != 0)))
+#endif
+		{
+			if (event.ShiftDown())
+				keycode += 'A' - 1;
+			else
+				keycode += 'a' - 1;
+		}
+
+
 		switch (keycode) {
 
 #ifndef DISABLE_SPACE_RAISES_CONSOLE
@@ -1378,7 +1397,6 @@ void wxtPanel::OnKeyDownChar( wxKeyEvent &event )
 
 		case 'q' :
 		/* ctrl+q does not send 113 but 17 */
-		/* WARNING : may be the same for other combinations */
 		case 17 :
 			if ((wxt_ctrl==yes && event.ControlDown())
 				|| wxt_ctrl!=yes) {
