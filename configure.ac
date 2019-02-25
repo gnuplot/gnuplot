@@ -210,13 +210,6 @@ AC_CHECK_HEADERS(dirent.h errno.h float.h langinfo.h limits.h locale.h math.h \
 
 AC_HEADER_STDBOOL
 
-if test "$ac_cv_header_math_h" = yes ; then
-  AC_MSG_CHECKING([for struct exception in math.h])
-  AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <math.h>]], [[struct exception *x; x->type; x->name;]])],[AC_MSG_RESULT(yes)
-     AC_DEFINE(HAVE_STRUCT_EXCEPTION_IN_MATH_H,1,
-               [ Define if math.h declares struct exception for matherr(). ])],[AC_MSG_RESULT(no)])
-fi
-
 if test "$ac_cv_header_sys_stat_h" = yes; then
   AC_HEADER_STAT
 fi

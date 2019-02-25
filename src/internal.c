@@ -50,9 +50,11 @@
 # include <windows.h>
 #endif
 
-#if !defined(__MINGW64_VERSION_MAJOR)
 /*
- * FIXME: This is almost certainly out of date on linux, since the matherr
+ * FIXME: Any platforms that still want support for matherr should
+ * add appropriate definitions here.  Everyone else can now ignore it.
+ *
+ * Use of matherr is out of date on linux, since the matherr
  * mechanism has been replaced by math_error() and supposedly is only
  * enabled via an explicit declaration #define _SVID_SOURCE.
  */
@@ -65,13 +67,15 @@
  *   isms  for handling exceptions, by including a function named
  *   matherr() in their programs.
  */
-
+/* Watcom compiler */
+#ifdef __WATCOMC__
 int
-GP_MATHERR( STRUCT_EXCEPTION_P_X )
+matherr(struct _exception *x)
 {
     return (undefined = TRUE);	/* don't print error message */
 }
 #endif
+
 
 static enum DATA_TYPES sprintf_specifier(const char *format);
 

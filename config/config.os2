@@ -372,9 +372,6 @@
 /* Define to 1 if you have the `strstr' function. */
 #define HAVE_STRSTR 1
 
-/* Define if math.h declares struct exception for matherr(). */
-/* #undef HAVE_STRUCT_EXCEPTION_IN_MATH_H */
-
 /* Define to 1 if you have the `sysinfo' function. */
 /* #undef HAVE_SYSINFO */
 

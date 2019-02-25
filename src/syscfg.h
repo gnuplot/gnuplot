@@ -221,13 +221,6 @@ FILE * win_popen(const char *filename, const char *mode);
 # endif                         /* !__DJGPP__ */
 #endif /* MSDOS */
 
-/* Watcom's compiler; this should probably be somewhere
- * in the Windows section
- */
-#ifdef __WATCOMC__
-# define GP_EXCEPTION_NAME _exception
-#endif
-
 
 #if defined(alliant)
 # undef HAVE_LIMITS_H
@@ -355,20 +348,6 @@ typedef RETSIGTYPE (*sigfunc) (void);
 /* Windows needs to redefine stdin/stdout functions */
 #if defined(_WIN32) && !defined(WINDOWS_NO_GUI)
 # include "win/wtext.h"
-#endif
-
-#ifndef GP_EXCEPTION_NAME
-# define GP_EXCEPTION_NAME exception
-#endif
-
-#ifndef GP_MATHERR
-# define GP_MATHERR matherr
-#endif
-
-#ifdef HAVE_STRUCT_EXCEPTION_IN_MATH_H
-# define STRUCT_EXCEPTION_P_X struct GP_EXCEPTION_NAME *x
-#else
-# define STRUCT_EXCEPTION_P_X /* nothing */
 #endif
 
 /* if GP_INLINE has not yet been defined, set to __inline__ for gcc,
