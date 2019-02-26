@@ -1313,8 +1313,7 @@ START_HELP(pm)
 " The `pm` terminal driver provides an OS/2 Presentation Manager window in",
 " which the graph is plotted.  The window is opened when the first graph is",
 " plotted.  This window has its own online help as well as facilities for",
-" printing, copying to the clipboard and some line type and color adjustments.",
-" The `multiplot` option is supported.",
+" printing, copying to the clipboard.",
 "",
 " Syntax:",
 "       set terminal pm {server {n}} {persist} {widelines} {enhanced} {\"title\"}",
@@ -1334,8 +1333,6 @@ START_HELP(pm)
 "",
 " If `title` is specified, it will be used as the title of the plot window.",
 " It will also be used as the name of the server instance, and will override",
-" the optional numerical argument.",
-"",
-" Linewidths may be changed with `set linestyle`."
+" the optional numerical argument."
 END_HELP(pm)
 #endif /* TERM_HELP */
