@@ -14,18 +14,19 @@ Mailing list for bug reports: gnuplot-bugs@lists.sourceforge.net
 :p.
 Major contributors (alphabetic order):
 
-    Hans-Bernhard Broeker, John Campbell
-    Robert Cunningham,  David Denholm
-    Gershon Elber, Roger Fearick
-    Carsten Grammes, Lucas Hart
-    Lars Hecking, Peter Juhasz
-    Thomas Koenig, David Kotz
-    Ed Kubaitis, Russell Lang
-    Timothee Lecomte, Alexander Lehmann
-    Alexander Mai, Bastian Maerkisch
-    Ethan A Merritt, Petr Mikulik
-    Daniel Sebald, Carsten Steger
-    Shigeharu Takeno, Tom Tkacik
-    Jos Van der Woude, James R. Van Zandt
-    Alex Woo, Johannes Zellner
+    Christoph Bersch, Hans-Bernhard Br”ker,
+    John Campbell,  Robert Cunningham,
+    David Denholm,  Gershon Elber,
+    Roger Fearick,  Carsten Grammes,
+    Lucas Hart,  Lars Hecking,
+    P‚ter Juh sz,  Thomas Koenig,
+    David Kotz,  Ed Kubaitis,
+    Russell Lang,  Timoth‚e Lecomte,
+    Alexander Lehmann,  J‚r“me Lodewyck,
+    Alexander Mai,  Bastian M„rkisch,
+    Ethan A Merritt,  Petr Mikul¡k,
+    Daniel Sebald,  Carsten Steger,
+    Shigeharu Takeno,  Tom Tkacik,
+    Jos Van der Woude, James R. Van Zandt,
+    Alex Woo,  Johannes Zellner
 :elines.
