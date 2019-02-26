@@ -364,8 +364,10 @@ AC_ARG_WITH(readline,dnl
   --with-readline=gnu      use the GNU readline library (default if present)
   --with-readline=bsd      use the NetBSD editline library (NB: does not handle UTF-8!)
   --with-readline=DIR      specify the location of readline/editline
-  --without-readline       do not use any readline function], ,
+  --without-readline       same as --with-readline=builtin], ,
   test -z "$with_readline" && with_readline=gnu)
+
+AS_IF([test "x${with_readline}" = "xno"], with_readline="builtin", )
 
 dnl Gnuplot history
 AC_ARG_ENABLE(history-file,dnl
