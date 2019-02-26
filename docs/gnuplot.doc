@@ -9849,6 +9849,8 @@ Ffigure_missing
        %W           week of the year (week starts on Monday) (ignored on input)
        %y           year, 0-68 for 2000-2068, 69-99 for 1969-1999
        %Y           year, 4-digit
+       %z           timezone, [+-]hh:mm
+       %Z           timezone name, ignored string
 #\begin{tabular}{|cl|} \hline
 #\multicolumn{2}{|c|}{Date Specifiers}\\
 #\hline \hline
@@ -9878,6 +9880,8 @@ Ffigure_missing
 #\verb@%W@ & week of the year (week starts on Monday) \\
 #\verb@%y@ & year, 0-99 in range 1969-2068\\
 #\verb@%Y@ & year, 4-digit \\
+#\verb@%z@ & timezone, [+-]hh:mm \\
+#\verb@%Z@ & timezone name, ignored string \\
 %c l .
 %Format@Explanation
 %_
@@ -9906,6 +9910,8 @@ Ffigure_missing
 %%W@week of the year (week starts on Monday)
 %%y@year, 0-99 in range 1969-2068
 %%Y@year, 4-digit
+%%z@timezone, [+-]hh:mm
+%%Z@timezone name, ignored string
 @end table
 
 
@@ -9943,6 +9949,8 @@ Ffigure_missing
 ^<tr>    <td><tt>%W</tt></td>    <td>week of the year (week starts on Monday)</td></tr>
 ^<tr>    <td><tt>%y</tt></td>    <td>year, 0-99 in range 1969-2068</td></tr>
 ^<tr>    <td><tt>%Y</tt></td>    <td>year, 4-digit</td></tr>
+^<tr>    <td><tt>%z</tt></td>    <td>timezone, [+-]hh:mm</td></tr>
+^<tr>    <td><tt>%Z</tt></td>    <td>timezone name, ignored string</td></tr>
 ^</tbody>
 ^</table>
 
