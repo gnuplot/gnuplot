@@ -134,12 +134,13 @@ void
 process_line(char *line, FILE *b)
 {
     static int line_count = 0;
+    static int prev_line = 0;
     static char line2[MAX_LINE_LEN+1];
     char hyplink1[64];
     char *pt, *tablerow;
     int i;
     int j;
-    static int startpage = 1;
+    static int startpage = 2;
     char str[MAX_LINE_LEN+1];
     char topic[MAX_LINE_LEN+1];
     int k, l;
@@ -546,9 +547,6 @@ process_line(char *line, FILE *b)
 		if (!startpage)
 		    fprintf(bo, ":p.\n");
 
-		/*if( k<0 ) fprintf(bo,":h%c.", line[0]=='1'?line[0]:line[0]-1);
-		   else */
-
 #ifdef IPF_MENU_SECTIONS
 		/* To make navigation with the old IBM online help viewer (View)
 		   easier, the following code creates additional panels which contain
@@ -576,6 +574,14 @@ process_line(char *line, FILE *b)
 		    fprintf(bo, ":h%c res=%d x=right y=top width=80%% height=100%% group=2.", line[0], line_count);
 		}
 #else
+		if (!startpage)	{ 
+		    /* add list of subtopics */
+		    refs(prev_line, bo, ":hp2.Subtopics:ehp2.\n.br\n:ul compact.\n", ":eul.\n", ":li.:link reftype=hd res=%d.%s:elink.\n");
+		} else {
+		    /* startpage was set to 2 initially, so we ignore this twice! */
+		    startpage--;
+		}
+
 		fprintf(bo, ":h%c res=%d.", line[0], line_count);
 #endif
 		fprintf(bo, "%s\n", line2+1);	/* title */
@@ -586,7 +592,10 @@ process_line(char *line, FILE *b)
 
 		para = 0;	/* not in a paragraph */
 		tabl = 0;	/* not in a table     */
+#ifdef IPF_MENU_SECTIONS
 		startpage = 0;
+#endif
+		prev_line = line_count;
 	    } else
 		fprintf(stderr, "unknown control code '%c' in column 1, line %d\n",
 			line[0], line_count);
