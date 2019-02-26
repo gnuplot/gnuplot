@@ -363,10 +363,10 @@ process_line(char *line, FILE *b)
 		/* Itemized list outside of table */
 		switch (line[1]) {
 		case 's':
-		    (void) fputs(":ol.\n", b);
+		    (void) fputs(":ul.\n", b);
 		    break;
 		case 'e':
-		    (void) fputs(":eol.\n", b);
+		    (void) fputs(":eul.\n", b);
 		    break;
 		case 'b':
 		    /* Bullet */
