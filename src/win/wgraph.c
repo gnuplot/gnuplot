@@ -1,7 +1,3 @@
-/*
- * $Id: wgraph.c,v 1.255.2.9 2017/08/29 11:45:16 markisch Exp $
- */
-
 /* GNUPLOT - win/wgraph.c */
 /*[
  * Copyright 1992, 1993, 1998, 2004   Maurice Castro, Russell Lang
@@ -3442,9 +3438,9 @@ ReadGraphIni(LPGW lpgw)
 		lpgw->Origin.y = CW_USEDEFAULT;
 	if (bOKINI)
 		GetPrivateProfileString(section, TEXT("GraphSize"), TEXT(""), profile, 80, file);
-	if ((p = GetInt(profile, (LPINT)&lpgw->Size.x)) == NULL)
+	if ((p = GetInt(profile, (LPINT)&lpgw->Size.x)) == NULL || lpgw->Size.x < 1)
 		lpgw->Size.x = CW_USEDEFAULT;
-	if ((p = GetInt(p, (LPINT)&lpgw->Size.y)) == NULL)
+	if ((p = GetInt(p, (LPINT)&lpgw->Size.y)) == NULL || lpgw->Size.y < 1)
 		lpgw->Size.y = CW_USEDEFAULT;
 	/* Saved size and origin are normalised to 96dpi. */
 	dpi = GetDPI();
