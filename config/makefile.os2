@@ -2,6 +2,8 @@
 # GNUPLOT Makefile for use on OS/2 2.x (and above)
 # using emx 0.9 (and above) and GNU make
 #
+# We note that builds using newer gcc based on kLIBC are not supported yet.
+#
 # To compile gnuplot, run the following command in directory gnuplot\src:
 #	make -f ..\config\makefile.os2
 #
@@ -13,9 +15,14 @@
 #	- emtex is only required for some parts of the documentation
 #
 #	- GD library, http://hobbes.nmsu.edu/pub/os2/util/gd-2-0-33.zip
-#	- GNU readline, http://os2ports.com/ftp/pub/os2/unix/devtools/readline/readline4.1-os2.zip
-#	- PDFlib Lite 6.0 or later compiled for emx (available as source from http://www.pdflib.com/ )
-#	- XFree86 libraries, ftp://ftp.netlabs.org/pub/xfree86/4.5.0
+#	- PNG library, http://hobbes.nmsu.edu/download/pub/os2/dev/mm/libpng-1.0.18.zip
+#	- ICONV library, http://hobbes.nmsu.edu/download/pub/os2/util/iconv0.2.1a.zip
+#	[ LUA library, http://hobbes.nmsu.edu/download/pub/os2/dev/lua-5.1.5-ecs.os2.zip - recompiled ]
+#	[ PDFlib Lite 6.0 or later compiled for emx (available as source from http://www.pdflib.com/ ) ]
+#	[ XFree86 libraries, ftp://ftp.netlabs.org/pub/xfree86/4.5.0 ]
+#
+#	- GBM binaries for image conversion, http://hobbes.nmsu.edu/download/pub/os2/apps/graphics/gbmos2_176_bin.zip
+#
 
 # We depend on using cmd.exe (or a compatible one) and the
 # standard OS/2 tool set. (additionally we use 'cat')
@@ -30,8 +37,10 @@ SHELL=cmd.exe
 #
 
 # X11 driver
-# requires installed XFree86
-X11=1
+# requires installed XFree86 libraries and headers
+# Note: x11 on OS/2 is broken: pause in a script no longer works and
+#       the plot is drawn shifted half-way outside the window.
+#X11=1
 
 # GIF, PNG, JPEG device drivers
 # Requires gd library (not part of gnuplot)
@@ -40,7 +49,7 @@ X11=1
 # or newer. This library writes PNG, JPEG and GIF images.
 # If libgd has been compiled with TrueType font support, then you can use
 # scaled TrueType fonts in PNG images. If not, then uncomment FREETYPE.
-# The pre-compiled GD library by Ilya Zakharevich available at 
+# The pre-compiled GD library by Ilya Zakharevich available at
 # http://hobbes.nmsu.edu/pub/os2/util/gd-2-0-33.zip
 # is strongly recommended. This packages already includes the required
 # GD, JPEG and Z and freetype libraries.
@@ -50,13 +59,24 @@ GIF=1
 JPEG=1
 FREETYPE=1
 
+# ICONV library
+ICONV=1
+
+# cairo/pango terminals:  pdfcairo, pngcairo, cairolatex
+# requires pango / cairo
+# Note that cairo/pango are only available for newer gcc/kLIBC, not EMX.
+#CAIRO=1
+
 # PDF device driver
 # requires PDFlib (not part of gnuplot)
-PDF=1
+#PDF=1
 
 # VESAkit support
 # requires SVGA- and VESA Kit (not part of gnuplot)
 # VESA=1
+
+# LUA support - lua/tikz terminal
+LUA=1
 
 # GNU_ReadLine support
 # requires GNU readline library (static or DLL; not part of gnuplot)
@@ -125,7 +145,7 @@ GNUPLOT_JS_DIR = share/js
 GNUPLOT_LUA_DIR = share/lua
 
 #
-# 3 sets of variables are defined and used to create
+# Two sets of variables are defined and used to create
 #   1: gnuplot.exe, and utilities
 #   2: gnupmdrv.exe (the PM-driver executable)
 #
@@ -139,7 +159,7 @@ OS2FLAGS = -DOS2
 
 # Flags for compiling with EMX/GCC
 # Special note: -ffloat-store is necessary to avoid some strange behaviour
-# of this code: 
+# of this code:
 #   reset; set key; set xlabel "Year"; set xdata time; set timefmt "%y%m%d"
 #   set format x "%y"; set xrange ["900621" : "950126"];
 #   plot '-' using 1:2 title 'Fitted IO' with lines 1
@@ -150,27 +170,28 @@ OS2FLAGS = -DOS2
 # of today (20010918) it isn't any more ...
 #
 EMXSPECIFIC = -DHAVE_CONFIG_H -ffloat-store
-LIBS = 
+LIBS =
 
 #
 # Choose flags suitable for a debugging or for a production build
 #
+WARNFLAGS = -Wall -Wno-comment
 ifdef DEBUG
-CFLAGS  = -g $(OS2FLAGS) $(EMXSPECIFIC) -Wall -Wno-comment -O0 -Zmt
+CFLAGS  = -g $(OS2FLAGS) $(EMXSPECIFIC) $(WARNFLAGS) -O0 -Zmt
 LDFLAGS  = -g -Zmt -Zcrtdll -Zbsd-signals
-CFLAGS2 = -g $(OS2FLAGS) $(EMXSPECIFIC) -Wall              -O0 -Zmt -Zomf
-LDFLAGS2 = -g -Zmt -Zcrtdll -Zbsd-signals -Zomf
+CFLAGS2 = -g $(OS2FLAGS) $(EMXSPECIFIC) $(WARNFLAGS) -O0 -Zmt -Zomf
+LDFLAGS2 = -g -Zmt -Zcrtdll -Zomf -Zbsd-signals
 else
-CFLAGS  = $(OS2FLAGS) $(EMXSPECIFIC) -O4 -mpentium -Wall -Wno-unused -Wno-comment -Zmt
+CFLAGS  = $(OS2FLAGS) $(EMXSPECIFIC) -O4 $(WARNFLAGS) -Zmt
 LDFLAGS  = -s -Zmt -Zcrtdll -Zbsd-signals
-CFLAGS2 = $(OS2FLAGS) $(EMXSPECIFIC) -O4 -mpentium -Wall -Wno-unused              -Zmt -Zomf
-LDFLAGS2 = -s -Zmt -Zcrtdll -Zbsd-signals -Zomf
+CFLAGS2 = $(OS2FLAGS) $(EMXSPECIFIC) -O4 $(WARNFLAGS) -Zmt -Zomf
+LDFLAGS2 = -s -Zmt -Zcrtdll -Zomf -Zbsd-signals
 endif
 
 #
 # Settings for the terminals to be included
 #
-TERMFLAGS = -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\" 
+TERMFLAGS = -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\"
 TERMFLAGS += -DGNUPLOT_LUA_DIR=\"$(GNUPLOT_LUA_DIR)\" -I. -I.. -I$(T)
 
 ifdef GD
@@ -190,6 +211,13 @@ ifdef JPEG
 endif
 endif
 
+ifdef CAIRO
+  CFLAGS += -DHAVE_CAIROPDF -I/usr/include/cairo -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/pango-1.0
+  TERMFLAGS += -DHAVE_CAIROEPS
+  TERMLIBS  += -lcairo -lpangocairo-1.0 -lpango-1.0 -lgobject-2.0 -lgmodule-2.0 -lfreetype -lglib-2.0 -lintl -lpthread
+  CAIROOBJS = gp_cairo.$(O) gp_cairo_helpers.$(O)
+endif
+
 ifdef PDF
   TERMFLAGS += -DHAVE_LIBPDF -DHAVE_PDFLIB_H
   TERMLIBS  += -lpdflib
@@ -199,6 +227,13 @@ endif
 ifdef VESA
   TERMFLAGS += -DEMXVESA
   TERMLIBS  += -ljmgraph -lvesa
+endif
+
+# LUA support
+ifdef LUA
+  TERMFLAGS += -DHAVE_LUA
+  TERMLIBS  += -lliblua
+  LUA_HELP  =  $(D)\gnuplot-tikz.help
 endif
 
 # X11 support
@@ -214,8 +249,16 @@ endif
 
 # GNU readline support
 ifdef GNU_RL
-  CFLAGS  += -DHAVE_LIBREADLINE
-  LIBS    += -lreadline -ltermcap
+  CFLAGS  += -DHAVE_LIBREADLINE -D HAVE_READLINE_READLINE_H -DHAVE_READLINE_HISTORY_H -DHAVE_READLINE_RESET
+  LIBS    += -lreadline -lncurses
+else
+  CFLAGS  += -DREADLINE
+endif
+
+# iconv support
+ifdef ICONV
+  CFLAGS  += -DHAVE_ICONV
+  LIBS    += -liconv
 endif
 
 
@@ -260,11 +303,18 @@ else
 binaries: gnuplot.exe gnupmdrv.exe
 endif
 
-OBJS = $(COREOBJS) version.$(O)
+OBJS = $(COREOBJS) $(CAIROOBJS) version.$(O)
 
-$(OBJS): config.h
 
 term.$(O): $(CORETERM) term.h config.h $(OS2DIR)\pm_msgs.h
+
+gp_cairo.$(O): wxterminal/gp_cairo.c
+	$(CC)  $(CFLAGS) $(TERMFLAGS) -o $*.$(O) -c $<
+
+gp_cairo_helpers.$(O): wxterminal/gp_cairo_helpers.c
+	$(CC)  $(CFLAGS) $(TERMFLAGS) -o $*.$(O) -c $<
+
+$(OBJS): config.h
 
 gnuplot.exe: $(OBJS)
 	$(CC) $(LDFLAGS) -o $@ $(OBJS) $(TERMLIBS) $(LIBS)
@@ -277,14 +327,15 @@ $(OS2DIR)\gclient.$(O2):   $(OS2DIR)\gclient.c    $(OS2DIR)\gnupmdrv.h	config.h 
 $(OS2DIR)\dialogs.$(O2):   $(OS2DIR)\dialogs.c    $(OS2DIR)\gnupmdrv.h	config.h  $(OS2DIR)\dialogs.h
 $(OS2DIR)\print.$(O2):     $(OS2DIR)\print.c      $(OS2DIR)\gnupmdrv.h	config.h
 $(OS2DIR)\gpexecute.$(O2): gpexecute.c            gpexecute.h
+
 $(OS2DIR)\gnupmdrv.res :   $(OS2DIR)\gnupmdrv.rc  $(OS2DIR)\gnuplot.ico $(OS2DIR)\dialogs.h
-	cd $(OS2DIR) && rc -r gnupmdrv.rc & cd ..
+	cd $(OS2DIR) && rc -i \usr\include\os2tk45 -r gnupmdrv.rc & cd ..
 
 OS2OBJ = $(OS2DIR)\gnupmdrv.$(O2) $(OS2DIR)\gclient.$(O2) $(OS2DIR)\print.$(O2) \
          $(OS2DIR)\dialogs.$(O2) gpexecute.$(O2)
 
 gnupmdrv.exe: $(OS2OBJ) $(OS2DIR)\gnupmdrv.res $(OS2DIR)\gnupmdrv.def
-	$(CC2) $(LDFLAGS2) -o $@ $(OS2OBJ) $(OS2DIR)\gnupmdrv.res $(OS2DIR)\gnupmdrv.def
+	$(CC2) $(LDFLAGS2) -o $@ $(OS2DIR)\gnupmdrv.res $(OS2OBJ) $(OS2DIR)\gnupmdrv.def
 
 gnupmdrv.hlp: $(OS2DIR)\gnupmdrv.ipf
 #	Cannot use the command
@@ -322,6 +373,11 @@ getcolor_x11.o: getcolor.c
 config.h: ..\config\config.os2
 	if exist $@ del $@
 	copy $< $@
+
+ifdef LUA
+$(LUA_HELP): $(T)/lua/gnuplot-tikz.lua
+	lua $< termhelp > $@
+endif
 
 #
 # Create documentation in various formats
@@ -376,7 +432,7 @@ $(DOCDIR)\gnuplot.ipf:  $(DOCDIR)\gnuplot.doc $(DOCDIR)\doc2ipf.exe
 # Some dependencies - no rule!
 $(DOCDIR)\doc2gih.exe $(DOCDIR)\doc2ipf.exe $(DOCDIR)\doc2info.exe \
 $(DOCDIR)\doc2tex.exe $(DOCDIR)\doc2rtf.exe: \
-      $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(DOCDIR)\allterm.h ..\src\config.h
+      $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(DOCDIR)\allterm.h ..\src\config.h $(LUA_HELP)
 
 
 SORT_TERMINALS=1
@@ -408,8 +464,8 @@ $(DOCDIR)\doc2ms.exe:   $(DOCDIR)\doc2ms.c $(DOCDIR)\termdoc.c $(OS2TERM)
 $(M)binary1 $(M)binary2 $(M)binary3: $(M)bf_test.exe
 	cd $(DEMODIR) && bf_test.exe
 
-$(M)bf_test.exe : bf_test.c alloc.$(O)
-	$(CC) $(CFLAGS) -o $@ bf_test.c alloc.$(O)
+$(M)bf_test.exe : bf_test.c
+	$(CC) $(CFLAGS) -o $@ bf_test.c
 
 #
 # Clean up
@@ -417,7 +473,7 @@ $(M)bf_test.exe : bf_test.c alloc.$(O)
 
 # Clean up all files temporary used
 clean:
-	if exist config.h               del config.h
+	if exist config.h                  del config.h
 	if exist *.$(O)                    del *.$(O)
 	if exist *.$(O2)                   del *.$(O2)
 	cd $(OS2DIR) && if exist *.$(O2)   del *.$(O2)
@@ -432,10 +488,10 @@ clean:
 
 # Clean up ALL files that were not part of the source distribution
 veryclean: clean
-	if exist *.exe                     del *.exe         
+	if exist *.exe                     del *.exe
+	if exist gnupmdrv.hlp              del gnupmdrv.hlp
 	if exist $(DOCDIR)\gnuplot.dvi     del $(DOCDIR)\gnuplot.dvi
 	if exist $(DOCDIR)\gnuplot.gih     del $(DOCDIR)\gnuplot.gih
-	if exist $(DOCDIR)\gnupmdrv.hlp    del $(DOCDIR)\gnupmdrv.hlp
 	if exist $(DOCDIR)\gnuplot.html    del $(DOCDIR)\gnuplot.html
 	if exist $(DOCDIR)\gnuplot.inf     del $(DOCDIR)\gnuplot.inf
 	if exist $(DOCDIR)\gnuplot.info    del $(DOCDIR)\gnuplot.info
@@ -449,4 +505,3 @@ veryclean: clean
 	if exist $(DOCDIR)\*.aux           del $(DOCDIR)\*.aux
 	if exist $(DOCDIR)\*.toc           del $(DOCDIR)\*.toc
 	if exist $(DEMODIR)\binary?        del $(DEMODIR)\binary?
-
