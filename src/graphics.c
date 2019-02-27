@@ -1707,7 +1707,7 @@ plot_bars(struct curve_points *plot)
 		/* incremented if 'plot new histogram' is encountered.        */
 		int clustersize = plot->histogram->clustersize + histogram_opts.gap;
 		x  += (i-1) * (clustersize - 1) + plot->histogram_sequence;
-		x  += histogram_opts.gap / 2.;
+		x  += (histogram_opts.gap - 1) / 2.;
 		x  /= clustersize;
 		x  += plot->histogram->start + 0.5;
 		/* Calculate width also */
