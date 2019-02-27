@@ -3644,9 +3644,9 @@ ReadGraphIni(LPGW lpgw)
 		lpgw->Origin.y = CW_USEDEFAULT;
 	if (bOKINI)
 		GetPrivateProfileString(section, TEXT("GraphSize"), TEXT(""), profile, 80, file);
-	if ((p = GetInt(profile, (LPINT)&lpgw->Size.x)) == NULL)
+	if ((p = GetInt(profile, (LPINT)&lpgw->Size.x)) == NULL || lpgw->Size.x < 1)
 		lpgw->Size.x = CW_USEDEFAULT;
-	if ((p = GetInt(p, (LPINT)&lpgw->Size.y)) == NULL)
+	if ((p = GetInt(p, (LPINT)&lpgw->Size.y)) == NULL || lpgw->Size.y < 1)
 		lpgw->Size.y = CW_USEDEFAULT;
 	/* Saved size and origin are normalised to 96dpi. */
 	dpi = GetDPI();

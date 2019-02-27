@@ -200,18 +200,25 @@ TERM_PUBLIC void wxt_options()
 			term->flags &= ~TERM_ENHANCED_TEXT;
 			break;
 		case WXT_SIZE:
+		    {
+			double insize; /* shige 2019-02-27 for size 0 */
 			c_token++;
 			if (END_OF_COMMAND)
 				int_error(c_token,"size requires 'width,height'");
-			wxt_width = real_expression();
+			if ((insize = real_expression()) >= 1)
+				wxt_width = insize;
+			else
+				int_error(c_token, "size is out of range");
 			if (!equals(c_token++,","))
 				int_error(c_token,"size requires 'width,height'");
-			wxt_height = real_expression();
-			if (wxt_width < 1 || wxt_height < 1)
+			if ((insize = real_expression()) >= 1)
+				wxt_height = insize;
+			else
 				int_error(c_token, "size is out of range");
 			if (set_size) duplication=TRUE;
 			set_size = TRUE;
 			break;
+		    }
 		case WXT_POSITION:
 			c_token++;
 			if (END_OF_COMMAND)
