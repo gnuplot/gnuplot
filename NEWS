@@ -10,7 +10,6 @@ Changes not in 5.2
 * NEW "splot ... with boxes"
 * NEW "plot ... with arrows"
 * NEW "set view projection {xz|yz}"
-* NEW "set pm3d noclipcb" will skip drawing quadrangles whose color is < cbmin
 * NEW per-plot fillcolor and fillstyle for pm3d surfaces
 * NEW allow separate color column with dgrid3d surfaces (but not color splines)
 * NEW string function trim(" padded string ") removes leading and trailing whitespace
@@ -54,6 +53,7 @@ New features introduced to 5.2 in patchlevel releases
 * NEW Rework gstrptime() to handle relative time formats tH tM tS
 * NEW command "set rgbmax <value>" controls interpretation of input RGB values
 * NEW allow array size to be determined automatically from initializer
+* NEW "set pm3d noclipcb" will skip drawing quadrangles whose color is < cbmin
 
 New features, changes and fixes in gnuplot version 5.2 (initial release)
 ========================================================================
