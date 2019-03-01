@@ -323,7 +323,7 @@ int
 X11_args(int argc, char *argv[])
 {
     int nx11 = 0, i, n;
-    char **xargv, **xargv_orig; 
+    char **xargv, **xargv_orig;
 
     xargv = xargv_orig = (char **) gp_alloc(argc * sizeof(char *), "<xargv>");
 
@@ -798,10 +798,10 @@ X11_update_opts()
     if (!strcmp("xlib",term->name))
 	return;
 
-    if (UNSET != do_raise || UNSET != x11_persist || 
+    if (UNSET != do_raise || UNSET != x11_persist ||
         UNSET != ctrlq || UNSET != replot_on_resize)
     {
-	fprintf(X11_ipc, "X %d %d %d %d %d\n", 
+	fprintf(X11_ipc, "X %d %d %d %d %d\n",
 		do_raise, x11_persist, dashedlines, ctrlq, replot_on_resize);
 	fflush(X11_ipc);
     }
@@ -1368,7 +1368,7 @@ X11_reset()
 
 
 /* Cached sizing values for the x11 terminal.
- * Updated/Maintained in mouse.c 
+ * Updated/Maintained in mouse.c
  */
 int          X11_hchar_saved, X11_vchar_saved;
 double       X11_ymax_saved = -1.0;
@@ -1415,14 +1415,14 @@ X11_graphics()
 	last_encoding = encoding;
     }
 
-#if defined(USE_MOUSE) && defined(PIPE_IPC)
+#if defined(USE_MOUSE)
     /* EAM Jan 2013 - multiplot is incompatible with replot_on_resize.	*/
     /* FIXME: This disables replot_on_resize until the next 'set term'.	*/
     /* A cleaner solution would be to have gnuplot_x11 itself track 	*/
     /* whether the current window contains a multiplot, and not	send	*/
     /* replot requests if it does.					*/
     if (multiplot) {
-	fprintf(X11_ipc, "X %d %d %d %d %d\n", 
+	fprintf(X11_ipc, "X %d %d %d %d %d\n",
 		do_raise, x11_persist, dashedlines, ctrlq, no);
 	fflush(X11_ipc);
     }
@@ -1437,29 +1437,37 @@ X11_graphics()
        change (in the ..._saved variables). Thus I no longer need
        to ask for this information NOW, and can just use it.
      */
-	if (!default_font_size_known) {
-		IPC_LOCK = TRUE;
-		PRINT1("QG%s\n",X11_default_font);
-		FFLUSH();
-		if (ipc_back_fd >= 0 && X11_MOUSE_FEEDBACK)
-			X11_waitforinput(0);
+    if (!default_font_size_known) {
+#ifdef PIPE_IPC
+	IPC_LOCK = TRUE;
+	PRINT1("QG%s\n", X11_default_font);
+	FFLUSH();
+	if (ipc_back_fd >= 0 && X11_MOUSE_FEEDBACK)
+	    X11_waitforinput(0);
 
-		default_font_size_known = TRUE;
-		IPC_LOCK = FALSE;
-	} else {
-		/* replot. I send a Qg to tell the outboard driver to use the new
-		   window sizes. I also use the stored window sizes to update myself
-		   (inboard driver) */
-		PRINT0("Qg\n");
-		FFLUSH();
+	default_font_size_known = TRUE;
+	IPC_LOCK = FALSE;
+#else
+	/* We still get the information for OS2_IPC... */
+	PRINT1("QG%s\n", X11_default_font);
+	FFLUSH();
+	default_font_size_known = TRUE;
+#endif
+    } else {
+	/* replot. I send a Qg to tell the outboard driver to use the new
+	   window sizes. I also use the stored window sizes to update myself
+	   (inboard driver) */
+	PRINT0("Qg\n");
+	FFLUSH();
 
-		if (X11_ymax_saved > 0.0) { /* use saved sizes if they're valid */
-			term->h_char = X11_hchar_saved;
-			term->v_char = X11_vchar_saved;
-			term->h_tic = term->v_tic = X11_vchar_saved / 2.5;
-			term->ymax = X11_ymax_saved;
-		}
+	if (X11_ymax_saved > 0.0) {
+	    /* use saved sizes if they're valid */
+	    term->h_char = X11_hchar_saved;
+	    term->v_char = X11_vchar_saved;
+	    term->h_tic = term->v_tic = X11_vchar_saved / 2.5;
+	    term->ymax = X11_ymax_saved;
 	}
+    }
 #endif
 
     /* Force default font at start of plot */
@@ -2324,7 +2332,7 @@ TERM_TABLE_START(x11_driver)
     X11_text, null_scale, X11_graphics, X11_move, X11_vector,
     X11_linetype, ENHX11_put_text, X11_text_angle,
     X11_justify_text, X11_point, do_arrow, X11_set_font,
-    X11_pointsize, 
+    X11_pointsize,
     TERM_CAN_MULTIPLOT|TERM_INIT_ON_REPLOT|TERM_NO_OUTPUTFILE|TERM_CAN_DASH|TERM_ALPHA_CHANNEL|TERM_LINEWIDTH|TERM_ENHANCED_TEXT,
     X11_text /* suspend can use same routine */ , 0 /* resume */ ,
     X11_fillbox, X11_linewidth
@@ -2513,14 +2521,14 @@ START_HELP(x11)
 "       set title '(mb strings)' font 'mbfont:*-fixed-medium-r-normal--14-*'",
 "",
 " The same syntax applies to the default font in Xresources settings,",
-" for example,", 
+" for example,",
 "       gnuplot*font: \\",
 "           mbfont:-misc-fixed-medium-r-normal--14-*-*-*-c-*-jisx0208.1983-0",
 "",
 " If gnuplot is built with --enable-x11-mbfonts, you can use two special",
 " PostScript font names 'Ryumin-Light-*' and 'GothicBBB-Medium-*' (standard",
 " Japanese PS fonts) without the prefix \"mbfont:\".",
-"", 
+"",
 "2 command-line_options",
 "?commands set terminal x11 command-line-options",
 "?set terminal x11 command-line-options",
