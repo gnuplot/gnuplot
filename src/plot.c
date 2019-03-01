@@ -345,10 +345,6 @@ main(int argc_orig, char **argv)
     }
 #endif /* DJGPP */
 
-#ifdef VMS
-    unsigned int status[2] = { 1, 0 };
-#endif
-
 #if (defined(PIPE_IPC) || defined(_WIN32)) && (defined(HAVE_LIBREADLINE) || (defined(HAVE_LIBEDITLINE) && defined(X11)))
     /* Editline needs this to be set before the very first call to readline(). */
     /* Support for rl_getc_function is broken for utf-8 in editline. Since it is only
@@ -497,10 +493,13 @@ main(int argc_orig, char **argv)
 
 #ifdef VMS
     /* initialise screen management routines for command recall */
-    if (status[1] = smg$create_virtual_keyboard(&vms_vkid) != SS$_NORMAL)
-	done(status[1]);
-    if (status[1] = smg$create_key_table(&vms_ktid) != SS$_NORMAL)
-	done(status[1]);
+    {
+    unsigned int ierror;
+    if (ierror = smg$create_virtual_keyboard(&vms_vkid) != SS$_NORMAL)
+	done(ierror);
+    if (ierror = smg$create_key_table(&vms_ktid) != SS$_NORMAL)
+	done(ierror);
+    }
 #endif /* VMS */
 
     if (!SETJMP(command_line_env, 1)) {
@@ -850,15 +849,12 @@ get_user_env()
 	    || (env_home = appdata_directory())
 	    || (env_home = getenv("USERPROFILE"))
 #endif
-#ifndef VMS
 	    || (env_home = getenv("HOME"))
-#endif
 	   )
 	    user_homedir = (const char *) gp_strdup(env_home);
 	else if (interactive)
 	    int_warn(NO_CARET, "no HOME found");
     }
-    /* Hhm ... what about VMS? */
     if (user_shell == NULL) {
 	const char *env_shell;
 

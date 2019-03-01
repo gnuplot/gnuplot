@@ -41,16 +41,6 @@ int curly_brace_count;
 static int get_num(char str[]);
 static void substitute(char **strp, size_t *str_lenp, int current);
 
-#ifdef VMS
-#include <descrip.h>
-#define MAILBOX "PLOT$MAILBOX"
-#ifdef __DECC
-#include <lib$routines.h>	/* avoid some IMPLICITFNC warnings */
-#include <starlet.h>
-#endif /* __DECC */
-#endif /* VMS */
-
-
 #define isident(c) (isalnum((unsigned char)(c)) || (c) == '_' || ALLOWED_8BITVAR(c))
 
 #define LBRACE '{'

@@ -1348,8 +1348,6 @@ existdir(const char *name)
 
     closedir(dp);
     return TRUE;
-#elif defined(VMS)
-    return FALSE;
 #else
     int_warn(NO_CARET,
 	     "Test on directory existence not supported\n\t('%s!')",

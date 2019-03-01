@@ -123,10 +123,9 @@ static void Dblfn();
 # include <io.h>
 # include <conio.h>
 # include <dos.h>
-#elif !defined(VMS)
-#  include <fcntl.h>
 #endif
 #ifdef _WIN32
+# include <fcntl.h>
 # include "win/winmain.h"
 #endif
 
