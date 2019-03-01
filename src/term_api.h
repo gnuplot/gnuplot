@@ -503,10 +503,6 @@ void do_arc( int cx, int cy, double radius,
 void LINUX_setup(void);
 #endif
 
-#ifdef VMS
-void vms_reset();
-#endif
-
 #ifdef OS2
 int PM_pause(char *);
 void PM_intc_cleanup(void);

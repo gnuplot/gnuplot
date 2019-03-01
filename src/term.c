@@ -256,8 +256,10 @@ void term_pasthru();
 void term_nopasthru();
 void fflush_binary();
 # define FOPEN_BINARY(file) fopen(file, "wb", "rfm=fix", "bls=512", "mrs=512")
+
 #else /* !VMS */
 # define FOPEN_BINARY(file) fopen(file, "wb")
+# define fflush_binary()
 #endif /* !VMS */
 
 #if defined(MSDOS) || defined(_WIN32)

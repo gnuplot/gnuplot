@@ -239,9 +239,7 @@ HP500C_init()
 TERM_PUBLIC void
 HP500C_reset()
 {
-#ifdef VMS
-    fflush_binary();
-#endif
+    fflush_binary();	/* Only needed for VMS */
 }
 
 
@@ -492,10 +490,7 @@ HP500C_text()
     free(obuf);
     b_freebitmap();
 
-#ifndef VMS
-    /* most vms spoolers add a formfeed character */
     putc('\f', gpoutfile);
-#endif /* !VMS */
 }
 
 #endif /* TERM_BODY */

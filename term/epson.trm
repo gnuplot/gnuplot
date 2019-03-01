@@ -182,9 +182,7 @@ TERM_PUBLIC void DPU414_setfont(void);
 TERM_PUBLIC void
 EPSON_reset()
 {
-#ifdef VMS
     fflush_binary();
-#endif
 }
 
 
@@ -425,9 +423,7 @@ nec_dump()
 #ifdef PC
     fputs("Print using: COPY /B\n", stderr);
 #endif
-#ifdef VMS
-    fflush_binary();
-#endif
+    fflush_binary();	/* Only needed for VMS */
 }
 
 /* output file must be binary mode for nec_dump */

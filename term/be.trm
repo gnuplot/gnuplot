@@ -268,7 +268,7 @@ TERM_PUBLIC void
 BE_graphics()
 {
     BEFORE_GRAPHICS;		/* kludge for crippled select */
-    PRINT1("G%d\n", BE_plot_number);	/* for VMS sake, keep as separate prints */
+    PRINT1("G%d\n", BE_plot_number);
 }
 
 TERM_PUBLIC void

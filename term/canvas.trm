@@ -396,9 +396,8 @@ CANVAS_init()
 TERM_PUBLIC void
 CANVAS_graphics()
 {
-#if !defined(VMS)
     int len;
-#endif
+
     /* Force initialization at the beginning of each plot */
     canvas_line_type = LT_UNDEFINED;
     canvas_text_angle = 0;
@@ -427,7 +426,6 @@ CANVAS_graphics()
 #endif /* GNUPLOT_JS_DIR */
     }
 
-#if !defined(VMS)
     len = strlen(CANVAS_scriptdir);
 # if defined(_WIN32)
     if (*CANVAS_scriptdir && CANVAS_scriptdir[len-1] != '\\' && CANVAS_scriptdir[len-1] != '/') {
@@ -443,7 +441,6 @@ CANVAS_graphics()
 	strcat(CANVAS_scriptdir,"/");
     }
 # endif
-#endif
 
     if (CANVAS_standalone) {
 	fprintf(gpoutfile,

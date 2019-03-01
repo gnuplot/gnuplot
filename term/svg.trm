@@ -904,7 +904,6 @@ SVG_write_preamble ()
 #endif /* GNUPLOT_JS_DIR */
     }
 
-#if !defined(VMS)
     len = strlen(SVG_scriptdir);
 # if defined(_WIN32) || defined(MSDOS)
     if (*SVG_scriptdir && SVG_scriptdir[len-1] != '\\' && SVG_scriptdir[len-1] != '/') {
@@ -920,7 +919,6 @@ SVG_write_preamble ()
 	strcat(SVG_scriptdir,"/");
     }
 # endif
-#endif
 
     if (SVG_mouseable) {
 	/* Inclusion of gnuplot_svg.js is sufficient to support toggling plots on/off */

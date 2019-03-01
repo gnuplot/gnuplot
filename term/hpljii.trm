@@ -229,10 +229,7 @@ HPLJII_text()
 
     b_freebitmap();
 
-#ifndef VMS
-    /* most vms spoolers add a formfeed character */
     putc('\f', gpoutfile);
-#endif /* !VMS */
 }
 
 
@@ -292,9 +289,7 @@ HPLJII_putc(unsigned int x, unsigned int y, int c, int ang)
 TERM_PUBLIC void
 HPLJII_reset()
 {
-#ifdef VMS
-    fflush_binary();
-#endif /* VMS */
+    fflush_binary();	/* Only needed for VMS */
 }
 
 
@@ -356,9 +351,7 @@ HPDJ_text()
 
     b_freebitmap();
 
-#ifndef VMS			/* most vms spoolers add a formfeed character */
     putc('\f', gpoutfile);
-#endif /* !VMS */
 }
 
 #endif

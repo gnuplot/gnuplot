@@ -1105,10 +1105,6 @@ os_error(int t_num, const char *str, va_dcl)
 #ifdef VA_START
     va_list args;
 #endif
-#ifdef VMS
-    static status[2] = { 1, 0 };		/* 1 is count of error msgs */
-#endif /* VMS */
-
     /* reprint line if screen has been written to */
     print_line_with_error(t_num);
 
@@ -1127,12 +1123,7 @@ os_error(int t_num, const char *str, va_dcl)
 #endif
     putc('\n', stderr);
 
-#ifdef VMS
-    status[1] = vaxc$errno;
-    sys$putmsg(status);
-#else /* VMS */
     perror("system error");
-#endif /* VMS */
 
     putc('\n', stderr);
     fill_gpval_string("GPVAL_ERRMSG", strerror(errno));

@@ -154,9 +154,7 @@ HPPJ_init()
 TERM_PUBLIC void
 HPPJ_reset()
 {
-#ifdef VMS
-    fflush_binary();
-#endif /* VMS */
+    fflush_binary();	/* Only needed for VMS */
 }
 
 

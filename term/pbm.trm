@@ -234,9 +234,7 @@ PBM_init()
 TERM_PUBLIC void
 PBM_reset()
 {
-#ifdef VMS
-    fflush_binary();
-#endif /* VMS */
+    fflush_binary();	/* Only needed for VMS */
 }
 
 
