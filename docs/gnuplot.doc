@@ -1199,7 +1199,7 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>log(x)</td>    <td>any</td>    <td>ln <i>x</i>, natural logarithm (base <i>e</i>) of <i>x</i></td></tr>
 ^<tr>    <td>log10(x)</td>    <td>any</td>    <td>log<sub>10</sub> <i>x</i>, logarithm (base 10) of <i>x</i></td></tr>
 ^<tr>    <td>norm(x)</td>    <td>any</td>    <td>norm(<i>x</i>), normal distribution function of real(<i>x</i>)</td></tr>
-^<tr>    <td>rand(x)</td>    <td>int</td>    <td>pseudo random number in the interval [0:1]</td></tr>
+^<tr>    <td>rand(x)</td>    <td>int</td>    <td>pseudo random number in the interval (0:1)</td></tr>
 ^<tr>    <td>real(x)</td>    <td>any</td>    <td>Re(<i>x</i>), real part of <i>x</i></td></tr>
 ^<tr>    <td>sgn(x)</td>    <td>any</td>    <td>1 if <i>x</i> &gt; 0,  -1 if <i>x</i> &lt; 0,  0 if <i>x</i> = 0. &image;(<i>x</i>) ignored</td></tr>
 ^<tr>    <td>sin(x)</td>    <td>any</td>    <td>sin <i>x</i>, sine of <i>x</i></td></tr>
@@ -1632,9 +1632,9 @@ C marker below is used to signal this to doc2html:
 4 rand
 ?expressions functions rand
 ?rand
-#rand(x) & int & pseudo random number in the interval [0:1] \\
-%rand(x)@int@pseudo random number in the interval [0:1]
- The `rand(x)` function returns a pseudo random number in the interval [0:1].
+#rand(x) & int & pseudo random number in the open interval (0:1) \\
+%rand(x)@int@pseudo random number in the open interval (0:1)
+ The `rand(x)` function returns a pseudo random number in the interval (0:1).
  See `random` for more details.
 4 real
 ?expressions functions real
@@ -2041,7 +2041,7 @@ C marker below is used to signal this to doc2html:
  random number package with splitting facilities", ACM Transactions on
  Mathematical Software, 17:98-111 (1991).
 
-       rand(0)     returns a pseudo random number in the interval [0:1]
+       rand(0)     returns a pseudo random number in the open interval (0:1)
                    generated from the current value of two internal
                    32-bit seeds.
        rand(-1)    resets both seeds to a standard value.
