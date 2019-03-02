@@ -683,6 +683,12 @@ StartOutput()
 	_getvideoconfig(&vc);
 	screensize = vc.numtextrows;
     }
+#elif defined(OS2)
+    if (line_count == NULL) {
+	int dst[2];
+	_scrsize(dst);
+	screensize = dst[1];
+    }
 #endif
     if (screensize < 3)
 	screensize = SCREENSIZE;
