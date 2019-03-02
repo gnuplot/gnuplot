@@ -1806,8 +1806,8 @@ pause_command()
 	    if (!Pause(buf)) /* returns false if Ctrl-C or Cancel was pressed */
 		bail_to_command_line();
 	}
-#elif defined(OS2)
-	if (strcmp(term->name, "pm") == 0 && sleep_time < 0) {
+#elif defined(OS2) && defined(USE_MOUSE)
+	if (strcmp(term->name, "pm") == 0) {
 	    int rc;
 	    if ((rc = PM_pause(buf)) == 0) {
 		/* if (!CallFromRexx)
@@ -1820,35 +1820,37 @@ pause_command()
 		text = 1;
 		EAT_INPUT_WITH(fgetc(stdin));
 	    }
+	} else {
+	    EAT_INPUT_WITH(fgetc(stdin));
 	}
 #else /* !(_WIN32 || OS2) */
-#ifdef USE_MOUSE
+# ifdef USE_MOUSE
 	if (term && term->waitforinput) {
 	    /* It does _not_ work to do EAT_INPUT_WITH(term->waitforinput()) */
 	    term->waitforinput(0);
 	} else
-#endif /* USE_MOUSE */
-#ifdef MSDOS
+# endif /* USE_MOUSE */
+# ifdef MSDOS
 	{
 	    int junk;
 	    /* cannot use EAT_INPUT_WITH here */
 	    do {
-#ifdef __DJGPP__
+#  ifdef __DJGPP__
 		/* We use getkey() since with DJGPP 2.05 and gcc 7.2,
 		   getchar() requires two keystrokes. */
 		junk = getkey();
-#else
+#  else
 		junk = getch();
-#endif
+#  endif
 		/* Check if Ctrl-C was pressed */
 		if (junk == 0x03)
 		    bail_to_command_line();
 	    } while (junk != EOF && junk != '\n' && junk != '\r');
 	    fputc('\n', stderr);
 	}
-#else
+# else
 	    EAT_INPUT_WITH(fgetc(stdin));
-#endif
+# endif
 
 #endif /* !(_WIN32 || OS2) */
     }
