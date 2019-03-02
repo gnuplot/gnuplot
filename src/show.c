@@ -1108,9 +1108,9 @@ show_version(FILE *fp)
 	    char *helpfile = NULL;
 	    if ((helpfile = getenv("GNUHELP")) == NULL)
 # if defined(MSDOS) || defined(OS2)
-		helpfile = HELPFILE;
-# else
 		helpfile = HelpFile;
+# else
+		helpfile = HELPFILE;
 # endif
 	fprintf(stderr, "HELPFILE           = \"%s\"\n", helpfile);
 #else /* _WIN32 */
@@ -1989,7 +1989,7 @@ show_log(struct axis *axis)
 	if (axis->base != 10.)
 	    fprintf(stderr, " (base %g)", axis->base);
 	return 1;
-    } 
+    }
     return 0;
 }
 
@@ -3071,7 +3071,6 @@ show_fontpath()
 	PS_fontpath ? PS_fontpath : "none");
     fprintf(stderr, "\tenvironmental variable GNUPLOT_FONTPATH: %s\n",
 	env_fontpath ? env_fontpath : "none");
-	
 }
 
 /* process 'show zero' command */
