@@ -91,7 +91,7 @@ void cancel_history(void);
 #define cancel_history()  {}
 #endif
 
-#ifdef MSDOS
+#if defined(MSDOS) || defined(OS2)
 /* retrieve path relative to gnuplot executable */
 char * RelativePathToGnuplot(const char * path);
 #endif

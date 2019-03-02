@@ -85,9 +85,9 @@ extern struct udft_entry *dummy_func;
 # define STDOUT 1
 #endif
 
-#ifdef MSDOS
-extern char HelpFile[];         /* patch for do_help  - AP */
-#endif /* MSDOS */
+#if defined(MSDOS) || defined(OS2)
+extern char HelpFile[];
+#endif
 
 #ifdef _WIN32
 # define SET_CURSOR_WAIT SetCursor(LoadCursor((HINSTANCE) NULL, IDC_WAIT))

@@ -1107,7 +1107,7 @@ show_version(FILE *fp)
 #ifndef _WIN32
 	    char *helpfile = NULL;
 	    if ((helpfile = getenv("GNUHELP")) == NULL)
-# ifndef MSDOS
+# if defined(MSDOS) || defined(OS2)
 		helpfile = HELPFILE;
 # else
 		helpfile = HelpFile;

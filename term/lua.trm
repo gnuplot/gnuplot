@@ -320,7 +320,7 @@ LUA_GP_term_out(lua_State *L) {
       do
         c = tos_getch();
       while (c != '\x04' && c != '\r' && c != '\n');
-#elif defined(_WIN32) || defined(MSDOS)
+#elif defined(_WIN32) || defined(MSDOS) || defined(OS2)
       do
         c = getchar();
       while (c != EOF && c != '\n' && c != '\r');
@@ -622,7 +622,7 @@ LUA_init_lua(void)
   struct stat stat_buf;
   char *script_fqn;
   char *gp_lua_dir;
-#if defined(_WIN32) || defined(MSDOS)
+#if defined(_WIN32) || defined(MSDOS) || defined(OS2)
   char *free_lua_dir = NULL;
 #endif
 
@@ -642,7 +642,7 @@ LUA_init_lua(void)
 
   gp_lua_dir = getenv("GNUPLOT_LUA_DIR");
 
-# if defined(_WIN32) || defined(MSDOS)
+# if defined(_WIN32) || defined(MSDOS) || defined(OS2)
   if (!gp_lua_dir)
     gp_lua_dir = free_lua_dir = RelativePathToGnuplot(GNUPLOT_LUA_DIR);
 #else /* not _WIN32 */
@@ -656,7 +656,7 @@ LUA_init_lua(void)
   } else {
     script_fqn = gp_strdup(LUA_script);
   }
-#if defined(_WIN32) || defined(MSDOS)
+#if defined(_WIN32) || defined(MSDOS) || defined(OS2)
   free(free_lua_dir);
 #endif
 

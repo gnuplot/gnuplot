@@ -2929,32 +2929,11 @@ help_command()
     if ((help_ptr = getenv("GNUHELP")) == (char *) NULL)
 # ifndef SHELFIND
 	/* if can't find environment variable then just use HELPFILE */
-
-/* patch by David J. Liu for getting GNUHELP from home directory */
-#  ifdef MSDOS
+#  if defined(MSDOS) || defined(OS2)
 	help_ptr = HelpFile;
 #  else
 	help_ptr = HELPFILE;
 #  endif
-#ifdef OS2
-  {
-  /* look in the path where the executable lives */
-  static char buf[MAXPATHLEN];
-  char *ptr;
-
-  _execname(buf, sizeof(buf));
-  _fnslashify(buf);
-  ptr=strrchr(buf, '/');
-  if (ptr) {
-     *(ptr+1)='\0';
-     strcat(buf, HELPFILE);
-     help_ptr=&buf[0];
-  }
-  else
-     help_ptr = HELPFILE;
-  }
-#endif
-/* end of patch  - DJL */
 
 # else				/* !SHELFIND */
     /* try whether we can find the helpfile via shell_find. If not, just

@@ -893,7 +893,7 @@ SVG_write_preamble ()
  */
     if (SVG_scriptdir == NULL) {
 #ifdef GNUPLOT_JS_DIR
-# if defined(_WIN32) || defined(MSDOS)
+# if defined(_WIN32) || defined(MSDOS) || defined(OS2)
 	SVG_scriptdir = RelativePathToGnuplot(GNUPLOT_JS_DIR);
 # else
 	/* use hardcoded _absolute_ path */
@@ -905,7 +905,7 @@ SVG_write_preamble ()
     }
 
     len = strlen(SVG_scriptdir);
-# if defined(_WIN32) || defined(MSDOS)
+# if defined(_WIN32) || defined(MSDOS) || defined(OS2)
     if (*SVG_scriptdir && SVG_scriptdir[len-1] != '\\' && SVG_scriptdir[len-1] != '/') {
 	SVG_scriptdir = gp_realloc(SVG_scriptdir, len+2, "jsdir");
 	if (SVG_scriptdir[len-1] == '\\') /* use backslash if used in jsdir, otherwise slash */

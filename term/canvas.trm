@@ -415,9 +415,9 @@ CANVAS_graphics()
      */
     if (CANVAS_scriptdir == NULL) {
 #ifdef GNUPLOT_JS_DIR
-# if defined(_WIN32) || defined(MSDOS)
+# if defined(_WIN32) || defined(MSDOS) || defined(OS2)
 	CANVAS_scriptdir = RelativePathToGnuplot(GNUPLOT_JS_DIR);
-# else /* !_WIN32 */
+# else
 	/* use hardcoded _absolute_ path */
 	CANVAS_scriptdir = strdup(GNUPLOT_JS_DIR);
 # endif
@@ -427,13 +427,13 @@ CANVAS_graphics()
     }
 
     len = strlen(CANVAS_scriptdir);
-# if defined(_WIN32)
+# if defined(_WIN32) || defined(MSDOS) || defined(OS2)
     if (*CANVAS_scriptdir && CANVAS_scriptdir[len-1] != '\\' && CANVAS_scriptdir[len-1] != '/') {
 	CANVAS_scriptdir = gp_realloc(CANVAS_scriptdir, len+2, "jsdir");
 	if (CANVAS_scriptdir[len-1] == '\\') /* use backslash if used in jsdir, otherwise slash */
-	    strcat(CANVAS_scriptdir,"\\");
+	    strcat(CANVAS_scriptdir, "\\");
 	else
-	    strcat(CANVAS_scriptdir,"/");
+	    strcat(CANVAS_scriptdir, "/");
     }
 # else
     if (*CANVAS_scriptdir && CANVAS_scriptdir[len-1] != '/') {

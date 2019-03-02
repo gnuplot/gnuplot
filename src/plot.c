@@ -139,7 +139,7 @@ extern int X11_args(int, char **); /* FIXME: defined in term/x11.trm */
 #endif
 
 /* patch to get home dir, see command.c */
-#ifdef MSDOS
+#if defined(MSDOS) || defined(OS2)
 char HelpFile[PATH_MAX];
 static char progpath[PATH_MAX] = "";
 #endif
@@ -316,13 +316,18 @@ main(int argc_orig, char **argv)
     malloc_debug(7);
 #endif
 
+
 /* init progpath and get helpfile from executable directory */
-#ifdef MSDOS
+#if defined(MSDOS) || defined(OS2)
     {
 	char *s;
 
+#ifdef __EMX__
+	_execname(progpath, sizeof(progpath));
+#else
 	safe_strncpy(progpath, argv[0], sizeof(progpath));
-	/* convert '\\' to '/' */
+#endif
+	/* convert '/' to '\\' */
 	for (s = progpath; *s != NUL; s++)
 	    if (*s == DIRSEP2)
 		*s = DIRSEP1;
@@ -801,7 +806,7 @@ load_rcfile(int where)
 
     if (where == 0) {
 #ifdef GNUPLOT_SHARE_DIR
-# if defined(_WIN32) || defined(MSDOS)
+# if defined(_WIN32) || defined(MSDOS) || defined(OS2)
 	rcfile = RelativePathToGnuplot(GNUPLOT_SHARE_DIR "\\gnuplotrc");
 # else
 	rcfile = (char *) gp_alloc(strlen(GNUPLOT_SHARE_DIR) + 1 + strlen("gnuplotrc") + 1, "rcfile");
@@ -1068,7 +1073,7 @@ restrict_popen()
 }
 
 
-#ifdef MSDOS
+#if defined(MSDOS) || defined(OS2)
 /* retrieve path relative to gnuplot executable */
 char *
 RelativePathToGnuplot(const char * path)

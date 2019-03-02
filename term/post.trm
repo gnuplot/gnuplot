@@ -415,11 +415,7 @@ NULL
 #if defined(GNUPLOT_PS_DIR)
 # if defined(_WIN32)
 #  include "win/winmain.h"
-# elif defined(OS2)
-#  define INCL_DOSPROCESS
-#  define INCL_DOSMODULEMGR
-#  include <os2.h>
-# endif /* _WIN32 || OS2 */
+# endif
 #else /* GNUPLOT_PS_DIR */
 # include "PostScript/prologues.h"
 #endif /* GNUPLOT_PS_DIR */
@@ -4129,37 +4125,13 @@ PS_open_prologue_file(char *name)
     /* Allocate and load default directory into ps_prologue_dir.  */
     /* FIXME:  Why should we have to recalculate this every time? */
 #ifdef GNUPLOT_PS_DIR
-#   if defined(_WIN32) || defined(MSDOS)
-	ps_prologue_dir = RelativePathToGnuplot(GNUPLOT_PS_DIR);
-#   elif defined(OS2)
-	const ULONG bufsiz = 1024;
-	CHAR exepath[bufsiz];
-	PPIB ppib;
-	ULONG rc;
-
-	rc = DosGetInfoBlocks(NULL, &ppib);
-	if (!rc)
-		rc = DosQueryModuleName(ppib->pib_hmte, bufsiz, (PCHAR) &exepath);
-	if (!rc) {
-	    char *p = strrchr(exepath, '\\');
-	    *(++p) = '\0';
-	    ps_prologue_dir = gp_alloc(strlen(exepath) + strlen(GNUPLOT_PS_DIR) + 2,
-			"Prolog path");
-	    strcpy(ps_prologue_dir, exepath);
-	    strcat(ps_prologue_dir, "\\");
-	    /* GNUPLOT_PS_DIR is _relative_ path */
-	    strcat(ps_prologue_dir, GNUPLOT_PS_DIR);
-	}
-	else {
-	    ps_prologue_dir = gp_alloc(1, "Prolog path");
-	    /* unsucessful to retrieve executable path */
-	    strcpy(ps_prologue_dir,"");
-	}
-#   else /* !_WIN32 && !OS2 */
-	/* use hardcoded _absolute_ path */
-	ps_prologue_dir = gp_strdup(GNUPLOT_PS_DIR);
-#   endif
-# endif /* system-dependent ps_prologue_dir */
+# if defined(_WIN32) || defined(MSDOS) || defined(OS2)
+    ps_prologue_dir = RelativePathToGnuplot(GNUPLOT_PS_DIR);
+# else
+    /* use hardcoded _absolute_ path */
+    ps_prologue_dir = gp_strdup(GNUPLOT_PS_DIR);
+# endif
+#endif /* system-dependent ps_prologue_dir */
 
     prologue_fd = NULL;
     /* First try current setting of "set psdir" */
