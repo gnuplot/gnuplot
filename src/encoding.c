@@ -172,7 +172,7 @@ static const char *
 encoding_micro()
 {
     static const char micro_utf8[4] = {0xC2, 0xB5, 0x0, 0x0};
-    static const char micro_437[2] = {0x96, 0x0};
+    static const char micro_437[2] = {0xE6, 0x0};
     static const char micro_latin1[2] = {0xB5, 0x0};
     static const char micro_default[2] = {'u', 0x0};
     switch (encoding) {
