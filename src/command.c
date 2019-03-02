@@ -1791,8 +1791,8 @@ pause_command()
 	    if (!Pause(buf)) /* returns false if Ctrl-C or Cancel was pressed */
 		bail_to_command_line();
 	}
-#elif defined(OS2)
-	if (strcmp(term->name, "pm") == 0 && sleep_time < 0) {
+#elif defined(OS2) && defined(USE_MOUSE)
+	if (strcmp(term->name, "pm") == 0) {
 	    int rc;
 	    if ((rc = PM_pause(buf)) == 0) {
 		/* if (!CallFromRexx)
@@ -1805,14 +1805,16 @@ pause_command()
 		text = 1;
 		EAT_INPUT_WITH(fgetc(stdin));
 	    }
+	} else {
+	    EAT_INPUT_WITH(fgetc(stdin));
 	}
 #else /* !(_WIN32 || OS2) */
-#ifdef USE_MOUSE
+# ifdef USE_MOUSE
 	if (term && term->waitforinput) {
 	    /* It does _not_ work to do EAT_INPUT_WITH(term->waitforinput()) */
 	    term->waitforinput(0);
 	} else
-#endif /* USE_MOUSE */
+# endif /* USE_MOUSE */
 	    EAT_INPUT_WITH(fgetc(stdin));
 
 #endif /* !(_WIN32 || OS2) */
@@ -1823,7 +1825,6 @@ pause_command()
     if (text != 0 && sleep_time >= 0)
 	fputc('\n', stderr);
     screen_ok = FALSE;
-
 }
 
 
