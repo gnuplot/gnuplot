@@ -248,16 +248,8 @@ static size_units parse_term_size(float *xsize, float *ysize, size_units def_uni
 
 
 #ifdef VMS
-char *vms_init();
-void vms_reset();
-void term_mode_tek();
-void term_mode_native();
-void term_pasthru();
-void term_nopasthru();
-void fflush_binary();
-# define FOPEN_BINARY(file) fopen(file, "wb", "rfm=fix", "bls=512", "mrs=512")
-
-#else /* !VMS */
+# include "vms.h"
+#else
 # define FOPEN_BINARY(file) fopen(file, "wb")
 # define fflush_binary()
 #endif /* !VMS */
@@ -556,12 +548,12 @@ term_end_plot()
     } else {
 	multiplot_next();
     }
+
 #ifdef VMS
     if (opened_binary)
 	fflush_binary();
     else
 #endif /* VMS */
-
 	(void) fflush(gpoutfile);
 
 #ifdef USE_MOUSE
@@ -1990,183 +1982,6 @@ test_term()
 
     term_end_plot();
 }
-
-
-#ifdef VMS
-/* these are needed to modify terminal characteristics */
-# ifndef VWS_XMAX
-   /* avoid duplicate warning; VWS includes these */
-#  include <descrip.h>
-#  include <ssdef.h>
-# endif                         /* !VWS_MAX */
-# include <iodef.h>
-# include <ttdef.h>
-# include <tt2def.h>
-# include <dcdef.h>
-# include <stat.h>
-# include <fab.h>
-/* If you use WATCOM C or a very strict ANSI compiler, you may have to
- * delete or comment out the following 3 lines: */
-# ifndef TT2$M_DECCRT3          /* VT300 not defined as of VAXC v2.4 */
-#  define TT2$M_DECCRT3 0X80000000
-# endif
-static unsigned short chan;
-static int old_char_buf[3], cur_char_buf[3];
-$DESCRIPTOR(sysoutput_desc, "SYS$OUTPUT");
-
-/* Look first for decw$display (decterms do regis).  Determine if we
- * have a regis terminal and save terminal characteristics */
-char *
-vms_init()
-{
-    /* Save terminal characteristics in old_char_buf and
-       initialise cur_char_buf to current settings. */
-    int i;
-#ifdef X11
-    if (getenv("DECW$DISPLAY"))
-	return ("x11");
-#endif
-    atexit(vms_reset);
-    sys$assign(&sysoutput_desc, &chan, 0, 0);
-    sys$qiow(0, chan, IO$_SENSEMODE, 0, 0, 0, old_char_buf, 12, 0, 0, 0, 0);
-    for (i = 0; i < 3; ++i)
-	cur_char_buf[i] = old_char_buf[i];
-    sys$dassgn(chan);
-
-    /* Test if terminal is regis */
-    if ((cur_char_buf[2] & TT2$M_REGIS) == TT2$M_REGIS)
-	return ("regis");
-    return (NULL);
-}
-
-/* set terminal to original state */
-void
-vms_reset()
-{
-    int i;
-
-    sys$assign(&sysoutput_desc, &chan, 0, 0);
-    sys$qiow(0, chan, IO$_SETMODE, 0, 0, 0, old_char_buf, 12, 0, 0, 0, 0);
-    for (i = 0; i < 3; ++i)
-	cur_char_buf[i] = old_char_buf[i];
-    sys$dassgn(chan);
-}
-
-/* set terminal mode to tektronix */
-void
-term_mode_tek()
-{
-    long status;
-
-    if (gpoutfile != stdout)
-	return;                 /* don't modify if not stdout */
-    sys$assign(&sysoutput_desc, &chan, 0, 0);
-    cur_char_buf[0] = 0x004A0000 | DC$_TERM | (TT$_TEK401X << 8);
-    cur_char_buf[1] = (cur_char_buf[1] & 0x00FFFFFF) | 0x18000000;
-
-    cur_char_buf[1] &= ~TT$M_CRFILL;
-    cur_char_buf[1] &= ~TT$M_ESCAPE;
-    cur_char_buf[1] &= ~TT$M_HALFDUP;
-    cur_char_buf[1] &= ~TT$M_LFFILL;
-    cur_char_buf[1] &= ~TT$M_MECHFORM;
-    cur_char_buf[1] &= ~TT$M_NOBRDCST;
-    cur_char_buf[1] &= ~TT$M_NOECHO;
-    cur_char_buf[1] &= ~TT$M_READSYNC;
-    cur_char_buf[1] &= ~TT$M_REMOTE;
-    cur_char_buf[1] |= TT$M_LOWER;
-    cur_char_buf[1] |= TT$M_TTSYNC;
-    cur_char_buf[1] |= TT$M_WRAP;
-    cur_char_buf[1] &= ~TT$M_EIGHTBIT;
-    cur_char_buf[1] &= ~TT$M_MECHTAB;
-    cur_char_buf[1] &= ~TT$M_SCOPE;
-    cur_char_buf[1] |= TT$M_HOSTSYNC;
-
-    cur_char_buf[2] &= ~TT2$M_APP_KEYPAD;
-    cur_char_buf[2] &= ~TT2$M_BLOCK;
-    cur_char_buf[2] &= ~TT2$M_DECCRT3;
-    cur_char_buf[2] &= ~TT2$M_LOCALECHO;
-    cur_char_buf[2] &= ~TT2$M_PASTHRU;
-    cur_char_buf[2] &= ~TT2$M_REGIS;
-    cur_char_buf[2] &= ~TT2$M_SIXEL;
-    cur_char_buf[2] |= TT2$M_BRDCSTMBX;
-    cur_char_buf[2] |= TT2$M_EDITING;
-    cur_char_buf[2] |= TT2$M_INSERT;
-    cur_char_buf[2] |= TT2$M_PRINTER;
-    cur_char_buf[2] &= ~TT2$M_ANSICRT;
-    cur_char_buf[2] &= ~TT2$M_AVO;
-    cur_char_buf[2] &= ~TT2$M_DECCRT;
-    cur_char_buf[2] &= ~TT2$M_DECCRT2;
-    cur_char_buf[2] &= ~TT2$M_DRCS;
-    cur_char_buf[2] &= ~TT2$M_EDIT;
-    cur_char_buf[2] |= TT2$M_FALLBACK;
-
-    status = sys$qiow(0, chan, IO$_SETMODE, 0, 0, 0, cur_char_buf, 12, 0, 0, 0, 0);
-    if (status == SS$_BADPARAM) {
-	/* terminal fallback utility not installed on system */
-	cur_char_buf[2] &= ~TT2$M_FALLBACK;
-	sys$qiow(0, chan, IO$_SETMODE, 0, 0, 0, cur_char_buf, 12, 0, 0, 0, 0);
-    } else {
-	if (status != SS$_NORMAL)
-	    lib$signal(status, 0, 0);
-    }
-    sys$dassgn(chan);
-}
-
-/* set terminal mode back to native */
-void
-term_mode_native()
-{
-    int i;
-
-    if (gpoutfile != stdout)
-	return;                 /* don't modify if not stdout */
-    sys$assign(&sysoutput_desc, &chan, 0, 0);
-    sys$qiow(0, chan, IO$_SETMODE, 0, 0, 0, old_char_buf, 12, 0, 0, 0, 0);
-    for (i = 0; i < 3; ++i)
-	cur_char_buf[i] = old_char_buf[i];
-    sys$dassgn(chan);
-}
-
-/* set terminal mode pasthru */
-void
-term_pasthru()
-{
-    if (gpoutfile != stdout)
-	return;                 /* don't modify if not stdout */
-    sys$assign(&sysoutput_desc, &chan, 0, 0);
-    cur_char_buf[2] |= TT2$M_PASTHRU;
-    sys$qiow(0, chan, IO$_SETMODE, 0, 0, 0, cur_char_buf, 12, 0, 0, 0, 0);
-    sys$dassgn(chan);
-}
-
-/* set terminal mode nopasthru */
-void
-term_nopasthru()
-{
-    if (gpoutfile != stdout)
-	return;                 /* don't modify if not stdout */
-    sys$assign(&sysoutput_desc, &chan, 0, 0);
-    cur_char_buf[2] &= ~TT2$M_PASTHRU;
-    sys$qiow(0, chan, IO$_SETMODE, 0, 0, 0, cur_char_buf, 12, 0, 0, 0, 0);
-    sys$dassgn(chan);
-}
-
-void
-fflush_binary()
-{
-    typedef short int INT16;    /* signed 16-bit integers */
-    INT16 k;            /* loop index */
-
-    if (gpoutfile != stdout) {
-	/* Stupid VMS fflush() raises error and loses last data block
-	   unless it is full for a fixed-length record binary file.
-	   Pad it here with NULL characters. */
-	for (k = (INT16) ((*gpoutfile)->_cnt); k > 0; --k)
-	    putc('\0', gpoutfile);
-	fflush(gpoutfile);
-    }
-}
-#endif /* VMS */
 
 /*
  * This is an abstraction of the enhanced text mode originally written

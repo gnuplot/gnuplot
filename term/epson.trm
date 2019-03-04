@@ -182,7 +182,7 @@ TERM_PUBLIC void DPU414_setfont(void);
 TERM_PUBLIC void
 EPSON_reset()
 {
-    fflush_binary();
+    fflush_binary();	/* Only needed for VMS */
 }
 
 
