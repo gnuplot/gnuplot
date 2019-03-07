@@ -185,8 +185,10 @@ typedef struct axis_scale_t {
 #ifdef __EMX__
 /* for gethostname ... */
 # include <netdb.h>
+/* name collision with X11 headers */
+# undef generic
 /* for __XOS2RedirRoot */
-#include <X11/Xlibint.h>
+# include <X11/Xlibint.h>
 #endif
 
 
@@ -233,7 +235,7 @@ typedef struct cmap_struct {
     cmap_t *cmap;
     struct cmap_struct *next_cmap_struct;
 } cmap_struct;
-    
+
 /* Stuff for toggling plots on/off in response to a mouse click on the key entry */
 typedef struct {
 	unsigned int left;
@@ -2376,7 +2378,7 @@ exec_cmd(plot_struct *plot, char *command)
 			fill_gc = XCreateGC(dpy,plot->window,0,0);
 		    XCopyGC(dpy, *current_gc, ~0, fill_gc);
 		    XSetFillStyle(dpy, fill_gc, FillSolid);
-		    XFillRectangle(dpy, plot->pixmap, fill_gc, 
+		    XFillRectangle(dpy, plot->pixmap, fill_gc,
 			bb[0], bb[1], bb[2]-bb[0], bb[3]-bb[1]);
 		    /* boxing = FALSE; */
 		    return;
@@ -4067,7 +4069,7 @@ DrawLineToRuler(plot_struct * plot)
     if (!gc_xor) {
 	GetGCXor(plot, &gc_xor);
     }
-    XDrawLine(dpy, plot->window, gc_xor, 
+    XDrawLine(dpy, plot->window, gc_xor,
 	    X(plot->ruler_x), Y(plot->ruler_y),
 	    plot->ruler_lineto_x, plot->ruler_lineto_y);
 }
@@ -4642,7 +4644,7 @@ process_event(XEvent *event)
 		static int cmd_tried = 0;
 		static char *cmd = NULL;
 		static unsigned long newGnuplotXID = 0;
-		
+
 		/* If the "-ctrlq" resource is set, ignore ' ' unless control key is also pressed */
 		if (ctrlq && !(modifier_mask & Mod_Ctrl))
 		    break;
@@ -5585,7 +5587,7 @@ static char dash_mono[Ndashes][10] = {
 /* Version 5 default dash types */
 static char dash_color[Ndashes][10] = {
     "0", "16",
-    "0", "64", "26", "6424", "642424", "0", "64", "26" 
+    "0", "64", "26", "6424", "642424", "0", "64", "26"
 };
 
 static void
@@ -5655,10 +5657,10 @@ int gpXTextHeight (XFontStruct *cfont)
 	return cfont->ascent + cfont->descent;
 }
 
-int gpXTextExtents (XFontStruct *cfont, char *str, int nchar, 
+int gpXTextExtents (XFontStruct *cfont, char *str, int nchar,
 		    XCharStruct *overall)
 {
-    int direction, ascent, decent; 
+    int direction, ascent, decent;
 #ifdef USE_X11_MULTIBYTE
     if (usemultibyte) {
 	int ret;
@@ -5672,7 +5674,7 @@ int gpXTextExtents (XFontStruct *cfont, char *str, int nchar,
 	return ret;
     }
 #endif
-    return XTextExtents(cfont, str, nchar, &direction, &ascent, 
+    return XTextExtents(cfont, str, nchar, &direction, &ascent,
 			&decent, overall);
 }
 
@@ -5877,7 +5879,7 @@ char *fontname;
     if (!fontname || !(*fontname)) {
 	if ((fontname = pr_GetR(db, ".font"))) {
 	    strncpy(default_font, fontname, sizeof(default_font)-1);
-    /* shige: default_font may be clear for each plot command by 
+    /* shige: default_font may be clear for each plot command by
      * X11_set_default_font() in x11.trm, since the function is called
      * in X11_graphics(). And then the font list will be cleared by the
      * next line in the case the default font is defined in X11 Resources.
@@ -5916,7 +5918,7 @@ char *fontname;
 	    hchar = search->hchar;
 	    return;
 #else
-	    if (!usemultibyte && !search->ismbfont) { 
+	    if (!usemultibyte && !search->ismbfont) {
 		font = search->font;
 		vchar = search->vchar;
 		hchar = search->hchar;
@@ -5932,7 +5934,7 @@ char *fontname;
     }
     /* If we get here, the request doesn't match a previously used font.
      * Whatever font we end up with should be recorded in the used_font
-     * list so that we can find it cheaply next time.		
+     * list so that we can find it cheaply next time.
      */
     requested_name = strdup(fontname);
 
@@ -6093,7 +6095,7 @@ char *fontname;
 		/* But (mincho|gothic) X fonts are not provided
 		 * on some X servers even in Japan
 		 */
-		sprintf(fontspec, "*-%s-%c-*--%d-*", 
+		sprintf(fontspec, "*-%s-%c-*--%d-*",
 			weight, slant, fontsize);
 		font = gpXLoadQueryFont(dpy, try_name = fontspec);
 	    }
@@ -6168,7 +6170,7 @@ char *fontname;
 #ifndef USE_X11_MULTIBYTE
     search->font = font;
 #else
-    if (!usemultibyte) { 
+    if (!usemultibyte) {
 	search->ismbfont = 0;
 	search->font = font;
 	search->mbfont = NULL;
@@ -6184,7 +6186,7 @@ char *fontname;
 
     FPRINTF((stderr, "gnuplot_x11: pr_font() set font %s, vchar %d hchar %d\n",
 		fontname, vchar, hchar));
-    FPRINTF((stderr, "gnuplot_x11: requested \"%s\" succeeded with \"%s\"\n", 
+    FPRINTF((stderr, "gnuplot_x11: requested \"%s\" succeeded with \"%s\"\n",
     		requested_name, try_name));
 
 }
