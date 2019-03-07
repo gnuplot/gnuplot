@@ -40,9 +40,7 @@ SHELL=cmd.exe
 
 # X11 driver
 # requires installed XFree86 libraries and headers
-# Note: x11 on OS/2 is broken: pause in a script no longer works and
-#       the plot is drawn shifted half-way outside the window.
-#X11=1
+X11=1
 
 # GIF, PNG, JPEG device drivers
 # Requires gd library (not part of gnuplot)
