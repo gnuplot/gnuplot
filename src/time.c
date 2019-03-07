@@ -314,7 +314,7 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec, double *reltime)
 	        break;
 	    }
 	case 'Z':		/* timezone name (ignored) */
-	    while (!isspace(*s))
+	    while (*s && !isspace(*s))
 		s++;
 	    break;
 #endif
