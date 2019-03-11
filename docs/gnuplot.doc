@@ -11336,7 +11336,7 @@ Ffigure_multiple_keys
 ?show object circle
  Syntax:
      set object <index> circle {at|center} <position> size <radius>
-         {arc [<begin>:<end>]}
+         {arc [<begin>:<end>]} {no{wedge}}
          {<other-object-properties>}
 
  The position of the circle is specified by giving the position of the center
@@ -11354,7 +11354,7 @@ Ffigure_multiple_keys
  a starting angle and ending angle, in degrees, for one arc of the circle.
  The arc is always drawn counterclockwise.
 
- See also `set object ellipse`.
+ See also `set style circle`, `set object ellipse`.
 
 4 polygon
 ?polygon
