@@ -1079,7 +1079,6 @@ show_version(FILE *fp)
 
 	c_token++;
 	fprintf(stderr, "\nCompile options:\n%s", compile_options);
-	fprintf(stderr, "    MAX_PARALLEL_AXES=%d\n", MAX_PARALLEL_AXES);
 	fprintf(stderr, "    %d-bit integer arithmetic\n\n",(int)sizeof(intgr_t)*8);
 
 #ifdef X11
@@ -1696,9 +1695,9 @@ show_paxis()
 	int_error(c_token, "no such parallel axis is active");
     fputs("\n\t", stderr);
     if (equals(c_token, "range"))
-	save_prange(stderr, &parallel_axis[p-1]);
+	save_prange(stderr, &parallel_axis_array[p-1]);
     else if (almost_equals(c_token, "tic$s"))
-	show_ticdefp(&parallel_axis[p-1]);
+	show_ticdefp(&parallel_axis_array[p-1]);
     c_token++;
 }
 

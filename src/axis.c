@@ -72,8 +72,10 @@ const AXIS_DEFAULTS axis_defaults[AXIS_ARRAY_SIZE] = {
 
 const AXIS default_axis_state = DEFAULT_AXIS_STRUCT;
 
-/* EAM DEBUG - Dynamic allocation of parallel axes. */
-AXIS *parallel_axis = NULL;
+/* Parallel axis structures are held in an array that is dynamically
+ * allocated on demand.
+ */
+AXIS *parallel_axis_array = NULL;
 int num_parallel_axes = 0;
 
 /* Separate axis THETA for tics around perimeter of polar grid
@@ -276,6 +278,10 @@ init_parallel_axis(AXIS *this_axis, AXIS_INDEX index)
     this_axis->index = index + PARALLEL_AXES;
     this_axis->ticdef.rangelimited = TRUE;
     this_axis->set_autoscale |= AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX;
+/* FIXME: didn't have to do this before. why now?
+ *        anyhow this is the wrong place.  Needs to be just before data input
+    axis_init(this_axis, TRUE);
+ */
 }
 /*
  * If we encounter a parallel axis index higher than any used so far,
@@ -287,12 +293,13 @@ extend_parallel_axis(int paxis)
 {
     int i;
     if (paxis > num_parallel_axes) {
-	parallel_axis = gp_realloc(parallel_axis, paxis * sizeof(AXIS), "extend parallel_axes");
+	parallel_axis_array = gp_realloc(parallel_axis_array, paxis * sizeof(AXIS),
+					"extend parallel_axes");
 	for (i = num_parallel_axes; i < paxis; i++)
-	    init_parallel_axis( &parallel_axis[i], i );
+	    init_parallel_axis( &parallel_axis_array[i], i );
 	num_parallel_axes = paxis;
     }
-    return &parallel_axis[paxis-1];
+    return &parallel_axis_array[paxis-1];
 }
 
 /*

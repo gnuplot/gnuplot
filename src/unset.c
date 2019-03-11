@@ -412,7 +412,7 @@ unset_command()
 	i = int_expression();
 	if (almost_equals(c_token, "tic$s")) {
 	    if (i > 0 && i <= num_parallel_axes)
-		unset_tics(&parallel_axis[i-1]);
+		unset_tics(&parallel_axis_array[i-1]);
 	    c_token++;
 	}
 	break;
@@ -721,7 +721,7 @@ unset_autoscale()
 	for (axis=0; axis<AXIS_ARRAY_SIZE; axis++)
 	    axis_array[axis].set_autoscale = FALSE;
 	for (axis=0; axis<num_parallel_axes; axis++)
-	    parallel_axis[axis].set_autoscale = FALSE;
+	    parallel_axis_array[axis].set_autoscale = FALSE;
     } else if (equals(c_token, "xy") || equals(c_token, "tyx")) {
 	axis_array[FIRST_X_AXIS].set_autoscale
 	    = axis_array[FIRST_Y_AXIS].set_autoscale = AUTOSCALE_NONE;
@@ -1906,11 +1906,11 @@ reset_command()
 
     /* Free all previously allocated parallel axis structures */
     for (axis=0; axis<num_parallel_axes; axis++) {
-	struct axis *this_axis = &parallel_axis[axis];
+	struct axis *this_axis = &parallel_axis_array[axis];
 	free_axis_struct(this_axis);
     }
-    free(parallel_axis);
-    parallel_axis = NULL;
+    free(parallel_axis_array);
+    parallel_axis_array = NULL;
     num_parallel_axes = 0;
 
     if (shadow_axis_array) {

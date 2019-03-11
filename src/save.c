@@ -780,7 +780,7 @@ set origin %g,%g\n",
     save_tics(fp, &R_AXIS);
     save_tics(fp, &THETA_AXIS);
     for (axis=0; axis<num_parallel_axes; axis++)
-	save_tics(fp, &parallel_axis[axis]);
+	save_tics(fp, &parallel_axis_array[axis]);
 
 #define SAVE_AXISLABEL_OR_TITLE(name,suffix,lab)			 \
     {									 \
@@ -834,7 +834,7 @@ set origin %g,%g\n",
     save_prange(fp, axis_array + POLAR_AXIS);
 
     for (axis=0; axis<num_parallel_axes; axis++)
-	save_prange(fp, &parallel_axis[axis]);
+	save_prange(fp, &parallel_axis_array[axis]);
 
 #undef SAVE_AXISLABEL
 #undef SAVE_AXISLABEL_OR_TITLE

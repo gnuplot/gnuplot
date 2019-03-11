@@ -80,8 +80,7 @@ typedef struct curve_points {
     AXIS_INDEX y_axis;		/* FIRST_Y_AXIS or SECOND_Y_AXIS */
     AXIS_INDEX z_axis;		/* same as either x_axis or y_axis, for 5-column plot types */
     int current_plotno;		/* Only used by "pn" option of linespoints */
-    int n_par_axes;		/* Only used for parallel axis plots */
-    double **z_n;		/* Only used for parallel axis plots */
+    AXIS_INDEX p_axis;		/* Only used for parallel axis plots */
     double *varcolor;		/* Only used if plot has variable color */
     struct coordinate *points;
 } curve_points;

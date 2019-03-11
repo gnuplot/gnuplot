@@ -54,9 +54,6 @@
  * SECOND_X_AXIS = FIRST_X_AXIS + SECOND_AXES
  * FIRST_X_AXIS & SECOND_AXES == 0
  */
-#ifndef MAX_PARALLEL_AXES
-# define MAX_PARALLEL_AXES MAXDATACOLS-1
-#endif
 
 typedef enum AXIS_INDEX {
     NO_AXIS = -2,
@@ -76,7 +73,7 @@ typedef enum AXIS_INDEX {
     T_AXIS,
     U_AXIS,
     V_AXIS,		/* Last index into axis_array[] */
-    PARALLEL_AXES,	/* Parallel axis data is allocated dynamically */
+    PARALLEL_AXES,	/* Parallel axis structures are allocated dynamically */
     THETA_index = 1234,	/* Used to identify THETA_AXIS */
 
     AXIS_ARRAY_SIZE = PARALLEL_AXES
@@ -308,8 +305,8 @@ extern AXIS *shadow_axis_array;
 extern const AXIS_DEFAULTS axis_defaults[AXIS_ARRAY_SIZE];
 extern const AXIS default_axis_state;
 
-/* EAM DEBUG - Dynamic allocation of parallel axes. */
-extern AXIS *parallel_axis;
+/* Dynamic allocation of parallel axis structures */
+extern AXIS *parallel_axis_array;
 extern int num_parallel_axes;
 
 /* A parsing table for mapping axis names into axis indices. For use

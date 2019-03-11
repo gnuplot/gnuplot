@@ -2828,21 +2828,29 @@ plot_c_bars(struct curve_points *plot)
 static void
 plot_parallel(struct curve_points *plot)
 {
-    int i, j;
+    int i;
     int x0, y0, x1, y1;
+    struct curve_points *thisplot;
+
+    /* The parallel axis data is stored in successive plot structures. */
+    /* We will draw it all at once when we see the first one and igore the rest. */
+    if (plot->p_axis != 1)
+	return;
 
     for (i = 0; i < plot->p_count; i++) {
-	struct axis *this_axis = &parallel_axis[0];
+	struct axis *this_axis = &parallel_axis_array[plot->p_axis-1];
 
 	/* rgb variable  -  color read from data column */
 	check_for_variable_color(plot, &plot->varcolor[i]);
 
-	x0 = map_x(1.0);
-	y0 = axis_map(this_axis, plot->z_n[0][i]);
-	for (j = 1; j < plot->n_par_axes; j++) {
-	    this_axis = &parallel_axis[j];
-	    x1 = map_x((double)(j+1));
-	    y1 = axis_map(this_axis, plot->z_n[j][i]);
+	x0 = map_x(plot->points[i].x);
+	y0 = axis_map(this_axis, plot->points[i].y);
+
+	thisplot = plot;
+	while (((thisplot = thisplot->next) != NULL) && thisplot->p_axis > 1) {
+	    this_axis = &parallel_axis_array[thisplot->p_axis-1];
+	    x1 = map_x(thisplot->points[i].x);
+	    y1 = axis_map(this_axis, thisplot->points[i].y);
 	    draw_clip_line(x0, y0, x1, y1);
 	    x0 = x1;
 	    y0 = y1;
@@ -3700,15 +3708,15 @@ place_parallel_axes(struct curve_points *first_plot, int pcount, int layer)
     struct curve_points *plot = first_plot;
 
     /* Check for use of parallel axes */
-    for (j = 0; j < pcount; j++, plot = plot->next) {
+    for (plot = first_plot; plot; plot = plot->next) {
     	if (plot->plot_type == DATA && plot->plot_style == PARALLELPLOT && plot->p_count > 0)
-	    if (axes_in_use < plot->n_par_axes)
-		axes_in_use = plot->n_par_axes;
+	    if (axes_in_use < plot->p_axis)
+		axes_in_use = plot->p_axis;
     }
 
     /* Set up the vertical scales used by axis_map() */
-    for (j = 0; j < axes_in_use; j++) {
-	struct axis *this_axis = &parallel_axis[j]; 
+    for (j = 1; j <= axes_in_use; j++) {
+	struct axis *this_axis = &parallel_axis_array[j-1]; 
 	axis_invert_if_requested(this_axis);
 	this_axis->term_lower = plot_bounds.ybot;
 	this_axis->term_scale =
@@ -3717,8 +3725,7 @@ place_parallel_axes(struct curve_points *first_plot, int pcount, int layer)
 
 	FPRINTF((stderr,
 	    "axis p%d: min %g max %g set_min %g set_max %g autoscale %o set_autoscale %o\n",
-	    j, this_axis->min, this_axis->max,
-	    this_axis->set_min, this_axis->set_max,
+	    j, this_axis->min, this_axis->max, this_axis->set_min, this_axis->set_max,
 	    this_axis->autoscale, this_axis->set_autoscale));
 	setup_tics(this_axis, 20);
     }
@@ -3728,19 +3735,19 @@ place_parallel_axes(struct curve_points *first_plot, int pcount, int layer)
 
     /* Draw the axis lines */
     term_apply_lp_properties(&parallel_axis_style.lp_properties);
-    for (j = 0; j < axes_in_use; j++) {
-	struct axis *this_axis = &parallel_axis[j];
+    for (j = 1; j <= axes_in_use; j++) {
+	struct axis *this_axis = &parallel_axis_array[j-1];
 	int max = axis_map(this_axis, this_axis->data_max);
 	int min = axis_map(this_axis, this_axis->data_min);
-	int axis_x = map_x((double)(j+1));
+	int axis_x = map_x((double)(j));
 	draw_clip_line( axis_x, min, axis_x, max );
     }
 
     /* Draw the axis tickmarks and labels.  Piggyback on ytick2d_callback */
     /* but avoid a call to the full axis_output_tics(). 		  */
-    for (j = 0; j < axes_in_use; j++) {
-	struct axis *this_axis = &parallel_axis[j];
-	double axis_coord = j+1;		/* paxis N is drawn at x=N */
+    for (j = 1; j <= axes_in_use; j++) {
+	struct axis *this_axis = &parallel_axis_array[j-1];
+	double axis_coord = j;		/* paxis N is drawn at x=N */
 
 	if (this_axis->tic_rotate && term->text_angle(this_axis->tic_rotate)) {
 	    tic_hjust = LEFT;

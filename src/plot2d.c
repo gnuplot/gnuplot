@@ -84,6 +84,8 @@ static text_label histogram_title;          /* Subtitle for this histogram */
 static int stack_count = 0;                 /* counter for stackheight */
 static struct coordinate *stackheight = NULL; /* Scratch space for y autoscale */
 
+static int paxis_start, paxis_end, paxis_current;	/* PARALLELPLOT bookkeeping */
+
 /* function implementations */
 
 /*
@@ -134,12 +136,6 @@ cp_extend(struct curve_points *cp, int num)
 	    if (cp->varcolor)
 		cp->varcolor = gp_realloc(cp->varcolor, num * sizeof(double),
 					"expanding curve variable colors");
-	    if (cp->z_n) {
-		int i;
-		for (i = 0; i < cp->n_par_axes; i++)
-		    cp->z_n[i] = gp_realloc(cp->z_n[i], num * sizeof(double),
-					"expanding curve z_n[i]");
-	    }
 	}
 	cp->p_max = num;
 	cp->p_max -= 1;		/* Set trigger point for reallocation ahead of	*/
@@ -151,14 +147,6 @@ cp_extend(struct curve_points *cp, int num)
 	cp->p_max = 0;
 	free(cp->varcolor);
 	cp->varcolor = NULL;
-	if (cp->z_n) {
-	    int i;
-	    for (i = 0; i < cp->n_par_axes; i++)
-		free(cp->z_n[i]);
-	    free(cp->z_n);
-	    cp->n_par_axes = 0;
-	    cp->z_n = NULL;
-	}
     }
 }
 
@@ -183,14 +171,6 @@ cp_free(struct curve_points *cp)
 	if (cp->labels)
 	    free_labels(cp->labels);
 	cp->labels = NULL;
-	if (cp->z_n) {
-	    int i;
-	    for (i = 0; i < cp->n_par_axes; i++)
-		free(cp->z_n[i]);
-	    free(cp->z_n);
-	    cp->n_par_axes = 0;
-	    cp->z_n = NULL;
-	}
 
 	free(cp);
 	cp = next;
@@ -390,12 +370,9 @@ get_data(struct curve_points *current_plot)
 	    /* in parallel with the y values.                                    */
 	    variable_color = FALSE;
 	}
-	if (variable_color)
+	if (variable_color) {
 	    current_plot->varcolor = gp_alloc(current_plot->p_max * sizeof(double),
 		"varcolor array");
-	if (variable_color && current_plot->plot_style == PARALLELPLOT) {
-	    /* Oops, we reserved one column of data too many */
-	    free(current_plot->z_n[--(current_plot->n_par_axes)]);
 	}
     }
 
@@ -565,18 +542,10 @@ get_data(struct curve_points *current_plot)
 	break;
 
     case PARALLELPLOT:
-	/* Maximum number of parallel axes is fixed at compile time */
-	if (current_plot->n_par_axes > num_parallel_axes)
-	    extend_parallel_axis(current_plot->n_par_axes);
-
-	/* First N columns are data; one more is optional varcolor */
-	min_cols = current_plot->n_par_axes;
-	max_cols = current_plot->n_par_axes + 1;
-	/* We have not yet read in any data, so we cannot do complete initialization */
-	for (j = 0; j < current_plot->n_par_axes; j++) {
-	    struct axis *this_axis = &parallel_axis[j];
-	    axis_init(this_axis, 1);
-	}
+	/* 1 column: y coordinate only */
+	/* Allow 1 extra column for variable color */
+	min_cols = 1;
+	max_cols = 2;
 	break;
 
     case TABLESTYLE:
@@ -766,7 +735,7 @@ get_data(struct curve_points *current_plot)
 			    if (j < 3) int_error(NO_CARET,errmsg);
 			    break;
 	    case PARALLELPLOT:
-			    if (j < 4) int_error(NO_CARET,errmsg);
+			    if (j < 1) int_error(NO_CARET,errmsg);
 			    break;
 	    case BOXPLOT:
 			    /* Only the key sample uses this value */
@@ -1135,32 +1104,20 @@ get_data(struct curve_points *current_plot)
 	}
 
 	case PARALLELPLOT:
-	{
-	    /* Currently each parallel axis consumes a field of the "using" spec.
-	     * This limits the number of parallel axes to the maximum size of the
-	     * using spec.
+	{   /* Similar to histogram plots, each parallel axis gets a separate
+	     * comma-separated plot element with a single "using" spec.
+	     * FIXME:
+	     *	option to specify x coordinate value
 	     */
-	    /* FIXME:  The syntax for "with parallelaxes" should be revised
-	     * to work the same way as "with histograms", so that there is a single
-	     * field using spec for each parallel axis.
-	     */
-	    int iaxis;
-	    if (j != current_plot->n_par_axes)
-		int_error(NO_CARET, "Expecting %d input columns, got %d\n",
-			current_plot->n_par_axes, j);
-	    /* Primary coordinate structure holds only x range and 1st y value.	*/
-	    /* The x range brackets the parallel axes by 0.5 on either side.	*/
-	    store2d_point(current_plot, i, 1.0, v[0], 
-				0.5, (double)(current_plot->n_par_axes)+0.5,
-				v[0], v[0], 0.0);
-	    /* The parallel axis data is stored in separate arrays */
-	    for (iaxis = 0; iaxis < current_plot->n_par_axes; iaxis++) {
-		coord_type dummy_type = INRANGE;
-		store_and_update_range( &current_plot->z_n[iaxis][i],
-			v[iaxis], &dummy_type, &parallel_axis[iaxis],
-			current_plot->noautoscale );
-	    }
-	    i++;
+	    coordval x = paxis_current;
+	    coordval y = v[1];
+	    store2d_point(current_plot, i++, x, y, x-0.5, x+0.5, y, y, 0.0); 
+#if (0)
+	    fprintf(stderr, "store %g %g rangecode %d to paxis %d current min/max = %g %g\n",
+			x, y, current_plot->points[i-1].type, current_plot->p_axis,
+			parallel_axis_array[current_plot->p_axis-1].min,
+			parallel_axis_array[current_plot->p_axis-1].max);
+#endif
 	    break;
 	}
 
@@ -1217,6 +1174,7 @@ store2d_point(
     double width)               /* BOXES widths: -1 -> autocalc, 0 ->  use xlow/xhigh */
 {
     struct coordinate *cp = &(current_plot->points[i]);
+    struct axis *x_axis_ptr, *y_axis_ptr;
     coord_type dummy_type = INRANGE;   /* sometimes we dont care about outranging */
     TBOOLEAN excluded_range = FALSE;
 
@@ -1269,11 +1227,14 @@ store2d_point(
     }
 
     /* Version 5: Allow to store Inf or NaN 
-     *  We used to exit immediately in this case rather than storing anything */
-    STORE_AND_UPDATE_RANGE(cp->x, x, cp->type, current_plot->x_axis,
-			current_plot->noautoscale, NOOP);
-    STORE_AND_UPDATE_RANGE(cp->y, y, cp->type, current_plot->y_axis,
-			current_plot->noautoscale, NOOP);
+     *  We used to exit immediately in this case rather than storing anything
+     */
+    x_axis_ptr = &axis_array[current_plot->x_axis];
+    y_axis_ptr = (current_plot->plot_style == PARALLELPLOT)
+		? &parallel_axis_array[current_plot->p_axis-1]
+		: &axis_array[current_plot->y_axis];
+    store_and_update_range(&(cp->x), x, &(cp->type), x_axis_ptr, current_plot->noautoscale);
+    store_and_update_range(&(cp->y), y, &(cp->type), y_axis_ptr, current_plot->noautoscale);
 
     switch (current_plot->plot_style) {
     case POINTSTYLE:		/* Only x and y are relevant to axis scaling */
@@ -1346,6 +1307,14 @@ store2d_point(
     case IMAGE:
 	STORE_AND_UPDATE_RANGE(cp->CRD_COLOR, width, dummy_type,
 				COLOR_AXIS, current_plot->noautoscale, NOOP);
+	break;
+
+    case PARALLELPLOT:
+	/* FIXME:  Might be better to use a parallelplot_range_fiddling routine */
+	store_and_update_range(&(cp->xlow), xlow, &dummy_type, x_axis_ptr, current_plot->noautoscale);
+	store_and_update_range(&(cp->xhigh), xhigh, &dummy_type, x_axis_ptr, current_plot->noautoscale);
+	store_and_update_range(&(cp->ylow), ylow, &dummy_type, y_axis_ptr, current_plot->noautoscale);
+	store_and_update_range(&(cp->yhigh), yhigh, &dummy_type, y_axis_ptr, current_plot->noautoscale);
 	break;
 
     default:			/* auto-scale to xlow xhigh ylow yhigh */
@@ -1820,6 +1789,7 @@ eval_plots()
     int nbins = 0;
     double binlow = 0, binhigh = 0, binwidth = 0;
 
+    /* Histogram bookkeeping */
     double newhist_start = 0.0;
     int histogram_sequence = -1;
     int newhist_color = 1;
@@ -1827,6 +1797,11 @@ eval_plots()
     histogram_rightmost = 0.0;
     free_histlist(&histogram_opts);
     init_histogram(NULL,NULL);
+
+    /* Parallel plot bookkeeping */
+    paxis_start = -1;
+    paxis_end = -1;
+    paxis_current = -1;
 
     uses_axis[FIRST_X_AXIS] =
 	uses_axis[FIRST_Y_AXIS] =
@@ -2624,6 +2599,21 @@ eval_plots()
 						    + this_plot->histogram->startpattern;
 	    }
 
+	    /* Parallel plot data bookkeeping */
+	    if (this_plot->plot_style == PARALLELPLOT) {
+		/* FIXME - sanity check to prevent intervening non-parallelplot plots */
+		if (paxis_start < 0) {
+		    paxis_start = 1;
+		    paxis_current = 0;
+		}
+		paxis_current++;
+		paxis_end = paxis_current;
+		if (paxis_current > num_parallel_axes)
+		    extend_parallel_axis(paxis_current);   
+		this_plot->p_axis = paxis_current;
+/* DEBUG */	axis_init(&parallel_axis_array[paxis_current-1], FALSE);
+	    }
+
 	    /* Styles that use palette */
 
 	    /* we can now do some checks that we deferred earlier */
@@ -2636,19 +2626,6 @@ eval_plots()
 		    goto SKIPPED_EMPTY_FILE;
 		}
 
-		/* Parallel plots require allocating additional storage.		*/
-		/* NB: This will be one column more than needed if the final column	*/
-		/*     contains variable color information. We will free it later.	*/
-		if (this_plot->plot_style == PARALLELPLOT) {
-		    int i;
-		    if (df_no_use_specs < 2)
-			int_error(NO_CARET, "not enough 'using' columns");
-		    this_plot->n_par_axes = df_no_use_specs;
-		    this_plot->z_n = gp_alloc((df_no_use_specs) * sizeof(double*), "z_n");
-		    for (i = 0; i < this_plot->n_par_axes; i++)
-			this_plot->z_n[i] = gp_alloc(this_plot->p_max * sizeof(double), "z_n[i]");
-		}
-		
 		/* Reset flags to auto-scale X axis to contents of data set */
 		if (!(uses_axis[x_axis] & USES_AXIS_FOR_DATA) && X_AXIS.autoscale) {
 		    struct axis *scaling_axis = &axis_array[this_plot->x_axis];
@@ -3273,6 +3250,9 @@ eval_plots()
 
     if (this_plot && this_plot->plot_style == TABLESTYLE) {
 	/* the y axis range has no meaning in this case */
+	;
+    } else if (this_plot && this_plot->plot_style == PARALLELPLOT) {
+	/* we should maybe check one of the parallel axes? */
 	;
     } else if (uses_axis[FIRST_Y_AXIS] && nonlinear(&axis_array[FIRST_Y_AXIS])) {
 	axis_checked_extend_empty_range(FIRST_Y_AXIS, "all points y value undefined!");

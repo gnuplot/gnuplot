@@ -936,7 +936,7 @@ set_autoscale()
 	for (axis=0; axis<AXIS_ARRAY_SIZE; axis++)
 	    axis_array[axis].set_autoscale = AUTOSCALE_BOTH;
 	for (axis=0; axis<num_parallel_axes; axis++)
-	    parallel_axis[axis].set_autoscale = AUTOSCALE_BOTH;
+	    parallel_axis_array[axis].set_autoscale = AUTOSCALE_BOTH;
 	return;
     } else if (equals(c_token, "xy") || equals(c_token, "yx")) {
 	axis_array[FIRST_X_AXIS].set_autoscale =
@@ -951,14 +951,14 @@ set_autoscale()
 	for (axis=0; axis<AXIS_ARRAY_SIZE; axis++)
 	    axis_array[axis].set_autoscale |= AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX;
 	for (axis=0; axis<num_parallel_axes; axis++)
-	    parallel_axis[axis].set_autoscale |= AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX;
+	    parallel_axis_array[axis].set_autoscale |= AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX;
 	c_token++;
 	return;
     } else if (almost_equals(c_token, "ke$epfix")) {
 	for (axis=0; axis<AXIS_ARRAY_SIZE; axis++)
 	    axis_array[axis].set_autoscale |= AUTOSCALE_BOTH;
 	for (axis=0; axis<num_parallel_axes; axis++)
-	    parallel_axis[axis].set_autoscale |= AUTOSCALE_BOTH;
+	    parallel_axis_array[axis].set_autoscale |= AUTOSCALE_BOTH;
 	c_token++;
 	return;
     }
@@ -5460,15 +5460,15 @@ set_paxis()
     c_token++;
     p = int_expression();
 
-    if (p <= 0 || p > MAX_PARALLEL_AXES)
+    if (p <= 0)
 	int_error(c_token-1, "illegal paxis");
     if (p > num_parallel_axes)
 	extend_parallel_axis(p);
 
     if (equals(c_token, "range"))
-	set_range( &parallel_axis[p-1] );
+	set_range( &parallel_axis_array[p-1] );
     else if (almost_equals(c_token, "tic$s"))
-	set_tic_prop( &parallel_axis[p-1] );
+	set_tic_prop( &parallel_axis_array[p-1] );
     else
 	int_error(c_token, "expecting 'range' or 'tics'");
 }
