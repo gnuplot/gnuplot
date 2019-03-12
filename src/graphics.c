@@ -3739,7 +3739,7 @@ place_parallel_axes(struct curve_points *first_plot, int pcount, int layer)
 	struct axis *this_axis = &parallel_axis_array[j-1];
 	int max = axis_map(this_axis, this_axis->data_max);
 	int min = axis_map(this_axis, this_axis->data_min);
-	int axis_x = map_x((double)(j));
+	int axis_x = map_x(this_axis->paxis_x);
 	draw_clip_line( axis_x, min, axis_x, max );
     }
 
@@ -3747,7 +3747,7 @@ place_parallel_axes(struct curve_points *first_plot, int pcount, int layer)
     /* but avoid a call to the full axis_output_tics(). 		  */
     for (j = 1; j <= axes_in_use; j++) {
 	struct axis *this_axis = &parallel_axis_array[j-1];
-	double axis_coord = j;		/* paxis N is drawn at x=N */
+	double axis_coord = this_axis->paxis_x;
 
 	if (this_axis->tic_rotate && term->text_angle(this_axis->tic_rotate)) {
 	    tic_hjust = LEFT;

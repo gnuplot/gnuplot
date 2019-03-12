@@ -278,17 +278,15 @@ init_parallel_axis(AXIS *this_axis, AXIS_INDEX index)
     this_axis->index = index + PARALLEL_AXES;
     this_axis->ticdef.rangelimited = TRUE;
     this_axis->set_autoscale |= AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX;
-/* FIXME: didn't have to do this before. why now?
- *        anyhow this is the wrong place.  Needs to be just before data input
     axis_init(this_axis, TRUE);
- */
 }
+
 /*
  * If we encounter a parallel axis index higher than any used so far,
  * extend parallel_axis[] to hold the corresponding data.
  * Returns pointer to the new axis.
  */
-AXIS *
+void
 extend_parallel_axis(int paxis)
 {
     int i;
@@ -299,7 +297,6 @@ extend_parallel_axis(int paxis)
 	    init_parallel_axis( &parallel_axis_array[i], i );
 	num_parallel_axes = paxis;
     }
-    return &parallel_axis_array[paxis-1];
 }
 
 /*

@@ -1106,18 +1106,10 @@ get_data(struct curve_points *current_plot)
 	case PARALLELPLOT:
 	{   /* Similar to histogram plots, each parallel axis gets a separate
 	     * comma-separated plot element with a single "using" spec.
-	     * FIXME:
-	     *	option to specify x coordinate value
 	     */
-	    coordval x = paxis_current;
+	    coordval x = parallel_axis_array[paxis_current-1].paxis_x;
 	    coordval y = v[1];
 	    store2d_point(current_plot, i++, x, y, x-0.5, x+0.5, y, y, 0.0); 
-#if (0)
-	    fprintf(stderr, "store %g %g rangecode %d to paxis %d current min/max = %g %g\n",
-			x, y, current_plot->points[i-1].type, current_plot->p_axis,
-			parallel_axis_array[current_plot->p_axis-1].min,
-			parallel_axis_array[current_plot->p_axis-1].max);
-#endif
 	    break;
 	}
 
@@ -1917,6 +1909,7 @@ eval_plots()
 	    TBOOLEAN set_fillcolor = FALSE;
 	    TBOOLEAN set_labelstyle = FALSE;
 	    TBOOLEAN set_ellipseaxes_units = FALSE;
+	    double paxis_x = -VERYLARGE;
 	    t_colorspec fillcolor = DEFAULT_COLORSPEC;
 
 	    /* CHANGE: Aug 2017
@@ -2194,6 +2187,7 @@ eval_plots()
 		    if (parametric && in_parametric)
 			int_error(c_token, "\"with\" allowed only after parametric function fully specified");
 		    this_plot->plot_style = get_style();
+
 		    if (this_plot->plot_style == FILLEDCURVES) {
 			/* read a possible option for 'with filledcurves' */
 			get_filledcurves_style_options(&this_plot->filledcurves_options);
@@ -2244,6 +2238,13 @@ eval_plots()
 			c_token++;
 			if (isanumber(c_token) || type_udv(c_token) == INTGR || type_udv(c_token) == CMPLX)
 			    this_plot->arrow_properties.head_length = real_expression();
+		    }
+		}
+
+		if (this_plot->plot_style == PARALLELPLOT) {
+		    if (equals(c_token, "at")) {
+			c_token++;
+			paxis_x = real_expression();
 		    }
 		}
 
@@ -2611,8 +2612,11 @@ eval_plots()
 		if (paxis_current > num_parallel_axes)
 		    extend_parallel_axis(paxis_current);   
 		this_plot->p_axis = paxis_current;
-/* DEBUG */	axis_init(&parallel_axis_array[paxis_current-1], FALSE);
+		axis_init(&parallel_axis_array[paxis_current-1], TRUE);
+		parallel_axis_array[paxis_current-1].paxis_x
+			= (paxis_x > -VERYLARGE) ? paxis_x : (double)paxis_current;
 	    }
+/* DEBUG */	else this_plot->p_axis = -1;
 
 	    /* Styles that use palette */
 

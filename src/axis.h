@@ -251,6 +251,7 @@ typedef struct axis {
     text_label label;		/* label string and position offsets */
     TBOOLEAN manual_justify;	/* override automatic justification */
     lp_style_type *zeroaxis;	/* usually points to default_axis_zeroaxis */
+    double paxis_x;		/* x coordinate of parallel axis */
 } AXIS;
 
 #define DEFAULT_AXIS_TICDEF {TIC_COMPUTED, NULL, {TC_DEFAULT, 0, 0.0}, {NULL, {0.,0.,0.}, FALSE},  { character, character, character, 0., 0., 0. }, FALSE, TRUE, FALSE }
@@ -519,7 +520,7 @@ void restore_autoscaled_ranges(AXIS *, AXIS *);
 char * axis_name(AXIS_INDEX);
 void init_sample_range(AXIS *axis, enum PLOT_TYPE plot_type);
 void init_parallel_axis(AXIS *, AXIS_INDEX);
-AXIS * extend_parallel_axis(int );
+void extend_parallel_axis(int);
 
 /* Evaluate the function linking a secondary axis to its primary axis */
 double eval_link_function(AXIS *, double);
