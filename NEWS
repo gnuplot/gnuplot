@@ -27,6 +27,7 @@ Changes not in 5.2
 * EXPERIMENTAL multiple textbox styles
 * EXPERIMENTAL load $DATABLOCK
 * EXPERIMENTAL "exit status <val>" exits program with user-provided status
+* CHANGE revised syntax for plot style "with parallelaxes"
 * CHANGE remove deprecated command "update"
 * CHANGE remove deprecated option "thru"
 * CHANGE special case optimization of nonlinear code to speed up logscale

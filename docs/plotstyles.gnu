@@ -608,7 +608,8 @@ set paxis 2 range [0:30]
 set paxis 4 range [-1:15]
 set paxis 4 tics  auto 1 left offset 5
 
-plot 'silver.dat' using 2:3:1:($3/2):(int($0/25)) with parallel lt 1 lc variable
+set style data parallelaxes
+plot 'silver.dat' using 2:(int($0/25)) lt 1 lc variable, '' using 3, '' using 1, '' using ($3/2)
 
 #
 # Filled curves

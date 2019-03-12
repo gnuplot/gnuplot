@@ -296,6 +296,7 @@ C
 
 4 Changes
 #start
+#b Revised syntax for plot style 'with parallelaxes'. See `parallel`.
 #b Imaginary values returned by the using specifier of a 2D plot are treated as
 ##undefined values (NaN) rather than as real(value).  This was always true for
 ##function plots and 3D data plots.  E.g. the following two plots are equivalent.
@@ -4590,20 +4591,36 @@ Ffigure_linespoints
 ?with parallelaxes
 ?parallelaxes
 Ffigure_parallel
+ Syntax:
+
+     set style data parallelaxes
+     plot $DATA using col1{:varcol1} {at <xpos>} {<line properties}, \
+          $DATA using col2, ...
+
  Parallel axis plots can highlight correlation in a multidimensional data set.
- Each input column is associated with a separately scaled vertical axis.
- The column values read from each line of input are connected by line segments
- drawn from axis 1 to axis 2 to axis 3 and so on.  That is, each line of input
- is represented by a separate line in the parallel axes plot.
+ Individual columns of input data are each associated with a separately scaled
+ vertical axis.  If all columns are drawn from a single file then each line on
+ the plot represents values from a single row of data.
  It is common to use some discrete categorization to assign line colors,
  allowing visual exploration of the correlation between this categorization and
  the axis dimensions.
+
+ Note: This version of gnuplot introduces a CHANGE in the syntax for plot style
+ parallelaxes.  The revised syntax allows an unlimited number of parallel axes.
+
+      gnuplot 5.2:   plot $DATA using 1:2:3:4:5 with parallelaxes
+      new syntax:    plot for [col=1:5] $DATA using col with parallelaxes
+
+ The new syntax also allows explicit placement of the parallel vertical axes
+ along the x axis as in the example below.  If no explicit x coordinate is
+ provide axis N will be placed at x=N.
+
+      array xpos[5] = [1, 5, 6, 7, 11, 12]
+      plot for [col=1:5] $DATA using col with parallelaxes at xpos[col]
+
  By default gnuplot will automatically determine the range and scale of the
  individual axes from the input data, but the usual `set axis range` commands
  can be used to customize this.  See `set paxis`.
-
- The maximum number of parallel axes is fixed at the time the program is built.
- The maximum for this copy of gnuplot is reported by `show version long`.
 2 points
 ?plotting styles points
 ?style points
