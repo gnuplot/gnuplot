@@ -2839,19 +2839,33 @@ plot_parallel(struct curve_points *plot)
 
     for (i = 0; i < plot->p_count; i++) {
 	struct axis *this_axis = &parallel_axis_array[plot->p_axis-1];
+	TBOOLEAN prev_NaN = FALSE;
 
 	/* rgb variable  -  color read from data column */
 	check_for_variable_color(plot, &plot->varcolor[i]);
 
 	x0 = map_x(plot->points[i].x);
 	y0 = axis_map(this_axis, plot->points[i].y);
+	prev_NaN = isnan(plot->points[i].y);
 
 	thisplot = plot;
-	while (((thisplot = thisplot->next) != NULL) && thisplot->p_axis > 1) {
+	while ((thisplot = thisplot->next)) {
+
+	    if (thisplot->plot_style != PARALLELPLOT)
+		continue;
+
+	    if (thisplot->points == NULL) {
+		prev_NaN = TRUE;
+		continue;
+	    }
+
 	    this_axis = &parallel_axis_array[thisplot->p_axis-1];
 	    x1 = map_x(thisplot->points[i].x);
 	    y1 = axis_map(this_axis, thisplot->points[i].y);
-	    draw_clip_line(x0, y0, x1, y1);
+	    if (prev_NaN)
+		prev_NaN = isnan(thisplot->points[i].y);
+	    else if (!(prev_NaN = isnan(thisplot->points[i].y)))
+		draw_clip_line(x0, y0, x1, y1);
 	    x0 = x1;
 	    y0 = y1;
 	}

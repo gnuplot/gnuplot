@@ -634,6 +634,11 @@ get_data(struct curve_points *current_plot)
 	
 	case DF_MISSING:
 	    /* Plot type specific handling of missing points goes here. */
+	    if (current_plot->plot_style == PARALLELPLOT) {
+		current_plot->points[i].type = UNDEFINED;
+		j = df_no_use_specs;
+		break;
+	    }
 	    if (current_plot->plot_style == HISTOGRAMS) {
 		current_plot->points[i].type = UNDEFINED;
 		i++;
@@ -2616,7 +2621,6 @@ eval_plots()
 		parallel_axis_array[paxis_current-1].paxis_x
 			= (paxis_x > -VERYLARGE) ? paxis_x : (double)paxis_current;
 	    }
-/* DEBUG */	else this_plot->p_axis = -1;
 
 	    /* Styles that use palette */
 

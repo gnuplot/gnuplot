@@ -1762,13 +1762,17 @@ int
 df_readascii(double v[], int max)
 {
     char *s;
-    /* Version 5:
-     * We used to return DF_MISSING or DF_UNDEFINED immediately if any column
-     * could not be parsed.  Now we note this failure in return_value but
-     * continue to process any additional requested columns before returning.
-     * This is a CHANGE.
-     */
     int return_value = DF_GOOD;
+
+    /* Version 5.3
+     * Some plot styles (e.g. PARALLELPLOT) must guarantee that every line
+     * of data will return some input value even if it is missing or bad.
+     * This flag will force the line to return NaN rather than being skipped.
+     * FIXME: it would be better to make this flag generic and set before entry.
+     */
+    TBOOLEAN df_bad_is_NaN
+	= (df_current_plot && df_current_plot->plot_style == PARALLELPLOT) ? TRUE
+	: FALSE;
 
     assert(max <= MAXDATACOLS);
 
@@ -1778,7 +1782,7 @@ df_readascii(double v[], int max)
 
     /*{{{  process line */
     while ((s = df_gets()) != NULL) {
-	int line_okay = 1;
+	TBOOLEAN line_okay = TRUE;
 	int output = 0;         /* how many numbers written to v[] */
 	return_value = DF_GOOD;
 
@@ -2231,8 +2235,13 @@ df_readascii(double v[], int max)
 						 timefmt, &tm, &usec, &reltime)
 			) {
 			/* line bad only if user explicitly asked for this column */
-			if (df_no_use_specs)
-			    line_okay = 0;
+			if (df_no_use_specs) {
+			    line_okay = FALSE;
+			    if (df_bad_is_NaN) {
+				v[output] = not_a_number();
+				return DF_UNDEFINED;
+			    }
+			}
 
 			/* return or ignore line depending on line_okay */
 			break;
@@ -2263,8 +2272,13 @@ df_readascii(double v[], int max)
 			return_value = DF_UNDEFINED;
 		    } else {
 			/* line bad only if user explicitly asked for this column */
-			if (df_no_use_specs)
-			    line_okay = 0;
+			if (df_no_use_specs) {
+			    line_okay = FALSE;
+			    if (df_bad_is_NaN) {
+				v[output] = not_a_number();
+				return DF_UNDEFINED;
+			    }
+			}
 			break;      /* return or ignore depending on line_okay */
 		    }
 		}
@@ -4900,7 +4914,7 @@ df_readbinary(double v[], int max)
 
     while (!df_eof) {
 	/*{{{  process line */
-	int line_okay = 1;
+	TBOOLEAN line_okay = TRUE;
 	int output = 0;             /* how many numbers written to v[] */
 	int i, fread_ret = 0;
 	int m_value, n_value, o_value;
@@ -5243,7 +5257,7 @@ df_readbinary(double v[], int max)
 		else {
 		    /* line bad only if user explicitly asked for this column */
 		    if (df_no_use_specs)
-			line_okay = 0;
+			line_okay = FALSE;
 		    break;  /* return or ignore depending on line_okay */
 		}
 
