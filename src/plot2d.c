@@ -2250,6 +2250,7 @@ eval_plots()
 		    if (equals(c_token, "at")) {
 			c_token++;
 			paxis_x = real_expression();
+			continue;
 		    }
 		}
 
@@ -3562,6 +3563,10 @@ reevaluate_plot_title(struct curve_points *this_plot)
 	    if (this_plot->plot_style == HISTOGRAMS
 	    &&  histogram_opts.type == HT_STACKED_IN_TOWERS) {
 		double xpos = this_plot->histogram_sequence + this_plot->histogram->start;
+		add_tic_user(&axis_array[FIRST_X_AXIS], this_plot->title, xpos, -1);
+	    }
+	    if (this_plot->plot_style == PARALLELPLOT) {
+		double xpos = parallel_axis_array[this_plot->p_axis-1].paxis_x;
 		add_tic_user(&axis_array[FIRST_X_AXIS], this_plot->title, xpos, -1);
 	    }
 	}

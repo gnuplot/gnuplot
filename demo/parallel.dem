@@ -37,7 +37,6 @@ set encoding utf8
 
 set border 0
 unset ytics
-set xtics ("X" 1, "Y" 2, "Z" 3, "B" 4) nomirror 
 set xrange [] noextend
 unset key
 
@@ -45,7 +44,7 @@ set paxis 1 tics format '%.0f Å' offset -1
 set paxis 4 tics left offset 4 format '%.0f Å^2'
 set paxis 4 range [0:40]
 
-plot 'GM1_sugar.pdb' using 6:7:8:10:5 with parallel lc var lw 2
+plot 'GM1_sugar.pdb' using 6:5 lc var lw 2 title "X", '' using 7 at 1.75 title "Y", '' using 8 at 2.5 title "Z", '' using 10 title "B"
 
 pause -1 "Hit return to continue"
 

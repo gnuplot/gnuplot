@@ -690,6 +690,9 @@ do_plot(struct curve_points *plots, int pcount)
 		this_plot->lp_properties = save_lp;
 	    }
 
+	/* Parallel plot titles are placed as xtic labels */
+	} else if (this_plot->plot_style == PARALLELPLOT) {
+	    localkey = FALSE;
 	} else if (this_plot->title && !*this_plot->title) {
 	    localkey = FALSE;
 	} else if (this_plot->plot_type == NODATA) {
