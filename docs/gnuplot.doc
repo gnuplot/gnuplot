@@ -7918,20 +7918,6 @@ Ffigure_fenceplot
  autoscale just the minimum or maximum of that axis.  If no keyword is given,
  all axes are autoscaled.
 
-?noextend
- By default autoscaling sets the axis range limits to the nearest tic label
- position that includes all the plot data. Keywords `fixmin`, `fixmax`, `fix`
- or `noextend` tell gnuplot to disable extension of the axis range to the next
- tic mark position. In this case the axis range limit exactly matches the
- coordinate of the most extreme data point.  `set autoscale noextend` is a
- synonym for `set autoscale fix`.  Range extension for a single axis can be 
- disabled by appending the `noextend` keyword to the corresponding range
- command, e.g.
-      set yrange [0:*] noextend
-
- `set autoscale keepfix` autoscales all axes while leaving the fix settings
- unchanged.
-
  When autoscaling, the axis range is automatically computed and the dependent
  axis (y for a `plot` and z for `splot`) is scaled to include the range of the
  function or data being plotted.
@@ -7960,7 +7946,30 @@ Ffigure_fenceplot
  number of tics, which can cause unexpected results.  To prevent this you can
  explicitly link the secondary axis range to the primary axis range.
  See `set link`.
+4 noextend
+?set autoscale noextend
+?set autoscale keepfix
+?set autoscale fix
+?noextend
+?keepfix
+?fix
+      set autoscale noextend
 
+ By default autoscaling sets the axis range limits to the nearest tic label
+ position that includes all the plot data. Keywords `fixmin`, `fixmax`, `fix`
+ or `noextend` tell gnuplot to disable extension of the axis range to the next
+ tic mark position. In this case the axis range limit exactly matches the
+ coordinate of the most extreme data point.  `set autoscale noextend` is a
+ synonym for `set autoscale fix`.  Range extension for a single axis can be
+ disabled by appending the `noextend` keyword to the corresponding range
+ command, e.g.
+      set yrange [0:*] noextend
+
+ `set autoscale keepfix` autoscales all axes while leaving the fix settings
+ unchanged.
+4 examples
+?autoscale examples
+?set autoscale examples
  Examples:
 
  This sets autoscaling of the y axis (other axes are not affected):
