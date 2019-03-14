@@ -4587,16 +4587,10 @@ Ffigure_linespoints
 
 2 parallelaxes
 ?plotting styles parallelaxes
-?style parallelaxes
 ?with parallelaxes
 ?parallelaxes
+?parallel
 Ffigure_parallel
- Syntax:
-
-     set style data parallelaxes
-     plot $DATA using col1{:varcol1} {at <xpos>} {<line properties}, \
-          $DATA using col2, ...
-
  Parallel axis plots can highlight correlation in a multidimensional data set.
  Individual columns of input data are each associated with a separately scaled
  vertical axis.  If all columns are drawn from a single file then each line on
@@ -4604,6 +4598,12 @@ Ffigure_parallel
  It is common to use some discrete categorization to assign line colors,
  allowing visual exploration of the correlation between this categorization and
  the axis dimensions.
+
+ Syntax:
+
+     set style data parallelaxes
+     plot $DATA using col1{:varcol1} {at <xpos>} {<line properties}, \
+          $DATA using col2, ...
 
  Note: This version of gnuplot introduces a CHANGE in the syntax for plot style
  parallelaxes.  The revised syntax allows an unlimited number of parallel axes.
@@ -13616,6 +13616,15 @@ Ffigure_multiple_keys
 
  For defining ellipse objects, see `set object ellipse`;
  for the 2D plot style, see `ellipses`.
+4 set style parallelaxis
+?commands set style parallelaxis
+?set style parallelaxis
+?show style parallelaxis
+
+ Syntax: set style parallelaxis {front|back} {line-properties}
+
+ Determines the line type and layer for drawing the vertical axes in plots
+ `with parallelaxes`.  See `with parallelaxes`, `set paxis`.
 4 set style textbox
 ?commands set style textbox
 ?commands show style textbox

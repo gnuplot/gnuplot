@@ -600,9 +600,9 @@ reset
 set output out . 'figure_parallel' . ext
 unset border
 unset key
-set xrange [] noextend
+set xrange [.5:4.5]
 unset ytics
-set xtics 1 format "axis %g" scale 0,0
+set xtics 1,1,4 format "axis %g" scale 0,0
 set for [axis=1:4] paxis axis tics
 set paxis 2 range [0:30]
 set paxis 4 range [-1:15]
