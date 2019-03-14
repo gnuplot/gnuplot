@@ -70,6 +70,7 @@ static void box_range_fiddling(struct curve_points *plot);
 static void boxplot_range_fiddling(struct curve_points *plot);
 static void histogram_range_fiddling(struct curve_points *plot);
 static void impulse_range_fiddling(struct curve_points *plot);
+static void parallel_range_fiddling(struct curve_points *plot);
 static int check_or_add_boxplot_factor(struct curve_points *plot, char* string, double x);
 static void add_tics_boxplot_factors(struct curve_points *plot);
 
@@ -1114,7 +1115,7 @@ get_data(struct curve_points *current_plot)
 	     */
 	    coordval x = parallel_axis_array[paxis_current-1].paxis_x;
 	    coordval y = v[1];
-	    store2d_point(current_plot, i++, x, y, x-0.5, x+0.5, y, y, 0.0); 
+	    store2d_point(current_plot, i++, x, y, x, x, y, y, 0.0); 
 	    break;
 	}
 
@@ -1244,6 +1245,7 @@ store2d_point(
     case FSTEPS:
     case HISTEPS:
     case ARROWS:
+    case PARALLELPLOT:
 	cp->xlow = xlow;
 	cp->xhigh = xhigh;
 	cp->ylow = ylow;
@@ -1304,14 +1306,6 @@ store2d_point(
     case IMAGE:
 	STORE_AND_UPDATE_RANGE(cp->CRD_COLOR, width, dummy_type,
 				COLOR_AXIS, current_plot->noautoscale, NOOP);
-	break;
-
-    case PARALLELPLOT:
-	/* FIXME:  Might be better to use a parallelplot_range_fiddling routine */
-	store_and_update_range(&(cp->xlow), xlow, &dummy_type, x_axis_ptr, current_plot->noautoscale);
-	store_and_update_range(&(cp->xhigh), xhigh, &dummy_type, x_axis_ptr, current_plot->noautoscale);
-	store_and_update_range(&(cp->ylow), ylow, &dummy_type, y_axis_ptr, current_plot->noautoscale);
-	store_and_update_range(&(cp->yhigh), yhigh, &dummy_type, y_axis_ptr, current_plot->noautoscale);
 	break;
 
     default:			/* auto-scale to xlow xhigh ylow yhigh */
@@ -1647,6 +1641,31 @@ impulse_range_fiddling(struct curve_points *plot)
     }
 }
 
+/* Clean up x and y axis bounds for parallel plots */
+static void
+parallel_range_fiddling(struct curve_points *plot)
+{
+    int num_parallelplots = 0;
+
+    while (plot) {
+	if (plot->plot_style == PARALLELPLOT) {
+	    double x = parallel_axis_array[plot->p_axis-1].paxis_x;
+	    autoscale_one_point( (&axis_array[plot->x_axis]), x-1.0 );
+	    autoscale_one_point( (&axis_array[plot->x_axis]), x+1.0 );
+	    num_parallelplots++;
+	}
+	plot = plot->next;
+    }
+
+    /* The normal y axis is not used by parallel plots, so if no */
+    /* range is established then we get lots of warning messages */
+    if (num_parallelplots > 0) {
+	if (axis_array[FIRST_Y_AXIS].min == VERYLARGE)
+	    axis_array[FIRST_Y_AXIS].min = 0.0;
+	if (axis_array[FIRST_Y_AXIS].max == -VERYLARGE)
+	    axis_array[FIRST_Y_AXIS].max = 1.0;
+    }
+}
 
 /* store_label() is called by get_data for each point */
 /* This routine is exported so it can be shared by plot3d */
@@ -3216,6 +3235,12 @@ eval_plots()
     if (!uses_axis[FIRST_X_AXIS] && !uses_axis[SECOND_X_AXIS])
 	if (first_plot->plot_type == NODATA)
 	    int_error(NO_CARET,"No data in plot");
+
+    /* Parallelaxis plots do not use the normal y axis so if no other plots
+     * are present yrange may still be undefined. We fix that now.
+     * In the absence of parallelaxis plots this call does nothing.
+     */
+    parallel_range_fiddling(first_plot);
 
     /* gnuplot version 5.0 always used x1 to track autoscaled range
      * regardless of whether x1 or x2 was used to plot the data. 
