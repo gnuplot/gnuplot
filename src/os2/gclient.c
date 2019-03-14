@@ -2101,6 +2101,20 @@ SwapFont(HPS hps, char *szFNS)
 		fat.fsSelection |= FATTR_SEL_BOLD;
 	    if (strstr(szFontName, ":Italic"))
 		fat.fsSelection |= FATTR_SEL_ITALIC;
+
+	    // Use the default encoding for symbol fonts for all encodings but UTF-8
+	    if (codepage != 1208) { // not UTF-8
+		LONG lCount = 1;
+		FONTMETRICS fm;
+
+		// Query font metrics
+		GpiQueryFonts(hps, QF_PUBLIC, fat.szFacename,
+			      &lCount, (LONG) sizeof(FONTMETRICS), &fm);
+		// Test for magic number of a symbol font with special encoding
+		if (lCount > 0 && fm.usCodePage == 65400)
+		    fat.usCodePage = 0;
+	    }
+
 	    DEBUG_FONT(("SwapFont: '%s' - '%s' - '%s', %x", szFNS, szFontName, fat.szFacename, fat.fsSelection));
 
 	    tabFont[itab].name = strdup(szFontName);
