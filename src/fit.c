@@ -125,6 +125,7 @@ static void Dblfn();
 # include <dos.h>
 #endif
 #ifdef _WIN32
+# include <fcntl.h>
 # include "win/winmain.h"
 #endif
 

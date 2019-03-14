@@ -44,6 +44,7 @@
 #include "scanner.h"		/* so that scanner() can count curly braces */
 #include "setshow.h"
 #ifdef _WIN32
+# include <fcntl.h>
 # if defined(__WATCOMC__) || defined(_MSC_VER)
 #  include <io.h>        /* for setmode() */
 # endif
