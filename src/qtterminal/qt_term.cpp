@@ -486,13 +486,16 @@ void qt_sendFont()
 			if (qt->socket.bytesAvailable() < (int)sizeof(gp_event_t)) {
 				fprintf(stderr, (waitcount++ % 10 > 0) ? "  ."
 					: "\nWarning: slow font initialization");
-#ifdef Q_OS_MAC
+#ifndef Q_OS_MAC
 				// OSX can be slow (>30 seconds?!) in determining font metrics
-				// Give it more time rather than failing after 1 second 
-				// Possibly this is only relevant to Qt5
-				GP_SLEEP(0.5);
-				continue;
+				// Always give it more time rather than failing after 1 second
+				// Everyone else can use --slow on the command line
+				if (slow_font_startup)
 #endif
+				{
+				    GP_SLEEP(0.5);
+				    continue;
+				}
 				return;
 			}
 			while (qt->socket.bytesAvailable() >= (int)sizeof(gp_event_t))
