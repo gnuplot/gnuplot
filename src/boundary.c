@@ -1082,6 +1082,10 @@ find_maxl_keys(struct curve_points *plots, int count, int *kcnt)
     mlen = cnt = 0;
     this_plot = plots;
     for (curve = 0; curve < count; this_plot = this_plot->next, curve++) {
+
+	if (this_plot->plot_style == PARALLELPLOT)
+	    continue;
+
 	if (this_plot->title && !this_plot->title_is_suppressed && !this_plot->title_position) {
 	    ignore_enhanced(this_plot->title_no_enhanced);
 	    len = estimate_strlen(this_plot->title);
