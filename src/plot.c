@@ -122,9 +122,10 @@ static void wrapper_for_write_history(void);
 
 TBOOLEAN interactive = TRUE;	/* FALSE if stdin not a terminal */
 TBOOLEAN noinputfiles = TRUE;	/* FALSE if there are script files */
-TBOOLEAN reading_from_dash=FALSE; /* True if processing "-" as an input file */
-TBOOLEAN skip_gnuplotrc = FALSE;/* skip system gnuplotrc and ~/.gnuplot */
-TBOOLEAN persist_cl = FALSE; /* TRUE if -persist is parsed in the command line */
+TBOOLEAN reading_from_dash=FALSE;	/* True if processing "-" as an input file */
+TBOOLEAN skip_gnuplotrc = FALSE;	/* skip system gnuplotrc and ~/.gnuplot */
+TBOOLEAN persist_cl = FALSE; 		/* --persist command line option */
+TBOOLEAN slow_font_startup = FALSE;	/* --slow command line option */
 
 /* user home directory */
 static const char *user_homedir = NULL;
@@ -391,6 +392,7 @@ main(int argc_orig, char **argv)
 		    "  -V, --version\n"
 		    "  -h, --help\n"
 		    "  -p  --persist\n"
+		    "  -s  --slow\n"
 		    "  -d  --default-settings\n"
 		    "  -c  scriptfile ARG1 ARG2 ... \n"
 		    "  -e  \"command1; command2; ...\"\n"
@@ -414,6 +416,8 @@ main(int argc_orig, char **argv)
 #endif
 		) {
 	    persist_cl = TRUE;
+	} else if (!strncmp(argv[i], "-slow", 2) || !strcmp(argv[i], "--slow")) {
+	    slow_font_startup = TRUE;
 	} else if (!strncmp(argv[i], "-d", 2) || !strcmp(argv[i], "--default-settings")) {
 	    /* Skip local customization read from ~/.gnuplot */
 	    skip_gnuplotrc = TRUE;
@@ -647,6 +651,9 @@ RECOVER_FROM_ERROR_IN_DASH:
 		noinputfiles = FALSE;
 		do_string(*argv);
 		interactive = save_state;
+
+	    } else if (!strncmp(*argv, "-slow", 2) || !strcmp(*argv, "--slow")) {
+		slow_font_startup = TRUE;
 
 	    } else if (!strncmp(*argv, "-d", 2) || !strcmp(*argv, "--default-settings")) {
 		/* Ignore this; it already had its effect */

@@ -45,6 +45,7 @@
 extern TBOOLEAN interactive;
 extern TBOOLEAN noinputfiles;
 extern TBOOLEAN persist_cl;
+extern TBOOLEAN slow_font_startup;
 
 extern const char *user_shell;
 

@@ -571,6 +571,7 @@ C
       -h, --help
       -p  --persist
       -d  --default-settings
+      -s  --slow
       -e  "command1; command2; ..."
       -c  scriptfile ARG1 ARG2 ...
 
@@ -579,6 +580,9 @@ C
 
  -d tells the program not to execute any private or system initialization
  (see `initialization`).
+
+ -s tells the program to wait for slow font initialization on startup.
+  Otherwise it prints an error and continues with bad font metrics.
 
  -e "command" tells gnuplot to execute that single command before continuing.
 
