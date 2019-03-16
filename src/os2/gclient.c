@@ -2850,14 +2850,21 @@ ReadGnu(void* arg)
 		    break;
 #endif
 		case 'c': /* set codepage */
-		    BufRead(hRead, &codepage, sizeof(codepage), &cbR);
-		    SelectFont(hps, szFontNameSize);
+		{
+		    int cp;
+
+		    BufRead(hRead, &cp, sizeof(cp), &cbR);
+		    if (codepage != cp) {
+			codepage = cp;
+			SelectFont(hps, szFontNameSize);
+		    }
 		    break;
-	        case '^': /* raise window */
+		}
+		case '^': /* raise window */
 		    WinSetWindowPos(hwndFrame, HWND_TOP, 0,0,0,0, SWP_RESTORE|SWP_SHOW|SWP_ACTIVATE|SWP_ZORDER);
 		    WinSetFocus( HWND_DESKTOP, hApp );
 		    break;
-	        case '_': /* lower window */
+		case '_': /* lower window */
 		    WinSetWindowPos(hwndFrame, HWND_BOTTOM, 0,0,0,0, SWP_ZORDER);
 		    break;
 		}
