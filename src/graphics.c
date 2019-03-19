@@ -3720,31 +3720,21 @@ place_raxis()
 static void
 place_parallel_axes(struct curve_points *first_plot, int pcount, int layer)
 {
-    int j;
-    int axes_in_use = 0;
     struct curve_points *plot = first_plot;
+    struct axis *this_axis;
+    int j, axes_in_use = 0;
 
-    /* Check for use of parallel axes */
+    /* Walk through the plots and prepare parallel axes as needed */
     for (plot = first_plot; plot; plot = plot->next) {
-    	if (plot->plot_type == DATA && plot->plot_style == PARALLELPLOT && plot->p_count > 0)
-	    if (axes_in_use < plot->p_axis)
-		axes_in_use = plot->p_axis;
-    }
-
-    /* Set up the vertical scales used by axis_map() */
-    for (j = 1; j <= axes_in_use; j++) {
-	struct axis *this_axis = &parallel_axis_array[j-1]; 
-	axis_invert_if_requested(this_axis);
-	this_axis->term_lower = plot_bounds.ybot;
-	this_axis->term_scale =
-	    (plot_bounds.ytop - plot_bounds.ybot)
-	    / (this_axis->max - this_axis->min);
-
-	FPRINTF((stderr,
-	    "axis p%d: min %g max %g set_min %g set_max %g autoscale %o set_autoscale %o\n",
-	    j, this_axis->min, this_axis->max, this_axis->set_min, this_axis->set_max,
-	    this_axis->autoscale, this_axis->set_autoscale));
-	setup_tics(this_axis, 20);
+	if (plot->plot_style == PARALLELPLOT && plot->p_count > 0) {
+	    axes_in_use = plot->p_axis;
+	    this_axis = &parallel_axis_array[plot->p_axis - 1];
+	    axis_invert_if_requested(this_axis);
+	    this_axis->term_lower = plot_bounds.ybot;
+	    this_axis->term_scale = (plot_bounds.ytop - plot_bounds.ybot)
+				  / (this_axis->max - this_axis->min);
+	    setup_tics(this_axis, 20);
+	}
     }
 
     if (parallel_axis_style.layer == LAYER_FRONT && layer == LAYER_BACK)
