@@ -9034,6 +9034,14 @@ Ffigure_fenceplot
  points for the next y-isoline, and so on.  A single blank line (a line
  containing no characters other than blank spaces and a carriage return and/or
  a line feed) separates one y-isoline from the next.
+
+ While `set contour` is in effect, `splot with <style>` will place the 
+ style elements (points, lines, impulses, labels, etc) along the contour lines.
+ `with pm3d` will produce a pm3d surface and also contour lines.
+ If you want to mix other plot elements, say labels read from a file, with
+ the contours generated while `set contour` is active you must append the
+ keyword `nocontours` after that clause in the splot command.
+
  See also `splot datafile`.
 
  See also
