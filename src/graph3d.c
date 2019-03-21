@@ -1120,8 +1120,11 @@ do_3dplot(
 
 	    case LABELPOINTS:
 		if (draw_this_surface) {
-		    if (!hidden3d || this_plot->opt_out_of_hidden3d)
-			place_labels3d(this_plot->labels->next, LAYER_PLOTLABELS);
+		    if (hidden3d && !(this_plot->opt_out_of_hidden3d))
+			break;
+		    if (draw_contour && !(this_plot->opt_out_of_contours))
+			break;
+		    place_labels3d(this_plot->labels->next, LAYER_PLOTLABELS);
 		}
 		break;
 
