@@ -1943,6 +1943,9 @@ eval_3dplots()
 	    if (this_plot->plot_style == TABLESTYLE)
 		int_error(NO_CARET, "use `plot with table` rather than `splot with table`"); 
 
+	    if (this_plot->plot_style == PARALLELPLOT)
+		int_error(NO_CARET, "plot style parallelaxes not supported in 3D");
+
 	    /* set default values for title if this has not been specified */
 	    this_plot->title_is_automated = FALSE;
 	    if (!set_title) {
