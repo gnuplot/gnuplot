@@ -1865,6 +1865,14 @@ eval_3dplots()
 		    this_plot->lp_properties.p_size = 1;
 	    }
 
+	    /* FIXME: Leaving an explicit font in the label style for contour */
+	    /* labels causes a double-free segfault.  Clear it preemptively.  */
+	    if (this_plot->plot_style == LABELPOINTS
+	    &&  (draw_contour && !this_plot->opt_out_of_contours)) {
+		free(this_plot->labels->font);
+		this_plot->labels->font = NULL;
+	    }
+
 	    if (crnt_param == 0
 		&& this_plot->plot_style != PM3DSURFACE
 		/* don't increment the default line/point properties if
@@ -2525,8 +2533,6 @@ parametric_3dfixup(struct surface_points *start_plot, int *plot_num)
 static void load_contour_label_options (struct text_label *contour_label)
 {
     struct lp_style_type *lp = &(contour_label->lp_properties);
-    if (!contour_label->font)
-	contour_label->font = gp_strdup(clabel_font);
     lp->p_interval = clabel_interval;
     lp->flags |= LP_SHOW_POINTS;
     lp_parse(lp, LP_ADHOC, TRUE);

@@ -22,6 +22,7 @@ Changes in 5.2.7
 * FIX prevent extra read past the end of a datablock holding matrix data
 * FIX pm - issues in box and polygon fill, (wide) lines, enhanced text, images
 * FIX dropped character in piped input stream if plot window is manually closed
+* FIX extraneous dots and potential segfault from splot with contour labels
 
 Changes in 5.2.6
 ================

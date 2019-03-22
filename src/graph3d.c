@@ -1365,7 +1365,6 @@ do_3dplot(
 			    free(thiscontour_label);
 			    thiscontour_label = gp_strdup(c);
 			}
-			/* cntr3d_lines(cntrs, &thiscontour_lp_properties); */
 			cntr3d_labels(cntrs, thiscontour_label, this_plot->labels);
 			break;
 
@@ -2061,6 +2060,7 @@ cntr3d_labels(struct gnuplot_contours *cntr, char *level_text, struct text_label
 		continue;
 	    map3d_xy(cntr->coords[i].x, cntr->coords[i].y, base_z, &x, &y);
 	    label->text = level_text;
+	    label->font = clabel_font;
 	    if (hidden3d) {
 		map3d_xyz(cntr->coords[i].x, cntr->coords[i].y, base_z, &v);
 		v.real_z = cntr->coords[i].z;
@@ -2070,6 +2070,7 @@ cntr3d_labels(struct gnuplot_contours *cntr, char *level_text, struct text_label
 		write_label(x, y, label);
 	    }
 	    label->text = NULL;		/* Otherwise someone will try to free it */
+	    label->font = NULL;
 	}
     }
 }

@@ -1,3 +1,12 @@
+2019-03-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot3d.c src/graph3d.c:
+	The command 'splot FOO with labels' is potentially ambiguous.
+	It could be a request for auto-generated contour labels or it could
+	be a request to take individual labels from a file.  But it cannot be
+	both at the same time.  Now we insure that the correct choice is made.
+	Bug #2154
+
 2019-02-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c (event_reset):
