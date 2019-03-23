@@ -244,7 +244,7 @@ SVG_Pen_RealID (int inPenCode)
 	inPenCode %= 13;	/* normalize pen code*/
     inPenCode += 3;
     if (inPenCode < 0)
-	inPenCode = 0;		/* LT_NODRAW or LT_BACKGROUND should use background color */
+	inPenCode = 0;		/* LT_BACKGROUND should use background color */
 
     return (inPenCode);
 }
@@ -306,7 +306,9 @@ SVG_PathOpen ()
 	fputs ("\t<path ", gpoutfile);
 
 	/* Line color */
-	if (SVG_color_mode == TC_RGB)
+	if (SVG_LineType == LT_NODRAW)
+	    fprintf(gpoutfile, "stroke='none' ");
+	else if (SVG_color_mode == TC_RGB)
 	    fprintf(gpoutfile, "stroke='rgb(%3d, %3d, %3d)' ",
 		    SVG_red, SVG_green, SVG_blue);
 	else if (SVG_color_mode == TC_LT)
