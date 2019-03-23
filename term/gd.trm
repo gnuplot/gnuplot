@@ -1550,12 +1550,16 @@ PNG_vector(unsigned int x, unsigned int y)
 {
     int lw = png_state.linewidth;
 
+    if (png_state.linetype == LT_NODRAW) {
+	/* Treat this as PNG_move */
+	;
+
     /* This terminal does not support dashed lines in general, but does   */
     /* render LT_AXIS as a dotted line, used for zeroaxis and grid lines. */
     /* Nov 2014 - rewritten using the algorithm from the canvas terminal. */
     /* FIXME: should either fix this up the rest of the way to support    */
     /* general dash patterns or simplify it back for dotted lines only.   */
-    if (png_state.linetype == LT_AXIS) {
+    } else if (png_state.linetype == LT_AXIS) {
 	static int last_lw = -1;
 	static int last_color = -1;
 	static double dashpattern[4] = {0.1, 0.5, 0.6, 1.0};
@@ -1658,21 +1662,25 @@ PNG_vector(unsigned int x, unsigned int y)
 TERM_PUBLIC void
 PNG_linetype(int type)
 {
+    int typeindex;
+
     if (type >= (GD_DEFINED_COLORS - 3))
 	type %= (GD_DEFINED_COLORS - 3);
-    if (type <= LT_BACKGROUND) /* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
-	type = -3;	/* Draw in background color */
+    typeindex = type;
+    if (typeindex < -3) /* LT_BACKGROUND, LT_UNDEFINED */
+	typeindex = -3;	/* Draw in background color */
 
-    if (type + 3 >= png_state.n_colors) {
-	int rgb = pm3d_color_names_tbl[type + 3].value;
+    if (typeindex + 3 >= png_state.n_colors) {
+	int rgb = pm3d_color_names_tbl[typeindex + 3].value;
 	png_state.color = gdImageColorResolve(png_state.image, 
 				(rgb >> 16) & 0xff, (rgb >> 8) & 0xff, rgb & 0xff);
 	png_state.rgb = rgb;
     } else {
-	png_state.color = png_state.color_table[type + 3];
-	png_state.rgb = png_state.rgb_table[type + 3];
+	png_state.color = png_state.color_table[typeindex + 3];
+	png_state.rgb = png_state.rgb_table[typeindex + 3];
     }
-    png_state.linetype = type;
+
+    png_state.linetype = type;	/* NB: may still have type <= LT_NODRAW */
 
     if (type == LT_AXIS)
 	png_state.dashfraction = -1.0;

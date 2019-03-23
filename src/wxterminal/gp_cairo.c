@@ -609,7 +609,8 @@ void gp_cairo_stroke(plot_struct *plot)
 	cairo_save(plot->cr);
 
 	if (plot->linetype == LT_NODRAW) {
-		cairo_set_operator(plot->cr, CAIRO_OPERATOR_XOR);
+		cairo_set_operator(plot->cr, CAIRO_OPERATOR_DEST);
+		lw = 0.0;
 
 	} else if (lt == LT_AXIS || plot->linestyle == GP_CAIRO_DOTS) {
 		/* Grid lines (lt 0) */
