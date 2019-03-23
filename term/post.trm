@@ -1996,6 +1996,8 @@ PS_reset()
 TERM_PUBLIC void
 PS_linetype(int linetype)
 {
+    if (linetype == LT_NODRAW)
+	PS_dashtype(DASHTYPE_NODRAW, NULL);
     if ((ps_params->terminal == PSTERM_EPSLATEX) && ps_params->oldstyle)
 	linetype = (linetype % 4) + 3;
     else
@@ -2031,6 +2033,10 @@ PS_dashtype(int type, t_dashtype *custom_dash_type)
 		PS_FLUSH_PATH;
 		if (PS_linetype_last != LT_SOLID+3 && PS_linetype_last != LT_AXIS+3)
 		    fprintf(gppsfile, "[] 0 setdash\n");
+		break;
+    case DASHTYPE_NODRAW:
+		PS_FLUSH_PATH;
+		fprintf(gppsfile, "[0 100] 0 setdash\n");
 		break;
     case DASHTYPE_CUSTOM:
 		PS_FLUSH_PATH;
