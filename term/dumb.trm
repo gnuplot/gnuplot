@@ -101,6 +101,7 @@ TERM_PUBLIC void dumb_set_color(t_colorspec *);
 #define DUMB_AXIS_CONST '\1'
 #define DUMB_BORDER_CONST '\2'
 #define DUMB_FILL_CONST '\3'
+#define DUMB_NODRAW_CONST '\4'
 
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
@@ -480,6 +481,8 @@ DUMB_linetype(int linetype)
 	dumb_pen = DUMB_BORDER_CONST;
     else if (linetype == LT_AXIS)
 	dumb_pen = DUMB_AXIS_CONST;
+    else if (linetype == LT_NODRAW)
+	dumb_pen = DUMB_NODRAW_CONST;
     else if (linetype <= LT_NODRAW)
 	dumb_pen = ' ';
     else {
@@ -517,6 +520,11 @@ DUMB_vector(unsigned int arg_x, unsigned int arg_y)
     int y = arg_y;		/* abs and cast to double wouldn't work */
     char pen, pen1;
     int delta;
+
+    if (dumb_pen == DUMB_NODRAW_CONST) {
+	DUMB_move(x, y);
+	return;
+    }
 
     if (ABS(y - dumb_y) > ABS(x - dumb_x)) {
 	switch (dumb_pen) {
