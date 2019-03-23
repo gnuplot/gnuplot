@@ -914,11 +914,17 @@ CANVAS_linetype(int linetype)
 	fprintf(gpoutfile, "ctx.strokeStyle = \"%s\";\n", canvas_state.color);
 	strcpy(canvas_state.previous_color, canvas_state.color);
     }
+
+    if (canvas_line_type == LT_NODRAW)
+	CANVAS_dashtype(DASHTYPE_NODRAW, NULL);
 }
 
 TERM_PUBLIC void
 CANVAS_dashtype(int type, t_dashtype *custom_dash_type)
 {
+    if (canvas_line_type == LT_NODRAW)
+	type = DASHTYPE_NODRAW;
+
     if (canvas_line_type == LT_AXIS)
 	type = DASHTYPE_AXIS;
 
@@ -931,6 +937,10 @@ CANVAS_dashtype(int type, t_dashtype *custom_dash_type)
     case DASHTYPE_SOLID:
 	if (canvas_dash_type != DASHTYPE_SOLID)
 	    fprintf(gpoutfile, "DT(gnuplot.solid);\n");
+	break;
+
+    case DASHTYPE_NODRAW:
+	fprintf(gpoutfile, "DT([0.0,1.0]);\n");
 	break;
 
     default:

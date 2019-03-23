@@ -974,10 +974,11 @@ EMF_linetype(int linetype)
     EMF_flush_polyline();
 
     if (linetype == LT_NODRAW)
-	linetype = LT_BACKGROUND;
+	EMF_load_dashtype(DASHTYPE_NODRAW);
+    else
+	EMF_linecolor(linetype);
 	
     emf_linetype = linetype;
-    EMF_linecolor(linetype);
 
     if (linetype == LT_SOLID)
 	EMF_load_dashtype(0);
@@ -1225,6 +1226,13 @@ EMF_load_dashtype(int dashtype)
 	for (i = 0; i < 8; i += 1)
 	    dot_length[(EMF_LINE_TYPES-1)*8 + i] =
 		emf_dashpattern[i] * ceil(emf_linewidth * empirical_scale/2.);
+    }
+
+    if (dashtype == DASHTYPE_NODRAW) {
+	dashtype = EMF_LINE_TYPES;	/* Point to placeholder array */
+	for (i = 0; i < 7; i++)
+	    dot_length[(EMF_LINE_TYPES-1)*8 + i] = 0;
+	dot_length[(EMF_LINE_TYPES-1)*8 + 7] = 10;
     }
 
     if (dashtype < 1 || !emf_dashed) {	/* solid mode */

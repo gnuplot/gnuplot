@@ -58,6 +58,7 @@
 #define LT_DEFAULT    (-7)
 
 /* Pre-defined dash types */
+#define DASHTYPE_NODRAW (-4)
 #define DASHTYPE_CUSTOM (-3)
 #define DASHTYPE_AXIS   (-2)
 #define DASHTYPE_SOLID  (-1)
