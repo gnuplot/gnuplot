@@ -1038,29 +1038,6 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	return  0L;
 #endif
 
-#if 0
-    case WM_BUTTON1DBLCLK:
-	/* put the mouse coordinates to the clipboard */
-	if (!IGNORE_MOUSE) {
-	    SHORT mx = MOUSEMSG(&message)->x;
-	    SHORT my = MOUSEMSG(&message)->y;
-	    double x, y;
-	    char s[256];
-	    int frm = ulMouseSprintfFormatItem - IDM_MOUSE_FORMAT_X_Y;
-
-	    /* Note: Another solution of getting mouse position
-	     *(available at any method, not just in this handle
-	     * event) is the following one:
-	     *
-	     * ok = WinQueryPointerPos(HWND_DESKTOP, &pt); // pt contains pos wrt desktop
-	     * WinMapWindowPoints(HWND_DESKTOP, hWnd, &pt, 1); // pt contains pos wrt our hwnd window
-	     * sprintf(s,"[%li,%li]",pt.x,pt.y);
-	     */
-
-	}
-	return 0L; /* end of case WM_BUTTON1DBLCLK */
-#endif
-
     case WM_BUTTON2CLICK: /* WM_BUTTON2UP: */
 	/* make zoom */
 	if (! IGNORE_MOUSE) {
@@ -1141,9 +1118,9 @@ SetMouseCoords(HWND hWnd, MPARAM mp1, int n, char *f)
     ChangeCheck(hWnd, ulMouseSprintfFormatItem, SHORT1FROMMP(mp1));
     ulMouseSprintfFormatItem = SHORT1FROMMP(mp1);
     if (n >= 0)
-	sprintf(s,"set mouse mouseformat %i clipboardformat %i", n, n);
+	sprintf(s, "set mouse mouseformat %i", n);
     else
-	sprintf(s,"set mouse mouseformat \"%s\" clipboardformat \"%s\"", f, f);
+	sprintf(s, "set mouse mouseformat \"%s\"", f);
     gp_execute(s);
 }
 
@@ -1332,7 +1309,7 @@ WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 
     case IDM_USEMOUSE: /* toggle using/not using mouse cursor tracking */
 	useMouse = !useMouse;
-	ChangeCheck(hWnd, IDM_USEMOUSE, useMouse?IDM_USEMOUSE:0);
+	ChangeCheck(hWnd, IDM_USEMOUSE, useMouse ? IDM_USEMOUSE : 0);
 	gp_execute(useMouse ? "set mouse" : "unset mouse");
 #if 0
 	if (!useMouse) /* redraw screen */
