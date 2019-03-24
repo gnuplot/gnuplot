@@ -322,9 +322,16 @@ static struct gen_table PM_opt_table[] =
 TERM_PUBLIC void
 PM_options()
 {
+    static TBOOLEAN first_init = TRUE;
     int old_termmode;
     char * title;
     TBOOLEAN need_title = FALSE;
+
+    // honor command line persist option
+    if (first_init) {
+	PM_persist = persist_cl || PM_persist;
+	first_init = FALSE;
+    }
 
     while (!END_OF_COMMAND) {
 	switch (lookup_table(&PM_opt_table[0], c_token)) {
