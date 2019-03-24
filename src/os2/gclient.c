@@ -950,6 +950,11 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	break;
     }
 
+    case WM_FOCUSCHANGE:
+	if (!SHORT1FROMMP(mp2)) /* losing focus */
+	    gp_exec_event(GE_reset, 0, 0, 0, 0, 0);
+	break;
+
     case WM_SIZE :
 	WinInvalidateRect(hWnd, NULL, TRUE);
 	break;
