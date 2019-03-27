@@ -313,6 +313,8 @@ imag(struct value *val)
 	/*     x = 2;  plot sprintf(format,x)         */
 	int_warn(NO_CARET, "encountered a string when expecting a number");
 	int_error(NO_CARET, "Did you try to generate a file name using dummy variable x or y?");
+    case NOTDEFINED:
+	return not_a_number();
     default:
 	int_error(NO_CARET, "unknown type in imag()");
     }

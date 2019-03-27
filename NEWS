@@ -2,6 +2,7 @@ Changes in 5.2.7
 ================
 * NEW "set pm3d noclipcb" will skip drawing quadrangles with color < cbmin
 * NEW pm - utf8, dashed lines, bold/italic text
+* NEW imaginary component of array values is available to "using" in column 3
 * CHANGE splot "with points pt 0" should act like "with dots"
 * CHANGE (tikz) improved default interpretation of gnuplot arrowhead style
 * CHANGE teach hidden3d to handle double-headed vectors (arrowstyle "heads")
@@ -160,8 +161,8 @@ Changes in 5.2.rc2
 * FIX dumb term: linetype character distinction was lost if not in color mode 
 * CHANGE svg terminal option "fontscale" replaces obsolete "fsize"
 
-Changes and new features in 5.2
-===============================
+New features, changes and fixes in gnuplot version 5.2 (initial release)
+========================================================================
 * NEW plot styles
 * NEW    splot ... using <x>:<y>:<z>:<zlow>:<zhigh> with zerrorfill
 * NEW    "set jitter" allows creation of bee swarm plots

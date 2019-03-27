@@ -1997,9 +1997,12 @@ df_readascii(double v[], int max)
 	    df_column[1].datum = df_pseudovalue_1;
 
 	/* Similar to above, we can go back to the original numerical value of A[i] */
-	if (df_array && df_array->udv_value.v.value_array[df_array_index].type == CMPLX)
+	if (df_array && df_array->udv_value.v.value_array[df_array_index].type == CMPLX) {
 	    df_column[1].datum =
 		df_array->udv_value.v.value_array[df_array_index].v.cmplx_val.real;
+	    df_column[2].datum =
+		df_array->udv_value.v.value_array[df_array_index].v.cmplx_val.imag;
+	}
 
 	/* Always save the contents of the first row in case it is needed for
 	 * later access via column("header").  However, unless we know for certain that
@@ -5610,9 +5613,12 @@ clear_df_column_headers()
     df_longest_columnhead = 0;
 }
 
-/* The main loop in df_readascii wants a string to process. */
-/* We generate one from the current array entry containing  */
-/* the array index in column 1 and the value in column 2.   */
+/* The main loop in df_readascii wants a string to process.
+ * We generate one from the current array entry containing
+ * column 1: array index
+ * column 2: array value (real component)
+ * column 3: array value (imaginary component)
+ */
 static char *
 df_generate_ascii_array_entry()
 {
@@ -5628,7 +5634,7 @@ df_generate_ascii_array_entry()
 	    df_line = gp_realloc(df_line, max_line_len *= 2, "datafile line buffer");
 	snprintf(df_line, max_line_len-1, "%d \"%s\"", df_array_index, entry->v.string_val);
     } else {
-	snprintf(df_line, max_line_len-1, "%d %g", df_array_index, real(entry));
+	snprintf(df_line, max_line_len-1, "%d %g %g", df_array_index, real(entry), imag(entry));
     }
 	
     return df_line;
