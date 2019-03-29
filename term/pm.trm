@@ -128,6 +128,7 @@ static TBOOLEAN PM_persist = FALSE;
 static TBOOLEAN PM_enhanced = TRUE;
 static int PM_plot_number = 0;
 static char PM_term_title[128] = "";
+static char PM_def_font[128] = "";
 
 static char PM_opts[256] = "";
 static TBOOLEAN PM_optargs = FALSE;
@@ -296,7 +297,7 @@ PM_make_servername(char *str)
 
 
 enum PM_id { PM_DEFAULT,
-	     PM_TITLE,
+	     PM_TITLE, PM_FONT,
 	     PM_SERVER, PM_NOSERVER,
 	     PM_PERSIST, PM_NOPERSIST,
 	     PM_WIDELINES, PM_NOWIDELINES,
@@ -315,6 +316,7 @@ static struct gen_table PM_opt_table[] =
     { "e$nhanced", PM_ENHANCED },
     { "noe$nhanced", PM_NOENHANCED },
     { "ti$tle", PM_TITLE },
+    { "font", PM_FONT },
     { NULL, PM_OTHER }
 };
 
@@ -378,6 +380,19 @@ PM_options()
 	    term->put_text = PM_put_text;
 	    term->flags &= ~TERM_ENHANCED_TEXT;
 	    break;
+	case PM_FONT: {
+	    char * s;
+
+	    c_token++;
+	    s = try_to_get_string();
+	    if (s != NULL) {
+		safe_strncpy(PM_def_font, s, sizeof(PM_def_font));
+		free(s);
+	    } else {
+		PM_def_font[0] = NUL;
+	    }
+	    break;
+	}
 	case PM_TITLE:
 	    c_token++;
 	    need_title = TRUE;
@@ -438,9 +453,10 @@ PM_options()
 	PM_enhanced ? "" : "no");
     if (PM_plot_number > 0)
 	sprintf(term_options + strlen(term_options), " server %d", PM_plot_number);
-    if (PM_term_title[0]) {
+    if (PM_def_font[0] != NUL)
+	sprintf(term_options + strlen(term_options), " font  %s", PM_def_font);
+    if (PM_term_title[0])
 	sprintf(term_options + strlen(term_options), " title \"%s\"", PM_term_title);
-    }
 
     PM_must_reset_opts = TRUE;
 }
@@ -585,10 +601,24 @@ PM_graphics()
 	                          cp = 0; break;
 	};
 	putc(SET_SPECIAL, PM_pipe);
-	putc('c', PM_pipe); /*  set codepage */
+	putc(SET_SPECIAL_CODEPAGE, PM_pipe); /*  set codepage */
 	fwrite(&cp, sizeof(int), 1, PM_pipe);
 	fflush(PM_pipe);
 	last_encoding = encoding;
+    }
+    if (PM_def_font[0] != NUL) {
+	int len;
+
+	fprintf(stderr, "Setting default font: %s\n", PM_def_font);
+	putc(SET_SPECIAL, PM_pipe);
+	putc(SET_SPECIAL_FONT, PM_pipe); /*  set default font */
+	len = strlen(PM_def_font) + 1;
+	fwrite(&len, sizeof(int), 1, PM_pipe);
+	fwrite(PM_def_font, 1, len, PM_pipe);
+	for (len = sizeof(int) - len % sizeof(int); len > 0; len--) {
+	    /* pad rest of int with zeros */
+	    putc(NUL, PM_pipe);
+	}
     }
     PM_query();
     PM_mode = SET_GRAPHICS;
@@ -666,7 +696,7 @@ PM_put_text(unsigned int x, unsigned int y, const char *str)
 #ifdef PM_OLD_ENHANCED_TEXT
     if (ignore_enhanced_text) {
 	putc(SET_SPECIAL, PM_pipe);
-	putc('e', PM_pipe); /* switch the enhanced mode off */
+	putc(SET_SPECIAL_ENHANCED, PM_pipe); /* switch the enhanced mode off */
 	putc('0', PM_pipe);
     }
 #endif
@@ -685,7 +715,7 @@ PM_put_text(unsigned int x, unsigned int y, const char *str)
 #ifdef PM_OLD_ENHANCED_TEXT
     if (ignore_enhanced_text) {
 	putc(SET_SPECIAL, PM_pipe);
-	putc('e', PM_pipe); /* restore the enhanced mode */
+	putc(SET_SPECIAL_ENHANCED, PM_pipe); /* restore the enhanced mode */
 	putc('2', PM_pipe);
     }
 #endif
@@ -698,7 +728,7 @@ PM_justify_text(enum JUSTIFY mode)
 #ifdef PM_OLD_ENHANCED_TEXT
     if (ignore_enhanced_text) {
 	putc(SET_SPECIAL, PM_pipe);
-	putc('e', PM_pipe); /* switch the enhanced mode off */
+	putc(SET_SPECIAL_ENHANCED, PM_pipe); /* switch the enhanced mode off */
 	putc('0', PM_pipe);
     }
 #endif
@@ -712,7 +742,7 @@ PM_justify_text(enum JUSTIFY mode)
 #else
     if (ignore_enhanced_text) {
 	putc(SET_SPECIAL, PM_pipe);
-	putc('e', PM_pipe); /* restore the enhanced mode */
+	putc(SET_SPECIAL_ENHANCED, PM_pipe); /* restore the enhanced mode */
 	putc('2', PM_pipe);
     }
 #endif
@@ -721,28 +751,26 @@ PM_justify_text(enum JUSTIFY mode)
 
 
 TERM_PUBLIC int
-PM_set_font(const char *font)
+PM_set_font(const char *ifont)
 {
+    char * font = (char *) ifont;
     unsigned int len;
 
     putc(SET_FONT, PM_pipe);
-    if (font == NULL)
-        len = 0;
-    else
-        len = strlen(font);
-
+    if ((font == NULL) && (PM_def_font[0] != NUL))
+	font = PM_def_font;
+    len = (font == NULL) ? 0 : strlen(font);
     if (len == 0) {
-        fwrite(&len, sizeof(int), 1, PM_pipe);
+	fwrite(&len, sizeof(int), 1, PM_pipe);
     } else {
-        len += 1;
-        fwrite(&len, sizeof(int), 1, PM_pipe);
-        fwrite(font, 1, len, PM_pipe);
-        for (len = sizeof(int) - len % sizeof(int); len > 0; len--) {
+	len += 1;
+	fwrite(&len, sizeof(int), 1, PM_pipe);
+	fwrite(font, 1, len, PM_pipe);
+	for (len = sizeof(int) - len % sizeof(int); len > 0; len--) {
 	    /* pad rest of int with zeros */
 	    putc(NUL, PM_pipe);
-        }
+	}
     }
-
     return TRUE;
 }
 
@@ -767,7 +795,7 @@ PM_query_font(void)
     rc = DosRead(fileno(PM_pipe), &len, sizeof(int), &cbR);
     newfont = (char *)malloc( len + 1 );
     rc = DosRead(fileno(PM_pipe), newfont, len*sizeof(char), &cbR);
-    newfont[len] = '\0';
+    newfont[len] = NUL;
 
     PM_font = (char *)malloc( len + 1 );
     sscanf( newfont, "%i.%s", &fontsize, PM_font );
@@ -1173,7 +1201,7 @@ PM_enhanced_flush()
 	unsigned int x, y, len;
 	ULONG rc, cbR;
 
-	*enhanced_cur_text = '\0';
+	*enhanced_cur_text = NUL;
 
 	if (PM_must_abort)
 	    PM_abortplot();
@@ -1331,7 +1359,7 @@ void
 pm_raise_terminal_window()
 {
     putc(SET_SPECIAL, PM_pipe);
-    putc('^', PM_pipe); /* raise window */
+    putc(SET_SPECIAL_RAISE, PM_pipe); /* raise window */
     fflush(PM_pipe);
 }
 
@@ -1339,7 +1367,7 @@ void
 pm_lower_terminal_window()
 {
     putc(SET_SPECIAL, PM_pipe);
-    putc('_', PM_pipe); /* lower window */
+    putc(SET_SPECIAL_LOWER, PM_pipe); /* lower window */
     fflush(PM_pipe);
 }
 
@@ -1410,6 +1438,7 @@ START_HELP(pm)
 "       set terminal pm      {{server} {n} | noserver}",
 "                            {nopersist | persist}",
 "                            {enhanced | noenhanced}",
+"                            {font <fontspec>}",
 "                            {nowidelines | widelines}",
 "                            {{title} \"title\"}",
 "",

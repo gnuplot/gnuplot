@@ -2016,6 +2016,8 @@ SelectFont(HPS hps, char *szFontNameSize)
     }
     sizCurFont = sizBaseFont;
     sizCurSubSup = sizBaseSubSup;
+
+    strcpy(szCurrentFontNameSize, szFontNameSize);
 }
 
 
@@ -2816,7 +2818,7 @@ ReadGnu(void* arg)
 		BufRead(hRead, &opt, 1, &cbR);
 		switch (opt) {
 #ifdef PM_KEEP_OLD_ENHANCED_TEXT
-		case 'e': /* enhanced mode on, off and restore */
+		case SET_SPECIAL_ENHANCED: /* enhanced mode on, off and restore */
 		    param = -1;
 		    BufRead(hRead, &param, 1, &cbR);
 		    switch (param) {
@@ -2831,7 +2833,7 @@ ReadGnu(void* arg)
 		    }
 		    break;
 #endif
-		case 'c': /* set codepage */
+		case SET_SPECIAL_CODEPAGE: /* set codepage */
 		{
 		    int cp;
 
@@ -2842,11 +2844,57 @@ ReadGnu(void* arg)
 		    }
 		    break;
 		}
-		case '^': /* raise window */
+		case SET_SPECIAL_FONT: /* set default font */
+		{
+		    int len;
+
+		    BufRead(hRead, &len, sizeof(int), &cbR);
+		    len = (len + sizeof(int) - 1) / sizeof(int);
+
+		    if (len != 0) {
+			char font[FONTBUF];
+			char *p, *tmp, *str;
+
+			tmp = str = malloc(len * sizeof(int));
+			BufRead(hRead, str, len * sizeof(int), &cbR);
+			p = strchr(str, ',');
+			 /* preserve previous font size if no new one is given */
+			if (p == NULL) {
+			    p = strchr(szFontNameSize, '.');
+			    if (p != NULL) {
+				*p = '\0';
+				strcpy(font, szFontNameSize);
+			    } else {
+				strcpy(font, "14");
+			    }
+			} else {
+			    *p = '\0';
+			    strcpy(font, p + 1);
+			}
+			strcat(font, ".");
+			/* allow abbreviation of some well known font names */
+			FontExpand(str);
+			 /* preserve previous font name if no new one is given */
+			if (*str == NUL) {
+			    str = strchr(szFontNameSize, '.');
+			    if (str != NULL)
+				str++;
+			    else
+				str = "Helvetica";
+			}
+			strcat(font, str);
+			free(tmp);
+			strcpy(szFontNameSize, font);
+			SelectFont(hps, font);
+			DEBUG_FONT(("set default font: %s", font));
+		    }
+		    break;
+		}
+		case SET_SPECIAL_RAISE: /* raise window */
 		    WinSetWindowPos(hwndFrame, HWND_TOP, 0,0,0,0, SWP_RESTORE|SWP_SHOW|SWP_ACTIVATE|SWP_ZORDER);
 		    WinSetFocus( HWND_DESKTOP, hApp );
 		    break;
-		case '_': /* lower window */
+		case SET_SPECIAL_LOWER: /* lower window */
 		    WinSetWindowPos(hwndFrame, HWND_BOTTOM, 0,0,0,0, SWP_ZORDER);
 		    break;
 		}

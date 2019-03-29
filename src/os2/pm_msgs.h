@@ -77,5 +77,11 @@
 #define GR_IMAGE		'i'
 #define GR_RGB_IMAGE	'I'
 
-#endif
+/* "special" option commands */
+#define SET_SPECIAL_ENHANCED	'e'
+#define SET_SPECIAL_RAISE	'^'
+#define SET_SPECIAL_LOWER	'_'
+#define SET_SPECIAL_FONT	'f'
+#define SET_SPECIAL_CODEPAGE	'c'
 
+#endif
