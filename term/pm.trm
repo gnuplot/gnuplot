@@ -54,18 +54,19 @@ register_term(pm)
 TERM_PUBLIC void PM_init(void);
 TERM_PUBLIC void PM_options(void);
 TERM_PUBLIC void PM_reset(void);
+TERM_PUBLIC void PM_suspend(void);
+TERM_PUBLIC void PM_resume(void);
 TERM_PUBLIC void PM_text(void);
 TERM_PUBLIC void PM_graphics(void);
-TERM_PUBLIC void PM_linetype(int lt);
-TERM_PUBLIC void PM_dashtype(int dt, t_dashtype *custom_dash_pattern);
 TERM_PUBLIC void PM_move(unsigned int x, unsigned int y);
 TERM_PUBLIC void PM_vector(unsigned int x, unsigned int y);
+TERM_PUBLIC void PM_linetype(int lt);
+TERM_PUBLIC void PM_dashtype(int dt, t_dashtype *custom_dash_pattern);
 TERM_PUBLIC int PM_text_angle(int ang);
 TERM_PUBLIC void PM_put_text(unsigned int x, unsigned int y, const char *str);
 TERM_PUBLIC int PM_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC int PM_set_font(const char *font);
 TERM_PUBLIC void PM_point(unsigned int x, unsigned int y, int number);
-TERM_PUBLIC void PM_suspend(void);
-TERM_PUBLIC void PM_resume(void);
 TERM_PUBLIC void PM_fillbox(int style, unsigned int x, unsigned int y, unsigned int w, unsigned int h);
 TERM_PUBLIC void PM_linewidth(double linewidth);
 #ifdef USE_MOUSE
@@ -89,7 +90,6 @@ TERM_PUBLIC void PM_enhanced_flush(void);
 #endif
 
 /* define PM world coordinate limits */
-
 #define PM_XMAX 19500
 #define PM_YMAX 12500
 
@@ -113,7 +113,6 @@ TERM_PUBLIC void PM_enhanced_flush(void);
 #include <os2.h>
 #include "os2/pm_msgs.h"
 
-#define PM_nopts 1
 
 /* path for pm program */
 static char PM_path[PATH_MAX] = "";
@@ -121,13 +120,17 @@ static char PM_path[PATH_MAX] = "";
 static int PM_mode = 0;
 static HEV hev;
 static int PM_termmode = 0;
-static int PM_must_reset_opts = FALSE;
-static int PM_must_abort = 0;
+static TBOOLEAN PM_must_reset_opts = FALSE;
+static TBOOLEAN PM_must_abort = FALSE;
 
-static char PM_opts[256] = "";
-static int PM_optargs = 0;
+static TBOOLEAN PM_widelines = FALSE;
+static TBOOLEAN PM_persist = FALSE;
+static TBOOLEAN PM_enhanced = TRUE;
 static int PM_plot_number = 0;
 static char PM_term_title[128] = "";
+
+static char PM_opts[256] = "";
+static TBOOLEAN PM_optargs = FALSE;
 
 static int mouseGnupmdrv = 0; /* PM set to 1 if we are connected to a mouseable gnupmdrv */
 
@@ -169,7 +172,6 @@ PM_init()
     static char buffer[1024];
     int pid;
     int rc;
-    int spawnmode;
     PPIB pib;
     PTIB tib;
     char semname[32];
@@ -186,7 +188,6 @@ PM_init()
 	PM_make_servername(tempname);
 	strcpy(pipename, "\\pipe\\");
 	strcat(pipename, tempname);
-/*        sprintf( pipename, "\\pipe\\gpServ%d", PM_plot_number ) ; */
 	DosGetInfoBlocks(&tib, &pib);
 	PM_pipe = fopen(pipename, "r+b");
 	if (PM_pipe != NULL) {
@@ -202,7 +203,6 @@ PM_init()
     if (PM_pipe == NULL) {
 	if (PM_termmode & 2) {
 	    PM_make_servername(tempname);
-/*            sprintf( tempname, "gpServ%d", PM_plot_number ) ; */
 	} else {
 	    static int gpid = 0;
 	    gpid++;
@@ -238,30 +238,25 @@ PM_init()
 			       "gnupmdrv.exe",
 			       PM_path,
 			       sizeof(PM_path));
-	if (rc != 0) {
-	    fputs("Cannot find gnupmdrv.exe !\n", stderr);
-	    exit(3);
-	}
+	if (rc != 0)
+	    int_error(NO_CARET, "Cannot find gnupmdrv.exe !\n");
 	rc = DosCreateEventSem(semname, &hev, 1, 0);
-	if (rc != 0) {
-	    fputs("Cannot create semaphore !\n", stderr);
-	    exit(3);
-	}
-	spawnmode = P_SESSION | P_DEFAULT;
-	if (PM_optargs != 0)
-	    spawnmode |= P_UNRELATED;
-	pid = spawnl(spawnmode, PM_path, PM_path, tempname, PM_opts, NULL);
-	if (pid == -1) {
-	    fputs("Cannot spawn gnupmdrv.exe !\n", stderr);
-	    exit(3);
+	if (rc != 0)
+	    int_error(NO_CARET, "Cannot create semaphore !\n");
+	{
+	    int spawnmode = P_SESSION | P_DEFAULT;
+	    if (PM_optargs)
+		spawnmode |= P_UNRELATED;
+	    pid = _spawnl(spawnmode, PM_path, PM_path, tempname, PM_opts, NULL);
+	    if (pid == -1)
+		int_error(NO_CARET, "Cannot spawn gnupmdrv.exe !\n");
 	}
 	DosGetInfoBlocks(&tib, &pib);
 	DosWaitEventSem(hev, 10000);
 	DosCloseEventSem(hev);
 	PM_pipe = fopen(pipename, "r+b");
 	if (PM_pipe == NULL) {
-	    fputs("Cannot open pipe to gnupmdrv.exe !\n", stderr);
-	    exit(3);
+	    int_error(NO_CARET, "Cannot open pipe to gnupmdrv.exe !\n");
 	} else if (PM_termmode == 0)
 	    PM_savepipe = PM_pipe;
 	setvbuf(PM_pipe, buffer, _IOFBF, 1024);
@@ -294,73 +289,152 @@ PM_make_servername(char *str)
 	}
 	hash %= (256 * 256 * 256 - 1);
 	sprintf(str, "gp%x", hash);
-    } else
+    } else {
 	sprintf(str, "gpServ%d", PM_plot_number);
+    }
 }
+
+
+enum PM_id { PM_DEFAULT,
+	     PM_TITLE,
+	     PM_SERVER, PM_NOSERVER,
+	     PM_PERSIST, PM_NOPERSIST,
+	     PM_WIDELINES, PM_NOWIDELINES,
+	     PM_ENHANCED, PM_NOENHANCED,
+	     PM_OTHER };
+
+static struct gen_table PM_opt_table[] =
+{
+    { "d$efault", PM_DEFAULT },
+    { "pe$rsist", PM_PERSIST },
+    { "nope$rsist", PM_NOPERSIST },
+    { "s$erver", PM_SERVER },
+    { "w$idelines", PM_WIDELINES },
+    { "now$idelines", PM_NOWIDELINES },
+    { "nos$erver", PM_NOSERVER },
+    { "e$nhanced", PM_ENHANCED },
+    { "noe$nhanced", PM_NOENHANCED },
+    { "ti$tle", PM_TITLE },
+    { NULL, PM_OTHER }
+};
 
 
 TERM_PUBLIC void
 PM_options()
 {
-    int old_termmode = PM_termmode;
-    PM_termmode = 0;
-    term_options[0] = NUL;
-    PM_term_title[0] = NUL;
-    PM_opts[0] = NUL;
-    PM_optargs = 0;
+    int old_termmode;
+    char * title;
+    TBOOLEAN need_title = FALSE;
+
     while (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "pe$rsist")) {
-	    strcat(PM_opts, "-p ");
-	    strcat(term_options, "persist ");
-	    PM_termmode |= 1;
-	    PM_optargs = 1;
-	    if (!(old_termmode & 1))
-		PM_pipe = NULL;
-	} else if (almost_equals(c_token, "s$erver")) {
-	    strcat(PM_opts, "-s ");
-	    strcat(term_options, "server ");
-	    PM_termmode |= 2;
-	    PM_optargs = 1;
-	    if (!(old_termmode & 2))
-		PM_pipe = NULL;
-	    if (isanumber(c_token + 1)) {
-		struct value t;
-		char *p = PM_opts + strlen(PM_opts);
-		c_token++;
-		PM_plot_number = (int) real(const_express(&t));
-		sprintf(p, "%d", PM_plot_number);
-		sprintf(term_options + strlen(term_options), "%d", PM_plot_number);
+	switch (lookup_table(&PM_opt_table[0], c_token)) {
+	case PM_PERSIST:
+	    c_token++;
+	    PM_persist = TRUE;
+	    break;
+	case PM_NOPERSIST:
+	    c_token++;
+	    PM_persist = FALSE;
+	    break;
+	case PM_SERVER:
+	    c_token++;
+	    PM_plot_number = int_expression();
+	    if (PM_plot_number <= 0) {
+		PM_plot_number = 0;
 	    }
-	} else if (almost_equals(c_token, "w$idelines")) {
-	    strcat(PM_opts, "-w ");
-	    strcat(term_options, "widelines ");
-	    PM_optargs = 1;
-	} else if (almost_equals(c_token, "e$nhanced")) {
-	    strcat(term_options, "enhanced ");
+	    break;
+	case PM_NOSERVER:
+	    c_token++;
+	    PM_plot_number = 0;
+	    break;
+	case PM_WIDELINES:
+	    c_token++;
+	    PM_widelines = TRUE;
+	    break;
+	case PM_NOWIDELINES:
+	    c_token++;
+	    PM_widelines = FALSE;
+	    break;
+	case PM_ENHANCED:
+	    c_token++;
+	    PM_enhanced = TRUE;
 #ifdef PM_OLD_ENHANCED_TEXT
-	    PM_optargs = 1;
-	    strcat(PM_opts, "-e ");
 	    term->put_text = PM_put_text;
 #else
 	    term->put_text = PM_enhanced_put_text;
 #endif
 	    term->flags |= TERM_ENHANCED_TEXT;
-	} else if (almost_equals(c_token, "noe$nhanced")) {
-	    strcat(term_options, "noenhanced ");
+	    break;
+	case PM_NOENHANCED:
+	    c_token++;
+	    PM_enhanced = FALSE;
 	    term->put_text = PM_put_text;
 	    term->flags &= ~TERM_ENHANCED_TEXT;
-	} else if (isstring(c_token)) {
-	    copy_str(PM_term_title, c_token, 127);
+	    break;
+	case PM_TITLE:
+	    c_token++;
+	    need_title = TRUE;
+	    // fall through
+	default:
+	    title = try_to_get_string();
+	    if (title == NULL && need_title)
+		int_error(c_token, "expecting string argument");
+	    if (strcmp(title, "") == 0)
+		title = NULL;
+	    if (title == NULL)
+		PM_term_title[0] = NUL;
+	    else
+		strlcpy(PM_term_title, title, sizeof(PM_term_title));
+	    break;
 	}
-	c_token++;
+    }
+
+    // re-init terminal parameters etc.
+    PM_optargs = FALSE;
+    old_termmode = PM_termmode;
+    PM_termmode = 0;
+    PM_opts[0] = NUL;
+    if (PM_persist) {
+	strcat(PM_opts, "-p ");
+	PM_optargs = TRUE;
+	PM_termmode |= 1;
+	if (!(old_termmode & 1))
+	    PM_pipe = NULL;
+    }
+    if (PM_plot_number > 0) {
+	PM_termmode |= 2;
+	if (!(old_termmode & 2))
+	    PM_pipe = NULL;
+	sprintf(PM_opts + strlen(PM_opts), "-s %d ", PM_plot_number);
+	PM_optargs = TRUE;
+    }
+    if (PM_widelines) {
+	strcat(PM_opts, "-w ");
+	PM_optargs = TRUE;
+    }
+    if (PM_enhanced) {
+#ifdef PM_OLD_ENHANCED_TEXT
+	strcat(PM_opts, "-e ");
+	PM_optargs = TRUE;
+#endif
     }
     if (PM_term_title[0]) {
-	strcat(PM_opts, " ");
-	strcat(term_options, " ");
-	strcat(PM_opts, PM_term_title);
-	strcat(term_options, PM_term_title);
+	sprintf(PM_opts + strlen(PM_opts), " \"%s\"", PM_term_title);
     }
-    /* FIXME: term_options is not set correctly */
+
+    // recreate option string
+    term_options[0] = NUL;
+    sprintf(term_options,
+	"%swidelines %spersist %senhanced",
+	PM_widelines? "" : "no",
+	PM_persist  ? "" : "no",
+	PM_enhanced ? "" : "no");
+    if (PM_plot_number > 0)
+	sprintf(term_options + strlen(term_options), " server %d", PM_plot_number);
+    if (PM_term_title[0]) {
+	sprintf(term_options + strlen(term_options), " title \"%s\"", PM_term_title);
+    }
+
     PM_must_reset_opts = TRUE;
 }
 
@@ -568,7 +642,7 @@ PM_text_angle(int ang)
     fwrite(&ang, sizeof(int), 1, PM_pipe);
 #ifndef PM_OLD_ENHANCED_TEXT
     /* store text angle, only needed for enhanced text */
-    PM_angle = (double)ang * M_PI / 180.;
+    PM_angle = ang * DEG2RAD;
 #endif
     return TRUE;
 }
@@ -720,7 +794,7 @@ PM_point(unsigned int x, unsigned int y, int number)
 void
 PM_abortplot(void)
 {
-    PM_must_abort = 0;
+    PM_must_abort = FALSE;
     term_reset();
     (void) putc('\n', stderr);
     bail_to_command_line();
@@ -732,7 +806,7 @@ PM_intc_cleanup(void)
 {
     if (PM_pipe == NULL || PM_mode == SET_TEXT)
 	PM_abortplot();
-    PM_must_abort = 1;
+    PM_must_abort = TRUE;
 }
 
 
@@ -1323,10 +1397,14 @@ START_HELP(pm)
 " The `pm` terminal driver provides an OS/2 Presentation Manager window in",
 " which the graph is plotted.  The window is opened when the first graph is",
 " plotted.  This window has its own online help as well as facilities for",
-" printing, copying to the clipboard.",
+" printing and copying to the clipboard.",
 "",
 " Syntax:",
-"       set terminal pm {server {n}} {persist} {widelines} {enhanced} {\"title\"}",
+"       set terminal pm      {{server} {n} | noserver}",
+"                            {nopersist | persist}",
+"                            {enhanced | noenhanced}",
+"                            {nowidelines | widelines}",
+"                            {{title} \"title\"}",
 "",
 " If `persist` is specified, each graph appears in its own window and all",
 " windows remain open after `gnuplot` exits.  If `server` is specified, all",
@@ -1343,7 +1421,7 @@ START_HELP(pm)
 "",
 " If `title` is specified, it will be used as the title of the plot window.",
 " It will also be used as the name of the server instance, and will override",
-" the optional numerical argument."
+" the optional numerical argument.",
 "",
 " The gnuplot outboard driver, gnupmdrv.exe, is searched in the same directory",
 " as gnuplot itself.  You can override that by defining one of the environment",
