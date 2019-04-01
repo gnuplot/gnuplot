@@ -2688,8 +2688,9 @@ eval_plots()
 		uses_axis[y_axis] |= USES_AXIS_FOR_FUNC;
 	    }
 
-	    /* These plot styles do not consume line/point properties */
-	    if (!in_parametric && this_plot->plot_style != IMAGE
+	    /* These plot styles are not differentiated by line/point properties */
+	    if ((this_plot->plot_type != KEYENTRY) && !in_parametric
+	        && this_plot->plot_style != IMAGE
 		&& this_plot->plot_style != RGBIMAGE && this_plot->plot_style != RGBA_IMAGE
 	    ) {
 		++line_num;
