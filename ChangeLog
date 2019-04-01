@@ -1,3 +1,8 @@
+2019-04-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c: reset base_linetype only once per plot
+	Bug #2153
+
 2019-03-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot3d.c src/graph3d.c:
