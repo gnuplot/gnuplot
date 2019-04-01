@@ -2064,6 +2064,9 @@ eval_plots()
 	    x_axis = FIRST_X_AXIS;
 	    y_axis = FIRST_Y_AXIS;
 
+	    /*  Set this before parsing any modifying options */
+	    this_plot->base_linetype = line_num;
+
 	    /* pm 25.11.2001 allow any order of options */
 	    while (!END_OF_COMMAND) {
 		int save_token = c_token;
@@ -2336,7 +2339,6 @@ eval_plots()
 		    lp.l_type = line_num;
 		    lp.p_type = line_num;
 		    lp.d_type = line_num;
-		    this_plot->base_linetype = line_num;
 
 		    /* user may prefer explicit line styles */
 		    if (prefer_line_styles)
