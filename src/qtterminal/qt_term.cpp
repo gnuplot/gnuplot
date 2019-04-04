@@ -832,7 +832,7 @@ int qt_set_font(const char* font)
 
 	/* Optimize by leaving early if there is no change */
 	if (qt->currentFontSize == qt_previousFontSize
-	&&  qt->currentFontName == qt->currentFontName) {
+	&&  qt->currentFontName == qt_previousFontName) {
 		return 1;
 	}
 
