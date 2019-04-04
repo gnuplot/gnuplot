@@ -154,6 +154,10 @@ int wxt_max_anchors = 0;
 TBOOLEAN pending_href = FALSE;
 const char *wxt_display_hypertext = NULL;
 wxtAnchorPoint wxt_display_anchor = {0,0,0};
+char * wxt_hypertext_fontname = NULL;
+double wxt_hypertext_fontsize = 10;
+int    wxt_hypertext_fontstyle = 10;
+int    wxt_hypertext_fontweight = 10;
 
 #else
 #define wxt_update_key_box(x,y)
@@ -2996,6 +3000,8 @@ void wxtPanel::wxt_cairo_refresh()
 	wxt_display_hypertext = NULL;
 	wxt_display_anchor.x = 0;
 	wxt_display_anchor.y = 0;
+	free(wxt_hypertext_fontname);
+	wxt_hypertext_fontname = NULL;
 
 	command_list_mutex.Lock();
 	command_list_t::iterator wxt_iter; /*declare the iterator*/
@@ -3092,6 +3098,11 @@ void wxtPanel::wxt_cairo_exec_command(gp_command command)
 		return;
 	case command_hypertext :
 		current_href = command.string;
+		free(wxt_hypertext_fontname);
+		wxt_hypertext_fontname = strdup(plot.fontname);
+		wxt_hypertext_fontsize = plot.fontsize;
+		wxt_hypertext_fontstyle = plot.fontstyle;
+		wxt_hypertext_fontweight = plot.fontweight;
 		return;
 	case command_point :
 		if (wxt_in_key_sample) {
@@ -3210,8 +3221,12 @@ void wxtPanel::wxt_cairo_exec_command(gp_command command)
 
 void wxtPanel::wxt_cairo_draw_hypertext()
 {
-	/* FIXME: Properly, we should save and restore the plot properties, */
+	/* FIXME: Properly, we should save and restore all plot properties, */
 	/* but since this box is the very last thing in the plot....        */
+	double save_fontsize = plot.fontsize;
+	int save_fontstyle = plot.fontstyle;
+	int save_fontweight = plot.fontweight;
+
 	rgb_color grey = {.9, .9, .9};
 	int width = 0;
 	int height = 0;
@@ -3224,6 +3239,12 @@ void wxtPanel::wxt_cairo_draw_hypertext()
 		    wxt_cairo_draw_hyperimage();
 		    display_text = imagefile+1;
 		}
+	}
+
+	if (wxt_hypertext_fontname) {
+	    gp_cairo_set_font(&plot, wxt_hypertext_fontname, wxt_hypertext_fontsize);
+	    plot.fontstyle = wxt_hypertext_fontstyle;
+	    plot.fontweight = wxt_hypertext_fontweight;
 	}
 
 	plot.justify_mode = LEFT;
@@ -3243,6 +3264,11 @@ void wxtPanel::wxt_cairo_draw_hypertext()
 		wxt_display_anchor.x + term->h_char,
 		wxt_display_anchor.y + term->v_char / 2,
 		display_text, NULL, NULL);
+
+	/* FIXME: Incomplete restoration of previous state */
+	plot.fontsize = save_fontsize;
+	plot.fontstyle = save_fontstyle;
+	plot.fontweight = save_fontweight;
 }
 
 void wxtPanel::wxt_cairo_draw_hyperimage()
