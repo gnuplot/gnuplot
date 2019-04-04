@@ -303,6 +303,8 @@ C
 ##plot [-1:1] sqrt(x); plot [-1:1] '+' using 1:(sqrt($1)
 #b The `set fontpath` command is deprecated. The search path for fonts to be
 ## embedded in output from the postscript terminal has been revised.
+#b Using `print` to load a datablock now generates additional datablock entries
+##when embedded newline characters are found
 #end
 3 Features introduced in version 5.2
 ?Features introduced in version 5.2
@@ -12918,6 +12920,8 @@ Ffigure_multiple_keys
 
  The destination for `print` commands can also be a named data block. Data
  block names start with '$', see also `inline data`.
+ When printing a string to a data block, embedded newline characters are
+ expanded to generate multiple data block entries.  This is a CHANGE.
 3 psdir
 ?commands set psdir
 ?commands show psdir
