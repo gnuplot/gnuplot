@@ -301,6 +301,21 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 	{
 		QString fontName; in >> fontName;
 		int size        ; in >> size;
+
+		// strip :Bold or :Italic property out of font name
+		if (fontName.contains(":italic", Qt::CaseInsensitive))
+			m_font.setStyle(QFont::StyleItalic);
+		else
+			m_font.setStyle(QFont::StyleNormal);
+		if (fontName.contains(":bold", Qt::CaseInsensitive))
+			m_font.setWeight(QFont::Bold);
+		else
+			m_font.setWeight(QFont::Normal);
+		int sep = fontName.indexOf(":");
+		if (sep >= 0)
+			fontName.truncate(sep);
+
+		// Blank font name means keep using the previous font
 		m_font.setFamily(fontName);
 		m_font.setPointSize(size);
 		m_font.setStyleStrategy(QFont::ForceOutline);	// pcf fonts die if rotated
@@ -329,7 +344,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		// Create a hypertext label that will become visible on mouseover.
 		// The Z offset is a kludge to force the label into the foreground.
 		if (!m_currentHypertext.isEmpty()) {
-			QGraphicsTextItem* textItem = addText(m_currentHypertext, m_font);
+			QGraphicsTextItem* textItem = addText(m_currentHypertext, m_hypertextFont);
 			textItem->setPos(point + m_textOffset);
 			textItem->setZValue(m_currentZ+10000);
 			textItem->setVisible(false);
@@ -583,6 +598,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 	{
 		m_currentHypertext.clear();
 		in >> m_currentHypertext;
+		m_hypertextFont = m_font;
 	}
 	else if (type == GETextBox)
 	{

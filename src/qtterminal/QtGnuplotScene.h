@@ -131,6 +131,7 @@ private:
 	QString m_currentHypertext;
 	QList<QGraphicsItem*> m_hypertextList;
 	QGraphicsPixmapItem* m_hyperimage;
+	QFont m_hypertextFont;
 
 	// Axis scales
 	bool   m_axisValid[5];	// x, y, x2, y2, z (indicates 3D plot)
