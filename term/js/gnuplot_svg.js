@@ -472,7 +472,7 @@ gnuplot_svg = function (svgElement) {
         dms.d = Math.floor(deg);
         dms.m = Math.floor((deg - dms.d) * 60);
         dms.s = Math.floor((deg - dms.d) * 3600 - dms.m * 60);
-        fmt = ((x < 0) ? '-' : ' ') + dms.d.toFixed(0) + '°' + dms.m.toFixed(0) + '"' + dms.s.toFixed(0) + "'";
+        fmt = ((x < 0) ? '-' : ' ') + dms.d.toFixed(0) + 'Â°' + dms.m.toFixed(0) + '"' + dms.s.toFixed(0) + "'";
         return fmt;
     };
    
