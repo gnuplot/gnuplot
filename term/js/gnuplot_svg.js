@@ -1,18 +1,18 @@
 // From:	Marko Karjalainen <markokarjalainen@kolumbus.fi>
 // Date:	27 Aug 2018
 // Experimental gnuplot plugin for svg
-// 
+//
 // All svg elements on page get own gnuplot plugin attached by js, so no conflict with global variables.
-// 
+//
 // Javascript variables are read from second script tag and converted to json for import to plugin.
 // Inline events are removed from xml and new ones are attached with addEventListener function.
 // Inline events should be removed from xml and xml should have better id/class names to attach events from js.
-// 
+//
 // Improved mouseover text and image handling
 //   content changed to xml only if it really changed and bouncing is calculated once.
-// 
+//
 // Convert functions are same as before, maybe renamed better.
-// 
+//
 // Javascript routines for mouse and keyboard interaction with
 // SVG documents produced by gnuplot SVG terminal driver.
 
@@ -37,7 +37,7 @@ if (window) {
 
 gnuplot_svg = function (svgElement) {
 
-    var version = '27 August 2018';
+    var version = '09 April 2019';
 
     var settings = {};
 
@@ -55,12 +55,12 @@ gnuplot_svg = function (svgElement) {
         'element': svgElement.getElementById('coord_text')
     };
 
-    var popoverContainer = { 
+    var popoverContainer = {
         'element': null,
         'content': null,
     };
-    
-    var popoverImage = { 
+
+    var popoverImage = {
         'element': null,
         'content': null,
         'width': 300,
@@ -68,22 +68,22 @@ gnuplot_svg = function (svgElement) {
         'defaultWidth': 300,
         'defaultHeight': 200,
     };
-    
-    var popoverText = { 
+
+    var popoverText = {
         'element': null,
         'content': null,
         'width': 11,
         'height': 16,
         'defaultWidth': 11,
         'defaultHeight': 16,
-    };    
+    };
 
     var point = svgElement.createSVGPoint();
 
     var axisDate = new Date();
 
-    var gridEnabled = false;    
-    
+    var gridEnabled = false;
+
     // Get plot boundaries and axis scaling information for mousing from current object script tag
     // TODO add these to svg xml custom attribute for reading(json format)
     var parseSettings = function () {
@@ -158,7 +158,7 @@ gnuplot_svg = function (svgElement) {
             popoverText.element = svgElement.getElementById('hypertext');
             popoverImage.element = svgElement.getElementById('hyperimage');
             popoverImage.defaultWidth = popoverImage.element.getAttribute('width');
-            popoverImage.defaultHeight = popoverImage.element.getAttribute('height');            
+            popoverImage.defaultHeight = popoverImage.element.getAttribute('height');
         }
 
         for (i = 0; i < hyperText.length; i++) {
@@ -475,7 +475,7 @@ gnuplot_svg = function (svgElement) {
         fmt = ((x < 0) ? '-' : ' ') + dms.d.toFixed(0) + '°' + dms.m.toFixed(0) + '"' + dms.s.toFixed(0) + "'";
         return fmt;
     };
-   
+
     // Set popover text to show
     var setPopoverText = function (content) {
 
@@ -488,7 +488,7 @@ gnuplot_svg = function (svgElement) {
         }
 
         var lines = content.split(/\n|\\n/g);
-        
+
         // Single line
         if (lines.length <= 1) {
             popoverText.element.textContent = content;
@@ -524,20 +524,20 @@ gnuplot_svg = function (svgElement) {
         // Box Width
         popoverContainer.element.setAttribute('width', popoverText.width);
     };
-    
+
     // Set popover image to show
     var setPopoverImage = function (content) {
-        
+
         // Set default image size
         popoverImage.width = popoverImage.defaultWidth;
         popoverImage.height = popoverImage.defaultHeight;
-        
+
         // Pick up height and width from image(width,height):name
         if (content.charAt(5) == '(') {
             popoverImage.width = parseInt(content.slice(6));
             popoverImage.height = parseInt(content.slice(content.indexOf(',') + 1));
         }
-        
+
         popoverImage.element.setAttribute('width', popoverImage.width);
         popoverImage.element.setAttribute('height', popoverImage.height);
         popoverImage.element.setAttribute('preserveAspectRatio', 'none');
@@ -545,18 +545,18 @@ gnuplot_svg = function (svgElement) {
         // attach image URL as a link
         content = content.slice(content.indexOf(':') + 1);
         popoverImage.element.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', content);
-    };    
+    };
 
     // Show popover text in given position
     var showPopoverText = function (position) {
         var domRect = svgElement.getBoundingClientRect();
         domRect = convertDOMToSVG({'x': domRect.right, 'y': domRect.bottom });
-        
+
         // bounce off frame bottom
         if (position.y + popoverText.height + 16 > domRect.y) {
             position.y = domRect.y - popoverText.height - 16;
         }
-       
+
         // bounce off right edge
         if (position.x + popoverText.width + 14 > domRect.x) {
             position.x = domRect.x - popoverText.width - 14;
@@ -577,35 +577,36 @@ gnuplot_svg = function (svgElement) {
         for (var i = 0; i < tspan.length; i++) {
             tspan[i].setAttribute('x', position.x + 14);
         }
+
     };
-    
+
     // Show popover image in given position
     var showPopoverImage = function (position) {
         var domRect = svgElement.getBoundingClientRect();
         domRect = convertDOMToSVG({'x': domRect.right, 'y': domRect.bottom });
-       
+
         // bounce off frame bottom
         if (position.y + popoverImage.height + 16 > domRect.y) {
             position.y = domRect.y - popoverImage.height - 16;
         }
-       
+
         // bounce off right edge
         if (position.x + popoverImage.width + 14 > domRect.x) {
             position.x = domRect.x - popoverImage.width - 14;
         }
-        
+
         popoverImage.element.setAttribute('x', position.x);
         popoverImage.element.setAttribute('y', position.y);
         popoverImage.element.setAttribute('visibility', 'visible');
     };
-    
+
     // Hide all popovers
     var hidePopover = function () {
         popoverContainer.element.setAttribute('visibility', 'hidden');
         popoverText.element.setAttribute('visibility', 'hidden');
         popoverImage.element.setAttribute('visibility', 'hidden');
     };
-    
+
     // Zoom svg inside viewbox
     var zoom = function (direction) {
         var zoomRate = 1.1;
@@ -724,7 +725,7 @@ gnuplot_svg = function (svgElement) {
         // Hide popover
         if (set === false) {
             hidePopover();
-            
+
             if (evt !== undefined) {
                 evt.stopPropagation();
                 evt.preventDefault();
@@ -732,18 +733,18 @@ gnuplot_svg = function (svgElement) {
 
             return;
         }
-       
+
         var position = null;
-        
+
         // Change content only if changed
         if (popoverContainer.content != content) {
-            
+
             // Set current text
             popoverContainer.content = content;
-            
+
             popoverImage.content = '';
             popoverText.content = content;
-            
+
             // If text starts with image: process it as an xlinked bitmap
             if (content.substring(0, 5) == 'image') {
                 var lines = content.split(/\n|\\n/g);
@@ -751,25 +752,25 @@ gnuplot_svg = function (svgElement) {
                 if (nameindex > 0) {
                     popoverImage.content = lines.shift();
                     popoverText.content = '';
-                    
+
                     // Additional text lines
                     if (lines !== undefined && lines.length > 0) {
                         popoverText.content = lines.join('\n');
                     }
                 }
-            }            
+            }
 
             // Set image content
             if(popoverImage.content){
                 setPopoverImage(popoverImage.content);
             }
-            
+
             // Set text content
             if(popoverText.content){
                 setPopoverText(popoverText.content);
             }
         }
-        
+
         if(popoverImage.content || popoverText.content){
             position = convertDOMToSVG({'x': evt.clientX, 'y': evt.clientY });
         }
@@ -778,7 +779,7 @@ gnuplot_svg = function (svgElement) {
         if(popoverImage.content){
             showPopoverImage(position);
         }
-        
+
         // Show popover on mouse position
         if(popoverText.content){
             showPopoverText(position);
