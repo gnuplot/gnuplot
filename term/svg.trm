@@ -68,7 +68,6 @@
  * Code for gnuplot version 4.5
  *   Bold -> font-weight:bold
  *   Italic -> font-style:italic
- *   Trying to match well with PNG output.
  * Rich Seymour <rseymour@usc.edu>
  */
 
@@ -230,6 +229,12 @@ static int SVG_dasharray[SVG_dashtypes][7] = {
 };
 static char *SVG_dashpattern = NULL;
 static char  SVG_custom_dash_pattern[64];
+
+/* Hypertext support */
+static double SVG_hypertext_fontSize = 0;
+static char *SVG_hypertext_fontName = NULL;
+static char *SVG_hypertext_fontStyle = NULL;
+static char *SVG_hypertext_fontWeight = NULL;
 
 /* Support for embedded hypertext */
 static char *SVG_hypertext_text = NULL;
@@ -1142,12 +1147,12 @@ SVG_text ()
 	    MOUSE_PARAM("GPVAL_X2_MIN", "plot_axis_x2min");
 	    MOUSE_PARAM("GPVAL_X2_MAX", "plot_axis_x2max");
 	} else
-	    fprintf(gpoutfile, "gnuplot_svg.plot_axis_x2min = \"none\"\n");
+	    fprintf(gpoutfile, "gnuplot_svg.plot_axis_x2min = \"none\";\n");
 	if ((axis_array[SECOND_Y_AXIS].ticmode & TICS_MASK) != NO_TICS) {
 	    MOUSE_PARAM("GPVAL_Y2_MIN", "plot_axis_y2min");
 	    MOUSE_PARAM("GPVAL_Y2_MAX", "plot_axis_y2max");
 	} else
-	    fprintf(gpoutfile, "gnuplot_svg.plot_axis_y2min = \"none\"\n");
+	    fprintf(gpoutfile, "gnuplot_svg.plot_axis_y2min = \"none\";\n");
 #undef MOUSE_PARAM
 
 	/*
@@ -1202,6 +1207,24 @@ SVG_text ()
 	    fprintf(gpoutfile, "gnuplot_svg.plot_timeaxis_y = \"DMS\";\n");
 	else
 	    fprintf(gpoutfile, "gnuplot_svg.plot_timeaxis_y = \"\";\n");
+
+	/* Hypertext font properties
+	 * NB: These will apply to all hypertext in the plot
+	 *     separate font for individual labels would require additional code
+	 */
+	fprintf(gpoutfile, "gnuplot_svg.hypertext_fontSize = %.1g;\n", SVG_hypertext_fontSize);
+	if (SVG_hypertext_fontName)
+	    fprintf(gpoutfile, "gnuplot_svg.hypertext_fontName = \"%s\";\n", SVG_hypertext_fontName);
+	else
+	    fprintf(gpoutfile, "gnuplot_svg.hypertext_fontName = null;\n");
+	if (SVG_hypertext_fontStyle)
+	    fprintf(gpoutfile, "gnuplot_svg.hypertext_fontStyle = \"%s\";\n", SVG_hypertext_fontStyle);
+	else
+	    fprintf(gpoutfile, "gnuplot_svg.hypertext_fontStyle = null;\n");
+	if (SVG_hypertext_fontWeight)
+	    fprintf(gpoutfile, "gnuplot_svg.hypertext_fontWeight = \"%s\";\n", SVG_hypertext_fontWeight);
+	else
+	    fprintf(gpoutfile, "gnuplot_svg.hypertext_fontWeight = null;\n");
 
 	fprintf(gpoutfile,"]]>\n</script>\n");
     } /* End of section writing out variables for mousing */
@@ -2123,20 +2146,50 @@ SVG_path(int p)
 TERM_PUBLIC void
 SVG_hypertext( int type, const char *text )
 {
-    if (type != TERM_HYPERTEXT_TOOLTIP && type != TERM_HYPERTEXT_TITLE)
-	return;
+    switch(type) {
 
-    free(SVG_hypertext_text);
-    if (text) {
-	char *buffer = gp_alloc(2+5*strlen(text),"escape");
-	enhanced_cur_text = buffer;
-	do { ENHsvg_writec(*text); }
-	    while (*text++);
-	SVG_hypertext_text = gp_strdup(buffer);
-	enhanced_cur_text = NULL;
-	free(buffer);
-    } else {
-	SVG_hypertext_text = NULL;
+    case TERM_HYPERTEXT_TOOLTIP:
+    case TERM_HYPERTEXT_TITLE:
+	free(SVG_hypertext_text);
+	if (text) {
+	    char *buffer = gp_alloc(2+5*strlen(text),"escape");
+	    enhanced_cur_text = buffer;
+	    do { ENHsvg_writec(*text); }
+		while (*text++);
+	    SVG_hypertext_text = gp_strdup(buffer);
+	    enhanced_cur_text = NULL;
+	    free(buffer);
+	} else {
+	    SVG_hypertext_text = NULL;
+	}
+	break;
+
+    case TERM_HYPERTEXT_FONT:
+	{
+	int sep;
+
+	free(SVG_hypertext_fontName); SVG_hypertext_fontName = NULL;
+	free(SVG_hypertext_fontStyle); SVG_hypertext_fontStyle = NULL;
+	free(SVG_hypertext_fontWeight); SVG_hypertext_fontWeight = NULL;
+	SVG_hypertext_fontSize = 0;
+
+	sep = strcspn(text, ",: ");
+	if (sep > 0) {
+	    SVG_hypertext_fontName = gp_strdup(text);
+	    SVG_hypertext_fontName[sep] = '\0';
+	}
+	sep = strcspn(text, ",");
+	if (sep > 0)
+	    sscanf(text + sep + 1, "%lf", &SVG_hypertext_fontSize);
+	if (strstr(text, "italic") || strstr(text, "Italic"))
+	    SVG_hypertext_fontStyle = gp_strdup("italic");
+	if (strstr(text, "bold") || strstr(text, "Bold"))
+	    SVG_hypertext_fontWeight = gp_strdup("bold");
+	}
+	break;
+
+    default:
+	break;
     }
 }
 

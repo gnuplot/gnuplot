@@ -221,6 +221,7 @@ typedef enum termlayer {
 /* Options used by the terminal entry point term->hypertext(). */
 #define TERM_HYPERTEXT_TOOLTIP 0
 #define TERM_HYPERTEXT_TITLE   1
+#define TERM_HYPERTEXT_FONT    2
 
 typedef struct fill_style_type {
     int fillstyle;
