@@ -1259,9 +1259,10 @@ SVG_text ()
 
     /* If there were any grid lines in this plot, add a button to toggle them */
     if (SVG_mouseable && SVG_hasgrid) {
-	fprintf(gpoutfile,"\n  <image x='10' y='%d' width='16' height='16' xlink:href='grid.png'\n",
-	(int)(term->ymax/SVG_SCALE)-26);
-	fprintf(gpoutfile,"    onclick='gnuplot_svg.toggleGrid();'/>\n");
+	fprintf(gpoutfile,"\n  <image x='10' y='%d' width='16' height='16' ",
+		(int)(term->ymax/SVG_SCALE)-26);
+	fprintf(gpoutfile, "\n    xlink:href='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAABmJLR0QA/wD/AP+gvaeTAAAAM0lEQVQokWP8//8/AymACc5iZGQkyEDRQCwgyUn///9nhGtgZISy8TBGnTSCnMRIavIGAGPTWfVV7DcfAAAAAElFTkSuQmCC'");
+	fprintf(gpoutfile, "\n    onclick='gnuplot_svg.toggleGrid();'/>\n");
     }
 
     fputs("</svg>\n\n", gpoutfile);
