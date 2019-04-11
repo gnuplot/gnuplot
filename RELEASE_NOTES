@@ -1,15 +1,47 @@
-		GNUPLOT Version 5.2.6 Release Notes
+		GNUPLOT Version 5.2.7 Release Notes
 		===================================
 
-These release notes are for version 5.2 patchlevel 6 (5.2.6).
+These release notes are for version 5.2 patchlevel 6 (5.2.7).
 This release contains bug-fixes, a few changes back-ported from the
-development version, and two new features.  The most notable fixes are for
-problems with the "pause mouse" command in the x11, wxt, and qt terminals.
+development version, and two new features.
 
 Please see the ChangeLog file for a complete list of changes made during the
 course of development from 5.0 to 5.2.
 
-Release Notes date: 24-December-2018
+Release Notes date: 10-April-2019
+
+Changes in 5.2.7
+================
+
+* NEW "set pm3d noclipcb" will skip drawing quadrangles with color < cbmin
+* NEW pm terminal supports utf8, dashed lines, bold/italic text
+* NEW imaginary component of array values is available to "using" in column 3
+* NEW gnuplot --slow may help use of qt terminal with slow system font server
+* CHANGE splot "with points pt 0" acts like "with dots"
+* CHANGE (tikz) improved default interpretation of gnuplot arrowhead style
+* CHANGE teach hidden3d to handle double-headed vectors (arrowstyle "heads")
+* CHANGE "unset title" or "reset" resets all title properties to default
+* CHANGE font names passed to enhanced text processing may be in quotes
+* CHANGE cairo terminals accept fractional font sizes
+* CHANGE "plot with table" does not output trailing field separator
+* CHANGE better centering for clustered histograms
+* CHANGE clear STATS_* variables before performing analysis
+* CHANGE cairo, libgd, and svg terminals handle LT_NODRAW by not drawing at all
+* FIX "plot with table" unnecessarily limited string column output to 60 chars 
+* FIX (windows) make sure graph window is shown even if the program is "hidden"
+* FIX hidden3d mode was not correctly dealing with arrowstyle backhead
+* FIX sprintf in 'using' spec must not clobber numeric locale
+* FIX tikz - request for polygon with 0 vertices could hang terminal
+* FIX lua/tikz - do not attempt to ftruncate output being piped through stdout
+* FIX tkcanvas - do not attempt to ftruncate output being piped through stdout
+* FIX handle NaN values in input stream to "stats FOO matrix"
+* FIX prevent extra read past the end of a datablock holding matrix data
+* FIX pm - issues in box and polygon fill, (wide) lines, enhanced text, images
+* FIX dropped character in piped input stream if plot window is manually closed
+* FIX extraneous dots and potential segfault from splot with contour labels
+* FIX boxplots - color sequence correctly starts with specified linetype
+* FIX incomplete initialization led to segfault from "gnuplot -c foo.gp baz"
+
 
 Changes in 5.2.6
 ================
@@ -237,8 +269,9 @@ KNOWN ISSUES
   Building the plugin demo with a SunPro Compiler requires changing the
   build flags as shown in comments in ./demo/plugin/Makefile.am
 
-* Font initialization on OSX can be very slow, causing the qt terminal to
-  issue warning or error messages for the first plot command.
+* Font initialization on OSX and Windows can be very slow, causing the qt
+  terminal to issue warning or error messages for the first plot command.
+  If this causes actual program failure, try "gnuplot --slow".
 
 * The antialiasing option produces artifacts in some versions of Qt.
   In particular point types 1 and 2 appear unbalanced due to shading.
@@ -335,7 +368,7 @@ Options for generating interactive plots for web display
 Installation
 ------------
 
-You can download a source tarball for gnuplot version 5.2.3 from the 
+You can download a source tarball for the current gnuplot version from the 
 gnuplot development site on SourceForge.
 	http://sourceforge.net/projects/gnuplot
 
@@ -343,7 +376,7 @@ Installation instructions are available in the source itself; the short
 version for linux/unix-like systems is to unpack the tarball and then
 <PRE>
 build it:
-      cd gnuplot-5.2.3 ; ./configure ; make
+      cd gnuplot-5.2.7 ; ./configure ; make
 test it:
       make check
 install it:
@@ -375,7 +408,4 @@ minor number).  Bugfixes to version 5.2 will appear in patchlevel releases
 5.2.1, 5.2.2, etc., approximately twice a year or as needed to correct a
 serious problem.
 
-Note: development has recently moved from cvs to git. Many of the files
-in the 5.2.4 source distribution still contain a cvs version identifier
-$RCSid and date, but these are not current if the file has been changed
-since the move to git.
+Note: development has moved from cvs to git.

@@ -1,9 +1,10 @@
 Changes in 5.2.7
 ================
 * NEW "set pm3d noclipcb" will skip drawing quadrangles with color < cbmin
-* NEW pm - utf8, dashed lines, bold/italic text
+* NEW pm terminal supports utf8, dashed lines, bold/italic text
 * NEW imaginary component of array values is available to "using" in column 3
-* CHANGE splot "with points pt 0" should act like "with dots"
+* NEW gnuplot --slow may help use of qt terminal with slow system font server
+* CHANGE splot "with points pt 0" acts like "with dots"
 * CHANGE (tikz) improved default interpretation of gnuplot arrowhead style
 * CHANGE teach hidden3d to handle double-headed vectors (arrowstyle "heads")
 * CHANGE "unset title" or "reset" resets all title properties to default
@@ -26,6 +27,7 @@ Changes in 5.2.7
 * FIX dropped character in piped input stream if plot window is manually closed
 * FIX extraneous dots and potential segfault from splot with contour labels
 * FIX boxplots - color sequence correctly starts with specified linetype
+* FIX incomplete initialization led to segfault from "gnuplot -c foo.gp baz"
 
 Changes in 5.2.6
 ================
