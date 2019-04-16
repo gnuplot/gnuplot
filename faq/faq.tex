@@ -1,95 +1,139 @@
 %% Don't forget to change the paper format in the next line
 %
-% $Id: gnuplot-faq.tex,v 1.5 1999/10/20 18:25:04 vonhagen Exp vonhagen $
-%
-%
 \documentclass[a4paper,11pt]{article}
-\usepackage{html}
-\usepackage[hyphens,T1]{url}
+\usepackage[margin=2cm]{geometry}
 \usepackage[T1]{fontenc}
+\usepackage[hyphens]{url}
+\urlstyle{sf}
 
-\newcommand{\news}[1]%
-	{\def~{\~{}}\htmladdnormallink{\latex{\url{#1}}\html{\texttt{#1}}}%
-		{news:#1}%
-	}
-\newcommand{\ftp}[2]%
-	{\htmladdnormallink{\latex{\url{#1}{} in \url{#2}}%
-		    \html{\texttt{#1} in \texttt{#2}}}%
-		{ftp://#1#2}%
-	}
-\newcommand{\mailto}[1]%
-	{\htmladdnormallink{\latex{\url{<#1>}}\html{\texttt{#1}}}%
-		{mailto:#1}%
-	}
-\newcommand{\http}[1]%
-	{\htmladdnormallink{\latex{\url{http://#1}}%
-		    \html{\texttt{http://#1}}}%
-		{http://#1}%
-	}
+\ifx\pdfoutput\undefined
+    % latex or latex2html output
+    \usepackage{times,mathptmx}
+    \usepackage[
+        hypertex,
+        hyperindex,
+        bookmarks,
+        bookmarksnumbered=true,
+        pdftitle={gnuplot faq},
+        pdfauthor={gnuplot},
+        pdfsubject={see www.gnuplot.info}
+        % , pdfcreator={}
+        % , pdfkeywords={...}
+    ]{hyperref}
+\else % *** pdflatex output
+    \usepackage{times,mathptmx}
+    \usepackage[
+%       pdftex,
+        hyperindex,
+        bookmarks,
+        bookmarksnumbered=true,
+        pdftitle={gnuplot faq},
+        pdfauthor={gnuplot},
+        pdfsubject={see www.gnuplot.info}
+        % , pdfcreator={}
+        % , pdfkeywords={...}
+    ]{hyperref}
+\fi
+
+\usepackage{color}
+\definecolor{darkblue}{rgb}{0,0,0.5}
+\hypersetup{
+  colorlinks   = true, %Colours links instead of ugly boxes
+  linkcolor    = darkblue, %Colour of internal links
+  urlcolor     = blue %Colour for external hyperlinks
+}
+
+% There may be incompatibilities between different versions of
+% url.sty, html.sty and hyperref.sty -- it seems there are machines which
+% cannot combine them together with simultaneous output to dvi, pdf, html.
+% Thus do it this way:
+\ifx\html\undefined
+    % Modified Dec 2014 (EAM) for use with htlatex or pdflatex
+    \def\http#1{{\small\href{http://#1}{\url{http://#1}}}}
+    \def\mailto#1{{\small\href{mailto://#1}{\url{mailto://#1}}}}
+    \def\news#1{\href{news://#1}{\url{news://#1}}}
+    \def\ftp#1#2{\href{ftp://#1#2}{\url{#1} in \url{#2}}}
+\else
+    % Running this file by latex2html:
+    \usepackage{html}
+%    \html{
+        \newcommand{\news}[1]%
+            {\def~{\~{}}\htmladdnormallink{\latex{\url{#1}}\html{\textit{#1}}}%
+                {news:#1}%
+            }
+        \newcommand{\ftp}[2]%
+            {\htmladdnormallink{\latex{\url{#1}{} in \url{#2}}%
+                    \html{\textit{#1} in \textit{#2}}}%
+                {ftp://#1#2}%
+            }
+        \newcommand{\mailto}[1]%
+            {\htmladdnormallink{\latex{\url{<#1>}}\html{\textit{#1}}}%
+                {mailto:#1}%
+            }
+        \newcommand{\http}[1]%
+            {\htmladdnormallink{\latex{\url{http://#1}}%
+                    \html{\textit{http://#1}}}%
+                {http://#1}%
+            }
+%   }
+\fi
+
 
 % comments and discussions:
 % version 1.4 dated 99/10/07
-% am: comment out obviously outdated stuff and wait for complaints
-% jvh: re: I accept
-% hbb: need expires and posting-frequency headers
-% jvh: re: expires is ok, but I still post it manually so
-%	I've got to see how I could get the posting frequency header
-% am: shouldn't we have document release and date in the title
-% jvh: re: I guess it would overload the title. I would
-%	accept the inclusion into 0.1. I still hope that
-%	the FAQ will experience a slightly lower release
-%	cycle in the near future :)
+% Revision 1.58 dated 2017/06/04 (last CVS version)
+%
 
 %
-\newcommand{\gnuplot}{\textbf{gnuplot}}
-\newcommand{\Gnuplot}{\textbf{Gnuplot}}
+\newcommand{\gnuplot}{\textbf{gnuplot }}
+\newcommand{\Gnuplot}{\textbf{Gnuplot }}
 
 
 \begin{document}
-\title{\Gnuplot{} FAQ}
+\title{\gnuplot FAQ}
 \author{}
 \date{}
 \maketitle
 
+\noindent
+This material is focused on \gnuplot version 5.
+        \\
+FAQ version: 15 April 2019
+
+
 \tableofcontents
+
 
 \setcounter{section}{-1}
 \section{Meta -- Questions}
-\subsection{Where do I get this document?}
-This document is posted about once every two weeks to the newsgroups
-\news{comp.graphics.apps.gnuplot}. Its newest
-(plaintext) version is available via anonymous ftp from
-\ftp{ftp.gnuplot.org}{/pub/gnuplot/faq/gnuplot-faq.txt}.
 
-If you have access to the WWW, you can get the newest version of this
-document from
-\http{www.ucc.ie/gnuplot/gnuplot-faq.html}.
+\subsection{Where do I get this document?}
+
+The newest version of this document is on the web at
+\http{www.gnuplot.info/faq/}.
 
 \subsection{Where do I send comments about this document?}
 
-Send comments, suggestions etc via email to the developer newsgroup
-\mailto{info-gnuplot-beta@Dartmouth.EDU}.
+Send comments, suggestions etc to the developer mailing list
+\mailto{gnuplot-beta@lists.sourceforge.net}.
 
 \section{General Information}
 
 \subsection{What is \gnuplot?}
 
-\gnuplot{} is a command-driven interactive function plotting
-program. It can be used to plot functions and data points in
-both two- and three-dimensional plots in many different
-formats, and will accommodate many of the needs of today's
-scientists for graphic data representation. \gnuplot{} is
-copyrighted, but freely distributable; you don't have to pay
-for it.
-
-This document deals with \gnuplot{} Version 3.7 which is the
-latest official release as of \today. References to bug-fix
-versions or (recent) beta versions are explicitly marked.
+\gnuplot is a command-driven plotting program.
+It can be used interactively to plot functions and data points in
+both two- and three-dimensional plots in many different styles and
+many different output formats.  \Gnuplot can also be used as a
+scripting language to automate generation of plots.
+It is designed primarily for the visual display of scientific data.
+\gnuplot is copyrighted, but freely distributable;
+you don't have to pay for it. You are welcome to download the source code.
 
 
 \subsection{How did it come about and why is it called \gnuplot?}
 
-The authors of \gnuplot{} are:
+The authors of \gnuplot are:
 Thomas Williams, Colin Kelley, Russell Lang, Dave Kotz, John
 Campbell, Gershon Elber, Alexander Woo and many others.
 
@@ -103,670 +147,704 @@ The following quote comes from Thomas Williams:
      prompted us to add some, albeit lame, support for file data.
 
      Any reference to GNUplot is incorrect. The real name of the program
-     is "\gnuplot". You see people use "\gnuplot" quite a bit because many
+     is "gnuplot". You see people use "Gnuplot" quite a bit because many
      of us have an aversion to starting a sentence with a lower case
-     letter, even in the case of proper nouns and titles. \gnuplot{} is not
+     letter, even in the case of proper nouns and titles. gnuplot is not
      related to the GNU project or the FSF in any but the most
      peripheral sense. Our software was designed completely
-     independently and the name "\gnuplot" was actually a compromise. I
+     independently and the name "gnuplot" was actually a compromise. I
      wanted to call it "llamaplot" and Colin wanted to call it "nplot."
      We agreed that "newplot" was acceptable but, we then discovered
      that there was an absolutely ghastly pascal program of that name
      that the Computer Science Dept.\ occasionally used. I decided that
-     "\gnuplot" would make a nice pun and after a fashion Colin agreed.
+     "gnuplot" would make a nice pun and after a fashion Colin agreed.
 \end{quote}
 
 
-\subsection{Does \gnuplot{} have anything to do with the FSF and the GNU
-project?}
-
-\Gnuplot{} is neither written nor maintained by the FSF\@. It is not
-covered by the General Public License, either. It used to be distributed
-by the FSF, however, due to licensing issues it is no longer.
-
-\Gnuplot{} is freeware in the sense that you don't have to pay
-for it. However it is not freeware in the sense that you would be
-allowed to distribute a modified version of your \gnuplot{} freely.
-Please read and accept the \texttt{Copyright} file in your distribution.
-
-\subsection{What does \gnuplot{} offer?}
+\subsection{What does \gnuplot offer?}
 
 \begin{itemize}
-\item Plotting of two-dimensional functions and data points in many
-different styles (points, lines, error bars)
-\item computations in integer, float and complex arithmetic
-\item plotting of three-dimensional data points and surfaces in
-many different styles (contour plot, mesh).
-\item support for complex arithmetic
-\item self - defined functions
-\item support for a large number of operating systems, graphics
-file formats and devices
-\item extensive on-line help
-\item labels for title, axes, data points
-\item command line editing and history on most platforms
+\item Two-dimensional functions and data plots combining many different
+elements such as points, lines, error bars, filled shapes, labels, arrows, ...
+\item Polar axes, log-scaled axes, general nonlinear axis mapping, parametric coordinates
+\item Data representations such as heat maps, beeswarm plots, violin plots, histograms, ...
+\item Three-dimensional plots of data points, lines, and surfaces in
+many different styles (contour plot, mesh)
+\item Algebraic computation in integer, float and complex arithmetic
+\item Data-driven model fitting using Marquardt-Levenberg minimization
+\item Support for a large number of operating systems, graphics
+file formats and output devices
+\item Extensive on-line help
+\item \TeX{}-like text formatting for labels, titles, axes, data points
+\item Interactive command line editing and history
 \end{itemize}
 
-\subsection{Is \gnuplot{} suitable for batch processing?}
 
-Yes. You can read in files from the command line, or you can
-redirect your standard input to read from a file. Both data and
-command files can be generated automatically, from data
-acquisition programs or whatever else you use.
+\subsection{Is \gnuplot suitable for scripting?}
 
-\subsection{Can I run \gnuplot{} on my computer?}
+Yes. Gnuplot can read in files containing additional commands during
+an interactive session, or it can be run in batch mode by piping a
+pre-existing file or a stream of commands to stdin. Gnuplot is used
+as a back-end graphics driver by higher-level mathematical packages 
+such as Octave and can easily be wrapped in a cgi script for use as a 
+web-driven plot generator.  Gnuplot supports context- or data-driven
+flow control and iteration using familiar statements
+{\em if else continue break while for}.
 
-\Gnuplot{} is available for a number of platforms. These are: Unix
-(X11 and NeXTSTEP), VAX/VMS, OS/2, MS-DOS, Amiga, MS-Windows,
-OS-9/68k, Atari ST, BeOS, and the Macintosh.
 
+\subsection{Can I run \gnuplot on my computer?}
 
-Please notify the FAQ-maintainer of any further ports you
-might be aware of.
+\Gnuplot{} is in widespread use on many platforms, including
+MS Windows, linux, unix, and OSX.  The current source code retains
+supports for older systems as well, including VMS, Ultrix, OS/2, and
+MS-DOS. 16-bit platforms are no longer supported.
 
-You should be able to compile the \gnuplot{} source more or
-less out of the box on any reasonable standard (ANSI/ISO C, POSIX)
+You should be able to compile the \gnuplot source more or
+less out of the box in any reasonably standard (ANSI/ISO C, POSIX)
 environment.
 
-\subsection{Legalize it!}
 
-\Gnuplot{} is freeware authored by a collection of volunteers, who cannot
+\subsection{Legalities}
+
+\Gnuplot{} is authored by a collection of volunteers, who cannot
 make any legal statement about the compliance or non-compliance of
-\gnuplot{} or its uses. There is also no warranty whatsoever. Use at your
-own risk.
+\gnuplot or its uses. There is no warranty whatsoever. Use at your own risk.
 
 
-Citing from the README of a mathematical subroutine package by R.
-Freund:
+\subsection{Does \gnuplot have anything to do with the FSF and the GNU
+project?}
 
-\begin{quote}
-For all intent and purpose, any description of what the codes are doing
-should be construed as being a note of what we thought the codes did on
-our machine on a particular Tuesday of last year.  If you're really
-lucky, they might do the same for you someday.  Then again, do you
-really feel *that* lucky?
-\end{quote}
+\Gnuplot{} is neither written nor maintained by the FSF\@. At one time it
+was distributed by the FSF but this is no longer true. \Gnuplot{} as a whole
+is not covered by the GNU General Public License (GPL).
 
-\subsection{Is \gnuplot{} Y2K compliant?}
+\Gnuplot{} is freeware in the sense that you don't have to pay for it.
+You can use or modify gnuplot as you like however certain restrictions
+apply to further distribution of modified versions.
+Please read and accept the modification and redistribution terms in
+the \textit{Copyright} file.
 
-\Gnuplot's compliance depends in part on the compliance of the underlying
-operating system and hardware.  The only use \gnuplot{} makes of a system-
-supplied date is in the "set timestamp" command, which simply echos the
-date on the plot.  If the underlying OS cannot produce an accurate time
-string, then the "set timestamp" command may fail to print the correct
-date on plots.
-
-In \gnuplot{} 3.5, if the user chooses to use \%y in a timestamp format,
-rather than \%Y, it will print 2-digit rather than 4-digit years.  The
-effects depend on the importance you place on the timestamps printed on
-plots.
-
-\Gnuplot{} 3.7 also allows the use of time/date data as variables, but the
-user has complete control over the input format of the data and the
-output format of the tic labels -- the same 2-digit "\%y" (interpreted
-as 1900+) and 4-digit "\%Y" formats are both available.  But again,
-these are user-specifiable, so if there is a Y2K problem here, it is the
-responsibility of the user.
-
-Of course, \gnuplot{} is built by executing a makefile, which may well be
-date--dependent.  So if the operating system has a Y2K problem, the
-process of building a new executable of \gnuplot{} may be affected.  But
-that wouldn't be a problem with \gnuplot{} per se.
-
-\textbf{IMPORTANT NOTICE}
-
-As of \gnuplot{} beta version 3.7.0.9, the interpretation of the "\%y" two
-digit year specifier was changed in accordance with the recommendations
-of The Open Group and all major Unix vendors.  When a century is not
-otherwise specified, values in the range 69-99 refer to the twentieth
-century and values in the range 00-68 refer to the twenty-first century.
-Be very careful when interpreting 2-digit year expressions.
 
 \subsection{Where do I get further information?}
 
-The following sites have more information about \gnuplot.
+See the main gnuplot web page \http{www.gnuplot.info}.
 
-\begin{itemize}
-\item \http{www.comnets.rwth-aachen.de/doc/gnu/gnuplot37/gnuplot.html}
-	an online documentation in html--format
-\item \http{www.usf.uni-osnabrueck.de/~breiter/tools/gnuplot/index.en.html}
-	has many links to many features and add-ons for \gnuplot{}
-\item \http{web.cs.uni.edu/Help/gnuplot/}
-	contains an online tutorial
-\item \http{brian.me.tufts.edu/GnuplotInLaTeX/}
-	contains infos abount \gnuplot{} and \LaTeX{}
-\item \http{ndevilla.free.fr/gnuplot/}
-	explains the use of a \gnuplot{} API in ANSI C (commonly known
-	as gnuplot\_pipes
-\item \http{ricardo.ecn.wfu.edu/~cottrell/qplot/}
-	on how to plot quarterly time data
-\item \http{monsoon.harvard.edu/~mhagger/download}
-	a Python interface for \gnuplot{}
-\item \ftp{ftp.thewrittenword.com}{/free/by-package/}
-	contains Solaris, IRIX, HP-UX and Digital Unix binaries
-\item \http{www.sci.muni.cz/~mikulik/gnuplot.html}
-	has Petr's famous OS/2 mouse support and the pm3d terminal
-	for colour 3d surfaces. Furthermore some more links to
-	other sites
-\end{itemize}
+Some documentation and tutorials are available in other languages than English.
+See \http{gnuplot.sourceforge.net/help.html}, section "Localized learning pages
+about gnuplot", for the most up-to-date list.
 
-Some documentation is available in other languages than English.
-Those include:
-\begin{itemize}
-\item \http{www.multimania.com/~gersoo/gnuplt/index.html}
-	contient des informations dans la langue de Moli\`ere:
-	les 1ers pas avec \gnuplot, malheureusement seulement
-	version 3.5. Vous trouverez un cours directement en ligne
-	appelle\'e "1ers pas avec gnuplot". Le cours est aussi
-	disponible en Postscript.
-\item \http{www.al.lu/euler/gnuplot.shtml}
-	encore des informations en langue fran\c{c}aise avec
-	possibilit\'e de t\'el\'echargement des versions
-	binaires
-\end{itemize}
 
-Here are some more sites, however these are somewhat outdated in
-carrying still references to beta versions. If you download software
-from there you should be aware that beta versions are not officially
-endorsed.
-
-\begin{itemize}
-\item \http{www.cs.dartmouth.edu/gnuplot_info.html}
-	slightly outdated site for the 3.6 beta version,
-	but also a web-gateway to the users' newsgroup
-\item \http{members.theglobe.com/gnuplot/}
-	basically same as above.
-\item \http{homepage.mac.com/gnuplot/}
-	is the new site for a Macintosh port of \gnuplot{}
-\end{itemize}
-
-The following sites were said to exist, however they seem to be
-down right now. 
-\begin{itemize}
-\item \http{www.geocities.com/SiliconValley/Foothills/6647/}
-	the copyright statement and some binaries
-	contains ads
-\item \http{www.delorie.com/gnu/docs/gnuplot/gplot_toc.html} doesn't 
-		work
-\item \ftp{picard.tamu.edu}{/pub/gnuplot}
-	gives  a tutorial
-\item \http{feff.phys.washington.edu/~ravel/gnuplot}
-	has a new mode for the users of (X)Emacs
-\end{itemize}
-    
 \section{Setting it up}
 
 \subsection{What is the current version of \gnuplot?}
 
-The current version of \gnuplot{} is 3.7, which has many
-improvements over 3.5. 3.6 was never released to avoid
-confusions with the beta versions.
+The current released version of \gnuplot is 5.2, first released in September 2017.
+Incremental versions (patchlevel 1, 2, ...) are typically released every six months.
+The development version of \gnuplot is currently 5.3.
 
 \subsection{Where can I get \gnuplot?}
 \label{where-get-gnuplot}
 
-The best place if definitly \http{www.gnuplot.org}. From there
-you find various pointers to other sites.
+The best place to start is \http{www.gnuplot.info}. From there
+you find various pointers to other sites, including the project
+development site on SourceForge \http{sourceforge.net/projects/gnuplot}.
 
-The source distribution ("gnuplot-3.7.tar.gz" or a similar name) is
-available from the official distribution site and its mirrors.
+The source distribution ("gnuplot-5.2.6.tar.gz" or a similar name) is
+available from the official distribution site \http{sourceforge.net/projects/gnuplot}.
 
-The main server is \ftp{ftp.gnuplot.org}{/pub/gnuplot/}. This server is
-mirrored by several others, among those are
+\subsection{Where can I get current development version of \gnuplot?}
+
+The development version of gnuplot is held in a git repository which you
+can clone as shown below to inspect or build an executable program 
+from the source.
+
+\scriptsize
+\begin{verbatim}
+  git clone https://git.code.sf.net/p/gnuplot/gnuplot-main gnuplot-gnuplot-main
+\end{verbatim}
+\normalsize
+
+Important note: questions related to the development version should go to
+\mailto{gnuplot-beta@lists.sourceforge.net}.
+
+
+\subsection{How do I compile \gnuplot on my system?}
+
+Read the release notes and files \textit{README} and \textit{INSTALL}.
+You will need C and C++ compilers and installed versions of various
+support libraries depending on what configuration options you choose and what
+terminal types you want your executable to support.
+
 \begin{itemize}
-   \item \ftp{mirror.aarnet.edu.au}{/pub/gnuplot/}
-   \item \ftp{ftp.dartmouth.edu}{/pub/gnuplot/}
-   \item \ftp{ftp.irisa.fr}{/pub/gnuplot/}
-   \item \ftp{ftp.gnuplot.vt.edu}{/pub/gnuplot/}
+\item
+To build from a release version on linux, use \textit{./configure} (or \textit{./configure {-}{-}prefix=\$HOME/usr}
+for an installation for a single user), \textit{make} and finally
+\textit{make install}.  Pay close attention to the output from the \textit{configure}
+script (yes there is a lot of it).
+There you will find hints as to what additional support libraries may be needed and
+what additional options may be desirable.  In general you will need to have installed
+the "development" package for each of the support libraries.
+\item
+To build from the development source on linux you must run a separate script \textit{./prepare}
+prior to running \textit{./configure} .
+\item
+On Windows, makefiles can be found in \textit{config/mingw}, \textit{config/msvc},
+\textit{config/watcom}, and \textit{config/cygwin}. Update the options in the 
+makefile's header and run the appropriate \textit{make} tool in the same directory
+as the makefile. Additional instructions can be found in the makefiles.
+\item
+For other platforms, copy the relevant makefile (e.g. \textit{makefile.os2} for
+OS/2) from \textit{config/} to \textit{src/}, optionally update options in the
+makefile's header, then change directory to \textit{src} and run \textit{make}.
 \end{itemize}
-
-You can also have a look at the following WWW-pages which provide a
-source to obtain \gnuplot:
-\begin{itemize}
-    \item \http{members.theglobe.com/gnuplot/}
-    \item \http{www.geocities.com/SiliconValley/Foothills/6647/}
-    \item \http{mirror.aarnet.edu.au/pub/gnuplot/}
-\end{itemize}
-
-The current version for the Macintosh is 2.04b, based on
-\gnuplot{} 3.5 pre3.6beta338, and is available from 
-\begin{itemize}
-\item \http{users.ece.gatech.edu/~schooley/}.
-\end{itemize}
-Unfortunately, this version does not seem to be maintained anymore.
-
-Source and binary distributions for the Amiga are available on
-Aminet \ftp{ftp.wustl.edu}{~aminet/} and its mirrors, for example
-ftp.uni-kl.de, oes.orst.edu or ftp.luth.se.
-
-MS-DOS and MS-Windows binaries are available from
-the above servers and are called gp37dos.zip, gp37dj.zip, gp37w16.zip,
-gp37mgw.zip, gnuplot3.7cyg.zip.
-
-OS/2 binaries are called gp37os2.zip.
-
-An X11 Window System front-end is available at 
-\http{www.flash.net/~dmishee/xgfe/xgfe.html}.
-
-The NeXTSTEP front end can be found at
-\ftp{next-ftp.peak.org}{/pub/next/binaries/plotting/Gnuplot1.2_bin.tar.Z}.
-
-A version for OS-9/68K can be found at
-\ftp{cabrales.cs.wisc.edu}{/pub/OSK/GRAPHICS/gnuplot32x.tar.Z}; it
-includes both an X-Window Systems and a non - X-Window Systems
-version. 
-
-Versions for the Atari ST and TT, which include some GEM
-windowing support, are available from
-\ftp{ftp.uni-kl.de}{/pub/atari/graphics/}, as gplt35st.zip
-and gplt35tt.zip. They work best under MiNT.
-
-Executable files, plus documentation in Japanese, exist for the
-X680x0 on
-\ftp{ftp.csis.oita-u.ac.jp}{/pub/x68k/fj.binaries.x68000/vol2}.
-
-It is a good idea to look for a nearby ftp site when
-downloading things. You can use archie for this. See if an
-archie client is installed at your system (by simply typing
-archie at the command prompt), or send mail to \mailto{archie@sura.net}
-with the word 'help' in both the subject line and the body of
-the mail. However, be aware that the version you find at a near
-ftp site may well be out of date; check the last modification
-date and the number of bytes against the newest release at one
-of the official servers.
-
-If you can't locate a working archie server, you can use other web-based
-search engines for searching for \gnuplot. One of these would be Lycos at
-\http{ftpsearch.lycos.com/}.
-
-As of June 1999, the \gnuplot{} distribution is also mirrored
-at the Comprehensive TeX Archive Network (CTAN) in the
-\texttt{graphics/gnuplot} directory. See
-\begin{itemize}
-\item \http{www.ctan.org/}.
-\end{itemize}
-
-Bug fixes can also be found at \gnuplot{} distribution sites
-in the \texttt{patches} directory.
-
-\subsection{How do I get \gnuplot{} to compile on my system?}
-
-As you would any other installation. Read the files README.1ST
-and README. 
-
-For Unix, use configure and make. For DOS, if you are using bash and
-DJGPP, you can just run \texttt{djconfig.sh}. For other platforms, copy
-the relevant makefile from \texttt{config/} to \texttt{src}, change to
-\texttt{src} and run make.
 
 
 \subsection{What documentation is there, and how do I get it?}
 
+Full documentation is included in the release distribution as a PDF file.
+Individual sections can be browsed from inside a gnuplot session
+by typing \textit{help {\em keyword}}.
+Documentation in other formats can be compiled from source in the
+{\em docs} subdirectory.
 
-The documentation is included in the source distribution. Look
-at the docs subdirectory, where you'll find
+Online copies in English and Japanese are available at
+\http{gnuplot.sourceforge.net/documentation.html}.
 
-\begin{itemize}
-\item a Unix man page, which says how to start \gnuplot{}
-\item a help file, which also can be printed as a manual
-\item a tutorial on using \gnuplot{} with \LaTeX{}
-\item a quick reference summary sheet for \TeX only
-\end{itemize}
+\subsection{Worked examples}
 
-PostScript copies of the documentation can be ftp'd from
-\ftp{ftp.dartmouth.edu}{/pub/gnuplot}, as \texttt{manual.ps.Z} and
-\texttt{tutorial.ps.Z}
+There is a directory of worked examples in the the source distribution.
+These examples and the resulting plots may also be found online at
+\http{gnuplot.sourceforge.net/demo/}.
 
-The documentation is built during the installation if you have \LaTeX{}
-installed on your system, look in the
-directories \texttt{docs} and \texttt{tutorial}.
 
-Documentation about \gnuplot{} is available in the most common
-formats at the \gnuplot{} distribution sites in the files 
-\texttt{gpdoc.zip} and \texttt{gpdoc2.zip}.
+\subsection{How do I determine which options are compiled into \gnuplot?}
+
+Given that you have a compiled version of \gnuplot, you can use the
+\verb+show+ command to display a list of configuration and build options
+that were used to build your copy.  The output formats (a.k.a. "terminals")
+built into your copy of gnuplot are reported by \verb+set terminal+.
+
+\small
+\begin{verbatim}
+gnuplot> show version long
+gnuplot> set terminal
+\end{verbatim}
+\normalsize
 
 
 \section{Working with it.}
 
 \subsection{How do I get help?}
 
-Read this document.
+Give the \verb+help+ command at the initial prompt. After that, keep
+looking through the keywords. Good starting points are \verb+help plot+
+and \verb+help set+.
 
-Give the 'help' command at the initial prompt. After that, keep
-looking through the keywords. Good starting points are 'plot'
-and 'set'.
-
+\begin{itemize}
+\item
 Read the manual, if you have it.
 
-Look through the demo subdirectory; it should give you some ideas.
+\item
+Run the demos in the {\em demo} subdirectory or look at the 
+online copies. They should give you some ideas.
 
+\item
 Ask your colleagues, the system administrator or the person who
 set up \gnuplot.
 
-If all these fail, please upgrade to the newest version of \gnuplot{}
-or urge your system-administrator to do so. Then
-post a question to \news{comp.graphics.apps.gnuplot} or send mail
-to the gatewayed mailing list \mailto{info-gnuplot@dartmouth.edu}.
-Do not forget to cite the version number and the operating system.
-If you want to subscribe to the mailing list, send a mail to
-\mailto{majordomo@dartmouth.edu} with the body of the message being
-'subscribe info-gnuplot'. Please don't do this if you can get
-\news{comp.graphics.apps.gnuplot} directly. If you post a
-question there, it is considered good form to solicit e-mail
-replies and post a summary.
+\item
+There is an old-school usenet group devoted to gnuplot questions
+\news{comp.graphics.apps.gnuplot}
+inhabited mostly by users who found it last century.
+
+\item
+A more browser-oriented help forum may be found on StackOverflow
+http{stackoverflow.com/questions/tagged/gnuplot}
+
+\item
+If all these fail, post a question to \news{comp.graphics.apps.gnuplot} or send mail
+to the gatewayed mailing list \mailto{gnuplot-info@lists.sourceforge.net}.
+Please note that due to the overwhelming amount of spam it would otherwise receive,
+you must subscribe before you can post to it. Subscription instructions 
+may be found at
+\http{lists.sourceforge.net/lists/listinfo/gnuplot-info}.
+
+\end{itemize}
+When asking a question, always mention the gnuplot version and
+operating system you are using.  If you are asking about a plot that 
+did not come out the way you expected, please try to show a minimal
+set gnuplot commands that produce a plot showing the problem.
+
 
 \subsection{How do I print out my graphs?}
 
-The kind of output produced is determined by the 'set terminal'
-command; for example, 'set terminal postscript' will produce
-the graph in PostScript format. Output can be redirected using
-the 'set output' command.
+The kind of output produced by a plot command is determined by a
+prior \verb+set terminal+ command.  For non-interactive output
+you should pair this with a \verb+set output+ command to provide
+a file name.
 
-As an example, the following prints out a graph of sin(x) on a
-Unix machine running the X-Window System.
+As an example, the following first plots a graph of sin(x) to the
+screen and then redraws that same plot as a PDF output file.
+Note: the PDF plot will not look exactly like the plot on the screen.
 
+\small
 \begin{verbatim}
-gnuplot> plot [-6:6] sin(x)
-gnuplot> set terminal postscript
-Terminal type set to 'postscript'
-Options are 'landscape monochrome "Courier" 14'
-gnuplot> set output "sin.ps"
+gnuplot> plot sin(x)
+gnuplot> set terminal pdf
+Terminal type is now 'pdfcairo'
+Options are ' transparent enhanced fontscale 0.5 size 5.00in, 3.00in '
+gnuplot> set output "sin.pdf"
 gnuplot> replot
-gnuplot> set output              # set output back to default
-gnuplot> set terminal x11        # ditto for terminal type
-gnuplot> ! lp -ops sin.ps        # print PS File (site dependent)
-request id is lprint-3433 (standard input)
-lp: printed file sin.ps on fg20.rz.uni-karlsruhe.de (5068 Byte)
-!
+gnuplot> unset output            # close output file (otherwise it stays open)
+gnuplot> unset terminal          # return to default interactive terminal
 gnuplot>
 \end{verbatim}
+\normalsize
 
-In Microschrott Windows you click in the upper left
-corner of the graph window and print directly from there.
+Using the platform-independent way of restoring terminal by \textit{set term
+push/pop} commands, do it by
+\small
+\begin{verbatim}
+gnuplot> set terminal push    # save current terminal type (may not be default)
+gnuplot> set terminal pdf
+gnuplot> set out 'a.pdf'
+gnuplot> replot
+gnuplot> unset out
+gnuplot> set term pop         # restore saved terminal type
+\end{verbatim}
+\normalsize
+
+Some interactive terminal types (\textit{win, wxt, qt}) provide a printer icon
+on the terminal's toolbar. This tool prints the current plot or saves it to file
+using generic system tools rather than by using a different gnuplot terminal type.
+That is, the file you get by selecting "save to png" in the print menu may be
+different than the file you get from \textit{set term png; replot;}.
+In general a plot saved in this way will look more like the screen image than
+a plot generated from the command line by changing the terminal type.
 
 
 \subsection{How do I include my graphs in <word processor>?}
 
 Basically, you save your plot to a file in a format your word
-processor can understand (using "set term" and "set output",
-see above), and then you read in the plot from your word
-processor. Vector formats should be preferred, as you can scale
-your graph later to the right size.
+processor can understand (using \verb+set term+ and \verb+set output+,
+see above), and then you read in the plot from your word processor. Vector
+formats (PostScript, emf, svg, pdf, \TeX{}, \LaTeX{}, etc) should be preferred,
+as you can scale your graph later to the right size.
 
-Details depend on the kind of word processor you use; use "set
-term" to get a list of available file formats.
+Details depend on which word processor you use; use \verb+set term+ to get a
+list of available file formats.
 
-Many word processors can use Encapsulated PostScript for
-graphs. This can be generated by the "set terminal postscript
-eps" command. Most MS-DOS word processors understand HPGL
-(terminal type hpgl).
+Many word processors can use Encapsulated PostScript (*.eps) for graphs. 
+You can generate eps output in \gnuplot using either
+\verb+set terminal postscript eps+
+or
+\verb+set terminal epscairo+
+.
+\Gnuplot does not embed a bitmap preview image in the output eps file.
+To accommodate some word processors you may have to add a preview image yourself.
+You can use the GSView viewer for this (available for OS/2, Windows and X11),
+or some Unix ps tool.
 
-With TeX, it depends on what you use to print your dvi files.
-If you use dvips or dvi2ps, you can use Encapsulated
-PostScript. For emTeX (popular for MS-DOSns OS/2), you can use emTeX,
-otherwise use the \LaTeX{} terminal type, which generates a
-picture environment.
+Some Windows office applications, including OpenOffice.org, can handle
+vector images in EMF format. These can be either produced by the emf 
+terminal, or by selecting 'Save as EMF...' from the toolbar of the graph
+window of the windows terminal.
 
-If nothing else helps, try using the pgm or ppm format and
-converting it to a bitmap format your favourite word processor
-can understand. An invaluable tool for this is Jef Poskanzer's
-PBMPLUS package.
+OpenOffice.org can also read SVG, as well as AutoCAD's dxf format.
 
-The PBMPLUS package is available in the contrib distribution
-for the X-Window System. The original site for this is
-\ftp{ftp.x.org}{/contrib/}. There are many mirrors, e.g.
-\ftp{ftp.tu-darmstadt.de}{/pub/X11/contrib/} or .
-\ftp{sunsite.unc.edu}{/pub/X11/contrib/}.
+There are many ways to use gnuplot to produce graphs for inclusion in a
+\TeX\ or \LaTeX\ document.  
+Some terminals produce *.tex fragments for direct inclusion; others 
+produce *.eps, *.pdf, *.png output to be included using the
+\textbackslash{}includegraphics command.
+The epslatex and cairolatex terminals produce both a graphics
+file (*.eps or *.pdf) and a *.tex document file that refers to it.
+The tikz terminal produces full text and graphics to a pdf file
+when the output is processed with pdflatex.
 
-The most recent release of pbm by the author is dated December
-91 and is called \texttt{pbmplus10dec91.tar.Z}.
+Most word processors can import bitmap images (png, pbm, etc).
+The disadvantage of this approach is that the resolution of your
+plot is limited by the size of the plot at the time it is generated
+by gnuplot, which is generally a much lower resolution than the
+document will eventually be printed in.
 
-There is new version including lots of patches from the net
-that is not maintained by the author called netpbm, with the
-newest version called \texttt{netpbm-1mar1994.tar.gz}.
 
-Check archie (see Q\ref{where-get-gnuplot}) for an archive site near you.
-
-For Microso\$t Windows and MacOS you can use the clip board to
-copy your graph and paste it into your favourite Windows or
-MacOS word processor.
-
-\subsection{How do I post-process a \gnuplot{} graph?}
+\subsection{How do I edit or post-process a \gnuplot graph?}
 
 This depends on the terminal type you use.
 
-You can use the terminal type fig (you may need to recompile
-\gnuplot{} to enable this terminal type, by putting \verb+#define FIG+
-into <term.h>), and use the xfig drawing program to edit the
-plot afterwards. You can obtain the xfig program from its web site
-\http{www.xfig.org/}. More information about the text-format used
-for fig can be found in the fig-package.
+\begin{itemize}
 
-You may use the tgif terminal, which creates output suitable for
-reading within tgif (\http{bourbon.cs.umd.edu:8001/tgif/}),
-an interactive 2-D drawing tool under X11.
+\item \textbf{svg} terminal (scalable vector graphics) output can
+be further edited by a svg editor, e.g. 
+\textbf{Inkscape} (\http{www.inkscape.org}),
+\textbf{Skencil} (\http{www.skencil.org}) or
+\textbf{Dia} (\http{projects.gnome.org/dia/}), or loaded
+into \textbf{OpenOffice.org} with an on-fly conversion into OO.o Draw
+primitives.
 
-Both tgif and xfig can also be obtained from the X Window contrib
-distribution (see Q3.3).
+\item PostScript or PDF output can be edited directly by tools such
+as Adobe Illustrator or Acrobat, or can be converted to a variety
+of other editable vector formats by the \textbf{pstoedit} package.
+Pstoedit is available at \http{www.pstoedit.net}.
 
-Pstoedit can convert Postscript into a wide variety of formats.
-Pstoedit is available a
-\http{www.geocities.com/SiliconValley/Nework/1958/pstoedit/}.
+\item The DXF format is the AutoCAD's format, editable by several
+other applications.
 
-Gimp may be able to post-process pixel graphics generated with
-\gnuplot.
-
+\item Bitmapped graphics (e.g. png, jpeg, pbm) can be edited using
+tools such as ImageMagick or Gimp.  
 In general, you should use a vector graphics program to post-process
-vector graphic formats, and pixel based programs for pixel graphics.
+vector graphic formats, and a pixel-based editing program 
+to post-process pixel graphics.
+
+\end{itemize}
 
 
 \subsection{How do I change symbol size, line thickness and the like?}
 
-Again, this depends on the terminal type. For PostScript, you can edit
-the generated PostScript file. An overview of what means what in the
-PostScript files \gnuplot{} generates can be found at
-\ftp{picard.tamu.edu}{/pub/gnuplot/} as gs-ps.doc.  A general
-introduction to PostScript can be found at
-\ftp{unix.hensa.ac.uk}{/pub/misc/ukc.reports/comp.sci/reports/} as
-11-92.ps.Z.
+Gnuplot offers a variety of commands to set line and point properties,
+including color, thickness, point shape, etc.  The command \verb+test+ will
+display a test page for the currently selected terminal type showing
+the available pre-defined combinations of color, size, shape, etc.
+You can use the command \textit{set linetype} to change this or 
+define additional combinations.
 
-
-\subsection{How do I generate plots in the GIF format?}
-
-If \gnuplot{} was compiled with the external GD library, there is a gif
-terminal.
-
-As of version 1.6, gd library dropped support for gif in favour of the
-superior png format. For those who absolutely need gif support in \gnuplot{},
-we are providing older versions of gd library at the \gnuplot{} distribution
-sites which are free of Unisys patented code. Please read also the file
-README a the ftp-sites.
 
 \subsection{Can I animate my graphs?}
 
-First have a look at animate.dem in the demo directory
-of \gnuplot. Basically, animated graphs are a sequence of
-plots in a suitable format.
+Only one \gnuplot terminal type (gif) directly outputs an animated file:
+\begin{verbatim}
+set terminal gif animate {delay <time>} {loop <N>} {optimize}
+\end{verbatim}
 
-Then have a look at the tool whirlgif 3.04, available at
-\http{www.danbbs.dk/~dino/whirlgif}. It reads run-length 
-encoded gifs and packs them into a minimal animation.
-On the web-pages you will find a manual and an example.
-
-You can also write a small script to get \gnuplot{} to output a family
-of GIF files, then have it execute some animator such as gifsicle:
-\http{http://www.lcdf.org/~eddietwo/gifsicle}
-or gifmerge
-\http{http://the-labs.com/GIFMerge}
-
-mpeg\_encode will encode a sequence of images into the mpeg-format.
+Have a look at
+\http{gnuplot.sourceforge.net/demo/animate.html}
+in the demo collection.
 
 
 \subsection{How do I plot implicit defined graphs?}
 
 Implicit graphs or curves cannot be plotted directly in \gnuplot.
 However there is a workaround. 
+\small
 \begin{verbatim}
-gnuplot> # as example. Place your definition in the following line
+gnuplot> # An example. Place your definition in the following line:
 gnuplot> f(x,y) = y - x**2 / tan(y)
 gnuplot> set contour base
 gnuplot> set cntrparam levels discrete 0.0
-gnuplot> set nosurface
-gnuplot> set term table
-gnuplot> set out 'curve.dat'
+gnuplot> unset surface
+gnuplot> set table $TEMP
 gnuplot> splot f(x,y)
-gnuplot> set out
-gnuplot> set term {your usual terminal for interactive work}
-gnuplot> plot 'curve.dat' w l
+gnuplot> unset table
+gnuplot> plot $TEMP w l
 \end{verbatim}
+\normalsize
 The trick is to draw the single contour line z=0 of the surface
-z=f(x,y), and store the resulting contour curve to a \gnuplot{} datafile.
+z=f(x,y), and store the resulting contour curve to a temporary file or datablock.
  
+
+\subsection{How to fill an area between two curves}
+
+A plot with filled area between two given curves can be easily obtained using
+the pseudo file '+' with \textit{filledcurves closed}. The example below
+demonstrates this for two curves f(x) and g(x):
+\small
+\begin{verbatim}
+f(x)=cos(x)
+g(x)=sin(x)
+xmax=pi/4
+set xrange [0:xmax]
+plot '+' using 1:(f($1)):(g($1)) with filledcurves
+\end{verbatim}
+\normalsize
+
+Note that this code fragment fills area between the two curves, regardless of
+which one is above the other.  If you want to fill only the area satisfying g(x)<f(x)
+or f(x)<g(x)
+add an additional keyword \textit{above} or \textit{below} after \textit{filledcurves}.
+
+See the documentation for \textit{help filledcurves}, 
+\textit{help special-filenames}, and \textit{help ternary} and see
+\textit{fillbetween.dem} in the \textit{demos} directory.
+
+
+\subsection{Pm3d splot from a datafile does not draw anything}
+\label{blank1}
+
+You do \verb+set pm3d; splot 'a.dat'+ and no plot but colorbox appears.
+Perhaps there is no blank line in between two subsequent scans (isolines) in
+the data file? Add blank lines! If you are curious what this means, then don't
+hesitate to look to files like \verb+demo/glass.dat+ or \verb+demo/triangle.dat+
+in the gnuplot demo directory.
+
+You can find useful the following awk script (call it e.g. \verb+addblanks.awk+)
+which adds blank lines to a data file whenever number in the first column
+changes:
+\small
+\begin{verbatim}
+/^[[:blank:]]*#/ {next} # ignore comments (lines starting with #)
+NF < 3 {next} # ignore lines which don't have at least 3 columns
+$1 != prev {printf "\n"; prev=$1} # print blank line
+{print} # print the line
+\end{verbatim}
+\normalsize
+Then, either preprocess your data file by command
+\verb+awk -f addblanks.awk <a.dat+ or plot the datafile under a unixish platform
+by \verb+gnuplot> splot "<awk -f addblanks.awk a.dat"+.
+
+
+\subsection{Drawing 2D projection of 3D data}
+
+Use \textit{set view map}
+There are also plotting styles \verb+with image+ and \verb+with rgbimage+
+for plotting 2D color images.
+
+\subsection{How to overlay dots/points scatter plot onto a pm3d map/surface}
+
+Use the explicit (see also implicit) switch of the pm3d style:
+\small
+\begin{verbatim}
+gnuplot> set pm3d explicit
+gnuplot> splot x with pm3d, x*y with points
+\end{verbatim}
+\normalsize
+
+
+\subsection{How to produce labeled contours}
+
+Labeling individual contours in a contour plot used to require special
+tricks and extra processing steps in \gnuplot version 4.
+See
+\http{gnuplot.sourceforge.net/scripts/index.html\#tricks-here}.
+
+In version 5 the procedure is much simpler.  Plot the contours twice,
+once "with lines" and once "with labels".  To make the labels stand out
+it may help to use 
+\begin{verbatim}
+set style textbox opaque noborder
+set contours
+splot 'DATA' with line, 'DATA' with labels boxed
+\end{verbatim}
+
+\subsection{Color facets with pm3d}
+
+It is possible to draw colors facets of a 3D objects, organized in such a file:
+\small
+\begin{verbatim}
+# triangle 1
+x0 y0 z0 <c0>
+x1 y1 z1 <c1>
+
+x2 y2 z2 <c2>
+x2 y2 z2 <c2>
+
+
+# triangle 2
+x y z
+...
+\end{verbatim}
+\normalsize
+
+Notice the positioning single and double blank line. \textit{<c>} is an optional
+color.
+
+Then plot it by (either of splot's):
+\small
+\begin{verbatim}
+set pm3d
+set style data pm3d
+splot 'facets.dat'
+splot 'facets_with_color.dat' using 1:2:3:4
+\end{verbatim}
+\normalsize
+
+Note that you avoid surface lines by \textit{set style data pm3d} or 
+\textit{splot ... with pm3d}.
+
+In the above example, pm3d displays triangles as independent surfaces.
+They are plotted one surface after another, as found in the data file.
+Parts overlapping in 2D projection are overdrawn.
+
+Gnuplot is not 3D modeling program. Its hidden routines apply for points and
+lines, but not for faces. 
+Without handling the data as a collection of faces, there would be no surface
+anything could be hidden behind.  The 'hidden3d' algorithm works by using the
+input data in two ways: first, to set up a collection of triangles (made from a
+mesh of quadrangles) that form the surface, second as a collection of edges.  It
+then goes through all those edges, checking what parts of them are not hidden
+behind any faces, and draws those.
+
+Consequently, gnuplot won't draw your surface or 3D object as a virtual reality.
+It works OK for \textit{set pm3d map} but for true 3D you would be probably more
+happy writing a converter of your facets into a VRML file.
+
+
+\subsection{Palette for printing my color map on color as well as black\&white
+printer?}
+
+Try \textit{set palette cubehelix}.
+
 
 \section{Wanted features}
 
-\subsection{What's new in \gnuplot{} 3.7?}
+\subsection{What's new in \gnuplot 5.0, 5.2, 5.2.5 etc?}
 
-Too many things to be named here.
-Please refer to the NEWS file in the source distribution.
-
-
-\subsection{Does \gnuplot{} have hidden line removal?}
-
-Version 3.7 supports hidden line removal on all platforms;
-use the command \verb+set hidden3d+.
-
-The 16-bit binaries of \gnuplot{} support the hidden line removal
-only partially as the hidden-line algorithm may hit
-the 640k memory limit.
+Too many things to list here.
+Please refer to the {\em Release Notes} and the \textit{NEWS} file in the
+source distribution, or the "New features" section in the gnuplot documentation.
 
 
-\subsection{Does \gnuplot{} support bar-charts/histograms/boxes?}
+\subsection{Does \gnuplot support a driver for <graphics format>?}
 
-Use the style "with boxes" for bar charts. To get filled boxes,
-you can try a modification by Steve Cumming and jturk, available via ftp
-from the contrib directory
-\ftp{ftp.ucc.ie}{/pub/gnuplot/contrib/gpl37fboxpatch.tar.gz}.
+To see a list of the available graphic drivers for your installation of
+\gnuplot, type \verb+set term+.
 
-Bernhard Reiter wrote an AWK script to post-process the fig-terminal output.
-Please have a look at
-\http{www.usf.uni-osnabrueck.de/~breiter/tools/gnuplot/barcharts.en.html}.
-
-\subsection{Does \gnuplot{} support pie charts?}
-
-It's not possible in \gnuplot, but have a look at
-\http{www.usf.uni-osnabrueck.de/~breiter/tools/piechart/piecharts.en.html}
-
-\subsection{Does \gnuplot{} quarterly time charts?}
-
-It's not possible in \gnuplot, but have a look at
-\http{ricardo.ecn.wfu.edu/~cottrell/qplot}. The corresponding
-file \verb+qplot.zip+ can be obtained from the contrib directory
-on any \gnuplot{} server.
+Some graphics drivers are included in the normal distribution
+but are not built by default. If you want to use them, you'll
+have to recompile from source.
 
 
-\subsection{Does \gnuplot{} support multiple y-axes on a single plot?}
+\subsection{Does \gnuplot have hidden line removal?}
 
-Yes. You can have 2 x- and 2 y-axes per plot. See "plot".
+Yes.
 
-\subsection{Can I put multiple pages on one page?}
+\subsection{Does \gnuplot support bar-charts/histograms/boxes?}
 
-Yes. "set multiplot"
+\Gnuplot{} supports various clustered and stacked histogram styles to display
+pre-tabulated data.  It also offers a few options for accumulating raw data
+into bins, which can in turn be displayed as a bar chart.  See the documentation
+for \textit{bins} and for \textit{smooth frequency}.
 
-If you use the postscript terminal and plot one graph per page you can
-use the program mpage (\http{www.mesa.nl/pub/mpage}) to print
-multiple logical pages per physical page. A similar program is
-the psnup program in the psutils package. This package is available at
-any CTAN mirror.
+\subsection{Does \gnuplot support pie charts? quarterly time charts?}
+
+Pie charts are sort of difficult in \gnuplot, but see
+\http{gnuplot.sourceforge.net/demo/circles.html}, 
+or have a look at
+\http{gnuplot-tricks.blogspot.com/2009/08/pie-charts-entirely-in-gnuplot.html}.
+
+The demo collection contains an example of a simple Gantt chart.
+
+\subsection{Can I arrange multiple plots next to each other on a single page?}
+
+Yes. \verb+set multiplot+.
+
+\subsection{Does \gnuplot support multiple y-axes on a single plot?}
+
+Yes. 2D plots can have separate x axes at the bottom (x1) and top (x2),
+and separate y axes at the left (y1) and right (y2).  Version 5 offers a
+plot mode \textit{with parallelaxes} that allows additional y axes to be
+defined.
 
 
-\subsection{Can I put both data files and commands into a single file?}
+\subsection{Can I put both commands and data into a single file?}
 
-This is possible by the new \verb+plot "-"+ possibility. The
-\verb+plot "-"+ command allows to read the data to be plot from
-standard input or the current batch job.
+Version 5 supports named blocks of data in "here document" format:
+\small
+\begin{verbatim}
+gnuplot> $DATABLOCK << EOD
+cats 4 2
+dogs 1 4
+EOD
+gnuplot> plot $DATABLOCK using 2:3:1 with labels
+\end{verbatim}
+\normalsize
+Once the named block has been defined, it can be used as many times
+as you like.
 
+Data can also be provided in-line as part of a plot command using the
+pseudo-file \verb+plot "-"+.  In this case the data can only be used
+once.
+
+\small
 \begin{verbatim}
 gnuplot> plot "-"
 1 1
 2 4
 3 9
-<CTRL-D>
+e
 \end{verbatim}
+\normalsize
 
 
-\subsection{Can I put Greek letters and super/subscripts into my
-labels?}
+\subsection{Can I put superscripts/subscripts in my labels?}
 
-You might try using the \LaTeX{} terminal type and putting text
-like \verb+"\\alpha_{3}"+ or \verb+'\alpha_{3}'+ into it.
+Most terminal types (gnuplot's name for the choice of output device) support
+an "enhanced text" mode.  This lets you use sub- and superscripts, italic and
+boldface, and different font faces or font sizes.
 
-The enhanced option in the postscript terminal is also able to use sub-
-and superscripts. It also allows to use Greek letters and symbols
-via symbol fonts.
+\subsection{How to use Greek letters or other special symbols?}
 
-If you include your \gnuplot-graphs into a \LaTeX{} document
-you can use the \LaTeX{}-package psfrag to typeset any characters
-into your graphs.
+The old-style way is to use enhanced text mode to switch to a specialize font,
+e.g. the Adobe "Symbol" font, that maps the characters you want onto ascii
+letters 'a', 'b', etc.  This may still be necessary for PostScript output.
+However a much simpler way is to select UTF-8 encoding and enter the
+special characters just as you would any other text.
+This obviates the need to change fonts and gives you access to all unicode
+code points including CJK character sets.  To actually print or view the
+files produced by \gnuplot you still need appropriate fonts installed on
+your computer or output device.  \Gnuplot itself does not provide fonts.
 
-One more possibility is to use the MetaPost terminal. It supports \TeX{}
-syntax and is converted onto encapsulated PostScript by mpost.
+The various \LaTeX{} terminal types (\textit{latex, epslatex, tikz, context, cairolatex})
+hand off text generation to \LaTeX{}. In this case you can use normal \LaTeX{}
+markup like \verb+"\\alpha_{3}"+ or \verb+'\alpha_{3}'+ .
 
+\subsection{How do I include accented characters}
+% \subsection{Can I type labels in Czech, French, Hungarian, Russian...}
+
+To obtain accented characters like \"u or \^n in your labels you should use
+8bit character codes together with the appropriate encoding option.
+See the following example:
+
+\small
+\begin{verbatim}
+gnuplot> set encoding iso_8859_1
+gnuplot> set title "M\374nchner Bierverbrauch \374ber die Jahre"
+gnuplot> plot "bier.dat" u 1:2
+\end{verbatim}
+\normalsize
+
+Consequently, you can type labels in Czech, French, Hungarian, Russian... by
+means of an appropriate \textit{set encoding}. However, you cannot mix two
+encodings in one file (e.g. accents for west and east latin encodings).
+
+A more general solution is to use UTF-8 encoding as described above, giving
+access to any accented characters with a unicode code point.
 
 \subsection{Can I do 1:1 scaling of axes?}
 
-Use "set size square".
-
-
-\subsection{Can I put tic marks for x and y axes into 3d plots?}
-
-Use the "with boxes" option.
-
-
-\subsection{Does \gnuplot{} support a driver for <graphics format>?}
-
-To see a list of the available graphic drivers for your
-installation of \gnuplot{}, type "set term".
-
-Some graphics drivers are included in the normal distribution,
-but are uncommented by default. If you want to use them, you'll
-have to change ~gnuplot/term.h, and recompile.
+Try \verb+set size square+
+or \verb+set view equal xy+.
 
 
 \subsection{Can I put different text sizes into my plots?}
 
-Some terminals, like the postscript terminal can, others can't.
-Look at the help for the different terminals.
-
-
-\subsection{How do I modify \gnuplot, and apply 'patches'?}
-
-For this, you will need to recompile \gnuplot.
-
-Modifications people make are either done by replacing files,
-such as terminal drivers, or by 'patching'. If a file is a
-replacement, it will probably tell you in its README or in the
-lines at the beginning.
-
-To patch a file, you need Larry Wall's patch utility. On many
-UNIX systems, it is already installed; do a man patch to check.
-If it isn't, you'll have to get it; it can be found wherever
-GNU software is archived.
-
+Most terminal types allow you to specify a starting font face and size.
+The "enhanced text" mode allows you to change fonts, text sizes, bold and
+italic styles within a plot.
 
 \subsection{How do I skip data points?}
 
-By specifying ? as a data value, as in
+By specifying \textit{?} as a data value, as in
+\small
 \begin{verbatim}
         1 2
         2 3
         3 ?
         4 5
 \end{verbatim}
+\normalsize
+
+See also \textit{set missing}.
+See also \textit{set datafile commentschars} for specifying comment characters in
+data files.
 
 
 \subsection{How do I plot every nth point?}
 
-This can be specified with the various options for the command "plot".
+This can be specified with various options for the command \verb+plot+,
+for example \verb+plot 'a.dat' every 2+.  If you want to draw a line 
+through every point but only draw a point symbol at every nth point,
+then try \verb+plot 'a.dat' with linespoints pointinterval n+.
 
 
 \subsection{How do I plot a vertical line?}
@@ -776,23 +854,26 @@ Depending on context, the main methods are:
 \item \verb+set arrow .... .... nohead+ where you have to compute
 explicitly the start and the end of the arrow.
 \item generate (inlined) datapoints and plot them
-\item switch to parametric mode
 \end{itemize}
 
-\subsection{How do I plot data files }
 
-\subsection{How do I include accentuated characters in Postscript
-output?}
+\subsection{How do I plot data files}
 
-To obtain accentuated characters like \"u or \^n into postscript plots
-you should use the postscript character codes together with the
-appropriate encoding option. See the following example:
+Easily: by a command \textit{plot 'a.dat'}. In 3D, use \textit{splot 'a.dat'} --
+but don't forget to put a blank line in between two subsequent scans (isolines),
+otherwise you will get an error that the data is not gridded; see also question 
+\ref{blank1}. If your data are not gridded, then use \textit{set dgrid3d \{many
+options\}}.
 
-\begin{verbatim}
-gnuplot> set encoding iso_8859_1
-gnuplot> set title "M\374nchner Bierverbrauch \374ber die Jahre"
-gnuplot> plot "bier.dat" u 1:2
-\end{verbatim}
+
+\subsection{How do I replot multiplot drawing}
+
+You cannot directly: gnuplot supports \verb+replot+ command, not
+\verb+remultiplot+. You have to write the complete sequence of commands since
+\verb+set multiplot+ till \verb+unset multiplot+ into a script file. Then
+you can \verb+load+ the script into gnuplot as many times as you need for
+replotting the drawing to different terminals or output files.
+
 
 \section{Miscellaneous}
 
@@ -801,107 +882,67 @@ gnuplot> plot "bier.dat" u 1:2
 First, try to see whether it actually is a bug, or whether it
 is a feature which may be turned off by some obscure set--command.
 
-Next, see whether you have an old version of \gnuplot{}; if you do,
+Next, see whether you have an old version of \gnuplot; if you do,
 chances are the bug has been fixed in a newer release.
 
-Fixes for bugs reported since the release of the current version are
-held in the \texttt{patches} directory at \gnuplot{} distribution sites.
+The development version may already contain fixes for bugs reported
+since the release of the current version.
 Before submitting a bug report, please check whether the bug in question
 has already been fixed.
 
 If, after checking these things, you still are convinced that there is a
-bug, proceed as follows. If you have a fairly general sort of bug
-report, posting to \news{comp.graphics.apps.gnuplot} is probably
-the way to go. If you have investigated a problem in detail, especially
-if you have a context or unified diff that fixes the problem, please
-e-email a report to \mailto{bug-gnuplot@dartmouth.edu}.
+bug please report it using the bug-tracker at
+\http{sourceforge.net/p/gnuplot/bugs}.
+Be sure to include the version of \gnuplot (including patchlevel) and 
+the operating system you are running it on.
+It helps a lot if you can provide a simple script that reproduces the error.
 
-The bug-gnuplot list is for reporting and collecting bug fixes, the
-\news{comp.graphics.apps.gnuplot} newsgroup will be more help for
-finding work arounds or actually solving \gnuplot{} related problems. If
-you do send in a bug report, be sure and include the version of \gnuplot{}
-(including patchlevel) as shown by the command "show version long",
-terminal driver, operating system, an exact description of the bug and
-input which can reproduce the bug. Failure to indicate these details can
-render a solution to your problem almost impossible. Also, any context
-diffs should be referenced against the latest official version of
-\gnuplot{} if at all possible.
+The tracker on sourceforge is for reporting bugs and collecting bug fixes
+that will appear in a subsequent release.
+The various online forums are a better place to ask about
+work arounds or actually solving \gnuplot related problems.
 
 
-\subsection{Can I use \gnuplot{} routines for my own programs?}
+\subsection{Can I use \gnuplot routines for my own programs?}
 
-Yes. John Campbell \mailto{jdc@nauvax.ucc.nau.edu} has written
-gplotlib, a version of \gnuplot{} as C subroutines callable from a
-C program. This is available as gplotlib.tar.Z at
-\ftp{ftp.nau.edu}{/pub/gplotlib.tar.Z}. This library
-has been updated to be compatible with version 3.5.
-
-On systems supporting the pipes, you can pipe commands to
-\gnuplot{} from other programs.
-
+On systems supporting pipes, you can pipe commands to \gnuplot from other
+programs. Many applications with gnuplot as the graphics engine, like Octave
+(\http{www.octave.org}), uses this method. This also works from a cgi script to
+drive \gnuplot from a forms-based web page.
 
 \subsection{What extensions have people made to \gnuplot? Where can I get
 them?}
 
-Extensions are available from
-\ftp{ftp.ucc.ie}{/pub/gnuplot/contrib/}
+Extensions or patches are available on the "Patches" page of the
+gnuplot development site
+\http{sourceforge.net/p/gnuplot/patches/}.
+The current development version will generally include features that are
+not yet part of the most recent official release of gnuplot.
 
-Some extensions available:
-\begin{itemize}
-\item \texttt{barchart\_via\_fig}: awk scripts to produce barcharts with
-filled boxes.
-\item \texttt{date-errorbar}: allows dates in the hi/lo fields for 
-errorbars.
-\item \texttt{gp37os2-mouse}: OS/2 binaries with mouse support (feature
-included in current beta versions).
-\item \texttt{perltk}: A perl/tk canvas widget.
-\item \texttt{polyg.patch}: Implements a polygon plotting style.
-\item \texttt{xgfe}: graphical front end using the Qt widgets available
-at \http{lnc.usc.edu/docs/xgfe/xgfe.html}.
-\item \texttt{Gnuplot.py}: A python package to create graphs from
-within python. More information at
-\http{monsoon.harvard.edu/~mhagger/Gnuplot/Gnuplot.html}.
-\end{itemize}
+\subsection{I need an integration, fft, iir-filter,...!}
 
-\subsection{I need an integration, fft, iir-filter,....!}
-
-\Gnuplot{} has been and is a plotting program, no data
-processing or mathematical program suite. Therefore \gnuplot{}
-can't do that. Look into the demo "bivariat.dem" for a basic
-implementation of an integration.
-
-For more sophisticated data-processing read the next section.
+\Gnuplot{} has been and is a plotting program, not a data
+processing or mathematical program suite. Therefore \gnuplot
+can't do that. Look into the demo file "bivariat.dem" for a basic
+implementation of an integration.  However \gnuplot version 5 does
+support calling functions from a dynamically loaded external shared
+object, i.e. a plugin.  So if you want to code up some complicated
+function in C or another language with compatible calling conventions,
+you can compile it into a plugin for \gnuplot to import.
 
 \subsection{Can I do heavy-duty data processing with \gnuplot? or
 What is beyond \gnuplot?}
 
-\gnuplot{} alone is not suited very well for this. One thing you might try
-is fudgit, an interactive multi-purpose fitting program written by
-Martin-D. Lacasse (\texttt{isaac@frodo.physics.mcgill.ca}). It can use
-\gnuplot{} as its graphics back end and is available from
-\ftp{ftp.physics.mcgill.ca}{/pub/Fudgit/fudgit_2.33.tar.Z} and from
-the main Linux server, tsx-11.mit.edu and its numerous mirrors around
-the world as \texttt{/pub/linux/sources/usr.bin/fudgit-2.33.tar.z}.
-Versions are available for AIX, Data General, HP-UX, IRIX 4, Linux,
-NeXT, Sun3, Sun4, Ultrix, OS/2 and MS-DOS\@. The MS-DOS version is
-available on simtel20 mirrors (simtel20 itself has closed down) in the
-"math" subdirectory as \verb+fudg_231.zip+.
+\gnuplot by itself is not suited very well for heavy numerical computation. 
+On the other hand it can handle very large data sets.
 
-Carsten Grammes has written a fitting program which has been
-merged into \gnuplot{} 3.7.
-
-Michael Courtney has written a program called lsqrft, which uses the
-Levenberg-Marquardt - Algorithm for fitting data to a function. It is
-available from
-\ftp{hobbes.nmsu.edu}{/pub/os2/apps/analysis/lsqrft15.zip};
-sources, which should compile on Unix, and executables for MS-DOS and
-OS/2 are available.  There is an interface to the OS/2 presentation
-manager.
+One thing you might try is \textit{fudgit}, an interactive multi-purpose
+fitting program written by Martin-D. Lacasse.
+It can use \gnuplot as its graphics back end.
 
 You might also want to look at the applications developed by
 the Software Tools Group (STG) at the National Center for
-Supercomputing Applications. Ftp to ftp.ncsa.uiuc.edu
-and get the file README.BROCHURE for more information.
+Supercomputing Applications \http{ncsa.uiuc.edu}.
 
 You can also try pgperl, an integration of the PGPLOT plotting
 package with Perl 5. Information can be found at
@@ -909,88 +950,69 @@ package with Perl 5. Information can be found at
 available from \ftp{ftp.ast.cam.ac.uk}{/pub/kgb/pgperl/} or
 \ftp{linux.nrao.edu}{/pub/packages/pgperl/}.
 
-Another possibility is Octave. To quote from its README: Octave
-is a high-level language, primarily intended for numerical
-computations. It provides a convenient command line interface
-for solving linear and nonlinear problems numerically.
-The latest released version of Octave is always available 
-from \http{www.che.wisc.edu/octave/} and via
-anonymous ftp from \ftp{bevo.che.wisc.edu}{/pub/octave}.
-Octave is licensed under GPL (see \http{www.gnu.org/copyleft/gpl.html}).
-By the way, octave uses \gnuplot{} as its plotting engine, so
-you get a data-processing program on top of \gnuplot{}.
+Another possibility is \textbf{Octave}. To quote from its README: Octave is a
+high-level language, primarily intended for numerical computations. Octave is
+licensed under GPL, and in principle, it is a free Matlab clone. It provides a
+convenient command line interface for solving linear and nonlinear problems
+numerically. The latest released version of Octave is always available from
+\http{www.octave.org}. By the way, octave uses \gnuplot as its plotting
+engine, so you get a data-processing program on top of \gnuplot.
 
-Finally, there is scilab at \http{www-rocq.inria.fr/scilab/}
-doing about the same as matlab. It is free but copyrighted
-software.
+Finally there is \textit{scilab} (\http{www.scilab.org}), an open source
+alternative to \textit{matlab}.
 
 
-\subsection{I have ported \gnuplot{} to another system, or patched it. What
+\subsection{How to use hotkeys in my interactive terminals}
+
+Most of the interactive terminals support both pre-defined and user-defined
+hotkeys to replot, toggle plot elements, change axis scaling, and so on.
+Hit \textit{h} in an active gnuplot plot window to get list of hotkeys. 
+Read \textit{help mouse} and \textit{help bind} for more information.
+
+
+\subsection{I have ported \gnuplot to another system, or patched it. What
 do I do?}
 
-If your patch is small, mail it to
-\mailto{info-gnuplot-beta@dartmouth.edu},
-with a thorough description of what the patch is supposed to
-do, which version of \gnuplot{} it is relative to, etc. Also, you
-can send notification of the patch to the FAQ maintainer, if
-you want a mention. Please don't send the patch itself to me.
-
-If your modifications are extensive (such as a port to another
-system), place them on a web/ftp site for download. There is currently
-no possibility to upload patches. Send a note to
-\mailto{info-gnuplot-beta@dartmouth.edu} on where to find the patch,
-what it is supposed to do, which version of \gnuplot{} it is to be applied
-against. For the time being (summer 1999) you can also send the patch to
-\mailto{gnuplot@ftp.ucc.ie}.
+The preferred way of submitting, commenting and upgrading patches is
+via 'Patches' section on 
+\http{sourceforge.net/p/gnuplot/patches/}.
+You may want to send a note to \mailto{gnuplot-beta@lists.sourceforge.net} for
+more lively discussion.
 
 
 \subsection{I want to help in developing the next version of \gnuplot.
 What can I do?}
 
-Join the \gnuplot{} beta test mailing list by sending a mail
+Join the \gnuplot beta test mailing list by sending a mail
 containing the line
-\verb+subscribe info-gnuplot-beta+
+\verb+subscribe gnuplot-beta+
 in the body (not the subject) of the mail to
-\mailto{Majordomo@Dartmouth.EDU}.
+\mailto{Majordomo@lists.sourceforge.net}.
 
-Also check with \http{sourceforge.net/projects/gnuplot} about latest
-source for beta releases for development.
 
 \subsection{Open questions for inclusion into the FAQ?}
 
 
-\mailto{info-gnuplot-beta@Dartmouth.EDU}.
+% \mailto{gnuplot-beta@lists.sourceforge.net}.
 
-Please submit your questions (along with the answer)
-to 
-\mailto{info-gnuplot-beta@Dartmouth.EDU}.
+Please submit your questions (along with the answer) to 
+\mailto{gnuplot-beta@lists.sourceforge.net}.
+
 
 \section{Making life easier}
 
 \subsection{How do I plot two functions in non-overlapping regions?}
 
-Use a parametric plot. An example:
+This used to be complicated.  In version 5 it is easy - place the
+desired range immediately before each function being plotted.
+For example, to plot experimental data and two different functional
+models f1 and f2 covering two different portions of the domain:
+\small
 \begin{verbatim}
-gnuplot> set parametric
-gnuplot> a=1
-gnuplot> b=3
-gnuplot> c=2
-gnuplot> d=4
-gnuplot> x1(t) = a+(b-a)*t
-gnuplot> x2(t) = c+(d-c)*t
-gnuplot> f1(x) = sin(x)
-gnuplot> f2(x) = x**2/8
-gnuplot> plot [t=0:1] x1(t),f1(x1(t)) title "f1", x2(t), f2(x2(t)) title "f2"
+gnuplot> set autoscale x  # get x range from the data
+gnuplot> plot "data", [-100:0] f1(x), [0:100] f2(x)
 \end{verbatim}
-
-You can also use \gnuplot's ability to ignore mathematically undefined
-expressions: the expression \verb+1/0+ is silently ignored, thus a
-construction like
-\begin{verbatim}
-gnuplot> set xran [-10:10]
-gnuplot> plot (abs(x)>0.5?1/0: x**2)
-\end{verbatim}
-plots a quadratic function only for \verb+|x| < 0.5+.
+\normalsize
 
 
 \subsection{How do I run my data through a filter before plotting?}
@@ -999,48 +1021,42 @@ If your system supports the popen() function, as Unix does, you
 should be able to run the output through another process, for
 example a short awk program, such as
 
+\small
 \begin{verbatim}
 gnuplot> plot "< awk ' { print $1, $3/$2 } ' file.in"
 \end{verbatim}
+\normalsize
 
 The plot command is very powerful and is able to do some
-arithmetic on datafiles. See "help plot".
+arithmetic on datafiles. See \verb+help plot+.
 
+The above filtering works seamlessly under Unixes and OS/2. On Windows, this
+is only supported by default in \textit{gnuplot} version 5, but required a 
+separate program \textit{wgnuplot\_pipes} in some earlier versions.
 
-\subsection{How do I make it easier to use \gnuplot{} with \LaTeX{}?}
+\subsection{How do I save and restore my current settings?}
 
-There is a set of \LaTeX{} macros and shell scripts that are meant
-to make your life easier when using \gnuplot{} with \LaTeX{}. This
-package can be found on \ftp{ftp.dartmouth.edu}{pub/gnuplot/latex.shar},
-by David Kotz.
-For example, the program "plotskel" can turn a gnuplot-output
-file plot.tex into a skeleton file skel.tex, that has the same
-size as the original plot but contains no graph. With the right
-macros, the skeleton can be used for preliminary \LaTeX{} passes,
-reserving the full graph for later passes, saving tremendous
-amounts of time.
+Use the \verb+save+ and \verb+load+ commands for this; see \verb+help save+
+and \verb+help load+ for details.
 
-
-\subsection{How do I save and restore my settings?}
-
-Use the "save" and "load" commands for this; see "help save"
-and "help load" for details.
+You can save the current terminal and restore it later without touching the
+filesystem by \textit{set term push} and \textit{set term pop}, respectively.
 
 
 \subsection{How do I plot lines (not grids) using splot?}
 
-If the data in a data file for splot is arranged in such a way
-that each one has the same number of data points (using blank
-lines as delimiters, as usual), splot will plot the data with a
-grid. If you want to plot just lines, use a different number of
-data entries (you can do this by doubling the last data point,
-for example). Don't forget to set parametric mode, of course.
+If the data input to splot is arranged such that each line contains
+the same number of data points (using blank lines as delimiters, as usual),
+splot will by default treat the data as describing a surface.
+If you want to draw individual lines instead, try some combination of
+\textit{unset surface}, \textit{set surface explicit}, \textit{plot ... nosurface}.
 
 
-\subsection{How do I plot a function f(x,y) which is bounded by other
-          functions in the x-y plain?}
+\subsection{How do I plot a function f(x,y) that is bounded by other
+          functions in the x-y plane?}
 
-An example:
+Here is one way:
+\small
 \begin{verbatim}
 gnuplot> f(x,y) = x**2 + y **2
 gnuplot> x(u) = 3*u
@@ -1051,30 +1067,27 @@ gnuplot> set cont
 gnuplot> splot [0:1] [0:1] u,yl(x(u))+(yu(x(u)) - yl(x(u)))*v,\
 > f(x(u), (yu(x(u)) - yl(x(u)))*v)
 \end{verbatim}
+\normalsize
 
 
-\subsection{How do I get rid of <feature> in a plot?}
+\subsection{How do I call \gnuplot from my own programs?}
 
-Usually, there is a set command to do this; do a
-	\verb+ gnuplot> ?set no+
-   for a short overview.
-
-
-\subsection{How do I call \gnuplot{} from my own programs?}
-
-There's a code which works for a UNIX system, using (efficient)
-named pipes. On M\$ Windows platforms, due to the lacking standard
-input of GUI programs, you need to use the C-code \texttt{pgnuplot}
-written by Hans-Bernhard Broeker
-\mailto{broeker@physik.rwth-aachen.de}. You can obtain this file on
-a ftp-server carrying the source for \texttt{gnuplot}.
+On unix-like systems, commands to gnuplot can be piped via stdin.
+Output from \gnuplot's \verb+print+ command can be read via a named pipe.
+On Windows, due to the lacking standard input (stdin) in GUI programs,
+you either need to use the console version \textit{gnuplot} (recommended),
+or use \textit{wgnuplot\_pipes}, which has an additional console window
+attached. The old helper program \textit{pgnuplot} is still included
+in the distribution package.
 
 
 \subsection{What if I need h-bar (Planck's constant)?}
 
-There is no predefined variable like pi. However to put h-bar as
-a character into the label, you must use the PostScript terminal.
-You can play around with constructs like
+The most straightforward way is to use a UTF-8 font, and type in the
+$\hbar$ character (Unicode code point \#x210F) directly. 
+ 
+This does not work in PostScript, however, so you must use approximations
+like
 \verb+ @{/=56 -} {/=24 h}+ or
 \verb+ {/=8 @{/Symbol=24 -} _{/=14 h}}+
 In the latter, the "-" (a long one in /Symbol) is non-spacing and 24-pt.
@@ -1082,56 +1095,112 @@ The 14-pt "h" is offset by an 8-pt space (which is the space preceding
 the "\_") but smaller, since it's written as a subscript.
 But these don't look too much like the hbar we're used to, since the bar
 is horizontal instead of sloped.  I don't see a way to get that.  I
-tried using an accent (\\264 in isoLatin encoding), but I haven't found a
-way to scale and position the pieces correctly.
+tried using an accent (character 264 in iso-latin-1 encoding), but I haven't found a
+way to scale and position the pieces correctly. 
+One more possibility would be \verb+{/=14 @^{/Symbol=10 -}{/=14 h}}+.
 
-One more possibility would be
-\verb+{/=14 @^{/Symbol=10 -}{/=14 h}}+.
+The reduced Planck's constant can be set very easily by using the
+AMS-LaTeX PostScript fonts which are available from
+\http{www.ams.org/tex/amsfonts.html} (also included in many LaTeX
+distributions). \Gnuplot{} (see \verb+help fontpath+) and the
+PostScript interpreter (usually Ghostscript) have to know where the
+file \verb+ msbm10.pfb+ (or \verb+ msbm10.pfa+) resides. Use
+\verb+ {/MSBM10 \175}+ to produce \verb+ \hslash+ which is a "h"
+superimposed by a sloped bar. The standard \verb+ \hbar+ (horizontal
+bar) has the octal code 176. Please note that h-bar exists only as an
+italic type.
 
-(This is a hint by Richard Crawford).
+\subsection{What if I need the Solar mass symbol?}
+
+As with Planck's constant, the most straightforward way is to use a 
+UTF-8 font, and type in the $\odot$ character (Unicode code point \#x2299 ; "circled dot operator") directly. 
+The very similar glyph at code point \#x2609 ; "sun" may be even better, but not many fonts have it.
+ 
+
+\subsection{How do I give exact positions for the graph borders on the page?}
+
+Specify the position of the top, bottom, left, and right borders in
+terms of their fractional position within the page:
+
+\small
+\begin{verbatim}
+set lmargin at screen 0.05
+set bmargin at screen 0.05
+set rmargin at screen 0.95
+set tmargin at screen 0.95
+\end{verbatim}
+\normalsize
 
 
+\section{Common problems}
 
-\section{Known Problems}
 
-\subsection{\Gnuplot{} is not plotting any points under X11! How come?}
-%%
-%%Very probably, you still are using an old version of
-%%gnuplot\_x11. Remove that, then do a full installation.
-%%
+\subsection{Help! None of my fonts work.}
+
+Gnuplot does not do font handling by itself; it must necessarily leave
+that to the individual device support libraries. Unfortunately, this
+means that different terminal types need different help in finding
+fonts. Here are some quick hints. For more detailed information please
+see the gnuplot documentation for the specific terminal type you are
+having problems with.
+
+\begin{description}
+\item [{png/jpeg/gif}] These terminal types use the libgd support library, which
+searches for fonts in the directories given in the environmental variable
+GDFONTPATH. Once you get libgd fontpaths sorted out, you will probably
+want to set a default font for gnuplot.
+For example: \verb+setenv GNUPLOT_DEFAULT_GDFONT verdana+
+\item [{post}] PostScript font names are not resolved until the document
+is printed. Gnuplot does not know what fonts are available to your
+printer, so it will accept any font name you give it. However, it
+is possible to bundle a font with the gnuplot output; please see the
+instructions given by gnuplot's internal command {}``help set term
+post fontfile''.
+\item [{svg}] Font handling is viewer-dependent. 
+\item [{x11}] The x11 terminal uses the normal x11 font server mechanism.
+The only tricky bit is that in order to use multi-byte fonts you must
+explicitly say so:
+\small\begin{verbatim}
+set term x11 font "mbfont:sazanami mincho,vera,20"
+\end{verbatim}\normalsize
+\item [{win}] Select "Choose font..." from the "Options" pull-down menu 
+in the toolbar.
+\item [{wxt, qt}] On linux systems these terminals rely on fonts provided
+by the system's \textit{fontconfig} utility.
+\end{description}
+
+\subsection{\Gnuplot{} does not open a plot window on VMS. Why?}
 On VMS, you need to make several symbols:
 
+\small
 \begin{verbatim}
         $ gnuplot_x11 :== $disk:[directory]gnuplot_x11
         $ gnuplot :== $disk:[directory]gnuplot.exe
         $ def/job GNUPLOT$HELP disk:[directory]gnuplot.hlb
 \end{verbatim}
+\normalsize
 
-Then run \gnuplot{} from your command line, and use
-"set term x11".
+Then run \gnuplot from your command line, and use
+\verb+set term x11+.
 
-If you run \gnuplot{} on Unix systems, be sure that the newest
-\verb+gnuplot_x11+ is the first in your search path.
-
-
-\subsection{My isoline data generated by a Fortran program is not
-handled correctly. What can I do?}
-
-Update to the newest \gnuplot.
-\Gnuplot{} 3.7 is able to read Fortran-style
-files where a blank line can contain more than a linefeed.
+On Unix systems the x11 and qt terminals require installation of
+separate helper programs \textit{gnuplot\_x11} and \textit{gnuplot\_qt}.
+These are usually installed in a directory \textit{/usr/libexec/gnuplot/5.0/}
+and \gnuplot knows to look for them there.  If they are installed somewhere
+else or gnuplot is having trouble finding them, try setting the environmental
+variable \verb+GNUPLOT_DRIVER_DIR+.
 
 
-\subsection{Why does \gnuplot{} ignore my very small numbers?}
+\subsection{Why does \gnuplot ignore my very small numbers?}
 
 
-\Gnuplot{} treats all numbers less than 1e-08 as zero, by default.
+For some purposes \Gnuplot{} treats numbers less than 1e-08 as being zero.
 Thus, if you are trying to plot a collection of very small
 numbers, they may be plotted as zero. Worse, if you're plotting
 on a log scale, they will be off scale. Or, if the whole set of
 numbers is "zero", your range may be considered empty:
 
-
+\small
 \begin{verbatim}
 gnuplot> plot 'test1'
 Warning: empty y range [4.047e-19:3e-11], adjusting to [-1:1]
@@ -1140,24 +1209,36 @@ gnuplot> plot 'test1'
               ^
 y range is less than `zero`
 \end{verbatim}
+\normalsize
 
 The solution is to change \gnuplot's idea of "zero":
+\small
 \begin{verbatim}
 gnuplot> set zero 1e-20
 \end{verbatim}
+\normalsize
 
-For more information, "help set zero"
-
-\subsection{\Gnuplot{} is plotting nothing when run via \gnuplot{}
-	<filename>!  What can I do?}
-
-Put a pause -1 after the plot command in the file. On an X-Window System
-system, you can also use the \verb+-persist+ option, the X11 window is
-then not closed. Close the X11 window by typing "q" when the focus is on
-it.
+For more information, type \verb+help set zero+.
 
 
-\subsection{My formulas are giving me nonsense results! What's going on?}
+\subsection{When I run \gnuplot from the shell or a script, the resulting plot flashes by on the screen and then disappears}
+
+\begin{enumerate}
+\item Put a \verb+pause -1+ after the plot command in the file, or at the file end.
+
+\item Use command \verb+gnuplot filename.gp -+ (yes, dash is the last
+parameter) to stay in the interactive regime when the script completes.
+
+\item Run \gnuplot as \textit{gnuplot -persist}
+
+\item On Windows you can also use either \verb+-persist+ or \verb+/noend+.
+
+\item Give the \textit{persist} option as part of the \textit{set terminal} command.
+\end{enumerate}
+
+
+
+\subsection{My formulas (like 1/3) are giving me nonsense results! What's going on?}
 
 \Gnuplot{} does integer, and not floating point, arithmetic on
 integer expressions. For example, the expression 1/3 evaluates
@@ -1165,64 +1246,37 @@ to zero. If you want floating point expressions, supply
 trailing dots for your floating point numbers. Example:
 
 
+\small
 \begin{verbatim}
 gnuplot> print 1/3
                 0
 gnuplot> print 1./3.
                 0.333333
 \end{verbatim}
+\normalsize
 
-This way of evaluating integer expressions is shared by both C and
-Fortran.
-
-%
-% Outdated, isn't it?!
-%
-%\subsection{My Linux \gnuplot complains about a missing
-%\texttt{gnuplot\_x11}. What is wrong? }
-%
-%The binary \gnuplot distribution from sunsite.unc.edu and its
-%mirrors in \texttt{Linux/apps/math/gplotbin.tgz} is missing one
-%executable that is necessary to access the x11 terminal. Please
-%install \gnuplot from another Linux distribution, e.g.
-%Slackware.
-
-\subsection{Set output 'filename' isn't outputting everything it
-should!}
-
-You need to flush the output with a closing 'set output'.
+This way of evaluating integer expressions is shared by both C and Fortran.
 
 
-\subsection{When using the \LaTeX--terminal, there is an error during
-the \LaTeX--run!}
+\subsection{My output files are incomplete!}
 
-Please upgrade to \gnuplot{} 3.7. Some versions of its beta-release had
-a problem in the \LaTeX--terminal.
+You may need to flush the output with a closing \verb+set output+.
+Some output formats (postscript, pdf, latex, svg, ...) can include several
+pages of plots in a single output file.  For these output modes, gnuplot
+leaves the file open after each plot so that you can add additional plots
+to it.  The file is not completed and made available to external applications
+until you explicitly close it (\verb+set output+ or \verb+unset output+),
+or select a different terminal type (\verb+set term+) or exit gnuplot.
+Output formats that contain only a single 'page' (png, emf, ...)
+should not suffer from this problem.
 
-The \LaTeX 2$\epsilon$-core does no longer include the commands
-"\\Diamond" and "\\Box"; they are included in the latexsym package,
-which is part of the base distribution and thus part of any LaTeX
-implementation.  Please do not forget to use this package.
 
-\subsection{The \texttt{exit} command does not work as documented!}
-
-This is a known bug and is fixed in the latest release. If you need
-the feature please upgrade to the latest release.
-
-\subsection{I can't find the demos and example files at the URLs in the
-documentation!}
-
-The examples have been removed from the NASA site. You can find the
-examples now at \http{www.gnuplot.vt.edu/gnuplot/gpdocs}. There you
-will find both PNG and GIF versions of the demo plots. There are some
-licensing problems with GIF images, so you should probably prefer the
-PNG ones. They also have the advantage to be much smaller in size.
-
-\subsection{Calling \gnuplot{} in a pipe or with a \gnuplot-script
+\subsection{Calling \gnuplot in a pipe or with a \gnuplot-script
 doesn't produce a plot!}
 
-You can call \gnuplot{} by using a short Perl-script like the
+You can call \gnuplot by using a short Perl-script like the
 following:
+\small
 \begin{verbatim}
 #!/usr/local/bin/perl -w
 open (GP, "|/usr/local/bin/gnuplot -persist") or die "no gnuplot";
@@ -1232,14 +1286,15 @@ GP->autoflush(1);
 print GP,"set term x11;plot '/tmp/data.dat' with lines\n";
 close GP
 \end{verbatim}
+\normalsize
 
 \Gnuplot{} closes its plot window on exit. The \verb+close GP+
 command is executed, and the plot window is closed even before you have
 a chance to look at it.
 
 There are three solutions to this: first, use the \verb+pause -1+
-command in \gnuplot{} before closing the pipe. Second, close the pipe
-only if you are sure that you don't need \gnuplot{} and its plot window
+command in \gnuplot before closing the pipe. Second, close the pipe
+only if you are sure that you don't need \gnuplot and its plot window
 anymore. Last, you can use the command line option \verb+-persist+: this
 option leaves the X-Window System plot window open.
 
@@ -1251,22 +1306,20 @@ Hans-Bernhard Broeker, John Campbell, Robert Cunningham, David Denholm,
 Gershon Elber, Roger Fearick, Carsten Grammes, Lucas Hart, Lars Hecking,
 Thomas Koenig, David Kotz, Ed Kubaitis, Russell Lang, Alexander Lehmann,
 Alexander Mai, Carsten Steger, Tom Tkacik, Jos Van der Woude, James R.
-Van Zandt, and Alex Woo.
+Van Zandt, and Alex Woo.  Additional substantial contributors to version 4.0
+include Ethan Merritt, Petr Mikul\'{\i}k and Johannes Zellner.
+Version 4.2, 4.4, 4.6 and 5.0 releases were coordinated by Ethan Merritt.
 
 This list was initially compiled by John Fletcher with contributions
 from Russell Lang, John Campbell, David Kotz, Rob Cunningham, Daniel
 Lewart and Alex Woo. Reworked by Thomas Koenig from a draft
 by Alex Woo, with corrections and additions from Alex Woo, John
-Campbell, Russell Lang, David Kotz and many corrections from Daniel
-Lewart.
-Again reworked for \gnuplot{} 3.7 by Alexander Mai and Juergen v.Hagen
-with corrections by Lars Hecking, Hans-Bernhard Broecker and other
-people.
+Campbell, Russell Lang, David Kotz and many corrections from Daniel Lewart.
+Again reworked for \gnuplot 3.7 by Alexander Mai and Juergen v.Hagen
+with corrections by Lars Hecking, Hans-Bernhard Broecker and others.
+Revised for \gnuplot version 4 by Petr Mikul\'{\i}k and Ethan Merritt.
+Revised for \gnuplot version 5 by Ethan Merritt.
 
 
 \end{document}
-%%
-%% $Id: gnuplot-faq.tex,v 1.5 1999/10/20 18:25:04 vonhagen Exp vonhagen $
-%%
-%% $History$
 %%
