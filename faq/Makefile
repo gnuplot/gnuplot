@@ -4,35 +4,22 @@
 
 SHELL = /bin/sh
 
-DVIPS = dvips
-L2HT = latex2html
-L2HT_OPTS = -split 0 -show_section_numbers -html_version 4.0 -nonavigation
+L2HT = htlatex
+L2HT_OPTS = "htlatex.cfg"
 LATEX = latex
 LYNX = lynx
 LYNX_OPTS = -dump
-PS2PDF = ps2pdf
+PDFLATEX = pdflatex
 
-all: dvi html pdf ps txt
+all: html pdf
 
 html: faq.html
 faq.html: faq.tex
-	$(L2HT) $(L2HT_OPTS) $<
-	-mv faq/$@ .
-	-mv faq/faq.css .
-	-rm -rf faq
-
-dvi: faq.dvi
-faq.dvi: faq.tex
-	$(LATEX) $<
-	$(LATEX) $<
-
-ps: faq.ps
-faq.ps: faq.dvi
-	$(DVIPS) -o $@ $<
+	$(L2HT) $< $(L2HT_OPTS)
 
 pdf: faq.pdf
-faq.pdf: faq.ps
-	$(PS2PDF) $<
+faq.pdf: faq.tex
+	$(PDFLATEX) $<
 
 txt: faq.txt
 faq.txt: faq.html
@@ -40,5 +27,6 @@ faq.txt: faq.html
 
 clean:
 	-rm -f faq.aux faq.css faq.dvi faq.html faq.log faq.out faq.pdf \
-	       faq.ps faq.toc faq.txt
+	       faq.tmp faq.ps faq.toc faq.txt faq.4tc faq.4ct faq.lg faq.idv faq.xref \
+	       *.png *.log *.aux
 
