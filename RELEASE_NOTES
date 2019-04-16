@@ -42,6 +42,7 @@ Changes in 5.2.7
 * FIX extraneous dots and potential segfault from splot with contour labels
 * FIX boxplots - color sequence correctly starts with specified linetype
 * FIX incomplete initialization led to segfault from "gnuplot -c foo.gp baz"
+* FIX Allow "pm3d depthorder base" to handle 3D boxes with logscale z
 
 
 Changes in 5.2.6

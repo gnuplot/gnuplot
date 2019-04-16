@@ -385,8 +385,12 @@ void pm3d_depth_queue_flush(void)
 	double w = trans_mat[3][3];
 #endif
 	vertex out;
-	double z = 0; /* assignment keeps the compiler happy */
+	double z = 0;
+	double zbase = 0;
 	int i;
+
+	if (pm3d.base_sort)
+	    cliptorange(zbase, Z_AXIS.min, Z_AXIS.max);
 
 	for (qp = quadrangles, qe = quadrangles + current_quadrangle; qp != qe; qp++) {
 
@@ -398,7 +402,7 @@ void pm3d_depth_queue_flush(void)
 	    for (i = 0; i < 4; i++, gpdPtr++) {
 
 		if (pm3d.base_sort)
-		    map3d_xyz(gpdPtr->x, gpdPtr->y, 0.0, &out);
+		    map3d_xyz(gpdPtr->x, gpdPtr->y, zbase, &out);
 		else
 		    map3d_xyz(gpdPtr->x, gpdPtr->y, gpdPtr->z, &out);
 
