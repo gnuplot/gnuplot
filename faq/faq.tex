@@ -6,6 +6,9 @@
 \usepackage[hyphens]{url}
 \urlstyle{sf}
 
+\parindent=0pt
+\parskip=5pt
+
 \ifx\pdfoutput\undefined
     % latex or latex2html output
     \usepackage{times,mathptmx}
@@ -79,7 +82,7 @@
 \fi
 
 
-% comments and discussions:
+% History:
 % version 1.4 dated 99/10/07
 % Revision 1.58 dated 2017/06/04 (last CVS version)
 %
@@ -103,7 +106,7 @@ FAQ version: 15 April 2019
 
 \tableofcontents
 
-
+\newpage
 \setcounter{section}{-1}
 \section{Meta -- Questions}
 
@@ -170,7 +173,7 @@ elements such as points, lines, error bars, filled shapes, labels, arrows, ...
 \item Data representations such as heat maps, beeswarm plots, violin plots, histograms, ...
 \item Three-dimensional plots of data points, lines, and surfaces in
 many different styles (contour plot, mesh)
-\item Algebraic computation in integer, float and complex arithmetic
+\item Algebraic computation using integer, floating point, or complex arithmetic
 \item Data-driven model fitting using Marquardt-Levenberg minimization
 \item Support for a large number of operating systems, graphics
 file formats and output devices
@@ -264,7 +267,7 @@ from the source.
 \end{verbatim}
 \normalsize
 
-Important note: questions related to the development version should go to
+Questions related to the development version should go to
 \mailto{gnuplot-beta@lists.sourceforge.net}.
 
 
@@ -317,7 +320,7 @@ These examples and the resulting plots may also be found online at
 \http{gnuplot.sourceforge.net/demo/}.
 
 
-\subsection{How do I determine which options are compiled into \gnuplot?}
+\subsection{How do I determine which options were compiled into my \gnuplot executable?}
 
 Given that you have a compiled version of \gnuplot, you can use the
 \verb+show+ command to display a list of configuration and build options
@@ -336,9 +339,9 @@ gnuplot> set terminal
 
 \subsection{How do I get help?}
 
-Give the \verb+help+ command at the initial prompt. After that, keep
-looking through the keywords. Good starting points are \verb+help plot+
-and \verb+help set+.
+Give the {\em help} command at the initial prompt. After that, keep
+looking through the keywords. Good starting points are {\em help plot}
+and {\em help set}.
 
 \begin{itemize}
 \item
@@ -347,9 +350,10 @@ Read the manual, if you have it.
 \item
 Run the demos in the {\em demo} subdirectory or look at the 
 online copies. They should give you some ideas.
+\http{gnuplot.info/demo}
 
 \item
-Ask your colleagues, the system administrator or the person who
+Ask your colleagues, the system administrator, or the person who
 set up \gnuplot.
 
 \item
@@ -359,7 +363,7 @@ inhabited mostly by users who found it last century.
 
 \item
 A more browser-oriented help forum may be found on StackOverflow
-http{stackoverflow.com/questions/tagged/gnuplot}
+\http{stackoverflow.com/questions/tagged/gnuplot}
 
 \item
 If all these fail, post a question to \news{comp.graphics.apps.gnuplot} or send mail
@@ -370,7 +374,7 @@ may be found at
 \http{lists.sourceforge.net/lists/listinfo/gnuplot-info}.
 
 \end{itemize}
-When asking a question, always mention the gnuplot version and
+When asking a question, always mention the \gnuplot version and
 operating system you are using.  If you are asking about a plot that 
 did not come out the way you expected, please try to show a minimal
 set gnuplot commands that produce a plot showing the problem.
@@ -379,13 +383,13 @@ set gnuplot commands that produce a plot showing the problem.
 \subsection{How do I print out my graphs?}
 
 The kind of output produced by a plot command is determined by a
-prior \verb+set terminal+ command.  For non-interactive output
-you should pair this with a \verb+set output+ command to provide
+prior {\em set terminal} command.  For non-interactive output
+you should pair this with a {\em set output} command to provide
 a file name.
 
-As an example, the following first plots a graph of sin(x) to the
+As an example, the following session first plots a graph of sin(x) to the
 screen and then redraws that same plot as a PDF output file.
-Note: the PDF plot will not look exactly like the plot on the screen.
+Note: the PDF plot may not look exactly like the plot on the screen.
 
 \small
 \begin{verbatim}
@@ -401,8 +405,8 @@ gnuplot>
 \end{verbatim}
 \normalsize
 
-Using the platform-independent way of restoring terminal by \textit{set term
-push/pop} commands, do it by
+When the current terminal is not the default interactive terminal you
+can accomplish the same thing using {\em push} and {\em pop}
 \small
 \begin{verbatim}
 gnuplot> set terminal push    # save current terminal type (may not be default)
@@ -415,30 +419,28 @@ gnuplot> set term pop         # restore saved terminal type
 \normalsize
 
 Some interactive terminal types (\textit{win, wxt, qt}) provide a printer icon
-on the terminal's toolbar. This tool prints the current plot or saves it to file
+on their toolbar. This widget prints the current plot or saves it to file
 using generic system tools rather than by using a different gnuplot terminal type.
 That is, the file you get by selecting "save to png" in the print menu may be
 different than the file you get from \textit{set term png; replot;}.
-In general a plot saved in this way will look more like the screen image than
+In general a plot saved in this way will more closely reproduce the screen image than
 a plot generated from the command line by changing the terminal type.
 
 
-\subsection{How do I include my graphs in <word processor>?}
+\subsection{How do I include my graphs in my favorite word processor?}
 
-Basically, you save your plot to a file in a format your word
-processor can understand (using \verb+set term+ and \verb+set output+,
-see above), and then you read in the plot from your word processor. Vector
-formats (PostScript, emf, svg, pdf, \TeX{}, \LaTeX{}, etc) should be preferred,
+Basically, you save your plot to a file in a format your word processor
+can understand, and then you read in the plot from your word processor. Vector
+formats (PostScript, emf, svg, pdf, \TeX{}, \LaTeX{}) should be preferred,
 as you can scale your graph later to the right size.
 
-Details depend on which word processor you use; use \verb+set term+ to get a
-list of available file formats.
+Use {\em set term} to get a list of available file formats.
 
 Many word processors can use Encapsulated PostScript (*.eps) for graphs. 
 You can generate eps output in \gnuplot using either
-\verb+set terminal postscript eps+
+{\em set terminal postscript eps}
 or
-\verb+set terminal epscairo+
+{\em set terminal epscairo}
 .
 \Gnuplot does not embed a bitmap preview image in the output eps file.
 To accommodate some word processors you may have to add a preview image yourself.
@@ -465,7 +467,7 @@ when the output is processed with pdflatex.
 Most word processors can import bitmap images (png, pbm, etc).
 The disadvantage of this approach is that the resolution of your
 plot is limited by the size of the plot at the time it is generated
-by gnuplot, which is generally a much lower resolution than the
+by \gnuplot, which is generally a much lower resolution than the
 document will eventually be printed in.
 
 
@@ -499,18 +501,128 @@ to post-process pixel graphics.
 
 \end{itemize}
 
+\subsection{How do I save and restore my current settings?}
 
-\subsection{How do I change symbol size, line thickness and the like?}
+Use the {\em save "filename"} and {\em load "filename"} commands.
 
-Gnuplot offers a variety of commands to set line and point properties,
-including color, thickness, point shape, etc.  The command \verb+test+ will
-display a test page for the currently selected terminal type showing
-the available pre-defined combinations of color, size, shape, etc.
-You can use the command \textit{set linetype} to change this or 
-define additional combinations.
+\subsection{Can I put both commands and data into a single file?}
+
+\Gnuplot version 5 supports named blocks of data in "here document" format:
+\small
+\begin{verbatim}
+gnuplot> $DATABLOCK << EOD
+  cats 4 2
+  dogs 1 4
+EOD
+gnuplot> plot $DATABLOCK using 2:3:1 with labels
+\end{verbatim}
+\normalsize
+Once the named block has been defined, it can be used as many times
+as you like.
+
+Data can also be provided in-line as part of a plot command using the
+pseudo-file \verb+"-"+.  In this case the data can only be used once.
+
+\small
+\begin{verbatim}
+gnuplot> plot "-"
+1 1
+2 4
+3 9
+e
+\end{verbatim}
+\normalsize
+
+\subsection{How do I run my data through a filter before plotting?}
+
+If your operating system supports the popen() function, you 
+should be able to filter input data through another process, for
+example a short awk program, as part of the {\em plot} command
+
+\small
+\begin{verbatim}
+gnuplot> plot "< awk ' { print $1, $3/$2 } ' file.in"
+\end{verbatim}
+\normalsize
+
+This mechanism is particularly powerful in combination with the
+unix-derived command line utilities {\em sort} and {\em grep}.
+
+\subsection{Can I use \gnuplot routines for my own programs?}
+
+On systems supporting pipes, you can pipe commands to \gnuplot from other
+programs. Many applications with gnuplot as the graphics engine, like Octave
+(\http{www.octave.org}), uses this method. This also works from a cgi script to
+drive \gnuplot from a forms-based web page.
 
 
-\subsection{Can I animate my graphs?}
+\section{Customizing the appearance of your plot}
+
+\subsection{How to inspect or change the default colors, line, and point properties?}
+
+When you issue a {\em plot} or {\em splot} command with multiple components,
+\gnuplot will by default cycle through a set of colors and linetypes.
+You can override this by providing specific color or linetype properties in the
+plot command or you can change the default sequence.
+Each of the commands below accepts many additional parameters
+\begin{list}{}{}
+  \item
+  {\em test} displays the active colors, line and point properties, etc
+             for the current terminal type
+  \item
+  {\em set color} or {\em set monochrome} selects a pre-defined sequence.
+  \item
+  {\em set linetype} changes the properties of an existing linetype or adds a new one.
+  \item
+  {\em set palette} changes the color palette used for pm3d modes such as heat maps.
+  \item
+  {\em set pointsize} scales all points by an additional factor
+\end{list}
+
+\subsection{Hidden line or surface removal}
+
+There are two relevant commands. {\em set hidden3d} affects surfaces 
+drawn using the 3D plot style {\em splot ... with lines}. It also clips
+line segments created by other 3D plot styles that are occluded by those
+surfaces.   However it does not handle plots generated in {\em pm3d} mode.
+This includes styles {\em with pm3d}, {\em with zerror}, {\em with boxes},
+and miscellaneous plot elements generated while {\em set pm3d} is in effect.
+Hidden surface removal for these plots is achieved instead by drawing them
+in order of their distance from the viewer, controlled by
+{\em set pm3d depthorder}.
+
+\subsection{How do I give exact positions for the graph borders on the page?}
+
+Specify the position of the top, bottom, left, and right borders in
+terms of their fractional position within the page:
+
+\small
+\begin{verbatim}
+set lmargin at screen 0.05
+set bmargin at screen 0.05
+set rmargin at screen 0.95
+set tmargin at screen 0.95
+\end{verbatim}
+\normalsize
+
+\subsection{Arranging multiple plots next to each other on a single page}
+
+The command you want is {\em set multiplot}.  The program can place
+a specified number of plots on a regular grid
+({\em set mulplot layout <rows>, <columns> ...}) or you can position them
+one by one using {\em set origin} and {\em set size}.
+
+\subsection{How to request 1:1 scaling of axes?}
+
+Try {\em set size square} or {\em set view equal xy}.
+
+\subsection{Palette that works for both color and black\&white printing?}
+
+Try {\em set palette cubehelix}.
+
+\section{Plot types that people often ask about}
+
+\subsection{Animations}
 
 Only one \gnuplot terminal type (gif) directly outputs an animated file:
 \begin{verbatim}
@@ -521,8 +633,7 @@ Have a look at
 \http{gnuplot.sourceforge.net/demo/animate.html}
 in the demo collection.
 
-
-\subsection{How do I plot implicit defined graphs?}
+\subsection{Implicit defined graphs}
 
 Implicit graphs or curves cannot be plotted directly in \gnuplot.
 However there is a workaround. 
@@ -543,11 +654,10 @@ The trick is to draw the single contour line z=0 of the surface
 z=f(x,y), and store the resulting contour curve to a temporary file or datablock.
  
 
-\subsection{How to fill an area between two curves}
+\subsection{How to fill an area between two functions}
 
-A plot with filled area between two given curves can be easily obtained using
-the pseudo file '+' with \textit{filledcurves closed}. The example below
-demonstrates this for two curves f(x) and g(x):
+A plot with filled area between two functions f(x) and g(x) can be obtained using
+the pseudo file '+' with  plot style {\em filledcurves}.
 \small
 \begin{verbatim}
 f(x)=cos(x)
@@ -558,39 +668,11 @@ plot '+' using 1:(f($1)):(g($1)) with filledcurves
 \end{verbatim}
 \normalsize
 
-Note that this code fragment fills area between the two curves, regardless of
+Note that this code fragment fills area between the two curves regardless of
 which one is above the other.  If you want to fill only the area satisfying g(x)<f(x)
 or f(x)<g(x)
-add an additional keyword \textit{above} or \textit{below} after \textit{filledcurves}.
+add an additional keyword {\em above} or {\em below} after {\em filledcurves}.
 
-See the documentation for \textit{help filledcurves}, 
-\textit{help special-filenames}, and \textit{help ternary} and see
-\textit{fillbetween.dem} in the \textit{demos} directory.
-
-
-\subsection{Pm3d splot from a datafile does not draw anything}
-\label{blank1}
-
-You do \verb+set pm3d; splot 'a.dat'+ and no plot but colorbox appears.
-Perhaps there is no blank line in between two subsequent scans (isolines) in
-the data file? Add blank lines! If you are curious what this means, then don't
-hesitate to look to files like \verb+demo/glass.dat+ or \verb+demo/triangle.dat+
-in the gnuplot demo directory.
-
-You can find useful the following awk script (call it e.g. \verb+addblanks.awk+)
-which adds blank lines to a data file whenever number in the first column
-changes:
-\small
-\begin{verbatim}
-/^[[:blank:]]*#/ {next} # ignore comments (lines starting with #)
-NF < 3 {next} # ignore lines which don't have at least 3 columns
-$1 != prev {printf "\n"; prev=$1} # print blank line
-{print} # print the line
-\end{verbatim}
-\normalsize
-Then, either preprocess your data file by command
-\verb+awk -f addblanks.awk <a.dat+ or plot the datafile under a unixish platform
-by \verb+gnuplot> splot "<awk -f addblanks.awk a.dat"+.
 
 
 \subsection{Drawing 2D projection of 3D data}
@@ -601,7 +683,7 @@ for plotting 2D color images.
 
 \subsection{How to overlay dots/points scatter plot onto a pm3d map/surface}
 
-Use the explicit (see also implicit) switch of the pm3d style:
+Use the {\em explicit} option of the pm3d style:
 \small
 \begin{verbatim}
 gnuplot> set pm3d explicit
@@ -626,88 +708,6 @@ set contours
 splot 'DATA' with line, 'DATA' with labels boxed
 \end{verbatim}
 
-\subsection{Color facets with pm3d}
-
-It is possible to draw colors facets of a 3D objects, organized in such a file:
-\small
-\begin{verbatim}
-# triangle 1
-x0 y0 z0 <c0>
-x1 y1 z1 <c1>
-
-x2 y2 z2 <c2>
-x2 y2 z2 <c2>
-
-
-# triangle 2
-x y z
-...
-\end{verbatim}
-\normalsize
-
-Notice the positioning single and double blank line. \textit{<c>} is an optional
-color.
-
-Then plot it by (either of splot's):
-\small
-\begin{verbatim}
-set pm3d
-set style data pm3d
-splot 'facets.dat'
-splot 'facets_with_color.dat' using 1:2:3:4
-\end{verbatim}
-\normalsize
-
-Note that you avoid surface lines by \textit{set style data pm3d} or 
-\textit{splot ... with pm3d}.
-
-In the above example, pm3d displays triangles as independent surfaces.
-They are plotted one surface after another, as found in the data file.
-Parts overlapping in 2D projection are overdrawn.
-
-Gnuplot is not 3D modeling program. Its hidden routines apply for points and
-lines, but not for faces. 
-Without handling the data as a collection of faces, there would be no surface
-anything could be hidden behind.  The 'hidden3d' algorithm works by using the
-input data in two ways: first, to set up a collection of triangles (made from a
-mesh of quadrangles) that form the surface, second as a collection of edges.  It
-then goes through all those edges, checking what parts of them are not hidden
-behind any faces, and draws those.
-
-Consequently, gnuplot won't draw your surface or 3D object as a virtual reality.
-It works OK for \textit{set pm3d map} but for true 3D you would be probably more
-happy writing a converter of your facets into a VRML file.
-
-
-\subsection{Palette for printing my color map on color as well as black\&white
-printer?}
-
-Try \textit{set palette cubehelix}.
-
-
-\section{Wanted features}
-
-\subsection{What's new in \gnuplot 5.0, 5.2, 5.2.5 etc?}
-
-Too many things to list here.
-Please refer to the {\em Release Notes} and the \textit{NEWS} file in the
-source distribution, or the "New features" section in the gnuplot documentation.
-
-
-\subsection{Does \gnuplot support a driver for <graphics format>?}
-
-To see a list of the available graphic drivers for your installation of
-\gnuplot, type \verb+set term+.
-
-Some graphics drivers are included in the normal distribution
-but are not built by default. If you want to use them, you'll
-have to recompile from source.
-
-
-\subsection{Does \gnuplot have hidden line removal?}
-
-Yes.
-
 \subsection{Does \gnuplot support bar-charts/histograms/boxes?}
 
 \Gnuplot{} supports various clustered and stacked histogram styles to display
@@ -724,10 +724,6 @@ or have a look at
 
 The demo collection contains an example of a simple Gantt chart.
 
-\subsection{Can I arrange multiple plots next to each other on a single page?}
-
-Yes. \verb+set multiplot+.
-
 \subsection{Does \gnuplot support multiple y-axes on a single plot?}
 
 Yes. 2D plots can have separate x axes at the bottom (x1) and top (x2),
@@ -735,43 +731,135 @@ and separate y axes at the left (y1) and right (y2).  Version 5 offers a
 plot mode \textit{with parallelaxes} that allows additional y axes to be
 defined.
 
+\subsection{How to draw a solid made of triangular facets?}
 
-\subsection{Can I put both commands and data into a single file?}
-
-Version 5 supports named blocks of data in "here document" format:
+It is possible to describe colored facets of a 3D object in a file
+organized like this:
 \small
 \begin{verbatim}
-gnuplot> $DATABLOCK << EOD
-cats 4 2
-dogs 1 4
-EOD
-gnuplot> plot $DATABLOCK using 2:3:1 with labels
-\end{verbatim}
-\normalsize
-Once the named block has been defined, it can be used as many times
-as you like.
+# triangle 1
+x0 y0 z0 <c0>
+x1 y1 z1 <c1>
 
-Data can also be provided in-line as part of a plot command using the
-pseudo-file \verb+plot "-"+.  In this case the data can only be used
-once.
+x2 y2 z2 <c2>
+x2 y2 z2 <c2>
 
-\small
-\begin{verbatim}
-gnuplot> plot "-"
-1 1
-2 4
-3 9
-e
+
+# triangle 2
+x y z
+...
 \end{verbatim}
 \normalsize
 
+Notice the single and double blank lines. Also notice that the triangle
+really consists of four vertices of which two are identical.
+\textit{<cn>} is an optional color.
 
-\subsection{Can I put superscripts/subscripts in my labels?}
+Then plot it by (either of splot's):
+\small
+\begin{verbatim}
+set pm3d
+set style data pm3d
+set pm3d depthorder
+splot 'facets.dat'
+splot 'facets_with_color.dat' using 1:2:3:4
+\end{verbatim}
+\normalsize
 
-Most terminal types (gnuplot's name for the choice of output device) support
-an "enhanced text" mode.  This lets you use sub- and superscripts, italic and
-boldface, and different font faces or font sizes.
+Gnuplot is not a 3D modeling program.
+The depthorder rendering will not handle inter-penetrating facets.
+For true 3D rendering you would be probably be better off using a ray-tracing program.
 
+
+\section{Text formatting and special symbols}
+
+\subsection{Text markup using "enhanced text" mode}
+
+\Gnuplot version 5 defaults to "enhanced text" mode, in which text markup is
+indicated by a set of special characters embedded in the text.
+
+\begin{center}
+\begin{tabular}{|clll|} \hline
+\multicolumn{4}{|c|}{Enhanced Text Control Codes} \\ \hline
+Control & Example & Result & Explanation \\ \hline
+\verb~^~ & \verb~a^x~ & $a^x$ & superscript\\
+\verb~_~ & \verb~a_x~ & $a_x$ & subscript\\
+\verb~@~ & \verb~a@^b_{cd}~ & $a^b_{cd}$ &phantom box (occupies no width)\\
+\verb~&~ & \verb~d&{space}b~ & d\verb*+     +b & inserts space of specified length\\
+\verb|~| & \verb|~a{.8-}| & $\tilde{a}$ & overprints '-' on 'a', raised by .8\\
+\verb~ ~ & \verb~ ~ & ~ ~ & times the current fontsize\\
+\verb| | & \verb|{/Times abc}| & {\rm abc} & print abc in font Times at current size\\
+\verb| | & \verb|{/Times*2 abc}| & \Large{\rm abc} & print abc in font Times at twice current size\\
+\verb| | & \verb|{/Times:Italic abc}| & {\it abc} & print abc in font Times with style italic\\
+\verb| | & \verb|{/Arial:Bold=20 abc}| & \Large\textsf{\textbf{abc}} & print abc in boldface Arial font size 20\\
+%% 5.3 only %% \verb|\U+| & \verb|\U+221E| & $\infty$ & Unicode point U+221E INFINITY\\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{How do I turn text markup on or off?}
+
+To exempt a particular text string from this processing mode use the keyword
+{\em noenhanced}.  For example we don't want to interpret file names as subscripts:
+\small
+\begin{verbatim}
+set title "Compare file_1.dat and file_2.dat" noenhanced
+\end{verbatim}
+\normalsize
+
+\subsection{Is UTF-8 the answer to all my special character problems?}
+
+Yes.
+
+Unfortunately there are some circumstances where it very cumbersome to use,
+notably in the generation of PostScript output.
+If you are working in a UTF-8 computing environment, you probably do not have to
+do anything special in gnuplot to use it.
+If you are not, then you can still tell gnuplot to use UTF-8 when creating output:
+{\em set encoding utf8}.  
+
+If you cannot enter UTF-8 characters on your
+keyboard you will have to solve that outside of gnuplot, or use octal escape 
+sequences to type them in byte-by-byte.  If your keyboard does generate UTF-8
+but you don't know what keystrokes would produce a specific character, there 
+are probably suitable character selection apps for your desktop
+(e.g. KDE {\em kcharselect}, or GNOME {\em Character Map}).
+
+\subsection{What if I need h-bar (Planck's constant)?}
+
+The most straightforward way is to use a UTF-8 font, and type in the
+$\hbar$ character (Unicode code point \#x210F) directly. 
+ 
+PostScript: PostScript does not handle utf8 easily so you must use an
+approximation based on enhanced text markup and possibly a special
+Symbol font:
+
+\verb+ @{/=56 -} {/=24 h}+ or
+\verb+ {/=8 @{/Symbol=24 -} _{/=14 h}}+
+In the latter, the "-" (a long one in /Symbol) is non-spacing and 24-pt.
+The 14-pt "h" is offset by an 8-pt space (which is the space preceding
+the "\_") but smaller, since it's written as a subscript.
+But these don't look too much like the hbar we're used to, since the bar
+is horizontal instead of sloped.
+Another possibility is \verb+{/=14 @^{/Symbol=10 -}{/=14 h}}+.
+
+The reduced Planck's constant can be set very easily by using the
+AMS-LaTeX PostScript fonts which are available from
+\http{www.ams.org/tex/amsfonts.html} (also included in many LaTeX
+distributions). \Gnuplot{} (see \verb+help fontpath+) and the
+PostScript interpreter (usually Ghostscript) have to know where the
+file \verb+ msbm10.pfb+ (or \verb+ msbm10.pfa+) resides. Use
+\verb+ {/MSBM10 \175}+ to produce \verb+ \hslash+ which is a "h"
+superimposed by a sloped bar. The standard \verb+ \hbar+ (horizontal
+bar) has the octal code 176. Please note that h-bar exists only as an
+italic type.
+
+\subsection{What if I need the Solar mass symbol?}
+
+As with Planck's constant, the most straightforward way is to use a 
+UTF-8 font, and type in the $\odot$ character (Unicode code point \#x2299 ; "circled dot operator") directly. 
+The very similar glyph at code point \#x2609 ; "sun" may be even better, but not many fonts provide it.
+ 
 \subsection{How to use Greek letters or other special symbols?}
 
 The old-style way is to use enhanced text mode to switch to a specialize font,
@@ -788,11 +876,12 @@ The various \LaTeX{} terminal types (\textit{latex, epslatex, tikz, context, cai
 hand off text generation to \LaTeX{}. In this case you can use normal \LaTeX{}
 markup like \verb+"\\alpha_{3}"+ or \verb+'\alpha_{3}'+ .
 
-\subsection{How do I include accented characters}
-% \subsection{Can I type labels in Czech, French, Hungarian, Russian...}
+\subsection{How do I include accented characters?}
 
-To obtain accented characters like \"u or \^n in your labels you should use
-8bit character codes together with the appropriate encoding option.
+If you are stuck using a non-utf8 encoding you should use
+8-bit character codes together with the appropriate encoding option
+to obtain accented characters like \"u or \^n in your labels.
+You can represent the 8-bit code with an escape sequence.
 See the following example:
 
 \small
@@ -803,24 +892,28 @@ gnuplot> plot "bier.dat" u 1:2
 \end{verbatim}
 \normalsize
 
-Consequently, you can type labels in Czech, French, Hungarian, Russian... by
-means of an appropriate \textit{set encoding}. However, you cannot mix two
-encodings in one file (e.g. accents for west and east latin encodings).
-
-A more general solution is to use UTF-8 encoding as described above, giving
-access to any accented characters with a unicode code point.
-
-\subsection{Can I do 1:1 scaling of axes?}
-
-Try \verb+set size square+
-or \verb+set view equal xy+.
-
+Everyone else should use UTF-8, where these are normal characters.
 
 \subsection{Can I put different text sizes into my plots?}
 
 Most terminal types allow you to specify a starting font face and size.
 The "enhanced text" mode allows you to change fonts, text sizes, bold and
 italic styles within a plot.
+
+
+
+\section{Wanted features}
+
+\subsection{Does \gnuplot support a driver for <graphics format>?}
+
+To see a list of the available graphic drivers for your installation of
+\gnuplot, type {\em set term}.
+
+Some graphics drivers are included in the normal distribution
+but are not built by default. If you want to use them, you'll
+have to recompile from source.
+
+
 
 \subsection{How do I skip data points?}
 
@@ -902,13 +995,6 @@ that will appear in a subsequent release.
 The various online forums are a better place to ask about
 work arounds or actually solving \gnuplot related problems.
 
-
-\subsection{Can I use \gnuplot routines for my own programs?}
-
-On systems supporting pipes, you can pipe commands to \gnuplot from other
-programs. Many applications with gnuplot as the graphics engine, like Octave
-(\http{www.octave.org}), uses this method. This also works from a cgi script to
-drive \gnuplot from a forms-based web page.
 
 \subsection{What extensions have people made to \gnuplot? Where can I get
 them?}
@@ -1015,34 +1101,6 @@ gnuplot> plot "data", [-100:0] f1(x), [0:100] f2(x)
 \normalsize
 
 
-\subsection{How do I run my data through a filter before plotting?}
-
-If your system supports the popen() function, as Unix does, you
-should be able to run the output through another process, for
-example a short awk program, such as
-
-\small
-\begin{verbatim}
-gnuplot> plot "< awk ' { print $1, $3/$2 } ' file.in"
-\end{verbatim}
-\normalsize
-
-The plot command is very powerful and is able to do some
-arithmetic on datafiles. See \verb+help plot+.
-
-The above filtering works seamlessly under Unixes and OS/2. On Windows, this
-is only supported by default in \textit{gnuplot} version 5, but required a 
-separate program \textit{wgnuplot\_pipes} in some earlier versions.
-
-\subsection{How do I save and restore my current settings?}
-
-Use the \verb+save+ and \verb+load+ commands for this; see \verb+help save+
-and \verb+help load+ for details.
-
-You can save the current terminal and restore it later without touching the
-filesystem by \textit{set term push} and \textit{set term pop}, respectively.
-
-
 \subsection{How do I plot lines (not grids) using splot?}
 
 If the data input to splot is arranged such that each line contains
@@ -1066,68 +1124,6 @@ gnuplot> set parametric
 gnuplot> set cont
 gnuplot> splot [0:1] [0:1] u,yl(x(u))+(yu(x(u)) - yl(x(u)))*v,\
 > f(x(u), (yu(x(u)) - yl(x(u)))*v)
-\end{verbatim}
-\normalsize
-
-
-\subsection{How do I call \gnuplot from my own programs?}
-
-On unix-like systems, commands to gnuplot can be piped via stdin.
-Output from \gnuplot's \verb+print+ command can be read via a named pipe.
-On Windows, due to the lacking standard input (stdin) in GUI programs,
-you either need to use the console version \textit{gnuplot} (recommended),
-or use \textit{wgnuplot\_pipes}, which has an additional console window
-attached. The old helper program \textit{pgnuplot} is still included
-in the distribution package.
-
-
-\subsection{What if I need h-bar (Planck's constant)?}
-
-The most straightforward way is to use a UTF-8 font, and type in the
-$\hbar$ character (Unicode code point \#x210F) directly. 
- 
-This does not work in PostScript, however, so you must use approximations
-like
-\verb+ @{/=56 -} {/=24 h}+ or
-\verb+ {/=8 @{/Symbol=24 -} _{/=14 h}}+
-In the latter, the "-" (a long one in /Symbol) is non-spacing and 24-pt.
-The 14-pt "h" is offset by an 8-pt space (which is the space preceding
-the "\_") but smaller, since it's written as a subscript.
-But these don't look too much like the hbar we're used to, since the bar
-is horizontal instead of sloped.  I don't see a way to get that.  I
-tried using an accent (character 264 in iso-latin-1 encoding), but I haven't found a
-way to scale and position the pieces correctly. 
-One more possibility would be \verb+{/=14 @^{/Symbol=10 -}{/=14 h}}+.
-
-The reduced Planck's constant can be set very easily by using the
-AMS-LaTeX PostScript fonts which are available from
-\http{www.ams.org/tex/amsfonts.html} (also included in many LaTeX
-distributions). \Gnuplot{} (see \verb+help fontpath+) and the
-PostScript interpreter (usually Ghostscript) have to know where the
-file \verb+ msbm10.pfb+ (or \verb+ msbm10.pfa+) resides. Use
-\verb+ {/MSBM10 \175}+ to produce \verb+ \hslash+ which is a "h"
-superimposed by a sloped bar. The standard \verb+ \hbar+ (horizontal
-bar) has the octal code 176. Please note that h-bar exists only as an
-italic type.
-
-\subsection{What if I need the Solar mass symbol?}
-
-As with Planck's constant, the most straightforward way is to use a 
-UTF-8 font, and type in the $\odot$ character (Unicode code point \#x2299 ; "circled dot operator") directly. 
-The very similar glyph at code point \#x2609 ; "sun" may be even better, but not many fonts have it.
- 
-
-\subsection{How do I give exact positions for the graph borders on the page?}
-
-Specify the position of the top, bottom, left, and right borders in
-terms of their fractional position within the page:
-
-\small
-\begin{verbatim}
-set lmargin at screen 0.05
-set bmargin at screen 0.05
-set rmargin at screen 0.95
-set tmargin at screen 0.95
 \end{verbatim}
 \normalsize
 
@@ -1169,30 +1165,31 @@ in the toolbar.
 by the system's \textit{fontconfig} utility.
 \end{description}
 
-\subsection{\Gnuplot{} does not open a plot window on VMS. Why?}
-On VMS, you need to make several symbols:
+\subsection{Pm3d splot from a datafile does not draw anything}
+\label{blank1}
 
+You do \verb+set pm3d; splot 'a.dat'+ and no plot but colorbox appears.
+Perhaps there is no blank line in between two subsequent scans (isolines) in
+the data file? Add blank lines! If you are curious what this means, then don't
+hesitate to look to files like \verb+demo/glass.dat+ or \verb+demo/triangle.dat+
+in the gnuplot demo directory.
+
+You can find useful the following awk script (call it e.g. \verb+addblanks.awk+)
+which adds blank lines to a data file whenever number in the first column
+changes:
 \small
 \begin{verbatim}
-        $ gnuplot_x11 :== $disk:[directory]gnuplot_x11
-        $ gnuplot :== $disk:[directory]gnuplot.exe
-        $ def/job GNUPLOT$HELP disk:[directory]gnuplot.hlb
+/^[[:blank:]]*#/ {next} # ignore comments (lines starting with #)
+NF < 3 {next} # ignore lines which don't have at least 3 columns
+$1 != prev {printf "\n"; prev=$1} # print blank line
+{print} # print the line
 \end{verbatim}
 \normalsize
-
-Then run \gnuplot from your command line, and use
-\verb+set term x11+.
-
-On Unix systems the x11 and qt terminals require installation of
-separate helper programs \textit{gnuplot\_x11} and \textit{gnuplot\_qt}.
-These are usually installed in a directory \textit{/usr/libexec/gnuplot/5.0/}
-and \gnuplot knows to look for them there.  If they are installed somewhere
-else or gnuplot is having trouble finding them, try setting the environmental
-variable \verb+GNUPLOT_DRIVER_DIR+.
-
+Then, either preprocess your data file by command
+\verb+awk -f addblanks.awk <a.dat+ or plot the datafile under a unixish platform
+by \verb+gnuplot> splot "<awk -f addblanks.awk a.dat"+.
 
 \subsection{Why does \gnuplot ignore my very small numbers?}
-
 
 For some purposes \Gnuplot{} treats numbers less than 1e-08 as being zero.
 Thus, if you are trying to plot a collection of very small
