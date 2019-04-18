@@ -323,9 +323,9 @@ These examples and the resulting plots may also be found online at
 \subsection{How do I determine which options were compiled into my \gnuplot executable?}
 
 Given that you have a compiled version of \gnuplot, you can use the
-\verb+show+ command to display a list of configuration and build options
+{\em show} command to display a list of configuration and build options
 that were used to build your copy.  The output formats (a.k.a. "terminals")
-built into your copy of gnuplot are reported by \verb+set terminal+.
+built into your copy of gnuplot are reported by {\em set terminal}.
 
 \small
 \begin{verbatim}
@@ -521,7 +521,7 @@ Once the named block has been defined, it can be used as many times
 as you like.
 
 Data can also be provided in-line as part of a plot command using the
-pseudo-file \verb+"-"+.  In this case the data can only be used once.
+pseudo-file '-'.  In this case the data can only be used once.
 
 \small
 \begin{verbatim}
@@ -639,17 +639,17 @@ data files.
 
 \subsection{How do I plot every nth point?}
 
-This can be specified with various options for the command \verb+plot+,
-for example \verb+plot 'a.dat' every 2+.  If you want to draw a line 
+This can be specified with various options for the command {\em plot},
+for example {\em plot 'a.dat' every 2}.  If you want to draw a line 
 through every point but only draw a point symbol at every nth point,
-then try \verb+plot 'a.dat' with linespoints pointinterval n+.
+then try {\em plot 'a.dat' with linespoints pointinterval n}.
 
 
 \subsection{How do I plot a vertical line?}
 
 Depending on context, the main methods are:
 \begin{itemize}
-\item \verb+set arrow .... .... nohead+ where you have to compute
+\item {\em set arrow .... .... nohead} where you have to compute
 explicitly the start and the end of the arrow.
 \item generate inlined datapoints and plot them
 \end{itemize}
@@ -713,7 +713,7 @@ add an additional keyword {\em above} or {\em below} after {\em filledcurves}.
 \subsection{Drawing 2D projection of 3D data}
 
 Use \textit{set view map}
-There are also plotting styles \verb+with image+ and \verb+with rgbimage+
+There are also plotting styles {\em with image} and {\em with rgbimage}
 for plotting 2D color images.
 
 \subsection{How to overlay dots/points scatter plot onto a pm3d map/surface}
@@ -948,7 +948,7 @@ your computer or output device.  \Gnuplot itself does not provide fonts.
 
 The various \LaTeX{} terminal types (\textit{latex, epslatex, tikz, context, cairolatex})
 hand off text generation to \LaTeX{}. In this case you can use normal \LaTeX{}
-markup like \verb+"\\alpha_{3}"+ or \verb+'\alpha_{3}'+ .
+markup like \verb+'\alpha_{3}'+ .
 
 \subsection{How do I include accented characters?}
 
@@ -1137,13 +1137,13 @@ cache can be empty.  Try invoking gnuplot with command line option {\em --slow}.
 
 \subsection{Pm3d splot from a datafile does not draw anything}
 
-You do \verb+set pm3d; splot 'a.dat'+ and no plot but colorbox appears.
+You do {\em set pm3d; splot 'a.dat'} and no plot but colorbox appears.
 Perhaps there is no blank line in between two subsequent scans (isolines) in
 the data file? Add blank lines! If you are curious what this means, then don't
-hesitate to look to files like \verb+demo/glass.dat+ or \verb+demo/triangle.dat+
+hesitate to look to files like {\em demo/glass.dat} or {\em demo/triangle.dat}
 in the gnuplot demo directory.
 
-You can find useful the following awk script (call it e.g. \verb+addblanks.awk+)
+You can find useful the following awk script (call it e.g. {\em addblanks.awk})
 which adds blank lines to a data file whenever number in the first column
 changes:
 \small
@@ -1155,7 +1155,7 @@ $1 != prev {printf "\n"; prev=$1} # print blank line
 \end{verbatim}
 \normalsize
 Then, either preprocess your data file by command
-\verb+awk -f addblanks.awk <a.dat+ or plot the datafile under a unixish platform
+{\em awk -f addblanks.awk <a.dat} or plot the datafile under a unixish platform
 by \verb+gnuplot> splot "<awk -f addblanks.awk a.dat"+.
 
 \subsection{Why does \gnuplot ignore my very small numbers?}
@@ -1184,7 +1184,7 @@ gnuplot> set zero 1e-20
 \end{verbatim}
 \normalsize
 
-For more information, type \verb+help set zero+.
+For more information, type {\em help set zero}.
 
 \subsection{When I {\em replot} a multiplot I get only a fragment}
 
@@ -1198,14 +1198,14 @@ terminals or output files.
 \subsection{When I run \gnuplot from the shell or a script, the resulting plot flashes by on the screen and then disappears}
 
 \begin{enumerate}
-\item Put a \verb+pause -1+ after the plot command in the file, or at the file end.
+\item Put a {\em pause -1} after the plot command in the file, or at the file end.
 
-\item Use command \verb+gnuplot filename.gp -+ (yes, dash is the last
+\item Use command {\em gnuplot filename.gp -} (yes, dash is the last
 parameter) to stay in the interactive regime when the script completes.
 
 \item Run \gnuplot as \textit{gnuplot -persist}
 
-\item On Windows you can also use either \verb+-persist+ or \verb+/noend+.
+\item On Windows you can also use either {\em -persist} or {\em /noend}.
 
 \item Give the \textit{persist} option as part of the \textit{set terminal} command.
 \end{enumerate}
@@ -1234,15 +1234,14 @@ This way of evaluating integer expressions is shared by both C and Fortran.
 
 \subsection{My output files are incomplete!}
 
-You may need to flush the output with a closing \verb+set output+.
+You may need to flush the output and close the file with 
+{\em set output} or {\em unset output}).
+
 Some output formats (postscript, pdf, latex, svg, ...) can include several
 pages of plots in a single output file.  For these output modes, gnuplot
 leaves the file open after each plot so that you can add additional plots
 to it.  The file is not completed and made available to external applications
-until you explicitly close it (\verb+set output+ or \verb+unset output+),
-or select a different terminal type (\verb+set term+) or exit gnuplot.
-Output formats that contain only a single 'page' (png, emf, ...)
-should not suffer from this problem.
+or select a different terminal type ({\em set term}) or exit gnuplot.
 
 
 \subsection{Calling \gnuplot in a pipe or with a \gnuplot-script
@@ -1266,25 +1265,16 @@ close GP
 command is executed, and the plot window is closed even before you have
 a chance to look at it.
 
-There are three solutions to this: first, use the \verb+pause -1+
+There are three solutions to this: first, use the {\em pause -1}
 command in \gnuplot before closing the pipe. Second, close the pipe
 only if you are sure that you don't need \gnuplot and its plot window
-anymore. Last, you can use the command line option \verb+-persist+: this
+anymore. Last, you can use the command line option {\em -persist}: this
 option leaves the X-Window System plot window open.
 
 
 \section{Credits}
 
-\Gnuplot{} 3.7's main contributors are (in alphabetical order)
-Hans-Bernhard Broeker, John Campbell, Robert Cunningham, David Denholm,
-Gershon Elber, Roger Fearick, Carsten Grammes, Lucas Hart, Lars Hecking,
-Thomas Koenig, David Kotz, Ed Kubaitis, Russell Lang, Alexander Lehmann,
-Alexander Mai, Carsten Steger, Tom Tkacik, Jos Van der Woude, James R.
-Van Zandt, and Alex Woo.  Additional substantial contributors to version 4.0
-include Ethan Merritt, Petr Mikul\'{\i}k and Johannes Zellner.
-Version 4.2, 4.4, 4.6 and 5.0 releases were coordinated by Ethan Merritt.
-
-This list was initially compiled by John Fletcher with contributions
+This FAQ was initially compiled by John Fletcher with contributions
 from Russell Lang, John Campbell, David Kotz, Rob Cunningham, Daniel
 Lewart and Alex Woo. Reworked by Thomas Koenig from a draft
 by Alex Woo, with corrections and additions from Alex Woo, John
@@ -1293,7 +1283,6 @@ Again reworked for \gnuplot 3.7 by Alexander Mai and Juergen v.Hagen
 with corrections by Lars Hecking, Hans-Bernhard Broecker and others.
 Revised for \gnuplot version 4 by Petr Mikul\'{\i}k and Ethan Merritt.
 Revised for \gnuplot version 5 by Ethan Merritt.
-
 
 \end{document}
 %%
