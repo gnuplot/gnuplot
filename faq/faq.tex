@@ -620,6 +620,41 @@ Try {\em set size square} or {\em set view equal xy}.
 
 Try {\em set palette cubehelix}.
 
+\subsection{How do I skip data points?}
+
+By specifying \textit{?} as a data value, as in
+\small
+\begin{verbatim}
+        1 2
+        2 3
+        3 ?
+        4 5
+\end{verbatim}
+\normalsize
+
+See also \textit{set missing}.
+See also \textit{set datafile commentschars} for specifying comment characters in
+data files.
+
+
+\subsection{How do I plot every nth point?}
+
+This can be specified with various options for the command \verb+plot+,
+for example \verb+plot 'a.dat' every 2+.  If you want to draw a line 
+through every point but only draw a point symbol at every nth point,
+then try \verb+plot 'a.dat' with linespoints pointinterval n+.
+
+
+\subsection{How do I plot a vertical line?}
+
+Depending on context, the main methods are:
+\begin{itemize}
+\item \verb+set arrow .... .... nohead+ where you have to compute
+explicitly the start and the end of the arrow.
+\item generate inlined datapoints and plot them
+\end{itemize}
+
+
 \section{Plot types that people often ask about}
 
 \subsection{Animations}
@@ -770,6 +805,45 @@ Gnuplot is not a 3D modeling program.
 The depthorder rendering will not handle inter-penetrating facets.
 For true 3D rendering you would be probably be better off using a ray-tracing program.
 
+\subsection{How do I plot two functions in non-overlapping regions?}
+
+Give the desired range immediately before each function being plotted.
+For example, to plot experimental data and two different functional
+models f1 and f2 covering two different portions of the domain:
+\small
+\begin{verbatim}
+gnuplot> set autoscale x  # get x range from the data
+gnuplot> plot 'data', [-100:0] f1(x), [0:100] f2(x)
+\end{verbatim}
+\normalsize
+
+
+\subsection{How do I plot lines (not grids) using splot?}
+
+If the data input to splot is arranged such that each line contains
+the same number of data points (using blank lines as delimiters, as usual),
+splot will by default treat the data as describing a surface.
+If you want to draw individual lines instead, try some combination of
+\textit{unset surface}, \textit{set surface explicit}, \textit{plot ... nosurface}.
+
+
+\subsection{How do I plot a function f(x,y) that is bounded by other
+          functions in the x-y plane?}
+
+Here is one way:
+\small
+\begin{verbatim}
+gnuplot> f(x,y) = x**2 + y **2
+gnuplot> x(u) = 3*u
+gnuplot> yu(x) = x**2
+gnuplot> yl(x) = -x**2
+gnuplot> set parametric
+gnuplot> set cont
+gnuplot> splot [0:1] [0:1] u,yl(x(u))+(yu(x(u)) - yl(x(u)))*v,\
+> f(x(u), (yu(x(u)) - yl(x(u)))*v)
+\end{verbatim}
+\normalsize
+
 
 \section{Text formatting and special symbols}
 
@@ -803,7 +877,7 @@ To exempt a particular text string from this processing mode use the keyword
 {\em noenhanced}.  For example we don't want to interpret file names as subscripts:
 \small
 \begin{verbatim}
-set title "Compare file_1.dat and file_2.dat" noenhanced
+set title 'Compare file_1.dat and file_2.dat' noenhanced
 \end{verbatim}
 \normalsize
 
@@ -902,7 +976,7 @@ italic styles within a plot.
 
 
 
-\section{Wanted features}
+\section{Miscellaneous}
 
 \subsection{Does \gnuplot support a driver for <graphics format>?}
 
@@ -912,63 +986,6 @@ To see a list of the available graphic drivers for your installation of
 Some graphics drivers are included in the normal distribution
 but are not built by default. If you want to use them, you'll
 have to recompile from source.
-
-
-
-\subsection{How do I skip data points?}
-
-By specifying \textit{?} as a data value, as in
-\small
-\begin{verbatim}
-        1 2
-        2 3
-        3 ?
-        4 5
-\end{verbatim}
-\normalsize
-
-See also \textit{set missing}.
-See also \textit{set datafile commentschars} for specifying comment characters in
-data files.
-
-
-\subsection{How do I plot every nth point?}
-
-This can be specified with various options for the command \verb+plot+,
-for example \verb+plot 'a.dat' every 2+.  If you want to draw a line 
-through every point but only draw a point symbol at every nth point,
-then try \verb+plot 'a.dat' with linespoints pointinterval n+.
-
-
-\subsection{How do I plot a vertical line?}
-
-Depending on context, the main methods are:
-\begin{itemize}
-\item \verb+set arrow .... .... nohead+ where you have to compute
-explicitly the start and the end of the arrow.
-\item generate (inlined) datapoints and plot them
-\end{itemize}
-
-
-\subsection{How do I plot data files}
-
-Easily: by a command \textit{plot 'a.dat'}. In 3D, use \textit{splot 'a.dat'} --
-but don't forget to put a blank line in between two subsequent scans (isolines),
-otherwise you will get an error that the data is not gridded; see also question 
-\ref{blank1}. If your data are not gridded, then use \textit{set dgrid3d \{many
-options\}}.
-
-
-\subsection{How do I replot multiplot drawing}
-
-You cannot directly: gnuplot supports \verb+replot+ command, not
-\verb+remultiplot+. You have to write the complete sequence of commands since
-\verb+set multiplot+ till \verb+unset multiplot+ into a script file. Then
-you can \verb+load+ the script into gnuplot as many times as you need for
-replotting the drawing to different terminals or output files.
-
-
-\section{Miscellaneous}
 
 \subsection{I've found a bug, what do I do?}
 
@@ -995,24 +1012,30 @@ that will appear in a subsequent release.
 The various online forums are a better place to ask about
 work arounds or actually solving \gnuplot related problems.
 
+\subsection{What extensions have people made to \gnuplot? Where can I get them?}
 
-\subsection{What extensions have people made to \gnuplot? Where can I get
-them?}
-
-Extensions or patches are available on the "Patches" page of the
-gnuplot development site
-\http{sourceforge.net/p/gnuplot/patches/}.
 The current development version will generally include features that are
-not yet part of the most recent official release of gnuplot.
+not yet part of the most recent stable release of gnuplot.
+As of April 2019 the 5.3 development version notably supports
+\begin{list}{}{}
+\setlength\itemsep{-4pt}
+\item 64-bit integer arithmetic
+\item 3D voxel grids
+\item 3D plot styles {\em isosurface, circles, boxes}
+\item {\em set walls} command to show xy xz and yz planes in 3D plots
+\item unicode escape sequences {\textbackslash}U+hhhh
+\item order N Bessel functions of the 1st and 2nd kind
+\item modified Bessel functions
+\item multiple textbox styles
+\end{list}
 
 \subsection{I need an integration, fft, iir-filter,...!}
 
 \Gnuplot{} has been and is a plotting program, not a data
 processing or mathematical program suite. Therefore \gnuplot
-can't do that. Look into the demo file "bivariat.dem" for a basic
-implementation of an integration.  However \gnuplot version 5 does
-support calling functions from a dynamically loaded external shared
-object, i.e. a plugin.  So if you want to code up some complicated
+can't do that.
+However version 5 does support calling functions from a dynamically loaded
+external shared object, i.e. a plugin.  So if you want to code up some complicated
 function in C or another language with compatible calling conventions,
 you can compile it into a plugin for \gnuplot to import.
 
@@ -1056,16 +1079,6 @@ Hit \textit{h} in an active gnuplot plot window to get list of hotkeys.
 Read \textit{help mouse} and \textit{help bind} for more information.
 
 
-\subsection{I have ported \gnuplot to another system, or patched it. What
-do I do?}
-
-The preferred way of submitting, commenting and upgrading patches is
-via 'Patches' section on 
-\http{sourceforge.net/p/gnuplot/patches/}.
-You may want to send a note to \mailto{gnuplot-beta@lists.sourceforge.net} for
-more lively discussion.
-
-
 \subsection{I want to help in developing the next version of \gnuplot.
 What can I do?}
 
@@ -1074,58 +1087,6 @@ containing the line
 \verb+subscribe gnuplot-beta+
 in the body (not the subject) of the mail to
 \mailto{Majordomo@lists.sourceforge.net}.
-
-
-\subsection{Open questions for inclusion into the FAQ?}
-
-
-% \mailto{gnuplot-beta@lists.sourceforge.net}.
-
-Please submit your questions (along with the answer) to 
-\mailto{gnuplot-beta@lists.sourceforge.net}.
-
-
-\section{Making life easier}
-
-\subsection{How do I plot two functions in non-overlapping regions?}
-
-This used to be complicated.  In version 5 it is easy - place the
-desired range immediately before each function being plotted.
-For example, to plot experimental data and two different functional
-models f1 and f2 covering two different portions of the domain:
-\small
-\begin{verbatim}
-gnuplot> set autoscale x  # get x range from the data
-gnuplot> plot "data", [-100:0] f1(x), [0:100] f2(x)
-\end{verbatim}
-\normalsize
-
-
-\subsection{How do I plot lines (not grids) using splot?}
-
-If the data input to splot is arranged such that each line contains
-the same number of data points (using blank lines as delimiters, as usual),
-splot will by default treat the data as describing a surface.
-If you want to draw individual lines instead, try some combination of
-\textit{unset surface}, \textit{set surface explicit}, \textit{plot ... nosurface}.
-
-
-\subsection{How do I plot a function f(x,y) that is bounded by other
-          functions in the x-y plane?}
-
-Here is one way:
-\small
-\begin{verbatim}
-gnuplot> f(x,y) = x**2 + y **2
-gnuplot> x(u) = 3*u
-gnuplot> yu(x) = x**2
-gnuplot> yl(x) = -x**2
-gnuplot> set parametric
-gnuplot> set cont
-gnuplot> splot [0:1] [0:1] u,yl(x(u))+(yu(x(u)) - yl(x(u)))*v,\
-> f(x(u), (yu(x(u)) - yl(x(u)))*v)
-\end{verbatim}
-\normalsize
 
 
 \section{Common problems}
@@ -1165,8 +1126,16 @@ in the toolbar.
 by the system's \textit{fontconfig} utility.
 \end{description}
 
+\subsection{The first plot in a qt terminal session fails or has bad layout}
+
+You may get an error message about "slow font initialization".
+This is because it shares a font cache with other programs.
+If you request a font that no one else is using, it takes longer to
+update the cache.  This mostly happens on Windows or OSX because other
+programs tend to use a different font mechanism so the system font
+cache can be empty.  Try invoking gnuplot with command line option {\em --slow}.
+
 \subsection{Pm3d splot from a datafile does not draw anything}
-\label{blank1}
 
 You do \verb+set pm3d; splot 'a.dat'+ and no plot but colorbox appears.
 Perhaps there is no blank line in between two subsequent scans (isolines) in
@@ -1217,6 +1186,14 @@ gnuplot> set zero 1e-20
 
 For more information, type \verb+help set zero+.
 
+\subsection{When I {\em replot} a multiplot I get only a fragment}
+
+\Gnuplot only retains enough information to regenerate the most recent
+{\em plot} or {\em splot} command. 
+You need to save the complete sequence of commands that generated the
+multiplot into a script file. Then you can {\em load} that script into
+\gnuplot as many times as you need for replotting the drawing to different
+terminals or output files.
 
 \subsection{When I run \gnuplot from the shell or a script, the resulting plot flashes by on the screen and then disappears}
 
