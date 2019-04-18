@@ -20,6 +20,7 @@ faq.html: faq.tex
 pdf: faq.pdf
 faq.pdf: faq.tex
 	$(PDFLATEX) $<
+	$(PDFLATEX) $<
 
 txt: faq.txt
 faq.txt: faq.html

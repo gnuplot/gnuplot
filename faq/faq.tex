@@ -168,7 +168,7 @@ The following quote comes from Thomas Williams:
 
 \begin{itemize}
 \item Two-dimensional functions and data plots combining many different
-elements such as points, lines, error bars, filled shapes, labels, arrows, ...
+ elements such as points, lines, error bars, filled shapes, labels, arrows, ...
 \item Polar axes, log-scaled axes, general nonlinear axis mapping, parametric coordinates
 \item Data representations such as heat maps, beeswarm plots, violin plots, histograms, ...
 \item Three-dimensional plots of data points, lines, and surfaces in
@@ -176,7 +176,7 @@ many different styles (contour plot, mesh)
 \item Algebraic computation using integer, floating point, or complex arithmetic
 \item Data-driven model fitting using Marquardt-Levenberg minimization
 \item Support for a large number of operating systems, graphics
-file formats and output devices
+ file formats and output devices
 \item Extensive on-line help
 \item \TeX{}-like text formatting for labels, titles, axes, data points
 \item Interactive command line editing and history
@@ -188,8 +188,8 @@ file formats and output devices
 Yes. Gnuplot can read in files containing additional commands during
 an interactive session, or it can be run in batch mode by piping a
 pre-existing file or a stream of commands to stdin. Gnuplot is used
-as a back-end graphics driver by higher-level mathematical packages 
-such as Octave and can easily be wrapped in a cgi script for use as a 
+as a back-end graphics driver by higher-level mathematical packages
+such as Octave and can easily be wrapped in a cgi script for use as a
 web-driven plot generator.  Gnuplot supports context- or data-driven
 flow control and iteration using familiar statements
 {\em if else continue break while for}.
@@ -258,7 +258,7 @@ available from the official distribution site \http{sourceforge.net/projects/gnu
 \subsection{Where can I get current development version of \gnuplot?}
 
 The development version of gnuplot is held in a git repository which you
-can clone as shown below to inspect or build an executable program 
+can clone as shown below to inspect or build an executable program
 from the source.
 
 \scriptsize
@@ -292,7 +292,7 @@ To build from the development source on linux you must run a separate script \te
 prior to running \textit{./configure} .
 \item
 On Windows, makefiles can be found in \textit{config/mingw}, \textit{config/msvc},
-\textit{config/watcom}, and \textit{config/cygwin}. Update the options in the 
+\textit{config/watcom}, and \textit{config/cygwin}. Update the options in the
 makefile's header and run the appropriate \textit{make} tool in the same directory
 as the makefile. Additional instructions can be found in the makefiles.
 \item
@@ -348,7 +348,7 @@ and {\em help set}.
 Read the manual, if you have it.
 
 \item
-Run the demos in the {\em demo} subdirectory or look at the 
+Run the demos in the {\em demo} subdirectory or look at the
 online copies. They should give you some ideas.
 \http{gnuplot.info/demo}
 
@@ -369,13 +369,13 @@ A more browser-oriented help forum may be found on StackOverflow
 If all these fail, post a question to \news{comp.graphics.apps.gnuplot} or send mail
 to the gatewayed mailing list \mailto{gnuplot-info@lists.sourceforge.net}.
 Please note that due to the overwhelming amount of spam it would otherwise receive,
-you must subscribe before you can post to it. Subscription instructions 
+you must subscribe before you can post to it. Subscription instructions
 may be found at
 \http{lists.sourceforge.net/lists/listinfo/gnuplot-info}.
 
 \end{itemize}
 When asking a question, always mention the \gnuplot version and
-operating system you are using.  If you are asking about a plot that 
+operating system you are using.  If you are asking about a plot that
 did not come out the way you expected, please try to show a minimal
 set gnuplot commands that produce a plot showing the problem.
 
@@ -436,7 +436,7 @@ as you can scale your graph later to the right size.
 
 Use {\em set term} to get a list of available file formats.
 
-Many word processors can use Encapsulated PostScript (*.eps) for graphs. 
+Many word processors can use Encapsulated PostScript (*.eps) for graphs.
 You can generate eps output in \gnuplot using either
 {\em set terminal postscript eps}
 or
@@ -448,15 +448,15 @@ You can use the GSView viewer for this (available for OS/2, Windows and X11),
 or some Unix ps tool.
 
 Some Windows office applications, including OpenOffice.org, can handle
-vector images in EMF format. These can be either produced by the emf 
+vector images in EMF format. These can be either produced by the emf
 terminal, or by selecting 'Save as EMF...' from the toolbar of the graph
 window of the windows terminal.
 
 OpenOffice.org can also read SVG, as well as AutoCAD's dxf format.
 
 There are many ways to use gnuplot to produce graphs for inclusion in a
-\TeX\ or \LaTeX\ document.  
-Some terminals produce *.tex fragments for direct inclusion; others 
+\TeX\ or \LaTeX\ document.
+Some terminals produce *.tex fragments for direct inclusion; others
 produce *.eps, *.pdf, *.png output to be included using the
 \textbackslash{}includegraphics command.
 The epslatex and cairolatex terminals produce both a graphics
@@ -478,7 +478,7 @@ This depends on the terminal type you use.
 \begin{itemize}
 
 \item \textbf{svg} terminal (scalable vector graphics) output can
-be further edited by a svg editor, e.g. 
+be further edited by a svg editor, e.g.
 \textbf{Inkscape} (\http{www.inkscape.org}),
 \textbf{Skencil} (\http{www.skencil.org}) or
 \textbf{Dia} (\http{projects.gnome.org/dia/}), or loaded
@@ -494,9 +494,9 @@ Pstoedit is available at \http{www.pstoedit.net}.
 other applications.
 
 \item Bitmapped graphics (e.g. png, jpeg, pbm) can be edited using
-tools such as ImageMagick or Gimp.  
+tools such as ImageMagick or Gimp.
 In general, you should use a vector graphics program to post-process
-vector graphic formats, and a pixel-based editing program 
+vector graphic formats, and a pixel-based editing program
 to post-process pixel graphics.
 
 \end{itemize}
@@ -521,7 +521,7 @@ Once the named block has been defined, it can be used as many times
 as you like.
 
 Data can also be provided in-line as part of a plot command using the
-pseudo-file '-'.  In this case the data can only be used once.
+pseudo-file "-".  In this case the data can only be used once.
 
 \small
 \begin{verbatim}
@@ -535,18 +535,18 @@ e
 
 \subsection{How do I run my data through a filter before plotting?}
 
-If your operating system supports the popen() function, you 
-should be able to filter input data through another process, for
-example a short awk program, as part of the {\em plot} command
+If your operating system supports the popen() function, you
+can filter input data through another program or system utility
+as part of the {\em plot} command.
 
 \small
 \begin{verbatim}
-gnuplot> plot "< awk ' { print $1, $3/$2 } ' file.in"
+gnuplot> plot "< sort +2 file.in"  # pre-sort data on column 2
 \end{verbatim}
 \normalsize
 
 This mechanism is particularly powerful in combination with the
-unix-derived command line utilities {\em sort} and {\em grep}.
+unix-derived command line utilities {\em awk}, {\em sort} and {\em grep}.
 
 \subsection{Can I use \gnuplot routines for my own programs?}
 
@@ -581,7 +581,7 @@ Each of the commands below accepts many additional parameters
 
 \subsection{Hidden line or surface removal}
 
-There are two relevant commands. {\em set hidden3d} affects surfaces 
+There are two relevant commands. {\em set hidden3d} affects surfaces
 drawn using the 3D plot style {\em splot ... with lines}. It also clips
 line segments created by other 3D plot styles that are occluded by those
 surfaces.   However it does not handle plots generated in {\em pm3d} mode.
@@ -640,7 +640,7 @@ data files.
 \subsection{How do I plot every nth point?}
 
 This can be specified with various options for the command {\em plot},
-for example {\em plot 'a.dat' every 2}.  If you want to draw a line 
+for example {\em plot 'a.dat' every 2}.  If you want to draw a line
 through every point but only draw a point symbol at every nth point,
 then try {\em plot 'a.dat' with linespoints pointinterval n}.
 
@@ -671,7 +671,7 @@ in the demo collection.
 \subsection{Implicit defined graphs}
 
 Implicit graphs or curves cannot be plotted directly in \gnuplot.
-However there is a workaround. 
+However there is a workaround.
 \small
 \begin{verbatim}
 gnuplot> # An example. Place your definition in the following line:
@@ -687,7 +687,7 @@ gnuplot> plot $TEMP w l
 \normalsize
 The trick is to draw the single contour line z=0 of the surface
 z=f(x,y), and store the resulting contour curve to a temporary file or datablock.
- 
+
 
 \subsection{How to fill an area between two functions}
 
@@ -736,7 +736,7 @@ See
 
 In version 5 the procedure is much simpler.  Plot the contours twice,
 once "with lines" and once "with labels".  To make the labels stand out
-it may help to use 
+it may help to use
 \begin{verbatim}
 set style textbox opaque noborder
 set contours
@@ -753,7 +753,7 @@ for \textit{bins} and for \textit{smooth frequency}.
 \subsection{Does \gnuplot support pie charts? quarterly time charts?}
 
 Pie charts are sort of difficult in \gnuplot, but see
-\http{gnuplot.sourceforge.net/demo/circles.html}, 
+\http{gnuplot.sourceforge.net/demo/circles.html},
 or have a look at
 \http{gnuplot-tricks.blogspot.com/2009/08/pie-charts-entirely-in-gnuplot.html}.
 
@@ -890,20 +890,20 @@ notably in the generation of PostScript output.
 If you are working in a UTF-8 computing environment, you probably do not have to
 do anything special in gnuplot to use it.
 If you are not, then you can still tell gnuplot to use UTF-8 when creating output:
-{\em set encoding utf8}.  
+{\em set encoding utf8}.
 
 If you cannot enter UTF-8 characters on your
-keyboard you will have to solve that outside of gnuplot, or use octal escape 
+keyboard you will have to solve that outside of gnuplot, or use octal escape
 sequences to type them in byte-by-byte.  If your keyboard does generate UTF-8
-but you don't know what keystrokes would produce a specific character, there 
+but you don't know what keystrokes would produce a specific character, there
 are probably suitable character selection apps for your desktop
 (e.g. KDE {\em kcharselect}, or GNOME {\em Character Map}).
 
 \subsection{What if I need h-bar (Planck's constant)?}
 
 The most straightforward way is to use a UTF-8 font, and type in the
-$\hbar$ character (Unicode code point \#x210F) directly. 
- 
+$\hbar$ character (Unicode code point \#x210F) directly.
+
 PostScript: PostScript does not handle utf8 easily so you must use an
 approximation based on enhanced text markup and possibly a special
 Symbol font:
@@ -930,10 +930,10 @@ italic type.
 
 \subsection{What if I need the Solar mass symbol?}
 
-As with Planck's constant, the most straightforward way is to use a 
-UTF-8 font, and type in the $\odot$ character (Unicode code point \#x2299 ; "circled dot operator") directly. 
+As with Planck's constant, the most straightforward way is to use a
+UTF-8 font, and type in the $\odot$ character (Unicode code point \#x2299 ; "circled dot operator") directly.
 The very similar glyph at code point \#x2609 ; "sun" may be even better, but not many fonts provide it.
- 
+
 \subsection{How to use Greek letters or other special symbols?}
 
 The old-style way is to use enhanced text mode to switch to a specialize font,
@@ -978,7 +978,7 @@ italic styles within a plot.
 
 \section{Miscellaneous}
 
-\subsection{Does \gnuplot support a driver for <graphics format>?}
+\subsection{Does \gnuplot support a driver for graphics format XXX?}
 
 To see a list of the available graphic drivers for your installation of
 \gnuplot, type {\em set term}.
@@ -1003,7 +1003,7 @@ has already been fixed.
 If, after checking these things, you still are convinced that there is a
 bug please report it using the bug-tracker at
 \http{sourceforge.net/p/gnuplot/bugs}.
-Be sure to include the version of \gnuplot (including patchlevel) and 
+Be sure to include the version of \gnuplot (including patchlevel) and
 the operating system you are running it on.
 It helps a lot if you can provide a simple script that reproduces the error.
 
@@ -1017,7 +1017,7 @@ work arounds or actually solving \gnuplot related problems.
 The current development version will generally include features that are
 not yet part of the most recent stable release of gnuplot.
 As of April 2019 the 5.3 development version notably supports
-\begin{list}{}{}
+\begin{itemize}{}{}
 \setlength\itemsep{-4pt}
 \item 64-bit integer arithmetic
 \item 3D voxel grids
@@ -1027,7 +1027,7 @@ As of April 2019 the 5.3 development version notably supports
 \item order N Bessel functions of the 1st and 2nd kind
 \item modified Bessel functions
 \item multiple textbox styles
-\end{list}
+\end{itemize}
 
 \subsection{I need an integration, fft, iir-filter,...!}
 
@@ -1042,7 +1042,7 @@ you can compile it into a plugin for \gnuplot to import.
 \subsection{Can I do heavy-duty data processing with \gnuplot? or
 What is beyond \gnuplot?}
 
-\gnuplot by itself is not suited very well for heavy numerical computation. 
+\gnuplot by itself is not suited very well for heavy numerical computation.
 On the other hand it can handle very large data sets.
 
 One thing you might try is \textit{fudgit}, an interactive multi-purpose
@@ -1075,7 +1075,7 @@ alternative to \textit{matlab}.
 
 Most of the interactive terminals support both pre-defined and user-defined
 hotkeys to replot, toggle plot elements, change axis scaling, and so on.
-Hit \textit{h} in an active gnuplot plot window to get list of hotkeys. 
+Hit \textit{h} in an active gnuplot plot window to get list of hotkeys.
 Read \textit{help mouse} and \textit{help bind} for more information.
 
 
@@ -1113,14 +1113,14 @@ printer, so it will accept any font name you give it. However, it
 is possible to bundle a font with the gnuplot output; please see the
 instructions given by gnuplot's internal command {}``help set term
 post fontfile''.
-\item [{svg}] Font handling is viewer-dependent. 
+\item [{svg}] Font handling is viewer-dependent.
 \item [{x11}] The x11 terminal uses the normal x11 font server mechanism.
 The only tricky bit is that in order to use multi-byte fonts you must
 explicitly say so:
 \small\begin{verbatim}
 set term x11 font "mbfont:sazanami mincho,vera,20"
 \end{verbatim}\normalsize
-\item [{win}] Select "Choose font..." from the "Options" pull-down menu 
+\item [{win}] Select "Choose font..." from the "Options" pull-down menu
 in the toolbar.
 \item [{wxt, qt}] On linux systems these terminals rely on fonts provided
 by the system's \textit{fontconfig} utility.
@@ -1128,12 +1128,13 @@ by the system's \textit{fontconfig} utility.
 
 \subsection{The first plot in a qt terminal session fails or has bad layout}
 
-You may get an error message about "slow font initialization".
-This is because it shares a font cache with other programs.
-If you request a font that no one else is using, it takes longer to
-update the cache.  This mostly happens on Windows or OSX because other
+You may also get an error message about "slow font initialization".
+This is because qt relies on a shared system font cache.
+If you request a font that no one else is using, it takes a while to
+update the cache.  This mostly happens on Windows or OSX, because other
 programs tend to use a different font mechanism so the system font
-cache can be empty.  Try invoking gnuplot with command line option {\em --slow}.
+cache can be empty.
+Try invoking gnuplot with command line option {\em --slow}.
 
 \subsection{Pm3d splot from a datafile does not draw anything}
 
@@ -1154,9 +1155,11 @@ $1 != prev {printf "\n"; prev=$1} # print blank line
 {print} # print the line
 \end{verbatim}
 \normalsize
+
 Then, either preprocess your data file by command
-{\em awk -f addblanks.awk <a.dat} or plot the datafile under a unixish platform
-by \verb+gnuplot> splot "<awk -f addblanks.awk a.dat"+.
+{\em awk -f addblanks.awk <a.dat}
+or plot the datafile under a unixish platform by\\
+{\em gnuplot > splot "<awk -f addblanks.awk a.dat"}.
 
 \subsection{Why does \gnuplot ignore my very small numbers?}
 
@@ -1189,7 +1192,7 @@ For more information, type {\em help set zero}.
 \subsection{When I {\em replot} a multiplot I get only a fragment}
 
 \Gnuplot only retains enough information to regenerate the most recent
-{\em plot} or {\em splot} command. 
+{\em plot} or {\em splot} command.
 You need to save the complete sequence of commands that generated the
 multiplot into a script file. Then you can {\em load} that script into
 \gnuplot as many times as you need for replotting the drawing to different
@@ -1234,7 +1237,7 @@ This way of evaluating integer expressions is shared by both C and Fortran.
 
 \subsection{My output files are incomplete!}
 
-You may need to flush the output and close the file with 
+You may need to flush the output and close the file with
 {\em set output} or {\em unset output}).
 
 Some output formats (postscript, pdf, latex, svg, ...) can include several
