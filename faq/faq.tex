@@ -99,9 +99,9 @@
 \maketitle
 
 \noindent
-This material is focused on \gnuplot version 5.
+This material describes \gnuplot version 5
         \\
-FAQ version: 15 April 2019
+FAQ version: April 2019
 
 
 \tableofcontents
@@ -213,19 +213,18 @@ environment.
 make any legal statement about the compliance or non-compliance of
 \gnuplot or its uses. There is no warranty whatsoever. Use at your own risk.
 
+\Gnuplot{} is freeware in the sense that you don't have to pay for it.
+You can use or modify gnuplot as you like, however certain restrictions
+apply to further distribution of modified versions.
+Please read and abide by the modification and redistribution terms in
+the \textit{Copyright} file.
 
 \subsection{Does \gnuplot have anything to do with the FSF and the GNU
 project?}
 
-\Gnuplot{} is neither written nor maintained by the FSF\@. At one time it
+\Gnuplot{} is neither written nor maintained by the FSF. At one time it
 was distributed by the FSF but this is no longer true. \Gnuplot{} as a whole
 is not covered by the GNU General Public License (GPL).
-
-\Gnuplot{} is freeware in the sense that you don't have to pay for it.
-You can use or modify gnuplot as you like however certain restrictions
-apply to further distribution of modified versions.
-Please read and accept the modification and redistribution terms in
-the \textit{Copyright} file.
 
 
 \subsection{Where do I get further information?}
@@ -241,7 +240,7 @@ about gnuplot", for the most up-to-date list.
 
 \subsection{What is the current version of \gnuplot?}
 
-The current released version of \gnuplot is 5.2, first released in September 2017.
+The current stable version of \gnuplot is 5.2, first released in September 2017.
 Incremental versions (patchlevel 1, 2, ...) are typically released every six months.
 The development version of \gnuplot is currently 5.3.
 
@@ -263,7 +262,7 @@ from the source.
 
 \scriptsize
 \begin{verbatim}
-  git clone https://git.code.sf.net/p/gnuplot/gnuplot-main gnuplot-gnuplot-main
+  git clone https://git.code.sf.net/p/gnuplot/gnuplot-main gnuplot
 \end{verbatim}
 \normalsize
 
@@ -382,7 +381,7 @@ set gnuplot commands that produce a plot showing the problem.
 
 \subsection{How do I print out my graphs?}
 
-The kind of output produced by a plot command is determined by a
+The output format produced by a plot command is determined by a
 prior {\em set terminal} command.  For non-interactive output
 you should pair this with a {\em set output} command to provide
 a file name.
@@ -405,7 +404,7 @@ gnuplot>
 \end{verbatim}
 \normalsize
 
-When the current terminal is not the default interactive terminal you
+If the start point is not the default interactive terminal you
 can accomplish the same thing using {\em push} and {\em pop}
 \small
 \begin{verbatim}
@@ -418,11 +417,11 @@ gnuplot> set term pop         # restore saved terminal type
 \end{verbatim}
 \normalsize
 
-Some interactive terminal types (\textit{win, wxt, qt}) provide a printer icon
+Some interactive terminal types ({\em win, wxt, qt}) provide a printer icon
 on their toolbar. This widget prints the current plot or saves it to file
 using generic system tools rather than by using a different gnuplot terminal type.
 That is, the file you get by selecting "save to png" in the print menu may be
-different than the file you get from \textit{set term png; replot;}.
+different than the file you get from {\em set term png; replot;}.
 In general a plot saved in this way will more closely reproduce the screen image than
 a plot generated from the command line by changing the terminal type.
 
@@ -443,16 +442,15 @@ or
 {\em set terminal epscairo}
 .
 \Gnuplot does not embed a bitmap preview image in the output eps file.
-To accommodate some word processors you may have to add a preview image yourself.
-You can use the GSView viewer for this (available for OS/2, Windows and X11),
-or some Unix ps tool.
+To accommodate some word processors you may have to add a preview image yourself
+using an external tool before importing it into the word processor.
 
-Some Windows office applications, including OpenOffice.org, can handle
-vector images in EMF format. These can be either produced by the emf
-terminal, or by selecting 'Save as EMF...' from the toolbar of the graph
-window of the windows terminal.
+Some applications, including the LibreOffice and Microsoft Office suites,
+can handle vector images in EMF format. These can be either produced by the emf
+terminal, or by selecting 'Save as EMF...' from the toolbar of the
+windows terminal plot window.
 
-OpenOffice.org can also read SVG, as well as AutoCAD's dxf format.
+LibreOffice can also read SVG, as well as AutoCAD's dxf format.
 
 There are many ways to use gnuplot to produce graphs for inclusion in a
 \TeX\ or \LaTeX\ document.
@@ -591,7 +589,7 @@ Hidden surface removal for these plots is achieved instead by drawing them
 in order of their distance from the viewer, controlled by
 {\em set pm3d depthorder}.
 
-\subsection{How do I give exact positions for the graph borders on the page?}
+\subsection{How do I force exact positions for the graph borders on the page?}
 
 Specify the position of the top, bottom, left, and right borders in
 terms of their fractional position within the page:
@@ -695,10 +693,8 @@ A plot with filled area between two functions f(x) and g(x) can be obtained usin
 the pseudo file '+' with  plot style {\em filledcurves}.
 \small
 \begin{verbatim}
-f(x)=cos(x)
-g(x)=sin(x)
-xmax=pi/4
-set xrange [0:xmax]
+f(x)=cos(x); g(x)=sin(x)
+set xrange [0:pi]
 plot '+' using 1:(f($1)):(g($1)) with filledcurves
 \end{verbatim}
 \normalsize
@@ -710,11 +706,11 @@ add an additional keyword {\em above} or {\em below} after {\em filledcurves}.
 
 
 
-\subsection{Drawing 2D projection of 3D data}
+\subsection{Drawing a 2D projection of 3D data}
 
-Use \textit{set view map}
-There are also plotting styles {\em with image} and {\em with rgbimage}
-for plotting 2D color images.
+The command {\em set view map} adjusts the view angle and scaling such
+that subsequent 3D graphs made with {\em splot} have approximately the same layout
+as a 2D graph made with {\em plot}.
 
 \subsection{How to overlay dots/points scatter plot onto a pm3d map/surface}
 
@@ -731,16 +727,13 @@ gnuplot> splot x with pm3d, x*y with points
 
 Labeling individual contours in a contour plot used to require special
 tricks and extra processing steps in \gnuplot version 4.
-See
-\http{gnuplot.sourceforge.net/scripts/index.html\#tricks-here}.
-
-In version 5 the procedure is much simpler.  Plot the contours twice,
+In version 5 it is much simpler.  Plot the contours twice,
 once "with lines" and once "with labels".  To make the labels stand out
 it may help to use
 \begin{verbatim}
 set style textbox opaque noborder
 set contours
-splot 'DATA' with line, 'DATA' with labels boxed
+splot 'DATA' with lines, 'DATA' with labels boxed
 \end{verbatim}
 
 \subsection{Does \gnuplot support bar-charts/histograms/boxes?}
@@ -788,7 +781,7 @@ x y z
 
 Notice the single and double blank lines. Also notice that the triangle
 really consists of four vertices of which two are identical.
-\textit{<cn>} is an optional color.
+\textit{<cN>} is an optional color.
 
 Then plot it by (either of splot's):
 \small
@@ -813,7 +806,7 @@ models f1 and f2 covering two different portions of the domain:
 \small
 \begin{verbatim}
 gnuplot> set autoscale x  # get x range from the data
-gnuplot> plot 'data', [-100:0] f1(x), [0:100] f2(x)
+gnuplot> plot 'data', [*:0] f1(x), [0:*] f2(x)
 \end{verbatim}
 \normalsize
 
@@ -840,7 +833,7 @@ gnuplot> yl(x) = -x**2
 gnuplot> set parametric
 gnuplot> set cont
 gnuplot> splot [0:1] [0:1] u,yl(x(u))+(yu(x(u)) - yl(x(u)))*v,\
-> f(x(u), (yu(x(u)) - yl(x(u)))*v)
+       >                   f(x(u), (yu(x(u)) - yl(x(u)))*v)
 \end{verbatim}
 \normalsize
 
@@ -1029,46 +1022,29 @@ As of April 2019 the 5.3 development version notably supports
 \item multiple textbox styles
 \end{itemize}
 
-\subsection{I need an integration, fft, iir-filter,...!}
-
-\Gnuplot{} has been and is a plotting program, not a data
-processing or mathematical program suite. Therefore \gnuplot
-can't do that.
-However version 5 does support calling functions from a dynamically loaded
-external shared object, i.e. a plugin.  So if you want to code up some complicated
-function in C or another language with compatible calling conventions,
-you can compile it into a plugin for \gnuplot to import.
-
 \subsection{Can I do heavy-duty data processing with \gnuplot? or
 What is beyond \gnuplot?}
 
-\gnuplot by itself is not suited very well for heavy numerical computation.
-On the other hand it can handle very large data sets.
+\gnuplot by itself is not very well suited for heavy numerical computation.
+On the other hand it can easily handle very large data sets (millions of points).
+If you have a specific application where the limitation is gnuplot's speed in
+evaluating a non-trivial function, it might be worth coding this function in
+C or C++ and making it a loadable plugin that gnuplot can call.
 
-One thing you might try is \textit{fudgit}, an interactive multi-purpose
-fitting program written by Martin-D. Lacasse.
-It can use \gnuplot as its graphics back end.
+Two programs you might look into if you need intensive numerical computation:
 
-You might also want to look at the applications developed by
-the Software Tools Group (STG) at the National Center for
-Supercomputing Applications \http{ncsa.uiuc.edu}.
-
-You can also try pgperl, an integration of the PGPLOT plotting
-package with Perl 5. Information can be found at
-\http{www.ast.cam.ac.uk/AAO/local/www/kgb/pgperl}, the source is
-available from \ftp{ftp.ast.cam.ac.uk}{/pub/kgb/pgperl/} or
-\ftp{linux.nrao.edu}{/pub/packages/pgperl/}.
-
-Another possibility is \textbf{Octave}. To quote from its README: Octave is a
-high-level language, primarily intended for numerical computations. Octave is
-licensed under GPL, and in principle, it is a free Matlab clone. It provides a
-convenient command line interface for solving linear and nonlinear problems
-numerically. The latest released version of Octave is always available from
-\http{www.octave.org}. By the way, octave uses \gnuplot as its plotting
+\textbf{octave} (\http{www.octave.org})
+is a high-level language primarily intended for numerical computations.
+Octave is licensed under GPL, and in principle, it is a free Matlab clone.
+It provides a convenient command line interface for solving linear and nonlinear problems
+numerically.  By the way, octave uses \gnuplot as its plotting
 engine, so you get a data-processing program on top of \gnuplot.
 
-Finally there is \textit{scilab} (\http{www.scilab.org}), an open source
-alternative to \textit{matlab}.
+\textbf{scilab} (\http{www.scilab.org}) is another open source alternative to \textbf{matlab}.
+
+\subsection{What if I need special function that gnuplot doesn't have?}
+
+See above. You may have to use another program or write a custom plugin.
 
 
 \subsection{How to use hotkeys in my interactive terminals}
@@ -1132,9 +1108,9 @@ You may also get an error message about "slow font initialization".
 This is because qt relies on a shared system font cache.
 If you request a font that no one else is using, it takes a while to
 update the cache.  This mostly happens on Windows or OSX, because other
-programs tend to use a different font mechanism so the system font
-cache can be empty.
-Try invoking gnuplot with command line option {\em --slow}.
+programs on those systems tend to use a different font mechanism so the 
+relevant font cache may be empty.
+Try invoking gnuplot with command line option {\em -\@-slow}.
 
 \subsection{Pm3d splot from a datafile does not draw anything}
 
@@ -1198,23 +1174,6 @@ multiplot into a script file. Then you can {\em load} that script into
 \gnuplot as many times as you need for replotting the drawing to different
 terminals or output files.
 
-\subsection{When I run \gnuplot from the shell or a script, the resulting plot flashes by on the screen and then disappears}
-
-\begin{enumerate}
-\item Put a {\em pause -1} after the plot command in the file, or at the file end.
-
-\item Use command {\em gnuplot filename.gp -} (yes, dash is the last
-parameter) to stay in the interactive regime when the script completes.
-
-\item Run \gnuplot as \textit{gnuplot -persist}
-
-\item On Windows you can also use either {\em -persist} or {\em /noend}.
-
-\item Give the \textit{persist} option as part of the \textit{set terminal} command.
-\end{enumerate}
-
-
-
 \subsection{My formulas (like 1/3) are giving me nonsense results! What's going on?}
 
 \Gnuplot{} does integer, and not floating point, arithmetic on
@@ -1247,11 +1206,24 @@ to it.  The file is not completed and made available to external applications
 or select a different terminal type ({\em set term}) or exit gnuplot.
 
 
-\subsection{Calling \gnuplot in a pipe or with a \gnuplot-script
-doesn't produce a plot!}
+\subsection{Calling gnuplot in a pipe or from a script doesn't show a plot on my screen!}
 
-You can call \gnuplot by using a short Perl-script like the
-following:
+One common cause is that \gnuplot exits immediately after drawing,
+the plot window closes when gnuplot exits, and it all happens too fast
+for you see the plot.
+There are several solutions to this:
+\begin{itemize}
+\item  Use the gnuplot command line option {\em -persist}.
+       This leaves the plot window open after gnuplot itself exits.
+\item  Interactive terminals also accept {\em persist} as an option to {\em set term}.
+\item  Send a {\em pause mouse close} command to gnuplot before closing the pipe.
+       This will tell gnuplot not to exit until the plot window is closed by
+       some other action.
+\item  Have the script close the pipe only when it is sure you don't need
+       gnuplot and its plot window any more.
+\end{itemize}
+
+Here is a short Perl-script showing two of these fixes:
 \small
 \begin{verbatim}
 #!/usr/local/bin/perl -w
@@ -1259,20 +1231,11 @@ open (GP, "|/usr/local/bin/gnuplot -persist") or die "no gnuplot";
 # force buffer to flush after each write
 use FileHandle;
 GP->autoflush(1);
-print GP,"set term x11;plot '/tmp/data.dat' with lines\n";
+print GP,"set term x11; plot sin(x) with lines\n";
+print GP,"pause mouse close\n";
 close GP
 \end{verbatim}
 \normalsize
-
-\Gnuplot{} closes its plot window on exit. The \verb+close GP+
-command is executed, and the plot window is closed even before you have
-a chance to look at it.
-
-There are three solutions to this: first, use the {\em pause -1}
-command in \gnuplot before closing the pipe. Second, close the pipe
-only if you are sure that you don't need \gnuplot and its plot window
-anymore. Last, you can use the command line option {\em -persist}: this
-option leaves the X-Window System plot window open.
 
 
 \section{Credits}
