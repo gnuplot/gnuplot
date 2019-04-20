@@ -4409,6 +4409,11 @@ set_obj(int tag, int obj_type)
 	    this_object->layer = LAYER_FRONTBACK;
 	    c_token++;
 	    continue;
+	} else if (almost_equals(c_token,"depth$order")) {
+	    /* Requests that this object be sorted with pm3d quadrangles */
+	    this_object->layer = LAYER_DEPTHORDER;
+	    c_token++;
+	    continue;
 	} else if (almost_equals(c_token,"def$ault")) {
 	    if (tag < 0) {
 		int_error(c_token,

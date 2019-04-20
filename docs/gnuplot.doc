@@ -4936,7 +4936,7 @@ Ffigure_surface+contours
  angle, such that it clearly represents a 3D surface.  See `set view`.
  In this case the X, Y, and Z axes are all visible in the plot.
  The illusion of 3D is enhanced by choosing hidden line removal or depth-sorted
- surface elements.  See `hidden3d` and the `depthorder` option of `set pm3d`.
+ surface elements.  See `hidden3d` and the `pm3d depthorder` option of `set pm3d`.
  The `splot` command can also calculate and draw contour lines corresponding
  to constant Z values. These contour lines may be drawn onto the surface
  itself, or projected onto the XY plane. See `set contour`.
@@ -11695,6 +11695,7 @@ Ffigure_multiple_keys
 ?commands set object
 ?commands show object
 ?set object
+?object depthorder
 ?show object
  The `set object` command defines a single object which will appear in
  subsequent plots. You may define as many objects as you like. Currently the
@@ -11711,7 +11712,8 @@ Ffigure_multiple_keys
  Syntax:
      set object <index>
          <object-type> <object-properties>
-         {front|back|behind} {clip|noclip}
+         {front|back|behind|depthorder}
+         {clip|noclip}
          {fc|fillcolor <colorspec>} {fs <fillstyle>}
          {default} {lw|linewidth <width>} {dt|dashtype <dashtype>}
      unset object <index>
@@ -11719,6 +11721,8 @@ Ffigure_multiple_keys
  <object-type> is either `rectangle`, `ellipse`, `circle`, or `polygon`.
  Each object type has its own set of characteristic properties.
 
+ The options `front`, `back`, `behind` control whether the object is drawn
+ before or after the plot itself. See `layers`.
  Setting `front` will draw the object in front of all plot elements, but
  behind any labels that are also marked `front`. Setting `back` will place the
  object behind all plot curves and labels. Setting `behind` will place the
@@ -11862,7 +11866,14 @@ Ffigure_multiple_keys
  Example:
      set object 1 polygon from 0,0 to 1,1 to 2,0
      set object 1 fc rgb "cyan" fillstyle solid 1.0 border lt -1
-
+5 depthorder
+?polygon depthorder
+?set object depthorder
+ The option `set object N depthorder` applies to 3D polygon objects only.
+ Rather than assigning the object to layer front/back/behind it is included
+ in the list of pm3d quadrangles sorted and rendered in order of depth by
+ `set pm3d depthorder`.  If you set this property for an object that is not
+ a 3D polygon it probably will not be drawn at all.
 3 offsets
 ?commands set offsets
 ?commands unset offsets

@@ -1017,6 +1017,7 @@ do_3dplot(
      */
     if (pm3d_order_depth || track_pm3d_quadrangles) {
 	pm3d_depth_queue_clear();
+	place_objects(first_object, LAYER_DEPTHORDER, 3);
     }
 
     this_plot = plots;

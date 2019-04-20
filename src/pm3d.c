@@ -1077,6 +1077,7 @@ pm3d_draw_one(struct surface_points *plot)
  * Add one pm3d quadrangle to the mix.
  * Called by zerrorfill() and by plot3d_boxes().
  * Also called by vplot_isosurface().
+ * (plot == NULL) if we were called from do_polygon().
  */
 void
 pm3d_add_quadrangle(struct surface_points *plot, gpdPoint corners[4])
@@ -1084,7 +1085,7 @@ pm3d_add_quadrangle(struct surface_points *plot, gpdPoint corners[4])
     quadrangle *q;
 
     /* FIXME: I have no idea how to estimate the number of facets for an isosurface */
-    if (plot->plot_style == ISOSURFACE) {
+    if (!plot || (plot->plot_style == ISOSURFACE)) {
 	if (allocated_quadrangles < current_quadrangle + 100) {
 	    allocated_quadrangles += 1000.;
 	    quadrangles = gp_realloc(quadrangles,
@@ -1101,8 +1102,13 @@ pm3d_add_quadrangle(struct surface_points *plot, gpdPoint corners[4])
     memcpy(q->corners, corners, 4*sizeof(gpdPoint));
     q->fillstyle = 0;	/* Should this be style_from_fill(&plot->fill_properties)? */
 
-    /* FIXME: color_from_rgbvar need only be set once per plot */
-    if (plot->pm3d_color_from_column) {
+    if (!plot) {
+	/* This quadrangle came from "set object polygon" rather than "splot with pm3d" */
+	q->qcolor.rgb_color = corners[0].c;
+	q->gray = PM3D_USE_RGB_COLOR_INSTEAD_OF_GRAY;
+
+    } else if (plot->pm3d_color_from_column) {
+	/* FIXME: color_from_rgbvar need only be set once per plot */
 	/* This is the usual path for 'splot with boxes' */
 	color_from_rgbvar = TRUE;
 	if (pm3d_shade.strength > 0) {

@@ -119,7 +119,6 @@ TBOOLEAN check_for_variable_color(struct curve_points *plot, double *colorvalue)
 
 void place_objects(struct object *listhead, int layer, int dimensions);
 void do_ellipse(int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping );
-void do_polygon(int dimensions, t_polygon *p, int style, t_clip_object clip, int facing );
 
 int filter_boxplot(struct curve_points *);
 void attach_title_to_plot(struct curve_points *this_plot, legend_key *key);

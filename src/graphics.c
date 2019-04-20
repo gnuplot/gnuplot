@@ -127,6 +127,7 @@ static void map_position_double(struct position* pos, double* x, double* y, cons
 static void plot_circles(struct curve_points *plot);
 static void plot_ellipses(struct curve_points *plot);
 static void do_rectangle(int dimensions, t_object *this_object, fill_style_type *fillstyle);
+static void do_polygon(int dimensions, t_object *this_object, int style, int facing );
 
 static double rgbscale(double rawvalue);
 
@@ -469,11 +470,11 @@ place_objects(struct object *listhead, int layer, int dimensions)
 		    break;
 	    }
 
-	    do_polygon(dimensions, &this_object->o.polygon, style, this_object->clip, facing);
+	    do_polygon(dimensions, this_object, style, facing);
 
 	    /* Retrace the border if the style requests it */
 	    if (need_fill_border(fillstyle))
-		do_polygon(dimensions, &this_object->o.polygon, 0, this_object->clip, facing);
+		do_polygon(dimensions, this_object, 0, facing);
 
 	    break;
 	}
@@ -4070,8 +4071,10 @@ do_ellipse( int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping )
 }
 
 void
-do_polygon( int dimensions, t_polygon *p, int style, t_clip_object clip, int facing )
+do_polygon( int dimensions, t_object *this_object, int style, int facing )
 {
+    t_polygon *p = &this_object->o.polygon;
+    t_clip_object clip = this_object->clip;
     static gpiPoint *corners = NULL;
     static gpiPoint *clpcorn = NULL;
     BoundingBox *clip_save = clip_area;
@@ -4115,8 +4118,25 @@ do_polygon( int dimensions, t_polygon *p, int style, t_clip_object clip, int fac
 	int out_length;
 	clip_polygon(corners, clpcorn, nv, &out_length);
 	clpcorn[0].style = style;
-	if (out_length > 1)
-	    term->filled_polygon(out_length, clpcorn);
+
+	if ((out_length == 5 || out_length == 4)
+	 && (pm3d.direction == PM3D_DEPTH) && (facing < 0)) {
+	    /* "set obj polygon depthorder" and "set pm3d depthorder" only */
+	    /* applies to quadrangles and triangles (= degenerate case)    */
+	    gpdPoint quad[4];
+	    for (nv=0; nv < 4; nv++) {
+		quad[nv].x = p->vertex[nv].x;
+		quad[nv].y = p->vertex[nv].y;
+		quad[nv].z = p->vertex[nv].z;
+	    }
+	    /* FIXME: not sure this works for all coloring modes */
+	    quad[0].c = this_object->lp_properties.pm3d_color.lt;
+	    pm3d_add_quadrangle( NULL, quad );
+	} else {
+
+	    if (out_length > 1)
+		term->filled_polygon(out_length, clpcorn);
+	}
 
     } else { /* Just draw the outline? */
  	newpath();

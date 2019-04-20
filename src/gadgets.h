@@ -535,6 +535,7 @@ extern int current_x11_windowid;
 #define LAYER_FRONT       1
 #define LAYER_FOREGROUND  2	/* not currently used */
 #define LAYER_FRONTBACK   4	/* used only by grid walls */
+#define LAYER_DEPTHORDER  8	/* for objects to be included in pm3d depth sorting */
 #define LAYER_PLOTLABELS 99
 
 /* Functions exported by gadgets.c */
@@ -655,5 +656,7 @@ void free_labels(struct text_label *tl);
 void get_offsets(struct text_label *this_label, int *htic, int *vtic);
 void write_label(int x, int y, struct text_label *label);
 int label_width(const char *, int *);
+
+TBOOLEAN pm3d_objects(void);
 
 #endif /* GNUPLOT_GADGETS_H */

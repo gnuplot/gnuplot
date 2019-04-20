@@ -1079,3 +1079,18 @@ init_gadgets()
    grid_wall[WALL_X1_TAG].lp_properties.pm3d_color.lt = WALL_X_COLOR;
    grid_wall[WALL_Z0_TAG].lp_properties.pm3d_color.lt = WALL_Z_COLOR;
 }
+
+/*
+ * walk through the list of objects to see if any require pm3d processing
+ */
+TBOOLEAN
+pm3d_objects(void)
+{
+    struct object *obj = first_object;
+    while (obj) {
+	if (obj->layer == LAYER_DEPTHORDER)
+	    return TRUE;
+	obj = obj->next;
+    }
+    return FALSE;
+}
