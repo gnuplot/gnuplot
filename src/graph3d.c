@@ -2261,6 +2261,8 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	"draw_3d_graphbox: whichgrid = %d current_layer = %d border_layer = %d\n",
 	whichgrid,current_layer,border_layer));
 
+    (t->layer)(TERM_LAYER_KEYBOX);
+
     clip_area = &canvas;
     if (draw_border && splot_map) {
 	if (border_layer == current_layer) {

@@ -536,6 +536,7 @@ extern int current_x11_windowid;
 #define LAYER_FOREGROUND  2	/* not currently used */
 #define LAYER_FRONTBACK   4	/* used only by grid walls */
 #define LAYER_DEPTHORDER  8	/* for objects to be included in pm3d depth sorting */
+#define LAYER_PLOT	 16	/* currently used only by fig.trm */
 #define LAYER_PLOTLABELS 99
 
 /* Functions exported by gadgets.c */

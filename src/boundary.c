@@ -1358,6 +1358,8 @@ draw_key(legend_key *key, TBOOLEAN key_pass, int *xinkey, int *yinkey)
 {
     struct termentry *t = term;
 
+    (t->layer)(TERM_LAYER_KEYBOX);
+
     /* In two-pass mode (set key opaque) we blank out the key box after	*/
     /* the graph is drawn and then redo the key in the blank area.	*/
     if (key_pass && t->fillbox && !(t->flags & TERM_NULL_SET_COLOR)) {
