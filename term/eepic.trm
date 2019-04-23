@@ -451,7 +451,7 @@ EEPIC_options()
 {
     float fontsize = 0;
 
-    int eepic_explicit_units = INCH;
+    int eepic_explicit_units = INCHES;
     static TBOOLEAN size_set = FALSE;
     eepic_color_on =
     eepic_true_rotate = FALSE;
@@ -465,7 +465,7 @@ EEPIC_options()
 	    eepic_true_rotate = FALSE;
 	    eepic_lineset = 0;
 	    eepic_pointsize = 0;
-	    eepic_explicit_units = INCH;
+	    eepic_explicit_units = INCHES;
 	    term->xmax = EEPIC_XMAX;
 	    term->ymax = EEPIC_YMAX;
 	    size_set = FALSE;
