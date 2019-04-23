@@ -1099,14 +1099,11 @@ void cairotrm_put_text(unsigned int x, unsigned int y, const char * string)
 		/* else carry on and process the rest of the string */
 	}
 
-#if 0	/* Dec 2017 additional of separate enhanced_fontname
-	 * should make this unnecessary.
-	 * EAM FIXME: Jan 2015 This fixes a "key font gets stuck in bold mode"
-	 * bug but I don't understand why it is needed.
+	/*
+	 * EAM FIXME: Apr 2019 This fixes a "key font gets stuck in bold mode" bug
+	 * first noticed in Jan 2015 but I still don't understand why it is needed.
 	 */
-	gp_cairo_enhanced_open(&plot, cairo_params->fontname, plot.fontsize,
-				0.0, TRUE, TRUE, 0);
-#endif
+	cairotrm_set_font(cairo_params->fontname);
 
 	/* finish */
 	gp_cairo_enhanced_finish(&plot, x, term->ymax - y);
