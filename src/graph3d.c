@@ -934,10 +934,11 @@ do_3dplot(
 
     /* This tells the canvas, qt, and svg terminals to restart the plot   */
     /* count so that key titles are in sync with the plots they describe. */
-    (*t->layer)(TERM_LAYER_RESET_PLOTNO);
+    (term->layer)(TERM_LAYER_RESET_PLOTNO);
 
     /* Key box */
     if (key->visible) {
+	(term->layer)(TERM_LAYER_KEYBOX);
 
 	/* In two-pass mode, we blank out the key area after the graph	*/
 	/* is drawn and then redo the key in the blank area.		*/
@@ -2260,8 +2261,6 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
     FPRINTF((stderr,
 	"draw_3d_graphbox: whichgrid = %d current_layer = %d border_layer = %d\n",
 	whichgrid,current_layer,border_layer));
-
-    (t->layer)(TERM_LAYER_KEYBOX);
 
     clip_area = &canvas;
     if (draw_border && splot_map) {
