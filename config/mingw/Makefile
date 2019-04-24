@@ -583,7 +583,9 @@ pipes: $(TARGETS_PIPES)
 
 console: $(TARGETS_CONSOLE)
 
-docs: gnuplot.pdf ps_symbols.pdf ps_fontfile_doc.pdf ps_guide.pdf
+docs: gnuplot.pdf ps_symbols.pdf ps_fontfile_doc.pdf ps_guide.pdf faq.pdf
+
+faq: faq.pdf
 
 helpfile: $(HELPFILE)
 
@@ -992,6 +994,11 @@ ps_fontfile_doc.pdf: $(D)psdoc/ps_fontfile_doc.tex
 ps_guide.pdf: $(D)psdoc/ps_guide.ps
 	ps2pdf $(D)psdoc/ps_guide.ps ps_guide.pdf
 
+faq.pdf: $(TOP)/faq/faq.tex
+	pdflatex $<
+	pdflatex $<
+	pdflatex $<
+
 # clean up temporary files
 clean:
 	$(RM) config.h wgnuplot.map wgnuplot.res
@@ -1016,7 +1023,7 @@ veryclean: clean
 	$(RM) gnuplot_qt.exe qtgnuplot_*.qm
 	$(RM) $(HELPFILE) $(HELPFILEJA) wgnuplot.chw wgnuplot.gid wgnuplot.mnu
 	$(RM) gnuplot.ps gnuplot.pdf
-	-$(RM) tutorial.pdf
+	-$(RM) tutorial.pdf faq.pdf
 	$(RM) ps_fontfile_doc.pdf ps_fontfile_doc.ps ps_guide.pdf
 	$(RM) ps_symbols.ps ps_symbols.pdf
 	$(RM) $(M)binary[123] $(M)fit.log $(M)soundfit.par
@@ -1092,7 +1099,7 @@ endif
 # docs
 	mkdir -p $(DESTDIR)/docs
 	-cp -p gnuplot.pdf $(DESTDIR)/docs/
-	cp -p $(TOP)/FAQ.pdf $(DESTDIR)/docs/
+	cp -p FAQ.pdf $(DESTDIR)/docs/FAQ.pdf
 	#-cp -p tutorial.pdf $(DESTDIR)/docs/
 	mkdir -p $(DESTDIR)/docs/psdoc
 	cp -p $(D)psdoc/ps_file.doc $(DESTDIR)/docs/psdoc/ps_file_doc.txt
