@@ -1,7 +1,7 @@
 # Project defaults are defined in top directory.
 # Here we just list exceptions.
 
-[*.{h,c}]
+[*.{h,c,cpp}]
 indent_style = tab
 indent_size = tab
 tab_width = 4
