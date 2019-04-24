@@ -1671,8 +1671,10 @@ save_linetype(FILE *fp, lp_style_type *lp, TBOOLEAN show_point)
 	    fprintf(fp, " pointsize default");
 	else
 	    fprintf(fp, " pointsize %.3f", lp->p_size);
-	fprintf(fp, " pointinterval %d", lp->p_interval);
-	fprintf(fp, " pointnumber %d", lp->p_number);
+	if (lp->p_interval != 0)
+	    fprintf(fp, " pointinterval %d", lp->p_interval);
+	if (lp->p_number != 0)
+	    fprintf(fp, " pointnumber %d", lp->p_number);
     }
 
 }
