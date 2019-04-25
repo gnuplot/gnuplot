@@ -2952,6 +2952,9 @@ show_xyzlabel(const char *name, const char *suffix, text_label *label)
 	fprintf(stderr, "\t%s%s is \"%s\", offset at ", name, suffix,
 	    label->text ? conv_text(label->text) : "");
 	show_position(&label->offset, 3);
+	fprintf(stderr, label->pos == LEFT ? " left justified"
+			: label->pos == RIGHT ? " right justified"
+			: "");
     } else
 	return;
 

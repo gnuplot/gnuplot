@@ -788,6 +788,7 @@ set origin %g,%g\n",
 	save_position(fp, &(lab.offset), 3, TRUE);			 \
 	fprintf(fp, " font \"%s\"", lab.font ? conv_text(lab.font) : "");\
 	save_textcolor(fp, &(lab.textcolor));				 \
+	if (lab.pos != CENTRE) save_justification(lab.pos,fp);		 \
 	if (lab.tag == ROTATE_IN_3D_LABEL_TAG)				 \
 	    fprintf(fp, " rotate parallel");				 \
 	else if (lab.rotate == TEXT_VERTICAL)				 \

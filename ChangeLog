@@ -1,3 +1,22 @@
+2019-04-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/boundary.c: Revise space allocated for ylabel
+	Version 5.2 attempted to use estimated character length of the ylabel
+	to decide the amount of space reserved to the left of the plot.
+	This caused multiple problems, exacerbated by the lack of options to
+	change the text justification.  The worst case was a non-rotated label
+	with TeX markup that was misinterpreted as printable text (Bug #2165).
+	These problems also applied to space on the right allocated for y2label.
+	Fixes:
+	 - use a fixed estimate of 3 character widths for nonrotated ylabel.
+	   The user can adjust the for longer labels using a combination of
+	   'set lmargin' and 'set ylabel offset delta_x'
+	 - parse and apply test justification left/right/center for ylabel
+	   The default remains center.
+	This returns the overall behavior to close to that of gnuplot 5.0
+	except that honoring left/right justification of ylabel text is new.
+	Bug #2165
+
 2019-04-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c: reset base_linetype only once per plot

@@ -1,7 +1,3 @@
-/*
- * $Id: boundary.c,v 1.50 2017/03/09 07:10:52 sfeam Exp $
- */
-
 /* GNUPLOT - boundary.c */
 
 /*[
@@ -247,8 +243,12 @@ boundary(struct curve_points *plots, int count)
 	    if (!axis_array[FIRST_Y_AXIS].ticmode)
 		ylabel_textwidth += 0.5 * t->v_char;
 	} else {
-	    /* How on earth did this used to work when it was always set to 0? */
-	    ylabel_textwidth = estimate_strlen(axis_array[FIRST_Y_AXIS].label.text) * t->h_char;
+	    /* Trying to estimate this length caused more problems than it solved.
+	     * For one thing it comes out wrong for text passed to TeX terminals.
+	     * Assume the common case is roughly 3 character widths and let the
+	     * user adjust lmargin and offset for longer non-rotated ylabels.
+	     */
+	    ylabel_textwidth = 3 * t->h_char;
 	}
     }
 
@@ -259,9 +259,8 @@ boundary(struct curve_points *plots, int count)
 	    if (!axis_array[SECOND_Y_AXIS].ticmode)
 		y2label_textwidth += 0.5 * t->v_char;
 	} else {
-	    /* should be (estimate_strlen()*t->h_char) but that's not what 5.0 did */
-	    /* this is an ugly ad hoc approximation of what it did before */
-	    y2label_textwidth = estimate_strlen(axis_array[SECOND_Y_AXIS].label.text) * t->h_char;
+	    /* See above. Estimating true text length causes problems */
+	    y2label_textwidth = 3 * t->h_char;
 	}
     }
 
@@ -751,9 +750,10 @@ boundary(struct curve_points *plots, int count)
 	+ ((float)xlablin+0.2) * t->v_char;
     xlabel_y -= ttic_textheight;
     ylabel_x = plot_bounds.xleft - ytic_width - ytic_textwidth;
-    ylabel_x -= ylabel_textwidth;
+    ylabel_x -= ylabel_textwidth/2;
 
     y2label_x = plot_bounds.xright + y2tic_width + y2tic_textwidth;
+    y2label_x += y2label_textwidth/2;
 
     /* Nov 2016  - simplify placement of timestamp
      * Stamp the same place on the page regardless of plot margins
@@ -1425,21 +1425,14 @@ draw_titles()
 	unsigned int x = ylabel_x;
 	unsigned int y = (plot_bounds.ytop + plot_bounds.ybot) / 2;
 	x += t->h_char;
-	axis_array[FIRST_Y_AXIS].label.pos = CENTRE;
 	write_label(x, y, &(axis_array[FIRST_Y_AXIS].label));
 	reset_textcolor(&(axis_array[FIRST_Y_AXIS].label.textcolor));
     }
 
     /* Y2LABEL */
     if (axis_array[SECOND_Y_AXIS].label.text) {
-	unsigned int x = y2label_x;
-	unsigned int y = (plot_bounds.ytop + plot_bounds.ybot) / 2;
-	if (axis_array[SECOND_Y_AXIS].label.rotate) {
-	    x += 2 * t->h_char;
-	    axis_array[SECOND_Y_AXIS].label.pos = CENTRE;
-	} else {
-	    axis_array[SECOND_Y_AXIS].label.pos = LEFT;
-	}
+	int x = y2label_x;
+	int y = (plot_bounds.ytop + plot_bounds.ybot) / 2;
 	write_label(x, y, &(axis_array[SECOND_Y_AXIS].label));
 	reset_textcolor(&(axis_array[SECOND_Y_AXIS].label.textcolor));
     }
