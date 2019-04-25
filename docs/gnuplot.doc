@@ -14563,6 +14563,8 @@ Ffigure_walls
 
  ylabel:  The y-axis label is centered to the left of the plot, defaulting to
  either horizontal or vertical orientation depending on the terminal type.
+ The program may not reserve enough space to the left of the plot to hold long
+ non-rotated ylabel text.  You can adjust this with `set lmargin`.
 
  zlabel: The z-axis label is centered along the z axis and placed in the space
  above the grid level.
