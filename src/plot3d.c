@@ -1426,7 +1426,7 @@ eval_3dplots()
 
     /* Normally we only need to initialize pm3d quadrangles if pm3d mode is active */
     /* but there are a few special cases that use them outside of pm3d mode.       */
-    track_pm3d_quadrangles = pm3d_objects() ? : FALSE;
+    track_pm3d_quadrangles = pm3d_objects() ? TRUE : FALSE;
 
     /* Explicit ranges in the splot command may temporarily rename dummy variables */
     strcpy(orig_dummy_u_var, c_dummy_var[0]);
