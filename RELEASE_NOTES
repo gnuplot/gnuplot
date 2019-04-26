@@ -8,7 +8,7 @@ development version, and two new features.
 Please see the ChangeLog file for a complete list of changes made during the
 course of development from 5.0 to 5.2.
 
-Release Notes date: 10-April-2019
+Release Notes date: 27-April-2019
 
 Changes in 5.2.7
 ================
@@ -28,6 +28,7 @@ Changes in 5.2.7
 * CHANGE clear STATS_* variables before performing analysis
 * CHANGE cairo, libgd, and svg terminals handle LT_NODRAW by not drawing at all
 * CHANGE svg terminal clickable icons are in-line data rather than external refs
+* CHANGE revise space allocated for ylabel; allow text justification for ylabel
 * FIX "plot with table" unnecessarily limited string column output to 60 chars 
 * FIX (windows) make sure graph window is shown even if the program is "hidden"
 * FIX hidden3d mode was not correctly dealing with arrowstyle backhead
@@ -42,7 +43,7 @@ Changes in 5.2.7
 * FIX extraneous dots and potential segfault from splot with contour labels
 * FIX boxplots - color sequence correctly starts with specified linetype
 * FIX incomplete initialization led to segfault from "gnuplot -c foo.gp baz"
-* FIX Allow "pm3d depthorder base" to handle 3D boxes with logscale z
+* FIX Allow "pm3d depthorder base" to handle 3D quadrangles with logscale z
 
 
 Changes in 5.2.6

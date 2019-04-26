@@ -789,14 +789,7 @@ ggmtime(struct tm *tm, double l_clock)
 
     tm->tm_year = ZERO_YEAR;
     tm->tm_mday = tm->tm_yday = tm->tm_mon = tm->tm_hour = tm->tm_min = tm->tm_sec = 0;
-    if (l_clock < 0) {
-	while (l_clock < 0) {
-	    int days_in_year = gdysize(--tm->tm_year);
-	    l_clock += days_in_year * DAY_SEC;	/* 24*3600 */
-	    /* adding 371 is noop in modulo 7 arithmetic, but keeps wday +ve */
-	    wday += 371 - days_in_year;
-	}
-    } else {
+    if (l_clock >= 0) {
 	for (;;) {
 	    int days_in_year = gdysize(tm->tm_year);
 	    if (l_clock < days_in_year * DAY_SEC)
@@ -805,6 +798,13 @@ ggmtime(struct tm *tm, double l_clock)
 	    tm->tm_year++;
 	    /* only interested in result modulo 7, but %7 is expensive */
 	    wday += (days_in_year - 364);
+	}
+    } else {
+	while (l_clock < 0) {
+	    int days_in_year = gdysize(--tm->tm_year);
+	    l_clock += days_in_year * DAY_SEC;	/* 24*3600 */
+	    /* adding 371 is noop in modulo 7 arithmetic, but keeps wday +ve */
+	    wday += 371 - days_in_year;
 	}
     }
     tm->tm_yday = (int) (l_clock / DAY_SEC);
