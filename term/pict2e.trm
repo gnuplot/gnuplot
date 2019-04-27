@@ -1,0 +1,1161 @@
+/* Hello, Emacs, this is -*-C-*- */
+
+/* GNUPLOT - pict2e.trm */
+
+/*[
+ * Copyright 1990 - 1993, 1998, 2004, 2018, 2019
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
+ *
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
+
+/*
+ * This file is included by term.h.
+ *
+ * This terminal driver supports:
+ *   LaTeX2e picture environment (pict2e).
+ *
+ * The code is derived from latex.trm by David Kotz, Russell Lang.
+ *
+ * AUTHORS
+ *   David Kotz, Russell Lang (latex/emtex)
+ *   Bastian Maerkisch (pict2e)
+ *
+ */
+
+/* LaTeX terminal using the LaTeX2e pict2e package.
+ * Unlike the older LaTeX terminals which use the original picture environment,
+ * it supports most modern gnuplot features and does not carry the weight of
+ * backward-compatibility.
+ */
+
+// transparency for pict2e width pdflatex and package "transparent"
+#define PICT2E_TRANSPARENT
+
+#ifdef TERM_REGISTER
+register_term(pict2e)
+#endif
+
+#ifdef TERM_PROTO
+
+TERM_PUBLIC void PICT2E_options(void);
+
+TERM_PUBLIC void PICT2E_init(void);
+TERM_PUBLIC void PICT2E_graphics(void);
+TERM_PUBLIC void PICT2E_text(void);
+TERM_PUBLIC void PICT2E_reset(void);
+
+TERM_PUBLIC int PICT2E_justify_text(enum JUSTIFY mode);
+TERM_PUBLIC int PICT2E_text_angle(int ang);
+TERM_PUBLIC void PICT2E_put_text(unsigned int x, unsigned int y, const char str[]);
+
+TERM_PUBLIC int PICT2E_make_palette(t_sm_palette *palette);
+TERM_PUBLIC void PICT2E_set_color(t_colorspec *colorspec);
+TERM_PUBLIC void PICT2E_linetype(int linetype);
+TERM_PUBLIC void PICT2E_dashtype(int dt, t_dashtype *custom_dash_pattern);
+
+TERM_PUBLIC void PICT2E_move(unsigned int x, unsigned int y);
+TERM_PUBLIC void PICT2E_point(unsigned int x, unsigned int y, int number);
+TERM_PUBLIC void PICT2E_vector(unsigned int ux, unsigned int uy);
+
+TERM_PUBLIC void PICT2E_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head);
+
+TERM_PUBLIC void PICT2E_fillbox(int style,
+		unsigned int x1, unsigned int y1,
+		unsigned int width, unsigned int height);
+TERM_PUBLIC void PICT2E_filled_polygon(int points, gpiPoint *corners);
+
+#define PICT2E_PTS_PER_INCH (72.27)
+#define PICT2E_DPI (600)	/* resolution of printer we expect to use */
+#define PICT2E_UNIT (PICT2E_PTS_PER_INCH/PICT2E_DPI)	/* dot size in pt */
+
+/* 5 inches wide by 3 inches high (default) */
+#define PICT2E_XMAX (5*PICT2E_DPI)	/* (PICT2E_PTS_PER_INCH/PICT2E_UNIT*5.0) */
+#define PICT2E_YMAX (3*PICT2E_DPI)	/* (PICT2E_PTS_PER_INCH/PICT2E_UNIT*3.0) */
+
+#define PICT2E_HTIC (5*PICT2E_DPI/72)		/* (5 pts) */
+#define PICT2E_VTIC (5*PICT2E_DPI/72)		/* (5 pts) */
+#define PICT2E_HCHAR (PICT2E_DPI*53/10/72)	/* (5.3 pts) */
+#define PICT2E_VCHAR (PICT2E_DPI*11/72)	/* (11 pts) */
+
+#endif
+
+
+#ifndef TERM_PROTO_ONLY
+#ifdef TERM_BODY
+
+static int pict2e_posx;
+static int pict2e_posy;
+static int pict2e_fontsize = 10;
+static char pict2e_font[MAX_ID_LEN+1] = "";
+static enum JUSTIFY pict2e_justify = LEFT;
+static int pict2e_angle = 0;
+static TBOOLEAN pict2e_explicit_size = FALSE;
+static size_units pict2e_explicit_units = INCHES;
+
+/* Default line-drawing character */
+/* the definition of plotpoint varies with linetype */
+#define PICT2E_DOT "\\usebox{\\plotpoint}"
+#define PICT2E_TINY_DOT "\\rule[-0.5pt]{1pt}{1pt}"	/* for dots plot style */
+
+/* COLORS */
+static void PICT2E_apply_color(void);
+static void PICT2E_apply_opacity(void);
+
+static TBOOLEAN pict2e_use_color = TRUE; /* LATEX terminal option */
+static char pict2e_color[32] = "";
+static char pict2e_new_color[32] = "";
+#define PICT2E_NUM_COLORS 6
+static const char * PICT2E_lt_colors[] = {
+    "red", "green", "blue", "magenta", "cyan", "yellow"
+};
+#ifdef PICT2E_TRANSPARENT
+static int pict2e_opacity = 100;
+static int pict2e_new_opacity = 100;
+#endif
+static TBOOLEAN pict2e_have_color = FALSE;
+
+/* POINTS */
+static TBOOLEAN pict2e_points = TRUE;  // use TeX symbols for points
+#define PICT2E_POINT_TYPES 15
+static int pict2e_pointsize = 0;
+static const char * pict2e_point_type[PICT2E_POINT_TYPES] = {
+    "\\makebox(0,0){$%s+$}",
+    "\\makebox(0,0){$%s\\times$}",
+    "\\makebox(0,0){$%s\\ast$}",
+    "\\raisebox{-.8pt}{\\makebox(0,0){$%s\\Box$}}",
+    "\\makebox(0,0){$%s\\blacksquare$}",
+    "\\makebox(0,0){$%s\\circ$}",
+    "\\makebox(0,0){$%s\\bullet$}",
+    "\\makebox(0,0){$%s\\triangle$}",
+    "\\makebox(0,0){$%s\\blacktriangle$}",
+    "\\makebox(0,0){$%s\\triangledown$}",
+    "\\makebox(0,0){$%s\\blacktriangledown$}",
+    "\\makebox(0,0){$%s\\lozenge$}",
+    "\\makebox(0,0){$%s\\blacklozenge$}",
+    "\\makebox(0,0){$%s\\heartsuit$}",
+    "\\makebox(0,0){$%s\\spadesuit$}"
+};
+
+/* LINES */
+static void PICT2E_linesize(void);
+static void PICT2E_solid_line(int x1, int x2, int y1, int y2);
+static void PICT2E_dot_line(int x1, int x2, int y1, int y2);
+static void PICT2E_flushdot(void);
+static void PICT2E_pushpath(unsigned int x, unsigned int y);
+static void PICT2E_endline(void);
+static void PICT2E_flushline(void);
+
+static float pict2e_size = 0;	/* current line thickness */
+static float pict2e_lw;
+static float pict2e_lw_scale = 1.;
+static TBOOLEAN pict2e_rounded = FALSE;
+static float pict2e_dotspace = 0;	/* current dotspace of line in points */
+#define PICT2E_DOT_SPACE 3.0
+#define PICT2E_LINEMAX 100	/* max value for linecount */
+static TBOOLEAN pict2e_inline;	/* are we in the middle of a line */
+static int pict2e_linecount = 0;	/* number of points in line so far */
+static unsigned int pict2e_path[PICT2E_LINEMAX][2];		/* point stack */
+static TBOOLEAN pict2e_moved = TRUE;	/* pen is up after move */
+static float pict2e_dotsize;	/* size of PICT2E_DOT in units */
+static TBOOLEAN pict2e_needsdot = FALSE;		/* does dotted line need termination? */
+
+/* AREA FILLING */
+static int PICT2E_fill(int style);
+typedef enum {
+    pict2e_no_fill, pict2e_fill, pict2e_fill_and_restore, pict2e_fill_transparent
+} pict2e_fill_cmds;
+
+/* ARROWS */
+static void PICT2E_do_arrow(int, int, int, int, int);
+static TBOOLEAN pict2e_arrows = TRUE;  // use LaTeX arrows
+
+/* OPTIONS */
+enum PICT2E_id {
+    PICT2E_DEFAULT,
+    PICT2E_SIZE,
+    PICT2E_FONT,
+    // PICT2E_STANDALONE, PICT2E_INPUT,
+    PICT2E_COLOR, PICT2E_MONOCHROME,
+    PICT2E_LINEWIDTH,
+    PICT2E_ROUNDED, PICT2E_BUTT,
+    PICT2E_POINTSCALE,
+    PICT2E_TEXARROWS, PICT2E_GPARROWS,
+    PICT2E_TEXPOINTS, PICT2E_GPPOINTS,
+    PICT2E_NORMALPOINTS, PICT2E_SMALLPOINTS, PICT2E_TINYPOINTS,
+    // PICT2E_BACKGROUND,
+    PICT2E_OTHER
+};
+
+static struct gen_table PICT2E_opts[] =
+{
+    { "d$efault", PICT2E_DEFAULT },
+    { "fo$nt", PICT2E_FONT },
+    { "si$ze", PICT2E_SIZE },
+    // { "stand$alone", PICT2E_STANDALONE },
+    // { "inp$ut", PICT2E_INPUT },
+    { "color", PICT2E_COLOR },
+    { "colour", PICT2E_COLOR },
+    { "mono$chrome", PICT2E_MONOCHROME },
+    // { "backg$round", PICT2E_BACKGROUND },
+    { "lw", PICT2E_LINEWIDTH },
+    { "linew$idth", PICT2E_LINEWIDTH },
+    { "round$ed", PICT2E_ROUNDED },
+    { "butt", PICT2E_BUTT },
+    // { "points$cale", PICT2E_POINTSCALE },
+    // { "ps", PICT2E_POINTSCALE },
+    { "texarrows", PICT2E_TEXARROWS },
+    { "gparrows", PICT2E_GPARROWS },
+    { "texpoints", PICT2E_TEXPOINTS },
+    { "gppoints", PICT2E_GPPOINTS },
+    { "norm$alpoints", PICT2E_NORMALPOINTS },
+    { "sma$llpoints", PICT2E_SMALLPOINTS },
+    { "tin$ypoints", PICT2E_TINYPOINTS },
+    { NULL, PICT2E_OTHER }
+};
+
+
+TERM_PUBLIC void
+PICT2E_options()
+{
+    char *s;
+    pict2e_explicit_size = FALSE;
+
+    while (!END_OF_COMMAND) {
+	enum PICT2E_id cmd = (enum PICT2E_id) lookup_table(&PICT2E_opts[0], c_token);
+	switch (cmd) {
+	case PICT2E_DEFAULT:
+	    pict2e_font[0] = NUL;
+	    c_token++;
+	    break;
+	case PICT2E_FONT:
+	    c_token++;
+	    if ((s = try_to_get_string()) != NULL) {
+		int fontsize;
+		char *comma = strrchr(s, ',');
+		if (comma && (1 == sscanf(comma + 1, "%i", &fontsize))) {
+		    pict2e_fontsize = fontsize;
+		    if (pict2e_fontsize <= 1)
+			pict2e_fontsize = 10;
+		    *comma = NUL;
+		}
+		if (*s != NUL)
+		    safe_strncpy(pict2e_font, s, MAX_ID_LEN);
+		free(s);
+	    }
+	    break;
+	case PICT2E_SIZE: {
+	    float xmax_t = 5., ymax_t = 3.;
+	    c_token++;
+	    pict2e_explicit_size = TRUE;
+	    pict2e_explicit_units = parse_term_size(&xmax_t, &ymax_t, INCHES);
+	    term->xmax = xmax_t * PICT2E_DPI / 72;
+	    term->ymax = ymax_t * PICT2E_DPI / 72;
+	    break;
+	}
+	case PICT2E_COLOR:
+	    pict2e_use_color = TRUE;
+	    term->flags &= ~TERM_MONOCHROME;
+	    c_token++;
+	    break;
+	case PICT2E_MONOCHROME:
+	    pict2e_use_color = FALSE;
+	    term->flags |= TERM_MONOCHROME;
+	    c_token++;
+	    break;
+	case PICT2E_GPARROWS:
+	    pict2e_arrows = FALSE;
+	    c_token++;
+	    break;
+	case PICT2E_TEXARROWS:
+	    pict2e_arrows = TRUE;
+	    c_token++;
+	    break;
+	case PICT2E_GPPOINTS:
+	    pict2e_points = FALSE;
+	    c_token++;
+	    break;
+	case PICT2E_TEXPOINTS:
+	    pict2e_points = TRUE;
+	    c_token++;
+	    break;
+	case PICT2E_BUTT:
+	    pict2e_rounded = FALSE;
+	    c_token++;
+	    break;
+	case PICT2E_ROUNDED:
+	    pict2e_rounded = TRUE;
+	    c_token++;
+	    break;
+	case PICT2E_LINEWIDTH:
+	    c_token++;
+	    pict2e_lw_scale = real_expression();
+	    if (pict2e_lw_scale < 0.0)
+		pict2e_lw_scale = 1.0;
+	    break;
+	case PICT2E_NORMALPOINTS:
+	    pict2e_pointsize = 0;
+	    c_token++;
+	    break;
+	case PICT2E_SMALLPOINTS:
+	    pict2e_pointsize = 1;
+	    c_token++;
+	    break;
+	case PICT2E_TINYPOINTS:
+	    pict2e_pointsize = 2;
+	    c_token++;
+	    break;
+	case PICT2E_OTHER:
+	default:
+	    c_token++;
+	    int_error(c_token, "unrecognized option");
+	}
+    }
+
+    /* tell gnuplot core about char sizes. Horizontal spacing
+     * is about half the text pointsize
+     */
+    term->v_char = (unsigned int) (pict2e_fontsize * PICT2E_DPI / 72);
+    term->h_char = (unsigned int) (pict2e_fontsize * PICT2E_DPI / 144);
+
+    sprintf(term_options, "font \"%s,%d\"", pict2e_font, pict2e_fontsize);
+
+    if (pict2e_explicit_size) {
+	if (pict2e_explicit_units == CM)
+	    sprintf(&(term_options[strlen(term_options)]), "size %.2fcm, %.2fcm ",
+		2.54 * (float)term->xmax / (PICT2E_DPI),
+		2.54 * (float)term->ymax / (PICT2E_DPI));
+	else
+	    sprintf(&(term_options[strlen(term_options)]), "size %.2fin, %.2fin ",
+		(float)term->xmax / (PICT2E_DPI),
+		(float)term->ymax / (PICT2E_DPI));
+    }
+
+    sprintf(&(term_options[strlen(term_options)]),
+	pict2e_use_color ? " color" : " monochrome");
+
+    sprintf(&(term_options[strlen(term_options)]), " linewidth %.1f", pict2e_lw_scale);
+
+    sprintf(&(term_options[strlen(term_options)]), pict2e_points ? " texpoints" : " gppoints");
+
+    sprintf(term_options + strlen(term_options),
+	pict2e_pointsize == 1 ? " smallpoints" :
+	    (pict2e_pointsize == 2 ? " tinypoints" : " normalpoints"));
+
+    sprintf(&(term_options[strlen(term_options)]), pict2e_arrows ? " texarrows" : " gparrows");
+}
+
+
+TERM_PUBLIC void
+PICT2E_init()
+{
+    fprintf(gpoutfile,
+	    "%% GNUPLOT: LaTeX2e picture (pict2e)\n" \
+	    "\\setlength{\\unitlength}{%fpt}\n",
+	    PICT2E_UNIT);
+    fputs("\\ifx\\plotpoint\\undefined\\newsavebox{\\plotpoint}\\fi\n"
+#ifdef PICT2E_TRANSPARENT
+	  // test if command \transparent is available
+	  "\\ifx\\transparent\\undefined%\n"
+	  "    \\providecommand{\\gpopaque}{}%\n"
+	  "    \\providecommand{\\gptransparent}[2]{\\color{.!#2}}%\n"
+	  "\\else%\n"
+	  "    \\providecommand{\\gpopaque}{\\transparent{1.0}}%\n"
+	  "    \\providecommand{\\gptransparent}[2]{\\transparent{#1}}%\n"
+	  "\\fi%\n"
+#endif
+	  "",
+	  gpoutfile);
+}
+
+
+TERM_PUBLIC void
+PICT2E_graphics()
+{
+    /* set size of canvas */
+    if (!pict2e_explicit_size) {
+	term->xmax = PICT2E_XMAX;
+	term->ymax = PICT2E_YMAX;
+    }
+
+    fprintf(gpoutfile, "\\begin{picture}(%d,%d)(0,0)\n",
+	    term->xmax, term->ymax);
+
+    if (pict2e_font[0] != NUL) {
+	fprintf(gpoutfile, "\
+\\font\\gnuplot=%s10 at %dpt\n\
+\\gnuplot\n",
+	        pict2e_font, pict2e_fontsize);
+    }
+
+    if (pict2e_rounded)
+	fputs("\\roundjoin\\roundcap\n", gpoutfile);
+    else
+	fputs("\\miterjoin\\buttcap\n", gpoutfile);
+
+    pict2e_lw = pict2e_lw_scale;
+    pict2e_size = 0;
+    pict2e_color[0] = 0;
+    PICT2E_linetype(LT_AXIS);
+    pict2e_inline = FALSE;
+    pict2e_linecount = 0;
+    pict2e_posx = pict2e_posy = 0;
+}
+
+
+TERM_PUBLIC void
+PICT2E_text()
+{
+    PICT2E_endline();
+    fputs("\\end{picture}\n", gpoutfile);
+    pict2e_posx = pict2e_posy = 0;	/* current position */
+    pict2e_moved = TRUE;		/* pen is up after move */
+}
+
+
+TERM_PUBLIC void
+PICT2E_reset()
+{
+    pict2e_posx = pict2e_posy = 0;	/* current position */
+    pict2e_moved = TRUE;		/* pen is up after move */
+}
+
+
+static void
+PICT2E_linesize(void)
+{
+    float size;
+
+    PICT2E_endline();
+
+    /* Find the new desired line thickness. */
+    size = pict2e_lw * 0.4;
+
+    /* If different from current size, redefine \plotpoint */
+    if (size != pict2e_size) {
+	fprintf(gpoutfile,
+	    "\\sbox{\\plotpoint}{\\rule[%.3fpt]{%.3fpt}{%.3fpt}}%%\n",
+	    -size / 2, size, size);
+	fprintf(gpoutfile, "\\linethickness{%.1fpt}%%\n", size);
+    }
+    pict2e_size = size;
+    pict2e_dotsize = size / PICT2E_UNIT;
+    pict2e_moved = TRUE;		/* reset */
+}
+
+
+TERM_PUBLIC void
+PICT2E_linetype(int linetype)
+{
+    t_colorspec colorspec;
+
+    PICT2E_endline();
+
+    /* save values for set_color */
+    colorspec.type = TC_LT;
+    colorspec.lt = linetype;
+    PICT2E_set_color(&colorspec);
+
+    /* all but axis lines are solid by default */
+    if (linetype == LT_AXIS)
+	pict2e_dotspace = PICT2E_DOT_SPACE;
+    else
+	pict2e_dotspace = 0.0;
+}
+
+
+TERM_PUBLIC void
+PICT2E_dashtype(int dt, t_dashtype *custom_dash_pattern)
+{
+    if (dt >= 0) {
+	int linetype = dt % 3;
+	pict2e_dotspace = PICT2E_DOT_SPACE * linetype;
+    } else if (dt == DASHTYPE_SOLID) {
+	pict2e_dotspace = 0.0;
+    } else if (dt == DASHTYPE_AXIS) {
+	pict2e_dotspace = PICT2E_DOT_SPACE;
+    } else if (dt == DASHTYPE_CUSTOM) {
+	/* not supported */
+    }
+}
+
+
+TERM_PUBLIC void
+PICT2E_linewidth(double linewidth)
+{
+    pict2e_lw = linewidth * pict2e_lw_scale;
+}
+
+
+TERM_PUBLIC void
+PICT2E_move(unsigned int x, unsigned int y)
+{
+    PICT2E_endline();
+
+    pict2e_posx = x;
+    pict2e_posy = y;
+    pict2e_moved = TRUE;		/* reset */
+}
+
+
+TERM_PUBLIC void
+PICT2E_point(unsigned int x, unsigned int y, int number)
+{
+    const char * size[] = { "", "\\scriptstyle", "\\scriptscriptstyle" };
+    char point[80];
+
+    PICT2E_apply_color();
+    PICT2E_apply_opacity();
+
+    if (pict2e_points) {
+	PICT2E_move(x, y);
+	/* Print the character defined by 'number'; number < 0 means
+	   to use a dot, otherwise one of the defined points. */
+	if (number >= 0)
+	    snprintf(point, sizeof(point), pict2e_point_type[number % PICT2E_POINT_TYPES], size[pict2e_pointsize]);
+	fprintf(gpoutfile, "\\put(%d,%d){%s}\n", x, y,
+		(number < 0 ? PICT2E_TINY_DOT : point));
+    } else {
+	do_point(x, y, number);
+    }
+}
+
+
+static void
+PICT2E_endline(void)
+{
+    PICT2E_flushline();
+    PICT2E_flushdot();
+}
+
+
+static void
+PICT2E_pushpath(unsigned int x, unsigned int y)
+{
+    if (pict2e_linecount < PICT2E_LINEMAX) {
+	pict2e_path[pict2e_linecount][0] = x;
+	pict2e_path[pict2e_linecount][1] = y;
+	pict2e_linecount++;
+    }
+    return;
+}
+
+
+TERM_PUBLIC void
+PICT2E_vector(unsigned int ux, unsigned int uy)
+{
+    if (!pict2e_inline) {
+	PICT2E_apply_color();
+	PICT2E_apply_opacity();
+	PICT2E_linesize();
+    }
+
+    if (pict2e_dotspace == 0.0)
+	PICT2E_solid_line(pict2e_posx, (int) ux, pict2e_posy, (int) uy);
+    else
+	PICT2E_dot_line(pict2e_posx, (int) ux, pict2e_posy, (int) uy);
+
+    pict2e_posx = ux;
+    pict2e_posy = uy;
+}
+
+
+static void
+PICT2E_dot_line(int x1, int x2, int y1, int y2)
+{
+    static float PICT2E_left;	/* fraction of space left after last dot */
+
+    /* we draw a dotted line using the current dot spacing */
+
+    if (pict2e_moved)
+	PICT2E_left = 1.0;	/* reset after a move */
+
+    /* zero-length line? */
+    if (x1 == x2 && y1 == y2) {
+	if (pict2e_moved)
+	    /* plot a dot */
+	    fprintf(gpoutfile, "\\put(%u,%u){%s}\n", x1, y1, PICT2E_DOT);
+    } else {
+	float dotspace = pict2e_dotspace / PICT2E_UNIT;
+	float x, y;		/* current position */
+	float xinc, yinc;	/* increments */
+	float slope;		/* slope of line */
+	float lastx = -1;	/* last x point plotted */
+	float lasty = -1;	/* last y point plotted */
+	int numdots = 0;	/* number of dots in this section */
+
+	/* first, figure out increments for x and y */
+	if (x2 == x1) {
+	    xinc = 0.0;
+	    yinc = (y2 - y1 > 0) ? dotspace : -dotspace;
+	} else {
+	    slope = ((float) y2 - y1) / ((float) x2 - x1);
+	    xinc = dotspace / sqrt(1 + slope * slope) * sign(x2 - x1);
+	    yinc = slope * xinc;
+	}
+
+	/* now draw the dotted line */
+	/* we take into account where we last placed a dot */
+	for (x = x1 + xinc * (1 - PICT2E_left), y = y1 + yinc * (1 - PICT2E_left);
+	     (x2 - x) * xinc >= 0 && (y2 - y) * yinc >= 0;	/* same sign or zero */
+	     lastx = x, x += xinc,
+	     lasty = y, y += yinc)
+	    numdots++;
+	if (numdots == 1)
+	    fprintf(gpoutfile, "\\put(%.2f,%.2f){%s}\n",
+		    lastx, lasty, PICT2E_DOT);
+	else if (numdots > 0)
+	    fprintf(gpoutfile, "\\multiput(%u,%u)(%.3f,%.3f){%u}{%s}\n",
+		    x1, y1, xinc, yinc, numdots, PICT2E_DOT);
+
+	/* how much is left over, as a fraction of dotspace? */
+	if (xinc != 0.0) {	/* xinc must be nonzero */
+	    if (lastx >= 0)
+		PICT2E_left = ABS(x2 - lastx) / ABS(xinc);
+	    else
+		PICT2E_left += ABS(x2 - x1) / ABS(xinc);
+	} else
+	    if (lasty >= 0)
+		PICT2E_left = ABS(y2 - lasty) / ABS(yinc);
+	    else
+		PICT2E_left += ABS(y2 - y1) / ABS(yinc);
+    }
+
+    pict2e_needsdot = (PICT2E_left > 0);
+
+    pict2e_moved = FALSE;
+}
+
+
+static void
+PICT2E_flushdot()
+{
+    if (pict2e_needsdot)
+	fprintf(gpoutfile, "\\put(%d,%d){%s}\n",
+		pict2e_posx, pict2e_posy, PICT2E_DOT);
+    pict2e_needsdot = FALSE;
+}
+
+
+TERM_PUBLIC void
+PICT2E_arrow(
+    unsigned int sx, unsigned int sy,
+    unsigned int ex, unsigned int ey,
+    int head)
+{
+    PICT2E_apply_color();
+    PICT2E_apply_opacity();
+    PICT2E_linesize();
+
+    if (pict2e_arrows)
+	// This mostly converts the parameters to signed.
+	PICT2E_do_arrow(sx, sy, ex, ey, head);
+    else
+	do_arrow(sx, sy, ex, ey, head);
+
+    pict2e_posx = ex;
+    pict2e_posy = ey;
+}
+
+
+static void
+PICT2E_do_arrow(
+    int sx, int sy, int ex, int ey, /* start and end points */
+    int head)
+{
+    int dx = ex - sx;
+    int dy = ey - sy;
+    float len;
+
+    if ((head & BOTH_HEADS) == BACKHEAD) {
+	/* we need to draw only the backhead,
+	  so we exchange start and stop coordinates */
+	int tx, ty;
+	tx = ex;  ex = sx;  sx = tx;
+	ty = ey;  ey = sy;  sy = ty;
+	dx *= -1;
+	dy *= -1;
+	head &= ~BOTH_HEADS;
+	head |= END_HEAD;
+    }
+
+    // pict2e has no restriction on slope
+    len = sqrt(dx * dx + dy * dy);
+    dx /= len / 100.;
+    dy /= len / 100.;
+    // TODO: divide by GCD
+    if ((head & HEADS_ONLY) != 0) {
+	if ((head & END_HEAD) != 0) {
+	    fprintf(gpoutfile, "\\put(%d,%d){\\vector(%d,%d){0}}\n",
+		    ex, ey, dx, dy);
+	}
+    } else {
+	fprintf(gpoutfile, "\\put(%d,%d){\\%s(%d,%d){%d}}\n",
+		sx, sy, head ? "vector" : "line",
+		dx, dy,
+		dx != 0 ? ABS(ex - sx) : ABS(ey - sy));
+    }
+    if ((head & BACKHEAD) != 0) {
+	fprintf(gpoutfile, "\\put(%d,%d){\\vector(%d,%d){0}}\n",
+		sx, sy,
+		-dx, -dy);
+    }
+}
+
+
+TERM_PUBLIC void
+PICT2E_put_text(unsigned int x, unsigned int y, const char str[])
+{
+    static const char *justify[] = { "[l]", "", "[r]" };
+
+    /* ignore empty strings */
+    if (str[0] == NUL)
+	return;
+
+    PICT2E_endline();
+    PICT2E_apply_color();
+    PICT2E_apply_opacity();
+
+    fprintf(gpoutfile, "\\put(%d,%d)", x, y);
+    if (pict2e_angle != 0)
+	fprintf(gpoutfile, "{\\rotatebox{%d}", pict2e_angle);
+    fprintf(gpoutfile, "{\\makebox(0,0)%s{%s}}",
+	    justify[pict2e_justify], str);
+    if (pict2e_angle != 0)
+	fputs("}", gpoutfile);
+    fputs("\n", gpoutfile);
+}
+
+
+TERM_PUBLIC int
+PICT2E_justify_text(enum JUSTIFY mode)
+{
+    pict2e_justify = mode;
+    return TRUE;
+}
+
+
+TERM_PUBLIC int
+PICT2E_text_angle(int ang)
+{
+    pict2e_angle = ang;
+    return TRUE;
+}
+
+
+TERM_PUBLIC int
+PICT2E_make_palette(t_sm_palette *palette)
+{
+    return 0;  /* we can do continuous colors */
+}
+
+
+static void
+PICT2E_apply_color(void)
+{
+    if (strcmp(pict2e_new_color, pict2e_color) != 0) {
+	strcpy(pict2e_color, pict2e_new_color);
+	if (pict2e_use_color) {
+	    fputs(pict2e_new_color, gpoutfile);
+	    pict2e_have_color = TRUE;
+	}
+    }
+}
+
+
+static void
+PICT2E_apply_opacity(void)
+{
+    if (!pict2e_use_color)
+	return;
+
+#ifdef PICT2E_TRANSPARENT
+    if (pict2e_opacity != pict2e_new_opacity) {
+	pict2e_opacity = pict2e_new_opacity;
+	if (!pict2e_have_color)
+	    fputs(pict2e_color, gpoutfile);
+	if (pict2e_opacity != 100)
+	    fprintf(gpoutfile,
+		    "\\gptransparent{%.2f}{%d}\n",
+		    pict2e_opacity / 100., pict2e_opacity);
+	else
+	    fputs("\\gpopaque\n", gpoutfile);
+	pict2e_have_color = FALSE;
+    }
+#endif
+}
+
+
+TERM_PUBLIC void
+PICT2E_set_color(t_colorspec *colorspec)
+{
+    if (!pict2e_use_color)
+	return;
+
+    switch (colorspec->type) {
+    case TC_RGB: {
+	double r = (double)((colorspec->lt >> 16 ) & 255) / 255.;
+	double g = (double)((colorspec->lt >> 8 ) & 255) / 255.;
+	double b = (double)(colorspec->lt & 255) / 255.;
+
+	snprintf(pict2e_new_color, sizeof(pict2e_new_color),
+		"\\color[rgb]{%3.2f,%3.2f,%3.2f}\n", r, g, b);
+	break;
+    }
+    case TC_LT: {
+	int linetype = colorspec->lt;
+	const char * colorname;
+
+	if (linetype == LT_BACKGROUND)
+	    colorname = "white";
+	else if (linetype < 0 || !pict2e_use_color)
+	    colorname = "black";
+	else
+	    colorname = PICT2E_lt_colors[linetype % PICT2E_NUM_COLORS];
+	snprintf(pict2e_new_color, sizeof(pict2e_new_color),
+		"\\color{%s}\n", colorname);
+	break;
+    }
+    case TC_FRAC: {
+	rgb_color color;
+
+	rgb1_from_gray(colorspec->value, &color);
+	snprintf(pict2e_new_color, sizeof(pict2e_new_color),
+		"\\color[rgb]{%3.2f,%3.2f,%3.2f}\n", color.r, color.g, color.b);
+	break;
+    }
+    default:
+	break;
+    }
+}
+
+
+static void
+PICT2E_flushline(void)
+{
+    if (pict2e_inline) {
+	int i;
+
+	if (pict2e_linecount >= 2) {
+	    if (pict2e_linecount == 2) {
+		// short line segment
+		fputs("\\Line", gpoutfile);
+	    } else if ((pict2e_path[0][0] == pict2e_path[pict2e_linecount - 1][0]) &&
+		       (pict2e_path[0][1] == pict2e_path[pict2e_linecount - 1][1])) {
+		// closed path
+		fputs("\\polygon", gpoutfile);
+		pict2e_linecount--;
+	    } else {
+		// multiple connected line segments
+		fputs("\\polyline", gpoutfile);
+	    }
+	    for (i = 0; i < pict2e_linecount; i++)
+		fprintf(gpoutfile, "(%d,%d)", pict2e_path[i][0], pict2e_path[i][1]);
+	    fputs("\n", gpoutfile);
+	}
+
+	pict2e_inline = FALSE;
+	pict2e_linecount = 0;
+    }
+}
+
+
+static void
+PICT2E_solid_line(int x1, int x2, int y1, int y2)
+{
+    if (!pict2e_inline)
+	PICT2E_pushpath(x1, y1);
+
+    pict2e_inline = TRUE;
+    PICT2E_pushpath(x2, y2);
+
+    if (pict2e_linecount == PICT2E_LINEMAX) {
+	PICT2E_flushline();
+	PICT2E_pushpath(x2, y2);
+    }
+
+    pict2e_posx = x2;
+    pict2e_posy = y2;
+}
+
+
+static int
+PICT2E_fill(int style)
+{
+    int fill = pict2e_fill;
+    int opt = style >> 4;
+
+    switch (style & 0xf) {
+    case FS_SOLID:
+	if (pict2e_use_color) {
+	    if (opt != 100) {
+		pict2e_color[0] = NUL;
+		fprintf(gpoutfile, "\\color{.!%d}\n", opt);
+		fill = pict2e_fill_and_restore;
+	    } else {
+		fill = pict2e_fill;
+	    }
+	} else if (opt < 50) {
+	    fill = pict2e_no_fill;
+	}
+	break;
+    case FS_TRANSPARENT_SOLID:
+	if (pict2e_use_color) {
+	    if (opt != 100) {
+#ifdef PICT2E_TRANSPARENT
+		pict2e_new_opacity = opt;
+		fill = pict2e_fill_transparent;
+#else
+		pict2e_color[0] = NUL;
+		fprintf(gpoutfile, "\\color{.!%d}\n", opt);
+		fill = pict2e_fill_and_restore;
+#endif
+	    } else {
+		fill = pict2e_fill;
+	    }
+	} else if (opt < 50) {
+	    fill = pict2e_no_fill;
+	}
+	break;
+    case FS_PATTERN:
+    case FS_TRANSPARENT_PATTERN:
+	if (pict2e_use_color) {
+	    opt %= 4;
+	    if (opt == 0)
+		fputs("\\color{white}\n", gpoutfile);
+	    else if (opt == 1)
+		fputs("\\color{.!50}\n", gpoutfile);
+	    else if (opt == 2)
+		fputs("\\color{.!20}\n", gpoutfile);
+	    else if (opt == 3)
+		if (strcmp(pict2e_color, "\\color{black}\n") != 0) {
+		    fputs("\\color{black}\n", gpoutfile);
+		    pict2e_color[0] = NUL;
+		}
+	    if (opt != 3)
+		pict2e_color[0] = NUL;
+	    fill = pict2e_fill_and_restore;
+	} else {
+	    if ((opt % 2) == 0)
+		fill = pict2e_no_fill;
+	    else
+		fill = pict2e_fill;
+	}
+	break;
+    case FS_EMPTY:
+	if (pict2e_use_color) {
+	    pict2e_color[0] = NUL;
+	    fputs("\\color{white}\n", gpoutfile);
+	    fill = pict2e_fill_and_restore;
+	} else {
+	    fill = pict2e_no_fill;
+	}
+	break;
+    case FS_DEFAULT:
+    default:
+	/* use currently active color */
+	fill = pict2e_fill;
+	break;
+    }
+    return fill;
+}
+
+
+TERM_PUBLIC void
+PICT2E_fillbox(int style,
+		unsigned int x1, unsigned int y1,
+		unsigned int width, unsigned int height)
+{
+    int ret;
+
+    PICT2E_move(x1, y1);
+    PICT2E_apply_color();
+
+    // determine fill color
+    if ((ret = PICT2E_fill(style)) == pict2e_no_fill)
+	return;
+
+    PICT2E_apply_opacity();
+
+    // outline box
+    fprintf(gpoutfile, "\\polygon*(%d,%d)(%d,%d)(%d,%d)(%d,%d)\n",
+	x1, y1,
+	x1 + width, y1,
+	x1 + width, y1 + height,
+	x1, y1 + height);
+
+#ifdef PICT2E_TRANSPARENT
+    pict2e_new_opacity = 100;
+#endif
+}
+
+
+TERM_PUBLIC void
+PICT2E_filled_polygon(int points, gpiPoint *corners)
+{
+    int i, ret;
+
+    PICT2E_move(corners[0].x, corners[0].y);
+    PICT2E_apply_color();
+
+    // determine fill color
+    if ((ret = PICT2E_fill(corners->style)) == pict2e_no_fill)
+	return;
+
+    PICT2E_apply_opacity();
+
+    // no need to list the endpoint
+    if ((corners[0].x == corners[points - 1].x) &&
+        (corners[0].y == corners[points - 1].y))
+	points--;
+
+    // need at least 3 unique points
+    if (points < 3)
+	return;
+
+    fprintf(gpoutfile, "\\polygon*(%d,%d)", corners[0].x, corners[0].y);
+    for (i = 0; i < points; i++)
+	fprintf(gpoutfile, "(%d,%d)", corners[i].x, corners[i].y);
+    fputs("\n", gpoutfile);
+
+#ifdef PICT2E_TRANSPARENT
+    pict2e_new_opacity = 100;
+#endif
+}
+
+#endif /* TERM_BODY */
+#endif /* TERM_PROTO_ONLY */
+
+#ifdef TERM_TABLE
+
+TERM_TABLE_START(pict2e_driver)
+    "pict2e", "LaTeX2e picture environment",
+    PICT2E_XMAX, PICT2E_YMAX, PICT2E_VCHAR, PICT2E_HCHAR,
+    PICT2E_VTIC, PICT2E_HTIC, PICT2E_options, PICT2E_init, PICT2E_reset,
+    PICT2E_text, null_scale, PICT2E_graphics, PICT2E_move, PICT2E_vector,
+    PICT2E_linetype,
+    PICT2E_put_text,
+    PICT2E_text_angle,
+    PICT2E_justify_text, PICT2E_point, PICT2E_arrow, set_font_null,
+    NULL, /* pointsize */
+    TERM_IS_LATEX | TERM_CAN_DASH | TERM_LINEWIDTH, /* flags */
+    NULL, NULL, /* suspend, resume */
+    PICT2E_fillbox, PICT2E_linewidth,
+#ifdef USE_MOUSE
+    NULL, NULL, NULL, NULL, NULL,
+#endif
+    PICT2E_make_palette, 0,
+    PICT2E_set_color,
+    PICT2E_filled_polygon,
+    0, /* image */
+    0, 0, 0, /* enhanced text */
+    0, /* layer */
+    0, /* path */
+    0.0, /* scale (unused) */
+    0, /* hypertext */
+    0,
+    0,
+    PICT2E_dashtype
+TERM_TABLE_END(pict2e_driver)
+
+#undef LAST_TERM
+#define LAST_TERM pict2e_driver
+
+#endif /* TERM_TABLE */
+
+
+#ifdef TERM_HELP
+START_HELP(pict2e)
+"1 pict2e",
+"?commands set terminal pict2e",
+"?set terminal pict2e",
+"?set term pict2e",
+"?terminal pict2e",
+"?term pict2e",
+"?pict2e",
+" The `pict2e` terminal uses the LaTeX2e variant of the picture environment.",
+" It replaces terminals which where based on the original LaTeX picture"
+" environment: `latex`, `emtex`, `tpic`, and `eepic`. (EXPERIMENTAL)",
+"",
+" Alternatives to this terminal with a more complete support of gnuplot's",
+" features are `tikz`, `pstricks`, `cairolatex`, `pslatex`, `epslatex`",
+" and `mp`.",
+"",
+" Syntax:",
+"       set terminal pict2e",
+"                    {font \"{<fontname>}{,<fontsize>}\"}",
+"                    {size <XX>{unit}, <YY>{unit}}",
+"                    {color | monochrome}",
+"                    {linewidth <lw>} {rounded | butt}",
+"                    {texarrows | gparrows} {texpoints | gppoints}",
+"                    {smallpoints | tinypoints | normalpoints}",
+"",
+" This terminal requires the following standard LaTeX packages: `pict2e`,",
+" `xcolor`, `graphics`/`graphicx` and `amssymb`. For pdflatex, the",
+" `transparent` package is used to support transparency.",
+"",
+" By default the plot will inherit font settings from the embedding document.",
+" You have the option to force a font with the `font` option, like cmtt",
+" (Courier) or cmr (Roman), instead. In this case you may also force a specific",
+" fontsize. Otherwise the fontsize argument is used to estimate the required",
+" space for text.",
+" Unless your driver is capable of building fonts at any size (e.g. dvips),",
+" stick to the standard 10, 11 and 12 point sizes.",
+"",
+" The default size for the plot is 5 inches by 3 inches. The `size` option",
+" changes this to whatever the user requests. By default the X and Y sizes",
+" are taken to be in inches, but other units are possible (currently only cm).",
+"",
+" With `texpoints`, points are drawn using LaTeX commands like \"\\Diamond\"",
+" and \"\\Box\".  These are provided by the the latexsym package, which is part",
+" of the base distribution and thus part of any LaTeX implementation.",
+" Other point types use symbols from the amssymb package.",
+" With `gppoints`, the terminal will use gnuplot's internal routines for",
+" drawing point symbols instead.",
+"",
+" With the `texpoints` option, you can select three different point sizes:",
+" `normalpoints`, `smallpoints`, and `tinypoints`.",
+"",
+" `color` causes gnuplot to produce \\color{...} commands so that the graphs",
+" are colored. Using this option, you must include \\usepackage{xcolor}",
+" in the preamble of your LaTeX document. `monochrome` will avoid the use of",
+" any color commands in the output.",
+" Transparent color fill is availble if pdflatex is used.",
+"",
+" `linewidth` sets the scale factor for the width of lines.",
+" `rounded` sets line caps and line joins to be rounded. `butt` sets butt",
+" caps and mitered joins and is the default.",
+"",
+" `pict2e` only supports dotted lines, but not dashed lines.",
+" All default line types are solid. Use `set linetype` with the `dashtype`",
+" property to change.",
+"",
+" `texarrows` draws `arrow`s using LaTeX commands which are shorter but do",
+" not offer all options. `gparrows` selects drawing arrows using gnuplot's own",
+" routine for full functionality instead.",
+""
+END_HELP(pict2e)
+#endif /* TERM_HELP */

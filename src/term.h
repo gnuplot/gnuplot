@@ -345,16 +345,19 @@
 /* latex and emtex */
 #include "latex.trm"
 
-/* latex/tex with picture in postscript */
-#ifdef PSLATEX_DRIVER
-#include "pslatex.trm"
-#endif
-
 /* EEPIC-extended LaTeX driver, for EEPIC users */
 #include "eepic.trm"
 
 /* TPIC specials for TeX */
 #include "tpic.trm"
+
+/* LaTeX2e picture environment */
+#include "pict2e.trm"
+
+/* latex/tex with picture in postscript */
+#ifdef PSLATEX_DRIVER
+#include "pslatex.trm"
+#endif
 
 /* LaTeX picture environment with PSTricks macros */
 #include "pstricks.trm"
