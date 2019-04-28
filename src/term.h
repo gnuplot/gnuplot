@@ -339,6 +339,7 @@
 #endif /* NO_BITMAP_SUPPORT */
 
 /* TeX related terminals */
+#if 0  /* disable LaTeX picture based terminals by default */
 #define EMTEX
 #define EEPIC
 
@@ -350,6 +351,7 @@
 
 /* TPIC specials for TeX */
 #include "tpic.trm"
+#endif
 
 /* LaTeX2e picture environment */
 #include "pict2e.trm"
