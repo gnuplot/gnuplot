@@ -20,7 +20,7 @@ Changes not in 5.2
 * NEW "set object polygon depthsort" as an alternative to front/back/behind
 * NEW overflow avoidance extends range of arguments handled by complex division
 * NEW largely extended pcl5 terminal supports PCL5e/PCL5c printers
-* NEW revised pstricks LaTeX terminal
+* NEW revised pstricks and texdraw LaTeX terminals
 * NEW extended dospc terminal (DOS32/OpenWatcom)
 * NEW extended svga terminal using the (M)GRX library (DOS32/DJGPP)
 * NEW heavily revised fig terminal
