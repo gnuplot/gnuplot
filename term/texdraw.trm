@@ -63,6 +63,7 @@ register_term(texdraw)
 
 #ifdef TERM_PROTO
 TERM_PUBLIC void TEXDRAW_init(void);
+TERM_PUBLIC void TEXDRAW_options(void);
 TERM_PUBLIC void TEXDRAW_graphics(void);
 TERM_PUBLIC void TEXDRAW_text(void);
 TERM_PUBLIC void TEXDRAW_reset(void);
