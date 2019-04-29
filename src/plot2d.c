@@ -1800,13 +1800,17 @@ store_label(
     char *string,               /* start of label string */
     double colorval)            /* used if text color derived from palette */
 {
-    struct text_label *tl = listhead;
+    static struct text_label *tl = NULL;
     int textlen;
 
-    /* Walk through list to get to the end. Yes I know this is inefficient */
-    /* but is anyone really going to plot so many labels that it matters?  */
-    if (!tl) int_error(NO_CARET,"text_label list was not initialized");
-    while (tl->next) tl = tl->next;
+    if (!listhead)
+	int_error(NO_CARET,"text_label list was not initialized");
+
+    /* If listhead->next is NULL, the list is currently empty and we will */
+    /* insert this label at the head.  Otherwise tl already points to the */
+    /* tail (previous insertion) and we will add the new label there.     */
+    if (listhead->next == NULL)
+	tl = listhead;
 
     /* Allocate a new label structure and fill it in */
     tl->next = gp_alloc(sizeof(struct text_label),"labelpoint label");

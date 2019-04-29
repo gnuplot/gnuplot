@@ -16,6 +16,7 @@ Changes in 5.2.7
 * CHANGE cairo, libgd, and svg terminals handle LT_NODRAW by not drawing at all
 * CHANGE svg terminal clickable icons are in-line data rather than external refs
 * CHANGE revise space allocated for ylabel; allow text justification for ylabel
+* CHANGE reduce overhead, making it feasible to have 10^6 hypertext labels
 * FIX "plot with table" unnecessarily limited string column output to 60 chars 
 * FIX (windows) make sure graph window is shown even if the program is "hidden"
 * FIX hidden3d mode was not correctly dealing with arrowstyle backhead
