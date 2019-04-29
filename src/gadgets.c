@@ -916,14 +916,16 @@ write_label(int x, int y, struct text_label *this_label)
 
 	/* The text itself */
 	if (this_label->hypertext) {
-	    /* Treat text as hypertext */
-	    char *font = this_label->font;
-	    if (font)
-		term->set_font(font);
-	    if (term->hypertext)
-	        term->hypertext(TERM_HYPERTEXT_TOOLTIP, this_label->text);
-	    if (font)
-		term->set_font("");
+	    if (this_label->text && *(this_label->text)) {
+		/* Treat text as hypertext */
+		char *font = this_label->font;
+		if (font)
+		    term->set_font(font);
+		if (term->hypertext)
+		    term->hypertext(TERM_HYPERTEXT_TOOLTIP, this_label->text);
+		if (font)
+		    term->set_font("");
+	    }
 	} else {
 	    /* A normal label (always print text) */
 	    get_offsets(this_label, &htic, &vtic);
