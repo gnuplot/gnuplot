@@ -2173,6 +2173,8 @@ SVG_hypertext( int type, const char *text )
 	free(SVG_hypertext_fontStyle); SVG_hypertext_fontStyle = NULL;
 	free(SVG_hypertext_fontWeight); SVG_hypertext_fontWeight = NULL;
 	SVG_hypertext_fontSize = 0;
+	if (!text || !(*text))
+	    break;
 
 	sep = strcspn(text, ",: ");
 	if (sep > 0) {
