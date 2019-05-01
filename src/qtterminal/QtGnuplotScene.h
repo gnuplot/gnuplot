@@ -129,6 +129,7 @@ private:
 	QtGnuplotEnhanced* m_enhanced;  // Current enhanced text block
 	QList<QtGnuplotKeybox> m_key_boxes;
 	QString m_currentHypertext;
+	QString m_selectedHypertext;
 	QList<QGraphicsItem*> m_hypertextList;
 	QGraphicsPixmapItem* m_hyperimage;
 	QFont m_hypertextFont;

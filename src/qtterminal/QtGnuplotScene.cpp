@@ -865,6 +865,7 @@ void QtGnuplotScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 	// The first item in m_hypertextList is always a background rectangle for the text
 	int i = m_hypertextList.count();
 	bool hit = false;
+	m_selectedHypertext.clear();
 	while (i-- > 1) {
 		if (!hit && ((m_hypertextList[i]->pos() - m_textOffset) 
 				- m_lastMousePos).manhattanLength() <= 5) {
@@ -885,7 +886,11 @@ void QtGnuplotScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 				m_hyperimage->setPixmap(QPixmap(imagename));
 				m_hyperimage->setVisible(true);
 				break;
+			} else {
+				// If there is a mouse click we will push this to the clipboard
+				m_selectedHypertext = current_text;
 			}
+
 		} else {
 			m_hypertextList[i]->setVisible(false);
 			m_hyperimage->setVisible(false);
@@ -931,6 +936,10 @@ void QtGnuplotScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 		    }
 	    }
 	}
+
+	// Supposedly !isEmpty indicates the mouse is hovering over a hypertext anchor
+	if ((button == 1) && !m_selectedHypertext.isEmpty())
+		QApplication::clipboard()->setText(m_selectedHypertext);
 
 	QGraphicsScene::mouseReleaseEvent(event);
 }

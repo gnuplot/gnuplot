@@ -24,6 +24,7 @@ Changes not in 5.2
 * NEW extended dospc terminal (DOS32/OpenWatcom)
 * NEW extended svga terminal using the (M)GRX library (DOS32/DJGPP)
 * NEW heavily revised fig terminal
+* NEW Left-click on hypertext label will copy text to clipboard (wxt qt)
 * EXPERIMENTAL internal support for appending to existing arrays
 * EXPERIMENTAL "set mouse mouseformat function <stringval_from_xy(x,y)>"
 * EXPERIMENTAL multiple textbox styles

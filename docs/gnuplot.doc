@@ -10869,6 +10869,9 @@ Ffigure_multiple_keys
        plot 'data' using 1:2:0 with labels hypertext point pt 7 \
             title 'mouse over point to see its order in data set'
 
+ For the wxt and qt terminals, left-click on a hypertext anchor after the
+ text has appeared will copy the hypertext to the clipboard.
+
  EXPERIMENTAL (implementation details may change)
  Text of the form "image{<xsize>,<ysize>}:<filename>{\n<caption text>}" will
  trigger display of the image file in a pop-up box. The optional size overrides

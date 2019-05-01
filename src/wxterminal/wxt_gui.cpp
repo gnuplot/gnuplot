@@ -1242,6 +1242,10 @@ void wxtPanel::OnLeftUp( wxMouseEvent& event )
 				(int) left_button_sw.Time(), this->GetId()) ) {
 		/* start a watch to send the time elapsed between up and down */
 		left_button_sw.Start();
+
+		/* EXPERIMENTAL: send associated hypertext to clipboard */
+		if (wxt_display_hypertext)
+			wxt_set_clipboard(wxt_display_hypertext);
 	}
 }
 
