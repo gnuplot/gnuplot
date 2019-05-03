@@ -254,6 +254,23 @@ development site on SourceForge \http{sourceforge.net/projects/gnuplot}.
 The source distribution ("gnuplot-5.2.6.tar.gz" or a similar name) is
 available from the official distribution site \http{sourceforge.net/projects/gnuplot}.
 
+\subsection{Why would I care about the development version?}
+
+The current development version will generally include features that are
+not yet part of the most recent stable release of gnuplot.
+As of May 2019 the 5.3 development version notably supports
+\begin{itemize}{}{}
+\setlength\itemsep{-4pt}
+\item 64-bit integer arithmetic
+\item 3D voxel grids
+\item 3D plot styles {\em isosurface, circles, boxes}
+\item {\em set walls} command to show xy xz and yz planes in 3D plots
+\item unicode escape sequences {\textbackslash}U+hhhh
+\item order N Bessel functions of the 1st and 2nd kind
+\item modified Bessel functions
+\item multiple textbox styles
+\end{itemize}
+
 \subsection{Where can I get current development version of \gnuplot?}
 
 The development version of gnuplot is held in a git repository which you
@@ -652,6 +669,19 @@ explicitly the start and the end of the arrow.
 \item generate inlined datapoints and plot them
 \end{itemize}
 
+\subsection{Y axis label in the wrong place and/or left margin too big}
+\Gnuplot has trouble estimating how much space to the left of the plot
+will be required to hold the Y axis label if it is printed horizontally
+({\em set ylabel norotate}).  This is particularly true if there is
+TeX markup in the label string.  To work around this problem you can place
+the text in a numbered label rather than in {\em ylabel}.
+\small
+\begin{verbatim}
+Y = 1001
+set label Y '$\operatorname{\mathfrak{Im}} S_{21}$'
+set label Y norotate at graph 0.0, 0.5 offset -6
+\end{verbatim}
+\normalsize
 
 \section{Plot types that people often ask about}
 
@@ -663,7 +693,7 @@ set terminal gif animate {delay <time>} {loop <N>} {optimize}
 \end{verbatim}
 
 Have a look at
-\http{gnuplot.sourceforge.net/demo/animate.html}
+\http{gnuplot.sourceforge.net/demo/animate2.html}
 in the demo collection.
 
 \subsection{Implicit defined graphs}
@@ -780,7 +810,8 @@ x y z
 \normalsize
 
 Notice the single and double blank lines. Also notice that the triangle
-really consists of four vertices of which two are identical.
+really has four vertices of which two are identical.  This is because the
+pm3d code only knows how to deal with quadrangles.
 \textit{<cN>} is an optional color.
 
 Then plot it by (either of splot's):
@@ -1004,23 +1035,6 @@ The tracker on sourceforge is for reporting bugs and collecting bug fixes
 that will appear in a subsequent release.
 The various online forums are a better place to ask about
 work arounds or actually solving \gnuplot related problems.
-
-\subsection{What extensions have people made to \gnuplot? Where can I get them?}
-
-The current development version will generally include features that are
-not yet part of the most recent stable release of gnuplot.
-As of April 2019 the 5.3 development version notably supports
-\begin{itemize}{}{}
-\setlength\itemsep{-4pt}
-\item 64-bit integer arithmetic
-\item 3D voxel grids
-\item 3D plot styles {\em isosurface, circles, boxes}
-\item {\em set walls} command to show xy xz and yz planes in 3D plots
-\item unicode escape sequences {\textbackslash}U+hhhh
-\item order N Bessel functions of the 1st and 2nd kind
-\item modified Bessel functions
-\item multiple textbox styles
-\end{itemize}
 
 \subsection{Can I do heavy-duty data processing with \gnuplot? or
 What is beyond \gnuplot?}
