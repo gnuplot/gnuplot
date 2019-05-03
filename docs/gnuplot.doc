@@ -3508,7 +3508,7 @@ Ffigure_boxplot
  end of the whiskers may be controlled using `set bars` or `set errorbars`.
 
  These default properties may be changed using the `set style boxplot` command.
- See `set style boxplot`, `bars`, `boxwidth`, `fillstyle`, `candlesticks`.
+ See `set style boxplot`, `boxwidth`, `errorbars`, `fillstyle`, `candlesticks`.
 
 2 boxxyerror
 ?plotting styles boxxyerror
@@ -9075,7 +9075,7 @@ Ffigure_missing
 ?show bars
 ?bars
  The `set errorbars` command controls the tics at the ends of error bars,
- and also at the end of the whiskers belonging to a boxplot.
+ and also at the end of the whiskers belonging to a boxplot. See `boxplot`.
 
  Syntax:
        set errorbars {small | large | fullwidth | <size>} {front | back}
