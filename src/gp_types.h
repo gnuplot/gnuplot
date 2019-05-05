@@ -137,10 +137,6 @@ typedef enum PLOT_SMOOTH {
     SMOOTH_FREQUENCY_NORMALISED
 } PLOT_SMOOTH;
 
-/* FIXME HBB 20000521: 'struct value' and its part, 'cmplx', should go
- * into one of scanner/internal/standard/util .h, but I've yet to
- * decide which of them */
-
 struct cmplx {
 	double real, imag;
 };
@@ -169,20 +165,16 @@ typedef enum coord_type {
 
 
 /* These fields of 'struct coordinate' hold extra properties of 3D data points */
-/* Used by splot styles RGBIMAGE and RGBA_IMAGE */
-#define CRD_R yhigh
-#define CRD_G xlow
-#define CRD_B xhigh
-#define CRD_A ylow
-/* Used by all splot style with variable line/point color */
-#define CRD_COLOR yhigh
-/* Used by splot styles POINTSTYLE and LINESPOINTS with variable point size */
-#define CRD_PTSIZE xlow
-/* Used by splot styles POINTSTYLE and LINESPOINTS with variable point type */
-#define CRD_PTTYPE xhigh
-/* Used by splot style ZERRORFILL */
-#define CRD_ZLOW xlow
-#define CRD_ZHIGH xhigh
+#define CRD_R yhigh      /* Used by splot styles RGBIMAGE and RGBA_IMAGE */
+#define CRD_G xlow       /* Used by splot styles RGBIMAGE and RGBA_IMAGE */
+#define CRD_B xhigh      /* Used by splot styles RGBIMAGE and RGBA_IMAGE */
+#define CRD_A ylow       /* Used by splot styles RGBIMAGE and RGBA_IMAGE */
+#define CRD_COLOR yhigh  /* Used by all splot styles with variable color */
+#define CRD_ROTATE ylow  /* Used by "with labels" */
+#define CRD_PTSIZE xlow  /* Used by "with points|linespoints|labels" */
+#define CRD_PTTYPE xhigh /* Used by "with points|linespoints|labels" */
+#define CRD_ZLOW xlow    /* Used by splot style ZERRORFILL */
+#define CRD_ZHIGH xhigh  /* Used by splot style ZERRORFILL */
 
 
 typedef struct coordinate {

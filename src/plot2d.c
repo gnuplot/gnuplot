@@ -500,9 +500,9 @@ get_data(struct curve_points *current_plot)
 
     case LABELPOINTS:
 	/* 3 column data: X Y Label */
-	/* extra columns allow variable pointsize and/or rotation */
+	/* extra columns allow variable pointsize, pointtype, and/or rotation */
 	min_cols = 3;
-	max_cols = 5;
+	max_cols = 6;
 	expect_string( 3 );
 	break;
 
@@ -786,33 +786,44 @@ get_data(struct curve_points *current_plot)
 	case POINTSTYLE:
 	case LINESPOINTS:
 	{   /* x y [var_ps or var_pt] [var_pt] */
-	    /* NB: fallback to 1.0 handles (current_plot->plot_smooth == SMOOTH_ACSPLINES) */
+	    /* NB: assumes CRD_PTSIZE == xlow and CRD_PTTYPE == xhigh */
+	    coordval weight = (current_plot->plot_smooth == SMOOTH_ACSPLINES) ? v[2] : 1.0;
 	    coordval var_ps = (j > 2) ? v[2] : 1.0;
 	    coordval var_pt = (j > 3) ? v[3] : v[2];
 	    if (var_pt < 0)
 		var_pt = 0;
 	    store2d_point(current_plot, i++, v[0], v[1],
-				v[0], var_pt, v[1], v[1], var_ps);
+				var_ps, var_pt, v[1], v[1], weight);
 	    break;
 	}
 
 	case LABELPOINTS:
-	{   /* x y string [var_ps | var_angle] */
-	    coordval var_ps = (j > 3) ? v[3] : 1.0;
+	{   /* x y string {rotate variable}
+	     *            {point {pt variable} {ps variable}}
+	     *            {tc|lc variable}
+	     */
+	    int var = 3;	/* column number for next variable spec */
+	    coordval var_rotation = 0.0;
+	    coordval var_ps = current_plot->labels->lp_properties.p_size;
+	    coordval var_pt = current_plot->labels->lp_properties.p_type;
+
+	    if (current_plot->labels->tag == VARIABLE_ROTATE_LABEL_TAG)
+		var_rotation = v[var++];
+	    if (var_pt == PT_VARIABLE)
+		var_pt = v[var++];
+	    if (var_ps == PTSZ_VARIABLE)
+		var_ps = v[var++];
+	    if (var > j)
+		int_error(NO_CARET, "Not enough using specs");
+
 	    store2d_point(current_plot, i, v[0], v[1],
-				v[0], v[0], v[1], v[1], var_ps);
+				var_ps, var_pt, var_rotation, v[1], 0.0);
+
 	    /* Allocate and fill in a text_label structure to match it */
 	    if (current_plot->points[i].type != UNDEFINED) {
-		struct text_label *tl;
-		tl = store_label(current_plot->labels, &(current_plot->points[i]), 
-			i, df_tokens[2], 
+		store_label(current_plot->labels, &(current_plot->points[i]),
+			i, df_tokens[2],
 			current_plot->varcolor ? current_plot->varcolor[i] : 0.0);
-		if (j > 3) {
-		    if (current_plot->labels->tag == VARIABLE_ROTATE_LABEL_TAG)
-			tl->rotate = (int)(var_ps);
-		    else
-			tl->lp_properties.p_size = var_ps;
-		}
 	    }
 	    i++;
 	    break;
@@ -1699,6 +1710,11 @@ store_label(
     tl->place.y = cp->y;
     tl->place.z = cp->z;
 
+    /* optional variables from user spec */
+    tl->rotate = cp->CRD_ROTATE;
+    tl->lp_properties.p_type = cp->CRD_PTTYPE;
+    tl->lp_properties.p_size = cp->CRD_PTSIZE;
+
     /* Check for optional (textcolor palette ...) */
     if (tl->textcolor.type == TC_Z)
 	tl->textcolor.value = colorval;
@@ -1771,6 +1787,8 @@ store_label(
     parse_esc(tl->text);
 
     FPRINTF((stderr,"LABELPOINT %f %f \"%s\" \n", tl->place.x, tl->place.y, tl->text));
+    FPRINTF((stderr,"           %g %g %g %g %g %g %g\n",
+		cp->x, cp->y, cp->xlow, cp->xhigh, cp->ylow, cp->yhigh, cp->z));
 
     return tl;
 }

@@ -1040,13 +1040,26 @@ get_3ddata(struct surface_points *this_plot)
 		}
 
 	    } else if (this_plot->plot_style == LABELPOINTS) {
-		if (j == 4) {
-		    /* 4th column holds label text rather than color */
-		    color = z;
-		    color_from_column(FALSE);
+		if (draw_contour && !this_plot->opt_out_of_contours) {
+		    /* j is 3 for some reason */ ;
 		} else {
-		    color = v[4];
-		    color_from_column(TRUE);
+		    int varcol = 4;
+		    cp->CRD_PTSIZE = this_plot->labels->lp_properties.p_size;
+		    cp->CRD_PTTYPE = this_plot->labels->lp_properties.p_type;
+		    if (cp->CRD_PTSIZE == PTSZ_VARIABLE)
+			cp->CRD_PTSIZE = v[varcol++];
+		    if (cp->CRD_PTTYPE == PT_VARIABLE)
+			cp->CRD_PTTYPE = v[varcol++];
+		    if (j < varcol)
+			int_error(NO_CARET, "Not enough input columns");
+		    if (j == varcol) {
+			/* 4th column holds label text rather than color */
+			color = z;
+			color_from_column(FALSE);
+		    } else {
+			color = v[varcol];
+			color_from_column(TRUE);
+		    }
 		}
 
 	    } else if (this_plot->plot_style == CIRCLES) {

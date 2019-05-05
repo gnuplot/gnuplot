@@ -312,6 +312,9 @@ place_arrows(int layer)
     clip_area = clip_save;
 }
 
+/*
+ * place_labels() handles both individual labels and 2D plot with labels
+ */
 static void
 place_labels(struct text_label *listhead, int layer, TBOOLEAN clip)
 {
@@ -2236,7 +2239,7 @@ plot_points(struct curve_points *plot)
 
 		if ((plot->plot_style == POINTSTYLE || plot->plot_style == LINESPOINTS)
 		&&  plot->lp_properties.p_size == PTSZ_VARIABLE)
-		    (*t->pointsize)(pointsize * plot->points[i].z);
+		    (*t->pointsize)(pointsize * plot->points[i].CRD_PTSIZE);
 
 		/* Feb 2016: variable point type */
 		if ((plot->plot_style == POINTSTYLE || plot->plot_style == LINESPOINTS)
