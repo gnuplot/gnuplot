@@ -25,6 +25,7 @@ Changes not in 5.2
 * NEW extended dospc terminal (DOS32/OpenWatcom)
 * NEW extended svga terminal using the (M)GRX library (DOS32/DJGPP)
 * NEW heavily revised fig terminal
+* NEW LaTeX terminal pict2e uses the LaTeX2e pict2e environment
 * NEW Left-click on hypertext label will copy text to clipboard (wxt qt)
 * NEW smooth option "zsort" controls order that points are plotting in
 * NEW multiple textbox styles
@@ -45,6 +46,7 @@ Changes not in 5.2
 * CHANGE remove undocumented EXPERIMENTAL option for pm3d filled contours
 * CHANGE print to datablock expands embedded \n into a separate block entry
 * CHANGE boxplot outliers affect autoscaling only if they are enabled
+* CHANGE remove latex, emtex, eepic, and tpic terminals from default build
 * FIX allow mixed use of in-key plot titles and manually placed titles
 * FIX open/close path for polygons
 * FIX several stability issues of the caca terminal
