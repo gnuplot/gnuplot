@@ -85,6 +85,10 @@ static void parametric_3dfixup(struct surface_points * start_plot, int *plot_num
 static struct surface_points * sp_alloc(int num_samp_1, int num_iso_1, int num_samp_2, int num_iso_2);
 static void sp_replace(struct surface_points *sp, int num_samp_1, int num_iso_1, int num_samp_2, int num_iso_2);
 
+static struct iso_curve * iso_alloc(int num);
+static void iso_extend(struct iso_curve *ip, int num);
+static void iso_free(struct iso_curve *ip);
+
 /* helper functions for grid_nongrid_data() */
 static double splines_kernel(double h);
 static void thin_plate_splines_setup( struct iso_curve *old_iso_crvs, double **p_xx, int *p_numpoints );
@@ -215,12 +219,67 @@ sp_free(struct surface_points *sp)
 
 	if (sp->labels) {
 	    free_labels(sp->labels);
-	    sp->labels = (struct text_label *)NULL;
+	    sp->labels = NULL;
 	}
 
 	free(sp);
 	sp = next;
     }
+}
+
+/*
+ * iso_alloc() allocates a iso_curve structure that can hold 'num'
+ * points.
+ */
+struct iso_curve *
+iso_alloc(int num)
+{
+    struct iso_curve *ip;
+    ip = gp_alloc(sizeof(struct iso_curve), "iso curve");
+    ip->p_max = (num >= 0 ? num : 0);
+    ip->p_count = 0;
+    if (num > 0) {
+	ip->points = gp_alloc(num * sizeof(struct coordinate), "iso curve points");
+	memset(ip->points, 0, num * sizeof(struct coordinate));
+    } else
+	ip->points = (struct coordinate *) NULL;
+    ip->next = NULL;
+    return (ip);
+}
+
+/*
+ * iso_extend() reallocates a iso_curve structure to hold "num"
+ * points. This will either expand or shrink the storage.
+ */
+void
+iso_extend(struct iso_curve *ip, int num)
+{
+    if (num == ip->p_max)
+	return;
+
+    if (num > 0) {
+	ip->points = gp_realloc(ip->points, num * sizeof(struct coordinate),
+				"expanding 3D points");
+	if (num > ip->p_max)
+	    memset( &(ip->points[ip->p_max]), 0, (num - ip->p_max) * sizeof(struct coordinate));
+	ip->p_max = num;
+    } else {
+	free(ip->points);
+	ip->points = NULL;
+	ip->p_max = 0;
+    }
+}
+
+/*
+ * iso_free() releases any memory which was previously malloc()'d to hold
+ *   iso curve points.
+ */
+void
+iso_free(struct iso_curve *ip)
+{
+    if (ip)
+	free(ip->points);
+    free(ip);
 }
 
 

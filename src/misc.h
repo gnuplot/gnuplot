@@ -53,9 +53,6 @@ extern int call_argc;
 
 /* Prototypes from file "misc.c" */
 
-struct iso_curve * iso_alloc(int num);
-void iso_extend(struct iso_curve *ip, int num);
-void iso_free(struct iso_curve *ip);
 const char *expand_call_arg(int c);
 void load_file(FILE *fp, char *name, int calltype);
 FILE *lf_top(void);

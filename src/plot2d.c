@@ -128,26 +128,25 @@ cp_extend(struct curve_points *cp, int num)
 	return;
 
     if (num > 0) {
-	if (cp->points == NULL) {
-	    cp->points = gp_alloc(num * sizeof(cp->points[0]),
-				  "curve points");
-	} else {
-	    cp->points = gp_realloc(cp->points, num * sizeof(cp->points[0]),
-				    "expanding curve points");
-	    if (cp->varcolor)
-		cp->varcolor = gp_realloc(cp->varcolor, num * sizeof(double),
-					"expanding curve variable colors");
-	}
+	cp->points = gp_realloc(cp->points, num * sizeof(cp->points[0]),
+				"expanding 2D points");
+	if (cp->varcolor)
+	    cp->varcolor = gp_realloc(cp->varcolor, num * sizeof(double),
+				    "expanding curve variable colors");
 	cp->p_max = num;
 	cp->p_max -= 1;		/* Set trigger point for reallocation ahead of	*/
 				/* true end in case two slots are used at once	*/
 				/* (e.g. redundant final point of closed curve)	*/
     } else {
+	/* FIXME: Does this ever happen?  Should it call cp_free() instead? */
 	free(cp->points);
 	cp->points = NULL;
 	cp->p_max = 0;
 	free(cp->varcolor);
 	cp->varcolor = NULL;
+	if (cp->labels)
+	    free_labels(cp->labels);
+	cp->labels = NULL;
     }
 }
 
