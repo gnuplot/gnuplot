@@ -35,6 +35,7 @@
 #include "alloc.h"
 #include "command.h"
 #include "datablock.h"
+#include "encoding.h"
 #include "graphics.h"
 #include "plot.h"
 #include "tables.h"
@@ -1052,10 +1053,19 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
 		c_token++;
 		if ((symbol = try_to_get_string())) {
 		    newlp.p_type = PT_CHARACTER;
-		    /* An alternative mechanism would be to use
-		     * utf8toulong(&newlp.p_char, symbol);
+		    /* An alternative mechanism would be to store
+		     * utf8toulong(&newlp.p_char, symbol)
+		     * and do the conversion to (or back to) utf8 when it is printed.
 		     */
 		    safe_strncpy(newlp.p_char, symbol, sizeof(newlp.p_char));
+		    /* Check for unicode escape */
+		    if (!strncmp("\\U+", newlp.p_char, 3)) {
+			uint32_t codepoint;
+			int length;
+			sscanf(&(newlp.p_char[3]), "%4x", &codepoint);
+			length = ucs4toutf8(codepoint, (unsigned char *)newlp.p_char);
+			newlp.p_char[length] = '\0';
+		    }
 		    /* Truncate ascii text to single character */
 		    if ((newlp.p_char[0] & 0x80) == 0)
 			newlp.p_char[1] = '\0';

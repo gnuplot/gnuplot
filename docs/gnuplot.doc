@@ -4637,25 +4637,29 @@ Ffigure_parallel
 ?pointtype
 Ffigure_points
  The `points` style displays a small symbol at each point. The command `set
- pointsize` may be used to change the default size of the points. The point type
+ pointsize` may be used to change the default size of all points. The point type
  defaults to that of the linetype. See `linetype`.  If no `using` spec is found
- in the plot command, input data columns are interpreted implicitly.
- See `style lines`.
+ in the plot command, input data columns are interpreted implicitly in the order
+      x y pointsize pointtype color
+ Any columns beyong the first two (x and y) are optional; they correspond to
+ additional plot properties `pointsize variable`, `pointtype variable`, etc.
 
  The first 8 point types are shared by all terminals. Individual terminals may
  provide a much larger number of distinct point types. Use the `test` command
- to show what is provided by the current terminal settings. Alternatively any
- single printable character may be given instead of a numerical point type,
- as in the example below.  Longer strings may be plotted using the plot style
- `labels` rather than `points`.
+ to show what is provided by the current terminal settings.
 
-      plot sin(x) with points pt "#"
+ Alternatively any single printable character may be given instead of a
+ numerical point type, as in the example below.  You may use any unicode
+ character as the pointtype (assumes utf8 support). See `escape sequences`.
+ Longer strings may be plotted using plot style `labels` rather than `points`.
 
- You may use any utf-8 character as the pointtype. See `utf8`.
+      plot f(x) with points pt "#"
+      plot d(x) with points pt "\U+2299"
+
+?points variable
+?with points variable
 =variable
 ?variable
-?variable pointtype
-?variable pointsize
 ?pointtype variable
 ?pointsize variable
  When using the keywords `pointtype`, `pointsize`, or `linecolor` in a plot
@@ -4663,10 +4667,8 @@ Ffigure_points
  In this case the corresponding properties of each point are assigned by
  additional columns of input data. Variable pointsize is always taken from the
  first additional column provided in a `using` spec.  Variable color is always
- taken from the last additional column.  When plotting with style `linespoints`
- it is not currently possible to specify separate colors for the lines and the
- points.  If all three properties are specified for each point, the order of
- input data columns is thus
+ taken from the last additional column. See `colorspec`. If all three properties
+ are specified for each point, the order of input data columns is thus
 
       plot DATA using x:y:pointsize:pointtype:color \
            with points lc variable pt variable ps variable
