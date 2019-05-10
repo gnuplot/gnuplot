@@ -364,7 +364,8 @@ get_data(struct curve_points *current_plot)
 	    variable_color = TRUE;
 	if (current_plot->lp_properties.l_type == LT_COLORFROMCOLUMN)
 	    variable_color = TRUE;
-	if (current_plot->plot_smooth != SMOOTH_NONE) {
+	if (current_plot->plot_smooth != SMOOTH_NONE
+	&&  current_plot->plot_smooth != SMOOTH_ZSORT) {
 	    /* FIXME:  It would be possible to support smooth cspline lc palette */
 	    /* but it would require expanding and interpolating plot->varcolor   */
 	    /* in parallel with the y values.                                    */
@@ -562,6 +563,11 @@ get_data(struct curve_points *current_plot)
     /* Restictions on plots with "smooth" option */
     switch (current_plot->plot_smooth) {
     case SMOOTH_NONE:
+	break;
+    case SMOOTH_ZSORT:
+	min_cols = 3;
+	if (current_plot->plot_style != POINTSTYLE)
+	    int_error(NO_CARET, "'smooth zsort' only possible in plots 'with points'");
 	break;
     case SMOOTH_ACSPLINES:
 	max_cols = 3;
@@ -784,11 +790,20 @@ get_data(struct curve_points *current_plot)
 
 	case POINTSTYLE:
 	case LINESPOINTS:
-	{   /* x y [var_ps or var_pt] [var_pt] */
+	{   /* x y {z} {var_ps} {var_pt} {lc variable} */
 	    /* NB: assumes CRD_PTSIZE == xlow and CRD_PTTYPE == xhigh */
+	    int var = 2;	/* column number for next variable spec */
 	    coordval weight = (current_plot->plot_smooth == SMOOTH_ACSPLINES) ? v[2] : 1.0;
-	    coordval var_ps = (j > 2) ? v[2] : 1.0;
-	    coordval var_pt = (j > 3) ? v[3] : v[2];
+	    coordval var_ps = current_plot->lp_properties.p_size;
+	    coordval var_pt = current_plot->lp_properties.p_type;
+	    if (current_plot->plot_smooth == SMOOTH_ZSORT)
+		weight = v[var++];
+	    if (var_pt == PT_VARIABLE)
+		var_pt = v[var++];
+	    if (var_ps == PTSZ_VARIABLE)
+		var_ps = v[var++];
+	    if (var > j)
+		int_error(NO_CARET, "Not enough using specs");
 	    if (var_pt < 0)
 		var_pt = 0;
 	    store2d_point(current_plot, i++, v[0], v[1],
@@ -2164,6 +2179,10 @@ eval_plots()
 			this_plot->plot_smooth = found_token;
 			this_plot->plot_style = LINES;
 			break;
+		    case SMOOTH_ZSORT:
+			this_plot->plot_smooth = SMOOTH_ZSORT;
+			this_plot->plot_style = POINTSTYLE;
+			break;
 		    case SMOOTH_NONE:
 		    default:
 			int_error(c_token, "unrecognized 'smooth' option");
@@ -2797,6 +2816,10 @@ eval_plots()
 		case SMOOTH_MONOTONE_CSPLINE:
 		    sort_points(this_plot);
 		    cp_implode(this_plot);
+		    break;
+		case SMOOTH_ZSORT:
+		    zsort_points(this_plot);
+		    break;
 		case SMOOTH_NONE:
 		case SMOOTH_BEZIER:
 		case SMOOTH_KDENSITY:

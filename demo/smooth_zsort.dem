@@ -1,0 +1,31 @@
+#
+# Test utility of sorting points on z (palette color)
+#
+set print $DATA
+do for [i=1:10000:1] {
+    print rand(0), rand(0), invnorm(rand(0))
+}
+unset print
+
+# -3 sigma = white  +3 sigma = dark
+set palette cubehelix negative
+set lmargin at screen 0.05
+unset tics
+set xlabel "Factor 1 (x)"
+set ylabel "Factor 2 (y)" offset -1
+set cbrange [-3:3]
+set cblabel "Z-score"
+set cbtics 1 format "%.0gσ"
+
+set pointsize 1.5
+
+set title "Random ordering on z\nhigh-value points are randomly obscured"
+plot $DATA using 1:2:3 with points lc palette
+
+pause -1 "Hit return to continue"
+
+set title "Sort on z before plotting\nhigh-value points are toward the viewer"
+plot $DATA using 1:2:3:3 smooth zsort with points lc palette
+
+pause -1 "Hit return to continue"
+

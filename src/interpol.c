@@ -135,6 +135,7 @@ static spline_coeff *cp_tridiag(struct curve_points * plot, int first_point, int
 static void do_cubic(struct curve_points * plot, spline_coeff * sc, int first_point, int num_points, struct coordinate * dest);
 static void do_freq(struct curve_points *plot,	int first_point, int num_points);
 static int compare_points(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2);
+static int compare_z(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2);
 
 
 /*
@@ -1013,6 +1014,19 @@ compare_points(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)
     return (0);
 }
 
+static int
+compare_z(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)
+{
+    struct coordinate const *p1 = arg1;
+    struct coordinate const *p2 = arg2;
+
+    if (p1->z > p2->z)
+	return (1);
+    if (p1->z < p2->z)
+	return (-1);
+    return (0);
+}
+
 void
 sort_points(struct curve_points *plot)
 {
@@ -1024,6 +1038,36 @@ sort_points(struct curve_points *plot)
 	qsort(plot->points + first_point, num_points,
 	      sizeof(struct coordinate), compare_points);
 	first_point += num_points;
+    }
+    return;
+}
+
+/*
+ * Sort on z rather than x
+ * used by "smooth zsort"
+ */
+void
+zsort_points(struct curve_points *plot)
+{
+    int i, first_point, num_points;
+
+    /* save variable color into struct coordinate */
+    if (plot->varcolor) {
+	for (i = 0; i < plot->p_count; i++)
+	    plot->points[i].CRD_COLOR = plot->varcolor[i];
+    }
+
+    first_point = 0;
+    while ((num_points = next_curve(plot, &first_point)) > 0) {
+	qsort(plot->points + first_point, num_points,
+	      sizeof(struct coordinate), compare_z);
+	first_point += num_points;
+    }
+
+    /* restore variable color */
+    if (plot->varcolor) {
+	for (i = 0; i < plot->p_count; i++)
+	    plot->varcolor[i] = plot->points[i].CRD_COLOR;
     }
     return;
 }

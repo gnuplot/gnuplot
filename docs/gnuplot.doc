@@ -231,6 +231,7 @@ C
 #end
 
 4 New plot styles and style options
+?new plot styles
 #start
 #b `splot $voxelgrid with {dots|points}` marks all voxels whose value is above 
 ## a requested threshold level.
@@ -245,6 +246,12 @@ C
 #b pm3d option `noclipcb` causes quadrangles with (palette color value < cbmin)
 ## to be skipped rather than being drawn with color clipped to cbmin
 #b Customized contour line types. See `set cntrparam`.
+#end
+
+4 New data pre-processing filters
+?new filters
+#start
+#b `smooth zsort` sorts 2D points on values in a 3rd column. See `smooth zsort`.
 #end
 
 4 New commands and command options
@@ -312,7 +319,6 @@ C
 3 Features introduced in version 5.2
 ?Features introduced in version 5.2
 4 New plot styles and style options
-?new plot styles
 #start
 #b 3D plot style `with zerrorfill`. See `zerrorfill`, `fenceplots` and
 ^ <a href="http://gnuplot.info/demo_5.2/zerror.html">
@@ -326,7 +332,6 @@ C
 ## (see `pointtype variable`)
 #end
 4 New data pre-processing filters
-?new filters
 #start
 #b Normalized frequency of occurrence in a data set (see `smooth fnormal`)
 #b Automated binning of data (see `bins`)
@@ -6768,7 +6773,7 @@ Ffigure_fenceplot
        smooth {unique | frequency | fnormal | cumulative | cnormal | bins
                       | kdensity {bandwidth}
                       | csplines | acsplines | mcsplines | bezier | sbezier
-                      | unwrap}
+                      | unwrap | zsort}
 
  The `unique`, `frequency`, `fnormal`, `cumulative` and `cnormal` sort the data
  on x and then plot some aspect of the distribution of x values.
@@ -6783,6 +6788,8 @@ Ffigure_fenceplot
 
  `unwrap` manipulates the data to avoid jumps of more than pi by adding or
  subtracting multiples of 2*pi.
+
+ `zsort` uses a 3rd column of input to sort points prior to plotting.
 
  If `autoscale` is in effect, axis ranges will be computed for the final curve
  rather than for the original data.
@@ -7011,6 +7018,20 @@ Ffigure_fenceplot
       plot $DATA smooth kdensity bandwidth <value> with boxes
  The bandwidth used in the previous plot is stored in variable
  GPVAL_KDENSITY_BANDWIDTH.
+5 zsort
+?commands plot datafile smooth zsort
+?plot datafile smooth zsort
+?plot smooth zsort
+?smooth zsort
+?zsort
+ Syntax
+      plot FOO using x:y:z:color smooth zsort with points lc palette
+ The intended use is to filter presentation of 2D scatter plots with a
+ huge number of points so that the distribution of high-scoring points
+ remains evident. Sorting the points on z guarantees that points with
+ a high z-value will not be obscured by points with lower z-values.
+ Limited to plot style "with points".
+
 4 special-filenames
 ?special-filenames
 ?commands plot datafile special-filenames

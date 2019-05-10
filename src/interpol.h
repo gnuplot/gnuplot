@@ -48,6 +48,7 @@ void gen_interp_unwrap(struct curve_points *plot);
 void gen_interp_frequency(struct curve_points *plot);
 void mcs_interp(struct curve_points *plot);
 void sort_points(struct curve_points *plot);
+void zsort_points(struct curve_points *plot);
 void cp_implode(struct curve_points *cp);
 void make_bins(struct curve_points *plot, int nbins, double binlow, double binhigh, double binwidth);
 
