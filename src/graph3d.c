@@ -1935,6 +1935,7 @@ plot3d_points(struct surface_points *plot)
     while (icrvs) {
 	struct coordinate *point;
 	int colortype = plot->lp_properties.pm3d_color.type;
+	const char *ptchar;
 
 	/* Apply constant color outside of the loop */
 	if (plot->plot_style == CIRCLES)
@@ -1979,22 +1980,33 @@ plot3d_points(struct surface_points *plot)
 			/* Retrace the border if the style requests it */
 			if (need_fill_border(&default_fillstyle))
 			    do_arc(x, y, radius, 0., 360., 0, FALSE);
+			continue;
 		    }
 
 		    /* This code is also used for "splot ... with dots" */
-		    else if (plot->plot_style == DOTS) {
+		    if (plot->plot_style == DOTS) {
 			(*t->point) (x, y, -1);
-		    }
-
-		    /* Print special character rather than drawn symbol */
-		    else if (plot->lp_properties.p_type == PT_CHARACTER) {
-			apply_pm3dcolor(&(plot->labels->textcolor));
-			(*t->put_text)(x, y, plot->lp_properties.p_char);
+			continue;
 		    }
 
 		    /* variable point type */
-		    else if (plot->lp_properties.p_type == PT_VARIABLE) {
+		    if ((plot->lp_properties.p_type == PT_VARIABLE)
+			 &&  !(isnan(point->CRD_PTTYPE))) {
 			(*t->point) (x, y, (int)(point->CRD_PTTYPE) - 1);
+		    }
+
+		    /* Print special character rather than drawn symbol */
+		    if (plot->lp_properties.p_type == PT_CHARACTER)
+			ptchar = plot->lp_properties.p_char;
+		    else if (plot->lp_properties.p_type == PT_VARIABLE
+			 &&  isnan(point->CRD_PTTYPE))
+			ptchar = (char *)(&point->CRD_PTCHAR);
+		    else
+			ptchar = NULL;
+		    if (ptchar) {
+			if (plot->labels)
+			    apply_pm3dcolor(&(plot->labels->textcolor));
+			(*t->put_text)(x, y, ptchar);
 		    }
 
 		    /* The normal case */

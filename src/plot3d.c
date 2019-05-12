@@ -39,6 +39,7 @@
 #include "contour.h"
 #include "datafile.h"
 #include "datablock.h"
+#include "encoding.h"
 #include "eval.h"
 #include "graph3d.h"
 #include "hidden3d.h"
@@ -1084,10 +1085,17 @@ get_3ddata(struct surface_points *this_plot)
 
 	    if (( this_plot->plot_style == POINTSTYLE || this_plot->plot_style == LINESPOINTS)) {
 		int varcol = 3;
+		coordval var_char = 0;
 		if (this_plot->lp_properties.p_size == PTSZ_VARIABLE)
 		    cp->CRD_PTSIZE = v[varcol++];
-		if (this_plot->lp_properties.p_type == PT_VARIABLE)
+		if (this_plot->lp_properties.p_type == PT_VARIABLE) {
+		    if (isnan(v[varcol]) && df_tokens[varcol]) {
+			safe_strncpy( (char *)(&var_char), df_tokens[varcol], sizeof(coordval));
+			truncate_to_one_utf8_char((char *)(&var_char));
+			cp->CRD_PTCHAR = var_char;
+		    }
 		    cp->CRD_PTTYPE = v[varcol++];
+		}
 		if (j < varcol)
 		    int_error(NO_CARET, "Not enough input columns");
 		else if (j == varcol) {

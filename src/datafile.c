@@ -2214,9 +2214,6 @@ df_readascii(double v[], int max)
 			else
 			    /* 'with points pt variable' is the only current user */
 			    if (df_current_plot
-#if 0
-			    &&  (df_current_plot->plot_style == POINTSTYLE)
-#endif
 			    &&  (df_current_plot->lp_properties.p_type == PT_VARIABLE))
 			{
 				static char varchar[8];
