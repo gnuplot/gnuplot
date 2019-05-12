@@ -497,6 +497,43 @@ strlen_utf8(const char *s)
     return j;
 }
 
+/*
+ * This operation is used in several places to reduce 8 chars of
+ * input to a single utf8 character used for PT_CHARACTER.
+ * Replaces content of original string.
+ * "AB" -> "A"
+ * "\U+0041" -> "A"
+ * "\316\261" -> utf8 "ɑ" (alpha) (unchanged from input)
+ *               the scanner already replaced string "\316" with octal byte 0316
+ */
+void
+truncate_to_one_utf8_char(char *orig)
+{
+    uint32_t codepoint;
+    char newchar[8];
+    int length;
+
+    safe_strncpy(newchar, orig, sizeof(newchar));
+
+    /* Check for unicode escape */
+    if (!strncmp("\\U+", newchar, 3)) {
+	sscanf(&newchar[3], "%4x", &codepoint);
+	length = ucs4toutf8(codepoint, (unsigned char *)newchar);
+	newchar[length] = '\0';
+    }
+    /* Truncate ascii text to single character */
+    else if ((newchar[0] & 0x80) == 0)
+	newchar[1] = '\0';
+    /* Some other 8-bit sequence (we don't check for valid utf8 */
+    else for (length=1; length<7; length++)
+	if ((newchar[length] & 0xc) == 0x8) {
+	    newchar[length+1] = '\0';
+	    break;
+	}
+
+    /* overwrite original string */
+    strcpy(orig, newchar);
+}
 
 /*
  * S-JIS functions

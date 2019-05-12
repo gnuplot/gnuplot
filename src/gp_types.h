@@ -174,6 +174,7 @@ typedef enum coord_type {
 #define CRD_ROTATE ylow  /* Used by "with labels" */
 #define CRD_PTSIZE xlow  /* Used by "with points|linespoints|labels" */
 #define CRD_PTTYPE xhigh /* Used by "with points|linespoints|labels" */
+#define CRD_PTCHAR ylow  /* Used by "with points pt variable */
 #define CRD_ZLOW xlow    /* Used by splot style ZERRORFILL */
 #define CRD_ZHIGH xhigh  /* Used by splot style ZERRORFILL */
 

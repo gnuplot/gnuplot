@@ -2209,6 +2209,21 @@ df_readascii(double v[], int max)
 			    else
 				return_value = DF_BAD;
 			}
+
+			/* Expecting a numerical type but got a string value */
+			else
+			    /* 'with points pt variable' is the only current user */
+			    if (df_current_plot
+#if 0
+			    &&  (df_current_plot->plot_style == POINTSTYLE)
+#endif
+			    &&  (df_current_plot->lp_properties.p_type == PT_VARIABLE))
+			{
+				static char varchar[8];
+				safe_strncpy(varchar, a.v.string_val, 8);
+				df_tokens[output] = varchar;
+			}
+
 			gpfree_string(&a);
 		    }
 

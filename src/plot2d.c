@@ -38,6 +38,7 @@
 #include "command.h"
 #include "datafile.h"
 #include "datablock.h"
+#include "encoding.h"
 #include "eval.h"
 #include "fit.h"
 #include "graphics.h"
@@ -791,15 +792,21 @@ get_data(struct curve_points *current_plot)
 	case POINTSTYLE:
 	case LINESPOINTS:
 	{   /* x y {z} {var_ps} {var_pt} {lc variable} */
-	    /* NB: assumes CRD_PTSIZE == xlow and CRD_PTTYPE == xhigh */
-	    int var = 2;	/* column number for next variable spec */
+	    /* NB: assumes CRD_PTSIZE == xlow CRD_PTTYPE == xhigh CRD_PTCHAR == ylow */
+	    int var = 2; /* column number for next variable spec */
 	    coordval weight = (current_plot->plot_smooth == SMOOTH_ACSPLINES) ? v[2] : 1.0;
 	    coordval var_ps = current_plot->lp_properties.p_size;
 	    coordval var_pt = current_plot->lp_properties.p_type;
+	    coordval var_char = 0;
 	    if (current_plot->plot_smooth == SMOOTH_ZSORT)
 		weight = v[var++];
-	    if (var_pt == PT_VARIABLE)
+	    if (var_pt == PT_VARIABLE) {
+		if (isnan(v[var]) && df_tokens[var]) {
+		    safe_strncpy( (char *)(&var_char), df_tokens[var], sizeof(coordval));
+		    truncate_to_one_utf8_char((char *)(&var_char));
+		}
 		var_pt = v[var++];
+	    }
 	    if (var_ps == PTSZ_VARIABLE)
 		var_ps = v[var++];
 	    if (var > j)
@@ -807,7 +814,7 @@ get_data(struct curve_points *current_plot)
 	    if (var_pt < 0)
 		var_pt = 0;
 	    store2d_point(current_plot, i++, v[0], v[1],
-				var_ps, var_pt, v[1], v[1], weight);
+					var_ps, var_pt, var_char, v[1], weight);
 	    break;
 	}
 

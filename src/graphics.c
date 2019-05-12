@@ -2157,6 +2157,7 @@ plot_points(struct curve_points *plot)
     int interval = plot->lp_properties.p_interval;
     int number = abs(plot->lp_properties.p_number);
     int offset = 0; 
+    const char *ptchar;
 
     /* The "pointnumber" property limits the total number of points drawn for this curve */
     if (number) {
@@ -2243,7 +2244,8 @@ plot_points(struct curve_points *plot)
 
 		/* Feb 2016: variable point type */
 		if ((plot->plot_style == POINTSTYLE || plot->plot_style == LINESPOINTS)
-		&&  plot->lp_properties.p_type == PT_VARIABLE) {
+		&&  (plot->lp_properties.p_type == PT_VARIABLE)
+		&&  !(isnan(plot->points[i].CRD_PTTYPE))) {
 		    pointtype = plot->points[i].CRD_PTTYPE - 1;
 		} else {
 		    pointtype = plot->lp_properties.p_type;
@@ -2264,11 +2266,24 @@ plot_points(struct curve_points *plot)
 		/* rgb variable  -  color read from data column */
 		check_for_variable_color(plot, &plot->varcolor[i]);
 
+		/* There are two conditions where we will print a character rather
+		 * than a point symbol. Otherwise ptchar = NULL;
+		 * (1) plot->lp_properties.p_type == PT_CHARACTER
+		 * (2) plot->lp_properties.p_type == PT_VARIABLE and the data file
+		 *     contained a string rather than a number
+		 */
+		if (plot->lp_properties.p_type == PT_CHARACTER)
+		    ptchar = plot->lp_properties.p_char;
+		else if (pointtype == PT_VARIABLE && isnan(plot->points[i].CRD_PTTYPE))
+		    ptchar = (char *)(&plot->points[i].CRD_PTCHAR);
+		else
+		    ptchar = NULL;
+
 		/* Print special character rather than drawn symbol */
-		if (pointtype == PT_CHARACTER) {
+		if (ptchar) {
 		    if (plot->labels)
 			apply_pm3dcolor(&(plot->labels->textcolor));
-		    (*t->put_text)(x, y, plot->lp_properties.p_char);
+		    (*t->put_text)(x, y, ptchar);
 		}
 
 		/* The normal case */
