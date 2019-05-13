@@ -912,7 +912,7 @@ do_3dplot(
 
     /* This tells the canvas, qt, and svg terminals to restart the plot   */
     /* count so that key titles are in sync with the plots they describe. */
-    (*t->layer)(TERM_LAYER_RESET_PLOTNO);
+    (term->layer)(TERM_LAYER_RESET_PLOTNO);
 
     /* Key box */
     if (key->visible) {

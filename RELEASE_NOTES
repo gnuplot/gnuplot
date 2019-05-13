@@ -3,12 +3,14 @@
 
 These release notes are for version 5.2 patchlevel 6 (5.2.7).
 This release contains bug-fixes, a few changes back-ported from the
-development version, and two new features.
+development version, and some minor new features.
+The largest change is a revised fig terminal that brings it into line
+with capabilities of other version 5 terminals.
 
 Please see the ChangeLog file for a complete list of changes made during the
 course of development from 5.0 to 5.2.
 
-Release Notes date: 03-May-2019
+Release Notes date: 13-May-2019
 
 Changes in 5.2.7
 ================
