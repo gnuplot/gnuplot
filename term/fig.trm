@@ -232,7 +232,8 @@ enum FIG_id {
     FIG_SMALL, FIG_BIG,
     FIG_PORTRAIT, FIG_LANDSCAPE,
     FIG_SIZE, FIG_FONT, FIG_FONTSIZE,
-    FIG_THICKNESS, FIG_DEPTH, 
+    FIG_THICKNESS, FIG_DEPTH,
+    FIG_SOLID, FIG_DASHED,
     FIG_NORMALTEXT, FIG_SPECIALTEXT, FIG_HIDDENTEXT, FIG_RIGIDTEXT,
     FIG_VERSION, FIG_OTHER
 };
@@ -242,6 +243,7 @@ static struct gen_table FIG_opts[] =
     { "big", FIG_BIG },
     { "c$olor", FIG_COLOR },
     { "c$olour", FIG_COLOR },
+    { "dash$ed", FIG_DASHED },
     { "depth", FIG_DEPTH },
     { "font", FIG_FONT },
     { "fontsize", FIG_FONTSIZE },
@@ -251,6 +253,7 @@ static struct gen_table FIG_opts[] =
     { "portrait", FIG_PORTRAIT },
     { "size", FIG_SIZE },
     { "small", FIG_SMALL },
+    { "solid", FIG_SOLID },
     { "linew$idth", FIG_THICKNESS },
     { "lw", FIG_THICKNESS },
     { "texth$idden", FIG_HIDDENTEXT },
@@ -312,6 +315,11 @@ FIG_options()
 	switch(lookup_table(&FIG_opts[0],c_token)) {
 	case FIG_MONOCHROME:
 	    FIG_use_color = FALSE;
+	    c_token++;
+	    break;
+	case FIG_SOLID:
+	case FIG_DASHED:
+	    /* ignored */
 	    c_token++;
 	    break;
 	case FIG_COLOR:
