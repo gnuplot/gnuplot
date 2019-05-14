@@ -6,7 +6,7 @@ dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
 dnl
-AC_INIT([gnuplot],[5.2.7alpha])
+AC_INIT([gnuplot],[5.2.7beta])
 AC_CONFIG_SRCDIR(src/graphics.c)
 AC_PREREQ([2.69])
 AC_CONFIG_HEADERS(config.h:config.hin)
