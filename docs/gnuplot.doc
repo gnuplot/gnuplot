@@ -14269,7 +14269,7 @@ Ffigure_multiple_keys
  Syntax:
        set view <rot_x>{,{<rot_z>}{,{<scale>}{,<scale_z>}}}
        set view map {scale <scale>}
-       set view map projection {xy|xz|yz}
+       set view projection {xy|xz|yz}
        set view {no}equal {xy|xyz}
        set view azimuth <angle>
        show view
