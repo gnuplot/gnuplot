@@ -996,6 +996,8 @@ void wxtPanel::ClearCommandlist()
 			iter->command == command_hypertext ||
 			iter->command == command_set_font)
 			delete[] iter->string;
+		if (iter->command == command_enhanced_open)
+			delete[] iter->string;
 		if (iter->command == command_filled_polygon)
 			delete[] iter->corners;
 		if (iter->command == command_image)
