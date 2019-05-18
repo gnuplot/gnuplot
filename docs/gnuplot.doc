@@ -2011,6 +2011,7 @@ C marker below is used to signal this to doc2html:
  1 Jan 1970. If the argument is real (or complex), the result is real as well.
  If the argument is a string, it is assumed to be a format string,
  and it is passed to `strftime` to provide a formatted time string.
+ See also `time_specifiers` and `timefmt`.
 4 valid
 ?expressions functions valid
 ?valid
@@ -13286,6 +13287,7 @@ Ffigure_multiple_keys
  Any points that lie outside the range of the whiskers are considered outliers.
  By default these are drawn as individual circles (pointtype 7).  The option
  `nooutliers` disables this.
+ If outliers are not drawn they do not contribute to autoscaling.
 
  By default boxplots are drawn in a style similar to candlesticks, but you have
  the option of using instead a style similar to finance bars.

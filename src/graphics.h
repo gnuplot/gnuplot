@@ -115,7 +115,7 @@ typedef enum en_procimg_action {
 
 void process_image(void *plot, t_procimg_action action);
 TBOOLEAN check_for_variable_color(struct curve_points *plot, double *colorvalue);
-
+void autoscale_boxplot(struct curve_points *plot);
 
 void place_objects(struct object *listhead, int layer, int dimensions);
 void do_ellipse(int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping );

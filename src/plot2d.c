@@ -1504,6 +1504,11 @@ boxplot_range_fiddling(struct curve_points *plot)
     if (plot->points[0].type == UNDEFINED)
 	int_error(NO_CARET,"boxplot has undefined x coordinate");
 
+    /* If outliers were processed, that has taken care of autoscaling. */
+    /* If not we need to calculate the whisker bar ends to determine yrange */
+    if (!boxplot_opts.outliers)
+	autoscale_boxplot(plot);
+
     extra_width = plot->points[0].xhigh - plot->points[0].xlow;
     if (extra_width == 0)
 	extra_width = (boxwidth > 0 && boxwidth_is_absolute) ? boxwidth : 0.5;
@@ -1524,6 +1529,7 @@ boxplot_range_fiddling(struct curve_points *plot)
 	else if (axis_array[plot->x_axis].max <= plot_max + extra_width)
 	    axis_array[plot->x_axis].max += extra_width;
     }
+
 }
 
 /* Since the stored x values for histogrammed data do not correspond exactly */
@@ -2396,6 +2402,8 @@ eval_plots()
 		    if (this_plot->plot_style == BOXPLOT) {
 			lp.p_type = boxplot_opts.pointtype;
 			lp.p_size = PTSZ_DEFAULT;
+			if (!boxplot_opts.outliers)
+			    this_plot->noautoscale = TRUE;
 		    }
 
 		    new_lt = lp_parse(&lp, LP_ADHOC,

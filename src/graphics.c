@@ -103,7 +103,7 @@ static void plot_vectors(struct curve_points * plot);
 static void plot_f_bars(struct curve_points * plot);
 static void plot_c_bars(struct curve_points * plot);
 static int compare_ypoints(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2);
-static void plot_boxplot(struct curve_points * plot);
+static void plot_boxplot(struct curve_points * plot, TBOOLEAN only_autoscale);
 
 static void place_labels(struct text_label * listhead, int layer, TBOOLEAN clip);
 static void place_arrows(int layer);
@@ -844,7 +844,7 @@ do_plot(struct curve_points *plots, int pcount)
 		break;
 
 	    case BOXPLOT:
-		plot_boxplot(this_plot);
+		plot_boxplot(this_plot, FALSE);
 		break;
 
 	    case PM3DSURFACE:
@@ -2951,8 +2951,17 @@ filter_boxplot(struct curve_points *plot)
     return N;
 }
 
+/*
+ * wrapper called by do_plot after reading in data but before plotting
+ */
+void
+autoscale_boxplot(struct curve_points *plot)
+{
+    plot_boxplot(plot, TRUE);
+}
+
 static void
-plot_boxplot(struct curve_points *plot)
+plot_boxplot(struct curve_points *plot, TBOOLEAN only_autoscale)
 {
     int N;
     struct coordinate *save_points = plot->points;
@@ -3010,6 +3019,8 @@ plot_boxplot(struct curve_points *plot)
 	/* Not enough points left to make a boxplot */
 	N = subset_count;
 	if (N < 4) {
+	    if (only_autoscale)
+		continue;
 	    candle.x = subset_points->x + boxplot_opts.separation * level;
 	    candle.yhigh = -VERYLARGE;
 	    candle.ylow = VERYLARGE;
@@ -3072,12 +3083,22 @@ plot_boxplot(struct curve_points *plot)
 	    }
 	}
 
-	/* Dummy up a single-point candlesticks plot using these limiting values */
-	candle.type = INRANGE;
+	/* X coordinate needed both for autoscaling and to draw the candlestick */
 	if (plot->plot_type == FUNC)
 	    candle.x = (subset_points[0].x + subset_points[N-1].x) / 2.;
 	else
 	    candle.x = subset_points->x + boxplot_opts.separation * level;
+
+	/* We're only here for autoscaling */
+	if (only_autoscale) {
+	    autoscale_one_point((&X_AXIS), candle.x);
+	    autoscale_one_point((&Y_AXIS), whisker_bot);
+	    autoscale_one_point((&Y_AXIS), whisker_top);
+	    continue;
+	}
+
+	/* Dummy up a single-point candlesticks plot using these limiting values */
+	candle.type = INRANGE;
 	candle.y = quartile1;
 	candle.z = quartile3;
 	candle.ylow  = whisker_bot;
