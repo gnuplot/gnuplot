@@ -78,7 +78,7 @@ DOCHEADERS = doc2x.h xref.h
 EXTRA_DIST = Makefile.in doc2texi.el figure_missing.pdf gnuplot.doc \
 titlepag.ipf titlepag.ms titlepag.tex	\
 toc_entr.sty psdoc faq-ja.tex gnuplot-ja.doc README.ja	\
-term-ja.diff plotstyles.gnu gnuplot.pdf \
+term-ja.diff plotstyles.gnu plotstyles_cvt.cmd gnuplot.pdf \
 windows/wgnuplot.hhk windows/wgnuplot.hhp windows/wgnuplot.stp windows/doc2html.c 
 
 ELCS = gnuplot-eldoc.elc
