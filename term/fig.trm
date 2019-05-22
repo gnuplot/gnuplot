@@ -1290,7 +1290,7 @@ START_HELP(fig)
 " The `fig` terminal device generates output in the Fig graphics language",
 " for import into the xfig interactive drawing tool.",
 " Notes: ",
-"       The fig terminal was significantly revised in gnuplot version 5.3.",
+"       The fig terminal was significantly revised in gnuplot 5.2.7.",
 "       Currently only version 3.2 of the fig file format is supported.",
 "       Use of dash patterns may require Xfig 3.2.6 or newer.",
 "",
