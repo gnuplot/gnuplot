@@ -101,6 +101,9 @@ extern struct value df_strings[];	/* used only by TABLESTYLE */
 /* number of columns in first row of data return to user in STATS_columns */
 extern int df_last_col;
 
+/* number of matrix elements entered as missing or NaN */
+extern int df_bad_matrix_values;
+
 /* string representing missing values, ascii datafiles */
 extern char *missing_val;
 

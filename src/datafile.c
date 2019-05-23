@@ -161,6 +161,7 @@ int df_no_use_specs;            /* how many using columns were specified */
 int df_line_number;
 int df_datum;                   /* suggested x value if none given */
 int df_last_col = 0;		/* visible to user via STATS_columns */
+int df_bad_matrix_values;
 AXIS_INDEX df_axis[MAXDATACOLS];
 TBOOLEAN df_matrix = FALSE;     /* indicates if data originated from a 2D or 3D format */
 
@@ -854,9 +855,9 @@ df_read_matrix(int *rows, int *cols)
     int max_rows = 0;
     int c;
     float *linearized_matrix = NULL;
-    int bad_data = 0;
     char *s;
     int index = 0;
+    df_bad_matrix_values = 0;
 
     *rows = 0;
     *cols = 0;
@@ -970,7 +971,7 @@ df_read_matrix(int *rows, int *cols)
 		    linearized_matrix[index++] = (float) df_column[i].datum;
 
 		if (df_column[i].good != DF_GOOD) {
-		    if (bad_data++ == 0)
+		    if (df_bad_matrix_values++ == 0)
 			int_warn(NO_CARET,"matrix contains missing or undefined values");
 		}
 	    }
