@@ -4,7 +4,7 @@
 ; Modified for 4.0, John Bollinger, 31 Dec 2002
 ; translated by Masahito Yamaga (ma@yama-ga.com) (for 3.7.2)
 ; translated by Shigeharu TAKENO 03/25 2006 (for 4.1)
-; $Id: wgp410-sj.mnu,v 1.7 2016-03-09 11:17:22+09 shige Exp $
+; $Id: wgp410-sj.mnu,v 1.11 2017-09-05 18:18:20+09 shige Exp $
 
 [Menu]
 ファイル(&F)
@@ -74,7 +74,7 @@
 [EndMenu]
 
 [Menu]
-プロット(&P)
+描画命令(&P)
 	プロット (plot)
 		plot 
 	3次元プロット (splot)
@@ -102,13 +102,13 @@
 	スタイル (単一)
 		線 (Lines)
 			with lines
-		ポイント (Points)
+		記号点 (Points)
 			with points
-		線とポイント (Lines and Points)
+		線と記号点 (Lines and Points)
 			with linespoints
-		垂線 (Impulses)
+		鉛直線 (Impulses)
 			with impulses
-		ドット (Dots)
+		小さい点 (Dots)
 			with dots
 		ステップ (Steps)
 			with steps
@@ -151,8 +151,8 @@
 [EndMenu]
 
 [Menu]
-表現(&E)
-	変数
+数式(&E)
+	変数値
 		print 
 	複素数 ...
 		{[INPUT]Real part?[EOS],[INPUT]Imaginary part?[EOS]}
@@ -171,8 +171,8 @@
 	[EndMenu]
 	[Menu]
 	2 項演算子
-		指数演算子	**
-		**
+		累乗	**
+			**
 		積	*
 			*
 		商	/
@@ -182,7 +182,7 @@
 		差	-
 			-
 		--
-		モジュロ演算子	%
+		剰余	%
 			%
 	[EndMenu]
 	[Menu]
@@ -217,6 +217,7 @@
 			[INPUT]First arg[EOS]?[INPUT]Second arg[EOS]:[INPUT]Third arg[EOS]
 	[EndMenu]
 [EndMenu]
+
 [Menu]
 関数(&N)
 	[Menu]
@@ -232,7 +233,7 @@
 			ceil([INPUT]Argument[EOS])
 		引数より大きくない最大の整数 (floor)
 			floor([INPUT]Argument[EOS])
-		整数 (int)
+		整数部分 (int)
 			int([INPUT]Argument[EOS])
 		--
 		平方根 (sqrt)
@@ -293,16 +294,16 @@
 		不完全ベータ関数 (ibeta)
 			ibeta([INPUT]First argument[EOS],[INPUT]Second argument[EOS],[INPUT]Third argument[EOS])
 		--
-		第j0次ベッセル関数 (besj0)
+		J0 ベッセル関数 (besj0)
 			besj0([INPUT]Argument[EOS])
-		第j1次ベッセル関数 (besj1)
+		J1 ベッセル関数 (besj1)
 			besj1([INPUT]Argument[EOS])
-		第y0次ベッセル関数 (besy0)
+		Y0 ベッセル関数 (besy0)
 			besy0([INPUT]Argument[EOS])
-		第y1次ベッセル関数 (besy1)
+		Y1 ベッセル関数 (besy1)
 			besy1([INPUT]Argument[EOS])
 		--
-		ランベルト W 関数 (lanbertw)
+		ランベルト W 関数 (lambertw)
 			lambertw([INPUT]Argument[EOS])
 
 	[EndMenu]
@@ -471,23 +472,23 @@
 	軸のラベルを表示
 		show xlabel{ENTER}show ylabel{ENTER}show zlabel{ENTER}
 	--
-	X 軸をひかない
+	X 軸を書かない
 		unset xzeroaxis{ENTER}
-	Y 軸をひかない
+	Y 軸を書かない
 		unset yzeroaxis{ENTER}
-	X,Y 両軸をひく
+	X,Y 両軸を書く
 		set zeroaxis{ENTER}
 	軸の状態を表示
 		show zeroaxis{ENTER}
 [EndMenu]
 
 [Menu]
-チャート(&C)
-	グリッドを表示する
+グラフ要素(&C)
+	格子線 (grid) を表示する
 		set grid{ENTER}
-	グリッドを表示しない
+	格子線 (grid) を表示しない
 		unset grid{ENTER}
-	グリッドの状態を表示
+	格子線 (grid) の状態を表示
 		show grid{ENTER}
 	--
 	矢印を追加
@@ -509,13 +510,13 @@
 	タイトルを表示
 		show title{ENTER}
 	--
-	凡例の位置を設定
+	凡例 (key) の位置を設定
 		set key [INPUT]Key position?{ENTER}
-	凡例の位置をデフォルトに
+	凡例 (key) の位置をデフォルトに
 		set key{ENTER}
-	凡例を表示しない
+	凡例 (key) を表示しない
 		unset key{ENTER}
-	凡例の位置を表示
+	凡例 (key) の位置を表示
 		show key{ENTER}
 	--
 	オフセットを設定
@@ -537,13 +538,13 @@
 	データの表示スタイル
 	線 (Lines)
 		set style data lines{ENTER}
-	ポイント (Points)
+	記号点 (Points)
 		set style data points{ENTER}
-	線とポイント (Lines + Points)
+	線と記号点 (Lines + Points)
 		set style data linespoints{ENTER}
-	ドット (Dots)
+	小さい点 (Dots)
 		set style data dots{ENTER}
-	垂線 (Impulses)
+	鉛直線 (Impulses)
 		set style data impulses{ENTER}
 	--
 	エラーバー (Error Bars)
@@ -567,13 +568,13 @@
 	関数の表示スタイル
 	線 (Lines)
 		set style function lines{ENTER}
-	ポイント (Points)
+	記号点 (Points)
 		set style function points{ENTER}
-	線とポイント (Lines + Points)
+	線と記号点 (Lines + Points)
 		set style function linespoints{ENTER}
-	ドット (Dots)
+	小さい点 (Dots)
 		set style function dots{ENTER}
-	垂線 (Impulses)
+	鉛直線 (Impulses)
 		set style function impulses{ENTER}
 	--
 	エラーバー (Error Bars)
@@ -594,8 +595,8 @@
 		unset style function{ENTER}
 	--
 	[Menu]
-	矢の表示スタイル
-	矢先 (Head)
+	矢 (arrow) の表示スタイル
+	片矢先 (Head)
 		set style arrow [INPUT]Arrow number?[EOS] head{ENTER}
 	両矢先 (Heads)
 		set style arrow [INPUT]Arrow number?[EOS] heads{ENTER}
@@ -660,15 +661,15 @@
 	等高線
 		直線で描画
 			set cntrparam linear{ENTER}
-		曲線で描画
+		3 次スプライン補間で描画
 			set cntrparam cubicspline{ENTER}
-		B-spline 補間で描画
+		B スプライン補間で描画
 			set cntrparam bspline{ENTER}
 		等高線の数
 			set cntrparam levels [INPUT]How many contours?{ENTER}
 		補間する点の数
 			set cntrparam points [INPUT]How many points for the contours?{ENTER}
-		B-spline 補間の次数
+		B スプライン補間の次数
 			set cntrparam order [INPUT]Order of B-splines (2-10)?{ENTER}
 		--
 		床に等高線を表示する
@@ -736,6 +737,10 @@
 ;   タイトル文字列内のセミコロンの次の数字はアイコンのインデックス。
 ;   MSDN の以下参照: "Toolbar Standard Button Image Index Values"
 ;   http://msdn.microsoft.com/en-us/library/bb760433%28v=vs.85%29.aspx
+;   代わりに、share/images への相対的な画像ファイルへのパスも与えられます。
+;   画像は ButtonSize (ピクセル単位) に縮尺されて読み込まれます。
+;[ButtonSize]
+;       24
 [Button]
 	再表示;4
 		replot{ENTER}
@@ -750,9 +755,9 @@
 		cd '[DIRECTORY]New directory?[EOS]'{ENTER}
 [Button]
 	印刷;14
-		set terminal [INPUT]Terminal type?{ENTER}set output "PRN"{ENTER}replot{ENTER}set terminal win{ENTER}set output{ENTER}
+		set term push;set terminal [INPUT]Terminal type?{ENTER}set output "PRN"{ENTER}replot{ENTER}set terminal pop{ENTER}unset output{ENTER}
 [Button]
-	ダンプ;14
+	ダンプ (win/wxt/qt);14
 		screendump{ENTER}
 [Button]
 	前;15

@@ -1,9 +1,9 @@
 .\" dummy line
-.\" $Id: gnuplot-ja.1,v 1.7 2014-06-17 17:31:59+09 shige Exp $
+.\" $Id: gnuplot-ja.1,v 1.9 2019-03-27 13:26:19+09 shige Exp $
 .\" 日本語訳: Shigeharu TAKENO <shige@iee.niit.ac.jp>
 .\"
-.\" .TH GNUPLOT 1 " 11 June 2014"
-.TH GNUPLOT 1 " 2014 年 6 月 11 日"
+.\" .TH GNUPLOT 1 " 15 March 2019"
+.TH GNUPLOT 1 " 2019 年 3 月 15 日"
 .UC 4
 .\" .SH NAME
 .SH 名前
@@ -94,6 +94,10 @@ gnuplot の "call" の仕組みでスクリプト scriptname を読み込み、
 \fB\-e "command list"\fP は、
 次の入力ファイルを読み込む前に指定したコマンドを実行します。
 .PP
+.\" \fB\-s, \-\-slow\fP wait for slow font initialization rather than continuing with an error.
+\fB\-s, \-\-slow\fP は、
+遅いフォントの初期化を待ち、エラーを出したまま続行することを避けます。
+.PP
 .\" \fB\-h, \-\-help\fP print summary of usage
 \fB\-h, \-\-help\fP は、使用法の要約を表示します。
 .PP
@@ -101,8 +105,6 @@ gnuplot の "call" の仕組みでスクリプト scriptname を読み込み、
 \fB\-V\fP は、現在のバージョンを表示します。
 .\" .SH X11 OPTIONS
 .SH X11 オプション
-.\" .B Gnuplot
-.\" shige -> 不要 ?
 .\" For terminal type x11, \fIgnuplot\fP
 .\" accepts the standard X Toolkit options and resources such as geometry, font,
 .\" and background. See the X(1) man page for a description of common options.

@@ -234,8 +234,8 @@ diff -ru docs/tex2ja.awk.ORG docs/tex2ja.awk
 +}
 +
 diff -ru term/ai.trm.ORG term/ai.trm
---- term/ai.trm.ORG	2018-10-04 11:17:03.658312000 +0900
-+++ term/ai.trm	2018-10-04 11:17:52.887455000 +0900
+--- term/ai.trm.ORG	2019-05-22 12:55:33.281362000 +0900
++++ term/ai.trm	2019-05-22 12:57:32.537615000 +0900
 @@ -529,6 +529,7 @@
  
  #ifdef TERM_HELP
@@ -268,8 +268,8 @@ diff -ru term/ai.trm.ORG term/ai.trm
  END_HELP(ai)
  #endif /* TERM_HELP */
 diff -ru term/aquaterm.trm.ORG term/aquaterm.trm
---- term/aquaterm.trm.ORG	2018-10-04 11:17:03.662051000 +0900
-+++ term/aquaterm.trm	2018-10-04 11:17:52.888080000 +0900
+--- term/aquaterm.trm.ORG	2019-05-22 12:55:33.285833000 +0900
++++ term/aquaterm.trm	2019-05-22 12:57:32.538367000 +0900
 @@ -1051,6 +1051,7 @@
  
  #ifdef TERM_HELP
@@ -320,8 +320,8 @@ diff -ru term/aquaterm.trm.ORG term/aquaterm.trm
  #endif /* TERM_HELP */
  
 diff -ru term/be.trm.ORG term/be.trm
---- term/be.trm.ORG	2018-10-04 11:17:03.662839000 +0900
-+++ term/be.trm	2018-10-04 11:17:52.888747000 +0900
+--- term/be.trm.ORG	2019-05-22 12:55:33.286862000 +0900
++++ term/be.trm	2019-05-22 12:57:32.539115000 +0900
 @@ -390,6 +390,7 @@
  
  #ifdef TERM_HELP
@@ -633,8 +633,8 @@ diff -ru term/be.trm.ORG term/be.trm
  END_HELP(be)
  #endif /* TERM_HELP */
 diff -ru term/caca.trm.ORG term/caca.trm
---- term/caca.trm.ORG	2018-10-04 11:17:03.662591000 +0900
-+++ term/caca.trm	2018-10-04 11:17:52.890266000 +0900
+--- term/caca.trm.ORG	2019-05-22 12:55:33.286579000 +0900
++++ term/caca.trm	2019-05-22 12:57:32.540813000 +0900
 @@ -1259,7 +1259,7 @@
  	if (CACA_charset == CACA_ASCII)
  		symbol = (point <= -1) ? L'.' : point % 26 + 'A';
@@ -808,8 +808,8 @@ diff -ru term/caca.trm.ORG term/caca.trm
  #endif /* TERM_HELP */
  
 diff -ru term/cairo.trm.ORG term/cairo.trm
---- term/cairo.trm.ORG	2018-10-04 11:17:03.663007000 +0900
-+++ term/cairo.trm	2018-10-04 11:17:52.891379000 +0900
+--- term/cairo.trm.ORG	2019-05-22 12:55:33.287069000 +0900
++++ term/cairo.trm	2019-05-22 12:57:32.542100000 +0900
 @@ -1426,6 +1426,7 @@
  
  #ifdef TERM_HELP
@@ -1206,8 +1206,8 @@ diff -ru term/cairo.trm.ORG term/cairo.trm
  #endif /* TERM_HELP */
  
 diff -ru term/canvas.trm.ORG term/canvas.trm
---- term/canvas.trm.ORG	2018-10-04 11:17:03.656035000 +0900
-+++ term/canvas.trm	2018-10-04 11:17:52.892222000 +0900
+--- term/canvas.trm.ORG	2019-05-22 12:55:33.278357000 +0900
++++ term/canvas.trm	2019-05-22 12:57:32.543042000 +0900
 @@ -1637,6 +1637,7 @@
  
  #ifdef TERM_HELP
@@ -1302,9 +1302,9 @@ diff -ru term/canvas.trm.ORG term/canvas.trm
  END_HELP(canvas)
  #endif /* TERM_HELP */
 diff -ru term/cgm.trm.ORG term/cgm.trm
---- term/cgm.trm.ORG	2018-10-04 11:17:03.656983000 +0900
-+++ term/cgm.trm	2018-10-04 11:17:52.893237000 +0900
-@@ -1739,6 +1739,7 @@
+--- term/cgm.trm.ORG	2019-05-22 12:55:33.279560000 +0900
++++ term/cgm.trm	2019-05-22 12:57:32.544204000 +0900
+@@ -1734,6 +1734,7 @@
  
  #ifdef TERM_HELP
  START_HELP(cgm)
@@ -1312,7 +1312,7 @@ diff -ru term/cgm.trm.ORG term/cgm.trm
  "1 cgm",
  "?commands set terminal cgm",
  "?set terminal cgm",
-@@ -2008,6 +2009,282 @@
+@@ -2003,6 +2004,282 @@
  " which should get you the first entry in your application's default font",
  " table. 'Helvetica Bold' will give you its second entry, etc.",
  ""
@@ -1596,8 +1596,8 @@ diff -ru term/cgm.trm.ORG term/cgm.trm
  END_HELP(cgm)
  #endif /* TERM_HELP */
 diff -ru term/context.trm.ORG term/context.trm
---- term/context.trm.ORG	2018-10-04 11:17:03.659441000 +0900
-+++ term/context.trm	2018-10-04 11:17:52.894280000 +0900
+--- term/context.trm.ORG	2019-05-22 12:55:33.282793000 +0900
++++ term/context.trm	2019-05-22 12:57:32.545418000 +0900
 @@ -1977,6 +1977,7 @@
  
  #ifdef TERM_HELP
@@ -1766,8 +1766,8 @@ diff -ru term/context.trm.ORG term/context.trm
  #endif /* TERM_HELP */
  
 diff -ru term/corel.trm.ORG term/corel.trm
---- term/corel.trm.ORG	2018-10-04 11:17:03.658560000 +0900
-+++ term/corel.trm	2018-10-04 11:17:52.894634000 +0900
+--- term/corel.trm.ORG	2019-05-22 12:55:33.281697000 +0900
++++ term/corel.trm	2019-05-22 12:57:32.545888000 +0900
 @@ -434,6 +434,7 @@
  
  #ifdef TERM_HELP
@@ -1801,8 +1801,8 @@ diff -ru term/corel.trm.ORG term/corel.trm
  END_HELP(corel)
  #endif /* TERM_HELP */
 diff -ru term/debug.trm.ORG term/debug.trm
---- term/debug.trm.ORG	2018-10-04 11:17:03.655659000 +0900
-+++ term/debug.trm	2018-10-04 11:17:52.894969000 +0900
+--- term/debug.trm.ORG	2019-05-22 12:55:33.277842000 +0900
++++ term/debug.trm	2019-05-22 12:57:32.546341000 +0900
 @@ -375,6 +375,7 @@
  
  #ifdef TERM_HELP
@@ -1829,8 +1829,8 @@ diff -ru term/debug.trm.ORG term/debug.trm
  END_HELP(debug)
  #endif
 diff -ru term/djsvga.trm.ORG term/djsvga.trm
---- term/djsvga.trm.ORG	2018-10-04 11:17:03.656762000 +0900
-+++ term/djsvga.trm	2018-10-04 11:17:52.895359000 +0900
+--- term/djsvga.trm.ORG	2019-05-22 12:55:33.279310000 +0900
++++ term/djsvga.trm	2019-05-22 12:57:32.546824000 +0900
 @@ -473,6 +473,7 @@
  */
  #ifdef TERM_HELP
@@ -1861,9 +1861,9 @@ diff -ru term/djsvga.trm.ORG term/djsvga.trm
  END_HELP(svga)
  #endif /* TERM_HELP */
 diff -ru term/dumb.trm.ORG term/dumb.trm
---- term/dumb.trm.ORG	2018-10-04 11:17:03.660072000 +0900
-+++ term/dumb.trm	2018-10-04 11:17:52.895938000 +0900
-@@ -974,6 +974,7 @@
+--- term/dumb.trm.ORG	2019-05-22 12:55:33.283458000 +0900
++++ term/dumb.trm	2019-05-22 12:57:32.547520000 +0900
+@@ -982,6 +982,7 @@
  
  #ifdef TERM_HELP
  START_HELP(dumb)
@@ -1871,7 +1871,7 @@ diff -ru term/dumb.trm.ORG term/dumb.trm
  "1 dumb",
  "?commands set terminal dumb",
  "?set terminal dumb",
-@@ -1048,5 +1049,80 @@
+@@ -1056,5 +1057,80 @@
  "        -0.8 +           ++||||+                    ++||||+    |",
  "          -1 +---+--------+--------+-------+--------+--------+-+",
  "                -4       -2        0       2        4        6  "
@@ -1953,8 +1953,8 @@ diff -ru term/dumb.trm.ORG term/dumb.trm
  END_HELP(dumb)
  #endif /* TERM_HELP */
 diff -ru term/dxf.trm.ORG term/dxf.trm
---- term/dxf.trm.ORG	2018-10-04 11:17:03.657091000 +0900
-+++ term/dxf.trm	2018-10-04 11:17:52.896343000 +0900
+--- term/dxf.trm.ORG	2019-05-22 12:55:33.279770000 +0900
++++ term/dxf.trm	2019-05-22 12:57:32.547988000 +0900
 @@ -404,6 +404,7 @@
  
  #ifdef TERM_HELP
@@ -1986,8 +1986,8 @@ diff -ru term/dxf.trm.ORG term/dxf.trm
  END_HELP(dxf)
  #endif /* TERM_HELP */
 diff -ru term/dxy.trm.ORG term/dxy.trm
---- term/dxy.trm.ORG	2018-10-04 11:17:03.655845000 +0900
-+++ term/dxy.trm	2018-10-04 11:17:52.896630000 +0900
+--- term/dxy.trm.ORG	2019-05-22 12:55:33.278066000 +0900
++++ term/dxy.trm	2019-05-22 12:57:32.548369000 +0900
 @@ -191,6 +191,7 @@
  
  #ifdef TERM_HELP
@@ -2015,9 +2015,9 @@ diff -ru term/dxy.trm.ORG term/dxy.trm
  END_HELP(dxy800a)
  #endif
 diff -ru term/eepic.trm.ORG term/eepic.trm
---- term/eepic.trm.ORG	2018-10-04 11:17:03.656569000 +0900
-+++ term/eepic.trm	2018-10-04 11:17:52.897097000 +0900
-@@ -577,6 +577,7 @@
+--- term/eepic.trm.ORG	2019-05-22 12:55:33.279057000 +0900
++++ term/eepic.trm	2019-05-22 12:57:32.549097000 +0900
+@@ -575,6 +575,7 @@
  
  #ifdef TERM_HELP
  START_HELP(eepic)
@@ -2025,7 +2025,7 @@ diff -ru term/eepic.trm.ORG term/eepic.trm
  "1 eepic",
  "?commands set terminal eepic",
  "?set terminal eepic",
-@@ -658,5 +659,93 @@
+@@ -656,5 +657,93 @@
  "        set xlabel '[t]{\\LaTeX\\ -- $ \\gamma $}'",
  " The other label -- account for long ticlabels:",
  "        set ylabel '[r]{\\LaTeX\\ -- $ \\gamma $\\rule{7mm}{0pt}}'"
@@ -2120,8 +2120,8 @@ diff -ru term/eepic.trm.ORG term/eepic.trm
  END_HELP(eepic)
  #endif /* TERM_HELP */
 diff -ru term/emf.trm.ORG term/emf.trm
---- term/emf.trm.ORG	2018-10-04 11:17:03.661897000 +0900
-+++ term/emf.trm	2018-10-04 11:17:52.898000000 +0900
+--- term/emf.trm.ORG	2019-05-22 12:55:33.285656000 +0900
++++ term/emf.trm	2019-05-22 12:57:32.550134000 +0900
 @@ -1971,6 +1971,7 @@
  
  #ifdef TERM_HELP
@@ -2178,8 +2178,8 @@ diff -ru term/emf.trm.ORG term/emf.trm
  END_HELP(emf)
  #endif /* TERM_HELP */
 diff -ru term/emxvga.trm.ORG term/emxvga.trm
---- term/emxvga.trm.ORG	2018-10-04 11:17:03.656836000 +0900
-+++ term/emxvga.trm	2018-10-04 11:17:52.898401000 +0900
+--- term/emxvga.trm.ORG	2019-05-22 12:55:33.279381000 +0900
++++ term/emxvga.trm	2019-05-22 13:00:43.321574000 +0900
 @@ -475,6 +475,7 @@
  #endif /* TERM_PROTO_ONLY */
  #ifdef TERM_HELP
@@ -2188,8 +2188,8 @@ diff -ru term/emxvga.trm.ORG term/emxvga.trm
  "1 emxvga",
  "?commands set terminal emxvga",
  "?set terminal emxvga",
-@@ -507,5 +508,41 @@
- "       set terminal vgal",
+@@ -500,5 +501,34 @@
+ "       set terminal emxvesa {vesa-mode}",
  "",
  " The only option is the vesa mode for `emxvesa`, which defaults to G640x480x256."
 +#else /* JAPANESE_DOC */
@@ -2206,14 +2206,8 @@ diff -ru term/emxvga.trm.ORG term/emxvga.trm
 +"?terminal emxvesa",
 +"?term emxvesa",
 +"?emxvesa",
-+"?commands set terminal vgal",
-+"?set terminal vgal",
-+"?set term vgal",
-+"?terminal vgal",
-+"?term vgal",
-+"?vgal",
 +" 注意: 古い (legacy) 出力形式です。",
-+" `emxvga`, `emxvesa`, `vgal` の各ドライバはそれぞれ SVGA, vesa SVGA,",
++" `emxvga`, `emxvesa` の各ドライバはそれぞれ SVGA, VESA SVGA,",
 +" VGA グラッフィックボードの PC をサポートします。これらは DOS、または",
 +" OS/2 上で、\"emx-gcc\" でコンパイルされたることを意図しています。これ",
 +" らにはさらに VESA パッケージと SVGAKIT が必要です。これらは Johannes",
@@ -2223,7 +2217,6 @@ diff -ru term/emxvga.trm.ORG term/emxvga.trm
 +" 書式:",
 +"       set terminal emxvga",
 +"       set terminal emxvesa {vesa-mode}",
-+"       set terminal vgal",
 +"",
 +" 唯一のオプションは `emxvesa` に対する vesa のモードで、デフォルトでは",
 +" それは G640x480x256 となっています。"
@@ -2231,8 +2224,8 @@ diff -ru term/emxvga.trm.ORG term/emxvga.trm
  END_HELP(emxvga)
  #endif /* TERM_HELP */
 diff -ru term/epson.trm.ORG term/epson.trm
---- term/epson.trm.ORG	2018-10-04 11:17:03.658898000 +0900
-+++ term/epson.trm	2018-10-04 11:17:52.898999000 +0900
+--- term/epson.trm.ORG	2019-05-22 12:55:33.282103000 +0900
++++ term/epson.trm	2019-05-22 12:57:32.551393000 +0900
 @@ -1088,6 +1088,7 @@
  
  #ifdef TERM_HELP
@@ -2342,8 +2335,8 @@ diff -ru term/epson.trm.ORG term/epson.trm
  END_HELP(epson_180dpi)
  #endif /* TERM_HELP */
 diff -ru term/excl.trm.ORG term/excl.trm
---- term/excl.trm.ORG	2018-10-04 11:17:03.658166000 +0900
-+++ term/excl.trm	2018-10-04 11:17:52.899331000 +0900
+--- term/excl.trm.ORG	2019-05-22 12:55:33.281179000 +0900
++++ term/excl.trm	2019-05-22 12:57:32.551836000 +0900
 @@ -273,6 +273,7 @@
  
  #ifdef TERM_HELP
@@ -2371,9 +2364,9 @@ diff -ru term/excl.trm.ORG term/excl.trm
  END_HELP(excl)
  #endif
 diff -ru term/fig.trm.ORG term/fig.trm
---- term/fig.trm.ORG	2018-10-04 11:17:03.655529000 +0900
-+++ term/fig.trm	2018-10-04 11:17:52.900300000 +0900
-@@ -1366,6 +1366,7 @@
+--- term/fig.trm.ORG	2019-05-22 12:55:33.277673000 +0900
++++ term/fig.trm	2019-05-23 08:24:41.258575000 +0900
+@@ -1279,6 +1279,7 @@
  
  #ifdef TERM_HELP
  START_HELP(fig)
@@ -2381,10 +2374,10 @@ diff -ru term/fig.trm.ORG term/fig.trm
  "1 fig",
  "?commands set terminal fig",
  "?set terminal fig",
-@@ -1457,6 +1458,101 @@
- "",
- " To plot the error bars on top of the circles use",
- "       plot 'file.dat' using 1:2:3 with err linetype 1 pointtype 2554"
+@@ -1336,6 +1337,68 @@
+ "       set linetype 999 lc rgb '#aabbcc'",
+ "       plot $data with fillecurve fillcolor rgb '#aabbcc'",
+ ""
 +#else /* JAPANESE_DOC */
 +"1 fig",
 +"?commands set terminal fig",
@@ -2394,99 +2387,66 @@ diff -ru term/fig.trm.ORG term/fig.trm
 +"?term fig",
 +"?fig",
 +"?xfig",
-+" `fig` ドライバは Fig グラフィック言語での出力を生成します。",
++" `fig` ドライバは、対話型描画ツール xfig に取り込める Fig グラフィック言",
++" 語での出力を生成します。",
++" 注意:",
++"        fig 出力形式は、gnuplot バージョン 5.3 で大きく改訂されました。",
++"        現在は fig ファイル形式バージョン 3.2 のみサポートしています。",
++"        点線/破線パターンを利用するには Xfig 3.2.6 以降が必要です。",
 +"",
 +" 書式:",
 +"       set terminal fig {monochrome | color}",
++"                        {small | big | size <xsize>{in|cm},<ysize>{in|cm}}",
 +"                        {landscape | portrait}",
-+"                        {small | big | size <xsize> <ysize>}",
-+"                        {metric | inches}",
-+"                        {pointsmax <max_points>}",
-+"                        {solid | dashed}",
-+"                        {font \"<fontname>{,<fontsize>}\"}",
++"                        {font \"<fontname>{,<fontsize>}\"} {fontsize <size>}",
 +"                        {textnormal | {textspecial texthidden textrigid}}",
-+"                        {{thickness|linewidth} <units>}",
-+"                        {depth <layer>}",
-+"                        {version <number>}",
++"                        {{linewidth|lw} <multiplier>}",
 +"",
-+" `monochrome` と `color` は 画像を白黒にするか `color` にするかを決定し",
-+" ます。`small` と `big` は、デフォルトの `landscape` モードではグラフを",
-+" 5x3 インチにするか 8x5 インチにするか、`portrait` モードでは 3x5 イン",
-+" チにするか 5x8 インチにするかを決定します。`size` は描画範囲を",
-+" <xsize>*<ysize> に設定 (変更) します。この場合の単位は、`inches` か",
-+" `metric` かの設定によってそれぞれインチかセンチメートルかになります。",
-+" この設定は \"xfig\" での編集に対するデフォルトの単位としても使われます。",
++" デフォルトの設定は、",
++"       set term fig color small landscape font \"Times Roman,10\" lw 1.0",
 +"",
-+" `pointsmax <max_points>` は折れ線の最大点数を設定します。",
-+"",
-+" `solid` は、実線 (solid) の linestyle が全部使われてしまった後で自動的",
-+" に使われる点線の使用を抑制し、別な形で表示します。",
++" `size` は描画範囲を <xsize>*<ysize> に、インチ単位 (デフォルト) かセン",
++" チ単位で設定 (変更) します。デフォルトは `size 5in,3in` です。",
++" `small` は `size 5in,3in` (portrait モードでは 3in,5in) の省略形、",
++" `big` は `size 8in,5in` の省略形です。",
 +"",
 +" `font` は、テキストフォントフェース名を <fontname> に、フォントサイズを",
-+" <fontsize> ポイントに設定します。`textnormal` はテキストフラグの設定を",
-+" リセットして postscript フォントを選択し、`textspecial` はテキストフラ",
-+" グを LaTeX special に設定し、`texthidden`, `textrigid` はそれぞれ無表示",
-+" のテキスト、スケーリングされないテキスト用のフラグを設定します。",
++" <fontsize> ポイントに設定します。その選択は、35 の標準 PostScript フォ",
++" ントに限定されています。",
++" `textnormal` はテキストフラグをリセットして postscript フォントを選択し、",
++" `textspecial` はテキストフラグを LaTeX special に設定し、",
++" `texthidden`, `textrigid` はそれぞれ無表示のテキスト、スケーリングされ",
++" ないテキスト用のフラグを設定します。",
 +"",
-+" `depth` は全ての線と文字列に対する、重なりに関するデフォルトの深さ",
-+" (depth layer) を設定します。デフォルトの深さは 10 で、\"xfig\" でグラフ",
-+" の上に何かを上書きするための余地を残しています。",
++" `linewidth` は、すべての線に対する linewidth の値への倍率です。",
 +"",
-+" `version` は生成される fig 出力の書式バージョンを設定します。現在は、",
-+" バージョン 3.1 と 3.2 のみがサポートされています。",
-+"",
-+" `thickness` はデフォルトの線の太さを設定し、指定されなければ 1 になりま",
-+" す。太さの変更は、`plot` コマンドの `linetype` の値に 100 倍の数を加え",
-+" ることで実現できます。同様に、(デフォルトの深さに対する) 各描画要素の",
-+" 深さの値は <linetype> に 1000 倍の数を加えることで制御できます。よって",
-+" その深さは <layer>+<linetype>/1000 になり、線の太さは (<linetype>%1000)",
-+" /100 となりますが、その値が 0 の場合はデフォルトの線の太さになります。",
-+" `linewidth` は `thickness` と同義です。",
-+"",
-+" `plot` コマンドの `point` スタイルによる描画の際の記号を `fig` ドライ",
-+" バで追加することもできます。記号の指定は (`pointtype` の値) % 100 の",
-+" 50 以上の値が使われ、その塗りつぶしの濃さは <pointtype> % 5 の値で制御",
-+" し、その輪郭は黒 (<pointtype> % 10 < 5 の場合) または現在の色で書かれ",
-+" ます。利用可能な記号は以下の通りです。",
++" `fig` ドライバには `plot` コマンドの `point` スタイルの記号が追加されて",
++" います。記号の指定は (`pointtype` の値) % 100 の 50 以上の値が使われ、",
++" その塗りつぶしの濃さは <pointtype> % 5 の値で制御し、その輪郭は黒",
++" (<pointtype> % 10 < 5 の場合) または現在の色で書かれます。利用可能な記",
++" 号は以下の通りです。",
 +"         50 - 59:  円",
 +"         60 - 69:  正方形",
 +"         70 - 79:  ひし形",
 +"         80 - 89:  上向きの三角形",
 +"         90 - 99:  下向きの三角形",
-+" これらの記号の大きさはフォントの大きさと関係しています。デフォルトでは",
-+" 記号の深さは、良いエラーバーを実現するために、線の深さより 1 だけ小さ",
-+" い値になっています。<pointtype> が 1000 より大きい場合、深さは <layer>",
-+" +<pointtype>/1000-1 になります。<pointtype>%1000 が 100 より大きい場合",
-+" 塗りつぶし色は (<pointtype>%1000)/100-1 になります。",
++" これらの記号の大きさはフォントの大きさで変更できます。",
 +"",
-+" 有効な塗りつぶし色 (1 から 9) は、黒、青、緑、水色、赤、紫、黄、白、暗",
-+" い青 (白黒モードでは 1 から 6 までは黒で 7 から 9 までは白) です。",
-+"",
-+" <linetype> と <pointtype> の詳細については、以下参照: `plot with`。",
-+"",
-+" `big` オプションは以前のバージョンの `bfig` ドライバの代用品ですが、こ",
-+" のドライバは今はもうサポートされていません。",
-+"",
++" RGB 色は、それが描画の前に線種として定義されているものではない場合、ま",
++" たは登録されている色名やパレット値に一致しなかった場合は灰色で置き換え",
++" られます。以下参照: `colornames`。",
 +" 例:",
-+"       set terminal fig monochrome small pointsmax 1000  # デフォルト",
-+"",
-+"       plot 'file.dat' with points linetype 102 pointtype 759",
-+" は、黄色で塗りつぶされた円を生成し、それら輪郭は幅 1 の青い線です。",
-+"",
-+"       plot 'file.dat' using 1:2:3 with err linetype 1 pointtype 554",
-+" は黒い線によるエラーバーと赤で塗りつぶされた円を生成します。この円は線",
-+" よりも 1 層だけ上になります (デフォルトでは深さは 9)。",
-+"",
-+" 円の上にエラーバーを書くには以下のようにしてください。",
-+"       plot 'file.dat' using 1:2:3 with err linetype 1 pointtype 2554"
++"       set linetype 999 lc rgb '#aabbcc'",
++"       plot $data with fillecurve fillcolor rgb '#aabbcc'",
++""
 +#endif /* JAPANESE_DOC */
  END_HELP(fig)
  #endif /* TERM_HELP */
  
 diff -ru term/gd.trm.ORG term/gd.trm
---- term/gd.trm.ORG	2018-10-04 11:17:03.659935000 +0900
-+++ term/gd.trm	2018-10-04 11:17:52.901859000 +0900
-@@ -2483,6 +2483,7 @@
+--- term/gd.trm.ORG	2019-05-22 12:55:33.283293000 +0900
++++ term/gd.trm	2019-05-22 12:57:32.555009000 +0900
+@@ -2491,6 +2491,7 @@
  #ifndef JPEG_HELP_ONLY
  #ifdef TERM_HELP
  START_HELP(png)
@@ -2494,7 +2454,7 @@ diff -ru term/gd.trm.ORG term/gd.trm
  "1 png",
  "?commands set terminal png",
  "?set terminal png",
-@@ -2559,6 +2560,88 @@
+@@ -2567,6 +2568,88 @@
  " Use 24 bits of color information per pixel, with a transparent background.",
  " Use the `enhanced text` mode to control the layout of strings to be printed.",
  ""
@@ -2583,7 +2543,7 @@ diff -ru term/gd.trm.ORG term/gd.trm
  END_HELP(png)
  #endif /* TERM_HELP */
  #endif /* JPEG_HELP_ONLY */
-@@ -2641,6 +2724,7 @@
+@@ -2649,6 +2732,7 @@
  
  #ifdef TERM_HELP
  START_HELP(jpeg)
@@ -2591,7 +2551,7 @@ diff -ru term/gd.trm.ORG term/gd.trm
  "1 jpeg",
  "?commands set terminal jpeg",
  "?set terminal jpeg",
-@@ -2688,6 +2772,55 @@
+@@ -2696,6 +2780,55 @@
  " Blank space at the edges of the finished plot may be trimmed using the `crop`",
  " option, resulting in a smaller final image size. Default is `nocrop`.",
  ""
@@ -2647,7 +2607,7 @@ diff -ru term/gd.trm.ORG term/gd.trm
  END_HELP(jpeg)
  #endif /* TERM_HELP */
  #endif /* HAVE_GD_JPEG */
-@@ -2797,6 +2930,7 @@
+@@ -2805,6 +2938,7 @@
  
  #ifdef TERM_HELP
  START_HELP(gif)
@@ -2655,7 +2615,7 @@ diff -ru term/gd.trm.ORG term/gd.trm
  "1 gif",
  "?commands set terminal gif",
  "?set terminal gif",
-@@ -2893,6 +3027,111 @@
+@@ -2901,6 +3035,111 @@
  " frames of the animation sequence are created by the script file animate2.dem",
  " from the standard collection of demos.",
  ""
@@ -2767,7 +2727,7 @@ diff -ru term/gd.trm.ORG term/gd.trm
  END_HELP(gif)
  #endif /* TERM_HELP */
  #endif /* HAVE_GD_GIF */
-@@ -2985,6 +3224,7 @@
+@@ -2993,6 +3232,7 @@
  
  #ifdef TERM_HELP
  START_HELP(sixelgd)
@@ -2775,7 +2735,7 @@ diff -ru term/gd.trm.ORG term/gd.trm
  "1 sixelgd",
  "?commands set terminal sixelgd",
  "?set terminal sixelgd",
-@@ -3043,6 +3283,69 @@
+@@ -3051,6 +3291,69 @@
  " terminals.  The later two support the `truecolor` mode using 256 sixel",
  " colors out of box. Distributed copies of xterm may or may not have been",
  " configured to support sixel graphics and 256 colors."
@@ -2846,8 +2806,8 @@ diff -ru term/gd.trm.ORG term/gd.trm
  #endif /* TERM_HELP */
  #endif /* WITH_GD_SIXEL */
 diff -ru term/ggi.trm.ORG term/ggi.trm
---- term/ggi.trm.ORG	2018-10-04 11:17:03.656113000 +0900
-+++ term/ggi.trm	2018-10-04 11:17:52.902619000 +0900
+--- term/ggi.trm.ORG	2019-05-22 12:55:33.278473000 +0900
++++ term/ggi.trm	2019-05-22 12:57:32.555856000 +0900
 @@ -1510,6 +1510,7 @@
  
  #ifdef TERM_HELP
@@ -2900,8 +2860,8 @@ diff -ru term/ggi.trm.ORG term/ggi.trm
  END_HELP(ggi)
  #endif
 diff -ru term/gpic.trm.ORG term/gpic.trm
---- term/gpic.trm.ORG	2018-10-04 11:17:03.655943000 +0900
-+++ term/gpic.trm	2018-10-04 11:17:52.902986000 +0900
+--- term/gpic.trm.ORG	2019-05-22 12:55:33.278213000 +0900
++++ term/gpic.trm	2019-05-22 12:57:32.556328000 +0900
 @@ -294,6 +294,7 @@
  
  #ifdef TERM_HELP
@@ -2977,8 +2937,8 @@ diff -ru term/gpic.trm.ORG term/gpic.trm
  END_HELP(gpic)
  #endif /* TERM_HELP */
 diff -ru term/grass.trm.ORG term/grass.trm
---- term/grass.trm.ORG	2018-10-04 11:17:03.659010000 +0900
-+++ term/grass.trm	2018-10-04 11:17:52.903418000 +0900
+--- term/grass.trm.ORG	2019-05-22 12:55:33.282239000 +0900
++++ term/grass.trm	2019-05-22 12:57:32.556853000 +0900
 @@ -624,6 +624,7 @@
  
  #ifdef TERM_HELP
@@ -3008,8 +2968,8 @@ diff -ru term/grass.trm.ORG term/grass.trm
  END_HELP(grass)
  #endif
 diff -ru term/hp26.trm.ORG term/hp26.trm
---- term/hp26.trm.ORG	2018-10-04 11:17:03.658637000 +0900
-+++ term/hp26.trm	2018-10-04 11:17:52.903864000 +0900
+--- term/hp26.trm.ORG	2019-05-22 12:55:33.281773000 +0900
++++ term/hp26.trm	2019-05-22 12:57:32.557430000 +0900
 @@ -691,6 +691,7 @@
  
  #ifdef TERM_HELP
@@ -3036,8 +2996,8 @@ diff -ru term/hp26.trm.ORG term/hp26.trm
  END_HELP(hp2623a)
  #endif
 diff -ru term/hp2648.trm.ORG term/hp2648.trm
---- term/hp2648.trm.ORG	2018-10-04 11:17:03.658948000 +0900
-+++ term/hp2648.trm	2018-10-04 11:17:52.904149000 +0900
+--- term/hp2648.trm.ORG	2019-05-22 12:55:33.282165000 +0900
++++ term/hp2648.trm	2019-05-22 12:57:32.557797000 +0900
 @@ -188,6 +188,7 @@
  
  #ifdef TERM_HELP
@@ -3064,8 +3024,8 @@ diff -ru term/hp2648.trm.ORG term/hp2648.trm
  END_HELP(hp2648)
  #endif
 diff -ru term/hp500c.trm.ORG term/hp500c.trm
---- term/hp500c.trm.ORG	2018-10-04 11:17:03.662375000 +0900
-+++ term/hp500c.trm	2018-10-04 11:17:52.904589000 +0900
+--- term/hp500c.trm.ORG	2019-05-22 12:55:33.286238000 +0900
++++ term/hp500c.trm	2019-05-22 12:57:32.558260000 +0900
 @@ -527,6 +527,7 @@
  
  #ifdef TERM_HELP
@@ -3102,8 +3062,8 @@ diff -ru term/hp500c.trm.ORG term/hp500c.trm
  END_HELP(hp500c)
  #endif /* TERM_HELP */
 diff -ru term/hpgl.trm.ORG term/hpgl.trm
---- term/hpgl.trm.ORG	2018-10-04 11:17:03.658423000 +0900
-+++ term/hpgl.trm	2018-10-04 11:17:52.905685000 +0900
+--- term/hpgl.trm.ORG	2019-05-22 12:55:33.281515000 +0900
++++ term/hpgl.trm	2019-05-22 12:57:32.559495000 +0900
 @@ -2611,6 +2611,7 @@
  #endif /* TERM_PROTO_ONLY */
  #ifdef TERM_HELP
@@ -3200,8 +3160,8 @@ diff -ru term/hpgl.trm.ORG term/hpgl.trm
  END_HELP(hpgl)
  #endif /* TERM_HELP */
 diff -ru term/hpljii.trm.ORG term/hpljii.trm
---- term/hpljii.trm.ORG	2018-10-04 11:17:03.659669000 +0900
-+++ term/hpljii.trm	2018-10-04 11:17:52.906073000 +0900
+--- term/hpljii.trm.ORG	2019-05-22 12:55:33.282986000 +0900
++++ term/hpljii.trm	2019-05-22 12:57:32.559950000 +0900
 @@ -401,6 +401,7 @@
  
  #ifdef TERM_HELP
@@ -3246,8 +3206,8 @@ diff -ru term/hpljii.trm.ORG term/hpljii.trm
  END_HELP(hpljii)
  #endif /* TERM_HELP */
 diff -ru term/hppj.trm.ORG term/hppj.trm
---- term/hppj.trm.ORG	2018-10-04 11:17:03.662118000 +0900
-+++ term/hppj.trm	2018-10-04 11:17:52.906380000 +0900
+--- term/hppj.trm.ORG	2019-05-22 12:55:33.285897000 +0900
++++ term/hppj.trm	2019-05-22 12:57:32.560358000 +0900
 @@ -273,6 +273,7 @@
  
  #ifdef TERM_HELP
@@ -3280,8 +3240,8 @@ diff -ru term/hppj.trm.ORG term/hppj.trm
  END_HELP(hppj)
  #endif
 diff -ru term/imagen.trm.ORG term/imagen.trm
---- term/imagen.trm.ORG	2018-10-04 11:17:03.656178000 +0900
-+++ term/imagen.trm	2018-10-04 11:17:52.906866000 +0900
+--- term/imagen.trm.ORG	2019-05-22 12:55:33.278558000 +0900
++++ term/imagen.trm	2019-05-22 12:57:32.560956000 +0900
 @@ -886,6 +886,7 @@
  
  #ifdef TERM_HELP
@@ -3322,8 +3282,8 @@ diff -ru term/imagen.trm.ORG term/imagen.trm
  END_HELP(imagen)
  #endif
 diff -ru term/kyo.trm.ORG term/kyo.trm
---- term/kyo.trm.ORG	2018-10-04 11:17:03.656619000 +0900
-+++ term/kyo.trm	2018-10-04 11:17:52.907152000 +0900
+--- term/kyo.trm.ORG	2019-05-22 12:55:33.279118000 +0900
++++ term/kyo.trm	2019-05-22 12:57:32.561367000 +0900
 @@ -204,6 +204,7 @@
  
  #ifdef TERM_HELP
@@ -3358,8 +3318,8 @@ diff -ru term/kyo.trm.ORG term/kyo.trm
  END_HELP(kyo)
  #endif
 diff -ru term/latex.trm.ORG term/latex.trm
---- term/latex.trm.ORG	2018-10-04 11:17:03.655796000 +0900
-+++ term/latex.trm	2018-10-04 11:17:52.907716000 +0900
+--- term/latex.trm.ORG	2019-05-22 12:55:33.278007000 +0900
++++ term/latex.trm	2019-05-22 12:57:32.562058000 +0900
 @@ -955,6 +955,7 @@
  
  #ifdef TERM_HELP
@@ -3437,8 +3397,8 @@ diff -ru term/latex.trm.ORG term/latex.trm
  END_HELP(latex)
  #endif /* TERM_TABLE */
 diff -ru term/linux.trm.ORG term/linux.trm
---- term/linux.trm.ORG	2018-10-04 11:17:03.659999000 +0900
-+++ term/linux.trm	2018-10-04 11:20:12.767504000 +0900
+--- term/linux.trm.ORG	2019-05-22 12:55:33.283371000 +0900
++++ term/linux.trm	2019-05-22 12:57:32.562547000 +0900
 @@ -451,6 +451,7 @@
  
  #ifdef TERM_HELP
@@ -3468,10 +3428,10 @@ diff -ru term/linux.trm.ORG term/linux.trm
  END_HELP(linux)
  #endif
 diff -ru term/lua/gnuplot-tikz-ja.help.ORG term/lua/gnuplot-tikz-ja.help
---- term/lua/gnuplot-tikz-ja.help.ORG	2018-10-04 11:20:49.559521000 +0900
-+++ term/lua/gnuplot-tikz-ja.help	2018-10-04 11:20:49.530397000 +0900
-@@ -0,0 +1,173 @@
-+/* $Id: gnuplot-tikz-ja.help,v 1.1 2014-12-12 13:26:57+09 shige Exp $ */
+--- term/lua/gnuplot-tikz-ja.help.ORG	2019-05-23 09:17:14.353993000 +0900
++++ term/lua/gnuplot-tikz-ja.help	2019-05-23 09:17:14.352392000 +0900
+@@ -0,0 +1,176 @@
++/* $Id: gnuplot-tikz-ja.help,v 1.2 2019-05-23 09:09:38+09 shige Exp $ */
 +#ifdef JAPANESE_DOC
 +"2 lua tikz",
 +"?set terminal lua tikz",
@@ -3485,7 +3445,6 @@ diff -ru term/lua/gnuplot-tikz-ja.help.ORG term/lua/gnuplot-tikz-ja.help
 +"",
 +"      {latex | tex | context}",
 +"      {color | monochrome}",
-+"      {dashed | solid}",
 +"      {nooriginreset | originreset}",
 +"      {nogparrows | gparrows}",
 +"      {nogppoints | gppoints}",
@@ -3499,6 +3458,8 @@ diff -ru term/lua/gnuplot-tikz-ja.help.ORG term/lua/gnuplot-tikz-ja.help
 +"      {charsize <x>{unit},<y>{unit}}",
 +"      {font \"<fontdesc>\"}",
 +"      {{fontscale | textscale} <scale>}",
++"      {dashlength | dl <DL>}",
++"      {linewidth | lw <LW>}",
 +"      {nofulldoc | nostandalone | fulldoc | standalone}",
 +"      {{preamble | header} \"<preamble_string>\"}",
 +"      {tikzplot <ltn>,...}",
@@ -3520,8 +3481,6 @@ diff -ru term/lua/gnuplot-tikz-ja.help.ORG term/lua/gnuplot-tikz-ja.help
 +"",
 +" 'monochrome' は、線の色付けを無効にし、塗り潰しを灰色階調に切り替えま",
 +" す。",
-+"",
-+" 'solid' は、実線のみを使用します。",
 +"",
 +" 'originreset' は、TikZ 画の原点を、描画の左下角へ移動します。これはい",
 +" くつかの描画を一つの tikzpicture 環境内に整列するのに使用できます。こ",
@@ -3571,6 +3530,10 @@ diff -ru term/lua/gnuplot-tikz-ja.help.ORG term/lua/gnuplot-tikz-ja.help
 +" オプション 'fontscale', 'textscale' には、縮尺比パラメータが必要です。",
 +" グラフ内のすべての文字列がその縮尺比で伸縮されます。",
 +"",
++" 'dashlength' (または 'dl') は、分割する破線の長さを、正の浮動小数点値",
++" <DL> で伸縮します。'linewidth' (または 'ld') はすべての線幅を <LW> で",
++" 伸縮します。",
++"",
 +" オプション 'tex', 'latex', 'context' は、TeX 出力形式の選択です。デフォ",
 +" ルトは LaTeX です。そのスタイルファイルを読み込むには、あなたの文書ファ",
 +" イルの先頭に対応する行を入れてください:",
@@ -3593,13 +3556,13 @@ diff -ru term/lua/gnuplot-tikz-ja.help.ORG term/lua/gnuplot-tikz-ja.help
 +" イルが存在します。1 以上のすべての線種に対して、デフォルトの描画スタイ",
 +" ルは 'smooth' です。",
 +"",
-+" オプション 'tikzarrows' を使用すると、ユーザの定義した gnuplot の矢",
-+" (arrow) のスタイルを TikZ の矢のスタイルに割り当てます。これは、矢の定",
-+" 義の角の値を '誤って使用する' ことでなされています。例えば、角 '7' に",
-+" よる矢のスタイルは TikZ スタイル 'gp arrow 7' に割り当てられ、他に与え",
-+" られた値はすべて無視されます。デフォルトでは、TikZ 出力形式はすべての",
-+" 矢に対してステルス形の矢先を使用します。デフォルトの gnuplot のように",
-+" するには、オプション 'gparrows' を使用してください。",
++" tikz 出力形式は、デフォルトでは単純な LaTeX の矢 (arrow) を生成します",
++" が、gnuplot の 'arrowstyle' の設定に従う矢を生成したければ、オプション",
++" 'gparrows' を使用してください。オプション 'tikzarrows' は、これら両者を",
++" 使用しない第 3 のもので、その arrowstyle に代わり、'angle' パラメータが",
++" あらかじめ定義されている TikZ の 12 の矢のスタイルの番号指定として使用",
++" されます。例えば、angle '7' の矢のスタイルは TikZ スタイル 'gp arrow 7'",
++" に割り当てられ、他の arrowstyle の設定はすべて無視されます。",
 +"",
 +" 'cmykimages' では、インライン画像データに対して RGB カラーモデルの代わ",
 +" りに CMYK モデルを使用しますが、他のすべての色 (線の色など) は、それら",
@@ -3627,12 +3590,12 @@ diff -ru term/lua/gnuplot-tikz-ja.help.ORG term/lua/gnuplot-tikz-ja.help
 +" 有効なフォントコマンドを入れることもでき、それは、\"font=<fontdesc>\"",
 +" の形式のノードパラメータとして直接渡されます。これは、あるノードにコー",
 +" ドを追加するのに「わざと間違えて」使えます。例えば '\\small,yshift=1ex'",
-+" も有効ですが、',yshift=1ex' も有効で、こちらは現在のフォント設定を変更",
-+" しません。しかしリストの第 2 引数は例外です。それが <数値>{単位} の形式",
-+" の数値の場合、それは他の出力形式でそうであるようにフォントサイズと解釈",
-+" され、第 1 引数に追加されてしまいます。単位が省略された値は 'pt' 単位と",
-+" 解釈されます。例えば、'\\sffamily,12,fill=red' は、背景色が赤で 12pt の",
-+" LaTeX sans serif フォントを設定します。",
++" も有効ですが、',yshift=1ex' も有効で、後者は現在のフォント設定を変更し",
++" ません。しかしリストの第 2 引数は例外で、それが <数値>{単位} の形式の数",
++" 値の場合、それは他の出力形式同様にフォントサイズと解釈し、第 1 引数に追",
++" 加されてしまいます。単位を省略した値は 'pt' 単位と解釈します。例えば、",
++" '\\sffamily,12,fill=red' は、背景色が赤で 12pt の LaTeX sans serif フォ",
++" ントを設定します。",
 +" 同じことが ConTeXt にも言えます。例えば、'\\switchtobodyfont[iwona],10'",
 +" はフォントを 10pt サイズの Iwona に変更します。",
 +" Plain TeX ユーザは、フォントサイズの変更は最初の引数で明示的に行わなけ",
@@ -3645,9 +3608,9 @@ diff -ru term/lua/gnuplot-tikz-ja.help.ORG term/lua/gnuplot-tikz-ja.help
 +""
 +#endif /* JAPANESE_DOC */
 diff -ru term/lua.trm.ORG term/lua.trm
---- term/lua.trm.ORG	2018-10-04 11:17:03.658505000 +0900
-+++ term/lua.trm	2018-10-04 11:17:52.909099000 +0900
-@@ -1487,6 +1487,7 @@
+--- term/lua.trm.ORG	2019-05-22 12:55:33.281630000 +0900
++++ term/lua.trm	2019-05-22 12:57:32.563773000 +0900
+@@ -1489,6 +1489,7 @@
  
  #ifdef TERM_HELP
  START_HELP(lua)
@@ -3655,7 +3618,7 @@ diff -ru term/lua.trm.ORG term/lua.trm
  "1 lua",
  "?commands set terminal lua",
  "?set terminal lua",
-@@ -1513,12 +1514,45 @@
+@@ -1515,12 +1516,45 @@
  " All arguments will be provided to the selected script for further",
  " evaluation. E.g. 'set term lua tikz help' will cause the script itself",
  " to print additional help on options and choices for the script.",
@@ -3692,8 +3655,8 @@ diff -ru term/lua.trm.ORG term/lua.trm
  #include "gnuplot-tikz.help"
 +#else
 +#include "lua/gnuplot-tikz-ja.help"
-+#endif
  #endif
++#endif
  ""
  END_HELP(lua)
  START_HELP(tikz)
@@ -3701,7 +3664,7 @@ diff -ru term/lua.trm.ORG term/lua.trm
  "1 tikz",
  "?commands set terminal tikz",
  "?set terminal tikz",
-@@ -1531,5 +1565,19 @@
+@@ -1533,5 +1567,19 @@
  " `set term tikz` is a short form of the command `set term lua tikz`.",
  " See `term lua` for more information.  Use the command `set term tikz help`",
  " to print terminal options."
@@ -3722,8 +3685,8 @@ diff -ru term/lua.trm.ORG term/lua.trm
  END_HELP(tikz)
  #endif /* TERM_HELP */
 diff -ru term/metafont.trm.ORG term/metafont.trm
---- term/metafont.trm.ORG	2018-10-04 11:17:03.659734000 +0900
-+++ term/metafont.trm	2018-10-04 11:17:52.909588000 +0900
+--- term/metafont.trm.ORG	2019-05-22 12:55:33.283065000 +0900
++++ term/metafont.trm	2019-05-22 12:57:32.564389000 +0900
 @@ -540,6 +540,7 @@
  
  #ifdef TERM_HELP
@@ -3837,8 +3800,8 @@ diff -ru term/metafont.trm.ORG term/metafont.trm
  END_HELP(mf)
  #endif /* TERM_HELP */
 diff -ru term/metapost.trm.ORG term/metapost.trm
---- term/metapost.trm.ORG	2018-10-04 11:17:03.655606000 +0900
-+++ term/metapost.trm	2018-10-04 11:17:52.910308000 +0900
+--- term/metapost.trm.ORG	2019-05-22 12:55:33.277778000 +0900
++++ term/metapost.trm	2019-05-22 12:57:32.565231000 +0900
 @@ -1049,6 +1049,7 @@
  
  #ifdef TERM_HELP
@@ -4049,8 +4012,8 @@ diff -ru term/metapost.trm.ORG term/metapost.trm
  END_HELP(mp)
  #endif				/* TERM_HELP */
 diff -ru term/mif.trm.ORG term/mif.trm
---- term/mif.trm.ORG	2018-10-04 11:17:03.655014000 +0900
-+++ term/mif.trm	2018-10-04 11:17:52.910850000 +0900
+--- term/mif.trm.ORG	2019-05-22 12:55:33.277146000 +0900
++++ term/mif.trm	2019-05-22 12:57:32.565936000 +0900
 @@ -965,6 +965,7 @@
  
  #ifdef TERM_HELP
@@ -4101,8 +4064,8 @@ diff -ru term/mif.trm.ORG term/mif.trm
  END_HELP(mif)
  #endif /* TERM_HELP */
 diff -ru term/pbm.trm.ORG term/pbm.trm
---- term/pbm.trm.ORG	2018-10-04 11:17:03.658821000 +0900
-+++ term/pbm.trm	2018-10-04 11:17:52.911236000 +0900
+--- term/pbm.trm.ORG	2019-05-22 12:55:33.282012000 +0900
++++ term/pbm.trm	2019-05-22 12:57:32.566424000 +0900
 @@ -483,6 +483,7 @@
  
  #ifdef TERM_HELP
@@ -4152,8 +4115,8 @@ diff -ru term/pbm.trm.ORG term/pbm.trm
  END_HELP(pbm)
  #endif /* TERM_HELP */
 diff -ru term/pc.trm.ORG term/pc.trm
---- term/pc.trm.ORG	2018-10-04 11:17:03.662707000 +0900
-+++ term/pc.trm	2018-10-04 11:17:52.911610000 +0900
+--- term/pc.trm.ORG	2019-05-22 12:55:33.286719000 +0900
++++ term/pc.trm	2019-05-22 12:57:32.566907000 +0900
 @@ -546,6 +546,7 @@
  
  #ifdef TERM_HELP
@@ -4182,8 +4145,8 @@ diff -ru term/pc.trm.ORG term/pc.trm
  END_HELP(dospc)
  #endif /* TERM_HELP */
 diff -ru term/pdf.trm.ORG term/pdf.trm
---- term/pdf.trm.ORG	2018-10-04 11:17:03.660167000 +0900
-+++ term/pdf.trm	2018-10-04 11:17:52.912404000 +0900
+--- term/pdf.trm.ORG	2019-05-22 12:55:33.283582000 +0900
++++ term/pdf.trm	2019-05-22 12:57:32.567817000 +0900
 @@ -1718,6 +1718,7 @@
  
  #ifdef TERM_HELP
@@ -4250,9 +4213,9 @@ diff -ru term/pdf.trm.ORG term/pdf.trm
  END_HELP(pdf)
  #endif
 diff -ru term/pm.trm.ORG term/pm.trm
---- term/pm.trm.ORG	2018-10-04 11:17:03.655375000 +0900
-+++ term/pm.trm	2018-10-04 11:17:52.913036000 +0900
-@@ -1247,6 +1247,7 @@
+--- term/pm.trm.ORG	2019-05-22 12:55:33.277495000 +0900
++++ term/pm.trm	2019-05-23 08:28:40.823085000 +0900
+@@ -1303,6 +1303,7 @@
  
  #ifdef TERM_HELP
  START_HELP(pm)
@@ -4260,10 +4223,10 @@ diff -ru term/pm.trm.ORG term/pm.trm
  "1 pm",
  "?commands set terminal pm",
  "?set terminal pm",
-@@ -1281,5 +1282,41 @@
- " the optional numerical argument.",
- "",
- " Linewidths may be changed with `set linestyle`."
+@@ -1334,5 +1335,38 @@
+ " If `title` is specified, it will be used as the title of the plot window.",
+ " It will also be used as the name of the server instance, and will override",
+ " the optional numerical argument."
 +#else /* JAPANESE_DOC */
 +"1 pm",
 +"?commands set terminal pm",
@@ -4274,9 +4237,8 @@ diff -ru term/pm.trm.ORG term/pm.trm
 +"?pm",
 +" `pm` ドライバは、グラフが描画される OS/2 プレゼンテーションマネージャ",
 +" ウィンドウを提供します。そのウィンドウは最初のグラフが描画されたときに",
-+" 開かれます。このウィンドウは印刷、クリップボードへのコピー、いくつかの",
-+" 線種や色の調整のための機能、そしてそれ自身のオンラインヘルプを持ってい",
-+" ます。`multiplot` オプションもサポートされています。",
++" 開かれます。このウィンドウは印刷、クリップボードへのコピー、そしてそれ",
++" 自身のオンラインヘルプを持っています。",
 +"",
 +" 書式:",
 +"       set terminal pm {server {n}} {persist} {widelines} {enhanced} {\"title\"}",
@@ -4296,16 +4258,14 @@ diff -ru term/pm.trm.ORG term/pm.trm
 +"",
 +" `title` を指定すると、それは描画ウィンドウのタイトルとして使われます。",
 +" それはサーバインスタンス名としても使われ、それは追加の数引数を上書きし",
-+" ます。",
-+"",
-+" 線の幅は `set linestyle` で変更できます。"
++" ます。"
 +#endif /* JAPANESE_DOC */
  END_HELP(pm)
  #endif /* TERM_HELP */
 diff -ru term/post.trm.ORG term/post.trm
---- term/post.trm.ORG	2018-10-04 11:17:03.659250000 +0900
-+++ term/post.trm	2018-10-04 11:17:52.915445000 +0900
-@@ -4446,6 +4446,7 @@
+--- term/post.trm.ORG	2019-05-22 12:55:33.282528000 +0900
++++ term/post.trm	2019-05-22 12:57:32.571494000 +0900
+@@ -4457,6 +4457,7 @@
   * of "text" that is necessary to avoid errors.
   */
  START_HELP(00psglobal)
@@ -4313,7 +4273,7 @@ diff -ru term/post.trm.ORG term/post.trm
  #define PS_COMMON_OPTS1 \
  "                               {level1 | leveldefault | level3}",\
  "                               {color | colour | monochrome}",\
-@@ -4517,9 +4518,85 @@
+@@ -4528,9 +4529,85 @@
  " actual limits of the plot.",\
  "",
  ""
@@ -4399,7 +4359,7 @@ diff -ru term/post.trm.ORG term/post.trm
  "1 epslatex",
  "?commands set terminal epslatex",
  "?set terminal epslatex",
-@@ -4687,9 +4764,184 @@
+@@ -4698,9 +4775,184 @@
  " by the `header` command.  Thus, you can use `header` to overwrite some of",
  " settings performed using \"gnuplot.cfg\"",
  ""
@@ -4584,7 +4544,7 @@ diff -ru term/post.trm.ORG term/post.trm
  "1 pslatex and pstex",
  "?commands set terminal pslatex",
  "?set terminal pslatex",
-@@ -4769,9 +5021,89 @@
+@@ -4780,9 +5032,89 @@
  "",
  " Linewidths and pointsizes may be changed with `set style line`."
  ""
@@ -4674,7 +4634,7 @@ diff -ru term/post.trm.ORG term/post.trm
  "1 postscript",
  "?commands set terminal postscript",
  "?set terminal postscript",
-@@ -5034,5 +5366,267 @@
+@@ -5045,5 +5377,267 @@
  " other fonts you may have to try both settings.  See also `fontfile`.",
  "",
  ""
@@ -4943,8 +4903,8 @@ diff -ru term/post.trm.ORG term/post.trm
  END_HELP(post)
  #endif /* TERM_HELP */
 diff -ru term/pstricks.trm.ORG term/pstricks.trm
---- term/pstricks.trm.ORG	2018-10-04 11:17:03.659800000 +0900
-+++ term/pstricks.trm	2018-10-04 11:17:52.915962000 +0900
+--- term/pstricks.trm.ORG	2019-05-22 12:55:33.283142000 +0900
++++ term/pstricks.trm	2019-05-22 12:57:32.572078000 +0900
 @@ -685,6 +685,7 @@
  
  #ifdef TERM_HELP
@@ -4984,8 +4944,8 @@ diff -ru term/pstricks.trm.ORG term/pstricks.trm
  END_HELP(pstricks)
  #endif /* TERM_HELP */
 diff -ru term/qms.trm.ORG term/qms.trm
---- term/qms.trm.ORG	2018-10-04 11:17:03.655425000 +0900
-+++ term/qms.trm	2018-10-04 11:17:52.916264000 +0900
+--- term/qms.trm.ORG	2019-05-22 12:55:33.277555000 +0900
++++ term/qms.trm	2019-05-22 12:57:32.572514000 +0900
 @@ -225,6 +225,7 @@
  
  #ifdef TERM_HELP
@@ -5012,8 +4972,8 @@ diff -ru term/qms.trm.ORG term/qms.trm
  END_HELP(qms)
  #endif
 diff -ru term/qt.trm.ORG term/qt.trm
---- term/qt.trm.ORG	2018-10-04 11:17:03.659563000 +0900
-+++ term/qt.trm	2018-10-04 11:17:52.916581000 +0900
+--- term/qt.trm.ORG	2019-05-22 12:55:33.282857000 +0900
++++ term/qt.trm	2019-05-22 12:57:32.572979000 +0900
 @@ -80,6 +80,7 @@
  
  #ifdef TERM_HELP
@@ -5131,8 +5091,8 @@ diff -ru term/qt.trm.ORG term/qt.trm
  END_HELP(qt)
  #endif /* TERM_HELP */
 diff -ru term/regis.trm.ORG term/regis.trm
---- term/regis.trm.ORG	2018-10-04 11:17:03.657034000 +0900
-+++ term/regis.trm	2018-10-04 11:17:52.916892000 +0900
+--- term/regis.trm.ORG	2019-05-22 12:55:33.279686000 +0900
++++ term/regis.trm	2019-05-22 12:57:32.573393000 +0900
 @@ -258,6 +258,7 @@
  
  #ifdef TERM_HELP
@@ -5164,9 +5124,9 @@ diff -ru term/regis.trm.ORG term/regis.trm
  END_HELP(regis)
  #endif
 diff -ru term/svg.trm.ORG term/svg.trm
---- term/svg.trm.ORG	2018-10-04 11:17:03.661594000 +0900
-+++ term/svg.trm	2018-10-04 11:17:52.917892000 +0900
-@@ -2187,6 +2187,7 @@
+--- term/svg.trm.ORG	2019-05-22 12:55:33.285344000 +0900
++++ term/svg.trm	2019-05-22 12:57:32.574607000 +0900
+@@ -2194,6 +2194,7 @@
  
  #ifdef TERM_HELP
  START_HELP(svg)
@@ -5174,7 +5134,7 @@ diff -ru term/svg.trm.ORG term/svg.trm
  "1 svg",
  "?commands set terminal svg",
  "?set terminal svg",
-@@ -2234,9 +2235,62 @@
+@@ -2241,9 +2242,62 @@
  " then a unique name is required to avoid potential conflicting references",
  " to other SVG plots.  Use the `name` option to ensure uniqueness.",
  ""
@@ -5237,7 +5197,7 @@ diff -ru term/svg.trm.ORG term/svg.trm
  "1 domterm",
  "?set terminal domterm",
  "?terminal domterm",
-@@ -2250,5 +2304,20 @@
+@@ -2257,5 +2311,20 @@
  "",
  " Please read the help for the `svg` terminal.",
  ""
@@ -5259,8 +5219,8 @@ diff -ru term/svg.trm.ORG term/svg.trm
  END_HELP(domterm)
  #endif /* TERM_HELP */
 diff -ru term/t410x.trm.ORG term/t410x.trm
---- term/t410x.trm.ORG	2018-10-04 11:17:03.662646000 +0900
-+++ term/t410x.trm	2018-10-04 11:17:52.918226000 +0900
+--- term/t410x.trm.ORG	2019-05-22 12:55:33.286647000 +0900
++++ term/t410x.trm	2019-05-22 12:57:32.575029000 +0900
 @@ -315,6 +315,7 @@
  
  #ifdef TERM_HELP
@@ -5287,8 +5247,8 @@ diff -ru term/t410x.trm.ORG term/t410x.trm
  END_HELP(tek410x)
  #endif
 diff -ru term/tek.trm.ORG term/tek.trm
---- term/tek.trm.ORG	2018-10-04 11:17:03.658255000 +0900
-+++ term/tek.trm	2018-10-04 11:17:52.918926000 +0900
+--- term/tek.trm.ORG	2019-05-22 12:55:33.281289000 +0900
++++ term/tek.trm	2019-05-22 12:57:32.575855000 +0900
 @@ -1539,6 +1539,7 @@
  
  #ifdef TERM_HELP
@@ -5382,8 +5342,8 @@ diff -ru term/tek.trm.ORG term/tek.trm
  END_HELP(tek40)
  #endif /* TERM_HELP */
 diff -ru term/texdraw.trm.ORG term/texdraw.trm
---- term/texdraw.trm.ORG	2018-10-04 11:17:03.662896000 +0900
-+++ term/texdraw.trm	2018-10-04 11:17:52.919291000 +0900
+--- term/texdraw.trm.ORG	2019-05-22 12:55:33.286931000 +0900
++++ term/texdraw.trm	2019-05-22 12:57:32.576319000 +0900
 @@ -368,6 +368,7 @@
  
  #ifdef TERM_HELP
@@ -5419,8 +5379,8 @@ diff -ru term/texdraw.trm.ORG term/texdraw.trm
  END_HELP(texdraw)
  #endif /* TERM_HELP */
 diff -ru term/tgif.trm.ORG term/tgif.trm
---- term/tgif.trm.ORG	2018-10-04 11:17:03.661778000 +0900
-+++ term/tgif.trm	2018-10-04 11:17:52.920098000 +0900
+--- term/tgif.trm.ORG	2019-05-22 12:55:33.285534000 +0900
++++ term/tgif.trm	2019-05-22 12:57:32.577292000 +0900
 @@ -1678,6 +1678,7 @@
  
  #ifdef TERM_HELP
@@ -5508,9 +5468,9 @@ diff -ru term/tgif.trm.ORG term/tgif.trm
  #endif
  /*{{{}}}*/
 diff -ru term/tkcanvas.trm.ORG term/tkcanvas.trm
---- term/tkcanvas.trm.ORG	2018-10-04 11:17:03.662238000 +0900
-+++ term/tkcanvas.trm	2018-10-04 11:17:52.921083000 +0900
-@@ -2141,6 +2141,7 @@
+--- term/tkcanvas.trm.ORG	2019-05-22 12:55:33.286060000 +0900
++++ term/tkcanvas.trm	2019-05-22 12:57:32.578478000 +0900
+@@ -2143,6 +2143,7 @@
  
  #ifdef TERM_HELP
  START_HELP(tkcanvas)
@@ -5518,7 +5478,7 @@ diff -ru term/tkcanvas.trm.ORG term/tkcanvas.trm
  "1 tkcanvas",
  "?commands set terminal tkcanvas",
  "?set terminal tkcanvas",
-@@ -2283,6 +2284,152 @@
+@@ -2285,6 +2286,152 @@
  "",
  " Interactive mode is not yet implemented for Python/Tk and Rexx/Tk.",
  " Interactive mode for Ruby/Tk does not yet support user_gnuplot_coordinates."
@@ -5672,8 +5632,8 @@ diff -ru term/tkcanvas.trm.ORG term/tkcanvas.trm
  #endif
  
 diff -ru term/tpic.trm.ORG term/tpic.trm
---- term/tpic.trm.ORG	2018-10-04 11:17:03.662313000 +0900
-+++ term/tpic.trm	2018-10-04 11:17:52.921655000 +0900
+--- term/tpic.trm.ORG	2019-05-22 12:55:33.286153000 +0900
++++ term/tpic.trm	2019-05-22 12:57:32.579119000 +0900
 @@ -928,6 +928,7 @@
  
  #ifdef TERM_HELP
@@ -5728,8 +5688,8 @@ diff -ru term/tpic.trm.ORG term/tpic.trm
  END_HELP(tpic)
  #endif /* TERM_TABLE */
 diff -ru term/vgagl.trm.ORG term/vgagl.trm
---- term/vgagl.trm.ORG	2018-10-04 11:17:03.656704000 +0900
-+++ term/vgagl.trm	2018-10-04 11:20:30.424755000 +0900
+--- term/vgagl.trm.ORG	2019-05-22 12:55:33.279237000 +0900
++++ term/vgagl.trm	2019-05-22 12:57:32.580018000 +0900
 @@ -1543,6 +1543,7 @@
  
  #ifdef TERM_HELP
@@ -5805,8 +5765,8 @@ diff -ru term/vgagl.trm.ORG term/vgagl.trm
  #endif
  #endif /* defined(USE_MOUSE) */
 diff -ru term/vws.trm.ORG term/vws.trm
---- term/vws.trm.ORG	2018-10-04 11:17:03.661669000 +0900
-+++ term/vws.trm	2018-10-04 11:17:52.922804000 +0900
+--- term/vws.trm.ORG	2019-05-22 12:55:33.285416000 +0900
++++ term/vws.trm	2019-05-22 12:57:32.580521000 +0900
 @@ -477,6 +477,7 @@
  
  #ifdef TERM_HELP
@@ -5835,9 +5795,9 @@ diff -ru term/vws.trm.ORG term/vws.trm
  END_HELP(VWS)
  #endif /* TERM_HELP */
 diff -ru term/win.trm.ORG term/win.trm
---- term/win.trm.ORG	2018-10-04 11:17:03.657174000 +0900
-+++ term/win.trm	2018-10-04 11:17:52.923619000 +0900
-@@ -1183,6 +1183,7 @@
+--- term/win.trm.ORG	2019-05-22 12:55:33.279894000 +0900
++++ term/win.trm	2019-05-22 12:57:32.581512000 +0900
+@@ -1187,6 +1187,7 @@
  
  #ifdef TERM_HELP
  START_HELP(windows)
@@ -5845,7 +5805,7 @@ diff -ru term/win.trm.ORG term/win.trm
  "1 windows",
  "?commands set terminal windows",
  "?set terminal windows",
-@@ -1503,5 +1504,321 @@
+@@ -1507,5 +1508,321 @@
  #endif
  "",
  " See `graph-menu`."
@@ -6168,9 +6128,9 @@ diff -ru term/win.trm.ORG term/win.trm
  END_HELP(windows)
  #endif /* TERM_HELP */
 diff -ru term/wxt.trm.ORG term/wxt.trm
---- term/wxt.trm.ORG	2018-10-04 11:17:03.659322000 +0900
-+++ term/wxt.trm	2018-10-04 11:17:52.924105000 +0900
-@@ -502,6 +502,7 @@
+--- term/wxt.trm.ORG	2019-05-22 12:55:33.282611000 +0900
++++ term/wxt.trm	2019-05-22 12:57:32.582138000 +0900
+@@ -505,6 +505,7 @@
  
  #ifdef TERM_HELP
  START_HELP(wxt)
@@ -6178,7 +6138,7 @@ diff -ru term/wxt.trm.ORG term/wxt.trm
  "1 wxt",
  "?set terminal wxt",
  "?terminal wxt",
-@@ -621,5 +622,130 @@
+@@ -624,5 +625,130 @@
  " bindings by <ctrl>+<space> and <ctrl>+'q', respectively.",
  " These three keywords (raise, persist and ctrl) can also be set and remembered",
  " between sessions through the configuration dialog."
@@ -6310,9 +6270,9 @@ diff -ru term/wxt.trm.ORG term/wxt.trm
  END_HELP(wxt)
  #endif /* TERM_HELP */
 diff -ru term/x11.trm.ORG term/x11.trm
---- term/x11.trm.ORG	2018-10-04 11:17:03.655300000 +0900
-+++ term/x11.trm	2018-10-04 11:17:52.925395000 +0900
-@@ -2345,6 +2345,7 @@
+--- term/x11.trm.ORG	2019-05-22 12:55:33.277388000 +0900
++++ term/x11.trm	2019-05-22 12:57:32.583653000 +0900
+@@ -2361,6 +2361,7 @@
  
  #ifdef TERM_HELP
  START_HELP(x11)
@@ -6320,7 +6280,7 @@ diff -ru term/x11.trm.ORG term/x11.trm
  "1 x11",
  "?commands set terminal x11",
  "?set terminal x11",
-@@ -2885,6 +2886,551 @@
+@@ -2900,6 +2901,550 @@
  "%@gnuplot*fastrotate:  on",
  "%@gnuplot*ctrlq:  off",
  "@end table"
@@ -6505,7 +6465,6 @@ diff -ru term/x11.trm.ORG term/x11.trm
 +"?set terminal x11 command-line-options",
 +"?set term x11 command-line-options",
 +"?x11 command-line-options",
-+"?command-line-options",
 +" X Toolkit オプションに加え、以下のオプションが gnuplot の立ち上げ時の",
 +" コマンドラインで、またはユーザのファイル \".Xdefaults\" 内のリソースとし",
 +" て指定できます (`raise` と `persist` は `set term x11 [no]raise [no]persist`",
@@ -6873,8 +6832,8 @@ diff -ru term/x11.trm.ORG term/x11.trm
  END_HELP(x11)
  #endif				/* TERM_HELP */
 diff -ru term/xlib.trm.ORG term/xlib.trm
---- term/xlib.trm.ORG	2018-10-04 11:17:03.659612000 +0900
-+++ term/xlib.trm	2018-10-04 11:17:52.925605000 +0900
+--- term/xlib.trm.ORG	2019-05-22 12:55:33.282915000 +0900
++++ term/xlib.trm	2019-05-22 12:57:32.583923000 +0900
 @@ -100,6 +100,7 @@
  
  #ifdef TERM_HELP
