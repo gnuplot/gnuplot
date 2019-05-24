@@ -1183,6 +1183,10 @@ get_3ddata(struct surface_points *this_plot)
 		if (j >= 4) {
 		    xlow = x - v[3]/2.;
 		    xhigh = x + v[3]/2.;
+		} else if (X_AXIS.log) {
+		    double width = (boxwidth > 0) ? boxwidth : 0.1;
+		    xlow = x * pow(X_AXIS.base, -width/2.);
+		    xhigh = x * pow(X_AXIS.base, width/2.);
 		} else {
 		    double width = (boxwidth > 0) ? boxwidth : 1.0;
 		    xlow = x - width/2.;

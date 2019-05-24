@@ -3797,8 +3797,13 @@ plot3d_boxes(struct surface_points *plot)
 
 	    if (boxdepth != 0) {
 		double depth = (boxdepth > 0) ? boxdepth : boxwidth * yscaler/xscaler;
-		dyl -= depth / 2.;
-		dyh += depth / 2.;
+		if (Y_AXIS.log) {
+		    dyl *= pow(Y_AXIS.base, -depth/2.);
+		    dyh *= pow(Y_AXIS.base, depth/2.);
+		} else {
+		    dyl -= depth / 2.;
+		    dyh += depth / 2.;
+		}
 		cliptorange(dyl, Y_AXIS.min, Y_AXIS.max);
 		cliptorange(dyh, Y_AXIS.min, Y_AXIS.max);
 	    }
