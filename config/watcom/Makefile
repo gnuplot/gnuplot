@@ -139,7 +139,7 @@ LDLIBS += LIBRARY d2d1.lib LIBRARY dwrite.lib
 # -aa : allow non-const initializers for locals
 # -d2 : debug information
 WCFLAGS = -zlf -ei -zq -I$(S);$(W) -zm -bm -5r -sg -orilt -aa -d2 $(CPPFLAGS) $(OPTS)
-WPPFLAGS = -zlf -ei -zq -I$(S);$(W) -zm -bm -5r -sg -orilt -d2 $(CPPFLAGS) $(OPTS)
+WPPFLAGS = -zlf -ei -zq -I$(S);$(W) -zm -bm -5r -sg -orilt -xs -d2 $(CPPFLAGS) $(OPTS)
 # removed: -za99
 
 # ...and here.
