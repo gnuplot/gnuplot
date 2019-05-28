@@ -1851,8 +1851,6 @@ C marker below is used to signal this to doc2html:
  This can be used to import external functions into gnuplot scripts using
  'f(x) = real(system(sprintf("somecommand %f", x)))'.
 4 trim
-?trim
-?functions trim
 =trim
 #trim(" string ") & string & string without leading or trailing whitespace \\
 %trim(" string ")@string@string without leading or trailing whitespace
@@ -1861,14 +1859,12 @@ C marker below is used to signal this to doc2html:
  data fields that may contain extra whitespace. For example
       plot FOO using 1:( trim(strcol(3)) eq "A" ? $2 : NaN )
 4 word
-?functions word
 =word
 #word("string",n) & string, int & returns the nth word in "string" \\
 %word("string",n)@string, int@returns the nth word in "string"
  `word("string",n)` returns the nth word in string. For example,
  `word("one two three",2)` returns the string "two".
 4 words
-?functions words
 =words
 #words("string") & string & returns the number of words in "string" \\
 %words("string")@string@returns the number of words in "string"
@@ -2101,6 +2097,13 @@ C marker below is used to signal this to doc2html:
        print word(s, 4) # "double quotes"
  Note, that in this last example the escaped quotes are necessary only for the
  string definition.
+
+?expressions functions trim
+?trim
+ `trim("  padded string ")` returns the original string stripped of leading
+ and trailing whitespace.  This is useful for string comparisons of input
+ data fields that may contain extra whitespace. For example
+      plot FOO using 1:( trim(strcol(3)) eq "A" ? $2 : NaN )
 
 3 Operators
 ?expressions operators
