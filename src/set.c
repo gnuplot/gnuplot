@@ -209,7 +209,7 @@ set_command()
 	}
 	if (forever_iteration(set_iterator)) {
 	    set_iterator = cleanup_iteration(set_iterator);
-	    int_error(save_token, "unbounded iteration");
+	    int_error(save_token, "unbounded iteration not accepted here");
 	}
 	save_token = c_token;
 	ITERATE:

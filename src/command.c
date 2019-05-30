@@ -1361,6 +1361,10 @@ do_command()
 
     c_token++;
     do_iterator = check_for_iteration();
+    if (forever_iteration(do_iterator)) {
+	cleanup_iteration(do_iterator);
+	int_error(c_token-2, "unbounded iteration not accepted here");
+    }
 
     if (!equals(c_token,"{")) {
 	cleanup_iteration(do_iterator);

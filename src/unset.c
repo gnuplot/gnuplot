@@ -166,7 +166,7 @@ unset_command()
     }
     if (forever_iteration(set_iterator)) {
 	set_iterator = cleanup_iteration(set_iterator);
-	int_error(save_token, "unbounded iteration");
+	int_error(save_token, "unbounded iteration not accepted here");
     }
 
     found_token = lookup_table(&set_tbl[0],c_token);
