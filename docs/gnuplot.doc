@@ -857,7 +857,8 @@ C
 
    plot for [i=2:6] 'datafile' using i title "Results for ".columnhead(i)
 
- This use of column headings is automated by `set key autotitle columnhead`.
+ This use of column headings is automated by `set datafile columnheaders` or
+ `set key autotitle columnhead`.
  See `labels`, `using xticlabels`, `plot title`, `using`, `key autotitle`.
 2 Enhanced text mode
 ?enhanced text
@@ -9109,8 +9110,18 @@ Ffigure_fenceplot
 ?set datafile
 ?show datafile
  The `set datafile` command options control interpretation of fields read from
- input data files by the `plot`, `splot`, and `fit` commands.  Six such
- options are currently implemented.
+ input data files by the `plot`, `splot`, and `fit` commands.
+ Several options are currently implemented.
+4 set datafile columnheaders
+?set datafile columnheaders
+=columnheaders
+ The `set datafile columnheaders` command guarantees that the first row of
+ input will be interpreted as column headers rather than as data values.
+ It affects all input data sources to plot, splot, fit, and stats commands.
+ If this setting is disabled by `unset datafile columnheaders`, the same
+ effect is triggered on a per-file basis if there is an explicit columnheader()
+ function in a using specifier or plot title associated with that file.
+ See also `set key autotitle` and `columnheader`.
 4 set datafile fortran
 ?set datafile fortran
 ?show datafile fortran
@@ -10611,7 +10622,9 @@ Ffigure_keyentry
  Note: The effect of `set key autotitle columnheader`, treatment of the first
  line in a data file as column headers rather than data applies even if the
  key is disabled by `unset key`.  It also applies to `stats` and `fit` commands
- even though they generate no key.
+ even though they generate no key.  If you want the first line of data to be
+ treated as column headers but _not_ to use them for plot titles, use
+ `set datafile columnheaders`.
 
  In all cases an explicit `title` or `notitle` keyword in the plot command
  itself will override the default from `set key autotitle`.

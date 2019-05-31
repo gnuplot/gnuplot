@@ -155,7 +155,7 @@ enum COLUMN_TYPE { CT_DEFAULT, CT_STRING, CT_KEYLABEL,
 		CT_XTICLABEL, CT_X2TICLABEL, CT_YTICLABEL, CT_Y2TICLABEL,
 		CT_ZTICLABEL, CT_CBTICLABEL };
 
-/* public variables client might access */
+/* public (exported) variables client might access */
 
 int df_no_use_specs;            /* how many using columns were specified */
 int df_line_number;
@@ -178,6 +178,13 @@ char *df_commentschars = 0;
 
 /* If any 'inline data' are in use for the current plot, flag this */
 TBOOLEAN plotted_data_from_stdin = FALSE;
+
+/* This flag is controlled by 'set/unset datafile columnheaders'.
+ * Even if it is FALSE, columnheader processing may still be triggered
+ * implicitly by use of the columheader function or keyword
+ * in a using spec or title.
+ */
+TBOOLEAN df_columnheaders = FALSE;
 
 /* Setting this allows the parser to recognize Fortran D or Q   */
 /* format constants in the input file. But it slows things down */
@@ -279,7 +286,7 @@ typedef struct df_column_struct {
 
 static df_column_struct *df_column = NULL;      /* we'll allocate space as needed */
 static int df_max_cols = 0;     /* space allocated */
-static int df_no_cols;          /* cols read */
+static int df_no_cols;          /* total number of columns found in input lines */
 static int fast_columns;        /* corey@cac optimization */
 
 char *df_tokens[MAXDATACOLS];			/* filled in by df_tokenise */
@@ -1084,16 +1091,17 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     /* Perhaps it should be a parameter to df_readline? */
     df_current_plot = plot;
 
-    /* If 'set key autotitle columnhead' is in effect we always treat the
-     * first data row as non-data (df_readline() will return DF_COLUMNHEADERS
-     * rather than the column count).  This is true even if the key is off
-     * or the data is read from 'stats' or from 'fit' rather than plot.
-     * FIXME:  This should probably be controlled by an option to 
-     *         'set datafile' rather than 'set key'.  Or maybe both?
+    /* If either 'set datafile columnhead' or 'set key autotitle columnhead'
+     * is in effect we always treat the * first data row as non-data
+     * (df_readline() will return DF_COLUMNHEADERSrather than the column count).
+     * This is true even if the key is off or the data is read from 'stats'
+     * or from 'fit' rather than plot.
      */
     column_for_key_title = NO_COLUMN_HEADER;
     df_already_got_headers = FALSE;
     if ((&keyT)->auto_titles == COLUMNHEAD_KEYTITLES)
+	parse_1st_row_as_headers = TRUE;
+    else if (df_columnheaders)
 	parse_1st_row_as_headers = TRUE;
     else
 	parse_1st_row_as_headers = FALSE;
@@ -1972,13 +1980,14 @@ df_readascii(double v[], int max)
 	 */
 	if (df_datum == 0 && !df_already_got_headers) {
 	    int j;
+	    FPRINTF((stderr, "datafile.c:%d processing %d column headers\n", __LINE__, df_no_cols));
 	    for (j=0; j<df_no_cols; j++) {
 		free(df_column[j].header);
 		df_column[j].header = df_parse_string_field(df_column[j].position);
 		if (df_column[j].header) {
 		    if (df_longest_columnhead < strlen(df_column[j].header))
 			df_longest_columnhead = strlen(df_column[j].header);
-		    FPRINTF((stderr,"Col %d: \"%s\"\n",j+1,df_column[j].header));
+		    FPRINTF((stderr, "Col %d: \"%s\"\n", j+1, df_column[j].header));
 		}
 	    }
 	    df_already_got_headers = TRUE;

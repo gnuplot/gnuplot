@@ -332,6 +332,9 @@ unset_command()
 	    df_nofpe_trap = FALSE;
 	    c_token++;
 	    break;
+	} else if (almost_equals(c_token,"columnhead$ers")) {
+	    df_columnheaders = FALSE;
+	    c_token++;
 	}
 	df_fortran_constants = FALSE;
 	unset_missing();
@@ -340,6 +343,7 @@ unset_command()
 	free(df_commentschars);
 	df_commentschars = gp_strdup(DEFAULT_COMMENTS_CHARS);
 	df_unset_datafile_binary();
+	df_columnheaders = FALSE;
 	break;
     case S_MICRO:
 	unset_micro();

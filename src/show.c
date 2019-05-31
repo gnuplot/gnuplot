@@ -3108,6 +3108,12 @@ show_datafile()
     if (END_OF_COMMAND || almost_equals(c_token,"com$mentschars")) {
 	fprintf(stderr, "\tComments chars are \"%s\"\n", df_commentschars);
     }
+    if (END_OF_COMMAND || almost_equals(c_token,"columnhead$ers")) {
+	if (df_columnheaders)
+	    fprintf(stderr, "\tFirst line is always treated as headers rather than data\n");
+	else
+	    fprintf(stderr, "\tFirst line is treated as headers only if accessed explicitly\n");
+    }
     if (df_fortran_constants)
 	fputs("\tDatafile parsing will accept Fortran D or Q constants\n",stderr);
     if (df_nofpe_trap)

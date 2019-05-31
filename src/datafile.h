@@ -104,6 +104,9 @@ extern int df_last_col;
 /* number of matrix elements entered as missing or NaN */
 extern int df_bad_matrix_values;
 
+/* First row of data is known to contain headers rather than data */
+extern TBOOLEAN df_columnheaders;
+
 /* string representing missing values, ascii datafiles */
 extern char *missing_val;
 

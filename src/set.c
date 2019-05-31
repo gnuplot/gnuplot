@@ -395,6 +395,9 @@ set_command()
 	    } else if (almost_equals(c_token,"nofpe_trap")) {
 		df_nofpe_trap = TRUE;
 		c_token++;
+	    } else if (almost_equals(c_token,"columnhead$ers")) {
+		df_columnheaders = TRUE;
+		c_token++;
 	    } else
 		int_error(c_token,"expecting datafile modifier");
 	    break;
