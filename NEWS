@@ -10,6 +10,7 @@ Changes not in 5.2
 * NEW "splot ... with boxes"
 * NEW "plot ... with arrows"
 * NEW "set view projection {xz|yz}"
+* NEW "set datafile columnheaders"
 * NEW per-plot fillcolor and fillstyle for pm3d surfaces
 * NEW allow separate color column with dgrid3d surfaces (but not color splines)
 * NEW string function trim(" padded string ") removes leading and trailing whitespace
@@ -44,7 +45,7 @@ Changes not in 5.2
 * CHANGE remove compile option EXTENDED_COLOR_SPECS used only by vgagl.trm
 * CHANGE remove linux and vgagl terminals
 * CHANGE remove undocumented EXPERIMENTAL option for pm3d filled contours
-* CHANGE print to datablock expands embedded \n into a separate block entry]
+* CHANGE print to datablock expands embedded \n into a separate block entry
 * CHANGE boxplot outliers affect autoscaling only if they are enabled
 * FIX allow mixed use of in-key plot titles and manually placed titles
 * FIX open/close path for polygons

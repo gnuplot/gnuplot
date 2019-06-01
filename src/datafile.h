@@ -149,6 +149,7 @@ void df_set_key_title_columnhead(struct curve_points *);
 char * df_parse_string_field(char *);
 int expect_string(const char column );
 
+char *df_retrieve_columnhead(int column);
 void df_reset_after_error(void);
 void f_dollars(union argument *x);
 void f_column (union argument *x);

@@ -2823,6 +2823,17 @@ f_timecolumn(union argument *arg)
     gpfree_string(&b);
 }
 
+/*
+ * called by stats to load array STATS_column_header[]
+ */
+char *
+df_retrieve_columnhead(int column)
+{
+    if (column <= 0 || !df_column)
+	return NULL;
+    return df_column[column-1].header;
+}
+
 /*}}} */
 
 

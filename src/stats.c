@@ -89,7 +89,7 @@ struct file_stats {
     long invalid;
     long outofrange;
     long blocks;  /* blocks are separated by double blank lines */
-    long columnheaders;
+    long header_records;
     int  columns;
 };
 
@@ -170,7 +170,7 @@ analyze_file( long n, int outofrange, int invalid, int blank, int dblblank, int 
     res.blanks  = blank;
     res.blocks  = dblblank + 1;  /* blocks are separated by dbl blank lines */
     res.outofrange = outofrange;
-    res.columnheaders = headers;
+    res.header_records = headers;
     res.columns = df_last_col;
 
     return res;
@@ -389,7 +389,7 @@ file_output( struct file_stats s )
 	fprintf( print_out, "%s\t%ld\n", "invalid", s.invalid );
 	fprintf( print_out, "%s\t%ld\n", "blanks", s.blanks );
 	fprintf( print_out, "%s\t%ld\n", "blocks", s.blocks );
-	fprintf( print_out, "%s\t%ld\n", "columnheaders", s.columnheaders );
+	fprintf( print_out, "%s\t%ld\n", "headers", s.header_records );
 	fprintf( print_out, "%s\t%ld\n", "outofrange", s.outofrange );
 	return;
     }
@@ -400,7 +400,7 @@ file_output( struct file_stats s )
     fprintf( print_out, "  Records:           %*ld\n", width, s.records );
     fprintf( print_out, "  Out of range:      %*ld\n", width, s.outofrange );
     fprintf( print_out, "  Invalid:           %*ld\n", width, s.invalid );
-    fprintf( print_out, "  Column headers:    %*ld\n", width, s.columnheaders );
+    fprintf( print_out, "  Header records:    %*ld\n", width, s.header_records );
     fprintf( print_out, "  Blank:             %*ld\n", width, s.blanks );
     fprintf( print_out, "  Data Blocks:       %*ld\n", width, s.blocks );
 }
@@ -657,6 +657,9 @@ clear_stats_variables( char *prefix )
     clear_one_var( prefix, "pos_min_y" );
     clear_one_var( prefix, "pos_max_y" );
 
+    /* column headers */
+    clear_one_var( prefix, "column_header" );
+
 }
 
 static void
@@ -706,11 +709,25 @@ file_variables( struct file_stats s, char *prefix )
     /* Suffix does not make sense here! */
     create_and_set_int_var( s.records, prefix, "records", "" );
     create_and_set_int_var( s.invalid, prefix, "invalid", "" );
-    create_and_set_int_var( s.columnheaders, prefix, "headers", "" );
+    create_and_set_int_var( s.header_records, prefix, "headers", "" );
     create_and_set_int_var( s.blanks,  prefix, "blank",   "" );
     create_and_set_int_var( s.blocks,  prefix, "blocks",  "" );
     create_and_set_int_var( s.outofrange, prefix, "outofrange", "" );
     create_and_set_int_var( s.columns, prefix, "columns", "" );
+
+    /* copy column headers to an array */
+    if (df_columnheaders) {
+	int i;
+	t_value headers;
+	t_value *A = gp_alloc((s.columns+1) * sizeof(t_value), "column_headers");
+
+	A[0].v.int_val = s.columns;
+	for (i = 1; i <= s.columns; i++)
+	    Gstring(&A[i], gp_strdup(df_retrieve_columnhead(i)));
+	headers.type = ARRAY;
+	headers.v.value_array = A;
+	create_and_store_var( &headers, prefix, "column_header", "" );
+    }
 }
 
 static void
@@ -815,7 +832,7 @@ statsrequest(void)
     long invalid;          /* number of missing/invalid records */
     long blanks;           /* number of blank lines */
     long doubleblanks;     /* number of repeated blank lines */
-    long columnheaders;    /* number of records treated as headers rather than data */
+    long header_records;   /* number of records treated as headers rather than data */
     long out_of_range;     /* number pts rejected, because out of range */
 
     struct file_stats res_file;
@@ -841,7 +858,7 @@ statsrequest(void)
     /* Initialize */
     invalid = 0;          /* number of missing/invalid records */
     blanks = 0;           /* number of blank lines */
-    columnheaders = 0;    /* number of records treated as headers rather than data */
+    header_records = 0;    /* number of records treated as headers rather than data */
     doubleblanks = 0;     /* number of repeated blank lines */
     out_of_range = 0;     /* number pts rejected, because out of range */
     n = 0;                /* number of records retained */
@@ -857,7 +874,7 @@ statsrequest(void)
     if ( !data_x || !data_y )
       int_error( NO_CARET, "Internal error: out of memory in stats" );
 
-    n = invalid = blanks = columnheaders = doubleblanks = out_of_range = 0;
+    n = invalid = blanks = header_records = doubleblanks = out_of_range = 0;
 
     /* Get filename */
     i = c_token;
@@ -978,7 +995,7 @@ statsrequest(void)
 	      continue;
 
 	    case DF_COLUMN_HEADERS:
-	      columnheaders += 1;
+	      header_records += 1;
 	      continue;
 
 	    case 0:
@@ -1053,7 +1070,7 @@ statsrequest(void)
     }
 
     /* Do the actual analysis */
-    res_file = analyze_file( n, out_of_range, invalid, blanks, doubleblanks, columnheaders );
+    res_file = analyze_file( n, out_of_range, invalid, blanks, doubleblanks, header_records );
 
     /* Jan 2015: Revised detection and handling of matrix data */
     if (array_data)
