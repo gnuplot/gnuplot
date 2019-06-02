@@ -868,31 +868,11 @@ is_array_assignment()
 
     /* Evaluate index */
     c_token += 2;
-
-#ifdef ARRAY_APPEND
-    /* NB: EXPERIMENTAL (and undocumented!) special case
-     * Array[$] = New
-     * appends a new value to the end of an existing array.
-     * Otherwise we replace the value of an existing array entry.
-     */
-    if (equals(c_token,"$")) {
-	int current_size = udv->udv_value.v.value_array[0].v.int_val;
-	udv->udv_value.v.value_array
-		= gp_realloc( udv->udv_value.v.value_array, (current_size + 2) * sizeof(t_value),
-			"extend array");
-	index = current_size + 1;
-	udv->udv_value.v.value_array[0].v.int_val = index;
-	udv->udv_value.v.value_array[index].type = NOTDEFINED;
-	c_token++;
-    } else
-#endif
-    {
-	index = int_expression();
-	if (index <= 0 || index > udv->udv_value.v.value_array[0].v.int_val)
-	    int_error(c_token, "array index out of range");
-	if (!equals(c_token, "]") || !equals(c_token+1, "="))
-	    int_error(c_token, "Expecting Arrayname[<expr>] = <expr>");
-    }
+    index = int_expression();
+    if (index <= 0 || index > udv->udv_value.v.value_array[0].v.int_val)
+	int_error(c_token, "array index out of range");
+    if (!equals(c_token, "]") || !equals(c_token+1, "="))
+	int_error(c_token, "Expecting Arrayname[<expr>] = <expr>");
 
     /* Evaluate right side of assignment */
     c_token += 2;
