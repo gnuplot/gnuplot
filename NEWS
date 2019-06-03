@@ -27,10 +27,9 @@ Changes not in 5.2
 * NEW heavily revised fig terminal
 * NEW Left-click on hypertext label will copy text to clipboard (wxt qt)
 * NEW smooth option "zsort" controls order that points are plotting in
+* NEW multiple textbox styles
 * EXPERIMENTAL "set mouse mouseformat function <stringval_from_xy(x,y)>"
-* EXPERIMENTAL multiple textbox styles
 * EXPERIMENTAL load $DATABLOCK
-* EXPERIMENTAL "exit status <val>" exits program with user-provided status
 * CHANGE revised syntax for plot style "with parallelaxes"
 * CHANGE remove deprecated command "update"
 * CHANGE remove deprecated option "thru"
@@ -62,6 +61,7 @@ New features introduced to 5.2 in patchlevel releases
 * NEW allow array size to be determined automatically from initializer
 * NEW "set pm3d noclipcb" will skip drawing quadrangles whose color is < cbmin
 * NEW imaginary component of array values is available to "using" in column 3
+* NEW "exit status <val>" exits program with user-provided status
 
 New features, changes and fixes in gnuplot version 5.2 (initial release)
 ========================================================================

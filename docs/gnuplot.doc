@@ -242,7 +242,8 @@ C
 #b Plot style `with boxes` can be used in 3D plots.
 #b 2D plot style `with arrows` is identical to `with vectors` except that each
 ## arrow is specified using x:y:length:angle rather than x:y:xdelta:ydelta
-#b pm3d surfaces can have individual fillstyle and fillcolor
+#b pm3d surfaces can have individual fillstyle and seprate top/bottom fillcolor
+## EXPERIMENTAL: splot FOO with pm3d fillcolor <colorspec>
 #b pm3d option `noclipcb` causes quadrangles with (palette color value < cbmin)
 ## to be skipped rather than being drawn with color clipped to cbmin
 #b Customized contour line types. See `set cntrparam`.
@@ -5250,8 +5251,6 @@ Ffigure_fenceplot
 
  When gnuplot exits to the controlling shell, the return value is not usually
  informative. This variant of the command allows you to return a specific value.
- This command is EXPERIMENTAL. Details may change;  appearance in version 5.4
- is not guaranteed.
 
       exit status <value>
 

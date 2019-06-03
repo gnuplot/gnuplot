@@ -579,9 +579,10 @@ get_data(struct curve_points *current_plot)
 	break;
     }
 
-    /* EXPERIMENTAL May 2013 - Treating timedata columns as strings allows */
-    /* functions column(N) and column("HEADER") to work on time data.	   */
-    /* Sep 2014: But the column count is wrong for HISTOGRAMS */
+    /* May 2013 - Treating timedata columns as strings allows
+     * functions column(N) and column("HEADER") to work on time data.
+     * Sep 2014: But the column count is wrong for HISTOGRAMS
+     */
     if (current_plot->plot_style != HISTOGRAMS) {
 	if (axis_array[current_plot->x_axis].datatype == DT_TIMEDATE)
 	    expect_string(1);
