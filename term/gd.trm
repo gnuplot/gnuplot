@@ -93,6 +93,18 @@
  * Shige Takeno, Mar 2011: deal with libgd built to use SJIS rather than UTF-8
  * Ethan Merritt, Apr 2012: Don't claim to support versions 1.x of libgd
  * kmiya@culti, Nov 2016: sixelgd terminal
+ *
+ * Ethan Merritt, Jun 2019:
+ *	Revisit use of brush for thick lines with alpha channel
+ *	+ setting alpha in the brush itself works OK up to about lw 4.
+ *	  After that the repeated composition of the brush wipes out the transparency.
+ *	- TODO:
+ *	  The brushed line could be written to a separate layer as an opaque object,
+ *	  then composited back onto the main canvas with alpha applied.
+ *	  term->path(start|end) could wrap that, but as of now the core code doesn't use
+ *	  start/end path for most lines.  Alternatively it might be triggered by
+ *	  term->set_color with alpha channel present and last until the color is changed
+ *	  again.
  */
 
 #define GD_DEFINED_COLORS	96	/* Must not exceed size of pm3d_color_names_tbl[] */
@@ -1167,24 +1179,38 @@ PNG_init_brush(int width)
 	brush = gp_alloc(sizeof(PNG_BRUSH),"gd brush");
 	PNG_brush[width] = brush;
 	brush->last_rgb = -99;  /* Something invalid */
-	if (!((brush->im = gdImageCreate(width,width))))
+	if (!((brush->im = gdImageCreateTrueColor(width,width))))
 	    int_error(NO_CARET,"libgd: failed to create brush structure");
 	brush->bgnd = gdImageColorAllocate( brush->im, 255, 255, 255 );
+	gdImageSaveAlpha(brush->im, 1);
 	gdImageFill(brush->im, 0, 0, brush->bgnd);
 	gdImageColorTransparent(brush->im, brush->bgnd);
     }
 
     if (png_state.color != brush->last_rgb) {
-	brush->fgnd = gdImageColorResolve(brush->im,
-	    gdImageRed(png_state.image,png_state.color),
-	    gdImageGreen(png_state.image,png_state.color),
-	    gdImageBlue(png_state.image,png_state.color) );
+	if (png_state.TrueColor) {
+	    int alpha = (png_state.rgb >> 25) & 0x7f;
+	    /* NB: gdEffectAlphaBlend does not work! */
+	    gdImageAlphaBlending(brush->im, gdEffectReplace);
+	    brush->fgnd = gdImageColorExactAlpha(png_state.image,
+		(png_state.rgb >> 16) & 0xff,
+		(png_state.rgb >> 8) & 0xff,
+		 png_state.rgb & 0xff,
+		 alpha & 0x7f);
+	} else {
+	    brush->fgnd = gdImageColorResolve(brush->im,
+		gdImageRed(png_state.image,png_state.color),
+		gdImageGreen(png_state.image,png_state.color),
+		gdImageBlue(png_state.image,png_state.color) );
+	}
 	brush->last_rgb = png_state.color;
 
-	/* EAM - quick and dirty is to fill the entire brush (square nib)  */
-	/* It might be better to approximate a circular nib by selectively */
-	/* coloring the individual pixels of the brush image.          	   */
+	/* EAM - quick and dirty is to fill the entire brush (square nib) */
+	/* Logically it would be better to approximate a circular nib by  */
+	/* selectively coloring the individual pixels of the brush image, */
+	/* but I tried that and it was not an improvement.                */
 	gdImageFilledRectangle(brush->im, 0, 0, width-1, width-1, brush->fgnd);
+
     }
 }
 
@@ -1469,13 +1495,13 @@ PNG_graphics()
 	    rgb = gdImageColorAllocateAlpha(png_state.image,
 		(brgb >> 16) & 0xff, (brgb >> 8) & 0xff, brgb & 0xff, 127);
 	    gdImageSaveAlpha(png_state.image, 1);
-	    gdImageAlphaBlending(png_state.image, 0);
+	    gdImageAlphaBlending(png_state.image, gdEffectReplace);
 	} else {
 	    rgb = gdImageColorAllocate(png_state.image,
 		(brgb >> 16) & 0xff, (brgb >> 8) & 0xff, brgb & 0xff);
 	}
 	gdImageFill(png_state.image, 1, 1, rgb);
-	gdImageAlphaBlending(png_state.image, 1);
+	gdImageAlphaBlending(png_state.image, gdEffectNormal);
 
     } else
 	png_state.image = gdImageCreate(PNG_XMAX, PNG_YMAX);
@@ -1503,9 +1529,9 @@ PNG_graphics()
     /* Fix for truecolor and transparent options */
     if (strcmp("sixelgd", term->name) == 0 && 
         png_state.TrueColor && png_state.flags & PNG_USE_TRANSPARENT) {
-	gdImageAlphaBlending(png_state.image, 0);
+	gdImageAlphaBlending(png_state.image, gdEffectReplace);
 	gdImageFill(png_state.image, 1, 1, png_state.color_table[0]);
-	gdImageAlphaBlending(png_state.image, 1);
+	gdImageAlphaBlending(png_state.image, gdEffectNormal);
     }
 }
 
