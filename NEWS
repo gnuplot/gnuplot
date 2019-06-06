@@ -1,3 +1,9 @@
+Changes in 5.2.8
+================
+* FIX qt: suppress off-by-one ysize (Bug #1759)
+* FIX cairo: suppress off-by-one ysize (Bug #1759)
+* FIX gd: apply alpha to brushstroke lines (Bug #2117)
+
 Changes in 5.2.7
 ================
 * NEW "set pm3d noclipcb" will skip drawing quadrangles with color < cbmin
