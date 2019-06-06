@@ -727,8 +727,8 @@ set isosamples %d, %d\n\
 		fprintf(fp, ",%g ", contour_levels_list[i]);
 	}
     }
+    fprintf(fp, "\nset cntrparam firstlinetype %d", contour_firstlinetype);
     fprintf(fp, " %ssorted\n", contour_sortlevels ? "" : "un");
-    fprintf(fp, "set cntrparam firstlinetype %d\n", contour_firstlinetype);
     fprintf(fp, "\
 set cntrparam points %d\n\
 set size ratio %g %g,%g\n\
