@@ -780,7 +780,7 @@ set origin %g,%g\n",
     for (axis=0; axis<num_parallel_axes; axis++)
 	save_tics(fp, &parallel_axis[axis]);
 
-#define SAVE_AXISLABEL_OR_TITLE(name,suffix,lab)			 \
+#define SAVE_AXISLABEL_OR_TITLE(name,suffix,lab,savejust)		 \
     {									 \
 	fprintf(fp, "set %s%s \"%s\" ",					 \
 		name, suffix, lab.text ? conv_text(lab.text) : "");	 \
@@ -788,7 +788,7 @@ set origin %g,%g\n",
 	save_position(fp, &(lab.offset), 3, TRUE);			 \
 	fprintf(fp, " font \"%s\"", lab.font ? conv_text(lab.font) : "");\
 	save_textcolor(fp, &(lab.textcolor));				 \
-	if (lab.pos != CENTRE) save_justification(lab.pos,fp);		 \
+	if (savejust && (lab.pos != CENTRE)) save_justification(lab.pos,fp); \
 	if (lab.tag == ROTATE_IN_3D_LABEL_TAG)				 \
 	    fprintf(fp, " rotate parallel");				 \
 	else if (lab.rotate == TEXT_VERTICAL)				 \
@@ -800,11 +800,11 @@ set origin %g,%g\n",
 	fprintf(fp, "%s\n", (lab.noenhanced) ? " noenhanced" : "");	 \
     }
 
-    SAVE_AXISLABEL_OR_TITLE("", "title", title);
+    SAVE_AXISLABEL_OR_TITLE("", "title", title, TRUE);
 
     /* FIXME */
     fprintf(fp, "set timestamp %s \n", timelabel_bottom ? "bottom" : "top");
-    SAVE_AXISLABEL_OR_TITLE("", "timestamp", timelabel);
+    SAVE_AXISLABEL_OR_TITLE("", "timestamp", timelabel, FALSE);
 
     save_prange(fp, axis_array + T_AXIS);
     save_prange(fp, axis_array + U_AXIS);
@@ -812,7 +812,7 @@ set origin %g,%g\n",
 
 #define SAVE_AXISLABEL(axis)					\
     SAVE_AXISLABEL_OR_TITLE(axis_name(axis),"label",	\
-			    axis_array[axis].label)
+			    axis_array[axis].label, TRUE)
 
     SAVE_AXISLABEL(FIRST_X_AXIS);
     SAVE_AXISLABEL(SECOND_X_AXIS);
