@@ -1196,9 +1196,11 @@ unset_logscale()
 	    static char command[64];
 	    if (!isalpha(axis_name(axis)[0]))
 		continue;
-	    sprintf(command, "unset nonlinear %s", axis_name(axis));
-	    do_string(command); 
-	    axis_array[axis].log = FALSE;
+	    if (axis_array[axis].log) {
+		sprintf(command, "unset nonlinear %s", axis_name(axis));
+		do_string(command); 
+		axis_array[axis].log = FALSE;
+	    }
 	    axis_array[axis].ticdef.logscaling = FALSE;
 	}
     }
@@ -1825,6 +1827,23 @@ reset_command()
 	while (!(END_OF_COMMAND))
 	    c_token++;
     }
+
+#if (0)
+    /* DEBUG - enable this code for testing
+     * The *.dem unit tests all end with a "reset" command.
+     * In order to test save/load from a wide variety of states we can intercept
+     * this command and insert save/load before execution.
+     */
+    extern TBOOLEAN successful_initialization;
+    if (successful_initialization) {
+	FILE *fp = fopen("/tmp/gnuplot_debug.sav", "w+");
+	replot_line[0] = '\0';
+	save_all(fp);
+	rewind(fp);
+	load_file(fp, gp_strdup("/tmp/gnuplot_debug.sav"), 1);
+	/* load_file closes fp */
+    }
+#endif
 
     /* Kludge alert, HBB 20000506: set to noninteractive mode, to
      * suppress some of the commentary output by the individual

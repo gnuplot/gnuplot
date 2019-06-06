@@ -136,7 +136,8 @@ static const char *user_homedir = NULL;
 /* user shell */
 const char *user_shell = NULL;
 
-static TBOOLEAN successful_initialization = FALSE;
+/* not static because unset.c refers to it when in debugging mode */
+TBOOLEAN successful_initialization = FALSE;
 
 #ifdef X11
 extern int X11_args __PROTO((int, char **)); /* FIXME: defined in term/x11.trm */
