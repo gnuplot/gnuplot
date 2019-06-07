@@ -108,6 +108,7 @@ enum WXT_id {
     WXT_DASHLENGTH,
     WXT_LINEWIDTH,
     WXT_BACKGROUND,
+    WXT_NOBACKGROUND,
     WXT_OTHER
 };
 
@@ -136,6 +137,7 @@ static struct gen_table wxt_opts[] = {
     {"line$width", WXT_LINEWIDTH},
     {"lw", WXT_LINEWIDTH},
     {"backg$round", WXT_BACKGROUND},
+    {"noback$ground", WXT_NOBACKGROUND},
     {NULL, WXT_OTHER}
 };
 
@@ -164,9 +166,8 @@ TERM_PUBLIC void wxt_options()
 #endif
 
 	while (!END_OF_COMMAND) {
-		switch (lookup_table(&wxt_opts[0], c_token)) {
+		switch (lookup_table(&wxt_opts[0], c_token++)) {
 		case WXT_FONT:
-			c_token++;
 			if (!(s = try_to_get_string()))
 				int_error(c_token,"font: expecting string");
 			font_setting = gp_strdup(s);
@@ -184,25 +185,21 @@ TERM_PUBLIC void wxt_options()
 			set_font = TRUE;
 			break;
 		case WXT_FONTSCALE:
-			c_token++;
 			wxt_set_fontscale = END_OF_COMMAND ? -1 : real_expression();
 			if (wxt_set_fontscale <= 0)
 			    wxt_set_fontscale = 1.;
 			break;
 		case WXT_ENHANCED:
-			c_token++;
 			wxt_enhanced_enabled = TRUE;
 			term->flags |= TERM_ENHANCED_TEXT;
 			break;
 		case WXT_NOENHANCED:
-			c_token++;
 			wxt_enhanced_enabled = FALSE;
 			term->flags &= ~TERM_ENHANCED_TEXT;
 			break;
 		case WXT_SIZE:
 		    {
 			double insize; /* shige 2019-02-27 for size 0 */
-			c_token++;
 			if (END_OF_COMMAND)
 				int_error(c_token,"size requires 'width,height'");
 			if ((insize = real_expression()) >= 1)
@@ -220,7 +217,6 @@ TERM_PUBLIC void wxt_options()
 			break;
 		    }
 		case WXT_POSITION:
-			c_token++;
 			if (END_OF_COMMAND)
 				int_error(c_token,"position requires 'x,y'");
 			wxt_posx = real_expression();
@@ -231,43 +227,36 @@ TERM_PUBLIC void wxt_options()
 			set_position = TRUE;
 			break;
 		case WXT_PERSIST:
-			c_token++;
 			wxt_persist = yes;
 			if (set_persist) duplication=TRUE;
 			set_persist = TRUE;
 			break;
 		case WXT_NOPERSIST:
-			c_token++;
 			wxt_persist = no;
 			if (set_persist) duplication=TRUE;
 			set_persist = TRUE;
 			break;
 		case WXT_RAISE:
-			c_token++;
 			wxt_raise = yes;
 			if (set_raise) duplication=TRUE;
 			set_raise = TRUE;
 			break;
 		case WXT_NORAISE:
-			c_token++;
 			wxt_raise = no;
 			if (set_raise) duplication=TRUE;
 			set_raise = TRUE;
 			break;
 		case WXT_CTRL:
-			c_token++;
 			wxt_ctrl = yes;
 			if (set_ctrl) duplication=TRUE;
 			set_ctrl = TRUE;
 			break;
 		case WXT_NOCTRL:
-			c_token++;
 			wxt_ctrl = no;
 			if (set_ctrl) duplication=TRUE;
 			set_ctrl = TRUE;
 			break;
 		case WXT_TITLE:
-			c_token++;
 			if (!(s = try_to_get_string()))
 				int_error(c_token,"title: expecting string");
 			if (*s)
@@ -277,24 +266,20 @@ TERM_PUBLIC void wxt_options()
 			set_title = TRUE;
 			break;
 		case WXT_CLOSE:
-			c_token++;
 			if (set_close) duplication=TRUE;
 			set_close = TRUE;
 			break;
 		case WXT_ROUNDED:
-			c_token++;
 			if (set_capjoin) duplication=TRUE;
 			wxt_linecap = ROUNDED;
 			set_capjoin = TRUE;
 			break;
 		case WXT_BUTT:
-			c_token++;
 			if (set_capjoin) duplication=TRUE;
 			wxt_linecap = BUTT;
 			set_capjoin = TRUE;
 			break;
 		case WXT_SQUARE:
-			c_token++;
 			if (set_capjoin) duplication=TRUE;
 			wxt_linecap = SQUARE;
 			set_capjoin = TRUE;
@@ -302,32 +287,37 @@ TERM_PUBLIC void wxt_options()
 		case WXT_DASHED:
 		case WXT_SOLID:
 			/* dashes always enabled in version 5 */
-			c_token++;
 			wxt_dashed = TRUE;
 			break;
 		case WXT_DASHLENGTH:
-			c_token++;
 			wxt_dashlength = real_expression();
 			if (wxt_dashlength <= 0)
 			    wxt_dashlength = 1.0;
 			break;
 		case WXT_LINEWIDTH:
-			c_token++;
 			wxt_lw = real_expression();
 			if (wxt_lw <= 0)
 			    wxt_lw = 1.0;
 			break;
 		case WXT_BACKGROUND:
 			{
-			c_token++;
 			wxt_background = parse_color_name();
 			wxt_rgb_background.r = (double)((wxt_background >> 16) & 0xff) / 255.;
 			wxt_rgb_background.g = (double)((wxt_background >>  8) & 0xff) / 255.;
 			wxt_rgb_background.b = (double)( wxt_background        & 0xff) / 255.;
 			break;
 			}
+		case WXT_NOBACKGROUND:
+			{
+			wxt_background = 0xffffff;
+			wxt_rgb_background.r = 1.0;
+			wxt_rgb_background.g = 1.0;
+			wxt_rgb_background.b = 1.0;
+			break;
+			}
 		case WXT_OTHER:
 		default:
+			c_token--;
 			if (isanumber(c_token) || type_udv(c_token) == INTGR) {
 				wxt_window_number = int_expression();
 				if (set_number) duplication=TRUE;
@@ -517,7 +507,7 @@ START_HELP(wxt)
 " Syntax:",
 "         set term wxt {<n>}",
 "                      {size <width>,<height>} {position <x>,<y>}",
-"                      {background <rgb_color>}",
+"                      {background <rgb_color> | nobackground}",
 "                      {{no}enhanced}",
 "                      {font <font>} {fontscale <scale>}",
 "                      {title \"title\"}",
