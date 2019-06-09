@@ -493,7 +493,8 @@ pgf.draw_raw_rgb_image = function(t, m, n, ll, ur, xfile)
   local ys = sf("%.3f", pgf.transform_ycoord(ur[2]) - pgf.transform_ycoord(ll[2]))
   gw("\\def\\gprawrgbimagedata{%\n  ")
   for cnt = 1,#t do
-    gw(sf("%02x%02x%02x", 255*t[cnt][1]+0.5, 255*t[cnt][2]+0.5, 255*t[cnt][3]+0.5))
+    gw(sf("%02x%02x%02x", math.floor(255*t[cnt][1]+0.5),
+          math.floor(255*t[cnt][2]+0.5), math.floor(255*t[cnt][3]+0.5)))
     if (cnt % 16) == 0 then
       gw("%\n  ")
     end
@@ -1632,7 +1633,7 @@ gfx.format_color = function(ctype, val)
   elseif ctype == 'RGBA' then
     c = string.format("rgb color={%.3f,%.3f,%.3f}", val[1], val[2], val[3])
   elseif ctype == 'GRAY' then
-    c = string.format("color=black!%i", 100*val[1]+0.5)
+    c = string.format("color=black!%i", math.floor(100*val[1]+0.5))
   end
   return c
 end
