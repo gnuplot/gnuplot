@@ -74,8 +74,8 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
-pgf.REVISION = "109"
-pgf.REVISION_DATE = "2019/06/09 16:31:15"
+pgf.REVISION = "110"
+pgf.REVISION_DATE = "2019/06/10 03:12:00"
 
 pgf.styles = {}
 
@@ -667,38 +667,25 @@ f:write([[
 
 % FIXME: is there a more elegant way to determine the output format?
 
-\def\pgfsysdriver@a{pgfsys-dvi.def}       % ps
-\def\pgfsysdriver@b{pgfsys-dvipdfm.def}   % pdf
-\def\pgfsysdriver@c{pgfsys-dvipdfmx.def}  % pdf
-\def\pgfsysdriver@d{pgfsys-dvips.def}     % ps
-\def\pgfsysdriver@e{pgfsys-pdftex.def}    % pdf
-\def\pgfsysdriver@f{pgfsys-tex4ht.def}    % html
-\def\pgfsysdriver@g{pgfsys-textures.def}  % ps
-\def\pgfsysdriver@h{pgfsys-vtex.def}      % ps
-\def\pgfsysdriver@i{pgfsys-xetex.def}     % pdf
-
 \newif\ifgppdfout\gppdfoutfalse
 \newif\ifgppsout\gppsoutfalse
 
-\ifx\pgfsysdriver\pgfsysdriver@a
-  \gppsouttrue
-\else\ifx\pgfsysdriver\pgfsysdriver@b
-  \gppdfouttrue
-\else\ifx\pgfsysdriver\pgfsysdriver@c
-  \gppdfouttrue
-\else\ifx\pgfsysdriver\pgfsysdriver@d
-  \gppsouttrue
-\else\ifx\pgfsysdriver\pgfsysdriver@e
-  \gppdfouttrue
-\else\ifx\pgfsysdriver\pgfsysdriver@f
-  % tex4ht
-\else\ifx\pgfsysdriver\pgfsysdriver@g
-  \gppsouttrue
-\else\ifx\pgfsysdriver\pgfsysdriver@h
-  \gppsouttrue
-\else\ifx\pgfsysdriver\pgfsysdriver@i
-  \gppdfouttrue
-\fi\fi\fi\fi\fi\fi\fi\fi\fi
+\expandafter\def\csname gnuplot@select@driver@pgfsys-dvi.def\endcsname     {\gppsouttrue}  % ps
+\expandafter\def\csname gnuplot@select@driver@pgfsys-dvipdfm.def\endcsname {\gppdfouttrue} % pdf
+\expandafter\def\csname gnuplot@select@driver@pgfsys-dvipdfmx.def\endcsname{\gppdfouttrue} % pdf
+\expandafter\def\csname gnuplot@select@driver@pgfsys-dvips.def\endcsname   {\gppsouttrue}  % ps
+\expandafter\def\csname gnuplot@select@driver@pgfsys-pdftex.def\endcsname  {\gppdfouttrue} % pdf
+\expandafter\def\csname gnuplot@select@driver@pgfsys-tex4ht.def\endcsname  {}              % html
+\expandafter\def\csname gnuplot@select@driver@pgfsys-textures.def\endcsname{\gppsouttrue}  % ps
+\expandafter\def\csname gnuplot@select@driver@pgfsys-vtex.def\endcsname    {\gppsouttrue}  % ps
+\expandafter\def\csname gnuplot@select@driver@pgfsys-xetex.def\endcsname   {\gppdfouttrue} % pdf
+\expandafter\def\csname gnuplot@select@driver@pgfsys-luatex.def\endcsname  {\gppdfouttrue} % pdf
+
+\ifcsname gnuplot@select@driver@\pgfsysdriver\endcsname
+  \csname gnuplot@select@driver@\pgfsysdriver\endcsname
+\else
+  \errmessage{The driver \pgfsysdriver\space is not supported by gnuplot-lua-tikz}%
+\fi
 
 % uncomment the following lines to make font values "appendable"
 % and if you are really sure about that ;-)
