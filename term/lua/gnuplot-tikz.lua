@@ -665,26 +665,29 @@ f:write([[
 \fi}
 \expandafter\gpchecktikzversion\pgfversion\relax
 
-% FIXME: is there a more elegant way to determine the output format?
+\def\gnuplot@output@ps{ps} % required for comparison in \gprawimage
 
-\newif\ifgppdfout\gppdfoutfalse
-\newif\ifgppsout\gppsoutfalse
-
-\expandafter\def\csname gnuplot@select@driver@pgfsys-dvi.def\endcsname     {\gppsouttrue}  % ps
-\expandafter\def\csname gnuplot@select@driver@pgfsys-dvipdfm.def\endcsname {\gppdfouttrue} % pdf
-\expandafter\def\csname gnuplot@select@driver@pgfsys-dvipdfmx.def\endcsname{\gppdfouttrue} % pdf
-\expandafter\def\csname gnuplot@select@driver@pgfsys-dvips.def\endcsname   {\gppsouttrue}  % ps
-\expandafter\def\csname gnuplot@select@driver@pgfsys-pdftex.def\endcsname  {\gppdfouttrue} % pdf
-\expandafter\def\csname gnuplot@select@driver@pgfsys-tex4ht.def\endcsname  {}              % html
-\expandafter\def\csname gnuplot@select@driver@pgfsys-textures.def\endcsname{\gppsouttrue}  % ps
-\expandafter\def\csname gnuplot@select@driver@pgfsys-vtex.def\endcsname    {\gppsouttrue}  % ps
-\expandafter\def\csname gnuplot@select@driver@pgfsys-xetex.def\endcsname   {\gppdfouttrue} % pdf
-\expandafter\def\csname gnuplot@select@driver@pgfsys-luatex.def\endcsname  {\gppdfouttrue} % pdf
+\expandafter\def\csname gnuplot@select@driver@pgfsys-dvi.def\endcsname     {ps}
+\expandafter\def\csname gnuplot@select@driver@pgfsys-dvipdfm.def\endcsname {pdf}
+\expandafter\def\csname gnuplot@select@driver@pgfsys-dvipdfmx.def\endcsname{pdf}
+\expandafter\def\csname gnuplot@select@driver@pgfsys-dvips.def\endcsname   {ps}
+\expandafter\def\csname gnuplot@select@driver@pgfsys-pdftex.def\endcsname  {pdf}
+\expandafter\def\csname gnuplot@select@driver@pgfsys-luatex.def\endcsname  {pdf}
+\expandafter\def\csname gnuplot@select@driver@pgfsys-tex4ht.def\endcsname  {html}
+\expandafter\def\csname gnuplot@select@driver@pgfsys-textures.def\endcsname{ps}
+\expandafter\def\csname gnuplot@select@driver@pgfsys-vtex.def\endcsname    {ps}
+\expandafter\def\csname gnuplot@select@driver@pgfsys-xetex.def\endcsname   {pdf}
 
 \ifcsname gnuplot@select@driver@\pgfsysdriver\endcsname
-  \csname gnuplot@select@driver@\pgfsysdriver\endcsname
+  \edef\gnuplot@output@mode{\csname gnuplot@select@driver@\pgfsysdriver\endcsname}
 \else
   \errmessage{The driver \pgfsysdriver\space is not supported by gnuplot-lua-tikz}%
+\fi
+
+\ifcsname PackageWarning\endcsname
+  \let\gnuplot@packagewarning\PackageWarning
+\else
+  \def\gnuplot@packagewarning#1#2{\immediate\write-1{Package #1 Warning: #2}}
 \fi
 
 % uncomment the following lines to make font values "appendable"
@@ -726,19 +729,13 @@ f:write([[
   \pgfsysprotocol@literal{#6 >}%
 }
 \def\gp@rawimage@html#1#2#3#4#5#6{%
-% FIXME: print a warning message here
+  \gnuplot@packagewarning{gnuplot-lua-tikz}{%
+    \noexpand\gp@rawimage is not implemented for \gnuplot@output@mode\space output.%
+  }%
 }
 
-\ifgppdfout
-  \def\gp@rawimage{\gp@rawimage@pdf}
-\else
-  \ifgppsout
-    \def\gp@rawimage{\gp@rawimage@ps}
-  \else
-    \def\gp@rawimage{\gp@rawimage@html}
-  \fi
-\fi
-
+% Select \gp@rawimage depending on the output mode
+\expandafter\let\expandafter\gp@rawimage\csname gp@rawimage@\gnuplot@output@mode\endcsname
 
 \def\gploadimage#1#2#3#4#5{%
   \pgftext[left,bottom,x=#1cm,y=#2cm] {\pgfimage[interpolate=false,width=#3cm,height=#4cm]{#5}};%
@@ -748,10 +745,10 @@ f:write([[
   \def\gp@image@size{#1}%
 }
 
-\def\gp@rawimage@#1#2#3#4#5#6#7#8{
+\def\gp@rawimage@#1#2#3#4#5#6#7#8{%
   \tikz@scan@one@point\gp@set@size(#6,#7)\relax%
   \tikz@scan@one@point\pgftransformshift(#2,#3)\relax%
-  \pgftext {%
+  \pgftext{%
     \pgfsys@beginpurepicture%
     \gp@image@size% fill \pgf@x and \pgf@y
     \gp@rawimage{#1}{#4}{#5}{\pgf@x}{\pgf@y}{#8}%
@@ -763,12 +760,12 @@ f:write([[
 %% color model is 'cmyk' or 'rgb' (default)
 \def\gprawimage#1#2#3#4#5#6#7#8#9{%
   \ifx&#9&%
-    \gp@rawimage@{#1}{#2}{#3}{#4}{#5}{#6}{#7}{#8}
+    \gp@rawimage@{#1}{#2}{#3}{#4}{#5}{#6}{#7}{#8}%
   \else
-    \ifgppsout
-      \gp@rawimage@{#1}{#2}{#3}{#4}{#5}{#6}{#7}{#8}
+    \ifx\gnuplot@output@mode\gnuplot@output@ps
+      \gp@rawimage@{#1}{#2}{#3}{#4}{#5}{#6}{#7}{#8}%
     \else
-      \gploadimage{#2}{#3}{#6}{#7}{#9}
+      \gploadimage{#2}{#3}{#6}{#7}{#9}%
     \fi
   \fi
 }
@@ -875,11 +872,11 @@ f:write([[
 %  #3 coordinate of "north east"
 %
 \def\gpdefrectangularnode#1#2#3{%
-  \expandafter\gdef\csname pgf@sh@ns@#1\endcsname{rectangle}
+  \expandafter\gdef\csname pgf@sh@ns@#1\endcsname{rectangle}%
   \expandafter\gdef\csname pgf@sh@np@#1\endcsname{%
     \def\southwest{#2}%
     \def\northeast{#3}%
-  }
+  }%
   \pgfgettransform\pgf@temp%
   % once it is defined, no more transformations will be applied, I hope
   \expandafter\xdef\csname pgf@sh@nt@#1\endcsname{\pgf@temp}%
