@@ -4,6 +4,7 @@ Changes in 5.2.8
 * FIX qt: suppress off-by-one ysize (Bug #1759)
 * FIX cairo: suppress off-by-one ysize (Bug #1759)
 * FIX gd: apply alpha to brushstroke lines (Bug #2117)
+* FIX tikz: fixes to accommodate lua 5.3 and newer pgf
 
 Changes in 5.2.7
 ================
