@@ -15,7 +15,7 @@ endif
 tex_DATA = gnuplot.cfg ${lua_files}
 texdir = @TEXDIR@
 
-${lua_files}:
+${lua_files}: $(top_srcdir)/term/lua/gnuplot-tikz.lua
 	test -z "$(build_lua)" || lua $(top_srcdir)/term/lua/gnuplot-tikz.lua style
 
 install-data-hook:
