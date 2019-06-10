@@ -1097,7 +1097,7 @@ START_HELP(pict2e)
 "?term pict2e",
 "?pict2e",
 " The `pict2e` terminal uses the LaTeX2e variant of the picture environment.",
-" It replaces terminals which where based on the original LaTeX picture"
+" It replaces terminals which were based on the original LaTeX picture",
 " environment: `latex`, `emtex`, `tpic`, and `eepic`. (EXPERIMENTAL)",
 "",
 " Alternatives to this terminal with a more complete support of gnuplot's",

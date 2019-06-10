@@ -293,6 +293,8 @@ C
 #b The `pstricks` terminal has been extended to support many modern gnuplot
 ## features including RGB colors and transparency, filled polygons, and boxes.
 #b New terminal `pict2e` to use the LaTeX2e pict2e environment.
+## It directly supersedes older terminals `latex`, `emtex`, `eepic`, and `tpic`,
+## which are no longer built by default.
 #b The `texdraw` terminal has been extended to support text at arbitrary angles,
 ## variable line width, v5 dashed lines, and filled boxes and polygons. It can
 ## now be used with plain TeX, too.
