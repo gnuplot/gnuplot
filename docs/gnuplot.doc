@@ -8358,7 +8358,8 @@ Ffigure_fenceplot
                        | bspline
                        | points <n>
                        | order <n>
-                       | levels { auto {<n>} | <n>
+                       | levels { <n> 
+                                  | auto {<n>}
                                   | discrete <z1> {,<z2>{,<z3>...}}
                                   | incremental <start>, <incr> {,<end>}
                                 }
@@ -8409,7 +8410,8 @@ Ffigure_fenceplot
  <start> and increasing by <increment>, until the number of contours is reached.
  <end> is used to determine the number of contour levels, which will be changed
  by any subsequent `set cntrparam levels <n>`.  If the z axis is logarithmic,
- <increment> will be interpreted as a factor, just like in `set ztics`.
+ <increment> will be interpreted as a multiplicative factor, as it is for
+ `set ztics`, and <end> should not be used.
 
  Keywords controlling the assignment of linetype to contours:
 
