@@ -376,19 +376,19 @@ PICT2E_init()
 	    "%% GNUPLOT: LaTeX2e picture (pict2e)\n" \
 	    "\\setlength{\\unitlength}{%fpt}\n",
 	    PICT2E_UNIT);
-    fputs("\\ifx\\plotpoint\\undefined\\newsavebox{\\plotpoint}\\fi\n"
+    fputs("\\ifx\\plotpoint\\undefined\\newsavebox{\\plotpoint}\\fi\n",
+	  gpoutfile);
 #ifdef PICT2E_TRANSPARENT
-	  // test if command \transparent is available
+    fputs(// test if command \transparent is available
 	  "\\ifx\\transparent\\undefined%\n"
 	  "    \\providecommand{\\gpopaque}{}%\n"
 	  "    \\providecommand{\\gptransparent}[2]{\\color{.!#2}}%\n"
 	  "\\else%\n"
 	  "    \\providecommand{\\gpopaque}{\\transparent{1.0}}%\n"
 	  "    \\providecommand{\\gptransparent}[2]{\\transparent{#1}}%\n"
-	  "\\fi%\n"
-#endif
-	  "",
+	  "\\fi%\n",
 	  gpoutfile);
+#endif
 }
 
 
