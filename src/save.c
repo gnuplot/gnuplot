@@ -712,15 +712,14 @@ set isosamples %d, %d\n\
 	fputs("bspline\n", fp);
 	break;
     }
-    fputs("set cntrparam levels ", fp);
+    fprintf(fp, "set cntrparam levels %d\nset cntrparam levels ", contour_levels);
     switch (contour_levels_kind) {
     case LEVELS_AUTO:
-	fprintf(fp, "auto %d", contour_levels);
+	fprintf(fp, "auto");
 	break;
     case LEVELS_INCREMENTAL:
-	fprintf(fp, "incremental %g,%g,%g",
-		contour_levels_list[0], contour_levels_list[1],
-		contour_levels_list[0] + contour_levels_list[1] * contour_levels);
+	fprintf(fp, "incremental %g,%g",
+		contour_levels_list[0], contour_levels_list[1]);
 	break;
     case LEVELS_DISCRETE:
 	{

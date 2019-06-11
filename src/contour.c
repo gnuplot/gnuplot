@@ -263,7 +263,10 @@ contour(int num_isolines, struct iso_curve *iso_lines)
 		z = eval_link_function((&Z_AXIS), z);
 	    break;
 	case LEVELS_INCREMENTAL:
-	    z = contour_levels_list[0] + i * contour_levels_list[1];
+	    if (Z_AXIS.log)
+		z = contour_levels_list[0] * pow(contour_levels_list[1], (double)i);
+	    else
+		z = contour_levels_list[0] + i * contour_levels_list[1];
 	    break;
 	case LEVELS_DISCRETE:
 	    z = contour_levels_list[i];
