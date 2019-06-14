@@ -50,6 +50,30 @@ set paxis 4 range [0:40]
 plot 'GM1_sugar.pdb' using 6:5 lc var lw 2 title "X", '' using 7 at 1.75 title "Y", '' using 8 at 2.5 title "Z", '' using 10 title "B"
 
 pause -1 "Hit return to continue"
+reset
+
+set style data parallel
+set palette defined (0 "dark-blue", 1 "dark-orange")
+set xrange [0.5:7.5]
+unset ytics
+set xtics font "/:Bold,13"
+unset border
+set bmargin 4
+unset colorbox
+a = 12.
+b = 34.
+
+set title "Parallel Axis Plot" font ",15"
+
+plot sample [x=1:20] '+' using (rand(0)):0 lc palette title "random", \
+    '' u ($1) title "x", \
+    '' u (-$1) title "-x", \
+    '' u (a*$1) title "a*x", \
+    '' u (a*$1+b) title "a*x+b", \
+    '' u (exp($1)) title "e^x", \
+    '' u (1/$1) title "1/x"
+
+pause -1 "Hit return to continue"
 
 set encoding save_encoding
 reset
