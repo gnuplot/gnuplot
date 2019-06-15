@@ -96,6 +96,7 @@ static void delete_object(struct object * prev, struct object * this);
 static void unset_style_rectangle(void);
 static void unset_style_circle(void);
 static void unset_style_ellipse(void);
+static void unset_style_parallel(void);
 static void unset_wall(int which);
 static void unset_loadpath(void);
 static void unset_locale(void);
@@ -1608,6 +1609,10 @@ unset_style()
 	unset_boxplot();
 	c_token++;
 	break;
+    case SHOW_STYLE_PARALLEL:
+	unset_style_parallel();
+	c_token++;
+	break;
     default:
 	int_error(c_token, "unrecognized style");
     }
@@ -1935,6 +1940,7 @@ reset_command()
     free(parallel_axis_array);
     parallel_axis_array = NULL;
     num_parallel_axes = 0;
+    unset_style_parallel();
 
     if (shadow_axis_array) {
 	for (i=0; i<NUMBER_OF_MAIN_VISIBLE_AXES; i++)
@@ -2066,6 +2072,12 @@ unset_style_ellipse()
     struct object foo = DEFAULT_ELLIPSE_STYLE;
     default_ellipse = foo;
     return;
+}
+static void
+unset_style_parallel()
+{
+    struct pa_style parallel_axis_default = DEFAULT_PARALLEL_AXIS_STYLE;
+    parallel_axis_style = parallel_axis_default;
 }
 static void
 unset_wall(int which)
