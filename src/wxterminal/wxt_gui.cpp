@@ -637,7 +637,7 @@ void wxtFrame::OnExport( wxCommandEvent& WXUNUSED( event ) )
 		rect.bottom = MulDiv(panel->plot.device_ymax, dpi, 10);
 		HDC hmf = CreateEnhMetaFileW(NULL, fullpathFilename.wc_str(), &rect, NULL);
 		// The win32_printing surface makes an effort to use the GDI API wherever possible,
-		// which should reduce the file size in many cases. 
+		// which should reduce the file size in many cases.
 		surface = cairo_win32_printing_surface_create(hmf);
 		if (cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS) {
 			fprintf(stderr, "Cairo error: could not create surface for metafile.\n");
@@ -2928,7 +2928,7 @@ void wxt_modify_plots(unsigned int ops, int plotno)
 	}
 	wxt_MutexGuiEnter();
 	wxt_current_panel->wxt_cairo_refresh();
-	// Empirically, without this Update() the plots are toggled correctly but the 
+	// Empirically, without this Update() the plots are toggled correctly but the
 	// change may not show on the screen until a mouse or other event next arrives
 	wxt_current_panel->Update();
 	wxt_MutexGuiLeave();
@@ -2958,7 +2958,7 @@ void wxtPanel::wxt_cairo_refresh()
 	  Call stack:
 	  [00] wxOnAssert(char const*, int, char const*, char const*, wchar_t const*)
 	  [01] wxClientDCImpl::DoGetSize(int*, int*) const
-	  [02] wxBufferedDC::UnMask()                  
+	  [02] wxBufferedDC::UnMask()
 	  wxwidgets documentation to the contrary, panel->IsShownOnScreen() is unreliable
 	 */
 	if (!wxt_current_window) {
@@ -3325,8 +3325,14 @@ void wxt_raise_window(wxt_window_t* window, bool force)
 		gdk_window_raise(gtk_widget_get_window(window->frame->GetHandle()));
 #else
 #ifdef __WXMSW__
-		// Only restore the window if it is not maximized.
-		if (!(window->frame->IsMaximized()))
+		// If gnuplot is invoked "hidden", the very first Show() is ignored.
+		// FIXME: Revert to the Windows API, since I could not manage to get
+		// it right using wxWidget class methods only.
+		if (!IsWindowVisible(window->frame->GetHandle()))
+			ShowWindow(window->frame->GetHandle(), SW_SHOWNORMAL);
+		// Only restore the window if it is iconized.  In particular
+		// leave it alone if it is maximized or "snapped".
+		if (window->frame->IsIconized())
 #endif
 		window->frame->Restore();
 		window->frame->Raise();
@@ -3699,7 +3705,7 @@ int wxtPanel::wxt_cairo_create_platform_context()
 	/* GetHDC is a wxMSW specific wxDC method that returns
 	 * the HDC on which painting should be done */
 	surface = cairo_win32_surface_create_with_ddb(
-		(HDC) dc.GetHDC(), CAIRO_FORMAT_RGB24, 
+		(HDC) dc.GetHDC(), CAIRO_FORMAT_RGB24,
 		plot.device_xmax, plot.device_ymax);
 	plot.cr = cairo_create(surface);
 	cairo_surface_destroy(surface);
