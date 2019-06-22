@@ -411,7 +411,7 @@ CGM_options()
 	    string = gp_input_line + token[c_token].start_index;
 
 	    /* Silently ignore these, as they are not yet implemented */
-	    if (equals(c_token, "dl") || almost_equals(c_token, "dashl$ength")) { 
+	    if (equals(c_token, "dl") || almost_equals(c_token, "dashl$ength")) {
 		c_token++;
 		(void) real_expression();
 		break;
@@ -438,16 +438,16 @@ CGM_options()
 		++c_token;
 	    } else {
 		char *s = NULL;
-		if (equals(c_token,"font"))
+		if (equals(c_token, "font"))
 		    c_token++;
 		if (isstringvalue(c_token) && (s = try_to_get_string())) {
 		    double relwidth;
 		    int font_index;
 		    char *comma = strchr(s,',');
-		    if (comma && (1 == sscanf(comma+1,"%d",&cgm_fontsize)))
+		    if (comma && (1 == sscanf(comma + 1, "%d", &cgm_fontsize)))
 			   *comma = '\0';
 		    if (*s)
-		      	   font_index = CGM_find_font(s, strlen(s), &relwidth);
+			font_index = CGM_find_font(s, strlen(s), &relwidth);
 		    else
 			   font_index = CGM_find_font(cgm_font, strlen(cgm_font), &relwidth);
 		    if (font_index == 0) {
@@ -494,7 +494,7 @@ CGM_options()
 
     sprintf(CGM_default_font, "%s,%d", cgm_font, cgm_fontsize);
     /* CGM_default_font holds the font and size set at 'set term' */
-    sprintf(term_options, "%s %s %s %s %s width %d linewidth %d \"%s\" %d",
+    sprintf(term_options, "%s %s %s %s %s width %d linewidth %d font \"%s, %d\"",
 	    cgm_portrait ? "portrait" : "landscape",
 	    cgm_monochrome ? "monochrome" : "color",
 	    cgm_rotate ? "rotate" : "norotate",
