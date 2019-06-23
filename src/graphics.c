@@ -109,7 +109,7 @@ static void place_labels(struct text_label * listhead, int layer, TBOOLEAN clip)
 static void place_arrows(int layer);
 static void place_grid(int layer);
 static void place_raxis(void);
-static void place_parallel_axes(struct curve_points *plots, int pcount, int layer);
+static void place_parallel_axes(struct curve_points *plots, int layer);
 
 static void plot_steps(struct curve_points * plot);	/* JG */
 static void plot_fsteps(struct curve_points * plot);	/* HOE */
@@ -591,7 +591,7 @@ do_plot(struct curve_points *plots, int pcount)
     axis_draw_2d_zeroaxis(SECOND_Y_AXIS,SECOND_X_AXIS);
 
     /* DRAW VERTICAL AXES OF PARALLEL AXIS PLOTS */
-    place_parallel_axes(plots, pcount, LAYER_BACK);
+    place_parallel_axes(plots, LAYER_BACK);
 
     /* DRAW PLOT BORDER */
     if (draw_border)
@@ -954,7 +954,7 @@ do_plot(struct curve_points *plots, int pcount)
 
     /* DRAW VERTICAL AXES OF PARALLEL AXIS PLOTS */
     if (parallel_axis_style.layer == LAYER_FRONT)
-	place_parallel_axes(plots, pcount, LAYER_FRONT);
+	place_parallel_axes(plots, LAYER_FRONT);
 
     /* REDRAW PLOT BORDER */
     if (draw_border && border_layer == LAYER_FRONT)
@@ -3765,7 +3765,7 @@ place_raxis()
 }
 
 static void
-place_parallel_axes(struct curve_points *first_plot, int pcount, int layer)
+place_parallel_axes(struct curve_points *first_plot, int layer)
 {
     struct curve_points *plot = first_plot;
     struct axis *this_axis;
