@@ -1184,18 +1184,11 @@ const struct gen_table fs_opt_tbl[] = {
 };
 
 void
-parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int def_pattern,
-		t_colorspec def_bordertype)
+parse_fillstyle(struct fill_style_type *fs)
 {
     TBOOLEAN set_fill = FALSE;
     TBOOLEAN set_border = FALSE;
     TBOOLEAN transparent = FALSE;
-
-    /* Set defaults */
-    fs->fillstyle = def_style;
-    fs->filldensity = def_density;
-    fs->fillpattern = def_pattern;
-    fs->border_color = def_bordertype;
 
     if (END_OF_COMMAND)
 	return;

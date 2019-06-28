@@ -2003,9 +2003,11 @@ eval_3dplots()
 		if ((this_plot->plot_style & PLOT_STYLE_HAS_FILL) && !set_fillstyle){
 		    int stored_token = c_token;
 		    if (equals(c_token,"fs") || almost_equals(c_token,"fill$style")) {
-			parse_fillstyle(&this_plot->fill_properties,
-				default_fillstyle.fillstyle, default_fillstyle.filldensity,
-				1, this_plot->lp_properties.pm3d_color);
+			this_plot->fill_properties.fillstyle = default_fillstyle.fillstyle;
+			this_plot->fill_properties.filldensity = default_fillstyle.filldensity;
+			this_plot->fill_properties.fillpattern = 1;
+			this_plot->fill_properties.border_color = this_plot->lp_properties.pm3d_color;
+			parse_fillstyle(&this_plot->fill_properties);
 			set_fillstyle = TRUE;
 		    }
 		    if (this_plot->plot_style == PM3DSURFACE)

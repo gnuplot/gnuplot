@@ -4440,20 +4440,12 @@ set_obj(int tag, int obj_type)
 
 	/* Now parse the style options; default to whatever the global style is  */
 	if (!got_fill) {
-	    fill_style_type *default_style;
-	    if (this_object->object_type == OBJ_RECTANGLE)
-		default_style = &default_rectangle.fillstyle;
-	    else
-		default_style = &default_fillstyle;
-
-	    if (new_obj)
-		parse_fillstyle(&this_object->fillstyle, default_style->fillstyle,
-			default_style->filldensity, default_style->fillpattern,
-			default_style->border_color);
-	    else
-		parse_fillstyle(&this_object->fillstyle, this_object->fillstyle.fillstyle,
-			this_object->fillstyle.filldensity, this_object->fillstyle.fillpattern,
-			this_object->fillstyle.border_color);
+	    if (new_obj) {
+		this_object->fillstyle = (this_object->object_type == OBJ_RECTANGLE)
+		? default_rectangle.fillstyle
+		: default_fillstyle;
+	    }
+	    parse_fillstyle(&this_object->fillstyle);
 	    if (c_token != save_token) {
 		got_fill = TRUE;
 		continue;
@@ -4535,9 +4527,7 @@ set_wall()
 	int save_token = c_token;
 
 	/* fill style */
-	parse_fillstyle(&this_object->fillstyle, this_object->fillstyle.fillstyle,
-		this_object->fillstyle.filldensity, this_object->fillstyle.fillpattern,
-		this_object->fillstyle.border_color);
+	parse_fillstyle(&this_object->fillstyle);
 
 	/* fill color */
 	if (equals(c_token,"fc") || almost_equals(c_token,"fillc$olor")) {
@@ -4676,11 +4666,7 @@ set_style()
 	set_linestyle(&first_linestyle, LP_STYLE);
 	break;
     case SHOW_STYLE_FILLING:
-	parse_fillstyle( &default_fillstyle,
-			default_fillstyle.fillstyle,
-			default_fillstyle.filldensity,
-			default_fillstyle.fillpattern,
-			default_fillstyle.border_color);
+	parse_fillstyle(&default_fillstyle);
 	break;
     case SHOW_STYLE_ARROW:
 	set_arrowstyle();

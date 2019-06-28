@@ -72,8 +72,7 @@ int lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allo
 void arrow_parse(struct arrow_style_type *, TBOOLEAN);
 void arrow_use_properties(struct arrow_style_type *arrow, int tag);
 
-void parse_fillstyle(struct fill_style_type *fs, int def_style,
-                     int def_density, int def_pattern, t_colorspec def_border);
+void parse_fillstyle(struct fill_style_type *fs);
 void parse_colorspec(struct t_colorspec *tc, int option);
 long parse_color_name(void);
 TBOOLEAN need_fill_border(struct fill_style_type *fillstyle);

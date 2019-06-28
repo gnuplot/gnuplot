@@ -1955,7 +1955,10 @@ eval_plots()
 		    c_token++;
 		    newhist_color = int_expression();
 		}
-		parse_fillstyle(&fs, FS_SOLID, 100, fs.fillpattern, default_fillstyle.border_color);
+		fs.fillstyle = FS_SOLID;
+		fs.filldensity = 100;
+		fs.border_color = default_fillstyle.border_color;
+		parse_fillstyle(&fs);
 
 		} while (c_token != previous_token);
 
@@ -2459,11 +2462,9 @@ eval_plots()
 		if (this_plot->plot_style & PLOT_STYLE_HAS_FILL){
 		    int stored_token = c_token;
 		    if (equals(c_token,"fs") || almost_equals(c_token,"fill$style")) {
-			parse_fillstyle(&this_plot->fill_properties,
-				default_fillstyle.fillstyle,
-				default_fillstyle.filldensity,
-				pattern_num,
-				default_fillstyle.border_color);
+			this_plot->fill_properties = default_fillstyle;
+			this_plot->fill_properties.fillpattern = pattern_num;
+			parse_fillstyle(&this_plot->fill_properties);
 			if (this_plot->plot_style == FILLEDCURVES
 			&& this_plot->fill_properties.fillstyle == FS_EMPTY)
 			    this_plot->fill_properties.fillstyle = FS_SOLID;
@@ -2580,12 +2581,11 @@ eval_plots()
 
 	    /* If we got this far without initializing the fill style, do it now */
 	    if (this_plot->plot_style & PLOT_STYLE_HAS_FILL) {
-		if (!set_fillstyle)
-		    parse_fillstyle(&this_plot->fill_properties,
-				default_fillstyle.fillstyle,
-				default_fillstyle.filldensity,
-				pattern_num,
-				default_fillstyle.border_color);
+		if (!set_fillstyle) {
+		    this_plot->fill_properties = default_fillstyle;
+		    this_plot->fill_properties.fillpattern = pattern_num;
+		    parse_fillstyle(&this_plot->fill_properties);
+		}
 		if ((this_plot->fill_properties.fillstyle == FS_PATTERN)
 		  ||(this_plot->fill_properties.fillstyle == FS_TRANSPARENT_PATTERN))
 		    pattern_num = this_plot->fill_properties.fillpattern + 1;
