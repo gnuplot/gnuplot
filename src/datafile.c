@@ -1093,7 +1093,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 
     /* If either 'set datafile columnhead' or 'set key autotitle columnhead'
      * is in effect we always treat the * first data row as non-data
-     * (df_readline() will return DF_COLUMNHEADERSrather than the column count).
+     * (df_readline() will return DF_COLUMN_HEADERS rather than the column count).
      * This is true even if the key is off or the data is read from 'stats'
      * or from 'fit' rather than plot.
      */
@@ -2710,10 +2710,7 @@ f_columnhead(union argument *arg)
     (void) pop(&a);
     column_for_key_title = (int) real(&a);
 
-    /* This handles the case:    plot ... using (column("FOO")) ... title columnhead
-     * FIXME: Why can't create_call_columnhead() dummy up the real column
-     *        rather than loading -1 and requiring that we retrieve via df_key_title?
-     */
+    /* This handles the case: plot ... using (column("FOO")) ... title columnhead */
     if (column_for_key_title == -1) {
 	push(Gstring(&a, df_key_title));
 	return;
@@ -2738,6 +2735,7 @@ f_columnhead(union argument *arg)
 	    static char unknown_column[2] = {0,0};
 	    push(Gstring(&a, &unknown_column[0]));
 	}
+	parse_1st_row_as_headers = TRUE;
     } else {
 /* DEBUG */ int_error(NO_CARET,"Internal error: df_column[] not initialized\n");
     }
