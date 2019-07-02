@@ -539,8 +539,6 @@ do_plot(struct curve_points *plots, int pcount)
     struct termentry *t = term;
     int curve;
     struct curve_points *this_plot = NULL;
-    int xl = 0, yl = 0;
-    int key_count = 0;
     TBOOLEAN key_pass = FALSE;
     legend_key *key = &keyT;
     int previous_plot_style;
@@ -619,7 +617,7 @@ do_plot(struct curve_points *plots, int pcount)
 
     /* Draw the key, or at least reserve space for it (pass 1) */
     if (key->visible)
-	draw_key( key, key_pass, &xl, &yl );
+	draw_key( key, key_pass);
     SECOND_KEY_PASS:
 	/* This tells the canvas, qt, and svg terminals to restart the plot   */
 	/* count so that key titles are in sync with the plots they describe. */
@@ -661,13 +659,9 @@ do_plot(struct curve_points *plots, int pcount)
 	/* Skip a line in the key between histogram clusters */
 	if (this_plot->plot_style == HISTOGRAMS
 	&&  previous_plot_style == HISTOGRAMS
-	&&  this_plot->histogram_sequence == 0 && yl != yl_ref) {
-	    if (++key_count >= key_rows) {
-		yl = yl_ref;
-		xl += key_col_wth;
-		key_count = 0;
-	    } else
-		yl = yl - key_entry_height;
+	&&  this_plot->histogram_sequence == 0 && !at_left_of_key()) {
+	    key_count++;
+	    advance_key(0);
 	}
 
 	/* Column-stacked histograms store their key titles internally */
@@ -687,14 +681,10 @@ do_plot(struct curve_points *plots, int pcount)
 			    lp_use_properties(&this_plot->lp_properties, histogram_linetype);
 			else
 			    load_linetype(&this_plot->lp_properties, histogram_linetype);
-			do_key_sample(this_plot, key, key_entry->text, xl, yl);
+			do_key_sample(this_plot, key, key_entry->text);
 		    }
-		    if (++key_count >= key_rows) {
-			yl = yl_ref;
-			xl += key_col_wth;
-			key_count = 0;
-		    } else
-			yl = yl - key_entry_height;
+		    key_count++;
+		    advance_key(0);
 		}
 		free_labels(this_plot->labels);
 		this_plot->labels = NULL;
@@ -716,9 +706,8 @@ do_plot(struct curve_points *plots, int pcount)
 		if (!this_plot->title_position
 		||  this_plot->title_position->scalex != character) {
 		    key_count++;
-		    if (key->invert)
-			yl = key->bounds.ybot + yl_ref + key_entry_height/2 - yl;
-		    do_key_sample(this_plot, key, this_plot->title, xl, yl);
+		    advance_key(TRUE);	/* invert only */
+		    do_key_sample(this_plot, key, this_plot->title);
 		}
 	    }
 	    ignore_enhanced(FALSE);
@@ -896,24 +885,16 @@ do_plot(struct curve_points *plots, int pcount)
 	else if (localkey && this_plot->title && !this_plot->title_is_suppressed) {
 	    /* we deferred point sample until now */
 	    if (this_plot->plot_style & PLOT_STYLE_HAS_POINT)
-		do_key_sample_point(this_plot, key, xl, yl);
+		do_key_sample_point(this_plot, key);
 
 	    if (this_plot->plot_style == LABELPOINTS)
-		do_key_sample_point(this_plot, key, xl, yl);
+		do_key_sample_point(this_plot, key);
 
 	    if (this_plot->plot_style == DOTS)
-		do_key_sample_point(this_plot, key, xl, yl);
+		do_key_sample_point(this_plot, key);
 
-	    if (!this_plot->title_position) {
-		if (key->invert)
-		    yl = key->bounds.ybot + yl_ref + key_entry_height/2 - yl;
-		if (key_count >= key_rows) {
-		    yl = yl_ref;
-		    xl += key_col_wth;
-		    key_count = 0;
-		} else
-		    yl = yl - key_entry_height;
-	    }
+	    if (!this_plot->title_position)
+		advance_key(0);
 	}
 
 	/* Option to label the end of the curve on the plot itself */
@@ -929,7 +910,7 @@ do_plot(struct curve_points *plots, int pcount)
     /* Go back and draw the legend in a separate pass if necessary */
     if (key->visible && key->front && !key_pass) {
 	key_pass = TRUE;
-	draw_key( key, key_pass, &xl, &yl );
+	draw_key( key, key_pass);
 	goto SECOND_KEY_PASS;
     }
 

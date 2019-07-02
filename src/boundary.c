@@ -67,12 +67,15 @@ static int title_x, title_y;
  */
 int key_entry_height;		/* bigger of t->v_char, t->v_tic */
 int key_point_offset;		/* offset from x for point sample */
-int key_col_wth, yl_ref;
 int ylabel_x, y2label_x, xlabel_y, x2label_y;
 int x2label_yoffset;
 int ylabel_y, y2label_y, xtic_y, x2tic_y, ytic_x, y2tic_x;
 int key_rows;
 int key_cols;
+int key_count;
+
+static int key_col_wth, yl_ref;
+static int xl, yl;
 
 /*{{{  boundary() */
 /* borders of plotting area
@@ -932,7 +935,10 @@ do_key_layout(legend_key *key)
     if (key->font)
 	t->set_font(key->font);
 
+    /* Is it OK to initialize these here rather than in do_plot? */
+    key_count = 0;
     key_xleft = 0;
+    xl = yl = 0;
 
     if (key->swidth >= 0) {
 	key_sample_width = key->swidth * t->h_char + t->h_tic;
@@ -1135,8 +1141,7 @@ void
 do_key_sample(
     struct curve_points *this_plot,
     legend_key *key,
-    char *title,
-    int xl, int yl)
+    char *title)
 {
     struct termentry *t = term;
 
@@ -1298,8 +1303,7 @@ do_key_sample(
 void
 do_key_sample_point(
     struct curve_points *this_plot,
-    legend_key *key,
-    int xl, int yl)
+    legend_key *key)
 {
     struct termentry *t = term;
 
@@ -1359,7 +1363,7 @@ do_key_sample_point(
 /* are drawn. Then the reserved space for the legend is blanked out, and 	*/
 /* finally the second pass through this code draws the legend.			*/
 void
-draw_key(legend_key *key, TBOOLEAN key_pass, int *xinkey, int *yinkey)
+draw_key(legend_key *key, TBOOLEAN key_pass)
 {
     struct termentry *t = term;
 
@@ -1416,8 +1420,8 @@ draw_key(legend_key *key, TBOOLEAN key_pass, int *xinkey, int *yinkey)
 
     yl_ref = key->bounds.ytop - (key_title_height + key_title_extra);
     yl_ref -= ((key->height_fix + 1) * key_entry_height) / 2;
-    *xinkey = key->bounds.xleft + key_size_left;
-    *yinkey = yl_ref;
+    xl = key->bounds.xleft + key_size_left;
+    yl = yl_ref;
 }
 
 /*
@@ -1499,4 +1503,29 @@ draw_titles()
     /* PLACE TIMELABEL */
     if (timelabel.text)
 	do_timelabel(time_x, time_y);
+}
+
+/* advance current position in the key in preparation for next key entry */
+void
+advance_key(TBOOLEAN only_invert)
+{
+    legend_key *key = &keyT;
+
+    if (key->invert)
+        yl = key->bounds.ybot + yl_ref + key_entry_height/2 - yl;
+    if (only_invert)
+	return;
+    if (key_count >= key_rows) {
+        yl = yl_ref;
+        xl += key_col_wth;
+        key_count = 0;
+    } else
+        yl = yl - key_entry_height;
+}
+
+/* stupid test used in only one place but it refers to our local variables */
+TBOOLEAN
+at_left_of_key()
+{
+    return (yl == yl_ref);
 }
