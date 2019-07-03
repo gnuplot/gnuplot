@@ -2644,6 +2644,10 @@ eval_plots()
 		 
 	    }
 
+	    /* We can skip a lot of stuff if this is not a real plot */
+	    if (this_plot->plot_type == KEYENTRY)
+		goto SKIPPED_EMPTY_FILE;
+
 	    /* Initialize the label list in case the BOXPLOT style needs it to store factors */
 	    if (this_plot->plot_style == BOXPLOT) {
 		if (this_plot->labels == NULL)
@@ -2745,7 +2749,7 @@ eval_plots()
 	    }
 
 	    /* These plot styles are not differentiated by line/point properties */
-	    if ((this_plot->plot_type != KEYENTRY) && !in_parametric
+	    if (!in_parametric
 	        && this_plot->plot_style != IMAGE
 		&& this_plot->plot_style != RGBIMAGE && this_plot->plot_style != RGBA_IMAGE
 	    ) {
