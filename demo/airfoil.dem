@@ -148,7 +148,7 @@ set style data lines
 set style function lines
 print  "Joukowski Airfoil using Complex Variables" 
 set title "Joukowski Airfoil using Complex Variables" offset 0,0
-set time
+set timestamp
 set yrange [-.2 : 1.8]
 set trange [0: 2*pi]
 set xrange [-.6:.6]

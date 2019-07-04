@@ -2934,7 +2934,7 @@ static void
 show_timestamp()
 {
     SHOW_ALL_NL;
-    show_xyzlabel("", "time", &timelabel);
+    show_xyzlabel("", "timestamp", &timelabel);
     fprintf(stderr, "\twritten in %s corner\n",
 	    (timelabel_bottom ? "bottom" : "top"));
 }

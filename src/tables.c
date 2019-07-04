@@ -276,7 +276,7 @@ const struct gen_table set_tbl[] =
     { "ticsc$ale", S_TICSCALE },
     { "ticsl$evel", S_TICSLEVEL },
     { "timef$mt", S_TIMEFMT },
-    { "tim$estamp", S_TIMESTAMP },
+    { "times$tamp", S_TIMESTAMP },
     { "tit$le", S_TITLE },
     { "v$ariables", S_VARIABLES },
     { "ve$rsion", S_VERSION },

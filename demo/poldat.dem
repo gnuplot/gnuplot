@@ -1,5 +1,5 @@
 set size square
-set time
+set timestamp "%a %d %b %Y"
 set clip
 set xtics axis nomirror
 set ytics axis nomirror
