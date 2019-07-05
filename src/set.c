@@ -950,6 +950,19 @@ set_autoscale()
 	    axis_array[FIRST_Y_AXIS].max_constraint = CONSTRAINT_NONE;
 	c_token++;
 	return;
+    } else if (equals(c_token, "paxis")) {
+	c_token++;
+	if (END_OF_COMMAND) {
+	    for (axis=0; axis<num_parallel_axes; axis++)
+		parallel_axis_array[axis].set_autoscale = AUTOSCALE_BOTH;
+	    return;
+	}
+	axis = int_expression() - 1;
+	if (0 <= axis && axis < num_parallel_axes) {
+	    parallel_axis_array[axis].set_autoscale = AUTOSCALE_BOTH;
+	    return;
+	}
+	/* no return */
     } else if (equals(c_token, "fix") || almost_equals(c_token, "noext$end")) {
 	for (axis=0; axis<AXIS_ARRAY_SIZE; axis++)
 	    axis_array[axis].set_autoscale |= AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX;
@@ -979,7 +992,7 @@ set_autoscale()
     if (set_autoscale_axis(&axis_array[V_AXIS])) return;
 
     /* come here only if nothing found: */
-	int_error(c_token, "Invalid range");
+	int_error(c_token, "Invalid axis");
 }
 
 
