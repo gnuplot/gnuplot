@@ -57,6 +57,9 @@ static void save_tics(FILE *, struct axis *);
 static void save_mtics(FILE *, struct axis *);
 static void save_zeroaxis(FILE *,AXIS_INDEX);
 static void save_set_all(FILE *);
+static void save_justification(int just, FILE *fp);
+static void save_axis_label_or_title(FILE *fp, char *name, char *suffix,
+			struct text_label *label, TBOOLEAN savejust);
 
 const char *coord_msg[] = {"first ", "second ", "graph ", "screen ", "character ", "polar "};
 /*
@@ -194,6 +197,29 @@ save_term(FILE *fp)
 	else
 	    fputs("# set output\n", fp);
 	fputs("#    EOF\n", fp);
+}
+
+/* helper function */
+static void
+save_axis_label_or_title(FILE *fp, char *name, char *suffix,
+			struct text_label *label, TBOOLEAN savejust)
+{
+    fprintf(fp, "set %s%s \"%s\" ",
+	    name, suffix, label->text ? conv_text(label->text) : "");
+    fprintf(fp, "\nset %s%s ", name, suffix);
+    save_position(fp, &(label->offset), 3, TRUE);
+    fprintf(fp, " font \"%s\"", label->font ? conv_text(label->font) : "");
+    save_textcolor(fp, &(label->textcolor));
+    if (savejust && (label->pos != CENTRE)) save_justification(label->pos,fp);
+    if (label->tag == ROTATE_IN_3D_LABEL_TAG)
+	fprintf(fp, " rotate parallel");
+    else if (label->rotate == TEXT_VERTICAL)
+	fprintf(fp, " rotate");
+    else if (label->rotate)
+	fprintf(fp, " rotate by %d", label->rotate);
+    else
+	fprintf(fp, " norotate");
+    fprintf(fp, "%s\n", (label->noenhanced) ? " noenhanced" : "");
 }
 
 static void
@@ -782,38 +808,17 @@ set origin %g,%g\n",
     for (axis=0; axis<num_parallel_axes; axis++)
 	save_tics(fp, &parallel_axis_array[axis]);
 
-#define SAVE_AXISLABEL_OR_TITLE(name,suffix,lab,savejust)		 \
-    {									 \
-	fprintf(fp, "set %s%s \"%s\" ",					 \
-		name, suffix, lab.text ? conv_text(lab.text) : "");	 \
-	fprintf(fp, "\nset %s%s ", name, suffix);			 \
-	save_position(fp, &(lab.offset), 3, TRUE);			 \
-	fprintf(fp, " font \"%s\"", lab.font ? conv_text(lab.font) : "");\
-	save_textcolor(fp, &(lab.textcolor));				 \
-	if (savejust && (lab.pos != CENTRE)) save_justification(lab.pos,fp); \
-	if (lab.tag == ROTATE_IN_3D_LABEL_TAG)				 \
-	    fprintf(fp, " rotate parallel");				 \
-	else if (lab.rotate == TEXT_VERTICAL)				 \
-	    fprintf(fp, " rotate");					 \
-	else if (lab.rotate)						 \
-	    fprintf(fp, " rotate by %d", lab.rotate);			 \
-	else								 \
-	    fprintf(fp, " norotate");					 \
-	fprintf(fp, "%s\n", (lab.noenhanced) ? " noenhanced" : "");	 \
-    }
-
-    SAVE_AXISLABEL_OR_TITLE("", "title", title, TRUE);
+    save_axis_label_or_title(fp, "", "title", &title, TRUE);
 
     fprintf(fp, "set timestamp %s \n", timelabel_bottom ? "bottom" : "top");
-    SAVE_AXISLABEL_OR_TITLE("", "timestamp", timelabel, FALSE);
+    save_axis_label_or_title(fp, "", "timestamp", &timelabel, FALSE);
 
     save_prange(fp, axis_array + T_AXIS);
     save_prange(fp, axis_array + U_AXIS);
     save_prange(fp, axis_array + V_AXIS);
 
 #define SAVE_AXISLABEL(axis)					\
-    SAVE_AXISLABEL_OR_TITLE(axis_name(axis),"label",	\
-			    axis_array[axis].label, TRUE)
+    save_axis_label_or_title(fp, axis_name(axis), "label", &axis_array[axis].label, TRUE)
 
     SAVE_AXISLABEL(FIRST_X_AXIS);
     SAVE_AXISLABEL(SECOND_X_AXIS);
@@ -838,7 +843,6 @@ set origin %g,%g\n",
 	save_prange(fp, &parallel_axis_array[axis]);
 
 #undef SAVE_AXISLABEL
-#undef SAVE_AXISLABEL_OR_TITLE
 
     fputs("unset logscale\n", fp);
     for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++) {
