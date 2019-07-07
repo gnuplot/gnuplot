@@ -106,6 +106,7 @@ static void set_minus_sign(void);
 static void set_micro(void);
 static void set_missing(void);
 static void set_separator(char **);
+static void set_datafile(void);
 static void set_datafile_commentschars(void);
 static void set_monochrome(void);
 static void set_mouse(void);
@@ -375,31 +376,7 @@ set_command()
 	    set_minus_sign();
 	    break;
 	case S_DATAFILE:
-	    if (almost_equals(++c_token,"miss$ing"))
-		set_missing();
-	    else if (almost_equals(c_token,"sep$arators"))
-		set_separator(&df_separators);
-	    else if (almost_equals(c_token,"com$mentschars"))
-		set_datafile_commentschars();
-	    else if (almost_equals(c_token,"bin$ary"))
-		df_set_datafile_binary();
-	    else if (almost_equals(c_token,"fort$ran")) {
-		df_fortran_constants = TRUE;
-		c_token++;
-	    } else if (almost_equals(c_token,"nofort$ran")) {
-		df_fortran_constants = FALSE;
-		c_token++;
-	    } else if (almost_equals(c_token,"fpe_trap")) {
-		df_nofpe_trap = FALSE;
-		c_token++;
-	    } else if (almost_equals(c_token,"nofpe_trap")) {
-		df_nofpe_trap = TRUE;
-		c_token++;
-	    } else if (almost_equals(c_token,"columnhead$ers")) {
-		df_columnheaders = TRUE;
-		c_token++;
-	    } else
-		int_error(c_token,"expecting datafile modifier");
+	    set_datafile();
 	    break;
 	case S_MOUSE:
 	    set_mouse();
@@ -6580,3 +6557,35 @@ rrange_to_xy()
     }
 }
 
+static void
+set_datafile()
+{
+    c_token++;
+    while (!END_OF_COMMAND) {
+	if (almost_equals(c_token,"miss$ing"))
+	    set_missing();
+	else if (almost_equals(c_token,"sep$arators"))
+	    set_separator(&df_separators);
+	else if (almost_equals(c_token,"com$mentschars"))
+	    set_datafile_commentschars();
+	else if (almost_equals(c_token,"bin$ary"))
+	    df_set_datafile_binary();
+	else if (almost_equals(c_token,"fort$ran")) {
+	    df_fortran_constants = TRUE;
+	    c_token++;
+	} else if (almost_equals(c_token,"nofort$ran")) {
+	    df_fortran_constants = FALSE;
+	    c_token++;
+	} else if (almost_equals(c_token,"fpe_trap")) {
+	    df_nofpe_trap = FALSE;
+	    c_token++;
+	} else if (almost_equals(c_token,"nofpe_trap")) {
+	    df_nofpe_trap = TRUE;
+	    c_token++;
+	} else if (almost_equals(c_token,"columnhead$ers")) {
+	    df_columnheaders = TRUE;
+	    c_token++;
+	} else
+	    int_error(c_token,"expecting datafile modifier");
+    }
+}
