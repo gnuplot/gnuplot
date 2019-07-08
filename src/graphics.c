@@ -681,7 +681,7 @@ do_plot(struct curve_points *plots, int pcount)
 			    lp_use_properties(&this_plot->lp_properties, histogram_linetype);
 			else
 			    load_linetype(&this_plot->lp_properties, histogram_linetype);
-			do_key_sample(this_plot, key, key_entry->text);
+			do_key_sample(this_plot, key, key_entry->text, 0.0);
 		    }
 		    key_count++;
 		    advance_key(0);
@@ -705,9 +705,11 @@ do_plot(struct curve_points *plots, int pcount)
 		/* If title is "at {end|beg}" do not draw it in the key */
 		if (!this_plot->title_position
 		||  this_plot->title_position->scalex != character) {
+		    coordval var_color;
 		    key_count++;
 		    advance_key(TRUE);	/* invert only */
-		    do_key_sample(this_plot, key, this_plot->title);
+		    var_color = (this_plot->varcolor) ? this_plot->varcolor[0] : 0.0;
+		    do_key_sample(this_plot, key, this_plot->title, var_color);
 		}
 	    }
 	    ignore_enhanced(FALSE);

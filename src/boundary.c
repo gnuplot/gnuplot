@@ -1141,7 +1141,8 @@ void
 do_key_sample(
     struct curve_points *this_plot,
     legend_key *key,
-    char *title)
+    char *title,
+    coordval var_color)
 {
     struct termentry *t = term;
 
@@ -1191,7 +1192,7 @@ do_key_sample(
 
     /* Draw sample in same style and color as the corresponding plot  */
     /* The variable color case uses the color of the first data point */
-    if (!check_for_variable_color(this_plot, &this_plot->varcolor[0]))
+    if (!check_for_variable_color(this_plot, &var_color))
 	term_apply_lp_properties(&this_plot->lp_properties);
 
     /* draw sample depending on bits set in plot_style */

@@ -7,7 +7,7 @@ void do_key_bounds(legend_key *key);
 void do_key_layout(legend_key *key);
 int find_maxl_keys(struct curve_points *plots, int count, int *kcnt);
 void do_key_sample(struct curve_points *this_plot,
-		   legend_key *key, char *title);
+		   legend_key *key, char *title, coordval var_color);
 void do_key_sample_point(struct curve_points *this_plot, legend_key *key);
 void draw_titles(void);
 void draw_key(legend_key *key, TBOOLEAN key_pass);
