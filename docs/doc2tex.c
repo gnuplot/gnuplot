@@ -547,12 +547,17 @@ puttex( char *str, FILE *file)
 	    }
 	    break;
         case 's':    /* find backquote after 'see' {see `} */
-        case 'S':
+        case 'S':    /* use the quoted text to generate a cross-ref */
             (void) fputc(ch, file);
 	    if ( str[0] == 'e' && str[1] == 'e' && isspace((unsigned char)str[2])){
                 see = TRUE;
             }
             break;
+	case 'c':   /* treat 'controlled using' the same as 'see' */
+            (void) fputc(ch, file);
+	    if (!strncmp( str, "ontrolled using", 15 ))
+		see = TRUE;
+	    break;
         case ')':
         case '.':
             see = FALSE;
