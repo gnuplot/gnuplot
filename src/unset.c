@@ -57,7 +57,6 @@
 #endif
 #include "voxelgrid.h"
 
-static void unset_all_tics(void);
 static void unset_angles(void);
 static void unset_arrow(void);
 static void unset_arrowstyles(void);
@@ -97,6 +96,7 @@ static void unset_style_rectangle(void);
 static void unset_style_circle(void);
 static void unset_style_ellipse(void);
 static void unset_style_parallel(void);
+static void unset_style_spiderplot(void);
 static void unset_wall(int which);
 static void unset_loadpath(void);
 static void unset_locale(void);
@@ -128,6 +128,7 @@ static void unset_psdir(void);
 static void unset_samples(void);
 static void unset_size(void);
 static void unset_style(void);
+static void unset_spiderplot(void);
 static void unset_surface(void);
 static void unset_table(void);
 static void unset_terminal(void);
@@ -429,6 +430,9 @@ unset_command()
 	break;
     case S_SIZE:
 	unset_size();
+	break;
+    case S_SPIDERPLOT:
+	unset_spiderplot();
 	break;
     case S_STYLE:
 	unset_style();
@@ -975,6 +979,7 @@ unset_grid()
     }
     polar_grid_angle = 0;
     grid_vertical_lines = FALSE;
+    grid_spiderweb = FALSE;
 }
 
 
@@ -1302,7 +1307,7 @@ unset_minitics(struct axis *this_axis)
 }
 
 /*process 'unset {x|y|x2|y2|z}tics' command */
-static void
+void
 unset_all_tics()
 {
     int i;
@@ -1613,11 +1618,31 @@ unset_style()
 	unset_style_parallel();
 	c_token++;
 	break;
+    case SHOW_STYLE_SPIDERPLOT:
+	unset_style_spiderplot();
+	c_token++;
+	break;
     default:
 	int_error(c_token, "unrecognized style");
     }
 }
 
+static void
+unset_spiderplot()
+{
+    if (spiderplot) {
+	spiderplot = FALSE;
+	data_style = POINTSTYLE;
+	aspect_ratio = 0;
+    }
+}
+
+static void
+unset_style_spiderplot()
+{
+    struct spider_web spiderweb = DEFAULT_SPIDERPLOT_STYLE;
+    spiderplot_style = spiderweb;
+}
 
 /* process 'unset surface' command */
 static void
@@ -1900,6 +1925,9 @@ reset_command()
     unset_polar();
     unset_parametric();
     unset_dummy();
+
+    unset_spiderplot();
+    unset_style_spiderplot();
 
     unset_axislabel_or_title(&title);
 

@@ -238,6 +238,10 @@ C
 #b `splot $voxelgrid with isosurface` creates a tesselated 3D surface enclosing
 ## voxels above a requested threshold level. See `isosurface`.
 #b Voxel grid values can be referenced in the `using` specifiers for 3D plots.
+#b `set spiderplot` selects a new plotting mode allowing creation of spider plots
+## (also known as radar charts). These are essentially parallel axis plots where
+## the axes are arranged radially rather than vertically.
+## See `spiderplot`, `set style spiderplot`, `set paxis`. 
 #b Plot style `with circles` can be used in 3D plots.
 #b Plot style `with boxes` can be used in 3D plots.
 #b 2D plot style `with arrows` is identical to `with vectors` except that each
@@ -315,6 +319,8 @@ C
 4 Changes
 #start
 #b Revised syntax for plot style 'with parallelaxes'. See `parallel`.
+## The histogram, parallelaxis, and spiderplot styles now use similar syntax
+## that can iterate over plot elements: `plot for [column=1:N] DATA using column`
 #b Imaginary values returned by the using specifier of a 2D plot are treated as
 ##undefined values (NaN) rather than as real(value).  This was always true for
 ##function plots and 3D data plots.  E.g. the following two plots are equivalent.
@@ -601,7 +607,7 @@ C
  (see `initialization`).
 
  -s tells the program to wait for slow font initialization on startup.
-  Otherwise it prints an error and continues with bad font metrics.
+ Otherwise it prints an error and continues with bad font metrics.
 
  -e "command" tells gnuplot to execute that single command before continuing.
 
@@ -3869,7 +3875,7 @@ Ffigure_candlesticks
  The width of the rectangle can be controlled by the `set boxwidth` command.
  For backwards compatibility with earlier gnuplot versions, when the
  boxwidth parameter has not been set then the width of the candlestick
- rectangle is controlled by `set errorbars <width>`.
+ rectangle is taken from `set errorbars <width>`.
 
  Alternatively, an explicit width for each box-and-whiskers grouping may be
  specified in an optional 6th column of data.  The width must be given in the
@@ -4692,6 +4698,53 @@ Ffigure_points
            with points lc variable pt variable ps variable
 
  Note: for information on user-defined program variables, see `variables`.
+2 spiderplot
+?plotting styles spiderplot
+?with spiderplot
+?spiderplot
+?radar chart
+ Spider plots are essentially parallel axis plots in which the axes are arranged
+ radially rather than vertically. Such plots are sometimes called `rader charts`.
+ In gnuplot this requires working within a coordinate system established by the
+ command `set spiderplot`, analogous to `set polar` except that the angular
+ coordinate is detemined implicitly by the parallel axis number. The appearance,
+ labelling, and tic placement of the axes is controlled by `set paxis`.
+ Further style choices are controlled using `set style spiderplot`, `set grid`,
+ and the individual components of the plot command.
+
+ Because each spider plot corresponds to a row of data rather than a column,
+ it would make no sense to generate key entry titles in the normal way.
+ Instead, if a plot component contains a title the text is used to label the
+ corresponding axis. This overrides any previous `set paxis n label "Foo"`.
+ To place a title in the key, you can either use a separate `keyentry` command
+ or extract text from a column in the input file with the `key(column)`
+ using specifier.  See `keyentry`, `using key`.
+ 
+ In this figure a spiderplot with 5 axes is used to compare multiple entities
+ that are each characterized by five scores.  Each line (row) in $DATA
+ generates a new polygon on the plot.
+Ffigure_spiderplot
+
+      set spiderplot
+      set style spiderplot fs transparent solid 0.2 border
+      set for [p=1:5] paxis p range [0:100]
+      set for [p=2:5] paxis p tics format ""
+      set             paxis 1 tics font ",9"
+      set for [p=1:5] paxis p label sprintf("Score %d",p)
+      set grid spiderplot
+      plot for [i=1:5] $DATA using i:key(1)
+
+3 newspiderplot
+?newspiderplot
+?spiderplot newspiderplot
+ Normally the sequential elements of a plot command `with spiderplot` each
+ correspond to one vertex of a single polygon.  In order to describe multiple
+ polygons in the same plot command, they must be separated by `newspiderplot`.
+ Example:
+      # One polygon with 10 vertices
+      plot for [i=1:5] 'A' using i, for [j=1:5] 'B' using j
+      # Two polygons with 5 vertices
+      plot for [i=1:5] 'A' using i, newspiderplot, for [j=1:5] 'B' using j
 2 steps
 ?plotting styles steps
 ?style steps
@@ -7315,6 +7368,16 @@ Ffigure_fenceplot
                    This corresponds to the data line in array or grid data.
        column(-2)  The index number of the current data set within a file that
                    contains multiple data sets.  See `index`.
+5 key
+?using key
+?plot using key
+ The layout of certain plot styles (column-stacked histograms, spider plots) 
+ is such that it would make no sense to generate plot titles from a data column
+ header. Also it would make no sense to generate axis tic labels from the
+ content of a data column (e.g. `using 2:3:xticlabels(1)`).  These plots styles
+ instead use the form `using 2:3:key(1)` to generate plot titles for the key
+ from the text content of a data column, usually a first column of row headers.
+ See the example given for `spiderplot`.
 5 xticlabels
 ?xticlabels
 ?using xticlabels
@@ -7762,7 +7825,7 @@ Ffigure_fenceplot
  specified will be included in the default title.
 
  The layout of the key itself (position, title justification, etc.) can be
- controlled by `set key`.  Please see `set key` for details.
+ controlled using `set key`.
 
  The `at` keyword allows you to place the plot title somewhere outside the
  auto-generated key box. The title can be placed immediately before or after the
@@ -8365,10 +8428,10 @@ Ffigure_fenceplot
        unset autoscale {<axes>}
        show autoscale
 
- where <axes> is either `x`, `y`, `z`, `cb`, `x2`, `y2` or `xy`.  A keyword with
- `min` or `max` appended (this cannot be done with `xy`) tells `gnuplot` to
- autoscale just the minimum or maximum of that axis.  If no keyword is given,
- all axes are autoscaled.
+ where <axes> is either `x`, `y`, `z`, `cb`, `x2`, `y2`, `xy`, or `paxis {n}`.
+ A keyword with `min` or `max` appended (this cannot be done with `xy`) tells
+ `gnuplot` to autoscale just the minimum or maximum of that axis.
+ If no keyword is given, all axes are autoscaled.
 
  When autoscaling, the axis range is automatically computed and the dependent
  axis (y for a `plot` and z for `splot`) is scaled to include the range of the
@@ -8763,7 +8826,7 @@ Ffigure_fenceplot
  Line segments that lie entirely outside the plot boundaries are never drawn.
 
  `set clip radial` affects plotting only in polar mode.  It clips lines
- against the radial bound controlled by `set rrange [0:MAX]`.  This criteria
+ against the radial bound established by `set rrange [0:MAX]`.  This criteria
  is applied in conjunction with `set clip {one|two}`.  I.e. the portion of a
  line between two points with R > RMAX that passes through the circle
  R = RMAX is drawn only if both `clip two` and `clip radial` are set.
@@ -8776,7 +8839,7 @@ Ffigure_fenceplot
  * Clipping of colored quadrangles drawn for `pm3d` maps and surfaces is
  controlled `set pm3d clip1in` and `set pm3d clip4in`.
 
- * Object clipping is controlled by the `{clip|noclip}` property of the
+ * Object clipping is controlled by the `clip` or `noclip` property of the
  individual object.
 
  * In the current version of gnuplot, "plot with vectors" in polar mode does
@@ -12512,12 +12575,14 @@ Ffigure_multiple_keys
 ?show paxis
  Syntax:
        set paxis <axisno> {range <range-options> | tics <tic-options>}
+       set paxis <axisno> label <label-options> { offset <radial-offset> }
        show paxis <axisno> {range | tics}
  The `set paxis` command is equivalent to the `set xrange` and `set xtics`
  commands except that it acts on one of the axes p1, p2, ... used in parallel
- axis plots.  See `parallelaxes`, `set xrange`, and `set xtics`.
+ axis plots and spiderplots.  See `parallelaxes`, `set xrange`, and `set xtics`.
  The normal options to the range and tics commands are accepted although not
- all options make sense for parallel axis plots.
+ all options make sense for parallel axis plots.  Placement of the label,
+ relevant only to spiderplots, can be adjusted by varying the radial offset.
 3 plot
 ?commands show plot
 ?show plot
@@ -12691,10 +12756,9 @@ Ffigure_multiple_keys
 ?set pm3d ftriangles
 ?depthorder
 =flush
-=scansforward
-=scansbackward
-=scansautomatic
-=depthorder
+?scansforward
+?scansautomatic
+?scansbackward
 =ftriangles
       set pm3d {scansautomatic | scansforward | scansbackward | depthorder}
 
@@ -12741,6 +12805,8 @@ Ffigure_multiple_keys
 ?pm3d clipcb
 ?noclipcb
 ?pm3d noclipcb
+?set pm3d clip1in
+?set pm3d clip4in
  pm3d mode clipping with respect to x, y coordinates of quadrangles can be done
  in two ways.
  `clip1in`: all 4 points of each quadrangle must be defined and at least
@@ -13160,6 +13226,19 @@ Ffigure_multiple_keys
 
  To make the graph twice as high as wide use:
        set size ratio 2
+3 spiderplot
+?set spiderplot
+ The `set spiderplot` command switches interpretation of coordinates to a
+ polar system in which each data point is mapped to a position along a
+ radial axis.  paxis 1 is always vertical; axes 2 to N proceed clockwise
+ with even spacing. The command must be issued prior to plotting. It has
+ additional effects equivalent to
+      set style data spiderplot
+      unset border
+      unset tics
+      set key noautotitle
+      set size ratio 1.0
+ Use `reset` to restore these after plotting.
 
 3 style
 ?set style
@@ -13230,7 +13309,7 @@ Ffigure_multiple_keys
  default, arrows have one head. Specifying `heads` draws arrow heads on both
  ends of the line.
 
- Head size can be controlled by `size <length>,<angle>` or
+ Head size can be modified using `size <length>,<angle>` or
  `size <length>,<angle>,<backangle>`, where `<length>` defines length of each
  branch of the arrow head and `<angle>` the angle (in degrees) they make with
  the arrow.  `<Length>` is in x-axis units; this can be changed by `first`,
@@ -13701,10 +13780,30 @@ Ffigure_multiple_keys
 ?set style parallelaxis
 ?show style parallelaxis
 
- Syntax: set style parallelaxis {front|back} {line-properties}
+ Syntax:
+       set style parallelaxis {front|back} {line-properties}
 
  Determines the line type and layer for drawing the vertical axes in plots
  `with parallelaxes`.  See `with parallelaxes`, `set paxis`.
+4 set style spiderplot
+?commands set style spiderplot
+?set style spiderplot
+
+ Syntax:
+         set style spiderplot
+                   {fillstyle <fillstyle-properties>}
+                   {<line-properties> | <point-properties>}
+ This commands controls the default appearance of spider plots.
+ The fill, line, and point properties can be modified in the first component
+ of the plot command.  The overall appearance of the plot is also affected
+ by other settings such as `set grid spiderplot`.  See also `set paxis`,
+ `spiderplot`.
+ Example:
+      # Default spider plot will be a polygon with a thick border but no fill
+      set style spiderplot fillstyle empty border lw 3
+      # This one will additionally place an open circle (pt 6) at each axis
+      plot for [i=1:6] DATA pointtype 6 pointsize 3
+
 4 set style textbox
 ?commands set style textbox
 ?commands show style textbox
@@ -13714,10 +13813,11 @@ Ffigure_multiple_keys
 ?textbox
 ?boxed
 
- Syntax: set style textbox {<bs>}
-                           {opaque|transparent} {fillcolor <color>}
-                           {{no}border {<bordercolor>}}{linewidth <lw>}
-                           {margins <xmargin>,<ymargin>}
+ Syntax:
+         set style textbox {<boxstyle-index>}
+                   {opaque|transparent} {fillcolor <color>}
+                   {{no}border {<bordercolor>}}{linewidth <lw>}
+                   {margins <xmargin>,<ymargin>}
 
  This command controls the appearance of labels with the attribute 'boxed'.
  Terminal types that do not support boxed text will ignore this style.
@@ -13918,6 +14018,7 @@ Ffigure_multiple_keys
 ?commands set tics
 ?commands unset tics
 ?commands show tics
+?set tics scale
 ?set tics
 ?unset tics
 ?show tics

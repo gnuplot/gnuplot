@@ -58,8 +58,6 @@ static void save_mtics(FILE *, struct axis *);
 static void save_zeroaxis(FILE *,AXIS_INDEX);
 static void save_set_all(FILE *);
 static void save_justification(int just, FILE *fp);
-static void save_axis_label_or_title(FILE *fp, char *name, char *suffix,
-			struct text_label *label, TBOOLEAN savejust);
 
 const char *coord_msg[] = {"first ", "second ", "graph ", "screen ", "character ", "polar "};
 /*
@@ -200,7 +198,7 @@ save_term(FILE *fp)
 }
 
 /* helper function */
-static void
+void
 save_axis_label_or_title(FILE *fp, char *name, char *suffix,
 			struct text_label *label, TBOOLEAN savejust)
 {
@@ -636,6 +634,12 @@ set encoding %s\n\
 	    (polar) ? "" : "un",
 	    (parametric) ? "" : "un");
 
+    if (spiderplot) {
+	fprintf(fp, "set spiderplot\n");
+	save_style_spider(fp);
+    } else 
+	fprintf(fp, "unset spiderplot\n");
+
     if (numeric_locale)
 	fprintf(fp, "set decimalsign locale \"%s\"\n", numeric_locale);
     if (decimalsign != NULL)
@@ -839,8 +843,19 @@ set origin %g,%g\n",
     SAVE_AXISLABEL(POLAR_AXIS);
     save_prange(fp, axis_array + POLAR_AXIS);
 
-    for (axis=0; axis<num_parallel_axes; axis++)
-	save_prange(fp, &parallel_axis_array[axis]);
+    for (axis=0; axis<num_parallel_axes; axis++) {
+	struct axis *paxis = &parallel_axis_array[axis];
+	save_prange(fp, paxis);
+	if (paxis->label.text)
+	    save_axis_label_or_title(fp,
+				axis_name(paxis->index),"label",
+				&paxis->label, TRUE);
+	if (paxis->zeroaxis) {
+	    fprintf(fp, "set paxis %d", axis+1);
+	    save_linetype(fp, paxis->zeroaxis, FALSE);
+	    fprintf(fp, "\n");
+	}
+    }
 
 #undef SAVE_AXISLABEL
 
@@ -1229,6 +1244,15 @@ save_style_parallel(FILE *fp)
 }
 
 void
+save_style_spider(FILE *fp)
+{
+    fprintf(fp, "set style spiderplot ");
+    save_linetype(fp, &(spiderplot_style.lp_properties), TRUE);
+    fprintf(fp, "\nset style spiderplot fillstyle ");
+    save_fillstyle(fp, &spiderplot_style.fillstyle);
+}
+
+void
 save_style_textbox(FILE *fp)
 {
     int bs;
@@ -1335,21 +1359,18 @@ save_prange(FILE *fp, struct axis *this_axis)
 	save_num_or_time_input(fp, this_axis->set_max, this_axis);
     }
 
-    fprintf(fp, " ] %sreverse %swriteback",
+    if (this_axis->index < PARALLEL_AXES)
+	fprintf(fp, " ] %sreverse %swriteback",
 	    ((this_axis->range_flags & RANGE_IS_REVERSED)) ? "" : "no",
 	    this_axis->range_flags & RANGE_WRITEBACK ? "" : "no");
-
-    if (this_axis->index >= PARALLEL_AXES) {
-	fprintf(fp, "\n");
-	return;
-    }
+    else
+	fprintf(fp, " ] ");
 
     if ((this_axis->set_autoscale & AUTOSCALE_FIXMIN)
     &&  (this_axis->set_autoscale & AUTOSCALE_FIXMAX)) {
 	fprintf(fp, " noextend");
 	noextend = TRUE;
     }
-    
 
     if (this_axis->set_autoscale && fp == stderr) {
 	/* add current (hidden) range as comments */

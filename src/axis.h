@@ -343,6 +343,9 @@ extern TBOOLEAN grid_tics_in_front;
 /* Whether to draw vertical grid lines in 3D */
 extern TBOOLEAN grid_vertical_lines;
 
+/* Whether to draw a grid in spiderplots */
+extern TBOOLEAN grid_spiderweb;
+
 /* Whether or not to draw a separate polar axis in polar mode */
 extern TBOOLEAN raxis;
 

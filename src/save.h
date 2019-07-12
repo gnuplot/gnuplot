@@ -51,6 +51,8 @@ void save_variables(FILE *fp);
 void save_set(FILE *fp);
 void save_term(FILE *fp);
 void save_all(FILE *fp);
+void save_axis_label_or_title(FILE *fp, char *name, char *suffix,
+			struct text_label *label, TBOOLEAN savejust);
 void save_position(FILE *, struct position *, int, TBOOLEAN);
 void save_prange(FILE *, struct axis *);
 void save_link(FILE *, struct axis *);
@@ -64,6 +66,7 @@ void save_object(FILE *, int);
 void save_walls(FILE *);
 void save_style_textbox(FILE *);
 void save_style_parallel(FILE *);
+void save_style_spider(FILE *);
 void save_data_func_style(FILE *, const char *, enum PLOT_STYLE);
 void save_linetype(FILE *, lp_style_type *, TBOOLEAN);
 void save_dashtype(FILE *, int, const t_dashtype *);

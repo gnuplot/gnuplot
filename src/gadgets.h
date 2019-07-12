@@ -203,13 +203,21 @@ struct arrowstyle_def {
     struct arrow_style_type arrow_properties;
 };
 
-/* For 'set style parallelaxis' */
+/* Used by 'set style parallelaxis' and 'set style spiderplot' */
 struct pa_style {
     lp_style_type lp_properties;/* used to draw the axes themselves */
     int layer;			/* front/back */
 };
 #define DEFAULT_PARALLEL_AXIS_STYLE \
-	{{0, LT_BLACK, 0, DASHTYPE_SOLID, 0, 0, 2.0, 0.0, DEFAULT_P_CHAR, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}, LAYER_FRONT }
+	{{0, LT_BLACK, 0, DASHTYPE_SOLID, 0, 0, 2.0, 0.0, DEFAULT_P_CHAR, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}, LAYER_FRONT}
+
+struct spider_web {
+    lp_style_type lp_properties;
+    fill_style_type fillstyle;
+};
+extern struct spider_web spiderplot_style;
+#define DEFAULT_SPIDERPLOT_STYLE \
+	{ DEFAULT_LP_STYLE_TYPE, {FS_EMPTY, 100, 0, DEFAULT_COLORSPEC} }
 
 /* The stacking direction of the key box: (vertical, horizontal) */
 typedef enum en_key_stack_direction {
@@ -458,6 +466,7 @@ extern text_label timelabel;
 extern int timelabel_bottom;
 
 extern TBOOLEAN	polar;
+extern TBOOLEAN spiderplot;
 extern TBOOLEAN inverted_raxis;	/* true if R_AXIS.set_min > R_AXIS.set_max */
 
 #define ZERO 1e-8		/* default for 'zero' set option */

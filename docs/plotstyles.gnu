@@ -716,6 +716,27 @@ vfill sample [t=0:20] '+'  using (cos($1)):(sin($1)):($1):(0.9):(10.0)
 splot $helix with isosurface level 1.0 lt 3 notitle
 
 unset vgrid $helix
+reset
+
+# Spider plot
+$DATA << EOD
+	A       B       C       D       E       F
+George	15      75      20      43      90      50
+Harriet	40	40	40	60	30	50
+EOD
+set datafile columnheaders
+
+set output out. 'figure_spiderplot' . ext
+set spiderplot
+set style spiderplot fs transparent solid 0.2 border
+set grid spiderplot
+set for [i=1:5] paxis i range [0:100]
+set             paxis 1 tics font ',9'
+set for [i=2:5] paxis i tics format ""
+set for [i=1:5] paxis i label sprintf("Score %d",i) offset 1
+set key reverse at screen .9, .9
+plot for [i=2:6] $DATA using i:key(1)
+reset
 
 # close last file
 unset outp

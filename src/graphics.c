@@ -71,14 +71,13 @@ struct lp_style_type bar_lp;
 /* 'set rgbmax {0|255}' */
 double rgbmax = 255;
 
-/* key placement is calculated in boundary, so we need file-wide variables
- * To simplify adjustments to the key, we set all these once [depends on
- * key->reverse] and use them throughout.
- */
-
 /* radius used to draw ttics and radial grid lines. */
 /* NB: x-axis coordinates, not polar. updated by xtick2d_callback. */
 static double largest_polar_circle;
+
+/* End points and tickmark offsets for radial axes in spiderplots */
+static double spoke_x0, spoke_y0, spoke_x1, spoke_y1;
+static double spoke_dx, spoke_dy;
 
 /*}}} */
 
@@ -110,6 +109,7 @@ static void place_arrows(int layer);
 static void place_grid(int layer);
 static void place_raxis(void);
 static void place_parallel_axes(struct curve_points *plots, int layer);
+static void place_spiderplot_axes(struct curve_points *plots, int layer);
 
 static void plot_steps(struct curve_points * plot);	/* JG */
 static void plot_fsteps(struct curve_points * plot);	/* HOE */
@@ -118,6 +118,8 @@ static void plot_histeps(struct curve_points * plot);	/* CAC */
 static void ytick2d_callback(struct axis *, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels);
 static void xtick2d_callback(struct axis *, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels);
 static void ttick_callback(struct axis *, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels);
+
+static void spidertick_callback(struct axis *, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels);
 
 static int histeps_compare(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2);
 
@@ -134,6 +136,7 @@ static double rgbscale(double rawvalue);
 static void draw_polar_circle(double place);
 
 static void plot_parallel(struct curve_points *plot);
+static void plot_spiderplot(struct curve_points *plot);
 
 /* for plotting error bars
  * half the width of error bar tic mark
@@ -203,7 +206,7 @@ place_grid(int layer)
      * the labels if the user has chosen "set tics front".
      * This guarantees that the axis tic labels lie on top of all grid lines.
      */
-    if (layer == LAYER_FOREGROUND) 
+    if (layer == LAYER_FOREGROUND)
 	grid_lp.l_type = mgrid_lp.l_type = LT_NODRAW;
 
     /* select first mapping */
@@ -422,7 +425,7 @@ place_objects(struct object *listhead, int layer, int dimensions)
 		}
 	    }
 
-	    if ((e->center.scalex == screen || e->center.scaley == screen) 
+	    if ((e->center.scalex == screen || e->center.scaley == screen)
 	    ||  (this_object->clip == OBJ_NOCLIP))
 	    	clip_area = &canvas;
 
@@ -591,6 +594,9 @@ do_plot(struct curve_points *plots, int pcount)
     /* DRAW VERTICAL AXES OF PARALLEL AXIS PLOTS */
     place_parallel_axes(plots, LAYER_BACK);
 
+    /* DRAW RADIAL AXES OF SPIDERPLOTS */
+    place_spiderplot_axes(plots, LAYER_BACK);
+
     /* DRAW PLOT BORDER */
     if (draw_border)
 	plot_border();
@@ -694,6 +700,25 @@ do_plot(struct curve_points *plots, int pcount)
 	/* Parallel plot titles are placed as xtic labels */
 	} else if (this_plot->plot_style == PARALLELPLOT) {
 	    localkey = FALSE;
+
+	/* Spiderplot titles are held as labels */
+	} else if (this_plot->plot_style == SPIDERPLOT && !(this_plot->plot_type == KEYENTRY)) {
+	    localkey = FALSE;
+	    if (this_plot->labels && (key_pass || !key->front) && (this_plot->p_axis == 1)) {
+		text_label *key_entry;
+		for (key_entry = this_plot->labels->next; key_entry; key_entry =  key_entry->next) {
+		    TBOOLEAN default_color = (this_plot->lp_properties.pm3d_color.type == TC_DEFAULT);
+		    if (default_color)
+			load_linetype(&this_plot->lp_properties, key_entry->tag + 1);
+		    advance_key(TRUE);
+		    do_key_sample(this_plot, key, key_entry->text,
+				    this_plot->points[key_entry->tag].CRD_COLOR);
+		    if (default_color)
+			this_plot->lp_properties.pm3d_color.type = TC_DEFAULT;
+		    key_count++;
+		    advance_key(0);
+		}
+	    }
 	} else if (this_plot->title && !*this_plot->title) {
 	    localkey = FALSE;
 	} else if (this_plot->plot_type == NODATA) {
@@ -874,6 +899,10 @@ do_plot(struct curve_points *plots, int pcount)
 		plot_parallel(this_plot);
 		break;
 
+	    case SPIDERPLOT:
+		plot_spiderplot(this_plot);
+		break;
+
 	    default:
 		int_error(NO_CARET, "unknown plot style");
 	    }
@@ -938,6 +967,10 @@ do_plot(struct curve_points *plots, int pcount)
     /* DRAW VERTICAL AXES OF PARALLEL AXIS PLOTS */
     if (parallel_axis_style.layer == LAYER_FRONT)
 	place_parallel_axes(plots, LAYER_FRONT);
+
+    /* DRAW RADIAL AXES OF SPIDERPLOTS */
+    if (parallel_axis_style.layer == LAYER_FRONT)
+	place_spiderplot_axes(plots, LAYER_FRONT);
 
     /* REDRAW PLOT BORDER */
     if (draw_border && border_layer == LAYER_FRONT)
@@ -1486,7 +1519,7 @@ plot_steps(struct curve_points *plot)
     }
 
     xleft = map_x(X_AXIS.min);
-    xright = map_x(X_AXIS.max); 
+    xright = map_x(X_AXIS.max);
     ybot = map_y(Y_AXIS.min);
     ytop = map_y(Y_AXIS.max);
 
@@ -2139,7 +2172,7 @@ plot_points(struct curve_points *plot)
     struct termentry *t = term;
     int interval = plot->lp_properties.p_interval;
     int number = abs(plot->lp_properties.p_number);
-    int offset = 0; 
+    int offset = 0;
     const char *ptchar;
 
     /* The "pointnumber" property limits the total number of points drawn for this curve */
@@ -2159,7 +2192,7 @@ plot_points(struct curve_points *plot)
 		interval = -interval;
 	}
     }
- 
+
     /* Set whatever we can that applies to every point in the loop */
     if (plot->lp_properties.p_type == PT_CHARACTER) {
 	ignore_enhanced(TRUE);
@@ -2415,7 +2448,7 @@ plot_ellipses(struct curve_points *plot)
 	}
     }
     free(e);
-    clip_area = clip_save; 
+    clip_area = clip_save;
 }
 
 /* plot_dots:
@@ -2886,6 +2919,148 @@ plot_parallel(struct curve_points *plot)
 }
 
 /*
+ * Spiderplots, also known as radar charts, are a form of parallel-axis plot
+ * in which the axes are arranged radially.  Each sequential clause in a
+ * "plot ... with spiderplot" command provides values along a single one of
+ * these axes.  Line, point, and fill properties are taken from the first
+ * clause of the plot command.  Line properties have already been applied
+ * prior to calling this routine.
+ */
+static void
+plot_spiderplot(struct curve_points *plot)
+{
+    int i, j;
+    struct curve_points *thisplot;
+    static gpiPoint *corners = NULL;
+    static gpiPoint *clpcorn = NULL;
+    BoundingBox *clip_save = clip_area;
+    int n_spokes = 0;
+
+    /* The parallel axis data is stored in successive plot structures.
+     * We will draw it all at once when we see the first one and ignore the rest.
+     */
+    if (plot->p_axis != 1)
+	return;
+
+    /* This loop counts the number of radial axes */
+    for (thisplot = plot; thisplot; thisplot = thisplot->next) {
+	if (thisplot->plot_type == KEYENTRY)
+	    continue;
+	if (thisplot->plot_style != SPIDERPLOT) {
+	    int_warn(NO_CARET, "plot %d is not a spiderplot component", n_spokes);
+	    continue;
+	}
+
+	/* Triggers when there is more than one spiderplot in the 'plot' command */
+	if (thisplot->p_axis < n_spokes-1)
+	    break;
+	n_spokes++;
+
+	/* Use plot title to label the corresponding radial axis */
+	if (thisplot->title) {
+	    free (parallel_axis_array[thisplot->p_axis-1].label.text);
+	    parallel_axis_array[thisplot->p_axis-1].label.text = strdup(thisplot->title);
+	}
+    }
+
+    if (n_spokes < 3)
+	int_error(NO_CARET, "at least 3 axes are needed for a spiderplot");
+
+    /* Allocate data structures for one polygon */
+    corners = gp_realloc(corners, (n_spokes+1) * sizeof(gpiPoint), "polygon");
+    clpcorn = gp_realloc(clpcorn, (2*n_spokes+1) * sizeof(gpiPoint), "polygon");
+    clip_area = &canvas;
+
+    /*
+     * Each row of data (NB: *not* each column) describes a vertex of a polygon.
+     * There is one vertex for each comma-separated clause within the overall 2D
+     * "plot" command.  Thus p_count rows of data produce p_count polygons.
+     * If any row contains NaN or a missing value, no polygon is produced.
+     */
+    for (i = 0; i < plot->p_count; i++) {
+	TBOOLEAN bad_data = FALSE;
+	struct axis *this_axis;
+	double r, theta;
+	double x, y;
+	int out_length;
+	int p_type;
+	TBOOLEAN already_did_one = FALSE;
+
+	for (thisplot = plot; thisplot != NULL; thisplot = thisplot->next) {
+
+	    /* Ignore other stuff, e.g. KEYENTRY */
+	    if (thisplot->plot_style != SPIDERPLOT || thisplot->plot_type != DATA)
+		continue;
+
+	    /* If any point is missing or NaN, skip the whole polygon */
+	    if ((thisplot->points == NULL) || (thisplot->p_count <= i)
+	    ||  (thisplot->points[i].type == UNDEFINED)
+	    ||  isnan(thisplot->points[i].x) || isnan(thisplot->points[i].y)) {
+		/* FIXME EAM: how to exit cleanly? */
+		bad_data = TRUE;
+		break;
+	    }
+
+	    /* Ran off end of previous spiderplot */
+	    if (thisplot->p_axis == 1 && already_did_one)
+		break;
+	    else
+		already_did_one = TRUE;
+
+	    /* stored values are axis number, unscaled R */
+	    this_axis = &parallel_axis_array[thisplot->p_axis-1];
+	    theta = M_PI_2 - (thisplot->points[i].x - 1) * 2*M_PI / n_spokes;
+	    r = (thisplot->points[i].y - this_axis->min) / (this_axis->max - this_axis->min);
+	    polar_to_xy(theta, r, &x, &y, FALSE);
+	    corners[thisplot->p_axis-1].x = map_x(x);
+	    corners[thisplot->p_axis-1].y = map_y(y);
+	}
+
+	/* Do not draw anything if one or more of the values was bad */
+	if (bad_data) {
+	    int_warn(NO_CARET, "Skipping spiderplot with bad data");
+	    continue;
+	}
+
+	corners[n_spokes].x = corners[0].x;
+	corners[n_spokes].y = corners[0].y;
+	clip_polygon(corners, clpcorn, n_spokes, &out_length);
+	clpcorn[0].style = style_from_fill(&plot->fill_properties);
+
+	/* rgb variable  -  color read from data column */
+	if (!check_for_variable_color(plot, &plot->varcolor[i])
+	&&   plot->lp_properties.pm3d_color.type == TC_DEFAULT) {
+	    lp_style_type lptmp;
+	    load_linetype(&lptmp, i+1);
+	    apply_pm3dcolor(&(lptmp.pm3d_color));
+	}
+
+	/* variable point type */
+	p_type = plot->points[i].CRD_PTTYPE - 1;
+
+	/* Fill area */
+	if (out_length > 1 && plot->fill_properties.fillstyle != FS_EMPTY) {
+	    term->filled_polygon(out_length, clpcorn);
+	}
+
+	/* Perimeter */
+	if (need_fill_border(&plot->fill_properties)) {
+	    for (j = 0; j < n_spokes; j++)
+		draw_clip_line( corners[j].x, corners[j].y,
+				corners[j+1].x, corners[j+1].y );
+	}
+
+	/* Points */
+	if (p_type) {
+	    for (j = 0; j < n_spokes; j++)
+		term->point(corners[j].x, corners[j].y, p_type);
+	}
+    }
+
+    clip_area = clip_save;
+}
+
+/*
  * Plot the curves in BOXPLOT style
  * helper functions: compare_ypoints, filter_boxplot
  */
@@ -3091,7 +3266,7 @@ plot_boxplot(struct curve_points *plot, TBOOLEAN only_autoscale)
 	plot->points = &candle;
 	plot->p_count = 1;
 
-	/* for boxplots "lc variable" means color by factor index */ 
+	/* for boxplots "lc variable" means color by factor index */
 	if (plot->varcolor)
 	    plot->varcolor[0] = plot->base_linetype + level + 1;
 
@@ -4084,7 +4259,7 @@ do_ellipse( int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping )
 	gpiPoint fillarea[120];
 	clip_polygon(vertex, fillarea, segments, &in);
 	fillarea[0].style = style;
-	if (term->filled_polygon)
+	if ((in > 1) && term->filled_polygon)
 	    term->filled_polygon(in, fillarea);
     } else {
 	/* Draw the arc */
@@ -4299,7 +4474,7 @@ process_image(void *plot, t_procimg_action action)
     if (project_points) {
 	map3d_xy_double(points[0].x, points[0].y, points[0].z,
 			&p_start_corner[0], &p_start_corner[1]);
-	map3d_xy_double(points[p_count-1].x, points[p_count-1].y, points[p_count-1].z, 
+	map3d_xy_double(points[p_count-1].x, points[p_count-1].y, points[p_count-1].z,
 			&p_end_corner[0], &p_end_corner[1]);
     } else {
 	p_start_corner[0] = points[0].x;
@@ -4875,5 +5050,145 @@ draw_polar_circle(double place)
 	draw_clip_line(ogx, ogy, gx, gy);
 	ogx = gx;
 	ogy = gy;
+    }
+}
+
+static void
+place_spiderplot_axes(struct curve_points *first_plot, int layer)
+{
+    struct curve_points *plot = first_plot;
+    struct axis *this_axis;
+    int j, n_spokes = 0;
+
+    if (!spiderplot)
+	return;
+
+    /* Walk through the plots and adjust axis min/max as needed */
+    for (plot = first_plot; plot; plot = plot->next) {
+	if (plot->p_count == 0)
+	    continue;
+	n_spokes = plot->p_axis;
+	this_axis = &parallel_axis_array[plot->p_axis - 1];
+	setup_tics(this_axis, 20);
+	/* Use plot title to label the corresponding radial axis */
+	if (plot->title) {
+	    free(this_axis->label.text);
+	    this_axis->label.text = strdup(plot->title);
+	}
+    }
+
+    /* Place the grid lines */
+    if (grid_spiderweb && layer == LAYER_BACK) {
+	this_axis = &parallel_axis_array[0];
+	this_axis->gridmajor = TRUE;
+	term_apply_lp_properties(&grid_lp);
+	/* copy n_spokes somewhere that spidertick_callback can see it */
+	this_axis->term_zero = n_spokes;
+	this_axis->ticdef.rangelimited = FALSE;
+	gen_tics(this_axis, spidertick_callback);
+	this_axis->gridmajor = FALSE;
+    }
+
+    if (parallel_axis_style.layer == LAYER_FRONT && layer == LAYER_BACK)
+	return;
+
+    /* Draw the axis lines */
+    for (j = 1; j <= n_spokes; j++) {
+	coordval theta = M_PI_2 - (j - 1) * 2*M_PI / n_spokes;
+
+	/* axis linestyle can be customized */
+	this_axis = &parallel_axis_array[j - 1];
+	if (this_axis->zeroaxis)
+	    term_apply_lp_properties(this_axis->zeroaxis);
+	else
+	    term_apply_lp_properties(&parallel_axis_style.lp_properties);
+
+	polar_to_xy(theta, 0.0, &spoke_x0, &spoke_y0, FALSE);
+	polar_to_xy(theta, 1.0, &spoke_x1, &spoke_y1, FALSE);
+	draw_clip_line( map_x(spoke_x0), map_y(spoke_y0), map_x(spoke_x1), map_y(spoke_y1) );
+
+	/* Draw the tickmarks and labels */
+	if (this_axis->ticmode) {
+	    spoke_dx = (spoke_y0 - spoke_y1) * .02;
+	    spoke_dy = (spoke_x1 - spoke_x0) * .02;
+	    /* FIXME: separate control of tic linewidth? */
+	    term_apply_lp_properties(&border_lp);
+	    this_axis->ticdef.rangelimited = FALSE;
+	    gen_tics(this_axis, spidertick_callback);
+	}
+
+	/* Draw the axis label */
+	/* Interpret any requested offset as a radial offset */
+	if (this_axis->label.text) {
+	    double radial_offset = this_axis->label.offset.x;
+	    this_axis->label.offset.x = 0.0;
+	    write_label( map_x(spoke_x1 + (1. + radial_offset) * 0.12 * (spoke_x1-spoke_x0)),
+			 map_y(spoke_y1 + (1. + radial_offset) * 0.12 * (spoke_y1-spoke_y0)),
+			 &this_axis->label );
+	    this_axis->label.offset.x = radial_offset;
+	}
+    }
+}
+
+static void
+spidertick_callback(struct axis *axis, double place, char *text, int ticlevel,
+                    struct lp_style_type grid, struct ticmark *userlabels)
+{
+    double fraction = (place - axis->min) / (axis->max - axis->min);
+    double tic_x = fraction * (spoke_x1 - spoke_x0);
+    double tic_y = fraction * (spoke_y1 - spoke_y0);
+    double ticsize = tic_scale(ticlevel, axis);
+
+    if (fraction <= 0)
+	return;
+
+    /* This is an awkward place to draw the grid, but due to the general
+     * mechanism of calculating tick positions via callback it is the only
+     * place we know the desired radial position of the grid lines.
+     */
+    if (grid_spiderweb && axis->gridmajor && (grid_lp.l_type != LT_NODRAW)) {
+	int n_spokes = axis->term_zero;
+	gpiPoint *corners = gp_alloc((n_spokes+1) * sizeof(gpiPoint), "polygon");
+	double x, y;
+	int i;
+
+	for (i = 0; i < n_spokes; i++) {
+	    double theta = M_PI_2 - 2*M_PI * (double)i / (double)n_spokes;
+	    polar_to_xy( theta, fraction, &x, &y, FALSE);
+	    corners[i].x = map_x(x);
+	    corners[i].y = map_y(y);
+	}
+	corners[n_spokes].x = corners[0].x;
+	corners[n_spokes].y = corners[0].y;
+	for (i = 0; i < n_spokes; i++)
+	    draw_clip_line( corners[i].x, corners[i].y, corners[i+1].x, corners[i+1].y );
+
+	free(corners);
+	return;
+    }
+
+    /* Draw tick mark itself */
+    draw_clip_line( map_x(tic_x - ticsize*spoke_dx), map_y(tic_y - ticsize*spoke_dy),
+		    map_x(tic_x + ticsize*spoke_dx), map_y(tic_y + ticsize*spoke_dy));
+
+    /* Draw tick label */
+    if (text) {
+	double offsetx_d, offsety_d;
+	int tic_label_x = map_x(tic_x - (4.+ticsize)*spoke_dx);
+	int tic_label_y = map_y(tic_y - (4.+ticsize)*spoke_dy);
+
+	map_position_r(&(axis->ticdef.offset), &offsetx_d, &offsety_d, "");
+	if (axis->ticdef.textcolor.type != TC_DEFAULT)
+	    apply_pm3dcolor(&(axis->ticdef.textcolor));
+	ignore_enhanced(!axis->ticdef.enhanced);
+	write_multiline(tic_label_x + (int)offsetx_d, tic_label_y + (int)offsety_d,
+			text,
+			CENTRE, CENTRE, axis->tic_rotate,
+			axis->ticdef.font);
+	ignore_enhanced(FALSE);
+
+	/* FIXME:  the plan is to have a separate lp for spiderplot tics */
+	if (axis->ticdef.textcolor.type != TC_DEFAULT)
+	    term_apply_lp_properties(&border_lp);
     }
 }

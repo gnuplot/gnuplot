@@ -268,6 +268,7 @@ const struct gen_table set_tbl[] =
     { "si$ze", S_SIZE },
     { "st$yle", S_STYLE },
     { "su$rface", S_SURFACE },
+    { "spider$plot", S_SPIDERPLOT },
     { "table", S_TABLE },
     { "t$erminal", S_TERMINAL },
     { "termopt$ions", S_TERMOPTIONS },
@@ -685,6 +686,7 @@ const struct gen_table show_style_tbl[] =
     { "rect$angle", SHOW_STYLE_RECTANGLE },
     { "boxplot", SHOW_STYLE_BOXPLOT },
     { "parallel$axis", SHOW_STYLE_PARALLEL },
+    { "spider$plot", SHOW_STYLE_SPIDERPLOT },
     { "textbox", SHOW_STYLE_TEXTBOX },
     { NULL, SHOW_STYLE_INVALID }
 };
@@ -729,6 +731,7 @@ const struct gen_table plotstyle_tbl[] =
     { "ell$ipses", ELLIPSES },
     { "sur$face", SURFACEGRID },
     { "parallel$axes", PARALLELPLOT },
+    { "spider$plot", SPIDERPLOT },
     { "table", TABLESTYLE },
     { "zerror$fill", ZERRORFILL },
     { NULL, PLOT_STYLE_NONE }

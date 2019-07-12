@@ -105,6 +105,9 @@ struct arrowstyle_def *first_arrowstyle = NULL;
 /* Holds the properties from 'set style parallelaxis' */
 struct pa_style parallel_axis_style = DEFAULT_PARALLEL_AXIS_STYLE;
 
+/* Holds properties for 'set style spiderplot' */
+struct spider_web spiderplot_style = DEFAULT_SPIDERPLOT_STYLE;
+
 /* set arrow */
 struct arrow_def *first_arrow = NULL;
 
@@ -123,6 +126,9 @@ int timelabel_bottom = TRUE;
 /* flag for polar mode */
 TBOOLEAN polar = FALSE;
 TBOOLEAN inverted_raxis = FALSE;
+
+/* toggle spiderplot mode on/off */
+TBOOLEAN spiderplot = FALSE;
 
 /* zero threshold, may _not_ be 0! */
 double zero = ZERO;

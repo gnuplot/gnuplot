@@ -1523,6 +1523,10 @@ show_style()
 	save_style_parallel(stderr);
 	c_token++;
 	break;
+    case SHOW_STYLE_SPIDERPLOT:
+	save_style_spider(stderr);
+	c_token++;
+	break;
     case SHOW_STYLE_ARROW:
 	c_token++;
 	CHECK_TAG_GT_ZERO;
@@ -1677,6 +1681,8 @@ show_grid()
 	fprintf(stderr, "\tGrid radii drawn every %f %s\n",
 		polar_grid_angle / ang2rad,
 		(ang2rad == 1.0) ? "radians" : "degrees");
+    if (grid_spiderweb)
+	fprintf(stderr, "\tGrid shown in spiderplots\n");
 
     fprintf(stderr, "\tGrid drawn at %s\n", (grid_layer==-1) ? "default layer" : ((grid_layer==0) ? "back" : "front"));
 }
@@ -1690,14 +1696,23 @@ show_raxis()
 static void
 show_paxis()
 {
+    struct axis *paxis;
     int p = int_expression();
     if (p <=0 || p > num_parallel_axes)
 	int_error(c_token, "no such parallel axis is active");
-    fputs("\n\t", stderr);
-    if (equals(c_token, "range"))
-	save_prange(stderr, &parallel_axis_array[p-1]);
-    else if (almost_equals(c_token, "tic$s"))
-	show_ticdefp(&parallel_axis_array[p-1]);
+    paxis = &parallel_axis_array[p-1];
+    fputs("\t", stderr);
+    if (END_OF_COMMAND || equals(c_token, "range"))
+	save_prange(stderr, paxis);
+    if (END_OF_COMMAND || almost_equals(c_token, "tic$s"))
+	show_ticdefp(paxis);
+    if (END_OF_COMMAND || equals(c_token, "label")) {
+	fprintf(stderr, "\t");
+	save_axis_label_or_title(stderr, axis_name(paxis->index),"label",
+				&paxis->label, TRUE);
+    }
+    if (paxis->zeroaxis)
+	save_linetype(stderr, paxis->zeroaxis, FALSE);
     c_token++;
 }
 
@@ -3403,7 +3418,7 @@ show_ticdefp(struct axis *this_axis)
 	break;
     }
 
-    if (this_axis->ticdef.rangelimited)
+    if (this_axis->ticdef.rangelimited && !spiderplot)
 	fprintf(stderr, "\n\t  tics are limited to data range");
     fputs("\n\t  labels are ", stderr);
     if (this_axis->manual_justify) {

@@ -1780,14 +1780,26 @@ df_readascii(double v[], int max)
      * FIXME: it would be better to make this flag generic and set before entry.
      */
     TBOOLEAN df_bad_is_NaN
-	= (df_current_plot && df_current_plot->plot_style == PARALLELPLOT) ? TRUE
-	: FALSE;
+	= (df_current_plot && (df_current_plot->plot_style == PARALLELPLOT));
 
     assert(max <= MAXDATACOLS);
 
     /* catch attempt to read past EOF on mixed-input */
     if (df_eof)
 	return DF_EOF;
+
+#if (1)
+    /* DEBUG FIXME
+     * Normally 'plot ARRAY ...' wants each array entry as a separate input "line".
+     * However spiderplots want only a single line, not one line per array entry.
+     * This code forces the single line but loses the content.
+     * Is there a better solution?
+     * Work-around
+     *    plot for [i=1:|ARRAY|] [t=1:1:1] '+' using (ARRAY[i]) with spiderplot
+     */
+    if (spiderplot && df_array && df_datum >= 0)
+	return DF_EOF;
+#endif
 
     /*{{{  process line */
     while ((s = df_gets()) != NULL) {
@@ -2122,7 +2134,7 @@ df_readascii(double v[], int max)
 		} else if (use_spec[output].expected_type == CT_KEYLABEL) {
 		    char *temp_string = df_parse_string_field(df_tokens[output]);
 		    if (df_current_plot)
-			add_key_entry(temp_string,df_datum);
+			add_key_entry(temp_string, df_datum);
 		    free(temp_string);
 
 		} else
@@ -3005,6 +3017,9 @@ df_set_key_title_columnhead(struct curve_points *plot)
 	free_at(df_plot_title_at);
 	df_plot_title_at = create_call_columnhead();
     }
+
+    /* This may be redundant, but can't hurt */
+    parse_1st_row_as_headers = TRUE;
 }
 
 char *
@@ -3047,9 +3062,14 @@ df_parse_string_field(char *field)
 static void
 add_key_entry(char *temp_string, int df_datum)
 {
-    text_label *new_entry = gp_alloc(sizeof(text_label), "key entry");
+    text_label *new_entry;
 
-    /* Associate this key list with the histogram it belongs to. */
+    /* Only process key entries for first clause of spiderplot */
+    if (df_current_plot->plot_style == SPIDERPLOT && df_current_plot->p_axis != 1)
+	return;
+
+    /* Associate this entry with the histogram or spiderplot it belongs to. */
+    new_entry = gp_alloc(sizeof(text_label), "key entry");
     if (!df_current_plot->labels) {
 	/* The first text_label structure in the list is a place-holder */
 	df_current_plot->labels = gp_alloc(sizeof(text_label), "key entry");
@@ -3062,6 +3082,8 @@ add_key_entry(char *temp_string, int df_datum)
     new_entry->font = NULL;
     new_entry->next = df_current_plot->labels->next;
     df_current_plot->labels->next = new_entry;
+
+    FPRINTF((stderr,"add_key_entry( \"%s\", %d )\n", new_entry->text, new_entry->tag));
 }
 
 

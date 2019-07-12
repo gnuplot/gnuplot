@@ -188,6 +188,10 @@ boundary(struct curve_points *plots, int count)
     } else
 	title_textheight = 0;
 
+    /* Extra space at the top for spiderplot axis label */
+    if (spiderplot)
+	title_textheight += t->v_char;
+
     /* x2label */
     if (x2lablin) {
 	double tmpx, tmpy;
@@ -391,6 +395,8 @@ boundary(struct curve_points *plots, int count)
 	    /* make room for the end of rotated ytics or y2tics */
 	    plot_bounds.ybot += (int) (t->h_char * 2);
 	}
+	if (spiderplot) /* Extra space at the bottom for spiderplot axis label */
+	    plot_bounds.ybot += t->h_char;
 	/* Last chance for better estimate of space required for ttic labels */
 	/* It is too late to go back and adjust positions relative to ytop */
 	if (ttic_textheight > 0) {
@@ -1029,6 +1035,12 @@ do_key_layout(legend_key *key)
 		key_panic = TRUE;
 	    }
 	    key_rows = (ptitl_cnt + key_cols - 1) / key_cols;
+#if (0)
+	} else {
+	    /* This was a work-around for a spiderplot bug. No longer needed? */
+	    if (key_rows == 0)
+		key_rows = i;
+#endif
 	}
     }
 
@@ -1097,15 +1109,20 @@ find_maxl_keys(struct curve_points *plots, int count, int *kcnt)
 	if (this_plot->plot_style == PARALLELPLOT)
 	    continue;
 
-	if (this_plot->title && !this_plot->title_is_suppressed && !this_plot->title_position) {
-	    ignore_enhanced(this_plot->title_no_enhanced);
-	    len = estimate_strlen(this_plot->title);
-	    if (len != 0) {
-		cnt++;
-		if (len > mlen)
-		    mlen = len;
+	if (this_plot->title && !this_plot->title_is_suppressed
+	&&  !this_plot->title_position) {
+	    if (this_plot->plot_style == SPIDERPLOT && this_plot->plot_type != KEYENTRY)
+		; /* Nothing */
+	    else {
+		ignore_enhanced(this_plot->title_no_enhanced);
+		len = estimate_strlen(this_plot->title);
+		if (len != 0) {
+		    cnt++;
+		    if (len > mlen)
+			mlen = len;
+		}
+		ignore_enhanced(FALSE);
 	    }
-	    ignore_enhanced(FALSE);
 	}
 
 	/* Check for new histogram here and save space for divider */
@@ -1113,8 +1130,13 @@ find_maxl_keys(struct curve_points *plots, int count, int *kcnt)
 	&&  previous_plot_style == HISTOGRAMS
 	&&  this_plot->histogram_sequence == 0 && cnt > 1)
 	    cnt++;
-	/* Check for column-stacked histogram with key entries */
-	if (this_plot->plot_style == HISTOGRAMS &&  this_plot->labels) {
+
+	/* Check for column-stacked histogram with key entries.
+	 * Same thing for spiderplots.
+	 * This is needed for 'plot ... using col:key(1)'
+	 */
+	if (this_plot->labels &&
+	    (this_plot->plot_style == HISTOGRAMS || this_plot->plot_style == SPIDERPLOT)) {
 	    text_label *key_entry = this_plot->labels->next;
 	    for (; key_entry; key_entry=key_entry->next) {
 		cnt++;

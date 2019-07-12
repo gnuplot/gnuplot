@@ -141,6 +141,7 @@ struct lp_style_type mgrid_lp  = DEFAULT_GRID_LP;
 int grid_layer = LAYER_BEHIND;
 TBOOLEAN grid_tics_in_front = FALSE;
 TBOOLEAN grid_vertical_lines = FALSE;
+TBOOLEAN grid_spiderweb = FALSE;
 double polar_grid_angle = 0;	/* nonzero means a polar grid */
 TBOOLEAN raxis = FALSE;
 double theta_origin = 0.0;	/* default origin at right side */
@@ -1928,6 +1929,8 @@ some_grid_selected()
 	    return TRUE;
     /* Dec 2016 - CHANGE */
     if (polar_grid_angle > 0)
+	return TRUE;
+    if (grid_spiderweb)
 	return TRUE;
     return FALSE;
 }

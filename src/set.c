@@ -171,6 +171,8 @@ static void set_palette_function(void);
 static void parse_histogramstyle(histogram_style *hs,
 				t_histogram_type def_type, int def_gap);
 static void set_style_parallel(void);
+static void set_style_spiderplot(void);
+static void set_spiderplot(void);
 static void parse_lighting_options(void);
 
 static const struct position default_position
@@ -440,6 +442,9 @@ set_command()
 	    break;
 	case S_SIZE:
 	    set_size();
+	    break;
+	case S_SPIDERPLOT:
+	    set_spiderplot();
 	    break;
 	case S_STYLE:
 	    set_style();
@@ -1994,6 +1999,9 @@ set_grid()
 	} else if (almost_equals(c_token,"nopo$lar")) {
 	    polar_grid_angle = 0; /* not polar grid */
 	    c_token++;
+	} else if (almost_equals(c_token, "spider$plot")) {
+	    grid_spiderweb = TRUE;
+	    c_token++;
 	} else if (equals(c_token,"back")) {
 	    grid_layer = LAYER_BACK;
 	    c_token++;
@@ -2028,6 +2036,8 @@ set_grid()
 	if (polar) {
 	    axis_array[POLAR_AXIS].gridmajor = TRUE;
 	    polar_grid_angle = 30.*DEG2RAD;
+	} else if (spiderplot) {
+	    grid_spiderweb = TRUE;
 	} else {
 	    axis_array[FIRST_X_AXIS].gridmajor = TRUE;
 	    axis_array[FIRST_Y_AXIS].gridmajor = TRUE;
@@ -4810,6 +4820,9 @@ set_style()
     case SHOW_STYLE_PARALLEL:
 	set_style_parallel();
 	break;
+    case SHOW_STYLE_SPIDERPLOT:
+	set_style_spiderplot();
+	break;
     default:
 	int_error(c_token, "unrecognized option - see 'help set style'");
     }
@@ -5435,7 +5448,10 @@ set_range(struct axis *this_axis)
 }
 
 /*
- * set paxis <axis> {range <range-options> | tics <tic-options> }
+ * set paxis <axis> {range <range-options>}
+ *                  {tics <tic-options>}
+ *                  {label <label options>} (only used for spiderplots)
+ *                  {<lp-options>} (only used for spiderplots)
  */
 static void
 set_paxis()
@@ -5448,13 +5464,25 @@ set_paxis()
 	int_error(c_token-1, "illegal paxis");
     if (p > num_parallel_axes)
 	extend_parallel_axis(p);
-
-    if (equals(c_token, "range"))
-	set_range( &parallel_axis_array[p-1] );
-    else if (almost_equals(c_token, "tic$s"))
-	set_tic_prop( &parallel_axis_array[p-1] );
-    else
-	int_error(c_token, "expecting 'range' or 'tics'");
+    while (!END_OF_COMMAND) {
+	if (equals(c_token, "range"))
+	    set_range( &parallel_axis_array[p-1] );
+	else if (almost_equals(c_token, "tic$s"))
+	    set_tic_prop( &parallel_axis_array[p-1] );
+	else if (equals(c_token, "label"))
+	    set_xyzlabel( &parallel_axis_array[p-1].label );
+	else {
+	    int save_token = c_token;
+	    lp_style_type axis_line = DEFAULT_LP_STYLE_TYPE;
+	    lp_parse(&axis_line, LP_ADHOC, FALSE);
+	    if (c_token != save_token) {
+		free(parallel_axis_array[p-1].zeroaxis);
+		parallel_axis_array[p-1].zeroaxis = gp_alloc(sizeof(struct lp_style_type), NULL);
+		memcpy(parallel_axis_array[p-1].zeroaxis, &axis_line, sizeof(struct lp_style_type));
+	    } else
+		int_error(c_token, "expecting 'range' or 'tics' or 'label'");
+	}
+    }
 }
 
 static void
@@ -6497,13 +6525,15 @@ parse_lighting_options()
     c_token--;
 }
 
-/* process 'set style parallelaxis' command */
+/* affects both 'set style parallelaxis' and 'set style spiderplot' */
 static void
 set_style_parallel()
 {
+    int save_token;
     c_token++;
+
     while (!END_OF_COMMAND) {
-	int save_token = c_token;
+	save_token = c_token;
 	lp_parse( &parallel_axis_style.lp_properties,  LP_ADHOC, FALSE );
 	if (save_token != c_token)
 	    continue;
@@ -6516,6 +6546,35 @@ set_style_parallel()
 	c_token++;
     }
 }
+
+static void
+set_spiderplot()
+{
+    c_token++;
+
+    draw_border = 0;
+    unset_all_tics();
+    aspect_ratio = 1.0;
+    polar = FALSE;
+    keyT.auto_titles = NOAUTO_KEYTITLES;
+
+    data_style = SPIDERPLOT;
+    spiderplot = TRUE;
+}
+
+static void
+set_style_spiderplot()
+{
+    c_token++;
+    while (!END_OF_COMMAND) {
+	int save_token = c_token;
+	parse_fillstyle( &spiderplot_style.fillstyle );
+	lp_parse( &spiderplot_style.lp_properties,  LP_ADHOC, TRUE );
+	if (save_token == c_token)
+	    break;
+    }
+}
+
 
 /* Utility routine to propagate rrange into corresponding x and y ranges */
 void

@@ -1210,7 +1210,8 @@ do_3dplot(
 		break;
 
 	    case PARALLELPLOT:
-		int_error(NO_CARET, "plot style parallelaxes not supported in 3D");
+	    case SPIDERPLOT:
+		int_error(NO_CARET, "plot style not supported in 3D");
 		break;
 
 	    case ISOSURFACE:
