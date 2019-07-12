@@ -38,6 +38,7 @@ Here are samples of PNG output from some of the demos.
     <li><a href="boxplot.html">boxplots</a></li>
     <li><a href="rugplot.html">rug plot</a></li>
     <li><a href="jitter.html">jitter (bee&nbsp;swarm)</a></li>
+    <li><a href="spiderplot.html">spider plot</a></li>
     <li><a href="cities.html">text</a></li>
     </ul>
 
@@ -71,10 +72,6 @@ Here are samples of PNG output from some of the demos.
     <li><a href="pm3dgamma.html">pm3d gamma</a></li>
     </ul>
 
-    <h4>Animation</h4>
-    <ul>
-    <li><a href="animate2.html">animated gif</a></li>
-    </ul>
 </td>
 
 <td rowspan=2>
@@ -189,20 +186,21 @@ Here are samples of PNG output from some of the demos.
     </ul>
 </td>
 
-<!---
-<td align=center valign=bot>
-	<h3>
-	Recent additions
-	</h3>
-	<a href="index2.html">more</a>
-</td>
- --->
+
 </tr>
 
-<tr valign=top><td align=center width=500>
-<img src="showcase_plot_1.png" width=500><br clear=all>
-<img src="showcase_plot_2.png" width=500><br clear=all>
-</td></tr>
+<tr valign=top>
+<td align=center width=500>
+    <img src="showcase_plot_1.png" width=500><br clear=all>
+    <img src="showcase_plot_2.png" width=500><br clear=all>
+
+    <h4 align=left>Animation</h4>
+    <ul align=left>
+    <li><a href="animate2.html">animated gif</a></li>
+    </ul>
+</td>
+
+</tr>
 
 </tbody></table>
 </p>
@@ -213,7 +211,7 @@ Here are samples of PNG output from some of the demos.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated January 2019</i>
+    <i>This page generated July 2019</i>
     </td>
 
     <td>

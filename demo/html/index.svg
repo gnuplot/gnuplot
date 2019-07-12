@@ -47,6 +47,7 @@ on mouse-coordinate tracking.
     <li><a href="boxplot.html">boxplot</a></li>
     <li><a href="rugplot.html">rug plot</a></li>
     <li><a href="jitter.html">jitter (bee&nbsp;swarm)</a></li>
+    <li><a href="spiderplot.html">spider plot</a></li>
     </ul>
 
     <h4>Math functions</h4>
@@ -219,7 +220,7 @@ on mouse-coordinate tracking.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated January 2019</i>
+    <i>This page generated July 2019</i>
     </td>
 
     <td>

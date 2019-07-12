@@ -43,6 +43,7 @@
     <li><a href="boxplot.html">boxplots</a></li>
     <li><a href="rugplot.html">rug plot</a></li>
     <li><a href="jitter.html">jitter (bee&nbsp;swarm)</a></li>
+    <li><a href="spiderplot.html">spider plot</a></li>
     </ul>
 
     <h4>Math functions</h4>
@@ -230,7 +231,7 @@
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated November 2018</i>
+    <i>This page generated July 2019</i>
     </td>
 
     <td>
