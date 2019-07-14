@@ -701,24 +701,9 @@ do_plot(struct curve_points *plots, int pcount)
 	} else if (this_plot->plot_style == PARALLELPLOT) {
 	    localkey = FALSE;
 
-	/* Spiderplot titles are held as labels */
+	/* Spiderplot key samples are handled in plot_spiderplot */
 	} else if (this_plot->plot_style == SPIDERPLOT && !(this_plot->plot_type == KEYENTRY)) {
 	    localkey = FALSE;
-	    if (this_plot->labels && (key_pass || !key->front) && (this_plot->p_axis == 1)) {
-		text_label *key_entry;
-		for (key_entry = this_plot->labels->next; key_entry; key_entry =  key_entry->next) {
-		    TBOOLEAN default_color = (this_plot->lp_properties.pm3d_color.type == TC_DEFAULT);
-		    if (default_color)
-			load_linetype(&this_plot->lp_properties, key_entry->tag + 1);
-		    advance_key(TRUE);
-		    do_key_sample(this_plot, key, key_entry->text,
-				    this_plot->points[key_entry->tag].CRD_COLOR);
-		    if (default_color)
-			this_plot->lp_properties.pm3d_color.type = TC_DEFAULT;
-		    key_count++;
-		    advance_key(0);
-		}
-	    }
 	} else if (this_plot->title && !*this_plot->title) {
 	    localkey = FALSE;
 	} else if (this_plot->plot_type == NODATA) {
@@ -3016,6 +3001,32 @@ plot_spiderplot(struct curve_points *plot)
 	    corners[thisplot->p_axis-1].y = map_y(y);
 	}
 
+	/* Spider plots are unusual in that each row starts a new plot
+	 * In order to associate the key entry with the correct plot we
+	 * must do it inside the loop over rows
+	 */
+	if (i > 0) {
+	    term->layer(TERM_LAYER_AFTER_PLOT);
+	    term->layer(TERM_LAYER_BEFORE_PLOT);
+	}
+	if (plot->labels) {
+	    TBOOLEAN default_color;
+	    text_label *key_entry;
+	    for (key_entry = plot->labels->next; key_entry; key_entry = key_entry->next) {
+		if (key_entry->tag != i)
+		    continue;
+		default_color = (plot->lp_properties.pm3d_color.type == TC_DEFAULT);
+		if (default_color)
+		    load_linetype(&plot->lp_properties, key_entry->tag + 1);
+		advance_key(TRUE);
+		do_key_sample(plot, &keyT, key_entry->text, plot->points[i].CRD_COLOR);
+		if (default_color)
+		    plot->lp_properties.pm3d_color.type = TC_DEFAULT;
+		key_count++;
+		advance_key(0);
+	    }
+	}
+
 	/* Do not draw anything if one or more of the values was bad */
 	if (bad_data) {
 	    int_warn(NO_CARET, "Skipping spiderplot with bad data");
@@ -3038,12 +3049,12 @@ plot_spiderplot(struct curve_points *plot)
 	/* variable point type */
 	p_type = plot->points[i].CRD_PTTYPE - 1;
 
-	/* Fill area */
+	/* Draw filled area */
 	if (out_length > 1 && plot->fill_properties.fillstyle != FS_EMPTY) {
 	    term->filled_polygon(out_length, clpcorn);
 	}
 
-	/* Perimeter */
+	/* Draw perimeter */
 	if (need_fill_border(&plot->fill_properties)) {
 	    for (j = 0; j < n_spokes; j++)
 		draw_clip_line( corners[j].x, corners[j].y,
@@ -3055,7 +3066,8 @@ plot_spiderplot(struct curve_points *plot)
 	    for (j = 0; j < n_spokes; j++)
 		term->point(corners[j].x, corners[j].y, p_type);
 	}
-    }
+
+    } /* End of loop over rows, each a separate polygon */
 
     clip_area = clip_save;
 }
