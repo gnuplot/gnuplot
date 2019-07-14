@@ -525,11 +525,14 @@ truncate_to_one_utf8_char(char *orig)
     else if ((newchar[0] & 0x80) == 0)
 	newchar[1] = '\0';
     /* Some other 8-bit sequence (we don't check for valid utf8 */
-    else for (length=1; length<7; length++)
-	if ((newchar[length] & 0xc) == 0x8) {
-	    newchar[length+1] = '\0';
-	    break;
-	}
+    else {
+	newchar[7] = '\0';
+	for (length=1; length<7; length++)
+	    if ((newchar[length] & 0xC0) != 0x80) {
+		newchar[length] = '\0';
+		break;
+	    }
+    }
 
     /* overwrite original string */
     strcpy(orig, newchar);
