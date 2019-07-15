@@ -2480,6 +2480,11 @@ eval_plots()
 			this_plot->labels->pos = CENTRE;
 			this_plot->labels->layer = LAYER_PLOTLABELS;
 		    }
+		    if ((this_plot->plot_style & PLOT_STYLE_HAS_POINT)
+                    &&  (this_plot->lp_properties.p_type == PT_CHARACTER)) {
+			if (!set_labelstyle)
+			    this_plot->labels->textcolor.type = TC_DEFAULT;
+		    }
 		    parse_label_options(this_plot->labels, 2);
 		    if (stored_token != c_token) {
 			if (set_labelstyle) {

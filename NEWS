@@ -1,11 +1,13 @@
 Changes in 5.2.8
 ================
 * FIX "set timestamp" from "save" must not include a justification (Bug #2178)
-* FIX set cntrparam levels increment <base>, <factor> for logscale z (Bug 2183)
+* FIX set cntrparam levels increment <base>, <factor> for logscale z (Bug #2183)
+* FIX character pointtypes should inherit plot coloring like normal pointtypes
 * FIX qt: suppress off-by-one ysize (Bug #1759)
 * FIX cairo: suppress off-by-one ysize (Bug #1759)
 * FIX gd: apply alpha to brushstroke lines (Bug #2117)
 * FIX tikz: fixes to accommodate lua 5.3 and newer pgf
+* FIX wxt: ExportToFile widget disabled in persist mode (Bug #2185)
 
 Changes in 5.2.7
 ================
