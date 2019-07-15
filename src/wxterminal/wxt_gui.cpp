@@ -4199,6 +4199,7 @@ void wxt_atexit()
 			wxt_iter->frame->toolbar->EnableTool(Toolbar_ZoomPrevious, false);
 			wxt_iter->frame->toolbar->EnableTool(Toolbar_ZoomNext, false);
 			wxt_iter->frame->toolbar->EnableTool(Toolbar_Autoscale, false);
+			wxt_iter->frame->toolbar->EnableTool(Toolbar_ExportToFile, false);
 		} else {
 			wxt_iter->frame->Destroy();
 		}
