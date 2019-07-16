@@ -8,6 +8,7 @@ set yrange [1:7.6]
 set view 55., 180., .845, 2.0
 unset xtics
 unset ytics
+unset ztics
 
 # Custom contour lines starting at 101
 set linetype 101 lc "black"
@@ -18,6 +19,7 @@ set linetype 105 lc 6
 
 set multiplot layout 2,2 spacing 0,0
 
+set key left at graph 1.6,0,0.7
 set key title "default"
 splot x*y lw 2
 
@@ -27,11 +29,11 @@ splot x*y lw 2
 
 set cntrparam first 101 sort
 unset hidden3d
-set key title "firstline, sorted"
+set key title "firstline sorted"
 splot x*y lw 2
 
 set hidden3d
-set key title "hidden3d, firstline, sorted"
+set key title "hidden3d firstline sorted"
 splot x*y lw 2
 unset multiplot
 

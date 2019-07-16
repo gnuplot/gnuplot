@@ -57,4 +57,13 @@ plot fn using (cx($2,$3,$4,$5,$6)):\
               (angle($5,$6,$4)) index 3 every ::0::10 with ellipses lw 1 title "Distant objects"
               
 pause -1
+
+set size ratio -1
+set view equal xy
+set xrange [*:*]
+set yrange [-100:100]
+set key inside left
+replot
+
+pause -1
 reset

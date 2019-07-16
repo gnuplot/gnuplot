@@ -9,7 +9,7 @@
 # could manually download the data first and then plot from the local copy.
 #
 # For more information on the plot itself see
-#	http://www.bmsc.washington.edu/scatter
+#	http://skuld.bmsc.washington.edu/scatter
 #
 # Ethan A Merritt - August 2012
 #
@@ -31,8 +31,8 @@ set link x via 12398./x inverse 12398./x
 set x2label  "X-ray wavelength in Å"
 set x2tics 0.1  format "%.1f Å" nomirror
 
-Brdata = "< GET http://www.bmsc.washington.edu/scatter/data/Br.dat"
-Tadata = "< GET http://www.bmsc.washington.edu/scatter/data/Ta.dat"
+Brdata = "< GET http://skuld.bmsc.washington.edu/scatter/data/Br.dat"
+Tadata = "< GET http://skuld.bmsc.washington.edu/scatter/data/Ta.dat"
 
 plot Brdata volatile using 1:3 title 'Br f"'  lt 1 lw 3, \
 '' volatile using 1:2 title "Br f'"  lt 1 lw 1, \

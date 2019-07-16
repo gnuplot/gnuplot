@@ -35,6 +35,10 @@ print "******************** file autoscale.dem ********************"
 load "autoscale.dem"
 reset
 
+print "******************** file bins.dem *************************"
+load "bins.dem"
+reset
+
 print "******************** file smooth_splines.dem ********************"
 load "smooth_splines.dem"
 load "monotonic_spline.dem"
@@ -78,6 +82,10 @@ reset
 
 print "******************** file polar_quadrants.dem ********************"
 load "polar_quadrants.dem"
+reset
+
+print "******************** file orbits.dem ********************"
+load "orbits.dem"
 reset
 
 print "******************** file solar_path.dem ****************"
@@ -279,7 +287,11 @@ if (GPVAL_TERM eq "postscript") {
 } else {
     load "enhanced_utf8.dem"
 }
+load "bolditalic.dem"
 reset
+
+print "********************** unicode text *********************"
+load "unicode.dem"
 
 print "********************** file dashtypes.dem *********************"
 load "dashtypes.dem"
@@ -404,6 +416,10 @@ print "********************** file borders.dem *********************"
 load "borders.dem"
 reset
 
+print "********************** file columnhead.dem *********************"
+load "columnhead.dem"
+reset
+
 print "********************** file margins.dem *********************"
 load "margins.dem"
 reset
@@ -412,8 +428,9 @@ print "********************** file rectangle.dem *********************"
 load "rectangle.dem"
 reset
 
-print "********************** file clipobject.dem *********************"
+print "********************** clipping *********************"
 load "clipobject.dem"
+load "clip_radial.dem"
 reset
 
 print "********************** file approximate.dem *********************"
@@ -431,7 +448,13 @@ load "nonlinear3.dem"
 load "nonlinear4.dem"
 load "nonlinear5.dem"
 load "nonlinear6.dem"
+load "logscale_clipping.dem"
 reset
+
+print "********************** linked axes **************************"
+load "linked_autoscale.dem"
+
+
 
 print "********************** file map_projection.dem *********************"
 load "map_projection.dem"
