@@ -1327,7 +1327,8 @@ do_key_sample_point(
 	    (*t->pointsize)(pointsize);
 	if (on_page(xl + key_point_offset, yl)) {
 	    if (this_plot->lp_properties.p_type == PT_CHARACTER) {
-		apply_pm3dcolor(&(this_plot->labels->textcolor));
+		if (this_plot->labels->textcolor.type != TC_DEFAULT)
+		    apply_pm3dcolor(&(this_plot->labels->textcolor));
 		(*t->put_text) (xl + key_point_offset, yl, 
 				this_plot->lp_properties.p_char);
 		apply_pm3dcolor(&(this_plot->lp_properties.pm3d_color));
