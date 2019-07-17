@@ -12,8 +12,7 @@ set linetype 2 pt 7 ps 1
 set key Left left samplen .01
 unset link x
 
-set multiplot layout 3,1
-set title 'axes x1y1'
+set multiplot layout 3,1 title 'axes x1y1'
 plot sample [i=1:5] '+' using (i):(i) axes x1y1 with lp title 'no link'
 
 set link x2
@@ -24,9 +23,8 @@ plot sample [i=1:5] '+' using (i):(i) axes x1y1 with lp title 'set link x2 via x
 unset multiplot
 pause -1 "Hit return to continue"
 
-set multiplot layout 3,1
+set multiplot layout 3,1 title 'axes x2y1'
 unset link x2
-set title 'axes x2y1'
 plot sample [i=1:5] '+' using (i):(i) axes x2y1 with lp title 'no link'
 
 set link x2
@@ -42,10 +40,10 @@ pause -1 "Hit return to continue"
 # 
 reset
 set x2tics
-set link x2 via 1/x inv 1/x
+set link x2 via x/10. inv x*10.
 set link y2
 set key Left right samplen .01
-set multiplot layout 1,2 title "set link x2 via 1/x inv 1/x\nset link y2"
+set multiplot layout 1,2 title "set link x2 via x/10. inv x*10\nset link y2"
 plot 'silver.dat' using 1:2 axes x1y1 with lp title 'axes x1y1', \
      '' using 1:2 axes x1y2 with lp title 'axes x1y2'
 plot 'silver.dat' using 1:2 axes x2y2 with lp title 'axes x2y2', \
@@ -54,13 +52,14 @@ unset multiplot
 pause -1 "Hit return to continue"
 
 reset
-set link y2 via 1./y inv 1./y
+set linetype 1 lw 2 pt 6 pi -1
+set link y2 via y*10. inv y/10.
 set link x2
 set y2tics
 set key Left right samplen .01
-set multiplot layout 1,2 title "set link x2\nset link y2 via 1/y inv 1/y"
-plot 'silver.dat' using 1:2 axes x1y1 title 'axes x1y1'
-plot 'silver.dat' using 1:2 axes x2y2 title 'axes x2y2'
+set multiplot layout 1,2 title "set link x2\nset link y2 via y*10. inv y/10."
+plot 'silver.dat' using 1:2 axes x1y1 with lp title 'axes x1y1'
+plot 'silver.dat' using 1:2 axes x2y2 with lp title 'axes x2y2'
 unset multiplot
 pause -1 "Hit return to continue"
 
