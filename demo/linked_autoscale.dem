@@ -1,0 +1,75 @@
+#
+# Exercise combinations of linked axes and autoscaled data
+# Some of these produced errors or incorrect plots in previous
+# gnuplot versions (5.0 - 5.2)  E.g. But #1973
+#
+set samples 5
+set x2tics 1
+set tics nomirror
+set auto noextend
+set linetype 1 pt 7 ps 1
+set linetype 2 pt 7 ps 1
+set key Left left samplen .01
+unset link x
+
+set multiplot layout 3,1 title 'axes x1y1'
+plot sample [i=1:5] '+' using (i):(i) axes x1y1 with lp title 'no link'
+
+set link x2
+plot sample [i=1:5] '+' using (i):(i) axes x1y1 with lp title 'set link x2'
+
+set link x2 via x*2 inv x/2
+plot sample [i=1:5] '+' using (i):(i) axes x1y1 with lp title 'set link x2 via x*2 inv x/2'
+unset multiplot
+pause -1 "Hit return to continue"
+
+set multiplot layout 3,1 title 'axes x2y1'
+unset link x2
+plot sample [i=1:5] '+' using (i):(i) axes x2y1 with lp title 'no link'
+
+set link x2
+plot sample [i=1:5] '+' using (i):(i) axes x2y1 with lp title 'set link x2'
+
+set link x2 via x*2 inv x/2
+plot sample [i=1:5] '+' using (i):(i) axes x2y1 with lp title 'set link x2 via x*2 inv x/2'
+unset multiplot
+pause -1 "Hit return to continue"
+
+#
+# More problem cases
+# 
+reset
+set x2tics
+set link x2 via x/10. inv x*10.
+set link y2
+set key Left right samplen .01
+set multiplot layout 1,2 title "set link x2 via x/10. inv x*10\nset link y2"
+plot 'silver.dat' using 1:2 axes x1y1 with lp title 'axes x1y1', \
+     '' using 1:2 axes x1y2 with lp title 'axes x1y2'
+plot 'silver.dat' using 1:2 axes x2y2 with lp title 'axes x2y2', \
+     '' using 1:2 axes x2y1 with lp title 'axes x2y1'
+unset multiplot
+pause -1 "Hit return to continue"
+
+reset
+set linetype 1 lw 2 pt 6 pi -1
+set link y2 via y*10. inv y/10.
+set link x2
+set y2tics
+set key Left right samplen .01
+set multiplot layout 1,2 title "set link x2\nset link y2 via y*10. inv y/10."
+plot 'silver.dat' using 1:2 axes x1y1 with lp title 'axes x1y1'
+plot 'silver.dat' using 1:2 axes x2y2 with lp title 'axes x2y2'
+unset multiplot
+pause -1 "Hit return to continue"
+
+#
+# This is a sampling bug rather than an autoscale bug
+#
+set title "Should be 5 samples but bug may give only 3"
+set key title 'plot sample [i=1:5:1] "+" using 1:1 axes x2y1'
+set link x2 via x*2 inv x/2
+set x2tics
+plot sample [i=1:5:1] '+' using 1:1 axes x2y1 with lp title 'set link x2 via x*2 inv x/2'
+pause -1 "Hit return to continue"
+reset

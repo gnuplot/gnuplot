@@ -3411,14 +3411,6 @@ eval_plots()
 	if (! axis_array[SECOND_Y_AXIS].autoscale)
 	    axis_revert_and_unlog_range(SECOND_Y_AXIS);
     }
-    if (! uses_axis[FIRST_Y_AXIS]) {
-	/* FIXME:  probably unneeded our wrong since adding reconcile_linked_axes */
-	assert(uses_axis[SECOND_Y_AXIS]);
-	if (axis_array[FIRST_Y_AXIS].autoscale & AUTOSCALE_MIN)
-	    axis_array[FIRST_Y_AXIS].min = axis_array[SECOND_Y_AXIS].min;
-	if (axis_array[FIRST_Y_AXIS].autoscale & AUTOSCALE_MAX)
-	    axis_array[FIRST_Y_AXIS].max = axis_array[SECOND_Y_AXIS].max;
-    }
 
     /* This call was in boundary(), called from do_plot(), but it caused
      * logscaling problems if do_plot() itself was called for refresh
