@@ -3012,13 +3012,15 @@ eval_plots()
 	/* Iterate-over-plot mechanism */
 	if (empty_iteration(plot_iterator) && this_plot)
 	    this_plot->plot_type = NODATA;
-	if (forever_iteration(plot_iterator) && (this_plot->plot_type == NODATA)) {
+	if (forever_iteration(plot_iterator) && !this_plot)
+	    int_error(NO_CARET,"unbounded iteration in something other than a data plot");
+	else if (forever_iteration(plot_iterator) && (this_plot->plot_type == NODATA)) {
 	    FPRINTF((stderr,"Ending * iteration at %d\n",plot_iterator->iteration));
 	    /* Clearing the plot title ensures that it will not appear in the key */
 	    free (this_plot->title);
 	    this_plot->title = NULL;
-	} else if (forever_iteration(plot_iterator) && (this_plot->plot_type == FUNC)) {
-	    int_error(NO_CARET,"unbounded iteration in function plot");
+	} else if (forever_iteration(plot_iterator) && (this_plot->plot_type != DATA)) {
+	    int_error(NO_CARET,"unbounded iteration in something other than a data plot");
 	} else if (next_iteration(plot_iterator)) {
 	    c_token = start_token;
 	    continue;

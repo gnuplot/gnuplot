@@ -2277,14 +2277,14 @@ eval_3dplots()
 	    }
 
 	    SKIPPED_EMPTY_FILE:
-	    if (empty_iteration(plot_iterator))
+	    if (empty_iteration(plot_iterator) && this_plot)
 		this_plot->plot_type = NODATA;
-	    if (forever_iteration(plot_iterator) && (this_plot->plot_type == NODATA)) {
+	    if (forever_iteration(plot_iterator) && !this_plot)
+		int_error(NO_CARET, "unbounded iteration in something other than a data plot");
+	    else if (forever_iteration(plot_iterator) && (this_plot->plot_type == NODATA))
 		eof_during_iteration = TRUE;
-	    }
-	    if (forever_iteration(plot_iterator) && (this_plot->plot_type == FUNC3D)) {
-		int_error(NO_CARET, "unbounded iteration in function plot");
-	    }
+	    else if (forever_iteration(plot_iterator) && (this_plot->plot_type != DATA3D))
+		int_error(NO_CARET, "unbounded iteration in something other than a data plot");
 
 	    /* restore original value of sample variables */
 	    /* FIXME: somehow this_plot has changed since we saved sample_var! */
