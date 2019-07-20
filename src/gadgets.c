@@ -610,7 +610,7 @@ clip_polygon(gpiPoint *in, gpiPoint *out, int in_length, int *out_length)
 	*out_length = in_length;
 	return;
     }
-    tmp_corners = gp_realloc(tmp_corners, 2 * in_length * sizeof(gpiPoint), "clip_polygon");
+    tmp_corners = gp_realloc(tmp_corners, 4 * in_length * sizeof(gpiPoint), "clip_polygon");
 
     /* vertices of the rectangular clipping window starting from
        top-left in counterclockwise direction */
