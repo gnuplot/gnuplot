@@ -5082,7 +5082,7 @@ place_spiderplot_axes(struct curve_points *first_plot, int layer)
 	if (plot->p_count == 0)
 	    continue;
 	n_spokes = plot->p_axis;
-	if (n_spokes >= num_parallel_axes)
+	if (n_spokes > num_parallel_axes)
 	    int_error(NO_CARET, "attempt to draw undefined radial axis");
 	this_axis = &parallel_axis_array[plot->p_axis - 1];
 	setup_tics(this_axis, 20);
