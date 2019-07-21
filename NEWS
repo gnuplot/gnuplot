@@ -1,5 +1,6 @@
 Changes in 5.2.8
 ================
+* CHANGE placement of ylabel (compromise 5.2.7 and earlier versions) (Bug #2181)
 * FIX "set timestamp" from "save" must not include a justification (Bug #2178)
 * FIX set cntrparam levels increment <base>, <factor> for logscale z (Bug #2183)
 * FIX character pointtypes should inherit plot coloring like normal pointtypes

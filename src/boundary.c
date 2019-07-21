@@ -240,8 +240,6 @@ boundary(struct curve_points *plots, int count)
     if (axis_array[FIRST_Y_AXIS].label.text) {
 	if (can_rotate && axis_array[FIRST_Y_AXIS].label.rotate != 0) {
 	    ylabel_textwidth = ylablin * t->v_char;
-	    if (!axis_array[FIRST_Y_AXIS].ticmode)
-		ylabel_textwidth += 0.5 * t->v_char;
 	} else {
 	    /* Trying to estimate this length caused more problems than it solved.
 	     * For one thing it comes out wrong for text passed to TeX terminals.
@@ -454,6 +452,9 @@ boundary(struct curve_points *plots, int count)
 
 	    ytic_textwidth = (int) (t->h_char * (widest_tic_strlen + 2));
 	}
+    } else if (axis_array[FIRST_Y_AXIS].label.text) {
+	/* substitutes for extra space added to left of ytic labels */
+	ytic_textwidth = 2 * (t->h_char);
     } else {
 	ytic_textwidth = 0;
     }
@@ -1425,7 +1426,8 @@ draw_titles()
     if (axis_array[FIRST_Y_AXIS].label.text) {
 	unsigned int x = ylabel_x;
 	unsigned int y = (plot_bounds.ytop + plot_bounds.ybot) / 2;
-	x += t->h_char;
+	/* There has been much argument about the optimal ylabel position */
+	x += t->h_char / 4.;
 	write_label(x, y, &(axis_array[FIRST_Y_AXIS].label));
 	reset_textcolor(&(axis_array[FIRST_Y_AXIS].label.textcolor));
     }
