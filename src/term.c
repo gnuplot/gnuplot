@@ -2447,11 +2447,12 @@ enhanced_recursion(
 char *
 stylefont(const char *fontname, TBOOLEAN isbold, TBOOLEAN isitalic)
 {
-    char *div;
+    int div;
     char *markup = gp_alloc( strlen(fontname) + 16, "font markup");
     strcpy(markup, fontname);
-    if ((div = strchr(markup,':')))
-	*div = '\0';
+    /* base font name can be followed by ,<size> or :Variant */
+    if ((div = strcspn(markup,",:")))
+	markup[div] = '\0';
     if (isbold)
 	strcat(markup, ":Bold");
     if (isitalic)

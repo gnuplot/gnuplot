@@ -78,6 +78,9 @@
  * Ethan Merritt Sep 2016:  Support rotatation of boxed text, including text
  * strings using the glyphshow mechanism.  Special-case the 'minus sign' glyph
  * at U+2212 by unconditionally mapping it to /minus.
+
+ * Ethan Merritt Jul 2019:  Consolidate PS_set_font and ENHPS_set_font,
+ * handle `set font "/:Bold"` in either case (note superfluous /).
  */
 
 #include "driver.h"
@@ -444,6 +447,15 @@ PS_RememberFont(char *fname)
 
     if (strcmp(fname, "Symbol-Oblique") != 0)
 	myfname = fname;
+
+    /* There is some confusion between a font name in an enhanced text */
+    /* string ({/Font}) and a bare name from set_font("Font"), because */
+    /* the user may have placed an unneeded / in front of the latter.  */
+    /* This is particularly a problem if the request is for "/:Bold".  */
+    if (*myfname == '/')
+	myfname++;
+    if (*myfname == ':')
+	return;
 
     for (fnp = PS_DocFonts; fnp ; fnp = fnp->next)
 	if (strcmp(fnp->name, myfname) == 0)
@@ -2372,50 +2384,82 @@ PS_justify_text(enum JUSTIFY mode)
 }
 
 
-TERM_PUBLIC int
-PS_set_font(const char *font)
+static int
+PS_common_set_font(const char *font, int caller(const char *font) )
 {
     char *name;
+    char *styledfontname = NULL;
     unsigned int  i;
     float size;
     size_t sep;
+    TBOOLEAN wants_italic = FALSE;
+    TBOOLEAN wants_bold = FALSE;
 
     if (!font || !(*font))
 	font = PS_default_font;
-    sep = strcspn(font,",");
     size = ps_fontsize;
+    sep = strcspn(font,",");
     if (font[sep] == ',')
 	sscanf (&(font[sep+1]),"%f",&size);
 
     if (sep == 0) {
-	name = gp_strdup(PS_default_font);
+	if (caller == ENHPS_set_font)
+	    name = gp_strdup(ps_params->font);
+	else
+	    name = gp_strdup(PS_default_font);
 	sep = strcspn(name,",");
     } else
 	name = gp_strdup(font);
     name[sep] = NUL;
-    for (i=0; i<sep; i++)
+
+    /* Check for set font "/:Bold" or set font ":Bold" */
+    wants_italic = strstr(name, ":Italic");
+    wants_bold = strstr(name, ":Bold");
+    sep = strcspn(name, ":");
+    styledfontname = stylefont( (sep == 0 || *name == '/') ? PS_default_font : name,
+	wants_bold, wants_italic);
+    free(name);
+    name = styledfontname;
+
+    /* PostScript does not like blanks in font names */
+    for (i = 0; name[i] != '\0'; i++)
 	if (name[i] == ' ') name[i] = '-';
 
     if (size <= 0)
 	size = ps_fontsize_previous;
 
-    /* If TeX is doing the font handling, we don't need to */
-    /* write anything into the postscript stream */
-    if (ps_params->terminal == PSTERM_POSTSCRIPT) {
+    if (caller == ENHPS_set_font && !ignore_enhanced_text) {
+	ps_enh_fontsize = size;
+	strcpy(ps_enh_font, name);
 	PS_RememberFont(name);
-	fprintf(gppsfile, "/%s findfont %g scalefont setfont\n",
-		name, size*PS_SCF);
-	/* FIXME: instead of trying to keep an approximate vshift current */
-	/*        we could modify Lshow/Rshow/Cshow to query the font.    */
-	if (size != ps_fontsize_previous)
-	    fprintf(gppsfile, "/vshift %d def\n", -(int)((size*PS_SCF)/3.));
-	ps_fontsize_previous = size;
+	size *= ps_params->fontscale;
+
+    } else {
+	/* The normal case (caller == PS_set_font).
+	 * Unless TeX is doing the font handling, we will write the
+	 * new font info directly into the postscript output stream
+	 */
+	if (ps_params->terminal == PSTERM_POSTSCRIPT) {
+	    PS_RememberFont(name);
+	    fprintf(gppsfile, "/%s findfont %g scalefont setfont\n",
+		    name, size*PS_SCF);
+	    if (size != ps_fontsize_previous)
+		fprintf(gppsfile, "/vshift %d def\n", -(int)((size*PS_SCF)/3.));
+	    ps_fontsize_previous = size;
+	}
     }
+
     free(name);
 
     term->v_char = (unsigned int)(size*PS_SCF);
     term->h_char = (unsigned int)(size*PS_SCF*6/10);
     return TRUE;
+}
+
+TERM_PUBLIC int
+PS_set_font(const char *font)
+{
+    return PS_common_set_font(font, PS_set_font);
 }
 
 
@@ -2698,39 +2742,15 @@ ENHPS_WRITEC(int c)
 	fputc(c, gppsfile);
 }
 
-/* a set-font routine for enhanced post : simply copies
- * the font into a global, or restores the globals
- * to the ps_params->font default
+/* In enhanced text mode the font name_size are stored for
+ * use in the recursive text processing rather than being written
+ * to the output stream immediately.
  */
 
 TERM_PUBLIC int
 ENHPS_set_font(const char *font)
 {
-    double size;
-
-    if (ignore_enhanced_text)
-	return PS_set_font(font);
-
-    if (*font) {
-	size_t sep = strcspn(font,",");
-	if (sep > 0 && sep < sizeof(ps_enh_font)) {
-	    strncpy(ps_enh_font,font,sep);
-	    ps_enh_font[sep] = NUL;
-	    PS_RememberFont(ps_enh_font);
-	}
-	ps_enh_fontsize = ps_fontsize;
-	if (*(font+sep) == ',')
-	    sscanf (font+sep+1,"%f",&ps_enh_fontsize);
-    } else {
-	/* return to defaults */
-	strcpy(ps_enh_font, ps_params->font);
-	ps_enh_fontsize = ps_fontsize;
-    }
-    size = ps_enh_fontsize * ps_params->fontscale;
-    term->v_char = (unsigned int)(size*PS_SCF);
-    term->h_char = (unsigned int)(size*PS_SCF*6/10);
-
-    return TRUE;
+    return PS_common_set_font(font, ENHPS_set_font);
 }
 
 TERM_PUBLIC void
