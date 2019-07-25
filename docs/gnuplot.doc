@@ -1826,8 +1826,9 @@ C marker below is used to signal this to doc2html:
 %strstrt("string","key")@strings@int index of first character of substring "key"
  `strstrt("string","key")` searches for the character string "key" in "string"
  and returns the index to the first character of "key". If "key" is not found,
- returns 0. Similar to C library function strstr except that it returns an
+ it returns 0. Similar to C library function strstr except that it returns an
  index rather than a string pointer. strstrt("hayneedlestack","needle") = 4.
+ This function is aware of utf8 encoding, so strstrt("αβγ","β") returns 2.
 4 substr
 ?expressions functions substr
 ?substr
@@ -3282,10 +3283,9 @@ Ffigure_newsyntax
  the environment variable `GNUPLOT`; Windows will use `APPDATA`).
  Note: The program can be configured to look first in the current directory,
  but this is not recommended because it is bad security practice.
-2 String constants and string variables
+2 String constants, string variables, and string functions
 ?string
 ?strings
-?string variables
  In addition to string constants, most gnuplot commands also accept a string
  variable, a string expression, or a function that returns a string.
  For example, the following four methods of creating a plot all result in the
@@ -3314,16 +3314,8 @@ Ffigure_newsyntax
        plot = "my_datafile.dat"
        title = "My Title"
        plot plot title title
-
- Three binary operators require string operands: the string concatenation
- operator ".", the string equality operator "eq" and the string inequality
- operator "ne".  The following example will print TRUE.
-
-      if ("A"."B" eq "AB") print "TRUE"
-
- See also the two string formatting functions `gprintf` and `sprintf`.
-
-=substring
+3 substrings
+?string substring
  Substrings can be specified by appending a range specifier to any string,
  string variable, or string-valued function.  The range specifier has the
  form [begin:end], where begin is the index of the first character of the
@@ -3331,6 +3323,30 @@ Ffigure_newsyntax
  The first character has index 1.  The begin or end fields may be empty, or
  contain '*', to indicate the true start or end of the original string.
  E.g.  str[:] and str[*:*] both describe the full string str.
+3 string operators
+?string operators
+ Three binary operators require string operands: the string concatenation
+ operator ".", the string equality operator "eq" and the string inequality
+ operator "ne".  The following example will print TRUE.
+
+      if ("A"."B" eq "AB") print "TRUE"
+3 string functions
+?string functions
+ Gnuplot provides several built-in functions that operate on strings.
+ General formatting functions: see `gprintf` `sprintf`.
+ Time formatting functions: see `strftime` `strptime`.
+ String manipulation: see `substr` `strstrt` `trim` `word` `words`.
+3 string encoding
+?string encoding
+=utf8
+ Gnuplot's built-in string manipulation functions are sensitive to utf-8
+ encoding (see `set encoding`). For example
+
+  utf8string = "αβγ"
+  strlen(utf8string) returns 3 (number of characters, not number of bytes)
+  utf8string[2:2] evaluates to "β"
+  strstrt(utf8string,"β") evaluates to 2
+
 2 Substitution and Command line macros
 ?substitution
  When a command line to gnuplot is first read, i.e. before it is interpreted

@@ -524,7 +524,7 @@ truncate_to_one_utf8_char(char *orig)
     /* Truncate ascii text to single character */
     else if ((newchar[0] & 0x80) == 0)
 	newchar[1] = '\0';
-    /* Some other 8-bit sequence (we don't check for valid utf8 */
+    /* Some other 8-bit sequence (we don't check for valid utf8) */
     else {
 	newchar[7] = '\0';
 	for (length=1; length<7; length++)

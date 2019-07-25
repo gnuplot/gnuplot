@@ -49,4 +49,18 @@ void truncate_to_one_utf8_char(char *orig);
 TBOOLEAN is_sjis_lead_byte(char c);
 size_t strlen_sjis(const char *s);
 
+#define advance_one_utf8_char(utf8str) \
+    do { \
+	if ((*utf8str & 0x80) == 0x00) \
+	    utf8str += 1; \
+	else if ((*utf8str & 0xe0) == 0xc0) \
+	    utf8str += 2; \
+	else if ((*utf8str & 0xf0) == 0xe0) \
+	    utf8str += 3; \
+	else if ((*utf8str & 0xf8) == 0xf0) \
+	    utf8str += 4; \
+	else /* invalid utf8 sequence */ \
+	    utf8str += 1; \
+    } while (0)
+
 #endif

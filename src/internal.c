@@ -39,6 +39,7 @@
 #include "gp_time.h"	/* for str(p|f)time */
 #include "command.h"	/* for do_system_func */
 #include "datablock.h"	/* for datablock_size() */
+#include "encoding.h"	/* for advance_one_utf8_char */
 #include "variable.h"	/* for locale handling */
 #include "parse.h"	/* for string_result_only */
 #include "datafile.h"	/* for evaluate_inside_using */
@@ -1350,6 +1351,7 @@ f_strstrt(union argument *arg)
 {
     struct value needle, haystack, result;
     char *start;
+    int hit = 0;
 
     (void) arg;
     (void) pop(&needle);
@@ -1359,7 +1361,18 @@ f_strstrt(union argument *arg)
 	int_error(NO_CARET, "internal error : non-STRING argument to strstrt");
 
     start = strstr(haystack.v.string_val, needle.v.string_val);
-    (void) Ginteger(&result, (int)(start ? (start-haystack.v.string_val)+1 : 0));
+    if (start == 0) {
+	hit = -1;
+    } else if (encoding == S_ENC_UTF8) {
+	char *utfstring = haystack.v.string_val;
+	while (utfstring < start) {
+	    advance_one_utf8_char(utfstring);
+	    hit++;
+	}
+    } else {
+	hit = (start - haystack.v.string_val);
+    }
+    (void) Ginteger(&result, hit+1);
     gpfree_string(&needle);
     gpfree_string(&haystack);
     push(&result);
