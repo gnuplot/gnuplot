@@ -74,8 +74,8 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
-pgf.REVISION = "110"
-pgf.REVISION_DATE = "2019/06/10 03:12:00"
+pgf.REVISION = "111"
+pgf.REVISION_DATE = "2019/07/24 18:53:00"
 
 pgf.styles = {}
 
@@ -252,7 +252,10 @@ pgf.write_doc_end = function()
 end
 
 pgf.write_graph_begin = function (font, noenv)
-  local global_opt = "" -- unused
+  local global_opt = ""
+  if gfx.opt.butt then
+    global_opt = ",cap=butt,join=miter"
+  end
   if gfx.opt.full_doc then
     gp.write(gfx.format[gfx.opt.tex_format].beforetikzpicture)
   end
@@ -1034,6 +1037,7 @@ pgf.print_help = function(fwrite)
       {nogppoints | gppoints}
       {picenvironment | nopicenvironment}
       {noclip | clip}
+      {butt}
       {notightboundingbox | tightboundingbox}
       {background "<colorpec>"}
       {size <x>{unit},<y>{unit}}
@@ -1083,6 +1087,9 @@ pgf.print_help = function(fwrite)
  'noclip' by which only a minimum bounding box of the canvas size
  is set. Neither a fixed bounding box nor a crop box is set if the
  'plotsize' or 'tightboundingbox' option is used.
+
+ 'butt' changes the linecap property to "butt" and the linejoin
+ property to "miter".  The defaults are "round" and "round".
 
  If 'tightboundingbox' is set the 'clip' option is ignored and the
  final bounding box is the natural bounding box calculated by tikz.
@@ -1811,6 +1818,8 @@ term.options = function(opt_str, initial, t_count)
     elseif almost_equals(o_next, "c$olor") or almost_equals(o_next, "c$olour") then
       -- colored lines
       gfx.opt.lines_colored = true
+    elseif almost_equals(o_next, "butt") then
+      gfx.opt.butt = true
     elseif almost_equals(o_next, "notime$stamp") then
       -- omit output of the timestamp
       gfx.opt.notimestamp = true
@@ -2084,6 +2093,7 @@ term.options = function(opt_str, initial, t_count)
   tf(gfx.opt.set_origin, 'originreset', 'nooriginreset')
   tf(gfx.opt.direct_image, 'bitmap', 'nobitmap')
   tf(gfx.opt.cmykimage, 'cmykimage', 'rgbimage')
+  tf(gfx.opt.butt,'butt', '')
   tf(gfx.opt.clip, 'clip', 'noclip')
   tf(gfx.opt.tightboundingbox, 'tightboundingbox', 'notightboundingbox')
   if term.external_images ~= nil then
