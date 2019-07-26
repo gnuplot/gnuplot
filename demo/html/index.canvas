@@ -106,6 +106,7 @@
     <li><a href="binary.html">binary data</a></li>
     <li><a href="rgbalpha.html">RGB + alpha channel</a></li>
     <li><a href="barchart_art.html">rescaled images</a></li>
+    <li><a href="imageNaN.html">missing/NaN values</a></li>
     </ul>
 
     <h4>Colors</h4>

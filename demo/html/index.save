@@ -124,6 +124,7 @@ Here are samples of PNG output from some of the demos.
     <li><a href="image2.html">binary and image tricks</a></li>
     <li><a href="rgbalpha.html">RGB + alpha channel</a></li>
     <li><a href="barchart_art.html">bar chart art</a></li>
+    <li><a href="imageNaN.html">missing/NaN values</a></li>
     </ul>
 
 </td>
