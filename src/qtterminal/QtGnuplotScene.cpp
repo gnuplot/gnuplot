@@ -55,6 +55,10 @@ typedef enum t_fillstyle { FS_EMPTY, FS_SOLID, FS_PATTERN, FS_DEFAULT, FS_TRANSP
 #include <QtGui>
 #include <QDebug>
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 11, 0)
+# define horizontalAdvance width
+#endif
+
 QtGnuplotScene::QtGnuplotScene(QtGnuplotEventHandler* eventHandler, QObject* parent)
 	: QGraphicsScene(parent)
 {
@@ -661,7 +665,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 	{
 		QFontMetrics metrics(m_font);
 		int par1 = (metrics.ascent() + metrics.descent());
-		int par2 = metrics.width("0123456789")/10.;
+		int par2 = metrics.horizontalAdvance("0123456789")/10.;
 		m_eventHandler->postTermEvent(GE_fontprops, 0, 0, par1, par2, m_widget);
 	}
 	else if (type == GEDone)
