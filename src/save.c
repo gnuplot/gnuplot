@@ -1375,13 +1375,9 @@ save_prange(FILE *fp, struct axis *this_axis)
     if (this_axis->set_autoscale && fp == stderr) {
 	/* add current (hidden) range as comments */
 	fputs("  # (currently [", fp);
-	if (this_axis->set_autoscale & AUTOSCALE_MIN) {
-	    save_num_or_time_input(fp, this_axis->min, this_axis);
-	}
+	save_num_or_time_input(fp, this_axis->min, this_axis);
 	putc(':', fp);
-	if (this_axis->set_autoscale & AUTOSCALE_MAX) {
-	    save_num_or_time_input(fp, this_axis->max, this_axis);
-	}
+	save_num_or_time_input(fp, this_axis->max, this_axis);
 	fputs("] )\n", fp);
     } else
 	putc('\n', fp);
