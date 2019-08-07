@@ -13,8 +13,11 @@ set key right out
 set title "Orbits of selected Solar System objects"
 set angles degrees
 set datafile separator "\t"
-if (strstrt(GNUTERM,"wxt")) \
-    set label 1 "Use Ctrl+mousewheel to zoom!" at graph 0.5,0.05 center 
+if (strstrt(GPVAL_TERM,"wxt") || strstrt(GPVAL_TERM,"qt")) {
+    set label 1 "Use Ctrl+mousewheel to zoom!" at graph 0.5,0.05 center
+    set style textbox opaque
+    set label 1 front boxed
+}
 
 fn = 'orbital_elements.dat'
 
