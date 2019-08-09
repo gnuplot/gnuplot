@@ -268,6 +268,12 @@ typedef struct df_binary_file_record_struct {
     df_translation_type scan_trans;   /* translate via origin, center or default */
     double scan_cen_or_ori[3];        /* vector representing center or origin, x/y/z */
 
+    /* `matrix every ::lowx:lowy:` can select a submatrix.
+     * This is its size.
+     */
+    int submatrix_ncols;
+    int submatrix_nrows;
+
     /* *** Do not modify outside of datafile.c!!! *** */
     char *memory_data;
 } df_binary_file_record_struct;
