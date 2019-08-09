@@ -1069,7 +1069,7 @@ statsrequest(void)
 	res_file.columns = columns = 1;
 
     if (df_matrix) {
-	int nc = df_bin_record[df_num_bin_records-1].scan_dim[0];
+	int nc = df_bin_record[df_num_bin_records-1].submatrix_ncols;
 	res_y = analyze_sgl_column( data_y, n, nc );
 	res_file.columns = nc;
 	columns = 1;

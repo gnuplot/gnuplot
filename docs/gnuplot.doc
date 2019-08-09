@@ -14865,7 +14865,8 @@ Ffigure_multiple_keys
 ?matrix every
  The `every` keyword has special meaning when used with matrix data.
  Rather than applying to blocks of single points, it applies to rows and
- column values.
+ column values.  Note that matrix rows and columns are indexed starting
+ from 0, so the row with index N is the (N+1)th row.
  Syntax:
        plot 'file' every {<column_incr>}
                            {:{<row_incr>}
@@ -14874,9 +14875,9 @@ Ffigure_multiple_keys
                                  {:{<end_column>}
                                    {:<end_row>}}}}}
  Examples:
-       plot 'file' matrix every :::N::N     # plot all values in row N of matrix
-       plot 'file' matrix every ::3::7:     # plot columns 3 to 7 of all rows
-       plot 'file' matrix every ::3:2:7:4   # submatrix of columns 3-7 rows 2-4
+       plot 'file' matrix every :::N::N   # plot all values in row with index N
+       plot 'file' matrix every ::3::7    # plot columns 3 to 7 for all rows
+       plot 'file' matrix every ::3:0:7:4 # submatrix bounded by [3,0] and [7,4]
 5 examples
 ?commands plot datafile matrix examples
 ?commands splot datafile matrix examples
