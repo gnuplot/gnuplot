@@ -1231,11 +1231,26 @@ f_strlen(union argument *arg)
     push(&result);
 }
 
+#define advance_one_utf8_char(utf8str) \
+    do { \
+	if ((*utf8str & 0x80) == 0x00) \
+	    utf8str += 1; \
+	else if ((*utf8str & 0xe0) == 0xc0) \
+	    utf8str += 2; \
+	else if ((*utf8str & 0xf0) == 0xe0) \
+	    utf8str += 3; \
+	else if ((*utf8str & 0xf8) == 0xf0) \
+	    utf8str += 4; \
+	else /* invalid utf8 sequence */ \
+	    utf8str += 1; \
+    } while (0)
+
 void
 f_strstrt(union argument *arg)
 {
     struct value needle, haystack, result;
     char *start;
+    int hit = 0;
 
     (void) arg;
     (void) pop(&needle);
@@ -1245,7 +1260,18 @@ f_strstrt(union argument *arg)
 	int_error(NO_CARET, "internal error : non-STRING argument to strstrt");
 
     start = strstr(haystack.v.string_val, needle.v.string_val);
-    (void) Ginteger(&result, (int)(start ? (start-haystack.v.string_val)+1 : 0));
+    if (start == 0) {
+	hit = -1;
+    } else if (encoding == S_ENC_UTF8) {
+	char *utfstring = haystack.v.string_val;
+	while (utfstring < start) {
+	    advance_one_utf8_char(utfstring);
+	    hit++;
+	}
+    } else {
+	hit = (start - haystack.v.string_val);
+    }
+    (void) Ginteger(&result, hit+1);
     gpfree_string(&needle);
     gpfree_string(&haystack);
     push(&result);

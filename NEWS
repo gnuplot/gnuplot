@@ -1,6 +1,7 @@
 Changes in 5.2.8
 ================
 * CHANGE placement of ylabel (compromise 5.2.7 and earlier versions) (Bug #2181)
+* CHANGE make strstrt() aware of UTF8, e.g. strstrt("αβγ5", "5") returns 4
 * FIX "set timestamp" from "save" must not include a justification (Bug #2178)
 * FIX set cntrparam levels increment <base>, <factor> for logscale z (Bug #2183)
 * FIX character pointtypes should inherit plot coloring like normal pointtypes
