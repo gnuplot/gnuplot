@@ -1347,7 +1347,7 @@ do_3dplot(
 			    key_text(xl, yl, cntrs->label);
 			}
 			if (thiscontour_lp_properties.pm3d_color.type == TC_Z)
-			    set_color( cb2gray( z2cb(cntrs->z) ) );
+			    set_color( cb2gray(cntrs->z) );
 			else {
 			    struct lp_style_type ls = thiscontour_lp_properties;
 			    int contour_linetype;
@@ -1820,7 +1820,7 @@ plot3d_lines_pm3d(struct surface_points *plot)
 			    if (color_from_column)
 				z =  (points[i - step].CRD_COLOR + points[i].CRD_COLOR) * 0.5;
 			    else
-				z =  (z2cb(points[i - step].z) + z2cb(points[i].z)) * 0.5;
+				z =  (points[i - step].z + points[i].z) * 0.5;
 			    set_color( cb2gray(z) );
 			    clip_vector(x, y);
 			} else {
@@ -1841,7 +1841,7 @@ plot3d_lines_pm3d(struct surface_points *plot)
 				    if (color_from_column)
 					z =  (points[i - step].CRD_COLOR + points[i].CRD_COLOR) * 0.5;
 				    else
-					z =  (z2cb(points[i - step].z) + z2cb(points[i].z)) * 0.5;
+					z =  (points[i - step].z + points[i].z) * 0.5;
 				    set_color( cb2gray(z) );
 				    clip_vector(x, y);
 				}
@@ -1867,7 +1867,7 @@ plot3d_lines_pm3d(struct surface_points *plot)
 				if (color_from_column)
 				    z =  (points[i - step].CRD_COLOR + points[i].CRD_COLOR) * 0.5;
 				else
-				    z =  (z2cb(points[i - step].z) + z2cb(points[i].z)) * 0.5;
+				    z =  (points[i - step].z + points[i].z) * 0.5;
 				set_color( cb2gray(z));
 				clip_vector(xx0, yy0);
 			    }
@@ -1886,7 +1886,7 @@ plot3d_lines_pm3d(struct surface_points *plot)
 				    if (color_from_column)
 					z =  (points[i - step].CRD_COLOR + points[i].CRD_COLOR) * 0.5;
 				    else
-					z =  (z2cb(points[i - step].z) + z2cb(points[i].z)) * 0.5;
+					z =  (points[i - step].z + points[i].z) * 0.5;
 				    set_color( cb2gray(z) );
 				    clip_vector(xx0, yy0);
 				}
@@ -3899,7 +3899,7 @@ check3d_for_variable_color(struct surface_points *plot, struct coordinate *point
 	if (plot->pm3d_color_from_column)
 	    set_color( cb2gray(point->CRD_COLOR) );
 	else
-	    set_color( cb2gray( z2cb(point->z) ) );
+	    set_color( cb2gray(point->z) );
 	break;
     case TC_LINESTYLE:	/* color from linestyle in data column */
 	plot->lp_properties.pm3d_color.lt = (int)(point->CRD_COLOR);

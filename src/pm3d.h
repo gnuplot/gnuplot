@@ -141,9 +141,6 @@ extern struct lp_style_type default_pm3d_border;
 extern struct lp_style_type pm3d_border_lp;
 extern TBOOLEAN track_pm3d_quadrangles;
 
-/* This became a no-op with nonlinear axis support */
-#define z2cb(z) (z)
-
 
 /****
   Declaration of routines
@@ -156,7 +153,6 @@ void pm3d_reset(void);
 void pm3d_draw_one(struct surface_points* plots);
 void pm3d_add_quadrangle(struct surface_points* plot, gpdPoint *corners);
 void pm3d_init_lighting_model(void);
-double z2cb_with_logs(double z);
 double cb2gray(double cb);
 void pm3d_rearrange_scan_array(struct surface_points* this_plot,
     struct iso_curve*** first_ptr, int* first_n, int* first_invert,

@@ -792,7 +792,7 @@ apply_pm3dcolor(struct t_colorspec *tc)
 
     switch (tc->type) {
 	case TC_Z:
-		set_color(cb2gray(z2cb(tc->value)));
+		set_color(cb2gray(tc->value));
 		break;
 	case TC_CB:
 		if (CB_AXIS.log)

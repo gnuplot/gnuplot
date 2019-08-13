@@ -711,10 +711,10 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			cb1 = cb2 = cb3 = cb4 = style.pm3d_color.lt;
 		    }
 		} else {
-		    cb1 = z2cb(pointsA[i].z);
-		    cb2 = z2cb(pointsA[i1].z);
-		    cb3 = z2cb(pointsB[ii].z);
-		    cb4 = z2cb(pointsB[ii1].z);
+		    cb1 = pointsA[i].z;
+		    cb2 = pointsA[i1].z;
+		    cb3 = pointsB[ii].z;
+		    cb4 = pointsB[ii1].z;
 		}
 		/* Fancy averages of RGB color make no sense */
 		if (color_from_rgbvar) {
@@ -896,10 +896,10 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			    cb3 = corners[2].c;
 			    cb4 = corners[3].c;
 			} else {
-			    cb1 = z2cb(corners[0].z);
-			    cb2 = z2cb(corners[1].z);
-			    cb3 = z2cb(corners[2].z);
-			    cb4 = z2cb(corners[3].z);
+			    cb1 = corners[0].z;
+			    cb2 = corners[1].z;
+			    cb3 = corners[2].z;
+			    cb4 = corners[3].z;
 			}
 			switch (pm3d.which_corner_color) {
 			    default:

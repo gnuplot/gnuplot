@@ -1633,7 +1633,7 @@ draw_vertex(p_vertex v)
 	else if (tc->type == TC_CB)
 	    set_color( cb2gray(v->real_z) );
 	else if (tc->type == TC_Z)
-	    set_color( cb2gray(z2cb(v->real_z)) );
+	    set_color( cb2gray(v->real_z) );
 
 	if (p_type == PT_CIRCLE) {
 	    double radius = v->original->CRD_PTSIZE * radius_scaler;
