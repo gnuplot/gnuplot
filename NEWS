@@ -8,6 +8,7 @@ Changes in 5.2.8
 * FIX bad autoscaling of linked y2 axis (Bug #2186)
 * FIX prevent infinite loop from unbounded interation in a non-data plot command
 * FIX dimensions reported by "stats matrix every" (Bug #2189)
+* FIX extent of boxplot whiskers could be off by one point (Bug #2106)
 * FIX qt: suppress off-by-one ysize (Bug #1759)
 * FIX cairo: suppress off-by-one ysize (Bug #1759)
 * FIX gd: apply alpha to brushstroke lines (Bug #2117)
