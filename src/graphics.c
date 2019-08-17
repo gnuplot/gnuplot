@@ -5202,7 +5202,7 @@ spidertick_callback(struct axis *axis, double place, char *text, int ticlevel,
 	ignore_enhanced(!axis->ticdef.enhanced);
 	write_multiline(tic_label_x + (int)offsetx_d, tic_label_y + (int)offsety_d,
 			text,
-			CENTRE, CENTRE, axis->tic_rotate,
+			CENTRE, JUST_CENTRE, axis->tic_rotate,
 			axis->ticdef.font);
 	ignore_enhanced(FALSE);
 
