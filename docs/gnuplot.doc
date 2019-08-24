@@ -274,7 +274,7 @@ C
 #b `set rgbmax <value>` controls interpretation of input RGB values.
 #b new formats descriptors tH tM tS handle relative times (interval lengths).
 ##See `time_specifiers`.
-#b Array size can be implicit if initializer is present, e.g. `Array A = [1,2,3]`.
+#b Array size can be implicit if an initializer is present, e.g. `Array A = [1,2,3]`.
 #b Optional radial clipping of line segments in polar mode. See `set clip`.
 #b Extra lines to customize the key can be added by substituting `keyentry` in
 ## place of a filename or function in `plot` and `splot` commands.
@@ -287,7 +287,8 @@ C
 #b `set datafile columnheaders` causes first line of input to be read as strings
 ## rather than as data values.  Equivalent to `set key autotitle columnheader`
 ## except that it does not affect generation of key entries.  If this option is
-## in effect the `stats` command will generate an array of column headers found.
+## in effect the `stats` command will generate an array of strings containing
+## the column headers found.
 #end
 
 4 New terminals and terminal options
@@ -313,7 +314,7 @@ C
 #start
 #b Enhanced text mode accepts \U+xxxx (xxxx is a 4 or 5 character hexadecimal)
 ##as representing a Unicode code point that is converted to the corresponding
-##UTF-8 byte sequence on output. EXPERIMENTAL (implementation may change)
+##UTF-8 byte sequence on output.
 #end
 
 4 Changes
@@ -3499,9 +3500,6 @@ Ffigure_newsyntax
  Curly braces are used in the syntax for enhanced text mode and to delimit
  blocks in if/then/else statements.  They are also used to denote complex
  numbers: {3,2} = 3 + 2i.
-
- The EEPIC, Imagen, Uniplex, LaTeX, and TPIC drivers allow a newline to be
- specified by \\ in a single-quoted string or \\\\ in a double-quoted string.
 3 Quote Marks
 ?quotes
 ?syntax quotes
@@ -12922,8 +12920,6 @@ Ffigure_multiple_keys
  This coloring option works best with `pm3d depthorder`, however, which
  unfortunately does not allow you to control the scan order so you may have
  to instead swap the colors defined for linestyles N and N+1.
-
- EXPERIMENTAL - details may change before this appears in a release version.
 4 interpolate
 ?set pm3d interpolate
 ?pm3d interpolate

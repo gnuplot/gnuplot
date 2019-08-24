@@ -1153,7 +1153,7 @@ AC_MSG_RESULT([])
 AC_MSG_RESULT([  Standalone terminals: yes (included by default)])
 AC_MSG_RESULT([    canvas, cgm, context, dumb, dxf, emf, epslatex,])
 AC_MSG_RESULT([    fig, hpgl, metafont, metapost, pcl5, postscript,])
-AC_MSG_RESULT([    pslatex, pstex, pstricks, svg, texdraw, tkcanvas])
+AC_MSG_RESULT([    pict2e, pslatex, pstex, pstricks, svg, texdraw, tkcanvas])
 AC_MSG_RESULT([])
 
 if test "$with_bitmap_terminals" == yes; then

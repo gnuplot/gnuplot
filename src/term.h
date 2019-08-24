@@ -338,20 +338,8 @@
 
 #endif /* NO_BITMAP_SUPPORT */
 
-/* TeX related terminals */
-#if 0  /* disable LaTeX picture based terminals by default */
-#define EMTEX
-#define EEPIC
+/* TeX related terminals start here */
 
-/* latex and emtex */
-#include "latex.trm"
-
-/* EEPIC-extended LaTeX driver, for EEPIC users */
-#include "eepic.trm"
-
-/* TPIC specials for TeX */
-#include "tpic.trm"
-#endif
 
 /* LaTeX2e picture environment */
 #include "pict2e.trm"
@@ -375,6 +363,25 @@
 
 /* ConTeXt */
 #include "context.trm"
+
+/*
+ * DEPRECATED latex terminals no longer built by default
+ */
+#if 0
+#  define EMTEX
+#  define EEPIC
+#  define OLD_LATEX_TERMINAL
+
+#  include "latex.trm"	/* latex and emtex */
+#  include "eepic.trm"	/* EEPIC-extended LaTeX driver */
+#  include "tpic.trm"	/* TPIC specials for TeX */
+#else
+#  include "latex_old.h" /* deprecation notice for docs */
+#  undef OLD_LATEX_TERMINAL
+#endif
+
+/* End of TeX related terminals */
+
 
 #ifdef USE_GGI_DRIVER
 # include "ggi.trm"
