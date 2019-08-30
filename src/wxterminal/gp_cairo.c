@@ -1916,6 +1916,7 @@ void gp_cairo_set_termvar(plot_struct *plot, unsigned int *v_char,
 	PangoRectangle ink_rect;
 	PangoRectangle logical_rect;
 	unsigned int tmp_v_char, tmp_h_char;
+	extern int debug;
 
 	/* Create a PangoLayout, set the font and text */
 	layout = gp_cairo_create_layout (plot->cr);
@@ -1937,6 +1938,16 @@ void gp_cairo_set_termvar(plot_struct *plot, unsigned int *v_char,
 	 * That's why I use ceil() instead of direct division result */
 	tmp_v_char = (int) ceil( (double) logical_rect.height/PANGO_SCALE) - 1;
 	tmp_h_char = (int) ceil( (double) logical_rect.width/(10*PANGO_SCALE));
+
+	/* Desparation fallback case.
+	 * There have been reports of failure to obtain font metrics.
+	 * We don't know why (pango use of harfbuzz is a suspect).
+	 */
+	if (tmp_v_char <= 1 || tmp_h_char <= 1 || debug == 7) {
+		tmp_h_char = 140 + (plot->fontsize - 10.) * 16.;
+		tmp_v_char = 300 * (plot->fontsize / 10.);
+		fprintf(stderr, "warning: problem determining pango font metrics\n");
+	}
 
 	if (v_char)
 		*v_char = tmp_v_char;
