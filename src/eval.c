@@ -944,6 +944,9 @@ update_plot_bounds(void)
     fill_gpval_integer("GPVAL_TERM_XSIZE", canvas.xright+1);
     fill_gpval_integer("GPVAL_TERM_YSIZE", canvas.ytop+1);
     fill_gpval_integer("GPVAL_TERM_SCALE", term->tscale);
+    /* May be useful for debugging font problems */
+    fill_gpval_integer("GPVAL_TERM_HCHAR", term->h_char);
+    fill_gpval_integer("GPVAL_TERM_VCHAR", term->v_char);
 }
 
 /*
