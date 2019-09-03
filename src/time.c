@@ -255,9 +255,11 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec, double *reltime)
 		ggmtime(tm, when);
 		if (fraction && fraction < s)
 		    ufraction = atof(fraction);
-		if (ufraction < 1.)		/* Filter out e.g. 123.456e7 */
+		if (ufraction < 1.)	/* Filter out e.g. 123.456e7 */
 		    *usec = ufraction;
-		*reltime = when;		/* not used unless return DT_DMS */
+		*reltime = when;	/* not used unless we return DT_DMS ... */
+		if (when < 0)		/* ... which we force for negative times */
+		    reltime_formats = TRUE;
 		break;
 	    }
 

@@ -2267,11 +2267,13 @@ df_readascii(double v[], int max)
 		    struct tm tm;
 		    double usec = 0.0;
 		    double reltime;
+		    int status;
 		    if (column > df_no_cols ||
 			df_column[column - 1].good == DF_MISSING ||
 			!df_column[column - 1].position ||
-			DT_TIMEDATE != gstrptime(df_column[column - 1].position,
-						 timefmt, &tm, &usec, &reltime)
+			(status = gstrptime(df_column[column - 1].position,
+					     timefmt, &tm, &usec, &reltime),
+			 status == DT_BAD)
 			) {
 			/* line bad only if user explicitly asked for this column */
 			if (df_no_use_specs) {
@@ -2285,7 +2287,10 @@ df_readascii(double v[], int max)
 			/* return or ignore line depending on line_okay */
 			break;
 		    }
-		    v[output] = (double) gtimegm(&tm) + usec;
+		    if (status == DT_DMS)
+			v[output] = reltime;
+		    else
+			v[output] = (double) gtimegm(&tm) + usec;
 
 		} else if (use_spec[output].expected_type == CT_STRING) {
 		    /* Do nothing. */
