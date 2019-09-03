@@ -1939,7 +1939,7 @@ void gp_cairo_set_termvar(plot_struct *plot, unsigned int *v_char,
 	tmp_v_char = (int) ceil( (double) logical_rect.height/PANGO_SCALE) - 1;
 	tmp_h_char = (int) ceil( (double) logical_rect.width/(10*PANGO_SCALE));
 
-	/* Desparation fallback case.
+	/* Desperation fallback case.
 	 * There have been reports of failure to obtain font metrics.
 	 * We don't know why (pango use of harfbuzz is a suspect).
 	 */

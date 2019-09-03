@@ -687,7 +687,7 @@ fn_completion(size_t anchor_pos, int direction)
 	    path = gp_strdup("");
 	}
 
-	/* seperate directory and (partial) file directory name */
+	/* separate directory and (partial) file directory name */
 	t = strrchr(path, DIRSEP1);
 #if DIRSEP2 != NUL
 	if (t == NULL) t = strrchr(path, DIRSEP2);
