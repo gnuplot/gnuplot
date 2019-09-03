@@ -508,8 +508,11 @@ voxel_command()
 
     if (vx < current_vgrid->vxmin || vx > current_vgrid->vxmax
     ||  vy < current_vgrid->vymin || vy > current_vgrid->vymax
-    ||  vz < current_vgrid->vzmin || vz > current_vgrid->vzmax)
-	int_error(NO_CARET, "voxel out of range");
+    ||  vz < current_vgrid->vzmin || vz > current_vgrid->vzmax) {
+	int_warn(NO_CARET, "voxel out of range");
+	(void)real_expression();
+	return;
+    }
 
     ivx = ceil( (vx - current_vgrid->vxmin) / current_vgrid->vxdelta );
     ivy = ceil( (vy - current_vgrid->vymin) / current_vgrid->vydelta );
