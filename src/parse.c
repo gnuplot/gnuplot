@@ -97,7 +97,6 @@ static void parse_unary_expression(void);
 static void parse_sum_expression(void);
 static int  parse_assignment_expression(void);
 static int  parse_array_assignment_expression(void);
-static int is_builtin_function(int t_num);
 
 static void set_up_columnheader_parsing(struct at_entry *previous );
 
@@ -1239,7 +1238,7 @@ add_udf(int t_num)
 }
 
 /* return standard function index or 0 */
-static int
+int
 is_builtin_function(int t_num)
 {
     int i;

@@ -63,6 +63,9 @@ extern TBOOLEAN parse_1st_row_as_headers;
 /* This is used by df_open() and df_readascii() */
 extern udvt_entry *df_array;
 
+/* This is used to block re-definition of built-in functions */
+extern int is_builtin_function(int t_num);
+
 /* Protection mechanism for trying to parse a string followed by a + or - sign.
  * Also suppresses an undefined variable message if an unrecognized token
  * is encountered during try_to_get_string().

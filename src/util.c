@@ -237,6 +237,11 @@ is_definition(int t_num)
     /* function? */
     /* look for dummy variables */
     if (isletter(t_num) && equals(t_num + 1, "(") && isletter(t_num + 2)) {
+
+	/* Block redefinition of reserved function names */
+	if (is_builtin_function(t_num))
+	    return 0;
+
 	t_num += 3;		/* point past first dummy */
 	while (equals(t_num, ",")) {
 	    if (!isletter(++t_num))
