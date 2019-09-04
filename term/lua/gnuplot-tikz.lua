@@ -562,7 +562,7 @@ pgf.write_variables = function(t)
   end
 end
 
--- write style to seperate file, or whatever...
+-- write style to separate file, or whatever...
 pgf.create_style = function()
   local name_common  = pgf.STYLE_FILE_BASENAME.."-common.tex"
   local name_latex   = pgf.STYLE_FILE_BASENAME..".sty"
@@ -1159,7 +1159,7 @@ pgf.print_help = function(fwrite)
  By using the 'externalimages' option all bitmap images will be written
  as external PNG images and included at compile time of the document.
  Generating DVI and later postscript files requires to convert the PNGs
- into EPS files in a seperate step e.g. by using ImageMagick's `convert`.
+ into EPS files in a separate step e.g. by using ImageMagick's `convert`.
  Transparent bitmap images are always generated as an external PNGs.
 
  The 'nobitmap' option let images be rendered as filled rectangles instead
@@ -1845,7 +1845,7 @@ term.options = function(opt_str, initial, t_count)
       get_next_token()
       gfx.opt.plotsize_x, gfx.opt.plotsize_y = get_two_sizes(o_next)
       if not gfx.opt.plotsize_x then
-        gp.int_error(t_count, string.format("error: two comma seperated lengths expected, got `%s'.", o_next))
+        gp.int_error(t_count, string.format("error: two comma separated lengths expected, got `%s'.", o_next))
       end
       gfx.opt.set_plotsize = true
       term_opt_size = string.format("plotsize %s,%s ", gfx.opt.plotsize_x, gfx.opt.plotsize_y)
@@ -1857,7 +1857,7 @@ term.options = function(opt_str, initial, t_count)
       get_next_token()
       local plotsize_x, plotsize_y = get_two_sizes(o_next)
       if not plotsize_x then
-        gp.int_error(t_count, string.format("error: two comma seperated lengths expected, got `%s'.", o_next))
+        gp.int_error(t_count, string.format("error: two comma separated lengths expected, got `%s'.", o_next))
       end
       gfx.opt.set_plotsize = false
       term_opt_size = string.format("size %s,%s ", plotsize_x, plotsize_y)
@@ -1867,13 +1867,13 @@ term.options = function(opt_str, initial, t_count)
       get_next_token()
       charsize_h, charsize_v = get_two_sizes(o_next)
       if not charsize_h then
-        gp.int_error(t_count, string.format("error: two comma seperated lengths expected, got `%s'.", o_next))
+        gp.int_error(t_count, string.format("error: two comma separated lengths expected, got `%s'.", o_next))
       end
     elseif almost_equals(o_next, "sc$ale") then
       get_next_token()
       local xscale, yscale = get_two_sizes(o_next)
       if not xscale then
-        gp.int_error(t_count, string.format("error: two comma seperated numbers expected, got `%s'.", o_next))
+        gp.int_error(t_count, string.format("error: two comma separated numbers expected, got `%s'.", o_next))
       end
       term_opt_scale = string.format("scale %s,%s ",xscale, yscale)
       term.xmax = term.xmax * xscale
@@ -1885,7 +1885,7 @@ term.options = function(opt_str, initial, t_count)
       for i = 1,#args do
         args[i] = tonumber(args[i])
         if args[i] == nil then
-          gp.int_error(t_count, string.format("error: list of comma seperated numbers expected, got `%s'.", o_next))
+          gp.int_error(t_count, string.format("error: list of comma separated numbers expected, got `%s'.", o_next))
         end
         args[i] = args[i] - 1
       end

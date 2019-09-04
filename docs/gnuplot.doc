@@ -805,7 +805,7 @@ C  need @ in table, so end and restart the table !
  The markup control characers act on the following single character or
  bracketed clause. The bracketed clause may contain a string of characters with
  no additional markup, e.g. 2^{10}, or it may contain additional markup that
- changes font properties.  Font specifiers MUST be preceeded by a '/' character
+ changes font properties.  Font specifiers MUST be preceded by a '/' character
  that immediately follows the opening '{'.  If a font name contains spaces it
  must be enclosed in single or double quotes.
 
@@ -1877,7 +1877,7 @@ C marker below is used to signal this to doc2html:
  The `word` and `words` functions provide limited support for quoted strings, 
  both single and double quotes can be used:
        print words("\"double quotes\" or 'single quotes'")   # 3
- A starting quote must either be preceeded by a white space, or start the 
+ A starting quote must either be preceded by a white space, or start the 
  string. This means that apostrophes in the middle or at the end of words are 
  considered as parts of the respective word:
        print words("Alexis' phone doesn't work") # 4
@@ -2597,7 +2597,7 @@ Ffigure_newsyntax
  Successive functions or datafiles plotted by a single command will be assigned
  successive linetypes in the current default sequence.  You can override this
  for any individual function, datafile, or plot element by giving explicit line
- prooperties in the plot command.
+ properties in the plot command.
 
  Examples:
 
@@ -2733,7 +2733,7 @@ Ffigure_newsyntax
  information for each line in the data file. This requires a corresponding
  additional column in the `using` specifier.  The extra column is interpreted as
  a 24-bit packed RGB triple. If the value is provided directly in the data file
- it is easiest to give it as a hexidecimal value (see `rgbcolor`). 
+ it is easiest to give it as a hexadecimal value (see `rgbcolor`). 
  Alternatively, the `using` specifier can contain an expression that evaluates
  to a 24-bit RGB color as in the example below.
  Text colors are similarly set using `tc rgbcolor variable`.
@@ -6638,7 +6638,7 @@ Ffigure_fenceplot
  An independent sampling range can be provided immediately before the '+'. As
  in normal function plots, a name can be assigned to the independent variable. 
  If given for the first plot element, the sampling range specifier has to be 
- preceeded by the `sample` keyword (see also `plot sampling`).
+ preceded by the `sample` keyword (see also `plot sampling`).
 
        plot sample [beta=0:2*pi] '+' using (sin(beta)):(cos(beta)) with lines
 
@@ -13108,7 +13108,7 @@ Ffigure_multiple_keys
 
  Syntax:
        set table {"outfile" | $datablock} {append}
-                 {separator {space|tab|comma|"<char>"}
+                 {separator {whitespace|tab|comma|"<char>"}
        plot <whatever>
        unset table
 
