@@ -79,9 +79,9 @@
  *	voxel(vx,vy,vz) += function( sqrt((x-vx)**2 + (y-vy)**2 + (z-vz)**2) )
  * Once loaded the grid can either be referenced by splot commands, e.g.
  * 	splot $FILE using x:y:z:(voxel(x,y,z)) with points lc palette
- * or using the new command (not implemented yet)
- * 	voxelgrid with {dots|points}
- * 	voxelgrid with isosurface <value>
+ * or plotted using new splot options
+ * 	splot $GRID with {dots|points}
+ * 	splot $GRID with isosurface level <value>
  *
  * The grid can be cleared by
  *	vclear
