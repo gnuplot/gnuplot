@@ -3484,6 +3484,18 @@ key_sample_fill(int xl, int yl, struct surface_points *this_plot)
 
     } else if (w > 0) {
 	(term->fillbox)(style,x,y,w,h);
+
+	/* FIXME:  what other plot styles want a border on the key sample? */
+	if ((this_plot->plot_style & PLOT_STYLE_HAS_PM3DBORDER)) {
+	    if (pm3d.border.l_type != LT_NODRAW && pm3d.border.l_type != LT_DEFAULT)
+		term_apply_lp_properties(&pm3d.border);
+	    newpath();
+	    draw_clip_line( x, y, x+w, y);
+	    draw_clip_line( x+w, y, x+w, y+h);
+	    draw_clip_line( x+w, y+h, x, y+h);
+	    draw_clip_line( x, y+h, x, y);
+	    closepath();
+	}
     }
 
     (term->layer)(TERM_LAYER_END_KEYSAMPLE);
