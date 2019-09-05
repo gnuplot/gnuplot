@@ -2168,7 +2168,7 @@ fit_command()
 		if ((1 != sscanf(s, "%d]", &index))
 		||  (index <= 0 || index > udv->udv_value.v.value_array[0].v.int_val))
 		    Eex("bad array index");
-		snprintf(par_name[num_params], sizeof(par_name[0]), "%s[%d]", tmp, index);
+		snprintf(par_name[num_params], sizeof(par_name[0]), "%40.40s[%d]", tmp, (short)index);
 		par_udv[num_params] = &(udv->udv_value.v.value_array[index]);
 	    } else {
 		/* Normal case */
