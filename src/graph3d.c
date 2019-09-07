@@ -504,16 +504,19 @@ boundary3d(struct surface_points *plots, int count)
     if (yscaler == 0) yscaler = 1;
     if (xscaler == 0) xscaler = 1;
 
-    /* 'set size {square|ratio}' for splots */
-    if (splot_map && aspect_ratio != 0.0) {
+    /* Let 2D 'set size {square|ratio}' affect splot_map also */
+    if (splot_map && (aspect_ratio != 0.0 || aspect_ratio_3D > 0)) {
 	double current_aspect_ratio;
 
-	if (aspect_ratio < 0 && (X_AXIS.max - X_AXIS.min) != 0.0) {
-	    current_aspect_ratio = - aspect_ratio
+	if (aspect_ratio != 0)
+	    current_aspect_ratio = aspect_ratio;
+	else
+	    current_aspect_ratio = -1.0;
+	if (current_aspect_ratio < 0 && (X_AXIS.max - X_AXIS.min) != 0.0) {
+	    current_aspect_ratio = - current_aspect_ratio
 		* fabs((Y_AXIS.max - Y_AXIS.min) /
 		       (X_AXIS.max - X_AXIS.min));
-	} else
-	    current_aspect_ratio = aspect_ratio;
+	}
 
 	/*{{{  set aspect ratio if valid and sensible */
 	if (current_aspect_ratio >= 0.01 && current_aspect_ratio <= 100.0) {
@@ -797,7 +800,7 @@ do_3dplot(
     /* Allow 'set view equal xy' to adjust rendered length of the X and/or Y axes.  */
     /* NB: only works correctly for terminals whose coordinate system is isotropic. */
     xcenter3d = ycenter3d = zcenter3d = 0.0;
-    if (aspect_ratio_3D >= 2) {
+    if (!splot_map && aspect_ratio_3D >= 2) {
 	if (yscale3d > xscale3d) {
 	    ycenter3d = 1.0 - xscale3d/yscale3d;
 	    yscale3d = xscale3d;

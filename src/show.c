@@ -132,6 +132,7 @@ static void show_psdir(void);
 static void show_angles(void);
 static void show_samples(void);
 static void show_isosamples(void);
+static void show_isotropic(void);
 static void show_view(void);
 static void show_surface(void);
 static void show_hidden3d(void);
@@ -435,6 +436,9 @@ show_command()
 	break;
     case S_ISOSAMPLES:
 	show_isosamples();
+	break;
+    case S_ISOTROPIC:
+	show_isotropic();
 	break;
     case S_ISOSURFACE:
 	show_isosurface();
@@ -2927,14 +2931,26 @@ show_size()
 
     fprintf(stderr, "\tsize is scaled by %g,%g\n", xsize, ysize);
     if (aspect_ratio > 0)
-	fprintf(stderr, "\tTry to set aspect ratio to %g:1.0\n", aspect_ratio);
+	fprintf(stderr, "\tTry to set aspect ratio to %g:1\n", aspect_ratio);
     else if (aspect_ratio == 0)
 	fputs("\tNo attempt to control aspect ratio\n", stderr);
     else
-	fprintf(stderr, "\tTry to set LOCKED aspect ratio to %g:1.0\n",
-		-aspect_ratio);
+	fprintf(stderr, "\tTry to set ratio of x and y axis scales to %g:1 %s\n",
+		-aspect_ratio,
+		aspect_ratio == -1 ? "[isotropic axis scales]" : "");
 }
 
+static void
+show_isotropic()
+{
+    SHOW_ALL_NL;
+    if (aspect_ratio == -1)
+	fprintf(stderr, "\tin 2D x and y axis scales are the same\n");
+    if (aspect_ratio_3D == 2)
+	fprintf(stderr, "\tin 3D x and y axis scales are the same\n");
+    if (aspect_ratio_3D == 3)
+	fprintf(stderr, "\tin 3D x, y, and z axis scales are the same\n");
+}
 
 /* process 'show origin' command */
 static void

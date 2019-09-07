@@ -87,6 +87,7 @@ static void unset_historysize(void);
 static void unset_pixmaps(void);
 static void unset_pixmap(int);
 static void unset_isosamples(void);
+static void unset_isotropic(void);
 static void unset_key(void);
 static void unset_label(void);
 static void delete_label(struct text_label * prev, struct text_label * this);
@@ -268,6 +269,9 @@ unset_command()
 	break;
     case S_ISOSAMPLES:
 	unset_isosamples();
+	break;
+    case S_ISOTROPIC:
+	unset_isotropic();
 	break;
     case S_JITTER:
 	unset_jitter();
@@ -1091,6 +1095,13 @@ unset_isosamples()
     iso_samples_2 = ISO_SAMPLES;
 }
 
+/* process 'unset isotropic' command */
+static void
+unset_isotropic()
+{
+    aspect_ratio = 0;
+    aspect_ratio_3D = 0;
+}
 
 void
 reset_key()

@@ -93,6 +93,7 @@ static void set_hidden3d(void);
 static void set_history(void);
 static void set_pixmap(void);
 static void set_isosamples(void);
+static void set_isotropic(void);
 static void set_key(void);
 static void set_label(void);
 static int  assign_label_tag(void);
@@ -311,6 +312,9 @@ set_command()
 	    break;
 	case S_ISOSURFACE:
 	    set_isosurface();
+	    break;
+	case S_ISOTROPIC:
+	    set_isotropic();
 	    break;
 	case S_JITTER:
 	    set_jitter();
@@ -2239,6 +2243,16 @@ set_isosamples()
     }
 }
 
+/* "set isotropic" subsumes poorly documented "set size ratio -1"
+ * and "set view equal xyz".
+ */
+static void
+set_isotropic()
+{
+    c_token++;
+    aspect_ratio = -1.0;
+    aspect_ratio_3D = 3;
+}
 
 /* When plotting an external key, the margin and l/r/t/b/c are
    used to determine one of twelve possible positions.  They must
@@ -5025,10 +5039,6 @@ set_view()
 	if (equals(c_token,"scale")) {
 	    c_token++;
 	    mapview_scale = real_expression();
-	}
-	if (aspect_ratio_3D != 0) {
-	    aspect_ratio = -1;
-	    aspect_ratio_3D = 0;
 	}
 	return;
     };
