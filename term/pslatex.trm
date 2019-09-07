@@ -69,6 +69,10 @@
  *    an additional LaTeX document.
  *  - Fixed text rotation of ps(la)tex terminals.
  *
+ * Sep 2019
+ *  - use the same page size in \includegraphics statement on terminal close
+ *    that was used for layout when the terminal was initialized.
+ *
  * Send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  */
 
@@ -145,6 +149,10 @@ static double PSLATEX_xmargin = 1.0;
 static double PSLATEX_ymargin = 1.0;
 static double PSLATEX_opacity = 1.0;
 
+/* Fix for "set size" different at the time terminal is opened/closed */
+static double PSLATEX_pagesize_x;
+static double PSLATEX_pagesize_y;
+
 /* Common functions for epslatex and ps(la)tex */
 
 TERM_PUBLIC void
@@ -160,8 +168,8 @@ PSLATEX_reset()
     \\put(0,0){\\includegraphics[width={%.2fbp},height={%.2fbp}]{%s}}%%\n\
     \\gplfronttext\n\
   \\end{picture}%%\n\
-\\endgroup\n", 1 + term->xmax * xsize / (2.0*PS_SC),
-               1 + term->ymax * ysize / (2.0*PS_SC),
+\\endgroup\n", 1 + PSLATEX_pagesize_x / (2.0*PS_SC),
+               1 + PSLATEX_pagesize_y / (2.0*PS_SC),
                pslatex_auxname);
             if (ps_params->epslatex_standalone)
                 fputs("\\end{document}\n", gpoutfile);
@@ -246,6 +254,9 @@ PSTEX_reopen_output()
 TERM_PUBLIC void
 PSTEX_common_init()
 {
+    PSLATEX_pagesize_x = term->xmax * xsize;
+    PSLATEX_pagesize_y = term->ymax * ysize;
+
     switch (ps_params->terminal) {
     case PSTERM_PSLATEX:
         fprintf(gpoutfile,"\
@@ -256,7 +267,7 @@ PSTEX_common_init()
   \\@sanitize\\catcode`\\%%=14\\relax\\special}%%\n\
 \\setlength{\\unitlength}{%.4fbp}%%\n", 1.0 / (2*PS_SC));
         fprintf(gpoutfile, "\\begin{picture}(%d,%d)(0,0)%%\n",
-                (int) (xsize * term->xmax), (int) (ysize * term->ymax));
+                (int) (PSLATEX_pagesize_x), (int) (PSLATEX_pagesize_y));
         break;
     case PSTERM_PSTEX:
         /* write plain TeX header */
@@ -285,7 +296,7 @@ PSTEX_common_init()
 \\fi\n\
 \\GNUPLOTunit=%.4fbp\n", 1.0 / (2*PS_SC));
         fprintf(gpoutfile, "\\GNUPLOTpicture(%d,%d)\n",
-                (int) (xsize * term->xmax), (int) (ysize * term->ymax));
+                (int) (PSLATEX_pagesize_x), (int) (PSLATEX_pagesize_y));
         break;
     default:; /* do nothing, just avoid a compiler warning */
     }
@@ -293,8 +304,8 @@ PSTEX_common_init()
     if (gppsfile != gpoutfile) {
         /* these are taken from the post.trm file computation
          * of the bounding box, but without the X_OFF and Y_OFF */
-        int urx = (int) (xsize * term->xmax / (2*PS_SC) + 0.5);
-        int ury = (int) (ysize * term->ymax / (2*PS_SC) + 0.5);
+        int urx = (int) (PSLATEX_pagesize_x / (2*PS_SC) + 0.5);
+        int ury = (int) (PSLATEX_pagesize_y / (2*PS_SC) + 0.5);
 
         /* pslatex_auxname is only != NULL with the `auxfile' option.
          * If pslatex_auxname is not a simple file name, but a path,
@@ -411,6 +422,9 @@ EPSLATEX_common_init()
     char *fontfamily = NULL;
     char *fontseries = NULL;
     char *fontshape = NULL;
+
+    PSLATEX_pagesize_x = term->xmax * xsize;
+    PSLATEX_pagesize_y = term->ymax * ysize;
 
     if (!gpoutfile) {
         char *temp = gp_alloc(strlen(outstr) + 1, "temp file string");
@@ -545,10 +559,10 @@ EPSLATEX_common_init()
 }%%\n\
 %s\n\
 \\begin{document}\n",
-                    term->xmax * xsize / (2.0*PS_SC),
-                    term->ymax * ysize / (2.0*PS_SC),
-                    term->xmax * xsize / (2.0*PS_SC),
-                    term->ymax * ysize / (2.0*PS_SC),
+                    PSLATEX_pagesize_x / (2.0*PS_SC),
+                    PSLATEX_pagesize_y / (2.0*PS_SC),
+                    PSLATEX_pagesize_x / (2.0*PS_SC),
+                    PSLATEX_pagesize_y / (2.0*PS_SC),
                     epslatex_header ? epslatex_header : "%" );
         }
 
@@ -682,13 +696,13 @@ EPSLATEX_common_init()
     \\setlength{\\fboxrule}{0.5pt}%%\n\
     \\setlength{\\fboxsep}{1pt}%%\n");
         fprintf(gpoutfile,"\\begin{picture}(%.2f,%.2f)%%\n",
-                term->xmax * xsize, term->ymax * ysize);
+                PSLATEX_pagesize_x, PSLATEX_pagesize_y);
     }
     if (ps_params->background.r >= 0) {
 	fprintf(gpoutfile, "\\definecolor{gpBackground}{rgb}{%.3f, %.3f, %.3f}%%\n",
 		ps_params->background.r, ps_params->background.g, ps_params->background.b);
 	fprintf(gpoutfile, "\\put(0,0){\\colorbox{gpBackground}{\\makebox(%.2f,%.2f)[]{}}}%%\n",
-		term->xmax * xsize, term->ymax * ysize);
+		PSLATEX_pagesize_x, PSLATEX_pagesize_y);
     }
 
     if (fontfamily)
