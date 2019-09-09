@@ -1,20 +1,37 @@
-		GNUPLOT Version 5.2.7 Release Notes
+		GNUPLOT Version 5.2.8 Release Notes
 		===================================
 
-These release notes are for version 5.2 patchlevel 7 (5.2.7).
-This release contains bug-fixes, a few changes back-ported from the
-development version, and some minor new features.
-The largest change is major revision to the fig and pm terminals
-bringing them into line with capabilities of other version 5 terminals.
+These release notes are for version 5.2 patchlevel 8 (5.2.8).
+This release contains bug-fixes and a few changes back-ported from the
+development version.
 
 Please see the ChangeLog file for a complete list of changes made during the
 course of development from 5.0 to 5.2.
 
-Release Notes date: 29-May-2019
+Release Notes date: 05-Sep-2019
+
+Changes in 5.2.8
+================
+* NEW user-visible GPVAL_TERM_HCHAR GPVAL_TERM_VCHAR (debug aid for font issues)
+* CHANGE placement of ylabel (compromise 5.2.7 and earlier versions) (Bug #2181)
+* CHANGE make strstrt() aware of UTF8, e.g. strstrt("αβγ5", "5") returns 4
+* FIX "set timestamp" from "save" must not include a justification (Bug #2178)
+* FIX set cntrparam levels increment <base>, <factor> for logscale z (Bug #2183)
+* FIX character pointtypes should inherit plot coloring like normal pointtypes
+* FIX bad autoscaling of linked y2 axis (Bug #2186)
+* FIX prevent infinite loop from unbounded interation in a non-data plot command
+* FIX dimensions reported by "stats matrix every" (Bug #2189)
+* FIX extent of boxplot whiskers could be off by one point (Bug #2106)
+* FIX qt: suppress off-by-one ysize (Bug #1759)
+* FIX cairo: suppress off-by-one ysize (Bug #1759)
+* FIX gd: apply alpha to brushstroke lines (Bug #2117)
+* FIX tikz: fixes to accommodate lua 5.3 and newer pgf
+* FIX wxt: ExportToFile widget disabled in persist mode (Bug #2185)
+* FIX qt: handling of modifier keys (ctrl alt shift) for keyboard events
+* FIX wxt: handling of modifier keys (ctrl alt shift) for keyboard events
 
 Changes in 5.2.7
 ================
-
 * NEW "set pm3d noclipcb" will skip drawing quadrangles with color < cbmin
 * NEW pm terminal supports utf8, dashed lines, bold/italic text
 * NEW imaginary component of array values is available to "using" in column 3
@@ -48,7 +65,6 @@ Changes in 5.2.7
 * FIX incomplete initialization led to segfault from "gnuplot -c foo.gp baz"
 * FIX Allow "pm3d depthorder base" to handle 3D quadrangles with logscale z
 
-
 Changes in 5.2.6
 ================
 * NEW keyword "keyentry" places an entry in the key without actually plotting
@@ -63,7 +79,7 @@ Changes in 5.2.6
 * FIX error line reporting inside an if/else bracketed clause
 * FIX error in date conversion for times within a nanosecond of a year boundary
 
-CHANGES IN 5.2.5
+Changes in 5.2.5
 ================
 
 * NEW "set pm3d depthorder base" sorts pm3d quadrangles by projecting to z=0
@@ -87,7 +103,7 @@ CHANGES IN 5.2.5
 * FIX incompatibility of "pm3d depthorder" and rgb color taken from data column
 * FIX aqua terminal font changes in enhanced text mode
 
-CHANGES IN 5.2.4
+Changes in 5.2.4
 ================
 * NEW "call" parameters ARG1, ARG2, ... are also present as ARGV[1]...ARGV[ARGC]
 * CHANGE generalize the test for missing data flag in input data
@@ -99,7 +115,7 @@ CHANGES IN 5.2.4
 * FIX font-handling bug; line-spacing of previous font still in effect
 * FIX post, svg, dumb terminals: early fontsize initialization
 
-CHANGES IN 5.2.3
+Changes in 5.2.3
 ================
 * NEW "set grid {no}vertical" adds grid lines in the xz and yz planes
 * NEW "set cntrparam {firstlinetype N} {{un}sorted}"
@@ -126,7 +142,7 @@ CHANGES IN 5.2.3
 * FIX svg terminal: point plot empty title produced spurious mousing directive
 * FIX tikz terminal: failed to recognize dashtype 1
 
-CHANGES IN 5.2.2
+Changes in 5.2.2
 ================
 * NEW set table separator {tab|comma|"char"} allows creation of csv files
 * NEW hotkey for changing azimuth in 3D plots with mousing
@@ -382,7 +398,7 @@ Installation instructions are available in the source itself; the short
 version for linux/unix-like systems is to unpack the tarball and then
 <PRE>
 build it:
-      cd gnuplot-5.2.7 ; ./configure ; make
+      cd gnuplot-5.2.8 ; ./configure ; make
 test it:
       make check
 install it:

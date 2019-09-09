@@ -1,5 +1,6 @@
 Changes in 5.2.8
 ================
+* NEW user-visible GPVAL_TERM_HCHAR GPVAL_TERM_VCHAR (debug aid for font issues)
 * CHANGE placement of ylabel (compromise 5.2.7 and earlier versions) (Bug #2181)
 * CHANGE make strstrt() aware of UTF8, e.g. strstrt("αβγ5", "5") returns 4
 * FIX "set timestamp" from "save" must not include a justification (Bug #2178)
@@ -14,6 +15,8 @@ Changes in 5.2.8
 * FIX gd: apply alpha to brushstroke lines (Bug #2117)
 * FIX tikz: fixes to accommodate lua 5.3 and newer pgf
 * FIX wxt: ExportToFile widget disabled in persist mode (Bug #2185)
+* FIX qt: handling of modifier keys (ctrl alt shift) for keyboard events
+* FIX wxt: handling of modifier keys (ctrl alt shift) for keyboard events
 
 Changes in 5.2.7
 ================
