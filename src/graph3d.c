@@ -808,6 +808,7 @@ do_3dplot(
 
     /* Give a chance for rectangles to be behind everything else */
     place_objects( first_object, LAYER_BEHIND, 3);
+    place_pixmaps(LAYER_BEHIND, 3);
 
     term_apply_lp_properties(&border_lp);	/* border linetype */
 
@@ -1502,6 +1503,7 @@ do_3dplot(
 
     /* Add 'front' rectangles */
     place_objects(first_object, LAYER_FRONT, 3);
+    place_pixmaps(LAYER_FRONT, 3);
 
     /* Grid walls */
     place_objects(grid_wall, LAYER_FRONT, 3);

@@ -40,6 +40,7 @@
 
 #include "alloc.h"
 #include "axis.h"
+#include "breaders.h"	/* for df_read_pixmap */
 #include "command.h"
 #include "contour.h"
 #include "datafile.h"
@@ -92,6 +93,7 @@ static void set_fit(void);
 static void set_grid(void);
 static void set_hidden3d(void);
 static void set_history(void);
+static void set_pixmap(void);
 static void set_isosamples(void);
 static void set_key(void);
 static void set_label(void);
@@ -300,6 +302,9 @@ set_command()
 	case S_HISTORYSIZE:	/* Deprecated in favor of "set history size" */
 	case S_HISTORY:
 	    set_history();
+	    break;
+	case S_PIXMAP:
+	    set_pixmap();
 	    break;
 	case S_ISOSAMPLES:
 	    set_isosamples();
@@ -2097,6 +2102,87 @@ set_history()
     }
 }
 
+#ifdef PIXMAPS
+/* process 'set pixmap' command */
+static void
+set_pixmap()
+{
+    t_pixmap *this_pixmap = NULL;
+    t_pixmap *new_pixmap = NULL;
+    t_pixmap *prev_pixmap = NULL;
+    char *temp;
+    int tag;
+
+    c_token++;
+    tag = int_expression();
+    if (tag <= 0)
+	int_error(c_token, "tag must be > 0");
+
+    for (this_pixmap = pixmap_listhead; this_pixmap != NULL;
+	prev_pixmap = this_pixmap, this_pixmap = this_pixmap->next)
+	    if (tag <= this_pixmap->tag)
+		break;
+
+    if (this_pixmap == NULL || tag != this_pixmap->tag) {
+	new_pixmap = gp_alloc(sizeof(t_pixmap), "pixmap");
+	if (prev_pixmap == NULL)
+	    pixmap_listhead = new_pixmap;
+	else
+	    prev_pixmap->next = new_pixmap;
+	memset(new_pixmap, 0, sizeof(t_pixmap));
+	new_pixmap->tag = tag;
+	new_pixmap->next = this_pixmap;
+	new_pixmap->layer = LAYER_FRONT;
+	this_pixmap = new_pixmap;
+    }
+
+    while (!END_OF_COMMAND) {
+	if (equals(c_token, "at")) {
+	    c_token++;
+	    get_position(&this_pixmap->pin);
+	    continue;
+	}
+	if (equals(c_token, "width")) {
+	    c_token++;
+	    get_position(&this_pixmap->extent);
+	    continue;
+	}
+	if ((temp = try_to_get_string())) {
+	    free(this_pixmap->filename);
+	    this_pixmap->filename = temp;
+	    continue;
+	}
+	if (equals(c_token, "behind") || equals(c_token, "back")) {
+	    c_token++;
+	    this_pixmap->layer = LAYER_BEHIND;
+	    continue;
+	}
+	if (equals(c_token, "front")) {
+	    c_token++;
+	    this_pixmap->layer = LAYER_FRONT;
+	    continue;
+	}
+	if (equals(c_token, "center")) {
+	    c_token++;
+	    this_pixmap->center = TRUE;
+	    continue;
+	}
+	/* Unrecognized option */
+	break;
+    }
+
+    if (!this_pixmap->filename)
+	int_error(c_token, "must give filename");
+
+    /* This will open the file and read in the pixmap pixels */
+    df_read_pixmap(this_pixmap);
+}
+#else
+static void
+set_pixmap()
+{ int_warn(NO_CARET, "this gnuplot does not support pixmaps");
+}
+#endif
 
 /* process 'set isosamples' command */
 static void

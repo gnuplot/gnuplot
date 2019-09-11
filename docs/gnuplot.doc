@@ -310,6 +310,14 @@ C
 ## interactive keyboard and mouse (svga only) input.
 #end
 
+4 Pixmaps as objects
+#start
+#b `set pixmap` allows import of an image in standard format (png jpeg gif) as
+## a pixmap that can be positioned anywhere in a plot or on the page.
+## Unlike plotting `with image`, pixmap objects retain their original aspect
+## ratio and size independent of axis scaling or rotation. See `pixmap`.
+#end
+
 4 Other new features
 #start
 #b Enhanced text mode accepts \U+xxxx (xxxx is a 4 or 5 character hexadecimal)
@@ -12597,6 +12605,36 @@ Ffigure_multiple_keys
  The normal options to the range and tics commands are accepted although not
  all options make sense for parallel axis plots.  Placement of the label,
  relevant only to spiderplots, can be adjusted by varying the radial offset.
+3 pixmap
+?pixmap
+?set pixmap
+?commands set pixmap
+ Syntax:
+       set pixmap <index> "filename" at <position> width <w>
+                  {front|behind} {center}
+       show pixmaps
+ 
+ The `set pixmap` command is similar to `set object` in that it defines an
+ object that will appear on subsequent plots.   The position and width of a
+ pixmap may be specified in any coordinate system (see `coordinates`).
+ Unlike the `with image` plot style, the aspect ratio and orientation of a
+ pixmap does not change with axis scaling or rotation. Also unlike `with image`,
+ pixmaps are not clipped by the border of the plot, only by the edge of the
+ canvas. The coordinates given by `at <position>` refer to the lower left
+ corner of the pixmap unless `center` is specified.
+ Example:
+       # Use a gradient as the background for all plotting
+       set pixmap 1 "gradient.png"
+       set pixmap 1 at screen 0, screen 0 width screen 1 behind
+       # Place a logo at the lower right of each page plotted
+       set pixmap 2 "logo.jpg"
+       set pixmap 2 at screen 0.95, screen 0 with screen 0.5 behind
+       # Place a small image at some 3D coordinate
+       # It will move as if attached to the surface being plotted
+       # but will always face forward and remain upright
+       set pixmap 3 "image.png" at my_x, my_y, f(my_x,my_y) width screen .05
+       splot f(x,y)
+
 3 plot
 ?commands show plot
 ?show plot

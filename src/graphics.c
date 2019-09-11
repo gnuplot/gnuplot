@@ -316,6 +316,60 @@ place_arrows(int layer)
 }
 
 /*
+ * place_pixmaps() handles both 2D and 3D pixmaps
+ * NOTE: implemented via term->image(), not individual pixels
+ */
+void
+place_pixmaps(int layer, int dimensions)
+{
+#ifdef PIXMAPS
+    t_pixmap *pixmap;
+    gpiPoint corner[4];
+    int x, y, dx, dy;
+
+    if (!term->image)
+	return;
+
+    for (pixmap = pixmap_listhead; pixmap; pixmap = pixmap->next) {
+	if (pixmap->layer != layer)
+	    continue;
+
+	if (dimensions == 3) {
+	    map3d_position(&pixmap->pin, &x, &y, "pixmap");
+	    if (pixmap->extent.scalex == first_axes)
+		dx = pixmap->extent.x * radius_scaler;
+	    else
+		map3d_position_r(&pixmap->extent, &dx, &dy, "pixmap");
+	} else {
+	    double Dx, Dy;
+	    map_position(&pixmap->pin, &x, &y, "pixmap");
+	    map_position_r(&pixmap->extent, &Dx, &Dy, "pixmap");
+	    dx = Dx;
+	}
+	if (dx == 0) /* Default */
+	    dx = pixmap->ncols * term->h_tic / 4;
+	dy = dx * (double)(pixmap->nrows) / (double)(pixmap->ncols);
+
+	if (pixmap->center) {
+	    x -= dx/2;
+	    y -= dy/2;
+	}
+
+	corner[0].x = x;
+	corner[0].y = y + dy;
+	corner[1].x = x + dx;
+	corner[1].y = y;
+	corner[2].x = 0;		/* no clipping */
+	corner[2].y = term->ymax;
+	corner[3].x = term->xmax;
+	corner[3].y = 0;
+
+	term->image(pixmap->ncols, pixmap->nrows, pixmap->image_data, corner, IC_RGBA);
+    }
+#endif
+}
+
+/*
  * place_labels() handles both individual labels and 2D plot with labels
  */
 static void
@@ -575,6 +629,7 @@ do_plot(struct curve_points *plots, int pcount)
 
     /* Give a chance for rectangles to be behind everything else */
     place_objects( first_object, LAYER_BEHIND, 2);
+    place_pixmaps(LAYER_BEHIND, 2);
 
     screen_ok = FALSE;
 
@@ -967,6 +1022,9 @@ do_plot(struct curve_points *plots, int pcount)
 
     /* And rectangles */
     place_objects( first_object, LAYER_FRONT, 2);
+
+    /* pixmaps in front of rectangles, OK? */
+    place_pixmaps( LAYER_FRONT, 2);
 
     /* PLACE LABELS */
     place_labels( first_label, LAYER_FRONT, FALSE );

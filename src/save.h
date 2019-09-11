@@ -62,6 +62,7 @@ void save_pm3dcolor(FILE *, const struct t_colorspec *);
 void save_fillstyle(FILE *, const struct fill_style_type *);
 void save_offsets(FILE *, char *);
 void save_histogram_opts(FILE *fp);
+void save_pixmaps(FILE *fp);
 void save_object(FILE *, int);
 void save_walls(FILE *);
 void save_style_textbox(FILE *);

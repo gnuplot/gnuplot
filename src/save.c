@@ -614,6 +614,8 @@ save_set_all(FILE *fp)
     fprintf(fp, "set style histogram ");
     save_histogram_opts(fp);
 
+    save_pixmaps(fp);
+
     fprintf(fp, "unset object\n");
     save_object(fp, 0);
     fprintf(fp, "unset walls\n");
@@ -1664,6 +1666,25 @@ save_histogram_opts (FILE *fp)
 	fprintf(fp, " font \"%s\" ", histogram_opts.title.font);
     save_position(fp, &histogram_opts.title.offset, 2, TRUE);
     fprintf(fp, "\n");
+}
+
+void
+save_pixmaps(FILE *fp)
+{
+#ifdef PIXMAPS
+    t_pixmap *pixmap;
+    for (pixmap = pixmap_listhead; pixmap; pixmap = pixmap->next) {
+	fprintf(fp, "set pixmap %d '%s' # (%d x %d pixmap)\n",
+		pixmap->tag, pixmap->filename, pixmap->ncols, pixmap->nrows);
+	fprintf(fp, "set pixmap %d at ", pixmap->tag);
+	save_position(fp,&pixmap->pin, 3, FALSE);
+	fprintf(fp, "  width ");
+	save_position(fp,&pixmap->pin, 1, FALSE);
+	fprintf(fp, " %s %s\n",
+		pixmap->layer == LAYER_FRONT ? "front" : "behind",
+		pixmap->center ? "center" : "");
+    }
+#endif
 }
 
 /* Save/show rectangle <tag> (0 means show all) */

@@ -42,6 +42,7 @@
 #endif
 
 #include "syscfg.h"
+#include "gadgets.h"
 
 /* Prototypes of functions exported by breaders.c */
 
@@ -50,5 +51,11 @@ void png_filetype_function(void);
 void gif_filetype_function(void);
 void jpeg_filetype_function(void);
 int  df_libgd_get_pixel(int i, int j, int component);
+
+#ifdef PIXMAPS
+TBOOLEAN df_read_pixmap(t_pixmap *pixmap);
+#else
+#define df_read_pixmap(A) FALSE
+#endif
 
 #endif /* GNUPLOT_BINEDF_H */

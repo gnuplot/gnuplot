@@ -102,6 +102,11 @@ struct linestyle_def *first_mono_linestyle = NULL;
 /* Pointer to first 'set style arrow' definition in linked list */
 struct arrowstyle_def *first_arrowstyle = NULL;
 
+#ifdef PIXMAPS
+/* Listhead for pixmaps */
+t_pixmap *pixmap_listhead = NULL;
+#endif
+
 /* Holds the properties from 'set style parallelaxis' */
 struct pa_style parallel_axis_style = DEFAULT_PARALLEL_AXIS_STYLE;
 

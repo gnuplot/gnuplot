@@ -424,6 +424,9 @@ show_command()
     case S_SAMPLES:
 	show_samples();
 	break;
+    case S_PIXMAP:
+	save_pixmaps(stderr);
+	break;
     case S_ISOSAMPLES:
 	show_isosamples();
 	break;
@@ -2758,7 +2761,6 @@ show_isosamples()
     fprintf(stderr, "\tiso sampling rate is %d, %d\n",
 	    iso_samples_1, iso_samples_2);
 }
-
 
 /* process 'show view' command */
 static void

@@ -203,6 +203,21 @@ struct arrowstyle_def {
     struct arrow_style_type arrow_properties;
 };
 
+#ifdef PIXMAPS
+/* Datastructure for 'set pixmap */
+typedef struct t_pixmap {
+    int tag;			/* index refering to this pixmap */
+    struct t_pixmap *next;	/* pointer to next pixmap in the linked list */
+    unsigned int ncols, nrows;	/* image size */
+    t_position pin;		/* where it goes */
+    t_position extent;		/* width dx;  dy implicitly dx*aspect_ratio */
+    int layer;			/* front/back/behind */
+    TBOOLEAN center;		/* position is center rather than lower left */
+    char *filename;		/* where to read the pixmap pixmap */
+    coordval *image_data;	/* pixel array RGBARGBA... */
+} t_pixmap;
+#endif
+
 /* Used by 'set style parallelaxis' and 'set style spiderplot' */
 struct pa_style {
     lp_style_type lp_properties;/* used to draw the axes themselves */
@@ -450,6 +465,8 @@ extern struct linestyle_def *first_perm_linestyle;
 extern struct linestyle_def *first_mono_linestyle;
 
 extern struct arrowstyle_def *first_arrowstyle;
+
+extern struct t_pixmap *pixmap_listhead;
 
 extern struct pa_style parallel_axis_style;
 

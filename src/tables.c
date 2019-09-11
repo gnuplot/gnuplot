@@ -199,6 +199,7 @@ const struct gen_table set_tbl[] =
     { "hid$den3d", S_HIDDEN3D },
     { "historysize", S_HISTORYSIZE },	/* Deprecated */
     { "his$tory", S_HISTORY },
+    { "pixmap$s", S_PIXMAP },
     { "isosurf$ace", S_ISOSURFACE },
     { "is$osamples", S_ISOSAMPLES },
     { "jitter", S_JITTER },
