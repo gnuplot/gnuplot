@@ -570,6 +570,8 @@ void qt_graphics()
 	qt_sendFont();
 	term->v_tic = (unsigned int) (term->v_char/2.5);
 	term->h_tic = (unsigned int) (term->v_char/2.5);
+	// Tell user what scale factor relates term coordinates to pixels
+	term->tscale = qt_oversamplingF;
 
 	if (qt_setPosition)
 	{
