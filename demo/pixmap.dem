@@ -1,0 +1,18 @@
+#
+# Demonstrate use of 'set pixmap' to provide a slide backgroun,
+# a project logo, and a plot element
+#
+set pixmap 1 'gradient.png' at screen 0,0 size screen 1,1 behind
+set pixmap 2 'icon64x64.png' at screen 0.02, 0.02 width screen 0.05 back
+set pixmap 3 'aries.png' at polar 29., 1.11, 0.0 center width char 2.5
+
+set lmargin 20
+
+set label 101 at screen 0.05, 0.85 front
+set label 101 "{/:Bold Pixmap uses}\n" \
+              . "\U+2022  Gradient used as a backdrop\n" \
+              . "\U+2022  Project logo botton right\n" \
+              . "\U+2022  Icon (Aries) as plot element"
+
+load 'armillary.dem'
+

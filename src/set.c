@@ -2110,7 +2110,7 @@ set_pixmap()
     t_pixmap *this_pixmap = NULL;
     t_pixmap *new_pixmap = NULL;
     t_pixmap *prev_pixmap = NULL;
-    char *temp;
+    char *temp = NULL;
     int tag;
 
     c_token++;
@@ -2142,9 +2142,12 @@ set_pixmap()
 	    get_position(&this_pixmap->pin);
 	    continue;
 	}
-	if (equals(c_token, "width")) {
+	if (equals(c_token, "width") || equals(c_token, "size")) {
+	    TBOOLEAN keep_aspect_ratio = equals(c_token, "width");
 	    c_token++;
 	    get_position(&this_pixmap->extent);
+	    if (keep_aspect_ratio)
+		this_pixmap->extent.y = 0;
 	    continue;
 	}
 	if ((temp = try_to_get_string())) {
@@ -2174,13 +2177,19 @@ set_pixmap()
     if (!this_pixmap->filename)
 	int_error(c_token, "must give filename");
 
+    /* Enforce non-negative extents */
+    if (this_pixmap->extent.x < 0)
+	this_pixmap->extent.x = 0;
+    if (this_pixmap->extent.y < 0)
+	this_pixmap->extent.y = 0;
+
     /* This will open the file and read in the pixmap pixels */
     df_read_pixmap(this_pixmap);
 }
 #else
 static void
 set_pixmap()
-{ int_warn(NO_CARET, "this gnuplot does not support pixmaps");
+{ int_error(c_token, "this gnuplot does not support pixmaps");
 }
 #endif
 

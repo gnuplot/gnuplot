@@ -12609,32 +12609,42 @@ Ffigure_multiple_keys
 ?pixmap
 ?set pixmap
 ?commands set pixmap
+ EXPERIMENTAL (compile with -DPIXMAPS, requires libgd)
  Syntax:
-       set pixmap <index> "filename" at <position> width <w>
+       set pixmap <index> "filename" at <position> {width <w>|size <w> <h>}
                   {front|behind} {center}
        show pixmaps
+       unset pixmaps
  
  The `set pixmap` command is similar to `set object` in that it defines an
- object that will appear on subsequent plots.   The position and width of a
- pixmap may be specified in any coordinate system (see `coordinates`).
- Unlike the `with image` plot style, the aspect ratio and orientation of a
- pixmap does not change with axis scaling or rotation. Also unlike `with image`,
- pixmaps are not clipped by the border of the plot, only by the edge of the
- canvas. The coordinates given by `at <position>` refer to the lower left
- corner of the pixmap unless `center` is specified.
- Example:
+ object that will appear on subsequent plots. The rectangular array of
+ red/green/blue/alpha values making up the pixmap are read from a png, jpeg, 
+ or gif file.  The position and extent occupied by the pixmap in the gnuplot
+ output may be specified in any coordinate system (see `coordinates`).
+ The coordinates given by `at <position>` refer to the lower left
+ corner of the pixmap unless keyword `center` is present.
+
+ If the x-extent of the rendered pixmap is set using `width <x-extent>` the
+ aspect ratio of the original image is retained and neither the aspect ratio
+ nor the orientation of the pixmap changes with axis scaling or rotation.
+ If both the x-extent and y-extent are given using `size <x-extent> <y-extent>`
+ this overrides the original aspect ratio.
+ Pixmaps are not clipped to the border of the plot.
+ Examples:
        # Use a gradient as the background for all plotting
+       # Both x and y will be resized to fill the entire canvas
        set pixmap 1 "gradient.png"
-       set pixmap 1 at screen 0, screen 0 width screen 1 behind
+       set pixmap 1 at screen 0, 0 size screen 1, 1 behind
+
        # Place a logo at the lower right of each page plotted
        set pixmap 2 "logo.jpg"
-       set pixmap 2 at screen 0.95, screen 0 with screen 0.5 behind
+       set pixmap 2 at screen 0.95, 0 width screen 0.05 behind
+
        # Place a small image at some 3D coordinate
        # It will move as if attached to the surface being plotted
        # but will always face forward and remain upright
        set pixmap 3 "image.png" at my_x, my_y, f(my_x,my_y) width screen .05
        splot f(x,y)
-
 3 plot
 ?commands show plot
 ?show plot
@@ -16417,19 +16427,15 @@ Ffigure_walls
 =locale
 =internationalization
 =pdf
- External library GD (used by PNG/JPEG/GIF drivers):
+ External library GD (used by PNG/JPEG/GIF/sixelgd terminals, pixmap):
  Versions of libgd through 2.0.33 had various bugs in mapping the characters
  of Adobe's Symbol font.  Also it was possible to trigger a library segfault if
  an anti-aliased line crosses an upper corner of the canvas.
 
- External library PDFlib (used by PDF driver):
+ External library PDFlib (used by PDF terminal, but not by pdfcairo):
  Gnuplot can be linked against libpdf versions 4, 5, or 6. However, these
  versions differ in their handling of piped I/O.  Therefore gnuplot scripts
  using piped output to PDF may work only for some versions of PDFlib.
-
- External library svgalib (used by deprecated linux and vgagl terminal driver):
- Requires gnuplot to be suid root (bad!) and has many bugs that are specific
- to the video card or graphics driver used in X11.
 
  Internationalization (locale settings):
  Gnuplot uses the C runtime library routine setlocale() to control

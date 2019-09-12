@@ -415,6 +415,7 @@ df_read_pixmap( t_pixmap *pixmap )
     /* Open file and allocate space for image data */
     df_filename = (char *) pixmap->filename;
     gd_filetype_function(filetype);
+    df_filename = NULL;
     pixmap->ncols = df_bin_record[0].scan_dim[0];
     pixmap->nrows = df_bin_record[0].scan_dim[1];
     pixmap->image_data = gp_realloc( pixmap->image_data,

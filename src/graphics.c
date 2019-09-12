@@ -335,6 +335,7 @@ place_pixmaps(int layer, int dimensions)
 	    continue;
 
 	if (dimensions == 3) {
+	    dy = 0;
 	    map3d_position(&pixmap->pin, &x, &y, "pixmap");
 	    if (pixmap->extent.scalex == first_axes)
 		dx = pixmap->extent.x * radius_scaler;
@@ -345,10 +346,15 @@ place_pixmaps(int layer, int dimensions)
 	    map_position(&pixmap->pin, &x, &y, "pixmap");
 	    map_position_r(&pixmap->extent, &Dx, &Dy, "pixmap");
 	    dx = Dx;
+	    dy = Dy;
 	}
-	if (dx == 0) /* Default */
-	    dx = pixmap->ncols * term->h_tic / 4;
-	dy = dx * (double)(pixmap->nrows) / (double)(pixmap->ncols);
+	/* dx == 0 means 1-to-1 representation of pixels */
+	if (dx == 0)
+	    dx = pixmap->ncols * term->tscale;
+
+	/* default is to keep original aspect ratio */
+	if (dy == 0)
+	    dy = dx * (double)(pixmap->nrows) / (double)(pixmap->ncols);
 
 	if (pixmap->center) {
 	    x -= dx/2;

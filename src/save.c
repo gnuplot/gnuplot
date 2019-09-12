@@ -1678,8 +1678,13 @@ save_pixmaps(FILE *fp)
 		pixmap->tag, pixmap->filename, pixmap->ncols, pixmap->nrows);
 	fprintf(fp, "set pixmap %d at ", pixmap->tag);
 	save_position(fp,&pixmap->pin, 3, FALSE);
-	fprintf(fp, "  width ");
-	save_position(fp,&pixmap->pin, 1, FALSE);
+	if (pixmap->extent.y == 0) {
+	    fprintf(fp, "  width ");
+	    save_position(fp,&pixmap->extent, 1, FALSE);
+	} else {
+	    fprintf(fp, "  size ");
+	    save_position(fp,&pixmap->extent, 2, FALSE);
+	}
 	fprintf(fp, " %s %s\n",
 		pixmap->layer == LAYER_FRONT ? "front" : "behind",
 		pixmap->center ? "center" : "");
