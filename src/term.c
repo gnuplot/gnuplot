@@ -139,6 +139,7 @@ TBOOLEAN monochrome = FALSE;
 
 /* true if in multiplot mode */
 TBOOLEAN multiplot = FALSE;
+int multiplot_count = 0;
 
 /* text output encoding, for terminals that support it */
 enum set_encoding_id encoding;
@@ -513,6 +514,9 @@ term_start_plot()
 	}
 	term_suspended = FALSE;
     }
+
+    if (multiplot)
+	multiplot_count++;
 
     /* Sync point for epslatex text positioning */
     (*term->layer)(TERM_LAYER_RESET);

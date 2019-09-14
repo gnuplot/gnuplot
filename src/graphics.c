@@ -331,7 +331,11 @@ place_pixmaps(int layer, int dimensions)
 	return;
 
     for (pixmap = pixmap_listhead; pixmap; pixmap = pixmap->next) {
-	if (pixmap->layer != layer)
+	if (layer != pixmap->layer)
+	    continue;
+
+	/* Allow a single backing pixmap behind multiple multiplot panels */
+	if (layer == LAYER_BEHIND && multiplot_count > 1)
 	    continue;
 
 	if (dimensions == 3) {

@@ -414,6 +414,7 @@ multiplot_start()
      */
     term_start_plot();
     multiplot = TRUE;
+    multiplot_count = 0;
     fill_gpval_integer("GPVAL_MULTIPLOT", 1);
 
     /* Place overall title before doing anything else */
@@ -453,6 +454,7 @@ void
 multiplot_end()
 {
     multiplot = FALSE;
+    multiplot_count = 0;
     fill_gpval_integer("GPVAL_MULTIPLOT", 0);
     /* reset plot size, origin and margins to values before 'set
        multiplot layout' */

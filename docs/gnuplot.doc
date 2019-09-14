@@ -12629,7 +12629,12 @@ Ffigure_multiple_keys
  nor the orientation of the pixmap changes with axis scaling or rotation.
  If both the x-extent and y-extent are given using `size <x-extent> <y-extent>`
  this overrides the original aspect ratio.
- Pixmaps are not clipped to the border of the plot.
+
+ Pixmaps are not clipped to the border of the plot.  As an exception to the
+ general behaviour of objects and layers, a pixmap assigned to layer `behind`
+ is rendered for only the first plot in a multiplot.  This allows all panels
+ in a multiplot to share a single background pixmap.
+
  Examples:
        # Use a gradient as the background for all plotting
        # Both x and y will be resized to fill the entire canvas

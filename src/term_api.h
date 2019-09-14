@@ -431,6 +431,7 @@ extern char *PS_fontpath;	/* just a directory name */
 
 extern TBOOLEAN monochrome;
 extern TBOOLEAN multiplot;
+extern int multiplot_count;
 
 /* 'set encoding' support: index of current encoding ... */
 extern enum set_encoding_id encoding;
