@@ -334,6 +334,10 @@ place_pixmaps(int layer, int dimensions)
 	if (layer != pixmap->layer)
 	    continue;
 
+	/* ignore zero-size pixmap from read failure */
+	if (!pixmap->nrows || !pixmap->ncols)
+	    continue;
+
 	/* Allow a single backing pixmap behind multiple multiplot panels */
 	if (layer == LAYER_BEHIND && multiplot_count > 1)
 	    continue;

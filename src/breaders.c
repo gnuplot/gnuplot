@@ -406,8 +406,12 @@ df_read_pixmap( t_pixmap *pixmap )
 	filetype = GD_GIF;
     else if (!strcasecmp(file_ext, "jpeg") || !strcasecmp(file_ext, "jpg"))
 	filetype = GD_JPEG;
-    else
+    else {
+	/* Clear anything that was there before */
+	pixmap->nrows = pixmap->ncols = 0;
+	int_warn(NO_CARET, "unrecognized pixmap type: %s", pixmap->filename);
 	return FALSE;
+    }
     
     /* Create a blank record that gd_filetype_function can write into */
     df_add_binary_records(1, DF_CURRENT_RECORDS);
