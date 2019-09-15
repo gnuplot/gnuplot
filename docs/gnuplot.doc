@@ -14095,7 +14095,7 @@ Ffigure_multiple_keys
  alone, or a start point, interval, and end point (see `xtics series`).
 
  Individual tic positions can be specified individually by providing an
- eplicit list of positions, where each position may have an associated
+ explicit list of positions, where each position may have an associated
  text label. See `xtics list`.
 
  However they are specified, tics will only be plotted when in range.
