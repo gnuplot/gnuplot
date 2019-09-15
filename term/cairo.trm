@@ -121,6 +121,7 @@ enum CAIROTRM_id {
     CAIROLATEX_EPS,
     CAIROLATEX_PDF,
     CAIROLATEX_PNG,
+    CAIROLATEX_PNG_RESOLUTION,
     CAIROTRM_OTHER
 };
 
@@ -151,6 +152,7 @@ typedef struct cairo_params_t {
     float lw;
     float ps;
     enum CAIROTRM_id output;	/* format of the graphics produced by cairolatex */
+    int resolution;             /* in dpi; CAIROLATEX_PNG only */
 } cairo_params_t;
 
 #define CAIROEPS_PARAMS_DEFAULT { \
@@ -163,12 +165,12 @@ static const cairo_params_t cairoeps_params_default = CAIROEPS_PARAMS_DEFAULT;
 #ifdef HAVE_CAIROEPS
 #define CAIROLATEX_PARAMS_DEFAULT { \
     CAIROTERM_LATEX, INCHES, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, TRUE, FALSE, NULL, \
-    11, 0.6, 5*72., 3*72., 0.25, 1.0, 1.0, FALSE \
+    11, 0.6, 5*72., 3*72., 0.25, 1.0, 1.0, FALSE, 300 \
 }
 #else
 #define CAIROLATEX_PARAMS_DEFAULT { \
     CAIROTERM_LATEX, INCHES, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, TRUE, FALSE, NULL, \
-    11, 0.6, 5*72., 3*72., 0.25, 1.0, 1.0, TRUE \
+    11, 0.6, 5*72., 3*72., 0.25, 1.0, 1.0, TRUE, 300 \
 }
 #endif
 static cairo_params_t cairolatex_params = CAIROLATEX_PARAMS_DEFAULT;
@@ -238,6 +240,7 @@ static struct gen_table cairotrm_opts[] = {
     {"eps", CAIROLATEX_EPS},
     {"pdf", CAIROLATEX_PDF},
     {"png", CAIROLATEX_PNG},
+    {"resolution", CAIROLATEX_PNG_RESOLUTION},
     {NULL, CAIROTRM_OTHER}
 };
 
@@ -499,7 +502,14 @@ TERM_PUBLIC void cairotrm_options()
 				int_error(c_token,
 					  "extraneous argument in set terminal %s",term->name);
 			cairo_params->output = CAIROLATEX_PNG;
-			c_token++;
+			++c_token;
+			break;
+		case CAIROLATEX_PNG_RESOLUTION:
+			if (cairo_params->output != CAIROLATEX_PNG)
+				int_error(c_token,
+					  "extraneous argument in set terminal %s",term->name);
+			++c_token;
+			cairo_params->resolution = abs(int_expression());
 			break;
 #endif /* PSLATEX_DRIVER */
 
@@ -771,7 +781,7 @@ void cairotrm_init()
 		case CAIROLATEX_PNG:
 			EPSLATEX_reopen_output("png");
 			/* We manually scale up to 300 dpi instead of the default 72 dpi */
-			plot.upsampling_rate = 300. / 72.;
+			plot.upsampling_rate = cairo_params->resolution / 72.;
 			surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32,
 					(int)floor(plot.device_xmax * plot.upsampling_rate) /*double width_in_points*/,
 					(int)floor(plot.device_ymax * plot.upsampling_rate) /*double height_in_points*/);
