@@ -1810,6 +1810,8 @@ SVG_layer(t_termlayer syncpoint)
 TERM_PUBLIC void
 SVG_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecolor color_mode) 
 {
+    SVG_PathClose();
+
     /* Map image onto the terminal's coordinate system. */
     fprintf(gpoutfile, "<image x='%.*f' y='%.*f' width='%.*f' height='%.*f' preserveAspectRatio='none' ",
 	    PREC, X(corner[0].x), PREC, Y(corner[0].y), 
