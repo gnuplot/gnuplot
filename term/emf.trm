@@ -1858,6 +1858,7 @@ ENHemf_put_text(unsigned int x, unsigned int y, const char *str)
     /* if there are no magic characters, we should just be able
      * punt the string to EMF_put_text()
      */
+    if (!strstr(str, "\\U+"))
     if (ignore_enhanced_text || !strpbrk(str, "{}^_@&~")) {
 	/* FIXME: do something to ensure default font is selected */
 	EMF_put_text(x,y,str);
