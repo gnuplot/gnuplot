@@ -2102,7 +2102,6 @@ set_history()
     }
 }
 
-#ifdef PIXMAPS
 /* process 'set pixmap' command */
 static void
 set_pixmap()
@@ -2197,12 +2196,6 @@ set_pixmap()
     /* This will open the file and read in the pixmap pixels */
     df_read_pixmap(this_pixmap);
 }
-#else
-static void
-set_pixmap()
-{ int_error(c_token, "this gnuplot does not support pixmaps");
-}
-#endif
 
 /* process 'set isosamples' command */
 static void

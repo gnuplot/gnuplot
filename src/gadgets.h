@@ -203,7 +203,6 @@ struct arrowstyle_def {
     struct arrow_style_type arrow_properties;
 };
 
-#ifdef PIXMAPS
 /* Datastructure for 'set pixmap */
 typedef struct t_pixmap {
     int tag;			/* index refering to this pixmap */
@@ -216,7 +215,6 @@ typedef struct t_pixmap {
     char *filename;		/* where to read the pixmap pixmap */
     coordval *image_data;	/* pixel array RGBARGBA... */
 } t_pixmap;
-#endif
 
 /* Used by 'set style parallelaxis' and 'set style spiderplot' */
 struct pa_style {

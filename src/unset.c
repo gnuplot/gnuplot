@@ -731,7 +731,6 @@ free_arrowstyle(struct arrowstyle_def *arrowstyle)
 static void
 unset_pixmaps()
 {
-#ifdef PIXMAPS
     t_pixmap *pixmap, *next;
     for (pixmap = pixmap_listhead; pixmap; pixmap = next) {
 	free(pixmap->filename);
@@ -740,7 +739,6 @@ unset_pixmaps()
 	free(pixmap);
     }
     pixmap_listhead = NULL;
-#endif
 }
 
 

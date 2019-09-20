@@ -296,6 +296,13 @@ gd_filetype_function(int type)
 int
 df_libgd_get_pixel(int i, int j, int component) { return 0; }
 
+TBOOLEAN
+df_read_pixmap( t_pixmap *pixmap )
+{
+    int_warn(NO_CARET, "This copy of gnuplot cannot read png/gif/jpeg images");
+    return FALSE;
+}
+
 #else
 
 #include <gd.h>
@@ -388,7 +395,6 @@ df_libgd_get_pixel(int i, int j, int component)
     }
 }
 
-#ifdef PIXMAPS
 TBOOLEAN
 df_read_pixmap( t_pixmap *pixmap )
 {
@@ -438,6 +444,5 @@ df_read_pixmap( t_pixmap *pixmap )
 
     return TRUE;
 }
-#endif
 
 #endif

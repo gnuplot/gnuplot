@@ -12609,7 +12609,6 @@ Ffigure_multiple_keys
 ?pixmap
 ?set pixmap
 ?commands set pixmap
- EXPERIMENTAL (compile with -DPIXMAPS, requires libgd)
  Syntax:
        set pixmap <index> "filename" at <position>
                   {width <w> | height <h> | size <w> <h>}

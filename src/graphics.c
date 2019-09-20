@@ -322,7 +322,6 @@ place_arrows(int layer)
 void
 place_pixmaps(int layer, int dimensions)
 {
-#ifdef PIXMAPS
     t_pixmap *pixmap;
     gpiPoint corner[4];
     int x, y, dx, dy;
@@ -386,7 +385,6 @@ place_pixmaps(int layer, int dimensions)
 
 	term->image(pixmap->ncols, pixmap->nrows, pixmap->image_data, corner, IC_RGBA);
     }
-#endif
 }
 
 /*

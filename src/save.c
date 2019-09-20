@@ -1671,7 +1671,6 @@ save_histogram_opts (FILE *fp)
 void
 save_pixmaps(FILE *fp)
 {
-#ifdef PIXMAPS
     t_pixmap *pixmap;
     for (pixmap = pixmap_listhead; pixmap; pixmap = pixmap->next) {
 	fprintf(fp, "set pixmap %d '%s' # (%d x %d pixmap)\n",
@@ -1684,7 +1683,6 @@ save_pixmaps(FILE *fp)
 		pixmap->layer == LAYER_FRONT ? "front" : "behind",
 		pixmap->center ? "center" : "");
     }
-#endif
 }
 
 /* Save/show rectangle <tag> (0 means show all) */
