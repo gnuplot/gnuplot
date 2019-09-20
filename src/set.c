@@ -2142,12 +2142,23 @@ set_pixmap()
 	    get_position(&this_pixmap->pin);
 	    continue;
 	}
-	if (equals(c_token, "width") || equals(c_token, "size")) {
-	    TBOOLEAN keep_aspect_ratio = equals(c_token, "width");
+	if (equals(c_token, "size")) {
 	    c_token++;
 	    get_position(&this_pixmap->extent);
-	    if (keep_aspect_ratio)
-		this_pixmap->extent.y = 0;
+	    continue;
+	}
+	if (equals(c_token, "width")) {
+	    c_token++;
+	    get_position(&this_pixmap->extent);
+	    this_pixmap->extent.y = 0;
+	    continue;
+	}
+	if (equals(c_token, "height")) {
+	    c_token++;
+	    get_position(&this_pixmap->extent);
+	    this_pixmap->extent.scaley = this_pixmap->extent.scalex;
+	    this_pixmap->extent.y = this_pixmap->extent.x;
+	    this_pixmap->extent.x = 0;
 	    continue;
 	}
 	if ((temp = try_to_get_string())) {

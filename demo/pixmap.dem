@@ -11,7 +11,7 @@ set lmargin 20
 set label 101 at screen 0.05, 0.85 front
 set label 101 "{/:Bold Pixmap use}\n" \
               . "\U+2022  Gradient used as a backdrop\n" \
-              . "\U+2022  Project logo botton left\n" \
+              . "\U+2022  Project logo bottom left\n" \
               . "\U+2022  Icon (Aries) as plot element"
 
 load 'armillary.dem'

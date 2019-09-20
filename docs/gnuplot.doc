@@ -12611,7 +12611,8 @@ Ffigure_multiple_keys
 ?commands set pixmap
  EXPERIMENTAL (compile with -DPIXMAPS, requires libgd)
  Syntax:
-       set pixmap <index> "filename" at <position> {width <w>|size <w> <h>}
+       set pixmap <index> "filename" at <position>
+                  {width <w> | height <h> | size <w> <h>}
                   {front|behind} {center}
        show pixmaps
        unset pixmaps
@@ -12627,8 +12628,10 @@ Ffigure_multiple_keys
  If the x-extent of the rendered pixmap is set using `width <x-extent>` the
  aspect ratio of the original image is retained and neither the aspect ratio
  nor the orientation of the pixmap changes with axis scaling or rotation.
- If both the x-extent and y-extent are given using `size <x-extent> <y-extent>`
- this overrides the original aspect ratio.
+ Similarly if the y-extent is set using `height <y-extent>`.  If both the
+ x-extent and y-extent are given using `size <x-extent> <y-extent>` this
+ overrides the original aspect ratio.  If no size is set then the original
+ size in pixels is used (the effective size is then terminal-dependent).
 
  Pixmaps are not clipped to the border of the plot.  As an exception to the
  general behaviour of objects and layers, a pixmap assigned to layer `behind`

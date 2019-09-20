@@ -342,27 +342,33 @@ place_pixmaps(int layer, int dimensions)
 	if (layer == LAYER_BEHIND && multiplot_count > 1)
 	    continue;
 
-	if (dimensions == 3) {
-	    dy = 0;
+	if (dimensions == 3)
 	    map3d_position(&pixmap->pin, &x, &y, "pixmap");
+	else
+	    map_position(&pixmap->pin, &x, &y, "pixmap");
+
+	/* dx = dy = 0 means 1-to-1 representation of pixels */
+	if (pixmap->extent.x == 0 && pixmap->extent.y == 0) {
+	    dx = pixmap->ncols * term->tscale;
+	    dy = pixmap->ncols * term->tscale;
+	} else if (dimensions == 3) {
+	    map3d_position_r(&pixmap->extent, &dx, &dy, "pixmap");
 	    if (pixmap->extent.scalex == first_axes)
 		dx = pixmap->extent.x * radius_scaler;
-	    else
-		map3d_position_r(&pixmap->extent, &dx, &dy, "pixmap");
+	    if (pixmap->extent.scaley == first_axes)
+		dy = pixmap->extent.y * radius_scaler;
 	} else {
 	    double Dx, Dy;
-	    map_position(&pixmap->pin, &x, &y, "pixmap");
 	    map_position_r(&pixmap->extent, &Dx, &Dy, "pixmap");
 	    dx = Dx;
 	    dy = Dy;
 	}
-	/* dx == 0 means 1-to-1 representation of pixels */
-	if (dx == 0)
-	    dx = pixmap->ncols * term->tscale;
 
 	/* default is to keep original aspect ratio */
-	if (dy == 0)
+	if (pixmap->extent.y == 0)
 	    dy = dx * (double)(pixmap->nrows) / (double)(pixmap->ncols);
+	if (pixmap->extent.x == 0)
+	    dx = dy * (double)(pixmap->ncols) / (double)(pixmap->nrows);
 
 	if (pixmap->center) {
 	    x -= dx/2;
