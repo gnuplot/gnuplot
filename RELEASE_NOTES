@@ -22,6 +22,7 @@ Changes in 5.2.8
 * FIX prevent infinite loop from unbounded interation in a non-data plot command
 * FIX dimensions reported by "stats matrix every" (Bug #2189)
 * FIX extent of boxplot whiskers could be off by one point (Bug #2106)
+* FIX mix unbounded iteration and functions in a single plot command (Bug #2201)
 * FIX qt: suppress off-by-one ysize (Bug #1759)
 * FIX cairo: suppress off-by-one ysize (Bug #1759)
 * FIX gd: apply alpha to brushstroke lines (Bug #2117)

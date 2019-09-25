@@ -3300,6 +3300,11 @@ eval_plots()
 	    }
 
 	    /* Iterate-over-plot mechanism */
+	    if (forever_iteration(plot_iterator) && this_plot->plot_type == NODATA) {
+		plot_iterator = cleanup_iteration(plot_iterator);
+		c_token = start_token;
+		continue;
+	    }
 	    if (next_iteration(plot_iterator)) {
 		c_token = start_token;
 		continue;
