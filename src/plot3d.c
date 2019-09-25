@@ -112,6 +112,15 @@ static struct udft_entry plot_func;
 
 int plot3d_num=0;
 
+/* FIXME:
+ * Because this is global, it gets clobbered if there is more than
+ * one unbounded iteration in the splot command, e.g.
+ *	splot for [i=0:*] A index i, for [j=0:*] B index j
+ * Moving it into (struct surface_points) would be nice but would require
+ * extra bookkeeping to track which plot header it is stored in.
+ */
+static int last_iteration_in_first_pass = INT_MAX;
+
 /*
  * sp_alloc() allocates a surface_points structure that can hold 'num_iso_1'
  * iso-curves with 'num_samp_2' samples and 'num_iso_2' iso-curves with
@@ -1524,10 +1533,11 @@ eval_3dplots()
 /*** First Pass: Read through data files ***/
     /*
      * This pass serves to set the x/yranges and to parse the command, as
-     * well as filling in every thing except the function data. That is done
+     * well as filling in everything except the function data. That is done
      * after the x/yrange is defined.
      */
     plot_iterator = check_for_iteration();
+    last_iteration_in_first_pass = INT_MAX;
 
     while (TRUE) {
 
@@ -2285,6 +2295,8 @@ eval_3dplots()
 		eof_during_iteration = TRUE;
 	    else if (forever_iteration(plot_iterator) && (this_plot->plot_type != DATA3D))
 		int_error(NO_CARET, "unbounded iteration in something other than a data plot");
+	    else if (forever_iteration(plot_iterator))
+		last_iteration_in_first_pass = plot_iterator->iteration_current;
 
 	    /* restore original value of sample variables */
 	    /* FIXME: somehow this_plot has changed since we saved sample_var! */
@@ -2305,7 +2317,9 @@ eval_3dplots()
 
 	/* Iterate-over-plot mechanisms */
 	if (eof_during_iteration) {
-	    /* Nothing to do */ ;
+	    FPRINTF((stderr, "eof during iteration current %d\n", plot_iterator->iteration_current));
+	    FPRINTF((stderr, "    last_iteration_in_first_pass %d\n", last_iteration_in_first_pass));
+	    eof_during_iteration = FALSE;
 	} else if (next_iteration(plot_iterator)) {
 	    c_token = start_token;
 	    continue;
@@ -2315,6 +2329,9 @@ eval_3dplots()
 	if (equals(c_token, ",")) {
 	    c_token++;
 	    plot_iterator = check_for_iteration();
+	    if (forever_iteration(plot_iterator))
+		if (last_iteration_in_first_pass != INT_MAX)
+		    int_warn(NO_CARET, "splot does not support multiple unbounded iterations");
 	} else
 	    break;
 
@@ -2399,6 +2416,10 @@ eval_3dplots()
 	this_plot = first_3dplot;
 	c_token = begin_token;
 	plot_iterator = check_for_iteration();
+
+	/* We kept track of the last productive iteration in the first pass */
+	if (forever_iteration(plot_iterator))
+	    plot_iterator->iteration_end = last_iteration_in_first_pass;
 
 	if (hidden3d) {
 	    u_step = (u_max - u_min) / (iso_samples_1 - 1);
@@ -2510,6 +2531,8 @@ eval_3dplots()
 		c_token++;
 		if (crnt_param == 0)
 		    plot_iterator = check_for_iteration();
+		if (forever_iteration(plot_iterator))
+		    plot_iterator->iteration_end = last_iteration_in_first_pass;
 	    } else
 		break;
 
