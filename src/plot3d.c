@@ -1667,7 +1667,10 @@ eval_3dplots()
 		this_plot->plot_type = DATA3D;
 		this_plot->plot_style = data_style;
 		eof_during_iteration = FALSE;
+
+		/* FIXME: additional fields may need to be reset */
 		this_plot->opt_out_of_hidden3d = FALSE;
+		this_plot->title_is_suppressed = FALSE;
 
 		/* Mechanism for deferred evaluation of plot title */
 		free_at(df_plot_title_at);
@@ -1757,8 +1760,10 @@ eval_3dplots()
 		this_plot->plot_type = FUNC3D;
 		this_plot->has_grid_topology = TRUE;
 		this_plot->plot_style = func_style;
-		this_plot->opt_out_of_hidden3d = FALSE;
 		this_plot->num_iso_read = iso_samples_2;
+		/* FIXME: additional fields may need to be reset */
+		this_plot->opt_out_of_hidden3d = FALSE;
+		this_plot->title_is_suppressed = FALSE;
 		/* ignore it for now */
 		some_functions = TRUE;
 		end_token = c_token - 1;

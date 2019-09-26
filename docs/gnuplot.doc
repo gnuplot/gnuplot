@@ -3373,7 +3373,7 @@ Ffigure_newsyntax
 
  Carriage-return ('\r') and newline ('\n') characters are stripped from the
  input stream during substitution.  This is in distinction to the string
- returned by the system() command which does not strip these characters.
+ returned by the system() function, which does not strip these characters.
  See `system`.
 
  Command-line substitution can be used anywhere on the `gnuplot` command
