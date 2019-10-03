@@ -548,11 +548,16 @@ place_objects(struct object *listhead, int layer, int dimensions)
 		    break;
 	    }
 
+	    /* For polygons in pm3d mode, set the border color */
+	    if (this_object->layer == LAYER_DEPTHORDER)
+		pm3d_border_lp = pm3d.border;
+
 	    do_polygon(dimensions, this_object, style, facing);
 
 	    /* Retrace the border if the style requests it */
-	    if (need_fill_border(fillstyle))
-		do_polygon(dimensions, this_object, 0, facing);
+	    if (this_object->layer != LAYER_DEPTHORDER)
+		if (need_fill_border(fillstyle))
+		    do_polygon(dimensions, this_object, 0, facing);
 
 	    break;
 	}
@@ -4418,6 +4423,7 @@ do_polygon( int dimensions, t_object *this_object, int style, int facing )
 		quad[nv].z = p->vertex[nv].z;
 	    }
 	    /* FIXME: not sure this works for all coloring modes */
+	    /* FIXME: could we pass through a per-quadrangle border style also? */
 	    quad[0].c = this_object->lp_properties.pm3d_color.lt;
 	    quad[1].c = style_from_fill(&(this_object->fillstyle));
 	    pm3d_add_quadrangle( NULL, quad );
