@@ -4419,6 +4419,7 @@ do_polygon( int dimensions, t_object *this_object, int style, int facing )
 	    }
 	    /* FIXME: not sure this works for all coloring modes */
 	    quad[0].c = this_object->lp_properties.pm3d_color.lt;
+	    quad[1].c = style_from_fill(&(this_object->fillstyle));
 	    pm3d_add_quadrangle( NULL, quad );
 	} else {
 

@@ -1106,6 +1106,7 @@ pm3d_add_quadrangle(struct surface_points *plot, gpdPoint corners[4])
 	/* This quadrangle came from "set object polygon" rather than "splot with pm3d" */
 	q->qcolor.rgb_color = corners[0].c;
 	q->gray = PM3D_USE_RGB_COLOR_INSTEAD_OF_GRAY;
+	q->fillstyle = corners[1].c;
 
     } else if (plot->pm3d_color_from_column) {
 	/* FIXME: color_from_rgbvar need only be set once per plot */
