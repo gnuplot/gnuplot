@@ -108,7 +108,9 @@ typedef struct {
   char clip;		/* 1in, 4in */
   TBOOLEAN no_clipcb;	/* FALSE: cb<0 treated as 0  TRUE: cb<0 treated as NaN */
   pm3d_scandir direction;
-  TBOOLEAN base_sort;	/* default: depth sort by mean Z;  true: use Z at base */
+			/* If direction is "depth" sort by max z of 4 corners unless ... */
+  TBOOLEAN base_sort;	/*     use z values of projection to baseplane */
+  TBOOLEAN zmean_sort;	/*     sort on mean z rather than max z */
   PM3D_IMPL_MODE implicit;
 			/* 1: [default] draw ALL surfaces with pm3d
 			   0: only surfaces specified with 'with pm3d' */
@@ -153,6 +155,7 @@ void pm3d_reset(void);
 void pm3d_draw_one(struct surface_points* plots);
 void pm3d_add_quadrangle(struct surface_points* plot, gpdPoint *corners);
 void pm3d_init_lighting_model(void);
+int pm3d_side( struct coordinate *p0, struct coordinate *p1, struct coordinate *p2);
 double cb2gray(double cb);
 void pm3d_rearrange_scan_array(struct surface_points* this_plot,
     struct iso_curve*** first_ptr, int* first_n, int* first_invert,

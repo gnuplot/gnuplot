@@ -4422,13 +4422,30 @@ do_polygon( int dimensions, t_object *this_object, int style, int facing )
 		quad[nv].y = p->vertex[nv].y;
 		quad[nv].z = p->vertex[nv].z;
 	    }
-	    /* FIXME: not sure this works for all coloring modes */
-	    /* FIXME: could we pass through a per-quadrangle border style also? */
+	    /* Allow 2-sided coloring */
+	    /* NB: This is sensitive to the order of the vertices */
 	    quad[0].c = this_object->lp_properties.pm3d_color.lt;
+	    if (this_object->lp_properties.pm3d_color.type == TC_LINESTYLE) {
+		int base_color = this_object->lp_properties.pm3d_color.lt;
+		struct coordinate triangle[3];
+		struct lp_style_type face;
+		int side;
+		int t;
+		for (t=0; t<3; t++) {
+		    triangle[t].x = quad[t].x;
+		    triangle[t].y = quad[t].y;
+		    triangle[t].z = quad[t].z;
+		}
+		side = pm3d_side( &(triangle[0]), &(triangle[1]), &(triangle[2]) );
+		lp_use_properties(&face, side < 0 ? base_color+1 : base_color);
+		quad[0].c = face.pm3d_color.lt;
+	    }
+
+	    /* FIXME: could we pass through a per-quadrangle border style also? */
 	    quad[1].c = style_from_fill(&(this_object->fillstyle));
 	    pm3d_add_quadrangle( NULL, quad );
-	} else {
 
+	} else { /* Not depth-sorted; draw it now */
 	    if (out_length > 1)
 		term->filled_polygon(out_length, clpcorn);
 	}

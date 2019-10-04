@@ -73,8 +73,6 @@ static void illuminate_one_quadrangle( quadrangle *q );
 static void filled_quadrangle(gpdPoint *corners, int fillstyle);
 static void ifilled_quadrangle(gpiPoint *corners);
 
-static int pm3d_side( struct coordinate *p0, struct coordinate *p1, struct coordinate *p2);
-
 static TBOOLEAN color_from_rgbvar = FALSE;
 static double light[3];
 
@@ -369,6 +367,7 @@ void pm3d_depth_queue_flush(void)
 	    cliptorange(zbase, Z_AXIS.min, Z_AXIS.max);
 
 	for (qp = quadrangles, qe = quadrangles + current_quadrangle; qp != qe; qp++) {
+	    double zmean = 0;
 
 	    gpdPtr = qp->corners;
 
@@ -378,11 +377,15 @@ void pm3d_depth_queue_flush(void)
 		    map3d_xyz(gpdPtr->x, gpdPtr->y, zbase, &out);
 		else
 		    map3d_xyz(gpdPtr->x, gpdPtr->y, gpdPtr->z, &out);
+		zmean += out.z;
 		if (i == 0 || out.z > z)
 		    z = out.z;
 	    }
 
-	    qp->z = z; /* maximal z value of all four corners */
+	    if (pm3d.zmean_sort)
+		qp->z = zmean / 4.;
+	    else
+		qp->z = z;
 	}
 
 	qsort(quadrangles, current_quadrangle, sizeof (quadrangle), compare_quadrangles);
@@ -1036,6 +1039,7 @@ pm3d_reset()
     pm3d.no_clipcb = FALSE;
     pm3d.direction = PM3D_SCANS_AUTOMATIC;
     pm3d.base_sort = FALSE;
+    pm3d.zmean_sort = TRUE;	/* DEBUG: prior to Oct 2019 default sort used zmax */
     pm3d.implicit = PM3D_EXPLICIT;
     pm3d.which_corner_color = PM3D_WHICHCORNER_MEAN;
     pm3d.interp_i = 1;
@@ -1497,7 +1501,7 @@ filled_quadrangle(gpdPoint *corners, int fillstyle)
  *     In the case of depth ordering, the user does not have good control
  *     over this.
  */
-static int
+int
 pm3d_side( struct coordinate *p0, struct coordinate *p1, struct coordinate *p2)
 {
     struct vertex v[3];
