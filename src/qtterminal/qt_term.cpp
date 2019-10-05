@@ -761,7 +761,7 @@ void qt_linetype(int lt)
 	else
 		qt->out << GEPenStyle << Qt::SolidLine;
 
-	if ((lt-1) == LT_BACKGROUND) {
+	if (lt == LT_BACKGROUND) {
 		/* FIXME: Add parameter to this API to set the background color from the gnuplot end */
 		qt->out << GEBackgroundColor;
 	} else
