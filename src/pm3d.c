@@ -71,7 +71,6 @@ static int apply_lighting_model( struct coordinate *, struct coordinate *, struc
 static void illuminate_one_quadrangle( quadrangle *q );
 
 static void filled_quadrangle(gpdPoint *corners, int fillstyle);
-static void ifilled_quadrangle(gpiPoint *corners);
 
 static TBOOLEAN color_from_rgbvar = FALSE;
 static double light[3];
@@ -359,7 +358,6 @@ void pm3d_depth_queue_flush(void)
 	quadrangle* qe;
 	gpdPoint* gpdPtr;
 	vertex out;
-	double z = 0;
 	double zbase = 0;
 	int i;
 
@@ -367,6 +365,7 @@ void pm3d_depth_queue_flush(void)
 	    cliptorange(zbase, Z_AXIS.min, Z_AXIS.max);
 
 	for (qp = quadrangles, qe = quadrangles + current_quadrangle; qp != qe; qp++) {
+	    double z = 0;
 	    double zmean = 0;
 
 	    gpdPtr = qp->corners;
@@ -1445,35 +1444,6 @@ apply_lighting_model( struct coordinate *v0, struct coordinate *v1,
     return rgb;
 }
 
-static void
-ifilled_quadrangle(gpiPoint* icorners)
-{
-    if (icorners->style == 0) {
-	if (default_fillstyle.fillstyle == FS_EMPTY)
-	    icorners->style = FS_OPAQUE;
-	else
-	    icorners->style = style_from_fill(&default_fillstyle);
-    }
-    term->filled_polygon(4, icorners);
-
-    if (pm3d.border.l_type != LT_NODRAW) {
-	int i;
-
-	/* LT_DEFAULT means draw border in current color */
-	/* FIXME: currently there is no obvious way to set LT_DEFAULT  */
-	if (pm3d.border.l_type != LT_DEFAULT) {
-	    /* It should be sufficient to set only the color, but for some */
-	    /* reason this causes the svg terminal to lose the fill type.  */
-	    term_apply_lp_properties(&pm3d_border_lp);
-	}
-
-	term->move(icorners[0].x, icorners[0].y);
-	for (i = 3; i >= 0; i--) {
-	    term->vector(icorners[i].x, icorners[i].y);
-	}
-    }
-}
-
 
 /* The pm3d code works with gpdPoint data structures (double: x,y,z,color)
  * term->filled_polygon and term->image want gpiPoint data (int: x,y,style)
@@ -1490,8 +1460,27 @@ filled_quadrangle(gpdPoint *corners, int fillstyle)
 	icorners[i].x = x;
 	icorners[i].y = y;
     }
-    icorners[0].style = fillstyle;
-    ifilled_quadrangle(icorners);
+
+    if (fillstyle)
+	icorners[0].style = fillstyle;
+    else if (default_fillstyle.fillstyle == FS_EMPTY)
+	icorners[0].style = FS_OPAQUE;
+    else
+	icorners[0].style = style_from_fill(&default_fillstyle);
+
+    term->filled_polygon(4, icorners);
+
+    if (pm3d_border_lp.l_type != LT_NODRAW) {
+	/* LT_DEFAULT means draw border in current color */
+	/* FIXME: currently there is no obvious way to set LT_DEFAULT  */
+	if (pm3d_border_lp.l_type != LT_DEFAULT)
+	    term_apply_lp_properties(&pm3d_border_lp);
+
+	term->move(icorners[0].x, icorners[0].y);
+	for (i = 3; i >= 0; i--) {
+	    term->vector(icorners[i].x, icorners[i].y);
+	}
+    }
 }
 
 /* EXPERIMENATAL
