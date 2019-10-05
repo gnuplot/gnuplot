@@ -1775,7 +1775,10 @@ save_object(FILE *fp, int tag)
 	/* Properties common to all objects */
 	if (tag == 0 || tag == this_object->tag) {
 	    fprintf(fp, "\n%sobject %2d ", (fp==stderr) ? "\t" : "set ",this_object->tag);
-	    fprintf(fp, "%s ", this_object->layer > 0 ? "front" : this_object->layer < 0 ? "behind" : "back");
+	    fprintf(fp, "%s ", this_object->layer == LAYER_FRONT ? "front" :
+				this_object->layer == LAYER_DEPTHORDER ? "depthorder" :
+				this_object->layer == LAYER_BEHIND ? "behind" :
+				"back");
 	    if (this_object->clip == OBJ_NOCLIP)
 		fputs("noclip ", fp);
 	    else 
