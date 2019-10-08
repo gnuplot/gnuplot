@@ -4423,7 +4423,9 @@ do_polygon( int dimensions, t_object *this_object, int style, int facing )
 		quad[nv].z = p->vertex[nv].z;
 	    }
 	    /* Allow 2-sided coloring */
-	    /* NB: This is sensitive to the order of the vertices */
+	    /* FIXME: this assumes pm3d_color.type == TC_RGB
+	     *        if type == TC_LT instead this will come out off-white
+	     */
 	    quad[0].c = this_object->lp_properties.pm3d_color.lt;
 	    if (this_object->lp_properties.pm3d_color.type == TC_LINESTYLE) {
 		int base_color = this_object->lp_properties.pm3d_color.lt;
@@ -4436,6 +4438,7 @@ do_polygon( int dimensions, t_object *this_object, int style, int facing )
 		    triangle[t].y = quad[t].y;
 		    triangle[t].z = quad[t].z;
 		}
+		/* NB: This is sensitive to the order of the vertices */
 		side = pm3d_side( &(triangle[0]), &(triangle[1]), &(triangle[2]) );
 		lp_use_properties(&face, side < 0 ? base_color+1 : base_color);
 		quad[0].c = face.pm3d_color.lt;
