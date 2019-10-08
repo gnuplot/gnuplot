@@ -53,6 +53,7 @@ typedef struct {
 
 #define PM3D_USE_BORDER_COLOR_INSTEAD_OF_GRAY -12345
 #define PM3D_USE_RGB_COLOR_INSTEAD_OF_GRAY -12346
+#define PM3D_USE_BACKGROUND_INSTEAD_OF_GRAY -12347
 
 static int allocated_quadrangles = 0;
 static int current_quadrangle = 0;
@@ -394,6 +395,8 @@ void pm3d_depth_queue_flush(void)
 	    /* set the color */
 	    if (qp->gray == PM3D_USE_BORDER_COLOR_INSTEAD_OF_GRAY)
 		apply_pm3dcolor(qp->qcolor.border_color);
+	    else if (qp->gray == PM3D_USE_BACKGROUND_INSTEAD_OF_GRAY)
+		term->linetype(LT_BACKGROUND);
 	    else if (qp->gray == PM3D_USE_RGB_COLOR_INSTEAD_OF_GRAY)
 		set_rgbcolor_var(qp->qcolor.rgb_color);
 	    else if (pm3d_shade.strength > 0)
@@ -1107,8 +1110,12 @@ pm3d_add_quadrangle(struct surface_points *plot, gpdPoint corners[4])
 
     if (!plot) {
 	/* This quadrangle came from "set object polygon" rather than "splot with pm3d" */
-	q->qcolor.rgb_color = corners[0].c;
-	q->gray = PM3D_USE_RGB_COLOR_INSTEAD_OF_GRAY;
+	if (corners[0].c == LT_BACKGROUND) {
+	    q->gray = PM3D_USE_BACKGROUND_INSTEAD_OF_GRAY;
+	} else {
+	    q->qcolor.rgb_color = corners[0].c;
+	    q->gray = PM3D_USE_RGB_COLOR_INSTEAD_OF_GRAY;
+	}
 	q->fillstyle = corners[1].c;
 
     } else if (plot->pm3d_color_from_column) {
