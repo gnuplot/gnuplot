@@ -77,7 +77,7 @@ AC_CHECK_TYPES([off_t])
 AC_FUNC_FSEEKO
 AC_SYS_LARGEFILE
 
-dml timezone support
+dnl timezone support
 AC_CHECK_MEMBERS([struct tm.tm_gmtoff, struct tm.__tm_gmtoff],,,[
 #include <sys/types.h>
 #include <time.h>])
