@@ -45,13 +45,13 @@ typedef struct {
     double z; /* maximal z value after rotation to graph coordinate system */
     gpdPoint corners[4];
     union { /* Only used by depthorder processing */
-	t_colorspec *border_color;
+	t_colorspec *colorspec;
 	unsigned int rgb_color;
     } qcolor;
     int fillstyle; /* from plot->fill_properties */
 } quadrangle;
 
-#define PM3D_USE_BORDER_COLOR_INSTEAD_OF_GRAY -12345
+#define PM3D_USE_COLORSPEC_INSTEAD_OF_GRAY -12345
 #define PM3D_USE_RGB_COLOR_INSTEAD_OF_GRAY -12346
 #define PM3D_USE_BACKGROUND_INSTEAD_OF_GRAY -12347
 
@@ -393,8 +393,8 @@ void pm3d_depth_queue_flush(void)
 	for (qp = quadrangles, qe = quadrangles + current_quadrangle; qp != qe; qp++) {
 
 	    /* set the color */
-	    if (qp->gray == PM3D_USE_BORDER_COLOR_INSTEAD_OF_GRAY)
-		apply_pm3dcolor(qp->qcolor.border_color);
+	    if (qp->gray == PM3D_USE_COLORSPEC_INSTEAD_OF_GRAY)
+		apply_pm3dcolor(qp->qcolor.colorspec);
 	    else if (qp->gray == PM3D_USE_BACKGROUND_INSTEAD_OF_GRAY)
 		term->linetype(LT_BACKGROUND);
 	    else if (qp->gray == PM3D_USE_RGB_COLOR_INSTEAD_OF_GRAY)
@@ -976,7 +976,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 				qp->qcolor.rgb_color = (unsigned int)gray;
 			    } else {
 				qp->gray = gray;
-				qp->qcolor.border_color = &this_plot->lp_properties.pm3d_color;
+				qp->qcolor.colorspec = &this_plot->lp_properties.pm3d_color;
 			    }
 			    qp->fillstyle = plot_fillstyle;
 			    current_quadrangle++;
@@ -1005,7 +1005,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			qp->qcolor.rgb_color = (unsigned int)gray;
 		    } else {
 			qp->gray = gray;
-			qp->qcolor.border_color = &this_plot->lp_properties.pm3d_color;
+			qp->qcolor.colorspec = &this_plot->lp_properties.pm3d_color;
 		    }
 		    qp->fillstyle = plot_fillstyle;
 		    current_quadrangle++;
@@ -1139,7 +1139,7 @@ pm3d_add_quadrangle(struct surface_points *plot, gpdPoint corners[4])
 
     } else if (plot->plot_style == ISOSURFACE) {
 	int rgb_color = corners[0].c;
-	q->qcolor.border_color = &plot->fill_properties.border_color;
+	q->qcolor.colorspec = &plot->fill_properties.border_color;
 	q->gray = PM3D_USE_RGB_COLOR_INSTEAD_OF_GRAY;
 	if (isosurface_options.inside_offset > 0) {
 	    struct lp_style_type style;
@@ -1165,8 +1165,8 @@ pm3d_add_quadrangle(struct surface_points *plot, gpdPoint corners[4])
 
     } else {
 	/* This is the usual [only?] path for 'splot with zerror' */
-	q->qcolor.border_color = &plot->fill_properties.border_color;
-	q->gray = PM3D_USE_BORDER_COLOR_INSTEAD_OF_GRAY;
+	q->qcolor.colorspec = &plot->fill_properties.border_color;
+	q->gray = PM3D_USE_COLORSPEC_INSTEAD_OF_GRAY;
     }
 }
 
