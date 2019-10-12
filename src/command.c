@@ -2074,11 +2074,13 @@ refresh_request()
      */
     for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++) {
 	AXIS *this_axis = &axis_array[axis];
-	if (this_axis->set_autoscale & AUTOSCALE_MIN)
+	if ((this_axis->set_autoscale & AUTOSCALE_MIN)
+	&&  (this_axis->writeback_min < VERYLARGE))
 	    this_axis->set_min = this_axis->writeback_min;
 	else
 	    this_axis->min = this_axis->set_min;
-	if (this_axis->set_autoscale & AUTOSCALE_MAX)
+	if ((this_axis->set_autoscale & AUTOSCALE_MAX)
+	&&  (this_axis->writeback_max > -VERYLARGE))
 	    this_axis->set_max = this_axis->writeback_max;
 	else
 	    this_axis->max = this_axis->set_max;

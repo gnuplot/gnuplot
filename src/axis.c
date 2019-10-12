@@ -2573,6 +2573,10 @@ extend_primary_ticrange(AXIS *axis)
     AXIS *primary = axis->linked_to_primary;
 
     if (axis->ticdef.logscaling) {
+	/* This can happen on "refresh" if the axis was unused */
+	if (primary->min >= VERYLARGE || primary->max <= -VERYLARGE)
+	    return;
+
 	/* NB: "zero" is the minimum non-zero value from "set zero" */
 	if ((primary->autoscale & AUTOSCALE_MIN)
 	||  fabs(primary->min - floor(primary->min)) < zero) {
