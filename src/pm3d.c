@@ -1477,10 +1477,10 @@ filled_quadrangle(gpdPoint *corners, int fillstyle)
 
     term->filled_polygon(4, icorners);
 
-    if (pm3d_border_lp.l_type != LT_NODRAW) {
+    if (pm3d.border.l_type != LT_NODRAW) {
 	/* LT_DEFAULT means draw border in current color */
 	/* FIXME: currently there is no obvious way to set LT_DEFAULT  */
-	if (pm3d_border_lp.l_type != LT_DEFAULT)
+	if (pm3d.border.l_type != LT_DEFAULT)
 	    term_apply_lp_properties(&pm3d_border_lp);
 
 	term->move(icorners[0].x, icorners[0].y);
