@@ -125,7 +125,7 @@ splot '++' using 1:2:(f($1,$2)):(hsv2rgb($1,$2,1.0)) \
 pause -1 "Hit return to continue"
 
 set title "Explicit borders for pm3d tiling"
-set pm3d border lt black hidden3d
+set pm3d border lt black lw 1.5
 set sample 10
 set isosample 10
 replot

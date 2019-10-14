@@ -18,7 +18,7 @@ set vrange [ -20. : 20. ]
 set zrange [ -0.25 : 0.5 ]
 
 set style fill solid 1.00 noborder
-set pm3d implicit at s hidden3d depth noborder
+set pm3d implicit at s depth noborder
 
 slice(x,y) = (x**2+y**2 < 10.0) ? 1.0 : (x**2+y**2 > 300.0) ? NaN : sin(abs(atan2(x,y)))
 sinc2(x,y) = sin(sqrt(x**2+y**2))/sqrt(x**2+y**2)

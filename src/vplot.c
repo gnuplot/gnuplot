@@ -206,7 +206,6 @@ vplot_isosurface (struct surface_points *plot, int downsample)
      */
     if (pm3d_shade.strength > 0)
 	pm3d_init_lighting_model();
-    pm3d_border_lp = pm3d.border;
 
     for (i = 0; i < N - downsample; i += downsample) {
 	for (j = 0; j < N - downsample; j += downsample) {

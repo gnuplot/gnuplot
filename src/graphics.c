@@ -548,10 +548,6 @@ place_objects(struct object *listhead, int layer, int dimensions)
 		    break;
 	    }
 
-	    /* For polygons in pm3d mode, set the border color */
-	    if (this_object->layer == LAYER_DEPTHORDER)
-		pm3d_border_lp = pm3d.border;
-
 	    do_polygon(dimensions, this_object, style, facing);
 
 	    /* Retrace the border if the style requests it */

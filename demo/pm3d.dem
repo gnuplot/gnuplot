@@ -151,21 +151,21 @@ splot log(x*x*y*y)
 pause -1 "Hit return to continue"
 unset hidden3d
 
-# draw the surface using pm3d's hidden3d with line type 100
+# draw the surface using pm3d's depth sorting with line type 100
 unset hidden
 unset surface
 
-set title "set pm3d hidden3d <linetype>: pm3d's much faster hidden3d variant"
+set title "set pm3d depthorder border lc 'black' lw 1"
 set samples 30; set isosamples 30
 set pm3d
 set style line 100 lt 5 lw 0.5
-set pm3d hidden3d 100
+set pm3d depthorder border lc 'black' lw 1
 set view 50,220
 set xrange [-2:2]
 set yrange [-2:2]
 splot log(x*x*y*y)
 pause -1 "Hit return to continue"
-set pm3d nohidden3d
+set pm3d
 
 set title "bad: surface and top are too close together"
 set xrange [-1:1]

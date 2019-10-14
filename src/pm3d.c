@@ -29,8 +29,7 @@
 /* Used to initialize `set pm3d border` */
 struct lp_style_type default_pm3d_border = DEFAULT_LP_STYLE_TYPE;
 
-/* Used by routine filled_quadrangle() in color.c */
-struct lp_style_type pm3d_border_lp;
+/* Set by plot styles that use pm3d quadrangles even in non-pm3d mode */
 TBOOLEAN track_pm3d_quadrangles;
 
 /*
@@ -455,8 +454,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
     }
 
     /* Apply and save the user-requested line properties */
-    pm3d_border_lp = this_plot->lp_properties;
-    term_apply_lp_properties(&pm3d_border_lp);
+    term_apply_lp_properties(&this_plot->lp_properties);
 
     if (at_which_z != PM3D_AT_BASE && at_which_z != PM3D_AT_TOP && at_which_z != PM3D_AT_SURFACE)
 	return;
@@ -1481,7 +1479,7 @@ filled_quadrangle(gpdPoint *corners, int fillstyle)
 	/* LT_DEFAULT means draw border in current color */
 	/* FIXME: currently there is no obvious way to set LT_DEFAULT  */
 	if (pm3d.border.l_type != LT_DEFAULT)
-	    term_apply_lp_properties(&pm3d_border_lp);
+	    term_apply_lp_properties(&pm3d.border);
 
 	term->move(icorners[0].x, icorners[0].y);
 	for (i = 3; i >= 0; i--) {
