@@ -41,7 +41,7 @@ lighting_model pm3d_shade;
 
 typedef struct {
     double gray;
-    double z; /* maximal z value after rotation to graph coordinate system */
+    double z; /* z value after rotation to graph coordinates for depth sorting */
     gpdPoint corners[4];
     union { /* Only used by depthorder processing */
 	t_colorspec *colorspec;
@@ -1081,10 +1081,20 @@ pm3d_draw_one(struct surface_points *plot)
  * Add one pm3d quadrangle to the mix.
  * Called by zerrorfill() and by plot3d_boxes().
  * Also called by vplot_isosurface().
- * (plot == NULL) if we were called from do_polygon().
  */
 void
 pm3d_add_quadrangle(struct surface_points *plot, gpdPoint corners[4])
+{
+    pm3d_add_polygon(plot, corners, 4);
+}
+
+/*
+ * The general case.
+ * More than 4 vertices not yet supported
+ * (plot == NULL) if we were called from do_polygon().
+ */
+void
+pm3d_add_polygon(struct surface_points *plot, gpdPoint corners[4], int vertices)
 {
     quadrangle *q;
 
@@ -1104,7 +1114,10 @@ pm3d_add_quadrangle(struct surface_points *plot, gpdPoint corners[4])
     }
     q = quadrangles + current_quadrangle++;
     memcpy(q->corners, corners, 4*sizeof(gpdPoint));
-    q->fillstyle = 0;	/* Should this be style_from_fill(&plot->fill_properties)? */
+    if (plot)
+	q->fillstyle = style_from_fill(&plot->fill_properties);
+    else
+	q->fillstyle = 0;
 
     if (!plot) {
 	/* This quadrangle came from "set object polygon" rather than "splot with pm3d" */
@@ -1135,11 +1148,16 @@ pm3d_add_quadrangle(struct surface_points *plot, gpdPoint corners[4])
 	if (pm3d_shade.strength > 0)
 	    illuminate_one_quadrangle(q);
 
-    } else if (plot->plot_style == ISOSURFACE) {
+    } else if (plot->plot_style == ISOSURFACE
+           ||  plot->plot_style == POLYGONS) {
+
 	int rgb_color = corners[0].c;
-	q->qcolor.colorspec = &plot->fill_properties.border_color;
-	q->gray = PM3D_USE_RGB_COLOR_INSTEAD_OF_GRAY;
-	if (isosurface_options.inside_offset > 0) {
+	if (corners[0].c == LT_BACKGROUND)
+	    q->gray = PM3D_USE_BACKGROUND_INSTEAD_OF_GRAY;
+	else
+	    q->gray = PM3D_USE_RGB_COLOR_INSTEAD_OF_GRAY;
+
+	if (plot->plot_style == ISOSURFACE && isosurface_options.inside_offset > 0) {
 	    struct lp_style_type style;
 	    struct coordinate v[3];
 	    int i;
@@ -1168,9 +1186,10 @@ pm3d_add_quadrangle(struct surface_points *plot, gpdPoint corners[4])
     }
 }
 
+
+
 /* Display an error message for the routine get_pm3d_at_option() below.
  */
-
 static void
 pm3d_option_at_error()
 {

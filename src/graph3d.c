@@ -121,6 +121,7 @@ static void do_3dkey_layout(legend_key *key, int *xinkey, int *yinkey);
 static void plot3d_impulses(struct surface_points * plot);
 static void plot3d_lines(struct surface_points * plot);
 static void plot3d_points(struct surface_points * plot);
+static void plot3d_polygons(struct surface_points * plot);
 static void plot3d_zerrorfill(struct surface_points * plot);
 static void plot3d_boxes(struct surface_points * plot);
 static void plot3d_vectors(struct surface_points * plot);
@@ -1178,6 +1179,13 @@ do_3dplot(
 			    pm3d_depth_queue_flush(); /* draw plot immediately */
 		    }
 		}
+		break;
+
+	    case POLYGONS:
+		if (term->filled_polygon)
+		    plot3d_polygons(this_plot);
+		else
+		    plot3d_lines(this_plot);
 		break;
 
 	    case LABELPOINTS:
@@ -3898,6 +3906,71 @@ plot3d_boxes(struct surface_points *plot)
 
     /* Restore global fillstyle */
     default_fillstyle = save_fillstyle;
+}
+
+/*
+ * Plot the data as a set of polygons.
+ * Successive lines of input data provide vertex coordinates.
+ * A blank line separates polygons.
+ * E.g. two triangles:
+ *	x1 y1 z1
+ *	x2 y2 z2
+ *	x3 y3 z3
+ *
+ *	x1 y1 z1
+ *	x2 y2 z2
+ *	x3 y3 z3
+ */
+static void
+plot3d_polygons(struct surface_points *plot)
+{
+    int nv;
+    struct iso_curve *icrvs;
+    struct coordinate *points;
+    gpdPoint quad[4];
+    int style = style_from_fill(&plot->fill_properties);
+
+    /* These don't need to be drawn at all */
+    if (plot->lp_properties.l_type == LT_NODRAW)
+	return;
+
+    /* This initialization is normally done in pm3d_plot()
+     * but polygons do not necessarily use that code path.
+     */
+    if (pm3d_shade.strength > 0)
+	pm3d_init_lighting_model();
+
+    for (icrvs = plot->iso_crvs; icrvs; icrvs = icrvs->next) {
+
+	/* Copy the vertex coordinates into a pm3d quadrangle */
+	for (nv = 0, points = icrvs->points; nv < icrvs->p_count; nv++) {
+	    /* We don't currently support anything but triangle and quadrangles */
+	    if (nv > 3)
+		break;
+	    quad[nv].x = points[nv].x;
+	    quad[nv].y = points[nv].y;
+	    quad[nv].z = points[nv].z;
+	}
+	/* Treat triangle as a degenerate quadrangle */
+	if (nv == 3) {
+	    quad[3].x = points[0].x;
+	    quad[3].y = points[0].y;
+	    quad[3].z = points[0].z;
+	}
+	/* Ignore lines and points */
+	if (nv < 3)
+	    continue;
+
+	/* Coloring piggybacks on options for isosurface */
+	quad[0].c = plot->fill_properties.border_color.lt;
+	quad[1].c = style;
+	pm3d_add_polygon( plot, quad, nv );
+    }
+
+    /* Default is to write out each polygon as we come to it. */
+    /* To get proper sorting, use "set pm3d depthorder".      */
+    if (pm3d.direction != PM3D_DEPTH)
+	pm3d_depth_queue_flush();
 }
 
 

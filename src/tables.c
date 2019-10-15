@@ -724,6 +724,7 @@ const struct gen_table plotstyle_tbl[] =
     { "can$dlesticks", CANDLESTICKS },
     { "boxplot", BOXPLOT },
     { "pm$3d", PM3DSURFACE },
+    { "poly$gons", POLYGONS },
     { "labels", LABELPOINTS },
     { "ima$ge", IMAGE },
     { "rgbima$ge", RGBIMAGE },

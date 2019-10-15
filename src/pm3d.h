@@ -139,8 +139,7 @@ extern lighting_model pm3d_shade;
 /* Used to initialize `set pm3d border` */
 extern struct lp_style_type default_pm3d_border;
 
-/* Used by routine filled_quadrangle() */
-extern struct lp_style_type pm3d_border_lp;
+/* Set by plot styles that use pm3d quadrangles even in non-pm3d mode */
 extern TBOOLEAN track_pm3d_quadrangles;
 
 
@@ -154,6 +153,7 @@ void pm3d_depth_queue_flush(void);
 void pm3d_reset(void);
 void pm3d_draw_one(struct surface_points* plots);
 void pm3d_add_quadrangle(struct surface_points* plot, gpdPoint *corners);
+void pm3d_add_polygon(struct surface_points* plot, gpdPoint *corners, int vertices);
 void pm3d_init_lighting_model(void);
 int pm3d_side( struct coordinate *p0, struct coordinate *p1, struct coordinate *p2);
 double cb2gray(double cb);

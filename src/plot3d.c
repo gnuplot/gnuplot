@@ -894,6 +894,11 @@ get_3ddata(struct surface_points *this_plot)
 	    local_this_iso->next->p_count = 0;
 	}
 
+	if (this_plot->plot_style == POLYGONS) {
+	    this_plot->has_grid_topology = FALSE;
+	    track_pm3d_quadrangles = TRUE;
+	}
+
 	/* If the user has set an explicit locale for numeric input, apply it */
 	/* here so that it affects data fields read from the input file.      */
 	set_numeric_locale();

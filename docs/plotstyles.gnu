@@ -738,6 +738,19 @@ set key reverse at screen .9, .9
 plot for [i=2:6] $DATA using i:key(1)
 reset
 
+# Polygons
+set output out. 'figure_polygons' . ext
+set xyplane at 0
+set view equal xyz
+unset border
+unset tics
+unset key
+set view 60,33,1.5
+set pm3d depth
+set pm3d border lc "black" lw 1.5
+splot "icosahedron.dat" with polygons fs transparent solid 0.8 fc bgnd
+reset
+
 # close last file
 unset outp
 

@@ -1183,6 +1183,7 @@ get_data(struct curve_points *current_plot)
 	case SURFACEGRID:
 	case ZERRORFILL:
 	case ISOSURFACE:
+	case POLYGONS:
 	    int_error(NO_CARET, "This plot style only available for splot");
 	    break;
 
