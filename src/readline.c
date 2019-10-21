@@ -358,7 +358,7 @@ static int do_search(int dir);
 static void print_search_result(const struct hist * result);
 
 #ifndef _WIN32
-static int mbwidth(char *c);
+static int mbwidth(const char *c);
 #endif
 static int strwidth(const char * str);
 
@@ -405,26 +405,16 @@ user_puts(char *str)
  * It should be replaced with a more accurate test.
  */
 static int
-mbwidth(char *c)
+mbwidth(const char *c)
 {
     switch (encoding) {
 
-    case S_ENC_UTF8: {
-#if defined(HAVE_WCHAR_H) && defined(HAVE_WCWIDTH)
-	wchar_t wc;
-	if (mbtowc(&wc, c, MB_CUR_MAX) < 0)
-	    return 1;
-	else
-	    return wcwidth(wc);
-#else
+    case S_ENC_UTF8:
 	return ((unsigned char)(*c) >= 0xe3 ? 2 : 1);
-#endif
-    }
 
-    case S_ENC_SJIS: {
+    case S_ENC_SJIS:
 	/* Assume all double-byte characters have double-width. */
 	return is_sjis_lead_byte(*c) ? 2 : 1;
-    }
 
     default:
 	return 1;
@@ -440,17 +430,19 @@ strwidth(const char * str)
     int i = 0;
 
     switch (encoding) {
-    case S_ENC_UTF8: {
-	char ch = str[i];
-	if ((ch & 0xE0) == 0xC0) {
-	    i += 1;
-	} else if ((ch & 0xF0) == 0xE0) {
-	    i += 2;
-	} else if ((ch & 0xF8) == 0xF0) {
-	    i += 3;
+    case S_ENC_UTF8:
+	while (str[i]) {
+	    const char *ch = &str[i++];
+	    if ((*ch & 0xE0) == 0xC0) {
+		i += 1;
+	    } else if ((*ch & 0xF0) == 0xE0) {
+		i += 2;
+	    } else if ((*ch & 0xF8) == 0xF0) {
+		i += 3;
+	    }
+	    width += mbwidth(ch);
 	}
-	width += mbwidth(&ch);
-    }
+	break;
     case S_ENC_SJIS:
 	/* Assume all double-byte characters have double-width. */
 	width = gp_strlen(str);
