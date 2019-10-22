@@ -980,7 +980,10 @@ df_read_matrix(int *rows, int *cols)
 		    linearized_matrix[index++] = (float) df_column[i].datum;
 
 		if (df_column[i].good != DF_GOOD) {
-		    if (df_bad_matrix_values++ == 0)
+		    if (df_nonuniform_matrix && index == 1)
+			/* This field is typically a label or comment */
+			;
+		    else if (df_bad_matrix_values++ == 0)
 			int_warn(NO_CARET,"matrix contains missing or undefined values");
 		}
 	    }
