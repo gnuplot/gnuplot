@@ -6743,6 +6743,9 @@ set_datafile()
 	} else if (almost_equals(c_token,"columnhead$ers")) {
 	    df_columnheaders = TRUE;
 	    c_token++;
+	} else if (almost_equals(c_token,"nocolumnhead$ers")) {
+	    df_columnheaders = FALSE;
+	    c_token++;
 	} else
 	    int_error(c_token,"expecting datafile modifier");
     }
