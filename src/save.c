@@ -728,7 +728,7 @@ set isosamples %d, %d\n\
 	fprintf(fp, "set datafile fortran\n");
     if (df_nofpe_trap)
 	fprintf(fp, "set datafile nofpe_trap\n");
-    fprintf(fp, "%s datafile columnheaders\n", df_columnheaders ? "set" : "unset");
+    fprintf(fp, "set datafile %scolumnheaders\n", df_columnheaders ? "" : "no");
 
     save_hidden3doptions(fp);
     fprintf(fp, "set cntrparam order %d\n", contour_order);
