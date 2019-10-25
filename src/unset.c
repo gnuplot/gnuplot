@@ -341,6 +341,7 @@ unset_command()
 	} else if (almost_equals(c_token,"columnhead$ers")) {
 	    df_columnheaders = FALSE;
 	    c_token++;
+	    break;
 	}
 	df_fortran_constants = FALSE;
 	unset_missing();
