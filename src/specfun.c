@@ -46,41 +46,39 @@
 #include "stdfn.h"
 #include "util.h"
 
-#define ITMAX   200
-
-#ifdef FLT_EPSILON
-# define MACHEPS FLT_EPSILON	/* 1.0E-08 */
-#else
-# define MACHEPS 1.0E-08
-#endif
-
-#ifndef E_MINEXP
-/* AS239 value, e^-88 = 2^-127 */
-#define E_MINEXP  (-88.0)
-#endif
-#ifndef E_MAXEXP
-#define E_MAXEXP (-E_MINEXP)
-#endif
+/*
+ * EAM Oct 2019:
+ * ITMAX, MACHEPS, and OFLOW limit convergence of the iterative approximations
+ * in ibeta() confrac() and igamma().  Originally (1988) these were set to
+ * ITMAX=200  MACHEPS=FLT_EPSILON (~1.E-08)  OFLOW = FLT_MAX  XBIG = 1.E+08
+ * I suppose this corresponded to contemporary hardware limitations.
+ * With these limits, igamma(a,x) convergence fails for large a.
+ * Temporary fix:  increase ITMAX and ask for higher precision
+ *   Replace MACHEPS with IGAMMA_PRECISION = 1.E-10
+ *   Replace OFLOW with IGAMMA_OVERFLOW = FLT_MAX
+ *   Convergence fails at about a=1.e08 with ITMAX=20000
+ * Development plan:  add a third algorithm to evaluation igamma for large a
+ *   Rethink ITMAX IGAMMA_PRECISION IGAMMA_OVERFLOW XBIG
+ *   Why limit to x>0 a>0?   E.g. A&S Fig 6.3 p261 shows full plane
+ */
+#define IGAMMA_PRECISION 1.E-10
+#define IGAMMA_OVERFLOW  FLT_MAX
+#define ITMAX            20000
+#define XBIG             1.0E+08 /* AS239 value for igamma(a,x>=XBIG) = 1.0 */
 
 #ifdef FLT_MAX
-# define OFLOW   FLT_MAX		/* 1.0E+37 */
+# define OFLOW FLT_MAX
 #else
-# define OFLOW   1.0E+37
+# define OFLOW 1.0E+37
 #endif
-
-/* AS239 value for igamma(a,x>=XBIG) = 1.0 */
-#define XBIG    1.0E+08
 
 /*
  * Mathematical constants
  */
-#define LNPI 1.14472988584940016
-#define LNSQRT2PI 0.9189385332046727
 #ifdef PI
 # undef PI
 #endif
 #define PI 3.14159265358979323846
-#define PNT68 0.6796875
 #define SQRT_TWO 1.41421356237309504880168872420969809	/* JG */
 
 /* Because of a historical screwup in naming, the C language "gamma" function
@@ -954,13 +952,13 @@ confrac(double a, double b, double x)
 	Ahi = Bod * Alo + Aod * Ahi;
 	Bhi = Bod * Blo + Aod * Bhi;
 
-	if (fabs(Bhi) < MACHEPS)
+	if (fabs(Bhi) < IGAMMA_PRECISION)
 	    Bhi = 0.0;
 
 	if (Bhi != 0.0) {
 	    fold = f;
 	    f = Ahi / Bhi;
-	    if (fabs(f - fold) < fabs(f) * MACHEPS)
+	    if (fabs(f - fold) < fabs(f) * IGAMMA_PRECISION)
 		return f;
 	}
     }
@@ -1050,7 +1048,7 @@ igamma(double a, double x)
 	    if (pn6 != 0.0) {
 
 		rn = pn5 / pn6;
-		if (fabs(rnold - rn) <= GPMIN(MACHEPS, MACHEPS * rn))
+		if (fabs(rnold - rn) <= GPMIN(IGAMMA_PRECISION, IGAMMA_PRECISION * rn))
 		    return 1.0 - arg * rn * a;
 
 		rnold = rn;
@@ -1061,12 +1059,12 @@ igamma(double a, double x)
 	    pn4 = pn6;
 
 	    /* Re-scale terms in continued fraction if terms are large */
-	    if (fabs(pn5) >= OFLOW) {
+	    if (fabs(pn5) >= IGAMMA_OVERFLOW) {
 
-		pn1 /= OFLOW;
-		pn2 /= OFLOW;
-		pn3 /= OFLOW;
-		pn4 /= OFLOW;
+		pn1 /= IGAMMA_OVERFLOW;
+		pn2 /= IGAMMA_OVERFLOW;
+		pn3 /= IGAMMA_OVERFLOW;
+		pn4 /= IGAMMA_OVERFLOW;
 	    }
 	}
     } else {
@@ -1077,10 +1075,12 @@ igamma(double a, double x)
 	    aa++;
 	    an *= x / aa;
 	    b += an;
-	    if (an < b * MACHEPS)
+	    if (an < b * IGAMMA_PRECISION)
 		return arg * b;
 	}
     }
+
+    /* Convergence failed */
     return -1.0;
 }
 
@@ -2112,7 +2112,7 @@ lambertw(double x)
     double p, e, t, w, eps;
     int i;
 
-    eps = MACHEPS;
+    eps = FLT_EPSILON;
 
     if (x < -exp(-1))
 	return -1;              /* error, value undefined */
