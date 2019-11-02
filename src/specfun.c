@@ -127,10 +127,6 @@ static double ranf(struct value * init);
 static double inverse_error_func(double p);
 static double inverse_normal_func(double p);
 static double lambertw(double x);
-#if (0)	/* Only used by low-precision Airy version */
-static double airy_neg( double x );
-static double airy_pos(double x);
-#endif
 #ifndef HAVE_LIBCERF
 static double humlik(double x, double y);
 #endif
@@ -2158,71 +2154,6 @@ f_lambertw(union argument *arg)
     push(Gcomplex(&a, x, 0.0));
 }
 
-#if (0)	/* This approximation of the airy function saves 2200 bytes relative
-		 * to the one from Cephes, but has low precision (2% relative error)
-		 */
-/* ------------------------------------------------------------
-   Airy Function Ai(x)
-
-   After:
-   "Two-Point Quasi-Fractional Approximations to the Airy Function Ai(x)"
-   by Pablo Martin, Ricardo Perez, Antonio L. Guerrero
-   Journal of Computational Physics 99, 337-340 (1992)
-
-   Beware of a misprint in equation (5) in this paper: The second term in
-   parentheses must be multiplied by "x", as is clear from equation (3)
-   and by comparison with equation (6). The implementation in this file
-   uses the CORRECT formula (with the "x").
-
-   This is not a very high accuracy approximation, but sufficient for
-   plotting and similar applications. Higher accuracy formulas are
-   available, but are much more complicated (typically requiring iteration).
-
-   Added: janert (PKJ) 2009-09-05
-   ------------------------------------------------------------ */
-
-static double
-airy_neg( double x ) {
-  double z = sqrt( 0.37 + pow( fabs(x), 3.0 ) );
-  double t = (2.0/3.0)*pow( fabs(x), 1.5 );
-  double y = 0;
-
-  y += ( -0.043883564 + 0.3989422*z )*cos(t)/pow( z, 7.0/6.0 );
-  y += x*( -0.013883003 - 0.3989422*z )*sin(t)/( pow( z, 5.0/6.0 ) * 1.5 * t );
-
-  return y;
-}
-
-static double
-airy_pos( double x ) {
-  double z = sqrt( 0.0425 + pow( fabs(x), 3.0 ) );
-  double y = 0;
-
-  y += (-0.002800908 + 0.326662423*z )/pow( z, 7.0/6.0 );
-  y += x * ( -0.007232251 - 0.044567423*z )/pow( z, 11.0/6.0 );
-  y *= exp(-(2.0/3.0)*z );
-
-  return y;
-}
-
-void
-f_airy(union argument *arg)
-{
-    struct value a;
-    double x;
-
-    (void) arg;                        /* avoid -Wunused warning */
-    x = real(pop(&a));
-
-    if( x < 0 ) {
-      x = airy_neg(x);
-    } else {
-      x = airy_pos(x);
-    }
-
-    push(Gcomplex(&a, x, 0.0));
-}
-#else	/* Airy function from the Cephes library */
 /*							airy.c
  *
  *	Airy function
@@ -3182,7 +3113,6 @@ f_airy(union argument *arg)
     push(Gcomplex(&a, ai, 0.0));
 }
 
-#endif	/* End choice of low- or high-precision airy function */
 
 /* ** expint.c
  *
