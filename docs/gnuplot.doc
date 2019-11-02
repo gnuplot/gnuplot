@@ -1555,10 +1555,8 @@ C marker below is used to signal this to doc2html:
 ?exp
 #exp(x) & any & $e^{x}$,  exponential function of $x$ \\
 %exp(x)@any@$e sup x$, exponential function of $x$
- The `exp(x)` function returns the exponential function of its argument (`e`
- raised to the power of its argument).  On some implementations (notably
- suns), exp(-x) returns undefined for very large x.  A user-defined function
- like safe(x) = x<-100 ? 0 : exp(x) might prove useful in these cases.
+ The `exp(x)` function returns `e` raised to the power of x, which can be
+ an integer, real, or complex value.
 4 expint
 ?expressions functions expint
 ?expint
