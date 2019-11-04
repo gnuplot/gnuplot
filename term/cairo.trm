@@ -509,7 +509,9 @@ TERM_PUBLIC void cairotrm_options()
 				int_error(c_token,
 					  "extraneous argument in set terminal %s",term->name);
 			++c_token;
-			cairo_params->resolution = abs((int)int_expression());
+			cairo_params->resolution = int_expression();
+			if (cairo_params->resolution <= 0)
+			    cairo_params->resolution = 300;
 			break;
 #endif /* PSLATEX_DRIVER */
 
