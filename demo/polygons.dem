@@ -89,6 +89,36 @@ set pm3d lighting spec2 0.6
 
 set title "splot icosahedron.dat with polygons"
 
-splot 'icosahedron.dat' with polygons fc "gray70"
+splot 'icosahedron.dat' with polygons fc "gray75"
 
-pause -1
+pause -1 "Hit return to continue"
+
+set title "splot dodecahedron.dat with polygons"
+set view 148, 55, 2.7
+set pm3d lighting spec2 0.3
+
+splot 'dodecahedron.dat' with polygons fc "gold"
+
+pause -1 "Hit return to continue"
+
+set title "splot truncated_cube with polygons" noenhanced
+set view 36, 60, 4.2
+set style fill transparent solid 0.75
+set pm3d nolighting border lt -1 lw 2
+
+splot 'truncated_cube.dat' using ($1-0.5):($2-0.5):($3-0.5) with polygons fc bgnd
+
+pause -1 "Hit return to continue"
+
+set title "A whale rendered as a fan of large polygons"
+set view 59, 314, 3.0, 1.0
+set view  equal xyz
+set pm3d depthorder 
+set pm3d border linecolor rgb "blue"  linewidth 0.25
+set autoscale
+
+splot 'whale.dat' using 1:2:3 with polygons fc "slategray", \
+      'whale.dat' with lines lw .2 lt 6
+
+pause -1 "Hit return to continue"
+reset

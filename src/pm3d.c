@@ -42,13 +42,23 @@ lighting_model pm3d_shade;
 typedef struct {
     double gray;
     double z; /* z value after rotation to graph coordinates for depth sorting */
-    gpdPoint corners[4];
-    union { /* Only used by depthorder processing */
+    union {
+	gpdPoint corners[4];	/* The normal case. vertices stored right here */
+	int array_index;	/* Stored elsewhere if there are more than 4 */
+    } vertex;
+    union {		/* Only used by depthorder processing */
 	t_colorspec *colorspec;
 	unsigned int rgb_color;
     } qcolor;
-    int fillstyle; /* from plot->fill_properties */
+    short fillstyle;	/* from plot->fill_properties */
+    short type;		/* QUAD_TYPE_NORMAL or QUAD_TYPE_4SIDES etc */
 } quadrangle;
+
+#define QUAD_TYPE_NORMAL   0
+#define QUAD_TYPE_TRIANGLE 3
+#define QUAD_TYPE_4SIDES   4
+#define QUAD_TYPE_LARGEPOLYGON 5
+
 
 #define PM3D_USE_COLORSPEC_INSTEAD_OF_GRAY -12345
 #define PM3D_USE_RGB_COLOR_INSTEAD_OF_GRAY -12346
@@ -57,6 +67,11 @@ typedef struct {
 static int allocated_quadrangles = 0;
 static int current_quadrangle = 0;
 static quadrangle* quadrangles = (quadrangle*)0;
+
+static gpdPoint *polygonlist = NULL;	/* holds polygons with >4 vertices */
+static int next_polygon = 0;		/* index of next slot in the list */
+static int current_polygon = 0;		/* index of the current polygon */
+static int polygonlistsize = 0;
 
 /* Internal prototypes for this module */
 static TBOOLEAN plot_has_palette;
@@ -70,10 +85,13 @@ static void pm3d_rearrange_part(struct iso_curve *, const int, struct iso_curve 
 static int apply_lighting_model( struct coordinate *, struct coordinate *, struct coordinate *, struct coordinate *, double gray );
 static void illuminate_one_quadrangle( quadrangle *q );
 
-static void filled_quadrangle(gpdPoint *corners, int fillstyle);
+static void filled_polygon(gpdPoint *corners, int fillstyle, int nv);
 
 static TBOOLEAN color_from_rgbvar = FALSE;
 static double light[3];
+
+static gpdPoint *get_polygon(int size);
+static void free_polygonlist(void);
 
 /*
  * Utility routines.
@@ -359,7 +377,7 @@ void pm3d_depth_queue_flush(void)
 	gpdPoint* gpdPtr;
 	vertex out;
 	double zbase = 0;
-	int i;
+	int nv, i;
 
 	if (pm3d.base_sort)
 	    cliptorange(zbase, Z_AXIS.min, Z_AXIS.max);
@@ -368,9 +386,16 @@ void pm3d_depth_queue_flush(void)
 	    double z = 0;
 	    double zmean = 0;
 
-	    gpdPtr = qp->corners;
+	    if (qp->type == QUAD_TYPE_LARGEPOLYGON) {
+		gpdPtr = &polygonlist[qp->vertex.array_index];
+		nv = gpdPtr[2].c;
+	    } else {
+		gpdPtr = qp->vertex.corners;
+		nv = 4;
+	    }
 
-	    for (i = 0; i < 4; i++, gpdPtr++) {
+
+	    for (i = 0; i < nv; i++, gpdPtr++) {
 		/* 3D boxes want to be sorted on z of the base, not the mean z */
 		if (pm3d.base_sort)
 		    map3d_xyz(gpdPtr->x, gpdPtr->y, zbase, &out);
@@ -382,7 +407,7 @@ void pm3d_depth_queue_flush(void)
 	    }
 
 	    if (pm3d.zmean_sort)
-		qp->z = zmean / 4.;
+		qp->z = zmean / nv;
 	    else
 		qp->z = z;
 	}
@@ -403,11 +428,18 @@ void pm3d_depth_queue_flush(void)
 	    else
 		set_color(qp->gray);
 
-	    filled_quadrangle(qp->corners, qp->fillstyle);
+	    if (qp->type == QUAD_TYPE_LARGEPOLYGON) {
+		gpdPoint *vertices = &polygonlist[qp->vertex.array_index];
+		int nv = vertices[2].c;
+		filled_polygon(vertices, qp->fillstyle, nv);
+	    } else {
+		filled_polygon(qp->vertex.corners, qp->fillstyle, 4);
+	    }
 	}
     }
 
     pm3d_depth_queue_clear();
+    free_polygonlist();
 
     term->layer(TERM_LAYER_END_PM3D_FLUSH);
 }
@@ -968,7 +1000,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			if (pm3d.direction == PM3D_DEPTH) {
 			    /* copy quadrangle */
 			    quadrangle* qp = quadrangles + current_quadrangle;
-			    memcpy(qp->corners, corners, 4 * sizeof (gpdPoint));
+			    memcpy(qp->vertex.corners, corners, 4 * sizeof (gpdPoint));
 			    if (color_from_rgbvar) {
 				qp->gray = PM3D_USE_RGB_COLOR_INSTEAD_OF_GRAY;
 				qp->qcolor.rgb_color = (unsigned int)gray;
@@ -977,6 +1009,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 				qp->qcolor.colorspec = &this_plot->lp_properties.pm3d_color;
 			    }
 			    qp->fillstyle = plot_fillstyle;
+			    qp->type = QUAD_TYPE_NORMAL;
 			    current_quadrangle++;
 			} else {
 			    if (pm3d_shade.strength > 0 || color_from_rgbvar)
@@ -987,17 +1020,17 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 				corners[0].z = corners[1].z = corners[2].z = corners[3].z = base_z;
 			    else if (at_which_z == PM3D_AT_TOP)
 				corners[0].z = corners[1].z = corners[2].z = corners[3].z = ceiling_z;
-			    filled_quadrangle(corners, plot_fillstyle);
+			    filled_polygon(corners, plot_fillstyle, 4);
 			}
 		    }
 		}
 	    } else { /* thus (interp_i == 1 && interp_j == 1) */
 		if (pm3d.direction != PM3D_DEPTH) {
-		    filled_quadrangle(corners, plot_fillstyle);
+		    filled_polygon(corners, plot_fillstyle, 4);
 		} else {
 		    /* copy quadrangle */
 		    quadrangle* qp = quadrangles + current_quadrangle;
-		    memcpy(qp->corners, corners, 4 * sizeof (gpdPoint));
+		    memcpy(qp->vertex.corners, corners, 4 * sizeof (gpdPoint));
 		    if (color_from_rgbvar) {
 			qp->gray = PM3D_USE_RGB_COLOR_INSTEAD_OF_GRAY;
 			qp->qcolor.rgb_color = (unsigned int)gray;
@@ -1006,6 +1039,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			qp->qcolor.colorspec = &this_plot->lp_properties.pm3d_color;
 		    }
 		    qp->fillstyle = plot_fillstyle;
+		    qp->type = QUAD_TYPE_NORMAL;
 		    current_quadrangle++;
 		}
 	    } /* interpolate between points */
@@ -1113,11 +1147,27 @@ pm3d_add_polygon(struct surface_points *plot, gpdPoint corners[4], int vertices)
 		allocated_quadrangles * sizeof(quadrangle), "pm3d_add_quadrangle");
     }
     q = quadrangles + current_quadrangle++;
-    memcpy(q->corners, corners, 4*sizeof(gpdPoint));
+    memcpy(q->vertex.corners, corners, 4*sizeof(gpdPoint));
     if (plot)
 	q->fillstyle = style_from_fill(&plot->fill_properties);
     else
 	q->fillstyle = 0;
+
+    /* For triangles and normal quadrangles, the vertices are stored in
+     * q->vertex.corners.  For larger polygons we store them in external array
+     * polygonlist and keep only an index into the array q->vertex.array.
+     */
+    q->type = QUAD_TYPE_NORMAL;
+    if (corners[3].x == corners[2].x && corners[3].y == corners[2].y
+    &&  corners[3].z == corners[2].z)
+	q->type = QUAD_TYPE_TRIANGLE;
+    if (vertices > 4) {
+	gpdPoint *save_corners = get_polygon(vertices);
+	q->vertex.array_index = current_polygon;
+	q->type = QUAD_TYPE_LARGEPOLYGON;
+	memcpy(save_corners, corners, vertices * sizeof(gpdPoint));
+	save_corners[2].c = vertices;
+    }
 
     if (!plot) {
 	/* This quadrangle came from "set object polygon" rather than "splot with pm3d" */
@@ -1346,13 +1396,13 @@ illuminate_one_quadrangle( quadrangle *q )
     struct coordinate c1, c2, c3, c4;
     vertex vtmp;
 
-    map3d_xyz(q->corners[0].x, q->corners[0].y, q->corners[0].z, &vtmp);
+    map3d_xyz(q->vertex.corners[0].x, q->vertex.corners[0].y, q->vertex.corners[0].z, &vtmp);
     c1.x = vtmp.x; c1.y = vtmp.y; c1.z = vtmp.z;
-    map3d_xyz(q->corners[1].x, q->corners[1].y, q->corners[1].z, &vtmp);
+    map3d_xyz(q->vertex.corners[1].x, q->vertex.corners[1].y, q->vertex.corners[1].z, &vtmp);
     c2.x = vtmp.x; c2.y = vtmp.y; c2.z = vtmp.z;
-    map3d_xyz(q->corners[2].x, q->corners[2].y, q->corners[2].z, &vtmp);
+    map3d_xyz(q->vertex.corners[2].x, q->vertex.corners[2].y, q->vertex.corners[2].z, &vtmp);
     c3.x = vtmp.x; c3.y = vtmp.y; c3.z = vtmp.z;
-    map3d_xyz(q->corners[3].x, q->corners[3].y, q->corners[3].z, &vtmp);
+    map3d_xyz(q->vertex.corners[3].x, q->vertex.corners[3].y, q->vertex.corners[3].z, &vtmp);
     c4.x = vtmp.x; c4.y = vtmp.y; c4.z = vtmp.z;
     q->gray = apply_lighting_model( &c1, &c2, &c3, &c4, q->gray);
 }
@@ -1470,16 +1520,22 @@ apply_lighting_model( struct coordinate *v0, struct coordinate *v1,
 
 
 /* The pm3d code works with gpdPoint data structures (double: x,y,z,color)
- * term->filled_polygon and term->image want gpiPoint data (int: x,y,style)
+ * term->filled_polygon want gpiPoint data (int: x,y,style).
  * This routine converts from gpdPoint to gpiPoint
  */
 static void
-filled_quadrangle(gpdPoint *corners, int fillstyle)
+filled_polygon(gpdPoint *corners, int fillstyle, int nv)
 {
     int i;
     double x, y;
-    gpiPoint icorners[4];
-    for (i = 0; i < 4; i++) {
+    gpiPoint icorners[PM3D_MAX_VERTICES];
+
+    if (nv > PM3D_MAX_VERTICES) {
+	nv = PM3D_MAX_VERTICES;
+	int_warn(NO_CARET, "pm3d polygons are limited to %d vertices", PM3D_MAX_VERTICES);
+    }
+
+    for (i = 0; i < nv; i++) {
 	map3d_xy_double(corners[i].x, corners[i].y, corners[i].z, &x, &y);
 	icorners[i].x = x;
 	icorners[i].y = y;
@@ -1492,7 +1548,7 @@ filled_quadrangle(gpdPoint *corners, int fillstyle)
     else
 	icorners[0].style = style_from_fill(&default_fillstyle);
 
-    term->filled_polygon(4, icorners);
+    term->filled_polygon(nv, icorners);
 
     if (pm3d.border.l_type != LT_NODRAW) {
 	/* LT_DEFAULT means draw border in current color */
@@ -1501,7 +1557,7 @@ filled_quadrangle(gpdPoint *corners, int fillstyle)
 	    term_apply_lp_properties(&pm3d.border);
 
 	term->move(icorners[0].x, icorners[0].y);
-	for (i = 3; i >= 0; i--) {
+	for (i = nv-1; i >= 0; i--) {
 	    term->vector(icorners[i].x, icorners[i].y);
 	}
     }
@@ -1533,4 +1589,32 @@ pm3d_side( struct coordinate *p0, struct coordinate *p1, struct coordinate *p2)
 
     /* cross-product */
     return sgn(u0*v1 - u1*v0);
+}
+
+/*
+ * Returns a pointer into the list of polygon vertices.
+ * If necessary reallocates the entire list to ensure there is enough 
+ * room for the requested number of vertices.
+ */
+static gpdPoint *get_polygon( int size )
+{
+    /* Check size of current list, allocate more space if needed */
+    if (next_polygon + size >= polygonlistsize) {
+	polygonlistsize = 2*polygonlistsize + size;
+	polygonlist = gp_realloc(polygonlist, polygonlistsize * sizeof(gpdPoint), NULL);
+    }
+
+    current_polygon = next_polygon;
+    next_polygon = current_polygon + size;
+    return &polygonlist[current_polygon];
+}
+
+void
+free_polygonlist()
+{
+    free(polygonlist);
+    polygonlist = NULL;
+    current_polygon = 0;
+    next_polygon = 0;
+    polygonlistsize = 0;
 }

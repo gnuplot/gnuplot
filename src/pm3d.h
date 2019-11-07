@@ -97,6 +97,8 @@ typedef enum {
     PM3D_COLOR_BY_NORMAL     = 11 /* derive color from surface normal (not currently used) */
 } PM3D_WHICH_CORNERS2COLOR;
 
+#define PM3D_MAX_VERTICES 50
+
 /*
   structure defining all properties of pm3d plotting mode
   (except for the properties of the smooth color box, see color_box instead)

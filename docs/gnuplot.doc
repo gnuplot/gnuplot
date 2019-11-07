@@ -233,8 +233,8 @@ C
 4 New plot styles and style options
 ?new plot styles
 #start
-#b 3D plot style `with polygons` reads triangles and quadrangles from a data
-## file.  This can be used to create a surface or to construct a solid object.
+#b 3D plot style `with polygons` reads polygon faces from a data file.
+## This can be used to create a surface or to construct a solid object.
 ## See `with polygons`.
 #b `splot $voxelgrid with {dots|points}` marks all voxels whose value is above 
 ## a requested threshold level.
@@ -4733,8 +4733,9 @@ Ffigure_points
       splot DATA {using x:y:z} with polygons
             {fillstyle <fillstyle spec>}
             {fillcolor <colorspec>}
- `splot with polygons` uses pm3d to render individual triangles or quadrangles
- in 3D.  These may be facets of a 3D surface or isolated shapes.
+ `splot with polygons` uses pm3d to render individual triangles, quadrangles,
+ and larger polygons in 3D.  These may be facets of a 3D surface or isolated
+ shapes. The code assumes that the vertices lie in a plane.
  Vertices defining individual polygons are read from successive records of the
  input file.  A blank line separates one polygon from the next.
 
@@ -4746,8 +4747,6 @@ Ffigure_points
  pm3d sort order and lighting are applied to the faces. It is probably always
  desirable to use `set pm3d depthsort`.
 
- If the input data describes more than four vertices for one polygon the
- extra vertices are ignored.
 Ffigure_polygons
       set xyplane at 0
       set view equal xyz

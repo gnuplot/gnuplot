@@ -470,6 +470,9 @@ load "transparent_solids.dem"
 print "********************** file pm3d_lighting.dem *********************"
 load "pm3d_lighting.dem"
 
+print "********************** file polygons.dem *********************"
+load "polygons.dem"
+
 print "********************** file vplot.dem *********************"
 load "vplot.dem"
 

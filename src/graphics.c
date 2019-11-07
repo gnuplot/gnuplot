@@ -4441,9 +4441,8 @@ do_polygon( int dimensions, t_object *this_object, int style, int facing )
 	    }
 
 	    /* FIXME: could we pass through a per-quadrangle border style also? */
-	    /* FIXME: call pm3d_add_polygon directly */
 	    quad[1].c = style;
-	    pm3d_add_quadrangle( NULL, quad );
+	    pm3d_add_polygon( NULL, quad, 4 );
 
 	} else { /* Not depth-sorted; draw it now */
 	    if (out_length > 1)

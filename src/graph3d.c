@@ -3927,7 +3927,7 @@ plot3d_polygons(struct surface_points *plot)
     int nv;
     struct iso_curve *icrvs;
     struct coordinate *points;
-    gpdPoint quad[4];
+    gpdPoint quad[PM3D_MAX_VERTICES+1];
     int style = style_from_fill(&plot->fill_properties);
 
     /* These don't need to be drawn at all */
@@ -3944,12 +3944,11 @@ plot3d_polygons(struct surface_points *plot)
 
 	/* Copy the vertex coordinates into a pm3d quadrangle */
 	for (nv = 0, points = icrvs->points; nv < icrvs->p_count; nv++) {
-	    /* We don't currently support anything but triangle and quadrangles */
-	    if (nv > 3)
-		break;
 	    quad[nv].x = points[nv].x;
 	    quad[nv].y = points[nv].y;
 	    quad[nv].z = points[nv].z;
+	    if (icrvs->p_count >= PM3D_MAX_VERTICES)
+		break;
 	}
 	/* Treat triangle as a degenerate quadrangle */
 	if (nv == 3) {
