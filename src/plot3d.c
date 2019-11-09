@@ -2238,6 +2238,8 @@ eval_3dplots()
 		    this_plot->iteration = plot_iterator ? plot_iterator->iteration : 0;
 		    this_plot->plot_style = first_dataset->plot_style;
 		    this_plot->lp_properties = first_dataset->lp_properties;
+		    this_plot->fill_properties = first_dataset->fill_properties;
+		    this_plot->arrow_properties = first_dataset->arrow_properties;
 		    if ((this_plot->plot_style == LABELPOINTS)
 		    ||  (this_plot->plot_style & PLOT_STYLE_HAS_POINT
 			    && this_plot->lp_properties.p_type == PT_CHARACTER)) {
