@@ -23,7 +23,7 @@ set xrange [ -1.1  : 1.1  ]
 set yrange [ -1.1  : 1.1  ]
 set zrange [ -1.1  : 1.1  ]
 #
-set title "Circles and polygons in 3D" font ",20"
+set title "Circle and polygon objects in 3D" font ",20"
 set arrow from 0,0,-1.2 to 0,0,1.2 lw 2 filled
 #
 # Place circles as objects using Cartesian axis coordinates

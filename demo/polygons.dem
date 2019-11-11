@@ -71,6 +71,8 @@ unset border
 unset tics
 unset key
 unset label
+undefine v*
+undefine seq*
 
 set title "Faces of an icosahedron drawn as 20 individual objects"
 splot -10

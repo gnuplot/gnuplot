@@ -96,7 +96,8 @@ on mouse-coordinate tracking.
     <li><a href="zerror.html">shaded error region</a></li>
     <li><a href="azimuth.html">azimuth</a></li>
     <li><a href="boxes3d.html">boxes</a></li>
-    <li><a href="armillary.html">circles and polygons</a></li>
+    <li><a href="armillary.html">circle and polygon 3D objects</a></li>
+    <li><a href="polygons.html">pm3d polygons</a></li>
     <li><a href="pm3d_lighting.html">lighting model</a></li>
     <li><a href="hidden_compare.html">hidden3d v. pm3d</a></li>
     </ul>
@@ -221,7 +222,7 @@ on mouse-coordinate tracking.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated July 2019</i>
+    <i>This page generated November 2019</i>
     </td>
 
     <td>
