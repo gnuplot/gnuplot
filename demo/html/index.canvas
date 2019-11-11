@@ -65,6 +65,14 @@
     <li><a href="airfoil.html">explicit Bezier splines</a></li>
     </ul>
 
+    <h4>Colors</h4>
+    <ul>
+    <li><a href="varcolor.html">data-dependent coloring</a></li>
+    <li><a href="rgb_variable.html">RGB coloring</a></li>
+    <li><a href="rgba_lines.html">RGB + alpha channel</a></li>
+    <li><a href="pm3dcolors.html">pm3d colors</a></li>
+    </ul>
+
 </td>
 
 <td rowspan=2>
@@ -83,7 +91,15 @@
     <li><a href="zerror.html">shaded error region</a></li>
     <li><a href="azimuth.html">azimuth</a></li>
     <li><a href="boxes3d.html">boxes</a></li>
+    <li><a href="armillary.html">circle and polygon 3D objects</a></li>
+    <li><a href="polygons.html">pm3d polygons</a></li>
     <li><a href="pm3d_lighting.html">lighting model</a></li>
+    </ul>
+
+    <h4>Volumn plots (new!)</h4>
+    <ul>
+    <li><a href="voxel.html">voxel-dependent coloring</a></li>
+    <li><a href="isosurface.html">3D isosurface</a></li>
     </ul>
 
     <h4>Coordinate and<br> axis transforms</h4>
@@ -107,14 +123,6 @@
     <li><a href="rgbalpha.html">RGB + alpha channel</a></li>
     <li><a href="barchart_art.html">rescaled images</a></li>
     <li><a href="imageNaN.html">missing/NaN values</a></li>
-    </ul>
-
-    <h4>Colors</h4>
-    <ul>
-    <li><a href="varcolor.html">data-dependent coloring</a></li>
-    <li><a href="rgb_variable.html">RGB coloring</a></li>
-    <li><a href="rgba_lines.html">RGB + alpha channel</a></li>
-    <li><a href="pm3dcolors.html">pm3d colors</a></li>
     </ul>
 </td>
 
