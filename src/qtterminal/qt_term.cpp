@@ -749,9 +749,6 @@ void qt_put_text(unsigned int x, unsigned int y, const char* string)
 
 void qt_linetype(int lt)
 {
-	if (lt <= LT_NODRAW)
-		lt = LT_NODRAW; // background color
-
 	/* Version 5: dash pattern will be set later by term->dashtype */
 	if (lt == LT_AXIS)
 		qt->out << GEPenStyle << Qt::DotLine;
@@ -760,10 +757,9 @@ void qt_linetype(int lt)
 	else 
 		qt->out << GEPenStyle << Qt::SolidLine;
 
-	if ((lt-1) == LT_BACKGROUND) {
-		/* FIXME: Add parameter to this API to set the background color from the gnuplot end */
+	if (lt == LT_BACKGROUND)
 		qt->out << GEBackgroundColor;
-	} else
+	else if (lt > LT_NODRAW)
 		qt->out << GEPenColor << qt_colorList[lt % 9 + 3];
 }
 
