@@ -13,7 +13,7 @@ AM_INIT_AUTOMAKE([1.10 subdir-objects])
 
 AM_MAINTAINER_MODE
 
-VERSION_MAJOR="`cat $srcdir/VERSION`"
+VERSION_MAJOR=AC_PACKAGE_VERSION
 PATCHLEVEL="`cat $srcdir/PATCHLEVEL`"
 AC_DEFINE_UNQUOTED(VERSION_MAJOR,["$VERSION_MAJOR"],[The main version number])
 AC_DEFINE_UNQUOTED(PATCHLEVEL,["$PATCHLEVEL"],[The patch level, a.k.a. micro version number])

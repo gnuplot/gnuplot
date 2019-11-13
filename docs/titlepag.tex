@@ -80,18 +80,12 @@
 \setcounter{secnumdepth}{5}
 \setcounter{tocdepth}{5}
 
-
-% Read the gnuplot version into macro \gnuplotVersion 
-\newread\fileGpVersion
-\openin\fileGpVersion VERSION
-\ifeof\fileGpVersion\openin\fileGpVersion VERSION.
-\ifeof\fileGpVersion\error FATAL: Cannot read file "VERSION"
-\fi\fi
-\read\fileGpVersion to \gpVersion
-\closein\fileGpVersion
+%
+% Current gnuplot version as a macro
+%%
+\def\gpVersion{5.3}
 \newbox\GpVersion \setbox\GpVersion=\hbox{\gpVersion}
 \def\gnuplotVersion{\usebox\GpVersion}
-
 
 % Layout setup of fancy headings:
 \pagestyle{fancy} \headsep=5.5mm \addtolength{\headheight}{7mm}
@@ -121,7 +115,7 @@
   \vspace{2ex}
 
   Version
-    \gnuplotVersion
+    {\gnuplotVersion }
   organized by: Ethan A Merritt and many others\\
 
    \vspace{2ex}
@@ -164,8 +158,7 @@
   \vspace{2ex}
 
   Mailing list for comments: \verb+gnuplot-info@lists.sourceforge.net+\\
-  Mailing list for bug reports: \verb+gnuplot-bugs@lists.sourceforge.net+\\
-  Web access (preferred): \verb+http://sourceforge.net/projects/gnuplot+
+  Web site and issue trackers: \verb+http://sourceforge.net/projects/gnuplot+
 
   \vfill
   This manual was originally prepared by Dick Crawford. \\
@@ -173,7 +166,7 @@
   \vspace{2ex}
 
 %  June 2017  Version 5.3
-   Version 5.3 (development snapshot July 2019)
+   Version {\gpVersion} (development snapshot November 2019)
 
    \end{center}
 \newpage

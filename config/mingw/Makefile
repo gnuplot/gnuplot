@@ -548,8 +548,8 @@ VERSIONING = timestamp.h
 endif
 
 PATCHLEVEL := $(shell cat $(TOP)/PATCHLEVEL)
-MAINVERSION := $(shell cat $(TOP)/VERSION)
-SHORTVERSION := $(shell cut -b 2 --complement $(TOP)/VERSION)$(PATCHLEVEL)
+MAINVERSION := 5.3
+SHORTVERSION := 53$(PATCHLEVEL)
 NUMBERS := 0 1 2 3 4 5 6 7 8 9
 ifeq ($(strip $(filter-out $(NUMBERS),$(PATCHLEVEL))),)
 LONGVERSION := $(MAINVERSION).$(PATCHLEVEL)

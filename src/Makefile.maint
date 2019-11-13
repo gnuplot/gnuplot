@@ -8,7 +8,7 @@ coresrc := $(sort $(filter-out $(noncoresrc),$(wildcard *.c)))
 
 coreterm := $(shell cd ../term && echo *.trm | sort)
 
-version := $(shell cat $(top_srcdir)/VERSION)
+version := $(PACKAGE_VERSION)
 file_version := $(shell sed -n 's/.*gnuplot_version.*"\(.*\)".*/\1/p' ./version.c|tr -d ' ')
 
 patchlevel := $(shell cat $(top_srcdir)/PATCHLEVEL)
@@ -34,7 +34,7 @@ makefile.all: $(srcdir)/Makefile.maint
 makefile.awc: makefile.all
 	sed -e 's/\\/\&/g' makefile.all > $@
 
-version.c: $(top_srcdir)/VERSION $(top_srcdir)/PATCHLEVEL
+version.c: $(top_srcdir)/PATCHLEVEL
 	@echo Making $@
 	@if [ "$(version)" != "$(file_version)" -o \
 	     "$(patchlevel)" != "$(file_pl)" ]; then \

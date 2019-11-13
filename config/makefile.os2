@@ -398,7 +398,6 @@ $(DOCDIR)\gnuplot.ps: $(DOCDIR)\gnuplot.dvi
 	$(DVIPS) -o $@ $(DOCDIR)\gnuplot.dvi
 $(DOCDIR)\gnuplot.pdf: $(DOCDIR)\gnuplot.tex
 	copy $(DOCDIR)\gnuplot.tex $(DOCDIR)\gnuplot_3.tex
-	copy $(DOCDIR)\..\VERSION $(DOCDIR)
 	cd $(DOCDIR) && $(PDFLATEX) gnuplot_3.tex && $(PDFLATEX) gnuplot_3.tex && $(PDFLATEX) gnuplot_3.tex
 	if exist $(DOCDIR)\gnuplot.pdf del $(DOCDIR)\gnuplot.pdf
 	move $(DOCDIR)\gnuplot_3.pdf $(DOCDIR)\gnuplot.pdf
