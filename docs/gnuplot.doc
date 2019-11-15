@@ -193,6 +193,7 @@ C
 2 New features
 3 Features introduced in version 5.3
 ?new version_5.3
+?new features
 ?new
  Version 5.3 is the current development version. New features introduced here
  will generally not appear in a supported release until version 5.4. Details
@@ -363,7 +364,6 @@ C
 #b Automated binning of data (see `bins`)
 #end
 4 Polar mode improvements and extensions
-?new polar mode features
 #start
 #b Polar coordinates may be used in label, arrow, and object definitions
 #b `set [m]ttics` places ticmarks and labels on the perimeter of a polar plot. See
@@ -379,7 +379,6 @@ C
 ## polar plot and the sense (clockwise or anti-clockwise) of increasing theta
 #end
 4 Nonlinear coordinates systems
-?new nonlinear coordinates
 #start
 #b Any plot axis can be assigned a pair of functions, possibly nonlinear, that
 ## describe the forward and reverse mapping to a linear range (see `set nonlinear`)
@@ -410,7 +409,6 @@ C
 ## used to represent these characters depends on the current encoding.
 #end
 4 New data type "array"
-?new features
 #start
 #b This gnuplot version introduces a new data type `array name[size]`.
 ## An array must be declared before use. Each array element A[i] may be a string,
@@ -2053,6 +2051,7 @@ C marker below is used to signal this to doc2html:
  active grid that contains the point (x,y,z).  It may also be used on the
  left side of an assignment statement to set the value of that voxel.
  E.g. voxel(x,y,z) = 0.0
+ See `splot voxel-grids`, `vgrid`.
 @end table
 4 elliptic integrals
 ?elliptic integrals
@@ -7955,7 +7954,8 @@ Ffigure_fenceplot
  or
       boxes         boxplot        ellipses       histograms  rgbalpha
       boxerrorbars  candlesticks   filledcurves   image       rgbimage
-      boxxyerror    circles        fillsteps      pm3d        zerrorfill
+      boxxyerror    circles        fillsteps      pm3d        polygons
+      isosurface    zerrorfill
  or
       table
 
@@ -7996,16 +7996,13 @@ Ffigure_fenceplot
  with `set style line`, one of these may be selected by setting <line_style> to
  the index of the desired style.
 
- If gnuplot was built with `pm3d` support, the special keyword `palette` is
- allowed for smooth color change of lines, points and dots in `splot`. The
- color is chosen from a smooth palette which was set previously with the
- command `set palette`. The color value corresponds to the z-value of the
- point coordinates or to the color coordinate if specified by the 4th parameter
- in `using`. Both 2D and 3D plots (`plot` and `splot` commands) can use palette
- colors as specified by either their fractional value or the corresponding value
- mapped to the colorbox range.  A palette color value can also be read from an
- explicitly specified input column in the `using` specifier.
- See `colors`, `set palette`, `linetype`.
+ Both 2D and 3D plots (`plot` and `splot` commands) can use colors from a 
+ smooth palette set previously with the command `set palette`. The color value
+ corresponds to the z-value of the point itself or to a separate color
+ coordinate provided in an optional additional `using` colymn.
+ Color values may be treated either as a fraction of the palette range
+ (`palette frac`) or as a coordinate value mapped onto the colorbox range
+ (`palette` or `palette z`).  See `colorspec`, `set palette`, `linetype`.
 
  The keyword `nohidden3d` applies only to plots made with the `splot` command.
  Normally the global option `set hidden3d` applies to all plots in the graph.
@@ -10359,8 +10356,8 @@ Ffigure_missing
  and to other surfaces, if more than one surface is plotted.  Contours drawn
  on the surface (`set contour surface`) don't work.
 
- As of gnuplot version 4.6, hidden3d also affects 3D plotting styles `points`,
- `labels`, `vectors`, and `impulses` even if no surface is present in the graph.
+ `hidden3d` also affects 3D plotting styles `points`, `labels`, `vectors`, and
+ `impulses` even if no surface is present in the graph.
  Unobscured portions of each vector are drawn as line segments (no arrowheads).
  Individual plots within the graph may be explicitly excluded from this
  processing by appending the extra option `nohidden3d` to the `with` specifier.
@@ -14507,6 +14504,8 @@ Ffigure_multiple_keys
 
  `unset vgrid $gridname` releases all data structures associated with that
  voxel grid.  The data structures are also released by `reset session`.
+ The function `voxel(x,y,z)` returns the value of the active grid point
+ nearest that coordinate. See also `splot voxel-grids`.
 
 3 view
 ?commands set view
