@@ -1,7 +1,3 @@
-%
-% $Id: titlepag.tex,v 1.45.2.6 2017/07/31 02:02:24 sfeam Exp $
-%
-
 \ifx\LaTeXe\undefined
 
 % old LaTeX version
@@ -84,17 +80,12 @@
 \setcounter{tocdepth}{5}
 
 
-% Read the gnuplot version into macro \gnuplotVersion 
-\newread\fileGpVersion
-\openin\fileGpVersion VERSION
-\ifeof\fileGpVersion\openin\fileGpVersion VERSION.
-\ifeof\fileGpVersion\error FATAL: Cannot read file "VERSION"
-\fi\fi
-\read\fileGpVersion to \gpVersion
-\closein\fileGpVersion
+%
+% Current gnuplot version as a macro
+%
+\def\gpVersion{5.2}
 \newbox\GpVersion \setbox\GpVersion=\hbox{\gpVersion}
 \def\gnuplotVersion{\usebox\GpVersion}
-
 
 % Layout setup of fancy headings:
 \pagestyle{fancy} \headsep=5.5mm \addtolength{\headheight}{7mm}
@@ -124,7 +115,7 @@
   \vspace{2ex}
 
   Version
-    \gnuplotVersion
+    {\gnuplotVersion }
   organized by: Ethan A Merritt and many others\\
 
    \vspace{2ex}
@@ -167,8 +158,7 @@
   \vspace{2ex}
 
   Mailing list for comments: \verb+gnuplot-info@lists.sourceforge.net+\\
-  Mailing list for bug reports: \verb+gnuplot-bugs@lists.sourceforge.net+\\
-  Web access (preferred): \verb+http://sourceforge.net/projects/gnuplot+
+  Web site and issue trackers: \verb+http://sourceforge.net/projects/gnuplot+
 
   \vfill
   This manual was originally prepared by Dick Crawford. \\
@@ -176,7 +166,7 @@
   \vspace{2ex}
 
 %  31 May 2017 Version 5.2
-   Version 5.2.8 (September 2019)
+   Version 5.2.8 (November 2019)
 
    \end{center}
 \newpage

@@ -305,7 +305,7 @@ timestamp.h: $(TOP)/ChangeLog
 	@if cmp -s $@ $@t; then rm -f $@t; else mv $@t $@; fi
 else
 VERSIONING = 
-$(S)/version.c: $(TOP)/VERSION $(TOP)/PATCHLEVEL $(TOP)/ChangeLog $(S)/Makefile.maint
+$(S)/version.c: $(TOP)/PATCHLEVEL $(TOP)/ChangeLog $(S)/Makefile.maint
 	$(MAKE) -C $(S) srcdir=. top_srcdir=.. -f Makefile.maint version.c
 endif
 
@@ -393,7 +393,6 @@ gnuplot.tex: $(D)gnuplot.doc doc2tex.exe
 # Call LaTeX three times to get the toc right.
 gnuplot.dvi: gnuplot.tex $(D)titlepag.tex
 	cp gnuplot.tex $(D)gp_tex2.tex
-	cp $(TOP)/VERSION $(D)
 	cd $(D) && latex gp_tex2.tex && latex gp_tex2.tex && latex gp_tex2.tex
 	mv $(D)gp_tex2.dvi gnuplot.dvi
 	rm -f $(D)gp_tex2.*
@@ -401,7 +400,6 @@ gnuplot.ps: gnuplot.dvi
 	dvips -o gnuplot.ps gnuplot.dvi
 gnuplot.pdf: gnuplot.tex $(D)titlepag.tex
 	cp gnuplot.tex $(D)gp_tex2.tex
-	cp $(TOP)/VERSION $(D)
 	cd $(D) && pdflatex gp_tex2.tex && pdflatex gp_tex2.tex \
 	 	&& pdflatex gp_tex2.tex
 	mv $(D)gp_tex2.pdf gnuplot.pdf
