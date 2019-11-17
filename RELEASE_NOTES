@@ -8,11 +8,11 @@ development version.
 Please see the ChangeLog file for a complete list of changes made during the
 course of development from 5.0 to 5.2.
 
-Release Notes date: 05-Sep-2019
+Release Notes date: 17-Nov-2019
 
 Changes in 5.2.8
 ================
-* NEW user-visible GPVAL_TERM_HCHAR GPVAL_TERM_VCHAR (debug aid for font issues)
+* CHANGE user-visible GPVAL_TERM_HCHAR GPVAL_TERM_VCHAR (help debug font issues)
 * CHANGE placement of ylabel (compromise 5.2.7 and earlier versions) (Bug #2181)
 * CHANGE make strstrt() aware of UTF8, e.g. strstrt("αβγ5", "5") returns 4
 * FIX "set timestamp" from "save" must not include a justification (Bug #2178)
