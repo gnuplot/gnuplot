@@ -34,6 +34,7 @@
 
 #include "syscfg.h"
 #include "alloc.h"
+#include "complexfun.h"
 #include "datafile.h"
 #include "datablock.h"
 #include "external.h"	/* for f_calle */
@@ -199,6 +200,10 @@ const struct ft_entry ft[] =
     {"airy",  f_airy},         /* janert, 20090905 */
     {"expint",  f_expint},     /* Jim Van Zandt, 20101010 */
     {"besin",  f_besin},
+
+#ifdef HAVE_COMPLEX_FUNCS
+    {"Sign", f_Sign},		/* Complex sign function */
+#endif
 
 #ifdef HAVE_LIBCERF
     {"cerf", f_cerf},		/* complex error function */
