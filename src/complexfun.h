@@ -3,6 +3,7 @@
  */
 #ifdef HAVE_COMPLEX_FUNCS
 
+void f_LambertW(union argument *arg);
 void f_Sign(union argument *arg);
 
 #endif

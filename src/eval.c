@@ -202,6 +202,7 @@ const struct ft_entry ft[] =
     {"besin",  f_besin},
 
 #ifdef HAVE_COMPLEX_FUNCS
+    {"LambertW", f_LambertW},	/* Complex W(z,k) */
     {"Sign", f_Sign},		/* Complex sign function */
 #endif
 
