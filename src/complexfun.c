@@ -227,4 +227,107 @@ LambertW(complex double z, int k)
 #undef dzexpz
 #undef ddzexpz
 
+
+/*
+ * lnGamma(z) computes the natural logarithm of the Gamma function
+ * valid over the entire complex plane using a Lanczos approximation.
+ * The imaginary component of the result is adjusted to describe a
+ * continuous surface everywhere except the negative real axis.
+ *
+ * This implementation copyright 2019 Ethan A Merritt
+ *
+ * references
+ * C. Lanczos, SIAM JNA  1, 1964. pp. 86-96.
+ * J. Spouge,  SIAM JNA 31, 1994. pp. 931.
+ * W. Press et al, "Numerical Recipes" Section 6.1.
+ */
+
+/* Internal Prototypes */
+static complex double lnGamma( complex double z );
+
+void
+f_lnGamma(union argument *arg)
+{
+    struct value result;
+    struct value a;
+
+    struct cmplx z;	/* gnuplot complex parameter z */
+    complex double w;	/* C99 _Complex representation of z */
+
+    pop(&a);
+    if (a.type != CMPLX)
+	int_error(NO_CARET, "z must be real or complex");
+    z = a.v.cmplx_val;
+
+    /* Negative integers are pole points */
+    if ( z.real < 0 && fabs(z.imag) < FLT_EPSILON
+    &&   fabs(z.real - round(z.real)) < FLT_EPSILON ) {
+	push(Gcomplex(&result, VERYLARGE, 0.0));
+	return;
+    }
+
+    /* The Lancosz approximation is valid on the half-plane with Real(z) > 0.
+     * To deal with z for which Real(z) < 0 we use the equivalence
+     *     Gamma(1-z) = (pi*z) / ( Gamma(1+z) * sin(pi*z) )
+     * to reframe the request in terms of a "reflected" z.
+     */
+    if (z.real < 0.5) {
+	complex double lnpi  = 1.14472988584940017414342735;
+	complex double t1;
+	double treal, timag;
+
+	w = (1.0 - z.real) + I*(-z.imag);
+	w = lnGamma(w);
+	t1 = clog(csin( M_PI*z.real + I*M_PI*z.imag ));
+	treal = lnpi - creal(w) - creal(t1);
+	timag = -cimag(w) - cimag(t1);
+	/* Shift result by 2pi to maintain a continuous surface
+	 * other than the discontinuity at the negative real axis
+	 */
+	timag += sgn(z.imag) * 2 * M_PI * floor((z.real+0.5)/2.);
+	push(Gcomplex(&result, treal, timag));
+
+    } else {
+	w = z.real + I*z.imag;
+	w = lnGamma(w);
+	push(Gcomplex(&result, creal(w), cimag(w)));
+    }
+}
+
+static complex double
+lnGamma( complex double z )
+{
+    static double coef[15] = {
+        0.99999999999999709182,
+       57.156235665862923517,    -59.597960355475491248,
+       14.136097974741747174,     -0.49191381609762019978,
+        0.33994649984811888699e-4, 0.46523628927048575665e-4,
+       -0.98374475304879564677e-4, 0.15808870322491248884e-3,
+       -0.21026444172410488319e-3, 0.21743961811521264320e-3,
+       -0.16431810653676389022e-3, 0.84418223983852743293e-4,
+       -0.26190838401581408670e-4, 0.36899182659531622704e-5
+    };
+    complex double sqrt2pi = 2.5066282746310005;
+    complex double g = 671./128.;
+    complex double sum, temp;
+
+    complex double f;
+    int k;
+
+    /* 15 term Lanczos approximation */
+    sum = coef[0];
+    for (k=1; k<15; k++)
+	sum = sum + coef[k] / (z + k);
+
+    if (z == 1.0 || z == 2.0)
+	return 0.0;
+
+    /* Numerical Recipes formulation */
+    temp = z + g;
+    temp = (z + 0.5) * clog(temp) - temp;
+    f = temp + clog( sqrt2pi * sum/z );
+
+    return f;
+}
+
 #endif /* HAVE_COMPLEX_FUNCS */

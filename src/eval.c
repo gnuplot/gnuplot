@@ -203,6 +203,7 @@ const struct ft_entry ft[] =
 
 #ifdef HAVE_COMPLEX_FUNCS
     {"LambertW", f_LambertW},	/* Complex W(z,k) */
+    {"lnGamma", f_lnGamma},	/* Complex lnGamma(z) */
     {"Sign", f_Sign},		/* Complex sign function */
 #endif
 
