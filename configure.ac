@@ -179,8 +179,6 @@ fi
 AM_CONDITIONAL(BUILD_GNUPLOT_X11, test "$no_x" != yes)
 
 dnl Operating systems.
-dnl FIXME AC_DEFINE(ISC22)
-dnl FIXME AC_DEFINE(KSR)
 dnl Check for MSDOS and djgpp, Apple MacOsX, BeOS
 GP_MSDOS
 GP_APPLE
@@ -192,9 +190,6 @@ dnl _instead_ of -lm ...
 AC_CHECK_FUNC(sin,,[AC_CHECK_LIB(m,sin)])
 
 dnl Header files. ANSI first
-dnl We prefer that the absense of a macro is the norm, so in syscfg.h
-dnl configure's HAVE_XXXX defines are translated into NO_XXXX for ANSI
-dnl headers and functions
 AC_HEADER_STDC
 
 dnl Header files
@@ -283,6 +278,11 @@ AC_CHECK_DECLS([signgam],,,
 #include <math.h>
 #endif
 ])
+
+dnl check for C99 complex types
+dnl and minimal set of complex math functions
+AC_CHECK_HEADERS(complex.h)
+AC_CHECK_FUNCS(csqrt cexp cabs clog)
 
 dnl check, if we have sigsetjmp and siglongjmp.
 dnl a trivial AC_CHECK_FUNCS(sigsetjmp) won't do

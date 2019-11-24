@@ -282,6 +282,14 @@ typedef unsigned uintgr_t;	/* no C99 types available */
 #define LARGEST_GUARANTEED_NONOVERFLOW (double)(INT_MAX)
 #endif
 
+/*
+ * Support for complex-valued functions
+ */
+#if defined(HAVE_COMPLEX_H)
+#if defined(HAVE_CSQRT) && defined(HAVE_CABS) && defined(HAVE_CLOG) && defined(HAVE_CEXP)
+#define HAVE_COMPLEX_FUNCS 1
+#endif
+#endif
 
 typedef double coordval;
 
