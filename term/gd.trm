@@ -1973,15 +1973,14 @@ PNG_set_font(const char *fontname)
         /* First try the old GDFONTPATH mechanism for locating fonts */
 	(void)gdUseFontConfig(0);
 	err = gdImageStringFT(NULL, &brect[0], 0,
-		png_state.ttffont, png_state.ttfsize*png_state.fontscale,
+		png_state.ttffont, size*png_state.fontscale,
 		0.0, 0, 0, "f00000000g");
 	/* If that didn't work, try again using fontconfig mechanism */
 	if (err && gdUseFontConfig(1)) {
-	    FPRINTF((stderr,"DEBUG1: gd.trm:3: gdUseFontConfig(1) (%s)\n",
-		    png_state.ttffont));
+	    FPRINTF((stderr,"gd.trm:%d gdUseFontConfig(1) (%s)\n",
+		    __LINE__, png_state.ttffont));
 	    err = gdImageStringFT(NULL, &brect[0], 0,
-		png_state.ttffont, 
-		png_state.default_ttfsize*png_state.fontscale,
+		png_state.ttffont, size*png_state.fontscale,
 		0.0, 0, 0, "f00000000g");
 	}
 	if (!err) {
