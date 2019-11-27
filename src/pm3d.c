@@ -781,7 +781,9 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		if (isnan(avgC))
 		    continue;
 
-		/* Option to not drawn quadrangles with cb < cbmin */
+		/* Option to not drawn quadrangles with cb out of range */
+		if (pm3d.no_clipcb && (avgC > CB_AXIS.max))
+		    continue;
 		if (pm3d.no_clipcb && (avgC < CB_AXIS.min))
 		    continue;
 

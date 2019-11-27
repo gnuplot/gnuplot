@@ -12,6 +12,7 @@ Changes in 5.2.8
 * FIX extent of boxplot whiskers could be off by one point (Bug #2106)
 * FIX mix unbounded iteration and functions in a single plot command (Bug #2201)
 * FIX reverse history search with readline=builtin (Bug #2209)
+* FIX "set pm3d noclipcb" failed to check both cbmin and cbmax
 * FIX qt: suppress off-by-one ysize (Bug #1759)
 * FIX cairo: suppress off-by-one ysize (Bug #1759)
 * FIX gd: apply alpha to brushstroke lines (Bug #2117)
@@ -19,6 +20,8 @@ Changes in 5.2.8
 * FIX wxt: ExportToFile widget disabled in persist mode (Bug #2185)
 * FIX qt: handling of modifier keys (ctrl alt shift) for keyboard events
 * FIX wxt: handling of modifier keys (ctrl alt shift) for keyboard events
+* FIX fig: dashtype "solid" was not passed through correctly to transfig
+* FIX gd: incorrect line spacing of multiline label (Bug #2215)
 
 Changes in 5.2.7
 ================
