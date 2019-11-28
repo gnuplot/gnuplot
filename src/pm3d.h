@@ -108,7 +108,7 @@ typedef struct {
   char flush;   	/* left, right, center */
   char ftriangles;   	/* 0/1 (don't) draw flushing triangles */
   char clip;		/* 1in, 4in */
-  TBOOLEAN no_clipcb;	/* FALSE: cb<0 treated as 0  TRUE: cb<0 treated as NaN */
+  TBOOLEAN no_clipcb;	/* FALSE: out-of-range cb treated as 0  TRUE: treated as NaN */
   pm3d_scandir direction;
 			/* If direction is "depth" sort by max z of 4 corners unless ... */
   TBOOLEAN base_sort;	/*     use z values of projection to baseplane */

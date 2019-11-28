@@ -796,9 +796,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		    continue;
 
 		/* Option to not drawn quadrangles with cb out of range */
-		if (pm3d.no_clipcb && (avgC > CB_AXIS.max))
-		    continue;
-		if (pm3d.no_clipcb && (avgC < CB_AXIS.min))
+		if (pm3d.no_clipcb && (avgC > CB_AXIS.max || avgC < CB_AXIS.min))
 		    continue;
 
 		if (color_from_rgbvar) /* we were given an RGB color */
@@ -970,6 +968,9 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			    /* we were given an explicit color */
 			    gray = avgC;
 			} else {
+			    /* clip if out of range */
+			    if (pm3d.no_clipcb && (avgC < CB_AXIS.min || avgC > CB_AXIS.max))
+				continue;
 			    /* transform z value to gray, i.e. to interval [0,1] */
 			    gray = cb2gray(avgC);
 			}
