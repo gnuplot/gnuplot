@@ -13047,11 +13047,11 @@ Ffigure_multiple_keys
 ?set pm3d map
 ?pm3d map
 ?map
+ The deprecated command `set pm3d map` is equivalent to
+ `set pm3d at b; set view map; set style data pm3d; set style func pm3d;`
+
  There used to be an option {transparent|solid} to this command.  Now
  you get the same effect from `set grid {front|layerdefault}`, respectively.
-
- The old command `set pm3d map` is equivalent to `set pm3d at b;
- set view map scale 1.0; set style data pm3d; set style func pm3d;`
 3 pointintervalbox
 ?commands set pointintervalbox
 ?set pointintervalbox

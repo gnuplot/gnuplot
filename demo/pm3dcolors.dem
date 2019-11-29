@@ -3,7 +3,8 @@
 #
 # Multiplot with some of the recommended rgbformulae palettes
 #
-set pm3d map
+set view map
+set style function pm3d
 set multiplot layout 3,3 \
     title "Palettes according to 'help palette rgbformulae'"
 g(x)=x
@@ -28,7 +29,8 @@ pause -1 "Hit return to continue"
 #
 #   Gradient Palettes
 #
-set pm3d map
+set view map
+set style function pm3d
 set palette color
 
 f(x)=(x+10)/20
@@ -131,7 +133,7 @@ pause -1 "Hit return to continue"
 #    Color Models
 #
 set palette color
-set pm3d map
+set view map
 set xrange [-10:10]
 unset ztics
 unset ytics
@@ -170,7 +172,7 @@ pause -1 "Hit return to continue"
 #   User Defined Functions
 #
 set palette color
-set pm3d map
+set view map
 set cbrange [f(-10):f(10)]
 set xrange [-10:10]
 set yrange [0:1]

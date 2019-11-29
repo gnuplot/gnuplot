@@ -121,7 +121,7 @@ print "because the number of pixels on the screen remains about the same"
 print "while much of the hi resolution data is decimated."
 print ""
 unset key
-set pm3d map
+set view map
 set xrange [10:117]
 set yrange [10:117]
 set tics out

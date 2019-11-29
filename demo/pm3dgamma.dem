@@ -2,7 +2,8 @@
 
 set pm3d; set palette
 set palette gray
-set pm3d map
+set view map
+set style function pm3d
 set cbrange [-10:10]
 set xrange [-10:10]
 set yrange [*:*]
