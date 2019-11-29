@@ -1,0 +1,36 @@
+set border 4095
+set bmargin 6
+set style fill transparent solid 0.50 border
+unset key
+unset colorbox
+set view 60, 60, 1.1, 0.6
+set samples 40, 40
+set isosamples 40, 40
+set xyplane 0
+set pm3d depthorder border linewidth 0.100
+set pm3d clip z 
+set pm3d lighting primary 0.5 specular 0.2 spec2 0
+
+set xrange [-1 : 5]
+set yrange [-3 : 3]
+set zrange [-10 : 10]
+set xtics 2 offset 0,-0.5
+set ytics 2 offset 0,-0.5
+set ztics 5
+
+f(x,y) = x**2 + y**2 * (1 - x)**3
+
+set multiplot layout 1,2 title "new pm3d option for smooth clipping against zrange"
+set title "set pm3d clip4in (old default)"
+set pm3d clip4in
+
+splot f(x,y) with pm3d fc "cyan"
+
+set title "set pm3d clip z (new default)"
+set pm3d clip z
+
+replot
+unset multiplot
+
+pause -1 "<return> to continue"
+reset

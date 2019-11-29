@@ -331,29 +331,6 @@ pause -1 "Hit return to continue"
 
 reset
 
-set title "Demo for clipping of 2 rectangles comes now. The xrange is [0:2]..."
-set pm3d; set palette
-set view map
-
-set xrange [0:2]
-splot 'clip14in.dat'
-pause -1 "Hit return to continue"
-
-set xrange [0:1.5]
-set yrange [*:*]
-set title "...and now xrange is [0:1.5] and 'set pm3d clip1in'"
-set pm3d clip1in
-replot
-pause -1 "Hit return to continue"
-
-set title "...now xrange is [0:1.5] and 'set pm3d clip4in'"
-set pm3d clip4in
-replot
-pause -1 "Hit return to continue"
-
-
-reset
-
 sinc(u,v) = sin(sqrt(u**2+v**2)) /sqrt(u**2+v**2)
 
 set sam 40

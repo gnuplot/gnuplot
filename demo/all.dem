@@ -245,6 +245,10 @@ print "********************** file pm3d.dem *********************"
 load "pm3d.dem"
 reset
 
+print "********************** file pm3d_clip.dem *********************"
+load "pm3d_clip.dem"
+reset
+
 print "********************** file pm3dcolors.dem *********************"
 load "pm3dcolors.dem"
 reset
