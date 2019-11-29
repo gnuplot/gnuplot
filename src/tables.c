@@ -513,6 +513,7 @@ const struct gen_table set_pm3d_tbl[] =
     { "fl$ush",		S_PM3D_FLUSH },
     { "ftr$iangles",	S_PM3D_FTRIANGLES },
     { "noftr$iangles",	S_PM3D_NOFTRIANGLES },
+    { "clip$z", 	S_PM3D_CLIP_Z },
     { "clip1$in",	S_PM3D_CLIP_1IN },
     { "clip4$in",	S_PM3D_CLIP_4IN },
     { "clipcb", 	S_PM3D_CLIPCB },

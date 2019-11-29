@@ -39,6 +39,7 @@
 #include "internal.h"		/* for eval_reset_after_error */
 #include "misc.h"
 #include "plot.h"
+#include "pm3d.h"		/* for pm3d_reset_after_error */
 #include "variable.h"		/* For locale handling */
 #include "setshow.h"		/* for conv_text() */
 #include "tabulate.h"		/* for table_mode */
@@ -1182,6 +1183,7 @@ common_error_exit()
     eval_reset_after_error();
     clause_reset_after_error();
     parse_reset_after_error();
+    pm3d_reset_after_error();
     set_iterator = cleanup_iteration(set_iterator);
     plot_iterator = cleanup_iteration(plot_iterator);
     scanning_range_in_progress = FALSE;

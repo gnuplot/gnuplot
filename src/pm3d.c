@@ -73,6 +73,8 @@ static int next_polygon = 0;		/* index of next slot in the list */
 static int current_polygon = 0;		/* index of the current polygon */
 static int polygonlistsize = 0;
 
+static int pm3d_plot_at = 0;	/* flag so that top/base polygons are not clipped against z */
+
 /* Internal prototypes for this module */
 static TBOOLEAN plot_has_palette;
 static double geomean4(double, double, double, double);
@@ -86,6 +88,7 @@ static int apply_lighting_model( struct coordinate *, struct coordinate *, struc
 static void illuminate_one_quadrangle( quadrangle *q );
 
 static void filled_polygon(gpdPoint *corners, int fillstyle, int nv);
+static int clip_filled_polygon( gpdPoint *inpts, gpdPoint *outpts, int nv );
 
 static TBOOLEAN color_from_rgbvar = FALSE;
 static double light[3];
@@ -490,6 +493,8 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 
     if (at_which_z != PM3D_AT_BASE && at_which_z != PM3D_AT_TOP && at_which_z != PM3D_AT_SURFACE)
 	return;
+    else
+	pm3d_plot_at = at_which_z;	/* clip_filled_polygon() will check this */
 
     /* return if the terminal does not support filled polygons */
     if (!term->filled_polygon)
@@ -708,7 +713,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		if (!(pointsA[i].type == INRANGE && pointsA[i1].type == INRANGE &&
 		      pointsB[ii].type == INRANGE && pointsB[ii1].type == INRANGE))
 		    continue;
-	    } else {		/* (pm3d.clip == PM3D_CLIP_1IN) */
+	    } else {
 		/* (2) all 4 points of the quadrangle must be defined */
 		if (pointsA[i].type == UNDEFINED || pointsA[i1].type == UNDEFINED ||
 		    pointsB[ii].type == UNDEFINED || pointsB[ii1].type == UNDEFINED)
@@ -1057,6 +1062,9 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
     /* free memory allocated by scan_array */
     free(scan_array);
 
+    /* reset local flags */
+    pm3d_plot_at = 0;
+
     /* for pm3dCompress.awk and pm3dConvertToImage.awk */
     if (pm3d.direction != PM3D_DEPTH)
 	term->layer(TERM_LAYER_END_PM3D_MAP);
@@ -1070,9 +1078,10 @@ void
 pm3d_reset()
 {
     strcpy(pm3d.where, "s");
+    pm3d_plot_at = 0;
     pm3d.flush = PM3D_FLUSH_BEGIN;
     pm3d.ftriangles = 0;
-    pm3d.clip = PM3D_CLIP_4IN;
+    pm3d.clip = PM3D_CLIP_Z;	/* prior to Dec 2019 default was PM3D_CLIP_4IN */
     pm3d.no_clipcb = FALSE;
     pm3d.direction = PM3D_SCANS_AUTOMATIC;
     pm3d.base_sort = FALSE;
@@ -1532,6 +1541,18 @@ filled_polygon(gpdPoint *corners, int fillstyle, int nv)
     int i;
     double x, y;
     gpiPoint icorners[PM3D_MAX_VERTICES];
+    gpdPoint clipcorners[2*PM3D_MAX_VERTICES];
+
+    if ((pm3d.clip == PM3D_CLIP_Z)
+    &&  (pm3d_plot_at != PM3D_AT_BASE && pm3d_plot_at != PM3D_AT_TOP)) {
+	int new = clip_filled_polygon( corners, clipcorners, nv );
+	if (new < 0)	/* All vertices out of range */
+	    return;
+	if (new > 0) {	/* Some got clipped */
+	    nv = new;
+	    corners = clipcorners;
+	}
+    }
 
     if (nv > PM3D_MAX_VERTICES) {
 	nv = PM3D_MAX_VERTICES;
@@ -1565,6 +1586,84 @@ filled_polygon(gpdPoint *corners, int fillstyle, int nv)
 	}
     }
 }
+
+/*
+ * Clip existing filled polygon again zmax or zmin.
+ * We already know that this is a convex polygon with at least one
+ * vertex in range.  The clipped polygon may have as few as 3 vertices
+ * or as many as n+1  (would be n+2 if the polygon is allowed to span
+ * the full z range, e.g. zoomed in to a region smaller than one facet).
+ * Returns the new number of vertices after clipping.
+ */
+int
+clip_filled_polygon( gpdPoint *inpts, gpdPoint *outpts, int nv )
+{
+    int first = 0;	/* First in-range point input */
+    int current = 0;	/* The one we are now considering */
+    int next = 0;	/* Possible next points */
+    int nvo = 0;	/* Number of vertices after clipping */
+    int noutrange = 0;	/* Number of out-range points */
+    double fraction;
+    double zmin = axis_array[FIRST_Z_AXIS].min;
+    double zmax = axis_array[FIRST_Z_AXIS].max;
+
+
+    /* Find first out of range point.
+     * If all are in range or all out of range, forget it. */
+    for (noutrange = 0, current = nv-1; current >= 0; current--) {
+	if (inrange( inpts[current].z, zmin, zmax ))
+	    first = current;
+	else
+	    noutrange++;
+    }
+    if (noutrange == nv)
+	return -1;
+    if (noutrange == 0)
+	return 0;
+
+    /* Copy first in-range point to the list of output vertices */
+    current = first;
+    outpts[nvo++] = inpts[current];
+
+    /* Add more vertices until we get to one that needs clipping */
+    for (next=(current+1)%nv; inrange(inpts[next].z, zmin, zmax); next = (next+1)%nv )
+	outpts[nvo++] = inpts[++current];
+
+    /* Current point is in-range but next point is out-range.
+     * Clip line segment from current-to-next and store as new vertex.
+     */
+    fraction = ((inpts[next].z >= zmax ? zmax : zmin) - inpts[current].z)
+             / (inpts[next].z - inpts[current].z);
+    outpts[nvo].x = inpts[current].x + fraction * (inpts[next].x - inpts[current].x);
+    outpts[nvo].y = inpts[current].y + fraction * (inpts[next].y - inpts[current].y);
+    outpts[nvo].z = inpts[next].z >= zmax ? zmax : zmin;
+    nvo++;
+
+    /* Find next in-bounds point.
+     * Clip line segment preceding it and store as new vertex.
+     */
+    current = (next+1) % nv;
+    while (!inrange(inpts[current].z, zmin, zmax)) {
+	next = current;
+	current = (next+1) % nv;
+    }
+
+    fraction = ((inpts[next].z >= zmax ? zmax : zmin) - inpts[current].z)
+             / (inpts[next].z - inpts[current].z);
+    outpts[nvo].x = inpts[current].x + fraction * (inpts[next].x - inpts[current].x);
+    outpts[nvo].y = inpts[current].y + fraction * (inpts[next].y - inpts[current].y);
+    outpts[nvo].z = inpts[next].z >= zmax ? zmax : zmin;
+    nvo++;
+
+    /* Copy the remaining vertices to the output list */
+    while (current != first) {
+	outpts[nvo++] = inpts[current];
+	current = (current+1) % nv;
+    }
+
+    return nvo;
+}
+
 
 /* EXPERIMENATAL
  * returns 1 for top of pm3d surface towards the viewer
@@ -1620,4 +1719,11 @@ free_polygonlist()
     current_polygon = 0;
     next_polygon = 0;
     polygonlistsize = 0;
+}
+
+void
+pm3d_reset_after_error()
+{
+    pm3d_plot_at = 0;
+    free_polygonlist();
 }

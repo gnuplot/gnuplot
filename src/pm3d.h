@@ -65,7 +65,9 @@ typedef enum {
     PM3D_CLIP_1IN: all 4 points of the quadrangle must be defined and at least
 		   1 point of the quadrangle must be in the x and y ranges
     PM3D_CLIP_4IN: all 4 points of the quadrangle must be in the x and y ranges
+    PM3D_CLIP_Z:   smooth clip to current zrange
 */
+#define PM3D_CLIP_Z 0
 #define PM3D_CLIP_1IN '1'
 #define PM3D_CLIP_4IN '4'
 
@@ -164,6 +166,7 @@ void pm3d_rearrange_scan_array(struct surface_points* this_plot,
     struct iso_curve*** second_ptr, int* second_n, int* second_invert);
 
 void set_plot_with_palette(int plot_num, int plot_mode);
+void pm3d_reset_after_error(void);
 
 TBOOLEAN is_plot_with_palette(void);
 TBOOLEAN is_plot_with_colorbox(void);

@@ -4000,6 +4000,11 @@ set_pm3d()
 	    case S_PM3D_CLIP_4IN: /* "clip4$in" */
 		pm3d.clip = PM3D_CLIP_4IN;
 		continue;
+	    case S_PM3D_CLIP_Z: /* "clip z" */
+		pm3d.clip = PM3D_CLIP_Z;
+		if (equals(c_token+1, "z"))
+		    c_token++;
+		continue;
 	    case S_PM3D_CLIPCB:
 		pm3d.no_clipcb = FALSE;
 		continue;

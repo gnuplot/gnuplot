@@ -327,6 +327,7 @@ C
 #b Enhanced text mode accepts \U+xxxx (xxxx is a 4 or 5 character hexadecimal)
 ##as representing a Unicode code point that is converted to the corresponding
 ##UTF-8 byte sequence on output.
+#b pm3d surfaces and other pm3d objects are smoothly clipped to zrange.
 #end
 
 4 Changes
@@ -8891,8 +8892,9 @@ Ffigure_fenceplot
  * `set clip` affects only points and lines produced by plot styles `lines`,
  `linespoints`, `points`, `arrows`, and `vectors`.
 
- * Clipping of colored quadrangles drawn for `pm3d` maps and surfaces is
- controlled `set pm3d clip1in` and `set pm3d clip4in`.
+ * Clipping of colored quadrangles drawn for pm3d surfaces and other solid
+ objects is controlled `set pm3d clip`. The default is smooth clipping against
+ the current zrange.
 
  * Object clipping is controlled by the `clip` or `noclip` property of the
  individual object.
@@ -12706,9 +12708,9 @@ Ffigure_multiple_keys
 ?show pm3d
 ?pm3d
  pm3d is an `splot` style for drawing palette-mapped 3d and 4d data as
- color/gray maps and surfaces.  It uses an algorithm that allows plotting
- gridded as well as non-gridded data without preprocessing, even when the data
- scans do not have the same number of points.
+ color/gray maps and surfaces.  It allows plotting gridded or non-gridded data
+ without preprocessing. pm3d style options also affect solid-fill polygons
+ used to construct other 3D plot elements.
 
  Syntax (the options can be given in any order):
        set pm3d {
@@ -12718,7 +12720,7 @@ Ffigure_multiple_keys
                                    | depthorder {base} }
                   { flush { begin | center | end } }
                   { ftriangles | noftriangles }
-                  { clip1in | clip4in }
+                  { clip {z} | clip1in | clip4in }
                   { {no}clipcb }
                   { corners2color
                     { mean|geomean|harmean|rms|median|min|max|c1|c2|c3|c4 }
@@ -12733,6 +12735,22 @@ Ffigure_multiple_keys
        show pm3d
        unset pm3d
 
+ Note that pm3d plots are plotted sequentially in the order given in the
+ splot command. Thus earlier plots may be obscured by later plots.
+ To avoid this you can use the `depthorder` scan option.
+
+ The pm3d surfaces can be projected onto the `top` or `bottom` of the view box.
+ See `pm3d position`.
+ The following command draws three color surfaces at different altitudes:
+       set border 4095
+       set pm3d at s
+       splot 10*x with pm3d at b, x*x-y*y, x*x+y*y with pm3d at t
+
+ See also help for `set palette`, `set cbrange`, `set colorbox`,
+ and the demo file `demo/pm3d.dem`.
+4 implicit
+?pm3d implicit
+?pm3d explicit
  A pm3d color surface is drawn if the splot command specifies `with pm3d`,
  if the data or function `style` is set to pm3d globally, or if the pm3d mode is
  `set pm3d implicit`.  In the latter two cases, the pm3d surface is draw in
@@ -12752,20 +12770,6 @@ Ffigure_multiple_keys
  If you set the default data or function style to `pm3d`, e.g.:
        set style data pm3d
  then the options `implicit` and `explicit` have no effect.
-
- Note that pm3d plots are plotted sequentially in the order given in the
- splot command. Thus earlier plots may be obscured by later plots.
- To avoid this you can use the `depthorder` scan option.
-
- The pm3d coloring can be drawn at any or all of three different positions,
- `top`, `bottom`, or `surface`. See `pm3d position`.
- The following command draws three color surfaces at different altitudes:
-       set border 4095
-       set pm3d at s
-       splot 10*x with pm3d at b, x*x-y*y, x*x+y*y with pm3d at t
-
- See also help for `set palette`, `set cbrange`, `set colorbox`,
- and definitely the demo file `demo/pm3d.dem`.
 4 algorithm
 ?pm3d algorithm
 
@@ -12911,14 +12915,22 @@ Ffigure_multiple_keys
 ?pm3d noclipcb
 ?set pm3d clip1in
 ?set pm3d clip4in
- pm3d mode clipping with respect to x, y coordinates of quadrangles can be done
- in two ways.
- `clip1in`: all 4 points of each quadrangle must be defined and at least
- 1 point of the quadrangle must lie in the x and y ranges.
- `clip4in`: (default) all 4 points of the quadrangle must be in range.
+ Syntax:
+      set pm3d {clip {z} | clip1in | clip4in}
+      set pm3d {no}clipcb
 
- `clipcb`: (default) palette color values < cbmin are clipped to cbmin.
- `noclipcb`: quadrangles with palette color value < cbmin are not drawn at all.
+ The component quadrangles of a pm3d surface or other 3D object are by default
+ smoothly clipped against the current zrange.  This is a change from earlier 
+ gnuplot versions.
+ Alternatively, surfaces can be clipped by rendering whole quadrangles but only
+ those with all 4 corners in-range on x, y, and z (`set pm3d clip4in`), or only
+ those with at least one corner in-range on x, y, and z (`set pm3d clip1in`).
+ 
+ Separate from clipping based on spatial x, y, and z coordinates, quadrangles
+ can be clipped (not rendered) based on extreme palette color values.
+ `clipcb`: (default) palette color values < cbmin are treated as cbmin;
+ palette color values > cbmax are treated as cbmax.
+ `noclipcb`: quadrangles with color value outside cbrange are not drawn at all.
 
 4 color_assignment
 ?pm3d color_assignment
