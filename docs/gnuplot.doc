@@ -250,10 +250,10 @@ C
 #b Plot style `with boxes` can be used in 3D plots.
 #b 2D plot style `with arrows` is identical to `with vectors` except that each
 ## arrow is specified using x:y:length:angle rather than x:y:xdelta:ydelta
-#b pm3d surfaces can have individual fillstyle and seprate top/bottom fillcolor
-## EXPERIMENTAL: splot FOO with pm3d fillcolor <colorspec>
-#b pm3d option `noclipcb` causes quadrangles with (palette color value < cbmin)
-## to be skipped rather than being drawn with color clipped to cbmin
+#b splot FOO with pm3d fillcolor <colorspec>
+#b pm3d surfaces can have individual fillstyle and separate top/bottom fillcolor
+#b pm3d option `noclipcb` causes quadrangles with palette color outside cbrange
+## to be skipped rather than being drawn with color clipped to cbmin or cbmax.
 #b Customized contour line types. See `set cntrparam`.
 #end
 
@@ -327,11 +327,13 @@ C
 #b Enhanced text mode accepts \U+xxxx (xxxx is a 4 or 5 character hexadecimal)
 ##as representing a Unicode code point that is converted to the corresponding
 ##UTF-8 byte sequence on output.
-#b pm3d surfaces and other pm3d objects are smoothly clipped to zrange.
 #end
 
 4 Changes
 #start
+#b `New default:` pm3d quadrangles are clipped smoothly to current zrange.
+## This affects pm3d surfaces and also the faces of 3D boxes, polygons, etc.
+## `set pm3d clip4in` selects the previous default (skip entire quadrangle).
 #b Revised syntax for plot style 'with parallelaxes'. See `parallel`.
 ## The histogram, parallelaxis, and spiderplot styles now use similar syntax
 ## that can iterate over plot elements: `plot for [column=1:N] DATA using column`
@@ -3669,6 +3671,20 @@ Ffigure_newsyntax
  so that the visual length is independent of the orientation angle.
 
  `angle` is always specified in degrees.
+2 Bee swarm plots
+?beeswarm
+?bee swarm
+=jitter
+Ffigure_jitter
+ "Bee swarm" plots result from applying jitter to separate overlapping points.
+ A typical use is to compare the distribution of y values exhibited by two or
+ more categories of points, where the category determines the x coordinate.
+ See the `set jitter` command for how to control the overlap criteria and the
+ displacement pattern used for jittering.  The plots in the figure were created
+ by the same plot command but different jitter settings.
+
+      set jitter
+      plot $data using 1:2:1 with points lc variable
 2 boxerrorbars
 ?plotting styles boxerrorbars
 ?style boxerrorbars
@@ -3850,6 +3866,7 @@ Ffigure_boxplot
 
  These default properties may be changed using the `set style boxplot` command.
  See `set style boxplot`, `bars`, `boxwidth`, `fillstyle`, `candlesticks`.
+
 #TeX \newpage
 2 boxxyerror
 ?plotting styles boxxyerror
@@ -4040,9 +4057,9 @@ Ffigure_ellipses
 
  By default, the major diameter is interpreted in the units of the plot's
  horizontal axis (x or x2) while the minor diameter in that of the vertical
- (y or y2).  This implies that if the x and y axis scales are not equal,
- then the major/minor diameter ratio will no longer be correct after rotation.
- This behavior can be changed with the `units` keyword, however.
+ (y or y2).  If the x and y axis scales are not equal, the major/minor diameter
+ ratio will no longer be correct after rotation.
+ This can be changed with the `units` keyword, however.
 
  There are three alternatives:
  if `units xy` is included in the plot specification, the axes will be scaled
@@ -4050,16 +4067,15 @@ Ffigure_ellipses
  in units of the x axis, while `units yy` means that both diameters are
  interpreted in units of the y axis. In the latter two cases the ellipses
  will have the correct aspect ratio, even if the plot is resized.
-
- If `units` is omitted, the default setting will be used, which is equivalent
- to `units xy`. This can be redefined by `set style ellipse`.
+ If `units` is omitted from the plot command, the setting from
+ `set style ellipse` will be used.
 
  Example (draws ellipses, cycling through the available line types):
 
      plot 'data' using 1:2:3:4:(0):0 with ellipses
 
  See also `set object ellipse`, `set style ellipse` and `fillstyle`.
-#TeX \newpage
+
 2 dots
 ?plotting styles dots
 ?style dots
@@ -4174,6 +4190,7 @@ Ffigure_financebars
 ^ <a href="http://www.gnuplot.info/demo/finance.html">
  finance demo.
 ^ </a>
+#TeX \newpage
 2 fsteps
 ?plotting styles fsteps
 ?style fsteps
@@ -4491,20 +4508,16 @@ Ffigure_scaled_image
 ?with image pixels
 ?image pixels
 ?pixels
-?plotting styles image failsafe
-?style image failsafe
-?with image failsafe
-?image failsafe
-?failsafe
  Some terminals use device- or library-specific optimizations to render image
  data within a rectangular 2D area.  This sometimes produces undesirable output,
  e.g. bad clipping or scaling, missing edges.  The `pixels` keyword tells
  gnuplot to use generic code that renders the image pixel-by-pixel instead.
  This rendering mode is slower and may result in much larger output files, but
  should produce a consistent rendered view on all terminals.
- (The `pixels` options was called `failsafe` mode in previous gnuplot versions.)
  Example:
        plot 'data' with image pixels
+
+#TeX \newpage
 2 impulses
 ?plotting styles impulses
 ?style impulses
@@ -4521,25 +4534,6 @@ Ffigure_impulses
       2 columns:  x  y     # line from [x,0] to [x,y]  (2D)
       3 columns:  x  y  z  # line from [x,y,0] to [x,y,z] (3D)
 
-2 isosurface
-?plotting styles isosurface
-?style isosurface
-?with isosurface
-?isosurface
-Ffigure_isosurface
- This 3D plot style requires a populated voxel grid (see `set vgrid`, `vfill`).
- Linear interpolation of voxel grid values is used to estimate fractional grid
- coordinates corresponding to the requested isolevel.  These points are then 
- used to generate a tesselated surface.  The facets making up the surface are
- rendered as pm3d polygons, so the surface coloring, transparency, and border
- properties are controlled by `set pm3d`.  In general the surface is easier to
- interpret visually if facets are given a thin border that is darker than the
- fill color.  By default the tesselation uses a mixture of quadrangles and
- triangles.  To use triangle only, see `set isosurface`.
- Example:
-      set style fill solid 0.3
-      set pm3d depthorder border lc "blue" lw 0.2
-      splot $helix with isosurface level 10 fc "cyan"
 2 labels
 ?plotting styles labels
 ?style labels
@@ -4644,11 +4638,11 @@ Ffigure_linespoints
  portion of line segment that passes underneath the symbol.
 
 2 parallelaxes
+Ffigure_parallel
 ?plotting styles parallelaxes
 ?with parallelaxes
 ?parallelaxes
 ?parallel
-Ffigure_parallel
  Parallel axis plots can highlight correlation in a multidimensional data set.
  Individual columns of input data are each associated with a separately scaled
  vertical axis.  If all columns are drawn from a single file then each line on
@@ -4679,6 +4673,16 @@ Ffigure_parallel
  By default gnuplot will automatically determine the range and scale of the
  individual axes from the input data, but the usual `set axis range` commands
  can be used to customize this.  See `set paxis`.
+2 Polar plots
+=polar
+Ffigure_polar
+ Polar plots are generated by changing the current coordinate system to
+ polar before issuing a plot command.  The option `set polar` tells gnuplot to
+ interpret input 2D coordinates as <angle>,<radius> rather than <x>,<y>.
+ Many, but not all, of the 2D plotting styles work in polar mode.
+ The figure shows a combination of plot styles `lines` and `filledcurves`.
+ See `set polar`, `set rrange`, `set size square`, `set theta`, `set ttics`.
+#TeX \newpage
 2 points
 ?plotting styles points
 ?style points
@@ -4803,6 +4807,8 @@ Ffigure_spiderplot
       plot for [i=1:5] 'A' using i, for [j=1:5] 'B' using j
       # Two polygons with 5 vertices
       plot for [i=1:5] 'A' using i, newspiderplot, for [j=1:5] 'B' using j
+
+#TeX \newpage
 2 steps
 ?plotting styles steps
 ?style steps
@@ -4913,6 +4919,7 @@ Ffigure_xyerrorbars
  An additional input column (5th or 7th) may be used to provide variable
  (per-datapoint) color information.
 
+#TeX \newpage
 2 yerrorbars
 ?plotting styles yerrorbars
 ?plotting styles errorbars
@@ -5012,7 +5019,85 @@ Ffigure_yerrorlines
 ^ <a href="http://www.gnuplot.info/demo/mgr.html">
  errorbar demo.
 ^ </a>
-2 zerrorfill
+#TeX \newpage
+2 3D plots
+?3D plots
+?plotting styles 3D plots
+=3D
+ 3D plots are generated using the command `splot` rather than `plot`.
+ Many of the 2D plot styles (points, images, impulse, labels, vectors) can also
+ be used in 3D by providing an extra column of data containing z coordinate.
+ Some plot types (pm3d coloring, surfaces, contours) must be generated using the
+ `splot` command even if only a 2D projection is wanted.
+3 Surface plots
+?surface plots
+=surface
+Ffigure_surface+contours
+ The styles `splot with lines` and `splot with surface` both generate a surface
+ made from a grid of lines.  Solid surfaces can be generated using the style
+ `splot with pm3d`.  Usually the surface is displayed at some convenient viewing
+ angle, such that it clearly represents a 3D surface.  See `set view`.
+ In this case the X, Y, and Z axes are all visible in the plot.
+ The illusion of 3D is enhanced by choosing hidden line removal. See `hidden3d`.
+ The `splot` command can also calculate and draw contour lines corresponding
+ to constant Z values. These contour lines may be drawn onto the surface
+ itself, or projected onto the XY plane. See `set contour`.
+Ffigure_mapcontours
+3 2D projection (set view map)
+?2D projection (set view map)
+ An important special case of the `splot` command is to map the Z coordinate
+ onto a 2D surface by projecting the plot along the Z axis onto the xy plane.
+ See `set view map`.  This plot mode is useful for contour plots and heat maps.
+ This figure shows contours plotted once with plot style `lines` and once with
+ style `labels`.
+3 PM3D plots
+?PM3D PLOTS
+Ffigure_pm3dsolid
+ 3D surfaces can also be drawn using solid pm3d quadrangles rather than 
+ lines. In this case there is no hidden surface removal, but if the component
+ facets are drawn back-to-front then a similar effect is achieved.
+ See `set pm3d depthorder`. While pm3d surfaces are by default colored using a
+ smooth color palette (see `set palette`), it is also possible to specify a
+ solid color surface or to specify distinct solid colors for the top and bottom
+ surfaces as in the figure shown here.  See `pm3d fillcolor`.
+ Unlike the line-trimming in hidden3d mode, pm3d surfaces can be smoothly
+ clipped to the current zrange.  See `set pm3d clip z`.
+
+2 Fence plots
+?fenceplots
+=zerrorfill
+Ffigure_fenceplot
+ Fence plots combine several 2D plots by aligning their Y coordinates and
+ separating them from each other by a displacement along X. Filling the area
+ between a base value and each plot's series of Z values enhances the visual
+ impact of the alignment on Y and comparison on Z. There are several ways
+ such plots can be created in gnuplot. The simplest is to use the 5 column
+ variant of the `zerrorfill` style. Suppose there are separate curves z = Fi(y)
+ indexed by i. A fence plot is generated by `splot with zerrorfill` using
+ input columns
+      i y z_base z_base Fi(y)
+
+2 isosurface
+?plotting styles isosurface
+?style isosurface
+?with isosurface
+?isosurface
+Ffigure_isosurface
+ This 3D plot style requires a populated voxel grid (see `set vgrid`, `vfill`).
+ Linear interpolation of voxel grid values is used to estimate fractional grid
+ coordinates corresponding to the requested isolevel.  These points are then 
+ used to generate a tesselated surface.  The facets making up the surface are
+ rendered as pm3d polygons, so the surface coloring, transparency, and border
+ properties are controlled by `set pm3d`.  In general the surface is easier to
+ interpret visually if facets are given a thin border that is darker than the
+ fill color.  By default the tesselation uses a mixture of quadrangles and
+ triangles.  To use triangle only, see `set isosurface`.
+ Example:
+      set style fill solid 0.3
+      set pm3d depthorder border lc "blue" lw 0.2
+      splot $helix with isosurface level 10 fc "cyan"
+
+2 Zerrorfill
 ?plotting styles zerrorfill
 ?style zerrorfill
 ?with zerrorfill
@@ -5029,6 +5114,7 @@ Ffigure_yerrorlines
       4 columns:  x  y  z  zdelta
       5 columns:  x  y  z  zlow  zhigh
 
+Ffigure_zerror
  The area between zlow and zhigh is filled and then a line is drawn through the
  z values. By default both the line and the fill area use the same color, but
  you can change this in the splot command.  The fill area properties are also
@@ -5050,73 +5136,6 @@ Ffigure_yerrorlines
       splot for [k=1:5] datafile[k] with zerrorfill lt black fc lt (k+1)
 
  This plot style can also be used to create fence plots. See `fenceplots`.
-
-2 3D plots
-?3D plots
-?plotting styles 3D plots
-=3D
- 3D plots are generated using the command `splot` rather than `plot`.
- Many of the 2D plot styles (points, images, impulse, labels, vectors) can also
- be used in 3D by providing an extra column of data containing z coordinate.
- Some plot types (pm3d coloring, surfaces, contours) must be generated using the
- `splot` command even if only a 2D projection is wanted.
-3 Surface plots
-?surface plots
-=surface
-Ffigure_surface+contours
- The styles `splot with lines` and `splot with surface` both generate a surface
- made from a grid of lines.  Solid surfaces can be generated using the style
- `splot with pm3d`.  Usually the surface is displayed at some convenient viewing
- angle, such that it clearly represents a 3D surface.  See `set view`.
- In this case the X, Y, and Z axes are all visible in the plot.
- The illusion of 3D is enhanced by choosing hidden line removal or depth-sorted
- surface elements.  See `hidden3d` and the `pm3d depthorder` option of `set pm3d`.
- The `splot` command can also calculate and draw contour lines corresponding
- to constant Z values. These contour lines may be drawn onto the surface
- itself, or projected onto the XY plane. See `set contour`.
-Ffigure_mapcontours
-3 2D projection (set view map)
-?2D projection (set view map)
- An important special case of the `splot` command is to map the Z coordinate
- onto a 2D surface by projecting the plot along the Z axis onto the xy plane.
- See `set view map`.  This plot mode is useful for contour plots and heat maps.
- This figure shows contours plotted once with plot style `lines` and once with
- style `labels`.
-#TeX \newpage
-2 Polar plots
-=polar
-Ffigure_polar
- Polar plots are generated by changing the current coordinate system to
- polar before issuing a plot command.  The option `set polar` tells gnuplot to
- interpret input 2D coordinates as <angle>,<radius> rather than <x>,<y>.
- Many, but not all, of the 2D plotting styles work in polar mode.
- The figure shows a combination of plot styles `lines` and `filledcurves`.
- See `set polar`, `set rrange`, `set size square`, `set theta`, `set ttics`.
-2 Bee swarm plots
-?beeswarm
-?bee swarm
-=jitter
-Ffigure_jitter
- "Bee swarm" plots result from applying jitter to separate overlapping points.
- A typical use is to compare the distribution of y values exhibited by two or
- more categories of points, where the category determines the x coordinate.
- See the `set jitter` command for how to control the overlap criteria and the
- displacement pattern used for jittering.  The plots in the figure were created
- by the same plot command but different jitter settings.
-      `plot $data using 1:2:1 lc variable`
-2 Fence plots
-?fenceplots
-=zerrorfill
-Ffigure_fenceplot
- Fence plots combine several 2D plots by aligning their Y coordinates and
- separating them from each other by a displacement along X. Filling the area
- between a base value and each plot's series of Z values enhances the visual
- impact of the alignment on Y and comparison on Z. There are several ways
- such plots can be created in gnuplot. The simplest is to use the 5 column
- variant of the `zerrorfill` style. Suppose there are separate curves z = Fi(y)
- indexed by i. A fence plot is generated by `splot with zerrorfill` using
- input columns
-      i y z_base z_base Fi(y)
 
 1 Commands
 ?commands
@@ -12913,6 +12932,7 @@ Ffigure_multiple_keys
 ?pm3d clipcb
 ?noclipcb
 ?pm3d noclipcb
+?set pm3d clip z
 ?set pm3d clip1in
 ?set pm3d clip4in
  Syntax:
@@ -16452,19 +16472,6 @@ Ffigure_walls
 2 known limitations
  It is not possible to use inline data (e.g. plot '-' ...) inside the curly
  brackets of a `do` or `while` loop.
-
-=gamma
-=bessel
-=timefmt
-=nohidden3d
-
- The gamma and bessel functions do not support complex arguments.
-
- Coordinates specified as "time" wrap at 24 hours.
-
- Parametric curves: The 'nohidden3d' option to exempt individual plots from the
- global setting 'set hidden3d' does not work for parametric curves.
- Iteration inside a `plot` command does not work for parametric curves.
 
  X11 terminal: It is difficult to select UTF-8 fonts.
  Only one color palette at a time is active for any given x11 plot window.

@@ -243,8 +243,8 @@ plot $HEATMAP matrix with image
 # ==============
 #
 reset
-set view 75, 33, 1.0, 0.82
 set view 69, 200, 1.18, 0.82
+set view 69, 200, 1.18, 1.00
 set bmargin at screen 0.3
 unset key
 set samples 20, 20
@@ -661,26 +661,68 @@ set label 1 font ",10"
 set key font ",9" spacing 0.5
 load demo . 'custom_key.dem'
 reset
-#
-# zerrorfill demo with walls to give added depth
-set output out . 'figure_walls' . ext
+
+# zerrorfill demo
+set output out . 'figure_zerror' . ext
 set view 60, 30, 1., 1.5
 set yrange [0.5:5.5]
 set zrange [1:*]
 set log z
 set border 127
+set pm3d depth base
+set xyplane at 1
+set style fill solid 0.5
+set key opaque box
+
+splot for [k=1:5] 'silver.dat' using 1:(k):2:3 with zerror lt black fc lt k title "k = ".k
+
+reset
+
+# pm3d plot with solid fill
+set output out . 'figure_pm3dsolid' . ext
+set border 4095 lw 2
+unset key
+unset colorbox
+set view 65, 34, 1.10, 1.1
+set samples 40, 40
+set isosamples 40, 40
+set xyplane 0
+set pm3d depthorder border linewidth 0.100
+set pm3d clip z 
+set pm3d lighting primary 0.5 specular 0.2 spec2 0.4
+
+set style line 101 lc "gold"
+set style line 102 lc "cyan"
+
+set xrange [-1 : 5]
+set yrange [-3 : 3]
+set zrange [-10 : 10]
+set xtics 2 offset 0,-0.5
+set ytics 2 offset 0,-0.5
+set ztics 5
+
+f(x,y) = x**2 + y**2 * (1 - x)**3
+
+set title "splot with pm3d, solid fillcolor" offset 0,1
+splot f(x,y) with pm3d fc ls 101
+
+# add walls to give added depth
+set output out . 'figure_walls' . ext
 
 set wall x0
 set wall y1
 set wall z0
 set xyplane 0
-unset key
+#set border 31 front
+unset title
+set pm3d interp 2,2 noborder
+set style fill solid 1.0
+splot f(x,y) with pm3d
 
-splot for [k=1:5] 'silver.dat' using 1:(k):2:3 with zerror lt black fc lt k title "k = ".k
+replot
 reset
 
 # Fence plot
-reset
 set output out . 'figure_fenceplot' . ext
 set title "fence plot constructed with zerrorfill" 
 unset key
