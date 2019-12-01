@@ -11744,8 +11744,9 @@ Ffigure_multiple_keys
  1 point of the quadrangle must lie in the x and y ranges.  `clip4in`: all 4
  points of each quadrangle must lie in the x and y ranges.
 
- `clipcb` (default): palette color values < cmbin are clipped to cbmin.
- `noclipcb`: quadrangles with palette color value < cbmin are not drawn at all.
+ `clipcb` (default): palette color values are clipped to cbmin and cbmax.
+ `noclipcb`: quadrangles with palette color value outside of the current cbrange
+ are not drawn at all.
 
 4 color_assignment
 ?pm3d color_assignment
@@ -11853,11 +11854,8 @@ Ffigure_multiple_keys
 ?set pm3d map
 ?pm3d map
 ?map
- There used to be an option {transparent|solid} to this command.  Now
- you get the same effect from `set grid {front|layerdefault}`, respectively.
-
- The old command `set pm3d map` is equivalent to `set pm3d at b;
- set view map scale 1.0; set style data pm3d; set style func pm3d;`
+ The deprecated command `set pm3d map` is equivalent to
+ `set pm3d at b; set view map; set style data pm3d; set style func pm3d;`
 3 palette
 ?commands set palette
 ?commands show palette
