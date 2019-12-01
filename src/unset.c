@@ -226,7 +226,6 @@ unset_command()
 	break;
     case S_DEBUG:
 	debug = 0;
-	c_token++;
 	break;
     case S_DUMMY:
 	unset_dummy();
