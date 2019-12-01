@@ -1,3 +1,8 @@
+2019-12-01  Release 5.2.8
+2019-05-29  Release 5.2.7
+
+	For changes since 2019-04-25 please see git log.
+
 2019-04-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/boundary.c: Revise space allocated for ylabel

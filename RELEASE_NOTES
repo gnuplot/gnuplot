@@ -8,7 +8,7 @@ development version.
 Please see the ChangeLog file for a complete list of changes made during the
 course of development from 5.0 to 5.2.
 
-Release Notes date: 17-Nov-2019
+Release Notes date: 27-Nov-2019
 
 Changes in 5.2.8
 ================
@@ -24,7 +24,6 @@ Changes in 5.2.8
 * FIX extent of boxplot whiskers could be off by one point (Bug #2106)
 * FIX mix unbounded iteration and functions in a single plot command (Bug #2201)
 * FIX reverse history search with readline=builtin (Bug #2209)
-* FIX "set pm3d noclipcb" failed to check both cbmin and cbmax
 * FIX qt: suppress off-by-one ysize (Bug #1759)
 * FIX cairo: suppress off-by-one ysize (Bug #1759)
 * FIX gd: apply alpha to brushstroke lines (Bug #2117)
