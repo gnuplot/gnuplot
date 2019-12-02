@@ -103,7 +103,7 @@ New features, changes and fixes in gnuplot version 5.2 (initial release)
 * NEW    windows terminal has experimental Direct2D driver
 * NEW    wxt supports saving graph as EMF on Windows
 * NEW    wxt supports printing on Windows
-* NEW    dumb suports ANSI colors and filled polygons
+* NEW    dumb supports ANSI colors and filled polygons
 * NEW Optional sampling interval in range specifier for pseudofile '+'
 * NEW gnuplot on Windows
 *        converts Unicode (BMP) input to current `set encoding`, including UTF-8
@@ -187,7 +187,7 @@ Changes in 5.0.rc2
 New features, changes and fixes in gnuplot version 5.0
 ======================================================
 
-* NEW The dashtype property on any line can be seperately controlled
+* NEW The dashtype property on any line can be separately controlled
 * NEW custom dashtypes
 * NEW LFS support for datafiles
 * NEW timecolumn(col,"timeformat') now requires 2nd parameter, the format
@@ -602,7 +602,7 @@ Time-organized list of news until gnuplot 4.0:
 [3.8g]
 * CHANGE set label with any line type (colour), point type and point size
 * CHANGE use either two or five minitic steps, never 4 (in logscale)
-* CHANGE reject candlesticks/financebars plots of to few colums --- warn
+* CHANGE reject candlesticks/financebars plots of to few columns --- warn
   and then plot with "points", instead
 * NEW Hotkeys to access clipboard in MS Windows version
 * NEW set style [data | function] filledcurves {options}
@@ -614,7 +614,7 @@ Time-organized list of news until gnuplot 4.0:
 * FIXED PostScript font reencoding for non-default fonts
 * FIXED dgrid for logscaled axes
 * FIXED tic generation for axes that have |min/max| very close to 1
-* FIXED several "impossible" parse erros in "show" command.
+* FIXED several "impossible" parse errors in "show" command.
 * FIXED bounding box of PSLatex generated .eps files
 * (attempted) FIX: X11 deadlocks caused by stdio buffering vs. select()
 * FIXED baseline of "histeps" plots with logscaled or shifted y axis.
@@ -844,7 +844,7 @@ CGM terminal mods:
 [3.7.0.6]
 * Petr Mikulik's OS/2 mouse patch integrated
 * 'make check' now runs demos non-interactively
-* Linux SVGA driver: don't drop root priviledge until VGA is initialised
+* Linux SVGA driver: don't drop root privilege until VGA is initialised
 * LaTeX tutorial updated for LaTeX2e
 * gnuplot-mode updated to 0.5e
 * old patches for postscript driver integrated:

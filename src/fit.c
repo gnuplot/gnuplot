@@ -1780,7 +1780,7 @@ fit_command()
 	err_cols[iz] = TRUE;
 	c_token++;
     } else if (almost_equals(c_token, "xyerr$ors")) {
-	/* convienience alias, x:z:sx:sz (or x:y:sx:sy) */
+	/* convenience alias, x:z:sx:sz (or x:y:sx:sy) */
 	if ((columns != 0) && (columns != 4))
 	    Eexc(c_token, "xyerror requires exactly 4 columns");
 	num_indep = 1;

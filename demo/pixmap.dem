@@ -1,5 +1,5 @@
 #
-# Demonstrate use of 'set pixmap' to provide a slide backgroun,
+# Demonstrate use of 'set pixmap' to provide a slide background,
 # a project logo, and a plot element
 #
 set pixmap 1 'gradient.png' at screen 0,0 size screen 1,1 behind

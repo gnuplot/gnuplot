@@ -74,8 +74,8 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
-pgf.REVISION = "111"
-pgf.REVISION_DATE = "2019/07/24 18:53:00"
+pgf.REVISION = "112"
+pgf.REVISION_DATE = "2019/12/01 10:22:00"
 
 pgf.styles = {}
 
@@ -774,7 +774,7 @@ f:write([[
 }
 
 %
-% gnuplottex comapatibility
+% gnuplottex compatibility
 % (see http://www.ctan.org/tex-archive/help/Catalogue/entries/gnuplottex.html)
 %
 
@@ -1100,7 +1100,7 @@ pgf.print_help = function(fwrite)
  sign ('#'). E.g. '#ff0000' specifies pure red. If omitted the
  background is transparent.
 
- The 'size' option expects two lenghts <x> and <y> as the canvas
+ The 'size' option expects two lengths <x> and <y> as the canvas
  size. The default size of the canvas is ]]..pgf.DEFAULT_CANVAS_SIZE_X..[[cm x ]]..pgf.DEFAULT_CANVAS_SIZE_Y..[[cm.
 
  The 'scale' option works similar to the 'size' option but expects
@@ -1171,7 +1171,7 @@ pgf.print_help = function(fwrite)
  images are externalized.
 
  The 'providevars' options makes gnuplot's internal and user variables
- available by using the '\gpgetvar{<var name>}' commmand within the TeX
+ available by using the '\gpgetvar{<var name>}' command within the TeX
  script. Use gnuplot's 'show variables all' command to see the list
  of valid variables.
 
@@ -1476,7 +1476,7 @@ gfx.adjust_plotbox = function()
       gfx.scalex = gfx.scalex*gfx.opt.plotsize_x * pgf.DEFAULT_RESOLUTION/(t.xright - t.xleft)
       gfx.scaley = gfx.scaley*gfx.opt.plotsize_y * pgf.DEFAULT_RESOLUTION/(t.ytop - t.ybot)
     else
-      -- could not determin a valid bounding box, so keep using the
+      -- could not determine a valid bounding box, so keep using the
       -- plotsize as the canvas size
       gp.term_out("WARNING: PGF/TikZ Terminal: `plotsize' option used, but I could not determin the plot area!\n")
     end
@@ -1927,7 +1927,7 @@ term.options = function(opt_str, initial, t_count)
       -- produce full tex document
       gfx.opt.full_doc = true
     elseif almost_equals(o_next, "create$style") then
-      -- creates the coresponding LaTeX style from the script
+      -- creates the corresponding LaTeX style from the script
       pgf.create_style()
     elseif almost_equals(o_next, "backg$round") then
       -- set background color
@@ -2383,7 +2383,7 @@ term.filled_polygon = function(style, fillpar, t)
       color = 'gpbgfillcolor'
       saturation = 100
       opacity = 100
-  elseif style == 'DEFAULT' or style == 'OPAQUE' then -- FIXME: not shure about the opaque style
+  elseif style == 'DEFAULT' or style == 'OPAQUE' then -- FIXME: not sure about the opaque style
       pattern = ''
       color = gfx.color
       saturation = 100

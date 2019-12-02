@@ -357,7 +357,7 @@ multiplot_start()
 		    mp_layout.tmargin.scalex = mp_layout.bmargin.scalex;
 		    mp_layout_set_margin_or_spacing(&(mp_layout.tmargin));
 		} else {
-		    int_error(c_token, "expection <top>");
+		    int_error(c_token, "expecting <top>");
 		}
 		set_margins = TRUE;
 		break;

@@ -210,7 +210,7 @@ datablock_size(struct value *datablock_value)
     return nlines;
 }
 
-/* resize or allocate a datablock; allocate memory in chuncks */
+/* resize or allocate a datablock; allocate memory in chunks */
 static int
 enlarge_datablock(struct value *datablock_value, int extra)
 {

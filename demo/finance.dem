@@ -106,7 +106,7 @@ plot 'finance.dat' using 0:2:3:4:5 notitle with financebars lt 8, \
 'finance.dat' using 0:11 notitle with lines lt 2
 
 
-pause -1 "Overlay an indicator on a seperate scale"
+pause -1 "Overlay an indicator on a separate scale"
 
 reset
 set title "Overlay an indicator on a separate scale"
@@ -142,7 +142,7 @@ plot 'finance.dat' using 0:2:3:4:5 notitle with financebars lt 8, \
 'finance.dat' using 0:11 notitle with lines lt 2, \
 'finance.dat' using 0:8 axes x1y2 notitle with lines lt 4
 
-pause -1 "Add volume in a seperate clip"
+pause -1 "Add volume in a separate clip"
 
 reset
 set label "Courtesy of Bollinger Capital" at graph 0.01, 0.07

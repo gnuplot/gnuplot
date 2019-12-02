@@ -174,7 +174,7 @@ unset_command()
 
     found_token = lookup_table(&set_tbl[0],c_token);
 
-    /* HBB 20000506: rationalize occurences of c_token++ ... */
+    /* HBB 20000506: rationalize occurrences of c_token++ ... */
     if (found_token != S_INVALID)
 	c_token++;
 
@@ -1543,7 +1543,7 @@ static void
 unset_samples()
 {
     /* HBB 20000506: unlike unset_isosamples(), this one *has* to
-     * clear 2D data structues! */
+     * clear 2D data structures! */
     cp_free(first_plot);
     first_plot = NULL;
 
@@ -1685,7 +1685,7 @@ unset_table()
 }
 
 
-/* process 'unset terminal' comamnd */
+/* process 'unset terminal' command */
 /* Aug 2012:  restore original terminal type */
 static void
 unset_terminal()

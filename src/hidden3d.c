@@ -109,7 +109,7 @@
 
 /* If the two triangles in a quad are both drawn, and they show
  * different sides to the user (the quad is 'bent over'), then it's
- * preferrable to force the diagonal being visible to avoid other
+ * preferable to force the diagonal being visible to avoid other
  * parts of the scene being obscured by a line the user can't
  * see. This avoids unnecessary user surprises. */
 #ifndef HANDLE_BENTOVER_QUADRANGLES
@@ -203,7 +203,7 @@ typedef enum polygon_direction {
 /* Three dynamical arrays that describe what we have to plot: */
 static dynarray vertices, edges, polygons;
 
-/* convenience #defines to make the generic vector useable as typed arrays */
+/* convenience #defines to make the generic vector usable as typed arrays */
 #define vlist ((p_vertex) vertices.v)
 #define plist ((p_polygon) polygons.v)
 #define elist ((p_edge) edges.v)
@@ -898,13 +898,13 @@ color_edges(
 	    if (((new_edge == old_edge)
 		 && hiddenHandleBentoverQuadrangles) /* a diagonal edge! */
 		|| (elist[old_edge].style != LT_NODRAW)) {
-		/* conflict has occured: two polygons meet here, with opposige
+		/* conflict has occurred: two polygons meet here, with opposige
 		 * sides being shown. What's to do?
 		 * 1) find a vertex of one polygon outside this common
 		 * edge
-		 * 2) check wether it's in front of or behind the
+		 * 2) check whether it's in front of or behind the
 		 * other polygon's plane
-		 * 3) if in front, color the edge accoring to the
+		 * 3) if in front, color the edge according to the
 		 * vertex' polygon, otherwise, color like the other
 		 * polygon */
 		long int vnum1 = elist[old_edge].v1;
@@ -1037,7 +1037,7 @@ build_networks(struct surface_points *plots, int pcount)
 	    return;
 	}
 
-	/* To avoid possibly suprising error messages, several 2d-only
+	/* To avoid possibly surprising error messages, several 2d-only
 	 * plot styles are mapped to others, that are genuinely
 	 * available in 3d. */
 	switch (this_plot->plot_style) {

@@ -26,7 +26,7 @@ pause -1 "Hit return to continue"
 reset
 
 #
-# Image surfaces are similiarly overlooked in the calculation of hidden line removal.
+# Image surfaces are similarly overlooked in the calculation of hidden line removal.
 # I.e. this demo doesn't actually work yet.  It's here for testing.
 #
 set isosamples 25,25

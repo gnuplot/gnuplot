@@ -748,7 +748,7 @@ make_tics(struct axis *this_axis, int guide)
 
 /* {{{ quantize_duodecimal_tics */
 /* HBB 20020220: New function, to be used to properly tic axes with a
- * duodecimal reference, as used in times (60 seconds, 60 minuts, 24
+ * duodecimal reference, as used in times (60 seconds, 60 minutes, 24
  * hours, 12 months). Derived from quantize_normal_tics(). The default
  * guide is assumed to be 12, here, not 20 */
 static double
@@ -1729,7 +1729,7 @@ load_one_range(struct axis *this_axis, double *a, t_autoscale *autoscale, t_auto
 	    include the '<' as a comparison operator in the expression.
 	    Setting scanning_range_in_progress will stop the parser from
 	    trying to build an action table if he finds '<' followed by '*'
-	    (which would normaly trigger a 'invalid expression'),  */
+	    (which would normally trigger a 'invalid expression'),  */
 	scanning_range_in_progress = TRUE;
 	number = get_num_or_time(this_axis);
 	scanning_range_in_progress = FALSE;
@@ -1810,7 +1810,7 @@ load_one_range(struct axis *this_axis, double *a, t_autoscale *autoscale, t_auto
 	}
     }
 
-    /*  Consitency check  */
+    /*  Consistency check  */
     if (*autoscale & which) {
 	if (which==AUTOSCALE_MIN && this_axis->min_constraint==CONSTRAINT_BOTH) {
 	    if (this_axis->min_ub < this_axis->min_lb ) {

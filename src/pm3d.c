@@ -527,7 +527,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 	   which will be plotted (INRANGE). Then set interp_i,j so that number of points
 	   will be a bit larger than |interp_i,j|.
 	   If (interp_i,j==0) => set this number of points according to DEFAULT_OPTIMAL_NB_POINTS.
-	   Ideally this should be comparable to the resulution of the output device, which
+	   Ideally this should be comparable to the resolution of the output device, which
 	   can hardly by done at this high level instead of the driver level.
    	*/
 	#define DEFAULT_OPTIMAL_NB_POINTS 200
@@ -560,7 +560,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 #if 0
 	fprintf(stderr, "pm3d.interp_i=%i\t pm3d.interp_j=%i\n", pm3d.interp_i, pm3d.interp_j);
 	fprintf(stderr, "INRANGE: max_scans=%i  max_scan_pts=%i\n", max_scans, max_scan_pts);
-	fprintf(stderr, "seting interp_i=%i\t interp_j=%i => there will be %i and %i points\n",
+	fprintf(stderr, "setting interp_i=%i\t interp_j=%i => there will be %i and %i points\n",
 		interp_i, interp_j, interp_i*max_scan_pts, interp_j*max_scans);
 #endif
     }
@@ -662,7 +662,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 	else {
 	    max_pts = GPMAX(scanA->p_count, scanB->p_count);
 	    go_over_pts = max_pts - 1;
-	    /* the j-subrange of quadrangles; in the remaing of the interval
+	    /* the j-subrange of quadrangles; in the remainder of the interval
 	     * [0..up_to] the flushing triangles are to be drawn */
 	    ftriangles_low_pt = from;
 	    ftriangles_high_pt = from + up_to_minus;

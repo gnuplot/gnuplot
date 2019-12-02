@@ -2128,7 +2128,7 @@ eval_plots()
 		free_at(table_filter_at);
 		table_filter_at = NULL;
 
-		/* Mechanism for defered evaluation of plot title */
+		/* Mechanism for deferred evaluation of plot title */
 		free_at(df_plot_title_at);
 
 		/* up to MAXDATACOLS cols */
@@ -3351,7 +3351,7 @@ eval_plots()
 		    this_plot->p_count = i;     /* samples_1 */
 		}
 
-		/* skip all modifers func / whole of data plots */
+		/* skip all modifiers func / whole of data plots */
 		c_token = this_plot->token;
 
 		/* used below */
@@ -3538,7 +3538,7 @@ eval_plots()
 
 /*
  * The hardest part of this routine is collapsing the FUNC plot types in the
- * list (which are garanteed to occur in (x,y) pairs while preserving the
+ * list (which are guaranteed to occur in (x,y) pairs while preserving the
  * non-FUNC type plots intact.  This means we have to work our way through
  * various lists.  Examples (hand checked): start_plot:F1->F2->NULL ==>
  * F2->NULL start_plot:F1->F2->F3->F4->F5->F6->NULL ==> F2->F4->F6->NULL
@@ -3593,7 +3593,7 @@ parametric_fixup(struct curve_points *start_plot, int *plot_num)
 		    double r = yp->points[i].y;
 		    double t = xp->points[i].y;
 		    /* Convert from polar to cartesian coordinate and check ranges */
-		    /* Note: The old in-line conversion checked R_AXIS.max agains fabs(r).
+		    /* Note: The old in-line conversion checked R_AXIS.max against fabs(r).
 		     * That's not what polar_to_xy() is currently doing.
 		     */
 		    if (polar_to_xy(t, r, &x, &y, TRUE) == OUTRANGE)

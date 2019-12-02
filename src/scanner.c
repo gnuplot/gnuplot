@@ -204,7 +204,7 @@ scanner(char **expressionp, size_t *expressionlenp)
 	    switch (expression[current]) {
 	    case '#':
 #ifdef OLD_STYLE_CALL_ARGS
-		/* FIXME: This ugly exception handles the old-style syntatic  */
+		/* FIXME: This ugly exception handles the old-style syntactic */
 		/* entity $# (number of arguments in "call" statement), which */
 		/* otherwise would be treated as introducing a comment.       */
 		if ((t_num == 0) ||

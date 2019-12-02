@@ -68,7 +68,7 @@ gp_alloc(size_t size, const char *message)
 
 /*
  * note gp_realloc assumes that failed realloc calls leave the original mem
- * block allocated. If this is not the case with any C compiler, a substitue
+ * block allocated. If this is not the case with any C compiler, a substitute
  * realloc function has to be used.
  */
 

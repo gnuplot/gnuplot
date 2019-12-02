@@ -112,7 +112,7 @@ fsign(double x)
      (QR-decomposition). Direct implementation of the algorithm
      presented in H.R.Schwarz: Numerische Mathematik, Equation 7.33
 
-     If 'd == NULL', d is not accesed: the routine just computes the QR
+     If 'd == NULL', d is not accessed: the routine just computes the QR
      decomposition of C and exits.
 
 *****************************************************************/

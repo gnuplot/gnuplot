@@ -4,7 +4,7 @@ exec wish "$0" "$@"
 
 # gpdemos.tcl --
 #
-# Demostration of gnuplot demos under Tcl/Tk.  Adapted from orignal
+# Demonstration of gnuplot demos under Tcl/Tk.  Adapted from original
 # demo by D.M.Burns and image demo from Tcl/Tk.  To run under unix:
 # 
 #    unix> wish gpdemos.tcl

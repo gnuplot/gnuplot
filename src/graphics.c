@@ -2940,7 +2940,7 @@ plot_parallel(struct curve_points *plot)
     struct curve_points *thisplot;
 
     /* The parallel axis data is stored in successive plot structures. */
-    /* We will draw it all at once when we see the first one and igore the rest. */
+    /* We will draw it all at once when we see the first one and ignore the rest. */
     if (plot->p_axis != 1)
 	return;
 

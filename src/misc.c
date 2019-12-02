@@ -885,7 +885,7 @@ parse_dashtype(struct t_dashtype *dt)
 
 /*
  * destination_class tells us whether we are filling in a line style ('set style line'),
- * a persistant linetype ('set linetype') or an ad hoc set of properties for a single
+ * a persistent linetype ('set linetype') or an ad hoc set of properties for a single
  * use ('plot ... lc foo lw baz').
  * allow_point controls whether we accept a point attribute in this lp_style.
  */
@@ -914,7 +914,7 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
 
     while (!END_OF_COMMAND) {
 
-	/* This special case is to flag an attemp to "set object N lt <lt>",
+	/* This special case is to flag an attempt to "set object N lt <lt>",
 	 * which would otherwise be accepted but ignored, leading to confusion
 	 * FIXME:  Couldn't this be handled at a higher level?
 	 */
@@ -1448,7 +1448,7 @@ arrow_use_properties(struct arrow_style_type *arrow, int tag)
     if (!this || this->tag != tag)
 	int_warn(NO_CARET,"arrowstyle %d not found", tag);
 
-    /* Restore orginal color if the style doesn't specify one */
+    /* Restore original color if the style doesn't specify one */
     if (arrow->lp_properties.pm3d_color.type == TC_DEFAULT)
 	arrow->lp_properties.pm3d_color = save_colorspec;
 }

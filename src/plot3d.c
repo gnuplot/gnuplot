@@ -1400,7 +1400,7 @@ get_3ddata(struct surface_points *this_plot)
 }
 
 /* HBB 20000501: code isolated from eval_3dplots(), where practically
- * identical code occured twice, for direct and crossing isolines,
+ * identical code occurred twice, for direct and crossing isolines,
  * respectively.  The latter only are done for in non-hidden3d
  * mode. */
 static void
@@ -2734,7 +2734,7 @@ eval_3dplots()
 
 /*
  * The hardest part of this routine is collapsing the FUNC plot types in the
- * list (which are gauranteed to occur in (x,y,z) triplets while preserving
+ * list (which are guaranteed to occur in (x,y,z) triplets while preserving
  * the non-FUNC type plots intact.  This means we have to work our way
  * through various lists.  Examples (hand checked):
  * start_plot:F1->F2->F3->NULL ==> F3->NULL

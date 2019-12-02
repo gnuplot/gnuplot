@@ -68,7 +68,7 @@ BoundingBox canvas;
 /* The bounding box against which clipping is to be done */
 BoundingBox *clip_area = &plot_bounds;
 
-/* 'set size', 'set origin' setttings */
+/* 'set size', 'set origin' settings */
 float xsize = 1.0;		/* scale factor for size */
 float ysize = 1.0;		/* scale factor for size */
 float zsize = 1.0;		/* scale factor for size */
@@ -83,9 +83,9 @@ int aspect_ratio_3D = 0;	/* 2 will put x and y on same scale, 3 for z also */
 t_position lmargin = DEFAULT_MARGIN_POSITION;
 /* space between bottom and plot_bounds.ybot in chars (-1: computed) */
 t_position bmargin = DEFAULT_MARGIN_POSITION;
-/* space between right egde and plot_bounds.xright in chars (-1: computed) */
+/* space between right edge and plot_bounds.xright in chars (-1: computed) */
 t_position rmargin = DEFAULT_MARGIN_POSITION;
-/* space between top egde and plot_bounds.ytop in chars (-1: computed) */
+/* space between top edge and plot_bounds.ytop in chars (-1: computed) */
 t_position tmargin = DEFAULT_MARGIN_POSITION;
 
 /* Pointer to first 'set dashtype' definition in linked list */

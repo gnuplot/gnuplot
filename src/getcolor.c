@@ -108,12 +108,12 @@ palettes_differ(t_sm_palette *p1, t_sm_palette *p2)
 
 /*  This one takes the gradient defined in sm_palette.gradient and
  *  returns an interpolated color for the given gray value.  It
- *  does not matter wether RGB or HSV or whatever values are stored
+ *  does not matter whether RGB or HSV or whatever values are stored
  *  in sm_palette.gradient[i].col, they will simply be interpolated.
- *  Return 0 on sucess, 1 if gray outside the range covered by the
+ *  Return 0 on success, 1 if gray outside the range covered by the
  *  gradient.  No gamma correction is done.  The user can implement
  *  gamma correction specifying more points.
- *  sm_palette.gradient[] should be sorted acording to .pos.
+ *  sm_palette.gradient[] should be sorted according to .pos.
  *  Returns 1 on failure and fills color with "nearest" color.
  */
 static int
@@ -456,7 +456,7 @@ is_extremum(rgb_color left, rgb_color mid, rgb_color right)
  *  This function takes a palette and constructs a gradient which can
  *  be used to approximate the palette by linear interpolation.
  *  The palette is sampled at samples+1 points equally spaced in [0,1].
- *  From this huge gradient a much smaler one is constructed by selecting
+ *  From this huge gradient a much smaller one is constructed by selecting
  *  just those sampling points which still do approximate the full sampled
  *  one well enough.  allowed_deviation determines the maximum deviation
  *  of all color components which is still acceptable for the reduced

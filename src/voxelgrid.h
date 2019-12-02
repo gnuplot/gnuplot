@@ -25,7 +25,7 @@ typedef struct vgrid {
 } vgrid;
 
 typedef struct isosurface_opt{
-    int tesselation;	/* 0 = mixed  1 = triangles only */
+    int tessellation;	/* 0 = mixed  1 = triangles only */
     int inside_offset;	/* difference between front/back linetypes */
 } isosurface_opt;
 

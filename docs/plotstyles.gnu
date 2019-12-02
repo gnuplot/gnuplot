@@ -442,7 +442,7 @@ plot '++' using 1:2:($2*0.4):(-$1*0.4) with vectors as 1
 # Missing Datapoints
 # ==================
 # (This is not an actual demonstration of the effect, just produces a lookalike)
-# The pdf version of this is supplied seperately to better fit with the LaTeX document.
+# The pdf version of this is supplied separately to better fit with the LaTeX document.
 #
 reset
 

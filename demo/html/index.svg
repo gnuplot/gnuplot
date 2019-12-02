@@ -106,7 +106,7 @@ on mouse-coordinate tracking.
     <h4>Volume plots (new!)</h4>
     <ul>
     <li><a href="voxel.html">voxel-dependent coloring</a></li>
-    <li><a href="vplot.html">3D representaion of voxels</a></li>
+    <li><a href="vplot.html">3D representation of voxels</a></li>
     <li><a href="isosurface.html">3D isosurface</a></li>
     </ul>
 

@@ -277,7 +277,7 @@ list_free()
  * writes a menu of all subtopics of the topic located at l
  * format must contain %s for the title of the subtopic and may contain
  * a %d for the line number of the subtopic (used by doc2html and doc2rtf
- * The whole menu is preceeded by start and gets the trailer end
+ * The whole menu is preceded by start and gets the trailer end
  */
 void
 refs( int l, FILE *f, char *start, char *end, char *format)
@@ -294,7 +294,7 @@ refs( int l, FILE *f, char *start, char *end, char *format)
     list = list->next;		/* look at next element before going on */
 
     if ((start != NULL) && (list != NULL) && (list->level > curlevel)) {
-	/* don't write start if there's no menue at all */
+	/* don't write start if there's no menu at all */
 	inlist = TRUE;
 	fprintf(f, "%s", start);
     }

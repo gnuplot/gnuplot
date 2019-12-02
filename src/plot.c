@@ -169,7 +169,7 @@ TBOOLEAN CallFromRexx = FALSE;
 static RETSIGTYPE
 inter(int anint)
 {
-    (void) anint;		/* aovid -Wunused warning */
+    (void) anint;		/* avoid -Wunused warning */
     (void) signal(SIGINT, (sigfunc) inter);
     (void) signal(SIGFPE, SIG_DFL);	/* turn off FPE trapping */
 
@@ -555,7 +555,7 @@ main(int argc_orig, char **argv)
 	    /*
 	     * It is safe to ignore the return values of 'atexit()' and
 	     * 'on_exit()'. In the worst case, there is no history of your
-	     * currrent session and you have to type all again in your next
+	     * current session and you have to type all again in your next
 	     * session.
 	     */
 	    gp_atexit(wrapper_for_write_history);

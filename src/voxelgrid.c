@@ -134,7 +134,7 @@ init_voxelsupport()
 
     /* default state of other voxel-related structures */
     isosurface_options.inside_offset = 1;	/* inside color = outside + 1 */
-    isosurface_options.tesselation = 0;		/* mixed triangles + quadrangles */
+    isosurface_options.tessellation = 0;		/* mixed triangles + quadrangles */
 }
 
 /*
@@ -449,10 +449,10 @@ set_isosurface()
 	c_token++;
 	if (almost_equals(c_token, "triang$les")) {
 	    c_token++;
-	    isosurface_options.tesselation = 1;
+	    isosurface_options.tessellation = 1;
 	} else if (almost_equals(c_token, "mix$ed")) {
 	    c_token++;
-	    isosurface_options.tesselation = 0;
+	    isosurface_options.tessellation = 0;
 	} else if (almost_equals(c_token, "inside$color")) {
 	    c_token++;
 	    if (END_OF_COMMAND)
@@ -472,7 +472,7 @@ show_isosurface()
 {
     c_token++;
     fprintf(stderr,"\tisosurfaces will use %s\n",
-	isosurface_options.tesselation != 0 ? "triangles only"
+	isosurface_options.tessellation != 0 ? "triangles only"
 	: "a mixture of triangles and quadrangles");
     fprintf(stderr,"\tinside surface linetype offset by %d\n",
 	isosurface_options.inside_offset);

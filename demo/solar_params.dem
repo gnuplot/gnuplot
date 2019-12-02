@@ -1,5 +1,5 @@
 #
-# Calculate solar position in equitorial coordinates (ascension, declination)
+# Calculate solar position in equatorial coordinates (ascension, declination)
 # then convert to horizontal coordinates (altitude, azimuth).
 # Parameters L, g, lambda, and eps are appoximated using values chosen
 # for accuracy in the era on either side of Jan 2000.

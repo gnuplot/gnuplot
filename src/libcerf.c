@@ -1,6 +1,6 @@
 /*
  * Complex error function (cerf) and related special functions from libcerf.
- * libcerf itself uses the C99 _Complex mechanism for decribing complex
+ * libcerf itself uses the C99 _Complex mechanism for describing complex
  * numbers.  This set of wrapper routines converts back and forth from 
  * gnuplot's own representation of complex numbers.
  * Ethan A Merritt - July 2013

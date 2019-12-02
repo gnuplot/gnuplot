@@ -1,5 +1,5 @@
 #
-# Use an array to hold the sum of values in each column
+# Use an array to hold the sum of values in each columnn
 #
 array Sum[20]
 do for [i=5:13] { 
@@ -8,7 +8,7 @@ do for [i=5:13] {
   print sprintf("Sum[%2d] = %d",i,Sum[i])
 }
 #
-# Use the stored sum to normalize values in each colum
+# Use the stored sum to normalize values in each column
 #
 set style fill transparent solid 0.2 border -1
 set style data filledcurve y=0

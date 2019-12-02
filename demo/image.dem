@@ -12,7 +12,7 @@
 
 print ""
 print "The plotting styles \`image\` and \`rgbimage\` are intended for plotting"
-print "images described in a data file either in the convential ASCII format or"
+print "images described in a data file either in the conventional ASCII format or"
 print "in a binary format described by the qualifiers \`binary\` and \`using\`."
 print "All pixels have an (x,y) or (x,y,z) coordinate.  These values can be"
 print "included in the data file or implicitly determined with the sampling"

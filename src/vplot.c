@@ -79,14 +79,14 @@
 
 #ifdef VOXEL_GRID_SUPPORT
 
-/*            Data structures for tesselation
+/*            Data structures for tessellation
  *            ===============================
- * We offer a choice of two tesselation tables.
+ * We offer a choice of two tessellation tables.
  * One is Heller's table originally derived for use with marching cubes.
  * It contains triangles only.
  * The other contains a mix of quadrangles and triangles.
  * Near a complicated fold in the surface the quadrangles are an imperfect
- * approximation of the triangular tesselation.  However for most smooth
+ * approximation of the triangular tessellation.  However for most smooth
  * surfaces the reduced number of facets from using quadrangles makes the
  * pm3d rendering look cleaner.
  */
@@ -104,7 +104,7 @@ static t_voxel cornervalue[8];
 
 /* local prototypes */
 static void vertex_interp( int edge_no, int start, int end, t_voxel isolevel );
-static void tesselate_one_cube( struct surface_points *plot,
+static void tessellate_one_cube( struct surface_points *plot,
 					int ix, int iy, int iz );
 
 /*
@@ -210,7 +210,7 @@ vplot_isosurface (struct surface_points *plot, int downsample)
     for (i = 0; i < N - downsample; i += downsample) {
 	for (j = 0; j < N - downsample; j += downsample) {
 	    for (k = 0; k < N - downsample; k += downsample) {
-		tesselate_one_cube( plot, i, j, k );
+		tessellate_one_cube( plot, i, j, k );
 	    }
 	}
     }
@@ -218,14 +218,14 @@ vplot_isosurface (struct surface_points *plot, int downsample)
 
 
 /*
- * tesselation algorithm applied to a single voxel.
+ * tessellation algorithm applied to a single voxel.
  * ix, iy, iz are the indices of the corner nearest [xmin, ymin, zmin].
  * We will work in index space and convert back to actual graph coordinates
  * when we have found the triangles (if any) that result from intersections
  * of the isosurface with this voxel.
  */
 static void
-tesselate_one_cube( struct surface_points *plot, int ix, int iy, int iz )
+tessellate_one_cube( struct surface_points *plot, int ix, int iy, int iz )
 {
     struct vgrid *vgrid = plot->vgrid;
     t_voxel isolevel = plot->iso_level;
@@ -291,7 +291,7 @@ tesselate_one_cube( struct surface_points *plot, int ix, int iy, int iz )
 	    vgrid->vzmin + ((double)iz + intersection[iedge][2]) * vgrid->vzdelta;
     }
 
-    if (isosurface_options.tesselation == 0) {
+    if (isosurface_options.tessellation == 0) {
 	/*
 	 * Draw a mixture of quadrangles and triangles
 	 */
@@ -334,7 +334,7 @@ tesselate_one_cube( struct surface_points *plot, int ix, int iy, int iz )
 
     } else {
 	/*
-	 * Draw the triangles from a purely triangular tesselation.
+	 * Draw the triangles from a purely triangular tessellation.
 	 * There can be up to four per voxel cube.
 	 */
 	for (it = 0; it < 4; it++) {

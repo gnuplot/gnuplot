@@ -1679,7 +1679,7 @@ f_sprintf(union argument *arg)
 
 	    /* On some platforms (e.g. big-endian Solaris) trying to print a
 	     * 64-bit int with %d or %x etc will fail due to using the wrong 32 bits.
-	     * We try to accomodate this by converting to a 32-bit int if possible.
+	     * We try to accommodate this by converting to a 32-bit int if possible.
 	     * If this overflows, replace the original format with the C99 64-bit
 	     * equivalent as defined in <inttypes.h>.
 	     */

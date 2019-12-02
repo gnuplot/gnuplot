@@ -5000,7 +5000,7 @@ set_table()
 }
 
 
-/* process 'set terminal' comamnd */
+/* process 'set terminal' command */
 static void
 set_terminal()
 {

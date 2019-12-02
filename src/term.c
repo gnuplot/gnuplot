@@ -1129,7 +1129,7 @@ do_arrow(
 /* Generic routine for drawing circles or circular arcs.          */
 /* If this feature proves useful, we can add a new terminal entry */
 /* point term->arc() to the API and let terminals either provide  */
-/* a private implemenation or use this generic one.               */
+/* a private implementation or use this generic one.               */
 
 void
 do_arc(
@@ -1644,7 +1644,7 @@ init_terminal()
 	    term_name = "pm";
 #endif /*OS2 */
 
-/* set linux terminal only if LINUX_setup was successfull, if we are on X11
+/* set linux terminal only if LINUX_setup was successful, if we are on X11
    LINUX_setup has failed, also if we are logged in by network */
 #ifdef LINUXVGA
 	if (LINUX_graphics_allowed)

@@ -205,7 +205,7 @@ struct arrowstyle_def {
 
 /* Datastructure for 'set pixmap */
 typedef struct t_pixmap {
-    int tag;			/* index refering to this pixmap */
+    int tag;			/* index referring to this pixmap */
     struct t_pixmap *next;	/* pointer to next pixmap in the linked list */
     unsigned int ncols, nrows;	/* image size */
     t_position pin;		/* where it goes */
