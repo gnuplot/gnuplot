@@ -9,6 +9,7 @@ Changes not in 5.2
 * NEW "splot ... with circles"
 * NEW "splot ... with boxes"
 * NEW "plot ... with arrows"
+* NEW "plot ... with polygons"
 * NEW "set view projection {xz|yz}"
 * NEW "set datafile columnheaders"
 * NEW per-plot fillcolor and fillstyle for pm3d surfaces
@@ -19,6 +20,7 @@ Changes not in 5.2
 * NEW modified Bessel functions I0 (besi0) and I1 (besi1)
 * NEW modified Bessel function of order n (besin)
 * NEW "set object polygon depthsort" as an alternative to front/back/behind
+* NEW "set pixmap" object-like bitmap images from png/gif/jpeg input files
 * NEW overflow avoidance extends range of arguments handled by complex division
 * NEW largely extended pcl5 terminal supports PCL5e/PCL5c printers
 * NEW revised pstricks and texdraw LaTeX terminals
@@ -47,6 +49,7 @@ Changes not in 5.2
 * CHANGE print to datablock expands embedded \n into a separate block entry
 * CHANGE boxplot outliers affect autoscaling only if they are enabled
 * CHANGE remove latex, emtex, eepic, and tpic terminals from default build
+* CHANGE pm3d quadrangles are by default clipped smoothly to zrange
 * FIX allow mixed use of in-key plot titles and manually placed titles
 * FIX open/close path for polygons
 * FIX several stability issues of the caca terminal

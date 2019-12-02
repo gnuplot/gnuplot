@@ -3,13 +3,16 @@ AUTOMAKE_OPTIONS = foreign
 
 SUBDIRS = config m4 term src docs man demo tutorial share
 
-EXTRA_DIST = BUGS CodeStyle Copyright FAQ.pdf GNUmakefile INSTALL INSTALL.gnu \
-Makefile.maint PATCHLEVEL PGPKEYS PORTING README RELEASE_NOTES \
-VERSION configure.vms win
+EXTRA_DIST = BUGS Copyright FAQ.pdf INSTALL INSTALL.gnu \
+PATCHLEVEL PGPKEYS README RELEASE_NOTES \
+configure.vms win
 
 DISTCLEANFILES = stamp-h
 
 ACLOCAL_AMFLAGS = -I m4
+
+distclean-local:
+	rm -rf autom4te.cache
 
 dist-hook:
 	@for dir in `find $(distdir) -type d -name CVS -print`; do \
