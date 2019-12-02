@@ -258,12 +258,14 @@ available from the official distribution site \http{sourceforge.net/projects/gnu
 
 The current development version will generally include features that are
 not yet part of the most recent stable release of gnuplot.
-As of May 2019 the 5.3 development version notably supports
+As of December 2019 the 5.3 development version notably supports
 \begin{itemize}{}{}
 \setlength\itemsep{-4pt}
 \item 64-bit integer arithmetic
 \item 3D voxel grids
 \item 3D plot styles {\em isosurface, circles, boxes}
+\item smooth clipping of 3D surfaces against current z range
+\item polygon objects and plot styles
 \item {\em set walls} command to show xy xz and yz planes in 3D plots
 \item unicode escape sequences {\textbackslash}U+hhhh
 \item order N Bessel functions of the 1st and 2nd kind
@@ -786,13 +788,15 @@ The demo collection contains an example of a simple Gantt chart.
 
 Yes. 2D plots can have separate x axes at the bottom (x1) and top (x2),
 and separate y axes at the left (y1) and right (y2).  Version 5 offers a
-plot mode \textit{with parallelaxes} that allows additional y axes to be
-defined.
+plot mode \textit{with parallelaxes} that allows any number of additional
+y axes to be defined.
 
 \subsection{How to draw a solid made of triangular facets?}
 
-It is possible to describe colored facets of a 3D object in a file
-organized like this:
+The development version supports a special plot style \textit{with polygons}
+that can handle polygonal faces (triangles, rectangles, octagons, ...).
+In earlier versions the best you can do is to describe colored facets of a
+3D object in a file organized like this:
 \small
 \begin{verbatim}
 # triangle 1
