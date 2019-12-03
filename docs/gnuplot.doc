@@ -558,22 +558,22 @@ C
  Deprecated in version 4 and removed in version 5:
        set title "Old" 0,-1
        set data linespoints
+       plot 'file' thru f(x)
        plot 1 2 4               # horizontal line at y=1
  Current equivalent:
        TITLE = "New"
        set title TITLE offset char 0, char -1
        set style data linespoints
+       plot 'file' using 1:(f(column(2)))
        plot 1 linetype 2 pointtype 4
  Deprecated, present in version 5.0 if configured --enable-backwards-compatibility
        if (defined(VARNAME)) ...
        set style increment user
-       plot 'file' thru f(x)
        call 'script' 1.23 ABC
           (in script:  print $0, "$1", "number of args = $#")
  Current equivalent:
        if (exists("VARNAME")) ...
        set linetype
-       plot 'file' using 1:(f(column(2)))
        call 'script' 1.23 "ABC"
           (in script:  print ARG1, ARG2, "number of args = ", ARGC
 2 Demos and Online Examples
@@ -6609,15 +6609,22 @@ Ffigure_zerror
                           {volatile} {noautoscale}
 
  The modifiers `binary`, `index`, `every`, `skip`, `using`, `bins`, and `smooth`
- are discussed separately.  In brief, `binary` allows data entry from a binary
- file, `index` selects which data sets in a multi-data-set file are to be
- plotted, `every` specifies which points within a single data set are to be
- plotted, `using` determines how the columns within a single record are to be
- interpreted, and `smooth` allows for simple interpolation and approximation.
- `bins` sorts individual input points into equal-sized intervals along x and
- plots a single accumulated value per interval.
+ are discussed separately.  In brief
+#start
+#b `skip N` tells the program to ignore N lines at the start of the input file
+#b `binary` indicates that the file contains binary data rather than text
+#b `index` selects which data sets in a multi-data-set file are to be plotted
+#b `every` specifies which points within a single data set are to be plotted
+#b `using` specifies which columns in the file are to be used in which order
+#b `smooth` performs simple filtering, interpolation, or curve-fitting of the
+## data prior to plotting
+#b `bins` sorts individual input points into equal-sized intervals along x and
+## plots a single accumulated value per interval
+#b `volatile` indicates that the content of the file may not be available to
+## reread later and therefore it should be retained internally for re-use.
+#end
 
- `splot` has a similar syntax, but does not support the `smooth` option.
+ `splot` has a similar syntax but does not support `smooth` or `bins`.
 
  The `noautoscale` keyword means that the points making up this plot will be
  ignored when automatically determining axis range limits.
@@ -6632,11 +6639,13 @@ Ffigure_zerror
  are read from each line and associated with a single data point.
  See `using`.
 
- In all cases, the numbers of each record of a data file must be separated
- by white space (one or more blanks or tabs) unless a format specifier is
- provided by the `using` option. This white space divides each record into
- columns. However, whitespace inside a pair of double quotes is ignored when
- counting columns, so the following datafile line has three columns:
+ The individual records on a single line of data must be separated by white
+ space (one or more blanks or tabs) a special field separator character is
+ is specified by the `set datafile` command.  A single field may itself 
+ contain white space characters if the entire field is enclosed in a pair of
+ double quotes, or if a field separator other than white space is in effect.
+ Whitespace inside a pair of double quotes is ignored when counting columns,
+ so the following datafile line has three columns:
        1.0 "second column" 3.0
 
  Data may be written in exponential format with the exponent preceded by the
@@ -6648,12 +6657,6 @@ Ffigure_zerror
  points separated by a blank records (if they are plotted with a line style).
  Two blank records in a row indicate a break between separate data sets.
  See `index`.
-
- Extra lines at the start of a data file may be explicitly ignored using the
- `skip` keyword in the plot command. A single additional line containing text
- column headers may be present.  It is skipped automatically if the plot command
- refers to column headers, otherwise you may need to skip it explicitly.
- See `skip`, `columnhead`, `autotitle columnheader`.
 
  If autoscaling has been enabled (`set autoscale`), the axes are automatically
  extended to include all datapoints, with a whole number of tic marks if tics
@@ -6724,6 +6727,35 @@ Ffigure_zerror
       plot 'DATA' using (column(N)):(1)
 
  For related plotting styles see `smooth frequency` and `smooth kdensity`.
+4 columnheaders
+?commands plot datafile columnheaders
+?data-file columnheaders
+?datafile columnheaders
+?columnheaders
+ Extra lines at the start of a data file may be explicitly ignored using the
+ `skip` keyword in the plot command. A single additional line containing text
+ column headers may be present.  It is skipped automatically if the plot command
+ refers explicitly to column headers, e.g. by using them for titles.
+ Otherwise you may need to skip it explicitly either by adding one to the skip
+ count or by setting the attribute `set datafile columnheaders`.
+ See `skip`, `columnhead`, `autotitle columnheader`, `set datafile`.
+4 csv files
+?csv files
+?datafile csv
+ Syntax:
+      set datafile separator {whitespace | tab | comma | "chars"}
+
+ "csv" is short for "comma-separated values". The term "csv file" is loosely
+ applied to files in which data fields are delimited by a specific character,
+ not necessarily a comma.  To read data from a csv file you must tell gnuplot
+ what the field-delimiting character is.  For instance to read from a file
+ using semicolon as a field delimiter:
+
+      set datafile separator ";"
+
+ See `set datafile separator`.  This applies only to files used for input.
+ To create a csv file on output, use the corresponding `separator` option to
+ `set table`.
 4 every
 ?commands plot datafile every
 ?plot datafile every
@@ -6905,9 +6937,9 @@ Ffigure_zerror
 ?datafile smooth
 ?smooth
 ?splines
- `gnuplot` includes a few general-purpose routines for interpolation and
- approximation of data; these are grouped under the `smooth` option.  More
- sophisticated data processing may be performed by preprocessing the data
+ `gnuplot` includes a few general-purpose routines for filtering, interpolation
+ and grouping data as it is input; these are grouped under the `smooth` option.
+ More sophisticated data processing may be performed by preprocessing the data
  externally or by using `fit` with an appropriate model.
 
  Syntax:
@@ -7287,20 +7319,7 @@ Ffigure_zerror
        $ gnuplot -p -e "plot '<&3', '<&4'" 3<data-3 4<data-4
        $ ./gnuplot 5< <(myprogram -with -options)
        gnuplot> plot '<&5'
-4 thru
-?commands plot datafile thru
-?plot datafile thru
-?plot thru
-?data-file thru
-?datafile thru
-?thru
- The `thru` keyword is no longer supported
 
- Old syntax:
-       plot 'file' thru f(x)
-
- Current syntax:
-       plot 'file' using 1:(f($2))
 4 using
 ?commands plot datafile using
 ?plot datafile using
@@ -14035,7 +14054,6 @@ Ffigure_multiple_keys
 4 plot with table
 ?plot with table
 ?with table
-?csv
  This discussion applies only to the special plot style `with table`.
 
  To avoid any style-dependent processing of the input data being tabulated
