@@ -93,11 +93,11 @@ plot demo . 'silver.dat' u 1:($2-10.) with boxes title 'with boxes' fs solid 0.5
 #
 set output out . 'figure_boxerrorbars' . ext
 set boxwidth 0.8 relative
-plot demo . 'silver.dat' u 1:($2-10.):(3*rand(0)) with boxerrorbars title 'with boxerrorbars' fs empty
+plot demo . 'silver.dat' u 1:($2-10.):(3*rand(0)) with boxerrorbars title 'with boxerrorbars' fs solid 0.5 fc "blue"
 #
 set output out . 'figure_impulses' . ext
 set bmargin at screen .2
-plot demo . 'silver.dat' u 1:($2-10.) with impulses title 'with impulses'
+plot demo . 'silver.dat' u 1:($2-10.) with impulses lw 2 title 'with impulses'
 set bmargin at screen .05
 
 #
@@ -112,7 +112,7 @@ unset xzeroaxis
 unset offset
 #
 set output out . 'figure_candlesticks' . ext
-plot demo . 'candlesticks.dat' using 1:3:2:6:5 title 'with candlesticks' with candlesticks whiskerbar fs empty
+plot demo . 'candlesticks.dat' using 1:3:2:6:5 title 'with candlesticks' with candlesticks whiskerbar fs solid 0.5 fc "cyan"
 #
 set output out . 'figure_financebars' . ext
 set bars 4
@@ -211,6 +211,12 @@ unset xtics; unset ytics
 plot demo . 'ellipses.dat' u 1:2:3:4:5 with ellipses units xy title "with ellipses",\
      '' u 1:2:3:4:5 with ellipses units xx notitle,\
      '' u 1:2:3:4:5 with ellipses units yy notitle
+
+#
+# Following example plots will be set in colour mode for pdf output
+#
+if (GPVAL_TERM eq "pdfcairo") \
+    set term pdfcairo color font fontspec size 3.5,2.0 dashlength 0.2
 
 #
 # 2D heat map from an array of in-line data
@@ -355,12 +361,6 @@ set border 0
 set size square
 set datafile separator "\t"
 plot demo . 'cities.dat' using 5:4:($3 < 5000 ? "-" : CityName(1,3)) with labels
-
-#
-# Following example plots will be set in colour mode for pdf output
-#
-if (GPVAL_TERM eq "pdfcairo") \
-    set term pdfcairo color font fontspec size 3.5,2.0 dashlength 0.2
 
 #
 # Use of `keyentry` to construct a key
@@ -671,10 +671,9 @@ set log z
 set border 127
 set pm3d depth base
 set xyplane at 1
-set style fill solid 0.5
 set key opaque box
 
-splot for [k=1:5] 'silver.dat' using 1:(k):2:3 with zerror lt black fc lt k title "k = ".k
+splot for [k=5:1:-1] 'silver.dat' using 1:(k):2:3 with zerror lt black fc lt k title "k = ".k
 
 reset
 
@@ -718,8 +717,6 @@ unset title
 set pm3d interp 2,2 noborder
 set style fill solid 1.0
 splot f(x,y) with pm3d
-
-replot
 reset
 
 # Fence plot
