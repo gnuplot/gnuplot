@@ -560,22 +560,29 @@ C
        set data linespoints
        plot 'file' thru f(x)
        plot 1 2 4               # horizontal line at y=1
+       update
  Current equivalent:
        TITLE = "New"
        set title TITLE offset char 0, char -1
        set style data linespoints
        plot 'file' using 1:(f(column(2)))
        plot 1 linetype 2 pointtype 4
- Deprecated, present in version 5.0 if configured --enable-backwards-compatibility
+       save fit "filename"
+ Deprecated in version 5
        if (defined(VARNAME)) ...
        set style increment user
        call 'script' 1.23 ABC
           (in script:  print $0, "$1", "number of args = $#")
+       set fontpath
+       set clabel
+       fit control variables FIT_*
  Current equivalent:
        if (exists("VARNAME")) ...
        set linetype
        call 'script' 1.23 "ABC"
           (in script:  print ARG1, ARG2, "number of args = ", ARGC
+       set cntrlabel
+       set fit <option> <value>
 2 Demos and Online Examples
 ?demos
 ?online examples
@@ -1091,7 +1098,7 @@ C  need @ in table, so end and restart the table !
  set via the environmental variable GNUPLOT_DEFAULT_GDFONT.
 
  The postscript terminal uses its own font search path. It is controlled by
- the `set fontpath` command and the environmental variable GNUPLOT_FONTPATH.
+ the environmental variable GNUPLOT_FONTPATH.
 
  GNUPLOT_PS_DIR is used by the postscript driver to search for external
  prologue files. Depending on the build process, gnuplot contains either a
@@ -5122,7 +5129,7 @@ Ffigure_zerror
 
  If there are multiple curves in the splot command each new curve may occlude
  all previous curves.  To get proper depth sorting so that curves can only be
- occluded by curves closer to the viewer, use the command `set pm3d depthorder`.
+ occluded by curves closer to the viewer, use `set pm3d depthorder base`.
  Unfortunately this causes all the filled areas to be drawn after all of the
  corresponding lines of z values.  In order to see both the lines and the
  depth-sorted fill areas you probably will need to make the fill areas
@@ -5812,11 +5819,10 @@ Ffigure_zerror
 3 control
 ?commands fit control
 ?fit control
- Settings of the `fit` command are controlled by `set fit`.  The old `gnuplot`
- user variables are deprecated as of version 5, see `fit control variables`.
-
  There are a number of environment variables that can be defined to affect
- `fit` before starting `gnuplot`, see `fit control environment`.
+ `fit` before starting `gnuplot`, see `fit control environment`. At run time
+ adjustments to the `fit` command operation can be controlled by `set fit`.
+ See `fit control variables`.
 4 control variables
 ?commands fit control variables
 ?fit control variables
@@ -5824,42 +5830,16 @@ Ffigure_zerror
 =FIT_MAXITER
 =FIT_START_LAMBDA
 =FIT_LAMBDA_FACTOR
- The user defined variables described here are deprecated, see `set fit`.
+ DEPRECATED in version 5.
+ These user variables used to affect fit behaviour.
 
- The default epsilon limit (1e-5) may be changed by declaring a value for
-       FIT_LIMIT
- When the sum of squared residuals changes between two iteration steps by
- a factor less than this number (epsilon), the fit is considered to have
- 'converged'.
+     FIT_LIMIT - use `set fit limit <epsilon>`
+     FIT_MAXITER - use `set fit maxiter <number_of_cycles>`
+     FIT_START_LAMBDA - use `set fit start-lambda <value>`
+     FIT_LAMBDA_FACTOR - use `set fit lambda-factor <value>`
+     FIT_SKIP - use the datafile `every` modifier
+     FIT_INDEX - See `fit multi-branch`
 
- The maximum number of iterations may be limited by declaring a value for
-       FIT_MAXITER
- A value of 0 (or not defining it at all)  means that there is no limit.
-
- If you need even more control about the algorithm, and know the
- Marquardt-Levenberg algorithm well, there are some more variables to
- influence it. The startup value of `lambda` is normally calculated
- automatically from the ML-matrix, but if you want to, you may provide
- your own one with
-       FIT_START_LAMBDA
- Specifying FIT_START_LAMBDA as zero or less will re-enable the automatic
- selection. The variable
-       FIT_LAMBDA_FACTOR
- gives the factor by which `lambda` is increased or decreased whenever
- the chi-squared target function increased or decreased significantly.
- Setting FIT_LAMBDA_FACTOR to zero re-enables the default factor of
- 10.0.
-
- Other variables with the FIT_ prefix may be added to `fit`, so it is safer
- not to use that prefix for user-defined variables.
-
- The variables FIT_SKIP and FIT_INDEX were used by earlier releases of
- `gnuplot` with a 'fit' patch called `gnufit` and are no longer available.
- The datafile `every` modifier provides the functionality of FIT_SKIP.
- FIT_INDEX was used for multi-branch fitting, but multi-branch fitting of
- one independent variable is now done as a pseudo-3D fit in which the
- second independent variable and `using` are used to specify the branch.
- See `fit multi-branch`.
 4 environment variables
 ?commands fit control environment
 ?fit control environment
@@ -8267,8 +8247,8 @@ Ffigure_zerror
  return to a defined state after lots of settings have been changed.
 
  The following are _not_ affected by `reset`:
-      `set term` `set output` `set loadpath` `set fontpath` `set linetype`
-      `set encoding` `set decimalsign` `set locale` `set psdir` `set fit`
+      `set term` `set output` `set loadpath` `set linetype` `set fit`
+      `set encoding` `set decimalsign` `set locale` `set psdir`
       `set overflow` `set multiplot`
 
  Note that `reset` does not necessarily return settings to the state they
@@ -10279,7 +10259,7 @@ Ffigure_missing
 
 3 function style
 ?set function style
- This form of the command is deprecated. Please see `set style function`.
+ This form of the command is deprecated. Please use `set style function`.
 3 functions
 ?commands show functions
 ?show functions
@@ -12966,7 +12946,7 @@ Ffigure_multiple_keys
  those with at least one corner in-range on x, y, and z (`set pm3d clip1in`).
  
  Separate from clipping based on spatial x, y, and z coordinates, quadrangles
- can be clipped (not rendered) based on extreme palette color values.
+ can be rendered or not based on extreme palette color values.
  `clipcb`: (default) palette color values < cbmin are treated as cbmin;
  palette color values > cbmax are treated as cbmax.
  `noclipcb`: quadrangles with color value outside cbrange are not drawn at all.
@@ -13038,8 +13018,6 @@ Ffigure_multiple_keys
        unset surf
        splot x*x+y*y linecolor rgb "blue"   # otherwise it would be black
 
- NB: The deprecated option `set pm3d hidden3d N` is still accepted. It is
- equivalent to `set pm3d border ls N`.
 4 fillcolor
 ?pm3d fillcolor
       splot FOO with pm3d fillcolor <colorspec>
@@ -13086,11 +13064,11 @@ Ffigure_multiple_keys
 ?set pm3d map
 ?pm3d map
 ?map
- The deprecated command `set pm3d map` is equivalent to
+ The deprecated option `set pm3d map` was equivalent to
  `set pm3d at b; set view map; set style data pm3d; set style func pm3d;`
 
- There used to be an option {transparent|solid} to this command.  Now
- you get the same effect from `set grid {front|layerdefault}`, respectively.
+ The deprecated option `set pm3d hidden3d N` was equivalent to
+ `set pm3d border ls N`.
 3 pointintervalbox
 ?commands set pointintervalbox
 ?set pointintervalbox
@@ -13974,8 +13952,7 @@ Ffigure_multiple_keys
 
  This command controls the appearance of labels with the attribute 'boxed'.
  Terminal types that do not support boxed text will ignore this style.
- Note: The current implementation is experimental; details may change.
- Implementation for some terminals (svg, latex) is incomplete.
+ Note: Implementation for some terminals (svg, latex) is incomplete.
  Most terminals cannot place a box correctly around rotated text.
 
  Three numbered textbox styles can be defined.  If no boxstyle index <bs>
