@@ -1,5 +1,5 @@
 #
-# zerrorfill with and without depth-sorting
+# zerrorfill
 #
 set yrange [0.5:5.5]
 set zrange [1:*]
@@ -12,15 +12,8 @@ set grid lt 1 lw 0.75 lc "grey"
 set xtics offset 0, -0.5
 set ytics offset -0.5, -0.5
 
-set title "splot with zerrorfill (no depth sorting)"
-splot for [k=1:5] 'silver.dat' using 1:(k):2:3 with zerror lt black fc lt k title "k = ".k
-
-pause -1 "Hit return to continue" 
-
-set title "splot with zerrorfill (set pm3d depthorder)"
-set pm3d depthorder
-set style fill transparent solid 0.5
-splot for [k=1:5] 'silver.dat' using 1:(k):2:3 with zerror lt black fc lt k title "k = ".k
+set title "splot with zerrorfill\n(note that plot ordering must be back-to-front)"
+splot for [k=5:1:-1] 'silver.dat' using 1:(k):2:3 with zerror lt black fc lt k title "k = ".k
 
 pause -1 "Hit return to continue"
 reset
@@ -31,6 +24,7 @@ reset
 set format z "%.1f" 
 unset key
 set view 66, 200, 1, 1
+set xyplane 0
 unset xtics
 unset ytics
 set title "fence plot constructed with zerrorfill" 
