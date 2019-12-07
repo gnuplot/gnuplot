@@ -1183,14 +1183,20 @@ gnuplot> set zero 1e-20
 
 For more information, type {\em help set zero}.
 
-\subsection{When I {\em replot} a multiplot I get only a fragment}
+\subsection{When I {\em replot} or {\em resize} a multiplot I get only a fragment}
 
 \Gnuplot only retains enough information to regenerate the most recent
 {\em plot} or {\em splot} command.
-You need to save the complete sequence of commands that generated the
-multiplot into a script file. Then you can {\em load} that script into
-\gnuplot as many times as you need for replotting the drawing to different
-terminals or output files.
+In order to reproduce the entire multiplot you need to save the complete
+sequence of commands that generated it into a script file.
+Then you can {\em load} that script into \gnuplot as many times as you need
+for replotting the drawing to different terminals or output files.
+
+The same problem arises when you resize a multiplot displayed in an interactive
+terminal window, because the resize event normally triggers a replot.
+The {\em qt} and {\em wxt} terminals provide a toggle in the toolbox widget
+that suppresses this replot on resize.  The {\em x11} terminal provides a 
+terminal option {\em set term x11 noreplotonresize}.
 
 \subsection{My formulas (like 1/3) are giving me nonsense results! What's going on?}
 
