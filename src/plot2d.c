@@ -3818,7 +3818,7 @@ reevaluate_plot_title(struct curve_points *this_plot)
 	evaluate_inside_using = TRUE;
 	evaluate_at(df_plot_title_at, &a);
 	evaluate_inside_using = FALSE;
-	if (a.type == STRING) {
+	if (!undefined && a.type == STRING) {
 	    free(this_plot->title);
 	    this_plot->title = a.v.string_val;
 

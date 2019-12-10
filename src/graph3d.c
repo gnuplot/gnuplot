@@ -265,7 +265,7 @@ find_maxl_keys3d(struct surface_points *plots, int count, int *kcnt)
 	if (this_plot->title && *this_plot->title
 	&& !this_plot->title_is_suppressed && !this_plot->title_position) {
 	    ++cnt;
-	    len = estimate_strlen(this_plot->title);
+	    len = estimate_strlen(this_plot->title, NULL);
 	    if (len > mlen)
 		mlen = len;
 	}
@@ -292,7 +292,7 @@ find_maxl_cntr(struct gnuplot_contours *contours, int *count)
     mlen = cnt = 0;
     while (cntrs) {
 	if (cntrs->isNewLevel) {
-	    len = estimate_strlen(cntrs->label)
+	    len = estimate_strlen(cntrs->label, NULL)
 		- strspn(cntrs->label," ");
 	    if (len)
 		cnt++;
@@ -396,7 +396,7 @@ boundary3d(struct surface_points *plots, int count)
     if (key->visible)
     if (key_rows && (key->region == GPKEY_AUTO_EXTERIOR_MARGIN || key->region == GPKEY_AUTO_EXTERIOR_LRTBC)
 	&& key->margin == GPKEY_BMARGIN)
-	plot_bounds.ybot += key_rows * key_entry_height + ktitle_lines * t->v_char;
+	plot_bounds.ybot += key_rows * key_entry_height + key_title_height;
 
     if (title.text) {
 	titlelin++;
@@ -977,7 +977,9 @@ do_3dplot(
 
 	if (key->title.text) {
 	    int center = (key->bounds.xright + key->bounds.xleft) / 2;
-	    int titley = key->bounds.ytop - (key_title_extra + t->v_char)/2;
+	    int titley = key->bounds.ytop - key_title_height/2;
+	    /* FIXME: empirical tweak. I don't know why this is needed */
+	    titley += (ktitle_lines-1) * t->v_char/2;
 	    write_label(center, titley, &key->title);
 	    (*t->linetype)(LT_BLACK);
 	}
@@ -3435,7 +3437,7 @@ key_text(int xl, int yl, char *text)
 	if ((*term->justify_text) (RIGHT)) {
 	    write_multiline(xl + key_text_right, yl, text, RIGHT, JUST_TOP, 0, key->font);
 	} else {
-	    int x = xl + key_text_right - (term->h_char) * estimate_strlen(text);
+	    int x = xl + key_text_right - (term->h_char) * estimate_strlen(text, NULL);
 	    write_multiline(x, yl, text, LEFT, JUST_TOP, 0, key->font);
 	}
     }
@@ -4056,11 +4058,22 @@ do_3dkey_layout(legend_key *key, int *xinkey, int *yinkey)
     }
     key_point_offset = (key_sample_left + key_sample_right) / 2;
 
-    key_title_height = ktitle_lines * t->v_char;
+    /* Key title width and height, adjusted for font size and markup */
     key_title_extra = 0;
-    if ((key->title.text) && (t->flags & TERM_ENHANCED_TEXT)
-    &&  (strchr(key->title.text,'^') || strchr(key->title.text,'_')))
-	    key_title_extra = t->v_char;
+    key_title_height = 0;
+    if (key->title.text) {
+	double est_height;
+	if (key->title.font)
+	    t->set_font(key->title.font);
+	estimate_strlen(key->title.text, &est_height);
+	key_title_height = est_height * t->v_char;
+	if (key->title.font)
+	    t->set_font("");
+	/* Allow a little extra clearance for markup */
+	if ((t->flags & TERM_ENHANCED_TEXT)
+	&&  (strchr(key->title.text,'^') || strchr(key->title.text,'_')))
+	    key_title_extra = t->v_char/2;
+    }
 
     key_width = key_col_wth * (key_cols - 1) + key_size_right + key_size_left;
     key_height = key_title_height + key_title_extra

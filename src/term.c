@@ -800,7 +800,7 @@ write_multiline(
 	    if (on_page(x, y))
 		(*t->put_text) (x, y, text);
 	} else {
-	    int len = estimate_strlen(text);
+	    int len = estimate_strlen(text, NULL);
 	    int hfix, vfix;
 
 	    if (angle == 0) {
@@ -2491,16 +2491,19 @@ enh_err_check(const char *str)
  * "estimate.trm" and then switch back to the current terminal.
  * If better, perhaps terminal-specific methods of estimation are
  * developed later they can be slotted into this one call site.
+ *
+ * Dec 2019: height is relative to original font size
+ *		DEBUG: currently pegged at 10pt - we should do better!
  */
 int
-estimate_strlen(const char *text)
+estimate_strlen(const char *text, double *height)
 {
     int len;
     char *s;
+    double estimated_fontheight = 1.0;
 
     if ((term->flags & TERM_IS_LATEX))
-	len = strlen_tex(text);
-    else
+	return strlen_tex(text);
 
 #ifdef GP_ENH_EST
     if (strchr(text,'\n') || (term->flags & TERM_ENHANCED_TEXT)) {
@@ -2508,6 +2511,7 @@ estimate_strlen(const char *text)
 	term = &ENHest;
 	term->put_text(0,0,text);
 	len = term->xmax;
+	estimated_fontheight = term->ymax / 10.;
 	term = tsave;
 	/* Assume that unicode escape sequences  \U+xxxx will generate a single character */
 	/* ENHest_plaintext is filled in by the put_text() call to estimate.trm           */
@@ -2517,13 +2521,16 @@ estimate_strlen(const char *text)
 	    s += 6;
 	}
 	FPRINTF((stderr,"Estimating length %d height %g for enhanced text \"%s\"",
-		len, (double)(term->ymax)/10., text));
+		len, estimated_fontheight, text));
 	FPRINTF((stderr,"  plain text \"%s\"\n", ENHest_plaintext));
     } else if (encoding == S_ENC_UTF8)
 	len = strwidth_utf8(text);
     else
 #endif
 	len = strlen(text);
+
+    if (height)
+	*height = estimated_fontheight;
 
     return len;
 }
@@ -2537,7 +2544,7 @@ estimate_plaintext(char *enhancedtext)
 {
     if (enhancedtext == NULL)
 	return NULL;
-    estimate_strlen(enhancedtext);
+    estimate_strlen(enhancedtext, NULL);
     return ENHest_plaintext;
 }
 
