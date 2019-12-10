@@ -141,7 +141,7 @@ OPTIONS = $(OPTIONS) /DGNUPLOT_HISTORY
 
 EXTRA_TARGETS =
 
-VERSION_CPPFLAGS = -DVERSION_MAJOR=\"5.3\" -DPATCHLEVEL=\"0\"
+VERSION_CPPFLAGS = -DVERSION_MAJOR=\"5.4\" -DPATCHLEVEL=\"0\"
 
 # flags for terminals
 # see other terminal defines in term.h
