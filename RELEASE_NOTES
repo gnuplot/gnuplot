@@ -1,6 +1,5 @@
-		GNUPLOT VERSION 5.3 NOTES
+		GNUPLOT VERSION 5.4 NOTES
 		=========================
 
 This file is a placeholder for the release notes that accompany a
-stable gnuplot release.   The current stable series is 5.2.x where
-x is the patchlevel.
+stable gnuplot release.

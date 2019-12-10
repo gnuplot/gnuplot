@@ -2,7 +2,8 @@
 AUTOMAKE_OPTIONS = foreign
 
 EXTRA_DIST = README Makefile.am.in driver.h impcodes.h \
-fig_defs.h post.h $(CORETERM) PostScript lua js write_png_image.c sixel.c
+fig_defs.h post.h $(CORETERM) PostScript lua js write_png_image.c sixel.c \
+latex_old.h
 
 postscriptdir = $(pkgdatadir)/$(VERSION_MAJOR)/PostScript
 

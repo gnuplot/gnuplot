@@ -548,8 +548,8 @@ VERSIONING = timestamp.h
 endif
 
 PATCHLEVEL := $(shell cat $(TOP)/PATCHLEVEL)
-MAINVERSION := 5.3
-SHORTVERSION := 53$(PATCHLEVEL)
+MAINVERSION := 5.4
+SHORTVERSION := 54$(PATCHLEVEL)
 NUMBERS := 0 1 2 3 4 5 6 7 8 9
 ifeq ($(strip $(filter-out $(NUMBERS),$(PATCHLEVEL))),)
 LONGVERSION := $(MAINVERSION).$(PATCHLEVEL)
@@ -702,7 +702,7 @@ timestamp.h: $(TOP)/.git/${git_current} Makefile
 	@echo "#endif /* GNUPLOT_TIMEBASE_H_INCLUDED */" >> $@t
 	@if cmp -s $@ $@t; then rm -f $@t; else mv $@t $@; fi
 else
-$(S)/version.c: $(TOP)/VERSION $(TOP)/PATCHLEVEL $(TOP)/ChangeLog $(S)/Makefile.maint
+$(S)/version.c: $(TOP)/PATCHLEVEL $(TOP)/ChangeLog $(S)/Makefile.maint
 	$(MAKE) -C $(S) srcdir=. top_srcdir=.. -f Makefile.maint version.c
 endif
 
@@ -918,9 +918,8 @@ gnuplot-figures.tex: $(D)gnuplot.doc doc2tex.exe $(TARGET)
 	GNUPLOT_LIB=$(M) ./$(TARGET) -d $(D)plotstyles.gnu
 	./doc2tex -figures $(D)gnuplot.doc gnuplot-figures.tex
 
-gnuplot.dvi: gnuplot.tex $(TOP)/VERSION $(D)toc_entr.sty $(D)titlepag.tex
+gnuplot.dvi: gnuplot.tex $(D)toc_entr.sty $(D)titlepag.tex
 	cp gnuplot.tex gp_tex2.tex
-	cp $(TOP)/VERSION .
 	cp -p $(D)toc_entr.sty .
 	cp -p $(D)titlepag.tex .
 	echo "" > pdffigures.tex
@@ -931,7 +930,7 @@ gnuplot.dvi: gnuplot.tex $(TOP)/VERSION $(D)toc_entr.sty $(D)titlepag.tex
 gnuplot.ps: gnuplot.dvi
 	dvips -o gnuplot.ps gnuplot.dvi
 
-gnuplot.pdf: gnuplot-figures.tex $(TOP)/VERSION $(D)toc_entr.sty $(D)titlepag.tex
+gnuplot.pdf: gnuplot-figures.tex $(D)toc_entr.sty $(D)titlepag.tex
 	cp gnuplot-figures.tex gp_tex2.tex
 	echo "\usepackage{graphicx}" > pdffigures.tex
 	echo "\usepackage{picins}" >> pdffigures.tex
@@ -1009,7 +1008,7 @@ clean:
 	$(RM) $(M)bf_test.exe demo_plugin.dll allterm.h allterm.c
 	$(RM) *.aux *.log *.dvi *.toc
 	$(RM) gnuplot.tex gnuplot-figures.tex pdffigures.tex figure_*.pdf
-	$(RM) titlepag.tex toc_entr.sty VERSION
+	$(RM) titlepag.tex toc_entr.sty
 	$(RM) eg?.tex eg?.eps linepoin.tex test.tex test_tikz.tex
 	$(RM) $(D)windows/wgnuplot.log $(D)windows/wgnuplot.hhc
 	$(RM) $(D)windows/*.png $(D)windows/wgnuplot.html
