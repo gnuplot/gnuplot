@@ -1,5 +1,9 @@
-Changes not in 5.2
+Changes not in 5.4
 ==================
+* CHANGE account for font size when estimating string extents
+
+Changes in 5.4
+==============
 * NEW support for 64-bit integer arithmetic
 * NEW support for voxel grids
 * NEW plot ... with table if <expression>

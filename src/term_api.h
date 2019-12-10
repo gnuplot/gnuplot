@@ -472,7 +472,7 @@ void init_monochrome(void);
 struct termentry *change_term(const char *name, int length);
 
 void write_multiline(int, int, char *, JUSTIFY, VERT_JUSTIFY, int, const char *);
-int estimate_strlen(const char *);
+int estimate_strlen(const char *length, double *estimated_fontheight);
 char *estimate_plaintext(char *);
 void list_terms(void);
 char* get_terminals_names(void);

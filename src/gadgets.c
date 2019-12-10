@@ -1027,7 +1027,7 @@ label_width(const char *str, int *lines)
     s = lab;
     while ((e = (char *) strchr(s, '\n')) != NULL) {
 	*e = '\0';
-	len = estimate_strlen(s);	/* = e-s ? */
+	len = estimate_strlen(s, NULL);	/* = e-s ? */
 	if (len > mlen)
 	    mlen = len;
 	if (len || l || *str == '\n')

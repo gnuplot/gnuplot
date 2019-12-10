@@ -811,7 +811,7 @@ ENHdumb_put_text(unsigned int x, unsigned int y, const char *str)
 	return;
     }
 
-    length = estimate_strlen(str);
+    length = estimate_strlen(str, NULL);
     if (x + length > dumb_xmax)
 	x = GPMAX(0, dumb_xmax - length);
     if (y > dumb_ymax)

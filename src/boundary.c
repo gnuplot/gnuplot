@@ -59,6 +59,7 @@ static int key_width;		/* calculate once, then everyone uses it */
 static int key_height;		/* ditto */
 static int key_title_height;	/* nominal number of lines * character height */
 static int key_title_extra;	/* allow room for subscript/superscript */
+static int key_title_ypos;	/* offset from key->bounds.ytop */
 static int time_y, time_x;
 static int title_x, title_y;
 
@@ -536,7 +537,7 @@ boundary(struct curve_points *plots, int count)
 	while (tic) {
 	    if (tic->label) {
 		double xx;
-		int length = estimate_strlen(tic->label)
+		int length = estimate_strlen(tic->label, NULL)
 			   * cos(DEG2RAD * (double)(axis_array[FIRST_X_AXIS].tic_rotate))
 			   * term->h_char;
 
@@ -958,16 +959,23 @@ do_key_layout(legend_key *key)
     if (key_entry_height == 0)
 	key_entry_height = 1;
 
-    /* Key title length and height */
+    /* Key title length and height, adjusted for font size and markup */
     key_title_height = 0;
     key_title_extra = 0;
+    key_title_ypos = 0;
     if (key->title.text) {
-	int ytheight;
-	(void) label_width(key->title.text, &ytheight);
-	key_title_height = ytheight * t->v_char;
-	if ((*key->title.text) && (t->flags & TERM_ENHANCED_TEXT)
-	&&  (strchr(key->title.text,'^') || strchr(key->title.text,'_')))
-	    key_title_extra = t->v_char;
+	double est_height;
+	int est_lines;
+	if (key->title.font)
+	    t->set_font(key->title.font);
+	(void) label_width(key->title.text, &est_lines);
+	(void) estimate_strlen(key->title.text, &est_height);
+	key_title_height = est_height * t->v_char;
+	key_title_ypos = (key_title_height/2);
+	if (key->title.font)
+	    t->set_font("");
+	/* FIXME: empirical tweak. I don't know why this is needed */
+	key_title_ypos -= (est_lines-1) * t->v_char/2;
     }
 
     if (key->reverse) {
@@ -1047,9 +1055,13 @@ do_key_layout(legend_key *key)
     /* If the key title is wider than the contents, try to make room for it */
     if (key->title.text) {
 	int ytlen = label_width(key->title.text, NULL) - key->swidth + 2;
+	if (key->title.font)
+	    t->set_font(key->title.font);
 	ytlen *= t->h_char;
 	if (ytlen > key_cols * key_col_wth)
 	    key_col_wth = ytlen / key_cols;
+	if (key->title.font)
+	    t->set_font("");
     }
 
     /* Adjust for outside key, leave manually set margins alone */
@@ -1115,7 +1127,7 @@ find_maxl_keys(struct curve_points *plots, int count, int *kcnt)
 		; /* Nothing */
 	    else {
 		ignore_enhanced(this_plot->title_no_enhanced);
-		len = estimate_strlen(this_plot->title);
+		len = estimate_strlen(this_plot->title, NULL);
 		if (len != 0) {
 		    cnt++;
 		    if (len > mlen)
@@ -1140,7 +1152,7 @@ find_maxl_keys(struct curve_points *plots, int count, int *kcnt)
 	    text_label *key_entry = this_plot->labels->next;
 	    for (; key_entry; key_entry=key_entry->next) {
 		cnt++;
-		len = key_entry->text ? estimate_strlen(key_entry->text) : 0;
+		len = key_entry->text ? estimate_strlen(key_entry->text, NULL) : 0;
 		if (len > mlen)
 		    mlen = len;
 	    }
@@ -1204,7 +1216,7 @@ do_key_sample(
 	if ((*t->justify_text) (RIGHT)) {
 	    write_multiline(xl + key_text_right, yl, title, RIGHT, JUST_CENTRE, 0, key->font);
 	} else {
-	    int x = xl + key_text_right - t->h_char * estimate_strlen(title);
+	    int x = xl + key_text_right - t->h_char * estimate_strlen(title, NULL);
 	    if (key->region == GPKEY_AUTO_EXTERIOR_LRTBC ||	/* HBB 990327 */
 		key->region == GPKEY_AUTO_EXTERIOR_MARGIN ||
 		inrange((x), (plot_bounds.xleft), (plot_bounds.xright)))
@@ -1413,8 +1425,7 @@ draw_key(legend_key *key, TBOOLEAN key_pass)
 
 	/* Only draw the title once */
 	if (key_pass || !key->front) {
-	    write_label(title_anchor,
-			key->bounds.ytop - (key_title_extra + key_entry_height)/2,
+	    write_label(title_anchor, key->bounds.ytop - key_title_ypos,
 			&key->title);
 	    (*t->linetype)(LT_BLACK);
 	}
