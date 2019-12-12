@@ -6593,7 +6593,7 @@ parse_lighting_options()
     pm3d_shade.ambient = 1.0;
     pm3d_shade.Phong = 5.0;	/* Phong exponent */
     pm3d_shade.rot_x = 45;	/* illumination angle */
-    pm3d_shade.rot_z = -45;	/* illumination angle */
+    pm3d_shade.rot_z = 85;	/* illumination angle */
     pm3d_shade.fixed = TRUE;	/* TRUE means the light does not rotate */
     pm3d_shade.spec2 = 0.0;	/* red specular highlights on back surface */
 

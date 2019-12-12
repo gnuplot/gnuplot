@@ -1394,8 +1394,8 @@ is_plot_with_colorbox()
 void
 pm3d_init_lighting_model()
 {
-    light[0] = cos(-DEG2RAD*pm3d_shade.rot_x)*cos(-(DEG2RAD*pm3d_shade.rot_z+90));
-    light[2] = cos(-DEG2RAD*pm3d_shade.rot_x)*sin(-(DEG2RAD*pm3d_shade.rot_z+90));
+    light[0] = cos(-DEG2RAD*pm3d_shade.rot_x)*cos(-(DEG2RAD*pm3d_shade.rot_z));
+    light[2] = cos(-DEG2RAD*pm3d_shade.rot_x)*sin(-(DEG2RAD*pm3d_shade.rot_z));
     light[1] = sin(-DEG2RAD*pm3d_shade.rot_x);
 }
 
