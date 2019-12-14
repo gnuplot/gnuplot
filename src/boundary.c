@@ -964,7 +964,11 @@ do_key_layout(legend_key *key)
     if (key->title.text) {
 	int ytheight;
 	(void) label_width(key->title.text, &ytheight);
+	if (key->title.font)
+	    t->set_font(key->title.font);
 	key_title_height = ytheight * t->v_char;
+	if (key->title.font)
+	    t->set_font("");
 	if ((*key->title.text) && (t->flags & TERM_ENHANCED_TEXT)
 	&&  (strchr(key->title.text,'^') || strchr(key->title.text,'_')))
 	    key_title_extra = t->v_char;
@@ -1047,9 +1051,13 @@ do_key_layout(legend_key *key)
     /* If the key title is wider than the contents, try to make room for it */
     if (key->title.text) {
 	int ytlen = label_width(key->title.text, NULL) - key->swidth + 2;
+	if (key->title.font)
+	    t->set_font(key->title.font);
 	ytlen *= t->h_char;
 	if (ytlen > key_cols * key_col_wth)
 	    key_col_wth = ytlen / key_cols;
+	if (key->title.font)
+	    t->set_font("");
     }
 
     /* Adjust for outside key, leave manually set margins alone */
