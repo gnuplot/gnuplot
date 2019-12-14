@@ -209,21 +209,23 @@ place_grid(int layer)
     if (layer == LAYER_FOREGROUND)
 	grid_lp.l_type = mgrid_lp.l_type = LT_NODRAW;
 
-    /* select first mapping */
-    x_axis = FIRST_X_AXIS;
-    y_axis = FIRST_Y_AXIS;
+    if (!grid_tics_in_front || (layer == LAYER_FOREGROUND)) {
+	/* select first mapping */
+	x_axis = FIRST_X_AXIS;
+	y_axis = FIRST_Y_AXIS;
 
-    /* label first y axis tics */
-    axis_output_tics(FIRST_Y_AXIS, &ytic_x, FIRST_X_AXIS, ytick2d_callback);
-    /* label first x axis tics */
-    axis_output_tics(FIRST_X_AXIS, &xtic_y, FIRST_Y_AXIS, xtick2d_callback);
+	/* label first y axis tics */
+	axis_output_tics(FIRST_Y_AXIS, &ytic_x, FIRST_X_AXIS, ytick2d_callback);
+	/* label first x axis tics */
+	axis_output_tics(FIRST_X_AXIS, &xtic_y, FIRST_Y_AXIS, xtick2d_callback);
 
-    /* select second mapping */
-    x_axis = SECOND_X_AXIS;
-    y_axis = SECOND_Y_AXIS;
+	/* select second mapping */
+	x_axis = SECOND_X_AXIS;
+	y_axis = SECOND_Y_AXIS;
 
-    axis_output_tics(SECOND_Y_AXIS, &y2tic_x, SECOND_X_AXIS, ytick2d_callback);
-    axis_output_tics(SECOND_X_AXIS, &x2tic_y, SECOND_Y_AXIS, xtick2d_callback);
+	axis_output_tics(SECOND_Y_AXIS, &y2tic_x, SECOND_X_AXIS, ytick2d_callback);
+	axis_output_tics(SECOND_X_AXIS, &x2tic_y, SECOND_Y_AXIS, xtick2d_callback);
+    }
 
     /* select first mapping */
     x_axis = FIRST_X_AXIS;
