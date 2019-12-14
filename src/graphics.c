@@ -87,6 +87,8 @@ static int stack_count;				/* points actually used */
 static void place_histogram_titles(void);
 
 /*{{{  static fns and local macros */
+static void adjust_offsets(void);
+static void adjust_nonlinear_offset(struct axis *axis);
 static void recheck_ranges(struct curve_points * plot);
 static void plot_border(void);
 static void plot_impulses(struct curve_points * plot, int yaxis_x, int xaxis_y);
@@ -583,19 +585,28 @@ adjust_offsets(void)
     double l = loff.scalex == graph ? fabs(X_AXIS.max - X_AXIS.min)*loff.x : loff.x;
     double r = roff.scalex == graph ? fabs(X_AXIS.max - X_AXIS.min)*roff.x : roff.x;
 
-    if (Y_AXIS.min < Y_AXIS.max) {
-	Y_AXIS.min -= b;
-	Y_AXIS.max += t;
+    if (nonlinear(&Y_AXIS)) {
+	adjust_nonlinear_offset(&Y_AXIS);
     } else {
-	Y_AXIS.max -= b;
-	Y_AXIS.min += t;
+	if (Y_AXIS.min < Y_AXIS.max) {
+	    Y_AXIS.min -= b;
+	    Y_AXIS.max += t;
+	} else {
+	    Y_AXIS.max -= b;
+	    Y_AXIS.min += t;
+	}
     }
-    if (X_AXIS.min < X_AXIS.max) {
-	X_AXIS.min -= l;
-	X_AXIS.max += r;
+
+    if (nonlinear(&X_AXIS)) {
+	adjust_nonlinear_offset(&X_AXIS);
     } else {
-	X_AXIS.max -= l;
-	X_AXIS.min += r;
+	if (X_AXIS.min < X_AXIS.max) {
+	    X_AXIS.min -= l;
+	    X_AXIS.max += r;
+	} else {
+	    X_AXIS.max -= l;
+	    X_AXIS.min += r;
+	}
     }
 
     if (X_AXIS.min == X_AXIS.max)
@@ -607,6 +618,38 @@ adjust_offsets(void)
 	clone_linked_axes(&axis_array[FIRST_X_AXIS], &axis_array[SECOND_X_AXIS]);
     if (axis_array[FIRST_Y_AXIS].linked_to_secondary)
 	clone_linked_axes(&axis_array[FIRST_Y_AXIS], &axis_array[SECOND_Y_AXIS]);
+}
+
+/*
+ * This routine is called only if we know the axis passed in is either
+ * nonlinear X or nonlinear Y.  We apply the offsets to the primary (linear)
+ * end of the linkage and then transform back to the axis itself (seconary).
+ */
+static void
+adjust_nonlinear_offset( struct axis *secondary)
+{
+    struct axis *primary = secondary->linked_to_primary;
+    double range = fabs(primary->max - primary->min);
+    double offset1, offset2;
+
+    if (secondary->index == FIRST_X_AXIS) {
+	if ((loff.scalex != graph && loff.x != 0)
+	||  (roff.scalex != graph && roff.x != 0))
+	    int_error(NO_CARET, "nonlinear axis offsets must be in graph units");
+	offset1 = loff.x;
+	offset2 = roff.x;
+    } else {
+	if ((boff.scaley != graph && boff.y != 0)
+	||  (toff.scaley != graph && toff.y != 0))
+	    int_error(NO_CARET, "nonlinear axis offsets must be in graph units");
+	offset1 = boff.y;
+	offset2 = toff.y;
+    }
+
+    primary->min -= range * offset1;
+    primary->max += range * offset2;
+    secondary->min = eval_link_function(secondary, primary->min);
+    secondary->max = eval_link_function(secondary, primary->max); 
 }
 
 void
