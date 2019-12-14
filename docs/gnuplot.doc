@@ -12067,12 +12067,15 @@ Ffigure_multiple_keys
  Each offset may be a constant or an expression.  Each defaults to 0.
  By default, the left and right offsets are given in units of the first x axis,
  the top and bottom offsets in units of the first y axis.  Alternatively, you
- may specify the offsets as a fraction of the total axis range by using the
- keyword "graph".  A positive offset expands the axis range in the specified
- direction, e.g., a positive bottom offset makes ymin more negative.  Negative
- offsets, while permitted, can have unexpected interactions with autoscaling
- and clipping.  To prevent the auto-scaling from further adjusting your axis
- ranges, it is useful to also specify "set auto fix".
+ may specify the offsets as a fraction of the total graph dimension by using the
+ keyword "graph". Only "graph" offsets are possible for nonlinear axes.
+
+ A positive offset expands the axis range in the specified direction, e.g.
+ a positive bottom offset makes ymin more negative.  Negative offsets interact
+ badly with autoscaling and clipping.
+
+ To prevent the auto-scaling from further adjusting your axis ranges, it is
+ useful to also specify "set auto fix" or "set xrange noextend".
 
  Example:
        set auto fix
