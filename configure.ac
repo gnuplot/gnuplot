@@ -4,7 +4,7 @@ dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
 dnl
-AC_INIT([gnuplot],[5.3])
+AC_INIT([gnuplot],[5.5])
 AC_CONFIG_SRCDIR(src/graphics.c)
 AC_PREREQ([2.69])
 AC_CONFIG_HEADERS(config.h:config.hin)
@@ -13,7 +13,7 @@ AM_INIT_AUTOMAKE([1.10 subdir-objects])
 
 AM_MAINTAINER_MODE
 
-VERSION_MAJOR=AC_PACKAGE_VERSION
+VERSION_MAJOR="5.5"
 PATCHLEVEL="`cat $srcdir/PATCHLEVEL`"
 AC_DEFINE_UNQUOTED(VERSION_MAJOR,["$VERSION_MAJOR"],[The main version number])
 AC_DEFINE_UNQUOTED(PATCHLEVEL,["$PATCHLEVEL"],[The patch level, a.k.a. micro version number])

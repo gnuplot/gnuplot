@@ -191,16 +191,17 @@ C
  self-contained script demonstrating the problem is often helpful.
 
 2 New features
-3 Features introduced in version 5.3
-?new version_5.3
 ?new features
 ?new
- Version 5.3 is the current development version. New features introduced here
- will generally not appear in a supported release until version 5.4. Details
- may change before that.  However some features developed for 5.3 may be
- back-ported for inclusion in incremental patch-level releases of the stable
- version 5.2.x.
+ Version 5.5 is the current development version, built from a snapshot of the 
+ source files in the master branch of the git repository. New features
+ introduced here will generally not appear in a supported release until
+ version 5.6.  Details may change before that.
+ The current stable version is 5.2, with initial release of 5.4 expected in
+ Spring 2020.
 
+3 Features introduced in version 5.4
+?new version_5.4
 4 Support for 64-bit integer arithmetic
 #start
 #b All evaluation of expressions and functions uses 64-integer arithmetic if
@@ -276,8 +277,6 @@ C
 ##and label placement to generate a 2D projection of a 3D splot.
 ##`set view projection xy` is equivalent to `set view map`.
 #b `set rgbmax <value>` controls interpretation of input RGB values.
-#b new formats descriptors tH tM tS handle relative times (interval lengths).
-##See `time_specifiers`.
 #b Array size can be implicit if an initializer is present, e.g. `Array A = [1,2,3]`.
 #b Optional radial clipping of line segments in polar mode. See `set clip`.
 #b Extra lines to customize the key can be added by substituting `keyentry` in
@@ -331,20 +330,18 @@ C
 
 4 Changes
 #start
-#b `New default:` pm3d quadrangles are clipped smoothly to current zrange.
+#b `pm3d filled area quadrangles` are clipped smoothly to current zrange.
 ## This affects pm3d surfaces and also the faces of 3D boxes, polygons, etc.
-## `set pm3d clip4in` selects the previous default (skip entire quadrangle).
 #b Revised syntax for plot style 'with parallelaxes'. See `parallel`.
 ## The histogram, parallelaxis, and spiderplot styles now use similar syntax
-## that can iterate over plot elements: `plot for [column=1:N] DATA using column`
+## that can iterate over plot elements:
+##     `plot for [column=1:N] DATA using column`
 #b Imaginary values returned by the using specifier of a 2D plot are treated as
 ##undefined values (NaN) rather than as real(value).  This was always true for
 ##function plots and 3D data plots.  E.g. the following two plots are equivalent.
 ##plot [-1:1] sqrt(x); plot [-1:1] '+' using 1:(sqrt($1)
 #b The `set fontpath` command is deprecated. The search path for fonts to be
 ## embedded in output from the postscript terminal has been revised.
-#b Using `print` to load a datablock now generates additional datablock entries
-##when embedded newline characters are found
 #end
 3 Features introduced in version 5.2
 ?Features introduced in version 5.2
@@ -451,6 +448,8 @@ C
 #b Pseudo-file '++' generates samples on the u and v axes, rather than x and y.
 ## This allows placement of multiple parametric surfaces in 3D that occupy
 ## distinct regions of Cartesian space.  See `sampling.dem`.
+#b new formats descriptors tH tM tS handle relative times (interval lengths).
+##See `time_specifiers`.
 #b ^R initiates a reverse-search through the history for the built-in readline
 ## which is used on Windows, too, see `command-line-editing`.
 #b Revised printing support on Windows using `set output "PRN"`,
@@ -507,7 +506,7 @@ C
 ## gnuplot -c scriptfile.gp ARG1 ARG2 ARG3 ...
 #end
 
-2 Differences from version 4
+2 Differences between versions 4 and 5
 ?changes
 ?differences
  Some changes introduced in version 5 may cause certain scripts written
@@ -657,7 +656,7 @@ C
 
  In earlier versions of gnuplot, some terminal types used the values from
  `set size` to control also the size of the output canvas; others did not.
- The use of 'set size' for this purpose was deprecated in version 4.2.
+ The use of 'set size' for this purpose was deprecated in version 4.
  Almost all terminals now behave as follows:
 
  `set term <terminal_type> size <XX>, <YY>` controls the size of the output
@@ -1049,7 +1048,7 @@ C  need @ in table, so end and restart the table !
  text string like any other character. However it is useful for combining forms
  or supplemental diacritical marks (e.g. an arrow over a letter to represent
  a vector).  See `set encoding`, `utf8`, and the
-^ <a href="http://www.gnuplot.info/demo_5.3/unicode.html">
+^ <a href="http://www.gnuplot.info/demo_5.4/unicode.html">
  online unicode demo.
 ^ </a>
 
@@ -1967,8 +1966,6 @@ C marker below is used to signal this to doc2html:
 
  It reads string data starting at column N as a time/date value and uses "timeformat"
  to interpret this as "seconds since the epoch" to millisecond precision.
- Note: prior to version 5 this function took only a single parameter and worked only
- for columns that contained purely an axis coordinate.
 4 tm_hour
 ?expressions functions tm_hour
 ?tm_hour
@@ -2788,8 +2785,8 @@ C ... and restart the table:
 ?iteration
 ?iterate
 Ffigure_newsyntax
- Version 4.6 of gnuplot introduced command iteration and block-structured
- if/else/while/do constructs.  See `if`, `while`, and `do`.
+ gnuplot supports command iteration and block-structured if/else/while/do
+ constructs.  See `if`, `while`, and `do`.
  Simple iteration is possible inside `plot` or `set` commands.
  See `plot for`.  General iteration spanning multiple
  commands is possible using a block construct as shown below.
@@ -2930,9 +2927,7 @@ Ffigure_newsyntax
  "#AARRGGBB" represents an RGB color with an alpha channel (transparency)
  value in the high bits. An alpha value of 0 represents a fully opaque color;
  i.e., "#00RRGGBB" is the same as "#RRGGBB".  An alpha value of 255 (FF)
- represents full transparency. `Note`: This convention for the alpha channel
- is backwards from that used by the "with rgbalpha" image plot mode in earlier
- versions of gnuplot.
+ represents full transparency.
 
  The color palette is a linear gradient of colors that smoothly maps a
  single numerical value onto a particular color.  Two such mappings are always
@@ -4664,11 +4659,11 @@ Ffigure_parallel
      plot $DATA using col1{:varcol1} {at <xpos>} {<line properties}, \
           $DATA using col2, ...
 
- Note: This version of gnuplot introduces a CHANGE in the syntax for plot style
+ Note: Version 5.4 of gnuplot introduced a CHANGE in the syntax for plot style
  parallelaxes.  The revised syntax allows an unlimited number of parallel axes.
 
       gnuplot 5.2:   plot $DATA using 1:2:3:4:5 with parallelaxes
-      new syntax:    plot for [col=1:5] $DATA using col with parallelaxes
+      gnuplot 5.4:   plot for [col=1:5] $DATA using col with parallelaxes
 
  The new syntax also allows explicit placement of the parallel vertical axes
  along the x axis as in the example below.  If no explicit x coordinate is
@@ -5070,6 +5065,7 @@ Ffigure_pm3dsolid
  Unlike the line-trimming in hidden3d mode, pm3d surfaces can be smoothly
  clipped to the current zrange.  See `set pm3d clip z`.
 
+#TeX \newpage
 2 Fence plots
 ?fenceplots
 =zerrorfill
@@ -5264,8 +5260,7 @@ Ffigure_zerror
 3 old-style
 ?commands call old-style
 ?call old-style
- This describes the call mechanism used by older versions of gnuplot, now
- deprecated.
+ This describes the deprecated call mechanism used by old versions of gnuplot.
 
        call "<input-file>" <param-0> <param-1> ... <param-9>
 
@@ -5493,7 +5488,7 @@ Ffigure_zerror
  to the `yerrorlines` and `xyerrorlines` 2D plot styles.
 
  With the command `set fit v4` the fit command syntax is compatible with
- `gnuplot` version 4 and before.  Then there must be two more `using`
+ `gnuplot` version 4.  In this case there must be two more `using`
  qualifiers (z and s) than there are independent variables, unless there is
  only one variable.  `gnuplot` then uses the following formats, depending on
  the number of columns given in the `using` specification:
@@ -6330,10 +6325,6 @@ Ffigure_zerror
  `filetype`.  Otherwise, non-uniform matrix binary format is assumed.
  (See `binary matrix` for more details.)
 
- NB: In previous versions of gnuplot there have been some differences between
- the interpretation of binary data keywords by `plot` and `splot`.  Where the
- meanings differ, one or both may change in a future gnuplot version.
-
  Gnuplot knows how to read a few standard binary file types that are fully
  self-describing, e.g. PNG images.  Type `show datafile binary` at the
  command line for a list. Apart from these, you can think of binary data
@@ -6357,8 +6348,6 @@ Ffigure_zerror
  A colon can be used to separate the dimensions for multiple records.
  For example, `array=25:35` indicates there are two one-dimensional records in
  the file.
-       Note:  Gnuplot version 4.2 used the syntax array=128x128 rather than
-              array=(128,128). The older syntax is now deprecated.
 4 record
 ?binary record
  This keyword serves the same function as `array` and has the same syntax.
@@ -6668,7 +6657,7 @@ Ffigure_zerror
 ?data-file bins
 ?datafile bins
 ?bins
- EXPERIMENTAL (implementation details may change)
+ EXPERIMENTAL (implementation details may change in a future version)
  Syntax:
       plot 'DATA' using <XCOL> {:<YCOL>} bins{=<NBINS>}
            {binrange [<LOW>:<HIGH>]} {binwidth=<width>}
@@ -7235,7 +7224,6 @@ Ffigure_zerror
  the number of points along v controlled by `set isosamples`.  You must set
  urange and vrange before plotting '++'.  However the x and y ranges can be
  autoscaled or can be explicitly set to different values than urange and vrange.
- Use of u and v to sample '++' is a CHANGE from version 5.0
  Examples:
 
        splot '++' using 1:2:(sin($1)*sin($2)) with pm3d
@@ -7506,7 +7494,7 @@ Ffigure_zerror
  See `plot using xticlabels`.
 5 cbticlabels
 ?using cbticlabels
- EXPERIMENTAL (details may change before next release version)
+ EXPERIMENTAL (details may change in a future release version)
  2D plots: colorbar labels are placed at the palette coordinate used by the
  plot for variable coloring "lc palette z".
  3D plots: colorbar labels are placed at the z coordinate of the point.
@@ -8846,7 +8834,7 @@ Ffigure_zerror
  `set colorsequence classic` lets each separate terminal type provide its own
  sequence of line colors.  The number provided varies from 4 to more than 100,
  but most start with red/green/blue/magenta/cyan/yellow.
- This was the default behaviour of earlier gnuplot versions.
+ This was the default behaviour prior to version 5.
 
  `set colorsequence podo` selects eight colors drawn from a set recommended by
  Wong (2011) [Nature Methods 8:441] as being easily distinguished by color-blind
@@ -9311,8 +9299,6 @@ Ffigure_zerror
  Conversely `set datafile missing NaN` causes all data or expressions evaluating
  to not-a-number (NaN) to be treated as missing data.
 
- Note: The treatment of missing or invalid data values in certain cases has
- changed in this version of gnuplot.
  The example below shows differences between gnuplot version 4 and version 5.
 Ffigure_missing
  Example:
@@ -9361,7 +9347,7 @@ Ffigure_missing
 ^ <a href="http://www.gnuplot.info/demo/mgr.html">
  imageNaN demo.
 ^ </a>
- Similarly gnuplot 5.3 will notice the missing value flag in column N whether
+ Similarly gnuplot 5.4 will notice the missing value flag in column N whether
  the plot command specifies `using N` or `using ($N)` or `using (func($N))`.
  However if the "missing" value is encountered during evaluation of some more
  complicated expression, e.g. `using (column(strcol(1))`, it may evaluate to
@@ -9766,7 +9752,7 @@ Ffigure_missing
  terminal session.  `set fit quiet` turns off the echo, whereas `results`
  prints only final results.  `brief` gives one line summaries for every
  iteration of the fit in addition.  `verbose` yields detailed iteration
- reports as it was the default before version 5.
+ reports as in version 4.
 
  If the `errorvariables` option is turned on, the error of each fitted
  parameter computed by `fit` will be copied to a user-defined variable
@@ -9837,7 +9823,7 @@ Ffigure_missing
        set fontpath "/directory/where/my/fonts/live"
        set term postscript fontfile <filename>
 
- [DEPRECATED in version 5.3]
+ [DEPRECATED in version 5.4]
 
  The `fontpath` directory is relevant only for embedding fonts in
  postscript output produced by the postscript terminal.
@@ -10488,8 +10474,7 @@ Ffigure_missing
  `set history quiet` suppresses numbers for all future `history` commands.
 
  The `trim` option reduces the number of duplicate lines in the history list
- by removing earlier instances of the current command.  This was the default
- behavior prior to gnuplot version 5.
+ by removing earlier instances of the current command.
 
  Default settings: `set history size 500 numbers trim`.
 3 isosamples
@@ -10696,8 +10681,8 @@ Ffigure_missing
 ?set key fixed
 ?key fixed
  Placement of the key for 3D plots (`splot`) by default uses the `fixed` option.
- Note that this is a change from earlier gnuplot versions. `fixed` placement is
- very similar to `inside` placement with one important difference.  The plot
+ Note: this is a change from gnuplot version 5.0 and earlier. `fixed` placement
+ is very similar to `inside` placement with one important difference.  The plot
  boundaries of a 3D plot change as the view point is rotated or scaled.  If the
  key is positioned `inside` these boundaries then the key also moves when the
  view is changed. `fixed` positioning ignores changes to the view angles or
@@ -11105,8 +11090,7 @@ Ffigure_multiple_keys
  Every time you run gnuplot the line types will be initialized to these values.
  You may initialize as many linetypes as you like. If you do not redefine, say,
  linetype 3 then it will continue to have the default properties (in this case
- blue, pt 3, lw 1, etc).  The first few lines of the example script insure that
- the commands will be skipped by older versions of gnuplot.
+ blue, pt 3, lw 1, etc).
 
  Similar script files can be used to define theme-based color choices, or sets
  of colors optimized for a particular plot type or output device.
@@ -11339,8 +11323,7 @@ Ffigure_multiple_keys
  character (unicode U+00B5).  The byte sequence used to represent this character
  depends on the current encoding.  See `format specifiers`, `encoding`.
 
- This command is EXPERIMENTAL. It has known limitations and implementation
- details may change.
+ This command is EXPERIMENTAL. Implementation details may change.
 
 3 minussign
 ?commands set minussign
@@ -11372,8 +11355,7 @@ Ffigure_multiple_keys
  postscript prologue output by gnuplot remaps the ascii hyphen code \055 to a
  different glyph named `minus`.
 
- This command is EXPERIMENTAL. It has known limitations and implementation
- details may change.
+ This command is EXPERIMENTAL. Implementation details may change.
 
  Example (assumes utf8 locale):
 
@@ -12183,7 +12165,7 @@ Ffigure_multiple_keys
  The command `unset overflow` causes integer arithmetic overflow to be ignored.
  No error is shown.  This may be desirable if your platform allows only 32-bit
  integer arithmetic and you want to approximate the behaviour of gnuplot
- versions prior to 5.3.
+ versions prior to 5.4.
 
  The `reset` command does not affect the state of overflow handling.
 
@@ -12852,10 +12834,10 @@ Ffigure_multiple_keys
  Since the highlights from a single source only affect one side of the surface,
  a second spotlight source may be desirable to add specular highlights from the
  opposite direction.  This is controlled by "spec2 <contribution>".
- EXPERIMENTAL (details may change): The second spotlight is a pure red light
- source that by default contributes nothing (spec2 0.0).
+ EXPERIMENTAL (details may change in a future version): The second spotlight is
+ a pure red light source that by default contributes nothing (spec2 0.0).
  See also hidden_compare.dem
-^ <a href="http://www.gnuplot.info/demo_5.3/hidden_compare.html">
+^ <a href="http://www.gnuplot.info/demo_5.4/hidden_compare.html">
  (comparison of hidden3d and pm3d treatment of solid-color surfaces)
 ^ </a>
 4 position
@@ -15719,7 +15701,7 @@ Ffigure_walls
  are usually provided as a quoted string.  The function can be a mathematical
  expression, or a triple of mathematical expressions in parametric mode.
 
- A new feature in version 5.3 is that `splot` can operate on voxel data.
+ Starting in version 5.4 `splot` can operate on voxel data.
  See `voxel-grids`, `set vgrid`, `vxrange`.  At present voxel grids can be
  be plotted using styles `with dots`, `with points`, or `with isosurface`.
  Voxel grid values can also be referenced in the `using` specifiers of other
