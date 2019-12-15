@@ -76,11 +76,11 @@
 
 #define MyAppName "gnuplot"
 
-#define MyAppVersionShort "5.3"
+#define MyAppVersionShort "5.4"
 
-#define MyAppVersion "5.3 CVS"
+#define MyAppVersion "5.4"
 
-#define MyAppNumVersion "5.3.0"
+#define MyAppNumVersion "5.4.0"
 
 #define MyAppPublisher "gnuplot development team"
 
