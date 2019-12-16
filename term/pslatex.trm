@@ -789,7 +789,7 @@ EPSLATEX_reopen_output(char * ext)
                           "For epslatex standalone mode, you have to %s",
                           "give the tex filename as output");
             /* rename primary output (tex) */
-            strncpy( &outstr[outstrlen-4], ".tex", 4);
+            strncpy( &outstr[outstrlen-4], ".tex", 5);
             /* redirect FILE stream */
             gppsfile = gpoutfile;
             gpoutfile = fopen(outstr,"w");
