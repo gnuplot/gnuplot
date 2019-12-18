@@ -84,7 +84,6 @@ extern dynarray dyn_contour_levels_list;
 /* Prototypes of functions exported by contour.c */
 
 struct gnuplot_contours *contour(int num_isolines, struct iso_curve *iso_lines);
-int solve_tri_diag(tri_diag m[], double r[], double x[], int n);
 
 
 #endif /* GNUPLOT_CONTOUR_H */

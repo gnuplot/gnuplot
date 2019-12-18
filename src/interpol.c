@@ -72,10 +72,6 @@
  *    - samples, axis array[] variables
  *    - plottypes
  *
- *  proto.h
- *    - solve_tri_diag()
- *    - typedef tri_diag
- *
  * EXPORTS
  *  gen_interp()
  *  sort_points()
@@ -98,6 +94,8 @@
  *
  *  Jun 30, 1996 Jens Emmerich
  *      implemented handling of UNDEFINED points
+ *  Dec 2019 EAM
+ *	move solve_tri_diag from contour.c to here
  */
 
 #include "interpol.h"
@@ -129,6 +127,7 @@ static void eval_bezier(struct curve_points * cp, int first_point,
 			 int num_points, double sr, coordval * px,
 			 coordval *py, double *c);
 static void do_bezier(struct curve_points * cp, double *bc, int first_point, int num_points, struct coordinate * dest);
+static int solve_tri_diag(tri_diag m[], double r[], double x[], int n);
 static int solve_five_diag(five_diag m[], double r[], double x[], int n);
 static spline_coeff *cp_approx_spline(struct curve_points * plot, int first_point, int num_points);
 static spline_coeff *cp_tridiag(struct curve_points * plot, int first_point, int num_points);
@@ -648,8 +647,6 @@ cp_tridiag(struct curve_points *plot, int first_point, int num_points)
     xp = gp_alloc((num_points) * sizeof(double), "x pos");
     yp = gp_alloc((num_points) * sizeof(double), "y pos");
 
-    /* KB 981107: With logarithmic axis first convert back to linear scale */
-
     xp[0] = this_points[0].x;
     yp[0] = this_points[0].y;
     for (i = 1; i < num_points; i++) {
@@ -709,6 +706,36 @@ cp_tridiag(struct curve_points *plot, int first_point, int num_points)
     free(yp);
 
     return (sc);
+}
+
+/*
+ * Solve tri diagonal linear system equation. The tri diagonal matrix is
+ * defined via matrix M, right side is r, and solution X i.e. M * X = R.
+ * Size of system given in n. Return TRUE if solution exist.
+ */
+static int
+solve_tri_diag(tri_diag m[], double r[], double x[], int n)
+{
+    int i;
+    double t;
+
+    for (i = 1; i < n; i++) {	/* Eliminate element m[i][i-1] (lower diagonal). */
+	if (m[i - 1][1] == 0)
+	    return FALSE;
+	t = m[i][0] / m[i - 1][1];	/* Find ratio between the two lines. */
+	m[i][1] = m[i][1] - m[i - 1][2] * t;
+	r[i] = r[i] - r[i - 1] * t;
+    }
+    /* Back substitution - update the solution vector X */
+    if (m[n - 1][1] == 0)
+	return FALSE;
+    x[n - 1] = r[n - 1] / m[n - 1][1];	/* Find last element. */
+    for (i = n - 2; i >= 0; i--) {
+	if (m[i][1] == 0)
+	    return FALSE;
+	x[i] = (r[i] - x[i + 1] * m[i][2]) / m[i][1];
+    }
+    return TRUE;
 }
 
 void

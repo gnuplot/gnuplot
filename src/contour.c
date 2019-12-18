@@ -1329,40 +1329,6 @@ solve_cubic_2(tri_diag m[], double x[], int n)
 }
 
 /*
- * Solve tri diagonal linear system equation. The tri diagonal matrix is
- * defined via matrix M, right side is r, and solution X i.e. M * X = R.
- * Size of system given in n. Return TRUE if solution exist.
- */
-/* not used any more in "contour.c", but in "spline.c" (21. Dec. 1995) ! */
-
-int
-solve_tri_diag(tri_diag m[], double r[], double x[], int n)
-{
-    int i;
-    double t;
-
-    for (i = 1; i < n; i++) {	/* Eliminate element m[i][i-1] (lower diagonal). */
-	if (m[i - 1][1] == 0)
-	    return FALSE;
-	t = m[i][0] / m[i - 1][1];	/* Find ratio between the two lines. */
-/*      m[i][0] = m[i][0] - m[i-1][1] * t; */
-/* m[i][0] is not used any more (and set to 0 in the above line) */
-	m[i][1] = m[i][1] - m[i - 1][2] * t;
-	r[i] = r[i] - r[i - 1] * t;
-    }
-    /* Now do back subtitution - update the solution vector X: */
-    if (m[n - 1][1] == 0)
-	return FALSE;
-    x[n - 1] = r[n - 1] / m[n - 1][1];	/* Find last element. */
-    for (i = n - 2; i >= 0; i--) {
-	if (m[i][1] == 0)
-	    return FALSE;
-	x[i] = (r[i] - x[i + 1] * m[i][2]) / m[i][1];
-    }
-    return TRUE;
-}
-
-/*
  * Generate a Bspline curve defined by all the points given in linked list p:
  * Algorithm: using deBoor algorithm
  * Note: if Curvekind is open contour than Open end knot vector is assumed,
