@@ -96,6 +96,7 @@
  *      implemented handling of UNDEFINED points
  *  Dec 2019 EAM
  *	move solve_tri_diag from contour.c to here
+ *	generalize cp_tridiag to work on any coordinate dimension
  */
 
 #include "interpol.h"
@@ -130,7 +131,8 @@ static void do_bezier(struct curve_points * cp, double *bc, int first_point, int
 static int solve_tri_diag(tri_diag m[], double r[], double x[], int n);
 static int solve_five_diag(five_diag m[], double r[], double x[], int n);
 static spline_coeff *cp_approx_spline(struct curve_points * plot, int first_point, int num_points);
-static spline_coeff *cp_tridiag(struct curve_points * plot, int first_point, int num_points);
+static spline_coeff *cp_tridiag(struct curve_points * plot, int first_point, int num_points,
+					int path_dim, int spline_dim);
 static void do_cubic(struct curve_points * plot, spline_coeff * sc, int first_point, int num_points, struct coordinate * dest);
 static void do_freq(struct curve_points *plot,	int first_point, int num_points);
 static int compare_points(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2);
@@ -612,30 +614,48 @@ cp_approx_spline(
     return (sc);
 }
 
-
 /*
  * Calculation of cubic splines
- *
  * This can be treated as a special case of approximation cubic splines, with
  * all weights -> infinity.
  *
  * Returns matrix of spline coefficients
+ *
+ * Dec 2019 EAM - modified original routine cp_tridiag() for use to
+ * create multi-dimensional splines
+ *   original code: created a spline for y using x as the control variable
+ *   revised code:  spline for arbitrary coord using another variable as control
+ *
+ * Previous call to cp_tridiag(plot, start, n)
+ *      becomes     cp_tridiag(plot, start, n, 0, 1)
+ * To create a spline for an arbitrary coordinate, e.g. x,
+ *	load path increments into plot->points[i].xhigh
+ *      gen_cubic_spline(plot, start, n, 6, 0)
+ *
  */
 static spline_coeff *
-cp_tridiag(struct curve_points *plot, int first_point, int num_points)
+cp_tridiag(
+    struct curve_points *plot, int first_point, int num_points,
+    int path_dim, int spline_dim)
 {
     spline_coeff *sc;
     tri_diag *m;
     double *r, *x, *h, *xp, *yp;
-    struct coordinate *this_points;
     int i;
 
-    x_axis = plot->x_axis;
-    y_axis = plot->y_axis;
+    /* Define an overlay onto struct coordinate that lets us select whichever
+     * of x,y,z,... is needed by specifying an index 0-6
+     */
+    struct gen_coord {
+	enum coord_type type;
+	coordval dimension[7];
+    };
+    struct gen_coord *this_point;
+
     if (num_points < 3)
 	int_error(plot->token, "Can't calculate splines, need at least 3 points");
 
-    this_points = (plot->points) + first_point;
+    this_point = (struct gen_coord *)((plot->points) + first_point);
 
     sc = gp_alloc((num_points) * sizeof(spline_coeff), "spline matrix");
     m = gp_alloc((num_points - 2) * sizeof(tri_diag), "spline help matrix");
@@ -647,11 +667,11 @@ cp_tridiag(struct curve_points *plot, int first_point, int num_points)
     xp = gp_alloc((num_points) * sizeof(double), "x pos");
     yp = gp_alloc((num_points) * sizeof(double), "y pos");
 
-    xp[0] = this_points[0].x;
-    yp[0] = this_points[0].y;
+    xp[0] = this_point[0].dimension[path_dim];
+    yp[0] = this_point[0].dimension[spline_dim];
     for (i = 1; i < num_points; i++) {
-	xp[i] = this_points[i].x;
-	yp[i] = this_points[i].y;
+	xp[i] = this_point[i].dimension[path_dim];
+	yp[i] = this_point[i].dimension[spline_dim];
 	h[i - 1] = xp[i] - xp[i - 1];
     }
 
@@ -707,6 +727,8 @@ cp_tridiag(struct curve_points *plot, int first_point, int num_points)
 
     return (sc);
 }
+
+
 
 /*
  * Solve tri diagonal linear system equation. The tri diagonal matrix is
@@ -986,7 +1008,8 @@ gen_interp(struct curve_points *plot)
 	num_points = next_curve(plot, &first_point);
 	switch (plot->plot_smooth) {
 	case SMOOTH_CSPLINES:
-	    sc = cp_tridiag(plot, first_point, num_points);
+	    /* 0 and 1 signify x and y, the first two dimensions in struct coordinate */
+	    sc = cp_tridiag(plot, first_point, num_points, 0, 1);
 	    do_cubic(plot, sc, first_point, num_points,
 		     new_points + i * (samples_1 + 1));
 	    free(sc);
