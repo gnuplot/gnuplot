@@ -33,10 +33,9 @@
 #ifndef GNUPLOT_INTERPOL_H
 # define GNUPLOT_INTERPOL_H
 
-/* #if... / #include / #define collection: */
-
 #include "syscfg.h"
 #include "graphics.h"
+#include "graph3d.h"
 
 /* Type definitions */
 
@@ -51,5 +50,6 @@ void sort_points(struct curve_points *plot);
 void zsort_points(struct curve_points *plot);
 void cp_implode(struct curve_points *cp);
 void make_bins(struct curve_points *plot, int nbins, double binlow, double binhigh, double binwidth);
+void gen_3d_splines(struct surface_points *plot);
 
 #endif /* GNUPLOT_INTERPOL_H */

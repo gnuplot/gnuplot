@@ -103,6 +103,7 @@ typedef struct surface_points {
 
     /* 2D and 3D plot structure fields overlay only to this point */
 
+    enum PLOT_SMOOTH plot_smooth; /* EXPERIMENTAL: smooth lines in 3D */
     TBOOLEAN opt_out_of_hidden3d; /* set by "nohidden" option to splot command */
     TBOOLEAN opt_out_of_contours; /* set by "nocontours" option to splot command */
     TBOOLEAN opt_out_of_surface;  /* set by "nosurface" option to splot command */

@@ -180,6 +180,8 @@ typedef enum coord_type {
 #define CRD_PTCHAR ylow  /* Used by "with points pt variable */
 #define CRD_ZLOW xlow    /* Used by splot style ZERRORFILL */
 #define CRD_ZHIGH xhigh  /* Used by splot style ZERRORFILL */
+#define CRD_PATH xhigh	 /* Used by 3D spline code to hold path coordinate */
+#define PATHCOORD 6	 /*      must match ^^ */
 
 
 typedef struct coordinate {

@@ -43,6 +43,7 @@
 #include "eval.h"
 #include "graph3d.h"
 #include "hidden3d.h"
+#include "interpol.h"
 #include "misc.h"
 #include "parse.h"
 #include "pm3d.h"
@@ -429,7 +430,7 @@ refresh_3dbounds(struct surface_points *first_plot, int nplots)
 
 	for (this_curve = this_plot->iso_crvs; this_curve; this_curve = this_curve->next) {
 
-	    /* VECTOR plots consume two ico_crvs structures, one for heads and one for tails.
+	    /* VECTOR plots consume two iso_crvs structures, one for heads and one for tails.
 	     * Only the first one has the true point count; the second one claims zero.
 	     * FIXME: Maybe we should change this?
 	     */
@@ -1829,6 +1830,17 @@ eval_3dplots()
 		if (save_token != c_token)
 		    continue;
 
+		/* EXPERIMENTAL option for cubic splines in 3D */
+		/* csplines is the only smoothing option supported */
+		if (equals(c_token, "smooth")) {
+		    c_token++;
+		    if (almost_equals(c_token, "c$splines"))
+			c_token++;
+		    this_plot->plot_smooth = SMOOTH_CSPLINES;
+		    this_plot->plot_style = LINES;
+		    continue;
+		}
+
 		/* deal with style */
 		if (almost_equals(c_token, "w$ith")) {
 		    if (set_with) {
@@ -2296,6 +2308,12 @@ eval_3dplots()
 	    } else {
 		int_error(NO_CARET, "unexpected plot_type %d at plot3d:%d\n",
 			this_plot->plot_type, __LINE__);
+	    }
+
+	    if (this_plot->plot_type == DATA3D && this_plot->plot_style == LINES
+	    &&  this_plot->plot_smooth == SMOOTH_CSPLINES) {
+		gen_3d_splines(this_plot);
+		refresh_3dbounds(this_plot, 1);
 	    }
 
 	    SKIPPED_EMPTY_FILE:
