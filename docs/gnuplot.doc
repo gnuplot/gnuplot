@@ -202,7 +202,7 @@ C
 
 4 New plot styles and style options
 #start
-#b cubic spline smoothing of 3D lines
+#b cubic spline smoothing of 3D lines. See `splot smooth csplines`
 #end
 
 3 Features introduced in version 5.4
@@ -6950,8 +6950,12 @@ Ffigure_zerror
  an error message is produced.
 
  The `smooth` options have no effect on function plots.
- The only `smooth` option for splot is `splot ... smooth with lines`, which
- calculates a natural cubic spline approximation in 3D.
+
+ Smoothing in 3D plots (splot) is currently limited to generating a natural
+ cubic spline to pass through a set of 3D points.  E.g.
+
+      splot $DATA using 1:2:3 smooth csplines with lines
+
 5 acsplines
 ?commands plot datafile smooth acsplines
 ?plot datafile smooth acsplines
@@ -7010,11 +7014,23 @@ Ffigure_zerror
 ?plot csplines
 ?smooth csplines
 ?csplines
+?splot smooth csplines
  The `smooth csplines` option connects consecutive points by natural cubic
  splines after rendering the data monotonic on x (see `smooth unique`).
- EXPERIMENTAL: `splot ... smooth with lines` fits splines to the x, y, and z
- coordinates by treating them as implicitly dependent on a hidden parameter
- that represents fractional path length along the original path.
+ The smoothed curve always passes through the data points, so closely-spaced
+ points may generate local bumps and excursions in the smoothed curve.
+
+ EXPERIMENTAL:
+ `splot ... smooth with lines` fits splines to the x, y, and z coordinates of
+ successive data points.  Unlike the 2D case, the points are not sorted first
+ so it is possible to fit a spline to a trajectory that contains loops.
+ In the general case three separate sets of spline coefficients are generated,
+ each treating one coordinate x, y, or z as a function of a shared implicit
+ trajectory path parameter.  However if the curve lies in the xz, yz, or xy
+ plane then only a single set of spline coefficients is generated.
+ This allows you to generate a stack of smoothed curves in 3D where each one
+ replicates the spline fit you would have obtained from a 2D plot of the
+ coordinates in projection.
 5 mcsplines
 ?commands plot datafile smooth mcsplines
 ?plot datafile smooth mcsplines

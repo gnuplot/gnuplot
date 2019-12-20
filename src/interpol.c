@@ -697,6 +697,7 @@ cp_tridiag(
 
     /* solve the matrix */
     if (!solve_tri_diag(m, r, x, num_points - 2)) {
+	free(sc);
 	free(h);
 	free(x);
 	free(r);
@@ -1506,11 +1507,12 @@ do_3d_cubic(struct iso_curve *curve)
     struct coordinate *old_points, *new_points;
     double xrange, yrange, zrange;
     double dx, dy, dz;
+    double maxdx, maxdy, maxdz;
     double t, tsum, tstep;
 
-    spline_coeff *sc_x;
-    spline_coeff *sc_y;
-    spline_coeff *sc_z;
+    spline_coeff *sc_x = NULL;
+    spline_coeff *sc_y = NULL;
+    spline_coeff *sc_z = NULL;
 
     old_points = curve->points;
 
@@ -1531,6 +1533,7 @@ do_3d_cubic(struct iso_curve *curve)
 
     /* Construct path-length vector; store it in unused slot of old_points */
     t = tsum = 0.0;
+    maxdx = maxdy = maxdz = 0.0;
     old_points[0].CRD_PATH = 0;
     for (i = 1; i < curve->p_count; i++) {
 	dx = (old_points[i].x - old_points[i-1].x) / xrange;
@@ -1538,37 +1541,119 @@ do_3d_cubic(struct iso_curve *curve)
 	dz = (old_points[i].z - old_points[i-1].z) / zrange;
 	tsum += sqrt( dx*dx + dy*dy + dz*dz );
 	old_points[i].CRD_PATH = tsum;
+
+	/* Track planarity */
+	if (fabs(dx) > maxdx)
+	    maxdx = fabs(dx);
+	if (fabs(dy) > maxdy)
+	    maxdy = fabs(dy);
+	if (fabs(dz) > maxdz)
+	    maxdz = fabs(dz);
     }
-    /* [not strictly necessary] Normalize so that path always runs from 0 to 1 */
+
+    /* Normalize so that the path always runs from 0 to 1 */
     for (i = 1; i < curve->p_count; i++)
 	old_points[i].CRD_PATH /= tsum;
-
     tstep = old_points[curve->p_count-1].CRD_PATH / (double)(nseg - 1);
 
-    /* Create and fill in list of interpolated points */
+    /* Create new list to hold interpolated points */
     new_points = gp_alloc((nseg+1) * sizeof(struct coordinate), "3D spline");
     memset( new_points, 0, (nseg+1) * sizeof(struct coordinate));
 
-    /* Calculate spline coefficients for each dimension x, y, z */
-    sc_x = cp_tridiag( curve->points, curve->p_count, PATHCOORD, 0);
-    sc_y = cp_tridiag( curve->points, curve->p_count, PATHCOORD, 1);
-    sc_z = cp_tridiag( curve->points, curve->p_count, PATHCOORD, 2);
+    /*
+     * If the curve being fitted lies entirely in one plane,
+     * we can do better by fitting a 2D spline rather than a 3D spline.
+     * This benefits the relatively common case of drawing a stack of
+     * 2D plots (e.g. fence plots).
+     * First check for a curve lying in the yz plane (x = constant).
+     */
+    if (maxdx < FLT_EPSILON) {
+	tstep = (old_points[curve->p_count-1].y - old_points[0].y) / (double)(nseg - 1);
+	sc_z = cp_tridiag(curve->points, curve->p_count, 1, 2);
 
-    for (i = 0, l=0; i < nseg; i++) {
-	double temp;
-	t = i * tstep;
-	/* Move forward to the spline interval this point is in */
-	while ((t >= old_points[l + 1].CRD_PATH) && (l < curve->p_count- 2))
-	    l++;
-	temp = t - old_points[l].CRD_PATH;
-
-	new_points[i].x = ((sc_x[l][3] * temp + sc_x[l][2]) * temp + sc_x[l][1])
-			* temp + sc_x[l][0];
-	new_points[i].y = ((sc_y[l][3] * temp + sc_y[l][2]) * temp + sc_y[l][1])
-			* temp + sc_y[l][0];
-	new_points[i].z = ((sc_z[l][3] * temp + sc_z[l][2]) * temp + sc_z[l][1])
-			* temp + sc_z[l][0];
+	for (i = 0, l = 0; i < nseg; i++) {
+	    double temp;
+	    t = old_points[0].y + i * tstep;
+	    /* Move forward to the spline interval this point is in */
+	    while ((t >= old_points[l + 1].y) && (l < curve->p_count- 2))
+		l++;
+	    temp = t - old_points[l].y;
+	    new_points[i].x = old_points[l].x;	/* All the same */
+	    new_points[i].y = t;
+	    new_points[i].z = ((sc_z[l][3] * temp + sc_z[l][2]) * temp + sc_z[l][1])
+			    * temp + sc_z[l][0];
+	}
     }
+
+    /*
+     * Check for a curve lying in the xz plane (y = constant).
+     */
+    else if (maxdy < FLT_EPSILON) {
+	tstep = (old_points[curve->p_count-1].x - old_points[0].x) / (double)(nseg - 1);
+	sc_z = cp_tridiag(curve->points, curve->p_count, 0, 2);
+
+	for (i = 0, l = 0; i < nseg; i++) {
+	    double temp;
+	    t = old_points[0].x + i * tstep;
+	    /* Move forward to the spline interval this point is in */
+	    while ((t >= old_points[l + 1].x) && (l < curve->p_count- 2))
+		l++;
+	    temp = t - old_points[l].x;
+	    new_points[i].x = t;
+	    new_points[i].y = old_points[l].y;	/* All the same */
+	    new_points[i].z = ((sc_z[l][3] * temp + sc_z[l][2]) * temp + sc_z[l][1])
+			    * temp + sc_z[l][0];
+	}
+    }
+
+    /*
+     * Check for a curve lying in the xy plane (z = constant).
+     */
+    else if (maxdz < FLT_EPSILON) {
+	tstep = (old_points[curve->p_count-1].x - old_points[0].x) / (double)(nseg - 1);
+	sc_y = cp_tridiag(curve->points, curve->p_count, 0, 1);
+
+	for (i = 0, l = 0; i < nseg; i++) {
+	    double temp;
+	    t = old_points[0].x + i * tstep;
+	    /* Move forward to the spline interval this point is in */
+	    while ((t >= old_points[l + 1].x) && (l < curve->p_count- 2))
+		l++;
+	    temp = t - old_points[l].x;
+	    new_points[i].x = t;
+	    new_points[i].y = ((sc_y[l][3] * temp + sc_y[l][2]) * temp + sc_y[l][1])
+			    * temp + sc_y[l][0];
+	    new_points[i].z = old_points[l].z;	/* All the same */
+	}
+    }
+
+    /*
+     * This is the general case.
+     * Calculate spline coefficients for each dimension x, y, z
+     */
+    else {
+	sc_x = cp_tridiag( curve->points, curve->p_count, PATHCOORD, 0);
+	sc_y = cp_tridiag( curve->points, curve->p_count, PATHCOORD, 1);
+	sc_z = cp_tridiag( curve->points, curve->p_count, PATHCOORD, 2);
+
+	for (i = 0, l=0; i < nseg; i++) {
+	    double temp;
+	    t = i * tstep;
+	    /* Move forward to the spline interval this point is in */
+	    while ((t >= old_points[l + 1].CRD_PATH) && (l < curve->p_count- 2))
+		l++;
+	    temp = t - old_points[l].CRD_PATH;
+
+	    new_points[i].x = ((sc_x[l][3] * temp + sc_x[l][2]) * temp + sc_x[l][1])
+			    * temp + sc_x[l][0];
+	    new_points[i].y = ((sc_y[l][3] * temp + sc_y[l][2]) * temp + sc_y[l][1])
+			    * temp + sc_y[l][0];
+	    new_points[i].z = ((sc_z[l][3] * temp + sc_z[l][2]) * temp + sc_z[l][1])
+			    * temp + sc_z[l][0];
+	}
+    }
+
+    /* We're done with the spline coefficients */
     free(sc_x);
     free(sc_y);
     free(sc_z);
@@ -1578,6 +1663,7 @@ do_3d_cubic(struct iso_curve *curve)
     curve->points = new_points;
     curve->p_count = nseg;
     curve->p_max = nseg+1;	/* not sure why we asked for 1 extra */
+
 }
 
 /*
