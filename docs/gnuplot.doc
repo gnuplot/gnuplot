@@ -193,12 +193,17 @@ C
 2 New features
 ?new features
 ?new
- Version 5.5 is the current development version, built from a snapshot of the 
- source files in the master branch of the git repository. New features
- introduced here will generally not appear in a supported release until
- version 5.6.  Details may change before that.
- The current stable version is 5.2, with initial release of 5.4 expected in
- Spring 2020.
+3 Development version
+?development version
+ Version 5.5 is the current development version, built from a snapshot of
+ the source files in the master branch of the git repository.
+ New features introduced here will generally not appear in a supported
+ release until version 5.6.  Details may change before that.
+
+4 New plot styles and style options
+#start
+#b cubic spline smoothing of 3D lines
+#end
 
 3 Features introduced in version 5.4
 ?new version_5.4
@@ -6593,7 +6598,8 @@ Ffigure_zerror
 ## reread later and therefore it should be retained internally for re-use.
 #end
 
- `splot` has a similar syntax but does not support `smooth` or `bins`.
+ `splot` has a similar syntax but does not support `bins`.
+ `splot` support for `smooth` (csplines only) is EXPERIMENTAL.
 
  The `noautoscale` keyword means that the points making up this plot will be
  ignored when automatically determining axis range limits.
@@ -6944,6 +6950,8 @@ Ffigure_zerror
  an error message is produced.
 
  The `smooth` options have no effect on function plots.
+ The only `smooth` option for splot is `splot ... smooth with lines`, which
+ calculates a natural cubic spline approximation in 3D.
 5 acsplines
 ?commands plot datafile smooth acsplines
 ?plot datafile smooth acsplines
@@ -7003,7 +7011,10 @@ Ffigure_zerror
 ?smooth csplines
 ?csplines
  The `smooth csplines` option connects consecutive points by natural cubic
- splines after rendering the data monotonic (see `smooth unique`).
+ splines after rendering the data monotonic on x (see `smooth unique`).
+ EXPERIMENTAL: `splot ... smooth with lines` fits splines to the x, y, and z
+ coordinates by treating them as implicitly dependent on a hidden parameter
+ that represents fractional path length along the original path.
 5 mcsplines
 ?commands plot datafile smooth mcsplines
 ?plot datafile smooth mcsplines
