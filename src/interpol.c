@@ -130,7 +130,8 @@ static void eval_bezier(struct curve_points * cp, int first_point,
 static void do_bezier(struct curve_points * cp, double *bc, int first_point, int num_points, struct coordinate * dest);
 static int solve_tri_diag(tri_diag m[], double r[], double x[], int n);
 static int solve_five_diag(five_diag m[], double r[], double x[], int n);
-static spline_coeff *cp_approx_spline(struct curve_points * plot, int first_point, int num_points);
+static spline_coeff *cp_approx_spline(struct coordinate *first_point, int num_points,
+					int path_dim, int spline_dim, int w_dim);
 static spline_coeff *cp_tridiag(struct coordinate *first_point, int num_points,
 					int path_dim, int spline_dim);
 static void do_cubic(struct curve_points * plot, spline_coeff * sc, int first_point, int num_points, struct coordinate * dest);
@@ -492,37 +493,43 @@ solve_five_diag(five_diag m[], double r[], double x[], int n)
 
 /*
  * Calculation of approximation cubic splines
- * Input:  x[i], y[i], weights z[i]
- *
  * Returns matrix of spline coefficients
+ * Dec 2019 EAM - modified original routine cp_approx_spline for use with
+ *                multi-dimensional splines
+ * original code: created spline for y given x = control, variable z = weight
+ * revised code:  create spline for coordinate indexed by spline_dim
+ *                given control variable indexed by path_dim
+ *                weights indexed by w_dim
  */
 static spline_coeff *
 cp_approx_spline(
-    struct curve_points *plot,
-    int first_point,		/* where to start in plot->points */
-    int num_points)		/* to determine end in plot->points */
+    struct coordinate *points, int num_points,
+    int path_dim, int spline_dim, int w_dim)
 {
     spline_coeff *sc;
     five_diag *m;
     double *r, *x, *h, *xp, *yp;
-    struct coordinate *this_points;
     int i;
 
-    x_axis = plot->x_axis;
-    y_axis = plot->y_axis;
-
-    sc = gp_alloc((num_points) * sizeof(spline_coeff),
-				   "spline matrix");
+    /* Define an overlay onto struct coordinate that lets us select whichever
+     * of x,y,z,... is needed by specifying an index 0-6
+     */
+    struct gen_coord {
+	enum coord_type type;
+	coordval dimension[7];
+    };
+    struct gen_coord *this_point;
 
     if (num_points < 4)
-	int_error(plot->token, "Can't calculate approximation splines, need at least 4 points");
+	int_error(NO_CARET, "Can't calculate approximation splines, need at least 4 points");
 
-    this_points = (plot->points) + first_point;
+    this_point = (struct gen_coord *)(points);
 
     for (i = 0; i < num_points; i++)
-	if (this_points[i].z <= 0)
-	    int_error(plot->token, "Can't calculate approximation splines, all weights have to be > 0");
+	if (this_point[i].dimension[w_dim] <= 0)
+	    int_error(NO_CARET, "Can't calculate approximation splines, all weights have to be > 0");
 
+    sc = gp_alloc((num_points) * sizeof(spline_coeff), "spline matrix");
     m = gp_alloc((num_points - 2) * sizeof(five_diag), "spline help matrix");
 
     r = gp_alloc((num_points - 2) * sizeof(double), "spline right side");
@@ -532,11 +539,11 @@ cp_approx_spline(
     xp = gp_alloc((num_points) * sizeof(double), "x pos");
     yp = gp_alloc((num_points) * sizeof(double), "y pos");
 
-    xp[0] = this_points[0].x;
-    yp[0] = this_points[0].y;
+    xp[0] = this_point[0].dimension[path_dim];
+    yp[0] = this_point[0].dimension[spline_dim];
     for (i = 1; i < num_points; i++) {
-	xp[i] = this_points[i].x;
-	yp[i] = this_points[i].y;
+	xp[i] = this_point[i].dimension[path_dim];
+	yp[i] = this_point[i].dimension[spline_dim];
 	h[i - 1] = xp[i] - xp[i - 1];
     }
 
@@ -549,54 +556,55 @@ cp_approx_spline(
 	if (i < 2)
 	    m[i][0] = 0;
 	else
-	    m[i][0] = 6 / this_points[i].z / h[i - 1] / h[i];
+	    m[i][0] = 6 / this_point[i].dimension[w_dim] / h[i - 1] / h[i];
 
 	if (i < 1)
 	    m[i][1] = 0;
 	else
-	    m[i][1] = h[i] - 6 / this_points[i].z / h[i] * (1 / h[i - 1] + 1 / h[i])
-		- 6 / this_points[i + 1].z / h[i] * (1 / h[i] + 1 / h[i + 1]);
+	    m[i][1] = h[i] - 6 / this_point[i].dimension[w_dim] / h[i] * (1 / h[i - 1] + 1 / h[i])
+		- 6 / this_point[i + 1].dimension[w_dim] / h[i] * (1 / h[i] + 1 / h[i + 1]);
 
 	m[i][2] = 2 * (h[i] + h[i + 1])
-	    + 6 / this_points[i].z / h[i] / h[i]
-	    + 6 / this_points[i + 1].z * (1 / h[i] + 1 / h[i + 1]) * (1 / h[i] + 1 / h[i + 1])
-	    + 6 / this_points[i + 2].z / h[i + 1] / h[i + 1];
+	    + 6 / this_point[i].dimension[w_dim] / h[i] / h[i]
+	    + 6 / this_point[i + 1].dimension[w_dim] * (1 / h[i] + 1 / h[i + 1]) * (1 / h[i] + 1 / h[i + 1])
+	    + 6 / this_point[i + 2].dimension[w_dim] / h[i + 1] / h[i + 1];
 
 	if (i > num_points - 4)
 	    m[i][3] = 0;
 	else
-	    m[i][3] = h[i + 1] - 6 / this_points[i + 1].z / h[i + 1] * (1 / h[i] + 1 / h[i + 1])
-		- 6 / this_points[i + 2].z / h[i + 1] * (1 / h[i + 1] + 1 / h[i + 2]);
+	    m[i][3] = h[i + 1] - 6 / this_point[i + 1].dimension[w_dim] / h[i + 1] * (1 / h[i] + 1 / h[i + 1])
+		- 6 / this_point[i + 2].dimension[w_dim] / h[i + 1] * (1 / h[i + 1] + 1 / h[i + 2]);
 
 	if (i > num_points - 5)
 	    m[i][4] = 0;
 	else
-	    m[i][4] = 6 / this_points[i + 2].z / h[i + 1] / h[i + 2];
+	    m[i][4] = 6 / this_point[i + 2].dimension[w_dim] / h[i + 1] / h[i + 2];
     }
 
     /* solve the matrix */
     if (!solve_five_diag(m, r, x, num_points - 2)) {
+	free(sc);
 	free(h);
 	free(x);
 	free(r);
 	free(m);
 	free(xp);
 	free(yp);
-	int_error(plot->token, "Can't calculate approximation splines");
+	int_error(NO_CARET, "Can't calculate approximation splines");
     }
     sc[0][2] = 0;
     for (i = 1; i <= num_points - 2; i++)
 	sc[i][2] = x[i - 1];
     sc[num_points - 1][2] = 0;
 
-    sc[0][0] = yp[0] + 2 / this_points[0].z / h[0] * (sc[0][2] - sc[1][2]);
+    sc[0][0] = yp[0] + 2 / this_point[0].dimension[w_dim] / h[0] * (sc[0][2] - sc[1][2]);
     for (i = 1; i <= num_points - 2; i++)
-	sc[i][0] = yp[i] - 2 / this_points[i].z *
+	sc[i][0] = yp[i] - 2 / this_point[i].dimension[w_dim] *
 	    (sc[i - 1][2] / h[i - 1]
 	     - sc[i][2] * (1 / h[i - 1] + 1 / h[i])
 	     + sc[i + 1][2] / h[i]);
     sc[num_points - 1][0] = yp[num_points - 1]
-	- 2 / this_points[num_points - 1].z / h[num_points - 2]
+	- 2 / this_point[num_points - 1].dimension[w_dim] / h[num_points - 2]
 	* (sc[num_points - 2][2] - sc[num_points - 1][2]);
 
     for (i = 0; i <= num_points - 2; i++) {
@@ -1017,7 +1025,8 @@ gen_interp(struct curve_points *plot)
 	    free(sc);
 	    break;
 	case SMOOTH_ACSPLINES:
-	    sc = cp_approx_spline(plot, first_point, num_points);
+	    /* 0 = control axis x,  1 = spline on y,  2 = weights held in z */
+	    sc = cp_approx_spline(&plot->points[first_point], num_points, 0, 1, 2);
 	    do_cubic(plot, sc, first_point, num_points,
 		     new_points + i * (samples_1 + 1));
 	    free(sc);
@@ -1520,8 +1529,6 @@ do_3d_cubic(struct iso_curve *curve)
      * Sanity check axis ranges.
      * This catches curves that lie in a plane of constant x or y.
      * The fixup prints a warning to the user but we don't see it here.
-     * It might be better to check explicitly and fall back to a 2D
-     * spline treatment rather than proceeding.
      */
     axis_checked_extend_empty_range(FIRST_X_AXIS, "at time of spline generation");
     axis_checked_extend_empty_range(FIRST_Y_AXIS, "at time of spline generation");
