@@ -1,5 +1,6 @@
 Changes not in 5.4
 ==================
+* NEW weighted and unweighted cubic spline smoothing for 3D "splot with lines"
 * CHANGE account for font size when estimating string extents
 
 Changes in 5.4

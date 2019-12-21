@@ -414,16 +414,6 @@ do_bezier(
 }
 
 /*
- * call contouring routines -- main entry
- */
-
-/*
- * it should be like this, but it doesn't run. If you find out why,
- * contact me: mgr@asgard.bo.open.de or Lars Hanke 2:243/4802.22@fidonet
- *
- */
-
-/*
  * Solve five diagonal linear system equation. The five diagonal matrix is
  * defined via matrix M, right side is r, and solution X i.e. M * X = R.
  * Size of system given in n. Return TRUE if solution exist.
@@ -1508,7 +1498,7 @@ make_bins(struct curve_points *plot, int nbins,
  *	number of spline samples should be independent of "set samples"
  */
 static void
-do_3d_cubic(struct iso_curve *curve)
+do_3d_cubic(struct iso_curve *curve, enum PLOT_SMOOTH smooth_option)
 {
     int i, l;
 
@@ -1576,7 +1566,11 @@ do_3d_cubic(struct iso_curve *curve)
      */
     if (maxdx < FLT_EPSILON) {
 	tstep = (old_points[curve->p_count-1].y - old_points[0].y) / (double)(nseg - 1);
-	sc_z = cp_tridiag(curve->points, curve->p_count, 1, 2);
+
+	if (smooth_option == SMOOTH_ACSPLINES)
+	    sc_z = cp_approx_spline(curve->points, curve->p_count, 1, 2, 3);
+	else
+	    sc_z = cp_tridiag(curve->points, curve->p_count, 1, 2);
 
 	for (i = 0, l = 0; i < nseg; i++) {
 	    double temp;
@@ -1597,7 +1591,10 @@ do_3d_cubic(struct iso_curve *curve)
      */
     else if (maxdy < FLT_EPSILON) {
 	tstep = (old_points[curve->p_count-1].x - old_points[0].x) / (double)(nseg - 1);
-	sc_z = cp_tridiag(curve->points, curve->p_count, 0, 2);
+	if (smooth_option == SMOOTH_ACSPLINES)
+	    sc_z = cp_approx_spline(curve->points, curve->p_count, 0, 2, 3);
+	else
+	    sc_z = cp_tridiag(curve->points, curve->p_count, 0, 2);
 
 	for (i = 0, l = 0; i < nseg; i++) {
 	    double temp;
@@ -1618,7 +1615,10 @@ do_3d_cubic(struct iso_curve *curve)
      */
     else if (maxdz < FLT_EPSILON) {
 	tstep = (old_points[curve->p_count-1].x - old_points[0].x) / (double)(nseg - 1);
-	sc_y = cp_tridiag(curve->points, curve->p_count, 0, 1);
+	if (smooth_option == SMOOTH_ACSPLINES)
+	    sc_y = cp_approx_spline(curve->points, curve->p_count, 0, 1, 3);
+	else
+	    sc_y = cp_tridiag(curve->points, curve->p_count, 0, 1);
 
 	for (i = 0, l = 0; i < nseg; i++) {
 	    double temp;
@@ -1639,9 +1639,15 @@ do_3d_cubic(struct iso_curve *curve)
      * Calculate spline coefficients for each dimension x, y, z
      */
     else {
-	sc_x = cp_tridiag( curve->points, curve->p_count, PATHCOORD, 0);
-	sc_y = cp_tridiag( curve->points, curve->p_count, PATHCOORD, 1);
-	sc_z = cp_tridiag( curve->points, curve->p_count, PATHCOORD, 2);
+	if (smooth_option == SMOOTH_ACSPLINES) {
+	    sc_x = cp_approx_spline(curve->points, curve->p_count, PATHCOORD, 0, 3);
+	    sc_y = cp_approx_spline(curve->points, curve->p_count, PATHCOORD, 1, 3);
+	    sc_z = cp_approx_spline(curve->points, curve->p_count, PATHCOORD, 2, 3);
+	} else {
+	    sc_x = cp_tridiag( curve->points, curve->p_count, PATHCOORD, 0);
+	    sc_y = cp_tridiag( curve->points, curve->p_count, PATHCOORD, 1);
+	    sc_z = cp_tridiag( curve->points, curve->p_count, PATHCOORD, 2);
+	}
 
 	for (i = 0, l=0; i < nseg; i++) {
 	    double temp;
@@ -1685,7 +1691,7 @@ gen_3d_splines( struct surface_points *plot )
 	/* Remove any unusable points before fitting a spline */
 	do_curve_cleanup(curve);
 	if (curve->p_count > 3)
-	    do_3d_cubic(curve);
+	    do_3d_cubic(curve, plot->plot_smooth);
 	curve = curve->next;
     }
 }

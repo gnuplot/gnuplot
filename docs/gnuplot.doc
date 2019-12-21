@@ -6598,8 +6598,8 @@ Ffigure_zerror
 ## reread later and therefore it should be retained internally for re-use.
 #end
 
- `splot` has a similar syntax but does not support `bins`.
- `splot` support for `smooth` (csplines only) is EXPERIMENTAL.
+ `splot` has a similar syntax but does not support `bins` and smoothing
+ support is limited to `smooth csplines` and `smooth acsplines`.
 
  The `noautoscale` keyword means that the points making up this plot will be
  ignored when automatically determining axis range limits.
@@ -6963,6 +6963,8 @@ Ffigure_zerror
 ?datafile smooth acsplines
 ?plot smooth acsplines
 ?plot acsplines
+?splot smooth acsplines
+?splot acsplines
 ?smooth acsplines
 ?acsplines
  The `smooth acsplines` option approximates the data with a natural smoothing
@@ -6987,6 +6989,17 @@ Ffigure_zerror
  Example:
        sw(x,S)=1/(x*x*S)
        plot 'data_file' using 1:2:(sw($3,100)) smooth acsplines
+       splot 'data_file' using 1:2:3:(sw($4,100)) smooth acsplines
+
+ EXPERIMENTAL:
+ `splot ... smooth acsplines with lines` fits splines to the x, y, and z
+ coordinates of successive data points.  Unlike the 2D case, the points are not
+ sorted first so it is possible to fit splines to a trajectory containing loops.
+ Caution: In the general 3D case there are many more spline terms fitted, so the
+ weight value must be larger to achieve a comparable effect.  Also note that
+ fractional path length is used as the implicit control variable and therefore
+ the intervals being weighted do not match the projections onto a single axis.
+
 5 bezier
 ?commands plot datafile smooth bezier
 ?plot datafile smooth bezier
@@ -7021,9 +7034,9 @@ Ffigure_zerror
  points may generate local bumps and excursions in the smoothed curve.
 
  EXPERIMENTAL:
- `splot ... smooth with lines` fits splines to the x, y, and z coordinates of
- successive data points.  Unlike the 2D case, the points are not sorted first
- so it is possible to fit a spline to a trajectory that contains loops.
+ `splot ... smooth csplines with lines` fits splines to the x, y, and z
+ coordinates of successive data points.  Unlike the 2D case, the points are not
+ sorted first so it is possible to fit splines to a trajectory containing loops.
  In the general case three separate sets of spline coefficients are generated,
  each treating one coordinate x, y, or z as a function of a shared implicit
  trajectory path parameter.  However if the curve lies in the xz, yz, or xy

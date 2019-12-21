@@ -882,6 +882,7 @@ get_3ddata(struct surface_points *this_plot)
 	double x, y, z;
 	double xlow = 0, xhigh = 0;
 	double xtail, ytail, ztail;
+	double weight = 1.0;
 	double zlow = VERYLARGE, zhigh = -VERYLARGE;
 	double color = VERYLARGE;
 	int pm3d_color_from_column = FALSE;
@@ -1209,6 +1210,12 @@ get_3ddata(struct surface_points *this_plot)
 		}
 		track_pm3d_quadrangles = TRUE;
 
+	    } else if (this_plot->plot_style == LINES && this_plot->plot_smooth == SMOOTH_ACSPLINES) {
+		if (j >= 4)
+		    weight = v[3];	/* spline weights */
+		else
+		    weight = 1.0;	/* default weight */
+
 	    } else {	/* all other plot styles */
 		if (j >= 4) {
 		    color = v[3];
@@ -1259,6 +1266,10 @@ get_3ddata(struct surface_points *this_plot)
 				this_plot->noautoscale, goto come_here_if_undefined);
 		    STORE_AND_UPDATE_RANGE(cp->CRD_ZHIGH, zhigh, cp->type, z_axis,
 				this_plot->noautoscale, goto come_here_if_undefined);
+		}
+
+		if (this_plot->plot_style == LINES && this_plot->plot_smooth == SMOOTH_ACSPLINES) {
+		    cp->ylow = weight;
 		}
 
 		if (this_plot->plot_style == BOXES) {
@@ -1830,13 +1841,17 @@ eval_3dplots()
 		if (save_token != c_token)
 		    continue;
 
-		/* EXPERIMENTAL option for cubic splines in 3D */
-		/* csplines is the only smoothing option supported */
+		/* EXPERIMENTAL smoothing options for splot with lines */
 		if (equals(c_token, "smooth")) {
 		    c_token++;
-		    if (almost_equals(c_token, "c$splines"))
+		    if (almost_equals(c_token, "c$splines")) {
 			c_token++;
-		    this_plot->plot_smooth = SMOOTH_CSPLINES;
+			this_plot->plot_smooth = SMOOTH_CSPLINES;
+		    } else if (almost_equals(c_token, "acs$plines")) {
+			c_token++;
+			this_plot->plot_smooth = SMOOTH_ACSPLINES;
+		    } else
+			int_error(c_token, "only cspline or acsplines possible here");
 		    this_plot->plot_style = LINES;
 		    continue;
 		}
@@ -2311,7 +2326,7 @@ eval_3dplots()
 	    }
 
 	    if (this_plot->plot_type == DATA3D && this_plot->plot_style == LINES
-	    &&  this_plot->plot_smooth == SMOOTH_CSPLINES) {
+	    &&  this_plot->plot_smooth != SMOOTH_NONE) {
 		gen_3d_splines(this_plot);
 		refresh_3dbounds(this_plot, 1);
 	    }
