@@ -1,12 +1,12 @@
-<html><head><title>Demos for gnuplot version 5.3</title>
+<html><head><title>Demos for gnuplot version 5.4</title>
 
 <link text="text/css" href="gnuplot_demo.css" rel="stylesheet"></head><body>
 
 
-<h2 align=center>Demos for gnuplot version 5.3 (pngcairo terminal)<br>
+<h2 align=center>Demos for gnuplot version 5.4 (pngcairo terminal)<br>
     See also the demo output for the
-    <a href="../demo_svg_5.3/">SVG</a> and
-    <a href="../demo_canvas_5.3/">canvas</a> terminals.
+    <a href="../demo_svg_5.4/">SVG</a> and
+    <a href="../demo_canvas_5.4/">canvas</a> terminals.
 </h2>
 
 <p>
@@ -214,7 +214,7 @@ Here are samples of PNG output from some of the demos.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated November 2019</i>
+    <i>This page generated December 2019</i>
     </td>
 
     <td>
@@ -222,9 +222,9 @@ Here are samples of PNG output from some of the demos.
     <li><a href="http://sourceforge.net/projects/gnuplot/">
 	Gnuplot development pages on SourceForge</a></li>
     <li>On-line PDF documentation in
-	<a href="http://gnuplot.sourceforge.net/docs_5.3/gnuplot.pdf">English</a>
+	<a href="http://gnuplot.sourceforge.net/docs_5.4/gnuplot.pdf">English</a>
 	and
-	<a href="http://gnuplot.sourceforge.net/docs_5.3/gnuplot-ja.pdf">Japanese</a>
+	<a href="http://gnuplot.sourceforge.net/docs_5.4/gnuplot-ja.pdf">Japanese</a>
     </li>
     </ul>
     </td>

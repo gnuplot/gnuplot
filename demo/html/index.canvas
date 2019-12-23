@@ -2,17 +2,17 @@
 <html>
 <head>
 <meta charset="UTF-8"> 
-<title>Gnuplot 5.3 demos (HTML canvas terminal)</title>
+<title>Gnuplot 5.4 demos (HTML canvas terminal)</title>
 <link type="text/css" href="gnuplot_demo.css" rel="stylesheet">
 <link type="text/css" href="gnuplot_mouse.css" rel="stylesheet">
 </head>
 
 <body oncontextmenu="return false;">
 
-<h2 align=center>Gnuplot 5.3 demos (HTML canvas terminal)<br>
+<h2 align=center>Gnuplot 5.4 demos (HTML canvas terminal)<br>
     See also the demo output for the
-    <a href="http://gnuplot.sourceforge.net/demo_5.3/">PNG</a> and
-    <a href="http://gnuplot.sourceforge.net/demo_svg_5.3/">SVG</a> terminals.
+    <a href="http://gnuplot.sourceforge.net/demo_5.4/">PNG</a> and
+    <a href="http://gnuplot.sourceforge.net/demo_svg_5.4/">SVG</a> terminals.
 </h2>
 <canvas id="warning" width=1 height=1>
     <div class='box'><h2>Your browser may not support the HTML 5 canvas element</h2></div>
@@ -241,7 +241,7 @@
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated November 2019</i>
+    <i>This page generated December 2019</i>
     </td>
 
     <td>

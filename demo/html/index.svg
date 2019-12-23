@@ -1,6 +1,6 @@
 <!DOCTYPE HTML>
 <html>
-<head><title>Demos for gnuplot Version 5.3 (SVG terminal)</title>
+<head><title>Demos for gnuplot Version 5.4 (SVG terminal)</title>
 <link type="text/css" href="gnuplot_demo.css" rel="stylesheet">
 <meta charset="UTF-8">
 </head>
@@ -8,10 +8,10 @@
 <body>
 
 <h2 align=center>
-    Gnuplot Version 5.3 demos (SVG terminal)<br>
+    Gnuplot Version 5.4 demos (SVG terminal)<br>
     See also the demo output for the 
-       <a href="../demo_5.3/">PNG</a> and
-       <a href="../demo_canvas_5.3/">canvas</a> terminals.
+       <a href="../demo_5.4/">PNG</a> and
+       <a href="../demo_canvas_5.4/">canvas</a> terminals.
 </h2>
 
 <p>
@@ -223,7 +223,7 @@ on mouse-coordinate tracking.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated November 2019</i>
+    <i>This page generated December 2019</i>
     </td>
 
     <td>
@@ -231,7 +231,7 @@ on mouse-coordinate tracking.
     <li><a href="http://sourceforge.net/projects/gnuplot/">
 	Gnuplot development pages on SourceForge</a></li>
     <li>On-line documentation in
-	<a href="http://gnuplot.sourceforge.net/docs_5.3/gnuplot.pdf">PDF</a></li>
+	<a href="http://gnuplot.sourceforge.net/docs_5.4/gnuplot.pdf">PDF</a></li>
     </ul>
     </td>
     
