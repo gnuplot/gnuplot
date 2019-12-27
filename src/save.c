@@ -110,6 +110,25 @@ save_all(FILE *fp)
 	fputs("#    EOF\n", fp);
 }
 
+void
+save_datablocks(FILE *fp)
+{
+    struct udvt_entry *udv = first_udv->next_udv;
+
+    while (udv) {
+	if (udv->udv_value.type == DATABLOCK) {
+	    char **line = udv->udv_value.v.data_array;
+	    fprintf(fp, "%s << EOD\n", udv->udv_name);
+	    while (line && *line) {
+		fprintf(fp, "%s\n", *line);
+		line++;
+	    }
+	    fprintf(fp, "EOD\n");
+	}
+	udv = udv->next_udv;
+    }
+}
+
 /*
  *  auxiliary functions
  */

@@ -48,6 +48,7 @@ extern const char *coord_msg[];
 /* Prototypes of functions exported by save.c */
 void save_functions(FILE *fp);
 void save_variables(FILE *fp);
+void save_datablocks(FILE *fp);
 void save_set(FILE *fp);
 void save_term(FILE *fp);
 void save_all(FILE *fp);

@@ -151,6 +151,7 @@ const struct gen_table dgrid3d_mode_tbl[] =
 /* 'save' command */
 const struct gen_table save_tbl[] =
 {
+    { "data$blocks", SAVE_DATABLOCKS },
     { "fit", SAVE_FIT },
     { "fun$ctions", SAVE_FUNCS },
     { "set", SAVE_SET },

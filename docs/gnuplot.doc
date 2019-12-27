@@ -8301,17 +8301,15 @@ Ffigure_zerror
 ?save
 ?save fit
  Syntax:
-       save  {functions | variables | terminal | set | fit} '<filename>'
+       save  {functions | variables | terminal | set | fit | datablocks}
+             '<filename>' {append}
 
- If no option is specified, `gnuplot` saves functions, variables, `set`
- options and the last `plot` (`splot`) command.
+ If no option is specified, `gnuplot` saves functions, user variables,
+ `set` options and the most recent `plot` or `splot` command.
+ The current status of `set term` and `set ouput` is written as a comment.
 
- `save`d files are written in text format and may be read by the
- `load` command. For `save` with the `set` option or without any
- option, the `terminal` choice and the `output` filename are written
- out as a comment, to get an output file that works in other
- installations of gnuplot, without changes and without risk of
- unwillingly overwriting files.
+ Saved files are written in text format and may be read by the
+ `load` command.
 
  `save terminal` will write out just the `terminal` status, without
  the comment marker in front of it. This is mainly useful for
@@ -8320,6 +8318,9 @@ Ffigure_zerror
  `terminal` status. Note that for a single gnuplot session you may
  rather use the other method of saving and restoring current terminal
  by the commands `set term push` and `set term pop`, see `set term`.
+
+ `save variables` writes all user variables but not datablocks and
+ not internal variables GPVAL_* GPFUN_* MOUSE_* ARG*.
 
  `save fit` saves only the variables used in the most recent `fit` command.
  The saved file may be used as a parameter file to initialize future fit
@@ -8337,7 +8338,7 @@ Ffigure_zerror
  Examples:
        save 'work.gnu'
        save functions 'func.dat'
-       save var 'var.dat'
+       save var 'state.dat'; save datablocks 'state.dat' append
        save set 'options.dat'
        save term 'myterm.gnu'
        save '-'

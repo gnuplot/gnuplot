@@ -64,7 +64,8 @@ enum plot_axes_id {
 /* plot smooth parameters in plot.h */
 
 /* options for 'save' command */
-enum save_id { SAVE_INVALID, SAVE_FUNCS, SAVE_TERMINAL, SAVE_SET, SAVE_VARS, SAVE_FIT };
+enum save_id { SAVE_INVALID, SAVE_FUNCS, SAVE_TERMINAL, SAVE_SET, SAVE_VARS,
+		SAVE_FIT, SAVE_DATABLOCKS };
 
 /* options for 'show' and 'set' commands
  * this is rather big, we might be better off with a hash table */
