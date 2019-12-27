@@ -4788,7 +4788,7 @@ Ffigure_polygons
  To place a title in the key, you can either use a separate `keyentry` command
  or extract text from a column in the input file with the `key(column)`
  using specifier.  See `keyentry`, `using key`.
- 
+
  In this figure a spiderplot with 5 axes is used to compare multiple entities
  that are each characterized by five scores.  Each line (row) in $DATA
  generates a new polygon on the plot.
@@ -8043,7 +8043,7 @@ Ffigure_zerror
  with `set style line`, one of these may be selected by setting <line_style> to
  the index of the desired style.
 
- Both 2D and 3D plots (`plot` and `splot` commands) can use colors from a 
+ Both 2D and 3D plots (`plot` and `splot` commands) can use colors from a
  smooth palette set previously with the command `set palette`. The color value
  corresponds to the z-value of the point itself or to a separate color
  coordinate provided in an optional additional `using` colymn.
@@ -8348,10 +8348,12 @@ Ffigure_zerror
 ?set
 ?show
 ?show all
- The `set` command can be used to set _lots_ of options.  No screen is
+ The `set` command can be used to set _lots_ of options.  No new graph is
  drawn, however, until a `plot`, `splot`, or `replot` command is given.
 
- The `show` command shows their settings;  `show all` shows all the settings.
+ For most options the corresponding `show` command reports the current setting.
+ A few `show` commands like `show palette` and `show colornames` are documented
+ separately.
 
  Options changed using `set` can be returned to the default state by giving the
  corresponding `unset` command.  See also the `reset` command, which returns
@@ -9186,15 +9188,14 @@ Ffigure_zerror
  See also help for `set pm3d`, `set palette`, `x11 pm3d`, and `set style line`.
 3 colornames
 ?colornames
-?show colornames
-?commands show colornames
-?show palette colornames
  Gnuplot knows a limited number of color names. You can use these to define
- the color range spanned by a pm3d palette, or to assign a terminal-independent
- color to a particular linetype or linestyle. To see the list of known color
- names, use the command `show colornames`.   Example:
-
+ the color range spanned by a pm3d palette, to assign a named color to a
+ particular linetype or linestyle, or to define a gradient for the current
+ color palette.
+ To list the known color names, use the command `show colornames`.
+ Examples:
        set style line 1 linecolor "sea-green"
+       set palette defined (0 "dark-red", 1 "white")
 3 contour
 ?commands set contour
 ?commands unset contour
@@ -10286,25 +10287,6 @@ Ffigure_missing
 3 function style
 ?set function style
  This form of the command is deprecated. Please use `set style function`.
-3 functions
-?commands show functions
-?show functions
- The `show functions` command lists all user-defined functions and their
- definitions.
-
- Syntax:
-       show functions
-
- For information about the definition and usage of functions in `gnuplot`,
- please see `expressions`.
- See also
-^ <a href="http://www.gnuplot.info/demo/spline.html">
- splines as user defined functions (spline.dem)
-^ </a>
- and
-^ <a href="http://www.gnuplot.info/demo/airfoil.html">
- use of functions and complex variables for airfoils (airfoil.dem).
-^ </a>
 3 grid
 ?commands set grid
 ?commands unset grid
@@ -12266,20 +12248,22 @@ Ffigure_multiple_keys
  if the final sum is within the range of integer representation.
 3 palette
 ?commands set palette
-?commands show palette
 ?set palette
-?show palette
 ?palette
- Palette is a color storage for use by `pm3d`, filled color contours or
- polygons, color histograms, color gradient background, and whatever it is
- or it will be implemented...  Here it stands for a palette of smooth
- "continuous" colors or grays, but let's call it just a palette.
-
- Color palettes require terminal entries for filled color polygons and
- palettes of smooth colors, are currently available for terminals listed in
- help for `set pm3d`. The range of color values are adjustable independently by
- `set cbrange` and `set log cb`. The whole color palette is
- visualized in the `colorbox`.
+ The palette is a set of colors, usually ordered in the form of one or
+ more stepped gradients, used for `pm3d` surfaces and other graph elements
+ colored by z value.  Colors in the current palette automatically mapped
+ from plot coordinates z values or an extra data column of gray values.
+ Palette colors also can be accessed explicitly in a color specification
+ (see `colorspec`)
+#start
+#b as a `gray value` also known as `palette fraction` in the range [0:1]
+#b as a `z value` corresponding to the z coordinate of a plot element
+#b as a `cb value` in the range [cbmin:cbmax] (see `set cbrange`)
+#end
+ The current palette is shown by default in a separate `colorbox` drawn
+ next to plots that use plot style `pm3d`. The colorbox can be manually
+ selected or disabled. See `set colorbox`.
 
  Syntax:
        set palette
@@ -12297,38 +12281,20 @@ Ffigure_multiple_keys
                   { nops_allcF | ps_allcF }
                   { maxcolors <maxcolors> }
                 }
-       show palette
-       show palette palette <n> {{float | int}}
-       show palette gradient
-       show palette fit2rgbformulae
-       show palette rgbformulae
-       show colornames
-
  `set palette` (i.e. without options) sets up the default values.
  Otherwise, the options can be given in any order.
- `show palette` shows the current palette properties.
 
- `show palette gradient` displays the gradient defining the palette (if
- appropriate).  `show palette rgbformulae` prints the available fixed gray -->
- color transformation formulae.  `show colornames` prints the known color names.
+ `show palette` lists the current palette properties.
 
- `show palette palette <n>` prints to the screen or to the file given by
- `set print` a table of RGB triplets calculated for the current palette settings
- and a palette having <n> discrete colors.  The default wide table can be
- limited to 3 columns of r,g,b float values [0..1] or integer values [0..255]
- by options float or int, respectively.  This way, the current gnuplot color
- palette can be loaded into other imaging applications, for example Octave.
- Alternatively, the `test palette` command will plot the R,G,B profiles for the
- current palette and leave the profile values in a datablock $PALETTE.
+ `test palette` displays the current palette on the screen.
 
  The following options determine the coloring properties.
 
- Figure using this palette can be `gray` or `color`.  For instance, in `pm3d`
- color surfaces the gray of each small spot is obtained by mapping the averaged
- z-coordinate of the 4 corners of surface quadrangles into the range
- [min_z,max_z] providing range of grays [0:1]. This value can be used directly
- as the gray for gray maps. The color map requires a transformation gray -->
- (R,G,B), i.e. a mapping [0:1] --> ([0:1],[0:1],[0:1]).
+ In `pm3d` color surfaces the gray value of each small quadrangle is obtained by
+ mapping the averaged z-coordinate of its 4 corners from the range [min_z,max_z]
+ into the range of grays, which is always [0:1]. This value can be used directly
+ as the gray for gray maps. The palette is a mapping that transforms the gray
+ value into an RGB color.
 
  Basically two different types of mappings can be used:  Analytic formulae to
  convert gray to color, or discrete mapping tables which are interpolated.
@@ -12336,26 +12302,16 @@ Ffigure_multiple_keys
  `palette defined` and `palette file` use interpolated tables.  `palette
  rgbformulae` reduces the size of postscript output to a minimum.
 
- The command `show palette fit2rgbformulae` finds the best matching `set
- palette rgbformulae` for the current `set palette`. Naturally, it makes sense
- to use it for non-rgbformulae palettes. This command can be found useful
- mainly for external programs using the same rgbformulae definition of palettes
- as gnuplot, like zimg (
-^ <a href="http://zimg.sourceforge.net">
-           http://zimg.sourceforge.net
-^ </a>
- ).
-
- `set palette gray` switches to a gray only palette. `set palette rgbformulae`,
+ `set palette gray` switches to a grayscale palette. `set palette rgbformulae`,
  `set palette defined`, `set palette file` and `set palette functions` switch
  to a color mapping. `set palette color` is an easy way to switch back from the
- gray palette to the last color mapping.
+ gray palette to the most recent color mapping.
 
  Automatic gamma correction via `set palette gamma <gamma>` can be done for
  gray maps (`set palette gray`) and for the `cubehelix` color palette schemes.
  Gamma = 1 produces a linear ramp of intensity. See `test palette`.
 
- Many terminals support only discrete number of colors (e.g. 256 colors in gif).
+ Some terminals support a limited number of colors (e.g. 256 colors in gif).
  After the default gnuplot linetype colors are allocated, the rest of the
  available colors are by default reserved for pm3d.  Thus a multiplot using
  multiple palettes could fail because the first palette has used all the
@@ -12416,9 +12372,6 @@ Ffigure_multiple_keys
 ^ <a name="positive"></a>
 ^ <a name="negative"></a>
 
- Note that it is possible to find a set of the best matching rgbformulae for any
- other color scheme by the command
-    show palette fit2rgbformulae
 4 defined
 ?commands set palette defined
 ?set palette defined
@@ -12698,10 +12651,10 @@ Ffigure_multiple_keys
                   {front|behind} {center}
        show pixmaps
        unset pixmaps
- 
+
  The `set pixmap` command is similar to `set object` in that it defines an
  object that will appear on subsequent plots. The rectangular array of
- red/green/blue/alpha values making up the pixmap are read from a png, jpeg, 
+ red/green/blue/alpha values making up the pixmap are read from a png, jpeg,
  or gif file.  The position and extent occupied by the pixmap in the gnuplot
  output may be specified in any coordinate system (see `coordinates`).
  The coordinates given by `at <position>` refer to the lower left
@@ -12735,15 +12688,6 @@ Ffigure_multiple_keys
        # but will always face forward and remain upright
        set pixmap 3 "image.png" at my_x, my_y, f(my_x,my_y) width screen .05
        splot f(x,y)
-3 plot
-?commands show plot
-?show plot
- The `show plot` command shows the current plotting command as it results
- from the last `plot` and/or `splot` and possible subsequent `replot` commands.
-
- In addition, the `show plot add2history` command adds this current plot
- command into the `history`. It is useful if you have used `replot` to add
- more curves to the current plot and you want to edit the whole command now.
 3 pm3d
 ?commands set pm3d
 ?commands show pm3d
@@ -12794,6 +12738,8 @@ Ffigure_multiple_keys
 4 implicit
 ?pm3d implicit
 ?pm3d explicit
+?with pm3d
+?splot with pm3d
  A pm3d color surface is drawn if the splot command specifies `with pm3d`,
  if the data or function `style` is set to pm3d globally, or if the pm3d mode is
  `set pm3d implicit`.  In the latter two cases, the pm3d surface is draw in
@@ -14503,19 +14449,6 @@ Ffigure_multiple_keys
  1) `splot` in parametric mode. See `set parametric`, `set isosamples`.
  2) generating 2-dimension sampled data for either `plot` or `splot` using the
  pseudofile "++". See `sampling 2D`.
-3 variables
-?commands show variables
-?show variables all
-?show variables
- The `show variables` command lists the current value of user-defined and
- internal variables. Gnuplot internally defines variables whose names begin
- with GPVAL_, MOUSE_, FIT_, and TERM_.
-
- Syntax:
-       show variables      # show variables that do not begin with GPVAL_
-       show variables all  # show all variables including those beginning GPVAL_
-       show variables NAME # show only variables beginning with NAME
-
 3 version
 ?show version
  The `show version` command lists the version of gnuplot being run, its last
@@ -15716,6 +15649,128 @@ Ffigure_walls
        system "print previous_plot.ps"
        ! print previous_plot.ps
        current_time = system("date")
+
+2 show
+ Most `set` commands have a corresponding show command with no special options.
+ For example
+      show linetype 3
+ will report the current properties in effect from previous commands like
+      set linetype 3 linewidth 2 dashpattern '.-'
+ A few `show` commands that diverge from this pattern are documented separately.
+3 show colornames
+?commands show colornames
+?show colornames
+?show palette colornames
+ Gnuplot knows about 100 colors by name. You can dump a list of these to the
+ terminal by using the command `show colornames`.
+ There is currently no way to set new names.
+3 show functions
+?commands show functions
+?show functions
+ The `show functions` command lists all user-defined functions and their
+ definitions.
+
+ Syntax:
+       show functions
+
+ For information about the definition and usage of functions in `gnuplot`,
+ please see `expressions`.
+ See also
+^ <a href="http://www.gnuplot.info/demo/spline.html">
+ splines as user defined functions (spline.dem)
+^ </a>
+ and
+^ <a href="http://www.gnuplot.info/demo/airfoil.html">
+ use of functions and complex variables for airfoils (airfoil.dem).
+^ </a>
+3 show palette
+?commands show palette
+?show palette
+=palette
+ Syntax:
+       show palette
+       show palette palette {<ncolors>} {{float | int | hex}}
+       show palette gradient
+       show palette fit2rgbformulae
+       show palette rgbformulae
+       test palette
+
+ The `test palette` command will plot the R,G,B profiles for the current
+ palette and store the profile values in a datablock $PALETTE.
+
+4 show palette gradient
+?commands show palette gradient
+?show palette gradient
+ `show palette gradient` displays the piecewise gradient established by a
+ prior `set palette defined` command.  If the current palette is based on
+ rgbformulae or a set of predefined values then this command does nothing.
+
+4 show palette fit2rgbformulae
+?commands show palette fit2rgbformulae
+?show palette fit2rgbformulae
+ [deprecated] `show palette fit2rgbformulae` finds an approximation to the
+ current palette in terms of the formulae coded into `set palette rgbformulae`.
+ If that is indeed how the current palette was defined, the match is exact.
+ Otherwise the approximation can by anything from good to horrible.
+ This is probably not what you want.
+
+4 show palette palette
+?commands show palette palette
+?show palette palette
+       show palette palette {<ncolors>} {{float | int | hex}}
+
+ `show palette palette <n>` prints to the screen or to the file given by
+ `set print` a table of color components for each entry in the current palette.
+ By default the continuous palette is sampled in 128 increments. Specifying
+ <ncolors> will sample the palette evenly at this number of increments
+ (rather than 128).  The default is a long listing in the form
+      0. gray=0.0000, (r,g,b)=(0.0000,0.0000,0.0000), #000000 =   0   0   0
+      1. gray=0.1111, (r,g,b)=(0.3333,0.0014,0.6428), #5500a4 =  85   0 164
+      2. gray=0.2222, (r,g,b)=(0.4714,0.0110,0.9848), #7803fb = 120   3 251
+      ...
+ An optional trailing keyword `float`, `int`, or `hex` instead prints only
+ single representation of the color components per entry:
+         int:        85       0     164
+       float:    0.3333  0.0014  0.6428
+         hex:  0x5500a4
+
+ By using `set print` to direct this output to a file, the current gnuplot
+ color palette can be loaded into other imaging applications such as Octave.
+
+ By using `set print` to direct output to a datablock, the current palette
+ can be saved so that it is available to future plot commands even if the
+ active palette is redefined.  This allows creating plots that draw from
+ multiple palettes, although the colorbox still represents only the current
+ active palette.
+
+4 show palette rgbformulae
+?commands show palette rgbformulae
+?show palette rgbformulae
+ `show palette rgbformulae` prints the available fixed gray -->
+ color transformation formulae.  It does _not_ show the state of the
+ current palette.
+
+3 show plot
+?commands show plot
+?show plot
+ The `show plot` command shows the most recent plotting command as it results
+ from the last `plot` and/or `splot` and possible subsequent `replot` commands.
+
+ In addition, the `show plot add2history` command adds this current plot
+ command into the `history`. It is useful if you have used `replot` to add
+ more curves to the current plot and you want to edit the whole command now.
+3 show variables
+?commands show variables
+?show variables all
+?show variables
+ The `show variables` command lists the current value of user-defined and
+ internal variables. Gnuplot internally defines variables whose names begin
+ with GPVAL_, MOUSE_, FIT_, and TERM_.
+
+ Syntax:
+       show variables      # show variables that do not begin with GPVAL_
+       show variables all  # show all variables including those beginning GPVAL_
+       show variables NAME # show only variables beginning with NAME
 
 2 splot
 ?commands splot
