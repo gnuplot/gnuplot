@@ -243,7 +243,7 @@ C
 #b 3D plot style `with polygons` reads polygon faces from a data file.
 ## This can be used to create a surface or to construct a solid object.
 ## See `with polygons`.
-#b `splot $voxelgrid with {dots|points}` marks all voxels whose value is above 
+#b `splot $voxelgrid with {dots|points}` marks all voxels whose value is above
 ## a requested threshold level.
 #b `splot $voxelgrid with isosurface` creates a tessellated 3D surface enclosing
 ## voxels above a requested threshold level. See `isosurface`.
@@ -251,7 +251,7 @@ C
 #b `set spiderplot` selects a new plotting mode allowing creation of spider plots
 ## (also known as radar charts). These are essentially parallel axis plots where
 ## the axes are arranged radially rather than vertically.
-## See `spiderplot`, `set style spiderplot`, `set paxis`. 
+## See `spiderplot`, `set style spiderplot`, `set paxis`.
 #b Plot style `with circles` can be used in 3D plots.
 #b Plot style `with boxes` can be used in 3D plots.
 #b 2D plot style `with arrows` is identical to `with vectors` except that each
@@ -3653,7 +3653,7 @@ Ffigure_newsyntax
  and y in the second.  For more information on how to fine-tune how columns in a
  file are interpreted as plot data, see `using`.
 
-2 arrows 
+2 arrows
 ?plotting styles arrows
 ?style arrows
 ?with arrows
@@ -4703,7 +4703,7 @@ Ffigure_points
  defaults to that of the linetype. See `linetype`.  If no `using` spec is found
  in the plot command, input data columns are interpreted implicitly in the order
       x y pointsize pointtype color
- Any columns beyong the first two (x and y) are optional; they correspond to
+ Any columns beyond the first two (x and y) are optional; they correspond to
  additional plot properties `pointsize variable`, `pointtype variable`, etc.
 
  The first 8 point types are shared by all terminals. Individual terminals may
@@ -4754,7 +4754,7 @@ Ffigure_points
  global fillstyle from `set style fill` is used.  Due to limitations in the
  pm3d code, a single border line style from `set pm3d border` is applied to all
  polygons.  This restriction may be removed in a later gnuplot version.
- 
+
  pm3d sort order and lighting are applied to the faces. It is probably always
  desirable to use `set pm3d depthsort`.
 
@@ -5060,7 +5060,7 @@ Ffigure_mapcontours
 3 PM3D plots
 ?PM3D PLOTS
 Ffigure_pm3dsolid
- 3D surfaces can also be drawn using solid pm3d quadrangles rather than 
+ 3D surfaces can also be drawn using solid pm3d quadrangles rather than
  lines. In this case there is no hidden surface removal, but if the component
  facets are drawn back-to-front then a similar effect is achieved.
  See `set pm3d depthorder`. While pm3d surfaces are by default colored using a
@@ -5093,7 +5093,7 @@ Ffigure_fenceplot
 Ffigure_isosurface
  This 3D plot style requires a populated voxel grid (see `set vgrid`, `vfill`).
  Linear interpolation of voxel grid values is used to estimate fractional grid
- coordinates corresponding to the requested isolevel.  These points are then 
+ coordinates corresponding to the requested isolevel.  These points are then
  used to generate a tessellated surface.  The facets making up the surface are
  rendered as pm3d polygons, so the surface coloring, transparency, and border
  properties are controlled by `set pm3d`.  In general the surface is easier to
@@ -6616,7 +6616,7 @@ Ffigure_zerror
 
  The individual records on a single line of data must be separated by white
  space (one or more blanks or tabs) a special field separator character is
- is specified by the `set datafile` command.  A single field may itself 
+ is specified by the `set datafile` command.  A single field may itself
  contain white space characters if the entire field is enclosed in a pair of
  double quotes, or if a field separator other than white space is in effect.
  Whitespace inside a pair of double quotes is ignored when counting columns,
@@ -7475,7 +7475,7 @@ Ffigure_zerror
 5 key
 ?using key
 ?plot using key
- The layout of certain plot styles (column-stacked histograms, spider plots) 
+ The layout of certain plot styles (column-stacked histograms, spider plots)
  is such that it would make no sense to generate plot titles from a data column
  header. Also it would make no sense to generate axis tic labels from the
  content of a data column (e.g. `using 2:3:xticlabels(1)`).  These plots styles
@@ -7995,7 +7995,7 @@ Ffigure_zerror
 
  where <style> is one of
       lines        dots       steps     vectors      yerrorlines
-      points       impulses   fsteps    xerrorbar    xyerrorbars 
+      points       impulses   fsteps    xerrorbar    xyerrorbars
       linespoints  labels     histeps   xerrorlines  xyerrorlines
       financebars  surface    arrows    yerrorbar    parallelaxes
  or
@@ -8046,7 +8046,7 @@ Ffigure_zerror
  Both 2D and 3D plots (`plot` and `splot` commands) can use colors from a
  smooth palette set previously with the command `set palette`. The color value
  corresponds to the z-value of the point itself or to a separate color
- coordinate provided in an optional additional `using` colymn.
+ coordinate provided in an optional additional `using` column.
  Color values may be treated either as a fraction of the palette range
  (`palette frac`) or as a coordinate value mapped onto the colorbox range
  (`palette` or `palette z`).  See `colorspec`, `set palette`, `linetype`.
@@ -8306,7 +8306,7 @@ Ffigure_zerror
 
  If no option is specified, `gnuplot` saves functions, user variables,
  `set` options and the most recent `plot` or `splot` command.
- The current status of `set term` and `set ouput` is written as a comment.
+ The current status of `set term` and `set output` is written as a comment.
 
  Saved files are written in text format and may be read by the
  `load` command.
@@ -8960,7 +8960,7 @@ Ffigure_zerror
  Syntax:
        set cntrlabel {format "format"} {font "font"}
        set cntrlabel {start <int>} {interval <int>}
-       set contrlabel onecolor
+       set cntrlabel onecolor
 
  `set cntrlabel` controls the labeling of contours, either in the key (default)
  or on the plot itself in the case of `splot ... with labels`.  In the latter
@@ -8997,7 +8997,7 @@ Ffigure_zerror
                        | bspline
                        | points <n>
                        | order <n>
-                       | levels { <n> 
+                       | levels { <n>
                                   | auto {<n>}
                                   | discrete <z1> {,<z2>{,<z3>...}}
                                   | incremental <start>, <incr> {,<end>}
@@ -9246,7 +9246,7 @@ Ffigure_zerror
  containing no characters other than blank spaces and a carriage return and/or
  a line feed) separates one y-isoline from the next.
 
- While `set contour` is in effect, `splot with <style>` will place the 
+ While `set contour` is in effect, `splot with <style>` will place the
  style elements (points, lines, impulses, labels, etc) along the contour lines.
  `with pm3d` will produce a pm3d surface and also contour lines.
  If you want to mix other plot elements, say labels read from a file, with
@@ -12889,7 +12889,7 @@ Ffigure_multiple_keys
  applied to the long thin rectangles generated by `splot with boxes`.
  It works better to add the keyword `base`, which performs the depth sort
  using the intersection of the box with the plane at z=0.  This type of
- plot is further improved by adding a lighing model.
+ plot is further improved by adding a lighting model.
  Example:
       set pm3d depthorder base
       set pm3d lighting
@@ -12911,12 +12911,12 @@ Ffigure_multiple_keys
       set pm3d {no}clipcb
 
  The component quadrangles of a pm3d surface or other 3D object are by default
- smoothly clipped against the current zrange.  This is a change from earlier 
+ smoothly clipped against the current zrange.  This is a change from earlier
  gnuplot versions.
  Alternatively, surfaces can be clipped by rendering whole quadrangles but only
  those with all 4 corners in-range on x, y, and z (`set pm3d clip4in`), or only
  those with at least one corner in-range on x, y, and z (`set pm3d clip1in`).
- 
+
  Separate from clipping based on spatial x, y, and z coordinates, quadrangles
  can be rendered or not based on extreme palette color values.
  `clipcb`: (default) palette color values < cbmin are treated as cbmin;
@@ -16182,7 +16182,7 @@ Ffigure_walls
 %STATS_blank@number of blank lines in the file
 %STATS_blocks@number of indexable blocks of data in the file
 %STATS_columns@number of data columns in the first row of data
-%STATS_column_header@array of strings holding column headers found 
+%STATS_column_header@array of strings holding column headers found
 @end table
 
  The second set reports properties of the in-range data from a single column.
@@ -16298,7 +16298,7 @@ Ffigure_walls
  The matrix dimensions are saved in variables STATS_size_x and STATS_size_y.
 @start table
       STATS_size_x            # number of matrix columns
-      STATS_size_y            # number of matrix rows 
+      STATS_size_y            # number of matrix rows
 #\begin{tabular}{|lll|} \hline
 #\verb@STATS_size_x@ &   &  number of matrix columns \\
 #\verb@STATS_size_y@ &   &  number of matrix rows \\
