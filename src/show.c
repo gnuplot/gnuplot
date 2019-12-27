@@ -42,6 +42,7 @@
 #include "axis.h"
 #include "command.h"
 #include "contour.h"
+#include "datablock.h"
 #include "datafile.h"
 #include "eval.h"
 #include "fit.h"
@@ -2239,38 +2240,47 @@ show_palette_fit2rgbformulae()
 static void
 show_palette_palette()
 {
-    int colors, i;
+    int i;
+    int colors = 128;
     double gray;
     rgb_color rgb1;
     rgb255_color rgb255;
-    int how = 0; /* How to print table: 0: default large; 1: rgb 0..1; 2: integers 0..255 */
     FILE *f;
+    /* How to format the table:
+	0: 1. gray=0.1111, (r,g,b)=(0.3333,0.0014,0.6428), #5500a4 =  85   0 164
+	1: 0.3333  0.0014  0.6428
+	2: 85      0       164
+	3: 0x5500a4
+      */
+    int format = 0;
 
     c_token++;
-    if (END_OF_COMMAND)
-	int_error(c_token,"palette size required");
-    colors = int_expression();
-    if (colors<2) colors = 128;
-    if (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "f$loat")) /* option: print r,g,b floats 0..1 values */
-	    how = 1;
-	else if (almost_equals(c_token, "i$nt")) /* option: print only integer 0..255 values */
-	    how = 2;
-    else
-	    int_error(c_token, "expecting no option or int or float");
-	c_token++;
+    while (!END_OF_COMMAND) {
+	if (equals(c_token, "float")) {
+	    format = 1;
+	    c_token++;
+	} else if (equals(c_token, "int")) {
+	    format = 2;
+	    c_token++;
+	} else if (equals(c_token, "hex")) {
+	    format = 3;
+	    c_token++;
+	} else {
+	    colors = int_expression();
+	    if (colors < 2)
+		colors = 128;
+	}
     }
 
-    i = (print_out==NULL || print_out==stderr || print_out==stdout);
     f = (print_out) ? print_out : stderr;
     fprintf(stderr, "%s palette with %i discrete colors",
-	    (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY) ? "Gray" : "Color", colors);
-    if (!i)
+	(sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY) ? "Gray" : "Color", colors);
+    if (print_out_name)
 	fprintf(stderr," saved to \"%s\".", print_out_name);
-    else
-	fprintf(stderr, ".\n");
 
     for (i = 0; i < colors; i++) {
+	char line[80];
+
 	/* colours equidistantly from [0,1]  */
 	gray = (double)i / (colors - 1);
 	if (sm_palette.positive == SMPAL_NEGATIVE)
@@ -2278,20 +2288,28 @@ show_palette_palette()
 	rgb1_from_gray(gray, &rgb1);
 	rgb255_from_rgb1(rgb1, &rgb255);
 
-	switch (how) {
+	switch (format) {
 	    case 1:
-		fprintf(f, "%0.4f\t%0.4f\t%0.4f\n", rgb1.r, rgb1.g, rgb1.b);
+		sprintf(line, "%0.4f\t%0.4f\t%0.4f", rgb1.r, rgb1.g, rgb1.b);
 		break;
 	    case 2:
-		fprintf(f, "%i\t%i\t%i\n", (int)rgb255.r, (int)rgb255.g, (int)rgb255.b);
+		sprintf(line, "%i\t%i\t%i", (int)rgb255.r, (int)rgb255.g, (int)rgb255.b);
+		break;
+	    case 3:
+		sprintf(line, "0x%06x", (int)rgb255.r<<16 | (int)rgb255.g<<8 | (int)rgb255.b);
 		break;
 	    default:
-		fprintf(f,
-    		    "%3i. gray=%0.4f, (r,g,b)=(%0.4f,%0.4f,%0.4f), #%02x%02x%02x = %3i %3i %3i\n",
+		sprintf(line,
+		    "%3i. gray=%0.4f, (r,g,b)=(%0.4f,%0.4f,%0.4f), #%02x%02x%02x = %3i %3i %3i",
     		    i, gray, rgb1.r, rgb1.g, rgb1.b,
     		    (int)rgb255.r, (int)rgb255.g, (int)rgb255.b,
     		    (int)rgb255.r, (int)rgb255.g, (int)rgb255.b );
+		break;
 	}
+	if (print_out_var)
+	    append_to_datablock( &print_out_var->udv_value, strdup(line) );
+	else
+	    fprintf(f, "%s\n", line);
     }
 }
 
