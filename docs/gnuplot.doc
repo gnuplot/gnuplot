@@ -4515,6 +4515,13 @@ Ffigure_scaled_image
  for `splot`.  The r, g, b, and alpha components are assumed to lie in the range
  [0:255].  To plot data for which RGBA components are floating point values in
  the range [0:1], first use the command `set rgbmax 1.0`.
+
+ If only a single data column is provided for the color components of either
+ rgbimage or rgbalpha plots, it is interpreted as containing 32 bit packed ARGB 
+ data using the convention that alpha=0 means opaque and alpha=255 means fully
+ transparent. Note that this is backwards from the alpha convention if alpha
+ is supplied in a separate column, but matches the ARGB packing convention for
+ individual commands to set color. See `colorspec`.
 3 transparency
 ?image transparency
 ?transparency

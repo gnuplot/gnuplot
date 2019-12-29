@@ -521,12 +521,12 @@ get_data(struct curve_points *current_plot)
 	break;
 
     case RGBIMAGE:
-	min_cols = 5;
+	min_cols = 3;
 	max_cols = 6;
 	break;
 
     case RGBA_IMAGE:
-	min_cols = 6;
+	min_cols = 3;
 	max_cols = 6;
 	break;
 
@@ -1120,6 +1120,15 @@ get_data(struct curve_points *current_plot)
 	case RGBA_IMAGE:
 	{   /* x y red green blue [alpha] */
 	    store2d_point(current_plot, i, v[0], v[1], v[0], v[0], v[1], v[1], 0.0);
+	    /* If there is only one column of image data, it must be 32-bit ARGB */
+	    if (j==3) {
+		unsigned int argb = v[2];
+		v[2] = (argb >> 16) & 0xff;
+		v[3] = (argb >> 8) & 0xff;
+		v[4] = (argb) & 0xff;
+		/* The alpha channel convention is unfortunate */
+		v[5] = 255 - (unsigned int)((argb >> 24) & 0xff);
+	    }
 	    cp = &(current_plot->points[i]);
 	    cp->CRD_R = v[2];
 	    cp->CRD_G = v[3];

@@ -1,3 +1,8 @@
+Since 5.4
+=========
+* NEW "with rgbimage" and "with rgbalpha" accept single column ARGB input
+* FIX y autoscaling of default "with filledcurves" #Bug 2294
+
 Changes in 5.4
 ==============
 * NEW support for 64-bit integer arithmetic

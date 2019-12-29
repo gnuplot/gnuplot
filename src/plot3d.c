@@ -1342,6 +1342,15 @@ get_3ddata(struct surface_points *this_plot)
 		/* We will autoscale the RGB components to  a total range [0:255]
 		 * so we don't need to do any fancy scaling here.
 		 */
+		/* If there is only one column of image data, it must be 32-bit ARGB */
+		if (j==4) {
+		    unsigned int argb = v[3];
+		    v[3] = (argb >> 16) & 0xff;
+		    v[4] = (argb >> 8) & 0xff;
+		    v[5] = (argb) & 0xff;
+		    /* The alpha channel convention is unfortunate */
+		    v[6] = 255 - (unsigned int)((argb >> 24) & 0xff);
+		}
 		cp->CRD_R = v[3];
 		cp->CRD_G = v[4];
 		cp->CRD_B = v[5];
