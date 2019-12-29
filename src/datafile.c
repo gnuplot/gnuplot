@@ -135,7 +135,7 @@ static void expand_df_column(int);
 static void clear_df_column_headers(void);
 static char *df_gets(void);
 static int df_tokenise(char *s);
-static float *df_read_matrix(int *rows, int *columns);
+static double *df_read_matrix(int *rows, int *columns);
 
 static void plot_option_every(void);
 static void plot_option_index(void);
@@ -850,20 +850,19 @@ df_tokenise(char *s)
 
 /*}}} */
 
-/*{{{  static float *df_read_matrix() */
-/* Reads a matrix from a text file and stores it as floats in allocated
- * memory.
+/*{{{  static double *df_read_matrix() */
+/* Reads a matrix from a text file and stores it in allocated memory.
  *
  * IMPORTANT NOTE:  The routine returns the memory pointer for that matrix,
  * but does not retain the pointer.  Maintenance of the memory is left to
  * the calling code.
  */
-static float *
+static double *
 df_read_matrix(int *rows, int *cols)
 {
     int max_rows = 0;
     int c;
-    float *linearized_matrix = NULL;
+    double *linearized_matrix = NULL;
     char *s;
     int index = 0;
     df_bad_matrix_values = 0;
@@ -942,7 +941,7 @@ df_read_matrix(int *rows, int *cols)
 	if (*rows > max_rows) {
 	    max_rows = GPMAX(2*max_rows,1);
 	    linearized_matrix = gp_realloc(linearized_matrix,
-				   *cols * max_rows * sizeof(float),
+				   *cols * max_rows * sizeof(double),
 				   "df_matrix");
 	}
 
@@ -977,7 +976,7 @@ df_read_matrix(int *rows, int *cols)
 		    /* It's going to be skipped anyhow, so... */
 		    linearized_matrix[index++] = 0;
 		} else
-		    linearized_matrix[index++] = (float) df_column[i].datum;
+		    linearized_matrix[index++] = df_column[i].datum;
 
 		if (df_column[i].good != DF_GOOD) {
 		    if (df_nonuniform_matrix && index == 1)
@@ -2400,9 +2399,10 @@ df_readascii(double v[], int max)
 char *read_error_msg = "Data file read error";
 double df_matrix_corner[2][2]; /* First argument is corner, second argument is x (0) or y(1). */
 
-float
+static double
 df_read_a_float(FILE *fin) {
     float fdummy;
+    /* FIXME:  What if the file contains doubles rather than floats? */
     if (fread(&fdummy, sizeof(fdummy), 1, fin) != 1) {
 	if (feof(fin))
 	    int_error(NO_CARET, "Data file is empty");
@@ -2410,7 +2410,8 @@ df_read_a_float(FILE *fin) {
 	    int_error(NO_CARET, read_error_msg);
     }
     df_swap_bytes_by_endianess((char *)&fdummy, byte_read_order(df_bin_file_endianess), sizeof(fdummy));
-    return fdummy;
+
+    return (double)fdummy;
 }
 
 void
@@ -2487,7 +2488,7 @@ df_determine_matrix_info(FILE *fin)
     } else {
 
 	/* ASCII matrix format, converted to binary memory format. */
-	static float *matrix = NULL;
+	static double *matrix = NULL;
 	int nr, nc;
 
 	/* Insurance against creating a matrix with df_read_matrix()
@@ -2495,11 +2496,19 @@ df_determine_matrix_info(FILE *fin)
 	 */
 	if (matrix)
 	    free(matrix);
+	matrix = NULL;
 
 	/* Set important binary variables, then free memory for all default
 	 * binary records and set number of records to 0. */
 	initialize_binary_vars();
 	clear_binary_records(DF_CURRENT_RECORDS);
+
+	/* The default binary record type is currently float (Dec 2019)
+	 * but we have changed df_read_matrix to return doubles.
+	 * Make sure the binary record type is marked accordingly.
+	 */
+	df_extend_binary_columns(1);
+	df_set_read_type(1, DF_DOUBLE);
 
 	/* If the user has set an explicit locale for numeric input, apply it */
 	/* here so that it affects data fields read from the input file.      */
@@ -4382,6 +4391,7 @@ df_set_read_type(int col, df_data_type type)
 	= df_binary_details[type].type.read_size;
 }
 
+#if (0)	/* UNUSED??? */
 
 /* Get the column data type. */
 df_data_type
@@ -4408,6 +4418,7 @@ df_get_read_size(int col)
 	return -1;
 }
 
+#endif
 
 /* If the column number is greater than number of binary columns, set
  * the unitialized columns binary info to that of the last specified
@@ -4790,7 +4801,7 @@ df_readbinary(double v[], int max)
 
     /* For matrix data structure (i.e., gnuplot binary). */
     static double first_matrix_column;
-    static float *scanned_matrix_row = 0;
+    static double *scanned_matrix_row = 0;
     static int first_matrix_row_col_count;
     TBOOLEAN saved_first_matrix_column = FALSE;
 
@@ -4985,8 +4996,8 @@ df_readbinary(double v[], int max)
 	    this_record->memory_data = memory_data;
 
 	    FPRINTF((stderr,"Fast matrix code:\n"));
-	    FPRINTF((stderr,"\t\t skip %d bytes, read %ld bytes as %d x %d array\n",
-		    record_skip, bytes_total, scan_size[0], scan_size[1]));
+	    FPRINTF((stderr,"\t\t skip %ld bytes, read %ld bytes per point %ld total as %d x %d array\n",
+		    record_skip, bytes_per_point, bytes_total, scan_size[0], scan_size[1]));
 
 	    /* Do the actual slurping */
 	    fread_ret = fread(memory_data, 1, bytes_total, data_fp);
@@ -5153,7 +5164,7 @@ df_readbinary(double v[], int max)
 		    && first_matrix_row_col_count < scan_size[0]) {
 		    if (!first_matrix_row_col_count)
 			scanned_matrix_row = gp_realloc(scanned_matrix_row,
-					 scan_size[0]*sizeof(float), "gpbinary matrix row");
+					 scan_size[0]*sizeof(double), "gpbinary matrix row");
 		    scanned_matrix_row[first_matrix_row_col_count] = df_column[i].datum;
 		    first_matrix_row_col_count++;
 		    if (first_matrix_row_col_count == scan_size[0]) {
