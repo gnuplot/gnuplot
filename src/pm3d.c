@@ -84,7 +84,9 @@ static double rms4(double, double, double, double);
 static void pm3d_plot(struct surface_points *, int);
 static void pm3d_option_at_error(void);
 static void pm3d_rearrange_part(struct iso_curve *, const int, struct iso_curve ***, int *);
-static int apply_lighting_model( struct coordinate *, struct coordinate *, struct coordinate *, struct coordinate *, double gray );
+static int apply_lighting_model(struct coordinate *, struct coordinate *,
+				struct coordinate *, struct coordinate *,
+				double gray, TBOOLEAN gray_is_rgb );
 static void illuminate_one_quadrangle( quadrangle *q );
 
 static void filled_polygon(gpdPoint *corners, int fillstyle, int nv);
@@ -467,6 +469,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
     gpdPoint **bl_point = NULL; /* used for bilinear interpolation */
     TBOOLEAN color_from_column = FALSE;
     TBOOLEAN color_from_fillcolor = FALSE;
+    udvt_entry *private_colormap = NULL;
     int plot_fillstyle;
 
     /* should never happen */
@@ -487,6 +490,9 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 	color_from_rgbvar = TRUE;
 	color_from_fillcolor = TRUE;
     }
+
+    if (this_plot->lp_properties.colormap)
+	private_colormap = this_plot->lp_properties.colormap;
 
     /* Apply and save the user-requested line properties */
     term_apply_lp_properties(&this_plot->lp_properties);
@@ -806,19 +812,29 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 
 		if (color_from_rgbvar) /* we were given an RGB color */
 			gray = avgC;
+		else if (private_colormap) /* FIXME: cbrange is not what we want */
+			gray = cb2gray(avgC);
 		else /* transform z value to gray, i.e. to interval [0,1] */
 			gray = cb2gray(avgC);
 
 		/* apply lighting model */
 		if (pm3d_shade.strength > 0) {
-		    if (at_which_z == PM3D_AT_SURFACE)
+		    if (at_which_z == PM3D_AT_SURFACE) {
+			TBOOLEAN gray_is_rgb = color_from_rgbvar;
+			if (private_colormap) {
+			    gray = rgb_from_colormap(gray, private_colormap);
+			    gray_is_rgb = TRUE;
+			}
 			gray = apply_lighting_model( &pointsA[i], &pointsA[i1],
-					&pointsB[ii], &pointsB[ii1], gray);
+					&pointsB[ii], &pointsB[ii1], gray, gray_is_rgb);
+		    }
 		    /* Don't apply lighting model to TOP/BOTTOM projections  */
 		    /* but convert from floating point 0<gray<1 to RGB color */
 		    /* since that is what would have been returned from the  */
 		    /* lighting code.					     */
-		    else if (!color_from_rgbvar) {
+		    else if (private_colormap) {
+			gray = rgb_from_colormap(gray, private_colormap);
+		    } else if (!color_from_rgbvar) {
 			rgb255_color temp;
 			rgb255maxcolors_from_gray(gray, &temp);
 			gray = (long)((temp.r << 16) + (temp.g << 8) + (temp.b));
@@ -829,6 +845,8 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		if (pm3d.direction != PM3D_DEPTH) {
 		    if (color_from_rgbvar || pm3d_shade.strength > 0)
 			set_rgbcolor_var((unsigned int)gray);
+		    else if (private_colormap)
+			set_rgbcolor_var(rgb_from_colormap(gray, private_colormap));
 		    else
 			set_color(gray);
 		}
@@ -991,14 +1009,21 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 				corcorners[i].z = corners[i].z;
 			    }
 
-			    if (at_which_z == PM3D_AT_SURFACE)
+			    if (private_colormap) {
+				gray = rgb_from_colormap(gray, private_colormap);
+				if (at_which_z == PM3D_AT_SURFACE)
+				    gray = apply_lighting_model( &corcorners[0], &corcorners[1],
+					    &corcorners[2], &corcorners[3], gray, TRUE);
+
+			    } else if (at_which_z == PM3D_AT_SURFACE) {
 				gray = apply_lighting_model( &corcorners[0], &corcorners[1],
-						&corcorners[2], &corcorners[3], gray);
+					&corcorners[2], &corcorners[3], gray, color_from_rgbvar);
+
 			    /* Don't apply lighting model to TOP/BOTTOM projections  */
 			    /* but convert from floating point 0<gray<1 to RGB color */
 			    /* since that is what would have been returned from the  */
 			    /* lighting code.					     */
-			    else if (!color_from_rgbvar) {
+			    } else if (!color_from_rgbvar) {
 				rgb255_color temp;
 				rgb255maxcolors_from_gray(gray, &temp);
 				gray = (long)((temp.r << 16) + (temp.g << 8) + (temp.b));
@@ -1009,9 +1034,12 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			    /* copy quadrangle */
 			    quadrangle* qp = quadrangles + current_quadrangle;
 			    memcpy(qp->vertex.corners, corners, 4 * sizeof (gpdPoint));
-			    if (color_from_rgbvar) {
+			    if (color_from_rgbvar || pm3d_shade.strength > 0) {
 				qp->gray = PM3D_USE_RGB_COLOR_INSTEAD_OF_GRAY;
 				qp->qcolor.rgb_color = (unsigned int)gray;
+			    } else if (private_colormap) {
+				qp->gray = PM3D_USE_RGB_COLOR_INSTEAD_OF_GRAY;
+				qp->qcolor.rgb_color = rgb_from_colormap(gray, private_colormap);
 			    } else {
 				qp->gray = gray;
 				qp->qcolor.colorspec = &this_plot->lp_properties.pm3d_color;
@@ -1022,6 +1050,8 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			} else {
 			    if (pm3d_shade.strength > 0 || color_from_rgbvar)
 				set_rgbcolor_var((unsigned int)gray);
+			    else if (private_colormap)
+				set_rgbcolor_var(rgb_from_colormap(gray, private_colormap));
 			    else
 				set_color(gray);
 			    if (at_which_z == PM3D_AT_BASE)
@@ -1039,9 +1069,12 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		    /* copy quadrangle */
 		    quadrangle* qp = quadrangles + current_quadrangle;
 		    memcpy(qp->vertex.corners, corners, 4 * sizeof (gpdPoint));
-		    if (color_from_rgbvar) {
+		    if (color_from_rgbvar || pm3d_shade.strength > 0) {
 			qp->gray = PM3D_USE_RGB_COLOR_INSTEAD_OF_GRAY;
 			qp->qcolor.rgb_color = (unsigned int)gray;
+		    } else if (private_colormap) {
+			qp->gray = PM3D_USE_RGB_COLOR_INSTEAD_OF_GRAY;
+			qp->qcolor.rgb_color = rgb_from_colormap(gray, private_colormap);
 		    } else {
 			qp->gray = gray;
 			qp->qcolor.colorspec = &this_plot->lp_properties.pm3d_color;
@@ -1416,7 +1449,7 @@ illuminate_one_quadrangle( quadrangle *q )
     c3.x = vtmp.x; c3.y = vtmp.y; c3.z = vtmp.z;
     map3d_xyz(q->vertex.corners[3].x, q->vertex.corners[3].y, q->vertex.corners[3].z, &vtmp);
     c4.x = vtmp.x; c4.y = vtmp.y; c4.z = vtmp.z;
-    q->gray = apply_lighting_model( &c1, &c2, &c3, &c4, q->gray);
+    q->gray = apply_lighting_model( &c1, &c2, &c3, &c4, q->gray, color_from_rgbvar);
 }
 
 /*
@@ -1425,7 +1458,7 @@ illuminate_one_quadrangle( quadrangle *q )
 int
 apply_lighting_model( struct coordinate *v0, struct coordinate *v1, 
 		struct coordinate *v2, struct coordinate *v3,
-		double gray )
+		double gray, TBOOLEAN gray_is_rgb )
 {
     double normal[3];
     double normal1[3];
@@ -1438,7 +1471,7 @@ apply_lighting_model( struct coordinate *v0, struct coordinate *v1,
     double r, g, b, tmp_r, tmp_g, tmp_b;
     double dot_prod, shade_fact, spec_fact;
 
-    if (color_from_rgbvar) {
+    if (gray_is_rgb) {
 	rgb = gray;
 	r = (double)((rgb >> 16) & 0xFF) / 255.;
 	g = (double)((rgb >>  8) & 0xFF) / 255.;

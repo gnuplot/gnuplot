@@ -34,7 +34,8 @@ typedef enum colortype {
 	TC_CB		= 4,	/* "palette cb <value>" */
 	TC_FRAC		= 5,	/* "palette frac <value> */
 	TC_Z		= 6,	/* "palette z" */
-	TC_VARIABLE	= 7	/* only used for "tc", never "lc" */
+	TC_VARIABLE	= 7,	/* only used for "tc", never "lc" */
+	TC_COLORMAP	= 8	/* "palette colormap" */
 } colortype;
 
 /* Generalized pm3d-compatible color specifier
@@ -228,6 +229,7 @@ void draw_color_smooth_box(int plot_mode);
  Support for user-callable routines
 */
 void f_hsv2rgb(union argument *);
+unsigned int rgb_from_colormap(double gray, udvt_entry *colormap);
 
 #endif /* COLOR_H */
 

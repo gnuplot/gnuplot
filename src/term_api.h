@@ -127,6 +127,7 @@ typedef struct lp_style_type {	/* contains all Line and Point properties */
     struct t_colorspec pm3d_color;
     t_dashtype custom_dash_pattern;	/* per-line, user defined dashtype */
     /* ... more to come ? */
+    struct udvt_entry *colormap;	/* used to return private colormap from lp_parse */
 } lp_style_type;
 
 #define DEFAULT_P_CHAR {0,0,0,0,0,0,0,0}

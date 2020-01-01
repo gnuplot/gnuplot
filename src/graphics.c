@@ -4576,6 +4576,7 @@ process_image(void *plot, t_procimg_action action)
     double view_port_y[2];
     double view_port_z[2] = {0,0};
     t_imagecolor pixel_planes;
+    udvt_entry *private_colormap = NULL;	/* "fc palette <colormap>" */
 
     /* Detours necessary to handle 3D plots */
     TBOOLEAN project_points = FALSE;		/* True if 3D plot */
@@ -4623,6 +4624,8 @@ process_image(void *plot, t_procimg_action action)
 	return;
     }
 
+    /* Check if a special color map was provided */
+    private_colormap = ((struct surface_points *)plot)->lp_properties.colormap;
 
     /* Check if the pixel data forms a valid rectangular grid for potential image
      * matrix support.  A general grid orientation is considered.  If the grid
@@ -5142,7 +5145,13 @@ process_image(void *plot, t_procimg_action action)
 				if (isnan(points[i_image].CRD_COLOR))
 					goto skip_pixel;
 			    }
-			    set_color( cb2gray(points[i_image].CRD_COLOR) );
+			    if (private_colormap) {
+				set_rgbcolor_var(
+				    rgb_from_colormap(cb2gray(points[i_image].CRD_COLOR),
+				    private_colormap ));
+			    } else {
+				set_color( cb2gray(points[i_image].CRD_COLOR) );
+			    }
 			} else {
 			    int r = rgbscale(points[i_image].CRD_R);
 			    int g = rgbscale(points[i_image].CRD_G);

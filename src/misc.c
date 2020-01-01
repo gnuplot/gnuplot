@@ -898,6 +898,7 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
     int set_pn = 0;
     int set_dt = 0;
     int new_lt = 0;
+    int set_colormap = 0;
 
     /* EAM Mar 2010 - We don't want properties from a user-defined default
      * linetype to override properties explicitly set here.  So fill in a
@@ -977,7 +978,9 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
 	 * from generating an error claiming redundant line properties.
 	 */
 	if ((destination_class == LP_NOFILL || destination_class == LP_ADHOC)
-	&&  (equals(c_token,"fc") || almost_equals(c_token,"fillc$olor")))
+	&&  (equals(c_token,"fc") || almost_equals(c_token,"fillc$olor"))
+	&&  (!almost_equals(c_token+1, "pal$ette"))
+	   )
 	    break;
 
 	if (equals(c_token,"lc") || almost_equals(c_token,"linec$olor")
@@ -990,6 +993,21 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
 		c_token--;
 		parse_colorspec(&(newlp.pm3d_color), TC_RGB);
 	    } else if (almost_equals(c_token, "pal$ette")) {
+		/* In general an ARRAY will return type UNDEFINED in the test below.
+		 * We can place a special type in there to indicate it's a colormap.
+		 * Note: calling parse_colorspec would only a check for {z|cb|frac}
+		 */
+		if (type_udv(c_token+1) == ARRAY) {
+		    udvt_entry *colormap = add_udv(c_token+1);
+		    fprintf(stderr,"size %ld ARRAY of type %d might be a colormap\n",
+			colormap->udv_value.v.value_array[0].v.int_val,
+			colormap->udv_value.v.value_array[0].type);
+		    newlp.pm3d_color.type = TC_COLORMAP;
+		    newlp.colormap = colormap;
+		    set_colormap++;
+		    c_token += 2;
+		    continue;
+		}
 		c_token--;
 		parse_colorspec(&(newlp.pm3d_color), TC_Z);
 	    } else if (equals(c_token,"bgnd")) {
@@ -1171,6 +1189,9 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
 	lp->custom_dash_pattern = newlp.custom_dash_pattern;
     }
 
+    if (set_colormap) {
+	lp->colormap = newlp.colormap;
+    }
 
     return new_lt;
 }

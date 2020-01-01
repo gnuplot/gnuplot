@@ -641,3 +641,22 @@ f_hsv2rgb(union argument *arg)
     (void) Ginteger(&result, hsv2rgb(&color));
     push(&result);
 }
+
+/*
+ * gray is in the interval [0:1]
+ * colormap is an ARRAY containing a palette of 32-bit ARGB values
+ */
+unsigned int
+rgb_from_colormap(double gray, udvt_entry *colormap)
+{
+    struct value *palette = colormap->udv_value.v.value_array;
+    int size = palette[0].v.int_val;
+    unsigned int rgb;
+
+	rgb = (gray <= 0.0) ? palette[1].v.int_val
+	    : (gray >= 1.0) ? palette[size].v.int_val
+	    : palette[ (int)(floor(size * gray)) + 1].v.int_val
+	    ;
+    return rgb;
+}
+

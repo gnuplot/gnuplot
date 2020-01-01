@@ -641,8 +641,7 @@ parse_primary_expression()
 		    int_error(c_token, "')' expected");
 		c_token++;
 
-		/* So far sprintf is the only built-in function */
-		/* with a variable number of arguments.         */
+		/* The sprintf built-in function has a variable number of arguments */
 		if (!strcmp(ft[whichfunc].f_name,"sprintf"))
 		    add_action(PUSHC)->v_arg = num_params;
 
