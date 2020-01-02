@@ -99,6 +99,8 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec, double *reltime)
     int yday = 0;
     TBOOLEAN sanity_check_date = FALSE;
     TBOOLEAN reltime_formats = FALSE;
+    TBOOLEAN explicit_pm = FALSE;
+    TBOOLEAN explicit_am = FALSE;
 
     tm->tm_mday = 1;
     tm->tm_mon = tm->tm_hour = tm->tm_min = tm->tm_sec = 0;
@@ -299,6 +301,14 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec, double *reltime)
 		s++;
 	    break;
 
+	case 'p':		/* am or pm */
+	    if (!strncmp(s, "pm", 2) || !strncmp(s, "PM", 2))
+		explicit_pm = TRUE;
+	    if (!strncmp(s, "am", 2) || !strncmp(s, "AM", 2))
+		explicit_am = TRUE;
+	    s += 2;
+	    break;
+
 #ifdef HAVE_STRUCT_TM_TM_GMTOFF
 	case 'z':		/* timezone offset  */
 	    {
@@ -333,6 +343,12 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec, double *reltime)
     }
 
     FPRINTF((stderr, "read date-time : %02d/%02d/%d:%02d:%02d:%02d\n", tm->tm_mday, tm->tm_mon + 1, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
+
+    /* apply AM/PM correction */
+    if ((tm->tm_hour < 12) && explicit_pm)
+	tm->tm_hour += 12;
+    if ((tm->tm_hour == 12) && explicit_am)
+	tm->tm_hour = 0;
 
     /* now sanity check the date/time entered, normalising if necessary
      * read_int cannot read a -ve number, but can read %m=0 then decrement
