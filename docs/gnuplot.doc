@@ -1959,6 +1959,8 @@ C marker below is used to signal this to doc2html:
 
  It reads string data starting at column N as a time/date value and uses "timeformat"
  to interpret this as "seconds since the epoch" to millisecond precision.
+ If no format parameter is given, the format defaults to the string from 
+ `set timefmt`.
 4 tm_hour
 ?expressions functions tm_hour
 ?tm_hour
@@ -7251,6 +7253,7 @@ Ffigure_zerror
 4 piped-data
 ?commands plot datafile piped-data
 ?plot datafile piped-data
+?datafile piped-data
 ?plot piped-data
 ?piped-data
 ?pipes
@@ -14255,15 +14258,14 @@ Ffigure_multiple_keys
 ?set timefmt
 ?show timefmt
 ?timefmt
- This command applies to timeseries where data are composed of dates/times.
- It has no meaning unless the command `set *data time` is given also.
+ This command sets the default format used to input time data.
+ See `set xdata time`, `timecolumn`.
 
  Syntax:
        set timefmt "<format string>"
        show timefmt
 
- The string argument tells `gnuplot` how to read timedata from the datafile.
- The valid formats are:
+ The valid formats for both `timefmt` and `timecolumn` are:
 
 @start table - first is interactive cleartext form
        Format       Explanation
@@ -14278,6 +14280,7 @@ Ffigure_multiple_keys
        %S           second, integer 0--60 on output, (double) on input
        %b           three-character abbreviation of the name of the month
        %B           name of the month
+       %p           two character match to one of:  am AM pm PM
 #\begin{tabular}{|cl|} \hline
 #\multicolumn{2}{|c|}{Time Series timedata Format Specifiers}\\
 #\hline \hline
@@ -14293,6 +14296,7 @@ Ffigure_multiple_keys
 #\verb@%S@ & second, integer 0--60 on output, (double) on input \\
 #\verb@%b@ & three-character abbreviation of the name of the month \\
 #\verb@%B@ & name of the month \\
+#\verb@%p@ & two character match to one of:  am AM pm PM \\
 %c l .
 %Format@Explanation
 %_
@@ -14307,6 +14311,7 @@ Ffigure_multiple_keys
 %%S@second, integer 0--60 on output, (double) on input
 %%b@three-character abbreviation of the name of the month
 %%B@name of the month
+%%p@two character match to one of: am AM pm PM
 @end table
 
 
@@ -14330,6 +14335,7 @@ Ffigure_multiple_keys
 ^<tr>    <td><tt>%S</tt></td>    <td>second, integer 0&ndash;60 on output, (double) on input</td></tr>
 ^<tr>    <td><tt>%b</tt></td>    <td>three-character abbreviation of the name of the month</td></tr>
 ^<tr>    <td><tt>%B</tt></td>    <td>name of the month</td></tr>
+^<tr>    <td><tt>%p</tt></td>    <td>two-character match to one of: am AM pm PM</td></tr>
 ^</tbody>
 ^</table>
 
@@ -14360,6 +14366,9 @@ Ffigure_multiple_keys
  while values 00-68 refer to the 21st century.   NB: This is in accordance with
  the UNIX98 spec, but conventions vary widely and two-digit year values are
  inherently ambiguous.
+
+ If the %p format returns "am" or "AM", hour 12 will be interpreted as hour 0.
+ If the %p format returns "pm" or "PM", hours < 12 will be increased by 12.
 
  See also `set xdata` and `time/date` for more information.
 
