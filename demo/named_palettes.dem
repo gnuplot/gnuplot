@@ -1,0 +1,100 @@
+#
+# Demonstrate construction and use of a separate palette
+# Ethan A Merritt - Dec 2019
+#
+# Method 1:
+#	The first method works in 5.2 but requires "lc rgb variable"
+#	rather than the more natural "fillcolor rgb variable".
+#	"set pm3d interpolate" breaks the color mapping of this method
+
+#
+# This creates a palette equivalent to
+#	set palette defined (0 "dark-blue", 1 "white")
+#
+array blues[256]
+do for [i=1:256] {
+    blues[i] = int( (0x7f + (i-1)/(255.) * 0xffff80) );
+}
+
+#
+# This is the equivalent of
+#	set cbrange [-1:1]
+blues_min = -1
+blues_max = 1
+
+#
+# This function maps z onto a palette color
+#
+blues(z) = (z <= blues_min) ? blues[1] \
+         : (z >= blues_max) ? blues[256] \
+         : blues[ floor(255. * (z-blues_min)/(blues_max-blues_min)) + 1]
+
+foo(x,y) = sin(x*y)
+
+set samples 41
+set isosamples 41
+unset colorbox
+set cbrange [-1:1]
+set xrange [0:5]
+set yrange [0:5]
+
+set title "Use hand-constructed 'blues' palette via rgb variable"
+
+splot '++' using 1:2:(foo($1,$2)):(blues(foo($1,$2))) with pm3d lc rgb variable \
+           title "pm3d using 1:2:3:4 with pm3d lc rgb variable"
+
+pause -1 "<cr> to continue"
+
+#
+# Method 2 (new in development version)
+#	"set pm3d interpolate" works now
+#	"set pm3d lighting" also works
+set title "Version 5.5 offers a new keyword to access this palette"
+
+splot '++' using 1:2:(foo($1,$2)) with pm3d fc palette blues\
+           title "pm3d using 1:2:3 with pm3d fc palette blues"
+
+pause -1 "<cr> to continue"
+
+set title "This method allow pm3d interpolation and lighting"
+set pm3d interpolate 2,2
+set pm3d lighting
+
+replot
+
+pause -1 "<cr> to continue"
+
+#
+# Demonstrate use of multiple palettes in the same plot
+#
+set title "pm3d coloring using two named colormap palettes"
+
+set palette defined (0 "turquoise", 1 "dark-green")
+set palette save water
+set palette defined (0 "yellow", 1 "red") negative
+set palette save flame
+
+set pm3d implicit
+set pm3d depthorder
+set pm3d lighting
+set auto
+unset border
+unset key
+
+set object 1 rect from screen 0, 0, 0 to screen 1, 1, 0 behind
+set object 1 rect fc  rgb "gray"  fillstyle solid 1.0  border -1
+set view equal xyz
+set view 290, 11, 2.2, 1.2
+set isosamples 100, 40
+unset tics
+set parametric
+set dummy u,v
+set urange [ -pi : pi ]
+set vrange [ -pi : pi ]
+
+splot cos(u)+.5*cos(u)*cos(v),sin(u)+.5*sin(u)*cos(v),.5*sin(v) fc palette flame, \
+    1+cos(u)+.5*cos(u)*cos(v),.5*sin(v),sin(u)+.5*sin(u)*cos(v) fc palette water
+
+pause -1 "<cr> to continue"
+
+reset

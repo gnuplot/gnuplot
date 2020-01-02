@@ -1,0 +1,21 @@
+#
+# test unpacking of integer hex matrix data into an ARGB image
+#
+$BITS << EOB
+0x7fffffff 0x3fff0000 0x1fff8888 0x00ffaaaa
+0x7fff0000 0x3fff8888 0x1fffaaaa 0x00ffffff
+0x7fff8888 0x3fffaaaa 0x1f00dddd 0x00ffffff
+0x7fffaaaa 0x3fff0000 0x1fff8888 0x00bb0000
+EOB
+set tics 1
+set xrange [-1:4]
+set title "Alpha+RGB image data loaded from a hexadecimal matrix"
+
+plot sin(x*x) lw 4 lc "black", $BITS matrix using 1:2:3 with rgbalpha pixels
+
+pause -1 "<cr> to continue"
+
+splot $BITS matrix using 1:2:(1.0):3 with rgbalpha pixels
+
+pause -1 "<cr> to continue"
+reset
