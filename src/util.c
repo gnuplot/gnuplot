@@ -1526,6 +1526,8 @@ value_to_str(struct value *val, TBOOLEAN need_quotes)
     case ARRAY:
 	{
 	sprintf(s[j], "<%d element array>", (int)(val->v.value_array->v.int_val));
+	if (val->v.value_array->type == COLORMAP)
+	    strcat(s[j], " (colormap)");
 	break;
 	}
     case VOXELGRID:

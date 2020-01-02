@@ -72,7 +72,7 @@ static palette_color_mode pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_NONE;
 
 static void set_angles(void);
 static void set_arrow(void);
-static int assign_arrow_tag(void);
+static int  assign_arrow_tag(void);
 static void set_autoscale(void);
 static void set_bars(void);
 static void set_border(void);
@@ -96,7 +96,7 @@ static void set_pixmap(void);
 static void set_isosamples(void);
 static void set_key(void);
 static void set_label(void);
-static int assign_label_tag(void);
+static int  assign_label_tag(void);
 static void set_loadpath(void);
 static void set_fontpath(void);
 static void set_locale(void);
@@ -169,6 +169,7 @@ static void check_palette_grayscale(void);
 static int set_palette_defined(void);
 static void set_palette_file(void);
 static void set_palette_function(void);
+static void save_palette(void);
 static void parse_histogramstyle(histogram_style *hs,
 				t_histogram_type def_type, int def_gap);
 static void set_style_parallel(void);
@@ -3798,6 +3799,10 @@ set_palette()
 		--c_token;
 		continue;
 	    }
+	    case S_PALETTE_SAVE:
+		save_palette();
+		continue;
+
 	    } /* switch over palette lookup table */
 	    int_error(c_token,"invalid palette option");
 	} /* end of while !end of command over palette options */
@@ -3812,6 +3817,51 @@ set_palette()
 }
 
 #undef CHECK_TRANSFORM
+
+/* 'set palette save <colormap>'
+ * saves color mapping of current palette into an array that can later be used
+ * to substitute for the main palettes, as in 
+ *    splot foo with pm3d fc palette <colormap>
+ */
+static void
+save_palette(void)
+{
+    struct udvt_entry *array;
+    struct value *A;
+    double gray;
+    rgb_color rgb1;
+    rgb255_color rgb255;
+    int colormap_size = 256;
+    int i;
+
+    /* Create or recycle a udv containing an array with the requested name */
+    if (!isletter(++c_token))
+	int_error(c_token, "illegal colormap name");
+    array = add_udv(c_token);
+    free_value(&array->udv_value);
+    c_token++;
+
+    array->udv_value.v.value_array = gp_alloc((colormap_size+1) * sizeof(t_value), "colormap");
+    array->udv_value.type = ARRAY;
+
+    /* Element zero of the new array is not visible but contains the size
+     * All other elements contain a 24 or 32 bit [A]RGB color value
+     * generated from the current palette.
+     */
+    A = array->udv_value.v.value_array;
+    A[0].v.int_val = colormap_size;
+    A[0].type = COLORMAP;
+    for (i = 0; i < colormap_size; i++) {
+	gray = (double)i / (colormap_size-1);
+	if (sm_palette.positive == SMPAL_NEGATIVE)
+	    gray = 1.0 - gray;
+	rgb1_from_gray(gray, &rgb1);
+	rgb255_from_rgb1(rgb1, &rgb255);
+
+	A[i+1].type = INTGR;
+	A[i+1].v.int_val = (int)rgb255.r<<16 | (int)rgb255.g<<8 | (int)rgb255.b;
+    }
+}
 
 /* process 'set colorbox' command */
 static void

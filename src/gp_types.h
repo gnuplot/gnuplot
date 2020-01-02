@@ -48,6 +48,7 @@ enum DATA_TYPES {
 	DATABLOCK,
 	ARRAY,
 	VOXELGRID,
+	COLORMAP,	/* sub-category of ARRAY containing packed ARGB values */
 	NOTDEFINED,	/* exists, but value is currently undefined */
 	INVALID_VALUE,	/* used only for error return by external functions */
 	INVALID_NAME	/* used only to trap errors in linked axis function definition */

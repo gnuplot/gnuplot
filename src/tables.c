@@ -489,6 +489,7 @@ const struct gen_table set_palette_tbl[] =
     { "maxc$olors",	S_PALETTE_MAXCOLORS },
     { "gam$ma",         S_PALETTE_GAMMA },
     { "cubehelix",      S_PALETTE_CUBEHELIX },
+    { "save",           S_PALETTE_SAVE },
     { NULL, S_PALETTE_INVALID }
 };
 

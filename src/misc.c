@@ -995,13 +995,14 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
 	    } else if (almost_equals(c_token, "pal$ette")) {
 		/* In general an ARRAY will return type UNDEFINED in the test below.
 		 * We can place a special type in there to indicate it's a colormap.
-		 * Note: calling parse_colorspec would only a check for {z|cb|frac}
+		 * Note: could call parse_colorspec to check for {z|cb|frac}
 		 */
 		if (type_udv(c_token+1) == ARRAY) {
 		    udvt_entry *colormap = add_udv(c_token+1);
-		    fprintf(stderr,"size %ld ARRAY of type %d might be a colormap\n",
-			colormap->udv_value.v.value_array[0].v.int_val,
-			colormap->udv_value.v.value_array[0].type);
+		    if (colormap->udv_value.v.value_array[0].type != COLORMAP)
+			fprintf(stderr,"size %ld ARRAY %s might not be a colormap\n",
+			    colormap->udv_value.v.value_array[0].v.int_val,
+			    colormap->udv_name);
 		    newlp.pm3d_color.type = TC_COLORMAP;
 		    newlp.colormap = colormap;
 		    set_colormap++;
