@@ -1,6 +1,9 @@
 Changes not in 5.4
 ==================
 * NEW weighted and unweighted cubic spline smoothing for 3D "splot with lines"
+* NEW "set palette save <name>" creates a named colormap from the current palette
+* NEW "splot ... with pm3d fc palette <name>" uses a saved colormap
+* NEW "plot ... with image fc palette <name>" uses a saved colormap
 * CHANGE account for font size when estimating string extents
 
 Changes in 5.4

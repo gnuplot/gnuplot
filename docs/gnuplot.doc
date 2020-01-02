@@ -205,6 +205,18 @@ C
 #b cubic spline smoothing of 3D lines. See `splot smooth csplines`
 #end
 
+4 Multiple named palettes
+#start
+#b The current palette can be saved to a named colormap for future use.
+## See `set palette save`.
+#b pm3d and image plots can specify a previously saved palette by name.
+## This permits the use of multiple palettes in a single plot command.
+## See `colorspec palette`.
+#b Named palette colormaps can be manipulated as arrays of 32-bit ARGB
+## color values. This permits addition of alpha-channel values or other
+## modifications not easily specified in a `set palette` command.
+#end
+
 3 Features introduced in version 5.4
 ?new version_5.4
 4 Support for 64-bit integer arithmetic
@@ -2916,6 +2928,7 @@ Ffigure_newsyntax
        palette frac <val>      # <val> runs from 0 to 1
        palette cb <value>      # <val> lies within cbrange
        palette z
+       palette <colormap>      # use named colormap rather than current palette
        variable                # color index is read from input file
        bgnd                    # background color
        black
@@ -2985,6 +2998,34 @@ Ffigure_newsyntax
        # See `pseudocolumns`.  This example uses to value in column -2 to
        # draw each data set in a different line color.
        plot 'data' using 1:2:(column(-2)) with lines lc variable
+
+4 palette
+?colorspec palette
+ Syntax
+       ... {lc|fc|tc} palette {z}
+       ... {lc|fc|tc} palette frac <fraction>
+       ... {lc|fc|tc} palette cb <fixed z-value>
+       ... fc palette <colormap>
+
+ The palette defines a range of colors with gray values between 0 and 1.
+ `palette frac <fraction>` selects the color with gray value <fraction>.
+
+ `palette cb <z-value>` selects the single color whose fractional gray value
+ is (z - cbmin) / (cbmax - cbmin).
+
+ `palette` and `palette z` both map the z coordinate of the plot element being
+ colored onto the current palette.  If z is outside cbrange it is by default
+ mapped to palette fraction 0 or palette franction 1.  If the option 
+ `set pm3d noclipcb` is set, then quadrangles in a pm3d plot whose z values 
+ are out of range will not be drawn at all.
+
+ `fillcolor palette <colormap>` maps the z coordinate of a plot element onto
+ a previously saved named colormap instead of using the current palette.
+ See `set palette save`.
+ This option is EXPERIMENTAL. Details may change.
+ Current limitations: Ssupported only for plots `with image` and `with pm3d`.
+ Mapping z values into the named colormap uses cbrange; there should be some
+ method for specifying a separate min/max range for each named colormap.
 
 4 rgbcolor variable
 ?rgbcolor variable
@@ -4494,6 +4535,7 @@ Ffigure_scaled_image
  are floating point values in the range [0:1]. To use the `rgbimage` style with
  such data, first use the command `set rgbmax 1.0`.
 
+=alpha channel
  The `rgbalpha` style handles input pixels that contain alpha channel
  (transparency) information in addition to the red, green, and blue components.
  Thus 6D data (x,y,r,g,b,a) is needed for `plot` and 7D data (x,y,z,r,g,b,a)
@@ -12294,12 +12336,17 @@ Ffigure_multiple_keys
                   { nops_allcF | ps_allcF }
                   { maxcolors <maxcolors> }
                 }
- `set palette` (i.e. without options) sets up the default values.
+      set palette save <colormap name>
+
+ `set palette` (i.e. without options) restores the default values.
  Otherwise, the options can be given in any order.
 
  `show palette` lists the current palette properties.
 
  `test palette` displays the current palette on the screen.
+
+ `set palette save <name>` creates a colormap for the current palette and saves
+ it into a named colormap array for later use.
 
  The following options determine the coloring properties.
 
@@ -12590,6 +12637,29 @@ Ffigure_multiple_keys
  Usage:
      awk -f pm3dCompress.awk thefile.ps >smallerfile.ps
      awk -f pm3dConvertToImage.awk thefile.ps >smallerfile.ps
+
+4 save <colormap>
+?set palette save
+?palette save
+?colormap
+=alpha channel
+=transparency
+
+ `set palette save <name>` creates a colormap array <name> and loads it from
+ the current palette settings. This saved colormap can be further manipulated
+ as an array of 32-bit ARGB color values and used by name in subsequent plots.
+
+ This example creates a palette running from dark red to white, saves it to
+ a colormap array named 'Reds', and makes all entries in the colormap
+ partially transparent.  This names colormap is then used later to color
+ a pm3d surface.  Note that the alpha channel value in a named colormap
+ follows the convention for ARGB line properties; i.e 0 is opaque 0xff is
+ fully transparent.
+
+      set palette defined (0 "dark-red", 1 "white"
+      set palette save Reds
+      do for [i=1:|Reds|] { Reds[i] = Reds[i] | 0x3F000000 }
+      splot func(x,y) with pm3d fillcolor palette Reds
 
 3 parametric
 ?commands set parametric
