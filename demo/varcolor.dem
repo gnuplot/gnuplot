@@ -76,4 +76,37 @@ plot 'candlesticks.dat' \
      '' using 1:(-1):1:(rgbfudge($1)) with labels tc rgb var point
 
 pause -1 'Hit <cr> to continue'
+
+set title "variable color using multiple named palettes"
+
+set palette defined (0 "gray90", 1 "dark-blue")
+set palette save blues
+set palette defined (0 "dark-red", 1 "yellow" )
+set palette save flame
+set palette cubehelix
+set palette save ch
+unset colorbox
+
+set for [i=1:10] linetype i lw 2.0
+
+plot 'candlesticks.dat' using 1:(1):1 with points pt 11 lc pal blues, \
+     '' using 1:2:(.1):1 with circles lc pal flame, \
+     '' using 1:3:2:6:5:1 with candlesticks lc pal ch, \
+     '' using ($1+.3):3:2:6:5:1 with financebars lc pal blues, \
+     '' using 1:(8):(by3($0)):(by4($0)):1 with boxxy lc pal flame fs solid, \
+     '' using 1:(-$2/2):1 with boxes lc pal ch
+
+pause -1 'Hit <cr> to continue'
+
+set errorbars lw 1.0 lc black dt solid
+plot 'candlesticks.dat' \
+        using 1:5:2:6:(.2):1 with boxerror lc pal blues fs solid 0.5, \
+     '' using 1:(1):1 with points pt 11 lc pal flame, \
+     '' using 1:(8):(by3($0)):(by4($0)):1 with xyerrorbars pt 5 ps 2 lc pal ch, \
+     '' using ($1+.5):($2/2):1 with impulses lc pal blues lw 3,\
+     '' using 1:(-3):(0.5):(1):1 with vectors lc pal flame,\
+     '' using 1:(-1):1:1 with labels tc pal z
+
+pause -1 'Hit <cr> to continue'
+
 reset

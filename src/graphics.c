@@ -4516,6 +4516,10 @@ check_for_variable_color(struct curve_points *plot, double *colorvalue)
     } else if (plot->lp_properties.pm3d_color.type == TC_Z) {
 	set_color( cb2gray(*colorvalue) );
 	return TRUE;
+    } else if (plot->lp_properties.pm3d_color.type == TC_COLORMAP) {
+	set_rgbcolor_var( rgb_from_colormap(cb2gray(*colorvalue),
+		plot->lp_properties.colormap) );
+	return TRUE;
     } else if (plot->lp_properties.l_type == LT_COLORFROMCOLUMN) {
 	lp_style_type lptmp;
 	/* lc variable will only pick up line _style_ as opposed to _type_ */

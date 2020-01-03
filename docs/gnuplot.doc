@@ -3023,7 +3023,6 @@ Ffigure_newsyntax
  a previously saved named colormap instead of using the current palette.
  See `set palette save`.
  This option is EXPERIMENTAL. Details may change.
- Current limitations: Ssupported only for plots `with image` and `with pm3d`.
  Mapping z values into the named colormap uses cbrange; there should be some
  method for specifying a separate min/max range for each named colormap.
 

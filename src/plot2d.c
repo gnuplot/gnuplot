@@ -364,6 +364,8 @@ get_data(struct curve_points *current_plot)
 	    variable_color = TRUE;
 	if (current_plot->lp_properties.pm3d_color.type == TC_Z)
 	    variable_color = TRUE;
+	if (current_plot->lp_properties.pm3d_color.type == TC_COLORMAP)
+	    variable_color = TRUE;
 	if (current_plot->lp_properties.l_type == LT_COLORFROMCOLUMN)
 	    variable_color = TRUE;
 	if (current_plot->plot_smooth != SMOOTH_NONE
@@ -1417,8 +1419,13 @@ store2d_point(
 				current_plot->noautoscale, cp->z = -VERYLARGE);
 
     /* If we have variable color corresponding to a z-axis value, use it to autoscale */
-    /* June 2010 - New mechanism for variable color */
     if (current_plot->lp_properties.pm3d_color.type == TC_Z && current_plot->varcolor)
+	STORE_AND_UPDATE_RANGE(current_plot->varcolor[i], current_plot->varcolor[i],
+		dummy_type, COLOR_AXIS, current_plot->noautoscale, NOOP);
+
+    /* Same thing for colormap z-values */
+    if (current_plot->lp_properties.pm3d_color.type == TC_COLORMAP
+	&& current_plot->varcolor && current_plot->lp_properties.colormap)
 	STORE_AND_UPDATE_RANGE(current_plot->varcolor[i], current_plot->varcolor[i],
 		dummy_type, COLOR_AXIS, current_plot->noautoscale, NOOP);
 
