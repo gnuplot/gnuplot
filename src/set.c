@@ -3552,7 +3552,7 @@ set_palette_function()
     char saved_dummy_var[MAX_ID_LEN+1];
 
     ++c_token;
-    strncpy( saved_dummy_var, c_dummy_var[0], MAX_ID_LEN );
+    strcpy( saved_dummy_var, c_dummy_var[0]);
 
     /* set dummy variable */
 #ifdef ALLOW_DUMMY_VAR_FOR_GRAY
@@ -3610,7 +3610,7 @@ set_palette_function()
     m_capture(&(sm_palette.Cfunc.definition), start_token, c_token-1);
     dummy_func = NULL;
 
-    strncpy( c_dummy_var[0], saved_dummy_var, MAX_ID_LEN );
+    strcpy( c_dummy_var[0], saved_dummy_var);
 }
 
 
