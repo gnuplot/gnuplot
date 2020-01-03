@@ -792,6 +792,12 @@ array_command()
 	A[i].type = NOTDEFINED;
     }
 
+    /* Element zero can also hold an indicator that this is a colormap */
+    if (equals(c_token, "colormap")) {
+	c_token++;
+	A[0].type = COLORMAP;
+    }
+
     /* Initializer syntax:   array A[10] = [x,y,z,,"foo",] */
     if (equals(c_token, "=")) {
 	int initializers = 0;

@@ -156,8 +156,10 @@ save_variables__sub(FILE *fp)
 	if (udv->udv_value.type != NOTDEFINED) {
 	    if ((udv->udv_value.type == ARRAY)
 		&& strncmp(udv->udv_name,"ARGV",4)) {
-		fprintf(fp,"array %s[%d] = ", udv->udv_name,
-			(int)(udv->udv_value.v.value_array[0].v.int_val));
+		fprintf(fp,"array %s[%d]%s = ", udv->udv_name,
+			(int)(udv->udv_value.v.value_array[0].v.int_val),
+			(udv->udv_value.v.value_array[0].type == COLORMAP)
+				? " colormap " : "");
 		save_array_content(fp, udv->udv_value.v.value_array);
 	    } else if (strncmp(udv->udv_name,"GPVAL_",6)
 		 && strncmp(udv->udv_name,"GPFUN_",6)
