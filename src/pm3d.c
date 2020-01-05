@@ -1421,6 +1421,9 @@ illuminate_one_quadrangle( quadrangle *q )
 
 /*
  * Adjust current RGB color based on pm3d lighting model.
+ * Jan 2019: preserve alpha channel
+ *	     This isn't quite right because specular highlights should
+ *	     not be affected by transparency.
  */
 int
 apply_lighting_model( struct coordinate *v0, struct coordinate *v1, 
@@ -1433,7 +1436,8 @@ apply_lighting_model( struct coordinate *v0, struct coordinate *v1,
     double t;
     double phi;
     double psi;
-    int rgb;
+    unsigned int rgb;
+    unsigned int alpha = 0;
     rgb_color color;
     double r, g, b, tmp_r, tmp_g, tmp_b;
     double dot_prod, shade_fact, spec_fact;
@@ -1443,6 +1447,7 @@ apply_lighting_model( struct coordinate *v0, struct coordinate *v1,
 	r = (double)((rgb >> 16) & 0xFF) / 255.;
 	g = (double)((rgb >>  8) & 0xFF) / 255.;
 	b = (double)((rgb      ) & 0xFF) / 255.;
+	alpha = rgb & 0xff000000;
     } else {
 	rgb1_from_gray(gray, &color);
 	r = color.r;
@@ -1526,6 +1531,9 @@ apply_lighting_model( struct coordinate *v0, struct coordinate *v1,
     rgb = ((unsigned char)((tmp_r)*255.) << 16)
 	+ ((unsigned char)((tmp_g)*255.) <<  8)
 	+ ((unsigned char)((tmp_b)*255.));
+
+    /* restore alpha value if there was one */
+    rgb |= alpha;
 
     return rgb;
 }
