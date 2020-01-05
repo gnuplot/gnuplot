@@ -75,7 +75,7 @@ pause -1 "Now try histograms stacked by columns"
 #	xtic labels should be picked up from column heads ('title column')
 #	key titles should be picked up from row heads ('key(1)')
 #
-set title "Immigration from Northern Europe\n(columstacked histogram)"
+set title "Immigration from Northern Europe\n(columnstacked histogram)"
 set style histogram columnstacked
 set key noinvert box
 set yrange [0:*]
