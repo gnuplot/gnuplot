@@ -208,8 +208,8 @@ load "contours.dem"
 load "custom_contours.dem"
 reset
 
-print "******************** file multimsh.dem ********************"
-load "multimsh.dem"
+print "******************** file pixmap.dem ********************"
+load "pixmap.dem"
 reset
 
 print "******************** file bivariat.dem ********************"

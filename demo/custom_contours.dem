@@ -5,7 +5,8 @@
 set contours
 set xrange [1:7.6]
 set yrange [1:7.6]
-set view 55., 180., .845, 2.0
+set view 67., 180., 1.42, 1.05
+set key outside right top
 unset xtics
 unset ytics
 unset ztics
@@ -19,7 +20,6 @@ set linetype 105 lc 6
 
 set multiplot layout 2,2 spacing 0,0
 
-set key left at graph 1.6,0,0.7
 set key title "default"
 splot x*y lw 2
 

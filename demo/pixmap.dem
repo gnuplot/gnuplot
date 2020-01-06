@@ -16,3 +16,4 @@ set label 101 "{/:Bold Pixmap use}\n" \
 
 load 'armillary.dem'
 
+pause -1

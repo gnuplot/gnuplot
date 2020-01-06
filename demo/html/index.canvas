@@ -124,6 +124,7 @@
     <li><a href="rgbalpha.html">RGB + alpha channel</a></li>
     <li><a href="barchart_art.html">rescaled images</a></li>
     <li><a href="imageNaN.html">missing/NaN values</a></li>
+    <li><a href="pixmap.html">pixmap gradients and icons</a></li>
     </ul>
 </td>
 
@@ -241,7 +242,7 @@
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated December 2019</i>
+    <i>This page generated January 2020</i>
     </td>
 
     <td>
