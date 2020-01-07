@@ -105,6 +105,7 @@ if BUILD_BITMAP
 gnuplot_SOURCES += bitmap.c
 endif
 
+if DEVELOPMENT_VERSION
 DISTCLEANFILES = timestamp.h
 BUILT_SOURCES = timestamp.h
 git_current := $(shell cut -c6- $(top_srcdir)/.git/HEAD)
@@ -115,6 +116,7 @@ timestamp.h: $(top_srcdir)/.git/${git_current} Makefile
 	@echo "const char gnuplot_date[] = \"`git --git-dir '$(top_srcdir)/.git' log -1 --format=%ci | cut -b-11`\";" >>$@t
 	@echo "#endif /* GNUPLOT_TIMEBASE_H_INCLUDED */" >> $@t
 	@if cmp -s $@ $@t; then rm -f $@t; else mv $@t $@; fi
+endif # DEVELOPMENT_VERSION
 
 if BUILD_QT
 

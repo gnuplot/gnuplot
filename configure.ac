@@ -9,8 +9,12 @@ AC_INIT(gnuplot, 5.4.rc0)
 AC_CONFIG_SRCDIR(src/graphics.c)
 AC_PREREQ([2.69])
 AC_CONFIG_HEADERS(config.h:config.hin)
-dnl for a non-beta release, we need to disable DEVELOPMENT_RELEASE
+
+dnl The line below is for use during development
 dnl AC_DEFINE(DEVELOPMENT_VERSION,1,[Provide contact info for gnuplot develoment])
+dnl The line below is for packaging a release version
+AM_CONDITIONAL([DEVELOPMENT_VERSION], 0)
+
 AM_INIT_AUTOMAKE([1.10 subdir-objects])
 
 AM_MAINTAINER_MODE
