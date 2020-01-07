@@ -1,0 +1,13 @@
+ BODY { 
+ 	background-color:white; 
+ 	margin-left: 5%; margin-right: 5%; 
+      }
+
+ H1   {
+	text-align: center; 
+	text-decoration:underline;
+      }
+
+ LI   {
+	padding-top: 0.3em;
+      }

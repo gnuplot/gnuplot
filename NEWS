@@ -31,6 +31,7 @@ Changes in 5.4
 * NEW Left-click on hypertext label will copy text to clipboard (wxt qt)
 * NEW smooth option "zsort" controls order that points are plotting in
 * NEW multiple textbox styles
+* NEW Time/date input recognizes format %p to handle am/pm field
 * EXPERIMENTAL "set mouse mouseformat function <stringval_from_xy(x,y)>"
 * EXPERIMENTAL load $DATABLOCK
 * CHANGE revised syntax for plot style "with parallelaxes"

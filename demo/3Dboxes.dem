@@ -1,0 +1,24 @@
+set boxwidth 0.4 absolute
+set boxdepth 0.3
+set style fill solid 1.00 border
+set grid vertical xtics ytics ztics
+set grid lt 0 lw 0.75
+set wall z0  fc  rgb "slategrey"  fillstyle  transparent solid 0.50 border lt -1
+set view 59, 24, 1, 1
+set xyplane at 0
+set xtics 0,1,10 offset  0.0, -0.5 add ("" 0)
+set ytics 1,1,5  offset -0.5, -0.5
+set xrange [0:11]
+set yrange [0:6]
+set pm3d depthorder base
+set pm3d border linewidth 1.000
+set pm3d lighting primary 0.5 specular 0.2 spec2 0
+unset key
+
+rgbfudge(x) = x*51*32768 + (11-x)*51*128 + int(abs(5.5-x)*510/9.)
+
+set title "3D boxes with pm3d depth sorting and lighting" 
+splot for [col=1:5] \
+    'candlesticks.dat' using 1:(col):(col*column(col)):(rgbfudge($1)) with boxes fc rgb variable
+
+pause -1 "<cr> to continue"

@@ -20,6 +20,10 @@ dist-hook:
 	@find $(distdir) -type d -name .deps -print | xargs rm -rf
 	@find $(distdir) -type f -name .cvsignore -print | xargs rm -f
 
+ReleaseNotes.html: RELEASE_NOTES
+	txt2html -pm --style_url ReleaseNotes.css RELEASE_NOTES \
+	         --outfile ReleaseNotes.html
+
 gnuplot:
 	cd src; make binonly
 

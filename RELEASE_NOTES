@@ -1,5 +1,241 @@
-		GNUPLOT VERSION 5.4 NOTES
-		=========================
+		Gnuplot Version 5.4 Release Notes
+		=================================
 
-This file is a placeholder for the release notes that accompany a
-stable gnuplot release.
+Gnuplot version 5.4.0 starts a new supported release series.
+Version 5.4 has many new features and a few changes to features that were
+present in previous versions.  Gnuplot development is now tracked in a git
+repository on SourceForge.  You can generate a complete history of changes
+using "git log" after downloading:
+
+    git clone -b branch-5-4-stable git://git.code.sf.net/p/gnuplot/gnuplot-main
+
+We appreciate any feedback from testing this release candidate so that any
+problems can be addressed prior to the 5.4.0 roll-out expected in Spring 2020.
+
+Release Notes date: 05-Jan-2020
+
+Features introduced in version 5.4
+==================================
+
+* Support for 64-bit integer arithmetic
+	o All evaluation of expressions and functions uses 64-bit arithmetic
+	  if supported by the hardware platform.
+	o Integer overflow is detected and handled according to user preference.
+
+* Voxel grids
+	o Gnuplot now supports operations based on 3D grids of voxel data.
+	o The current content of one of more voxel grids can be referenced by
+	  splot commands to assign colors or other properties to plot elements.
+	o Data in a voxel grids can be plotted by splot styles dots, points,
+	  or isosurface.
+
+* Pixmaps as objects
+	o "set pixmap" allows import of a png/jpeg/gif image as a pixmap that
+	  can be positioned anywhere in a plot or on the page.  Unlike plotting
+	  "with image", pixmap objects retain their original aspect ratio and
+	  size independent of axis scaling or rotation.
+	  Example: http://gnuplot.info/demo_5.4/pixmap.html
+
+* New plot styles and plot options
+	o 3D plot style "with polygons" reads polygon faces from a data file.
+	  These can be used to create a surface or to describe a solid object.
+	  Example: http://gnuplot.info/demo_5.4/polygons.html
+	o "splot $voxelgrid with isosurface" creates a tessellated 3D surface
+	  enclosing voxels above a requested threshold level.
+	  Example: http://gnuplot.info/demo_5.4/isosurface.html
+	o "set spiderplot" selects a new plotting mode allowing creation of
+	  spider plots, also known as radar charts. These are essentially
+	  parallel axis plots where the axes are arranged radially rather than
+	  vertically.
+	  Example: http://gnuplot.info/demo_5.4/spiderplot.html
+	o Plot styles "with circles" and "with boxes" can be used in 3D plots.
+	  Example: http://gnuplot.info/demo_5.4/3Dboxes.html
+	o 2D plot style "with arrows" is a variant of "with vectors" in which
+	  each arrow is specified by x:y:length:angle rather than x:y:dx:dy.
+	o pm3d surfaces can have individual fill styles and separate top/bottom
+	  fill colors.
+	  Example: http://gnuplot.info/demo_5.4/hidden_compare.html
+	o pm3d option "noclipcb" causes quadrangles with palette color outside
+	  cbrange to be omitted from the plot rather than being assigned a
+	  color clipped to cbmin or cbmax.
+	o Contour line types can be customized.
+	  Example: http://gnuplot.info/demo_5.4/custom_contours.html
+
+* New data pre-processing filters
+	o "smooth zsort" sorts 2D points on values in a 3rd column to determine
+	  their drawing order.  In combination with using palette colors, this
+	  facilitates highlighting outliers in a crowded scatter plot.
+
+* New commands and command options
+	o Voxel grid commands "set vgrid", "set vxrange", "vclear", "vfill"
+	  and voxel().
+	o New options "set walls" and "set grid vertical" for showing the
+	  xy, xz, and yz planes in 3D plots.
+	o "set table separator {tab|comma|"char"}" and "plot with table"
+	  can be used to create csv files.
+	o Array size can be implicit if an initializer is present, e.g.
+	  Array A = [1,2,3]
+	o Extra lines of text or symbols in the key can be added by
+	  substituting "keyentry" in place of a filename or function in
+	  plot and splot commands.
+	o User-specified interpretation of mouse coordinates.
+	  See map-projection demos.
+	o The "load" command can input commands from a data block as an
+	  alternative to reading them from a file.
+	o "set datafile columnheaders" causes the first line of input to be
+	  read as strings rather than as data values. This is equivalent to
+	  "set key autotitle columnheader" but does not affect generation of
+	  key entries.  Column headers are collected into an array of strings
+	  by any subsequent "stats" commands.
+	o "set view projection {xz|yz}"
+
+* New terminals and terminal options
+	o New latex terminal "pict2e" supercedes older terminals "latex",
+	  "emtex", "eepic", and "tpic", which are no longer build by default.
+	o The "pstricks" terminal now supports current gnuplot features
+	  including RGB colors, transparency, filled polygons, and boxes.
+	o The "pcl5" terminal now supports current gnuplot features.
+	o The "texdraw" terminal has been updated.
+	o The "windows" terminal now uses Direct2D rather than GDI/GDI+.
+	o The "dospc" and "svga" DOS terminals now support interactive
+	  terminal and mouse input.
+
+* Other new features
+	o Enhanced text mode accepts the escape sequence \U+xxxx (where xxxx
+	  is a 4 or 5 character hexadecimal) to represent a Unicode code point
+	  that is converted to the corresponding UTF-8 byte sequence on output.
+	o Time/date input recognizes format %p to handle am/pm field
+	o Support for multiple textbox styles
+	o Built-in modified Bessel functions (besi0 besi1 besin)
+	o Built-in order N Bessel functions of the 1st and 2nd kind (besjn besyn)
+
+* Changes
+	o Plot style "with parallelaxes" has revised syntax to match
+	  histogram and spiderplot commands.  There is no longer a limit
+	  on the number of axes in a plot, and iteration is possible:
+	  E.g.: "plot for [column=1:N] DATA using column with parallelaxes"
+	o pm3d filled area quadrangles are clipped smoothly to the current
+	  zrange. This affects pm3d surfaces and the faces of 3D boxes,
+	  polygons, etc.
+	  Example: http://gnuplot.info/demo_5.4/pm3d_clip.html
+	o Imaginary values returned by the "using" specifier of a 2D plot
+	  are treated as undefined values (NaN).  This was already true for
+	  function plots and for 3D data plots.
+	o The "set fontpath" command is deprecated (only affects PostScript).
+
+
+		 Notes for packagers and testers
+		================================
+
+Obsolete or deprecated components
+---------------------------------
+
+The "gnuplot mode" elisp and TeX files for use with emacs are now
+maintained as a separate project: https://github.com/bruceravel/gnuplot-mode
+so there is no longer a configuration option --with-lisp-files.
+
+LaTeX-related terminal drivers latex, emtex, eepic, and tpic are no longer
+built by default.  Their closest equivalent is the new pict2e terminal, but
+LaTeX users who want support for the full range of gnuplot plot styles are
+recommended to use the cairolatex or tikz terminals.
+
+
+Configuration options for interactive use
+-----------------------------------------
+
+The 5.4 source code supports three primary cross-platform interactive
+modes in addition to several platform-specific modes.
+
+1) Qt
+
+   The qt terminal supports interactive display with menu-driven
+   output to png, svg or pdf.  If either Qt4 or Qt5 is detected by the
+   configure script, this will be the default terminal.  It is now the
+   fastest and most full-featured interactive terminal option.
+
+   To disable this terminal:
+      ./configure --without-qt
+
+   To force use of Qt4 even if Qt5 is present:
+      ./configure --with-qt=qt4
+
+2) Cairo/pango/wxWidgets
+
+   This set of terminals includes pngcairo, pdfcairo, epscairo, and cairolatex
+   for output to a file. The wxt terminal provides interactive display
+   All of these will be built by default if the configuration script finds
+   the required libcairo, libpango, libcairo, libwxgtk, and related
+   support libraries
+
+   To disable these terminals:
+       ./configure --without-cairo
+       ./configure --with-cairo --disable-wxwidgets
+
+3) X11 (the "classic" interactive interface)
+   This used to be the preferred interactive interface, but the newer
+   wxt and qt terminals offer nicer output and a wider range of features.
+
+
+Options for output to files
+---------------------------
+
+Of course the terminals (output modes) present in previous gnuplot versions
+are also still available. These include, among many more obscure options:
+
+- png/jpeg/gif output via libgd
+- PostScript (*.ps or *.eps)
+- Many flavors of TeX/LaTeX output, including TikZ and ConTeXt
+- Bitmapped output to support older devices (e.g. HP deskjet, epson, and
+  seiko printers, pbm bitmapped graphics files) is available if needed
+  but is no longer configured in by default.
+      ./configure --with-bitmap-terminals
+
+Options for generating interactive plots for web display
+--------------------------------------------------------
+
+- Mouseable output for display on the web can be created using either
+  the canvas terminal (HTML5 2D canvas element) or the svg terminal.
+  Both allow zooming, toggling plot elements on/off, and user-scriptable
+  hot keys.
+
+			Other Notes
+			===========
+
+Installation
+------------
+
+You can download a source tarball for the current gnuplot version
+from the gnuplot development site on SourceForge.
+	http://sourceforge.net/projects/gnuplot
+
+Installation instructions are available in the source itself; the short
+version for linux/unix-like systems is to unpack the tarball and then
+<PRE>
+build it:
+      cd gnuplot-5.4.0 ; ./configure ; make
+test it:
+      make check
+install it:
+      make install
+</PRE>
+
+Pay careful attention to the output of the ./configure script.
+It may indicate that some output drivers have been omitted because the
+necessary support libraries were not found.  In general you need to have
+previously installed the "*-devel-*" versions of these libraries.
+
+
+Support
+-------
+Please report all bugs and installation problems to the bug tracker
+on SourceForge:
+	https://sourceforge.net/p/gnuplot/bugs/
+
+Development
+-----------
+Gnuplot development is ongoing. The development branch contains preliminary
+implementations of new features.  The current development version is 5.5
+(odd minor number) and will eventually be released as version 5.6 (even
+minor number).  Bugfixes to version 5.4 will appear in patchlevel releases
+5.4.1, 5.4.2, etc., approximately twice a year or as needed to correct a
+serious problem.
