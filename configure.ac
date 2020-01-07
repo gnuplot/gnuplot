@@ -718,15 +718,6 @@ AC_ARG_WITH(row-help,dnl
                [ Define if you want online help and subtopic tables sorted by column. ])
    fi])
 
-dnl Whether we want to create the LaTeX tutorial
-TUTORIAL=notutorial
-AC_ARG_WITH(tutorial,dnl
-[  --with-tutorial         process the LaTeX tutorial when building])
-dnl only if latex/2e is found
-if test "$with_latex" != no -a "$with_tutorial" = yes ; then
-  TUTORIAL=tutorial
-fi
-
 dnl enable multi-byte font support in x11 terminal
 AC_ARG_ENABLE(x11-mbfonts,dnl
 [  --disable-x11-mbfonts   disable multi-byte font support for x11 ],,
@@ -763,13 +754,6 @@ AC_ARG_ENABLE(raise-console,dnl
                 [ Define to treat spacebar like any other keystroke. ])
   fi
 
-
-dnl
-if test ! -f src/graphics.c ; then
-  AC_MSG_RESULT([Compiling outside source directory - copying needed files])
-  mkdir tutorial >/dev/null 2>&1
-  cp ${srcdir}/tutorial/eg3.dat tutorial
-fi
 
 dnl explicit call to PKG_PROG_PKG_CONFIG because the first call to
 dnl PKG_CHECK_MODULES may not happen
@@ -1116,7 +1100,6 @@ AC_SUBST(GIHDIR)
 AC_SUBST(TEXDIR)
 AC_SUBST(TERMLIBS)
 AC_SUBST(TERMXLIBS)
-AC_SUBST(TUTORIAL)
 
 dnl Write Makefiles and configuration header
 AC_CONFIG_FILES([Makefile
@@ -1132,8 +1115,7 @@ AC_CONFIG_FILES([Makefile
            src/beos/Makefile
            src/wxterminal/Makefile
            src/qtterminal/Makefile
-           term/Makefile
-           tutorial/Makefile])
+           term/Makefile])
 AC_CONFIG_COMMANDS([default],[test -z "$CONFIG_HEADERS" || echo timestamp >stamp-h],[])
 AC_OUTPUT
 

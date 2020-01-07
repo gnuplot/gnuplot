@@ -23,7 +23,6 @@ if ${ACLOCAL} -I m4 && ${AUTOHEADER} \
   && (cd demo && make -f Makefile.am.in Makefile.am ) \
   && (cd m4 && make -f Makefile.am.in Makefile.am ) \
   && (cd term && make -f Makefile.am.in Makefile.am ) \
-  && (cd tutorial && make -f Makefile.am.in Makefile.am ) \
   && ${AUTOMAKE} -a -c \
   && sed 's/noinst_PROGRAMS = bf_test$(EXEEXT) @GNUPLOT_X11@/noinst_PROGRAMS = bf_test$(EXEEXT) @GNUPLOT_X11@$(EXEEXT)/' \
 	<src/Makefile.in >src/Makefile.in2 \
