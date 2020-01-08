@@ -477,6 +477,12 @@ load "pm3d_lighting.dem"
 print "********************** file polygons.dem *********************"
 load "polygons.dem"
 
+print "********************** file named_palettes.dem *********************"
+load "named_palettes.dem"
+
+print "********************** file rgb_hexdata.dem *********************"
+load "rgb_hexdata.dem"
+
 print "********************** file vplot.dem *********************"
 load "vplot.dem"
 
