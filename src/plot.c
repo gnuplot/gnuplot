@@ -47,6 +47,7 @@
 #include "version.h"
 #include "voxelgrid.h"
 #include "encoding.h"
+#include "xdg.h"
 
 #include <signal.h>
 #include <setjmp.h>
@@ -795,6 +796,7 @@ init_session()
 	successful_initialization = TRUE;
 
 	load_rcfile(2);		/* ~/.gnuplot */
+	load_rcfile(3);		/* ~/.config/gnuplot/gnuplotrc */
 }
 
 /*
@@ -839,6 +841,15 @@ load_rcfile(int where)
 	strcpy(rcfile, user_homedir);
 	PATH_CONCAT(rcfile, PLOTRC);
 	plotrc = fopen(rcfile, "r");
+    } else if (where == 3) {
+#ifdef __unix__
+	char * XDGConfigHome = xdg_get_var(kXDGConfigHome);
+	size_t len = strlen(XDGConfigHome);
+	rcfile = gp_alloc(len + 1 + sizeof("gnuplot/gnuplotrc"), "rcfile");
+	strcpy(rcfile, XDGConfigHome);
+	PATH_CONCAT(rcfile, "gnuplot/gnuplotrc");
+	plotrc = fopen(rcfile, "r");
+#endif
     }
 
     if (plotrc) {
