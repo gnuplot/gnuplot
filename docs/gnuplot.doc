@@ -8898,9 +8898,9 @@ Ffigure_zerror
 ?unset clabel
 ?show clabel
 ?clabel
- This command is deprecated. Use `set cntrlabel` instead.
- `unset clabel` is replaced by `set cntrlabel onecolor`.
+ This command has been deprecated. Use `set cntrlabel` instead.
  `set clabel "format"` is replaced by `set cntrlabel format "format"`.
+ `unset clabel` is replaced by `set cntrlabel onecolor`.
 3 clip
 ?commands set clip
 ?commands unset clip

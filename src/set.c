@@ -79,7 +79,6 @@ static void set_border(void);
 static void set_boxplot(void);
 static void set_boxdepth(void);
 static void set_boxwidth(void);
-static void set_clabel(void);
 static void set_clip(void);
 static void set_cntrparam(void);
 static void set_cntrlabel(void);
@@ -240,9 +239,6 @@ set_command()
 	    break;
 	case S_BOXWIDTH:
 	    set_boxwidth();
-	    break;
-	case S_CLABEL:
-	    set_clabel();
 	    break;
 	case S_CLIP:
 	    set_clip();
@@ -1192,21 +1188,6 @@ set_boxwidth()
     }
     c_token++;
 }
-
-/* DEPRECATED - process 'set clabel' command */
-static void
-set_clabel()
-{
-    char *new_format;
-
-    c_token++;
-    clabel_onecolor = FALSE;
-    if ((new_format = try_to_get_string())) {
-	safe_strncpy(contour_format, new_format, sizeof(contour_format));
-	free(new_format);
-    }
-}
-
 
 /* process 'set clip' command */
 static void

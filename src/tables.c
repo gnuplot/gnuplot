@@ -174,7 +174,7 @@ const struct gen_table set_tbl[] =
     { "bor$der", S_BORDER },
     { "boxdepth", S_BOXDEPTH },
     { "box$width", S_BOXWIDTH },
-    { "cl$abel", S_CLABEL },
+    { "clabel", S_CLABEL },
     { "c$lip", S_CLIP },
     { "cntrp$aram", S_CNTRPARAM },
     { "cntrl$abel", S_CNTRLABEL },
