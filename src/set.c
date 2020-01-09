@@ -1162,7 +1162,10 @@ set_boxdepth()
 {
     c_token++;
     boxdepth = 0.0;
-    if (!END_OF_COMMAND)
+    if (equals(c_token, "square")) {
+	c_token++;
+	boxdepth = -1;
+    } else if (!END_OF_COMMAND)
     	boxdepth = real_expression();
 }
 

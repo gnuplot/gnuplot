@@ -3824,11 +3824,15 @@ plot3d_boxes(struct surface_points *plot)
 		continue;
 
 	    if (boxdepth != 0) {
-		double depth = (boxdepth > 0) ? boxdepth : boxwidth * yscaler/xscaler;
+		double depth = boxdepth;
 		if (Y_AXIS.log) {
+		    if (boxdepth < 0)
+			depth = boxwidth * yscaler/xscaler;
 		    dyl *= pow(Y_AXIS.base, -depth/2.);
 		    dyh *= pow(Y_AXIS.base, depth/2.);
 		} else {
+		    if (boxdepth < 0)
+			depth = boxwidth * (Y_AXIS.max-Y_AXIS.min)/(X_AXIS.max-X_AXIS.min);
 		    dyl -= depth / 2.;
 		    dyh += depth / 2.;
 		}

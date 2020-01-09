@@ -8855,8 +8855,11 @@ Ffigure_zerror
 ?set boxdepth
 ?show boxdepth
 ?boxdepth
+      set boxdepth {<y extent>} | square
  The `set boxdepth` command affects only 3D plots created by `splot with boxes`.
  It sets the extent of each box along the y axis, i.e. its thickness.
+ `set boxdepth square` will try to choose a y extent that gives the appearance
+ of a square crossection independent of the axis scales on x and y.
 3 color
 ?commands set color
 ?set color
