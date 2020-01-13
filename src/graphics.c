@@ -5240,6 +5240,14 @@ place_spiderplot_axes(struct curve_points *first_plot, int layer)
 	}
     }
 
+    /* This should never happen if there really are spiderplots,
+     * but we have left open the possibility that other plot types
+     * could be mapped onto the radial axes.
+     * That case does not yet have support in place.
+     */
+    if (n_spokes == 0 || parallel_axis_array == NULL)
+	return;
+
     /* Place the grid lines */
     if (grid_spiderweb && layer == LAYER_BACK) {
 	this_axis = &parallel_axis_array[0];

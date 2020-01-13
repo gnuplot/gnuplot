@@ -419,7 +419,7 @@ boundary3d(struct surface_points *plots, int count)
 	i = (int) (plot_bounds.ytop - plot_bounds.ybot) / t->v_char - 1 - ktitle_lines;
 	if (i > key->maxrows && key->maxrows > 0)
 	    i = key->maxrows;
-	if (i == 0)
+	if (i <= 0)
 	    i = 1;
 	if (ptitl_cnt > i) {
 	    key_cols = (int) ((ptitl_cnt - 1)/ i) + 1;
