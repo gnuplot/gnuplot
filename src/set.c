@@ -3439,6 +3439,11 @@ set_palette_defined()
 
     }
 
+    if (num <= 0) {
+	reset_palette();
+	int_error(c_token, "invalid palette syntax");
+    }
+
     sm_palette.gradient_num = num + 1;
     check_palette_grayscale();
 
@@ -3614,9 +3619,8 @@ check_palette_grayscale()
 
     /* check if gray values are sorted */
     for (i=0; i<sm_palette.gradient_num-1; ++i ) {
-	if (gradient[i].pos > gradient[i+1].pos) {
-	    int_error( c_token, "Gray scale not sorted in gradient." );
-	}
+	if (gradient[i].pos > gradient[i+1].pos)
+	    int_error( c_token, "Palette gradient not monotonic" );
     }
 
     /* fit gray axis into [0:1]:  subtract offset and rescale */
