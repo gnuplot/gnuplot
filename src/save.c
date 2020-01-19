@@ -158,7 +158,7 @@ save_variables__sub(FILE *fp)
 		&& strncmp(udv->udv_name,"ARGV",4)) {
 		fprintf(fp,"array %s[%d]%s = ", udv->udv_name,
 			(int)(udv->udv_value.v.value_array[0].v.int_val),
-			(udv->udv_value.v.value_array[0].type == COLORMAP)
+			(udv->udv_value.v.value_array[0].type == COLORMAP_ARRAY)
 				? " colormap " : "");
 		save_array_content(fp, udv->udv_value.v.value_array);
 	    } else if (strncmp(udv->udv_name,"GPVAL_",6)
@@ -183,7 +183,7 @@ save_array_content(FILE *fp, struct value *array)
     int size = array[0].v.int_val;
     fprintf(fp, "[");
     for (i=1; i<=size; i++) {
-	if (array[0].type == COLORMAP)
+	if (array[0].type == COLORMAP_ARRAY)
 	    fprintf(fp, "0x%08x", (unsigned int)(array[i].v.int_val));
 	else if (array[i].type != NOTDEFINED)
 	    disp_value(fp, &(array[i]), TRUE);

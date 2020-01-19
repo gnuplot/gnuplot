@@ -3854,7 +3854,7 @@ save_palette(void)
      */
     A = array->udv_value.v.value_array;
     A[0].v.int_val = colormap_size;
-    A[0].type = COLORMAP;
+    A[0].type = COLORMAP_ARRAY;
     for (i = 0; i < colormap_size; i++) {
 	gray = (double)i / (colormap_size-1);
 	if (sm_palette.positive == SMPAL_NEGATIVE)

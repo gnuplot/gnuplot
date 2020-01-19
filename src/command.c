@@ -795,7 +795,7 @@ array_command()
     /* Element zero can also hold an indicator that this is a colormap */
     if (equals(c_token, "colormap")) {
 	c_token++;
-	A[0].type = COLORMAP;
+	A[0].type = COLORMAP_ARRAY;
     }
 
     /* Initializer syntax:   array A[10] = [x,y,z,,"foo",] */

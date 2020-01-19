@@ -999,7 +999,7 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
 		 */
 		if (type_udv(c_token+1) == ARRAY) {
 		    udvt_entry *colormap = add_udv(c_token+1);
-		    if (colormap->udv_value.v.value_array[0].type != COLORMAP)
+		    if (colormap->udv_value.v.value_array[0].type != COLORMAP_ARRAY)
 			fprintf(stderr,"size %ld ARRAY %s might not be a colormap\n",
 			    colormap->udv_value.v.value_array[0].v.int_val,
 			    colormap->udv_name);
