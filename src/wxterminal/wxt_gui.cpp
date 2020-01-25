@@ -919,6 +919,7 @@ wxtPanel::wxtPanel( wxWindow *parent, wxWindowID id, const wxSize& size )
 	zoom_string2 = wxT("");
 
 	wxt_ruler = false;
+	wxt_ruler_lineto = false;
 	wxt_ruler_x = 0;
 	wxt_ruler_y = 0;
 
@@ -1127,7 +1128,12 @@ void wxtPanel::DrawToDC(wxDC &dc, wxRegion &region)
 		/* wx 2.9 Cocoa bug workaround, which has no logical functions support */
 		dc.SetLogicalFunction( wxINVERT );
 #endif
+#ifdef __WXMSW__
+		dc.DrawLine(0, (int)wxt_ruler_y, plot.device_xmax, (int)wxt_ruler_y);
+		dc.DrawLine((int)wxt_ruler_x, 0, (int)wxt_ruler_x, plot.device_ymax);
+#else
 		dc.CrossHair( (int)wxt_ruler_x, (int)wxt_ruler_y );
+#endif
 		dc.SetLogicalFunction( wxCOPY );
 	}
 
