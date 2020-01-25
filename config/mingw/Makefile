@@ -228,7 +228,7 @@ GNUSORT = /bin/sort
 # get it from: http://www.jrsoftware.org/isdl.php
 # Use unicode version of Inno Setup Compiler but not Standard version
 # because the setup file of gnuplot installer is now encoded utf-8 with BOM.
-ISCC = $(PROGRAMFILES32)/Inno\ Setup\ 5/iscc
+ISCC = $(PROGRAMFILES32)/Inno\ Setup\ 6/iscc
 
 # Directory that might contain extra files to be shipped with the installer.
 # This should include dependencies like DLLs, but also fontconfig configuration files.
