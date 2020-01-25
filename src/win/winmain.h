@@ -77,7 +77,6 @@ void MultiByteAccumulate(BYTE ch, LPWSTR wstr, int * count);
 LPSTR RelativePathToGnuplot(const char * path);
 
 int ConsoleReadCh(void);
-DWORD WINAPI stdin_pipe_reader(LPVOID param);
 
 UINT GetDPI(void);
 
