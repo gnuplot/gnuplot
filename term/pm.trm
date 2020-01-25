@@ -326,8 +326,7 @@ PM_options()
 {
     static TBOOLEAN first_init = TRUE;
     int old_termmode;
-    char * title;
-    TBOOLEAN need_title = FALSE;
+    char * s;
 
     // honor command line persist option
     if (first_init) {
@@ -380,9 +379,7 @@ PM_options()
 	    term->put_text = PM_put_text;
 	    term->flags &= ~TERM_ENHANCED_TEXT;
 	    break;
-	case PM_FONT: {
-	    char * s;
-
+	case PM_FONT:
 	    c_token++;
 	    s = try_to_get_string();
 	    if (s != NULL) {
@@ -392,21 +389,24 @@ PM_options()
 		PM_def_font[0] = NUL;
 	    }
 	    break;
-	}
 	case PM_TITLE:
 	    c_token++;
-	    need_title = TRUE;
-	    // fall through
-	default:
-	    title = try_to_get_string();
-	    if (title == NULL && need_title)
+	    s = try_to_get_string();
+	    if (s == NULL)
 		int_error(c_token, "expecting string argument");
-	    if (strcmp(title, "") == 0)
-		title = NULL;
-	    if (title == NULL)
+	    strlcpy(PM_term_title, s, sizeof(PM_term_title));
+	    free(s);
+	    break;
+	default:
+	    /* deprecated behaviour */
+	    s = try_to_get_string();
+	    if (s == NULL) {
+		int_error(c_token, "Unknown terminal option");
 		PM_term_title[0] = NUL;
-	    else
-		strlcpy(PM_term_title, title, sizeof(PM_term_title));
+	    } else {
+		strlcpy(PM_term_title, s, sizeof(PM_term_title));
+		free(s);
+	    }
 	    break;
 	}
     }
