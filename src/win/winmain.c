@@ -1081,25 +1081,6 @@ fake_pclose(FILE *stream)
 
 #ifdef WGP_CONSOLE
 
-DWORD WINAPI
-stdin_pipe_reader(LPVOID param)
-{
-#if 0
-    HANDLE h = (HANDLE)_get_osfhandle(fileno(stdin));
-    char c;
-    DWORD cRead;
-
-    if (ReadFile(h, &c, 1, &cRead, NULL))
-        return c;
-#else
-    unsigned char c;
-    if (fread(&c, 1, 1, stdin) == 1)
-	return (DWORD)c;
-    return EOF;
-#endif
-}
-
-
 int
 ConsoleGetch(void)
 {
@@ -1107,23 +1088,23 @@ ConsoleGetch(void)
     HANDLE h;
     DWORD waitResult;
 
-    if (!_isatty(fd))
-	h = CreateThread(NULL, 0, stdin_pipe_reader, NULL, 0, NULL);
-    else
-	h = (HANDLE)_get_osfhandle(fd);
+    h = (HANDLE)_get_osfhandle(fd);
+    if (h == INVALID_HANDLE_VALUE)
+	fprintf(stderr, "ERROR: Invalid stdin handle value!\n");
 
     do {
 	waitResult = MsgWaitForMultipleObjects(1, &h, FALSE, INFINITE, QS_ALLINPUT);
 	if (waitResult == WAIT_OBJECT_0) {
-	    DWORD c;
 	    if (_isatty(fd)) {
-		c = ConsoleReadCh();
+		DWORD c = ConsoleReadCh();
 		if (c != NUL)
 		    return c;
 	    } else {
-		GetExitCodeThread(h, &c);
-		CloseHandle(h);
-		return c;
+		unsigned char c;
+		if (fread(&c, 1, 1, stdin) == 1)
+		    return c;
+		else
+		    return EOF;
 	    }
 	} else if (waitResult == WAIT_OBJECT_0+1) {
 	    WinMessageLoop();

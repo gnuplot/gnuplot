@@ -63,7 +63,7 @@ extern "C" {
 	#include "parse.h"     // for real_expression
 	#include "axis.h"
 #ifdef _WIN32
-	#include "win/winmain.h"  // for WinMessageLoop, ConsoleReadCh, stdin_pipe_reader
+	#include "win/winmain.h"  // for WinMessageLoop, ConsoleReadCh
 	#include "win/wgnuplib.h" // for TextStartEditing, TextStopEditing
 	#include "win/wtext.h"    // for kbhit, getchar
 	#include <io.h>           // for isatty
@@ -1123,7 +1123,7 @@ int qt_waitforinput(int options)
 	if (options != TERM_ONLY_CHECK_MOUSING) { // NOTE: change this if used also for the caca terminal
 #ifdef WGP_CONSOLE
 		if (!isatty(fd))
-			h[0] = CreateThread(NULL, 0, stdin_pipe_reader, NULL, 0, NULL);
+			h[0] = (HANDLE)_get_osfhandle(fd);
 		else
 #endif
 			h[0] = GetStdHandle(STD_INPUT_HANDLE);
@@ -1168,11 +1168,11 @@ int qt_waitforinput(int options)
 		if ((waitResult == idx_stdin) && (idx_stdin != -1)) { // console windows or caca terminal (TBD)
 #ifdef WGP_CONSOLE
 			if (!isatty(fd)) {
-				DWORD dw;
-
-				GetExitCodeThread(h[0], &dw);
-				CloseHandle(h[0]);
-				c = dw;
+				unsigned char ch;
+				if (fread(&ch, 1, 1, stdin) == 1)
+					c = ch;
+				else
+					c = EOF;
 				quitLoop = true;
 			} else
 #endif
@@ -1208,7 +1208,7 @@ int qt_waitforinput(int options)
 					}
 				}
 			}
-			// If the native pipe handle signalled new data, but the QtLocalSocket 
+			// If the native pipe handle signalled new data, but the QtLocalSocket
 			// object has no data available, release the CPU for a little while.
 			if (size == 0)
 				Sleep(100);
@@ -1249,6 +1249,8 @@ int qt_waitforinput(int options)
 	// This happens if neither the qt queue is alive, nor there is a console window.
 	if ((options != TERM_ONLY_CHECK_MOUSING) && !waitOK)
 		return getchar();
+#else
+	(void) waitOK;
 #endif
 	return c;
 #endif // _WIN32
@@ -1580,7 +1582,7 @@ void qt_hypertext( int type, const char *text )
 void qt_boxed_text(unsigned int x, unsigned int y, int option)
 {
 	if (option == TEXTBOX_MARGINS) {
-	    // slightly largin y margin to allow for descenders 
+	    // slightly largin y margin to allow for descenders
 	    double xmargin = (double)x/(100*qt_oversamplingF);
 	    double ymargin = (double)y/(100*qt_oversamplingF) + 0.75/qt_oversamplingF;
 	    qt->out << GETextBox << QPointF(xmargin, ymargin) << option;
