@@ -626,7 +626,7 @@ install:
 	copy /Y $(TOP)\share\LaTeX\gnuplot.cfg $(DESTDIR)\share\LaTeX
 	if not exist $(DESTDIR)\docs mkdir $(DESTDIR)\docs
 	for %f in (NEWS) do copy $(TOP)\%f $(DESTDIR)\%f
-	for %f in (BUGS README Copyright ChangeLog FAQ.pdf) do copy $(TOP)\%f $(DESTDIR)\docs\%f
+	for %f in (BUGS README Copyright FAQ.pdf) do copy $(TOP)\%f $(DESTDIR)\docs\%f
 	if not exist $(DESTDIR)\license mkdir $(DESTDIR)\license
 	for %f in (Copyright) do copy $(TOP)\%f $(DESTDIR)\license\%f
 	if exist $(TOP)\win\README-Windows.txt copy /Y $(TOP)\win\README-Windows.txt $(DESTDIR)

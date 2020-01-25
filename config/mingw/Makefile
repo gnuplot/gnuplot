@@ -664,15 +664,15 @@ OBJS_PIPES =  $(subst .o,.po,$(OBJS) $(WINOBJS) $(WINOBJS_WGNUPLOT))
 OBJS_CONSOLE =  $(subst .o,.co,$(OBJS) $(WINOBJS))
 
 wgnuplot.exe: $(VERSIONING) $(OBJS_PLAIN) wgplt_res.o $(EXTRALIBS)
-	$(LDX) $(LDFLAGS) -mwindows $(LDFLAGS2) -o $@ $(OBJS_PLAIN) wgplt_res.o $(LDLIBS)\
+	$(LDX) $(LDFLAGS) -mwindows $(LDFLAGS2) -o $@ $(OBJS_PLAIN) wgplt_res.o $(LDLIBS) \
 	$(TERMLIBS) $(TERMLIBS_PLAIN) $(WX_LIBS) $(PANGOCAIRO_LIBS)
 
 wgnuplot_pipes.exe: $(VERSIONING) $(OBJS_PIPES) wgplt_res.o $(EXTRALIBS)
-	$(LDX) $(LDFLAGS) -mconsole $(LDFLAGS2) -o $@  $(OBJS_PIPES) wgplt_res.o $(LDLIBS)\
+	$(LDX) $(LDFLAGS) -mconsole $(LDFLAGS2) -o $@  $(OBJS_PIPES) wgplt_res.o $(LDLIBS) \
 	$(TERMLIBS) $(TERMLIBS_PIPES) $(WX_LIBS) $(PANGOCAIRO_LIBS)
 
 gnuplot.exe: $(VERSIONING) $(OBJS_CONSOLE) wgplt_res.o $(EXTRALIBS)
-	$(LDX) $(LDFLAGS) -mconsole $(LDFLAGS2) -o $@ $(OBJS_CONSOLE) wgplt_res.o  $(LDLIBS)\
+	$(LDX) $(LDFLAGS) -mconsole $(LDFLAGS2) -o $@ $(OBJS_CONSOLE) wgplt_res.o  $(LDLIBS) \
 	$(TERMLIBS) $(TERMLIBS_CONSOLE) $(WX_LIBS) $(PANGOCAIRO_LIBS)
 
 wgnuplot.mnu: $(W)/wgnuplot.mnu
@@ -702,7 +702,7 @@ timestamp.h: $(TOP)/.git/${git_current} Makefile
 	@echo "#endif /* GNUPLOT_TIMEBASE_H_INCLUDED */" >> $@t
 	@if cmp -s $@ $@t; then rm -f $@t; else mv $@t $@; fi
 else
-$(S)/version.c: $(TOP)/VERSION $(TOP)/PATCHLEVEL $(TOP)/ChangeLog $(S)/Makefile.maint
+$(S)/version.c: $(TOP)/VERSION $(TOP)/PATCHLEVEL $(S)/Makefile.maint
 	$(MAKE) -C $(S) srcdir=. top_srcdir=.. -f Makefile.maint version.c
 endif
 
@@ -1082,14 +1082,13 @@ endif
 	cp -p $(TOP)/win/Copyright-ja.txt $(DESTDIR)/
 	cp -p $(TOP)/README $(DESTDIR)/
 	cp -p $(TOP)/NEWS $(DESTDIR)/
-	cp -p $(TOP)/ChangeLog $(DESTDIR)/
 	cp -p $(TOP)/BUGS $(DESTDIR)/
 	cp -p $(TOP)/RELEASE_NOTES $(DESTDIR)/
 	cp -p $(TOP)/win/README-Windows.txt $(DESTDIR)/
 	cp -p $(TOP)/win/README-Windows-ja.txt $(DESTDIR)/
 	-cp -p $(TOP)/win/README-testing.txt $(DESTDIR)/
 	-cp -p $(TOP)/win/README-testing-ja.txt $(DESTDIR)/
-	-unix2dos $(DESTDIR)/*.txt $(DESTDIR)/README $(DESTDIR)/ChangeLog
+	-unix2dos $(DESTDIR)/*.txt $(DESTDIR)/README
 	-unix2dos $(DESTDIR)/Copyright $(DESTDIR)/NEWS $(DESTDIR)/BUGS $(DESTDIR)/RELEASE_NOTES
 # demo and contrib
 	mkdir -p $(DESTDIR)/demo
