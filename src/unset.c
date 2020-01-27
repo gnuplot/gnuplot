@@ -218,6 +218,9 @@ unset_command()
     case S_CONTOUR:
 	unset_contour();
 	break;
+    case S_CORNERPOLES:
+	cornerpoles = FALSE;
+	break;
     case S_DASHTYPE:
 	unset_dashtype();
 	break;
@@ -2017,6 +2020,7 @@ reset_command()
     border_lp = default_border_lp;
     border_layer = LAYER_FRONT;
     draw_border = 31;
+    cornerpoles = TRUE;
 
     draw_surface = TRUE;
     implicit_surface = TRUE;

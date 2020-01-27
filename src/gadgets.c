@@ -156,6 +156,7 @@ int border_layer = LAYER_FRONT;
 struct lp_style_type border_lp = DEFAULT_BORDER_LP;
 const struct lp_style_type default_border_lp = DEFAULT_BORDER_LP;
 const struct lp_style_type background_lp = {0, LT_BACKGROUND, 0, DASHTYPE_SOLID, 0, 0, 1.0, 0.0, DEFAULT_P_CHAR, BACKGROUND_COLORSPEC, DEFAULT_DASHPATTERN};
+TBOOLEAN cornerpoles = TRUE;
 
 /* set clip */
 TBOOLEAN clip_lines1 = TRUE;

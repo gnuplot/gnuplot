@@ -2447,7 +2447,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		    /* Draw the front vertical: floor-to-ceiling, front: */
 		    draw3d_line(&ff, &tf, &border_lp);
 		}
-	    } else {
+	    } else if (cornerpoles) {
 		/* find heights of surfaces at the corners of the xy
 		 * rectangle */
 		double height[2][2];

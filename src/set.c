@@ -83,6 +83,7 @@ static void set_clip(void);
 static void set_cntrparam(void);
 static void set_cntrlabel(void);
 static void set_contour(void);
+static void set_cornerpoles(void);
 static void set_dashtype(void);
 static void set_dgrid3d(void);
 static void set_decimalsign(void);
@@ -259,6 +260,9 @@ set_command()
 	    break;
 	case S_CONTOUR:
 	    set_contour();
+	    break;
+	case S_CORNERPOLES:
+	    set_cornerpoles();
 	    break;
 	case S_DASHTYPE:
 	    set_dashtype();
@@ -1434,6 +1438,13 @@ set_colorsequence(int option)
 	int_error(c_token, "Expecting 'classic' or 'default'");
     }
     c_token++;
+}
+
+static void
+set_cornerpoles()
+{
+    c_token++;
+    cornerpoles = TRUE;
 }
 
 /* process 'set dashtype' command */

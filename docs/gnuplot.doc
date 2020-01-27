@@ -273,6 +273,8 @@ C
 #b pm3d option `noclipcb` causes quadrangles with palette color outside cbrange
 ## to be skipped rather than being drawn with color clipped to cbmin or cbmax.
 #b Customized contour line types. See `set cntrparam`.
+#b The vertical lines connecting the base plane to the corners of a 3D surface
+## can be toggled on/off. See `set cornerpoles`.
 #end
 
 4 New data pre-processing filters
@@ -8807,6 +8809,11 @@ Ffigure_zerror
  The default setting is 31, which is all four sides for `plot`, and base and
  z axis for `splot`.
 
+ Separate from the four vertical lines in a 3D border, the `splot` command
+ by default draws a vertical line each corner of a surface to the base plane
+ of the plot. These verticals are not controlled by `set border`.
+ Instead use `set/unset cornerpoles`.
+
  In 2D plots the border is normally drawn on top of all plots elements
  (`front`). If you want the border to be drawn behind the plot elements,
  use `set border back`.
@@ -9316,6 +9323,12 @@ Ffigure_zerror
 ^ <a href="http://www.gnuplot.info/demo/discrete.html">
  contours with user defined levels demo (discrete.dem).
 ^ </a>
+3 cornerpoles
+?command set cornerpoles
+?set cornerpoles
+?cornerpoles
+ By default splot draws a vertical line from each corner of a 3D surface to the
+ base plane. These vertical lines can be suppressed using `unset cornerpoles`.
 3 dashtype
 ?commands set dashtype
 ?commands show dashtype

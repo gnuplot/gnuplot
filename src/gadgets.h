@@ -502,6 +502,7 @@ extern t_colorspec background_fill;
 extern int draw_border;
 extern int user_border;
 extern int border_layer;
+extern TBOOLEAN cornerpoles;
 
 extern struct lp_style_type border_lp;
 extern const struct lp_style_type background_lp;

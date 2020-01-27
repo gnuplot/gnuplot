@@ -179,6 +179,7 @@ const struct gen_table set_tbl[] =
     { "cntrp$aram", S_CNTRPARAM },
     { "cntrl$abel", S_CNTRLABEL },
     { "cont$ours", S_CONTOUR },
+    { "cornerp$oles", S_CORNERPOLES },
     { "dasht$ype", S_DASHTYPE },
     { "dt", S_DASHTYPE },
     { "da$ta", S_DATA },

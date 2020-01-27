@@ -302,6 +302,7 @@ save_set_all(FILE *fp)
 	fprintf(fp, "\n");
     } else
 	fputs("unset border\n", fp);
+    fprintf(fp, "%s cornerpoles\n", cornerpoles ? "set" : "unset");
 
     for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++) {
 	if (axis == SAMPLE_AXIS) continue;
