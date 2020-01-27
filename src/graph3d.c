@@ -2447,7 +2447,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		    /* Draw the front vertical: floor-to-ceiling, front: */
 		    draw3d_line(&ff, &tf, &border_lp);
 		}
-	    } else if (cornerpoles) {
+	    } else {
 		/* find heights of surfaces at the corners of the xy
 		 * rectangle */
 		double height[2][2];
@@ -2467,32 +2467,34 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		 * surface mesh(es) are also the geometrical ones of
 		 * their xy projections. This is only true for
 		 * 'explicit' surface datasets, i.e. z(x,y) */
-		for (; --plot_num >= 0; plot = plot->next_sp) {
-		    struct iso_curve *curve = plot->iso_crvs;
-		    int count;
-		    int iso;
+		if (cornerpoles) {
+		    for (; --plot_num >= 0; plot = plot->next_sp) {
+			struct iso_curve *curve = plot->iso_crvs;
+			int count;
+			int iso;
 
-		    if (plot->plot_type == NODATA || plot->plot_type == KEYENTRY)
-			continue;
-		    if (plot->plot_type == VOXELDATA)
-			continue;
-		    if (plot->plot_type == DATA3D) {
-			if (!plot->has_grid_topology)
+			if (plot->plot_type == NODATA || plot->plot_type == KEYENTRY)
 			    continue;
-			iso = plot->num_iso_read;
-		    } else
-			iso = iso_samples_2;
+			if (plot->plot_type == VOXELDATA)
+			    continue;
+			if (plot->plot_type == DATA3D) {
+			    if (!plot->has_grid_topology)
+				continue;
+			    iso = plot->num_iso_read;
+			} else
+			    iso = iso_samples_2;
 
-		    count = curve->p_count;
-		    if (count == 0)
-			continue;
+			count = curve->p_count;
+			if (count == 0)
+			    continue;
 
-		    check_corner_height(curve->points, height, depth);
-		    check_corner_height(curve->points + count - 1, height, depth);
-		    while (--iso)
-			curve = curve->next;
-		    check_corner_height(curve->points, height, depth);
-		    check_corner_height(curve->points + count - 1, height, depth);
+			check_corner_height(curve->points, height, depth);
+			check_corner_height(curve->points + count - 1, height, depth);
+			while (--iso)
+			    curve = curve->next;
+			check_corner_height(curve->points, height, depth);
+			check_corner_height(curve->points + count - 1, height, depth);
+		    }
 		}
 
 #define VERTICAL(mask,x,y,i,j,bottom,top)			\
