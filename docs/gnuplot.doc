@@ -1090,9 +1090,11 @@ C  need @ in table, so end and restart the table !
  system help library.
 
  On Unix, HOME is used as the name of a directory to search for a .gnuplot
- file if none is found in the current directory.  On MS-DOS, Windows and OS/2,
- GNUPLOT is used.  On Windows, the NT-specific variable USERPROFILE is also
- tried. VMS, SYS$LOGIN: is used. Type `help startup`.
+ file if none is found in the current directory.  Additionally gnuplot searches
+ for $XDG_CONFIG_HOME/gnuplot/gnuplotrc which is loaded after .gnuplot.  On
+ MS-DOS, Windows and OS/2, GNUPLOT is used.  On Windows, the NT-specific
+ variable USERPROFILE is also tried. VMS, SYS$LOGIN: is used. Type `help
+ startup`.
 
  On Unix, PAGER is used as an output filter for help messages.
 
@@ -3338,12 +3340,15 @@ Ffigure_newsyntax
 ?start-up
 ?initialization
 ?.gnuplot
+?gnuplotrc
  When gnuplot is run, it first looks for a system-wide initialization file
  `gnuplotrc`.  The location of this file is determined when the program is built
  and is reported by `show loadpath`.  The program then looks in the user's HOME
  directory for a file called `.gnuplot` on Unix-like systems or `GNUPLOT.INI` on
  other systems.  (OS/2 will look for it in the directory named in
- the environment variable `GNUPLOT`; Windows will use `APPDATA`).
+ the environment variable `GNUPLOT`; Windows will use `APPDATA`).  On Unix-like
+ systems gnuplot additionally checks for the file
+ $XDG_CONFIG_HOME/gnuplot/gnuplotrc.
  Note: The program can be configured to look first in the current directory,
  but this is not recommended because it is bad security practice.
 2 String constants, string variables, and string functions
@@ -8333,13 +8338,15 @@ Ffigure_zerror
 
  Note that `reset` does not necessarily return settings to the state they
  were in at program entry, because the default values may have been altered by
- commands in the initialization files gnuplotrc or $HOME/.gnuplot.  However,
- these commands can be re-executed by using the variant command `reset session`.
+ commands in the initialization files gnuplotrc, $HOME/.gnuplot, or
+ $XDG_CONFIG_HOME/gnuplot/gnuplotrc.  However, these commands can be
+ re-executed by using the variant command `reset session`.
 
 =session
  `reset session` deletes any user-defined variables and functions, restores
  default settings, and then re-executes the system-wide gnuplotrc initialization
- file and any private $HOME/.gnuplot preferences file.  See `initialization`.
+ file and any private $HOME/.gnuplot or $XDG_CONFIG_HOME/gnuplot/gnuplotrc
+ preferences file.  See `initialization`.
 
 =error state
  `reset errors` clears only the error state variables GPVAL_ERRNO and

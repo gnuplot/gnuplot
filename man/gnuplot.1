@@ -48,7 +48,7 @@ Support for a huge variety of output devices and file formats.
 .PP
 \fB\-c scriptname ARG1 ARG2 ..., load script using gnuplot's "call" mechanism and pass it the remainder of the command line as arguments
 .PP
-\fB\-d, \-\-default\fP settings.  Do not read from gnuplotrc or ~/.gnuplot on entry.
+\fB\-d, \-\-default\fP settings.  Do not read from gnuplotrc, ~/.gnuplot, and $XDG_DATA_HOME/gnuplot/gnuplotrc on entry.
 .PP
 \fB\-e "command list"\fP executes the requested commands before loading the next input file.
 .PP
@@ -69,8 +69,8 @@ gnuplot.  None of these are required.
 .TP
 .B GNUTERM
 The name of the terminal type to be used by default.  This can be
-overridden by the gnuplotrc or .gnuplot start-up files and,
-of course, by later explicit "set terminal" commands.
+overridden by the gnuplotrc, .gnuplot, or $XDG_DATA_HOME/gnuplot/gnuplotrc
+start-up files and, of course, by later explicit "set terminal" commands.
 .TP
 .B GNUHELP 
 The pathname of the HELP file (gnuplot.gih).
@@ -131,6 +131,11 @@ Gnuplot looks for a private initialization file in the HOME directory.
 It may contain any legal gnuplot commands, but typically they are
 limited to setting the preferred terminal and line types
 and defining frequently-used functions or variables.
+.TP
+.I $XDG_CONFIG_HOME/gnuplot/gnuplotrc
+After loading the other initialization files, Gnuplot will check if there is a
+file named gnuplotrc in the gnuplot subdirectory in $XDG_CONFIG_HOME (default
+~/.config).  The same restrictions as for .gnuplot apply.
 .TP 
 .I fit.log
 The default name of the logfile output by the "fit" command.
