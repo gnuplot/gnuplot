@@ -217,6 +217,12 @@ C
 ## modifications not easily specified in a `set palette` command.
 #end
 
+4 Other new features
+#start
+#b Support XSG base directory for gnuplotrc configuration preferences.
+## See `environment`.
+#end
+
 3 Features introduced in version 5.4
 ?new version_5.4
 4 Support for 64-bit integer arithmetic
