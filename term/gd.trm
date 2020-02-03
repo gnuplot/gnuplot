@@ -1181,7 +1181,8 @@ PNG_init_brush(int width)
 	brush->last_rgb = -99;  /* Something invalid */
 	if (!((brush->im = gdImageCreateTrueColor(width,width))))
 	    int_error(NO_CARET,"libgd: failed to create brush structure");
-	brush->bgnd = gdImageColorAllocate( brush->im, 255, 255, 255 );
+	/* Whatever is chosen here is unavailable as a brush color */
+	brush->bgnd = gdImageColorAllocate( brush->im, 254, 253, 252 );
 	gdImageSaveAlpha(brush->im, 1);
 	gdImageFill(brush->im, 0, 0, brush->bgnd);
 	gdImageColorTransparent(brush->im, brush->bgnd);
