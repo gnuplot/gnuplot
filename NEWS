@@ -54,6 +54,7 @@ Changes in 5.4
 * FIX allow mixed use of in-key plot titles and manually placed titles
 * FIX open/close path for polygons
 * FIX several stability issues of the caca terminal
+* FIX gd terminals: rendering of white lines with lw > 1
 
 New features introduced to 5.2 in patchlevel releases
 =====================================================
