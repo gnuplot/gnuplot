@@ -150,6 +150,7 @@ const struct ft_entry ft[] =
     {"real",  f_real},
     {"imag",  f_imag},
     {"arg",  f_arg},
+    {"conj",  f_conjg},
     {"conjg",  f_conjg},
     {"sin",  f_sin},
     {"cos",  f_cos},
