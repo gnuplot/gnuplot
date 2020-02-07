@@ -139,6 +139,8 @@ built by default.  Their closest equivalent is the new pict2e terminal, but
 LaTeX users who want support for the full range of gnuplot plot styles are
 recommended to use the cairolatex or tikz terminals.
 
+The Japanese man page is provided both in SJIS and UTF-8 encodings.
+Installation into appropriate directories is left to packagers.
 
 Configuration options for interactive use
 -----------------------------------------
