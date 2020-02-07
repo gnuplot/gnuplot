@@ -192,12 +192,26 @@ C
 2 New features
 ?new version_5.5
 ?new
-3 Development version
-?development version
- Version 5.5 is the current development version, built from a snapshot of
- the source files in the master branch of the git repository.
- New features introduced here will generally not appear in a supported
- release until version 5.6.  Details may change before that.
+ Version 5.5 is the current development version, built from a snapshot of the 
+ source files in the master branch of the git repository. New features
+ introduced here will generally not appear in a supported release until
+ version 5.6.  Details may change before that.
+
+4 Complex-valued functions
+ This version of gnuplot provides a larger set of complex-valued functions and
+ updated versions of some functions present in earlier versions.
+#start
+#b Updated complex incomplete gamma function with improved domain and precision.
+## See `igamma`.
+#b New complex function LambertW(z,k) returns the kth branch of multivalued
+## function W_k(z).
+## Note that existing function lambertw(x) = real(LambertW( real(z), 0 )).
+## See `LambertW`.
+#b New complex function lnGamma(z).
+## Note that existing function lgamma(x) = real(lnGamma(real(z)).
+## See `lnGamma`.
+#b Complex function conj(z) returns the complex conjugate of z.
+#end
 
 4 New plot styles and style options
 ?new plot_styles
@@ -238,6 +252,7 @@ C
 #b Function VP_fwhm(sigma,gamma) returns the full width at half maximum
 ## of the Voigt profile. See `VP`, `VP_fwhm`, `libcerf`.
 #b Support XSG base directory for gnuplotrc configuration preferences.
+## Reads initialization commands from $HOME/.config/gnuplot/gnuplotrc if present.
 ## See `environment`.
 #end
 
@@ -253,6 +268,7 @@ C
 #end
 
 4 Voxel grids
+?new voxel grids
  Gnuplot now supports operations based on 3D grids of voxel data.
 
 #start
@@ -267,11 +283,12 @@ C
 #b `vgfill` is a variant of `vfill` that uses grid coordinates rather than
 ## user coordinates.
 #b `vclear $gridname` resets an existing voxel grid to contain all zero values.
-#b the current contents of one or more voxel grids can be referenced by
+#b The current contents of one or more voxel grids can be referenced by
 ## `splot` commands to assign colors or other properties of plot elements
 ## by using the `voxel` function in using specifiers.
 ## See demo `voxel.dem`.
-#b voxel grids can also be plotted by name in `splot` commands with plot styles
+#b `show vgrid` reports basic statistics about all currently defined voxel grids.
+#b Voxel grids can also be plotted by name in `splot` commands with plot styles
 ## `dots`, `points`, or `isosurface`.
 ## See demo `vplot.dem`.
 #end
@@ -305,7 +322,9 @@ C
 
 4 New data pre-processing filters
 #start
-#b `smooth zsort` sorts 2D points on values in a 3rd column. See `smooth zsort`.
+#b `smooth zsort` sorts 2D points on values in a third column. See `smooth zsort`.
+## This is useful to bring a small number of salient points in a very large data
+## set to the front so that they are not occluded.
 #end
 
 4 New commands and command options
@@ -329,7 +348,7 @@ C
 #b User-specified translation of mouse coordinates (EXPERIMENTAL).
 ##See map_projection demo.
 #b The `load` command can input commands from a datablock as an alternative to
-## reading them from a file (EXPERIMENTAL).
+## reading them from a file.
 #b `set datafile columnheaders` causes first line of input to be read as strings
 ## rather than as data values.  Equivalent to `set key autotitle columnheader`
 ## except that it does not affect generation of key entries.  If this option is
@@ -338,6 +357,7 @@ C
 #end
 
 4 New terminals and terminal options
+?new terminals and terminal options
 #start
 #b The `pcl5` terminal has been extended to support PCL5e/PCL5c printers and
 ## many modern gnuplot features.
@@ -357,6 +377,7 @@ C
 #end
 
 4 Pixmaps as objects
+?new pixmaps
 #start
 #b `set pixmap` allows import of an image in standard format (png jpeg gif) as
 ## a pixmap that can be positioned anywhere in a plot or on the page.
@@ -365,6 +386,7 @@ C
 #end
 
 4 Other new features
+?new other features
 #start
 #b Enhanced text mode accepts \U+xxxx (xxxx is a 4 or 5 character hexadecimal)
 ##as representing a Unicode code point that is converted to the corresponding
@@ -386,8 +408,9 @@ C
 #b The `set fontpath` command is deprecated. The search path for fonts to be
 ## embedded in output from the postscript terminal has been revised.
 #end
+
 3 Features introduced in version 5.2
-?Features introduced in version 5.2
+?new version_5.2
 4 New plot styles and style options
 #start
 #b 3D plot style `with zerrorfill`. See `zerrorfill`, `fenceplots` and
@@ -1211,6 +1234,7 @@ C  need @ in table, so end and restart the table !
  and <imag> must be numerical constants.  Thus {0,1} represents 'i'.
  The real and imaginary components of complex value x can be extracted as
  real(x) and imag(x). The modulus is given by abs(x).
+ The phase angle is given by arg(x).
 
  Gnuplot's standard 2D and 3D plot styles can plot only real values; if you
  need to plot a complex-valued function f(x) with non-zero imaginary components
@@ -1261,11 +1285,11 @@ C  need @ in table, so end and restart the table !
 ^  <col align="left">
 ^</colgroup>
 ^<thead>
-^<tr>   <th colspan="3"> Math library functions </th></tr>
+^<tr>   <th colspan="3"> Math library and built-in functions </th></tr>
 ^<tr>    <th>Function</th>    <th>Arguments</th>    <th>Returns</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>    <td>abs(x)</td>    <td>any</td>    <td>|<i>x</i>|, absolute value of <i>x</i>; same type</td></tr>
+^<tr>    <td>abs(x)</td>    <td>int or real</td>    <td>|<i>x</i>|, absolute value of <i>x</i>; same type</td></tr>
 ^<tr>    <td>abs(x)</td>    <td>complex</td>    <td>length of <i>x</i>, &radic;( Re(<i>x</i>)<sup>2</sup> + Im(<i>x</i>)<sup>2</sup> )</td></tr>
 ^<tr>    <td>acos(x)</td>    <td>any</td>    <td>cos<sup>-1</sup> <i>x</i> (inverse cosine)</td></tr>
 ^<tr>    <td>acosh(x)</td>    <td>any</td>    <td>cosh<sup>-1</sup> <i>x</i> (inverse hyperbolic cosine) in radians</td></tr>
@@ -1289,6 +1313,7 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>besi1(x)</td>   <td>real</td>    <td>Modified Bessel function of order 1, <i>x</i> in radians</td></tr>
 ^<tr>    <td>besin(n,x)</td>   <td>int,real</td><td>Modified Bessel function of order n, <i>x</i> in radians</td></tr>
 ^<tr>    <td>ceil(x)</td>    <td>any</td>    <td>&lceil;<i>x</i>&rceil;, smallest integer not less than <i>x</i> (real part)</td></tr>
+^<tr>    <td>conj(x)</td>    <td>complex</td>    <td>complex conjugate of <i>x</i></td>
 ^<tr>    <td>cos(x)</td>    <td>radians</td>    <td>cos <i>x</i>, cosine of <i>x</i></td></tr>
 ^<tr>    <td>cosh(x)</td>    <td>any</td>    <td>cosh <i>x</i>, hyperbolic cosine of <i>x</i> in radians</td></tr>
 ^<tr>    <td>erf(x)</td>    <td>any</td>    <td>erf(Re(<i>x</i>)), error function of real(<i>x</i>)</td></tr>
@@ -1303,14 +1328,17 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>imag(x)</td>    <td>complex</td>    <td>Im(<i>x</i>), imaginary part of <i>x</i> as a real number</td></tr>
 ^<tr>    <td>invnorm(x)</td>    <td>any</td>    <td>inverse normal distribution function real(<i>x</i>)</td></tr>
 ^<tr>    <td>int(x)</td>    <td>real</td>    <td>integer part of <i>x</i>, truncated toward zero</td></tr>
-^<tr>    <td>lambertw(x)</td>    <td>real</td>    <td>Lambert <i>W</i> function</td></tr>
-^<tr>    <td>lgamma(x)</td>    <td>any</td>    <td>lgamma(Re(<i>x</i>)), lgamma function of real(<i>x</i>)</td></tr>
+^<tr>    <td>LambertW(z,k)</td> <td>complex, int</td> <td>kth branch of complex Lambert W function</td></tr>
+^<tr>    <td>lambertw(x)</td>    <td>real</td>    <td>principal branch (k=0) of Lambert <i>W</i> function</td></tr>
+^<tr>    <td>lgamma(x)</td>    <td>real</td>    <td>lgamma(Re(<i>x</i>)), lgamma function of real(<i>x</i>)</td></tr>
+^<tr>    <td>lnGamma(x)</td>    <td>complex</td>    <td>lnGamma(x) valid over entire complex plane</td></tr>
 ^<tr>    <td>log(x)</td>    <td>any</td>    <td>ln <i>x</i>, natural logarithm (base <i>e</i>) of <i>x</i></td></tr>
 ^<tr>    <td>log10(x)</td>    <td>any</td>    <td>log<sub>10</sub> <i>x</i>, logarithm (base 10) of <i>x</i></td></tr>
 ^<tr>    <td>norm(x)</td>    <td>any</td>    <td>norm(<i>x</i>), normal distribution function of real(<i>x</i>)</td></tr>
 ^<tr>    <td>rand(x)</td>    <td>int</td>    <td>pseudo random number in the interval (0:1)</td></tr>
 ^<tr>    <td>real(x)</td>    <td>any</td>    <td>Re(<i>x</i>), real part of <i>x</i></td></tr>
 ^<tr>    <td>sgn(x)</td>    <td>any</td>    <td>1 if <i>x</i> &gt; 0,  -1 if <i>x</i> &lt; 0,  0 if <i>x</i> = 0. &image;(<i>x</i>) ignored</td></tr>
+^<tr>    <td>Sign(x)</td>    <td>complex</td>    <td> 0 if <i>x</i> = 0, otherwise <i>x</i>/|<i>x></i>|</td></tr>
 ^<tr>    <td>sin(x)</td>    <td>any</td>    <td>sin <i>x</i>, sine of <i>x</i></td></tr>
 ^<tr>    <td>sinh(x)</td>    <td>any</td>    <td>sinh <i>x</i>, hyperbolic sine of <i>x</i> in radians</td></tr>
 ^<tr>    <td>sqrt(x)</td>    <td>any</td>    <td>&radic;<i>x</i>, square root of <i>x</i></td></tr>
@@ -1410,9 +1438,9 @@ C For the HTML help we want both, table and sections, so the magic
 C marker below is used to signal this to doc2html:
 ^<!-- INCLUDE_NEXT_TABLE -->
 @start table
-#\begin{longtable}{|ccl|} \hline
-#\multicolumn{3}{|c|}{Math library functions} \\ \hline \hline
-#Function & Arguments & Returns \\ \hline
+#\begin{longtable}{@{\extracolsep{\fill}}|lcrl|@{}} \hline
+#\multicolumn{4}{|c|}{Math library and built-in functions} \\ \hline \hline
+#Function & Arguments & ~ & Returns ({\gpCX } indicates complex result) \\ \hline
 #\endhead \hline \endfoot
 %c c l .
 %Function@Arguments@Returns
@@ -1420,10 +1448,10 @@ C marker below is used to signal this to doc2html:
 4 abs
 ?expressions functions abs
 ?abs
-#abs(x) & any  &  absolute value of $x$, $|x|$; same type \\
-#abs(x) & complex &  length of $x$, $\sqrt{{\mbox{real}(x)^{2} +
+#abs(x) & int or real & ~ &  absolute value of $x$, $|x|$ \\
+#abs(x) & complex & ~ &  length of $x$, $\sqrt{{\mbox{real}(x)^{2} +
 #\mbox{imag}(x)^{2}}}$ \\
-%abs(x)@any@absolute value of $x$, $|x|$; same type
+%abs(x)@int or real@absolute value of $x$, $|x|$
 %abs(x)@complex@length of $x$, $sqrt{roman real (x) sup 2 + roman imag (x) sup 2}$
  The `abs(x)` function returns the absolute value of its argument.  The
  returned value is of the same type as the argument.
@@ -1436,23 +1464,23 @@ C marker below is used to signal this to doc2html:
 4 acos
 ?expressions functions acos
 ?acos
-#acos(x) & any  & $\cos^{-1} x$ (inverse cosine) \\
-%acos(x)@any@$cos sup -1 x$ (inverse cosine)
+#acos(x) &  ~~   & \gpCX & $\cos^{-1} x$ (inverse cosine) \\
+%acos(x)@ ~~ @$cos sup -1 x$ (inverse cosine)
  The `acos(x)` function returns the arc cosine (inverse cosine) of its
  argument.  `acos` returns its argument in radians or degrees, as selected by
  `set angles`.
 4 acosh
 ?expressions functions acosh
 ?acosh
-#acosh(x) & any  & $\cosh^{-1} x$ (inverse hyperbolic cosine) in radians \\
-%acosh(x)@any@$cosh sup -1 x$ (inverse hyperbolic cosine) in radians
+#acosh(x) &  ~~   & \gpCX & $\cosh^{-1} x$ (inverse hyperbolic cosine) in radians \\
+%acosh(x)@ ~~ @$cosh sup -1 x$ (inverse hyperbolic cosine) in radians
  The `acosh(x)` function returns the inverse hyperbolic cosine of its argument
  in radians.
 4 airy
 ?expressions functions airy
 ?airy
-#airy(x) & any  & Airy function Ai(x) \\
-%airy(x)@any@Airy function Ai(x)
+#airy(x) &  ~~   & ~ & Airy function Ai(x) \\
+%airy(x)@ ~~ @Airy function Ai(x)
  The `airy(x)` function returns the value of the Airy function Ai(x) of its
  argument. The function Ai(x) is that solution of the equation y'' - x y = 0
  which is everywhere finite. If the argument is complex, its imaginary part
@@ -1460,37 +1488,37 @@ C marker below is used to signal this to doc2html:
 4 arg
 ?expressions functions arg
 ?arg
-#arg(x) & complex & the phase of $x$ \\
+#arg(x) & complex & ~ & the phase of $x$, $-\pi\leq$arg($x$)$\leq\pi$ \\
 %arg(x)@complex@the phase of $x$
  The `arg(x)` function returns the phase of a complex number in radians or
  degrees, as selected by `set angles`.
 4 asin
 ?expressions functions asin
 ?asin
-#asin(x) & any  & $\sin^{-1} x$ (inverse sin) \\
-%asin(x)@any@$sin sup -1 x$ (inverse sin)
+#asin(x) &  ~~   & \gpCX & $\sin^{-1} x$ (inverse sin) \\
+%asin(x)@ ~~ @$sin sup -1 x$ (inverse sin)
  The `asin(x)` function returns the arc sin (inverse sin) of its argument.
  `asin` returns its argument in radians or degrees, as selected by `set
  angles`.
 4 asinh
 ?expressions functions asinh
 ?asinh
-#asinh(x) & any  & $\sinh^{-1} x$ (inverse hyperbolic sin) in radians \\
-%asinh(x)@any@$sinh sup -1 x$ (inverse hyperbolic sin) in radians
+#asinh(x) &  ~~   & \gpCX & $\sinh^{-1} x$ (inverse hyperbolic sin) in radians \\
+%asinh(x)@ ~~ @$sinh sup -1 x$ (inverse hyperbolic sin) in radians
  The `asinh(x)` function returns the inverse hyperbolic sin of its argument in
  radians.
 4 atan
 ?expressions functions atan
 ?atan
-#atan(x) & any  & $\tan^{-1} x$ (inverse tangent) \\
-%atan(x)@any@$tan sup -1 x$ (inverse tangent)
+#atan(x) &  ~~   & \gpCX & $\tan^{-1} x$ (inverse tangent) \\
+%atan(x)@ ~~ @$tan sup -1 x$ (inverse tangent)
  The `atan(x)` function returns the arc tangent (inverse tangent) of its
  argument.  `atan` returns its argument in radians or degrees, as selected by
  `set angles`.
 4 atan2
 ?expressions functions atan2
 ?atan2
-#atan2(y,x) & int or real & $\tan^{-1} (y/x)$ (inverse tangent) \\
+#atan2(y,x) & int or real & ~ & $\tan^{-1} (y/x)$ (inverse tangent) \\
 %atan2(y,x)@int or real@$tan sup -1 (y/x)$ (inverse tangent)
  The `atan2(y,x)` function returns the arc tangent (inverse tangent) of the
  ratio of the real parts of its arguments.  `atan2` returns its argument in
@@ -1498,325 +1526,353 @@ C marker below is used to signal this to doc2html:
 4 atanh
 ?expressions functions atanh
 ?atanh
-#atanh(x) & any  & $\tanh^{-1} x$ (inverse hyperbolic tangent) in radians \\
-%atanh(x)@any@$tanh sup -1 x$ (inverse hyperbolic tangent) in radians
+#atanh(x) &  ~~   & \gpCX & $\tanh^{-1} x$ (inverse hyperbolic tangent) in radians \\
+%atanh(x)@ ~~ @$tanh sup -1 x$ (inverse hyperbolic tangent) in radians
  The `atanh(x)` function returns the inverse hyperbolic tangent of its
  argument in radians.
 ?expressions functions EllipticK
 ?EllipticK
 4 EllipticK
-#EllipticK(k) & real k $\in$ (-1:1) & $K(k)$ complete elliptic integral of the first kind \\
+#EllipticK(k) & real k $\in$ (-1:1) & ~ & $K(k)$ complete elliptic integral of the first kind \\
 %EllipticK(k)@real k in (-1:1)@$K ( k )$ complete elliptic integral of the first kind
  The `EllipticK(k)` function returns the complete elliptic integral of the
  first kind. See `elliptic integrals` for more details.
 ?expressions functions EllipticE
 ?EllipticE
 4 EllipticE
-#EllipticE(k) & real k $\in$ [-1:1] & $E(k)$ complete elliptic integral of the second kind \\
+#EllipticE(k) & real k $\in$ [-1:1] & ~ & $E(k)$ complete elliptic integral of the second kind \\
 %EllipticE(k)@real k in [-1:1]@ $E ( k )$ complete elliptic integral of the second kind
  The `EllipticE(k)` function returns the complete elliptic integral of the
  second kind. See `elliptic integrals` for more details.
 ?expressions functions EllipticPi
 ?EllipticPi
 4 EllipticPi
-#EllipticPi(n,k) & real n$<$1, real k $\in$ (-1:1) & $\Pi(n,k)$ complete elliptic integral of the third kind \\
+#EllipticPi(n,k) & real n$<$1, real k $\in$ (-1:1) & ~ & $\Pi(n,k)$ complete elliptic integral of the third kind \\
 %EllipticPi(n,k)@ real n<1, real k in (-1:1)@ $Pi ( n,k )$ complete elliptic integral of the third kind
  The `EllipticPi(n,k)` function returns the complete elliptic integral of the
  third kind. See `elliptic integrals` for more details.
 4 besj0
 ?expressions functions besj0
 ?besj0
-# besj0(x) & int or real &  $J_{0}$ Bessel function of $x$ in radians \\
+# besj0(x) & int or real & ~ &  $J_{0}$ Bessel function of $x$ in radians \\
 %besj0(x)@int or real@$J sub 0$ Bessel function of $x$ in radians
  The `besj0(x)` function returns the J0th Bessel function of its argument.
  `besj0` expects its argument to be in radians.
 4 besj1
 ?expressions functions besj1
 ?besj1
-# besj1(x) & int or real & $J_{1}$ Bessel function of $x$ in radians \\
+# besj1(x) & int or real & ~ & $J_{1}$ Bessel function of $x$ in radians \\
 %besj1(x)@int or real@$J sub 1$ Bessel function of $x$ in radians
  The `besj1(x)` function returns the J1st Bessel function of its argument.
  `besj1` expects its argument to be in radians.
 4 besjn
 ?expressions functions besjn
 ?besjn
-# besjn(n,x) & int, real & $J_{n}$ Bessel function of $x$ in radians \\
+# besjn(n,x) & int, real & ~ & $J_{n}$ Bessel function of $x$ in radians \\
 %besjn(n,x)@int,real@$J sub n$ Bessel function of $x$ in radians
  The `besjn(n,x)` functions returns the Jn Bessel function of x in radians.
 4 besy0
 ?expressions functions besy0
 ?besy0
-# besy0(x) & int or real & $Y_{0}$ Bessel function of $x$ in radians \\
+# besy0(x) & int or real & ~ & $Y_{0}$ Bessel function of $x$ in radians \\
 %besy0(x)@int or real@$Y sub 0$ Bessel function of $x$ in radians
  The `besy0(x)` function returns the Y0th Bessel function of its argument.
  `besy0` expects its argument to be in radians.
 4 besy1
 ?expressions functions besy1
 ?besy1
-# besy1(x) & int or real & $Y_{1}$ Bessel function of $x$ in radians \\
+# besy1(x) & int or real & ~ & $Y_{1}$ Bessel function of $x$ in radians \\
 %besy1(x)@int or real@$Y sub 1$ Bessel function of $x$ in radians
  The `besy1(x)` function returns the Y1st Bessel function of its argument.
  `besy1` expects its argument to be in radians.
 4 besyn
 ?expressions functions besyn
 ?besyn
-# besyn(n,x) & int, real & $Y_{n}$ Bessel function of $x$ in radians \\
+# besyn(n,x) & int, real & ~ & $Y_{n}$ Bessel function of $x$ in radians \\
 %besyn(n,x)@int,real@$Y sub n$ Bessel function of $x$ in radians
  The `besyn(n,x)` functions returns the Yn Bessel function of x in radians.
 4 besi0
 ?expressions functions besi0
 ?besi0
-# besi0(x) &real & Modified Bessel function of order 0, $x$ in radians \\
+# besi0(x) &real & ~ & Modified Bessel function of order 0, $x$ in radians \\
 %besi0(x)@real@ Modified Bessel function of order 0, $x$ in radians
  The `besi0(x)` function is the modified Bessel function or order 0.
  `besi0` expects its argument to be in radians.
 4 besi1
 ?expressions functions besi1
 ?besi1
-# besi1(x) &real & Modified Bessel function of order 1, $x$ in radians \\
+# besi1(x) &real & ~ & Modified Bessel function of order 1, $x$ in radians \\
 %besi1(x)@real@ Modified Bessel function of order 1, $x$ in radians
  The `besi1(x)` function is the modified Bessel function or order 1.
  `besi1` expects its argument to be in radians.
 4 besin
 ?expressions functions besin
 ?besin
-# besin(n,x) &int, real & Modified Bessel function of order n, $x$ in radians \\
+# besin(n,x) &int, real & ~ & Modified Bessel function of order n, $x$ in radians \\
 %besin(x)@int,real@ Modified Bessel function of order n, $x$ in radians
  `besin(n,x)` is the modified Bessel function or order n for integer n and
  x in radians.
 4 ceil
 ?expressions functions ceil
 ?ceil
-#ceil(x) & any & $\lceil x \rceil$, smallest integer not less than $x$
+#ceil(x) &  ~~  & ~ & $\lceil x \rceil$, smallest integer not less than $x$
 #(real part) \\
-%ceil(x)@any@$left ceiling x right ceiling$, smallest integer not less than $x$ (real part)
+%ceil(x)@ ~~ @$left ceiling x right ceiling$, smallest integer not less than $x$ (real part)
  The `ceil(x)` function returns the smallest integer that is not less than its
  argument.  For complex numbers, `ceil` returns the smallest integer not less
  than the real part of its argument.
+4 conj
+?expressions functions conj
+?conj
+#conj(x) & complex & \gpCX & complex conjugate of $x$ \\
+%conj(x)@complex@complex conjugate of $x$
+ The `conj(x)` function returns the complex conjugate x.
+ conj( {r, i} ) = {r, -i}
 4 cos
 ?expressions functions cos
 ?cos
-#cos(x) & any & $\cos x$, cosine of $x$ \\
+#cos(x) &  ~~  & \gpCX & $\cos x$, cosine of $x$ \\
 %cos(x)@radians@$cos~x$, cosine of $x$
  The `cos(x)` function returns the cosine of its argument.  `cos` accepts its
  argument in radians or degrees, as selected by `set angles`.
 4 cosh
 ?expressions functions cosh
 ?cosh
-#cosh(x) & any & $\cosh x$, hyperbolic cosine of $x$ in radians \\
-%cosh(x)@any@$cosh~x$, hyperbolic cosine of $x$ in radians
+#cosh(x) &  ~~  & \gpCX & $\cosh x$, hyperbolic cosine of $x$ in radians \\
+%cosh(x)@ ~~ @$cosh~x$, hyperbolic cosine of $x$ in radians
  The `cosh(x)` function returns the hyperbolic cosine of its argument.  `cosh`
  expects its argument to be in radians.
 4 erf
 ?expressions functions erf
 ?erf
-#erf(x) & any & $\mbox{erf}(\mbox{real}(x))$,  error function of real($x$) \\
-%erf(x)@any@$erf ( roman real (x))$, error function of real ($x$)
+#erf(x) &  ~~  & ~ & $\mbox{erf}(\mbox{real}(x))$,  error function of real($x$) \\
+%erf(x)@ ~~ @$erf ( roman real (x))$, error function of real ($x$)
  The `erf(x)` function returns the error function of the real part of its
  argument.  If the argument is a complex value, the imaginary component is
  ignored.  See `erfc`, `inverf`, and `norm`.
 4 erfc
 ?expressions functions erfc
 ?erfc
-#erfc(x) & any & $\mbox{erfc}(\mbox{real}(x))$,  1.0 - error function of real($x$) \\
-%erfc(x)@any@$erfc ( roman real (x))$, 1.0 - error function of real ($x$)
+#erfc(x) &  ~~  & ~ & $\mbox{erfc}(\mbox{real}(x))$,  1.0 - error function of real($x$) \\
+%erfc(x)@ ~~ @$erfc ( roman real (x))$, 1.0 - error function of real ($x$)
  The `erfc(x)` function returns 1.0 - the error function of the real part of
  its argument.  If the argument is a complex value, the imaginary component is
  ignored.  See `erf`, `inverf`, and `norm`.
 4 exp
 ?expressions functions exp
 ?exp
-#exp(x) & any & $e^{x}$,  exponential function of $x$ \\
-%exp(x)@any@$e sup x$, exponential function of $x$
+#exp(x) &  ~~  & \gpCX & $e^{x}$,  exponential function of $x$ \\
+%exp(x)@ ~~ @$e sup x$, exponential function of $x$
  The `exp(x)` function returns `e` raised to the power of x, which can be
  an integer, real, or complex value.
 4 expint
 ?expressions functions expint
 ?expint
-#expint(n,x) & int $n\ge0$, real $x\ge0$ & $E_n(x)=\int_1^\infty t^{-n} e^{-xt}\,dt$,  exponential integral of $x$ \\
-%expint(n,x)@any@$E sub n (x)$, exponential integral function of $x$
+#expint(n,x) & int $n\ge0$, real $x\ge0$ & ~ & $E_n(x)=\int_1^\infty t^{-n} e^{-xt}\,dt$,  exponential integral of $x$ \\
+%expint(n,x)@ ~~ @$E sub n (x)$, exponential integral function of $x$
  The `expint(n,x)` function returns the exponential integral of the real
  part of its argument: integral from 1 to infinity of t^(-n) e^(-tx) dt.
  n must be a nonnegative integer, x>=0, and either x>0 or n>1.
 4 floor
 ?expressions functions floor
 ?floor
-#floor(x) & any & $\lfloor x \rfloor$,  largest integer not greater
+#floor(x) &  ~~  & ~ & $\lfloor x \rfloor$,  largest integer not greater
 #than $x$ (real part) \\
-%floor(x)@any@$left floor x right floor$, largest integer not greater than $x$ (real part)
+%floor(x)@ ~~ @$left floor x right floor$, largest integer not greater than $x$ (real part)
  The `floor(x)` function returns the largest integer not greater than its
  argument.  For complex numbers, `floor` returns the largest integer not
  greater than the real part of its argument.
 4 gamma
 ?expressions functions gamma
 ?gamma
-#gamma(x) & any & $\mbox{gamma}(\mbox{real}(x))$,  gamma function of real($x$) \\
-%gamma(x)@any@$GAMMA ( roman real (x))$, gamma function of real ($x$)
+#gamma(x) &  ~~  & ~ & $\Gamma(x)$, gamma function of real($x$) \\
+%gamma(x)@ ~~ @$GAMMA ( roman real (x))$, gamma function of real ($x$)
  The `gamma(x)` function returns the gamma function of the real part of its
  argument.  For integer n, gamma(n+1) = n!.  If the argument is a complex
  value, the imaginary component is ignored.
 4 ibeta
 ?expressions functions ibeta
 ?ibeta
-#ibeta(p,q,x) & any & $\mbox{ibeta}(\mbox{real}(p,q,x))$,  ibeta function of real($p$,$q$,$x$) \\
-%ibeta(p,q,x)@any@$ibeta ( roman real (p,q,x))$, ibeta function of real ($p$,$q$,$x$)
- The `ibeta(p,q,x)` function returns the incomplete beta function of the real
- parts of its arguments. p, q > 0 and x in [0:1].  If the arguments are
+#ibeta(a,b,x) & $a,b>0$, $x \in [0:1]$ & ~ & $B(a,b,x)=\frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)}\intop_{0}^{x}t^{a-1}(1-t)^{b-1}dt$, incomplete beta \\
+%ibeta(a,b,x)@ ~~ @$ibeta ( roman real (a,b,x))$, ibeta function of real ($a$,$b$,$x$)
+ The `ibeta(a,b,x)` function returns the normalized incomplete beta function of
+ the real parts of its arguments. a, b > 0 and x in [0:1].  If the arguments are
  complex, the imaginary components are ignored.  The function is approximated by
  the method of continued fractions (Abramowitz and Stegun, 1964).
- The approximation is only accurate in the region x < (p-1)/(p+q-2).
+ The approximation is only accurate in the region x < (a-1)/(a+b-2).
+ If convergence does not reach 1.E-10, the function returns NaN.
 4 inverf
 ?expressions functions inverf
 ?inverf
-#inverf(x) & any &  inverse error function of real($x$)  \\
-%inverf(x)@any@inverse error function real($x$)
+#inverf(x) &  ~~  & ~ &  inverse error function of real($x$)  \\
+%inverf(x)@ ~~ @inverse error function real($x$)
  The `inverf(x)` function returns the inverse error function of the real part
  of its argument.   See `erf` and `invnorm`.
 4 igamma
 ?expressions functions igamma
 ?igamma
-#igamma(a,x) & any & $\mbox{igamma}(\mbox{real}(a,x))$,  igamma function of real($a$,$x$) \\
-%igamma(a,x)@any@$igamma ( roman real (a,x))$, igamma function of real ($a$,$x$)
- The `igamma(a,x)` function returns the normalized incomplete gamma
+#igamma(a,x) & $a>0$, $x\geq0$ & ~ & $P(a,x)=\frac{1}{\Gamma(x)}\intop_{0}^{x}t^{a-1}e^{-t}dt$, incomplete gamma \\
+%igamma(a,x)@ ~~ @$igamma ( roman real (a,x))$, igamma function of real ($a$,$x$)
+ The `igamma(a,x)` function returns the normalized lower incomplete gamma
  function of the real parts of its arguments, where a > 0 and x >= 0.
  The standard notation is P(a,x), e.g. Abramowitz and Stegun (6.5.1),
  with limiting value of 1 as x approaches infinity.  If the arguments
  are complex, the imaginary components are ignored.
+ If the implemented series approximation does not converge to within 1.E-10,
+ NaN is returned. Precision and convergence may be improved in a later version.
 4 imag
 ?expressions functions imag
 ?imag
-#imag(x) & complex &  imaginary part of $x$ as a real number \\
+#imag(x) & complex & ~ &  imaginary part of $x$ as a real number \\
 %imag(x)@complex@imaginary part of $x$ as a real number
  The `imag(x)` function returns the imaginary part of its argument as a real
  number.
 4 invnorm
 ?expressions functions invnorm
 ?invnorm
-#invnorm(x) & any &  inverse normal distribution function of real($x$)  \\
-%invnorm(x)@any@inverse normal distribution function real($x$)
+#invnorm(x) &  ~~  & ~ &  inverse normal distribution function of real($x$)  \\
+%invnorm(x)@ ~~ @inverse normal distribution function real($x$)
  The `invnorm(x)` function returns the inverse cumulative normal (Gaussian)
  distribution function of the real part of its argument.  See `norm`.
 4 int
 ?expressions functions int
 ?int
-#int(x) & real &  integer part of $x$, truncated toward zero \\
+#int(x) & real & ~ &  integer part of $x$, truncated toward zero \\
 %int(x)@real@integer part of $x$, truncated toward zero
  The `int(x)` function returns the integer part of its argument, truncated
  toward zero.
+
+#LambertW(z,k) & complex, int & \gpCX & kth branch of complex Lambert W function \\
+%LambertW(z,k) & complex, int & $k$th branch of complex Lambert W function
+
 4 lambertw
 ?expressions functions lambertw
 ?lambertw
-#lambertw(x) & real & Lambert W function \\
-%lambertw(x)@real@Lambert W function
- The `lambertw(x)` function returns the value of the principal branch of
- Lambert's W function, which is defined by the equation (W(x)*exp(W(x))=x.
+#lambertw(x) & real & ~ & principal branch (k=0) of Lambert W function \\
+%lambertw(x)@real@principal branch (k=0) of Lambert W function
+ The `lambertw(x)` function returns the value of the principal branch (k=0)
+ of Lambert's W function, which is defined by the equation (W(x)*exp(W(x))=x.
  x must be a real number with x >= -exp(-1).
 4 lgamma
 ?expressions functions lgamma
 ?lgamma
-#lgamma(x) & any & $\mbox{lgamma}(\mbox{real}(x))$,  lgamma function of real($x$) \\
-%lgamma(x)@any@$lgamma ( roman real (x))$, lgamma function of real ($x$)
+#lgamma(x) & real & ~ & $\ln\Gamma(x)$  for real $x$  \\
+%lgamma(x)@real@$lgamma function of real  $x$ 
  The `lgamma(x)` function returns the natural logarithm of the gamma function
  of the real part of its argument.  If the argument is a complex value, the
- imaginary component is ignored.
+ imaginary component is ignored.  For complex values use lnGamma(z).
+4 lngamma
+#lnGamma(x) & complex & \gpCX & $\ln\Gamma(x)$ valid over entire complex plane \\
+%lnGamma(x)@complex@$lgamma function valid over entire complex plane 
+ The `lnGamma(x)` function returns the natural logarithm of the gamma function.
+ This implementation uses a Lanczos approximation valid over the entire complex
+ plane. The imaginary component of the result is phase-shifted to yield a
+ continuous surface everywhere except the negative real axis.
 4 log
 ?expressions functions log
 ?log
-#log(x) & any & $\log_{e} x$,  natural logarithm (base $e$) of $x$ \\
-%log(x)@any@$ln~x$, natural logarithm (base $e$) of $x$
+#log(x) &  ~~  & \gpCX & $\log_{e} x$,  natural logarithm (base $e$) of $x$ \\
+%log(x)@ ~~ @$ln~x$, natural logarithm (base $e$) of $x$
  The `log(x)` function returns the natural logarithm (base `e`) of its
  argument.  See `log10`.
 4 log10
 ?expressions functions log10
 ?log10
-#log10(x) & any & $\log_{10} x$,  logarithm (base $10$) of $x$ \\
-%log10(x)@any@${log sub 10}~x$, logarithm (base $10$) of $x$
+#log10(x) &  ~~  & \gpCX & $\log_{10} x$,  logarithm (base $10$) of $x$ \\
+%log10(x)@ ~~ @${log sub 10}~x$, logarithm (base $10$) of $x$
  The `log10(x)` function returns the logarithm (base 10) of its argument.
 4 norm
 ?expressions functions norm
 ?norm
-#norm(x) & any & normal distribution (Gaussian) function of real($x$) \\
-%norm(x)@any@$norm(x)$, normal distribution function of real($x$)
+#norm(x) &  ~~  & ~ & normal distribution (Gaussian) function of real($x$) \\
+%norm(x)@ ~~ @$norm(x)$, normal distribution function of real($x$)
  The `norm(x)` function returns the cumulative normal (Gaussian) distribution
  function of the real part of its argument.   See `invnorm`, `erf` and `erfc`.
 4 rand
 ?expressions functions rand
 ?rand
-#rand(x) & int & pseudo random number in the open interval (0:1) \\
+#rand(x) & int & ~ & pseudo random number in the open interval (0:1) \\
 %rand(x)@int@pseudo random number in the open interval (0:1)
  The `rand(x)` function returns a pseudo random number in the interval (0:1).
  See `random` for more details.
 4 real
 ?expressions functions real
 ?real
-#real(x) & any &  real part of $x$ \\
-%real(x)@any@real part of $x$
+#real(x) &  ~~  & ~ &  real part of $x$ \\
+%real(x)@ ~~ @real part of $x$
  The `real(x)` function returns the real part of its argument.
 4 sgn
 ?expressions functions sgn
 ?sgn
-#sgn(x) & any & 1 if $x>0$, -1 if $x<0$, 0 if $x=0$. imag($x$) ignored \\
-%sgn(x)@any@1 if $x > 0$, -1 if $x < 0$, 0 if $x = 0$. $roman imag (x)$ ignored
+#sgn(x) &  ~~  & ~ & 1 if $x>0$, -1 if $x<0$, 0 if $x=0$. imag($x$) ignored \\
+%sgn(x)@ ~~ @1 if $x > 0$, -1 if $x < 0$, 0 if $x = 0$. $roman imag (x)$ ignored
  The `sgn(x)` function returns 1 if its argument is positive, -1 if its
  argument is negative, and 0 if its argument is 0.  If the argument is a
  complex value, the imaginary component is ignored.
+4 Sign
+#Sign(x) & complex & \gpCX & 0 if $x = 0$, otherwise $x/|x|$ \\
+%Sign(x)@complex@0 if $x = 0$, otherwise $x/|x|$
+ The `Sign(x)` function returns 0 if its argument is zero, otherwise it returns
+ the complex value Sign(x) = x/|x|.
 4 sin
 ?expressions functions sin
 ?sin
-#sin(x) & any & $\sin x$, sine of $x$ \\
-%sin(x)@any@$sin~x$, sine of $x$
+#sin(x) &  ~~  & \gpCX & $\sin x$, sine of $x$ \\
+%sin(x)@ ~~ @$sin~x$, sine of $x$
  The `sin(x)` function returns the sine of its argument.  `sin` expects its
  argument to be in radians or degrees, as selected by `set angles`.
 4 sinh
 ?expressions functions sinh
 ?sinh
-#sinh(x) & any & $\sinh x$, hyperbolic sine of $x$ in radians \\
-%sinh(x)@any@$sinh~x$, hyperbolic sine of $x$ in radians
+#sinh(x) &  ~~  & \gpCX & $\sinh x$, hyperbolic sine of $x$ in radians \\
+%sinh(x)@ ~~ @$sinh~x$, hyperbolic sine of $x$ in radians
  The `sinh(x)` function returns the hyperbolic sine of its argument.  `sinh`
  expects its argument to be in radians.
 4 sqrt
 ?expressions functions sqrt
 ?sqrt
-#sqrt(x) & any & $\sqrt{x}$,  square root of $x$ \\
-%sqrt(x)@any@$sqrt x $, square root of $x$
+#sqrt(x) &  ~~  & \gpCX & $\sqrt{x}$,  square root of $x$ \\
+%sqrt(x)@ ~~ @$sqrt x $, square root of $x$
  The `sqrt(x)` function returns the square root of its argument. If the
  x is a complex value, this always returns the root with positive real
  part.
 4 tan
 ?expressions functions tan
 ?tan
-#tan(x) & any & $\tan x$,  tangent of $x$ \\
-%tan(x)@any@$tan~x$, tangent of $x$
+#tan(x) &  ~~  & \gpCX & $\tan x$,  tangent of $x$ \\
+%tan(x)@ ~~ @$tan~x$, tangent of $x$
  The `tan(x)` function returns the tangent of its argument.  `tan` expects
  its argument to be in radians or degrees, as selected by `set angles`.
 4 tanh
 ?expressions functions tanh
 ?tanh
-#tanh(x) & any & $\tanh x$, hyperbolic tangent of $x$ in radians\\
-%tanh(x)@any@$tanh~x$, hyperbolic tangent of $x$ in radians
+#tanh(x) &  ~~  & \gpCX & $\tanh x$, hyperbolic tangent of $x$ in radians\\
+%tanh(x)@ ~~ @$tanh~x$, hyperbolic tangent of $x$ in radians
  The `tanh(x)` function returns the hyperbolic tangent of its argument.  `tanh`
  expects its argument to be in radians.
 4 voigt
 ?expressions functions voigt
 ?voigt
-#voigt(x,y) & real & Voigt/Faddeeva function $\frac{y}{\pi} \int{\frac{exp(-t^2)}{(x-t)^2+y^2}}dt$ \\
-#           &       & Note: voigt$(x,y)$ = $real($faddeeva$(x+iy))$ \\
+#voigt(x,y) & real & ~ & Voigt/Faddeeva function $\frac{y}{\pi} \int{\frac{exp(-t^2)}{(x-t)^2+y^2}}dt$ \\
+#           &       & ~ & Note: voigt$(x,y)$ = $real($faddeeva$(x+iy))$ \\
 %voigt(x,y)@real@convolution of Gaussian and Lorentzian
  The function `voigt(x,y)` returns an approximation to the Voigt/Faddeeva
  function used in spectral analysis. The approximation is accurate to
- one part in 10^4.  If the libcerf routines are available, the re_w_of_z()
+ one part in 10^4.  If the libcerf library is available, the re_w_of_z()
  routine is used to provide a more accurate value.
  Note that voigt(x,y) = real(faddeeva( x + y*{0,1} )).
 #\hline \end{longtable}
 #%% begin dummy tabular because the @end processing wants to end one
-#\begin{tabular}{|ccl|}
+#\begin{tabular}{|lcl|}
 @end table
 
 ^<!-- INCLUDE_NEXT_TABLE -->
 @start table
-#\begin{longtable}{|ccl|} \hline
-#\multicolumn{3}{|c|}{Special functions from libcerf (only if available)} \\ \hline \hline
-#Function & Arguments & Returns \\ \hline
+#\setlength\LTleft{0pt}
+#\setlength\LTright{0pt}
+#\begin{longtable}{@{\extracolsep{\fill}}|lcrl|@{}} \hline
+#\multicolumn{4}{|c|}{Special functions from libcerf (only if available)} \\ \hline \hline
+#Function ~~~~~~~~~~~~~~~~~ & Arguments & ~ & Returns ({\gpCX } indicates complex result)\\ \hline
 #\endhead \hline \endfoot
 %c c l .
 %Function@Arguments@Returns
@@ -1824,31 +1880,35 @@ C marker below is used to signal this to doc2html:
 4 cerf
 ?expressions functions cerf
 ?cerf
-#cerf(z) & complex &  complex error function \\
+#cerf(z) & complex & \gpCX &  complex error function \\
 %cerf(z)@complex@complex error function
  `cerf(z)` is the complex version of the error function erf(x)
+ Requires external library libcerf.
 4 cdawson
 ?expressions functions cdawson
 ?cdawson
 =dawson
 %cdawson(z)@complex@complex Dawson's integral
-#cdawson(z)&complex&complex extension of Dawson's integral $D(z)={\frac{\sqrt{\pi}}{2}e^{-z^2} erfi(z)} $ \\
+#cdawson(z)&complex& \gpCX &complex extension of Dawson's integral $D(z)={\frac{\sqrt{\pi}}{2}e^{-z^2} erfi(z)} $ \\
  `cdawson(z)` returns Dawson's Integral evaluated for the complex argument z.
  cdawson(z) = sqrt(pi)/2 * exp(-z^2) * erfi(z)
+ Requires external library libcerf.
 4 faddeeva
 ?expressions functions faddeeva
 ?faddeeva
 %faddeeva(z)@complex@rescaled complex error function w(z) = exp(-z^2) * erfc(-i*z)
-#faddeeva(z)&complex&rescaled complex error function $w(z) = e^{-z^2}~ erfc(-iz) $ \\
+#faddeeva(z)&complex& \gpCX &rescaled complex error function $w(z) = e^{-z^2}~ erfc(-iz) $ \\
  The `faddeeva(z)` function returns the rescaled complex error function
  faddeeva(z) = exp(-z^2) * erfc(-i*z)
  This corresponds to Eqs 7.1.3 and 7.1.4 of Abramowitz and Stegun.
+ Requires external library libcerf.
 4 erfi
 ?expressions functions erfi
 ?erfi
 %erfi(x)@real@imaginary error function erfi(x) = -i * erf(ix)
-#erfi(x)&real&imaginary error function $erf(x) = -i * erf(ix)$ \\
+#erfi(x)&real&~&imaginary error function $erf(x) = -i * erf(ix)$ \\
  Imaginary error function erfi(x) = -i * erf(ix)
+ Requires external library libcerf.
 4 Voigt Profile
 ?expressions functions VP
 ?expressions functions VP_fwhm
@@ -1856,20 +1916,20 @@ C marker below is used to signal this to doc2html:
 ?VP_fwhm
 %VP(x,sigma,gamma)@real@Voigt profile
 %VP_fwhm(sigma,gamma)@real@Voigt profile full width at half maximum
-#VP(x,$\sigma$,$\gamma$)&real& Voigt profile $ VP(x,\sigma,\gamma) = {\int^{\infty}_{-\infty}{G(x^\prime;\sigma) L(x-x^\prime;\gamma) dx^\prime }} $ \\
-#VP\_fwhm($\sigma$,$\gamma$)&real& Voigt profile full width at half maximum value\\
+#VP(x,$\sigma$,$\gamma$)&real& ~ & Voigt profile $ VP(x,\sigma,\gamma) = {\int^{\infty}_{-\infty}{G(x^\prime;\sigma) L(x-x^\prime;\gamma) dx^\prime }} $ \\
+#VP\_fwhm($\sigma$,$\gamma$)&real& ~ & Voigt profile full width at half maximum value\\
  `VP(x,sigma,gamma)` corresponds to the Voigt profile defined by convolution of
  a Gaussian G(x;sigma) with a Lorentzian L(x;gamma).
  `VP_fwhm(sigma,gamma)` gives the full width at half maximum value of this function.
 
 #\hline \end{longtable}
 #%% begin dummy tabular because the @end processing wants to end one
-#\begin{tabular}{|ccl|}
+#\begin{tabular}{|lcl|}
 @end table
 
 ^<!-- INCLUDE_NEXT_TABLE -->
 @start table
-#\begin{tabular}{|ccl|} \hline
+#\begin{longtable}{@{\extracolsep{\fill}}|lcl|@{}} \hline
 #\multicolumn{3}{|c|}{String functions} \\ \hline \hline
 #Function & Arguments & Returns \\ \hline
 %c c l .
@@ -1971,11 +2031,14 @@ C marker below is used to signal this to doc2html:
 %words("string")@string@returns the number of words in "string"
  `words("string")` returns the number of words in string. For example,
  `words(" a b c d")` returns 4.
+#\hline \end{longtable}
+#%% begin dummy tabular because the @end processing wants to end one
+#\begin{tabular}{|lcl|}
 @end table
 
 ^<!-- INCLUDE_NEXT_TABLE -->
 @start table
-#\begin{tabular}{|ccl|} \hline
+#\begin{tabular}{|lcl|} \hline
 #\multicolumn{3}{|c|}{other {\bf gnuplot} functions} \\ \hline \hline
 #Function & Arguments & Returns \\ \hline
 %c c l .
@@ -2149,6 +2212,7 @@ C marker below is used to signal this to doc2html:
  E.g. voxel(x,y,z) = 0.0
  See `splot voxel-grids`, `vgrid`.
 @end table
+
 4 elliptic integrals
 ?elliptic integrals
 =elliptic integrals
@@ -2165,6 +2229,16 @@ C marker below is used to signal this to doc2html:
  `(1-(k*sin(p))**2)**(-0.5)/(1-n*sin(p)**2)`.  The parameter `n` must be less
  than 1, while `k` must lie between -1 and 1 (exclusive).  Note that by
  definition EllipticPi(0,k) == EllipticK(k) for all possible values of `k`.
+4 LambertW
+?expressions functions LambertW
+?LambertW
+ Lambert W function with complex domain and range.
+ LambertW( z, k ) returns the kth branch of the function W defined by
+ the equation W(z) * exp(z) = z.
+ The complex value is obtained using Halley's method as described by
+ Corless et al [1996], Adv. Comp. Math 5:329.
+ The nominal precision is 1.E-13 but convergence can be poor very close to
+ discontinuities, e.g. branch points.
 4 Special functions provided by libcerf
 ?libcerf
  Some special functions are only provided if your copy of gnuplot was configured
@@ -2172,6 +2246,13 @@ C marker below is used to signal this to doc2html:
  These include the complex error function cerf(z), the imaginary error function
  erfi(x), a complex extension of Dawson's integral cdawson(z), and complex
  versions of the Faddeeva function and the Voigt profile VP(x, sigma, gamma).
+4 lnGamma
+?expressions functions lnGamma
+?lnGamma
+ lnGamma(z) returns the natural log of the gamma function with complex domain
+ and range.  Implemented using 15 term approximation following Lanczos [1964],
+ SIAM JNA 1:86-96.  The imaginary component of the result is phase-shifted to
+ yield a continuous surface everywhere except the negative real axis.
 4 Random number generator
 ?expressions random
 ?random
@@ -2262,7 +2343,7 @@ C marker below is used to signal this to doc2html:
 =one's complement
 =operator precedence
 =cardinality
-#\begin{tabular}{|ccl|} \hline
+#\begin{tabular}{|lcl|} \hline
 #\multicolumn{3}{|c|}{Unary Operators}\\ \hline \hline
 #Symbol & Example & Explanation \\ \hline
 #\verb@-@ & \verb@-a@ & unary minus \\
@@ -2367,7 +2448,7 @@ C ... and restart the table:
 =string operators
 =modulo
 =exponentiation
-#\begin{tabular}{|ccl|} \hline
+#\begin{tabular}{|lcl|} \hline
 #\multicolumn{3}{|c|}{Binary Operators} \\ \hline \hline
 #Symbol & Example & Explanation \\ \hline
 #\verb~**~ & \verb~a**b~ & exponentiation\\
@@ -2480,7 +2561,7 @@ C ... and restart the table:
 @start table - first is interactive cleartext form
      Symbol       Example      Explanation
        ?:          a?b:c     ternary operation
-#\begin{tabular}{|ccl|} \hline
+#\begin{tabular}{|lcl|} \hline
 #\multicolumn{3}{|c|}{Ternary Operator} \\ \hline \hline
 #Symbol & Example & Explanation \\ \hline
 #\verb~?:~ & \verb~a?b:c~ & ternary operation\\
