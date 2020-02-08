@@ -168,8 +168,8 @@ PSLATEX_reset()
     \\put(0,0){\\includegraphics[width={%.2fbp},height={%.2fbp}]{%s}}%%\n\
     \\gplfronttext\n\
   \\end{picture}%%\n\
-\\endgroup\n", 1 + PSLATEX_pagesize_x / (2.0*PS_SC),
-               1 + PSLATEX_pagesize_y / (2.0*PS_SC),
+\\endgroup\n", PSLATEX_pagesize_x / (2.0*PS_SC),
+               PSLATEX_pagesize_y / (2.0*PS_SC),
                pslatex_auxname);
             if (ps_params->epslatex_standalone)
                 fputs("\\end{document}\n", gpoutfile);
@@ -425,6 +425,12 @@ EPSLATEX_common_init()
 
     PSLATEX_pagesize_x = term->xmax * xsize;
     PSLATEX_pagesize_y = term->ymax * ysize;
+
+    /* cairo terminals use a different convention for xmax/ymax */
+    if (!strcmp(term->name,"cairolatex")) {
+	PSLATEX_pagesize_x += 2*PS_SC * xsize;
+	PSLATEX_pagesize_y += 2*PS_SC * ysize;
+    }
 
     if (!gpoutfile) {
         char *temp = gp_alloc(strlen(outstr) + 1, "temp file string");
