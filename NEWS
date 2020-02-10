@@ -55,6 +55,7 @@ Changes in 5.4
 * FIX open/close path for polygons
 * FIX several stability issues of the caca terminal
 * FIX gd terminals: rendering of white lines with lw > 1
+* FIX do not reapply "set offset" on refresh or scrolling event
 
 New features introduced to 5.2 in patchlevel releases
 =====================================================

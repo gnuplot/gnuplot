@@ -2085,6 +2085,11 @@ refresh_request()
 	return;
     }
 
+    /* The margins from "set offset" were already applied;
+     * don't reapply them here
+     */
+    retain_offsets = TRUE;
+
     /* Restore the axis range/scaling state from original plot
      * Dima Kogan April 2018
      */

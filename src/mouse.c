@@ -1620,6 +1620,8 @@ zoom_rescale_xyx2y2(double a0,double a1,double a2,double a3,double a4,double a5,
     double ymax  = rescale(FIRST_Y_AXIS,  a10, a11);
     double x2max = rescale(SECOND_X_AXIS, a12, a13);
     double y2max = rescale(SECOND_Y_AXIS, a14, a15);
+
+    retain_offsets = TRUE;
     do_zoom(xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max);
 
     if (msg[0] && display_ipc_commands()) {
@@ -1720,6 +1722,7 @@ rescale_around_mouse(double *newmin, double *newmax, int AXIS, double mouse_pos,
 static void
 zoom_in_X(int zoom_key)
 {
+    retain_offsets = TRUE;
     if (is_mouse_outside_plot()) {
 	/* zoom in (X axis only) */
 	double w1 = (zoom_key=='+') ? 23./25. : 23./21.;
@@ -1761,6 +1764,7 @@ static void
 zoom_around_mouse(int zoom_key)
 {
     double xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max;
+
     if (is_mouse_outside_plot()) {
 	/* zoom in (factor of approximately 2^(.25), so four steps gives 2x larger) */
 	double w1 = (zoom_key=='+') ? 23./25. : 23./21.;
@@ -1784,6 +1788,7 @@ zoom_around_mouse(int zoom_key)
 	rescale_around_mouse(&x2min, &x2max, SECOND_X_AXIS, real_x2, xscale);
 	rescale_around_mouse(&y2min, &y2max, SECOND_Y_AXIS, real_y2, yscale);
     }
+    retain_offsets = TRUE;
     do_zoom(xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max);
     if (display_ipc_commands())
 	fprintf(stderr, "zoom %s.\n", (zoom_key=='+' ? "in" : "out"));

@@ -57,11 +57,15 @@
 /* Externally visible/modifiable status variables */
 
 /* 'set offset' --- artificial buffer zone between coordinate axes and
- * the area actually covered by the data */
+ * the area actually covered by the data.
+ * The retain_offsets flag is an interlock to prevent repeated application
+ * of the offsets when a plot is refreshed or scrolled.
+ */
 t_position loff = {first_axes, first_axes, first_axes, 0.0, 0.0, 0.0};
 t_position roff = {first_axes, first_axes, first_axes, 0.0, 0.0, 0.0};
 t_position toff = {first_axes, first_axes, first_axes, 0.0, 0.0, 0.0};
 t_position boff = {first_axes, first_axes, first_axes, 0.0, 0.0, 0.0};
+TBOOLEAN retain_offsets = FALSE;
 
 /* set bars */
 double bar_size = 1.0;
@@ -586,6 +590,11 @@ adjust_offsets(void)
     double t = toff.scaley == graph ? fabs(Y_AXIS.max - Y_AXIS.min)*toff.y : toff.y;
     double l = loff.scalex == graph ? fabs(X_AXIS.max - X_AXIS.min)*loff.x : loff.x;
     double r = roff.scalex == graph ? fabs(X_AXIS.max - X_AXIS.min)*roff.x : roff.x;
+
+    if (retain_offsets) {
+	retain_offsets = FALSE;
+	return;
+    }
 
     if (nonlinear(&Y_AXIS)) {
 	adjust_nonlinear_offset(&Y_AXIS);
