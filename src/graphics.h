@@ -89,6 +89,7 @@ typedef struct curve_points {
 
 /* 'set offset' status variables */
 extern t_position loff, roff, toff, boff;
+extern TBOOLEAN retain_offsets;
 
 /* 'set bar' status */
 extern double bar_size;
