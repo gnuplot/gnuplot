@@ -2,7 +2,7 @@
 /* GNUPLOT - djsvga.trm */
 
 /*[
- * Copyright 1992 - 1993, 1998, 2004
+ * Copyright 1992 - 1993, 1998, 2004, 2018, 2020
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -58,9 +58,6 @@ register_term(djsvga)		/* no ; */
 #ifdef TERM_PROTO
 #define DJSVGA_XMAX 640
 #define DJSVGA_YMAX 480
-
-#define DJSVGA_XLAST (DJSVGA_XMAX - 1)
-#define DJSVGA_YLAST (DJSVGA_YMAX - 1)
 
 #define DJSVGA_VCHAR 16
 #define DJSVGA_HCHAR 8
@@ -176,6 +173,13 @@ static GrColor dj_colors[DJNUMCOLOR];
 static void *DJSVGA_colorbuf = NULL;
 #endif
 static GrTextOption DJSVGA_TextOption;
+#if defined(MGRX_VERSION_API) && (MGRX_VERSION_API >= 0x0110)
+# define GRX_TXO_FGCOLOR txo_fgcolor
+# define GRX_TXO_BGCOLOR txo_bgcolor
+#else
+# define GRX_TXO_FGCOLOR txo_fgcolor.v
+# define GRX_TXO_BGCOLOR txo_bgcolor.v
+#endif
 
 #define DJSVGAFONTLEN PATH_MAX
 static char DJSVGA_fontname[DJSVGAFONTLEN] = "";
@@ -440,7 +444,7 @@ DJSVGA_graphics()
 #ifdef DJSVGA_SAVE_COLORS
     GrRestoreColors(DJSVGA_colorbuf);
 #endif
-    GrClearScreen(GrAllocColor2ID(dj_background));
+    GrClearContext(GrAllocColor2ID(dj_background));
 
     /* initialize font */
     DJSVGA_fontname[0] = NUL;  /* enforce init */
@@ -568,11 +572,7 @@ DJSVGA_linetype(int linetype)
     if (linetype >= DJNUMCOLOR - 2)
 	linetype %= DJNUMCOLOR - 2;
     /* HBB: set the TextOption color variable right here (faster) */
-#if defined(MGRX_VERSION_API) && (MGRX_VERSION_API >= 0x0110)
-    DJSVGA_TextOption.txo_fgcolor = dj_color = dj_colors[linetype + 2];
-#else
-    DJSVGA_TextOption.txo_fgcolor.v = dj_color = dj_colors[linetype + 2];
-#endif
+    DJSVGA_TextOption.GRX_TXO_FGCOLOR = dj_color = dj_colors[linetype + 2];
     if (linetype == LT_AXIS)
 	DJSVGA_dashtype(DASHTYPE_AXIS, NULL);
     else
@@ -643,7 +643,7 @@ DJSVGA_color(t_colorspec *colorspec)
 	GrColor color = GrBlack();
 
 	if (linetype == LT_BACKGROUND) {
-	    color = dj_background;
+	    color = GrAllocColor2ID(dj_background);
 	} else if (linetype == LT_NODRAW) {
 	    /* can this happen at all? */
 	    FPRINTF((stderr, "Debug:  linetype NODRAW!"));
@@ -654,11 +654,7 @@ DJSVGA_color(t_colorspec *colorspec)
 		linetype %= DJNUMCOLOR - 2;
 	    color = dj_colors[linetype + 2];
 	}
-#if defined(MGRX_VERSION_API) && (MGRX_VERSION_API >= 0x0110)
-	DJSVGA_TextOption.txo_fgcolor = dj_color = color;
-#else
-	DJSVGA_TextOption.txo_fgcolor.v = dj_color = color;
-#endif
+	DJSVGA_TextOption.GRX_TXO_FGCOLOR = dj_color = color;
 	break;
     }
     case TC_FRAC: {
@@ -666,26 +662,12 @@ DJSVGA_color(t_colorspec *colorspec)
 
 	/* Translate palette index to RGB colour */
 	rgb255maxcolors_from_gray(colorspec->value, &rgb255);
-#if defined(MGRX_VERSION_API) && (MGRX_VERSION_API >= 0x0110)
-	DJSVGA_TextOption.txo_fgcolor = dj_color = GrAllocColorID(rgb255.r, rgb255.g, rgb255.b);
-#else
-	DJSVGA_TextOption.txo_fgcolor.v = dj_color = GrAllocColorID(rgb255.r, rgb255.g, rgb255.b);
-#endif
+	DJSVGA_TextOption.GRX_TXO_FGCOLOR = dj_color = GrAllocColorID(rgb255.r, rgb255.g, rgb255.b);
 	break;
     }
     case TC_RGB: {
-	uint16_t red, green, blue;
-
-	/* extract color components from colorspec.lt */
-	/* uint16_t alpha = 0xff - ((colorspec->lt >> 24) & 0xff); */
-	red = (colorspec->lt >> 16) & 0xff;
-	green = (colorspec->lt >> 8) & 0xff;
-	blue = (colorspec->lt) & 0xff;
-#if defined(MGRX_VERSION_API) && (MGRX_VERSION_API >= 0x0110)
-	DJSVGA_TextOption.txo_fgcolor = dj_color = GrAllocColorID(red, green, blue);
-#else
-	DJSVGA_TextOption.txo_fgcolor.v = dj_color = GrAllocColorID(red, green, blue);
-#endif
+	/* We just need to mask out the alpha channel. */
+	DJSVGA_TextOption.GRX_TXO_FGCOLOR = dj_color =  GrAllocColor2ID(colorspec->lt & 0xffffff);
 	break;
     }
     default:
@@ -1432,7 +1414,7 @@ DJSVGA_image(unsigned int M, unsigned int N, coordval *image,
 	GrColor * colors;
 	int n;
 
-	FPRINTF((stderr, "DJSVGA_image: palette\n"));
+	FPRINTF((stderr, "svga: palette image\n"));
 
 	/* convert image data */
 	data = (uint8_t *) gp_alloc(M * N, "image data");
@@ -1461,11 +1443,13 @@ DJSVGA_image(unsigned int M, unsigned int N, coordval *image,
 	rgb_color rgb1;
 	rgb255_color rgb255;
 	GrColor color;
+	GrContext grc;
 
-	FPRINTF((stderr, "DJSVGA_image: rgb / rgba\n"));
+	FPRINTF((stderr, "svga: rgb / rgba image\n"));
 
 	/* create and fill context */
 	GrCreateContext(M, N, NULL, &ctxt);
+	GrSaveContext(&grc);
 	GrSetContext(&ctxt);
 	line = (GrColor *) gp_alloc(M * sizeof(GrColor), "scan line");
 	if (color_mode == IC_RGB) {
@@ -1501,13 +1485,13 @@ DJSVGA_image(unsigned int M, unsigned int N, coordval *image,
 	    }
 	}
 	free(line);
-	GrSetContext(NULL);
+	GrSetContext(&grc);
 
 	im = GrImageFromContext(&ctxt);
 	break;
     }
     default: /* unknown */
-	FPRINTF((stderr, "DJSVGA_image: unknown\n"));
+	FPRINTF((stderr, "svga: unknown image type\n"));
 	return;
     }
 
@@ -2128,15 +2112,6 @@ TERM_TABLE_END(djsvga_driver)
 #endif /* TERM_TABLE */
 #endif /* TERM_PROTO_ONLY */
 
-/*
- * HBB: I think this documentation should be at least a *bit* longer
- *   (E.g., the "fontname" parameter is claimed to be non-existent!)
- */
-/* RCC: Not any more...
- *      If you have other ideas about what could be in the help section,
- *      please let me know (rccrawford@lanl.gov) --- particularly info
- *      about what fonts are permitted, if there is such a list.
-*/
 #ifdef TERM_HELP
 START_HELP(svga)
 "1 svga",
