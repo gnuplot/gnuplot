@@ -205,6 +205,12 @@ C
 #b cubic spline smoothing of 3D lines. See `splot smooth csplines`
 #end
 
+4 New commands and command options
+?new commands
+#start
+#b `palette(z)` returns the RGB palette color mapping z into cbrange. 
+#end
+
 4 Multiple named palettes
 #start
 #b The current palette can be saved to a named colormap for future use.
@@ -290,7 +296,6 @@ C
 #end
 
 4 New commands and command options
-?new commands
 #start
 #b Voxel grid commands. See `set vgrid`, `set vxrange`, `vclear`, `vfill`,
 ## and `voxel`.
@@ -1353,6 +1358,7 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>columnhead(x)</td>    <td>int</td>    <td> string containing first entry of column <i>x</i> in datafile.</td></tr>
 ^<tr>    <td>exists("X")</td>    <td>string</td>    <td> returns 1 if a variable named X is defined, 0 otherwise.</td></tr>
 ^<tr>    <td>hsv2rgb(h,s,v)</td>    <td>h,s,v in [0:1]</td>    <td> converts HSV color to 24bit RGB color.</td></tr>
+^<tr>    <td>palette(z)</td>    <td>double</td>    <td> RGB palette color mapped to z</td></tr>
 ^<tr>    <td>stringcolumn(x)</td>    <td>int</td>    <td> content column <i>x</i> as a string.</td></tr>
 ^<tr>    <td>timecolumn(N,format)</td>    <td>int, string</td>    <td> time data in column <i>N</i> during data input</td></tr>
 ^<tr>    <td>tm_hour(x)</td>    <td>int</td>    <td>the hour</td></tr>
@@ -1972,6 +1978,13 @@ C marker below is used to signal this to doc2html:
 %hsv2rgb(h,s,v)@h,s,v in [0:1]@24bit RGB color value.
  The `hsv2rgb(h,s,v)` function converts HSV (Hue/Saturation/Value) triplet
  to an equivalent RGB value.
+4 palette
+?expressions functions palette
+?palette
+#palette(z) & double & RGB palette color mapped to z. \\
+%palette(z)@double@RGB palette color mapped to z.
+ `palette(z)` returns the RGB representation of the palette color mapped to z
+  given the current extremes of cbrange.
 4 stringcolumn
 ?expressions functions stringcolumn
 ?stringcolumn
@@ -12329,7 +12342,7 @@ Ffigure_multiple_keys
 3 palette
 ?commands set palette
 ?set palette
-?palette
+=palette
  The palette is a set of colors, usually ordered in the form of one or
  more stepped gradients, used for `pm3d` surfaces and other graph elements
  colored by z value.  Colors in the current palette automatically mapped

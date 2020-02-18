@@ -229,6 +229,7 @@ void draw_color_smooth_box(int plot_mode);
  Support for user-callable routines
 */
 void f_hsv2rgb(union argument *);
+void f_palette(union argument *);
 unsigned int rgb_from_colormap(double gray, udvt_entry *colormap);
 
 #endif /* COLOR_H */
