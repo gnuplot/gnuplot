@@ -258,7 +258,6 @@ C
 #end
 
 4 New commands and command options
-?new commands
 #start
 #b Voxel grid commands. See `set vgrid`, `set vxrange`, `vclear`, `vfill`,
 ## and `voxel`.
@@ -1336,6 +1335,7 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>columnhead(x)</td>    <td>int</td>    <td> string containing first entry of column <i>x</i> in datafile.</td></tr>
 ^<tr>    <td>exists("X")</td>    <td>string</td>    <td> returns 1 if a variable named X is defined, 0 otherwise.</td></tr>
 ^<tr>    <td>hsv2rgb(h,s,v)</td>    <td>h,s,v in [0:1]</td>    <td> converts HSV color to 24bit RGB color.</td></tr>
+^<tr>    <td>palette(z)</td>    <td>double</td>    <td> RGB palette color mapped to z</td></tr>
 ^<tr>    <td>stringcolumn(x)</td>    <td>int</td>    <td> content column <i>x</i> as a string.</td></tr>
 ^<tr>    <td>timecolumn(N,format)</td>    <td>int, string</td>    <td> time data in column <i>N</i> during data input</td></tr>
 ^<tr>    <td>tm_hour(x)</td>    <td>int</td>    <td>the hour</td></tr>
@@ -1955,6 +1955,13 @@ C marker below is used to signal this to doc2html:
 %hsv2rgb(h,s,v)@h,s,v in [0:1]@24bit RGB color value.
  The `hsv2rgb(h,s,v)` function converts HSV (Hue/Saturation/Value) triplet
  to an equivalent RGB value.
+4 palette
+?expressions functions palette
+?palette
+#palette(z) & double & RGB palette color mapped to z. \\
+%palette(z)@double@RGB palette color mapped to z.
+ `palette(z)` returns the RGB representation of the palette color mapped to z
+  given the current extremes of cbrange.
 4 stringcolumn
 ?expressions functions stringcolumn
 ?stringcolumn
@@ -12221,18 +12228,21 @@ Ffigure_multiple_keys
 ?commands set palette
 ?commands show palette
 ?set palette
-?show palette
-?palette
- Palette is a color storage for use by `pm3d`, filled color contours or
- polygons, color histograms, color gradient background, and whatever it is
- or it will be implemented...  Here it stands for a palette of smooth
- "continuous" colors or grays, but let's call it just a palette.
-
- Color palettes require terminal entries for filled color polygons and
- palettes of smooth colors, are currently available for terminals listed in
- help for `set pm3d`. The range of color values are adjustable independently by
- `set cbrange` and `set log cb`. The whole color palette is
- visualized in the `colorbox`.
+=palette
+ The palette is a set of colors, usually ordered in the form of one or
+ more stepped gradients, used for `pm3d` surfaces and other graph elements
+ colored by z value.  Colors in the current palette are automatically mapped
+ from plot coordinates z values or an extra data column of gray values.
+ Palette colors also can be accessed explicitly in a color specification
+ (see `colorspec`)
+#start
+#b as a `gray value` also known as `palette fraction` in the range [0:1]
+#b as a `z value` corresponding to the z coordinate of a plot element
+#b as a `cb value` in the range [cbmin:cbmax] (see `set cbrange`)
+#end
+ The current palette is shown by default in a separate `colorbox` drawn
+ next to plots that use plot style `pm3d`. The colorbox can be manually
+ selected or disabled. See `set colorbox`.
 
  Syntax:
        set palette

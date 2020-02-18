@@ -233,6 +233,7 @@ const struct ft_entry ft[] =
     {"value", f_value},		/* retrieve value of variable known by name */
 
     {"hsv2rgb", f_hsv2rgb},	/* color conversion */
+    {"palette", f_palette},	/* palette color lookup */
 
 #ifdef VOXEL_GRID_SUPPORT
     {"voxel", f_voxel},		/* extract value of single voxel */

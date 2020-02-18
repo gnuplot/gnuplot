@@ -14,7 +14,7 @@ using "git log" after downloading:
 We appreciate any feedback from testing this release candidate so that any
 problems can be addressed prior to the 5.4.0 roll-out expected in Spring 2020.
 
-Release Notes date: 23-May-2020
+Release Notes date: 27-May-2020
 
 * Changes between -rc1 and -rc2
 	o faster response to piped input on Windows (Bug #2204)
@@ -23,6 +23,7 @@ Release Notes date: 23-May-2020
 	o minor changes to dumb.trm, pixmap handling
 	o -rc1 failed to act on "with labels rotate by <ang>" (Bug #2264)
 	o \n _not_ stripped from string returned by backquoted shell command
+	o new function palette(z) returns packed RGB representation
 
 Features introduced in version 5.4
 ==================================

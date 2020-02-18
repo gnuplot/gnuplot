@@ -1,0 +1,27 @@
+#
+# Show how transparency can be combined with palette colors for
+# individual plot elements; e.g. points or lines as opposed to
+# fill areas, for which transparency is part of the fill style.
+#
+set view 86, 18, 1.03784, 0.981818
+set view azimuth -16.5857
+
+unset key
+unset tics
+unset border
+set pm3d border lc "black" lw 0.25
+set urange [-5 : 5]
+set vrange [-5 : 5]
+set cbrange [ -30 : 30 ]
+set samples 13, 13
+set colorbox user origin 0.9, 0.25
+
+transparent = 0xef000000
+
+set title "combining transparency with palette colors"
+splot '++' using 1:2:($1*$2) with pm3d fc "white", \
+      '++' using 1:2:($1*$2):(transparent+palette($1*$2)) \
+      with points pt 7 ps 5 lc rgb var
+
+pause -1 "Hit return to continue"
+reset
