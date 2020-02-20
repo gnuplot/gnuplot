@@ -204,6 +204,7 @@ const struct ft_entry ft[] =
     {"cdawson", f_cdawson},	/* complex Dawson's integral */
     {"erfi", f_erfi},		/* imaginary error function */
     {"VP", f_voigtp},		/* Voigt profile */
+    {"VP_fwhm", f_VP_fwhm},	/* Voigt profile full width at half maximum */
     {"faddeeva", f_faddeeva},	/* Faddeeva rescaled complex error function "w_of_z" */
 #endif
 

@@ -108,6 +108,7 @@ Features introduced in version 5.4
 	o Support for multiple textbox styles
 	o Built-in modified Bessel functions (besi0 besi1 besin)
 	o Built-in order N Bessel functions of the 1st and 2nd kind (besjn besyn)
+	o VP_fwhm(sigma,gamma) returns Voigt profile full width at half maximum
 
 * Changes
 	o Plot style "with parallelaxes" has revised syntax to match
