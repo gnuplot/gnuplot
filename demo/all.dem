@@ -257,6 +257,10 @@ print "********************** file complex_trig.dem *********************"
 load "complex_trig.dem"
 reset
 
+print "********************** file cerf.dem *************************"
+load "cerf.dem"
+reset
+
 print "********************** file heatmaps.dem *********************"
 load "heatmaps.dem"
 reset

@@ -1310,6 +1310,7 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>faddeeva(z)</td>    <td>complex</td>    <td>rescaled complex error function <i>w</i>(<i>z</i>) = exp(-<i>z</i>²) × erfc(-i<i>z</i>)</td></tr>
 ^<tr>    <td>erfi(x)</td>    <td>real</td>    <td>imaginary error function erfi(<i>x</i>) = -i × erf(i<i>x</i>)</td></tr>
 ^<tr>    <td>VP(x,sigma,gamma)</td>    <td>real</td>    <td>Voigt profile</td></tr>
+^<tr>    <td>VP_fwhm(sigma,gamma)</td>    <td>real</td>    <td>Voigt profile full with at half max</td></tr>
 
 ^</tbody>
 ^</table>
@@ -1821,11 +1822,16 @@ C marker below is used to signal this to doc2html:
  Imaginary error function erfi(x) = -i * erf(ix)
 4 Voigt Profile
 ?expressions functions VP
+?expressions functions VP_fwhm
 ?VP
+?VP_fwhm
 %VP(x,sigma,gamma)@real@Voigt profile
+%VP_fwhm(sigma,gamma)@real@Voigt profile full width at half maximum
 #VP(x,$\sigma$,$\gamma$)&real& Voigt profile $ VP(x,\sigma,\gamma) = {\int^{\infty}_{-\infty}{G(x^\prime;\sigma) L(x-x^\prime;\gamma) dx^\prime }} $ \\
+#VP\_fwhm($\sigma$,$\gamma$)&real& Voigt profile full width at half maximum value\\
  `VP(x,sigma,gamma)` corresponds to the Voigt profile defined by convolution of
  a Gaussian G(x;sigma) with a Lorentzian L(x;gamma).
+ `VP_fwhm(sigma,gamma)` gives the full width at half maximum value of this function.
 
 #\hline \end{longtable}
 #%% begin dummy tabular because the @end processing wants to end one
