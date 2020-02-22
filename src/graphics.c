@@ -596,27 +596,31 @@ adjust_offsets(void)
 	return;
     }
 
-    if (nonlinear(&Y_AXIS)) {
-	adjust_nonlinear_offset(&Y_AXIS);
-    } else {
-	if (Y_AXIS.min < Y_AXIS.max) {
-	    Y_AXIS.min -= b;
-	    Y_AXIS.max += t;
+    if ((Y_AXIS.autoscale & AUTOSCALE_BOTH) != AUTOSCALE_NONE) {
+	if (nonlinear(&Y_AXIS)) {
+	    adjust_nonlinear_offset(&Y_AXIS);
 	} else {
-	    Y_AXIS.max -= b;
-	    Y_AXIS.min += t;
+	    if (Y_AXIS.min < Y_AXIS.max) {
+		Y_AXIS.min -= b;
+		Y_AXIS.max += t;
+	    } else {
+		Y_AXIS.max -= b;
+		Y_AXIS.min += t;
+	    }
 	}
     }
 
-    if (nonlinear(&X_AXIS)) {
-	adjust_nonlinear_offset(&X_AXIS);
-    } else {
-	if (X_AXIS.min < X_AXIS.max) {
-	    X_AXIS.min -= l;
-	    X_AXIS.max += r;
+    if ((X_AXIS.autoscale & AUTOSCALE_BOTH) != AUTOSCALE_NONE) {
+	if (nonlinear(&X_AXIS)) {
+	    adjust_nonlinear_offset(&X_AXIS);
 	} else {
-	    X_AXIS.max -= l;
-	    X_AXIS.min += r;
+	    if (X_AXIS.min < X_AXIS.max) {
+		X_AXIS.min -= l;
+		X_AXIS.max += r;
+	    } else {
+		X_AXIS.max -= l;
+		X_AXIS.min += r;
+	    }
 	}
     }
 

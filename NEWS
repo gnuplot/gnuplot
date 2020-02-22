@@ -51,6 +51,7 @@ Changes in 5.4
 * CHANGE boxplot outliers affect autoscaling only if they are enabled
 * CHANGE remove latex, emtex, eepic, and tpic terminals from default build
 * CHANGE pm3d quadrangles are by default clipped smoothly to zrange
+* CHANGE `set offset` is ignored when the axis range is not autoscaled
 * FIX allow mixed use of in-key plot titles and manually placed titles
 * FIX open/close path for polygons
 * FIX several stability issues of the caca terminal
