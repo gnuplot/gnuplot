@@ -575,10 +575,10 @@ get_data(struct curve_points *current_plot)
 	    int_error(NO_CARET, "'smooth zsort' only possible in plots 'with points'");
 	break;
     case SMOOTH_ACSPLINES:
-	max_cols = 3;
+	max_cols++;
 	break;
     default:
-	if (df_no_use_specs > 2)
+	if (df_no_use_specs > 2 && current_plot->plot_style != FILLEDCURVES)
 	    int_warn(NO_CARET, "extra columns ignored by smoothing option");
 	break;
     }
@@ -1003,15 +1003,31 @@ get_data(struct curve_points *current_plot)
 	     */
 	    coordval y1 = v[1];
 	    coordval y2;
+	    coordval w = 0.0;	/* only needed for SMOOTH_ACSPLINES) */
 	    if (j==2) {
 		y2 = current_plot->filledcurves_options.at;
 	    } else {
 		y2 = v[2];
 		if (current_plot->filledcurves_options.closeto == FILLEDCURVES_DEFAULT)
 		    current_plot->filledcurves_options.closeto = FILLEDCURVES_BETWEEN;
+		if (current_plot->filledcurves_options.closeto == FILLEDCURVES_BETWEEN) {
+		    switch (current_plot->plot_smooth) {
+			case SMOOTH_NONE:
+			case SMOOTH_CSPLINES:
+			case SMOOTH_SBEZIER:
+			    break;
+			case SMOOTH_ACSPLINES:
+			    w = (j > 3) ? v[3] : 1.0;
+			    break;
+			default:
+			    int_warn(NO_CARET, "use csplines, acsplines or sbezier to smooth filledcurves");
+			    current_plot->plot_smooth = SMOOTH_NONE;
+			    break;
+		    }
+		}
 	    }
 	    store2d_point(current_plot, i++, v[0], y1,
-			v[0], v[0], y1, y2, 0.0);
+			v[0], v[0], y1, y2, w);
 	    break;
 	}
 

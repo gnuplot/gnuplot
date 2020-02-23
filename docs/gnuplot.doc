@@ -4190,16 +4190,19 @@ Ffigure_filledcurves
 
  where the option can be one of the following
 
-     [closed | {above | below}
-     {x1 | x2 | y | r}[=<a>] | xy=<x>,<y>]
+     closed
+     {above|below} x1 x2  y r=<a> xy=<x>,<y>
+     between
 
  The first variant, `closed`, treats the curve itself as a closed polygon.
  This is the default if there are two columns of input data.
 
- The second variant is to fill the area between the curve and a given axis,
- a horizontal or vertical line, or a point.
-
      filledcurves closed   ... just filled closed curve,
+
+ The second variant is to fill the area between the curve and a given axis,
+ a horizontal or vertical line, or a point. This can be further restricted
+ to filling the area above or below the specified line.
+
      filledcurves x1       ... x1 axis,
      filledcurves x2       ... x2 axis, etc for y1 and y2 axes,
      filledcurves y=42     ... line at y=42, i.e. parallel to x axis,
@@ -4225,9 +4228,6 @@ Ffigure_yerrorfill
      ... using 1:2:3 with filledcurves below
  In either case the option limits the filled area to one side of the bounding
  line or curve.
-
- Notes: Not all terminal types support this plotting mode.
-        The x= and y= keywords are ignored for 3 columns data plots
 
  Zooming a filled curve drawn from a datafile may produce empty or incorrect
  areas because gnuplot is clipping points and lines, and not areas.

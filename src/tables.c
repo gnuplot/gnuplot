@@ -754,6 +754,7 @@ const struct gen_table filledcurves_opts_tbl[] =
     { "r", FILLEDCURVES_ATR },
     { "above", FILLEDCURVES_ABOVE },
     { "below", FILLEDCURVES_BELOW },
+    { "between", FILLEDCURVES_BETWEEN },
     { "y",  FILLEDCURVES_Y1 },
     { NULL, -1 }
 };
