@@ -43,7 +43,8 @@
  *  Hans-Bernhard Broeker (several improvements)
  *  Bastian Märkisch (palette and RGB colors, dashed lines, enhanced text,
  *    filled polygons, color and pattern fill, image, terminal options,
- *    support MGRX fork, text encodings, interactive keyboard / mouse input)
+ *    support MGRX fork, text encodings, interactive keyboard / mouse input,
+ *    rotated plain text at arbitrary angles)
  *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
@@ -193,6 +194,7 @@ static int dj_cursorx, dj_cursory;
 static int dj_width, dj_height;
 #endif
 static enum JUSTIFY dj_justify;
+static int dj_angle = 0;
 static int dj_lastx = 0;
 static int dj_lasty = 0;
 static TBOOLEAN dj_in_path = FALSE;
@@ -745,6 +747,8 @@ DJSVGA_angle(int ang)
 	ang += 360;
     ang %= 360;
 
+    dj_angle = ang;
+
     if (ang < 45 || ang > 315)
 	DJSVGA_TextOption.txo_direct = GR_TEXT_RIGHT;
     else if (ang < 135)
@@ -936,12 +940,111 @@ DJSVGA_put_text(unsigned int x, unsigned int y, const char *str)
 {
     DJSVGA_flush_line();
 
+    // Use the library's text output for multiples of 90 degrees,
+    // otherwise do slow bit-by-bit rotation.
+    if ((dj_angle % 90) == 0) {
 #if defined(MGRX_VERSION_API) && (MGRX_VERSION_API >= 0x0110)
-    /* determine text length in characters automatically according to encoding */
-    GrDrawString((void *)str, 0, x, dj_ylast - y, &DJSVGA_TextOption);
+	/* determine text length in characters automatically according to encoding */
+	GrDrawString((void *)str, 0, x, dj_ylast - y, &DJSVGA_TextOption);
 #else
-    GrDrawString((void *)str, strlen(str), x, dj_ylast - y, &DJSVGA_TextOption);
+	GrDrawString((void *)str, strlen(str), x, dj_ylast - y, &DJSVGA_TextOption);
 #endif
+    } else {
+	GrContext * mem, save;
+	GrTextOption txo;
+	int width, height;
+	int x1, x2, x3, dx, minx, maxx;
+	int y1, y2, y3, dy, miny, maxy;
+	float c, s;
+
+	// init our own TextOption:
+	//   copy txo_font, txo_chrtype, and txo_bgcolor
+	memcpy(&txo, &DJSVGA_TextOption, sizeof(txo));
+	txo.txo_direct = GR_TEXT_RIGHT;
+	txo.txo_xalign = GR_ALIGN_LEFT;
+	txo.txo_yalign = GR_ALIGN_BOTTOM;
+	txo.GRX_TXO_FGCOLOR = GrWhite() | GrWRITE;
+
+	// now create a b/w memory context
+#if defined(MGRX_VERSION_API) && (MGRX_VERSION_API >= 0x0110)
+	GrStringSize((void *) str, 0, &txo, &width, &height);
+#else
+	GrStringSize((void *) str, strlen(str), &txo, &width, &height);
+#endif
+	mem = GrCreateFrameContext(GR_frameRAM1, width, height, NULL, NULL);
+
+	// render the text horizontally in the memory context
+	GrSaveContext(&save);
+	GrSetContext(mem);
+	GrClearContext(GrBlack());
+#if defined(MGRX_VERSION_API) && (MGRX_VERSION_API >= 0x0110)
+	GrDrawString((void *) str, 0, 0, height - 1, &txo);
+#else
+	GrDrawString((void *) str, strlen(str), 0, height - 1, &txo);
+#endif
+	GrSetContext(&save);
+
+	// calculate sin/cos only once
+	c =   cos(DEG2RAD * dj_angle);
+	s = - sin(DEG2RAD * dj_angle);
+
+	// calculate the destination of the other corners of the bounding rectangle,
+	// rotate around the origin (0,0)
+	x1 = (+ height * s);
+	y1 = (  height * c);
+	x2 = (+ height * s + width * c);
+	y2 = (  height * c - width * s);
+	x3 = (               width * c);
+	y3 = (             - width * s);
+
+	// enclosing rectangle
+	minx = GPMIN(0, GPMIN(x1, GPMIN(x2, x3)));
+	miny = GPMIN(0, GPMIN(y1, GPMIN(y2, y3)));
+	maxx = GPMAX(0, GPMAX(x1, GPMAX(x2, x3)));
+	maxy = GPMAX(0, GPMAX(y1, GPMAX(y2, y3)));
+
+	// adjust the final position according to the text alignment
+	switch (dj_justify) {
+	default:
+	case LEFT:
+	    // center of rotation is (0, height/2)
+	    dx = (int)( height/2. * s);
+	    dy = (int)( height/2. * c);
+	    break;
+	case CENTRE:
+	    // center of rotation is (width/2, height/2)
+	    dx = (int)( height/2. * s + width/2. * c);
+	    dy = (int)( height/2. * c - width/2. * s);
+	    break;
+	case RIGHT:
+	    // center of rotation is (width, height/2)
+	    dx = (int)( height/2. * s + width * c);
+	    dy = (int)( height/2. * c - width * s);
+	    break;
+	}
+
+	// we explicitely compute the color of every destination pixel
+	// loop over x' (xp) and y' (yp)
+	for (int yp = miny; yp < maxy; yp++) {
+	    for (int xp = minx; xp < maxx; xp++) {
+		// source point: reverse transform
+		int xs = (int) ( xp * c - yp * s);
+		int ys = (int) ( xp * s + yp * c);
+		if ((xs >= 0) && (xs < width) && (ys >= 0) && (ys < height)) {
+		    if (GrPixelC(mem, xs, height - 1 - ys)) {
+			// destination point
+			int xd = xp + ((int) x) - dx;
+			int yd = dj_ylast - (yp + (int) y - dy);
+			// there's no GrSetPixel(), so we draw a short horizontal line
+			GrHLine(xd, xd, yd, DJSVGA_TextOption.GRX_TXO_FGCOLOR | GrWRITE);
+		    }
+		}
+	    }
+	}
+
+	// we're done with the memory context
+	GrDestroyContext(mem);
+    }
 }
 
 
