@@ -10,7 +10,7 @@ matrix.$(O) misc.$(O) mouse.$(O) multiplot.$(O) parse.$(O) plot.$(O) \
 plot2d.$(O) plot3d.$(O) pm3d.$(O) readline.$(O) save.$(O) scanner.$(O) \
 set.$(O) show.$(O) specfun.$(O) standard.$(O) stats.$(O) stdfn.$(O) \
 tables.$(O) tabulate.$(O) term.$(O) time.$(O) unset.$(O) util.$(O) \
-util3d.$(O) variable.$(O) voxelgrid.$(O) vplot.$(O)
+util3d.$(O) variable.$(O) voxelgrid.$(O) vplot.$(O) xdg.$(O)
 
 # List of terminal driver sources
 CORETERM = $(T)ai.trm $(T)aquaterm.trm $(T)be.trm $(T)caca.trm \
