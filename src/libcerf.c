@@ -117,6 +117,11 @@ f_erfi(union argument *arg)
 
 /* Full width at half maximum of the Voigt profile
  * VP_fwhm( sigma, gamma )
+ * EXPERIMENTAL
+ *	- the libcerf function is not reliable (not available prior to version 1.11
+ *	and handles out-of-range input by printing to stderr and returning a bad
+ *      value or exiting
+ *	- the fall-back approximation is accurate onlyt to 0.02%
  */
 void
 f_VP_fwhm(union argument *arg)
@@ -127,7 +132,16 @@ f_VP_fwhm(union argument *arg)
 
     gamma = real(pop(&a));
     sigma = real(pop(&a));
+#ifdef HAVE_VPHWHM
     fwhm = 2. * voigt_hwhm(sigma, gamma);
+#else
+    /* This approximation claims accuracy of only 0.02% */
+    {
+    double fG = 2. * sigma * sqrt(2.*log(2.));
+    double fL = 2. * gamma;
+    fwhm = 0.5346 * fL + sqrt( 0.2166*fL*fL + fG*fG);
+    }
+#endif
     push(Gcomplex(&a, fwhm, 0.0));
 }
 
