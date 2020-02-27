@@ -1,7 +1,7 @@
 %% Don't forget to change the paper format in the next line
 %
-% translated to Japanese by Shigeharu TAKENO
-% Original: Id: faq.tex updated at 2019-05-03
+% translated to Japanese by Shigeharu TAKENO (2020-01-18)
+% Original: Id: faq.tex updated at 2019-12-29
 %
 %%% \documentclass[a4paper,11pt]{article}
 \documentclass[a4paper,11pt]{jarticle}
@@ -114,8 +114,8 @@
 この文書は、\gnuplot バージョン 5 についての記述です。
 %% end Japanese
         \\
-%%% FAQ version: April 2019
-FAQ バージョン: 2019 4 月
+%%% FAQ version: December 2019
+FAQ バージョン: 2019 12 月
 
 
 \tableofcontents
@@ -404,10 +404,10 @@ gnuplot Web ページ \http{www.gnuplot.info} を見てください。
 
 %%% The current development version will generally include features that are
 %%% not yet part of the most recent stable release of gnuplot.
-%%% As of May 2019 the 5.3 development version notably supports
+%%% As of December 2019 the 5.3 development version notably supports
 一般的に、現在の開発版は、最終安定リリース版の gnuplot には
 まだ入っていない機能も入っています。
-2019 年 4 月現在、開発版のバージョン 5.3 は、以下を特にサポートしています:
+2019 年 12 月現在、開発版のバージョン 5.3 は、以下を特にサポートしています:
 %% end Japanese
 \begin{itemize}{}{}
 \setlength\itemsep{-4pt}
@@ -419,6 +419,12 @@ gnuplot Web ページ \http{www.gnuplot.info} を見てください。
 %% end Japanese
 %%% \item 3D plot styles {\em isosurface, circles, boxes}
 \item 3 次元描画スタイル {\em isosurface, circles, boxes}
+%% end Japanese
+%% \item smooth clipping of 3D surfaces against current z range
+\item 3 次元曲面の現在の zrange に対する滑らかなクリッピング
+%% end Japanese
+%% \item polygon objects and plot styles
+\item 多角形 (polygon) の object と描画スタイル
 %% end Japanese
 %%% \item {\em set walls} command to show xy xz and yz planes in 3D plots
 \item コマンド {\em set walls} で 3 次元グラフに xy, xz, yz 平面を表示
@@ -1368,20 +1374,25 @@ splot 'DATA' with lines, 'DATA' with labels boxed
 
 %%% Yes. 2D plots can have separate x axes at the bottom (x1) and top (x2),
 %%% and separate y axes at the left (y1) and right (y2).  Version 5 offers a
-%%% plot mode \textit{with parallelaxes} that allows additional y axes to be
-%%% defined.
+%%% plot mode \textit{with parallelaxes} that allows any number of additional
+%%% y axes to be defined.
 はい。2 次元グラフでは別々に x 軸を下 (x1) と上 (x2) に
 持つことができますし、別々に y 軸を左 (y1) と右 (y2) に持つことができます。
 バージョン 5 では、\textit{with parallelaxes} という描画モードで
-y 軸をさらに追加することもできます。
+y 軸をさらにいくつでも追加することもできます。
 
 %%% \subsection{How to draw a solid made of triangular facets?}
 \subsection{小 3 角面で構成される物体を描画するには}
 
-%%% It is possible to describe colored facets of a 3D object in a file
-%%% organized like this:
-3 次元物体の面に色をつけたものをファイルに記述するには、
-以下のような形式にすれば可能です。
+%%% The development version supports a special plot style \textit{with polygons}
+%%% that can handle polygonal faces (triangles, rectangles, octagons, ...).
+%%% In earlier versions the best you can do is to describe colored facets of a
+%%% 3D object in a file organized like this:
+現在の開発版は、特別な描画スタイル \textit{with polygons} をサポートし
+ていて、これは多角形形状 (三角形、四辺形、八角形、...) を処理できますが、
+以前のバージョンで、それを行う最も良い方法は、
+以下のような形式で 3 次元物体の面に色をつけたものをファイルに記述する
+ことです:
 %% end Japanese
 %%% \small
 %%% \begin{verbatim}
@@ -2113,22 +2124,37 @@ gnuplot> set zero 1e-20
 %%% For more information, type {\em help set zero}.
 より詳しい情報については {\em help set zero} を参照してください。
 
-%%% \subsection{When I {\em replot} a multiplot I get only a fragment}
-\subsection{multiplot のグラフを {\em replot} すると一かけらしか出ません}
+%%% \subsection{When I {\em replot} or {\em resize} a multiplot I get 
+%%% only a fragment}
+\subsection{multiplot のグラフを {\em replot} や {\em resize} すると
+一かけらしか出ません}
 
 %%% \Gnuplot only retains enough information to regenerate the most recent
 %%% {\em plot} or {\em splot} command.
-%%% You need to save the complete sequence of commands that generated the
-%%% multiplot into a script file. Then you can {\em load} that script into
-%%% \gnuplot as many times as you need for replotting the drawing to different
-%%% terminals or output files.
+%%% In order to reproduce the entire multiplot you need to save the complete
+%%% sequence of commands that generated it into a script file.
+%%% Then you can {\em load} that script into \gnuplot as many times as you need
+%%% for replotting the drawing to different terminals or output files.
 \gnuplot は、直近の {\em plot} や {\em splot} コマンドを
-再生成するために十分な情報を保持するだけなので、multiplot に対しては、
-それを生成する完全なコマンド列を
+再生成するために十分な情報を保持するだけなので、
+multiplot 全体を完全に再現するには、それを生成する完全なコマンド列を
 スクリプトファイルに保存する必要があります。
 そして、{\em load} することでその内容を \gnuplot に取り込めば、
 あなたが必要とする回数だけ異なる出力形式、異なる出力ファイルに対して
 再描画をすることができます。
+
+%%% The same problem arises when you resize a multiplot displayed in an 
+%%% interactive
+%%% terminal window, because the resize event normally triggers a replot.
+%%% The {\em qt} and {\em wxt} terminals provide a toggle in the toolbox widget
+%%% that suppresses this replot on resize.  The {\em x11} terminal provides a 
+%%% terminal option {\em set term x11 noreplotonresize}.
+同じ問題が、対話型出力形式で multiplot を resize した場合にも起こります。
+それは、resize イベントは通常 replot を実行しているからです。
+{\em qt} と {\em wxt} 出力形式は、ツールボックスウィジェット内に、
+resize 時に replot することを抑制するトグルスイッチを提供しています。
+{\em x11} 出力形式は、option {\em set term x11 noreplotonresize} を
+提供しています。
 
 %%% \subsection{My formulas (like 1/3) are giving me nonsense results! 
 %%% What's going on?}

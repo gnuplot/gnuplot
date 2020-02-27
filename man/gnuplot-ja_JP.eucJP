@@ -1,8 +1,8 @@
 .\" dummy line
-.\" 日本語訳: Shigeharu TAKENO <shige@iee.niit.ac.jp>
+.\" 日本語訳: Shigeharu TAKENO <shige@iee.niit.ac.jp> (2020-02-25)
 .\"
-.\" .TH GNUPLOT 1 " 11 June 2014"
-.TH GNUPLOT 1 " 2014 年 6 月 11 日"
+.\" .TH GNUPLOT 1 "February 2020"
+.TH GNUPLOT 1 " 2020 年 2 月 1 日"
 .UC 4
 .\" .SH NAME
 .SH 名前
@@ -84,14 +84,19 @@ gnuplot プログラムが終了した後も描画ウィンドウを残します。
 gnuplot の "call" の仕組みでスクリプト scriptname を読み込み、
 コマンドラインの残りはそれへの引数として渡します。
 .PP
-.\" \fB\-d, \-\-default\fP settings.  Do not read from gnuplotrc or ~/.gnuplot on entry.
+.\" \fB\-d, \-\-default\fP settings.  Do not read from gnuplotrc, ~/.gnuplot, and $XDG_DATA_HOME/gnuplot/gnuplotrc on entry.
 \fB\-d, \-\-default\fP は、
 デフォルトの設定で起動します。
-これは、gnuplotrc や ~/.gnuplot を起動時には読み込みません。
+これは、gnuplotrc や ~/.gnuplot, $XDG_DATA_HOME/gnuplot/gnuplotrc を
+起動時には読み込みません。
 .PP
 .\" \fB\-e "command list"\fP executes the requested commands before loading the next input file.
 \fB\-e "command list"\fP は、
 次の入力ファイルを読み込む前に指定したコマンドを実行します。
+.PP
+.\" \fB\-s, \-\-slow\fP wait for slow font initialization rather than continuing with an error.
+\fB\-s, \-\-slow\fP は、
+遅いフォントの初期化を待ち、エラーを出したまま続行することを避けます。
 .PP
 .\" \fB\-h, \-\-help\fP print summary of usage
 \fB\-h, \-\-help\fP は、使用法の要約を表示します。
@@ -100,8 +105,6 @@ gnuplot の "call" の仕組みでスクリプト scriptname を読み込み、
 \fB\-V\fP は、現在のバージョンを表示します。
 .\" .SH X11 OPTIONS
 .SH X11 オプション
-.\" .B Gnuplot
-.\" shige -> 不要 ?
 .\" For terminal type x11, \fIgnuplot\fP
 .\" accepts the standard X Toolkit options and resources such as geometry, font,
 .\" and background. See the X(1) man page for a description of common options.
@@ -121,10 +124,11 @@ gnuplot は多くのシェル環境変数を認識します。必須のものはありません。
 .TP
 .B GNUTERM
 .\" The name of the terminal type to be used by default.  This can be
-.\" overridden by the gnuplotrc or .gnuplot start-up files and,
-.\" of course, by later explicit "set terminal" commands.
+.\" overridden by the gnuplotrc, .gnuplot, or $XDG_DATA_HOME/gnuplot/gnuplotrc
+.\" start-up files and, of course, by later explicit "set terminal" commands.
 デフォルトで使用される出力形式 (terminal) の名前。
-これは、gnuplotrc や .gnuplot 等の初期化ファイルや、
+これは、gnuplotrc や .gnuplot, $XDG_DATA_HOME/gnuplot/gnuplotrc 等の
+初期化ファイルや、
 そしてもちろんその後にコマンド "set terminal" で
 明示的に指定したものの方が優先されます。
 .TP
@@ -223,6 +227,16 @@ gnuplot は個人用の初期化ファイルを
 ここには、正しい gnuplot コマンドなら何を書いてもいいのですが、
 一般的には、よく使う出力形式の指定や、線種の設定、
 よく使う関数や変数の定義を設定する程度に抑えておきます。
+.TP
+.I $XDG_CONFIG_HOME/gnuplot/gnuplotrc
+.\" After loading the other initialization files, Gnuplot will check 
+.\" if there is a file named gnuplotrc in the gnuplot subdirectory 
+.\" in $XDG_CONFIG_HOME (default ~/.config).  The same restrictions 
+.\" as for .gnuplot apply.
+他の初期化ファイルを読み込んだ後で、gnuplot は $XDG_CONFIG_HOME 
+(デフォルトは ~/.config) のサブディレクトリ gnuplot 内に gnuplotrc
+という名前のファイルがあるかどうかをチェックします。
+.gnuplot と同じ制限を適用します。
 .TP 
 .I fit.log
 .\" The default name of the logfile output by the "fit" command.
