@@ -924,10 +924,10 @@ START_HELP(texdraw)
 " caps and mitered joins and is the default.",
 "",
 " `linewidth` and `pointscale` scale the width of lines and the size of point",
-" symbols, respectively. `pointscale`only applies to `gppoints`.",
+" symbols, respectively. `pointscale` only applies to `gppoints`.",
 "",
 " `psarrows` draws `arrow`s using TeXdraw commands which are shorter but do not",
-" offer all options. `gparrows` selects drawing drawing arrows using gnuplot's",
+" offer all options. `gparrows` selects drawing arrows using gnuplot's",
 " own routine for full functionality instead.  Similarly, `texpoints`, and ",
 " `gppoints` select LaTeX symbols or gnuplot's point drawing routines."
 END_HELP(texdraw)

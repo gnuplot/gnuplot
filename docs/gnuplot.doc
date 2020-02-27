@@ -643,9 +643,9 @@ C
  Gnuplot accepts the following options on the command line
       -V, --version
       -h, --help
-      -p  --persist
-      -d  --default-settings
-      -s  --slow
+      -p, --persist
+      -d, --default-settings
+      -s, --slow
       -e  "command1; command2; ..."
       -c  scriptfile ARG1 ARG2 ...
 
@@ -1310,7 +1310,7 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>faddeeva(z)</td>    <td>complex</td>    <td>rescaled complex error function <i>w</i>(<i>z</i>) = exp(-<i>z</i>²) × erfc(-i<i>z</i>)</td></tr>
 ^<tr>    <td>erfi(x)</td>    <td>real</td>    <td>imaginary error function erfi(<i>x</i>) = -i × erf(i<i>x</i>)</td></tr>
 ^<tr>    <td>VP(x,sigma,gamma)</td>    <td>real</td>    <td>Voigt profile</td></tr>
-^<tr>    <td>VP_fwhm(sigma,gamma)</td>    <td>real</td>    <td>Voigt profile full with at half max</td></tr>
+^<tr>    <td>VP_fwhm(sigma,gamma)</td>    <td>real</td>    <td>Voigt profile full width at half max</td></tr>
 
 ^</tbody>
 ^</table>
@@ -1359,7 +1359,7 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>columnhead(x)</td>    <td>int</td>    <td> string containing first entry of column <i>x</i> in datafile.</td></tr>
 ^<tr>    <td>exists("X")</td>    <td>string</td>    <td> returns 1 if a variable named X is defined, 0 otherwise.</td></tr>
 ^<tr>    <td>hsv2rgb(h,s,v)</td>    <td>h,s,v in [0:1]</td>    <td> converts HSV color to 24bit RGB color.</td></tr>
-^<tr>    <td>palette(z)</td>    <td>double</td>    <td> RGB palette color mapped to z</td></tr>
+^<tr>    <td>palette(z)</td>    <td>real</td>    <td> RGB palette color mapped to z</td></tr>
 ^<tr>    <td>stringcolumn(x)</td>    <td>int</td>    <td> content column <i>x</i> as a string.</td></tr>
 ^<tr>    <td>timecolumn(N,format)</td>    <td>int, string</td>    <td> time data in column <i>N</i> during data input</td></tr>
 ^<tr>    <td>tm_hour(x)</td>    <td>int</td>    <td>the hour</td></tr>
@@ -1987,8 +1987,8 @@ C marker below is used to signal this to doc2html:
 4 palette
 ?expressions functions palette
 ?palette
-#palette(z) & double & RGB palette color mapped to z. \\
-%palette(z)@double@RGB palette color mapped to z.
+#palette(z) & real & RGB palette color mapped to z. \\
+%palette(z)@real@RGB palette color mapped to z.
  `palette(z)` returns the RGB representation of the palette color mapped to z
   given the current extremes of cbrange.
 4 stringcolumn
@@ -4838,7 +4838,7 @@ Ffigure_points
  polygons.  This restriction may be removed in a later gnuplot version.
 
  pm3d sort order and lighting are applied to the faces. It is probably always
- desirable to use `set pm3d depthsort`.
+ desirable to use `set pm3d depthorder`.
 
 Ffigure_polygons
       set xyplane at 0
@@ -6587,7 +6587,7 @@ Ffigure_zerror
  Sometimes the scanning directions in a binary datafile are not consistent with
  that assumed by gnuplot.  These keywords can flip the scanning direction along
  dimensions x, y, z.
-5 origin=
+5 origin
 ?binary keywords origin
 ?binary origin
  When gnuplot generates coordinates based upon transposition and flip, it
@@ -6697,8 +6697,8 @@ Ffigure_zerror
  See `using`.
 
  The individual records on a single line of data must be separated by white
- space (one or more blanks or tabs) a special field separator character is
- is specified by the `set datafile` command.  A single field may itself
+ space (one or more blanks or tabs) or a special field separator character
+ which is specified by the `set datafile` command.  A single field may itself
  contain white space characters if the entire field is enclosed in a pair of
  double quotes, or if a field separator other than white space is in effect.
  Whitespace inside a pair of double quotes is ignored when counting columns,
@@ -10639,8 +10639,8 @@ Ffigure_missing
       set isosurface {no}insidecolor <n>
  Surfaces plotted by the command `splot $voxelgrid with isosurface` are by
  default constructed from a mixture of quadrangles and triangles.  The use
- of quadrangles creates a less complicated visual impression.  This is the
- default.  This command proveds an option to tessellate with only triangles.
+ of quadrangles creates a less complicated visual impression.
+ This command provides an option to tessellate with only triangles.
 
  By default the inside of an isosurface is drawn in a separate color.
  The method of choosing that color is the same as for hidden3d surfaces,
@@ -12203,7 +12203,7 @@ Ffigure_multiple_keys
  badly with autoscaling and clipping.
 
  To prevent the auto-scaling from further adjusting your axis ranges, it is
- useful to also specify "set auto fix" or "set xrange noextend".
+ useful to also specify `set auto fix` or `set xrange noextend`.
 
  Example:
        set auto fix
@@ -12695,12 +12695,12 @@ Ffigure_multiple_keys
 
  This example creates a palette running from dark red to white, saves it to
  a colormap array named 'Reds', and makes all entries in the colormap
- partially transparent.  This names colormap is then used later to color
+ partially transparent.  This named colormap is then used later to color
  a pm3d surface.  Note that the alpha channel value in a named colormap
  follows the convention for ARGB line properties; i.e 0 is opaque 0xff is
  fully transparent.
 
-      set palette defined (0 "dark-red", 1 "white"
+      set palette defined (0 "dark-red", 1 "white")
       set palette save Reds
       do for [i=1:|Reds|] { Reds[i] = Reds[i] | 0x3F000000 }
       splot func(x,y) with pm3d fillcolor palette Reds
@@ -15844,7 +15844,7 @@ Ffigure_walls
  [deprecated] `show palette fit2rgbformulae` finds an approximation to the
  current palette in terms of the formulae coded into `set palette rgbformulae`.
  If that is indeed how the current palette was defined, the match is exact.
- Otherwise the approximation can by anything from good to horrible.
+ Otherwise the approximation can be anything from good to horrible.
  This is probably not what you want.
 
 4 show palette palette
@@ -16286,11 +16286,11 @@ Ffigure_walls
 
  In addition to printed output, the program stores the individual statistics
  into three sets of variables.
- The first set of variables reports how the data is laid out in the file:
+ The first set of variables reports how the data is laid out in the file.
  The array of column headers is generated only if option
- `set datafile columnheaders` is in effect.
+ `set datafile columnheaders` is in effect:
 @start table
-      STATS_records           # total number N of in-range data records (N)
+      STATS_records           # total number N of in-range data records
       STATS_outofrange        # number of records filtered out by range limits
       STATS_invalid           # number of invalid/incomplete/missing records
       STATS_blank             # number of blank lines in the file
