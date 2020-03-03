@@ -100,9 +100,6 @@ if test "${with_libcerf}" = yes ; then
       [AC_DEFINE([HAVE_LIBCERF], 1, [define if you have libcerf])
       have_libcerf=yes]
   )
-  AC_SEARCH_LIBS([voigt_hwhm], [cerf],
-      [AC_DEFINE([HAVE_VPHWHM], 1, [define for libcerf version > 1.10]),]
-  )
 fi
 
 dnl Various programs

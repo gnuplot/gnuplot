@@ -1,7 +1,7 @@
 /*
  * Complex error function (cerf) and related special functions from libcerf.
  * libcerf itself uses the C99 _Complex mechanism for describing complex
- * numbers.  This set of wrapper routines converts back and forth from 
+ * numbers.  This set of wrapper routines converts back and forth from
  * gnuplot's own representation of complex numbers.
  * Ethan A Merritt - July 2013
  */
@@ -34,7 +34,7 @@ f_cerf(union argument *arg)
 
 /* The libcerf cdawson function returns Dawson's integral
  *      cdawson(z) = exp(-z^2) int[0,z] exp(t^2) dt
- *                 = sqrt(pi)/2 * exp(-z^2) * erfi(z)     
+ *                 = sqrt(pi)/2 * exp(-z^2) * erfi(z)
  * for complex z.
  */
 void
@@ -117,32 +117,68 @@ f_erfi(union argument *arg)
 
 /* Full width at half maximum of the Voigt profile
  * VP_fwhm( sigma, gamma )
- * EXPERIMENTAL
- *	- the libcerf function is not reliable (not available prior to version 1.11
- *	and handles out-of-range input by printing to stderr and returning a bad
- *      value or exiting
- *	- the fall-back approximation is accurate onlyt to 0.02%
  */
 void
 f_VP_fwhm(union argument *arg)
 {
-    struct value a;
+    struct value par;
     double sigma, gamma;
-    double fwhm;
+    double HM, fwhm;
+    double fG, fL;
+    double a, b, c;		/* 3 points used by regula falsi */
+    double del_a, del_b, del_c;
+    int k;
+    int side = 0;
 
-    gamma = real(pop(&a));
-    sigma = real(pop(&a));
-#ifdef HAVE_VPHWHM
-    fwhm = 2. * voigt_hwhm(sigma, gamma);
-#else
-    /* This approximation claims accuracy of only 0.02% */
-    {
-    double fG = 2. * sigma * sqrt(2.*log(2.));
-    double fL = 2. * gamma;
+    gamma = fabs(real(pop(&par)));
+    sigma = fabs(real(pop(&par)));
+    HM = voigt(0.0, sigma, gamma) / 2.0;
+
+    /* This approximation claims accuracy of 0.02%
+     * Olivero & Longbothum [1977]
+     * Journal of Quantitative Spectroscopy and Radiative Transfer. 17:233
+     */
+    fG = 2. * sigma * sqrt(2.*log(2.));
+    fL = 2. * gamma;
     fwhm = 0.5346 * fL + sqrt( 0.2166*fL*fL + fG*fG);
+
+    /* Choose initial points a,b that bracket the expected root */
+    a = fwhm/2. * 0.995;
+    b = fwhm/2. * 1.005;
+    del_a = voigt(a, sigma, gamma) - HM;
+    del_b = voigt(b, sigma, gamma) - HM;
+
+    /* Iteratation using regula falsi (Illinois variant).
+     * Empirically, this takes <5 iterations to converge to FLT_EPSILON
+     * and <10 iterations to converge to DBL_EPSILON.
+     */
+    for (k=0; k<100; k++) {
+	c = (b*del_a - a*del_b) / (del_a - del_b);
+	if (fabs(b-a) < 2. * DBL_EPSILON * fabs(b+a))
+	    break;
+	del_c = voigt(c, sigma, gamma) - HM;
+
+	if (del_b * del_c > 0) {
+	    b = c; del_b = del_c;
+	    if (side < 0)
+		del_a /= 2.;
+	    side = -1;
+	} else if (del_a * del_c > 0) {
+	    a = c; del_a = del_c;
+	    if (side > 0)
+		del_b /= 2.;
+	    side = 1;
+	} else {
+	    break;
+	}
     }
-#endif
-    push(Gcomplex(&a, fwhm, 0.0));
+    fwhm = 2.*c;
+
+    /* I have never seen convergence worse than k = 15 */
+    if (k > 50)
+	fwhm = not_a_number();
+
+    push(Gcomplex(&par, fwhm, 0.0));
 }
 
 #endif
