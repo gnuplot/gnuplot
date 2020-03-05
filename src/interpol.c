@@ -1030,7 +1030,10 @@ gen_interp(struct curve_points *plot)
 	    /* for FILLEDCURVES_BETWEEN we do it again for x and yhigh */
 	    sc = cp_tridiag(&plot->points[first_point], num_points, 0, 1);
 	    if (plot->plot_style == FILLEDCURVES
-	    &&  plot->filledcurves_options.closeto == FILLEDCURVES_BETWEEN)
+	    &&   ( plot->filledcurves_options.closeto == FILLEDCURVES_BETWEEN
+		|| plot->filledcurves_options.closeto == FILLEDCURVES_ABOVE
+		|| plot->filledcurves_options.closeto == FILLEDCURVES_BELOW)
+	    )
 		sc2 = cp_tridiag(&plot->points[first_point], num_points, 0, 4);
 	    do_cubic(plot, sc, sc2, first_point, num_points,
 		     new_points + i * (samples_1 + 1));
@@ -1041,7 +1044,10 @@ gen_interp(struct curve_points *plot)
 	    /* 0 = control axis x,  1 = spline on y,  2 = weights held in z */
 	    sc = cp_approx_spline(&plot->points[first_point], num_points, 0, 1, 2);
 	    if (plot->plot_style == FILLEDCURVES
-	    &&  plot->filledcurves_options.closeto == FILLEDCURVES_BETWEEN)
+	    &&   ( plot->filledcurves_options.closeto == FILLEDCURVES_BETWEEN
+		|| plot->filledcurves_options.closeto == FILLEDCURVES_ABOVE
+		|| plot->filledcurves_options.closeto == FILLEDCURVES_BELOW)
+	    )
 		sc2 = cp_approx_spline(&plot->points[first_point], num_points, 0, 4, 2);
 	    do_cubic(plot, sc, sc2, first_point, num_points,
 		     new_points + i * (samples_1 + 1));
