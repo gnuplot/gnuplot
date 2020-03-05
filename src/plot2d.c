@@ -1010,7 +1010,9 @@ get_data(struct curve_points *current_plot)
 		y2 = v[2];
 		if (current_plot->filledcurves_options.closeto == FILLEDCURVES_DEFAULT)
 		    current_plot->filledcurves_options.closeto = FILLEDCURVES_BETWEEN;
-		if (current_plot->filledcurves_options.closeto == FILLEDCURVES_BETWEEN) {
+		if (current_plot->filledcurves_options.closeto == FILLEDCURVES_BETWEEN
+		||  current_plot->filledcurves_options.closeto == FILLEDCURVES_ABOVE
+		||  current_plot->filledcurves_options.closeto == FILLEDCURVES_BELOW) {
 		    switch (current_plot->plot_smooth) {
 			case SMOOTH_NONE:
 			case SMOOTH_CSPLINES:
