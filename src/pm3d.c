@@ -59,7 +59,6 @@ typedef struct {
 #define QUAD_TYPE_4SIDES   4
 #define QUAD_TYPE_LARGEPOLYGON 5
 
-
 #define PM3D_USE_COLORSPEC_INSTEAD_OF_GRAY -12345
 #define PM3D_USE_RGB_COLOR_INSTEAD_OF_GRAY -12346
 #define PM3D_USE_BACKGROUND_INSTEAD_OF_GRAY -12347
@@ -1581,8 +1580,21 @@ filled_polygon(gpdPoint *corners, int fillstyle, int nv)
 {
     int i;
     double x, y;
-    gpiPoint icorners[PM3D_MAX_VERTICES];
-    gpdPoint clipcorners[2*PM3D_MAX_VERTICES];
+
+    /* For normal pm3d surfaces and tesselation the constituent polygons
+     * have a small number of vertices, usually 4.
+     * However generalized polygons like cartographic areas could have a
+     * vastly larger number of vertices, so we allow for dynamic reallocation.
+     * TODO: cleanup.
+     */
+    static int max_vertices = 0;
+    static gpiPoint *icorners = NULL;
+    static gpdPoint *clipcorners = NULL;
+    if (nv > max_vertices) {
+	max_vertices = nv;
+	icorners = gp_realloc( icorners, max_vertices * sizeof(gpiPoint), "filled_polygon");
+	clipcorners = gp_realloc( clipcorners, (2*max_vertices) * sizeof(gpdPoint), "filled_polygon");
+    }
 
     if ((pm3d.clip == PM3D_CLIP_Z)
     &&  (pm3d_plot_at != PM3D_AT_BASE && pm3d_plot_at != PM3D_AT_TOP)) {
@@ -1593,11 +1605,6 @@ filled_polygon(gpdPoint *corners, int fillstyle, int nv)
 	    nv = new;
 	    corners = clipcorners;
 	}
-    }
-
-    if (nv > PM3D_MAX_VERTICES) {
-	nv = PM3D_MAX_VERTICES;
-	int_warn(NO_CARET, "pm3d polygons are limited to %d vertices", PM3D_MAX_VERTICES);
     }
 
     for (i = 0; i < nv; i++) {
