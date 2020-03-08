@@ -1,17 +1,24 @@
 #ifdef TERM_HELP
 START_HELP(linux)
-"1 linux console (vgagl)",
+"1 linux console",
 "?set terminal linux",
 "?set terminal vgagl",
-" The `linux` and `vgagl` terminal types were originally needed in order to",
-" run gnuplot from the linux console, i.e. in the absense of X11 or any other",
-" windowing environment.  They required a custom kernel module and matching",
-" support from svgalib, both obsolete.  These terminals have been deprecated.",
+"?linux console",
+"?console",
+"=linux console",
+"=console",
+"=sixel",
+"=vgagl",
+"=yaft",
+" Older gnuplot versions required special terminals `linux` or `vgagl`",
+" in order to display graphics on the linux console, i.e. in the absence of",
+" X11 or other windowing environment.  These terminals have been deprecated.",
 "",
-" The recommended method of running gnuplot from the linux console is now to",
-" run a console terminal such as yaft (https://github.com/uobikiemukot/yaft)",
+" The recommended way to run gnuplot from the linux console is now to use a",
+" console terminal emulator such as yaft (https://github.com/uobikiemukot/yaft)",
 " that supports sixel graphics.  With yaft as your console terminal you can",
-" run gnuplot and select one of the terminals with sixel output.",
-" See `sixelgd`."
+" run gnuplot and select a terminal with sixel output. See `sixelgd`.",
+" As a fall-back option you could use `set term dumb`, but sixel graphics",
+" are much nicer."
 END_HELP(linux)
 #endif

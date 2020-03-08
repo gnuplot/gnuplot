@@ -166,6 +166,10 @@
 /* Terminals not relevant for MSDOS, MS-Windows */
 #if !(defined(MSDOS) || defined(_WIN32))
 
+/* This is not really a terminal, it generates a help section for */
+/* using the linux console. */
+# include "linux-vgagl.trm"
+
 /* gpic for groff */
 #ifdef HAVE_GPIC
 # include "gpic.trm"
