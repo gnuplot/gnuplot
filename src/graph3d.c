@@ -3927,8 +3927,10 @@ plot3d_polygons(struct surface_points *plot)
     int nv;
     struct iso_curve *icrvs;
     struct coordinate *points;
-    gpdPoint quad[PM3D_MAX_VERTICES+1];
-    int style = style_from_fill(&plot->fill_properties);
+    int style;
+
+    static gpdPoint *quad = NULL;
+    static int quadmax = 0;
 
     /* These don't need to be drawn at all */
     if (plot->lp_properties.l_type == LT_NODRAW)
@@ -3939,16 +3941,26 @@ plot3d_polygons(struct surface_points *plot)
      */
     if (pm3d_shade.strength > 0)
 	pm3d_init_lighting_model();
+    style = style_from_fill(&plot->fill_properties);
+
+    /* Most polygons are small */
+    quadmax = 8;
+    quad = gp_realloc(quad, quadmax * sizeof(gpdPoint), NULL);
 
     for (icrvs = plot->iso_crvs; icrvs; icrvs = icrvs->next) {
 
+	/* Allow for very large polygons (e.g. cartographic outlines) */
+	int npoints = icrvs->p_count;
+	if (npoints > quadmax) {
+	    quadmax = npoints;
+	    quad = gp_realloc(quad, quadmax * sizeof(gpdPoint), NULL);
+	}
+
 	/* Copy the vertex coordinates into a pm3d quadrangle */
-	for (nv = 0, points = icrvs->points; nv < icrvs->p_count; nv++) {
+	for (nv = 0, points = icrvs->points; nv < npoints; nv++) {
 	    quad[nv].x = points[nv].x;
 	    quad[nv].y = points[nv].y;
 	    quad[nv].z = points[nv].z;
-	    if (icrvs->p_count >= PM3D_MAX_VERTICES)
-		break;
 	}
 	/* Treat triangle as a degenerate quadrangle */
 	if (nv == 3) {
@@ -3970,6 +3982,11 @@ plot3d_polygons(struct surface_points *plot)
     /* To get proper sorting, use "set pm3d depthorder".      */
     if (pm3d.direction != PM3D_DEPTH)
 	pm3d_depth_queue_flush();
+
+    /* Clean up */
+    free(quad);
+    quadmax = 0;
+    quad = NULL;
 }
 
 
