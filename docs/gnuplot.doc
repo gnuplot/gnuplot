@@ -4823,6 +4823,10 @@ Ffigure_points
 ?style polygons
 ?with polygons
 ?polygons
+      plot DATA {using 1:2} with polygons
+
+ `plot with polygons` is currently treated as `plot with filledcurves closed`
+
       splot DATA {using x:y:z} with polygons
             {fillstyle <fillstyle spec>}
             {fillcolor <colorspec>}
