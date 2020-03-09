@@ -11,7 +11,7 @@ START_HELP(linux)
 "=vgagl",
 "=yaft",
 " Older gnuplot versions required special terminals `linux` or `vgagl`",
-" in order to produce graphics from the linux console, i.e. in the absence of",
+" in order to display graphics on the linux console, i.e. in the absence of",
 " X11 or other windowing environment.  These terminals have been deprecated.",
 "",
 " The recommended way to run gnuplot from the linux console is now to use a",
