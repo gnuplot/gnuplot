@@ -283,6 +283,8 @@ dnl check for C99 complex types
 dnl and minimal set of complex math functions
 AC_CHECK_HEADERS(complex.h)
 AC_CHECK_FUNCS(csqrt cexp cabs clog)
+dnl check for C99 floating point exception handling
+AC_CHECK_HEADERS(fenv.h)
 
 dnl check, if we have sigsetjmp and siglongjmp.
 dnl a trivial AC_CHECK_FUNCS(sigsetjmp) won't do
