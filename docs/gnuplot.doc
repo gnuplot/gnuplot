@@ -1293,7 +1293,7 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>abs(x)</td>    <td>complex</td>    <td>length of <i>x</i>, &radic;( Re(<i>x</i>)<sup>2</sup> + Im(<i>x</i>)<sup>2</sup> )</td></tr>
 ^<tr>    <td>acos(x)</td>    <td>any</td>    <td>cos<sup>-1</sup> <i>x</i> (inverse cosine)</td></tr>
 ^<tr>    <td>acosh(x)</td>    <td>any</td>    <td>cosh<sup>-1</sup> <i>x</i> (inverse hyperbolic cosine) in radians</td></tr>
-^<tr>    <td>airy(x)</td>    <td>any</td>    <td>Airy function Ai(<i>x</i>)</td></tr>
+^<tr>    <td>airy(x)</td>    <td>real</td>    <td>Airy function Ai(<i>x</i>) for real x</td></tr>
 ^<tr>    <td>arg(x)</td>    <td>complex</td>    <td>the phase of <i>x</i></td></tr>
 ^<tr>    <td>asin(x)</td>    <td>any</td>    <td>sin<sup>-1</sup> <i>x</i> (inverse sin)</td></tr>
 ^<tr>    <td>asinh(x)</td>    <td>any</td>    <td>sinh<sup>-1</sup> <i>x</i> (inverse hyperbolic sin) in radians</td></tr>
@@ -1303,11 +1303,11 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>EllipticK(k)</td>    <td>real k in (-1:1)</td>    <td><i>K(k)</i> complete elliptic integral of the first kind</td></tr>
 ^<tr>    <td>EllipticE(k)</td>    <td>real k in [-1:1]</td>    <td><i>E(k)</i> complete elliptic integral of the second kind</td></tr>
 ^<tr>    <td>EllipticPi(n,k)</td>    <td> real n&lt;1, real k in (-1:1)</td>    <td> &Pi;(<i>n,k</i>) complete elliptic integral of the third kind</td></tr>
-^<tr>    <td>besj0(x)</td>    <td>int or real</td>    <td><i>J</i><sub>0</sub> Bessel function of <i>x</i> in radians</td></tr>
-^<tr>    <td>besj1(x)</td>    <td>int or real</td>    <td><i>J</i><sub>1</sub> Bessel function of <i>x</i> in radians</td></tr>
+^<tr>    <td>besj0(x)</td>    <td>real</td>    <td><i>J</i><sub>0</sub> Bessel function of <i>x</i> in radians</td></tr>
+^<tr>    <td>besj1(x)</td>    <td>real</td>    <td><i>J</i><sub>1</sub> Bessel function of <i>x</i> in radians</td></tr>
 ^<tr>    <td>besjn(n,x)</td>    <td>int,real</td>    <td><i>J</i><sub>n</sub> Bessel function of <i>x</i> in radians</td></tr>
-^<tr>    <td>besy0(x)</td>    <td>int or real</td>    <td><i>Y</i><sub>0</sub> Bessel function of <i>x</i> in radians</td></tr>
-^<tr>    <td>besy1(x)</td>    <td>int or real</td>    <td><i>Y</i><sub>1</sub> Bessel function of <i>x</i> in radians</td></tr>
+^<tr>    <td>besy0(x)</td>    <td>real</td>    <td><i>Y</i><sub>0</sub> Bessel function of <i>x</i> in radians</td></tr>
+^<tr>    <td>besy1(x)</td>    <td>real</td>    <td><i>Y</i><sub>1</sub> Bessel function of <i>x</i> in radians</td></tr>
 ^<tr>    <td>besyn(n,x)</td>   <td>int,real</td>    <td><i>Y</i><sub>n</sub> Bessel function of <i>x</i> in radians</td></tr>
 ^<tr>    <td>besi0(x)</td>   <td>real</td>    <td>Modified Bessel function of order 0, <i>x</i> in radians</td></tr>
 ^<tr>    <td>besi1(x)</td>   <td>real</td>    <td>Modified Bessel function of order 1, <i>x</i> in radians</td></tr>
@@ -1479,8 +1479,8 @@ C marker below is used to signal this to doc2html:
 4 airy
 ?expressions functions airy
 ?airy
-#airy(x) &  ~~   & ~ & Airy function Ai(x) \\
-%airy(x)@ ~~ @Airy function Ai(x)
+#airy(x) &  real   & ~ & Airy function Ai(x) for real x\\
+%airy(x)@ real @Airy function Ai(x) for real x
  The `airy(x)` function returns the value of the Airy function Ai(x) of its
  argument. The function Ai(x) is that solution of the equation y'' - x y = 0
  which is everywhere finite. If the argument is complex, its imaginary part
@@ -1554,15 +1554,15 @@ C marker below is used to signal this to doc2html:
 4 besj0
 ?expressions functions besj0
 ?besj0
-# besj0(x) & int or real & ~ &  $J_{0}$ Bessel function of $x$ in radians \\
-%besj0(x)@int or real@$J sub 0$ Bessel function of $x$ in radians
+# besj0(x) & real & ~ &  $J_{0}$ Bessel function of $x$ in radians \\
+%besj0(x)@real@$J sub 0$ Bessel function of $x$ in radians
  The `besj0(x)` function returns the J0th Bessel function of its argument.
  `besj0` expects its argument to be in radians.
 4 besj1
 ?expressions functions besj1
 ?besj1
-# besj1(x) & int or real & ~ & $J_{1}$ Bessel function of $x$ in radians \\
-%besj1(x)@int or real@$J sub 1$ Bessel function of $x$ in radians
+# besj1(x) & real & ~ & $J_{1}$ Bessel function of $x$ in radians \\
+%besj1(x)@real@$J sub 1$ Bessel function of $x$ in radians
  The `besj1(x)` function returns the J1st Bessel function of its argument.
  `besj1` expects its argument to be in radians.
 4 besjn
@@ -1574,15 +1574,15 @@ C marker below is used to signal this to doc2html:
 4 besy0
 ?expressions functions besy0
 ?besy0
-# besy0(x) & int or real & ~ & $Y_{0}$ Bessel function of $x$ in radians \\
-%besy0(x)@int or real@$Y sub 0$ Bessel function of $x$ in radians
+# besy0(x) & real & ~ & $Y_{0}$ Bessel function of $x$ in radians \\
+%besy0(x)@real@$Y sub 0$ Bessel function of $x$ in radians
  The `besy0(x)` function returns the Y0th Bessel function of its argument.
  `besy0` expects its argument to be in radians.
 4 besy1
 ?expressions functions besy1
 ?besy1
-# besy1(x) & int or real & ~ & $Y_{1}$ Bessel function of $x$ in radians \\
-%besy1(x)@int or real@$Y sub 1$ Bessel function of $x$ in radians
+# besy1(x) & real & ~ & $Y_{1}$ Bessel function of $x$ in radians \\
+%besy1(x)@real@$Y sub 1$ Bessel function of $x$ in radians
  The `besy1(x)` function returns the Y1st Bessel function of its argument.
  `besy1` expects its argument to be in radians.
 4 besyn
@@ -1921,6 +1921,41 @@ C marker below is used to signal this to doc2html:
  `VP(x,sigma,gamma)` corresponds to the Voigt profile defined by convolution of
  a Gaussian G(x;sigma) with a Lorentzian L(x;gamma).
  `VP_fwhm(sigma,gamma)` gives the full width at half maximum value of this function.
+
+#\hline \end{longtable}
+#%% begin dummy tabular because the @end processing wants to end one
+#\begin{tabular}{|lcl|}
+@end table
+
+^<!-- INCLUDE_NEXT_TABLE -->
+@start table
+#\setlength\LTleft{0pt}
+#\setlength\LTright{0pt}
+#\begin{longtable}{@{\extracolsep{\fill}}|lcrl|@{}} \hline
+#\multicolumn{4}{|c|}{Special functions from Amos library (only if available)} \\ \hline \hline
+#Function ~~~~~~~~~~~~~~~~~ & Arguments & ~ & Returns ({\gpCX } indicates complex result)\\ \hline
+#\endhead \hline \endfoot
+%c c l .
+%Function@Arguments@Returns
+%_
+# ~ & ~ & ~ & \hspace{9cm} \\
+
+4 Ai
+?expressions functions Ai
+?Ai
+#Ai(z) & complex & \gpCX &  complex Airy function $Ai(z)$\\
+%Ai(z)@complex@complex error function
+ `Ai(z)` is the complex Airy function Ai(z).
+ Supported via external library containing routines by Donald E. Amos,
+ Sandia National Laboratoris, SAND85-1018 (1985).
+4 Bi
+?expressions functions Bi
+?Bi
+#Bi(z) & complex & \gpCX &  complex Airy function $Bi(z)$\\
+%Bi(z)@complex@complex error function
+ `Bi(z)` is the complex Airy function Bi(z).
+ Supported via external library containing routines by Donald E. Amos,
+ Sandia National Laboratoris, SAND85-1018 (1985).
 
 #\hline \end{longtable}
 #%% begin dummy tabular because the @end processing wants to end one
@@ -2270,6 +2305,26 @@ C marker below is used to signal this to doc2html:
                    to x.
        rand({x,y}) for integer 0 < x,y < 2^31-1 sets seed1 to x and
                    seed2 to y.
+4 Special functions with complex arguments
+?expressions functions special
+?expressions functions complex
+?special_functions
+?libcerf
+?Amos
+?libopenspecfun
+
+ Some special functions with complex domain are provided through external
+ libraries. If your copy of gnuplot was not linked against these libraries then
+ it will not provide those functions.
+
+ For functions requiring libcerf (http://apps.jcns.fz-juelich.de/libcerf), see
+ `cerf`, `cdawson`, `faddeeva`, `erfi`, `VP`, and `VP_fwhm`.
+
+ For functions requiring routines implemented by Douglas E. Amos,
+ Sandia National Laboratories, SAND85-1018 (1985), see `Ai`, `Bi`.
+ These routines may be found in netlib (http://netlib.sandia.gov) or in
+ libopenspecfun (https://github.com/JuliaLang/openspecfun).
+
 4 value
 ?expressions functions value
 ?value

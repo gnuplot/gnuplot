@@ -34,6 +34,7 @@
 
 #include "syscfg.h"
 #include "alloc.h"
+#include "amos_airy.h"	/* Airy functions from AMOS */
 #include "complexfun.h"
 #include "datafile.h"
 #include "datablock.h"
@@ -197,9 +198,13 @@ const struct ft_entry ft[] =
     {"asinh",  f_asinh},
     {"acosh",  f_acosh},
     {"atanh",  f_atanh},
-    {"lambertw",  f_lambertw}, /* HBB, from G.Kuhnle 20001107 */
-    {"airy",  f_airy},         /* janert, 20090905 */
-    {"expint",  f_expint},     /* Jim Van Zandt, 20101010 */
+    {"lambertw",  f_lambertw},	/* HBB, from G.Kuhnle 20001107 */
+    {"airy",  f_airy},		/* cephes library version */
+#ifdef HAVE_AMOS
+    {"Ai", f_amos_Ai},		/* AMOS version from libopenspecfun */
+    {"Bi", f_amos_Bi},		/* AMOS version from libopenspecfun */
+#endif
+    {"expint",  f_expint},	/* Jim Van Zandt, 20101010 */
     {"besin",  f_besin},
 
 #ifdef HAVE_COMPLEX_FUNCS

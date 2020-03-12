@@ -1,0 +1,69 @@
+#
+# Exercise comples Airy functions Ai(z), Bi(z)
+#
+if (!strstrt(GPVAL_COMPILE_OPTIONS, "+AMOS")) {
+    print "This copy of gnuplot does not support Ai, Bi"
+    exit  # return to caller
+}
+
+#
+# Compare built-in airy(x) with AMOS Ai(z) for real z
+#
+set xrange [0:5]
+
+set multiplot layout 2,1 \
+    title "Agreement of built-in airy(x) with Amos library Ai(z) for real z"
+set lmargin at screen 0.15
+plot [0:10] abs(Ai(x) - airy(x)) / Ai(x)
+set yrange [0:1.4]
+set ytics 1
+plot [0:30] (Ai(x) - airy(x)) / Ai(x)
+unset multiplot
+
+pause -1 "Hit return to continue"
+
+reset
+
+set xrange [-4:4]
+set yrange [-4:4]
+set zrange [-4:2]
+set sample 51
+set isosample 51
+set view 45, 51, 0.9
+set xyplane 0
+set border -1
+set pm3d border lt -1 lighting spec 0.5
+set cblabel "arg(Ai(x + iy))" rotate
+unset cbtics
+set xlabel "x"
+set ylabel "iy"
+set palette defined (0 "dark-red", 1 "gold")
+
+set title "Real( Ai(x + iy) )"
+splot '++' using 1:2:(real(Ai(x + y*I))):(arg(Ai(x + y*I))) notitle with pm3d
+
+pause -1 "Hit return to continue"
+
+set title "Imag( Ai(x + iy) )"
+splot '++' using 1:2:(imag(Ai(x + y*I))):(arg(Ai(x + y*I))) notitle with pm3d
+
+pause -1 "Hit return to continue"
+
+reset session
+set log cb
+set cbtics format "%.0t×10^{%T}"
+unset mcbtics
+set palette cubehelix gamma 2.0
+set view map scale 0.9
+set isosamples 100,100
+
+set title 'Modulus of Ai(z)'
+splot abs(Ai( x + y*{0,1} )) with pm3d
+pause -1 "Hit return to continue"
+
+set title 'Modulus of Bi(z)'
+splot abs(Bi( x + y*{0,1} )) with pm3d
+pause -1 "Hit return to continue"
+
+reset
+

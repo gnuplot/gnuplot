@@ -102,6 +102,20 @@ if test "${with_libcerf}" = yes ; then
   )
 fi
 
+AC_ARG_WITH(amos,dnl
+[  --without-amos          without special functions from amos library (default enabled)],,
+  [test -z "${with_amos}" && with_amos=yes])
+
+if test "${with_amos}" = yes ; then
+  dnl The Amos routines (D. E. Amos, Sandia National Laboratories) calculate
+  dnl Bessel and related functions with complex argument and nonnegative order.
+  dnl These routines exist in various library packages including libopenspecfun.
+  AC_SEARCH_LIBS([zairy_], [openspecfun],
+      [AC_DEFINE([HAVE_AMOS], 1, [define if you have a library of Amos special functions])
+      have_openspecfun=yes]
+  )
+fi
+
 dnl Various programs
 dnl X/Emacs for building .texi version of docs
 test x"$EMACS" = xt && EMACS=
@@ -1367,6 +1381,12 @@ if test "$have_libcerf" = yes; then
   AC_MSG_RESULT([  cerf() and other special functions from libcerf: yes])
 else
   AC_MSG_RESULT([  cerf() and other special functions: no (libcerf not found)])
+fi
+
+if test "$have_libopenspecfun" = yes; then
+  AC_MSG_RESULT([  Airy functions from libopenspecfun: yes])
+else
+  AC_MSG_RESULT([  Ai and Bi not supported: (libopenspecfun not found)])
 fi
 
 if test "$have_external_functions" = yes; then
