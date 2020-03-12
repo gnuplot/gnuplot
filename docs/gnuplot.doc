@@ -10848,6 +10848,8 @@ Ffigure_keyentry
  in the `plot` or `splot` command to insert extra lines.  Instead of providing
  a filename or function to plot, use `keyentry` as a placeholder followed by
  plot style information (used to generate a key symbol) and a title.
+ All the usual options for title font, text color, `at` coordinates, and
+ enhanced text markup apply.
  Example:
       plot $HEATMAP matrix with image notitle, \
            keyentry with boxes fc palette cb 0 title "no effect", \
