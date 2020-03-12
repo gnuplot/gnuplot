@@ -247,9 +247,6 @@ static unsigned int X11_rgblast;
 static TBOOLEAN default_font_size_known = FALSE;
 static TBOOLEAN X11_MOUSE_FEEDBACK = TRUE;
 #endif
-#ifdef PIPE_IPC
-static TBOOLEAN IPC_LOCK = FALSE;
-#endif
 
 static int parse_driver(const char *);
 
@@ -867,150 +864,177 @@ X11_atexit()
 TERM_PUBLIC int
 X11_waitforinput(int options)
 {
-#ifdef PIPE_IPC
+    /* There're several modes this function can take:
+
+       if (options & TERM_ONLY_CHECK_MOUSING)
+
+         Not reading stdin. Non-blocking reads from ipc_back_fd. We keep
+         processing ipc_back_fd events as long as they're available. When no
+         more data is available, we return 0.
+
+         This mode trumps the others
+
+
+       if( paused_for_mouse )
+
+         Not reading stdin. Blocking reads from ipc_back_fd. We keep processing
+         ipc_back_fd events in a loop
+
+
+       if (options & TERM_WAIT_FOR_FONTPROPS)
+
+         Very similar to if(paused_for_mouse). Not reading stdin. Blocking reads
+         from ipc_back_fd in a loop
+
+       Otherwise the logic is:
+
+         if( any ipc_back_fd data is available )
+           read and process it ALL;
+         read and return one byte from stdin
+     */
+
+#ifndef PIPE_IPC
+    if (options == TERM_ONLY_CHECK_MOUSING)
+	return 0;
+    return getc(stdin);
+#else
+
+    // normal path
     fd_set fds;
     static struct gp_event_t ge;
     static int l = 0;
     struct timeval one_msec;
     int n;
-    int fd = fileno(stdin);
-    int repeat_count = 0;
 
-AGAIN:
+    bool blocking_loop_reading_ipc_back_fd =
+        paused_for_mouse || (options & TERM_WAIT_FOR_FONTPROPS);
+    bool have_any_ipc_back_fd_data = false;
+
+    if (ipc_back_fd < 0) {
+        if (paused_for_mouse) {
+            // We're waiting for a command from the back-channel IPC, but this pipe
+            // doesn't exist, so we'll never get the command we're waiting for. Give
+            // up.
+            paused_for_mouse = 0;
+            int_error(NO_CARET,"Mousing not active");
+        }
+
+        if (options & TERM_WAIT_FOR_FONTPROPS) {
+            // Similar. No back-channel, so we'll never get the "done" event.
+            // Here I just silently return
+            return 0;
+        }
+        return getc(stdin);
+    }
+
     /* XXX:  if the input device it not a tty (e.g. /dev/null)
      *       mouse events are not processed. This is necessary
      *       as on some systems /dev/null is not selectable.
      * TODO: should we close the ipc_back_fd in this case ? */
-    if (ipc_back_fd >= 0)
-	do {
-	    int ierr;
-	    struct timeval *timeout = NULL;
-	    FD_ZERO(&fds);
-	    if (!paused_for_mouse)
-		FD_SET(fd, &fds);
-	    FD_SET(ipc_back_fd, &fds);
 
-	    /* When taking input from the console, we are willing to wait here	*/
-	    /* until the next character is typed. But if input is from a script	*/
-	    /* we just want to check for hotkeys or mouse input and then leave	*/
-	    /*  again without waiting on stdin.					*/
-	    if (options == TERM_ONLY_CHECK_MOUSING) {
-		timeout = &one_msec;
-		one_msec.tv_sec = 0;
-		one_msec.tv_usec = TERM_EVENT_POLL_TIMEOUT;
-	    }
+    // While we have ipc_back_fd data to process, process it. If not, read the
+    // stdin data
+    do {
+        int ierr;
+        struct timeval *timeout = NULL; // wait forever by default
+        FD_ZERO(&fds);
+        FD_SET(ipc_back_fd, &fds);
 
-	    ierr = select(ipc_back_fd + 1, SELECT_TYPE_ARG234 &fds, 0, 0, timeout);
-	    if (ierr < 0 && errno == EINTR) {
-		FD_ZERO(&fds);
-		wrap_readline_signal_handler();
-		continue;
-	    }
-	    if (FD_ISSET(ipc_back_fd, &fds)) {
-		n = read(ipc_back_fd, (void *) (l + (char *) &ge), sizeof(ge) - l);
-		if (n == 0) {
-		    close(ipc_back_fd);
-		    ipc_back_fd = -1;
-		    /* don't close X11_ipc, otherwise later writes
-		     * to it will cause a segfault */
-		    IPC_LOCK = FALSE;
-		    break;	/* outboard driver has stopped */
-		}
-		l += n;
-		if (l == sizeof(ge)) {
-		    /* note: do_event() may not return (if an
-		     * error occurs), so need to reset l first */
-		    l = 0;
-		    do_event(&ge);
+        /* When taking input from the console, we are willing to wait here	*/
+        /* until the next character is typed. But if input is from a script	*/
+        /* we just want to check for hotkeys or mouse input and then leave	*/
+        /*  again without waiting on stdin.					*/
+        if (options == TERM_ONLY_CHECK_MOUSING) {
+            timeout = &one_msec;
+            one_msec.tv_sec = 0;
+            one_msec.tv_usec = TERM_EVENT_POLL_TIMEOUT;
+        }
+        else if (!blocking_loop_reading_ipc_back_fd)
+            FD_SET(fileno(stdin), &fds);
 
-		    /* I react only to the first GE_fontprops event. Subsequent
-		       GE_fontprops events only save the sizing information for
-		       later. We also can't use the main pipe at that point. The
-		       'pause' command gets confused, for example. */
-		    if (ge.type == GE_fontprops && !default_font_size_known) {
-		    	if (repeat_count > 0)
-		    	    FPRINTF((stderr,
-			        "X11_waitforinput: caught GE_fontprops after %d tries\n",
-				repeat_count));
-			if (IPC_LOCK)
-			    return(GE_fontprops);
-		    }
-		    if (ge.type == GE_buttonrelease && (paused_for_mouse & PAUSE_CLICK)) {
-			int button = ge.par1;
-			if (button == 1 && (paused_for_mouse & PAUSE_BUTTON1))
-			    paused_for_mouse = 0;
-			if (button == 2 && (paused_for_mouse & PAUSE_BUTTON2))
-			    paused_for_mouse = 0;
-			if (button == 3 && (paused_for_mouse & PAUSE_BUTTON3))
-			    paused_for_mouse = 0;
-			if (paused_for_mouse == 0)
-			    return '\0';
-		    }
-		    if (ge.type == GE_keypress && (paused_for_mouse & PAUSE_KEYSTROKE)) {
-			/* Ignore NULL keycode */
-			if (ge.par1 > '\0') {
-			    paused_for_mouse = 0;
-			    return '\0';
-			}
-		    }
-		    if (ge.type == GE_reset) {
-			/* Error or window close */
-			paused_for_mouse = 0;
-			return '\0';
-		    }
-		}
-	    } else if (options == TERM_ONLY_CHECK_MOUSING) {
-		return '\0';
-	    }
+        ierr = select(ipc_back_fd + 1, SELECT_TYPE_ARG234 &fds, 0, 0, timeout);
+        if (ierr < 0 && errno == EINTR) {
+            wrap_readline_signal_handler();
+            continue;
+        }
 
-	} while (!FD_ISSET(fd, &fds));
+        if (!FD_ISSET(ipc_back_fd, &fds)) {
+            // no ipc_back_fd data available. I can move on
+            if (options & TERM_ONLY_CHECK_MOUSING)
+                return 0;
+            if (blocking_loop_reading_ipc_back_fd)
+                // This shouldn't happen. In this case we should be waiting
+                // for ipc_back_fd data forever, so select() should never
+                // return with no data. In any case, I ask for more data if
+                // there isn't any
+                continue;
 
-    /* If ipc_back_fd is not open, we will never see any mouse events! */
-    else if (paused_for_mouse) {
-	paused_for_mouse = 0;
-	int_error(NO_CARET,"Mousing not active");
-    }
+            break;
+        }
 
-    /* IPC_LOCK indicates that we are specifically waiting for a reply on */
-    /* the mousing channel.  If stdin unblocks first, defer reading it,   */
-    /* wait a few microseconds, and try again.                            */
-    /* FIXME EAM - Give up after a few seconds. This will drop input chars*/
-    /* but at least it won't hang forever if the X11 connection goes bad. */
-    if (IPC_LOCK) {
-#ifdef HAVE_USLEEP
-	usleep(100);
-#endif
-        if (repeat_count++ < 10000)
-	    goto AGAIN;
-    }
+        // got some ipc_back_fd data. Process all of it before moving on to
+        // stdin
+        have_any_ipc_back_fd_data = true;
 
-    /* Same sort of thing if we are specifically waiting for mouse input. */
-    if (paused_for_mouse) {
-#ifdef HAVE_USLEEP
-	usleep(10);
-#endif
-	goto AGAIN;
-    }
+        n = read(ipc_back_fd, (void *) (l + (char *) &ge), sizeof(ge) - l);
+        if (n == 0) {
+            close(ipc_back_fd);
+            ipc_back_fd = -1;
+            /* don't close X11_ipc, otherwise later writes
+             * to it will cause a segfault
+             * outboard driver has stopped */
+            paused_for_mouse = 0;
+            if( options & (TERM_WAIT_FOR_FONTPROPS | TERM_ONLY_CHECK_MOUSING) )
+                return 0;
+            break;
+        }
+        l += n;
+        if (l == sizeof(ge)) {
+            /* note: do_event() may not return (if an
+             * error occurs), so need to reset l first */
+            l = 0;
+            do_event(&ge);
+
+            /* I react only to the first GE_fontprops event. Subsequent
+               GE_fontprops events only save the sizing information for
+               later. We also can't use the main pipe at that point. The
+               'pause' command gets confused, for example. */
+            if (ge.type == GE_fontprops && !default_font_size_known &&
+                (options & TERM_WAIT_FOR_FONTPROPS))
+                return GE_fontprops;
+
+            if (ge.type == GE_buttonrelease && (paused_for_mouse & PAUSE_CLICK)) {
+                int button = ge.par1;
+                if (button == 1 && (paused_for_mouse & PAUSE_BUTTON1))
+                    paused_for_mouse = 0;
+                if (button == 2 && (paused_for_mouse & PAUSE_BUTTON2))
+                    paused_for_mouse = 0;
+                if (button == 3 && (paused_for_mouse & PAUSE_BUTTON3))
+                    paused_for_mouse = 0;
+                if (paused_for_mouse == 0)
+                    return '\0';
+            }
+            if (ge.type == GE_keypress && (paused_for_mouse & PAUSE_KEYSTROKE)) {
+                /* Ignore NULL keycode */
+                if (ge.par1 > '\0') {
+                    paused_for_mouse = 0;
+                    return '\0';
+                }
+            }
+            if (ge.type == GE_reset) {
+                /* Error or window close */
+                paused_for_mouse = 0;
+                return '\0';
+            }
+        }
+
+    } while(blocking_loop_reading_ipc_back_fd || have_any_ipc_back_fd_data);
+
+    return getc(stdin);
 
 #endif /* PIPE_IPC */
-
-    if (options == TERM_ONLY_CHECK_MOUSING)
-	return '\0';
-
-# if 0
-/* HBB 20010620: switching back and forth between X11 and a non-GUI
- * terminal, while stdin is redirected, causes gnuplot to terminate
- * right after it re-enters the X11 terminal --- read() returns a '\0'
- * character once, and then EOF. Switching to <stdio.h>'s getc() fixed
- * that, for me. */
-    if (read(0, &c, 1) != 1)
-	return EOF;
-    else
-	return c;
-# else
-    return getc(stdin);
-# endif	/* 0/1 */
 }
+
 #endif /* USE_MOUSE */
 
 
@@ -1127,11 +1151,6 @@ X11_init()
 TERM_PUBLIC void
 X11_reset()
 {
-    /* Leave the pipe alone, until exit or  set term x11 reset */
-    /* but make sure that all locks are cleared.               */
-#ifdef PIPE_IPC
-    IPC_LOCK = FALSE;
-#endif
 #ifdef USE_MOUSE
     paused_for_mouse = 0;
 #endif
@@ -1437,14 +1456,12 @@ X11_graphics()
      */
     if (!default_font_size_known) {
 #ifdef PIPE_IPC
-	IPC_LOCK = TRUE;
 	PRINT1("QG%s\n", X11_default_font);
 	FFLUSH();
 	if (ipc_back_fd >= 0 && X11_MOUSE_FEEDBACK)
-	    X11_waitforinput(0);
+	    X11_waitforinput(TERM_WAIT_FOR_FONTPROPS);
 
 	default_font_size_known = TRUE;
-	IPC_LOCK = FALSE;
 #else
 	/* We still get the information for OS2_IPC... */
 	PRINT1("QG%s\n", X11_default_font);

@@ -217,6 +217,7 @@ typedef enum termlayer {
 
 /* Options used by the terminal entry point term->waitforinput(). */
 #define TERM_ONLY_CHECK_MOUSING	1
+#define TERM_WAIT_FOR_FONTPROPS	2
 #define TERM_EVENT_POLL_TIMEOUT 0	/* select() timeout in usec */
 
 /* Options used by the terminal entry point term->hypertext(). */
