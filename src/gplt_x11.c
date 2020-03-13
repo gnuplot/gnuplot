@@ -4611,6 +4611,54 @@ process_configure_notify_event(XEvent *event, TBOOLEAN isRetry )
     }
 }
 
+__attribute__((unused))
+static const char* evt_names(int type)
+{
+#define EVT_LIST(_)                         \
+    _(KeyPress)                             \
+    _(KeyRelease)                           \
+    _(ButtonPress)                          \
+    _(ButtonRelease)                        \
+    _(MotionNotify)                         \
+    _(EnterNotify)                          \
+    _(LeaveNotify)                          \
+    _(FocusIn)                              \
+    _(FocusOut)                             \
+    _(KeymapNotify)                         \
+    _(Expose)                               \
+    _(GraphicsExpose)                       \
+    _(NoExpose)                             \
+    _(VisibilityNotify)                     \
+    _(CreateNotify)                         \
+    _(DestroyNotify)                        \
+    _(UnmapNotify)                          \
+    _(MapNotify)                            \
+    _(MapRequest)                           \
+    _(ReparentNotify)                       \
+    _(ConfigureNotify)                      \
+    _(ConfigureRequest)                     \
+    _(GravityNotify)                        \
+    _(ResizeRequest)                        \
+    _(CirculateNotify)                      \
+    _(CirculateRequest)                     \
+    _(PropertyNotify)                       \
+    _(SelectionClear)                       \
+    _(SelectionRequest)                     \
+    _(SelectionNotify)                      \
+    _(ColormapNotify)                       \
+    _(ClientMessage)                        \
+    _(MappingNotify)                        \
+    _(GenericEvent)                         \
+    _(LASTEvent)
+#define EVT_NAME(name) case name: return #name;
+        switch(type)
+        {
+            EVT_LIST(EVT_NAME)
+        default: ;
+        }
+    return "UNKNOWN";
+}
+
 static void
 process_event(XEvent *event)
 {
@@ -4618,7 +4666,7 @@ process_event(XEvent *event)
     KeySym keysym;
     char key_sequence[8];
 
-    FPRINTF((stderr, "Event 0x%x\n", event->type));
+    FPRINTF((stderr, "Event %s\n", evt_names(event->type)));
 
     switch (event->type) {
     case ConfigureNotify:

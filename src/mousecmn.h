@@ -52,26 +52,38 @@ struct gp_event_t {
 
 /* event types:
 */
+#define GE_EVT_LIST(_) \
+    _(GE_motion)            /* mouse has moved */ \
+    _(GE_buttonpress)       /* mouse button has been pressed; par1 = number of the button (1, 2, 3...) */ \
+    _(GE_buttonrelease)     /* mouse button has been released; par1 = number of the button (1, 2, 3...); par2 = time (ms) since previous button release */ \
+    _(GE_keypress)          /* keypress; par1 = keycode (either ASCII, or one of the GP_ enums defined below); par2 = ( |1 .. don't pass through bindings )*/ \
+    _(GE_buttonpress_old)   /* same as GE_buttonpress but triggered from inactive window */ \
+    _(GE_buttonrelease_old) /* same as GE_buttonrelease but triggered from inactive window */ \
+    _(GE_keypress_old)      /* same as GE_keypress but triggered from inactive window */ \
+    _(GE_modifier)          /* shift/ctrl/alt key pressed or released; par1 = is new mask, see Mod_ enums below */ \
+    _(GE_plotdone)          /* acknowledgement of plot completion (for synchronization) */ \
+    _(GE_replot)            /* used only by ggi.trm */ \
+    _(GE_reset)             /* reset to a well-defined state (e.g.  after an X11 error occured) */ \
+    _(GE_fontprops)         /* par1 = hchar par2 = vchar */ \
+    _(GE_pending)           /* signal gp_exec_event() to send pending events */ \
+    _(GE_raise)             /* raise console window */ \
+
+#define GE_EVT_DEFINE_ENUM(name) name,
 enum {
-    GE_motion,          /* mouse has moved */
-    GE_buttonpress,     /* mouse button has been pressed; par1 = number of the button (1, 2, 3...) */
-    GE_buttonrelease,   /* mouse button has been released; par1 = number of the button (1, 2, 3...); par2 = time (ms) since previous button release */
-    GE_keypress,        /* keypress; par1 = keycode (either ASCII, or one of the GP_ enums defined below); par2 = ( |1 .. don't pass through bindings )*/
-    GE_buttonpress_old,	/* same as GE_buttonpress but triggered from inactive window */
-    GE_buttonrelease_old,	/* same as GE_buttonrelease but triggered from inactive window */
-    GE_keypress_old,	/* same as GE_keypress but triggered from inactive window */
-    GE_modifier,        /* shift/ctrl/alt key pressed or released; par1 = is new mask, see Mod_ enums below */
-    GE_plotdone,        /* acknowledgement of plot completion (for synchronization) */
-    GE_replot,          /* used only by ggi.trm */
-    GE_reset,           /* reset to a well-defined state
-			   (e.g.  after an X11 error occured) */
-    GE_fontprops,       /* par1 = hchar par2 = vchar */
-#if defined(PIPE_IPC)
-    GE_pending,         /* signal gp_exec_event() to send pending events */
-#endif
-    GE_raise            /* raise console window */
+    GE_EVT_LIST(GE_EVT_DEFINE_ENUM)
+    GE_EVT_NUM
 };
 
+static const char* GE_evt_name(int type)
+{
+#define GE_EVT_NAME(name) case name: return #name;
+    switch(type)
+    {
+        GE_EVT_LIST(GE_EVT_NAME);
+    default: ;
+    }
+    return "GE_UNKNOWN";
+}
 
 /* the status of the shift, ctrl and alt keys
  * Mod_Opt is used by the "bind" mechanism to indicate that the

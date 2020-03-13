@@ -2361,7 +2361,7 @@ do_event(struct gp_event_t *ge)
     replot_disabled = plotted_data_from_stdin;
 
     if (ge->type) {
-	FPRINTF((stderr, "(do_event) type       = %d\n", ge->type));
+	FPRINTF((stderr, "(do_event) type       = %s\n", GE_evt_name(ge->type)));
 	FPRINTF((stderr, "           mx, my     = %d, %d\n", ge->mx, ge->my));
 	FPRINTF((stderr, "           par1, par2 = %d, %d\n", ge->par1, ge->par2));
     }
