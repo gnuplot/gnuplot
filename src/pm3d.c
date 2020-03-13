@@ -1559,7 +1559,7 @@ filled_polygon(gpdPoint *corners, int fillstyle, int nv)
     static gpdPoint *clipcorners = NULL;
     if (nv > max_vertices) {
 	max_vertices = nv;
-	icorners = gp_realloc( icorners, max_vertices * sizeof(gpiPoint), "filled_polygon");
+	icorners = gp_realloc( icorners, (2*max_vertices) * sizeof(gpiPoint), "filled_polygon");
 	clipcorners = gp_realloc( clipcorners, (2*max_vertices) * sizeof(gpdPoint), "filled_polygon");
     }
 
@@ -1604,76 +1604,75 @@ filled_polygon(gpdPoint *corners, int fillstyle, int nv)
 
 /*
  * Clip existing filled polygon again zmax or zmin.
- * We already know that this is a convex polygon with at least one
- * vertex in range.  The clipped polygon may have as few as 3 vertices
- * or as many as n+1  (would be n+2 if the polygon is allowed to span
- * the full z range, e.g. zoomed in to a region smaller than one facet).
+ * We already know this is a convex polygon with at least one vertex in range.
+ * The clipped polygon may have as few as 3 vertices or as many as n+2.
  * Returns the new number of vertices after clipping.
  */
 int
 clip_filled_polygon( gpdPoint *inpts, gpdPoint *outpts, int nv )
 {
-    int first = 0;	/* First in-range point input */
-    int current = 0;	/* The one we are now considering */
-    int next = 0;	/* Possible next points */
+    int current = 0;	/* The vertex we are now considering */
+    int next = 0;	/* The next vertex */
     int nvo = 0;	/* Number of vertices after clipping */
     int noutrange = 0;	/* Number of out-range points */
     double fraction;
     double zmin = axis_array[FIRST_Z_AXIS].min;
     double zmax = axis_array[FIRST_Z_AXIS].max;
 
-
-    /* Find first out of range point.
-     * If all are in range or all out of range, forget it. */
-    for (noutrange = 0, current = nv-1; current >= 0; current--) {
-	if (inrange( inpts[current].z, zmin, zmax ))
-	    first = current;
-	else
-	    noutrange++;
+    /* classify inrange/outrange vertices */
+    static TBOOLEAN *outrange = NULL;
+    static int maxvert = 0;
+    if (nv > maxvert) {
+	maxvert = nv;
+	outrange = gp_realloc(outrange, maxvert * sizeof(TBOOLEAN), NULL);
     }
+    for (current = 0; current < nv; current++) {
+	if (inrange( inpts[current].z, zmin, zmax ))
+	    outrange[current] = FALSE;
+	else {
+	    outrange[current] = TRUE;
+	    noutrange++;
+	}
+    }
+
+    /* If all are in range or all out of range, forget it. */
     if (noutrange == nv)
 	return -1;
     if (noutrange == 0)
 	return 0;
 
-    /* Copy first in-range point to the list of output vertices */
-    current = first;
-    outpts[nvo++] = inpts[current];
+    for (current = 0; current < nv; current++) {
+	next = (current+1) % nv;
 
-    /* Add more vertices until we get to one that needs clipping */
-    for (next=(current+1)%nv; inrange(inpts[next].z, zmin, zmax); next = (next+1)%nv )
-	outpts[nvo++] = inpts[++current];
+	/* Current point is out of range */
+	if (outrange[current]) {
+	    if (!outrange[next]) {
+		/* Current point is out-range but next point is in-range.
+		 * Clip line segment from current-to-next and store as new vertex.
+		 */
+		fraction = ((inpts[current].z >= zmax ? zmax : zmin) - inpts[next].z)
+			 / (inpts[current].z - inpts[next].z);
+		outpts[nvo].x = inpts[next].x + fraction * (inpts[current].x - inpts[next].x);
+		outpts[nvo].y = inpts[next].y + fraction * (inpts[current].y - inpts[next].y);
+		outpts[nvo].z = inpts[current].z >= zmax ? zmax : zmin;
+		nvo++;
+	    }
 
-    /* Current point is in-range but next point is out-range.
-     * Clip line segment from current-to-next and store as new vertex.
-     */
-    fraction = ((inpts[next].z >= zmax ? zmax : zmin) - inpts[current].z)
-             / (inpts[next].z - inpts[current].z);
-    outpts[nvo].x = inpts[current].x + fraction * (inpts[next].x - inpts[current].x);
-    outpts[nvo].y = inpts[current].y + fraction * (inpts[next].y - inpts[current].y);
-    outpts[nvo].z = inpts[next].z >= zmax ? zmax : zmin;
-    nvo++;
-
-    /* Find next in-bounds point.
-     * Clip line segment preceding it and store as new vertex.
-     */
-    current = (next+1) % nv;
-    while (!inrange(inpts[current].z, zmin, zmax)) {
-	next = current;
-	current = (next+1) % nv;
-    }
-
-    fraction = ((inpts[next].z >= zmax ? zmax : zmin) - inpts[current].z)
-             / (inpts[next].z - inpts[current].z);
-    outpts[nvo].x = inpts[current].x + fraction * (inpts[next].x - inpts[current].x);
-    outpts[nvo].y = inpts[current].y + fraction * (inpts[next].y - inpts[current].y);
-    outpts[nvo].z = inpts[next].z >= zmax ? zmax : zmin;
-    nvo++;
-
-    /* Copy the remaining vertices to the output list */
-    while (current != first) {
-	outpts[nvo++] = inpts[current];
-	current = (current+1) % nv;
+	/* Current point is in range */
+	} else {
+	    outpts[nvo++] = inpts[current];
+	    if (outrange[next]) {
+		/* Current point is in-range but next point is out-range.
+		 * Clip line segment from current-to-next and store as new vertex.
+		 */
+		fraction = ((inpts[next].z >= zmax ? zmax : zmin) - inpts[current].z)
+			 / (inpts[next].z - inpts[current].z);
+		outpts[nvo].x = inpts[current].x + fraction * (inpts[next].x - inpts[current].x);
+		outpts[nvo].y = inpts[current].y + fraction * (inpts[next].y - inpts[current].y);
+		outpts[nvo].z = inpts[next].z >= zmax ? zmax : zmin;
+		nvo++;
+	    }
+	}
     }
 
     return nvo;
