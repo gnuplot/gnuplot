@@ -22,9 +22,11 @@
 #ifdef HAVE_AMOS
 
 extern void zairy_( double *zr, double *zi, int32_t *id, int32_t *kode,
-		   double *air, double *aii, int32_t *nz, int32_t *ierr );
+		    double *air, double *aii, int32_t *underflow, int32_t *ierr );
 extern void zbiry_( double *zr, double *zi, int32_t *id, int32_t *kode,
-		   double *air, double *aii, int32_t *ierr );
+		    double *air, double *aii, int32_t *ierr );
+extern void zbesk_( double *zr, double *zi, double *nu, int32_t *kode, int32_t *length,
+		    double *zbr, double *zbi, int32_t *underflow, int32_t *ierr);
 
 void
 f_amos_Ai(union argument *arg)
@@ -93,4 +95,53 @@ f_amos_Bi(union argument *arg)
 
     push(&a);
 }
+
+/*
+ * Modified Bessel function of the second kind K_nu(z)
+ *	val = BesselK( nu, z )
+ * The underlying libamos routine besk fills in an array of values
+ * val[j] corresponding to a sequence functions BesselK( nu+j, z )
+ * but we ask for only the j=0 case.
+ */
+#define NJ 1
+void
+f_amos_BesselK(union argument *arg)
+{
+    struct value a;
+    struct cmplx z;
+    struct cmplx Bk[NJ];
+    double nu;
+    int32_t kode, length, underflow, ierr;
+
+    (void) arg;                        /* avoid -Wunused warning */
+
+    /* ... unpack arguments ... */
+    pop(&a);
+    if (a.type == INTGR) {
+	z.real = a.v.int_val;
+	z.imag = 0;
+    } else {
+	z.real = a.v.cmplx_val.real;
+	z.imag = a.v.cmplx_val.imag;
+    }
+    nu = real(pop(&a));
+
+
+    kode = 1;		/* 1 = unscaled   2 = scaled */
+    length = NJ;	/* number of members in the returned sequence of functions */
+
+    /* Fortran calling conventions! */
+    zbesk_( &z.real, &z.imag, &nu, &kode, &length,
+	    &Bk[0].real, &Bk[0].imag, &underflow, &ierr );
+
+    if (ierr != 0) {
+	Gcomplex(&a, not_a_number(), 0.0);
+    } else {
+	Gcomplex(&a, Bk[0].real, Bk[0].imag);
+    }
+
+    push(&a);
+}
+#undef NJ
+
 #endif	/* HAVE_AMOS */

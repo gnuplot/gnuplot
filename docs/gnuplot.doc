@@ -211,6 +211,9 @@ C
 ## Note that existing function lgamma(x) = real(lnGamma(real(z)).
 ## See `lnGamma`.
 #b Complex function conj(z) returns the complex conjugate of z.
+#b Complex Airy functions Ai(z) and Bi(z) and complex modified Bessel function
+## of the second kind Kν(z) are provided through an external library
+## if available at build time. See `BesselK`.
 #end
 
 4 New plot styles and style options
@@ -1956,7 +1959,15 @@ C marker below is used to signal this to doc2html:
  `Bi(z)` is the complex Airy function Bi(z).
  Supported via external library containing routines by Donald E. Amos,
  Sandia National Laboratoris, SAND85-1018 (1985).
-
+4 BesselK
+?expressions functions BesselK
+?functions BesselK
+?BesselK
+#BesselK(nu,z) & real, complex & \gpCX & $K_{\nu}(z)$ modified Bessel function of the second kind\\
+%BesselK(nu,z) @ real, complex @ modified Bessel function K_nu of the second kind
+ `BesselK(nu,z)` is the modified Bessel function of the second kind K_nu.
+ Supported via external library containing routines by Donald E. Amos,
+ Sandia National Laboratoris, SAND85-1018 (1985).
 #\hline \end{longtable}
 #%% begin dummy tabular because the @end processing wants to end one
 #\begin{tabular}{|lcl|}
@@ -2321,7 +2332,7 @@ C marker below is used to signal this to doc2html:
  `cerf`, `cdawson`, `faddeeva`, `erfi`, `VP`, and `VP_fwhm`.
 
  For functions requiring routines implemented by Douglas E. Amos,
- Sandia National Laboratories, SAND85-1018 (1985), see `Ai`, `Bi`.
+ Sandia National Laboratories, SAND85-1018 (1985), see `Ai`, `Bi`, `BesselK`.
  These routines may be found in netlib (http://netlib.sandia.gov) or in
  libopenspecfun (https://github.com/JuliaLang/openspecfun).
 
