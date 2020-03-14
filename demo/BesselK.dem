@@ -48,10 +48,10 @@ set cbtics ("-π" -pi, "0" 0, "π" pi)
 set palette cubehelix
 set border -1
 set xyplane 0
-set sample 501
-set isosample 501
+set sample 300
+set isosample 300
 
-set title "complex Bessel function |K_{1/2} (x + iy)|"
+set title "complex Bessel function {|K_{1/2} (x + iy)|}"
 unset key
 
 splot '++' using 1:2:( abs(BesselK( 0.5, x+y*I )) ):( arg(BesselK( 0.5, x+y*I )) ) with pm3d
@@ -62,8 +62,8 @@ reset
 set border -1
 set grid x y z vertical
 set view 41, 19
-set samples 51, 51
-set isosamples 51, 51
+set samples 50, 50
+set isosamples 50, 50
 set hidden3d
 
 set xyplane 0

@@ -262,6 +262,11 @@ print "********************** file cerf.dem *************************"
 load "cerf.dem"
 reset
 
+print "********************** libamos routines *************************"
+load "complex_airy.dem"
+load "BesselK.dem"
+reset
+
 print "********************** file heatmaps.dem *********************"
 load "heatmaps.dem"
 reset
