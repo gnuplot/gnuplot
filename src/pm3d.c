@@ -1615,31 +1615,40 @@ clip_filled_polygon( gpdPoint *inpts, gpdPoint *outpts, int nv )
     int next = 0;	/* The next vertex */
     int nvo = 0;	/* Number of vertices after clipping */
     int noutrange = 0;	/* Number of out-range points */
+    int nover = 0;
+    int nunder = 0;
     double fraction;
     double zmin = axis_array[FIRST_Z_AXIS].min;
     double zmax = axis_array[FIRST_Z_AXIS].max;
 
     /* classify inrange/outrange vertices */
-    static TBOOLEAN *outrange = NULL;
+    static int *outrange = NULL;
     static int maxvert = 0;
     if (nv > maxvert) {
 	maxvert = nv;
-	outrange = gp_realloc(outrange, maxvert * sizeof(TBOOLEAN), NULL);
+	outrange = gp_realloc(outrange, maxvert * sizeof(int), NULL);
     }
     for (current = 0; current < nv; current++) {
-	if (inrange( inpts[current].z, zmin, zmax ))
-	    outrange[current] = FALSE;
-	else {
-	    outrange[current] = TRUE;
+	if (inrange( inpts[current].z, zmin, zmax )) {
+	    outrange[current] = 0;
+	} else if (inpts[current].z > zmax) {
+	    outrange[current] = 1;
 	    noutrange++;
+	    nover++;
+	} else if (inpts[current].z < zmin) {
+	    outrange[current] = -1;
+	    noutrange++;
+	    nunder++;
 	}
     }
 
-    /* If all are in range or all out of range, forget it. */
-    if (noutrange == nv)
-	return -1;
+    /* If all are in range, nothing to do */
     if (noutrange == 0)
 	return 0;
+
+    /* If all vertices are out of range on the same side, draw nothing */
+    if (nunder == nv || nover == nv)
+	return -1;
 
     for (current = 0; current < nv; current++) {
 	next = (current+1) % nv;
@@ -1655,6 +1664,23 @@ clip_filled_polygon( gpdPoint *inpts, gpdPoint *outpts, int nv )
 		outpts[nvo].x = inpts[next].x + fraction * (inpts[current].x - inpts[next].x);
 		outpts[nvo].y = inpts[next].y + fraction * (inpts[current].y - inpts[next].y);
 		outpts[nvo].z = inpts[current].z >= zmax ? zmax : zmin;
+		nvo++;
+	    }
+	    else if ( /* clip_lines2 && */ (outrange[current] * outrange[next] < 0)) {
+		/* Current point and next point are out of range on opposite
+		 * sides of the z range.  Clip both ends of the segment.
+		 */
+		fraction = ((inpts[current].z >= zmax ? zmax : zmin) - inpts[next].z)
+			 / (inpts[current].z - inpts[next].z);
+		outpts[nvo].x = inpts[next].x + fraction * (inpts[current].x - inpts[next].x);
+		outpts[nvo].y = inpts[next].y + fraction * (inpts[current].y - inpts[next].y);
+		outpts[nvo].z = inpts[current].z >= zmax ? zmax : zmin;
+		nvo++;
+		fraction = ((inpts[next].z >= zmax ? zmax : zmin) - outpts[nvo-1].z)
+			 / (inpts[next].z - outpts[nvo-1].z);
+		outpts[nvo].x = outpts[nvo-1].x + fraction * (inpts[next].x - outpts[nvo-1].x);
+		outpts[nvo].y = outpts[nvo-1].y + fraction * (inpts[next].y - outpts[nvo-1].y);
+		outpts[nvo].z = inpts[next].z >= zmax ? zmax : zmin;
 		nvo++;
 	    }
 
@@ -1674,6 +1700,10 @@ clip_filled_polygon( gpdPoint *inpts, gpdPoint *outpts, int nv )
 	    }
 	}
     }
+
+    /* this is not supposed to happen, but ... */
+    if (nvo <= 1)
+	return -1;
 
     return nvo;
 }
