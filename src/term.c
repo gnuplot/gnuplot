@@ -1644,16 +1644,6 @@ init_terminal()
 	    term_name = "pm";
 #endif /*OS2 */
 
-/* set linux terminal only if LINUX_setup was successful, if we are on X11
-   LINUX_setup has failed, also if we are logged in by network */
-#ifdef LINUXVGA
-	if (LINUX_graphics_allowed)
-#if defined(VGAGL) && defined (THREEDKIT)
-	    term_name = "vgagl";
-#else
-	    term_name = "linux";
-#endif
-#endif /* LINUXVGA */
     }
 
     /* We have a name, try to set term type */

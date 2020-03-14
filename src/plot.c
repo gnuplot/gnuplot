@@ -201,55 +201,6 @@ inter(int anint)
 #endif
 }
 
-#ifdef LINUXVGA
-/* utility functions to ensure that setuid gnuplot
- * assumes root privileges only for those parts
- * of the code which require root rights.
- *
- * By "Dr. Werner Fink" <werner@suse.de>
- */
-static uid_t euid, ruid;
-static gid_t egid, rgid;
-static int asked_privi = 0;
-
-void
-drop_privilege()
-{
-    if (!asked_privi) {
-	euid = geteuid();
-	egid = getegid();
-	ruid = getuid();
-	rgid = getgid();
-	asked_privi = 1;
-    }
-    if (setegid(rgid) == -1)
-	(void) fprintf(stderr, "setegid(%d): %s\n",
-		       (int) rgid, strerror(errno));
-    if (seteuid(ruid) == -1)
-	(void) fprintf(stderr, "seteuid(%d): %s\n",
-		       (int) ruid, strerror(errno));
-}
-
-void
-take_privilege()
-{
-    if (!asked_privi) {
-	euid = geteuid();
-	egid = getegid();
-	ruid = getuid();
-	rgid = getgid();
-	asked_privi = 1;
-    }
-    if (setegid(egid) == -1)
-	(void) fprintf(stderr, "setegid(%d): %s\n",
-		       (int) egid, strerror(errno));
-    if (seteuid(euid) == -1)
-	(void) fprintf(stderr, "seteuid(%d): %s\n",
-		       (int) euid, strerror(errno));
-}
-
-#endif /* LINUXVGA */
-
 /* a wrapper for longjmp so we can keep everything local */
 void
 bail_to_command_line()
@@ -280,10 +231,6 @@ main(int argc_orig, char **argv)
     static volatile int argc;
     argc = argc_orig;
 
-#ifdef LINUXVGA
-    LINUX_setup();		/* setup VGA before dropping privilege DBT 4/5/99 */
-    drop_privilege();
-#endif
 /* make sure that we really have revoked root access, this might happen if
    gnuplot is compiled without vga support but is installed suid by mistake */
 #ifdef __linux__

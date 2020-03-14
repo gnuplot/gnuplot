@@ -964,12 +964,6 @@ show_version(FILE *fp)
 #endif
 		"";
 
-	    const char *linuxvga =
-#ifdef LINUXVGA
-		"+LINUXVGA  "
-#endif
-		"";
-
 	    const char *nocwdrc =
 #ifdef USE_CWDRC
 		"+"
@@ -1016,9 +1010,9 @@ show_version(FILE *fp)
 		"";
 #endif
 
-	    sprintf(compile_options, "    %s%s\n    %s%s\n    %s%s%s\n    %s%s%s%s\n",
+	    sprintf(compile_options, "    %s%s\n    %s%s\n    %s%s\n    %s%s%s%s\n",
 		    rdline, gnu_rdline, unicodebuild, plotoptions,
-		    libcerf, libgd, linuxvga,
+		    libcerf, libgd,
 		    nocwdrc, x11, use_mouse, hiddenline
 		    );
 	}

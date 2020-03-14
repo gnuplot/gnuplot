@@ -504,10 +504,6 @@ void do_arc( int cx, int cy, double radius,
              double arc_start, double arc_end,
 	     int style, TBOOLEAN wedge);
 
-#ifdef LINUXVGA
-void LINUX_setup(void);
-#endif
-
 #ifdef OS2
 int PM_pause(char *);
 void PM_intc_cleanup(void);

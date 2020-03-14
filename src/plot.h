@@ -75,11 +75,6 @@ void interrupt_setup(void);
 void gp_expand_tilde(char **);
 void get_user_env(void);
 
-#ifdef LINUXVGA
-void drop_privilege(void);
-void take_privilege(void);
-#endif /* LINUXVGA */
-
 #ifdef OS2
 int ExecuteMacro(char *, int);
 #endif
