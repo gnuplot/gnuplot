@@ -240,6 +240,12 @@ save_axis_label_or_title(FILE *fp, char *name, char *suffix,
 	fprintf(fp, " rotate by %d", label->rotate);
     else
 	fprintf(fp, " norotate");
+
+    if (label == &title && label->boxed) {
+	fprintf(fp," boxed ");
+	if (label->boxed > 0)
+	    fprintf(fp,"bs %d ",label->boxed);
+    }
     fprintf(fp, "%s\n", (label->noenhanced) ? " noenhanced" : "");
 }
 

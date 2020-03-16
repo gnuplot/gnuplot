@@ -61,7 +61,8 @@ static int key_title_height;	/* nominal number of lines * character height */
 static int key_title_extra;	/* allow room for subscript/superscript */
 static int key_title_ypos;	/* offset from key->bounds.ytop */
 static int time_y, time_x;
-static int title_x, title_y;
+
+int title_x, title_y;		/* Used by boundary and by 2D graphics */
 
 /*
  * These quantities are needed in do_plot() e.g. for histogtram title layout
@@ -176,18 +177,26 @@ boundary(struct curve_points *plots, int count)
 
     /*     first compute heights of things to be written in the margin */
 
-    /* title */
+
+    /* Title placement has been reworked for 5.4
+     * NOTE: title_textheight is _not_ the height of the title!
+     * It is the amount of space reserved for the title above the plot.
+     * A negative offset greater than the number of title lines means
+     * that the title will appear inside the boundary and no extra space
+     * needs to be reserved for it above the plot.
+     */
+    title_textheight = 0;
     if (titlelin) {
-	double tmpx, tmpy;
-	map_position_r(&(title.offset), &tmpx, &tmpy, "title");
+	title_textheight = t->v_char;	/* Gap of one normal line height */
 	if (title.font)
 	    t->set_font(title.font);
-	title_textheight = (int) ((titlelin) * (t->v_char) + tmpy);
+	title_y = titlelin * t->v_char;
+	if ((titlelin + title.offset.y) > 0)
+	    title_textheight += titlelin * t->v_char;
 	if (title.font)
 	    t->set_font("");
-	title_textheight += (int)(t->v_char); /* Gap of one normal line height */
-    } else
-	title_textheight = 0;
+	title_y += 0.5 * t->v_char;	/* Approximate same placement as version 5.2 */
+    }
 
     /* Extra space at the top for spiderplot axis label */
     if (spiderplot)
@@ -743,12 +752,19 @@ boundary(struct curve_points *plots, int count)
     }
 
     title_x = (plot_bounds.xleft + plot_bounds.xright) / 2;
-    title_y = plot_bounds.ytop + title_textheight + x2tic_textheight;
-    title_y += ttic_textheight;
-    if (x2label_y + x2label_yoffset > plot_bounds.ytop)
-	title_y += x2label_textheight;
-    if (x2tic_height > 0)
-	title_y += x2tic_height;
+
+    /* title_y was previously set to the actual title height.
+     * Further corrections to this placement only if it is above the plot
+     */
+    title_y += plot_bounds.ytop;
+    if (titlelin + title.offset.y > 0) {
+	title_y += x2tic_textheight;
+	title_y += ttic_textheight;
+	if (x2label_y + x2label_yoffset > plot_bounds.ytop)
+	    title_y += x2label_textheight;
+	if (x2tic_height > 0)
+	    title_y += x2tic_height;
+    }
 
     /* Shift upward by 0.2 line to allow for descenders in xlabel text */
     xlabel_y = plot_bounds.ybot - xtic_height - xtic_textheight - xlabel_textheight
@@ -1498,20 +1514,6 @@ draw_titles()
 
 	write_label(x, y, label);
 	reset_textcolor(&(label->textcolor));
-    }
-
-    /* PLACE TITLE */
-    if (title.text) {
-	double tmpx, tmpy;
-	int x, y;
-	map_position_r(&(title.offset), &tmpx, &tmpy, "doplot");
-	/* we worked out y-coordinate in boundary(), including the y offset */
-	x = title_x;
-	y = title_y - tmpy - t->v_char / 2;
-
-	/* NB: write_label applies text color but does not reset it */
-	write_label(x, y, &title);
-	reset_textcolor(&(title.textcolor));
     }
 
     /* X2LABEL */

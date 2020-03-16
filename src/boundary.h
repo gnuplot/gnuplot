@@ -21,5 +21,6 @@ extern int ylabel_x, y2label_x, xlabel_y, x2label_y;
 extern int ylabel_y, y2label_y, xtic_y, x2tic_y, ytic_x, y2tic_x;
 extern int key_cols, key_rows;
 extern int key_count;
+extern int title_x, title_y;
 
 #endif /* GNUPLOT_BOUNDARY_H */
