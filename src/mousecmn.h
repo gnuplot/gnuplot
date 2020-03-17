@@ -74,17 +74,6 @@ enum {
     GE_EVT_NUM
 };
 
-static const char* GE_evt_name(int type)
-{
-#define GE_EVT_NAME(name) case name: return #name;
-    switch(type)
-    {
-        GE_EVT_LIST(GE_EVT_NAME);
-    default: ;
-    }
-    return "GE_UNKNOWN";
-}
-
 /* the status of the shift, ctrl and alt keys
  * Mod_Opt is used by the "bind" mechanism to indicate that the
  * Ctrl or Alt key is allowed but not required

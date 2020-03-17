@@ -163,6 +163,20 @@ static bind_t *bindings = (bind_t *) 0;
 static const int NO_KEY = -1;
 static TBOOLEAN trap_release = FALSE;
 
+/*
+ * event -> name translation for debugging
+ */
+const char* GE_evt_name(int type)
+{
+#define GE_EVT_NAME(name) case name: return #name;
+    switch(type)
+    {
+        GE_EVT_LIST(GE_EVT_NAME);
+    default: ;
+    }
+    return "GE_UNKNOWN";
+}
+
 /* forward declarations */
 static void alert(void);
 static void MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double *y2);
