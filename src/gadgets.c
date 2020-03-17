@@ -1105,3 +1105,16 @@ pm3d_objects(void)
     }
     return FALSE;
 }
+
+/*
+ * Place overall title on the canvas (shared by plot and splot).
+ */
+void
+place_title(int title_x, int title_y)
+{
+    if (title.text) {
+	/* NB: write_label applies text color but does not reset it */
+	write_label(title_x, title_y, &title);
+	reset_textcolor(&(title.textcolor));
+    }
+}

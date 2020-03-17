@@ -639,6 +639,7 @@ do_3dplot(
     int xl = 0, yl = 0;
     int xl_save, yl_save;
     int xl_prev = 0, yl_prev = 0;
+    int title_x = 0, title_y = 0;
     transform_matrix mat;
     int key_count;
     TBOOLEAN key_pass = FALSE;
@@ -887,9 +888,9 @@ do_3dplot(
 	    y = (plot_bounds.ytop + titlelin * (t->h_char));
 	}
 
-	/* NB: write_label applies text color but does not reset it */
-	write_label(x, y, &title);
-	reset_textcolor(&(title.textcolor));
+	/* Save title position for later */
+	title_x = x;
+	title_y = y;
     }
 
     /* PLACE TIMELABEL */
@@ -1521,6 +1522,10 @@ do_3dplot(
 
     /* PLACE ARROWS */
     place_arrows3d(LAYER_FRONT);
+
+    /* PLACE TITLE LAST */
+    if (title.text != 0)
+	place_title(title_x, title_y);
 
 #ifdef USE_MOUSE
     /* finally, store the 2d projection of the x and y axis, to enable zooming by mouse */

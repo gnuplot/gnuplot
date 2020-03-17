@@ -749,7 +749,7 @@ do_plot(struct curve_points *plots, int pcount)
     /* Sync point for epslatex text positioning */
     (term->layer)(TERM_LAYER_FRONTTEXT);
 
-    /* Draw plot title and axis labels */
+    /* Draw axis labels and timestamps */
     /* Note: As of Dec 2012 these are drawn as "front" text. */
     draw_titles();
 
@@ -1111,6 +1111,9 @@ do_plot(struct curve_points *plots, int pcount)
 
     /* PLACE ARROWS */
     place_arrows( LAYER_FRONT );
+
+    /* PLACE TITLE LAST */
+    place_title(title_x, title_y);
 
     /* Release the palette if we have used one (PostScript only?) */
     if (is_plot_with_palette() && term->previous_palette)
