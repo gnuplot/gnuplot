@@ -13,6 +13,14 @@
  * The cairy() routine (note C naming but Fortran parameter passing)
  * is from my own build of the AMOS routines.
  *
+ * IERR codes from libamos
+ *	0	no error
+ *	1	input error, no computation
+ *	2	overflow predicted from input value
+ *	3	overflow from computation
+ *	4	input value out of range, no computation
+ *	5	other error
+ *
  * Ethan A Merritt - March 2020
  */
 
@@ -88,6 +96,8 @@ f_amos_Bi(union argument *arg)
     zbiry_( &z.real, &z.imag, &id, &kode, &bi.real, &bi.imag, &ierr );
 
     if (ierr != 0) {
+	FPRINTF((stderr,"zbiry( {%.3f, %.3f} ): ierr = %d\n",
+		z.real, z.imag, ierr));
 	Gcomplex(&a, not_a_number(), 0.0);
     } else {
 	Gcomplex(&a, bi.real, bi.imag);
@@ -135,6 +145,8 @@ f_amos_BesselK(union argument *arg)
 	    &Bk[0].real, &Bk[0].imag, &underflow, &ierr );
 
     if (ierr != 0) {
+	FPRINTF((stderr,"zbesk( {%.3f, %.3f} ): ierr = %d\n",
+		z.real, z.imag, ierr));
 	Gcomplex(&a, not_a_number(), 0.0);
     } else {
 	Gcomplex(&a, Bk[0].real, Bk[0].imag);
