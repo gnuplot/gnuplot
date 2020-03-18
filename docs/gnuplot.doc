@@ -612,6 +612,21 @@ C
           (in script:  print ARG1, ARG2, "number of args = ", ARGC
        set cntrlabel
        set fit <option> <value>
+
+ Deprecated in version 5.4
+       # use of a file containing `reread` to perform iteration
+       N = 0;  load "file-containing-reread";
+       file content:
+           N = N+1
+           plot func(N,x)
+           pause -1
+           if (N<5) reread
+ Current equivalent
+       do for [N=1:5] {
+           plot func(N, x)
+           pause -1
+       }
+
 2 Demos and Online Examples
 ?demos
 ?online examples
@@ -6093,7 +6108,6 @@ Ffigure_zerror
        history 10 "|head -5 >>diary.gp" # write 5 history commands using pipe
        history ?load         # show all history entries starting with "load"
        history ?"set c"      # like above, several words enclosed in quotes
-       hi !reread            # execute last entry starting with "reread"
        hist !"set xr"        # like above, several words enclosed in quotes
        hist !55              # reexecute the command at history entry 55
 2 if
@@ -6276,15 +6290,14 @@ Ffigure_zerror
 
  The variant "pause mouse key" will resume after any keypress in the active
  plot window. If you want to wait for a particular key to be pressed, you can
- use a reread loop such as:
+ use a loop such as:
 
        print "I will resume after you hit the Tab key in the plot window"
-       load "wait_for_tab"
-
- File "wait_for_tab" contains the lines
-
+       plot <something>
        pause mouse key
-       if (MOUSE_KEY != 9) reread
+       while (MOUSE_KEY != 9) {
+           pause mouse key
+       }
 
 2 plot
 ?commands plot
@@ -8309,52 +8322,20 @@ Ffigure_zerror
 2 reread
 ?commands reread
 ?reread
+ [DEPRECATED in version 5.4]
+
+ This command is deprecated in favor of explicit iteration.
+ See `iterate`.
  The `reread` command causes the current `gnuplot` command file, as specified
- by a `load` command or on the command line, to be reset to its starting
- point before further commands are read from it.  This essentially implements
- an endless loop of the commands from the beginning of the command file to
- the `reread` command.  (But this is not necessarily a disaster---`reread` can
- be very useful when used in conjunction with `if`.)
- The `reread` command has no effect if input from standard input.
-
- Examples:
-
- Suppose the file "looper" contains the commands
-       a=a+1
-       plot sin(x*a)
-       pause -1
-       if(a<5) reread
- and from within `gnuplot` you submit the commands
-       a=0
-       load 'looper'
- The result will be five plots (separated by the `pause` message).
-
- Suppose the file "data" contains six columns of numbers with a total yrange
- from 0 to 10; the first is x and the next are five different functions of x.
- Suppose also that the file "plotter" contains the commands
-       c_p = c_p+1
-       plot "$0" using 1:c_p with lines linetype c_p
-       if(c_p <  n_p) reread
- and from within `gnuplot` you submit the commands
-       n_p=6
-       c_p=1
-       unset key
-       set yrange [0:10]
-       set multiplot
-       call 'plotter' 'data'
-       unset multiplot
- The result is a single graph consisting of five plots.  The yrange must be
- set explicitly to guarantee that the five separate graphs (drawn on top of
- each other in multiplot mode) will have exactly the same axes.  The linetype
- must be specified; otherwise all the plots would be drawn with the same type.
- See animate.dem in demo directory for an animated example.
-
+ by a `load` command, to be reset to its starting point before further commands
+ are read from it.  This essentially implements an endless loop of the commands
+ from the beginning of the command file to the `reread` command.
+ The `reread` command has no effect when reading interactively (from stdin).
 2 reset
 ?commands reset
 ?reset
-?reset errors
-?reset bind
-?reset session
+      reset {bind | errors | session}
+
  The `reset` command causes all graph-related options that can be set with the
  `set` command to return to their default values.  This command can be used to
  restore the default settings after executing a loaded command file, or to
@@ -8371,16 +8352,19 @@ Ffigure_zerror
  $XDG_CONFIG_HOME/gnuplot/gnuplotrc.  However, these commands can be
  re-executed by using the variant command `reset session`.
 
+?reset session
 =session
  `reset session` deletes any user-defined variables and functions, restores
  default settings, and then re-executes the system-wide gnuplotrc initialization
  file and any private $HOME/.gnuplot or $XDG_CONFIG_HOME/gnuplot/gnuplotrc
  preferences file.  See `initialization`.
 
+?reset errors
 =error state
  `reset errors` clears only the error state variables GPVAL_ERRNO and
  GPVAL_ERRMSG.
 
+?reset bind
 =bind
  `reset bind` restores all hotkey bindings to their default state.
 2 save

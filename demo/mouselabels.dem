@@ -25,6 +25,7 @@ LID = 100
 # Loop over interactive placement of new labels
 #
 load "mouselab_1.dem"
+print "Back from mouselab_1"
 show label
 
 #
