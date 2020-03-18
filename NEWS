@@ -35,6 +35,7 @@ Changes in 5.4
 * EXPERIMENTAL "set mouse mouseformat function <stringval_from_xy(x,y)>"
 * EXPERIMENTAL load $DATABLOCK
 * CHANGE revised syntax for plot style "with parallelaxes"
+* CHANGE deprecate command "reread"
 * CHANGE remove deprecated command "update"
 * CHANGE remove deprecated option "thru"
 * CHANGE special case optimization of nonlinear code to speed up logscale

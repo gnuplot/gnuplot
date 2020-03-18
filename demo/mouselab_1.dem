@@ -4,33 +4,42 @@
 #
 # On entry, LID is the identifier for the previous label
 #
-LID = LID + 1
-set label 2 sprintf(">>> READY FOR LABEL %d <<<",LID-100) 
-set label 2 at graph .02, graph .65 tc lt (LID-100)
-replot
-
-#
-# Get mouse position and first character of label
-#
-pause mouse key
-if (MOUSE_KEY == 27) exit
-
-LABEL = MOUSE_CHAR
-LABEL_X = MOUSE_X
-LABEL_Y = MOUSE_Y
-set label LID LABEL at LABEL_X, LABEL_Y
-replot
-#
-# Call routine that catches keystrokes one by one and
-# updates the label
-#
-load "mouselab_2.dem"
-#
-# Print out final label details
-#
-show label LID
-
 #
 # Loop until we see an <esc>
 #
-if (MOUSE_KEY != 27) reread
+while (1) {
+
+    if (exists("MOUSE_KEY") && MOUSE_KEY == 27) {
+	break
+    }
+
+    LID = LID + 1
+    set label 2 sprintf(">>> READY FOR LABEL %d <<<",LID-100) 
+    set label 2 at graph .02, graph .65 tc lt (LID-100)
+    replot
+
+    #
+    # Get mouse position and first character of label
+    #
+    pause mouse key
+
+    if (MOUSE_KEY == 27) {
+	break
+    }
+
+    LABEL = ""
+    LABEL_X = MOUSE_X
+    LABEL_Y = MOUSE_Y
+    set label LID LABEL at LABEL_X, LABEL_Y
+    replot
+    #
+    # Call routine that catches keystrokes one by one and
+    # updates the label
+    #
+    load "mouselab_2.dem"
+    #
+    # Print out final label details
+    #
+    show label LID
+
+} # end of loop waiting for <esc>
