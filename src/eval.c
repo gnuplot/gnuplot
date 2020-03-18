@@ -201,10 +201,12 @@ const struct ft_entry ft[] =
     {"lambertw",  f_lambertw},	/* HBB, from G.Kuhnle 20001107 */
     {"airy",  f_airy},		/* cephes library version */
 #ifdef HAVE_AMOS
-    {"Ai", f_amos_Ai},		/* AMOS version from libopenspecfun */
-    {"Bi", f_amos_Bi},		/* AMOS version from libopenspecfun */
-    {"BesselI", f_amos_BesselI},/* AMOS version from libopenspecfun */
-    {"BesselK", f_amos_BesselK},/* AMOS version from libopenspecfun */
+    {"Ai", f_amos_Ai},		/* Amos version from libopenspecfun */
+    {"Bi", f_amos_Bi},		/* Amos version from libopenspecfun */
+    {"BesselI", f_amos_BesselI},/* Amos version from libopenspecfun */
+    {"BesselK", f_amos_BesselK},/* Amos version from libopenspecfun */
+    {"Hankel1", f_Hankel1},	/* Amos version from libopenspecfun */
+    {"Hankel2", f_Hankel2},	/* Amos version from libopenspecfun */
 #endif
     {"expint",  f_expint},	/* Jim Van Zandt, 20101010 */
     {"besin",  f_besin},

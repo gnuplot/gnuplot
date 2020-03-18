@@ -33,6 +33,9 @@ extern void zairy_( double *zr, double *zi, int32_t *id, int32_t *kode,
 		    double *air, double *aii, int32_t *underflow, int32_t *ierr );
 extern void zbiry_( double *zr, double *zi, int32_t *id, int32_t *kode,
 		    double *air, double *aii, int32_t *ierr );
+extern void zbesh_( double *zr, double *zi, double *nu, int32_t *kode,
+		    int32_t *kind, int32_t *length,
+		    double *zbr, double *zbi, int32_t *underflow, int32_t *ierr);
 extern void zbesi_( double *zr, double *zi, double *nu, int32_t *kode, int32_t *length,
 		    double *zbr, double *zbi, int32_t *underflow, int32_t *ierr);
 extern void zbesk_( double *zr, double *zi, double *nu, int32_t *kode, int32_t *length,
@@ -159,6 +162,64 @@ f_amos_BesselK(union argument *arg)
 
 
 /*
+ * Hankel functions of the first and second kinds
+ *	val = Hankel1( nu, z ) = Jnu(z) + iYnu(z)
+ *	val = Hankel2( nu, z ) = Jnu(z) - iYnu(z)
+ * The underlying libamos routine besi fills in an array of values
+ * val[j] corresponding to a sequence functions Hankel( kind, nu+j, z )
+ * but we ask for only the j=0 case.
+ */
+void
+f_amos_Hankel(int k, union argument *arg)
+{
+    struct value a;
+    struct cmplx z;
+    struct cmplx H[NJ];
+    double nu;
+    int32_t kode, kind, length, underflow, ierr;
+
+    (void) arg;                        /* avoid -Wunused warning */
+
+    /* ... unpack arguments ... */
+    pop(&a);
+    if (a.type == INTGR) {
+	z.real = a.v.int_val;
+	z.imag = 0;
+    } else {
+	z.real = a.v.cmplx_val.real;
+	z.imag = a.v.cmplx_val.imag;
+    }
+    nu = real(pop(&a));
+
+
+    kode = 1;		/* 1 = unscaled   2 = scaled */
+    kind = k;		/* 1 = first kind, 2 = second kind */
+    length = NJ;	/* number of members in the returned sequence of functions */
+
+    /* Fortran calling conventions! */
+    zbesh_( &z.real, &z.imag, &nu, &kode, &kind, &length,
+	    &H[0].real, &H[0].imag, &underflow, &ierr );
+
+    if (ierr != 0) {
+	FPRINTF((stderr,"zbesh( {%.3f, %.3f} ): ierr = %d\n",
+		z.real, z.imag, ierr));
+	Gcomplex(&a, not_a_number(), 0.0);
+    } else {
+	Gcomplex(&a, H[0].real, H[0].imag);
+    }
+
+    push(&a);
+}
+
+void
+f_Hankel1(union argument *arg) { f_amos_Hankel( 1, arg ); }
+
+void
+f_Hankel2(union argument *arg) { f_amos_Hankel( 2, arg ); }
+
+
+
+/*
  * Modified Bessel function of the first kind I_nu(z)
  *	val = BesselI( nu, z )
  * The underlying libamos routine besi fills in an array of values
@@ -205,6 +266,9 @@ f_amos_BesselI(union argument *arg)
 
     push(&a);
 }
+
+
+
 #undef NJ
 
 #endif	/* HAVE_AMOS */

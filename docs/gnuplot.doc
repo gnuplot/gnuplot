@@ -1959,6 +1959,19 @@ C marker below is used to signal this to doc2html:
  `Bi(z)` is the complex Airy function Bi(z).
  Supported via external library containing routines by Donald E. Amos,
  Sandia National Laboratoris, SAND85-1018 (1985).
+4 BesselH
+?expressions functions BesselH1
+?expressions functions BesselH2
+?BesselH1
+?BesselH2
+#BesselH1(nu,z) & real, complex & \gpCX & $H^{(1)}_{\nu}(z)$ Hankel function of the first kind\\
+#BesselH2(nu,z) & real, complex & \gpCX & $H^{(2)}_{\nu}(z)$ Hankel function of the second kind\\
+ `BesselH1(nu,z)` and `BesselH2(nu,z)` are the Hankel functions of the first and
+ second kind.
+     H1(nu,z) = J(nu,z) + iY(nu,z)
+     H2(nu,z) = J(nu,z) - iY(nu,z)
+ Supported via external library containing routines by Donald E. Amos,
+ Sandia National Laboratoris, SAND85-1018 (1985).
 4 BesselI
 ?expressions functions BesselI
 ?functions BesselI

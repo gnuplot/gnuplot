@@ -11,4 +11,6 @@ void f_amos_Ai (union argument *x);
 void f_amos_Bi (union argument *x);
 void f_amos_BesselI (union argument *x);
 void f_amos_BesselK (union argument *x);
+void f_Hankel1 (union argument *x);
+void f_Hankel2 (union argument *x);
 #endif
