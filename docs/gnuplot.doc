@@ -1959,6 +1959,15 @@ C marker below is used to signal this to doc2html:
  `Bi(z)` is the complex Airy function Bi(z).
  Supported via external library containing routines by Donald E. Amos,
  Sandia National Laboratoris, SAND85-1018 (1985).
+4 BesselI
+?expressions functions BesselI
+?functions BesselI
+?BesselI
+#BesselI(nu,z) & real, complex & \gpCX & $I_{\nu}(z)$ modified Bessel function of the first kind\\
+%BesselI(nu,z) @ real, complex @ modified Bessel function I_nu of the first kind
+ `BesselI(nu,z)` is the modified Bessel function of the first kind I_nu.
+ Supported via external library containing routines by Donald E. Amos,
+ Sandia National Laboratoris, SAND85-1018 (1985).
 4 BesselK
 ?expressions functions BesselK
 ?functions BesselK
@@ -2332,7 +2341,8 @@ C marker below is used to signal this to doc2html:
  `cerf`, `cdawson`, `faddeeva`, `erfi`, `VP`, and `VP_fwhm`.
 
  For functions requiring routines implemented by Douglas E. Amos,
- Sandia National Laboratories, SAND85-1018 (1985), see `Ai`, `Bi`, `BesselK`.
+ Sandia National Laboratories, SAND85-1018 (1985).
+ See `Ai`, `Bi`, `BesselI`, `BesselK`.
  These routines may be found in netlib (http://netlib.sandia.gov) or in
  libopenspecfun (https://github.com/JuliaLang/openspecfun).
 

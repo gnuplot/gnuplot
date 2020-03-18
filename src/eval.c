@@ -203,6 +203,7 @@ const struct ft_entry ft[] =
 #ifdef HAVE_AMOS
     {"Ai", f_amos_Ai},		/* AMOS version from libopenspecfun */
     {"Bi", f_amos_Bi},		/* AMOS version from libopenspecfun */
+    {"BesselI", f_amos_BesselI},/* AMOS version from libopenspecfun */
     {"BesselK", f_amos_BesselK},/* AMOS version from libopenspecfun */
 #endif
     {"expint",  f_expint},	/* Jim Van Zandt, 20101010 */
