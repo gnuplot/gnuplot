@@ -195,7 +195,8 @@ static int iteration_depth = 0;
 static TBOOLEAN requested_break = FALSE;
 static TBOOLEAN requested_continue = FALSE;
 
-static int command_exit_status = 0;
+/* set when an "exit" command is encountered */
+static int command_exit_requested = 0;
 
 /* support for dynamic size of input line */
 void
@@ -426,13 +427,13 @@ do_line()
     c_token = 0;
     while (c_token < num_tokens) {
 	command();
+	if (command_exit_requested) {
+	    command_exit_requested = 0;	/* yes this is necessary */
+	    return 1;
+	}
 	if (iteration_early_exit()) {
 	    c_token = num_tokens;
 	    break;
-	}
-	if (command_exit_status) {
-	    command_exit_status = 0;
-	    return 1;
 	}
 	if (c_token < num_tokens) {	/* something after command */
 	    if (equals(c_token, ";")) {
@@ -473,10 +474,20 @@ do_string_and_free(char *cmdline)
 	extend_input_line();
     strcpy(gp_input_line, cmdline);
     screen_ok = FALSE;
-    command_exit_status = do_line();
+    command_exit_requested = do_line();
 
-    /* We don't know if screen_ok is appropriate so leave it FALSE. */
-    lf_pop();
+    /* "exit" is supposed to take us out of the current file from a
+     * "load <file>" command.  But the LFS stack holds both files and
+     * bracketed clauses, so we have to keep popping until we hit an
+     * actual file.
+     */
+    if (command_exit_requested) {
+	while (lf_head && !lf_head->name) {
+	    FPRINTF((stderr,"pop one level of non-file LFS\n"));
+	    lf_pop();
+	}
+    } else
+	lf_pop();
 }
 
 
@@ -1075,7 +1086,7 @@ exit_command()
     }
 
     /* else graphics will be tidied up in main */
-    command_exit_status = 1;
+    command_exit_requested = 1;
 }
 
 
@@ -1369,6 +1380,9 @@ do_command()
     do {
 	requested_continue = FALSE;
 	do_string(clause);
+
+	if (command_exit_requested != 0)
+	    requested_break = TRUE;
 	if (requested_break)
 	    break;
     } while (next_iteration(do_iterator));
@@ -1413,6 +1427,8 @@ while_command()
     while (exprval != 0) {
 	requested_continue = FALSE;
 	do_string(clause);
+	if (command_exit_requested)
+	    requested_break = TRUE;
 	if (requested_break)
 	    break;
 	c_token = save_token;
