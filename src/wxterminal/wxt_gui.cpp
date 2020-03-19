@@ -1089,7 +1089,9 @@ void wxtPanel::DrawToDC(wxDC &dc, wxRegion &region)
 		dc.SetPen( tmp_pen );
 #ifndef __WXOSX_COCOA__
 		/* wx 2.9 Cocoa bug workaround, which has no logical functions support */
+#if (GTK_MAJOR_VERSION < 3)
 		dc.SetLogicalFunction( wxINVERT );
+#endif
 #endif
 		dc.DrawLine( zoom_x1, zoom_y1, mouse_x, zoom_y1 );
 		dc.DrawLine( mouse_x, zoom_y1, mouse_x, mouse_y );
@@ -1126,7 +1128,9 @@ void wxtPanel::DrawToDC(wxDC &dc, wxRegion &region)
 		dc.SetPen( tmp_pen );
 #ifndef __WXOSX_COCOA__
 		/* wx 2.9 Cocoa bug workaround, which has no logical functions support */
+#if (GTK_MAJOR_VERSION < 3)
 		dc.SetLogicalFunction( wxINVERT );
+#endif
 #endif
 #ifdef __WXMSW__
 		dc.DrawLine(0, (int)wxt_ruler_y, plot.device_xmax, (int)wxt_ruler_y);
@@ -1143,7 +1147,9 @@ void wxtPanel::DrawToDC(wxDC &dc, wxRegion &region)
 		dc.SetPen( tmp_pen );
 #ifndef __WXOSX_COCOA__
 		/* wx 2.9 Cocoa bug workaround, which has no logical functions support */
+#if (GTK_MAJOR_VERSION < 3)
 		dc.SetLogicalFunction( wxINVERT );
+#endif
 #endif
 		dc.DrawLine((int)wxt_ruler_x, (int)wxt_ruler_y, mouse_x, mouse_y);
 		dc.SetLogicalFunction( wxCOPY );
