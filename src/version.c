@@ -40,7 +40,7 @@ const char gnuplot_patchlevel[] = "rc0";
 #ifdef DEVELOPMENT_VERSION
 #include "timestamp.h"
 #else
-const char gnuplot_date[] = "2020-03-03 ";
+const char gnuplot_date[] = "2020-03-21 ";
 #endif
 const char gnuplot_copyright[] = "Copyright (C) 1986-1993, 1998, 2004, 2007-2020";
 

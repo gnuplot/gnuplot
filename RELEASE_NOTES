@@ -1,8 +1,8 @@
 		Gnuplot Version 5.4 Release Notes
 		=================================
 
-Gnuplot version 5.4.0 starts a new supported release series.
-Version 5.4 has many new features and a few changes to features that were
+Gnuplot version 5.4 patchlevel 0 will be the start of a new supported release
+series with many new features and a few changes to features that were
 present in previous versions.  Gnuplot development is now tracked in a git
 repository on SourceForge.  You can generate a complete history of changes
 using "git log" after downloading:
@@ -12,7 +12,7 @@ using "git log" after downloading:
 We appreciate any feedback from testing this release candidate so that any
 problems can be addressed prior to the 5.4.0 roll-out expected in Spring 2020.
 
-Release Notes date: 05-Jan-2020
+Release Notes date: 21-Mar-2020
 
 Features introduced in version 5.4
 ==================================
@@ -43,9 +43,9 @@ Features introduced in version 5.4
 	o "splot $voxelgrid with isosurface" creates a tessellated 3D surface
 	  enclosing voxels above a requested threshold level.
 	  Example: http://gnuplot.info/demo_5.4/isosurface.html
-	o "set spiderplot" selects a new plotting mode allowing creation of
-	  spider plots, also known as radar charts. These are essentially
-	  parallel axis plots where the axes are arranged radially rather than
+	o "set spiderplot" selects a new plotting mode for creating spider
+	  plots, also known as radar charts. These are essentially parallel
+	  axis plots in which the axes are arranged radially rather than
 	  vertically.
 	  Example: http://gnuplot.info/demo_5.4/spiderplot.html
 	o Plot styles "with circles" and "with boxes" can be used in 3D plots.
@@ -139,7 +139,7 @@ built by default.  Their closest equivalent is the new pict2e terminal, but
 LaTeX users who want support for the full range of gnuplot plot styles are
 recommended to use the cairolatex or tikz terminals.
 
-The Japanese man page is provided both in SJIS and UTF-8 encodings.
+The Japanese man page is provided both in eucJP and UTF-8 encodings.
 Installation into appropriate directories is left to packagers.
 
 Configuration options for interactive use
@@ -191,6 +191,15 @@ are also still available. These include, among many more obscure options:
   seiko printers, pbm bitmapped graphics files) is available if needed
   but is no longer configured in by default.
       ./configure --with-bitmap-terminals
+
+Output of inline graphics to xterm or linux console terminal emulator
+---------------------------------------------------------------------
+
+The sixel or sixelgd terminals display graphics in-line with the commands
+typed on a suitable terminal emulator.  For example "xterm -ti 340"
+emulates a vt340 with sixel color graphics.  The yaft terminal emulator
+can be run at linux console level with no x11 or other windowing system
+active.
 
 Options for generating interactive plots for web display
 --------------------------------------------------------
