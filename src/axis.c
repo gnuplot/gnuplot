@@ -259,6 +259,7 @@ init_sample_range(AXIS *axis, enum PLOT_TYPE plot_type)
     axis_array[SAMPLE_AXIS].max = axis->max;
     axis_array[SAMPLE_AXIS].set_min = axis->set_min;
     axis_array[SAMPLE_AXIS].set_max = axis->set_max;
+    axis_array[SAMPLE_AXIS].datatype = axis->datatype;
     /* Functions are sampled along the x or y plot axis */
     /* Data is drawn from pseudofile '+', assumed to be linear */
     /* NB:  link_udf MUST NEVER BE FREED as it is only a copy */
