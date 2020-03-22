@@ -4901,6 +4901,13 @@ process_image(void *plot, t_procimg_action action)
 		TBOOLEAN visible;
 		double x, y, z, x_low, x_high, y_low, y_high, z_low, z_high;
 
+		/* This of course should not happen, but if an improperly constructed
+		 * input file presents more data than expected, the extra data can
+		 * cause this overflow.
+		 */
+		if (i_image >= p_count || i_image < 0)
+		    int_error(NO_CARET, "Unexpected line of data in matrix encountered");
+
 		x = points[i_image].x;
 		y = points[i_image].y;
 		z = points[i_image].z;
