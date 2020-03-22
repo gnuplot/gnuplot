@@ -4896,8 +4896,7 @@ process_image(void *plot, t_procimg_action action)
 	    pixel_M_N = -1;
 
 	    /* Step through the points placing them in the proper spot in the matrix array. */
-	    for (i=0, j=line_length, i_image=i_start;
-		 i < p_count && i_image < p_count;  i++) {
+	    for (i=0, j=line_length, i_image=i_start; i < p_count; i++) {
 
 		TBOOLEAN visible;
 		double x, y, z, x_low, x_high, y_low, y_high, z_low, z_high;
@@ -4985,13 +4984,6 @@ process_image(void *plot, t_procimg_action action)
 		    i_image += i_delta_line;
 		    j = line_length;
 		}
-
-		/* This of course should not happen, but if an improperly constructed
-		 * input file presents more data than expected, the extra data can
-		 * cause this overflow.
-		 */
-		if (i_image >= p_count || i_image < 0)
-		    int_error(NO_CARET, "Unexpected line of data in matrix encountered");
 	    }
 
 	    if ( (M > 0) && (N > 0) ) {
