@@ -16073,8 +16073,9 @@ Ffigure_walls
      plot $DATA matrix columnheaders rowheaders with image
 
  For text input, a blank line or comment line ends the matrix, and starts a new
- surface mesh.  You can select among the meshes inside a file by the `index`
- option to the `splot` command, as usual.
+ data block.  You can select among the data blocks in a file by the `index`
+ option to the `splot` command, as usual.  The columnheaders option, if present,
+ is applied only to the first data block.
 5 nonuniform
 ?commands plot datafile matrix nonuniform
 ?commands splot datafile matrix nonuniform
