@@ -660,7 +660,6 @@ df_fgets( FILE *fin )
 
 /*}}} */
 
-/*{{{  static int df_tokenise(s) */
 static int
 df_tokenise(char *s)
 {
@@ -848,7 +847,6 @@ df_tokenise(char *s)
     return df_no_cols;
 }
 
-/*}}} */
 
 /*{{{  static double *df_read_matrix() */
 /* Reads a matrix from a text file and stores it in allocated memory.
@@ -890,18 +888,49 @@ df_read_matrix(int *rows, int *cols)
 		if (*s && !strncmp(s, indexname, strlen(indexname)))
 		    index_found = TRUE;
 	    }
-	    if (linearized_matrix)
-		return linearized_matrix;
-	    else
+
+	    /* This whole section copied with minor tweaks from df_readascii() */
+	    if (++blank_count == 1) {
+		/* first blank line */
+		if (linearized_matrix)
+		    return linearized_matrix;
+		if (indexname && !index_found)
+		    continue;
+		if (df_current_index < df_lower_index)
+		    continue;
+	    }
+	    if (blank_count == 2) {
+		/* just reached the end of a data block */
+		++df_current_index;
+		if (indexname && index_found) {
+		    df_eof = 1;
+		    return linearized_matrix;
+		}
+		if (df_current_index <= df_lower_index)
+		    continue;
+		if (df_current_index > df_upper_index) {
+		    df_eof = 1;
+		    return linearized_matrix;
+		}
+	    } else {
+		/* Ignore any blank lines beyond the 2nd */
 		continue;
+	    }
 	}
+
+	/* get here => was not blank */
+
+	/* TODO:  Handle columnheaders for 2nd and subsequent data blocks?
+	 * if (blank_count >= 2) { do something }
+	 */
+
+	blank_count = 0;
 
 	if (mixed_data_fp && is_EOF(*s)) {
 	    df_eof = 1;
 	    return linearized_matrix;
 	}
 	c = df_tokenise(s);
-
 	if (!c)
 	    return linearized_matrix;
 
