@@ -6604,7 +6604,7 @@ Ffigure_zerror
  Sometimes the scanning directions in a binary datafile are not consistent with
  that assumed by gnuplot.  These keywords can flip the scanning direction along
  dimensions x, y, z.
-5 origin
+5 origin	
 ?binary keywords origin
 ?binary origin
  When gnuplot generates coordinates based upon transposition and flip, it
