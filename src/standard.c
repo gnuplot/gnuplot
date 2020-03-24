@@ -1421,6 +1421,7 @@ f_besjn(union argument *arg)
     if ((n.type != INTGR) || (fabs(imag(&a)) > zero)) {
 	push(Gcomplex(&a, 0.0, 0.0));
 	undefined = TRUE;
+	int_error(NO_CARET, "improper argument to besjn(int,real)");
     } else {
 	push(Gcomplex(&a, jn(n.v.int_val, real(&a)), 0.0));
     }
@@ -1436,6 +1437,7 @@ f_besyn(union argument *arg)
     if ((n.type != INTGR) || (fabs(imag(&a)) > zero)) {
 	push(Gcomplex(&a, 0.0, 0.0));
 	undefined = TRUE;
+	int_error(NO_CARET, "improper argument to besyn(int,real)");
     } else {
 	push(Gcomplex(&a, yn(n.v.int_val, real(&a)), 0.0));
     }
