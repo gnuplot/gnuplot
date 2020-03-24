@@ -3358,6 +3358,7 @@ f_besin(union argument *arg)
     if (a.type != INTGR) {
 	push(Gcomplex(&a, not_a_number(), 0.0));
 	undefined = TRUE;
+	int_error(NO_CARET, "improper argument to besin(int,real)");
     } else {
 	push(Gcomplex(&a, iv(v, x), 0.0));
     }
