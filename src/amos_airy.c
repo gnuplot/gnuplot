@@ -38,8 +38,13 @@ extern void zbesh_( double *zr, double *zi, double *nu, int32_t *kode,
 		    double *zbr, double *zbi, int32_t *underflow, int32_t *ierr);
 extern void zbesi_( double *zr, double *zi, double *nu, int32_t *kode, int32_t *length,
 		    double *zbr, double *zbi, int32_t *underflow, int32_t *ierr);
+extern void zbesj_( double *zr, double *zi, double *nu, int32_t *kode, int32_t *length,
+		    double *zbr, double *zbi, int32_t *underflow, int32_t *ierr);
 extern void zbesk_( double *zr, double *zi, double *nu, int32_t *kode, int32_t *length,
 		    double *zbr, double *zbi, int32_t *underflow, int32_t *ierr);
+extern void zbesy_( double *zr, double *zi, double *nu, int32_t *kode, int32_t *length,
+		    double *zbr, double *zbi, int32_t *underflow,
+		    double *wr, double *wi, int32_t *ierr);
 
 void
 f_amos_Ai(union argument *arg)
@@ -221,6 +226,7 @@ f_Hankel2(union argument *arg) { f_amos_Hankel( 2, arg ); }
 
 /*
  * Modified Bessel function of the first kind I_nu(z)
+ * with complex argument z.
  *	val = BesselI( nu, z )
  * The underlying libamos routine besi fills in an array of values
  * val[j] corresponding to a sequence functions BesselI( nu+j, z )
@@ -262,6 +268,108 @@ f_amos_BesselI(union argument *arg)
 	Gcomplex(&a, not_a_number(), 0.0);
     } else {
 	Gcomplex(&a, Bi[0].real, Bi[0].imag);
+    }
+
+    push(&a);
+}
+
+
+/*
+ * Modified Bessel function of the first kind J_nu(z)
+ * with complex argument z.
+ *	val = BesselJ( nu, z )
+ * The underlying libamos routine besi fills in an array of values
+ * val[j] corresponding to a sequence functions BesselJ( nu+j, z )
+ * but we ask for only the j=0 case.
+ */
+void
+f_amos_BesselJ(union argument *arg)
+{
+    struct value a;
+    struct cmplx z;
+    struct cmplx Bj[NJ];
+    double nu;
+    int32_t kode, length, underflow, ierr;
+
+    (void) arg;                        /* avoid -Wunused warning */
+
+    /* ... unpack arguments ... */
+    pop(&a);
+    if (a.type == INTGR) {
+	z.real = a.v.int_val;
+	z.imag = 0;
+    } else {
+	z.real = a.v.cmplx_val.real;
+	z.imag = a.v.cmplx_val.imag;
+    }
+    nu = real(pop(&a));
+
+
+    kode = 1;		/* 1 = unscaled   2 = scaled */
+    length = NJ;	/* number of members in the returned sequence of functions */
+
+    /* Fortran calling conventions! */
+    zbesj_( &z.real, &z.imag, &nu, &kode, &length,
+	    &Bj[0].real, &Bj[0].imag, &underflow, &ierr );
+
+    if (ierr != 0) {
+	FPRINTF((stderr,"zbesj( {%.3f, %.3f} ): ierr = %d\n",
+		z.real, z.imag, ierr));
+	Gcomplex(&a, not_a_number(), 0.0);
+    } else {
+	Gcomplex(&a, Bj[0].real, Bj[0].imag);
+    }
+
+    push(&a);
+}
+
+
+/*
+ * Modified Bessel function of the second kind Y_nu(z)
+ * with complex argument z.
+ *	val = BesselY( nu, z )
+ * The underlying libamos routine besi fills in an array of values
+ * val[j] corresponding to a sequence functions BesselJ( nu+j, z )
+ * but we ask for only the j=0 case.
+ */
+void
+f_amos_BesselY(union argument *arg)
+{
+    struct value a;
+    struct cmplx z;
+    struct cmplx By[NJ];
+    double WorkR[NJ], WorkI[NJ];	/* Scratch space for zbesy_ */
+    double nu;
+    int32_t kode, length, underflow, ierr;
+
+    (void) arg;                        /* avoid -Wunused warning */
+
+    /* ... unpack arguments ... */
+    pop(&a);
+    if (a.type == INTGR) {
+	z.real = a.v.int_val;
+	z.imag = 0;
+    } else {
+	z.real = a.v.cmplx_val.real;
+	z.imag = a.v.cmplx_val.imag;
+    }
+    nu = real(pop(&a));
+
+
+    kode = 1;		/* 1 = unscaled   2 = scaled */
+    length = NJ;	/* number of members in the returned sequence of functions */
+
+    /* Fortran calling conventions! */
+    zbesy_( &z.real, &z.imag, &nu, &kode, &length,
+	    &By[0].real, &By[0].imag, &underflow,
+	    &WorkR[0],  &WorkI[0], &ierr );
+
+    if (ierr != 0) {
+	fprintf(stderr,"zbesy( {%.3f, %.3f} ): ierr = %d\n",
+		z.real, z.imag, ierr);
+	Gcomplex(&a, not_a_number(), 0.0);
+    } else {
+	Gcomplex(&a, By[0].real, By[0].imag);
     }
 
     push(&a);

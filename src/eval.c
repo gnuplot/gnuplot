@@ -204,7 +204,9 @@ const struct ft_entry ft[] =
     {"Ai", f_amos_Ai},		/* Amos version from libopenspecfun */
     {"Bi", f_amos_Bi},		/* Amos version from libopenspecfun */
     {"BesselI", f_amos_BesselI},/* Amos version from libopenspecfun */
+    {"BesselJ", f_amos_BesselJ},/* Amos version from libopenspecfun */
     {"BesselK", f_amos_BesselK},/* Amos version from libopenspecfun */
+    {"BesselY", f_amos_BesselY},/* Amos version from libopenspecfun */
     {"Hankel1", f_Hankel1},	/* Amos version from libopenspecfun */
     {"Hankel2", f_Hankel2},	/* Amos version from libopenspecfun */
 #endif

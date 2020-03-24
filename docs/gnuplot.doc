@@ -211,9 +211,15 @@ C
 ## Note that existing function lgamma(x) = real(lnGamma(real(z)).
 ## See `lnGamma`.
 #b Complex function conj(z) returns the complex conjugate of z.
-#b Complex Airy functions Ai(z) and Bi(z) and complex modified Bessel function
-## of the second kind Kν(z) are provided through an external library
-## if available at build time. See `BesselK`.
+#end
+ Complex special functions are supported if a suitable external library
+ is found at build time.
+#start
+#b Complex Bessel functions Iν(z), Jν(z), Kν(z), Yν(z) of order ν (real)
+## with complex argument z. See `BesselK`.
+#b Complex Hankel functions H1ν(z), H2ν(z) of order ν with complex z.
+## See `BesselH1`.
+#b Complex Airy functions Ai(z), Bi(z).
 #end
 
 4 New plot styles and style options
@@ -1935,7 +1941,7 @@ C marker below is used to signal this to doc2html:
 #\setlength\LTleft{0pt}
 #\setlength\LTright{0pt}
 #\begin{longtable}{@{\extracolsep{\fill}}|lcrl|@{}} \hline
-#\multicolumn{4}{|c|}{Special functions from Amos library (only if available)} \\ \hline \hline
+#\multicolumn{4}{|c|}{Complex special functions from Amos library (only if available)} \\ \hline \hline
 #Function ~~~~~~~~~~~~~~~~~ & Arguments & ~ & Returns ({\gpCX } indicates complex result)\\ \hline
 #\endhead \hline \endfoot
 %c c l .
@@ -1962,14 +1968,37 @@ C marker below is used to signal this to doc2html:
 4 BesselH
 ?expressions functions BesselH1
 ?expressions functions BesselH2
+?expressions functions Hankel
 ?BesselH1
 ?BesselH2
+?Hankel
 #BesselH1(nu,z) & real, complex & \gpCX & $H^{(1)}_{\nu}(z)$ Hankel function of the first kind\\
 #BesselH2(nu,z) & real, complex & \gpCX & $H^{(2)}_{\nu}(z)$ Hankel function of the second kind\\
  `BesselH1(nu,z)` and `BesselH2(nu,z)` are the Hankel functions of the first and
- second kind.
+ second kind
      H1(nu,z) = J(nu,z) + iY(nu,z)
      H2(nu,z) = J(nu,z) - iY(nu,z)
+ for real argument nu and complex argument z.
+ Supported via external library containing routines by Donald E. Amos,
+ Sandia National Laboratoris, SAND85-1018 (1985).
+4 BesselJ
+?expressions functions BesselJ
+?functions BesselJ
+?BesselJ
+#BesselJ(nu,z) & real, complex & \gpCX & $J_{\nu}(z)$ Bessel function of the first kind\\
+%BesselJ(nu,z) @ real, complex @ Bessel function J_nu of the first kind
+ `BesselJ(nu,z)` is the Bessel function of the first kind J_nu
+ for real argument nu and complex argument z.
+ Supported via external library containing routines by Donald E. Amos,
+ Sandia National Laboratoris, SAND85-1018 (1985).
+4 BesselY
+?expressions functions BesselY
+?functions BesselY
+?BesselY
+#BesselY(nu,z) & real, complex & \gpCX & $Y_{\nu}(z)$ Bessel function of the second kind\\
+%BesselY(nu,z) @ real, complex @ Bessel function Y_nu of the second kind
+ `BesselY(nu,z)` is the Bessel function of the second kind Y_nu
+ for real argument nu and complex argument z.
  Supported via external library containing routines by Donald E. Amos,
  Sandia National Laboratoris, SAND85-1018 (1985).
 4 BesselI
@@ -1978,7 +2007,8 @@ C marker below is used to signal this to doc2html:
 ?BesselI
 #BesselI(nu,z) & real, complex & \gpCX & $I_{\nu}(z)$ modified Bessel function of the first kind\\
 %BesselI(nu,z) @ real, complex @ modified Bessel function I_nu of the first kind
- `BesselI(nu,z)` is the modified Bessel function of the first kind I_nu.
+ `BesselI(nu,z)` is the modified Bessel function of the first kind I_nu
+ for real argument nu and complex argument z.
  Supported via external library containing routines by Donald E. Amos,
  Sandia National Laboratoris, SAND85-1018 (1985).
 4 BesselK
@@ -1987,7 +2017,8 @@ C marker below is used to signal this to doc2html:
 ?BesselK
 #BesselK(nu,z) & real, complex & \gpCX & $K_{\nu}(z)$ modified Bessel function of the second kind\\
 %BesselK(nu,z) @ real, complex @ modified Bessel function K_nu of the second kind
- `BesselK(nu,z)` is the modified Bessel function of the second kind K_nu.
+ `BesselK(nu,z)` is the modified Bessel function of the second kind K_nu
+ for real argument nu and complex argument z.
  Supported via external library containing routines by Donald E. Amos,
  Sandia National Laboratoris, SAND85-1018 (1985).
 #\hline \end{longtable}
@@ -2353,11 +2384,12 @@ C marker below is used to signal this to doc2html:
  For functions requiring libcerf (http://apps.jcns.fz-juelich.de/libcerf), see
  `cerf`, `cdawson`, `faddeeva`, `erfi`, `VP`, and `VP_fwhm`.
 
- For functions requiring routines implemented by Douglas E. Amos,
- Sandia National Laboratories, SAND85-1018 (1985).
- See `Ai`, `Bi`, `BesselI`, `BesselK`.
+ Complex Airy, Bessel, and Hankel functions of real order nu and complex
+ arguments require a library containing routines implemented by Douglas E. Amos,
+ Sandia National Laboratories, SAND85-1018 (1985). 
  These routines may be found in netlib (http://netlib.sandia.gov) or in
  libopenspecfun (https://github.com/JuliaLang/openspecfun).
+ See `Ai`, `Bi`, `BesselJ`, `BesselY`, `BesselI`, `BesselK`, `Hankel`.
 
 4 value
 ?expressions functions value
