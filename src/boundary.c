@@ -1358,9 +1358,13 @@ do_key_sample_point(
 {
     struct termentry *t = term;
 
-    /* If the plot this title belongs to specified a non-standard place */
-    /* for the key sample to appear, use that to override xl, yl.       */
-    if (this_plot->title_position && this_plot->title_position->scalex != character) {
+    /* If the plot this title belongs to specified a non-standard place
+     * for the key sample to appear, use that to override xl, yl.
+     * For "at end|beg" do nothing at all.
+     */
+    if (this_plot->title_position) {
+	if (this_plot->title_position->scalex == character)
+	    return;
 	map_position(this_plot->title_position, &xl, &yl, "key sample");
 	xl -=  (key->just == GPKEY_LEFT) ? key_text_left : key_text_right;
     }
