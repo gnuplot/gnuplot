@@ -54,14 +54,14 @@
  * I suppose this corresponded to contemporary hardware limitations.
  * With these limits, igamma(a,x) convergence fails for large a.
  * Temporary fix:  increase ITMAX and ask for higher precision
- *   Replace MACHEPS with IGAMMA_PRECISION = 1.E-10
+ *   Replace MACHEPS with IGAMMA_PRECISION = 1.E-14
  *   Replace OFLOW with IGAMMA_OVERFLOW = FLT_MAX
  *   Convergence fails at about a=1.e08 with ITMAX=20000
- * Development plan:  add a third algorithm to evaluation igamma for large a
- *   Rethink ITMAX IGAMMA_PRECISION IGAMMA_OVERFLOW XBIG
+ * Development plan:
  *   Why limit to x>0 a>0?   E.g. A&S Fig 6.3 p261 shows full plane
+ *   Complex values?
  */
-#define IGAMMA_PRECISION 1.E-10
+#define IGAMMA_PRECISION 1.E-14
 #define IGAMMA_OVERFLOW  FLT_MAX
 #define ITMAX            20000
 #define XBIG             1.0E+08 /* AS239 value for igamma(a,x>=XBIG) = 1.0 */
@@ -142,6 +142,7 @@ static double erf(double a);
 #ifndef HAVE_ERFC
 static double erfc(double a);
 #endif
+static double igamma_GL(double a, double x);
 
 /* Macros to configure routines taken from CEPHES: */
 
@@ -619,6 +620,9 @@ f_ibeta(union argument *arg)
 	push(Gcomplex(&a, x, 0.0));
 }
 
+/*
+ * igamma( a, x )
+ */
 void f_igamma(union argument *arg)
 {
     struct value a;
@@ -626,8 +630,18 @@ void f_igamma(union argument *arg)
     double arg1;
 
     (void) arg;				/* avoid -Wunused warning */
-    x = real(pop(&a));
-    arg1 = real(pop(&a));
+
+    pop(&a);
+    if (a.type == CMPLX && a.v.cmplx_val.imag != 0)
+	int_error(NO_CARET, "this copy of gnuplot does not support complex arguments to igamma");
+    else
+	x = real(&a);
+
+    pop(&a);
+    if (a.type == CMPLX && a.v.cmplx_val.imag != 0)
+	int_error(NO_CARET, "this copy of gnuplot does not support complex arguments to igamma");
+    else
+	arg1 = real(&a);
 
     x = igamma(arg1, x);
     if (x == -1.0) {
@@ -985,15 +999,19 @@ confrac(double a, double b, double x)
  *   BUGS      Values 0 <= x <= 1 may lead to inaccurate results.
  *
  *   REFERENCE ALGORITHM AS239  APPL. STATIST. (1988) VOL. 37, NO. 3
+ *   B. L. Shea "Chi-Squared and Incomplete Gamma Integral"
  *
  * Copyright (c) 1992 Jos van der Woude, jvdwoude@hut.nl
  *
  * Note: this function was translated from the Public Domain Fortran
  *       version available from http://lib.stat.cmu.edu/apstat/239
  *
+ * EAM 2020 modified to use Gauss-Legendre quadrature when a and x
+ * are both large.
+ *
  */
 
-double
+static double
 igamma(double a, double x)
 {
     double arg;
@@ -1009,12 +1027,20 @@ igamma(double a, double x)
     /* Deal with special cases */
     if (x == 0.0)
 	return 0.0;
-    if (x > XBIG)
-	return 1.0;
 
     /* Check value of factor arg */
     arg = a * log(x) - x - LGAMMA(a + 1.0);
     arg = gp_exp(arg);
+
+    /* EAM 2020: For large values of a convergence fails.
+     * Use Gauss-Legendre quadrature instead.
+     */
+    if ((a > 100.) && (fabs(x-a)/a < 0.2))
+	return igamma_GL( a, x );
+
+    /* FIXME: This can be relaxed */
+    if (x > XBIG)
+	return 1.0;
 
     /* Choose infinite series or continued fraction. */
 
@@ -1078,6 +1104,54 @@ igamma(double a, double x)
 
     /* Convergence failed */
     return -1.0;
+}
+
+/* icomplete gamma function evaluated by Gauss-Legendre quadrature
+ * as recommended for large values of a by Numerical Recipes (Sec 6.2).
+ */
+static double
+igamma_GL( double a, double x )
+{
+    static const double y[18] = {
+    0.0021695375159141994,
+    0.011413521097787704,0.027972308950302116,0.051727015600492421,
+    0.082502225484340941, 0.12007019910960293,0.16415283300752470,
+    0.21442376986779355, 0.27051082840644336, 0.33199876341447887,
+    0.39843234186401943, 0.46931971407375483, 0.54413605556657973,
+    0.62232745288031077, 0.70331500465597174, 0.78649910768313447,
+    0.87126389619061517, 0.95698180152629142 };
+
+    static const double w[18] = {
+    0.0055657196642445571,
+    0.012915947284065419,0.020181515297735382,0.027298621498568734,
+    0.034213810770299537,0.040875750923643261,0.047235083490265582,
+    0.053244713977759692,0.058860144245324798,0.064039797355015485,
+    0.068745323835736408,0.072941885005653087,0.076598410645870640,
+    0.079687828912071670,0.082187266704339706,0.084078218979661945,
+    0.085346685739338721,0.085983275670394821 };
+
+    double xu, t, ans;
+    double a1 = a - 1.0;
+    double lna1 = log(a1);
+    double sqrta1 = sqrt(a1);
+    double sum = 0.0;
+    int j;
+
+    if (x > a - 1.0)
+	xu = GPMAX( a1 + 11.5 * sqrta1,  x + 6.0 * sqrta1 );
+    else
+	xu = GPMIN( a1 - 7.5 * sqrta1, x - 5.0 * sqrta1 );
+    if (xu < 0)
+	xu = 0.0;
+
+    for (j=0; j<18; j++) {
+	t = x + (xu - x) * y[j];
+	sum += w[j] * exp( -(t-a1) + a1 * (log(t) - lna1));
+    }
+
+    ans = sum * (xu-x) * exp( a1 * (lna1-1.) - LGAMMA(a) );
+
+    return (x > a1) ? 1.0 - ans : -ans;
 }
 
 

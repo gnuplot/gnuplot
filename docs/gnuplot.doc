@@ -201,7 +201,7 @@ C
  This version of gnuplot provides a larger set of complex-valued functions and
  updated versions of some functions present in earlier versions.
 #start
-#b Updated complex incomplete gamma function with improved domain and precision.
+#b Updated incomplete gamma function with improved domain and precision.
 ## See `igamma`.
 #b New complex function LambertW(z,k) returns the kth branch of multivalued
 ## function W_k(z).
@@ -212,8 +212,8 @@ C
 ## See `lnGamma`.
 #b Complex function conj(z) returns the complex conjugate of z.
 #end
- Complex special functions are supported if a suitable external library
- is found at build time.
+ Additional complex special functions are supported if a suitable external
+ library is found at build time.
 #start
 #b Complex Bessel functions Iν(z), Jν(z), Kν(z), Yν(z) of order ν (real)
 ## with complex argument z. See `BesselK`.
@@ -1333,7 +1333,7 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>gamma(x)</td>    <td>any</td>    <td>&Gamma;(Re(<i>x</i>)), gamma function of real(<i>x</i>)</td></tr>
 ^<tr>    <td>ibeta(p,q,x)</td>    <td>any</td>    <td>ibeta(Re(<i>p,q,x</i>)), ibeta function of real(<i>p</i>,<i>q</i>,<i>x</i>)</td></tr>
 ^<tr>    <td>inverf(x)</td>    <td>any</td>    <td>inverse error function real(<i>x</i>)</td></tr>
-^<tr>    <td>igamma(a,x)</td>    <td>any</td>    <td>igamma(Re(<i>a,x</i>)), igamma function of real(<a>a</a>,<i>x</i>)</td></tr>
+^<tr>    <td>igamma(a,x)</td>    <td>real</td>    <td>igamma(<i>a>0,x>=0</i>), igamma function of real <a>a>0</a>,<i>x>=0</i>)</td></tr>
 ^<tr>    <td>imag(x)</td>    <td>complex</td>    <td>Im(<i>x</i>), imaginary part of <i>x</i> as a real number</td></tr>
 ^<tr>    <td>invnorm(x)</td>    <td>any</td>    <td>inverse normal distribution function real(<i>x</i>)</td></tr>
 ^<tr>    <td>int(x)</td>    <td>real</td>    <td>integer part of <i>x</i>, truncated toward zero</td></tr>
@@ -1698,7 +1698,7 @@ C marker below is used to signal this to doc2html:
 %gamma(x)@ ~~ @$GAMMA ( roman real (x))$, gamma function of real ($x$)
  The `gamma(x)` function returns the gamma function of the real part of its
  argument.  For integer n, gamma(n+1) = n!.  If the argument is a complex
- value, the imaginary component is ignored.
+ value, the imaginary component is ignored. For complex arguments see `lnGamma`.
 4 ibeta
 ?expressions functions ibeta
 ?ibeta
@@ -1723,12 +1723,19 @@ C marker below is used to signal this to doc2html:
 #igamma(a,x) & $a>0$, $x\geq0$ & ~ & $P(a,x)=\frac{1}{\Gamma(x)}\intop_{0}^{x}t^{a-1}e^{-t}dt$, incomplete gamma \\
 %igamma(a,x)@ ~~ @$igamma ( roman real (a,x))$, igamma function of real ($a$,$x$)
  The `igamma(a,x)` function returns the normalized lower incomplete gamma
- function of the real parts of its arguments, where a > 0 and x >= 0.
+ function of its arguments, where a > 0 and x >= 0.
  The standard notation is P(a,x), e.g. Abramowitz and Stegun (6.5.1),
- with limiting value of 1 as x approaches infinity.  If the arguments
- are complex, the imaginary components are ignored.
- If the implemented series approximation does not converge to within 1.E-10,
- NaN is returned. Precision and convergence may be improved in a later version.
+ with limiting value of 1 as x approaches infinity.
+
+ When a is large (>100) and (x-a)/a is small (<0.2), igamma(a,x) is calculated
+ by Gauss-Legendre quadrature.  Otherwise the calculation uses a continued
+ fraction if (x > 1 && x > a+2) or Pearson's series expansion.
+ References: (1) Numerical Recipes section 6.2 (2) AS 239, BL Shea (1988)
+ J. Royal Stat. Soc. Series C (Applied Statistics) 37:466-473.
+
+ If the series does not converge to within 1.E-14, NaN is returned.
+ Extension to arguments in the complex domain may be implemented in a
+ future version of gnuplot.
 4 imag
 ?expressions functions imag
 ?imag
