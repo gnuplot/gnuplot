@@ -683,11 +683,6 @@ C
  fit on the canvas.  Please be aware that setting scale values larger than 1
  may cause problems.
 
- The major exception to this convention is the PostScript driver, which
- by default continues to act as it did in earlier versions. Be warned that
- some future version of gnuplot may change the default behaviour of the
- PostScript driver as well.
-
  Example:
 
        set size 0.5, 0.5
