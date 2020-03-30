@@ -199,7 +199,7 @@ C
 
 4 Complex-valued functions
  This version of gnuplot provides a larger set of complex-valued functions and
- updated versions of some functions present in earlier versions.
+ updated versions of some functions that were present in earlier versions.
 #start
 #b Updated incomplete gamma function with improved domain and precision.
 ## See `igamma`.
@@ -1333,7 +1333,7 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>gamma(x)</td>    <td>any</td>    <td>&Gamma;(Re(<i>x</i>)), gamma function of real(<i>x</i>)</td></tr>
 ^<tr>    <td>ibeta(p,q,x)</td>    <td>any</td>    <td>ibeta(Re(<i>p,q,x</i>)), ibeta function of real(<i>p</i>,<i>q</i>,<i>x</i>)</td></tr>
 ^<tr>    <td>inverf(x)</td>    <td>any</td>    <td>inverse error function real(<i>x</i>)</td></tr>
-^<tr>    <td>igamma(a,x)</td>    <td>real</td>    <td>igamma(<i>a>0,x>=0</i>), igamma function of real <a>a>0</a>,<i>x>=0</i>)</td></tr>
+^<tr>    <td>igamma(a,z)</td>    <td>real</td>    <td>igamma(<i>a>0,z</i>), igamma function of complex <a>a>0</a>,<i>z</i>)</td></tr>
 ^<tr>    <td>imag(x)</td>    <td>complex</td>    <td>Im(<i>x</i>), imaginary part of <i>x</i> as a real number</td></tr>
 ^<tr>    <td>invnorm(x)</td>    <td>any</td>    <td>inverse normal distribution function real(<i>x</i>)</td></tr>
 ^<tr>    <td>int(x)</td>    <td>real</td>    <td>integer part of <i>x</i>, truncated toward zero</td></tr>
@@ -1718,24 +1718,9 @@ C marker below is used to signal this to doc2html:
  The `inverf(x)` function returns the inverse error function of the real part
  of its argument.   See `erf` and `invnorm`.
 4 igamma
-?expressions functions igamma
-?igamma
-#igamma(a,x) & $a>0$, $x\geq0$ & ~ & $P(a,x)=\frac{1}{\Gamma(x)}\intop_{0}^{x}t^{a-1}e^{-t}dt$, incomplete gamma \\
-%igamma(a,x)@ ~~ @$igamma ( roman real (a,x))$, igamma function of real ($a$,$x$)
- The `igamma(a,x)` function returns the normalized lower incomplete gamma
- function of its arguments, where a > 0 and x >= 0.
- The standard notation is P(a,x), e.g. Abramowitz and Stegun (6.5.1),
- with limiting value of 1 as x approaches infinity.
+#igamma(a,z) & complex, $\Re(a)>0$ & \gpCX & incompete gamma function $P(a,z)=\frac{1}{\Gamma(z)}\intop_{0}^{z}t^{a-1}e^{-t}dt$ \\
+%igamma(a,z)@ ~~ @$igamma (a,z)$, lower incomplete gamma function of ($a$,$z$)
 
- When a is large (>100) and (x-a)/a is small (<0.2), igamma(a,x) is calculated
- by Gauss-Legendre quadrature.  Otherwise the calculation uses a continued
- fraction if (x > 1 && x > a+2) or Pearson's series expansion.
- References: (1) Numerical Recipes section 6.2 (2) AS 239, BL Shea (1988)
- J. Royal Stat. Soc. Series C (Applied Statistics) 37:466-473.
-
- If the series does not converge to within 1.E-14, NaN is returned.
- Extension to arguments in the complex domain may be implemented in a
- future version of gnuplot.
 4 imag
 ?expressions functions imag
 ?imag
@@ -2335,6 +2320,29 @@ C marker below is used to signal this to doc2html:
  `(1-(k*sin(p))**2)**(-0.5)/(1-n*sin(p)**2)`.  The parameter `n` must be less
  than 1, while `k` must lie between -1 and 1 (exclusive).  Note that by
  definition EllipticPi(0,k) == EllipticK(k) for all possible values of `k`.
+
+4 Gamma
+ `gamma(x)` returns the gamma function of the real part of its argument.
+ For integer n, gamma(n+1) = n!.  If the argument is a complex value,
+ the imaginary component is ignored. For complex arguments see `lnGamma`.
+
+4 Igamma
+?expressions functions igamma
+?igamma
+ `igamma(a, z)` returns the lower incomplete gamma function, also known as
+ P(a, z), e.g. Abramowitz and Stegun (6.5.1). If no complex function
+ support is present the domain is limited to real arguments a > 0, z >= 0.
+ Otherwise Real(a) must be > 0.
+
+ When a is large (>100) and (z-a)/a is small (<0.2), igamma(z,x) is calculated
+ by Gauss-Legendre quadrature.  Otherwise the calculation uses a continued
+ fraction if (z > 1 && z > a+2) or Pearson's series expansion.
+ References: (1) Numerical Recipes section 6.2 (2) AS 239, BL Shea (1988)
+ J. Royal Stat. Soc. Series C (Applied Statistics) 37:466-473.
+
+ The convergence of these algorithms is poor for Real(z) < 0.
+ If the series does not converge to within 1.E-14, NaN is returned.
+
 4 LambertW
 ?expressions functions LambertW
 ?LambertW

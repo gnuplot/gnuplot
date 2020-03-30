@@ -36,6 +36,44 @@
 
 #ifdef HAVE_COMPLEX_FUNCS
 
+#ifdef HAVE_FENV_H
+#include <fenv.h>
+#endif
+
+/* 
+ * Various complex functions like cexp may set errno on underflow
+ * We would prefer to return 0.0 rather than NaN
+ */
+#ifdef HAVE_FENV_H
+#define initialize_underflow( who ) \
+    if (errno) \
+	int_error(NO_CARET, "%s: error present on entry (errno %d %s)", who, errno, strerror(errno)); \
+    else feclearexcept(FE_ALL_EXCEPT);
+#else
+#define initialize_underflow( who ) \
+    if (errno) \
+	int_error(NO_CARET, "%s: error present on entry (errno %d %s)", who, errno, strerror(errno));
+#endif
+
+#ifdef HAVE_FENV_H
+#define handle_underflow( who, var ) \
+    if (errno) { \
+	if (fetestexcept(FE_UNDERFLOW)) { \
+	    var = 0.0; \
+	    errno = 0; \
+	} else { \
+	    fprintf(stderr,"%s: errno = %d\n", who, errno); \
+	} \
+    }
+#else
+#define handle_underflow( who, var ) int_error(NO_CARET, "%s: errno = %d", who, errno);
+#endif
+
+/* internal prototypes */
+static complex double lnGamma( complex double z );
+static complex double igamma( complex double a, complex double z );
+static double complex igamma_GL( double complex a, double complex z );
+
 /*
  * Complex Sign function
  * Sign(z) = z/|z| for z non-zero
@@ -242,9 +280,6 @@ LambertW(complex double z, int k)
  * W. Press et al, "Numerical Recipes" Section 6.1.
  */
 
-/* Internal Prototypes */
-static complex double lnGamma( complex double z );
-
 void
 f_lnGamma(union argument *arg)
 {
@@ -328,6 +363,252 @@ lnGamma( complex double z )
     f = temp + clog( sqrt2pi * sum/z );
 
     return f;
+}
+
+/*
+ * TODO
+ *	- replace existing igamma with this one if HAVE_COMPLEX_FUNCS
+ *	- extend to full complex plane e.g. Temme 1996 or Bujanda 2016
+ */
+
+void
+f_Igamma(union argument *arg)
+{
+    struct value result;
+    struct value a;
+
+    struct cmplx s;	/* gnuplot complex parameter s */
+    struct cmplx z;	/* gnuplot complex parameter z */
+
+    complex double w;	/* C99 _Complex representation */
+
+    pop(&a);			/* Complex argument z */
+    if (a.type == CMPLX)
+	z = a.v.cmplx_val;
+    else {
+	z.real = real(&a);
+	z.imag = 0;
+    }
+    pop(&a);			/* Complex argument s */
+    if (a.type == CMPLX)
+	s = a.v.cmplx_val;
+    else {
+	s.real = real(&a);
+	s.imag = 0;
+    }
+
+    w = igamma( s.real + I*s.imag, z.real + I*z.imag );
+
+    if (w == -1) {
+	/* Failed to converge or other error */
+	push(Gcomplex(&result, not_a_number(), 0));
+	return;
+    }
+
+    push(Gcomplex(&result, creal(w), cimag(w)));
+}
+
+/*   igamma(a, z)
+ *   lower incomplete gamma function P(a, z).
+ *
+ *                        1      z  -t   (a-1)
+ *             P(a, z) = ---- * ∫  e  * t     dt 
+ *                       Γ(a)    0
+ *
+ *   complex a,	real(a) > 0
+ *   complex z
+ *
+ *   adapted from previous gnuplot real-valued function igamma(double a, double x)
+ *
+ *   REFERENCE ALGORITHM AS239  APPL. STATIST. (1988) VOL. 37, NO. 3
+ *   B. L. Shea "Chi-Squared and Incomplete Gamma Integral"
+ *
+ *   See also: 
+ *   N. M. Temme (1994)
+ *   Probability in the Engineering and Informational Sciences 8: 291-307.
+ *
+ *   Coefficients for Gauss-Legendre quadrature:
+ *   Press et al, Numerical Recipes (3rd Ed.) Section 6.2
+ *
+ */
+
+#define IGAMMA_PRECISION 1.E-14
+
+static complex double
+igamma(complex double a, complex double z)
+{
+    complex double arg, ga1;
+    complex double aa;
+    complex double an;
+    complex double b;
+    int i;
+
+    /* Check that we have valid values for a and z */
+    if (creal(a) <= 0.0)
+	return -1.0;
+
+    /* Deal with special cases */
+    if (z == 0.0)
+	return 0.0;
+
+    initialize_underflow("igamma");
+
+#if (0)
+    /* EAM 2020: FIXME
+     * For real(z) < 0 convergence of the standard series is very slow.
+     * We should catch these cases ahead of time and use a different algorithm.
+     * See Gil et al (2016) ACM TOMS 43:3 Article 26
+     *     http://dx.doi.org/10.1145/2972951
+     */
+    if (debug != 4)
+    if (creal(z) < 0) {
+	return igamma_negative_z( creal(a), z );
+    }
+#endif
+
+    /* EAM 2020: For large values of a convergence fails.
+     * Use Gauss-Legendre quadrature instead.
+     */
+    if ((cabs(a) > 100.) && (cabs(z-a)/cabs(a) < 0.2)) {
+	if (debug == 1) return NAN;
+	return igamma_GL( a, z );
+    }
+
+    /* Check value of factor arg */
+    ga1 = lnGamma(a + 1.0);
+    arg = a * clog(z) - z - ga1;
+    arg = cexp(arg);
+
+    /* Underflow of arg is common for large z or a */
+    handle_underflow("igamma", arg);
+
+    /* Choose infinite series or continued fraction. */
+
+    if ((cabs(z) > 1.0) && (cabs(z) >= cabs(a) + 2.0)) {
+
+	/* Use a continued fraction expansion */
+	complex double pn1, pn2, pn3, pn4, pn5, pn6;
+	complex double rn;
+	complex double rnold;
+
+	if (debug == 2) return NAN;
+
+	aa = 1.0 - a;
+	b = aa + z + 1.0;
+	pn1 = 1.0;
+	pn2 = z;
+	pn3 = z + 1.0;
+	pn4 = z * b;
+	rnold = pn3 / pn4;
+
+	for (i = 1; i <= 2000; i++) {
+	    aa += 1.0;
+	    b += 2.0;
+	    an = aa * (double) i;
+
+	    pn5 = b * pn3 - an * pn1;
+	    pn6 = b * pn4 - an * pn2;
+
+	    /* Serious overflow */
+	    if (isnan(cabs(pn5)) || isnan(cabs(pn6)))
+		int_warn(NO_CARET, "igamma: overflow");
+
+	    if (pn6 != 0.0) {
+		rn = pn5 / pn6;
+		if (cabs(rnold - rn) <= GPMIN(IGAMMA_PRECISION, IGAMMA_PRECISION * cabs(rn))) {
+		    return 1.0 - arg * rn * a;
+		}
+		rnold = rn;
+	    }
+	    pn1 = pn3;
+	    pn2 = pn4;
+	    pn3 = pn5;
+	    pn4 = pn6;
+
+	    /* Re-scale terms in continued fraction if they are large */
+#define     IGAMMA_OVERFLOW  FLT_MAX
+	    if (cabs(pn5) >= IGAMMA_OVERFLOW) {
+		pn1 /= IGAMMA_OVERFLOW;
+		pn2 /= IGAMMA_OVERFLOW;
+		pn3 /= IGAMMA_OVERFLOW;
+		pn4 /= IGAMMA_OVERFLOW;
+	    }
+	}
+
+    } else {
+	/* Use Pearson's series expansion. */
+	complex double retval;
+
+	if (debug == 3) return NAN;
+
+	for (i = 0, aa = a, an = b = 1.0; i <= 1000; i++) {
+	    aa += 1.0;
+	    an *= z / aa;
+	    b += an;
+	    retval = arg * b;
+
+	    handle_underflow( "igamma", retval );
+
+	    if (cabs(an) < cabs(b) * IGAMMA_PRECISION)
+		return retval;
+	}
+    }
+
+    /* Convergence failed */
+    int_warn(NO_CARET, "no convergence after %d iterations", i);
+    return -1.0;
+}
+
+/* icomplete gamma function evaluated by Gauss-Legendre quadrature
+ * as recommended for large values of a by Numerical Recipes (Sec 6.2).
+ */
+static double complex
+igamma_GL( double complex a, double complex z )
+{
+    static const double y[18] = {
+    0.0021695375159141994,
+    0.011413521097787704,0.027972308950302116,0.051727015600492421,
+    0.082502225484340941, 0.12007019910960293,0.16415283300752470,
+    0.21442376986779355, 0.27051082840644336, 0.33199876341447887,
+    0.39843234186401943, 0.46931971407375483, 0.54413605556657973,
+    0.62232745288031077, 0.70331500465597174, 0.78649910768313447,
+    0.87126389619061517, 0.95698180152629142 };
+
+    static const double w[18] = {
+    0.0055657196642445571,
+    0.012915947284065419,0.020181515297735382,0.027298621498568734,
+    0.034213810770299537,0.040875750923643261,0.047235083490265582,
+    0.053244713977759692,0.058860144245324798,0.064039797355015485,
+    0.068745323835736408,0.072941885005653087,0.076598410645870640,
+    0.079687828912071670,0.082187266704339706,0.084078218979661945,
+    0.085346685739338721,0.085983275670394821 };
+
+    double complex xu, t, ans;
+    double complex a1 = a - 1.0;
+    double complex lna1 = clog(a1);
+    double complex sqrta1 = csqrt(a1);
+    double complex sum = 0.0;
+    int j;
+
+    if (cabs(z) > cabs(a1))
+	xu = GPMAX( cabs(a1 + 11.5 * sqrta1),  cabs(z + 6.0 * sqrta1) );
+    else
+	xu = GPMIN( cabs(a1 - 7.5 * sqrta1),  cabs(z - 5.0 * sqrta1) );
+
+    /* FIXME:  I don't know what the complex equivalent is for this test */
+    /* if (xu < 0) xu = 0.0; */
+
+    for (j=0; j<18; j++) {
+	t = z + (xu - z) * y[j];
+	sum += w[j] * cexp( -(t-a1) + a1 * (clog(t) - lna1));
+    }
+
+    ans = sum * (xu-z) * cexp( a1 * (lna1-1.) - lnGamma(a) );
+
+    if (cabs(z) > cabs(a1))
+	return 1.0 - ans;
+    else
+	return -ans;
 }
 
 #endif /* HAVE_COMPLEX_FUNCS */
