@@ -101,6 +101,7 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec, double *reltime)
     TBOOLEAN reltime_formats = FALSE;
     TBOOLEAN explicit_pm = FALSE;
     TBOOLEAN explicit_am = FALSE;
+    TBOOLEAN leading_minus_sign = FALSE;
 
     tm->tm_mday = 1;
     tm->tm_mon = tm->tm_hour = tm->tm_min = tm->tm_sec = 0;
@@ -269,6 +270,16 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec, double *reltime)
 	    /* Relative time formats tH tM tS */
 	    {
 		double cont = 0;
+
+		/* Special case of negative time with first field 0,
+		 * e.g.  -00:12:34
+		 */
+		if (*reltime == 0) {
+		    while (isspace(*s)) s++;
+		    if (*s == '-')
+			leading_minus_sign = TRUE;
+		}
+
 		fmt++;
 		if (*fmt == 'H') {
 		    cont = 3600. * strtod(s, &s);
@@ -281,9 +292,12 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec, double *reltime)
 		}
 		if (*reltime < 0)
 		    *reltime -= fabs(cont);
+		else if (*reltime > 0)
+		    *reltime += fabs(cont);
+		else if (leading_minus_sign)
+		    *reltime -= fabs(cont);
 		else
-		    *reltime += cont;
-		/* FIXME:  reltime > 0 && cont < 0 should be disallowed */
+		    *reltime = cont;
 		/* FIXME:  leading precision field should be accepted but ignored */
 		break;
 	    }
