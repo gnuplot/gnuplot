@@ -1,6 +1,8 @@
 		Gnuplot Version 5.4 Release Notes
 		=================================
 
+First release candidate 5.4.rc1
+
 Gnuplot version 5.4 patchlevel 0 will be the start of a new supported release
 series with many new features and a few changes to features that were
 present in previous versions.  Gnuplot development is now tracked in a git
@@ -12,7 +14,7 @@ using "git log" after downloading:
 We appreciate any feedback from testing this release candidate so that any
 problems can be addressed prior to the 5.4.0 roll-out expected in Spring 2020.
 
-Release Notes date: 21-Mar-2020
+Release Notes date: 07-Apr-2020
 
 Features introduced in version 5.4
 ==================================
