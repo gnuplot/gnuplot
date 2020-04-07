@@ -807,7 +807,7 @@ MP_set_font(const char *font)
     if (*font) {
 	size_t sep = strcspn(font, ",");
 	if (sep < sizeof(MP_fontname))
-	    strncpy(MP_fontname, font, sizeof(MP_fontname));
+	    strncpy(MP_fontname, font, sizeof(MP_fontname)-1);
 	sscanf(&(font[sep + 1]), "%lf", &MP_fontsize);
 	if (MP_fontsize < 5)
 	    MP_fontsize = 5.0;
