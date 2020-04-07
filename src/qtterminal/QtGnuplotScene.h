@@ -49,7 +49,7 @@
 
 #include <QGraphicsScene>
 #include <QGraphicsItemGroup>
-#include <QTime>
+#include <QElapsedTimer>
 
 class QtGnuplotEnhanced;
 class QtGnuplotWidget;
@@ -104,7 +104,7 @@ private:
 	QPoint  m_currentBoxOrigin;
 	QPoint  m_textOffset;
 	double  m_currentZ;
-	QTime   m_watches[4];
+	QElapsedTimer   m_watches[4];
 	int     m_currentPlotNumber;
 	bool    m_inKeySample;
 	bool    m_preserve_visibility;
