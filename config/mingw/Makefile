@@ -42,7 +42,7 @@ VARIANT = PLAIN
 # Comment out the definition lines to disable the according features:
 
 # Define this only if doing a release build
-#RELEASE=1
+RELEASE=1
 
 # Set-up your compiler environment
 #
@@ -226,8 +226,7 @@ GNUSORT = /bin/sort
 
 # Inno Setup Compiler
 # get it from: http://www.jrsoftware.org/isdl.php
-# Use unicode version of Inno Setup Compiler but not Standard version
-# because the setup file of gnuplot installer is now encoded utf-8 with BOM.
+# Use the Unicode version of Inno Setup Compiler
 ISCC = $(PROGRAMFILES32)/Inno\ Setup\ 6/iscc
 
 # Directory that might contain extra files to be shipped with the installer.
@@ -672,7 +671,7 @@ wgnuplot_pipes.exe: $(VERSIONING) $(OBJS_PIPES) wgplt_res.o $(EXTRALIBS)
 	$(TERMLIBS) $(TERMLIBS_PIPES) $(WX_LIBS) $(PANGOCAIRO_LIBS)
 
 gnuplot.exe: $(VERSIONING) $(OBJS_CONSOLE) wgplt_res.o $(EXTRALIBS)
-	$(LDX) $(LDFLAGS) -mconsole $(LDFLAGS2) -o $@ $(OBJS_CONSOLE) wgplt_res.o  $(LDLIBS) \
+	$(LDX) $(LDFLAGS) -mconsole $(LDFLAGS2) -o $@ $(OBJS_CONSOLE) wgplt_res.o $(LDLIBS) \
 	$(TERMLIBS) $(TERMLIBS_CONSOLE) $(WX_LIBS) $(PANGOCAIRO_LIBS)
 
 wgnuplot.mnu: $(W)/wgnuplot.mnu
@@ -779,7 +778,7 @@ demo_plugin.dll: $(M)plugin/demo_plugin.c
 $(BUILDHELPFILE): doc2html.exe $(D)gnuplot.doc $(D)windows/wgnuplot.hhp $(D)windows/wgnuplot.hhk \
                   $(D)windows/wgnuplot.stp $(D)plotstyles.gnu $(CORETERM) $(TARGET)
 	./doc2html $(D)gnuplot.doc $(D)windows/
-	-./$(TARGET) -d -e "winhelp=1; cd '$(D)'" plotstyles.gnu
+	-GNUPLOT_LIB=../demo ./$(TARGET) -d -e "winhelp=1; cd '$(D)'" plotstyles.gnu
 	-$(HHC) $(D)windows/wgnuplot.hhp
 
 $(HELPFILE): $(BUILDHELPFILE)
@@ -837,7 +836,7 @@ wgnuplot-ja.chm: $(JASRC) doc2html-ja.exe \
 	sed -i -e "s/charset=utf-8/charset=shift-jis/" $(JADW)wgnuplot.hhc
 	sed -i -e "s/Language=0x409 Englisch (USA)/Language=0x411 Japanisch (Japan)/" $(JADW)/wgnuplot.hhp
 	# Build help file
-	-./$(TARGET) -d -e "winhelp=1; cd '$(JAD)'" plotstyles.gnu
+	-GNUPLOT_LIB=../demo ./$(TARGET) -d -e "winhelp=1; cd '$(JAD)'" plotstyles.gnu
 	-$(HHC) $(JADW)wgnuplot.hhp
 	cp $(JADW)wgnuplot.chm $(HELPFILEJA)
 
@@ -993,10 +992,15 @@ ps_fontfile_doc.pdf: $(D)psdoc/ps_fontfile_doc.tex
 ps_guide.pdf: $(D)psdoc/ps_guide.ps
 	ps2pdf $(D)psdoc/ps_guide.ps ps_guide.pdf
 
+ifdef RELEASE
+faq.pdf: $(TOP)/FAQ.pdf
+	cp $< .
+else
 faq.pdf: $(TOP)/faq/faq.tex
 	pdflatex $<
 	pdflatex $<
 	pdflatex $<
+endif
 
 # clean up temporary files
 clean:
