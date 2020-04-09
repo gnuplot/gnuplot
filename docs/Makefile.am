@@ -82,7 +82,8 @@ EXTRA_DIST = Makefile.in doc2texi.el figure_missing.pdf gnuplot.doc \
 titlepag.ipf titlepag.ms titlepag.tex	\
 toc_entr.sty psdoc gnuplot-ja.doc README.ja	\
 term-ja.diff plotstyles.gnu gnuplot.pdf \
-windows/wgnuplot.hhk windows/wgnuplot.hhp windows/wgnuplot.stp windows/doc2html.c
+windows/wgnuplot.hhk windows/wgnuplot.hhp windows/wgnuplot.stp windows/doc2html.c \
+plotstyles_cvt.cmd
 
 ELCS = gnuplot-eldoc.elc
 

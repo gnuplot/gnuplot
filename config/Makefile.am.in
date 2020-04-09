@@ -13,6 +13,7 @@ Makefile.am: Makefile.am.in
 	echo EXTRA_DIST = MacOSX Makefile.am.in buildvms.com	\
 	  config.* djconfig.sh make_vms.com makefile.* watcom/Makefile	\
 	  watcom/config.h cygwin/Makefile mingw/Makefile msvc/Makefile \
+	  djgpp/Makefile djgpp/config.h \
 	  | fmt \
           | (tr '\012' @; echo) \
 	  | sed 's/@$$/%/;s/@/ \\@/g' \
