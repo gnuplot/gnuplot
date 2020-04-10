@@ -85,6 +85,7 @@ static void unset_histogram(void);
 static void unset_textbox_style(void);
 static void unset_historysize(void);
 static void unset_pixmaps(void);
+static void unset_pixmap(int);
 static void unset_isosamples(void);
 static void unset_key(void);
 static void unset_label(void);
@@ -255,7 +256,12 @@ unset_command()
 	unset_historysize();
 	break;
     case S_PIXMAP:
-	unset_pixmaps();
+	if (END_OF_COMMAND)
+	    unset_pixmaps();
+	else {
+	    i = int_expression();
+	    unset_pixmap(i);
+	}
 	break;
     case S_ISOSAMPLES:
 	unset_isosamples();
@@ -729,7 +735,7 @@ free_arrowstyle(struct arrowstyle_def *arrowstyle)
  * Deletes all pixmaps.
  */
 static void
-unset_pixmaps()
+unset_pixmaps(void)
 {
     t_pixmap *pixmap, *next;
     for (pixmap = pixmap_listhead; pixmap; pixmap = next) {
@@ -739,6 +745,30 @@ unset_pixmaps()
 	free(pixmap);
     }
     pixmap_listhead = NULL;
+}
+/*
+ * Deletes a single pixmap
+ */
+static void
+unset_pixmap(int i)
+{
+    t_pixmap *pixmap = pixmap_listhead;
+    t_pixmap *prev = pixmap_listhead;
+    while (pixmap) {
+	if (pixmap->tag == i) {
+	    if (pixmap == pixmap_listhead)
+		prev = pixmap_listhead = pixmap->next;
+	    else
+		prev->next = pixmap->next;
+	    free(pixmap->filename);
+	    free(pixmap->image_data);
+	    free(pixmap);
+	    pixmap = prev->next;
+	} else {
+	    prev = pixmap;
+	    pixmap = pixmap->next;
+	}
+    }
 }
 
 

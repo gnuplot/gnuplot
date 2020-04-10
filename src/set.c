@@ -2161,6 +2161,7 @@ set_pixmap()
 	    continue;
 	}
 	if ((temp = try_to_get_string())) {
+	    gp_expand_tilde(&temp);
 	    free(this_pixmap->filename);
 	    this_pixmap->filename = temp;
 	    continue;
