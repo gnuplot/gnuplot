@@ -664,7 +664,7 @@ X11_options()
 	} else if (set_number) {
 #ifdef EXTERNAL_X11_WINDOW
 	    if (set_window)
-		int_error(NO_CARET,"an existing X11 window cannot be asigned to a plot number");
+		int_error(NO_CARET,"an existing X11 window cannot be assigned to a plot number");
 #endif
 	    fprintf(X11_ipc, "N%d\n", new_term_number);
 	    fflush(X11_ipc);
@@ -1097,7 +1097,7 @@ X11_init()
 	} else {
 	    /* we do not open a bidirectional communication
 	     * for non-tty's by default. If this is desired,
-	     * the mouse must be turned on explicitely *before*
+	     * the mouse must be turned on explicitly *before*
 	     * starting the x11 driver.
 	     * So: if we're here, we close the ipc-back-channel
 	     * which will cause a SIGPIPE in the driver. This
@@ -2213,7 +2213,7 @@ X11_image(unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_i
      *
      * This means that there exists the chance of the data stream enlarging
      * by a factor of two.  So the algorithm must make sure to keep the
-     * number of bytes transfered less than the buffer length.
+     * number of bytes transferred less than the buffer length.
      *
      * Also note that the '\0' character is often prevalent in 16 bit image
      * data where the palette may be 8 bits or less.  For this reason, a
@@ -2493,7 +2493,7 @@ START_HELP(x11)
 " The <size>, <slant>, and <weight> specifications are all optional.",
 " If you do not specify <slant> or <weight> then you will get whatever font ",
 " variant the font server offers first.",
-" You may set a default enconding via the corresponding X11 resource. E.g.",
+" You may set a default encoding via the corresponding X11 resource. E.g.",
 "       gnuplot*encoding: iso8859-15",
 " The driver also recognizes some common PostScript font names and",
 " replaces them with possible X11 or TrueType equivalents.",

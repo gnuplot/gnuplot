@@ -263,7 +263,7 @@ typedef enum t_imagecolor { IC_PALETTE, IC_RGB, IC_RGBA }
 #define TERM_INIT_ON_REPLOT   (1<<3)	/* call term->init() on replot     */
 #define TERM_IS_POSTSCRIPT    (1<<4)	/* post, next, pslatex, etc        */
 #define TERM_ENHANCED_TEXT    (1<<5)	/* enhanced text mode is enabled   */
-#define TERM_NO_OUTPUTFILE    (1<<6)	/* terminal doesnt write to a file */
+#define TERM_NO_OUTPUTFILE    (1<<6)	/* terminal doesn't write to a file */
 #define TERM_CAN_CLIP         (1<<7)	/* terminal does its own clipping  */
 #define TERM_CAN_DASH         (1<<8)	/* terminal supports dashed lines  */
 #define TERM_ALPHA_CHANNEL    (1<<9)	/* alpha channel transparency      */

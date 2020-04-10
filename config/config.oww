@@ -10,7 +10,7 @@
 /* Define if you want online help and subtopic tables sorted by column. */
 /* #undef COLUMN_HELP */
 
-/* Provide contact info for gnuplot develoment */
+/* Provide contact info for gnuplot development */
 /* #undef DEVELOPMENT_VERSION */
 /* Don't change it here -- this define is set in config/watcom/Makefile. */
 
@@ -493,7 +493,7 @@
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
 
-/* Define if the 3dkit libray is present. */
+/* Define if the 3dkit library is present. */
 /* #undef THREEDKIT */
 
 /* Define if your libcaca does not have caca_export_canvas_to_memory but the
@@ -523,7 +523,7 @@
 /* The main version number */
 /* #undef VERSION_MAJOR */
 
-/* Define if the vgagl libray is present. */
+/* Define if the vgagl library is present. */
 /* #undef VGAGL */
 
 /* Define if you want the wxwidgets terminal. */

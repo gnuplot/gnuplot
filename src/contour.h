@@ -58,7 +58,7 @@ typedef enum en_contour_kind {
 typedef enum en_contour_levels_kind {
     /* How contour levels are set */
     LEVELS_AUTO,		/* automatically selected */
-    LEVELS_INCREMENTAL,		/* user specified start & incremnet */
+    LEVELS_INCREMENTAL,		/* user specified start & increment */
     LEVELS_DISCRETE		/* user specified discrete levels */
 } t_contour_levels_kind;
 

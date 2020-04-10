@@ -96,7 +96,7 @@ typedef struct poly_struct {
 } poly_struct;
 
 /* Contours are saved using this struct list. */
-typedef struct cntr_struct {		
+typedef struct cntr_struct {
     double X, Y;		/* The coordinates of this vertex. */
     struct cntr_struct *next;	/* To chain lists. */
 } cntr_struct;
@@ -287,7 +287,7 @@ contour(int num_isolines, struct iso_curve *iso_lines)
 	if (contour_list != save_contour_list) {
 	    contour_list->isNewLevel = 1;
 	    /* Nov-2011 Use gprintf rather than sprintf so that LC_NUMERIC is used */
-	    gprintf(contour_list->label, sizeof(contour_list->label), 
+	    gprintf(contour_list->label, sizeof(contour_list->label),
 		    contour_format, 1.0, z);
 	    contour_list->z = z;
 	}
@@ -1251,7 +1251,7 @@ intp_cubic_spline(
  *   m[i][0] = M_{i,i-1}  for i=1,2,...,n-1    and    m[0][0] = M_{0,n-1} ,
  *   m[i][1] = M_{i, i }  for i=0,1,...,n-1
  *   m[i][2] = M_{i,i+1}  for i=0,1,...,n-2    and    m[n-1][2] = M_{n-1,0}.
- * M should be symmetric (m[i+1][0]=m[i][2]) and positiv definite.
+ * M should be symmetric (m[i+1][0]=m[i][2]) and positive definite.
  * The size of the system is given in n (n>=1).
  *
  * In the first procedure the Cholesky decomposition M = C^T * D * C
@@ -1269,7 +1269,7 @@ solve_cubic_1(tri_diag m[], int n)
 
     d = m[0][1];		/* D_{0,0} = M_{0,0} */
     if (d <= 0.)
-	return FALSE;		/* M (or D) should be positiv definite */
+	return FALSE;		/* M (or D) should be positive definite */
     m_n = m[0][0];		/*  M_{0,n-1}  */
     m_nn = m[n - 1][1];		/* M_{n-1,n-1} */
     for (i = 0; i < n - 2; i++) {
@@ -1280,7 +1280,7 @@ solve_cubic_1(tri_diag m[], int n)
 	m_n = -m[i][2] * m_n;	/* to get C_{i+1,n-1} */
 	d = m[i + 1][1] - m[i][2] * m_ij;	/* D_{i+1,i+1} */
 	if (d <= 0.)
-	    return FALSE;	/* Elements of D should be positiv */
+	    return FALSE;	/* Elements of D should be positive */
 	m[i + 1][1] = d;
     }
     if (n >= 2) {		/* Complete last column */
@@ -1350,7 +1350,7 @@ solve_tri_diag(tri_diag m[], double r[], double x[], int n)
 	m[i][1] = m[i][1] - m[i - 1][2] * t;
 	r[i] = r[i] - r[i - 1] * t;
     }
-    /* Now do back subtitution - update the solution vector X: */
+    /* Now do back substitution - update the solution vector X: */
     if (m[n - 1][1] == 0)
 	return FALSE;
     x[n - 1] = r[n - 1] / m[n - 1][1];	/* Find last element. */

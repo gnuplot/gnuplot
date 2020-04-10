@@ -126,7 +126,7 @@ typedef struct plot_struct {
 	/* handle vertical/horizontal lines properly */
 	double current_x, current_y;
 	double orig_current_x, orig_current_y;
-	
+
 	/* style data used while processing gnuplot commands */
 	JUSTIFY justify_mode;
 	int linetype;
@@ -186,7 +186,7 @@ GP_CAIRO_DASH,
 GP_CAIRO_DOTS
 };
 
-/* correspondance between gnuplot's linetypes and colors */
+/* correspondence between gnuplot's linetypes and colors */
 rgb_color gp_cairo_linetype2color( int linetype );
 void gp_cairo_set_background(rgb_color background);
 

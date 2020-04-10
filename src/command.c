@@ -2674,7 +2674,7 @@ replotrequest()
 	free(replot_args);
     }
     plot_token = 0;		/* whole line to be saved as replot line */
-    SET_REFRESH_OK(E_REFRESH_NOT_OK, 0);		/* start of replot will destory existing data */
+    SET_REFRESH_OK(E_REFRESH_NOT_OK, 0);		/* start of replot will destroy existing data */
 
     screen_ok = FALSE;
     num_tokens = scanner(&gp_input_line, &gp_input_line_len);

@@ -81,7 +81,7 @@
 	tried to access wgnuplot simultaneously or when one program tried to start
 	more than one wgnuplot session. Only a single instance of wgnuplot would be
 	started and all input would be sent to that instance. When two or more programs
-	tried to pipe input to wgnuplot, the two seperate input streams would be sent
+	tried to pipe input to wgnuplot, the two separate input streams would be sent
 	to one wgnuplot window resulting in one very confused copy of wgnuplot. The only
 	way to avoid this problem was to change pgnuplot so that it would start a
 	new instance of wgnuplot every time.
@@ -119,7 +119,7 @@
 	+ New function FindUnquotedSpace() which replaces the earlier technique for
 	  finding the command line arguments to send on to wgnuplot. Prior to this
 	  the arguments were assumed to start after argv[0], however argv[0] is not
-	  set the same by all combinitaions of compiler, command processor, and OS.
+	  set the same by all combinations of compiler, command processor, and OS.
 	  The new method ignores argv completely and manually search the command line
 	  string for the first space which isn't enclosed in double-quotes.
 
@@ -243,14 +243,14 @@ main (int argc, char *argv[])
 	    printf("gnuplot %s patchlevel %s\n",
 		   gnuplot_version, gnuplot_patchlevel);
 	    return 0;
-	} else if ((!stricmp(argv[i], "-noend")) || (!stricmp(argv[i], "/noend")) || 
+	} else if ((!stricmp(argv[i], "-noend")) || (!stricmp(argv[i], "/noend")) ||
 		   (!stricmp(argv[i], "-persist"))) {
 	    bPersist = TRUE;
 	} else if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
 	    printf("Usage: gnuplot [OPTION] [FILE] [-]\n"
 		    "  -V, --version       show gnuplot version\n"
 		    "  -h, --help          show this help\n"
-		    "  -e \"cmd; cmd; ...\"  prepand additional commands\n"
+		    "  -e \"cmd; cmd; ...\"  prepend additional commands\n"
 		    "  -persist            don't close the plot after executing FILE\n"
 		    "  -noend, /noend      like -persist (non-portable Windows-only options)\n"
 		    "  -                   allow work in interactive mode after executing FILE\n"

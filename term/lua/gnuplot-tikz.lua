@@ -1478,7 +1478,7 @@ gfx.adjust_plotbox = function()
     else
       -- could not determine a valid bounding box, so keep using the
       -- plotsize as the canvas size
-      gp.term_out("WARNING: PGF/TikZ Terminal: `plotsize' option used, but I could not determin the plot area!\n")
+      gp.term_out("WARNING: PGF/TikZ Terminal: `plotsize' option used, but I could not determine the plot area!\n")
     end
   elseif not gfx.opt.tightboundingbox then
     if gfx.opt.clip then

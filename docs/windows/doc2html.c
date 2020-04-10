@@ -348,7 +348,7 @@ process_line(char *line, FILE *b, FILE *c, FILE *d)
                 /* NB: don't set inkey here */
 #endif
                 if (debug)
-                    fprintf(stderr,"keyword defintion: \"%s\" on line %d.\n", line2 + 1, line_count);
+                    fprintf(stderr,"keyword definition: \"%s\" on line %d.\n", line2 + 1, line_count);
             }
 	    break;
     case '@':{			/* start/end table */
@@ -488,7 +488,7 @@ process_line(char *line, FILE *b, FILE *c, FILE *d)
                     strcpy(location, name);
 
 #ifndef SPLIT_FILES
-                /* let hhc auomatically split contents */
+                /* let hhc automatically split contents */
                 if (!startpage) {
                     fprintf(b, "<OBJECT type=\"application/x-oleobject\" classid=\"clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e\">\n");
 	            fprintf(b, "<param name=\"New HTML file\" value=\"%s.html\">\n", location);

@@ -4710,7 +4710,7 @@ Ffigure_points
  defaults to that of the linetype. See `linetype`.  If no `using` spec is found
  in the plot command, input data columns are interpreted implicitly in the order
       x y pointsize pointtype color
- Any columns beyong the first two (x and y) are optional; they correspond to
+ Any columns beyond the first two (x and y) are optional; they correspond to
  additional plot properties `pointsize variable`, `pointtype variable`, etc.
 
  The first 8 point types are shared by all terminals. Individual terminals may

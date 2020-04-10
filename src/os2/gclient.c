@@ -3575,7 +3575,7 @@ static char
 		    /*{{{  get optional font size*/
 		    TEXT_DEBUG((ff,"Calling strtod(%s) ...", p));
 		    f = strtod(p, &p);
-		    TEXT_DEBUG((ff,"Retured %.1f and %s\n", f, p));
+		    TEXT_DEBUG((ff,"Returned %.1f and %s\n", f, p));
 
 		    if (!f)
 			f = fontsize;

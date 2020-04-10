@@ -203,7 +203,7 @@ IMAGEN_options()
 	    break;
 	case IMAGEN_OTHER:
 	default:
-	    if (equals(c_token, "[")) {	/* windows spesified */
+	    if (equals(c_token, "[")) {	/* windows specified */
 		c_token++;
 		/* if (IM_plot_nr>1) */
 		if (equals(c_token, "]")) {

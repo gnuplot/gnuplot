@@ -503,7 +503,7 @@ line shell to be used for executing commands and starting sub-shells.
 On all versions of Windows and OS/2 the variable looked at is COMSPEC.
 Other platforms will consult SHELL.
 
-The x11 and qt terminals each require an auxilliary program (gnuplot_x11
+The x11 and qt terminals each require an auxiliary program (gnuplot_x11
 gnuplot_qt) to manage the displayed plots.  These are installed by 
 default in /usr/local/libexec/gnuplot/<version>/ but this default can be
 overridden by the environmental variable GNUPLOT_DRIVER_DIR.

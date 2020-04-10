@@ -87,7 +87,7 @@ QMS_init()
 {
     /* This was just ^IOL, but at Rutgers at least we need some more stuff */
     fputs("^PY^-\n^IOL\n^ISYNTAX00000^F^IB11000^IJ00000^IT00000\n", gpoutfile);
-    /*     ^ QUIC on    ^set defaults  ^ set botttom,top,left margins
+    /*     ^ QUIC on    ^set defaults  ^ set bottom,top,left margins
      *            ^landscape         ^free format
      */
 

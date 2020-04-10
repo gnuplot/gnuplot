@@ -360,7 +360,7 @@ static void clear_used_font_list(void);
 static struct cmap_t *current_cmap = NULL;
 static struct cmap_t *cmap_list_start = NULL;
 
-/* These might work better as fuctions, but defines will do for now. */
+/* These might work better as functions, but defines will do for now. */
 #define ERROR_NOTICE(str)         "\nGNUPLOT (gplt_x11):  " str
 #define ERROR_NOTICE_NEWLINE(str) "\n                     " str
 
@@ -2929,7 +2929,7 @@ exec_cmd(plot_struct *plot, char *command)
 	if (!have_pm3d)
 	    return;
 
-/* These might work better as fuctions, but defines will do for now. */
+/* These might work better as functions, but defines will do for now. */
 #define ERROR_NOTICE(str)         "\nGNUPLOT (gplt_x11):  " str
 #define ERROR_NOTICE_NEWLINE(str) "\n                     " str
 
@@ -3024,8 +3024,8 @@ exec_cmd(plot_struct *plot, char *command)
 
 #if SINGLE_PALETTE_BIT_SHIFT
 /* If the palette size is 2 to some power then a single bit shift would work.
- * The multiply/shift method doesn't seem noticably slower and generally works
- * with any size pallete.  Keep this around for the time being in case some
+ * The multiply/shift method doesn't seem noticeably slower and generally works
+ * with any size palette.  Keep this around for the time being in case some
  * use for it comes up.
  */
 		    /* Initialize the palette shift, or if the palette size changes then update the shift. */
@@ -3278,8 +3278,8 @@ exec_cmd(plot_struct *plot, char *command)
 
 #if SINGLE_PALETTE_BIT_SHIFT
 /* If the palette size is 2 to some power then a single bit shift would work.
- * The multiply/shift method doesn't seem noticably slower and generally works
- * with any size pallete.  Keep this around for the time being in case some
+ * The multiply/shift method doesn't seem noticeably slower and generally works
+ * with any size palette.  Keep this around for the time being in case some
  * use for it comes up.
  */
 					unsigned long pixel = plot->cmap->pixels[image[row_start + i]>>palette_bit_shift];
@@ -3291,7 +3291,7 @@ exec_cmd(plot_struct *plot, char *command)
 					 * advanced CPUs have bit shifting.  The first method uses this.  However, a bit
 					 * shift isn't necessary because we can just take the top word of a two word
 					 * number and we've effectively divided by 2^16.  The second method uses this.
-					 * However, my guess is that C compilers more effeciently translate the first
+					 * However, my guess is that C compilers more efficiently translate the first
 					 * method with the bit shift than the second method which pulls out the top word.
 					 * (There is one instruction less for the shift version than the word selection
 					 * version on gcc for x86.)
@@ -3950,7 +3950,7 @@ PaletteMake(t_sm_palette * tpal)
 	    }
 	    current_cmap = cmp;
 	} else {
-	    /* Unique and truely new colormap.  Make it the current map. */
+	    /* Unique and truly new colormap.  Make it the current map. */
 	    if (current_plot) {
 		current_plot->cmap = new_cmap;
 		RecolorWindow(current_plot);
@@ -6060,7 +6060,7 @@ char *fontname;
 			fontsize, fontencoding);
 	    }
 #ifdef USE_X11_MULTIBYTE
-	    /* Japanese standard PostScript font names (adviced from
+	    /* Japanese standard PostScript font names (advised from
 	     * N.Matsuda). */
 	    else if (multibyte_fonts_usable
 		     && (!strncmp("Ryumin-Light", shortname,

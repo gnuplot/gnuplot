@@ -73,7 +73,7 @@
 # include <wx/wx.h>
 #endif /* WX_PRECOMP */
 
-/* clipboard functionnality */
+/* clipboard functionality */
 #include <wx/dataobj.h>
 #include <wx/clipbrd.h>
 
@@ -108,7 +108,7 @@
 #include <vector>
 #include <list>
 
-/* suprisingly Cocoa version of wxWidgets does not define _Bool ! */
+/* surprisingly Cocoa version of wxWidgets does not define _Bool ! */
 #ifdef __WXOSX_COCOA__
 #define _Bool bool
 #endif
@@ -138,7 +138,7 @@ extern "C" {
 # define IMAGE_SURFACE
 #endif
 
-/* temporarly undef GTK_SURFACE for two reasons :
+/* temporarily undef GTK_SURFACE for two reasons :
  * - because of a CAIRO_OPERATOR_SATURATE bug,
  * - because as for now, it is slower than the pure image surface,
  * (multiple copies between video memory and main memory for operations that are
@@ -173,7 +173,7 @@ extern "C" {
  * redefinition of fprintf, getch...
  * console window */
 # ifdef _WIN32
-#  ifndef _WIN32_WINNT 
+#  ifndef _WIN32_WINNT
 #   define _WIN32_WINNT 0x0501
 #  endif
 #  include <windows.h>
@@ -259,8 +259,8 @@ class wxtApp : public wxApp
 public:
 #if defined(WXT_MULTITHREADED) && defined(WX_NEEDS_XINITTHREADS) && defined(X11)
 	/* Magic fix needed by wxgtk3.0 */
-        wxtApp() : wxApp() { XInitThreads(); } 
-#endif 
+        wxtApp() : wxApp() { XInitThreads(); }
+#endif
 
 	/* This one is called just after wxWidgets initialization */
 	bool OnInit();

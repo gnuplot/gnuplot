@@ -1,4 +1,4 @@
-/* GNUPLOT - getcolor.c */
+neighoring/* GNUPLOT - getcolor.c */
 
 /*[
  *
@@ -163,7 +163,7 @@ interpolate_color_from_gray(double gray, rgb_color *color)
         double dx = sm_palette.gradient[idx].pos
 	    - sm_palette.gradient[idx - 1].pos;
 	double f = (gray - sm_palette.gradient[idx-1].pos) / dx;
-	
+
 	col1 = & sm_palette.gradient[idx - 1].col;
 	color->r = (col1->r + f * (col2->r - col1->r));
 	color->g = (col1->g + f * (col2->g - col1->g));
@@ -260,7 +260,7 @@ color_components_from_gray(double gray, rgb_color *color)
 	color->r = clip_to_01(color->r);
 	color->g = clip_to_01(color->g);
 	color->b = clip_to_01(color->b);
-	}	
+	}
 	break;
     }
 }
@@ -314,7 +314,7 @@ rgb255_from_rgb1(rgb_color rgb1, rgb255_color *rgb255)
  *
  *  EAM Sep 2010 - Guarantee that for palettes with multiple segments
  *  (created by 'set palette defined ...') the mapped gray value is always
- *  in the appropriate segment.  This has the effect of overriding 
+ *  in the appropriate segment.  This has the effect of overriding
  *  use_maxcolors if the defined palette has more segments than the nominal
  *  limit.
  */
@@ -327,7 +327,7 @@ rgb1maxcolors_from_gray(double gray, rgb_color *color)
     rgb1_from_gray(gray, color);
 }
 
-double 
+double
 quantize_gray( double gray )
 {
     double qgray = floor(gray * sm_palette.use_maxcolors)
@@ -352,8 +352,8 @@ quantize_gray( double gray )
 	 * interval. Earlier versions of quantize_gray() handled this case poorly.
 	 * This version isn't perfect either.  In particular it fails to handle the
 	 * converse problematic case where qgray is inside some small interval but
-	 * the true gray value is not.  This causes a color from the narrow segment 
-	 *  to be applied incorrectly to neighoring segments as well.
+	 * the true gray value is not.  This causes a color from the narrow segment
+	 *  to be applied incorrectly to neighboring segments as well.
 	 */
 	else for (j=0; j<sm_palette.gradient_num; j++) {
 	    /* Does the true gray value lie in this interval? */
@@ -367,7 +367,7 @@ quantize_gray( double gray )
 	}
     }
 
-    return qgray;	
+    return qgray;
 }
 
 
@@ -835,12 +835,12 @@ HSV_2_RGB(rgb_color *col)
 /*
  * Support for user-callable rgb = hsv2rgb(h,s,v)
  */
-unsigned int 
+unsigned int
 hsv2rgb ( rgb_color *color )
 {
     HSV_2_RGB(color);
 
-    return    ((unsigned int)(255.*color->r) << 16) 
+    return    ((unsigned int)(255.*color->r) << 16)
 	    + ((unsigned int)(255.*color->g) << 8)
 	    + ((unsigned int)(255.*color->b));
 }

@@ -92,7 +92,7 @@ Features introduced in version 5.4
 	o "set view projection {xz|yz}"
 
 * New terminals and terminal options
-	o New latex terminal "pict2e" supercedes older terminals "latex",
+	o New latex terminal "pict2e" supersedes older terminals "latex",
 	  "emtex", "eepic", and "tpic", which are no longer build by default.
 	o The "pstricks" terminal now supports current gnuplot features
 	  including RGB colors, transparency, filled polygons, and boxes.

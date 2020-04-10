@@ -34,7 +34,7 @@
  * doc2rnh.c  -- program to convert Gnuplot .DOC format to
  *               Digital Standard Runoff for VMS HELP files
  *               (gnuplot.doc, including the terminal documentation
- *                is no longer formated for VMS HELP by default)
+ *                is no longer formatted for VMS HELP by default)
  *
  * From hlp2ms by Thomas Williams
  *
@@ -178,7 +178,7 @@ process_line(char *line, FILE *b)
 /* most tables are simple; no flags means no protected characters
  * other than period (command indicator) in first column
  *
- * However, for ease of maintainence, two tables have sublevels
+ * However, for ease of maintenance, two tables have sublevels
  * and descriptions, corresponding to the printed table entries,
  * encapsulated by the table markers.  Therefore we need to
  * do some more work.
@@ -220,7 +220,7 @@ process_line(char *line, FILE *b)
 
 /*
  *  "." in first column is the DSR command character;
- *  therefore, include the preceeding " "
+ *  therefore, include the preceding " "
  */
 	    case '.':{
 		    putrnh(line, b);

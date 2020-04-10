@@ -202,7 +202,7 @@ WIN_flush_line(path_points * poly)
 		if (poly->n > 1)
 			GraphOpSize(graphwin, W_polyline, poly->n, 0, (void *) poly->point, poly->n * sizeof(POINT));
 		if (poly->n > 0) {
-			/* Save last path point in case there's a vector command without preceeding move. */
+			/* Save last path point in case there's a vector command without preceding move. */
 			poly->point[0].x = poly->point[poly->n - 1].x;
 			poly->point[0].y = poly->point[poly->n - 1].y;
 			/* Reset counter */
@@ -721,7 +721,7 @@ WIN_vector(unsigned int x, unsigned int y)
 	    (WIN_poly.point[WIN_poly.n - 1].x != x) ||
 	    (WIN_poly.point[WIN_poly.n - 1].y != y)) {
 		if (WIN_poly.n == 0) {
-			/* vector command without preceeding move: e.g. in "with line lc variable" */
+			/* vector command without preceding move: e.g. in "with line lc variable" */
 			/* Coordinates were saved with last flush already. */
 			WIN_poly.n++;
 		}
@@ -1207,7 +1207,7 @@ START_HELP(windows)
 "                            {enhanced | noenhanced}",
 "                            {font <fontspec>}",
 "                            {fontscale <scale>}",
-"                            {linewdith <scale>}",
+"                            {linewidth <scale>}",
 "                            {pointscale <scale>}",
 "                            {background <rgb color>}",
 "                            {title \"Plot Window Title\"}",

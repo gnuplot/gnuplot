@@ -81,13 +81,13 @@
  *   so font may now render differently than before...
  * - pointsize rework (size twice also now)
  * - HCHAR and VCHAR are more efficiently computed
- * 1.0.8 06-May-2004 Stephane Barbaray <stephane.barbaray@compodata.com> 
+ * 1.0.8 06-May-2004 Stephane Barbaray <stephane.barbaray@compodata.com>
  * - fixed to work with MS security patch (kb835732) applied, because MS introduced bugs!!!
  * - EMR_EXTTEXTOUTW (84) is now EMR_EXTTEXTOUTA (83)
- * 1.0.7 3-Feb-2003 Ethan A Merritt 
+ * 1.0.7 3-Feb-2003 Ethan A Merritt
  * - modify text and point color handling to match other terminal types
  * - FIXME! alignment of rotated text is not correct.
- * 1.0.6 25-Jul-2002 Ethan A Merritt <merritt@u.washington.edu> 
+ * 1.0.6 25-Jul-2002 Ethan A Merritt <merritt@u.washington.edu>
  * - generalized text rotation and justification
  * 1.0.5 2000/07/20
  * - Handles were not freed at all, resulting to resource leaks when viewing on Windows 9x (not on NT4/W2000!!!)
@@ -312,7 +312,7 @@ typedef  enum {
 #define EMF_Ellipse(left,top,right,bottom)  {	\
     EMF_write_emr(42, 0x18);			\
     EMF_write_rectl(left,top,right,bottom)	\
-}    
+}
 #define EMF_SetTextAlign(align) {		\
     EMF_write_emr(22, 0x0C);			\
     EMF_write_long(align);			\
@@ -333,7 +333,7 @@ typedef  enum {
     EMF_write_emr(3, (7+2*nvert)*4);		\
     EMF_write_rectl(0,0,0,0);  /* Bounds */	\
     EMF_write_long(nvert);			\
-} 
+}
 
 /* shige */
 /* Write the EMR, the header, and a single-entry colormap */
@@ -356,7 +356,7 @@ typedef  enum {
     EMF_write_long(0);		/* y pixels per meter */ \
     EMF_write_long(0);		/* # entries in color table */ \
     EMF_write_long(0);		/* # color table entries used */ \
-} 
+}
 
 #endif /* TERM_PROTO */
 
@@ -426,10 +426,10 @@ static const unsigned char pattern_bitmaps[][PATTERN_BITMAP_LENGTH] = {
 
 static void EMF_flush_polyline(void);
 static void EMF_flush_polygon(void);
-static void EMF_write_byte(int); 
-static void EMF_write_short(int); 
+static void EMF_write_byte(int);
+static void EMF_write_short(int);
 static void EMF_write_long(unsigned long);
-static void EMF_write_float(double); 
+static void EMF_write_float(double);
 static void EMF_setfont(void);
 
 #define ANSI_CHARSET          0
@@ -458,7 +458,7 @@ static void EMF_setfont(void);
 #define ETO_PDY		  0x2000
 #endif
 
-static void 
+static void
 EMF_setfont()
 {
     int i, count;
@@ -500,7 +500,7 @@ EMF_setfont()
     EMF_DeleteObject(EMF_HANDLE_FONT);
 
     /* SB 20040506: was not complete size was 104, now it is 332 */
-    EMF_write_emr(82, 332); 
+    EMF_write_emr(82, 332);
     EMF_write_long(EMF_HANDLE_FONT);
     EMF_write_long((long) (-emf_fontsize * EMF_PT2HM * emf_fontscale));	/* height */
     EMF_write_long(0);		        /* width */
@@ -541,7 +541,7 @@ EMF_setfont()
 	EMF_write_byte((char) (i < strlen(font) ? font[i] : 0));
 	EMF_write_byte(0);
     }
-    
+
     /* SB 20040506: modification following */
     for (i = 0; i < 64; i++) {
 	/* FULL face name (max 64) */
@@ -568,7 +568,7 @@ EMF_setfont()
     EMF_SelectObject(EMF_HANDLE_FONT);
 }
 
-static void 
+static void
 EMF_flush_polygon()
 {
     int i = 0;
@@ -586,12 +586,12 @@ EMF_flush_polygon()
     emf_coords = 0;
 }
 
-static void 
+static void
 EMF_flush_polyline()
 {
     if (emf_coords == 0)
 	return;
-    
+
     EMF_flush_dashtype();
 
     if (emf_coords <= 2) {
@@ -607,14 +607,14 @@ EMF_flush_polyline()
 }
 
 /* HBB 20040708: the following keep K&R argument types for now */
-static void 
+static void
 EMF_write_byte(int value)
 {
     char c = value;
     fwrite(&c, 1, 1, gpoutfile);
 }
 
-static void 
+static void
 EMF_write_short(int value)
 {
     short actual_value = value;
@@ -626,7 +626,7 @@ EMF_write_short(int value)
     fwrite(c, 1, 2, gpoutfile);
 }
 
-static void 
+static void
 EMF_write_long(unsigned long value)
 {
     char c[4];
@@ -641,7 +641,7 @@ EMF_write_long(unsigned long value)
 
 /* FIXME HBB 20001103: this only works as given iff 'float' is the
  * same format as on x86's, i.e. IEEE 4-byte floating point format */
-static void 
+static void
 EMF_write_float(double value)
 {
     char c[4];
@@ -661,7 +661,7 @@ EMF_write_float(double value)
     fwrite(c, 1, 4, gpoutfile);
 }
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 EMF_options()
 {
     char *s;
@@ -746,7 +746,7 @@ EMF_options()
 	    c_token++;
 	    emf_bgnd_rgb = parse_color_name();
 	    emf_background = RGB((emf_bgnd_rgb>>16)&0xFF,
-			(emf_bgnd_rgb>>8)&0xFF, 
+			(emf_bgnd_rgb>>8)&0xFF,
 			emf_bgnd_rgb&0xFF);
 	}
 
@@ -804,7 +804,7 @@ EMF_options()
 	/* We have old-style bare font size specified */
 	emf_defaultfontsize = int_expression();
     }
-    
+
     sprintf(term_options, "%s %s font \"%s,%g\"",
 	    emf_monochrome ? "monochrome" : "color",
 	    emf_pentype ? "butt" : "rounded",
@@ -829,7 +829,7 @@ EMF_options()
 		emf_bgnd_rgb);
 }
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 EMF_init()
 {
     emf_posx = emf_posy = 0;
@@ -838,7 +838,7 @@ EMF_init()
     emf_graphics = FALSE;
 }
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 EMF_graphics()
 {
     int width = 0.5 + term->xmax/EMF_PX2HM;
@@ -897,7 +897,7 @@ EMF_graphics()
     emf_color = emf_textcolor = LT_UNDEFINED;
 }
 
-TERM_PUBLIC int 
+TERM_PUBLIC int
 EMF_set_font(const char *font)
 {
     /* FIXME: This condition is somehow triggered by enhanced_recursion */
@@ -932,7 +932,7 @@ EMF_set_font(const char *font)
     return TRUE;
 }
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 EMF_text()
 {
     long pos;
@@ -968,7 +968,7 @@ EMF_text()
     fseek(gpoutfile, 0L, SEEK_SET);
 }
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 EMF_linetype(int linetype)
 {
     EMF_flush_polyline();
@@ -977,12 +977,12 @@ EMF_linetype(int linetype)
 	EMF_load_dashtype(DASHTYPE_NODRAW);
     else
 	EMF_linecolor(linetype);
-	
+
     emf_linetype = linetype;
 
     if (linetype == LT_SOLID)
 	EMF_load_dashtype(0);
-	
+
     if (linetype == LT_AXIS)
 	EMF_load_dashtype(2);
 }
@@ -1003,7 +1003,7 @@ EMF_dashtype (int type, t_dashtype *custom_dash_type)
 	    emf_dashpattern[i] = custom_dash_type->pattern[i];
 	EMF_load_dashtype(DASHTYPE_CUSTOM);
 	break;
-	
+
     default:
 	EMF_load_dashtype(type);
 	break;
@@ -1011,7 +1011,7 @@ EMF_dashtype (int type, t_dashtype *custom_dash_type)
     }
 }
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 EMF_linecolor(int linecolor)
 {
     static long color_table_data[] =
@@ -1045,7 +1045,7 @@ EMF_linecolor(int linecolor)
 
 TERM_PUBLIC int EMF_make_palette(t_sm_palette *palette)
 {
-    return 0; /* can do continous colors */
+    return 0; /* can do continuous colors */
 }
 
 TERM_PUBLIC void EMF_previous_palette()
@@ -1126,7 +1126,7 @@ EMF_filled_polygon(int points, gpiPoint *corners)
 
     EMF_DeleteObject(EMF_HANDLE_BRUSH);
 
-    if (style == FS_PATTERN || style == FS_TRANSPARENT_PATTERN) { 
+    if (style == FS_PATTERN || style == FS_TRANSPARENT_PATTERN) {
 	/* Implementation of bitmapped pattern fill */
 	const unsigned char *pattern;
 
@@ -1168,7 +1168,7 @@ EMF_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, uns
 	EMF_filled_polygon(4, corner);
 }
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 EMF_linewidth(double width)
 {
     EMF_flush_polyline();
@@ -1194,7 +1194,7 @@ EMF_flush_dashtype(void)
 /*
  * Resets _both_ line color and dash type!
  */
-TERM_PUBLIC void 
+TERM_PUBLIC void
 EMF_load_dashtype(int dashtype)
 {
     int i, j;
@@ -1265,7 +1265,7 @@ EMF_load_dashtype(int dashtype)
 
 }
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 EMF_move(unsigned int x, unsigned int y)
 {
     if (x >= term->xmax || y >= term->ymax) {
@@ -1279,7 +1279,7 @@ EMF_move(unsigned int x, unsigned int y)
     emf_posy = y;
 }
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 EMF_dashed_vector(unsigned int ux, unsigned int uy)
 {
     int xa, ya;
@@ -1295,7 +1295,7 @@ EMF_dashed_vector(unsigned int ux, unsigned int uy)
     adx = abs(dx);
     ady = abs(dy * 10);
 
-    /* using the approximation sqrt(x**2 + y**2)  ~  x + (5*x*x)/(12*y)   when x > y.  
+    /* using the approximation sqrt(x**2 + y**2)  ~  x + (5*x*x)/(12*y)   when x > y.
        Note ordering of calculations to avoid overflow on 16 bit architectures */
     if (10 * adx < ady)
 	dist = (ady / 2 + 25 * adx / ady * adx / 6 * 5) / 5;
@@ -1328,7 +1328,7 @@ EMF_dashed_vector(unsigned int ux, unsigned int uy)
     emf_step -= (int) remain;
 }
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 EMF_solid_vector(unsigned int ux, unsigned int uy)
 {
     if (ux >= term->xmax || uy >= term->ymax)
@@ -1347,7 +1347,7 @@ EMF_solid_vector(unsigned int ux, unsigned int uy)
     emf_coords++;
 }
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 EMF_put_text(unsigned int x, unsigned int y, const char str[])
 {
     int i, alen;
@@ -1371,7 +1371,7 @@ EMF_put_text(unsigned int x, unsigned int y, const char str[])
 	if (encoding == S_ENC_UTF8) FromEnc = "UTF-8";
 	else FromEnc = "Shift_JIS";
 
-	if ((cd = iconv_open("UTF-16LE", FromEnc)) == (iconv_t)-1) 
+	if ((cd = iconv_open("UTF-16LE", FromEnc)) == (iconv_t)-1)
 	    int_warn(NO_CARET, "iconv_open failed");
 	else {
 	    if (iconv(cd, (void *)&str_start, &mblen, &wstr_start, &wlen) == (size_t)-1)
@@ -1398,7 +1398,7 @@ EMF_put_text(unsigned int x, unsigned int y, const char str[])
 #ifdef HAVE_ICONV
     if (encoding == S_ENC_UTF8 || encoding == S_ENC_SJIS) {
 	EMF_write_emr(84, 76 + alen + nchars * 4);	/* ExtTextOutW, UTF16-LE version */
-    } else 
+    } else
 #endif
     {
 	EMF_write_emr(83, 76 + alen + nchars * 4);	/* ExtTextOutA, ANSI char version! */
@@ -1423,22 +1423,22 @@ EMF_put_text(unsigned int x, unsigned int y, const char str[])
 
 #ifdef HAVE_ICONV
     if (encoding == S_ENC_UTF8 || encoding == S_ENC_SJIS) {
-	for (i = 0; i < alen; i++) 
+	for (i = 0; i < alen; i++)
 	    EMF_write_byte(i < slen ? wstr[i] : 0);	/* writing text */
 	free(wstr);
     } else
 #endif
-	for (i = 0; i < alen; i++) 
+	for (i = 0; i < alen; i++)
 	    EMF_write_byte(i < slen ? str[i] : 0);	/* writing text */
     for (i = 0; i < nchars; i++)
 	/* writing intercharacter spacing array (but we don't use it) */
-	EMF_write_long(300); 
+	EMF_write_long(300);
 
     /* Invalidate current position */
     emf_posx = emf_posy = -2000;
 }
 
-TERM_PUBLIC int 
+TERM_PUBLIC int
 EMF_text_angle(int ang)
 {
     /* Win GDI rotation is scaled in tenth of degrees, so... */
@@ -1463,7 +1463,7 @@ EMF_text_angle(int ang)
     return TRUE;
 }
 
-TERM_PUBLIC int 
+TERM_PUBLIC int
 EMF_justify_text(enum JUSTIFY mode)
 {
     int align = GP_TA_BOTTOM;
@@ -1486,14 +1486,14 @@ EMF_justify_text(enum JUSTIFY mode)
     return (TRUE);
 }
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 EMF_reset()
 {
     emf_posx = emf_posy = 0;
     emf_graphics = FALSE;
 }
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 EMF_point(unsigned int x, unsigned int y, int number)
 {
     int old_dashtype;
@@ -1572,7 +1572,7 @@ EMF_point(unsigned int x, unsigned int y, int number)
 	EMF_filled_polygon(4, corners);
 	break;
     case 5:
-	y = term->ymax-y; /* EAM - WTF? */ 
+	y = term->ymax-y; /* EAM - WTF? */
 	EMF_SelectObject(EMF_STOCK_OBJECT_BLACK_PEN);
 	EMF_SelectObject(EMF_STOCK_OBJECT_WHITE_BRUSH);
 	EMF_DeleteObject(EMF_HANDLE_BRUSH);
@@ -1584,7 +1584,7 @@ EMF_point(unsigned int x, unsigned int y, int number)
 	EMF_Ellipse((long)(x-emf_tic),(long)(y-emf_tic),(long)(x+emf_tic),(long)(y+emf_tic));
 	break;
     case 6: /* filled circle */
-	y = term->ymax-y; /* EAM - WTF? */ 
+	y = term->ymax-y; /* EAM - WTF? */
 	EMF_SelectObject(EMF_STOCK_OBJECT_WHITE_BRUSH);
 	EMF_DeleteObject(EMF_HANDLE_BRUSH);
 	EMF_CreateBrush(EMF_HANDLE_BRUSH, 0, emf_color, 0);
@@ -1648,16 +1648,16 @@ EMF_point(unsigned int x, unsigned int y, int number)
 	corners[3].x = x;                corners[3].y = y - emf_tic;
 	corners[4].x = x + emf_tic9511;  corners[4].y = y - emf_tic3090;
 	EMF_filled_polygon(5, corners);
-	break;	
+	break;
     }
 /* end_points: */
 
-    emf_dashtype = old_dashtype; 
+    emf_dashtype = old_dashtype;
     emf_dashtype_count++;
 }
 
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 EMF_set_pointsize(double size)
 {
     if (size < 0)
@@ -1672,7 +1672,7 @@ EMF_set_pointsize(double size)
     emf_tic5878 = emf_tic * 0.5878;
     emf_tic8090 = emf_tic * 0.8090;
     emf_tic3090 = emf_tic * 0.3090;
-    
+
     emf_tic621 = emf_tic * 18 / 29;
 }
 
@@ -1770,7 +1770,7 @@ ENHemf_FLUSH()
 		emf_fontsize = ENHemf_fontsize;
 
 		EMF_set_font(ENHemf_font);
-		
+
 		emf_fontsize = save_fontsize;
 		strcpy(emf_fontname,save_font);
 	    }
@@ -1802,7 +1802,7 @@ ENHemf_FLUSH()
 		/* by a UTF8 string, taking into account that CJK characters    */
 		/* are rougnly twice as wide as a typical ascii character.      */
 		strl = strwidth_utf8(str);
-	    
+
 	    } else {
 	 	/* Otherwise we assume 1 equal-width character per byte.        */
 		strl = strlen(str);

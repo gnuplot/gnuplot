@@ -187,7 +187,7 @@ EXCL_text()
 TERM_PUBLIC void
 EXCL_linetype(int linetype)
 {
-/* excl line widths in mils: 4 is mimimum, but too thin; then
+/* excl line widths in mils: 4 is minimum, but too thin; then
    7,10,14,17,20,24,27...
    exclpen=MOD(NPEN,8)*7
    CSI  exclpen; exclpen; TALGLPE

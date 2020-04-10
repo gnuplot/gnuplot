@@ -31,7 +31,7 @@
 # Comment for programs using gnuplot as their plotting engine:
 # Both wgnuplot*.exe compile also pgnuplot.exe. This small helper program was
 # used when gnuplot.exe was not available on Windows. Nowadays, pgnuplot.exe
-# is deprecated -- plese use gnuplot.exe instead.
+# is deprecated -- please use gnuplot.exe instead.
 
 TARGET=wgnuplot.exe
 #TARGET=wgnuplot_pipes.exe

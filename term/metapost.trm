@@ -92,7 +92,7 @@ TERM_PUBLIC void MP_dashtype(int type, t_dashtype *custom_dash_type);
 
 /* gnuplot units will be one pixel if printing device has this
    resolution. Too small resolutions (like 300) can give rough
-   appearence to curves when user tries to smooth a curve by choosing
+   appearance to curves when user tries to smooth a curve by choosing
    high sampling rate. */
 #define MP_DPI (2400)
 
@@ -138,7 +138,7 @@ static TBOOLEAN MP_inline = FALSE;
 static TBOOLEAN MP_color = FALSE;
 static TBOOLEAN MP_solid = FALSE;
 
-/* compatability mode*/
+/* compatibility mode*/
 /* static TBOOLEAN MP_notex = FALSE; */
 #define MP_NO_TEX 0
 #define MP_TEX 1
@@ -1038,7 +1038,7 @@ TERM_TABLE_START(mp_driver)
     MP_text, null_scale, MP_graphics, MP_move, MP_vector,
     MP_linetype, MP_put_text, MP_text_angle,
     MP_justify_text, MP_point, MP_arrow, MP_set_font, MP_pointsize,
-    TERM_BINARY|TERM_CAN_CLIP|TERM_CAN_DASH|TERM_IS_LATEX,	/*flags*/ 
+    TERM_BINARY|TERM_CAN_CLIP|TERM_CAN_DASH|TERM_IS_LATEX,	/*flags*/
     0, 0, MP_boxfill, MP_linewidth
 #ifdef USE_MOUSE
     , 0, 0, 0, 0, 0		/* no mouse support for metapost */

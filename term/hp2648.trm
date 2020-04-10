@@ -100,7 +100,7 @@ HP2648graphics()
     fprintf(gpoutfile, "\033*dacZ");
 /*                   1     23
 	1. mode
-	2. clear grahics screen
+	2. clear graphics screen
 	3. graphics video on
 */
 }

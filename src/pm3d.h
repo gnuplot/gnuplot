@@ -34,7 +34,7 @@
 /*
   where to plot pm3d: base or top (color map) or surface (color surface)
   The string pm3d.where can be any combination of the #defines below.
-  For instance, "b" plot at botton only, "st" plots firstly surface, then top, etc.
+  For instance, "b" plot at bottom only, "st" plots firstly surface, then top, etc.
 */
 #define PM3D_AT_BASE	'b'
 #define PM3D_AT_TOP	't'

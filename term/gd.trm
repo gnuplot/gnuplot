@@ -60,7 +60,7 @@
  * rrggbb are the red green and blue components in hex.  For example
  * x00ff00 is green.  The background color is set first, then the
  * color borders, then the X & Y axis, then the plotting colors.
- * (The wierd color spec is in order to get around limitations
+ * (The weird color spec is in order to get around limitations
  * in gnuplot's scanner.)
  *
  * This driver is modeled after the PBM driver pbm.trm.
@@ -172,7 +172,7 @@ TERM_PUBLIC void ENHGD_boxed_text(unsigned int, unsigned int, int);
 # define gdUseFontConfig(x) 0
 #endif
 
-/* These intermediate functions are necessary on Windows since 
+/* These intermediate functions are necessary on Windows since
    the shared version of libgd uses a different calling convention
    and there is no proper macro defined.
 */
@@ -181,7 +181,7 @@ static void gp_gdImagePolygon(gdImagePtr, gdPointPtr, int, int);
 static void gp_gdImageFilledPolygon(gdImagePtr, gdPointPtr, int, int);
 #else
 # define gp_gdImagePolygon gdImagePolygon
-# define gp_gdImageFilledPolygon gdImageFilledPolygon 
+# define gp_gdImageFilledPolygon gdImageFilledPolygon
 #endif
 
 static void PNG_PointX(unsigned int, unsigned int);
@@ -323,7 +323,7 @@ static struct gen_table PNG_opts[] =
 static double PNG_linewidth_factor = 1.0;
 static double PNG_dashlength_factor = 1.0;
 
-/* shige takeno: 
+/* shige takeno:
  * libgd can be built to prefer UTF-8 or SJIS encoding for Japanese.
  * If it wants SJIS and we are currently in UTF8, convert.
  * If it wants UTF8 and we are currently in SJIS, convert.
@@ -361,13 +361,13 @@ static gdFTStringExtra PNG_FONT_INFO = {0,0,0,0,0,NULL,NULL};
 #endif
 
 #if defined(_WIN32) && !defined(NONDLL)
-static void 
+static void
 gp_gdImagePolygon(gdImagePtr im, gdPointPtr p, int n, int c)
 {
     gdImagePolygon(im, p, n, c);
 }
 
-static void 
+static void
 gp_gdImageFilledPolygon(gdImagePtr im, gdPointPtr p, int n, int c)
 {
     gdImageFilledPolygon(im, p, n, c);
@@ -433,7 +433,7 @@ image_do_crop (void)
 	gdImageDestroy(png_state.image);
 	png_state.image = im_crop;
 	/* Re-set transparency for sixelgd */
-	if (strcmp("sixelgd", term->name) == 0 && 
+	if (strcmp("sixelgd", term->name) == 0 &&
 	    png_state.TrueColor && (png_state.flags & PNG_USE_TRANSPARENT)) {
 	    gdImageColorTransparent(png_state.image, png_state.color_table[0]);
 	}
@@ -819,7 +819,7 @@ PNG_options()
 		err = gdImageStringFT(NULL, &brect[0], 0,
 			png_state.ttffont, png_state.default_ttfsize*png_state.fontscale,
 			0.0, 0, 0, "test");
-	
+
 		/* If that didn't work, try again using the fontconfig mechanism */
 		if (err && gdUseFontConfig(1)) {
 		    err = gdImageStringFT(NULL, &brect[0], 0,
@@ -1108,7 +1108,7 @@ PNG_options()
 	    sprintf(term_options + strlen(term_options), "animate ");
 	else
 	    sprintf(term_options + strlen(term_options),
-		"animate delay %d loop %d %soptimize ", 
+		"animate delay %d loop %d %soptimize ",
 		png_state.frame_delay, png_state.loop_count,
 		png_state.frame_optimization ? "" : "no");
     }
@@ -1327,15 +1327,15 @@ void PNG_set_color (t_colorspec *colorspec)
     case TC_RGB:
 	png_state.rgb = colorspec->lt;
 	if (png_state.TrueColor)
-	    png_state.color = gdImageColorExactAlpha(png_state.image, 
+	    png_state.color = gdImageColorExactAlpha(png_state.image,
 		(colorspec->lt >> 16) & 0xff,
-		(colorspec->lt >> 8) & 0xff, 
+		(colorspec->lt >> 8) & 0xff,
 		 colorspec->lt & 0xff,
 		(colorspec->lt >> 25) & 0x7f);
 	else
 	    png_state.color = gdImageColorResolve(png_state.image,
 		(colorspec->lt >> 16) & 0xff,
-		(colorspec->lt >> 8) & 0xff, 
+		(colorspec->lt >> 8) & 0xff,
 		colorspec->lt & 0xff);
 	break;
 
@@ -1370,7 +1370,7 @@ void PNG_filled_polygon(int points, gpiPoint *corners)
     int i;
     int fillpar = corners->style >> 4;
     int color = png_state.color;
-    
+
     /* since gpiPoint carries more than just x and y if
      * we have EXTENDED_COLOR_SPECS defined, we need to
      * copy it to the gdPointPtr struct; make it static
@@ -1474,7 +1474,7 @@ PNG_graphics()
     unsigned int rgb;
     unsigned int n_colors = GD_DEFINED_COLORS;
 
-    /* avoid to pre-allocate colors for the sixel terminal in indexed mode */ 
+    /* avoid to pre-allocate colors for the sixel terminal in indexed mode */
     if ((strcmp("sixelgd", term->name) == 0) && !png_state.TrueColor)
 	n_colors = 1;
 
@@ -1528,7 +1528,7 @@ PNG_graphics()
 	gdImageColorTransparent(png_state.image, -1);
 
     /* Fix for truecolor and transparent options */
-    if (strcmp("sixelgd", term->name) == 0 && 
+    if (strcmp("sixelgd", term->name) == 0 &&
         png_state.TrueColor && png_state.flags & PNG_USE_TRANSPARENT) {
 	gdImageAlphaBlending(png_state.image, gdEffectReplace);
 	gdImageFill(png_state.image, 1, 1, png_state.color_table[0]);
@@ -1624,14 +1624,14 @@ PNG_vector(unsigned int x, unsigned int y)
 		/* when the line is thick.			             */
 		if (lw > 2) {
 		    if (png_state.dashfraction >= dashpattern[0])
-		    gdImageFilledArc(png_state.image, 
+		    gdImageFilledArc(png_state.image,
 				     (int)(new_x + 0.5), Y((int)(new_y + 0.5)),
 				2 * lw, 2 * lw,
 			 	0, 360, png_state.color, gdArc);
 		} else {
-		    gdImageLine(png_state.image, 
+		    gdImageLine(png_state.image,
 				(int)(last_x + 0.5), Y((int)(last_y + 0.5)),
-				(int)(new_x + 0.5), Y((int)(new_y + 0.5)), 
+				(int)(new_x + 0.5), Y((int)(new_y + 0.5)),
 				    gdBrushed );
 		}
 	    }
@@ -1644,7 +1644,7 @@ PNG_vector(unsigned int x, unsigned int y)
     /* All other (not dashed) vectors */
     } else {
 	if (png_state.linewidth == 1) {
-#if defined(gdAntiAliased) 
+#if defined(gdAntiAliased)
 	    gdImageSetThickness(png_state.image,1);
 	    gdImageSetAntiAliased(png_state.image, png_state.color);
 	    gdImageLine(png_state.image, png_state.x, Y(png_state.y),
@@ -1693,7 +1693,7 @@ PNG_linetype(int type)
 
     if (typeindex + 3 >= png_state.n_colors) {
 	int rgb = pm3d_color_names_tbl[typeindex + 3].value;
-	png_state.color = gdImageColorResolve(png_state.image, 
+	png_state.color = gdImageColorResolve(png_state.image,
 				(rgb >> 16) & 0xff, (rgb >> 8) & 0xff, rgb & 0xff);
 	png_state.rgb = rgb;
     } else {
@@ -2129,7 +2129,7 @@ ENHGD_FLUSH()
 		x, Y(y), fragment);
     }
 #endif
-    if (err) 
+    if (err)
 	fprintf(stderr,"gdImageStringFT: %s while printing string %s with font %s\n",
 	    err,enhanced_text,ENHgd_font);
 
@@ -2357,7 +2357,7 @@ PNG_image (unsigned int M, unsigned int N, coordval * image, gpiPoint * corner, 
 	    rgb1.g = *image++;
 	    rgb1.b = *image++;
 	    rgb255_from_rgb1( rgb1, &rgb255 );
-	    pixel = gdImageColorResolve( im, 
+	    pixel = gdImageColorResolve( im,
 		(int)rgb255.r, (int)rgb255.g, (int)rgb255.b );
 	    gdImageSetPixel( im, m, n, pixel );
 	}
@@ -2746,8 +2746,8 @@ GIF_text()
 	/* Note - using a global colormap saves space, but it breaks	*/
 	/* if later frames add new colors to the palette.		*/
 	if (png_state.frame_count == 0) {
-	    gdImageGifAnimBegin(png_state.image, gpoutfile, 
-		1, /* Load Global Colormap even if it isn't used */ 
+	    gdImageGifAnimBegin(png_state.image, gpoutfile,
+		1, /* Load Global Colormap even if it isn't used */
 		png_state.loop_count );
 	}
 	gdImageGifAnimAdd(png_state.image, gpoutfile,
@@ -2756,8 +2756,8 @@ GIF_text()
 	    0, 0 /* No offset */,
 	    png_state.frame_delay,
 	    (png_state.flags & PNG_USE_TRANSPARENT)
-			? gdDisposalRestorePrevious 
-			: gdDisposalNone, 
+			? gdDisposalRestorePrevious
+			: gdDisposalNone,
 	    (png_state.frame_optimization && !(png_state.flags & PNG_USE_TRANSPARENT))
 	    ? png_state.previous_image : NULL);
 	png_state.frame_count++;
@@ -3053,7 +3053,7 @@ START_HELP(sixelgd)
 " Blank space at the edges of the finished plot may be trimmed using the `crop`",
 " option, resulting in a smaller final image size. Default is `nocrop`."
 "",
-" The terminal has been sucessfully tested with the xterm, mlterm and mintty",
+" The terminal has been successfully tested with the xterm, mlterm and mintty",
 " terminals.  The later two support the `truecolor` mode using 256 sixel",
 " colors out of box. Distributed copies of xterm may or may not have been",
 " configured to support sixel graphics and may be limited to 16 colors."

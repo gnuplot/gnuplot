@@ -1,6 +1,6 @@
 $ ! CONFIGURE.VMS -- configure command file for VMS
 $ !
-$ ! Writen by John.Hasstedt@sunysb.edu.  This command file creates config.h
+$ ! Written by John.Hasstedt@sunysb.edu.  This command file creates config.h
 $ ! and either a make file or a command file.  These files are based on the
 $ ! makefile.vms and buildvms.com files distributed with previous versions
 $ ! of gnuplot.

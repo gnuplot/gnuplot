@@ -1135,7 +1135,7 @@ void
 do_arc(
     int cx, int cy, /* Center */
     double radius, /* Radius */
-    double arc_start, double arc_end, /* Limits of arc in degress */
+    double arc_start, double arc_end, /* Limits of arc in degrees */
     int style, TBOOLEAN wedge)
 {
     gpiPoint vertex[250];

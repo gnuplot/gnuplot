@@ -272,7 +272,7 @@ GGI_line_colors()
     GGIcolors[6]   = GGIgray;
 }
 
-/* Called bevore a graphic is displayed */
+/* Called before a graphic is displayed */
 TERM_PUBLIC void GGI_graphics()
 {
 #ifdef USE_MOUSE
@@ -1429,7 +1429,7 @@ GGI_set_color(struct t_colorspec *colorspec)
 	rgb.b = ((colorspec->lt) & 0xff) * (65535./255.);
 	ggiSetGCForeground(GGIvisual, ggiMapColor(GGIvisual,&rgb));
     }
-    
+
     if (colorspec->type != TC_FRAC)
 	return;
 

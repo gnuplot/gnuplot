@@ -97,7 +97,7 @@ TERM_PUBLIC void TGIF_set_linewidth(double size);
 TERM_PUBLIC int TGIF_make_palette (t_sm_palette *);
 TERM_PUBLIC void TGIF_previous_palette (void);
 TERM_PUBLIC void TGIF_set_color (t_colorspec *);
-TERM_PUBLIC void TGIF_fillbox(int style, unsigned int x1, unsigned int y1, 
+TERM_PUBLIC void TGIF_fillbox(int style, unsigned int x1, unsigned int y1,
 			      unsigned int width, unsigned int height);
 TERM_PUBLIC void TGIF_FillSolid(char *curcolor,int fillpar);
 TERM_PUBLIC void TGIF_filled_polygon (int, gpiPoint *);
@@ -429,7 +429,7 @@ TGIF_options()
 	    uTgif_win_horiz, uTgif_win_verti);
 
     strcat(term_options, TgifUseColor ? " color" : " monochrome");
-    sprintf(&(term_options[strlen(term_options)]), " linewidth %f", 
+    sprintf(&(term_options[strlen(term_options)]), " linewidth %f",
 	    dActThick_default);
     sprintf(&(term_options[strlen(term_options)]), " %s font \"%s,%u\"",
 	    TgifSolid ? "solid" : "dashed",
@@ -1539,11 +1539,11 @@ TGIF_set_font(const char *font)
 TERM_PUBLIC int
 TGIF_make_palette(t_sm_palette *palette)
 {
-    return 0; 
+    return 0;
     /* can do continuous colors */
 }
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 TGIF_previous_palette(void)
 {
     /* do nothing */
@@ -1556,19 +1556,19 @@ TGIF_set_color(t_colorspec *colorspec)
 	TGIF_linetype(colorspec->lt);
     } else if (colorspec->type == TC_FRAC) {
 	rgb255maxcolors_from_gray(colorspec->value, &rgbActColor);
-	sprintf(sActColor, "#%.2x%.2x%.2x", 
+	sprintf(sActColor, "#%.2x%.2x%.2x",
 		rgbActColor.r, rgbActColor.g, rgbActColor.b);
     } else if (colorspec->type == TC_RGB) {
 	rgbActColor.r = colorspec->lt >> 16 & 0xff;
 	rgbActColor.g = colorspec->lt >> 8 & 0xff;
 	rgbActColor.b = colorspec->lt & 0xff;
-	sprintf(sActColor, "#%.2x%.2x%.2x", 
+	sprintf(sActColor, "#%.2x%.2x%.2x",
 		rgbActColor.r, rgbActColor.g, rgbActColor.b);
     }
 }
 
 TERM_PUBLIC void
-TGIF_fillbox(int style, unsigned int x1, unsigned int y1, 
+TGIF_fillbox(int style, unsigned int x1, unsigned int y1,
 	     unsigned int width, unsigned int height)
 {
     gpiPoint corner[4];
@@ -1657,14 +1657,14 @@ TERM_TABLE_START(tgif_driver)
     TGIF_text, null_scale, TGIF_graphics, TGIF_move, TGIF_vector,
     TGIF_linetype, TGIF_put_text, TGIF_text_angle,
     TGIF_justify_text, TGIF_point, do_arrow, TGIF_set_font,
-    TGIF_set_pointsize, 
-    TERM_CAN_MULTIPLOT|TERM_CAN_DASH|TERM_LINEWIDTH, 
+    TGIF_set_pointsize,
+    TERM_CAN_MULTIPLOT|TERM_CAN_DASH|TERM_LINEWIDTH,
     0, 0, TGIF_fillbox,
     TGIF_set_linewidth
 #ifdef USE_MOUSE
     ,0, 0, 0, 0, 0 /* no mouse support for the tgif terminal */
 #endif
-    , TGIF_make_palette, TGIF_previous_palette, TGIF_set_color, 
+    , TGIF_make_palette, TGIF_previous_palette, TGIF_set_color,
     TGIF_filled_polygon
 TERM_TABLE_END(tgif_driver)
 
@@ -1705,7 +1705,7 @@ START_HELP(tgif)
 " `defaults` sets all options to their defaults: `portrait`, `[1,1]`, `color`,",
 " `linewidth 1.0`, `dashed`, `\"Helvetica,18\"`.",
 "",
-" The `solid` option is usually prefered if lines are colored, as they often",
+" The `solid` option is usually preferred if lines are colored, as they often",
 " are in the editor.  Hardcopy will be black-and-white, so `dashed` should be",
 " chosen for that.",
 "",

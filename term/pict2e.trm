@@ -1143,7 +1143,7 @@ START_HELP(pict2e)
 " are colored. Using this option, you must include \\usepackage{xcolor}",
 " in the preamble of your LaTeX document. `monochrome` will avoid the use of",
 " any color commands in the output.",
-" Transparent color fill is availble if pdflatex is used.",
+" Transparent color fill is available if pdflatex is used.",
 "",
 " `linewidth` sets the scale factor for the width of lines.",
 " `rounded` sets line caps and line joins to be rounded. `butt` sets butt",
