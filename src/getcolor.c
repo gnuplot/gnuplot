@@ -1,4 +1,4 @@
-neighoring/* GNUPLOT - getcolor.c */
+/* GNUPLOT - getcolor.c */
 
 /*[
  *
