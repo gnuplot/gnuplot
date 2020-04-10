@@ -12756,13 +12756,16 @@ Ffigure_multiple_keys
 3 pixmap
 ?pixmap
 ?set pixmap
+?unset pixmaps
+?show pixmaps
 ?commands set pixmap
  Syntax:
        set pixmap <index> "filename" at <position>
-                  {width <w> | height <h> | size <w> <h>}
+                  {width <w> | height <h> | size <w>,<h>}
                   {front|behind} {center}
        show pixmaps
        unset pixmaps
+       unset pixmap <index>
 
  The `set pixmap` command is similar to `set object` in that it defines an
  object that will appear on subsequent plots. The rectangular array of

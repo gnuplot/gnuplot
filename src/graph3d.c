@@ -811,7 +811,8 @@ do_3dplot(
 
     /* Give a chance for rectangles to be behind everything else */
     place_objects( first_object, LAYER_BEHIND, 3);
-    place_pixmaps(LAYER_BEHIND, 3);
+    if (replot_mode != AXIS_ONLY_ROTATE)
+	place_pixmaps(LAYER_BEHIND, 3);
 
     term_apply_lp_properties(&border_lp);	/* border linetype */
 

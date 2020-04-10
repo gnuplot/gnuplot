@@ -367,8 +367,8 @@ place_pixmaps(int layer, int dimensions)
 	} else {
 	    double Dx, Dy;
 	    map_position_r(&pixmap->extent, &Dx, &Dy, "pixmap");
-	    dx = Dx;
-	    dy = Dy;
+	    dx = fabs(Dx);
+	    dy = fabs(Dy);
 	}
 
 	/* default is to keep original aspect ratio */
