@@ -346,7 +346,8 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec, double *reltime)
 #endif
 
 	default:
-	    int_warn(DATAFILE, "Bad time format in string");
+	    int_warn(DATAFILE, "Bad time format %%%c", *fmt);
+
 	}
 	fmt++;
     }
