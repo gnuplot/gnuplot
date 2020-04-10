@@ -651,7 +651,7 @@ execute_at(struct at_type *at_ptr)
 }
 
 /* As of May 2013 input of Inf/NaN values through evaluation is treated */
-/* equivalently to direct input of a formated value.  See imageNaN.dem. */
+/* equivalently to direct input of a formatted value.  See imageNaN.dem. */
 void
 evaluate_at(struct at_type *at_ptr, struct value *val_ptr)
 {

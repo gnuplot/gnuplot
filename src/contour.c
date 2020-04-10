@@ -1486,7 +1486,7 @@ eval_bspline(
  * might be float (Knot(i) = i) or open (where the first and last "order"
  * knots are equal). contr_isclosed determines knot kind - open contour means
  * open knot vector, and closed contour selects float knot vector.
- * Note the knot vector is not exist and this routine simulates it existance
+ * Note the knot vector is not exist and this routine simulates it existence
  * Also note the indexes for the knot vector starts from 0.
  */
 static double

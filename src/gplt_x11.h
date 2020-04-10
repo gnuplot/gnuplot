@@ -73,10 +73,10 @@
 /* Encoding character for removing '\n' and '\0' from data stream.
  * The strategy is as follows, we pick a character half way between
  * '\0' and '\n'.  Then the encoded characters occupy a range
- * of 10.  Next, by observing statistics of the occurrances
+ * of 10.  Next, by observing statistics of the occurrences
  * of the encoded characters in the binary data, the translation
  * character is chosen so that these encoded characters are moved
- * to locations having the least occurances of bytes.
+ * to locations having the least occurrences of bytes.
  */
 #define SET_COLOR_CODE_CHAR      5
 #define FILLED_POLYGON_CODE_CHAR 5

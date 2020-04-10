@@ -4553,7 +4553,7 @@ df_show_binary(FILE *fp)
     else
 	fprintf(fp, "none");
 
-    fprintf(fp, "\n\t  File Endianness: %s",
+    fprintf(fp, "\n\t  File Endianess: %s",
 	    df_endian[df_bin_file_endianess_default]);
 
     fprintf(fp, "\n\t  Default binary format: %s",
