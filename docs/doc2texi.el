@@ -46,7 +46,7 @@
 ;; text stream.  It seems much more efficient in this context to treat
 ;; it as a buffer.  All of the work is done by the function
 ;; `d2t-doc-to-texi'.  Each of the conversion chores is handled by an
-;; individual function.  Each of thse functions is very similar in
+;; individual function.  Each of these functions is very similar in
 ;; structure.  They start at the top of the buffer, search forward for
 ;; a line matching the text element being converted, perform the
 ;; replacement in place, and move on until the end of the buffer.
@@ -74,7 +74,7 @@
 ;;
 ;; This will start emacs in batch mode, load this file, run the
 ;; converter, then quit.  This takes about 30 seconds my 133 MHz
-;; Pentium.  It also sends a large number of mesages to stderr, so you
+;; Pentium.  It also sends a large number of messages to stderr, so you
 ;; may want to redirect stderr to /dev/null or to a file.
 ;;
 ;; Then you can do
@@ -160,7 +160,7 @@ If PATTERN is omitted, it defaults to \"[ \\f\\t\\n\\r\\v]+\"."
 @setchapternewpage odd
 @c %**end of header
 
-@c define the command and options indeces
+@c define the command and options indices
 @defindex cm
 @defindex op
 @defindex tm

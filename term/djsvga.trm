@@ -1023,7 +1023,7 @@ DJSVGA_put_text(unsigned int x, unsigned int y, const char *str)
 	    break;
 	}
 
-	// we explicitely compute the color of every destination pixel
+	// we explicitly compute the color of every destination pixel
 	// loop over x' (xp) and y' (yp)
 	for (int yp = miny; yp < maxy; yp++) {
 	    for (int xp = minx; xp < maxx; xp++) {

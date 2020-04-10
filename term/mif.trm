@@ -193,7 +193,7 @@ static int mif_pattern_table[MIF_NPENS] =
 /** MIF groups administration **/
 #define MIF_NGROUP_ID           20
 static struct mif_group_id {
-    int group_existance;
+    int group_existence;
 /* This group id should generate a MIF group */
 #define MIF_GROUP_EXISTS        1
 /* This group id should not generate a MIF group */
@@ -202,7 +202,7 @@ static struct mif_group_id {
     int group_id;
 #define MIF_INVALID_GROUP_ID    0	/* An invalid MIF group ID */
 
-} mif_group_id[MIF_NGROUP_ID];	/* List of used group ID:s and corresponding MIF groups existance */
+} mif_group_id[MIF_NGROUP_ID];	/* List of used group ID:s and corresponding MIF groups existence */
 
 /** Semaphores **/
 static int mif_initialized = 0;	/* != 0 when output is active */
@@ -529,7 +529,7 @@ MIF_init()
 	/* Reset group ID generator */
 	for (i = 0; i < MIF_NGROUP_ID; i++) {
 	    mif_group_id[i].group_id = MIF_INVALID_GROUP_ID;
-	    mif_group_id[i].group_existance = MIF_GROUP_NOT_EXISTS;
+	    mif_group_id[i].group_existence = MIF_GROUP_NOT_EXISTS;
 	}
 
 	/* Identify ourselves */
@@ -608,7 +608,7 @@ MIF_graphics()
 	/* Reset group ID generator */
 	for (i = 0; i < MIF_NGROUP_ID; i++) {
 	    mif_group_id[i].group_id = MIF_INVALID_GROUP_ID;
-	    mif_group_id[i].group_existance = MIF_GROUP_NOT_EXISTS;
+	    mif_group_id[i].group_existence = MIF_GROUP_NOT_EXISTS;
 	}
 
 	/* Frame preamble */
@@ -650,7 +650,7 @@ MIF_text()
 
 	for (i = 0; i < MIF_NGROUP_ID; i++) {
 	    if (mif_group_id[i].group_id != MIF_INVALID_GROUP_ID &&
-		mif_group_id[i].group_existance == MIF_GROUP_EXISTS) {
+		mif_group_id[i].group_existence == MIF_GROUP_EXISTS) {
 		fprintf(gpoutfile, "\
 \t<Group\n\
 \t\t<ID %d>\n\
@@ -879,7 +879,7 @@ insert_mif_line(double fx, double fy)
     return (rval);
 }
 
-/* Register group ID. Update group ID existance. */
+/* Register group ID. Update group ID existence. */
 /* Returns:     1       group_id belongs to a MIF group
 		0       group_id does not belong to a MIF group
 	       -1       not inside a Frame
@@ -898,18 +898,18 @@ proc_group_id(int group_id)
 	     mif_group_id[i].group_id != MIF_INVALID_GROUP_ID &&
 	     mif_group_id[i].group_id != group_id;
 	     i++) {
-	    /* Don't check the group_existance variable */
+	    /* Don't check the group_existence variable */
 	}
 
 	if (i < MIF_NGROUP_ID) {
 	    if (mif_group_id[i].group_id == MIF_INVALID_GROUP_ID) {
 		/* Register as new group ID for eventual use as MIF group */
 		mif_group_id[i].group_id = group_id;
-		mif_group_id[i].group_existance = MIF_GROUP_NOT_EXISTS;
+		mif_group_id[i].group_existence = MIF_GROUP_NOT_EXISTS;
 	    } else {
 		/* If second use of this group ID -> create a new MIF group */
 		if (mif_group_id[i].group_id == group_id) {
-		    mif_group_id[i].group_existance = MIF_GROUP_EXISTS;
+		    mif_group_id[i].group_existence = MIF_GROUP_EXISTS;
 		    /* NOTE: a group MUST have at least two members. */
 		    rval = 1;
 		}

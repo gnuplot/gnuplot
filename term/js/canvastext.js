@@ -136,7 +136,7 @@ CanvasTextFunctions.measure = function( font, size, str)
 
     for ( i = 0; i < len; i++) {
         var index = str.charAt(i);
-	// EAM deal with non-ascii characaters
+	// EAM deal with non-ascii characters
 	if (index > '~')
 	    index = str.charCodeAt(i);
 
@@ -158,7 +158,7 @@ CanvasTextFunctions.draw = function(ctx,font,size,x,y,str)
 
     for ( i = 0; i < len; i++) {
         var index = str.charAt(i);
-	// EAM deal with non-ascii characaters
+	// EAM deal with non-ascii characters
 	if (index > '~')
 	    index = str.charCodeAt(i);
 
