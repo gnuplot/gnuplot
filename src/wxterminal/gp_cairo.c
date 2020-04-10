@@ -144,7 +144,7 @@ static rgb_color gp_cairo_colorlist[12] = {
 {0.5,0.5,0.5} /* grey */
 };
 
-/* correspondance between gnuplot linetypes and terminal colors */
+/* correspondence between gnuplot linetypes and terminal colors */
 void gp_cairo_set_background( rgb_color background )
 {
 	gp_cairo_colorlist[0] = background;
@@ -512,7 +512,7 @@ void gp_cairo_end_polygon(plot_struct *plot)
 		plot->color = path->color;
 		gp_cairo_fill( plot, path->corners->style & 0xf, path->corners->style >> 4 );
 		cairo_fill(plot->cr);
-		/* free the ressources, and go to the next point */
+		/* free the resources, and go to the next point */
 		free(path->corners);
 		path2 = path->previous;
 		free(path);
@@ -1103,7 +1103,7 @@ void gp_cairo_draw_point(plot_struct *plot, int x1, int y1, int style)
 		if (style == 14)
 			cairo_fill_preserve(plot->cr);
 		cairo_stroke(plot->cr);
-		break;				
+		break;
 	default :
 		break;
 	}
@@ -1595,7 +1595,7 @@ void gp_cairo_enhanced_finish(plot_struct *plot, int x, int y)
 	baseline_offset = pango_layout_get_baseline(layout) / PANGO_SCALE;
 	vert_just = 0.5 * (float)(plot->fontsize * plot->oversampling_scale);
 	vert_just = baseline_offset - vert_just;
-	
+
 	arg = plot->text_angle * M_PI/180;
 	enh_x = x - vert_just * sin(arg);
 	enh_y = y - vert_just * cos(arg);
@@ -1630,7 +1630,7 @@ void gp_cairo_enhanced_finish(plot_struct *plot, int x, int y)
 	/* pango_cairo_show_layout does not clear the path (here a starting point)
 	 * Do it by ourselves, or we can get spurious lines on future calls. */
 	cairo_new_path(plot->cr);
-	
+
 	if (in_textbox) {
 		box_rotation = -arg;
 		box_origin_x = x;
@@ -1755,7 +1755,7 @@ void gp_cairo_boxed_text(plot_struct *plot, int x, int y, int option)
 
 		/* In progress: textbox rotation
 		 * 1) translate to text origin
-		 * 2) substract translation from bounding box
+		 * 2) subtract translation from bounding box
 		 * 3) rotate about new origin
 		 * 4) stroke/fill
 		 */
@@ -1767,11 +1767,11 @@ void gp_cairo_boxed_text(plot_struct *plot, int x, int y, int option)
 		dy = 0.25 * bounding_ymargin * (float)(plot->fontsize * plot->oversampling_scale);
 		if (option == TEXTBOX_GREY)
 		    dy = 0;
-		gp_cairo_move(plot,   bounding_box[0]-dx, bounding_box[1]-dy); 
-		gp_cairo_vector(plot, bounding_box[0]-dx, bounding_box[3]+dy); 
-		gp_cairo_vector(plot, bounding_box[2]+dx, bounding_box[3]+dy); 
-		gp_cairo_vector(plot, bounding_box[2]+dx, bounding_box[1]-dy); 
-		gp_cairo_vector(plot, bounding_box[0]+dx, bounding_box[1]-dy); 
+		gp_cairo_move(plot,   bounding_box[0]-dx, bounding_box[1]-dy);
+		gp_cairo_vector(plot, bounding_box[0]-dx, bounding_box[3]+dy);
+		gp_cairo_vector(plot, bounding_box[2]+dx, bounding_box[3]+dy);
+		gp_cairo_vector(plot, bounding_box[2]+dx, bounding_box[1]-dy);
+		gp_cairo_vector(plot, bounding_box[0]+dx, bounding_box[1]-dy);
 		cairo_close_path(plot->cr);
 		if (option == TEXTBOX_BACKGROUNDFILL) {
 		    cairo_set_source_rgba(plot->cr, plot->color.r, plot->color.g,

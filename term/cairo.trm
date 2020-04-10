@@ -1355,7 +1355,7 @@ void cairotrm_dashtype(int type, t_dashtype *custom_dash_pattern)
 #ifdef HAVE_CAIROEPS
 TERM_TABLE_START (epscairo_driver)
     "epscairo", "eps terminal based on cairo",
-    /* the following values are overriden by cairotrm_graphics */
+    /* the following values are overridden by cairotrm_graphics */
     1 /* xmax */ , 1 /* ymax */ , 1 /* vchar */ , 1 /* hchar */ ,
     1 /* vtic */ , 1 /* htic */ ,
     cairotrm_options, cairotrm_init, cairotrm_reset, cairotrm_text, null_scale, cairotrm_graphics,
@@ -1385,7 +1385,7 @@ TERM_TABLE_END (epscairo_driver)
 #ifdef PSLATEX_DRIVER
 TERM_TABLE_START(cairolatex_driver)
     "cairolatex", "LaTeX picture environment using graphicx package and Cairo backend",
-    /* the following values are overriden by cairotrm_graphics */
+    /* the following values are overridden by cairotrm_graphics */
     1 /* xmax */ , 1 /* ymax */ , 1 /* vchar */ , 1 /* hchar */ ,
     1 /* vtic */ , 1 /* htic */ ,
     cairotrm_options, cairotrm_init, cairotrm_reset, cairotrm_text, null_scale, cairotrm_graphics,
@@ -1417,7 +1417,7 @@ TERM_TABLE_END(cairolatex_driver)
 
 TERM_TABLE_START (pdfcairo_driver)
     "pdfcairo", "pdf terminal based on cairo",
-    /* the following values are overriden by cairotrm_graphics */
+    /* the following values are overridden by cairotrm_graphics */
     1 /* xmax */ , 1 /* ymax */ , 1 /* vchar */ , 1 /* hchar */ ,
     1 /* vtic */ , 1 /* htic */ ,
     cairotrm_options, cairotrm_init, cairotrm_reset, cairotrm_text, null_scale, cairotrm_graphics,
@@ -1446,7 +1446,7 @@ TERM_TABLE_END (pdfcairo_driver)
 
 TERM_TABLE_START (pngcairo_driver)
     "pngcairo", "png terminal based on cairo",
-    /* the following values are overriden by cairotrm_graphics */
+    /* the following values are overridden by cairotrm_graphics */
     1 /* xmax */ , 1 /* ymax */ , 1 /* vchar */ , 1 /* hchar */ ,
     1 /* vtic */ , 1 /* htic */ ,
     cairotrm_options, cairotrm_init, cairotrm_reset, cairotrm_text, null_scale, cairotrm_graphics,

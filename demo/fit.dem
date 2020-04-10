@@ -70,7 +70,7 @@ fit density(x) 'lcdemo.dat' using 1:2:5 yerror via 'start.par'
 set title 'fitted to realistic model function'
 plot 'lcdemo.dat' using 1:2:5 with errorbars, density(x)
 
-# FIXME: Nowadays this fit ends too quickly as to be usefull any more...
+# FIXME: Nowadays this fit ends too quickly as to be useful any more...
 #print ''
 #print "Looks already rather nice?  We will now do the following:  Set the epsilon"
 #print "fit3.dat lower so that we need more iteration steps to convergence."

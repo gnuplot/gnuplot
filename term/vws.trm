@@ -150,11 +150,11 @@ VWS_init()
  * attribute block, set the particular attribute, and
  * write to the destination attribute block.
  * Both the block number and attribute are integers, so it
- * is easy to confuse an attribute and an attribute blcok
+ * is easy to confuse an attribute and an attribute block
  */
 
 /*  lph:  Color map corresponding to an example in
- *  MicroVMS Graphics Progamming Guide (V3.0) */
+ *  MicroVMS Graphics Programming Guide (V3.0) */
 
     const float r_map[8] = { 0.40, 0.50, 0.50, 0.00, 0.25, 0.90, 0.80, 0.35 };
     const float g_map[8] = { 0.30, 0.50, 0.25, 0.70, 0.25, 0.50, 0.30, 0.65 };
@@ -177,7 +177,7 @@ VWS_init()
     uis$get_hw_color_info(&ws_devname, &ws_type);
 
 /* lph: ws's color table for monochrome  */
-/* by default,  color table index 0 is backgound, and 1 is foregound */
+/* by default,  color table index 0 is background, and 1 is foreground */
 /* a color {index into the color table} is assigned to the active line */
 /* in VWS_linetype */
 

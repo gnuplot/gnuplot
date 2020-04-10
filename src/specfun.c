@@ -1086,7 +1086,7 @@ igamma(double a, double x)
 
 
 /* ----------------------------------------------------------------
-    Cummulative distribution function of the ChiSquare distribution
+    Cumulative distribution function of the ChiSquare distribution
    ---------------------------------------------------------------- */
 double
 chisq_cdf(int dof, double chisqr)

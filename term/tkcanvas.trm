@@ -60,7 +60,7 @@
  * the window manager (the canvas itself doesn't report its real size).
  *   Matt Willis, October 1999, mattbwillis@my-deja.com
  *
- * cleaned up and generalized in order to accomodate an increasing
+ * cleaned up and generalized in order to accommodate an increasing
  * number of scripting languages; added support for Python and Ruby.
  * based on a patch dated October 2002.
  *   Joachim Wuttke, November 2014, jwuttke@users.sourceforge.net
@@ -148,8 +148,8 @@ TERM_PUBLIC void TK_boxed_text(unsigned int x, unsigned int y, int option);
 #ifdef TERM_BODY
 
 /* FIXME HBB 20000725: This needs to be fixed.  As is, this driver causes
- * the terminal layer to depend on several other core modules. This is a 
- * design bug. "term" is supposed as 'frontier' layer: it should not be 
+ * the terminal layer to depend on several other core modules. This is a
+ * design bug. "term" is supposed as 'frontier' layer: it should not be
  * dependent on any other code inside gnuplot */
 
 #include "axis.h" /* axis_array */
@@ -558,7 +558,7 @@ TK_graphics()
 	    int_warn(NO_CARET,"Error re-writing output file: %s", strerror(errno));
     }
 
-    if (!tk_standalone && 
+    if (!tk_standalone &&
 	((tk_script_language == TK_LANG_PERL) || (tk_script_language == TK_LANG_PERLTKX)))
 	tk_function = "";
     if (tk_standalone && (tk_script_language == TK_LANG_REXX))
@@ -690,7 +690,7 @@ TK_dashtype(int dt, t_dashtype *custom_dash_pattern)
 	    tmp_dashpattern[0] = NUL;
 	    for (i = 0; (i < DASHPATTERN_LENGTH/2) && (fabs(custom_dash_pattern->pattern[2*i]) > FLT_EPSILON); i++) {
 		char buf[32];
-		snprintf(buf, sizeof(buf), "%d %d ", 
+		snprintf(buf, sizeof(buf), "%d %d ",
 		    (int) (custom_dash_pattern->pattern[2*i] * tk_linewidth),
 		    (int) (custom_dash_pattern->pattern[2*i + 1] * tk_linewidth));
 		strncat(tmp_dashpattern, buf, sizeof(tmp_dashpattern) - strlen(tmp_dashpattern)-1);
@@ -924,7 +924,7 @@ TERM_PUBLIC void
 TK_vector(unsigned int x, unsigned int y)
 {
     if ((x != tk_lastx) || (TK_YMAX - y != tk_lasty)) {
-	/* vector without preceeding move as e.g. in "with line lc variable" */
+	/* vector without preceding move as e.g. in "with line lc variable" */
 	if (tk_polygon_points == 0)
 	    TK_add_path_point(tk_lastx, tk_lasty);
 	TK_add_path_point(x, TK_YMAX - y);
@@ -1521,7 +1521,7 @@ TK_justify_text(enum JUSTIFY anchor)
 }
 
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 TK_point(unsigned int x, unsigned int y, int point)
 {
     TK_flush_line();
@@ -1666,7 +1666,7 @@ static char *tk_info_procs[TK_LANG_MAX] = {
     "def gnuplot_axisranges():\n"
     "\treturn (%f, %f, %f, %f,\\\n"
     "\t        %f, %f, %f, %f)\n",
-  
+
   /* Ruby */
     "def gnuplot_plotarea()\n"
     "  return [%d, %d, %d, %d]\n"
@@ -1896,7 +1896,7 @@ TK_fillbox(int style, unsigned int x, unsigned int y, unsigned int w, unsigned i
 	default:
 	    break;
     }
-    TK_rectangle(x, TK_YMAX - y, x + w, TK_YMAX - y - h, color, stipple); 
+    TK_rectangle(x, TK_YMAX - y, x + w, TK_YMAX - y - h, color, stipple);
 }
 
 
@@ -1940,10 +1940,10 @@ TK_filled_polygon(int points, gpiPoint *corners)
     if ((points > 2) && (corners[0].x == corners[points-1].x)  && (corners[0].y == corners[points-1].y))
 	points--;
 
-    fputs(tk_poly_begin[tk_script_language], gpoutfile); 
+    fputs(tk_poly_begin[tk_script_language], gpoutfile);
     for (i = 0; i < points; i++)
-	fprintf(gpoutfile, tk_poly_point[tk_script_language], corners[i].x, TK_YMAX - corners[i].y); 
-    fprintf(gpoutfile, tk_poly_end[tk_script_language], tk_color); 
+	fprintf(gpoutfile, tk_poly_point[tk_script_language], corners[i].x, TK_YMAX - corners[i].y);
+    fprintf(gpoutfile, tk_poly_end[tk_script_language], tk_color);
 }
 
 
@@ -1993,7 +1993,7 @@ TK_add_path_point(int x, int y)
 
 #ifdef WRITE_PNG_IMAGE
 TERM_PUBLIC void
-TK_image(unsigned m, unsigned n, coordval * image, gpiPoint * corner, t_imagecolor color_mode) 
+TK_image(unsigned m, unsigned n, coordval * image, gpiPoint * corner, t_imagecolor color_mode)
 {
     int width  = ABS(corner[0].x - corner[1].x);
     int height = ABS(corner[0].y - corner[1].y);
@@ -2105,7 +2105,7 @@ TERM_TABLE_START(tkcanvas)
     NULL /* layer */, TK_path,
     0.0,
     NULL /* hypertext */,
-    TK_boxed_text, 
+    TK_boxed_text,
     NULL, TK_dashtype
 TERM_TABLE_END(tkcanvas)
 #undef LAST_TERM

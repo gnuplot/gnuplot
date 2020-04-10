@@ -308,7 +308,7 @@ PrintSizeDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 	    SetWindowLongPtr(hdlg, DWLP_MSGRESULT, PSNRET_NOERROR);
 	    return TRUE;
 	}
-	case PSN_SETACTIVE: /* display: intialize according to printer */
+	case PSN_SETACTIVE: /* display: initialize according to printer */
 	    if (lpr->psize.x < 0 || lpr->bDriverChanged) {
 		/* FIXME: also if settings changed (paper size, orientation) */
 		IPrintDialogServices * services = (IPrintDialogServices *) lpr->services;

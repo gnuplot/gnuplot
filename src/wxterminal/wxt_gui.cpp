@@ -61,7 +61,7 @@
  * Here is the interactive part :
  * - rescaling according to the window's size,
  * - mouse support (cursor position, zoom, rotation, ruler, clipboard...),
- * - a toolbar to give additionnal capabilities (similar to the OS/2 terminal),
+ * - a toolbar to give additional capabilities (similar to the OS/2 terminal),
  * - multiple plot windows.
  *
  * ------------------------------------------------------*/
@@ -450,7 +450,7 @@ wxtFrame::wxtFrame( const wxString& title, wxWindowID id )
 	SetIcons(icon);
 
 	/* set up the status bar, and fill it with an empty
-	 * string. It will be immediately overriden by gnuplot. */
+	 * string. It will be immediately overridden by gnuplot. */
 	CreateStatusBar();
 	SetStatusText( wxT("") );
 
@@ -531,7 +531,7 @@ wxtFrame::~wxtFrame()
 
 
 /* toolbar event : Export to file
- * We will create a file dialog, using platform-independant wxWidgets functions
+ * We will create a file dialog, using platform-independent wxWidgets functions
  */
 void wxtFrame::OnExport( wxCommandEvent& WXUNUSED( event ) )
 {
@@ -1827,7 +1827,7 @@ wxtConfigDialog::wxtConfigDialog(wxWindow* parent)
 	wxStaticBoxSizer *wrapping_sizer = new wxStaticBoxSizer( sb, wxVERTICAL );
 	wxStaticText *text1 = new wxStaticText(this, wxID_ANY,
 		wxT("Options remembered between sessions, ")
-		wxT("overriden by `set term wxt <options>`.\n\n"),
+		wxT("overridden by `set term wxt <options>`.\n\n"),
 		wxDefaultPosition, wxSize(300, wxDefaultCoord));
 	wrapping_sizer->Add(text1,wxSizerFlags(0).Align(0).Expand().Border(wxALL) );*/
 
@@ -3966,7 +3966,7 @@ bool wxt_exec_event(int type, int mx, int my, int par1, int par2, wxWindowID id)
 
 #ifdef WXT_MULTITHREADED
 /* Implements waitforinput used in wxt.trm
- * Returns the next input charachter, meanwhile treats terminal events */
+ * Returns the next input character, meanwhile treats terminal events */
 int wxt_waitforinput(int options)
 {
 	/* wxt_waitforinput *is* launched immediately after the wxWidgets terminal
@@ -4402,7 +4402,7 @@ void wxt_sigint_return()
 }
 
 /* A critical function should call this from a safe zone (no locked mutex, objects destroyed).
- * If the interrupt is asked, this fonction will not return (longjmp) */
+ * If the interrupt is asked, this function will not return (longjmp) */
 void wxt_sigint_check()
 {
 	FPRINTF2((stderr,"checking interrupt status\n"));

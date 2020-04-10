@@ -196,7 +196,7 @@ struct fontdata {
                                    Of the standard fonts, only the
                                    four versions of "Courier" are
                                    monospaced. Also, metrics of the
-                                   same font from different foundaries
+                                   same font from different foundries
                                    are sometimes different.  */
 };
 

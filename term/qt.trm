@@ -43,7 +43,7 @@ register_term (qt)
 #ifdef TERM_TABLE
 TERM_TABLE_START (qt_driver)
     "qt", "Qt cross-platform interactive terminal",
-    /* the following values are overriden by qt_graphics */
+    /* the following values are overridden by qt_graphics */
     1 /* xmax */ , 1 /* ymax */ , 1 /* vchar */ , 1 /* hchar */ ,
     1 /* vtic */ , 1 /* htic */ ,
     qt_options, qt_init, qt_reset, qt_text_wrapper, null_scale, qt_graphics,
@@ -164,7 +164,7 @@ START_HELP(qt)
 " By default, the window is raised to the top of your desktop when a plot is",
 " drawn. This can be controlled with the keyword \"raise\".",
 " The keyword \"persist\" will prevent gnuplot from exiting before you",
-" explicitely close all the plot windows.",
+" explicitly close all the plot windows.",
 " Finally, by default the <space> key raises the gnuplot console window",
 " [MS Windows only], and 'q' closes the plot window. The keyword \"ctrl\" ",
 " allows you to replace those bindings by <ctrl>+<space> and <ctrl>+'q'.",

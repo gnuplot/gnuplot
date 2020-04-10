@@ -231,7 +231,7 @@ TextInit(LPTW lptw)
     if (!lptw->Attr)
 	lptw->Attr = NOTEXT;
 
-    /* init ScreenBuffer, add emtpy line buffer,
+    /* init ScreenBuffer, add empty line buffer,
        initial size has already been read from wgnuplot.ini
     */
     sb_init(&(lptw->ScreenBuffer), lptw->ScreenBuffer.size);

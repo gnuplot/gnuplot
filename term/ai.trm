@@ -55,7 +55,7 @@
 
 /* Changed to 3.6 terminal format, David C. Schooley, 9/29/95 */
 /* Improved multiple plot support, David C. Schooley, 6/5/95 */
-/* Compatiblity with Illustrator 7.0, David C. Schooley, 6/5/95 */
+/* Compatibility with Illustrator 7.0, David C. Schooley, 6/5/95 */
 /* Font and size support for labels, David C. Schooley, 6/5/95 */
 
 #include "driver.h"

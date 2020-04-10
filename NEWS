@@ -675,7 +675,7 @@ Time-organized list of news until gnuplot 4.0:
 * NEW hidden3d works with contour lines
 * NEW overprinting feature for PostScript revised
 * NEW Windows terminal now has linewidth support from inside gnuplot
-* NEW table terminal will output additional colums some plot styles
+* NEW table terminal will output additional columns with some plot styles
 * FIXED hidden3d display of tics and axes
 
 [3.8d]

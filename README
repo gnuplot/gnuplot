@@ -44,7 +44,7 @@ Copyright and Porting
  See the ChangeLog and docs/old/History.old file for changes to gnuplot.
 
  Build instructions are in the INSTALL file.  Some additional
-informations needed to port gnuplot to new platforms not covered by
+information needed to port gnuplot to new platforms not covered by
 GNU autoconf can be found in the PORTING file. 
 
  The code for gnuplot was written with portability in mind, and has been

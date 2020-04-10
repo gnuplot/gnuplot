@@ -1,7 +1,7 @@
 /* GNUPLOT - mousecnm.h */
 
 /*[
- * 
+ *
  * Copyright: Petr Mikulik <mikulik@physics.muni.cz>, since 1999
  *
  * Permission to use, copy, and distribute this software and its

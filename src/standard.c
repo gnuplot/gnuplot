@@ -84,9 +84,9 @@ static double dzero = 0.0;
 /* There appears to be a mistake in Hart, Cheney et al. on page 149.
  * Where it list Qn(x)/x ~ P(z*z)/Q(z*z), z = 8/x, it should read
  *               Qn(x)/z ~ P(z*z)/Q(z*z), z = 8/x
- * In the functions below, Qn(x) is implementated using the later
+ * In the functions below, Qn(x) is implemented using the later
  * equation.
- * These bessel functions are accurate to about 1e-13
+ * These bessel functions are accurate to about 1e-13.
  */
 
 /* jzero for x in [0,8]

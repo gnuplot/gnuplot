@@ -567,7 +567,7 @@ LUA_set_term_vars(void) {
   lua_setfield(L, luaterm, "TERM_IS_LATEX");
   lua_pushinteger(L, TERM_ENHANCED_TEXT);     /* enhanced text mode is enabled   */
   lua_setfield(L, luaterm, "TERM_ENHANCED_TEXT");
-  lua_pushinteger(L, TERM_NO_OUTPUTFILE);     /* terminal doesnt write to a file */
+  lua_pushinteger(L, TERM_NO_OUTPUTFILE);     /* terminal doesn't write to a file */
   lua_setfield(L, luaterm, "TERM_NO_OUTPUTFILE");
   lua_pushinteger(L, TERM_CAN_CLIP);          /* terminal does its own clipping  */
   lua_setfield(L, luaterm, "TERM_CAN_CLIP");
@@ -714,22 +714,22 @@ LUA_get_colorstyle(int style) {
     case TC_LT:       /* Use the color of linetype <n> */
       style_str = "LT";
       break;
-    case TC_LINESTYLE:/* Use the color of line style <n> (only for "internal" use or unsused?) */
+    case TC_LINESTYLE:/* Use the color of line style <n> (only for "internal" use or unused?) */
       style_str = "LINESTYLE";
       break;
     case TC_RGB:      /* Explicit RGBA values provided by user */
       style_str = "RGBA";
       break;
-    case TC_CB:       /* "palette cb <value>" (only for "internal" use or unsused?) */
+    case TC_CB:       /* "palette cb <value>" (only for "internal" use or unused?) */
       style_str = "CB";
       break;
     case TC_FRAC:     /* "palette frac <value>" */
       style_str = "FRAC";
       break;
-    case TC_Z:        /* "palette z" (only for "internal" use or unsused?) */
+    case TC_Z:        /* "palette z" (only for "internal" use or unused?) */
       style_str = "Z";
       break;
-    case TC_DEFAULT:  /* Use default color, set separately (only for "internal" use or unsused?) */
+    case TC_DEFAULT:  /* Use default color, set separately (only for "internal" use or unused?) */
       style_str = "DEFAULT";
       break;
   }
@@ -742,7 +742,7 @@ LUA_get_fillstyle(int style) {
   const char *style_str = "unknown";
 
   if (style == FS_OPAQUE) {
-    /* FIXME: not quite shure how to handle this, since it is only used by the
+    /* FIXME: not quite sure how to handle this, since it is only used by the
       postscript terminal */
     style_str = "OPAQUE";
   } else {

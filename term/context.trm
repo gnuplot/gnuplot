@@ -212,7 +212,7 @@ static double CONTEXT_fontsize = CONTEXT_FONTSIZE;
 
 /* fontname,fontsize to be put next to font labels if needed */
 static char CONTEXT_font_explicit[2*MAX_ID_LEN+1] = "";
-/* this is only set to >0 if asked for explicitely (for example with set_font(",15")) */
+/* this is only set to >0 if asked for explicitly (for example with set_font(",15")) */
 static double CONTEXT_fontsize_explicit = 0.0;
 
 /* the last pointsize used (it will only be changed if it becomes different) */
@@ -263,7 +263,7 @@ static char *CONTEXT_image_filename = NULL;
 /* whether images will be external or not */
 enum CONTEXT_IMAGES CONTEXT_images = CONTEXT_IMAGES_INLINE;
 
-/* Pallete has to be stored for the usage in later plots */
+/* Palette has to be stored for the usage in later plots */
 static t_sm_palette *CONTEXT_old_palette;
 
 /*********************/
@@ -483,7 +483,7 @@ CONTEXT_options()
 		case CONTEXT_OPT_COLOR:
 			c_token++;
 			CONTEXT_params.color = TRUE;
-			/* just mimick other terminals; no idea what it does;
+			/* just mimic other terminals; no idea what it does;
 			   at the moment monochrome is not fully implemented either */
 			term->flags &= ~TERM_MONOCHROME;
 			break;
@@ -789,7 +789,7 @@ CONTEXT_init()
 
 	/* place the header first if this is a standalone graphic */
 	if (CONTEXT_params.standalone) {
-		/* If encoding is explicitely set to UTF-8 by gnuplot, use that setting.
+		/* If encoding is explicitly set to UTF-8 by gnuplot, use that setting.
 		 * \enableregime only makes a difference for pdfTeX; in LuaTeX and XeTeX UTF-8 is already default,
 		 * so this line will be ignored.
 		 *
@@ -997,7 +997,7 @@ CONTEXT_graphics()
 	fprintf(gpoutfile, "%% -------------------------\n");
 
 	/* since palette is initialized only once, subsequent plots wouldn't see it
-	 * unless we write it on the top of relevant plots explicitely */
+	 * unless we write it on the top of relevant plots explicitly */
 	if (is_plot_with_palette()) {
 		CONTEXT_write_palette(CONTEXT_old_palette);
 	}
@@ -1190,14 +1190,14 @@ CONTEXT_put_text(unsigned int x, unsigned int y, const char str[])
 			break;
 	}
 
-	/* remove whitespaces at the beginning of string
-	 * (usually problem in positive numbers)
+	/* remove whitespace at the beginning of string
+	 * (usually a problem in positive numbers)
 	 * They interfere with positioning: whitespace at the beginning takes
 	 * some place although it's invisible, so left-aligned and centered labels
-	 * are posioned wrong otherwise.
+	 * are positioned incorrectly.
 	 * Example:
 	 *   -1 0 1 2: centered labels on x axis
-	 * if we had a space in front, positive numbers would be "centered" in a weird way*/
+	 * if we had a space in front, positive numbers would be "centered" in a weird way */
 	for (s = str; s[0] == ' '; s++);
 
 	/* label position */
@@ -1549,7 +1549,7 @@ CONTEXT_linewidth(double linewidth)
  * CONTEXT_write_palette_gradient
  * ------------------------------
  *
- * Writes the colors and positions for a gradient pallete.
+ * Writes the colors and positions for a gradient palette.
  */
 static void
 CONTEXT_write_palette_gradient(gradient_struct *gradient, int cnt)
@@ -1614,7 +1614,7 @@ CONTEXT_write_palette(t_sm_palette *palette)
 		case SMPAL_COLOR_MODE_FUNCTIONS:
 			fprintf(gpoutfile, "color_mode(functions)");
 			break;
-		/* interpolated table: explicitely defined or read from file */
+		/* interpolated table: explicitly defined or read from file */
 		case SMPAL_COLOR_MODE_GRADIENT:
 			fprintf(gpoutfile, "color_mode(gradient);");
 			CONTEXT_write_palette_gradient(palette->gradient, palette->gradient_num);

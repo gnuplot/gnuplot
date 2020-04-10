@@ -230,7 +230,7 @@ might_be_numeric(int t_num)
  * is_definition() returns TRUE if the next tokens are of the form
  *   identifier =
  *              -or-
- *   identifier ( identifer {,identifier} ) =
+ *   identifier ( identifier {,identifier} ) =
  */
 int
 is_definition(int t_num)
@@ -300,7 +300,7 @@ token_len(int t_num)
 
 /*
  * capture() copies into str[] the part of gp_input_line[] which lies between
- * the begining of token[start] and end of token[end].
+ * the beginning of token[start] and end of token[end].
  */
 void
 capture(char *str, int start, int end, int max)
@@ -640,7 +640,7 @@ gprintf_value(
 	    break;
 	case 'h':
 	case 'H':
-	    /* g/G with enhanced formating (if applicable) */
+	    /* g/G with enhanced formatting (if applicable) */
 	    t[0] = (*format == 'h') ? 'g' : 'G';
 	    t[1] = 0;
 

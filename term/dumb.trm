@@ -139,7 +139,7 @@ static int dumb_colormode = 0;
 
 static void dumb_set_pixel(int x, int y, int v);
 
-enum DUMB_id { DUMB_FEED, DUMB_NOFEED, DUMB_ENH, DUMB_NOENH, 
+enum DUMB_id { DUMB_FEED, DUMB_NOFEED, DUMB_ENH, DUMB_NOENH,
                DUMB_SIZE, DUMB_ASPECT,
                DUMB_ANSI, DUMB_ANSI256, DUMB_ANSIRGB, DUMB_NOCOLOR,
                DUMB_OTHER };
@@ -261,7 +261,7 @@ dumb_set_pixel(int x, int y, int v)
     char *charpixel;
 
     if ((unsigned int) x <= dumb_xmax 	/* ie x>=0 && x<=dumb_xmax */
-    &&  (unsigned int) y <= dumb_ymax 
+    &&  (unsigned int) y <= dumb_ymax
     )  {
 	charpixel = (char *)(&dumb_matrix[dumb_xmax * y + x]);
 	/* null-terminate single ascii character (needed for UTF-8) */
@@ -281,7 +281,7 @@ DUMB_init()
 
     dumb_matrix = gp_realloc(dumb_matrix, size*sizeof(charcell), "dumb terminal");
 #ifndef NO_DUMB_COLOR_SUPPORT
-    dumb_colors = gp_realloc(dumb_colors, size*sizeof(t_colorspec), "dumb terminal");    
+    dumb_colors = gp_realloc(dumb_colors, size*sizeof(t_colorspec), "dumb terminal");
 #endif
 }
 
@@ -1028,11 +1028,11 @@ START_HELP(dumb)
 " To obtain the best color match in `ansi` mode, you should use",
 " `set colorsequence classic`.",
 " Depending on the mode, the `dumb` terminal will emit the",
-" folowing sequences (without the additional whitespace):",
+" following sequences (without the additional whitespace):",
 "",
 "       ESC [ 0 m           reset attributes to defaults",
 "       foreground color:",
-"       ESC [ 1 m           set intense/bold", 
+"       ESC [ 1 m           set intense/bold",
 "       ESC [ 22 m          intense/bold off",
 "       ESC [ <fg> m        with color code 30 <= <fg> <= 37",
 "       ESC [ 39 m          reset to default",

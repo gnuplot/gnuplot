@@ -10,7 +10,7 @@
 /* Define if you want online help and subtopic tables sorted by column. */
 /* #undef COLUMN_HELP */
 
-/* Provide contact info for gnuplot develoment */
+/* Provide contact info for gnuplot development */
 #define DEVELOPMENT_VERSION 1
 
 /* Define to treat spacebar like any other keystroke. */
@@ -511,7 +511,7 @@
 /* Define if you want to use the sunview terminal (sun). */
 /* #undef SUN */
 
-/* Define if the 3dkit libray is present. */
+/* Define if the 3dkit library is present. */
 /* #undef THREEDKIT */
 
 /* Define if your libcaca does not have caca_export_canvas_to_memory but the
@@ -560,7 +560,7 @@
 /* Version number of package */
 #define VERSION "5.0"
 
-/* Define if the vgagl libray is present. */
+/* Define if the vgagl library is present. */
 /* #undef VGAGL */
 
 /* Define if you want the wxwidgets terminal. */

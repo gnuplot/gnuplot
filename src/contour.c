@@ -91,12 +91,12 @@ typedef struct edge_struct {
 } edge_struct;
 
 typedef struct poly_struct {
-    struct edge_struct *edge[3];	/* As we do triangolation here... */
+    struct edge_struct *edge[3];	/* As we do triangulation here... */
     struct poly_struct *next;	/* To chain lists. */
 } poly_struct;
 
 /* Contours are saved using this struct list. */
-typedef struct cntr_struct {		
+typedef struct cntr_struct {
     double X, Y;		/* The coordinates of this vertex. */
     struct cntr_struct *next;	/* To chain lists. */
 } cntr_struct;
@@ -287,7 +287,7 @@ contour(int num_isolines, struct iso_curve *iso_lines)
 	if (contour_list != save_contour_list) {
 	    contour_list->isNewLevel = 1;
 	    /* Nov-2011 Use gprintf rather than sprintf so that LC_NUMERIC is used */
-	    gprintf(contour_list->label, sizeof(contour_list->label), 
+	    gprintf(contour_list->label, sizeof(contour_list->label),
 		    contour_format, 1.0, z);
 	    contour_list->z = z;
 	}
@@ -647,7 +647,7 @@ gen_triangle(
 	pe_temp = p_edge1;	/* pointer in bottom list */
 
 	/*
-	 * Generate edges and triagles for next row:
+	 * Generate edges and triangles for next row:
 	 */
 
 	/* generate first vertical edge */
@@ -808,7 +808,7 @@ add_edge(
 
 /*
  * Generate new triangle and append it to list, but only if all edges are defined.
- * The list is referenced by p_poly and pp_tail (p_poly points on first ploygon
+ * The list is referenced by p_poly and pp_tail (p_poly points on first polygon
  * and pp_tail on last one).
  * Note, the list may be empty (pe_ploy==pp_tail==NULL) on entry and exit.
  */
@@ -1251,7 +1251,7 @@ intp_cubic_spline(
  *   m[i][0] = M_{i,i-1}  for i=1,2,...,n-1    and    m[0][0] = M_{0,n-1} ,
  *   m[i][1] = M_{i, i }  for i=0,1,...,n-1
  *   m[i][2] = M_{i,i+1}  for i=0,1,...,n-2    and    m[n-1][2] = M_{n-1,0}.
- * M should be symmetric (m[i+1][0]=m[i][2]) and positiv definite.
+ * M should be symmetric (m[i+1][0]=m[i][2]) and positive definite.
  * The size of the system is given in n (n>=1).
  *
  * In the first procedure the Cholesky decomposition M = C^T * D * C
@@ -1269,7 +1269,7 @@ solve_cubic_1(tri_diag m[], int n)
 
     d = m[0][1];		/* D_{0,0} = M_{0,0} */
     if (d <= 0.)
-	return FALSE;		/* M (or D) should be positiv definite */
+	return FALSE;		/* M (or D) should be positive definite */
     m_n = m[0][0];		/*  M_{0,n-1}  */
     m_nn = m[n - 1][1];		/* M_{n-1,n-1} */
     for (i = 0; i < n - 2; i++) {
@@ -1280,7 +1280,7 @@ solve_cubic_1(tri_diag m[], int n)
 	m_n = -m[i][2] * m_n;	/* to get C_{i+1,n-1} */
 	d = m[i + 1][1] - m[i][2] * m_ij;	/* D_{i+1,i+1} */
 	if (d <= 0.)
-	    return FALSE;	/* Elements of D should be positiv */
+	    return FALSE;	/* Elements of D should be positive */
 	m[i + 1][1] = d;
     }
     if (n >= 2) {		/* Complete last column */
@@ -1452,7 +1452,7 @@ eval_bspline(
  * might be float (Knot(i) = i) or open (where the first and last "order"
  * knots are equal). contr_isclosed determines knot kind - open contour means
  * open knot vector, and closed contour selects float knot vector.
- * Note the knot vector is not exist and this routine simulates it existance
+ * Note the knot vector is not exist and this routine simulates it existence
  * Also note the indexes for the knot vector starts from 0.
  */
 static double

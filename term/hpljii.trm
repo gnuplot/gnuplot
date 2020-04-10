@@ -49,7 +49,7 @@
 
 /* The following HP laserjet series II driver uses generic bit mapped graphics
    routines from bitmap.c to build up a bit map in memory.  The driver
-   interchanges colomns and lines in order to access entire lines
+   interchanges columns and lines in order to access entire lines
    easily and returns the lines to get bits in the right order :
    (x,y) -> (y,XMAX-1-x). */
 /* This interchange is done by calling b_makebitmap() with reversed
@@ -104,7 +104,7 @@ TERM_PUBLIC void HPDJ_text(void);
 
 /* Courier font with 6 lines per inch */
 #define HPLJII_VCHAR (HPLJII_PPI/6)
-/* Courier font with 10 caracters per inch */
+/* Courier font with 10 characters per inch */
 #define HPLJII_HCHAR (HPLJII_PPI/10)
 /* Save current cursor position */
 #define HPLJII_PUSH_CURSOR fputs("\033&f0S",gpoutfile)

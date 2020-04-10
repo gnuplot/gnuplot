@@ -47,7 +47,7 @@
 
 /* The following pbmplus drivers use the generic bit mapped graphics
    routines from bitmap.c to build up a bit map in memory.  The driver
-   interchanges colomns and lines in order to access entire lines
+   interchanges columns and lines in order to access entire lines
    easily and returns the lines to get bits in the right order :
    (x,y) -> (y,XMAX-1-x). */
 /* This interchange is done by calling b_makebitmap() with reversed
@@ -90,7 +90,7 @@ TERM_PUBLIC void PBM_point(unsigned int x, unsigned int y, int point);
 static int pbm_font = 1;	/* small font */
 static int pbm_mode = 0;	/* 0:monochrome 1:gray 2:color */
 
-/* Only needed for dubious backwards compatibility with 'set size'
+/* Only needed for dubious backward compatibility with 'set size'
  * in pre-4.2 versions that didn't support 'set term size'
  */
 static TBOOLEAN PBM_explicit_size = FALSE;

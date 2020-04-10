@@ -196,7 +196,7 @@ zooming or temporarily annotating the graph.
 
 :h2 res=606. Unzoom and zoom history
 :i2 refid=mmouse. Unzoom and zoom
-:p.These choises lets you browse through the list of zooms.
+:p.These choices lets you browse through the list of zooms.
 
 :h2 res=607. Ruler
 :i2 refid=mmouse. Ruler
@@ -322,7 +322,7 @@ plot area, either in centimeters or relative to the page size.
 choose the :hp2.Job properties:ehp2. option. This will bring up your
 printer setup dialog box. This is part of the printer driver, and the 
 features you can adjust will depend on your printer. You can generally
-use this to swich between landscape and portrait mode, for instance.
+use this to switch between landscape and portrait mode, for instance.
 Note that some drivers might not have any options.
  
 :h1 res=2000. Printer selection dialog box help

@@ -400,7 +400,7 @@ TERM_PUBLIC void wxt_options()
 	}
 
 	if (set_capjoin)
-		strncat(term_options, 
+		strncat(term_options,
 			wxt_linecap == ROUNDED ? " rounded"
 			: wxt_linecap == SQUARE ? " square"
 			: " butt",
@@ -460,7 +460,7 @@ TERM_PUBLIC void wxt_text_wrapper()
 #ifdef TERM_TABLE
 TERM_TABLE_START (wxt_driver)
     "wxt", "wxWidgets cross-platform interactive terminal",
-    /* the following values are overriden by wxt_graphics */
+    /* the following values are overridden by wxt_graphics */
     1 /* xmax */ , 1 /* ymax */ , 1 /* vchar */ , 1 /* hchar */ ,
     1 /* vtic */ , 1 /* htic */ ,
     wxt_options, wxt_init, wxt_reset, wxt_text_wrapper, null_scale, wxt_graphics,
@@ -606,7 +606,7 @@ START_HELP(wxt)
 " By default, the window is raised to the top of your desktop when a plot is",
 " drawn. This can be controlled with the keyword \"raise\".",
 " The keyword \"persist\" will prevent gnuplot from exiting before you",
-" explicitely close all the plot windows.",
+" explicitly close all the plot windows.",
 " Finally, by default the key <space> raises the gnuplot console window, and",
 " 'q' closes the plot window. The keyword \"ctrl\" allows you to replace those",
 " bindings by <ctrl>+<space> and <ctrl>+'q', respectively.",

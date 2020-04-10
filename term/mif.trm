@@ -115,7 +115,7 @@ TERM_PUBLIC void MIF_filled_polygon(int points, gpiPoint* corners);
 
 /** Coordinates **/
 /* The cast to float is not necessary because we are dividing by a float */
-/* On OSK the cast to a float is not allowed in a constant expression wich */
+/* On OSK the cast to a float is not allowed in a constant expression which */
 /* is used by the declaration and initialization of mif_line */
 /* Converts gnuplot units to MIF units */
 #define GNP_TO_MIF(P)   ((P) / 1000.0)
@@ -149,7 +149,7 @@ static struct mif_line {	/* Line point structure specification */
     struct mif_line *next;	/* Pointer to next line point */
     struct mif_line *prev;	/* Pointer to previous line point */
 } mif_line =
-{				/* Current position structure. Adjust for orign. Local for this file. */
+{				/* Current position structure. Adjust for origin. Local for this file. */
     GNP_TO_MIF(0),
 	GNP_TO_MIF(MIF_YLAST),
 	&mif_line,
@@ -667,10 +667,10 @@ MIF_text()
 
 	/* Tell that this terminal driver is not working with a plot frame */
 	mif_in_frame = 0;
-    }				/* Frame finshed */
+    }				/* Frame finished */
 }
 
-/* Select type of line in grapics */
+/* Select type of line in graphics */
 /* NOTE: actually written to output the first time a primitive
  * is drawn AFTER this call */
 /* -2=border, -1=X/Y-axis, 0-13=lines, and 14-=mapped back */

@@ -75,7 +75,7 @@ Installation
 gnuplot comes with its own installer, which will basically do the following,
 provided you check the corresponding options:
 
-* Extract this package (or parts thereof) in a directory of your coice, e.g.
+* Extract this package (or parts thereof) in a directory of your choice, e.g.
   C:\Program Files\gnuplot etc.
 
 * Create shortcut icons to wgnuplot on your dektop and (on Windows XP and

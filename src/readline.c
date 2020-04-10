@@ -40,7 +40,7 @@
  *   Msdos port and some enhancements:
  *     Gershon Elber and many others.
  *
- *   Adapted to work with UTF-8 enconding.
+ *   Adapted to work with UTF-8 encoding.
  *     Ethan A Merritt  April 2011
  */
 
@@ -149,7 +149,7 @@ wrap_readline_signal_handler()
  * ^U kills the entire line
  * ^W deletes previous full or partial word
  * ^V disables interpretation of the following key
- * LF and CR return the entire line regardless of the cursor postition
+ * LF and CR return the entire line regardless of the cursor position
  * DEL deletes previous or current character (configuration dependent)
  * TAB will perform filename completion
  * ^R start a backward-search of the history
@@ -163,7 +163,7 @@ wrap_readline_signal_handler()
 # include <sys/ioctl.h>
 #endif
 
-/* replaces the previous klugde in configure */
+/* replaces the previous kludge in configure */
 #if defined(HAVE_TERMIOS_H) && defined(HAVE_TCGETATTR)
 # define TERMIOS
 #else /* not HAVE_TERMIOS_H && HAVE_TCGETATTR */

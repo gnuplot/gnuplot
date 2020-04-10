@@ -484,7 +484,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
     &&  this_plot->lp_properties.pm3d_color.value == -1)
 	color_from_rgbvar = TRUE;
 
-    if (this_plot->fill_properties.border_color.type == TC_RGB 
+    if (this_plot->fill_properties.border_color.type == TC_RGB
     ||  this_plot->fill_properties.border_color.type == TC_LINESTYLE) {
 	color_from_rgbvar = TRUE;
 	color_from_fillcolor = TRUE;
@@ -1028,7 +1028,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 				gray = (long)((temp.r << 16) + (temp.g << 8) + (temp.b));
 			    }
 			}
-	
+
 			if (pm3d.direction == PM3D_DEPTH) {
 			    /* copy quadrangle */
 			    quadrangle* qp = quadrangles + current_quadrangle;
@@ -1458,7 +1458,7 @@ illuminate_one_quadrangle( quadrangle *q )
  *	     not be affected by transparency.
  */
 int
-apply_lighting_model( struct coordinate *v0, struct coordinate *v1, 
+apply_lighting_model( struct coordinate *v0, struct coordinate *v1,
 		struct coordinate *v2, struct coordinate *v3,
 		double gray, TBOOLEAN gray_is_rgb )
 {
@@ -1484,7 +1484,7 @@ apply_lighting_model( struct coordinate *v0, struct coordinate *v1,
 	rgb1_from_gray(gray, &color);
 	r = color.r;
 	g = color.g;
-	b = color.b;	   
+	b = color.b;
     }
 
     psi = -DEG2RAD*(surface_rot_z);
@@ -1499,9 +1499,9 @@ apply_lighting_model( struct coordinate *v0, struct coordinate *v1,
 
     t = sqrt( normal[0]*normal[0] + normal[1]*normal[1] + normal[2]*normal[2] );
 
-    normal[0] /= t;    
-    normal[1] /= t;    
-    normal[2] /= t;    
+    normal[0] /= t;
+    normal[1] /= t;
+    normal[2] /= t;
 
     /* Correct for the view angle so that the illumination is "fixed" with */
     /* respect to the viewer rather than rotating with the surface.        */
@@ -1509,7 +1509,7 @@ apply_lighting_model( struct coordinate *v0, struct coordinate *v1,
 	normal1[0] =  cos(psi)*normal[0] -  sin(psi)*normal[1] + 0*normal[2];
 	normal1[1] =  sin(psi)*normal[0] +  cos(psi)*normal[1] + 0*normal[2];
 	normal1[2] =  0*normal[0] +                0*normal[1] + 1*normal[2];
-	
+
 	normal[0] =  1*normal1[0] +         0*normal1[1] +         0*normal1[2];
 	normal[1] =  0*normal1[0] +  cos(phi)*normal1[1] -  sin(phi)*normal1[2];
 	normal[2] =  0*normal1[0] +  sin(phi)*normal1[1] +  cos(phi)*normal1[2];
@@ -1528,7 +1528,7 @@ apply_lighting_model( struct coordinate *v0, struct coordinate *v1,
     tmp_g = g*(pm3d_shade.ambient-pm3d_shade.strength+shade_fact*pm3d_shade.strength);
     tmp_b = b*(pm3d_shade.ambient-pm3d_shade.strength+shade_fact*pm3d_shade.strength);
 
-    /* Specular highlighting */ 
+    /* Specular highlighting */
     if (pm3d_shade.spec > 0.0) {
 
 	reflect[0] = -light[0]+2*dot_prod*normal[0];
@@ -1538,7 +1538,7 @@ apply_lighting_model( struct coordinate *v0, struct coordinate *v1,
 	reflect[0] /= t;
 	reflect[1] /= t;
 	reflect[2] /= t;
-	
+
 	dot_prod = -reflect[2];
 
 	/* old-style Phong equation; no need for bells or whistles */
@@ -1581,7 +1581,7 @@ filled_polygon(gpdPoint *corners, int fillstyle, int nv)
     int i;
     double x, y;
 
-    /* For normal pm3d surfaces and tesselation the constituent polygons
+    /* For normal pm3d surfaces and tessellation the constituent polygons
      * have a small number of vertices, usually 4.
      * However generalized polygons like cartographic areas could have a
      * vastly larger number of vertices, so we allow for dynamic reallocation.
@@ -1742,7 +1742,7 @@ clip_filled_polygon( gpdPoint *inpts, gpdPoint *outpts, int nv )
 }
 
 
-/* EXPERIMENATAL
+/* EXPERIMENTAL
  * returns 1 for top of pm3d surface towards the viewer
  *        -1 for bottom of pm3d surface towards the viewer
  * NB: the ordering of the quadrangle vertices depends on the scan direction.
@@ -1772,7 +1772,7 @@ pm3d_side( struct coordinate *p0, struct coordinate *p1, struct coordinate *p2)
 
 /*
  * Returns a pointer into the list of polygon vertices.
- * If necessary reallocates the entire list to ensure there is enough 
+ * If necessary reallocates the entire list to ensure there is enough
  * room for the requested number of vertices.
  */
 static gpdPoint *get_polygon( int size )

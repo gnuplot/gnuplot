@@ -2121,7 +2121,7 @@ PS_pointsize (double ptsize)
  *
  * [3.] [doesn't exist, skip to next number]
  *
- * 4. issue the new command whereever you change the symbols (and linetype):
+ * 4. issue the new command wherever you change the symbols (and linetype):
  *    example:
  *        2.5 UP
  *        4.0 UL  % optionally change linewidth, too
@@ -3057,9 +3057,9 @@ static void
 write_component_array(const char *text, gradient_struct *grad,
 		      int cnt, int offset)
 {
-    /*  write someting like
+    /*  write something like
      *     /RedA [ 0 .1 .2 .3 .35 .3 .2 .1 0 0 0 ] def
-     *  nicely formated to gppsfile
+     *  nicely formatted to gppsfile
      */
     int i=0, len=0;
     char *val;
@@ -3454,7 +3454,7 @@ write_png_image_to_buffer(unsigned M, unsigned N, coordval *image, t_imagecolor 
 	png_img = gdImageCreateTrueColor(M, N);
     } else {
 	/* we would need a gray scale image, but libgd does not support
-	   it directly. We emulate it with a paletted image which in the end
+	   it directly. We emulate it with a palette image which in the end
 	   does not matter for us. */
 	png_img = gdImageCreatePalette(M, N);
     }
@@ -3566,7 +3566,7 @@ write_png_image_to_buffer(unsigned M, unsigned N, coordval *image, t_imagecolor 
     image255 = (unsigned char *) gp_alloc(N * stride, "Postscript image bytes");
 
     if (color_mode == IC_RGB) {
-	/* Adapted from gp_cairo_helpers.c (use unsigned int to respect endianess of the platform). */
+	/* Adapted from gp_cairo_helpers.c (use unsigned int to respect endianness of the platform). */
 	rgb_color rgb1;
         rgb255_color rgb255;
 	unsigned int *image255_ptr;
