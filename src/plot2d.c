@@ -1005,7 +1005,10 @@ get_data(struct curve_points *current_plot)
 	    coordval y2;
 	    coordval w = 0.0;	/* only needed for SMOOTH_ACSPLINES) */
 	    if (j==2) {
-		y2 = current_plot->filledcurves_options.at;
+		if (current_plot->filledcurves_options.closeto == FILLEDCURVES_CLOSED)
+		    y2 = y1;
+		else
+		    y2 = current_plot->filledcurves_options.at;
 	    } else {
 		y2 = v[2];
 		if (current_plot->filledcurves_options.closeto == FILLEDCURVES_DEFAULT)
