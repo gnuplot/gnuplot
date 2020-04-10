@@ -738,7 +738,8 @@ do_3dplot(
 	}
 	if (surface_rot_z == 90 || surface_rot_z == 270) {
 	    yz_plane = TRUE;
-	    base_z = ceiling_z;
+	    if (surface_rot_x == 270 || yz_projection)
+		base_z = ceiling_z;
 	}
     }
 
