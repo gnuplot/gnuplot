@@ -151,7 +151,7 @@ static int df_skip_bytes(off_t nbytes);
 
 /*{{{  variables */
 
-enum COLUMN_TYPE { CT_DEFAULT, CT_STRING, CT_KEYLABEL,
+enum COLUMN_TYPE { CT_DEFAULT, CT_STRING, CT_KEYLABEL, CT_MUST_HAVE,
 		CT_XTICLABEL, CT_X2TICLABEL, CT_YTICLABEL, CT_Y2TICLABEL,
 		CT_ZTICLABEL, CT_CBTICLABEL };
 
@@ -2338,6 +2338,14 @@ df_readascii(double v[], int max)
 		     * THIS IS A CHANGE.
 		     */
 		    } else if ((column <= df_no_cols)
+			     && (use_spec[output].expected_type == CT_MUST_HAVE)) {
+			/* This catches cases where the plot style cannot tolerate
+			 * silently missed points (e.g. stacked histograms)
+			 */
+			v[output] = not_a_number();
+			return DF_UNDEFINED;
+
+		    } else if ((column <= df_no_cols)
 			     && (df_column[column - 1].good == DF_MISSING)) {
 			v[output] = not_a_number();
 			return_value = DF_MISSING;
@@ -3001,6 +3009,17 @@ expect_string(const char column)
     && (use_spec[column-1].at->actions[1].index == COLUMN))
 	use_spec[column-1].at->actions[1].index = STRINGCOLUMN;
     return(use_spec[column-1].column);
+}
+
+/*
+ * Plotting routines can call this prior to invoking df_readline() to indicate
+ * that they cannot tolerate failing to return some value for this column,
+ * even if the input field is junk.
+ */
+void
+require_value(const char column)
+{
+    use_spec[column-1].expected_type = CT_MUST_HAVE;
 }
 
 /*

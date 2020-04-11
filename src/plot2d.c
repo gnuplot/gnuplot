@@ -481,6 +481,13 @@ get_data(struct curve_points *current_plot)
     case HISTOGRAMS:
 	min_cols = 1;
 	max_cols = 3;
+	/* Stacked histogram get out of sync if "missing" values in the
+	 * input data are silently ignored.  require_value() forces a
+	 * value of NaN to be returned in this case.
+	 */
+	if (histogram_opts.type == HT_STACKED_IN_TOWERS
+	||  histogram_opts.type == HT_STACKED_IN_LAYERS)
+	    require_value(1);
 	break;
 
     case BOXES:
