@@ -589,6 +589,16 @@ get_data(struct curve_points *current_plot)
 	    int_warn(NO_CARET, "extra columns ignored by smoothing option");
 	break;
     }
+    if (current_plot->plot_smooth && current_plot->plot_style == FILLEDCURVES) {
+	if (current_plot->filledcurves_options.closeto == FILLEDCURVES_CLOSED) {
+	    if (current_plot->plot_smooth == SMOOTH_CSPLINES)
+		current_plot->plot_smooth = SMOOTH_PATH;
+	    if (current_plot->plot_smooth != SMOOTH_PATH) {
+		current_plot->plot_smooth = SMOOTH_NONE;
+		int_warn(NO_CARET, "only 'smooth path' or 'smooth cspline' is supported for closed curves");
+	    }
+	}
+    }
 
     /* May 2013 - Treating timedata columns as strings allows
      * functions column(N) and column("HEADER") to work on time data.
@@ -1032,7 +1042,7 @@ get_data(struct curve_points *current_plot)
 			    w = (j > 3) ? v[3] : 1.0;
 			    break;
 			default:
-			    int_warn(NO_CARET, "use csplines, acsplines or sbezier to smooth filledcurves");
+			    int_warn(NO_CARET, "use csplines, acsplines or sbezier to smooth non-closed filledcurves");
 			    current_plot->plot_smooth = SMOOTH_NONE;
 			    break;
 		    }
@@ -2307,8 +2317,9 @@ eval_plots()
 		    case SMOOTH_CUMULATIVE:
 		    case SMOOTH_CUMULATIVE_NORMALISED:
 		    case SMOOTH_MONOTONE_CSPLINE:
+		    case SMOOTH_PATH:
 			this_plot->plot_smooth = found_token;
-			this_plot->plot_style = LINES;
+			this_plot->plot_style = LINES;	/* can override later */
 			break;
 		    case SMOOTH_ZSORT:
 			this_plot->plot_smooth = SMOOTH_ZSORT;
@@ -2990,6 +3001,7 @@ eval_plots()
 		    zsort_points(this_plot);
 		    break;
 		case SMOOTH_NONE:
+		case SMOOTH_PATH:
 		case SMOOTH_BEZIER:
 		case SMOOTH_KDENSITY:
 		default:
@@ -3024,6 +3036,9 @@ eval_plots()
 		    break;
 		case SMOOTH_MONOTONE_CSPLINE:
 		    mcs_interp(this_plot);
+		    break;
+		case SMOOTH_PATH:
+		    gen_2d_path_splines(this_plot);
 		    break;
 		case SMOOTH_NONE:
 		case SMOOTH_UNIQUE:

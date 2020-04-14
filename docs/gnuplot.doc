@@ -203,6 +203,8 @@ C
 4 New plot styles and style options
 #start
 #b cubic spline smoothing of 3D lines. See `splot smooth csplines`
+#b curve smoothing using along-path cubic splines suitable for closed curves
+## or for 2D curves that are not monotonic on x. See `smooth path`.
 #end
 
 4 New commands and command options
@@ -7013,12 +7015,12 @@ Ffigure_zerror
 
  Syntax:
        smooth {unique | frequency | fnormal | cumulative | cnormal | bins
-                      | kdensity {bandwidth}
-                      | csplines | acsplines | mcsplines | bezier | sbezier
-                      | unwrap | zsort}
+              | kdensity {bandwidth}
+              | csplines | acsplines | mcsplines | path | bezier | sbezier
+              | unwrap | zsort}
 
- The `unique`, `frequency`, `fnormal`, `cumulative` and `cnormal` sort the data
- on x and then plot some aspect of the distribution of x values.
+ The `unique`, `frequency`, `fnormal`, `cumulative` and `cnormal` options
+ sort the data on x and then plot some aspect of the distribution of x values.
 
  The spline and Bezier options determine coefficients describing a continuous
  curve between the endpoints of the data. This curve is then plotted in the same
@@ -7127,17 +7129,17 @@ Ffigure_zerror
  The smoothed curve always passes through the data points, so closely-spaced
  points may generate local bumps and excursions in the smoothed curve.
 
- EXPERIMENTAL:
  `splot ... smooth csplines with lines` fits splines to the x, y, and z
- coordinates of successive data points.  Unlike the 2D case, the points are not
+ coordinates of successive data points.  Unlike 2D csplines, the points are not
  sorted first so it is possible to fit splines to a trajectory containing loops.
  In the general case three separate sets of spline coefficients are generated,
  each treating one coordinate x, y, or z as a function of a shared implicit
- trajectory path parameter.  However if the curve lies in the xz, yz, or xy
- plane then only a single set of spline coefficients is generated.
- This allows you to generate a stack of smoothed curves in 3D where each one
- replicates the spline fit you would have obtained from a 2D plot of the
- coordinates in projection.
+ trajectory path parameter. This is analogous to the 2D `plot ... smooth path`.
+ 
+ In the special case that the curve lies in the xz, yz, or xy plane then only a
+ single set of spline coefficients is generated.  This allows you to generate a
+ stack of smoothed curves in 3D where each one replicates the spline fit you
+ would have obtained from a 2D plot of the coordinates in projection.
 5 mcsplines
 ?commands plot datafile smooth mcsplines
 ?plot datafile smooth mcsplines
@@ -7152,6 +7154,25 @@ Ffigure_zerror
  convexity of the original data points.  This reduces the effect of outliers.
  FN Fritsch & RE Carlson (1980) "Monotone Piecewise Cubic Interpolation",
  SIAM Journal on Numerical Analysis 17: 238–246.
+5 path
+?commands path datafile smooth path
+?plot datafile smooth path
+?plot smooth path
+?smooth path
+?datafile smooth path
+?path
+ The `smooth path` option generates cubic splines to fit points in the order
+ they are presented in the input data; i.e. they are not first sorted on x.
+ This generates a smooth spline through a closed curve or along a trajectory
+ that contains loops.  As always, a separate curve is created for each set
+ of points in the input file, where a blank line separates the sets.
+ Plotting `smooth path with filledcurves closed` will guarantee that each set
+ of points creates a closed curve.  Plotting `smooth path with lines` will
+ generate a closed curve if the first and last points in the set are the same.
+ Otherwise it will create an open-ended smooth path.  See 
+^ <a href="http://www.gnuplot.info/demo/smooth_path.html">
+ smooth_path.dem
+^ </a>
 5 sbezier
 ?commands plot datafile smooth sbezier
 ?plot datafile smooth sbezier

@@ -39,9 +39,10 @@ print "******************** file bins.dem *************************"
 load "bins.dem"
 reset
 
-print "******************** file smooth_splines.dem ********************"
+print "******************** smooth splines ********************"
 load "smooth_splines.dem"
 load "monotonic_spline.dem"
+load "smooth_path.dem"
 reset
 
 

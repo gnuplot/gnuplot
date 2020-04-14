@@ -1853,7 +1853,8 @@ eval_3dplots()
 		/* EXPERIMENTAL smoothing options for splot with lines */
 		if (equals(c_token, "smooth")) {
 		    c_token++;
-		    if (almost_equals(c_token, "c$splines")) {
+		    if (almost_equals(c_token, "c$splines")
+		    ||  equals(c_token, "path")) {
 			c_token++;
 			this_plot->plot_smooth = SMOOTH_CSPLINES;
 		    } else if (almost_equals(c_token, "acs$plines")) {

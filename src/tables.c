@@ -132,6 +132,7 @@ const struct gen_table plot_smooth_tbl[] =
     { "mcs$plines", SMOOTH_MONOTONE_CSPLINE },
     { "fnor$mal", SMOOTH_FREQUENCY_NORMALISED },
     { "z$sort", SMOOTH_ZSORT },
+    { "path", SMOOTH_PATH },
     { NULL, SMOOTH_NONE }
 };
 

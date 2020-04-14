@@ -51,5 +51,6 @@ void zsort_points(struct curve_points *plot);
 void cp_implode(struct curve_points *cp);
 void make_bins(struct curve_points *plot, int nbins, double binlow, double binhigh, double binwidth);
 void gen_3d_splines(struct surface_points *plot);
+void gen_2d_path_splines(struct curve_points *plot);
 
 #endif /* GNUPLOT_INTERPOL_H */

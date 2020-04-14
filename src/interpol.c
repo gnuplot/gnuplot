@@ -138,7 +138,7 @@ static void do_cubic(struct curve_points * plot,
 			spline_coeff * sc, spline_coeff * sc2,
 			int first_point, int num_points, struct coordinate * dest);
 static void do_freq(struct curve_points *plot,	int first_point, int num_points);
-static void do_curve_cleanup(struct iso_curve *curve);
+static int do_curve_cleanup(struct coordinate *point, int npoints);
 static int compare_points(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2);
 static int compare_z(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2);
 
@@ -1713,6 +1713,155 @@ do_3d_cubic(struct iso_curve *curve, enum PLOT_SMOOTH smooth_option)
 }
 
 /*
+ * Generate 2D splines along a path for each set of points in the plot,
+ * smoothing option SMOOTH_PATH.
+ * TODO:
+ * - number of spline samples should be controlled by something other
+ *   than "set samples"
+ * - spline weights from an additional column
+ */
+void
+gen_2d_path_splines( struct curve_points *plot )
+{
+    int i;
+    int ic, first_point;	/* indexes for original data */
+    int is = 0;			/* index for new (splined) data */
+    struct coordinate *old_points = NULL;
+    struct coordinate *splined_points;
+    spline_coeff *sc_x = NULL;
+    spline_coeff *sc_y = NULL;
+
+    double xrange = fabs(axis_array[plot->x_axis].max - axis_array[plot->x_axis].min);
+    double yrange = fabs(axis_array[plot->y_axis].max - axis_array[plot->y_axis].min);
+    int curves = num_curves(plot);
+
+    /* Allocate space to hold the interpolated points */
+    splined_points = gp_alloc( (samples_1 * curves) * sizeof(struct coordinate), NULL );
+    memset( splined_points, 0, (samples_1 * curves) * sizeof(struct coordinate));
+
+    first_point = 0;
+    for (ic = 0; ic < curves; ic++) {
+	double t, tstep, tsum;
+	double dx, dy;
+	int l;
+	int nold;
+	int num_points = next_curve(plot, &first_point);
+	TBOOLEAN closed = FALSE;
+
+	/* Make a copy of the original points so that we don't corrupt the
+	 * list by adding up to three new ones. 
+	 */
+	old_points = gp_realloc( old_points, (num_points + 3) * sizeof(struct coordinate),
+				"spline points");
+	memcpy( &old_points[1], &plot->points[first_point], num_points * sizeof(struct coordinate));
+
+	/* Remove any unusable points (NaN, missing, duplicates) before fitting a spline.
+	 * If that leaves fewer than 3 points, skip it.
+	 */
+	nold = do_curve_cleanup(&old_points[1], num_points);
+	if (nold < 3) {
+	    first_point += num_points;
+	    continue;
+	}
+
+	/* We expect one of two cases. Either this really is a closed
+	 * curve (end point matches start point) or it is an open-ended
+	 * path that may not be monotonic on x.
+	 * For plot style "with filledcurves closed" we add an extra
+	 * point at the end if it is not already there.
+	 */
+	if (old_points[1].x == old_points[nold].x
+	&&  old_points[1].y == old_points[nold].y)
+	    closed = TRUE;
+	if ((plot->plot_style == FILLEDCURVES) && !closed) {
+	    old_points[++nold] = old_points[1];
+	    closed = TRUE;
+	}
+
+	if (closed) {
+	    /* Wrap around to one point before and one point after the path closure */
+	    nold += 2;
+	    old_points[0] = old_points[nold-3];
+	    old_points[nold-1] = old_points[2];
+	} else {
+	    /* Dummy up an extension at either end */
+	    nold += 2;
+	    old_points[0].x = old_points[1].x + old_points[1].x - old_points[2].x;
+	    old_points[nold-1].x = old_points[nold-2].x + old_points[nold-2].x - old_points[nold-3].x;
+	    old_points[0].y = old_points[1].y + old_points[1].y - old_points[2].y;
+	    old_points[nold-1].y = old_points[nold-2].y + old_points[nold-2].y - old_points[nold-3].y;
+	}
+
+	/* Construct path-length vector; store it in unused slot of old_points */
+	t = tsum = 0.0;
+	old_points[0].CRD_PATH = 0;
+	for (i = 1; i < nold; i++) {
+	    dx = (old_points[i].x - old_points[i-1].x) / xrange;
+	    dy = (old_points[i].y - old_points[i-1].y) / yrange;
+	    tsum += sqrt( dx*dx + dy*dy );
+	    old_points[i].CRD_PATH = tsum;
+	}
+
+	/* Normalize so that the path fraction always runs from 0 to 1 */
+	for (i = 1; i < nold; i++)
+	    old_points[i].CRD_PATH /= tsum;
+	tstep = 1.0 / (double)(samples_1 - 1);
+
+	/* Calculate spline coefficients for x and for y as a function of path */
+	sc_x = cp_tridiag( old_points, nold, PATHCOORD, 0);
+	sc_y = cp_tridiag( old_points, nold, PATHCOORD, 1);
+
+	/* First output point is the same as the original first point */
+	splined_points[is++] = old_points[1];
+
+	/* Skip the points in the overlap region */
+	for (i = 0; i * tstep < old_points[1].CRD_PATH; i++)
+	    ;
+
+	/* Use spline coefficients to generate a new point at each sample interval. */
+	for (l=0; i < samples_1; i++) {
+	    double temp;
+	    t = i * tstep;
+
+	    /* Stop before wrapping around. Copy the original end point. */
+	    if (t > old_points[nold-2].CRD_PATH) {
+		splined_points[is++] = old_points[nold-2];
+		break;
+	    }
+
+	    /* Move forward to the spline interval this point is in */
+	    while ((t >= old_points[l + 1].CRD_PATH) && (l < nold- 2))
+		l++;
+	    temp = t - old_points[l].CRD_PATH;
+
+	    splined_points[is].x = ((sc_x[l][3] * temp + sc_x[l][2]) * temp + sc_x[l][1])
+				 * temp + sc_x[l][0];
+	    splined_points[is].y = ((sc_y[l][3] * temp + sc_y[l][2]) * temp + sc_y[l][1])
+				 * temp + sc_y[l][0];
+	    is++;
+	}
+
+	/* Done with spline coefficients */
+	free(sc_x);
+	free(sc_y);
+
+	/* Add a seperator point after this set of splined points */
+	splined_points[is++].type = UNDEFINED;
+
+	first_point += num_points;
+    }
+
+    /* Replace original data with splined approximation */
+    free(old_points);
+    free(plot->points);
+    plot->points = splined_points;
+    plot->p_max = curves * samples_1;
+    plot->p_count = is;
+
+    return;
+}
+
+/*
  * Externally callable interface to 3D spline routines
  */
 void
@@ -1722,24 +1871,23 @@ gen_3d_splines( struct surface_points *plot )
 
     while (curve) {
 	/* Remove any unusable points before fitting a spline */
-	do_curve_cleanup(curve);
+	curve->p_count = do_curve_cleanup(curve->points, curve->p_count);
 	if (curve->p_count > 3)
 	    do_3d_cubic(curve, plot->plot_smooth);
 	curve = curve->next;
     }
 }
 
-static void
-do_curve_cleanup( struct iso_curve *curve )
+static int
+do_curve_cleanup( struct coordinate *point, int npoints )
 {
     int i, keep;
-    struct coordinate *point = curve->points;
 
     /* Step through points in curve keeping only the usable ones.
      * Discard duplicates
      */
     keep = 0;
-    for (i = 0; i < curve->p_count; i++) {
+    for (i = 0; i < npoints; i++) {
 	if (point[i].type == UNDEFINED)
 	    continue;
 	if (isnan(point[i].x) || isnan(point[i].y) || isnan(point[i].z))
@@ -1754,5 +1902,5 @@ do_curve_cleanup( struct iso_curve *curve )
 	keep++;
     }
 
-    curve->p_count = keep;
+    return keep;
 }
