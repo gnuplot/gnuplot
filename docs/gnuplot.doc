@@ -7560,12 +7560,17 @@ Ffigure_zerror
  bookkeeping values in addition to the actual data values contained in the input
  file. These are contained in "pseudocolumns".
        column(0)   The sequential order of each point within a data set.
-                   The counter starts at 0 and is reset by two sequential blank
+                   The counter starts at 0, increments on each non-blank,
+                   non-comment line, and is reset by two sequential blank
                    records.  The shorthand form $0 is available.
-       column(-1)  This counter starts at 0 and is reset by a single blank line.
+       column(-1)  This counter starts at 0, increments on a single blank line,
+                   and is reset by two sequential blank lines.
                    This corresponds to the data line in array or grid data.
-       column(-2)  The index number of the current data set within a file that
-                   contains multiple data sets.  See `index`.
+                   It can also be used to distinguish separate line segments
+                   or polygons within a data set.
+       column(-2)  Starts at 0 and increments on two sequential blank lines.
+                   This is the index number of the current data set within a
+                   file that contains multiple data sets.  See `index`.
 5 key
 ?using key
 ?plot using key
