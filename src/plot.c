@@ -796,6 +796,7 @@ load_rcfile(int where)
 	strcpy(rcfile, XDGConfigHome);
 	PATH_CONCAT(rcfile, "gnuplot/gnuplotrc");
 	plotrc = fopen(rcfile, "r");
+	free(XDGConfigHome);
 #endif
     }
 
