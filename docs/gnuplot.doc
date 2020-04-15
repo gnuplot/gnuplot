@@ -348,11 +348,11 @@ C
 4 New plot styles and style options
 #start
 #b 3D plot style `with zerrorfill`. See `zerrorfill`, `fenceplots` and
-^ <a href="http://gnuplot.info/demo_5.2/zerror.html">
+^ <a href="http://gnuplot.info/demo_5.4/zerror.html">
    zerror demo.
 ^ </a>
 #b Beeswarm plots. See `set jitter`, `beeswarm` and
-^ <a href="http://gnuplot.info/demo_5.2/jitter.html">
+^ <a href="http://gnuplot.info/demo_5.4/jitter.html">
    beeswarm plot demo
 ^ </a>
 #b The symbol used for individual points in a plot can be controlled by data values
@@ -367,12 +367,12 @@ C
 #start
 #b Polar coordinates may be used in label, arrow, and object definitions
 #b `set [m]ttics` places ticmarks and labels on the perimeter of a polar plot. See
-^ <a href="http://gnuplot.info/demo_5.2/ttics.html"> polar axis and ticlabels demo
+^ <a href="http://gnuplot.info/demo_5.4/ttics.html"> polar axis and ticlabels demo
 ^ </a>
 #b `set rlabel`  places a label above the r axis
 #b Inverted `rrange` (i.e. set rrange [90:0]) allows use of celestial horizontal
 ## coordinates. See
-^ <a href="http://gnuplot.info/demo_5.2/solar_path.html"> solar path demo
+^ <a href="http://gnuplot.info/demo_5.4/solar_path.html"> solar path demo
 ^ </a>
 #b `set border polar` draws a solid line around the perimeter of a polar plot
 #b `set theta` controls the position of theta = 0 around the perimeter of a
@@ -382,7 +382,7 @@ C
 #start
 #b Any plot axis can be assigned a pair of functions, possibly nonlinear, that
 ## describe the forward and reverse mapping to a linear range (see `set nonlinear`)
-^ <a href="http://gnuplot.info/demo_5.2/nonlinear3.html">
+^ <a href="http://gnuplot.info/demo_5.4/nonlinear3.html">
    Nonlinear x/y axis demo
 ^ </a>
 #b The familiar command `set logscale` has been reimplemented as a special case
@@ -7437,12 +7437,17 @@ Ffigure_zerror
  bookkeeping values in addition to the actual data values contained in the input
  file. These are contained in "pseudocolumns".
        column(0)   The sequential order of each point within a data set.
-                   The counter starts at 0 and is reset by two sequential blank
+                   The counter starts at 0, increments on each non-blank,
+                   non-comment line, and is reset by two sequential blank
                    records.  The shorthand form $0 is available.
-       column(-1)  This counter starts at 0 and is reset by a single blank line.
+       column(-1)  This counter starts at 0, increments on a single blank line,
+                   and is reset by two sequential blank lines.
                    This corresponds to the data line in array or grid data.
-       column(-2)  The index number of the current data set within a file that
-                   contains multiple data sets.  See `index`.
+                   It can also be used to distinguish separate line segments
+                   or polygons within a data set.
+       column(-2)  Starts at 0 and increments on two sequential blank lines.
+                   This is the index number of the current data set within a
+                   file that contains multiple data sets.  See `index`.
 5 key
 ?using key
 ?plot using key
