@@ -790,6 +790,39 @@ set pm3d border lc "black" lw 1.5
 splot "icosahedron.dat" with polygons fs transparent solid 0.8 fc bgnd
 reset
 
+# Along-path cubic spline smoothing
+set output out.'figure_smooth_path' . ext
+$CURVE << EOD
+1   2
+1.5 2
+2   2.5
+3   5
+2.5 5
+1.5 4
+EOD
+$LOOP << EOD
+1.5 0.5
+2.5 0.5
+3   1.0
+3.5 1.5
+4.0 3.5
+3.6 4.5
+3.0 2.5
+4   1.5
+5   1.5
+EOD
+
+set xrange [0:6]
+set yrange [0:7]
+unset tics; unset border; set margins 0,0,0,3
+set style fill transparent solid 0.2 border lt 8
+
+plot $CURVE smooth path with filledcurves closed title "smooth path with filledcurves closed", \
+     $LOOP  smooth path with lines lt 8 title "smooth path with lines", \
+     $CURVE with points pt 7 lc "steelblue" title "original points", \
+     $LOOP  with points pt 7 lc "steelblue" notitle
+reset
+
 # close last file
 unset outp
 

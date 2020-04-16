@@ -7154,6 +7154,8 @@ Ffigure_zerror
  convexity of the original data points.  This reduces the effect of outliers.
  FN Fritsch & RE Carlson (1980) "Monotone Piecewise Cubic Interpolation",
  SIAM Journal on Numerical Analysis 17: 238–246.
+
+Ffigure_smooth_path
 5 path
 ?commands path datafile smooth path
 ?plot datafile smooth path
@@ -7168,9 +7170,9 @@ Ffigure_zerror
  of points in the input file, where a blank line separates the sets.
  Plotting `smooth path with filledcurves closed` will guarantee that each set
  of points creates a closed curve.  Plotting `smooth path with lines` will
- generate a closed curve if the first and last points in the set are the same.
- Otherwise it will create an open-ended smooth path.  See 
-^ <a href="http://www.gnuplot.info/demo/smooth_path.html">
+ generate a closed curve if the first and last points in the set overlap,
+ otherwise it will create an open-ended smooth path.  See 
+^ <a href="http://www.gnuplot.info/demo_5.5/smooth_path.html">
  smooth_path.dem
 ^ </a>
 5 sbezier
