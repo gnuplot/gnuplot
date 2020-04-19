@@ -4114,6 +4114,9 @@ place_parallel_axes(struct curve_points *first_plot, int layer)
 	struct axis *this_axis = &parallel_axis_array[j-1];
 	double axis_coord = this_axis->paxis_x;
 
+	if ((this_axis->ticmode & TICS_MASK) == NO_TICS)
+	    continue;
+
 	if (this_axis->tic_rotate && term->text_angle(this_axis->tic_rotate)) {
 	    tic_hjust = LEFT;
 	    tic_vjust = CENTRE;
@@ -4129,7 +4132,7 @@ place_parallel_axes(struct curve_points *first_plot, int layer)
 	tic_direction = -1;
 	tic_text = tic_start - this_axis->ticscale * term->v_tic;
 	tic_text -= term->v_char;
-	
+
 	gen_tics(this_axis, ytick2d_callback);
 	term->text_angle(0);
     }

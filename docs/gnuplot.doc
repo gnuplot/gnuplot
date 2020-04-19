@@ -4654,13 +4654,14 @@ Ffigure_linespoints
 2 parallelaxes
 Ffigure_parallel
 ?plotting styles parallelaxes
+?plot with parallelaxes
 ?with parallelaxes
 ?parallelaxes
 ?parallel
  Parallel axis plots can highlight correlation in a multidimensional data set.
  Individual columns of input data are each associated with a separately scaled
  vertical axis.  If all columns are drawn from a single file then each line on
- the plot represents values from a single row of data.
+ the plot represents values from a single row of data in that file.
  It is common to use some discrete categorization to assign line colors,
  allowing visual exploration of the correlation between this categorization and
  the axis dimensions.
@@ -4671,7 +4672,7 @@ Ffigure_parallel
      plot $DATA using col1{:varcol1} {at <xpos>} {<line properties}, \
           $DATA using col2, ...
 
- Note: Version 5.4 of gnuplot introduces a CHANGE in the syntax for plot style
+ CHANGE: Version 5.4 of gnuplot introduces a change in the syntax for plot style
  parallelaxes.  The revised syntax allows an unlimited number of parallel axes.
 
       gnuplot 5.2:   plot $DATA using 1:2:3:4:5 with parallelaxes
@@ -12635,8 +12636,14 @@ Ffigure_multiple_keys
  commands except that it acts on one of the axes p1, p2, ... used in parallel
  axis plots and spiderplots.  See `parallelaxes`, `set xrange`, and `set xtics`.
  The normal options to the range and tics commands are accepted although not
- all options make sense for parallel axis plots.  Placement of the label,
- relevant only to spiderplots, can be adjusted by varying the radial offset.
+ all options make sense for parallel axis plots.
+
+ `set paxis <axisno> label <label-options>` is relevant to spiderplots but
+ ignored otherwise.  Axes of a parallel axis plot can be labeled using the
+ `title` option of the plot command, which generates an xtic label.
+ Note that this may require also `set xtics`.
+
+ The axis linetype properties are controlled using `set style parallelaxis`.
 3 pixmap
 ?pixmap
 ?set pixmap

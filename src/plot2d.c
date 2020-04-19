@@ -261,6 +261,13 @@ plotrequest()
 	if (!ticdef->def.user && ticdef->type == TIC_USER)
 	    ticdef->type = TIC_COMPUTED;
     }
+    for (axis=0; axis<num_parallel_axes; axis++) {
+	struct ticdef *ticdef = &parallel_axis_array[axis].ticdef;
+	if (ticdef->def.user)
+	    ticdef->def.user = prune_dataticks(ticdef->def.user);
+	if (!ticdef->def.user && ticdef->type == TIC_USER)
+	    ticdef->type = TIC_COMPUTED;
+    }
 
     /* use the default dummy variable unless changed */
     if (dummy_token > 0)
@@ -1250,7 +1257,6 @@ store2d_point(
 
     /* FIXME this destroys any UNDEFINED flag assigned during input */
     cp->type = INRANGE;
-    dummy_type = cp->type;
 
     if (polar) {
 	double theta = x;
@@ -1300,8 +1306,8 @@ store2d_point(
      *  We used to exit immediately in this case rather than storing anything
      */
     x_axis_ptr = &axis_array[current_plot->x_axis];
+    dummy_type = cp->type;	/* Save result of range check on x */
     y_axis_ptr = &axis_array[current_plot->y_axis];
-    y_type_ptr = &(cp->type);
 
     store_and_update_range(&(cp->x), x, &(cp->type), x_axis_ptr, current_plot->noautoscale);
     store_and_update_range(&(cp->y), y, &(cp->type), y_axis_ptr, current_plot->noautoscale);
@@ -1309,10 +1315,11 @@ store2d_point(
     /* special cases for the "y" axes of parallel axis plots */
     if ((current_plot->plot_style == PARALLELPLOT)
     ||  (current_plot->plot_style == SPIDERPLOT)) {
-	if (spiderplot)
-	    y_type_ptr = &dummy_type;
+	y_type_ptr = &dummy_type;	/* Use xrange test result as a start point */
 	y_axis_ptr = &parallel_axis_array[current_plot->p_axis-1];
 	store_and_update_range(&(cp->y), y, y_type_ptr, y_axis_ptr, FALSE);
+    } else {
+	dummy_type = INRANGE;
     }
 
     switch (current_plot->plot_style) {
@@ -3777,11 +3784,13 @@ reevaluate_plot_title(struct curve_points *this_plot)
 		double xpos = this_plot->histogram_sequence + this_plot->histogram->start;
 		add_tic_user(&axis_array[FIRST_X_AXIS], this_plot->title, xpos, -1);
 	    }
-	    if (this_plot->plot_style == PARALLELPLOT) {
-		double xpos = parallel_axis_array[this_plot->p_axis-1].paxis_x;
-		add_tic_user(&axis_array[FIRST_X_AXIS], this_plot->title, xpos, -1);
-	    }
 	}
+    }
+
+    if (this_plot->plot_style == PARALLELPLOT
+    && !this_plot->title_is_automated) {
+	double xpos = parallel_axis_array[this_plot->p_axis-1].paxis_x;
+	add_tic_user(&axis_array[FIRST_X_AXIS], this_plot->title, xpos, -1);
     }
 }
 
