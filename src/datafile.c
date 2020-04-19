@@ -2150,13 +2150,6 @@ df_readascii(double v[], int max)
 			if (a.type == STRING) {
 			    add_tic_user(&axis_array[axis], a.v.string_val, xpos, -1);
 			    gpfree_string(&a);
-			} else {
-			    /* Version 5: In this case do not generate a tic at all. */
-			    /* E.g. plot $FOO using 1:2:(filter(3) ? strcol(3) : NaN) */
-			    /*
-			    add_tic_user(&axis_array[axis], "", xpos, -1);
-			    int_warn(NO_CARET,"Tic label does not evaluate as string!\n");
-			     */
 			}
 		    } else {
 			char *temp_string = df_parse_string_field(df_tokens[output]);
@@ -3080,6 +3073,8 @@ df_set_key_title_columnhead(struct curve_points *plot)
 	if (!plot) /* stats "name" option rather than plot title */
 	    column_for_key_title = use_spec[0].column;
 	else if (plot->plot_style == HISTOGRAMS)
+	    column_for_key_title = use_spec[0].column;
+	else if (plot->plot_style == PARALLELPLOT)
 	    column_for_key_title = use_spec[0].column;
 	else if (df_no_use_specs == 1)
 	    column_for_key_title = use_spec[0].column;
