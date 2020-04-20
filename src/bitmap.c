@@ -46,15 +46,15 @@
  * and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
 ]*/
@@ -1147,7 +1147,7 @@ b_boxfill(
     int pixcolor, actpix, pat, mask, idx, bitoffs;
     unsigned char *fillbitmap;
 
-    switch( style & 0xf ) {
+    switch (style & 0xf) {
     case FS_SOLID:
 	/* use halftone fill pattern according to filldensity */
 	/* filldensity is from 0..100 percent */
@@ -1178,17 +1178,16 @@ b_boxfill(
     /* this implements a primitive raster generator, which plots the */
     /* bitmaps point by point calling b_setpixel(). Perhaps someone */
     /* will implement a more efficient solution */
-
-    bitoffs=0;
-    for (iy = y; iy < y+h; iy++) { /* box height */
+    bitoffs = 0;
+    for (iy = y; iy < y + h; iy++) { /* box height */
 	pat = fillbitmap[bitoffs % fill_bitmap_width];
 	bitoffs++;
 	mask = 1 << (fill_bitmap_width - 1);
-	for (ix = x; ix < x+w; ix++) { /* box width */
+	for (ix = x; ix < x + w; ix++) { /* box width */
 	    /* actual pixel = 0 or color, according to pattern */
 	    actpix = (pat & mask) ? pixcolor : 0;
 	    mask >>= 1;
-	    if( mask == 0 ) {
+	    if (mask == 0) {
 		mask = 1 << (fill_bitmap_width - 1);
 	    }
 	    b_setpixel(ix, iy, actpix);
@@ -1197,5 +1196,45 @@ b_boxfill(
 
 }
 
+/* code from sixeltek terminal by Erik Olofsen */
+void
+b_filled_polygon(int points, gpiPoint *corners)
+{
+    int nodes, *nodex, px, py, i, j, swap;
 
+    nodex = (int *) malloc(sizeof(int) * points);
 
+    for (py = 0; py < b_ysize; py++) {
+
+	nodes = 0;
+	j = points - 1;
+	for (i = 0; i < points; i++) {
+	    if ((corners[i].y < py && corners[j].y >= py) ||
+		(corners[j].y < py && corners[i].y >= py)) {
+		nodex[nodes++] = (int) ((corners[i].x + (double)(py - corners[i].y) /
+					  (double)(corners[j].y - corners[i].y) *
+					  (corners[j].x - corners[i].x)) + 0.5);
+	    }
+	    j = i;
+	}
+
+	i = 0;
+	while (i < nodes - 1) {
+	    if (nodex[i] > nodex[i + 1]) {
+		swap = nodex[i];
+		nodex[i] = nodex[i + 1];
+		nodex[i + 1] = swap;
+		if (i) i--;
+	    } else {
+		i++;
+	    }
+	}
+
+	for (i = 0; i < nodes; i += 2) {
+	    for (px = nodex[i]; px < nodex[i + 1]; px++)
+		b_setpixel(px, py, b_value);
+	}
+    }
+
+    free(nodex);
+}

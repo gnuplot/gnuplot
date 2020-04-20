@@ -1062,48 +1062,10 @@ SIXEL_set_color(t_colorspec *colorspec)
 TERM_PUBLIC void
 SIXEL_filled_polygon(int points, gpiPoint *corners)
 {
-    int nodes, *nodex, py, i, j, swap;
-
     if (SIXEL_lt == LT_BACKGROUND)
 	return; /* opaque polygon! */
 
-    b_setlinetype(0);
-
-    nodex = (int *) malloc(sizeof(int) * points);
-
-    for (py = 0; py < b_ysize; py++) {
-
-	nodes = 0;
-	j = points - 1;
-	for (i = 0; i < points; i++) {
-	    if ((corners[i].y < py && corners[j].y >= py) ||
-		(corners[j].y < py && corners[i].y >= py)) {
-		nodex[nodes++] = (int) ((corners[i].x + (double)(py - corners[i].y) /
-					  (double)(corners[j].y - corners[i].y) *
-					  (corners[j].x - corners[i].x)) + 0.5);
-	    }
-	    j = i;
-	}
-
-	i = 0;
-	while (i < nodes - 1) {
-	    if (nodex[i] > nodex[i + 1]) {
-		swap = nodex[i];
-		nodex[i] = nodex[i + 1];
-		nodex[i + 1] = swap;
-		if (i) i--;
-	    } else {
-		i++;
-	    }
-	}
-
-	for (i = 0; i < nodes; i += 2) {
-	    b_move(nodex[i], py);
-	    b_vector(nodex[i + 1], py);
-	}
-    }
-
-    free(nodex);
+    b_filled_polygon(points, corners);
 }
 
 #endif /* SIXEL */
