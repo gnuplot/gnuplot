@@ -174,12 +174,9 @@ TERM_PUBLIC void SIXEL_reset(void);
 TERM_PUBLIC void SIXEL_text(void);
 TERM_PUBLIC void SIXEL_setfont(void);
 TERM_PUBLIC void SIXEL_graphics(void);
-TERM_PUBLIC void SIXEL_move(unsigned int x, unsigned int y);
-TERM_PUBLIC void SIXEL_vector(unsigned int x, unsigned int y);
 TERM_PUBLIC void SIXEL_linetype(int linetype);
 TERM_PUBLIC void SIXEL_dashtype(int type, t_dashtype *custom_dash_type);
 TERM_PUBLIC void SIXEL_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height);
-TERM_PUBLIC void SIXEL_linewidth(double linewidth);
 TERM_PUBLIC int SIXEL_make_palette (t_sm_palette *);
 TERM_PUBLIC void SIXEL_set_color(t_colorspec *colorspec);
 TERM_PUBLIC void SIXEL_filled_polygon(int points, gpiPoint *corners);
@@ -514,8 +511,6 @@ static int SIXEL_font;
 static int SIXEL_lt;
 static int SIXEL_dt;
 static int SIXEL_fp, SIXEL_np;
-static double SIXEL_lw;
-static unsigned int SIXEL_xp, SIXEL_yp;
 
 struct SIXEL_colorspec {
     int state;		/* see definitions above */
@@ -846,92 +841,6 @@ SIXEL_graphics()
 
 
 TERM_PUBLIC void
-SIXEL_move(unsigned int x, unsigned int y)
-{
-    SIXEL_xp = x;
-    SIXEL_yp = y;
-    b_move(x,y);
-}
-
-
-TERM_PUBLIC void
-SIXEL_vector(unsigned int x, unsigned int y)
-{
-    unsigned int x1, y1, x2, y2;
-    int runcount;
-    int dx, dy;
-    int xinc, yinc;
-    unsigned int xplot, yplot;
-    unsigned int i, wh, wh2;
-
-    if (SIXEL_lw <= 1.) {
-      b_vector(x,y);
-      return;
-    }
-
-    wh = (int) (SIXEL_lw + 0.5);
-    wh2 = wh/2;
-
-    x1 = SIXEL_xp;
-    y1 = SIXEL_yp;
-    x2 = x;
-    y2 = y;
-
-/* algorithm from bitmap.c */
-
-    runcount = 0;
-    dx = abs((int) (x1) - (int) (x2));
-    if (x2 > x1)
-	xinc = 1;
-    else if (x2 == x1)
-	xinc = 0;
-    else
-	xinc = -1;
-    dy = abs((int) (y1) - (int) (y2));
-    if (y2 > y1)
-	yinc = 1;
-    else if (y2 == y1)
-	yinc = 0;
-    else
-	yinc = -1;
-    xplot = x1;
-    yplot = y1;
-    if (dx > dy) {
-	/* iterate x */
-	while (xplot != x2) {
-	    xplot += xinc;
-	    runcount += dy;
-	    if (runcount >= (dx - runcount)) {
-		yplot += yinc;
-		runcount -= dx;
-	    }
-	    for (i = 1; i <= wh; i++) {
-		b_move(xplot - wh2, yplot - wh2 + i);
-		b_vector(xplot - wh2 + wh, yplot - wh2 + i);
-	    }
-	}
-    } else {
-	/* iterate y */
-	while (yplot != y2) {
-	    yplot += yinc;
-	    runcount += dx;
-	    if (runcount >= (dy - runcount)) {
-		xplot += xinc;
-		runcount -= dy;
-	    }
-	    for (i = 1; i <= wh; i++) {
-		b_move(xplot - wh2, yplot - wh2 + i);
-		b_vector(xplot - wh2 + wh, yplot - wh2 + i);
-	    }
-	}
-    }
-
-    SIXEL_xp = x;
-    SIXEL_yp = y;
-}
-
-
-TERM_PUBLIC void
 SIXEL_linetype(int linetype)
 {
     int i;
@@ -978,13 +887,6 @@ SIXEL_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, u
 	style = FS_OPAQUE;
 
     b_boxfill(style, x1, y1, width, height);
-}
-
-
-TERM_PUBLIC void
-SIXEL_linewidth(double linewidth)
-{
-    SIXEL_lw = linewidth;
 }
 
 
@@ -1428,10 +1330,10 @@ TERM_TABLE_START(sixel_driver)
     "sixeltek", "Sixel output using bitmap graphics",
     SIXEL_XMAX, SIXEL_YMAX, SIXEL_VCHAR, SIXEL_HCHAR,
     SIXEL_VTIC, SIXEL_HTIC, SIXEL_options, SIXEL_init, SIXEL_reset,
-    SIXEL_text, null_scale, SIXEL_graphics, SIXEL_move, SIXEL_vector,
+    SIXEL_text, null_scale, SIXEL_graphics, b_move, b_vector,
     SIXEL_linetype, b_put_text, b_text_angle,
     null_justify_text, line_and_point, do_arrow, set_font_null,
-    0, 0, 0, 0, SIXEL_fillbox, SIXEL_linewidth,
+    0, 0, 0, 0, SIXEL_fillbox, b_linewidth,
 #ifdef USE_MOUSE
     NULL, NULL, NULL, NULL, NULL,
 #endif

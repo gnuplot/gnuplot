@@ -98,10 +98,12 @@ static void b_putc(unsigned int, unsigned int, int, unsigned int);
 static GP_INLINE void b_setpixel(unsigned int x, unsigned int y, unsigned int value);
 static GP_INLINE void b_setmaskpixel(unsigned int x, unsigned int y, unsigned int value);
 static void b_line(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2);
+static void b_wline(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2);
 
 /* file-scope variables */
 
 static unsigned int b_value = 1; /* colour of lines */
+static double       b_lw = 1;	/* line width */
 static unsigned int b_currx, b_curry; /* the current coordinates */
 static unsigned int b_hchar;	/* width of characters */
 static unsigned int b_hbits;	/* actual bits in char horizontally */
@@ -968,6 +970,78 @@ b_line(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2)
 }
 
 
+/* draw a wide line (solid only, no dash pattern */
+/* code from sixeltek terminal by Erik Olofsen */
+static void
+b_wline(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2)
+{
+    int runcount;
+    int dx, dy;
+    int xinc, yinc;
+    unsigned int xplot, yplot;
+    unsigned int i, wh, wh2;
+    int x;
+
+    if (b_lw <= 1.) {
+	b_line(x1, y1, x2, y2);
+	return;
+    }
+
+    wh = (int) (b_lw + 0.5);
+    wh2 = wh / 2;
+
+    /* algorithm from bitmap.c */
+    runcount = 0;
+    dx = abs((int) (x1) - (int) (x2));
+    if (x2 > x1)
+	xinc = 1;
+    else if (x2 == x1)
+	xinc = 0;
+    else
+	xinc = -1;
+    dy = abs((int) (y1) - (int) (y2));
+    if (y2 > y1)
+	yinc = 1;
+    else if (y2 == y1)
+	yinc = 0;
+    else
+	yinc = -1;
+    xplot = x1;
+    yplot = y1;
+    if (dx > dy) {
+	/* iterate x */
+	while (xplot != x2) {
+	    xplot += xinc;
+	    runcount += dy;
+	    if (runcount >= (dx - runcount)) {
+		yplot += yinc;
+		runcount -= dx;
+	    }
+	    for (i = 1; i <= wh; i++) {
+		x = xplot - wh2;
+		// for (x = (int) xplot - (int) wh2; dx <= ((int) xplot - (int) wh2 + wh); x++)
+		   b_setpixel(x, yplot - wh2 + i, b_value);
+	    }
+	}
+    } else {
+	/* iterate y */
+	while (yplot != y2) {
+	    yplot += yinc;
+	    runcount += dx;
+	    if (runcount >= (dy - runcount)) {
+		xplot += xinc;
+		runcount -= dy;
+	    }
+	    for (i = 1; i <= wh; i++) {
+		x = xplot - wh2;
+		// for (x = (int) xplot - (int) wh2; dx <= ((int) xplot - (int) wh2 + wh); x++)
+		   b_setpixel(x, yplot - wh2 + i, b_value);
+	    }
+	}
+    }
+}
+
+
 /*
  * set character size
  */
@@ -1007,7 +1081,7 @@ b_charsize(unsigned int size)
 
 
 /*
- * put characater c at (x,y) rotated by angle with color b_value.
+ * put character c at (x,y) rotated by angle with color b_value.
  */
 static
 void b_putc(unsigned int x, unsigned int y, int c, unsigned int c_angle)
@@ -1057,7 +1131,7 @@ void b_putc(unsigned int x, unsigned int y, int c, unsigned int c_angle)
 
 
 /*
-   ** set b_linemask to b_pattern[linetype]
+ * set b_linemask to b_pattern[linetype]
  */
 void
 b_setlinetype(int linetype)
@@ -1069,6 +1143,16 @@ b_setlinetype(int linetype)
 
     b_linemask = b_pattern[linetype + 2];
     b_maskcount = 0;
+}
+
+
+/*
+ * set l_lw to linewidth
+ */
+void
+b_linewidth(double linewidth)
+{
+    b_lw = linewidth;
 }
 
 
@@ -1102,7 +1186,7 @@ b_vector(unsigned int x, unsigned int y)
     /* We can't clip properly, but we can refuse to draw out of bounds */
     if (x < term->xmax && y < term->ymax
     &&  b_currx < term->xmax && b_curry < term->ymax)
-	b_line(b_currx, b_curry, x, y);
+	b_wline(b_currx, b_curry, x, y);
     b_currx = x;
     b_curry = y;
 }

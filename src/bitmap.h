@@ -86,6 +86,7 @@ void b_charsize(unsigned int);
 void b_setvalue(unsigned int);
 
 void b_setlinetype(int);
+void b_linewidth(double linewidth);
 void b_move(unsigned int, unsigned int);
 void b_vector(unsigned int, unsigned int);
 void b_put_text(unsigned int, unsigned int, const char *);
