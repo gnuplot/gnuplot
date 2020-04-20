@@ -1475,7 +1475,7 @@ change_term(const char *origname, int length)
 #endif
 #ifdef HAVE_LIBGD
     /* To allow "set term sixel" as short for "set term sixelgd" */
-    if (!strncmp(origname,"sixel",5)) {
+    if (!strncmp(origname, "sixel", length)) {
 	name = "sixelgd";
 	length = 7;
     }
