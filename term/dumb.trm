@@ -109,12 +109,7 @@ TERM_PUBLIC void dumb_set_color(t_colorspec *);
 #include "readline.h"
 
 /* UTF-8 support */
-#ifdef HAVE_STDLIB_H
-#define DUMB_UTF8
- typedef int32_t charcell;
-#else
- typedef char charcell;
-#endif
+typedef int32_t charcell;
 
 /* matrix of characters */
 static charcell *dumb_matrix = NULL;
@@ -391,9 +386,8 @@ DUMB_text()
 	}
 #endif
     for (x = 0; x < dumb_xmax; x++) {
-#ifdef DUMB_UTF8
 	    char *c;
-#endif
+
 #ifndef NO_DUMB_COLOR_SUPPORT
 	    t_colorspec * color = &dumb_colors[dumb_xmax*y + x];
 	    switch (color->type) {
@@ -441,12 +435,8 @@ DUMB_text()
 		break;
 	    }
 #endif
-#ifdef DUMB_UTF8
 	    c = (char *)(&dumb_matrix[dumb_xmax*y + x]);
 	    fputs(c, gpoutfile);
-#else
-	    fputc(DUMB_PIXEL(x, y), gpoutfile);
-#endif
 	}
 	if (dumb_feed || y > 0)
 	    putc('\n', gpoutfile);
@@ -635,17 +625,12 @@ DUMB_put_text(unsigned int x, unsigned int y, const char *str)
     if (x + length > dumb_xmax)
 	x = GPMAX(0, dumb_xmax - length);
 
-#ifdef DUMB_UTF8
     for (i = 0; i < length && x < dumb_xmax; i++, x++) {
-	utf8_copy_one( (char *)(&DUMB_PIXEL(x, y)), gp_strchrn(str,i));
+	utf8_copy_one((char *)(&DUMB_PIXEL(x, y)), gp_strchrn(str, i));
 #ifndef NO_DUMB_COLOR_SUPPORT
 	memcpy(&dumb_colors[dumb_xmax * y + x], &dumb_color, sizeof(t_colorspec));
 #endif
     }
-#else
-    for (; x < dumb_xmax && *str; x++, str++)
-	dumb_set_pixel(x, y, *str, 5);
-#endif
 }
 
 
@@ -772,17 +757,12 @@ ENHdumb_FLUSH()
 	/* print the string fragment, perhaps invisibly */
 	/* NB: base expresses offset from current y pos */
 	if (ENHdumb_show && y < dumb_ymax) {
-#ifdef DUMB_UTF8
 	    for (i = 0; i < len && x < dumb_xmax; i++, x++) {
 		utf8_copy_one( (char *)(&DUMB_PIXEL(x, y)), gp_strchrn(str,i));
 #ifndef NO_DUMB_COLOR_SUPPORT
 		memcpy(&dumb_colors[dumb_xmax * y + x], &dumb_color, sizeof(t_colorspec));
 #endif
 	    }
-#else
-	    for (; x < dumb_xmax && *str; x++, str++)
-		dumb_set_pixel(x, y, *str, 5);
-#endif
 	}
 
 	if (!ENHdumb_widthflag)
