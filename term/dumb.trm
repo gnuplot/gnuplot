@@ -377,7 +377,7 @@ DUMB_rgb_color(rgb255_color rgb255)
 TERM_PUBLIC void
 DUMB_text()
 {
-    int x, y;
+    int x, y, i;
 
     putc('\f', gpoutfile);
     for (y = dumb_ymax - 1; y >= 0; y--) {
@@ -438,7 +438,10 @@ DUMB_text()
 	    }
 #endif
 	    c = (char *)(&dumb_matrix[dumb_xmax*y + x]);
-	    fputs(c, gpoutfile);
+	    /* The UTF-8 character might be four bytes long and so there's
+	       no guarantee that the charcell ends in a NUL. */
+	    for (i = 0; i < sizeof(charcell) && *c != NUL; i++, c++)
+		fputc(*c, gpoutfile);
 	}
 	if (dumb_feed || y > 0)
 	    putc('\n', gpoutfile);
