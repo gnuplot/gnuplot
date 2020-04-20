@@ -201,8 +201,10 @@ DUMB_options()
 	case DUMB_ANSIRGB:
 	    c_token++;
 	    dumb_colormode = cmd;
+#ifndef NO_DUMB_COLOR_SUPPORT
 	    term->make_palette = dumb_make_palette;
 	    term->set_color = dumb_set_color;
+#endif
 	    break;
 	case DUMB_NOCOLOR:
 	    c_token++;
