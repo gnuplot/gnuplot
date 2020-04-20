@@ -848,8 +848,8 @@ b_makebitmap(unsigned int x, unsigned int y, unsigned int planes)
     unsigned int j;
     unsigned int rows;
 
-    x = 8 * (unsigned int) (x / 8.0 + 0.9);	/* round up to multiple of 8 */
-    y = 8 * (unsigned int) (y / 8.0 + 0.9);	/* round up to multiple of 8 */
+    x = 8 * ((x + 7) / 8);	/* round up to multiple of 8 */
+    y = 8 * ((y + 7) / 8);	/* round up to multiple of 8 */
     b_psize = y / 8;		/* size of each plane */
     rows = b_psize * planes;	/* total number of rows of 8 pixels high */
     b_xsize = x;
@@ -1064,6 +1064,9 @@ b_setlinetype(int linetype)
 {
     if (linetype >= 7)
 	linetype %= 7;
+    if (linetype < LT_SOLID)
+	linetype = LT_SOLID;
+
     b_linemask = b_pattern[linetype + 2];
     b_maskcount = 0;
 }
