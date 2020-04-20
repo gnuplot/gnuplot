@@ -539,9 +539,8 @@ the stored bitmap in the format required by the device.
 
 As of version 4.5, inclusion of bitmap.c and the terminal drivers
 that depend on it is controlled by ./configure --with-bitmap-terminals.
-This may be desirable because the license for bitmap.c is more
-restrictive than the gnuplot license itself, and because the terminals
-it supports are mostly obsolete.
+This may be desirable because the terminals it supports are mostly
+obsolete.
 
 Internally, the bitmap is built of one or more planes of 1
 bit per pixel. In fact, I think the library would be easier to
