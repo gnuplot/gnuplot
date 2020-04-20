@@ -467,7 +467,13 @@ TERM_TABLE_START(pbm_driver)
     do_arrow, set_font_null,
     0,				/* pointsize */
     TERM_CAN_MULTIPLOT | TERM_BINARY,
-    0, 0, b_boxfill
+    0, 0, b_boxfill,
+    b_linewidth,
+#ifdef USE_MOUSE
+    NULL, NULL, NULL, NULL, NULL,
+#endif
+    NULL /* make_palette */, NULL, NULL /* set_color */,
+    b_filled_polygon
 TERM_TABLE_END(pbm_driver)
 
 #undef LAST_TERM
