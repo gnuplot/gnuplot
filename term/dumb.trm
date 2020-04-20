@@ -745,7 +745,7 @@ ENHdumb_OPEN(
 	/* Start new text fragment */
 	    enhanced_cur_text = &enhanced_text[0];
 	/* Scale fractional font height to vertical units of display */
-	    ENHdumb_base = base * 2;
+	    ENHdumb_base = base * 2 / fontsize;
 	/* Keep track of whether we are supposed to show this string */
 	    ENHdumb_show = showflag;
 	/* 0/1/2  no overprint / 1st pass / 2nd pass */
