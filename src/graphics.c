@@ -2033,6 +2033,9 @@ plot_bars(struct curve_points *plot)
 	    }
 	}	/* for loop */
     }		/* if xerrorbars OR xyerrorbars OR xerrorlines OR xyerrorlines */
+
+    /* Restore original line properties */
+    term_apply_lp_properties(&(plot->lp_properties));
 }
 
 /* plot_boxes:

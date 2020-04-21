@@ -1347,6 +1347,13 @@ do_key_sample(
 
     (*t->layer)(TERM_LAYER_END_KEYSAMPLE);
 
+    /* Restore original linetype for the main plot if we changed it */
+    if (this_plot->plot_type != FUNC
+    && (this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
+    && (bar_lp.flags & LP_ERRORBAR_SET) != 0) {
+	term_apply_lp_properties(&this_plot->lp_properties);
+    }
+
     /* Restore previous clipping area */
     clip_area = clip_save;
 }
