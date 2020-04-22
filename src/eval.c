@@ -187,7 +187,6 @@ const struct ft_entry ft[] =
     {"lgamma",  f_lgamma},
     {"ibeta",  f_ibeta},
     {"voigt",  f_voigt},
-    {"igamma",  f_igamma},
     {"rand",  f_rand},
     {"floor",  f_floor},
     {"ceil",  f_ceil},
@@ -214,10 +213,12 @@ const struct ft_entry ft[] =
     {"besin",  f_besin},
 
 #ifdef HAVE_COMPLEX_FUNCS
-    {"Igamma", f_Igamma},	/* Complex Igamma(a,z) */
+    {"igamma", f_Igamma},	/* Complex igamma(a,z) */
     {"LambertW", f_LambertW},	/* Complex W(z,k) */
     {"lnGamma", f_lnGamma},	/* Complex lnGamma(z) */
     {"Sign", f_Sign},		/* Complex sign function */
+#else
+    {"igamma",  f_igamma},	/* Jos van der Woude 1992 */
 #endif
 
 #ifdef HAVE_LIBCERF

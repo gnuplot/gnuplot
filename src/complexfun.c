@@ -367,7 +367,6 @@ lnGamma( complex double z )
 
 /*
  * TODO
- *	- replace existing igamma with this one if HAVE_COMPLEX_FUNCS
  *	- extend to full complex plane e.g. Temme 1996 or Bujanda 2016
  */
 
@@ -610,5 +609,20 @@ igamma_GL( double complex a, double complex z )
     else
 	return -ans;
 }
+
+/* ----------------------------------------------------------------
+    Cumulative distribution function of the ChiSquare distribution
+    (called internally from fit.c)
+   ---------------------------------------------------------------- */
+double
+chisq_cdf(int dof, double chisqr)
+{
+    if (dof <= 0)
+	return not_a_number();
+    if (chisqr <= 0.)
+	return 0;
+    return igamma( (double complex)(0.5 * dof), (double complex)(0.5 * chisqr));
+}
+
 
 #endif /* HAVE_COMPLEX_FUNCS */

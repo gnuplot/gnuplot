@@ -122,11 +122,14 @@ static double polevl(double x, const double coef[], int N);
 static double p1evl(double x, const double coef[], int N);
 static double confrac(double a, double b, double x);
 static double ibeta(double a, double b, double x);
-static double igamma(double a, double x);
 static double ranf(struct value * init);
 static double inverse_error_func(double p);
 static double inverse_normal_func(double p);
 static double lambertw(double x);
+#ifndef HAVE_COMPLEX_FUNCS
+static double igamma(double a, double x);
+static double igamma_GL(double a, double x);
+#endif
 #ifndef HAVE_LIBCERF
 static double humlik(double x, double y);
 #endif
@@ -142,7 +145,6 @@ static double erf(double a);
 #ifndef HAVE_ERFC
 static double erfc(double a);
 #endif
-static double igamma_GL(double a, double x);
 
 /* Macros to configure routines taken from CEPHES: */
 
@@ -620,6 +622,7 @@ f_ibeta(union argument *arg)
 	push(Gcomplex(&a, x, 0.0));
 }
 
+#ifndef HAVE_COMPLEX_FUNCS
 /*
  * igamma( a, x )
  */
@@ -650,6 +653,7 @@ void f_igamma(union argument *arg)
     } else
 	push(Gcomplex(&a, x, 0.0));
 }
+#endif /* no HAVE_COMPLEX_FUNCS */
 
 void f_gamma(union argument *arg)
 {
@@ -976,6 +980,7 @@ confrac(double a, double b, double x)
     return -1.0;
 }
 
+#ifndef HAVE_COMPLEX_FUNCS
 /* ** igamma.c
  *
  *   DESCRIBE  Approximate the incomplete gamma function P(a, x).
@@ -1154,9 +1159,9 @@ igamma_GL( double a, double x )
     return (x > a1) ? 1.0 - ans : -ans;
 }
 
-
 /* ----------------------------------------------------------------
     Cumulative distribution function of the ChiSquare distribution
+    (called internally from fit.c)
    ---------------------------------------------------------------- */
 double
 chisq_cdf(int dof, double chisqr)
@@ -1167,6 +1172,7 @@ chisq_cdf(int dof, double chisqr)
 	return 0;
     return igamma(0.5 * dof, 0.5 * chisqr);
 }
+#endif /* no HAVE_COMPLEX_FUNCS */
 
 
 /***********************************************************************
