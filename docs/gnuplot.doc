@@ -192,17 +192,19 @@ C
 2 New features
 ?new version_5.5
 ?new
- Version 5.5 is the current development version, built from a snapshot of the 
+ Version 5.5 is the current development version, built from a snapshot of the
  source files in the master branch of the git repository. New features
  introduced here will generally not appear in a supported release until
  version 5.6.  Details may change before that.
 
-4 Complex-valued functions
+4 Special and complex-valued functions
  This version of gnuplot provides a larger set of complex-valued functions and
  updated versions of some functions that were present in earlier versions.
 #start
 #b Updated incomplete gamma function with improved domain and precision.
 ## See `igamma`.
+#b Updated incomplete beta function with improved domain and precision.
+## See `ibeta`.
 #b New complex function LambertW(z,k) returns the kth branch of multivalued
 ## function W_k(z).
 ## Note that existing function lambertw(x) = real(LambertW( real(z), 0 )).
@@ -238,6 +240,7 @@ C
 #b `stats <non-existant file>` yields a testable value. See `stats test`.
 #b `stats $vgrid` finds min/max/mean/stddev of voxels in grid
 #b `if ... else if ... else ...`
+#b `palette(z)` returns the RGB palette color mapping z into cbrange.
 #end
 
 4 Multiple named palettes
@@ -1700,16 +1703,8 @@ C marker below is used to signal this to doc2html:
  argument.  For integer n, gamma(n+1) = n!.  If the argument is a complex
  value, the imaginary component is ignored. For complex arguments see `lnGamma`.
 4 ibeta
-?expressions functions ibeta
-?ibeta
 #ibeta(a,b,x) & $a,b>0$, $x \in [0:1]$ & ~ & $B(a,b,x)=\frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)}\intop_{0}^{x}t^{a-1}(1-t)^{b-1}dt$, incomplete beta \\
 %ibeta(a,b,x)@ ~~ @$ibeta ( roman real (a,b,x))$, ibeta function of real ($a$,$b$,$x$)
- The `ibeta(a,b,x)` function returns the normalized incomplete beta function of
- the real parts of its arguments. a, b > 0 and x in [0:1].  If the arguments are
- complex, the imaginary components are ignored.  The function is approximated by
- the method of continued fractions (Abramowitz and Stegun, 1964).
- The approximation is only accurate in the region x < (a-1)/(a+b-2).
- If convergence does not reach 1.E-10, the function returns NaN.
 4 inverf
 ?expressions functions inverf
 ?inverf
@@ -1720,7 +1715,6 @@ C marker below is used to signal this to doc2html:
 4 igamma
 #igamma(a,z) & complex, $\Re(a)>0$ & \gpCX & incompete gamma function $P(a,z)=\frac{1}{\Gamma(z)}\intop_{0}^{z}t^{a-1}e^{-t}dt$ \\
 %igamma(a,z)@ ~~ @$igamma (a,z)$, lower incomplete gamma function of ($a$,$z$)
-
 4 imag
 ?expressions functions imag
 ?imag
@@ -1758,13 +1752,13 @@ C marker below is used to signal this to doc2html:
 ?expressions functions lgamma
 ?lgamma
 #lgamma(x) & real & ~ & $\ln\Gamma(x)$  for real $x$  \\
-%lgamma(x)@real@$lgamma function of real  $x$ 
+%lgamma(x)@real@$lgamma function of real  $x$
  The `lgamma(x)` function returns the natural logarithm of the gamma function
  of the real part of its argument.  If the argument is a complex value, the
  imaginary component is ignored.  For complex values use lnGamma(z).
 4 lngamma
 #lnGamma(x) & complex & \gpCX & $\ln\Gamma(x)$ valid over entire complex plane \\
-%lnGamma(x)@complex@$lgamma function valid over entire complex plane 
+%lnGamma(x)@complex@$lgamma function valid over entire complex plane
  The `lnGamma(x)` function returns the natural logarithm of the gamma function.
  This implementation uses a Lanczos approximation valid over the entire complex
  plane. The imaginary component of the result is phase-shifted to yield a
@@ -2343,6 +2337,15 @@ C marker below is used to signal this to doc2html:
  The convergence of these algorithms is poor for Real(z) < 0.
  If the series does not converge to within 1.E-14, NaN is returned.
 
+4 Ibeta
+?expressions functions ibeta
+?ibeta
+ `ibeta(a,b,x)` returns the normalized lower incomplete beta integral of the
+ real parts of its arguments. a, b > 0 and x in [0:1].  If the arguments are
+ complex, the imaginary components are ignored. The implementation in gnuplot
+ 5.5 uses code from the Cephes library [Moshier 1989, "Methods and Programs
+ for Mathematical Functions", Prentice-Hall].
+
 4 LambertW
 ?expressions functions LambertW
 ?LambertW
@@ -2401,7 +2404,7 @@ C marker below is used to signal this to doc2html:
 
  Complex Airy, Bessel, and Hankel functions of real order nu and complex
  arguments require a library containing routines implemented by Douglas E. Amos,
- Sandia National Laboratories, SAND85-1018 (1985). 
+ Sandia National Laboratories, SAND85-1018 (1985).
  These routines may be found in netlib (http://netlib.sandia.gov) or in
  libopenspecfun (https://github.com/JuliaLang/openspecfun).
  See `Ai`, `Bi`, `BesselJ`, `BesselY`, `BesselI`, `BesselK`, `Hankel`.
@@ -3311,8 +3314,8 @@ Ffigure_newsyntax
 
  `palette` and `palette z` both map the z coordinate of the plot element being
  colored onto the current palette.  If z is outside cbrange it is by default
- mapped to palette fraction 0 or palette franction 1.  If the option 
- `set pm3d noclipcb` is set, then quadrangles in a pm3d plot whose z values 
+ mapped to palette fraction 0 or palette franction 1.  If the option
+ `set pm3d noclipcb` is set, then quadrangles in a pm3d plot whose z values
  are out of range will not be drawn at all.
 
  `fillcolor palette <colormap>` maps the z coordinate of a plot element onto

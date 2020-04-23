@@ -1,5 +1,54 @@
 /* GNUPLOT - specfun.c */
 
+/*
+ * FILE CONTENTS
+ *
+ * -	Gnuplot license (but note that many of the routines retain
+ *	their original license also)
+ * -	Attribution and source for routines from the cephes library
+ *
+ * -	mtherr, polevl, p1levl
+ *		utility routines from cephes library
+ * -	ISNAN ISFINITE lngamma
+ *		#ifndef LGAMMA     (system does not provide a log gamma)
+ * - 	humlik
+ *		fallback implementation of Faddeeva/Voigt function
+ *		if not available from libcerf or other library
+ * -	ibeta confrac
+ *		incomplete beta function using continued fraction approximation
+ *		#ifdef IBETA
+ * -	igamma igamma_GL chisq_cdf
+ *		incomplete gamma function (positive real domain only)
+ *		#ifndef HAVE_COMPLEX_FUNCTIONS
+ * -	ranf
+ *		random number generator
+ *		L'Ecuyer et al (1991) ACM/TOMS 17:98-111
+ * -	inverse_normal_func
+ *		inverse normal distribution function (cephes)
+ * -	erf erfc
+ *		complementary error function (fallback from cephes)
+ *		if not available from libcerf or other library
+ * -	inverse_error_function
+ *		NIST (2002) Ethan Merritt (2003)
+ * -	lambertw
+ *		Lambert W function (real domain only)
+ *		gnuplot implementation by Gunter Kuhnle based on
+ *		algorithm by Keith Briggs
+ * -	airy
+ *		Airy functions Ai Bi (cephes)
+ * -	expintA
+ *		exponential integral
+ *		gnuplot implementation James R Van Zandt 2010
+ * -	besin iv iv_asymptotic ikv_asymptotic_uniform
+ *		Modified Bessel function of order n (Boost/cephes)
+ * -	temme_ik_series CF1_ik CF2_ik ikv_temme
+ *		Modified Bessel functions of the first and second kind
+ *		of fractional order (adapted from Boost library)
+ * -	incbet incbd incbcf pseries
+ *		Normalized incomplete beta function (cephes)
+ *		#ifdef IBETA
+ */
+
 /*[
  * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
  *
@@ -31,20 +80,25 @@
 ]*/
 
 /*
- * AUTHORS
- *
- *   Original Software:
- *   Jos van der Woude, jvdwoude@hut.nl
- *
- */
-
-/* FIXME:
- * plain comparisons of floating point numbers!
+ * The original source for routines from the cephes library is distributed
+ * via http://www.netlib.org/cephes/
+ * Although these files do not contain licensing information, the author
+ * has agreed to their use and distribution under terms of the standard
+ * BSD license.
+ * The primary documentation for the libray functions is the book
+ * "Methods and Programs for Mathematical Functions", Prentice-Hall, 1989
+ * by Stephen Moshier.
  */
 
 #include "specfun.h"
 #include "stdfn.h"
 #include "util.h"
+
+/*
+ * Compile options
+ */
+#define INCBET	/* Cephes library implementation of ibeta() */
+#undef  IBETA	/* Jos van der Woude implementation of ibeta() */
 
 /*
  * EAM Oct 2019:
@@ -63,7 +117,7 @@
  */
 #define IGAMMA_PRECISION 1.E-14
 #define IGAMMA_OVERFLOW  FLT_MAX
-#define ITMAX            20000
+#define ITMAX            2000
 #define XBIG             1.0E+08 /* AS239 value for igamma(a,x>=XBIG) = 1.0 */
 
 #ifdef FLT_MAX
@@ -120,8 +174,6 @@ extern int signgam;		/* this is not always declared in math.h */
 static int mtherr(char *, int);
 static double polevl(double x, const double coef[], int N);
 static double p1evl(double x, const double coef[], int N);
-static double confrac(double a, double b, double x);
-static double ibeta(double a, double b, double x);
 static double ranf(struct value * init);
 static double inverse_error_func(double p);
 static double inverse_normal_func(double p);
@@ -601,6 +653,11 @@ f_erfc(union argument *arg)
     push(Gcomplex(&a, x, 0.0));
 }
 
+#ifdef IBETA	/* Original gnuplot ibeta() by Jos van der Woude */
+
+static double confrac(double a, double b, double x);
+static double ibeta(double a, double b, double x);
+
 void
 f_ibeta(union argument *arg)
 {
@@ -621,6 +678,7 @@ f_ibeta(union argument *arg)
     } else
 	push(Gcomplex(&a, x, 0.0));
 }
+#endif /* IBETA */
 
 #ifndef HAVE_COMPLEX_FUNCS
 /*
@@ -872,6 +930,8 @@ static double humlik(double x, double y)
 }
 #endif /* libcerf not available */
 
+#ifdef IBETA	/* Original gnuplot ibeta() by Jos van der Woude */
+
 /* ** ibeta.c
  *
  *   DESCRIBE  Approximate the incomplete beta function Ix(a, b).
@@ -979,6 +1039,7 @@ confrac(double a, double b, double x)
 
     return -1.0;
 }
+#endif /* IBETA */
 
 #ifndef HAVE_COMPLEX_FUNCS
 /* ** igamma.c
@@ -3330,8 +3391,8 @@ f_expint(union argument *arg)
 
 /*
  * ===================== BESIN =====================
- * The remainder of this file implements besin(n,x)
- * the modified Bessel function of order n.
+ * Start implementation of besin(n,x), the modified
+ * Bessel function of order n.
  * This feature can be disabled by undefining BESIN.
  */
 #define BESIN
@@ -4011,3 +4072,414 @@ static void ikv_temme(double v, double x, double *Iv_p, double *Kv_p)
  * End of code supporting besin(n,x)
  * ===================== BESIN =====================
  */
+
+
+
+/*
+ * ==================== INCBET =====================
+ * Start implementation of incbet(a,b, z)
+ * the normalized incomplete beta function
+ * adapted from Cephes library release 2.8
+ * This feature can be disabled by undefining INCBET.
+ */
+
+#ifdef INCBET
+
+/*
+ * begin wrapper/adaptation for use in gnuplot
+ */
+
+/* NB: these are log(2**127) and log (2**-128)
+ *      but this is very conservative for IEEE math
+ */
+#define MAXLOG  8.8029691931113054295988
+#define MINLOG -8.872283911167299960540
+
+static double incbet( double a, double b, double x );
+static double incbd( double a, double b, double x );
+static double incbcf( double a, double b, double x );
+static double pseries( double a, double b, double x );
+
+void
+f_ibeta(union argument *arg)
+{
+    struct value a;
+    double x;
+    double arg1;
+    double arg2;
+
+    (void) arg;                         /* avoid -Wunused warning */
+    x = real(pop(&a));
+    arg2 = real(pop(&a));
+    arg1 = real(pop(&a));
+
+    x = incbet(arg1, arg2, x);
+    if (x == -1.0) {
+        undefined = TRUE;
+        push(Gcomplex(&a, not_a_number(), 0.0));
+    } else
+        push(Gcomplex(&a, x, 0.0));
+}
+
+
+/*
+ *	Incomplete beta integral
+ *	cephes library routine incbet.c
+ *
+ * DESCRIPTION:
+ *
+ * Computes the normalized lower incomplete beta integral Βx(a,b)
+ * The function is defined as
+ *
+ *     _           x
+ *    | (a+b)      ⌠   a-1     b-1
+ *  ___________    |  t   (1-t)   dt.
+ *   _     _       ⌡
+ *  | (a) | (b)    0
+ *
+ * The domain of definition is 0 <= x <= 1.  In this
+ * implementation a and b are restricted to positive values.
+ * The integral from x to 1 may be obtained by the symmetry
+ * relation
+ *
+ *    1 - incbet( a, b, x )  =  incbet( b, a, 1-x ).
+ *
+ * The integral is evaluated by a continued fraction expansion
+ * or, when b*x is small, by a power series.
+ *
+ * ACCURACY:
+ *
+ * Tested at uniformly distributed random points (a,b,x) with a and b
+ * in "domain" and x between 0 and 1.
+ *                                        Relative error
+ * arithmetic   domain     # trials      peak         rms
+ *    IEEE      0,5         10000       6.9e-15     4.5e-16
+ *    IEEE      0,85       250000       2.2e-13     1.7e-14
+ *    IEEE      0,1000      30000       5.3e-12     6.3e-13
+ *    IEEE      0,10000    250000       9.3e-11     7.1e-12
+ *    IEEE      0,100000    10000       8.7e-10     4.8e-11
+ * Outputs smaller than the IEEE gradual underflow threshold
+ * were excluded from these statistics.
+ *
+ * ERROR MESSAGES:
+ *   message         condition      value returned
+ * incbet domain      x<0, x>1          NaN
+ * incbet underflow                     0.0
+ */
+
+/*
+ * Cephes Math Library, Release 2.8:  June, 2000
+ * Copyright 1984, 1995, 2000 by Stephen L. Moshier
+ * file: incbet.c
+ */
+
+#define MAXGAM 171.624376956302725
+
+static double big = 4.503599627370496e15;
+static double biginv =  2.22044604925031308085e-16;
+
+
+double
+incbet( double aa, double bb, double xx )
+{
+    double a, b, t, x, xc, w, y;
+    TBOOLEAN reflection = FALSE;
+
+    if ( aa <= 0.0 || bb <= 0.0 )
+	return -1.0;
+
+    if ( (xx <= 0.0) || ( xx >= 1.0) ) {
+	if ( xx == 0.0 )
+	    return 0.0;
+	if ( xx == 1.0 )
+	    return 1.0;
+	return -1.0;
+    }
+
+    if ( (bb * xx) <= 1.0 && xx <= 0.95) {
+	t = pseries(aa, bb, xx);
+	    goto done;
+    }
+
+    w = 1.0 - xx;
+
+    /* Reverse a and b if x is greater than the mean. */
+    if ( xx > (aa/(aa+bb)) ) {
+	reflection = TRUE;
+	a = bb;
+	b = aa;
+	xc = xx;
+	x = w;
+    } else {
+	a = aa;
+	b = bb;
+	xc = w;
+	x = xx;
+    }
+
+    if ( reflection && (b * x) <= 1.0 && x <= 0.95) {
+	t = pseries(a, b, x);
+	goto done;
+    }
+
+    /* Choose expansion for better convergence. */
+    y = x * (a+b-2.0) - (a-1.0);
+    if ( y < 0.0 )
+	w = incbcf( a, b, x );
+    else
+	w = incbd( a, b, x ) / xc;
+
+    /* Multiply w by the factor
+     *  x^a  (1-x)^b  gamma(a+b) / ( a * gamma(a) * gamma(b) )
+     */
+
+    y = a * log(x);
+    t = b * log(xc);
+    if ( (a+b) < MAXGAM && fabs(y) < MAXLOG && fabs(t) < MAXLOG ) {
+	t = pow(xc,b);
+	t *= pow(x,a);
+	t /= a;
+	t *= w;
+	t *= TGAMMA(a+b) / (TGAMMA(a) * TGAMMA(b));
+	goto done;
+    }
+
+    /* Resort to logarithms.  */
+    y += t + LGAMMA(a+b) - LGAMMA(a) - LGAMMA(b);
+    y += log(w/a);
+    if ( y < MINLOG )
+	t = 0.0;
+    else
+	t = exp(y);
+
+done:
+
+    if ( reflection )
+	t = (t <= MACHEP) ?  1.0 - MACHEP :  1.0 - t;
+
+    return t;
+}
+
+/* Continued fraction expansion #1
+ * for incomplete beta integral
+ */
+
+static double
+incbcf( double a, double b, double x )
+{
+    double xk, pk, pkm1, pkm2, qk, qkm1, qkm2;
+    double k1, k2, k3, k4, k5, k6, k7, k8;
+    double r, t, ans, thresh;
+    int n;
+
+    k1 = a;
+    k2 = a + b;
+    k3 = a;
+    k4 = a + 1.0;
+    k5 = 1.0;
+    k6 = b - 1.0;
+    k7 = k4;
+    k8 = a + 2.0;
+
+    pkm2 = 0.0;
+    qkm2 = 1.0;
+    pkm1 = 1.0;
+    qkm1 = 1.0;
+    ans = 1.0;
+    r = 1.0;
+    n = 0;
+    thresh = 3.0 * MACHEP;
+
+    do {
+	xk = -( x * k1 * k2 )/( k3 * k4 );
+	pk = pkm1 +  pkm2 * xk;
+	qk = qkm1 +  qkm2 * xk;
+	pkm2 = pkm1;
+	pkm1 = pk;
+	qkm2 = qkm1;
+	qkm1 = qk;
+
+	xk = ( x * k5 * k6 )/( k7 * k8 );
+	pk = pkm1 +  pkm2 * xk;
+	qk = qkm1 +  qkm2 * xk;
+	pkm2 = pkm1;
+	pkm1 = pk;
+	qkm2 = qkm1;
+	qkm1 = qk;
+
+	if ( qk != 0 )
+	    r = pk/qk;
+	if ( r != 0 ) {
+	    t = fabs( (ans - r)/r );
+	    ans = r;
+	} else {
+	    t = 1.0;
+	}
+
+	if ( t < thresh )
+	    return ans;
+
+	k1 += 1.0;
+	k2 += 1.0;
+	k3 += 2.0;
+	k4 += 2.0;
+	k5 += 1.0;
+	k6 -= 1.0;
+	k7 += 2.0;
+	k8 += 2.0;
+
+	if ( (fabs(qk) + fabs(pk)) > big ) {
+	    pkm2 *= biginv;
+	    pkm1 *= biginv;
+	    qkm2 *= biginv;
+	    qkm1 *= biginv;
+	}
+	if ( (fabs(qk) < biginv) || (fabs(pk) < biginv) ) {
+	    pkm2 *= big;
+	    pkm1 *= big;
+	    qkm2 *= big;
+	    qkm1 *= big;
+	}
+
+    } while ( ++n < 300 );
+
+    return ans;
+}
+
+
+/* Continued fraction expansion #2
+ * for incomplete beta integral
+ */
+
+static double
+incbd( double a, double b, double x )
+{
+    double xk, pk, pkm1, pkm2, qk, qkm1, qkm2;
+    double k1, k2, k3, k4, k5, k6, k7, k8;
+    double r, t, ans, z, thresh;
+    int n;
+
+    k1 = a;
+    k2 = b - 1.0;
+    k3 = a;
+    k4 = a + 1.0;
+    k5 = 1.0;
+    k6 = a + b;
+    k7 = a + 1.0;;
+    k8 = a + 2.0;
+
+    pkm2 = 0.0;
+    qkm2 = 1.0;
+    pkm1 = 1.0;
+    qkm1 = 1.0;
+    z = x / (1.0-x);
+    ans = 1.0;
+    r = 1.0;
+    n = 0;
+    thresh = 3.0 * MACHEP;
+
+    do {
+	xk = -( z * k1 * k2 )/( k3 * k4 );
+	pk = pkm1 +  pkm2 * xk;
+	qk = qkm1 +  qkm2 * xk;
+	pkm2 = pkm1;
+	pkm1 = pk;
+	qkm2 = qkm1;
+	qkm1 = qk;
+
+	xk = ( z * k5 * k6 )/( k7 * k8 );
+	pk = pkm1 +  pkm2 * xk;
+	qk = qkm1 +  qkm2 * xk;
+	pkm2 = pkm1;
+	pkm1 = pk;
+	qkm2 = qkm1;
+	qkm1 = qk;
+
+	if ( qk != 0 )
+	    r = pk/qk;
+	if ( r != 0 ) {
+	    t = fabs( (ans - r)/r );
+	    ans = r;
+	} else {
+	    t = 1.0;
+	}
+
+	if ( t < thresh )
+	    return ans;
+
+	k1 += 1.0;
+	k2 -= 1.0;
+	k3 += 2.0;
+	k4 += 2.0;
+	k5 += 1.0;
+	k6 += 1.0;
+	k7 += 2.0;
+	k8 += 2.0;
+
+	if ( (fabs(qk) + fabs(pk)) > big ) {
+	    pkm2 *= biginv;
+	    pkm1 *= biginv;
+	    qkm2 *= biginv;
+	    qkm1 *= biginv;
+	}
+	if ( (fabs(qk) < biginv) || (fabs(pk) < biginv) ) {
+	    pkm2 *= big;
+	    pkm1 *= big;
+	    qkm2 *= big;
+	    qkm1 *= big;
+	}
+
+    } while ( ++n < 300 );
+
+    return(ans);
+}
+
+/* Power series for incomplete beta integral.
+ * Use when b*x is small and x not too close to 1.
+ */
+
+static double
+pseries( double a, double b, double x )
+{
+    double s, t, u, v, n, t1, z, ai;
+
+    ai = 1.0 / a;
+    u = (1.0 - b) * x;
+    v = u / (a + 1.0);
+    t1 = v;
+    t = u;
+    n = 2.0;
+    s = 0.0;
+    z = MACHEP * ai;
+
+    while ( fabs(v) > z ) {
+	u = (n - b) * x / n;
+	t *= u;
+	v = t / (a + n);
+	s += v;
+	n += 1.0;
+    }
+    s += t1;
+    s += ai;
+
+    u = a * log(x);
+    if ( (a+b) < MAXGAM && fabs(u) < MAXLOG ) {
+	t = TGAMMA(a+b)/(TGAMMA(a)*TGAMMA(b));
+	s = s * t * pow(x,a);
+    } else {
+	t = LGAMMA(a+b) - LGAMMA(a) - LGAMMA(b) + u + log(s);
+	if ( t < MINLOG )
+	    s = 0.0;
+	else
+	    s = exp(t);
+    }
+
+    return s;
+}
+
+#endif	/* INCBET */
+/*
+ * End of code supporting incbet(a,b,x)
+ * ==================== INCBET =====================
+ */
+

@@ -267,6 +267,10 @@ load "complex_airy.dem"
 load "BesselK.dem"
 reset
 
+print "********************** special functions *************************"
+load "ibeta.dem"
+reset
+
 print "********************** file heatmaps.dem *********************"
 load "heatmaps.dem"
 reset

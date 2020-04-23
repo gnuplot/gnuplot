@@ -1,0 +1,47 @@
+# normalized lower incomplete beta integral ibeta(a,b, x)
+save_encoding = GPVAL_ENCODING
+set encoding utf8
+
+set title "Incomplete beta integral          {Γ(a+b)/(Γ(a)Γ(b))} {/*2 ∫@_{/*0.5 0}^{/*.5 x}} {/:Italic t^{a-1}(1-t)^{b-1}dt}\n" offset 0,-1
+
+set xrange [0:1]
+set yrange [0:1]
+
+set xlabel "x"
+set ylabel "ibeta(a,b, x)"
+set key outside
+
+plot ibeta(9,1,x) lw 2 title "a=9 b=1", ibeta(7,2,x) lw 2 title "a=7 b=2",\
+     ibeta(5,5,x) lw 2 title "a=5 b=5", ibeta(2,7,x) lw 2 title "a=2 b=7",\
+     ibeta(1,9,x) lw 2 lt 6 title "a=1 b=9"
+
+pause -1 "<cr> to continue"
+
+#
+# Show region of the domain which the old ibeta algorithm did not cover
+#
+
+set xrange [0 : 1.0 ]
+set yrange [0 : 0.1 ]
+set zrange [0 : 1.0 ]
+set xlabel "a"
+set ylabel "b"
+set xtics format "%.1f" offset 0, -0.3
+set ytics format "%.2f"
+set xyplane 0
+set key at screen .8,.7 reverse right
+
+set sample 40
+set isosample 40
+
+set pm3d lighting spec2 0.5 border lw .5
+unset colorbox
+
+z = 0.95
+splot ibeta(x,y,z) with pm3d fc "gray75" title sprintf("ibeta(a,b, x=%.2f)",z)
+
+pause -1 "<cr> to continue"
+
+reset
+set encoding save_encoding
+
