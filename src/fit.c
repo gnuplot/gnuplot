@@ -103,7 +103,6 @@
 #include "setshow.h"
 #include "scanner.h"  /* For legal_identifier() */
 #include "specfun.h"
-#include "complexfun.h" /* For chisq_cdf */
 #include "util.h"
 #include "variable.h" /* For locale handling */
 #include <signal.h>

@@ -191,9 +191,9 @@ const struct ft_entry ft[] =
     {"floor",  f_floor},
     {"ceil",  f_ceil},
 
-    {"norm",  f_normal},	/* XXX-JG */
-    {"inverf",  f_inverse_erf},	/* XXX-JG */
-    {"invnorm",  f_inverse_normal},	/* XXX-JG */
+    {"norm",  f_normal},
+    {"inverf",  f_inverse_erf},
+    {"invnorm",  f_inverse_normal},
     {"asinh",  f_asinh},
     {"acosh",  f_acosh},
     {"atanh",  f_atanh},

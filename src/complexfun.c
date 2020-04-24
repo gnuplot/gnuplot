@@ -71,8 +71,18 @@
 
 /* internal prototypes */
 static complex double lnGamma( complex double z );
-static complex double igamma( complex double a, complex double z );
-static double complex igamma_GL( double complex a, double complex z );
+static complex double Igamma( complex double a, complex double z );
+static double complex Igamma_GL( double complex a, double complex z );
+
+/* wrapper for Igamma so that when it replaces igamma
+ * there is still something for old callers who want to call
+ * it with real arguments rather than complex.
+ */
+double
+igamma( double a, double z )
+{
+    return creal( Igamma( (complex double)a, (complex double)z ) );
+}
 
 /*
  * Complex Sign function
@@ -396,7 +406,7 @@ f_Igamma(union argument *arg)
 	s.imag = 0;
     }
 
-    w = igamma( s.real + I*s.imag, z.real + I*z.imag );
+    w = Igamma( s.real + I*s.imag, z.real + I*z.imag );
 
     if (w == -1) {
 	/* Failed to converge or other error */
@@ -407,7 +417,7 @@ f_Igamma(union argument *arg)
     push(Gcomplex(&result, creal(w), cimag(w)));
 }
 
-/*   igamma(a, z)
+/*   Igamma(a, z)
  *   lower incomplete gamma function P(a, z).
  *
  *                        1      z  -t   (a-1)
@@ -434,7 +444,7 @@ f_Igamma(union argument *arg)
 #define IGAMMA_PRECISION 1.E-14
 
 static complex double
-igamma(complex double a, complex double z)
+Igamma(complex double a, complex double z)
 {
     complex double arg, ga1;
     complex double aa;
@@ -450,7 +460,7 @@ igamma(complex double a, complex double z)
     if (z == 0.0)
 	return 0.0;
 
-    initialize_underflow("igamma");
+    initialize_underflow("Igamma");
 
 #if (0)
     /* EAM 2020: FIXME
@@ -461,7 +471,7 @@ igamma(complex double a, complex double z)
      */
     if (debug != 4)
     if (creal(z) < 0) {
-	return igamma_negative_z( creal(a), z );
+	return Igamma_negative_z( creal(a), z );
     }
 #endif
 
@@ -470,7 +480,7 @@ igamma(complex double a, complex double z)
      */
     if ((cabs(a) > 100.) && (cabs(z-a)/cabs(a) < 0.2)) {
 	if (debug == 1) return NAN;
-	return igamma_GL( a, z );
+	return Igamma_GL( a, z );
     }
 
     /* Check value of factor arg */
@@ -479,7 +489,7 @@ igamma(complex double a, complex double z)
     arg = cexp(arg);
 
     /* Underflow of arg is common for large z or a */
-    handle_underflow("igamma", arg);
+    handle_underflow("Igamma", arg);
 
     /* Choose infinite series or continued fraction. */
 
@@ -510,7 +520,7 @@ igamma(complex double a, complex double z)
 
 	    /* Serious overflow */
 	    if (isnan(cabs(pn5)) || isnan(cabs(pn6)))
-		int_warn(NO_CARET, "igamma: overflow");
+		int_warn(NO_CARET, "Igamma: overflow");
 
 	    if (pn6 != 0.0) {
 		rn = pn5 / pn6;
@@ -546,7 +556,7 @@ igamma(complex double a, complex double z)
 	    b += an;
 	    retval = arg * b;
 
-	    handle_underflow( "igamma", retval );
+	    handle_underflow( "Igamma", retval );
 
 	    if (cabs(an) < cabs(b) * IGAMMA_PRECISION)
 		return retval;
@@ -562,7 +572,7 @@ igamma(complex double a, complex double z)
  * as recommended for large values of a by Numerical Recipes (Sec 6.2).
  */
 static double complex
-igamma_GL( double complex a, double complex z )
+Igamma_GL( double complex a, double complex z )
 {
     static const double y[18] = {
     0.0021695375159141994,
@@ -609,20 +619,5 @@ igamma_GL( double complex a, double complex z )
     else
 	return -ans;
 }
-
-/* ----------------------------------------------------------------
-    Cumulative distribution function of the ChiSquare distribution
-    (called internally from fit.c)
-   ---------------------------------------------------------------- */
-double
-chisq_cdf(int dof, double chisqr)
-{
-    if (dof <= 0)
-	return not_a_number();
-    if (chisqr <= 0.)
-	return 0;
-    return igamma( (double complex)(0.5 * dof), (double complex)(0.5 * chisqr));
-}
-
 
 #endif /* HAVE_COMPLEX_FUNCS */
