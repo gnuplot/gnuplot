@@ -47,6 +47,7 @@ void f_rand(union argument *x);
 void f_normal(union argument *x);
 void f_inverse_normal(union argument *x);
 void f_inverse_erf(union argument *x);
+void f_inverse_igamma(union argument *x);
 void f_lambertw(union argument *x);
 void f_airy(union argument *x);
 void f_expint(union argument *x);
@@ -54,8 +55,8 @@ void f_besin(union argument *x);
 
 #ifndef HAVE_COMPLEX_FUNCS
 void f_igamma(union argument *x);
-double chisq_cdf(int dof, double chisqr);
 #endif
+double chisq_cdf(int dof, double chisqr);
 
 #ifndef HAVE_LIBCERF
 void f_voigt(union argument *x);

@@ -30,6 +30,8 @@
  *		if not available from libcerf or other library
  * -	inverse_error_function
  *		NIST (2002) Ethan Merritt (2003)
+ * -	inverse_incomplete_gamma
+ *		Ethan Merritt (2020)
  * -	lambertw
  *		Lambert W function (real domain only)
  *		gnuplot implementation by Gunter Kuhnle based on
@@ -91,6 +93,7 @@
  */
 
 #include "specfun.h"
+#include "complexfun.h"
 #include "stdfn.h"
 #include "util.h"
 
@@ -133,7 +136,7 @@
 # undef PI
 #endif
 #define PI 3.14159265358979323846
-#define SQRT_TWO 1.41421356237309504880168872420969809	/* JG */
+#define SQRT_TWO 1.41421356237309504880168872420969809
 
 /* Because of a historical screwup in naming, the C language "gamma" function
  * was really ln(gamma).  Linux chose to provide this as "lgamma", but kept
@@ -177,6 +180,7 @@ static double p1evl(double x, const double coef[], int N);
 static double ranf(struct value * init);
 static double inverse_error_func(double p);
 static double inverse_normal_func(double p);
+static double inverse_incomplete_gamma(double a, double p);
 static double lambertw(double x);
 #ifndef HAVE_COMPLEX_FUNCS
 static double igamma(double a, double x);
@@ -1219,6 +1223,7 @@ igamma_GL( double a, double x )
 
     return (x > a1) ? 1.0 - ans : -ans;
 }
+#endif /* no HAVE_COMPLEX_FUNCS */
 
 /* ----------------------------------------------------------------
     Cumulative distribution function of the ChiSquare distribution
@@ -1233,7 +1238,6 @@ chisq_cdf(int dof, double chisqr)
 	return 0;
     return igamma(0.5 * dof, 0.5 * chisqr);
 }
-#endif /* no HAVE_COMPLEX_FUNCS */
 
 
 /***********************************************************************
@@ -1365,7 +1369,6 @@ f_inverse_normal(union argument *arg)
 	push(Gcomplex(&a, inverse_normal_func(x), 0.0));
     }
 }
-
 
 void
 f_inverse_erf(union argument *arg)
@@ -2234,6 +2237,112 @@ inverse_error_func(double y)
     return (x);
 }
 
+/*
+ *   invgamma(a, p) returns z such that igamma(a, z) = p
+ */
+void
+f_inverse_igamma(union argument *arg)
+{
+    struct value ret;
+    double a, p;
+    double z;
+
+    (void) arg;
+    p = real(pop(&ret));
+    a = real(pop(&ret));
+
+    if (a <= 0) {
+	undefined = TRUE;
+	push(Gcomplex(&ret, not_a_number(), 0.0));
+	int_warn(NO_CARET, "invigamma: a<=0 invalid");
+
+    } else if (p < 0 || p > 1) {
+	undefined = TRUE;
+	push(Gcomplex(&ret, not_a_number(), 0.0));
+	int_warn(NO_CARET, "invigamma: p invalid");
+
+    } else if (p == 1.) {
+	z = GPMAX( 100., a + 100.*sqrt(a) );
+	push(Gcomplex(&ret, z, 0.0));
+
+    } else if (p == 0) {
+	push(Gcomplex(&ret, 0.0, 0.0));
+
+    } else if (debug == 9) {
+	/* use cephes routine instead for comparison */
+	extern double igami( double a, double p );
+	z = igami(a,p);
+	push(Gcomplex(&ret, z, 0.0));
+
+    /* The normal case */
+    } else {
+	z = inverse_incomplete_gamma(a,p);
+	push(Gcomplex(&ret, z, 0.0));
+    }
+}
+
+/* Inverse normalized incomplete gamma function
+ *   invgamma(a, p) returns z such that igamma(a, z) = p
+ * Following the logic of Numerical Recipes (6.2.1) we
+ * use Halley's method to improve an initial guess at z
+ * Ethan A Merritt - April 2020
+ */
+static double
+inverse_incomplete_gamma( double a, double p )
+{
+    double t, u, z;
+    double err;
+    double lngamma_a = LGAMMA(a);
+    double afac = exp( (a-1) * (log(a-1)-1.) - lngamma_a);
+    int j;
+    const double EPS = sqrt(MACHEP);
+
+    /* Initial guess based on Abramovitz & Stegun 26.2.22, 26.4.17 */
+    if (a > 1.) {
+	double pp = (p < 0.5) ? p : (1.-p);
+	t = sqrt(-2.*log(pp));
+	/* Abramowitz & Stegun 26.2.22 */
+	z = t - (2.30753 + 0.27061*t) / (1. + 0.99229*t + 0.04481*t*t);
+	if (p < 0.5) z = -z;
+	/* Abramowitz & Stegun 26.4.17 */
+	z = a * pow( (1. - 2./(9.*a) + z*sqrt(2./(9.*a))), 3 );
+
+    /* Initial guess based on NR 6.2.8 6.2.9 */
+    } else {
+	t = 1. - a * (0.253 + a * 0.12);
+	if (p < t)
+	    z = pow( p/t, 1./a);
+	else
+	    z = 1. - log(1. - (p-t)/(1.-t));
+    }
+
+    /* Halley's method */
+    for (j=0; j<12; j++) {
+	if (z <= 0)
+	    return 0;
+	err = igamma(a,z) - p;
+	if (a > 1.)
+	    t = afac * exp( -(z-(a-1)) + (a-1)*(log(z)-log(a-1)));
+	else
+	    t = exp( -z + (a-1)*log(z) - lngamma_a);
+	u = err/t;
+	t = u / (1. - 0.5*GPMIN( 1., u * ((a-1)/z - 1.)));
+	/* FIXME: underflow OK? */
+	if (errno) {
+	    int_warn(NO_CARET, "inverse_incomplete_gamma: %s\nt = %g u = %g z = %g\n",
+			strerror(errno), t, u, z);
+	    z = not_a_number();
+	    break;
+	}
+	z -= t;
+	if (z <= 0)
+	    z = 0.5*(z+t);
+	if (fabs(t) < z * EPS)
+	    break;
+    }
+
+    return z;
+}
 
 /* Implementation of Lamberts W-function which is defined as
  * w(x)*e^(w(x))=x
@@ -4482,4 +4591,10 @@ pseries( double a, double b, double x )
  * End of code supporting incbet(a,b,x)
  * ==================== INCBET =====================
  */
+
+
+/* DEBUG
+   Cephes library routine for inverse igamma
+ */
+#include "igami.c"
 

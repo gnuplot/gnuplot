@@ -202,9 +202,12 @@ C
  updated versions of some functions that were present in earlier versions.
 #start
 #b Updated incomplete gamma function with improved domain and precision.
+## Complex arguments accepted.
 ## See `igamma`.
 #b Updated incomplete beta function with improved domain and precision.
 ## See `ibeta`.
+#b New function for the inverse incomplete gamma function.
+## See `invigamma`.
 #b New complex function LambertW(z,k) returns the kth branch of multivalued
 ## function W_k(z).
 ## Note that existing function lambertw(x) = real(LambertW( real(z), 0 )).
@@ -1338,8 +1341,9 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>inverf(x)</td>    <td>any</td>    <td>inverse error function real(<i>x</i>)</td></tr>
 ^<tr>    <td>igamma(a,z)</td>    <td>real</td>    <td>igamma(<i>a>0,z</i>), igamma function of complex <a>a>0</a>,<i>z</i>)</td></tr>
 ^<tr>    <td>imag(x)</td>    <td>complex</td>    <td>Im(<i>x</i>), imaginary part of <i>x</i> as a real number</td></tr>
-^<tr>    <td>invnorm(x)</td>    <td>any</td>    <td>inverse normal distribution function real(<i>x</i>)</td></tr>
 ^<tr>    <td>int(x)</td>    <td>real</td>    <td>integer part of <i>x</i>, truncated toward zero</td></tr>
+^<tr>    <td>invigamma(a,p)</td>    <td>0<p<1</td>    <td>inverse incomplete gamma function</td></tr>
+^<tr>    <td>invnorm(x)</td>    <td>any</td>    <td>inverse normal distribution function real(<i>x</i>)</td></tr>
 ^<tr>    <td>LambertW(z,k)</td> <td>complex, int</td> <td>kth branch of complex Lambert W function</td></tr>
 ^<tr>    <td>lambertw(x)</td>    <td>real</td>    <td>principal branch (k=0) of Lambert <i>W</i> function</td></tr>
 ^<tr>    <td>lgamma(x)</td>    <td>real</td>    <td>lgamma(Re(<i>x</i>)), lgamma function of real(<i>x</i>)</td></tr>
@@ -1722,13 +1726,6 @@ C marker below is used to signal this to doc2html:
 %imag(x)@complex@imaginary part of $x$ as a real number
  The `imag(x)` function returns the imaginary part of its argument as a real
  number.
-4 invnorm
-?expressions functions invnorm
-?invnorm
-#invnorm(x) &  ~~  & ~ &  inverse normal distribution function of real($x$)  \\
-%invnorm(x)@ ~~ @inverse normal distribution function real($x$)
- The `invnorm(x)` function returns the inverse cumulative normal (Gaussian)
- distribution function of the real part of its argument.  See `norm`.
 4 int
 ?expressions functions int
 ?int
@@ -1736,6 +1733,17 @@ C marker below is used to signal this to doc2html:
 %int(x)@real@integer part of $x$, truncated toward zero
  The `int(x)` function returns the integer part of its argument, truncated
  toward zero.
+4 invnorm
+?expressions functions invnorm
+?invnorm
+#invnorm(x) &  ~~  & ~ &  inverse normal distribution function of real($x$)  \\
+%invnorm(x)@ ~~ @inverse normal distribution function real($x$)
+ The `invnorm(x)` function returns the inverse cumulative normal (Gaussian)
+ distribution function of the real part of its argument.  See `norm`.
+
+4 invigamma
+#invigamma(a,p) & real & ~ &  inverse incomplete gamma function  \\
+%invigamma(a,p)@ real @inverse incomplete gamma function
 
 #LambertW(z,k) & complex, int & \gpCX & kth branch of complex Lambert W function \\
 %LambertW(z,k) & complex, int & $k$th branch of complex Lambert W function
@@ -1969,7 +1977,6 @@ C marker below is used to signal this to doc2html:
  Sandia National Laboratoris, SAND85-1018 (1985).
 4 BesselJ
 ?expressions functions BesselJ
-?functions BesselJ
 ?BesselJ
 #BesselJ(nu,z) & real, complex & \gpCX & $J_{\nu}(z)$ Bessel function of the first kind\\
 %BesselJ(nu,z) @ real, complex @ Bessel function J_nu of the first kind
@@ -1979,7 +1986,6 @@ C marker below is used to signal this to doc2html:
  Sandia National Laboratoris, SAND85-1018 (1985).
 4 BesselY
 ?expressions functions BesselY
-?functions BesselY
 ?BesselY
 #BesselY(nu,z) & real, complex & \gpCX & $Y_{\nu}(z)$ Bessel function of the second kind\\
 %BesselY(nu,z) @ real, complex @ Bessel function Y_nu of the second kind
@@ -1989,7 +1995,6 @@ C marker below is used to signal this to doc2html:
  Sandia National Laboratoris, SAND85-1018 (1985).
 4 BesselI
 ?expressions functions BesselI
-?functions BesselI
 ?BesselI
 #BesselI(nu,z) & real, complex & \gpCX & $I_{\nu}(z)$ modified Bessel function of the first kind\\
 %BesselI(nu,z) @ real, complex @ modified Bessel function I_nu of the first kind
@@ -1999,7 +2004,6 @@ C marker below is used to signal this to doc2html:
  Sandia National Laboratoris, SAND85-1018 (1985).
 4 BesselK
 ?expressions functions BesselK
-?functions BesselK
 ?BesselK
 #BesselK(nu,z) & real, complex & \gpCX & $K_{\nu}(z)$ modified Bessel function of the second kind\\
 %BesselK(nu,z) @ real, complex @ modified Bessel function K_nu of the second kind
@@ -2345,6 +2349,15 @@ C marker below is used to signal this to doc2html:
  complex, the imaginary components are ignored. The implementation in gnuplot
  5.5 uses code from the Cephes library [Moshier 1989, "Methods and Programs
  for Mathematical Functions", Prentice-Hall].
+
+4 Invigamma
+?expressions functions invigamma
+?invigamma
+ The inverse incomplete gamma function `invigamma(a,p)` returns the value
+ z such that p = igamma(a,z).
+ p is limited to (0;1]. a is limited to positive real values.
+ The implementation in gnuplot has relative accuracy that ranges from 
+ 1.e-16 for a<1 to 5.e-6 for a = 1.e10.  Convergence may fail for a < 0.005.
 
 4 LambertW
 ?expressions functions LambertW

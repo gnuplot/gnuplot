@@ -460,6 +460,7 @@ Igamma(complex double a, complex double z)
     if (z == 0.0)
 	return 0.0;
 
+    errno = 0;
     initialize_underflow("Igamma");
 
 #if (0)
@@ -519,8 +520,10 @@ Igamma(complex double a, complex double z)
 	    pn6 = b * pn4 - an * pn2;
 
 	    /* Serious overflow */
-	    if (isnan(cabs(pn5)) || isnan(cabs(pn6)))
+	    if (isnan(cabs(pn5)) || isnan(cabs(pn6))) {
 		int_warn(NO_CARET, "Igamma: overflow");
+		return -1.0;
+	    }
 
 	    if (pn6 != 0.0) {
 		rn = pn5 / pn6;
@@ -553,10 +556,9 @@ Igamma(complex double a, complex double z)
 	for (i = 0, aa = a, an = b = 1.0; i <= 1000; i++) {
 	    aa += 1.0;
 	    an *= z / aa;
+	    handle_underflow( "Igamma", an );
 	    b += an;
 	    retval = arg * b;
-
-	    handle_underflow( "Igamma", retval );
 
 	    if (cabs(an) < cabs(b) * IGAMMA_PRECISION)
 		return retval;
@@ -564,7 +566,9 @@ Igamma(complex double a, complex double z)
     }
 
     /* Convergence failed */
-    int_warn(NO_CARET, "no convergence after %d iterations", i);
+    if (!errno)
+	int_warn(NO_CARET, "Igamma: no convergence after %d iterations residual %g",
+		i, cabs(an));
     return -1.0;
 }
 
