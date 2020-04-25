@@ -806,7 +806,7 @@ b_getpixel(unsigned int x, unsigned int y)
 {
     unsigned int row;
     unsigned char mask;
-    unsigned short value=0; /* HBB 991123: initialize! */
+    unsigned int value=0; /* HBB 991123: initialize! */
     int i;
 
     if (b_rastermode) {
