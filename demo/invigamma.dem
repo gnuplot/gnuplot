@@ -1,0 +1,50 @@
+#
+# Unit test for inverse incomplete gamma integral
+#
+# z = invigamma( a, p )
+# p = igamma( a, z )
+#
+# Domain restrictions
+# 	0 < p <= 1
+#       a > 0
+
+set title "Inverse normalized lower incomplete gamma function"
+set xrange [0:1]
+set yrange [0:8]
+set xlabel "p"
+set ylabel "invigamma( a, p )"
+set key outside box opaque invert reverse Left
+set grid
+set tics scale 0
+set sample 500
+
+plot invigamma( 0.5, x ) title "a = 0.5", \
+     invigamma( 1.0, x ) title "a = 1.0", \
+     invigamma( 1.5, x ) title "a = 1.5", \
+     invigamma( 2.0, x ) title "a = 2.0"
+
+pause -1 "<cr> to continue"
+reset 
+
+set title "Residual after igamma(invigamma(a,p))"
+set xlabel "p"
+set ylabel "residual"
+
+residual(a,p) =  igamma( a, invigamma(a,p) ) - p
+
+set xrange [0:1]
+
+do for [E=10:-2:-1] {
+    plot residual( 10**E, x ) title sprintf("a = %g", 10**E)
+    pause .5
+}
+
+pause -1 "<cr> to continue"
+
+E = -3
+set title "Residual after igamma(invigamma(a,p))" .\
+          "\nNumerical overflow/underflow when a < 0.005"
+replot
+
+pause -1 "<cr> to continue"
+reset
