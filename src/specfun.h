@@ -48,6 +48,7 @@ void f_normal(union argument *x);
 void f_inverse_normal(union argument *x);
 void f_inverse_erf(union argument *x);
 void f_inverse_igamma(union argument *x);
+void f_inverse_ibeta(union argument *x);
 void f_lambertw(union argument *x);
 void f_airy(union argument *x);
 void f_expint(union argument *x);

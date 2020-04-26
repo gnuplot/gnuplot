@@ -195,6 +195,7 @@ const struct ft_entry ft[] =
     {"inverf",  f_inverse_erf},
     {"invnorm",  f_inverse_normal},
     {"invigamma", f_inverse_igamma},
+    {"invibeta", f_inverse_ibeta},
     {"asinh",  f_asinh},
     {"acosh",  f_acosh},
     {"atanh",  f_atanh},

@@ -32,13 +32,15 @@
  *		NIST (2002) Ethan Merritt (2003)
  * -	inverse_incomplete_gamma
  *		Ethan Merritt (2020)
+ * -	inverse_incomplete_beta
+ *		Ethan Merritt (2020)
  * -	lambertw
  *		Lambert W function (real domain only)
  *		gnuplot implementation by Gunter Kuhnle based on
  *		algorithm by Keith Briggs
  * -	airy
  *		Airy functions Ai Bi (cephes)
- * -	expintA
+ * -	expint
  *		exponential integral
  *		gnuplot implementation James R Van Zandt 2010
  * -	besin iv iv_asymptotic ikv_asymptotic_uniform
@@ -102,6 +104,14 @@
  */
 #define INCBET	/* Cephes library implementation of ibeta() */
 #undef  IBETA	/* Jos van der Woude implementation of ibeta() */
+
+#ifdef  INCBET
+static double incbet( double a, double b, double z );
+#define ibeta(a,b,z) incbet(a,b,z)
+#endif
+#ifdef IBETA
+static double ibeta(double a, double b, double x);
+#endif
 
 /*
  * EAM Oct 2019:
@@ -181,6 +191,7 @@ static double ranf(struct value * init);
 static double inverse_error_func(double p);
 static double inverse_normal_func(double p);
 static double inverse_incomplete_gamma(double a, double p);
+static double inverse_incomplete_beta(double a, double b, double p);
 static double lambertw(double x);
 #ifndef HAVE_COMPLEX_FUNCS
 static double igamma(double a, double x);
@@ -660,7 +671,6 @@ f_erfc(union argument *arg)
 #ifdef IBETA	/* Original gnuplot ibeta() by Jos van der Woude */
 
 static double confrac(double a, double b, double x);
-static double ibeta(double a, double b, double x);
 
 void
 f_ibeta(union argument *arg)
@@ -2268,12 +2278,6 @@ f_inverse_igamma(union argument *arg)
     } else if (p == 0) {
 	push(Gcomplex(&ret, 0.0, 0.0));
 
-    } else if (debug == 9) {
-	/* use cephes routine instead for comparison */
-	extern double igami( double a, double p );
-	z = igami(a,p);
-	push(Gcomplex(&ret, z, 0.0));
-
     /* The normal case */
     } else {
 	z = inverse_incomplete_gamma(a,p);
@@ -2282,7 +2286,7 @@ f_inverse_igamma(union argument *arg)
 }
 
 /* Inverse normalized incomplete gamma function
- *   invgamma(a, p) returns z such that igamma(a, z) = p
+ *   invigamma(a, p) returns z such that igamma(a, z) = p
  * Following the logic of Numerical Recipes (6.2.1) we
  * use Halley's method to improve an initial guess at z
  * Ethan A Merritt - April 2020
@@ -2300,8 +2304,8 @@ inverse_incomplete_gamma( double a, double p )
     /* Initial guess based on Abramovitz & Stegun 26.2.22, 26.4.17 */
     if (a > 1.) {
 	double pp = (p < 0.5) ? p : (1.-p);
-	t = sqrt(-2.*log(pp));
 	/* Abramowitz & Stegun 26.2.22 */
+	t = sqrt(-2.*log(pp));
 	z = t - (2.30753 + 0.27061*t) / (1. + 0.99229*t + 0.04481*t*t);
 	if (p < 0.5) z = -z;
 	/* Abramowitz & Stegun 26.4.17 */
@@ -2343,6 +2347,101 @@ inverse_incomplete_gamma( double a, double p )
 
     return z;
 }
+
+/*
+ *   invibeta(a, b, p) returns z such that ibeta(a, b, z) = p
+ */
+void
+f_inverse_ibeta(union argument *arg)
+{
+    struct value ret;
+    double a, b, p;
+    double z;
+
+    (void) arg;
+    p = real(pop(&ret));
+    b = real(pop(&ret));
+    a = real(pop(&ret));
+
+    if (p < 0.0 || p > 1.0)
+	int_warn(NO_CARET, "f_inverse_ibeta: p %g not in domain", p);
+
+    if (p <= 0) {
+	push(Gcomplex(&ret, 0.0, 0.0));
+    } else if (p >= 1) {
+	push(Gcomplex(&ret, 1.0, 0.0));
+
+    /* The normal case */
+    } else {
+	z = inverse_incomplete_beta(a,b,p);
+	push(Gcomplex(&ret, z, 0.0));
+    }
+}
+
+
+/* Inverse normalized incomplete beta function
+ *   invibeta(a, b, p) returns z such that ibeta(a, b, z) = p
+ * Following the logic of Numerical Recipes (6.4) we
+ * use Halley's method to improve an initial guess at z
+ * Ethan A Merritt - April 2020
+ */
+static double
+inverse_incomplete_beta( double a, double b, double p )
+{
+    double err, t, u, w, z;
+    int j;
+
+    const double EPS = sqrt(MACHEP);
+    double afac = LGAMMA(a+b) - LGAMMA(a) - LGAMMA(b);
+
+    /* Initial guess from Abramowitz & Stegun 26.2.22, 26.5.22 */
+    if (a >= 1. && b >= 1.) {
+	double lambda, h;
+	double pp = (p < 0.5) ? p : (1.-p);
+	/* Abramowitz & Stegun 26.2.22 */
+	t = sqrt(-2.*log(pp));
+	z = t - (2.30753 + 0.27061*t) / (1. + 0.99229*t + 0.04481*t*t);
+	if (p < 0.5) z = -z;
+	/* Abramowitz & Stegun 26.5.22 */
+	lambda = (sqrt(z) - 3.) / 6.;
+	h = 2. / ( 1./(2.*a-1.) + 1./(2.*b-1) );
+	w = (z * sqrt(h + lambda) / h)
+	  - (1./(2.*b-1.) - 1./(2.*a-1.)) * (lambda + 5./6. - 2./(3.*h));
+	z = a / (a + b * exp(2.*w));
+
+    /* Initial guess based on NR 6.4.8 */
+    } else {
+	double lna = log( a / (a+b) );
+	double lnb = log( b / (a+b) );
+	t = exp(a * lna) / a;
+	u = exp(b * lnb) / b;
+	w = t + u;
+	if (p < t/w)
+	    z = pow( a*w*p, 1./a );
+	else
+	    z = 1. - pow( b*w*(1.-p), 1./b);
+    }
+
+    /* Halley's method */
+    for (j=0; j<12; j++) {
+	if (z == 0. || z == 1.)
+	    return z;
+	err = ibeta(a,b,z) - p;
+	t = exp( (a-1.)*log(z) + (b-1.)*log(1.-z) + afac );
+	u = err / t;
+	t = u / (1. - 0.5*GPMIN( 1., u*((a-1.)/z - (b-1.)/(1.-z)) ));
+	z -= t;
+	if (z <= 0)
+	    z = 0.5 * (z + t);
+	if (z >= 1)
+	    z = 0.5 * (z + t + 1.);
+	if (fabs(t) < EPS*z  && j > 0)
+	    break;
+    }
+
+    return z;
+}
+
 
 /* Implementation of Lamberts W-function which is defined as
  * w(x)*e^(w(x))=x
@@ -4204,7 +4303,6 @@ static void ikv_temme(double v, double x, double *Iv_p, double *Kv_p)
 #define MAXLOG  8.8029691931113054295988
 #define MINLOG -8.872283911167299960540
 
-static double incbet( double a, double b, double x );
 static double incbd( double a, double b, double x );
 static double incbcf( double a, double b, double x );
 static double pseries( double a, double b, double x );
@@ -4307,13 +4405,13 @@ incbet( double aa, double bb, double xx )
 
     if ( (bb * xx) <= 1.0 && xx <= 0.95) {
 	t = pseries(aa, bb, xx);
-	    goto done;
+	goto done;
     }
 
     w = 1.0 - xx;
 
     /* Reverse a and b if x is greater than the mean. */
-    if ( xx > (aa/(aa+bb)) ) {
+    if ( xx > (aa/(aa+bb))) {
 	reflection = TRUE;
 	a = bb;
 	b = aa;
@@ -4592,9 +4690,4 @@ pseries( double a, double b, double x )
  * ==================== INCBET =====================
  */
 
-
-/* DEBUG
-   Cephes library routine for inverse igamma
- */
-#include "igami.c"
 

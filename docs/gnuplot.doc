@@ -208,6 +208,8 @@ C
 ## See `ibeta`.
 #b New function for the inverse incomplete gamma function.
 ## See `invigamma`.
+#b New function for the inverse incomplete beta function.
+## See `invibeta`.
 #b New complex function LambertW(z,k) returns the kth branch of multivalued
 ## function W_k(z).
 ## Note that existing function lambertw(x) = real(LambertW( real(z), 0 )).
@@ -1342,6 +1344,7 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>igamma(a,z)</td>    <td>real</td>    <td>igamma(<i>a>0,z</i>), igamma function of complex <a>a>0</a>,<i>z</i>)</td></tr>
 ^<tr>    <td>imag(x)</td>    <td>complex</td>    <td>Im(<i>x</i>), imaginary part of <i>x</i> as a real number</td></tr>
 ^<tr>    <td>int(x)</td>    <td>real</td>    <td>integer part of <i>x</i>, truncated toward zero</td></tr>
+^<tr>    <td>invibeta(a,b,p)</td>    <td>0<p<1</td>    <td>inverse incomplete beta function</td></tr>
 ^<tr>    <td>invigamma(a,p)</td>    <td>0<p<1</td>    <td>inverse incomplete gamma function</td></tr>
 ^<tr>    <td>invnorm(x)</td>    <td>any</td>    <td>inverse normal distribution function real(<i>x</i>)</td></tr>
 ^<tr>    <td>LambertW(z,k)</td> <td>complex, int</td> <td>kth branch of complex Lambert W function</td></tr>
@@ -1740,6 +1743,10 @@ C marker below is used to signal this to doc2html:
 %invnorm(x)@ ~~ @inverse normal distribution function real($x$)
  The `invnorm(x)` function returns the inverse cumulative normal (Gaussian)
  distribution function of the real part of its argument.  See `norm`.
+
+4 invibeta
+#invibeta(a,b,p) & real & ~ &  inverse incomplete beta function  \\
+%invibeta(a,b,p)@ real @inverse incomplete beta function
 
 4 invigamma
 #invigamma(a,p) & real & ~ &  inverse incomplete gamma function  \\
@@ -2341,6 +2348,15 @@ C marker below is used to signal this to doc2html:
  The convergence of these algorithms is poor for Real(z) < 0.
  If the series does not converge to within 1.E-14, NaN is returned.
 
+4 Invigamma
+?expressions functions invigamma
+?invigamma
+ The inverse incomplete gamma function `invigamma(a,p)` returns the value
+ z such that p = igamma(a,z).
+ p is limited to (0;1]. a is limited to positive real values.
+ The implementation in gnuplot has relative accuracy that ranges from 
+ 1.e-16 for a<1 to 5.e-6 for a = 1.e10.  Convergence may fail for a < 0.005.
+
 4 Ibeta
 ?expressions functions ibeta
 ?ibeta
@@ -2350,14 +2366,12 @@ C marker below is used to signal this to doc2html:
  5.5 uses code from the Cephes library [Moshier 1989, "Methods and Programs
  for Mathematical Functions", Prentice-Hall].
 
-4 Invigamma
-?expressions functions invigamma
-?invigamma
- The inverse incomplete gamma function `invigamma(a,p)` returns the value
- z such that p = igamma(a,z).
- p is limited to (0;1]. a is limited to positive real values.
- The implementation in gnuplot has relative accuracy that ranges from 
- 1.e-16 for a<1 to 5.e-6 for a = 1.e10.  Convergence may fail for a < 0.005.
+4 Invibeta
+?expressions functions invibeta
+?invibeta
+ The inverse incomplete beta function `invibeta(a,b,p)` returns the value
+ z such that p = ibeta(a,b,z).
+ a, b are limited to positive real values.
 
 4 LambertW
 ?expressions functions LambertW
