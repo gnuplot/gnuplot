@@ -1231,10 +1231,14 @@ b_boxfill(
     unsigned int w, unsigned int h)
 {
     unsigned int ix, iy;
-    int pixcolor, actpix, pat, mask, idx, bitoffs;
+    int pixcolor, pat, mask, idx, bitoffs;
     unsigned char *fillbitmap;
+    TBOOLEAN transparent = FALSE;
 
     switch (style & 0xf) {
+    case FS_TRANSPARENT_SOLID:
+	transparent = TRUE;
+	// fall-through
     case FS_SOLID:
 	/* use halftone fill pattern according to filldensity */
 	/* filldensity is from 0..100 percent */
@@ -1246,6 +1250,9 @@ b_boxfill(
 	fillbitmap = fill_halftone_bitmaps[idx];
 	pixcolor = b_value;
 	break;
+    case FS_TRANSPARENT_PATTERN:
+	transparent = TRUE;
+	// fall-through
     case FS_PATTERN:
 	/* use fill pattern according to fillpattern */
 	idx = (style >> 4);  /* fillpattern is enumerated */
@@ -1253,6 +1260,11 @@ b_boxfill(
 	    idx = 0;
 	idx %= fill_pattern_num;
 	fillbitmap = fill_pattern_bitmaps[idx];
+	pixcolor = b_value;
+	break;
+    case FS_DEFAULT:
+	/* Fill with current color, wherever it came from */
+	fillbitmap = fill_halftone_bitmaps[fill_halftone_num - 1];
 	pixcolor = b_value;
 	break;
     case FS_EMPTY:
@@ -1265,19 +1277,16 @@ b_boxfill(
     /* this implements a primitive raster generator, which plots the */
     /* bitmaps point by point calling b_setpixel(). Perhaps someone */
     /* will implement a more efficient solution */
-    bitoffs = 0;
     for (iy = y; iy < y + h; iy++) { /* box height */
-	pat = fillbitmap[bitoffs % fill_bitmap_width];
-	bitoffs++;
-	mask = 1 << (fill_bitmap_width - 1);
+	bitoffs = iy % fill_bitmap_width;
+	pat = fillbitmap[bitoffs];
 	for (ix = x; ix < x + w; ix++) { /* box width */
+	    mask = 1 << (ix % fill_bitmap_width);
 	    /* actual pixel = 0 or color, according to pattern */
-	    actpix = (pat & mask) ? pixcolor : 0;
-	    mask >>= 1;
-	    if (mask == 0) {
-		mask = 1 << (fill_bitmap_width - 1);
-	    }
-	    b_setpixel(ix, iy, actpix);
+	    if (pat & mask)
+		b_setpixel(ix, iy, pixcolor);
+	    else if (!transparent)
+		b_setpixel(ix, iy, 0);
 	}
     }
 

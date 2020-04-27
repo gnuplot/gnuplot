@@ -883,8 +883,6 @@ SIXEL_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, u
 {
     if (SIXEL_lt == LT_BACKGROUND)
 	return;
-    if (style == FS_DEFAULT)
-	style = FS_OPAQUE;
 
     b_boxfill(style, x1, y1, width, height);
 }
