@@ -1297,10 +1297,51 @@ void
 b_filled_polygon(int points, gpiPoint *corners)
 {
     int nodes, *nodex, px, py, i, j, swap;
+    int style = corners->style;
+    int pixcolor, pat, mask, idx, bitoffs;
+    unsigned char *fillbitmap;
+    TBOOLEAN transparent = FALSE;
+
+    switch (style & 0xf) {
+    case FS_TRANSPARENT_SOLID:
+	transparent = TRUE;
+	// fall-through
+    case FS_SOLID:
+	/* use halftone fill pattern according to filldensity */
+	/* filldensity is from 0..100 percent */
+	idx = GPMAX((int) ((style >> 4) * (fill_halftone_num - 1) / 100), 0);
+	if (idx >= fill_halftone_num)
+	    idx = fill_halftone_num - 1;
+	fillbitmap = fill_halftone_bitmaps[idx];
+	pixcolor = b_value;
+	break;
+    case FS_TRANSPARENT_PATTERN:
+	transparent = TRUE;
+	// fall-through
+    case FS_PATTERN:
+	/* use fill pattern according to fillpattern */
+	idx = GPMAX((style >> 4), 0);  /* fillpattern is enumerated */
+	idx %= fill_pattern_num;
+	fillbitmap = fill_pattern_bitmaps[idx];
+	pixcolor = b_value;
+	break;
+    case FS_DEFAULT:
+	/* Fill with current color, wherever it came from */
+	fillbitmap = fill_halftone_bitmaps[fill_halftone_num - 1];
+	pixcolor = b_value;
+	break;
+    case FS_EMPTY:
+    default:
+	/* fill with background color */
+	fillbitmap = fill_halftone_bitmaps[0];
+	pixcolor = 0;
+    }
 
     nodex = (int *) malloc(sizeof(int) * points);
 
     for (py = 0; py < b_ysize; py++) {
+	bitoffs = py % fill_bitmap_width;
+	pat = fillbitmap[bitoffs];
 
 	nodes = 0;
 	j = points - 1;
@@ -1327,8 +1368,14 @@ b_filled_polygon(int points, gpiPoint *corners)
 	}
 
 	for (i = 0; i < nodes; i += 2) {
-	    for (px = nodex[i]; px < nodex[i + 1]; px++)
-		b_setpixel(px, py, b_value);
+	    for (px = nodex[i]; px < nodex[i + 1]; px++) {
+		mask = 1 << (px % fill_bitmap_width);
+		/* actual pixel = 0 or color, according to pattern */
+		if (pat & mask)
+		    b_setpixel(px, py, pixcolor);
+		else if (!transparent)
+		    b_setpixel(px, py, 0);
+	    }
 	}
     }
 
