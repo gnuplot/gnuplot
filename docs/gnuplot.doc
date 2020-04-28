@@ -227,6 +227,7 @@ C
 #b Complex Hankel functions H1ν(z), H2ν(z) of order ν with complex z.
 ## See `BesselH1`.
 #b Complex Airy functions Ai(z), Bi(z).
+#b Complex exponential integral of order n. See `expint`.
 #end
 
 4 New plot styles and style options
@@ -1685,13 +1686,8 @@ C marker below is used to signal this to doc2html:
  The `exp(x)` function returns `e` raised to the power of x, which can be
  an integer, real, or complex value.
 4 expint
-?expressions functions expint
-?expint
 #expint(n,x) & int $n\ge0$, real $x\ge0$ & ~ & $E_n(x)=\int_1^\infty t^{-n} e^{-xt}\,dt$,  exponential integral of $x$ \\
 %expint(n,x)@ ~~ @$E sub n (x)$, exponential integral function of $x$
- The `expint(n,x)` function returns the exponential integral of the real
- part of its argument: integral from 1 to infinity of t^(-n) e^(-tx) dt.
- n must be a nonnegative integer, x>=0, and either x>0 or n>1.
 4 floor
 ?expressions functions floor
 ?floor
@@ -1703,7 +1699,6 @@ C marker below is used to signal this to doc2html:
  greater than the real part of its argument.
 4 gamma
 ?expressions functions gamma
-?gamma
 #gamma(x) &  ~~  & ~ & $\Gamma(x)$, gamma function of real($x$) \\
 %gamma(x)@ ~~ @$GAMMA ( roman real (x))$, gamma function of real ($x$)
  The `gamma(x)` function returns the gamma function of the real part of its
@@ -2018,6 +2013,8 @@ C marker below is used to signal this to doc2html:
  for real argument nu and complex argument z.
  Supported via external library containing routines by Donald E. Amos,
  Sandia National Laboratoris, SAND85-1018 (1985).
+#expint(n,z) & int $n>0$, complex $z$ & \gpCX & $E_n(z)=\int_1^\infty t^{-n} e^{-zt}\,dt$,  exponential integral\\
+%expint(n,z)@ int n>0, complex @$E sub n (z)$, complex exponential integral function
 #\hline \end{longtable}
 #%% begin dummy tabular because the @end processing wants to end one
 #\begin{tabular}{|lcl|}
@@ -2326,7 +2323,23 @@ C marker below is used to signal this to doc2html:
  than 1, while `k` must lie between -1 and 1 (exclusive).  Note that by
  definition EllipticPi(0,k) == EllipticK(k) for all possible values of `k`.
 
+4 Expint
+?expressions functions expint
+?expint
+ `expint(n,z)` returns the exponential integral of order n, where n is an
+ integer >= 0.  This is the integral from 1 to infinity of t^(-n) e^(-tz) dt.
+
+ If your copy of gnuplot was built with support for complex functions from
+ the Amos library, then the evaluation uses Amos routine cexint
+ [Amos 1990 Algorithm 683, ACM Trans Math Software 16:178].
+ In this case z may be any complex number with -pi < arg(z) <= pi.
+ Note that cexint does not permit evaluation with n = 0.
+
+ If n is 0, or if Amos library support is not present, then z is limited to
+ real values z >= 0.
+
 4 Gamma
+?gamma
  `gamma(x)` returns the gamma function of the real part of its argument.
  For integer n, gamma(n+1) = n!.  If the argument is a complex value,
  the imaginary component is ignored. For complex arguments see `lnGamma`.

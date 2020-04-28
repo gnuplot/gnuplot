@@ -175,6 +175,7 @@ const struct ft_entry ft[] =
     {"log",  f_log},
     {"besi0",  f_besi0},
     {"besi1",  f_besi1},
+    {"besin",  f_besin},
     {"besj0",  f_besj0},
     {"besj1",  f_besj1},
     {"besjn",  f_besjn},
@@ -211,8 +212,11 @@ const struct ft_entry ft[] =
     {"Hankel1", f_Hankel1},	/* Amos version from libopenspecfun */
     {"Hankel2", f_Hankel2},	/* Amos version from libopenspecfun */
 #endif
+#ifdef HAVE_CEXINT
+    {"expint",  f_amos_cexint},	/* Amos algorithm 683 from libamos */
+#else
     {"expint",  f_expint},	/* Jim Van Zandt, 20101010 */
-    {"besin",  f_besin},
+#endif
 
 #ifdef HAVE_COMPLEX_FUNCS
     {"igamma", f_Igamma},	/* Complex igamma(a,z) */

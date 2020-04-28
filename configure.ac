@@ -103,16 +103,31 @@ if test "${with_libcerf}" = yes ; then
 fi
 
 AC_ARG_WITH(amos,dnl
-[  --without-amos          without special functions from amos library (default enabled)],,
-  [test -z "${with_amos}" && with_amos=yes])
+[  --with-amos[=DIR]           location of libamos or libopenspecfun (complex functions)],,
+  with_amos=yes)
 
-if test "${with_amos}" = yes ; then
+if test -d "$with_amos"; then
+  LIBAMOS_LDFLAGS=-L$with_amos
+fi
+
+if test "${with_amos}" != no ; then
+  _ldflags="$LDFLAGS"
+  LDFLAGS="$LDFLAGS $LIBAMOS_LDFLAGS"
+  AC_MSG_CHECKING( for amos libraries using LDFLAGS: $LDFLAGS )
+
   dnl The Amos routines (D. E. Amos, Sandia National Laboratories) calculate
   dnl Bessel and related functions with complex argument and nonnegative order.
   dnl These routines exist in various library packages including libopenspecfun.
-  AC_SEARCH_LIBS([zairy_], [openspecfun],
+  AC_SEARCH_LIBS([zairy_], [amos openspecfun],
       [AC_DEFINE([HAVE_AMOS], 1, [define if you have a library of Amos special functions])
-      have_openspecfun=yes]
+      have_amoslibrary=yes]
+  )
+  dnl The Amos routine cexint (Complex exponential integral) is not in the general
+  dnl collection of Bessel functions so it may or may not be present in the same
+  dnl library as the others.
+  AC_SEARCH_LIBS([cexint_], [amos openspecfun],
+      [AC_DEFINE([HAVE_CEXINT], 1, [define if you have Amos function cexint])
+      have_cexint=yes && LIBS="$LIBS -L/home/local/lib64"]
   )
 fi
 
@@ -1383,10 +1398,15 @@ else
   AC_MSG_RESULT([  cerf() and other special functions: no (libcerf not found)])
 fi
 
-if test "$have_libopenspecfun" = yes; then
-  AC_MSG_RESULT([  Airy functions from libopenspecfun: yes])
+if test "$have_amoslibrary" = yes; then
+  AC_MSG_RESULT([  Airy and Bessel functions from libopenspecfun or libamos: yes])
 else
-  AC_MSG_RESULT([  Ai and Bi not supported: (libopenspecfun not found)])
+  AC_MSG_RESULT([  Library containing Amos routines for complex functions not found])
+fi
+if test "$have_cexint" = yes; then
+  AC_MSG_RESULT([  Complex exponential integral cexint from libamos: yes])
+else
+  AC_MSG_RESULT([  Complex exponential integral cexint from libamos: no])
 fi
 
 if test "$have_external_functions" = yes; then

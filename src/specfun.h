@@ -58,6 +58,7 @@ void f_besin(union argument *x);
 void f_igamma(union argument *x);
 #endif
 double chisq_cdf(int dof, double chisqr);
+double expint(double n, double z);
 
 #ifndef HAVE_LIBCERF
 void f_voigt(union argument *x);

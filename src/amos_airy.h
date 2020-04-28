@@ -18,3 +18,6 @@ void f_amos_BesselY (union argument *x);
 void f_Hankel1 (union argument *x);
 void f_Hankel2 (union argument *x);
 #endif
+
+/* CEXINT is in libamos but not in libopenspecfun */
+void f_amos_cexint (union argument *x);

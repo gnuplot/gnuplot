@@ -10,16 +10,28 @@
  * The zairy_() routine (note Fortran naming and parameter passing conventions)
  * is found, for example, in libopenspecfun.  We use it to calculate Ai(z).
  * Similarly zbiry_() is used to calcualte Bi(z).
- * The cairy() routine (note C naming but Fortran parameter passing)
- * is from my own build of the AMOS routines.
  *
- * IERR codes from libamos
+ * The cexint_() routine is also from the AMOS collection, but is not part
+ * of the Bessel function subset and not included in libopenspecfun.
+ * I could not find source for a version of the source that splits the
+ * real and imaginary parts of the arguments as with the zxxxx.f Bessel
+ * routines; this one accepts and returns a CMPLX argument rather than separate
+ * real and imaginary parts.
+ *             D. E. Amos, ALGORITHM 683  A Portable FORTRAN Subroutine
+ *             for Exponential Integrals of a Complex Argument
+ *             ACM Trans. Math. Software 16:178-182 (1990)
+ *
+ * IERR codes from libamos Bessel functions
  *	0	no error
  *	1	input error, no computation
  *	2	overflow predicted from input value
  *	3	overflow from computation
  *	4	input value out of range, no computation
  *	5	other error
+ * IERR codes from cexint
+ *	2	underflow
+ *	4-5	argument reduction caused loss of significance
+ *	6	failed to converge
  *
  * Ethan A Merritt - March 2020
  */
@@ -45,6 +57,16 @@ extern void zbesk_( double *zr, double *zi, double *nu, int32_t *kode, int32_t *
 extern void zbesy_( double *zr, double *zi, double *nu, int32_t *kode, int32_t *length,
 		    double *zbr, double *zbi, int32_t *underflow,
 		    double *wr, double *wi, int32_t *ierr);
+
+#if defined(HAVE_CEXINT) && defined(HAVE_COMPLEX_H)
+#include <complex.h>
+#include <specfun.h>	/* for fallback to expint() */
+#include <util.h>	/* for int_error() */
+
+extern void cexint_( double complex *z, int32_t *norder, int32_t *kode,
+		     double *tol, int32_t *length,
+		     double complex *cy, int32_t *ierr);
+#endif
 
 void
 f_amos_Ai(union argument *arg)
@@ -73,6 +95,7 @@ f_amos_Ai(union argument *arg)
     if (underflow != 0 || ierr != 0) {
 	FPRINTF((stderr,"zairy( {%.3f, %.3f} ): underflow = %d   ierr = %d\n",
 		z.real, z.imag, underflow, ierr));
+	undefined = TRUE;
 	Gcomplex(&a, not_a_number(), 0.0);
     } else {
 	Gcomplex(&a, ai.real, ai.imag);
@@ -108,6 +131,7 @@ f_amos_Bi(union argument *arg)
     if (ierr != 0) {
 	FPRINTF((stderr,"zbiry( {%.3f, %.3f} ): ierr = %d\n",
 		z.real, z.imag, ierr));
+	undefined = TRUE;
 	Gcomplex(&a, not_a_number(), 0.0);
     } else {
 	Gcomplex(&a, bi.real, bi.imag);
@@ -157,6 +181,7 @@ f_amos_BesselK(union argument *arg)
     if (ierr != 0) {
 	FPRINTF((stderr,"zbesk( {%.3f, %.3f} ): ierr = %d\n",
 		z.real, z.imag, ierr));
+	undefined = TRUE;
 	Gcomplex(&a, not_a_number(), 0.0);
     } else {
 	Gcomplex(&a, Bk[0].real, Bk[0].imag);
@@ -208,6 +233,7 @@ f_amos_Hankel(int k, union argument *arg)
     if (ierr != 0) {
 	FPRINTF((stderr,"zbesh( {%.3f, %.3f} ): ierr = %d\n",
 		z.real, z.imag, ierr));
+	undefined = TRUE;
 	Gcomplex(&a, not_a_number(), 0.0);
     } else {
 	Gcomplex(&a, H[0].real, H[0].imag);
@@ -265,6 +291,7 @@ f_amos_BesselI(union argument *arg)
     if (ierr != 0) {
 	FPRINTF((stderr,"zbesi( {%.3f, %.3f} ): ierr = %d\n",
 		z.real, z.imag, ierr));
+	undefined = TRUE;
 	Gcomplex(&a, not_a_number(), 0.0);
     } else {
 	Gcomplex(&a, Bi[0].real, Bi[0].imag);
@@ -315,6 +342,7 @@ f_amos_BesselJ(union argument *arg)
     if (ierr != 0) {
 	FPRINTF((stderr,"zbesj( {%.3f, %.3f} ): ierr = %d\n",
 		z.real, z.imag, ierr));
+	undefined = TRUE;
 	Gcomplex(&a, not_a_number(), 0.0);
     } else {
 	Gcomplex(&a, Bj[0].real, Bj[0].imag);
@@ -367,6 +395,7 @@ f_amos_BesselY(union argument *arg)
     if (ierr != 0) {
 	fprintf(stderr,"zbesy( {%.3f, %.3f} ): ierr = %d\n",
 		z.real, z.imag, ierr);
+	undefined = TRUE;
 	Gcomplex(&a, not_a_number(), 0.0);
     } else {
 	Gcomplex(&a, By[0].real, By[0].imag);
@@ -375,6 +404,65 @@ f_amos_BesselY(union argument *arg)
     push(&a);
 }
 
+#if defined(HAVE_CEXINT) && defined(HAVE_COMPLEX_H)
+
+void
+f_amos_cexint(union argument *arg)
+{
+    struct value a;
+    double complex z, cy;
+    double tolerance;
+    int32_t norder, kode, length, ierr;
+
+    (void) arg;		/* avoid -Wunused warning */
+    pop(&a);		/* complex z */
+
+    kode = 1;		/* 1 = unscaled   2 = scaled */
+    length = NJ;	/* number of members in the returned sequence of functions */
+    tolerance = 1.e-8;	/* FIXME: not sure what is reasonable to ask for */
+
+    if (a.type == INTGR) {
+	z = (double)a.v.int_val;
+    } else {
+	z = a.v.cmplx_val.real + I * a.v.cmplx_val.imag;
+    }
+    if (carg(z) < -M_PI || carg(z) > M_PI)
+	int_error(NO_CARET, "cexint requires arg(z) in [-pi:pi]");
+
+    pop(&a);		/* integer norder */
+    if (a.type == INTGR)
+	norder = a.v.int_val;
+    if (a.type != INTGR || norder < 0)
+	int_error(NO_CARET, "cexint supports only integer n > 0");
+
+    /* Special case for n = 0.  cexint requires n > 0 so in this case
+     * we revert to the real-only implementation.
+     */
+    if (norder == 0 && cimag(z) == 0) {
+	double y = expint(0, creal(z));
+	if (y <= -1)
+	    undefined = TRUE;
+	push(Gcomplex(&a, y, 0.0));
+	return;
+    }
+
+    /* Fortran calling conventions! */
+    cexint_( &z, &norder, &kode, &tolerance, &length, &cy, &ierr );
+
+    /* ierr == 2 means underflow, in which case cy has already been set to 0 */
+    if (ierr == 1 || ierr > 2) {
+	FPRINTF((stderr, "f_amos_cexint( %d, {%g, %g} ): ierr = %d\n",
+		norder, creal(z), cimag(z), ierr));
+	undefined = TRUE;
+	Gcomplex(&a, not_a_number(), 0.0);
+    } else {
+	Gcomplex(&a, creal(cy), cimag(cy));
+    }
+
+    push(&a);
+}
+
+#endif
 
 
 #undef NJ

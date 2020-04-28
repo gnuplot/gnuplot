@@ -200,7 +200,6 @@ static double igamma_GL(double a, double x);
 #ifndef HAVE_LIBCERF
 static double humlik(double x, double y);
 #endif
-static double expint(double n, double x);
 #ifndef LGAMMA
 static int ISNAN(double x);
 static int ISFINITE(double x);
@@ -3490,7 +3489,7 @@ f_airy(union argument *arg)
  * Copyright (c) 2010 James R. Van Zandt, jrvz@comcast.net
  */
 
-static double
+double
 expint(double n, double z)
 {
     double y; /* the answer */
@@ -3585,9 +3584,19 @@ f_expint(union argument *arg)
     struct value a;
     double n, x;
 
-    (void) arg;                        /* avoid -Wunused warning */
-    x = real(pop(&a));
-    n = real(pop(&a));
+    (void) arg;		/* avoid -Wunused warning */
+
+    /* Domain limited to real x >= 0 */
+    pop(&a);
+    if (a.type == CMPLX && a.v.cmplx_val.imag != 0.0)
+	int_error(NO_CARET, "the copy of gnuplot does not support complex expint");
+    x = real(&a);
+
+    /* n must be nonnegative integer */
+    pop(&a);
+    if (a.type != INTGR)
+	int_error(NO_CARET, "order of expint must be nonnegative integer");
+    n = a.v.int_val;
 
     x = expint(n, x);
     if (x <= -1)
