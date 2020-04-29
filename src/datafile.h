@@ -52,7 +52,8 @@ enum DF_STATUS {
     DF_FOUND_KEY_TITLE = -6,
     DF_KEY_TITLE_MISSING = -7,
     DF_STRINGDATA = -8,
-    DF_COLUMN_HEADERS = -9
+    DF_COLUMN_HEADERS = -9,
+    DF_COMPLEX_VALUE = -10
 };
 
 /* large file support (offsets potentially > 2GB) */

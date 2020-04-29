@@ -123,6 +123,15 @@ int plot3d_num=0;
 static int last_iteration_in_first_pass = INT_MAX;
 
 /*
+ * It is a common mistake to try to plot a complex-valued function
+ * without reducing it to some derived real value like abs(f(z)).
+ * When this happens the user gets a not entirely obvious error message
+ * "All point z value undefined".  Try to distinguish this by counting
+ * complex values as we go.
+ */
+static int n_complex_values = 0;
+
+/*
  * sp_alloc() allocates a surface_points structure that can hold 'num_iso_1'
  * iso-curves with 'num_samp_2' samples and 'num_iso_2' iso-curves with
  * 'num_samp_1' samples.
@@ -998,6 +1007,11 @@ get_3ddata(struct surface_points *this_plot)
 		cp->type = UNDEFINED;
 		goto come_here_if_undefined;
 	    }
+	    if (j == DF_COMPLEX_VALUE) {
+		cp->type = UNDEFINED;
+		n_complex_values++;
+		goto come_here_if_undefined;
+	    }
 	    cp->type = INRANGE;	/* unless we find out different */
 
 	    /* EAM Oct 2004 - Substantially rework this section */
@@ -1472,7 +1486,13 @@ calculate_set_of_isolines(
 
 	    evaluate_at(plot_func.at, &a);
 
-	    if (undefined || (fabs(imag(&a)) > zero)) {
+	    if (fabs(imag(&a)) > zero) {
+		points[i].type = UNDEFINED;
+		n_complex_values++;
+		continue;
+	    }
+
+	    if (undefined) {
 		points[i].type = UNDEFINED;
 		continue;
 	    }
@@ -1542,6 +1562,11 @@ eval_3dplots()
 
     /* Assume that the input data can be re-read later */
     volatile_data = FALSE;
+
+    /* Track complex values so that we can warn about trying to plot
+     * a complex-valued function directly.
+     */
+    n_complex_values = 0;
 
     /* Normally we only need to initialize pm3d quadrangles if pm3d mode is active */
     /* but there are a few special cases that use them outside of pm3d mode.       */
@@ -2606,6 +2631,10 @@ eval_3dplots()
     if (plot_num == 0 || first_3dplot == NULL) {
 	int_error(c_token, "no functions or data to plot");
     }
+
+    /* Is this too severe? */
+    if (n_complex_values > 3)
+	int_warn(NO_CARET, "Did you try to plot a complex-valued function?");
 
     if (nonlinear(&axis_array[FIRST_X_AXIS])) {
 	/* Transfer observed data or function ranges back to primary axes */

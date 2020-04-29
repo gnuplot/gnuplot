@@ -89,6 +89,13 @@ static struct coordinate *stackheight = NULL; /* Scratch space for y autoscale *
 
 static int paxis_start, paxis_end, paxis_current;	/* PARALLELPLOT bookkeeping */
 
+/* If the user tries to plot a complex-valued function without reducing it to
+ * some derived value like abs(f(z)), it generates a non-obvious error message
+ * "all points y value undefined". Try to detect this case by counting complex
+ * values as they are encountered so that a better error message is possible.
+ */
+static int n_complex_values = 0;
+
 /* function implementations */
 
 /*
@@ -654,6 +661,10 @@ get_data(struct curve_points *current_plot)
 		      df_line_number, df_filename ? df_filename : "");
 	    continue;
 
+	case DF_COMPLEX_VALUE:
+	    n_complex_values++;
+	    fprintf(stderr,"plot2d.c:%d caught a complex value\n",__LINE__);
+	    /* Fall through to normal undefined case */
 	case DF_UNDEFINED:
 	    /* Version 5 - We are now trying to pass back all available info even
 	     * if one of the requested columns was missing or undefined.
@@ -2020,6 +2031,9 @@ eval_plots()
     /* Assume that the input data can be re-read later */
     volatile_data = FALSE;
 
+    /* Track complex values so that we can warn about trying to plot them */
+    n_complex_values = 0;
+
     /* ** First Pass: Read through data files ***
      * This pass serves to set the xrange and to parse the command, as well
      * as filling in every thing except the function data. That is done after
@@ -3299,9 +3313,15 @@ eval_plots()
 			(void) Gcomplex(&plot_func.dummy_values[0], x, 0.0);
 			evaluate_at(plot_func.at, &a);
 
-			/* Imaginary values are treated as UNDEFINED */
-			if (undefined || (fabs(imag(&a)) > zero)) {
+			if (undefined) {
 			    this_plot->points[i].type = UNDEFINED;
+			    continue;
+			}
+
+			/* Imaginary values are treated as UNDEFINED */
+			if ((fabs(imag(&a)) > zero)) {
+			    this_plot->points[i].type = UNDEFINED;
+			    n_complex_values++;
 			    continue;
 			}
 
@@ -3476,6 +3496,10 @@ eval_plots()
     if (plot_num == 0 || first_plot == NULL) {
 	int_error(c_token, "no functions or data to plot");
     }
+
+    /* Is this too severe? */
+    if (n_complex_values > 3)
+	int_warn(NO_CARET, "Did you try to plot a complex-valued function?");
 
     if (!uses_axis[FIRST_X_AXIS] && !uses_axis[SECOND_X_AXIS])
 	if (first_plot->plot_type == NODATA)
