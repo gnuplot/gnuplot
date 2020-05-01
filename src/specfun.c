@@ -193,6 +193,7 @@ static double inverse_normal_func(double p);
 static double inverse_incomplete_gamma(double a, double p);
 static double inverse_incomplete_beta(double a, double b, double p);
 static double lambertw(double x);
+static double expint(double n, double x);
 #ifndef HAVE_COMPLEX_FUNCS
 static double igamma(double a, double x);
 static double igamma_GL(double a, double x);

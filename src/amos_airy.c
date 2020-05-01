@@ -60,7 +60,6 @@ extern void zbesy_( double *zr, double *zi, double *nu, int32_t *kode, int32_t *
 
 #if defined(HAVE_CEXINT) && defined(HAVE_COMPLEX_H)
 #include <complex.h>
-#include <specfun.h>	/* for fallback to expint() */
 #include <util.h>	/* for int_error() */
 
 extern void cexint_( double complex *z, int32_t *norder, int32_t *kode,
@@ -433,16 +432,14 @@ f_amos_cexint(union argument *arg)
     if (a.type == INTGR)
 	norder = a.v.int_val;
     if (a.type != INTGR || norder < 0)
-	int_error(NO_CARET, "cexint supports only integer n > 0");
+	int_error(NO_CARET, "cexint requires integer n >= 0");
 
-    /* Special case for n = 0.  cexint requires n > 0 so in this case
-     * we revert to the real-only implementation.
+    /* Special case for n = 0.
+     * E0(z) = exp(-z)/z by definition, so just return that
      */
-    if (norder == 0 && cimag(z) == 0) {
-	double y = expint(0, creal(z));
-	if (y <= -1)
-	    undefined = TRUE;
-	push(Gcomplex(&a, y, 0.0));
+    if (norder == 0) {
+	cy = cexp(-z)/z;
+	push(Gcomplex(&a, creal(cy), cimag(cy)));
 	return;
     }
 

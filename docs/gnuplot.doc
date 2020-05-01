@@ -2013,8 +2013,8 @@ C marker below is used to signal this to doc2html:
  for real argument nu and complex argument z.
  Supported via external library containing routines by Donald E. Amos,
  Sandia National Laboratoris, SAND85-1018 (1985).
-#expint(n,z) & int $n>0$, complex $z$ & \gpCX & $E_n(z)=\int_1^\infty t^{-n} e^{-zt}\,dt$,  exponential integral\\
-%expint(n,z)@ int n>0, complex @$E sub n (z)$, complex exponential integral function
+#expint(n,z) & int $n\geq0$, complex $z$ & \gpCX & $E_n(z)=\int_1^\infty t^{-n} e^{-zt}\,dt$,  exponential integral\\
+%expint(n,z)@ int n>=0, complex @$E sub n (z)$, complex exponential integral function
 #\hline \end{longtable}
 #%% begin dummy tabular because the @end processing wants to end one
 #\begin{tabular}{|lcl|}
@@ -2330,13 +2330,12 @@ C marker below is used to signal this to doc2html:
  integer >= 0.  This is the integral from 1 to infinity of t^(-n) e^(-tz) dt.
 
  If your copy of gnuplot was built with support for complex functions from
- the Amos library, then the evaluation uses Amos routine cexint
+ the Amos library, then for n>0 the evaluation uses Amos routine cexint
  [Amos 1990 Algorithm 683, ACM Trans Math Software 16:178].
  In this case z may be any complex number with -pi < arg(z) <= pi.
- Note that cexint does not permit evaluation with n = 0.
+ expint(0,z) is calculated as exp(-z)/z.
 
- If n is 0, or if Amos library support is not present, then z is limited to
- real values z >= 0.
+ If Amos library support is not present, z is limited to real values z >= 0.
 
 4 Gamma
 ?gamma
