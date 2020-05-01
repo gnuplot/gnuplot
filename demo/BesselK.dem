@@ -12,7 +12,7 @@ set yrange [0:10]
 set sample 201
 
 set title "Modified Bessel functions of the second kind"
-plot for [K=0:5] BesselK(K,x) title sprintf("Bessel K_{%d}(x)",K)
+plot for [K=0:5] BesselK(K,x) lw 3 title sprintf("Bessel K_{%d}(x)",K)
 
 pause -1 "Hit return to continue"
 

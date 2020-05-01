@@ -18,10 +18,10 @@ set grid
 set tics scale 0
 set sample 500
 
-plot invigamma( 0.5, x ) title "a = 0.5", \
-     invigamma( 1.0, x ) title "a = 1.0", \
-     invigamma( 1.5, x ) title "a = 1.5", \
-     invigamma( 2.0, x ) title "a = 2.0"
+plot invigamma( 0.5, x ) lw 3 title "a = 0.5", \
+     invigamma( 1.0, x ) lw 3 title "a = 1.0", \
+     invigamma( 1.5, x ) lw 3 title "a = 1.5", \
+     invigamma( 2.0, x ) lw 3 title "a = 2.0"
 
 pause -1 "<cr> to continue"
 reset 
@@ -29,6 +29,7 @@ reset
 set title "Residual after igamma(invigamma(a,p))"
 set xlabel "p"
 set ylabel "residual"
+set sample 200
 
 residual(a,p) =  igamma( a, invigamma(a,p) ) - p
 
@@ -43,7 +44,7 @@ pause -1 "<cr> to continue"
 
 E = -3
 set title "Residual after igamma(invigamma(a,p))" .\
-          "\nNumerical overflow/underflow when a < 0.005"
+          "\nSuffers from numerical overflow/underflow when a < 0.005"
 replot
 
 pause -1 "<cr> to continue"

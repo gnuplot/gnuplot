@@ -823,6 +823,27 @@ plot $CURVE smooth path with filledcurves closed title "smooth path with filledc
      $LOOP  with points pt 7 lc "steelblue" notitle
 reset
 
+# Plotting modulus and phase of complex functions
+#
+set output out.'figure_E0' . ext
+set label "{/:Italic E_0(z)}" at graph 0,0,1.1
+unset tics; unset key
+set xtics ("0\nReal(z)" 0) left out nomirror scale 1.5 offset 0,-0.3
+set ytics ("0\nImag(z)" 0) left out nomirror scale 1.5 offset 0,-0.3
+set view 60,35
+set palette model HSV defined (0 0 1 1, 1 1 1 1)
+set cbrange [-pi:pi]
+set cbtics ("-π" -pi, "π" pi, "phase" 0) scale 0
+set pm3d corners2color c1
+E0(z) = exp(-z)/z
+I = {0,1}
+set urange [-1:2];set vrange [-2:2]
+set sample 51; set isosample 51
+set xyplane 0
+
+splot '++' using 1:2:(abs(E0(x+I*y))):(arg(E0(x+I*y))) with pm3d
+reset
+
 # close last file
 unset outp
 
