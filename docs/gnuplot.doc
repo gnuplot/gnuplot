@@ -13565,7 +13565,9 @@ Ffigure_multiple_keys
  The `set style fill` command is used to set the default style of the plot
  elements in plots with boxes, histograms, candlesticks and filledcurves.
  This default can be superseded by fillstyles attached to individual plots.
- See also 'set style rectangle'.
+
+ Note that there is a separate default fill style for rectangle objects.
+ See `set style rectangle`.
 
  Syntax:
        set style fill {empty
@@ -13573,7 +13575,7 @@ Ffigure_multiple_keys
                        | {transparent} pattern {<n>}}
                       {border {lt} {lc <colorspec>} | noborder}
 
- The default fillstyle is `empty`.
+ The `empty` option causes filled areas not to be filled. This is the default.
 
  The `solid` option causes filling with a solid color, if the terminal
  supports that. The <density> parameter specifies the intensity of the
@@ -13588,8 +13590,6 @@ Ffigure_multiple_keys
  depend on the terminal driver.  If multiple datasets using filled boxes are
  plotted, the pattern cycles through all available pattern types, starting
  from pattern <n>, much as the line type cycles for multiple line plots.
-
- The `empty` option causes filled boxes not to be filled. This is the default.
 
 ?fillcolor
 ?fc
