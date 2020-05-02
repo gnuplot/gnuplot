@@ -5,6 +5,7 @@ Changes not in 5.4
 * NEW "splot ... with pm3d fc palette <name>" uses a saved colormap
 * NEW "plot ... with image fc palette <name>" uses a saved colormap
 * NEW support XDG base directory as location for gnuplotrc preferences file
+* NEW up to 256 colors with the sixeltek terminal
 * CHANGE account for font size when estimating string extents
 
 Changes in 5.4

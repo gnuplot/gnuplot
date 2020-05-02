@@ -710,6 +710,7 @@ SIXEL_text()
 {
     int i, j, k, l, ic, n, pr, no;
     char c, pc;
+    unsigned * map;
 
     /* initialization to Sixel mode and pixel aspect ratio,
        but do not change the background */
@@ -724,19 +725,24 @@ SIXEL_text()
 	           (int) (((SIXEL_palette[k].rgbval & 0x0000ff) * 100./255.)) );
     }
 
+    map = gp_alloc(6 * b_xsize * sizeof(unsigned), "sixeltek");
     for (j = b_ysize - 6; j >= 0; j -= 6) {
+	// get pixel values only once
+	for (i = 0; i < b_xsize; i++)
+	    for (l = 0; l < 6; l++)
+		map[i * 6 + l] = b_getpixel(i, j + l);
 	for (k = 1; k <= SIXEL_ncol; k++) {
 	    no = 0; /* for finite line records (VMS) */
 	    pr = 0;
 	    pc = '\0';
 	    n = 0;
 	    for (i = 0; i < b_xsize; i++) {
-		ic = (b_getpixel(i, j    ) == k ? 32 : 0) +
-		     (b_getpixel(i, j + 1) == k ? 16 : 0) +
-		     (b_getpixel(i, j + 2) == k ?  8 : 0) +
-		     (b_getpixel(i, j + 3) == k ?  4 : 0) +
-		     (b_getpixel(i, j + 4) == k ?  2 : 0) +
-		     (b_getpixel(i, j + 5) == k ?  1 : 0);
+		unsigned mask = 0x20;
+		ic = 0;
+		for (l = 0; l < 6; l++) {
+		    ic |= (map[i * 6 + l] == k) ? mask : 0;
+		    mask >>= 1;
+		}
 		c = (char) (ic + 63);
 		if (c == pc && i != b_xsize - 1) {
 		    n++;
@@ -776,6 +782,7 @@ SIXEL_text()
 	  fputs("$\n", gpoutfile);
       }
     }
+    free(map);
 
     /* get out of Sixel mode */
 #ifndef VMS
