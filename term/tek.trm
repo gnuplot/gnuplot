@@ -172,7 +172,6 @@ TERM_PUBLIC void SIXEL_options(void);
 TERM_PUBLIC void SIXEL_init(void);
 TERM_PUBLIC void SIXEL_reset(void);
 TERM_PUBLIC void SIXEL_text(void);
-TERM_PUBLIC void SIXEL_setfont(void);
 TERM_PUBLIC void SIXEL_graphics(void);
 TERM_PUBLIC void SIXEL_linetype(int linetype);
 TERM_PUBLIC void SIXEL_dashtype(int type, t_dashtype *custom_dash_type);
@@ -495,6 +494,9 @@ SEL_reset()
 
 #include "bitmap.h"
 
+static int SIXEL_findslot(int rgbval);
+static void SIXEL_setfont(void);
+
 #define SIXEL_XMAX  (640)
 #define SIXEL_YMAX  (480)
 #define SIXEL_VCHAR (FNT5X9_VCHAR)
@@ -524,7 +526,8 @@ struct SIXEL_colorspec {
 #define SIXEL_NCOL (16)
 static struct SIXEL_colorspec SIXEL_palette[SIXEL_NCOL];
 
-static int SIXEL_findslot(int rgbval)
+static int
+SIXEL_findslot(int rgbval)
 {
     int i, iopt;
     int d1, d2, dist, dopt;
@@ -560,7 +563,7 @@ static int SIXEL_findslot(int rgbval)
 	d1 = (SIXEL_palette[i].rgbval & 0x00ff00) >> 8;
 	d2 = (rgbval & 0x00ff00) >> 8;
 	dist += (d1 - d2) * (d1 - d2);
-	d1 = (SIXEL_palette[i].rgbval & 0x0000ff) >> 16;
+	d1 = (SIXEL_palette[i].rgbval & 0x0000ff);
 	d2 = (rgbval & 0x0000ff);
 	dist += (d1 - d2) * (d1 - d2);
 	if (dist < dopt) {
@@ -792,7 +795,7 @@ SIXEL_text()
 }
 
 
-TERM_PUBLIC void
+static void
 SIXEL_setfont()
 {
     switch (SIXEL_font) {
