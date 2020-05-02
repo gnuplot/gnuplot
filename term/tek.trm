@@ -508,8 +508,12 @@ static void SIXEL_setfont(void);
 #define SIXEL_COL_DEFINED 1
 #define SIXEL_COL_USED 2
 
+/* This is the _maximum_ number of allowed palette entries. */
+#define SIXEL_NCOL 256
+
 static int SIXEL_mode = 1;  // mono=0, color=1
 static int SIXEL_font = 1;  // small=1,medium=2,large=3
+static int SIXEL_ncol = 16; // actual number of colors to be used
 static int SIXEL_lt;
 static int SIXEL_dt;
 static int SIXEL_fp, SIXEL_np;
@@ -519,11 +523,7 @@ struct SIXEL_colorspec {
     int rgbval;
 };
 
-/* the palette may be used for pre-defined, user-defined, and Gnuplot palette colors.
-   set SIXEL_NCOL to 16 and the number of planes in SIXEL_init() to 5 for VT340 and
-   similar Sixel devices, or higher for more recent implementations */
-
-#define SIXEL_NCOL (16)
+/* The palette is used for pre-defined, user-defined, and gnuplot palette colors. */
 static struct SIXEL_colorspec SIXEL_palette[SIXEL_NCOL];
 
 static int
@@ -533,7 +533,7 @@ SIXEL_findslot(int rgbval)
     int d1, d2, dist, dopt;
 
     /* try to find a slot with a matching rgb value */
-    for (i = 0; i < SIXEL_NCOL; i++) {
+    for (i = 0; i < SIXEL_ncol; i++) {
 	if (SIXEL_palette[i].rgbval == rgbval) {
 	    SIXEL_palette[i].state = SIXEL_COL_USED;
 	    return i;
@@ -541,7 +541,7 @@ SIXEL_findslot(int rgbval)
     }
 
     /* if not found, try to find an undefined slot */
-    for (i = 0; i < SIXEL_NCOL; i++) {
+    for (i = 0; i < SIXEL_ncol; i++) {
 	if (SIXEL_palette[i].state == SIXEL_COL_UNDEFINED) {
 	    SIXEL_palette[i].state = SIXEL_COL_USED;
 	    SIXEL_palette[i].rgbval = rgbval;
@@ -551,7 +551,7 @@ SIXEL_findslot(int rgbval)
 
     /* if not found, try to find an unused slot */
     dopt = 0x30000; /* max is 3 times 256 squared */
-    for (i = 0; i < SIXEL_NCOL; i++) {
+    for (i = 0; i < SIXEL_ncol; i++) {
 	if (SIXEL_palette[i].state != SIXEL_COL_USED) {
 	    SIXEL_palette[i].state = SIXEL_COL_USED;
 	    SIXEL_palette[i].rgbval = rgbval;
@@ -578,7 +578,8 @@ SIXEL_findslot(int rgbval)
 
 enum SIXEL_id {
     SIXEL_SMALL, SIXEL_MEDIUM, SIXEL_LARGE,
-    SIXEL_MONOCHROME, SIXEL_COLOR, SIXEL_SIZE,
+    SIXEL_MONOCHROME, SIXEL_COLOR, SIXEL_COLORS,
+    SIXEL_SIZE,
     SIXEL_OTHER
 };
 
@@ -590,6 +591,7 @@ static struct gen_table SIXEL_opts[] =
     { "mo$nochrome", SIXEL_MONOCHROME },
     { "c$olor", SIXEL_COLOR },
     { "c$olour", SIXEL_COLOR },
+    { "colors", SIXEL_COLORS },
     { "size", SIXEL_SIZE },
     { NULL, SIXEL_OTHER }
 };
@@ -618,8 +620,17 @@ SIXEL_options()
 	    break;
 	case SIXEL_COLOR:
 	    SIXEL_mode = 1;
+	    // We do not change number of colors here.
 	    term->flags &= ~TERM_MONOCHROME;
 	    c_token++;
+	    break;
+	case SIXEL_COLORS:
+	    SIXEL_mode = 1;
+	    term->flags &= ~TERM_MONOCHROME;
+	    c_token++;
+	    SIXEL_ncol = real_expression();
+	    if (SIXEL_ncol < 0) SIXEL_ncol = 16;
+	    if (SIXEL_ncol > 256) SIXEL_ncol = 256;
 	    break;
 	case SIXEL_SIZE: {
 	    float width, height;
@@ -656,9 +667,11 @@ SIXEL_options()
 	strcpy(term_options, "large");
 	break;
     }
-
-    sprintf(term_options + strlen(term_options), " %s size %d,%d",
-	SIXEL_mode == 1 ? "color" : "monochrome",
+    if (SIXEL_mode == 0)
+	strcat(term_options, " monochrome");
+    else
+	sprintf(term_options + strlen(term_options), " colors %d", SIXEL_ncol);
+    sprintf(term_options + strlen(term_options), " size %d,%d",
 	term->xmax + 1, term->ymax + 1);
 }
 
@@ -669,11 +682,17 @@ SIXEL_init()
     unsigned int xpixels = term->xmax + 1;
     unsigned int ypixels = term->ymax + 1;
 
-    /* Why 5 planes for VT340?  16 predefined colors only require 4. */
-    /* A usable palette would require 7 or 8 (128 or 256 colors). */
-    /* A pixel is empty, or has any of the standard 16 colors, so there
-       are 17 possibilities, and 5 planes are needed... */
-    b_makebitmap(xpixels, ypixels, 5);
+    /* We count the numbers of planes where we reserve an additional
+       slot to account for "empty" pixels. */
+    int nplanes = 1;
+    int c = SIXEL_ncol + 1;
+    int i;
+    for (i = 0; i < 9; i++) {
+	if (c & 1)
+	    nplanes = i + 1;
+	c >>= 1;
+    }
+    b_makebitmap(xpixels, ypixels, nplanes);
 
     SIXEL_setfont();
 }
@@ -697,7 +716,7 @@ SIXEL_text()
     fprintf(gpoutfile,"\033Pq\"1;1\n");
 
     /* output the actually used rgb colors */
-    for (k = 0; k < SIXEL_NCOL; k++) {
+    for (k = 0; k < SIXEL_ncol; k++) {
 	if (SIXEL_palette[k].state == SIXEL_COL_USED)
 	    fprintf(gpoutfile, "#%d;2;%d;%d;%d\n", k,
 	           (int) (((SIXEL_palette[k].rgbval & 0xff0000) >> 16) * 100./255.),
@@ -706,7 +725,7 @@ SIXEL_text()
     }
 
     for (j = b_ysize - 6; j >= 0; j -= 6) {
-	for (k = 1; k <= SIXEL_NCOL; k++) {
+	for (k = 1; k <= SIXEL_ncol; k++) {
 	    no = 0; /* for finite line records (VMS) */
 	    pr = 0;
 	    pc = '\0';
@@ -751,7 +770,7 @@ SIXEL_text()
 	    }
 	    pc = c;
 	}
-	if (k == SIXEL_NCOL)
+	if (k == SIXEL_ncol)
 	  fputs("-\n", gpoutfile);
 	else if (pr == 2)
 	  fputs("$\n", gpoutfile);
@@ -797,7 +816,7 @@ SIXEL_graphics()
     int i;
 
     b_boxfill(FS_EMPTY, 0, 0, b_xsize, b_ysize);
-    for (i = 0; i < SIXEL_NCOL; i++) {
+    for (i = 0; i < SIXEL_ncol; i++) {
 	struct linestyle_def *this;
 	SIXEL_palette[i].state = SIXEL_COL_UNDEFINED;
 	SIXEL_palette[i].rgbval = 0;
@@ -830,7 +849,7 @@ SIXEL_linetype(int linetype)
 	    i = SIXEL_findslot(0); /* find slot with black color */
 	    b_setvalue(1 + i);
 	} else if (linetype > 0) {
-	    i = linetype % SIXEL_NCOL;
+	    i = linetype % SIXEL_ncol;
 	    b_setvalue(1 + i);
 	} else {
 	    b_setlinetype(0);
@@ -865,7 +884,7 @@ SIXEL_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, u
 
 
 /* the palette defines all colors from the first undefined one;
-   this slot region will be contiguous */
+   this slot region will be continuous */
 
 TERM_PUBLIC int
 SIXEL_make_palette(t_sm_palette *palette)
@@ -875,13 +894,13 @@ SIXEL_make_palette(t_sm_palette *palette)
     if (palette == NULL) {
 	/* If we already have a palette, overwrite it */
 	if (SIXEL_fp > 0) {
-	    for (i = SIXEL_fp; i < SIXEL_NCOL; i++)
+	    for (i = SIXEL_fp; i < SIXEL_ncol; i++)
 		SIXEL_palette[i].state = SIXEL_COL_UNDEFINED;
 	    // return SIXEL_np;
 	}
 
-	SIXEL_np = SIXEL_NCOL;
-	for (SIXEL_fp = 0; SIXEL_fp < SIXEL_NCOL; SIXEL_fp++) {
+	SIXEL_np = SIXEL_ncol;
+	for (SIXEL_fp = 0; SIXEL_fp < SIXEL_ncol; SIXEL_fp++) {
 	    if (SIXEL_palette[SIXEL_fp].state != SIXEL_COL_UNDEFINED)
 		SIXEL_np--;
 	    else
@@ -1399,15 +1418,19 @@ START_HELP(tek40)
 "?term sixeltek",
 "?sixeltek",
 " Syntax:",
-"    set terminal sixeltek {<fontsize>} {color|mono} {size <x>,<y>}",
+"    set terminal sixeltek {<fontsize>} {color|colors <n>|mono} {size <x>,<y>}",
 "",
 " The `sixel` output format was originally used by DEC terminals and printers.",
+" This driver supports palette images with a maximum of 256 colors. The default",
+" is 16 which can be changed using the `colors` option.",
+"",
+" The font size can be specified as `small`, `medium` or `large`.",
+"",
 " For use with xterm emulation, xterm must be compiled/configured with",
 " \"--enable-sixel-graphics\" and started with \"-ti 340\" on the command line.",
-" Menu option \"sixelScrolling\" should be selected. xterm/vt340 emulation",
-" limits plots to 16 simultaneous colors, but other emulators may permit more.",
+" The menu option \"sixelScrolling\" should be selected.",
 "",
-" Note that gnuplot also supports another sixel output terminal, sixelgd,",
+" Note that gnuplot also supports another sixel output terminal, `sixelgd`,",
 " that offers more options and features."
 #endif
 #ifdef BITGRAPH
