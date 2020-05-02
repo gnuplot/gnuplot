@@ -977,7 +977,9 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
 	 * from generating an error claiming redundant line properties.
 	 */
 	if ((destination_class == LP_NOFILL || destination_class == LP_ADHOC)
-	&&  (equals(c_token,"fc") || almost_equals(c_token,"fillc$olor")))
+	&&  (equals(c_token,"fc") || almost_equals(c_token,"fillc$olor"))
+	&&  (!almost_equals(c_token+1, "pal$ette"))
+	   )
 	    break;
 
 	if (equals(c_token,"lc") || almost_equals(c_token,"linec$olor")
