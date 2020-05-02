@@ -508,8 +508,8 @@ static void SIXEL_setfont(void);
 #define SIXEL_COL_DEFINED 1
 #define SIXEL_COL_USED 2
 
-static int SIXEL_mode;
-static int SIXEL_font;
+static int SIXEL_mode = 1;  // mono=0, color=1
+static int SIXEL_font = 1;  // small=1,medium=2,large=3
 static int SIXEL_lt;
 static int SIXEL_dt;
 static int SIXEL_fp, SIXEL_np;
@@ -597,14 +597,6 @@ static struct gen_table SIXEL_opts[] =
 TERM_PUBLIC void
 SIXEL_options()
 {
-    int xpixels = SIXEL_XMAX;
-    int ypixels = SIXEL_YMAX;
-    struct value a;
-    SIXEL_font = 1;
-    SIXEL_mode = 1;
-
-    term_options[0] = NUL;
-
     while (!END_OF_COMMAND) {
 	switch(lookup_table(&SIXEL_opts[0],c_token)) {
 	case SIXEL_SMALL:
@@ -629,30 +621,20 @@ SIXEL_options()
 	    term->flags &= ~TERM_MONOCHROME;
 	    c_token++;
 	    break;
-	case SIXEL_SIZE:
+	case SIXEL_SIZE: {
+	    float width, height;
+
 	    c_token++;
-	    if (END_OF_COMMAND) {
-		term->xmax = SIXEL_XMAX;
-		term->ymax = SIXEL_YMAX;
-	    } else {
-		xpixels = real(const_express(&a));
-		if (equals(c_token, ",")) {
-		    c_token++;
-		    ypixels = real(const_express(&a));
-		    ypixels = (ypixels / 6) * 6; /* multiple of six */
-		}
+	    parse_term_size(&width, &height, PIXELS);
+	    if (width > 0 && height > 0) {
+		term->xmax = width - 1;
+		term->ymax = height - 1;
 	    }
-	    if (xpixels > 0)
-		term->xmax = xpixels;
-	    if (ypixels > 0)
-		term->ymax = ypixels;
 	    break;
+	}
 	case SIXEL_OTHER:
 	default:
-	    /* reset to default, since term is already set */
-	    SIXEL_font = 1;
-	    SIXEL_mode = 1;
-	    int_error(c_token, "expecting: {small, medium, large}, {monochrome, color}, and {size x,y}");
+	    int_error(c_token, "unknown option; expecting: {small, medium, large}, {monochrome, color}, or {size x,y}");
 	    break;
 	}
     }
@@ -663,38 +645,29 @@ SIXEL_options()
     term->h_tic = term->v_tic;
 
     /* setup options string */
-
     switch (SIXEL_font) {
     case 1:
-	strcat(term_options, "small");
+	strcpy(term_options, "small");
 	break;
     case 2:
-	strcat(term_options, "medium");
+	strcpy(term_options, "medium");
 	break;
     case 3:
-	strcat(term_options, "large");
+	strcpy(term_options, "large");
 	break;
     }
 
-    switch (SIXEL_mode) {
-    case 0:
-	strcat(term_options, " monochrome");
-	break;
-    case 1:
-	strcat(term_options, " color");
-	break;
-    }
-
-    sprintf(term_options + strlen(term_options), " size %d,%d",
-	term->xmax, term->ymax);
+    sprintf(term_options + strlen(term_options), " %s size %d,%d",
+	SIXEL_mode == 1 ? "color" : "monochrome",
+	term->xmax + 1, term->ymax + 1);
 }
 
 
 TERM_PUBLIC void
 SIXEL_init()
 {
-    unsigned int xpixels = term->xmax;
-    unsigned int ypixels = term->ymax;
+    unsigned int xpixels = term->xmax + 1;
+    unsigned int ypixels = term->ymax + 1;
 
     /* Why 5 planes for VT340?  16 predefined colors only require 4. */
     /* A usable palette would require 7 or 8 (128 or 256 colors). */
