@@ -791,6 +791,10 @@ HSV_2_RGB(rgb_color *col)
 	return;
     }
 
+    /* Apply HSV offset */
+    h += sm_palette.HSV_offset;
+    if (h > 1.0) h -= 1.0;
+
     h *= 6.;  /* h range in gnuplot is [0,1] and not the usual [0,360] */
     i = floor(h);
     f = h - i;

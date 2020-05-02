@@ -1255,14 +1255,18 @@ C  need @ in table, so end and restart the table !
  The phase angle is given by arg(z).
 
 Ffigure_E0
- Gnuplot's 2D and 3D plot styles expect only real values; to plot a
- complex-valued function f(z) with non-zero imaginary components you must
- specify the real or imaginary component or modulus of phase.
+ Gnuplot's 2D and 3D plot styles expect real values; to plot a complex-valued
+ function f(z) with non-zero imaginary components you must plot the real or
+ imaginary component, or the modulus or phase.
  For example to represent the modulus and phase of a function f(z) with
- complex argument and complex result it is possible to use the modulus
- to define the height of a surface and use the phase to define its color.
+ complex argument and complex result it is possible to use the height of the
+ surface to represent modulus and use the color to represent the phase.
+ By default the color will wrap around from -π to π at hue (H) = 0 (red).
+ You can change this by setting the start point along H to something
+ other than 0.  The example shown starts and wraps at H = 0.3 (green).
+ See `set palette defined`.
 
-      set palette model HSV defined (0 0 1 1, 1 1 1 1)
+      set palette model HSV start 0.3 defined (0 0 1 1, 1 1 1 1)
       set cbrange [-pi:pi]
       set cbtics ("-π" -pi, "π" pi)
       set pm3d corners2color c1
@@ -12786,7 +12790,7 @@ Ffigure_multiple_keys
                     | functions <R>,<G>,<B>
                   }
                   { cubehelix {start <val>} {cycles <val>} {saturation <val>} }
-                  { model { RGB | HSV | CMY } }
+                  { model { RGB | CMY | HSV {start <radians>} } }
                   { positive | negative }
                   { nops_allcF | ps_allcF }
                   { maxcolors <maxcolors> }
@@ -12937,6 +12941,10 @@ Ffigure_multiple_keys
        set palette model HSV
        set palette defined ( 0 0 1 1, 1 1 1 1 )
        set palette defined ( 0 0 1 0, 1 0 1 1, 6 0.8333 1 1, 7 0.8333 0 1)
+
+ Full color HSV spectrum wrapping at some hue other than red
+       set palette model HSV start 0.15
+       set palette defined ( 0 0 1 1, 1 1 1 1 )
 
  Approximate the default palette used by MATLAB:
        set pal defined (1 '#00008f', 8 '#0000ff', 24 '#00ffff', \

@@ -3815,6 +3815,12 @@ set_palette()
 		if (model == C_MODEL_XYZ)
 		    int_warn(c_token,"CIE/XYZ not supported");
 		sm_palette.cmodel = model;
+		if (model == C_MODEL_HSV && equals(c_token+1,"start")) {
+		    c_token += 2;
+		    sm_palette.HSV_offset = real_expression();
+		    sm_palette.HSV_offset = clip_to_01(sm_palette.HSV_offset);
+		    c_token--;
+		}
 		continue;
 	    }
 	    /* ps_allcF: write all rgb formulae into PS file? */

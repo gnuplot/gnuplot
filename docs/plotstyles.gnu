@@ -831,7 +831,7 @@ unset tics; unset key
 set xtics ("0\nReal(z)" 0) left out nomirror scale 1.5 offset 0,-0.3
 set ytics ("0\nImag(z)" 0) left out nomirror scale 1.5 offset 0,-0.3
 set view 60,35
-set palette model HSV defined (0 0 1 1, 1 1 1 1)
+set palette model HSV start 0.3 defined (0 0 1 1, 1 1 1 1)
 set cbrange [-pi:pi]
 set cbtics ("-π" -pi, "π" pi, "phase" 0) scale 0
 set pm3d corners2color c1

@@ -1016,9 +1016,11 @@ set origin %g,%g\n",
       switch( sm_palette.cmodel ) {
 	default:
 	case C_MODEL_RGB: fputs( "RGB ", fp ); break;
-	case C_MODEL_HSV: fputs( "HSV ", fp ); break;
 	case C_MODEL_CMY: fputs( "CMY ", fp ); break;
+	case C_MODEL_HSV: fputs( "HSV ", fp ); break;
       }
+      if (sm_palette.cmodel == C_MODEL_HSV && sm_palette.HSV_offset != 0)
+	fprintf( fp, "start %.2f ", sm_palette.HSV_offset );
       fputs( "\nset palette ", fp );
       switch( sm_palette.colorMode ) {
       default:

@@ -2431,10 +2431,19 @@ show_palette()
 	fputs(" color positions for discrete palette terminals\n", stderr);
 	fputs( "\tColor-Model: ", stderr );
 	switch( sm_palette.cmodel ) {
-	default:
-	case C_MODEL_RGB: fputs( "RGB\n", stderr ); break;
-	case C_MODEL_HSV: fputs( "HSV\n", stderr ); break;
-	case C_MODEL_CMY: fputs( "CMY\n", stderr ); break;
+	    default:
+	    case C_MODEL_RGB:
+		fputs( "RGB\n", stderr );
+		break;
+	    case C_MODEL_CMY:
+		fputs( "CMY\n", stderr );
+		break;
+	    case C_MODEL_HSV:
+		if (sm_palette.HSV_offset != 0)
+		    fprintf(stderr,"HSV start %.2f\n",sm_palette.HSV_offset);
+		else
+		    fputs( "HSV\n", stderr );
+		break;
 	}
 	fprintf(stderr,"\tgamma is %.4g\n", sm_palette.gamma );
 	return;

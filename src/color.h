@@ -190,6 +190,9 @@ typedef struct {
   double cubehelix_cycles;	/* number of times round the colorwheel */
   double cubehelix_saturation;	/* color saturation */
 
+  /* offset for HSV color mapping */
+  double HSV_offset;		/* offset (radians) from colorwheel 0 */
+
 } t_sm_palette;
 
 
