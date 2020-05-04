@@ -1726,7 +1726,7 @@ START_HELP(pdf)
 " [DEPRECATED] This terminal uses the non-free library PDFlib (GmbH Munchen)"
 " to produce files in Portable Document Format. Unless you have a commercial",
 " license for PDFlib and need some special feature it provides you would do",
-" better to use the cairopdf terminal instead.  Gnuplot can also export PDF",
+" better to use the cairo pdf terminal instead.  Gnuplot can also export PDF",
 " files from wxt or qt interactive terminal sessions.",
 "",
 " Syntax:",
