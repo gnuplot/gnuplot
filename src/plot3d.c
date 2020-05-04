@@ -1218,9 +1218,9 @@ get_3ddata(struct surface_points *this_plot)
 
 		} else if (this_plot->fill_properties.border_color.type == TC_COLORMAP
 			&& j >= 4) {
+		    double gray = map2gray(v[--j], this_plot->lp_properties.colormap);
 		    color_from_column(TRUE);
-		    color = rgb_from_colormap(cb2gray(v[--j]),
-						this_plot->lp_properties.colormap);
+		    color = rgb_from_colormap(gray, this_plot->lp_properties.colormap);
 
 		} else if (this_plot->lp_properties.l_type == LT_COLORFROMCOLUMN) {
 		    struct lp_style_type lptmp;

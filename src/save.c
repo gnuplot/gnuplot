@@ -99,6 +99,7 @@ save_all(FILE *fp)
 	save_set_all(fp);
 	save_functions__sub(fp);
 	save_variables__sub(fp);
+	save_colormaps(fp);
 	if (df_filename)
 	    fprintf(fp, "## Last datafile plotted: \"%s\"\n", df_filename);
 	fprintf(fp, "%s\n", replot_line);
@@ -154,13 +155,12 @@ save_variables__sub(FILE *fp)
 
     while (udv) {
 	if (udv->udv_value.type != NOTDEFINED) {
-	    if ((udv->udv_value.type == ARRAY)
-		&& strncmp(udv->udv_name,"ARGV",4)) {
-		fprintf(fp,"array %s[%d]%s = ", udv->udv_name,
-			(int)(udv->udv_value.v.value_array[0].v.int_val),
-			(udv->udv_value.v.value_array[0].type == COLORMAP_ARRAY)
-				? " colormap " : "");
-		save_array_content(fp, udv->udv_value.v.value_array);
+	    if ((udv->udv_value.type == ARRAY) && strncmp(udv->udv_name,"ARGV",4)) {
+		if (udv->udv_value.v.value_array[0].type != COLORMAP_ARRAY) {
+		    fprintf(fp,"array %s[%d] = ", udv->udv_name,
+			(int)(udv->udv_value.v.value_array[0].v.int_val));
+		    save_array_content(fp, udv->udv_value.v.value_array);
+		}
 	    } else if (strncmp(udv->udv_name,"GPVAL_",6)
 		 && strncmp(udv->udv_name,"GPFUN_",6)
 		 && strncmp(udv->udv_name,"MOUSE_",6)
@@ -170,6 +170,30 @@ save_variables__sub(FILE *fp)
 		    fprintf(fp, "%s = ", udv->udv_name);
 		    disp_value(fp, &(udv->udv_value), TRUE);
 		    (void) putc('\n', fp);
+	    }
+	}
+	udv = udv->next_udv;
+    }
+}
+
+void
+save_colormaps(FILE *fp)
+{
+    /* always skip pi */
+    struct udvt_entry *udv = first_udv->next_udv;
+
+    while (udv) {
+	if (udv->udv_value.type != NOTDEFINED) {
+	    if (udv->udv_value.type == ARRAY
+	    &&  udv->udv_value.v.value_array[0].type == COLORMAP_ARRAY) {
+		    double cm_min, cm_max;
+		    fprintf(fp,"array %s[%d] colormap = ", udv->udv_name,
+			(int)(udv->udv_value.v.value_array[0].v.int_val));
+		    save_array_content(fp, udv->udv_value.v.value_array);
+		    get_colormap_range(udv, &cm_min, &cm_max);
+		    if (cm_min != cm_max)
+			fprintf(fp,"set colormap %s range [%g:%g]\n",
+				udv->udv_name, cm_min, cm_max);
 	    }
 	}
 	udv = udv->next_udv;

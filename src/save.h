@@ -49,6 +49,7 @@ extern const char *coord_msg[];
 void save_functions(FILE *fp);
 void save_variables(FILE *fp);
 void save_datablocks(FILE *fp);
+void save_colormaps(FILE *fp);
 void save_set(FILE *fp);
 void save_term(FILE *fp);
 void save_all(FILE *fp);

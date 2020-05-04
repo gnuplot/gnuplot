@@ -375,6 +375,10 @@ show_command()
     case S_COLORBOX:
 	show_colorbox();
 	break;
+    case S_COLORMAP:
+	save_colormaps(stderr);
+	c_token++;
+	break;
     case S_COLORNAMES:
     case S_COLORSEQUENCE:
 	c_token--;

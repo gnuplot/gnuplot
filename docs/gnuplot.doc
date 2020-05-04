@@ -216,7 +216,7 @@ C
 4 Multiple named palettes
 #start
 #b The current palette can be saved to a named colormap for future use.
-## See `set palette save`.
+## See `set colormap`.
 #b pm3d and image plots can specify a previously saved palette by name.
 ## This permits the use of multiple palettes in a single plot command.
 ## See `colorspec palette`.
@@ -3062,10 +3062,11 @@ Ffigure_newsyntax
 
  `fillcolor palette <colormap>` maps the z coordinate of a plot element onto
  a previously saved named colormap instead of using the current palette.
- See `set palette save`.
+ See `set colormap`.
  This option is EXPERIMENTAL. Details may change.
- Mapping z values into the named colormap uses cbrange; there should be some
- method for specifying a separate min/max range for each named colormap.
+ If the colormap has a separate range associated with it, that range is used
+ to map z values analous to the use of cbrange to map the standard palette.
+ If there is no separate range for this colormap then cbrange is used.
 
 4 rgbcolor variable
 ?rgbcolor variable
@@ -8968,6 +8969,45 @@ Ffigure_smooth_path
  dot/dash pattern or linewidth to distinguish linetypes. The `set color`
  command selects the color linetypes.  See `set monochrome`, `set linetype`,
  and `set colorsequence`.
+
+3 Colormap
+?commands set colormap
+?set colormap
+?colormap
+?show colormap
+=alpha channel
+=transparency
+=palette
+ Syntax:
+
+      set colormap new <colormap-name>
+      set colormap <colormap-name> range [<min>:<max>]
+      show colormaps
+
+ `set colormap new <name>` creates a colormap array <name> and loads it from
+ the current palette settings. This saved colormap can be further manipulated
+ as an array of 32-bit ARGB color values and used by name in subsequent plots.
+
+ Here is an example that creates a palette running from dark red to white,
+ saves it to a colormap array named 'Reds', and makes all entries in the
+ colormap partially transparent.  This named colormap is then used later
+ to color a pm3d surface.
+ Note that the alpha channel value in a named colormap follows the convention
+ for ARGB line properties; i.e 0 is opaque 0xff is fully transparent.
+
+      set palette defined (0 "dark-red", 1 "white")
+      set colormap new Reds
+      do for [i=1:|Reds|] { Reds[i] = Reds[i] | 0x3F000000 }
+      splot func(x,y) with pm3d fillcolor palette Reds
+
+ The mapping of z values onto the colormap can be tuned by setting minimum and
+ maximum z values that correspond to the end points.  For example
+
+      set colormap Reds range [0:10]
+
+ If no range is set, or if min and max are the same, then the mapping uses the
+ current limits of cbrange. See `set cbrange`.  
+
 3 colorsequence
 ?commands set colorsequence
 ?set colorsequence
@@ -12394,7 +12434,6 @@ Ffigure_multiple_keys
                   { nops_allcF | ps_allcF }
                   { maxcolors <maxcolors> }
                 }
-      set palette save <colormap name>
 
  `set palette` (i.e. without options) restores the default values.
  Otherwise, the options can be given in any order.
@@ -12402,9 +12441,6 @@ Ffigure_multiple_keys
  `show palette` lists the current palette properties.
 
  `test palette` displays the current palette on the screen.
-
- `set palette save <name>` creates a colormap for the current palette and saves
- it into a named colormap array for later use.
 
  The following options determine the coloring properties.
 
@@ -12695,29 +12731,6 @@ Ffigure_multiple_keys
  Usage:
      awk -f pm3dCompress.awk thefile.ps >smallerfile.ps
      awk -f pm3dConvertToImage.awk thefile.ps >smallerfile.ps
-
-4 save <colormap>
-?set palette save
-?palette save
-?colormap
-=alpha channel
-=transparency
-
- `set palette save <name>` creates a colormap array <name> and loads it from
- the current palette settings. This saved colormap can be further manipulated
- as an array of 32-bit ARGB color values and used by name in subsequent plots.
-
- This example creates a palette running from dark red to white, saves it to
- a colormap array named 'Reds', and makes all entries in the colormap
- partially transparent.  This named colormap is then used later to color
- a pm3d surface.  Note that the alpha channel value in a named colormap
- follows the convention for ARGB line properties; i.e 0 is opaque 0xff is
- fully transparent.
-
-      set palette defined (0 "dark-red", 1 "white")
-      set palette save Reds
-      do for [i=1:|Reds|] { Reds[i] = Reds[i] | 0x3F000000 }
-      splot func(x,y) with pm3d fillcolor palette Reds
 
 3 parametric
 ?commands set parametric

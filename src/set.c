@@ -166,11 +166,14 @@ static int assign_arrowstyle_tag(void);
 static void set_tic_prop(struct axis *);
 static void set_mttics(struct axis *this_axis);
 
+static void set_colormap(void);
+static void new_colormap(void);
+static void set_colormap_range(void);
+
 static void check_palette_grayscale(void);
 static int set_palette_defined(void);
 static void set_palette_file(void);
 static void set_palette_function(void);
-static void save_palette(void);
 static void parse_histogramstyle(histogram_style *hs,
 				t_histogram_type def_type, int def_gap);
 static void set_style_parallel(void);
@@ -248,6 +251,9 @@ set_command()
 	case S_COLOR:
 	    unset_monochrome();
 	    c_token++;
+	    break;
+	case S_COLORMAP:
+	    set_colormap();
 	    break;
 	case S_COLORSEQUENCE:
 	    set_colorsequence(0);
@@ -3815,9 +3821,6 @@ set_palette()
 		--c_token;
 		continue;
 	    }
-	    case S_PALETTE_SAVE:
-		save_palette();
-		continue;
 
 	    } /* switch over palette lookup table */
 	    int_error(c_token,"invalid palette option");
@@ -3834,13 +3837,29 @@ set_palette()
 
 #undef CHECK_TRANSFORM
 
-/* 'set palette save <colormap>'
+/*
+ * V5.5 EXPERIMENTAL
+ * set colormap new <colormap-name>
+ * set colormap <colormap-name> range [min:max]
+ */
+void
+set_colormap()
+{
+    c_token++;
+    if (equals(c_token, "new")) {
+	new_colormap();
+    } else if (equals(c_token+1, "range")) {
+	set_colormap_range();
+    }
+}
+
+/* 'set colormap new <colormap>'
  * saves color mapping of current palette into an array that can later be used
  * to substitute for the main palettes, as in 
  *    splot foo with pm3d fc palette <colormap>
  */
 static void
-save_palette(void)
+new_colormap(void)
 {
     struct udvt_entry *array;
     struct value *A;
@@ -3861,12 +3880,25 @@ save_palette(void)
     array->udv_value.type = ARRAY;
 
     /* Element zero of the new array is not visible but contains the size
-     * All other elements contain a 24 or 32 bit [A]RGB color value
-     * generated from the current palette.
      */
     A = array->udv_value.v.value_array;
     A[0].v.int_val = colormap_size;
     A[0].type = COLORMAP_ARRAY;
+
+    /* FIXME: Leverage the known structure of value.v as a union
+     *        to overload both the colormap value as v.int_val
+     *        and the min/max range as v.cmplx_val.imag
+     *        There is nothing wrong with this in terms of available
+     *        storage, but a new member field of the union would be cleaner.
+     * Initialize to min = max = 0, which means use current cbrange.
+     * A different min/max can be written later via set_colormap();
+     */
+    A[1].v.cmplx_val.imag = 0.0;	/* min */
+    A[2].v.cmplx_val.imag = 0.0;	/* max */
+
+    /* All other elements contain a 24 or 32 bit [A]RGB color value
+     * generated from the current palette.
+     */
     for (i = 0; i < colormap_size; i++) {
 	gray = (double)i / (colormap_size-1);
 	if (sm_palette.positive == SMPAL_NEGATIVE)
@@ -3877,6 +3909,35 @@ save_palette(void)
 	A[i+1].type = INTGR;
 	A[i+1].v.int_val = (int)rgb255.r<<16 | (int)rgb255.g<<8 | (int)rgb255.b;
     }
+}
+
+/* set colormap <colormap-name> range [min:max]
+ * FIXME: parsing the bare colormap name rather than a string works
+ *        but that means you can't put the name in a variable.
+ */
+static void
+set_colormap_range()
+{
+    struct udvt_entry *udv = add_udv(c_token);
+    struct value *colormap;
+    double cm_min, cm_max;
+
+    if (udv->udv_value.type != ARRAY
+    ||  udv->udv_value.v.value_array[0].type != COLORMAP_ARRAY)
+	int_error(c_token, "not a colormap");
+    colormap = udv->udv_value.v.value_array;
+
+    if (!equals(++c_token,"range") || !equals(++c_token,"["))
+	int_error(c_token, "syntax: set colormap <name> range [min:max]");
+    c_token++;
+    cm_min = real_expression();
+    c_token++;
+    cm_max = real_expression();
+    if (!equals(c_token,"]"))
+	int_error(c_token, "syntax: set colormap <name> range [min:max]");
+    c_token++;
+    colormap[1].v.cmplx_val.imag = cm_min;
+    colormap[2].v.cmplx_val.imag = cm_max;
 }
 
 /* process 'set colorbox' command */

@@ -230,7 +230,13 @@ void draw_color_smooth_box(int plot_mode);
 */
 void f_hsv2rgb(union argument *);
 void f_palette(union argument *);
+
+/*
+ * Support for colormaps (named palettes)
+ */
 unsigned int rgb_from_colormap(double gray, udvt_entry *colormap);
+double map2gray(double z, udvt_entry *colormap);
+void get_colormap_range( udvt_entry *colormap, double *cm_min, double *cm_max );
 
 #endif /* COLOR_H */
 

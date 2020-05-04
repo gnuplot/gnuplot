@@ -70,9 +70,9 @@ pause -1 "<cr> to continue"
 set title "pm3d coloring using two named colormap palettes"
 
 set palette defined (0 "turquoise", 1 "dark-green")
-set palette save water
+set colormap new water
 set palette defined (0 "yellow", 1 "red") negative
-set palette save flame
+set colormap new flame
 
 set pm3d implicit
 set pm3d depthorder

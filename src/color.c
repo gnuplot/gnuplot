@@ -665,6 +665,32 @@ f_palette(union argument *arg)
 }
 
 /*
+ * A colormap can have specific min/max stored internally,
+ * but otherwise we use the current cbrange
+ */
+double
+map2gray(double z, udvt_entry *colormap)
+{
+    double gray;
+    double cm_min, cm_max;
+
+	get_colormap_range(colormap, &cm_min, &cm_max);
+	if (cm_min == cm_max)
+	    gray = cb2gray(z);
+	else
+	    gray = (z - cm_min) / (cm_max - cm_min);
+
+    return gray;
+}
+
+void
+get_colormap_range( udvt_entry *colormap, double *cm_min, double *cm_max )
+{
+	*cm_min = colormap->udv_value.v.value_array[1].v.cmplx_val.imag;
+	*cm_max = colormap->udv_value.v.value_array[2].v.cmplx_val.imag;
+}
+
+/*
  * gray is in the interval [0:1]
  * colormap is an ARRAY containing a palette of 32-bit ARGB values
  */

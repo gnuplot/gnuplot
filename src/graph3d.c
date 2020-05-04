@@ -4027,9 +4027,10 @@ check3d_for_variable_color(struct surface_points *plot, struct coordinate *point
 	apply_pm3dcolor(&(plot->lp_properties.pm3d_color));
 	break;
     case TC_COLORMAP:
-	if (plot->lp_properties.colormap)
-	    set_rgbcolor_var( rgb_from_colormap( cb2gray(point->CRD_COLOR),
-					plot->lp_properties.colormap) );
+	if (plot->lp_properties.colormap) {
+	    double gray = map2gray(point->CRD_COLOR, plot->lp_properties.colormap);
+	    set_rgbcolor_var( rgb_from_colormap(gray, plot->lp_properties.colormap) );
+	    }
 	break;
     default:
 	/* The other cases were taken care of already */

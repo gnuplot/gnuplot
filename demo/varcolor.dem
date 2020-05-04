@@ -80,11 +80,11 @@ pause -1 'Hit <cr> to continue'
 set title "variable color using multiple named palettes"
 
 set palette defined (0 "gray90", 1 "dark-blue")
-set palette save blues
+set colormap new blues
 set palette defined (0 "dark-red", 1 "yellow" )
-set palette save flame
+set colormap new flame
 set palette cubehelix
-set palette save ch
+set colormap new ch
 unset colorbox
 
 set for [i=1:10] linetype i lw 2.0
