@@ -41,6 +41,7 @@
 #include "datablock.h"
 #include "encoding.h"
 #include "eval.h"
+#include "getcolor.h"
 #include "graph3d.h"
 #include "hidden3d.h"
 #include "interpol.h"
@@ -1203,10 +1204,28 @@ get_3ddata(struct surface_points *this_plot)
 		&&  this_plot->fill_properties.border_color.value < 0) {
 		    color_from_column(TRUE);
 		    color = v[--j];
+
+		} else if (this_plot->fill_properties.border_color.type == TC_Z
+			&& j >= 4) {
+		    rgb255_color rgbcolor;
+		    unsigned int rgb;
+		    rgb255maxcolors_from_gray(cb2gray(v[--j]), &rgbcolor);
+		    rgb = (unsigned int)rgbcolor.r << 16
+			| (unsigned int)rgbcolor.g << 8
+			| (unsigned int)rgbcolor.b;
+		    color_from_column(TRUE);
+		    color = rgb;
+
+		} else if (this_plot->fill_properties.border_color.type == TC_COLORMAP
+			&& j >= 4) {
+		    color_from_column(TRUE);
+		    color = rgb_from_colormap(cb2gray(v[--j]),
+						this_plot->lp_properties.colormap);
+
 		} else if (this_plot->lp_properties.l_type == LT_COLORFROMCOLUMN) {
 		    struct lp_style_type lptmp;
-		    color_from_column(TRUE);
 		    load_linetype(&lptmp, (int)v[--j]);
+		    color_from_column(TRUE);
 		    color = lptmp.pm3d_color.lt;
 		}
 
