@@ -9651,7 +9651,7 @@ Ffigure_missing
  On most systems this is controlled by the environmental variables
  LC_ALL, LC_CTYPE, or LANG.  This mechanism is necessary, for example, to
  pass multibyte character encodings such as UTF-8 or EUC_JP to the wxt
- and cairopdf terminals.  This command does not affect the locale-specific
+ and pdf terminals.  This command does not affect the locale-specific
  representation of dates or numbers.
  See also `set locale` and `set decimalsign`.
 
@@ -12931,8 +12931,8 @@ Ffigure_multiple_keys
  
  Separate from clipping based on spatial x, y, and z coordinates, quadrangles
  can be rendered or not based on extreme palette color values.
- `clipcb`: (default) palette color values < cbmin are treated as cbmin;
- palette color values > cbmax are treated as cbmax.
+ `clipcb`: (default) palette color values < cbmin are clipped to equal cbmin;
+ palette color values > cbmax are clipped to equal cbmax.
  `noclipcb`: quadrangles with color value outside cbrange are not drawn at all.
 
 4 color_assignment
