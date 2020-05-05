@@ -343,7 +343,27 @@ nearest_ansi(rgb255_color rgb255)
     }
     return best;
 }
-/* end of code libcaca code */
+/* end of libcaca code */
+
+
+static unsigned
+to_ansi256(rgb255_color *c)
+{
+    if ((c->r - 8) / 10 == (c->b - 8) / 10 && (c->r - 8) / 10 == (c->g - 8) / 10) {
+	// gray scale
+	if (c->g < 8) // black
+	    return 16;
+	if (c->g >= 238) // white
+	    return 231;
+	return (c->g - 8) / 10 + 232;  // like XTerm, Mintty
+    } else {
+	// 6x6x6 color cube
+#define RMAPCUBE6(n) ((n >= 55) ? ((n) - 35) / 40 : 0)
+	return (((unsigned) RMAPCUBE6(c->r) * 36) +
+	        ((unsigned) RMAPCUBE6(c->g) *  6) +
+	        ((unsigned) RMAPCUBE6(c->b))) + 16;
+    }
+}
 
 
 static void
@@ -356,15 +376,7 @@ dumb_rgb_color(rgb255_color rgb255, char * colorstring)
 	break;
     }
     case DUMB_ANSI256:
-	if ((rgb255.r / 11 == rgb255.g / 11) && (rgb255.r / 11 == rgb255.b / 11)) {
-	    /* gray level */
-	    sprintf(colorstring, "\033[38;5;%im", 241 + rgb255.r / 11);
-	} else {
-	    rgb255.r /= 43;
-	    rgb255.g /= 43;
-	    rgb255.b /= 43;
-	    sprintf(colorstring, "\033[38;5;%im", 16 + 36 * rgb255.r + 6 * rgb255.g + rgb255.b);
-	}
+	sprintf(colorstring, "\033[38;5;%im", to_ansi256(&rgb255));
 	break;
     case DUMB_ANSIRGB:
 	sprintf(colorstring, "\033[38;2;%i;%i;%im", rgb255.r, rgb255.g, rgb255.b);
@@ -438,7 +450,7 @@ DUMB_text()
 	    memset(&dumb_prev_color, 0, sizeof(t_colorspec));
 	}
 #endif
-    for (x = 0; x < dumb_xmax; x++) {
+	for (x = 0; x < dumb_xmax; x++) {
 	    char *c;
 
 #ifndef NO_DUMB_COLOR_SUPPORT
@@ -615,6 +627,7 @@ DUMB_vector(unsigned int arg_x, unsigned int arg_y)
     dumb_x = x;
     dumb_y = y;
 }
+
 
 static void
 utf8_copy_one(char *dest, char *orig)
