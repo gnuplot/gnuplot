@@ -13715,7 +13715,8 @@ Ffigure_multiple_keys
  The `set style fill` command is used to set the default style of the plot
  elements in plots with boxes, histograms, candlesticks and filledcurves.
  This default can be superseded by fillstyles attached to individual plots.
- See also 'set style rectangle'.
+ Note that there is a separate default fill style for rectangles created by
+ `set obj`. See `set style rectangle`.
 
  Syntax:
        set style fill {empty
