@@ -87,8 +87,8 @@ TERM_PUBLIC void ENHdumb_FLUSH(void);
 #define ENHdumb_put_text NULL
 #endif
 #ifndef NO_DUMB_COLOR_SUPPORT
-TERM_PUBLIC int dumb_make_palette(t_sm_palette *palette);
-TERM_PUBLIC void dumb_set_color(t_colorspec *);
+TERM_PUBLIC int DUMB_make_palette(t_sm_palette *palette);
+TERM_PUBLIC void DUMB_set_color(t_colorspec *);
 #endif
 
 #define DUMB_XMAX 79
@@ -202,8 +202,8 @@ DUMB_options()
 	    c_token++;
 	    dumb_colormode = cmd;
 #ifndef NO_DUMB_COLOR_SUPPORT
-	    term->make_palette = dumb_make_palette;
-	    term->set_color = dumb_set_color;
+	    term->make_palette = DUMB_make_palette;
+	    term->set_color = DUMB_set_color;
 #endif
 	    break;
 	case DUMB_NOCOLOR:
@@ -347,29 +347,80 @@ nearest_ansi(rgb255_color rgb255)
 
 
 static void
-DUMB_rgb_color(rgb255_color rgb255)
+dumb_rgb_color(rgb255_color rgb255, char * colorstring)
 {
     switch (dumb_colormode) {
     case DUMB_ANSI: {
 	unsigned color = nearest_ansi(rgb255);
-	fprintf(gpoutfile, "\033[%i;%im", color >= 8 ? 22 : 1, 30 + (color % 8));
+	sprintf(colorstring, "\033[%i;%im", color >= 8 ? 22 : 1, 30 + (color % 8));
 	break;
     }
     case DUMB_ANSI256:
 	if ((rgb255.r / 11 == rgb255.g / 11) && (rgb255.r / 11 == rgb255.b / 11)) {
 	    /* gray level */
-	    fprintf(gpoutfile, "\033[38;5;%im", 241 + rgb255.r / 11);
+	    sprintf(colorstring, "\033[38;5;%im", 241 + rgb255.r / 11);
 	} else {
 	    rgb255.r /= 43;
 	    rgb255.g /= 43;
 	    rgb255.b /= 43;
-	    fprintf(gpoutfile, "\033[38;5;%im", 16 + 36 * rgb255.r + 6 * rgb255.g + rgb255.b);
+	    sprintf(colorstring, "\033[38;5;%im", 16 + 36 * rgb255.r + 6 * rgb255.g + rgb255.b);
 	}
 	break;
     case DUMB_ANSIRGB:
-	fprintf(gpoutfile, "\033[38;2;%i;%i;%im", rgb255.r, rgb255.g, rgb255.b);
+	sprintf(colorstring, "\033[38;2;%i;%i;%im", rgb255.r, rgb255.g, rgb255.b);
 	break;
     }
+}
+
+
+const char *
+ansi_colorstring(t_colorspec * color, t_colorspec * prev_color)
+{
+    static char colorstring[256];
+
+    colorstring[0] = NUL;
+    switch (color->type) {
+    case TC_LT: {
+	int n;
+
+	if (dumb_colormode < DUMB_ANSI)
+	    break;
+	if (prev_color != NULL && prev_color->type == TC_LT && prev_color->lt == color->lt)
+	    break;
+	n = color->lt + 1;
+	/* map line type to colors */
+	if (n <= 0) {
+	    sprintf(colorstring, "\033[0;39m");  /* normal foreground color */
+	} else {
+	    if (n > 15) n = ((n - 1) % 15) + 1;
+	    sprintf(colorstring, "\033[%i;%im", n > 8 ? 22 : 1, 30 + (n % 8));
+	}
+	break;
+    }
+    case TC_FRAC: {
+	rgb255_color rgb255;
+
+	if (prev_color != NULL && prev_color->type == TC_FRAC && prev_color->value == color->value)
+	    break;
+	rgb255maxcolors_from_gray(color->value, &rgb255);
+	dumb_rgb_color(rgb255, colorstring);
+	break;
+    }
+    case TC_RGB: {
+	rgb255_color rgb255;
+
+	if (prev_color != NULL && prev_color->type == TC_RGB && prev_color->lt == color->lt)
+	    break;
+	rgb255.r = (color->lt >> 16) & 0xff;
+	rgb255.g = (color->lt >>  8) & 0xff;
+	rgb255.b = (color->lt >>  0) & 0xff;
+	dumb_rgb_color(rgb255, colorstring);
+	break;
+    }
+    default:
+	break;
+    }
+    return colorstring;
 }
 #endif
 
@@ -392,51 +443,12 @@ DUMB_text()
 
 #ifndef NO_DUMB_COLOR_SUPPORT
 	    t_colorspec * color = &dumb_colors[dumb_xmax*y + x];
-	    switch (color->type) {
-	    case TC_LT: {
-		int n;
-
-		if (dumb_colormode < DUMB_ANSI)
-		    break;
-		if (dumb_prev_color.type == TC_LT && dumb_prev_color.lt == color->lt)
-		    break;
-		n = color->lt + 1;
-		/* map line type to colors */
-		if (n <= 0) {
-		    fprintf(gpoutfile, "\033[0;39m");  /* normal foreground color */
-		} else {
-		    if (n > 15) n = ((n - 1) % 15) + 1;
-		    fprintf(gpoutfile, "\033[%i;%im", n > 8 ? 22 : 1, 30 + (n % 8));
-		}
-		memcpy(&dumb_prev_color, color, sizeof(t_colorspec));
-		break;
-	    }
-	    case TC_FRAC: {
-		rgb255_color rgb255;
-
-		if (dumb_prev_color.type == TC_FRAC && dumb_prev_color.value == color->value)
-		    break;
-		rgb255maxcolors_from_gray(color->value, &rgb255);
-		DUMB_rgb_color(rgb255);
-		memcpy(&dumb_prev_color, color, sizeof(t_colorspec));
-		break;
-	    }
-	    case TC_RGB: {
-		rgb255_color rgb255;
-
-		if (dumb_prev_color.type == TC_RGB && dumb_prev_color.lt == color->lt)
-		    break;
-		rgb255.r = (color->lt >> 16) & 0xff;
-		rgb255.g = (color->lt >>  8) & 0xff;
-		rgb255.b = (color->lt >>  0) & 0xff;
-		DUMB_rgb_color(rgb255);
-		memcpy(&dumb_prev_color, color, sizeof(t_colorspec));
-		break;
-	    }
-	    default:
-		break;
-	    }
+	    const char * colorstring = ansi_colorstring(color, &dumb_prev_color);
+	    if (colorstring[0] != NUL)
+		fputs(colorstring, gpoutfile);
+	    memcpy(&dumb_prev_color, color, sizeof(t_colorspec));
 #endif
+
 	    c = (char *)(&dumb_matrix[dumb_xmax*y + x]);
 	    /* The UTF-8 character might be four bytes long and so there's
 	       no guarantee that the charcell ends in a NUL. */
@@ -835,7 +847,7 @@ ENHdumb_put_text(unsigned int x, unsigned int y, const char *str)
 
 #ifndef NO_DUMB_COLOR_SUPPORT
 TERM_PUBLIC int
-dumb_make_palette(t_sm_palette *palette)
+DUMB_make_palette(t_sm_palette *palette)
 {
     /* report continuous colors */
     return 0;
@@ -843,7 +855,7 @@ dumb_make_palette(t_sm_palette *palette)
 
 
 TERM_PUBLIC void
-dumb_set_color(t_colorspec *colorspec)
+DUMB_set_color(t_colorspec *colorspec)
 {
     memcpy(&dumb_color, colorspec, sizeof(t_colorspec));
 }
@@ -961,9 +973,9 @@ TERM_TABLE_START(dumb_driver)
 #ifdef USE_MOUSE
     NULL, NULL, NULL, NULL, NULL,
 #endif
-    NULL,	/* Color support sets this to dumb_make_palette */
+    NULL,	/* Color support sets this to DUMB_make_palette */
     NULL, 	/* previous_palette */
-    NULL,	/* Color support sets this to dumb_set_color */
+    NULL,	/* Color support sets this to DUMB_set_color */
     dumb_filled_polygon, /* filled_polygon */
     NULL, /* image */
 #ifndef NO_DUMB_ENHANCED_SUPPORT
