@@ -804,9 +804,11 @@ array_command()
     }
 
     /* Element zero can also hold an indicator that this is a colormap */
+    /* FIXME: more sanity checks?  e.g. all entries INTGR */
     if (equals(c_token, "colormap")) {
 	c_token++;
-	A[0].type = COLORMAP_ARRAY;
+	if (nsize >= 2)	/* Need at least 2 entries to calculate range */
+	    A[0].type = COLORMAP_ARRAY;
     }
 
     /* Initializer syntax:   array A[10] = [x,y,z,,"foo",] */

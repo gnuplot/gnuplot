@@ -3918,14 +3918,11 @@ new_colormap(void)
 static void
 set_colormap_range()
 {
-    struct udvt_entry *udv = add_udv(c_token);
-    struct value *colormap;
+    struct udvt_entry *colormap = get_colormap(c_token);
     double cm_min, cm_max;
 
-    if (udv->udv_value.type != ARRAY
-    ||  udv->udv_value.v.value_array[0].type != COLORMAP_ARRAY)
+    if (!colormap)
 	int_error(c_token, "not a colormap");
-    colormap = udv->udv_value.v.value_array;
 
     if (!equals(++c_token,"range") || !equals(++c_token,"["))
 	int_error(c_token, "syntax: set colormap <name> range [min:max]");
@@ -3936,8 +3933,8 @@ set_colormap_range()
     if (!equals(c_token,"]"))
 	int_error(c_token, "syntax: set colormap <name> range [min:max]");
     c_token++;
-    colormap[1].v.cmplx_val.imag = cm_min;
-    colormap[2].v.cmplx_val.imag = cm_max;
+    colormap->udv_value.v.value_array[1].v.cmplx_val.imag = cm_min;
+    colormap->udv_value.v.value_array[2].v.cmplx_val.imag = cm_max;
 }
 
 /* process 'set colorbox' command */

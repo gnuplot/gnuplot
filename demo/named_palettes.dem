@@ -1,6 +1,6 @@
 #
 # Demonstrate construction and use of a separate palette
-# Ethan A Merritt - Dec 2019
+# Ethan A Merritt - May 2020
 #
 # Method 1:
 #	The first method works in 5.2 but requires "lc rgb variable"
@@ -51,12 +51,14 @@ pause -1 "<cr> to continue"
 #	"set pm3d lighting" also works
 set title "Version 5.5 offers a new keyword to access this palette"
 
-splot '++' using 1:2:(foo($1,$2)) with pm3d fc palette blues\
-           title "pm3d using 1:2:3 with pm3d fc palette blues"
+set palette defined (0 "dark-blue", 1 "white")
+set colormap new bluemap
+splot '++' using 1:2:(foo($1,$2)) with pm3d fc palette bluemap\
+           title "pm3d using 1:2:3 with pm3d fc palette bluemap"
 
 pause -1 "<cr> to continue"
 
-set title "This method allow pm3d interpolation and lighting"
+set title "Named colormaps allow pm3d interpolation and lighting"
 set pm3d interpolate 2,2
 set pm3d lighting
 

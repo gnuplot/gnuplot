@@ -993,24 +993,19 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
 		c_token--;
 		parse_colorspec(&(newlp.pm3d_color), TC_RGB);
 	    } else if (almost_equals(c_token, "pal$ette")) {
-		/* In general an ARRAY will return type UNDEFINED in the test below.
-		 * We can place a special type in there to indicate it's a colormap.
-		 * Note: could call parse_colorspec to check for {z|cb|frac}
+		/* The next word could be any of {z|cb|frac|<colormap-name>}.
+		 * Check first for a colormap name.
 		 */
-		if (type_udv(c_token+1) == ARRAY) {
-		    udvt_entry *colormap = add_udv(c_token+1);
-		    if (colormap->udv_value.v.value_array[0].type != COLORMAP_ARRAY)
-			fprintf(stderr,"size %ld ARRAY %s might not be a colormap\n",
-			    colormap->udv_value.v.value_array[0].v.int_val,
-			    colormap->udv_name);
+		udvt_entry *colormap = get_colormap(c_token+1);
+		if (colormap) {
 		    newlp.pm3d_color.type = TC_COLORMAP;
 		    newlp.colormap = colormap;
 		    set_colormap++;
 		    c_token += 2;
-		    continue;
+		} else {
+		    c_token--;
+		    parse_colorspec(&(newlp.pm3d_color), TC_Z);
 		}
-		c_token--;
-		parse_colorspec(&(newlp.pm3d_color), TC_Z);
 	    } else if (equals(c_token,"bgnd")) {
 		newlp.pm3d_color.type = TC_LT;
 		newlp.pm3d_color.lt = LT_BACKGROUND;
@@ -1626,4 +1621,23 @@ get_image_options(t_image *image)
 	image->fallback = TRUE;
     }
 
+}
+
+/*
+ * Try to interpret the next token in a command line as the name of a colormap.
+ * If it seems to belong to a valid colormap, return a pointer.
+ * Otherwise return NULL.  The caller is responsible for reporting an error.
+ */
+struct udvt_entry *
+get_colormap(int token)
+{
+    udvt_entry *colormap = NULL;
+
+    if (type_udv(token) == ARRAY) {
+	udvt_entry *udv = add_udv(token);
+	if ((udv->udv_value.v.value_array[0].type == COLORMAP_ARRAY)
+	&&  (udv->udv_value.v.value_array[0].v.int_val >= 2))
+	    colormap = udv;
+    }
+    return colormap;
 }
