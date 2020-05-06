@@ -811,8 +811,8 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 
 		if (color_from_rgbvar) /* we were given an RGB color */
 			gray = avgC;
-		else if (private_colormap) /* FIXME: cbrange is not what we want */
-			gray = cb2gray(avgC);
+		else if (private_colormap)
+			gray = map2gray(avgC, private_colormap);
 		else /* transform z value to gray, i.e. to interval [0,1] */
 			gray = cb2gray(avgC);
 
