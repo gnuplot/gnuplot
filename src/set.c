@@ -3876,6 +3876,10 @@ new_colormap(void)
     free_value(&array->udv_value);
     c_token++;
 
+    /* Take size from current palette */
+    if (sm_palette.use_maxcolors > 0 && sm_palette.use_maxcolors <= 256)
+	colormap_size = sm_palette.use_maxcolors;
+
     array->udv_value.v.value_array = gp_alloc((colormap_size+1) * sizeof(t_value), "colormap");
     array->udv_value.type = ARRAY;
 
