@@ -704,9 +704,9 @@ do_plot(struct curve_points *plots, int pcount)
     if (is_plot_with_palette())
 	make_palette();
 
-    /* Give a chance for rectangles to be behind everything else */
-    place_objects( first_object, LAYER_BEHIND, 2);
+    /* Give a chance for background items to be behind everything else */
     place_pixmaps(LAYER_BEHIND, 2);
+    place_objects( first_object, LAYER_BEHIND, 2);
 
     screen_ok = FALSE;
 
@@ -736,6 +736,9 @@ do_plot(struct curve_points *plots, int pcount)
     /* Add back colorbox if appropriate */
     if (is_plot_with_colorbox() && color_box.layer == LAYER_BACK)
 	    draw_color_smooth_box(MODE_PLOT);
+
+    /* Pixmaps before objects */
+    place_pixmaps(LAYER_BACK, 2);
 
     /* Fixed objects */
     place_objects( first_object, LAYER_BACK, 2);
@@ -1097,11 +1100,11 @@ do_plot(struct curve_points *plots, int pcount)
     if (is_plot_with_colorbox() && color_box.layer == LAYER_FRONT)
 	    draw_color_smooth_box(MODE_PLOT);
 
+    /* pixmaps in behind rectangles to enable rectangle as border */
+    place_pixmaps( LAYER_FRONT, 2);
+
     /* And rectangles */
     place_objects( first_object, LAYER_FRONT, 2);
-
-    /* pixmaps in front of rectangles, OK? */
-    place_pixmaps( LAYER_FRONT, 2);
 
     /* PLACE LABELS */
     place_labels( first_label, LAYER_FRONT, FALSE );

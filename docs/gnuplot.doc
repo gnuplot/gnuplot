@@ -3093,6 +3093,8 @@ Ffigure_newsyntax
       the plot legend (`key`)
       front
  Within each layer elements are drawn in the order
+      grid, axis, and border elements
+      pixmaps in numerical order
       objects (rectangles, circles, ellipses, polygons) in numerical order
       labels in numerical order
       arrows in numerical order
@@ -12653,7 +12655,7 @@ Ffigure_multiple_keys
  Syntax:
        set pixmap <index> "filename" at <position>
                   {width <w> | height <h> | size <w>,<h>}
-                  {front|behind} {center}
+                  {front|back|behind} {center}
        show pixmaps
        unset pixmaps
        unset pixmap <index>
