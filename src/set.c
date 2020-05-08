@@ -2168,9 +2168,14 @@ set_pixmap()
 	    this_pixmap->filename = temp;
 	    continue;
 	}
-	if (equals(c_token, "behind") || equals(c_token, "back")) {
+	if (equals(c_token, "behind")) {
 	    c_token++;
 	    this_pixmap->layer = LAYER_BEHIND;
+	    continue;
+	}
+	if (equals(c_token, "back")) {
+	    c_token++;
+	    this_pixmap->layer = LAYER_BACK;
 	    continue;
 	}
 	if (equals(c_token, "front")) {
