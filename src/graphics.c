@@ -391,7 +391,11 @@ place_pixmaps(int layer, int dimensions)
 	corner[3].x = term->xmax;
 	corner[3].y = 0;
 
-	term->image(pixmap->ncols, pixmap->nrows, pixmap->image_data, corner, IC_RGBA);
+	/* Check for horizontal named palette colorbox */
+	if (!pixmap->filename && dx > dy*2)
+	    term->image(pixmap->nrows, pixmap->ncols, pixmap->image_data, corner, IC_RGBA);
+	else
+	    term->image(pixmap->ncols, pixmap->nrows, pixmap->image_data, corner, IC_RGBA);
     }
 }
 

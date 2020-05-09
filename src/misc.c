@@ -1641,3 +1641,36 @@ get_colormap(int token)
     }
     return colormap;
 }
+
+/*
+ * Create a pixmap containing an existing colormap palette.
+ * This can be used to produce a colorbox for a named palette
+ * separate from the automatic colorbox generated for the main palette.
+ */
+void
+pixmap_from_colormap(t_pixmap *pixmap)
+{
+    udvt_entry *colormap = get_colormap(c_token);
+    unsigned int rgb;
+    int size, i, ip;
+
+    if (!colormap)
+	int_error(c_token, "not a colormap");
+    size = colormap->udv_value.v.value_array[0].v.int_val;
+    c_token++;
+
+    pixmap->image_data = gp_realloc( pixmap->image_data,
+			size * 4. * sizeof(coordval), "pixmap");
+
+    /* Unpack ARGB colormap entry into 4 separate values R G B A */
+    for (i = 1, ip = 0; i <= size; i++) {
+	rgb = colormap->udv_value.v.value_array[i].v.int_val;
+	pixmap->image_data[ip++] = ((rgb >> 16) & 0xff) / 255.;
+	pixmap->image_data[ip++] = ((rgb >> 8) & 0xff) / 255.;
+	pixmap->image_data[ip++] = ((rgb) & 0xff) / 255.;
+	pixmap->image_data[ip++] = 255-((rgb >> 24) & 0xff);
+    }
+
+    pixmap->ncols = 1;
+    pixmap->nrows = size;
+}

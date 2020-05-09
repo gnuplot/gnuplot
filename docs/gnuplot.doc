@@ -12811,7 +12811,8 @@ Ffigure_multiple_keys
 ?show pixmaps
 ?commands set pixmap
  Syntax:
-       set pixmap <index> "filename" at <position>
+       set pixmap <index> {"filename" | colormap <name>}
+                  at <position>
                   {width <w> | height <h> | size <w>,<h>}
                   {front|back|behind} {center}
        show pixmaps
@@ -12854,6 +12855,14 @@ Ffigure_multiple_keys
        # but will always face forward and remain upright
        set pixmap 3 "image.png" at my_x, my_y, f(my_x,my_y) width screen .05
        splot f(x,y)
+4 pixmap from colormap
+?pixmap colormap
+?set pixmap colormap
+ Another use of pixmaps is to create a colorbox for a named palette,
+ separate from the colorbox that is automatically generated for the active
+ main palette
+
+      set pixmap <index> colormap <name> at <position> size <width>, <height>
 3 pm3d
 ?commands set pm3d
 ?commands show pm3d

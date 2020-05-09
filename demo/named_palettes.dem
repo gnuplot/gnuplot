@@ -94,6 +94,12 @@ set dummy u,v
 set urange [ -pi : pi ]
 set vrange [ -pi : pi ]
 
+# construct colorboxes for the two named palettes
+set pixmap 1 colormap water at screen 0.92, 0.3  size screen 0.03, 0.4 back
+set pixmap 2 colormap flame at screen 0.2, 0.04  size screen 0.4, 0.03 back
+set obj 11 rect from screen 0.92, 0.3 rto screen 0.03, 0.4 fs empty back
+set obj 12 rect from screen 0.2, 0.04 rto screen 0.4, 0.03 fs empty back
+
 splot cos(u)+.5*cos(u)*cos(v),sin(u)+.5*sin(u)*cos(v),.5*sin(v) fc palette flame, \
     1+cos(u)+.5*cos(u)*cos(v),.5*sin(v),sin(u)+.5*sin(u)*cos(v) fc palette water
 

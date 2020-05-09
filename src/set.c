@@ -2112,6 +2112,7 @@ set_pixmap()
     t_pixmap *new_pixmap = NULL;
     t_pixmap *prev_pixmap = NULL;
     char *temp = NULL;
+    TBOOLEAN from_colormap = FALSE;
     int tag;
 
     c_token++;
@@ -2168,6 +2169,12 @@ set_pixmap()
 	    this_pixmap->filename = temp;
 	    continue;
 	}
+	if (equals(c_token, "colormap")) {
+	    c_token++;
+	    pixmap_from_colormap(this_pixmap);
+	    from_colormap = TRUE;
+	    continue;
+	}
 	if (equals(c_token, "behind")) {
 	    c_token++;
 	    this_pixmap->layer = LAYER_BEHIND;
@@ -2192,8 +2199,11 @@ set_pixmap()
 	break;
     }
 
+    if (from_colormap)
+	return;
+
     if (!this_pixmap->filename)
-	int_error(c_token, "must give filename");
+	int_error(c_token, "must give filename or colormap");
 
     /* Enforce non-negative extents */
     if (this_pixmap->extent.x < 0)

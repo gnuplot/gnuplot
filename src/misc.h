@@ -77,6 +77,7 @@ void parse_colorspec(struct t_colorspec *tc, int option);
 long parse_color_name(void);
 TBOOLEAN need_fill_border(struct fill_style_type *fillstyle);
 struct udvt_entry *get_colormap(int token);
+void pixmap_from_colormap(t_pixmap *pixmap);
 
 void get_image_options(t_image *image);
 

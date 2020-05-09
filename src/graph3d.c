@@ -913,6 +913,9 @@ do_3dplot(
     /* Grid walls */
     place_objects(grid_wall, LAYER_BACK, 3);
 
+    /* pixmaps before objects so that a rectangle can be used as a border */
+    place_pixmaps(LAYER_BACK, 3);
+
     /* Add 'back' rectangles */
     place_objects(first_object, LAYER_BACK, 3);
 
@@ -1515,8 +1518,8 @@ do_3dplot(
 	draw_color_smooth_box(MODE_SPLOT);
 
     /* Add 'front' rectangles */
-    place_objects(first_object, LAYER_FRONT, 3);
     place_pixmaps(LAYER_FRONT, 3);
+    place_objects(first_object, LAYER_FRONT, 3);
 
     /* Grid walls */
     place_objects(grid_wall, LAYER_FRONT, 3);

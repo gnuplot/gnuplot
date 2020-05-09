@@ -1735,7 +1735,8 @@ save_pixmaps(FILE *fp)
 	fprintf(fp, "  size ");
 	save_position(fp,&pixmap->extent, 2, FALSE);
 	fprintf(fp, " %s %s\n",
-		pixmap->layer == LAYER_FRONT ? "front" : "behind",
+		pixmap->layer == LAYER_FRONT ? "front" : 
+		pixmap->layer == LAYER_BACK ? "back" : "behind",
 		pixmap->center ? "center" : "");
     }
 }
