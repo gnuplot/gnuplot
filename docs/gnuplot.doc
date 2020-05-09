@@ -5355,9 +5355,10 @@ Ffigure_zerror
           print ARG2 * 4.56, @ARG2 * 4.56
           print "This plot produced by script ", ARG0
 
- Notice that ARG1 must be dereferenced as a macro, but ARG2 may be dereferenced
- either as a macro (yielding a numerical constant) or a variable (yielding that
- same numerical value after auto-promotion of the string "1.23" to a real).
+ Notice that because ARG1 is a string it must be dereferenced as a macro,
+ but ARG2 may be dereferenced either as a macro (yielding a numerical constant)
+ or a variable (yielding that same numerical value after auto-promotion of the
+ string "1.23" to a real).
 
  The same result could be obtained directly from a shell script by invoking
  gnuplot with the `-c` command line option:
@@ -16729,7 +16730,7 @@ Ffigure_walls
  Qt terminal: 3D rotation of polygons and surfaces can be slow;
  this is strongly affected by the Qt rendering mode (see Qt documentation).
 
- The `raise` and `lower` functions are unreliable.
+ The `raise` and `lower` commands are unreliable.
 
 2 External libraries
 ?bugs external_libraries
@@ -16740,8 +16741,8 @@ Ffigure_walls
 =pdf
  External library GD (used by PNG/JPEG/GIF/sixelgd terminals, pixmap):
  Versions of libgd through 2.0.33 had various bugs in mapping the characters
- of Adobe's Symbol font.  Also it was possible to trigger a library segfault if
- an anti-aliased line crosses an upper corner of the canvas.
+ of Adobe's Symbol font.
+ Dot-dash patterns are not supported for these terminals.
 
  External library PDFlib (used by PDF terminal, but not by pdfcairo):
  Gnuplot can be linked against libpdf versions 4, 5, or 6. However, these
