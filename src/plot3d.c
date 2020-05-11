@@ -1505,14 +1505,14 @@ calculate_set_of_isolines(
 
 	    evaluate_at(plot_func.at, &a);
 
-	    if (fabs(imag(&a)) > zero) {
+	    if (undefined) {
 		points[i].type = UNDEFINED;
-		n_complex_values++;
 		continue;
 	    }
 
-	    if (undefined) {
+	    if (fabs(imag(&a)) > zero) {
 		points[i].type = UNDEFINED;
+		n_complex_values++;
 		continue;
 	    }
 
