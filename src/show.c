@@ -946,6 +946,13 @@ show_version(FILE *fp)
 		"";
 #endif
 
+	    const char *libamos =
+#ifdef HAVE_AMOS
+		"+AMOS  ";
+#else
+		"";
+#endif
+
 	    const char *libgd =
 #ifdef HAVE_LIBGD
 # ifdef HAVE_GD_PNG
@@ -1014,9 +1021,9 @@ show_version(FILE *fp)
 		"";
 #endif
 
-	    sprintf(compile_options, "    %s%s\n    %s%s\n    %s%s\n    %s%s%s%s\n",
+	    sprintf(compile_options, "    %s%s\n    %s%s\n    %s%s%s\n    %s%s%s%s\n",
 		    rdline, gnu_rdline, unicodebuild, plotoptions,
-		    libcerf, libgd,
+		    libcerf, libamos, libgd,
 		    nocwdrc, x11, use_mouse, hiddenline
 		    );
 	}
@@ -1081,7 +1088,13 @@ show_version(FILE *fp)
 
 	c_token++;
 	fprintf(stderr, "\nCompile options:\n%s", compile_options);
-	fprintf(stderr, "    %d-bit integer arithmetic\n\n",(int)sizeof(intgr_t)*8);
+	fprintf(stderr, "    %d-bit integer arithmetic\n",(int)sizeof(intgr_t)*8);
+	fprintf(stderr, "   %s complex function library support\n\n",
+#ifdef HAVE_COMPLEX_FUNCS
+		"");
+#else
+		" no");
+#endif
 
 #ifdef X11
 	{
