@@ -1904,7 +1904,8 @@ C marker below is used to signal this to doc2html:
 4 cdawson
 ?expressions functions cdawson
 ?cdawson
-=dawson
+=Dawson's integral
+?Dawson's integral
 %cdawson(z)@complex@complex Dawson's integral
 #cdawson(z)&complex& \gpCX &complex extension of Dawson's integral $D(z)={\frac{\sqrt{\pi}}{2}e^{-z^2} erfi(z)} $ \\
  `cdawson(z)` returns Dawson's Integral evaluated for the complex argument z.
@@ -2377,7 +2378,7 @@ C marker below is used to signal this to doc2html:
 ?invigamma
  The inverse incomplete gamma function `invigamma(a,p)` returns the value
  z such that p = igamma(a,z).
- p is limited to (0;1]. a is limited to positive real values.
+ p is limited to (0;1]. a must be a positive real number.
  The implementation in gnuplot has relative accuracy that ranges from 
  1.e-16 for a<1 to 5.e-6 for a = 1.e10.  Convergence may fail for a < 0.005.
 

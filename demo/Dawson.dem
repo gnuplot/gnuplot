@@ -1,0 +1,63 @@
+#
+# Dawson's integral of real and complex variables
+#
+if (!strstrt(GPVAL_COMPILE_OPTIONS,"+LIBCERF")) {
+	print  "This copy of gnuplot was not linked against libcerf"
+	exit;
+}
+save_encoding = GPVAL_ENCODING
+set encoding utf8
+
+set key invert top right at graph 1., .3
+set xzeroaxis
+set yzeroaxis
+set ytics  0.2
+set tics nomirror
+set border 3
+set rmargin 8
+set tmargin 4
+set xrange [ -0.20 : 2.20 ]
+set yrange [ -0.10 : 0.70 ]
+
+set title offset 0,-2
+set title "Dawson's integral          {/*2 ∫@_{/*0.5 0}^{/*.5 x}} {/:Italic exp(t^2 - x^2)dt}\n"
+
+plot cdawson(x) lw 2 title "cdawson(x)", \
+     [0:2.2] cdawson(sqrt(x)) lw 2 title "cdawson(√x)", \
+     x*cdawson(x) lw 2 title "x·cdawson(x)"
+
+pause -1 "<cr> to continue"
+reset
+
+set xrange [ -2.4 : 2.4 ]
+set yrange [ -1.5 : 1.5 ]
+set zrange [ -8 : 8 ]
+set xtics 1 offset 0,-0.5
+set ytics 1 offset 0,-0.5
+set ztics 5
+set xlabel "Real(z)"
+set ylabel "Imag(z)"
+set grid x y z vertical
+
+set palette defined (0 "dark-blue", 0.5 "gold", 1 "dark-red")
+set cbrange [-5:5]
+unset colorbox
+unset key
+set sample 51
+set isosample 51
+set pm3d depth border lw 0.25 lighting spec2 0.4
+set view 57, 37, 1.1, 0.8
+set xyplane 0
+
+set multiplot layout 1,2 title "\nDawson's integral of complex variable z"
+
+set label 1 at 0,1,10 "Real(cdawson(z))" right
+splot real(cdawson(x + I*y)) with pm3d title "Real(cdawson(z))"
+set label 1 at 0,1,10 "Imag(cdawson(z))" right
+splot imag(cdawson(x + I*y)) with pm3d title "Real(cdawson(z))"
+
+unset multiplot
+pause -1 "<cr> to continue"
+
+reset
+set encoding save_encoding

@@ -258,8 +258,9 @@ print "********************** file complex_trig.dem *********************"
 load "complex_trig.dem"
 reset
 
-print "********************** file cerf.dem *************************"
+print "********************** libcerf routines *************************"
 load "cerf.dem"
+load "Dawson.dem"
 reset
 
 print "********************** libamos routines *************************"
