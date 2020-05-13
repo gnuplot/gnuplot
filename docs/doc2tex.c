@@ -212,7 +212,7 @@ process_line( char *line, FILE *b)
 		}
 		else if (!strncmp(line+1,"TeX",3)) {
 		    /* Treat rest of line as LaTeX command */
-		    fprintf(b, "%s\n", line + 5);
+		    fprintf(b, "%s ", line + 5);
 		}
 		else {
 		    if (strchr(line, '\n'))
