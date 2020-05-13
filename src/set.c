@@ -3739,6 +3739,7 @@ set_palette()
 		TBOOLEAN done = FALSE;
 		CHECK_TRANSFORM;
 		sm_palette.colorMode = SMPAL_COLOR_MODE_CUBEHELIX;
+		sm_palette.cmodel = C_MODEL_RGB;
 		sm_palette.cubehelix_start = 0.5;
 		sm_palette.cubehelix_cycles = -1.5;
 		sm_palette.cubehelix_saturation = 1.0;
