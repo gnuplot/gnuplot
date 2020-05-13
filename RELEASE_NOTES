@@ -1,7 +1,7 @@
 		Gnuplot Version 5.4 Release Notes
 		=================================
 
-First release candidate 5.4.rc1
+First release candidate 5.4.rc2
 
 Gnuplot version 5.4 patchlevel 0 will be the start of a new supported release
 series with many new features and a few changes to features that were
@@ -14,7 +14,13 @@ using "git log" after downloading:
 We appreciate any feedback from testing this release candidate so that any
 problems can be addressed prior to the 5.4.0 roll-out expected in Spring 2020.
 
-Release Notes date: 07-Apr-2020
+Release Notes date: 12-May-2020
+
+* Changes between -rc1 and -rc2
+	o faster response to piped input on Windows (Bug #2204)
+	o "splot with boxes" failed to recognize "fc palette" in -rc1
+	o repair several problems with parallel axis plots (Bug #2294)
+	o minor changes to dumb.trm, pixmap handling
 
 Features introduced in version 5.4
 ==================================
@@ -26,7 +32,7 @@ Features introduced in version 5.4
 
 * Voxel grids
 	o Gnuplot now supports operations based on 3D grids of voxel data.
-	o The current content of one of more voxel grids can be referenced by
+	o The current content of one or more voxel grids can be referenced by
 	  splot commands to assign colors or other properties to plot elements.
 	o Data in a voxel grids can be plotted by splot styles dots, points,
 	  or isosurface.
@@ -93,7 +99,7 @@ Features introduced in version 5.4
 
 * New terminals and terminal options
 	o New latex terminal "pict2e" supersedes older terminals "latex",
-	  "emtex", "eepic", and "tpic", which are no longer build by default.
+	  "emtex", "eepic", and "tpic", which are no longer built by default.
 	o The "pstricks" terminal now supports current gnuplot features
 	  including RGB colors, transparency, filled polygons, and boxes.
 	o The "pcl5" terminal now supports current gnuplot features.
@@ -124,6 +130,8 @@ Features introduced in version 5.4
 	  are treated as undefined values (NaN).  This was already true for
 	  function plots and for 3D data plots.
 	o The "set fontpath" command is deprecated (only affects PostScript).
+	o Since the "latex" and "eepic" terminals are deprecated, the
+	  tutorial for using them is no longer included with the distribution.
 
 
 		 Notes for packagers and testers
