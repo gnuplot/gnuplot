@@ -261,6 +261,7 @@ reset
 print "********************** libcerf routines *************************"
 load "cerf.dem"
 load "Dawson.dem"
+load "Fresnel.dem"
 reset
 
 print "********************** libamos routines *************************"

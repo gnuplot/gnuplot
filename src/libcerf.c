@@ -4,6 +4,11 @@
  * numbers.  This set of wrapper routines converts back and forth from
  * gnuplot's own representation of complex numbers.
  * Ethan A Merritt - July 2013
+ * Private implementations of special functions related to functions in libcerf
+ *	VP_fwhm - full width at half max for the Voigt profile
+ *	FresnelC - Fresnel integral cosine (real) term
+ *	FresnelS - Fresnel integral sine (imaginary) term
+ * Ethan A Merritt - April 2020
  */
 
 #include "gp_types.h"
@@ -179,6 +184,42 @@ f_VP_fwhm(union argument *arg)
 	fwhm = not_a_number();
 
     push(Gcomplex(&par, fwhm, 0.0));
+}
+
+/* Fresnel integrals
+ *              x
+ *     C(x) =  ∫ cos(pi/2 * t^2) dt
+ *              x
+ *     S(x) =  ∫ sin(pi/2 * t^2) dt
+ *
+ * calculated from the relationship
+ *
+ *     C(x) + iS(x) = (1+i)/2 erf(z) where z = √π/2 (1-i) x
+ */
+void
+f_FresnelC(union argument *arg)
+{
+    struct value a;
+    complex double z;
+    double x = real(pop(&a));
+    static double sqrt_pi_2 = 0.886226925452758;
+
+    z = sqrt_pi_2 * (x - I*x);
+    z = (1. + I)/2. * cerf(z);
+    push(Gcomplex(&a, creal(z), 0.0));
+}
+
+void
+f_FresnelS(union argument *arg)
+{
+    struct value a;
+    complex double z;
+    double x = real(pop(&a));
+    static double sqrt_pi_2 = 0.886226925452758;
+
+    z = sqrt_pi_2 * (x - I*x);
+    z = (1. + I)/2. * cerf(z);
+    push(Gcomplex(&a, cimag(z), 0.0));
 }
 
 #endif

@@ -1,0 +1,51 @@
+#
+# Fresnel integrals expressed in terms of complex error function 
+# Should these be provided as built-in functions?
+# Would it be better to use an implementation not requiring libcerf?
+#
+if (!strstrt(GPVAL_COMPILE_OPTIONS,"+LIBCERF")) {
+	print  "This copy of gnuplot was not linked against libcerf"
+	exit;
+}
+save_encoding = GPVAL_ENCODING
+set encoding utf8
+
+set title "{/:Bold Fresnel integrals C(z), S(z)}" offset 0,-1
+set key reverse Left left invert
+set for [l=1:3] linetype l lw 2
+set border 3
+set tics nomirror
+set margins 10,10,4,4
+
+set xrange [0:pi]
+set yrange [0:1]
+set ytics 0.0, 0.25, 0.75
+
+plot cdawson(x), FresnelS(x), FresnelC(x), 0.5 lc "black" dt '...' notitle
+
+pause -1 "<cr> to continue"
+reset
+
+set label 1 at screen 0.1, 0.9
+set label 2 at screen 0.1, 0.8
+set label 3 at screen 0.1, 0.7
+set label 1 "{/:Bold Clothoid using Fresnel integrals}"
+set label 2 "x = FresnelC(z) = {/*2 ∫@_{/*0.5 0}^{/*.5 x}} {/:Italic cos(@^π⁄_2 t^2)dt}\n"
+set label 3 "y = FresnelS(z) = {/*2 ∫@_{/*0.5 0}^{/*.5 x}} {/:Italic sin(@^π⁄_2 t^2)dt}\n"
+
+set xrange [-1:1]
+set yrange [-1:1]
+set size square
+set sample 1000
+unset border
+set xzeroaxis
+set yzeroaxis
+set xtics axis add ("" 0)
+set ytics axis add ("" 0)
+unset key
+
+plot sample [t=-9:9] '+' using (FresnelC(t)) : (FresnelS(t)) with lines lc "blue" lw .6
+
+pause -1 "<cr> to continue"
+reset
+set encoding save_encoding

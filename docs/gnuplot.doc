@@ -219,7 +219,8 @@ C
 ## See `lnGamma`.
 #b Complex function conj(z) returns the complex conjugate of z.
 #end
- Additional complex special functions are supported if a suitable external
+
+ Additional special functions are supported if a suitable external
  library is found at build time.
 #start
 #b Complex Bessel functions Iν(z), Jν(z), Kν(z), Yν(z) of order ν (real)
@@ -228,6 +229,7 @@ C
 ## See `BesselH1`.
 #b Complex Airy functions Ai(z), Bi(z).
 #b Complex exponential integral of order n. See `expint`.
+#b Fresnel integrals C(x) and S(x). See `FresnelC`.
 #end
 
 4 New plot styles and style options
@@ -1397,6 +1399,8 @@ Ffigure_E0
 ^<tr>    <td>cdawson(z)</td>    <td>complex</td>    <td>complex Dawson's integral</td></tr>
 ^<tr>    <td>faddeeva(z)</td>    <td>complex</td>    <td>rescaled complex error function <i>w</i>(<i>z</i>) = exp(-<i>z</i>²) × erfc(-i<i>z</i>)</td></tr>
 ^<tr>    <td>erfi(x)</td>    <td>real</td>    <td>imaginary error function erfi(<i>x</i>) = -i × erf(i<i>x</i>)</td></tr>
+^<tr>    <td>FresnelC(x)</td>    <td>real</td>    <td> cosine (real) component of Fresnel integral </td></tr>
+^<tr>    <td>FresnelS(x)</td>    <td>real</td>    <td> sine (imaginary) component of Fresnel integral </td></tr>
 ^<tr>    <td>VP(x,sigma,gamma)</td>    <td>real</td>    <td>Voigt profile</td></tr>
 ^<tr>    <td>VP_fwhm(sigma,gamma)</td>    <td>real</td>    <td>Voigt profile full width at half max</td></tr>
 
@@ -1927,6 +1931,12 @@ C marker below is used to signal this to doc2html:
 #erfi(x)&real&~&imaginary error function $erf(x) = -i * erf(ix)$ \\
  Imaginary error function erfi(x) = -i * erf(ix)
  Requires external library libcerf.
+4 FresnelC
+%FresnelC(x)@real@ C(x) = integral[0;x] cos(pi/2 t^2)dt
+#FresnelC(x)&real&~&Fresnel integral $C(x)=\int^{x}_{0} cos(\frac{\pi}{2}t^2)dt$ \\
+4 FresnelS
+%FresnelS(x)@real@ S(x) = integral[0;x] sin(pi/2 t^2)dt
+#FresnelS(x)&real&~&Fresnel integral $S(x)=\int^{x}_{0} sin(\frac{\pi}{2}t^2)dt$ \\
 4 Voigt Profile
 ?expressions functions VP
 ?expressions functions VP_fwhm
@@ -2349,6 +2359,17 @@ C marker below is used to signal this to doc2html:
  expint(0,z) is calculated as exp(-z)/z.
 
  If Amos library support is not present, z is limited to real values z >= 0.
+
+4 Fresnel integrals FresnelC(x) and FresnelS(x)
+?expressions functions FresnelC
+?expressions functions FresnelS
+?FresnelC
+?FresnelS
+ The cosine and sine Fresnel integrals are calculated using their relationship
+ to the complex error function erf(z).  Due to dependence on erf(z),
+ these functions are only available if libcerf library support is present.
+#TeX $C(x) = \int^{x}_{0} cos(\frac{\pi}{2} t^2)dt$ \quad $S(x) = \int^{x}_{0} sin(\frac{\pi}{2} t^2)dt$\\
+#TeX $C(x)+iS(x)=\frac{1+i}{2} erf(z)$ where $z = \frac{\sqrt{\pi}}{2}(1-i)x$
 
 4 Gamma
 ?gamma

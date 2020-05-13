@@ -234,6 +234,8 @@ const struct ft_entry ft[] =
     {"VP", f_voigtp},		/* Voigt profile */
     {"VP_fwhm", f_VP_fwhm},	/* Voigt profile full width at half maximum */
     {"faddeeva", f_faddeeva},	/* Faddeeva rescaled complex error function "w_of_z" */
+    {"FresnelC", f_FresnelC},	/* Fresnel integral cosine term calculated from cerf */
+    {"FresnelS", f_FresnelS},	/* Fresnel integral sine term calculated from cerf */
 #endif
 
     {"tm_sec",  f_tmsec},	/* for timeseries */
