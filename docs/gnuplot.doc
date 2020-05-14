@@ -2352,6 +2352,8 @@ C marker below is used to signal this to doc2html:
  `expint(n,z)` returns the exponential integral of order n, where n is an
  integer >= 0.  This is the integral from 1 to infinity of t^(-n) e^(-tz) dt.
 
+#TeX \quad\quad $E_n(x)=\int_1^\infty t^{-n} e^{-xt}\,dt$
+
  If your copy of gnuplot was built with support for complex functions from
  the Amos library, then for n>0 the evaluation uses Amos routine cexint
  [Amos 1990 Algorithm 683, ACM Trans Math Software 16:178].
@@ -2368,8 +2370,10 @@ C marker below is used to signal this to doc2html:
  The cosine and sine Fresnel integrals are calculated using their relationship
  to the complex error function erf(z).  Due to dependence on erf(z),
  these functions are only available if libcerf library support is present.
-#TeX $C(x) = \int^{x}_{0} cos(\frac{\pi}{2} t^2)dt$ \quad $S(x) = \int^{x}_{0} sin(\frac{\pi}{2} t^2)dt$\\
-#TeX $C(x)+iS(x)=\frac{1+i}{2} erf(z)$ where $z = \frac{\sqrt{\pi}}{2}(1-i)x$
+
+#TeX \quad\quad $C(x) = \int^{x}_{0} cos(\frac{\pi}{2} t^2)dt$ \quad $S(x) = \int^{x}_{0} sin(\frac{\pi}{2} t^2)dt$
+
+#TeX \quad\quad $C(x)+iS(x)=\frac{1+i}{2} erf(z)$ where $z = \frac{\sqrt{\pi}}{2}(1-i)x$
 
 4 Gamma
 ?gamma
@@ -2380,19 +2384,22 @@ C marker below is used to signal this to doc2html:
 4 Igamma
 ?expressions functions igamma
 ?igamma
- `igamma(a, z)` returns the lower incomplete gamma function, also known as
- P(a, z), e.g. Abramowitz and Stegun (6.5.1). If no complex function
- support is present the domain is limited to real arguments a > 0, z >= 0.
- Otherwise Real(a) must be > 0.
+ `igamma(a, z)` returns the lower incomplete gamma function P(a, z),
+ [Abramowitz and Stegun (6.5.1)].  If complex function support is present
+ a and z may be complex values; real(a) > 0;
+
+#TeX \quad\quad $P(a,z)=\frac{1}{\Gamma(z)}\intop_{0}^{z}t^{a-1}e^{-t}dt$
 
  When a is large (>100) and (z-a)/a is small (<0.2), igamma(z,x) is calculated
  by Gauss-Legendre quadrature.  Otherwise the calculation uses a continued
  fraction if (z > 1 && z > a+2) or Pearson's series expansion.
  References: (1) Numerical Recipes section 6.2 (2) AS 239, BL Shea (1988)
  J. Royal Stat. Soc. Series C (Applied Statistics) 37:466-473.
+ The convergence of these algorithms is poor for real(z) < 0.
+ If the series does not converge to within 1.E-14 the function returns NaN.
 
- The convergence of these algorithms is poor for Real(z) < 0.
- If the series does not converge to within 1.E-14, NaN is returned.
+ If no complex function support is present the domain is limited to
+ real arguments a > 0, z >= 0.
 
 4 Invigamma
 ?expressions functions invigamma
@@ -2406,11 +2413,14 @@ C marker below is used to signal this to doc2html:
 4 Ibeta
 ?expressions functions ibeta
 ?ibeta
- `ibeta(a,b,x)` returns the normalized lower incomplete beta integral of the
- real parts of its arguments. a, b > 0 and x in [0:1].  If the arguments are
- complex, the imaginary components are ignored. The implementation in gnuplot
- 5.5 uses code from the Cephes library [Moshier 1989, "Methods and Programs
- for Mathematical Functions", Prentice-Hall].
+ `ibeta(a,b,x)` returns the normalized lower incomplete beta integral of
+ real arguments a,b > 0,  x in [0:1].
+
+#TeX \quad\quad $ibeta(a,b,x)=\frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)}\intop_{0}^{x}t^{a-1}(1-t)^{b-1}dt$
+
+ If the arguments are complex, the imaginary components are ignored.
+ The implementation in gnuplot 5.5 uses code from the Cephes library
+ [Moshier 1989, "Methods and Programs for Mathematical Functions", Prentice-Hall].
 
 4 Invibeta
 ?expressions functions invibeta
