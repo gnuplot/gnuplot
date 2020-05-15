@@ -73,6 +73,12 @@
 static complex double lnGamma( complex double z );
 static complex double Igamma( complex double a, complex double z );
 static double complex Igamma_GL( double complex a, double complex z );
+static double complex Igamma_negative_z( double a, double complex z );
+
+#undef IGAMMA_POINCARE
+#ifdef IGAMMA_POINCARE
+static double complex Igamma_Poincare( double a, double complex z );
+#endif
 
 /* wrapper for Igamma so that when it replaces igamma
  * there is still something for old callers who want to call
@@ -377,36 +383,38 @@ lnGamma( complex double z )
 
 /*
  * TODO
- *	- extend to full complex plane e.g. Temme 1996 or Bujanda 2016
+ *	- extend to full complex plane e.g. Temme 1996 or Gil 2016
  */
+#define IGAMMA_PRECISION 1.E-14
+#define MAXLOG 708.396418532264106224	/* log(2**1022) */
 
 void
 f_Igamma(union argument *arg)
 {
     struct value result;
-    struct value a;
+    struct value tmp;
 
-    struct cmplx s;	/* gnuplot complex parameter s */
+    struct cmplx a;	/* gnuplot complex parameter a */
     struct cmplx z;	/* gnuplot complex parameter z */
 
     complex double w;	/* C99 _Complex representation */
 
-    pop(&a);			/* Complex argument z */
-    if (a.type == CMPLX)
-	z = a.v.cmplx_val;
+    pop(&tmp);			/* Complex argument z */
+    if (tmp.type == CMPLX)
+	z = tmp.v.cmplx_val;
     else {
-	z.real = real(&a);
+	z.real = real(&tmp);
 	z.imag = 0;
     }
-    pop(&a);			/* Complex argument s */
-    if (a.type == CMPLX)
-	s = a.v.cmplx_val;
+    pop(&tmp);			/* Complex argument a */
+    if (tmp.type == CMPLX)
+	a = tmp.v.cmplx_val;
     else {
-	s.real = real(&a);
-	s.imag = 0;
+	a.real = real(&tmp);
+	a.imag = 0;
     }
 
-    w = Igamma( s.real + I*s.imag, z.real + I*z.imag );
+    w = Igamma( a.real + I*a.imag, z.real + I*z.imag );
 
     if (w == -1) {
 	/* Failed to converge or other error */
@@ -441,8 +449,6 @@ f_Igamma(union argument *arg)
  *
  */
 
-#define IGAMMA_PRECISION 1.E-14
-
 static complex double
 Igamma(complex double a, complex double z)
 {
@@ -463,20 +469,34 @@ Igamma(complex double a, complex double z)
     errno = 0;
     initialize_underflow("Igamma");
 
-#if (0)
-    /* EAM 2020: FIXME
-     * For real(z) < 0 convergence of the standard series is very slow.
-     * We should catch these cases ahead of time and use a different algorithm.
+    /* For real(z) < 0 convergence of the standard series is poor.
+     * We catch these cases ahead of time and use a different algorithm.
      * See Gil et al (2016) ACM TOMS 43:3 Article 26
-     *     http://dx.doi.org/10.1145/2972951
+     * Note this alternative only accepts real a.
      */
-    if (debug != 4)
-    if (creal(z) < 0) {
-	return Igamma_negative_z( creal(a), z );
-    }
+    if (creal(z) < 0 && cimag(a) == 0) {
+
+#ifdef IGAMMA_POINCARE
+	/* Case 5:
+	 * Gil (2016) suggests using a Poincaré-like expansion when |z| > 50.
+	 * However in my tests this seemed worse than cases 1-3.
+	 */
+	if (debug == 5)
+	if (creal(z) < -50.)
+	    return Igamma_Poincare( creal(a), -z );
 #endif
 
-    /* EAM 2020: For large values of a convergence fails.
+	/* Case 3:
+	 * Abramowitz & Stegum (6.5.29)
+	 */
+	if (debug != 3)
+	if (creal(a) < 75.)
+	    return Igamma_negative_z( creal(a), z );
+
+    } /* End special cases for real(z) < 0 */
+
+    /* Case 1:
+     * EAM 2020: For large values of a convergence fails.
      * Use Gauss-Legendre quadrature instead.
      */
     if ((cabs(a) > 100.) && (cabs(z-a)/cabs(a) < 0.2)) {
@@ -496,7 +516,9 @@ Igamma(complex double a, complex double z)
 
     if ((cabs(z) > 1.0) && (cabs(z) >= cabs(a) + 2.0)) {
 
-	/* Use a continued fraction expansion */
+	/* Case 2:
+	 * Use a continued fraction expansion
+	 */
 	complex double pn1, pn2, pn3, pn4, pn5, pn6;
 	complex double rn;
 	complex double rnold;
@@ -548,10 +570,12 @@ Igamma(complex double a, complex double z)
 	}
 
     } else {
-	/* Use Pearson's series expansion. */
+	/* Case 4:
+	 * Use Pearson's series expansion.
+	 */
 	complex double retval;
 
-	if (debug == 3) return NAN;
+	if (debug == 4) return NAN;
 
 	for (i = 0, aa = a, an = b = 1.0; i <= 1000; i++) {
 	    aa += 1.0;
@@ -623,5 +647,93 @@ Igamma_GL( double complex a, double complex z )
     else
 	return -ans;
 }
+
+/* Incomplete gamma function for negative z
+ * computed using a series expansion for gamma*
+ *
+ *                  1    inf   (-z)^k
+ *   gamma*(a,z) = ---  Sum    ------
+ *                 Γ(a)  k=0   k!(a+k)
+ *
+ * Abramowitz & Stegun (6.5.29) = Paris (8.7.1)
+ */
+static double complex
+Igamma_negative_z(double a, double complex z)
+{
+    double complex t = 1/a;
+    double complex v = t;
+    double p;
+    int k;
+
+    for (k=0; k<1000; k++) {
+	p = (a + k) / (a + k + 1);
+	t *= -z * p / (k+1);
+	v += t;
+	if (!(cabs(t) < VERYLARGE)) {
+	    int_warn(NO_CARET, "Igamma: overflow");
+	    return -1.0;
+	}
+	if (cabs(t/v) < IGAMMA_PRECISION)
+	    break;
+     }
+     if (k >= 1000)
+	int_warn(NO_CARET,
+	    "Igamma: no convergence after %d iterations residual %g",
+	    k, cabs(t/v));
+
+    /* At this point v is gamma* */
+    /* FIXME: Do we have to handle underflow/overflow? */
+    /* NB: a is real, so cexp(lnGamma(a)) could be exp(LGAMMA(a)) */
+    t = v * cpow(z, a) / cexp(lnGamma(a));
+
+    return t;
+}
+
+
+#ifdef IGAMMA_POINCARE
+/* Incomplete gamma function computed using a Poincaré expansion
+ *
+ *                  e^z    inf   (1-a)_k
+ *   gamma*(a,z) ~ -----  Sum    ------
+ *                 zΓ(a)   k=0     z^k
+ *
+ * Suggested by Gil (2016) for a>0 and |z| > 50.
+ * ACM TOMS 43, 3, Article 26  DOI: http://dx.doi.org/10.1145/2972951
+ * Eq (29)
+ */
+static double complex
+Igamma_Poincare(double a, double complex z)
+{
+    double complex t = 1.0;
+    double complex v = t;
+    double p;
+    int k;
+
+    for (k=0; k<1000; k++) {
+	p = (1. - a) + k;
+	t *= p/z;
+	v += t;
+	if (!(cabs(t) < VERYLARGE)) {
+	    int_warn(NO_CARET, "Igamma: overflow");
+	    return -1.0;
+	}
+	if (cabs(t/v) < IGAMMA_PRECISION)
+	    break;
+     }
+     if (k >= 1000)
+	int_warn(NO_CARET,
+	    "Igamma: no convergence after %d iterations residual %g",
+	    k, cabs(t/v));
+
+    /* NB: a is real, so cexp(lnGamma(a)) could be exp(LGAMMA(a)) */
+    t = v * cexp(z) / (z * cexp(lnGamma(a)));
+
+    /* convert from gamma* to igamma */
+    t *= cpow(z,a);
+
+    return t;
+}
+#endif
+
 
 #endif /* HAVE_COMPLEX_FUNCS */

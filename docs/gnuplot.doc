@@ -2388,15 +2388,26 @@ C marker below is used to signal this to doc2html:
  [Abramowitz and Stegun (6.5.1)].  If complex function support is present
  a and z may be complex values; real(a) > 0;
 
-#TeX \quad\quad $P(a,z)=\frac{1}{\Gamma(z)}\intop_{0}^{z}t^{a-1}e^{-t}dt$
+#TeX \quad\quad igamma$(a,z)=P(a,z) = z^a\gamma^*(a,z)$
+#TeX $=\frac{1}{\Gamma(z)}\intop_{0}^{z}t^{a-1}e^{-t}dt$
 
- When a is large (>100) and (z-a)/a is small (<0.2), igamma(z,x) is calculated
- by Gauss-Legendre quadrature.  Otherwise the calculation uses a continued
- fraction if (z > 1 && z > a+2) or Pearson's series expansion.
- References: (1) Numerical Recipes section 6.2 (2) AS 239, BL Shea (1988)
- J. Royal Stat. Soc. Series C (Applied Statistics) 37:466-473.
- The convergence of these algorithms is poor for real(z) < 0.
- If the series does not converge to within 1.E-14 the function returns NaN.
+ One of four algorithms is used depending on a and z.
+#TeX \\
+ Case (1) When a is large (>100) and (z-a)/a is small (<0.2) use
+ Gauss-Legendre quadrature with coefficients from Numerical Recipes 3rd
+ Edition section 6.2, Press et al (2007).
+#TeX \\
+ Case (2) When z > 1 and z > (a+2) use a continued fraction following
+ Shea (1988) J. Royal Stat. Soc. Series C (Applied Statistics) 37:466-473.
+#TeX \\
+ Case (3) When z < 0 and a < 75 and imag(a) == 0 use the series from
+ Abramowitz & Stegun (6.5.29).
+#TeX \\
+ Otherwise (Case 4) use Pearson's series expansion.
+
+ Note that convergence is poor in some regions of the full domain.
+ If the chosen algorithm does not converge to within 1.E-14 the function
+ returns NaN and prints a warning.
 
  If no complex function support is present the domain is limited to
  real arguments a > 0, z >= 0.
@@ -2416,7 +2427,7 @@ C marker below is used to signal this to doc2html:
  `ibeta(a,b,x)` returns the normalized lower incomplete beta integral of
  real arguments a,b > 0,  x in [0:1].
 
-#TeX \quad\quad $ibeta(a,b,x)=\frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)}\intop_{0}^{x}t^{a-1}(1-t)^{b-1}dt$
+#TeX \quad\quad ibeta$(a,b,x)=\frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)}\intop_{0}^{x}t^{a-1}(1-t)^{b-1}dt$
 
  If the arguments are complex, the imaginary components are ignored.
  The implementation in gnuplot 5.5 uses code from the Cephes library
@@ -2633,7 +2644,7 @@ C ... and restart the table:
  for larger values of N.
 
 ?cardinality
- This operator returns the number of elements |A| when applied to array A.
+ The cardinality operator |...| returns the number of elements |A| in array A.
  It returns the number of data lines |$DATA| when applied to datablock $DATA.
 4 Binary
 ?expressions operators binary
