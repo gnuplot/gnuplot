@@ -14,13 +14,14 @@ using "git log" after downloading:
 We appreciate any feedback from testing this release candidate so that any
 problems can be addressed prior to the 5.4.0 roll-out expected in Spring 2020.
 
-Release Notes date: 12-May-2020
+Release Notes date: 15-May-2020
 
 * Changes between -rc1 and -rc2
 	o faster response to piped input on Windows (Bug #2204)
 	o "splot with boxes" failed to recognize "fc palette" in -rc1
 	o repair several problems with parallel axis plots (Bug #2294)
 	o minor changes to dumb.trm, pixmap handling
+	o -rc1 failed to act on "with labels rotate by <ang>" (Bug #2264)
 
 Features introduced in version 5.4
 ==================================

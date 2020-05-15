@@ -846,7 +846,7 @@ get_data(struct curve_points *current_plot)
 	     *            {tc|lc variable}
 	     */
 	    int var = 3;	/* column number for next variable spec */
-	    coordval var_rotation = 0.0;
+	    coordval var_rotation = current_plot->labels->rotate;
 	    coordval var_ps = current_plot->labels->lp_properties.p_size;
 	    coordval var_pt = current_plot->labels->lp_properties.p_type;
 

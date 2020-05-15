@@ -1126,6 +1126,7 @@ get_3ddata(struct surface_points *this_plot)
 		    /* j is 3 for some reason */ ;
 		} else {
 		    int varcol = 4;
+		    cp->CRD_ROTATE = this_plot->labels->rotate;
 		    cp->CRD_PTSIZE = this_plot->labels->lp_properties.p_size;
 		    cp->CRD_PTTYPE = this_plot->labels->lp_properties.p_type;
 		    if (cp->CRD_PTSIZE == PTSZ_VARIABLE)
