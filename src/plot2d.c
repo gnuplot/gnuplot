@@ -3319,7 +3319,7 @@ eval_plots()
 			}
 
 			/* Imaginary values are treated as UNDEFINED */
-			if ((fabs(imag(&a)) > zero)) {
+			if (fabs(imag(&a)) > zero && !isnan(real(&a))) {
 			    this_plot->points[i].type = UNDEFINED;
 			    n_complex_values++;
 			    continue;

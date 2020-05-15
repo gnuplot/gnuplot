@@ -1510,7 +1510,7 @@ calculate_set_of_isolines(
 		continue;
 	    }
 
-	    if (fabs(imag(&a)) > zero) {
+	    if (fabs(imag(&a)) > zero && !isnan(real(&a))) {
 		points[i].type = UNDEFINED;
 		n_complex_values++;
 		continue;
