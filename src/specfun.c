@@ -19,7 +19,7 @@
  *		#ifdef IBETA
  * -	igamma igamma_GL chisq_cdf
  *		incomplete gamma function (positive real domain only)
- *		#ifndef HAVE_COMPLEX_FUNCTIONS
+ *		#ifndef HAVE_COMPLEX_FUNCS
  * -	ranf
  *		random number generator
  *		L'Ecuyer et al (1991) ACM/TOMS 17:98-111

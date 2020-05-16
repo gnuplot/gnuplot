@@ -1,4 +1,12 @@
 #
+#
+#
+# Check support for LambertW
+if (!strstrt(GPVAL_COMPILE_OPTIONS, "+COMPLEX_FUNC")) {
+    print "This copy of gnuplot does not support complex LambertW"
+    exit  # return to caller
+}
+#
 # Complex Lambert W function
 #
 I = {0,1}

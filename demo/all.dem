@@ -271,6 +271,7 @@ reset
 
 print "********************** special functions *************************"
 load "ibeta.dem"
+load "lambert.dem"
 reset
 
 print "********************** file heatmaps.dem *********************"
