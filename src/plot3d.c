@@ -1006,7 +1006,13 @@ get_3ddata(struct surface_points *this_plot)
 
 	    if (j == DF_UNDEFINED || j == DF_MISSING) {
 		cp->type = UNDEFINED;
-		goto come_here_if_undefined;
+		/* Version 5.5 - Since version 5 2D plot modes store all available
+		 * info even if one of the requested columns is missing or undefined.
+		 * Now we extend this behavior to 3D processing also.
+		 * prior to May 2020 the next line was
+		 *    goto come_here_if_undefined;
+		 */
+		j = df_no_use_specs;
 	    }
 	    if (j == DF_COMPLEX_VALUE) {
 		cp->type = UNDEFINED;
