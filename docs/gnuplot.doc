@@ -1332,9 +1332,6 @@ Ffigure_E0
 ^<tr>    <td>atan(x)</td>    <td>any</td>    <td>tan<sup>-1</sup> <i>x</i> (inverse tangent)</td></tr>
 ^<tr>    <td>atan2(y,x)</td>    <td>int or real</td>    <td>tan<sup>-1</sup>(<i>y/x</i>) (inverse tangent)</td></tr>
 ^<tr>    <td>atanh(x)</td>    <td>any</td>    <td>tanh<sup>-1</sup> <i>x</i> (inverse hyperbolic tangent) in radians</td></tr>
-^<tr>    <td>EllipticK(k)</td>    <td>real k in (-1:1)</td>    <td><i>K(k)</i> complete elliptic integral of the first kind</td></tr>
-^<tr>    <td>EllipticE(k)</td>    <td>real k in [-1:1]</td>    <td><i>E(k)</i> complete elliptic integral of the second kind</td></tr>
-^<tr>    <td>EllipticPi(n,k)</td>    <td> real n&lt;1, real k in (-1:1)</td>    <td> &Pi;(<i>n,k</i>) complete elliptic integral of the third kind</td></tr>
 ^<tr>    <td>besj0(x)</td>    <td>real</td>    <td><i>J</i><sub>0</sub> Bessel function of <i>x</i> in radians</td></tr>
 ^<tr>    <td>besj1(x)</td>    <td>real</td>    <td><i>J</i><sub>1</sub> Bessel function of <i>x</i> in radians</td></tr>
 ^<tr>    <td>besjn(n,x)</td>    <td>int,real</td>    <td><i>J</i><sub>n</sub> Bessel function of <i>x</i> in radians</td></tr>
@@ -1348,6 +1345,9 @@ Ffigure_E0
 ^<tr>    <td>conj(x)</td>    <td>complex</td>    <td>complex conjugate of <i>x</i></td>
 ^<tr>    <td>cos(x)</td>    <td>radians</td>    <td>cos <i>x</i>, cosine of <i>x</i></td></tr>
 ^<tr>    <td>cosh(x)</td>    <td>any</td>    <td>cosh <i>x</i>, hyperbolic cosine of <i>x</i> in radians</td></tr>
+^<tr>    <td>EllipticK(k)</td>    <td>real k in (-1:1)</td>    <td><i>K(k)</i> complete elliptic integral of the first kind</td></tr>
+^<tr>    <td>EllipticE(k)</td>    <td>real k in [-1:1]</td>    <td><i>E(k)</i> complete elliptic integral of the second kind</td></tr>
+^<tr>    <td>EllipticPi(n,k)</td>    <td> real n&lt;1, real k in (-1:1)</td>    <td> &Pi;(<i>n,k</i>) complete elliptic integral of the third kind</td></tr>
 ^<tr>    <td>erf(x)</td>    <td>any</td>    <td>erf(Re(<i>x</i>)), error function of real(<i>x</i>)</td></tr>
 ^<tr>    <td>erfc(x)</td>    <td>any</td>    <td>erfc(Re(<i>x</i>)), 1.0 - error function of real(<i>x</i>)</td></tr>
 ^<tr>    <td>exp(x)</td>    <td>any</td>    <td><i>e<sup>x</sup></i>, exponential function of <i>x</i></td></tr>
@@ -1566,27 +1566,6 @@ C marker below is used to signal this to doc2html:
 %atanh(x)@ ~~ @$tanh sup -1 x$ (inverse hyperbolic tangent) in radians
  The `atanh(x)` function returns the inverse hyperbolic tangent of its
  argument in radians.
-?expressions functions EllipticK
-?EllipticK
-4 EllipticK
-#EllipticK(k) & real k $\in$ (-1:1) & ~ & $K(k)$ complete elliptic integral of the first kind \\
-%EllipticK(k)@real k in (-1:1)@$K ( k )$ complete elliptic integral of the first kind
- The `EllipticK(k)` function returns the complete elliptic integral of the
- first kind. See `elliptic integrals` for more details.
-?expressions functions EllipticE
-?EllipticE
-4 EllipticE
-#EllipticE(k) & real k $\in$ [-1:1] & ~ & $E(k)$ complete elliptic integral of the second kind \\
-%EllipticE(k)@real k in [-1:1]@ $E ( k )$ complete elliptic integral of the second kind
- The `EllipticE(k)` function returns the complete elliptic integral of the
- second kind. See `elliptic integrals` for more details.
-?expressions functions EllipticPi
-?EllipticPi
-4 EllipticPi
-#EllipticPi(n,k) & real n$<$1, real k $\in$ (-1:1) & ~ & $\Pi(n,k)$ complete elliptic integral of the third kind \\
-%EllipticPi(n,k)@ real n<1, real k in (-1:1)@ $Pi ( n,k )$ complete elliptic integral of the third kind
- The `EllipticPi(n,k)` function returns the complete elliptic integral of the
- third kind. See `elliptic integrals` for more details.
 4 besj0
 ?expressions functions besj0
 ?besj0
@@ -1678,6 +1657,27 @@ C marker below is used to signal this to doc2html:
 %cosh(x)@ ~~ @$cosh~x$, hyperbolic cosine of $x$ in radians
  The `cosh(x)` function returns the hyperbolic cosine of its argument.  `cosh`
  expects its argument to be in radians.
+?expressions functions EllipticK
+?EllipticK
+4 EllipticK
+#EllipticK(k) & real k $\in$ (-1:1) & ~ & $K(k)$ complete elliptic integral of the first kind \\
+%EllipticK(k)@real k in (-1:1)@$K ( k )$ complete elliptic integral of the first kind
+ The `EllipticK(k)` function returns the complete elliptic integral of the
+ first kind. See `elliptic integrals` for more details.
+?expressions functions EllipticE
+?EllipticE
+4 EllipticE
+#EllipticE(k) & real k $\in$ [-1:1] & ~ & $E(k)$ complete elliptic integral of the second kind \\
+%EllipticE(k)@real k in [-1:1]@ $E ( k )$ complete elliptic integral of the second kind
+ The `EllipticE(k)` function returns the complete elliptic integral of the
+ second kind. See `elliptic integrals` for more details.
+?expressions functions EllipticPi
+?EllipticPi
+4 EllipticPi
+#EllipticPi(n,k) & real n$<$1, real k $\in$ (-1:1) & ~ & $\Pi(n,k)$ complete elliptic integral of the third kind \\
+%EllipticPi(n,k)@ real n<1, real k in (-1:1)@ $Pi ( n,k )$ complete elliptic integral of the third kind
+ The `EllipticPi(n,k)` function returns the complete elliptic integral of the
+ third kind. See `elliptic integrals` for more details.
 4 erf
 ?expressions functions erf
 ?erf
@@ -2334,17 +2334,23 @@ C marker below is used to signal this to doc2html:
 =elliptic integrals
  The `EllipticK(k)` function returns the complete elliptic integral of the first
  kind, i.e. the definite integral between 0 and pi/2 of the function
- `(1-(k*sin(p))**2)**(-0.5)`.  The domain of `k` is -1 to 1 (exclusive).
+ `(1 - k^2*sin^2(p))^(-0.5)`.  The domain of `k` is -1 to 1 (exclusive).
+
+#TeX \quad\quad EllipticK$(k)=\int_0^{\pi/2} {\sqrt{1-k^2sin^2\theta}~}^{-1}~d\theta$
 
  The `EllipticE(k)` function returns the complete elliptic integral of the
  second kind, i.e. the definite integral between 0 and pi/2 of the function
- `(1-(k*sin(p))**2)**0.5`.  The domain of `k` is -1 to 1 (inclusive).
+ `(1 - k^2*sin^2(p))^0.5`.  The domain of `k` is -1 to 1 (inclusive).
+
+#TeX \quad\quad EllipticE$(k)=\int_0^{\pi/2} {\sqrt{1-k^2sin^2\theta}}~d\theta$
 
  The `EllipticPi(n,k)` function returns the complete elliptic integral of the
  third kind, i.e. the definite integral between 0 and pi/2 of the function
- `(1-(k*sin(p))**2)**(-0.5)/(1-n*sin(p)**2)`.  The parameter `n` must be less
+ `(1 - k^2*sin^2(p))^(-0.5) / (1  - n*sin^2(p))`.  The parameter `n` must be less
  than 1, while `k` must lie between -1 and 1 (exclusive).  Note that by
  definition EllipticPi(0,k) == EllipticK(k) for all possible values of `k`.
+
+#TeX \quad\quad EllipticPi$(n,k)=\int_0^{\pi/2} {\big[(1-nsin^2\theta)\sqrt{1-k^2sin^2\theta}~\big]}^{-1}d\theta$
 
 4 Expint
 ?expressions functions expint

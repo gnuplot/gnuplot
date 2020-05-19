@@ -1,0 +1,42 @@
+#
+# Elliptic integrals of the third kind
+#
+save_encoding = GPVAL_ENCODING
+set encoding utf8
+
+set title "Complete elliptic integral of the third kind EllipticPi(n,k)"
+
+set key reverse left Left
+set key title "Π(n,k) = {/*2 ∫@_{/*0.5 0}^{/*.5 π/2}}"\
+             ."{/:Italic [1-nsin^2(t)]^{-1} sqrt(1-k^2sin^2(t))^{-1} dt}\n"
+
+set border 3
+set margins 10,10,-1,4
+set sample 250
+set xrange [0:1]
+set xtics 0.1 format "%.1f" nomirror
+set yrange [0:6]
+set ytics 1 nomirror
+set xlabel "{/:Italic k}"
+
+plot EllipticPi(0.5,x) with lines lw 2 title "n = 0.5", \
+     EllipticPi(0.0,x) with lines lw 2 title "n = 0", \
+     EllipticPi(-1.,x) with lines lw 2 title "n = -1", \
+     EllipticPi(-3.,x) with lines lw 2 title "n = -3", \
+     EllipticPi(-10.,x) with lines lw 2 lc "brown" title "n = -10"
+
+pause -1 "<cr> to continue"
+
+set title "Complete elliptic integrals of the first and second kinds"
+set key notitle invert top center spacing 2
+set xtics 0.5
+set xlabel "x"
+set xrange [-1:1]
+set yrange [1:3]
+
+plot EllipticE(x) lw 2 title "\nEllipticE(x)={/*1.5 ∫@_{/*0.5 0}^{/*.5 π/2}}{/:Italic sqrt(1-k^2sin^2(t)) dt}\n",\
+     EllipticK(x) lw 2 title "\nEllipticK(x)={/*1.5 ∫@_{/*0.5 0}^{/*.5 π/2}}{/:Italic sqrt(1-k^2sin^2(t))^{-1} dt}\n"
+
+pause -1 "<cr> to continue"
+reset
+set encoding save_encoding

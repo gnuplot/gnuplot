@@ -270,6 +270,7 @@ load "BesselK.dem"
 reset
 
 print "********************** special functions *************************"
+load "elliptic.dem"
 load "ibeta.dem"
 load "lambert.dem"
 reset
