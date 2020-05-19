@@ -2350,6 +2350,7 @@ inverse_incomplete_gamma( double a, double p )
 
 /*
  *   invibeta(a, b, p) returns z such that ibeta(a, b, z) = p
+ *   a, b > 0    0 <= p <= 1
  */
 void
 f_inverse_ibeta(union argument *arg)
@@ -2366,9 +2367,11 @@ f_inverse_ibeta(union argument *arg)
     if (p < 0.0 || p > 1.0)
 	int_warn(NO_CARET, "f_inverse_ibeta: p %g not in domain", p);
 
-    if (p <= 0) {
+    if (a <= 0.0 || b <= 0.0) {
+	push(Gcomplex(&ret, not_a_number(), 0.0));
+    } else if (p <= 0) {
 	push(Gcomplex(&ret, 0.0, 0.0));
-    } else if (p >= 1) {
+    } else if (fabs(1. - p) < IGAMMA_PRECISION)  {
 	push(Gcomplex(&ret, 1.0, 0.0));
 
     /* The normal case */
@@ -2391,7 +2394,6 @@ inverse_incomplete_beta( double a, double b, double p )
     double err, t, u, w, z;
     int j;
 
-    const double EPS = sqrt(MACHEP);
     double afac = LGAMMA(a+b) - LGAMMA(a) - LGAMMA(b);
 
     /* Initial guess from Abramowitz & Stegun 26.2.22, 26.5.22 */
@@ -2422,6 +2424,14 @@ inverse_incomplete_beta( double a, double b, double p )
 	    z = 1. - pow( b*w*(1.-p), 1./b);
     }
 
+    /* underflow above yields z ~ 1, which is OK, but errno is set */
+    if (fabs(1.-z) < IGAMMA_PRECISION)
+	errno = 0;
+
+    /* Not sure this can ever happen */
+    if (isnan(z) || errno)
+	return not_a_number();
+
     /* Halley's method */
     for (j=0; j<12; j++) {
 	if (z == 0. || z == 1.)
@@ -2435,7 +2445,7 @@ inverse_incomplete_beta( double a, double b, double p )
 	    z = 0.5 * (z + t);
 	if (z >= 1)
 	    z = 0.5 * (z + t + 1.);
-	if (fabs(t) < EPS*z  && j > 0)
+	if (fabs(t) <= MACHEP && j > 1)
 	    break;
     }
 

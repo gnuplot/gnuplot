@@ -1,0 +1,43 @@
+#
+# Unit test for invibeta implementation
+#
+set title "Numerical precision limits relative accuracy of invibeta()\nwhen a or b < ~0.05 "
+set key title "  "
+
+set border -1 front lt black linewidth 1.000 dashtype solid
+set grid xtics ytics ztics
+set grid vertical
+set view 68, 135, 1, 0.85
+set samples 50, 50
+set isosamples 50, 50
+set style data lines
+set xyplane relative 0
+set log z
+set xlabel "a" 
+set xrange [ 0.00000 : 0.200000 ] noreverse writeback
+set ylabel "b" 
+set yrange [ 0.00000 : 0.200000 ] noreverse writeback
+set zlabel "Residual" 
+set zlabel  offset character -2, 0, 0 font "" textcolor lt -1 rotate
+
+p = 0.9
+splot abs(ibeta( x, y, invibeta(x,y,p)) - p) \
+      title "|ibeta(a,b, invibeta(a,b, p)) - p|", \
+      invibeta(x,y,p) title "invibeta(x,y,p)\np = 0.9"
+
+pause -1 "<cr> to continue"
+
+# x axis is parameter p
+# y axis is parameter b
+
+set xlabel "p"
+set xrange [0:1]
+
+a = 0.1
+splot \
+      abs(ibeta( a, y, invibeta(a,y,x)) - x)\
+      title "Residual ibeta(a,b, invibeta(a,b,p))", \
+      invibeta(a,y,x) title "invibeta(a,b,p)\na = 0.1"
+
+pause -1 "<cr> to continue"
+reset
