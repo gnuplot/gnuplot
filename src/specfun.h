@@ -63,4 +63,6 @@ double chisq_cdf(int dof, double chisqr);
 void f_voigt(union argument *x);
 #endif
 
+void f_SynchrotronF(union argument *x);
+
 #endif /* GNUPLOT_SPECFUN_H */

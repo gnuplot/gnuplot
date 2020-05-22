@@ -218,6 +218,7 @@ C
 ## Note that existing function lgamma(x) = real(lnGamma(real(z)).
 ## See `lnGamma`.
 #b Complex function conj(z) returns the complex conjugate of z.
+#b Synchrotron function F(x), see `SynchrotronF`.
 #end
 
  Additional special functions are supported if a suitable external
@@ -1376,6 +1377,7 @@ Ffigure_E0
 ^<tr>    <td>sin(x)</td>    <td>any</td>    <td>sin <i>x</i>, sine of <i>x</i></td></tr>
 ^<tr>    <td>sinh(x)</td>    <td>any</td>    <td>sinh <i>x</i>, hyperbolic sine of <i>x</i> in radians</td></tr>
 ^<tr>    <td>sqrt(x)</td>    <td>any</td>    <td>&radic;<i>x</i>, square root of <i>x</i></td></tr>
+^<tr>    <td>SynchrotronF(x)</td> <td>real</td> <td> Synchtrotron function F</td></tr>
 ^<tr>    <td>tan(x)</td>    <td>any</td>    <td>tan <i>x</i>, tangent of <i>x</i></td></tr>
 ^<tr>    <td>tanh(x)</td>    <td>any</td>    <td>tanh <i>x</i>, hyperbolic tangent of <i>x</i> in radians</td></tr>
 ^<tr>    <td>voigt(x,y)</td>    <td>real</td>    <td>convolution of Gaussian and Lorentzian</td></tr>
@@ -1857,6 +1859,10 @@ C marker below is used to signal this to doc2html:
  The `sqrt(x)` function returns the square root of its argument. If the
  x is a complex value, this always returns the root with positive real
  part.
+4 SynchrotronF
+?expressions functions SynchrotronF
+#SynchrotronF(x) & real & ~ & $F(x) = x\intop_{x}^{\infty}K_{\frac{5}{3}}(\nu)~d\nu$ \\
+%SynchrotronF(x)@ ~~ @ Synchrotron function F%
 4 tan
 ?expressions functions tan
 ?tan
@@ -2510,6 +2516,19 @@ C marker below is used to signal this to doc2html:
  These routines may be found in netlib (http://netlib.sandia.gov) or in
  libopenspecfun (https://github.com/JuliaLang/openspecfun).
  See `Ai`, `Bi`, `BesselJ`, `BesselY`, `BesselI`, `BesselK`, `Hankel`.
+
+4 Synchrotron function
+?SynchrotronF
+?functions SynchrotronF
+ The synchrotron function SynchrotronF(x) describes the power distribution
+ spectrum of synchrotron radiation as a function of x given in units of the
+ critical photon energy (i.e. critical frequency vc).
+
+#TeX \quad\quad $F(x) = x\intop_{x}^{\infty}K_{\frac{5}{3}}(\nu)~d\nu$
+#TeX where $K_{\frac{5}{3}}$ is a modified Bessel function of the second kind.
+
+ Chebyshev coefficients for approximation accurate to 1.E-15 are taken from
+ MacLead (2000) NuclInstMethPhysRes A443:540-545.
 
 4 value
 ?expressions functions value

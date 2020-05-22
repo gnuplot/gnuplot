@@ -273,6 +273,7 @@ print "********************** special functions *************************"
 load "elliptic.dem"
 load "ibeta.dem"
 load "lambert.dem"
+load "synchrotron.dem"
 reset
 
 print "********************** file heatmaps.dem *********************"

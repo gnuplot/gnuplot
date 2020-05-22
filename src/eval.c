@@ -238,14 +238,16 @@ const struct ft_entry ft[] =
     {"FresnelS", f_FresnelS},	/* Fresnel integral sine term calculated from cerf */
 #endif
 
+    {"SynchrotronF", f_SynchrotronF},	/* Synchrotron F */
+
     {"tm_sec",  f_tmsec},	/* for timeseries */
     {"tm_min",  f_tmmin},	/* for timeseries */
-    {"tm_hour",  f_tmhour},	/* for timeseries */
-    {"tm_mday",  f_tmmday},	/* for timeseries */
+    {"tm_hour", f_tmhour},	/* for timeseries */
+    {"tm_mday", f_tmmday},	/* for timeseries */
     {"tm_mon",  f_tmmon},	/* for timeseries */
-    {"tm_year",  f_tmyear},	/* for timeseries */
-    {"tm_wday",  f_tmwday},	/* for timeseries */
-    {"tm_yday",  f_tmyday},	/* for timeseries */
+    {"tm_year", f_tmyear},	/* for timeseries */
+    {"tm_wday", f_tmwday},	/* for timeseries */
+    {"tm_yday", f_tmyday},	/* for timeseries */
 
     {"sprintf",  f_sprintf},	/* for string variables only */
     {"gprintf",  f_gprintf},	/* for string variables only */

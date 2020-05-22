@@ -51,6 +51,9 @@
  * -	incbet incbd incbcf pseries
  *		Normalized incomplete beta function (cephes)
  *		#ifdef IBETA
+ * -	synchrotron function F
+ *		Chebyshev approximation coefficients from
+ *		MacLeod (2000) NuclInstMethPhysRes A443:540-545.
  */
 
 /*[
@@ -89,7 +92,7 @@
  * Although these files do not contain licensing information, the author
  * has agreed to their use and distribution under terms of the standard
  * BSD license.
- * The primary documentation for the libray functions is the book
+ * The primary documentation for the cephes library functions is the book
  * "Methods and Programs for Mathematical Functions", Prentice-Hall, 1989
  * by Stephen Moshier.
  */
@@ -4711,3 +4714,133 @@ pseries( double a, double b, double x )
  */
 
 
+/*
+ * Chebyshev coefficients fit to synchrotron function
+ *              ∞
+ *     F(x) = x∫ K(5/3) y dy    where x is frequency in units of
+ *              x               critical frequence v_c
+ *
+ * MacLeod (2000) NucInstMethPhysRes A443:540-545.
+ * The domain is split into 3 regions delimited by L = 27/64  U = 2197/512
+ *
+ * x < L	F(t) = pi/sqrt(3) (t^(1/3)f1(t) - t^(11/3)f2(t) - t)
+ *
+ * L <= x <= U	F(t) = pi/sqrt(3) t^(1/3) etp(-t^(2/3))f3(t)
+
+ * U < x	F(t) = sqrt(pi*t/2) etp(-t)f4(t)
+ *
+ * In each case the argument t to the Chebyshev polynomials f1 f2 f3 f4
+ * is a transform of x.  The claimed accuracy is 16 significant digits.
+ */
+
+static double f1_c[6] = {
+  2.4105383531095902 ,
+  0.0203052715485175 ,
+  0.0001333568543455 ,
+  0.0000002309772357 ,
+  0.0000000001998684 ,
+  0.0000000000001047
+};
+
+static double f2_c[5] = {
+  0.1577621017755018 ,
+  0.0003758515021084 ,
+  0.0000003988488202 ,
+  0.0000000002436560 ,
+  0.0000000000000971
+}; 
+
+static double f3_c[19] = {
+  1.3216565315966927 ,
+ -0.5065739548627054 ,
+  0.0183439310952146 ,
+  0.0253507299516339 ,
+ -0.0047005797257551 ,
+ -0.0002534396748095 ,
+  0.0001725150548613 ,
+ -0.0000147584170505 ,
+ -0.0000019684687917 ,
+  0.0000004832573584 ,
+ -0.0000000174479076 ,
+ -0.0000000052436671 ,
+  0.0000000007070160 ,
+ -0.0000000000011112 ,
+ -0.0000000000074073 ,
+  0.0000000000006102 ,
+  0.0000000000000189 ,
+ -0.0000000000000065 ,
+  0.0000000000000003
+};
+
+static double f4_c[23] = {
+  2.1496191117235133 ,
+  0.0707950115291429 ,
+ -0.0036549721782930 ,
+  0.0003175929093108 ,
+ -0.0000361428956832 ,
+  0.0000049140690366 ,
+ -0.0000007612313048 ,
+  0.0000001305499914 ,
+ -0.0000000243177802 ,
+  0.0000000048537057 ,
+ -0.0000000010276744 ,
+  0.0000000002290392 ,
+ -0.0000000000534048 ,
+  0.0000000000129634 ,
+ -0.0000000000032626 ,
+  0.0000000000008485 ,
+ -0.0000000000002273 ,
+  0.0000000000000626 ,
+ -0.0000000000000177 ,
+  0.0000000000000051 ,
+ -0.0000000000000015 ,
+  0.0000000000000005 ,
+ -0.0000000000000001
+};
+
+static double
+expand_cheby( double t, double *coef, int n )
+{
+    double u0 = 0.0;
+    double u1 = 0.0;
+    double u2 = 0.0;
+
+    while (--n >= 0) {
+	u2 = u1;
+	u1 = u0;
+	u0 = coef[n] + 2 * t * u1 - u2;
+    }
+
+    return (u0 - u2) / 2.0;
+}
+
+void
+f_SynchrotronF (union argument *arg)
+{
+    struct value a;
+    double t, F;
+    double x = real(pop(&a));
+
+    /* Domain error */
+    if (x < 0) {
+	F = not_a_number();
+    } else if (x > 745.) {
+	F = 0.0; /* Calculation will underflow */
+
+    } else if (x < 27./64.) {
+	t = x*x * 8192./729. - 1.0;
+	F = pow(x,1./3.) * expand_cheby(t, f1_c, 6)
+	  - pow(x,11./3.) * expand_cheby(t, f2_c, 5)
+	  - x;
+	F *= M_PI/sqrt(3.);
+    } else if (x <= 2197./512.) {
+	t = (128.*pow(x,2./3.) - 205.) / 133.;
+	F = pow(x,1./3.) * exp(-pow(x,2./3.)) * expand_cheby(t, f3_c, 19);
+	F *= M_PI/sqrt(3.);
+    } else {
+	t = 2197./(256.*x) - 1.0;
+	F = sqrt(M_PI*x/2.) * exp(-x) * expand_cheby(t, f4_c, 23);
+    }
+
+    push(Gcomplex ( &a, F, 0.0 ));
+}
