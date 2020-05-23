@@ -1,7 +1,7 @@
 #
 # Unit test for invibeta implementation
 #
-set title "Numerical precision limits relative accuracy of invibeta()\nwhen a or b < ~0.05 "
+set title 'Numerical precision limits relative accuracy of invibeta()\nwhen a or b < \~0.05 '
 set key title "  "
 
 set border -1 front lt black linewidth 1.000 dashtype solid
