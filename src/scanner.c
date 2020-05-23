@@ -371,8 +371,7 @@ substitute(char **strp, size_t *str_lenp, int current)
     /* now replace ` ` with output */
     output_pos = 0;
     while ((c = output[output_pos++])) {
-	if (c != '\n' && c != '\r')
-	    (*strp)[current++] = c;
+	(*strp)[current++] = c;
 	if (current == *str_lenp)
 	    extend_input_line();
     }
