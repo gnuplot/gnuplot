@@ -371,7 +371,12 @@ substitute(char **strp, size_t *str_lenp, int current)
     /* now replace ` ` with output */
     output_pos = 0;
     while ((c = output[output_pos++])) {
+#if (0)
+	/* This was added in 3.5, so it's been a long time.
+	 * But it makes no sense. Removed for 5.4
+	 */
 	if (c != '\n' && c != '\r')
+#endif
 	    (*strp)[current++] = c;
 	if (current == *str_lenp)
 	    extend_input_line();

@@ -14,7 +14,7 @@ using "git log" after downloading:
 We appreciate any feedback from testing this release candidate so that any
 problems can be addressed prior to the 5.4.0 roll-out expected in Spring 2020.
 
-Release Notes date: 15-May-2020
+Release Notes date: 23-May-2020
 
 * Changes between -rc1 and -rc2
 	o faster response to piped input on Windows (Bug #2204)
@@ -22,6 +22,7 @@ Release Notes date: 15-May-2020
 	o repair several problems with parallel axis plots (Bug #2294)
 	o minor changes to dumb.trm, pixmap handling
 	o -rc1 failed to act on "with labels rotate by <ang>" (Bug #2264)
+	o \n _not_ stripped from string returned by backquoted shell command
 
 Features introduced in version 5.4
 ==================================
@@ -113,6 +114,8 @@ Features introduced in version 5.4
 	o Enhanced text mode accepts the escape sequence \U+xxxx (where xxxx
 	  is a 4 or 5 character hexadecimal) to represent a Unicode code point
 	  that is converted to the corresponding UTF-8 byte sequence on output.
+	o Hypertext from "set label ... hypertext" is sent to the clipboard
+	  on left mouse-click.
 	o Time/date input recognizes format %p to handle am/pm field
 	o Support for multiple textbox styles
 	o Built-in modified Bessel functions (besi0 besi1 besin)
