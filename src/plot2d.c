@@ -1617,10 +1617,14 @@ boxplot_range_fiddling(struct curve_points *plot)
     if (plot->points[0].type == UNDEFINED)
 	int_error(NO_CARET,"boxplot has undefined x coordinate");
 
-    /* If outliers were processed, that has taken care of autoscaling. */
-    /* If not we need to calculate the whisker bar ends to determine yrange */
-    if (!boxplot_opts.outliers)
-	autoscale_boxplot(plot);
+    /* If outliers were processed, that has taken care of autoscaling on y.
+     * If not, we need to calculate the whisker bar ends to determine yrange.
+     */
+    if (boxplot_opts.outliers)
+	restore_autoscaled_ranges(&axis_array[plot->x_axis], NULL);
+    else
+	restore_autoscaled_ranges(&axis_array[plot->x_axis], &axis_array[plot->y_axis]);
+    autoscale_boxplot(plot);
 
     extra_width = plot->points[0].xhigh - plot->points[0].xlow;
     if (extra_width == 0)

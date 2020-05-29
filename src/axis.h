@@ -401,6 +401,7 @@ extern struct axis THETA_AXIS;
 
 /* Simplest form of autoscaling (no check on autoscale constraints).
  * Used by refresh_bounds() and refresh_3dbounds().
+ * Used also by autoscale_boxplot.
  */
 #define autoscale_one_point(axis, x) do {\
     if (axis->set_autoscale & AUTOSCALE_MIN && x < axis->min) \
