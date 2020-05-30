@@ -2037,7 +2037,6 @@ print_command()
 		len = strappend(&dataline, &size, len, a.v.string_val);
 	    else
 		fputs(a.v.string_val, print_out);
-	    gpfree_string(&a);
 	    need_space = FALSE;
 	} else {
 	    if (need_space) {
@@ -2052,6 +2051,7 @@ print_command()
 		disp_value(print_out, &a, FALSE);
 	    need_space = TRUE;
 	}
+	free_value(&a);
 
     } while (!END_OF_COMMAND && equals(c_token, ","));
 

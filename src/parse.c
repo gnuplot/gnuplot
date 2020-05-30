@@ -128,7 +128,7 @@ real_expression()
    double result;
    struct value a;
    result = real(const_express(&a));
-   gpfree_string(&a);
+   free_value(&a);
    return result;
 }
 
@@ -169,12 +169,6 @@ const_express(struct value *valptr)
 
     if (undefined) {
 	int_error(tkn, "undefined value");
-    }
-
-    if (valptr->type == ARRAY) {
-	/* Make sure no one tries to free it later */
-	valptr->type = NOTDEFINED;
-	int_error(NO_CARET, "const_express: unsupported array operation");
     }
 
     return (valptr);

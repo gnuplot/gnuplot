@@ -2626,10 +2626,10 @@ set_label()
 	if (a.type == STRING) {
 	    c_token = save_token;
 	    tag = assign_label_tag();
-	    gpfree_string(&a);
 	} else {
 	    tag = (int) real(&a);
 	}
+	free_value(&a);
     }
 
     if (tag <= 0)
@@ -4981,20 +4981,19 @@ set_style()
 		textbox->opaque = FALSE;
 		c_token++;
 	    } else if (almost_equals(c_token,"mar$gins")) {
-		struct value a;
 		c_token++;
 		if (END_OF_COMMAND) {
 		    textbox->xmargin = 1.;
 		    textbox->ymargin = 1.;
 		    break;
 		}
-		textbox->xmargin = real(const_express(&a));
+		textbox->xmargin = real_expression();
 		if (textbox->xmargin < 0)
 		    textbox->xmargin = 0;
 		textbox->ymargin = textbox->xmargin;
 		if (equals(c_token,",")) {
 		    c_token++;
-		    textbox->ymargin = real(const_express(&a));
+		    textbox->ymargin = real_expression();
 		    if (textbox->ymargin < 0)
 			textbox->ymargin = 0;
 		}
@@ -5601,9 +5600,8 @@ set_view()
 static void
 set_zero()
 {
-    struct value a;
     c_token++;
-    zero = magnitude(const_express(&a));
+    zero = real_expression();
 }
 
 

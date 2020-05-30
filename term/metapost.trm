@@ -213,8 +213,6 @@ static struct gen_table MP_opts[] = {
 TERM_PUBLIC void
 MP_options()
 {
-    struct value a;
-
     /* Annoying hack to handle the case of 'set termoption' after */
     /* we have already initialized the terminal.                  */
     if (!almost_equals(c_token-1, "termopt$ion")) {
@@ -307,8 +305,7 @@ MP_options()
 	case MP_OPT_MAGNIFICATION:
 	    c_token++;
 	    if (!END_OF_COMMAND)	/* global text scaling */
-		MP_textmag = (double) real(const_express(&a));
-	    /* c_token++; */ /* Needed ??? */
+		MP_textmag = real_expression();
 	    break;
 	case MP_OPT_FONT:
 	    c_token++;
@@ -328,7 +325,7 @@ MP_options()
 	    } else if (option == MP_OPT_FONT) {
 		int_error(c_token,"expecting font name");
 	    } else if (!END_OF_COMMAND) {	/*font size */
-		MP_fontsize = (double) real(const_express(&a));
+		MP_fontsize = real_expression();
 		c_token++;
 	    }
 	    break;

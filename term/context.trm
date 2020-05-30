@@ -400,7 +400,6 @@ CONTEXT_params_reset()
 TERM_PUBLIC void
 CONTEXT_options()
 {
-	struct value a;
 	char   *tmp_string;
 	char   tmp_term_options[MAX_LINE_LEN+1] = "";
 
@@ -526,15 +525,15 @@ CONTEXT_options()
 			break;
 		case CONTEXT_OPT_SCALE_DASHLENGTH:
 			c_token++;
-			CONTEXT_params.scale_dashlength = real(const_express(&a));
+			CONTEXT_params.scale_dashlength = real_expression();
 			break;
 		case CONTEXT_OPT_SCALE_LINEWIDTH:
 			c_token++;
-			CONTEXT_params.scale_linewidth = real(const_express(&a));
+			CONTEXT_params.scale_linewidth = real_expression();
 			break;
 		case CONTEXT_OPT_SCALE_TEXT:
 			c_token++;
-			CONTEXT_params.scale_text = real(const_express(&a));
+			CONTEXT_params.scale_text = real_expression();
 			break;
 		case CONTEXT_OPT_DEFAULTFONT:
 			c_token++;
