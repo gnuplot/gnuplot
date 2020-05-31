@@ -89,6 +89,8 @@ struct udft_entry * add_udf(int t_num);
 void cleanup_udvlist(void);
 int is_function(int t_num);
 
+struct value *split(const char *string, const char *sep);
+
 /* Code that uses the iteration routines here must provide */
 /* a blank iteration structure to use for bookkeeping.     */
 typedef struct iterator {
