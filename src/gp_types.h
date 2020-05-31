@@ -47,8 +47,10 @@ enum DATA_TYPES {
 	STRING,
 	DATABLOCK,
 	ARRAY,
+			/* ARRAY subcategories are marked in array->value_array[0].type */
+	COLORMAP_ARRAY,	/*    Array containing packed ARGB values */
+	TEMP_ARRAY,	/*    Array with lifetime limited to evaluation stack */
 	VOXELGRID,
-	COLORMAP_ARRAY,	/* sub-category of ARRAY containing packed ARGB values */
 	NOTDEFINED,	/* exists, but value is currently undefined */
 	INVALID_VALUE,	/* used only for error return by external functions */
 	INVALID_NAME	/* used only to trap errors in linked axis function definition */

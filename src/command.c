@@ -683,6 +683,11 @@ define()
 	c_token += 2;
 	udv = add_udv(start_token);
 	(void) const_express(&result);
+
+	/* Special handling needed to safely return an array */
+	if (result.type == ARRAY)
+	    make_array_permanent(&result);
+
 	/* Prevents memory leak if the variable name is re-used */
 	free_value(&udv->udv_value);
 	udv->udv_value = result;
@@ -845,6 +850,7 @@ lower_command(void)
 /*
  * Arrays are declared using the syntax
  *    array A[size] { = [ element, element, ... ] }
+ *    array A = [ .., .. ]
  * where size is an integer and space is reserved for elements A[1] through A[size]
  * The size itself is stored in A[0].v.int_val.A
  * The list of initial values is optional.
@@ -896,11 +902,9 @@ array_command()
     }
 
     /* Initializer syntax:   array A[10] = [x,y,z,,"foo",] */
-    if (equals(c_token, "=")) {
+    if (equals(c_token, "=") && equals(c_token+1, "[")) {
 	int initializers = 0;
-	if (!equals(++c_token, "["))
-	    int_error(c_token, "expecting Array[size] = [x,y,...]");
-	c_token++;
+	c_token += 2;
 	for (i = 1; i <= nsize; i++) {
 	    if (equals(c_token, "]"))
 		break;
@@ -979,7 +983,13 @@ is_array_assignment()
 
     /* Evaluate right side of assignment */
     c_token += 2;
-    (void) const_express(&newvalue);
+    const_express(&newvalue);
+    if (newvalue.type == ARRAY) {
+	if (newvalue.v.value_array[0].type == TEMP_ARRAY)
+	    gpfree_array(&newvalue);
+	int_error(c_token, "Cannot nest arrays");
+    }
+    free_value(&udv->udv_value.v.value_array[index]);
     udv->udv_value.v.value_array[index] = newvalue;
 
     return TRUE;

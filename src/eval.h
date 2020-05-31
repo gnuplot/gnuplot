@@ -155,6 +155,7 @@ struct value * pop_or_convert_from_string(struct value *);
 void free_value(struct value *a);
 void gpfree_string(struct value *a);
 void gpfree_array(struct value *a);
+void make_array_permanent(struct value *a);
 
 void init_array( struct udvt_entry *array, int size );
 

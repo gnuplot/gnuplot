@@ -1452,6 +1452,8 @@ f_index(union argument *arg)
 	if (i <= 0 || i > array.v.value_array[0].v.int_val)
 	    int_error(NO_CARET, "array index out of range");
 	push( &array.v.value_array[i] );
+	if (array.v.value_array[0].type == TEMP_ARRAY)
+	    gpfree_array(&array);
 
     } else if (array.type == DATABLOCK) {
 	i--;	/* line numbers run from 1 to nlines */
@@ -1475,12 +1477,15 @@ f_cardinality(union argument *arg)
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&array);
 
-    if (array.type == ARRAY)
+    if (array.type == ARRAY) {
 	size = array.v.value_array[0].v.int_val;
-    else if (array.type == DATABLOCK)
+	if (array.v.value_array[0].type == TEMP_ARRAY)
+	    gpfree_array(&array);
+    } else if (array.type == DATABLOCK) {
 	size = datablock_size(&array);
-    else
+    } else {
 	int_error(NO_CARET, "internal error: cardinality of a scalar variable");
+    }
 
     push(Ginteger(&array, size));
 }
