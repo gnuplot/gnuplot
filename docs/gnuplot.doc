@@ -3319,15 +3319,17 @@ Ffigure_newsyntax
       gnuplot -persist -e 'plot [-5:5] sinh(x)'
 
  gnuplot will open a display window, draw the plot into it, and then exit,
- leaving the display window containing the plot on the screen.  Depending on
- the terminal type, some mousing operations may still be possible in the
- persistent window.  However operations like zoom/unzoom that require redrawing
- the plot are generally not possible because the main program has already exited.
-
- You can also specify `persist` or `nopersist` at the time you set a new terminal
- type. For example
+ leaving the display window containing the plot on the screen.
+ You can also specify `persist` or `nopersist` when you set a new terminal.
 
       set term qt persist size 700,500
+
+ Depending on the terminal type, some mousing operations may still be possible
+ in the persistent window.  However operations like zoom/unzoom that require
+ redrawing the plot are not possible because the main program has exited.
+ If you want to leave a plot window open and fully mouseable after creating
+ the plot, for example when running gnuplot from a script file rather than
+ interactively, see `pause mouse close`.
 
 2 Plotting
 ?plotting
@@ -6252,6 +6254,7 @@ Ffigure_zerror
  Syntax:
        pause <time> {"<string>"}
        pause mouse {<endcondition>}{, <endcondition>} {"<string>"}
+       pause mouse close
 
  <time> may be any constant or floating-point expression.  `pause -1` will wait
  until a carriage return is hit, zero (0) won't pause at all, and a positive
@@ -6298,6 +6301,25 @@ Ffigure_zerror
        while (MOUSE_KEY != 9) {
            pause mouse key
        }
+3 pause mouse close
+?commands pause mouse close
+?pause mouse close
+?pause close
+ The command `pause mouse close` is a specific example of pausing to wait for
+ an external event.  In this case the program waits for a "close" event from
+ the plot window.  Exactly how to generate such an event varies with your
+ desktop environment and configuration, but usually you can close the plot
+ window by clicking on some widget on the window border or by typing
+ a hot-key sequence such as <alt><F4> or <ctrl>q.  If you are unsure whether
+ a suitable widget or hot-key is available to the user, you may also want to
+ define a hot-key sequence using gnuplot's own mechanism. See `bind`.
+
+ The command sequence below may be useful when running gnuplot from a script
+ rather than from the command line.
+
+      plot <...whatever...>
+      bind all "alt-End" "exit gnuplot"
+      pause mouse close
 
 2 plot
 ?commands plot
