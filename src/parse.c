@@ -602,12 +602,12 @@ parse_primary_expression()
 	    udv = get_udv_by_name(parse_datablock_name());
 	    if (!udv)
 		int_error(c_token-1, "no such datablock");
+	    add_action(PUSH)->udv_arg = udv;
 	} else {
-	    udv = add_udv(c_token++);
-	    if (udv->udv_value.type != ARRAY)
-		int_error(c_token-1, "not an array");
+	    /* Allow array name as a dummy variable */
+	    /* Give an error during evaluation if it isn't really an array */
+	    parse_primary_expression();
 	}
-	add_action(PUSH)->udv_arg = udv;
 	if (!equals(c_token, "|"))
 	    int_error(c_token, "'|' expected");
 	c_token++;

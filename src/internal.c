@@ -168,9 +168,6 @@ f_call(union argument *x)
     save_dummy = udf->dummy_values[0];
     (void) pop(&(udf->dummy_values[0]));
 
-    if (udf->dummy_values[0].type == ARRAY)
-	int_error(NO_CARET, "f_call: unsupported array operation");
-
     if (udf->dummy_num != 1)
 	int_error(NO_CARET, "function %s requires %d variables", udf->udf_name, udf->dummy_num);
 
@@ -218,8 +215,6 @@ f_calln(union argument *x)
     /* pop parameters we can use */
     for (i = num_pop - 1; i >= 0; i--) {
 	(void) pop(&(udf->dummy_values[i]));
-	if (udf->dummy_values[i].type == ARRAY)
-	    int_error(NO_CARET, "f_calln: unsupported array operation");
     }
 
     if (recursion_depth++ > STACK_DEPTH)
