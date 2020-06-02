@@ -74,8 +74,8 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
-pgf.REVISION = "112"
-pgf.REVISION_DATE = "2019/12/01 10:22:00"
+pgf.REVISION = "113"
+pgf.REVISION_DATE = "2020/06/02 16:02:00"
 
 pgf.styles = {}
 
@@ -369,7 +369,11 @@ end
 
 
 pgf.draw_points = function(t, pm)
-  gp.write("\\gppoint{"..pm.."}{")
+  local style_options = ""
+  if gfx.opacity < 1.0 then
+    style_options = string.format(",opacity=%.3f", gfx.opacity)
+  end
+  gp.write("\\gp3point{"..pm.."}{"..style_options.."}{")
   for i,v in ipairs(t) do
       gp.write("("..pgf.format_coord(v[1], v[2])..")")
   end
@@ -821,6 +825,7 @@ f:write([[
 % prevent plot mark distortions due to changes in the PGF transformation matrix
 % use `\gpscalepointstrue' and `\gpscalepointsfalse' for enabling and disabling
 % point scaling
+% 3-parameter variant gp3point passes style options as well as point type and coordinates
 %
 \newif\ifgpscalepoints
 \tikzset{gp shift only/.style={%
@@ -828,6 +833,9 @@ f:write([[
 }}
 \def\gppoint#1#2{%
   \path[solid] plot[only marks,gp point,mark options={gp shift only},#1] coordinates {#2};%
+}
+\def\gp3point#1#2#3{%
+  \path[solid#2] plot[only marks,gp point,mark options={gp shift only},#1] coordinates {#3};%
 }
 
 
