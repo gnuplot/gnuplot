@@ -123,7 +123,7 @@ const struct ft_entry ft[] =
     {"concatenate",  f_concatenate},	/* for string variables only */
     {"eqs",  f_eqs},			/* for string variables only */
     {"nes",  f_nes},			/* for string variables only */
-    {"[]",  f_range},			/* for string variables only */
+    {"[]",  f_range},			/* substring or array slice */
     {"[]",  f_index},			/* for array variables only */
     {"||",  f_cardinality},		/* for array variables only */
     {"assign", f_assign},		/* assignment operator '=' */
@@ -1193,4 +1193,33 @@ make_array_permanent(struct value *array)
     }
     copy[0].type = UNDEFINED;
     array->v.value_array = copy;
+}
+
+/* Extract a portion of the array full[N] into a new array slice[M]
+ * where M <= N
+ */
+struct value *
+array_slice( struct value *full, int beg, int end)
+{
+    struct value *array = full->v.value_array;
+    struct value *slice;
+    int i,j;
+
+    /* Sanity checks */
+    if (beg < 1 || end < beg)
+	int_error(NO_CARET, "improper range for array slice");
+    if (end > array[0].v.int_val)
+	end = array[0].v.int_val;
+
+    slice = gp_alloc( (2 + end - beg) * sizeof(struct value), "array slice" );
+    slice[0].type = TEMP_ARRAY;
+    slice[0].v.int_val = 1 + end - beg;
+
+    for (i = beg, j = 1; i <= end; i++,j++) {
+	slice[j] = array[i];
+	if (slice[j].type == STRING)
+	    slice[j].v.string_val = strdup(slice[j].v.string_val);
+    }
+
+    return slice;
 }

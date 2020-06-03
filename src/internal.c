@@ -82,7 +82,7 @@ static enum DATA_TYPES sprintf_specifier(const char *format);
 
 #define BADINT_DEFAULT int_error(NO_CARET, "error: bit shift applied to non-INT");
 #define BAD_TYPE(type) int_error(NO_CARET, (type==NOTDEFINED) ? "uninitialized user variable" : "internal error : type neither INT nor CMPLX");
-	
+
 static const char *nonstring_error = "internal error : STRING operator applied to undefined or non-STRING variable";
 
 static int recursion_depth = 0;
@@ -1377,12 +1377,13 @@ f_strstrt(union argument *arg)
  * f_range() handles both explicit calls to substr(string, beg, end)
  * and the short form string[beg:end].  The calls to gp_strlen() and
  * gp_strchrn() allow it to handle utf8 strings.
+ * f_range() also handles requests for an array slice B = A[low:high].
  */
 void
 f_range(union argument *arg)
 {
     struct value beg, end, full;
-    struct value substr;
+    struct value result;
     int ibeg, iend;
 
     (void) arg;			/* avoid -Wunused warning */
@@ -1402,11 +1403,18 @@ f_range(union argument *arg)
 	iend = floor(end.v.cmplx_val.real);
     else
 	int_error(NO_CARET, "internal error: non-numeric substring range specifier");
-	
+
+    if (full.type == ARRAY) {
+	result.v.value_array = array_slice( &full, ibeg, iend );
+	result.type = ARRAY;
+	if (full.v.value_array[0].type == TEMP_ARRAY)
+	    gpfree_array(&full);
+	push(&result);
+	return;
+    }
+
     if (full.type != STRING)
 	int_error(NO_CARET, "internal error: substring range operator applied to non-STRING type");
-
-    FPRINTF((stderr,"f_range( \"%s\", %d, %d)\n", full.v.string_val, beg.v.int_val, end.v.int_val));
 
     if (iend > gp_strlen(full.v.string_val))
 	iend = gp_strlen(full.v.string_val);
@@ -1414,12 +1422,12 @@ f_range(union argument *arg)
 	ibeg = 1;
 
     if (ibeg > iend) {
-	push(Gstring(&substr, ""));
+	push(Gstring(&result, ""));
     } else {
 	char *begp = gp_strchrn(full.v.string_val,ibeg-1);
 	char *endp = gp_strchrn(full.v.string_val,iend);
 	*endp = '\0';
-	push(Gstring(&substr, begp));
+	push(Gstring(&result, begp));
     }
     gpfree_string(&full);
 }

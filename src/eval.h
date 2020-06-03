@@ -156,6 +156,7 @@ void free_value(struct value *a);
 void gpfree_string(struct value *a);
 void gpfree_array(struct value *a);
 void make_array_permanent(struct value *a);
+struct value * array_slice(struct value *full, int beg, int end);
 
 void init_array( struct udvt_entry *array, int size );
 
