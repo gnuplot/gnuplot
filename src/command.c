@@ -626,6 +626,14 @@ undefine_command()
 	else if (*key == '$')
 	    copy_str(&key[1], ++c_token, MAX_ID_LEN-1);
 
+	/* Other strange stuff on command line */
+	else if (!isletter(c_token))
+	    int_error(c_token, "Not a variable name");
+
+	/* This command cannot deal with array elements or functions */
+	if (equals(c_token+1, "[") || equals(c_token+1, "("))
+	    int_error(c_token, "Cannot undefine function or array element");
+
 	/* ignore internal variables */
 	if (strncmp(key, "GPVAL_", 6) && strncmp(key, "MOUSE_", 6))
 	    del_udv_by_name( key, wildcard );
