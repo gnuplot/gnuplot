@@ -1,9 +1,11 @@
 2020-06-02
 
   * For gnuplot version 5.4
-    pgf.REVISION = "113"
+  * pgf.REVISION = "114"
+    Force linewidth to 0pt for text node justification
+  * pgf.REVISION = "113"
     pgf.REVISION_DATE = "2020/06/02 16:02:00"
-  * revise gppoint to pass through opacity information
+    revise gppoint to pass through opacity information
     keep old variant gppoint so that old files still work
     new variant is called gp3point  (3 parameters rather than 2)
 
