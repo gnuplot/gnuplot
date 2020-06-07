@@ -3582,12 +3582,14 @@ eval_plots()
 	axis_check_range(SECOND_Y_AXIS);
     } else {
 	assert(uses_axis[FIRST_Y_AXIS]);
+#if (0)	/* causes problems if y2 is set to logscale but never used */
 	if (axis_array[SECOND_Y_AXIS].autoscale & AUTOSCALE_MIN)
 	    axis_array[SECOND_Y_AXIS].min = axis_array[FIRST_Y_AXIS].min;
 	if (axis_array[SECOND_Y_AXIS].autoscale & AUTOSCALE_MAX)
 	    axis_array[SECOND_Y_AXIS].max = axis_array[FIRST_Y_AXIS].max;
 	if (! axis_array[SECOND_Y_AXIS].autoscale)
 	    axis_check_range(SECOND_Y_AXIS);
+#endif
     }
 
     /* This call cannot be in boundary(), called from do_plot(), because
