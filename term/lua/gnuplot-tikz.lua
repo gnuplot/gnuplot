@@ -74,8 +74,8 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
-pgf.REVISION = "113"
-pgf.REVISION_DATE = "2020/06/02 16:02:00"
+pgf.REVISION = "114"
+pgf.REVISION_DATE = "2020/06/07 19:26:00"
 
 pgf.styles = {}
 
@@ -910,9 +910,9 @@ f:write([[
   line join=round,%
 }}
 
-\tikzset{gp node left/.style={anchor=mid west,yshift=-.12ex}}
-\tikzset{gp node center/.style={anchor=mid,yshift=-.12ex}}
-\tikzset{gp node right/.style={anchor=mid east,yshift=-.12ex}}
+\tikzset{gp node left/.style={anchor=mid west,yshift=-.12ex,line width=0pt}}
+\tikzset{gp node center/.style={anchor=mid,yshift=-.12ex,line width=0pt}}
+\tikzset{gp node right/.style={anchor=mid east,yshift=-.12ex,line width=0pt}}
 
 % basic plot mark size (points)
 \newdimen\gpbasems
