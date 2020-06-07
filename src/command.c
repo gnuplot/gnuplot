@@ -2132,8 +2132,10 @@ refresh_request()
 
 	if (this_axis->linked_to_secondary)
 	    clone_linked_axes(this_axis, this_axis->linked_to_secondary);
-	else if (this_axis->linked_to_primary)
+	else if (this_axis->linked_to_primary) {
+	    if (this_axis->linked_to_primary->autoscale != AUTOSCALE_BOTH)
 	    clone_linked_axes(this_axis, this_axis->linked_to_primary);
+	}
     }
 
     if (refresh_ok == E_REFRESH_OK_2D) {
