@@ -876,8 +876,14 @@ int qt_text_angle(int angle)
 
 void qt_fillbox(int style, unsigned int x, unsigned int y, unsigned int width, unsigned int height)
 {
+	// If y >= ymax then no box is drawn. So we clip.
+	unsigned int ytop = y + height;
+	if (ytop >= term->ymax) {
+	    ytop = term->ymax-1;
+	    height = ytop - y;
+	}
 	qt->out << GEBrushStyle << style;
-	qt->out << GEFillBox << QRect(qt_termCoord(x, y + height), QSize(width, height)/qt_oversampling);
+	qt->out << GEFillBox << QRect(qt_termCoord(x, ytop), QSize(width, height)/qt_oversampling);
 }
 
 int qt_make_palette(t_sm_palette* palette)
