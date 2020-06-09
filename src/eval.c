@@ -141,6 +141,7 @@ const struct ft_entry ft[] =
     {"stringcolumn",  f_stringcolumn},	/* for using specs */
     {"strcol",  f_stringcolumn},	/* shorthand form */
     {"columnhead",  f_columnhead},
+    {"columnheader",  f_columnhead},
     {"valid",  f_valid},
     {"timecolumn",  f_timecolumn},
 
