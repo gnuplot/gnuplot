@@ -2201,7 +2201,7 @@ df_readascii(double v[], int max)
 
 		    /* June 2018: CHANGE.  For consistency with function plots,	*/
 		    /* treat imaginary result as UNDEFINED.			*/
-		    if (a.type == CMPLX && fabs(imag(&a)) > zero) {
+		    if (a.type == CMPLX && (fabs(imag(&a)) > zero) && !isnan(real(&a))) {
 			return_value = DF_COMPLEX_VALUE;
 			v[output] = not_a_number();
 			continue;
