@@ -1,4 +1,4 @@
-C corresponding original gnuplot.doc for 5.4.0 (2020-04-09)
+C corresponding original gnuplot.doc for 5.4.0 (2020-06-01)
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -317,7 +317,6 @@ C 行が長いのは、できればなんとかしたい
 #end
 
 4 新しいコマンドやコマンドオプション
-?new commands
 #start
 #b ボクセル格子データ用コマンド。以下参照: `set vgrid`, `set vxrange`,
 ## `vclear`, `vfill`, `voxel`。
@@ -410,11 +409,11 @@ C 行が長いのは、できればなんとかしたい
 #start
 #b 3 次元描画スタイル `with zerrorfill`。以下参照: `zerrorfill`,
 ## `fenceplots`,
-^ <a href="http://gnuplot.info/demo_5.2/zerror.html">
+^ <a href="http://gnuplot.info/demo_5.4/zerror.html">
    zerror デモ。
 ^ </a>
 #b ビースウォームグラフ。以下参照: `set jitter`, `beeswarm`,
-^ <a href="http://gnuplot.info/demo_5.2/jitter.html">
+^ <a href="http://gnuplot.info/demo_5.4/jitter.html">
    ビースウォームグラフデモ。
 ^ </a>
 #b グラフの点 (points) で使われる個々の記号は、データ値で制御できます。
@@ -430,13 +429,13 @@ C 行が長いのは、できればなんとかしたい
 #b ラベル、矢 (arrow)、オブジェクトの定義に極座標が使えます。
 #b `set [m]ttics` は極座標モードでの外周方位軸のラベルと刻みを配置しま
 ## す。以下参照:
-^ <a href="http://gnuplot.info/demo_5.2/ttics.html">
+^ <a href="http://gnuplot.info/demo_5.4/ttics.html">
    極座標軸と刻みラベルデモ
 ^ </a>
 #b `set rlabel` は動径軸 (r 軸) の上にラベルを配置します。
 #b 逆向きの `rrange` (例: set rrange [90:0]) で天球地平座標 (celestial
 ## horizontal coordinates) が使えるようになります。以下参照:
-^ <a href="http://gnuplot.info/demo_5.2/solar_path.html">
+^ <a href="http://gnuplot.info/demo_5.4/solar_path.html">
    天体軌道デモ
 ^ </a>
 #b `set border polar` は極座標の外周の回りに実線を描きます。
@@ -448,7 +447,7 @@ C 行が長いのは、できればなんとかしたい
 #b グラフの任意の軸に、線形の範囲への写像とその逆写像を意味する関数の組
 ## を割り当てることができ、それを非線形にすることも可能です (以下参照:
 ## `set nonlinear`)。
-^ <a href="http://gnuplot.info/demo_5.2/nonlinear3.html">
+^ <a href="http://gnuplot.info/demo_5.4/nonlinear3.html">
    非線形 x,y 軸デモ
 ^ </a>
 #b なじみ深いコマンド `set logscale` は、現在は関数の組 log(x), exp(x)
@@ -1426,6 +1425,7 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>columnhead(x)</td>    <td>整数</td>    <td> データファイルの最初の <i>x</i> 列目中の文字列</td></tr>
 ^<tr>    <td>exists("X")</td>    <td>文字列</td>    <td> 変数名 X が定義されていれば 1, そうでなければ 0</td></tr>
 ^<tr>    <td>hsv2rgb(h,s,v)</td>    <td>[0:1] 内の実数 h,s,v</td>    <td> HSV 色を 24ビットの RGB 色へ変換</td></tr>
+^<tr>    <td>palette(z)</td>    <td>実数</td>    <td> z に割り当てられた RGB パレット色</td></tr>
 ^<tr>    <td>stringcolumn(x)</td>    <td>整数</td>    <td> 文字列としての <i>x</i> 列目の内容</td></tr>
 ^<tr>    <td>timecolumn(N,format)</td>    <td>整数, 文字列</td>    <td> データ入力中の <i>N</i> 列目の日時データ</td></tr>
 ^<tr>    <td>tm_hour(x)</td>    <td>整数</td>    <td>時</td></tr>
@@ -2030,6 +2030,13 @@ C マーカを doc2html へのこのシグナルとして使用します。
 %hsv2rgb(h,s,v)@[0:1] 内の h,s,v@24 ビット RGB 色値
  関数 `hsv2rgb(h,s,v)` は、HSV (色相(Hue)/彩度(Saturation)/明度(Value))
  の 3 つ組をそれと同等な RGB 値に変換します。
+4 palette
+?expressions functions palette
+?palette
+#palette(z) & 実数 & z に割り当てられた RGB パレット色 \\
+%palette(z)@実数@z に割り当てられた RGB パレット色
+ `palette(z)` は cbrange の現在の範囲で z に割り当てられるパレット色の
+ RGB 表現を返します。
 4 stringcolumn
 ?expressions functions stringcolumn
 ?stringcolumn
@@ -3183,6 +3190,8 @@ Ffigure_newsyntax
       グラフの表題 (`key`)
       front
  各階層内では、要素の描画は以下の順番です:
+      格子線、軸、境界要素 (grid, axis, border elements)
+      番号順のピクスマップ画像 (pixmaps)
       番号順のオブジェクト (rectangle, circle, ellipse, polygon)
       番号順のラベル (label)
       番号順の矢印 (arrow)
@@ -3340,15 +3349,18 @@ Ffigure_newsyntax
       gnuplot -persist -e 'plot [-5:5] sinh(x)'
 
  gnuplot は、表示ウィンドウを開き、その中にグラフを描き、そして終了し、
- 表示ウィンドウはグラフをその中に持ったままスクリーンに残ります。出力形
- 式によっては、その残ったウィンドウ上でも多少のマウス操作が可能な場合も
- あります。しかし、グラフの再描画を要求するズーム (とその逆) のような操
- 作は、既にプログラムが終了しているので一般的には無理です。
-
- 新しい出力形式を設定するときにも `persist` や `nopersist` を指定できま
- す。例:
-
+ 表示ウィンドウはグラフをその中に持ったままスクリーンに残ります。新しい
+ 出力形式をセットする際に `persist` や `nopersist` を指定することもでき
+ ます。
+ 
       set term qt persist size 700,500
+
+ 出力形式によっては、その残ったウィンドウ上でも多少のマウス操作が可能な
+ 場合もあります。しかし、グラフの再描画を要求するズーム (とその逆) のよ
+ うな操作は、既にプログラムが終了しているので無理です。描画ウィンドウを
+ 開いたまま残し、その後のマウス機能も完全に可能にするには、例えば
+ gnuplot を対話型ではなく、スクリプトファイルから実行させる方法がありま
+ す。以下参照: `pause mouse close`。
 
 2 描画 (Plotting)
 ?plotting
@@ -3491,9 +3503,9 @@ Ffigure_newsyntax
  テータスは、変数 GPVAL_SYSTEM_ERRNO と GPVAL_SYSTEM_ERRMSG に返されま
  す。
 
- 復帰 ('\r') と改行 ('\n') 文字は、置換時の文字入力から取り除きます。こ
- れは、system() 関数による返り値の文字列とは違いがあり、こちらはこれら
- の文字を取り除きません。以下参照: `system`。
+ [変更] (version 4 から 5.2 までと異なる挙動): 復帰 ('\r') と改行 ('\n')
+ 文字は、置換時の文字入力から取り除きません。この変更は、インラインの逆
+ 引用符の置換に system() 関数を導入したものです。
 
  コマンド置換は、単一引用符内の文字列以外は、`gnuplot` のコマンドライ
  ン中、どこででも使用可能です。
@@ -4762,14 +4774,15 @@ Ffigure_linespoints
 2 parallelaxes
 Ffigure_parallel
 ?plotting styles parallelaxes
+?plot with parallelaxes
 ?with parallelaxes
 ?parallelaxes
 ?parallel
  平行座標描画 (parallel axis plot, parallel coordinates plot とも呼ばれ
  る) は、多次元データの相関を視覚化します。入力データの個々の列は、それ
  ぞれ別々のスケールの縦軸に割り当てられます。一つのファイルのすべての列
- を描画する場合は、グラフの折れ線 1 本が、データの 1 行分の値を表してい
- ます。
+ を描画する場合は、グラフの折れ線 1 本が、そのファイルのデータの 1 行分
+ の値を表しています。
  それらを数種類に分類して色を割り当てることはよく行われますが、
  それは、その分類と軸との間の関係を視覚的に調査することを可能にします。
 
@@ -4779,9 +4792,9 @@ Ffigure_parallel
      plot $DATA using col1{:varcol1} {at <xpos>} {<line properties}, \
           $DATA using col2, ...
 
- 注意: gnuplot バージョン 5.4 では、描画スタイル parallelaxes の書式に
- 「変更」を導入しています。改良された書式では、平行座標軸数の制限をなく
- すことが可能です。
+ 変更: gnuplot バージョン 5.4 では、描画スタイル parallelaxes の書式に
+ 変更を導入しています。改良された書式では、平行座標軸数の制限をなくすこ
+ とが可能です。
 
       gnuplot 5.2:   plot $DATA using 1:2:3:4:5 with parallelaxes
       gnuplot 5.4:   plot for [col=1:5] $DATA using col with parallelaxes
@@ -5381,9 +5394,10 @@ Ffigure_zerror
           print ARG2 * 4.56, @ARG2 * 4.56
           print "This plot produced by script ", ARG0
 
- この例の ARG1 はマクロとして参照しなければいけませんが、ARG2 はマクロ
- 参照でも (数値定数になる)、変数のままでも (文字列 "1.23" が実数値に自
- 動的に変換された後の同じ数値になる) 構わないことに注意してください。
+ この例の ARG1 は文字列なので、それはマクロとして参照しなければいけませ
+ んが、ARG2 はマクロ参照でも (数値定数になる)、変数のままでも (文字列
+ "1.23" が実数値に自動的に変換された後の同じ数値になる) 構わないことに
+ 注意してください。
 
  シェルスクリプトで gnuplot をコマンドラインオプション `-c` つきで実行
  することで、これと同じことを直接行うこともできます:
@@ -6270,6 +6284,7 @@ Ffigure_zerror
  書式:
        pause <time> {"<string>"}
        pause mouse {<endcondition>}{, <endcondition>} {"<string>"}
+       pause mouse close
 
  <time> は、任意の定数または実数値の式です。`pause -1` は改行キーが押さ
  されるまで待ち、0 を指定すると一切待たず、正の数を指定するとその秒数だ
@@ -6316,6 +6331,25 @@ Ffigure_zerror
        while (MOUSE_KEY != 9) {
            pause mouse key
        }
+3 pause mouse close
+?commands pause mouse close
+?pause mouse close
+?pause close
+ コマンド `pause mouse close` は、外部イベントを待つために中断する特徴
+ 的な例の一つです。この場合、gnuplot は描画ウィンドウから "close" イベ
+ ントが来るのを待ちます。デスクトップ環境、構成毎に正確にそのイベントを
+ 生成する方法は異なりますが、通常は、描画ウィンドウをウィンドウの境界に
+ あるなんらかの部品をマウスクリックするか、<alt><F4> や <ctrl>q のよう
+ なホットキー列をタイプすることで close できます。それに適切な枠の部品
+ や、ホットキーをユーザが利用可能であるかわからない場合、gnuplot 自身の
+ 仕組みでホットキー列を定義することもできます。以下参照: `bind`。
+
+ 以下のコマンド列は、gnuplot をコマンドラインからでなくスクリプトから実
+ 行している場合に有用です。
+
+      plot <...whatever...>
+      bind all "alt-End" "exit gnuplot"
+      pause mouse close
 
 2 plot
 ?commands plot
@@ -7586,13 +7620,16 @@ Ffigure_zerror
  plot 文の `using` 項目内の式では、入力ファイルに含まれる実際のデータ値
  に加えて管理情報も参照でき、これらは "疑似列" (pseudocolumns) に含まれ
  ています。
-       column(0)   データ集合内での各点の順番。順番は 0 から始まり、2
-                   行のブランク行でリセットされます。略記 $0 も使用可。
-       column(-1)  この番号は 0 から始まり、1 行のブランク行でリセット
-                   されます。これは、行列、または格子状データ内のデータ
-                   行に対応します。
-       column(-2)  複数のデータ集合を持つファイル内の、現在のデータ集合
-                   の index 番号。以下参照: `index`。
+       column(0)   データ集合内での各点の順番。順番は 0 から始まり、空
+                   行やコメント行でない行で増え、2 行の連続する空行でリ
+                   セットされます。略記 $0 も使用可。
+       column(-1)  この番号は 0 から始まり、1 行の空行で増え、2 行の連
+                   続する空行でリセットされます。これは、行列、または格
+                   子状データ内のデータ行に対応します。また、データ集合
+                   内の別々の線分や多角形を区別するのにも使えます。
+       column(-2)  0 から始まり、2 行の連続する空行で増えます。これは、
+                   複数のデータ集合を持つファイル内の、現在のデータ集合
+                   の index 番号です。以下参照: `index`。
 5 key
 ?using key
 ?plot using key
@@ -9822,7 +9859,7 @@ Ffigure_missing
  コマンド `set encoding locale` は、他のオプションとは違い、これは現在
  のロカールを実行時の環境から決定しようとします。たいていのシステムでは
  これは環境変数 LC_ALL, LC_CTYPE, LANG のいずれかによって制御されます。
- この仕組みは、例えば wxt, cairopdf 出力形式で、UTF-8 や EUC-JP のよう
+ この仕組みは、例えば wxt, pdf 出力形式で、UTF-8 や EUC-JP のよう
  なマルチバイト文字エンコードを通すために必要です。このコマンドは日付や
  数字などのロカール特有の表現には影響を与えません。
  以下も参照: `set locale`, `set decimalsign`。
@@ -12413,17 +12450,22 @@ Ffigure_multiple_keys
 ?commands set palette
 ?commands show palette
 ?set palette
-?show palette
-?palette
- パレットは、`pm3d` で、カラー等高線や多角形、カラーヒストグラム、色勾
- 配の背景、その他実装されている、あるいは実装されるものの塗りつぶしで使
- われる、色の記憶場所です。ここではそれは滑らかで "連続的な" カラーや灰
- 色階調のパレットを意味しますが、それを単にパレットと呼ぶことにします。
- 
- カラーパレットは、多角形の色の塗りつぶしと滑らかな色のパレットをサポー
- トした出力形式を必要とし、それは現在、`pm3d` で一覧表示される出力形式
- で使用可能です。色の値の範囲は、`set cbrange` と `set log cb` で独立に
- 調整可能です。カラーパレット全体は `colorbox` 中に表示されます。
+=palette
+ パレットは、色の集合で、通常は一つ以上の段階的なグラデーションの形式で
+ 順序づけられ、`pm3d` 曲面やその他のグラフ要素を z の値で色付けするのに
+ 使われます。plot の z 座標か、追加のデータ列の灰色階調値が、現在のパレ
+ ットの色に自動的に写像されます。パレットの色は、明示的な色指定でもアク
+ セスできます (以下参照: `colorspec`)。
+#start
+#b 範囲 [0:1] 内の、パレット比 (`palette fraction`) ともいう灰色階調値
+## (`gray value`) として
+#b 描画要素の z 座標に対応する z 値 (`z value`) として
+#b 範囲 [cbmin:cbmax] 内のカラーボックス値 (`cb value`) として
+## (以下参照: `set cbrange`)
+#end
+ 現在のパレットは、デフォルトでは描画スタイル `pm3d` を使用するグラフの
+ 隣に別のカラーボックス (`colorbox`) として表示されます。そのカラーボッ
+ クスは、手動で選択したり無効にしたりできます。以下参照: `set colorbox`。
 
  書式:
        set palette
@@ -12839,19 +12881,27 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  (spiderplot) の p1, p2, ... 軸の一つに作用すること以外は、`set xrange`
  や `set xtics` と同じです。以下参照: `parallelaxes`, `set xrange`,
  `set xtics`。range と tics コマンドへの通常のオプションは、平行座標描
- 画スタイルには意味のないものもありますが、一応すべてを受けつけます。ラ
- ベルの配置はクモの巣グラフにのみ関連しますが、動径方向の offset を変え
- ることで調整できます。
+ 画スタイルには意味のないものもありますが、一応すべてを受けつけます。
+
+ `set paxis <axisno> label <label-options>` は、spiderplot 用で、その他
+ では無視されます。平行座標描画の軸は、plot コマンドの `title` オプショ
+ ンでラベル付けできます。これは xtic ラベルを生成するので、`set xtics`
+ も必要となることに注意してください。
+ 
+ 軸の線種属性は、`set style parallelaxis` で制御します。
 3 pixmap
 ?pixmap
 ?set pixmap
+?unset pixmaps
+?show pixmaps
 ?commands set pixmap
  書式:
        set pixmap <index> "filename" at <position>
-                  {width <w> | height <h> | size <w> <h>}
-                  {front|behind} {center}
+                  {width <w> | height <h> | size <w>,<h>}
+                  {front|back|behind} {center}
        show pixmaps
        unset pixmaps
+       unset pixmap <index>
 
  コマンド `set pixmap` は、その後に続く plot で表示されるオブジェクトを
  定義するコマンド `set object` と似ています。そのピクスマップを構成する
@@ -13139,8 +13189,8 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 
  空間座標 x, y, z ベースのクリッピングとは別に、四辺形を描画するかどう
  かを最終的なパレットカラー値で決定することもできます。
- `clipcb`: (デフォルト) cbmin 未満のパレットカラー値は cbmin として、
- cbmax より大きいパレットカラー値は cbmax として扱います。
+ `clipcb`: (デフォルト) cbmin 未満のパレットカラー値は cbmin にクリッピ
+ ングし、cbmax より大きいパレットカラー値は cbmax にクリッピングします。
  `noclipcb`: cbrange 外のパレットカラー値の四辺形は何も描画しません。
 
 4 色の割り当て
@@ -13773,7 +13823,10 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  コマンド `set style fill` は、boxes, histograms, candlesticks,
  filledcurves での描画における描画要素のデフォルトのスタイルの設定に使
  われます。このデフォルトは、個々の描画に塗り潰しスタイル (fillstyle)
- を指定することで上書きできます。以下参照: `set style rectangle`。
+ を指定することで上書きできます。
+
+ `set obj` で生成する長方形 (rectangle) の塗り潰しスタイルには、別のデ
+ フォルトがあることに注意してください。 以下参照: `set style rectangle`。
 
  書式:
        set style fill {empty
@@ -13781,7 +13834,8 @@ C 下記の以下参照: オプション `positive`, `negative`)。
                        | {transparent} pattern {<n>}}
                       {border {lt} {lc <colorspec>} | noborder}
 
- デフォルトの塗りつぶしスタイル (fillstyle) は `empty` です。
+ オプション `empty` は、塗り潰し領域を塗り潰しません。これがデフォルト
+ です。
 
  オプション `solid` は、出力形式がサポートしている場合、その色での単色
  塗りを行います。パラメータ <density> は塗りつぶし色の強さを表していて
@@ -13796,8 +13850,6 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  バに依存します。塗りつぶしの boxes スタイルで複数のデータ集合を描画す
  る場合そのパターンは、複数の曲線の描画における線種の周期と同様、有効な
  パターンを、パターン <n> から始めて周期的に利用します。
-
- オプション `empty` は、箱を塗りつぶしませんが、これがデフォルトです。
 
 ?fillcolor
 ?fc
@@ -16736,7 +16788,7 @@ C 度の記号は set encoding locale で出るようになると。
  これは Qt のレンダリングモード (Qt の説明書を参照してください) に強く
  依存します。
 
- `raise` と `lower` の機能はあまり当てにできません。
+ コマンド `raise` と `lower` はあまり当てにできません。
 
 2 外部ライブラリ (External libraries)
 ?bugs external_libraries
@@ -16747,9 +16799,8 @@ C 度の記号は set encoding locale で出るようになると。
 =pdf
  外部ライブラリ GD (PNG/JPEG/GIF/sixelgd 出力形式、pixmap で使用):
  バージョン 2.0.33 までの libgd には、Adobe の Symbol フォントの文字の
- マッピングに関するいくつかのバグがありました。また、アンチエイリアスさ
- れた線分がキャンバスの上の角と交わる場合に、ライブラリがセグメンテーシ
- ョンフォルトを引き起すこともありました。
+ マッピングに関するいくつかのバグがありました。
+ 点線-破線パターンは、これらの出力形式ではサポートしていません。
 
  外部ライブラリ PDFlib (pdfcairo ではない PDF terminal で使用):
  gnuplot は libpdf のバージョン 4, 5, 6 のいずれかをリンクできます。し

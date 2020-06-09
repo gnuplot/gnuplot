@@ -234,8 +234,8 @@ diff -ru docs/tex2ja.awk.ORG docs/tex2ja.awk
 +}
 +
 diff -ru term/ai.trm.ORG term/ai.trm
---- term/ai.trm.ORG	2020-04-09 16:31:56.915369000 +0900
-+++ term/ai.trm	2020-04-09 16:33:48.590153000 +0900
+--- term/ai.trm.ORG	2020-06-08 18:02:46.730098000 +0900
++++ term/ai.trm	2020-06-08 18:03:43.574408000 +0900
 @@ -526,6 +526,7 @@
  
  #ifdef TERM_HELP
@@ -268,8 +268,8 @@ diff -ru term/ai.trm.ORG term/ai.trm
  END_HELP(ai)
  #endif /* TERM_HELP */
 diff -ru term/aquaterm.trm.ORG term/aquaterm.trm
---- term/aquaterm.trm.ORG	2020-04-09 16:31:56.933762000 +0900
-+++ term/aquaterm.trm	2020-04-09 16:33:48.590957000 +0900
+--- term/aquaterm.trm.ORG	2020-06-08 18:02:46.877623000 +0900
++++ term/aquaterm.trm	2020-06-08 18:03:43.575232000 +0900
 @@ -1048,6 +1048,7 @@
  
  #ifdef TERM_HELP
@@ -320,8 +320,8 @@ diff -ru term/aquaterm.trm.ORG term/aquaterm.trm
  #endif /* TERM_HELP */
  
 diff -ru term/be.trm.ORG term/be.trm
---- term/be.trm.ORG	2020-04-09 16:31:56.937976000 +0900
-+++ term/be.trm	2020-04-09 16:33:48.591696000 +0900
+--- term/be.trm.ORG	2020-06-08 18:02:46.886893000 +0900
++++ term/be.trm	2020-06-08 18:03:43.576072000 +0900
 @@ -387,6 +387,7 @@
  
  #ifdef TERM_HELP
@@ -633,8 +633,8 @@ diff -ru term/be.trm.ORG term/be.trm
  END_HELP(be)
  #endif /* TERM_HELP */
 diff -ru term/caca.trm.ORG term/caca.trm
---- term/caca.trm.ORG	2020-04-09 16:31:56.936691000 +0900
-+++ term/caca.trm	2020-04-09 16:33:48.593340000 +0900
+--- term/caca.trm.ORG	2020-06-08 18:02:46.885758000 +0900
++++ term/caca.trm	2020-06-08 18:03:43.577794000 +0900
 @@ -1263,7 +1263,7 @@
  	if (CACA_charset == CACA_ASCII)
  		symbol = (point <= -1) ? L'.' : point % 26 + 'A';
@@ -808,8 +808,8 @@ diff -ru term/caca.trm.ORG term/caca.trm
  #endif /* TERM_HELP */
  
 diff -ru term/cairo.trm.ORG term/cairo.trm
---- term/cairo.trm.ORG	2020-04-09 16:31:56.939061000 +0900
-+++ term/cairo.trm	2020-04-09 16:33:48.594608000 +0900
+--- term/cairo.trm.ORG	2020-06-08 18:02:46.894916000 +0900
++++ term/cairo.trm	2020-06-08 18:03:43.579161000 +0900
 @@ -1477,6 +1477,7 @@
  
  #ifdef TERM_HELP
@@ -1211,8 +1211,8 @@ diff -ru term/cairo.trm.ORG term/cairo.trm
  #endif /* TERM_HELP */
  
 diff -ru term/canvas.trm.ORG term/canvas.trm
---- term/canvas.trm.ORG	2020-04-09 16:31:56.903750000 +0900
-+++ term/canvas.trm	2020-04-09 16:33:48.595524000 +0900
+--- term/canvas.trm.ORG	2020-06-08 18:02:46.692539000 +0900
++++ term/canvas.trm	2020-06-08 18:03:43.580155000 +0900
 @@ -1670,6 +1670,7 @@
  
  #ifdef TERM_HELP
@@ -1307,8 +1307,8 @@ diff -ru term/canvas.trm.ORG term/canvas.trm
  END_HELP(canvas)
  #endif /* TERM_HELP */
 diff -ru term/cgm.trm.ORG term/cgm.trm
---- term/cgm.trm.ORG	2020-04-09 16:31:56.908946000 +0900
-+++ term/cgm.trm	2020-04-09 16:33:48.596624000 +0900
+--- term/cgm.trm.ORG	2020-06-08 18:02:46.702335000 +0900
++++ term/cgm.trm	2020-06-08 18:03:43.581307000 +0900
 @@ -1727,6 +1727,7 @@
  
  #ifdef TERM_HELP
@@ -1631,8 +1631,8 @@ diff -ru term/cgm.trm.ORG term/cgm.trm
  END_HELP(cgm)
  #endif /* TERM_HELP */
 diff -ru term/context.trm.ORG term/context.trm
---- term/context.trm.ORG	2020-04-09 16:31:56.922277000 +0900
-+++ term/context.trm	2020-04-09 16:33:48.597883000 +0900
+--- term/context.trm.ORG	2020-06-08 18:02:46.792693000 +0900
++++ term/context.trm	2020-06-08 18:03:43.582599000 +0900
 @@ -1977,6 +1977,7 @@
  
  #ifdef TERM_HELP
@@ -1801,8 +1801,8 @@ diff -ru term/context.trm.ORG term/context.trm
  #endif /* TERM_HELP */
  
 diff -ru term/corel.trm.ORG term/corel.trm
---- term/corel.trm.ORG	2020-04-09 16:31:56.917157000 +0900
-+++ term/corel.trm	2020-04-09 16:33:48.598351000 +0900
+--- term/corel.trm.ORG	2020-06-08 18:02:46.736614000 +0900
++++ term/corel.trm	2020-06-08 18:03:43.583125000 +0900
 @@ -431,6 +431,7 @@
  
  #ifdef TERM_HELP
@@ -1836,8 +1836,8 @@ diff -ru term/corel.trm.ORG term/corel.trm
  END_HELP(corel)
  #endif /* TERM_HELP */
 diff -ru term/debug.trm.ORG term/debug.trm
---- term/debug.trm.ORG	2020-04-09 16:31:56.901741000 +0900
-+++ term/debug.trm	2020-04-09 16:33:48.598775000 +0900
+--- term/debug.trm.ORG	2020-06-08 18:02:46.690831000 +0900
++++ term/debug.trm	2020-06-08 18:03:43.583578000 +0900
 @@ -372,6 +372,7 @@
  
  #ifdef TERM_HELP
@@ -1864,9 +1864,9 @@ diff -ru term/debug.trm.ORG term/debug.trm
  END_HELP(debug)
  #endif
 diff -ru term/djsvga.trm.ORG term/djsvga.trm
---- term/djsvga.trm.ORG	2020-04-09 16:31:56.907909000 +0900
-+++ term/djsvga.trm	2020-04-09 16:33:48.599957000 +0900
-@@ -2139,6 +2139,7 @@
+--- term/djsvga.trm.ORG	2020-06-08 18:02:46.701376000 +0900
++++ term/djsvga.trm	2020-06-08 18:03:43.584710000 +0900
+@@ -2242,6 +2242,7 @@
  */
  #ifdef TERM_HELP
  START_HELP(svga)
@@ -1874,7 +1874,7 @@ diff -ru term/djsvga.trm.ORG term/djsvga.trm
  "1 svga",
  "?commands set terminal svga",
  "?set terminal svga",
-@@ -2168,5 +2169,38 @@
+@@ -2271,5 +2272,38 @@
  " parameter sets the scale factor for point symbols. You can use `fontscale`",
  " to scale the bitmap font. This might be useful if you have a hi-res display.",
  " Note that integer factors give best results."
@@ -1914,9 +1914,9 @@ diff -ru term/djsvga.trm.ORG term/djsvga.trm
  END_HELP(svga)
  #endif /* TERM_HELP */
 diff -ru term/dumb.trm.ORG term/dumb.trm
---- term/dumb.trm.ORG	2020-04-09 16:31:56.924609000 +0900
-+++ term/dumb.trm	2020-04-09 16:33:48.600698000 +0900
-@@ -993,6 +993,7 @@
+--- term/dumb.trm.ORG	2020-06-08 18:02:46.797844000 +0900
++++ term/dumb.trm	2020-06-08 18:03:43.585520000 +0900
+@@ -995,6 +995,7 @@
  
  #ifdef TERM_HELP
  START_HELP(dumb)
@@ -1924,7 +1924,7 @@ diff -ru term/dumb.trm.ORG term/dumb.trm
  "1 dumb",
  "?commands set terminal dumb",
  "?set terminal dumb",
-@@ -1067,5 +1068,80 @@
+@@ -1069,5 +1070,80 @@
  "        -0.8 +           ++||||+                    ++||||+    |",
  "          -1 +---+--------+--------+-------+--------+--------+-+",
  "                -4       -2        0       2        4        6  "
@@ -2006,8 +2006,8 @@ diff -ru term/dumb.trm.ORG term/dumb.trm
  END_HELP(dumb)
  #endif /* TERM_HELP */
 diff -ru term/dxf.trm.ORG term/dxf.trm
---- term/dxf.trm.ORG	2020-04-09 16:31:56.909660000 +0900
-+++ term/dxf.trm	2020-04-09 16:33:48.601147000 +0900
+--- term/dxf.trm.ORG	2020-06-08 18:02:46.702985000 +0900
++++ term/dxf.trm	2020-06-08 18:03:43.586059000 +0900
 @@ -400,6 +400,7 @@
  
  #ifdef TERM_HELP
@@ -2039,8 +2039,8 @@ diff -ru term/dxf.trm.ORG term/dxf.trm
  END_HELP(dxf)
  #endif /* TERM_HELP */
 diff -ru term/dxy.trm.ORG term/dxy.trm
---- term/dxy.trm.ORG	2020-04-09 16:31:56.902734000 +0900
-+++ term/dxy.trm	2020-04-09 16:33:48.601520000 +0900
+--- term/dxy.trm.ORG	2020-06-08 18:02:46.691658000 +0900
++++ term/dxy.trm	2020-06-08 18:03:43.586435000 +0900
 @@ -188,6 +188,7 @@
  
  #ifdef TERM_HELP
@@ -2068,8 +2068,8 @@ diff -ru term/dxy.trm.ORG term/dxy.trm
  END_HELP(dxy800a)
  #endif
 diff -ru term/eepic.trm.ORG term/eepic.trm
---- term/eepic.trm.ORG	2020-04-09 16:31:56.906541000 +0900
-+++ term/eepic.trm	2020-04-09 16:33:48.602133000 +0900
+--- term/eepic.trm.ORG	2020-06-08 18:02:46.700193000 +0900
++++ term/eepic.trm	2020-06-08 18:03:43.587026000 +0900
 @@ -578,6 +578,7 @@
  
  #ifdef TERM_HELP
@@ -2186,8 +2186,8 @@ diff -ru term/eepic.trm.ORG term/eepic.trm
  END_HELP(eepic)
  #endif /* TERM_HELP */
 diff -ru term/emf.trm.ORG term/emf.trm
---- term/emf.trm.ORG	2020-04-09 16:31:56.933171000 +0900
-+++ term/emf.trm	2020-04-09 16:33:48.603228000 +0900
+--- term/emf.trm.ORG	2020-06-08 18:02:46.877065000 +0900
++++ term/emf.trm	2020-06-08 18:03:43.588055000 +0900
 @@ -1978,6 +1978,7 @@
  
  #ifdef TERM_HELP
@@ -2244,8 +2244,8 @@ diff -ru term/emf.trm.ORG term/emf.trm
  END_HELP(emf)
  #endif /* TERM_HELP */
 diff -ru term/emxvga.trm.ORG term/emxvga.trm
---- term/emxvga.trm.ORG	2020-04-09 16:31:56.908180000 +0900
-+++ term/emxvga.trm	2020-04-09 16:36:36.503432000 +0900
+--- term/emxvga.trm.ORG	2020-06-08 18:02:46.701618000 +0900
++++ term/emxvga.trm	2020-06-08 18:03:43.588591000 +0900
 @@ -473,6 +473,7 @@
  #endif /* TERM_PROTO_ONLY */
  #ifdef TERM_HELP
@@ -2289,8 +2289,8 @@ diff -ru term/emxvga.trm.ORG term/emxvga.trm
  END_HELP(emxvga)
  #endif /* TERM_HELP */
 diff -ru term/epson.trm.ORG term/epson.trm
---- term/epson.trm.ORG	2020-04-09 16:31:56.918763000 +0900
-+++ term/epson.trm	2020-04-09 16:33:48.604549000 +0900
+--- term/epson.trm.ORG	2020-06-08 18:02:46.753284000 +0900
++++ term/epson.trm	2020-06-08 18:03:43.589292000 +0900
 @@ -1081,6 +1081,7 @@
  
  #ifdef TERM_HELP
@@ -2400,8 +2400,8 @@ diff -ru term/epson.trm.ORG term/epson.trm
  END_HELP(epson_180dpi)
  #endif /* TERM_HELP */
 diff -ru term/excl.trm.ORG term/excl.trm
---- term/excl.trm.ORG	2020-04-09 16:31:56.914730000 +0900
-+++ term/excl.trm	2020-04-09 16:33:48.605205000 +0900
+--- term/excl.trm.ORG	2020-06-08 18:02:46.728692000 +0900
++++ term/excl.trm	2020-06-08 18:03:43.589713000 +0900
 @@ -270,6 +270,7 @@
  
  #ifdef TERM_HELP
@@ -2429,8 +2429,8 @@ diff -ru term/excl.trm.ORG term/excl.trm
  END_HELP(excl)
  #endif
 diff -ru term/fig.trm.ORG term/fig.trm
---- term/fig.trm.ORG	2020-04-09 16:31:56.901029000 +0900
-+++ term/fig.trm	2020-04-09 16:33:48.606253000 +0900
+--- term/fig.trm.ORG	2020-06-08 18:02:46.690111000 +0900
++++ term/fig.trm	2020-06-08 18:03:43.590724000 +0900
 @@ -1287,6 +1287,7 @@
  
  #ifdef TERM_HELP
@@ -2509,8 +2509,8 @@ diff -ru term/fig.trm.ORG term/fig.trm
  #endif /* TERM_HELP */
  
 diff -ru term/gd.trm.ORG term/gd.trm
---- term/gd.trm.ORG	2020-04-09 16:31:56.924287000 +0900
-+++ term/gd.trm	2020-04-09 16:33:48.608045000 +0900
+--- term/gd.trm.ORG	2020-06-08 18:02:46.794819000 +0900
++++ term/gd.trm	2020-06-08 18:03:43.592560000 +0900
 @@ -2503,6 +2503,7 @@
  #ifndef JPEG_HELP_ONLY
  #ifdef TERM_HELP
@@ -2871,8 +2871,8 @@ diff -ru term/gd.trm.ORG term/gd.trm
  #endif /* TERM_HELP */
  #endif /* WITH_GD_SIXEL */
 diff -ru term/ggi.trm.ORG term/ggi.trm
---- term/ggi.trm.ORG	2020-04-09 16:31:56.904263000 +0900
-+++ term/ggi.trm	2020-04-09 16:33:48.608821000 +0900
+--- term/ggi.trm.ORG	2020-06-08 18:02:46.692957000 +0900
++++ term/ggi.trm	2020-06-08 18:03:43.593391000 +0900
 @@ -1508,6 +1508,7 @@
  
  #ifdef TERM_HELP
@@ -2925,8 +2925,8 @@ diff -ru term/ggi.trm.ORG term/ggi.trm
  END_HELP(ggi)
  #endif
 diff -ru term/gpic.trm.ORG term/gpic.trm
---- term/gpic.trm.ORG	2020-04-09 16:31:56.903180000 +0900
-+++ term/gpic.trm	2020-04-09 16:33:48.609268000 +0900
+--- term/gpic.trm.ORG	2020-06-08 18:02:46.692034000 +0900
++++ term/gpic.trm	2020-06-08 18:03:43.593995000 +0900
 @@ -291,6 +291,7 @@
  
  #ifdef TERM_HELP
@@ -3002,8 +3002,8 @@ diff -ru term/gpic.trm.ORG term/gpic.trm
  END_HELP(gpic)
  #endif /* TERM_HELP */
 diff -ru term/grass.trm.ORG term/grass.trm
---- term/grass.trm.ORG	2020-04-09 16:31:56.919248000 +0900
-+++ term/grass.trm	2020-04-09 16:33:48.609754000 +0900
+--- term/grass.trm.ORG	2020-06-08 18:02:46.774438000 +0900
++++ term/grass.trm	2020-06-08 18:03:43.594502000 +0900
 @@ -601,6 +601,7 @@
  
  #ifdef TERM_HELP
@@ -3033,8 +3033,8 @@ diff -ru term/grass.trm.ORG term/grass.trm
  END_HELP(grass)
  #endif
 diff -ru term/hp26.trm.ORG term/hp26.trm
---- term/hp26.trm.ORG	2020-04-09 16:31:56.917460000 +0900
-+++ term/hp26.trm	2020-04-09 16:33:48.610258000 +0900
+--- term/hp26.trm.ORG	2020-06-08 18:02:46.736888000 +0900
++++ term/hp26.trm	2020-06-08 18:03:43.595032000 +0900
 @@ -689,6 +689,7 @@
  
  #ifdef TERM_HELP
@@ -3061,8 +3061,8 @@ diff -ru term/hp26.trm.ORG term/hp26.trm
  END_HELP(hp2623a)
  #endif
 diff -ru term/hp2648.trm.ORG term/hp2648.trm
---- term/hp2648.trm.ORG	2020-04-09 16:31:56.918982000 +0900
-+++ term/hp2648.trm	2020-04-09 16:33:48.610611000 +0900
+--- term/hp2648.trm.ORG	2020-06-08 18:02:46.763874000 +0900
++++ term/hp2648.trm	2020-06-08 18:03:43.595406000 +0900
 @@ -185,6 +185,7 @@
  
  #ifdef TERM_HELP
@@ -3089,8 +3089,8 @@ diff -ru term/hp2648.trm.ORG term/hp2648.trm
  END_HELP(hp2648)
  #endif
 diff -ru term/hp500c.trm.ORG term/hp500c.trm
---- term/hp500c.trm.ORG	2020-04-09 16:31:56.935341000 +0900
-+++ term/hp500c.trm	2020-04-09 16:33:48.611052000 +0900
+--- term/hp500c.trm.ORG	2020-06-08 18:02:46.884192000 +0900
++++ term/hp500c.trm	2020-06-08 18:03:43.595872000 +0900
 @@ -516,6 +516,7 @@
  
  #ifdef TERM_HELP
@@ -3127,8 +3127,8 @@ diff -ru term/hp500c.trm.ORG term/hp500c.trm
  END_HELP(hp500c)
  #endif /* TERM_HELP */
 diff -ru term/hpgl.trm.ORG term/hpgl.trm
---- term/hpgl.trm.ORG	2020-04-09 16:31:56.916295000 +0900
-+++ term/hpgl.trm	2020-04-09 16:33:48.612601000 +0900
+--- term/hpgl.trm.ORG	2020-06-08 18:02:46.735760000 +0900
++++ term/hpgl.trm	2020-06-08 18:03:43.597371000 +0900
 @@ -3280,6 +3280,7 @@
  
  #ifdef TERM_HELP
@@ -3266,8 +3266,8 @@ diff -ru term/hpgl.trm.ORG term/hpgl.trm
  END_HELP(pcl5)
  #endif /* TERM_HELP */
 diff -ru term/hpljii.trm.ORG term/hpljii.trm
---- term/hpljii.trm.ORG	2020-04-09 16:31:56.922759000 +0900
-+++ term/hpljii.trm	2020-04-09 16:33:48.613110000 +0900
+--- term/hpljii.trm.ORG	2020-06-08 18:02:46.793329000 +0900
++++ term/hpljii.trm	2020-06-08 18:03:43.597851000 +0900
 @@ -391,6 +391,7 @@
  
  #ifdef TERM_HELP
@@ -3312,8 +3312,8 @@ diff -ru term/hpljii.trm.ORG term/hpljii.trm
  END_HELP(hpljii)
  #endif /* TERM_HELP */
 diff -ru term/hppj.trm.ORG term/hppj.trm
---- term/hppj.trm.ORG	2020-04-09 16:31:56.933989000 +0900
-+++ term/hppj.trm	2020-04-09 16:33:48.613533000 +0900
+--- term/hppj.trm.ORG	2020-06-08 18:02:46.877830000 +0900
++++ term/hppj.trm	2020-06-08 18:03:43.598256000 +0900
 @@ -268,6 +268,7 @@
  
  #ifdef TERM_HELP
@@ -3346,8 +3346,8 @@ diff -ru term/hppj.trm.ORG term/hppj.trm
  END_HELP(hppj)
  #endif
 diff -ru term/imagen.trm.ORG term/imagen.trm
---- term/imagen.trm.ORG	2020-04-09 16:31:56.904580000 +0900
-+++ term/imagen.trm	2020-04-09 16:33:48.614127000 +0900
+--- term/imagen.trm.ORG	2020-06-08 18:02:46.693245000 +0900
++++ term/imagen.trm	2020-06-08 18:03:43.598849000 +0900
 @@ -884,6 +884,7 @@
  
  #ifdef TERM_HELP
@@ -3388,8 +3388,8 @@ diff -ru term/imagen.trm.ORG term/imagen.trm
  END_HELP(imagen)
  #endif
 diff -ru term/kyo.trm.ORG term/kyo.trm
---- term/kyo.trm.ORG	2020-04-09 16:31:56.907316000 +0900
-+++ term/kyo.trm	2020-04-09 16:33:48.614529000 +0900
+--- term/kyo.trm.ORG	2020-06-08 18:02:46.700851000 +0900
++++ term/kyo.trm	2020-06-08 18:03:43.599238000 +0900
 @@ -201,6 +201,7 @@
  
  #ifdef TERM_HELP
@@ -3424,8 +3424,8 @@ diff -ru term/kyo.trm.ORG term/kyo.trm
  END_HELP(kyo)
  #endif
 diff -ru term/latex.trm.ORG term/latex.trm
---- term/latex.trm.ORG	2020-04-09 16:31:56.902499000 +0900
-+++ term/latex.trm	2020-04-09 16:33:48.615311000 +0900
+--- term/latex.trm.ORG	2020-06-08 18:02:46.691470000 +0900
++++ term/latex.trm	2020-06-08 18:03:43.600293000 +0900
 @@ -1164,6 +1164,7 @@
  
  #ifdef TERM_HELP
@@ -3516,8 +3516,8 @@ diff -ru term/latex.trm.ORG term/latex.trm
  END_HELP(latex)
  #endif /* TERM_TABLE */
 diff -ru term/latex_old.h.ORG term/latex_old.h
---- term/latex_old.h.ORG	2020-04-09 16:31:56.916910000 +0900
-+++ term/latex_old.h	2020-04-09 16:33:48.615657000 +0900
+--- term/latex_old.h.ORG	2020-06-08 18:02:46.736411000 +0900
++++ term/latex_old.h	2020-06-08 18:03:43.600651000 +0900
 @@ -5,6 +5,7 @@
   */
  #ifdef TERM_HELP
@@ -3559,8 +3559,8 @@ diff -ru term/latex_old.h.ORG term/latex_old.h
  END_HELP(latex)
  #endif
 diff -ru term/linux-vgagl.trm.ORG term/linux-vgagl.trm
---- term/linux-vgagl.trm.ORG	2020-04-09 16:31:56.906743000 +0900
-+++ term/linux-vgagl.trm	2020-04-09 16:33:48.615975000 +0900
+--- term/linux-vgagl.trm.ORG	2020-06-08 18:02:46.700354000 +0900
++++ term/linux-vgagl.trm	2020-06-08 18:03:43.600993000 +0900
 @@ -1,5 +1,6 @@
  #ifdef TERM_HELP
  START_HELP(linux)
@@ -3599,8 +3599,8 @@ diff -ru term/linux-vgagl.trm.ORG term/linux-vgagl.trm
  END_HELP(linux)
  #endif
 diff -ru term/lua/gnuplot-tikz-ja.help.ORG term/lua/gnuplot-tikz-ja.help
---- term/lua/gnuplot-tikz-ja.help.ORG	2020-04-09 16:46:02.645400000 +0900
-+++ term/lua/gnuplot-tikz-ja.help	2020-04-09 16:46:02.643407000 +0900
+--- term/lua/gnuplot-tikz-ja.help.ORG	2020-06-08 18:08:43.107147000 +0900
++++ term/lua/gnuplot-tikz-ja.help	2020-06-08 18:08:43.086170000 +0900
 @@ -0,0 +1,181 @@
 +/* $Id: gnuplot-tikz-ja.help,v 1.3 2019-08-05 18:06:42+09 shige Exp $ */
 +#ifdef JAPANESE_DOC
@@ -3784,8 +3784,8 @@ diff -ru term/lua/gnuplot-tikz-ja.help.ORG term/lua/gnuplot-tikz-ja.help
 +""
 +#endif /* JAPANESE_DOC */
 diff -ru term/lua.trm.ORG term/lua.trm
---- term/lua.trm.ORG	2020-04-09 16:31:56.916751000 +0900
-+++ term/lua.trm	2020-04-09 16:33:48.617162000 +0900
+--- term/lua.trm.ORG	2020-06-08 18:02:46.736232000 +0900
++++ term/lua.trm	2020-06-08 18:03:43.602146000 +0900
 @@ -1480,6 +1480,7 @@
  
  #ifdef TERM_HELP
@@ -3861,8 +3861,8 @@ diff -ru term/lua.trm.ORG term/lua.trm
  END_HELP(tikz)
  #endif /* TERM_HELP */
 diff -ru term/metafont.trm.ORG term/metafont.trm
---- term/metafont.trm.ORG	2020-04-09 16:31:56.923012000 +0900
-+++ term/metafont.trm	2020-04-09 16:33:48.617768000 +0900
+--- term/metafont.trm.ORG	2020-06-08 18:02:46.793597000 +0900
++++ term/metafont.trm	2020-06-08 18:03:43.602721000 +0900
 @@ -538,6 +538,7 @@
  
  #ifdef TERM_HELP
@@ -3976,8 +3976,8 @@ diff -ru term/metafont.trm.ORG term/metafont.trm
  END_HELP(mf)
  #endif /* TERM_HELP */
 diff -ru term/metapost.trm.ORG term/metapost.trm
---- term/metapost.trm.ORG	2020-04-09 16:31:56.901492000 +0900
-+++ term/metapost.trm	2020-04-09 16:33:48.618612000 +0900
+--- term/metapost.trm.ORG	2020-06-08 18:02:46.690601000 +0900
++++ term/metapost.trm	2020-06-08 18:03:43.603536000 +0900
 @@ -1057,6 +1057,7 @@
  
  #ifdef TERM_HELP
@@ -4188,8 +4188,8 @@ diff -ru term/metapost.trm.ORG term/metapost.trm
  END_HELP(mp)
  #endif				/* TERM_HELP */
 diff -ru term/mif.trm.ORG term/mif.trm
---- term/mif.trm.ORG	2020-04-09 16:31:56.894001000 +0900
-+++ term/mif.trm	2020-04-09 16:33:48.619284000 +0900
+--- term/mif.trm.ORG	2020-06-08 18:02:46.680002000 +0900
++++ term/mif.trm	2020-06-08 18:03:43.604190000 +0900
 @@ -963,6 +963,7 @@
  
  #ifdef TERM_HELP
@@ -4240,8 +4240,8 @@ diff -ru term/mif.trm.ORG term/mif.trm
  END_HELP(mif)
  #endif /* TERM_HELP */
 diff -ru term/pbm.trm.ORG term/pbm.trm
---- term/pbm.trm.ORG	2020-04-09 16:31:56.918402000 +0900
-+++ term/pbm.trm	2020-04-09 16:33:48.619743000 +0900
+--- term/pbm.trm.ORG	2020-06-08 18:02:46.752827000 +0900
++++ term/pbm.trm	2020-06-08 18:03:43.604667000 +0900
 @@ -478,6 +478,7 @@
  
  #ifdef TERM_HELP
@@ -4291,8 +4291,8 @@ diff -ru term/pbm.trm.ORG term/pbm.trm
  END_HELP(pbm)
  #endif /* TERM_HELP */
 diff -ru term/pc.trm.ORG term/pc.trm
---- term/pc.trm.ORG	2020-04-09 16:31:56.937409000 +0900
-+++ term/pc.trm	2020-04-09 16:33:48.620633000 +0900
+--- term/pc.trm.ORG	2020-06-08 18:02:46.886432000 +0900
++++ term/pc.trm	2020-06-08 18:03:43.605497000 +0900
 @@ -1587,6 +1587,7 @@
  
  #ifdef TERM_HELP
@@ -4346,8 +4346,8 @@ diff -ru term/pc.trm.ORG term/pc.trm
  END_HELP(dospc)
  #endif /* TERM_HELP */
 diff -ru term/pdf.trm.ORG term/pdf.trm
---- term/pdf.trm.ORG	2020-04-09 16:31:56.925144000 +0900
-+++ term/pdf.trm	2020-04-09 16:33:48.621639000 +0900
+--- term/pdf.trm.ORG	2020-06-08 18:02:46.805939000 +0900
++++ term/pdf.trm	2020-06-08 18:06:59.849309000 +0900
 @@ -1716,6 +1716,7 @@
  
  #ifdef TERM_HELP
@@ -4373,7 +4373,7 @@ diff -ru term/pdf.trm.ORG term/pdf.trm
 +" [非推奨] この出力形式は、Portable Document Format 形式のファイルを生成",
 +" するのに、フリーではないライブラリ PDFlib (GmbH Munchen)を使用します。",
 +" あなたが、PDFlib の商用ライセンスを持っているのでなければ、そしてそれが",
-+" 提供する特別な機能を必要とするのでなければ、これの代わりに cairopdf 出",
++" 提供する特別な機能を必要とするのでなければ、これの代わりに cairo pdf 出",
 +" 力形式を使用する方がいいでしょう。gnuplot では、wxt や qt のような対話",
 +" 型出力形式での作業中に PDF ファイルを生成させることもできます。",
 +"",
@@ -4414,8 +4414,8 @@ diff -ru term/pdf.trm.ORG term/pdf.trm
  END_HELP(pdf)
  #endif
 diff -ru term/pict2e.trm.ORG term/pict2e.trm
---- term/pict2e.trm.ORG	2020-04-09 16:31:56.907086000 +0900
-+++ term/pict2e.trm	2020-04-09 16:33:48.622441000 +0900
+--- term/pict2e.trm.ORG	2020-06-08 18:02:46.700667000 +0900
++++ term/pict2e.trm	2020-06-08 18:03:43.607117000 +0900
 @@ -1089,6 +1089,7 @@
  
  #ifdef TERM_HELP
@@ -4502,8 +4502,8 @@ diff -ru term/pict2e.trm.ORG term/pict2e.trm
  END_HELP(pict2e)
  #endif /* TERM_HELP */
 diff -ru term/pm.trm.ORG term/pm.trm
---- term/pm.trm.ORG	2020-04-09 16:31:56.900264000 +0900
-+++ term/pm.trm	2020-04-09 16:33:48.623295000 +0900
+--- term/pm.trm.ORG	2020-06-08 18:02:46.688104000 +0900
++++ term/pm.trm	2020-06-08 18:03:43.607900000 +0900
 @@ -1422,6 +1422,7 @@
  
  #ifdef TERM_HELP
@@ -4562,8 +4562,8 @@ diff -ru term/pm.trm.ORG term/pm.trm
  END_HELP(pm)
  #endif /* TERM_HELP */
 diff -ru term/post.trm.ORG term/post.trm
---- term/post.trm.ORG	2020-04-09 16:31:56.921227000 +0900
-+++ term/post.trm	2020-04-09 16:33:48.626268000 +0900
+--- term/post.trm.ORG	2020-06-08 18:02:46.782819000 +0900
++++ term/post.trm	2020-06-08 18:03:43.610599000 +0900
 @@ -4458,6 +4458,7 @@
   * of "text" that is necessary to avoid errors.
   */
@@ -5204,8 +5204,8 @@ diff -ru term/post.trm.ORG term/post.trm
  END_HELP(post)
  #endif /* TERM_HELP */
 diff -ru term/pstricks.trm.ORG term/pstricks.trm
---- term/pstricks.trm.ORG	2020-04-09 16:31:56.923469000 +0900
-+++ term/pstricks.trm	2020-04-09 16:33:48.627262000 +0900
+--- term/pstricks.trm.ORG	2020-06-08 18:02:46.794009000 +0900
++++ term/pstricks.trm	2020-06-08 18:03:43.611493000 +0900
 @@ -1283,6 +1283,7 @@
  
  #ifdef TERM_HELP
@@ -5278,8 +5278,8 @@ diff -ru term/pstricks.trm.ORG term/pstricks.trm
  END_HELP(pstricks)
  #endif /* TERM_HELP */
 diff -ru term/qms.trm.ORG term/qms.trm
---- term/qms.trm.ORG	2020-04-09 16:31:56.900460000 +0900
-+++ term/qms.trm	2020-04-09 16:33:48.627695000 +0900
+--- term/qms.trm.ORG	2020-06-08 18:02:46.688346000 +0900
++++ term/qms.trm	2020-06-08 18:03:43.611898000 +0900
 @@ -223,6 +223,7 @@
  
  #ifdef TERM_HELP
@@ -5306,8 +5306,8 @@ diff -ru term/qms.trm.ORG term/qms.trm
  END_HELP(qms)
  #endif
 diff -ru term/qt.trm.ORG term/qt.trm
---- term/qt.trm.ORG	2020-04-09 16:31:56.922439000 +0900
-+++ term/qt.trm	2020-04-09 16:33:48.628135000 +0900
+--- term/qt.trm.ORG	2020-06-08 18:02:46.792959000 +0900
++++ term/qt.trm	2020-06-08 18:03:43.612325000 +0900
 @@ -76,6 +76,7 @@
  
  #ifdef TERM_HELP
@@ -5425,8 +5425,8 @@ diff -ru term/qt.trm.ORG term/qt.trm
  END_HELP(qt)
  #endif /* TERM_HELP */
 diff -ru term/regis.trm.ORG term/regis.trm
---- term/regis.trm.ORG	2020-04-09 16:31:56.909395000 +0900
-+++ term/regis.trm	2020-04-09 16:33:48.628605000 +0900
+--- term/regis.trm.ORG	2020-06-08 18:02:46.702741000 +0900
++++ term/regis.trm	2020-06-08 18:03:43.612714000 +0900
 @@ -255,6 +255,7 @@
  
  #ifdef TERM_HELP
@@ -5458,8 +5458,8 @@ diff -ru term/regis.trm.ORG term/regis.trm
  END_HELP(regis)
  #endif
 diff -ru term/svg.trm.ORG term/svg.trm
---- term/svg.trm.ORG	2020-04-09 16:31:56.931773000 +0900
-+++ term/svg.trm	2020-04-09 16:33:48.629896000 +0900
+--- term/svg.trm.ORG	2020-06-08 18:02:46.875666000 +0900
++++ term/svg.trm	2020-06-08 18:03:43.613909000 +0900
 @@ -2298,6 +2298,7 @@
  
  #ifdef TERM_HELP
@@ -5553,8 +5553,8 @@ diff -ru term/svg.trm.ORG term/svg.trm
  END_HELP(domterm)
  #endif /* TERM_HELP */
 diff -ru term/t410x.trm.ORG term/t410x.trm
---- term/t410x.trm.ORG	2020-04-09 16:31:56.936921000 +0900
-+++ term/t410x.trm	2020-04-09 16:33:48.630341000 +0900
+--- term/t410x.trm.ORG	2020-06-08 18:02:46.886014000 +0900
++++ term/t410x.trm	2020-06-08 18:03:43.614355000 +0900
 @@ -312,6 +312,7 @@
  
  #ifdef TERM_HELP
@@ -5581,8 +5581,8 @@ diff -ru term/t410x.trm.ORG term/t410x.trm
  END_HELP(tek410x)
  #endif
 diff -ru term/tek.trm.ORG term/tek.trm
---- term/tek.trm.ORG	2020-04-09 16:31:56.915127000 +0900
-+++ term/tek.trm	2020-04-09 16:33:48.631112000 +0900
+--- term/tek.trm.ORG	2020-06-08 18:02:46.729834000 +0900
++++ term/tek.trm	2020-06-08 18:03:43.615150000 +0900
 @@ -1534,6 +1534,7 @@
  
  #ifdef TERM_HELP
@@ -5679,8 +5679,8 @@ diff -ru term/tek.trm.ORG term/tek.trm
  END_HELP(tek40)
  #endif /* TERM_HELP */
 diff -ru term/texdraw.trm.ORG term/texdraw.trm
---- term/texdraw.trm.ORG	2020-04-09 16:31:56.938352000 +0900
-+++ term/texdraw.trm	2020-04-09 16:37:58.757241000 +0900
+--- term/texdraw.trm.ORG	2020-06-08 18:02:46.887192000 +0900
++++ term/texdraw.trm	2020-06-08 18:03:43.615799000 +0900
 @@ -882,6 +882,7 @@
  
  #ifdef TERM_HELP
@@ -5749,8 +5749,8 @@ diff -ru term/texdraw.trm.ORG term/texdraw.trm
  END_HELP(texdraw)
  #endif /* TERM_HELP */
 diff -ru term/tgif.trm.ORG term/tgif.trm
---- term/tgif.trm.ORG	2020-04-09 16:31:56.932632000 +0900
-+++ term/tgif.trm	2020-04-09 16:33:48.632704000 +0900
+--- term/tgif.trm.ORG	2020-06-08 18:02:46.876504000 +0900
++++ term/tgif.trm	2020-06-08 18:03:43.616736000 +0900
 @@ -1677,6 +1677,7 @@
  
  #ifdef TERM_HELP
@@ -5840,8 +5840,8 @@ diff -ru term/tgif.trm.ORG term/tgif.trm
  #endif
  /*{{{}}}*/
 diff -ru term/tkcanvas.trm.ORG term/tkcanvas.trm
---- term/tkcanvas.trm.ORG	2020-04-09 16:31:56.934698000 +0900
-+++ term/tkcanvas.trm	2020-04-09 16:33:48.633793000 +0900
+--- term/tkcanvas.trm.ORG	2020-06-08 18:02:46.883582000 +0900
++++ term/tkcanvas.trm	2020-06-08 18:03:43.617863000 +0900
 @@ -2116,6 +2116,7 @@
  
  #ifdef TERM_HELP
@@ -6004,8 +6004,8 @@ diff -ru term/tkcanvas.trm.ORG term/tkcanvas.trm
  #endif
  
 diff -ru term/tpic.trm.ORG term/tpic.trm
---- term/tpic.trm.ORG	2020-04-09 16:31:56.935061000 +0900
-+++ term/tpic.trm	2020-04-09 16:33:48.634410000 +0900
+--- term/tpic.trm.ORG	2020-06-08 18:02:46.883954000 +0900
++++ term/tpic.trm	2020-06-08 18:03:43.618519000 +0900
 @@ -926,6 +926,7 @@
  
  #ifdef TERM_HELP
@@ -6066,8 +6066,8 @@ diff -ru term/tpic.trm.ORG term/tpic.trm
  END_HELP(tpic)
  #endif /* TERM_TABLE */
 diff -ru term/vws.trm.ORG term/vws.trm
---- term/vws.trm.ORG	2020-04-09 16:31:56.932044000 +0900
-+++ term/vws.trm	2020-04-09 16:33:48.634857000 +0900
+--- term/vws.trm.ORG	2020-06-08 18:02:46.875964000 +0900
++++ term/vws.trm	2020-06-08 18:03:43.619006000 +0900
 @@ -474,6 +474,7 @@
  
  #ifdef TERM_HELP
@@ -6096,8 +6096,8 @@ diff -ru term/vws.trm.ORG term/vws.trm
  END_HELP(VWS)
  #endif /* TERM_HELP */
 diff -ru term/win.trm.ORG term/win.trm
---- term/win.trm.ORG	2020-04-09 16:31:56.910133000 +0900
-+++ term/win.trm	2020-04-09 16:33:48.635779000 +0900
+--- term/win.trm.ORG	2020-06-08 18:02:46.703442000 +0900
++++ term/win.trm	2020-06-08 18:07:41.972510000 +0900
 @@ -1188,6 +1188,7 @@
  
  #ifdef TERM_HELP
@@ -6130,7 +6130,7 @@ diff -ru term/win.trm.ORG term/win.trm
 +"                            {enhanced | noenhanced}",
 +"                            {font <fontspec>}",
 +"                            {fontscale <scale>}",
-+"                            {linewdith <scale>}",
++"                            {linewidth <scale>}",
 +"                            {pointscale <scale>}",
 +"                            {background <rgb color>}",
 +"                            {title \"Plot Window Title\"}",
@@ -6435,8 +6435,8 @@ diff -ru term/win.trm.ORG term/win.trm
  END_HELP(windows)
  #endif /* TERM_HELP */
 diff -ru term/wxt.trm.ORG term/wxt.trm
---- term/wxt.trm.ORG	2020-04-09 16:31:56.921555000 +0900
-+++ term/wxt.trm	2020-04-09 16:33:48.636396000 +0900
+--- term/wxt.trm.ORG	2020-06-08 18:02:46.789544000 +0900
++++ term/wxt.trm	2020-06-08 18:03:43.620544000 +0900
 @@ -493,6 +493,7 @@
  
  #ifdef TERM_HELP
@@ -6577,8 +6577,8 @@ diff -ru term/wxt.trm.ORG term/wxt.trm
  END_HELP(wxt)
  #endif /* TERM_HELP */
 diff -ru term/x11.trm.ORG term/x11.trm
---- term/x11.trm.ORG	2020-04-09 16:31:56.899760000 +0900
-+++ term/x11.trm	2020-04-09 16:33:48.637976000 +0900
+--- term/x11.trm.ORG	2020-06-08 18:02:46.686204000 +0900
++++ term/x11.trm	2020-06-08 18:03:43.622030000 +0900
 @@ -2355,6 +2355,7 @@
  
  #ifdef TERM_HELP
@@ -7139,8 +7139,8 @@ diff -ru term/x11.trm.ORG term/x11.trm
  END_HELP(x11)
  #endif				/* TERM_HELP */
 diff -ru term/xlib.trm.ORG term/xlib.trm
---- term/xlib.trm.ORG	2020-04-09 16:31:56.922577000 +0900
-+++ term/xlib.trm	2020-04-09 16:33:48.638357000 +0900
+--- term/xlib.trm.ORG	2020-06-08 18:02:46.793121000 +0900
++++ term/xlib.trm	2020-06-08 18:03:43.622337000 +0900
 @@ -96,6 +96,7 @@
  
  #ifdef TERM_HELP
