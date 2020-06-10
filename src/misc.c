@@ -251,7 +251,7 @@ expand_call_args(void)
  * (3) on program entry to load initialization files (acts like "load")
  * (4) to execute script files given on the command line (acts like "load")
  * (5) to execute a single script file given with -c (acts like "call")
- * (6) "load $datablock"
+ * (6) "load $datablock" (EXPERIMENTAL)
  */
 void
 load_file(FILE *fp, char *name, int calltype)

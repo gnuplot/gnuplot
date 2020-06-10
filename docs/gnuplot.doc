@@ -277,8 +277,6 @@ C
 ##See `keyentry`.
 #b User-specified translation of mouse coordinates (EXPERIMENTAL).
 ##See map_projection demo.
-#b The `load` command can input commands from a datablock as an alternative to
-## reading them from a file (EXPERIMENTAL).
 #b `set datafile columnheaders` causes first line of input to be read as strings
 ## rather than as data values.  Equivalent to `set key autotitle columnheader`
 ## except that it does not affect generation of key entries.  If this option is
@@ -5229,7 +5227,7 @@ Ffigure_zerror
  syntax).  However in many cases it is more natural to use them as you would any
  other variable.
 
- In parallel the string parameters ARG1 ... ARG9 the passed parameters are
+ In parallel to the string parameters ARG1 ... ARG9, the passed parameters are
  stored in an array ARGV[9].  See `argv`.
 
 3 argv[ ]
@@ -6134,11 +6132,9 @@ Ffigure_zerror
  and then executed by the `load` command.  Files being `load`ed may themselves
  contain `load` or `call` commands.  See `comments` for information about
  comments in commands.  To `load` with arguments, see `call`.
- EXPERIMENTAL: Commands can be read from a datablock rather than a file.
 
  Syntax:
        load "<input-file>"
-       load $datablock
 
  The name of the input file must be enclosed in quotes.
 
