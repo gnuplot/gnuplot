@@ -414,6 +414,7 @@ free_value(struct value *a)
     gpfree_string(a);
     gpfree_datablock(a);
     gpfree_array(a);
+    a->type = NOTDEFINED;
 }
 
 /* It is always safe to call gpfree_string with a->type is INTGR or CMPLX.

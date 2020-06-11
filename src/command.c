@@ -1955,20 +1955,15 @@ print_set_output(char *name, TBOOLEAN datablock, TBOOLEAN append_p)
 	}
     } else {
 	print_out_var = add_udv_by_name(name);
-	if (print_out_var == NULL) {
-	    fprintf(stderr, "Error allocating datablock \"%s\"\n", name);
-	    return;
-	}
-	if (print_out_var->udv_value.type != NOTDEFINED) {
-	    gpfree_string(&print_out_var->udv_value);
-	    if (!append_p)
-		gpfree_datablock(&print_out_var->udv_value);
-	    if (print_out_var->udv_value.type != DATABLOCK)
-		print_out_var->udv_value.v.data_array = NULL;
-	} else {
+	if (!append_p)
+	    gpfree_datablock(&print_out_var->udv_value);
+	/* If this is not an existing datablock to be appended */
+	/* then make it a new empty datablock */
+	if (print_out_var->udv_value.type != DATABLOCK) {
+	    free_value(&print_out_var->udv_value);
+	    print_out_var->udv_value.type = DATABLOCK;
 	    print_out_var->udv_value.v.data_array = NULL;
 	}
-	print_out_var->udv_value.type = DATABLOCK;
     }
 
     print_out_name = name;
