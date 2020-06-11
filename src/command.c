@@ -2145,11 +2145,6 @@ print_command()
 	    }
 	    continue;
 	}
-	if (type_udv(c_token) == ARRAY && !equals(c_token+1, "[")) {
-	    udvt_entry *array = add_udv(c_token++);
-	    save_array_content(print_out, array->udv_value.v.value_array);
-	    continue;
-	}
 	const_express(&a);
 	if (a.type == STRING) {
 	    if (dataline != NULL)
@@ -2157,6 +2152,11 @@ print_command()
 	    else
 		fputs(a.v.string_val, print_out);
 	    need_space = FALSE;
+	} else if (a.type == ARRAY) {
+	    save_array_content(print_out, a.v.value_array);
+	    if (a.v.value_array[0].type == TEMP_ARRAY)
+		gpfree_array(&a);
+	    continue;
 	} else {
 	    if (need_space) {
 		if (dataline != NULL)
