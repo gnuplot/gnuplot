@@ -167,9 +167,7 @@ void QtGnuplotScene::flushCurrentPointsItem()
 void QtGnuplotScene::update_key_box(const QRectF rect)
 {
 	if (m_currentPlotNumber > m_key_boxes.count()) {
-		// DEBUG Feb 2018 should no longer trigger
-		// because m_key_box insertion is done in layer code for GEAfterPlot
-		m_key_boxes.insert(m_currentPlotNumber, QtGnuplotKeybox(rect));
+		m_key_boxes.insert(m_currentPlotNumber-1, QtGnuplotKeybox(rect));
 	} else if (m_key_boxes[m_currentPlotNumber-1].isEmpty()) {
 		// Retain the visible/hidden flag when re-initializing the Keybox
 		bool tmp = m_key_boxes[m_currentPlotNumber-1].ishidden();
@@ -515,12 +513,12 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 			if (0 < m_currentPlotNumber && m_currentPlotNumber <= m_key_boxes.count())
 				newgroup->setVisible( !(m_key_boxes[m_currentPlotNumber-1].ishidden()) );
 			// Store it in an ordered list so we can toggle it by index
-			m_plot_group.insert(m_currentPlotNumber, newgroup);
+			m_plot_group.insert(m_currentPlotNumber-1, newgroup);
 		} 
 
 		if (m_currentPlotNumber >= m_key_boxes.count()) {
 			QRectF empty( QPointF(0,0), QPointF(0,0));
-			m_key_boxes.insert(m_currentPlotNumber,  empty);
+			m_key_boxes.append(empty);
 			m_key_boxes[m_currentPlotNumber-1].resetStatus();
 		}
 
