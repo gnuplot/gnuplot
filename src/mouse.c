@@ -2337,9 +2337,12 @@ event_reset(struct gp_event_t *ge)
 	}
     }
 
-    /* This hack is necessary on some systems in order to prevent one  */
-    /* character of input from being swallowed when the plot window is */
-    /* closed. But which systems, exactly, and in what circumstances?  */
+    /* This hack is necessary on some systems in order to prevent one
+     * character of input from being swallowed when the plot window is
+     * closed. But which systems, exactly, and in what circumstances?
+     * FIXME (June 2020):
+     * A change to readline.c:getc_wrapper may have made this unnecessary.
+     */
     if (paused_for_mouse || !interactive) {
 	if (term && (!strncmp("x11",term->name,3)
 		 || !strncmp("wxt",term->name,3)
