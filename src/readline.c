@@ -75,7 +75,14 @@ getc_wrapper(FILE* fp)
     while (1) {
 	errno = 0;
 #ifdef USE_MOUSE
-	if (term && term->waitforinput && interactive) {
+	/* EAM June 2020:
+	 * For 20 years this was conditional on interactive.
+	 *    if (term && term->waitforinput && interactive)
+	 * Now I am suspicious that this was the cause of dropped
+	 * characters when mixing piped input with mousing,
+	 * e.g. Bugs 2134, 2279
+	 */
+	if (term && term->waitforinput) {
 	    c = term->waitforinput(0);
 	}
 	else
@@ -1399,7 +1406,10 @@ ansi_getc()
     int c;
 
 #ifdef USE_MOUSE
-    if (term && term->waitforinput && interactive)
+    /* EAM June 2020 why only interactive?
+     * if (term && term->waitforinput && interactive)
+     */
+    if (term && term->waitforinput)
 	c = term->waitforinput(0);
     else
 #endif
