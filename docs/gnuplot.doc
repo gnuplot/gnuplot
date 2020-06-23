@@ -11836,17 +11836,25 @@ Ffigure_multiple_keys
  two linked axes is visible.  The hidden axis remains linear. Coordinates along
  the visible axis are mapped by applying g(x) to hidden axis coordinates.
  f(x) maps the visible axis coordinates back onto the hidden linear axis.
+ You must provide both the forward and inverse expressions.
 
- Example:
+ To illustrate how this works, consider the case of a log-scale x2 axis.
 
-       set xrange [1:1000]
-       set nonlinear x via log10(x) inverse 10**x
+       set x2ange [1:1000]
+       set nonlinear x2 via log10(x) inverse 10**x
 
- This example establishes a log-scaled x axis. It is an alternative way of
- achieving the effect of `set log x`.  The hidden axis in this case has range
- [0:3], obtained by calculating [log10(xmin):log10(xmax)].  You must provide
- both the forward and inverse expressions.
+ This achieves the same effect as `set log x2`.  The hidden axis in this case
+ has range [0:3], obtained by calculating [log10(xmin):log10(xmax)].
 
+ The transformation functions f() and g() must be defined using a
+ dummy variable appropriate to the nonlinear axis:
+     axis: x x2   dummy variable x
+     axis: y y2   dummy variable y
+     axis: z cb   dummy variable z
+     axis: r      dummy variable r
+
+?set nonlinear examples
+?nonlinear examples
  Example:
 
        set xrange [-3:3]
