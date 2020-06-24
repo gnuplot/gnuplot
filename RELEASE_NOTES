@@ -1,7 +1,7 @@
 		Gnuplot Version 5.4 Release Notes
 		=================================
 
-First release candidate 5.4.rc2
+// Release candidate 5.4.rc2
 
 Gnuplot version 5.4 patchlevel 0 will be the start of a new supported release
 series with many new features and a few changes to features that were
@@ -14,7 +14,14 @@ using "git log" after downloading:
 We appreciate any feedback from testing this release candidate so that any
 problems can be addressed prior to the 5.4.0 roll-out expected in Spring 2020.
 
-Release Notes date: 04-Jun-2020
+Release Notes date: 22-Jun-2020
+
+* Changes since -rc2
+	o qt: clip fillbox (and "clear") to ymax (Bug #2276)
+	o qt: avoid error messages from Qt 5.15
+	o tikz: implicit border width of text nodes is always zero (Bug #2275)
+	o Do not recalculate range of unused y2 axis on refresh (Bug #2274)
+	o Back out EXPERIMENTAL command "load $DATABLOCK"
 
 * Changes between -rc1 and -rc2
 	o faster response to piped input on Windows (Bug #2204)
@@ -22,7 +29,7 @@ Release Notes date: 04-Jun-2020
 	o repair several problems with parallel axis plots (Bug #2294)
 	o minor changes to dumb.trm, pixmap handling
 	o -rc1 failed to act on "with labels rotate by <ang>" (Bug #2264)
-	o \n _not_ stripped from string returned by backquoted shell command
+	o internal \n _not_ stripped from output of backquoted shell command
 	o fix autoscaling of boxplots
 	o new function palette(z) returns packed RGB representation
 	o lua/tikz terminal applies alpha channel to point symbols
@@ -263,7 +270,7 @@ Development
 -----------
 Gnuplot development is ongoing. The development branch contains preliminary
 implementations of new features.  The current development version is 5.5
-(odd minor number) and will eventually be released as version 5.6 (even
-minor number).  Bugfixes to version 5.4 will appear in patchlevel releases
-5.4.1, 5.4.2, etc., approximately twice a year or as needed to correct a
-serious problem.
+(odd minor number) and will eventually be released as version 5.6 or 6.0
+(even minor number).  Bugfixes to version 5.4 will appear in patchlevel
+releases 5.4.1, 5.4.2, etc., approximately twice a year or as needed
+to correct a serious problem.

@@ -371,12 +371,12 @@ substitute(char **strp, size_t *str_lenp, int current)
     /* now replace ` ` with output */
     output_pos = 0;
     while ((c = output[output_pos++])) {
-#if (0)
-	/* This was added in 3.5, so it's been a long time.
-	 * But it makes no sense. Removed for 5.4
+	/* This was added in 3.5, so it's been a long time,
+	 * but deleting internal line breaks makes no sense.
+	 * Removed for 5.4
+	 * A trailing \n is still removed, however.
 	 */
-	if (c != '\n' && c != '\r')
-#endif
+	if ((output[output_pos] != '\0') || (c != '\n'))
 	    (*strp)[current++] = c;
 	if (current == *str_lenp)
 	    extend_input_line();
