@@ -3472,8 +3472,8 @@ Ffigure_newsyntax
  the backquoted text on the command line.  Exit status of the system command
  is returned in variables GPVAL_SYSTEM_ERRNO and GPVAL_SYSTEM_ERRMSG.
 
- Note: Carriage-return ('\r') and newline ('\n') characters are not stripped
- from the input stream during substitution.  This is a change from version 5.2.
+ Note: Internal carriage-return ('\r') and newline ('\n') characters are not
+ stripped from the substituted string.  This is a change from version 5.2.
 
  Command-line substitution can be used anywhere on the `gnuplot` command
  line except inside strings delimited by single quotes.
