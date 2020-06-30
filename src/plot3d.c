@@ -1259,7 +1259,9 @@ get_3ddata(struct surface_points *this_plot)
 		 * CRD_COLOR at all, since the z test bails to a goto.
 		 */
 		if (this_plot->plot_style == IMAGE) {
-		    cp->CRD_COLOR = (pm3d_color_from_column) ? color : z;
+		    dummy_type = INRANGE;
+		    store_and_update_range(&cp->CRD_COLOR, (pm3d_color_from_column) ? color : z,
+					&dummy_type, &CB_AXIS, this_plot->noautoscale);
 		}
 
 		/* Version 5: cp->z=0 in the UNDEF_ACTION recovers what	version 4 did */
