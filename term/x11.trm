@@ -531,7 +531,7 @@ X11_options()
 	    if (END_OF_COMMAND)
 		int_error(c_token, "expecting font name");
 	    if (isstringvalue(c_token) && (s = try_to_get_string())) {
-		strncpy(X11_default_font, s, sizeof(X11_default_font));
+		strncpy(X11_default_font, s, sizeof(X11_default_font)-1);
 		free(s);
 	    } else {
 		copy_str(X11_default_font, c_token, sizeof(X11_default_font));
