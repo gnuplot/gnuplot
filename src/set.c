@@ -4935,6 +4935,10 @@ set_style()
 	    if (equals(c_token,"size")) {
 		c_token++;
 		get_position(&default_ellipse.o.ellipse.extent);
+		if (default_ellipse.o.ellipse.extent.x < 0)
+		    default_ellipse.o.ellipse.extent.x = 0;
+		if (default_ellipse.o.ellipse.extent.y < 0)
+		    default_ellipse.o.ellipse.extent.y = 0;
 		c_token--;
 	    } else if (almost_equals(c_token,"ang$le")) {
 		c_token++;
@@ -5549,6 +5553,7 @@ set_view()
 	}
 	return;
     } else if (almost_equals(c_token,"noequal$_axes")) {
+	/* FIXME: set aspect_ratio = 0 ?? */
 	aspect_ratio_3D = 0;
 	c_token++;
 	return;

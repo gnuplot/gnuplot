@@ -1142,16 +1142,16 @@ get_data(struct curve_points *current_plot)
 
 	case ELLIPSES:
 	{   /* x y
-	     * x y major_diam
+	     * x y diam  (used for both major and minor axis)
 	     * x y major_diam minor_diam
 	     * x y major_diam minor_diam orientation
 	     */
 	    coordval x = v[0];
 	    coordval y = v[1];
-	    coordval major_axis = (j >= 3) ? fabs(v[2]) : 0.0;
-	    coordval minor_axis = (j >= 4) ? fabs(v[3]) : (j >= 3) ? fabs(v[2]) : 0.0;
+	    coordval major_axis = (j >= 3) ? v[2] : 0.0;
+	    coordval minor_axis = (j >= 4) ? v[3] : (j >= 3) ? v[2] : 0.0;
 	    coordval orientation = (j >= 5) ? v[4] : 0.0;
-	    coordval flag = (major_axis > 0 && minor_axis > 0) ? 0.0 : DEFAULT_RADIUS;
+	    coordval flag = (major_axis < 0 || minor_axis < 0) ?  DEFAULT_RADIUS : 0;
 
 	    if (j == 2)	/* FIXME: why not also for j == 3 or 4? */
 		orientation = default_ellipse.o.ellipse.orientation;

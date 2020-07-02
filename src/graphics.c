@@ -2530,46 +2530,42 @@ plot_ellipses(struct curve_points *plot)
 	    e->center.y = map_y(plot->points[i].y);
 	    if (invalid_coordinate(e->center.x, e->center.y))
 		continue;
-
-	    e->extent.x = plot->points[i].xlow; /* major axis */
-	    e->extent.y = plot->points[i].xhigh; /* minor axis */
-	    /* the mapping can be set by the
-	     * "set ellipseaxes" setting
-	     * both x units, mixed, both y units */
-	    /* clumsy solution */
-	    switch (e->type) {
-	    case ELLIPSEAXES_XY:
-		map_position_r(&e->extent, &tempx, &tempy, "ellipse");
-		e->extent.x = tempx;
-		e->extent.y = tempy;
-		break;
-	    case ELLIPSEAXES_XX:
-		map_position_r(&e->extent, &tempx, &tempy, "ellipse");
-		tempfoo = tempx;
-		e->extent.x = e->extent.y;
-		map_position_r(&e->extent, &tempy, &tempx, "ellipse");
-		e->extent.x = tempfoo;
-		e->extent.y = tempy;
-		break;
-	    case ELLIPSEAXES_YY:
-		map_position_r(&e->extent, &tempx, &tempy, "ellipse");
-		tempfoo = tempy;
-		e->extent.y = e->extent.x;
-		map_position_r(&e->extent, &tempy, &tempx, "ellipse");
-		e->extent.x = tempx;
-		e->extent.y = tempfoo;
-		break;
-	    }
+	    e->orientation = plot->points[i].ylow;
 
 	    if (plot->points[i].z <= DEFAULT_RADIUS) {
 		map_position_r(&default_ellipse.o.ellipse.extent,
 				&e->extent.x, &e->extent.y, "ellipse");
+	    } else {
+		e->extent.x = plot->points[i].xlow; /* major axis */
+		e->extent.y = plot->points[i].xhigh; /* minor axis */
+		/* the mapping can be set by the
+		 * "set ellipseaxes" setting
+		 * both x units, mixed, both y units */
+		/* clumsy solution */
+		switch (e->type) {
+		case ELLIPSEAXES_XY:
+		    map_position_r(&e->extent, &tempx, &tempy, "ellipse");
+		    e->extent.x = tempx;
+		    e->extent.y = tempy;
+		    break;
+		case ELLIPSEAXES_XX:
+		    map_position_r(&e->extent, &tempx, &tempy, "ellipse");
+		    tempfoo = tempx;
+		    e->extent.x = e->extent.y;
+		    map_position_r(&e->extent, &tempy, &tempx, "ellipse");
+		    e->extent.x = tempfoo;
+		    e->extent.y = tempy;
+		    break;
+		case ELLIPSEAXES_YY:
+		    map_position_r(&e->extent, &tempx, &tempy, "ellipse");
+		    tempfoo = tempy;
+		    e->extent.y = e->extent.x;
+		    map_position_r(&e->extent, &tempy, &tempx, "ellipse");
+		    e->extent.x = tempx;
+		    e->extent.y = tempfoo;
+		    break;
+		}
 	    }
-
-	    /* May 2018 - default orientation used to be signalled by
-	     * DEFAULT_ELLIPSE rather than passed in explicitly
-	     */
-	    e->orientation = plot->points[i].ylow;
 
 	    /* rgb variable  -  color read from data column */
 	    if (!check_for_variable_color(plot, &plot->varcolor[i]) && withborder)

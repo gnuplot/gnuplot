@@ -4131,7 +4131,7 @@ Ffigure_ellipses
  and the x axis.
 
       2 columns: x y
-      3 columns: x y major_diam
+      3 columns: x y diam  (used for both major and minor axes)
       4 columns: x y major_diam minor_diam
       5 columns: x y major_diam minor_diam angle
 
@@ -4140,10 +4140,15 @@ Ffigure_ellipses
  (see `set style ellipse`).  The orientation of the ellipse, which is
  defined as the angle between the major diameter and the plot's x axis,
  is taken from the default ellipse style (see `set style ellipse`).
+
  If three input columns are provided, the third column is used for both
  diameters.  The orientation angle defaults to zero.
+
  If four columns are present, they are interpreted as x, y, major diameter,
  minor diameter.  Note that these are diameters, not radii.
+ If either diameter is negative, both diameters will be taken from the
+ default set by `set style ellipse`.
+
  An optional 5th column may specify the orientation angle in degrees.
  The ellipses will also be drawn with their default extent if either of the
  supplied diameters in the 3-4-5 column form is negative.
