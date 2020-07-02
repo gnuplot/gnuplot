@@ -128,7 +128,7 @@ QSize QtGnuplotWidget::plotAreaSize() const
 
 void QtGnuplotWidget::setViewMatrix()
 {
-	m_view->resetMatrix();
+	m_view->resetTransform();
 }
 
 void QtGnuplotWidget::processEvent(QtGnuplotEventType type, QDataStream& in)
@@ -146,7 +146,7 @@ void QtGnuplotWidget::processEvent(QtGnuplotEventType type, QDataStream& in)
 		QSize s;
 		in >> s;
 		m_lastSizeRequest = s;
-		m_view->resetMatrix();
+		m_view->resetTransform();
 		QWidget* viewport = m_view->viewport();
 /*		qDebug() << "QtGnuplotWidget::processEvent Size request" << s << size() << " / viewport" << m_view->maximumViewportSize();
 		qDebug() << " widget size   " << size();
