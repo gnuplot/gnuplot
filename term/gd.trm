@@ -1348,7 +1348,10 @@ void PNG_set_color (t_colorspec *colorspec)
 	    png_state.rgb = (color.r << 16) + (color.g << 8) +color.b;
 	    return;
 	} else {
-	    int png_color = (gray <= 0) ? 0 : (int)(gray * sm_palette.colors);
+	    int png_color;
+	    if (sm_palette.use_maxcolors > 0)
+		gray = quantize_gray(gray);
+	    png_color = (gray <= 0) ? 0 : (int)(gray * sm_palette.colors);
 	    if (png_color >= sm_palette.colors)
 		png_color = sm_palette.colors - 1;
 	    /* map [0;1] to interval [0;png_smooth_colors-1] */
