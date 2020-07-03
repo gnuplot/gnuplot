@@ -9739,14 +9739,9 @@ Ffigure_missing
  splines". It does not take additional parameters.
 
  The `qnorm` algorithm calculates a weighted average of the input data at
- each grid point. Each data point is weighted inversely by its distance from
- the grid point raised to the norm power.  (Actually, the weights are given
- by the inverse of dx^norm + dy^norm, where dx and dy are the components of
- the separation of the grid point from each data point.  For some norms
- that are powers of two, specifically 4, 8, and 16, the computation is
- optimized by using the Euclidean distance in the weight calculation,
- (dx^2+dy^2)^norm/2.  However, any non-negative integer can be used.)
- The power of the norm can be specified as a single optional parameter.
+ each grid point. Each data point is weighted by the inverse of its distance
+ from the grid point raised to some power. The power is specified as an
+ optional integer parameter that defaults to 1.
  This algorithm is the default.
 
  Finally, several smoothing kernels are available to calculate weighted

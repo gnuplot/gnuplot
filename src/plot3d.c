@@ -598,6 +598,20 @@ static double
 qnorm( double dist_x, double dist_y, int q ) 
 {
     double dist = 0.0;
+
+#if (1)
+    switch (q) {
+    case 1:
+	dist = pythag(dist_x, dist_y);
+	break;
+    case 2:
+	dist = dist_x*dist_x + dist_y*dist_y;
+	break;
+    default:
+	dist = pow( pythag(dist_x, dist_y), q);
+	break;
+    }
+#else	/* old code (versions 3.5 - 5.2) */
     switch (q) {
     case 1:
 	dist = dist_x + dist_y;
@@ -624,6 +638,7 @@ qnorm( double dist_x, double dist_y, int q )
 	dist = pow(dist_x, (double)q ) + pow(dist_y, (double)q );
 	break;
     }
+#endif
     return dist;
 }
 
@@ -739,13 +754,7 @@ grid_nongrid_data(struct surface_points *this_plot)
 						 dgrid3d_norm_value );
 
 			    if (dist == 0.0) {
-				/* HBB 981209: revised flagging as undefined */
-				/* Supporting all those infinities on various
-				 * platforms becomes tiresome, 
-				 * to say the least :-(
-				 * Let's just return the first z where this 
-				 * happens unchanged, and be done with this,
-				 * period. */
+				/* HBB 981209:  flag the first undefined z and return */
 				points->type = UNDEFINED;
 				z = opoints->z;
 				c = opoints->CRD_COLOR;
