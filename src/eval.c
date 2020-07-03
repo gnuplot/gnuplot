@@ -56,6 +56,7 @@ static RETSIGTYPE fpe(int an_int);
 
 /* Global variables exported by this module */
 struct udvt_entry udv_pi = { NULL, "pi", {INTGR, {0} } };
+struct udvt_entry *udv_I;
 struct udvt_entry *udv_NaN;
 /* first in linked list */
 struct udvt_entry *first_udv = &udv_pi;
