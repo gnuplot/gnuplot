@@ -76,6 +76,7 @@ void QtGnuplotWidget::init()
 	m_active = false;
 	m_lastSizeRequest = QSize(-1, -1);
 	m_rounded = true;
+	m_ctrlQ = true;
 	m_backgroundColor = Qt::white;
 	m_antialias = true;
 	m_replotOnResize = true;
@@ -326,6 +327,7 @@ void QtGnuplotWidget::loadSettings(const QSettings& settings)
 {
 	setAntialias(settings.value("antialias", true).toBool());
 	setRounded(settings.value("rounded", true).toBool());
+	setCtrlQ(settings.value("ctrlQ", true).toBool());
 	setBackgroundColor(settings.value("backgroundColor", QColor(Qt::white)).value<QColor>());
 	setReplotOnResize(settings.value("replotOnResize", true).toBool());
 	setStatusLabelActive(settings.value("statusLabelActive", false).toBool());
@@ -335,6 +337,7 @@ void QtGnuplotWidget::saveSettings(QSettings& settings) const
 {
 	settings.setValue("antialias", m_antialias);
 	settings.setValue("rounded", m_rounded);
+	settings.setValue("ctrlQ", m_ctrlQ);
 	settings.setValue("backgroundColor", m_backgroundColor);
 	settings.setValue("replotOnResize", m_replotOnResize);
 	settings.setValue("statusLabelActive", m_statusLabelActive);
@@ -349,6 +352,11 @@ void QtGnuplotWidget::setAntialias(bool value)
 void QtGnuplotWidget::setRounded(bool value)
 {
 	m_rounded = value;
+}
+
+void QtGnuplotWidget::setCtrlQ(bool value)
+{
+	m_ctrlQ = value;
 }
 
 void QtGnuplotWidget::setReplotOnResize(bool value)

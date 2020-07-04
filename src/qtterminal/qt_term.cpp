@@ -170,6 +170,8 @@ static int  qt_optionFontSize = 9;
 static double qt_optionDashLength = 1.0;
 static double qt_optionLineWidth = 1.0;
 
+static int qt_optionctrlq = -1;	// tristate -1 = not set 0 = false 1 = true 
+
 /* Encapsulates all Qt options that have a constructor and destructor. */
 struct QtOption {
     QtOption()
@@ -562,7 +564,14 @@ void qt_graphics()
 #endif
 	qt->out << GEActivate;
 	qt->out << GETitle << qt_option->Title;
-	qt->out << GESetCtrl << qt_optionCtrl;
+
+	// We used to always send true or false; now it's a tristate
+	// only sent if there was an explicit set/unset in the "set term" command
+	if (qt_optionctrlq >= 0) {
+		qt->out << GESetCtrl << qt_optionCtrl;
+		qt_optionctrlq = -1;
+	}
+
 	qt->out << GESetWidgetSize << QSize(term->xmax, term->ymax)/qt_oversampling;
 	// Initialize the scene
 	qt->out << GESetSceneSize << QSize(term->xmax, term->ymax)/qt_oversampling;
@@ -1538,6 +1547,12 @@ void qt_options()
 	if (set_persist)  termOptions += qt_optionPersist ? " persist" : " nopersist";
 	if (set_raise)    termOptions += qt_optionRaise ? " raise" : " noraise";
 	if (set_ctrl)     termOptions += qt_optionCtrl ? " ctrl" : " noctrl";
+
+	/// Only send the ctrlQ option if it is explicitly given in "set term qt {no}ctrlq"
+	if (set_ctrl)
+	    qt_optionctrlq = qt_optionCtrl;
+	else
+	    qt_optionctrlq = -1;
 
 	/// @bug change Utf8 to local encoding
 	strncpy(term_options, termOptions.toUtf8().data(), MAX_LINE_LEN);
