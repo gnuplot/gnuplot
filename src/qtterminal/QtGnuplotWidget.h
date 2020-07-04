@@ -71,6 +71,7 @@ public:
 
 	Q_PROPERTY(bool antialias READ antialias WRITE setAntialias);
 	Q_PROPERTY(bool rounded READ rounded WRITE setRounded);
+	Q_PROPERTY(bool ctrlQ READ ctrlQ WRITE setCtrlQ);
 	Q_PROPERTY(bool replotOnResize READ replotOnResize WRITE setReplotOnResize);
 	Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor);
 	Q_PROPERTY(bool statusLabelActive READ statusLabelActive WRITE setStatusLabelActive);
@@ -90,12 +91,14 @@ public:
 
 	bool antialias() const { return m_antialias; }
 	bool rounded() const { return m_rounded; }
+	bool ctrlQ() const { return m_ctrlQ; }
 	bool replotOnResize() const { return m_replotOnResize; }
 	const QColor& backgroundColor() const { return m_backgroundColor; }
 	bool statusLabelActive() const { return m_statusLabelActive; }
 
 	void setAntialias(bool value);
 	void setRounded(bool value);
+	void setCtrlQ(bool value);
 	void setReplotOnResize(bool value);
 	void setBackgroundColor(const QColor& color);
 	void setStatusLabelActive(bool active);
@@ -131,6 +134,7 @@ private:
 	QSize m_sizeHint;
 	// these can be set from the tool widget or from the command line
 	bool m_rounded;
+	bool m_ctrlQ;
 	QColor m_backgroundColor;
 	// Settings
 	bool m_antialias;
