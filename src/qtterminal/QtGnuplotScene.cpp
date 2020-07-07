@@ -970,7 +970,12 @@ void QtGnuplotScene::keyPressEvent(QKeyEvent* event)
 	int key = -1;
 	int live;
 
-	/// @todo quit on 'q' or Ctrl+'q'
+	// quit on 'q' or Ctrl+'q'
+	if ((event->key() == 'Q')
+	&& ( !m_widget->ctrlQ() || (QApplication::keyboardModifiers() & Qt::ControlModifier) )) {
+//		event->accept();	// doesn't seem to be needed?
+		key = -1;
+	} else
 
 	// Keypad keys
 	if (event->modifiers() & Qt::KeypadModifier)
