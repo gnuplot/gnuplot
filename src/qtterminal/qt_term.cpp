@@ -639,7 +639,6 @@ void qt_text_wrapper()
 
 void qt_reset()
 {
-	/// @todo
 }
 
 void qt_move(unsigned int x, unsigned int y)
