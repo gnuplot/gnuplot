@@ -2,6 +2,7 @@ Since 5.4
 =========
 * NEW "with rgbimage" and "with rgbalpha" accept single column ARGB input
 * NEW add toggle in toolbar widget for qt terminal option "ctrl-q"
+* NEW keyword "smooth kdensity period <val>"
 * FIX y autoscaling of default "with filledcurves" #Bug 2294
 * FIX placement of mirrored x and y tics in mode 'set view projection ...'
 * FIX pm3d lighting calculation for degenerate quadrangles

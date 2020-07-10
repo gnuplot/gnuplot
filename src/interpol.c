@@ -195,9 +195,41 @@ num_curves(struct curve_points *plot)
 
    The implementation is based closely on the implementation for Bezier
    curves, except for the way the actual interpolation is generated.
-
-   FIXME: It's silly to recalculate the mean/stddev/bandwidth every time.
 */
+static double kdensity_bandwidth = 0;
+
+static void
+stats_kdensity (
+    struct curve_points *cp,
+    int first_point,	/* where to start in plot->points (to find x-range) */
+    int num_points	/* to determine end in plot->points */
+    ) {
+    struct coordinate *this_points = (cp->points) + first_point;
+    double kdensity_avg = 0;
+    double kdensity_sigma = 0;
+    double default_bandwidth;
+    int i;
+
+    kdensity_avg = 0.0;
+    kdensity_sigma = 0.0;
+    for (i = 0; i < num_points; i++) {
+	kdensity_avg   += this_points[i].x;
+	kdensity_sigma += this_points[i].x * this_points[i].x;
+    }
+    kdensity_avg /= (double)num_points;
+    kdensity_sigma = sqrt( kdensity_sigma/(double)num_points - kdensity_avg*kdensity_avg );
+
+    /* This is the optimal bandwidth if the point distribution is Gaussian.
+       (Applied Smoothing Techniques for Data Analysis
+       by Adrian W, Bowman & Adelchi Azzalini (1997)) */
+    /* If the supplied bandwidth is zero of less, the default bandwidth is used. */
+    default_bandwidth = pow( 4.0/(3.0*num_points), 1.0/5.0 ) * kdensity_sigma;
+    if (cp->smooth_parameter <= 0) {
+	kdensity_bandwidth = default_bandwidth;
+	cp->smooth_parameter = -default_bandwidth;
+    } else
+	kdensity_bandwidth = cp->smooth_parameter;
+}
 
 /* eval_kdensity is a modification of eval_bezier */
 static double
@@ -208,37 +240,18 @@ eval_kdensity (
     double x		/* x value at which to calculate y */
     ) {
 
-    unsigned int i;
     struct coordinate *this_points = (cp->points) + first_point;
-
+    double period = cp->smooth_period;
+    unsigned int i;
     double y, Z;
-    double avg, sigma;
-    double bandwidth, default_bandwidth;
-
-    avg = 0.0;
-    sigma = 0.0;
-    for (i = 0; i < num_points; i++) {
-	avg   += this_points[i].x;
-	sigma += this_points[i].x * this_points[i].x;
-    }
-    avg /= (double)num_points;
-    sigma = sqrt( sigma/(double)num_points - avg*avg ); /* Standard Deviation */
-
-    /* This is the optimal bandwidth if the point distribution is Gaussian.
-       (Applied Smoothing Techniques for Data Analysis
-       by Adrian W, Bowman & Adelchi Azzalini (1997)) */
-    /* If the supplied bandwidth is zero of less, the default bandwidth is used. */
-    default_bandwidth = pow( 4.0/(3.0*num_points), 1.0/5.0 )*sigma;
-    if (cp->smooth_parameter <= 0) {
-	bandwidth = default_bandwidth;
-	cp->smooth_parameter = -default_bandwidth;
-    } else
-	bandwidth = cp->smooth_parameter;
 
     y = 0;
     for (i = 0; i < num_points; i++) {
-	Z = ( x - this_points[i].x )/bandwidth;
-	y += this_points[i].y * exp( -0.5*Z*Z ) / bandwidth;
+	double dist = fabs(x - this_points[i].x);
+	if (period > 0 && dist > period/2)
+	    dist = period - dist;
+	Z = dist / kdensity_bandwidth;
+	y += this_points[i].y * exp( -0.5*Z*Z ) / kdensity_bandwidth;
     }
     y /= sqrt(2.0*M_PI);
 
@@ -267,6 +280,8 @@ do_kdensity(
     sxmax = X_AXIS.max;
 
     step = (sxmax - sxmin) / (samples_1 - 1);
+
+    stats_kdensity( cp, first_point, num_points );
 
     for (i = 0; i < samples_1; i++) {
 	x = sxmin + i * step;
