@@ -75,6 +75,7 @@ static void impulse_range_fiddling(struct curve_points *plot);
 static void parallel_range_fiddling(struct curve_points *plot);
 static int check_or_add_boxplot_factor(struct curve_points *plot, char* string, double x);
 static void add_tics_boxplot_factors(struct curve_points *plot);
+static void parse_kdensity_options(struct curve_points *this_plot);
 
 /* internal and external variables */
 
@@ -2328,11 +2329,7 @@ eval_plots()
 			this_plot->plot_smooth = found_token;
 			break;
 		    case SMOOTH_KDENSITY:
-			this_plot->smooth_parameter = -1; /* Default */
-			if (almost_equals(c_token,"band$width")) {
-			    c_token++;
-			    this_plot->smooth_parameter = real_expression();
-			}
+			parse_kdensity_options(this_plot);
 			/* Fall through */
 		    case SMOOTH_ACSPLINES:
 		    case SMOOTH_BEZIER:
@@ -3732,6 +3729,29 @@ parametric_fixup(struct curve_points *start_plot, int *plot_num)
 
     /* Ok, stick the free list at the end of the curve_points plot list. */
     *last_pointer = free_list;
+}
+
+
+/*
+ * handle keyword options for "smooth kdensity {bandwidth <val>} {period <val>}
+ */
+static void
+parse_kdensity_options(struct curve_points *this_plot)
+{
+    TBOOLEAN done = FALSE;
+    this_plot->smooth_parameter = -1; /* Default */
+    this_plot->smooth_period = 0;
+
+    while (!done) {
+	if (almost_equals(c_token,"band$width")) {
+	    c_token++;
+	    this_plot->smooth_parameter = real_expression();
+	} else if (almost_equals(c_token,"period")) {
+	    c_token++;
+	    this_plot->smooth_period = real_expression();
+	} else
+	    done = TRUE;
+    }
 }
 
 /*

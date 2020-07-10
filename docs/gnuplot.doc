@@ -7045,7 +7045,7 @@ Ffigure_zerror
 
  Syntax:
        smooth {unique | frequency | fnormal | cumulative | cnormal | bins
-              | kdensity {bandwidth}
+              | kdensity {bandwidth} {period}
               | csplines | acsplines | mcsplines | path | bezier | sbezier
               | unwrap | zsort}
 
@@ -7334,19 +7334,30 @@ Ffigure_smooth_path
 ?plot kdensity
 ?smooth kdensity
 ?kdensity
- The `smooth kdensity` option is a way to plot a kernel density estimate
- (a smooth histogram) for a random collection of points, using Gaussian kernels.
- A Gaussian is placed at the location of each point in the first column and
- the sum of all these Gaussians is plotted as a function. The value in the
- second column is taken as weight of the Gaussian. To obtain a normalized
- histogram, this should be 1/number-of-points. By default gnuplot calculates
- and uses the bandwidth which would be optimal for normally distributed data.
+ The `smooth kdensity` option generates and plots a kernel density estimate
+ using Gaussian kernels for the distribution from which a set of values was
+ drawn.  Values are taken from the first data column, optional weights are
+ taken from the second column.  A Gaussian is placed at the location of each
+ point and the sum of all these Gaussians is plotted as a function.
+ To obtain a normalized histogram, each weight should be 1/number-of-points.
+ 
+ Bandwidth:
+ By default gnuplot calculates and uses the bandwidth which would be optimal
+ for normally distributed data values.
       default_bandwidth = sigma * (4/3N) ** (0.2)
  This will usually be a very conservative, i.e. broad bandwidth.
  Alternatively, you can provide an explicit bandwidth.
       plot $DATA smooth kdensity bandwidth <value> with boxes
- The bandwidth used in the previous plot is stored in variable
- GPVAL_KDENSITY_BANDWIDTH.
+ The bandwidth used in the previous plot is stored in GPVAL_KDENSITY_BANDWIDTH.
+
+ Period:
+ For periodic data individual Gaussian components should be treated as repeating
+ at intervals of one period.  One example is data measured as a function of
+ angle, where the period is 2pi.  Another example is data indexed by day-of-year
+ and measured over multiple years, where the period is 365.
+ In such cases the period should be provided in the plot command:
+      plot $ANGULAR_DAT smooth kdensity period 2*pi with lines
+
 5 zsort
 ?commands plot datafile smooth zsort
 ?plot datafile smooth zsort

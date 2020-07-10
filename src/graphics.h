@@ -73,6 +73,7 @@ typedef struct curve_points {
     int histogram_sequence;	/* Ordering of this dataset within the histogram */
     enum PLOT_SMOOTH plot_smooth; /* which "smooth" method to be used? */
     double smooth_parameter;	/* e.g. optional bandwidth for smooth kdensity */
+    double smooth_period;	/* e.g. 2pi for a circular function */
     int boxplot_factors;	/* Only used if plot_style == BOXPLOT */
     int p_max;			/* how many points are allocated */
     int p_count;		/* count of points in points */
