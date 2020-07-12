@@ -1941,7 +1941,10 @@ show_key()
 	break;
     }
     case GPKEY_USER_PLACEMENT:
-	fputs("\tkey is at ", stderr);
+	fprintf(stderr, "\t%s %s of ",
+		key->vpos == JUST_BOT ? "bottom" : key->vpos == JUST_CENTRE ? "center" : "top",
+		key->hpos == RIGHT ? "right" : key->hpos == LEFT ? "left" : "center");
+	fputs("key is at ", stderr);
 	show_position(&key->user_pos, 2);
 	putc('\n', stderr);
 	break;
