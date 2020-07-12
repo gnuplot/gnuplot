@@ -4068,8 +4068,28 @@ do_3dkey_layout(legend_key *key, int *xinkey, int *yinkey)
     /* Now that we know the size of the key, we can position it as requested */
     if (key->region == GPKEY_USER_PLACEMENT) {
 	int corner_x, corner_y;
+	t_position keypos = key->user_pos;
 
-	map3d_position(&key->user_pos, &corner_x, &corner_y, "key");
+	/* Translate request for graph coordinates from x/y
+	 * to whatever the equivalent is for an xz or yz projection
+	 */
+	if (yz_projection && key->user_pos.scalex == graph) {
+	    keypos.scalez = graph;
+	    keypos.z = 1.0 - key->user_pos.x;
+	    keypos.x = 0;
+	}
+	if (xz_projection && key->user_pos.scalex == graph) {
+	    keypos.scalez = graph;
+	    keypos.z = key->user_pos.x;
+	    keypos.x = 0;
+	}
+	if (xz_projection && key->user_pos.scaley == graph) {
+	    keypos.scalex = graph;
+	    keypos.x = key->user_pos.y;
+	    keypos.y = 0;
+	}
+	
+	map3d_position(&keypos, &corner_x, &corner_y, "key");
 
 	if (key->hpos == CENTRE)
 	    key->bounds.xleft = corner_x - key_width / 2;
