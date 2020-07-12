@@ -3682,7 +3682,8 @@ parse_plot_title(struct curve_points *this_plot, char *xtitle, char *ytitle, TBO
 
 	/* This ugliness is because columnheader can be either a keyword */
 	/* or a function name.  Yes, the design could have been better. */
-	if (almost_equals(c_token,"col$umnheader") && !equals(c_token+1,"(")) {
+	if (almost_equals(c_token,"col$umnheader")
+	&& !(almost_equals(c_token,"columnhead$er") && equals(c_token+1,"(")) ) {
 	    df_set_key_title_columnhead(this_plot);
 	} else if (equals(c_token,"at")) {
 	    *set_title = FALSE;

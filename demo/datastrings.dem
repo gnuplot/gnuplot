@@ -1,9 +1,8 @@
 #
-# Demonstrate features of datastrings patch
+# Demonstrate reading strings from column headings or data column
+# for placement as plot titles or tic labels
 # Ethan A Merritt <merritt@u.washington.edu>
 # 08-Mar-2003
-#
-reset
 #
 # Illustrate reading plot labels from column head in datafile
 #
@@ -25,7 +24,7 @@ pause -1 "<cr> to plot again using x2ticlabels"
 # Illustrate reading xtic axis labels from the datafile
 #
 reset
-set title "Read tic labels from a datafile column\nAn approximation of Hans Olav Eggestad's categoric plot patch\nusing 'using ($0):2:xticlabels(1)' and 'set style fill solid border -1'"
+set title "Read tic labels from a datafile column\nusing 'using ($0):2:xticlabels(1)'"
 set boxwidth 0.3
 set style fill solid 1.000000 border -1
 set bmargin 3
@@ -55,10 +54,10 @@ plot 'ctg-y2.dat' using ($0-0.2):2 index 0 with boxes title "precipitation 1992-
 pause -1 "<cr> to plot same data from table format"
 set title "Plot from table format (titles taken from column headers)"
 unset x2tics
-plot 'table.dat' using ($0-0.2):2 title column(2) with boxes, \
-     ''          using ($0+0.2):3 title column(3) with boxes, \
-     ''          using ($0):4     title column(4) with linespoints, \
-     ''          using ($0):5:xtic(1) title column(5) with linespoints
+plot 'table.dat' using ($0-0.2):2 title columnhead(2) with boxes, \
+     ''          using ($0+0.2):3 title columnhead(3) with boxes, \
+     ''          using ($0):4     title columnhead(4) with linespoints, \
+     ''          using ($0):5:xtic(1) title columnhead(5) with linespoints
 #
 pause -1 "<cr> to show double use of y values"
 #
