@@ -1,9 +1,7 @@
 		Gnuplot Version 5.4 Release Notes
 		=================================
 
-// Release candidate 5.4.rc2
-
-Gnuplot version 5.4 patchlevel 0 will be the start of a new supported release
+Gnuplot version 5.4 patchlevel 0 is the start of a new supported release
 series with many new features and a few changes to features that were
 present in previous versions.  Gnuplot development is now tracked in a git
 repository on SourceForge.  You can generate a complete history of changes
@@ -11,17 +9,18 @@ using "git log" after downloading:
 
     git clone -b branch-5-4-stable git://git.code.sf.net/p/gnuplot/gnuplot-main
 
-We appreciate any feedback from testing this release candidate so that any
-problems can be addressed prior to the 5.4.0 roll-out expected in Spring 2020.
-
-Release Notes date: 22-Jun-2020
+Release Notes date: 13-Jul-2020
 
 * Changes since -rc2
+	o x11: do not drop characters on 'pause mouse close' (Bug #2208)
 	o qt: clip fillbox (and "clear") to ymax (Bug #2276)
 	o qt: avoid error messages from Qt 5.15
 	o tikz: implicit border width of text nodes is always zero (Bug #2275)
 	o Do not recalculate range of unused y2 axis on refresh (Bug #2274)
 	o Back out EXPERIMENTAL command "load $DATABLOCK"
+	o colors in 'splot with image' should not change on zooming
+	o replace dgrid3d approximation with true Euclidean metric (Bug #2277)
+	o adjust "set key at graph <x>, <y>" as needed for 2D projection splots
 
 * Changes between -rc1 and -rc2
 	o faster response to piped input on Windows (Bug #2204)
@@ -124,6 +123,8 @@ Features introduced in version 5.4
 	o Enhanced text mode accepts the escape sequence \U+xxxx (where xxxx
 	  is a 4 or 5 character hexadecimal) to represent a Unicode code point
 	  that is converted to the corresponding UTF-8 byte sequence on output.
+	o Plot titles are evaluated _after_ plotting, rather than before.
+	  This allows the title to reference values generated while plotting.
 	o Hypertext from "set label ... hypertext" is sent to the clipboard
 	  on left mouse-click.
 	o Time/date input recognizes format %p to handle am/pm field
