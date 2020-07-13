@@ -1,6 +1,7 @@
 %% Don't forget to change the paper format in the next line
 %
-\documentclass[a4paper,11pt]{article}
+%\documentclass[a4paper,11pt]{article}
+\documentclass[letter,11pt]{article}
 \usepackage[margin=2cm]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage[hyphens]{url}
@@ -99,9 +100,11 @@
 \maketitle
 
 \noindent
-This material describes \gnuplot version 5
+This material describes \gnuplot version 5 (up to 5.4)
         \\
-FAQ version: December 2019
+FAQ version: July 2020
+        \\
+PDF version of current document: {\http{www.gnuplot.info/faq/faq.pdf}.
 
 
 \tableofcontents
@@ -240,9 +243,9 @@ about gnuplot", for the most up-to-date list.
 
 \subsection{What is the current version of \gnuplot?}
 
-The current stable version of \gnuplot is 5.2, first released in September 2017.
+The current stable version of \gnuplot is 5.4, first released in July 2020.
 Incremental versions (patchlevel 1, 2, ...) are typically released every six months.
-The development version of \gnuplot is currently 5.3.
+The development version of \gnuplot is currently 5.5.
 
 \subsection{Where can I get \gnuplot?}
 \label{where-get-gnuplot}
@@ -251,27 +254,19 @@ The best place to start is \http{www.gnuplot.info}. From there
 you find various pointers to other sites, including the project
 development site on SourceForge \http{sourceforge.net/projects/gnuplot}.
 
-The source distribution ("gnuplot-5.2.6.tar.gz" or a similar name) is
+The source distribution ("gnuplot-5.4.0.tar.gz" or a similar name) is
 available from the official distribution site \http{sourceforge.net/projects/gnuplot}.
 
 \subsection{Why would I care about the development version?}
 
 The current development version will generally include features that are
 not yet part of the most recent stable release of gnuplot.
-As of December 2019 the 5.3 development version notably supports
-\begin{itemize}{}{}
-\setlength\itemsep{-4pt}
-\item 64-bit integer arithmetic
-\item 3D voxel grids
-\item 3D plot styles {\em isosurface, circles, boxes}
-\item smooth clipping of 3D surfaces against current z range
-\item polygon objects and plot styles
-\item {\em set walls} command to show xy xz and yz planes in 3D plots
-\item unicode escape sequences {\textbackslash}U+hhhh
-\item order N Bessel functions of the 1st and 2nd kind
-\item modified Bessel functions
-\item multiple textbox styles
-\end{itemize}
+%As of July 2020 the 5.5 development version notably supports
+%\begin{itemize}{}{}
+%\setlength\itemsep{-4pt}
+%\item named colormaps to supplement the primary palette
+%\item along-path smoothing options for 2D and 3D curves
+%\end{itemize}
 
 \subsection{Where can I get current development version of \gnuplot?}
 
@@ -742,7 +737,10 @@ add an additional keyword {\em above} or {\em below} after {\em filledcurves}.
 
 The command {\em set view map} adjusts the view angle and scaling such
 that subsequent 3D graphs made with {\em splot} have approximately the same layout
-as a 2D graph made with {\em plot}.
+as a 2D graph made with {\em plot}, with the x axis horizontal and the y axis vertical.
+Version 5.4 commands {\em set view projection xz} and {\em set view projection yz}
+similarly initialize layouts for 2D projection of the xz or yz plane, with the
+z axis horizontal and the x or y axis vertical.
 
 \subsection{How to overlay dots/points scatter plot onto a pm3d map/surface}
 
@@ -793,8 +791,8 @@ y axes to be defined.
 
 \subsection{How to draw a solid made of triangular facets?}
 
-The development version supports a special plot style \textit{with polygons}
-that can handle polygonal faces (triangles, rectangles, octagons, ...).
+Version 5.4: plot style \textit{with polygons} can handle polygonal faces
+(triangles, rectangles, octagons, ...).
 In earlier versions the best you can do is to describe colored facets of a
 3D object in a file organized like this:
 \small
@@ -914,23 +912,24 @@ set title 'Compare file_1.dat and file_2.dat' noenhanced
 Yes.
 
 Unfortunately there are some circumstances where it very cumbersome to use,
-notably in the generation of PostScript output.
+notably in generating PostScript output.
 If you are working in a UTF-8 computing environment, you probably do not have to
 do anything special in gnuplot to use it.
 If you are not, then you can still tell gnuplot to use UTF-8 when creating output:
 {\em set encoding utf8}.
 
-If you cannot enter UTF-8 characters on your
-keyboard you will have to solve that outside of gnuplot, or use octal escape
-sequences to type them in byte-by-byte.  If your keyboard does generate UTF-8
-but you don't know what keystrokes would produce a specific character, there
-are probably suitable character selection apps for your desktop
-(e.g. KDE {\em kcharselect}, or GNOME {\em Character Map}).
+If you cannot enter UTF-8 characters on your keyboard you will have to solve
+that outside of gnuplot. Or you can use octal escape sequences to type them in
+byte-by-byte, or (version 5.4) unicode escape sequences like
+{\em \verb&\U+221E&} ($\infty$).
+If your keyboard does generate UTF-8 but you don't know what keystrokes would
+produce a specific character, there are probably suitable character selection
+apps for your desktop (e.g. KDE {\em kcharselect}, or GNOME {\em Character Map}).
 
 \subsection{What if I need h-bar (Planck's constant)?}
 
 The most straightforward way is to use a UTF-8 font, and type in the
-$\hbar$ character (Unicode code point \#x210F) directly.
+$\hbar$ character (Unicode {\verb&\U+210F&}) directly.
 
 PostScript: PostScript does not handle utf8 easily so you must use an
 approximation based on enhanced text markup and possibly a special
@@ -959,8 +958,10 @@ italic type.
 \subsection{What if I need the Solar mass symbol?}
 
 As with Planck's constant, the most straightforward way is to use a
-UTF-8 font, and type in the $\odot$ character (Unicode code point \#x2299 ; "circled dot operator") directly.
-The very similar glyph at code point \#x2609 ; "sun" may be even better, but not many fonts provide it.
+UTF-8 font, and type in the $\odot$ character
+(Unicode {\verb&\U+2299&} ; "circled dot operator")
+directly.  The very similar glyph at (Unicode code point {\verb&\U+2609&} ; "sun")
+may be even better, but not many fonts provide it.
 
 \subsection{How to use Greek letters or other special symbols?}
 
@@ -976,7 +977,7 @@ your computer or output device.  \Gnuplot itself does not provide fonts.
 
 The various \LaTeX{} terminal types (\textit{latex, epslatex, tikz, context, cairolatex})
 hand off text generation to \LaTeX{}. In this case you can use normal \LaTeX{}
-markup like \verb+'\alpha_{3}'+ .
+markup like \verb+$\alpha_{3}$+ .
 
 \subsection{How do I include accented characters?}
 
@@ -1018,15 +1019,14 @@ have to recompile from source.
 \subsection{I've found a bug, what do I do?}
 
 First, try to see whether it actually is a bug, or whether it
-is a feature which may be turned off by some obscure set--command.
+is a feature you can turn off with some obscure {\em set} command.
 
-Next, see whether you have an old version of \gnuplot; if you do,
+Next, see whether you have an old version of \gnuplot; if so,
 chances are the bug has been fixed in a newer release.
 
-The development version may already contain fixes for bugs reported
-since the release of the current version.
 Before submitting a bug report, please check whether the bug in question
-has already been fixed.
+has already been fixed in the upstream source since the release of the
+current version. These are marked "pending-fixed" on the bug tracker.
 
 If, after checking these things, you still are convinced that there is a
 bug please report it using the bug-tracker at
@@ -1037,7 +1037,7 @@ It helps a lot if you can provide a simple script that reproduces the error.
 
 The tracker on sourceforge is for reporting bugs and collecting bug fixes
 that will appear in a subsequent release.
-The various online forums are a better place to ask about
+The various online forums are better places to ask about
 work arounds or actually solving \gnuplot related problems.
 
 \subsection{Can I do heavy-duty data processing with \gnuplot? or
@@ -1049,7 +1049,7 @@ If you have a specific application where the limitation is gnuplot's speed in
 evaluating a non-trivial function, it might be worth coding this function in
 C or C++ and making it a loadable plugin that gnuplot can call.
 
-Two programs you might look into if you need intensive numerical computation:
+Programs you might look into if you need intensive numerical computation:
 
 \textbf{octave} (\http{www.octave.org})
 is a high-level language primarily intended for numerical computations.
@@ -1059,6 +1059,10 @@ numerically.  By the way, octave uses \gnuplot as its plotting
 engine, so you get a data-processing program on top of \gnuplot.
 
 \textbf{scilab} (\http{www.scilab.org}) is another open source alternative to \textbf{matlab}.
+
+\textbf{julia + Gaston} (\http{github.com/mbaz/Gaston.jl})
+The Julia language is designed for numerical analysis and computational science.
+Gaston is a julia package that provides an interface to gnuplot for graphical output.
 
 \subsection{What if I need special function that gnuplot doesn't have?}
 
@@ -1174,7 +1178,7 @@ y range is less than `zero`
 \end{verbatim}
 \normalsize
 
-The solution is to change \gnuplot's idea of "zero":
+The solution is to change gnuplot's idea of "zero":
 \small
 \begin{verbatim}
 gnuplot> set zero 1e-20
@@ -1223,11 +1227,12 @@ This way of evaluating integer expressions is shared by both C and Fortran.
 You may need to flush the output and close the file with
 {\em set output} or {\em unset output}).
 
-Some output formats (postscript, pdf, latex, svg, ...) can include several
+Some output formats (postscript, pdf, latex, ...) can include several
 pages of plots in a single output file.  For these output modes, gnuplot
 leaves the file open after each plot so that you can add additional plots
 to it.  The file is not completed and made available to external applications
-or select a different terminal type ({\em set term}) or exit gnuplot.
+until you issue a {\em set} or {\em unset output} command,
+select a different terminal type ({\em set term}), or exit gnuplot.
 
 
 \subsection{Calling gnuplot in a pipe or from a script doesn't show a plot on my screen!}
