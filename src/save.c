@@ -426,11 +426,15 @@ save_set_all(FILE *fp)
     /* Save parallel axis state */
     save_style_parallel(fp);
 
-    fprintf(fp, "set key title \"%s\"", conv_text(key->title.text));
-    if (key->title.font)
-	fprintf(fp, " font \"%s\" ", key->title.font);
-    save_justification(key->title.pos, fp);
-    fputs("\n", fp);
+    if (key->title.text == NULL)
+	fprintf(fp, "set key notitle\n");
+    else {
+	fprintf(fp, "set key title \"%s\"", conv_text(key->title.text));
+	if (key->title.font)
+	    fprintf(fp, " font \"%s\" ", key->title.font);
+	save_justification(key->title.pos, fp);
+	fputs("\n", fp);
+    }
 
     fputs("set key ", fp);
     switch (key->region) {
