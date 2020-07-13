@@ -4441,35 +4441,6 @@ df_set_read_type(int col, df_data_type type)
 	= df_binary_details[type].type.read_size;
 }
 
-#if (0)	/* UNUSED??? */
-
-/* Get the column data type. */
-df_data_type
-df_get_read_type(int col)
-{
-    assert(col > 0);
-    /* Check if we have room at least col columns */
-    if (col < df_max_bininfo_cols)
-	return(df_column_bininfo[col].column.read_type);
-    else
-	return -1;
-}
-
-
-/* Get the binary column data size. */
-int
-df_get_read_size(int col)
-{
-    assert(col > 0);
-    /* Check if we have room at least col columns */
-    if (col < df_max_bininfo_cols)
-	return(df_column_bininfo[col].column.read_size);
-    else
-	return -1;
-}
-
-#endif
-
 /* If the column number is greater than number of binary columns, set
  * the uninitialized columns binary info to that of the last specified
  * column or the default if none were set.  */

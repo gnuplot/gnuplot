@@ -1059,12 +1059,6 @@ do_key_layout(legend_key *key)
 		key_panic = TRUE;
 	    }
 	    key_rows = (ptitl_cnt + key_cols - 1) / key_cols;
-#if (0)
-	} else {
-	    /* This was a work-around for a spiderplot bug. No longer needed? */
-	    if (key_rows == 0)
-		key_rows = i;
-#endif
 	}
     }
 
