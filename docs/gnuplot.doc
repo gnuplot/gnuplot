@@ -152,18 +152,27 @@ C
 ?faq
 ?FAQ
 ?seeking-assistance
- The canonical gnuplot web page can be found at
+ The canonical gnuplot home page can be found at
 ^ <a href="http://www.gnuplot.info">
            http://www.gnuplot.info
 ^ </a>
 
- Before seeking help, please check file FAQ.pdf or the above website for
+ Before seeking help, please check file FAQ.pdf or the above website for a
 ^ <a href="http://www.gnuplot.info/faq/">
            FAQ (Frequently Asked Questions) list.
 ^ </a>
 
- If you need help as a gnuplot user, please use the newsgroup
-           comp.graphics.apps.gnuplot
+ Another resource for help with specific plotting problems (not bugs) is
+           https://stackoverflow.com/questions/tagged/gnuplot
+
+ Bug reports and feature requests should be uploaded to the trackers at
+           http://sourceforge.net/projects/gnuplot/support
+ Please check previous reports to see if the bug you want to report has
+ already been fixed in a newer version.
+
+ When reporting a bug or posting a question, please include full details
+ of the gnuplot version, the terminal type, and the operating system.
+ A short self-contained script demonstrating the problem is very helpful.
 
  Instructions for subscribing to gnuplot mailing lists may be
  found via the gnuplot development website on SourceForge
@@ -171,24 +180,14 @@ C
            http://sourceforge.net/projects/gnuplot
 ^ </a>
 
- Please note that before you write to any of the gnuplot mailing lists,
- you have to subscribe to the list first.  This is necessary to keep the
- spam level down.
+ Please note that before you write to any of the gnuplot mailing lists you
+ must first subscribe to the list.  This helps reduce the amount of spam.
 
  The address for mailing to list members is:
            gnuplot-info@lists.sourceforge.net
 
- Bug reports and code contributions should be uploaded to the trackers at
-           http://sourceforge.net/projects/gnuplot/support
- Please check previous bug reports if the bug you want to report has not been
- already fixed in a newer version.
-
- A mailing list for those interested in development version of gnuplot is:
+ A mailing list for those interested in the development version of gnuplot is:
            gnuplot-beta@lists.sourceforge.net
-
- When posting a question, please include full details of the gnuplot version,
- the terminal type, and the operating system you are using.  A short
- self-contained script demonstrating the problem is often helpful.
 
 2 New features
 ?new features
