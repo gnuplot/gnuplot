@@ -35,26 +35,29 @@ set zrange [ -8 : 8 ]
 set xtics 1 offset 0,-0.5
 set ytics 1 offset 0,-0.5
 set ztics 5
-set xlabel "Real(z)"
-set ylabel "Imag(z)"
-set grid x y z vertical
+#set xlabel "x"
+#set ylabel "iy"
+set xtics add ("0\nx" 0)
+set ytics add ("0\niy" 0)
+set grid x y z vertical lw 1
 
 set palette defined (0 "dark-blue", 0.5 "gold", 1 "dark-red")
-set cbrange [-5:5]
+set cbrange [-4:4]
 unset colorbox
 unset key
-set sample 51
-set isosample 51
+set sample 41
+set isosample 41
 set pm3d depth border lw 0.25 lighting spec2 0.4
 set view 57, 37, 1.1, 0.8
 set xyplane 0
+set style textbox opaque noborder margin 2,8
 
-set multiplot layout 1,2 title "\nDawson's integral of complex variable z"
+set multiplot layout 1,2 title "\nDawson's integral of complex variable\n z = x + iy"
 
-set label 1 at 0,1,10 "Real(cdawson(z))" right
+set label 1 at 0,1,10 "Real(cdawson(z))" right boxed
 splot real(cdawson(x + I*y)) with pm3d title "Real(cdawson(z))"
-set label 1 at 0,1,10 "Imag(cdawson(z))" right
-splot imag(cdawson(x + I*y)) with pm3d title "Real(cdawson(z))"
+set label 1 at 0,1,10 "Imag(cdawson(z))" right boxed
+splot imag(cdawson(x + I*y)) with pm3d title "Imag(cdawson(z))"
 
 unset multiplot
 pause -1 "<cr> to continue"
