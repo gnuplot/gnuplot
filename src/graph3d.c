@@ -96,12 +96,15 @@ float surface_lscale = 0.0;
 float mapview_scale = 1.0;
 float azimuth = 0.0;
 
-/* These indicate projection onto the xy, xz or yz plane
- * as requested by 'set view map' or 'set view projection'
+/* These flags indicate projection onto the xy, xz or yz plane
+ * as requested by 'set view map' or 'set view projection'.
+ * in_3d_polygon disables conversion of graph coordinates from x/y/z to
+ * hor/ver in projection; i.e. polygon vertices are always orthogonal x/y/z.
  */
 TBOOLEAN splot_map = FALSE;
 TBOOLEAN xz_projection = FALSE;
 TBOOLEAN yz_projection = FALSE;
+TBOOLEAN in_3d_polygon = FALSE;
 
 /* position of the base plane, as given by 'set ticslevel' or 'set xyplane' */
 t_xyplane xyplane = { 0.5, FALSE };
@@ -660,6 +663,8 @@ do_3dplot(
 	surface_scale = 1.425 * mapview_scale;
 	flip_projection_axis(&axis_array[FIRST_Z_AXIS]);
     }
+    in_3d_polygon = FALSE;	/* protects polygons from xz, yz projections */
+
     mat_rot_z(surface_rot_z, trans_mat);
     mat_rot_x(surface_rot_x, mat);
     mat_mult(trans_mat, trans_mat, mat);
@@ -3251,6 +3256,7 @@ map3d_getposition(
     TBOOLEAN char_coords = FALSE;
     TBOOLEAN plot_coords = FALSE;
     double xx, yy;
+#define flat ((pos->scalex == graph) && (pos->scaley == graph) && (pos->z == 0))
 
     switch (pos->scalex) {
     case first_axes:
@@ -3259,7 +3265,13 @@ map3d_getposition(
 	plot_coords = TRUE;
 	break;
     case graph:
-	*xpos = X_AXIS.min + *xpos * (X_AXIS.max - X_AXIS.min);
+	if (xz_projection && flat && !in_3d_polygon)
+	    *zpos = Z_AXIS.min + *xpos * (Z_AXIS.max - Z_AXIS.min);
+	else if (yz_projection && flat && !in_3d_polygon)
+	    /* Why is the direction inverted? */
+	    *zpos = Z_AXIS.max + *xpos * (Z_AXIS.min - Z_AXIS.max);
+	else
+	    *xpos = X_AXIS.min + *xpos * (X_AXIS.max - X_AXIS.min);
 	plot_coords = TRUE;
 	break;
     case screen:
@@ -3286,7 +3298,9 @@ map3d_getposition(
 	plot_coords = TRUE;
 	break;
     case graph:
-	if (splot_map)
+	if (xz_projection && flat && !in_3d_polygon)
+	    *xpos = X_AXIS.min + *ypos * (X_AXIS.max - X_AXIS.min);
+	else if (splot_map)
 	    *ypos = Y_AXIS.max - *ypos * (Y_AXIS.max - Y_AXIS.min);
 	else
 	    *ypos = Y_AXIS.min + *ypos * (Y_AXIS.max - Y_AXIS.min);
@@ -3315,7 +3329,10 @@ map3d_getposition(
 	plot_coords = TRUE;
 	break;
     case graph:
-	*zpos = Z_AXIS.min + *zpos * (Z_AXIS.max - Z_AXIS.min);
+	if ((xz_projection || yz_projection) && flat && !in_3d_polygon)
+	    ; /* already received "x" fraction */
+	else
+	    *zpos = Z_AXIS.min + *zpos * (Z_AXIS.max - Z_AXIS.min);
 	plot_coords = TRUE;
 	break;
     case screen:
@@ -3330,6 +3347,7 @@ map3d_getposition(
 	int_error(NO_CARET,"Cannot mix screen or character coords with plot coords");
 
     return (screen_coords || char_coords);
+#undef flat
 }
 
 /*
@@ -4093,28 +4111,8 @@ do_3dkey_layout(legend_key *key, int *xinkey, int *yinkey)
     /* Now that we know the size of the key, we can position it as requested */
     if (key->region == GPKEY_USER_PLACEMENT) {
 	int corner_x, corner_y;
-	t_position keypos = key->user_pos;
 
-	/* Translate request for graph coordinates from x/y
-	 * to whatever the equivalent is for an xz or yz projection
-	 */
-	if (yz_projection && key->user_pos.scalex == graph) {
-	    keypos.scalez = graph;
-	    keypos.z = 1.0 - key->user_pos.x;
-	    keypos.x = 0;
-	}
-	if (xz_projection && key->user_pos.scalex == graph) {
-	    keypos.scalez = graph;
-	    keypos.z = key->user_pos.x;
-	    keypos.x = 0;
-	}
-	if (xz_projection && key->user_pos.scaley == graph) {
-	    keypos.scalex = graph;
-	    keypos.x = key->user_pos.y;
-	    keypos.y = 0;
-	}
-	
-	map3d_position(&keypos, &corner_x, &corner_y, "key");
+	map3d_position(&key->user_pos, &corner_x, &corner_y, "key");
 
 	if (key->hpos == CENTRE)
 	    key->bounds.xleft = corner_x - key_width / 2;

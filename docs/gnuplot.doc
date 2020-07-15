@@ -14790,11 +14790,18 @@ Ffigure_multiple_keys
  Syntax:
       set view projection {xy|xz|yz}
  Rotates the view angles of a 3D plot so that one of the primary planes
- xy, xz, or yz lies in the plane of the plot.  Axis labels and tics positioning
+ xy, xz, or yz lies in the plane of the plot.  Axis label and tic positioning
  is adjusted accordingly;  tics and labels on the third axis are disabled.
  The plot is scaled up to approximately match the size that 'plot' would
  generate for the same axis ranges.
  `set view projection xy` is equivalent to `set view map`.
+
+ When the x and y coordinates used to specify objects, labels, arrows and other
+ elements are both provided as "graph" coordinates, then in projection views
+ they are interpreted as "horizontal/vertical" rather than "x/y".
+
+     set key top right at graph 0.95, graph 0.95     # works in any projection
+ 
 3 vrange
 ?commands set vrange
 ?commands show vrange

@@ -4230,7 +4230,7 @@ do_rectangle( int dimensions, t_object *this_object, fill_style_type *fillstyle 
 	    if (dimensions == 2 || this_rect->center.scalex == screen) {
 		map_position_double(&this_rect->center, &x1, &y1, "rect");
 		map_position_r(&this_rect->extent, &width, &height, "rect");
-	    } else if (splot_map) {
+	    } else if (splot_map || xz_projection || yz_projection) {
 		int junkw, junkh;
 		map3d_position_double(&this_rect->center, &x1, &y1, "rect");
 		map3d_position_r(&this_rect->extent, &junkw, &junkh, "rect");
@@ -4259,7 +4259,7 @@ do_rectangle( int dimensions, t_object *this_object, fill_style_type *fillstyle 
 	    ||  (this_rect->bl.scalex == screen && this_rect->tr.scalex == screen)) {
 		map_position_double(&this_rect->bl, &x1, &y1, "rect");
 		map_position_double(&this_rect->tr, &x2, &y2, "rect");
-	    } else if (splot_map) {
+	    } else if (splot_map || xz_projection || yz_projection) {
 		map3d_position_double(&this_rect->bl, &x1, &y1, "rect");
 		map3d_position_double(&this_rect->tr, &x2, &y2, "rect");
 	    } else
@@ -4443,6 +4443,11 @@ do_polygon( int dimensions, t_object *this_object, int style, int facing )
     if (!p->vertex || p->type < 2)
 	return;
 
+    /* opt out of coordinate transform in xz or yz projection
+     * that would otherwise convert graph x/y/z to hor/ver
+     */
+    in_3d_polygon = TRUE;
+
     corners = gp_realloc(corners, p->type * sizeof(gpiPoint), "polygon");
     clpcorn = gp_realloc(clpcorn, 2 * p->type * sizeof(gpiPoint), "polygon");
 
@@ -4527,6 +4532,7 @@ do_polygon( int dimensions, t_object *this_object, int style, int facing )
     }
 
     clip_area = clip_save;
+    in_3d_polygon = FALSE;
 }
 
 TBOOLEAN

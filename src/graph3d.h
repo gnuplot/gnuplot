@@ -155,6 +155,7 @@ extern float surface_lscale;
 extern float mapview_scale;
 extern float azimuth;
 extern TBOOLEAN splot_map, xz_projection, yz_projection;
+extern TBOOLEAN in_3d_polygon;
 
 typedef struct { 
     double z; 
