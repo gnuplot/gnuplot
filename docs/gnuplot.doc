@@ -190,7 +190,7 @@ C
            gnuplot-beta@lists.sourceforge.net
 
 2 New features
-?new features
+?new version_5.5
 ?new
 3 Development version
 ?development version
@@ -200,6 +200,7 @@ C
  release until version 5.6.  Details may change before that.
 
 4 New plot styles and style options
+?new plot_styles
 #start
 #b cubic spline smoothing of 3D lines. See `splot smooth csplines`
 #b curve smoothing using along-path cubic splines suitable for closed curves
@@ -213,6 +214,7 @@ C
 #end
 
 4 Multiple named palettes
+?new multiple_palettes
 #start
 #b The current palette can be saved to a named colormap for future use.
 ## See `set colormap`.
@@ -225,7 +227,10 @@ C
 #end
 
 4 Other new features
+?new other
 #start
+#b New function VP_fwhm(sigma,gamma) returns the full width at half maximum
+## of the Voigt profile. See `VP`, `VP_fwhm`, `libcerf`.
 #b Support XSG base directory for gnuplotrc configuration preferences.
 ## See `environment`.
 #end
@@ -233,6 +238,7 @@ C
 3 Features introduced in version 5.4
 ?new version_5.4
 4 Support for 64-bit integer arithmetic
+ New features in 5.4
 #start
 #b All evaluation of expressions and functions uses 64-integer arithmetic if
 ## supported by the platform.
@@ -263,7 +269,6 @@ C
 #end
 
 4 New plot styles and style options
-?new plot styles
 #start
 #b 3D plot style `with polygons` reads polygon faces from a data file.
 ## This can be used to create a surface or to construct a solid object.
@@ -291,7 +296,6 @@ C
 #end
 
 4 New data pre-processing filters
-?new filters
 #start
 #b `smooth zsort` sorts 2D points on values in a 3rd column. See `smooth zsort`.
 #end
@@ -420,7 +424,7 @@ C
 ## nonlinear axis where the paired functions are log(x) and exp(x).
 #end
 4 New commands and command options
-?new commands in 5.2
+?new version_5.2
 #start
 #b Inside the bracketed clause of an iteration, `continue` jumps immediately
 ## to the next iteration, `break` immediately exits from the iteration
@@ -2135,6 +2139,13 @@ C marker below is used to signal this to doc2html:
  `(1-(k*sin(p))**2)**(-0.5)/(1-n*sin(p)**2)`.  The parameter `n` must be less
  than 1, while `k` must lie between -1 and 1 (exclusive).  Note that by
  definition EllipticPi(0,k) == EllipticK(k) for all possible values of `k`.
+4 Special functions provided by libcerf
+?libcerf
+ Some special functions are only provided if your copy of gnuplot was configured
+ to use the external libcerf library (https://jugit.fz-juelich.de/mlz/libcerf).
+ These include the complex error function cerf(z), the imaginary error function
+ erfi(x), a complex extension of Dawson's integral cdawson(z), and complex
+ versions of the Faddeeva function and the Voigt profile VP(x, sigma, gamma).
 4 Random number generator
 ?expressions random
 ?random
