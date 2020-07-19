@@ -11,28 +11,6 @@ using "git log" after downloading:
 
 Release Notes date: 13-Jul-2020
 
-* Changes since -rc2
-	o x11: do not drop characters on 'pause mouse close' (Bug #2208)
-	o qt: clip fillbox (and "clear") to ymax (Bug #2276)
-	o qt: avoid error messages from Qt 5.15
-	o tikz: implicit border width of text nodes is always zero (Bug #2275)
-	o Do not recalculate range of unused y2 axis on refresh (Bug #2274)
-	o Back out EXPERIMENTAL command "load $DATABLOCK"
-	o colors in 'splot with image' should not change on zooming
-	o replace dgrid3d approximation with true Euclidean metric (Bug #2277)
-	o adjust "set key at graph <x>, <y>" as needed for 2D projection splots
-
-* Changes between -rc1 and -rc2
-	o faster response to piped input on Windows (Bug #2204)
-	o "splot with boxes" failed to recognize "fc palette" in -rc1
-	o repair several problems with parallel axis plots (Bug #2294)
-	o minor changes to dumb.trm, pixmap handling
-	o -rc1 failed to act on "with labels rotate by <ang>" (Bug #2264)
-	o internal \n _not_ stripped from output of backquoted shell command
-	o fix autoscaling of boxplots
-	o new function palette(z) returns packed RGB representation
-	o lua/tikz terminal applies alpha channel to point symbols
-
 Features introduced in version 5.4
 ==================================
 
@@ -132,7 +110,7 @@ Features introduced in version 5.4
 	o Built-in modified Bessel functions (besi0 besi1 besin)
 	o Built-in order N Bessel functions of the 1st and 2nd kind (besjn besyn)
 
-* Changes
+* Changes/Differences to previous gnuplot versions
 	o Plot style "with parallelaxes" has revised syntax to match
 	  histogram and spiderplot commands.  There is no longer a limit
 	  on the number of axes in a plot, and iteration is possible:
@@ -147,6 +125,18 @@ Features introduced in version 5.4
 	o The "set fontpath" command is deprecated (only affects PostScript).
 	o Since the "latex" and "eepic" terminals are deprecated, the
 	  tutorial for using them is no longer included with the distribution.
+
+
+* Fixes since 5.4.rc2 (second release candidate)
+	o x11: do not drop characters on 'pause mouse close' (Bug #2208)
+	o qt: clip fillbox (and "clear") to ymax (Bug #2276)
+	o qt: avoid error messages from Qt 5.15
+	o tikz: implicit border width of text nodes is always zero (Bug #2275)
+	o Do not recalculate range of unused y2 axis on refresh (Bug #2274)
+	o Back out EXPERIMENTAL command "load $DATABLOCK"
+	o colors in 'splot with image' should not change on zooming
+	o replace dgrid3d approximation with true Euclidean metric (Bug #2277)
+	o adjust "set key at graph <x>, <y>" as needed for 2D projection splots
 
 
 		 Notes for packagers and testers
