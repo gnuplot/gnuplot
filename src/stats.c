@@ -896,7 +896,8 @@ statsrequest(void)
 	columns = df_open(file_name, 2, NULL);	/* up to 2 using specs allowed */
 
 	if (columns < 0) {
-	    int_warn(NO_CARET, "Can't read data file");
+	    /* This allows the user to test for failure */
+	    fill_gpval_integer("GPVAL_ERRNO", 1);
 	    while (!END_OF_COMMAND)
 		c_token++;
 	    goto stats_cleanup;

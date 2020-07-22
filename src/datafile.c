@@ -1399,19 +1399,35 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 
 	/* filename cannot be static array! */
 	gp_expand_tilde(&df_filename);
+
+	/* Open failure generates a warning rather than an immediate fatal error.
+	 * We assume success (GPVAL_ERRNO == 0) and let the caller change this to
+	 * something else if it considers DF_EOF a serious error.
+	 */
+	fill_gpval_integer("GPVAL_ERRNO", 0);
+
 #ifdef HAVE_SYS_STAT_H
 	{
 	    struct stat statbuf;
 	    if ((stat(df_filename, &statbuf) > -1) &&
 		S_ISDIR(statbuf.st_mode)) {
-		os_error(name_token, "\"%s\" is a directory",
-			df_filename);
+		char *errmsg = gp_alloc(32 + strlen(df_filename), "errmsg");
+		sprintf(errmsg, "\"%s\" is a directory", df_filename);
+		int_warn(name_token, errmsg);
+		fill_gpval_string("GPVAL_ERRMSG", errmsg);
+		free(errmsg);
+		df_eof = 1;
+		return DF_EOF;
 	    }
 	}
 #endif /* HAVE_SYS_STAT_H */
 
 	if ((data_fp = loadpath_fopen(df_filename, df_binary_file ? "rb" : "r")) == NULL) {
-	    int_warn(NO_CARET, "Cannot find or open file \"%s\"", df_filename);
+	    char *errmsg = gp_alloc(32 + strlen(df_filename), "errmsg");
+	    sprintf(errmsg, "Cannot find or open file \"%s\"", df_filename);
+	    int_warn(NO_CARET, errmsg);
+	    fill_gpval_string("GPVAL_ERRMSG", errmsg);
+	    free(errmsg);
 	    df_eof = 1;
 	    return DF_EOF;
 	}
