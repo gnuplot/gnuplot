@@ -199,27 +199,21 @@ f_calln(union argument *x)
     udf = x->udf_arg;
     if (!udf->at)		/* undefined */
 	int_error(NO_CARET, "undefined function: %s", udf->udf_name);
-    for (i = 0; i < MAX_NUM_VAR; i++)
-	save_dummy[i] = udf->dummy_values[i];
 
     (void) pop(&num_params);
 
-    if (num_params.v.int_val != udf->dummy_num)
+    num_pop = num_params.v.int_val;
+
+    if (num_pop != udf->dummy_num)
 	int_error(NO_CARET, "function %s requires %d variable%c",
 	    udf->udf_name, udf->dummy_num, (udf->dummy_num == 1)?'\0':'s');
+    /* Jul 2020 CHANGE: we used to discard and ignore extra parameters */
+    if (num_pop > MAX_NUM_VAR)
+	int_error(NO_CARET, "too many parameters passed to function %s",
+	    udf->udf_name);
 
-    /* if there are more parameters than the function is expecting */
-    /* simply ignore the excess */
-    if (num_params.v.int_val > MAX_NUM_VAR) {
-	/* pop and discard the dummies that there is no room for */
-	num_pop = num_params.v.int_val - MAX_NUM_VAR;
-	for (i = 0; i < num_pop; i++)
-	    (void) pop(&(udf->dummy_values[0]));
-
-	num_pop = MAX_NUM_VAR;
-    } else {
-	num_pop = num_params.v.int_val;
-    }
+    for (i = 0; i < num_pop; i++)
+	save_dummy[i] = udf->dummy_values[i];
 
     /* pop parameters we can use */
     for (i = num_pop - 1; i >= 0; i--) {
@@ -235,7 +229,7 @@ f_calln(union argument *x)
 
     recursion_depth--;
 
-    for (i = 0; i < MAX_NUM_VAR; i++) {
+    for (i = 0; i < num_pop; i++) {
 	gpfree_string(&udf->dummy_values[i]);
 	udf->dummy_values[i] = save_dummy[i];
     }
