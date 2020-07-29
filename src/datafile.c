@@ -118,6 +118,7 @@
 #include "breaders.h"
 #include "tabulate.h" /* For sanity check inblock != outblock */
 #include "variable.h" /* For locale handling */
+#include "voxelgrid.h"
 
 /* test to see if the end of an inline datafile is reached */
 #define is_EOF(c) ((c) == 'e' || (c) == 'E')
@@ -396,6 +397,8 @@ static df_byte_read_order_type byte_read_order(df_endianess_type);
 /* Logical variables indicating information about data file. */
 TBOOLEAN df_binary_file;
 TBOOLEAN df_matrix_file;
+TBOOLEAN df_voxelgrid;
+
 
 static int df_M_count;
 static int df_N_count;
@@ -1118,6 +1121,8 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     df_ypixels = 0;
     df_transpose = FALSE;
 
+    df_voxelgrid = FALSE;
+
     df_eof = 0;
 
     /* Save for use by df_readline(). */
@@ -1149,6 +1154,10 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	    if (df_array->udv_value.type != ARRAY)
 		int_error(c_token-1, "Array %s invalid", df_arrayname);
 	}
+    } else if (cmd_filename[0] == '$' && get_vgrid_by_name(cmd_filename)) {
+	/* The rest of the df_open() processing is not relevant */
+	df_voxelgrid = TRUE;
+	return(1);
     } else {
 	free(df_filename);
 	df_filename = gp_strdup(cmd_filename);

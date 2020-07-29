@@ -16,10 +16,11 @@ typedef struct vgrid {
     double vzmin;
     double vzmax;
     double vzdelta;
-    double min_value;
-    double max_value;
-    double mean_value;
-    double stddev;
+    double min_value;	/* min non-zero voxel value */
+    double max_value;   /* max voxel value */
+    double mean_value;  /* mean non-zero voxel value */
+    double stddev;      /* esd over non-zero voxels */
+    double sum;
     int nzero;
     t_voxel *vdata;	/* points to 3D array of voxels */
 } vgrid;
@@ -40,11 +41,12 @@ void set_vgrid_range(void);
 void show_vgrid(void);
 void gpfree_vgrid(struct udvt_entry *grid);
 void unset_vgrid(void);
-udvt_entry *get_vgrid_by_name(char *name);
+udvt_entry *get_vgrid_by_name(const char *name);
 void check_grid_ranges(void);
 t_voxel voxel(double vx, double vy, double vz);
 void set_isosurface(void);
 void show_isosurface(void);
+void vgrid_stats(vgrid *vgrid);
 
 /* variables */
 extern isosurface_opt isosurface_options;

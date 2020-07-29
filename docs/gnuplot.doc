@@ -16381,6 +16381,7 @@ Ffigure_walls
 =filter
  Syntax:
       stats {<ranges>} 'filename' {matrix | using N{:M}} {name 'prefix'} {{no}output}
+      stats $voxelgridname {name 'prefix'}
 
  This command prepares a statistical summary of the data in one or two columns
  of a file. The using specifier is interpreted in the same way as for plot
@@ -16389,6 +16390,10 @@ Ffigure_walls
  analysis. See `set xrange`. The summary is printed to the screen by default.
  Output can be redirected to a file by prior use of the command `set print`,
  or suppressed altogether using the `nooutput` option.
+
+ If the file cannot be found or cannot be read, a non-fatal warning is issued.
+ This can be used to test for the existance of a file without generating a
+ program error. See `stats test`.
 
  In addition to printed output, the program stores the individual statistics
  into three sets of variables.
@@ -16580,6 +16585,53 @@ Ffigure_walls
  or function `columnheader(N)` can be used to generate the name from whatever
  string is found in that column in the first row of the data file:
       do for [COL=5:8] { stats 'datafile' using COL name columnheader }
+3 test for existence of a file
+?stats test
+?statistics test
+ Trying to plot a nonexistent or unreadable file will generate an error that
+ halts the progress of a script or iteration.  The stats command can be used
+ to avoid this as in the example below
+      do for [i=first:last] {
+          filename = sprintf("file%02d.dat", i)
+          stats filename nooutput
+          if (GPVAL_ERRNO) {
+              print GPVAL_ERRMSG
+              continue
+          }
+          plot filename title filename
+      }
+3 voxelgrid
+?stats voxelgrid
+?statistics voxelgrid
+      stats $vgridname {name "prefix"}
+ The stats command can be used to interrogate the content of a voxel grid.
+ It yields the same information as `show vgrid` but saves it in variables
+ accessible for use in a script.
+
+@start table
+      STATS_min               # minimum non-zero value over all voxels in grid
+      STATS_max               # maximum value over all voxels in grid
+      STATS_mean              # mean value of non-zero voxels in grid
+      STATS_stderr            # standard deviation of non-zero voxel values
+      STATS_sum               # sum over all values in grid
+      STATS_nonzero           # number of non-zero voxels
+#\begin{tabular}{|lll|} \hline
+#\verb@STATS_min@ &   &  minimum non-zero value over all voxels in grid \\
+#\verb@STATS_max@       &   &  maximum value over all voxels in grid \\
+#\verb@STATS_mean@   &   &  mean value of non-zero voxels in grid \\
+#\verb@STATS_stddev@   &   &  standard deviation of non-zero voxel values \\
+#\verb@STATS_ssum@   &   &  sum over all values in grid \\
+#\verb@STATS_nonzero@ &   &  number of non-zero voxels \\
+%l l .
+%Variable@Description
+%_
+%STATS_min@minimum non-zero value over all voxels in grid
+%STATS_max@maximum value over all voxels in grid
+%STATS_mean@mean value of non-zero voxels in grid
+%STATS_stddev@standard deviation of non-zero voxel values
+%STATS_sum@sum over all values in grid
+%STATS_nonzero@number of non-zero voxels
+@end table
 
 2 system
 ?commands system
@@ -16746,7 +16798,8 @@ Ffigure_walls
  decreases with its distance from the data point.
 
  Note that `vfill` always increments existing values in the current voxel grid.
- To reset them to zero, use `vclear`.
+ To reset a single voxel to zero, use `voxel(x,y,z) = 0`.
+ To reset the entire grid to zero, use `vclear`.
 2 While
 ?while
 ?commands while

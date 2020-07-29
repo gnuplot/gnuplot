@@ -91,6 +91,9 @@ extern TBOOLEAN df_matrix;
 /* is this a binary file? */
 extern TBOOLEAN df_binary;
 
+/* was df_open called on something that turned out to be a voxel grid? */
+extern TBOOLEAN df_voxelgrid;
+
 extern char *df_filename;
 extern int df_line_number;
 extern AXIS_INDEX df_axis[];
