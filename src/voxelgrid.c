@@ -809,6 +809,7 @@ modify_voxels( t_voxel *grid, double x, double y, double z,
     int ix, iy, iz;
     int ivx, ivy, ivz;
     int nvx, nvy, nvz;
+    TBOOLEAN save_fpe_trap;
     double vx, vy, vz, distance;
     t_voxel *voxel;
     int N;
@@ -834,6 +835,13 @@ modify_voxels( t_voxel *grid, double x, double y, double z,
     if (nvoxels_modified == 0)
 	fprintf(stderr, "\tvoxel cube defined by radius %g: %d x %d x %d\n",
 		radius, nvx, nvy, nvz);
+
+    /* This can be a HUGE iteration, in which case resetting the
+     * FPE trap handler on every voxel evaluateion can be a
+     * significant performance bottleneck (why??).
+     */
+    save_fpe_trap = df_nofpe_trap;
+    df_nofpe_trap = TRUE;
 
     /* The iteration covers a cube rather than a sphere */
     evaluate_inside_using = TRUE;
@@ -875,6 +883,8 @@ modify_voxels( t_voxel *grid, double x, double y, double z,
 	    }
 	}
     }
+
+    df_nofpe_trap = save_fpe_trap;
     evaluate_inside_using = FALSE;
 
     return;
