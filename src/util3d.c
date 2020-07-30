@@ -845,7 +845,7 @@ map3d_xyz(
     double x, double y, double z,		/* user coordinates */
     p_vertex out)
 {
-    int i, j;
+    int i;
     double V[4], Res[4];	/* Homogeneous coords. vectors. */
 
     /* Normalize object space to -1..1 */
@@ -856,9 +856,10 @@ map3d_xyz(
 
     /* Res[] = V[] * trans_mat[][] (uses row-vectors) */
     for (i = 0; i < 4; i++) {
-	Res[i] = trans_mat[3][i];		/* V[3] is 1. anyway */
-	for (j = 0; j < 3; j++)
-	    Res[i] += V[j] * trans_mat[j][i];
+	Res[i] = trans_mat[3][i];		/* V[3] is always 1. */
+	Res[i] += V[0] * trans_mat[0][i];
+	Res[i] += V[1] * trans_mat[1][i];
+	Res[i] += V[2] * trans_mat[2][i];
     }
 
     if (Res[3] == 0)
