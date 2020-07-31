@@ -533,14 +533,15 @@ please add path to zlib.h to CPPFLAGS in Makefile])])],
 
 dnl check presence of gd library
 dnl we don't check for libfreetype and libjpeg locations - if gd requires
-dnl them, the gdlib-config scipt contains all the required information
+dnl them, the gdlib-config script or the gdlibc.pc contains all the required information
 AC_ARG_WITH(gd,dnl
 [  --with-gd[=DIR]           location of gd library (png jpeg gif terminals)],,
   with_gd=yes)
 
 if test "$with_gd" != no; then
+  PKG_CHECK_MODULES_NOFAIL(libgd, [gdlib])
   AC_PATH_PROG([GDLIB_CONFIG], [gdlib-config])
-  if test -n "$GDLIB_CONFIG"; then
+  if test $pkg_failed == no && test -n "$GDLIB_CONFIG"; then
     libgd_CPPFLAGS=`$GDLIB_CONFIG --cflags`
     libgd_LDFLAGS=`$GDLIB_CONFIG --ldflags`
     libgd_LIBS=`$GDLIB_CONFIG --libs`
