@@ -143,6 +143,7 @@ int vms_vkid;			/* Virtual keyboard id */
 int vms_ktid;			/* key table id, for translating keystrokes */
 #endif /* VMS */
 
+typedef enum ifstate {IF_INITIAL=1, IF_TRUE, IF_FALSE} ifstate;
 
 /* static prototypes */
 static void command(void);
@@ -154,6 +155,8 @@ static int read_line(const char *prompt, int start);
 static void do_system(const char *);
 static void test_palette_subcommand(void);
 static int find_clause(int *, int *);
+static void if_else_command(ifstate if_state);
+static void old_if_command(struct at_type *expr);
 static int report_error(int ierr);
 
 static int expand_1level_macros(void);
@@ -184,8 +187,6 @@ char *print_out_name = NULL;
 /* input data, parsing variables */
 int num_tokens, c_token;
 
-int if_depth = 0;
-TBOOLEAN if_condition = FALSE;
 TBOOLEAN if_open_for_else = FALSE;
 
 static int clause_depth = 0;
@@ -375,7 +376,6 @@ do_line()
     }
     FPRINTF((stderr, "  echo: \"%s\"\n", gp_input_line));
 
-    if_depth = 0;
     num_tokens = scanner(&gp_input_line, &gp_input_line_len);
 
     /*
@@ -1207,155 +1207,150 @@ new_clause(int clause_start, int clause_end)
     return clause;
 }
 
-/* process the 'if' command */
+/*
+ * if / else command
+ *
+ * Aug 2020:
+ * Restructured to handle if / else if / else sequences in a single routine.
+ * Because the routine must handle recursion, the state flag (if_status)
+ * is made a parameter rather than a global.
+ */
+static void
+if_else_command(ifstate if_state)
+{
+    int clause_start, clause_end;
+    int next_token;
+
+    /* initial or recursive ("else if") if clause */
+    if (equals(c_token,"if")) {
+	struct at_type *expr;
+
+	if (!equals(++c_token, "("))
+	    int_error(c_token, "expecting (expression)");
+	/* advance past if condition whether or not we evaluate it */
+	expr = temp_at();
+	if (equals(c_token,"{")) {
+	    next_token = find_clause(&clause_start, &clause_end);
+	} else {
+	    /* pre-v5 syntax for "if" with no curly brackets */
+	    old_if_command(expr);
+	    return;
+	}
+	if (if_state == IF_TRUE) {
+	    /* This means we are here recursively in an "else if"
+	     * following an "if" clause that was already executed.
+	     * Skip both the expression and the bracketed clause.
+	     */
+	    c_token = next_token;
+	} else if (TRUE || if_state == IF_INITIAL) {
+	    struct value condition;
+	    evaluate_at(expr, &condition);
+	    if (real(&condition) == 0) {
+		if_state = IF_FALSE;
+		c_token = next_token;
+	    } else  {
+		char *clause;
+		if_state = IF_TRUE;
+		clause = new_clause(clause_start, clause_end);
+		begin_clause();
+		do_string_and_free(clause);
+		end_clause();
+		if (iteration_early_exit())
+		    c_token = num_tokens;
+		else
+		    c_token = next_token;
+	    }
+	} else {
+	    int_error(c_token, "unexpected if_state");
+	}
+    }
+
+    /* Done with "if" portion.  Check for "else" */
+    if (equals(c_token,"else")) {
+	c_token++;
+	if (equals(c_token,"if")) {
+	    if_else_command(if_state);
+	} else if (equals(c_token,"{")) {
+	    next_token = find_clause(&clause_start, &clause_end);
+	    if (if_state == IF_TRUE) {
+		c_token = next_token;
+	    } else {
+		char *clause;
+		if_state = IF_TRUE;
+		clause = new_clause(clause_start, clause_end);
+		begin_clause();
+		do_string_and_free(clause);
+		end_clause();
+		if (iteration_early_exit())
+		    c_token = num_tokens;
+		else
+		    c_token = next_token;
+	    }
+	    if_open_for_else = FALSE;
+	} else {
+	    int_error(c_token, "expecting bracketed else clause");
+	}
+    } else {
+	/* There was no "else" on this line but we might see it on another line */
+	if_open_for_else = !(if_state == IF_TRUE);
+    }
+
+    return;
+}
+
+/*
+ * The original if_command and else_command become wrappers
+ */
 void
 if_command()
 {
-    double exprval;
-    int end_token;
-
-    if (!equals(++c_token, "("))	/* no expression */
-	int_error(c_token, "expecting (expression)");
-    exprval = real_expression();
-
-    /*
-     * EAM May 2011
-     * New if {...} else {...} syntax can span multiple lines.
-     * Isolate the active clause and execute it recursively.
-     */
-    if (equals(c_token,"{")) {
-	/* Identify start and end position of the clause substring */
-	char *clause = NULL;
-	int if_start, if_end, else_start=0, else_end=0;
-	int clause_start, clause_end;
-
-	c_token = find_clause(&if_start, &if_end);
-
-	if (equals(c_token,"else")) {
-	    if (!equals(++c_token,"{"))
-		int_error(c_token,"expected {else-clause}");
-	    c_token = find_clause(&else_start, &else_end);
-	}
-	end_token = c_token;
-
-	if (exprval != 0) {
-	    clause_start = if_start;
-	    clause_end = if_end;
-	    if_condition = TRUE;
-	} else {
-	    clause_start = else_start;
-	    clause_end = else_end;
-	    if_condition = FALSE;
-	}
-	if_open_for_else = (else_start) ? FALSE : TRUE;
-
-	if (if_condition || else_start != 0) {
-	    clause = new_clause(clause_start, clause_end);
-	    begin_clause();
-	    do_string_and_free(clause);
-	    end_clause();
-	}
-
-	if (iteration_early_exit())
-	    c_token = num_tokens;
-	else
-	    c_token = end_token;
-
+	if_else_command(IF_INITIAL);
 	return;
-    }
-
-    /*
-     * EAM May 2011
-     * Old if/else syntax (no curly braces) affects the rest of the current line.
-     * Deprecate?
-     */
-    if (clause_depth > 0)
-	int_error(c_token,"Old-style if/else statement encountered inside brackets");
-    if_depth++;
-    if (exprval != 0.0) {
-	/* fake the condition of a ';' between commands */
-	int eolpos = token[num_tokens - 1].start_index + token[num_tokens - 1].length;
-	--c_token;
-	token[c_token].length = 1;
-	token[c_token].start_index = eolpos + 2;
-	gp_input_line[eolpos + 2] = ';';
-	gp_input_line[eolpos + 3] = NUL;
-
-	if_condition = TRUE;
-    } else {
-	while (c_token < num_tokens) {
-	    /* skip over until the next command */
-	    while (!END_OF_COMMAND) {
-		++c_token;
-	    }
-	    if (equals(++c_token, "else")) {
-		/* break if an "else" was found */
-		if_condition = FALSE;
-		--c_token; /* go back to ';' */
-		return;
-	    }
-	}
-	/* no else found */
-	c_token = num_tokens = 0;
-    }
 }
-
-/* process the 'else' command */
 void
 else_command()
 {
-    int end_token;
-   /*
-    * EAM May 2011
-    * New if/else syntax permits else clause to appear on a new line
-    */
-    if (equals(c_token+1,"{")) {
-	int clause_start, clause_end;
-	char *clause;
-
-	if (if_open_for_else)
-	    if_open_for_else = FALSE;
-	else
-	    int_error(c_token,"Invalid {else-clause}");
-
-	c_token++;	/* Advance to the opening curly brace */
-	end_token = find_clause(&clause_start, &clause_end);
-
-	if (!if_condition) {
-	    clause = new_clause(clause_start, clause_end);
-	    begin_clause();
-	    do_string_and_free(clause);
-	    end_clause();
-	}
-
-	if (iteration_early_exit())
-	    c_token = num_tokens;
-	else
-	    c_token = end_token;
-
-	return;
-    }
-
-
-   /* EAM May 2011
-    * The rest is only relevant to the old if/else syntax (no curly braces)
-    */
-    if (if_depth <= 0) {
-	int_error(c_token, "else without if");
-	return;
-    } else {
-	if_depth--;
-    }
-
-    if (TRUE == if_condition) {
-	/* First part of line was true so
-	 * discard the rest of the line. */
-	c_token = num_tokens = 0;
-    } else {
-	REPLACE_ELSE(c_token);
-	if_condition = TRUE;
-    }
+    if_else_command(if_open_for_else ? IF_FALSE : IF_TRUE);
+    return;
 }
+
+
+/*
+ * Old if/else syntax (no curly braces) is confined to a single input line.
+ * The rest of the line is *always* consumed.
+ */
+static void
+old_if_command(struct at_type *expr)
+{
+    struct value condition;
+    char *if_start, *if_end;
+    char *else_start = NULL;
+
+    if (clause_depth > 0)
+	int_error(c_token,"Old-style if/else statement encountered inside brackets");
+
+    evaluate_at(expr, &condition);
+
+    /* find start and end of the "if" part */
+    if_start = &gp_input_line[ token[c_token].start_index ];
+    while ((c_token < num_tokens) && !equals(c_token,"else"))
+	c_token++;
+
+    if (equals(c_token,"else")) {
+	if_end = &gp_input_line[ token[c_token].start_index - 1 ];
+	*if_end = '\0';
+	else_start = &gp_input_line[ token[c_token].start_index + token[c_token].length ];
+    }
+
+    if (real(&condition) != 0.0)
+	do_string(if_start);
+    else if (else_start)
+	do_string(else_start);
+
+    c_token = num_tokens = 0;		/* discard rest of line */
+}
+
+
 
 /* process commands of the form 'do for [i=1:N] ...' */
 void

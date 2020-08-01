@@ -43,7 +43,6 @@ extern int inline_num;
 
 extern int if_depth;			/* old if/else syntax only */
 extern TBOOLEAN if_open_for_else;	/* new if/else syntax only */
-extern TBOOLEAN if_condition;		/* used by both old and new syntax */
 
 typedef struct lexical_unit {	/* produced by scanner */
     TBOOLEAN is_token;		/* true if token, false if a value */

@@ -474,8 +474,6 @@ lf_pop()
     interactive = lf->interactive;
     inline_num = lf->inline_num;
     add_udv_by_name("GPVAL_LINENO")->udv_value.v.int_val = inline_num;
-    if_depth = lf->if_depth;
-    if_condition = lf->if_condition;
     if_open_for_else = lf->if_open_for_else;
 
     /* Restore saved input state and free the copy */
@@ -549,9 +547,7 @@ lf_push(FILE *fp, char *name, char *cmdline)
     lf->depth = lf_head ? lf_head->depth+1 : 0;	/* recursion depth */
     if (lf->depth > STACK_DEPTH)
 	int_error(NO_CARET, "load/eval nested too deeply");
-    lf->if_depth = if_depth;
     lf->if_open_for_else = if_open_for_else;
-    lf->if_condition = if_condition;
     lf->c_token = c_token;
     lf->num_tokens = num_tokens;
     lf->tokens = gp_alloc((num_tokens+1) * sizeof(struct lexical_unit),

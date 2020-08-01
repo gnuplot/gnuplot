@@ -6130,26 +6130,29 @@ Ffigure_zerror
 2 if
 ?commands if
 ?if
- New syntax:
+ Syntax:
        if (<condition>) { <commands>;
               <commands>
+              <commands>
+       } else if (<condition>) {
               <commands>
        } else {
               <commands>
        }
- Old syntax:
-       if (<condition>) <command-line> [; else if (<condition>) ...; else ...]
 
  This version of gnuplot supports block-structured if/else statements. If the
  keyword `if` or `else` is immediately followed by an opening "{", then
  conditional execution applies to all statements, possibly on multiple input
  lines, until a matching "}" terminates the block.  If commands may be nested.
 
- The old single-line if/else syntax is still supported, but can not be
- mixed with the new block-structured syntax.  See `if-old`.
+ The old pre-version 5 single-line if/else syntax is still supported,
+ but can not be mixed with the new block-structured syntax.  See `if-old`.
 3 if-old
 ?if if-old
 ?if-old
+ Old syntax:
+       if (<condition>) <command-line> [; else if (<condition>) ...; else ...]
+
  Through gnuplot version 4.4, the scope of the if/else commands was limited to
  a single input line. Now a multi-line clause may be enclosed in curly brackets.
  The old syntax is still honored but cannot be used inside a bracketed clause.
@@ -6173,7 +6176,7 @@ Ffigure_zerror
  else:
        v=0
        v=v+1; if (v%2) print "2" ; else if (v%3) print "3"; else print "fred"
- (repeat the last line repeatedly!)
+
 2 for
 ?for
  The `plot`, `splot`, `set` and `unset` commands may optionally contain an
