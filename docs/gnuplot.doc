@@ -205,12 +205,15 @@ C
 #b cubic spline smoothing of 3D lines. See `splot smooth csplines`
 #b curve smoothing using along-path cubic splines suitable for closed curves
 ## or for 2D curves that are not monotonic on x. See `smooth path`.
+#b new keyword `period` for smoothing periodic data. See `smooth kdensity`.
 #end
 
 4 New commands and command options
 ?new commands
 #start
-#b `palette(z)` returns the RGB palette color mapping z into cbrange. 
+#b `stats <non-existant file>` yields a testable value. See `stats test`.
+#b `stats $vgrid` finds min/max/mean/stddev of voxels in grid
+#b `if ... else if ... else ...`
 #end
 
 4 Multiple named palettes
@@ -229,7 +232,8 @@ C
 4 Other new features
 ?new other
 #start
-#b New function VP_fwhm(sigma,gamma) returns the full width at half maximum
+#b Function `palette(z)` returns the RGB palette color for z in cbrange. 
+#b Function VP_fwhm(sigma,gamma) returns the full width at half maximum
 ## of the Voigt profile. See `VP`, `VP_fwhm`, `libcerf`.
 #b Support XSG base directory for gnuplotrc configuration preferences.
 ## See `environment`.
