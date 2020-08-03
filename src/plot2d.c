@@ -1009,7 +1009,8 @@ get_data(struct curve_points *current_plot)
 	    coordval y1 = v[1];
 	    coordval y2;
 	    if (j==2) {
-		if (current_plot->filledcurves_options.closeto == FILLEDCURVES_CLOSED)
+		if (current_plot->filledcurves_options.closeto == FILLEDCURVES_CLOSED
+		||  current_plot->filledcurves_options.closeto == FILLEDCURVES_DEFAULT)
 		    y2 = y1;
 		else
 		    y2 = current_plot->filledcurves_options.at;
