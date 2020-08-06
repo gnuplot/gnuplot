@@ -3274,6 +3274,10 @@ show_variables()
 	    /* In the default case skip GPVAL_ variables */
 	    udv = udv->next_udv;
 	    continue;
+	} else if (!strncmp(udv->udv_name,"GPFUN_",6)) {
+	    /* Skip GPFUN_ variables; these are reported by "show function" */
+	    udv = udv->next_udv;
+	    continue;
 	}
 	if (udv->udv_value.type == NOTDEFINED) {
 	    FPRINTF((stderr, "\t%-*s is undefined\n", len, udv->udv_name));
