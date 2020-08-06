@@ -64,8 +64,8 @@ set border 3
 set margins screen .15, screen .85, screen .15, screen .85
 set key
 
-plot $viol1 using 2:(1) smooth kdensity bandwidth 10. with filledcurves above y lt 9 title 'B', \
-     $viol2 using 2:(1) smooth kdensity bandwidth 10. with filledcurves above y lt 10 title 'A'
+plot $viol1 using 2:(1) smooth kdensity bandwidth 10. with filledcurves above x1 lt 9 title 'B', \
+     $viol2 using 2:(1) smooth kdensity bandwidth 10. with filledcurves above x1 lt 10 title 'A'
 
 pause -1 "Hit <cr> to continue"
 
