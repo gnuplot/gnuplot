@@ -954,9 +954,11 @@ get_data(struct curve_points *current_plot)
 
 	case BOXERROR:
 	{   /* 3 columns:  x y ydelta
-	     * 4 columns:  x y ydelta xdelta   (boxwidth != -2)
+	     * 4 columns:  x y ydelta xdelta     (if xdelta <=0 use boxwidth)
+	     * 5 columns:  x y ylow yhigh xdelta (if xdelta <=0 use boxwidth)
+	     * ==========
+	     * DEPRECATED
 	     * 4 columns:  x y ylow yhigh      (boxwidth == -2)
-	     * 5 columns:  x y ylow yhigh xdelta
 	     */
 	    coordval xlow, xhigh, ylow, yhigh, width;
 	    if (j == 3) {
@@ -966,12 +968,16 @@ get_data(struct curve_points *current_plot)
 		yhigh = v[1] + v[2];
 		width = -1.0;
 	    } else if (j == 4) {
+		if (v[3] <= 0)
+		    v[3] = boxwidth;
 		xlow  = (boxwidth == -2) ? v[0] : v[0] - v[3]/2.;
 		xhigh = (boxwidth == -2) ? v[0] : v[0] + v[3]/2.;
 		ylow  = (boxwidth == -2) ? v[2] : v[1] - v[2];
 		yhigh = (boxwidth == -2) ? v[3] : v[1] + v[2];
 		width = (boxwidth == -2) ? -1.0 : 0.0;
 	    } else {
+		if (v[4] <= 0)
+		    v[4] = boxwidth;
 		xlow  = v[0] - v[4]/2.;
 		xhigh = v[0] + v[4]/2.;
 		ylow  = v[2];
