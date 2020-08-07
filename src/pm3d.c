@@ -1168,7 +1168,6 @@ pm3d_add_quadrangle(struct surface_points *plot, gpdPoint corners[4])
 
 /*
  * The general case.
- * More than 4 vertices not yet supported
  * (plot == NULL) if we were called from do_polygon().
  */
 void
@@ -1498,6 +1497,23 @@ apply_lighting_model( struct coordinate *v0, struct coordinate *v1,
 	      - (v1->y-v0->y)*(v2->x-v0->x)*xscale3d*yscale3d ;
 
     t = sqrt( normal[0]*normal[0] + normal[1]*normal[1] + normal[2]*normal[2] );
+
+    /* Trap and handle degenerate case of two identical vertices.
+     * Aug 2020
+     * FIXME: The problem case that revealed this problem always involved
+     *        v2 == (v0 or v1) but some unknown example might instead yield
+     *        v0 == v1, which is not addressed here.
+     */
+    if (t < 1.e-12) {
+	if (v2 == v3) /* 2nd try; give up and return original color */
+	    return (gray_is_rgb)
+		? gray
+		:   ((unsigned char)(r*255.) << 16)
+		  + ((unsigned char)(g*255.) <<  8)
+		  + ((unsigned char)(b*255.));
+	else
+	    return apply_lighting_model(  v0, v1, v3, v3, gray, gray_is_rgb);
+    }
 
     normal[0] /= t;
     normal[1] /= t;
