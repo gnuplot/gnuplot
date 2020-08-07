@@ -1135,7 +1135,6 @@ pm3d_add_quadrangle(struct surface_points *plot, gpdPoint corners[4])
 
 /*
  * The general case.
- * More than 4 vertices not yet supported
  * (plot == NULL) if we were called from do_polygon().
  */
 void
