@@ -1465,6 +1465,23 @@ apply_lighting_model( struct coordinate *v0, struct coordinate *v1,
 
     t = sqrt( normal[0]*normal[0] + normal[1]*normal[1] + normal[2]*normal[2] );
 
+    /* Trap and handle degenerate case of two identical vertices.
+     * Aug 2020
+     * FIXME: The problem case that revealed this problem always involved
+     *        v2 == (v0 or v1) but some unknown example might instead yield
+     *        v0 == v1, which is not addressed here.
+     */
+    if (t < 1.e-12) {
+	if (v2 == v3) /* 2nd try; give up and return original color */
+	    return (color_from_rgbvar)
+		? gray
+		:   ((unsigned char)(r*255.) << 16)
+		  + ((unsigned char)(g*255.) <<  8)
+		  + ((unsigned char)(b*255.));
+	else
+	    return apply_lighting_model(v0, v1, v3, v3, gray);
+    }
+
     normal[0] /= t;
     normal[1] /= t;
     normal[2] /= t;
