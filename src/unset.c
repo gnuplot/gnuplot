@@ -806,6 +806,7 @@ static void
 unset_bars()
 {
     bar_size = 0.0;
+    bar_lp.flags &= ~LP_ERRORBAR_SET;
 }
 
 /* reset is different from unset */
@@ -819,6 +820,7 @@ reset_bars()
     bar_lp.pm3d_color.type = TC_VARIABLE;
     bar_size = 1.0;
     bar_layer = LAYER_FRONT;
+    bar_lp.flags = 0;
 }
 
 /* process 'unset border' command */
