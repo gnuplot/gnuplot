@@ -127,6 +127,7 @@ static void plot3d_points(struct surface_points * plot);
 static void plot3d_polygons(struct surface_points * plot);
 static void plot3d_zerrorfill(struct surface_points * plot);
 static void plot3d_boxes(struct surface_points * plot);
+static void plot3d_boxerrorbars(struct surface_points *plot);
 static void plot3d_vectors(struct surface_points * plot);
 static void plot3d_lines_pm3d(struct surface_points * plot);
 static void get_surface_cbminmax(struct surface_points *plot, double *cbmin, double *cbmax);
@@ -1140,7 +1141,6 @@ do_3dplot(
 	    case XERRORBARS:	/* ignored; treat like points */
 	    case XYERRORBARS:	/* ignored; treat like points */
 	    case BOXXYERROR:	/* HBB: ignore these as well */
-	    case BOXERROR:
 	    case ARROWS:
 	    case CANDLESTICKS:	/* HBB: ditto */
 	    case BOXPLOT:
@@ -1182,6 +1182,10 @@ do_3dplot(
 		    plot3d_boxes(this_plot);
 		else
 		    plot3d_impulses(this_plot);
+		break;
+
+	    case BOXERROR:
+		plot3d_boxerrorbars(this_plot);
 		break;
 
 	    case PM3DSURFACE:
@@ -1273,7 +1277,6 @@ do_3dplot(
 	    case XERRORBARS:	/* ignored; treat like points */
 	    case XYERRORBARS:	/* ignored; treat like points */
 	    case BOXXYERROR:	/* HBB: ignore these as well */
-	    case BOXERROR:
 	    case CANDLESTICKS:	/* HBB: ditto */
 	    case BOXPLOT:
 	    case FINANCEBARS:
@@ -1322,6 +1325,7 @@ do_3dplot(
 
 	    case BOXES:
 	    case CIRCLES:
+	    case BOXERROR:
 		apply_pm3dcolor(&this_plot->lp_properties.pm3d_color);
 		if (this_plot->iso_crvs)
 		    check3d_for_variable_color(this_plot, this_plot->iso_crvs->points);
@@ -3528,9 +3532,14 @@ key_sample_fill(int xl, int yl, struct surface_points *this_plot)
 	(term->fillbox)(style,x,y,w,h);
 
 	/* FIXME:  what other plot styles want a border on the key sample? */
-	if ((this_plot->plot_style & PLOT_STYLE_HAS_PM3DBORDER)) {
-	    if (pm3d.border.l_type != LT_NODRAW && pm3d.border.l_type != LT_DEFAULT)
-		term_apply_lp_properties(&pm3d.border);
+	if ((this_plot->plot_style & (PLOT_STYLE_HAS_PM3DBORDER | PLOT_STYLE_HAS_FILL))) {
+	    if ((this_plot->plot_style & PLOT_STYLE_HAS_PM3DBORDER))
+		if (pm3d.border.l_type != LT_NODRAW && pm3d.border.l_type != LT_DEFAULT)
+		    term_apply_lp_properties(&pm3d.border);
+#ifdef BOXERROR_3D
+	    if (this_plot->plot_style == BOXERROR)
+		need_fill_border(&this_plot->fill_properties);
+#endif
 	    newpath();
 	    draw_clip_line( x, y, x+w, y);
 	    draw_clip_line( x+w, y, x+w, y+h);
@@ -4248,3 +4257,140 @@ splot_map_deactivate()
     flip_projection_axis(&axis_array[FIRST_Y_AXIS]);
 }
 
+
+#ifdef BOXERROR_3D
+/*
+ * 3D version of plot with boxerrorbars
+ * The only intended use for this is in xz projection, where it generates a
+ * box + errorbar plot oriented horizontally rather than vertically.
+ */
+static void
+plot3d_boxerrorbars(struct surface_points *plot)
+{
+    int i;			/* point index */
+    double dx, dxl, dxh;	/* rectangle extent along X axis (vertical) */
+    double dz, dzl, dzh;	/* rectangle extent along Z axis (horizontal) */
+    double dy;			/* always 0 */
+    int x0, y0, x1, y1;		/* terminal coordinates */
+    int pass;
+
+    int style = style_from_fill(&plot->fill_properties);
+    int colortype = plot->fill_properties.border_color.type;
+
+    if (!xz_projection) {
+	int_warn(NO_CARET, "splot 'with boxerrorbars' only works in xz projection");
+	return;
+    }
+
+    /* We make two passes through the data
+     * 1st pass: draw the boxes
+     * 2nd pass: draw the errorbars
+     */
+    for (pass=1; pass<=2; pass++) {
+	struct iso_curve *icrvs = plot->iso_crvs;
+
+	if (pass == 1) {
+	    if (colortype == TC_RGB)
+		set_rgbcolor_const(plot->lp_properties.pm3d_color.lt);
+	}
+	if (pass == 2) {
+	    /* Errorbar line style from "set bars" */
+	    if ((bar_lp.flags & LP_ERRORBAR_SET) != 0)
+		term_apply_lp_properties(&bar_lp);
+	    else {
+		term_apply_lp_properties(&plot->lp_properties);
+		need_fill_border(&plot->fill_properties);
+	    }
+	}
+
+	while (icrvs) {
+	    struct coordinate *points = icrvs->points;
+
+	    for (i = 0; i < icrvs->p_count; i++) {
+
+		if (points[i].type == UNDEFINED)
+		    continue;
+
+		dx  = points[i].x;
+		dxh = dx + boxwidth/2.;
+		dxl = dx - boxwidth/2.;
+		dz = points[i].z;
+		dzl = points[i].CRD_ZLOW;
+		dzh = points[i].CRD_ZHIGH;
+		dy = 0;
+
+		/* clip to border */
+		cliptorange(dxl, X_AXIS.min, X_AXIS.max);
+		cliptorange(dxh, X_AXIS.min, X_AXIS.max);
+		cliptorange(dzl, Z_AXIS.min, Z_AXIS.max);
+		cliptorange(dzh, Z_AXIS.min, Z_AXIS.max);
+		cliptorange(dz, Z_AXIS.min, Z_AXIS.max);
+
+		/* Entire box is out of range */
+		if (dxl == dxh && (dxl == X_AXIS.min || dxl == X_AXIS.max))
+		    continue;
+
+		if (pass == 1) {
+		    /* Variable color */
+		    check3d_for_variable_color(plot, &points[i]);
+
+		    /* Draw box */
+		    map3d_xy( dxl, dy, Z_AXIS.min, &x0, &y0 );
+		    map3d_xy( dxh, dy, dz, &x1, &y1 );
+		    (term->fillbox)(style, x0, GPMIN(y0,y1), (x1-x0), abs(y1-y0));
+
+		    /* Draw border */
+		    if (need_fill_border(&plot->fill_properties)) {
+			newpath();
+			(term->move)   (x0, y0);
+			(term->vector) (x1, y0);
+			(term->vector) (x1, y1);
+			(term->vector) (x0, y1);
+			(term->vector) (x0, y0);
+			closepath();
+			if (plot->fill_properties.border_color.type != TC_DEFAULT)
+			    term_apply_lp_properties(&plot->lp_properties);
+		    }
+		}
+
+		if (pass == 2) {
+		    int vl, vh;
+
+		    /* conservative clipping */
+		    if ((X_AXIS.min < X_AXIS.max) && (dx <= X_AXIS.min || dx >= X_AXIS.max))
+			continue;
+		    if ((X_AXIS.min > X_AXIS.max) && (dx <= X_AXIS.max || dx >= X_AXIS.min))
+			continue;
+
+		    /* Draw error bars */
+		    map3d_xy( dxl, dy, dz, &x0, &vl );
+		    map3d_xy( dxh, dy, dz, &x0, &vh );
+		    map3d_xy( dx, dy, dzl, &x0, &y0 );
+		    map3d_xy( dx, dy, dzh, &x1, &y1 );
+		    /* Draw main error bar */
+		    (term->move) (x0, y0);
+		    (term->vector) (x1, y1);
+
+		    /* Draw the whiskers perpendicular to the main bar */
+		    if (bar_size >= 0.0) {
+			vl = y0 + bar_size * (y0 - vl);
+			vh = y0 + bar_size * (y0 - vh);
+		    }
+		    draw_clip_line(x0, vl, x0, vh);
+		    draw_clip_line(x1, vl, x1, vh);
+		}
+
+	    }	/* loop over points */
+
+	    icrvs = icrvs->next;
+	}
+    }	/* Passes 1 and 2 */
+
+    /* Restore base properties before key sample is drawn */
+    term_apply_lp_properties(&plot->lp_properties);
+}
+#else
+static void
+plot3d_boxerrorbars(struct surface_points *plot)
+{ int_error(NO_CARET, "this copy of gnuplot does not support 3D boxerrorbars"); }
+#endif /* BOXERROR_3D */
