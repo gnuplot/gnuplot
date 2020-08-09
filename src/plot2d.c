@@ -518,6 +518,7 @@ get_data(struct curve_points *current_plot)
 	break;
 
     case IMPULSES:	/* 2 + possible variable color */
+    case POLYGONS:
     case LINES:
     case DOTS:
 	min_cols = 1;
