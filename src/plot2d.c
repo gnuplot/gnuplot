@@ -501,6 +501,7 @@ get_data(struct curve_points *current_plot)
 	break;
 
     case IMPULSES:	/* 2 + possible variable color */
+    case POLYGONS:
     case LINES:
     case DOTS:
 	min_cols = 1;
@@ -1024,6 +1025,12 @@ get_data(struct curve_points *current_plot)
 	    break;
 	}
 
+	case POLYGONS:
+	{   /* Nothing yet to distinguish this from filledcurves */
+	    store2d_point(current_plot, i++, v[0], v[1], v[0], v[0], v[1], v[1], 0);
+	    break;
+	}
+
 	case BOXPLOT:
 	{   /* 2 columns:  x data
 	     * 3 columns:  x data width
@@ -1203,7 +1210,6 @@ get_data(struct curve_points *current_plot)
 	case SURFACEGRID:
 	case ZERRORFILL:
 	case ISOSURFACE:
-	case POLYGONS:
 	    int_error(NO_CARET, "This plot style only available for splot");
 	    break;
 

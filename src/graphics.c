@@ -940,6 +940,7 @@ do_plot(struct curve_points *plots, int pcount)
 		break;
 
 	    case FILLEDCURVES:
+	    case POLYGONS:
 		if (this_plot->filledcurves_options.closeto == FILLEDCURVES_DEFAULT) {
 		    if (this_plot->plot_type == DATA)
 			memcpy(&this_plot->filledcurves_options,
