@@ -95,6 +95,7 @@ const struct gen_ftable command_ftbl[] =
     { "up$date", update_command },
     { "vclear", vclear_command },
     { "vfill", vfill_command },
+    { "vgfill", vfill_command },
     { "voxel", voxel_command },
     { "while", while_command },
     { "{", begin_clause },

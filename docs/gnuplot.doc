@@ -262,6 +262,8 @@ C
 #b `vfill DATA_SOURCE using x:y:z:radius:(<expression>)` acts analogously to
 ## a plot command except that instead of plotting it increments voxels near each
 ## point in the input data.
+#b `vgfill` is a variant of `vfill` that uses grid coordinates rather than
+## user coordinates.
 #b `vclear $gridname` resets an existing voxel grid to contain all zero values.
 #b the current contents of one or more voxel grids can be referenced by
 ## `splot` commands to assign colors or other properties of plot elements
@@ -307,7 +309,7 @@ C
 4 New commands and command options
 #start
 #b Voxel grid commands. See `set vgrid`, `set vxrange`, `vclear`, `vfill`,
-## and `voxel`.
+## `vgfill`, and `voxel`.
 #b New options for showing the xy xz and yz planes in 3D plots.
 ##See `set walls`, `set grid vertical`.
 #b `set table separator {tab|comma|"char"}` can be used to create csv files.
@@ -16781,10 +16783,14 @@ Ffigure_walls
 2 vfill
 ?commands vfill
 ?vfill
+?vgfill
 =VoxelDistance
 ?VoxelDistance
+=GridDistance
+?GridDistance
  Syntax:
-      vfill FILE using x:y:z:radius:(<expression>)
+      vfill  FILE using x:y:z:radius:(<expression>)
+      vgfill FILE using x:y:z:radius:(<expression>)
 
  The `vfill` command acts analogously to a `plot` command except that instead
  of creating a plot it modifies voxels in the currently active voxel grid.
@@ -16793,15 +16799,26 @@ Ffigure_walls
  are incremented as follows:
 #start
 #b user variable VoxelDistance is set to the distance from (x,y,z) to that
-## voxel's grid coordinates (vx,vy,vz).
+## voxel's origin in user coordinates (vx,vy,vz).
+#b user variable GridDistance is set to the distance from (x,y,z) to that
+## voxel's origin in grid coordinates.
 #b The expression provided in the 5th `using` specifier is evaluated.
-## This expression can use the new value of VoxelDistance.
+## This expression can use the new value of VoxelDistance and/or GridDistance.
 #b voxel(vx,vy,vz) += result of evaluating <expression>
 #end
- Example:
+ Examples:
       vfill "file.dat" using 1:2:3:(3.0):(1.0)
  This command adds 1 to the value of every voxel within a sphere of radius 3.0
- around each point in file.dat.
+ around each point in file.dat.  The number of voxels that this sphere impinges
+ on depends on the grid spacing in user coordinates, which may be different
+ along the x, y, and z directions.
+
+      vgfill "file.dat" using 1:2:3:(2):(1.0)
+ This command adds 1 to the value of voxels within a 5x5x5 cube of voxels
+ centered on the current point. The radius "2" is interpreted as extending
+ exactly 2 voxels in either direction along x, 2 voxels in either direction
+ along y, etc, regardless of the relative scaling of user coordinates along
+ those axes.
 
  Example:
       vfill "file.dat" using 1:2:3:4:(VoxelDistance < 1 ? 1 : 1/VoxelDistance)
@@ -16809,7 +16826,8 @@ Ffigure_walls
  each point by the content of column 4.  The increment added to a voxel
  decreases with its distance from the data point.
 
- Note that `vfill` always increments existing values in the current voxel grid.
+ Note that `vfill` and `vgfill` always increments existing values in the
+ current voxel grid.
  To reset a single voxel to zero, use `voxel(x,y,z) = 0`.
  To reset the entire grid to zero, use `vclear`.
 2 While
