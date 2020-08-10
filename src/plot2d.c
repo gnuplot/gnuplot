@@ -2198,7 +2198,7 @@ eval_plots()
 		this_plot->plot_type = DATA;
 		this_plot->plot_style = data_style;
 		this_plot->plot_smooth = SMOOTH_NONE;
-		this_plot->filledcurves_options.closeto = FILLEDCURVES_DEFAULT;
+		this_plot->filledcurves_options = filledcurves_opts_data;
 
 		/* Only relevant to "with table" */
 		free_at(table_filter_at);
@@ -2261,7 +2261,7 @@ eval_plots()
 		}
 		this_plot->plot_type = FUNC;
 		this_plot->plot_style = func_style;
-		this_plot->filledcurves_options.closeto = FILLEDCURVES_DEFAULT;
+		this_plot->filledcurves_options = filledcurves_opts_func;
 		end_token = c_token - 1;
 	    }                   /* end of IS THIS A FILE OR A FUNC block */
 
