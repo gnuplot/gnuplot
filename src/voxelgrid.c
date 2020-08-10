@@ -830,8 +830,9 @@ modify_voxels( t_voxel *grid, double x, double y, double z,
 
     /* Only print once */
     if (nvoxels_modified == 0)
-	fprintf(stderr, "\tvoxel cube defined by radius %g: %d x %d x %d\n",
-		radius, nvx, nvy, nvz);
+	fprintf(stderr,
+		"\tradius %g gives a brick of %d voxels on x, %d voxels on y, %d voxels on z\n",
+		radius, 1+2*nvx, 1+2*nvy, 1+2*nvz);
 
     /* The iteration covers a cube rather than a sphere */
     evaluate_inside_using = TRUE;
