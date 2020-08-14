@@ -1554,6 +1554,10 @@ ChangeView(int x, int z)
 static void
 ChangeAzimuth(int x)
 {
+    /* Disable for 2D projections */
+    if (xz_projection || yz_projection)
+	return;
+
     /* Can't use Mod_Shift because keyboards differ on the */
     /* shift status of the < and > keys. */
     if (modifier_mask & Mod_Ctrl)
@@ -2249,7 +2253,7 @@ event_motion(struct gp_event_t *ge)
 	    redraw = TRUE;
 	} else if (button & (1 << 3)) {
 	    /* dragging with button 3 -> change azimuth */
-	    azimuth += (mouse_x - start_x) * 90.0 / term->xmax;
+	    ChangeAzimuth( (mouse_x - start_x) * 90.0 / term->xmax );
 	    start_x = mouse_x;
 	    redraw = TRUE;
 	}
