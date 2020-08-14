@@ -2925,7 +2925,10 @@ xtick_callback(
     /* Draw top tic mark */
     if ((this_axis->index == SECOND_X_AXIS)
     ||  (this_axis->index == FIRST_X_AXIS && (this_axis->ticmode & TICS_MIRROR))) {
-	map3d_xyz(place, other_end, base_z, &v3);
+	if (xz_projection)
+	    map3d_xyz(place, other_end, Z_AXIS.max, &v3);
+	else
+	    map3d_xyz(place, other_end, base_z, &v3);
 	v4.x = v3.x - tic_unitx * scale * t->v_tic;
 	v4.y = v3.y - tic_unity * scale * t->v_tic;
 	v4.z = v3.z - tic_unitz * scale * t->v_tic;
@@ -3057,7 +3060,10 @@ ytick_callback(
     /* Draw right tic mark */
     if ((this_axis->index == SECOND_Y_AXIS)
     ||  (this_axis->index == FIRST_Y_AXIS && (this_axis->ticmode & TICS_MIRROR))) {
-	map3d_xyz(other_end, place, base_z, &v3);
+	if (yz_projection)
+	    map3d_xyz(other_end, place, Z_AXIS.min, &v3);
+	else
+	    map3d_xyz(other_end, place, base_z, &v3);
 	v4.x = v3.x - tic_unitx * scale * t->h_tic;
 	v4.y = v3.y - tic_unity * scale * t->h_tic;
 	v4.z = v3.z - tic_unitz * scale * t->h_tic;
