@@ -4438,9 +4438,10 @@ do_polygon( int dimensions, t_object *this_object, int style, int facing )
     static gpiPoint *corners = NULL;
     static gpiPoint *clpcorn = NULL;
     BoundingBox *clip_save = clip_area;
+    int vertices = p->type;
     int nv;
 
-    if (!p->vertex || p->type < 2)
+    if (!p->vertex || vertices < 2)
 	return;
 
     /* opt out of coordinate transform in xz or yz projection
@@ -4448,10 +4449,10 @@ do_polygon( int dimensions, t_object *this_object, int style, int facing )
      */
     in_3d_polygon = TRUE;
 
-    corners = gp_realloc(corners, p->type * sizeof(gpiPoint), "polygon");
-    clpcorn = gp_realloc(clpcorn, 2 * p->type * sizeof(gpiPoint), "polygon");
+    corners = gp_realloc(corners, vertices * sizeof(gpiPoint), "polygon");
+    clpcorn = gp_realloc(clpcorn, 2 * vertices * sizeof(gpiPoint), "polygon");
 
-    for (nv = 0; nv < p->type; nv++) {
+    for (nv = 0; nv < vertices; nv++) {
 	if (dimensions == 3)
 	    map3d_position(&p->vertex[nv], &corners[nv].x, &corners[nv].y, "pvert");
 	else
@@ -4467,8 +4468,8 @@ do_polygon( int dimensions, t_object *this_object, int style, int facing )
 	double v1[2], v2[2], cross_product;
 	v1[0] = corners[1].x - corners[0].x;
 	v1[1] = corners[1].y - corners[0].y;
-	v2[0] = corners[p->type-2].x - corners[0].x;
-	v2[1] = corners[p->type-2].y - corners[0].y;
+	v2[0] = corners[vertices-2].x - corners[0].x;
+	v2[1] = corners[vertices-2].y - corners[0].y;
 	cross_product = v1[0]*v2[1] - v1[1]*v2[0];
 	if (facing == LAYER_FRONT && cross_product > 0)
 	    return;
@@ -4484,12 +4485,10 @@ do_polygon( int dimensions, t_object *this_object, int style, int facing )
 	clip_polygon(corners, clpcorn, nv, &out_length);
 	clpcorn[0].style = style;
 
-	if ((out_length == 5 || out_length == 4)
-	 && (pm3d.direction == PM3D_DEPTH) && (facing < 0)) {
-	    /* "set obj polygon depthorder" and "set pm3d depthorder" only */
-	    /* applies to quadrangles and triangles (= degenerate case)    */
-	    gpdPoint quad[4];
-	    for (nv=0; nv < 4; nv++) {
+	if ((this_object->layer == LAYER_DEPTHORDER) && (vertices < 12)) {
+	    /* FIXME - size arbitrary limit */
+	    gpdPoint quad[12];
+	    for (nv=0; nv < vertices; nv++) {
 		quad[nv].x = p->vertex[nv].x;
 		quad[nv].y = p->vertex[nv].y;
 		quad[nv].z = p->vertex[nv].z;
@@ -4518,7 +4517,7 @@ do_polygon( int dimensions, t_object *this_object, int style, int facing )
 
 	    /* FIXME: could we pass through a per-quadrangle border style also? */
 	    quad[1].c = style;
-	    pm3d_add_polygon( NULL, quad, 4 );
+	    pm3d_add_polygon( NULL, quad, vertices );
 
 	} else { /* Not depth-sorted; draw it now */
 	    if (out_length > 1)
