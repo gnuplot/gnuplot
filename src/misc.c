@@ -185,65 +185,6 @@ prepare_call(int calltype)
     }
 }
 
-#ifdef OLD_STYLE_CALL_ARGS
-
-const char *
-expand_call_arg(int c)
-{
-    static char numstr[3];
-    if (c == '$') {
-	return "$";
-    } else if (c == '#') {
-	assert(call_argc >= 0 && call_argc <= 9);
-	sprintf(numstr, "%i", call_argc);
-	return numstr;
-    } else if (c >= '0' && c <= '9') {
-	int ind = c - '0';
-	if (ind >= call_argc)
-	    return "";
-	else
-	    return call_args[ind];
-    } else {
-	/* pass through unrecognized syntax elements that begin with $, e.g. datablock names */
-	sprintf(numstr, "$%c", c);
-	return numstr;
-    }
-    return NULL; /* Avoid compiler warning */
-}
-
-
-static void
-expand_call_args(void)
-{
-    int il = 0;
-    int len;
-    char *rl;
-    char *raw_line = gp_strdup(gp_input_line);
-
-    rl = raw_line;
-    *gp_input_line = '\0';
-    while (*rl) {
-	if (*rl == '$') {
-	    const char *sub = expand_call_arg(*(++rl));
-	    len = strlen(sub);
-	    while (gp_input_line_len - il < len + 1)
-		extend_input_line();
-	    strcpy(gp_input_line + il, sub);
-	    il += len;
-	} else {
-	    if (il + 1 > gp_input_line_len)
-		extend_input_line();
-	    gp_input_line[il++] = *rl;
-	}
-	rl++;
-    }
-    if (il + 1 > gp_input_line_len)
-	extend_input_line();
-    gp_input_line[il] = '\0';
-    free(raw_line);
-}
-#endif /* OLD_STYLE_CALL_ARGS */
-
 /*
  * calltype indicates whether load_file() is called from
  * (1) the "load" command, no arguments substitution is done
@@ -390,10 +331,6 @@ load_file(FILE *fp, char *name, int calltype)
 
 	/* process line */
 	if (strlen(gp_input_line) > 0) {
-#ifdef OLD_STYLE_CALL_ARGS
-	    if (calltype == 2 || calltype == 5)
-		expand_call_args();
-#endif
 	    screen_ok = FALSE;	/* make sure command line is echoed on error */
 	    if (do_line())
 		stop = TRUE;
