@@ -96,11 +96,6 @@ extern char HelpFile[];
 # define SET_CURSOR_ARROW       /* nought, zilch */
 #endif
 
-/* Include code to support deprecated "call" syntax. */
-#if (1) /* Deprecated */
-#define OLD_STYLE_CALL_ARGS
-#endif
-
 /* input data, parsing variables */
 extern int num_tokens, c_token;
 

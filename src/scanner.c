@@ -203,14 +203,7 @@ scanner(char **expressionp, size_t *expressionlenp)
 	} else
 	    switch (expression[current]) {
 	    case '#':
-#ifdef OLD_STYLE_CALL_ARGS
-		/* FIXME: This ugly exception handles the old-style syntactic */
-		/* entity $# (number of arguments in "call" statement), which */
-		/* otherwise would be treated as introducing a comment.       */
-		if ((t_num == 0) ||
-		    (gp_input_line[token[t_num-1].start_index] != '$'))
-#endif
-			goto endline;	/* ignore the rest of the line */
+		goto endline;	/* ignore the rest of the line */
 	    case '^':
 	    case '+':
 	    case '-':
