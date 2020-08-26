@@ -1676,6 +1676,7 @@ START_HELP(canvas)
 "?set term canvas",
 "?terminal canvas",
 "?term canvas",
+"=canvas terminal",
 "",
 " The `canvas` terminal creates a set of javascript commands that draw onto the",
 " HTML5 canvas element.",

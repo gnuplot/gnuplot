@@ -710,6 +710,11 @@ C
 ?canvas
 ?set term size
 
+ This documentation uses the term "canvas" to mean the full drawing area
+ available for positioning the plot and associated elements like labels,
+ titles, key, etc.  NB: For information about the HTML5 canvas terminal
+ see `set term canvas`.
+
  In earlier versions of gnuplot, some terminal types used the values from
  `set size` to control also the size of the output canvas; others did not.
  The use of 'set size' for this purpose was deprecated in version 4.
