@@ -5336,6 +5336,7 @@ df_readbinary(double v[], int max)
 		    }
 
 		    if (a.type == STRING) {
+			v[output] = not_a_number();     /* found a string, not a number */
 			if (use_spec[output].expected_type == CT_STRING) {
 			    char *s = gp_alloc(strlen(a.v.string_val)+3,"quote");
 			    *s = '"';
@@ -5343,6 +5344,14 @@ df_readbinary(double v[], int max)
 			    strcat(s, "\"");
 			    free(df_stringexpression[output]);
 			    df_tokens[output] = df_stringexpression[output] = s;
+			}
+			/* Expecting a numerical type but got a string value */
+			/* 'with points pt variable' is the only current user */
+			if (df_current_plot
+			&&  (df_current_plot->lp_properties.p_type == PT_VARIABLE)) {
+			    static char varchar[8];
+			    safe_strncpy(varchar, a.v.string_val, 8);
+			    df_tokens[output] = varchar;
 			}
 			gpfree_string(&a);
 		    } else if (a.type == CMPLX && (fabs(imag(&a)) > zero)) {
