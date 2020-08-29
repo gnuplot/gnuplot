@@ -129,6 +129,10 @@
 /* Used to skip whitespace but not cross a field boundary */
 #define NOTSEP (!df_separators || !strchr(df_separators,*s))
 
+enum COLUMN_TYPE { CT_DEFAULT, CT_STRING, CT_KEYLABEL, CT_MUST_HAVE,
+		CT_XTICLABEL, CT_X2TICLABEL, CT_YTICLABEL, CT_Y2TICLABEL,
+		CT_ZTICLABEL, CT_CBTICLABEL };
+
 /*{{{  static fns */
 static int check_missing(char *s);
 
@@ -147,14 +151,11 @@ static void add_key_entry(char *temp_string, int df_datum);
 static char * df_generate_pseudodata(void);
 static char * df_generate_ascii_array_entry(void);
 static int df_skip_bytes(off_t nbytes);
+static int axcol_for_ticlabel(enum COLUMN_TYPE type, int *axis);
 
 /*}}} */
 
 /*{{{  variables */
-
-enum COLUMN_TYPE { CT_DEFAULT, CT_STRING, CT_KEYLABEL, CT_MUST_HAVE,
-		CT_XTICLABEL, CT_X2TICLABEL, CT_YTICLABEL, CT_Y2TICLABEL,
-		CT_ZTICLABEL, CT_CBTICLABEL };
 
 /* public (exported) variables client might access */
 
@@ -2123,36 +2124,7 @@ df_readascii(double v[], int max)
 			if (df_current_plot->plot_style == BOXPLOT)
 				continue;
 		    }
-		    switch (use_spec[output].expected_type) {
-			default:
-			case CT_XTICLABEL:
-			    axis = FIRST_X_AXIS;
-			    axcol = 0;
-			    break;
-			case CT_X2TICLABEL:
-			    axis = SECOND_X_AXIS;
-			    axcol = 0;
-			    break;
-			case CT_YTICLABEL:
-			    axis = FIRST_Y_AXIS;
-			    axcol = 1;
-			    break;
-			case CT_Y2TICLABEL:
-			    axis = SECOND_Y_AXIS;
-			    axcol = 1;
-			    break;
-			case CT_ZTICLABEL:
-			    axis = FIRST_Z_AXIS;
-			    axcol = 2;
-			    break;
-			case CT_CBTICLABEL:
-			    axis = COLOR_AXIS;
-			    if (df_axis[2] == FIRST_Z_AXIS)
-				axcol = 2;
-			    else
-				axcol = df_no_use_specs - 1;
-			    break;
-		    }
+		    axcol = axcol_for_ticlabel( use_spec[output].expected_type, &axis );
 		    /* Trap special case of only a single 'using' column */
 		    if (output == 1)
 			xpos = (axcol == 0) ? df_datum : v[axcol-1];
@@ -2413,9 +2385,6 @@ df_readascii(double v[], int max)
 	 * all callers would have to be modified to deal with it one
 	 * way or the other. */
 	output -= df_no_tic_specs;
-	assert(df_no_use_specs == 0
-	       || output == df_no_use_specs
-	       || output == max);
 
 	/*
 	 * EAM Apr 2012 - If there is no using spec, then whatever we found on
@@ -5346,14 +5315,14 @@ df_readbinary(double v[], int max)
 			    df_tokens[output] = df_stringexpression[output] = s;
 			}
 			/* Expecting a numerical type but got a string value */
-			/* 'with points pt variable' is the only current user */
-			if (df_current_plot
-			&&  (df_current_plot->lp_properties.p_type == PT_VARIABLE)) {
+			else if (df_current_plot
+			     && (df_current_plot->lp_properties.p_type == PT_VARIABLE)) {
 			    static char varchar[8];
 			    safe_strncpy(varchar, a.v.string_val, 8);
 			    df_tokens[output] = varchar;
 			}
 			gpfree_string(&a);
+			continue;	/* otherwise isnan(v[output]) would terminate */
 		    } else if (a.type == CMPLX && (fabs(imag(&a)) > zero)) {
 			/* June 2018: CHANGE. For consistency with function plots, */
 			/* imaginary results are treated as UNDEFINED.		   */
@@ -5461,51 +5430,15 @@ df_readbinary(double v[], int max)
 		evaluate_inside_using = TRUE;
 		evaluate_at(use_spec[i].at, &a);
 		evaluate_inside_using = FALSE;
-		switch (use_spec[i].expected_type) {
-		    default:
-		    case CT_XTICLABEL:
-			axis = FIRST_X_AXIS;
-			axcol = 0;
-			break;
-		    case CT_X2TICLABEL:
-			axis = SECOND_X_AXIS;
-			axcol = 0;
-			break;
-		    case CT_YTICLABEL:
-			axis = FIRST_Y_AXIS;
-			axcol = 1;
-			break;
-		    case CT_Y2TICLABEL:
-			axis = SECOND_Y_AXIS;
-			axcol = 1;
-			break;
-		    case CT_ZTICLABEL:
-			axis = FIRST_Z_AXIS;
-			axcol = 2;
-			break;
-		    case CT_CBTICLABEL:
-			axis = COLOR_AXIS;
-			if (df_axis[2] == FIRST_Z_AXIS)
-			    axcol = 2;
-			else
-			    axcol = df_no_use_specs - 1;
-			break;
-		}
 		if (a.type == STRING) {
+		    axcol = axcol_for_ticlabel( use_spec[output].expected_type, &axis );
 		    add_tic_user(&axis_array[axis], a.v.string_val, v[axcol], -1);
 		    gpfree_string(&a);
 		}
 	    }
 	}
 
-	/* output == df_no_use_specs if using was specified -
-	 * actually, smaller of df_no_use_specs and max */
-	assert(df_no_use_specs == 0
-	       || output == df_no_use_specs
-	       || output == max);
-
 	return output;
-
     }
     /*}}} */
 
@@ -5767,4 +5700,44 @@ df_generate_ascii_array_entry()
     }
 
     return df_line;
+}
+
+/* utility routine shared by df_readascii and df_readbinary */
+static int
+axcol_for_ticlabel(enum COLUMN_TYPE type, int *axis)
+{
+    int axcol;
+
+	switch (type) {
+	    default:
+	    case CT_XTICLABEL:
+		*axis = FIRST_X_AXIS;
+		axcol = 0;
+		break;
+	    case CT_X2TICLABEL:
+		*axis = SECOND_X_AXIS;
+		axcol = 0;
+		break;
+	    case CT_YTICLABEL:
+		*axis = FIRST_Y_AXIS;
+		axcol = 1;
+		break;
+	    case CT_Y2TICLABEL:
+		*axis = SECOND_Y_AXIS;
+		axcol = 1;
+		break;
+	    case CT_ZTICLABEL:
+		*axis = FIRST_Z_AXIS;
+		axcol = 2;
+		break;
+	    case CT_CBTICLABEL:
+		*axis = COLOR_AXIS;
+		if (df_axis[2] == FIRST_Z_AXIS)
+		    axcol = 2;
+		else
+		    axcol = df_no_use_specs - 1;
+		break;
+	}
+
+    return axcol;
 }
