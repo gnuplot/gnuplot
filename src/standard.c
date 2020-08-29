@@ -735,7 +735,7 @@ f_acosh(union argument *arg)
     y = imag(&a);
     if (y == 0.0 && fabs(x) <= 1.0) {
 	push(Gcomplex(&a, 0.0, acos(x) / ang2rad));
-    } else if (y == 0) {
+    } else if (y == 0.0 && x > 1.0) {
 	push(Gcomplex(&a, log(x + sqrt(x * x - 1)) / ang2rad, 0.0));
     } else {
 	alpha = sqrt((x + 1) * (x + 1) + y * y) / 2
