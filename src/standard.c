@@ -524,23 +524,30 @@ f_asin(union argument *arg)
 {
     struct value a;
     double alpha, beta, x, y;
+    double t;
     int ysign;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     x = real(&a);
     y = imag(&a);
+    ysign = (y >= 0) ? 1 : -1;
+
     if (y == 0.0 && fabs(x) <= 1.0) {
 	push(Gcomplex(&a, asin(x) / ang2rad, 0.0));
     } else if (x == 0.0) {
-	push(Gcomplex(&a, 0.0, -log(-y + sqrt(y * y + 1)) / ang2rad));
+	/* Rearrange terms to avoid loss of precision */
+	/* t = -log(-y + sqrt(y * y + 1)) */
+	alpha = sqrt(1 + y * y);
+	t = ysign * log(alpha + sqrt(alpha * alpha - 1));
+	push(Gcomplex(&a, 0.0, t / ang2rad));
     } else {
 	beta = sqrt((x + 1) * (x + 1) + y * y) / 2 - sqrt((x - 1) * (x - 1) + y * y) / 2;
 	if (beta > 1)
 	    beta = 1;		/* Avoid rounding error problems */
 	alpha = sqrt((x + 1) * (x + 1) + y * y) / 2 + sqrt((x - 1) * (x - 1) + y * y) / 2;
-	ysign = (y >= 0) ? 1 : -1;
-	push(Gcomplex(&a, asin(beta) / ang2rad, ysign * log(alpha + sqrt(alpha * alpha - 1)) / ang2rad));
+	t = ysign * log(alpha + sqrt(alpha * alpha - 1));
+	push(Gcomplex(&a, asin(beta) / ang2rad, t / ang2rad));
     }
 }
 
@@ -689,24 +696,30 @@ f_asinh(union argument *arg)
 {
     struct value a;		/* asinh(z) = -I*asin(I*z) */
     double alpha, beta, x, y;
+    double t;
     int ysign;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     x = -imag(&a);
     y = real(&a);
+    ysign = (y >= 0) ? 1 : -1;
     if (y == 0.0 && fabs(x) <= 1.0) {
 	push(Gcomplex(&a, 0.0, -asin(x) / ang2rad));
     } else if (y == 0.0) {
 	push(Gcomplex(&a, 0.0, 0.0));
 	undefined = TRUE;
     } else if (x == 0.0) {
-	push(Gcomplex(&a, log(y + sqrt(y * y + 1)) / ang2rad, 0.0));
+	/* Rearrange terms to avoid loss of precision */
+	/* t = log(y + sqrt(y * y + 1)) */
+	alpha = sqrt(y * y + 1);
+	t = ysign * log(alpha + sqrt(alpha * alpha - 1));
+	push(Gcomplex(&a, t / ang2rad, 0.0));
     } else {
-	beta = sqrt((x + 1) * (x + 1) + y * y) / 2 - sqrt((x - 1) * (x - 1) + y * y) / 2;
+	beta  = sqrt((x + 1) * (x + 1) + y * y) / 2 - sqrt((x - 1) * (x - 1) + y * y) / 2;
 	alpha = sqrt((x + 1) * (x + 1) + y * y) / 2 + sqrt((x - 1) * (x - 1) + y * y) / 2;
-	ysign = (y >= 0) ? 1 : -1;
-	push(Gcomplex(&a, ysign * log(alpha + sqrt(alpha * alpha - 1)) / ang2rad, -asin(beta) / ang2rad));
+	t = ysign * log(alpha + sqrt(alpha * alpha - 1));
+	push(Gcomplex(&a, t / ang2rad, -asin(beta) / ang2rad));
     }
 }
 
