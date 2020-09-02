@@ -8,7 +8,8 @@ Since 5.4
 * FIX pm3d lighting calculation for degenerate quadrangles
 * FIX botched deprecation of old syntax for "call" arguments Bug #2298
 * FIX pm3d "depthorder" affects 'set obj polygon' with >4 vertices Bug #2297
-* FIX loss of precision for asin(x), asinh(x) with real x << 0 Bug #2303
+* FIX loss of precision for asin(x), asinh(x) with real x << 0 Bug #2302
+* FIX error handling of bad font name in enhanced text Bug #2303
 * FIX incomplete domain for complex acosh(x), real x < -1 was treated as NaN
 
 Changes in 5.4
