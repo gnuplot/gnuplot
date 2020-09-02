@@ -2175,7 +2175,7 @@ enhanced_recursion(
 			    ++p;
 			if (*p != *start_of_fontname) {
 			    int_warn(NO_CARET, "cannot interpret font name %s", start_of_fontname);
-			    p = start_of_fontname;
+			    p = start_of_fontname + 1;
 			}
 			start_of_fontname++;
 			end_of_fontname = p++;
