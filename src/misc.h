@@ -74,6 +74,7 @@ void arrow_use_properties(struct arrow_style_type *arrow, int tag);
 
 void parse_fillstyle(struct fill_style_type *fs);
 void parse_colorspec(struct t_colorspec *tc, int option);
+long lookup_color_name(char *string);
 long parse_color_name(void);
 TBOOLEAN need_fill_border(struct fill_style_type *fillstyle);
 struct udvt_entry *get_colormap(int token);

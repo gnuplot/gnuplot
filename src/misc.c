@@ -1338,23 +1338,33 @@ parse_colorspec(struct t_colorspec *tc, int options)
 }
 
 long
+lookup_color_name(char *string)
+{
+    int iret;
+    long color = -2;
+
+    iret = lookup_table_nth(pm3d_color_names_tbl, string);
+    if (iret >= 0)
+	color = pm3d_color_names_tbl[iret].value;
+    else if (string[0] == '#')
+	iret = sscanf(string,"#%lx",&color);
+    else if (string[0] == '0' && (string[1] == 'x' || string[1] == 'X'))
+	iret = sscanf(string,"%lx",&color);
+
+    return color;
+}
+
+long
 parse_color_name()
 {
     char *string;
-    long color = -2;
+    long color;
 
     /* Terminal drivers call this after seeing a "background" option */
     if (almost_equals(c_token,"rgb$color") && almost_equals(c_token-1,"back$ground"))
 	c_token++;
     if ((string = try_to_get_string())) {
-	int iret;
-	iret = lookup_table_nth(pm3d_color_names_tbl, string);
-	if (iret >= 0)
-	    color = pm3d_color_names_tbl[iret].value;
-	else if (string[0] == '#')
-	    iret = sscanf(string,"#%lx",&color);
-	else if (string[0] == '0' && (string[1] == 'x' || string[1] == 'X'))
-	    iret = sscanf(string,"%lx",&color);
+	color = lookup_color_name(string);
 	free(string);
 	if (color == -2)
 	    int_error(c_token, "unrecognized color name and not a string \"#AARRGGBB\" or \"0xAARRGGBB\"");
@@ -1362,7 +1372,7 @@ parse_color_name()
 	color = int_expression();
     }
 
-    return (unsigned int)(color);
+    return (unsigned long)(color);
 }
 
 /* arrow parsing...

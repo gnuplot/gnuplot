@@ -236,6 +236,7 @@ const struct ft_entry ft[] =
 
     {"hsv2rgb", f_hsv2rgb},	/* color conversion */
     {"palette", f_palette},	/* palette color lookup */
+    {"rgbcolor", f_rgbcolor},	/* 32bit ARGB color lookup by name or string */
 
 #ifdef VOXEL_GRID_SUPPORT
     {"voxel", f_voxel},		/* extract value of single voxel */

@@ -25,6 +25,7 @@
 #include "graphics.h"
 #include "plot.h"
 #include "graph3d.h"
+#include "misc.h"
 #include "pm3d.h"
 #include "term_api.h"
 #include "util3d.h"
@@ -663,6 +664,30 @@ f_palette(union argument *arg)
 
     push(Ginteger(&result, rgb));
 }
+
+/*
+ * User-callable interpretation of a string as a 24bit RGB color
+ * replicating the colorspec interpretation in e.g. 'linecolor rgb "foo"'.
+ */
+void
+f_rgbcolor(union argument *arg)
+{
+    struct value a;
+    long rgb;
+
+    pop(&a);
+    if (a.type == STRING) {
+	rgb = lookup_color_name(a.v.string_val);
+	if (rgb == -2)
+	    rgb = 0;
+	free(a.v.string_val);
+    } else {
+	rgb = 0;	
+    }
+    
+    push(Ginteger(&a, rgb));
+}
+
 
 /*
  * A colormap can have specific min/max stored internally,

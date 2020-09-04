@@ -233,6 +233,7 @@ C
 ?new other
 #start
 #b Function `palette(z)` returns the RGB palette color for z in cbrange. 
+#b Function `rgbcolor("name")` returns a 32bit ARGB value for a named color.
 #b Function VP_fwhm(sigma,gamma) returns the full width at half maximum
 ## of the Voigt profile. See `VP`, `VP_fwhm`, `libcerf`.
 #b Support XSG base directory for gnuplotrc configuration preferences.
@@ -1385,7 +1386,8 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>columnhead(x)</td>    <td>int</td>    <td> string containing first entry of column <i>x</i> in datafile.</td></tr>
 ^<tr>    <td>exists("X")</td>    <td>string</td>    <td> returns 1 if a variable named X is defined, 0 otherwise.</td></tr>
 ^<tr>    <td>hsv2rgb(h,s,v)</td>    <td>h,s,v in [0:1]</td>    <td> converts HSV color to 24bit RGB color.</td></tr>
-^<tr>    <td>palette(z)</td>    <td>real</td>    <td> RGB palette color mapped to z</td></tr>
+^<tr>    <td>palette(z)</td>    <td>real</td>    <td> 24bit RGB palette color mapped to z</td></tr>
+^<tr>    <td>rgbcolor("name")</td>    <td>string</td>    <td> 32bit ARGB color from name</td></tr>
 ^<tr>    <td>stringcolumn(x)</td>    <td>int</td>    <td> content column <i>x</i> as a string.</td></tr>
 ^<tr>    <td>timecolumn(N,format)</td>    <td>int, string</td>    <td> time data in column <i>N</i> during data input</td></tr>
 ^<tr>    <td>tm_hour(x)</td>    <td>int</td>    <td>the hour</td></tr>
@@ -2013,10 +2015,19 @@ C marker below is used to signal this to doc2html:
 4 palette
 ?expressions functions palette
 ?palette
-#palette(z) & real & RGB palette color mapped to z. \\
-%palette(z)@real@RGB palette color mapped to z.
- `palette(z)` returns the RGB representation of the palette color mapped to z
-  given the current extremes of cbrange.
+#palette(z) & real & 24 bit RGB palette color mapped to z. \\
+%palette(z)@real@24 bit RGB palette color mapped to z.
+ `palette(z)` returns the 24 bit RGB representation of the palette color
+  mapped to z given the current extremes of cbrange.
+4 rgbcolor
+?expressions functions rgbcolor
+?rgbcolor
+#rgbcolor("name") & string & 32bit ARGB color from name or string representation. \\
+%rgbcolor("name")@string@32bit ARGB color from name or string representation.
+ `rgbcolor("name")` returns an integer containing the 32 bit alpha + RGB color
+ value of a named color or a string of the form "0xAARRGGBB" or "#AARRGGBB".
+ If the string is not recognized as a color description the function returns 0.
+ See `colorspec`.
 4 stringcolumn
 ?expressions functions stringcolumn
 ?stringcolumn
