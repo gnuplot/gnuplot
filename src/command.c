@@ -1905,6 +1905,7 @@ print_set_output(char *name, TBOOLEAN datablock, TBOOLEAN append_p)
 #endif
 	    if (0 > fclose(print_out))
 		perror(print_out_name);
+	print_out = stderr;
     }
 
     free(print_out_name);
