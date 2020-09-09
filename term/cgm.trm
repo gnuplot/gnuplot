@@ -130,10 +130,6 @@ static int CGM_find_nearest_color(t_colorspec *colorspec);
 
 #include <ctype.h>		/* for isspace() */
 
-#ifndef assert
-#define assert(x) 0		/* defeat assertions */
-#endif
-
 /* uncomment the following to enable assertions for this module only,
    regardless of compiler switches
 #ifdef NDEBUG
@@ -145,6 +141,7 @@ static int CGM_find_nearest_color(t_colorspec *colorspec);
 
 #define CGM_ADJ (sizeof(int)/sizeof(short))
 
+static TBOOLEAN cgm_initialized = FALSE;
 static unsigned int cgm_posx;
 static unsigned int cgm_posy;
 static unsigned int cgm_linetype = 1;
@@ -536,6 +533,8 @@ CGM_options()
 	cgm_user_color_count = CGM_COLORS;
     }
 
+    /* not set if there is an error exit before we reach here */
+    cgm_initialized = TRUE;
 }
 
 static void
@@ -663,6 +662,9 @@ CGM_graphics()
 	6, 1,			/* Escape */
 	7, 2			/* Application Data */
     };
+
+    if (!cgm_initialized)
+	int_error(NO_CARET, "cgm terminal initialization failed");
 
     /* metafile description (class 1), including filename if available */
     if (!outstr)
