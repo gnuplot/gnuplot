@@ -212,17 +212,22 @@ C
 ## See `invibeta`.
 #b New complex function LambertW(z,k) returns the kth branch of multivalued
 ## function W_k(z).
-## Note that existing function lambertw(x) = real(LambertW( real(z), 0 )).
+## Note that the older function lambertw(x) = real(LambertW( real(z), 0 )).
 ## See `LambertW`.
 #b New complex function lnGamma(z).
 ## Note that existing function lgamma(x) = real(lnGamma(real(z)).
 ## See `lnGamma`.
 #b Complex function conj(z) returns the complex conjugate of z.
 #b Synchrotron function F(x), see `SynchrotronF`.
+#b acosh(z) domain extended to cover negative real axis.
+#b asin(z) asinh(z) improved precision for complex arguments.
+#b Predefined variable I = sqrt(-1) = {0,1} for convenience.
+## This is useful because gnuplot does not accept {a,b} as a valid complex
+## constant but does accept (a + b*I) as a valid complex expression.
 #end
 
  Additional special functions are supported if a suitable external
- library is found at build time.
+ library is found at build time.  See `special_functions`.
 #start
 #b Complex Bessel functions Iν(z), Jν(z), Kν(z), Yν(z) of order ν (real)
 ## with complex argument z. See `BesselK`.
@@ -240,7 +245,7 @@ C
 #b curve smoothing using along-path cubic splines suitable for closed curves
 ## or for 2D curves that are not monotonic on x. See `smooth path`.
 #b new keyword `period` for smoothing periodic data. See `smooth kdensity`.
-#b `set colorbox cbtics <linestyle>` distinguishes cbtics from other tics.
+#b `set colorbox cbtics <linestyle>` affects cbtics but not other tics.
 #end
 
 4 New commands and command options
@@ -249,7 +254,6 @@ C
 #b `stats <non-existant file>` yields a testable value. See `stats test`.
 #b `stats $vgrid` finds min/max/mean/stddev of voxels in grid
 #b `if ... else if ... else ...`
-#b `palette(z)` returns the RGB palette color mapping z into cbrange.
 #end
 
 4 Multiple named palettes
@@ -269,10 +273,10 @@ C
 ?new other
 #start
 #b Function `palette(z)` returns the RGB palette color for z in cbrange. 
-#b Function `rgbcolor("name")` returns a 32bit ARGB value for a named color.
+#b Function `rgbcolor("name")` returns the 32bit ARGB value for a named color.
 #b Function VP_fwhm(sigma,gamma) returns the full width at half maximum
 ## of the Voigt profile. See `VP`, `VP_fwhm`, `libcerf`.
-#b Support XSG base directory for gnuplotrc configuration preferences.
+#b Support XDG base directory for gnuplotrc configuration preferences.
 ## Reads initialization commands from $HOME/.config/gnuplot/gnuplotrc if present.
 ## See `environment`.
 #end
@@ -1253,6 +1257,9 @@ C  need @ in table, so end and restart the table !
  Arithmetic operations and most built-in functions support the use of complex
  arguments.  Complex constants are expressed as {<real>,<imag>}, where <real>
  and <imag> must be numerical constants.  Thus {0,1} represents 'i'.
+ The program predefines a variable I = {0,1} on entry that can be used to
+ generate complex values in terms of other variables. 
+ Thus `x + y*I` is a valid expression but `{x,y}` is not.
  The real and imaginary components of complex value z can be extracted as
  real(z) and imag(z). The modulus is given by abs(z).
  The phase angle is given by arg(z).
@@ -1290,8 +1297,12 @@ Ffigure_E0
  Floating point constants are interpreted via the C library routine atof().
 
  Complex constants are expressed as {<real>,<imag>}, where <real> and <imag>
- must be numerical constants.  For example, {3,2} represents 3 + 2i; {0,1}
- represents 'i' itself.  The curly braces are explicitly required here.
+ must be numerical constants.  For example, {0,1} represents 'i' itself;
+ {3,2} represents 3 + 2i.  The curly braces are explicitly required here.
+ The program predefines a variable I = {0,1} on entry that can be used to
+ avoid typing the explicit form.  For example `3 + 2*I` is the same as `{3,2}`,
+ with the advantage that it can be used with variable coefficient for the
+ imaginary component.  Thus `x + y*I` is a valid expression but `{x,y}` is not.
 
  String constants consist of any sequence of characters enclosed either in
  single quotes or double quotes. The distinction between single and double
