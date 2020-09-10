@@ -2022,11 +2022,14 @@ C marker below is used to signal this to doc2html:
 4 rgbcolor
 ?expressions functions rgbcolor
 ?rgbcolor
+=alpha channel
 #rgbcolor("name") & string & 32bit ARGB color from name or string representation. \\
 %rgbcolor("name")@string@32bit ARGB color from name or string representation.
  `rgbcolor("name")` returns an integer containing the 32 bit alpha + RGB color
  value of a named color or a string of the form "0xAARRGGBB" or "#AARRGGBB".
  If the string is not recognized as a color description the function returns 0.
+ This can be used to read a color name from a data file or to add an alpha
+ channel to a named color in the upper byte of the returned value.
  See `colorspec`.
 4 stringcolumn
 ?expressions functions stringcolumn
@@ -2974,7 +2977,6 @@ Ffigure_newsyntax
 
 3 colorspec
 ?colorspec
-?rgbcolor
 =colors
 ?lc
 ?linecolor
@@ -3021,6 +3023,9 @@ Ffigure_newsyntax
  value in the high bits. An alpha value of 0 represents a fully opaque color;
  i.e., "#00RRGGBB" is the same as "#RRGGBB".  An alpha value of 255 (FF)
  represents full transparency.
+
+ For a callable function that converts any of these forms to a 32bit
+ integer representation of the color, see `expressions functions rgbcolor`.
 
  The color palette is a linear gradient of colors that smoothly maps a
  single numerical value onto a particular color.  Two such mappings are always
