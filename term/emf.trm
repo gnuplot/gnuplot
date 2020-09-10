@@ -666,6 +666,7 @@ EMF_options()
 {
     char *s;
     int emf_bgnd_rgb = 0;
+    float new_defaultfontsize = emf_defaultfontsize;
 
     /* Annoying hack to handle the case of 'set termoption' after */
     /* we have already initialized the terminal.                  */
@@ -786,15 +787,14 @@ EMF_options()
 	/* Fall through to old-style bare font name */
 	if ((s = try_to_get_string())) {
 	    char *comma = strrchr(s,',');
-	    if (comma && (1 == sscanf(comma+1,"%g",&emf_defaultfontsize))) {
+	    if (comma && (1 == sscanf(comma+1,"%f",&new_defaultfontsize))) {
 		*comma = '\0';
 	    }
 	    if (*s)
 		safe_strncpy(emf_defaultfontname, s, sizeof(emf_defaultfontname));
 	    free(s);
-	    if (isanumber(c_token)) {
-		emf_defaultfontsize = int_expression();
-	    }
+	    if (isanumber(c_token))
+		new_defaultfontsize = real_expression();
 	    continue;
 	}
 	break;
@@ -802,8 +802,11 @@ EMF_options()
 
     if (!END_OF_COMMAND) {
 	/* We have old-style bare font size specified */
-	emf_defaultfontsize = int_expression();
+	new_defaultfontsize = real_expression();
     }
+
+    if (new_defaultfontsize > 0)
+	emf_defaultfontsize = new_defaultfontsize;
 
     sprintf(term_options, "%s %s font \"%s,%g\"",
 	    emf_monochrome ? "monochrome" : "color",
