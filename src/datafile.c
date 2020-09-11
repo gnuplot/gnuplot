@@ -1398,7 +1398,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	df_datablock = TRUE;
 	df_datablock_line = get_datablock(df_filename);
 	/* Better safe than sorry. Check for inblock != outblock */
-	if (table_var && table_var->udv_value.v.data_array == df_datablock_line)
+	if (plot && table_var && table_var->udv_value.v.data_array == df_datablock_line)
 	    int_error(NO_CARET,"input and output datablock are the same");
     } else if (!strcmp(df_filename, "@@") && df_array) {
 	/* df_array was set in string_or_express() */
