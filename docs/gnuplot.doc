@@ -6834,7 +6834,6 @@ Ffigure_zerror
 ?data-file bins
 ?datafile bins
 ?bins
- EXPERIMENTAL (implementation details may change in a future version)
  Syntax:
       plot 'DATA' using <XCOL> {:<YCOL>} bins{=<NBINS>}
            {binrange [<LOW>:<HIGH>]} {binwidth=<width>}
