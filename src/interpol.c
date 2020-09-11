@@ -1327,9 +1327,6 @@ mcs_interp(struct curve_points *plot)
  *   plot FOO using N:(1) bins{=<nbins>} {binrange=[binlow:binhigh]}
  *                        {binwidth=<width>} with boxes
  *
- * This option is EXPERIMENTAL, details may change before inclusion in a stable
- * gnuplot release.
- *
  * If no binrange is given, binlow and binhigh are taken from the x range of the data.
  * In either of these cases binlow is the midpoint x-coordinate of the first bin
  * and binhigh is the midpoint x-coordinate of the last bin.
@@ -1443,6 +1440,14 @@ make_bins(struct curve_points *plot, int nbins,
     if (yaxis->autoscale & AUTOSCALE_MAX) {
 	if (yaxis->max < ymax)
 	    yaxis->max = ymax;
+    }
+
+    /* Recheck inrange/outrange */
+    for (i=0; i<nbins; i++) {
+	if (inrange(plot->points[i].y, yaxis->min, yaxis->max))
+	    plot->points[i].type = INRANGE;
+	else
+	    plot->points[i].type = OUTRANGE;
     }
 
     /* Clean up */
