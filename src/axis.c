@@ -2800,3 +2800,21 @@ store_and_update_range(
     }
     return 0;
 }
+
+/* Simplest form of autoscaling (no check on autoscale constraints).
+ * Used by refresh_bounds() and refresh_3dbounds().
+ * Used also by autoscale_boxplot.
+ * FIXME:  Reversed axes are skipped because not skipping them causes errors
+ *         if apply_zoom->refresh_request->refresh_bounds->autoscale_one_point.
+ *	   But really autoscaling shouldn't be done at all in that case.
+ */
+void
+autoscale_one_point(struct axis *axis, double x)
+{
+    if (!(axis->range_flags & RANGE_IS_REVERSED)) {
+	if (axis->set_autoscale & AUTOSCALE_MIN && x < axis->min)
+	    axis->min = x;
+	if (axis->set_autoscale & AUTOSCALE_MAX && x > axis->max)
+	    axis->max = x;
+    }
+}

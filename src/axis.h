@@ -399,17 +399,6 @@ extern struct axis THETA_AXIS;
 #define axis_mapback(axis, pos) \
     (((double)(pos) - (axis)->term_lower)/(axis)->term_scale + (axis)->min)
 
-/* Simplest form of autoscaling (no check on autoscale constraints).
- * Used by refresh_bounds() and refresh_3dbounds().
- * Used also by autoscale_boxplot.
- */
-#define autoscale_one_point(axis, x) do {\
-    if (axis->set_autoscale & AUTOSCALE_MIN && x < axis->min) \
-	axis->min = x; \
-    if (axis->set_autoscale & AUTOSCALE_MAX && x > axis->max) \
-	axis->max = x; \
-    } while (0);
-
 /* parse a position of the form
  *    [coords] x, [coords] y {,[coords] z}
  * where coords is one of first,second.graph,screen,character
@@ -465,6 +454,7 @@ typedef void (*tic_callback) (struct axis *, double, char *, int,
 /* ------------ functions exported by axis.c */
 coord_type store_and_update_range(double *store, double curval, coord_type *type,
 				struct axis *axis, TBOOLEAN noautoscale);
+void autoscale_one_point( struct axis *axis, double x );
 t_autoscale load_range(struct axis *, double *, double *, t_autoscale);
 void check_log_limits(struct axis *, double, double);
 void axis_invert_if_requested(struct axis *);
