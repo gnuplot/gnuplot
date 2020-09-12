@@ -185,6 +185,7 @@ char *enhanced_cur_text = NULL;
 double enhanced_fontscale = 1.0;
 char enhanced_escape_format[16] = "";
 double enhanced_max_height = 0.0, enhanced_min_height = 0.0;
+#define ENHANCED_TEXT_MAX (&enhanced_text[MAX_LINE_LEN])
 /* flag variable to disable enhanced output of filenames, mainly. */
 TBOOLEAN ignore_enhanced_text = FALSE;
 
@@ -2031,6 +2032,9 @@ test_term()
 void
 do_enh_writec(int c)
 {
+    /* Guard against buffer overflow */
+    if (enhanced_cur_text >= ENHANCED_TEXT_MAX)
+	return;
     /* note: c is meant to hold a char, but is actually an int, for
      * the same reasons applying to putc() and friends */
     *enhanced_cur_text++ = c;
