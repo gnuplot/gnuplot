@@ -6866,7 +6866,7 @@ Ffigure_zerror
  contributes a count of 1 to the accumulation of total counts in the bin for
  that x coordinate value.  If a second column is given then the value in that
  column is added to the accumulation for the bin.  Thus the following two plot
- command are equivalent:
+ commands are equivalent:
       plot 'DATA" using N bins=20
       set samples 20
       plot 'DATA' using (column(N)):(1)
