@@ -3918,11 +3918,9 @@ set_colorbox()
 		c_token--;
 		continue;
 	    case S_COLORBOX_INVERT: /* Flip direction of color gradient + cbaxis */
-		c_token++;
 		color_box.invert = TRUE;
 		continue;
 	    case S_COLORBOX_NOINVERT: /* Flip direction of color gradient + cbaxis */
-		c_token++;
 		color_box.invert = FALSE;
 		continue;
 	    } /* switch over colorbox lookup table */
