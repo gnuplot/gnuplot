@@ -414,6 +414,7 @@ typedef struct {
   char rotation; /* 'v' or 'h' vertical or horizontal box */
   char border; /* if non-null, a border will be drawn around the box (default) */
   int border_lt_tag;
+  int cbtics_lt_tag;
   int layer; /* front or back */
   int xoffset;	/* To adjust left or right, e.g. for y2tics */
   struct position origin;

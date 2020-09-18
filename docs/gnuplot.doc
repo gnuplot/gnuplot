@@ -206,6 +206,7 @@ C
 #b curve smoothing using along-path cubic splines suitable for closed curves
 ## or for 2D curves that are not monotonic on x. See `smooth path`.
 #b new keyword `period` for smoothing periodic data. See `smooth kdensity`.
+#b `set colorbox cbtics <linestyle>` distinguishes cbtics from other tics.
 #end
 
 4 New commands and command options
@@ -9376,7 +9377,7 @@ Ffigure_smooth_path
                   { origin x, y }
                   { size x, y }
                   { front | back }
-                  { noborder | bdefault | border [line style] }
+                  { noborder | bdefault | border <linestyle> } {cbtics <linestyle>}
                 }
        show colorbox
        unset colorbox
@@ -9403,6 +9404,9 @@ Ffigure_smooth_path
  will use line style `2604`, a thin line with the default border color (-1)
  for drawing the border. `bdefault` (which is the default) will use the default
  border line style for drawing the border of the color box.
+
+ `cbtics` allows you to specify a line style for the colorbox tics (cbtics)
+ different from the line style of the border.
 
  The axis of the color box is called `cb` and it is controlled by means of the
  usual axes commands, i.e. `set/unset/show` with `cbrange`, `[m]cbtics`,

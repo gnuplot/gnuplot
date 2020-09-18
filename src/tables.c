@@ -466,6 +466,7 @@ const struct gen_table set_colorbox_tbl[] =
     { "bo$rder",	S_COLORBOX_BORDER },
     { "bd$efault",	S_COLORBOX_BDEFAULT },
     { "nobo$rder",	S_COLORBOX_NOBORDER },
+    { "cbtics",		S_COLORBOX_CBTICS },
     { "o$rigin",	S_COLORBOX_ORIGIN },
     { "s$ize",		S_COLORBOX_SIZE },
     { "inv$ert",	S_COLORBOX_INVERT },

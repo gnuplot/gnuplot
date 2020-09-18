@@ -2475,14 +2475,19 @@ static void
 show_colorbox()
 {
     c_token++;
-    if (color_box.border) {
-	fputs("\tcolor box with border, ", stderr);
-	if (color_box.border_lt_tag >= 0)
-	    fprintf(stderr,"line type %d is ", color_box.border_lt_tag);
-	else
-	    fputs("DEFAULT line type is ", stderr);
+    if (!color_box.border) {
+	fprintf(stderr, "\tcolor box without border");
     } else {
-	fputs("\tcolor box without border is ", stderr);
+	fprintf(stderr, "\tcolor box with border lt");
+	if (color_box.border_lt_tag > 0)
+	    fprintf(stderr," %d", color_box.border_lt_tag);
+	else
+	    fprintf(stderr," default");
+	fprintf(stderr, " cbtics lt");
+	if (color_box.cbtics_lt_tag > 0)
+	    fprintf(stderr," %d ", color_box.cbtics_lt_tag);
+	else
+	    fprintf(stderr," same ");
     }
     if (color_box.where != SMCOLOR_BOX_NO) {
 	if (color_box.layer == LAYER_FRONT) fputs("drawn front\n\t", stderr);

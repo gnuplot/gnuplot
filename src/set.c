@@ -3999,15 +3999,21 @@ set_colorbox()
 		if (!END_OF_COMMAND) {
 		    /* expecting a border line type */
 		    color_box.border_lt_tag = int_expression();
-		    if (color_box.border_lt_tag <= 0) {
-			color_box.border_lt_tag = 0;
-			int_error(c_token, "tag must be strictly positive (see `help set style line')");
-		    }
+		    if (color_box.border_lt_tag <= 0)
+			color_box.border_lt_tag = -1;
 		    --c_token;
 		}
 		continue;
+	    case S_COLORBOX_CBTICS: /* "cbtics" */
+		c_token++;
+		color_box.cbtics_lt_tag = int_expression();
+		if (color_box.cbtics_lt_tag <= 0)
+		    color_box.cbtics_lt_tag = -1;
+		--c_token;
+		continue;
 	    case S_COLORBOX_BDEFAULT: /* "bd$efault" */
 		color_box.border_lt_tag = -1; /* use default border */
+		color_box.cbtics_lt_tag = 0;  /* and cbtics */
 		continue;
 	    case S_COLORBOX_NOBORDER: /* "nobo$rder" */
 		color_box.border = 0;
@@ -4035,11 +4041,9 @@ set_colorbox()
 		c_token--;
 		continue;
 	    case S_COLORBOX_INVERT: /* Flip direction of color gradient + cbaxis */
-		c_token++;
 		color_box.invert = TRUE;
 		continue;
 	    case S_COLORBOX_NOINVERT: /* Flip direction of color gradient + cbaxis */
-		c_token++;
 		color_box.invert = FALSE;
 		continue;
 	    } /* switch over colorbox lookup table */
