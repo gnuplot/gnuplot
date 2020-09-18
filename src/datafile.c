@@ -3456,7 +3456,8 @@ df_bin_default_columns default_style_cols[] = {
     {RGBA_IMAGE, 4, 2},
     {CIRCLES, 2, 1},
     {ELLIPSES, 2, 3},
-    {TABLESTYLE, 0, 0}
+    {TABLESTYLE, 0, 0},
+    {ZERRORFILL, 3, 1}
 };
 
 
