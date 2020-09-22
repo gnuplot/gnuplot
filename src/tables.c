@@ -70,6 +70,7 @@ const struct gen_ftable command_ftbl[] =
     { "import", import_command },
     { "else", else_command },
     { "l$oad", load_command },
+    { "local", local_command },
     { "pa$use", pause_command },
     { "p$lot", plot_command },
     { "pr$int", print_command },

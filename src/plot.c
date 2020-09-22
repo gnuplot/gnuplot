@@ -551,10 +551,14 @@ main(int argc_orig, char **argv)
 	    rl_reset_after_signal ();
 	}
 #endif
-	SET_CURSOR_ARROW;
-	/* Reset bookkeeping for load stack and nested clauses. */
+
+	/* If we were in a "load", "call", or nested bracketed clause 
+	 * clean up the lf_push/pop stack and restore shadowed variables.
+	 */
 	clause_reset_after_error();
-	reset_load_stack_after_error();
+	lf_reset_after_error();
+
+	SET_CURSOR_ARROW;
 
 #ifdef VMS
 	/* after catching interrupt */

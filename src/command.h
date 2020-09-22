@@ -156,6 +156,7 @@ void load_command(void);
 void begin_clause(void);
 void clause_reset_after_error(void);
 void end_clause(void);
+void local_command(void);
 void null_command(void);
 void pause_command(void);
 void plot_command(void);

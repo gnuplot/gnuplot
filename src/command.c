@@ -1793,6 +1793,62 @@ clause_reset_after_error()
     iteration_depth = 0;
 }
 
+/* "local" is a modifier for introduction of a variable.
+ * The scope of the local variable is determined by the depth of the lf_push
+ * operation preceding its occurance.
+ * If a variable of that name already exists it is saved internally to
+ * a new variable GPLOCAL_xxx_NAME, where NAME was the original name and xxx
+ * is the depth of the lf_push/pop stack in which the "local" declaration
+ * is encountered.
+ * The original variable will be restored by the corresponding lf_pop.
+ */
+void
+local_command()
+{
+    int array_token = 0;
+
+    c_token++;
+    if (equals(c_token,"array"))
+	array_token = c_token++;
+
+    /* Has no effect if encountered at the top level */
+    if (lf_head) {
+	struct udvt_entry *udv, *save_udv;
+	struct value save_value;
+	int save_name_len;
+	char *save_name;
+
+	/* Keep original value and clear it from its original location */
+	udv = add_udv(c_token);
+	save_value = udv->udv_value;
+	udv->udv_value.type = NOTDEFINED;
+
+	/* Create a shadow variable to hold the original state */
+	save_name_len = strlen(udv->udv_name) + strlen("GPLOCAL_xxx_") + 1;
+	save_name = gp_alloc(save_name_len, NULL);
+	snprintf(save_name, save_name_len, "GPLOCAL_%03d_%s",
+		lf_head->depth, udv->udv_name);
+	save_udv = add_udv_by_name(save_name);
+	free(save_name);
+
+	/* If there really was such a variable that is now shadowed,
+	 * save its original value. Otherwise the saved state is NOTDEFINED.
+	 */
+	save_udv->udv_value = save_value;
+
+	/* flag that at least some local variables will go out of scope on lf_pop */
+	lf_head->local_variables = TRUE;
+    }
+
+    /* Create new local variable with this name */
+    if (array_token) {
+	c_token = array_token;
+	array_command();
+    } else {
+	define();
+    }
+}
+
 /* helper routine to multiplex mouse event handling with a timed pause command */
 void
 timed_pause(double sleep_time)

@@ -51,6 +51,7 @@
 #endif
 
 static void prepare_call(int calltype);
+static void lf_exit_scope(int depth);
 
 /* State information for load_file(), to recover from errors
  * and properly handle recursive load_file calls
@@ -431,6 +432,10 @@ lf_pop()
     free(lf->name);
     free(lf->cmdline);
 
+    /* Clean up any local variables going out of scope */
+    if (lf->local_variables)
+	lf_exit_scope(lf->depth);
+
     lf_head = lf->prev;
     free(lf);
     return (TRUE);
@@ -494,6 +499,7 @@ lf_push(FILE *fp, char *name, char *cmdline)
     if (lf->depth > STACK_DEPTH)
 	int_error(NO_CARET, "load/eval nested too deeply");
     lf->if_open_for_else = if_open_for_else;
+    lf->local_variables = FALSE;
     lf->c_token = c_token;
     lf->num_tokens = num_tokens;
     lf->tokens = gp_alloc((num_tokens+1) * sizeof(struct lexical_unit),
@@ -514,14 +520,51 @@ lf_top()
     return (lf_head->fp);
 }
 
-/* called from main to pop everything off the stack of loaded files */
+/* Clean up from error inside a "load" or "call" scope
+ * (called from main).
+ */
 void
-reset_load_stack_after_error()
+lf_reset_after_error()
 {
     free(failed_file_name);
     failed_file_name = NULL;
+    /* pop off everything on stack */
     while (lf_pop());
 }
+
+/* Restore any variables that were shadowed by a local variable */
+static void
+lf_exit_scope(int depth)
+{
+    struct udvt_entry *udv, *restored_udv;
+    struct udvt_entry *prev_udv = first_udv;
+    char prefix[13];
+    char *name;
+
+    snprintf(prefix, sizeof(prefix), "GPLOCAL_%03d_", depth);
+    FPRINTF((stderr, "Leaving scope of %s variables\n", prefix));
+
+    for (prev_udv = first_udv, udv = prev_udv->next_udv;
+	 udv;  prev_udv = udv, udv = udv->next_udv) {
+	if (strncmp(udv->udv_name,prefix,12))
+	    continue;
+	name = &(udv->udv_name[12]);
+	restored_udv = get_udv_by_name(name);
+	if (restored_udv) {
+	    free_value(&restored_udv->udv_value);
+	    restored_udv->udv_value = udv->udv_value;
+	    /* It is not sufficient to mark the shadow copy NOTDEFINED because if
+	     * we see it later we would spuriously restore the original from it.
+	     * Instead delete it altogether.
+	     */
+	    prev_udv->next_udv = udv->next_udv;
+	    free(udv->udv_name);
+	    free(udv);
+	    udv = prev_udv;
+	}
+    }
+}
+
 
 FILE *
 loadpath_fopen(const char *filename, const char *mode)

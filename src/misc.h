@@ -58,7 +58,7 @@ void load_file(FILE *fp, char *name, int calltype);
 FILE *lf_top(void);
 TBOOLEAN lf_pop(void);
 void lf_push(FILE *fp, char *name, char *cmdline);
-void reset_load_stack_after_error(void);
+void lf_reset_after_error(void);
 FILE *loadpath_fopen(const char *, const char *);
 void push_terminal(int is_interactive);
 void pop_terminal(void);
@@ -97,6 +97,7 @@ typedef struct lf_state_struct {
     int inline_num;		/* inline_num on entry */
     int depth;			/* recursion depth */
     TBOOLEAN if_open_for_else;	/* used by _new_ if/else syntax */
+    TBOOLEAN local_variables;	/* set if this depth is the scope for local variables */
     char *input_line;		/* Input line text to restore */
     struct lexical_unit *tokens;/* Input line tokens to restore */
     int num_tokens;		/* How big is the above ? */
