@@ -91,7 +91,9 @@ write_history(char *filename)
 void
 read_history(char *filename)
 {
+#ifdef GNUPLOT_HISTORY
     gp_read_history(filename);
+#endif
 }
 
 
