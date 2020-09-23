@@ -3357,6 +3357,7 @@ df_insert_scanned_use_spec(int uspec)
 
 /* Not the most elegant way of defining the default columns, but I prefer
  * this to switch and conditional statements when there are so many styles.
+ * EAM: The default columns are irrelevant if there is a using spec in the plot command.
  */
 typedef struct df_bin_default_columns {
     PLOT_STYLE plot_style;
@@ -3380,7 +3381,6 @@ df_bin_default_columns default_style_cols[] = {
     {FILLSTEPS, 1, 1},
     {HISTEPS, 1, 1},
     {VECTOR, 2, 2},
-    {ARROWS, 2, 2},
     {CANDLESTICKS, 4, 1},
     {FINANCEBARS, 4, 1},
     {BOXPLOT, 2, 1},
@@ -3391,15 +3391,12 @@ df_bin_default_columns default_style_cols[] = {
     {PM3DSURFACE, 1, 2},
     {LABELPOINTS, 2, 1},
     {HISTOGRAMS, 1, 0},
-    {PARALLELPLOT, 1, 0},
-    {SPIDERPLOT, 1, 0},
     {IMAGE, 1, 2},
     {RGBIMAGE, 3, 2},
     {RGBA_IMAGE, 4, 2},
     {CIRCLES, 2, 1},
     {ELLIPSES, 2, 3},
-    {TABLESTYLE, 0, 0},
-    {ZERRORFILL, 3, 1}
+    {TABLESTYLE, 0, 0}
 };
 
 
@@ -3429,7 +3426,8 @@ adjust_binary_use_spec(struct curve_points *plot)
 	if (default_style_cols[ps_index].plot_style == plot_style)
 	    break;
     }
-    if (ps_index == sizeof(default_style_cols)/sizeof(default_style_cols[0]))
+    if (ps_index == sizeof(default_style_cols)/sizeof(default_style_cols[0])
+    &&  !df_no_use_specs)
 	int_error(NO_CARET, nothing_known);
 
     /* Matrix format is interpreted as always having three columns. */
