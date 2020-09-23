@@ -5435,7 +5435,7 @@ df_readbinary(double v[], int max)
 		evaluate_at(use_spec[i].at, &a);
 		evaluate_inside_using = FALSE;
 		if (a.type == STRING) {
-		    axcol = axcol_for_ticlabel( use_spec[output].expected_type, &axis );
+		    axcol = axcol_for_ticlabel( use_spec[i].expected_type, &axis );
 		    add_tic_user(&axis_array[axis], a.v.string_val, v[axcol], -1);
 		    gpfree_string(&a);
 		}
