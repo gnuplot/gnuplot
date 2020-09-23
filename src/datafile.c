@@ -3438,7 +3438,6 @@ df_bin_default_columns default_style_cols[] = {
     {FILLSTEPS, 1, 1},
     {HISTEPS, 1, 1},
     {VECTOR, 2, 2},
-    {ARROWS, 2, 2},
     {CANDLESTICKS, 4, 1},
     {FINANCEBARS, 4, 1},
     {BOXPLOT, 2, 1},
@@ -3449,15 +3448,12 @@ df_bin_default_columns default_style_cols[] = {
     {PM3DSURFACE, 1, 2},
     {LABELPOINTS, 2, 1},
     {HISTOGRAMS, 1, 0},
-    {PARALLELPLOT, 1, 0},
-    {SPIDERPLOT, 1, 0},
     {IMAGE, 1, 2},
     {RGBIMAGE, 3, 2},
     {RGBA_IMAGE, 4, 2},
     {CIRCLES, 2, 1},
     {ELLIPSES, 2, 3},
-    {TABLESTYLE, 0, 0},
-    {ZERRORFILL, 3, 1}
+    {TABLESTYLE, 0, 0}
 };
 
 
@@ -3472,7 +3468,7 @@ df_bin_default_columns default_style_cols[] = {
 static void
 adjust_binary_use_spec(struct curve_points *plot)
 {
-    char *nothing_known = "No default columns known for that plot style";
+    char *nothing_known = "a 'using' specifier is required for that binary plot style";
     unsigned int ps_index;
     enum PLOT_STYLE plot_style = plot ? plot->plot_style : LINES;
 
@@ -3487,7 +3483,11 @@ adjust_binary_use_spec(struct curve_points *plot)
 	if (default_style_cols[ps_index].plot_style == plot_style)
 	    break;
     }
-    if (ps_index == sizeof(default_style_cols)/sizeof(default_style_cols[0]))
+    /* A known default is all very well, but if there was an actual using spec
+     * that's all we need.
+     */
+    if (ps_index == sizeof(default_style_cols)/sizeof(default_style_cols[0])
+    &&  !df_no_use_specs)
 	int_error(NO_CARET, nothing_known);
 
     /* Matrix format is interpreted as always having three columns. */
