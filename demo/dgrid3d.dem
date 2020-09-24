@@ -13,6 +13,12 @@ set dgrid3d splines
 splot "gnu-valley" u 1:2:3 w lines
 pause -1 "Hit return to continue"
 
+# Hann function
+set title "dgrid3d Hann function"
+set dgrid3d hann
+splot "gnu-valley" u 1:2:3 w lines
+pause -1 "Hit return to continue"
+
 # QNorm
 set title "dgrid3d 30,30 qnorm 1"
 set dgrid3d 30,30 qnorm 1
