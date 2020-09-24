@@ -1,43 +1,30 @@
-# This file demonstrates new features in gnuplot 3.8i
-# -1- loading fontfiles for postscript output
-print "\n This file demonstrates how to use postscript type 1 font"
-print " files with gnuplot."
-print "\n Please note that this demo runs only on postscript terminal,"
-print " because fontfile inclusion is only supported by this terminal."
-print "\n In addition, this demo needs two font files which are not"
-print " included in the gnuplot distribution."
-print " On systems with ghostscript they should be found automatically."
-print " If not, they can be downloaded from the net:"
-print " http://sourceforge.net/projects/gs-fonts/"
-print " Please put the files \"p052003l.pfb\" and \"p052023l.pfb\""
-print " somewhere they are found, e.g. into the working directory."
-pause -1 "Hit return to continue"
 #
-      xmin=-270.
-      xmax=270.
-      ymin=-1.1
-      ymax=1.1
-#
-reset
-set terminal push
-set terminal postscript enhanced linewidth 2 'Times-Roman' 22 \
-    fontfile 'p052003l.pfb' fontfile 'p052023l.pfb'
-set output 'fontfile.ps'
-unset autoscale
-set xr [xmin:xmax]
-set yr [ymin:ymax]
-#
-save_encoding = GPVAL_ENCODING
-set encoding iso_8859_1
-set format y '%.1f'
-set label 'Times-Roman: {/Times-Roman abcdefghABCDEFGH äöüß}' at graph 0.05,0.6 left
-set label 'URWPalladioL-Roma: {/URWPalladioL-Roma abcdefghABCDEFGH äöüß}' at graph 0.05,0.5 left
-set label 'URWPalladioL-Ital: {/URWPalladioL-Ital abcdefghABCDEFGH äöüß}' at graph 0.05,0.4 left
-set xlabel '{/URWPalladioL-Ital x} / °'
-set ylabel '{/URWPalladioL-Ital y}'
-plot sin(pi/180.*x) title '{/URWPalladioL-Ital y} = sin {/URWPalladioL-Ital x}'
-print "\n Now have a look at the file fontfile.ps"
-set output
+# Demonstrate use of TeX Computer Modern fonts in gnuplot PostScript terminal
+# This demo requires Adobe Type 1 fonts that may not be installed on your system.
+# If necessary you can download them from
+#    http://mirrors.ctan.org/fonts/cm/ps-type1/bakoma/pfb/cmr10.pfb
+#    http://mirrors.ctan.org/fonts/cm/ps-type1/bakoma/pfb/cmmi10.pfb
+#    http://mirrors.ctan.org/fonts/cm/ps-type1/bakoma/patched-pfb/cmsy10.pfb
+# 
+set term push
+set term post eps color fontfile 'cmr10.pfb' fontfile 'cmmi10.pfb' fontfile 'cmsy10.pfb'
+set output 'cmfonts.eps'
+
+set title "Use of TeX Computer Modern fonts in gnuplot PostScript terminal"
+
+set label 1 'Times-Roman: {/Times-Roman abcdefghABCDEFGH}'
+set label 2 'cmr10: {/cmr10 abcdefghABCDEFGH}'
+set label 3 'cmmi10: {/cmmi10 abcdefghABCDEFGH} {/cmmi10 \013\014\015\016\042}'
+set label 4 'cmsy10: {/cmmi10 abcdefghABCDEFGH} {/cmsy10 \013\014\015\016\042}'
+set label 1 at graph 0.05,0.6 left
+set label 2 at graph 0.05,0.5 left
+set label 3 at graph 0.05,0.4 left
+set label 4 at graph 0.05,0.3 left
+
+set xlabel "{/cmmi10 \013}"
+plot [0:2*pi] sin(x) title "{/cmr10 sin({/cmmi10 \013})}"
+
+unset output
 set terminal pop
-set encoding save_encoding
 reset
+
