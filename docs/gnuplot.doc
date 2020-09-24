@@ -9816,7 +9816,7 @@ Ffigure_missing
        exp :       w(d) = exp(-d)
        box :       w(d) = 1                     if d<1
                         = 0                     otherwise
-       hann :      w(d) = 0.5*(1-cos(2*pi*d))   if d<1
+       hann :      w(d) = 0.5*(1+cos(pi*d))     if d<1
                    w(d) = 0                     otherwise
 
  When using one of these five smoothing kernels, up to two additional

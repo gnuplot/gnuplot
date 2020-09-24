@@ -781,7 +781,7 @@ grid_nongrid_data(struct surface_points *this_plot)
 				weight = (dist<1.0) ? 1.0 : 0.0;
 			    } else if (dgrid3d_mode == DGRID3D_HANN) {
 				if (dist < 1.0)
-				    weight = 0.5*(1-cos(2.0*M_PI*dist));
+				    weight = 0.5*(1+cos(M_PI*dist));
 			    }
 			    z += opoints->z * weight;
 			    c += opoints->CRD_COLOR * weight;
