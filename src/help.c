@@ -412,7 +412,7 @@ FindHelp(char *keyword)		/* string we look for */
 		    /* Expand front portion of keyword */
 		    int i, shift = key_len - len;
 
-		    for (i=keyword_len+shift; i >= len; i--)
+		    for (i=keyword_len+shift; i >= len && i >= shift; i--)
 			keyword[i] = keyword[i-shift];
 		    strncpy(keyword, key->key, key_len);  /* give back the full spelling */
 		    len = key_len;
