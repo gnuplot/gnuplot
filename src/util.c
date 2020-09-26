@@ -1043,7 +1043,6 @@ do {						\
 static void
 print_line_with_error(int t_num)
 {
-    int i;
     int true_line_num = inline_num;
 
     if (t_num == DATAFILE) {
@@ -1070,6 +1069,9 @@ print_line_with_error(int t_num)
 	}
 
 	if (t_num != NO_CARET) {
+	    int i;
+	    int caret = GPMIN(token[t_num].start_index, strlen(minimal_input_line));
+
 	    /* Refresh current command line */
 	    if (!screen_ok)
 		fprintf(stderr, "\n%s%s\n",
@@ -1079,7 +1081,7 @@ print_line_with_error(int t_num)
 	    PRINT_SPACES_UNDER_PROMPT;
 
 	    /* Print spaces up to token */
-	    for (i = 0; i < token[t_num].start_index; i++)
+	    for (i = 0; i < caret; i++)
 		fputc((minimal_input_line[i] == '\t') ? '\t' : ' ', stderr);
 
 	    /* Print token */
