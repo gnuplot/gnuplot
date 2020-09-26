@@ -2957,7 +2957,7 @@ valid_format(const char *format)
 	/* Found a % to check --- scan past option specifiers: */
 	do {
 	    format++;
-	} while (strchr("+-#0123456789.", *format));
+	} while (*format && strchr("+-#0123456789.", *format));
 
 	/* Now at format modifier */
 	switch (*format) {
