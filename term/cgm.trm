@@ -1002,7 +1002,7 @@ CGM_make_palette(t_sm_palette *palette)
 	 int i, k;
 
 	 cgm_smooth_colors = palette->colors;
-	 if (CGM_COLORS + cgm_smooth_colors > cgm_user_color_max) {
+	 if (TRUE || CGM_COLORS + cgm_smooth_colors > cgm_user_color_max) {
 	      cgm_user_color_max = CGM_COLORS + cgm_smooth_colors;
 	      cgm_user_color_table =
 		   gp_realloc(cgm_user_color_table,
