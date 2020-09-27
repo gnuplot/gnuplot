@@ -1423,9 +1423,9 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 		S_ISDIR(statbuf.st_mode)) {
 		char *errmsg = gp_alloc(32 + strlen(df_filename), "errmsg");
 		sprintf(errmsg, "\"%s\" is a directory", df_filename);
-		int_warn(name_token, errmsg);
 		fill_gpval_string("GPVAL_ERRMSG", errmsg);
 		free(errmsg);
+		int_warn(name_token, "\"%s\" is a directory", df_filename);
 		df_eof = 1;
 		return DF_EOF;
 	    }
@@ -1435,9 +1435,9 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	if ((data_fp = loadpath_fopen(df_filename, df_binary_file ? "rb" : "r")) == NULL) {
 	    char *errmsg = gp_alloc(32 + strlen(df_filename), "errmsg");
 	    sprintf(errmsg, "Cannot find or open file \"%s\"", df_filename);
-	    int_warn(NO_CARET, errmsg);
 	    fill_gpval_string("GPVAL_ERRMSG", errmsg);
 	    free(errmsg);
+	    int_warn(NO_CARET, "Cannot find or open file \"%s\"", df_filename);
 	    df_eof = 1;
 	    return DF_EOF;
 	}
