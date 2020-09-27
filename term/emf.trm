@@ -960,9 +960,14 @@ EMF_text()
 
     /* update the header */
     pos = ftell(gpoutfile);
-    fseek(gpoutfile, 48L, SEEK_SET);
-    EMF_write_long(pos);
-    EMF_write_long(emf_record_count);
+    if (pos < 0) {
+	term_graphics = FALSE;
+	int_error(NO_CARET, "emf: cannot reset output file");
+    } else {
+	fseek(gpoutfile, 48L, SEEK_SET);
+	EMF_write_long(pos);
+	EMF_write_long(emf_record_count);
+    }
 
     /* Reset to start of output file.  If the user mistakenly tries to	*/
     /* plot again into the same file, it will overwrite the original	*/
