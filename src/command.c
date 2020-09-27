@@ -3499,6 +3499,7 @@ expand_1level_macros()
 			while (*m)
 			    gp_input_line[o++] = (*m++);
 		    } else {
+			gp_input_line[o] = '\0';
 			int_warn( NO_CARET, "%s is not a string variable",m);
 		    }
 		    *c-- = temp_char;
