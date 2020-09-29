@@ -2051,7 +2051,8 @@ ENHX11_FLUSH()
 
 	char tmpfont[128];	/* FIXME - there must be a better way! */
 	*enhanced_cur_text = '\0';
-	sprintf(tmpfont,"%s,%.1f", ENHx11_font, ENHx11_fontsize);
+	snprintf(tmpfont,127,"%s,%.1f", ENHx11_font, ENHx11_fontsize);
+	tmpfont[127] = '\0';
 	PRINT1("QF%s\n", tmpfont);
 	*X11_last_font_used = '\01';
 
