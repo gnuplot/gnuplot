@@ -767,7 +767,7 @@ parse_dashtype(struct t_dashtype *dt)
 
     /* Or string representing pattern elements ... */
     } else if ((dash_str = try_to_get_string())) {
-	TBOOLEAN leading_space = FALSE;
+	int leading_space = 0;
 #define DSCALE 10.
 	while (dash_str[j] && (k < DASHPATTERN_LENGTH || dash_str[j] == ' ')) {
 	    /* .      Dot with short space
@@ -789,7 +789,7 @@ parse_dashtype(struct t_dashtype *dt)
 		break;
 	    case ' ':
 		if (k == 0)
-		    leading_space = TRUE;
+		    leading_space++;
 		else
 		    dt->pattern[k-1] += 1.0 * DSCALE;
 		break;
@@ -799,8 +799,8 @@ parse_dashtype(struct t_dashtype *dt)
 	    j++;
 	}
 	/* Move leading space, if any, to the end */
-	if (leading_space)
-	    dt->pattern[k-1] += 1.0 * DSCALE;
+	if (k > 0)
+	    dt->pattern[k-1] += leading_space * DSCALE;
 #undef  DSCALE
 
 	/* truncate dash_str if we ran out of space in the array representation */
@@ -808,8 +808,9 @@ parse_dashtype(struct t_dashtype *dt)
 	safe_strncpy(dt->dstring, dash_str, sizeof(dt->dstring));
 	free(dash_str);
 	if (k == 0)
-	    return DASHTYPE_SOLID;
-	res = DASHTYPE_CUSTOM;
+	    res = DASHTYPE_SOLID;
+	else
+	    res = DASHTYPE_CUSTOM;
 
     /* Or index of previously defined dashtype */
     } else {
