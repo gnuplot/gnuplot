@@ -1,8 +1,4 @@
 #
-# This demo is very slow and requires unusually large stack size.
-# Do not attempt to run this demo under MSDOS.
-#
-
 # the function integral_f(x) approximates the integral of f(x) from 0 to x.
 # integral2_f(x,y) approximates the integral from x to y.
 # define f(x) to be any single variable function
@@ -12,7 +8,7 @@
 # repeated x/delta times (from x down to 0)
 #
 delta = 0.2
-#  delta can be set to 0.025 for non-MSDOS machines
+#  Setting delta < 0.1 may exceed recursion depth limit
 #
 # integral_f(x) takes one variable, the upper limit.  0 is the lower limit.
 # calculate the integral of function f(t) from 0 to x

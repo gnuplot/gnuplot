@@ -1,0 +1,283 @@
+<html><head><title>Demos for gnuplot version 5.5</title>
+
+<link text="text/css" href="gnuplot_demo.css" rel="stylesheet"></head><body>
+
+
+<h2 align=center>Demos for gnuplot version 5.5 (pngcairo terminal)<br>
+    See also the demo output for the
+    <a href="../demo_svg_5.5/">SVG</a> and
+    <a href="../demo_canvas_5.5/">canvas</a> terminals.
+</h2>
+
+<p>
+Gnuplot is distributed with a large set of demonstration scripts.
+Here are samples of PNG output from some of the demos.
+
+<table border="0" width="100%">
+<tbody><tr valign="top">
+
+<td rowspan=2>
+    <h4>Basic 2D plot styles</h4>
+    <ul>
+    <li><a href="simple.html">simple&nbsp;functions</a></li>
+    <li><a href="fillcrvs.html">filled&nbsp;curves</a></li>
+    <li><a href="fillbetween.html">fill&nbsp;between&nbsp;curves</a></li>
+    <li><a href="candlesticks.html">candlesticks</a></li>
+    <li><a href="errorbars.html">error bars</a></li>
+    <li><a href="histograms.html">histograms</a> (<a href="histograms2.html">more</a>)</li>
+    <li><a href="boxclusters.html">bar graphs</a>
+    <li><a href="steps.html">step functions</a></li>
+    <li><a href="multiaxis.html">multiple axis scales</a></li>
+    <li><a href="using.html">mixing styles</a></li>
+    <li><a href="pointsize.html">variable size points</a></li>
+    <li><a href="parallel.html">parallel axis plots</a></li>
+    <li><a href="param.html">parametric&nbsp;functions</a></li>
+    <li><a href="piecewise.html">piecewise&nbsp;functions</a></li>
+    <li><a href="vector.html">vector fields</a></li>
+    <li><a href="circles.html">circles</a></li>
+    <li><a href="boxplot.html">boxplots</a></li>
+    <li><a href="rugplot.html">rug plot</a></li>
+    <li><a href="jitter.html">jitter (bee&nbsp;swarm)</a></li>
+    <li><a href="spiderplot.html">spider plot</a></li>
+    <li><a href="cities.html">text</a></li>
+    </ul>
+
+    <h4>Probability and Statistics</h4>
+    <ul>
+    <li><a href="prob2.html">probability</a></li>
+    <li><a href="prob.html">probability (more)</a></li>
+    <li><a href="random.html">random numbers</a></li>
+    <li><a href="bivariat.html">recursion, etc...</a></li>
+    <li><a href="stats.html">data statistics</a></li>
+    <li><a href="approximate.html">approximation</a></li>
+    </ul>
+
+    <h4>Curve fitting</h4>
+    <ul>
+    <li><a href="smooth_splines.html">cubic and Bezier splines</a></li>
+    <li><a href="monotonic_spline.html">monotonic csplines</a></li>
+    <li><a href="smooth_path.html">along-path splines</a></li>
+    <li><a href="spline.html">explicit B-splines</a></li>
+    <li><a href="airfoil.html">explicit Bezier splines</a></li>
+    <li><a href="fit.html">Levenberg-Marquardt DLS</a></li>
+    </ul>
+
+    <h4>Colors</h4>
+    <ul>
+    <li><a href="varcolor.html">data-dependent coloring</a></li>
+    <li><a href="rgb_variable.html">RGB coloring</a></li>
+    <li><a href="rgba_lines.html">RGB + alpha channel</a></li>
+    <li><a href="named_palettes.html">named palettes</a></li>
+    <li><a href="pm3dcolors.html">pm3d colors</a></li>
+    <li><a href="pm3dgamma.html">pm3d gamma</a></li>
+    </ul>
+
+</td>
+
+<td rowspan=2>
+    <h4>3D plots and surfaces</h4>
+    <ul>
+    <li><a href="surface1.html">surfaces 1</a></li>
+    <li><a href="surface2.html">surfaces 2</a></li>
+    <li><a href="contours.html">contours</a></li>
+    <li><a href="custom_contours.html">custom contour lines</a></li>
+    <li><a href="singulr.html">singularities</a></li>
+    <li><a href="hidden.html">hidden surfaces</a></li>
+    <li><a href="pm3d.html">pm3d coloring</a></li>
+    <li><a href="hidden2.html">pm3d hidden surfaces</a></li>
+    <li><a href="pm3d_clip.html">pm3d clipping</a></li>
+    <li><a href="world2.html">3D mapping</a></li>
+    <li><a href="projection.html">2D projection of 3D surface</a></li>
+    <li><a href="zerror.html">shaded error region</a></li>
+    <li><a href="azimuth.html">azimuth</a></li>
+    <li><a href="boxes3d.html">boxes</a></li>
+    <li><a href="armillary.html">circle and polygon 3D objects</a></li>
+    <li><a href="polygons.html">pm3d polygons</a></li>
+    <li><a href="pm3d_lighting.html">lighting model</a></li>
+    <li><a href="hidden_compare.html">hidden3d vs. pm3d</a></li>
+    </ul>
+
+    <h4>Volume plots (new!)</h4>
+    <ul>
+    <li><a href="voxel.html">voxel-dependent coloring</a></li>
+    <li><a href="vplot.html">3D representation of voxels</a></li>
+    <li><a href="isosurface.html">3D isosurface</a></li>
+    </ul>
+
+    <h4>Coordinate and<br> axis transforms</h4>
+    <ul>
+    <li><a href="linkedaxes.html">linked axes</a></li>
+    <li><a href="nonlinear2.html">logscale axes</a></li>
+    <li><a href="nonlinear3.html">nonlinear axes</a></li>
+    <li><a href="nonlinear1.html">broken axes</a></li>
+    <li><a href="ttics.html">polar coords</a></li>
+    <li><a href="polar.html">polar functions</a></li>
+    <li><a href="poldat.html">polar data</a></li>
+    <li><a href="polar_quadrants.html">polar quadrants</a></li>
+    <li><a href="world.html">cylindrical/spherical</a></li>
+    <li><a href="timedat.html">time/date coords</a></li>
+    <li><a href="sampling.html">coord sampling ranges</a></li>
+    </ul>
+
+    <h4>Binary and Image data </h4>
+    <ul>
+    <li><a href="binary.html">binary data</a></li>
+    <li><a href="image.html">image data</a></li>
+    <li><a href="image2.html">binary and image tricks</a></li>
+    <li><a href="rgbalpha.html">RGB + alpha channel</a></li>
+    <li><a href="barchart_art.html">bar chart art</a></li>
+    <li><a href="imageNaN.html">missing/NaN values</a></li>
+    <li><a href="pixmap.html">pixmap gradients and icons</a></li>
+    </ul>
+
+</td>
+
+<td rowspan=2>
+    <h4>Sample Applications</h4>
+    <ul>
+    <li><a href="controls.html">control models</a></li>
+    <li><a href="discrete.html">discrete&nbsp;contours</a></li>
+    <!--- <li><a href="electron.html">electron</a></li> --->
+    <li><a href="finance.html">financial data</a></li>
+    <li><a href="iterate.html">iteration</a></li>
+    <li><a href="scatter.html">non-gridded data</a></li>
+    <li><a href="running_avg.html">running averages</a></li>
+    <li><a href="bins.html">automatic binning</a></li>
+    <li><a href="smooth.html">binning/histograms</a></li>
+    <li><a href="array.html">arrays</a></li>
+    <li><a href="fenceplot.html">fence plots</a></li>
+    <li><a href="gantt.html">Gantt chart</a></li>
+    <li><a href="columnhead.html">points labeled by origin</a></li>
+    <li><a href="label_stacked_histograms.html">label stacked histogram</a></li>
+    <li><a href="heatmaps.html">2D and 3D heat maps</a></li>
+    <li><a href="solar_path.html">solar path diagram</a></li>
+    <li><a href="map_projection.html">map projections</a></li>
+    <li><a href="violinplot.html">violin plot</a></li>
+    </ul>
+
+    <h4>Text options</h4>
+    <ul>
+    <li><a href="rotate_labels.html">rotated text</a></li>
+    <li><a href="enhanced_utf8.html">'enhanced' text</a></li>
+    <li><a href="datastrings.html">string data</a></li>
+    <li><a href="textbox.html">boxed text</a></li>
+    <li><a href="cities.html">variable font size</a></li>
+    <li><a href="stringvar.html">string variables</a></li>
+    <li><font color=gray>hypertext (no png support)</font></li>
+    <li><a href="unicode.html">unicode as \U+xxxx"</li>
+    </ul>
+
+    <h4>Page Layout</h4>
+    <ul>
+    <!-- li><a href="key.html">plot key</a></li -->
+    <li><a href="layout.html">multiplot&nbsp;layout</a></li>
+    <li><a href="multiplt.html">multiple plots</a></li>
+    <li><a href="margins.html">aligned plots</a></li>
+    <li><a href="ellipse.html">axis location</a></li>
+    <li><a href="tics.html">axis ticmarks</a></li>
+    <li><a href="walls.html">walls</a></li>
+    <li><a href="rectangle.html">rectangles</a></li>
+    <li><a href="custom_key.html">customized key</a></li>
+    <li><a href="keyentry.html">extra key entries</a></li>
+    </ul>
+
+    <h4>Styles</h4>
+    <ul>
+    <li><a href="lines_arrows.html">line and arrow styles</a></li>
+    <li><a href="fillstyle.html">fill styles</a></li>
+    <li><a href="dashtypes.html">dashed lines</a></li>
+    <li><a href="transparent.html">transparency</a></li>
+    <li><a href="transparent_solids.html">transparent solids</a></li>
+    </ul>
+
+    <h4 align=left>Animation</h4>
+    <ul align=left>
+    <li><a href="animate2.html">animated gif</a></li>
+    </ul>
+</td>
+
+<td rowspan=2 width=500>
+    <table>
+    <tbody>
+	<tr valign=top colspan=2>
+	    <td align=center width=500>
+		<img src="showcase_plot_1.png" width=500><br clear=all>
+	    </td>
+	</tr>
+
+	<tr valign=top>
+	<td align=center width=500 style="border-style: double none none none; border-color:#006600;">
+	    <h4 align=left>Complex Functions and Special Functions</h4>
+	    <a href="BesselK.html">
+		<img src="BesselK.4.png" width="250" align=right>
+	    </a>
+	    <ul align=left>
+	    <li><a href="complex_trig.html">complex trig functions</a></li>
+	    <li><a href="cerf.html">complex error function</a></li>
+	    <li><a href="lnGamma.html">complex lnGamma</a></li>
+	    <li><a href="elliptic.html">elliptic integrals</a></li>
+	    <li><a href="ibeta.html">Incomplete Beta integral</a></li>
+	    <li><a href="igamma.html">Incomplete Gamma function</a></li>
+	    <li><a href="BesselK.html">Bessel functions </a></li>
+	    <li><a href="complex_airy.html">Airy functions</a></li>
+	    <li><a href="Dawson.html">Dawson's integral</a></li>
+	    <li><a href="Fresnel.html">Fresnel integral</a></li>
+	    <li><a href="lambert.html">Lambert function</a></li>
+	    <li><a href="synchrotron.html">Synchrotron function</a></li>
+	    </ul>
+	</td>
+	</tr>
+
+	<tr>
+	    <td align=center width=500 style="border-style: none none double none; border-color:#006600;">
+	    <table><tbody>
+	    <td>
+		<a href="lnGamma.html">
+		    <img src="lnGamma.1.png" width="250" align=left>
+		</a>
+	    </td>
+	    <td>
+		<a href="complex_airy.html">
+		    <img src="complex_airy.3.png" width="250" align=right>
+		</a>
+	    </td>
+	    </tbody></table>
+	    </td>
+	</tr>
+
+    </tbody>
+    </table>
+</td>
+
+</tbody></table>
+</p>
+<hr>
+
+
+<table border="0" width="100%">
+<tbody><tr valign="top">
+
+    <td>
+    <i>This page generated October 2020</i>
+    </td>
+
+    <td>
+    <ul>
+    <li><a href="http://sourceforge.net/projects/gnuplot/">
+	Gnuplot development pages on SourceForge</a></li>
+    <li>On-line PDF documentation in
+	<a href="http://gnuplot.sourceforge.net/docs_5.5/gnuplot.pdf">English</a>
+	and
+	<a href="http://gnuplot.sourceforge.net/docs_5.5/gnuplot-ja.pdf">Japanese</a>
+    </li>
+    </ul>
+    </td>
+    
+    <td>
+    <ul>
+    </ul>
+    </td>
+    
+</tr>
+</tbody></table>
+</body></html>

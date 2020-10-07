@@ -51,7 +51,7 @@ set xyplane 0
 set sample 300
 set isosample 300
 
-set title "complex Bessel function {|K_{1/2} (x + iy)|}"
+set title "{/Times=16 complex Bessel function} {/Times:Italic=16 |K_{1/2} (x + iy)|}"
 unset key
 
 splot '++' using 1:2:( abs(BesselK( 0.5, x+y*I )) ):( arg(BesselK( 0.5, x+y*I )) ) with pm3d

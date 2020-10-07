@@ -39,12 +39,14 @@ set xlabel "x"
 set ylabel "iy"
 set palette defined (0 "dark-red", 1 "gold")
 
-set title "Real( Ai(x + iy) )"
+set title "{/Times:Italic=16 Real( Ai(x+iy) )}"
+set title offset 0,0.5
 splot '++' using 1:2:(real(Ai(x + y*I))):(arg(Ai(x + y*I))) notitle with pm3d
 
 pause -1 "Hit return to continue"
 
-set title "Imag( Ai(x + iy) )"
+set title "{/Times:Italic=16 Imag( Ai(x+iy) )}"
+set title offset 0,0.5
 splot '++' using 1:2:(imag(Ai(x + y*I))):(arg(Ai(x + y*I))) notitle with pm3d
 
 pause -1 "Hit return to continue"
