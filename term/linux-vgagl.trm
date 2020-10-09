@@ -8,7 +8,7 @@ START_HELP(linux)
 "=linux console",
 "=console",
 "=sixel",
-"=vgagl",
+"=vgagl (linux console)",
 "=yaft",
 " Older gnuplot versions required special terminals `linux` or `vgagl`",
 " in order to display graphics on the linux console, i.e. in the absence of",

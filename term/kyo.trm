@@ -216,6 +216,6 @@ START_HELP(kyo)
 "?prescribe",
 " The `kyo` and `prescribe` terminal drivers support the Kyocera laser printer.",
 " The only difference between the two is that `kyo` uses \"Helvetica\" whereas",
-" `prescribe` uses \"Courier\".  There are no options."
+" `prescribe` uses \"Courier\".  There are no options.  Note: legacy terminal."
 END_HELP(kyo)
 #endif
