@@ -480,7 +480,6 @@ C
 ## nonlinear axis where the paired functions are log(x) and exp(x).
 #end
 4 New commands and command options
-?new version_5.2
 #start
 #b Inside the bracketed clause of an iteration, `continue` jumps immediately
 ## to the next iteration, `break` immediately exits from the iteration
@@ -1985,74 +1984,20 @@ C marker below is used to signal this to doc2html:
 %_
 # ~ & ~ & ~ & \hspace{9cm} \\
 
-4 Ai
-?expressions functions Ai
-?Ai
 #Ai(z) & complex & \gpCX &  complex Airy function $Ai(z)$\\
 %Ai(z)@complex@complex error function
- `Ai(z)` is the complex Airy function Ai(z).
- Supported via external library containing routines by Donald E. Amos,
- Sandia National Laboratoris, SAND85-1018 (1985).
-4 Bi
-?expressions functions Bi
-?Bi
 #Bi(z) & complex & \gpCX &  complex Airy function $Bi(z)$\\
 %Bi(z)@complex@complex error function
- `Bi(z)` is the complex Airy function Bi(z).
- Supported via external library containing routines by Donald E. Amos,
- Sandia National Laboratoris, SAND85-1018 (1985).
-4 BesselH
-?expressions functions BesselH1
-?expressions functions BesselH2
-?expressions functions Hankel
-?BesselH1
-?BesselH2
-?Hankel
 #BesselH1(nu,z) & real, complex & \gpCX & $H^{(1)}_{\nu}(z)$ Hankel function of the first kind\\
 #BesselH2(nu,z) & real, complex & \gpCX & $H^{(2)}_{\nu}(z)$ Hankel function of the second kind\\
- `BesselH1(nu,z)` and `BesselH2(nu,z)` are the Hankel functions of the first and
- second kind
-     H1(nu,z) = J(nu,z) + iY(nu,z)
-     H2(nu,z) = J(nu,z) - iY(nu,z)
- for real argument nu and complex argument z.
- Supported via external library containing routines by Donald E. Amos,
- Sandia National Laboratoris, SAND85-1018 (1985).
-4 BesselJ
-?expressions functions BesselJ
-?BesselJ
 #BesselJ(nu,z) & real, complex & \gpCX & $J_{\nu}(z)$ Bessel function of the first kind\\
 %BesselJ(nu,z) @ real, complex @ Bessel function J_nu of the first kind
- `BesselJ(nu,z)` is the Bessel function of the first kind J_nu
- for real argument nu and complex argument z.
- Supported via external library containing routines by Donald E. Amos,
- Sandia National Laboratoris, SAND85-1018 (1985).
-4 BesselY
-?expressions functions BesselY
-?BesselY
 #BesselY(nu,z) & real, complex & \gpCX & $Y_{\nu}(z)$ Bessel function of the second kind\\
 %BesselY(nu,z) @ real, complex @ Bessel function Y_nu of the second kind
- `BesselY(nu,z)` is the Bessel function of the second kind Y_nu
- for real argument nu and complex argument z.
- Supported via external library containing routines by Donald E. Amos,
- Sandia National Laboratoris, SAND85-1018 (1985).
-4 BesselI
-?expressions functions BesselI
-?BesselI
 #BesselI(nu,z) & real, complex & \gpCX & $I_{\nu}(z)$ modified Bessel function of the first kind\\
 %BesselI(nu,z) @ real, complex @ modified Bessel function I_nu of the first kind
- `BesselI(nu,z)` is the modified Bessel function of the first kind I_nu
- for real argument nu and complex argument z.
- Supported via external library containing routines by Donald E. Amos,
- Sandia National Laboratoris, SAND85-1018 (1985).
-4 BesselK
-?expressions functions BesselK
-?BesselK
 #BesselK(nu,z) & real, complex & \gpCX & $K_{\nu}(z)$ modified Bessel function of the second kind\\
 %BesselK(nu,z) @ real, complex @ modified Bessel function K_nu of the second kind
- `BesselK(nu,z)` is the modified Bessel function of the second kind K_nu
- for real argument nu and complex argument z.
- Supported via external library containing routines by Donald E. Amos,
- Sandia National Laboratoris, SAND85-1018 (1985).
 #expint(n,z) & int $n\geq0$, complex $z$ & \gpCX & $E_n(z)=\int_1^\infty t^{-n} e^{-zt}\,dt$,  exponential integral\\
 %expint(n,z)@ int n>=0, complex @$E sub n (z)$, complex exponential integral function
 #\hline \end{longtable}
@@ -2369,6 +2314,58 @@ C marker below is used to signal this to doc2html:
 
 #TeX \quad\quad EllipticPi$(n,k)=\int_0^{\pi/2} {\big[(1-nsin^2\theta)\sqrt{1-k^2sin^2\theta}~\big]}^{-1}d\theta$
 
+4 Complex Airy functions
+?expressions functions Ai
+?Ai
+?expressions functions Bi
+?Bi
+ `Ai(z)` and `Bi(z)` are the Airy functions of complex argument.
+ Supported via an external library containing routines by Donald E. Amos,
+ Sandia National Laboratoris, SAND85-1018 (1985).
+
+4 Complex Bessel functions
+?expressions functions BesselJ
+?BesselJ
+ `BesselJ(nu,z)` is the Bessel function of the first kind J_nu
+ for real argument nu and complex argument z.
+ Supported via external library containing routines by Donald E. Amos,
+ Sandia National Laboratoris, SAND85-1018 (1985).
+
+?expressions functions BesselY
+?BesselY
+ `BesselY(nu,z)` is the Bessel function of the second kind Y_nu
+ for real argument nu and complex argument z.
+ Supported via external library containing routines by Donald E. Amos,
+ Sandia National Laboratoris, SAND85-1018 (1985).
+
+?expressions functions BesselI
+?BesselI
+ `BesselI(nu,z)` is the modified Bessel function of the first kind I_nu
+ for real argument nu and complex argument z.
+ Supported via external library containing routines by Donald E. Amos,
+ Sandia National Laboratoris, SAND85-1018 (1985).
+
+?expressions functions BesselK
+?BesselK
+ `BesselK(nu,z)` is the modified Bessel function of the second kind K_nu
+ for real argument nu and complex argument z.
+ Supported via external library containing routines by Donald E. Amos,
+ Sandia National Laboratoris, SAND85-1018 (1985).
+
+?expressions functions BesselH1
+?expressions functions BesselH2
+?expressions functions Hankel
+?BesselH1
+?BesselH2
+?Hankel
+ `BesselH1(nu,z)` and `BesselH2(nu,z)` are the Hankel functions of the first and
+ second kind
+     H1(nu,z) = J(nu,z) + iY(nu,z)
+     H2(nu,z) = J(nu,z) - iY(nu,z)
+ for real argument nu and complex argument z.
+ Supported via external library containing routines by Donald E. Amos,
+ Sandia National Laboratoris, SAND85-1018 (1985).
+
 4 Expint
 ?expressions functions expint
 ?expint
@@ -2477,7 +2474,6 @@ C marker below is used to signal this to doc2html:
  The nominal precision is 1.E-13 but convergence can be poor very close to
  discontinuities, e.g. branch points.
 4 Special functions provided by libcerf
-?libcerf
  Some special functions are only provided if your copy of gnuplot was configured
  to use the external libcerf library (https://jugit.fz-juelich.de/mlz/libcerf).
  These include the complex error function cerf(z), the imaginary error function
