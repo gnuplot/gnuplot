@@ -293,7 +293,6 @@ C
 #end
 
 4 Voxel grids
-?new voxel grids
  Gnuplot now supports operations based on 3D grids of voxel data.
 
 #start
@@ -382,7 +381,6 @@ C
 #end
 
 4 New terminals and terminal options
-?new terminals and terminal options
 #start
 #b The `pcl5` terminal has been extended to support PCL5e/PCL5c printers and
 ## many modern gnuplot features.
@@ -402,7 +400,6 @@ C
 #end
 
 4 Pixmaps as objects
-?new pixmaps
 #start
 #b `set pixmap` allows import of an image in standard format (png jpeg gif) as
 ## a pixmap that can be positioned anywhere in a plot or on the page.
@@ -411,7 +408,6 @@ C
 #end
 
 4 Other new features
-?new other features
 #start
 #b Enhanced text mode accepts \U+xxxx (xxxx is a 4 or 5 character hexadecimal)
 ##as representing a Unicode code point that is converted to the corresponding
@@ -2473,12 +2469,6 @@ C marker below is used to signal this to doc2html:
  Corless et al [1996], Adv. Comp. Math 5:329.
  The nominal precision is 1.E-13 but convergence can be poor very close to
  discontinuities, e.g. branch points.
-4 Special functions provided by libcerf
- Some special functions are only provided if your copy of gnuplot was configured
- to use the external libcerf library (https://jugit.fz-juelich.de/mlz/libcerf).
- These include the complex error function cerf(z), the imaginary error function
- erfi(x), a complex extension of Dawson's integral cdawson(z), and complex
- versions of the Faddeeva function and the Voigt profile VP(x, sigma, gamma).
 4 lnGamma
 ?expressions functions lnGamma
 ?lnGamma
@@ -2512,18 +2502,23 @@ C marker below is used to signal this to doc2html:
 ?libopenspecfun
 
  Some special functions with complex domain are provided through external
- libraries. If your copy of gnuplot was not linked against these libraries then
- it will not provide those functions.
+ libraries. If your copy of gnuplot was not configured to link against these
+ libraries then it will support only the real domain or will not provide
+ the function at all.
 
- For functions requiring libcerf (http://apps.jcns.fz-juelich.de/libcerf), see
- `cerf`, `cdawson`, `faddeeva`, `erfi`, `VP`, and `VP_fwhm`.
+ Functions requiring libcerf (http://apps.jcns.fz-juelich.de/libcerf) depend
+ on configuration option `--with-libcerf`.  This is the default.
+ See `cerf`, `cdawson`, `faddeeva`, `erfi`, `VP`, and `VP_fwhm`.
 
  Complex Airy, Bessel, and Hankel functions of real order nu and complex
  arguments require a library containing routines implemented by Douglas E. Amos,
  Sandia National Laboratories, SAND85-1018 (1985).
  These routines may be found in netlib (http://netlib.sandia.gov) or in
  libopenspecfun (https://github.com/JuliaLang/openspecfun).
+ The corresponding configuration option is `--with-amos=<library directory>`.
  See `Ai`, `Bi`, `BesselJ`, `BesselY`, `BesselI`, `BesselK`, `Hankel`.
+ The complex exponential integral is provided by netlib or libamos but not by
+ libopenspecfun.  See `expint`.
 
 4 Synchrotron function
 ?SynchrotronF
