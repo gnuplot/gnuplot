@@ -9,10 +9,6 @@
     <a href="../demo_canvas_5.5/">canvas</a> terminals.
 </h2>
 
-<p>
-Gnuplot is distributed with a large set of demonstration scripts.
-Here are samples of PNG output from some of the demos.
-
 <table border="0" width="100%">
 <tbody><tr valign="top">
 
@@ -216,6 +212,7 @@ Here are samples of PNG output from some of the demos.
 	    <li><a href="cerf.html">complex error function</a></li>
 	    <li><a href="lnGamma.html">complex lnGamma</a></li>
 	    <li><a href="elliptic.html">elliptic integrals</a></li>
+	    <li><a href="expint.html">exponential integral</a></li>
 	    <li><a href="ibeta.html">Incomplete Beta integral</a></li>
 	    <li><a href="igamma.html">Incomplete Gamma function</a></li>
 	    <li><a href="BesselK.html">Bessel functions </a></li>

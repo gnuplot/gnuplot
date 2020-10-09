@@ -953,6 +953,13 @@ show_version(FILE *fp)
 		"";
 #endif
 
+	    const char *have_cexint =
+#ifdef HAVE_CEXINT
+		"+CEXINT  ";
+#else
+		"";
+#endif
+
 	    const char *complexfunc =
 #ifdef HAVE_COMPLEX_FUNCS
 		"+COMPLEX_FUNCS  ";
@@ -1028,9 +1035,9 @@ show_version(FILE *fp)
 		"";
 #endif
 
-	    sprintf(compile_options, "    %s%s\n    %s%s\n    %s%s%s\n    %s\n    %s%s%s%s\n",
+	    sprintf(compile_options, "    %s%s\n    %s%s\n    %s%s%s%s\n    %s\n    %s%s%s%s\n",
 		    rdline, gnu_rdline, unicodebuild, plotoptions,
-		    complexfunc, libcerf, libamos,
+		    complexfunc, libcerf, libamos, have_cexint,
 		    libgd,
 		    nocwdrc, x11, use_mouse, hiddenline
 		    );

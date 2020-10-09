@@ -3603,7 +3603,7 @@ f_expint(union argument *arg)
     /* Domain limited to real x >= 0 */
     pop(&a);
     if (a.type == CMPLX && a.v.cmplx_val.imag != 0.0)
-	int_error(NO_CARET, "the copy of gnuplot does not support complex expint");
+	int_error(NO_CARET, "this copy of gnuplot does not support complex expint");
     x = real(&a);
 
     /* n must be nonnegative integer */

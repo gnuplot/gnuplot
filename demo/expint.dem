@@ -13,6 +13,12 @@ plot for [N=0:5] expint(N,x) with lines lw 3 title sprintf("n = %d",N)
 pause -1 "<cr> to continue"
 
 reset
+
+if (!strstrt(GPVAL_COMPILE_OPTIONS, "+CEXINT")) {
+    print "This copy of gnuplot does not support complex expint"
+    exit
+}
+
 set title "Complex Exponential Integral\n\n {/:Italic {E_n(z) = }{/*2 ∫@_{/*0.5 1}^{/*.5 ∞}}{t^ne^{-tz}}}       for {/:Italic n=2}"
 set title offset -25
 

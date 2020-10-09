@@ -18,7 +18,7 @@ index.html: index.save
 	cp index.save index.html
 	cp ../../term/js/*.png .
 
-special_functions: index.html showcase_plots complex_trig.html cerf.html elliptic.html ibeta.html igamma.html BesselK.html complex_airy.html Dawson.html Fresnel.html lambert.html lnGamma.html synchrotron.html
+special_functions: index.html showcase_plots complex_trig.html cerf.html elliptic.html expint.html ibeta.html igamma.html BesselK.html complex_airy.html Dawson.html Fresnel.html lambert.html lnGamma.html synchrotron.html
 	cp index.special_functions index.html
 
 circles.html: $(GNUPLOT_LIB)/hidden2.dem ./webify.pl
