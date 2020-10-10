@@ -31,10 +31,11 @@
 #include "eval.h"
 #include "stdfn.h"
 #include "util.h"	/* for int_error() */
-#include <complex.h>	/* C99 _Complex */
-#include "complexfun.h"
 
 #ifdef HAVE_COMPLEX_FUNCS
+
+#include <complex.h>	/* C99 _Complex */
+#include "complexfun.h"
 
 #ifdef HAVE_FENV_H
 #include <fenv.h>
