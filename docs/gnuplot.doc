@@ -1266,10 +1266,13 @@ Ffigure_E0
  For example to represent the modulus and phase of a function f(z) with
  complex argument and complex result it is possible to use the height of the
  surface to represent modulus and use the color to represent the phase.
- By default the color will wrap around from -π to π at hue (H) = 0 (red).
- You can change this by setting the start point along H to something
- other than 0.  The example shown starts and wraps at H = 0.3 (green).
- See `set palette defined`.
+ It is convenient to use a color palette in HSV space with component H (hue),
+ running from 0 to 1, mapped to the range of the phase returned by arg(z),
+ [-π:π], so that the color wraps when the phase angle does.  By default this
+ would be at H = 0 (red).  You can change this with the `start` keyword in
+ `set palette` so that some other value of H is mapped to 0.
+ The example shown starts and wraps at H = 0.3 (green).
+ See `set palette defined`, `arg`, `set angles`.
 
       set palette model HSV start 0.3 defined (0 0 1 1, 1 1 1 1)
       set cbrange [-pi:pi]
@@ -3156,8 +3159,7 @@ C ... and restart the table:
  some of these terms are used.
 
  A "page" or "screen" or "canvas" is the entire area addressable by `gnuplot`.
- On a desktop it is a full window; on a plotter, it is a single sheet of paper;
- in svga mode it is the full monitor screen.
+ On a desktop it is a full window; on a plotter, it is a single sheet of paper.
 
  A screen may contain one or more "plots".  A plot is defined by an abscissa
  and an ordinate, although these need not actually appear on it, as well as
@@ -3586,7 +3588,7 @@ Ffigure_newsyntax
  bindings, except that <space> and 'q' cannot normally be rebound. For an
  exception, see `bind space`.
 
- Only mouse button 1 can be bound, and only for 2D plots.
+ Mouse button bindings are only active in 2D plots.
 
  You get the list of all hotkeys by typing `show bind` or `bind` or by typing
  the hotkey 'h' in the graph window.
@@ -3655,9 +3657,10 @@ Ffigure_newsyntax
 ?commands bind space
 ?bind space
  If gnuplot was built with configuration option --enable-raise-console, then
- typing <space> in the plot window raises gnuplot's command window. This hotkey
- can be changed to ctrl-space by starting gnuplot as 'gnuplot -ctrlq', or by
- setting the XResource 'gnuplot*ctrlq'.  See `x11 command-line-options`.
+ typing <space> in the plot window raises gnuplot's command window. Maybe.
+ In practice this is highly system-dependent.  This hotkey can be changed to
+ ctrl-space by starting gnuplot as 'gnuplot -ctrlq', or by setting the
+ XResource 'gnuplot*ctrlq'.
 3 Mouse variables
 ?mouse variables
  When `mousing` is active, clicking in the active window will set several user
@@ -3834,6 +3837,7 @@ Ffigure_newsyntax
  Gnuplot's built-in string manipulation functions are sensitive to utf-8
  encoding (see `set encoding`). For example
 
+  set encoding utf8
   utf8string = "αβγ"
   strlen(utf8string) returns 3 (number of characters, not number of bytes)
   utf8string[2:2] evaluates to "β"
@@ -4543,20 +4547,16 @@ Ffigure_ellipses
  In all of the above cases, optional variable color data may be given in an
  additional last (3th, 4th, 5th or 6th) column. See `colorspec`.
 
- By default, the major diameter is interpreted in the units of the plot's
- horizontal axis (x or x2) while the minor diameter in that of the vertical
- (y or y2).  If the x and y axis scales are not equal, the major/minor diameter
- ratio will no longer be correct after rotation.
- This can be changed with the `units` keyword, however.
-
- There are three alternatives:
- if `units xy` is included in the plot specification, the axes will be scaled
- as described above. `units xx` ensures that both diameters are interpreted
- in units of the x axis, while `units yy` means that both diameters are
- interpreted in units of the y axis. In the latter two cases the ellipses
- will have the correct aspect ratio, even if the plot is resized.
- If `units` is omitted from the plot command, the setting from
- `set style ellipse` will be used.
+ `units keyword:` If `units xy` is included in the plot specification,
+ the major diameter is interpreted in the units of the plot's horizontal axis
+ (x or x2) while the minor diameter in that of the vertical axis (y or y2).
+ If the x and y axis scales are not equal, the major/minor diameter ratio will
+ no longer be correct after rotation.
+ `units xx` interprets both diameters in units of the x axis.
+ `units yy` interprets both diameters in units of the y axis.
+ In the latter two cases the ellipses will have the correct aspect ratio even
+ if the plot is resized.  If `units` is omitted from the plot command,
+ the setting from `set style ellipse` will be used.
 
  Example (draws ellipses, cycling through the available line types):
 
@@ -5420,34 +5420,6 @@ Ffigure_xyerrorbars
  An additional input column (5th or 7th) may be used to provide variable
  (per-datapoint) color information.
 
-#TeX \newpage
-2 yerrorbars
-?plotting styles yerrorbars
-?plotting styles errorbars
-?style yerrorbars
-?with yerrorbars
-?style errorbars
-?with errorbars
-?yerrorbars
-Ffigure_yerrorbars
- The `yerrorbars` (or `errorbars`) style is only relevant to 2D data plots.
- `yerrorbars` is like `points`, except that a vertical error bar is also drawn.
- At each point (x,y), a line is drawn from (x,y-ydelta) to (x,y+ydelta) or
- from (x,ylow) to (x,yhigh), depending on how many data columns are provided.
- The appearance of the tic mark at the ends of the bar is controlled by
- `set errorbars`.
-
-      2 columns:  [implicit x] y ydelta
-      3 columns:  x  y  ydelta
-      4 columns:  x  y  ylow  yhigh
-
- An additional input column (4th or 5th) may be used to provide information
- such as variable point color.
-
- See also
-^ <a href="http://www.gnuplot.info/demo/mgr.html">
- errorbar demo.
-^ </a>
 2 xerrorlines
 ?plotting styles xerrorlines
 ?style xerrorlines
@@ -5467,6 +5439,7 @@ Ffigure_xerrorlines
  An additional input column (4th or 5th) may be used to provide information
  such as variable point color.
 
+#TeX \newpage
 2 xyerrorlines
 ?plotting styles xyerrorlines
 ?style xyerrorlines
@@ -5494,6 +5467,36 @@ Ffigure_xyerrorlines
  An additional input column (5th or 7th) may be used to provide variable
  (per-datapoint) color information.
 
+2 yerrorbars
+?plotting styles yerrorbars
+?plotting styles errorbars
+?style yerrorbars
+?with yerrorbars
+?style errorbars
+?with errorbars
+?yerrorbars
+=errorbars
+Ffigure_yerrorbars
+ The `yerrorbars` (or `errorbars`) style is only relevant to 2D data plots.
+ `yerrorbars` is like `points`, except that a vertical error bar is also drawn.
+ At each point (x,y), a line is drawn from (x,y-ydelta) to (x,y+ydelta) or
+ from (x,ylow) to (x,yhigh), depending on how many data columns are provided.
+ The appearance of the tic mark at the ends of the bar is controlled by
+ `set errorbars`.
+
+      2 columns:  [implicit x] y ydelta
+      3 columns:  x  y  ydelta
+      4 columns:  x  y  ylow  yhigh
+
+ An additional input column (4th or 5th) may be used to provide information
+ such as variable point color.
+
+ See also
+^ <a href="http://www.gnuplot.info/demo/mgr.html">
+ errorbar demo.
+^ </a>
+
+#TeX \newpage
 2 yerrorlines
 ?plotting styles yerrorlines
 ?plotting styles errorlines
@@ -5502,6 +5505,7 @@ Ffigure_xyerrorlines
 ?style errorlines
 ?with errorlines
 ?yerrorlines
+?errorlines
 Ffigure_yerrorlines
  The `yerrorlines` (or `errorlines`) style is only relevant to 2D data
  plots. `yerrorlines` is like `linespoints`, except that a vertical error line
@@ -5760,7 +5764,7 @@ Ffigure_zerror
 3 old-style
 ?commands call old-style
 ?call old-style
- This describes the deprecated call mechanism used by old versions of gnuplot.
+ [DEPRECATED] This describes the call mechanism used by old versions of gnuplot.
 
        call "<input-file>" <param-0> <param-1> ... <param-9>
 
@@ -6550,14 +6554,10 @@ Ffigure_zerror
        if (1==2) print "Never see this"; print "Or this either"
  will not display anything.
 
- else:
-       v=0
-       v=v+1; if (v%2) print "2" ; else if (v%3) print "3"; else print "fred"
-
 2 for
 ?for
  The `plot`, `splot`, `set` and `unset` commands may optionally contain an
- iteration for clause.  This has the effect of executing the basic command
+ iteration clause.  This has the effect of executing the basic command
  multiple times, each time re-evaluating any expressions that make use of the
  iteration control variable.  Iteration of arbitrary command sequences can be
  requested using the `do` command.
@@ -6611,8 +6611,7 @@ Ffigure_zerror
  had been typed in interactively.  Files created by the `save` command can
  later be `load`ed.  Any text file containing valid commands can be created
  and then executed by the `load` command.  Files being `load`ed may themselves
- contain `load` or `call` commands.  See `comments` for information about
- comments in commands.  To `load` with arguments, see `call`.
+ contain `load` or `call` commands.  To `load` with arguments, see `call`.
  EXPERIMENTAL: Commands can be read from a datablock rather than a file.
 
  Syntax:
@@ -7467,9 +7466,12 @@ Ffigure_zerror
  The `smooth` options have no effect on function plots.
 
  Smoothing in 3D plots (splot) is currently limited to generating a natural
- cubic spline to pass through a set of 3D points.  E.g.
+ cubic spline to pass through a set of 3D points.  In the general case the
+ the splines are generated along a trajectory (`smooth path`).  For a 2D
+ projection of 3D data `smooth csplines` acts as it does in 2D.
+ Either keyword is accepted in an `splot` command.
 
-      splot $DATA using 1:2:3 smooth csplines with lines
+      splot $DATA using 1:2:3 smooth path with lines
 
 5 acsplines
 ?commands plot datafile smooth acsplines
@@ -7553,7 +7555,8 @@ Ffigure_zerror
  sorted first so it is possible to fit splines to a trajectory containing loops.
  In the general case three separate sets of spline coefficients are generated,
  each treating one coordinate x, y, or z as a function of a shared implicit
- trajectory path parameter. This is analogous to the 2D `plot ... smooth path`.
+ trajectory path parameter. This is equivalent to the 2D `plot ... smooth path`
+ option.
  
  In the special case that the curve lies in the xz, yz, or xy plane then only a
  single set of spline coefficients is generated.  This allows you to generate a
@@ -7585,7 +7588,8 @@ Ffigure_smooth_path
  The `smooth path` option generates cubic splines to fit points in the order
  they are presented in the input data; i.e. they are not first sorted on x.
  This generates a smooth spline through a closed curve or along a trajectory
- that contains loops.  As always, a separate curve is created for each set
+ that contains loops. This smoothing mode is supported for both 2D and 3D
+ plot commands.  As always, a separate curve is created for each set
  of points in the input file, where a blank line separates the sets.
  Plotting `smooth path with filledcurves closed` will guarantee that each set
  of points creates a closed curve.  Plotting `smooth path with lines` will
@@ -8103,101 +8107,6 @@ Ffigure_smooth_path
  read from the input stream or file may not be available for re-reading.
  This tells the program to use `refresh` rather than `replot` commands whenever
  possible.  See `refresh`.
-3 errorbars
-?commands plot errorbars
-?commands splot errorbars
-?plot errorbars
-?splot errorbars
-=errorbars
- Error bars are supported for 2D data file plots by reading one to four
- additional columns (or `using` entries); these additional values are used in
- different ways by the various errorbar styles.
-
- In the default situation, `gnuplot` expects to see three, four, or six
- numbers on each line of the data file---either
-
-       (x, y, ydelta),
-       (x, y, ylow, yhigh),
-       (x, y, xdelta),
-       (x, y, xlow, xhigh),
-       (x, y, xdelta, ydelta), or
-       (x, y, xlow, xhigh, ylow, yhigh).
-
- The x coordinate must be specified.  The order of the numbers must be
- exactly as given above, though the `using` qualifier can manipulate the order
- and provide values for missing columns.  For example,
-
-       plot 'file' with errorbars
-       plot 'file' using 1:2:(sqrt($1)) with xerrorbars
-       plot 'file' using 1:2:($1-$3):($1+$3):4:5 with xyerrorbars
-
- The last example is for a file containing an unsupported combination of
- relative x and absolute y errors.  The `using` entry generates absolute x min
- and max from the relative error.
-
- The y error bar is a vertical line plotted from (x, ylow) to (x,
- yhigh). If ydelta is specified instead of ylow and yhigh, ylow = y -
- ydelta and yhigh = y + ydelta are derived. If there are only two
- numbers on the record, yhigh and ylow are both set to y. The x error
- bar is a horizontal line computed in the same fashion. To get lines
- plotted between the data points, `plot` the data file twice, once with
- errorbars and once with lines (but remember to use the `notitle`
- option on one to avoid two entries in the key). Alternately, use the
- errorlines command (see `errorlines`).
-
- The tic marks at the ends of the bar are controlled by `set errorbars`.
-
- If autoscaling is on, the ranges will be adjusted to include the error bars.
-
- See also
-^ <a href="http://www.gnuplot.info/demo/mgr.html">
- errorbar demos.
-^ </a>
-
- See `plot using`, `plot with`, and `set style` for more information.
-3 errorlines
-?commands plot errorlines
-?commands splot errorlines
-?plot errorlines
-?splot errorlines
-?errorlines
- Lines with error bars are supported for 2D data file plots by reading
- one to four additional columns (or `using` entries); these additional
- values are used in different ways by the various errorlines styles.
-
- In the default situation, `gnuplot` expects to see three, four, or six
- numbers on each line of the data file---either
-
-       (x, y, ydelta),
-       (x, y, ylow, yhigh),
-       (x, y, xdelta),
-       (x, y, xlow, xhigh),
-       (x, y, xdelta, ydelta), or
-       (x, y, xlow, xhigh, ylow, yhigh).
-
- The x coordinate must be specified. The order of the numbers must be
- exactly as given above, though the `using` qualifier can manipulate
- the order and provide values for missing columns. For example,
-
-       plot 'file' with errorlines
-       plot 'file' using 1:2:(sqrt($1)) with xerrorlines
-       plot 'file' using 1:2:($1-$3):($1+$3):4:5 with xyerrorlines
-
- The last example is for a file containing an unsupported combination
- of relative x and absolute y errors. The `using` entry generates
- absolute x min and max from the relative error.
-
- The y error bar is a vertical line plotted from (x, ylow) to (x,
- yhigh). If ydelta is specified instead of ylow and yhigh, ylow = y -
- ydelta and yhigh = y + ydelta are derived. If there are only two
- numbers on the record, yhigh and ylow are both set to y. The x error
- bar is a horizontal line computed in the same fashion.
-
- The tic marks at the ends of the bar are controlled by `set errorbars`.
-
- If autoscaling is on, the ranges will be adjusted to include the error bars.
-
- See `plot using`, `plot with`, and `set style` for more information.
 3 functions
 ?commands plot functions
 ?plot functions
@@ -8580,10 +8489,10 @@ Ffigure_smooth_path
  <line_width> and <point_size>, which are specified relative to the default
  values for each terminal.  The pointsize may also be altered
  globally---see `set pointsize` for details.  But note that both <point_size>
- as set here and  as set by `set pointsize` multiply the default point
- size---their effects are  not cumulative.  That is,
- `set pointsize 2; plot x w p ps 3` will use points three times default size,
- not six.
+ as set here and as set by `set pointsize` multiply the default point
+ size; their effects are  not cumulative.  That is,
+ `set pointsize 2; plot x with points ps 3` will use points three times the
+ default size, not six.
 
  It is also possible to specify `pointsize variable` either as part of a
  line style or for an individual plot. In this case one extra column of input
@@ -8699,9 +8608,7 @@ Ffigure_smooth_path
 2 quit
 ?commands quit
 ?quit
- The `exit` and `quit` commands and END-OF-FILE character will exit `gnuplot`.
- Each of these commands will clear the output device (as does the `clear`
- command) before exiting.
+ `quit` is a synonym for the `exit` command. See `exit`.
 2 raise
 ?commands raise
 ?commands lower
@@ -8756,7 +8663,7 @@ Ffigure_smooth_path
  to plot a function against the second axes if the previous command was `plot`
  but not if it was `splot`.
 
- N.B.---use of
+ Note:
 
        plot '-' ; ... ; replot
 
@@ -8966,8 +8873,8 @@ Ffigure_smooth_path
  <tag> is an integer that identifies the arrow.  If no tag is given, the
  lowest unused tag value is assigned automatically.  The tag can be used to
  delete or change a specific arrow.  To change any attribute of an existing
- arrow, use the `set arrow` command with the appropriate tag and specify the
- parts of the arrow to be changed.
+ arrow, use `set arrow` with the appropriate tag and specify the attributes
+ to be changed.
 
  The position of the first end point of the arrow is always specified by "from".
  The other end point can be specified using any of three different mechanisms.
@@ -9049,8 +8956,8 @@ Ffigure_smooth_path
 ?noautoscale
  Autoscaling may be set individually on the x, y or z axis or globally on all
  axes. The default is to autoscale all axes.  If you want to autoscale based on
- a subset of the plots in the figure, you can mark the other ones with the flag
- `noautoscale`.  See `datafile`.
+ a subset of the plots in the figure, you can mark the ones to be omitted with
+ the flag `noautoscale` in the plot command.  See `datafile`.
 
  Syntax:
        set autoscale {<axes>{|min|max|fixmin|fixmax|fix} | fix | keepfix}
@@ -9058,7 +8965,7 @@ Ffigure_smooth_path
        unset autoscale {<axes>}
        show autoscale
 
- where <axes> is either `x`, `y`, `z`, `cb`, `x2`, `y2`, `xy`, or `paxis {n}`.
+ where <axes> is either `x`, `y`, `z`, `cb`, `x2`, `y2`, `xy`, or `paxis <p>`.
  A keyword with `min` or `max` appended (this cannot be done with `xy`) tells
  `gnuplot` to autoscale just the minimum or maximum of that axis.
  If no keyword is given, all axes are autoscaled.
@@ -9067,16 +8974,13 @@ Ffigure_smooth_path
  axis (y for a `plot` and z for `splot`) is scaled to include the range of the
  function or data being plotted.
 
+ Autoscaling the independent axes (x for `plot` and x,y for `splot`) is a
+ request to set the range for these axes to match the data being plotted.
+ If the plot contains only functions (no input data), autoscaling these axes
+ has no effect.
+
  If autoscaling of the dependent axis (y or z) is not set, the current y or z
- range is used.
-
- Autoscaling the independent variables (x for `plot` and x,y for `splot`) is a
- request to set the domain to match any data file being plotted.  If there are
- no data files, autoscaling an independent variable has no effect.  In other
- words, in the absence of a data file, functions alone do not affect the x
- range (or the y range if plotting z = f(x,y)).
-
- Please see `set xrange` for additional information about ranges.
+ range is used. Please see `set xrange` for additional information about ranges.
 
  The behavior of autoscaling remains consistent in parametric mode, (see
  `set parametric`).  However, there are more dependent variables and hence more
@@ -9358,19 +9262,11 @@ Ffigure_smooth_path
  some experimentation may be required to find a useful value of boxwidth.
 
  The default is superseded by explicit width information taken from an extra
- data column in styles `boxes` or `boxerrorbars`.  In a four-column data set,
- the fourth column will be interpreted as the box width unless the width is set
- to -2.0, in which case the width will be calculated automatically.
+ data column in styles `boxes` or `boxerrorbars`.
  See `style boxes` and `style boxerrorbars` for more details.
 
  To set the box width to automatic use the command
        set boxwidth
-
- or, for four-column data,
-       set boxwidth -2
-
- The same effect can be achieved with the `using` keyword in `plot`:
-       plot 'file' using 1:2:3:4:(-2)
 
  To set the box width to half of the automatic size use
        set boxwidth 0.5 relative
@@ -9391,13 +9287,13 @@ Ffigure_smooth_path
 3 color
 ?commands set color
 ?set color
- Gnuplot supports two alternative sets of linetypes. The default set uses a
- different color for each linetype, although it also allows you to draw dotted
- or dashed lines in that color.  The alternative monochrome set uses only
- dot/dash pattern or linewidth to distinguish linetypes. The `set color`
- command selects the color linetypes.  See `set monochrome`, `set linetype`,
- and `set colorsequence`.
-
+ Gnuplot assigns each element of a `plot` or `splot` command a new set of line
+ properties taken from a predefined sequence.  The default is to distinguish
+ successive lines by a change in color.  The alternative selected by 
+ `set monochrome` uses a sequence of black lines distinguishd by linewidth or
+ dot/dash pattern.  The `set color` command exits this alternative monochrome
+ mode and restores the previous set of default color lines.
+ See `set monochrome`, `set linetype`, and `set colorsequence`.
 3 Colormap
 ?commands set colormap
 ?set colormap
@@ -9761,7 +9657,7 @@ Ffigure_smooth_path
  `unset colorbox` resets the default parameters for the colorbox and switches
  the colorbox off.
 
- See also help for `set pm3d`, `set palette`, `x11 pm3d`, and `set style line`.
+ See also help for `set pm3d`, `set palette`, and `set style line`.
 3 colornames
 ?colornames
  Gnuplot knows a limited number of color names. You can use these to define
@@ -9860,9 +9756,6 @@ Ffigure_smooth_path
       set linetype 5 dt 5        # always use this dash pattern with linetype 5
       set dashtype 66 "..-"      # define a new dashtype using a string
  See also `dashtype`.
-3 data style
-?set data style
- This form of the command is deprecated. Please see `set style data`.
 3 datafile
 ?set datafile
 ?show datafile
@@ -10285,8 +10178,8 @@ Ffigure_missing
  representation of dates or numbers.
  See also `set locale` and `set decimalsign`.
 
- Generally you must set the encoding before setting the terminal type, as it
- may affect the choice of appropriate fonts.
+ Generally you should set the encoding before setting the terminal type,
+ as it may affect the selection of fonts.
 3 errorbars
 ?commands set errorbars
 ?commands show errorbars
@@ -10861,9 +10754,6 @@ Ffigure_missing
        set format x "%.2tH hours"   # "-1.02 hours"
        set format x "%tM:%.2tS"     # "-61:12.50"
 
-3 function style
-?set function style
- This form of the command is deprecated. Please use `set style function`.
 3 grid
 ?commands set grid
 ?commands unset grid
@@ -17255,19 +17145,12 @@ Ffigure_walls
 2 External libraries
 ?bugs external_libraries
 =libgd
-=svgalib
 =locale
 =internationalization
-=pdf
  External library GD (used by PNG/JPEG/GIF/sixelgd terminals, pixmap):
  Versions of libgd through 2.0.33 had various bugs in mapping the characters
  of Adobe's Symbol font.
  Dot-dash patterns are not supported for these terminals.
-
- External library PDFlib (used by PDF terminal, but not by pdfcairo):
- Gnuplot can be linked against libpdf versions 4, 5, or 6. However, these
- versions differ in their handling of piped I/O.  Therefore gnuplot scripts
- using piped output to PDF may work only for some versions of PDFlib.
 
  Internationalization (locale settings):
  Gnuplot uses the C runtime library routine setlocale() to control

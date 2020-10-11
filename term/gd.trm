@@ -3059,7 +3059,11 @@ START_HELP(sixelgd)
 " The terminal has been successfully tested with the xterm, mlterm and mintty",
 " terminals.  The later two support the `truecolor` mode using 256 sixel",
 " colors out of box. Distributed copies of xterm may or may not have been",
-" configured to support sixel graphics and may be limited to 16 colors."
+" configured to support sixel graphics and may be limited to 16 colors.",
+"",
+" The sixel terminal is also useful for displaying gnuplot graphics on the",
+" linux console when no windowing system or graphics display manager is active.",
+" See `linux console`."
 END_HELP(sixelgd)
 #endif /* TERM_HELP */
 #endif /* WITH_GD_SIXEL */
