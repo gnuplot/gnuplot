@@ -86,7 +86,7 @@ gdysize(int yr)
  *		a date that is returned in tm, with fractional seconds
  *		returned in usec
  * DT_DMS	indicates relative time format elements were encountered
- *		(tH tM tS).  The relative time in seconds is returned
+ *		(tD tH tM tS).  The relative time in seconds is returned
  *		in reltime.
  * DT_BAD	time format could not be interpreted
  *
@@ -138,7 +138,7 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec, double *reltime)
 	tm->tm_mon = -1;
 	sanity_check_date = TRUE;
     }
-    /* Relative time formats tH tM tS cannot be mixed with date formats */
+    /* Relative time formats tD tH tM tS cannot be mixed with date formats */
     if (strstr(fmt,"%t")) {
 	reltime_formats = TRUE;
 	*reltime = 0.0;
@@ -267,7 +267,7 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec, double *reltime)
 	    }
 
 	case 't':
-	    /* Relative time formats tH tM tS */
+	    /* Relative time formats tD tH tM tS */
 	    {
 		double cont = 0;
 
@@ -281,7 +281,9 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec, double *reltime)
 		}
 
 		fmt++;
-		if (*fmt == 'H') {
+		if (*fmt == 'D') {
+		    cont = 86400. * strtod(s, &s);
+		} else if (*fmt == 'H') {
 		    cont = 3600. * strtod(s, &s);
 		} else if (*fmt == 'M') {
 		    cont = 60. * strtod(s, &s);
@@ -632,15 +634,36 @@ xstrftime(
 		int tminute, tsecond;
 
 		    switch (*fmt++) {
+		    case 'D':
+			/* +/- fractional days */
+			if (p > 0) {
+			    incr = snprintf(s, bsz-l-1, "%*.*f", w, p, fulltime/86400.);
+			    CHECK_SPACE(incr);
+			    break;
+			}
+			/* Set flag in case hours come next */
+			if (fulltime < 0) {
+			    CHECK_SPACE(1);	/* the minus sign */
+			    *s++ = '-';
+			    l++;
+			}
+			sign_printed = TRUE;
+			/* +/- integral day truncated toward zero */
+			sprintf(s, "%0*d", w, (int)floor(fabs(fulltime/86400.)));
+
+			/* Subtract the day component from the total */
+			fulltime -= sgn(fulltime) * 86400. * floor(fabs(fulltime/86400.));
+			break;
 		    case 'H':
 			/* +/- fractional hours (not wrapped at 24h) */
 			if (p > 0) {
-			    incr = snprintf(s, bsz-l-1, "%*.*f", w, p, fulltime/3600.);
+			    incr = snprintf(s, bsz-l-1, "%*.*f", w, p,
+				sign_printed ? fabs(fulltime)/3600. : fulltime/3600.);
 			    CHECK_SPACE(incr);
 			    break;
 			}
 			/* Set flag in case minutes come next */
-			if (fulltime < 0) {
+			if (fulltime < 0 && !sign_printed) {
 			    CHECK_SPACE(1);	/* the minus sign */
 			    *s++ = '-';
 			    l++;

@@ -10547,7 +10547,11 @@ Ffigure_missing
 ?set time_specifiers
 ?date_specifiers
 ?time_specifiers
- In time/date mode, the acceptable formats are:
+ There are two groups of time format specifiers: time/date and relative time.
+ These may be used to generate axis tic labels or to encode time in a string.
+ See `set xtics time`, `strftime`, `strptime`.
+
+ The time/date formats are
 
 @start table - first is interactive cleartext form
        Format       Explanation
@@ -10681,13 +10685,12 @@ Ffigure_missing
 ^</tbody>
 ^</table>
 
- Numerical formats may be preceded by a "0" ("zero") to pad the field with
- leading zeroes, and preceded by a positive digit to define the minimum field
- width.  The %S, and %t formats also accept a precision specifier so that
- fractional hours/minutes/seconds can be written.
+ The relative time formats express the length of a time interval on either
+ side of a zero time point.  The relative time formats are
 
 @start table - first is interactive cleartext form
        Format       Explanation
+       %tD          +/- days relative to time=0
        %tH          +/- hours relative to time=0 (does not wrap at 24)
        %tM          +/- minutes relative to time=0
        %tS          +/- seconds associated with previous tH or tM field
@@ -10695,12 +10698,14 @@ Ffigure_missing
 #\multicolumn{2}{|c|}{Time Specifiers}\\
 #\hline \hline
 #Format & Explanation \\ \hline
+#\verb@%tD@ & +/- days relative to time=0 \\
 #\verb@%tH@ & +/- hours relative to time=0 (does not wrap at 24) \\
 #\verb@%tM@ & +/- minutes relative to time=0 \\
 #\verb@%tS@ & +/- seconds associated with previous tH or tM field \\
 %c l .
 %Format@Explanation
 %_
+%%tH@+/- days relative to time=0
 %%tH@+/- hours relative to time=0 (does not wrap at 24)
 %%tM@+/- minutes relative to time=0
 %%tS@+/- seconds associated with previous tH or tM field
@@ -10716,11 +10721,17 @@ Ffigure_missing
 ^<tr>    <th>Time Format</th>    <th>Explanation</th></tr>
 ^</thead>
 ^<tbody>
+^<tr>    <td><tt>%tD</tt></td>    <td>+/- days relative to time=0</td></tr>
 ^<tr>    <td><tt>%tH</tt></td>    <td>+/- hours relative to time=0 (does not wrap at 24)</td></tr>
 ^<tr>    <td><tt>%tM</tt></td>    <td>+/- minutes relative to time=0</td></tr>
 ^<tr>    <td><tt>%tS</tt></td>    <td>+/- seconds associated with previous tH or tM field</td></tr>
 ^</tbody>
 ^</table>
+
+ Numerical formats may be preceded by a "0" ("zero") to pad the field with
+ leading zeroes, and preceded by a positive digit to define the minimum field
+ width.  The %S, and %t formats also accept a precision specifier so that
+ fractional hours/minutes/seconds can be written.
 
 5 Examples
 ?commands set format date_specifiers examples
@@ -15684,6 +15695,8 @@ Ffigure_walls
 4 xtics timedata
 ?set xtics timedata
 ?xtics timedata tics
+?set xtics time
+?xtics time
 ?timedata tics
  Times and dates are stored internally as a number of seconds.
 
