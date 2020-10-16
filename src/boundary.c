@@ -1191,6 +1191,8 @@ do_key_sample(
     coordval var_color)
 {
     struct termentry *t = term;
+    int xl_save = xl;
+    int yl_save = yl;
 
     /* Clip key box against canvas */
     BoundingBox *clip_save = clip_area;
@@ -1352,6 +1354,8 @@ do_key_sample(
 
     /* Restore previous clipping area */
     clip_area = clip_save;
+    xl = xl_save;
+    yl = yl_save;
 }
 
 void
@@ -1360,6 +1364,8 @@ do_key_sample_point(
     legend_key *key)
 {
     struct termentry *t = term;
+    int xl_save = xl;
+    int yl_save = yl;
 
     /* If the plot this title belongs to specified a non-standard place
      * for the key sample to appear, use that to override xl, yl.
@@ -1414,6 +1420,8 @@ do_key_sample_point(
 	}
     }
 
+    xl = xl_save;
+    yl = yl_save;
     (t->layer)(TERM_LAYER_END_KEYSAMPLE);
 }
 
