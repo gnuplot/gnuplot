@@ -511,14 +511,14 @@ truncate_to_one_utf8_char(char *orig)
 {
     uint32_t codepoint;
     char newchar[8];
-    int length;
+    int length = 0;
 
     safe_strncpy(newchar, orig, sizeof(newchar));
 
     /* Check for unicode escape */
     if (!strncmp("\\U+", newchar, 3)) {
-	sscanf(&newchar[3], "%4x", &codepoint);
-	length = ucs4toutf8(codepoint, (unsigned char *)newchar);
+	if (sscanf(&newchar[3], "%4x", &codepoint) == 1)
+	    length = ucs4toutf8(codepoint, (unsigned char *)newchar);
 	newchar[length] = '\0';
     }
     /* Truncate ascii text to single character */
