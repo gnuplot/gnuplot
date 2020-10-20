@@ -2982,7 +2982,6 @@ static void load_contour_label_options (struct text_label *contour_label)
 {
     struct lp_style_type *lp = &(contour_label->lp_properties);
     lp->p_interval = clabel_interval;
-    lp->flags |= LP_SHOW_POINTS;
     lp_parse(lp, LP_ADHOC, TRUE);
 }
 
