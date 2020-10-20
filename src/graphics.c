@@ -3279,9 +3279,6 @@ static void
 plot_boxplot(struct curve_points *plot, TBOOLEAN only_autoscale)
 {
     int N;
-    struct coordinate *save_points = plot->points;
-    int saved_p_count = plot->p_count;
-
     struct coordinate *subset_points;
     int subset_count, true_count;
     struct text_label *subset_label = plot->labels;
@@ -3295,7 +3292,7 @@ plot_boxplot(struct curve_points *plot, TBOOLEAN only_autoscale)
     if (levels == 0)
 	levels = 1;
 
-    if (!save_points || saved_p_count == 0)
+    if (!plot->points || plot->p_count == 0)
 	return;
 
     /* The entire collection of points was already sorted in filter_boxplot()
@@ -3307,23 +3304,23 @@ plot_boxplot(struct curve_points *plot, TBOOLEAN only_autoscale)
      */
     for (level=0; level<levels; level++) {
 	if (levels == 1) {
-	    subset_points = save_points;
-	    subset_count = saved_p_count;
+	    subset_points = plot->points;
+	    subset_count = plot->p_count;
 	} else {
 	    subset_label = subset_label->next;
 	    true_count = 0;
 	    /* advance to first point in subset */
-	    for (subset_points = save_points;
+	    for (subset_points = plot->points;
 		 subset_points->z != subset_label->tag;
 		 subset_points++, true_count++) {
 		    /* No points found for this boxplot factor */
-		    if (true_count >= saved_p_count)
+		    if (true_count >= plot->p_count)
 			break;
 	    }
 
 	    /* count well-defined points in this subset */
 	    for (subset_count=0;
-		 true_count < saved_p_count
+		 true_count < plot->p_count
 		    && subset_points[subset_count].z == subset_label->tag;
 		 subset_count++, true_count++) {
 			if (subset_points[subset_count].type == UNDEFINED)
@@ -3423,17 +3420,24 @@ plot_boxplot(struct curve_points *plot, TBOOLEAN only_autoscale)
 	candle.yhigh = whisker_top;
 	candle.xlow  = subset_points->xlow + boxplot_opts.separation * level;
 	candle.xhigh = median;	/* Crazy order of candlestick parameters! */
-	plot->points = &candle;
-	plot->p_count = 1;
 
 	/* for boxplots "lc variable" means color by factor index */
 	if (plot->varcolor)
 	    plot->varcolor[0] = plot->base_linetype + level + 1;
 
-	if (boxplot_opts.plotstyle == FINANCEBARS)
-	    plot_f_bars( plot );
-	else
-	    plot_c_bars( plot );
+	/* Use the current plot structure to plot the boxplot as a candlestick */
+	{
+	    struct coordinate save_point = plot->points[0];
+	    int save_count = plot->p_count;
+	    plot->points[0] = candle;
+	    plot->p_count = 1;
+	    if (boxplot_opts.plotstyle == FINANCEBARS)
+		plot_f_bars( plot );
+	    else
+		plot_c_bars( plot );
+	    plot->points[0] = save_point;
+	    plot->p_count = save_count;
+	}
 
 	/* Now draw individual points for the outliers */
 	outliers:
@@ -3469,9 +3473,6 @@ plot_boxplot(struct curve_points *plot, TBOOLEAN only_autoscale)
 	    }
 	}
 
-    /* Restore original dataset points and size */
-    plot->points = save_points;
-    plot->p_count = saved_p_count;
     }
 }
 
