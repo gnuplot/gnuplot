@@ -2499,20 +2499,23 @@ toggle_command()
 
     } else if ((plottitle = try_to_get_string()) != NULL) {
 	struct curve_points *plot;
-	int length = strlen(plottitle);
+	int last = strlen(plottitle) - 1;
 	if (refresh_ok == E_REFRESH_OK_2D)
 	    plot = first_plot;
 	else if (refresh_ok == E_REFRESH_OK_3D)
 	    plot = (struct curve_points *)first_3dplot;
 	else
 	    plot = NULL;
-	for (plotno = 0; plot != NULL; plot = plot->next, plotno++) {
-	    if (plot->title)
-		if (!strcmp(plot->title, plottitle)
-		||  (plottitle[length-1] == '*' && !strncmp(plot->title, plottitle, length-1))) {
-		    foundit = TRUE;
-		    break;
-		}
+	if (last >= 0) {
+	    for (plotno = 0; plot != NULL; plot = plot->next, plotno++) {
+		if (plot->title)
+		    if (!strcmp(plot->title, plottitle)
+		    ||  (plottitle[last] == '*'
+			&& !strncmp(plot->title, plottitle, last))) {
+			foundit = TRUE;
+			break;
+		    }
+	    }
 	}
 	free(plottitle);
 	if (!foundit) {
