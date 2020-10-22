@@ -1437,7 +1437,8 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	    sprintf(errmsg, "Cannot find or open file \"%s\"", df_filename);
 	    fill_gpval_string("GPVAL_ERRMSG", errmsg);
 	    free(errmsg);
-	    int_warn(NO_CARET, "Cannot find or open file \"%s\"", df_filename);
+	    if (plot)	/* suppress message if this is a stats command */
+		int_warn(NO_CARET, "Cannot find or open file \"%s\"", df_filename);
 	    df_eof = 1;
 	    return DF_EOF;
 	}

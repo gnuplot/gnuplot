@@ -841,11 +841,11 @@ statsrequest(void)
     struct two_column_stats res_xy = {0};
 
     /* Vars for variable handling */
-    static char *prefix = NULL;       /* prefix for user-defined vars names */
+    static char *prefix = NULL;	/* prefix for user-defined vars names */
     TBOOLEAN prefix_from_columnhead = FALSE;
 
     /* Vars that control output */
-    TBOOLEAN do_output = TRUE;     /* Generate formatted output */
+    TBOOLEAN do_output = TRUE;	/* Generate formatted output */
     TBOOLEAN array_data = FALSE;
 
     c_token++;
@@ -859,7 +859,7 @@ statsrequest(void)
     /* Initialize */
     invalid = 0;          /* number of missing/invalid records */
     blanks = 0;           /* number of blank lines */
-    header_records = 0;    /* number of records treated as headers rather than data */
+    header_records = 0;   /* number of records treated as headers rather than data */
     doubleblanks = 0;     /* number of repeated blank lines */
     out_of_range = 0;     /* number pts rejected, because out of range */
     n = 0;                /* number of records retained */
@@ -867,7 +867,7 @@ statsrequest(void)
 
     free(data_x);
     free(data_y);
-    data_x = vec(max_n);       /* start with max. value */
+    data_x = vec(max_n);  /* start with max. value */
     data_y = vec(max_n);
     free(prefix);
     prefix = NULL;
@@ -896,11 +896,17 @@ statsrequest(void)
 	df_set_plot_mode(MODE_PLOT);		/* Used for matrix datafiles */
 	columns = df_open(file_name, 2, NULL);	/* up to 2 using specs allowed */
 
+	/* "stats <badfilename> nooutput"
+	 * allows user to test for existance of a file without generating a fatal error.
+	 * The 'nooutput' keyword suppresses the resulting error message as well.
+	 */
 	if (columns < 0) {
-	    /* This allows the user to test for failure */
 	    fill_gpval_integer("GPVAL_ERRNO", 1);
 	    while (!END_OF_COMMAND)
-		c_token++;
+		if (almost_equals(c_token++, "noout$put"))
+		    do_output = FALSE;
+	    if (do_output)
+		fprintf(stderr, "Cannot find or open file \"%s\"\n", file_name);
 	    goto stats_cleanup;
 	}
 
@@ -1065,7 +1071,7 @@ statsrequest(void)
 
     /* No data! Try to explain why. */
     if ( n == 0 ) {
-	if ( out_of_range > 0 )
+	if (out_of_range > 0)
 	    int_warn( NO_CARET, "All points out of range" );
 	else
 	    int_warn( NO_CARET, "No valid data points found in file" );
