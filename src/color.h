@@ -73,6 +73,15 @@ typedef enum {
     SMPAL_COLOR_MODE_CUBEHELIX = 'c'
 } palette_color_mode;
 
+/*
+ *    color gradient type
+ */
+typedef enum {
+    SMPAL_GRADIENT_TYPE_NONE     = 0,
+    SMPAL_GRADIENT_TYPE_SMOOTH   = 1, /* smooth palette */
+    SMPAL_GRADIENT_TYPE_DISCRETE = 2, /* (full) discrete palette */
+    SMPAL_GRADIENT_TYPE_MIXED    = 3, /* partially discrete palette */
+} palette_gradient_type;
 
 /* Contains a colour in RGB scheme.
    Values of  r, g and b  are all in range [0;1] */
@@ -173,6 +182,15 @@ typedef struct {
    * Then a truncated gray value may miss the gradient it belongs in. */
   double smallest_gradient_interval;
 
+  /* 
+   * Identifier of color gradient type which is one of, 
+   *   1. Smooth gradient (SMPAL_GRADIENT_TYPE_SMOOTH)
+   *   2. Discrete gradient (SMPAL_GRADIENT_TYPE_DISCRETE)
+   *   3. Smooth and Discrete Mixed gradient (SMPAL_GRADIENT_TYPE_MIXED)
+   * This value set by the routine 'check_palette_gradient_type'.
+   */
+  int gradient_type;
+
   /* the used color model: RGB, HSV, XYZ, etc. */
   int cmodel;
 
@@ -215,6 +233,7 @@ void init_color(void);  /* call once to initialize variables */
 int make_palette(void);
 
 void invalidate_palette(void);
+void check_palette_gradient_type(void);
 
 /*
    Send current colour to the terminal

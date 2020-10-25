@@ -330,13 +330,18 @@ rgb1maxcolors_from_gray(double gray, rgb_color *color)
 double
 quantize_gray( double gray )
 {
-    double qgray = floor(gray * sm_palette.use_maxcolors)
-		 / (sm_palette.use_maxcolors-1);
+    double qgray = gray;
 
-    if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRADIENT) {
-	int j;
+    if (sm_palette.gradient_type == SMPAL_GRADIENT_TYPE_DISCRETE)
+      return qgray;
+
+    qgray = floor(gray * sm_palette.use_maxcolors)
+		        / (sm_palette.use_maxcolors-1);
+
+    if (sm_palette.gradient_type == SMPAL_GRADIENT_TYPE_MIXED) {
 	gradient_struct *g = sm_palette.gradient;
 	double small_interval = 1. / sm_palette.use_maxcolors;
+	int j;
 
 	/* Backward compatibility with common case of 1 segment */
 	if ((sm_palette.gradient_num <= 2) && (qgray == 0))
@@ -366,6 +371,9 @@ quantize_gray( double gray )
 
 	}
     }
+
+    if (qgray >= 1.0)
+        qgray = 1.0;
 
     return qgray;
 }
