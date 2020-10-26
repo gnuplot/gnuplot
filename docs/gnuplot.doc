@@ -5566,7 +5566,7 @@ Ffigure_pm3dsolid
  solid color surface or to specify distinct solid colors for the top and bottom
  surfaces as in the figure shown here.  See `pm3d fillcolor`.
  Unlike the line-trimming in hidden3d mode, pm3d surfaces can be smoothly
- clipped to the current zrange.  See `set pm3d clip z`.
+ clipped to the current zrange.  See `set pm3d clipping`.
 
 #TeX \newpage
 2 Fence plots
@@ -9410,8 +9410,8 @@ Ffigure_smooth_path
  `linespoints`, `points`, `arrows`, and `vectors`.
 
  * Clipping of colored quadrangles drawn for pm3d surfaces and other solid
- objects is controlled `set pm3d clip`. The default is smooth clipping against
- the current zrange.
+ objects is controlled `set pm3d clipping`. The default is smooth clipping
+ against the current zrange.
 
  * Object clipping is controlled by the `clip` or `noclip` property of the
  individual object.
@@ -13410,12 +13410,11 @@ Ffigure_multiple_keys
 ?pm3d clipping
 ?set pm3d clipping
 ?clipcb
+?clip1in
+?clip4in
 ?pm3d clipcb
 ?noclipcb
 ?pm3d noclipcb
-?set pm3d clip z
-?set pm3d clip1in
-?set pm3d clip4in
  Syntax:
       set pm3d {clip {z} | clip1in | clip4in}
       set pm3d {no}clipcb
@@ -13426,6 +13425,7 @@ Ffigure_multiple_keys
  Alternatively, surfaces can be clipped by rendering whole quadrangles but only
  those with all 4 corners in-range on x, y, and z (`set pm3d clip4in`), or only
  those with at least one corner in-range on x, y, and z (`set pm3d clip1in`).
+ These options are mutually exclusive.
 
  Separate from clipping based on spatial x, y, and z coordinates, quadrangles
  can be rendered or not based on extreme palette color values.
