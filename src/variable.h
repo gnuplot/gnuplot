@@ -36,7 +36,6 @@
 # define VARIABLE_H
 
 #include "syscfg.h"
-#include "national.h"
 
 /* Generic defines */
 

@@ -202,19 +202,24 @@ loadpath_handler(int action, char *path)
 
 }
 
-/* not set or shown directly, but controlled by 'set locale'
- * defined in national.h
+/* Day and month names controlled by 'set locale'.
+ * These used to be defined in national.h but internationalization via locale
+ * is now a bit more common than it was last century.
  */
-
-char full_month_names[12][32] =
-{ FMON01, FMON02, FMON03, FMON04, FMON05, FMON06, FMON07, FMON08, FMON09, FMON10, FMON11, FMON12 };
-char abbrev_month_names[12][8] =
-{ AMON01, AMON02, AMON03, AMON04, AMON05, AMON06, AMON07, AMON08, AMON09, AMON10, AMON11, AMON12 };
-
-char full_day_names[7][32] =
-{ FDAY0, FDAY1, FDAY2, FDAY3, FDAY4, FDAY5, FDAY6 };
-char abbrev_day_names[7][8] =
-{ ADAY0, ADAY1, ADAY2, ADAY3, ADAY4, ADAY5, ADAY6 };
+char full_month_names[12][32] = { 
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+};
+char abbrev_month_names[12][8] = {
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+};
+char full_day_names[7][32] = {
+    "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
+};
+char abbrev_day_names[7][8] = {
+    "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
+};
 
 char *
 locale_handler(int action, char *newlocale)
