@@ -8,7 +8,7 @@ set samples 40, 40
 set isosamples 40, 40
 set xyplane 0
 set pm3d depthorder border linewidth 0.100
-set pm3d clip z 
+set pm3d clip
 set pm3d lighting primary 0.5 specular 0.2 spec2 0
 
 set xrange [-1 : 5]
@@ -20,14 +20,14 @@ set ztics 5
 
 f(x,y) = x**2 + y**2 * (1 - x)**3
 
-set multiplot layout 1,2 title "new pm3d option for smooth clipping against zrange"
+set multiplot layout 1,2 title "new pm3d default is smooth clipping against zrange"
 set title "set pm3d clip4in (old default)"
 set pm3d clip4in
 
 splot f(x,y) with pm3d fc "cyan"
 
-set title "set pm3d clip z (new default)"
-set pm3d clip z
+set title "set pm3d clip (new default)"
+set pm3d clip
 
 replot
 unset multiplot

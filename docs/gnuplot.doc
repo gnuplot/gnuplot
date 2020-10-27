@@ -13416,16 +13416,18 @@ Ffigure_multiple_keys
 ?noclipcb
 ?pm3d noclipcb
  Syntax:
-      set pm3d {clip {z} | clip1in | clip4in}
+      set pm3d {clip | clip1in | clip4in}
       set pm3d {no}clipcb
 
  The component quadrangles of a pm3d surface or other 3D object are by default
  smoothly clipped against the current zrange.  This is a change from earlier
- gnuplot versions.
+ gnuplot versions.  In 2D projection (`set view map`) this mode also clips
+ against xrange and yrange.
+
  Alternatively, surfaces can be clipped by rendering whole quadrangles but only
  those with all 4 corners in-range on x, y, and z (`set pm3d clip4in`), or only
  those with at least one corner in-range on x, y, and z (`set pm3d clip1in`).
- These options are mutually exclusive.
+ The options `clip`, `clip1in`, and `clip4in` are mutually exclusive.
 
  Separate from clipping based on spatial x, y, and z coordinates, quadrangles
  can be rendered or not based on extreme palette color values.
