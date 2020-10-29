@@ -1530,6 +1530,11 @@ PNG_graphics()
 	    gdImageColorAllocate(png_state.image, (rgb >> 16) & 0xff,
 				 (rgb >> 8) & 0xff, rgb & 0xff);
     }
+
+    if ( png_state.frame_optimization && ( png_state.frame_count > 0 ) && png_state.previous_image ) {
+         gdImagePaletteCopy(png_state.image, png_state.previous_image);
+    }
+
     if (png_state.flags & PNG_USE_TRANSPARENT)
 	gdImageColorTransparent(png_state.image, png_state.color_table[0]);
     else
