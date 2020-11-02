@@ -2313,6 +2313,8 @@ C marker below is used to signal this to doc2html:
 
 #TeX \quad\quad EllipticPi$(n,k)=\int_0^{\pi/2} {\big[(1-nsin^2\theta)\sqrt{1-k^2sin^2\theta}~\big]}^{-1}d\theta$
 
+ Elliptic integral algorithm: B.C.Carlson 1995, Numerical Algorithms 10:13-26.
+
 4 Complex Airy functions
 ?expressions functions Ai
 ?Ai
