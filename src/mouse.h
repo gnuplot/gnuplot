@@ -85,93 +85,12 @@ typedef struct mouse_setting_t {
     NULL                        \
 }
 
+extern long mouse_mode;
+extern char* mouse_alt_string;
 extern mouse_setting_t default_mouse_setting;
 extern mouse_setting_t mouse_setting;
 extern char mouse_fmt_default[];
 extern udft_entry mouse_readout_function;
-
-/* enum of GP_ -keycodes has moved to mousecmn.h so that it can be
- * accessed by standalone terminals too */
-
-
-/* FIXME HBB 20010207: Codestyle violation, again. */
-#ifdef _MOUSE_C
-/* the following table must match exactly the
- * enum's of GP_ and end with a NULL pointer! */
-static char* special_keys[] = {
-    "GP_FIRST_KEY", /* keep this dummy there */
-    "Linefeed",
-    "Clear",
-    "Pause",
-    "Scroll_Lock",
-    "Sys_Req",
-    "Insert",
-    "Home",
-    "Left",
-    "Up",
-    "Right",
-    "Down",
-    "PageUp",
-    "PageDown",
-    "End",
-    "Begin",
-    "KP_Space",
-    "KP_Tab",
-    "KP_F1",
-    "KP_F2",
-    "KP_F3",
-    "KP_F4",
-
-    /* see KP_0 - KP_9 */
-    "KP_Insert",
-    "KP_End",
-    "KP_Down",
-    "KP_PageDown",
-    "KP_Left",
-    "KP_Begin",
-    "KP_Right",
-    "KP_Home",
-    "KP_Up",
-    "KP_PageUp",
-
-    "KP_Delete",
-    "KP_Equal",
-    "KP_Multiply",
-    "KP_Add",
-    "KP_Separator",
-    "KP_Subtract",
-    "KP_Decimal",
-    "KP_Divide",
-    "KP_0",
-    "KP_1",
-    "KP_2",
-    "KP_3",
-    "KP_4",
-    "KP_5",
-    "KP_6",
-    "KP_7",
-    "KP_8",
-    "KP_9",
-    "F1",
-    "F2",
-    "F3",
-    "F4",
-    "F5",
-    "F6",
-    "F7",
-    "F8",
-    "F9",
-    "F10",
-    "F11",
-    "F12",
-    "Close",
-    "Button1",
-    "Button2",
-    "Button3",
-    "GP_LAST_KEY",
-    (char*) 0 /* must be the last line */
-};
-#endif /* _MOUSE_C */
 
 enum {
     MOUSE_COORDINATES_REAL = 0,
@@ -184,16 +103,6 @@ enum {
     MOUSE_COORDINATES_ALT,    /* alternative format as specified by the user */
     MOUSE_COORDINATES_FUNCTION = 8 /* value needed in term.c even if no USE_MOUSE */
 };
-
-/* FIXME HBB 20010207: Codestyle violation: these should be in mouse.c! */
-#if defined(_MOUSE_C)
-    long mouse_mode = MOUSE_COORDINATES_REAL;
-    char* mouse_alt_string = (char*) 0;
-#else
-    extern long mouse_mode;
-    extern char* mouse_alt_string;
-#endif
-
 
 void event_plotdone(void);
 void recalc_statusline(void);
