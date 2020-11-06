@@ -82,6 +82,10 @@ AC_CHECK_MEMBERS([struct tm.tm_gmtoff, struct tm.__tm_gmtoff],,,[
 #include <sys/types.h>
 #include <time.h>])
 
+dnl explicit call to PKG_PROG_PKG_CONFIG because the first call to
+dnl PKG_CHECK_MODULES{,_NOFAIL} may not happen
+PKG_PROG_PKG_CONFIG
+
 AC_ARG_WITH(libcerf,dnl
 [  --without-libcerf       build without special functions from libcerf (default enabled)],,
   [test -z "${with_libcerf}" && with_libcerf=yes])
@@ -799,10 +803,6 @@ if test ! -f src/graphics.c ; then
   mkdir tutorial >/dev/null 2>&1
   cp ${srcdir}/tutorial/eg3.dat tutorial
 fi
-
-dnl explicit call to PKG_PROG_PKG_CONFIG because the first call to
-dnl PKG_CHECK_MODULES may not happen
-PKG_PROG_PKG_CONFIG
 
 dnl  wxWidgets terminal
 
