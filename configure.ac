@@ -88,6 +88,10 @@ AC_CHECK_MEMBERS([struct tm.tm_gmtoff, struct tm.__tm_gmtoff],,,[
 #include <sys/types.h>
 #include <time.h>])
 
+dnl explicit call to PKG_PROG_PKG_CONFIG because the first call to
+dnl PKG_CHECK_MODULES{,_NOFAIL} may not happen
+PKG_PROG_PKG_CONFIG
+
 AC_ARG_WITH(libcerf,dnl
 [  --without-libcerf       build without special functions from libcerf (default enabled)],,
   [test -z "${with_libcerf}" && with_libcerf=yes])
@@ -758,10 +762,6 @@ AC_ARG_ENABLE(raise-console,dnl
                 [ Define to treat spacebar like any other keystroke. ])
   fi
 
-
-dnl explicit call to PKG_PROG_PKG_CONFIG because the first call to
-dnl PKG_CHECK_MODULES may not happen
-PKG_PROG_PKG_CONFIG
 
 dnl  wxWidgets terminal
 
