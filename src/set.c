@@ -3130,7 +3130,8 @@ set_mouse()
     PM_update_menu_items();
 #endif
 #else /* USE_MOUSE */
-    c_token++;
+    while (!END_OF_COMMAND)
+	c_token++;
     int_warn(NO_CARET, "this copy of gnuplot has no mouse support");
 #endif /* USE_MOUSE */
 }
