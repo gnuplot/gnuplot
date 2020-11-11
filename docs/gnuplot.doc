@@ -190,8 +190,10 @@ C
            gnuplot-beta@lists.sourceforge.net
 
 2 New features
+3 Development version
 ?new version_5.5
 ?new
+?development version
  Version 5.5 is the current development version, built from a snapshot of the
  source files in the master branch of the git repository. New features
  introduced here will generally not appear in a supported release until
@@ -1288,7 +1290,7 @@ Ffigure_E0
       set cbtics ("-π" -pi, "π" pi)
       set pm3d corners2color c1
       E0(z) = exp(-z)/z
-      I = {0;1}
+      I = {0,1}
       splot '++' using 1:2:(abs(E0(x+I*y))):(arg(E0(x+I*y))) with pm3d
 
 3 Constants
@@ -1361,7 +1363,7 @@ Ffigure_E0
 ^<tr>    <td>besi1(x)</td>   <td>real</td>    <td>Modified Bessel function of order 1, <i>x</i> in radians</td></tr>
 ^<tr>    <td>besin(n,x)</td>   <td>int,real</td><td>Modified Bessel function of order n, <i>x</i> in radians</td></tr>
 ^<tr>    <td>ceil(x)</td>    <td>any</td>    <td>&lceil;<i>x</i>&rceil;, smallest integer not less than <i>x</i> (real part)</td></tr>
-^<tr>    <td>conj(x)</td>    <td>complex</td>    <td>complex conjugate of <i>x</i></td>
+^<tr>    <td>conj(x)</td>    <td>complex</td>    <td>complex conjugate of <i>x</i></td></tr>
 ^<tr>    <td>cos(x)</td>    <td>radians</td>    <td>cos <i>x</i>, cosine of <i>x</i></td></tr>
 ^<tr>    <td>cosh(x)</td>    <td>any</td>    <td>cosh <i>x</i>, hyperbolic cosine of <i>x</i> in radians</td></tr>
 ^<tr>    <td>EllipticK(k)</td>    <td>real k in (-1:1)</td>    <td><i>K(k)</i> complete elliptic integral of the first kind</td></tr>
@@ -1375,11 +1377,11 @@ Ffigure_E0
 ^<tr>    <td>gamma(x)</td>    <td>any</td>    <td>&Gamma;(Re(<i>x</i>)), gamma function of real(<i>x</i>)</td></tr>
 ^<tr>    <td>ibeta(p,q,x)</td>    <td>any</td>    <td>ibeta(Re(<i>p,q,x</i>)), ibeta function of real(<i>p</i>,<i>q</i>,<i>x</i>)</td></tr>
 ^<tr>    <td>inverf(x)</td>    <td>any</td>    <td>inverse error function real(<i>x</i>)</td></tr>
-^<tr>    <td>igamma(a,z)</td>    <td>real</td>    <td>igamma(<i>a>0,z</i>), igamma function of complex <a>a>0</a>,<i>z</i>)</td></tr>
+^<tr>    <td>igamma(a,z)</td>    <td>complex</td>    <td>igamma(<i>a&gt;0,z</i>), igamma function of complex <a>a>0</a>,<i>z</i></td></tr>
 ^<tr>    <td>imag(x)</td>    <td>complex</td>    <td>Im(<i>x</i>), imaginary part of <i>x</i> as a real number</td></tr>
 ^<tr>    <td>int(x)</td>    <td>real</td>    <td>integer part of <i>x</i>, truncated toward zero</td></tr>
-^<tr>    <td>invibeta(a,b,p)</td>    <td>0<p<1</td>    <td>inverse incomplete beta function</td></tr>
-^<tr>    <td>invigamma(a,p)</td>    <td>0<p<1</td>    <td>inverse incomplete gamma function</td></tr>
+^<tr>    <td>invibeta(a,b,p)</td>    <td>0&lt;p&lt;1</td>    <td>inverse incomplete beta function</td></tr>
+^<tr>    <td>invigamma(a,p)</td>    <td>0&lt;p&lt;1</td>    <td>inverse incomplete gamma function</td></tr>
 ^<tr>    <td>invnorm(x)</td>    <td>any</td>    <td>inverse normal distribution function real(<i>x</i>)</td></tr>
 ^<tr>    <td>LambertW(z,k)</td> <td>complex, int</td> <td>kth branch of complex Lambert W function</td></tr>
 ^<tr>    <td>lambertw(x)</td>    <td>real</td>    <td>principal branch (k=0) of Lambert <i>W</i> function</td></tr>
@@ -1391,7 +1393,7 @@ Ffigure_E0
 ^<tr>    <td>rand(x)</td>    <td>int</td>    <td>pseudo random number in the interval (0:1)</td></tr>
 ^<tr>    <td>real(x)</td>    <td>any</td>    <td>Re(<i>x</i>), real part of <i>x</i></td></tr>
 ^<tr>    <td>sgn(x)</td>    <td>any</td>    <td>1 if <i>x</i> &gt; 0,  -1 if <i>x</i> &lt; 0,  0 if <i>x</i> = 0. &image;(<i>x</i>) ignored</td></tr>
-^<tr>    <td>Sign(x)</td>    <td>complex</td>    <td> 0 if <i>x</i> = 0, otherwise <i>x</i>/|<i>x></i>|</td></tr>
+^<tr>    <td>Sign(x)</td>    <td>complex</td>    <td> 0 if <i>x</i> = 0, otherwise <i>x</i>/|<i>x</i>|</td></tr>
 ^<tr>    <td>sin(x)</td>    <td>any</td>    <td>sin <i>x</i>, sine of <i>x</i></td></tr>
 ^<tr>    <td>sinh(x)</td>    <td>any</td>    <td>sinh <i>x</i>, hyperbolic sine of <i>x</i> in radians</td></tr>
 ^<tr>    <td>sqrt(x)</td>    <td>any</td>    <td>&radic;<i>x</i>, square root of <i>x</i></td></tr>
@@ -1721,7 +1723,7 @@ C marker below is used to signal this to doc2html:
 %exp(x)@ ~~ @$e sup x$, exponential function of $x$
  The `exp(x)` function returns `e` raised to the power of x, which can be
  an integer, real, or complex value.
-4 expint
+C 4 expint
 #expint(n,x) & int $n\ge0$, real $x\ge0$ & ~ & $E_n(x)=\int_1^\infty t^{-n} e^{-xt}\,dt$,  exponential integral of $x$ \\
 %expint(n,x)@ ~~ @$E sub n (x)$, exponential integral function of $x$
 4 floor
@@ -1740,7 +1742,7 @@ C marker below is used to signal this to doc2html:
  The `gamma(x)` function returns the gamma function of the real part of its
  argument.  For integer n, gamma(n+1) = n!.  If the argument is a complex
  value, the imaginary component is ignored. For complex arguments see `lnGamma`.
-4 ibeta
+C 4 ibeta
 #ibeta(a,b,x) & $a,b>0$, $x \in [0:1]$ & ~ & $B(a,b,x)=\frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)}\intop_{0}^{x}t^{a-1}(1-t)^{b-1}dt$, incomplete beta \\
 %ibeta(a,b,x)@ ~~ @$ibeta ( roman real (a,b,x))$, ibeta function of real ($a$,$b$,$x$)
 4 inverf
@@ -1750,7 +1752,7 @@ C marker below is used to signal this to doc2html:
 %inverf(x)@ ~~ @inverse error function real($x$)
  The `inverf(x)` function returns the inverse error function of the real part
  of its argument.   See `erf` and `invnorm`.
-4 igamma
+C 4 igamma
 #igamma(a,z) & complex, $\Re(a)>0$ & \gpCX & incompete gamma function $P(a,z)=\frac{1}{\Gamma(z)}\intop_{0}^{z}t^{a-1}e^{-t}dt$ \\
 %igamma(a,z)@ ~~ @$igamma (a,z)$, lower incomplete gamma function of ($a$,$z$)
 4 imag
@@ -1775,11 +1777,11 @@ C marker below is used to signal this to doc2html:
  The `invnorm(x)` function returns the inverse cumulative normal (Gaussian)
  distribution function of the real part of its argument.  See `norm`.
 
-4 invibeta
+C 4 invibeta
 #invibeta(a,b,p) & real & ~ &  inverse incomplete beta function  \\
 %invibeta(a,b,p)@ real @inverse incomplete beta function
 
-4 invigamma
+C 4 invigamma
 #invigamma(a,p) & real & ~ &  inverse incomplete gamma function  \\
 %invigamma(a,p)@ real @inverse incomplete gamma function
 
@@ -1798,13 +1800,13 @@ C marker below is used to signal this to doc2html:
 ?expressions functions lgamma
 ?lgamma
 #lgamma(x) & real & ~ & $\ln\Gamma(x)$  for real $x$  \\
-%lgamma(x)@real@$lgamma function of real  $x$
+%lgamma(x)@real@lgamma function of real  $x$
  The `lgamma(x)` function returns the natural logarithm of the gamma function
  of the real part of its argument.  If the argument is a complex value, the
  imaginary component is ignored.  For complex values use lnGamma(z).
 4 lngamma
 #lnGamma(x) & complex & \gpCX & $\ln\Gamma(x)$ valid over entire complex plane \\
-%lnGamma(x)@complex@$lgamma function valid over entire complex plane
+%lnGamma(x)@complex@lgamma function valid over entire complex plane
  The `lnGamma(x)` function returns the natural logarithm of the gamma function.
  This implementation uses a Lanczos approximation valid over the entire complex
  plane. The imaginary component of the result is phase-shifted to yield a
@@ -1877,7 +1879,7 @@ C marker below is used to signal this to doc2html:
  The `sqrt(x)` function returns the square root of its argument. If the
  x is a complex value, this always returns the root with positive real
  part.
-4 SynchrotronF
+C 4 SynchrotronF
 ?expressions functions SynchrotronF
 #SynchrotronF(x) & real & ~ & $F(x) = x\intop_{x}^{\infty}K_{\frac{5}{3}}(\nu)~d\nu$ \\
 %SynchrotronF(x)@ ~~ @ Synchrotron function F%
@@ -1955,12 +1957,12 @@ C marker below is used to signal this to doc2html:
 #erfi(x)&real&~&imaginary error function $erf(x) = -i * erf(ix)$ \\
  Imaginary error function erfi(x) = -i * erf(ix)
  Requires external library libcerf.
-4 FresnelC
+C 4 FresnelC
 %FresnelC(x)@real@ C(x) = integral[0;x] cos(pi/2 t^2)dt
-#FresnelC(x)&real&~&Fresnel integral $C(x)=\int^{x}_{0} cos(\frac{\pi}{2}t^2)dt$ \\
-4 FresnelS
+#FresnelC(x)&real&~&Fresnel integral $C(x)=\int^{x}_{0}\cos(\frac{\pi}{2}t^2)dt$ \\
+C 4 FresnelS
 %FresnelS(x)@real@ S(x) = integral[0;x] sin(pi/2 t^2)dt
-#FresnelS(x)&real&~&Fresnel integral $S(x)=\int^{x}_{0} sin(\frac{\pi}{2}t^2)dt$ \\
+#FresnelS(x)&real&~&Fresnel integral $S(x)=\int^{x}_{0}\sin(\frac{\pi}{2}t^2)dt$ \\
 4 Voigt Profile
 ?expressions functions VP
 ?expressions functions VP_fwhm
@@ -1993,11 +1995,13 @@ C marker below is used to signal this to doc2html:
 # ~ & ~ & ~ & \hspace{9cm} \\
 
 #Ai(z) & complex & \gpCX &  complex Airy function $Ai(z)$\\
-%Ai(z)@complex@complex error function
+%Ai(z)@complex@complex Airy function $Ai(z)$
 #Bi(z) & complex & \gpCX &  complex Airy function $Bi(z)$\\
-%Bi(z)@complex@complex error function
+%Bi(z)@complex@complex Airy function $Bi(z)$
 #BesselH1(nu,z) & real, complex & \gpCX & $H^{(1)}_{\nu}(z)$ Hankel function of the first kind\\
+%BesselH1(nu,z) @ real, complex @ Hankel function H1_nu of the first kind
 #BesselH2(nu,z) & real, complex & \gpCX & $H^{(2)}_{\nu}(z)$ Hankel function of the second kind\\
+%BesselH2(nu,z) @ real, complex @ Hankel function H2_nu of the second kind
 #BesselJ(nu,z) & real, complex & \gpCX & $J_{\nu}(z)$ Bessel function of the first kind\\
 %BesselJ(nu,z) @ real, complex @ Bessel function J_nu of the first kind
 #BesselY(nu,z) & real, complex & \gpCX & $Y_{\nu}(z)$ Bessel function of the second kind\\
@@ -2306,13 +2310,13 @@ C marker below is used to signal this to doc2html:
  kind, i.e. the definite integral between 0 and pi/2 of the function
  `(1 - k^2*sin^2(p))^(-0.5)`.  The domain of `k` is -1 to 1 (exclusive).
 
-#TeX \quad\quad EllipticK$(k)=\int_0^{\pi/2} {\sqrt{1-k^2sin^2\theta}~}^{-1}~d\theta$
+#TeX \quad\quad EllipticK$(k)=\int_0^{\pi/2} {\sqrt{1-k^2\sin^2\theta}~}^{-1}~d\theta$
 
  The `EllipticE(k)` function returns the complete elliptic integral of the
  second kind, i.e. the definite integral between 0 and pi/2 of the function
  `(1 - k^2*sin^2(p))^0.5`.  The domain of `k` is -1 to 1 (inclusive).
 
-#TeX \quad\quad EllipticE$(k)=\int_0^{\pi/2} {\sqrt{1-k^2sin^2\theta}}~d\theta$
+#TeX \quad\quad EllipticE$(k)=\int_0^{\pi/2} {\sqrt{1-k^2\sin^2\theta}}~d\theta$
 
  The `EllipticPi(n,k)` function returns the complete elliptic integral of the
  third kind, i.e. the definite integral between 0 and pi/2 of the function
@@ -2320,7 +2324,7 @@ C marker below is used to signal this to doc2html:
  than 1, while `k` must lie between -1 and 1 (exclusive).  Note that by
  definition EllipticPi(0,k) == EllipticK(k) for all possible values of `k`.
 
-#TeX \quad\quad EllipticPi$(n,k)=\int_0^{\pi/2} {\big[(1-nsin^2\theta)\sqrt{1-k^2sin^2\theta}~\big]}^{-1}d\theta$
+#TeX \quad\quad EllipticPi$(n,k)=\int_0^{\pi/2} {\big[(1-n\sin^2\theta)\sqrt{1-k^2\sin^2\theta}~\big]}^{-1}d\theta$
 
  Elliptic integral algorithm: B.C.Carlson 1995, Numerical Algorithms 10:13-26.
 
@@ -2401,7 +2405,7 @@ C marker below is used to signal this to doc2html:
  to the complex error function erf(z).  Due to dependence on erf(z),
  these functions are only available if libcerf library support is present.
 
-#TeX \quad\quad $C(x) = \int^{x}_{0} cos(\frac{\pi}{2} t^2)dt$ \quad $S(x) = \int^{x}_{0} sin(\frac{\pi}{2} t^2)dt$
+#TeX \quad\quad $C(x) = \int^{x}_{0}\cos(\frac{\pi}{2} t^2)dt$ \quad $S(x) = \int^{x}_{0}\sin(\frac{\pi}{2} t^2)dt$
 
 #TeX \quad\quad $C(x)+iS(x)=\frac{1+i}{2} erf(z)$ where $z = \frac{\sqrt{\pi}}{2}(1-i)x$
 
@@ -3460,7 +3464,7 @@ Ffigure_newsyntax
  See `set colormap`.
  This option is EXPERIMENTAL. Details may change.
  If the colormap has a separate range associated with it, that range is used
- to map z values analous to the use of cbrange to map the standard palette.
+ to map z values analogous to the use of cbrange to map the standard palette.
  If there is no separate range for this colormap then cbrange is used.
 
 4 rgbcolor variable
@@ -7477,7 +7481,7 @@ Ffigure_zerror
  The `smooth` options have no effect on function plots.
 
  Smoothing in 3D plots (splot) is currently limited to generating a natural
- cubic spline to pass through a set of 3D points.  In the general case the
+ cubic spline to pass through a set of 3D points.  In the general case
  the splines are generated along a trajectory (`smooth path`).  For a 2D
  projection of 3D data `smooth csplines` acts as it does in 2D.
  Either keyword is accepted in an `splot` command.
@@ -10716,7 +10720,7 @@ Ffigure_missing
 %c l .
 %Format@Explanation
 %_
-%%tH@+/- days relative to time=0
+%%tD@+/- days relative to time=0
 %%tH@+/- hours relative to time=0 (does not wrap at 24)
 %%tM@+/- minutes relative to time=0
 %%tS@+/- seconds associated with previous tH or tM field
