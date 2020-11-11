@@ -144,13 +144,13 @@ process_line( char *line, FILE *b)
 	    line[strlen(line)-1]=NUL;
             (void) fputs("\\label{",b);
 	    fputs(line+1, b);
-            (void) fputs("}\n",b);
+            (void) fputs("}%\n",b);
 	    if (!strpbrk(line+1," ")) {	/* Make an index entry also */
 		(void) fputs("\\index{",b);
 		while ((ind = strpbrk(line+1,"-_")))
 		    *ind = ' ';
 		fputs(line+1, b);
-		(void) fputs("}\n",b);
+		(void) fputs("}%\n",b);
 	    }
 	    break;		/* ignore */ /* <- don't ignore */
 
@@ -160,7 +160,7 @@ process_line( char *line, FILE *b)
 	    while ((ind = strpbrk(line+1,"-_")))
 		*ind = ' ';
 	    fputs(line+1, b);
-	    (void) fputs("}\n",b);
+	    (void) fputs("}%\n",b);
 	    break;
 
     case 'F':			/* embedded figure */
