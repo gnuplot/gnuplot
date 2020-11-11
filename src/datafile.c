@@ -1839,8 +1839,10 @@ df_readascii(double v[], int max)
      * This flag will force the line to return NaN rather than being skipped.
      * FIXME: it would be better to make this flag generic and set before entry.
      */
-    TBOOLEAN df_bad_is_NaN
-	= (df_current_plot && (df_current_plot->plot_style == PARALLELPLOT));
+    TBOOLEAN df_bad_returns_NaN
+	= (df_current_plot
+	    && (df_current_plot->plot_style == PARALLELPLOT
+		|| df_current_plot->plot_style == TABLESTYLE));
 
     assert(max <= MAXDATACOLS);
 
@@ -2306,7 +2308,7 @@ df_readascii(double v[], int max)
 			/* line bad only if user explicitly asked for this column */
 			if (df_no_use_specs) {
 			    line_okay = FALSE;
-			    if (df_bad_is_NaN) {
+			    if (df_bad_returns_NaN) {
 				v[output] = not_a_number();
 				return DF_UNDEFINED;
 			    }
@@ -2345,6 +2347,10 @@ df_readascii(double v[], int max)
 		    } else if ((column <= df_no_cols)
 			     && (df_column[column - 1].good == DF_MISSING)) {
 			v[output] = not_a_number();
+			if (missing_val && df_current_plot->plot_style == TABLESTYLE) {
+			    df_strings[output].type = STRING;
+			    df_strings[output].v.string_val = gp_strdup(missing_val);
+			}
 			return_value = DF_MISSING;
 		    } else if ((column <= df_no_cols)
 			     && (df_column[column - 1].good == DF_UNDEFINED)) {
@@ -2353,13 +2359,15 @@ df_readascii(double v[], int max)
 		    } else {
 			/* line bad only if user explicitly asked for this column */
 			if (df_no_use_specs) {
-			    line_okay = FALSE;
-			    if (df_bad_is_NaN) {
+			    if (df_bad_returns_NaN) {
 				v[output] = not_a_number();
-				return DF_UNDEFINED;
+				return_value = DF_UNDEFINED;
+			    } else {
+				line_okay = FALSE;
+				break;      /* return or ignore depending on line_okay */
 			    }
-			}
-			break;      /* return or ignore depending on line_okay */
+			} else
+			    break;      /* return or ignore depending on line_okay */
 		    }
 		}
 		/* Special case to make 'using 0' et al. to work with labels */

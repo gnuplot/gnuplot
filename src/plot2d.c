@@ -693,6 +693,10 @@ get_data(struct curve_points *current_plot)
 		current_plot->points[i].type = UNDEFINED;
 		i++;
 	    }
+	    if (current_plot->plot_style == TABLESTYLE) {
+		j = df_no_use_specs;
+		break;
+	    }
 	    continue;
 
 	case DF_FIRST_BLANK:
