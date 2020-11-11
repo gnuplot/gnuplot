@@ -140,6 +140,7 @@ static TBOOLEAN SVG_mouseable = FALSE;
 static TBOOLEAN SVG_standalone = FALSE;
 static TBOOLEAN SVG_domterm = FALSE;
 static TBOOLEAN SVG_emit_doctype = TRUE;
+static TBOOLEAN SVG_animate = FALSE;
 
 static TBOOLEAN SVG_groupFilledIsOpen = FALSE; /* open pm3d group flag*/
 static TBOOLEAN SVG_inTextBox = FALSE;
@@ -702,6 +703,12 @@ SVG_options ()
 	    continue;
 	}
 
+	if (SVG_domterm && almost_equals(c_token, "anim$ate")) {
+	    c_token++;
+	    SVG_animate = TRUE;
+	    continue;
+	}
+
 	int_error(c_token, "unrecognized terminal option");
     }
 
@@ -746,6 +753,11 @@ SVG_options ()
 	    "background \"#%06x\" ", SVG_background);
     }
 
+    if (SVG_animate) {
+	sprintf(term_options + strlen(term_options),
+	    "animate ");
+    }
+
 }
 
 static void
@@ -765,6 +777,7 @@ SVG_local_reset()
     SVG_scriptdir = NULL;
     SVG_gridline = FALSE;
     SVG_hasgrid = FALSE;
+    SVG_animate = FALSE;
     /* Default to enhanced text */
     term->put_text = ENHsvg_put_text;
     term->flags |= TERM_ENHANCED_TEXT;
@@ -861,8 +874,13 @@ SVG_write_preamble ()
 				break;
     }
 
-    if (SVG_domterm)
-      fprintf(gpoutfile, "\033]72;");
+    if (SVG_domterm) {
+	/* Erase all off-screen lines in terminal buffer */
+	if (SVG_animate)
+	    fprintf(gpoutfile, "\033[3J");
+	fprintf(gpoutfile, "\033]72;");
+    }
+
     if (SVG_emit_doctype)
         fprintf (gpoutfile,
                  "<?xml version=\"1.0\" %s standalone=\"no\"?>\n",
@@ -2354,12 +2372,29 @@ START_HELP(domterm)
 "?set term domterm",
 "?term domterm",
 "?domterm",
+" Syntax:",
+"       set terminal domterm ",
+"                        {font \"<fontname>{,<fontsize>}\"} {{no}enhanced}",
+"                        {fontscale <multiplier>}",
+"                        {rounded|butt|square} {solid|dashed} {linewidth <lw>}",
+"                        {background <rgb_color>}",
+"                        {animate}",
+"",
 " The `domterm` terminal device runs on the DomTerm terminal emulator",
 " including the domterm and qtdomterm programs.",
 " It supports SVG graphics embedded directly in the terminal output.",
 " See http://domterm.org .",
 "",
-" Please read the help for the `svg` terminal.",
+" For information on terminal options, please see the `svg` terminal.",
+"",
+"2 animate",
+"?set term domterm animate",
+"?term domterm animate",
+"      set term domterm animate",
+"",
+" The `animate` option resets the cursor position to the terminal top left at",
+" the start of every plot so that successive plots overwrite the same area on",
+" the screen. This may be desirable in order to create an in-place animation.",
 ""
 END_HELP(domterm)
 #endif /* TERM_HELP */

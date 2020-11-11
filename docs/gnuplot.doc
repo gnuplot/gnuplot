@@ -697,6 +697,15 @@ C
  the corresponding gnuplot script can be downloaded to serve as a model for
  generating similar plots.
 
+2 Animation
+?animation
+ Any of gnuplot's interactive terminals (qt win wxt x11 aqua) can be used
+ to display an animation by plotting successive frames from the command line
+ or from a script.
+
+ Several non-interactive terminals also support some form of animation.
+ See `term gif animate`, `term sixelgd animate`, `term domterm animate`.
+
 2 Batch/Interactive Operation
 ?batch/interactive
  `Gnuplot` may be executed in either batch or interactive modes, and the two
