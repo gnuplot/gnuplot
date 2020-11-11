@@ -399,7 +399,7 @@ process_line(char *line, FILE *b, FILE *c, FILE *d)
 		    /* Continuation of bulleted line */
 		    fputs(line2+2, b);
 		}
-		else {
+		else if (strncmp(line+1, "TeX", 3) != 0) {
 		    if (strchr(line, '\n'))
 			*(strchr(line, '\n')) = '\0';
 		    fprintf(b, "<li><pre>%s</pre>\n", line + 1);
