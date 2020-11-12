@@ -1185,7 +1185,7 @@ plot_impulses(struct curve_points *plot, int yaxis_x, int xaxis_y)
 
 	/* The jitter x offset is a scaled multiple of character width. */
 	if (!polar && jitter.spread > 0)
-	    x += plot->points[i].xhigh * 0.3 * term->h_char;
+	    x += plot->points[i].CRD_XJITTER * 0.3 * term->h_char;
 
 	if (invalid_coordinate(x,y))
 	    continue;
@@ -2368,15 +2368,15 @@ plot_points(struct curve_points *plot)
 	     * vertical jitter y offset is a multiple of character heights.
 	     */
 	    if (jitter.spread > 0) {
-		x += plot->points[i].xhigh * 0.7 * t->h_char;
+		x += plot->points[i].CRD_XJITTER * 0.7 * t->h_char;
 		switch (jitter.style) {
 		    case JITTER_ON_Y:
-			y += plot->points[i].yhigh * 0.7 * t->v_char;
+			y += plot->points[i].CRD_YJITTER * 0.7 * t->v_char;
 			break;
 		    case JITTER_SWARM:
 		    case JITTER_SQUARE:
 		    default:
-			y = map_y(plot->points[i].y + plot->points[i].yhigh);
+			y = map_y(plot->points[i].y + plot->points[i].CRD_YJITTER);
 			break;
 		}
 	    }

@@ -11079,6 +11079,8 @@ Ffigure_missing
  adjust the point size and spread multiplier as appropriate.
  See `coordinates`, `pointsize`.
 
+ Caveat: jitter is incompatible with "pointsize variable".
+
  `set jitter` is also useful in 3D plots of voxel data.  Because voxel grids
  are regular lattices of evenly spaced points, many view angles cause points
  to overlap and/or generate Moiré patterns.  These artifacts can be removed

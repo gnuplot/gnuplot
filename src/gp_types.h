@@ -170,20 +170,28 @@ typedef enum coord_type {
 } coord_type;
 
 
-/* These fields of 'struct coordinate' hold extra properties of 3D data points */
-#define CRD_R yhigh      /* Used by splot styles RGBIMAGE and RGBA_IMAGE */
-#define CRD_G xlow       /* Used by splot styles RGBIMAGE and RGBA_IMAGE */
-#define CRD_B xhigh      /* Used by splot styles RGBIMAGE and RGBA_IMAGE */
-#define CRD_A ylow       /* Used by splot styles RGBIMAGE and RGBA_IMAGE */
-#define CRD_COLOR yhigh  /* Used by all splot styles with variable color */
-#define CRD_ROTATE ylow  /* Used by "with labels" */
-#define CRD_PTSIZE xlow  /* Used by "with points|linespoints|labels" */
-#define CRD_PTTYPE xhigh /* Used by "with points|linespoints|labels" */
-#define CRD_PTCHAR ylow  /* Used by "with points pt variable */
-#define CRD_ZLOW xlow    /* Used by splot style ZERRORFILL */
-#define CRD_ZHIGH xhigh  /* Used by splot style ZERRORFILL */
-#define CRD_PATH xhigh	 /* Used by 3D spline code to hold path coordinate */
-#define PATHCOORD 6	 /*      must match ^^ */
+/* These are aliases of fields in 'struct coordinate' used to hold
+ * extra properties of 3D data points (i.e. anything other than x/y/z)
+ * or of specific plot types.
+ * The aliases are needed because the total number of data slots is limited
+ * to 7: x y z xlow ylow xhigh yhigh
+ * At some point we may need to expand struct coordinate.
+ */
+#define CRD_R yhigh        /* Used by splot styles RGBIMAGE and RGBA_IMAGE */
+#define CRD_G xlow         /* Used by splot styles RGBIMAGE and RGBA_IMAGE */
+#define CRD_B xhigh        /* Used by splot styles RGBIMAGE and RGBA_IMAGE */
+#define CRD_A ylow         /* Used by splot styles RGBIMAGE and RGBA_IMAGE */
+#define CRD_COLOR yhigh    /* Used by all splot styles with variable color */
+#define CRD_ROTATE ylow    /* Used by "with labels" */
+#define CRD_PTSIZE xlow    /* Used by "with points|linespoints|labels" */
+#define CRD_PTTYPE xhigh   /* Used by "with points|linespoints|labels" */
+#define CRD_PTCHAR ylow    /* Used by "with points pt variable */
+#define CRD_ZLOW xlow      /* Used by splot style ZERRORFILL */
+#define CRD_ZHIGH xhigh    /* Used by splot style ZERRORFILL */
+#define CRD_XJITTER xlow   /* Used to hold jitter offset on x */
+#define CRD_YJITTER yhigh  /* Used to hold jitter offset on y */
+#define CRD_PATH xhigh     /* Used by 3D spline code to hold path coordinate */
+#define PATHCOORD 6        /*    must match sequence order of field CRD_PATH */
 
 
 typedef struct coordinate {

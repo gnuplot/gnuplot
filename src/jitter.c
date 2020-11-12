@@ -114,13 +114,14 @@ jitter_points(struct curve_points *plot)
     yoverlap.scaley = jitter.overlap.scalex;
     map_position_r(&yoverlap, &xjit, &ygap, "jitter");
 
-    /* Clear xhigh and yhigh, where we will later store the jitter offsets. */
-    /* Store variable color temporarily in ylow so it is not lost by sorting. */
+    /* Clear data slots where we will later store the jitter offsets.
+     * Store variable color temporarily in z so it is not lost by sorting.
+     */
     for (i = 0; i < plot->p_count; i++) {
 	if (plot->varcolor)
-	    plot->points[i].ylow = plot->varcolor[i];
-	plot->points[i].xhigh = 0.0;
-	plot->points[i].yhigh = 0.0;
+	    plot->points[i].z = plot->varcolor[i];
+	plot->points[i].CRD_XJITTER = 0.0;
+	plot->points[i].CRD_YJITTER = 0.0;
     }
 
     /* Sort points */
@@ -141,15 +142,15 @@ jitter_points(struct curve_points *plot)
 			xjit -= jitter.limit;
 	    if ((j & 01) != 0)
 		    xjit = -xjit;
-	    plot->points[i+j].xhigh = xjit;
+	    plot->points[i+j].CRD_XJITTER = xjit;
 
 	    if (jitter.style == JITTER_SQUARE)
-		plot->points[i+j].yhigh = plot->points[i].y - plot->points[i+j].y;
+		plot->points[i+j].CRD_YJITTER = plot->points[i].y - plot->points[i+j].y;
 
 	    /* Displace points on y instead of x */
 	    if (jitter.style == JITTER_ON_Y) {
-		plot->points[i+j].yhigh = xjit;
-		plot->points[i+j].xhigh = 0;
+		plot->points[i+j].CRD_YJITTER = xjit;
+		plot->points[i+j].CRD_XJITTER = 0;
 	    }
 
 	}
@@ -157,11 +158,10 @@ jitter_points(struct curve_points *plot)
     }
 
     /* Copy variable colors back to where the plotting code expects to find them */
-    if (plot->varcolor)
-	for (i = 0; i < plot->p_count; i++) {
-	    plot->varcolor[i] = plot->points[i].ylow;
-	    plot->points[i].ylow = plot->points[i].y;
-	}
+    if (plot->varcolor) {
+	for (i = 0; i < plot->p_count; i++)
+	    plot->varcolor[i] = plot->points[i].z;
+    }
 
 }
 
