@@ -2333,9 +2333,15 @@ C 4 FresnelS
 ?Ai
 ?expressions functions Bi
 ?Bi
- `Ai(z)` and `Bi(z)` are the Airy functions of complex argument.
+ `Ai(z)` and `Bi(z)` are the Airy functions of complex argument z, computed
+ in terms of the modified Bessel functions K and I.
  Supported via an external library containing routines by Donald E. Amos,
  Sandia National Laboratoris, SAND85-1018 (1985).
+
+#TeX \quad\quad Ai$(z) = \frac{1}{\pi}\sqrt{\frac{z}{3}} K_{\nicefrac{1}{3}}(\zeta)$
+#TeX \quad\quad\quad $\zeta = \frac{2}{3}z^{\nicefrac{3}{2}}$
+
+#TeX \quad\quad Bi$(z) = \sqrt{\frac{z}{3}} {\big[I_{\nicefrac{-1}{3}}(\zeta) + I_{\nicefrac{1}{3}}(\zeta)]}$
 
 4 Complex Bessel functions
 ?expressions functions BesselJ
@@ -2545,8 +2551,8 @@ C 4 FresnelS
  spectrum of synchrotron radiation as a function of x given in units of the
  critical photon energy (i.e. critical frequency vc).
 
-#TeX \quad\quad $F(x) = x\intop_{x}^{\infty}K_{\frac{5}{3}}(\nu)~d\nu$
-#TeX where $K_{\frac{5}{3}}$ is a modified Bessel function of the second kind.
+#TeX \quad\quad $F(x) = x\intop_{x}^{\infty}K_{\nicefrac{5}{3}}(\nu)~d\nu$
+#TeX where $K_{\nicefrac{5}{3}}$ is a modified Bessel function of the second kind.
 
  Chebyshev coefficients for approximation accurate to 1.E-15 are taken from
  MacLead (2000) NuclInstMethPhysRes A443:540-545.
