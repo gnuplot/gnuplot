@@ -43,7 +43,10 @@ The PDF and HTML versions of the gnuplot manual can include hyperlinks to
 demonstration plots.  There is a special makefile target "make pdf"
 to generate and include sample plots directly in the manual itself.
 
-Under EMACS, interactive help uses the file "gnuplot.info" ('make info').
+The "texi" and "info" output formats are used by the gnu info system
+and by the EMACS gnuplot mode.  The gnuplot project no longer supports
+either of these, so their build targets are no longer included by default.
+See README.emacs in the top directory.
 
 On OS/2, the Information Presentation Facility Compiler converts the
 file "gnuplot.ipf" to a "gnuplot.inf" file.
@@ -122,7 +125,7 @@ Here is an example of the DOC master help format:
 Some notes about the format:
 ----------------------------
 Remember that all text must be able to be processed by gnuplot, VMS,
- nroff, troff, info, itl, and latex, and always do something reasonable. 
+ nroff, troff, itl, and latex, and always do something reasonable.
 The first column is reserved for control characters.
 Text does not start in the first column.
 Lines that start in column 2 may be typeset by LaTeX.
