@@ -5026,11 +5026,13 @@ Ffigure_scaled_image
 ?image pixels
 ?pixels
  Some terminals use device- or library-specific optimizations to render image
- data within a rectangular 2D area.  This sometimes produces undesirable output,
- e.g. bad clipping or scaling, missing edges.  The `pixels` keyword tells
- gnuplot to use generic code that renders the image pixel-by-pixel instead.
- This rendering mode is slower and may result in much larger output files, but
- should produce a consistent rendered view on all terminals.
+ data within a rectangular 2D area. This sometimes produces undesirable output,
+ e.g. inter-pixel smoothing, bad clipping or missing edges. An example of this
+ is the smoothing applied by web browsers when rendering svg images.
+ The `pixels` keyword tells gnuplot to use generic code to render the image
+ pixel-by-pixel.  This rendering mode is slower and may result in larger output
+ files, but should produce a consistent rendered view on all terminals.
+ It may in particular be preferable for heatmaps with a small number of pixels.
  Example:
        plot 'data' with image pixels
 
