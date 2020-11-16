@@ -984,7 +984,9 @@ PSTRICKS_set_color(t_colorspec *colorspec)
     switch (colorspec->type) {
     case TC_FRAC:
 	PSTRICKS_color_type = colorspec->type;
-	new_color = (gray <= 0) ? 0 : (int)(gray * sm_palette.colors);
+        if (sm_palette.use_maxcolors != 0)
+            gray = quantize_gray(gray);
+	new_color = (gray <= 0) ? 0 : (gray >= 1) ? sm_palette.colors - 1 : (int)(gray * sm_palette.colors);
 	if (new_color >= PSTRICKS_palette_size)
 	    new_color = PSTRICKS_palette_size - 1;
 	if (PSTRICKS_palette_set == FALSE) {
