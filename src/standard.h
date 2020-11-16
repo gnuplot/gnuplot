@@ -48,6 +48,7 @@
 void f_real(union argument *x);
 void f_imag(union argument *x);
 void f_int(union argument *x);
+void f_round(union argument *x);
 void f_arg(union argument *x);
 void f_conjg(union argument *x);
 void f_sin(union argument *x);

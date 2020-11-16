@@ -858,6 +858,15 @@ f_ellip_third(union argument *arg)
 
 }
 
+/* int(x) returns the integer portion of x, rounded towards zero.
+ * This is trunc(x) as defined in C99 except that we always return an int.
+ * If x > largest 64bit int we return NaN.
+ * Unlike floor, ceil, and round,  int(x) will return an int even if x
+ * is so large that the limited precision in the floating point representation
+ * means that several integers share that same representation.
+ * This turns out to be roughly the range 10^15 < x < 10^19.
+ * I.e. in that range |int(real(N)) - N| may be non-zero.
+ */
 void
 f_int(union argument *arg)
 {
@@ -868,12 +877,39 @@ f_int(union argument *arg)
     if (a.type == NOTDEFINED || isnan(foo)) {
 	push(Gcomplex(&a, not_a_number(), 0.0));
 	undefined = TRUE;
-    } else if (fabs(foo) > LARGEST_GUARANTEED_NONOVERFLOW) {
+    } else if (a.type == INTGR) {
+	push(&a);
+    } else if (fabs(foo) >= LARGEST_GUARANTEED_NONOVERFLOW) {
 	if (overflow_handling == INT64_OVERFLOW_UNDEFINED)
 	    undefined = TRUE;
 	push(Gcomplex(&a, not_a_number(), 0.0));
     } else
-	push(Ginteger(&a, (intgr_t)foo));
+	push(Ginteger(&a, (intgr_t)trunc(foo)));
+}
+
+/* round(x) returns the integer nearest to the real part of x.
+ * This is a wrapper for llround(x) as defined in C99.
+ * If x is so large that round(x) would not necessarily be the nearest int
+ * due to limited precision, we return NaN rather than an incorrect integer.
+ */
+void
+f_round(union argument *arg)
+{
+    struct value a;
+    double foo = real(pop(&a));
+    (void) arg;			/* avoid -Wunused warning */
+
+    if (a.type == NOTDEFINED || isnan(foo)) {
+	push(Gcomplex(&a, not_a_number(), 0.0));
+	undefined = TRUE;
+    } else if (a.type == INTGR) {
+	push(&a);
+    } else if (fabs(foo) >= LARGEST_EXACT_INT/2.) {
+	if (overflow_handling == INT64_OVERFLOW_UNDEFINED)
+	    undefined = TRUE;
+	push(Gcomplex(&a, not_a_number(), 0.0));
+    } else
+	push(Ginteger(&a, (intgr_t)llround(foo)));
 }
 
 #define BAD_DEFAULT default: int_error(NO_CARET, "internal error : argument neither INT or CMPLX")
@@ -983,6 +1019,10 @@ f_log(union argument *arg)
 }
 
 
+/* This is a wrapper for C99 floor(x) except that we always return an int.
+ * If x is so large that floor(x) would not necessarily be the nearest int
+ * due to limited precision, we return NaN rather than an incorrect integer.
+ */
 void
 f_floor(union argument *arg)
 {
@@ -999,7 +1039,7 @@ f_floor(union argument *arg)
     case CMPLX:
 	foo = a.v.cmplx_val.real;
 	/* Note: this test catches NaN also */
-	if (!(fabs(foo) < LARGEST_GUARANTEED_NONOVERFLOW)) {
+	if (!(fabs(foo) < LARGEST_EXACT_INT/2.)) {
 	    if (overflow_handling == INT64_OVERFLOW_UNDEFINED)
 		undefined = TRUE;
 	    push(Gcomplex(&a, not_a_number(), 0.0));
@@ -1012,6 +1052,10 @@ f_floor(union argument *arg)
 }
 
 
+/* This is a wrapper for C99 ceil(x) except that we always return an int.
+ * If x is so large that ceil(x) would not necessarily be the nearest int
+ * due to limited precision, we return NaN rather than an incorrect integer.
+ */
 void
 f_ceil(union argument *arg)
 {
@@ -1028,7 +1072,7 @@ f_ceil(union argument *arg)
     case CMPLX:
 	foo = a.v.cmplx_val.real;
 	/* Note: this test catches NaN also */
-	if (!(fabs(foo) < LARGEST_GUARANTEED_NONOVERFLOW)) {
+	if (!(fabs(foo) < LARGEST_EXACT_INT/2.)) {
 	    if (overflow_handling == INT64_OVERFLOW_UNDEFINED)
 		undefined = TRUE;
 	    push(Gcomplex(&a, not_a_number(), 0.0));

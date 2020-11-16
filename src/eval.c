@@ -168,6 +168,7 @@ const struct ft_entry ft[] =
     {"EllipticE",  f_ellip_second},
     {"EllipticPi", f_ellip_third},
     {"int",  f_int},
+    {"round",  f_round},
     {"abs",  f_abs},
     {"sgn",  f_sgn},
     {"sqrt",  f_sqrt},
