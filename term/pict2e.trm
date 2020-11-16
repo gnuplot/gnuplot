@@ -842,7 +842,7 @@ PICT2E_set_color(t_colorspec *colorspec)
     case TC_FRAC: {
 	rgb_color color;
 
-	rgb1_from_gray(colorspec->value, &color);
+	rgb1maxcolors_from_gray(colorspec->value, &color);
 	snprintf(pict2e_new_color, sizeof(pict2e_new_color),
 		"\\color[rgb]{%3.2f,%3.2f,%3.2f}\n", color.r, color.g, color.b);
 	break;
