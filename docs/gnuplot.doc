@@ -1649,15 +1649,12 @@ C marker below is used to signal this to doc2html:
 %besin(x)@int,real@ Modified Bessel function of order n, $x$ in radians
  `besin(n,x)` is the modified Bessel function or order n for integer n and
  x in radians.
-4 ceil
+C 4 ceil
 ?expressions functions ceil
-?ceil
-#ceil(x) &  ~~  & ~ & $\lceil x \rceil$, smallest integer not less than $x$
-#(real part) \\
+#ceil(x) &  ~~  & ~ & $\lceil x \rceil$, smallest integer not less than the real part of $x$ \\
 %ceil(x)@ ~~ @$left ceiling x right ceiling$, smallest integer not less than $x$ (real part)
- The `ceil(x)` function returns the smallest integer that is not less than its
- argument.  For complex numbers, `ceil` returns the smallest integer not less
- than the real part of its argument.
+ `ceil(x)` returns the smallest integer not less than the real part of x.
+ Outside the domain |x|<2^52 ceil(x) returns NaN.
 4 conj
 ?expressions functions conj
 ?conj
@@ -1726,15 +1723,13 @@ C marker below is used to signal this to doc2html:
 C 4 expint
 #expint(n,x) & int $n\ge0$, real $x\ge0$ & ~ & $E_n(x)=\int_1^\infty t^{-n} e^{-xt}\,dt$,  exponential integral of $x$ \\
 %expint(n,x)@ ~~ @$E sub n (x)$, exponential integral function of $x$
-4 floor
+C 4 floor
 ?expressions functions floor
-?floor
 #floor(x) &  ~~  & ~ & $\lfloor x \rfloor$,  largest integer not greater
-#than $x$ (real part) \\
+#than the real part of $x$ \\
 %floor(x)@ ~~ @$left floor x right floor$, largest integer not greater than $x$ (real part)
- The `floor(x)` function returns the largest integer not greater than its
- argument.  For complex numbers, `floor` returns the largest integer not
- greater than the real part of its argument.
+ `floor(x)` returns the largest integer not greater than the real part of x.
+ Outside the domain |x|<2^52 floor(x) returns NaN.
 4 gamma
 ?expressions functions gamma
 #gamma(x) &  ~~  & ~ & $\Gamma(x)$, gamma function of real($x$) \\
@@ -1762,13 +1757,11 @@ C 4 igamma
 %imag(x)@complex@imaginary part of $x$ as a real number
  The `imag(x)` function returns the imaginary part of its argument as a real
  number.
-4 int
+C 4 int
 ?expressions functions int
-?int
 #int(x) & real & ~ &  integer part of $x$, truncated toward zero \\
 %int(x)@real@integer part of $x$, truncated toward zero
- The `int(x)` function returns the integer part of its argument, truncated
- toward zero.
+ int(x) returns the integer part of its argument, truncated toward zero.
 4 invnorm
 ?expressions functions invnorm
 ?invnorm
@@ -1844,6 +1837,12 @@ C 4 invigamma
 #real(x) &  ~~  & ~ &  real part of $x$ \\
 %real(x)@ ~~ @real part of $x$
  The `real(x)` function returns the real part of its argument.
+C 4 round
+?expressions functions round
+#round(x) &  ~~  & ~ & $\lfloor x \rceil$,  integer nearest to the real part of $x$ \\
+%round(x)@ ~~ @ integer nearest to the real part of $x$
+ `round(x)` returns the integer nearest to the real part of x.
+ Outside the domain |x|<2^52 round(x) returns NaN.
 4 sgn
 ?expressions functions sgn
 ?sgn
@@ -2303,24 +2302,73 @@ C 4 FresnelS
  See `splot voxel-grids`, `vgrid`.
 @end table
 
+4 integer conversion functions: int floor ceil round
+?integer conversion
+?integer
+?precision
+ Gnuplot integer variables are stored with 64 bits of precision if that is
+ supported by the platform.
+
+ Gnuplot complex and real variables are on most platforms stored in IEEE754
+ binary64 (double) floating point representation. Their precision is limited
+ to 53 bits, corresponding to roughly 16 significant digits.
+
+ Therefore integers with absolute value larger than 2^53 cannot be uniquely
+ represented in a floating point variable.  I.e. for large N the operation
+ int(real(N)) may return an integer near but not equal to N.
+
+ Furthermore, functions that convert from a floating point value to an integer
+ by truncation may not yield the expected value if the operation depends on
+ more than 15 significant digits of precision even if the magnitude is small.
+ For example int(log10(0.1)) returns 0 rather than -1 because the floating
+ point representation is equivalent to -0.999999999999999...
+ See also `overflow`.
+
+?expressions functions int
+?int
+ `int(x)` returns the integer part of its argument, truncated toward zero.
+ If |x| > 2^63, i.e. too large to represent as an integer, NaN is returned.
+ If |x| > 2^52 the return value will lie within a range of neighboring integers
+ that cannot be distinguished due to limited floating point precision.
+ See `integer conversion`.
+
+?expressions functions floor
+?floor
+ `floor(x)` returns the largest integer not greater than the real part of x.
+ If |x| > 2^52 the true value cannot be uniquely determined; in this case the
+ return value is NaN.  See `integer conversion`.
+
+?expressions functions ceil
+?ceil
+ `ceil(x)` returns the smallest integer not less than the real part of x.
+ If |x| > 2^52 the true value cannot be uniquely determined; in this case the
+ return value is NaN.  See `integer conversion`.
+
+?expressions functions round
+?round
+ `round(x)` returns the integer nearest to the real part of x.
+ If |x| > 2^52 the true value cannot be uniquely determined; in this case the
+ return value is NaN.  See `integer conversion`.
+
 4 elliptic integrals
 ?elliptic integrals
+?elliptic
 =elliptic integrals
  The `EllipticK(k)` function returns the complete elliptic integral of the first
  kind, i.e. the definite integral between 0 and pi/2 of the function
- `(1 - k^2*sin^2(p))^(-0.5)`.  The domain of `k` is -1 to 1 (exclusive).
+ `(1 - k^2*sin^2(θ))^(-0.5)`.  The domain of `k` is -1 to 1 (exclusive).
 
 #TeX \quad\quad EllipticK$(k)=\int_0^{\pi/2} {\sqrt{1-k^2\sin^2\theta}~}^{-1}~d\theta$
 
  The `EllipticE(k)` function returns the complete elliptic integral of the
  second kind, i.e. the definite integral between 0 and pi/2 of the function
- `(1 - k^2*sin^2(p))^0.5`.  The domain of `k` is -1 to 1 (inclusive).
+ `(1 - k^2*sin^2(θ))^0.5`.  The domain of `k` is -1 to 1 (inclusive).
 
 #TeX \quad\quad EllipticE$(k)=\int_0^{\pi/2} {\sqrt{1-k^2\sin^2\theta}}~d\theta$
 
  The `EllipticPi(n,k)` function returns the complete elliptic integral of the
  third kind, i.e. the definite integral between 0 and pi/2 of the function
- `(1 - k^2*sin^2(p))^(-0.5) / (1  - n*sin^2(p))`.  The parameter `n` must be less
+ `(1 - k^2*sin^2(θ))^(-0.5) / (1  - n*sin^2(θ))`.  The parameter `n` must be less
  than 1, while `k` must lie between -1 and 1 (exclusive).  Note that by
  definition EllipticPi(0,k) == EllipticK(k) for all possible values of `k`.
 
@@ -2545,8 +2593,8 @@ C 4 FresnelS
  libopenspecfun.  See `expint`.
 
 4 Synchrotron function
+?expressions functions SynchrotronF
 ?SynchrotronF
-?functions SynchrotronF
  The synchrotron function SynchrotronF(x) describes the power distribution
  spectrum of synchrotron radiation as a function of x given in units of the
  critical photon energy (i.e. critical frequency vc).
