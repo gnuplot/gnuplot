@@ -879,10 +879,15 @@ f_int(union argument *arg)
 	undefined = TRUE;
     } else if (a.type == INTGR) {
 	push(&a);
+#ifdef GNUPLOT_INT64_SUPPORT
     } else if (fabs(foo) >= LARGEST_GUARANTEED_NONOVERFLOW) {
 	if (overflow_handling == INT64_OVERFLOW_UNDEFINED)
 	    undefined = TRUE;
 	push(Gcomplex(&a, not_a_number(), 0.0));
+#else
+    } else if (fabs(foo) > LARGEST_GUARANTEED_NONOVERFLOW) {
+	push(Gcomplex(&a, not_a_number(), 0.0));
+#endif
     } else
 	push(Ginteger(&a, (intgr_t)trunc(foo)));
 }
@@ -904,10 +909,15 @@ f_round(union argument *arg)
 	undefined = TRUE;
     } else if (a.type == INTGR) {
 	push(&a);
+#ifdef GNUPLOT_INT64_SUPPORT
     } else if (fabs(foo) >= LARGEST_EXACT_INT/2.) {
 	if (overflow_handling == INT64_OVERFLOW_UNDEFINED)
 	    undefined = TRUE;
 	push(Gcomplex(&a, not_a_number(), 0.0));
+#else
+    } else if (fabs(foo) >= LARGEST_GUARANTEED_NONOVERFLOW) {
+	push(Gcomplex(&a, not_a_number(), 0.0));
+#endif
     } else
 	push(Ginteger(&a, (intgr_t)llround(foo)));
 }
@@ -1038,11 +1048,16 @@ f_floor(union argument *arg)
 	break;
     case CMPLX:
 	foo = a.v.cmplx_val.real;
+#ifdef GNUPLOT_INT64_SUPPORT
 	/* Note: this test catches NaN also */
 	if (!(fabs(foo) < LARGEST_EXACT_INT/2.)) {
 	    if (overflow_handling == INT64_OVERFLOW_UNDEFINED)
 		undefined = TRUE;
 	    push(Gcomplex(&a, not_a_number(), 0.0));
+#else
+	if (fabs(foo) >= LARGEST_GUARANTEED_NONOVERFLOW) {
+	    push(Gcomplex(&a, not_a_number(), 0.0));
+#endif
 	} else {
 	    push(Ginteger(&a, (intgr_t) floor(foo)));
 	}
@@ -1071,11 +1086,16 @@ f_ceil(union argument *arg)
 	break;
     case CMPLX:
 	foo = a.v.cmplx_val.real;
+#ifdef GNUPLOT_INT64_SUPPORT
 	/* Note: this test catches NaN also */
 	if (!(fabs(foo) < LARGEST_EXACT_INT/2.)) {
 	    if (overflow_handling == INT64_OVERFLOW_UNDEFINED)
 		undefined = TRUE;
 	    push(Gcomplex(&a, not_a_number(), 0.0));
+#else
+	if (fabs(foo) >= LARGEST_GUARANTEED_NONOVERFLOW) {
+	    push(Gcomplex(&a, not_a_number(), 0.0));
+#endif
 	} else {
 	    push(Ginteger(&a, (intgr_t) ceil(foo)));
 	}
