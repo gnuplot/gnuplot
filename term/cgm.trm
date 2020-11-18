@@ -832,8 +832,10 @@ CGM_set_font(const char *font)
     size = cgm_fontsize;
     if (comma)
 	sscanf(comma + 1, "%d", &size);
-    t->v_char = size * CGM_PT;
-    t->h_char = size * CGM_PT * .527 * width;
+    if (size > 0) {
+	t->v_char = size * CGM_PT;
+	t->h_char = size * CGM_PT * .527 * width;
+    }
 
     cgm_next.char_height = t->v_char;
 
