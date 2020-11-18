@@ -2340,7 +2340,8 @@ enhanced_recursion(
 		    uint32_t codepoint;
 		    unsigned char utf8char[8];
 		    int i, length;
-
+		    if (strlen(&(p[3])) < 4)
+			break;
 		    if (sscanf(&(p[3]), "%5x", &codepoint) != 1)
 			break;
 		    length = ucs4toutf8(codepoint, utf8char);
