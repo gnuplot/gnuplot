@@ -630,17 +630,25 @@ DUMB_vector(unsigned int arg_x, unsigned int arg_y)
 
 
 static void
-utf8_copy_one(char *dest, char *orig)
+utf8_copy_one(char *dest, const char *orig)
 {
+    const char *nextchar = orig;
+    unsigned long wch;
     *((charcell *)dest) = 0;	/* zero-fill */
-    *dest = *orig;		/* first char */
-    if (encoding != S_ENC_UTF8)
+
+    if (encoding != S_ENC_UTF8) {
+	*dest = *orig;
 	return;
-    if ((*dest & 0x80) == 0)	/* ascii char */
-	return;
-    orig++; dest++;
-    while ((*orig & 0xc0) == 0x80)
+    }
+
+    /* Valid UTF8 byte sequence */
+    if (utf8toulong(&wch, &nextchar)) {
+	while (orig < nextchar)
+	    *dest++ = *orig++;
+    } else {
+	int_warn(NO_CARET, "invalid UTF-8 byte sequence");
 	*dest++ = *orig++;
+    }
 }
 
 TERM_PUBLIC void
