@@ -375,10 +375,11 @@ TBOOLEAN contains8bit(const char *s)
  * UTF-8 functions
  */
 
-#define INVALID_UTF8 0xfffful
+#define INVALID_UTF8 0xFFFDul
 
 /* Read from second byte to end of UTF-8 sequence.
-used by utf8toulong() */
+ * used by utf8toulong()
+ */
 static TBOOLEAN
 utf8_getmore (unsigned long * wch, const char **str, int nbytes)
 {
@@ -407,8 +408,8 @@ utf8_getmore (unsigned long * wch, const char **str, int nbytes)
 
 
 /* Convert UTF-8 multibyte sequence from string to unsigned long character.
-Returns TRUE on success.
-*/
+ * Returns TRUE on success.
+ */
 TBOOLEAN
 utf8toulong (unsigned long * wch, const char ** str)
 {
@@ -435,6 +436,10 @@ utf8toulong (unsigned long * wch, const char ** str)
 	return utf8_getmore(wch, str, 3);
     }
 
+    /* Note: 5 and 6 byte UTF8 sequences are no longer valid
+     *       according to RFC 3629 (Nov 2003)
+     */
+#if (0)
     if ((c & 0xfc) == 0xf8) {
 	*wch = c & 0x03;
 	return utf8_getmore(wch, str, 4);
@@ -444,6 +449,7 @@ utf8toulong (unsigned long * wch, const char ** str)
 	*wch = c & 0x01;
 	return utf8_getmore(wch, str, 5);
     }
+#endif
 
     *wch = INVALID_UTF8;
     return FALSE;
@@ -451,9 +457,9 @@ utf8toulong (unsigned long * wch, const char ** str)
 
 
 /*
-* Convert unicode codepoint to UTF-8
-* returns number of bytes in the UTF-8 representation
-*/
+ * Convert unicode codepoint to UTF-8
+ * returns number of bytes in the UTF-8 representation
+ */
 int
 ucs4toutf8(uint32_t codepoint, unsigned char *utf8char)
 {
@@ -484,8 +490,9 @@ ucs4toutf8(uint32_t codepoint, unsigned char *utf8char)
 
 
 /*
-* Returns number of (possibly multi-byte) characters in a UTF-8 string
-*/
+ * Returns number of (possibly multi-byte) characters in a UTF-8 string
+ * FIXME: reject/ignore/warn on invalid byte sequences?
+ */
 size_t
 strlen_utf8(const char *s)
 {
