@@ -44,3 +44,6 @@ if (ARGC == 0) {
     if (exists("ARGV")) { print "ARGV = ", ARGV }
     plot $DATA using ($1):($2) title "Does $1 clobber using spec?"
 }
+
+unset table
+reset
