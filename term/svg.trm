@@ -114,8 +114,8 @@ TERM_PUBLIC void SVG_image(unsigned m, unsigned n, coordval *image, gpiPoint *co
 static int SVG_imageno = 0;
 #endif
 
-#define SVG_SCALE	10.	/* Coordinates accuracy is 1/SVG_SCALE pixel */
-#define PREC		1	/* Decimal places needed for SVG_SCALEd values */
+#define SVG_SCALE	100.	/* Coordinate accuracy is 1/SVG_SCALE pixel */
+#define PREC		2	/* Decimal places needed for SVG_SCALEd values */
 #define Y(y) ((float)((int)term->ymax - (int)y) / SVG_SCALE)
 #define X(x) ((float)(x) / SVG_SCALE)
 
