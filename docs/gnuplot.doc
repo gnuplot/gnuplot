@@ -271,6 +271,13 @@ C
 ## modifications not easily specified in a `set palette` command.
 #end
 
+4 New terminals and terminal options
+#start
+#b New terminal `block` for text-mode pseudo-graphics uses Unicode
+## block or Braille characters to offer improved resolution compared
+## to the `dumb` or `caca` terminals.
+#end
+
 4 Other new features
 ?new other
 #start

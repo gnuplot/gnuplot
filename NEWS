@@ -8,6 +8,7 @@ Changes not in 5.4
 * NEW up to 256 colors with the sixeltek terminal
 * NEW keyword "smooth kdensity period <val>"
 * NEW if ... else if ... else
+* NEW terminal "blocks" uses pseudo-graphics for terminal mode graphics
 * CHANGE account for font size when estimating string extents
 * CHANGE "stats <non-existant file>" yields a testable non-fatal error
 * CHANGE criterion for fallback to default axes in 'plot with ellipse'

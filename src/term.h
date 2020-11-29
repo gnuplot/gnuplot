@@ -230,6 +230,11 @@
 # include "caca.trm"
 #endif
 
+/* pseudo-graphics using block or Braille characters */
+#ifndef NO_BITMAP_SUPPORT
+# include "block.trm"
+#endif
+
 /* Legacy terminal for export to AutoCad (Release 10.x)
  * DWGR10 format (1988)
  * Still included by popular demand although basically untouched for 20+ years.
