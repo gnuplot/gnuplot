@@ -285,9 +285,6 @@ typedef unsigned uintgr_t;	/* no C99 types available */
 #define LARGEST_EXACT_INT 9007199254740992.	/* IEEE 754 double 53-bit mantissa  2^53*/
 #endif
 
-#ifndef uint32_t
-typedef u_int32_t uint32_t;
-#endif
 /*
  * Support for complex-valued functions
  */
