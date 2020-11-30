@@ -1,15 +1,37 @@
-		Gnuplot Version 5.4 Release Notes
-		=================================
+		Gnuplot Version 5.4.1 Release Notes
+		===================================
 
-Gnuplot version 5.4 patchlevel 0 is the start of a new supported release
-series with many new features and a few changes to features that were
-present in previous versions.  Gnuplot development is now tracked in a git
-repository on SourceForge.  You can generate a complete history of changes
-using "git log" after downloading:
+This release contains bug-fixes and a few changes back-ported from the
+development version.
 
-    git clone -b branch-5-4-stable git://git.code.sf.net/p/gnuplot/gnuplot-main
+Release Notes date: 01-Dec-2020
 
-Release Notes date: 13-Jul-2020
+Changes in 5.4.1
+================
+* NEW "with rgbimage" and "with rgbalpha" accept single column ARGB input
+* NEW keyword "smooth kdensity period <val>"
+* NEW time format %tD encodes days relative to time 0
+* NEW pm3d quadrangles in 2D projection are clipped smoothly to x and y
+* CHANGE increase svg coordinate precision to two decimal points Bug #2369
+* FIX y autoscaling of default "with filledcurves" Bug #2294
+* FIX placement of mirrored x and y tics in mode 'set view projection ...'
+* FIX pm3d lighting calculation for degenerate quadrangles
+* FIX botched deprecation of old syntax for "call" arguments Bug #2298 #2368
+* FIX pm3d "depthorder" affects 'set obj polygon' with >4 vertices Bug #2297
+* FIX loss of precision for asin(x), asinh(x) with real x << 0 Bug #2302
+* FIX error handling of bad font name in enhanced text Bugs #2303 #2308
+* FIX incomplete domain for complex acosh(x), real x < -1 was treated as NaN
+* FIX error handling of fuzzed input  Bugs #2306 #2307 #2309 #2312 #2344
+* FIX add range check for plot of binned data (allows clipping on y)
+* FIX "unzoom" applied to autoscaled volatile data
+* FIX no default for binary columns needed if there is a 'using' spec Bug #2315
+* FIX buffer overflow of enhanced text fragment  Bugs #2310 #2311
+* FIX qnorm and Hann functions applied in dgrid3d Bugs #2277 #2318
+* FIX handling of dashtype given as a string with leading whitespace Bug #2336
+* FIX preserve key position across isolated instance of "title at x,y" Bug #2342
+* FIX contour labels had spurious point symbols
+* FIX allow "pointtype variable" in combination with jitter Bug #2354
+* FIX more checks for valid UTF-8 Bugs #2362 #2364
 
 Features introduced in version 5.4
 ==================================
@@ -238,7 +260,7 @@ Installation instructions are available in the source itself; the short
 version for linux/unix-like systems is to unpack the tarball and then
 <PRE>
 build it:
-      cd gnuplot-5.4.0 ; ./configure ; make
+      cd gnuplot-5.4.1 ; ./configure ; make
 test it:
       make check
 install it:
