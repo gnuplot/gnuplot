@@ -2,7 +2,11 @@
 		===================================
 
 This release contains bug-fixes and a few changes back-ported from the
-development version.
+development version. Gnuplot development is now tracked in a git repository
+on SourceForge. You can generate a complete history of changes using "git log"
+after downloading:
+
+	git clone -b branch-5-4-stable git://git.code.sf.net/p/gnuplot/gnuplot-main
 
 Release Notes date: 01-Dec-2020
 
