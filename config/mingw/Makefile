@@ -1095,11 +1095,11 @@ endif
 #	-cp -p $(TOP)/win/README-testing-ja.txt $(DESTDIR)/
 	-unix2dos $(DESTDIR)/*.txt $(DESTDIR)/README
 	-unix2dos $(DESTDIR)/Copyright $(DESTDIR)/NEWS $(DESTDIR)/BUGS $(DESTDIR)/RELEASE_NOTES
-# demo and contrib
-	mkdir -p $(DESTDIR)/demo
-	-cp -pr $(M)* $(DESTDIR)/demo/
-#	mkdir -p $(DESTDIR)/demo/games
-#	-cp -p $(M)/games/* $(DESTDIR)/demo/games/
+# demo and contrib (exclude demo/plugin and demo/html)
+	-mkdir -p $(DESTDIR)/demo
+	-cp -p $(M)* $(DESTDIR)/demo/
+	-mkdir -p $(DESTDIR)/demo/games
+	-cp -p $(M)/games/* $(DESTDIR)/demo/games/
 # docs
 	mkdir -p $(DESTDIR)/docs
 	-cp -p gnuplot.pdf $(DESTDIR)/docs/
