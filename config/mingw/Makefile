@@ -1117,20 +1117,22 @@ endif
 ifdef DLLS
 ifdef MINGW64
 ifndef M32
-	ldd gnuplot.exe | cut -d " " -f 3 | grep "^/mingw64/bin" | sort | uniq | xargs -t -i cp {} $(DESTDIR)/bin
 ifdef QT
-	ldd gnuplot_qt.exe | cut -d " " -f 3 | grep "^/mingw64/bin" | sort | uniq | xargs -t -i cp {} $(DESTDIR)/bin
+	ldd gnuplot.exe gnuplot_qt.exe | cut -d " " -f 3 | grep "^/mingw64/bin" | sort | uniq | xargs -t -i cp {} $(DESTDIR)/bin
 	-mkdir $(DESTDIR)/bin/platforms
 	cp /mingw64/share/qt5/plugins/platforms/qminimal.dll $(DESTDIR)/bin/platforms
-	cp /mingw64/share/qt5/plugins/platforms/qwindows.dll $(DESTDIR)/bin/platforms
+	cp /mingw64/share/qt5/plugins/platforms/qwindows.dll $(DnESTDIR)/bin/platforms
+else
+	ldd gnuplot.exe | cut -d " " -f 3 | grep "^/mingw64/bin" | sort | uniq | xargs -t -i cp {} $(DESTDIR)/bin
 endif # QT
 else # !M32
-	ldd gnuplot.exe gnuplot_qt.exe | cut -d " " -f 3 | grep "^/mingw32/bin" | sort | uniq | xargs -t -i cp {} $(DESTDIR)/bin
 ifdef QT
-	ldd gnuplot_qt.exe gnuplot_qt.exe | cut -d " " -f 3 | grep "^/mingw32/bin" | sort | uniq | xargs -t -i cp {} $(DESTDIR)/bin
+	ldd gnuplot.exe gnuplot_qt.exe | cut -d " " -f 3 | grep "^/mingw32/bin" | sort | uniq | xargs -t -i cp {} $(DESTDIR)/bin
 	-mkdir $(DESTDIR)/bin/platforms
 	cp /mingw32/share/qt5/plugins/platforms/qminimal.dll $(DESTDIR)/bin/platforms
 	cp /mingw32/share/qt5/plugins/platforms/qwindows.dll $(DESTDIR)/bin/platforms
+else
+	ldd gnuplot.exe | cut -d " " -f 3 | grep "^/mingw32/bin" | sort | uniq | xargs -t -i cp {} $(DESTDIR)/bin
 endif # QT
 endif # M32
 endif # MINGW64
