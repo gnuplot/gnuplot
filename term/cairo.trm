@@ -71,6 +71,11 @@ TERM_PUBLIC void cairotrm_set_color(t_colorspec *colorspec);
 TERM_PUBLIC void cairotrm_filled_polygon(int n, gpiPoint * corners);
 TERM_PUBLIC void cairotrm_boxed_text(unsigned int x, unsigned int y, int option);
 TERM_PUBLIC void cairotrm_dashtype(int type, t_dashtype *custom_dash_pattern);
+
+#ifdef HAVE_WEBP
+TERM_PUBLIC void WEBP_options(int);	/* We call it from cairotrm_options */
+#endif
+
 #endif /* TERM_PROTO */
 
 #ifndef TERM_PROTO_ONLY
@@ -267,6 +272,12 @@ TERM_PUBLIC void cairotrm_options()
 	    cairo_params = &cairoeps_params;
 	    cairo_params_default = &cairoeps_params_default;
 	}
+#ifdef HAVE_WEBP
+	else if (strcmp(term->name, "webp") == 0) {
+	    cairo_params = &cairopng_params;
+	    cairo_params_default = &cairopng_params_default;
+	}
+#endif
 #ifdef PSLATEX_DRIVER
 	else if (strcmp(term->name, "cairolatex") == 0) {
 	    cairo_params = &cairolatex_params;
@@ -326,6 +337,10 @@ TERM_PUBLIC void cairotrm_options()
 			c_token++;
 			if (!strcmp(term->name,"pngcairo"))
 			    cairo_params->explicit_units = parse_term_size(&cairo_params->width, &cairo_params->height, PIXELS);
+#ifdef HAVE_WEBP
+			else if (!strcmp(term->name,"webp"))
+			    cairo_params->explicit_units = parse_term_size(&cairo_params->width, &cairo_params->height, PIXELS);
+#endif
 			else
 			    cairo_params->explicit_units = parse_term_size(&cairo_params->width, &cairo_params->height, INCHES);
 			if (set_size) duplication=TRUE;
@@ -523,6 +538,15 @@ TERM_PUBLIC void cairotrm_options()
 			    c_token++;
 			    break;
 			}
+#ifdef HAVE_WEBP
+			if (strcmp(term->name, "webp") == 0) {
+			    int save_token = c_token;
+			    WEBP_options(0);
+			    if (save_token != c_token)
+				break;
+			}
+#endif
+
 		default:
 			int_error(c_token, "unrecognized terminal option");
 			break;
@@ -664,6 +688,11 @@ TERM_PUBLIC void cairotrm_options()
 			ps_params->background.b = cairo_params->background.b;
 		}
 	}
+#endif
+
+#ifdef HAVE_WEBP
+	/* Add webp-specific options to the terminal option string */
+	WEBP_options(1);
 #endif
 }
 

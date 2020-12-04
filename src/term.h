@@ -405,6 +405,11 @@
 # include "cairo.trm"
 #endif
 
+/* webp must come after cairo */
+#ifdef HAVE_WEBP
+# include "webp.trm"
+#endif
+
 #ifdef HAVE_LUA
 #include "lua.trm"
 #endif

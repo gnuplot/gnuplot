@@ -1,0 +1,401 @@
+/* GNUPLOT - webp.trm */
+/*[
+ * Copyright 2020 - Ethan A Merritt
+ *
+ * Gnuplot license:
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
+ *
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+ *
+ * Alternative license:
+ *
+ * As an alternative to distributing code in this file under the gnuplot license,
+ * you may instead comply with the terms below. In this case, redistribution and
+ * use in source and binary forms, with or without modification, are permitted
+ * provided that the following conditions are met:
+ *
+ * Redistributions of source code must retain the above copyright notice, this
+ * list of conditions and the following disclaimer.  Redistributions in binary
+ * form must reproduce the above copyright notice, this list of conditions and
+ * the following disclaimer in the documentation and/or other materials provided
+ * with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+]*/
+
+/*
+ * December 2020
+ * Initial implementation based on WebPAnimEncoder API in mux.h
+ * requires libwebp and libwepmux. The webp format supports either lossy
+ * encoding (YUV + alpha color space) or lossless encoding (ARGB color space).
+ * This implementation deals only with the latter.  Individual frames are
+ * created by handing through most driver calls to the pngcairo terminal.
+ * At the end of each frame, the call to WEBP_text converts the cairo
+ * pixel array to webp.
+ * If the terminal is in single frame mode (i.e. "noanimate") the frame
+ * is immediately written to gpoutfile.
+ * In animation mode, frames are accummulated until the next "set/unset output",
+ * "set term" or program termination.  At that point the call to WEBP_reset
+ * invokes WebPAnimEncoderAssemble to produce the webp animation stream
+ * sent to gpoutfile.
+ * Notes
+ *	- terminal options are handled by the pngcairo terminal except
+ *	  for animation properties delay <milliseconds> loop <repeat-count>
+ *	- the WebPAnimEncoder API seems to lack an mechanism for setting
+ *	  the dispose_method to WEBP_MUX_DISPOSE_BACKGROUND, which would
+ *	  be needed for proper handling of a transparent background.
+ *	  This causes successive frames to generate ghost images.
+ *	  The utility program webpmux can be used to fix this by post-processing
+ *	  the animation file.
+ */
+
+#include "driver.h"
+
+#ifdef TERM_REGISTER
+register_term (webp)
+#endif
+
+#ifdef TERM_PROTO
+TERM_PUBLIC void WEBP_options(int);
+TERM_PUBLIC void WEBP_init(void);
+TERM_PUBLIC void WEBP_text(void);
+TERM_PUBLIC void WEBP_reset(void);
+#endif /* TERM_PROTO */
+
+#ifdef TERM_BODY
+
+#include <webp/encode.h>
+#include <webp/mux.h>
+
+/* Structures that need to be retained across animation frames */
+static WebPConfig wpconfig;
+static WebPAnimEncoder* wp_enc = NULL;
+static WebPAnimEncoderOptions wp_enc_options;
+static struct {
+    TBOOLEAN	animate;
+    int		loop;		/* number of repetitions on playback; 0 = infinite */
+    int		delay;		/* time in milliseconds between successive frames */
+    int		frame;		/* current frame number within animation */
+    uint32_t	background;	/* ARGB version of cairo_params->background */
+} webp_params = { FALSE, 0, 50, 0, 0xFFFFFF };
+
+void WEBP_options(int show)
+{
+    /* called from cairotrm_options */
+    if (!show) {
+	if (equals(c_token, "animate")) {
+	    c_token++;
+	    webp_params.animate = TRUE;
+	    webp_params.frame = 0;
+	} else if (almost_equals(c_token, "noan$imate")) {
+	    c_token++;
+	    webp_params.animate = FALSE;
+	    webp_params.frame = 0;
+	} else if (equals(c_token, "loop")) {
+	    c_token++;
+	    webp_params.loop = int_expression();
+	    if (webp_params.loop < 0)
+		webp_params.loop = 0;
+	} else if (equals(c_token, "delay")) {
+	    c_token++;
+	    webp_params.delay = int_expression();
+	    if (webp_params.delay <= 0)
+		webp_params.delay = 50;
+	}
+    }
+
+    if (show) {
+	if (webp_params.animate) {
+	    char tmp_term_options[MAX_LINE_LEN] = "";
+	    sprintf(tmp_term_options,
+		    " animate delay %d loop %d ",
+		    webp_params.delay, webp_params.loop);
+	    strcat(term_options, tmp_term_options);
+	} else {
+	    strcat(term_options, " noanimate");
+	}
+    }
+}
+
+void WEBP_init()
+{
+    cairo_surface_t *surface = NULL;
+
+    if (plot.cr)
+	cairo_destroy(plot.cr);
+    gp_cairo_initialize_plot(&plot);
+    plot.device_xmax = (double) cairo_params->width;
+    plot.device_ymax = (double) cairo_params->height;
+    plot.dashlength = cairo_params->dash_length;
+
+    surface = cairo_image_surface_create( CAIRO_FORMAT_ARGB32,
+		plot.device_xmax, plot.device_ymax );
+    plot.hinting = 100;
+    plot.polygons_saturate = TRUE;
+
+    plot.cr = cairo_create(surface);
+    cairo_surface_destroy(surface);
+
+    webp_params.background = (int)(255 * cairo_params->background.r) << 16
+			   | (int)(255 * cairo_params->background.g) << 8
+			   | (int)(255 * cairo_params->background.b);
+}
+
+static int WEBP_writer( const uint8_t* data, size_t data_size,
+			const WebPPicture* const pic)
+{
+    if (data_size > 0)
+	return fwrite( data, data_size, 1, gpoutfile );
+    else
+	return 1;
+}
+
+void WEBP_text()
+{
+    WebPPicture picture;
+    uint32_t *argb_output;
+    int ix, iy;
+    int timestamp_ms;
+
+    /* Extract per-frame information from cairo to feed webp */
+    cairo_surface_t *surface = cairo_get_target(plot.cr);
+    int width = cairo_image_surface_get_width(surface);
+    int height = cairo_image_surface_get_height(surface);
+    int stride = cairo_image_surface_get_stride(surface);
+    cairo_format_t format = cairo_image_surface_get_format(surface);
+    unsigned char* data = cairo_image_surface_get_data(surface);
+
+    /* close any open paths and [maybe?] "emit" the current page */
+    gp_cairo_stroke(&plot);
+    gp_cairo_end_polygon(&plot);
+    cairo_show_page(plot.cr);	/* FIXME: correct? necessary? */
+
+    /* Tune webp compression parameters */
+    if (!WebPConfigInit(&wpconfig))
+	int_error(NO_CARET, "invalid webp configuration");
+    wpconfig.lossless = 1;	/* lossless */
+    wpconfig.quality = 75.;	/* 0=fast-but-larger 100=slow-best */
+    wpconfig.method = 6;	/* 0=fast/larger, 6=slow/smaller */
+    wpconfig.thread_level = 1;	/* non-zero uses multi-threaded encoding */
+    wpconfig.image_hint = WEBP_HINT_GRAPH;
+    WebPValidateConfig(&wpconfig);
+
+    /* Initialize this frame */
+    WebPPictureInit(&picture);
+    picture.use_argb = 1;
+    picture.width = width;
+    picture.height = height;
+    WebPPictureAlloc(&picture);
+
+    /* Attach output stream */
+    picture.writer = (webp_params.animate) ? NULL : WEBP_writer;
+    picture.custom_ptr = NULL;
+
+    /* Copy image data */
+    argb_output = picture.argb;
+    for (iy = 0; iy < height; iy++) {
+	uint32_t* src = (uint32_t*) data;
+	uint32_t* dst = argb_output;
+
+	for (ix=0; ix < width; ix++, src++, dst++) {
+	    *dst = (format != CAIRO_FORMAT_ARGB32)
+		 ? (*src | 0xFF000000)
+		 : *src;
+	}
+
+	data += stride;
+	argb_output += picture.argb_stride;
+    }
+
+    /* At this point the picture contains the frame we want to encode */
+
+    /* Single frame */ 
+    if (!webp_params.animate) {
+	WebPEncode(&wpconfig, &picture);
+	WebPPictureFree(&picture);
+    }
+
+    /* Animation */
+    if (webp_params.animate) {
+
+	if (webp_params.frame == 0) {
+	    /* Initialize the animation */
+	    WebPAnimEncoderOptionsInit(&wp_enc_options);
+	    wp_enc_options.anim_params.loop_count = webp_params.loop;
+
+	    wp_enc = WebPAnimEncoderNew( picture.width, picture.height, &wp_enc_options);
+	    if (!wp_enc) {
+		WebPPictureFree(&picture);
+		int_error(NO_CARET, "webp: failed to initialize encoder");
+	    }
+	}
+
+	/* Cairo already did this unless the "transparent" options was set */
+	/* WebPBlendAlpha(&picture, webp_params.background); */
+
+	/* Add this frame to the animation */
+	timestamp_ms = webp_params.frame * webp_params.delay;
+	WebPAnimEncoderAdd(wp_enc, &picture, timestamp_ms, &wpconfig);
+	WebPPictureFree(&picture);
+
+	/* Increase frame count */
+	webp_params.frame++;
+#if (0)
+	/* This code is equivalent to that in anim_encode.c but none of this is
+	 * exported through the WebPAnimEncoder API so I can't use it.
+	 * How is one supposed to set the dispose method???
+	 */
+	EncodedFrame *prev = GetFrame(wp_enc, webp_params.frame);
+	prev->sub_frame_.dispose_method = WEBP_MUX_DISPOSE_BACKGROUND;
+	prev->key_frame_.dispose_method = WEBP_MUX_DISPOSE_BACKGROUND;
+#endif
+
+    }
+
+}
+
+/*
+ * _reset() called on exit, 'set term', or 'set output'.
+ */
+TERM_PUBLIC void
+WEBP_reset()
+{
+    if (plot.cr)
+	    cairo_destroy(plot.cr);
+    plot.cr = NULL;
+
+    if (webp_params.animate) {
+	int timestamp_ms = webp_params.frame * webp_params.delay;
+	WebPData webp_data;
+	int ierr;
+
+	ierr = WebPAnimEncoderAdd(wp_enc, NULL, timestamp_ms, NULL);
+	if (!ierr)
+	    int_error(NO_CARET, "WebPAnimEncoderAdd failed: %s",
+			WebPAnimEncoderGetError(wp_enc));
+	ierr = WebPAnimEncoderAssemble(wp_enc, &webp_data);
+	if (!ierr)
+	    int_error(NO_CARET, "WebPAnimEncoderAssemble failed: %s",
+			WebPAnimEncoderGetError(wp_enc));
+	WebPAnimEncoderDelete(wp_enc);
+	wp_enc = NULL;
+
+	fprintf(stderr, "%d frames in animation\n", webp_params.frame);
+	webp_params.frame = 0;
+
+	ierr = fwrite( webp_data.bytes, webp_data.size, 1, gpoutfile );
+	if (ierr != 1)
+	    int_error(NO_CARET, "Cannot write animation to file");
+	WebPDataClear(&webp_data);
+    }
+}
+
+#endif /* TERM_BODY */
+
+#ifdef TERM_TABLE
+TERM_TABLE_START (webp_driver)
+    "webp", "single frame or animation using cairo, pango, and libwebp",
+    /* the following values are overridden by cairotrm_graphics */
+    1 /* xmax */ , 1 /* ymax */ , 1 /* vchar */ , 1 /* hchar */ ,
+    1 /* vtic */ , 1 /* htic */ ,
+    cairotrm_options,
+    WEBP_init, WEBP_reset, WEBP_text,
+    null_scale, cairotrm_graphics,
+    cairotrm_move, cairotrm_vector, cairotrm_linetype, cairotrm_put_text,
+    cairotrm_text_angle, cairotrm_justify_text,
+    cairotrm_point, do_arrow, cairotrm_set_font,
+    cairotrm_pointsize,
+    TERM_BINARY|TERM_CAN_DASH|TERM_ALPHA_CHANNEL|TERM_LINEWIDTH|TERM_FONTSCALE|TERM_POINTSCALE,
+    0 /* suspend */, 0 /* resume */, cairotrm_fillbox, cairotrm_linewidth
+#ifdef USE_MOUSE
+    , 0, 0, 0, 0, 0
+#endif
+    , cairotrm_make_palette, 0 /* cairotrm_previous_palette */, cairotrm_set_color, cairotrm_filled_polygon
+    , cairotrm_image
+    , cairotrm_enhanced_open, cairotrm_enhanced_flush, cairotrm_enhanced_writec
+    , 0, 0, 1.0
+    , NULL /* hypertext */
+    , cairotrm_boxed_text
+    , NULL /* modify_plots */
+    , cairotrm_dashtype
+TERM_TABLE_END (webp_driver)
+
+#undef LAST_TERM
+#define LAST_TERM webp_driver
+
+#endif /* TERM_TABLE */
+
+#ifdef TERM_HELP
+START_HELP(webp)
+"1 webp",
+"?set terminal webp",
+"?terminal webp",
+"?set term webp",
+"?term webp",
+"?webp",
+" The `webp` terminal generates either a single frame or an animation.",
+" The actual drawing is done via cairo, a 2D graphics library, and pango,",
+" a library for laying out and rendering text.",
+"",
+" Syntax:",
+"         set term webp",
+"                      {size <x_pixels>,<y_pixels>}",
+"                      {font <font>} {fontscale <scale>} {{no}enhanced}",
+"                      {{no}transparent} {background <rgbcolor>",
+"                      {linewidth <lw>} {rounded|butt|square} {dashlength <dl>}",
+"                      {pointscale <ps>}",
+"",
+"                      {{no}animate {delay <msec>} {loop <n>}}",
+"",
+" Individual frames produced by the webp terminal are first created as 32-bit",
+" RGB + alpha channel images using routines shared with the pngcairo terminal.",
+" See `help set term pngcairo` for more details about font and style options.",
+" The frames are then converted to webp format on output.",
+"",
+" The `animate` option produces a webp file containing multiple frames,",
+" each one created by a separate `plot` or `splot` command.  The animation",
+" sequence is terminated by the next `set output` or `set terminal` command.",
+"",
+" The `delay` suboption sets the delay time in milliseconds between frames",
+" during playback (default 50 milliseconds).",
+"",
+" The `loop` suboption specifies how many times the animation sequence should",
+" be repeated during playback.  The default (0) gives a continuous loop.", 
+""
+END_HELP(webp)
+#endif /* TERM_HELP */
+

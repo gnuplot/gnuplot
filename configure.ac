@@ -997,6 +997,19 @@ fi
 
 AM_CONDITIONAL(BUILD_GPCAIRO, test "${build_gpcairo}" = yes)
 
+dnl webp terminal
+if test "${with_cairo}" = yes; then
+  with_webp=yes
+  PKG_CHECK_MODULES_NOFAIL(WEBP, [libwebp libwebpmux],
+      [
+      CPPFLAGS="$CPPFLAGS $WEBP_CFLAGS"
+      LDFLAGS="$LDFLAGS $WEBP_LIBS"
+      AC_DEFINE(HAVE_WEBP,1, [ Define to build the webp terminal. ])
+      ],
+      with_webp=no
+  )
+fi
+
 dnl Enable subsystem to generate statistical summary of file contents
 AC_ARG_ENABLE(stats,dnl
 [  --disable-stats         Omit calculation of statistical summary of data],
@@ -1305,6 +1318,12 @@ if test "$with_cairo" = yes; then
   AC_MSG_RESULT([  cairo-based pdf and png terminals: yes ])
 else
   AC_MSG_RESULT([  cairo-based terminals: no (requires cairo>=1.2, pango>=1.22, glib>=2.28)])
+fi
+
+if test "$with_webp" = yes; then
+  AC_MSG_RESULT([  webp terminal: yes ])
+else
+  AC_MSG_RESULT([  webp terminal: no (requires cairo, pango, libwebp, libwebpmux)])
 fi
 
 if test "$with_lua" = yes; then

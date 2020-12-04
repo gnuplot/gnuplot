@@ -712,8 +712,24 @@ C
  to display an animation by plotting successive frames from the command line
  or from a script.
 
- Several non-interactive terminals also support some form of animation.
- See `term gif animate`, `term sixelgd animate`, `term domterm animate`.
+ Several non-mousing terminals also support some form of animation.
+ See `term sixelgd animate`, `term domterm animate`.
+
+ Two terminals can save an animation to a file for later playback locally
+ or by embedding it a web page.  See `term gif animate`, `term webp`.
+
+ Example:
+
+      unset border; unset tics; unset key; set view equal xyz
+      set pm3d border linecolor "black"
+
+      set term webp animate delay 50
+      set output 'spinning_d20.webp'
+      do for [ang=1:360:2] {
+          set view 60, ang
+          splot 'icosahedron.dat' with polygons fc "gold"
+      }
+      unset output
 
 2 Batch/Interactive Operation
 ?batch/interactive

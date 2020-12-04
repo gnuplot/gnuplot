@@ -914,7 +914,7 @@ PNG_options()
 	    if (strncmp("gif",term->name,3) == 0)
 		gif_anim_option = 1;
 	    else if (strncmp("sixel",term->name,5) != 0)
-		int_error(c_token,"Only the gif terminal supports animation");
+		int_error(c_token,"This terminal does not support animation");
 	    c_token++;
 	    png_state.animate = TRUE;
 	    png_state.frame_count = 0;
@@ -923,7 +923,7 @@ PNG_options()
 	    break;
 	case GIF_DELAY:
 	    if (strncmp("gif",term->name,3))
-		int_error(c_token,"Only the gif terminal supports animation");
+		int_warn(c_token,"This terminal does not support animation");
 	    c_token++;
 	    png_state.frame_delay = int_expression();
 	    if (png_state.frame_delay <= 0)
@@ -932,21 +932,21 @@ PNG_options()
 	    break;
 	case GIF_LOOP:
 	    if (strncmp("gif",term->name,3))
-		int_error(c_token,"Only the gif terminal supports animation");
+		int_warn(c_token,"This terminal does not support animation");
 	    c_token++;
 	    png_state.loop_count = int_expression();
 	    gif_anim_option = 1;
 	    break;
 	case GIF_NOOPT:
 	    if (strncmp("gif",term->name,3))
-		int_error(c_token,"Only the gif terminal supports animation");
+		int_warn(c_token,"This terminal does not support animation");
 	    c_token++;
 	    png_state.frame_optimization = FALSE;
 	    gif_anim_option = 1;
 	    break;
 	case GIF_OPT:
 	    if (strncmp("gif",term->name,3))
-		int_error(c_token,"Only the gif terminal supports animation");
+		int_warn(c_token,"This terminal does not support animation");
 	    c_token++;
 	    png_state.frame_optimization = TRUE;
 	    gif_anim_option = 1;
