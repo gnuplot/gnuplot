@@ -12,7 +12,7 @@ GNUPLOT_LIB = ..
 # Several of the demos need manual intervention:
 #	fontfile vector epslatex
 #
-html: airfoil.html approximate.html armillary.html array.html arrowstyle.html barchart_art.html binary.html bins.html bivariat.html boxplot.html boxclusters.html candlesticks.html circles.html cities.html columnhead.html contours.html custom_contours.html controls.html custom_key.html dashtypes.html datastrings.html dgrid3d.html discrete.html electron.html ellipse.html enhanced_utf8.html epslatex.html errorbars.html fenceplot.html fillbetween.html fillcrvs.html fillstyle.html finance.html fit.html hidden.html hidden2.html hidden_compare.html histograms.html histograms2.html gantt.html image.html image2.html imageNaN.html index.html iterate.html jitter.html keyentry.html label_stacked_histograms.html layout.html lines_arrows.html linkedaxes.html map_projection.html margins.html monotonic_spline.html multiaxis.html multiplt.html named_palettes.html nokey.html nonlinear1.html nonlinear2.html nonlinear3.html parallel.html param.html piecewise.html pixmap.html pm3dcolors.html pm3d.html pm3dgamma.html pm3d_clip.html pm3d_lighting.html pointsize.html polar.html poldat.html polar_quadrants.html polygons.html prob2.html prob.html projection.html rainbow.html random.html rectangle.html rgba_lines.html rgbalpha.html rgb_variable.html rotate_labels.html rugplot.html running_avg.html sampling.html scatter.html simple.html singulr.html smooth.html smooth_path.html solar_path.html spiderplot.html spline.html smooth_splines.html steps.html stringvar.html surface1.html surface2.html azimuth.html transparent.html transparent_solids.html textbox.html tics.html timedat.html ttics.html using.html varcolor.html vector.html violinplot.html walls.html world.html world2.html animate2.html heatmaps.html stats.html unicode.html zerror.html boxes3d.html voxel.html vplot.html isosurface.html
+html: airfoil.html approximate.html armillary.html array.html arrowstyle.html barchart_art.html binary.html bins.html bivariat.html boxplot.html boxclusters.html candlesticks.html circles.html cities.html columnhead.html contours.html custom_contours.html controls.html custom_key.html dashtypes.html datastrings.html dgrid3d.html discrete.html electron.html ellipse.html enhanced_utf8.html epslatex.html errorbars.html fenceplot.html fillbetween.html fillcrvs.html fillstyle.html finance.html fit.html hidden.html hidden2.html hidden_compare.html histograms.html histograms2.html gantt.html image.html image2.html imageNaN.html index.html iterate.html jitter.html keyentry.html label_stacked_histograms.html layout.html lines_arrows.html linkedaxes.html map_projection.html margins.html monotonic_spline.html multiaxis.html multiplt.html named_palettes.html nokey.html nonlinear1.html nonlinear2.html nonlinear3.html parallel.html param.html piecewise.html pixmap.html pm3dcolors.html pm3d.html pm3dgamma.html pm3d_clip.html pm3d_lighting.html pointsize.html polar.html poldat.html polar_quadrants.html polygons.html prob2.html prob.html projection.html rainbow.html random.html rectangle.html rgba_lines.html rgbalpha.html rgb_variable.html rotate_labels.html rugplot.html running_avg.html sampling.html scatter.html simple.html singulr.html smooth.html smooth_path.html solar_path.html spiderplot.html spline.html smooth_splines.html steps.html stringvar.html surface1.html surface2.html azimuth.html transparent.html transparent_solids.html textbox.html tics.html timedat.html ttics.html using.html varcolor.html vector.html violinplot.html walls.html world.html world2.html heatmaps.html stats.html unicode.html zerror.html boxes3d.html voxel.html vplot.html isosurface.html
 
 index.html: index.save
 	cp index.save index.html
@@ -71,13 +71,6 @@ rgba_lines.html: $(GNUPLOT_LIB)/rgba_lines.dem ./webify.pl
 
 complex_trig.html: $(GNUPLOT_LIB)/complex_trig.dem ./webify.pl
 	export DEMOTERM="pngcairo enhanced font 'times'"; ./webify.pl complex_trig
-
-animate2.html: $(GNUPLOT_LIB)/animate2.dem ./webify.pl
-	export DEMOTERM="gif animate transparent noopt delay 10 size 200,200 background rgb 'black'"; ./webify.pl animate2
-	mv animate2.html temp.html
-	cat temp.html | sed -e 's/1.png/1.gif/g' > animate2.html
-	mv animate2.1.png animate2.1.gif
-	rm temp.html
 
 showcase_plots: voxel.html pm3d_lighting.html violinplot.html
 	cp violinplot.5.png showcase_plot_1.png

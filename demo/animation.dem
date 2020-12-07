@@ -1,0 +1,37 @@
+#
+# Spinning globe animation sequence
+#
+# Works directly from an interactive terminal (qt wxt x11, win)
+# Also works with the gif or webp terminals to generate a file
+# Example of intended use:
+#     set term webp animate delay 100 size 300,300
+#     set output 'world.webp'
+#     load 'animate2.dem'
+#     unset output
+
+unset title
+unset key
+unset tics
+set border 0
+set hidden3d offset 1
+set parametric
+set angles degrees
+set samples 64,64
+set isosamples 13,13
+set mapping spherical
+set dummy u,v
+set urange [ -90.000 :  90.000 ]
+set vrange [   0.000 : 360.000 ]
+set view equal xyz
+
+set pm3d depthorder border lc "black"
+
+do for [ang = 0:355:5] {
+    xrot = 60
+    zrot = (720 - ang) %360
+    set view xrot, zrot, 1.92, 1 
+
+    splot cos(u)*cos(v),cos(u)*sin(v),sin(u) with lines lc "blue", \
+          'world.dat' with polygons fs transparent solid 0.5 fc "olive"
+}
+
