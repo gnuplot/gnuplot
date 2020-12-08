@@ -1,6 +1,6 @@
 # Generate webp gif and fallback png files for animation demo
 
-set term webp size 300,300 animate delay 100
+set term webp size 300,300 animate delay 100 quality 25
 set output 'animation.webp'
 load '../animation.dem'
 

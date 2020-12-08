@@ -67,7 +67,7 @@ $(T)metapost.trm $(T)pbm.trm $(T)pict2e.trm \
 $(T)pm.trm $(T)post.trm $(T)pslatex.trm \
 $(T)pstricks.trm $(T)qms.trm $(T)qt.trm $(T)regis.trm \
 $(T)svg.trm $(T)t410x.trm $(T)tek.trm $(T)texdraw.trm $(T)tgif.trm \
-$(T)tkcanvas.trm $(T)win.trm $(T)wxt.trm $(T)x11.trm $(T)xlib.trm 
+$(T)tkcanvas.trm $(T)webp.trm $(T)win.trm $(T)wxt.trm $(T)x11.trm $(T)xlib.trm 
 
 LEGACYTERM = $(T)latex.trm $(T)emtex.trm $(T)eepic.trm $(T)tpic.trm \
 $(T)corel.trm $(T)dxy.trm $(T)excl.trm $(T)kyo.trm $(T)mif.trm \

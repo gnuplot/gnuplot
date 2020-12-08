@@ -62,10 +62,9 @@
  * Initial implementation based on WebPAnimEncoder API in mux.h
  * requires libwebp and libwepmux. The webp format supports either lossy
  * encoding (YUV + alpha color space) or lossless encoding (ARGB color space).
- * This implementation deals only with the latter.  Individual frames are
- * created by handing through most driver calls to the pngcairo terminal.
- * At the end of each frame, the call to WEBP_text converts the cairo
- * pixel array to webp.
+ * Individual frames are created by handing through most driver calls to the
+ * pngcairo terminal.  At the end of each frame, the call to WEBP_text converts
+ * the cairo pixel array to webp.
  * If the terminal is in single frame mode (i.e. "noanimate") the frame
  * is immediately written to gpoutfile.
  * In animation mode, frames are accummulated until the next "set/unset output",
@@ -75,6 +74,7 @@
  * Notes
  *	- terminal options are handled by the pngcairo terminal except
  *	  for animation properties delay <milliseconds> loop <repeat-count>
+ *        and quality <integer value 1..100>
  *	- the WebPAnimEncoder API seems to lack an mechanism for setting
  *	  the dispose_method to WEBP_MUX_DISPOSE_BACKGROUND, which would
  *	  be needed for proper handling of a transparent background.
@@ -109,9 +109,10 @@ static struct {
     TBOOLEAN	animate;
     int		loop;		/* number of repetitions on playback; 0 = infinite */
     int		delay;		/* time in milliseconds between successive frames */
+    int 	quality;	/* 1-74 lossy; 75-100 lossless */
     int		frame;		/* current frame number within animation */
     uint32_t	background;	/* ARGB version of cairo_params->background */
-} webp_params = { FALSE, 0, 50, 0, 0xFFFFFF };
+} webp_params = { FALSE, 0, 50, 75, 0, 0xFFFFFF };
 
 void WEBP_options(int show)
 {
@@ -135,6 +136,13 @@ void WEBP_options(int show)
 	    webp_params.delay = int_expression();
 	    if (webp_params.delay <= 0)
 		webp_params.delay = 50;
+	} else if (equals(c_token, "quality")) {
+	    c_token++;
+	    webp_params.quality = int_expression();
+	    if (webp_params.quality <= 0)
+		webp_params.quality = 75;
+	    if (webp_params.quality > 100)
+		webp_params.quality = 100;
 	}
     }
 
@@ -142,8 +150,8 @@ void WEBP_options(int show)
 	if (webp_params.animate) {
 	    char tmp_term_options[MAX_LINE_LEN] = "";
 	    sprintf(tmp_term_options,
-		    " animate delay %d loop %d ",
-		    webp_params.delay, webp_params.loop);
+		    " animate quality %d delay %d loop %d ",
+		    webp_params.quality, webp_params.delay, webp_params.loop);
 	    strcat(term_options, tmp_term_options);
 	} else {
 	    strcat(term_options, " noanimate");
@@ -205,14 +213,17 @@ void WEBP_text()
     cairo_show_page(plot.cr);	/* FIXME: correct? necessary? */
 
     /* Tune webp compression parameters */
-    if (!WebPConfigInit(&wpconfig))
-	int_error(NO_CARET, "invalid webp configuration");
-    wpconfig.lossless = 1;	/* lossless */
-    wpconfig.quality = 75.;	/* 0=fast-but-larger 100=slow-best */
-    wpconfig.method = 6;	/* 0=fast/larger, 6=slow/smaller */
+    WebPConfigInit(&wpconfig);
+    wpconfig.quality = webp_params.quality;
+    wpconfig.lossless = (webp_params.quality < 75) ? 0 : 1;
+    wpconfig.method = 4;	/* 0=fast/larger, 6=slow/smaller */
     wpconfig.thread_level = 1;	/* non-zero uses multi-threaded encoding */
     wpconfig.image_hint = WEBP_HINT_GRAPH;
-    WebPValidateConfig(&wpconfig);
+
+//  wpconfig.filter_strength = 0;	/* no dithering => sharper edges */
+
+    if (!WebPValidateConfig(&wpconfig))
+	int_error(NO_CARET, "invalid webp configuration");
 
     /* Initialize this frame */
     WebPPictureInit(&picture);
@@ -379,16 +390,24 @@ START_HELP(webp)
 "                      {linewidth <lw>} {rounded|butt|square} {dashlength <dl>}",
 "                      {pointscale <ps>}",
 "",
-"                      {{no}animate {delay <msec>} {loop <n>}}",
+"                      {{no}animate {quality <q>} {delay <msec>} {loop <n>}}",
 "",
 " Individual frames produced by the webp terminal are first created as 32-bit",
 " RGB + alpha channel images using routines shared with the pngcairo terminal.",
-" See `help set term pngcairo` for more details about font and style options.",
+" See `set term pngcairo` for more details about font and style options.",
 " The frames are then converted to webp format on output.",
 "",
 " The `animate` option produces a webp file containing multiple frames,",
 " each one created by a separate `plot` or `splot` command.  The animation",
 " sequence is terminated by the next `set output` or `set terminal` command.",
+"",
+" `quality` (1..100) affects the size of the output file.",
+" q values from 1 to 74 use lossy compression; smaller values produce a",
+" smaller file at the cost of lost detail in the rendered image.",
+" q values from 75 to 100 use lossless compression. All produce the same",
+" image quality (lossless!). Larger values spend more computing time for",
+" diminishing benefit in reduced file size.",
+" The default is 75, lossless compression without excessive computation.",
 "",
 " The `delay` suboption sets the delay time in milliseconds between frames",
 " during playback (default 50 milliseconds).",

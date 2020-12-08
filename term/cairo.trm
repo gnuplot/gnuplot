@@ -692,7 +692,8 @@ TERM_PUBLIC void cairotrm_options()
 
 #ifdef HAVE_WEBP
 	/* Add webp-specific options to the terminal option string */
-	WEBP_options(1);
+	if (strcmp(term->name, "webp") == 0)
+	    WEBP_options(1);
 #endif
 }
 

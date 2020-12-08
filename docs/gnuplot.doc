@@ -276,6 +276,9 @@ C
 #b New terminal `block` for text-mode pseudo-graphics uses Unicode
 ## block or Braille characters to offer improved resolution compared
 ## to the `dumb` or `caca` terminals.
+#b New terminal `webp` generates a single frame or an animation sequence
+## using webp encoding.  Frames are generated using pngcairo, then
+## encoded through the WebPAnimEncoder API exported by libwebp and libwebpmux.
 #end
 
 4 Other new features
