@@ -116,11 +116,15 @@ MOUSE=1
 #CAIROTERMS=1
 #CAIROLIBS=1
 
-# WXWIDGETS interactive terminal
+# wxt interactive terminal
 # Requires wxWidgets, Cairo, Pango, and their respective dependencies.
 # Uncomment the following lines to compile it.
 #WXT=1
 #CAIROLIBS=1
+
+# Include webp terminal 
+# Requires webp lib and cairo libraries.
+#WEBP=1
 
 # Build qt terminal?
 #QT=1
@@ -433,6 +437,10 @@ endif
 ifdef CAIROTERMS
 	CFLAGS += -DHAVE_CAIROPDF
 	TERMFLAGS += -DHAVE_CAIROEPS
+ifdef WEBP
+	CFLAGS += -DHAVE_WEBP
+	TERMLIBS += -lwebp -lwebpmux
+endif
 endif
 
 ifdef WXT
