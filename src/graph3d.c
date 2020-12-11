@@ -3430,7 +3430,7 @@ key_text(int xl, int yl, char *text)
     legend_key *key = &keyT;
 
     (term->layer)(TERM_LAYER_BEGIN_KEYSAMPLE);
-    if (key->just == GPKEY_LEFT && key->region != GPKEY_USER_PLACEMENT) {
+    if (key->just == GPKEY_LEFT) {
 	write_multiline(xl + key_text_left, yl, text, LEFT, JUST_TOP, 0, key->font);
     } else {
 	if ((*term->justify_text) (RIGHT)) {
