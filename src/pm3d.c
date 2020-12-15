@@ -1612,6 +1612,10 @@ filled_polygon(gpdPoint *corners, int fillstyle, int nv)
     static gpiPoint *icorners = NULL;
     static gpiPoint *ocorners = NULL;
     static gpdPoint *clipcorners = NULL;
+
+    if (!(term->filled_polygon))
+	return;
+
     if (nv > max_vertices) {
 	max_vertices = nv;
 	icorners = gp_realloc( icorners, (2*max_vertices) * sizeof(gpiPoint), "filled_polygon");
