@@ -10753,7 +10753,7 @@ Ffigure_missing
              {left | right | center} {top | bottom | center}
              {vertical | horizontal} {Left | Right}
              {{no}enhanced}
-             {{no}opaque}
+             {{no}opaque {fc <colorspec>}}
              {{no}reverse} {{no}invert}
              {samplen <sample_length>} {spacing <line_spacing>}
              {width <width_increment>} {height <height_increment>}
@@ -10795,8 +10795,8 @@ Ffigure_missing
  title are drawn at the same time as the corresponding plot.  That means newer
  plots may sometimes place elements on top of the key.  `set key opaque` causes
  the key to be generated after all the plots.  In this case the key area is
- filled with background color and then the key symbols and titles are written.
- Therefore the key itself may obscure portions of some plot elements.
+ filled with background color or the requested fill color and then the key
+ symbols and titles are written.
  The default can be restored by `set key noopaque`.
 
  By default the first plot label is at the top of the key and successive labels
