@@ -3196,7 +3196,8 @@ plot_spiderplot(struct curve_points *plot)
 
 	/* Draw filled area */
 	if (out_length > 1 && plot->fill_properties.fillstyle != FS_EMPTY) {
-	    term->filled_polygon(out_length, clpcorn);
+	    if (term->filled_polygon)
+		term->filled_polygon(out_length, clpcorn);
 	}
 
 	/* Draw perimeter */
