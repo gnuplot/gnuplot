@@ -2564,6 +2564,13 @@ set_key()
 
 	case S_KEY_FRONT:
 	    key->front = TRUE;
+	    if (almost_equals(c_token+1,"fill$color") || equals(c_token+1,"fc")) {
+		c_token ++;
+		parse_colorspec(&key->fillcolor, TC_RGB);
+		c_token--;
+	    } else {
+		key->fillcolor = background_fill;
+	    }
 	    break;
 	case S_KEY_NOFRONT:
 	    key->front = FALSE;

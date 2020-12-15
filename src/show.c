@@ -1972,8 +1972,12 @@ show_key()
     } else
 	fprintf(stderr, "not boxed\n");
 
-    if (key->front)
-	fprintf(stderr, "\tkey box is opaque and drawn in front of the graph\n");
+    if (key->front) {
+	fprintf(stderr, "\tkey box is opaque");
+	if (key->fillcolor.lt != LT_BACKGROUND)
+	    save_pm3dcolor(stderr, &key->fillcolor);
+	fprintf(stderr," \n");
+    }
 
     fprintf(stderr, "\
 \tsample length is %g characters\n\

@@ -1437,8 +1437,7 @@ draw_key(legend_key *key, TBOOLEAN key_pass)
     /* In two-pass mode (set key opaque) we blank out the key box after	*/
     /* the graph is drawn and then redo the key in the blank area.	*/
     if (key_pass && t->fillbox && !(t->flags & TERM_NULL_SET_COLOR)) {
-	t_colorspec background_fill = BACKGROUND_COLORSPEC;
-	(*t->set_color)(&background_fill);
+	(*t->set_color)(&key->fillcolor);
 	(*t->fillbox)(FS_OPAQUE, key->bounds.xleft, key->bounds.ybot,
 		key_width, key_height);
     }

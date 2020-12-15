@@ -557,7 +557,16 @@ save_set_all(FILE *fp)
 		key->swidth, key->vert_factor, key->width_fix, key->height_fix);
     fprintf(fp, "\nset key maxcolumns %d maxrows %d",key->maxcols,key->maxrows);
     fputc('\n', fp);
-    fprintf(fp, "set key %sopaque\n", key->front ? "" : "no");
+    if (key->front) {
+	fprintf(fp, "set key opaque");
+	if (key->fillcolor.lt != LT_BACKGROUND) {
+	    fprintf(fp, " lc ");
+	    save_pm3dcolor(fp, &key->fillcolor);
+	}
+	fprintf(fp, "\n");
+    } else {
+	fprintf(fp, "set key noopaque\n");
+    }
 
     if (!(key->visible))
 	fputs("unset key\n", fp);
