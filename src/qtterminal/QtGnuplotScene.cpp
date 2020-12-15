@@ -350,6 +350,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 			textItem->setPos(point + m_textOffset);
 			textItem->setZValue(m_currentZ+10000);
 			textItem->setVisible(false);
+			textItem->setData(1,m_currentPointSize);
 			m_hypertextList.append(textItem);
 			m_currentHypertext.clear();
 		}
@@ -869,8 +870,9 @@ void QtGnuplotScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 	bool hit = false;
 	m_selectedHypertext.clear();
 	while (i-- > 1) {
+		double trigger_distance = 5. * m_hypertextList[i]->data(1).toDouble();
 		if (!hit && ((m_hypertextList[i]->pos() - m_textOffset) 
-				- m_lastMousePos).manhattanLength() <= 5) {
+				- m_lastMousePos).manhattanLength() <= trigger_distance) {
 			hit = true;
 			m_hypertextList[i]->setVisible(true);
 			((QGraphicsRectItem *)m_hypertextList[0])->setRect(m_hypertextList[i]->boundingRect());
