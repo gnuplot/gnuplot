@@ -337,6 +337,12 @@ void gp_cairo_set_font(plot_struct *plot, const char *name, float fontsize)
 	free(fname);
 }
 
+/* work-around for "bold font gets stuck" bug */
+void gp_cairo_clear_bold_font(plot_struct *plot)
+{
+	plot->fontweight = PANGO_WEIGHT_NORMAL;
+	plot->fontstyle = PANGO_STYLE_NORMAL;
+}
 
 void gp_cairo_set_linewidth(plot_struct *plot, double linewidth)
 {

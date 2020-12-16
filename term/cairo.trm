@@ -1082,7 +1082,8 @@ void cairotrm_put_text(unsigned int x, unsigned int y, const char * string)
 	/* Uses enhanced_recursion() to analyse the string to print.
 	 * enhanced_recursion() calls _enhanced_open() to initialize the text drawing,
 	 * then it calls _enhanced_writec() which buffers the characters to draw,
-	 * and finally _enhanced_flush() to draw the buffer with the correct justification. */
+	 * and finally _enhanced_flush() to draw the buffer with the correct justification.
+	 */
 
 	gp_cairo_enhanced_init(&plot, strlen(string));
 
@@ -1090,12 +1091,12 @@ void cairotrm_put_text(unsigned int x, unsigned int y, const char * string)
 	enhanced_fontscale = cairo_params->fontscale;
 	strncpy(enhanced_escape_format, "%c", sizeof(enhanced_escape_format));
 
-	/* Set the recursion going. We say to keep going until a
-	* closing brace, but we don't really expect to find one.
-	* If the return value is not the nul-terminator of the
-	* string, that can only mean that we did find an unmatched
-	* closing brace in the string. We increment past it (else
-	* we get stuck in an infinite loop) and try again. */
+	/* Set the recursion going. We say to keep going until a closing brace,
+	 * but we don't really expect to find one. If the return value is not
+	 * the nul-terminator of the string, that can only mean that we did find
+	 * an unmatched closing brace in the string. We increment past it (else
+	 * we get stuck in an infinite loop) and try again.
+	 */
 
 	while (*(string = enhanced_recursion((char*)string, TRUE,
 			cairo_enhanced_fontname,
@@ -1111,11 +1112,8 @@ void cairotrm_put_text(unsigned int x, unsigned int y, const char * string)
 		/* else carry on and process the rest of the string */
 	}
 
-	/*
-	 * EAM FIXME: Apr 2019 This fixes a "key font gets stuck in bold mode" bug
-	 * first noticed in Jan 2015 but I still don't understand why it is needed.
-	 */
-	cairotrm_set_font(cairo_params->fontname);
+	/* EAM FIXME: I still don't understand why this is needed */
+	gp_cairo_clear_bold_font(&plot);
 
 	/* finish */
 	gp_cairo_enhanced_finish(&plot, x, term->ymax - y);
