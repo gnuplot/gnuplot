@@ -1063,6 +1063,7 @@ START_HELP(mp)
 "?mp",
 "?metapost",
 "",
+" Note: legacy terminal (not built by default).",
 " The `mp` driver produces output intended to be input to the Metapost program.",
 " Running Metapost on the file creates EPS files containing the plots. By",
 " default, Metapost passes all text through TeX.  This has the advantage of",

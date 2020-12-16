@@ -368,7 +368,9 @@
 #include "metafont.trm"
 
 /* METAPOST */
+#ifdef WITH_METAPOST
 #include "metapost.trm"
+#endif
 
 /* ConTeXt */
 #include "context.trm"

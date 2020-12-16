@@ -958,6 +958,13 @@ AS_IF([test "x${with_mif}" = "xyes"],
   AC_DEFINE(HAVE_MIF,1,
           [ Define to include support for mif terminal ],))
 
+dnl  Allow to include metapost terminal
+AC_ARG_WITH(metapost,dnl
+[  --with-metapost          metapost terminal])
+AS_IF([test "x${with_metapost}" = "xyes"],
+  AC_DEFINE(HAVE_METAPOST,1,
+          [ Define to include support for metapost terminal ],))
+
 dnl ReGIS terminal
 AC_ARG_WITH(regis,dnl
 [  --with-regis             ReGIS terminal])
@@ -1197,7 +1204,7 @@ AC_MSG_RESULT([])
 
 AC_MSG_RESULT([  Standalone terminals: yes (included by default)])
 AC_MSG_RESULT([    canvas, cgm, context, dumb, dxf, emf, epslatex,])
-AC_MSG_RESULT([    fig, hpgl, metafont, metapost, pcl5, postscript,])
+AC_MSG_RESULT([    fig, hpgl, metafont, pcl5, postscript,])
 AC_MSG_RESULT([    pict2e, pslatex, pstex, pstricks, svg, texdraw, tkcanvas])
 AC_MSG_RESULT([])
 
@@ -1247,6 +1254,12 @@ if test "$with_mif" == yes; then
   AC_MSG_RESULT([    mif terminal (FrameMaker 3): yes])
 else
   AC_MSG_RESULT([    mif terminal (FrameMaker 3): no   (use --with-mif to enable)])
+fi
+
+if test "$with_metapost" == yes; then
+  AC_MSG_RESULT([    metapost terminal          : yes])
+else
+  AC_MSG_RESULT([    metapost terminal          : no   (use --with-metapost to enable)])
 fi
 
 if test "$with_regis" = yes; then
