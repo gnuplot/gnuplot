@@ -242,6 +242,9 @@ const char* gp_cairo_get_encoding(plot_struct *plot);
 /* determine default font to use */
 const char * gp_cairo_default_font(void);
 
+/* work-around for "bold font gets stuck" bug */
+void gp_cairo_clear_bold_font(plot_struct *plot);
+
 /* Text boxes */
 void gp_cairo_boxed_text(plot_struct *plot, int x, int y, int option);
 
