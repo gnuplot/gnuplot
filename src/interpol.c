@@ -1526,13 +1526,10 @@ make_bins(struct curve_points *plot, int nbins,
 	    yaxis->max = ymax;
     }
 
-    /* Recheck inrange/outrange */
-    for (i=0; i<nbins; i++) {
-	if (inrange(plot->points[i].y, yaxis->min, yaxis->max))
-	    plot->points[i].type = INRANGE;
-	else
+    /* Recheck range on y */
+    for (i=0; i<nbins; i++)
+	if (!inrange(plot->points[i].y, yaxis->min, yaxis->max))
 	    plot->points[i].type = OUTRANGE;
-    }
 
     /* Clean up */
     free(bin);
