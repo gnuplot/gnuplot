@@ -1676,7 +1676,7 @@ C marker below is used to signal this to doc2html:
  `besin(n,x)` is the modified Bessel function or order n for integer n and
  x in radians.
 C 4 ceil
-?expressions functions ceil
+C ?expressions functions ceil
 #ceil(x) &  ~~  & ~ & $\lceil x \rceil$, smallest integer not less than the real part of $x$ \\
 %ceil(x)@ ~~ @$left ceiling x right ceiling$, smallest integer not less than $x$ (real part)
  `ceil(x)` returns the smallest integer not less than the real part of x.
@@ -1750,7 +1750,7 @@ C 4 expint
 #expint(n,x) & int $n\ge0$, real $x\ge0$ & ~ & $E_n(x)=\int_1^\infty t^{-n} e^{-xt}\,dt$,  exponential integral of $x$ \\
 %expint(n,x)@ ~~ @$E sub n (x)$, exponential integral function of $x$
 C 4 floor
-?expressions functions floor
+C ?expressions functions floor
 #floor(x) &  ~~  & ~ & $\lfloor x \rfloor$,  largest integer not greater
 #than the real part of $x$ \\
 %floor(x)@ ~~ @$left floor x right floor$, largest integer not greater than $x$ (real part)
@@ -1784,7 +1784,7 @@ C 4 igamma
  The `imag(x)` function returns the imaginary part of its argument as a real
  number.
 C 4 int
-?expressions functions int
+C ?expressions functions int
 #int(x) & real & ~ &  integer part of $x$, truncated toward zero \\
 %int(x)@real@integer part of $x$, truncated toward zero
  int(x) returns the integer part of its argument, truncated toward zero.
@@ -1864,7 +1864,7 @@ C 4 invigamma
 %real(x)@ ~~ @real part of $x$
  The `real(x)` function returns the real part of its argument.
 C 4 round
-?expressions functions round
+C ?expressions functions round
 #round(x) &  ~~  & ~ & $\lfloor x \rceil$,  integer nearest to the real part of $x$ \\
 %round(x)@ ~~ @ integer nearest to the real part of $x$
  `round(x)` returns the integer nearest to the real part of x.
@@ -1905,7 +1905,7 @@ C 4 round
  x is a complex value, this always returns the root with positive real
  part.
 C 4 SynchrotronF
-?expressions functions SynchrotronF
+C ?expressions functions SynchrotronF
 #SynchrotronF(x) & real & ~ & $F(x) = x\intop_{x}^{\infty}K_{\frac{5}{3}}(\nu)~d\nu$ \\
 %SynchrotronF(x)@ ~~ @ Synchrotron function F%
 4 tan
@@ -2350,7 +2350,7 @@ C 4 FresnelS
  point representation is equivalent to -0.999999999999999...
  See also `overflow`.
 
-?expressions functions int
+?expresssions functions int
 ?int
  `int(x)` returns the integer part of its argument, truncated toward zero.
  If |x| > 2^63, i.e. too large to represent as an integer, NaN is returned.
@@ -3293,7 +3293,9 @@ C ... and restart the table:
 2 inline data and datablocks
 ?inline data
 ?inline
+?data inline
 ?datablocks
+?data datablocks
  There are two mechanisms for embedding data into a stream of gnuplot commands.
  If the special filename '-' appears in a plot command, then the lines
  immediately following the plot command are interpreted as inline data.
@@ -7180,8 +7182,10 @@ Ffigure_zerror
 ?datafile
 ?data
 ?file
- Discrete data contained in a file can be displayed by specifying the name of
- the data file (enclosed in single or double quotes) on the `plot` command line.
+ Data provided in a file can be plotted by giving the name of the file
+ (enclosed in single or double quotes) on the `plot` command line.
+ Data may also come from an input stream that is not a file.
+ See `special-filenames`, `piped-data`, `datablocks`.
 
  Syntax:
        plot '<file_name>' {binary <binary list>}
@@ -7868,6 +7872,7 @@ Ffigure_smooth_path
 ?plot datafile special-filenames
 ?plot special-filenames
 ?datafile special-filenames
+?data special-filenames
 ?special-filenames ++
 ?special-filenames +
 ?+
@@ -7946,6 +7951,8 @@ Ffigure_smooth_path
 4 piped-data
 ?commands plot datafile piped-data
 ?plot datafile piped-data
+?datafile piped-data
+?data piped-data
 ?plot piped-data
 ?piped-data
 ?pipes
@@ -7988,11 +7995,6 @@ Ffigure_smooth_path
 
  Syntax:
        plot 'file' using <entry> {:<entry> {:<entry> ...}} {'format'}
-
- If a format is specified, it is used to read in each datafile record using the
- C library 'scanf' function.  Otherwise the record is interpreted as consisting
- of columns (fields) of data separated by whitespace (spaces and/or tabs),
- but see `datafile separator`.
 
  Each <entry> may be a simple column number that selects the value from one
  field of the input file, a string that matches a column label in the first
@@ -8037,15 +8039,21 @@ Ffigure_smooth_path
  If the `using` list has two entries, these will be used for x and y.
  See `set style` and `fit` for details about plotting styles that make use of
  data from additional columns of input.
+5 format
+?using format
+?plot using format
+ If a format is specified, it is used to read in each datafile record using the
+ C library 'scanf' function.  Otherwise the record is interpreted as consisting
+ of columns (fields) of data separated by whitespace (spaces and/or tabs),
+ but see `datafile separator`.
 
- 'scanf' accepts several numerical specifications but `gnuplot`
- requires all inputs to be double-precision floating-point variables,
- so "%lf" is essentially the only permissible specifier.
- A format string given by the user must contain at least one such
- input specifier, and no more than seven of them.
- 'scanf' expects to see white space---a blank, tab
- ("\t"), newline ("\n"), or formfeed ("\f")---between numbers; anything else
- in the input stream must be explicitly skipped.
+ 'scanf' itself accepts several numerical specifications but `gnuplot` requires
+ all inputs to be double-precision floating-point variables, so "%lf" is
+ essentially the only permissible specifier.  The format string must contain at
+ least one such input specifier and no more than seven of them.
+ 'scanf' expects to see white space -- a blank, tab ("\t"), newline ("\n"),
+ or formfeed ("\f") -- between numbers; anything else in the input stream must
+ be explicitly skipped.
 
  Note that the use of "\t", "\n", or "\f" requires use of double-quotes
  rather than single-quotes.
