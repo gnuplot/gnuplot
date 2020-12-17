@@ -1010,7 +1010,7 @@ if test "${with_cairo}" = yes; then
   PKG_CHECK_MODULES_NOFAIL(WEBP, [libwebp libwebpmux],
       [
       CPPFLAGS="$CPPFLAGS $WEBP_CFLAGS"
-      LDFLAGS="$LDFLAGS $WEBP_LIBS"
+      TERMLIBS="$TERMLIBS $WEBP_LIBS"
       AC_DEFINE(HAVE_WEBP,1, [ Define to build the webp terminal. ])
       ],
       with_webp=no
