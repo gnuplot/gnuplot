@@ -226,6 +226,7 @@ static int df_lower_index = 0;  /* first mesh required */
 static int df_upper_index = MAXINT;
 static int df_index_step = 1;   /* 'every' for indices */
 static int df_current_index;    /* current mesh */
+static int df_last_index_read;  /* last mesh we actually read data from */
 
 /* stuff for named index support */
 static char *indexname = NULL;
@@ -897,6 +898,8 @@ df_read_matrix(int *rows, int *cols)
 		continue;
 	}
 
+	df_last_index_read = df_current_index;
+
 	if (mixed_data_fp && is_EOF(*s)) {
 	    df_eof = 1;
 	    return linearized_matrix;
@@ -1069,6 +1072,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     indexname = NULL;
 
     df_current_index = 0;
+    df_last_index_read = 0;
     blank_count = 2;
     /* by initialising blank_count, leading blanks will be ignored */
 
@@ -1910,6 +1914,7 @@ df_readascii(double v[], int max)
 	/*}}} */
 
 	/* get here => was not blank */
+	df_last_index_read = df_current_index;
 
 	blank_count = 0;
 
@@ -2630,7 +2635,7 @@ f_column(union argument *arg)
 	column = (int) real(&a);
 
     if (column == -2)
-	push(Ginteger(&a, df_current_index));
+	push(Ginteger(&a, df_last_index_read));
     else if (column == -1)
 	push(Ginteger(&a, line_count));
     else if (column == 0)       /* $0 = df_datum */
@@ -4948,6 +4953,7 @@ df_readbinary(double v[], int max)
 	point_count = -1;
 	line_count = 0;
 	df_current_index = df_bin_record_count;
+	df_last_index_read = df_current_index;
 
 	/* Craig DeForest Feb 2013 - Fast version of uniform binary matrix.
 	 * Don't apply this to ascii input or special filetypes.

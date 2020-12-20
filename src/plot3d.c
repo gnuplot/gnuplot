@@ -2252,10 +2252,6 @@ eval_3dplots()
 			}
 		    }
 
-		    if (this_plot != first_dataset)
-			/* copy (explicit) "with pm3d at ..." option from the first dataset in the file */
-			strcpy(this_plot->pm3d_where, first_dataset->pm3d_where);
-
 		    /* okay, we have read a surface */
 		    plot_num++;
 		    tp_3d_ptr = &(this_plot->next_sp);
@@ -2291,6 +2287,7 @@ eval_3dplots()
 			*(this_plot->labels) = *(first_dataset->labels);
 			this_plot->labels->next = NULL;
 		    }
+		    strcpy(this_plot->pm3d_where, first_dataset->pm3d_where);
 		} while (df_return != DF_EOF);
 
 		df_close();
