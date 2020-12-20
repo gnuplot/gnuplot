@@ -3804,6 +3804,16 @@ parse_plot_title(struct curve_points *this_plot, char *xtitle, char *ytitle, TBO
 		char *skip = try_to_get_string();
 		free(skip);
 
+	    /* In the very common case of a string constant, use it as-is. */
+	    /* This guarantees that the title is only entered in the key once per
+	     * data file rather than once per data set within the file.
+	     */
+	    } else if (isstring(c_token) && !equals(c_token+1,".")) {
+		free_at(df_plot_title_at);
+		df_plot_title_at = NULL;
+		free(this_plot->title);
+		this_plot->title = try_to_get_string();
+
 	    /* Create an action table that can generate the title later */
 	    } else { 
 		free_at(df_plot_title_at);
