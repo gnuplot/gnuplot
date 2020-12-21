@@ -3879,6 +3879,14 @@ parse_plot_title(struct curve_points *this_plot, char *xtitle, char *ytitle, TBO
 
 }
 
+/*
+ * If a plot component title (key entry) was provided as a string expression
+ * rather than a simple string constant, we saved the expression to evaluate
+ * after the corresponding data has been input. This routine is called once
+ * for each data set in the input data stream, which would potentially generate
+ * a separate key entry for each data set.  We can short-circuit this by
+ * clearing the saved string expression after generating the first title.
+ */
 void
 reevaluate_plot_title(struct curve_points *this_plot)
 {
@@ -3891,11 +3899,20 @@ reevaluate_plot_title(struct curve_points *this_plot)
 	if (!undefined && a.type == STRING) {
 	    free(this_plot->title);
 	    this_plot->title = a.v.string_val;
+
 	    /* Special case where the "title" is used as a tic label */
 	    if (this_plot->plot_style == HISTOGRAMS
 	    &&  histogram_opts.type == HT_STACKED_IN_TOWERS) {
 		double xpos = this_plot->histogram_sequence + this_plot->histogram->start;
 		add_tic_user(&axis_array[FIRST_X_AXIS], this_plot->title, xpos, -1);
+	    }
+
+	    /* FIXME:  good or bad to suppress all but the first generated title
+	     *         for a file containing multiple data sets?
+	     */
+	    else {
+		free_at(df_plot_title_at);
+		df_plot_title_at = NULL;
 	    }
 	}
     }
