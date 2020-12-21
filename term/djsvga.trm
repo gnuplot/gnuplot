@@ -1326,7 +1326,11 @@ static GrPattern *
 DJSVGA_pattern(int pattern, int style)
 {
     pattern %= dj_fill_pattern_num;
+#if defined(MGRX_VERSION_API) && (MGRX_VERSION_API >= 0x0134)
+    dj_pattern.gp_ptype = GR_PTYPE_BITMAP;
+#else
     dj_pattern.gp_ispixmap = 0;
+#endif
     dj_pattern.gp_bmp_height = 8;
     dj_pattern.gp_bmp_fgcolor = dj_color;
     if (style == FS_TRANSPARENT_PATTERN)
@@ -1509,6 +1513,7 @@ DJSVGA_image(unsigned int M, unsigned int N, coordval *image,
 	  gpiPoint *corner, t_imagecolor color_mode)
 {
     GrContext ctxt;
+    // FIXME: GrImage is deprecated as of MGRX 1.3.4.
     GrImage * im = NULL;
 
     switch (color_mode) {
