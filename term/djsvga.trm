@@ -1101,6 +1101,8 @@ DJSVGA_enhanced_open(
 	/* widthflag FALSE means do not update text position after printing */
 	dj_enhanced_widthflag = widthflag;
 	/* Select font */
+	// FIMXE: why not simply call set_font() here?
+	// DJSVGA_set_font(fontname);
 	if ((fontname != NULL) && (strlen(fontname) > 0)) {
 	    DJSVGA_trim_font_string(fontname, filename, sizeof(filename));
 	    if (filename[0] == NUL)
@@ -1118,7 +1120,22 @@ DJSVGA_enhanced_open(
 		font = DJSVGA_LoadFont(DJSVGA_default_fontname);
 	    }
 	}
-	DJSVGA_TextOption.txo_font = (font != NULL) ? font : grx_default_font();
+	if (font == NULL) {
+	    font = grx_default_font();
+	    /* handle fontscale for the GRX/MGRX default font */
+	    if (dj_fontscale != 1.) {
+		GrFont * scaled;
+		int w, h;
+
+		w = font->h.width * dj_fontscale;
+		h = font->h.height * dj_fontscale;
+		scaled = GrBuildConvertedFont(font, GR_FONTCVT_RESIZE, w, h, 0, 0);
+		font = scaled;
+		if (DJSVGA_default_font == grx_default_font())
+		    DJSVGA_default_font = scaled;
+	    }
+	}
+	DJSVGA_TextOption.txo_font = font;
 	{ /* update hchar / vchar */
 	    const char text[] = "0123456789";
 	    int len = strlen(text);
