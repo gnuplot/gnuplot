@@ -2179,6 +2179,12 @@ void wxt_graphics()
 	/* depends on plot->xscale and plot->yscale */
 	gp_cairo_initialize_context(wxt_current_plot);
 
+#ifdef _WIN32
+	/* On Windows, we set the resolution to the screen resolution, i.e. taking
+	   the "text scaling" factor into account. */
+	gp_cairo_set_resolution(GetDPI());
+#endif
+
 	/* set or refresh terminal size according to the window size */
 	/* oversampling_scale is updated in gp_cairo_initialize_context */
 	wxt_current_plot->xmax = wxt_current_plot->device_xmax*wxt_current_plot->oversampling_scale;

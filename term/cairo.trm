@@ -916,6 +916,12 @@ void cairotrm_graphics()
 	term->ymax = (plot.device_ymax - 1) * plot.oversampling_scale;
 	term->tscale = plot.oversampling_scale;
 
+#ifdef _WIN32
+	/* On Windows, always explicitly set the resolution to 96dpi to avoid
+       applying the "text scaling" factor. */
+	gp_cairo_set_resolution(96);
+#endif
+
 	/* set font details (h_char, v_char) according to settings */
 	cairotrm_set_font("");
 
