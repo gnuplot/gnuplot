@@ -673,6 +673,11 @@ GraphInit(LPGW lpgw)
 		GetClientRect(lpgw->hWndGraph, &rect);
 		lpgw->Decoration.x = wrect.right - wrect.left + rect.left - rect.right;
 		lpgw->Decoration.y = wrect.bottom - wrect.top + rect.top - rect.bottom + lpgw->ToolbarHeight + lpgw->StatusHeight;
+		/* 2020-10-07 shige: get real value of Size.{x,y} for CW_USEDEFAULT */
+		if (lpgw->Size.x == CW_USEDEFAULT || lpgw->Size.y == CW_USEDEFAULT) {
+			lpgw->Size.x = wrect.right - wrect.left;
+			lpgw->Size.y = wrect.bottom - wrect.top;
+		}
 	}
 
 	/* resize to match requested canvas size */
@@ -3661,6 +3666,8 @@ ReadGraphIni(LPGW lpgw)
 	if ((lpgw->Size.x != CW_USEDEFAULT) && (lpgw->Size.y != CW_USEDEFAULT)) {
 		lpgw->Canvas.x = lpgw->Size.x;
 		lpgw->Canvas.y = lpgw->Size.y;
+	} else { /* 2020-10-07 shige: Initialize of Canvas.{x,y} */
+		lpgw->Canvas.x = lpgw->Canvas.y = 0;
 	}
 
 	if (bOKINI)
