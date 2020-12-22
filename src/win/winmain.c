@@ -426,29 +426,42 @@ ReadMainIni(LPTSTR file, LPTSTR section)
 
 
 #ifndef WGP_CONSOLE
+#ifndef __WATCOMC__
 int WINAPI
-WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCmdShow)
+_tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
+#else
+int WINAPI
+WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+#endif
 #else
 int
-main(int argc, char **argv)
+_tmain(int argc, TCHAR **argv)
 #endif
 {
     LPTSTR tail;
+    int i;
 #ifdef WGP_CONSOLE
     HINSTANCE hInstance = GetModuleHandle(NULL), hPrevInstance = NULL;
-#else
-    int i;
 #endif
 
-#ifndef WGP_CONSOLE
-# if defined( __MINGW32__) && !defined(_W64)
-#  define argc _argc
-#  define argv _argv
-# else /* MSVC, WATCOM, MINGW-W64 */
+#ifndef _UNICODE
+# ifndef WGP_CONSOLE
+#  if defined(__MINGW32__) && !defined(_W64)
+#   define argc _argc
+#   define argv _argv
+#  else /* MSVC, WATCOM, MINGW-W64 */
+#   define argc __argc
+#   define argv __argv
+#  endif
+# endif /* WGP_CONSOLE */
+#else
 #  define argc __argc
-#  define argv __argv
-# endif
-#endif /* WGP_CONSOLE */
+#  define argv argv_u8
+    /* create an UTF-8 encoded copy of all arguments */
+    char ** argv_u8 = calloc(__argc, sizeof(char *));
+    for (i = 0; i < __argc; i++)
+	argv_u8[i] = AnsiText(__wargv[i], S_ENC_UTF8);
+#endif
 
     szModuleName = (LPTSTR) malloc((MAXSTR + 1) * sizeof(TCHAR));
     CheckMemory(szModuleName);
@@ -1572,6 +1585,12 @@ win_fopen(const char *filename, const char *mode)
     LPWSTR wfilename = UnicodeText(filename, encoding);
     LPWSTR wmode = UnicodeText(mode, encoding);
     file = _wfopen(wfilename, wmode);
+    if (file == NULL) {
+	/* "encoding" didn't work, try UTF-8 instead */
+	free(wfilename);
+	wfilename = UnicodeText(filename, S_ENC_UTF8);
+	file = _wfopen(wfilename, wmode);
+    }
     free(wfilename);
     free(wmode);
     return file;

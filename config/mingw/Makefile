@@ -307,6 +307,7 @@ endif
 
 ifdef UNICODE
   CFLAGS += -DUNICODE -D_UNICODE
+  LDFLAGS += -municode
 endif
 
 CFLAGS += $(CWFLAGS)
