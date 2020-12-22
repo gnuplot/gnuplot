@@ -223,7 +223,7 @@ static void	StorePen(LPGW lpgw, int i, COLORREF ref, int colorstyle, int monosty
 static void	MakePens(LPGW lpgw, HDC hdc);
 static void	DestroyPens(LPGW lpgw);
 static void	Wnd_GetTextSize(HDC hdc, LPCSTR str, size_t len, int *cx, int *cy);
-static void	GetPlotRect(LPGW lpgw, LPRECT rect);
+static BOOL	GetPlotRect(LPGW lpgw, LPRECT rect);
 static void	MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc);
 static void	DestroyFonts(LPGW lpgw);
 static void	SelFont(LPGW lpgw);
@@ -974,10 +974,10 @@ Wnd_GetTextSize(HDC hdc, LPCSTR str, size_t len, int *cx, int *cy)
 }
 
 
-static void
+static BOOL
 GetPlotRect(LPGW lpgw, LPRECT rect)
 {
-	GetClientRect(lpgw->hGraph, rect);
+	return GetClientRect(lpgw->hGraph, rect);
 }
 
 
@@ -5045,15 +5045,16 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			return 0;
 		}
 		case WM_SIZE:
-			GetPlotRect(lpgw, &rect);
-			if (lpgw->Canvas.x != 0) {
-				lpgw->Canvas.x = rect.right - rect.left;
-				lpgw->Canvas.y = rect.bottom - rect.top;
-			}
+			if (GetPlotRect(lpgw, &rect)) {
+				if (lpgw->Canvas.x != 0) {
+					lpgw->Canvas.x = rect.right - rect.left;
+					lpgw->Canvas.y = rect.bottom - rect.top;
+				}
 #ifdef HAVE_D2D
-			if (lpgw->d2d)
-				d2dResize(lpgw, rect);
+				if (lpgw->d2d)
+					d2dResize(lpgw, rect);
 #endif
+			}
 			break;
 #ifndef WGP_CONSOLE
 		case WM_DROPFILES:
