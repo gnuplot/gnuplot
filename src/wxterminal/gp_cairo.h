@@ -250,6 +250,9 @@ void gp_cairo_boxed_text(plot_struct *plot, int x, int y, int option);
 
 void gp_cairo_set_dashtype(plot_struct *plot, int type, t_dashtype *custom_dash_pattern);
 
+/* explicitly set resolution */
+void gp_cairo_set_resolution(int dpi);
+
 #ifdef __cplusplus
 }
 #endif /*__cplusplus*/
