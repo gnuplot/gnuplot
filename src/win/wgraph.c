@@ -4333,6 +4333,12 @@ WndGraphParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			break;
 		}
+		case WM_MOVE: {
+			GetWindowRect(hwnd, &rect);
+			lpgw->Origin.x = rect.left;
+			lpgw->Origin.y = rect.top;
+			break;
+		}
 		case WM_SYSCOMMAND:
 			switch (LOWORD(wParam)) {
 				case M_GRAPH_TO_TOP:
