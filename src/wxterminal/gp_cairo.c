@@ -815,7 +815,7 @@ gp_cairo_create_layout(cairo_t *cr)
 
 void gp_cairo_set_resolution(int dpi)
 {
-	pango_cairo_font_map_set_resolution(pango_cairo_font_map_get_default(), dpi);
+	pango_cairo_font_map_set_resolution(PANGO_CAIRO_FONT_MAP(pango_cairo_font_map_get_default()), dpi);
 }
 
 void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string,
