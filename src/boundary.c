@@ -1561,15 +1561,15 @@ advance_key(TBOOLEAN only_invert)
     legend_key *key = &keyT;
 
     if (key->invert)
-        yl = key->bounds.ybot + yl_ref + key_entry_height/2 - yl;
+	yl = key->bounds.ybot + yl_ref + key_entry_height/2 - yl;
     if (only_invert)
 	return;
     if (key_count >= key_rows) {
-        yl = yl_ref;
-        xl += key_col_wth;
-        key_count = 0;
+	yl = yl_ref;
+	xl += key_col_wth;
+	key_count = 0;
     } else
-        yl = yl - key_entry_height;
+	yl = yl - key_entry_height;
 }
 
 /* stupid test used in only one place but it refers to our local variables */
