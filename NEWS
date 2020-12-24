@@ -1,3 +1,13 @@
+Changes since 5.4.1
+================
+* CHANGE generate only one key entry per multi-dataset input file Bug #2380
+* CHANGE (Windows): attempt to convert unicode on command line to UTF-8
+* FIX cairo terminals: Do not lose font info during multi-line enhanced text
+* FIX left-justification of titles in splot with user-specified key position
+* FIX cairo terminals (Windows): ignore "text scaling" from user screen settings
+* FIX win: instabilities associated with changing window size Bug #2301 #2304 
+
+
 Changes in 5.4.1
 ================
 * NEW "with rgbimage" and "with rgbalpha" accept single column ARGB input
