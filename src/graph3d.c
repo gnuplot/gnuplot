@@ -4023,7 +4023,10 @@ plot3d_polygons(struct surface_points *plot)
 	    continue;
 
 	/* Coloring piggybacks on options for isosurface */
-	quad[0].c = plot->fill_properties.border_color.lt;
+	if (plot->pm3d_color_from_column && !isnan(points[0].CRD_COLOR))
+	    quad[0].c = points[0].CRD_COLOR;
+	else
+	    quad[0].c = plot->fill_properties.border_color.lt;
 	quad[1].c = style;
 	pm3d_add_polygon( plot, quad, nv );
     }

@@ -1290,6 +1290,21 @@ get_3ddata(struct surface_points *this_plot)
 		else
 		    weight = 1.0;	/* default weight */
 
+	    } else if (this_plot->plot_style == POLYGONS) {
+		if (j >= 4) {
+		    if (this_plot->lp_properties.l_type == LT_COLORFROMCOLUMN) {
+			struct lp_style_type lptmp;
+			load_linetype(&lptmp, (int)v[3]);
+			color = lptmp.pm3d_color.lt;
+			color_from_column(TRUE);
+		    }
+		    if (this_plot->fill_properties.border_color.type == TC_RGB
+		    &&  this_plot->fill_properties.border_color.value < 0) {
+			color = v[3];
+			color_from_column(TRUE);
+		    }
+		}
+
 	    } else {	/* all other plot styles */
 		if (j >= 4) {
 		    color = v[3];
@@ -1368,7 +1383,7 @@ get_3ddata(struct surface_points *this_plot)
 				this_plot->noautoscale, {});
 		    }
 		    /* We converted linetype colors (lc variable) to RGB colors on input.
-		     * Other plot style do not do this.
+		     * Most plot styles do not do this.
 		     * When we later call check3d_for_variable_color it needs to know this.
 		     */
 		    if (this_plot->lp_properties.l_type == LT_COLORFROMCOLUMN) {

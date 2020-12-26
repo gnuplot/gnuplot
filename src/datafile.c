@@ -2360,6 +2360,14 @@ df_readascii(double v[], int max)
 			     && (df_column[column - 1].good == DF_UNDEFINED)) {
 			v[output] = df_column[column - 1].datum;
 			return_value = DF_UNDEFINED;
+		    } else if ((df_current_plot && df_current_plot->plot_style == POLYGONS
+				&& df_no_use_specs
+				&& column == df_no_cols+1)) {
+			/* DEBUG - the idea here is to forgive a missing color value in
+			 *         polygon vertices after the first one. The test is not
+			 *         quite correct since we don't track the vertex number.
+			 */
+			v[output] = not_a_number();
 		    } else {
 			/* line bad only if user explicitly asked for this column */
 			if (df_no_use_specs) {

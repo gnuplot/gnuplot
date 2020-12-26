@@ -5330,13 +5330,22 @@ Ffigure_points
 ?style polygons
 ?with polygons
 ?polygons
+ 2D plots:
+
       plot DATA {using 1:2} with polygons
 
- `plot with polygons` is currently treated as `plot with filledcurves closed`
+ `plot with polygons` is currently treated as `plot with filledcurves closed`.
+ Each polygon may be assigned a separate color by providing a third using
+ specifier and the keywords `lc variable` (value is interpreted as a linetype)
+ or `lc rgb variable` (value is interpreted as a 24-bit RGB color).
+ Only the color value from the first vertex of the polygon is used.
+
+ 3D plots:
 
       splot DATA {using x:y:z} with polygons
             {fillstyle <fillstyle spec>}
             {fillcolor <colorspec>}
+
  `splot with polygons` uses pm3d to render individual triangles, quadrangles,
  and larger polygons in 3D.  These may be facets of a 3D surface or isolated
  shapes. The code assumes that the vertices lie in a plane.
@@ -5347,6 +5356,11 @@ Ffigure_points
  global fillstyle from `set style fill` is used.  Due to limitations in the
  pm3d code, a single border line style from `set pm3d border` is applied to all
  polygons.  This restriction may be removed in a later gnuplot version.
+
+ Each polygon may be assigned a separate RGB color by providing a fourth using
+ specifier and the keywords `lc variable` (value is interpreted as a linetype)
+ or `lc rgb variable` (value is interpreted as a 24-bit RGB color).
+ Only the color value from the first vertex of the polygon is used.
 
  pm3d sort order and lighting are applied to the faces. It is probably always
  desirable to use `set pm3d depthorder`.
