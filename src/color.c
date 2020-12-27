@@ -935,3 +935,38 @@ rgb_from_colormap(double gray, udvt_entry *colormap)
     return rgb;
 }
 
+/*
+ * Interpret the colorspec of a linetype to yield an RGB packed integer.
+ * This is not guaranteed to handle colorspecs that were not part of a linetype.
+ */
+unsigned int
+rgb_from_colorspec(struct t_colorspec *tc)
+{
+    double cbval;
+    rgb255_color color;
+
+    switch (tc->type) {
+	case TC_DEFAULT:
+		return 0;
+	case TC_RGB:
+		return tc->lt;
+	case TC_Z:
+		cbval = cb2gray(tc->value);
+		break;
+	case TC_CB:
+		cbval = (CB_AXIS.log && tc->value <= 0) ? CB_AXIS.min : tc->value;
+		cbval = cb2gray(cbval);
+		break;
+	case TC_FRAC:
+		cbval = (sm_palette.positive == SMPAL_POSITIVE) ?  tc->value : 1-tc->value;
+		break;
+	case TC_COLORMAP:
+		/* not handled but perhaps it should be? */
+	default:
+		/* cannot happen in a linetype */
+		return 0;
+    }
+
+    rgb255maxcolors_from_gray( cbval, &color );
+    return (unsigned int)color.r << 16 | (unsigned int)color.g << 8 | (unsigned int)color.b;
+}

@@ -1242,7 +1242,7 @@ get_3ddata(struct surface_points *this_plot)
 		    struct lp_style_type lptmp;
 		    load_linetype(&lptmp, (int)v[--j]);
 		    color_from_column(TRUE);
-		    color = lptmp.pm3d_color.lt;
+		    color = rgb_from_colorspec( &lptmp.pm3d_color );
 		}
 
 		if (j >= 4) {
@@ -1294,8 +1294,8 @@ get_3ddata(struct surface_points *this_plot)
 		if (j >= 4) {
 		    if (this_plot->lp_properties.l_type == LT_COLORFROMCOLUMN) {
 			struct lp_style_type lptmp;
-			load_linetype(&lptmp, (int)v[3]);
-			color = lptmp.pm3d_color.lt;
+			load_linetype(&lptmp, (int)(v[3]));
+			color = rgb_from_colorspec( &lptmp.pm3d_color );
 			color_from_column(TRUE);
 		    }
 		    if (this_plot->fill_properties.border_color.type == TC_RGB

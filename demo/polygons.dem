@@ -95,11 +95,19 @@ splot 'icosahedron.dat' with polygons fc "gray75"
 
 pause -1 "Hit return to continue"
 
-set title "splot dodecahedron.dat with polygons"
+set title "splot dodecahedron.dat with polygons lc variable"
 set view 148, 55, 2.7
 set pm3d lighting spec2 0.3
+set palette cubehelix
+set for [i=1:12] linetype 99+i lc palette frac i/12.
 
-splot 'dodecahedron.dat' with polygons fc "gold"
+splot 'dodecahedron.dat' using 1:2:3:($0+100) with polygons lc variable
+
+pause -1 "Hit return to continue"
+
+set title "splot dodecahedron with polygons lc rgb variable"
+
+splot 'dodecahedron.dat' using 1:2:3:(0xffffff * rand(0)) with polygons lc rgb variable
 
 pause -1 "Hit return to continue"
 
