@@ -9436,7 +9436,7 @@ Ffigure_smooth_path
  colormap partially transparent.  This named colormap is then used later
  to color a pm3d surface.
  Note that the alpha channel value in a named colormap follows the convention
- for ARGB line properties; i.e 0 is opaque 0xff is fully transparent.
+ for ARGB line properties; i.e 0 is opaque, 0xff is fully transparent.
 
       set palette defined (0 "dark-red", 1 "white")
       set colormap new Reds
@@ -9449,7 +9449,10 @@ Ffigure_smooth_path
       set colormap Reds range [0:10]
 
  If no range is set, or if min and max are the same, then the mapping uses the
- current limits of cbrange. See `set cbrange`.  
+ current limits of cbrange. See `set cbrange`.
+
+ A colormap can be used to gradient-fill a rectangular area.
+ See `pixmap colormap`.
 
 3 colorsequence
 ?commands set colorsequence
@@ -12882,6 +12885,7 @@ Ffigure_multiple_keys
                   {   rgbformulae <r>,<g>,<b>
                     | defined { ( <gray1> <color1> {, <grayN> <colorN>}... ) }
                     | file '<filename>' {datafile-modifiers}
+                    | colormap <colormap-name> 
                     | functions <R>,<G>,<B>
                   }
                   { cubehelix {start <val>} {cycles <val>} {saturation <val>} }
@@ -13102,19 +13106,24 @@ Ffigure_multiple_keys
  The default values are
        set palette cubehelix start 0.5 cycles -1.5 saturation 1
        set palette gamma 1.5
-
+4 colormap
+?commands set palette colormap
+?palette colormap
+ `set palette colormap <name>` loads a defined gradient that was previously
+ saved to a colormap. Alpha channel information in the colormap, if any, 
+ will be lost when the color values are copied into the palette definition.
+ See `colormap`.
 4 file
 ?commands set palette file
 ?set palette file
 ?palette file
  `set palette file` is basically a `set palette defined (<gradient>)` where
- <gradient> is read from a datafile.  Either 4 columns (gray,R,G,B) or
- just three columns (R,G,B) have to be selected via the `using` data file
- modifier.  In the three column case, the line number will be used as gray.
+ <gradient> is read from a datafile.  Select four columns (gray,R,G,B) or
+ three columns (R,G,B) via the `using` specifier.
+ In the three column case, the line number will be used as gray.
  The gray range is automatically rescaled to [0,1].  The file is read as a
  normal data file, so all datafile modifiers can be used.
- Please note, that `R` might actually be e.g. `H` if HSV color space is
- selected.
+ Please note that `R` might actually be `H` if HSV color space is selected.
 
  As usual <filename> may be `'-'` which means that the data follow the command
  inline and are terminated by a single `e` on a line of its own.
@@ -13137,7 +13146,6 @@ Ffigure_multiple_keys
  Binary palette files are supported as well, see `binary general`. Example:
  put 64 triplets of R,G,B doubles into file palette.bin and load it by
        set palette file "palette.bin" binary record=64 using 1:2:3
-
 
 4 gamma correction
 ?commands set palette gamma-correction

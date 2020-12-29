@@ -171,7 +171,8 @@ static void new_colormap(void);
 static void set_colormap_range(void);
 
 static void check_palette_grayscale(void);
-static int set_palette_defined(void);
+static void set_palette_colormap(void);
+static int  set_palette_defined(void);
 static void set_palette_file(void);
 static void set_palette_function(void);
 static void parse_histogramstyle(histogram_style *hs,
@@ -3387,11 +3388,12 @@ set_palette_defined()
     sm_palette.smallest_gradient_interval = 1;
 
     if (END_OF_COMMAND) {
-	/* lets use some default gradient */
+	/* some default gradient */
 	double pal[][4] = { {0.0, 0.05, 0.05, 0.2}, {0.1, 0, 0, 1},
-			    {0.25, 0.7, 0.85, 0.9}, {0.4, 0, 0.75, 0},
-			    {0.5, 1, 1, 0}, {0.7, 1, 0, 0},
-			    {0.9, 0.6, 0.6, 0.6}, {1.0, 0.95, 0.95, 0.95} };
+			    {0.3, 0.05, 0.9, 0.4}, {0.5, 0.9, 0.9, 0},
+			    {0.7, 1, 0.6471, 0}, {0.8, 1, 0, 0},
+			    {0.9, 0.94, 0.195, 0.195}, {1.0, 1, .8, .8} };
+
 	int i;
 	for (i=0; i<8; i++) {
 	    sm_palette.gradient[i].pos = pal[i][0];
@@ -3417,7 +3419,7 @@ set_palette_defined()
 	p = real_expression();
 	col_str = try_to_get_string();
 	if (col_str) {
-	    /* either color name or X-style rgb value "#rrggbb" */
+	    /* Hex constant or X-style rgb value "#rrggbb" */
 	    if (col_str[0] == '#' || col_str[0] == '0') {
 		/* X-style specifier */
 		int rr,gg,bb;
@@ -3428,26 +3430,18 @@ set_palette_defined()
 		r = (double)(rr)/255.;
 		g = (double)(gg)/255.;
 		b = (double)(bb)/255.;
-	    }
-	    else { /* some predefined names */
-		/* Maybe we could scan the X11 rgb.txt file to look up color
-		 * names?  Or at least move these definitions to some file
-		 * which is included somehow during compilation instead
-		 * hardcoding them. */
-		/* Can't use lookupt_table() as it works for tokens only,
-		   so we'll do it manually */
-		const struct gen_table *tbl = pm3d_color_names_tbl;
-		while (tbl->key) {
-		    if (!strcmp(col_str, tbl->key)) {
-			r = (double)((tbl->value >> 16 ) & 255) / 255.;
-			g = (double)((tbl->value >> 8 ) & 255) / 255.;
-			b = (double)(tbl->value & 255) / 255.;
-			break;
-		    }
-		    tbl++;
-		}
-		if (!tbl->key)
+
+	    /* Predefined color names.
+	     * Could we move these definitions to some file that is included
+	     * somehow during compilation instead hardcoding them?
+	     */
+	    } else {
+		int rgbval = lookup_table_entry(pm3d_color_names_tbl, col_str);
+		if (rgbval < 0)
 		    int_error( c_token-1, "Unknown color name." );
+		r = ((rgbval >> 16) & 255) / 255.;
+		g = ((rgbval >> 8 ) & 255) / 255.;
+		b = (rgbval & 255) / 255.;
 		named_colors = 1;
 	    }
 	    free(col_str);
@@ -3491,6 +3485,35 @@ set_palette_defined()
     return named_colors;
 }
 
+/*
+ *  process 'set palette colormap' command
+ */
+static void
+set_palette_colormap()
+{
+    int i, actual_size;
+    udvt_entry *colormap = get_colormap(c_token);
+
+    if (!colormap)
+	int_error(c_token, "expecting colormap name");
+    
+    free(sm_palette.gradient);
+    sm_palette.gradient = NULL;
+    actual_size = colormap->udv_value.v.value_array[0].v.int_val;
+    sm_palette.gradient = gp_alloc( actual_size*sizeof(gradient_struct), "gradient" );
+    sm_palette.gradient_num = actual_size;
+
+    for (i = 0; i < actual_size; i++) {
+	unsigned int rgb24 = colormap->udv_value.v.value_array[i+1].v.int_val;
+	sm_palette.gradient[i].col.r = ((rgb24 >> 16) & 0xff) / 255.;
+	sm_palette.gradient[i].col.g = ((rgb24 >> 8) & 0xff) / 255.;
+	sm_palette.gradient[i].col.b = ((rgb24) & 0xff) / 255.;
+	sm_palette.gradient[i].pos = i;
+    }
+
+    check_palette_grayscale();
+}
+
 
 /*  process 'set palette file' command
  *  load a palette from file, honor datafile modifiers
@@ -3498,7 +3521,6 @@ set_palette_defined()
 static void
 set_palette_file()
 {
-    int specs;
     double v[4];
     int i, j, actual_size;
     char *file_name;
@@ -3510,37 +3532,29 @@ set_palette_file()
 	int_error(c_token, "missing filename");
 
     df_set_plot_mode(MODE_QUERY);	/* Needed only for binary datafiles */
-    specs = df_open(file_name, 4, NULL);
+    df_open(file_name, 4, NULL);
     free(file_name);
 
-    if (specs > 0 && specs < 3)
-	int_error( c_token, "Less than 3 using specs for palette");
-
-    if (sm_palette.gradient) {
-	free( sm_palette.gradient );
-	sm_palette.gradient = 0;
-    }
+    free(sm_palette.gradient);
+    sm_palette.gradient = NULL;
     actual_size = 10;
-    sm_palette.gradient =
-      gp_alloc( actual_size*sizeof(gradient_struct), "gradient" );
+    sm_palette.gradient = gp_alloc( actual_size*sizeof(gradient_struct), "gradient" );
 
     i = 0;
 
-    /* values are simply clipped to [0,1] without notice */
+    /* values are clipped to [0,1] without notice */
     while ((j = df_readline(v, 4)) != DF_EOF) {
 	if (i >= actual_size) {
-	  actual_size += 10;
-	  sm_palette.gradient = (gradient_struct*)
-	    gp_realloc( sm_palette.gradient,
-			actual_size*sizeof(gradient_struct),
-			"pm3d gradient" );
+	    actual_size += 10;
+	    sm_palette.gradient = gp_realloc( sm_palette.gradient,
+		    actual_size*sizeof(gradient_struct), "pm3d gradient" );
 	}
 	switch (j) {
 	    case 3:
 		sm_palette.gradient[i].col.r = clip_to_01(v[0]);
 		sm_palette.gradient[i].col.g = clip_to_01(v[1]);
 		sm_palette.gradient[i].col.b = clip_to_01(v[2]);
-		sm_palette.gradient[i].pos = i ;
+		sm_palette.gradient[i].pos = i;
 		break;
 	    case 4:
 		sm_palette.gradient[i].col.r = clip_to_01(v[1]);
@@ -3561,20 +3575,13 @@ set_palette_file()
 
     sm_palette.gradient_num = i;
     check_palette_grayscale();
-
 }
 
 
 /* Process a 'set palette function' command.
  *  Three functions with fixed dummy variable gray are registered which
  *  map gray to the different color components.
- *  If ALLOW_DUMMY_VAR_FOR_GRAY is set:
- *    A different dummy variable may proceed the formulae in quotes.
- *    This syntax is different from the usual '[u=<start>:<end>]', but
- *    as <start> and <end> are fixed to 0 and 1 you would have to type
- *    always '[u=]' which looks strange, especially as just '[u]'
- *    wouldn't work.
- *  If unset:  dummy variable is fixed to 'gray'.
+ *  The dummy variable must be 'gray'.
  */
 static void
 set_palette_function()
@@ -3586,15 +3593,7 @@ set_palette_function()
     strcpy( saved_dummy_var, c_dummy_var[0]);
 
     /* set dummy variable */
-#ifdef ALLOW_DUMMY_VAR_FOR_GRAY
-    if (isstring(c_token)) {
-	quote_str( c_dummy_var[0], c_token, MAX_ID_LEN );
-	++c_token;
-    }
-    else
-#endif /* ALLOW_DUMMY_VAR_FOR_GRAY */
     strncpy( c_dummy_var[0], "gray", MAX_ID_LEN );
-
 
     /* Afunc */
     start_token = c_token;
@@ -3788,6 +3787,14 @@ set_palette()
 		--c_token;
 		continue;
 	    } /* cubehelix */
+	    case S_PALETTE_COLORMAP: { /* colormap */
+		CHECK_TRANSFORM;
+		++c_token;
+		set_palette_colormap();
+		sm_palette.colorMode = SMPAL_COLOR_MODE_GRADIENT;
+		pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_GRADIENT;
+		continue;
+	    }
 	    case S_PALETTE_DEFINED: { /* "def$ine" */
 		CHECK_TRANSFORM;
 		++c_token;

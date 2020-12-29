@@ -483,6 +483,7 @@ const struct gen_table set_palette_tbl[] =
     { "neg$ative",	S_PALETTE_NEGATIVE },
     { "gray$scale",	S_PALETTE_GRAY },
     { "grey$scale",	S_PALETTE_GRAY },
+    { "colormap",	S_PALETTE_COLORMAP },
     { "col$or",		S_PALETTE_COLOR },
     { "rgb$formulae",	S_PALETTE_RGBFORMULAE },
     { "def$ined",       S_PALETTE_DEFINED },
