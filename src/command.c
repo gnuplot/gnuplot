@@ -172,8 +172,8 @@ int inline_num;			/* input line number */
 struct udft_entry *dummy_func;
 
 /* support for replot command */
-char *replot_line;
-int plot_token;			/* start of 'plot' command */
+char *replot_line = NULL;
+int plot_token = 0;		/* start of 'plot' command */
 
 /* flag to disable `replot` when some data are sent through stdin;
  * used by mouse/hotkey capable terminals */
