@@ -2350,7 +2350,7 @@ C 4 FresnelS
  point representation is equivalent to -0.999999999999999...
  See also `overflow`.
 
-?expresssions functions int
+?expressions functions int
 ?int
  `int(x)` returns the integer part of its argument, truncated toward zero.
  If |x| > 2^63, i.e. too large to represent as an integer, NaN is returned.
