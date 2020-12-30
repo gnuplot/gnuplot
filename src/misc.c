@@ -1609,8 +1609,10 @@ pixmap_from_colormap(t_pixmap *pixmap)
 
     if (!colormap)
 	int_error(c_token, "not a colormap");
-    size = colormap->udv_value.v.value_array[0].v.int_val;
     c_token++;
+    free(pixmap->colormapname);
+    pixmap->colormapname = gp_strdup(colormap->udv_name);
+    size = colormap->udv_value.v.value_array[0].v.int_val;
 
     pixmap->image_data = gp_realloc( pixmap->image_data,
 			size * 4. * sizeof(coordval), "pixmap");

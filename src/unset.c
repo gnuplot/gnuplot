@@ -743,6 +743,7 @@ unset_pixmaps(void)
     t_pixmap *pixmap, *next;
     for (pixmap = pixmap_listhead; pixmap; pixmap = next) {
 	free(pixmap->filename);
+	free(pixmap->colormapname);
 	free(pixmap->image_data);
 	next = pixmap->next;
 	free(pixmap);
@@ -764,6 +765,7 @@ unset_pixmap(int i)
 	    else
 		prev->next = pixmap->next;
 	    free(pixmap->filename);
+	    free(pixmap->colormapname);
 	    free(pixmap->image_data);
 	    free(pixmap);
 	    pixmap = prev->next;

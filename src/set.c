@@ -2200,7 +2200,7 @@ set_pixmap()
 	break;
     }
 
-    if (from_colormap)
+    if (from_colormap || this_pixmap->colormapname)
 	return;
 
     if (!this_pixmap->filename)

@@ -2443,6 +2443,7 @@ $PALETTE u 1:2 t 'red' w l lt 1 lc rgb 'red',\
      * for our temporary testing plot.
      */
     save_set(f);
+    save_pixmaps(f);
 
     /* execute all commands from the temporary file */
     rewind(f);

@@ -213,6 +213,7 @@ typedef struct t_pixmap {
     int layer;			/* front/back/behind */
     TBOOLEAN center;		/* position is center rather than lower left */
     char *filename;		/* where to read the pixmap pixmap */
+    char *colormapname;		/* the colormap this was taken from */
     coordval *image_data;	/* pixel array RGBARGBA... */
 } t_pixmap;
 
