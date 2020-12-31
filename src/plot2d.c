@@ -1164,7 +1164,7 @@ get_data(struct curve_points *current_plot)
 	    coordval major_axis = (j >= 3) ? v[2] : 0.0;
 	    coordval minor_axis = (j >= 4) ? v[3] : (j >= 3) ? v[2] : 0.0;
 	    coordval orientation = (j >= 5) ? v[4] : 0.0;
-	    coordval flag = (major_axis < 0 || minor_axis < 0) ?  DEFAULT_RADIUS : 0;
+	    coordval flag = (major_axis <= 0 || minor_axis <= 0) ?  DEFAULT_RADIUS : 0;
 
 	    if (j == 2)	/* FIXME: why not also for j == 3 or 4? */
 		orientation = default_ellipse.o.ellipse.orientation;
