@@ -1,5 +1,6 @@
 reset
 load "gen-random.inc"
+unset key
 
 set title "How to plot a kernel density estimate for this 2D dataset?"
 plot $random using 1:2

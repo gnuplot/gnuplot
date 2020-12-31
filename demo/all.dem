@@ -139,8 +139,9 @@ print "******************** file hidden_compare.dem ********************"
 load "hidden_compare.dem"
 reset
 
-print "******************** file dgrid3d.dem ********************"
+print "******************** dgrid3d ********************"
 load "dgrid3d.dem"
+load "kdensity2d.dem"
 reset
 
 print "******************** file world.dem ********************"
@@ -204,7 +205,7 @@ print "******************** file projection.dem ******************"
 load "projection.dem"
 reset
 
-print "******************** file contours.dem ********************"
+print "******************** contours ********************"
 load "contours.dem"
 load "custom_contours.dem"
 reset
@@ -250,10 +251,6 @@ print "********************** file pm3d_clip.dem *********************"
 load "pm3d_clip.dem"
 reset
 
-print "********************** file pm3dcolors.dem *********************"
-load "pm3dcolors.dem"
-reset
-
 print "********************** file complex_trig.dem *********************"
 load "complex_trig.dem"
 reset
@@ -267,10 +264,13 @@ reset
 print "********************** libamos routines *************************"
 load "complex_airy.dem"
 load "BesselK.dem"
+load "expint.dem"
 reset
 
 print "********************** special functions *************************"
 load "elliptic.dem"
+load "lnGamma.dem"
+load "igamma.dem"
 load "ibeta.dem"
 load "lambert.dem"
 load "synchrotron.dem"
@@ -372,7 +372,7 @@ print "********************** file iterate.dem *********************"
 load "iterate.dem"
 reset
 
-print "********************** file histograms.dem *********************"
+print "********************** histograms *********************"
 load "histograms.dem"
 load "histograms2.dem"
 load "label_stacked_histograms.dem"
@@ -421,7 +421,7 @@ print "********************** file key.dem *********************"
 load "key.dem"
 reset
 
-print "********************** file custom_key.dem *********************"
+print "********************** custom key layout *********************"
 load "custom_key.dem"
 load "nokey.dem"
 load "keyentry.dem"
@@ -499,6 +499,9 @@ load "polygons.dem"
 print "********************** file named_palettes.dem *********************"
 load "named_palettes.dem"
 
+print "********************** file palette+alpha.dem *********************"
+load "palette+alpha.dem"
+
 print "********************** file rgb_hexdata.dem *********************"
 load "rgb_hexdata.dem"
 
@@ -508,8 +511,11 @@ load "vplot.dem"
 print "********************** file isosurface.dem *********************"
 load "isosurface.dem"
 
-print "********************** file voxel.dem *********************"
-load "voxel.dem"
+#print "********************** file voxel.dem *********************"
+#load "voxel.dem"
+#
+pause 2
+print "**********************   all done   ************************"
 
-pause 3
 reset session
+exit gnuplot
