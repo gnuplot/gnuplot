@@ -2283,7 +2283,7 @@ C 4 FresnelS
 #tm\_yday(x) & int & the day of the year \\
 %tm_yday(x)@int@the day of the year
  The `tm_yday(x)` function interprets its argument as a time, in seconds from
- 1 Jan 1970.  It returns the day of the year (an integer in the range 1--366)
+ 1 Jan 1970.  It returns the day of the year (an integer in the range 0--365)
  as a real.
 4 tm_year
 ?expressions functions tm_year
