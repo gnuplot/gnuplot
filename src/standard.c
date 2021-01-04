@@ -1480,6 +1480,18 @@ TIMEFUNC( f_tmyear, tm_year)
 TIMEFUNC( f_tmwday, tm_wday)
 TIMEFUNC( f_tmyday, tm_yday)
 
+void								
+f_tmweek(union argument *arg)					
+{								
+    struct value a;						
+    int week;
+								
+    (void) arg;			/* avoid -Wunused warning */	
+    (void) pop(&a);						
+    week = tmweek(real(&a));
+    push(Gcomplex(&a, (double)week, 0.0));			
+}
+
 
 /*****************************************************************************/
 

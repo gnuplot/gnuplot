@@ -1342,14 +1342,15 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>palette(z)</td>    <td>double</td>    <td> RGB palette color mapped to z</td></tr>
 ^<tr>    <td>stringcolumn(x)</td>    <td>int</td>    <td> content column <i>x</i> as a string.</td></tr>
 ^<tr>    <td>timecolumn(N,format)</td>    <td>int, string</td>    <td> time data in column <i>N</i> during data input</td></tr>
-^<tr>    <td>tm_hour(x)</td>    <td>int</td>    <td>the hour</td></tr>
-^<tr>    <td>tm_mday(x)</td>    <td>int</td>    <td>the day of the month</td></tr>
-^<tr>    <td>tm_min(x)</td>    <td>int</td>    <td>the minute</td></tr>
-^<tr>    <td>tm_mon(x)</td>    <td>int</td>    <td>the month</td></tr>
-^<tr>    <td>tm_sec(x)</td>    <td>int</td>    <td>the second</td></tr>
-^<tr>    <td>tm_wday(x)</td>    <td>int</td>    <td>the day of the week</td></tr>
-^<tr>    <td>tm_yday(x)</td>    <td>int</td>    <td>the day of the year</td></tr>
-^<tr>    <td>tm_year(x)</td>    <td>int</td>    <td>the year</td></tr>
+^<tr>    <td>tm_hour(t)</td>    <td>time in sec</td>    <td>the hour</td></tr>
+^<tr>    <td>tm_mday(t)</td>    <td>time in sec</td>    <td>the day of the month</td></tr>
+^<tr>    <td>tm_min(t)</td>    <td>time in sec</td>    <td>the minute</td></tr>
+^<tr>    <td>tm_mon(t)</td>    <td>time in sec</td>    <td>the month</td></tr>
+^<tr>    <td>tm_sec(t)</td>    <td>time in sec</td>    <td>the second</td></tr>
+^<tr>    <td>tm_wday(t)</td>    <td>time in sec</td>    <td>the day of the week</td></tr>
+^<tr>    <td>tm_week(t)</td>    <td>time in sec</td>    <td>ISO 8601 week of year</td></tr>
+^<tr>    <td>tm_yday(t)</td>    <td>time in sec</td>    <td>the day of the year</td></tr>
+^<tr>    <td>tm_year(t)</td>    <td>time in sec</td>    <td>the year</td></tr>
 ^<tr>    <td>time(x)</td>    <td>any</td>    <td>the current system time</td></tr>
 ^<tr>    <td>valid(x)</td>    <td>int</td>    <td> test validity of column(<i>x</i>) during datafile manip.</td></tr>
 ^<tr>    <td>value("name")</td>    <td>string</td>    <td> returns the current value of the named variable.</td></tr>
@@ -1992,67 +1993,69 @@ C marker below is used to signal this to doc2html:
 4 tm_hour
 ?expressions functions tm_hour
 ?tm_hour
-#tm\_hour(x) & int & the hour \\
-%tm_hour(x)@int@the hour
- The `tm_hour(x)` function interprets its argument as a time, in seconds from
+#tm\_hour(t) & time in sec & the hour (0..23)\\
+%tm_hour(t)@time in sec@the hour (0..23)
+ The `tm_hour(t)` function interprets its argument as a time, in seconds from
  1 Jan 1970.  It returns the hour (an integer in the range 0--23) as a real.
 4 tm_mday
 ?expressions functions tm_mday
 ?tm_mday
-#tm\_mday(x) & int & the day of the month \\
-%tm_mday(x)@int@the day of the month
- The `tm_mday(x)` function interprets its argument as a time, in seconds from
+#tm\_mday(t) & time in sec & the day of the month (1..31)\\
+%tm_mday(t)@time in sec@the day of the month (1..31)
+ The `tm_mday(t)` function interprets its argument as a time, in seconds from
  1 Jan 1970.  It returns the day of the month (an integer in the range 1--31)
  as a real.
 4 tm_min
 ?expressions functions tm_min
 ?tm_min
-#tm\_min(x) & int & the minute \\
-%tm_min(x)@int@the minute
- The `tm_min(x)` function interprets its argument as a time, in seconds from
+#tm\_min(t) & time in sec & the minute (0..59)\\
+%tm_min(t)@time in sec@the minute (0..59)
+ The `tm_min(t)` function interprets its argument as a time, in seconds from
  1 Jan 1970.  It returns the minute (an integer in the range 0--59) as a real.
 4 tm_mon
 ?expressions functions tm_mon
 ?tm_mon
-#tm\_mon(x) & int & the month \\
-%tm_mon(x)@int@the month
- The `tm_mon(x)` function interprets its argument as a time, in seconds from
+#tm\_mon(t) & time in sec & the month (0..11)\\
+%tm_mon(t)@time in sec@the month (0..11)
+ The `tm_mon(t)` function interprets its argument as a time, in seconds from
  1 Jan 1970.  It returns the month (an integer in the range 0--11) as a real.
 4 tm_sec
 ?expressions functions tm_sec
 ?tm_sec
-#tm\_sec(x) & int & the second \\
-%tm_sec(x)@int@the second
- The `tm_sec(x)` function interprets its argument as a time, in seconds from
+#tm\_sec(t) & time in sec & the second (0..59)\\
+%tm_sec(t)@time in sec@the second (0..59)
+ The `tm_sec(t)` function interprets its argument as a time, in seconds from
  1 Jan 1970.  It returns the second (an integer in the range 0--59) as a real.
 4 tm_wday
 ?expressions functions tm_wday
 ?tm_wday
-#tm\_wday(x) & int & the day of the week \\
-%tm_wday(x)@int@the day of the week
- The `tm_wday(x)` function interprets its argument as a time, in seconds from
- 1 Jan 1970.  It returns the day of the week (an integer in the range 0--6) as
- a real.
+#tm\_wday(t) & time in sec & the day of the week (Sun..Sat) as (0..6)\\
+%tm_wday(t)@time in sec@the day of the week (Sun..Sat) as (0..6)
+ The `tm_wday(t)` function interprets its argument as a time, in seconds from
+ 1 Jan 1970.  It returns the day of the week (Sun..Sat) as an integer (0..6).
+4 tm_week
+#tm\_week(t) & time in sec & week of year in ISO8601 "week date" system (1..53)\\
+%tm_week(t)@time in sec@ISO 8601 week of year in ISO8601 "week date" system (1..53)
 4 tm_yday
 ?expressions functions tm_yday
 ?tm_yday
-#tm\_yday(x) & int & the day of the year \\
-%tm_yday(x)@int@the day of the year
- The `tm_yday(x)` function interprets its argument as a time, in seconds from
+#tm\_yday(t) & time in sec & the day of the year (0..365)\\
+%tm_yday(t)@time in sec@the day of the year (0..365)
+ The `tm_yday(t)` function interprets its argument as a time, in seconds from
  1 Jan 1970.  It returns the day of the year (an integer in the range 0--365)
  as a real.
 4 tm_year
 ?expressions functions tm_year
 ?tm_year
-#tm\_year(x) & int & the year \\
-%tm_year(x)@int@the year
- The `tm_year(x)` function interprets its argument as a time, in seconds from
+#tm\_year(t) & time in sec & the year \\
+%tm_year(t)@time in sec@the year
+ The `tm_year(t)` function interprets its argument as a time, in seconds from
  1 Jan 1970.  It returns the year (an integer) as a real.
 4 time
 ?expressions functions time
 ?time
-#time(x) & any & the current system time \\
-%time(x)@any@the current system time
+#time(x) & any & the current system time in seconds \\
+%time(x)@any@the current system time in seconds
  The `time(x)` function returns the current system time. This value can be
  converted to a date string with the `strftime` function, or it can be used
  in conjunction with `timecolumn` to generate relative time/date plots.
@@ -10102,9 +10105,9 @@ Ffigure_missing
        %s           number of seconds since the start of year 1970
        %S           second, integer 00--60 on output, (double) on input
        %T           shorthand for "%H:%M:%S" (only output)
-       %U           week of the year (week starts on Sunday)
+       %U           week of the year (week starts on Sunday) DO NOT USE!
        %w           day of the week, 0--6 (Sunday = 0) (ignored on input)
-       %W           week of the year (week starts on Monday) (ignored on input)
+       %W           week of the year (ISO 8601 week date) (ignored on input)
        %y           year, 0-68 for 2000-2068, 69-99 for 1969-1999
        %Y           year, 4-digit
        %z           timezone, [+-]hh:mm
@@ -10133,9 +10136,9 @@ Ffigure_missing
 #\verb@%S@ & second, integer 00--60 on output, (double) on input\\
 #\verb@%s@ & number of seconds since start of year 1970 \\
 #\verb@%T@ & shorthand for \verb@"%H:%M:%S"@ (only output)\\
-#\verb@%U@ & week of the year (week starts on Sunday) \\
+#\verb@%U@ & week of the year (week starts on Sunday) DO NOT USE\\
 #\verb@%w@ & day of the week, 0--6 (Sunday = 0) \\
-#\verb@%W@ & week of the year (week starts on Monday) \\
+#\verb@%W@ & week of the year (ISO 8601 week date) (ignored on input)\\
 #\verb@%y@ & year, 0-99 in range 1969-2068\\
 #\verb@%Y@ & year, 4-digit \\
 #\verb@%z@ & timezone, [+-]hh:mm \\
@@ -10163,9 +10166,9 @@ Ffigure_missing
 %%S@second, integer 0--60 on output, (double) on input
 %%s@number of seconds since start of year 1970
 %%T@shorthand for "%H:%M:%S" (only output)
-%%U@week of the year (week starts on Sunday)
+%%U@week of the year (week starts on Sunday) DO NOT USE
 %%w@day of the week, 0--6 (Sunday = 0)
-%%W@week of the year (week starts on Monday)
+%%W@week of the year (ISO 8601 week date)
 %%y@year, 0-99 in range 1969-2068
 %%Y@year, 4-digit
 %%z@timezone, [+-]hh:mm
@@ -10203,14 +10206,18 @@ Ffigure_missing
 ^<tr>    <td><tt>%s</tt></td>    <td>number of seconds since start of year 1970</td></tr>
 ^<tr>    <td><tt>%T</tt></td>    <td>shorthand for <tt>%H:%M:%S</tt> (only output)</td></tr>
 ^<tr>    <td><tt>%U</tt></td>    <td>week of the year (week starts on Sunday)</td></tr>
-^<tr>    <td><tt>%w</tt></td>    <td>day of the week, 0&ndash;6 (Sunday = 0)</td></tr>
-^<tr>    <td><tt>%W</tt></td>    <td>week of the year (week starts on Monday)</td></tr>
+^<tr>    <td><tt>%w</tt></td>    <td>day of the week, 0&ndash;6 (Sunday = 0) DO NOT USE</td></tr>
+^<tr>    <td><tt>%W</tt></td>    <td>week of the year (ISO 8601 week date)</td></tr>
 ^<tr>    <td><tt>%y</tt></td>    <td>year, 0-99 in range 1969-2068</td></tr>
 ^<tr>    <td><tt>%Y</tt></td>    <td>year, 4-digit</td></tr>
 ^<tr>    <td><tt>%z</tt></td>    <td>timezone, [+-]hh:mm</td></tr>
 ^<tr>    <td><tt>%Z</tt></td>    <td>timezone name, ignored string</td></tr>
 ^</tbody>
 ^</table>
+
+ For more information on the %W format (week of year) see `tm_week`.
+ Gnuplot has historically provided a similar format %U but it is not reliable
+ for dates close to New Year's Day.  Use %W instead.
 
  The relative time formats express the length of a time interval on either
  side of a zero time point.  The relative time formats are
@@ -10292,6 +10299,22 @@ Ffigure_missing
        set format x "%.2tH hours"   # "-1.02 hours"
        set format x "%tM:%.2tS"     # "-61:12.50"
 
+4 tm_week
+?expressions functions tm_week
+?functions tm_week
+?tm_week
+ The `tm_week(t)` function interprets its argument as a time in seconds from
+ 1 Jan 1970. It returns the week number in the ISO 8601 "week date" system.
+ This corresponds to gnuplot's %W format (see `time_specifiers`).
+ Despite the name of this function it is not a field in the POSIX tm structure.
+
+ In brief:  ISO Week 1 of year YYYY begins on the Monday closest to 1 Jan YYYY.
+ This may place it in the previous year.  For example Tue 30 Dec 2008 has
+ ISO week date 2009-W01-2 (2nd day of week 1 of 2009).  In other cases up to
+ three days at the start of January may come before the Monday of ISO week 1;
+ these days are assigned to the final week of the previous calendar year.
+ E.g. Fri 1 Jan 2021 has ISO week date 2020-W53-05.
+
 3 function style
 ?set function style
  This form of the command is deprecated. Please use `set style function`.
@@ -10314,6 +10337,7 @@ Ffigure_missing
 ^ <a href="http://www.gnuplot.info/demo/airfoil.html">
  use of functions and complex variables for airfoils (airfoil.dem).
 ^ </a>
+
 3 grid
 ?commands set grid
 ?commands unset grid

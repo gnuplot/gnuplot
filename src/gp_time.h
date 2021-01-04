@@ -86,6 +86,7 @@ double gtimegm(struct tm *);
 /* seconds to *tm */
 int ggmtime(struct tm *, double);
 
-
+/* ISO week number from time in seconds since epoch */
+int tmweek(double);
 
 #endif /* GNUPLOT_GP_TIME_H */
