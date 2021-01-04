@@ -721,33 +721,14 @@ xstrftime(
 		    break;
 		}
 
-	    case 'W':		/* mon 1 day of week */
+	    case 'W':		/* Mon..Sun is day 0..6 */
+		/* CHANGE Jan 2021
+		 * Follow ISO 8601 standard week date convention.
+		 */
 		{
-		    int week;
-		    if (tm->tm_yday <= tm->tm_wday) {
-			week = 1;
-
-			if ((tm->tm_mday - tm->tm_yday) > 4) {
-			    week = 52;
-			}
-			if (tm->tm_yday == tm->tm_wday && tm->tm_wday == 0)
-			    week = 52;
-
-		    } else {
-
-			/* sun prev week */
-			int bw = tm->tm_yday - tm->tm_wday;
-
-			if (tm->tm_wday > 0)
-			    bw += 7;	/* sun end of week */
-
-			week = (int) bw / 7;
-
-			if ((bw % 7) > 2)	/* jan 1 is before friday */
-			    week++;
-		    }
-		    FORMAT_STRING(1, 2, week);	/* %02d */
-		    break;
+		int week = tmweek(fulltime);
+		FORMAT_STRING(1, 2, week);	/* %02d */
+		break;
 		}
 
 	    case 'U':		/* sun 1 day of week */
@@ -912,3 +893,55 @@ ggmtime(struct tm *tm, double l_clock)
     return (0);
 }
 
+/*
+ * ISO 8601 week date standard
+ * return week of year given time in seconds
+ * Notes:
+ *	Each week runs from Monday to Sunday.
+ *	The first week of the year starts on the Monday closest to 1 January.
+ *	Corollaries: Up to three days in Week 1 may be in previous year.
+ *	The last week of a year may extend into the next calendar year.
+ *	The highest week number in a year is either 52 or 53.
+ */
+int
+tmweek( double time )
+{
+    struct tm tm;
+    int wday, week;
+
+    /* Fill time structure from time since epoch in seconds */
+    ggmtime(&tm, time);
+
+    /* ISO C tm->tm_wday using 0 = Sunday but we want 0 = Monday */
+    wday = (6 + tm.tm_wday) % 7;
+    week = (int)(10 + tm.tm_yday - wday ) / 7;
+
+    /* Up to three days in December may belong in week 1 of the next year. */
+    if (tm.tm_mon == 11) {
+	if ( (tm.tm_mday == 31 && wday < 3)
+	||   (tm.tm_mday == 30 && wday < 2)
+	||   (tm.tm_mday == 29 && wday < 1))
+	    week = 1;
+    }
+
+    /* Up to three days in January may be in the last week of the previous year.
+     * That might be either week 52 or week 53 depending on the leap year cycle.
+     */
+    if (week == 0) {
+	struct tm temp = tm;
+	int Jan01, Dec31;
+	/* Was either 1 Jan or 31 Dec of the previous year a Thursday? */
+	temp.tm_year -= 1; temp.tm_mon = 0; temp.tm_mday = 1;
+	ggmtime( &temp, gtimegm(&temp) );
+	Jan01 = temp.tm_wday;
+	temp.tm_mon = 11; temp.tm_mday = 31;
+	ggmtime( &temp, gtimegm(&temp) );
+	Dec31 = temp.tm_wday;
+	if (Jan01 == 4 || Dec31 == 4)
+	    week = 53;
+	else
+	    week = 52;
+    }
+
+    return week;
+}

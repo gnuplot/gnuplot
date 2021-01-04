@@ -250,6 +250,7 @@ const struct ft_entry ft[] =
     {"tm_year", f_tmyear},	/* for timeseries */
     {"tm_wday", f_tmwday},	/* for timeseries */
     {"tm_yday", f_tmyday},	/* for timeseries */
+    {"tm_week", f_tmweek},	/* for timeseries */
 
     {"sprintf",  f_sprintf},	/* for string variables only */
     {"gprintf",  f_gprintf},	/* for string variables only */
