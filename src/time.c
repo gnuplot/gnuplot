@@ -725,32 +725,19 @@ xstrftime(
 		 * Follow ISO 8601 standard week date convention.
 		 */
 		{
-		int week = tmweek(fulltime);
+		int week = tmweek(fulltime, 0);
 		FORMAT_STRING(1, 2, week);	/* %02d */
 		break;
 		}
 
-	    case 'U':		/* sun 1 day of week */
+	    case 'U':		/* Sun..Sat is day 0..6 */
+		/* CHANGE Jan 2021
+		 * Follow CDC/MMWR "epi week" convention
+		 */
 		{
-		    int week, bw;
-
-		    if (tm->tm_yday <= tm->tm_wday) {
-			week = 1;
-			if ((tm->tm_mday - tm->tm_yday) > 4) {
-			    week = 52;
-			}
-		    } else {
-			/* sat prev week */
-			bw = tm->tm_yday - tm->tm_wday - 1;
-			if (tm->tm_wday >= 0)
-			    bw += 7;	/* sat end of week */
-			week = (int) bw / 7;
-			if ((bw % 7) > 1) {	/* jan 1 is before friday */
-			    week++;
-			}
-		    }
-		    FORMAT_STRING(1, 2, week);	/* %02d */
-		    break;
+		int week = tmweek(fulltime, 1);
+		FORMAT_STRING(1, 2, week);	/* %02d */
+		break;
 		}
 
 	    case 'w':		/* day of week, sun=0 */
@@ -893,17 +880,20 @@ ggmtime(struct tm *tm, double l_clock)
 }
 
 /*
- * ISO 8601 week date standard
- * return week of year given time in seconds
+ * tmweek( time, standard )
+ * input:  time in seconds since epoch date 1-Jan-1970
+ * return: week of year in either
+ *      standard = 0  to use ISO 8601 standard week (Mon-Sun)
+ *      standard = 1  to use CDC/MMWR "epi week" (Sun-Sat)
  * Notes:
- *	Each week runs from Monday to Sunday.
- *	The first week of the year starts on the Monday closest to 1 January.
+ *	The first week of the year is the week whose starts is closest
+ *	    to 1 January, even if that is in the previous calendar year.
  *	Corollaries: Up to three days in Week 1 may be in previous year.
  *	The last week of a year may extend into the next calendar year.
  *	The highest week number in a year is either 52 or 53.
  */
 int
-tmweek( double time )
+tmweek( double time, int standard )
 {
     struct tm tm;
     int wday, week;
@@ -911,8 +901,11 @@ tmweek( double time )
     /* Fill time structure from time since epoch in seconds */
     ggmtime(&tm, time);
 
-    /* ISO C tm->tm_wday using 0 = Sunday but we want 0 = Monday */
-    wday = (6 + tm.tm_wday) % 7;
+    if (standard == 0)
+	/* ISO C tm->tm_wday uses 0 = Sunday but we want 0 = Monday */
+	wday = (6 + tm.tm_wday) % 7;
+    else
+	wday = tm.tm_wday;
     week = (int)(10 + tm.tm_yday - wday ) / 7;
 
     /* Up to three days in December may belong in week 1 of the next year. */
@@ -929,17 +922,18 @@ tmweek( double time )
     if (week == 0) {
 	struct tm temp = tm;
 	int Jan01, Dec31;
-	/* Was either 1 Jan or 31 Dec of the previous year a Thursday? */
+
+	/* Was either 1 Jan or 31 Dec of the previous year precisely midweek? */
 	temp.tm_year -= 1; temp.tm_mon = 0; temp.tm_mday = 1;
 	ggmtime( &temp, gtimegm(&temp) );
 	Jan01 = temp.tm_wday;
 	temp.tm_mon = 11; temp.tm_mday = 31;
 	ggmtime( &temp, gtimegm(&temp) );
 	Dec31 = temp.tm_wday;
-	if (Jan01 == 4 || Dec31 == 4)
-	    week = 53;
+	if (standard == 0)
+	    week = (Jan01 == 4 || Dec31 == 4) ? 53 : 52;
 	else
-	    week = 52;
+	    week = (Jan01 == 3 || Dec31 == 3) ? 53 : 52;
     }
 
     return week;

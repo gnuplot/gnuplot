@@ -10105,7 +10105,7 @@ Ffigure_missing
        %s           number of seconds since the start of year 1970
        %S           second, integer 00--60 on output, (double) on input
        %T           shorthand for "%H:%M:%S" (only output)
-       %U           week of the year (week starts on Sunday) DO NOT USE!
+       %U           week of the year (CDC/MMWR "epi week") (ignored on input)
        %w           day of the week, 0--6 (Sunday = 0) (ignored on input)
        %W           week of the year (ISO 8601 week date) (ignored on input)
        %y           year, 0-68 for 2000-2068, 69-99 for 1969-1999
@@ -10136,7 +10136,7 @@ Ffigure_missing
 #\verb@%S@ & second, integer 00--60 on output, (double) on input\\
 #\verb@%s@ & number of seconds since start of year 1970 \\
 #\verb@%T@ & shorthand for \verb@"%H:%M:%S"@ (only output)\\
-#\verb@%U@ & week of the year (week starts on Sunday) DO NOT USE\\
+#\verb@%U@ & week of the year (CDC/MMWR "epi week") (ignored on input)\\
 #\verb@%w@ & day of the week, 0--6 (Sunday = 0) \\
 #\verb@%W@ & week of the year (ISO 8601 week date) (ignored on input)\\
 #\verb@%y@ & year, 0-99 in range 1969-2068\\
@@ -10166,7 +10166,7 @@ Ffigure_missing
 %%S@second, integer 0--60 on output, (double) on input
 %%s@number of seconds since start of year 1970
 %%T@shorthand for "%H:%M:%S" (only output)
-%%U@week of the year (week starts on Sunday) DO NOT USE
+%%U@week of the year (CDC/MMWR "epi week")
 %%w@day of the week, 0--6 (Sunday = 0)
 %%W@week of the year (ISO 8601 week date)
 %%y@year, 0-99 in range 1969-2068
@@ -10205,8 +10205,8 @@ Ffigure_missing
 ^<tr>    <td><tt>%S</tt></td>    <td>second, integer 0&ndash;60 on output, (double) on input</td></tr>
 ^<tr>    <td><tt>%s</tt></td>    <td>number of seconds since start of year 1970</td></tr>
 ^<tr>    <td><tt>%T</tt></td>    <td>shorthand for <tt>%H:%M:%S</tt> (only output)</td></tr>
-^<tr>    <td><tt>%U</tt></td>    <td>week of the year (week starts on Sunday)</td></tr>
-^<tr>    <td><tt>%w</tt></td>    <td>day of the week, 0&ndash;6 (Sunday = 0) DO NOT USE</td></tr>
+^<tr>    <td><tt>%U</tt></td>    <td>week of the year (CDC/MMWR "epi week")</td></tr>
+^<tr>    <td><tt>%w</tt></td>    <td>day of the week, 0&ndash;6 (Sunday = 0)</td></tr>
 ^<tr>    <td><tt>%W</tt></td>    <td>week of the year (ISO 8601 week date)</td></tr>
 ^<tr>    <td><tt>%y</tt></td>    <td>year, 0-99 in range 1969-2068</td></tr>
 ^<tr>    <td><tt>%Y</tt></td>    <td>year, 4-digit</td></tr>
@@ -10215,9 +10215,11 @@ Ffigure_missing
 ^</tbody>
 ^</table>
 
- For more information on the %W format (week of year) see `tm_week`.
- Gnuplot has historically provided a similar format %U but it is not reliable
- for dates close to New Year's Day.  Use %W instead.
+ For more information on the %W format (ISO week of year) see `tm_week`.
+ The %U format (CDC/MMWR epidemiological week) is similar to %W except that it
+ uses weeks that start on Sunday rather than Monday.
+ Caveat: Both the %W and the %U formats were unreliable in gnuplot versions
+ prior to 5.4.2.  See unit test "week_date.dem".
 
  The relative time formats express the length of a time interval on either
  side of a zero time point.  The relative time formats are
@@ -10303,17 +10305,26 @@ Ffigure_missing
 ?expressions functions tm_week
 ?functions tm_week
 ?tm_week
- The `tm_week(t)` function interprets its argument as a time in seconds from
- 1 Jan 1970. It returns the week number in the ISO 8601 "week date" system.
- This corresponds to gnuplot's %W format (see `time_specifiers`).
- Despite the name of this function it is not a field in the POSIX tm structure.
+?epidemiological week
+ The `tm_week(t, standard)` function interprets its argument as a time in
+ seconds from 1 Jan 1970.  Despite the name of this function it does not
+ report a field from the POSIX tm structure.
 
- In brief:  ISO Week 1 of year YYYY begins on the Monday closest to 1 Jan YYYY.
+ If standard = 0 it returns the week number in the ISO 8601 "week date" system.
+ This corresponds to gnuplot's %W format.
+ If standard = 1 it returns the CDC/MMWR epidemiological week number
+ ("epi week").  This corresponds to gnuplot's %U format.  See `time_specifiers`.
+
+ ISO Week 1 of year YYYY begins on the Monday closest to 1 Jan YYYY.
  This may place it in the previous year.  For example Tue 30 Dec 2008 has
  ISO week date 2009-W01-2 (2nd day of week 1 of 2009).  In other cases up to
  three days at the start of January may come before the Monday of ISO week 1;
  these days are assigned to the final week of the previous calendar year.
  E.g. Fri 1 Jan 2021 has ISO week date 2020-W53-05.
+
+ The US Center for Disease Control (CDC) epidemiological week is a similar
+ week date convention that differs from the ISO standard by defining a week as
+ starting on Sunday, rather than on Monday.
 
 3 function style
 ?set function style
