@@ -1551,11 +1551,14 @@ f_tmweek(union argument *arg)
 {								
     struct value a;						
     int week;
+    int standard;
 								
     (void) arg;			/* avoid -Wunused warning */	
-    (void) pop(&a);						
-    week = tmweek(real(&a));
-    push(Gcomplex(&a, (double)week, 0.0));			
+    if ((pop(&a)->type != INTGR) || (a.v.int_val < 0) || (a.v.int_val > 1))
+	int_error(NO_CARET, "syntax: tm_week(time, standard)");
+    standard = a.v.int_val;
+    week = tmweek(real(pop(&a)), standard);
+    push(Ginteger(&a, week));
 }
 
 

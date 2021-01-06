@@ -1,0 +1,39 @@
+#
+# Show incorrect and corrected week number output for formats
+# %W (ISO 8601 "week date") and %U (CDC/MMWR "epi week").
+# Gnuplot versions through 5.4.1 produced incorrect output.
+#
+print "Contrast two different conventions for week dates"
+print "Format %W is the Monday-based ISO 8601 week date."
+print "Format %U is the Sunday-based CDC/MMWR 'epi week'."
+print "   (both were incorrect prior to gnuplot 5.4.2)   "
+print ""
+
+print "        date   %a  %w  %d   %j  %W  %U"
+print "  ===================================="
+
+
+do for [d in "27 28 29 30 31"] {
+    date = d.".12.2003"
+    print "  ", date,  \
+      strftime("  %a", (strptime("%d.%m.%Y", date))), \
+      strftime("  %w",(strptime("%d.%m.%Y", date))), \
+      strftime("  %d",(strptime("%d.%m.%Y", date))), \
+      strftime("  %j",(strptime("%d.%m.%Y", date))), \
+      strftime("  %W",(strptime("%d.%m.%Y", date))), \
+      strftime("  %U",(strptime("%d.%m.%Y", date)))
+    if (d eq "28") { print "              ISO 2004-W01      --" }
+}
+
+do for [d in "01 02 03 04 05 06 07 08 09 10 11 12 13"] {
+    date = d.".01.2004"
+    print "  ", date,  \
+      strftime("  %a", (strptime("%d.%m.%Y", date))), \
+      strftime("  %w",(strptime("%d.%m.%Y", date))), \
+      strftime("  %d",(strptime("%d.%m.%Y", date))), \
+      strftime("  %j",(strptime("%d.%m.%Y", date))), \
+      strftime("  %W",(strptime("%d.%m.%Y", date))), \
+      strftime("  %U",(strptime("%d.%m.%Y", date)))
+    if (d eq "03") { print "               2004 epi week 1      --" }
+}
+
