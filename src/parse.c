@@ -650,6 +650,10 @@ parse_primary_expression()
 		if (!strcmp(ft[whichfunc].f_name,"timecolumn"))
 		    add_action(PUSHC)->v_arg = num_params;
 
+		/* These functions have an optional 3rd parameter */
+		if (!strncmp(ft[whichfunc].f_name,"weekdate_",9))
+		    add_action(PUSHC)->v_arg = num_params;
+
 		/* The column() function has side effects requiring special handling */
 		if (!strcmp(ft[whichfunc].f_name,"column")) {
 		    set_up_columnheader_parsing( &(at->actions[at->a_count-1]) );

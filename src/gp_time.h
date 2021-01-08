@@ -88,5 +88,7 @@ int ggmtime(struct tm *, double);
 
 /* time in seconds -> ISO 8601 week number or CDC/MMWR "epi week" number */
 int tmweek(double, int);
+/* ISO 8601 or CDC/MMWE week date -> time in seconds */
+double weekdate( int year, int week, int day, int standard );
 
 #endif /* GNUPLOT_GP_TIME_H */

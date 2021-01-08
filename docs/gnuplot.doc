@@ -311,6 +311,24 @@ C
 ## ratio and size independent of axis scaling or rotation. See `pixmap`.
 #end
 
+4 Week-date time support
+ The Covid-19 pandemic of 2020/2021 generated increased interest in plotting
+ epidemiological data, which is often tabulated using a "week date" reporting
+ convention.  This revealed deficiencies with gnuplot support for this
+ convention, including errors in time formats %W and %U.  These formats
+ worked incorrectly prior to version 5.4.2.
+#start
+#b Time specifier format %W has been brought into accord with the
+## ISO 8601 week date standard.
+#b Time specifier format %U has been brought into accord with the
+## CDC/MMWR week date standard.
+#b New function `tm_week(time, std)` returns ISO or CDC standard week of year.
+#b New function `weekdate_iso(year, week, day)` converts ISO standard week date
+## to calendar time.
+#b New function `weekdate_cdc(year, week, day)` converts CDC standard week date
+## to calendar time.
+#end
+
 4 Other new features
 #start
 #b Enhanced text mode accepts \U+xxxx (xxxx is a 4 or 5 character hexadecimal)
@@ -10304,27 +10322,74 @@ Ffigure_missing
 4 tm_week
 ?expressions functions tm_week
 ?functions tm_week
+?time_specifiers tm_week
 ?tm_week
 ?epidemiological week
- The `tm_week(t, standard)` function interprets its argument as a time in
- seconds from 1 Jan 1970.  Despite the name of this function it does not
+=epidemiological week
+ The `tm_week(t, standard)` function interprets its first argument t as a time
+ in seconds from 1 Jan 1970.  Despite the name of this function it does not
  report a field from the POSIX tm structure.
 
  If standard = 0 it returns the week number in the ISO 8601 "week date" system.
- This corresponds to gnuplot's %W format.
- If standard = 1 it returns the CDC/MMWR epidemiological week number
- ("epi week").  This corresponds to gnuplot's %U format.  See `time_specifiers`.
+ This corresponds to gnuplot's %W time format.
+ If standard = 1 it returns the CDC epidemiological week number ("epi week").
+ This corresponds to gnuplot's %U time format.
+ For corresponding inverse functions that convert week dates to calendar time
+ see `weekdate_iso`, `weekdate_cdc`.
 
- ISO Week 1 of year YYYY begins on the Monday closest to 1 Jan YYYY.
- This may place it in the previous year.  For example Tue 30 Dec 2008 has
- ISO week date 2009-W01-2 (2nd day of week 1 of 2009).  In other cases up to
- three days at the start of January may come before the Monday of ISO week 1;
+ In brief, ISO Week 1 of year YYYY begins on the Monday closest to 1 Jan YYYY.
+ This may place it in the previous calendar year.  For example Tue 30 Dec 2008
+ has ISO week date 2009-W01-2 (2nd day of week 1 of 2009).  Up to three days
+ at the start of January may come before the Monday of ISO week 1;
  these days are assigned to the final week of the previous calendar year.
  E.g. Fri 1 Jan 2021 has ISO week date 2020-W53-05.
 
  The US Center for Disease Control (CDC) epidemiological week is a similar
  week date convention that differs from the ISO standard by defining a week as
  starting on Sunday, rather than on Monday.
+
+4 weekdate_iso
+?expressions functions weekdate_iso
+?functions weekdate_iso
+?time_specifiers weekdate_iso
+?weekdate_iso
+ Syntax:
+      time = weekdate_iso( year, week [, day] )
+
+ This function converts from the year, week, day components of a date in
+ ISO 8601 "week date" format to the calendar date as a time in seconds since
+ the epoch date 1 Jan 1970.  Note that the nominal year in the week date
+ system is not necessarily the same as the calendar year.  The week is an
+ integer from 1 to 53.  The day parameter is optional. If it is omitted
+ or equal to 0 the time returned is the start of the week. Otherwise day
+ is an integer from 1 (Monday) to 2 (Sunday).
+ See `tm_week` for additional information on an inverse function that converts
+ from calendar date to week number in the ISO standard convention.
+
+ Example:
+      # Plot data from a file with column 1 containing ISO weeks
+      #     Week     cases  deaths
+      #     2020-05    432       1
+      calendar_date(w) = weekdate_iso( int(w[1:4]), int(w[6:7]) )
+      set xtics time format "%b\n%Y"
+      plot FILE using (calendar_date(strcol(1))) : 2   title columnhead
+
+4 weekdate_cdc
+?expressions functions weekdate_cdc
+?functions weekdate_cdc
+?time_specifiers weekdate_cdc
+?weekdate_cdc
+=epidemiological week
+ Syntax:
+      time = weekdate_cdc( year, week [, day] )
+
+ This function converts from the year, week, day components of a date in
+ the CDC/MMWR "epi week" format to the calendar date as a time in seconds since
+ the epoch date 1 Jan 1970.  The CDC week date convention differs from the
+ ISO week date in that it is defined in terms of each week running from
+ day 1 = Sunday to day 6 = Saturday.  If the third parameter is 0 or is
+ omitted, the time returned is the start of the week.
+ See `tm_week` and `weekdate_iso`.
 
 3 function style
 ?set function style
