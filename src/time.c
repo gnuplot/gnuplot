@@ -939,3 +939,56 @@ tmweek( double time, int standard )
 
     return week;
 }
+
+
+/*
+ * Convert from week date notation to standard time in seconds since epoch.
+ *   time = weekdate( year, week, standard )
+ *   year, week as given in "week date" format; may not be calendar year
+ *          e.g. ISO week date 2009-W01-2 corresponds to 30 Dec 2008
+ *   standard 0 - ISO 8601 week date (week starts on Monday)
+ *   standard 1 - CDC/MMRW epidemiological week (starts on Sunday)
+ */
+double
+weekdate( int year, int week, int day, int standard )
+{
+    struct tm time_tm;
+    double time;
+    int wday;
+
+    /* Sanity check input (but allow day = 0 to mean day 1) */
+    /* FIXME:  Is there a minimum year for ISO dates? */
+    if (week < 1 || week > 53 || day > 7 || day < 0)
+	int_error(NO_CARET, "invalid week date");
+    if (day == 0)
+	day = 1;
+
+    memset( &time_tm, 0, sizeof(struct tm) );
+
+    /* Find standard time and week date for 1 Jan in nominal year.
+     * This will let us determine the start date for the week date system.
+     */
+    time_tm.tm_year = year;
+    time_tm.tm_mday = 1;
+    time_tm.tm_mon = 0;
+    time = gtimegm(&time_tm);
+
+    /* Normalize (unlike mktime, gtimegm does not recalculation wday) */
+    ggmtime(&time_tm, time);
+
+    /* Add offset to nearest Sunday (ISO 8601) */
+    if (standard == 1)
+	wday = time_tm.tm_wday;
+    else
+	wday = (6 + time_tm.tm_wday) % 7;
+    if (wday < 4)
+	time -= wday * DAY_SEC;
+    else
+	time += (7-wday) * DAY_SEC;
+
+    /* Now add offsets to the week number we were given */
+    time += (week-1) * WEEK_SEC;
+    time += (day-1) * DAY_SEC;
+
+    return time;
+}

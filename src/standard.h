@@ -95,5 +95,7 @@ void f_tmyear(union argument *x);
 void f_tmwday(union argument *x);
 void f_tmyday(union argument *x);
 void f_tmweek(union argument *x);
+void f_weekdate_iso(union argument *x);
+void f_weekdate_cdc(union argument *x);
 
 #endif /* GNUPLOT_STANDARD_H */

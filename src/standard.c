@@ -1561,6 +1561,48 @@ f_tmweek(union argument *arg)
     push(Ginteger(&a, week));
 }
 
+/*
+ * time = weekdate_iso( year, week [, day] )
+ */
+void
+f_weekdate_iso(union argument *arg)
+{
+    struct value a;
+    int nparams;
+    int year, week, day;
+
+    (void) arg;			/* avoid -Wunused warning */	
+    nparams = real(pop(&a));
+    if (nparams == 3)
+	day = real(pop(&a));
+    else
+	day = 1;
+    week = real(pop(&a));
+    year = real(pop(&a));
+    push(Gcomplex(&a, weekdate(year, week, day, 0), 0.0));
+}
+
+/*
+ * time = weekdate_cdc( year, week [, day] )
+ */
+void
+f_weekdate_cdc(union argument *arg)
+{
+    struct value a;
+    int nparams;
+    int year, week, day;
+
+    (void) arg;			/* avoid -Wunused warning */	
+    nparams = real(pop(&a));
+    if (nparams == 3)
+	day = real(pop(&a));
+    else
+	day = 1;
+    week = real(pop(&a));
+    year = real(pop(&a));
+    push(Gcomplex(&a, weekdate(year, week, day, 1), 0.0));
+}
+
 
 /*****************************************************************************/
 
