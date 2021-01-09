@@ -136,6 +136,7 @@
 <td rowspan=2>
     <h4>Sample Applications</h4>
     <ul>
+    <li><a href="epi_data.html">Epidemiological data</a></li>
     <li><a href="controls.html">control models</a></li>
     <li><a href="discrete.html">discrete&nbsp;contours</a></li>
     <!--- <li><a href="electron.html">electron</a></li> --->
@@ -198,7 +199,9 @@
     <tbody>
 	<tr valign=top colspan=2>
 	    <td align=center width=500>
+		<a href="epi_data.html">
 		<img src="showcase_plot_1.png" width=500><br clear=all>
+		</a>
 	    </td>
 	</tr>
 
@@ -256,7 +259,7 @@
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated December 2020</i>
+    <i>This page generated January 2021</i>
     </td>
 
     <td>

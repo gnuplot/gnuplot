@@ -22,7 +22,7 @@ C
 ^  James R. Van Zandt, Alex Woo, Johannes Zellner<br>
 ^</p>
 ^<p align="center">  Copyright (C) 1986 - 1993, 1998 - 2004   Thomas Williams, Colin Kelley<br>
-^     Copyright (C) 2004 - 2020 various authors</p>
+^     Copyright (C) 2004 - 2021 various authors</p>
 ^<p align="center">   Mailing list for comments: <tt>gnuplot-info@lists.sourceforge.net</tt><br>
 ^      Mailing list for bug reports: <tt>gnuplot-bugs@lists.sourceforge.net</tt><br>
 ^      Web access (preferred): <tt>http://sourceforge.net/projects/gnuplot</tt></p>
@@ -281,12 +281,28 @@ C
 ## encoded through the WebPAnimEncoder API exported by libwebp and libwebpmux.
 #end
 
+4 Week-date time support
+ The Covid-19 pandemic of 2020/2021 generated increased interest in plotting
+ epidemiological data, which is often tabulated using a "week date" reporting
+ convention.  This revealed deficiencies with gnuplot support for this
+ convention, including errors in time formats %W and %U.
+#start
+#b Time specifier format %W has been brought into accord with the
+## ISO 8601 week date standard.
+#b Time specifier format %U has been brought into accord with the
+## CDC/MMWR week date standard.
+#b New function `tm_week(time, std)` returns ISO or CDC standard week of year.
+#b New function `weekdate_iso(year, week, day)` converts ISO standard week date
+## to calendar time.
+#b New function `weekdate_cdc(year, week, day)` converts CDC standard week date
+## to calendar time.
+#end
+
 4 Other new features
 ?new other
 #start
 #b Function `palette(z)` returns the RGB palette color for z in cbrange. 
 #b Function `rgbcolor("name")` returns the 32bit ARGB value for a named color.
-#b Function `tm_week(time)` returns week of year in ISO 8601 "week date" standard.
 #b Function `VP_fwhm(sigma,gamma)` returns the full width at half maximum
 ## of the Voigt profile. See `VP`, `VP_fwhm`, `libcerf`.
 #b Support XDG base directory for gnuplotrc configuration preferences.
