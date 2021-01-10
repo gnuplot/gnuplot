@@ -531,8 +531,8 @@ effective_error(double **deriv, int i)
     if (num_errors <= 1) /* z-errors or equal weights */
 	tot_err = err_data[i];
     else {
-	/* "Effective variance" according to 
-	 *  Jay Orear, Am. J. Phys., Vol. 50, No. 10, October 1982 
+	/* "Effective variance" according to
+	 *  Jay Orear, Am. J. Phys., Vol. 50, No. 10, October 1982
 	 */
 	tot_err = SQR(err_data[i * num_errors + (num_errors - 1)]);
 	for (j = 0, k = 0; j < num_indep; j++) {
@@ -561,7 +561,7 @@ analyze(double a[], double **C, double d[], double *chisq, double ** deriv)
 
     calculate(d, C, a);
 
-    /* derivatives in indep. variables are required for 
+    /* derivatives in indep. variables are required for
        effective variance method */
     if (num_errors > 1)
 	calc_derivatives(a, d, deriv);
@@ -895,7 +895,7 @@ regress_finalize(int iter, double chisq, double last_chisq, double lambda, doubl
     v = add_udv_by_name("FIT_P");
     Gcomplex(&v->udv_value, pvalue, 0);
     v = add_udv_by_name("FIT_NITER");
-    Ginteger(&v->udv_value, niter);    
+    Ginteger(&v->udv_value, niter);
 
     /* Save final parameters. Depending on the backend and
        its internal state, the last call_gnuplot may not have been
@@ -903,7 +903,7 @@ regress_finalize(int iter, double chisq, double last_chisq, double lambda, doubl
     for (i = 0; i < num_params; i++)
 	Gcomplex(par_udv[i], a[i] * scale_params[i], 0.0);
 
-    /* Set error and covariance variables to zero, 
+    /* Set error and covariance variables to zero,
        thus making sure they are created. */
     if (fit_errorvariables) {
 	for (i = 0; i < num_params; i++)
@@ -1394,7 +1394,7 @@ setvar(char *varname, double data)
 
 
 /*****************************************************************
-    Set a user-defined variable from an error variable: 
+    Set a user-defined variable from an error variable:
     Take the parameter name, turn it  into an error parameter
     name (e.g. a to a_err) and then set it.
 ******************************************************************/
@@ -1534,7 +1534,7 @@ print_function_definitions_recursion(struct at_type *at, int *count, int maxfun,
 		    break;
 		}
 	    }
-	    rc |= print_function_definitions_recursion(at->actions[i].arg.udf_arg->at, 
+	    rc |= print_function_definitions_recursion(at->actions[i].arg.udf_arg->at,
 	                                               count, maxfun, definitions,
 	                                               depth + 1, maxdepth);
 	}
@@ -1814,7 +1814,7 @@ fit_command()
 	    /* default to unitweights */
 	    num_indep = (columns == 0) ? 1 : columns - 1;
 	    num_errors = 0;
-	} 
+	}
     }
 
     FPRINTF((stderr, "cmd=%s\n", gp_input_line));
@@ -1969,11 +1969,12 @@ fit_command()
 	case DF_FIRST_BLANK:
 	case DF_SECOND_BLANK:
 	    continue;
-	case DF_COLUMN_HEADERS:
+	case DF_COMPLEX_VALUE:
 	    continue;
+	case DF_COLUMN_HEADERS:
 	case DF_FOUND_KEY_TITLE:
 	    continue;
-	case 0:
+	case DF_BAD:
 	    Eex2("bad data on line %d of datafile", df_line_number);
 	    break;
 	case 1:		/* only z provided */
