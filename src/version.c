@@ -36,13 +36,13 @@
 
 
 const char gnuplot_version[] = "5.4";
-const char gnuplot_patchlevel[] = "1";
+const char gnuplot_patchlevel[] = "2alpha";
 #ifdef DEVELOPMENT_VERSION
 #include "timestamp.h"
 #else
-const char gnuplot_date[] = "2020-12-01 ";
+const char gnuplot_date[] = "2021-01-10 ";
 #endif
-const char gnuplot_copyright[] = "Copyright (C) 1986-1993, 1998, 2004, 2007-2020";
+const char gnuplot_copyright[] = "Copyright (C) 1986-1993, 1998, 2004, 2007-2021";
 
 const char faq_location[] = FAQ_LOCATION;
 
