@@ -164,7 +164,7 @@ DIRECT2D11=1
 GRXPATH=c:/Source/grx249
 # or, the MGRX fork of GRX
 #MGRX=1
-MGRXPATH=c:/Source/mgrx110
+MGRXPATH=c:/Source/mgrx
 
 
 # Below you can adapt paths according to your software setup:
@@ -302,7 +302,7 @@ endif
 
 ifdef UNICODE
   CFLAGS += -DUNICODE -D_UNICODE
-  LDFLAGS += -municode
+  LDFLAGS2 += -municode
 endif
 
 CFLAGS += $(CWFLAGS)
