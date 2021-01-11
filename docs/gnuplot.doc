@@ -285,7 +285,8 @@ C
  The Covid-19 pandemic of 2020/2021 generated increased interest in plotting
  epidemiological data, which is often tabulated using a "week date" reporting
  convention.  This revealed deficiencies with gnuplot support for this
- convention, including errors in time formats %W and %U.
+ convention, including errors in time formats %W and %U.  This have now been
+ remedied and support for week-date time extended.
 #start
 #b Time specifier format %W has been brought into accord with the
 ## ISO 8601 week date standard.
@@ -1508,6 +1509,35 @@ Ffigure_E0
 ^  <col align="left">
 ^</colgroup>
 ^<thead>
+^<tr>   <th colspan="3"> time functions </th></tr>
+^<tr>    <th>Function</th>    <th>Arguments</th>    <th>Returns</th></tr>
+^</thead>
+^<tbody>
+^<tr>    <td>time(x)</td>    <td>any</td>    <td>the current system time</td></tr>
+^<tr>    <td>timecolumn(N,format)</td>    <td>int, string</td>    <td> formatted time data from column <i>N</i> of input data</td></tr>
+^<tr>    <td>tm_hour(t)</td>    <td>time in sec</td>    <td>the hour</td></tr>
+^<tr>    <td>tm_mday(t)</td>    <td>time in sec</td>    <td>the day of the month</td></tr>
+^<tr>    <td>tm_min(t)</td>    <td>time in sec</td>    <td>the minute</td></tr>
+^<tr>    <td>tm_mon(t)</td>    <td>time in sec</td>    <td>the month</td></tr>
+^<tr>    <td>tm_sec(t)</td>    <td>time in sec</td>    <td>the second</td></tr>
+^<tr>    <td>tm_wday(t)</td>    <td>time in sec</td>    <td>the day of the week</td></tr>
+^<tr>    <td>tm_week(t)</td>    <td>time in sec</td>    <td>ISO 8601 week of year</td></tr>
+^<tr>    <td>tm_yday(t)</td>    <td>time in sec</td>    <td>the day of the year</td></tr>
+^<tr>    <td>tm_year(t)</td>    <td>time in sec</td>    <td>the year</td></tr>
+^<tr>    <td>weekdate_iso(year,week,day)</td> <td>int</td> <td> time eqv to ISO 8601 standard week date</td></tr>
+^<tr>    <td>weekdate_cdc(year,week,day)</td> <td>int</td> <td> time eqv to CDC epidemiological week date</td></tr>
+^</tbody>
+^</table>
+
+^<p>&nbsp;</p>
+
+^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3" width="90%">
+^<colgroup>
+^  <col align="center">
+^  <col align="center">
+^  <col align="left">
+^</colgroup>
+^<thead>
 ^<tr>   <th colspan="3"> other gnuplot functions </th></tr>
 ^<tr>    <th>Function</th>    <th>Arguments</th>    <th>Returns</th></tr>
 ^</thead>
@@ -1519,17 +1549,6 @@ Ffigure_E0
 ^<tr>    <td>palette(z)</td>    <td>real</td>    <td> 24bit RGB palette color mapped to z</td></tr>
 ^<tr>    <td>rgbcolor("name")</td>    <td>string</td>    <td> 32bit ARGB color from name</td></tr>
 ^<tr>    <td>stringcolumn(x)</td>    <td>int</td>    <td> content column <i>x</i> as a string.</td></tr>
-^<tr>    <td>timecolumn(N,format)</td>    <td>int, string</td>    <td> time data in column <i>N</i> during data input</td></tr>
-^<tr>    <td>tm_hour(t)</td>    <td>time in sec</td>    <td>the hour</td></tr>
-^<tr>    <td>tm_mday(t)</td>    <td>time in sec</td>    <td>the day of the month</td></tr>
-^<tr>    <td>tm_min(t)</td>    <td>time in sec</td>    <td>the minute</td></tr>
-^<tr>    <td>tm_mon(t)</td>    <td>time in sec</td>    <td>the month</td></tr>
-^<tr>    <td>tm_sec(t)</td>    <td>time in sec</td>    <td>the second</td></tr>
-^<tr>    <td>tm_wday(t)</td>    <td>time in sec</td>    <td>the day of the week</td></tr>
-^<tr>    <td>tm_week(t)</td>    <td>time in sec</td>    <td>ISO 8601 week of year</td></tr>
-^<tr>    <td>tm_yday(t)</td>    <td>time in sec</td>    <td>the day of the year</td></tr>
-^<tr>    <td>tm_year(t)</td>    <td>time in sec</td>    <td>the year</td></tr>
-^<tr>    <td>time(x)</td>    <td>any</td>    <td>the current system time</td></tr>
 ^<tr>    <td>valid(x)</td>    <td>int</td>    <td> test validity of column(<i>x</i>) during datafile manip.</td></tr>
 ^<tr>    <td>value("name")</td>    <td>string</td>    <td> returns the current value of the named variable.</td></tr>
 ^</tbody>
@@ -2172,6 +2191,91 @@ C 4 FresnelS
 ^<!-- INCLUDE_NEXT_TABLE -->
 @start table
 #\begin{tabular}{|lcl|} \hline
+#\multicolumn{3}{|c|}{Time functions} \\ \hline \hline
+#Function & Arguments & Returns \\ \hline
+%c c l .
+%Function@Arguments@Returns
+%_
+C 4 time
+C ?expressions functions time
+#time(x) & any & the current system time in seconds \\
+%time(x)@any@the current system time in seconds
+C 4 timecolumn
+C ?expressions functions timecolumn
+#timecolumn(N,"timeformat") & int, string & formatted time data from column $N$ of input \\
+%timecolumn(N,"timeformat")@int, string@formatted time data from column $N$ of input
+C 4 tm_hour
+?expressions functions tm_hour
+?tm_hour
+#tm\_hour(t) & time in sec & the hour (0..23)\\
+%tm_hour(t)@time in sec@the hour (0..23)
+ The `tm_hour(t)` function interprets its argument as a time, in seconds from
+ 1 Jan 1970.  It returns the hour (an integer in the range 0--23) as a real.
+C 4 tm_mday
+?expressions functions tm_mday
+?tm_mday
+#tm\_mday(t) & time in sec & the day of the month (1..31)\\
+%tm_mday(t)@time in sec@the day of the month (1..31)
+ The `tm_mday(t)` function interprets its argument as a time, in seconds from
+ 1 Jan 1970.  It returns the day of the month (an integer in the range 1--31)
+ as a real.
+C 4 tm_min
+?expressions functions tm_min
+?tm_min
+#tm\_min(t) & time in sec & the minute (0..59)\\
+%tm_min(t)@time in sec@the minute (0..59)
+ The `tm_min(t)` function interprets its argument as a time, in seconds from
+ 1 Jan 1970.  It returns the minute (an integer in the range 0--59) as a real.
+C 4 tm_mon
+?expressions functions tm_mon
+?tm_mon
+#tm\_mon(t) & time in sec & the month (0..11)\\
+%tm_mon(t)@time in sec@the month (0..11)
+ The `tm_mon(t)` function interprets its argument as a time, in seconds from
+ 1 Jan 1970.  It returns the month (an integer in the range 0--11) as a real.
+C 4 tm_sec
+?expressions functions tm_sec
+?tm_sec
+#tm\_sec(t) & time in sec & the second (0..59)\\
+%tm_sec(t)@time in sec@the second (0..59)
+ The `tm_sec(t)` function interprets its argument as a time, in seconds from
+ 1 Jan 1970.  It returns the second (an integer in the range 0--59) as a real.
+C 4 tm_wday
+?expressions functions tm_wday
+?tm_wday
+#tm\_wday(t) & time in sec & the day of the week (Sun..Sat) as (0..6)\\
+%tm_wday(t)@time in sec@the day of the week (Sun..Sat) as (0..6)
+ The `tm_wday(t)` function interprets its argument as a time, in seconds from
+ 1 Jan 1970.  It returns the day of the week (Sun..Sat) as an integer (0..6).
+C 4 tm_week
+#tm\_week(t) & time in sec & week of year in ISO8601 "week date" system (1..53)\\
+%tm_week(t)@time in sec@ISO 8601 week of year in ISO8601 "week date" system (1..53)
+C 4 tm_yday
+?expressions functions tm_yday
+?tm_yday
+#tm\_yday(t) & time in sec & the day of the year (0..365)\\
+%tm_yday(t)@time in sec@the day of the year (0..365)
+ The `tm_yday(t)` function interprets its argument as a time, in seconds from
+ 1 Jan 1970.  It returns the day of the year (an integer in the range 0--365)
+ as a real.
+C 4 tm_year
+?expressions functions tm_year
+?tm_year
+#tm\_year(t) & time in sec & the year \\
+%tm_year(t)@time in sec@the year
+ The `tm_year(t)` function interprets its argument as a time, in seconds from
+ 1 Jan 1970.  It returns the year (an integer) as a real.
+C 4 weekdata_iso
+#weekdate\_iso(year,week,day) & int & time corresponding to ISO 8601 standard week date\\
+%weekdate_iso(year,week,day)@int@ time corresponding to ISO 8601 standard week date 
+C 4 weekdata_cdc
+#weekdate\_cdc(year,week,day) & int & time corresponding to CDC epidemiological week date\\
+%weekdate_cdc(year,week,day)@int@ time corresponding to CDC epidemiological week date 
+@end table
+
+^<!-- INCLUDE_NEXT_TABLE -->
+@start table
+#\begin{tabular}{|lcl|} \hline
 #\multicolumn{3}{|c|}{other {\bf gnuplot} functions} \\ \hline \hline
 #Function & Arguments & Returns \\ \hline
 %c c l .
@@ -2239,93 +2343,6 @@ C 4 FresnelS
  to fits or datafile plots.  It returns the content of column x as a string variable.
  `strcol(x)` is shorthand for `stringcolumn(x)`.
  See `plot datafile using`.
-4 timecolumn
-?expressions functions timecolumn
-?timecolumn
-#timecolumn(N,"timeformat") & int, string & time data from column $N$ during data input. \\
-%timecolumn(N,"timeformat")@int, string@time data from column $N$ during data input.
- `timecolumn(N,"timeformat")` may be used only in expressions as part of `using`
- manipulations to fits or datafile plots.   See `plot datafile using`.
-
- It reads string data starting at column N as a time/date value and uses "timeformat"
- to interpret this as "seconds since the epoch" to millisecond precision.
- If no format parameter is given, the format defaults to the string from
- `set timefmt`.
-4 tm_hour
-?expressions functions tm_hour
-?tm_hour
-#tm\_hour(t) & time in sec & the hour (0..23)\\
-%tm_hour(t)@time in sec@the hour (0..23)
- The `tm_hour(t)` function interprets its argument as a time, in seconds from
- 1 Jan 1970.  It returns the hour (an integer in the range 0--23) as a real.
-4 tm_mday
-?expressions functions tm_mday
-?tm_mday
-#tm\_mday(t) & time in sec & the day of the month (1..31)\\
-%tm_mday(t)@time in sec@the day of the month (1..31)
- The `tm_mday(t)` function interprets its argument as a time, in seconds from
- 1 Jan 1970.  It returns the day of the month (an integer in the range 1--31)
- as a real.
-4 tm_min
-?expressions functions tm_min
-?tm_min
-#tm\_min(t) & time in sec & the minute (0..59)\\
-%tm_min(t)@time in sec@the minute (0..59)
- The `tm_min(t)` function interprets its argument as a time, in seconds from
- 1 Jan 1970.  It returns the minute (an integer in the range 0--59) as a real.
-4 tm_mon
-?expressions functions tm_mon
-?tm_mon
-#tm\_mon(t) & time in sec & the month (0..11)\\
-%tm_mon(t)@time in sec@the month (0..11)
- The `tm_mon(t)` function interprets its argument as a time, in seconds from
- 1 Jan 1970.  It returns the month (an integer in the range 0--11) as a real.
-4 tm_sec
-?expressions functions tm_sec
-?tm_sec
-#tm\_sec(t) & time in sec & the second (0..59)\\
-%tm_sec(t)@time in sec@the second (0..59)
- The `tm_sec(t)` function interprets its argument as a time, in seconds from
- 1 Jan 1970.  It returns the second (an integer in the range 0--59) as a real.
-4 tm_wday
-?expressions functions tm_wday
-?tm_wday
-#tm\_wday(t) & time in sec & the day of the week (Sun..Sat) as (0..6)\\
-%tm_wday(t)@time in sec@the day of the week (Sun..Sat) as (0..6)
- The `tm_wday(t)` function interprets its argument as a time, in seconds from
- 1 Jan 1970.  It returns the day of the week (Sun..Sat) as an integer (0..6).
-4 tm_week
-#tm\_week(t) & time in sec & week of year in ISO8601 "week date" system (1..53)\\
-%tm_week(t)@time in sec@ISO 8601 week of year in ISO8601 "week date" system (1..53)
-4 tm_yday
-?expressions functions tm_yday
-?tm_yday
-#tm\_yday(t) & time in sec & the day of the year (0..365)\\
-%tm_yday(t)@time in sec@the day of the year (0..365)
- The `tm_yday(t)` function interprets its argument as a time, in seconds from
- 1 Jan 1970.  It returns the day of the year (an integer in the range 0--365)
- as a real.
-4 tm_year
-?expressions functions tm_year
-?tm_year
-#tm\_year(t) & time in sec & the year \\
-%tm_year(t)@time in sec@the year
- The `tm_year(t)` function interprets its argument as a time, in seconds from
- 1 Jan 1970.  It returns the year (an integer) as a real.
-4 time
-?expressions functions time
-?time
-#time(x) & any & the current system time in seconds \\
-%time(x)@any@the current system time in seconds
- The `time(x)` function returns the current system time. This value can be
- converted to a date string with the `strftime` function, or it can be used
- in conjunction with `timecolumn` to generate relative time/date plots.
- The type of the argument determines what is returned. If the argument is an
- integer, time() returns the current time as an integer, in seconds from
- 1 Jan 1970. If the argument is real (or complex), the result is real as well.
- If the argument is a string, it is assumed to be a format string,
- and it is passed to `strftime` to provide a formatted time string.
- See also `time_specifiers` and `timefmt`.
 4 valid
 ?expressions functions valid
 ?valid
@@ -2637,6 +2654,117 @@ C 4 FresnelS
  See `Ai`, `Bi`, `BesselJ`, `BesselY`, `BesselI`, `BesselK`, `Hankel`.
  The complex exponential integral is provided by netlib or libamos but not by
  libopenspecfun.  See `expint`.
+
+4 Time functions
+5 time
+?expressions functions time
+?time
+ The `time(x)` function returns the current system time. This value can be
+ converted to a date string with the `strftime` function, or it can be used
+ in conjunction with `timecolumn` to generate relative time/date plots.
+ The type of the argument determines what is returned. If the argument is an
+ integer, time() returns the current time as an integer, in seconds from the
+ epoch date, 1 Jan 1970. If the argument is real (or complex), the result is
+ real as well.  If the argument is a string, it is assumed to be a format
+ and it is passed to `strftime` to provide a formatted time string.
+ See also `time_specifiers` and `timefmt`.
+5 timecolumn
+?expressions functions timecolumn
+?timecolumn
+ `timecolumn(N,"timeformat")` reads string data starting at column N as a time/date
+ value and uses "timeformat" to interpret this as "seconds since the epoch" to
+ millisecond precision.  If no format parameter is given, the format defaults
+ to the string from `set timefmt`.  This function is valid only in the `using`
+ specification of a plot or stats command.  See `plot datafile using`.
+5 tm_structure
+?epoch
+ Gnuplot stores time internally as a 64-bit floating point value representing
+ seconds since the epoch date 1 Jan 1970.  In order to interpret this as a time
+ or date it is converted to or from a POSIX standard structure `struct_tm`.
+ Note that fractional seconds, if any, cannot be retrieved via tm_sec().
+ The components may be accessed individually using the functions
+#start
+#b `tm_hour(t)` integer hour in the range 0--23
+#b `tm_mday(t)` integer day of month in the range 1--31
+#b `tm_min(t)`  integer minute in the range 0--59
+#b `tm_mon(t)`  integer month of year in the range 0--11
+#b `tm_sec(t)`  integer second in the range 0--59
+#b `tm_wday(t)` integer day of the week in the range 0 (Sunday)--6(Saturday)
+#b `tm_yday(t)` integer day of the year the range 0--365
+#b `tm_year(t)` integer year
+#end
+5 tm_week
+?expressions functions tm_week
+?functions tm_week
+?time_specifiers tm_week
+?tm_week
+?epidemiological week
+=epidemiological week
+ The `tm_week(t, standard)` function interprets its first argument t as a time
+ in seconds from 1 Jan 1970.  Despite the name of this function it does not
+ report a field from the POSIX tm structure.
+
+ If standard = 0 it returns the week number in the ISO 8601 "week date" system.
+ This corresponds to gnuplot's %W time format.
+ If standard = 1 it returns the CDC epidemiological week number ("epi week").
+ This corresponds to gnuplot's %U time format.
+ For corresponding inverse functions that convert week dates to calendar time
+ see `weekdate_iso`, `weekdate_cdc`.
+
+ In brief, ISO Week 1 of year YYYY begins on the Monday closest to 1 Jan YYYY.
+ This may place it in the previous calendar year.  For example Tue 30 Dec 2008
+ has ISO week date 2009-W01-2 (2nd day of week 1 of 2009).  Up to three days
+ at the start of January may come before the Monday of ISO week 1;
+ these days are assigned to the final week of the previous calendar year.
+ E.g. Fri 1 Jan 2021 has ISO week date 2020-W53-05.
+
+ The US Center for Disease Control (CDC) epidemiological week is a similar
+ week date convention that differs from the ISO standard by defining a week as
+ starting on Sunday, rather than on Monday.
+
+5 weekdate_iso
+?expressions functions weekdate_iso
+?functions weekdate_iso
+?time_specifiers weekdate_iso
+?weekdate_iso
+ Syntax:
+      time = weekdate_iso( year, week [, day] )
+
+ This function converts from the year, week, day components of a date in
+ ISO 8601 "week date" format to the calendar date as a time in seconds since
+ the epoch date 1 Jan 1970.  Note that the nominal year in the week date
+ system is not necessarily the same as the calendar year.  The week is an
+ integer from 1 to 53.  The day parameter is optional. If it is omitted
+ or equal to 0 the time returned is the start of the week. Otherwise day
+ is an integer from 1 (Monday) to 2 (Sunday).
+ See `tm_week` for additional information on an inverse function that converts
+ from calendar date to week number in the ISO standard convention.
+
+ Example:
+      # Plot data from a file with column 1 containing ISO weeks
+      #     Week     cases  deaths
+      #     2020-05    432       1
+      calendar_date(w) = weekdate_iso( int(w[1:4]), int(w[6:7]) )
+      set xtics time format "%b\n%Y"
+      plot FILE using (calendar_date(strcol(1))) : 2   title columnhead
+
+5 weekdate_cdc
+?expressions functions weekdate_cdc
+?functions weekdate_cdc
+?time_specifiers weekdate_cdc
+?weekdate_cdc
+=epidemiological week
+ Syntax:
+      time = weekdate_cdc( year, week [, day] )
+
+ This function converts from the year, week, day components of a date in
+ the CDC/MMWR "epi week" format to the calendar date as a time in seconds since
+ the epoch date 1 Jan 1970.  The CDC week date convention differs from the
+ ISO week date in that it is defined in terms of each week running from
+ day 1 = Sunday to day 6 = Saturday.  If the third parameter is 0 or is
+ omitted, the time returned is the start of the week.
+ See `tm_week` and `weekdate_iso`.
+
 
 4 Synchrotron function
 ?expressions functions SynchrotronF
@@ -10912,78 +11040,6 @@ Ffigure_missing
        set format x "%tH:%tM:%tS"   # "-01:01:12"
        set format x "%.2tH hours"   # "-1.02 hours"
        set format x "%tM:%.2tS"     # "-61:12.50"
-
-4 tm_week
-?expressions functions tm_week
-?functions tm_week
-?time_specifiers tm_week
-?tm_week
-?epidemiological week
-=epidemiological week
- The `tm_week(t, standard)` function interprets its first argument t as a time
- in seconds from 1 Jan 1970.  Despite the name of this function it does not
- report a field from the POSIX tm structure.
-
- If standard = 0 it returns the week number in the ISO 8601 "week date" system.
- This corresponds to gnuplot's %W time format.
- If standard = 1 it returns the CDC epidemiological week number ("epi week").
- This corresponds to gnuplot's %U time format.
- For corresponding inverse functions that convert week dates to calendar time
- see `weekdate_iso`, `weekdate_cdc`.
-
- In brief, ISO Week 1 of year YYYY begins on the Monday closest to 1 Jan YYYY.
- This may place it in the previous calendar year.  For example Tue 30 Dec 2008
- has ISO week date 2009-W01-2 (2nd day of week 1 of 2009).  Up to three days
- at the start of January may come before the Monday of ISO week 1;
- these days are assigned to the final week of the previous calendar year.
- E.g. Fri 1 Jan 2021 has ISO week date 2020-W53-05.
-
- The US Center for Disease Control (CDC) epidemiological week is a similar
- week date convention that differs from the ISO standard by defining a week as
- starting on Sunday, rather than on Monday.
-
-4 weekdate_iso
-?expressions functions weekdate_iso
-?functions weekdate_iso
-?time_specifiers weekdate_iso
-?weekdate_iso
- Syntax:
-      time = weekdate_iso( year, week [, day] )
-
- This function converts from the year, week, day components of a date in
- ISO 8601 "week date" format to the calendar date as a time in seconds since
- the epoch date 1 Jan 1970.  Note that the nominal year in the week date
- system is not necessarily the same as the calendar year.  The week is an
- integer from 1 to 53.  The day parameter is optional. If it is omitted
- or equal to 0 the time returned is the start of the week. Otherwise day
- is an integer from 1 (Monday) to 2 (Sunday).
- See `tm_week` for additional information on an inverse function that converts
- from calendar date to week number in the ISO standard convention.
-
- Example:
-      # Plot data from a file with column 1 containing ISO weeks
-      #     Week     cases  deaths
-      #     2020-05    432       1
-      calendar_date(w) = weekdate_iso( int(w[1:4]), int(w[6:7]) )
-      set xtics time format "%b\n%Y"
-      plot FILE using (calendar_date(strcol(1))) : 2   title columnhead
-
-4 weekdate_cdc
-?expressions functions weekdate_cdc
-?functions weekdate_cdc
-?time_specifiers weekdate_cdc
-?weekdate_cdc
-=epidemiological week
- Syntax:
-      time = weekdate_cdc( year, week [, day] )
-
- This function converts from the year, week, day components of a date in
- the CDC/MMWR "epi week" format to the calendar date as a time in seconds since
- the epoch date 1 Jan 1970.  The CDC week date convention differs from the
- ISO week date in that it is defined in terms of each week running from
- day 1 = Sunday to day 6 = Saturday.  If the third parameter is 0 or is
- omitted, the time returned is the start of the week.
- See `tm_week` and `weekdate_iso`.
 
 3 grid
 ?commands set grid
