@@ -826,10 +826,10 @@ MyFGetS(char *str, unsigned int size, FILE *file)
 
 	for (i = 1; i < size - 1; i++) {
 	    c = ConsoleGetch();
-	    if (str[i] == EOF)
+	    if (c == EOF)
 		break;
-	     str[i] = c;
-	    if (str[i] == '\n')
+	    str[i] = c;
+	    if (c == '\n')
 		break;
 	}
 	str[i] = NUL;
