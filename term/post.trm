@@ -2413,8 +2413,8 @@ PS_common_set_font(const char *font, int caller(const char *font) )
     name[sep] = NUL;
 
     /* Check for set font "/:Bold" or set font ":Bold" */
-    wants_italic = strstr(name, ":Italic");
-    wants_bold = strstr(name, ":Bold");
+    wants_italic = strstr(name, ":Italic") != NULL;
+    wants_bold = strstr(name, ":Bold") != NULL;
     sep = strcspn(name, ":");
     styledfontname = stylefont( (sep == 0 || *name == '/') ? PS_default_font : name,
 	wants_bold, wants_italic);
