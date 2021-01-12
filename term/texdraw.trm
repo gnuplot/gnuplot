@@ -412,7 +412,7 @@ TEXDRAW_graphics()
 		    term->xmax, term->ymax);
     } else {
 	fprintf(gpoutfile, "\\move (0 0) \\rlvec (%d 0) \\rlvec (0 %d) \\rlvec (%d 0) \\ifill f:%0.2f\n",
-		    term->xmax, term->ymax, -term->xmax,
+		    term->xmax, term->ymax, - (int) term->xmax,
 		    TEXDRAW_background);
     }
 
@@ -816,7 +816,7 @@ TEXDRAW_fillbox(int style,
     fprintf(gpoutfile, "\\move (%d %d)", x1, y1);
     fprintf(gpoutfile, "\\rlvec (%d %d)", width, 0);
     fprintf(gpoutfile, "\\rlvec (%d %d)", 0, height);
-    fprintf(gpoutfile, "\\rlvec (%d %d)", -width, 0);
+    fprintf(gpoutfile, "\\rlvec (%d %d)", - (int) width, 0);
     // the polygon is closed automatically by fill
     fprintf(gpoutfile, "\\ifill f:%0.2f\n", gray);
 }
