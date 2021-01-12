@@ -1575,7 +1575,7 @@ draw_enhanced_text(LPGW lpgw, LPRECT rect, int x, int y, const char * str)
 {
 	const char * original_string = str;
 	unsigned int pass, num_passes;
-	struct termentry *tsave;
+	struct termentry *tsave = NULL;
 	TCHAR save_fontname[MAXFONTNAME];
 	int save_fontsize;
 
@@ -3336,7 +3336,7 @@ CopyPrint(LPGW lpgw)
 {
 	DOCINFO docInfo;
 	HDC printer = NULL;
-	HANDLE printerHandle;
+	HANDLE printerHandle = 0;
 	PRINTDLGEX pd;
 	DEVNAMES * pDevNames;
 	DEVMODE * pDevMode;

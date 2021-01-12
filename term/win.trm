@@ -236,7 +236,7 @@ WIN_options()
 	int win_y = 0;
 	int win_width = 0;
 	int win_height = 0;
-	char * title;
+	char * title = NULL;
 	int fontsize;
 	char fontname[MAXFONTNAME];
 	int window_number;
@@ -547,9 +547,9 @@ WIN_options()
 	if (set_title) {
 		free (graphwin->Title);
 #ifdef UNICODE
-		graphwin->Title = (title) ?  UnicodeText(title, encoding) : _tcsdup(WINGRAPHTITLE);
+		graphwin->Title = (title != NULL) ?  UnicodeText(title, encoding) : _tcsdup(WINGRAPHTITLE);
 #else
-		graphwin->Title = (title) ?  title : strdup(WINGRAPHTITLE);
+		graphwin->Title = (title != NULL) ?  title : strdup(WINGRAPHTITLE);
 #endif
 		GraphChangeTitle(graphwin);
 	}

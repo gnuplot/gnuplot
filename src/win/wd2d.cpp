@@ -598,7 +598,7 @@ d2dMeasureText(ID2D1RenderTarget * pRenderTarget, LPCWSTR text, IDWriteTextForma
 {
 	HRESULT hr = S_OK;
 
-	IDWriteTextLayout * pTextLayout;
+	IDWriteTextLayout * pTextLayout = NULL;
 	if (SUCCEEDED(hr)) {
 		hr = g_pDWriteFactory->CreateTextLayout(
 			text,
@@ -610,14 +610,17 @@ d2dMeasureText(ID2D1RenderTarget * pRenderTarget, LPCWSTR text, IDWriteTextForma
 		);
 	}
 
+	DWRITE_TEXT_METRICS textMetrics;
+	if (SUCCEEDED(hr))
+		hr = pTextLayout->GetMetrics(&textMetrics);
+
 	if (SUCCEEDED(hr)) {
-		DWRITE_TEXT_METRICS textMetrics;
-		pTextLayout->GetMetrics(&textMetrics);
 		// Note: result is in DIPs
 		size->width = textMetrics.widthIncludingTrailingWhitespace;
 		size->height = textMetrics.height;
-		SafeRelease(&pTextLayout);
 	}
+
+	SafeRelease(&pTextLayout);
 	return hr;
 }
 
@@ -1409,7 +1412,7 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 				case TERM_LAYER_END_PM3D_MAP:
 				case TERM_LAYER_END_PM3D_FLUSH:
 					if (pPolygonRenderTarget != NULL) {
-						ID2D1Bitmap * pBitmap;
+						ID2D1Bitmap * pBitmap = NULL;
 						if (SUCCEEDED(hr))
 							hr = pPolygonRenderTarget->EndDraw();
 						if (SUCCEEDED(hr))

@@ -462,6 +462,7 @@ BLOCK_text()
     switch (BLOCK_mode) {
     case BLOCK_MODE_HALF:
     case BLOCK_MODE_HALFH:
+    default:
 	nsets = 0;
 	pattern = NULL;
 	break;

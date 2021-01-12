@@ -826,7 +826,7 @@ readline(const char *prompt)
     int cur_char;
     char *new_line;
     TBOOLEAN next_verbatim = FALSE;
-    char *prev_line;
+    char *prev_line = NULL;
 
     /* start with a string of MAXBUF chars */
     if (line_len != 0) {
@@ -1143,7 +1143,10 @@ readline(const char *prompt)
 		switch_prompt(search_prompt, prompt);
 		if (search_result != NULL)
 		    copy_line(search_result->line);
-		free(prev_line);
+		if (prev_line != NULL) {
+		    free(prev_line);
+		    prev_line = NULL;
+		}
 		search_result_width = 0;
 		search_mode = FALSE;
 		break;
@@ -1159,8 +1162,13 @@ readline(const char *prompt)
 	    default:
 		/* abort, restore previous input line */
 		switch_prompt(search_prompt, prompt);
-		copy_line(prev_line);
-		free(prev_line);
+		if (prev_line != NULL) {
+		    copy_line(prev_line);
+		    free(prev_line);
+		    prev_line = NULL;
+		} else {
+		    copy_line("");
+		}
 		search_result_width = 0;
 		search_mode = FALSE;
 		break;
