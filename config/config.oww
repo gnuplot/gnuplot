@@ -594,6 +594,7 @@
 #define wcsnicmp _wcsnicmp
 #if __WATCOMC__ <= 1290
 # define trunc(a) (int)(a)
+# define llround(a) (long long)((a) + 0.5)
 #endif
 
 /* Warning: _wsystem is broken and hence we do not have Unicode support
