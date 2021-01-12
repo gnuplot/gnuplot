@@ -3004,7 +3004,7 @@ valid_format(const char *format)
  * number.
  */
 int
-expect_string(const char column)
+expect_string(const signed char column)
 {
     /* Used only by TABLESTYLE */
     if (column <= 0) {

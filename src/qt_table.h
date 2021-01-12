@@ -10,7 +10,7 @@
  *     collapsed them into quadrangles.
  *     So there is room for improvement in this table.
  */ 
-static char qt_table[256][13] = 
+static signed char qt_table[256][13] = 
 {
     {  -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,  -1},
     {   8,  3,  0, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,  -1},
