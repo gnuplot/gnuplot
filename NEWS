@@ -14,6 +14,7 @@ Changes not in 5.4
 * CHANGE "stats <non-existant file>" yields a testable non-fatal error
 * CHANGE criterion for fallback to default axes in 'plot with ellipse'
 * CHANGE deprecate special case of 'with boxerrorbars" flagged by boxwidth = -2
+* CHANGE wgnuplot menu files use UTF-8 encoding
 
 Changes in 5.4
 ==============

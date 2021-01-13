@@ -1,4 +1,6 @@
 ; Menu file for Windows gnuplot
+; File encoding is UTF-8 (2021-01-13)
+;
 ; Roger Hadgraft, 26-5-92
 ; Russell Lang, 30 Nov 1992
 ; Modified for 4.0, John Bollinger, 31 Dec 2002
