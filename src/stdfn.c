@@ -527,6 +527,7 @@ gp_opendir(const char *name)
     DIR *dir = 0;
     char *mbname;
 
+    printf("ptr: %i, int: %i, long: %i\n", sizeof(void *), sizeof(int), sizeof(long));
     if (name && name[0]) {
 	size_t base_length = strlen(name);
 	    /* search pattern must end with suitable wildcard */
@@ -539,7 +540,7 @@ gp_opendir(const char *name)
 	    free(mbname);
 
 	    if ((dir->name != NULL) &&
-		((dir->handle = (long) _wfindfirst(dir->name, &dir->info)) != -1)) {
+		((dir->handle = _wfindfirst(dir->name, &dir->info)) != -1)) {
 		dir->result.d_name = NULL;
 	    } else { /* rollback */
 		free(dir->name);
