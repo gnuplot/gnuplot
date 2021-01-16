@@ -608,7 +608,7 @@ clip_polygon(gpiPoint *in, gpiPoint *out, int in_length, int *out_length)
     gpiPoint clip_boundary[5];
     static gpiPoint *tmp_corners = NULL;
 
-    if (!clip_area) {
+    if (!clip_area || in_length < 3) {
 	memcpy(out, in, in_length * sizeof(gpiPoint));
 	*out_length = in_length;
 	return;

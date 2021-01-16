@@ -1389,8 +1389,10 @@ finish_filled_curve(
     if (filledcurves_options->oneside < 0 && side > 0)
 	return;
 
-    /* EAM Apr 2013 - Use new polygon clipping code */
-    clipcorners = gp_realloc( clipcorners, 2*points*sizeof(gpiPoint), "filledcurve verticess");
+    /* The polygon clipping code does not deal well with 1- or 2- vertex "polygons" */
+    if (points < 3)
+	return;
+    clipcorners = gp_realloc(clipcorners, 2*points*sizeof(gpiPoint), "filledcurve vertices");
     clip_polygon(corners, clipcorners, points, &clippoints);
     clipcorners->style = style_from_fill(&plot->fill_properties);
     if (clippoints > 0)
