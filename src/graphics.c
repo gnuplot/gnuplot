@@ -45,7 +45,6 @@
 #include "axis.h"
 #include "command.h"
 #include "misc.h"
-#include "gp_time.h"
 #include "gadgets.h"
 #include "jitter.h"
 #include "plot2d.h"		/* for boxwidth */

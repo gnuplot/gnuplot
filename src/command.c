@@ -76,7 +76,6 @@
 #include "datafile.h"
 #include "getcolor.h"
 #include "gp_hist.h"
-#include "gp_time.h"
 #include "misc.h"
 #include "parse.h"
 #include "plot.h"
