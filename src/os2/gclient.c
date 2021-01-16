@@ -3980,14 +3980,17 @@ MousePosToViewport(int *x, int *y, SHORT mx, SHORT my)
     RECTL rc;
 
     /* Rectangle where we are moving: viewport, not the full window! */
-    GpiQueryPageViewport(hpsScreen, &rc);
+    if (GpiQueryPageViewport(hpsScreen, &rc)) {
+	rc.xRight -= rc.xLeft;
+	rc.yTop -= rc.yBottom; /* only distance is important */
 
-    rc.xRight -= rc.xLeft;
-    rc.yTop -= rc.yBottom; /* only distance is important */
-
-    /* px=px(mx); mouse=>gnuplot driver coordinates */
-    *x =(int)(mx * 19500.0 / rc.xRight + 0.5);
-    *y =(int)(my * 12500.0 / rc.yTop + 0.5);
+	/* px=px(mx); mouse=>gnuplot driver coordinates */
+	*x = (int)(mx * 19500.0 / rc.xRight + 0.5);
+	*y = (int)(my * 12500.0 / rc.yTop + 0.5);
+    } else {
+	/* call was unsuccessfull */
+	*x = *y = 0;
+    }
 }
 
 
