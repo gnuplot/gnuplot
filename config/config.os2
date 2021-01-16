@@ -666,4 +666,5 @@
 # define isinf(x) (fpclassify(x) == FP_INFINITE)
 # define atoll _atoll
 # define strlcpy(a, b, c) strcpy(a, b)
+# define llround(a) (long long)((a) + 0.5)
 #endif
