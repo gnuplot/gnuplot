@@ -304,6 +304,8 @@ C
 #b The previously experimental Direct2D variant of the `windows` terminal
 ## replaces the GDI and GDI+ variants. It now supports printing using D2D
 ## and color fonts.
+#b The `pm` OS/2 terminal has been modernized to support e.g. uft8, bold and
+## italic text, and dashed lines. (Since 5.2.7).
 #b The `dospc` and `svga` DOS terminals have been modernized and now support
 ## interactive keyboard and mouse (svga only) input.
 #end
