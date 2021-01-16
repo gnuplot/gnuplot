@@ -461,11 +461,11 @@ Fu&nctions
 		set zrange [[INPUT]Lower bound?[EOS]:[INPUT]Upper bound?[EOS]]{ENTER}
 	--
 	X Label
-		set xlabel "[INPUT]Label text?[EOS]" [INPUT]X offset, Y offset (eg. 2,3) ?{ENTER}
+		set xlabel "[INPUT]Label text?[EOS]" offset [INPUT]X offset, Y offset (eg. 2,3) ?{ENTER}
 	Y Label
-		set ylabel "[INPUT]Label text?[EOS]" [INPUT]X offset, Y offset (eg. 2,3) ?{ENTER}
+		set ylabel "[INPUT]Label text?[EOS]" offset [INPUT]X offset, Y offset (eg. 2,3) ?{ENTER}
 	Z Label
-		set zlabel "[INPUT]Label text?[EOS]" [INPUT]X offset, Y offset (eg. 2,3) ?{ENTER}
+		set zlabel "[INPUT]Label text?[EOS]" offset [INPUT]X offset, Y offset (eg. 2,3) ?{ENTER}
 	Show axis Labels
 		show xlabel{ENTER}show ylabel{ENTER}show zlabel{ENTER}
 	--
