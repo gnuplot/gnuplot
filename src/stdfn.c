@@ -527,7 +527,6 @@ gp_opendir(const char *name)
     DIR *dir = 0;
     char *mbname;
 
-    printf("ptr: %i, int: %i, long: %i\n", sizeof(void *), sizeof(int), sizeof(long));
     if (name && name[0]) {
 	size_t base_length = strlen(name);
 	    /* search pattern must end with suitable wildcard */
