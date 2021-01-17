@@ -42,7 +42,7 @@ const char gnuplot_patchlevel[] = "0";
 #else
 const char gnuplot_date[] = "2020-02-07 ";
 #endif
-const char gnuplot_copyright[] = "Copyright (C) 1986-1993, 1998, 2004, 2007-2020";
+const char gnuplot_copyright[] = "Copyright (C) 1986-1993, 1998, 2004, 2007-2021";
 
 const char faq_location[] = FAQ_LOCATION;
 
