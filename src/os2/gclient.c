@@ -117,33 +117,14 @@
 
 /*==== d e b u g g i n g =====================================================*/
 
-#if 0
-# include "pmprintf.h"
-# define DEBUG_IMAGE(a) PmPrintf a
-#else
-# define DEBUG_IMAGE(a)
+#ifdef HAVE_PMPRINTF
+# include <pmprintf.h>
 #endif
-
-#if 0
-# include "pmprintf.h"
-# define DEBUG_COLOR(a) PmPrintf a
-#else
-# define DEBUG_COLOR(a)
-#endif
-
-#if 0
-# include "pmprintf.h"
-# define DEBUG_FONT(a) PmPrintf a
-#else
-# define DEBUG_FONT(a)
-#endif
-
-#if 0
-# include "pmprintf.h"
-# define DEBUG_LINES(a) PmPrintf a
-#else
-# define DEBUG_LINES(a)
-#endif
+#define DEBUG_IMAGE(a) // PmPrintf a
+#define DEBUG_COLOR(a) // PmPrintf a
+#define DEBUG_FONT(a) // PmPrintf a
+#define DEBUG_LINES(a) // PmPrintf a
+#define TEXT_DEBUG(x) // PmPrintf x
 
 /*==== l o c a l    d a t a ==================================================*/
 
@@ -3447,12 +3428,6 @@ void SigHandler(int sig)
 
 #ifdef PM_KEEP_OLD_ENHANCED_TEXT
 
-/* disable debugging info */
-#define TEXT_DEBUG(x) /* fprintf x */ ;
-#if 0
-static FILE *ff;
-#endif
-
 /* process a bit of string, and return the last character used.
  * p is start of string
  * brace is TRUE to keep processing to }, FALSE for do one character
@@ -3481,7 +3456,7 @@ static char
 {
     POINTL aptl[TXTBOX_COUNT];
     BOOL bChangeFont = FALSE;
-    TEXT_DEBUG((ff, "RECURSE WITH [%p] %s, %d %s %.1f %.1f %d %d\n",
+    TEXT_DEBUG(("RECURSE WITH [%p] %s, %d %s %d %d %d %d\n",
 		p, p, brace, fontname, fontsize, base,
 		widthflag, showflag));
 
@@ -3548,7 +3523,7 @@ static char
 
 	    /*{{{  recurse(possibly with a new font) */
 
-	    TEXT_DEBUG((ff,"Dealing with {\n"));
+	    TEXT_DEBUG(("Dealing with {\n"));
 	    if (*++p == '/') {
 		/* then parse a fontname, optional fontsize */
 		while (*++p == ' ')
@@ -3573,14 +3548,14 @@ static char
 		if (ch == '=') {
 		    *p++ = '\0';
 		    /*{{{  get optional font size*/
-		    TEXT_DEBUG((ff,"Calling strtod(%s) ...", p));
+		    TEXT_DEBUG(("Calling strtod(%s) ...", p));
 		    f = strtod(p, &p);
-		    TEXT_DEBUG((ff,"Returned %.1f and %s\n", f, p));
+		    TEXT_DEBUG(("Returned %.1f and %s\n", f, p));
 
 		    if (!f)
 			f = fontsize;
 
-		    TEXT_DEBUG((ff,"Font size %.1f\n", f));
+		    TEXT_DEBUG(("Font size %d\n", f));
 		    /*}}}*/
 		} else {
 		    *p++ = '\0';
@@ -3598,11 +3573,11 @@ static char
 	    } /* if ('/') */
 	    /*}}}*/
 
-	    TEXT_DEBUG((ff,"Before recursing, we are at [%p] %s\n", p, p));
+	    TEXT_DEBUG(("Before recursing, we are at [%p] %s\n", p, p));
 
 	    p = ParseText(hps,p, TRUE, localfontname, f, base, widthflag, showflag);
 
-	    TEXT_DEBUG((ff,"BACK WITH %s\n", p));
+	    TEXT_DEBUG(("BACK WITH %s\n", p));
 	    if (savepos)
 		/* restore overwritten character */
 		*savepos = save;
