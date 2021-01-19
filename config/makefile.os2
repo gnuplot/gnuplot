@@ -374,7 +374,7 @@ gnupmdrv.hlp: $(OS2DIR)\gnupmdrv.ipf
 X11LIBS = -L$(X11ROOT)/XFree86/lib -lX11 -lsocket -Zbsd-signals -Zcrtdll
 # X11 includes
 X11INCLUDES = -I$(X11ROOT)/XFree86/include
-X11FLAGS= -Zmt -D__UNIXOS2__ -DI_NEED_OS2_H
+X11FLAGS= -Zmt -D__UNIXOS2__ -DI_NEED_OS2_H -DGenericEvent=-1
 ifdef MOUSE
 X11FLAGS += -DUSE_MOUSE
 endif
