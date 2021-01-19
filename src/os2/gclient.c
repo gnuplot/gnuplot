@@ -279,12 +279,17 @@ static BOOL mouseTerminal = FALSE;
 */
 static BOOL lock_mouse = TRUE;
 
-/* Structure for the ruler: on/off, position,...
-*/
+/* Structure for the ruler: on/off, position,... */
 static struct {
    BOOL on;
    int x, y;  /* ruler position */
 } ruler = { 0, 0, 0 };
+
+/* Status of the line from ruler to cursor */
+static struct {
+    BOOL on;	/* ruler line active ? */
+    int x, y;	/* ruler line end position (previous cursor position) */
+} ruler_lineto = { FALSE, 0, 0 };
 
 // Pointer definition
 HWND hptrDefault, hptrCrossHair, hptrScaling,
@@ -366,6 +371,7 @@ static void     UpdateStatusLine(HPS hps, char *text);
 static void     gpPMmenu_update(void);
 static void     DrawZoomBox(void);
 static void     DrawRuler(void);
+static void     DrawRulerLineTo(void);
 
 #define IGNORE_MOUSE (!mouseTerminal || !useMouse || lock_mouse)
 /*  don't react to mouse in the event handler, and avoid some crashes */
@@ -561,6 +567,11 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 		DrawZoomBox(); /* erase zoom box */
 		zoombox.to.x = mx; zoombox.to.y = my;
 		DrawZoomBox(); /* draw new zoom box */
+	    }
+	    if (ruler.on && ruler_lineto.on) {
+		DrawRulerLineTo(); /*  erase current line */
+		ruler_lineto.x = mx; ruler_lineto.y = my;
+		DrawRulerLineTo(); /*  draw new line */
 	    }
 	    /* track(show) mouse position -- send the event to gnuplot */
 	    gp_exec_event(GE_motion, mx, my, 0, 0, 0);
@@ -1049,7 +1060,7 @@ WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
     static int ulPauseItem = IDM_PAUSEDLG;
     int mx, my;
 
-    GetMousePosViewport(hWnd,&mx,&my);
+    GetMousePosViewport(hWnd, &mx, &my);
 
     switch ((USHORT) SHORT1FROMMP(mp1)) {
     case IDM_ABOUT :    /* show the 'About' box */
@@ -1276,7 +1287,7 @@ WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
     {
 	int mx, my;
 
-	GetMousePosViewport(hWnd,&mx,&my);
+	GetMousePosViewport(hWnd, &mx, &my);
 	gp_exec_event(GE_keypress, mx, my, 'r', 1, 0);
 	return 0L;
     }
@@ -1690,6 +1701,7 @@ ThreadDraw(void* arg)
     GpiSetDrawingMode(hpsScreen, DM_DRAW);
     GpiDrawChain(hpsScreen);
     DrawRuler();
+    DrawRulerLineTo();
     DisplayStatusLine(hpsScreen);
     WinEndPaint(hpsScreen);
     DosReleaseMutexSem(semHpsAccess);
@@ -2196,6 +2208,7 @@ ReadGnu(void* arg)
 		FLUSHPATH(hps, "SET_TEXT");
 		GpiCloseSegment(hps);
 		DrawRuler();
+		DrawRulerLineTo();
 		DisplayStatusLine(hps);
 		DosReleaseMutexSem(semHpsAccess);
 		WinPostMsg(hApp, WM_GNUPLOT, 0L, 0L);
@@ -3046,13 +3059,15 @@ ReadGnu(void* arg)
 		BufRead(hRead, &x, sizeof(x), &cbR);
 		BufRead(hRead, &y, sizeof(y), &cbR);
 		DrawRuler(); /* remove previous drawing, if any */
+		DrawRulerLineTo();
 		if (x < 0) {
 		    ruler.on = FALSE;
 		} else {
 		    ruler.on = TRUE;
-		    ruler.x = x;
-		    ruler.y = y;
+		    ruler.x = ruler_lineto.x = x;
+		    ruler.y = ruler_lineto.x = y;
 		    DrawRuler();
+		    DrawRulerLineTo();
 		}
 		break;
 	    }
@@ -3061,21 +3076,33 @@ ReadGnu(void* arg)
 	    {
 		int c, x, y;
 
-		BufRead(hRead, &c, sizeof(x), &cbR);
+		BufRead(hRead, &c, sizeof(c), &cbR);
 		BufRead(hRead, &x, sizeof(x), &cbR);
 		BufRead(hRead, &y, sizeof(y), &cbR);
 		switch (c) {
+		case -4: /* switch off line between ruler and mouse cursor */
+		    DrawRulerLineTo();
+		    ruler_lineto.on = FALSE;
+		    break;
+		case -3: /* switch on line between ruler and mouse cursor */
+		    if (ruler.on && ruler_lineto.on)
+			    break;
+		    ruler_lineto.x = x;
+		    ruler_lineto.y = y;
+		    ruler_lineto.on = TRUE;
+		    DrawRulerLineTo();
+		    break;
 		case -2: { /* move mouse to the given point */
 		    RECTL rc;
 		    POINTL pt;
 
-		    GpiQueryPageViewport(hpsScreen,&rc);
+		    GpiQueryPageViewport(hpsScreen, &rc);
 		    /* only distance is important */
 		    rc.xRight -= rc.xLeft;
 		    rc.yTop -= rc.yBottom;
 		    /* window => pixels coordinates */
-		    pt.x =(long int) ((x * (double) rc.xRight) / (double) GNUXPAGE);
-		    pt.y =(long int) ((x * (double) rc.yTop) / (double) GNUYPAGE);
+		    pt.x = (long int) ((x * (double) rc.xRight) / (double) GNUXPAGE);
+		    pt.y = (long int) ((x * (double) rc.yTop) / (double) GNUYPAGE);
 		    WinMapWindowPoints(hApp, HWND_DESKTOP, &pt, 1);
 		    WinSetPointerPos(HWND_DESKTOP, pt.x, pt.y);
 		    break;
@@ -3103,6 +3130,10 @@ ReadGnu(void* arg)
 		if (c >= 0 && zoombox.on) { /* erase zoom box */
 		    DrawZoomBox();
 		    zoombox.on = FALSE;
+		}
+		if (c >= 0 && ruler_lineto.on) { /* erase ruler line */
+		    DrawRulerLineTo();
+		    ruler_lineto.on = FALSE;
 		}
 		break;
 	    }
@@ -3854,6 +3885,30 @@ DrawRuler()
 }
 
 
+/* Draw the ruler line to cursor position.
+ */
+static void
+DrawRulerLineTo()
+{
+    POINTL p;
+
+    if (!ruler.on || !ruler_lineto.on || ruler.x < 0 || ruler_lineto.x < 0)
+	return;
+
+    GpiSetColor(hpsScreen, RGB_TRANS(CLR_RED));
+    GpiSetLineWidth(hpsScreen, LINEWIDTH_NORMAL);
+    GpiSetMix(hpsScreen, FM_INVERT);
+
+    p.x = ruler.x;
+    p.y = ruler.y;
+    GpiMove(hpsScreen, &p);
+
+    p.x = ruler_lineto.x;
+    p.y = ruler_lineto.y;
+    GpiLine(hpsScreen, &p);
+}
+
+
 /*
  * This routine recalculates mouse/pointer position [mx,my] in [in pixels]
  * current window to the viewport coordinates
@@ -3889,7 +3944,7 @@ GetMousePosViewport(HWND hWnd, int *mx, int *my)
 
     WinQueryPointerPos(HWND_DESKTOP, &p); /* this is position wrt desktop */
     WinMapWindowPoints(HWND_DESKTOP, hWnd, &p, 1); /* pos. wrt our window in pixels */
-    MousePosToViewport(mx,my,p.x,p.y);
+    MousePosToViewport(mx, my, p.x, p.y);
 }
 
 
