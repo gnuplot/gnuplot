@@ -661,7 +661,7 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 		NumColors, PalSupport & CAPS_PALETTE_MANAGER, !bPMPaletteMode ));
 
 	sizlPage.cx = 0; sizlPage.cy = 0;
-	sizlPage.cx = 19500; sizlPage.cy = 12500;
+	sizlPage.cx = GNUXPAGE; sizlPage.cy = GNUYPAGE;
 	hpsScreen = GpiCreatePS(hab, hdcScreen, &sizlPage,
 				PU_HIMETRIC|GPIT_NORMAL|GPIA_ASSOC);
 	/* spawn server for GNUPLOT ... */
@@ -2135,9 +2135,9 @@ ReadGnu(void* arg)
 		    GpiSetColor(hps, color = RGB_TRANS(CLR_RED)); /* cross the unfinished plot */
 		    GpiBeginPath(hps, 1);
 		    p.x = p.y = 0; GpiMove(hps, &p);
-		    p.x = 19500; p.y = 12500; GpiLine(hps, &p);
-		    p.x = 0; p.y = 12500; GpiMove(hps, &p);
-		    p.x = 19500; p.y = 0; GpiLine(hps, &p);
+		    p.x = GNUXPAGE; p.y = GNUYPAGE; GpiLine(hps, &p);
+		    p.x = 0; p.y = GNUYPAGE; GpiMove(hps, &p);
+		    p.x = GNUXPAGE; p.y = 0; GpiLine(hps, &p);
 		    GpiEndPath(hps);
 		    GpiStrokePath(hps, 1, 0);
 		}
@@ -3074,8 +3074,8 @@ ReadGnu(void* arg)
 		    rc.xRight -= rc.xLeft;
 		    rc.yTop -= rc.yBottom;
 		    /* window => pixels coordinates */
-		    pt.x =(long int) ((x * (double) rc.xRight) / 19500.0);
-		    pt.y =(long int) ((x * (double) rc.yTop) / 12500.0);
+		    pt.x =(long int) ((x * (double) rc.xRight) / (double) GNUXPAGE);
+		    pt.y =(long int) ((x * (double) rc.yTop) / (double) GNUYPAGE);
 		    WinMapWindowPoints(hApp, HWND_DESKTOP, &pt, 1);
 		    WinSetPointerPos(HWND_DESKTOP, pt.x, pt.y);
 		    break;
@@ -3842,14 +3842,14 @@ DrawRuler()
     p.y = ruler.y;
     GpiMove(hpsScreen, &p);
 
-    p.x = 19500;
+    p.x = GNUXPAGE;
     GpiLine(hpsScreen, &p);
 
     p.x = ruler.x;
     p.y = 0;
     GpiMove(hpsScreen, &p);
 
-    p.y = 12500;
+    p.y = GNUYPAGE;
     GpiLine(hpsScreen, &p);
 }
 
@@ -3869,10 +3869,10 @@ MousePosToViewport(int *x, int *y, SHORT mx, SHORT my)
 	rc.yTop -= rc.yBottom; /* only distance is important */
 
 	/* px=px(mx); mouse=>gnuplot driver coordinates */
-	*x = (int)(mx * 19500.0 / rc.xRight + 0.5);
-	*y = (int)(my * 12500.0 / rc.yTop + 0.5);
+	*x = (int)(mx * (double) GNUXPAGE / rc.xRight + 0.5);
+	*y = (int)(my * (double) GNUYPAGE / rc.yTop + 0.5);
     } else {
-	/* call was unsuccessfull */
+	/* call was unsuccessful */
 	*x = *y = 0;
     }
 }
