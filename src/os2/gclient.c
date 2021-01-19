@@ -80,6 +80,10 @@
 #define INCL_DOSSESMGR
 #define INCL_DOSSEMAPHORES
 #define INCL_DOSMISC
+#ifdef HAVE_EXCEPTQ
+# define INCL_DOSEXCEPTIONS
+# define INCL_DOSMODULEMGR
+#endif
 #define INCL_DOSQUEUES
 #define INCL_WINSWITCHLIST
 #define INCL_GPIPRIMITIVES
@@ -104,6 +108,8 @@
 #include "gnupmdrv.h"
 #include "pm_msgs.h"
 #include "mousecmn.h"
+/* Finally, include the common mousing declarations and routines: */
+#include "gpexecute.h"
 
 
 /*==== m i s c e l l a n e o u s =============================================*/
@@ -117,6 +123,12 @@
 
 /*==== d e b u g g i n g =====================================================*/
 
+#ifdef HAVE_EXCEPTQ
+# include <exceptq.h>
+/* missing definition */
+BOOL    LoadExceptq(EXCEPTIONREGISTRATIONRECORD* pExRegRec,
+                    const char* pOpts, const char* pInfo);
+#endif
 #ifdef HAVE_PMPRINTF
 # include <pmprintf.h>
 #endif
@@ -384,9 +396,6 @@ static int drop_count = 0;
 
 /* Each drop action is assigned a number, for relating drop events
    with PMR_DROP requests. */
-
-/* Finally, include the common mousing declarations and routines: */
-#include "../gpexecute.h"
 
 /* End of new functions related to the mouse processing */
 
@@ -909,7 +918,7 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	RECTL rectl_tmp;
 
 	DosQueryMutexSem(semHpsAccess, &pid, &tid, &ulCount);
-	if ((ulCount > 0) &&(tid != tidDraw)) {
+	if ((ulCount > 0) && (tid != tidDraw)) {
 	    /* simple repaint while building plot or metafile */
 	    /* use temporary PS                   */
 	    lock_mouse = 1; /* PM: this may help against gnupmdrv crashes */
@@ -1794,11 +1803,16 @@ DoPaint(HWND hWnd, HPS hps)
 static void
 ThreadDraw(void* arg)
 {
-    HAB hab = WinInitialize(0);
+    HAB hab;
+#ifdef HAVE_EXCEPTQ
+    EXCEPTIONREGISTRATIONRECORD exRegRec;
 
-    InitScreenPS();
+    LoadExceptq(&exRegRec, NULL, NULL);
+#endif
 
+    hab = WinInitialize(0);
     DosRequestMutexSem(semHpsAccess,(ULONG) SEM_INDEFINITE_WAIT);
+    InitScreenPS();
     ScalePS(hpsScreen);
     GpiSetStopDraw(hpsScreen, SDW_OFF);
     GpiSetDrawingMode(hpsScreen, DM_DRAW);
@@ -1809,6 +1823,10 @@ ThreadDraw(void* arg)
     DosReleaseMutexSem(semHpsAccess);
     WinTerminate(hab);
     tidDraw = 0;
+
+#ifdef HAVE_EXCEPTQ
+    UninstallExceptq(&exRegRec);
+#endif
 #if 0
     /* This does not work here(why?!), thus moved to pm.trm: PM_text(); */
     gp_exec_event(GE_plotdone, mx, my, 0, 0, 0); /* enable again zoom and scale by mouse motions */
@@ -2181,6 +2199,11 @@ ReadGnu(void* arg)
     ULONG *rgbTable = NULL; /* current colour table (this is a 'virtual' palette) */
     LONG color = 0;
     int fillstyle = FS_SOLID | (100 << 4);
+#ifdef HAVE_EXCEPTQ
+    EXCEPTIONREGISTRATIONRECORD exRegRec;
+
+    LoadExceptq(&exRegRec, NULL, NULL);
+#endif
 
     hab = WinInitialize(0);
     DosEnterCritSec();
@@ -3238,6 +3261,10 @@ ReadGnu(void* arg)
     }
     DosDisConnectNPipe(hRead);
     WinPostMsg(hApp, WM_CLOSE, 0L, 0L);
+
+#ifdef HAVE_EXCEPTQ
+    UninstallExceptq(&exRegRec);
+#endif
 }
 
 

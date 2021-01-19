@@ -84,8 +84,13 @@ LUA=1
 # creates binaries suitable for debugging. Some bugs may come and go
 # as opposed to a production build since we lower the optimization level
 # DEBUG=1
+
 # Helper library for debugging only:
 PMPRINTF=1
+
+# ExceptQ
+# Crash reporting via exceptq library.
+EXCEPTQ=1
 
 # MOUSE support for PM and X11 terminals
 # NOTE: This cannot be disabled
@@ -272,6 +277,10 @@ ifdef PMPRINTF
 endif
 endif
 
+ifdef EXCEPTQ
+  CFLAGS2  += -DHAVE_EXCEPTQ
+  LDFLAGS2 += -Zmap -Zlinker /map -Zlinker /linenumbers
+endif
 
 # TOOLS
 CPP = cpp
@@ -347,6 +356,9 @@ OS2OBJ = $(OS2DIR)\gnupmdrv.$(O2) $(OS2DIR)\gclient.$(O2) $(OS2DIR)\print.$(O2) 
 
 gnupmdrv.exe: $(OS2OBJ) $(OS2DIR)\gnupmdrv.res $(OS2DIR)\gnupmdrv.def
 	$(CC2) $(LDFLAGS2) -o $@ $(OS2DIR)\gnupmdrv.res $(OS2OBJ) $(OS2DIR)\gnupmdrv.def
+ifdef EXCEPTQ
+	mapxqs gnupmdrv.map
+endif
 
 gnupmdrv.hlp: $(OS2DIR)\gnupmdrv.ipf
 #	Cannot use the command

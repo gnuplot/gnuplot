@@ -56,12 +56,20 @@
 #define INCL_DOSMEMMGR
 #define INCL_DOSPROCESS
 #define INCL_DOSFILEMGR
+#ifdef HAVE_EXCEPTQ
+# define INCL_DOSEXCEPTIONS
+# define INCL_DOSMODULEMGR
+#endif
 #include <os2.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "config.h"
 #include "gnupmdrv.h"
+#ifdef HAVE_EXCEPTQ
+# define INCL_LOADEXCEPTQ
+# include <exceptq.h>
+#endif
 
 /*==== g l o b a l    d a t a ================================================*/
 
@@ -110,14 +118,21 @@ int main ( int argc, char **argv )
     PFNWP        pfnOldFrameWndProc ;
     HWND         hwndHelp ;
     BOOL         bPos ;
+#ifdef HAVE_EXCEPTQ
+    EXCEPTIONREGISTRATIONRECORD exRegRec;
+#endif
 
     /* (am, 19981001)
-     * A subtile problem is fixed here:
+     * A subtle problem is fixed here:
      * upon the first initialization of this driver (i.e. we're here in main())
      * it may inherit handles of files opened (temporarily) by gnuplot itself!
      * We close them here.
      */
     _fcloseall();
+
+#ifdef HAVE_EXCEPTQ
+    LoadExceptq(&exRegRec, "I", "gnupmdrv");
+#endif
 
     if( argc <= 1 ) strcpy( szIPCName, IPCDEFAULT ) ;
     else {
@@ -229,6 +244,9 @@ int main ( int argc, char **argv )
     WinDestroyMsgQueue (hmq) ;
     WinTerminate (hab) ;
 
+#ifdef HAVE_EXCEPTQ
+    UninstallExceptq(&exRegRec);
+#endif
     return 0 ;
     }
 
