@@ -224,11 +224,6 @@ static const  char  *SetDataStyles[] = {
     "lines", "linespoints", "points", "steps"
 };
 
-struct {
-    BOOL on;  // set during zooming
-    POINTL from, to; // corners
-} zoombox = { 0 };
-
 static ULONG    ulShellPos[4];
 static PAUSEDATA pausedata = {sizeof(PAUSEDATA), NULL, NULL};
 static char     szFontNameSize[FONTBUF];	/* default name and size, format: "10.Helvetica" */
@@ -278,6 +273,13 @@ static BOOL mouseTerminal = FALSE;
    in a window not yet plotted.
 */
 static BOOL lock_mouse = TRUE;
+
+/* Status of zoom box */
+static struct Zoombox {
+    BOOL on;		/* set during zooming */
+    POINTL from, to;		/* corners of the zoom box */
+    char * text1, * text2;	/* texts in the corners (i.e. positions) */
+} zoombox = { FALSE, {0,0}, {0,0}, NULL, NULL };
 
 /* Structure for the ruler: on/off, position,... */
 static struct {
@@ -366,9 +368,10 @@ static int      LType(int iType);
 static void     TextToClipboard(PCSZ);
 static void     GetMousePosViewport(HWND hWnd, int *mx, int *my);
 static void     MousePosToViewport(int *x, int *y, SHORT mx, SHORT my);
+static void     gpPMmenu_update(void);
 static void     DisplayStatusLine(HPS hps);
 static void     UpdateStatusLine(HPS hps, char *text);
-static void     gpPMmenu_update(void);
+static void     DrawMouseText(HPS hps, PPOINTL pt, char * text, LONG len);
 static void     DrawZoomBox(void);
 static void     DrawRuler(void);
 static void     DrawRulerLineTo(void);
@@ -2799,8 +2802,19 @@ ReadGnu(void* arg)
 		    UpdateStatusLine(hps,text);
 		    break;
 		case 1:
+		    DrawZoomBox();
+		    if (zoombox.text1)
+			free(zoombox.text1);
+		    zoombox.text1 = strdup(text);
+		    DrawZoomBox();
+		    break;
 		case 2:
-		    break; /* not implemented */
+		    DrawZoomBox();
+		    if (zoombox.text2)
+			free(zoombox.text2);
+		    zoombox.text2 = strdup(text);
+		    DrawZoomBox();
+		    break;
 		}
 		break;
 	    }
@@ -3963,13 +3977,10 @@ DisplayStatusLine(HPS hps)
 
     if (!sl_curr_text)
 	return;
-    GpiSetColor(hps, RGB_TRANS(COLOR_MOUSE)); /* set text color */
-    GpiSetCharMode(hps, CM_MODE1);
+
     pt.x = 2;
     pt.y = 2;
-    GpiSetMix(hps, FM_INVERT);
-    /* GpiSetMix(hps, FM_XOR); */
-    GpiCharStringAt(hps, &pt,(long) strlen(sl_curr_text), sl_curr_text);
+    DrawMouseText(hps, &pt, sl_curr_text, strlen(sl_curr_text));
 }
 
 
@@ -4027,16 +4038,57 @@ gpPMmenu_update()
 
 
 static void
+DrawMouseText(HPS hps, PPOINTL pt, char * text, LONG len)
+{
+    GpiSetColor(hps, RGB_TRANS(COLOR_MOUSE));
+    GpiSetCharMode(hps, CM_MODE1);
+    GpiSetMix(hps, FM_INVERT);
+    GpiCharStringAt(hps, pt, len, text);
+}
+
+
+static void
 DrawZoomBox()
 {
+    HPS hps = hpsScreen;
+    POINTL pt;
+
     if (!zoombox.on)
 	return;
+
     GpiSetLineWidth(hpsScreen, LINEWIDTH_NORMAL);
     GpiSetLineType(hpsScreen, LINETYPE_SHORTDASH);
     GpiSetMix(hpsScreen, FM_INVERT);
     GpiMove(hpsScreen, &zoombox.from);
     GpiBox(hpsScreen, DRO_OUTLINE, &zoombox.to, 0, 0);
     GpiSetLineType(hpsScreen, LINETYPE_DEFAULT);
+
+    if (zoombox.text1) {
+	char *separator = strchr(zoombox.text1, '\r');
+	if (separator) {
+	    pt = zoombox.from;
+	    pt.y -= lCharHeight;
+	    DrawMouseText(hps, &zoombox.from, zoombox.text1, separator - zoombox.text1);
+	    DrawMouseText(hps, &zoombox.from, separator + 1, strlen(separator + 1));
+	} else {
+	    pt = zoombox.from;
+	    pt.y -= lCharHeight / 2;
+	    DrawMouseText(hps, &zoombox.from, zoombox.text1, strlen(zoombox.text1));
+	}
+    }
+    if (zoombox.text2) {
+	char *separator = strchr(zoombox.text2, '\r');
+	if (separator) {
+	    pt = zoombox.to;
+	    pt.y -= lCharHeight;
+	    DrawMouseText(hps, &zoombox.to, zoombox.text2, separator - zoombox.text2);
+	    DrawMouseText(hps, &pt, separator + 1, strlen(separator + 1));
+	} else {
+	    pt = zoombox.to;
+	    pt.y -= lCharHeight / 2;
+	    DrawMouseText(hps, &pt, zoombox.text2, strlen(zoombox.text2));
+	}
+    }
 }
 
 /* eof gclient.c */
