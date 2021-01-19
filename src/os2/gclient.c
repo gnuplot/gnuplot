@@ -956,7 +956,7 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	}
 	free(pp);
 #ifndef STANDARD_FONT_DIALOG
-	gp_execute("refresh");
+	gp_exec_event(GE_replot, 0, 0, 0, 0, 0);
 #endif
 	break;
 #if 0
@@ -1312,7 +1312,7 @@ WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	return 0L;
 
     case IDM_DO_REPLOT:
-	gp_execute("replot");
+	gp_exec_event(GE_replot, 0, 0, 0, 0, 0);
 	return 0L;
 
     case IDM_DO_RELOAD:
