@@ -79,6 +79,12 @@ static struct {
     long    lVertRes ;  // vertical resolution pels / metre
     } prCaps ;
 
+
+/* own window functions... */
+void WinSetDlgItemFloat( HWND, USHORT, float ) ;
+void WinSetDlgItemFloatF( HWND, USHORT, int, float ) ;
+void WinQueryDlgItemFloat( HWND, USHORT, float* ) ;
+
 ULONG GetPrinters( PPRQINFO3* pprq, ULONG *pcTot  ) ;
 
 
