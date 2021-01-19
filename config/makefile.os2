@@ -84,6 +84,8 @@ LUA=1
 # creates binaries suitable for debugging. Some bugs may come and go
 # as opposed to a production build since we lower the optimization level
 # DEBUG=1
+# Helper library for debugging only:
+PMPRINTF=1
 
 # MOUSE support for PM and X11 terminals
 # NOTE: This cannot be disabled
@@ -261,6 +263,13 @@ endif
 ifdef ICONV
   CFLAGS  += -DHAVE_ICONV
   LIBS    += -liconv
+endif
+
+ifdef DEBUG
+ifdef PMPRINTF
+  CFLAGS2 += -DHAVE_PMRINTF
+  LDFLAGS2 += -lpmprintf
+endif
 endif
 
 
