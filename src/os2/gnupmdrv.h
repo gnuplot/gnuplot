@@ -39,11 +39,7 @@
 
 #include "config.h"
 /* include resource defines */
-
-#ifndef DISPDEFS_H
-/*#include "dispdefs.h"*/
 #include "dialogs.h"
-#endif
 
 /*==== own window messages  =================================================*/
 
@@ -63,44 +59,36 @@
 
 /*==== various names ========================================================*/
 
-#define GNUPIPE     "\\pipe\\gnuplot"       /* named pipe to gnuplot */
-#define GNUQUEUE    "\\queues\\gnuplot"     /* queue for gnuplot termination */
-#define GNUSEM      "\\sem32\\gnuplot.sem"  /* synch gnuplot and gnupmdrv */
 #define GNUINI      "GNUPMDRV.INI"          /* ini filename */
-#define GNUEXEFILE  "gnuplot.exe"           /* exe file name */
-#define GNUHELPFILE "gnuplot.gih"           /* help file name */
-#define GNUTERMINIT "GNUTERM=pm"            /* terminal setup string */
 #define INITIAL_FONT "14.Helvetica"         /* initial font for plots */
 #define APP_NAME     "GnuplotPM"            /* application name */
-#define CHILD_NAME   "GnupltChild"          /* child window name */
 
         /* profile (ini file) names  */
 #define INISHELLPOS  "PosShell"
 #define INIPAUSEPOS  "PosPause"
-#define INIPLOTPOS   "PosPlot"
 #define INIFONT      "DefFont"
 #define INIFRAC      "PageFrac"
 #define INIPRDRIV    "DrivData"
 #define INIPRPR      "Printer"
 #define INIOPTS      "DefOpts"
 #define INICHAR      "Fontdata"
-#define INIKEEPRATIO "KeepRatio"	/* PM */
-#define INIUSEMOUSE  "UseMouse"	/* PM */
-#define INIMOUSECOORD "MouseCoord"	/* PM */
+#define INIKEEPRATIO "KeepRatio"
+#define INIUSEMOUSE  "UseMouse"
+#define INIMOUSECOORD "MouseCoord"
 
 
 /*==== global data  ==========================================================*/
 
 HAB         hab ;               /* application anchor block handle */
-HWND   	    hApp ;          /* application window handle */
+HWND        hApp ;              /* application window handle */
 HWND        hwndFrame ;         /* frame window handle */
 
-#define   FONTBUF   256         /* buffer for dropped font namesize */
+#define     FONTBUF   256       /* buffer for dropped font namesize */
 #define     GNUXPAGE  19500     /* width of plot area in 0.01 cm */
 #define     GNUYPAGE  12500     /* height of plot area in 0.01 cm */
 
-extern char szIPCName[];       /* name used in IPC with gnuplot */
-extern char szIniFile[256];    /* full path of ini file */
+extern char szIPCName[];        /* name used in IPC with gnuplot */
+extern char szIniFile[256];     /* full path of ini file */
 extern int  bServer;
 extern int  bPersist;
 extern int  bWideLines;
@@ -144,7 +132,6 @@ int              SetPrinterMode( HWND, PQPRINT ) ;
 MPARAM           PrintCmdProc( HWND, ULONG, MPARAM, MPARAM ) ;
 MRESULT EXPENTRY PrintDlgProc( HWND, ULONG, MPARAM, MPARAM ) ;
 MRESULT EXPENTRY PauseMsgDlgProc( HWND, ULONG, MPARAM, MPARAM ) ;
-MRESULT EXPENTRY QFontDlgProc( HWND ,ULONG, MPARAM, MPARAM ) ;
 MRESULT EXPENTRY QPrintDlgProc (HWND, ULONG, MPARAM, MPARAM) ;
 MRESULT EXPENTRY QPrintersDlgProc ( HWND, ULONG, MPARAM, MPARAM ) ;
 MRESULT EXPENTRY DisplayClientWndProc(HWND, ULONG, MPARAM, MPARAM);
@@ -152,8 +139,3 @@ MRESULT EXPENTRY NewFrameWndProc(HWND, ULONG, MPARAM, MPARAM) ;
 MRESULT EXPENTRY About(HWND, ULONG, MPARAM, MPARAM);
 MRESULT EXPENTRY CancelPrintDlgProc ( HWND, ULONG, MPARAM, MPARAM ) ;
 MRESULT EXPENTRY SendCommandDlgProc( HWND, ULONG, MPARAM, MPARAM ) ;
-
-        /* own window functions... */
-void WinSetDlgItemFloat( HWND, USHORT, float ) ;
-void WinSetDlgItemFloatF( HWND, USHORT, int, float ) ;
-void WinQueryDlgItemFloat( HWND, USHORT, float* ) ;

@@ -38,19 +38,6 @@ BEGIN
     BEGIN
         MENUITEM   "~Use mouse\tm", IDM_USEMOUSE,,MIA_CHECKED
         MENUITEM   "Mouse+key ~help\th", IDM_MOUSE_HELP
-/*
-
-        SUBMENU    "Coordinates", IDM_MOUSE_COORDINATES
-        BEGIN
-            MENUITEM  "~real", IDM_MOUSE_COORDINATES_REAL,,MIA_CHECKED
-            MENUITEM  "~screen", IDM_MOUSE_COORDINATES_SCREEN
-            MENUITEM  "~pixels", IDM_MOUSE_COORDINATES_PIXELS
-          MENUITEM  SEPARATOR
-            MENUITEM  "x ~date", IDM_MOUSE_COORDINATES_XDATE
-            MENUITEM  "x ~time", IDM_MOUSE_COORDINATES_XTIME
-            MENUITEM  "x date+time", IDM_MOUSE_COORDINATES_XDATETIME
-        END
-*/
         MENUITEM  SEPARATOR
         SUBMENU   "By mouse...", -1
         BEGIN
@@ -68,17 +55,6 @@ BEGIN
             MENUITEM  "date", IDM_MOUSE_FORMAT_DATE
             MENUITEM  "time", IDM_MOUSE_FORMAT_TIME
             MENUITEM  "date / time", IDM_MOUSE_FORMAT_DATETIME
-/*
-            MENUITEM  SEPARATOR
-            MENUITEM  "x;y", IDM_MOUSE_FORMAT_XsY
-            MENUITEM  "x,y,", IDM_MOUSE_FORMAT_XcYc
-            MENUITEM  "x,y;", IDM_MOUSE_FORMAT_XcYs
-            MENUITEM  SEPARATOR
-            MENUITEM  "[x:y]", IDM_MOUSE_FORMAT_pXdYp
-            MENUITEM  "[x;y]", IDM_MOUSE_FORMAT_pXsYp
-            MENUITEM  SEPARATOR
-            MENUITEM  "set label...", IDM_MOUSE_FORMAT_LABEL
-*/
         END
         MENUITEM  "Unzoom all\tu,F10", IDM_MOUSE_UNZOOMALL,,MIA_DISABLED
         MENUITEM  "Unzoom back\tp,F11", IDM_MOUSE_UNZOOM,,MIA_DISABLED
@@ -127,7 +103,6 @@ BEGIN
         MENUITEM   "reload\tF5", IDM_DO_RELOAD
         MENUITEM  SEPARATOR
         MENUITEM   "~command...", IDM_DO_SENDCOMMAND
-        // MENUITEM  "cmds2clip", IDM_MOUSE_CMDS2CLIP,,
     END
 
     MENUITEM "~Gnuplot" , IDM_COMMAND
