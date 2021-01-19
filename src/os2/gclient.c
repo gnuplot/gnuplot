@@ -3015,6 +3015,15 @@ ReadGnu(void* arg)
 		/* ignore alpha value */
 		rgb_color &= 0x00ffffff;
 
+		// monochrome mode:  map to gray
+		if (!bColours) {
+		    int r = (rgb_color >> 16) & 0xff;
+		    int g = (rgb_color >>  8) & 0xff;
+		    int b = (rgb_color      ) & 0xff;
+		    int luma = (r * 30 + g * 59 + b * 11) / 100;
+		    rgb_color = (luma << 16) | (luma << 8) | luma;
+		}
+
 		/* Find an approximate color in the current palette */
 		if (bPMPaletteMode)
 		    pm3d_color = GpiQueryColorIndex(hps, 0, rgb_color);
@@ -3097,6 +3106,25 @@ ReadGnu(void* arg)
 		/* FIXME: does not work if GNUBUF < image_size ! */
 		BufRead(hRead, image, image_size, &cbR);
 
+		// monochrome mode:  map to gray
+		if (!bColours) {
+		    int x, y;
+		    int pad_bytes = (4 - (3 * M) % 4) % 4; /* scan lines start on ULONG boundaries */
+		    PBYTE pImage = image;
+		    for (y = 0; y < N; y++) {
+			for (x = 0; x < M; x++) {
+			    RGB * pRGB = (RGB *) pImage;
+			    int r = pRGB->bRed;
+			    int g = pRGB->bGreen;
+			    int b = pRGB->bBlue;
+			    int luma = (r * 30 + g * 59 + b * 11) / 100;
+			    pRGB->bRed = pRGB->bGreen = pRGB->bBlue = luma;
+			    pImage += 3;
+			}
+			pImage += pad_bytes;
+		    }
+		}
+
 		points[0].x = corner[0].x;
 		points[0].y = corner[1].y;
 		points[1].x = corner[1].x;
@@ -3116,7 +3144,7 @@ ReadGnu(void* arg)
 		GpiEndPath(hps);
 		GpiSetClipPath(hps, 1, SCP_AND);
 
-		pbmi = (PBITMAPINFO2) calloc( sizeof(BITMAPINFOHEADER2), 1 );
+		pbmi = (PBITMAPINFO2) calloc(sizeof(BITMAPINFOHEADER2), 1);
 		pbmi->cbFix = sizeof(BITMAPINFOHEADER2);
 		pbmi->cx = M;
 		pbmi->cy = N;
