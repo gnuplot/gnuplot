@@ -11,7 +11,7 @@
 /* PM driver for GNUPLOT */
 
 /*[
- * Copyright 1992, 1993, 1998, 2004   Roger Fearick
+ * Copyright 1992, 1993, 1998, 2004, 2019-2021   Roger Fearick
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -65,6 +65,12 @@
  *   Franz Bakan
  *       - communication gnupmdrv -> gnuplot via shared memory (April 1999)
  *       - date and time on x axis (August 1999)
+ *
+ *   Bastian Maerkisch
+ *       RGB colors, pattern fill, images, fixes (2004, 2005)
+ *       dashed lines, bold/italic text, fill style for boxes and polygons, fixes (2019)
+ *       line-to-ruler, zoom-coordinates, cleanup, fixes (2021)
+ *
  */
 
 #define INCL_PM
