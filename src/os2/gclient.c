@@ -657,10 +657,22 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 #if 0
 	ChangeCheck(hWnd, IDM_MOUSE_POLAR_DISTANCE, mousePolarDistance?IDM_MOUSE_POLAR_DISTANCE:0);
 #endif
+	switch (ulPauseMode) {
+	case PAUSE_DLG:
+	    ChangeCheck(hWnd, IDM_PAUSEDLG, IDM_PAUSEDLG);
+	    break;
+	case PAUSE_BTN:
+	    ChangeCheck(hWnd, IDM_PAUSEDLG, IDM_PAUSEBTN);
+	    break;
+	case PAUSE_GNU:
+	    ChangeCheck(hWnd, IDM_PAUSEDLG, IDM_PAUSEGNU);
+	    break;
+	}
 
 	/* disable close from system menu(close only from gnuplot) */
 	hApp = WinQueryWindow(hWnd, QW_PARENT); /* temporary assignment.. */
 	hSysMenu = WinWindowFromID(hApp, FID_SYSMENU);
+
 	/* setup semaphores */
 	/* DosCreateEventSem(NULL, &semStartSeq, 0L, 0L); */
 	DosCreateEventSem(NULL, &semPause, 0L, 0L);
