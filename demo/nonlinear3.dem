@@ -6,6 +6,9 @@
 # used for scaling.
 # The 4th plot shows the original, unscaled image using linear axes.
 #
+save_encoding_3 = GPVAL_ENCODING
+set encoding utf8
+
 unset border
 set title offset 0,-1
 
@@ -39,3 +42,4 @@ unset multiplot
 
 pause -1 "<cr> to continue"
 reset
+set encoding save_encoding_3

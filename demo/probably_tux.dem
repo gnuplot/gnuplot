@@ -3,6 +3,9 @@
 # Each pixel is re-scaled based on distance from the center, where
 # the scale factor treats that distance as a Z score.
 #
+save_encoding = GPVAL_ENCODING
+set encoding utf8
+
 #set title "Probability axes:  Scale image pixels by distance from center treated as a Z-score"
 set label 1 "Tux (probably)" font "Times:Bold" 
 set label 1 at graph 0.5, 0.4 center front 
@@ -35,3 +38,4 @@ set nonlinear y via f(y) inverse g(y)
 
 plot 'blutux.rgb' binary array=(128,128) flipy format='%uchar' with rgbimage pixels
 
+set encoding save_encoding

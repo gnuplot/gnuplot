@@ -1,6 +1,9 @@
 #
 # Test utility of sorting points on z (palette color)
 #
+save_encoding = GPVAL_ENCODING
+set encoding utf8
+
 set print $DATA
 do for [i=1:10000:1] {
     print rand(0), rand(0), invnorm(rand(0))
@@ -29,3 +32,4 @@ plot $DATA using 1:2:3:3 smooth zsort with points lc palette
 
 pause -1 "Hit return to continue"
 
+set encoding save_encoding
