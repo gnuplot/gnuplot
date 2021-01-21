@@ -1,6 +1,9 @@
 #
 # Unit test for invibeta implementation
 #
+save_encoding = GPVAL_ENCODING
+set encoding utf8
+
 set title "Numerical precision limits relative accuracy of invibeta()\nwhen a or b < ∼0.05 "
 set key title "  "
 
@@ -41,3 +44,4 @@ splot \
 
 pause -1 "<cr> to continue"
 reset
+set encoding save_encoding

@@ -1,6 +1,9 @@
 #
 # Complex exponential integral
 #
+save_encoding = GPVAL_ENCODING
+set encoding utf8
+
 set title "Exponential Integral    {/:Italic {E_n(x) = }{/*2 ∫@_{/*0.5 1}^{/*.5 ∞}}{t^ne^{-tx}}}"
 set title offset 0,-3
 set key title "expint(n,x)"
@@ -16,6 +19,7 @@ reset
 
 if (!strstrt(GPVAL_COMPILE_OPTIONS, "+CEXINT")) {
     print "This copy of gnuplot does not support complex expint"
+    set encoding save_encoding
     exit
 }
 
@@ -53,3 +57,4 @@ splot '++' using 1:2:(abs( expint(2,x+y*I))):(arg( expint(2,x+y*I))) with pm3d
 
 pause -1 "<cr> to continue"
 reset
+set encoding save_encoding

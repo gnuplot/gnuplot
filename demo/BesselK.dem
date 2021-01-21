@@ -7,6 +7,9 @@ if (!strstrt(GPVAL_COMPILE_OPTIONS, "+AMOS")) {
     exit  # return to caller
 }
 
+save_encoding = GPVAL_ENCODING
+set encoding utf8
+
 set xrange [0:5]
 set yrange [0:10]
 set sample 201
@@ -79,3 +82,4 @@ splot imag( BesselK( nu=4, x+y*I) ) with pm3d fc ls 3
 
 pause -1 "Hit return to continue"
 reset
+set encoding save_encoding

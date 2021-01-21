@@ -8,6 +8,15 @@
 #  - functions are not consistent in returning +Inf or VERYLARGE or NaN
 #
 
+# Check support for lnGamma
+if (!strstrt(GPVAL_COMPILE_OPTIONS, "+COMPLEX_FUNC")) {
+    print "This copy of gnuplot does not support complex lnGamma"
+    exit  # return to caller
+}
+
+save_encoding = GPVAL_ENCODING
+set encoding utf8
+
 unset cornerpoles
 set grid x y z vertical lw 1
 set border 31 + 768 + 96
@@ -40,3 +49,4 @@ splot abs(Gamma(x + y*I)) with pm3d title "{/Times:Italic=16 Γ(x+iy)}"
 
 pause -1 "<cr> to continue"
 reset
+set encoding save_encoding

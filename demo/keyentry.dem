@@ -1,6 +1,9 @@
 #
 # Demonstrate use of "keyentry" elements to build a key
 #
+save_encoding = GPVAL_ENCODING
+set encoding utf8
+
 set key title "Key made with explicit \n{/:Italic keyentry} elements"
 set key box reverse Left right samplen 2
 
@@ -39,3 +42,4 @@ splot keyentry with points pt '¶' title "points", \
 pause -1 "<cr> to continue"
 
 reset
+set encoding save_encoding

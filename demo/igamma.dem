@@ -1,6 +1,9 @@
 #
 # Show limitation in old (prior to version 5.5) igamma domain and convergence
 #
+save_encoding = GPVAL_ENCODING
+set encoding utf8
+
 set title "Show limitations in old (pre v5.5) igamma domain and convergence"
 
 set label 1 at graph 0.1, 0.8
@@ -40,3 +43,4 @@ splot igamma(x,y) lw .1
 
 pause -1
 reset
+set encoding save_encoding
