@@ -5129,7 +5129,8 @@ process_image(void *plot, t_procimg_action action)
 		if (corners_in_view > 0 || view_in_pixel) {
 
 		    int N_corners = 0;    /* Number of corners. */
-		    gpiPoint corners[5];  /* At most 5 corners. */
+		    gpiPoint corners[8];  /* At most 5 corners. */
+		    gpiPoint clipped[8];  /* used during clipping */
 
 		    corners[0].style = FS_DEFAULT;
 
@@ -5194,6 +5195,13 @@ process_image(void *plot, t_procimg_action action)
 				alpha = 100;
 			    if (term->flags & TERM_ALPHA_CHANNEL)
 				corners[0].style = FS_TRANSPARENT_SOLID + (alpha<<4);
+			}
+
+			/* Clip to x/y in 2D projection */
+			if (!project_points || splot_map) {
+			    for (k=0; k<N_corners; k++)
+				clipped[k] = corners[k];
+			    clip_polygon(clipped, corners, N_corners, &N_corners);
 			}
 
 			if (rectangular_image && term->fillbox
