@@ -264,7 +264,7 @@ static int lCharWidth = 217;
 static int lCharHeight = 465;
 
 /* useMouse is set when user switches mousing on, e.g. the mouse is allowed */
-static BOOL useMouse = 0;
+static BOOL useMouse = TRUE;
 
 /* gnuplot's PM terminal sends GR_MOUSECAPABLE message from its init routine, which
    sets the variable below. Then we are sure that we talk to a mouse-capable
@@ -1577,12 +1577,6 @@ QueryIni(HAB hab)
     if (bData) bKeepRatio =(BOOL)ulOpts[0];
 
     /* Mousing: */
-    /* Ignore reading "Use mouse" --- no good idea to have mouse on by default.
-       Maybe it was the reason of some crashes(mouse init before draw).
-       ulCB = sizeof(useMouse);
-       bData = PrfQueryProfileData(hini, APP_NAME, INIUSEMOUSE, &ulOpts, &ulCB);
-       if (bData) useMouse =(int)ulOpts[0];
-    */
     /* ignore reading mouse cursor(real, relative or pixels).
        Reason/bug: it does not switch the check mark in the menu, even
        though it works as expected.
@@ -1656,10 +1650,6 @@ SaveIni(HWND hWnd)
 			    sizeof(bKeepRatio));
 
 	/* Mouse stuff */
-	/* Ignore reading "Use mouse" --- no good idea to have mouse on by default.
-	   Maybe it was the reason of some crashes(mouse init before draw).
-	   PrfWriteProfileData(hini, APP_NAME, INIUSEMOUSE, &useMouse, sizeof(useMouse));
-	*/
 	/* Do not write the mouse coord. mode.
 	   PrfWriteProfileData(hini, APP_NAME, INIMOUSECOORD, &mouse_mode, sizeof(mouse_mode));
 	*/
