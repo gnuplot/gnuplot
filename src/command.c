@@ -1809,9 +1809,9 @@ pause_command()
 		bail_to_command_line();
 	}
 #elif defined(OS2) && defined(USE_MOUSE)
-	if (strcmp(term->name, "pm") == 0) {
-	    int rc;
-	    if ((rc = PM_pause(buf)) == 0) {
+	if (isatty(fileno(stdin)) && strcmp(term->name, "pm") == 0) {
+	    int rc = PM_pause(buf);
+	    if (rc == 0) {
 		/* if (!CallFromRexx)
 		 * would help to stop REXX programs w/o raising an error message
 		 * in RexxInterface() ...
@@ -1823,7 +1823,10 @@ pause_command()
 		EAT_INPUT_WITH(fgetc(stdin));
 	    }
 	} else {
+	    if (strcmp(term->name, "pm") == 0)
+		fputs(buf, stderr);
 	    EAT_INPUT_WITH(fgetc(stdin));
+	    fputc('\n', stderr);
 	}
 #else /* !(_WIN32 || OS2) */
 # ifdef USE_MOUSE
