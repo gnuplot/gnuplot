@@ -2017,7 +2017,7 @@ ENHsvg_FLUSH()
 	fputs("&#x", gpoutfile);		/* xml escape sequence */
 	s += 3;					/* start of hex codepoint */
 	for (i=0; i<5; i++, s++) {		/* copy up to 5 hex characters */
-	    if (isxdigit(*s))
+	    if (isxdigit((unsigned char)*s))
 		fputc(*s, gpoutfile);
 	    else
 		break;

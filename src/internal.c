@@ -2131,13 +2131,13 @@ f_trim(union argument *arg)
 
     /* Trim from front */
     s = a.v.string_val;
-    while (isspace(*s))
+    while (isspace((unsigned char) *s))
 	s++;
 
     /* Trim from back */
     trim = strdup(s);
     s = &trim[strlen(trim)-1];
-    while ((s > trim) && isspace(*s))
+    while ((s > trim) && isspace((unsigned char) *s))
 	*(s--) = '\0';
 
     free(a.v.string_val);
