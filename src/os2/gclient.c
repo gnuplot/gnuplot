@@ -264,7 +264,7 @@ static int lCharWidth = 217;
 static int lCharHeight = 465;
 
 /* useMouse is set when user switches mousing on, e.g. the mouse is allowed */
-static BOOL useMouse = TRUE;
+static BOOL useMouse = FALSE;
 
 /* gnuplot's PM terminal sends GR_MOUSECAPABLE message from its init routine, which
    sets the variable below. Then we are sure that we talk to a mouse-capable

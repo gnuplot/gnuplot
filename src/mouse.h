@@ -67,8 +67,15 @@ typedef struct mouse_setting_t {
     char *labelopts;       /* label options                               */
 } mouse_setting_t;
 
-/* start with mouse on by default */
+
+#ifdef OS2
+        /* don't start with mouse on default -- clashes with arrow keys on command line */
+#define DEFAULT_MOUSE_MODE    0
+#else
+        /* start with mouse on by default */
 #define DEFAULT_MOUSE_MODE    1
+#endif
+
 #define DEFAULT_MOUSE_SETTING { \
     DEFAULT_MOUSE_MODE,         \
     300, /* ms */               \
