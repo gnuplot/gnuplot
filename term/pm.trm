@@ -454,7 +454,7 @@ PM_options()
     if (PM_plot_number > 0)
 	sprintf(term_options + strlen(term_options), " server %d", PM_plot_number);
     if (PM_def_font[0] != NUL)
-	sprintf(term_options + strlen(term_options), " font  %s", PM_def_font);
+	sprintf(term_options + strlen(term_options), " font \"%s\"", PM_def_font);
     if (PM_term_title[0])
 	sprintf(term_options + strlen(term_options), " title \"%s\"", PM_term_title);
 
@@ -551,8 +551,8 @@ PM_text()
 	putc(SET_TEXT, PM_pipe);
 	fflush(PM_pipe);
 #if 0
-        keep_term_initialised = term_initialised ;
-        term_initialised = FALSE ; /* need to force init */
+	keep_term_initialised = term_initialised ;
+	term_initialised = FALSE ; /* need to force init */
 #endif
     }
 
@@ -601,7 +601,7 @@ PM_graphics()
 	                          cp = 0; break;
 	};
 	putc(SET_SPECIAL, PM_pipe);
-	putc(SET_SPECIAL_CODEPAGE, PM_pipe); /*  set codepage */
+	putc(SET_SPECIAL_CODEPAGE, PM_pipe); /* set codepage */
 	fwrite(&cp, sizeof(int), 1, PM_pipe);
 	fflush(PM_pipe);
 	last_encoding = encoding;
@@ -609,9 +609,8 @@ PM_graphics()
     if (PM_def_font[0] != NUL) {
 	int len;
 
-	fprintf(stderr, "Setting default font: %s\n", PM_def_font);
 	putc(SET_SPECIAL, PM_pipe);
-	putc(SET_SPECIAL_FONT, PM_pipe); /*  set default font */
+	putc(SET_SPECIAL_FONT, PM_pipe); /* set default font */
 	len = strlen(PM_def_font) + 1;
 	fwrite(&len, sizeof(int), 1, PM_pipe);
 	fwrite(PM_def_font, 1, len, PM_pipe);
@@ -1065,12 +1064,12 @@ PM_image(unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_im
     rgb_image = (PBYTE) gp_alloc(image_size, "PM RGB image");
 
     if (color_mode == IC_PALETTE) {
-    	unsigned int x, y;
+	unsigned int x, y;
 
 	rgb_image += N * (3 * M + pad_bytes);
-	for (y=0; y<N; y++) {
+	for (y = 0; y < N; y++) {
 	    rgb_image -= 3 * M + pad_bytes;
-	    for(x=0; x<M; x++) {
+	    for(x = 0; x < M; x++) {
 		rgb255_color rgb255;
 		rgb255maxcolors_from_gray(*image++, &rgb255);
 		*(rgb_image++) = rgb255.b;
@@ -1080,12 +1079,12 @@ PM_image(unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_im
 	    rgb_image -= 3 * M;
 	}
     } else if (color_mode == IC_RGB) {
-    	unsigned int x, y;
+	unsigned int x, y;
 
 	rgb_image += N * (3 * M + pad_bytes);
-	for (y=0; y<N; y++) {
+	for (y = 0; y < N; y++) {
 	    rgb_image -= 3 * M + pad_bytes;
-	    for(x=0; x<M; x++) {
+	    for(x = 0; x < M; x++) {
 		rgb255_color rgb255;
 		rgb255.r = (BYTE) (*image++ * 255 + 0.5);
 		rgb255.g = (BYTE) (*image++ * 255 + 0.5);
@@ -1309,7 +1308,7 @@ PM_enhanced_put_text(unsigned int x, unsigned int y, const char *str)
 	ENHpm_sizeonly = TRUE;
     }
 
-    for (pass=1; pass <= num_passes; pass++) {
+    for (pass = 1; pass <= num_passes; pass++) {
 
 	/* This will restore the default font
 	   and update PM_font and PM_fontsize */
@@ -1332,7 +1331,7 @@ PM_enhanced_put_text(unsigned int x, unsigned int y, const char *str)
 	    enh_err_check(str);
 
 	    if (!*++str)
-	    	break; /* end of string */
+		break; /* end of string */
 
 	    /* else carry on and process the rest of the string */
 	}
