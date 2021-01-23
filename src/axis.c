@@ -2181,7 +2181,7 @@ char *c, *cfmt;
     for (c = cfmt = gp_strdup(format); *c; ) {
 	if (*c++ == '%') {
 	    while (*c && !strchr("DdMmSsEN%",*c)) {
-		if (!isdigit(*c) && !isspace(*c) && !ispunct(*c))
+		if (!isdigit((unsigned char)*c) && !isspace((unsigned char)*c) && !ispunct((unsigned char)*c))
 			int_error(NO_CARET,"unrecognized format: \"%s\"",format);
 		c++;
 	    }

@@ -859,7 +859,7 @@ readline(const char *prompt)
 	/* Accumulate ascii (7bit) printable characters
 	 * and all leading 8bit characters.
 	 */
-	if (((isprint(cur_char)
+	if (((isprint((unsigned char)cur_char)
 	      || (((cur_char & 0x80) != 0) && (cur_char != EOF))
 	     ) && (cur_char != '\t')) /* TAB is a printable character in some locales */
 	    || next_verbatim

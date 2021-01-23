@@ -276,7 +276,7 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec, double *reltime)
 		 * e.g.  -00:12:34
 		 */
 		if (*reltime == 0) {
-		    while (isspace(*s)) s++;
+		    while (isspace((unsigned char) *s)) s++;
 		    if (*s == '-')
 			leading_minus_sign = TRUE;
 		}
@@ -307,14 +307,14 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec, double *reltime)
 
 	case 'a':		/* weekday name (ignored) */
 	case 'A':		/* weekday name (ignored) */
-	    while (isalpha(*s))
+	    while (isalpha((unsigned char) *s))
 		s++;
 	    break;
 	case 'w':		/* one or two digit weekday number (ignored) */
 	case 'W':		/* one or two digit week number (ignored) */
-	    if (isdigit(*s))
+	    if (isdigit((unsigned char) *s))
 		s++;
-	    if (isdigit(*s))
+	    if (isdigit((unsigned char) *s))
 		s++;
 	    break;
 
@@ -343,7 +343,7 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec, double *reltime)
 	        break;
 	    }
 	case 'Z':		/* timezone name (ignored) */
-	    while (*s && !isspace(*s))
+	    while (*s && !isspace((unsigned char) *s))
 		s++;
 	    break;
 #endif

@@ -2801,7 +2801,7 @@ set_logscale()
 	if (set_for_axis[axis]) {
 	    static char command[128];
 	    char *dummy;
-	    if (!isalpha(axis_name(axis)[0]))
+	    if (!isalpha((unsigned char)axis_name(axis)[0]))
 		continue;
 	    switch (axis) {
 	    case FIRST_Y_AXIS:

@@ -1293,7 +1293,7 @@ unset_logscale()
     for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++) {
 	if (set_for_axis[axis]) {
 	    static char command[64];
-	    if (!isalpha(axis_name(axis)[0]))
+	    if (!isalpha((unsigned char)axis_name(axis)[0]))
 		continue;
 	    if (axis_array[axis].log) {
 		sprintf(command, "unset nonlinear %s", axis_name(axis));
