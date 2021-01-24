@@ -3,7 +3,7 @@
 /* GNUPLOT - pm.trm */
 
 /*[
- * Copyright 1992, 1993, 1998, 2004
+ * Copyright 1992, 1993, 1998, 2004, 2019, 2021
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -783,22 +783,24 @@ PM_set_font(const char *ifont)
 static void
 PM_query_font(void)
 {
-    unsigned int len, fontsize;
-    char *newfont;
+    unsigned int len;
+    char *newfont, *s;
     ULONG cbR, rc;
 
     putc(GR_QUERY_FONT, PM_pipe);
     fflush(PM_pipe);
 
-    free( PM_font );
+    free(PM_font);
     rc = DosRead(fileno(PM_pipe), &len, sizeof(int), &cbR);
-    newfont = (char *)malloc( len + 1 );
-    rc = DosRead(fileno(PM_pipe), newfont, len*sizeof(char), &cbR);
+    newfont = (char *) malloc(len + 1);
+    rc = DosRead(fileno(PM_pipe), newfont, len * sizeof(char), &cbR);
     newfont[len] = NUL;
 
-    PM_font = (char *)malloc( len + 1 );
-    sscanf( newfont, "%i.%s", &fontsize, PM_font );
-    PM_fontsize = (double)fontsize;
+    PM_font = (char *) malloc(len + 1);
+    s = strchr(newfont, '.');
+    PM_fontsize = atoi(newfont);
+    if (s != NULL)
+      strcpy(PM_font, s + 1);
     free(newfont);
 
     (void) rc;
