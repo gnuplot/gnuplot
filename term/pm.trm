@@ -67,6 +67,7 @@ TERM_PUBLIC void PM_put_text(unsigned int x, unsigned int y, const char *str);
 TERM_PUBLIC int PM_justify_text(enum JUSTIFY mode);
 TERM_PUBLIC int PM_set_font(const char *font);
 TERM_PUBLIC void PM_point(unsigned int x, unsigned int y, int number);
+TERM_PUBLIC void PM_pointsize(double size);
 TERM_PUBLIC void PM_fillbox(int style, unsigned int x, unsigned int y, unsigned int w, unsigned int h);
 TERM_PUBLIC void PM_linewidth(double linewidth);
 #ifdef USE_MOUSE
@@ -129,6 +130,9 @@ static TBOOLEAN PM_enhanced = TRUE;
 static int PM_plot_number = 0;
 static char PM_term_title[128] = "";
 static char PM_def_font[128] = "";
+static double PM_linewidth_scale = 1.; /* scale factor for linewidth */
+static double PM_fontscale = 1.;
+static double PM_pointscale = 1.;
 
 static char PM_opts[256] = "";
 static TBOOLEAN PM_optargs = FALSE;
@@ -298,6 +302,7 @@ PM_make_servername(char *str)
 
 enum PM_id { PM_DEFAULT,
 	     PM_TITLE, PM_FONT,
+	     PM_LINEWIDTH, PM_POINTSCALE, PM_FONTSCALE,
 	     PM_SERVER, PM_NOSERVER,
 	     PM_PERSIST, PM_NOPERSIST,
 	     PM_WIDELINES, PM_NOWIDELINES,
@@ -317,6 +322,12 @@ static struct gen_table PM_opt_table[] =
     { "noe$nhanced", PM_NOENHANCED },
     { "ti$tle", PM_TITLE },
     { "font", PM_FONT },
+    { "linew$idth", PM_LINEWIDTH },
+    { "lw", PM_LINEWIDTH },
+    { "fonts$cale", PM_FONTSCALE },
+    { "fs", PM_FONTSCALE },
+    { "pointscale", PM_POINTSCALE },
+    { "ps", PM_POINTSCALE },
     { NULL, PM_OTHER }
 };
 
@@ -362,6 +373,21 @@ PM_options()
 	case PM_NOWIDELINES:
 	    c_token++;
 	    PM_widelines = FALSE;
+	    break;
+	case PM_LINEWIDTH:
+	    c_token++;
+	    PM_linewidth_scale = real_expression();
+	    if (PM_linewidth_scale <= 0) PM_linewidth_scale = 1.;
+	    break;
+	case PM_FONTSCALE:
+	    c_token++;
+	    PM_fontscale = real_expression();
+	    if (PM_fontscale <= 0) PM_fontscale = 1.;
+	    break;
+	case PM_POINTSCALE:
+	    c_token++;
+	    PM_pointscale = real_expression();
+	    if (PM_pointscale <= 0) PM_pointscale = 1.;
 	    break;
 	case PM_ENHANCED:
 	    c_token++;
@@ -451,10 +477,16 @@ PM_options()
 	PM_widelines? "" : "no",
 	PM_persist  ? "" : "no",
 	PM_enhanced ? "" : "no");
-    if (PM_plot_number > 0)
-	sprintf(term_options + strlen(term_options), " server %d", PM_plot_number);
     if (PM_def_font[0] != NUL)
 	sprintf(term_options + strlen(term_options), " font \"%s\"", PM_def_font);
+    if (PM_linewidth_scale != 1.)
+	sprintf(term_options + strlen(term_options), " linewidth %.1f", PM_linewidth_scale);
+    if (PM_pointscale != 1.)
+	sprintf(term_options + strlen(term_options), " pointscale %.1f", PM_pointscale);
+    if (PM_fontscale != 1.)
+	sprintf(term_options + strlen(term_options), " fontscale %.1f", PM_fontscale);
+    if (PM_plot_number > 0)
+	sprintf(term_options + strlen(term_options), " server %d", PM_plot_number);
     if (PM_term_title[0])
 	sprintf(term_options + strlen(term_options), " title \"%s\"", PM_term_title);
 
@@ -576,6 +608,13 @@ PM_graphics()
 #ifdef USE_MOUSE
     PM_update_menu_items();
 #endif
+    {
+	unsigned int fontscale = PM_fontscale * 100;
+	putc(SET_SPECIAL, PM_pipe);
+	putc(SET_SPECIAL_FONTSCALE, PM_pipe); /* set fontscale */
+	fwrite(&fontscale, sizeof(int), 1, PM_pipe);
+	fflush(PM_pipe);
+    }
     if (encoding != last_encoding) {
 	int cp;
 	/* A complete list of codepages can be found at
@@ -827,6 +866,13 @@ PM_point(unsigned int x, unsigned int y, int number)
 }
 
 
+TERM_PUBLIC void
+PM_pointsize(double size)
+{
+    term_pointsize = size * PM_pointscale;
+}
+
+
 void
 PM_abortplot(void)
 {
@@ -889,7 +935,7 @@ TERM_PUBLIC void
 PM_linewidth(double linewidth)
 {
     int lw;
-    lw = linewidth * 100;
+    lw = PM_linewidth_scale * linewidth * 100;
     putc(SET_LINEWIDTH, PM_pipe);
     fwrite(&lw, sizeof(int), 1, PM_pipe);
 }
@@ -1389,7 +1435,7 @@ TERM_TABLE_START(PM_driver)
 #endif
     PM_text_angle,
     PM_justify_text, PM_point, do_arrow, PM_set_font,
-    0 /*pointsize */ ,
+    PM_pointsize,
     TERM_CAN_MULTIPLOT | TERM_NO_OUTPUTFILE | TERM_ENHANCED_TEXT,
     PM_suspend, PM_resume,
     PM_fillbox, PM_linewidth,
@@ -1441,6 +1487,9 @@ START_HELP(pm)
 "                            {enhanced | noenhanced}",
 "                            {font <fontspec>}",
 "                            {nowidelines | widelines}",
+"                            {fontscale <scale>}",
+"                            {linewidth <scale>}",
+"                            {pointscale <scale>}",
 "                            {{title} \"title\"}",
 "",
 " If `persist` is specified, each graph appears in its own window and all",
@@ -1455,6 +1504,9 @@ START_HELP(pm)
 " (see `enhanced text` for details).  Font names for the core PostScript fonts",
 " may be abbreviated to a single letter ",
 " (T/H/C/S for Times/Helvetica/Courier/Symbol).",
+"",
+" `linewidth`, `fontscale`, `pointscale` can be used to scale the width of",
+" lines, the size of text, or the size of the point symbols.",
 "",
 " If `title` is specified, it will be used as the title of the plot window.",
 " It will also be used as the name of the server instance, and will override",

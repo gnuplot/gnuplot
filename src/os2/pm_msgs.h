@@ -82,6 +82,7 @@
 #define SET_SPECIAL_RAISE	'^'
 #define SET_SPECIAL_LOWER	'_'
 #define SET_SPECIAL_FONT	'f'
+#define SET_SPECIAL_FONTSCALE	's'
 #define SET_SPECIAL_CODEPAGE	'c'
 
 #endif
