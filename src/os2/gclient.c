@@ -234,6 +234,7 @@ static ULONG    ulShellPos[4];
 static PAUSEDATA pausedata = {sizeof(PAUSEDATA), NULL, NULL};
 static char     szFontNameSize[FONTBUF];	/* default name and size, format: "10.Helvetica" */
 static char	szCurrentFontNameSize[FONTBUF];	/* currently selected font */
+static unsigned fontscale = 1;
 static PRQINFO3 infPrinter = { "" };
 static QPRINT   qPrintData = {
     sizeof(QPRINT), 0.0, 0.0, 1.0, 1.0, 0,
@@ -1830,6 +1831,7 @@ SelectFont(HPS hps, char *szFontNameSize)
     char *p;
 
     sscanf(szFontNameSize, "%hd", &shPointSize);
+    shPointSize = shPointSize * fontscale / 100.;
     szFontName = strchr(szFontNameSize, '.') + 1;
 
     fat.usRecordLength  = sizeof(fat);
@@ -1936,6 +1938,7 @@ SwapFont(HPS hps, char *szFNS)
 	int i;
 
 	sscanf(szFNS, "%hd", &shPointSize);
+	shPointSize = shPointSize * fontscale / 100.;
 	szFontName = strchr(szFNS, '.') + 1;
 
 	/* search for previous font with correct encoding */
@@ -2036,7 +2039,7 @@ SwapFont(HPS hps, char *szFNS)
 
 
 #define FLUSHPATH(hps, where) FlushPath(hps, &bPath, linewidth, color, where)
-inline void
+static inline void
 FlushPath(HPS hps, BOOL * bPath, int linewidth, LONG color, char * where)
 {
     if (*bPath) {
@@ -2776,6 +2779,17 @@ ReadGnu(void* arg)
 			DEBUG_FONT(("set default font: %s", font));
 		    }
 		    break;
+		}
+		case SET_SPECIAL_FONTSCALE:
+		{
+		    int newfontscale;
+
+		    BufRead(hRead, &newfontscale, sizeof(int), &cbR);
+		    if (fontscale != newfontscale) {
+			fontscale = newfontscale;
+			SelectFont(hps, szFontNameSize);
+		    }
+		    DEBUG_FONT(("set fontscale: %.1f", fontscale / 100.));
 		}
 		case SET_SPECIAL_RAISE: /* raise window */
 		    WinSetWindowPos(hwndFrame, HWND_TOP, 0,0,0,0, SWP_RESTORE|SWP_SHOW|SWP_ACTIVATE|SWP_ZORDER);
