@@ -1,14 +1,18 @@
 Changes since 5.4.1
 ================
+* NEW define on program entry:   I = sqrt(-1) = {0.,1.}
+* NEW support input data that uses epidemiological date-week formats
+* NEW optional fillcolor for "set key opaque"
 * CHANGE generate only one key entry per multi-dataset input file Bug #2380
 * CHANGE (Windows): attempt to convert unicode on command line to UTF-8
+* CHANGE clip `with image` to plot boundary in 2D plots
+* CHANGE In gprintf format "%c", add no space for a null prefix Bug #2266
 * FIX time formats %U %W Bug #2390
 * FIX cairo terminals: Do not lose font info during multi-line enhanced text
 * FIX left-justification of titles in splot with user-specified key position
 * FIX cairo terminals (Windows): ignore "text scaling" from user screen settings
-* FIX win: instabilities associated with changing window size Bug #2301 #2304 
-* NEW define on program entry:   I = sqrt(-1) = {0.,1.}
-* NEW support input data that uses epidemiological date-week formats
+* FIX win: instabilities associated with changing window size Bug #2301 #2304
+* FIX clipping of filled polygons that have only 1 or 2 vertices Bug #2400
 
 
 Changes in 5.4.1
