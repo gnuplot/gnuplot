@@ -869,8 +869,7 @@ gprintf_value(
 		    /* HBB 20010121: avoid division of -ve ints! */
 		    power = (power + 24) / 3;
 		    if (power == 8) { /* add no extra space */
-			t[0] = 0;
-		        snprintf(dest, remaining_space, temp);
+		        snprintf(dest, remaining_space, temp, '\0');
 		    } else {
 		        snprintf(dest, remaining_space, temp, "yzafpnum kMGTPEZY"[power]);
 		    }
