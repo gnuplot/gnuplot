@@ -6,9 +6,6 @@ if (!strstrt(GPVAL_COMPILE_OPTIONS, "+AMOS")) {
     exit  # return to caller
 }
 
-save_encoding = GPVAL_ENCODING
-set encoding utf8
-
 #
 # Compare built-in airy(x) with AMOS Ai(z) for real z
 #
@@ -71,4 +68,4 @@ splot abs(Bi( x + y*{0,1} )) with pm3d
 pause -1 "Hit return to continue"
 
 reset
-set encoding save_encoding
+
