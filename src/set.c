@@ -3434,14 +3434,21 @@ set_palette_defined()
 	    /* Predefined color names.
 	     * Could we move these definitions to some file that is included
 	     * somehow during compilation instead hardcoding them?
+	     * NB: could use lookup_table_nth() but it would not save much.
 	     */
 	    } else {
-		int rgbval = lookup_table_entry(pm3d_color_names_tbl, col_str);
-		if (rgbval < 0)
+		const struct gen_table *tbl = pm3d_color_names_tbl;
+		while (tbl->key) {
+		    if (!strcmp(col_str, tbl->key)) {
+			r = (double)((tbl->value >> 16) & 255) / 255.;
+			g = (double)((tbl->value >>  8) & 255) / 255.;
+			b = (double)(tbl->value & 255) / 255.;
+			break;
+		    }
+		    tbl++;
+		}
+		if (!tbl->key)
 		    int_error( c_token-1, "Unknown color name." );
-		r = ((rgbval >> 16) & 255) / 255.;
-		g = ((rgbval >> 8 ) & 255) / 255.;
-		b = (rgbval & 255) / 255.;
 		named_colors = 1;
 	    }
 	    free(col_str);
