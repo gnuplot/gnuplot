@@ -301,13 +301,3 @@ MRESULT EXPENTRY NewFrameWndProc (HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2)
         }
     return (*pfnOldFrameWndProc)(hwnd, msg, mp1, mp2) ;
     }
-
-
-MRESULT EXPENTRY About( HWND hDlg, ULONG message, MPARAM mp1, MPARAM mp2)
-/*
-** 'About' box dialog function
-*/
-    {
-    return WinDefDlgProc( hDlg, message, mp1, mp2 ) ;
-    }
-

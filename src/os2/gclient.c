@@ -110,6 +110,7 @@
 #include <signal.h>
 #include <time.h>
 #include "config.h"
+#include "version.c" /* directly include version information */
 #include "term_api.h"
 #include "gnupmdrv.h"
 #include "pm_msgs.h"
@@ -1086,13 +1087,24 @@ WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 
     switch ((USHORT) SHORT1FROMMP(mp1)) {
     case IDM_ABOUT :    /* show the 'About' box */
-	WinDlgBox(HWND_DESKTOP,
-		  hWnd ,
-		  (PFNWP)About ,
-		  0L,
-		  ID_ABOUT,
-		  NULL);
+    {
+	char label[256];
+	MB2INFO mb;
+
+	sprintf(label,"gnuplot display for OS/2\nVersion %s patchlevel %s",
+		gnuplot_version, gnuplot_patchlevel);
+	mb.cb         = sizeof(mb);
+	mb.hIcon      = WinLoadPointer(HWND_DESKTOP, 0, 1);
+	mb.cButtons   = 1;
+	mb.flStyle    = MB_CUSTOMICON | MB_MOVEABLE;
+	mb.hwndNotify = NULLHANDLE;
+	strcpy(mb.mb2d[0].achText, "~OK");
+	mb.mb2d[0].idButton = 1;
+	mb.mb2d[0].flStyle  = BS_PUSHBUTTON | BS_DEFAULT;
+	WinMessageBox2(HWND_DESKTOP, hwndFrame,
+		label,"GnuplotPM", ID_ABOUT, &mb);
 	break;
+    }
 
     case IDM_GPLOTINF:  /* view gnuplot.inf */
     {
