@@ -196,8 +196,8 @@ static LONG rgb_colors[18];
 #define   RGB_PALETTE_SIZE 0    /* size of the 'virtual' palette used for
 				   translation of index to RGB value */
 
-/* FIXME: a large GNUBUF circumvents a bug/limitation in BufRead:
-   it cannot read datablocks larger than GNUBUF. */
+/* GNUBUF is the size of the buffer for the data stream from gnuplot.
+   Requests larger than this are split. By default, we use 128kB. */
 #define   GNUBUF    131072      /* buffer for gnuplot commands */
 #define   PIPEBUF   4096        /* size of pipe buffers */
 
@@ -358,7 +358,7 @@ static void     CopyToClipBrd(HWND);
 static void     ReadGnu(void*);
 static void     SetFillStyle(HPS hps, int style);
 static HPS      InitScreenPS(void);
-static int      BufRead(HFILE, void*, int, PULONG);
+static APIRET   BufRead(HFILE, void*, int, PULONG);
 static int      GetNewFont(HWND, HPS);
 void            SigHandler(int);
 static void     FontExpand(char *);
@@ -2790,6 +2790,7 @@ ReadGnu(void* arg)
 			SelectFont(hps, szFontNameSize);
 		    }
 		    DEBUG_FONT(("set fontscale: %.1f", fontscale / 100.));
+		    break;
 		}
 		case SET_SPECIAL_RAISE: /* raise window */
 		    WinSetWindowPos(hwndFrame, HWND_TOP, 0,0,0,0, SWP_RESTORE|SWP_SHOW|SWP_ACTIVATE|SWP_ZORDER);
@@ -3007,11 +3008,10 @@ ReadGnu(void* arg)
 		    BufRead(hRead, &(corner[i].x), sizeof(int), &cbR);
 		    BufRead(hRead, &(corner[i].y), sizeof(int), &cbR);
 		}
-		BufRead(hRead, &image_size, sizeof(image_size), &cbR);
-		DEBUG_IMAGE(("GR_IMAGE: M=%i, N=%i, size=%i", M, N, image_size));
+		usErr = BufRead(hRead, &image_size, sizeof(image_size), &cbR);
+		DEBUG_IMAGE(("GR_IMAGE: M=%i, N=%i, size=%i, rc=%d", M, N, image_size, usErr));
 		DEBUG_IMAGE(("GR_IMAGE: corner [0]=(%i,%i) [1]=(%i,%i)", corner[0].x, corner[0].y, corner[1].x, corner[1].y));
 		image = (PBYTE) malloc(image_size);
-		/* FIXME: does not work if GNUBUF < image_size ! */
 		BufRead(hRead, image, image_size, &cbR);
 
 		// monochrome mode:  map to gray
@@ -3079,7 +3079,7 @@ ReadGnu(void* arg)
 		GpiSetClipPath(hps, 0, SCP_RESET);
 
 		/* We have to keep the image and the image header in memory since
-		   we use retained graphics */
+		   we use retained graphics. */
 		ile = (image_list_entry *) malloc(sizeof(image_list_entry));
 		ile->next = image_list;
 		ile->pbmi = pbmi;
@@ -3287,28 +3287,35 @@ SetFillStyle(HPS hps, int style)
 /*
 ** pull next plot command out of buffer read from GNUPLOT
 */
-static int
+static APIRET
 BufRead(HFILE hfile, void *buf, int nBytes, ULONG *pcbR)
 {
     ULONG ulR, ulRR;
     int rc;
     static char buffer[GNUBUF];
-    static char *pbuffer = buffer+GNUBUF, *ebuffer = buffer+GNUBUF;
+    static char *pbuffer = buffer + GNUBUF;
+    static char *ebuffer = buffer + GNUBUF;
 
     for (; nBytes > 0; nBytes--) {
-        if (pbuffer >= ebuffer) {
-            ulR = GNUBUF;
-            rc = DosRead(hfile, buffer, ulR, &ulRR);
-            if (rc != 0)
+	if (pbuffer >= ebuffer) {
+	    ulR = GNUBUF;
+	    rc = DosRead(hfile, buffer, ulR, &ulRR);
+#ifdef HAVE_PMPRINTF
+	    if ((rc != NO_ERROR && rc != ERROR_MORE_DATA) || (ulRR == 0))
+		PmPrintf("BufRead error: %i bytes read: %li", rc, ulRR);
+#endif
+	    // ERROR_MORE_DATA signals that there's more data in the pipe
+	    if (rc != NO_ERROR && rc != ERROR_MORE_DATA)
 		return rc;
-            if (ulRR == 0)
-		return 1;
-            pbuffer = buffer;
-            ebuffer = pbuffer+ulRR;
+	    if (ulRR == 0)
+		return ERROR_NO_DATA;
+	    pbuffer = buffer;
+	    ebuffer = pbuffer + ulRR;
 	}
-        *(char*)buf++ = *pbuffer++;
+	*(char*)buf++ = *pbuffer++;
     }
-    return 0L;
+    /* FIXME: pcbR is neither set nor used anywhere */
+    return NO_ERROR;
 }
 
 
