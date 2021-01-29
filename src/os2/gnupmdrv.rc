@@ -15,16 +15,16 @@ BEGIN
         MENUITEM    "Prin~ters...", IDM_PRINTSETUP
         MENUITEM    "~Print..."   , IDM_PRINT
         MENUITEM    "~Fonts...", IDM_FONTS
-        MENUITEM    "~Colours",  IDM_COLOURS,,MIA_CHECKED
+        MENUITEM    "~Colours", IDM_COLOURS,, MIA_CHECKED
         MENUITEM    "~Thick Lines", IDM_LINES_THICK
         SUBMENU     "Pa~use mode", IDM_PAUSEOPT
         BEGIN
-            MENUITEM  "~Dialog box", IDM_PAUSEDLG,,MIA_CHECKED
+            MENUITEM  "~Dialog box", IDM_PAUSEDLG,, MIA_CHECKED
             MENUITEM  "~Menu bar", IDM_PAUSEBTN
             MENUITEM  "~Gnuplot", IDM_PAUSEGNU
         END
-        MENUITEM    "P~op to front",  IDM_FRONT,,MIA_CHECKED
-        MENUITEM    "~Keep aspect ratio",  IDM_KEEPRATIO,,MIA_CHECKED
+        MENUITEM    "P~op to front", IDM_FRONT,, MIA_CHECKED
+        MENUITEM    "~Keep aspect ratio", IDM_KEEPRATIO,, MIA_CHECKED
         MENUITEM  SEPARATOR
         MENUITEM    "~Save settings", IDM_SAVE
     END
@@ -34,20 +34,20 @@ BEGIN
         MENUITEM    "Cl~ear clipboard", IDM_CLEARCLIP
     END
 
-    SUBMENU  "~Mouse" , IDM_MOUSE,,MIA_DISABLED
+    SUBMENU  "~Mouse", IDM_MOUSE,, MIA_DISABLED
     BEGIN
-        MENUITEM   "~Use mouse\tm", IDM_USEMOUSE,,MIA_CHECKED
+        MENUITEM   "~Use mouse\tm", IDM_USEMOUSE,, MIA_CHECKED
         MENUITEM   "Mouse+key ~help\th", IDM_MOUSE_HELP
         MENUITEM  SEPARATOR
         SUBMENU   "By mouse...", -1
         BEGIN
-            MENUITEM  "Pos2clip\t2x MB1", -2,,MIA_DISABLED
-            MENUITEM  "Zoom\tMB2 - MB1",-3,,MIA_DISABLED
-            MENUITEM  "Annotate\tMB3", -4,,MIA_DISABLED
+            MENUITEM  "Pos2clip\t2x MB1", -2,, MIA_DISABLED
+            MENUITEM  "Zoom\tMB2 - MB1",-3,, MIA_DISABLED
+            MENUITEM  "Annotate\tMB3", -4,, MIA_DISABLED
         END
         SUBMENU   "Coords ~format", IDM_MOUSE_FORMAT
         BEGIN
-            MENUITEM  "x,y", IDM_MOUSE_FORMAT_XcY,,MIA_CHECKED
+            MENUITEM  "x,y", IDM_MOUSE_FORMAT_XcY,, MIA_CHECKED
             MENUITEM  "[x,y]", IDM_MOUSE_FORMAT_pXcYp
             MENUITEM  "x y", IDM_MOUSE_FORMAT_X_Y
             MENUITEM  SEPARATOR
@@ -56,9 +56,9 @@ BEGIN
             MENUITEM  "time", IDM_MOUSE_FORMAT_TIME
             MENUITEM  "date / time", IDM_MOUSE_FORMAT_DATETIME
         END
-        MENUITEM  "Unzoom all\tu,F10", IDM_MOUSE_UNZOOMALL,,MIA_DISABLED
-        MENUITEM  "Unzoom back\tp,F11", IDM_MOUSE_UNZOOM,,MIA_DISABLED
-        MENUITEM  "Zoom next\tn,F12", IDM_MOUSE_ZOOMNEXT,,MIA_DISABLED
+        MENUITEM  "Unzoom all\tu,F10", IDM_MOUSE_UNZOOMALL,, MIA_DISABLED
+        MENUITEM  "Unzoom back\tp,F11", IDM_MOUSE_UNZOOM,, MIA_DISABLED
+        MENUITEM  "Zoom next\tn,F12", IDM_MOUSE_ZOOMNEXT,, MIA_DISABLED
         MENUITEM  SEPARATOR
         MENUITEM  "~Ruler\tr", IDM_MOUSE_RULER
         MENUITEM  "~Polar distance\t5", IDM_MOUSE_POLAR_DISTANCE,,
@@ -66,11 +66,11 @@ BEGIN
 
     SUBMENU "~Utilities" , IDM_UTILS
     BEGIN
-	MENUITEM "~Break drawing\tCtrl-C" , IDM_BREAK_DRAWING
+        MENUITEM "~Break drawing\tCtrl-C", IDM_BREAK_DRAWING
         MENUITEM  SEPARATOR
-	MENUITEM  "~grid on/off\tg", IDM_SET_GRID
-	MENUITEM  "~lin/log y\tl, L", IDM_SET_LINLOGY
-	SUBMENU "~set",IDM_SET
+        MENUITEM  "~grid on/off\tg", IDM_SET_GRID
+        MENUITEM  "~lin/log y\tl, L", IDM_SET_LINLOGY
+        SUBMENU "~set", IDM_SET
         BEGIN
             SUBMENU "style ~data", IDM_SET_D_S
             BEGIN
@@ -97,12 +97,12 @@ BEGIN
                 MENUITEM  "~steps", IDM_SET_F_S_STEPS
             END
         END
-        MENUITEM   SEPARATOR
-        MENUITEM   "autoscale\ta,F3", IDM_SET_AUTOSCALE
-        MENUITEM   "replot\te,F4", IDM_DO_REPLOT
-        MENUITEM   "reload\tF5", IDM_DO_RELOAD
         MENUITEM  SEPARATOR
-        MENUITEM   "~command...", IDM_DO_SENDCOMMAND
+        MENUITEM  "autoscale\ta,F3", IDM_SET_AUTOSCALE
+        MENUITEM  "replot\te,F4", IDM_DO_REPLOT
+        MENUITEM  "reload\tF5", IDM_DO_RELOAD
+        MENUITEM  SEPARATOR
+        MENUITEM  "~command...", IDM_DO_SENDCOMMAND
     END
 
     MENUITEM "~Gnuplot" , IDM_COMMAND
@@ -122,7 +122,7 @@ END
 
 ACCELTABLE 1
 BEGIN
-//  VK_ESC, IDM_COMMAND, VIRTUALKEY 
+//  VK_ESC, IDM_COMMAND, VIRTUALKEY
     VK_DELETE, IDM_CLEARCLIP, VIRTUALKEY
     VK_INSERT, IDM_COPY, VIRTUALKEY, CONTROL
     VK_F1, IDM_GPLOTINF, VIRTUALKEY
@@ -151,21 +151,21 @@ END
 HELPSUBTABLE 1
 BEGIN
     HELPSUBITEM  IDH_EXTENDED, IDH_EXTENDED
-    HELPSUBITEM  IDM_PRINTSETUP ,IDM_PRINTSETUP 
-    HELPSUBITEM  IDM_PRINT ,IDM_PRINT 
-    HELPSUBITEM  IDM_FONTS ,IDM_FONTS 
-    HELPSUBITEM  IDM_FILE ,IDM_FILE 
-    HELPSUBITEM  IDM_ABOUT ,IDM_ABOUT 
-    HELPSUBITEM  IDM_FRONT ,IDM_FRONT 
-    HELPSUBITEM  IDM_COLOURS ,IDM_COLOURS 
-    HELPSUBITEM  IDM_LINES_THICK ,IDM_LINES_THICK 
-    HELPSUBITEM  IDM_SAVE ,IDM_SAVE 
-    HELPSUBITEM  IDM_COMMAND ,IDM_COMMAND  
-    HELPSUBITEM  IDM_CONTINUE,IDM_CONTINUE
-    HELPSUBITEM  IDM_PAUSEDLG,IDM_PAUSEDLG 
-    HELPSUBITEM  IDM_PAUSEOPT,IDM_PAUSEOPT 
-    HELPSUBITEM  IDM_PAUSEBTN,IDM_PAUSEBTN 
-    HELPSUBITEM  IDM_PAUSEGNU,IDM_PAUSEGNU 
+    HELPSUBITEM  IDM_PRINTSETUP, IDM_PRINTSETUP
+    HELPSUBITEM  IDM_PRINT, IDM_PRINT
+    HELPSUBITEM  IDM_FONTS, IDM_FONTS
+    HELPSUBITEM  IDM_FILE, IDM_FILE
+    HELPSUBITEM  IDM_ABOUT, IDM_ABOUT
+    HELPSUBITEM  IDM_FRONT, IDM_FRONT
+    HELPSUBITEM  IDM_COLOURS, IDM_COLOURS
+    HELPSUBITEM  IDM_LINES_THICK, IDM_LINES_THICK
+    HELPSUBITEM  IDM_SAVE, IDM_SAVE
+    HELPSUBITEM  IDM_COMMAND, IDM_COMMAND
+    HELPSUBITEM  IDM_CONTINUE, IDM_CONTINUE
+    HELPSUBITEM  IDM_PAUSEDLG, IDM_PAUSEDLG
+    HELPSUBITEM  IDM_PAUSEOPT, IDM_PAUSEOPT
+    HELPSUBITEM  IDM_PAUSEBTN, IDM_PAUSEBTN
+    HELPSUBITEM  IDM_PAUSEGNU, IDM_PAUSEGNU
 END
 HELPSUBTABLE ID_PRINT
 BEGIN
@@ -193,99 +193,4 @@ BEGIN
 END
 
 
-DLGTEMPLATE ID_ABOUT LOADONCALL MOVEABLE DISCARDABLE
-BEGIN
-    DIALOG  "", ID_ABOUT, 22, 17, 144, 75, 
-    BEGIN
-        CTEXT           "GnuplotPM", -1, 8, 65, 128, 8
-        CTEXT           "gnuplot display for OS/2", -1, 8, 50, 128, 8
-        CTEXT           "Revision: 1.11", -1, 8, 35, 128, 8
-        DEFPUSHBUTTON   "OK", DID_OK, 56, 10, 32, 14, WS_GROUP
-    END
-END
-
-DLGTEMPLATE ID_QPRINT LOADONCALL MOVEABLE DISCARDABLE
-BEGIN
-    DIALOG  "GnuplotPM: printer setup", ID_QPRINT, 83, 7, 220, 175, 
-            FS_NOBYTEALIGN | WS_VISIBLE, FCF_TITLEBAR
-    BEGIN
-        DEFPUSHBUTTON   "OK", DID_OK, 6, 5, 38, 13
-        PUSHBUTTON      "Cancel", DID_CANCEL, 52, 5, 38, 13
-        PUSHBUTTON      "Help", 310, 176, 5, 38, 13, BS_HELP
-        GROUPBOX        "Set plot area", -1, 2, 41, 214, 116
-        PUSHBUTTON      "Adjust...", IDD_QPRTRACK, 7, 111, 56, 13
-        CONTROL         "Text", IDD_QPRBOX, 84, 96, 98, 49, WC_STATIC, 
-                        SS_FGNDRECT | WS_VISIBLE
-        CONTROL         "", IDD_QPRFRAME, 86, 98, 71, 34, WC_STATIC, 
-                        SS_HALFTONERECT | WS_VISIBLE
-        ENTRYFIELD      "Text", IDD_QPRXSIZE, 83, 47, 36, 12, ES_RIGHT | NOT 
-                        ES_AUTOSCROLL | ES_READONLY
-        ENTRYFIELD      "", IDD_QPRXFRAC, 168, 47, 39, 8, NOT ES_AUTOSCROLL | 
-                        ES_MARGIN
-        LTEXT           "Vertical size:", -1, 8, 63, 66, 8, NOT WS_GROUP
-        LTEXT           "Horizontal size:", -1, 8, 47, 70, 8, NOT WS_GROUP
-        ENTRYFIELD      "Text", IDD_QPRYSIZE, 83, 63, 36, 12, ES_RIGHT | NOT 
-                        ES_AUTOSCROLL | ES_READONLY
-        ENTRYFIELD      "", IDD_QPRYFRAC, 168, 63, 39, 8, NOT ES_AUTOSCROLL | 
-                        ES_MARGIN
-        LTEXT           "Or enter fraction of indicated size:", -1, 9, 79, 
-                        143, 8, NOT WS_GROUP
-        LTEXT           "cm", -1, 125, 63, 13, 8, NOT WS_GROUP
-        LTEXT           "cm", -1, 125, 47, 13, 8
-        PUSHBUTTON      "Job properties...", IDD_QPRSETPR, 98, 5, 72, 13
-        LTEXT           "Print to file named:", IDD_PRINTQNAME, 8, 28, 80, 8, 
-                        DT_HALFTONE
-        ENTRYFIELD      "", IDD_QPRNAME, 91, 28, 87, 8, NOT ES_AUTOSCROLL | 
-                        ES_MARGIN
-        LTEXT           "Adjust using", -1, 8, 136, 72, 8
-        LTEXT           "mouse...", -1, 8, 127, 37, 8
-        LTEXT           "Current printer:", -1, 8, 161, 64, 8
-        ENTRYFIELD      "", IDD_PRINTNAME, 74, 161, 139, 8, ES_MARGIN
-    END
-END
-
-DLGTEMPLATE IDD_QUERYPRINT LOADONCALL MOVEABLE DISCARDABLE
-BEGIN
-    DIALOG  "GnuplotPM: printer selection", IDD_QUERYPRINT, 59, 44, 243, 99, 
-            FS_NOBYTEALIGN | WS_VISIBLE, FCF_SYSMENU | FCF_TITLEBAR
-    BEGIN
-        LTEXT           "Select printer:", IDD_QPTEXT, 4, 89, 65, 8
-        LISTBOX         IDD_QPRSLIST, 5, 29, 232, 60
-        DEFPUSHBUTTON   "OK", DID_OK, 5, 5, 38, 13, WS_GROUP
-        PUSHBUTTON      "Cancel", DID_CANCEL, 54, 5, 38, 13
-        PUSHBUTTON      "Help", 310, 102, 5, 38, 13, BS_HELP
-    END
-END
-
-DLGTEMPLATE IDD_PAUSEBOX LOADONCALL MOVEABLE DISCARDABLE
-BEGIN
-    DIALOG  "Gnuplot: pause", IDD_PAUSEBOX, 70, 30, 230, 33, WS_VISIBLE, 
-            FCF_TITLEBAR | FCF_MINBUTTON
-    BEGIN
-        DEFPUSHBUTTON   "Continue", DID_OK, 2, 0, 40, 14
-        PUSHBUTTON      "Cancel", DID_CANCEL, 54, 0, 40, 14
-        PUSHBUTTON      "Help", 310, 106, 0, 40, 14, BS_HELP
-        LTEXT           "", IDD_PAUSETEXT, 4, 20, 223, 8
-    END
-END
-
-DLGTEMPLATE ID_PRINTSTOP LOADONCALL MOVEABLE DISCARDABLE
-BEGIN
-    DIALOG  "GnuplotPM printing...", ID_PRINTSTOP, 128, 74, 148, 22, 
-            WS_VISIBLE, FCF_SYSMENU | FCF_TITLEBAR
-    BEGIN
-        PUSHBUTTON      "Cancel current print job", DID_CANCEL, 7, 3, 132, 
-                        14
-    END
-END
-
-DLGTEMPLATE IDM_DO_SENDCOMMAND
-BEGIN
-    DIALOG "Send a command to gnuplot", IDM_DO_SENDCOMMAND, 32, 32, 250, 56, , FCF_TITLEBAR | FCF_SYSMENU
-    BEGIN
-        CONTROL "~Command:",                       0,  10, 32,  50,  8, WC_STATIC, WS_VISIBLE | SS_TEXT | DT_LEFT | DT_MNEMONIC
-        CONTROL "",                      IDM_DO_SENDCOMMAND,  60, 32, 180,  8, WC_ENTRYFIELD, WS_VISIBLE | ES_AUTOSCROLL | ES_MARGIN | WS_TABSTOP | WS_GROUP
-        DEFPUSHBUTTON "~OK",               DID_OK,  10,  8,  38, 13, WS_TABSTOP | WS_GROUP
-        CONTROL       "~Cancel",       DID_CANCEL,  60,  8,  38, 13, WC_BUTTON, BS_PUSHBUTTON | WS_VISIBLE | WS_TABSTOP
-    END
-END
+RCINCLUDE "gnupmdrv.dlg"
