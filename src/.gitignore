@@ -4,9 +4,17 @@ Makefile.in
 gnuplot
 gnuplot_qt
 gnuplot_x11
+gnuplot.gih
+gnupmdrv.hlp
+*.ini
 bf_test
 html
 timestamp.h
 *.o
 ui_*.h
 *.qm
+*.d
+*.lst
+*.map
+*.xqs
+*.brk

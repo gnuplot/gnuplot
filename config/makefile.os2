@@ -66,7 +66,8 @@ ICONV=1
 #CAIRO=1
 
 # PDF device driver
-# requires PDFlib (not part of gnuplot)
+# requires PDFlib or PDFlib-Lite
+# Note that you also need to uncomment the inclusion in term.h
 #PDF=1
 
 # VESAkit support
@@ -272,7 +273,7 @@ endif
 
 ifdef DEBUG
 ifdef PMPRINTF
-  CFLAGS2 += -DHAVE_PMRINTF
+  CFLAGS2 += -DHAVE_PMPRINTF
   LDFLAGS2 += -lpmprintf
 endif
 endif
@@ -297,9 +298,9 @@ PLAINTEX = tex
 # Default Rules
 #
 .c.$(O):
-	$(CC)  $(CFLAGS) $(TERMFLAGS) -o $*.$(O) -c $*.c
+	$(CC)  $(CFLAGS) $(TERMFLAGS) -MMD -o $*.$(O) -c $*.c
 .c.obj:
-	$(CC2) $(CFLAGS2) $(TERMFLAGS) -o $*.obj -c $*.c
+	$(CC2) $(CFLAGS2) $(TERMFLAGS) -MMD -o $*.obj -c $*.c
 
 #
 # Include dependencies valid for all platforms from makefile.all
@@ -342,11 +343,12 @@ gnuplot.exe: $(OBJS)
 #
 # Build the PM outboard driver
 #
-$(OS2DIR)\gnupmdrv.$(O2):  $(OS2DIR)\gnupmdrv.c   $(OS2DIR)\gnupmdrv.h	config.h
-$(OS2DIR)\gclient.$(O2):   $(OS2DIR)\gclient.c    $(OS2DIR)\gnupmdrv.h	config.h  $(OS2DIR)\pm_msgs.h	mouse.h
-$(OS2DIR)\dialogs.$(O2):   $(OS2DIR)\dialogs.c    $(OS2DIR)\gnupmdrv.h	config.h  $(OS2DIR)\dialogs.h
-$(OS2DIR)\print.$(O2):     $(OS2DIR)\print.c      $(OS2DIR)\gnupmdrv.h	config.h
-$(OS2DIR)\gpexecute.$(O2): gpexecute.c            gpexecute.h
+$(OS2DIR)\gnupmdrv.$(O2): $(OS2DIR)\gnupmdrv.c $(OS2DIR)\gnupmdrv.h $(OS2DIR)\dialogs.h	config.h
+$(OS2DIR)\gclient.$(O2):  $(OS2DIR)\gclient.c  $(OS2DIR)\gnupmdrv.h $(OS2DIR)\dialogs.h	config.h \
+	$(OS2DIR)\pm_msgs.h gpexecute.h mousecmn.h mouse.h
+$(OS2DIR)\dialogs.$(O2):  $(OS2DIR)\dialogs.c  $(OS2DIR)\gnupmdrv.h $(OS2DIR)\dialogs.h	config.h  
+$(OS2DIR)\print.$(O2):    $(OS2DIR)\print.c    $(OS2DIR)\gnupmdrv.h $(OS2DIR)\dialogs.h	config.h
+$(OS2DIR)\gpexecute.$(O2): gpexecute.c gpexecute.h mousecmn.h config.h
 
 $(OS2DIR)\gnupmdrv.res :   $(OS2DIR)\gnupmdrv.rc  $(OS2DIR)\gnuplot.ico $(OS2DIR)\dialogs.h
 	cd $(OS2DIR) && rc -i \usr\include\os2tk45 -r gnupmdrv.rc & cd ..
@@ -389,6 +391,14 @@ getcolor_x11.o: getcolor.c
 	$(CC) $(CFLAGS) $(X11FLAGS) $(EMXSPECIFIC) -DGPLT_X11_MODE -c -o $@ $<
 
 #
+# pull in dependency info for existing object files
+#
+ifndef NODEPS
+-include $(OBJS:.$(O)=.d)
+-include $(OS2OBJS:.$(O2)=.d)
+endif
+
+#
 # Create config.h
 # This file is preferable over having explicit gcc command longer than 10 lines:
 # gcc ... -DHAVE_ -DHAVE_ ... -DHAVE_ -DHAVE_ ... myfile.c
@@ -426,8 +436,10 @@ $(DOCDIR)\gnuplot.pdf: $(DOCDIR)\gnuplot.tex
 $(DOCDIR)\gnuplot.tex:  $(DOCDIR)\gnuplot.doc $(DOCDIR)\doc2tex.exe
 	$(DOCDIR)\doc2tex.exe $(DOCDIR)\gnuplot.doc $@
 $(DOCDIR)\gnuplot.inf:  $(DOCDIR)\gnuplot.ipf $(DOCDIR)\plotstyles.gnu
+ifdef IMAGEHELP
 	gnuplot -d -e "set loadpath '../demo'; winhelp=1; cd '$(D)'" plotstyles.gnu
 	cd $(DOCDIR) && plotstyles_cvt.cmd
+endif
 #	Cannot use the command
 #	$(IPF_C) /INF $< $@
 #	because IPFC 2.1 does not support this syntax. Use instead:
@@ -501,6 +513,7 @@ clean:
 	if exist *.$(O)                    del *.$(O)
 	if exist *.$(O2)                   del *.$(O2)
 	cd $(OS2DIR) && if exist *.$(O2)   del *.$(O2)
+	if exist *.d                       del *.d
 	if exist $(OS2DIR)\gnupmdrv.res    del $(OS2DIR)\gnupmdrv.res
 	if exist $(DEMODIR)\bf_test.exe    del $(DEMODIR)\bf_test.exe
 	if exist $(DOCDIR)\doc2*.exe       del $(DOCDIR)\doc2*.exe
@@ -510,12 +523,15 @@ clean:
 	if exist $(DOCDIR)\gnuplot_2*      del $(DOCDIR)\gnuplot_2*
 	if exist $(DOCDIR)\gnuplot_3*      del $(DOCDIR)\gnuplot_3*
 	if exist core                      del core
+	if exist $(DEMODIR)\core           del $(DEMODIR)\core
+	if exist $(DEMODIR)\fit.log        del $(DEMODIR)\fit.log
 	if exist $(DOCDIR)\allterm.?       del $(DOCDIR)\allterm.?
 
 # Clean up ALL files that were not part of the source distribution
 veryclean: clean
 	if exist *.exe                     del *.exe
 	if exist gnupmdrv.hlp              del gnupmdrv.hlp
+	if exist gnuplot.gih               del gnuplot.gih
 	if exist $(DOCDIR)\gnuplot.dvi     del $(DOCDIR)\gnuplot.dvi
 	if exist $(DOCDIR)\gnuplot.gih     del $(DOCDIR)\gnuplot.gih
 	if exist $(DOCDIR)\gnuplot.html    del $(DOCDIR)\gnuplot.html
