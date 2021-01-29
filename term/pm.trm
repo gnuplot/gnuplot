@@ -1100,13 +1100,11 @@ PM_image(unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_im
     unsigned int image_size;
     unsigned int pad_bytes;
 
-    /* IC_PALETTE and IC_RGB images are converted to a 24bit RGB format
+    /* Images are converted to a 24bit RGB format
        suitable for OS/2's presentation manager:
         - sequence of lines is reversed
         - each line starts at a 4 byte boundary
     */
-
-    /* fprintf(stderr, "PM_image: %i x %i, mode=%s\n", M, N, color_mode==IC_RGB?"IC_RGB":"IC_PALETTE" ); */
     pad_bytes = (4 - (3 * M) % 4) % 4; /* scan lines start on ULONG boundaries */
     image_size = (M + pad_bytes ) * N * 3;
     rgb_image = (PBYTE) gp_alloc(image_size, "PM RGB image");
@@ -1117,7 +1115,7 @@ PM_image(unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_im
 	rgb_image += N * (3 * M + pad_bytes);
 	for (y = 0; y < N; y++) {
 	    rgb_image -= 3 * M + pad_bytes;
-	    for(x = 0; x < M; x++) {
+	    for (x = 0; x < M; x++) {
 		rgb255_color rgb255;
 		rgb255maxcolors_from_gray(*image++, &rgb255);
 		*(rgb_image++) = rgb255.b;
@@ -1126,17 +1124,19 @@ PM_image(unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_im
 	    }
 	    rgb_image -= 3 * M;
 	}
-    } else if (color_mode == IC_RGB) {
+    } else if (color_mode == IC_RGB || color_mode == IC_RGBA) {
 	unsigned int x, y;
 
 	rgb_image += N * (3 * M + pad_bytes);
 	for (y = 0; y < N; y++) {
 	    rgb_image -= 3 * M + pad_bytes;
-	    for(x = 0; x < M; x++) {
+	    for (x = 0; x < M; x++) {
 		rgb255_color rgb255;
 		rgb255.r = (BYTE) (*image++ * 255 + 0.5);
 		rgb255.g = (BYTE) (*image++ * 255 + 0.5);
 		rgb255.b = (BYTE) (*image++ * 255 + 0.5);
+		/* Note: We just ignore the alpha channel. */
+		if (color_mode == IC_RGBA) image++;
 		*(rgb_image++) = rgb255.b;
 		*(rgb_image++) = rgb255.g;
 		*(rgb_image++) = rgb255.r;
@@ -1145,7 +1145,7 @@ PM_image(unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_im
 	}
     }
 
-    if ((color_mode == IC_PALETTE) || (color_mode == IC_RGB)) {
+    if (color_mode == IC_PALETTE || color_mode == IC_RGB  || color_mode == IC_RGBA) {
 	unsigned int i;
 
 	/* transfer data to gnupmdrv */
