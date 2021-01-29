@@ -1,0 +1,113 @@
+#ifndef OS2_INCLUDED
+#include <os2.h>
+#endif
+DLGINCLUDE 1 "dialogs.h"
+
+DLGTEMPLATE IDD_QUERYPRINT LOADONCALL MOVEABLE DISCARDABLE
+BEGIN
+    DIALOG  "GnuplotPM: printer selection", IDD_QUERYPRINT, 59, 44, 243, 99,
+            FS_NOBYTEALIGN | WS_VISIBLE, FCF_SYSMENU | FCF_TITLEBAR
+            PRESPARAMS PP_FONTNAMESIZE, "9.WarpSans"
+    BEGIN
+        LTEXT           "Select printer:", IDD_QPTEXT, 4, 88, 65, 8
+        LISTBOX         IDD_QPRSLIST, 4, 24, 232, 65
+        DEFPUSHBUTTON   "OK", DID_OK, 4, 4, 38, 13, WS_GROUP
+        PUSHBUTTON      "Cancel", DID_CANCEL, 44, 4, 38, 13
+        PUSHBUTTON      "Help", 310, 92, 4, 38, 13, BS_HELP
+    END
+END
+
+DLGTEMPLATE IDD_PAUSEBOX LOADONCALL MOVEABLE DISCARDABLE
+BEGIN
+    DIALOG  "Gnuplot: pause", IDD_PAUSEBOX, 68, 24, 230, 37, WS_VISIBLE,
+            FCF_TITLEBAR | FCF_MINBUTTON
+            PRESPARAMS PP_FONTNAMESIZE, "9.WarpSans"
+    BEGIN
+        DEFPUSHBUTTON   "Continue", DID_OK, 4, 4, 40, 14
+        PUSHBUTTON      "Cancel", DID_CANCEL, 48, 4, 40, 14
+        PUSHBUTTON      "Help", 310, 100, 4, 40, 14, BS_HELP
+        LTEXT           "", IDD_PAUSETEXT, 4, 24, 223, 8
+    END
+END
+
+DLGTEMPLATE IDM_DO_SENDCOMMAND LOADONCALL MOVEABLE DISCARDABLE
+BEGIN
+    DIALOG  "Send a command to gnuplot", IDM_DO_SENDCOMMAND, 32, 40, 250, 48, ,
+            FCF_SYSMENU | FCF_TITLEBAR
+            PRESPARAMS PP_FONTNAMESIZE, "9.WarpSans"
+    BEGIN
+        LTEXT           "~Command:", 0, 8, 24, 50, 12, DT_VCENTER |
+                        DT_MNEMONIC | NOT WS_GROUP
+        ENTRYFIELD      "", IDM_DO_SENDCOMMAND, 62, 26, 180, 8, ES_MARGIN |
+                        WS_GROUP
+        DEFPUSHBUTTON   "~OK", DID_OK, 4, 4, 38, 13, WS_GROUP
+        PUSHBUTTON      "~Cancel", DID_CANCEL, 44, 4, 38, 13
+    END
+END
+
+DLGTEMPLATE ID_ABOUT LOADONCALL MOVEABLE DISCARDABLE
+BEGIN
+    DIALOG  "", ID_ABOUT, 22, 24, 144, 68, , FCF_SYSMENU | FCF_TITLEBAR
+            PRESPARAMS PP_FONTNAMESIZE, "9.WarpSans"
+    BEGIN
+        CTEXT           "GnuplotPM", -1, 8, 53, 128, 8
+                        PRESPARAMS PP_FONTNAMESIZE, "9.WarpSans.Bold"
+        CTEXT           "gnuplot display for OS/2", -1, 8, 41, 128, 8
+        CTEXT           "Revision: 1.12", -1, 8, 25, 128, 8
+        DEFPUSHBUTTON   "OK", DID_OK, 56, 4, 36, 12, WS_GROUP
+    END
+END
+
+DLGTEMPLATE ID_PRINTSTOP LOADONCALL MOVEABLE DISCARDABLE
+BEGIN
+    DIALOG  "GnuplotPM printing...", ID_PRINTSTOP, 128, 74, 148, 22,
+            WS_VISIBLE, FCF_SYSMENU | FCF_TITLEBAR
+            PRESPARAMS PP_FONTNAMESIZE, "9.WarpSans"
+    BEGIN
+        PUSHBUTTON      "Cancel current print job", DID_CANCEL, 7, 3, 132,
+                        14
+    END
+END
+
+DLGTEMPLATE ID_QPRINT LOADONCALL MOVEABLE DISCARDABLE
+BEGIN
+    DIALOG  "GnuplotPM: printer setup", ID_QPRINT, 80, -4, 220, 175,
+            FS_NOBYTEALIGN | WS_VISIBLE, FCF_TITLEBAR
+            PRESPARAMS PP_FONTNAMESIZE, "9.WarpSans"
+    BEGIN
+        DEFPUSHBUTTON   "OK", DID_OK, 8, 4, 38, 13
+        PUSHBUTTON      "Cancel", DID_CANCEL, 48, 4, 38, 13
+        PUSHBUTTON      "Help", 310, 176, 4, 38, 13, BS_HELP
+        GROUPBOX        "Set plot area", -1, 2, 41, 214, 116
+        PUSHBUTTON      "Adjust...", IDD_QPRTRACK, 7, 111, 56, 13
+        CONTROL         "Text", IDD_QPRBOX, 84, 96, 98, 49, WC_STATIC,
+                        SS_FGNDRECT | WS_VISIBLE
+        CONTROL         "", IDD_QPRFRAME, 88, 100, 71, 34, WC_STATIC,
+                        SS_HALFTONERECT | WS_VISIBLE
+        ENTRYFIELD      "Text", IDD_QPRXSIZE, 80, 48, 36, 8, ES_RIGHT | NOT
+                        ES_AUTOSCROLL | ES_READONLY | NOT WS_TABSTOP
+        ENTRYFIELD      "", IDD_QPRXFRAC, 142, 50, 39, 8, NOT ES_AUTOSCROLL |
+                        ES_MARGIN
+        LTEXT           "Vertical size:", -1, 20, 64, 60, 12, DT_BOTTOM |
+                        NOT WS_GROUP
+        LTEXT           "Horizontal size:", -1, 20, 48, 60, 12, DT_BOTTOM |
+                        NOT WS_GROUP
+        ENTRYFIELD      "Text", IDD_QPRYSIZE, 80, 64, 36, 8, ES_RIGHT | NOT
+                        ES_AUTOSCROLL | ES_READONLY | NOT WS_TABSTOP
+        ENTRYFIELD      "", IDD_QPRYFRAC, 142, 66, 39, 8, NOT ES_AUTOSCROLL |
+                        ES_MARGIN
+        LTEXT           "Or enter fraction of indicated size:", -1, 9, 79,
+                        143, 8, NOT WS_GROUP
+        LTEXT           "cm", -1, 120, 64, 13, 13, DT_BOTTOM | NOT WS_GROUP
+        LTEXT           "cm", -1, 120, 48, 13, 12, DT_BOTTOM
+        PUSHBUTTON      "Job properties...", IDD_QPRSETPR, 92, 4, 72, 13
+        LTEXT           "Print to file named:", IDD_PRINTQNAME, 4, 24, 80,
+                        12, DT_VCENTER | DT_HALFTONE
+        ENTRYFIELD      "", IDD_QPRNAME, 90, 26, 124, 8, NOT ES_AUTOSCROLL |
+                        ES_MARGIN
+        LTEXT           "Adjust using", -1, 8, 136, 72, 8
+        LTEXT           "mouse...", -1, 8, 127, 37, 8
+        LTEXT           "Current printer:", -1, 8, 161, 64, 8
+        ENTRYFIELD      "", IDD_PRINTNAME, 74, 161, 139, 8, ES_MARGIN
+    END
+END
