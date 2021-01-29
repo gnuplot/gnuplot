@@ -568,9 +568,9 @@ DUMB_vector(unsigned int arg_x, unsigned int arg_y)
 	}
 	dumb_set_pixel(dumb_x, dumb_y, pen1);
 	for (delta = 1; delta < ABS(y - dumb_y); delta++) {
-	    dumb_set_pixel(dumb_x  + (int) ((double) (x - dumb_x) *
-					    delta / ABS(y - dumb_y) + 0.5),
-			   dumb_y + delta * sign(y - dumb_y), pen);
+	    dumb_set_pixel(
+		dumb_x  + (int)round((double) (x - dumb_x) * delta / ABS(y - dumb_y)),
+		dumb_y + delta * sign(y - dumb_y), pen);
 	}
 	dumb_set_pixel(x, y, pen1);
     } else if (ABS(x - dumb_x) > ABS(y - dumb_y)) {
@@ -597,8 +597,7 @@ DUMB_vector(unsigned int arg_x, unsigned int arg_y)
 	dumb_set_pixel(dumb_x, dumb_y, pen1);
 	for (delta = 1; delta < ABS(x - dumb_x); delta++)
 	    dumb_set_pixel(dumb_x + delta * sign(x - dumb_x),
-			   dumb_y +
-			   (int) ((double) (y - dumb_y) * delta / ABS(x - dumb_x) + 0.5),
+			   dumb_y + (int)round((double) (y - dumb_y) * delta / ABS(x - dumb_x)),
 			   pen);
 	dumb_set_pixel(x, y, pen1);
     } else {
