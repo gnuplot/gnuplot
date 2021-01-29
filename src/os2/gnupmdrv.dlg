@@ -45,19 +45,6 @@ BEGIN
     END
 END
 
-DLGTEMPLATE ID_ABOUT LOADONCALL MOVEABLE DISCARDABLE
-BEGIN
-    DIALOG  "", ID_ABOUT, 22, 24, 144, 68, , FCF_SYSMENU | FCF_TITLEBAR
-            PRESPARAMS PP_FONTNAMESIZE, "9.WarpSans"
-    BEGIN
-        CTEXT           "GnuplotPM", -1, 8, 53, 128, 8
-                        PRESPARAMS PP_FONTNAMESIZE, "9.WarpSans.Bold"
-        CTEXT           "gnuplot display for OS/2", -1, 8, 41, 128, 8
-        CTEXT           "Revision: 1.12", -1, 8, 25, 128, 8
-        DEFPUSHBUTTON   "OK", DID_OK, 56, 4, 36, 12, WS_GROUP
-    END
-END
-
 DLGTEMPLATE ID_PRINTSTOP LOADONCALL MOVEABLE DISCARDABLE
 BEGIN
     DIALOG  "GnuplotPM printing...", ID_PRINTSTOP, 128, 74, 148, 22,
