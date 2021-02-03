@@ -233,9 +233,12 @@ static const  char  *SetDataStyles[] = {
 
 static ULONG    ulShellPos[4];
 static PAUSEDATA pausedata = {sizeof(PAUSEDATA), NULL, NULL};
+static char     szInitialFontNameSize[FONTBUF] = INITIAL_FONT;
+static int      iInitialFontSize;
+static char     *szInitialFontName;
 static char     szFontNameSize[FONTBUF];	/* default name and size, format: "10.Helvetica" */
 static char	szCurrentFontNameSize[FONTBUF];	/* currently selected font */
-static unsigned fontscale = 1;
+static unsigned fontscale = 100;	/* scaling factor for font size in percent */
 static PRQINFO3 infPrinter = { "" };
 static QPRINT   qPrintData = {
     sizeof(QPRINT), 0.0, 0.0, 1.0, 1.0, 0,
@@ -328,9 +331,11 @@ static SIZEF sizBaseFont;
 static struct _ft {
     char *name;
     int   codepage;
+    BOOL  bold;
+    BOOL  italic;
     LONG  lcid;
 } tabFont[256] = {
-    {NULL,0L},
+    {NULL, 0, FALSE, FALSE, 0L},
     {NULL}
 };
 
@@ -396,6 +401,31 @@ struct drop {
 
 
 /*==== c o d e ===============================================================*/
+
+/* Our own versions of strlcpy and strlcat, required only for EMX. */
+#ifndef __KLIBC__
+#undef strlcpy
+static size_t
+strlcpy(char *dst, const char *src, size_t size)
+{
+    size_t len = strlen(src);
+    if (size > 0) {
+	strncpy(dst, src, size);
+	if (len >= size)
+	    dst[size - 1] = NUL;
+    }
+    return len;
+}
+
+#undef strlcat
+size_t
+strlcat(char *dst, const char *src, size_t size)
+{
+    size_t len = strlen(dst);
+    return strlcpy(dst + len, src, size - len) + len;
+}
+#endif
+
 
 /* An object is being dragged over the client window.  Check whether
    it can be dropped or not. */
@@ -970,8 +1000,8 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 			      FONTBUF,
 			      pp,
 			      QPF_NOINHERIT) != 0L) {
-	    strcpy(szFontNameSize, pp);
-	    DEBUG_FONT(("WM_PRESPARAMCHANGED: %s", szFontNameSize));
+	    strlcpy(szFontNameSize, pp, FONTBUF);
+	    DEBUG_FONT(("WM_PRESPARAMCHANGED: \"%s\"", szFontNameSize));
 	    WinInvalidateRect(hWnd, NULL, TRUE);
 	}
 	free(pp);
@@ -1576,6 +1606,10 @@ QueryIni(HAB hab)
                           (long) sizeof(qPrintData.szPrinterName));
     PrfQueryProfileString(hini, APP_NAME, INIFONT, INITIAL_FONT,
 			  szFontNameSize, FONTBUF);
+    // save for later use
+    strcpy(szInitialFontNameSize, szFontNameSize);
+    szInitialFontName = strchr(szInitialFontNameSize, '.') + 1;
+    iInitialFontSize = atoi(szInitialFontNameSize);
     ulCB = sizeof(ulOpts);
     bData = PrfQueryProfileData(hini, APP_NAME, INICHAR, &ulOpts, &ulCB);
     if (bData) {
@@ -1827,24 +1861,58 @@ ScalePS(HPS hps)
 
 
 /*
-**  Select a named and sized outline font
+**  Select the default outline font.
+**  The format of szFontNameSize is "<size>.<face name>{:Bold}{:Italic}".
+**  <face name> may be empty.
 */
 void
 SelectFont(HPS hps, char *szFontNameSize)
 {
     HDC    hdc;
-    FATTRS fat;
+    static FATTRS  fat;  // docs say that it may not be on the stack...
+    FONTMETRICS fm;
     LONG   xDeviceRes, yDeviceRes;
     POINTL ptlFont;
     SIZEF  sizfx;
-    static LONG lcid = 0L;
-    static char *szFontName;
-    static short shPointSize;
-    char *p;
+    LONG   lcid = 0L;
+    char   szFontName[FACESIZE];
+    short  shPointSize;
+    char  *p, *q;
+    BOOL   bBold, bItalic;
 
-    sscanf(szFontNameSize, "%hd", &shPointSize);
-    shPointSize = shPointSize * fontscale / 100.;
-    szFontName = strchr(szFontNameSize, '.') + 1;
+    DEBUG_FONT(("SelectFont: %s", szFontNameSize));
+
+    shPointSize = (atoi(szFontNameSize) * fontscale) / 100;
+    p = strchr(szFontNameSize, '.');
+    szFontName[0] = NUL;
+    if (p != NULL) {
+	p++;
+	if (*p == NUL) {
+	    // no font name, no attributes
+	    strlcpy(szFontName, szInitialFontName, FACESIZE);
+	} else if (*p == ':') {
+	    // just attributes, but no font name
+	    strlcpy(szFontName, szInitialFontName, FACESIZE);
+	    // append attributes
+	    strlcat(szFontName, p, FACESIZE);
+	} else {
+	    // font name provided
+	    strlcpy(szFontName, p, FACESIZE);
+	}
+    }
+    DEBUG_FONT(("SelectFont: fontname \"%s\"", szFontName));
+
+    // strip off attributes to obtain font family name
+    p = strstr(szFontName, " Bold");
+    if (p == NULL)
+	p = strstr(szFontName, ":Bold");
+    bBold = (p != NULL);
+    q = strstr(szFontName, " Italic");
+    if (q == NULL)
+	q = strstr(szFontName, ":Italic");
+    bItalic = (q != NULL);
+    if (bBold) *p = NUL;
+    if (bItalic) *q = NUL;
 
     fat.usRecordLength  = sizeof(fat);
     fat.fsSelection     = 0;
@@ -1857,23 +1925,19 @@ SelectFont(HPS hps, char *szFontNameSize)
     fat.fsFontUse       = FATTR_FONTUSE_OUTLINE |
 	FATTR_FONTUSE_TRANSFORMABLE;
 
-    strlcpy(fat.szFacename, szFontName, FACESIZE);
-    p = strchr(fat.szFacename, ':');
-    if (p != NULL) *p = NUL;
-    if (fat.szFacename[0] == NUL) {
-	p = strchr(szFontNameSize, '.');
-	if (p != NULL)
-	    strlcpy(fat.szFacename, p + 1, FACESIZE);
-    }
-    if (strstr(szFontName, ":Bold"))
+    if (bBold)
 	fat.fsSelection |= FATTR_SEL_BOLD;
-    if (strstr(szFontName, ":Italic"))
+    if (bItalic)
 	fat.fsSelection |= FATTR_SEL_ITALIC;
+
+    strlcpy(fat.szFacename, szFontName, FACESIZE);
 
     if (tabFont[0].name != NULL)
 	free(tabFont[0].name);
     tabFont[0].name = strdup(szFontName);
     tabFont[0].codepage = codepage;
+    tabFont[0].bold = bBold;
+    tabFont[0].italic = bItalic;
     tabFont[0].lcid = 10L;
 
     lcid = GpiQueryCharSet(hps);
@@ -1899,47 +1963,43 @@ SelectFont(HPS hps, char *szFontNameSize)
     sizfx.cx = MAKEFIXED(ptlFont.x, 0);
     sizfx.cy = MAKEFIXED(ptlFont.y, 0);
     lVOffset = ptlFont.y;
-
     sizBaseFont = sizfx;
     GpiSetCharBox(hps, &sizfx);
 
     /* set up some useful globals */
-    {
-	FONTMETRICS fm;
+    GpiQueryFontMetrics(hps, sizeof(FONTMETRICS), &fm);
+    lBaseSubOffset = -fm.lSubscriptYOffset;
+    lBaseSupOffset = fm.lSuperscriptYOffset;
+    lSubOffset = lBaseSubOffset;
+    lSupOffset = lBaseSupOffset;
+    lCharHeight = fm.lMaxAscender * 1.2;
+    lCharWidth  = fm.lAveCharWidth;
+    sizBaseSubSup.cx = MAKEFIXED(ptlFont.x * 0.7, 0);
+    sizBaseSubSup.cy = MAKEFIXED(ptlFont.y * 0.7, 0);
 
-	GpiQueryFontMetrics(hps, sizeof(FONTMETRICS), &fm);
-	lBaseSubOffset = -fm.lSubscriptYOffset;
-	lBaseSupOffset = fm.lSuperscriptYOffset;
-	lSubOffset = lBaseSubOffset;
-	lSupOffset = lBaseSupOffset;
-	lCharHeight = fm.lMaxAscender * 1.2;
-	lCharWidth  = fm.lAveCharWidth;
-	sizBaseSubSup.cx = MAKEFIXED(ptlFont.x * 0.7, 0);
-	sizBaseSubSup.cy = MAKEFIXED(ptlFont.y * 0.7, 0);
-    }
     sizCurFont = sizBaseFont;
     sizCurSubSup = sizBaseSubSup;
 
-    strcpy(szCurrentFontNameSize, szFontNameSize);
+    strlcpy(szCurrentFontNameSize, szFontNameSize, FONTBUF);
 }
 
 
 /*
-**  Select a named and sized outline(adobe) font
+**  Select a named and sized outline font.
+**  The format of szFNS is "<point size>.<face name>{:Bold}{:Italic}"
+**  or NULL for the default font.  <face name> may be empty.
 */
-void
+static void
 SwapFont(HPS hps, char *szFNS)
 {
     HDC    hdc;
-    FATTRS  fat;
+    static FATTRS  fat;  // docs say that it may not be on the stack...
     LONG   xDeviceRes, yDeviceRes;
     POINTL ptlFont;
-    static LONG lcid = 0L;
+    LONG   lcid = 0L;
     static int itab = 1;
-    static char *szFontName;
-    static short shPointSize;
 
-    if (szFNS == NULL) {    /* restore base font */
+    if (szFNS == NULL || szFNS[0] == NUL) {    /* restore base font */
 	sizCurFont = sizBaseFont;
 	sizCurSubSup = sizBaseSubSup;
 	lSubOffset = lBaseSubOffset;
@@ -1947,25 +2007,73 @@ SwapFont(HPS hps, char *szFNS)
 	GpiSetCharSet(hps, 10);
 	GpiSetCharBox(hps, &sizBaseFont);
     } else {
-	int i;
+	char   szFontName[FACESIZE];
+	short  shPointSize;
+	FONTMETRICS fm;
+	int    i;
+	char  *p, *q;
+	BOOL  bBold, bItalic;
 
-	sscanf(szFNS, "%hd", &shPointSize);
-	shPointSize = shPointSize * fontscale / 100.;
-	szFontName = strchr(szFNS, '.') + 1;
+	// we always expect a font size
+	shPointSize = (atoi(szFNS) * fontscale) / 100;
+	p = strchr(szFNS, '.');
+	szFontName[0] = NUL;
+	if (p != NULL) {
+	    p++;
+	    if (*p == NUL || *p == ':') {
+		// no font name, but maybe attributes
+		char * q = strchr(szFontNameSize, '.');
+		if (q != NULL) {
+		    q++;
+		    if (*q == ':') {
+			// default font does not include font name
+			strlcpy(szFontName, szInitialFontName, FACESIZE);
+			// append default attributes
+			strlcat(szFontName, q, FACESIZE);
+		    } else if (*q == NUL) {
+			// no (proper) default font name
+			strlcpy(szFontName, szInitialFontName, FACESIZE);
+		    } else {
+			// copy default font name
+			strlcpy(szFontName, q, FACESIZE);
+		    }
+		    if (*p != NUL) {
+			// append attributes
+			strlcat(szFontName, p, FACESIZE);
+		    }
+		}
+	    } else {
+		// font name provided
+		strlcpy(szFontName, p, FACESIZE);
+	    }
+	}
+	DEBUG_FONT(("SwapFont: fontname \"%s\"", szFontName));
 
-	/* search for previous font with correct encoding */
+	// strip off attributes to obtain font family name
+	p = strstr(szFontName, " Bold");
+	if (p == NULL)
+	    p = strstr(szFontName, ":Bold");
+	bBold = (p != NULL);
+	q = strstr(szFontName, " Italic");
+	if (q == NULL)
+	    q = strstr(szFontName, ":Italic");
+	bItalic = (q != NULL);
+	if (bBold) *p = NUL;
+	if (bItalic) *q = NUL;
+
+	/* search for a previous font with correct encoding and attributes */
 	lcid = 0;
 	for (i = 0; i < itab; i++) {
 	    if ((strcmp(szFontName, tabFont[i].name) == 0) &&
+	        (bBold == tabFont[i].bold) && (bItalic == tabFont[i].italic) &&
 	        (codepage == tabFont[i].codepage)) {
 		lcid = tabFont[i].lcid;
 		break;
 	    }
 	}
 
+	// no match found: create new logical font
 	if (lcid == 0) {
-	    char * p;
-
 	    fat.usRecordLength  = sizeof(fat);
 	    fat.fsSelection     = 0;
 	    fat.lMatch          = 0;
@@ -1977,18 +2085,12 @@ SwapFont(HPS hps, char *szFNS)
 	    fat.fsFontUse       = FATTR_FONTUSE_OUTLINE |
 		FATTR_FONTUSE_TRANSFORMABLE;
 
-	    strlcpy(fat.szFacename, szFontName, FACESIZE);
-	    p = strchr(fat.szFacename, ':');
-	    if (p != NULL) *p = NUL;
-	    if (fat.szFacename[0] == NUL) {
-		p = strchr(szFontNameSize, '.');
-		if (p != NULL)
-		    strlcpy(fat.szFacename, p + 1, FACESIZE);
-	    }
-	    if (strstr(szFontName, ":Bold"))
+	    if (bBold)
 		fat.fsSelection |= FATTR_SEL_BOLD;
-	    if (strstr(szFontName, ":Italic"))
+	    if (bItalic)
 		fat.fsSelection |= FATTR_SEL_ITALIC;
+
+	    strlcpy(fat.szFacename, szFontName, FACESIZE);
 
 	    // Use the default encoding for symbol fonts for all encodings but UTF-8
 	    if (codepage != 1208) { // not UTF-8
@@ -2007,11 +2109,12 @@ SwapFont(HPS hps, char *szFNS)
 
 	    tabFont[itab].name = strdup(szFontName);
 	    tabFont[itab].codepage = codepage;
-	    lcid = itab+10;
+	    tabFont[itab].bold = bBold;
+	    tabFont[itab].italic = bItalic;
+	    lcid = itab + 10;
 	    tabFont[itab].lcid = lcid;
 	    ++itab;
 
-	    /* lcid = 11L; */
 	    GpiSetCharSet(hps, 0L);
 	    GpiDeleteSetId(hps, lcid);
 	    GpiCreateLogFont(hps, NULL, lcid, &fat);
@@ -2024,8 +2127,8 @@ SwapFont(HPS hps, char *szFNS)
 	DevQueryCaps(hdc, CAPS_VERTICAL_RESOLUTION,   1L, &yDeviceRes);
 
 	/* Find desired font size in pixels */
-	ptlFont.x = 2540L *(long)shPointSize / 72L;
-	ptlFont.y = 2540L *(long)shPointSize / 72L;
+	ptlFont.x = 2540L * (long) shPointSize / 72L;
+	ptlFont.y = 2540L * (long) shPointSize / 72L;
 
 	/* Set the character box */
 	sizCurFont.cx = MAKEFIXED(ptlFont.x, 0);
@@ -2037,15 +2140,11 @@ SwapFont(HPS hps, char *szFNS)
 	sizCurSubSup.cy = MAKEFIXED(ptlFont.y*0.7, 0);
 
 	/* set up some useful globals */
-	{
-	    FONTMETRICS fm;
-
-	    GpiQueryFontMetrics(hps, sizeof(FONTMETRICS), &fm);
-	    lSubOffset = -fm.lSubscriptYOffset;
-	    lSupOffset = fm.lSuperscriptYOffset;
-	    lCharHeight = fm.lMaxAscender * 1.2;
-	    lCharWidth  = fm.lAveCharWidth;
-	}
+	GpiQueryFontMetrics(hps, sizeof(FONTMETRICS), &fm);
+	lSubOffset = -fm.lSubscriptYOffset;
+	lSupOffset = fm.lSuperscriptYOffset;
+	lCharHeight = fm.lMaxAscender * 1.2;
+	lCharWidth  = fm.lAveCharWidth;
     }
 }
 
@@ -2633,34 +2732,45 @@ ReadGnu(void* arg)
 
 	    case SET_FONT :   /* set font */
 	    {
-		int len;
+		int len, size;
 
 		BufRead(hRead, &len, sizeof(int), &cbR);
-		len = (len + sizeof(int) - 1) / sizeof(int);
+		size = (len + sizeof(int) - 1) / sizeof(int);
 
 		if (len == 0) {
 		    SwapFont(hps, NULL);
-		    strcpy(szCurrentFontNameSize, szFontNameSize);
+		    strlcpy(szCurrentFontNameSize, szFontNameSize, FONTBUF);
+		    DEBUG_FONT(("SET_FONT: default font \"%s\"", szFontNameSize));
 		} else {
 		    char font[FONTBUF];
 		    char *p, *tmp, *str;
 
-		    tmp = str = malloc(len * sizeof(int));
-		    BufRead(hRead, str, len * sizeof(int), &cbR);
-		    p = strchr(str, ',');
-		    if (p == NULL)
-			strcpy(font, "10");  // FIXME: this should be the default size
-		    else {
-			*p = '\0';
-			strcpy(font, p+1);
+		    tmp = str = malloc(size * sizeof(int));
+		    BufRead(hRead, str, size * sizeof(int), &cbR);
+		    if (len == 1) { // empty string (only terminating NUL)
+			DEBUG_FONT(("SET_FONT: empty font: \"%s\"", szFontNameSize));
+			SwapFont(hps, NULL);
+			strlcpy(szCurrentFontNameSize, szFontNameSize, FONTBUF);
+		    } else {
+			DEBUG_FONT(("SET_FONT: \"%s\"", str));
+			p = strchr(str, ',');
+			if (p == NULL) {
+			    // default font size
+			    strlcpy(font, szFontNameSize, FONTBUF);
+			    p = strchr(font, '.');
+			    *(++p) = NUL;
+			} else {
+			    *p = NUL;
+			    strlcpy(font, p + 1, FONTBUF);
+			    strlcat(font, ".", FONTBUF);
+			}
+			/* allow abbreviation of some well known font names */
+			FontExpand(str);
+			strlcat(font, str, FONTBUF);
+			SwapFont(hps, font);
+			strlcpy(szCurrentFontNameSize, font, FONTBUF);
 		    }
-		    strcat(font, ".");
-		    /* allow abbreviation of some well known font names */
-		    FontExpand(str);
-		    strcat(font, str);
 		    free(tmp);
-		    SwapFont(hps, font);
-		    strcpy(szCurrentFontNameSize, font);
 		}
 		break;
 	    }
@@ -2672,7 +2782,7 @@ ReadGnu(void* arg)
 		namelen = strlen(szCurrentFontNameSize);
 		DosWrite(hRead, &namelen, sizeof(int), &cbR);
 		DosWrite(hRead, szCurrentFontNameSize, namelen, &cbR);
-		/* FIXME: is padding necessary? */
+		DEBUG_FONT(("GR_QUERY_FONT \"%s\"", szCurrentFontNameSize));
 		break;
 	    }
 
@@ -2759,36 +2869,23 @@ ReadGnu(void* arg)
 
 			tmp = str = malloc(len * sizeof(int));
 			BufRead(hRead, str, len * sizeof(int), &cbR);
+			// deal with font size first
 			p = strchr(str, ',');
-			 /* preserve previous font size if no new one is given */
 			if (p == NULL) {
-			    p = strchr(szFontNameSize, '.');
-			    if (p != NULL) {
-				*p = '\0';
-				strcpy(font, szFontNameSize);
-			    } else {
-				strcpy(font, "14");
-			    }
+			    // fall back to initial font size
+			    sprintf(font, "%i", iInitialFontSize);
 			} else {
-			    *p = '\0';
-			    strcpy(font, p + 1);
+			    *p =  NUL;
+			    strlcpy(font, p + 1, FONTBUF);
 			}
-			strcat(font, ".");
+			strlcat(font, ".", FONTBUF);
 			/* allow abbreviation of some well known font names */
 			FontExpand(str);
-			 /* preserve previous font name if no new one is given */
-			if (*str == NUL) {
-			    str = strchr(szFontNameSize, '.');
-			    if (str != NULL)
-				str++;
-			    else
-				str = "Helvetica";
-			}
-			strcat(font, str);
+			strlcat(font, str, FONTBUF);
 			free(tmp);
-			strcpy(szFontNameSize, font);
+			strlcpy(szFontNameSize, font, FONTBUF);
 			SelectFont(hps, font);
-			DEBUG_FONT(("set default font: %s", font));
+			DEBUG_FONT(("SET_SPECIAL_FONT: \"%s\"", font));
 		    }
 		    break;
 		}
@@ -2801,7 +2898,7 @@ ReadGnu(void* arg)
 			fontscale = newfontscale;
 			SelectFont(hps, szFontNameSize);
 		    }
-		    DEBUG_FONT(("set fontscale: %.1f", fontscale / 100.));
+		    DEBUG_FONT(("SET_SPECIAL_FONTSCALE: %i\%", newfontscale));
 		    break;
 		}
 		case SET_SPECIAL_RAISE: /* raise window */
@@ -3752,16 +3849,37 @@ QueryTextBox(HPS hps, int len, char *str)
 void
 FontExpand(char *name)
 {
-    if (strcmp(name,"S") == 0)
+    char * p, *attr;
+
+    // make a temporary copy of the font attributes
+    p = strchr(name, ':');
+    if (p != NULL) {
+	attr = strdup(p);
+	*p = NUL;
+    }
+
+    if (strcmp(name, "S") == 0)
 	strcpy(name, "Symbol Set");
-    if (strcmp(name,"Symbol") == 0)
+    if (strcmp(name, "Symbol") == 0)
 	strcpy(name, "Symbol Set");
-    else if (strcmp(name,"H") == 0)
+    else if (strcmp(name, "H") == 0)
 	strcpy(name, "Helvetica");
-    else if (strcmp(name,"T") == 0)
+    else if (strcmp(name, "sans") == 0)
+	strcpy(name, "Helvetica");
+    else if (strcmp(name, "T") == 0)
 	strcpy(name, "Times New Roman");
-    else if (strcmp(name,"C") == 0)
+    else if (strcmp(name, "Times") == 0)
+	strcpy(name, "Times New Roman");
+    else if (strcmp(name, "serif") == 0)
+	strcpy(name, "Times New Roman");
+    else if (strcmp(name, "C") == 0)
 	strcpy(name, "Courier");
+
+    // append them again to the font name
+    if (p != NULL) {
+	strcat(name, attr);
+	free(attr);
+    }
 }
 
 
@@ -4110,7 +4228,7 @@ DrawZoomBox()
 	    pt = zoombox.from;
 	    pt.y -= lCharHeight;
 	    DrawMouseText(hps, &zoombox.from, zoombox.text1, separator - zoombox.text1);
-	    DrawMouseText(hps, &zoombox.from, separator + 1, strlen(separator + 1));
+	    DrawMouseText(hps, &pt, separator + 1, strlen(separator + 1));
 	} else {
 	    pt = zoombox.from;
 	    pt.y -= lCharHeight / 2;
