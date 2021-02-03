@@ -27,7 +27,7 @@ data3 = '< grep "Norway.*cases" ECDC-weekly-national-COVID.csv'
 data4 = '< grep "Finland.*cases" ECDC-weekly-national-COVID.csv'
 data5 = '< grep "Iceland.*cases" ECDC-weekly-national-COVID.csv'
 
-set title "weekly COVID-19 cases per 100,000 people" font "/Bold,15"
+set title "weekly COVID-19 cases per 100,000 people" font ":Bold,15"
 
 plot data1 using (calendar(strcol(7))) : (1.e5*$6/$4) lw 2 title "Denmark", \
      data2 using (calendar(strcol(7))) : (1.e5*$6/$4) lw 2 title "Sweden", \

@@ -114,7 +114,7 @@ set ytics ("1.0" 1.0) nomirror
 set xtics nomirror
 set border 3
 
-plot data using 2:(1.0) with points pt '-' font "/:Bold"
+plot data using 2:(1.0) with points pt '-' font ":Bold"
 
 pause -1 "Hit <cr> to continue"
 reset
