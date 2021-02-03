@@ -56,7 +56,7 @@ set style data parallel
 set palette defined (0 "dark-blue", 1 "dark-orange")
 set xrange [0.5:7.5]
 unset ytics
-set xtics font "/:Bold,13"
+set xtics font ":Bold,13"
 unset border
 set bmargin 4
 unset colorbox
