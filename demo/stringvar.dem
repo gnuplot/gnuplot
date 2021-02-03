@@ -52,12 +52,12 @@ print "substr(foo,3,4) = ",substr(foo,3,4)
 print ""
 if (!iswindows && !isos2) {
   haystack = system("date")
-} else if (iswindows) {
+} else { if (iswindows) {
   haystack = system("date /T") . " " . system("time /T")
 } else {
   # no system program to retrieve time and date required
   haystack = time("%D %T")
-}
+}}
 needle = ":"
 S = strstrt(haystack,needle)
 print "haystack     = \`date\`"
