@@ -147,8 +147,8 @@ static FILE *PM_savepipe = NULL;
 
 /* track current state of pm terminal */
 /* this is only needed for enhanced text */
-static char * PM_font = NULL;
-static double PM_fontsize = 12.0;
+static char PM_font[FACESIZE] = "";
+static unsigned int PM_fontsize = 12.0;
 static unsigned int PM_x = 0;
 static unsigned int PM_y = 0;
 static enum JUSTIFY PM_justification = LEFT;
@@ -167,7 +167,7 @@ static double ENHpm_base;
 static void PM_reset_opts(void);
 static void PM_query(void);
 static void PM_make_servername(char *);
-static void PM_abortplot();
+static void PM_abortplot(void);
 static void PM_query_font(void);
 
 
@@ -420,7 +420,7 @@ PM_options()
 	    s = try_to_get_string();
 	    if (s == NULL)
 		int_error(c_token, "expecting string argument");
-	    strlcpy(PM_term_title, s, sizeof(PM_term_title));
+	    safe_strncpy(PM_term_title, s, sizeof(PM_term_title));
 	    free(s);
 	    break;
 	default:
@@ -430,7 +430,7 @@ PM_options()
 		int_error(c_token, "Unknown terminal option");
 		PM_term_title[0] = NUL;
 	    } else {
-		strlcpy(PM_term_title, s, sizeof(PM_term_title));
+		safe_strncpy(PM_term_title, s, sizeof(PM_term_title));
 		free(s);
 	    }
 	    break;
@@ -645,7 +645,7 @@ PM_graphics()
 	fflush(PM_pipe);
 	last_encoding = encoding;
     }
-    if (PM_def_font[0] != NUL) {
+    { /* update the default font */
 	int len;
 
 	putc(SET_SPECIAL, PM_pipe);
@@ -795,8 +795,6 @@ PM_set_font(const char *ifont)
     unsigned int len;
 
     putc(SET_FONT, PM_pipe);
-    if ((font == NULL) && (PM_def_font[0] != NUL))
-	font = PM_def_font;
     len = (font == NULL) ? 0 : strlen(font);
     if (len == 0) {
 	fwrite(&len, sizeof(int), 1, PM_pipe);
@@ -829,17 +827,17 @@ PM_query_font(void)
     putc(GR_QUERY_FONT, PM_pipe);
     fflush(PM_pipe);
 
-    free(PM_font);
     rc = DosRead(fileno(PM_pipe), &len, sizeof(int), &cbR);
     newfont = (char *) malloc(len + 1);
-    rc = DosRead(fileno(PM_pipe), newfont, len * sizeof(char), &cbR);
+    rc = DosRead(fileno(PM_pipe), newfont, len, &cbR);
     newfont[len] = NUL;
 
-    PM_font = (char *) malloc(len + 1);
     s = strchr(newfont, '.');
     PM_fontsize = atoi(newfont);
     if (s != NULL)
-      strcpy(PM_font, s + 1);
+	safe_strncpy(PM_font, s + 1, sizeof(PM_font));
+    else
+	safe_strncpy(PM_font, "Helvetica", sizeof(PM_font));
     free(newfont);
 
     (void) rc;
@@ -1210,20 +1208,15 @@ PM_enhanced_open(
 	/* Select font */
 	/* FIXME: It would be nice to have fractional font sizes
 	          for super- and subscripts. */
-	/* FIXME: sometimes fontname has zero length */
 	if ((fontname != NULL) && strlen(fontname) > 0) {
 	    fontstring = malloc(strlen(fontname) + 16);
 	    sprintf(fontstring, "%s,%i", fontname, (int)fontsize);
-	} else if (PM_font != NULL) {
-	    fontstring = malloc(strlen(PM_font) + 16);
-	    sprintf( fontstring, "%s,%i", PM_font, (int)fontsize );
 	} else {
 	    fontstring = malloc(16);
 	    sprintf(fontstring, ",%i", (int)fontsize);
 	}
 	PM_set_font(fontstring);
 	free(fontstring);
-	PM_query_font();
 
 	/* Scale fractional font height to vertical units of display */
 	/* FIXME:
@@ -1327,6 +1320,7 @@ PM_enhanced_put_text(unsigned int x, unsigned int y, const char *str)
 {
     char *original_string = (char *)str;
     unsigned int pass, num_passes;
+    char *saved_font;
 
     /* If no enhanced text processing is needed, we can use the plain  */
     /* vanilla put_text() routine instead of this fancy recursive one. */
@@ -1338,7 +1332,7 @@ PM_enhanced_put_text(unsigned int x, unsigned int y, const char *str)
     /* Set up global variables needed by enhanced_recursion() */
     ENHpm_opened_string = FALSE;
     enhanced_fontscale = 1.0;
-    strncpy(enhanced_escape_format,"%c",sizeof(enhanced_escape_format));
+    safe_strncpy(enhanced_escape_format, "%c", sizeof(enhanced_escape_format));
 
     /* Tell the terminal to move the drawing position */
     /* we store the current position to PM_x and PM_y */
@@ -1356,12 +1350,12 @@ PM_enhanced_put_text(unsigned int x, unsigned int y, const char *str)
 	ENHpm_sizeonly = TRUE;
     }
 
-    for (pass = 1; pass <= num_passes; pass++) {
+    /* Update PM_font and PM_fontsize:
+       the font might have been changed from the default. */
+    PM_query_font();
+    saved_font = strdup(PM_font);
 
-	/* This will restore the default font
-	   and update PM_font and PM_fontsize */
-	PM_set_font(NULL);
-	PM_query_font();
+    for (pass = 1; pass <= num_passes; pass++) {
 
 	/* Set the recursion going. We say to keep going until a
 	* closing brace, but we don't really expect to find one.
@@ -1371,7 +1365,7 @@ PM_enhanced_put_text(unsigned int x, unsigned int y, const char *str)
 	* we get stuck in an infinite loop) and try again.
 	*/
 	while (*(str = enhanced_recursion((char *)str, TRUE,
-			"", PM_fontsize,
+			saved_font, PM_fontsize,
 			0.0, TRUE, TRUE, 0))) {
 	    (term->enhanced_flush)();
 
@@ -1393,6 +1387,7 @@ PM_enhanced_put_text(unsigned int x, unsigned int y, const char *str)
 	    str = original_string;
 	}
     }
+    free(saved_font);
 
     /* restore default font */
     PM_set_font(NULL);

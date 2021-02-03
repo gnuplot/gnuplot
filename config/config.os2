@@ -665,7 +665,6 @@
 # define isblank(x) isspace(x)
 # define isinf(x) (fpclassify(x) == FP_INFINITE)
 # define atoll _atoll
-# define strlcpy(a, b, c) strcpy(a, b)
 # define round(x) ((x >= 0.0) ? floor(x + 0.5) : ceil(x - 0.5))
 # define lround(a) (long)(round(a))
 # define llround(a) (long long)(round(a))
