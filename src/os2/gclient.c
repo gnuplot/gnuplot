@@ -93,6 +93,7 @@
 #define INCL_DOSQUEUES
 #define INCL_WINSWITCHLIST
 #define INCL_GPIPRIMITIVES
+#define INCL_GPILCIDS
 #include <os2.h>
 /* Warning: the OS/2 headers already define LT_DEFAULT
             which conflicts with our definition. */
@@ -1925,12 +1926,30 @@ SelectFont(HPS hps, char *szFontNameSize)
     fat.fsFontUse       = FATTR_FONTUSE_OUTLINE |
 	FATTR_FONTUSE_TRANSFORMABLE;
 
-    if (bBold)
-	fat.fsSelection |= FATTR_SEL_BOLD;
-    if (bItalic)
-	fat.fsSelection |= FATTR_SEL_ITALIC;
+    if (bBold || bItalic) {
+	// obtain face name using an OS/2 API
+	FACENAMEDESC pfndFaceAttrs;
+	ULONG len;
 
-    strlcpy(fat.szFacename, szFontName, FACESIZE);
+	/* initialize face name description structure for
+	   weight class, normal width, and italics */
+	pfndFaceAttrs.usSize = sizeof(FACENAMEDESC);
+	pfndFaceAttrs.usWeightClass = bBold ? FWEIGHT_BOLD : 0;
+	pfndFaceAttrs.usWidthClass = FWIDTH_NORMAL;
+	pfndFaceAttrs.usReserved = 0;
+	pfndFaceAttrs.flOptions = bItalic ? FTYPE_ITALIC : 0;
+
+	len = GpiQueryFaceString(hps, szFontName, &pfndFaceAttrs,
+	                         FACESIZE, fat.szFacename);
+	if (strcmp(szFontName, fat.szFacename) == 0) {
+	    DEBUG_FONT(("SelectFont: simulate %s %s font",
+	                bBold ? "bold":"", bItalic ? "italic":""));
+	    // there is no bold or italic variant of the font: simulate
+	    fat.fsSelection = (bBold ? FATTR_SEL_BOLD : 0) | (bItalic ? FATTR_SEL_ITALIC : 0);
+	}
+    } else {
+	strlcpy(fat.szFacename, szFontName, FACESIZE);
+    }
 
     if (tabFont[0].name != NULL)
 	free(tabFont[0].name);
@@ -2085,12 +2104,30 @@ SwapFont(HPS hps, char *szFNS)
 	    fat.fsFontUse       = FATTR_FONTUSE_OUTLINE |
 		FATTR_FONTUSE_TRANSFORMABLE;
 
-	    if (bBold)
-		fat.fsSelection |= FATTR_SEL_BOLD;
-	    if (bItalic)
-		fat.fsSelection |= FATTR_SEL_ITALIC;
+	    if (bBold || bItalic) {
+		// obtain face name using an OS/2 API
+		FACENAMEDESC pfndFaceAttrs;
+		ULONG len;
 
-	    strlcpy(fat.szFacename, szFontName, FACESIZE);
+		/* initialize face name description structure for
+		   weight class, normal width, and italics */
+		pfndFaceAttrs.usSize = sizeof(FACENAMEDESC);
+		pfndFaceAttrs.usWeightClass = bBold ? FWEIGHT_BOLD : 0;
+		pfndFaceAttrs.usWidthClass = FWIDTH_NORMAL;
+		pfndFaceAttrs.usReserved = 0;
+		pfndFaceAttrs.flOptions = bItalic ? FTYPE_ITALIC : 0;
+
+		len = GpiQueryFaceString(hps, szFontName, &pfndFaceAttrs,
+		                         FACESIZE, fat.szFacename);
+		if (strcmp(szFontName, fat.szFacename) == 0) {
+		    DEBUG_FONT(("SwapFont: simulate %s %s font",
+		                bBold ? "bold":"", bItalic ? "italic":""));
+		    // there is no bold or italic variant of the font: simulate
+		    fat.fsSelection = (bBold ? FATTR_SEL_BOLD : 0) | (bItalic ? FATTR_SEL_ITALIC : 0);
+		}
+	    } else {
+		strlcpy(fat.szFacename, szFontName, FACESIZE);
+	    }
 
 	    // Use the default encoding for symbol fonts for all encodings but UTF-8
 	    if (codepage != 1208) { // not UTF-8
