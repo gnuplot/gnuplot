@@ -1324,7 +1324,8 @@ PM_enhanced_put_text(unsigned int x, unsigned int y, const char *str)
 
     /* If no enhanced text processing is needed, we can use the plain  */
     /* vanilla put_text() routine instead of this fancy recursive one. */
-    if (ignore_enhanced_text || !strpbrk(str, "{}^_@&~")) {
+    if (ignore_enhanced_text || 
+	(!strpbrk(str, "{}^_@&~") && !contains_unicode(str))) {
 	PM_put_text(x,y,str);
 	return;
     }
