@@ -122,12 +122,12 @@
 
 /*==== m i s c e l l a n e o u s =============================================*/
 
-/* February 2008, according to the gnuplot bugs report #1773922
+/* Bug report #570  (Feb. 2008)
    The standard font selection dialog is somehow broken after saving options.
-   Use the font palette dialog instead.
+   (Feb. 2021) For newer OS/2 versions, this seems no longer be the case, but
+   you can still use the font palette dialog instead.
 */
-/* #define STANDARD_FONT_DIALOG 1 */
-#undef STANDARD_FONT_DIALOG
+#define STANDARD_FONT_DIALOG 1
 
 /*==== d e b u g g i n g =====================================================*/
 
@@ -366,7 +366,7 @@ static void     ReadGnu(void*);
 static void     SetFillStyle(HPS hps, int style);
 static HPS      InitScreenPS(void);
 static APIRET   BufRead(HFILE, void*, int, PULONG);
-static int      GetNewFont(HWND, HPS);
+static BOOL     GetNewFont(HWND, HPS);
 void            SigHandler(int);
 static void     FontExpand(char *);
 #ifdef PM_KEEP_OLD_ENHANCED_TEXT
@@ -3470,52 +3470,79 @@ BufRead(HFILE hfile, void *buf, int nBytes, ULONG *pcbR)
 /*
 ** Get a new font using standard font dialog
 */
-int
+BOOL
 GetNewFont(HWND hwnd, HPS hps)
 {
-    static FONTDLG pfdFontdlg;      /* Font dialog info structure */
-    static int i1 =1;
-    static int iSize;
+    static FONTDLG pfdFontdlg; /* Font dialog info structure */
+    int iSize;
     char szPtList[64];
-    HWND hwndFontDlg;     /* Font dialog window handle */
-    char szFamilyname[FACESIZE];
+    HWND hwndFontDlg;          /* Font dialog window handle */
+    char szFamilyName[FACESIZE];
+    char * p, * q;
+    BOOL bold = FALSE;
+    BOOL italic = FALSE;
 
-    if (i1) {
-        strcpy(pfdFontdlg.fAttrs.szFacename, strchr(szFontNameSize, '.') + 1);
-        strcpy(szFamilyname, strchr(szFontNameSize, '.') + 1);
-        sscanf(szFontNameSize, "%d", &iSize);
-        memset(&pfdFontdlg, 0, sizeof(FONTDLG));
+    // determine font size
+    iSize = atoi(szFontNameSize);
 
-        pfdFontdlg.cbSize = sizeof(FONTDLG);
-        pfdFontdlg.hpsScreen = hps;
-	/*   szFamilyname[0] = 0; */
-        pfdFontdlg.pszFamilyname = szFamilyname;
-        pfdFontdlg.usFamilyBufLen = FACESIZE;
-        pfdFontdlg.fl = FNTS_HELPBUTTON |
-	    FNTS_CENTER | FNTS_VECTORONLY |
-	    FNTS_OWNERDRAWPREVIEW;
-        pfdFontdlg.clrFore = CLR_BLACK;
-        pfdFontdlg.clrBack = CLR_WHITE;
-        pfdFontdlg.usWeight = FWEIGHT_NORMAL;
-        pfdFontdlg.fAttrs.usCodePage = codepage;
-        pfdFontdlg.fAttrs.usRecordLength = sizeof(FATTRS);
+    // determine family name
+    p = strchr(szFontNameSize, '.');
+    if (p == NULL)
+	strlcpy(szFamilyName, szFontNameSize, FACESIZE);
+    else
+	strlcpy(szFamilyName, p + 1, FACESIZE);
+    if (szFamilyName[0] == NUL) {
+	// apply default font
+	strlcpy(szFamilyName, szInitialFontName, FACESIZE);
     }
+
+    // determine attributes, strip
+    p = strstr(szFamilyName, ":Bold");
+    if (p == NULL)
+	p = strstr(szFamilyName, " Bold");
+    q = strstr(szFamilyName, ":Italic");
+    if (q == NULL)
+	q = strstr(szFamilyName, " Italic");
+    bold = (p != NULL);
+    italic = (q != NULL);
+    if (p != NULL) *p = NUL;
+    if (q != NULL) *q = NUL;
+
+    DEBUG_FONT(("Font dialog init: %ipt \"%s\"%s%s", iSize, 	szFamilyName,
+		bold ? ", bold" : "", italic ? ", italic" : ""));
+
+    memset(&pfdFontdlg, 0, sizeof(FONTDLG));
+    pfdFontdlg.cbSize = sizeof(FONTDLG);
+    pfdFontdlg.hpsScreen = hps;
+    pfdFontdlg.pszFamilyname = szFamilyName;
+    pfdFontdlg.usFamilyBufLen = FACESIZE;
+    pfdFontdlg.fl = FNTS_HELPBUTTON |
+	FNTS_CENTER | FNTS_VECTORONLY;
+    pfdFontdlg.flType = FTYPE_ROUNDED_DONT_CARE | FTYPE_OBLIQUE_DONT_CARE |
+	(italic ? FTYPE_ITALIC : 0);
+    pfdFontdlg.clrFore = CLR_BLACK;
+    pfdFontdlg.clrBack = CLR_WHITE;
+    pfdFontdlg.usWeight = bold ? FWEIGHT_BOLD : FWEIGHT_NORMAL;
+    pfdFontdlg.fAttrs.usRecordLength = sizeof(FATTRS);
+    pfdFontdlg.fAttrs.usCodePage = codepage;
+
     sprintf(szPtList, "%d 8 10 12 14 18 24", iSize);
     pfdFontdlg.pszPtSizeList = szPtList;
-    pfdFontdlg.fxPointSize = MAKEFIXED(iSize,0);
+    pfdFontdlg.fxPointSize = MAKEFIXED(iSize, 0);
     hwndFontDlg = WinFontDlg(HWND_DESKTOP, hwnd, &pfdFontdlg);
-    if (i1) {
-        pfdFontdlg.fl = FNTS_HELPBUTTON |
-	    FNTS_CENTER | FNTS_VECTORONLY |
-	    FNTS_INITFROMFATTRS;
-        i1=0;
+
+    if (hwndFontDlg && (pfdFontdlg.lReturn == DID_OK)) {
+	bold = (pfdFontdlg.usWeight == FWEIGHT_BOLD);
+	italic = (pfdFontdlg.flType & FTYPE_ITALIC);
+	iSize = FIXEDINT(pfdFontdlg.fxPointSize);
+	sprintf(szFontNameSize, "%d.%s%s%s",
+		iSize, pfdFontdlg.pszFamilyname,
+		bold ? ":Bold" :  "", italic ? ":Italic" : "");
+	DEBUG_FONT(("Font selection: %s", szFontNameSize));
+	return TRUE;
+    } else {
+	return FALSE;
     }
-    if (hwndFontDlg &&(pfdFontdlg.lReturn == DID_OK)) {
-        iSize = FIXEDINT(pfdFontdlg.fxPointSize);
-        sprintf(szFontNameSize, "%d.%s", iSize, pfdFontdlg.fAttrs.szFacename);
-        return 1;
-    } else
-	return 0;
 }
 
 #else
@@ -3523,7 +3550,7 @@ GetNewFont(HWND hwnd, HPS hps)
 /*
 ** Get a new font using standard font palette
 */
-int
+BOOL
 GetNewFont(HWND hwnd, HPS hps)
 {
     HOBJECT hObject;
@@ -3532,8 +3559,8 @@ GetNewFont(HWND hwnd, HPS hps)
 
     hObject = WinQueryObject("<WP_FNTPAL>");
     if (hObject != NULLHANDLE)
-        fSuccess = WinOpenObject(hObject, ulView, TRUE);
-    return fSuccess ? 1 : 0;
+	fSuccess = WinOpenObject(hObject, ulView, TRUE);
+    return fSuccess;
 }
 
 #endif /* STANDARD_FONT_DIALOG */
