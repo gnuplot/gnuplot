@@ -3049,7 +3049,7 @@ ReadGnu(void* arg)
 	    {
 		/* Note: use of uchar limits the size of the 'virtual'
 			  palette to 256 entries. (see also RGB_PALETTE_SIZE) */
-		unsigned char c;
+		unsigned char c = 0;
 
 		BufRead(hRead, &c, sizeof(c), &cbR);
 		// FIXME: need range checking here
@@ -3102,7 +3102,7 @@ ReadGnu(void* arg)
 	    case 'f':  // old filled polygon - without fill style
 	    {
 		int points, x,y, i;
-		LONG curr_color;
+		LONG curr_color = 0;
 		POINTL p;
 
 		FLUSHPATH(hps, "GR_FILLED_POLYGON");

@@ -487,7 +487,7 @@
 /* #undef MSDOS */
 
 /* Define to disable terminals that depend on code in bitmap.c */
-#define NO_BITMAP_SUPPORT 1
+/* #undef NO_BITMAP_SUPPORT */
 
 /* Define to 1 if your C compiler doesn't accept -c and -o together. */
 /* #undef NO_MINUS_C_MINUS_O */

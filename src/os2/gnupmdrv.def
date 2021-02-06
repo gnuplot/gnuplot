@@ -1,13 +1,10 @@
-NAME        GnuShell WINDOWAPI
+NAME        gnupmdrv
+WINDOWAPI
 
-DESCRIPTION 'Gnuplot shell'
+DESCRIPTION 'gnuplot PM driver'
 
 CODE        MOVEABLE
 DATA        MOVEABLE MULTIPLE
 
-HEAPSIZE  4096
 STACKSIZE 98304
 
-
-
-    

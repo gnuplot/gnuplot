@@ -1,15 +1,17 @@
 #
-# GNUPLOT Makefile for use on OS/2 2.x (and above)
-# using emx 0.9 (and above) and GNU make
+# GNUPLOT Makefile for use on OS/2
+#  either using EMX 0.9 and GNU make,
+#  or using GCC and kLIBC
 #
-# We note that builds using newer gcc based on kLIBC are not supported yet.
+# To compile gnuplot, run the following command in the gnuplot\src directory:
 #
-# To compile gnuplot, run the following command in directory gnuplot\src:
-#	make -f ..\config\makefile.os2
+#	make -f ..\config\makefile.os2 MAKESHELL=cmd.exe
 #
+# Note the MAKESHELL argument, which is required for GCC/kLIBC.
 
 # The following tools and libraries are recommended/required to use this
-# makefile out of the box:
+# makefile out of the box with EMX:
+#
 #	- GNU make, e.g. http://hobbes.nmsu.edu/pub/os2/dev/util/make-3.81beta3-r2-bin.zip
 #	- IPFC included in the OS/2 developer kit
 #	- emtex is only required for some parts of the documentation
@@ -23,10 +25,24 @@
 #
 #	- GBM binaries for image conversion, http://hobbes.nmsu.edu/download/pub/os2/apps/graphics/gbmos2_176_bin.zip
 #
+# With GCC/kLIBC we recommend installing the following libraries and development packages
+# using yum/ANPM:
+#
+#	gdlib, zlib, freetype, libpng, libjpeg-turbo,
+#	lua, libiconv,
+# 	cairo, pango, pangocairo, libglib, libobject, libwebp,
+#	exceptq
+#
+
+# We aim to distinguish between the original EMX/GCC and the newer GCC/kLIBC
+# using the compiler version and assume that 3.2.1 was the last to rely solely
+# on EMX libs.
+ISKLIBC := $(shell gcc -dumpversion | gawk -F. "{print ($$3+100*($$2+100*$$1)) >= 30202}")
 
 # We depend on using cmd.exe (or a compatible one) and the
-# standard OS/2 tool set. (additionally we use 'cat')
+# standard OS/2 tool set. (additionally we use 'cat', 'awk')
 SHELL=cmd.exe
+#MAKESHELL=cmd.exe
 
 #
 # ***************** Begin of Configuration section ***************************
@@ -38,7 +54,9 @@ SHELL=cmd.exe
 
 # X11 driver
 # requires installed XFree86 libraries and headers
+ifeq ($(ISKLIBC),0)
 X11=1
+endif
 
 # GIF, PNG, JPEG device drivers
 # Requires gd library (not part of gnuplot)
@@ -63,12 +81,26 @@ ICONV=1
 # cairo/pango terminals:  pdfcairo, pngcairo, cairolatex
 # requires pango / cairo
 # Note that cairo/pango are only available for newer gcc/kLIBC, not EMX.
-#CAIRO=1
+ifeq ($(ISKLIBC),1)
+CAIRO=1
+endif
+
+# webp terminal
+# requires CAIRO and webp, webdemux
+# Note that is only available for newer gcc/kLIBC, not EMX.
+ifeq ($(ISKLIBC),1)
+WEBP=1
+endif
 
 # PDF device driver
 # requires PDFlib or PDFlib-Lite
 # Note that you also need to uncomment the inclusion in term.h
 #PDF=1
+
+# Terminals based on the bitmap.c code
+# These are mostly old printers, but also include the pnm, sixel, and block
+# terminals.
+BITMAP=1
 
 # VESAkit support
 # requires SVGA- and VESA Kit (not part of gnuplot)
@@ -110,6 +142,12 @@ IMAGEHELP=1
 
 .PHONY: all runtime alldocs demo binaries infomin clean veryclean
 .SUFFIXES: .c .trm .o .obj .exe .rc .res .dll
+
+ifeq ($(ISKLIBC),1)
+$(info This seems to be a GCC with kLIBC!)
+else
+$(info This seems to be EMX/GCC!)
+endif
 
 # A reasonable default
 default: runtime
@@ -186,16 +224,25 @@ LIBS =
 # Choose flags suitable for a debugging or for a production build
 #
 WARNFLAGS = -Wall -Wno-comment
+ifeq ($(ISKLIBC),1)
+WARNFLAGS += -Wno-pointer-sign -Wno-unused-but-set-variable
+endif
 ifdef DEBUG
 CFLAGS  = -g $(OS2FLAGS) $(EMXSPECIFIC) $(WARNFLAGS) -O0 -Zmt
-LDFLAGS  = -g -Zmt -Zcrtdll -Zbsd-signals
+LDFLAGS  = -g -Zmt -Zcrtdll
 CFLAGS2 = -g $(OS2FLAGS) $(EMXSPECIFIC) $(WARNFLAGS) -O0 -Zmt -Zomf
-LDFLAGS2 = -g -Zmt -Zcrtdll -Zomf -Zbsd-signals
+LDFLAGS2 = -g -Zmt -Zcrtdll -Zomf
 else
 CFLAGS  = $(OS2FLAGS) $(EMXSPECIFIC) -O4 $(WARNFLAGS) -Zmt
-LDFLAGS  = -s -Zmt -Zcrtdll -Zbsd-signals
+LDFLAGS  = -s -Zmt -Zcrtdll
 CFLAGS2 = $(OS2FLAGS) $(EMXSPECIFIC) -O4 $(WARNFLAGS) -Zmt -Zomf
-LDFLAGS2 = -s -Zmt -Zcrtdll -Zomf -Zbsd-signals
+LDFLAGS2 = -s -Zmt -Zcrtdll -Zomf
+endif
+ifeq ($(ISKLIBC),0)
+CFLAGS   += -Zbsd-signals
+LDFLAGS  += -Zbsd-signals
+CFLAGS2  += -Zbsd-signals
+LDFLAGS2 += -Zbsd-signals
 endif
 
 #
@@ -226,6 +273,10 @@ ifdef CAIRO
   TERMFLAGS += -DHAVE_CAIROEPS
   TERMLIBS  += -lcairo -lpangocairo-1.0 -lpango-1.0 -lgobject-2.0 -lgmodule-2.0 -lfreetype -lglib-2.0 -lintl -lpthread
   CAIROOBJS = gp_cairo.$(O) gp_cairo_helpers.$(O)
+ifdef WEBP
+  TERMFLAGS += -DHAVE_WEBP
+  TERMLIBS  += -lwebp -lwebpmux
+endif
 endif
 
 ifdef PDF
@@ -242,13 +293,18 @@ endif
 # LUA support
 ifdef LUA
   TERMFLAGS += -DHAVE_LUA
-  TERMLIBS  += -lliblua
+  TERMLIBS  += -llua
   LUA_HELP  =  $(D)\gnuplot-tikz.help
 endif
 
 # X11 support
 ifdef X11
   TERMFLAGS += -DX11 -DX11_DRIVER_DIR=\".\"
+endif
+
+# BITMAP support
+ifndef BITMAP
+  TERMFLAGS += -DNO_BITMAP_SUPPORT
 endif
 
 # MOUSE support
@@ -346,7 +402,7 @@ gnuplot.exe: $(OBJS)
 $(OS2DIR)\gnupmdrv.$(O2): $(OS2DIR)\gnupmdrv.c $(OS2DIR)\gnupmdrv.h $(OS2DIR)\dialogs.h	config.h
 $(OS2DIR)\gclient.$(O2):  $(OS2DIR)\gclient.c  $(OS2DIR)\gnupmdrv.h $(OS2DIR)\dialogs.h	config.h \
 	$(OS2DIR)\pm_msgs.h gpexecute.h mousecmn.h mouse.h
-$(OS2DIR)\dialogs.$(O2):  $(OS2DIR)\dialogs.c  $(OS2DIR)\gnupmdrv.h $(OS2DIR)\dialogs.h	config.h  
+$(OS2DIR)\dialogs.$(O2):  $(OS2DIR)\dialogs.c  $(OS2DIR)\gnupmdrv.h $(OS2DIR)\dialogs.h	config.h
 $(OS2DIR)\print.$(O2):    $(OS2DIR)\print.c    $(OS2DIR)\gnupmdrv.h $(OS2DIR)\dialogs.h	config.h
 $(OS2DIR)\gpexecute.$(O2): gpexecute.c gpexecute.h mousecmn.h config.h
 

@@ -248,21 +248,41 @@ PM_init()
 	rc = DosCreateEventSem(semname, &hev, 1, 0);
 	if (rc != 0)
 	    int_error(NO_CARET, "Cannot create semaphore !\n");
+#ifndef __KLIBC__
 	{
 	    int spawnmode = P_SESSION | P_DEFAULT;
-	    if (PM_optargs)
+	    if (PM_optargs != 0)
 		spawnmode |= P_UNRELATED;
 	    pid = _spawnl(spawnmode, PM_path, PM_path, tempname, PM_opts, NULL);
 	    if (pid == -1)
 		int_error(NO_CARET, "Cannot spawn gnupmdrv.exe !\n");
 	}
+#else
+	/* kLIBC: spawn() and friends cannot execute WINAPI applications from WINCOMPAT
+	          apps. Use system() instead as a work-around. */
+	{
+	    char cmd[1024];
+	    int ierr;
+
+	    sprintf(cmd, "cmd /c \"start %s %s %s\"", PM_path, PM_opts, tempname);
+	    FPRINTF((stderr, "system command: %s\n", cmd));
+	    ierr = system(cmd);
+	    if (ierr == -1) // FIXME: correct return code?
+		int_error(NO_CARET, "Cannot start gnupmdrv.exe (%s)!\n", PM_path);
+	    DosSleep(200);
+	}
+#endif
 	DosGetInfoBlocks(&tib, &pib);
-	DosWaitEventSem(hev, 10000);
+	/* Wait for gnupmdrv to signal that the pipe is ready... */
+	rc = DosWaitEventSem(hev, 10000);
 	DosCloseEventSem(hev);
+	if (rc != 0)
+	    int_error(NO_CARET, "Cannot wait for semaphore: rc = %x!\n", rc);
+
 	PM_pipe = fopen(pipename, "r+b");
-	if (PM_pipe == NULL) {
-	    int_error(NO_CARET, "Cannot open pipe to gnupmdrv.exe !\n");
-	} else if (PM_termmode == 0)
+	if (PM_pipe == NULL)
+	    int_error(NO_CARET, "Cannot open pipe to gnupmdrv!\n");
+	if (PM_termmode == 0)
 	    PM_savepipe = PM_pipe;
 	setvbuf(PM_pipe, buffer, _IOFBF, 1024);
 	pid = pib->pib_ulpid;
@@ -1324,7 +1344,7 @@ PM_enhanced_put_text(unsigned int x, unsigned int y, const char *str)
 
     /* If no enhanced text processing is needed, we can use the plain  */
     /* vanilla put_text() routine instead of this fancy recursive one. */
-    if (ignore_enhanced_text || 
+    if (ignore_enhanced_text ||
 	(!strpbrk(str, "{}^_@&~") && !contains_unicode(str))) {
 	PM_put_text(x,y,str);
 	return;

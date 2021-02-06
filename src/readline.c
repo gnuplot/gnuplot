@@ -61,6 +61,9 @@
 #ifdef WGP_CONSOLE
 #include "win/winmain.h"
 #endif
+#ifdef __KLIBC__
+#include <sys/termio.h>
+#endif
 
 /*
  * adaptor routine for gnu libreadline
@@ -306,8 +309,11 @@ static int msdos_getch();
 #endif /* MSDOS or _WIN32 */
 
 #ifdef OS2
-# if defined( special_getc )
-#  undef special_getc()
+# ifdef __KLIBC__
+#  include <conio.h>
+# endif
+# if defined(special_getc)
+#  undef special_getc
 # endif				/* special_getc */
 # define special_getc() os2_getch()
 static int msdos_getch(void);
@@ -1483,6 +1489,11 @@ msdos_getch()
     int ch = getkey();
     c = (ch & 0xff00) ? 0 : ch & 0xff;
 #elif defined (OS2)
+# ifdef __KLIBC__
+    if (interactive)
+	c = getch();
+    else
+# endif
     c = getc(stdin);
 #else /* not OS2, not DJGPP*/
 # if defined (USE_MOUSE)
@@ -1497,6 +1508,11 @@ msdos_getch()
 #ifdef DJGPP
 	c = ch & 0xff;
 #elif defined(OS2)
+# ifdef __KLIBC__
+	if (interactive)
+	    c = getch();
+	else
+# endif
 	c = getc(stdin);
 #else /* not OS2, not DJGPP */
 # if defined (USE_MOUSE)
