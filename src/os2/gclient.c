@@ -2504,7 +2504,9 @@ ReadGnu(void* arg)
 
                     DosEnterCritSec();
                     len = (len + sizeof(int) - 1) / sizeof(int);
-                    if (len == 0) len = 1; /*?? how about read */
+		    /* Data always includes a terminating NUL, hence len>0.
+		       So this check is somewhat paranoid: */
+                    if (len == 0) len = 1;
                     str = malloc(len * sizeof(int));
 		    *str = '\0';
                     DosExitCritSec();

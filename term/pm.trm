@@ -502,7 +502,7 @@ PM_reset_opts()
     len = strlen(PM_opts) + 1;
     fwrite(&len, sizeof(int), 1, PM_pipe);
     fwrite(PM_opts, 1, len, PM_pipe);
-    for (len = sizeof(int) - len % sizeof(int); len > 0; len--) {
+    for (len = (sizeof(int) - len % sizeof(int)) % sizeof(int); len > 0; len--) {
 	/* pad rest of int with zeros */
 	putc(NUL, PM_pipe);
     }
@@ -653,7 +653,7 @@ PM_graphics()
 	len = strlen(PM_def_font) + 1;
 	fwrite(&len, sizeof(int), 1, PM_pipe);
 	fwrite(PM_def_font, 1, len, PM_pipe);
-	for (len = sizeof(int) - len % sizeof(int); len > 0; len--) {
+	for (len = (sizeof(int) - len % sizeof(int)) % sizeof(int); len > 0; len--) {
 	    /* pad rest of int with zeros */
 	    putc(NUL, PM_pipe);
 	}
@@ -745,7 +745,7 @@ PM_put_text(unsigned int x, unsigned int y, const char *str)
     len = strlen(str) + 1;
     fwrite(&len, sizeof(int), 1, PM_pipe);
     fwrite(str, 1, len, PM_pipe);
-    for (len = sizeof(int) - len % sizeof(int); len > 0; len--) {
+    for (len = (sizeof(int) - len % sizeof(int)) % sizeof(int); len > 0; len--) {
 	/* pad rest of int with zeros */
 	putc(NUL, PM_pipe);
     }
@@ -802,7 +802,7 @@ PM_set_font(const char *ifont)
 	len += 1;
 	fwrite(&len, sizeof(int), 1, PM_pipe);
 	fwrite(font, 1, len, PM_pipe);
-	for (len = sizeof(int) - len % sizeof(int); len > 0; len--) {
+	for (len = (sizeof(int) - len % sizeof(int)) % sizeof(int); len > 0; len--) {
 	    /* pad rest of int with zeros */
 	    putc(NUL, PM_pipe);
 	}
@@ -906,7 +906,7 @@ PM_pause(char *str)
     len = strlen(str) + 1;
     fwrite(&len, sizeof(int), 1, PM_pipe);
     fwrite(str, 1, len, PM_pipe);
-    for (rc = sizeof(int) - len % sizeof(int); rc > 0; rc--) {
+    for (rc = (sizeof(int) - len % sizeof(int)) % sizeof(int); rc > 0; rc--) {
 	/* pad rest of int with zeros */
 	putc(NUL, PM_pipe);
     }
@@ -1261,7 +1261,7 @@ PM_enhanced_flush()
 	fwrite(&mode, sizeof(int), 1, PM_pipe);
 	fwrite(&len, sizeof(int), 1, PM_pipe);
 	fwrite(enhanced_text, 1, len, PM_pipe);
-	for (len = sizeof(int) - len % sizeof(int); len > 0; len--) {
+	for (len = (sizeof(int) - len % sizeof(int)) % sizeof(int); len > 0; len--) {
 	    /* pad rest of int with zeros */
 	    putc(NUL, PM_pipe);
 	}
