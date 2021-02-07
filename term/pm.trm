@@ -171,8 +171,124 @@ static void PM_abortplot(void);
 static void PM_query_font(void);
 
 
+/* functions for sending messages to and receiving from gnupmdrv */
+static TBOOLEAN PM_is_connected(void);
+#define PM_send_msg(a) PM_send_char(a)
+static inline void  PM_send_char(char c);
+static inline void  PM_send_int(int i);
+static inline void  PM_send_uint(unsigned i);
+static        void  PM_send_str(const char *str);
+static inline void  PM_send_buf(unsigned len, const void *buf);
+static inline void  PM_send_data(unsigned len, const void *buf);
+static inline void  PM_flush(void);
+static inline int   PM_recv_int(void);
+static inline char *PM_recv_str(void);
+
+
+static inline TBOOLEAN
+PM_is_connected(void)
+{
+    return (PM_pipe != NULL);
+}
+
+static inline void
+PM_send_char(char c)
+{
+    if (PM_pipe)
+	putc(c, PM_pipe);
+}
+
+
+static inline void
+PM_send_int(int i)
+{
+    if (PM_pipe)
+	fwrite(&i, sizeof(int), 1, PM_pipe);
+}
+
+
+static inline void
+PM_send_uint(unsigned int i)
+{
+    if (PM_pipe)
+	fwrite(&i, sizeof(unsigned int), 1, PM_pipe);
+}
+
+
+static void
+PM_send_str(const char *str)
+{
+    if (PM_pipe) {
+	/* distinguish between NULL and empty string */
+	if (str == NULL)
+	    PM_send_uint(0);
+	else {
+	    unsigned len = strlen(str) + 1;
+	    PM_send_buf(len, str);
+	    /* pad rest of int with zeros
+	       Note that this was wrong since the very early times of gnuplot. */
+	    for (len = (sizeof(int) - len % sizeof(int)) % sizeof(int); len > 0; len--)
+		putc(NUL, PM_pipe);
+	}
+    }
+}
+
+
+static inline void
+PM_send_buf(unsigned len, const void *buf)
+{
+    if (PM_pipe) {
+	fwrite(&len, sizeof(int), 1, PM_pipe);
+	fwrite(buf, 1, len, PM_pipe);
+    }
+}
+
+
+static inline void
+PM_send_data(unsigned len, const void *buf)
+{
+    if (PM_pipe)
+	fwrite(buf, 1, len, PM_pipe);
+}
+
+
+static inline void
+PM_flush(void)
+{
+    if (PM_pipe)
+	fflush(PM_pipe);
+}
+
+
+static inline int
+PM_recv_int(void)
+{
+    ULONG cbR, rc;
+    int n = 0;
+
+    rc = DosRead(fileno(PM_pipe), &n, sizeof(int), &cbR);
+    return n;
+}
+
+
+static char *
+PM_recv_str(void)
+{
+    ULONG cbR, rc;
+    char *str;
+    unsigned len;
+
+    len = PM_recv_int();
+    str = (char *) malloc(len + 1);
+    rc = DosRead(fileno(PM_pipe), str, len * sizeof(char), &cbR);
+    str[len] = NUL;
+    /* FIXME: need padding?? */
+    return str;
+}
+
+
 TERM_PUBLIC void
-PM_init()
+PM_init(void)
 {
     static char buffer[1024];
     int pid;
@@ -198,8 +314,8 @@ PM_init()
 	if (PM_pipe != NULL) {
 	    setvbuf(PM_pipe, buffer, _IOFBF, 1024);
 	    pid = pib->pib_ulpid;
-	    fwrite(&pid, 1, 4, PM_pipe);
-	    fflush(PM_pipe);
+	    PM_send_int(pid);
+	    PM_flush();
 	    /* set new options */
 /*            PM_reset_opts() ; */
 	}
@@ -294,8 +410,8 @@ PM_init()
     }
 #ifdef USE_MOUSE
     /* PM: notify gnupmdrv that this is mouse-enhanced terminal */
-    putc( GR_MOUSECAPABLE, PM_pipe ) ;
-    fflush( PM_pipe ) ;
+    PM_send_msg(GR_MOUSECAPABLE);
+    PM_flush();
     /* we catch mouseable gnupmdrv's answer in PM_query by 0xABCD */
 #endif
     PM_query();
@@ -353,7 +469,7 @@ static struct gen_table PM_opt_table[] =
 
 
 TERM_PUBLIC void
-PM_options()
+PM_options(void)
 {
     static TBOOLEAN first_init = TRUE;
     int old_termmode;
@@ -515,62 +631,53 @@ PM_options()
 
 
 static void
-PM_reset_opts()
+PM_reset_opts(void)
 {
-    int len;
-    putc(SET_OPTIONS, PM_pipe);
-    len = strlen(PM_opts) + 1;
-    fwrite(&len, sizeof(int), 1, PM_pipe);
-    fwrite(PM_opts, 1, len, PM_pipe);
-    for (len = sizeof(int) - len % sizeof(int); len > 0; len--) {
-	/* pad rest of int with zeros */
-	putc(NUL, PM_pipe);
-    }
-    fflush(PM_pipe);
+    PM_send_msg(SET_OPTIONS);
+    PM_send_str(PM_opts);
+    PM_flush();
     PM_must_reset_opts = FALSE;
 }
 
 
 static void
-PM_query()
+PM_query(void)
 {
-    int rc;
-    ULONG cbR;
-    putc(GR_QUERY, PM_pipe);
-    fflush(PM_pipe);
-    rc = DosRead(fileno(PM_pipe), &term->h_char, sizeof(int), &cbR);
+    PM_send_msg(GR_QUERY);
+    PM_flush();
+
+    term->h_char = PM_recv_int();
     if (term->h_char == 0xABCD) {
 	/* PM we received greetings from a mouseable gnupmdrv */
 	mouseGnupmdrv = 1; /*  thus set mouseGnupmdrv on and reread h_char */
-	rc = DosRead(fileno(PM_pipe), &term->h_char, sizeof(int), &cbR) ;
+	term->h_char = PM_recv_int();
     }
-    rc = DosRead(fileno(PM_pipe), &term->v_char, sizeof(int), &cbR);
-    (void) rc;
+    term->v_char = PM_recv_int();
 }
 
 
 # ifdef USE_MOUSE
 /* update menu items in PM terminal */
 void
-PM_update_menu_items()
+PM_update_menu_items(void)
 {
     /* connected to a mouseable gnupmdrv */
-    if ((PM_pipe != NULL) && (mouseGnupmdrv)) {
+    if (PM_is_connected() && (mouseGnupmdrv)) {
 	struct t_gpPMmenu gpPMmenu;
 
 	PM_set_gpPMmenu(&gpPMmenu);
-	putc(SET_MENU, PM_pipe);
-	fwrite(&gpPMmenu, sizeof(gpPMmenu), 1, PM_pipe);
+	PM_send_msg(SET_MENU);
+	PM_send_data(sizeof(gpPMmenu), &gpPMmenu);
     }
 }
 #endif
 
 
 TERM_PUBLIC void
-PM_reset()
+PM_reset(void)
 {
-    putc(GR_RESET, PM_pipe);
-    fflush(PM_pipe);
+    PM_send_msg(GR_RESET);
+    PM_flush();
     term_force_init = FALSE;
     if (PM_termmode > 0) {
 	fclose(PM_pipe);
@@ -580,28 +687,28 @@ PM_reset()
 
 
 TERM_PUBLIC void
-PM_suspend()
+PM_suspend(void)
 {
-    putc(GR_SUSPEND, PM_pipe);
-    fflush(PM_pipe);
+    PM_send_msg(GR_SUSPEND);
+    PM_flush();
 }
 
 
 TERM_PUBLIC void
-PM_resume()
+PM_resume(void)
 {
-    putc(GR_RESUME, PM_pipe);
-    fflush(PM_pipe);
+    PM_send_msg(GR_RESUME);
+    PM_flush();
 }
 
 
 TERM_PUBLIC void
-PM_text()
+PM_text(void)
 {
-    fflush(PM_pipe);
+    PM_flush();
     if (PM_mode != SET_TEXT) {
-	putc(SET_TEXT, PM_pipe);
-	fflush(PM_pipe);
+	PM_send_msg(SET_TEXT);
+	PM_flush();
 #if 0
 	keep_term_initialised = term_initialised ;
 	term_initialised = FALSE ; /* need to force init */
@@ -620,11 +727,11 @@ PM_text()
 
 
 TERM_PUBLIC void
-PM_graphics()
+PM_graphics(void)
 {
     static int last_encoding = -999;
-    putc(SET_GRAPHICS, PM_pipe);
-    fflush(PM_pipe);
+    PM_send_msg(SET_GRAPHICS);
+    PM_flush();
 #ifdef USE_MOUSE
     PM_update_menu_items();
 #endif
@@ -659,25 +766,19 @@ PM_graphics()
 	    default: /*  S_ENC_DEFAULT, ... */
 	                          cp = 0; break;
 	};
-	putc(SET_SPECIAL, PM_pipe);
-	putc(SET_SPECIAL_CODEPAGE, PM_pipe); /* set codepage */
-	fwrite(&cp, sizeof(int), 1, PM_pipe);
-	fflush(PM_pipe);
+	PM_send_msg(SET_SPECIAL);
+	PM_send_msg(SET_SPECIAL_CODEPAGE); /* set codepage */
+	PM_send_int(cp);
+	PM_flush();
+
 	last_encoding = encoding;
     }
     { /* update the default font */
-	int len;
-
-	putc(SET_SPECIAL, PM_pipe);
-	putc(SET_SPECIAL_FONT, PM_pipe); /* set default font */
-	len = strlen(PM_def_font) + 1;
-	fwrite(&len, sizeof(int), 1, PM_pipe);
-	fwrite(PM_def_font, 1, len, PM_pipe);
-	for (len = sizeof(int) - len % sizeof(int); len > 0; len--) {
-	    /* pad rest of int with zeros */
-	    putc(NUL, PM_pipe);
+	PM_send_msg(SET_SPECIAL);
+	PM_send_msg(SET_SPECIAL_FONT); /*  set default font */
+	PM_send_str(PM_def_font);
+	PM_flush();
 	}
-    }
     PM_query();
     PM_mode = SET_GRAPHICS;
 }
@@ -688,11 +789,9 @@ PM_move(unsigned int x, unsigned int y)
 {
     if (PM_must_abort)
 	PM_abortplot();
-
-    putc(GR_MOVE, PM_pipe);
-    fwrite(&x, sizeof(int), 1, PM_pipe);
-    fwrite(&y, sizeof(int), 1, PM_pipe);
-
+    PM_send_msg(GR_MOVE);
+    PM_send_uint(x);
+    PM_send_uint(y);
 #ifndef PM_OLD_ENHANCED_TEXT
     /* save current position, only needed for enhanced text */
     PM_x = x;
@@ -706,17 +805,17 @@ PM_vector(unsigned int x, unsigned int y)
 {
     if (PM_must_abort)
 	PM_abortplot();
-    putc(GR_DRAW, PM_pipe);
-    fwrite(&x, sizeof(int), 1, PM_pipe);
-    fwrite(&y, sizeof(int), 1, PM_pipe);
+    PM_send_msg(GR_DRAW);
+    PM_send_uint(x);
+    PM_send_uint(y);
 }
 
 
 TERM_PUBLIC void
 PM_linetype(int lt)
 {
-    putc(SET_LINE, PM_pipe);
-    fwrite(&lt, sizeof(int), 1, PM_pipe);
+    PM_send_msg(SET_LINE);
+    PM_send_int(lt);
 }
 
 
@@ -724,8 +823,8 @@ TERM_PUBLIC void
 PM_dashtype(int dt, t_dashtype *custom_dash_pattern)
 {
     if (dt != DASHTYPE_CUSTOM) {  // cannot handle custom dash patterns
-	putc(SET_DASH, PM_pipe);
-	fwrite(&dt, sizeof(int), 1, PM_pipe);
+	PM_send_msg(SET_DASH);
+	PM_send_int(dt);
     }
 }
 
@@ -733,8 +832,8 @@ PM_dashtype(int dt, t_dashtype *custom_dash_pattern)
 TERM_PUBLIC int
 PM_text_angle(int ang)
 {
-    putc(SET_ANGLE, PM_pipe);
-    fwrite(&ang, sizeof(int), 1, PM_pipe);
+    PM_send_msg(SET_ANGLE);
+    PM_send_int(ang);
 #ifndef PM_OLD_ENHANCED_TEXT
     /* store text angle, only needed for enhanced text */
     PM_angle = ang * DEG2RAD;
@@ -746,35 +845,25 @@ PM_text_angle(int ang)
 TERM_PUBLIC void
 PM_put_text(unsigned int x, unsigned int y, const char *str)
 {
-    int len;
-
     if (PM_must_abort)
 	PM_abortplot();
 
 #ifdef PM_OLD_ENHANCED_TEXT
     if (ignore_enhanced_text) {
-	putc(SET_SPECIAL, PM_pipe);
-	putc(SET_SPECIAL_ENHANCED, PM_pipe); /* switch the enhanced mode off */
-	putc('0', PM_pipe);
+	PM_send_msg(SET_SPECIAL);
+	PM_send_msg(SET_SPECIAL_ENHANCED); /* switch the enhanced mode off */
+	PM_send_char('0');
     }
 #endif
-
-    putc(GR_TEXT, PM_pipe);
-    fwrite(&x, sizeof(int), 1, PM_pipe);
-    fwrite(&y, sizeof(int), 1, PM_pipe);
-    len = strlen(str) + 1;
-    fwrite(&len, sizeof(int), 1, PM_pipe);
-    fwrite(str, 1, len, PM_pipe);
-    for (len = sizeof(int) - len % sizeof(int); len > 0; len--) {
-	/* pad rest of int with zeros */
-	putc(NUL, PM_pipe);
-    }
-
+    PM_send_msg(GR_TEXT);
+    PM_send_uint(x);
+    PM_send_uint(y);
+    PM_send_str(str);
 #ifdef PM_OLD_ENHANCED_TEXT
     if (ignore_enhanced_text) {
-	putc(SET_SPECIAL, PM_pipe);
-	putc(SET_SPECIAL_ENHANCED, PM_pipe); /* restore the enhanced mode */
-	putc('2', PM_pipe);
+	PM_send_msg(SET_SPECIAL);
+	PM_send_msg(SET_SPECIAL_ENHANCED); /* restore the enhanced mode */
+	PM_send_char('2');
     }
 #endif
 }
@@ -785,23 +874,23 @@ PM_justify_text(enum JUSTIFY mode)
 {
 #ifdef PM_OLD_ENHANCED_TEXT
     if (ignore_enhanced_text) {
-	putc(SET_SPECIAL, PM_pipe);
-	putc(SET_SPECIAL_ENHANCED, PM_pipe); /* switch the enhanced mode off */
-	putc('0', PM_pipe);
+	PM_send_msg(SET_SPECIAL);
+	PM_send_msg(SET_SPECIAL_ENHANCED); /* switch the enhanced mode off */
+	PM_send_char('0');
     }
 #endif
 
-    putc(SET_JUSTIFY, PM_pipe);
-    fwrite(&mode, sizeof(int), 1, PM_pipe);
+    PM_send_msg(SET_JUSTIFY);
+    PM_send_uint(mode);
 
 #ifndef PM_OLD_ENHANCED_TEXT
     /* store text justification, only needed for enhanced text */
     PM_justification = mode;
 #else
     if (ignore_enhanced_text) {
-	putc(SET_SPECIAL, PM_pipe);
-	putc(SET_SPECIAL_ENHANCED, PM_pipe); /* restore the enhanced mode */
-	putc('2', PM_pipe);
+	PM_send_msg(SET_SPECIAL);
+	PM_send_msg(SET_SPECIAL_ENHANCED); /* restore the enhanced mode */
+	PM_send_char('2');
     }
 #endif
     return TRUE;
@@ -809,24 +898,10 @@ PM_justify_text(enum JUSTIFY mode)
 
 
 TERM_PUBLIC int
-PM_set_font(const char *ifont)
+PM_set_font(const char *font)
 {
-    char * font = (char *) ifont;
-    unsigned int len;
-
-    putc(SET_FONT, PM_pipe);
-    len = (font == NULL) ? 0 : strlen(font);
-    if (len == 0) {
-	fwrite(&len, sizeof(int), 1, PM_pipe);
-    } else {
-	len += 1;
-	fwrite(&len, sizeof(int), 1, PM_pipe);
-	fwrite(font, 1, len, PM_pipe);
-	for (len = sizeof(int) - len % sizeof(int); len > 0; len--) {
-	    /* pad rest of int with zeros */
-	    putc(NUL, PM_pipe);
-	}
-    }
+    PM_send_msg(SET_FONT);
+    PM_send_str(font);
     return TRUE;
 }
 
@@ -840,18 +915,12 @@ PM_set_font(const char *ifont)
 static void
 PM_query_font(void)
 {
-    unsigned int len;
     char *newfont, *s;
-    ULONG cbR, rc;
 
-    putc(GR_QUERY_FONT, PM_pipe);
-    fflush(PM_pipe);
+    PM_send_msg(GR_QUERY_FONT);
+    PM_flush();
 
-    rc = DosRead(fileno(PM_pipe), &len, sizeof(int), &cbR);
-    newfont = (char *) malloc(len + 1);
-    rc = DosRead(fileno(PM_pipe), newfont, len, &cbR);
-    newfont[len] = NUL;
-
+    newfont = PM_recv_str();
     s = strchr(newfont, '.');
     PM_fontsize = atoi(newfont);
     if (s != NULL)
@@ -859,8 +928,6 @@ PM_query_font(void)
     else
 	safe_strncpy(PM_font, "Helvetica", sizeof(PM_font));
     free(newfont);
-
-    (void) rc;
 }
 
 #endif
@@ -873,14 +940,11 @@ PM_point(unsigned int x, unsigned int y, int number)
 ** use colour or not
 */
 {
-    int mode;
-    mode = 1;
-    putc(SET_POINTMODE, PM_pipe);
-    fwrite(&mode, sizeof(int), 1, PM_pipe);
+    PM_send_msg(SET_POINTMODE);
+    PM_send_int(1);
     do_point(x, y, number);
-    mode = 0;
-    putc(SET_POINTMODE, PM_pipe);
-    fwrite(&mode, sizeof(int), 1, PM_pipe);
+    PM_send_msg(SET_POINTMODE);
+    PM_send_int(0);
 }
 
 
@@ -916,46 +980,32 @@ PM_pause(char *str)
 ** pause - using message box on PM screen
 */
 {
-    int len, rc;
-    ULONG cbR;
-
     if (PM_pipe == NULL)
 	return 2;
-
-    putc(GR_PAUSE, PM_pipe);
-    len = strlen(str) + 1;
-    fwrite(&len, sizeof(int), 1, PM_pipe);
-    fwrite(str, 1, len, PM_pipe);
-    for (rc = sizeof(int) - len % sizeof(int); rc > 0; rc--) {
-	/* pad rest of int with zeros */
-	putc(NUL, PM_pipe);
-    }
-    fflush(PM_pipe);
-    rc = DosRead(fileno(PM_pipe), &len, sizeof(int), &cbR);
-    (void) rc;
-    return len;
+    PM_send_msg(GR_PAUSE);
+    PM_send_str(str);
+    PM_flush();
+    return PM_recv_int();
 }
 
 
 TERM_PUBLIC void
 PM_fillbox(int style, unsigned int x, unsigned int y, unsigned int w, unsigned int h)
 {
-    putc(SET_FILLBOX, PM_pipe);
-    fwrite(&style, sizeof(style), 1, PM_pipe);
-    fwrite(&x, sizeof(x), 1, PM_pipe);
-    fwrite(&y, sizeof(y), 1, PM_pipe);
-    fwrite(&w, sizeof(w), 1, PM_pipe);
-    fwrite(&h, sizeof(h), 1, PM_pipe);
+    PM_send_msg(SET_FILLBOX);
+    PM_send_int(style);
+    PM_send_uint(x);
+    PM_send_uint(y);
+    PM_send_uint(w);
+    PM_send_uint(h);
 }
 
 
 TERM_PUBLIC void
 PM_linewidth(double linewidth)
 {
-    int lw;
-    lw = PM_linewidth_scale * linewidth * 100;
-    putc(SET_LINEWIDTH, PM_pipe);
-    fwrite(&lw, sizeof(int), 1, PM_pipe);
+    PM_send_msg(SET_LINEWIDTH);
+    PM_send_int(PM_linewidth_scale * linewidth * 100);
 }
 
 
@@ -963,29 +1013,24 @@ TERM_PUBLIC int
 PM_make_palette(t_sm_palette * palette)
 {
     if (palette == NULL) {
-	ULONG rc, cbR;
-	int PM_nColors;
-
 	/* query maximum number of colours in palette */
-	putc(GR_MAKE_PALETTE, PM_pipe);
-	putc(0, PM_pipe);
-	fflush(PM_pipe);
-	rc = DosRead(fileno(PM_pipe), &PM_nColors, sizeof(int), &cbR);
-	(void) rc;
-	return PM_nColors;
+	PM_send_msg(GR_MAKE_PALETTE);
+	PM_send_char(0);
+	PM_flush();
+	return PM_recv_int();
     }
 
     if (sm_palette.colors > 0) {
 	ULONG *rgbTable;
 	unsigned int i;
 
-	/* Note: gvpm sources have also limit 256, is it limit of PM palette?
+	/* Note: gvpm sources also have a limit of 256. Is it a limit of the PM palette?
 	   I suppose yes, thus let colours passed as unsigned char through the pipe.
 	   Gray interval [0;1] will be mapped to interval [0;255] whose r,g,b
 	   components are mapped by the array below.
 	 */
-	putc(GR_MAKE_PALETTE, PM_pipe);
-	putc(1, PM_pipe);
+	PM_send_msg(GR_MAKE_PALETTE);
+	PM_send_char(1);
 	rgbTable = (ULONG *) malloc(sizeof(ULONG) * sm_palette.colors);
 	for (i = 0; i < sm_palette.colors; i++) {
 	    ULONG r, g, b;
@@ -995,8 +1040,8 @@ PM_make_palette(t_sm_palette * palette)
 	    b = (ULONG) (palette->color[i].b * 255 + 0.5);
 	    rgbTable[i] = (r << 16) + (g << 8) + b;	/*  PM API likes this form */
 	}
-	fwrite(&sm_palette.colors, sizeof(int), 1, PM_pipe);
-	fwrite(rgbTable, sizeof(ULONG) * sm_palette.colors, 1, PM_pipe);
+	PM_send_int(sm_palette.colors);
+	PM_send_data(sizeof(ULONG) * sm_palette.colors, rgbTable);
 	free(rgbTable);
     }
     return 0;
@@ -1014,24 +1059,24 @@ PM_set_color(t_colorspec *colorspec)
 
 	    rgb255maxcolors_from_gray(colorspec->value, &rgb255);
 	    rgb = (rgb255.r << 16) + (rgb255.g << 8) + rgb255.b;
-	    putc(GR_SET_RGBCOLOR, PM_pipe);
-	    fwrite(&rgb, sizeof(int), 1, PM_pipe);
+	    PM_send_msg(GR_SET_RGBCOLOR);
+	    PM_send_uint(rgb);
 	} else {
 	    unsigned char colorindex;
 
 	    /* map [0;1] to interval [0;sm_palette.colors-1] */
 	    colorindex = ((colorspec->value * (sm_palette.colors - 1.)) + 0.5);
-	    putc(GR_SET_COLOR, PM_pipe);
-	    fwrite(&colorindex, sizeof(colorindex), 1, PM_pipe);
+	    PM_send_msg(GR_SET_COLOR);
+	    PM_send_char(colorindex);
 	}
 	break;
     case TC_LT:
-	putc(GR_LTCOLOR, PM_pipe);
-	fwrite(&(colorspec->lt), sizeof(int), 1, PM_pipe);
+	PM_send_msg(GR_LTCOLOR);
+	PM_send_int(colorspec->lt);
 	break;
     case TC_RGB:
-	putc(GR_SET_RGBCOLOR, PM_pipe);
-	fwrite(&(colorspec->lt), sizeof(int), 1, PM_pipe);
+	PM_send_msg(GR_SET_RGBCOLOR);
+	PM_send_int(colorspec->lt);
 	break;
     default:
 	break;
@@ -1043,14 +1088,12 @@ TERM_PUBLIC void
 PM_filled_polygon(int points, gpiPoint *corners)
 {
     int i;
-    int style = corners->style;
-    putc(GR_FILLED_POLYGON, PM_pipe);
-    // FIXME: this is not backwards-compatible: should we use another code?
-    fwrite(&style, sizeof(style), 1, PM_pipe);
-    fwrite(&points, sizeof(int), 1, PM_pipe); /*  tell him number of corners */
+    PM_send_msg(GR_FILLED_POLYGON);
+    PM_send_int(corners->style);
+    PM_send_int(points); /* number of corners */
     for (i = 0; i < points; i++) {
-	fwrite(&corners[i].x, sizeof(int), 1, PM_pipe);
-	fwrite(&corners[i].y, sizeof(int), 1, PM_pipe);
+	PM_send_int(corners[i].x);
+	PM_send_int(corners[i].y);
     }
 }
 
@@ -1060,52 +1103,45 @@ PM_filled_polygon(int points, gpiPoint *corners)
 TERM_PUBLIC void
 PM_put_tmptext(int i, const char str[])
 {
-    if (PM_pipe) {
-	putc(PUT_TMPTEXT, PM_pipe);
-	fwrite(&i, sizeof(int), 1, PM_pipe);
-	i = strlen(str) + 1;
-	fwrite(&i, sizeof(int), 1, PM_pipe);
-	fwrite(&str[0], i, 1, PM_pipe);
-	fflush(PM_pipe);
-    }
+    PM_send_msg(PUT_TMPTEXT);
+    PM_send_int(i);
+    /* NOTE: PM_send_str() would have been more consistent,
+       but now it's too late. */
+    PM_send_buf(strlen(str) + 1, str);
+    PM_flush();
 }
 
 
 TERM_PUBLIC void
 PM_set_ruler(int x, int y)
 {
-    if (PM_pipe) {
-	putc(SET_RULER, PM_pipe);
-	fwrite(&x, sizeof(int), 1, PM_pipe);
-	fwrite(&y, sizeof(int), 1, PM_pipe);
-	fflush(PM_pipe);
-    }
+    PM_send_msg(SET_RULER);
+    PM_send_int(x);
+    PM_send_int(y);
+    PM_flush();
 }
 
 
 TERM_PUBLIC void
 PM_set_cursor(int c, int x, int y)
 {
-    if (PM_pipe) {
-	putc(SET_CURSOR, PM_pipe);
-	fwrite(&c, sizeof(int), 1, PM_pipe);
-	fwrite(&x, sizeof(int), 1, PM_pipe);
-	fwrite(&y, sizeof(int), 1, PM_pipe);
-	fflush(PM_pipe);
-    }
+    PM_send_msg(SET_CURSOR);
+    PM_send_int(c);
+    PM_send_int(x);
+    PM_send_int(y);
+    PM_flush();
 }
 
 
 TERM_PUBLIC void
 PM_set_clipboard(const char s[])
 {
-    if (PM_pipe) {
-	int i = strlen(s);
-	putc(SET_CLIPBOARD, PM_pipe);
-	fwrite(&i, sizeof(int), 1, PM_pipe);
-	fwrite(s, i+1, 1, PM_pipe);
-	fflush(PM_pipe);
-    }
+    PM_send_msg(SET_CLIPBOARD);
+    /* NOTE: PM_send_str() would have been more consistent,
+       but now it's too late. */
+    PM_send_buf(strlen(s), s);
+    PM_send_char(0);
+    PM_flush();
 }
 
 #endif /* USE_MOUSE */
@@ -1167,16 +1203,14 @@ PM_image(unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_im
 	unsigned int i;
 
 	/* transfer data to gnupmdrv */
-	putc(GR_RGB_IMAGE, PM_pipe);
-	fwrite(&M, sizeof(M), 1, PM_pipe);
-	fwrite(&N, sizeof(N), 1, PM_pipe);
-	for (i=0; i<4; i++) {
-	    fwrite(&(corner[i].x), sizeof(int), 1, PM_pipe);
-	    fwrite(&(corner[i].y), sizeof(int), 1, PM_pipe);
+	PM_send_msg(GR_RGB_IMAGE);
+	PM_send_uint(M);
+	PM_send_uint(N);
+	for (i = 0; i < 4; i++) {
+	    PM_send_int(corner[i].x);
+	    PM_send_int(corner[i].y);
 	}
-	fwrite(&image_size, sizeof(image_size), 1, PM_pipe);
-	fwrite(rgb_image, image_size, 1, PM_pipe);
-	fflush(PM_pipe);
+	PM_send_buf(image_size, rgb_image);
     }
 
     free(rgb_image);
@@ -1258,8 +1292,7 @@ PM_enhanced_flush()
     if (ENHpm_opened_string) {
 	int width, height;
 	unsigned int mode;
-	unsigned int x, y, len;
-	ULONG rc, cbR;
+	unsigned int x, y;
 
 	*enhanced_cur_text = NUL;
 
@@ -1270,27 +1303,20 @@ PM_enhanced_flush()
 	/* NB: base expresses offset from current y pos */
 	x = PM_x - ENHpm_base * sin(PM_angle);
 	y = PM_y + ENHpm_base * cos(PM_angle);
-	mode = ((ENHpm_show && !ENHpm_sizeonly) ? 0x01 : 0x00 );
-	len = strlen(enhanced_text) + 1;
+	mode = ((ENHpm_show && !ENHpm_sizeonly) ? 0x01 : 0x00);
 
 	/* send message to gnupmdrv */
-	putc(GR_ENH_TEXT, PM_pipe);
-	fwrite(&x, sizeof(int), 1, PM_pipe);
-	fwrite(&y, sizeof(int), 1, PM_pipe);
+	PM_send_msg(GR_ENH_TEXT);
+	PM_send_uint(x);
+	PM_send_uint(y);
 	/* write 'mode indicator' (currently show switch only) */
-	fwrite(&mode, sizeof(int), 1, PM_pipe);
-	fwrite(&len, sizeof(int), 1, PM_pipe);
-	fwrite(enhanced_text, 1, len, PM_pipe);
-	for (len = sizeof(int) - len % sizeof(int); len > 0; len--) {
-	    /* pad rest of int with zeros */
-	    putc(NUL, PM_pipe);
-	}
+	PM_send_uint(mode);
+	PM_send_str(enhanced_text);
 
 	/* answer from gnupmdrv is length of text */
-	fflush(PM_pipe);
-	rc = DosRead(fileno(PM_pipe), &width, sizeof(int), &cbR);
-	rc = DosRead(fileno(PM_pipe), &height, sizeof(int), &cbR);
-	(void) rc;
+	PM_flush();
+	width = PM_recv_int();
+	height = PM_recv_int();
 
 	/* update drawing position according to len */
 	if (!ENHpm_widthflag) {
@@ -1419,19 +1445,20 @@ PM_enhanced_put_text(unsigned int x, unsigned int y, const char *str)
 
 /* helper function */
 void
-pm_raise_terminal_window()
+pm_raise_terminal_window(void)
 {
-    putc(SET_SPECIAL, PM_pipe);
-    putc(SET_SPECIAL_RAISE, PM_pipe); /* raise window */
-    fflush(PM_pipe);
+    PM_send_msg(SET_SPECIAL);
+    PM_send_msg(SET_SPECIAL_RAISE); /* raise window */
+    PM_flush();
 }
 
+
 void
-pm_lower_terminal_window()
+pm_lower_terminal_window(void)
 {
-    putc(SET_SPECIAL, PM_pipe);
-    putc(SET_SPECIAL_LOWER, PM_pipe); /* lower window */
-    fflush(PM_pipe);
+    PM_send_msg(SET_SPECIAL);
+    PM_send_msg(SET_SPECIAL_LOWER); /* lower window */
+    PM_flush();
 }
 
 
