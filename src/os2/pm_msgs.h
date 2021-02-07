@@ -54,7 +54,8 @@
 #define SET_SPECIAL	'o'  /* used for special options */
 #define SET_MENU	'#'
 #define GR_QUERY	'Q'
-#define GR_SUSPEND	'E'	/* 's' */
+#define GR_SUSPEND	'E'
+#define GR_SUSPEND_OLD	's'
 #define GR_RESUME	'r'
 #define GR_MOVE		'M'
 #define GR_DRAW		'V'
@@ -73,9 +74,11 @@
 #define GR_SET_COLOR		'C'
 #define GR_SET_RGBCOLOR		'b'
 #define GR_LTCOLOR		'N'
-#define GR_FILLED_POLYGON	'y' /* 'f' */
+#define GR_FILLED_POLYGON	'y'
+#define GR_FILLED_POLYGON_OLD	'f'
 #define GR_IMAGE		'i'
 #define GR_RGB_IMAGE	'I'
+#define GR_RGBA_IMAGE	'?'
 
 /* "special" option commands */
 #define SET_SPECIAL_ENHANCED	'e'

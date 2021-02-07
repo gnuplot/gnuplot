@@ -2398,7 +2398,7 @@ ReadGnu(void* arg)
 		GpiOpenSegment(hps, iSeg);
 		break;
 
-	    case 's' :
+	    case GR_SUSPEND_OLD :
 		/* suspend after multiplot */
 		break;
 
@@ -3099,7 +3099,7 @@ ReadGnu(void* arg)
 		BufRead(hRead, &fillstyle, sizeof(fillstyle), &cbR);
 		// fall-through
 
-	    case 'f':  // old filled polygon - without fill style
+	    case GR_FILLED_POLYGON_OLD :  // old filled polygon - without fill style
 	    {
 		int points, x,y, i;
 		LONG curr_color = 0;
@@ -3138,11 +3138,13 @@ ReadGnu(void* arg)
 	    }
 
 	    case GR_RGB_IMAGE :
+	    case GR_RGBA_IMAGE :
 	    {
 		unsigned int i, M, N, image_size;
 		POINTL corner[4];
 		PBYTE image;
-		PBITMAPINFO2 pbmi;
+		PBYTE mask;
+		PBITMAPINFO2 pbmi, pbmi2;
 		POINTL points[4];
 		POINTL clip;
 		LONG hits;
@@ -3154,6 +3156,13 @@ ReadGnu(void* arg)
 		    BufRead(hRead, &(corner[i].x), sizeof(int), &cbR);
 		    BufRead(hRead, &(corner[i].y), sizeof(int), &cbR);
 		}
+
+		if (*buff == GR_RGBA_IMAGE) {
+		    usErr = BufRead(hRead, &image_size, sizeof(image_size), &cbR);
+		    mask = (PBYTE) malloc(image_size);
+		    BufRead(hRead, mask, image_size, &cbR);
+		}
+
 		usErr = BufRead(hRead, &image_size, sizeof(image_size), &cbR);
 		DEBUG_IMAGE(("GR_IMAGE: M=%i, N=%i, size=%i, rc=%d", M, N, image_size, usErr));
 		DEBUG_IMAGE(("GR_IMAGE: corner [0]=(%i,%i) [1]=(%i,%i)", corner[0].x, corner[0].y, corner[1].x, corner[1].y));
@@ -3205,8 +3214,34 @@ ReadGnu(void* arg)
 		pbmi->cPlanes = 1;
 		pbmi->cBitCount = 24;
 		pbmi->ulCompression = BCA_UNCOMP;
-		hits = GpiDrawBits(hps, image, pbmi, 4, points, ROP_SRCCOPY, BBO_IGNORE);
-#if 0
+
+		if (*buff == GR_RGBA_IMAGE) {
+		    pbmi2 = (PBITMAPINFO2) calloc(sizeof(BITMAPINFOHEADER2) + 255 * sizeof(RGB2), 1);
+		    memcpy(pbmi2, pbmi, sizeof(BITMAPINFOHEADER2));
+		    pbmi2->cBitCount = 8;
+		    /* The color table maps alpha values to binary transparency. */
+		    pbmi2->argbColor[0xff].bBlue  = 0xff;
+		    pbmi2->argbColor[0xff].bGreen = 0xff;
+		    pbmi2->argbColor[0xff].bRed   = 0xff;
+#if 1
+		    /* Stamp out the mask first, then draw the image. */
+		    /* This actually relies on the color of transparent pixels being set to black,
+		       which we don't do. But source images are likely that way already. */
+		    hits = GpiDrawBits(hps, mask, pbmi2, 4, points, ROP_SRCAND, BBO_IGNORE);
+		    hits = GpiDrawBits(hps, image, pbmi, 4, points, ROP_SRCPAINT, BBO_IGNORE);
+#else
+		    /* Better version, which does not require image anipulation. But it is slower
+		       and causes more flicker:
+		       XOR with image, stamp out mask, XOR with image again.
+		    */
+		    hits = GpiDrawBits(hps, image, pbmi, 4, points, ROP_SRCINVERT, BBO_IGNORE);
+		    hits = GpiDrawBits(hps, mask, pbmi2, 4, points, ROP_SRCAND, BBO_IGNORE);
+		    hits = GpiDrawBits(hps, image, pbmi, 4, points, ROP_SRCINVERT, BBO_IGNORE);
+#endif
+		} else {
+		    hits = GpiDrawBits(hps, image, pbmi, 4, points, ROP_SRCCOPY, BBO_IGNORE);
+		}
+
 		if (hits == GPI_ERROR) {
 		    PERRINFO perriBlk = WinGetErrorInfo(hab);
 		    if (perriBlk) {
@@ -3220,7 +3255,7 @@ ReadGnu(void* arg)
 			WinFreeErrorInfo(perriBlk);
 		    }
 		}
-#endif
+
 		// reset clip region
 		GpiSetClipPath(hps, 0, SCP_RESET);
 
@@ -3231,6 +3266,14 @@ ReadGnu(void* arg)
 		ile->pbmi = pbmi;
 		ile->image = image;
 		image_list = ile;
+
+		if (*buff == GR_RGBA_IMAGE) {
+		    ile = (image_list_entry *) malloc(sizeof(image_list_entry));
+		    ile->next = image_list;
+		    ile->pbmi = pbmi2;
+		    ile->image = mask;
+		    image_list = ile;
+		}
 		break;
 	    }
 
@@ -3353,7 +3396,11 @@ ReadGnu(void* arg)
 		mouseTerminal = TRUE;
 		break;
 
-	    default :  /* should handle error */
+	    default :
+		/* This should not happen if the versions of gnuplot and gnupmdrv match. */
+#ifdef HAVE_PMPRINTF
+		PmPrintf("Unknown command: 0x(%02x) '%c'", *buff, *buff);
+#endif
 		break;
 	    }
 	}

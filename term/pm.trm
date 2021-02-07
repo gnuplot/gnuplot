@@ -1150,9 +1150,13 @@ PM_set_clipboard(const char s[])
 TERM_PUBLIC void
 PM_image(unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_imagecolor color_mode)
 {
-    PBYTE rgb_image;
+    PBYTE rgb_image, mask = NULL;
     unsigned int image_size;
+    unsigned int mask_size;
     unsigned int pad_bytes;
+    unsigned int pad_mask;
+    BOOL is_rgba = (color_mode == IC_RGBA);
+    BYTE is_transparent = 0x00; /* indicator if image actually is transparent */
 
     /* Images are converted to a 24bit RGB format
        suitable for OS/2's presentation manager:
@@ -1160,8 +1164,14 @@ PM_image(unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_im
         - each line starts at a 4 byte boundary
     */
     pad_bytes = (4 - (3 * M) % 4) % 4; /* scan lines start on ULONG boundaries */
-    image_size = (M + pad_bytes ) * N * 3;
+    image_size = (M + pad_bytes) * N * 3;
     rgb_image = (PBYTE) gp_alloc(image_size, "PM RGB image");
+
+    if (is_rgba) {
+	pad_mask = (4 - M % 4) % 4;
+	mask_size = (M + pad_bytes) * N;
+	mask = (PBYTE) gp_alloc(mask_size, "PM RGBA mask");
+    }
 
     if (color_mode == IC_PALETTE) {
 	unsigned int x, y;
@@ -1182,20 +1192,30 @@ PM_image(unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_im
 	unsigned int x, y;
 
 	rgb_image += N * (3 * M + pad_bytes);
+	if (is_rgba)
+	    mask  += N * (M + pad_mask);
+
 	for (y = 0; y < N; y++) {
 	    rgb_image -= 3 * M + pad_bytes;
+	    if (is_rgba)
+		mask -= M + pad_mask;
 	    for (x = 0; x < M; x++) {
 		rgb255_color rgb255;
 		rgb255.r = (BYTE) (*image++ * 255 + 0.5);
 		rgb255.g = (BYTE) (*image++ * 255 + 0.5);
 		rgb255.b = (BYTE) (*image++ * 255 + 0.5);
-		/* Note: We just ignore the alpha channel. */
-		if (color_mode == IC_RGBA) image++;
+		if (is_rgba) {
+		    *mask = *image++ * 255 + 0.5;
+		    is_transparent |= *mask;
+		    mask++;
+		}
 		*(rgb_image++) = rgb255.b;
 		*(rgb_image++) = rgb255.g;
 		*(rgb_image++) = rgb255.r;
 	    }
 	    rgb_image -= 3 * M;
+	    if (is_rgba)
+		mask -= M;
 	}
     }
 
@@ -1203,17 +1223,20 @@ PM_image(unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_im
 	unsigned int i;
 
 	/* transfer data to gnupmdrv */
-	PM_send_msg(GR_RGB_IMAGE);
+	PM_send_msg(is_rgba && is_transparent ? GR_RGBA_IMAGE : GR_RGB_IMAGE);
 	PM_send_uint(M);
 	PM_send_uint(N);
 	for (i = 0; i < 4; i++) {
 	    PM_send_int(corner[i].x);
 	    PM_send_int(corner[i].y);
 	}
+	if (is_rgba && is_transparent)
+	    PM_send_buf(mask_size, mask);
 	PM_send_buf(image_size, rgb_image);
     }
 
     free(rgb_image);
+    free(mask);
 }
 
 
