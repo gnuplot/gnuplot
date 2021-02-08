@@ -1004,7 +1004,7 @@ gen_tics(struct axis *this, tic_callback callback)
      */
     if (def->def.user) {
 	struct ticmark *mark = def->def.user;
-	double uncertain = (this->max - this->min) / 10;
+	double uncertain = (nonlinear(this)) ? 0 : (this->max - this->min) / 10;
 	double internal_min = this->min - SIGNIF * uncertain;
 	double internal_max = this->max + SIGNIF * uncertain;
 
