@@ -601,6 +601,9 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	    WinSetPointer(HWND_DESKTOP, hptrDefault); /* set default pointer */
 	    return 0L;
 	}
+	/* check for valid mouse parameters */
+	if ((mx <= 0) && (my <= 0))
+	    return 0L;
 	/* was the mouse moved? */
 	if ((prev_mx != mx) || (prev_my != my)) {
 	    WinSetPointer(HWND_DESKTOP, hptrCurrent);
