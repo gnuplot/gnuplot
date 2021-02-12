@@ -348,6 +348,10 @@ char * gp_getcwd(char *path, size_t len);
 # endif
 #endif
 
+#if defined(OS2) && !defined(__KLIBC__)
+void usleep(unsigned long microseconds);
+#endif
+
 /* sleep delay time, where delay is a double value */
 #if defined(HAVE_USLEEP) && !defined(_WIN32)
 #  define GP_SLEEP(delay) usleep((unsigned int) ((delay)*1e6))

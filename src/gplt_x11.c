@@ -163,6 +163,7 @@ Error. Incompatible options.
 #  define INCL_DOSPROCESS
 #  define INCL_DOSSEMAPHORES
 #  include <os2.h>
+#  define usleep(t) _sleep2((t)/1000)
 # endif
 # include "gpexecute.h"
 # include "mouse.h"

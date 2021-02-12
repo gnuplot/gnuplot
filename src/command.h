@@ -199,4 +199,9 @@ char *print_show_output(void); /* show print output file */
 
 int do_system_func(const char *cmd, char **output);
 
+#ifdef OS2_IPC
+void os2_ipc_setup(void);
+int  os2_ipc_waitforinput(int mode);
+#endif
+
 #endif /* GNUPLOT_COMMAND_H */

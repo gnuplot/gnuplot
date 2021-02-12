@@ -50,16 +50,13 @@
 #include <os2.h>
 
 void gp_execute(char *command);
-extern char mouseShareMemName[];
+void gp_post_shared_mem(void);
 
+extern char mouseShareMemName[];
 extern PVOID input_from_PM_Terminal;
 extern HEV semInputReady;
-extern int pausing;
+extern BOOL pausing;
 extern ULONG ppidGnu;
-
-/* forward declarations */
-void gp_post_shared_mem(void);
-void gp_execute(char *s);
 
 #endif /* OS2_IPC */
 

@@ -77,7 +77,7 @@ PVOID input_from_PM_Terminal;
 HEV semInputReady = 0;
   /* handle to event semaphore (post an event to gnuplot that the shared
      memory contains a command to be executed) */
-int pausing = 0;
+BOOL pausing = FALSE;
   /* avoid passing data back to gnuplot in `pause' mode */
   /* gplt_x11.c */
 ULONG ppidGnu = 0;
@@ -101,7 +101,7 @@ gp_post_shared_mem()
      * distinguish mouse button down and up, for instance
      * (info sent to shared memory was too fast; maybe a blocking
      * semaphore would help, but no fun to implement it...)
-     &*/
+     */
 }
 
 /* Copy the command (given by the input string) to the shared memory
@@ -126,11 +126,13 @@ gp_execute(char *s)
 	strcpy(input_from_PM_Terminal, s);
     if (((char *) input_from_PM_Terminal)[0] == 0)
 	return;
+#if 0
     if (pausing) {		/* no communication during pause */
 	/* DosBeep(440,111); */
 	((char *) input_from_PM_Terminal)[0] = 0;
 	return;
     }
+#endif
     gp_post_shared_mem();
 }
 
@@ -263,11 +265,6 @@ gp_exec_event(char type, int mx, int my, int par1, int par2, int winid)
 	return;
     ((char *) input_from_PM_Terminal)[0] = '%';	/* flag that passing gp_event_t */
     memcpy(((char *) input_from_PM_Terminal) + 1, &ge, sizeof(ge));	/* copy the command to shared memory */
-    if (pausing) {		/* no communication during pause */
-	/* DosBeep(440,111); */
-	((char *) input_from_PM_Terminal)[0] = 0;
-	return;
-    }
     gp_post_shared_mem();
 #endif
 }

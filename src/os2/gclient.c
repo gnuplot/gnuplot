@@ -627,7 +627,7 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 
     case WM_BUTTON1DOWN:
 	WinSetFocus(HWND_DESKTOP, hWnd);
-	if (! IGNORE_MOUSE)
+	if (!IGNORE_MOUSE)
 	    gp_exec_event(GE_buttonpress, mx, my, 1, 0, 0);
 	return 0L;
 
@@ -685,11 +685,11 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	LONG    PalSupport;
 
 	/* set initial values */
-	ChangeCheck(hWnd, IDM_LINES_THICK, bWideLines?IDM_LINES_THICK:0);
-	ChangeCheck(hWnd, IDM_COLOURS, bColours?IDM_COLOURS:0);
-	ChangeCheck(hWnd, IDM_FRONT, bPopFront?IDM_FRONT:0);
-	ChangeCheck(hWnd, IDM_KEEPRATIO, bKeepRatio?IDM_KEEPRATIO:0);
-	ChangeCheck(hWnd, IDM_USEMOUSE, useMouse?IDM_USEMOUSE:0);
+	ChangeCheck(hWnd, IDM_LINES_THICK, bWideLines ? IDM_LINES_THICK : 0);
+	ChangeCheck(hWnd, IDM_COLOURS, bColours ? IDM_COLOURS : 0);
+	ChangeCheck(hWnd, IDM_FRONT, bPopFront ? IDM_FRONT : 0);
+	ChangeCheck(hWnd, IDM_KEEPRATIO, bKeepRatio ? IDM_KEEPRATIO : 0);
+	ChangeCheck(hWnd, IDM_USEMOUSE, useMouse? IDM_USEMOUSE : 0);
 #if 0
 	ChangeCheck(hWnd, IDM_MOUSE_POLAR_DISTANCE, mousePolarDistance?IDM_MOUSE_POLAR_DISTANCE:0);
 #endif
@@ -1387,7 +1387,7 @@ WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
     case IDM_DO_SENDCOMMAND:
 	if (input_from_PM_Terminal) {
 	    if (pausing)
-		DosBeep(440,111);
+		DosBeep(440, 111);
 	    else
 		WinDlgBox(HWND_DESKTOP, hWnd, SendCommandDlgProc,
 			  NULLHANDLE, IDM_DO_SENDCOMMAND,
@@ -1625,7 +1625,7 @@ QueryIni(HAB hab)
     }
     ulCB = sizeof(bKeepRatio);
     bData = PrfQueryProfileData(hini, APP_NAME, INIKEEPRATIO, &ulOpts, &ulCB);
-    if (bData) bKeepRatio =(BOOL)ulOpts[0];
+    if (bData) bKeepRatio = (BOOL)ulOpts[0];
 
     /* Mousing: */
     /* ignore reading mouse cursor(real, relative or pixels).
@@ -2441,7 +2441,7 @@ ReadGnu(void* arg)
 	    {
 		int len;
 
-		pausing = 1;
+		pausing = TRUE;
 		BufRead(hRead, &len, sizeof(int), &cbR);
 		len = (len + sizeof(int) - 1) / sizeof(int);
 		if (len > 0){  /* get pause text */
@@ -2466,7 +2466,7 @@ ReadGnu(void* arg)
 		DosExitCritSec();
 		/* reply to gnuplot so it can continue */
 		DosWrite(hRead, &ulPauseReply, sizeof(int), &cbR);
-		pausing = 0;
+		pausing = FALSE;
 		break;
 	    }
 
@@ -4292,8 +4292,8 @@ gpPMmenu_update()
 	return;
 #endif
 
-    ChangeCheck(hApp, IDM_USEMOUSE, useMouse ? IDM_USEMOUSE:0);
-    ChangeCheck(hApp, IDM_LINES_THICK, bWideLines ? IDM_LINES_THICK:0);
+    ChangeCheck(hApp, IDM_USEMOUSE, useMouse ? IDM_USEMOUSE : 0);
+    ChangeCheck(hApp, IDM_LINES_THICK, bWideLines ? IDM_LINES_THICK : 0);
     WinEnableMenuItem(/* can this situation be unzoomed back? */
 	WinWindowFromID(WinQueryWindow(hApp, QW_PARENT), FID_MENU),
 	IDM_MOUSE_UNZOOM,(gpPMmenu.where_zoom_queue & 1) ? TRUE : FALSE);
@@ -4306,7 +4306,7 @@ gpPMmenu_update()
 	    IDM_MOUSE_ZOOMNEXT,(gpPMmenu.where_zoom_queue & 4) ? TRUE : FALSE)
 	== TRUE)
 	gpPMmenu_update_req = FALSE;
-    ChangeCheck(hApp, IDM_MOUSE_POLAR_DISTANCE, gpPMmenu.polar_distance?IDM_MOUSE_POLAR_DISTANCE:0);
+    ChangeCheck(hApp, IDM_MOUSE_POLAR_DISTANCE, gpPMmenu.polar_distance ? IDM_MOUSE_POLAR_DISTANCE : 0);
 }
 
 

@@ -75,6 +75,7 @@ TERM_PUBLIC void PM_set_ruler(int, int);
 TERM_PUBLIC void PM_set_cursor(int, int, int);
 TERM_PUBLIC void PM_put_tmptext(int, const char str[]);
 TERM_PUBLIC void PM_set_clipboard(const char[]);
+TERM_PUBLIC int  PM_waitforinput(int mode);
 #endif
 TERM_PUBLIC int PM_make_palette (t_sm_palette *);
 TERM_PUBLIC void PM_set_color (t_colorspec *);
@@ -118,7 +119,7 @@ TERM_PUBLIC void PM_enhanced_flush(void);
 /* path for pm program */
 static char PM_path[PATH_MAX] = "";
 /* track mode to avoid redraw after hitting break */
-static int PM_mode = 0;
+static int PM_mode = SET_TEXT;
 static HEV hev;
 static int PM_termmode = 0;
 static TBOOLEAN PM_must_reset_opts = FALSE;
@@ -709,19 +710,10 @@ PM_text(void)
     if (PM_mode != SET_TEXT) {
 	PM_send_msg(SET_TEXT);
 	PM_flush();
-#if 0
-	keep_term_initialised = term_initialised ;
-	term_initialised = FALSE ; /* need to force init */
-#endif
     }
-
     PM_mode = SET_TEXT;
 #ifdef USE_MOUSE
-    {
-	/* FIXME 20040712: 'extern' in a source file is always wrong. */
-	extern TBOOLEAN allowmotion;
-	allowmotion = TRUE;
-    }
+    exec_event(GE_plotdone, 0, 0, 0, 0, 0);
 #endif
 }
 
@@ -730,6 +722,10 @@ TERM_PUBLIC void
 PM_graphics(void)
 {
     static int last_encoding = -999;
+
+    if (PM_mode == SET_GRAPHICS)
+	return;
+
     PM_send_msg(SET_GRAPHICS);
     PM_flush();
 #ifdef USE_MOUSE
@@ -778,7 +774,7 @@ PM_graphics(void)
 	PM_send_msg(SET_SPECIAL_FONT); /*  set default font */
 	PM_send_str(PM_def_font);
 	PM_flush();
-	}
+    }
     PM_query();
     PM_mode = SET_GRAPHICS;
 }
@@ -1144,6 +1140,15 @@ PM_set_clipboard(const char s[])
     PM_flush();
 }
 
+
+/* Currently, this is only used for input during a "load"
+   command and during timed "pause" commands. */
+int
+PM_waitforinput(int mode)
+{
+    return os2_ipc_waitforinput(mode);
+}
+
 #endif /* USE_MOUSE */
 
 
@@ -1484,7 +1489,6 @@ pm_lower_terminal_window(void)
     PM_flush();
 }
 
-
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -1506,7 +1510,7 @@ TERM_TABLE_START(PM_driver)
     PM_suspend, PM_resume,
     PM_fillbox, PM_linewidth,
 #ifdef USE_MOUSE
-    0 /* PM_waitforinput */,
+    PM_waitforinput,
     PM_put_tmptext, PM_set_ruler, PM_set_cursor, PM_set_clipboard,
 #endif
     PM_make_palette,

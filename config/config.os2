@@ -511,7 +511,7 @@
 #define HAVE_UNISTD_H 1
 
 /* Define to 1 if you have the `usleep' function. */
-/* #undef HAVE_USLEEP */
+#define HAVE_USLEEP 1
 
 /* Define to 1 if you have the <values.h> header file. */
 /* #undef HAVE_VALUES_H */
@@ -760,4 +760,5 @@
 # define round(x) ((x >= 0.0) ? floor(x + 0.5) : ceil(x - 0.5))
 # define lround(a) (long)(round(a))
 # define llround(a) (long long)(round(a))
+# define useconds_t unsigned
 #endif
