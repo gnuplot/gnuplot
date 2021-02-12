@@ -10,8 +10,6 @@ msvc/Makefile:   Makefile for Microsoft Visual C++ 2005 or later and nmake on Wi
 watcom/Makefile: Makefile for OpenWatcom C++ on Windows
 buildvms.com: Shell script on VMS
 make_vms.com: Shell script on VMS
-makefile.unx: Generic makefile for unixes
-makefile.emx: Makefile for use with emx-0.8f/gcc and ndmake 4.5 on DOS
 makefile.g:   Makefile on GRASS (a geographic information system)
 makefile.os2: Makefile for gcc/emx on OS/2
 makefile.vms: Makefile on VMS

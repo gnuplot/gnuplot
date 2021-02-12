@@ -298,7 +298,7 @@ static int msdos_getch(void);
 #  ifdef DJGPP
 #   include <pc.h>
 #  endif			/* DJGPP */
-#  if defined(__EMX__) || defined (__WATCOMC__)
+#  ifdef __WATCOMC__
 #   include <conio.h>
 #  endif			/* __EMX__ */
 #  define special_getc() msdos_getch()

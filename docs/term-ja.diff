@@ -2317,51 +2317,6 @@ diff -ru term/emf.trm.ORG term/emf.trm
 +#endif /* JAPANESE_DOC */
  END_HELP(emf)
  #endif /* TERM_HELP */
-diff -ru term/emxvga.trm.ORG term/emxvga.trm
---- term/emxvga.trm	2021-01-26.ORG 07:15:29.000000000 +0900
-+++ term/emxvga.trm	2021-01-26 20:11:47.330634000 +0900
-@@ -473,6 +473,7 @@
- #endif /* TERM_PROTO_ONLY */
- #ifdef TERM_HELP
- START_HELP(emxvga)
-+#ifndef JAPANESE_DOC
- "1 emxvga",
- "?commands set terminal emxvga",
- "?set terminal emxvga",
-@@ -498,5 +499,33 @@
- "       set terminal emxvesa {vesa-mode}",
- "",
- " The only option is the vesa mode for `emxvesa`, which defaults to G640x480x256."
-+#else /* JAPANESE_DOC */
-+"1 emxvga",
-+"?commands set terminal emxvga",
-+"?set terminal emxvga",
-+"?set term emxvga",
-+"?terminal emxvga",
-+"?term emxvga",
-+"?emxvga",
-+"?commands set terminal emxvesa",
-+"?set terminal emxvesa",
-+"?set term emxvesa",
-+"?terminal emxvesa",
-+"?term emxvesa",
-+"?emxvesa",
-+" 注意: 古い (legacy) 出力形式です。",
-+" `emxvga`, `emxvesa` の各ドライバはそれぞれ VGA, VESA SVGA の PC をサポ",
-+" ートします。これらは DOS、または OS/2 上で、\"emx-gcc\" でコンパイルさ",
-+" れたことを意図しています。これらにはさらに VESA パッケージと SVGAKIT が",
-+" 必要です。これらは Johannes Martin (JMARTIN@GOOFY.ZDV.UNI-MAINZ.DE) が",
-+" 保守し David J. Liu (liu@phri.nyu.edu) が拡張しているライブラリです。",
-+"",
-+" 書式:",
-+"       set terminal emxvga",
-+"       set terminal emxvesa {vesa-mode}",
-+"",
-+" 唯一のオプションは `emxvesa` に対する vesa のモードで、デフォルトでは",
-+" それは G640x480x256 となっています。"
-+#endif /* JAPANESE_DOC */
- END_HELP(emxvga)
- #endif /* TERM_HELP */
 diff -ru term/epson.trm.ORG term/epson.trm
 --- term/epson.trm	2021-01-26.ORG 07:15:29.000000000 +0900
 +++ term/epson.trm	2021-01-26 20:11:47.330731000 +0900

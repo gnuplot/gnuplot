@@ -2759,7 +2759,7 @@ changedir(char *path)
     if (isalpha((unsigned char)path[0]) && (path[1] == ':')) {
 	int driveno = toupper((unsigned char)path[0]) - 'A';	/* 0=A, 1=B, ... */
 
-# if defined(__EMX__) || defined(__WATCOMC__)
+# if defined(__WATCOMC__)
 	(void) _chdrive(driveno + 1);
 # elif defined(__DJGPP__)
 	(void) setdisk(driveno);
@@ -3400,7 +3400,7 @@ do_shell()
 /* read from stdin, everything except VMS */
 
 # ifndef USE_READLINE
-#  if defined(MSDOS) && !defined(__EMX__) && !defined(__DJGPP__)
+#  if defined(MSDOS) && !defined(__DJGPP__)
 
 /* if interactive use console IO so CED will work */
 

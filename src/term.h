@@ -112,22 +112,10 @@
 #endif
 
 /****************************************************************************/
-/* MS-DOS */
-#if defined(MSDOS)
-
-/* MSDOS with emx-gcc compiler */
-# if defined(__EMX__)
-   /* Vesa-Cards */
-#  define EMXVESA
-#  include "emxvga.trm"
-# endif				/* MSDOS && EMX */
-
 /* MSDOS with OpenWatcom compiler */
-# if defined(__WATCOMC__)
-#  include "pc.trm"
-# endif
-
-#endif /* MSDOS */
+#if defined(MSDOS) && defined(__WATCOMC__)
+# include "pc.trm"
+#endif
 /****************************************************************************/
 
 /* Windows */
@@ -146,10 +134,6 @@
 #ifdef OS2
 /* presentation manager */
 # include "pm.trm"
-# ifdef EMXVESA
-/* works with DOS and OS/2 (windowed/full screen) */
-#  include "emxvga.trm"
-# endif
 #endif /* OS2 */
 
 

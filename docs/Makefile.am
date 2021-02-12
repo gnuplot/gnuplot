@@ -57,7 +57,7 @@ T = $(top_srcdir)/term/
 CORETERM = $(T)ai.trm $(T)aquaterm.trm $(T)be.trm $(T)block.trm $(T)caca.trm \
 $(T)cairo.trm $(T)canvas.trm $(T)cgm.trm $(T)context.trm \
 $(T)debug.trm $(T)djsvga.trm $(T)dumb.trm $(T)dxf.trm \
-$(T)emf.trm $(T)emxvga.trm $(T)epson.trm \
+$(T)emf.trm $(T)epson.trm \
 $(T)estimate.trm $(T)fig.trm $(T)gd.trm $(T)ggi.trm \
 $(T)gpic.trm $(T)grass.trm $(T)hpgeneric.h $(T)hpgl.trm $(T)imagen.trm \
 $(T)linux-vgagl.trm $(T)latex_old.h \

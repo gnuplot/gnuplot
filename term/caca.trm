@@ -3346,7 +3346,7 @@ gp_kbhit(void)
     FD_ZERO(&fds);
     FD_SET(0, &fds);
     return select(1, &fds, NULL, NULL, &tv);
-# elif (defined(MSDOS) && !defined(__EMX__))
+# elif defined(MSDOS)
     return kbhit();
 # else
 #  error "No definition of kbhit() available."

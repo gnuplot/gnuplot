@@ -1015,12 +1015,11 @@ regress_check_stop(int iter, double chisq, double last_chisq, double lambda)
  *  which also generates #ifdefs)
  *
  *  I hope that other OSes do it better, if not... add #ifdefs :-(
- *  EMX does not have kbhit.
  *
  *  HBB: I think this can be enabled for DJGPP V2. SIGINT is actually
  *  handled there, AFAIK.
  */
-#if (defined(MSDOS) && !defined(__EMX__))
+#ifdef MSDOS
     if (kbhit()) {
 	do {
 	    getchx();

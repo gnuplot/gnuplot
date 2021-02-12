@@ -16,7 +16,7 @@ util3d.$(O) variable.$(O) voxelgrid.$(O) vplot.$(O) xdg.$(O)
 CORETERM = $(T)ai.trm $(T)aquaterm.trm $(T)be.trm $(T)caca.trm &
 $(T)cairo.trm $(T)canvas.trm $(T)cgm.trm $(T)context.trm $(T)corel.trm &
 $(T)debug.trm $(T)djsvga.trm $(T)dumb.trm $(T)dxf.trm $(T)dxy.trm &
-$(T)eepic.trm $(T)emf.trm $(T)emxvga.trm $(T)epson.trm $(T)estimate.trm &
+$(T)eepic.trm $(T)emf.trm $(T)epson.trm $(T)estimate.trm &
 $(T)excl.trm $(T)fig.trm $(T)gd.trm $(T)ggi.trm $(T)gpic.trm $(T)grass.trm &
 $(T)hp26.trm $(T)hp2648.trm $(T)hp500c.trm $(T)hpgl.trm $(T)hpljii.trm &
 $(T)hppj.trm $(T)imagen.trm $(T)kyo.trm $(T)latex.trm $(T)linux-vgagl.trm &

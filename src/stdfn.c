@@ -182,7 +182,7 @@ unsigned int
 sleep(unsigned int delay)
 {
 #if defined(MSDOS)
-# if !((defined(__EMX__) || defined(DJGPP))
+# if !defined(DJGPP)
     /* kludge to provide sleep() for msc 5.1 */
     unsigned long time_is_up;
 
