@@ -1612,6 +1612,10 @@ QueryIni(HAB hab)
     // save for later use
     strcpy(szInitialFontNameSize, szFontNameSize);
     szInitialFontName = strchr(szInitialFontNameSize, '.') + 1;
+    if (*szInitialFontName == NUL) {
+	strlcat(szInitialFontNameSize,
+	        strchr(INITIAL_FONT, '.') + 1, FONTBUF);
+    }
     iInitialFontSize = atoi(szInitialFontNameSize);
     ulCB = sizeof(ulOpts);
     bData = PrfQueryProfileData(hini, APP_NAME, INICHAR, &ulOpts, &ulCB);
@@ -1625,15 +1629,6 @@ QueryIni(HAB hab)
     ulCB = sizeof(bKeepRatio);
     bData = PrfQueryProfileData(hini, APP_NAME, INIKEEPRATIO, &ulOpts, &ulCB);
     if (bData) bKeepRatio =(BOOL)ulOpts[0];
-
-    /* Mousing: */
-    /* ignore reading mouse cursor(real, relative or pixels).
-       Reason/bug: it does not switch the check mark in the menu, even
-       though it works as expected.
-       ulCB = sizeof(mouse_mode);
-       bData = PrfQueryProfileData(hini, APP_NAME, INIMOUSECOORD, &ulOpts, &ulCB);
-       if (bData) mouse_mode =(ULONG)ulOpts[0];
-    */
 
     PrfCloseProfile(hini);
 
@@ -1668,6 +1663,7 @@ SaveIni(HWND hWnd)
     hab = WinQueryAnchorBlock(hWnd);
     hini = PrfOpenProfile(hab, szIniFile);
     if (hini != NULLHANDLE) {
+	/* windows position */
         WinQueryWindowPos(hwndFrame, &swp);
         ulPlotPos[0] = swp.x;
         ulPlotPos[1] = swp.y;
@@ -1675,15 +1671,21 @@ SaveIni(HWND hWnd)
         ulPlotPos[3] = swp.cy;
         PrfWriteProfileData(hini, APP_NAME, INISHELLPOS, &ulPlotPos,
 			    sizeof(ulPlotPos));
+
+	/* position of pause dialog */
         if (pausedata.pswp != NULL)
             PrfWriteProfileData(hini, APP_NAME, INIPAUSEPOS,
 				pausedata.pswp, sizeof(SWP));
+
+	/* options */
         ulOpts[0] = (ULONG)TRUE;
         ulOpts[1] = (ULONG)bWideLines;
         ulOpts[2] = (ULONG)bColours;
         ulOpts[3] = ulPauseMode;
         ulOpts[4] = (ULONG)bPopFront;
         PrfWriteProfileData(hini, APP_NAME, INIOPTS, &ulOpts, sizeof(ulOpts));
+
+	/* printer data */
         PrfWriteProfileData(hini, APP_NAME, INIFRAC, &qPrintData.xsize,
 			    4 * sizeof(float));
         if (qPrintData.pdriv != NULL)
@@ -1692,21 +1694,27 @@ SaveIni(HWND hWnd)
         PrfWriteProfileString(hini, APP_NAME, INIPRPR,
 			      qPrintData.szPrinterName[0] == '\0'? NULL:
 			      qPrintData.szPrinterName);
-        PrfWriteProfileString(hini, APP_NAME, INIFONT, szFontNameSize);
+
+	/* default font name */
+	{
+	    char szFontName[FONTBUF];
+
+	    /* make sure the default font includes a font name */
+	    strlcpy(szFontName, szFontNameSize, FONTBUF);
+	    if (szFontName[strlen(szFontName) - 1] == '.')
+		strlcat(szFontName, szInitialFontName, FONTBUF);
+	    PrfWriteProfileString(hini, APP_NAME, INIFONT, szFontName);
+	}
         ulOpts[0] =(ULONG)lCharWidth;
         ulOpts[1] =(ULONG)lCharHeight;
         PrfWriteProfileData(hini, APP_NAME, INICHAR, &ulOpts, sizeof(ulOpts));
+
 	PrfWriteProfileData(hini, APP_NAME, INIKEEPRATIO, &bKeepRatio,
 			    sizeof(bKeepRatio));
 
-	/* Mouse stuff */
-	/* Do not write the mouse coord. mode.
-	   PrfWriteProfileData(hini, APP_NAME, INIMOUSECOORD, &mouse_mode, sizeof(mouse_mode));
-	*/
 	PrfCloseProfile(hini);
     } else {
-        WinMessageBox(HWND_DESKTOP,
-		      HWND_DESKTOP,
+	WinMessageBox(HWND_DESKTOP, HWND_DESKTOP,
 		      "Can't write ini file",
 		      APP_NAME,
 		      0,
@@ -1878,7 +1886,7 @@ SelectFont(HPS hps, char *szFontNameSize)
     POINTL ptlFont;
     SIZEF  sizfx;
     LONG   lcid = 0L;
-    char   szFontName[FACESIZE];
+    char   szFontName[FONTBUF];
     short  shPointSize;
     char  *p, *q;
     BOOL   bBold, bItalic;
@@ -1892,15 +1900,15 @@ SelectFont(HPS hps, char *szFontNameSize)
 	p++;
 	if (*p == NUL) {
 	    // no font name, no attributes
-	    strlcpy(szFontName, szInitialFontName, FACESIZE);
+	    strlcpy(szFontName, szInitialFontName, FONTBUF);
 	} else if (*p == ':') {
 	    // just attributes, but no font name
-	    strlcpy(szFontName, szInitialFontName, FACESIZE);
+	    strlcpy(szFontName, szInitialFontName, FONTBUF);
 	    // append attributes
-	    strlcat(szFontName, p, FACESIZE);
+	    strlcat(szFontName, p, FONTBUF);
 	} else {
 	    // font name provided
-	    strlcpy(szFontName, p, FACESIZE);
+	    strlcpy(szFontName, p, FONTBUF);
 	}
     }
     DEBUG_FONT(("SelectFont: fontname \"%s\"", szFontName));
@@ -2010,7 +2018,7 @@ SwapFont(HPS hps, char *szFNS)
 	GpiSetCharSet(hps, 10);
 	GpiSetCharBox(hps, &sizBaseFont);
     } else {
-	char   szFontName[FACESIZE];
+	char   szFontName[FONTBUF];
 	short  shPointSize;
 	FONTMETRICS fm;
 	int    i;
@@ -2030,24 +2038,24 @@ SwapFont(HPS hps, char *szFNS)
 		    q++;
 		    if (*q == ':') {
 			// default font does not include font name
-			strlcpy(szFontName, szInitialFontName, FACESIZE);
+			strlcpy(szFontName, szInitialFontName, FONTBUF);
 			// append default attributes
-			strlcat(szFontName, q, FACESIZE);
+			strlcat(szFontName, q, FONTBUF);
 		    } else if (*q == NUL) {
 			// no (proper) default font name
-			strlcpy(szFontName, szInitialFontName, FACESIZE);
+			strlcpy(szFontName, szInitialFontName, FONTBUF);
 		    } else {
 			// copy default font name
-			strlcpy(szFontName, q, FACESIZE);
+			strlcpy(szFontName, q, FONTBUF);
 		    }
 		    if (*p != NUL) {
 			// append attributes
-			strlcat(szFontName, p, FACESIZE);
+			strlcat(szFontName, p, FONTBUF);
 		    }
 		}
 	    } else {
 		// font name provided
-		strlcpy(szFontName, p, FACESIZE);
+		strlcpy(szFontName, p, FONTBUF);
 	    }
 	}
 	DEBUG_FONT(("SwapFont: fontname \"%s\"", szFontName));
@@ -3446,7 +3454,7 @@ GetNewFont(HWND hwnd, HPS hps)
     static int iSize;
     char szPtList[64];
     HWND hwndFontDlg;     /* Font dialog window handle */
-    char szFamilyname[FACESIZE];
+    char szFamilyName[FONTBUF];
 
     if (i1) {
         strcpy(pfdFontdlg.fAttrs.szFacename, strchr(szFontNameSize, '.') + 1);
@@ -3458,7 +3466,7 @@ GetNewFont(HWND hwnd, HPS hps)
         pfdFontdlg.hpsScreen = hps;
 	/*   szFamilyname[0] = 0; */
         pfdFontdlg.pszFamilyname = szFamilyname;
-        pfdFontdlg.usFamilyBufLen = FACESIZE;
+	pfdFontdlg.usFamilyBufLen = FONTBUF;
         pfdFontdlg.fl = FNTS_HELPBUTTON |
 	    FNTS_CENTER | FNTS_VECTORONLY |
 	    FNTS_OWNERDRAWPREVIEW;
@@ -3584,7 +3592,7 @@ static char
     if (fontname != NULL) {
 	char szFont[FONTBUF];
 
-	sprintf(szFont, "%d.%s", fontsize, fontname);
+	snprintf(szFont, FONTBUF, "%d.%s", fontsize, fontname);
 	SwapFont(hps, szFont);
 	bChangeFont = TRUE;
     }
