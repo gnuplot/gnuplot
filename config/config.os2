@@ -1,7 +1,7 @@
 /* config.h for makefile.os2
  *
  * Prepared according to config.h from ./configure and by means of
- * config_strip.sh as of gnuplot 5.1 in February 2016.
+ * config_strip.sh as of gnuplot 5.5 in February 2021.
  */
 
 /* Define to allow use of certain deprecated syntax. */
@@ -42,8 +42,9 @@
 /* Define if you want to use a newer version of libgrx under MSDOS/djgpp. */
 /* #undef GRX21 */
 
-/* Define to 1 if you have the <3dkit.h> header file. */
-/* #undef HAVE_3DKIT_H */
+/* define if you have a library of Amos special functions */
+/* #undef HAVE_AMOS */
+/* Don't change it here -- this define is set in config/makefile.os2. */
 
 /* Define to 1 if you have the `atexit' function. */
 #define HAVE_ATEXIT 1
@@ -54,6 +55,11 @@
 /* Define to 1 if you have the `bzero' function. */
 #define HAVE_BZERO 1
 
+/* Define to 1 if you have the `cabs' function. */
+#ifdef __KLIBC__
+# define HAVE_CABS 1
+#endif
+
 /* libcairo support for eps (cairo >= 1.6) */
 /* #undef HAVE_CAIROEPS */
 /* Don't change it here -- this define is set in config/makefile.os2 */
@@ -61,6 +67,29 @@
 /* Define if you want the cairo-based terminals. */
 /* #undef HAVE_CAIROPDF */
 /* Don't change it here -- this define is set in config/makefile.os2 */
+
+/* define if you have Amos function cexint */
+/* #undef HAVE_CEXINT */
+
+/* Define to 1 if you have the `cexp' function. */
+#ifdef __KLIBC__
+# define HAVE_CEXP 1
+#endif
+
+/* Define to 1 if you have the `clog' function. */
+#ifdef __KLIBC__
+# define HAVE_CLOG 1
+#endif
+
+/* Define to 1 if you have the <complex.h> header file. */
+#ifdef __KLIBC__
+# define HAVE_COMPLEX_H 1
+#endif
+
+/* Define to 1 if you have the `csqrt' function. */
+#ifdef __KLIBC__
+# define HAVE_CSQRT 1
+#endif
 
 /* Define to 1 if you have the declaration of `signgam', and to 0 if you
    don't. */
@@ -72,7 +101,9 @@
 #define HAVE_DIRENT_H 1
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
-/* #undef HAVE_DLFCN_H */
+#ifdef __KLIBC__
+# define HAVE_DLFCN_H 1
+#endif
 
 /* Define to 1 if you have the <dl.h> header file. */
 /* #undef HAVE_DL_H */
@@ -103,6 +134,11 @@
 /* Define to 1 if you have the `fdopen' function. */
 #define HAVE_FDOPEN 1
 
+/* Define to 1 if you have the <fenv.h> header file. */
+#ifdef __KLIBC__
+# define HAVE_FENV_H 1
+#endif
+
 /* Define to 1 if you have the <float.h> header file. */
 #define HAVE_FLOAT_H 1
 
@@ -110,10 +146,14 @@
 #define HAVE_FORK 1
 
 /* Define to 1 if fseeko (and presumably ftello) exists and is declared. */
-/* #undef HAVE_FSEEKO */
+#ifdef __KLIBC__
+#define HAVE_FSEEKO 1
+#endif
 
 /* Define to 1 if you have the `gamma' function. */
-/* #undef HAVE_GAMMA */
+#ifdef __KLIBC__
+# define HAVE_GAMMA 1
+#endif
 
 /* Define if libgd supports gif. */
 /* #undef HAVE_GD_GIF */
@@ -147,7 +187,7 @@
 /* Define to include support for gpic terminal */
 /* #undef HAVE_GPIC */
 
-/* Define to use gtk/gdk tweaks */
+/* define if your wxWidgets uses the gtk toolkit */
 /* #undef HAVE_GTK */
 
 /* define if you have libiconv and iconv.h */
@@ -166,13 +206,14 @@
 /* #undef HAVE_KPSEXPAND */
 
 /* Define to 1 if you have the <langinfo.h> header file. */
-/* #undef HAVE_LANGINFO_H */
+#ifdef __KLIBC__
+# define HAVE_LANGINFO_H 1
+#endif
 
 /* Define to 1 if you have the `lgamma' function. */
 #ifdef __KLIBC__
 # define HAVE_LGAMMA 1
 #endif
-
 
 /* Define if you have the caca library. */
 /* #undef HAVE_LIBCACA */
@@ -243,6 +284,9 @@
 /* Define to 1 if you have the `memset' function. */
 #define HAVE_MEMSET 1
 
+/* Define to include support for metapost terminal */
+/* #undef HAVE_METAPOST */
+
 /* Define to include support for mif terminal */
 /* #undef HAVE_MIF */
 
@@ -280,9 +324,24 @@
 /* #undef HAVE_READLINE_HISTORY_H */
 /* Don't change it here -- this define is set in config/makefile.os2. */
 
+/* Define if your libreadline has rl_pending_signal */
+/* #undef HAVE_READLINE_PENDING_SIGNAL */
+/* Don't change it here -- this define is set in config/makefile.os2. */
+
 /* Define to 1 if you have the <readline/readline.h> header file. */
 /* #undef HAVE_READLINE_READLINE_H */
 /* Don't change it here -- this define is set in config/makefile.os2. */
+
+/* Define if your libreadline has rl_reset_after_signal */
+/* #undef HAVE_READLINE_RESET */
+/* Don't change it here -- this define is set in config/makefile.os2. */
+
+/* Define if your libreadline has _rl_signal_handler */
+/* #undef HAVE_READLINE_SIGNAL_HANDLER */
+/* Don't change it here -- this define is set in config/makefile.os2. */
+
+/* Define to include support for ReGIS terminal */
+/* #undef HAVE_REGIS */
 
 /* Define to 1 if you have the <readline/tilde.h> header file. */
 /* #undef HAVE_READLINE_TILDE_H */
@@ -314,7 +373,7 @@
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #ifdef __KLIBC__
-# define HAVE_STDINT_H */
+# define HAVE_STDINT_H 1
 #endif
 
 /* Define to 1 if you have the <stdlib.h> header file. */
@@ -358,19 +417,29 @@
 #endif
 
 /* Define to 1 if you have the `strndup' function. */
-/* #undef HAVE_STRNDUP */
+#ifdef __KLIBC__
+# define HAVE_STRNDUP 1
+#endif
 
 /* Define to 1 if you have the `strnicmp' function. */
 #define HAVE_STRNICMP 1
 
 /* Define to 1 if you have the `strnlen' function. */
-/* #undef HAVE_STRNLEN */
+#ifdef __KLIBC__
+# define HAVE_STRNLEN 1
+#endif
 
 /* Define to 1 if you have the `strrchr' function. */
 #define HAVE_STRRCHR 1
 
 /* Define to 1 if you have the `strstr' function. */
 #define HAVE_STRSTR 1
+
+/* Define to 1 if `tm_gmtoff' is a member of `struct tm'. */
+/* #undef HAVE_STRUCT_TM_TM_GMTOFF */
+
+/* Define to 1 if `__tm_gmtoff' is a member of `struct tm'. */
+/* #undef HAVE_STRUCT_TM___TM_GMTOFF */
 
 /* Define to 1 if you have the `sysinfo' function. */
 /* #undef HAVE_SYSINFO */
@@ -408,11 +477,26 @@
 /* Define to 1 if you have the <sys/utsname.h> header file. */
 #define HAVE_SYS_UTSNAME_H 1
 
+/* Define to 1 if you have <sys/wait.h> that is POSIX.1 compatible. */
+#define HAVE_SYS_WAIT_H 1
+
 /* Define to 1 if you have the `tcgetattr' function. */
-/* #undef HAVE_TCGETATTR */
+#ifdef __KLIBC__
+# define HAVE_TCGETATTR 1
+#endif
 
 /* Define to 1 if you have the <termios.h> header file. */
-/* #undef HAVE_TERMIOS_H */
+#ifdef __KLIBC__
+# define HAVE_TERMIOS_H 1
+#endif
+
+/* Define to 1 if you have the `tgamma' function. */
+#ifdef __KLIBC__
+# define HAVE_TGAMMA 1
+#endif
+
+/* Define to include support for tgif terminal */
+/* #undef HAVE_TGIF */
 
 /* Define to 1 if you have the <time.h> header file. */
 #define HAVE_TIME_H 1
@@ -441,9 +525,6 @@
 /* Define to 1 if you have the `vfprintf' function. */
 #define HAVE_VFPRINTF 1
 
-/* Define to 1 if you have the <vgagl.h> header file. */
-/* #undef HAVE_VGAGL_H */
-
 /* Define to 1 if you have the <wchar.h> header file. */
 #ifdef __KLIBC__
 # define HAVE_WCHAR_H 1
@@ -451,6 +532,10 @@
 
 /* Define to 1 if you have the `wcwidth' function. */
 /* #undef HAVE_WCWIDTH */
+
+/* Define to build the webp terminal. */
+/* #undef HAVE_WEBP */
+/* Don't change it here -- this define is set in config/makefile.os2. */
 
 /* Define to 1 if `fork' works. */
 #define HAVE_WORKING_FORK 1
@@ -464,12 +549,6 @@
 #else
 # define HAVE__BOOL 0
 #endif
-
-/* Define to enable handling point size in hidden3d code. */
-#define HIDDEN3D_VAR_PTSIZE 1
-
-/* Define if this is a Linux system with SuperVGA library. */
-/* #undef LINUXVGA */
 
 /* Define to 1 if malloc(0)==0 */
 /* #undef MALLOC_ZERO_RETURNS_ZERO */
@@ -489,9 +568,6 @@
 /* Define to disable terminals that depend on code in bitmap.c */
 /* #undef NO_BITMAP_SUPPORT */
 
-/* Define to 1 if your C compiler doesn't accept -c and -o together. */
-/* #undef NO_MINUS_C_MINUS_O */
-
 /* Name of package */
 /* #undef PACKAGE */
 
@@ -507,6 +583,9 @@
 /* Define to the one symbol short name of this package. */
 /* #undef PACKAGE_TARNAME */
 
+/* Define to the home page for this package. */
+/* #undef PACKAGE_URL */
+
 /* Define to the version of this package. */
 /* #undef PACKAGE_VERSION */
 
@@ -521,6 +600,7 @@
 
 /* Define if you want the Qt terminal. */
 /* #undef QTTERM */
+/* Don't change it here -- this define is set in config/makefile.os2. */
 
 /* Define if you want to use the included readline function. */
 /* #undef READLINE */
@@ -541,9 +621,6 @@
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
 
-/* Define if the 3dkit library is present. */
-/* #undef THREEDKIT */
-
 /* Define if your libcaca does not have caca_export_canvas_to_memory but the
    old caca_export_memory */
 /* #undef USE_CACA_EXPORT_MEMORY */
@@ -552,7 +629,7 @@
    RISK!). */
 /* #undef USE_CWDRC */
 
-/* Define if you want to use the experimental ggi driver. */
+/* Define this to build the General Graphics Interface (ggi) driver. */
 /* #undef USE_GGI_DRIVER */
 
 /* Define if you have interactive terminals that use mouse support. */
@@ -561,6 +638,28 @@
 
 /* Define to add support for generating a statistical summary of data */
 #define USE_STATS 1
+
+/* Enable extensions on AIX 3, Interix.  */
+#ifndef _ALL_SOURCE
+# define _ALL_SOURCE 1
+#endif
+/* Enable GNU extensions on systems that have them.  */
+#ifndef _GNU_SOURCE
+# define _GNU_SOURCE 1
+#endif
+/* Enable threading extensions on Solaris.  */
+#ifndef _POSIX_PTHREAD_SEMANTICS
+# define _POSIX_PTHREAD_SEMANTICS 1
+#endif
+/* Enable extensions on HP NonStop.  */
+#ifndef _TANDEM_SOURCE
+# define _TANDEM_SOURCE 1
+#endif
+/* Enable general extensions on Solaris.  */
+#ifndef __EXTENSIONS__
+# define __EXTENSIONS__ 1
+#endif
+
 
 /* Define to enable multi-byte font support for x11 */
 /* #undef USE_X11_MULTIBYTE */
@@ -571,8 +670,9 @@
 /* The main version number */
 /* #undef VERSION_MAJOR */
 
-/* Define if the vgagl library is present. */
-/* #undef VGAGL */
+/* Define to include support for tektronix terminal emulators */
+/* #undef WITH_TEKTRONIX */
+/* Don't change it here -- this define is set in config/makefile.os2. */
 
 /* Define if you want the wxwidgets terminal. */
 /* #undef WXWIDGETS */
@@ -590,11 +690,6 @@
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 /* #undef _FILE_OFFSET_BITS */
-
-/* Enable GNU extensions on systems that have them.  */
-#ifndef _GNU_SOURCE
-# define _GNU_SOURCE 1
-#endif
 
 /* Define to 1 to make fseeko visible on some hosts (e.g. glibc 2.2). */
 /* #undef _LARGEFILE_SOURCE */
@@ -614,12 +709,11 @@
 /* Define to `int' if <sys/types.h> does not define. */
 /* #define pid_t int */
 
-/* Define to `unsigned' if <sys/types.h> does not define. */
+/* Define to `unsigned int' if <sys/types.h> does not define. */
 /* #undef size_t */
 
 /* Define as `fork' if `vfork' does not work. */
 /* #undef vfork */
-
 
 /*
  * ==================================================
@@ -645,10 +739,8 @@
 #define PM_KEEP_OLD_ENHANCED_TEXT 1
 
 /*
- As the new generic approach for enhanced text for the PM
- terminal is still considered somewhat experimental, the
- old code will be used if this is defined. (Please note
- that this option might be removed in the future.)
+ You can still use the old enhanced text code. Note that it does
+ not support features like overprinting and Unicode escapes.
 */
 /* #undef PM_OLD_ENHANCED_TEXT */
 
