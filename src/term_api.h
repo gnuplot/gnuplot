@@ -506,6 +506,7 @@ void do_arc( int cx, int cy, double radius,
 	     int style, TBOOLEAN wedge);
 
 #ifdef OS2
+TBOOLEAN PM_is_connected(void);
 int PM_pause(char *);
 void PM_intc_cleanup(void);
 # ifdef USE_MOUSE

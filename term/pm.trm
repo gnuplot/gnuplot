@@ -173,7 +173,6 @@ static void PM_query_font(void);
 
 
 /* functions for sending messages to and receiving from gnupmdrv */
-static TBOOLEAN PM_is_connected(void);
 #define PM_send_msg(a) PM_send_char(a)
 static inline void  PM_send_char(char c);
 static inline void  PM_send_int(int i);
@@ -186,7 +185,7 @@ static inline int   PM_recv_int(void);
 static inline char *PM_recv_str(void);
 
 
-static inline TBOOLEAN
+inline TBOOLEAN
 PM_is_connected(void)
 {
     return (PM_pipe != NULL);

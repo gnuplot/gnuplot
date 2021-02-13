@@ -107,7 +107,8 @@ int paused_for_mouse = 0;
 static char *input_line_SharedMem = NULL; /* pointer to the shared memory for mouse messages */
 static HEV semInputReady = 0;      /* mouse event semaphore */
 static TBOOLEAN thread_rl_Running = FALSE;  /* running status */
-static int thread_RetCode = -1; /* return code from input thread */
+static int thread_rl_RetCode = -1; /* return code from readline input thread */
+static int thread_pause_RetCode = -1; /* return code from pause input thread */
 static TBOOLEAN pause_internal; /* flag to indicate not to use a dialog box */
 #endif /* OS2_IPC */
 
@@ -243,7 +244,7 @@ thread_read_line(void *arg)
 {
     (void) arg;
     thread_rl_Running = TRUE;
-    thread_RetCode = read_line(PROMPT, 0);
+    thread_rl_RetCode = read_line(PROMPT, 0);
     thread_rl_Running = FALSE;
     DosPostEventSem(semInputReady);
 }
@@ -263,10 +264,10 @@ thread_pause(void *arg)
 	do {
 	    junk = fgetc(stdin);
 	} while (junk != EOF && junk != '\r' && junk != '\n');
-	thread_RetCode = (junk == EOF) ? 0 : 1;
+	thread_pause_RetCode = (junk == EOF) ? 0 : 1;
     } else {
 	/* rc==1: OK; rc==0: cancel */
-	thread_RetCode = rc;
+	thread_pause_RetCode = rc;
     }
     DosPostEventSem(semInputReady);
 }
@@ -308,8 +309,8 @@ os2_ipc_dispatch_event(void)
 
 	/* copy event data immediately */
 	memcpy(&ge, input_line_SharedMem + 1, sizeof(ge));
-	*input_line_SharedMem = 0; /* discard the command line */
-	thread_RetCode = 0;
+	*input_line_SharedMem = 0; /* discard the event data */
+	thread_rl_RetCode = 0;
 
 	/* process event */
 	do_event(&ge);
@@ -334,12 +335,12 @@ os2_ipc_dispatch_event(void)
 	fprintf(stderr, "\n\tCommand(s) ignored for other than PM and X11 terminals\a\n");
 	if (interactive)
 	    fputs(PROMPT, stderr);
-	*input_line_SharedMem = 0; /* discard the command line */
+	*input_line_SharedMem = 0; /* discard the event data */
 	return 0;
     }
     strcpy(gp_input_line, input_line_SharedMem);
     input_line_SharedMem[0] = 0;
-    thread_RetCode = 0;
+    thread_rl_RetCode = 0;
     return 1;
 }
 
@@ -390,7 +391,7 @@ com_line()
 	    if (os2_ipc_dispatch_event() == 0)
 		return 0;
 	}
-	if (thread_RetCode)
+	if (thread_rl_RetCode)
 	    return 1;
 #else	/* The normal case */
 	if (read_line(PROMPT, 0))
@@ -1890,45 +1891,44 @@ pause_command()
 		bail_to_command_line();
 	}
 #elif defined(OS2) && defined(USE_MOUSE)
-	// FIXME: Even though on OS/2 only pm and x11 terminals support mousing,
-	//        should we still have a more generic test?
 	if ((strcmp(term->name, "pm") == 0) || (strcmp(term->name, "x11") == 0)) {
 	    ULONG u;
 
-	if (paused_for_mouse) {
-	    // FIXME: only pause for mouse if window is actually open!
-	    /* Only print a message if there is one given on the command line. */
-	    if (text)
-		fputs(buf, stderr);
-	    while (paused_for_mouse) {
-		/* wait for mouse event */
-		DosWaitEventSem(semInputReady, SEM_INDEFINITE_WAIT);
-		DosResetEventSem(semInputReady, &u);
-		os2_ipc_dispatch_event();
-	    }
-	    if (text)
-	        fputc('\n', stderr);
-	} else {
-	    /* If input is redirected or if the x11 terminal is active,
-	       we don't use a dialog/menu for pausing. */
-	    pause_internal = !isatty(fileno(stdin)) || (strcmp(term->name, "x11") == 0);
-	    thread_RetCode =  -1;
-	    _beginthread(thread_pause, NULL, 32768, text ? buf : NULL);
-	    do {
-		/* wait until pause is done or gnupmdrv makes shared mem available */
-		DosWaitEventSem(semInputReady, SEM_INDEFINITE_WAIT);
-		DosResetEventSem(semInputReady, &u);
-		if (thread_RetCode < 0)
+	    if (paused_for_mouse &&
+		/* only pause for mouse if window is actually open */
+		((strcmp(term->name, "pm") != 0) || PM_is_connected())) {
+		/* Only print a message if there is one given on the command line. */
+		if (text) fputs(buf, stderr);
+		while (paused_for_mouse) {
+		    /* wait for mouse event */
+		    DosWaitEventSem(semInputReady, SEM_INDEFINITE_WAIT);
+		    DosResetEventSem(semInputReady, &u);
 		    os2_ipc_dispatch_event();
-	    } while (thread_RetCode < 0);
-	    if (thread_RetCode == 0) {
-		/* if (!CallFromRexx)
-		 * would help to stop REXX programs w/o raising an error message
-		 * in RexxInterface() ...
-		 */
-		bail_to_command_line();
+		}
+		if (text) fputc('\n', stderr);
+	    } else {
+		/* If input is redirected or if the x11 terminal is active,
+		   we don't use a dialog/menu for pausing. */
+		pause_internal = !isatty(fileno(stdin)) || (strcmp(term->name, "x11") == 0);
+		thread_pause_RetCode =  -1;
+		_beginthread(thread_pause, NULL, 32768, text ? buf : NULL);
+		do {
+		    /* wait until pause is done or gnupmdrv makes shared mem available */
+		    DosWaitEventSem(semInputReady, SEM_INDEFINITE_WAIT);
+		    DosResetEventSem(semInputReady, &u);
+		    if (thread_pause_RetCode < 0)
+			os2_ipc_dispatch_event();
+		} while (thread_pause_RetCode < 0);
+		if (!isatty(fileno(stdin)) && text)
+		    fputc('\n', stderr);
+		if (thread_pause_RetCode == 0) {
+		    /* if (!CallFromRexx)
+		     * would help to stop REXX programs w/o raising an error message
+		     * in RexxInterface() ...
+		     */
+		    bail_to_command_line();
+		}
 	    }
-	}
 	} else {
 	    /* NOT x11 or pm terminal, so need to handle mouse events,
 	       just wait for input */
