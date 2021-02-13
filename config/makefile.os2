@@ -197,6 +197,7 @@ LDFLAGS  = -s -Zmt -Zcrtdll -Zbsd-signals
 CFLAGS2 = $(OS2FLAGS) $(EMXSPECIFIC) -O4 $(WARNFLAGS) -Zmt -Zomf
 LDFLAGS2 = -s -Zmt -Zcrtdll -Zomf -Zbsd-signals
 endif
+EXTRADEP += inttypes.h
 
 #
 # Settings for the terminals to be included
@@ -337,8 +338,23 @@ gp_cairo_helpers.$(O): wxterminal/gp_cairo_helpers.c
 
 $(OBJS): config.h
 
-gnuplot.exe: $(OBJS)
+gnuplot.exe: $(EXTRADEP) $(OBJS)
 	$(CC) $(LDFLAGS) -o $@ $(OBJS) $(TERMLIBS) $(LIBS)
+
+inttypes.h: $(firstword $(MAKEFILE_LIST))
+	@echo Creating a minimal inttypes.h for gnuplot
+	@echo #if defined(__EMX__) > $@
+	@echo #define PRId64 "lld" >> $@
+	@echo #define PRIi64 "lli" >> $@
+	@echo #define PRIo64 "llo" >> $@
+	@echo #define PRIu64 "llu" >> $@
+	@echo #define PRIx64 "llx" >> $@
+	@echo #define PRIX64 "llX" >> $@
+	@echo #define INT64_MAX LLONG_MAX >> $@
+	@echo #define INT64_MIN LLONG_MIN >> $@
+	@echo typedef unsigned long long uint64_t; >> $@
+	@echo typedef long long int64_t; >> $@
+	@echo #endif >> $@
 
 #
 # Build the PM outboard driver
@@ -376,13 +392,14 @@ gnupmdrv.hlp: $(OS2DIR)\gnupmdrv.ipf
 X11LIBS = -L$(X11ROOT)/XFree86/lib -lX11 -lsocket -Zbsd-signals -Zcrtdll
 # X11 includes
 X11INCLUDES = -I$(X11ROOT)/XFree86/include
-X11FLAGS= -Zmt -D__UNIXOS2__ -DI_NEED_OS2_H
+X11FLAGS= -I. -Zmt -D__UNIXOS2__ -DI_NEED_OS2_H
 ifdef MOUSE
 X11FLAGS += -DUSE_MOUSE
 endif
+X11OBJS = gplt_x11.o gpexecute.o getcolor_x11.o version.o
 
-gnuplot_x11.exe: gplt_x11.o gpexecute.o getcolor_x11.o version.o
-	$(CC) $(LDFLAGS) $(X11FLAGS) $(EMXSPECIFIC) -o $@ -DGPLT_X11_MODE $^ $(X11LIBS)
+gnuplot_x11.exe: $(EXTRADEP) $(X11OBJS)
+	$(CC) $(LDFLAGS) $(X11FLAGS) $(EMXSPECIFIC) -o $@ -DGPLT_X11_MODE $(X11OBJS) $(X11LIBS)
 
 gplt_x11.o: gplt_x11.c mouse.h gpexecute.h config.h
 	$(CC) $(CFLAGS) $(X11FLAGS) $(EMXSPECIFIC) $(X11INCLUDES) -c -o $@ $<
@@ -514,6 +531,7 @@ clean:
 	if exist *.$(O2)                   del *.$(O2)
 	cd $(OS2DIR) && if exist *.$(O2)   del *.$(O2)
 	if exist *.d                       del *.d
+	if exist inttypes.h                del inttypes.h
 	if exist $(OS2DIR)\gnupmdrv.res    del $(OS2DIR)\gnupmdrv.res
 	if exist $(DEMODIR)\bf_test.exe    del $(DEMODIR)\bf_test.exe
 	if exist $(DOCDIR)\doc2*.exe       del $(DOCDIR)\doc2*.exe

@@ -158,9 +158,9 @@
 #define HAVE_INDEX 1
 
 /* Define to 1 if you have the <inttypes.h> header file. */
-#ifdef __KLIBC__
-# define HAVE_INTTYPES_H 1
-#endif
+/* EMX does not have inttypes.h, but we create a sufficient one
+   from the Makefile */
+#define HAVE_INTTYPES_H 1
 
 /* Define if you want to use kpsexpand (TeX). */
 /* #undef HAVE_KPSEXPAND */
