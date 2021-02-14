@@ -51,18 +51,9 @@
 #include <signal.h>
 #include <setjmp.h>
 
-#ifdef OS2 /* os2.h required for gpexecute.h */
-# define INCL_DOS
+#ifdef OS2
 # define INCL_REXXSAA
-# ifdef OS2_IPC
-#  define INCL_DOSSEMAPHORES
-# endif
 # include <os2.h>
-#endif /* OS2 */
-
-/* on OS/2 this is needed even without USE_MOUSE */
-#if defined(OS2_IPC)
-# include "gpexecute.h"
 #endif
 
 #if defined(MSDOS) || defined(__EMX__) || (defined(WGP_CONSOLE) && defined(MSVC))
@@ -298,18 +289,13 @@ main(int argc_orig, char **argv)
     _control87(MCW_EM, MCW_EM);
 #endif
 
-#if defined(OS2)
+#ifdef OS2
     {
-	int rc;
-#ifdef OS2_IPC
-	char semInputReadyName[40];
-
-	sprintf(semInputReadyName, "\\SEM32\\GP%i_Input_Ready", getpid());
-	rc = DosCreateEventSem(semInputReadyName, &semInputReady, 0, 0);
-	if (rc != 0)
-	    fputs("DosCreateEventSem error\n", stderr);
-#endif
-	rc = RexxRegisterSubcomExe("GNUPLOT", (PFN) RexxInterface, NULL);
+	int rc = RexxRegisterSubcomExe("GNUPLOT", (PFN) RexxInterface, NULL);
+	(void) rc;
+# ifdef OS2_IPC
+	os2_ipc_setup();
+# endif
     }
 #endif
 

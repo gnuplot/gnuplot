@@ -582,20 +582,9 @@ PM_text()
     if (PM_mode != SET_TEXT) {
 	putc(SET_TEXT, PM_pipe);
 	fflush(PM_pipe);
-#if 0
-	keep_term_initialised = term_initialised ;
-	term_initialised = FALSE ; /* need to force init */
-#endif
     }
-
     PM_mode = SET_TEXT;
-#ifdef USE_MOUSE
-    {
-	/* FIXME 20040712: 'extern' in a source file is always wrong. */
-	extern TBOOLEAN allowmotion;
-	allowmotion = TRUE;
-    }
-#endif
+    exec_event(GE_plotdone, 0, 0, 0, 0, 0);
 }
 
 

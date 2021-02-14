@@ -101,15 +101,14 @@ int paused_for_mouse = 0;
 #define PROMPT "gnuplot> "
 
 #ifdef OS2_IPC
-#  define INCL_DOSMEMMGR
-#  define INCL_DOSPROCESS
-#  define INCL_DOSSEMAPHORES
-#  include <os2.h>
-PVOID input_from_PM_Terminal = NULL;
-char mouseSharedMemName[40] = "";
-HEV semInputReady = 0;      /* semaphore to be created in plot.c */
-int thread_rl_Running = 0;  /* running status */
-int thread_rl_RetCode = -1; /* return code from readline in a thread */
+# define INCL_DOSMEMMGR
+# define INCL_DOSPROCESS
+# define INCL_DOSSEMAPHORES
+# include <os2.h>
+static char *input_line_SharedMem = NULL; /* pointer to the shared memory for mouse messages */
+static HEV semInputReady = 0;      /* mouse event semaphore */
+static TBOOLEAN thread_rl_Running = FALSE;  /* running status */
+static int thread_rl_RetCode = -1; /* return code from readline input thread */
 #endif /* OS2_IPC */
 
 #ifndef _WIN32
@@ -207,14 +206,6 @@ extend_input_line()
 	gp_input_line = gp_alloc(MAX_LINE_LEN, "gp_input_line");
 	gp_input_line_len = MAX_LINE_LEN;
 	gp_input_line[0] = NUL;
-
-#ifdef OS2_IPC
-	sprintf( mouseSharedMemName, "\\SHAREMEM\\GP%i_Mouse_Input", getpid() );
-	if (DosAllocSharedMem((PVOID) & input_from_PM_Terminal,
-		mouseSharedMemName, MAX_LINE_LEN, PAG_WRITE | PAG_COMMIT))
-	    fputs("command.c: DosAllocSharedMem ERROR\n",stderr);
-#endif /* OS2_IPC */
-
     } else {
 	gp_input_line = gp_realloc(gp_input_line, gp_input_line_len + MAX_LINE_LEN,
 				"extend input line");
@@ -246,12 +237,86 @@ extend_token_table()
 
 
 #ifdef OS2_IPC
-void thread_read_line()
+void
+thread_read_line(void *arg)
 {
-   thread_rl_Running = 1;
-   thread_rl_RetCode = ( read_line(PROMPT, 0) );
-   thread_rl_Running = 0;
-   DosPostEventSem(semInputReady);
+    (void) arg;
+    thread_rl_Running = TRUE;
+    thread_rl_RetCode = read_line(PROMPT, 0);
+    thread_rl_Running = FALSE;
+    DosPostEventSem(semInputReady);
+}
+
+
+void
+os2_ipc_setup(void)
+{
+    APIRET rc;
+    char semInputReadyName[40];
+    char mouseSharedMemName[40];
+
+    /* create input event semaphore */
+    sprintf(semInputReadyName, "\\SEM32\\GP%i_Input_Ready", getpid());
+    rc = DosCreateEventSem(semInputReadyName, &semInputReady, 0, 0);
+    if (rc != 0)
+	fputs("DosCreateEventSem error\n", stderr);
+
+    /* allocate shared memory */
+    sprintf(mouseSharedMemName, "\\SHAREMEM\\GP%i_Mouse_Input", getpid());
+    rc = DosAllocSharedMem((PPVOID) &input_line_SharedMem,
+		mouseSharedMemName, MAX_LINE_LEN,
+		PAG_READ | PAG_WRITE | PAG_COMMIT);
+    if (rc != 0)
+	fputs("DosAllocSharedMem ERROR\n", stderr);
+    else
+	*input_line_SharedMem = 0;
+}
+
+
+int
+os2_ipc_dispatch_event(void)
+{
+    if (input_line_SharedMem == NULL || !*input_line_SharedMem)
+	return 0;
+
+    if (*input_line_SharedMem == '%') {
+	struct gp_event_t ge;
+
+	/* copy event data immediately */
+	memcpy(&ge, input_line_SharedMem + 1, sizeof(ge));
+	*input_line_SharedMem = 0; /* discard the event data */
+	thread_rl_RetCode = 0;
+
+	/* process event */
+	do_event(&ge);
+
+	/* end pause mouse? */
+	if ((ge.type == GE_buttonrelease) && (paused_for_mouse & PAUSE_CLICK) &&
+	    (((ge.par1 == 1) && (paused_for_mouse & PAUSE_BUTTON1)) ||
+	     ((ge.par1 == 2) && (paused_for_mouse & PAUSE_BUTTON2)) ||
+	     ((ge.par1 == 3) && (paused_for_mouse & PAUSE_BUTTON3)))) {
+	    paused_for_mouse = 0;
+	}
+	if ((ge.type == GE_keypress) && (paused_for_mouse & PAUSE_KEYSTROKE) &&
+	    (ge.par1 != NUL)) {
+	    paused_for_mouse = 0;
+	}
+	return 0;
+    }
+    if (*input_line_SharedMem &&
+        strstr(input_line_SharedMem, "plot") != NULL &&
+        (strcmp(term->name, "pm") != 0 && strcmp(term->name, "x11") != 0)) {
+	/* avoid plotting if terminal is not PM or X11 */
+	fprintf(stderr, "\n\tCommand(s) ignored for other than PM and X11 terminals\a\n");
+	if (interactive)
+	    fputs(PROMPT, stderr);
+	*input_line_SharedMem = 0; /* discard the event data */
+	return 0;
+    }
+    strcpy(gp_input_line, input_line_SharedMem);
+    input_line_SharedMem[0] = 0;
+    thread_rl_RetCode = 0;
+    return 1;
 }
 #endif /* OS2_IPC */
 
@@ -259,18 +324,6 @@ void thread_read_line()
 int
 com_line()
 {
-#ifdef OS2_IPC
-static char *input_line_SharedMem = NULL;
-
-    if (input_line_SharedMem == NULL) {  /* get shared mem only once */
-    if (DosGetNamedSharedMem((PVOID) &input_line_SharedMem,
-		mouseSharedMemName, PAG_WRITE | PAG_READ))
-	fputs("readline.c: DosGetNamedSharedMem ERROR\n", stderr);
-    else
-	*input_line_SharedMem = 0;
-    }
-#endif /* OS2_IPC */
-
     if (multiplot) {
 	/* calls int_error() if it is not happy */
 	term_check_multiplot_okay(interactive);
@@ -281,42 +334,33 @@ static char *input_line_SharedMem = NULL;
 
 #if defined(OS2_IPC) && defined(USE_MOUSE)
 	ULONG u;
-	if (thread_rl_Running == 0) {
-	    int res = _beginthread(thread_read_line,NULL,32768,NULL);
+
+	if (!thread_rl_Running) {
+	    int res;
+
+	    // Discard pending mouse events to avoid spurious side effects.
+	    // This seems only necessary since we do no handle mouse events
+	    // anywhere else (like in pause, during load, etc.).
+	    input_line_SharedMem[0] = 0;
+	    DosResetEventSem(semInputReady, &u);
+
+	    res = _beginthread(thread_read_line, NULL, 32768, NULL);
 	    if (res == -1)
-		fputs("error command.c could not begin thread\n",stderr);
+		fputs("error command.c could not begin thread\n", stderr);
 	}
 	/* wait until a line is read or gnupmdrv makes shared mem available */
-	DosWaitEventSem(semInputReady,SEM_INDEFINITE_WAIT);
-	DosResetEventSem(semInputReady,&u);
+	DosWaitEventSem(semInputReady, SEM_INDEFINITE_WAIT);
+	DosResetEventSem(semInputReady, &u);
 	if (thread_rl_Running) {
-	    if (input_line_SharedMem == NULL || !*input_line_SharedMem)
-		return (0);
-	    if (*input_line_SharedMem=='%') {
-		do_event( (struct gp_event_t*)(input_line_SharedMem+1) ); /* pass terminal's event */
-		input_line_SharedMem[0] = 0; /* discard the whole command line */
-		thread_rl_RetCode = 0;
-		return (0);
-	    }
-	    if (*input_line_SharedMem &&
-		strstr(input_line_SharedMem,"plot") != NULL &&
-		(strcmp(term->name,"pm") && strcmp(term->name,"x11"))) {
-		/* avoid plotting if terminal is not PM or X11 */
-		fprintf(stderr,"\n\tCommand(s) ignored for other than PM and X11 terminals\a\n");
-		if (interactive) fputs(PROMPT,stderr);
-		input_line_SharedMem[0] = 0; /* discard the whole command line */
-		return (0);
-	    }
-	    strcpy(gp_input_line, input_line_SharedMem);
-	    input_line_SharedMem[0] = 0;
-	    thread_rl_RetCode = 0;
+	    /* input thread still running, this must be a "mouse" event */
+	    if (os2_ipc_dispatch_event() == 0)
+		return 0;
 	}
 	if (thread_rl_RetCode)
-	    return (1);
-
+	    return 1;
 #else	/* The normal case */
 	if (read_line(PROMPT, 0))
-	    return (1);
+	    return 1;
 #endif	/* defined(OS2_IPC) && defined(USE_MOUSE) */
     }
 
