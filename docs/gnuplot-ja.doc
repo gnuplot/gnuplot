@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.712 2020-09-04 15:49:46+09 shige Exp $
-C corresponding original gnuplot.doc at 2020-09-04
+C RCS $Id: gnuplot-ja.doc,v 1.726 2021-02-01 11:01:17+09 shige Exp $
+C corresponding original gnuplot.doc at 2021-01-26
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -29,7 +29,7 @@ C で書かれているが、それを HTML 名前参照形式に変更している。
 ^  James R. Van Zandt, Alex Woo, Johannes Zellner<br>
 ^</p>
 ^<p align="center">  Copyright (C) 1986 - 1993, 1998 - 2004   Thomas Williams, Colin Kelley<br>
-^     Copyright (C) 2004 - 2020 various authors</p>
+^     Copyright (C) 2004 - 2021 various authors</p>
 ^<p align="center">   Mailing list for comments: <tt>gnuplot-info@lists.sourceforge.net</tt><br>
 ^      Mailing list for bug reports: <tt>gnuplot-bugs@lists.sourceforge.net</tt><br>
 ^      Web access (preferred): <tt>http://sourceforge.net/projects/gnuplot</tt></p>
@@ -249,14 +249,53 @@ C 行が長いのは、できればなんとかしたい
            gnuplot-beta@lists.sourceforge.net
 
 2 新しい機能 (New features)
+3 開発版 (Development version)
 ?new version_5.5
 ?new
-3 開発版 (Development version)
 ?development version
  バージョン 5.5 は現在の開発版で、それは git リポジトリにあるマスターブ
  ランチ内のソースファイルのスナップショットを使って作成できます。それに
  導入された新しい機能は、一般には、バージョン 5.6 までの正式版に現れる
  ことはありませんし、細かい仕様は導入の前に変更される可能性があります。
+
+4 特殊関数と複素数値関数 (Special and complex-valued functions)
+ gnuplot のこのバージョンでは、沢山の複素数値関数と、以前のバージョンに
+ あったいくつかの関数の改良版を提供します。
+#start
+#b (正規化) 不完全ガンマ関数の定義域と精度の改良。複素引数が可能に。
+## 以下参照: `igamma`。
+#b (正規化) 不完全ベータ関数の定義域と精度の改良。
+## 以下参照: `ibeta`。
+#b 逆 (正規化) 不完全ガンマ関数を新しく追加。
+## 以下参照: `invigamma`。
+#b 逆 (正規化) 不完全ベータ関数を新しく追加。
+## 以下参照: `invibeta`。
+#b 多価関数 W_k(z) の第 k 分岐を返す複素関数 LambertW(z,k) を新しく追加。
+## 古い lambertw(x) は real(LambertW( real(z), 0 )) であることに注意。
+## 以下参照: `LambertW`。
+#b 複素関数 lnGamma(z) を新しく追加。
+## 既にある lgamma(x) は real(lnGamma(real(z)) であることに注意。
+## 以下参照: `lnGamma`。
+#b z の複素共役を返す複素関数 conj(z)
+#b (第 1) シンクロトロン関数 F(x)。以下参照: `SynchrotronF`。
+#b acosh(z) の定義域を負の実数軸を覆うように拡張。
+#b asin(z) asinh(z) の複素数引数に対する精度の改良。
+#b 便利なように I = sqrt(-1) = {0,1} を定義済み変数に。
+## gnuplot は {a,b} を正しい複素数定数と見なしてくれませんが、しかし
+## (a + b*I) なら正しい複素数数式として受けつけてくれるので有用です。
+#end
+
+ ビルド時に適切な外部ライブラリがあれば、さらにいくつかの特殊関数をサポ
+ ートします。以下参照: `special_functions`。
+#start
+#b ν 次 (実数) の、引数 z に対する複素ベッセル関数 Iν(z), Jν(z),
+## Kν(z), Yν(z)。以下参照: `BesselK`。
+#b ν 次 (実数) の、引数 z に対する複素ハンケル関数 H1ν(z), H2ν(z)。
+## 以下参照: `BesselH1`。
+#b 複素エアリー関数 Ai(z), Bi(z)。
+#b n 次の複素指数積分。以下参照: `expint`。
+#b フレネル積分 C(x), S(x)。以下参照: `FresnelC`。
+#end
 
 4 新しい描画スタイルやスタイルオプション
 ?new plot_styles
@@ -266,6 +305,7 @@ C 行が長いのは、できればなんとかしたい
 ## 元スプライン平滑化。以下参照: `smooth path`。
 #b 周期的データの平滑化用の新しいキーワード `period`。以下参照:
 ## `smooth kdensity`。
+#b cbtics 以外の軸には影響しない `set colorbox cbtics <linestyle>`
 #end
 
 4 新しいコマンドやコマンドオプション
@@ -290,14 +330,45 @@ C 行が長いのは、できればなんとかしたい
 ## `set palette` では簡単に指定できない他の修正を可能にします。
 #end
 
+4 新しい出力形式とオプション (New terminals and terminal options)
+#start
+#b 新しい出力形式 `block` は、疑似グラフィックのテキストモード用のもの
+## で、`dumb` や `caca` 出力形式に対して改良された解像度を提供するため
+## に Unicode ブロック、あるいは点字 (Braille 文字) を使用します。
+#b 新しい出力形式 `webp` は、webp エンコーディングを用いて、単一フレー
+## ムか、アニメーション列を生成します。各フレームは pngcairo で生成し、
+## その後 libwebp と libwebpmux による WebPAnimEncoder API を通してエン
+## コードを行います。
+#end
+
+4 週曜日のサポート (Week-date time support)
+ 2020-2021 年に起きた新型コロナウィルス (Covid-19) の騒動では、疫学的デ
+ ータのグラフ化の関心が高まりましたが、そこでは報告の慣習として、よく
+ 「週曜日」を使った表が示されていました。そしてこれにより、この慣習に対
+ する gnuplot のサポートの不足が明らかになり、日時書式の %W と %U のエ
+ ラーもわかりました。現在これは改善し、週曜日もサポートするように拡張し
+ てあります。
+#start
+#b 日時書式 %W は、ISO 8601 の週曜日規則に従うようになりました。
+#b 日時書式 %U は、CDC/MMWR の週曜日規則に従うようになりました。
+#b 新しい関数 `tm_week(time, std)` は、ISO か CDC 規則でのその年の週番
+## 号を返します。
+#b 新しい関数 `weekdate_iso(year, week, day)` は、ISO 規則での週曜日を
+## カレンダー時刻に変換します。
+#b 新しい関数 `weekdate_cdc(year, week, day)` は、CDC 規則での週曜日を
+## カレンダー時刻に変換します。
+#end
+
 4 その他の新しい機能
 ?new other
 #start
 #b cbrange 内の z に割当てられた RGB パレット色を返す関数 `palette(z)`
-#b Voigt プロファイルの半値全幅を返す関数 VP_fwhm(sigma,gamma)。以下参
-## 照: `VP`, `VP_fwhm`, `libcerf`。
-#b gnuplotrc の設定選択用に XSG ベースディレクトリをサポート。以下参照:
-## `environment`。
+#b 色名からその色の 32bit ARGB 値を返す関数 `rgbcolor("name")`
+#b Voigt プロファイルの半値全幅を返す関数 `VP_fwhm(sigma,gamma)`。以下
+## 参照: `VP`, `VP_fwhm`, `libcerf`。
+#b gnuplotrc の設定選択用に XDG ベースディレクトリをサポート。初期化コ
+## マンドは、$HOME/.config/gnuplot/gnuplotrc (もし存在すれば) から読み
+## 込みます。以下参照: `environment`。
 #end
 
 3 バージョン 5.4 で導入された機能
@@ -330,6 +401,8 @@ C 行が長いのは、できればなんとかしたい
 ## 数を使うことで、`splot` コマンドで色やその他の属性を割り当てるために
 ## 参照することができます。
 ## デモ `voxel.dem` を参照してください。
+#b `show vgrid` で現在定義されているすべてのボクセル格子の基本的な統計
+## 情報を出力。
 #b ボクセル格子は、`splot` コマンドの描画スタイル `dots`, `points`, ま
 ## たは `isosurface` で、その名前を使って描画できます。
 ## デモ `vplot.dem` を参照してください。
@@ -366,7 +439,8 @@ C 行が長いのは、できればなんとかしたい
 4 新しいデータ前処理フィルタ
 #start
 #b `smooth zsort` は 3 列目の値で 2 次元の点をソートします。以下参照:
-## `smooth zsort`。
+## `smooth zsort`。これは、とても大きいデータ集合内の少しの特別な点を
+## 前面に移動してそれらが埋もれないようにするためには有用です。
 #end
 
 4 新しいコマンドやコマンドオプション
@@ -390,7 +464,7 @@ C 行が長いのは、できればなんとかしたい
 #b マウス座標変換関数をユーザ指定可に (試験段階)
 ##map_projection デモを参照。
 #b コマンド `load` は、入力コマンドをファイルから読み込む代わりにデータ
-## ブロックからも読み込むことができます (試験段階)。
+## ブロックからも読み込むことができます。
 #b `set datafile columnheaders` は、入力の先頭行を、データ値ではなく文
 ## 字列として読ませます。これは、凡例行の生成には影響を与えないことを除
 ## けば `set key autotitle columnheader` と同等です。このオプションの有
@@ -449,8 +523,9 @@ C 行が長いのは、できればなんとかしたい
 #b コマンド `set fontpath` は非推奨です。postscript 出力形式からの出力
 ## の中に埋め込まれるフォントの検索パスは改良されています。
 #end
+
 3 バージョン 5.2 で導入された機能 (Features introduced in version 5.2)
-?Features introduced in version 5.2
+?new version_5.2
 4 新しい描画スタイルやスタイルオプション
 #start
 #b 3 次元描画スタイル `with zerrorfill`。以下参照: `zerrorfill`,
@@ -500,7 +575,6 @@ C 行が長いのは、できればなんとかしたい
 ## による非線形軸の例の一つとして再実装されました。
 #end
 4 新しいコマンドやコマンドオプション
-?new version_5.2
 #start
 #b 繰り返し実行部分の中カッコ内では、`continue` は次の繰り返しにすぐに
 ## 移動し、`break` は繰り返しを中断します。
@@ -730,6 +804,32 @@ C 行が長いのは、できればなんとかしたい
  そこでは、各デモを作成するコマンドがグラフの隣りに表示されますし、その
  gnuplot スクリプトをダウンロードすることもできますので、それを保存し同
  様のグラフを作成することができます。
+
+2 アニメーション (Animation)
+?animation
+ gnuplot の対話型出力形式 (qt, win, wxt, x11, aqua) ではいずれも、コマ
+ ンドラインやスクリプトから連続するフレームの描画を行うことでアニメーシ
+ ョンを表示することができます。
+
+ マウスが使えない出力形式でも、ある種のアニメーションをサポートするもの
+ があります。以下参照: `term sixelgd animate`, `term domterm animate`。
+
+ アニメーションをファイルとして保存して、後で手元で再生したり Web ペー
+ ジに埋め込んだりできる出力形式が 2 つあります。以下参照:
+ `term gif animate`, `term webp`。
+
+ 例:
+
+      unset border; unset tics; unset key; set view equal xyz
+      set pm3d border linecolor "black"
+
+      set term webp animate delay 50
+      set output 'spinning_d20.webp'
+      do for [ang=1:360:2] {
+          set view 60, ang
+          splot 'icosahedron.dat' with polygons fc "gold"
+      }
+      unset output
 
 2 バッチ/対話型操作 (Batch/Interactive)
 ?batch/interactive
@@ -1291,23 +1391,39 @@ C  need @ in table, so end and restart the table !
  す。書式 "string"[beg:end] は、文字列値の組み込み関数
  substr("strings",beg,end) を呼ぶこととほぼ同じですが、関数呼び出しでは
  beg, end は省略することはできません。
-3 複素数計算 (Complex arithmetic)
-?complex arithmetic
+3 複素数値 (Complex values)
+?complex values
 ?complex
  計算の演算子とほとんどの組み込み関数は複素数引数の使用をサポートしてい
  ます。複素定数は、{<real>,<imag>} と表記し、<real> と <imag> は、数定
  数である必要があります。よって、{0,1} は 'i' を意味します。
- 複素数値 x の実数部分と虚数部分は、real(x), imag(x) として取り出せます。
- 絶対値は abs(x) で得られます。
+ 現在の gnuplot は、あらかじめ I = {0,1} を変数として定義していて、他の
+ 変数から複素数値を作るのに使えるようにしています。つまり、`x + y*I` は
+ 正しい数式なのですが、`{x,y}` はそうではありません。
+ 複素数値 z の実数部分と虚数部分は、real(z), imag(z) として取り出せます。
+ 長さは abs(z) で、偏角は arg(z) で得られます。
 
- gnuplot の 2 次元と 3 次元の描画スタイルでは、実数値のみ描画できます。
- よって 0 でない虚数部分を持つ複素数値関数 f(x) を描画する場合は、
- real(f(x)) か abs(f(x)) の描画を選択する必要があります。複素数値の表現
- の例は、
-^ <a href="http://www.gnuplot.info/demo/complex_trig.html">
- 複素三角関数デモ (complex_trig.dem)
-^ </a>
- をご覧ください。
+Ffigure_E0
+ gnuplot の 2 次元と 3 次元の描画スタイルは、実数値を仮定しています。よ
+ って 0 でない虚数部分を持つ複素数値関数 f(x) を描画する場合は、実数部
+ 分や虚数部分、あるいは長さや偏角を描画させなければいけません。
+ 例えば複素引数に対する関数 f(z) の複素数値の長さと偏角を表示させるには、
+ 長さを曲面の高さ、偏角を色で表示するという手があります。
+ その場合、HSV 色空間のカラーパレットを用いて、0 から 1 の範囲の H 成分
+ (色相) を arg(z) が返す偏角の範囲 [-π:π] に割り当て、偏角が 1 周した
+ ら色も巻き戻るようにすると便利でしょう。デフォルトでは、これは H = 0
+ (赤) から始まりますが、`set palette` の `start` キーワードを使ってその
+ 開始位置を変更し、H の他の値を 0 に割り当てることも可能です。
+ 以下の例は、H = 0.3 (緑) から開始し巻き戻るようにしています。以下参照:
+ `set palette defined`, `arg`, `set angles`。
+
+      set palette model HSV start 0.3 defined (0 0 1 1, 1 1 1 1)
+      set cbrange [-pi:pi]
+      set cbtics ("-π" -pi, "π" pi)
+      set pm3d corners2color c1
+      E0(z) = exp(-z)/z
+      I = {0,1}
+      splot '++' using 1:2:(abs(E0(x+I*y))):(arg(E0(x+I*y))) with pm3d
 
 3 定数 (Constants)
 ?constants
@@ -1323,9 +1439,13 @@ C  need @ in table, so end and restart the table !
  す。
 
  複素数の定数は {<real>,<imag>} と表現します。ここで <real> と <imag>
- (実部、虚部) は数値定数である必要があります。例えば {3,2} は 3 + 2i を
- あらわし、{0,1} は 'i' 自身を表します。これらには明示的に中カッコを使
- う必要があります。
+ (実部、虚部) は数値定数である必要があります。例えば、{0,1} は 'i' 自身
+ を表し、{3,2} は 3 + 2i を表します。これらには明示的に中カッコを使う必
+ 要があります。この gnuplot では、あらかじめ I = {0,1} を変数として定義
+ して、明示的な形式の入力を避ける工夫をしています。例えば、`3 + 2*I` は
+ `{3,2}` と同じですが、こちらは虚数成分に変数係数を使えるところが優位で
+ す。すなわち、`x + y*I` は正しい数式ですが、`{x,y}` はそうではありませ
+ ん。
 
  文字列定数は単一引用符か二重引用符のいずれかで囲まれた任意の文字の並び
  からなるものです。単一引用符と二重引用符の違いは重要です。以下参照:
@@ -1352,36 +1472,37 @@ C  need @ in table, so end and restart the table !
 ^  <col align="left">
 ^</colgroup>
 ^<thead>
-^<tr>    <th colspan="3"> 数学ライブラリ関数 </th></tr>
+^<tr>    <th colspan="3"> 数学ライブラリ、組み込み関数 </th></tr>
 ^<tr>    <th>関数</th>    <th>引数</th>    <th>戻り値</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>    <td>abs(x)</td>    <td>任意</td>    <td>|<i>x</i>|, <i>x</i> の絶対値; 同じ型</td></tr>
-^<tr>    <td>abs(x)</td>    <td>複素数</td>    <td>length of <i>x</i>, &radic;( Re(<i>x</i>)<sup>2</sup> + Im(<i>x</i>)<sup>2</sup> )</td></tr>
+^<tr>    <td>abs(x)</td>    <td>整数または実数</td>    <td>|<i>x</i>|, <i>x</i> の絶対値; 同じ型</td></tr>
+^<tr>    <td>abs(x)</td>    <td>複素数</td>    <td><i>x</i> の長さ, &radic;( Re(<i>x</i>)<sup>2</sup> + Im(<i>x</i>)<sup>2</sup> )</td></tr>
 ^<tr>    <td>acos(x)</td>    <td>任意</td>    <td>cos<sup>-1</sup> <i>x</i> (アークコサイン)</td></tr>
 ^<tr>    <td>acosh(x)</td>    <td>任意</td>    <td>ラジアンでの cosh<sup>-1</sup> <i>x</i> (逆双曲余弦)</td></tr>
-^<tr>    <td>airy(x)</td>    <td>任意</td>    <td>エアリー (Airy) 関数 Ai(<i>x</i>)</td></tr>
+^<tr>    <td>airy(x)</td>    <td>実数</td>    <td>実数の x に対するエアリー (Airy) 関数 Ai(<i>x</i>)</td></tr>
 ^<tr>    <td>arg(x)</td>    <td>複素数</td>    <td><i>x</i> の偏角</td></tr>
 ^<tr>    <td>asin(x)</td>    <td>任意</td>    <td>sin<sup>-1</sup> <i>x</i> (アークサイン)</td></tr>
 ^<tr>    <td>asinh(x)</td>    <td>任意</td>    <td>ラジアンでの sinh<sup>-1</sup> <i>x</i> (逆双曲正弦)</td></tr>
 ^<tr>    <td>atan(x)</td>    <td>任意</td>    <td>tan<sup>-1</sup> <i>x</i> (アークタンジェント)</td></tr>
 ^<tr>    <td>atan2(y,x)</td>    <td>整数または実数</td>    <td>tan<sup>-1</sup>(<i>y/x</i>) (アークタンジェント)</td></tr>
 ^<tr>    <td>atanh(x)</td>    <td>任意</td>    <td>ラジアンでの tanh<sup>-1</sup> <i>x</i> (逆双曲正接)</td></tr>
-^<tr>    <td>EllipticK(k)</td>    <td>(-1:1) 内の実数 k</td>    <td><i>K(k)</i> 第 1 種完全楕円積分</td></tr>
-^<tr>    <td>EllipticE(k)</td>    <td>[-1:1] 内の実数 k</td>    <td><i>E(k)</i> 第 2 種完全楕円積分</td></tr>
-^<tr>    <td>EllipticPi(n,k)</td>    <td>実数 n&lt;1, (-1:1) 内の実数 k</td>    <td> &Pi;(<i>n,k</i>) 第 3 種完全楕円積分</td></tr>
-^<tr>    <td>besj0(x)</td>    <td>整数または実数</td>    <td>ラジアンでの <i>J</i><sub>0</sub> ベッセル関数 (0 次ベッセル関数)</td></tr>
-^<tr>    <td>besj1(x)</td>    <td>整数または実数</td>    <td>ラジアンでの <i>J</i><sub>1</sub> ベッセル関数 (1 次ベッセル関数)</td></tr>
+^<tr>    <td>besj0(x)</td>    <td>実数</td>    <td>ラジアンでの <i>J</i><sub>0</sub> ベッセル関数 (0 次ベッセル関数)</td></tr>
+^<tr>    <td>besj1(x)</td>    <td>実数</td>    <td>ラジアンでの <i>J</i><sub>1</sub> ベッセル関数 (1 次ベッセル関数)</td></tr>
 ^<tr>    <td>besjn(n,x)</td>    <td>整数, 実数</td>    <td>ラジアンでの <i>J</i><sub>n</sub> ベッセル関数 (n 次ベッセル関数)</td></tr>
-^<tr>    <td>besy0(x)</td>    <td>整数または実数</td>    <td>ラジアンでの <i>Y</i><sub>0</sub> ベッセル関数 (0 次ノイマン関数)</td></tr>
-^<tr>    <td>besy1(x)</td>    <td>整数または実数</td>    <td>ラジアンでの <i>Y</i><sub>1</sub> ベッセル関数 (1 次ノイマン関数)</td></tr>
+^<tr>    <td>besy0(x)</td>    <td>実数</td>    <td>ラジアンでの <i>Y</i><sub>0</sub> ベッセル関数 (0 次ノイマン関数)</td></tr>
+^<tr>    <td>besy1(x)</td>    <td>実数</td>    <td>ラジアンでの <i>Y</i><sub>1</sub> ベッセル関数 (1 次ノイマン関数)</td></tr>
 ^<tr>    <td>besyn(n,x)</td>   <td>整数, 実数</td>    <td>ラジアンでの <i>Y</i><sub>n</sub> ベッセル関数 (n 次ノイマン関数)</td></tr>
 ^<tr>    <td>besi0(x)</td>     <td>実数</td>       <td>ラジアンでの <i>I</i><sub>0</sub> 変形ベッセル関数 (0 次変形ベッセル関数</td></tr>
 ^<tr>    <td>besi1(x)</td>     <td>実数</td>       <td>ラジアンでの <i>I</i><sub>1</sub> 変形ベッセル関数 (1 次変形ベッセル関数</td></tr>
 ^<tr>    <td>besin(n,x)</td>   <td>整数, 実数</td> <td>ラジアンでの <i>I</i><sub>n</sub> 変形ベッセル関数 (n 次変形ベッセル関数</td></tr>
 ^<tr>    <td>ceil(x)</td>    <td>任意</td>    <td>&lceil;<i>x</i>&rceil;, <i>x</i> (の実部) 以上の最小の整数</td></tr>
+^<tr>    <td>conj(x)</td>    <td>複素数</td>    <td><i>x</i> の複素共役</td></tr>
 ^<tr>    <td>cos(x)</td>    <td>radians</td>    <td>cos <i>x</i>, <i>x</i> のコサイン</td></tr>
 ^<tr>    <td>cosh(x)</td>    <td>任意</td>    <td>cosh <i>x</i>, ラジアンでの <i>x</i> のハイパボリックコサイン</td></tr>
+^<tr>    <td>EllipticK(k)</td>    <td>(-1:1) 内の実数 k</td>    <td><i>K(k)</i> 第 1 種完全楕円積分</td></tr>
+^<tr>    <td>EllipticE(k)</td>    <td>[-1:1] 内の実数 k</td>    <td><i>E(k)</i> 第 2 種完全楕円積分</td></tr>
+^<tr>    <td>EllipticPi(n,k)</td>    <td>実数 n&lt;1, (-1:1) 内の実数 k</td>    <td> &Pi;(<i>n,k</i>) 第 3 種完全楕円積分</td></tr>
 ^<tr>    <td>erf(x)</td>    <td>任意</td>    <td>erf(Re(<i>x</i>)), <i>x</i> の実部の誤差関数</td></tr>
 ^<tr>    <td>erfc(x)</td>    <td>任意</td>    <td>erfc(Re(<i>x</i>)), 1.0 - (<i>x</i> の実部の誤差関数)</td></tr>
 ^<tr>    <td>exp(x)</td>    <td>任意</td>    <td><i>e<sup>x</sup></i>, <i>x</i> の指数関数</td></tr>
@@ -1390,21 +1511,27 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>gamma(x)</td>    <td>任意</td>    <td>&Gamma;(Re(<i>x</i>)), <i>x</i> の実部のガンマ関数</td></tr>
 ^<tr>    <td>ibeta(p,q,x)</td>    <td>任意</td>    <td>ibeta(Re(<i>p,q,x</i>)), <i>p</i>,<i>q</i>,<i>x</i> の実部の不完全ベータ関数</td></tr>
 ^<tr>    <td>inverf(x)</td>    <td>任意</td>    <td><i>x</i> の実部の逆誤差関数</td></tr>
-^<tr>    <td>igamma(a,x)</td>    <td>任意</td>    <td>igamma(Re(<i>a,x</i>)), <a>a</a>,<i>x</i> の実部の不完全ガンマ関数</td></tr>
+^<tr>    <td>igamma(a,z)</td>    <td>複素数</td>    <td>igamma(<i>a&gt;0,z</i>), 複素数 <a>a&gt;0</a>,<i>z</i> の不完全ガンマ関数</td></tr>
 ^<tr>    <td>imag(x)</td>    <td>複素数</td>    <td>Im(<i>x</i>), <i>x</i> の虚数部分 (実数)</td></tr>
-^<tr>    <td>invnorm(x)</td>    <td>任意</td>    <td><i>x</i> の実部の逆正規分布関数</td></tr>
 ^<tr>    <td>int(x)</td>    <td>実数</td>    <td><i>x</i> の整数部分 (0 に向かって丸め)</td></tr>
-^<tr>    <td>lambertw(x)</td>    <td>実数</td>    <td>Lambert <i>W</i> 関数</td></tr>
-^<tr>    <td>lgamma(x)</td>    <td>任意</td>    <td>lgamma(Re(<i>x</i>)), <i>x</i> の実部のガンマ対数関数</td></tr>
+^<tr>    <td>invibeta(a,b,p)</td>    <td>0&lt;p&lt;1</td>    <td>逆不完全ベータ関数</td></tr>
+^<tr>    <td>invigamma(a,p)</td>    <td>0&lt;p&lt;1</td>    <td>逆不完全ガンマ関数</td></tr>
+^<tr>    <td>invnorm(x)</td>    <td>任意</td>    <td><i>x</i> の実部の逆正規分布関数</td></tr>
+^<tr>    <td>LambertW(z,k)</td> <td>複素数, 整数</td> <td>複素 Lambert W 関数の第 k 分岐</td></tr>
+^<tr>    <td>lambertw(x)</td>    <td>実数</td>    <td>Lambert <i>W</i> 関数の主値 (第 0 分岐)</td></tr>
+^<tr>    <td>lgamma(x)</td>    <td>実数</td>    <td>lgamma(Re(<i>x</i>)), <i>x</i> の実部のガンマ対数関数</td></tr>
+^<tr>    <td>lnGamma(x)</td>    <td>複素数</td>    <td>複素平面全体で正当な lnGamma(x)</td></tr>
 ^<tr>    <td>log(x)</td>    <td>任意</td>    <td>ln <i>x</i>, <i>x</i> の自然対数 (底 <i>e</i>)</td></tr>
 ^<tr>    <td>log10(x)</td>    <td>任意</td>    <td>log<sub>10</sub> <i>x</i>, <i>x</i> の対数 (底 10)</td></tr>
 ^<tr>    <td>norm(x)</td>    <td>任意</td>    <td>norm(<i>x</i>), <i>x</i> の実部の正規分布関数</td></tr>
 ^<tr>    <td>rand(x)</td>    <td>整数</td>    <td>区間 (0:1) 内の疑似乱数</td></tr>
 ^<tr>    <td>real(x)</td>    <td>任意</td>    <td>Re(<i>x</i>), <i>x</i> の実数部分</td></tr>
 ^<tr>    <td>sgn(x)</td>    <td>任意</td>    <td><i>x</i> &gt; 0 なら 1, <i>x</i> &lt; 0 なら -1, <i>x</i> = 0 なら 0. <i>x</i> の虚部は無視</td></tr>
+^<tr>    <td>Sign(x)</td>    <td>複素数</td>    <td><i>x</i> = 0 なら 0、それ以外は <i>x</i>/|<i>x</i>|</td></tr>
 ^<tr>    <td>sin(x)</td>    <td>任意</td>    <td>sin <i>x</i>, <i>x</i> のサイン</td></tr>
 ^<tr>    <td>sinh(x)</td>    <td>任意</td>    <td>sinh <i>x</i>,ラジアンでの <i>x</i> のハイパボリックサイン</td></tr>
 ^<tr>    <td>sqrt(x)</td>    <td>任意</td>    <td>&radic;<i>x</i>, <i>x</i> の平方根</td></tr>
+^<tr>    <td>SynchrotronF(x)</td> <td>実数</td> <td>(第 1) シンクロトロン関数 F</td></tr>
 ^<tr>    <td>tan(x)</td>    <td>任意</td>    <td>tan <i>x</i>, <i>x</i> のタンジェント</td></tr>
 ^<tr>    <td>tanh(x)</td>    <td>任意</td>    <td>tanh <i>x</i>, ラジアンでの <i>x</i> のハイパボリックタンジェント</td></tr>
 ^<tr>    <td>voigt(x,y)</td>    <td>実数</td>    <td>ガウス関数とローレンツ関数の畳みこみ</td></tr>
@@ -1428,6 +1555,8 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>cdawson(z)</td>    <td>複素数</td>    <td>複素 Dawson 積分</td></tr>
 ^<tr>    <td>faddeeva(z)</td>    <td>複素数</td>    <td>再スケール化複素誤差関数 <i>w</i>(<i>z</i>) = exp(-<i>z</i><sup>2</sup>) × erfc(-i<i>z</i>)</td></tr>
 ^<tr>    <td>erfi(x)</td>    <td>実数</td>    <td>虚誤差関数 erfi(<i>x</i>) = -i × erf(i<i>x</i>)</td></tr>
+^<tr>    <td>FresnelC(x)</td>    <td>実数</td>    <td>フレネル積分のコサイン (実数) 成分</td></tr>
+^<tr>    <td>FresnelS(x)</td>    <td>実数</td>    <td>フレネル積分のサイン (虚数) 成分</td></tr>
 ^<tr>    <td>VP(x,sigma,gamma)</td>    <td>実数</td>    <td>Voigt プロファイル</td></tr>
 ^<tr>    <td>VP_fwhm(sigma,gamma)</td>    <td>実数</td>    <td>Voigt プロファイルの半値全幅 (FWHM)</td></tr>
 
@@ -1470,6 +1599,35 @@ C  need @ in table, so end and restart the table !
 ^  <col align="left">
 ^</colgroup>
 ^<thead>
+^<tr>   <th colspan="3"> 時刻関数 </th></tr>
+^<tr>    <th>関数</th>    <th>引数</th>    <th>戻り値</th></tr>
+^</thead>
+^<tbody>
+^<tr>    <td>time(x)</td>    <td>任意</td>    <td>現在のシステム時刻</td></tr>
+^<tr>    <td>timecolumn(N,format)</td>    <td>整数, 文字列</td>    <td> 入力データの <i>N</i> 列目からの書式化日時データ</td></tr>
+^<tr>    <td>tm_hour(t)</td>    <td>秒数による時刻</td>    <td>時</td></tr>
+^<tr>    <td>tm_mday(t)</td>    <td>秒数による時刻</td>    <td>日 (その月の)</td></tr>
+^<tr>    <td>tm_min(t)</td>    <td>秒数による時刻</td>    <td>分</td></tr>
+^<tr>    <td>tm_mon(t)</td>    <td>秒数による時刻</td>    <td>月</td></tr>
+^<tr>    <td>tm_sec(t)</td>    <td>秒数による時刻</td>    <td>秒</td></tr>
+^<tr>    <td>tm_wday(t)</td>    <td>秒数による時刻</td>    <td>その週の何日目</td></tr>
+^<tr>    <td>tm_week(t)</td>    <td>秒数による時刻</td>    <td>その年の週番号 (ISO 8601)</td></tr>
+^<tr>    <td>tm_yday(t)</td>    <td>秒数による時刻</td>    <td>その年の何日目</td></tr>
+^<tr>    <td>tm_year(t)</td>    <td>秒数による時刻</td>    <td>西暦</td></tr>
+^<tr>    <td>weekdate_iso(year,week,day)</td> <td>整数</td> <td> ISO 8601 規則での週曜日に対応する時刻</td></tr>
+^<tr>    <td>weekdate_cdc(year,week,day)</td> <td>整数</td> <td> CDC による疫学的週曜日に対応する時刻</td></tr>
+^</tbody>
+^</table>
+
+^<p>&nbsp;</p>
+
+^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3" width="90%">
+^<colgroup>
+^  <col align="center">
+^  <col align="center">
+^  <col align="left">
+^</colgroup>
+^<thead>
 ^<tr>    <th colspan="3"> 他の gnuplot の関数 </th></tr>
 ^<tr>    <th>関数</th>    <th>引数</th>    <th>戻り値</th></tr>
 ^</thead>
@@ -1478,18 +1636,9 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>columnhead(x)</td>    <td>整数</td>    <td> データファイルの最初の <i>x</i> 列目中の文字列</td></tr>
 ^<tr>    <td>exists("X")</td>    <td>文字列</td>    <td> 変数名 X が定義されていれば 1, そうでなければ 0</td></tr>
 ^<tr>    <td>hsv2rgb(h,s,v)</td>    <td>[0:1] 内の実数 h,s,v</td>    <td> HSV 色を 24ビットの RGB 色へ変換</td></tr>
-^<tr>    <td>palette(z)</td>    <td>実数</td>    <td> z に割り当てられた RGB パレット色</td></tr>
+^<tr>    <td>palette(z)</td>    <td>実数</td>    <td> z に割り当てられた 24 ビット RGB パレット色</td></tr>
+^<tr>    <td>rgbcolor("name")</td>    <td>文字列</td>    <td> 色名の 32 ビット ARGB 値</td></tr>
 ^<tr>    <td>stringcolumn(x)</td>    <td>整数</td>    <td> 文字列としての <i>x</i> 列目の内容</td></tr>
-^<tr>    <td>timecolumn(N,format)</td>    <td>整数, 文字列</td>    <td> データ入力中の <i>N</i> 列目の日時データ</td></tr>
-^<tr>    <td>tm_hour(x)</td>    <td>整数</td>    <td>時</td></tr>
-^<tr>    <td>tm_mday(x)</td>    <td>整数</td>    <td>日</td></tr>
-^<tr>    <td>tm_min(x)</td>    <td>整数</td>    <td>分</td></tr>
-^<tr>    <td>tm_mon(x)</td>    <td>整数</td>    <td>月</td></tr>
-^<tr>    <td>tm_sec(x)</td>    <td>整数</td>    <td>秒</td></tr>
-^<tr>    <td>tm_wday(x)</td>    <td>整数</td>    <td>その週の何日目</td></tr>
-^<tr>    <td>tm_yday(x)</td>    <td>整数</td>    <td>その年の何日目</td></tr>
-^<tr>    <td>tm_year(x)</td>    <td>整数</td>    <td>西暦</td></tr>
-^<tr>    <td>time(x)</td>    <td>任意</td>    <td>現在のシステム時刻</td></tr>
 ^<tr>    <td>valid(x)</td>    <td>整数</td>    <td> データ中の column(<i>x</i>) の正当性</td></tr>
 ^<tr>    <td>value("name")</td>    <td>文字列</td>    <td> 名前 name の変数の現在の値</td></tr>
 ^</tbody>
@@ -1500,9 +1649,9 @@ C HTML ヘルプに関しては表とセクションの両方が必要なので、以下のマジック
 C マーカを doc2html へのこのシグナルとして使用します。
 ^<!-- INCLUDE_NEXT_TABLE -->
 @start table
-#\begin{longtable}{|ccl|} \hline
-#\multicolumn{3}{|c|}{数学ライブラリ関数} \\ \hline \hline
-#関数 & 引数 & 戻り値 \\ \hline
+#\begin{longtable}{@{\extracolsep{\fill}}|lcrl|@{}} \hline
+#\multicolumn{4}{|c|}{数学ライブラリ、組み込み関数} \\ \hline \hline
+#関数 & 引数 & ~ & 戻り値 ({\gpCX } は複素数) \\ \hline
 #\endhead \hline \endfoot
 %c c l .
 %関数@引数@戻り値
@@ -1510,10 +1659,10 @@ C マーカを doc2html へのこのシグナルとして使用します。
 4 abs
 ?expressions functions abs
 ?abs
-#abs(x) & 任意  &  $x$ の絶対値, $|x|$; 同じ型\\
-#abs(x) & 複素数 &  $x$ の長さ, $\sqrt{{\mbox{real}(x)^{2} +
+#abs(x) & 整数または実数 & ~ &  $x$ の絶対値, $|x|$ \\
+#abs(x) & 複素数 & ~ & $x$ の長さ, $\sqrt{{\mbox{real}(x)^{2} +
 #\mbox{imag}(x)^{2}}}$ \\
-%abs(x)@任意@$x$ の絶対値, $|x|$; 同じ型
+%abs(x)@整数または実数@$x$ の絶対値, $|x|$
 %abs(x)@複素数@$x$ の長さ, $sqrt{roman real (x) sup 2 + roman imag (x) sup 2}$
  関数 `abs(x)` 引数の絶対値を返します。返り値の型は引数と同じです。
 
@@ -1525,58 +1674,58 @@ C マーカを doc2html へのこのシグナルとして使用します。
 4 acos
 ?expressions functions acos
 ?acos
-#acos(x) & 任意 & $\cos^{-1} x$ (アークコサイン) \\
-%acos(x)@任意@$cos sup -1 x$ (アークコサイン)
+#acos(x) &  ~~   & \gpCX & $\cos^{-1} x$ (アークコサイン) \\
+%acos(x)@ ~~ @$cos sup -1 x$ (アークコサイン)
  関数 `acos(x)` は引数のアークコサイン (逆余弦) を返します。`acos` の返
  す値がラジアン単位かまたは度であるかは `set angles` で選択されます。
 4 acosh
 ?expressions functions acosh
 ?acosh
-#acosh(x) & 任意 & ラジアンでの $\cosh^{-1} x$ (逆双曲余弦)\\
-%acosh(x)@任意@$ラジアンでの cosh sup -1 x$ (逆双曲余弦)
+#acosh(x) &  ~~   & \gpCX & ラジアンでの $\cosh^{-1} x$ (逆双曲余弦) \\
+%acosh(x)@ ~~ @ラジアンでの $cosh sup -1 x$ (逆双曲余弦)
  関数 `acosh(x)` は逆ハイパボリックコサイン (逆双曲余弦) の値をラジアン
  で返します。
 4 airy
 ?expressions functions airy
 ?airy
-#airy(x) & 任意  & エアリー関数 Ai(x) \\
-%airy(x)@任意@エアリー関数 Ai(x)
+#airy(x) &  実数   & ~ & 実数 x に対するエアリー関数 Ai(x)\\
+%airy(x)@ 実数 @実数 x に対するエアリー関数 Ai(x)
  関数 `airy(x)` は、エアリー (Airy) 関数 Ai(x) の値を返します。関数
  Ai(x) は、微分方程式 y'' - x y = 0 の、実数全体で有界な解です。引数が
  複素数の場合、その虚数部分は無視されます。
 4 arg
 ?expressions functions arg
 ?arg
-#arg(x) & 複素数 & $x$ の偏角 \\
+#arg(x) & 複素数 & ~ & $x$ の偏角, $-\pi\leq$arg($x$)$\leq\pi$ \\
 %arg(x)@複素数@$x$ の偏角
  関数 `arg(x)` は複素数の偏角を、`set angles` の設定にしたがってラジア
  ン、または度で返します。
 4 asin
 ?expressions functions asin
 ?asin
-#asin(x) & 任意  & $\sin^{-1} x$ (アークサイン) \\
-%asin(x)@任意@$sin sup -1 x$ (アークサイン)
+#asin(x) &  ~~   & \gpCX & $\sin^{-1} x$ (アークサイン) \\
+%asin(x)@ ~~ @$sin sup -1 x$ (アークサイン)
  関数 `asin(x)` は引数のアークサイン (逆正弦) を返します。`asin` の返す
  値は `set angles` の設定によってラジアン単位かまたは度になります。
 4 asinh
 ?expressions functions asinh
 ?asinh
-#asinh(x) & 任意  & ラジアンでの $\sinh^{-1} x$ (逆双曲正弦)\\
-%asinh(x)@任意@$ラジアンでの sinh sup -1 x$ (逆双曲正弦)
+#asinh(x) &  ~~   & \gpCX & ラジアンでの $\sinh^{-1} x$ (逆双曲正弦)\\
+%asinh(x)@ ~~ @$ラジアンでの sinh sup -1 x$ (逆双曲正弦)
  関数 `asinh(x)` は逆ハイパボリックサイン (逆双曲正弦) の値をラジアンで
  返します。
 4 atan
 ?expressions functions atan
 ?atan
-#atan(x) & 任意  & $\tan^{-1} x$ (アークタンジェント) \\
-%atan(x)@任意@$tan sup -1 x$ (アークタンジェント)
+#atan(x) &  ~~   & \gpCX & $\tan^{-1} x$ (アークタンジェント) \\
+%atan(x)@ ~~ @$tan sup -1 x$ (アークタンジェント)
  関数 `atan(x)` は引数のアークタンジェント (逆正接) の値を返します。
  `atan` の返す値は `set angles` の設定によってラジアン単位かまたは度に
  なります。
 4 atan2
 ?expressions functions atan2
 ?atan2
-#atan2(y,x) & 整数または実数 & $\tan^{-1} (y/x)$ (アークタンジェント) \\
+#atan2(y,x) & 整数または実数 & ~ & $\tan^{-1} (y/x)$ (アークタンジェント) \\
 %atan2(y,x)@整数または実数@$tan sup -1 (y/x)$ (アークタンジェント)
  関数 `atan2(y,x)` は引数の実数部分の比のアークタンジェント (逆正接) の
  値を返します。`atan2` は `set angles` の設定によってラジアン単位か度に
@@ -1584,313 +1733,335 @@ C マーカを doc2html へのこのシグナルとして使用します。
 4 atanh
 ?expressions functions atanh
 ?atanh
-#atanh(x) & 任意  & ラジアンでの $\tanh^{-1} x$ (逆双曲正接)\\
-%atanh(x)@任意@ラジアンでの $tanh sup -1 x$ (逆双曲正接)
+#atanh(x) &  ~~   & \gpCX & ラジアンでの $\tanh^{-1} x$ (逆双曲正接)\\
+%atanh(x)@ ~~ @ラジアンでの $tanh sup -1 x$ (逆双曲正接)
  関数 `atanh(x)` は逆ハイパボリックタンジェント (逆双曲正接) の値をラジ
  アンで返します。
-?expressions functions EllipticK
-?EllipticK
-4 EllipticK
-#EllipticK(k) & 実数 k $\in$ (-1:1) & $K(k)$ 第 1 種完全楕円積分\\
-%EllipticK(k)@(-1:1) 内の実数 k@$K ( k )$ 第 1 種完全楕円積分
- 関数 `EllipticK(k)` は、第 1 種完全楕円積分の値を返します。詳細は、以
- 下参照: `elliptic integrals`。
-?expressions functions EllipticE
-?EllipticE
-4 EllipticE
-#EllipticE(k) & 実数 k $\in$ [-1:1] & $E(k)$ 第 2 種完全楕円積分\\
-%EllipticE(k)@[-1:1] 内の実数 k@ $E ( k )$ 第 2 種完全楕円積分
- 関数 `EllipticE(k)` は、第 2 種完全楕円積分の値を返します。詳細は、以
- 下参照: `elliptic integrals`。
-?expressions functions EllipticPi
-?EllipticPi
-4 EllipticPi
-#EllipticPi(n,k) & 実数 n$<$1, 実数 k $\in$ (-1:1) & $\Pi(n,k)$ 第 3 種完全楕円積分\\
-%EllipticPi(n,k)@ 実数 n<1, (-1:1) 内の実数 k@ $Pi ( n,k )$ 第 3 種完全楕円積分
- 関数 `EllipticPi(n,k)` は、第 3 種完全楕円積分の値を返します。詳細は、
- 以下参照: `elliptic integrals`。
 4 besj0
 ?expressions functions besj0
 ?besj0
-# besj0(x) & 整数または実数 & $J_{0}$ ベッセル関数 (0 次ベッセル関数)\\
-%besj0(x)@整数または実数@$J sub 0$ ベッセル関数 (0 次ベッセル関数)
+# besj0(x) & 実数 & ~ & $x$ ラジアンの $J_{0}$ ベッセル関数 (0 次ベッセル関数)\\
+%besj0(x)@実数@$x$ ラジアンの $J sub 0$ ベッセル関数 (0 次ベッセル関数)
  関数 `besj0(x)` は引数の J0 ベッセル関数 (0 次の第 1 種円柱関数 J0、0
  次ベッセル関数) の値を返します。`besj0` には引数はラジアンで与えます。
 4 besj1
 ?expressions functions besj1
 ?besj1
-# besj1(x) & 整数または実数 & $J_{1}$ ベッセル関数 (1 次ベッセル関数)\\
-%besj1(x)@整数または実数@$J sub 1$ ベッセル関数 (1 次ベッセル関数)
+# besj1(x) & 実数 & ~ & $x$ ラジアンの $J_{1}$ ベッセル関数 (1 次ベッセル関数)\\
+%besj1(x)@実数@$x$ ラジアンの $J sub 1$ ベッセル関数 (1 次ベッセル関数)
  関数 `besj1(x)` は引数の J1 ベッセル関数 (1 次の第 1 種円柱関数 J1、1
  次ベッセル関数) の値を返します。`besj1` には引数はラジアンで与えます。
 4 besjn
 ?expressions functions besjn
 ?besjn
-# besjn(n,x) & 整数, 実数 & $J_{n}$ ベッセル関数 (n 次ベッセル関数)\\
-%besjn(n,x)@整数, 実数@$J sub n$ ベッセル関数 (n 次ベッセル関数)
+# besjn(n,x) & 整数, 実数 & ~ & $x$ ラジアンの $J_{n}$ ベッセル関数 (n 次ベッセル関数)\\
+%besjn(n,x)@整数, 実数@$x$ ラジアンの $J sub n$ ベッセル関数 (n 次ベッセル関数)
  関数 `besjn(n,x)` は引数の Jn ベッセル関数 (n 次の第 1 種円柱関数 Jn、
  n 次ベッセル関数) の値を返します。引数 x はラジアンで与えます。
 4 besy0
 ?expressions functions besy0
 ?besy0
-# besy0(x) & 整数または実数 & $Y_{0}$ ベッセル関数 (0 次ノイマン関数)\\
-%besy0(x)@整数または実数@$Y sub 0$ ベッセル関数 (0 次ノイマン関数)
+# besy0(x) & 実数 & ~ & $x$ ラジアンの $Y_{0}$ ベッセル関数 (0 次ノイマン関数)\\
+%besy0(x)@実数@$x$ ラジアンの $Y sub 0$ ベッセル関数 (0 次ノイマン関数)
  関数 `besy0(x)` は引数の Y0 ベッセル関数 (0 次の第 2 種円柱関数 Y0、0
  次ノイマン関数) の値を返します。`besy0` には引数はラジアンで与えます。
 4 besy1
 ?expressions functions besy1
 ?besy1
-# besy1(x) & 整数または実数 & $Y_{1}$ ベッセル関数 (1 次ノイマン関数)\\
-%besy1(x)@整数または実数@$Y sub 1$ ベッセル関数 (1 次ノイマン関数)
+# besy1(x) & 実数 & ~ & $x$ ラジアンの $Y_{1}$ ベッセル関数 (1 次ノイマン関数)\\
+%besy1(x)@実数@$x$ ラジアンの $Y sub 1$ ベッセル関数 (1 次ノイマン関数)
  関数 `besy1(x)` は引数の Y1 ベッセル関数 (1 次の第 2 種円柱関数 Y1、1
  次ノイマン関数) の値を返します。`besy1` には引数はラジアンで与えます。
 4 besyn
 ?expressions functions besyn
 ?besyn
-# besyn(n,x) & 整数, 実数 & $Y_{n}$ ベッセル関数 (n 次ノイマン関数)\\
-%besyn(n,x)@整数, 実数@$Y sub n$ ベッセル関数 (n 次ノイマン関数)
+# besyn(n,x) & 整数, 実数 & ~ & $x$ ラジアンの $Y_{n}$ ベッセル関数 (n 次ノイマン関数)\\
+%besyn(n,x)@整数, 実数@$x$ ラジアンの $Y sub n$ ベッセル関数 (n 次ノイマン関数)
  関数 `besyn(n,x)` は引数の Yn ベッセル関数 (n 次の第 2 種円柱関数 Yn、
  n 次ノイマン関数) の値を返します。引数 x はラジアンで与えます。
 4 besi0
 ?expressions functions besi0
 ?besi0
-# besi0(x) & 実数 & $I_{0}$ 変形ベッセル関数 (0 次変形ベッセル関数)\\
-%besi0(x)@実数@ $I sub 0$ 変形ベッセル関数 (0 次変形ベッセル関数)
+# besi0(x) & 実数 & ~ & $x$ ラジアンの $I_{0}$ (0 次) 変形ベッセル関数\\
+%besi0(x)@実数@$x$ ラジアンの $I sub 0$ (0 次) 変形ベッセル関数
  関数 `besi0(x)` は 0 次の変形ベッセル関数です。`besi0` の引数の単位は
  ラジアンです。
 4 besi1
 ?expressions functions besi1
 ?besi1
-# besi1(x) & 実数 & $I_{1}$ 変形ベッセル関数 (1 次変形ベッセル関数)\\
-%besi1(x)@実数@ $I sub 1$ 変形ベッセル関数 (1 次変形ベッセル関数)
+# besi1(x) & 実数 & ~ & $x$ ラジアンの $I_{1}$ (1 次) 変形ベッセル関数\\
+%besi1(x)@実数@$x$ ラジアンの $I sub 1$ (1 次) 変形ベッセル関数
  関数 `besi1(x)` は 1 次の変形ベッセル関数です。`besi1` の引数の単位は
  ラジアンです。
 4 besin
 ?expressions functions besin
 ?besin
-# besin(n,x) &整数, 実数& $I_{n}$ 変形ベッセル関数 (n 次変形ベッセル関数)\\
-%besin(x)@整数, 実数l@ $I sub n$ 変形ベッセル関数 (n 次変形ベッセル関数)
+# besin(n,x) &整数, 実数& ~ & $x$ ラジアンの $I_{n}$ (n 次) 変形ベッセル関数\\
+%besin(x)@整数, 実数l@$x$ ラジアンの $I sub n$ (n 次) 変形ベッセル関数
  関数 `besin(n,x)` は n 次の変形ベッセル関数です。引数 x の単位はラジア
  ンです。
-4 ceil
-?expressions functions ceil
-?ceil
-#ceil(x) & 任意 & $\lceil x \rceil$, $x$ (の実部) 以上の最小の整数\\
-%ceil(x)@任意@$left ceiling x right ceiling$, $x$ (の実部) 以上の最小の整数
- 関数 `ceil(x)` は引数以上の最小の整数を返します。複素数引数に対しては
- `ceil` はその引数の実部以上の最小の整数を返します。
+C C 4 ceil
+C ?expressions functions ceil
+#ceil(x) & ~~ & ~ & $\lceil x \rceil$, $x$ の実部以上の最小の整数\\
+%ceil(x)@ ~~ @$left ceiling x right ceiling$, $x$ (の実部) 以上の最小の整数
+ `ceil(x)` は x の実部以上の最小の整数を返します。
+ |x|<2^52 の範囲外の場合、ceil(x) は NaN を返します。
+4 conj
+?expressions functions conj
+?conj
+#conj(x) & 複素数 & \gpCX & $x$ の複素共役 \\
+%conj(x)@複素数@$x$ の複素共役
+ 関数 `conj(x)` は、x の複素共役を返します。conj( {r, i} ) = {r, -i}
 4 cos
 ?expressions functions cos
 ?cos
-#cos(x) & 任意 & $x$ のコサイン $\cos x$\\
+#cos(x) & ~~ & \gpCX & $x$ のコサイン $\cos x$\\
 %cos(x)@ラジアン@$x$ のコサイン $cos~x$
  関数 `cos(x)` は引数のコサイン (余弦) の値を返します。`cos` は
  `set angles` の選択にしたがって、ラジアンまたは度の引数を受け付けます。
 4 cosh
 ?expressions functions cosh
 ?cosh
-#cosh(x) & 任意 & $\cosh x$, $x$ のハイパボリックコサイン \\
-%cosh(x)@任意@$cosh~x$, $x$ のハイパボリックコサイン
+#cosh(x) & ~~ & \gpCX & $\cosh x$, $x$ ラジアンのハイパボリックコサイン \\
+%cosh(x)@ ~~ @$cosh~x$, $x$ ラジアンのハイパボリックコサイン
  関数 `cosh(x)` は引数のハイパボリックコサインの値を返します。`cosh` の
  引数はラジアンで与えます。
+?expressions functions EllipticK
+?EllipticK
+4 EllipticK
+#EllipticK(k) & 実数 k $\in$ (-1:1) & ~ & $K(k)$ 第 1 種完全楕円積分\\
+%EllipticK(k)@(-1:1) 内の実数 k@$K ( k )$ 第 1 種完全楕円積分
+ 関数 `EllipticK(k)` は、第 1 種完全楕円積分の値を返します。詳細は、以
+ 下参照: `elliptic integrals`。
+?expressions functions EllipticE
+?EllipticE
+4 EllipticE
+#EllipticE(k) & 実数 k $\in$ [-1:1] & ~ & $E(k)$ 第 2 種完全楕円積分\\
+%EllipticE(k)@[-1:1] 内の実数 k@ $E ( k )$ 第 2 種完全楕円積分
+ 関数 `EllipticE(k)` は、第 2 種完全楕円積分の値を返します。詳細は、以
+ 下参照: `elliptic integrals`。
+?expressions functions EllipticPi
+?EllipticPi
+4 EllipticPi
+#EllipticPi(n,k) & 実数 n$<$1, 実数 k $\in$ (-1:1) & ~ & $\Pi(n,k)$ 第 3 種完全楕円積分\\
+%EllipticPi(n,k)@ 実数 n<1, (-1:1) 内の実数 k@ $Pi ( n,k )$ 第 3 種完全楕円積分
+ 関数 `EllipticPi(n,k)` は、第 3 種完全楕円積分の値を返します。詳細は、
+ 以下参照: `elliptic integrals`。
 4 erf
 ?expressions functions erf
 ?erf
-#erf(x) & 任意 & $\mbox{erf}(\mbox{real}(x))$,  $x$ の 実部の誤差関数\\
-%erf(x)@任意@$erf ( roman real (x))$, $x$ の実部の誤差関数
+#erf(x) & ~~ & ~ & $\mbox{erf}(\mbox{real}(x))$,  $x$ の 実部の誤差関数\\
+%erf(x)@ ~~ @$erf ( roman real (x))$, $x$ の実部の誤差関数
  関数 `erf(x)` は引数の実部の誤差関数の値を返します。引数が複素数の場合
  は虚部は無視されます。以下参照: `erfc`, `inverf`, `norm`。
 4 erfc
 ?expressions functions erfc
 ?erfc
-#erfc(x) & 任意 & $\mbox{erfc}(\mbox{real}(x))$,  1.0 - ($x$ の実部の誤差関数) \\
-%erfc(x)@任意@$erfc ( roman real (x))$, 1.0 - ($x$ の実部の誤差関数)
+#erfc(x) & ~~ & ~ & $\mbox{erfc}(\mbox{real}(x))$,  1.0 - ($x$ の実部の誤差関数) \\
+%erfc(x)@ ~~ @$erfc ( roman real (x))$, 1.0 - ($x$ の実部の誤差関数)
  関数 `erfc(x)` は 1.0 から、引数の実部の誤差関数の値を引いたものを返し
  ます。引数が複素数の場合は虚部は無視されます。以下参照: `erf`,
  `inverf`, `norm`。
 4 exp
 ?expressions functions exp
 ?exp
-#exp(x) & 任意 & $e^{x}$, $x$ の指数関数\\
-%exp(x)@任意@$e sup x$, $x$ の指数関数
+#exp(x) &  ~~  & \gpCX & $e^{x}$, $x$ の指数関数\\
+%exp(x)@ ~~ @$e sup x$, $x$ の指数関数
  関数 `exp(x)` は、`e` の x 乗の値を返しますが、x は整数でも、実数でも
  複素数でも構いません。
-4 expint
-?expressions functions expint
-?expint
-#expint(n,x) & 整数 $n\ge0$, 実数 $x\ge0$ & $E_n(x)=\int_1^\infty t^{-n} e^{-xt}\,dt$, $x$ の指数積分 \\
-%expint(n,x)@any@$E sub n (x)$, $x$ の指数積分
- 関数 `expint(n,x)` は、その引数の実数部分の指数積分、すなわち t の関数
- t^(-n) e^(-tx) の 1 から∞までの積分値を返します。n は 0 以上の整数、
- x は 0 以上の実数で、x>0 か n>1 のいずれかでなければなりません。
-4 floor
-?expressions functions floor
-?floor
-#floor(x) & 任意 & $\lfloor x \rfloor$, $x$ (の実部) 以下の最大の整数\\
-%floor(x)@任意@$left floor x right floor$, $x$ (の実部) 以下の最大の整数
- 関数 `floor(x)` はその引数以下の最大の整数を返します。複素数引数に対し
- ては `floor` はその引数の実部以下の最大の整数を返します。
+C C 4 expint
+#expint(n,x) & 整数 $n\ge0$, 実数 $x\ge0$ & ~ & $E_n(x)=\int_1^\infty t^{-n} e^{-xt}\,dt$, $x$ の指数積分 \\
+%expint(n,x)@ ~~ @$E sub n (x)$, $x$ の指数積分
+C C 4 floor
+C ?expressions functions floor
+#floor(x) &  ~~  & ~ & $\lfloor x \rfloor$, $x$ の実部以下の最大の整数\\
+%floor(x)@ ~~ @$left floor x right floor$, $x$ の実部以下の最大の整数
+ `floor(x)` は x の実部以下の最大の整数を返します。
+ |x|<2^52 の範囲外の場合、floor(x) は NaN を返します。
 4 gamma
 ?expressions functions gamma
-?gamma
-#gamma(x) & 任意 & $\mbox{gamma}(\mbox{real}(x))$, $x$ の実部のガンマ関数\\
-%gamma(x)@任意@$GAMMA ( roman real (x))$, $x$ の実部のガンマ関数
+#gamma(x) &  ~~  & ~ & $\Gamma(x)$, $x$ の実部のガンマ関数\\
+%gamma(x)@ ~~ @$GAMMA ( roman real (x))$, $x$ の実部のガンマ関数
  関数 `gamma(x)` は引数の実部のガンマ関数の値を返します。整数 n に対し
  ては gamma(n+1) = n! です。引数が複素数の場合、虚数部分は無視されます。
-4 ibeta
-?expressions functions ibeta
-?ibeta
-#ibeta(p,q,x) & 任意 & $\mbox{ibeta}(\mbox{real}(p,q,x))$, $p$,$q$,$x$ の実部の不完全ベータ関数 \\
-%ibeta(p,q,x)@任意@$ibeta ( roman real (p,q,x))$, $p$,$q$,$x$ の実部の不完全ベータ関数
- 関数 `ibeta(p,q,x)` は引数の実部の不完全ベータ関数の値を返します。p, q
- は正で x は [0:1] 内の値です。引数が複素数の場合は虚部は無視されます。
- この関数は連分数法 (Abramowitz and Stegun, 1964) で近似していて、この
- 近似は x < (p-1)/(p+q-2) の範囲でしか正確ではありません。
+ 複素引数に関しては、以下参照: `lnGamma`。
+C C 4 ibeta
+#ibeta(a,b,x) & $a,b>0$, $x \in [0:1]$ & ~ & $B(a,b,x)=\frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)}\intop_{0}^{x}t^{a-1}(1-t)^{b-1}dt$, 不完全ベータ関数 \\
+%ibeta(a,b,x)@ ~~ @$ibeta ( roman real (a,b,x))$, $a$,$b$,$x$ の実部の不完全ベータ関数
 4 inverf
 ?expressions functions inverf
 ?inverf
-#inverf(x) & 任意 & $x$ の実部の逆誤差関数 \\
-%inverf(x)@任意@$x$ の実部の逆誤差関数
+#inverf(x) &  ~~  & ~ & $x$ の実部の逆誤差関数 \\
+%inverf(x)@ ~~ @$x$ の実部の逆誤差関数
  関数 `inverf(x)` は引数の実部の逆誤差関数の値を返します。以下参照:
  `erf`, `invnorm`。
-4 igamma
-?expressions functions igamma
-?igamma
-#igamma(a,x) & 任意 & $\mbox{igamma}(\mbox{real}(a,x))$, $a$,$x$ の実部の不完全ガンマ関数 \\
-%igamma(a,x)@任意@$igamma ( roman real (a,x))$, $a$,$x$ の実部の不完全ガンマ関数
- 関数 `igamma(a,x)` は引数の実部の、正規化された不完全ガンマ関数の値を
- 返します。ここで、a > 0, x >= 0 です。標準的な記法では P(a,x) (例えば
- Abramowitz and Stegun (6.5.1)) で、x が無限大に発散する場合の極限値は
- 1 です。引数が複素数の場合は虚部は無視されます。
+C C 4 igamma
+#igamma(a,z) & 複素数, $\Re(a)>0$ & \gpCX & 不完全ガンマ関数 $P(a,z)=\frac{1}{\Gamma(z)}\intop_{0}^{z}t^{a-1}e^{-t}dt$ \\
+%igamma(a,z)@ ~~ @$igamma (a,z)$, ($a$,$z$) の下方不完全ガンマ関数
 4 imag
 ?expressions functions imag
 ?imag
-#imag(x) & 複素数 & $x$ の虚数部分 (実数) \\
+#imag(x) & 複素数 & ~ & $x$ の虚数部分 (実数) \\
 %imag(x)@複素数@$x$ の虚数部分 (実数)
  関数 `imag(x)` は引数の虚数部分を実数として返します。
+C C 4 int
+C ?expressions functions int
+#int(x) & 実数 & ~ &  $x$ の 0 に向かって丸めた整数部分\\
+%int(x)@実数@$x$ の 0 に向かって丸めた整数部分
+ `int(x)` は、引数の 0 に向かって丸めた整数部分を返します。
 4 invnorm
 ?expressions functions invnorm
 ?invnorm
-#invnorm(x) & 任意 & $x$ の実部の逆正規分布関数 \\
-%invnorm(x)@任意@$x$ の実部の逆正規分布関数
+#invnorm(x) &  ~~  & ~ & $x$ の実部の逆正規分布関数 \\
+%invnorm(x)@ ~~ @$x$ の実部の逆正規分布関数
  関数 `invnorm(x)` は引数の実部に対する、正規分布 (ガウス分布) の累積分
  布関数の逆関数の値を返します。以下参照: `norm`。
-4 int
-?expressions functions int
-?int
-#int(x) & 実数 &  $x$ の整数部分 (0 に向かって丸め) \\
-%int(x)@実数@$x$ の整数部分 (0 に向かって丸め)
- 関数 `int(x)` は、引数の整数部分 (0 に向かって丸めた) を返します。
+
+C C 4 invibeta
+#invibeta(a,b,p) & 実数 & ~ &  逆 (正規化) 不完全ベータ関数  \\
+%invibeta(a,b,p)@ 実数 @逆 (正規化) 不完全ベータ関数
+
+C C 4 invigamma
+#invigamma(a,p) & 実数 & ~ &  逆 (正規化) 不完全ガンマ関数  \\
+%invigamma(a,p)@ 実数 @逆 (正規化) 不完全ガンマ関数
+
+#LambertW(z,k) & 複素数, 整数 & \gpCX & 複素 Lambert W 関数の第 k 分岐 \\
+%LambertW(z,k) & 複素数, 整数 & 複素 Lambert W 関数の第 $k$ 分岐
+
 4 lambertw
 ?expressions functions lambertw
 ?lambertw
-#lambertw(x) & 実数 & Lambert W 関数 \\
-%lambertw(x)@実数@Lambert W 関数
- 関数 `lambertw(x)` は Lambert の W 関数の主値を返します。W 関数は、方
- 程式 (W(x)*exp(W(x))=x によって定義されます。x は x >= -exp(-1) を満た
- す実数でなければいけません。
+#lambertw(x) & 実数 & ~ & Lambert W 関数の主値 (第 0 分岐) \\
+%lambertw(x)@実数@Lambert W 関数の主値 (第 0 分岐)
+ 関数 `lambertw(x)` は Lambert の W 関数の主値 (第 0 分岐) を返します。
+ W 関数は、方程式 (W(x)*exp(W(x))=x によって定義されます。
+ x は、x >= -exp(-1) を満たす実数でなければいけません。
 4 lgamma
 ?expressions functions lgamma
 ?lgamma
-#lgamma(x) & 任意 & $\mbox{lgamma}(\mbox{real}(x))$, $x$ の実部のガンマ対数関数\\
-%lgamma(x)@任意@$lgamma ( roman real (x))$, $x$ の実部のガンマ対数関数
+#lgamma(x) & 実数 & ~ & 実数 $x$ に対する $\ln\Gamma(x)$ (ガンマ対数関数) \\
+%lgamma(x)@実数@実数 $x$ に対する lgamma 関数 (ガンマ対数関数)
  関数 `lgamma(x)` は引数の実部のガンマ関数値の自然対数の値を返します。
- 引数が複素数の場合、虚部は無視されます。
+ 引数が複素数の場合、虚部は無視されます。複素数には lnGamma(z) を使用し
+ てください。
+4 lngamma
+#lnGamma(x) & 複素数 & \gpCX & 複素平面全体で正当な $\ln\Gamma(x)$ \\
+%lnGamma(x)@複素数@複素平面全体で正当な lgamma 関数
+ 関数 `lnGamma(x)` は、ガンマ関数の自然対数値を返します。この実装は、複
+ 素平面全体で正当な Lanczos 近似を使用しています。この値の虚数成分は、
+ 負の実軸部分を除く全体で連続な曲面を生成するよう位相をずらしています。
 4 log
 ?expressions functions log
 ?log
-#log(x) & 任意 & $\log_{e} x$,  $x$ の自然対数 (底 $e$) \\
-%log(x)@任意@$ln~x$, $x$ の自然対数 (底 $e$)
+#log(x) &  ~~  & \gpCX & $\log_{e} x$,  $x$ の自然対数 (底 $e$) \\
+%log(x)@ ~~ @$ln~x$, $x$ の自然対数 (底 $e$)
  関数 `log(x)` は引数の自然対数 (底 `e`) の値を返します。以下参照:
  `log10`。
 4 log10
 ?expressions functions log10
 ?log10
-#log10(x) & 任意 & $\log_{10} x$, $x$ の対数 (底 $10$) \\
-%log10(x)@任意@${log sub 10}~x$, $x$ の対数 (底 $10$)
+#log10(x) &  ~~  & \gpCX & $\log_{10} x$, $x$ の対数 (底 $10$) \\
+%log10(x)@ ~~ @${log sub 10}~x$, $x$ の対数 (底 $10$)
  関数 `log10(x)` は引数の対数 (底 10) を返します。
 4 norm
 ?expressions functions norm
 ?norm
-#norm(x) & 任意 & $x$ の実部の正規分布 (ガウス分布) 関数 \\
-%norm(x)@任意@$norm(x)$, $x$ の実部の正規分布 (ガウス分布) 関数
+#norm(x) &  ~~  & ~ & $x$ の実部の正規分布 (ガウス分布) 関数 \\
+%norm(x)@ ~~ @$norm(x)$, $x$ の実部の正規分布 (ガウス分布) 関数
  関数 `norm(x)` は、引数の実部に対する、正規分布 (ガウス分布) の累積分
  布関数の値を返します。以下参照: `invnorm`, `erf`, `erfc`。
 4 rand
 ?expressions functions rand
 ?rand
-#rand(x) & 整数 & 開区間 (0:1) 内の疑似乱数生成器 \\
+#rand(x) & 整数 & ~ & 開区間 (0:1) 内の疑似乱数生成器 \\
 %rand(x)@整数@開区間 (0:1) 内の疑似乱数生成器
  関数 `rand(x)` は、開区間 (0:1) 内の疑似乱数を返します。詳しくは以下参
  照: `random`。
 4 real
 ?expressions functions real
 ?real
-#real(x) & 任意 &  $x$ の実部 \\
-%real(x)@任意@$x$ の実部
+#real(x) &  ~~  & ~ & $x$ の実部 \\
+%real(x)@ ~~ @$x$ の実部
  関数 `real(x)` は引数の実部を返します。
+C C 4 round
+C ?expressions functions round
+#round(x) &  ~~  & ~ & $\lfloor x \rceil$,  $x$ の実部に一番近い整数\\
+%round(x)@ ~~ @ $x$ の実部に一番近い整数
+ `round(x)` は、x の実部に一番近い整数を返します。
+ |x|<2^52 の範囲外の場合、round(x) は NaN を返します。
 4 sgn
 ?expressions functions sgn
 ?sgn
-#sgn(x) & 任意 & $x>0$ なら 1, $x<0$ なら -1, $x=0$ なら 0. $x$ の虚部は無視 \\
-%sgn(x)@任意@$x>0$ なら 1, $x<0$ なら -1, $x=0$ なら 0. $x$ の虚部は無視
+#sgn(x) &  ~~  & ~ & $x>0$ なら 1, $x<0$ なら -1, $x=0$ なら 0 (虚部は無視) \\
+%sgn(x)@ ~~ @$x>0$ なら 1, $x<0$ なら -1, $x=0$ なら 0 (虚部は無視)
  関数 `sgn(x)` は引数が正なら 1 を、負なら -1 を、0 ならば 0 を返します。
  引数が複素数の場合虚部は無視されます。
+4 Sign
+#Sign(x) & 複素数 & \gpCX & $x = 0$ なら 0、それ以外は $x/|x|$ \\
+%Sign(x)@複素数@$x = 0$ なら 0、それ以外は $x/|x|$
+ 関数 `Sign(x)` は、引数が 0 なら 0 を返し、それ以外の場合は複素数値
+ Sign(x) = x/|x| を返します。
 4 sin
 ?expressions functions sin
 ?sin
-#sin(x) & 任意 & $\sin x$, $x$ のサイン\\
-%sin(x)@任意@$sin~x$, $x$ のサイン
+#sin(x) &  ~~  & \gpCX & $\sin x$, $x$ のサイン \\
+%sin(x)@ ~~ @$sin~x$, $x$ のサイン
  関数 `sin(x)` は引数のサイン (正弦) の値を返します。`sin` は
  `set angles` の選択にしたがって、ラジアンまたは度の引数を受け付けます。
 4 sinh
 ?expressions functions sinh
 ?sinh
-#sinh(x) & 任意 & $\sinh x$, $x$ のハイパボリックサイン \\
-%sinh(x)@任意@$sinh~x$, $x$ のハイパボリックサイン
+#sinh(x) &  ~~  & \gpCX & $\sinh x$, $x$ ラジアンのハイパボリックサイン \\
+%sinh(x)@ ~~ @$sinh~x$, $x$ ラジアンのハイパボリックサイン
  関数 `sinh(x)` は引数のハイパボリックサインの値を返します。`sinh` の
  引数はラジアンで与えます。
 4 sqrt
 ?expressions functions sqrt
 ?sqrt
-#sqrt(x) & 任意 & $\sqrt{x}$,  $x$ の平方根\\
-%sqrt(x)@任意@$sqrt x $, $x$ の平方根
+#sqrt(x) &  ~~  & \gpCX & $\sqrt{x}$,  $x$ の平方根\\
+%sqrt(x)@ ~~ @$sqrt x $, $x$ の平方根
  関数 `sqrt(x)` は引数の平方根の値を返します。x が複素数の場合、これは
  常に正の実部を持つ根を返します。
+C C 4 SynchrotronF
+C ?expressions functions SynchrotronF
+#SynchrotronF(x) & 実数 & ~ & $F(x) = x\intop_{x}^{\infty}K_{\frac{5}{3}}(\nu)~d\nu$ \\
+%SynchrotronF(x)@ ~~ @ (第 1) シンクロトロン関数 F%
 4 tan
 ?expressions functions tan
 ?tan
-#tan(x) & 任意 & $\tan x$,  $x$ のタンジェント \\
-%tan(x)@任意@$tan~x$, $x$ のタンジェント
+#tan(x) &  ~~  & \gpCX & $\tan x$,  $x$ のタンジェント \\
+%tan(x)@ ~~ @$tan~x$, $x$ のタンジェント
  関数 `tan(x)` は引数のタンジェント (正接) の値を返します。`tan` は
  `set angles` の選択にしたがって、ラジアンまたは度の引数を受け付けます。
 4 tanh
 ?expressions functions tanh
 ?tanh
-#tanh(x) & 任意 & $\tanh x$, $x$ のハイパボリックタンジェント\\
-%tanh(x)@任意@$tanh~x$, $x$ のハイパボリックタンジェント
+#tanh(x) &  ~~  & \gpCX & $\tanh x$, $x$ ラジアンのハイパボリックタンジェント\\
+%tanh(x)@ ~~ @$tanh~x$, $x$ ラジアンのハイパボリックタンジェント
  関数 `tanh(x)` は引数のハイパボリックタンジェントの値を返します。
  `tanh` の引数はラジアンで与えます。
 4 voigt
 ?expressions functions voigt
 ?voigt
-#voigt(x,y) & 実数 & Voigt/Faddeeva 関数 $\frac{y}{\pi} \int{\frac{exp(-t^2)}{(x-t)^2+y^2}}dt$ \\
-#           &       & 注意: voigt$(x,y)$ = $real($faddeeva$(x+iy))$ \\
+#voigt(x,y) & 実数 & ~ & Voigt/Faddeeva 関数 $\frac{y}{\pi} \int{\frac{exp(-t^2)}{(x-t)^2+y^2}}dt$ \\
+#           &       & ~ & 注意: voigt$(x,y)$ = $real($faddeeva$(x+iy))$ \\
 %voigt(x,y)@実数@ガウス関数とローレンツ関数の畳みこみ
  関数 `voigt(x,y)` は、スペクトル解析で使用される Voigt/Faddeeva 関数の
- 近似を返します。その誤差は 1/10^4 以内です。libcerf ルーチンが利用可能
- ならば、より正確な値を求めるために re_w_of_z() ルーチンが使われます。
+ 近似を返します。その誤差は 1/10^4 以内です。libcerf ライブラリが利用可
+ 能ならば、より正確な値を求めるために re_w_of_z() ルーチンが使われます。
  voigt(x,y) = real(faddeeva( x + y*{0,1} )) に注意してください。
 #\hline \end{longtable}
 #%% @end が必要とするため、ダミーの tabular の開始
-#\begin{tabular}{|ccl|}
+#\begin{tabular}{|lcl|}
 @end table
 
 ^<!-- INCLUDE_NEXT_TABLE -->
 @start table
-#\begin{longtable}{|ccl|} \hline
-#\multicolumn{3}{|c|}{libcerf (利用可能な場合のみ) による特殊関数} \\ \hline \hline
-#関数 & 引数 & 戻り値 \\ \hline
+#\setlength\LTleft{0pt}
+#\setlength\LTright{0pt}
+#\begin{longtable}{@{\extracolsep{\fill}}|lcrl|@{}} \hline
+#\multicolumn{4}{|c|}{libcerf (利用可能な場合のみ) による特殊関数} \\ \hline \hline
+#関数 ~~~~~~~~~~~~~~~~~ & 引数 & ~ & 戻り値 ({\gpCX } は複素数)\\ \hline
 #\endhead \hline \endfoot
 %c c l .
 %関数@引数@戻り値
@@ -1898,31 +2069,42 @@ C マーカを doc2html へのこのシグナルとして使用します。
 4 cerf
 ?expressions functions cerf
 ?cerf
-#cerf(z) & 複素数 & 複素誤差関数 \\
+#cerf(z) & 複素数 & \gpCX & 複素誤差関数 \\
 %cerf(z)@複素数@複素誤差関数
  `cerf(z)` は誤差関数 erf(x) の複素バージョンです。
+ 外部ライブラリ libcerf が必要です。
 4 cdawson
 ?expressions functions cdawson
 ?cdawson
-=dawson
+=Dawson's integral
+?Dawson's integral
 %cdawson(z)@複素数@複素 Dawson 積分
-#cdawson(z)&複素数&Dawson 積分 $D(z)={\frac{\sqrt{\pi}}{2}e^{-z^2} erfi(z)}$ の複素拡張 \\
+#cdawson(z)&複素数& \gpCX &Dawson 積分 $D(z)={\frac{\sqrt{\pi}}{2}e^{-z^2} erfi(z)}$ の複素拡張 \\
  `cdawson(z)` は複素引数に対する Dawson 積分の値を返します。
  cdawson(z) = sqrt(pi)/2 * exp(-z^2) * erfi(z)
+ 外部ライブラリ libcerf が必要です。
 4 faddeeva
 ?expressions functions faddeeva
 ?faddeeva
 %faddeeva(z)@複素数@再スケール化複素誤差関数 w(z) = exp(-z^2) * erfc(-i*z)
-#faddeeva(z)&複素数&再スケール化複素誤差関数 $w(z) = e^{-z^2}~ erfc(-iz) $ \\
+#faddeeva(z)&複素数& \gpCX &再スケール化複素誤差関数 $w(z) = e^{-z^2}~ erfc(-iz) $ \\
  関数 `faddeeva(z)` は再スケール化複素誤差関数です。
  faddeeva(z) = exp(-z^2) * erfc(-i*z)
  これは、Abramowitz-Stegun の式 7.1.3, 7.1.4 に対応します。
+ 外部ライブラリ libcerf が必要です。
 4 erfi
 ?expressions functions erfi
 ?erfi
 %erfi(x)@実数@虚誤差関数 erfi(x) = -i * erf(ix)
-#erfi(x)&実数&虚誤差関数 $erf(x) = -i * erf(ix)$ \\
+#erfi(x)&実数&~&虚誤差関数 $erf(x) = -i * erf(ix)$ \\
  虚誤差関数 erfi(x) = -i * erf(ix)
+ 外部ライブラリ libcerf が必要です。
+C C 4 FresnelC
+%FresnelC(x)@実数@ C(x) = integral[0;x] cos(pi/2 t^2)dt
+#FresnelC(x)&実数&~&フレネル積分 $C(x)=\int^{x}_{0}\cos(\frac{\pi}{2}t^2)dt$ \\
+C C 4 FresnelS
+%FresnelS(x)@実数@ S(x) = integral[0;x] sin(pi/2 t^2)dt
+#FresnelS(x)&実数&~&フレネル積分 $S(x)=\int^{x}_{0}\sin(\frac{\pi}{2}t^2)dt$ \\
 4 Voigt Profile
 ?expressions functions VP
 ?expressions functions VP_fwhm
@@ -1930,8 +2112,8 @@ C マーカを doc2html へのこのシグナルとして使用します。
 ?VP_fwhm
 %VP(x,sigma,gamma)@実数@Voigt プロファイル
 %VP_fwhm(sigma,gamma)@実数@Voigt プロファイルの半値全幅 (FWHM)
-#VP(x,$\sigma$,$\gamma$)&実数& Voigt プロファイル $ VP(x,\sigma,\gamma) = {\int^{\infty}_{-\infty}{G(x^\prime;\sigma) L(x-x^\prime;\gamma) dx^\prime }} $ \\
-#VP\_fwhm($\sigma$,$\gamma$)&実数& Voigt プロファイルの半値全幅 (FWHM)\\
+#VP(x,$\sigma$,$\gamma$)&実数& ~ & Voigt プロファイル $ VP(x,\sigma,\gamma) = {\int^{\infty}_{-\infty}{G(x^\prime;\sigma) L(x-x^\prime;\gamma) dx^\prime }} $ \\
+#VP\_fwhm($\sigma$,$\gamma$)&実数& ~ & Voigt プロファイルの半値全幅 (FWHM)\\
  `VP(x,sigma,gamma)` はガウス密度関数 G(x;sigma) とローレンツ密度関数
  L(x;gamma) の畳み込みで定義される Voigt プロファイル (密度関数) に対
  応します。
@@ -1939,16 +2121,52 @@ C マーカを doc2html へのこのシグナルとして使用します。
 
 #\hline \end{longtable}
 #%% @end が必要とするため、ダミーの tabular の開始
-#\begin{tabular}{|ccl|}
+#\begin{tabular}{|lcl|}
 @end table
 
 ^<!-- INCLUDE_NEXT_TABLE -->
 @start table
-#\begin{tabular}{|ccl|} \hline
-#\multicolumn{3}{|c|}{文字列関数} \\ \hline \hline
-#関数 & 引数 & 返り値 \\ \hline
+#\setlength\LTleft{0pt}
+#\setlength\LTright{0pt}
+#\begin{longtable}{@{\extracolsep{\fill}}|lcrl|@{}} \hline
+#\multicolumn{4}{|c|}{Amos ライブラリ (利用可能な場合のみ) による複素特殊関数} \\ \hline \hline
+#関数 ~~~~~~~~~~~~~~~~~ & 引数 & ~ & 戻り値 ({\gpCX } は複素数)\\ \hline
+#\endhead \hline \endfoot
 %c c l .
-%関数@引数@返り値
+%関数@引数@戻り値
+%_
+# ~ & ~ & ~ & \hspace{7cm} \\
+
+#Ai(z) & 複素数 & \gpCX &  複素エアリー関数 $Ai(z)$\\
+%Ai(z)@複素数@複素エアリー関数 Ai(z)
+#Bi(z) & 複素数 & \gpCX &  複素エアリー関数 $Bi(z)$\\
+%Bi(z)@複素数@複素エアリー関数 Bi(z)
+#BesselH1(nu,z) & 実数, 複素数 & \gpCX & $H^{(1)}_{\nu}(z)$ 第 1 種ハンケル関数\\
+%BesselH1(nu,z) @ 実数, 複素数 @ 第 1 種ハンケル関数 H1_nu
+#BesselH2(nu,z) & 実数, 複素数 & \gpCX & $H^{(2)}_{\nu}(z)$ 第 2 種ハンケル関数\\
+%BesselH2(nu,z) @ 実数, 複素数 @ 第 2 種ハンケル関数 H2_nu
+#BesselJ(nu,z) & 実数, 複素数 & \gpCX & $J_{\nu}(z)$ 第 1 種ベッセル関数\\
+%BesselJ(nu,z) @ 実数, 複素数 @ 第 1 種ベッセル関数 J_nu
+#BesselY(nu,z) & 実数, 複素数 & \gpCX & $Y_{\nu}(z)$ 第 2 種ベッセル関数\\
+%BesselY(nu,z) @ 実数, 複素数 @ 第 2 種ベッセル関数 Y_nu
+#BesselI(nu,z) & 実数, 複素数 & \gpCX & $I_{\nu}(z)$ 第 1 種変形ベッセル関数\\
+%BesselI(nu,z) @ 実数, 複素数 @ 第 1 種変形ベッセル関数 I_nu
+#BesselK(nu,z) & 実数, 複素数 & \gpCX & $K_{\nu}(z)$ 第 2 種変形ベッセル関数\\
+%BesselK(nu,z) @ 実数, 複素数 @ 第 2 種変形ベッセル関数 K_nu
+#expint(n,z) & 整数 $n\geq0$, 複素数 $z$ & \gpCX & $E_n(z)=\int_1^\infty t^{-n} e^{-zt}\,dt$,  指数積分\\
+%expint(n,z)@ 整数 n>=0, 複素数 @$E sub n (z)$, 複素指数積分関数
+#\hline \end{longtable}
+#%% @end が必要とするため、ダミーの tabular の開始
+#\begin{tabular}{|lcl|}
+@end table
+
+^<!-- INCLUDE_NEXT_TABLE -->
+@start table
+#\begin{longtable}{@{\extracolsep{\fill}}|lcl|@{}} \hline
+#\multicolumn{3}{|c|}{文字列関数} \\ \hline \hline
+#関数 & 引数 & 戻り値 \\ \hline
+%c c l .
+%関数@引数@戻り値
 %_
 4 gprintf
 ?expressions functions gprintf
@@ -2047,15 +2265,103 @@ C マーカを doc2html へのこのシグナルとして使用します。
 %words("string")@文字列@文字列 "string" 中の単語数
  `words("string")` は文字列 string 中の単語数を返します。例えば
  `words(" a b c d")` は 4 を返します。
+#\hline \end{longtable}
+#%% @end が必要とするため、ダミーの tabular の開始
+#\begin{tabular}{|lcl|}
 @end table
 
 ^<!-- INCLUDE_NEXT_TABLE -->
 @start table
-#\begin{tabular}{|ccl|} \hline
-#\multicolumn{3}{|c|}{他の {\bf gnuplot} の関数} \\ \hline \hline
-#関数 & 引数 & 返り値 \\ \hline
+#\begin{tabular}{|lcl|} \hline
+#\multicolumn{3}{|c|}{時刻関数} \\ \hline \hline
+#関数 & 引数 & 戻り値 \\ \hline
 %c c l .
-%関数@引数@返り値
+%関数@引数@戻り値
+%_
+C C 4 time
+C ?expressions functions time
+?time
+#time(x) & 任意 & 現在のシステム時刻 (秒単位) \\
+%time(x)@任意@現在のシステム時刻 (秒単位)
+C C 4 timecolumn
+C ?expressions functions timecolumn
+?timecolumn
+#timecolumn(N,"timeformat") & 整数, 文字列 & 入力データの $N$ 列目からの書式化日時データ \\
+%timecolumn(N,"timeformat")@整数, 文字列@入力データの $N$ 列目からの書式化日時データ
+C C 4 tm_hour
+?expressions functions tm_hour
+?tm_hour
+#tm\_hour(t) & 秒数による時刻 & 時 (0..23)\\
+%tm_hour(t)@秒数による時刻@時 (0..23)
+ 関数 `tm_hour(t)` は引数を 1970 年 1 月 1 日からの秒数と解釈し、それが
+ 時刻の何時 (0--23 の範囲の整数) であるかを、実数として返します。
+C C 4 tm_mday
+?expressions functions tm_mday
+?tm_mday
+#tm\_mday(t) & 秒数による時刻 & 日 (1..31)\\
+%tm_mday(t)@秒数による時刻@日 (1..31)
+ 関数 `tm_mday(t)` は引数を 1970 年 1 月 1 日からの秒数と解釈し、それが
+ その月の何日 (1--31 の範囲の整数) であるかを、実数として返します。
+C C 4 tm_min
+?expressions functions tm_min
+?tm_min
+#tm\_min(t) & 秒数による時刻 & 分 (0..59)\\
+%tm_min(t)@秒数による時刻@分 (0..59)
+ 関数 `tm_min(t)` は引数を 1970 年 1 月 1 日からの秒数と解釈し、それが
+ 時刻の何分 (0--59 の範囲の整数) であるかを、実数として返します。
+C C 4 tm_mon
+?expressions functions tm_mon
+?tm_mon
+#tm\_mon(t) & 秒数による時刻 & 月 (0..11)\\
+%tm_mon(t)@秒数による時刻@月 (0..11)
+ 関数 `tm_mon(t)` は引数を 1970 年 1 月 1 日からの秒数と解釈し、それが
+ 何月 (0--11 の範囲の整数) であるかを、実数として返します。
+C C 4 tm_sec
+?expressions functions tm_sec
+?tm_sec
+#tm\_sec(t) & 秒数による時刻 & 秒 (0..59)\\
+%tm_sec(t)@秒数による時刻@秒 (0..59)
+ 関数 `tm_sec(t)` は引数を 1970 年 1 月 1 日からの秒数と解釈し、それが
+ 時刻の何秒 (0--59 の範囲の整数) であるかを、実数として返します。
+C C 4 tm_wday
+?expressions functions tm_wday
+?tm_wday
+#tm\_wday(t) & 秒数による時刻 & 曜日 (日から土を 0..6 で)\\
+%tm_wday(t)@秒数による時刻@曜日 (日から土を 0..6 で)
+ 関数 `tm_wday(t)` は引数を 1970 年 1 月 1 日からの秒数と解釈し、それが
+ 何曜日であるかを、日曜から土曜を 0 から 6 の整数として返します。
+C C 4 tm_week
+#tm\_week(t) & 秒数による時刻 & ISO 8601 規則での週番号 (1..53)\\
+%tm_week(t)@秒数による時刻@ISO 8601 規則での週番号 (1..53)
+C C 4 tm_yday
+?expressions functions tm_yday
+?tm_yday
+#tm\_yday(t) & 秒数による時刻 & その年の何日目 (0..365)\\
+%tm_yday(t)@秒数による時刻@その年の何日目 (0..365)
+ 関数 `tm_yday(t)` は引数を 1970 年 1 月 1 日からの秒数と解釈し、それが
+ その年の何日目 (0--365 の範囲の整数) であるかを、実数として返します。
+C C 4 tm_year
+?expressions functions tm_year
+?tm_year
+#tm\_year(t) & 秒数による時刻 & 西暦 \\
+%tm_year(t)@秒数による時刻@西暦
+ 関数 `tm_year(t)` は引数を 1970 年 1 月 1 日からの秒数と解釈し、それが
+ 西暦何年 (整数) であるかを、実数として返します。
+C C 4 weekdata_iso
+#weekdate\_iso(year,week,day) & 整数 & ISO 8601 規則での週曜日に対応する時刻\\
+%weekdate_iso(year,week,day)@整数@ ISO 8601 規則での週曜日に対応する時刻
+C C 4 weekdata_cdc
+#weekdate\_cdc(year,week,day) & 整数 & CDC による疫学的週曜日に対応する時刻\\
+%weekdate_cdc(year,week,day)@整数@ CDC による疫学的週曜日に対応する時刻\\
+@end table
+
+^<!-- INCLUDE_NEXT_TABLE -->
+@start table
+#\begin{tabular}{|lcl|} \hline
+#\multicolumn{3}{|c|}{他の {\bf gnuplot} の関数} \\ \hline \hline
+#関数 & 引数 & 戻り値 \\ \hline
+%c c l .
+%関数@引数@戻り値
 %_
 4 column
 ?expressions functions column
@@ -2091,10 +2397,21 @@ C マーカを doc2html へのこのシグナルとして使用します。
 4 palette
 ?expressions functions palette
 ?palette
-#palette(z) & 実数 & z に割り当てられた RGB パレット色 \\
-%palette(z)@実数@z に割り当てられた RGB パレット色
+#palette(z) & 実数 & z に割り当てられた 24 ビット RGB パレット色 \\
+%palette(z)@実数@z に割り当てられた 24 ビット RGB パレット色
  `palette(z)` は cbrange の現在の範囲で z に割り当てられるパレット色の
- RGB 表現を返します。
+ 24 ビット RGB 表現を返します。
+4 rgbcolor
+?expressions functions rgbcolor
+?rgbcolor
+=alpha channel
+#rgbcolor("name") & 文字列 & 色名か文字列表現の色の 32 ビット ARGB 値\\
+%rgbcolor("name")@文字列@色名か文字列表現の色の 32 ビット ARGB 値
+ `rgbcolor("name")` は、色名か、"0xAARRGGBB" や "#AARRGGBB" の形式の文
+ 字列に対する、アルファ値 + RGB 色表現の 32 ビット整数値を返します。文
+ 字列が色の表現であると認識されなければ、この関数は 0 を返します。これ
+ を使えば、データファイルから色名を読んだり、色名の色にアルファ値を上位
+ バイトに追加した値を返り値として得たりできます。以下参照: `colorspec`。
 4 stringcolumn
 ?expressions functions stringcolumn
 ?stringcolumn
@@ -2106,89 +2423,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  操作の数式の一部としてのみ使われます。これは $x$ 列目の内容を文字列変
  数として返します。`strcol(x)` は、`stringcolumn(x)` の省略形です。
  以下も参照: `plot datafile using`。
-4 timecolumn
-?expressions functions timecolumn
-?timecolumn
-#timecolumn(N,"timeformat") & 整数, 文字列 & データ入力中の $N$ 列目の日時データ \\
-%timecolumn(N,"timeformat")@整数, 文字列@データファイル入力中の $N$ 列目の日時データ
- `timecolumn(N,"timeformat")` は fit、あるいはデータファイル描画での
- `using` 処理の数式の一部としてのみ使います。以下参照:
- `plot datafile using`。
-
- これは、N 列目から始まる文字列データを日時データ値として読み、これをミ
- リ秒精度の "Unix エポック (1970 年 1 月 1 日) からの秒数" として解釈す
- るために "timeformat" を使用します。
- 書式パラメータの指定がない場合、デフォルトの `set timefmt` による文字
- 列を使います。
-4 tm_hour
-?expressions functions tm_hour
-?tm_hour
-#tm\_hour(x) & 整数 & 時\\
-%tm_hour(x)@整数@時
- 関数 `tm_hour(x)` は引数を 1970 年 1 月 1 日からの秒数と解釈し、それが
- 時刻の何時 (0--23 の範囲の整数) であるかを、実数として返します。
-4 tm_mday
-?expressions functions tm_mday
-?tm_mday
-#tm\_mday(x) & 整数 & 日 \\
-%tm_mday(x)@整数@日
- 関数 `tm_mday(x)` は引数を 1970 年 1 月 1 日からの秒数と解釈し、それが
- その月の何日 (1--31 の範囲の整数) であるかを、実数として返します。
-4 tm_min
-?expressions functions tm_min
-?tm_min
-#tm\_min(x) & 整数 & 分 \\
-%tm_min(x)@整数@分
- 関数 `tm_min(x)` は引数を 1970 年 1 月 1 日からの秒数と解釈し、それが
- 時刻の何分 (0--59 の範囲の整数) であるかを、実数として返します。
-4 tm_mon
-?expressions functions tm_mon
-?tm_mon
-#tm\_mon(x) & 整数 & 月 \\
-%tm_mon(x)@整数@月
- 関数 `tm_mon(x)` は引数を 1970 年 1 月 1 日からの秒数と解釈し、それが
- 何月 (0--11 の範囲の整数) であるかを、実数として返します。
-4 tm_sec
-?expressions functions tm_sec
-?tm_sec
-#tm\_sec(x) & 整数 & 秒 \\
-%tm_sec(x)@整数@秒
- 関数 `tm_sec(x)` は引数を 1970 年 1 月 1 日からの秒数と解釈し、それが
- 時刻の何秒 (0--59 の範囲の整数) であるかを、実数として返します。
-4 tm_wday
-?expressions functions tm_wday
-?tm_wday
-#tm\_wday(x) & 整数 & その週の何日目 \\
-%tm_wday(x)@整数@その週の何日目
- 関数 `tm_wday(x)` は引数を 1970 年 1 月 1 日からの秒数と解釈し、それが
- その週の何日目 (0--6 の範囲の整数) であるかを、実数として返します。
-4 tm_yday
-?expressions functions tm_yday
-?tm_yday
-#tm\_yday(x) & 整数 & その年の何日目 \\
-%tm_yday(x)@整数@その年の何日目
- 関数 `tm_yday(x)` は引数を 1970 年 1 月 1 日からの秒数と解釈し、それが
- その年の何日目 (1--366 の範囲の整数) であるかを、実数として返します。
-4 tm_year
-?expressions functions tm_year
-?tm_year
-#tm\_year(x) & 整数 & 西暦 \\
-%tm_year(x)@整数@西暦
- 関数 `tm_year(x)` は引数を 1970 年 1 月 1 日からの秒数と解釈し、それが
- 西暦何年 (整数) であるかを、実数として返します。
-4 time
-?expressions functions time
-?time
-#time(x) & 任意 & 現在のシステム時刻 \\
-%time(x)@任意@現在のシステム時刻
- 関数 `time(x)` は現在のシステム時刻を返します。この値は `strftime` 関
- 数で日時文字列に変換できますし、`timecolumn` と組み合わせて相対的な日
- 時グラフを作成するのにも使えます。引数の型はそれが返すものを決定します。
- 引数が整数の場合は time() は現在の時刻を 1970 年 1 月 1 日からの整数と
- して返し、引数が実数 (または複素数) ならば同様の値を実数として返します。
- 引数が文字列ならば、それを書式文字列であるとみなし、書式化された日時文
- 字列を提供するようそれを `strftime` に渡します。
- 以下参照: `time_specifiers`, `timefmt`。
 4 valid
 ?expressions functions valid
 ?valid
@@ -2209,29 +2443,250 @@ C マーカを doc2html へのこのシグナルとして使用します。
  使えます。例: voxel(x,y,z) = 0.0
  以下参照: `splot voxel-grids`, `vgrid`。
 @end table
+
+4 整数変換関数 (integer conversion functions): int floor ceil round
+?integer conversion
+?integer
+?precision
+ gnuplot の整数変数値は、使用環境が許せば、64 ビットの精度で保存します。
+
+ gnuplot の複素数変数値、実数変数値は、ほとんどの使用環境で IEEE754 の
+ binary64 (double) 浮動小数形式で保存します。その精度は、53 ビットに制
+ 限され、有効数字はおよそ 16 桁です。
+
+ よって、絶対値が 2^53 よりも大きい整数は、浮動小数変数で一意に表現する
+ ことはできません。つまり、大きな N に対する int(real(N)) という操作は
+ N に近いけれども N とは異なる整数を返す可能性があります。
+
+ さらに、浮動小数値を切り捨てにより整数値に変換する関数は、その値自身が
+ 小さくても、16 桁以上の精度に依存する操作では期待する値を得られない可
+ 能性があります。例えば、int(log10(0.1)) は、-1 でなく 0 を返しますが、
+ それはその浮動小数表現が -0.999999999999999... に等しいからです。
+ 以下も参照: `overflow`。
+
+?expressions functions int
+?int
+ `int(x)` は、引数の 0 の方向に切り捨てた整数部分を返します。
+ |x| > 2^63、すなわち整数値として大きすぎる場合は NaN を返します。
+ |x| > 2^52 の場合は、返り値はある整数の近傍におさまりますが、浮動小数
+ 精度の制限のためにそれらを区別できません。
+ 以下参照: `integer conversion`。
+
+?expressions functions floor
+?floor
+ `floor(x)` は、x の実数部分以下の最大の整数を返します。
+ |x| > 2^52 の場合、その値は一意に決定できませんので、その場合は NaN を
+ 返します。以下参照: `integer conversion`。
+
+?expressions functions ceil
+?ceil
+ `ceil(x)` は、x の実数部分以上の最小の整数を返します。
+ |x| > 2^52 の場合、その値は一意に決定できませんので、その場合は NaN を
+ 返します。以下参照: `integer conversion`。
+
+?expressions functions round
+?round
+ `round(x)` は、x の実数部分に一番近い整数を返します。
+ |x| > 2^52 の場合、その値は一意に決定できませんので、その場合は NaN を
+ 返します。以下参照: `integer conversion`。
+
 4 種々の楕円積分 (elliptic integrals)
 ?elliptic integrals
+?elliptic
 =elliptic integrals
  関数 `EllipticK(k)` は、第 1 種完全楕円積分、すなわち、関数
- `(1-(k*sin(p))**2)**(-0.5)` の 0 からπ/2 までの範囲の広義積分の値を返
- します。`k` の定義域は -1 から 1 です (両端は含まない)。
+ `(1 - k^2*sin^2(θ))^(-0.5)` の 0 からπ/2 までの範囲の広義積分の値を
+ 返します。`k` の定義域は -1 から 1 です (両端は含まない)。
+
+#TeX \quad\quad EllipticK$(k)=\int_0^{\pi/2} {\sqrt{1-k^2\sin^2\theta}~}^{-1}~d\theta$
 
  関数 `EllipticE(k)` は、第 2 種完全楕円積分、すなわち、関数
- `(1-(k*sin(p))**2)**0.5` の 0 からπ/2 までの範囲の広義積分の値を返し
- ます。`k` の定義域は -1 から 1 です (両端も含む)。
+ `(1 - k^2*sin^2(θ))^(-0.5)` の 0 からπ/2 までの範囲の広義積分の値を
+ 返します。`k` の定義域は -1 から 1 です (両端も含む)。
+
+#TeX \quad\quad EllipticE$(k)=\int_0^{\pi/2} {\sqrt{1-k^2\sin^2\theta}}~d\theta$
 
  関数 `EllipticPi(n,k)` は、第 3 種完全楕円積分、すなわち関数
- `(1-(k*sin(p))**2)**(-0.5)/(1-n*sin(p)**2)` の 0 からπ/2 までの範囲の
- 広義積分の値を返します。パラメータ `n` は 1 より小さく、`k` は -1 と 1
- の間 (両端は含まない) でなければいけません。定義より、すべての正の `k`
- に対し EllipticPi(0,k) == EllipticK(k) であることに注意してください。
-4 libcerf が提供する特殊関数 (Special functions provided by libcerf)
-?libcerf
- いくつかの特殊関数は、あなたの gnuplot が外部 libcerf ライブラリ
- (https://jugit.fz-juelich.de/mlz/libcerf) を使ってビルドされているとき
- だけ提供されます。それらは、複素誤差関数 cerf(z), 虚数誤差関数 erfi(x),
- Dawson 積分の複素拡張 cdawson(z), Faddeeva 関数の複素数版と、Voigt プ
- ロファイル VP(x, sigma, gamma) です。
+ `(1 - k^2*sin^2(θ))^(-0.5) / (1 - n*sin^2(θ))` の 0 からπ/2 までの
+ 範囲の広義積分の値を返します。パラメータ `n` は 1 より小さく、`k` は
+ -1 と 1 の間 (両端は含まない) でなければいけません。定義より、すべての
+ 正の `k` に対し EllipticPi(0,k) == EllipticK(k) であることに注意してく
+ ださい。
+
+#TeX \quad\quad EllipticPi$(n,k)=\int_0^{\pi/2} {\big[(1-n\sin^2\theta)\sqrt{1-k^2\sin^2\theta}~\big]}^{-1}d\theta$
+
+ 楕円積分のアルゴリズム: B.C.Carlson 1995, Numerical Algorithms 10:13-26.
+
+4 複素エアリー関数  (Complex Airy functions)
+?expressions functions Ai
+?Ai
+?expressions functions Bi
+?Bi
+ `Ai(z)` と `Bi(z)` は、複素引数 z のエアリー関数で、変形ベッセル関数 K
+ と I を用いて計算されます。
+ Donald E. Amos, Sandia National Laboratoris, SAND85-1018 (1985) による
+ ルーチンを含む外部ライブラリによってサポートしています。
+
+#TeX \quad\quad Ai$(z) = \frac{1}{\pi}\sqrt{\frac{z}{3}} K_{\nicefrac{1}{3}}(\zeta)$
+#TeX \quad\quad\quad $\zeta = \frac{2}{3}z^{\nicefrac{3}{2}}$
+
+#TeX \quad\quad Bi$(z) = \sqrt{\frac{z}{3}} {\big[I_{\nicefrac{-1}{3}}(\zeta) + I_{\nicefrac{1}{3}}(\zeta)]}$
+
+4 複素ベッセル関数 (Complex Bessel functions)
+?expressions functions BesselJ
+?BesselJ
+ `BesselJ(nu,z)` は、実引数の nu と複素引数の z に対する第 1 種ベッセル
+ 関数 J_nu です。
+ Donald E. Amos, Sandia National Laboratoris, SAND85-1018 (1985) による
+ ルーチンを含む外部ライブラリによってサポートしています。
+
+?expressions functions BesselY
+?BesselY
+ `BesselY(nu,z)` は、実引数の nu と複素引数の z に対する第 2 種ベッセル
+ 関数 Y_nu です。
+ Donald E. Amos, Sandia National Laboratoris, SAND85-1018 (1985) による
+ ルーチンを含む外部ライブラリによってサポートしています。
+
+?expressions functions BesselI
+?BesselI
+ `BesselI(nu,z)` は、実引数の nu と複素引数の z に対する第 1 種変形ベッ
+ セル関数 I_nu です。
+ Donald E. Amos, Sandia National Laboratoris, SAND85-1018 (1985) による
+ ルーチンを含む外部ライブラリによってサポートしています。
+
+?expressions functions BesselK
+?BesselK
+ `BesselK(nu,z)` は、実引数の nu と複素引数の z に対する第 2 種変形ベッ
+ セル関数 K_nu です。
+ Donald E. Amos, Sandia National Laboratoris, SAND85-1018 (1985) による
+ ルーチンを含む外部ライブラリによってサポートしています。
+
+?expressions functions BesselH1
+?expressions functions BesselH2
+?expressions functions Hankel
+?BesselH1
+?BesselH2
+?Hankel
+ `BesselH1(nu,z)` と `BesselH2(nu,z)` は、それぞれ実引数の nu と複素引
+ 数の z に対する第 1 種、第 2 種のハンケル関数です。
+     H1(nu,z) = J(nu,z) + iY(nu,z)
+     H2(nu,z) = J(nu,z) - iY(nu,z)
+ Donald E. Amos, Sandia National Laboratoris, SAND85-1018 (1985) による
+ ルーチンを含む外部ライブラリによってサポートしています。
+
+4 Expint
+?expressions functions expint
+?expint
+ `expint(n,z)` は、0 以上の整数 n に対して、次数 n の指数積分を返します。
+ これは、t^(-n) e^(-tz) dt の 1 から∞までの積分値です。
+
+#TeX \quad\quad $E_n(x)=\int_1^\infty t^{-n} e^{-xt}\,dt$
+
+ あなたが使っている gnuplot が、Amos ライブラリによる複素関数のサポート
+ 付きでビルドされたものであれば、n>0 に対して、その評価には Amos ルーチ
+ ンの cexint を使用します [Amos 1990 Algorithm 683, ACM Trans Math
+ Software 16:178]。その場合、z は -pi < arg(z) <= pi の任意の複素数とで
+ きます。expint(0,z) は、exp(-z)/z と計算します。
+
+ Amos ライブラリのサポートがなければ、z は 0 以上の実数値に制限されます。
+
+4 フレネル積分 (Fresnel integrals FresnelC(x) and FresnelS(x))
+?expressions functions FresnelC
+?expressions functions FresnelS
+?FresnelC
+?FresnelS
+ コサインとサインのフレネル積分は、複素誤差関数 erf(z) との関係を用いて
+ 計算します。erf(z) に依存するため、これらの積分は libcerf ライブラリの
+ サポートがある場合にのみ利用できます。
+
+#TeX \quad\quad $C(x) = \int^{x}_{0}\cos(\frac{\pi}{2} t^2)dt$ \quad $S(x) = \int^{x}_{0}\sin(\frac{\pi}{2} t^2)dt$
+
+#TeX \quad\quad $C(x)+iS(x)=\frac{1+i}{2} erf(z)$、$z = \frac{\sqrt{\pi}}{2}(1-i)x$
+
+4 Gamma
+?gamma
+ `gamma(x)` は、その引数の実数部分のガンマ関数値を返します。整数 n に対
+ しては gamma(n+1) = n! です。引数が複素数の場合、その虚数部分は無視し
+ ます。複素数引数に対しては、以下参照: `lnGamma`。
+
+4 Igamma
+?expressions functions igamma
+?igamma
+ `igamma(a, z)` は、下方 (正規化) 不完全ガンマ関数 P(a, z) を返します
+  [Abramowitz and Stegun (6.5.1)]。複素関数サポートがあれば、a と z は
+  real(a) > 0 の複素数値も許されます。
+
+#TeX \quad\quad igamma$(a,z)=P(a,z) = z^a\gamma^*(a,z)$
+#TeX $=\frac{1}{\Gamma(z)}\intop_{0}^{z}t^{a-1}e^{-t}dt$
+
+ a, z の値に依存して、以下の 4 つのアルゴリズムを使用します。
+#TeX \\
+ ケース (1) a が大きく (>100) (z-a)/a が小さい (<0.2) 場合、
+ Numerical Recipes 第 3 版 6.2 節 (2007) にある係数での Gauss-Legendre
+ 数値積分公式を利用します。
+#TeX \\
+ ケース (2) z > 1 で z > (a+2) の場合、Shea (1988) J. Royal Stat. Soc.
+ Series C (Applied Statistics) 37:466-473 の連分数を利用します。
+#TeX \\
+ ケース (3) z < 0 で a < 75 で imag(a) == 0 の場合は、Abramowitz &
+ Stegun (6.5.29) の数列を利用します。
+#TeX \\
+ ケース (4) その他の場合は、Peason の級数展開を利用します。
+
+ 全平面では、ある領域でその収束は良くないことに注意してください。選択し
+ たアルゴリズムで 1.E-14 の範囲で収束しなければ、関数は NaN を返し、警
+ 告を表示します。
+
+ 複素関数サポートがない場合は、定義域は実数の引数の a > 0, z >= 0 に制
+ 限されます。
+
+4 Invigamma
+?expressions functions invigamma
+?invigamma
+ 逆不完全ガンマ関数 `invigamma(a,p)` は、p = igamma(a,z) となる z の値
+ を返します。p は (0;1] に制限され、a は正の実数でなければいけません。
+ gnuplot での実装は、a<1 に対する 1.e-16 から、a = 1.e10 に対する 5.e-6
+ までの相対精度を持ちます。
+
+4 Ibeta
+?expressions functions ibeta
+?ibeta
+ `ibeta(a,b,x)` は、実数引数 a,b > 0, [0;1] 内の x に対する、正規化下方
+ 不完全ベータ積分値を返します。
+
+#TeX \quad\quad ibeta$(a,b,x)=\frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)}\intop_{0}^{x}t^{a-1}(1-t)^{b-1}dt$
+
+ 引数が複素数の場合、虚数部分は無視します。gnuplot 5.5 での実装は、
+ Cephes ライブラリ [Moshier 1989, "Methods and Programs for
+ Mathematical Functions", Prentice-Hall] からのコードを利用しています。
+
+4 Invibeta
+?expressions functions invibeta
+?invibeta
+ 逆不完全ベータ関数 `invibeta(a,b,p)` は、p = ibeta(a,b,z) となる z の
+ 値を返します。a, b は正の実数に、p は [0,1] 内の値に制限されています。
+ a, b が 0 に近づくとき
+#TeX ($\lessapprox 0.05$)
+ invibeta() は 1.0 に近づくので、その相対精度は浮動小数精度に制限される
+ ことに注意してください。
+
+4 LambertW
+?expressions functions LambertW
+?LambertW
+ 複素定義域と複素値域を持つ Lambert W 関数です。
+ LambertW( z, k ) は、方程式 W(z) * exp(z) = z で定義される 関数 W の第
+ k 分岐を返します。
+ その複素数値は、Corless et al [1996], Adv. Comp. Math 5:329 に記載され
+ ている Halley の方法を使って求めます。
+ 名目上の精度は 1.E-13 ですが、不連続、すなわち分岐点の近くでは収束は良
+ くありません。
+4 lnGamma
+?expressions functions lnGamma
+?lnGamma
+ lnGamma(z) は、複素定義域と複素値域を持つ、ガンマ関数の自然対数値を返
+ します。 Lanczos [1964], SIAM JNA 1:86-96 による 15 項近似による実装で
+ す。結果の虚数成分は、負の実軸部分を除く全体で連続な曲面を生成するよう
+ 位相をずらしています。
 4 乱数の生成 (random)
 ?expressions random
 ?random
@@ -2247,6 +2702,159 @@ C マーカを doc2html へのこのシグナルとして使用します。
        rand(x)     0 < x < 2^31-1 の整数なら種の両方を x に設定する
        rand({x,y}) 0 < x,y < 2^31-1 の整数なら seed1 を x に seed2 を y
                    に設定する
+4 複素引数の特殊関数 (Special functions with complex arguments)
+?expressions functions special
+?expressions functions complex
+?special_functions
+?libcerf
+?Amos
+?libopenspecfun
+
+ 複素定義域を持ついくつかの特殊関数を、外部ライブラリを通して提供します。
+ あなたが使っている gnuplot がこれらのライブラリへのリンクなしでビルド
+ されている場合は、定義域が実数の場合のみサポートするか、または関数自体
+ を全く提供しないかとなるでしょう。
+
+ libcerf (http://apps.jcns.fz-juelich.de/libcerf) を必要とする関数は、
+ ビルド時の設定オプション `--with-libcerf` に依存し、これがデフォルトで
+ す。以下参照: `cerf`, `cdawson`, `faddeeva`, `erfi`, `VP`, `VP_fwhm`。
+
+ 実数次 nu と複素引数の複素エアリー、ベッセル、ハンケル関数は、Douglas
+ E. Amos, Sandia National Laboratories, SAND85-1018 (1985) によって実装
+ されたルーチンを含むライブラリを必要とします。これらのルーチンは、
+ netlib (http://netlib.sandia.gov) や、libopenspecfun
+ (https://github.com/JuliaLang/openspecfun) にあります。これらに対応す
+ るビルド時の設定オプションは `--with-amos=<library directory>` です。
+ 以下参照: `Ai`, `Bi`, `BesselJ`, `BesselY`, `BesselI`, `BesselK`,
+ `Hankel`。
+ 複素指数積分は、netlib, libamos では提供していますが、libopenspecfun
+ にはありません。以下参照: `expint`。
+
+4 時刻関数 (Time functions)
+5 time
+?expressions functions time
+?time
+ 関数 `time(x)` は現在のシステム時刻を返します。この値は `strftime` 関
+ 数で日時文字列に変換できますし、`timecolumn` と組み合わせて相対的な日
+ 時グラフを作成するのにも使えます。引数の型はそれが返すものを決定します。
+ 引数が整数の場合は time() は現在の時刻を 1970 年 1 月 1 日からの整数と
+ して返し、引数が実数 (または複素数) ならば同様の値を実数として返します。
+ 引数が文字列ならば、それを書式文字列であるとみなし、書式化された日時文
+ 字列を提供するようそれを `strftime` に渡します。
+ 以下参照: `time_specifiers`, `timefmt`。
+5 timecolumn
+?expressions functions timecolumn
+?timecolumn
+ `timecolumn(N,"timeformat")` は、N 列目から始まる文字列データを日時デ
+ ータ値として読み、"timeformat" を使用して、それを "Unix エポック (1970
+ 年 1 月 1 日) からの秒数" としてミリ秒精度で解釈します。書式パラメータ
+ の指定がない場合、デフォルトの `set timefmt` による文字列を使います。
+ この関数は、plot か stats コマンドでの `using` 指定でのみ有効です。以
+ 下参照: `plot datafile using`。
+5 tm_structure
+?epoch
+ gnuplot は、内部では時刻を、Unix エポック 1970 年 1 月 1 日からの秒数
+ を表す 64 bit の浮動小数値として保持しています。これを時刻や日付として
+ 解釈するために、それを POSIX 標準の構造体 `struct_tm` に変換します。
+ 1 秒未満の秒数は、どんな場合でも tm_sec() からは取得できないことに注意
+ してください。各要素には、以下の関数を利用して個別にアクセスできます。
+#start
+#b `tm_hour(t)` 整数 0--23 の範囲の時間
+#b `tm_mday(t)` 整数 1--31 の範囲のその月の日
+#b `tm_min(t)`  整数 0--59 の範囲の分
+#b `tm_mon(t)`  整数 0--11 の範囲のその年の月
+#b `tm_sec(t)`  整数 0--59 の範囲の秒
+#b `tm_wday(t)` 整数 0(日)-- 6(土) の範囲の曜日
+#b `tm_yday(t)` 整数 0--365 の範囲のその年の日
+#b `tm_year(t)` 整数 西暦
+#end
+5 tm_week
+?expressions functions tm_week
+?functions tm_week
+?time_specifiers tm_week
+?tm_week
+?epidemiological week
+=epidemiological week
+ 関数 `tm_week(t, standard)` は、その引数を 1970 年 1 月 1 日からの秒数
+ での時刻とみなします。なお、関数名から POSIX の tm 構造体のメンバと思
+ うかもしれませんが、そうではありません。
+
+ standard = 0 の場合、これは ISO 8601 週曜日規則での週番号を返します。
+ これは、gnuplot の時刻書式 %W に対応します。
+ standard = 1 の場合、これは CDC (アメリカ疾病予防管理センター) 疫学的
+ 週曜日規則 (「疫学的週」) での週番号を返します。
+ これは、gnuplot の時刻書式 %U に対応します。
+ これらに対応する、週曜日からカレンダー時刻に変換する逆関数については、
+ 以下参照: `weekdate_iso`, `weekdate_cdc`。
+
+ 解説: ISO の YYYY 年の 1 番の週は、YYYY 年 1 月 1 に一番近い月曜日から
+ 始まります。これは、前の年になる可能性もあります。例えば、2008 年 12
+ 月 30 日火曜日は、ISO の週曜日では 2009-W01-2 (2009 年の週番号 1 の第
+ 2 日) となります。逆に、1 月の 1 日から 3 日までは、ISO の週番号 1 の
+ 月曜より前になることがありえます。この場合、これらの日は、前の年の最後
+ の週番号の週に含まれることになります。例えば、2021 年 1 月 1 日金曜日
+ は、ISO の週曜日では 2020-W53-5 です。
+
+ アメリカ疾病予防管理センター (CDC) の定める疫学的週は、同様の週曜日規
+ 則ですが、ISO 規則とは、月曜開始ではなく、日曜開始であるところが違いま
+ す。
+
+5 weekdate_iso
+?expressions functions weekdate_iso
+?functions weekdate_iso
+?weekdate_iso
+ 書式:
+      time = weekdate_iso( year, week [, day] )
+
+ この関数は、ISO 8601 週曜日での year(西暦), week(週番号), day(日番号)
+ の要素を、Unix エポックの 1970 年 1 月 1 日からの秒数でのカレンダー時
+ 刻に変換します。週曜日系での名目上の年 (year) は、カレンダーでの年と必
+ ずしも一致しないことに注意してください。週番号 week は 1 から 53 の間
+ の整数です。日番号 day はオプションで、それが 0 かまたは省略した場合は
+ その週の開始時刻を返し、そうでなければ day は 1 (月曜) から 7 (日曜)
+ までの整数です。
+ カレンダー日を、ISO 規則での週番号に変換する逆関数に関する情報について
+ は、以下参照:`tm_week`。
+
+ 例:
+      # 1 列目に ISO 週番号を持つファイルからのデータの描画
+      #     週      感染者  死亡者
+      #     2020-05    432       1
+      calendar_date(w) = weekdate_iso( int(w[1:4]), int(w[6:7]) )
+      set xtics time format "%b\n%Y"
+      plot FILE using (calendar_date(strcol(1))) : 2   title columnhead
+
+5 weekdate_cdc
+?expressions functions weekdate_cdc
+?functions weekdate_cdc
+?time_specifiers weekdate_cdc
+?weekdate_cdc
+=epidemiological week
+ 書式:
+      time = weekdate_cdc( year, week [, day] )
+
+ この関数は、CDC/MMWR (アメリカ疾病予防管理センター/疫学週報) の疫学的
+ 週曜日での year(西暦), week(週番号), day(日番号) の要素を、Unix エポッ
+ クの 1970 年 1 月 1 日からの秒数でのカレンダー時刻に変換します。CDC 週
+ 曜日規則は、ISO 規則とは、週が 1 = 日曜から 6 = 土曜まで、と定義されて
+ いる点に違いがあります。3 番目のパラメータが 0 または省略した場合は、
+ その週の開始時刻が返ります。
+ 以下参照: `tm_week`, `weekdate_iso`。
+
+
+4 Synchrotron function
+?expressions functions SynchrotronF
+?SynchrotronF
+ (第 1) シンクロトロン関数 SynchrotronF(x) は、シンクロトロン放射のパワ
+ ー分布スペクトルを、臨界フォトンエネルギー (臨界周波数 vc) の単位で与
+ える x の関数として記述するものです。
+
+#TeX \quad\quad $F(x) = x\intop_{x}^{\infty}K_{\nicefrac{5}{3}}(\nu)~d\nu$
+#TeX ここで、$K_{\nicefrac{5}{3}}$ は第 2 種変形ベッセル関数。
+
+ 1.E-15 まで正確な近似の Chebyshev 係数は、MacLead (2000)
+ NuclInstMethPhysRes A443:540-545 から採用しています。
+
 4 value
 ?expressions functions value
 ?value
@@ -2318,7 +2926,7 @@ C マーカを doc2html へのこのシグナルとして使用します。
 =one's complement
 =operator precedence
 =cardinality
-#\begin{tabular}{|ccl|} \hline
+#\begin{tabular}{|lcl|} \hline
 #\multicolumn{3}{|c|}{単項演算子}\\ \hline \hline
 #記号 & 例 & 説明 \\ \hline
 #\verb@-@ & \verb@-a@ & マイナス符号 \\
@@ -2384,8 +2992,8 @@ C ... and restart the table:
  し、大きな N の値に対しては実数での近似値を返します。
 
 ?cardinality
- |A| は、配列 A に適用した場合は要素数を返します。データブロック $DATA
- に適用した場合は、|$DATA| はデータ行数を返します。
+ 基数オペレータ |...| は、配列 A の要素数 |A| を返します。データブロッ
+ ク $DATA に適用した場合は、|$DATA| はデータ行数を返します。
 4 二項演算子 (Binary)
 ?expressions operators binary
 ?operators binary
@@ -2421,7 +3029,7 @@ C ... and restart the table:
 =string operators
 =modulo
 =exponentiation
-#\begin{tabular}{|ccl|} \hline
+#\begin{tabular}{|lcl|} \hline
 #\multicolumn{3}{|c|}{二項演算子} \\ \hline \hline
 #記号 & 例 & 説明 \\ \hline
 #\verb~**~ & \verb~a**b~ & 累乗\\
@@ -2533,7 +3141,7 @@ C ... and restart the table:
 @start table - まずは対話型テキスト形式
       記号          例       説明
        ?:          a?b:c     三項演算子
-#\begin{tabular}{|ccl|} \hline
+#\begin{tabular}{|lcl|} \hline
 #\multicolumn{3}{|c|}{三項演算子} \\ \hline \hline
 #記号 & 例 & 説明 \\ \hline
 #\verb~?:~ & \verb~a?b:c~ & 三項演算子\\
@@ -2875,8 +3483,7 @@ C ... and restart the table:
 
  "ページ (page)"、"表示画面 (screen)"、"キャンバス (canvas)" は、
  `gnuplot` がアクセス可能な領域全体を指します。デスクトップではそれはウ
- ィンドウ全体を指し、プロッタでは、一枚の紙全体、svga モードでは、モニ
- タスクリーン全体を指します。
+ ィンドウ全体を指し、プロッタでは、一枚の紙全体を指します。
 
  表示画面は、一つ、またはそれ以上の "グラフ描画 (plot)" を含みます。グ
  ラフ描画は一つの横座標と一つの縦座標で定義されますが、余白 (margin) や
@@ -2924,7 +3531,9 @@ C ... and restart the table:
 2 インラインデータとデータブロック (inline data and datablocks)
 ?inline data
 ?inline
+?data inline
 ?datablocks
+?data datablocks
  gnuplot のコマンド入力の中にデータを埋め込む仕組みは 2 種類用意されて
  います。まず、特殊ファイル名 '-' が plot コマンド中に与えると、その
  plot コマンド以下に続く行がインラインデータと解釈されます。以下参照:
@@ -3052,7 +3661,6 @@ Ffigure_newsyntax
 
 3 色指定 (colorspec)
 ?colorspec
-?rgbcolor
 =colors
 ?lc
 ?linecolor
@@ -3101,6 +3709,9 @@ Ffigure_newsyntax
  とを意味します。アルファ値 0 は完全に不透明色であることを意味し、よっ
  て "#00RRGGBB" は "#RRGGBB" と同じになります。アルファ値の 255 (FF) は
  完全に透明であることを意味します。
+
+ これらの任意の形式から、色の 32 ビット整数表現への変換を行うのに利用で
+ きる関数については、以下参照: `expressions functions rgbcolor`。
 
  カラーパレットとは、色の線型なグラデーションで、単一の数値を特定の色に
  滑らかに対応づけます。常にそのような 2 つの対応付けが効力を持ちます。
@@ -3320,7 +3931,7 @@ Ffigure_newsyntax
  ー割当を置き換えますが、<space> と 'q' は通常は再定義はできません。そ
  の唯一の例外については、以下参照: `bind space`。
 
- マウスボタンは、ボタン 1 のみ、2 次元描画用にのみ定義可能です。
+ マウスボタン割り当ては、2 次元描画でのみ有効です。
 
  ホットキーの一覧を得るには `show bind`, または `bind` とタイプするか、
  グラフウィンドウ上でホットキー 'h' を入力してください。
@@ -3393,10 +4004,10 @@ Ffigure_newsyntax
 ?bind space
  gnuplot が、configure 時にオプション --enable-rase-console をつけてイ
  ンストールされた場合は、描画ウィンドウ内で <space> をタイプすると
- gnuplot のコマンドウィンドウが前面に出ます。このホットキーは、
- 'gnuplot -ctrlq' のようにして gnuplot を起動するか、または X リソース
- の 'gnuplot*ctrlq' を設定することで ctrl-space に変更できます。
- 以下参照: `x11 command-line-options`。
+ gnuplot のコマンドウィンドウが前面に出ます。多分。実際には、これは強く
+ システムに依存します。このホットキーは、'gnuplot -ctrlq' のようにして
+ gnuplot を起動するか、または X リソースの 'gnuplot*ctrlq' を設定するこ
+ とで ctrl-space に変更できます。
 3 マウス用の変数 (Mouse variables)
 ?mouse variables
  `mousing` (マウス機能) が有効な場合、現在のウィンドウ上でのマウスクリ
@@ -3446,7 +4057,7 @@ Ffigure_newsyntax
  表示ウィンドウはグラフをその中に持ったままスクリーンに残ります。
  新しい出力形式を設定するときに `persist` や `nopersist` を指定すること
  もできます。
- 
+
       set term qt persist size 700,500
 
  出力形式によっては、その残ったウィンドウ上でも多少のマウス操作が可能な
@@ -3578,6 +4189,7 @@ Ffigure_newsyntax
  gnuplot の組み込み文字列操作関数は、UTF-8 エンコードを認識します (以下
  参照: `set encoding`)。例:
 
+  set encoding utf8
   utf8string = "αβγ"
   strlen(utf8string) は 3 を返す (文字数であって、バイト数ではない)
   utf8string[2:2] は "β" となる
@@ -4287,18 +4899,15 @@ Ffigure_ellipses
  上のすべての場合で、variable color データを最後の列 (3,4,5,6 列目) と
  して追加できます。以下参照: `colorspec`。
 
- デフォルトでは、主軸直径は水平軸 (x または x2) の単位、副軸直径は垂直
- 軸 (y または y2) の単位であるとみなされます。x 軸と y 軸の縮尺が異なる
- 場合、主軸と副軸の比は回転後には正しくはなりません。しかしこれは、キー
- ワード `units` で変更できます。
-
- これに関しては、3 種類の代用品があります:
- `units xy` が描画指定に含まれている場合、その軸は上に述べたように縮尺
- されます。`units xx` とすると、直径は両軸とも x 軸の単位で計算され、
- `units yy` は両軸とも y 軸の単位で計算されます。後の 2 つは、描画のサ
- イズを変更しても、楕円は正しいアスペクト比を持ちます。
- plot コマンドで `units` を省略した場合は、`set style ellipse` の設定を
- 使います。
+ キーワード `units`: `units xy` が描画指定に含まれている場合、主軸直径
+ は水平軸 (x または x2) の単位、副軸直径は垂直軸 (y または y2) の単位で
+ あるとみなされます。x 軸と y 軸の縮尺が異なる場合、主軸と副軸の比は回
+ 転後には正しくはなりません。
+ `units xx` は、直径は両軸とも x 軸の単位で計算します。
+ `units yy` は、直径は両軸とも y 軸の単位で計算します。
+ 後の 2 つは、描画のサイズを変更しても、楕円は正しいアスペクト比を持ち
+ ます。plot コマンドで `units` を省略した場合は、`set style ellipse` の
+ 設定を使います。
 
  例 (楕円を有効な線種を周期的に使用して描画):
 
@@ -4754,13 +5363,15 @@ Ffigure_scaled_image
 ?image pixels
 ?pixels
  出力形式によっては、2 次元の長方形領域内での画像データ描画の、デバイス
- やライブラリに依存した最適化ルーチンを使用しています。これは、例えばク
- リッピングや伸縮がうまくなかったり、縁が欠けるなど、望ましくない出力を
- 生成することがあります。キーワード `pixels` は、そのようなルーチンの代
- わりに、画像を 1 ピクセルずつ描画するような一般的なコードを使用するよ
- う gnuplot に指示します。この描画モードでは、描画は遅く、とても大きな
- 出力ファイルを生成しますが、どの出力形式でも共通的な見た目を作成してく
- れるでしょう。
+ やライブラリに依存した最適化ルーチンを使用しますが、これは、中間ピクセ
+ ル平滑化を行ったり、クリッピングがうまくなかったり、縁が欠けるなど、望
+ ましくない出力を生成することがあります。例として、SVG 画像レンダリング
+ 時のウェブブラウザによる平滑化があります。
+ キーワード `pixels` は、画像を 1 ピクセルずつ描画するような一般的なコ
+ ードを使用するよう gnuplot に指示します。この描画モードでは、描画は遅
+ く、大きな出力ファイルを生成しますが、どの出力形式でも共通的な見た目を
+ 作成してくれるます。これは、特にピクセル数の少ない温度分布図で好まれる
+ でしょう。
  例:
        plot 'data' with image pixels
 
@@ -4987,14 +5598,22 @@ Ffigure_points
 ?style polygons
 ?with polygons
 ?polygons
+ 2 次元グラフ:
+
       plot DATA {using 1:2} with polygons
 
  `plot with polygons` は、現在は `plot with filledcurves closed` として
- 処理されます。
+ 処理されます。各多角形には、3 列目の値を与え、キーワード `lc variable`
+ を指定する (その値を linetype と解釈) か、`lc rgb variable` を指定する
+ (その値を 24 ビット RGB 色と解釈) ことで、個別の色を割り当てることがで
+ きます。多角形の最初の頂点の色の値のみが使用されます。
+
+ 3 次元グラフ:
 
       splot DATA {using x:y:z} with polygons
             {fillstyle <fillstyle spec>}
             {fillcolor <colorspec>}
+
  `splot with polygons` は、3 次元空間の個々の三角形、四角形、およびそれ
  以上の多角形を描画するのに pm3d を使用します。これらは 3 次元曲面の一
  面や単独の形状となり得ます。このルーチンは、頂点が一つの平面に乗ってい
@@ -5007,6 +5626,11 @@ Ffigure_points
  ルーチンの制限のため、`set pm3d border` による一つの境界線スタイルが、
  すべての多角形に適用されますが、この制限は将来の版の gnuplot では取り
  除かれるでしょう。
+
+ 各多角形には、4 列目の値を与え、キーワード `lc variable` を指定する
+ (その値を linetype と解釈) か、`lc rgb variable` を指定する (その値を
+ 24 ビット RGB 色と解釈) ことで、個別の色を割り当てることができます。多
+ 角形の最初の頂点の色の値のみが使用されます。
 
  面には、pm3d のソート順と光源モデルを適用しますので、常に、
  `set pm3d depthorder` を使う方がいいかもしれせん。
@@ -5185,34 +5809,6 @@ Ffigure_xyerrorbars
  入力列を追加 (5,7 列目) すると、それらは各データ点毎の variable color
  情報として使われます。
 
-#TeX \newpage
-2 yerrorbars
-?plotting styles yerrorbars
-?plotting styles errorbars
-?style yerrorbars
-?with yerrorbars
-?style errorbars
-?with errorbars
-?yerrorbars
-Ffigure_yerrorbars
- `yerrorbars` (または `errorbars`) スタイルは 2 次元のデータ描画のみで
- 利用可能です。`yerrorbars` は、垂直の誤差指示線 (error bar) が表示され
- る以外は `points` に似ています。各点 (x,y) において (x,y-ydelta) から
- (x,y+ydelta) まで、または (x,ylow) から (x,yhigh) までの線分が引かれま
- すが、これらはいくつのデータ列が与えられるかによって変わります。誤差指
- 示線の端の刻みの印の見た目は、`set errorbars` で制御できます。
-
-      2 列:  [暗黙の x]  y  ydelta
-      3 列:  x  y  ydelta
-      4 列:  x  y  ylow  yhigh
-
- 入力列を追加 (4,5 列目) すると、それらは点の variable color 情報として
- 使われます。
-
- 以下も参照
-^ <a href="http://www.gnuplot.info/demo/mgr.html">
- errorbar デモ。
-^ </a>
 2 xerrorlines
 ?plotting styles xerrorlines
 ?style xerrorlines
@@ -5232,6 +5828,7 @@ Ffigure_xerrorlines
  入力列を追加 (4,5 列目) すると、それらは点の variable color 情報として
  使われます。
 
+#TeX \newpage
 2 xyerrorlines
 ?plotting styles xyerrorlines
 ?style xyerrorlines
@@ -5259,6 +5856,36 @@ Ffigure_xyerrorlines
  入力列を追加 (5,7 列目) すると、それらは各データ点毎の variable color
  情報として使われます。
 
+2 yerrorbars
+?plotting styles yerrorbars
+?plotting styles errorbars
+?style yerrorbars
+?with yerrorbars
+?style errorbars
+?with errorbars
+?yerrorbars
+=errorbars
+Ffigure_yerrorbars
+ `yerrorbars` (または `errorbars`) スタイルは 2 次元のデータ描画のみで
+ 利用可能です。`yerrorbars` は、垂直の誤差指示線 (error bar) が表示され
+ る以外は `points` に似ています。各点 (x,y) において (x,y-ydelta) から
+ (x,y+ydelta) まで、または (x,ylow) から (x,yhigh) までの線分が引かれま
+ すが、これらはいくつのデータ列が与えられるかによって変わります。誤差指
+ 示線の端の刻みの印の見た目は、`set errorbars` で制御できます。
+
+      2 列:  [暗黙の x]  y  ydelta
+      3 列:  x  y  ydelta
+      4 列:  x  y  ylow  yhigh
+
+ 入力列を追加 (4,5 列目) すると、それらは点の variable color 情報として
+ 使われます。
+
+ 以下も参照
+^ <a href="http://www.gnuplot.info/demo/mgr.html">
+ errorbar デモ。
+^ </a>
+
+#TeX \newpage
 2 yerrorlines
 ?plotting styles yerrorlines
 ?plotting styles errorlines
@@ -5267,6 +5894,7 @@ Ffigure_xyerrorlines
 ?style errorlines
 ?with errorlines
 ?yerrorlines
+?errorlines
 Ffigure_yerrorlines
  `yerrorlines` (または `errorlines`) スタイルは 2 次元のデータ描画のみ
  で利用可能です。`yerrorlines` は `linespoints` に似ていますが、垂直の
@@ -5327,7 +5955,7 @@ Ffigure_pm3dsolid
  ますし、この図にあるように (訳注: 図が表示されている場合)、上の面と下
  の面に異なる単色を指定することもできます。以下参照: `pm3d fillcolor`。
  hidden3d モードでの線分の切り取りとは違い、pm3d 曲面は現在の zrange の
- 範囲に滑らかにクリッピングできます。以下参照: `set pm3d clip z`。
+ 範囲に滑らかにクリッピングできます。以下参照: `set pm3d clipping`。
 
 #TeX \newpage
 2 柵グラフ (Fence plots)
@@ -5527,8 +6155,8 @@ Ffigure_zerror
 3 old-style
 ?commands call old-style
 ?call old-style
- 以下は、古いバージョンの gnuplot で使われていた、非推奨な call の仕組
- みの説明です。
+ [非推奨] 以下は、古いバージョンの gnuplot で使われていた call の仕組み
+ の説明です。
 
        call "<input-file>" <param-0> <param-1> ... <param-9>
 
@@ -6307,17 +6935,13 @@ Ffigure_zerror
        if (1==2) print "Never see this"; print "Or this either"
  とすると、何も表示されません。
 
- その他:
-       v=0
-       v=v+1; if (v%2) print "2" ; else if (v%3) print "3" ; else print "fred"
-
 2 for
 ?for
- `plot`, `splot`, `set`, `unset` コマンドでは、繰り返しの for 節を使う
- こともできます。これは、基本的なコマンドを複数回実行する効果を持ち、そ
- のおのおのの実行では繰り返し制御変数によって数式は再評価されます。`do`
- コマンドでは、どんなコマンド列でも繰り返し実行させることができます。繰
- り返し節は現在は以下の 2 つの形式をサポートしています:
+ `plot`, `splot`, `set`, `unset` コマンドでは、繰り返しの節を使うことも
+ できます。これは、基本的なコマンドを複数回実行する効果を持ち、そのおの
+ おのの実行では繰り返し制御変数によって数式は再評価されます。`do` コマ
+ ンドでは、どんなコマンド列でも繰り返し実行させることができます。繰り返
+ し節は現在は以下の 2 つの形式をサポートしています:
 
        for [intvar = start:end{:increment}]
        for [stringvar in "A B C D"]
@@ -6368,8 +6992,8 @@ Ffigure_zerror
  `load` することができます。有効なコマンドの書かれたテキストファイルを
  つくれば、それは、`load`コマンドによって、実行することができます。
  `load` 中のファイルの中にさらに `load` または `call` コマンドがあって
- も構いません。コマンド中のコメントについては、以下参照: `comments`。
- `load` するときに引数を与える方法については、以下参照: `call`。
+ も構いません。`load` するときに引数を与える方法については、以下参照:
+ `call`。
  試験段階の機能: コマンドはファイルでなくデータブロックからも読み込めま
  す。
 
@@ -6467,7 +7091,7 @@ Ffigure_zerror
  タイプすることで描画ウィンドウを close できます。それに適切な枠の部品
  や、ホットキーを利用可能であるかわからない場合、gnuplot 自身の仕組みで
  ホットキー列を定義することもできます。以下参照: `bind`。
- 
+
  以下のコマンド列は、gnuplot をコマンドラインからでなくスクリプトから実
  行している場合に有用です。
 
@@ -6853,9 +7477,10 @@ Ffigure_zerror
 ?datafile
 ?data
 ?file
- ファイルに納められた離散的なデータは、`plot` コマンドライン上で、その
- データファイル名 (<datafile>) を単一引用符または二重引用符で囲んで指定
- することによって表示できます。
+ ファイル内にあるデータは、`plot` コマンドライン上で、そのデータファイ
+ ル名を単一引用符または二重引用符で囲んで指定することで表示できます。
+ データはファイルではない、入力ストリームから受け取ることもできます。
+ 以下参照: `special-filenames`, `piped-data`, `datablocks`。
 
  書式:
        plot '<file_name>' {binary <binary list>}
@@ -6951,7 +7576,6 @@ Ffigure_zerror
 ?data-file bins
 ?datafile bins
 ?bins
- 試験段階の機能 (仕様の細かい部分は将来の版で変更する可能性があります)。
  書式:
       plot 'DATA' using <XCOL> {:<YCOL>} bins{=<NBINS>}
            {binrange [<LOW>:<HIGH>]} {binwidth=<width>}
@@ -7250,10 +7874,14 @@ Ffigure_zerror
 
  `smooth` オプションは、関数の描画のときには無視されます。
 
- 3 次元 plot (splot) での平滑化は、現在は 3 次元の点の集合を通る
- 自然 3 次スプライン曲線の生成に限定されています。例:
+ 3 次元 plot (splot) での平滑化は、現在は 3 次元の点の集合を通る自然 3
+ 次スプライン曲線の生成に限定されています。一般的には、軌道
+ (`smooth path`) にスプラインを沿って生成します。3 次元データの 2 次元
+ 射影に対しては、`smooth csplines` はそれが 2 次元データであるかのよう
+ に作用します。一つの `splot` コマンドでは、いずれか一つのキーワードの
+ みが許されています。
 
-      splot $DATA using 1:2:3 smooth csplines with lines
+      splot $DATA using 1:2:3 smooth path with lines
 
 5 acsplines
 ?commands plot datafile smooth acsplines
@@ -7338,7 +7966,8 @@ Ffigure_zerror
  初にソートしませんので、当てはめるスプラインの軌道はループを持つ可能性
  があります。一般に、スプライン係数の別々な 3 つの集合を生成し、それぞ
  れが一つの座標 x, y, z を、共通の明示的でない軌道パラメータの関数値と
- して扱います。これは、2 次元の `plot ... smooth path` の類似品です。
+ して扱います。これは、2 次元の `plot ... smooth path` オプションと同等
+ です。
 
  その曲線が xy, yz, xy のいずれかの平面上にあるような特別な場合は、単一
  の係数集合のみを生成します。これにより、3 次元空間内の平滑化曲線を、座
@@ -7359,7 +7988,6 @@ Ffigure_zerror
  FN Fritsch & RE Carlson (1980) "Monotone Piecewise Cubic Interpolation",
  SIAM Journal on Numerical Analysis 17: 238-246.
 
-Ffigure_smooth_path
 5 path
 ?commands path datafile smooth path
 ?plot datafile smooth path
@@ -7369,12 +7997,14 @@ Ffigure_smooth_path
 ?path
  オプション `smooth path` は、入力データ内で現れる順、すなわち最初に x
  でソートしたりせずに、3 次元スプライン曲線で引き続く点をつなぎます。
+Ffigure_smooth_path
  これは、閉曲線や、ループを含む軌道向きの滑らかなスプラインを生成します。
- いつものように、入力ファイルの空行で区切られた各点集合に対して、別々の
- 曲線を作ります。`smooth path with filledcurves closed` による描画は、
- 各点集合から閉曲線を描くことを保証し、`smooth path with lines` による
- 描画は、始点と終点が同じであれば閉曲線を、そうでなければ開いた曲線を描
- くことを保証します。以下も参照してください。
+ この平滑モードは、2 次元, 3 次元の両方の描画コマンドでサポートしていま
+ す。いつものように、入力ファイルの空行で区切られた各点集合に対して、別
+ 々の曲線を作ります。`smooth path with filledcurves closed` による描画
+ は、各点集合から閉曲線を描くことを保証し、`smooth path with lines` に
+ よる描画は、始点と終点が同じであれば閉曲線を、そうでなければ開いた曲線
+ を描くことを保証します。以下も参照してください。
 ^ <a href="http://www.gnuplot.info/demo_5.5/smooth_path.html">
  smooth_path.dem
 ^ </a>
@@ -7551,6 +8181,7 @@ Ffigure_smooth_path
 ?plot datafile special-filenames
 ?plot special-filenames
 ?datafile special-filenames
+?data special-filenames
 ?special-filenames ++
 ?special-filenames +
 ?+
@@ -7637,6 +8268,8 @@ Ffigure_smooth_path
 4 パイプによる入力データ (piped-data)
 ?commands plot datafile piped-data
 ?plot datafile piped-data
+?datafile piped-data
+?data piped-data
 ?plot piped-data
 ?piped-data
 ?pipes
@@ -7681,11 +8314,6 @@ Ffigure_smooth_path
  書式:
        plot 'file' using <entry> {:<entry> {:<entry> ...}} {'format'}
 
- format を指定すると、それを C ライブラリ関数 'scanf' に適用してデータ
- ファイルの各行を読みます。そうでなければ、各行はホワイトスペース (スペ
- ースやタブ) で区切られたデータの列 (フィールド) からなるとみなしますが
- 以下も参照: `datafile separator`。
-
  各 <entry> は、入力ファイルの一つのフィールドを選択するための単なる列
  の番号か、一つのデータ集合の最初の行の列のラベルに一致する文字列、カッ
  コで囲まれた数式、xticlabels(2) のようにカッコで囲まない特別な関数、の
@@ -7729,15 +8357,23 @@ Ffigure_smooth_path
  `using` に 2 つのエントリを与えた場合、それらは x, y として使われます。
  さらにエントリを追加して、入力からのデータを利用するような描画スタイル
  の詳細については、以下参照: `set style`, `fit`。
+C using の書式 (format)
+5 format
+?using format
+?plot using format
+ format を指定すると、それを C ライブラリ関数 'scanf' に適用してデータ
+ ファイルの各行を読みます。そうでなければ、各行はホワイトスペース (スペ
+ ースやタブ) で区切られたデータの列 (フィールド) からなるとみなしますが
+ 以下も参照: `datafile separator`。
 
  'scanf' 関数では色々なデータ形式の数値入力が使えますが、`gnuplot` は全
  ての入力データを倍精度浮動小数とみなしますから、`gnuplot` では `%lf`
- が本質的に唯一の数値入力指定、ということになります。
- 書式文字列には、少なくとも一つ、そして 7 つ以下の、そのような入力指定子
- を入れる必要があります。
+ が本質的に唯一の数値入力指定、ということになります。その書式文字列には
+ 少なくとも一つ、そして 7 つ以下の、そのような入力指定子を入れる必要が
+ あります。
  'scanf' は数と数の間にホワイトスペース、すなわち空白、タブ ("\t")、改行
- ("\n")、または改ページ ("\f") があると期待します。それ以外の入力は明示
- 的にスキップされるべきです。
+ ("\n")、または改ページ ("\f") があると期待します。それ以外の入力は明ら
+ かにスキップしなければいけません。
 
  "\t", "\n", "\f" を使うときは単一引用符よりむしろ二重引用符を使うべき
  であることに注意してください。
@@ -7896,105 +8532,6 @@ Ffigure_smooth_path
  以前に読み込んだデータが、再読み込み時には有効ではないことを意味します。
  これは、`replot` コマンドの代わりに、可能な限り `refresh` コマンド
  を使うよう gnuplot に指示します。以下参照: `refresh`。
-3 errorbars
-?commands plot errorbars
-?commands splot errorbars
-?plot errorbars
-?splot errorbars
-=errorbars
- エラーバーは、1 から 4 個の追加されたデータを読む (またはエントリを
- `using` で追加選択する) ことにより、2 次元データの描画において実現され
- ています。これら追加される値は、それぞれのエラーバースタイルで異なった
- 形で使われます。
-
- デフォルトでは、`gnuplot` はデータファイルの各行に以下のような 3 つ、
- 4 つ、あるいは 6 つの列があることを期待しています:
-
-       (x, y, ydelta),
-       (x, y, ylow, yhigh),
-       (x, y, xdelta),
-       (x, y, xlow, xhigh),
-       (x, y, xdelta, ydelta),
-       (x, y, xlow, xhigh, ylow, yhigh)
-
- x 座標は必ず指定しなければいけません。各数値を書く順序も上で挙げた通りで
- なくてはなりません。ただ、`using` 修飾子を使えばその順序を操作できますし、
- 欠けている列の値も補うことは可能ですが。例えば、
-
-       plot 'file' with errorbars
-       plot 'file' using 1:2:(sqrt($1)) with xerrorbars
-       plot 'file' using 1:2:($1-$3):($1+$3):4:5 with xyerrorbars
-
- 最後の例は、相対的な x の誤差と絶対的な y の誤差、という、サポートされて
- いない組のファイルに対するものです。`using` エントリが相対的な x の誤差
- から絶対的な x の最小値と最大値を生成しています。
-
- y のエラーバーは、(x, ylow) から (x, yhigh) への鉛直な線として描かれます。
- ylow と yhigh の代わりに ydelta が指定されたときは、ylow = y - ydelta,
- yhigh = y + ydelta となります。ある行にデータが 2 つしかなければ、ylow と
- yhight はともに y となります。x エラーバーは同様に計算された水平線です。
- データの各点を結ぶ折れ線を引きたい場合は、with errorbars と with lines を
- 指定して、同じデータファイルを 2 回 `plot` して下さい (ただし、キーの中に
- 2 つのエントリを作らないように、その一方には `notitle` オプションを使う
- ことを忘れないで下さい)。他の選択肢として、errorlines コマンドもあります
- (以下参照: `errorlines`)。
-
- エラーバーの端の刻みの印の見た目は、`set errorbars` で制御できます。
-
- 自動範囲指定が有効であれば、その描画範囲はエラーバーも含むように調整
- されます。
-
- 以下も参照
-^ <a href="http://www.gnuplot.info/demo/mgr.html">
- エラーバーのデモ
-^ </a>
-
- 更なる情報に関しては、以下参照: `plot using`, `plot with`, `set style`。
-3 errorlines
-?commands plot errorlines
-?commands splot errorlines
-?plot errorlines
-?splot errorlines
-?errorlines
- 誤差線 (errorbar) を伴う線描画は、2 次元データファイルの描画でサポート
- されていて、それは 1 個から 4 個の追加の (または `using` で指定する)
- 列データを与えることで行なわれます。これらの追加される値は、様々な
- errorline スタイルのそれぞれで異なった形で使われます。
-
- デフォルトの状態では、`gnuplot` は、データファイルの各行に 3 個、4 個、
- 6 個のいずれかの個数のデータがあることを期待し、それぞれ以下のいずれか
- に対応します。
-
-       (x, y, ydelta),
-       (x, y, ylow, yhigh),
-       (x, y, xdelta),
-       (x, y, xlow, xhigh),
-       (x, y, xdelta, ydelta),
-       (x, y, xlow, xhigh, ylow, yhigh)
-
- x 座標は指定する必要がありますし、データの順番も上の形式である必要があ
- りますが、`using` 修飾子でその順番を操作したり、欠けている列に対する値
- を与えたりすることができます。例えば
-
-       plot 'file' with errorlines
-       plot 'file' using 1:2:(sqrt($1)) with xerrorlines
-       plot 'file' using 1:2:($1-$3):($1+$3):4:5 with xyerrorlines
-
- 最後の例は、相対的な x の誤差と絶対的な y の誤差、というサポートされて
- いない組合せのデータのファイルに対するもので、`using` で相対的な誤差か
- ら絶対的な x の最小値と最大値を生成しています。
-
- y 誤差線は (x, ylow) から (x, yhigh) へ描画される縦線です。ylow, yhigh
- 代わりに ydelta が指定された場合は、ylow = y - ydelta, yhigh = y + ydelta
- と扱われます。ある行に 2 つのデータしかない場合、yhigh, ylow は両方と
- も y になります。x 誤差線は同様の方法で計算される水平線です。
-
- エラーバーの端の刻みの印の見た目は、`set errorbars` で制御できます。
-
- 自動縮尺 (autoscaling) が ON の場合、描画範囲は誤差線が入るように調整
- されます。
-
- 更なる情報については、以下参照: `plot using`, `plot with`, `set style`。
 3 関数描画 (functions)
 ?commands plot functions
 ?plot functions
@@ -8396,8 +8933,8 @@ Ffigure_smooth_path
  `set pointsize`。しかし、ここでセットされる <point_size> と、
  `set pointsize` でセットされる大きさは、いずれもデフォルトのポイントサ
  イズに掛けられることに注意してください。すなわち、それらの効果は累積は
- しません。例えば、`set pointsize 2; plot x w p ps 3` は、デフォルトの
- サイズの 3 倍であって、6 倍ではありません。
+ しません。例えば、`set pointsize 2; plot x with points ps 3` は、デフ
+ ォルトのサイズの 3 倍であって、6 倍ではありません。
 
  ラインスタイルの一部分、あるいは各 plot において `pointsize variable`
  という指定も可能です。この場合、入力には追加の 1 列が要求されます。例
@@ -8514,9 +9051,7 @@ Ffigure_smooth_path
 2 quit
 ?commands quit
 ?quit
- `exit` と `quit` の両コマンドと END-OF-FILE 文字は、`gnuplot` を終了
- させます。これらのコマンドは、出力装置を (`clear` コマンドと同様に)
- クリアしてから終了させます。
+ `quit` は、コマンド `exit` と同義です。以下参照: `exit`。
 2 raise
 ?commands raise
 ?commands lower
@@ -8577,10 +9112,9 @@ Ffigure_smooth_path
 
        plot '-' ; ... ; replot
 
- という使い方は推奨されません。それは、これがあなたに再び同じデータすべ
- ての入力を要求することになるからです。たいていの場合、代わりにコマンド
- `refresh` を使えます。これは、以前に読み込んだデータを使ってグラフを再
- 描画します。
+ は推奨されません。それは、これがあなたに再び同じデータすべての入力を要
+ 求することになるからです。たいていの場合、代わりにコマンド `refresh`
+ を使えます。これは、以前に読み込んだデータを使ってグラフを再描画します。
 
  `multiplot` モードでは、`replot` コマンドはすべての plot ではなく、直
  前の plot 部分だけしか再実行しないことに注意してください。
@@ -8787,8 +9321,8 @@ Ffigure_smooth_path
  タグ <tag> は各矢印を識別する整数です。タグを指定しない場合は、その時
  点で未使用の最も小さい数が自動的に割り当てられます。タグを使うことで、
  特定の矢印を変更したり、削除したりできます。既に存在する矢印の属性を変
- 更する場合は、タグを明示した `set arrow` コマンドで変更箇所を指定して
- ください。
+ 更する場合は、タグを明示した `set arrow` コマンドで変更したい属性を指
+ 定してください。
 
  矢印の最初の端点の位置は、常に "from" で指定しますが、もう一つの端点は
  以下で説明する 3 つの異なる仕組みのいずれかで指定できます。<position>
@@ -8865,8 +9399,8 @@ Ffigure_smooth_path
 ?noautoscale
  自動縮尺機能 (autoscale) は x, y, z の各軸に対して独立に、または一括し
  て指定できます。デフォルトでは全ての軸に対して自動縮尺設定を行います。
- 図の中の一部の描画 (`plot`) の組のみを元に autoscale したい場合は、そ
- の対象でない `plot` にフラグ `noautoscale` をつけることができます。
+ 図の中の一部の描画 (`plot`) の組のみを autoscale したい場合は、除外す
+ るものの plot コマンドにフラグ `noautoscale` をつければいいでしょう。
  以下参照: `datafile`。
 
  書式:
@@ -8876,7 +9410,7 @@ Ffigure_smooth_path
        show autoscale
 
  ここで、<axes> (軸) は `x`, `y`, `z`, `cb`, `x2`, `y2`, `xy`,
- `paxis {n}` のいずれかです。`min` または `max` を軸に追加指定すると
+ `paxis <p>` のいずれかです。`min` または `max` を軸に追加指定すると
  (`xy` では使えませんが) それは `gnuplot` にその軸の最小値、または最大
  値のみを自動縮尺させることになります。軸も何も指定されていない場合は全
  ての軸が対象となります。
@@ -8885,17 +9419,14 @@ Ffigure_smooth_path
  (`plot` のときは y 軸、`splot` のときは z 軸) は、関数やデータの値域が
  収まるように設定されます。
 
- 従属変数軸 (y または z) の自動縮尺機能が指定されていない場合は、現在の
- y や z の描画範囲がそのまま使われます。
-
  独立変数軸 (`plot` のときは x 軸、`splot` のときは x,y 軸) の自動縮尺
- 機能が指定されている場合は、描画される全てのデータファイルの点が収まる
- ように定義域をとるようになります。データファイルが 1 つも指定されてい
- ない場合は、自動縮尺機能はなんの効果もありません。つまり、関数のみが
- 指定されていてデーターファイルを使わない場合は、x 軸の描画範囲
- (z = f(x,y) を描画しているときは y 軸も) は影響をうけません。
+ 機能は、描画されるデータに合うようにこれらの軸の範囲をとるよう指示しま
+ す。描画が関数のみ (入力データなし) の場合、これらの軸の自動縮尺機能は
+ なんの効果も持ちません。
 
- 範囲に関するより詳しい情報に関しては、以下参照: `set xrange`。
+ 従属変数軸 (y または z) の自動縮尺機能が指定されていない場合は、現在の
+ y や z の描画範囲がそのまま使われます。 範囲に関するより詳しい情報に関
+ しては、以下参照: `set xrange`。
 
  媒介変数モード (parametric) でも自動縮尺機能は有効です (以下参照:
  `set parametric`)。この場合、より多くの従属変数があるので、x, y, z 各
@@ -9177,19 +9708,11 @@ Ffigure_smooth_path
  見出すには何度か試してみる必要があるかも知れません。
 
  デフォルトの値は、`boxes` や `boxerrorbars` スタイルの幅指定用の追加の
- データ列の明示的な値があればそれによって置き換えられます。4 列のデータ
- の場合、第 4 列目の値が棒の幅として使われます。ただし、その幅が -2.0
- の場合には棒の幅は自動計算されます。詳細は、以下参照: `style boxes`,
- `style boxerrorbars`。
+ データ列の明示的な値があればそれによって置き換えられます。
+ 詳細は、以下参照: `style boxes`, `style boxerrorbars`。
 
  棒の幅を自動的にセットするには
        set boxwidth
-
- とする、あるいは 4 列のデータに対しては以下のようにします。
-       set boxwidth -2
-
- `plot` のキーワード `using` を使っても同じ効果を得ることができます:
-       plot 'file' using 1:2:3:4:(-2)
 
  棒の幅を自動的な値の半分にするには
        set boxwidth 0.5 relative
@@ -9210,12 +9733,13 @@ Ffigure_smooth_path
 3 カラーモード (color)
 ?commands set color
 ?set color
- gnuplot は、2 つの異なる線種群をサポートしています。デフォルトでは、個
- 々の線種に異なる色を使用しますが、その色で点線や破線を描くこともできま
- す。もう一つは白黒の線種で、点線/破線パターンや線幅のみで線種を区別し
- ます。コマンド `set color` はカラーの線種を選択します。以下参照:
- `set monochrome`, `set linetype`, `set colorsequence`。
-
+ gnuplot は、`plot` や `splot` コマンドの各要素に、事前に定義した列から
+ 取り出した新しい線属性集合を割り当てます。デフォルトでは、色を変更する
+ ことで引き続く曲線同士を区別できるようにしますが、`set monochrome` に
+ よるもう一つの方法は、線幅か点線/破線パターンで区別できる黒い曲線の列
+ を使用します。コマンド `set color` は、この白黒モードを中断し、デフォ
+ ルトのカラー曲線の集合に戻ります。
+ 以下参照: `set monochrome`, `set linetype`, `set colorsequence`。
 3 カラーマップ (Colormap)
 ?commands set colormap
 ?set colormap
@@ -9254,6 +9778,9 @@ Ffigure_smooth_path
 
  範囲を設定しない場合、あるいは最小値と最大値が同じ値の場合は、現在の
  cbrange の限界値を使用します。以下参照: `set cbrange`。
+
+ カラーマップは、長方形領域をグラデーション塗りするのにも使えます。
+ 以下参照: `pixmap colormap`。
 
 3 色巡回列 (colorsequence)
 ?commands set colorsequence
@@ -9335,8 +9862,8 @@ Ffigure_smooth_path
  `arrows`, `vectors` で生成される点、線分のみに影響します。
 
  * `pm3d` 曲面や他の中身の詰まったオブジェクトの描画に使用する色長方形
- のクリッピングの制御は、`set pm3d clip` で行います。デフォルトは、現在
- の zrange に対する滑らかなクリッピングです。
+ のクリッピングの制御は、`set pm3d clipping` で行います。デフォルトは、
+ 現在の zrange に対する滑らかなクリッピングです。
 
  * オブジェクトのクリッピングは、個々のオブジェクト (object) の
  `clip` か `noclip` 属性で制御します。
@@ -9538,7 +10065,8 @@ Ffigure_smooth_path
                   { origin x, y }
                   { size x, y }
                   { front | back }
-                  { noborder | bdefault | border [line style] }
+                  { noborder | bdefault | border <linestyle> }
+                    {cbtics <linestyle>}
                 }
        show colorbox
        unset colorbox
@@ -9568,6 +10096,9 @@ Ffigure_smooth_path
  描画します。`bdefault` (デフォルト) は、カラーボックスの境界の描画にデ
  フォルトの境界の line style を使います。
 
+ `cbtics` は、カラーボックスの目盛り (cbtics) に対して、境界のラインス
+ タイルとは異なる線種を指定するのに使えます。
+
  カラーボックスの軸は `cb` と呼ばれ、通常の軸のコマンドで制御されます。
  すなわち `set/unset/show` で `cbrange`, `[m]cbtics`, `format cb`,
  `grid [m]cb`, `cblabel` などが、そして多分 `cbdata`, `[no]cbdtics`,
@@ -9577,7 +10108,7 @@ Ffigure_smooth_path
  `unset colorbox` はカラーボックスのパラメータをデフォルト値にリセット
  し、その上でカラーボックスを OFF にします。
 
- 以下も参照: `set pm3d`, `set palette`, `x11 pm3d`, `set style line`。
+ 以下も参照: `set pm3d`, `set palette`, `set style line`。
 3 色名 (colornames)
 ?colornames
  gnuplot は限定された個数の色の名前を持っています。これらは、pm3d パレ
@@ -9678,10 +10209,6 @@ Ffigure_smooth_path
       set linetype 5 dt 5        # このパターンを linetype 5 で常に使う
       set dashtype 66 "..-"      # 文字列で新しい dashtype を定義
  以下参照: `dashtype`。
-3 data style
-?set data style
- このコマンドの形式は現在は推奨されていません。以下参照:
- `set style data`。
 3 datafile
 ?set datafile
 ?show datafile
@@ -9982,7 +10509,7 @@ Ffigure_missing
        exp :       w(d) = exp(-d)
        box :       w(d) = 1                     d<1 の場合
                         = 0                     その他
-       hann :      w(d) = 0.5*(1-cos(2*pi*d))   d<1 の場合
+       hann :      w(d) = 0.5*(1+cos(pi*d))     d<1 の場合
                    w(d) = 0                     その他
 
  これら 5 つの平滑化重み付け関数のうち一つを使用する場合、2 つまでの追
@@ -10102,8 +10629,8 @@ Ffigure_missing
  どのロカール特有の表現には影響を与えません。
  以下も参照: `set locale`, `set decimalsign`。
 
- 一般にエンコードの設定は、それが適切なフォントの選択に影響を与えるよう
- に、出力形式の設定の前に行なう必要があります。
+ 一般にエンコードの設定は、それがフォントの選択に影響を与えるように、出
+ 力形式の設定の前に行なう必要があります。
 3 誤差線の端 (errorbars)
 ?commands set errorbars
 ?commands show errorbars
@@ -10470,7 +10997,11 @@ Ffigure_missing
 ?set time_specifiers
 ?date_specifiers
 ?time_specifiers
- 日時データモード (time/date mode) では、次の書式が使用できます:
+ 日時書式指定には、日時指定と相対時刻の 2 つのグループがあります。これ
+ らは、 軸の刻みのラベルを生成したり、時刻を文字列にエンコードするのに
+ 使われます。以下参照: `set xtics time`, `strftime`, `strptime`。
+
+ 日時書式は以下の通りです。
 
 @start table - first is interactive cleartext form
        書式         説明
@@ -10494,9 +11025,9 @@ Ffigure_missing
        %S           秒 (出力では 00--60 の整数、入力では実数)
        %s           1970 年最初からの秒数
        %T           "%H:%M:%S" の簡略形 (出力のみ)
-       %U           その年の通算週 (週は日曜日開始)
+       %U           その年の通算週 (CDC/MMWR 疫学的週) (入力では無視)
        %w           曜日番号 (0--6, 日曜 = 0) (入力では無視)
-       %W           その年の通算週 (週は月曜日開始) (入力では無視)
+       %W           その年の通算週 (ISO 8601 の週番号) (入力では無視)
        %y           西暦 (2000-2068 年は 0-68、1969-1999 年は 69-99)
        %Y           西暦 (4 桁)
        %z           タイムゾーン、[+-]hh:mm
@@ -10525,9 +11056,9 @@ Ffigure_missing
 #\verb@%S@ & 秒 (出力では 00--60 の整数、入力では実数)\\
 #\verb@%s@ & 1970 年最初からの秒数 \\
 #\verb@%T@ & \verb@"%H:%M:%S"@ の簡略形 (出力のみ)\\
-#\verb@%U@ & その年の通算週 (週は日曜日開始) \\
+#\verb@%U@ & その年の通算週 (CDC/MMWR 疫学的週) (入力では無視)\\
 #\verb@%w@ & 曜日番号 (0--6, 日曜 = 0) \\
-#\verb@%W@ & その年の通算週 (週は月曜日開始) \\
+#\verb@%W@ & その年の通算週 (ISO 8601 の週番号) (入力では無視)\\
 #\verb@%y@ & 西暦 (0-99、1969-2068 年の下 2 桁) \\
 #\verb@%Y@ & 西暦 (4 桁) \\
 #\verb@%z@ & タイムゾーン、[+-]hh:mm \\
@@ -10555,9 +11086,9 @@ Ffigure_missing
 %%S@秒 (出力では 0--60 の整数、入力では実数)
 %%s@1970 年最初からの秒数
 %%T@"%H:%M:%S" の簡略形 (出力のみ)
-%%U@その年の通算週 (週は日曜日開始)
+%%U@その年の通算週 (CDC/MMWR 疫学的週)
 %%w@曜日番号 (0--6, 日曜 = 0)
-%%W@その年の通算週 (週は月曜日開始)
+%%W@その年の通算週 (ISO 8601 の週番号)
 %%y@西暦 (0-99、1969-2068 年の下 2 桁)
 %%Y@西暦 (4 桁)
 %%z@タイムゾーン、[+-]hh:mm
@@ -10594,9 +11125,9 @@ Ffigure_missing
 ^<tr>    <td><tt>%S</tt></td>    <td>秒 (出力では 0&ndash;60 の整数、入力では実数)</td></tr>
 ^<tr>    <td><tt>%s</tt></td>    <td>1970 年最初からの秒数</td></tr>
 ^<tr>    <td><tt>%T</tt></td>    <td><tt>%H:%M:%S</tt> の簡略形 (出力のみ)</td></tr>
-^<tr>    <td><tt>%U</tt></td>    <td>その年の通算週 (週は日曜日開始)</td></tr>
+^<tr>    <td><tt>%U</tt></td>    <td>その年の通算週 (CDC/MMWR 疫学的週)</td></tr>
 ^<tr>    <td><tt>%w</tt></td>    <td>曜日番号 (0&ndash;6, 日曜 = 0)</td></tr>
-^<tr>    <td><tt>%W</tt></td>    <td>その年の通算週 (週は月曜日開始)</td></tr>
+^<tr>    <td><tt>%W</tt></td>    <td>その年の通算週 (ISO 8601 の週番号)</td></tr>
 ^<tr>    <td><tt>%y</tt></td>    <td>西暦 (0-99、1969-2068 年の下 2 桁)</td></tr>
 ^<tr>    <td><tt>%Y</tt></td>    <td>西暦 (4 桁)</td></tr>
 ^<tr>    <td><tt>%z</tt></td>    <td>タイムゾーン、[+-]hh:mm</td></tr>
@@ -10604,28 +11135,35 @@ Ffigure_missing
 ^</tbody>
 ^</table>
 
- 数字を表す書式には、先頭に 0 を埋めるために "0" (ゼロ) を前につけるこ
- とができ、また最小の出力幅を指定するために正の整数を前につけることもで
- きます。書式 %S と %t は精度指定も受けつけるので、小数の時/分/秒を書く
- こともできます。
+ 書式 %W (ISO の週番号) に関する詳細は、以下参照: `tm_week`。
+ 書式 %U (CDC/MMWR: アメリカ疾病予防管理センター疫学週報の疫学的週番号)
+ は、週が月曜開始でなく日曜開始であることを除けば %W と同様です。
+ 警告: バージョン 5.4.2 より前の gnuplot では、書式 %W と %U はいずれも
+ 信頼できません。"week_date.dem" の単位テストを参照してください。
+
+ 相対時刻書式は、時刻 0 地点のいずれかの側の時間間隔の長さを表現します。
+ 相対時刻書式は以下の通りです。
 
 @start table - first is interactive cleartext form
        書式         説明
-       %tH          エポック時への相対的な正負の時 (24 での巻戻しなし)
-       %tM          エポック時への相対的な正負の分
+       %tD          時刻 0 への相対的な正負の日付
+       %tH          時刻 0 への相対的な正負の時 (24 での巻戻しなし)
+       %tM          時刻 0 への相対的な正負の分
        %tS          直前の tH, tM 項目に対応する正負の秒数
 #\begin{tabular}{|cl|} \hline
 #\multicolumn{2}{|c|}{時刻指定子}\\
 #\hline \hline
 #書式 & 説明 \\ \hline
-#\verb@%tH@ & エポック時への相対的な正負の時 (24 での巻戻しなし) \\
-#\verb@%tM@ & エポック時への相対的な正負の分 \\
+#\verb@%tD@ & 時刻 0 への相対的な正負の日付 \\
+#\verb@%tH@ & 時刻 0 への相対的な正負の時 (24 での巻戻しなし) \\
+#\verb@%tM@ & 時刻 0 への相対的な正負の分 \\
 #\verb@%tS@ & 直前の tH, tM 項目に対応する正負の秒数 \\
 %c l .
 %書式@説明
 %_
-%%tH@エポック時への相対的な正負の時 (24 での巻戻しなし)
-%%tM@エポック時への相対的な正負の分
+%%tD@時刻 0 への相対的な正負の日付
+%%tH@時刻 0 への相対的な正負の時 (24 での巻戻しなし)
+%%tM@時刻 0 への相対的な正負の分
 %%tS@直前の tH, tM 項目に対応する正負の秒数
 @end table
 
@@ -10639,11 +11177,17 @@ Ffigure_missing
 ^<tr>    <th>時刻書式</th>        <th>説明</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>    <td><tt>%tH</tt></td>    <td>エポック時への相対的な正負の時 (24 での巻戻しなし)</td></tr>
-^<tr>    <td><tt>%tM</tt></td>    <td>エポック時への相対的な正負の分</td></tr>
+^<tr>    <td><tt>%tD</tt></td>    <td>時刻 0 への相対的な正負の日付</td></tr>
+^<tr>    <td><tt>%tH</tt></td>    <td>時刻 0 への相対的な正負の時 (24 での巻戻しなし)</td></tr>
+^<tr>    <td><tt>%tM</tt></td>    <td>時刻 0 への相対的な正負の分</td></tr>
 ^<tr>    <td><tt>%tS</tt></td>    <td>直前の tH, tM 項目に対応する正負の秒数</td></tr>
 ^</tbody>
 ^</table>
+
+ 数字を表す書式には、先頭に 0 を埋めるために "0" (ゼロ) を前につけるこ
+ とができ、また最小の出力幅を指定するために正の整数を前につけることもで
+ きます。書式 %S と %t は精度指定も受けつけるので、小数の時/分/秒を書く
+ こともできます。
 
 5 例 (Examples)
 ?commands set format date_specifiers examples
@@ -10678,10 +11222,6 @@ Ffigure_missing
        set format x "%.2tH hours"   # "-1.02 hours"
        set format x "%tM:%.2tS"     # "-61:12.50"
 
-3 function style
-?set function style
- このコマンドの形式は現在は推奨されていません。`set style function` を
- 使用してください。
 3 格子線 (grid)
 ?commands set grid
 ?commands unset grid
@@ -10976,6 +11516,8 @@ Ffigure_missing
  指定し、点のサイズと拡大係数を適切な値に調整してください。以下参照:
  `coordinates`, `pointsize`。
 
+ 警告: jitter は、"pointsize variable" と両立しません。
+
  `set jitter` は、3 次元のボクセルデータでも有用です。ボクセル格子デー
  タは、均等に配置された点の規則正しい格子であるため、多くの視方向で、点
  が重なったり、モアレパターンを生成したりします。それらの副作用は、各格
@@ -11007,7 +11549,7 @@ Ffigure_missing
              {left | right | center} {top | bottom | center}
              {vertical | horizontal} {Left | Right}
              {{no}enhanced}
-             {{no}opaque}
+             {{no}opaque {fc <colorspec>}}
              {{no}reverse} {{no}invert}
              {samplen <sample_length>} {spacing <line_spacing>}
              {width <width_increment>} {height <height_increment>}
@@ -11050,9 +11592,9 @@ Ffigure_missing
  記号とタイトルは、それに対応するグラフと同時に描かれます。それは、新し
  いグラフが時には凡例の上に要素をかぶせて配置しうることを意味します。
  `set key opaque` は、凡例をすべてのグラフの描画が終った後に生成させま
- す。この場合、凡例の領域は背景色で塗りつぶされて凡例の記号とタイトルが
- 描かれます。よって、凡例自身はいくつかの描画要素を覆い隠してしまい得る
- ことになります。`set key noopaque` でデフォルトに復帰できます。
+ す。この場合、凡例の領域を背景色か指定した色で塗りつぶし、その後で凡例
+ の記号とタイトルを書きます。
+ `set key noopaque` でデフォルトに復帰できます。
 
  デフォルトでは、最初の描画のラベルが凡例の一番上に現われ、それに続くラ
  ベルがその下に並んで行きます。オプション `invert` は、最初のラベルを凡
@@ -12702,10 +13244,11 @@ Ffigure_multiple_keys
                   {   rgbformulae <r>,<g>,<b>
                     | defined { ( <gray1> <color1> {, <grayN> <colorN>}... ) }
                     | file '<filename>' {datafile-modifiers}
+                    | colormap <colormap-name>
                     | functions <R>,<G>,<B>
                   }
                   { cubehelix {start <val>} {cycles <val>} {saturation <val>} }
-                  { model { RGB | HSV | CMY } }
+                  { model { RGB | CMY | HSV {start <radians>} } }
                   { positive | negative }
                   { nops_allcF | ps_allcF }
                   { maxcolors <maxcolors> }
@@ -12860,6 +13403,10 @@ C 下記の以下参照: オプション `positive`, `negative`)。
        set palette defined ( 0 0 1 1, 1 1 1 1 )
        set palette defined ( 0 0 1 0, 1 0 1 1, 6 0.8333 1 1, 7 0.8333 0 1)
 
+ 赤以外のある色相で巻き進めた HSV フルカラースペクトル
+       set palette model HSV start 0.15
+       set palette defined ( 0 0 1 1, 1 1 1 1 )
+
  MATLAB で使われるデフォルトパレットの近似:
        set pal defined (1 '#00008f', 8 '#0000ff', 24 '#00ffff', \
                         40 '#ffff00', 56 '#ff0000', 64 '#800000')
@@ -12921,20 +13468,26 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  デフォルト値は以下の通りです。
        set palette cubehelix start 0.5 cycles -1.5 saturation 1
        set palette gamma 1.5
-
+4 colormap
+?commands set palette colormap
+?palette colormap
+ `set palette colormap <name>` は、事前に colormap として保存した定義済
+ みのグラデーションを読み込みます。そのカラーマップのアルファチャンネル
+ (透過) 情報 は、それがあったとしても、色の値がパレット定義にコピーされ
+ る際に失われます。
+ 以下参照: `colormap`。
 4 file
 ?commands set palette file
 ?set palette file
 ?palette file
  `set palette file` は基本的に `set palette defined (<gradient>)` と同
  じで、この <gradient> がデータファイルから読み込まれます。4 列 (gray,
- R,G,B) かまたは 3 列 (R,G,B) のデータが `using` データファイル修飾子に
- よって選択される必要があります。3 列の場合、行番号が gray の値として使
- われますが、その gray の範囲は自動的に [0,1] にスケール変換されます。
- ファイルは通常のデータファイルとして読まれるので、全てのデータファイル
- 修飾子が使えます。
- 例えば HSV 色空間が選択されている場合には、`R` は実際には `H` を指すと
- いうことに注意してください。
+ R,G,B) かまたは 3 列 (R,G,B) を `using` データファイル修飾子で選択して
+ ください。3 列の場合、行番号を gray の値として使います。
+ gray の範囲は自動的に [0,1] にスケール変換します。ファイルは通常のデー
+ タファイルとして読むので、全てのデータファイル修飾子が使えます。
+ HSV 色空間が選択されている場合には、`R` は実際には `H` を指すことに注
+ 意してください。
 
  例によって、<filename> が `'-'` の場合は、データがインライン形式で引き
  続いて与えられ、一つの `e` のみの行でそれが終了することを意味します。
@@ -12959,7 +13512,6 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  `binary general`。R,G,B の double のデータの 64 個の 3 つ組をファイル
  palette.bin に出力し、それを読み込む例:
        set palette file "palette.bin" binary record=64 using 1:2:3
-
 
 4 ガンマ補正 (gamma correction)
 ?commands set palette gamma-correction
@@ -13081,7 +13633,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  では無視されます。平行座標描画の軸は、plot コマンドの `title` オプショ
  ンでラベル付けできます。これは xtic ラベルを生成するので、`set xtics`
  も必要となることに注意してください。
- 
+
  軸の線種属性は、`set style parallelaxis` で制御します。
 3 pixmap
 ?pixmap
@@ -13364,23 +13916,25 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 ?pm3d clipping
 ?set pm3d clipping
 ?clipcb
+?clip1in
+?clip4in
 ?pm3d clipcb
 ?noclipcb
 ?pm3d noclipcb
-?set pm3d clip z
-?set pm3d clip1in
-?set pm3d clip4in
  書式:
-      set pm3d {clip {z} | clip1in | clip4in}
+      set pm3d {clip | clip1in | clip4in}
       set pm3d {no}clipcb
 
  pm3d 曲面や他の 3 次元オブジェクトを構成する四辺形は、デフォルトでは現
  在の zrange に関して滑らかにクリッピングします。これは、gnuplot 5.0 以
- 前とは異なる挙動です。
+ 前とは異なる挙動です。2 次元射影 (`set view map`) では、このモードは
+ xrange と yrange に対してもクリッピングします。
+
  それとは別に、4 つの角全部が x, y, z の範囲内である四辺形全体
  (`set pm3d clip4in`)、または少なくとも 1 つの角が x, y, z の範囲内であ
  る四辺形全体 (`set pm3d clip1in`)を描画することにより、クリッピングす
- ることもできます。
+ ることもできます。オプション `clip`, `clip1in`, `clip4in` は相互に排他
+ 的です。
 
  空間座標 x, y, z ベースのクリッピングとは別に、四辺形を描画するかどう
  かを最終的なパレットカラー値で決定することもできます。
@@ -15680,6 +16234,8 @@ Ffigure_walls
 4 xtics timedata
 ?set xtics timedata
 ?xtics timedata tics
+?set xtics time
+?xtics time
 ?timedata tics
  時間と日付は内部では秒数として保持されています。
 
@@ -17174,20 +17730,12 @@ C 度の記号は set encoding locale で出るようになると。
 2 外部ライブラリ (External libraries)
 ?bugs external_libraries
 =libgd
-=svgalib
 =locale
 =internationalization
-=pdf
  外部ライブラリ GD (PNG/JPEG/GIF/sixelgd 出力形式、pixmap で使用):
  バージョン 2.0.33 までの libgd には、Adobe の Symbol フォントの文字の
  マッピングに関するいくつかのバグがありました。
  点線-破線パターンは、これらの出力形式ではサポートしていません。
-
- 外部ライブラリ PDFlib (pdfcairo ではない PDF terminal で使用):
- gnuplot は libpdf のバージョン 4, 5, 6 のいずれかをリンクできます。し
- かし、これらはバージョンによってパイプされた入出力の処理が違っています
- ので、パイプを使って PDF を出力する gnuplot スクリプトは、PDFlib のあ
- るバージョンでだけしかちゃんと動かないかもしれません。
 
  国際化 (ロケールの設定):
  gnuplot は、入出力の数、時刻、日付文字列のロケールに依存した書式の制御
