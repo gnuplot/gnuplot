@@ -979,7 +979,7 @@ do_key_layout(legend_key *key)
     key_title_height = 0;
     key_title_extra = 0;
     key_title_ypos = 0;
-    if (key->title.text) {
+    if (key->title.text && *key->title.text) {
 	double est_height;
 	int est_lines;
 	if (key->title.font)
