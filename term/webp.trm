@@ -394,7 +394,7 @@ START_HELP(webp)
 "",
 " Individual frames produced by the webp terminal are first created as 32-bit",
 " RGB + alpha channel images using routines shared with the pngcairo terminal.",
-" See `set term pngcairo` for more details about font and style options.",
+" See `set term pngcairo` for more details about font and terminal options.",
 " The frames are then converted to webp format on output.",
 "",
 " The `animate` option produces a webp file containing multiple frames,",

@@ -957,7 +957,7 @@ START_HELP(block)
 " `size` sets the terminal size in character cells.",
 "",
 " `dot`, `half`, `quadrants`, `sextants`, or `braille` select the character",
-" set used for the creation of pseudo-graphics.  `dots` uses simple dots,",
+" set used for the creation of pseudo-graphics.  `dot` uses simple dots,",
 " while `half` uses half-block characters.  `quadrants` uses block characters",
 " which yield double resolution in both directions.  `sextants` uses 2x3 block",
 " characters, and `braille` uses Braille characters which give a 2x4 pseudo-",
