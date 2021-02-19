@@ -124,6 +124,7 @@ static int PM_termmode = 0;
 static TBOOLEAN PM_must_reset_opts = FALSE;
 static TBOOLEAN PM_must_abort = FALSE;
 
+/* terminal options */
 static TBOOLEAN PM_widelines = FALSE;
 static TBOOLEAN PM_persist = FALSE;
 static TBOOLEAN PM_enhanced = TRUE;
@@ -142,13 +143,16 @@ static int mouseGnupmdrv = 0; /* PM set to 1 if we are connected to a mouseable 
 static FILE *PM_pipe = NULL;
 static FILE *PM_savepipe = NULL;
 
+/* characteristics of the default font */
+static int PM_def_hchar;
+static int PM_def_vchar;
 
 #ifndef PM_OLD_ENHANCED_TEXT
 
 /* track current state of pm terminal */
 /* this is only needed for enhanced text */
 static char PM_font[FACESIZE] = "";
-static unsigned int PM_fontsize = 12.0;
+static unsigned int PM_fontsize = 12;
 static unsigned int PM_x = 0;
 static unsigned int PM_y = 0;
 static enum JUSTIFY PM_justification = LEFT;
@@ -275,11 +279,13 @@ PM_init()
     }
 #ifdef USE_MOUSE
     /* PM: notify gnupmdrv that this is mouse-enhanced terminal */
-    putc( GR_MOUSECAPABLE, PM_pipe ) ;
-    fflush( PM_pipe ) ;
+    putc(GR_MOUSECAPABLE, PM_pipe);
+    fflush(PM_pipe);
     /* we catch mouseable gnupmdrv's answer in PM_query by 0xABCD */
 #endif
     PM_query();
+    PM_def_hchar = term->h_char;
+    PM_def_vchar = term->v_char;
 }
 
 
@@ -650,10 +656,12 @@ PM_graphics()
     }
 #ifdef USE_MOUSE
     /* PM: notify gnupmdrv that this is mouse-enhanced terminal */
-    PM_send_msg(GR_MOUSECAPABLE);
-    PM_flush();
+    putc(GR_MOUSECAPABLE, PM_pipe);
+    fflush(PM_pipe);
 #endif
     PM_query();
+    PM_def_hchar = term->h_char;
+    PM_def_vchar = term->v_char;
     PM_mode = SET_GRAPHICS;
 }
 
@@ -801,6 +809,13 @@ PM_set_font(const char *ifont)
 	    /* pad rest of int with zeros */
 	    putc(NUL, PM_pipe);
 	}
+    }
+    // update hchar/vchar
+    if (len == 0) {
+	term->h_char = PM_def_hchar;
+	term->v_char = PM_def_vchar;
+    } else {
+	PM_query();
     }
     return TRUE;
 }
@@ -1319,7 +1334,7 @@ PM_enhanced_put_text(unsigned int x, unsigned int y, const char *str)
 
     /* If no enhanced text processing is needed, we can use the plain  */
     /* vanilla put_text() routine instead of this fancy recursive one. */
-    if (ignore_enhanced_text || 
+    if (ignore_enhanced_text ||
 	(!strpbrk(str, "{}^_@&~") && !contains_unicode(str))) {
 	PM_put_text(x,y,str);
 	return;

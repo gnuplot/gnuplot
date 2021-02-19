@@ -1894,6 +1894,8 @@ SelectFont(HPS hps, char *szFontNameSize)
     short  shPointSize;
     char  *p, *q;
     BOOL   bBold, bItalic;
+    POINTL aptl[TXTBOX_COUNT];
+    GRADIENTL grdlold, grdl = {1, 0};
 
     DEBUG_FONT(("SelectFont: %s", szFontNameSize));
 
@@ -1992,6 +1994,13 @@ SelectFont(HPS hps, char *szFontNameSize)
     sizBaseSubSup.cx = MAKEFIXED(ptlFont.x * 0.7, 0);
     sizBaseSubSup.cy = MAKEFIXED(ptlFont.y * 0.7, 0);
 
+    /* Use average width of digits instead of info from font metrics */
+    GpiQueryCharAngle(hps, &grdlold);
+    GpiSetCharAngle(hps, &grdl);
+    GpiQueryTextBox(hps, 10, "0123456789", TXTBOX_COUNT, aptl);
+    GpiSetCharAngle(hps, &grdlold);
+    lCharWidth = aptl[TXTBOX_CONCAT].x / 10;
+
     sizCurFont = sizBaseFont;
     sizCurSubSup = sizBaseSubSup;
 
@@ -2027,7 +2036,9 @@ SwapFont(HPS hps, char *szFNS)
 	FONTMETRICS fm;
 	int    i;
 	char  *p, *q;
-	BOOL  bBold, bItalic;
+	BOOL   bBold, bItalic;
+	POINTL aptl[TXTBOX_COUNT];
+	GRADIENTL grdlold, grdl = {1, 0};
 
 	// we always expect a font size
 	shPointSize = (atoi(szFNS) * fontscale) / 100;
@@ -2160,6 +2171,13 @@ SwapFont(HPS hps, char *szFNS)
 	lSupOffset = fm.lSuperscriptYOffset;
 	lCharHeight = fm.lMaxAscender * 1.2;
 	lCharWidth  = fm.lAveCharWidth;
+
+	/* Use average width of digits instead of info from font metrics */
+	GpiQueryCharAngle(hps, &grdlold);
+	GpiSetCharAngle(hps, &grdl);
+	GpiQueryTextBox(hps, 10, "0123456789", TXTBOX_COUNT, aptl);
+	GpiSetCharAngle(hps, &grdlold);
+	lCharWidth = aptl[TXTBOX_CONCAT].x / 10;
     }
 }
 
