@@ -249,6 +249,7 @@ static HEV      semPause;
 static HMTX     semHpsAccess;
 static ULONG    ulPauseReply = 1;
 static ULONG    ulPauseMode  = PAUSE_DLG;
+static ULONG    ulPauseItem  = IDM_PAUSEDLG;
 
 static HWND     hSysMenu;
 
@@ -695,13 +696,16 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 #endif
 	switch (ulPauseMode) {
 	case PAUSE_DLG:
-	    ChangeCheck(hWnd, IDM_PAUSEDLG, IDM_PAUSEDLG);
+	    ChangeCheck(hWnd, ulPauseItem, IDM_PAUSEDLG);
+	    ulPauseItem = IDM_PAUSEDLG;
 	    break;
 	case PAUSE_BTN:
-	    ChangeCheck(hWnd, IDM_PAUSEDLG, IDM_PAUSEBTN);
+	    ChangeCheck(hWnd, ulPauseItem, IDM_PAUSEBTN);
+	    ulPauseItem = IDM_PAUSEBTN;
 	    break;
 	case PAUSE_GNU:
-	    ChangeCheck(hWnd, IDM_PAUSEDLG, IDM_PAUSEGNU);
+	    ChangeCheck(hWnd, ulPauseItem, IDM_PAUSEGNU);
+	    ulPauseItem = IDM_PAUSEGNU;
 	    break;
 	}
 
@@ -1114,7 +1118,6 @@ SetMouseCoords(HWND hWnd, MPARAM mp1, int n, char *f)
 MRESULT
 WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 {
-    static int ulPauseItem = IDM_PAUSEDLG;
     int mx, my;
 
     GetMousePosViewport(hWnd, &mx, &my);
