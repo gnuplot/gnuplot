@@ -404,6 +404,7 @@ PM_init(void)
 	pid = pib->pib_ulpid;
 	fwrite(&pid, 1, 4, PM_pipe);
 	fflush(PM_pipe);
+	PM_reset_opts();
     } else {
 	if (PM_must_reset_opts)
 	    PM_reset_opts();
@@ -774,6 +775,11 @@ PM_graphics(void)
 	PM_send_str(PM_def_font);
 	PM_flush();
     }
+#ifdef USE_MOUSE
+    /* PM: notify gnupmdrv that this is mouse-enhanced terminal */
+    PM_send_msg(GR_MOUSECAPABLE);
+    PM_flush();
+#endif
     PM_query();
     PM_mode = SET_GRAPHICS;
 }
