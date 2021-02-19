@@ -2694,6 +2694,8 @@ ReadGnu(void* arg)
 	    {
 		int lt, col;
 
+		FLUSHPATH(hps, "SET_LTCOLOR");
+
 		BufRead(hRead, &lt, sizeof(int), &cbR);
 		col = lt;
 		if (lt > LT_NODRAW) {
@@ -2712,8 +2714,10 @@ ReadGnu(void* arg)
 	    {
 		int dt = 0;
 
-		DEBUG_LINES(("dash:  %d", dt));
+		FLUSHPATH(hps, "SET_DASH");
+
 		BufRead(hRead, &dt, sizeof(int), &cbR);
+		DEBUG_LINES(("SET_DASH: %d", dt));
 		if (dt == DASHTYPE_AXIS) /* map axis dashpattern */
 		    dt = 1;
 		else if (dt == DASHTYPE_SOLID) /* map solid "pattern" */
@@ -3066,6 +3070,8 @@ ReadGnu(void* arg)
 			  palette to 256 entries. (see also RGB_PALETTE_SIZE) */
 		unsigned char c = 0;
 
+		FLUSHPATH(hps, "GR_SET_COLOR");
+
 		BufRead(hRead, &c, sizeof(c), &cbR);
 		// FIXME: need range checking here
 		if (bPMPaletteMode)
@@ -3080,6 +3086,8 @@ ReadGnu(void* arg)
 	    case GR_SET_RGBCOLOR :
 	    {
 		int rgb_color;
+
+		FLUSHPATH(hps, "GR_SET_RGBCOLOR");
 
 		BufRead(hRead, &rgb_color, sizeof(rgb_color), &cbR);
 		/* ignore alpha value */
@@ -3164,6 +3172,8 @@ ReadGnu(void* arg)
 		POINTL clip;
 		LONG hits;
 		image_list_entry *ile;
+
+		FLUSHPATH(hps, "GR_RGBx_IMAGE");
 
 		BufRead(hRead, &M, sizeof(M), &cbR);
 		BufRead(hRead, &N, sizeof(N), &cbR);
