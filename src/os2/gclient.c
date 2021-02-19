@@ -383,6 +383,7 @@ static void     TextToClipboard(PCSZ);
 static void     GetMousePosViewport(HWND hWnd, int *mx, int *my);
 static void     MousePosToViewport(int *x, int *y, SHORT mx, SHORT my);
 static void     gpPMmenu_update(void);
+static void     ResetStatusLineText(void);
 static void     DisplayStatusLine(HPS hps);
 static void     UpdateStatusLine(HPS hps, char *text);
 static void     DrawMouseText(HPS hps, PPOINTL pt, char * text, LONG len);
@@ -2363,6 +2364,9 @@ ReadGnu(void* arg)
 		    free(ile);
 		}
 
+		/* discard the old status line text */
+		ResetStatusLineText();
+
 		break;
 	    }
 
@@ -2968,15 +2972,12 @@ ReadGnu(void* arg)
 		static char *text = NULL;
 		static int text_alloc = -1;
 
-		/* Position of the "table" of values resulting from
-		 * mouse movement(and clicks).  Negative y value would
-		 * position it at the top of the window---not
-		 * implemented. */
 		BufRead(hRead,&where, sizeof(int), &cbR);
 		BufRead(hRead,&l, sizeof(int), &cbR);
 		if (text_alloc < l)
 		    text = realloc(text, text_alloc = l+10);
 		BufRead(hRead, &text[0], l, &cbR);
+
 		switch (where) {
 		case 0:
 		    UpdateStatusLine(hps,text);
@@ -4177,6 +4178,8 @@ DrawRuler()
 
     p.y = GNUYPAGE;
     GpiLine(hpsScreen, &p);
+
+    GpiSetMix(hpsScreen, FM_DEFAULT);
 }
 
 
@@ -4201,6 +4204,8 @@ DrawRulerLineTo()
     p.x = ruler_lineto.x;
     p.y = ruler_lineto.y;
     GpiLine(hpsScreen, &p);
+
+    GpiSetMix(hpsScreen, FM_DEFAULT);
 }
 
 
@@ -4247,6 +4252,18 @@ GetMousePosViewport(HWND hWnd, int *mx, int *my)
  * Status line previous and current text:
  */
 static char *sl_curr_text = NULL;
+
+
+/*
+ * Discard the status line text (because we start a new graph)
+ */
+static void
+ResetStatusLineText(void)
+{
+    free(sl_curr_text);
+    sl_curr_text = NULL;
+}
+
 
 /*
  * Display the status line by the text
@@ -4325,6 +4342,8 @@ DrawMouseText(HPS hps, PPOINTL pt, char * text, LONG len)
     GpiSetCharMode(hps, CM_MODE1);
     GpiSetMix(hps, FM_INVERT);
     GpiCharStringAt(hps, pt, len, text);
+
+    GpiSetMix(hps, FM_DEFAULT);
 }
 
 
@@ -4342,7 +4361,9 @@ DrawZoomBox()
     GpiSetMix(hpsScreen, FM_INVERT);
     GpiMove(hpsScreen, &zoombox.from);
     GpiBox(hpsScreen, DRO_OUTLINE, &zoombox.to, 0, 0);
+
     GpiSetLineType(hpsScreen, LINETYPE_DEFAULT);
+    GpiSetMix(hpsScreen, FM_DEFAULT);
 
     if (zoombox.text1) {
 	char *separator = strchr(zoombox.text1, '\r');
