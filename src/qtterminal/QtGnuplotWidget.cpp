@@ -292,8 +292,13 @@ void QtGnuplotWidget::exportToPdf(const QString& fileName)
 	QPrinter printer;
 	printer.setOutputFormat(QPrinter::PdfFormat);
 	printer.setOutputFileName(fileName);
+#if QT_VERSION < QT_VERSION_CHECK(5, 3, 0)
 	printer.setPaperSize(QSizeF(m_scene->width(), m_scene->height()), QPrinter::Point);
 	printer.setPageMargins(0, 0, 0, 0, QPrinter::Point);
+#else
+	printer.setPageSize(QPageSize(QSizeF(m_scene->width(), m_scene->height()), QPageSize::Point));
+	printer.setPageMargins(QMarginsF(0, 0, 0, 0), QPageLayout::Point);
+#endif
 	QPainter painter(&printer);
 	painter.setRenderHints(renderHints());
 	m_scene->render(&painter);
