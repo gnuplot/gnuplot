@@ -158,27 +158,20 @@ AC_CHECK_PROGS(TROFF, troff, no)
 AC_CHECK_PROGS(LATEX2HTML, latex2html, no)
 
 AC_ARG_WITH(texdir,dnl
-  [--with-texdir=DIR       where to install latex style files (default: ask kpsexpand)],
+  [--with-texdir=DIR       where to install latex style files (default: ask kpsewhich)],
   TEXDIR="$withval",
   TEXDIR="no")
-dnl Allow manual specification of kpsexpand 
-AC_CHECK_PROGS(KPSEXPAND, kpsexpand, no)
+dnl Allow manual specification of kpsewhich
+AC_CHECK_PROGS(KPSEWHICH, kpsewhich, no)
 AC_CHECK_PROGS(TEXHASH, texhash, true)
-AC_ARG_WITH(kpsexpand,dnl
-  [--with-kpsexpand        search for kpsexpand at run-time (default disabled)],
-  [if test "$withval" = yes; then
-    test "$KPSEXPAND" != "no" || AC_MSG_ERROR(dnl
-      [You tell me to use kpsexpand, but there is no kpsexpand])
-    AC_DEFINE(HAVE_KPSEXPAND,1,[ Define if you want to use kpsexpand (TeX). ])
-  fi])
 
 dnl we only care about texdir if latex is enabled
 if test "$with_latex" = yes; then
-  test "$KPSEXPAND" = "no" -a "$TEXDIR" = "no" && AC_MSG_ERROR(dnl
-    [texdir is not given and there is no kpsexpand, please tell where to install])
+  test "$KPSEWHICH" = "no" -a "$TEXDIR" = "no" && AC_MSG_ERROR(dnl
+    [texdir is not given and there is no kpsewhich, please tell where to install])
   dnl texdir has priority
   if test "$TEXDIR" = "no"; then
-    TEXDIR=`$KPSEXPAND '$TEXMFLOCAL'`
+    TEXDIR=`$KPSEWHICH --expand-var '$TEXMFLOCAL'`
     if test "x$TEXDIR" = "x" -o "$TEXDIR" = "\$TEXMFLOCAL"; then
       if test "x$prefix" != "xNONE"; then
         TEXDIR=${prefix}/share/texmf
@@ -1446,12 +1439,6 @@ if test "$have_external_functions" = yes; then
   AC_MSG_RESULT([  plugin support for loading external functions: yes ])
 else
   AC_MSG_RESULT([  plugin support for loading external functions: no ])
-fi
-
-if test "$with_kpsexpand" = yes; then
-  AC_MSG_RESULT([  Use TeX kpsexpand to search for fonts: yes])
-else
-  AC_MSG_RESULT([  Use TeX kpsexpand to search for fonts: no (use --with-kpsexpand to enable)])
 fi
 
 dnl if test "$enable_backwards_compatibility" = yes; then
