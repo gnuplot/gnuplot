@@ -144,6 +144,7 @@ BOOL    LoadExceptq(EXCEPTIONREGISTRATIONRECORD* pExRegRec,
 #define DEBUG_COLOR(a) // PmPrintf a
 #define DEBUG_FONT(a) // PmPrintf a
 #define DEBUG_LINES(a) // PmPrintf a
+#define DEBUG_LAYER(a) // PmPrintf a
 #define TEXT_DEBUG(x) // PmPrintf x
 
 /*==== l o c a l    d a t a ==================================================*/
@@ -341,6 +342,16 @@ static struct _ft {
     {NULL}
 };
 
+typedef struct _plotlist {
+    int no;	   // plot number
+    unsigned plot; // segment number of plot
+    unsigned plot1; // segment number of plot
+    unsigned key;  // segment number of key
+    unsigned key1;  // segment number of key
+    struct _plotlist *next;
+} plotlist;
+static plotlist * plots = NULL;
+
 typedef struct image_list_entry {
     PBITMAPINFO2 pbmi;
     PBYTE image;
@@ -391,6 +402,7 @@ static void     DrawMouseText(HPS hps, PPOINTL pt, char * text, LONG len);
 static void     DrawZoomBox(void);
 static void     DrawRuler(void);
 static void     DrawRulerLineTo(void);
+static void     modify_segment(HPS hps, unsigned seg, unsigned op);
 
 #define IGNORE_MOUSE (!mouseTerminal || !useMouse || lock_mouse)
 /*  don't react to mouse in the event handler, and avoid some crashes */
@@ -628,10 +640,39 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	return 0L; /* end of WM_MOUSEMOVE */
 
     case WM_BUTTON1DOWN:
+    {
+	BOOL     fSuccess;
+	POINTL   pt;
+	SIZEL    size = {100L, 100L}; /* size of pick aperture */
+	LONG     alSegTag[2];
+
 	WinSetFocus(HWND_DESKTOP, hWnd);
-	if (!IGNORE_MOUSE)
-	    gp_exec_event(GE_buttonpress, mx, my, 1, 0, 0);
+	// check if we are clicking on a key entry
+	pt.x = mx;
+	pt.y = my;
+	fSuccess = GpiSetPickAperturePosition(hpsScreen, &pt);
+	/* set aperture size (use default) */
+	//fSuccess = GpiSetPickApertureSize(hpsScreen, PICKAP_DEFAULT, &size);
+	fSuccess = GpiSetPickApertureSize(hpsScreen, PICKAP_REC, &size);
+	if (GpiCorrelateChain(hpsScreen, PICKSEL_VISIBLE, &pt,
+				1, 1, alSegTag) > 0) {
+	    DEBUG_LAYER(("Click correlation: tag=%li", alSegTag[0]));
+	    plotlist * plot = plots;
+	    while (plot != NULL) {
+		if (plot->key == alSegTag[0] || plot->key1 == alSegTag[0]) {
+		    modify_segment(hpsScreen, plot->plot, MODPLOTS_INVERT_VISIBILITIES);
+		    modify_segment(hpsScreen, plot->plot1, MODPLOTS_INVERT_VISIBILITIES);
+		    break;
+		}
+		plot = plot->next;
+	    }
+	    WinInvalidateRect(hWnd, NULL, TRUE);
+	} else {
+	    if (!IGNORE_MOUSE)
+		gp_exec_event(GE_buttonpress, mx, my, 1, 0, 0);
+	}
 	return 0L;
+    }
 
     case WM_BUTTON2DOWN:
 	WinSetFocus(HWND_DESKTOP, hWnd);
@@ -710,7 +751,7 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	    break;
 	}
 
-	/* disable close from system menu(close only from gnuplot) */
+	/* disable close from system menu (close only from gnuplot) */
 	hApp = WinQueryWindow(hWnd, QW_PARENT); /* temporary assignment.. */
 	hSysMenu = WinWindowFromID(hApp, FID_SYSMENU);
 
@@ -2235,6 +2276,72 @@ FlushPath(HPS hps, BOOL * bPath, int linewidth, LONG color, char * where)
 }
 
 
+static void
+modify_segment(HPS hps, unsigned seg, unsigned op)
+{
+    LONG val;
+
+    if (seg == 0) return;
+    switch (op) {
+    default:
+    case MODPLOTS_SET_VISIBLE:
+	val = ATTR_ON;
+	break;
+    case MODPLOTS_SET_INVISIBLE:
+	val = ATTR_OFF;
+	break;
+    case MODPLOTS_INVERT_VISIBILITIES:
+	val = GpiQuerySegmentAttrs(hps, seg, ATTR_VISIBLE);
+	val = (val == ATTR_ON) ? ATTR_OFF : ATTR_ON;
+	break;
+    }
+    DEBUG_LAYER(("Set segment %i visibility to %i", seg, val));
+    GpiSetSegmentAttrs(hps, seg, ATTR_VISIBLE, val);
+}
+
+
+#ifdef HAVE_PMPRINTF
+// name strings for layers (used for debugging)
+// adopted from Dima Kogan's diagnostics in the x11 code
+__attribute__((unused))
+static const char *
+layer_names(t_termlayer type)
+{
+#define LAYER_LIST(_)     \
+    _(RESET)              \
+    _(BACKTEXT)           \
+    _(FRONTTEXT)          \
+    _(BEGIN_BORDER)       \
+    _(END_BORDER)         \
+    _(BEGIN_GRID)         \
+    _(END_GRID)           \
+    _(END_TEXT)           \
+    _(BEFORE_PLOT)        \
+    _(AFTER_PLOT)         \
+    _(KEYBOX)             \
+    _(BEGIN_KEYSAMPLE)    \
+    _(END_KEYSAMPLE)      \
+    _(RESET_PLOTNO)       \
+    _(BEFORE_ZOOM)        \
+    _(BEGIN_PM3D_MAP)     \
+    _(END_PM3D_MAP)       \
+    _(BEGIN_PM3D_FLUSH)   \
+    _(END_PM3D_FLUSH)     \
+    _(BEGIN_IMAGE)        \
+    _(END_IMAGE)          \
+    _(BEGIN_COLORBOX)     \
+    _(END_COLORBOX)       \
+    _(3DPLOT)
+#define LAYER_NAME(name) case TERM_LAYER_##name: return #name;
+    switch (type) {
+	LAYER_LIST(LAYER_NAME)
+        default: ;
+    }
+    return "unknown";
+}
+#endif
+
+
 /*
 ** Thread to read plot commands from GNUPLOT pm driver.
 ** Opens named pipe, then clears semaphore to allow GNUPLOT driver to proceed.
@@ -2251,7 +2358,6 @@ ReadGnu(void* arg)
     ULONG rc;
     USHORT usErr;
     ULONG cbR;
-    USHORT i;
     unsigned char buff[2];
     HEV hev;
     static char *szPauseText = NULL;
@@ -2266,6 +2372,7 @@ ReadGnu(void* arg)
     ULONG *rgbTable = NULL; /* current colour table (this is a 'virtual' palette) */
     LONG color = 0;
     int fillstyle = FS_SOLID | (100 << 4);
+    unsigned plotno = 0;
 #ifdef HAVE_EXCEPTQ
     EXCEPTIONREGISTRATIONRECORD exRegRec;
 
@@ -2366,14 +2473,22 @@ ReadGnu(void* arg)
 		InitScreenPS();
 		ScalePS(hps);
 		GpiSetDrawingMode(hps, DM_DRAWANDRETAIN);
-		for (i = 1; i <= iSeg; i++)
-		    GpiDeleteSegment(hps, i);
+		DEBUG_LAYER(("Cleaning up %i segments", iSeg));
+		GpiDeleteSegments(hps, 1, iSeg);
 		iSeg = 1;
 		GpiOpenSegment(hps, iSeg);
 		/* DosExitCritSec(); */
 		GpiSetLineEnd(hps, LINEEND_ROUND);
 		GpiSetLineWidthGeom(hps, linewidth);
 		GpiSetCharBox(hps, &sizBaseFont);
+
+		/* free list of plot segments */
+		plotno = 0;
+		while (plots) {
+		    plotlist * next = plots->next;
+		    free(plots);
+		    plots = next;
+		}
 
 		/* free image buffers from previous plot, if any */
 		while (image_list) {
@@ -2411,6 +2526,105 @@ ReadGnu(void* arg)
 		DosReleaseMutexSem(semHpsAccess);
 		WinPostMsg(hApp, WM_GNUPLOT, 0L, 0L);
 		break;
+
+	    case SET_LAYER : /* handle some layer info for toggle etc. */
+	    {
+		unsigned layer;
+		BufRead(hRead, &layer, sizeof(int), &cbR);
+		DEBUG_LAYER(("SET_LAYER: %s (%i)", layer_names(layer), layer));
+
+		switch (layer) {
+		case TERM_LAYER_BEFORE_PLOT:
+		{
+		    plotlist * thisplot;
+
+		    /* put every plot in its own segment */
+		    FLUSHPATH(hps, "SET_LAYER");
+		    GpiCloseSegment(hps);
+		    iSeg++;
+		    GpiOpenSegment(hps, iSeg);
+
+		    /* create a new plot segment structure and prepend it to the list */
+		    DEBUG_LAYER(("SET_LAYER: start plot #%i", plotno));
+		    thisplot = malloc(sizeof(plotlist));
+		    thisplot->no = plotno++;
+		    thisplot->plot = 0;
+		    thisplot->plot1 = 0;
+		    thisplot->key = 0;
+		    thisplot->key1 = 0;
+		    thisplot->next = plots;
+		    plots = thisplot;
+		    break;
+		}
+		case TERM_LAYER_AFTER_PLOT:
+		    /* graphs are drawn _after_ the key element */
+		    if (plots->plot != iSeg) {
+			if (plots->plot == 0)
+			    plots->plot = iSeg;
+			else
+			    plots->plot1 = iSeg;
+		    }
+		    /* need to start a new segment for mutiplots anyway */
+		    FLUSHPATH(hps, "SET_LAYER");
+		    GpiCloseSegment(hps);
+		    iSeg++;
+		    GpiOpenSegment(hps, iSeg);
+		    DEBUG_LAYER(("SET_LAYER: end plot #%i: seg=%i seg1=%i key=%i key1=%i",
+			plots->no, plots->plot1, plots->plot, plots->key, plots->key1));
+		    break;
+		case TERM_LAYER_BEGIN_KEYSAMPLE:
+		    /* put every key sample in its own segment */
+		    FLUSHPATH(hps, "SET_LAYER");
+		    GpiCloseSegment(hps);
+		    iSeg++;
+		    GpiOpenSegment(hps, iSeg);
+		    // correlation only works for detectable and tagged primitives
+		    GpiSetSegmentAttrs(hps, iSeg, ATTR_DETECTABLE, ATTR_ON);
+		    GpiSetTag(hps, iSeg);
+		    // work around spurious extra key entries...
+		    if (plots->key == 0)
+			plots->key = iSeg;
+		    else
+			plots->key1 = iSeg;
+		    break;
+		case TERM_LAYER_END_KEYSAMPLE:
+		    FLUSHPATH(hps, "SET_LAYER");
+		    GpiSetTag(hps, 0);
+		    GpiCloseSegment(hps);
+		    iSeg++;
+		    if (plots->plot == 0)
+			plots->plot = iSeg;
+		    else
+			plots->plot1 = iSeg;
+		    GpiOpenSegment(hps, iSeg);
+		    break;
+		}
+		break;
+	    }
+
+	    case SET_MODIFY_PLOTS :
+	    {
+		unsigned int op;
+		int plotno;
+		plotlist * plot;
+
+		BufRead(hRead, &op, sizeof(int), &cbR);
+		BufRead(hRead, &plotno, sizeof(int), &cbR);
+		DEBUG_LAYER(("MODIFY_PLOTS op=%i plot=%i", op, plotno));
+
+	        plot = plots;
+		while (plot != NULL) {
+		    if (plotno == plot->no || plotno < 0) {
+			modify_segment(hps, plot->plot, op);
+			modify_segment(hps, plot->plot1, op);
+		    }
+		    plot = plot->next;
+		}
+
+		/* enforce a screen update */
+		WinInvalidateRect(WinWindowFromDC(hdcScreen), NULL, TRUE);
+		break;
+	    }
 
 	    case GR_RESET :
 		/* gnuplot has reset drivers, allow user to kill this */

@@ -58,6 +58,8 @@ TERM_PUBLIC void PM_suspend(void);
 TERM_PUBLIC void PM_resume(void);
 TERM_PUBLIC void PM_text(void);
 TERM_PUBLIC void PM_graphics(void);
+TERM_PUBLIC void PM_layer(t_termlayer layer);
+TERM_PUBLIC void PM_modify_plots(unsigned int operations, int plotno);
 TERM_PUBLIC void PM_move(unsigned int x, unsigned int y);
 TERM_PUBLIC void PM_vector(unsigned int x, unsigned int y);
 TERM_PUBLIC void PM_linetype(int lt);
@@ -790,6 +792,24 @@ PM_graphics(void)
     PM_def_hchar = term->h_char;
     PM_def_vchar = term->v_char;
     PM_mode = SET_GRAPHICS;
+}
+
+
+TERM_PUBLIC void
+PM_layer(t_termlayer layer)
+{
+    PM_send_msg(SET_LAYER);
+    PM_send_int(layer);
+}
+
+
+TERM_PUBLIC void
+PM_modify_plots(unsigned int operations, int plotno)
+{
+    PM_send_msg(SET_MODIFY_PLOTS);
+    PM_send_uint(operations);
+    PM_send_int(plotno);
+    PM_flush();
 }
 
 
@@ -1543,12 +1563,12 @@ TERM_TABLE_START(PM_driver)
 #else
     NULL, NULL, NULL,
 #endif
-    NULL, /* layer */
+    PM_layer,
     NULL, /* path */
     0.0, /* scale (unused) */
     NULL, /* hypertext */
     NULL, /* boxed text */
-    NULL, /* modify plots */
+    PM_modify_plots,
     PM_dashtype
 TERM_TABLE_END(PM_driver)
 

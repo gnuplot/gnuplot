@@ -1,7 +1,7 @@
 /* GNUPLOT - pm_msgs.h */
 
 /*[
- * Copyright 1992, 1993, 1998, 2004   Roger Fearick
+ * Copyright 1992, 1993, 1998, 2004, 2021   Roger Fearick
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -41,6 +41,8 @@
 /* graphics commands */
 #define SET_GRAPHICS	'G'
 #define SET_TEXT	'E'
+#define SET_LAYER       'Y'
+#define SET_MODIFY_PLOTS '*'
 #define SET_LINE	'L'
 #define SET_DASH	'd'
 #define SET_FILLBOX	'B'
