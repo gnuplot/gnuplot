@@ -396,8 +396,8 @@ static void     GetMousePosViewport(HWND hWnd, int *mx, int *my);
 static void     MousePosToViewport(int *x, int *y, SHORT mx, SHORT my);
 static void     gpPMmenu_update(void);
 static void     ResetStatusLineText(void);
-static void     DisplayStatusLine(HPS hps);
-static void     UpdateStatusLine(HPS hps, char *text);
+static void     DisplayStatusLine();
+static void     UpdateStatusLine(char *text);
 static void     DrawMouseText(HPS hps, PPOINTL pt, char * text, LONG len);
 static void     DrawZoomBox(void);
 static void     DrawRuler(void);
@@ -608,6 +608,9 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
     /* Graphics part, SET_GRAPHICS, required to update menu */
     if (gpPMmenu_update_req)
 	gpPMmenu_update();
+
+    /* Update the status line */
+    DisplayStatusLine();
 
     /* mouse events first */
     switch (message) {
@@ -1817,7 +1820,7 @@ ThreadDraw(void* arg)
     GpiDrawChain(hpsScreen);
     DrawRuler();
     DrawRulerLineTo();
-    DisplayStatusLine(hpsScreen);
+    DisplayStatusLine();
     WinEndPaint(hpsScreen);
     DosReleaseMutexSem(semHpsAccess);
     WinTerminate(hab);
@@ -2522,7 +2525,7 @@ ReadGnu(void* arg)
 		GpiCloseSegment(hps);
 		DrawRuler();
 		DrawRulerLineTo();
-		DisplayStatusLine(hps);
+		DisplayStatusLine();
 		DosReleaseMutexSem(semHpsAccess);
 		WinPostMsg(hApp, WM_GNUPLOT, 0L, 0L);
 		break;
@@ -3219,7 +3222,7 @@ ReadGnu(void* arg)
 
 		switch (where) {
 		case 0:
-		    UpdateStatusLine(hps,text);
+		    UpdateStatusLine(text);
 		    break;
 		case 1:
 		    DrawZoomBox();
@@ -4494,9 +4497,10 @@ GetMousePosViewport(HWND hWnd, int *mx, int *my)
 
 
 /*
- * Status line previous and current text:
+ * Status text:
  */
 static char *sl_curr_text = NULL;
+static BOOL sl_needs_update = FALSE;
 
 
 /*
@@ -4506,47 +4510,37 @@ static void
 ResetStatusLineText(void)
 {
     free(sl_curr_text);
-    sl_curr_text = NULL;
+    sl_curr_text = strdup("");
+    sl_needs_update = FALSE;
 }
 
 
 /*
- * Display the status line by the text
+ * Actually display new status line text
+ * We can only update the status bar while we have access to the message queue.
  */
 static void
-DisplayStatusLine(HPS hps)
+DisplayStatusLine()
 {
-    POINTL pt;
-
-    if (!sl_curr_text)
-	return;
-
-    pt.x = 2;
-    pt.y = 2;
-    DrawMouseText(hps, &pt, sl_curr_text, strlen(sl_curr_text));
+    if (sl_needs_update) {
+	BOOL rc = WinSetWindowText(hwndStatus, sl_curr_text);
+	if (rc) sl_needs_update = FALSE;
+    }
 }
 
-
 /*
- * Update the status line by the text; firstly erase the previous text
+ * Update the status line with new text: first store text only
  */
 static void
-UpdateStatusLine(HPS hps, char *text)
+UpdateStatusLine(char *text)
 {
     if (gpPMmenu_update_req)
 	gpPMmenu_update(); /* check for updated menu */
-    if (sl_curr_text) {
-	/* erase the previous text */
-	DisplayStatusLine(hps);
-	free(sl_curr_text);
-    }
-    if (!text || !*text)
-	sl_curr_text = 0;
-    else {
-	/* display new text */
-	sl_curr_text = strdup(text);
-	DisplayStatusLine(hps);
-    }
+
+    if (text != NULL && strcmp(text, sl_curr_text) != 0)
+	sl_needs_update = TRUE;
+    free(sl_curr_text);
+    sl_curr_text = strdup(text != NULL ? text : "");
 }
 
 

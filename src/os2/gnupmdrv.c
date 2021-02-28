@@ -47,6 +47,10 @@
  * AUTHOR
  *
  *   Gnuplot driver for OS/2:  Roger Fearick
+ *
+ * Status bar code adopted from the tutorial by Marc Mittelmeijer and
+ * Eric Slaats, which is licensed under CC BY-SA 3.0.
+ *   http://www.edm2.com/index.php/Building_an_Editor_-_Part_1
  */
 
 #define INCL_PM
@@ -72,6 +76,11 @@
 #endif
 
 /*==== g l o b a l    d a t a ================================================*/
+
+HAB  hab;               /* application anchor block handle */
+HWND hApp;              /* application window handle */
+HWND hwndFrame;         /* frame window handle */
+HWND hwndStatus;        /* status bar window handle */
 
 char szIPCName[256] ;
 char szIniFile[256] ;
@@ -201,23 +210,72 @@ int main ( int argc, char **argv )
 
                 // create main window
 
-    hwndFrame = WinCreateStdWindow (
+    hwndFrame = WinCreateStdWindow(
                     HWND_DESKTOP,
-                    0,//WS_VISIBLE,
+                    0,
                     &flFrameFlags,
                     APP_NAME,
                     NULL,
                     flClientFlags,
                     0L,
                     1,
-                    &hApp) ;
+                    &hApp);
 
     if ( ! hwndFrame ) return 0 ;
 
+              // Create statusbar window with same colors as the menu
+    {
+        CHAR font[FONTBUF] = "9.WarpSans Bold";
+        ULONG len;
+        PPRESPARAMS ppresStatus;
+        PPARAM aparam;
+
+        // query menu font
+        len = WinQueryPresParam(WinWindowFromID(hwndFrame, FID_MENU),
+                    PP_FONTNAMESIZE, 0, NULL,
+                    sizeof(font), font, 0);
+        if (len == 0) len =  strlen(font) + 1;
+
+        // allocate a suitably-sized PRESPARAMS structure
+        ppresStatus = (PPRESPARAMS)malloc(sizeof(ULONG) * (1+3+3+2) + len);
+        ppresStatus->cb = sizeof(ULONG) * (3+3+2) + len;
+
+        // first entry is background color
+        aparam = ppresStatus->aparam;
+        aparam->id = PP_BACKGROUNDCOLORINDEX;
+        aparam->cb = sizeof(ULONG);
+        *(PULONG)(&aparam->ab) = SYSCLR_MENU;
+
+        // second entry is text color
+        aparam = (PPARAM)(((PULONG) aparam) + 3);
+        aparam->id = PP_FOREGROUNDCOLORINDEX;
+        aparam->cb = sizeof(ULONG);
+        *(PULONG)(&aparam->ab) = SYSCLR_MENUTEXT;
+
+        // third, we set the font name and size
+        aparam = (PPARAM)(((PULONG) aparam) + 3);
+        aparam->id = PP_FONTNAMESIZE;
+        aparam->cb = len;
+        memcpy(&aparam->ab, font, len);
+
+        hwndStatus = WinCreateWindow(hwndFrame,
+                            WC_STATIC,
+                            NULL,  /* No initial text */
+                            SS_TEXT | DT_VCENTER | WS_VISIBLE,
+                            0, 0, 0, 0,
+                            hwndFrame,
+                            HWND_TOP,
+                            STATUSBAR,
+                            0,
+                            ppresStatus); // presentation parameters
+
+        free(ppresStatus);
+    }
+
                 // subclass window for help & DDE trapping
 
-    pfnOldFrameWndProc = WinSubclassWindow( hwndFrame, (PFNWP)NewFrameWndProc ) ;
-    WinSetWindowULong( hwndFrame, QWL_USER, (ULONG) pfnOldFrameWndProc ) ;
+    pfnOldFrameWndProc = WinSubclassWindow(hwndFrame, (PFNWP)NewFrameWndProc);
+    WinSetWindowULong(hwndFrame, QWL_USER, (ULONG) pfnOldFrameWndProc);
 
                 // init the help manager
 
@@ -232,10 +290,11 @@ int main ( int argc, char **argv )
     strcat( text, "]" ) ;
     WinSetWindowText( hwndFrame, text ) ;
     }
+
                 // process window messages
 
-    while (WinGetMsg (hab, &qmsg, NULLHANDLE, 0, 0))
-         WinDispatchMsg (hab, &qmsg) ;
+    while (WinGetMsg(hab, &qmsg, NULLHANDLE, 0, 0))
+         WinDispatchMsg(hab, &qmsg);
 
                 // shut down
 
@@ -284,20 +343,59 @@ static HWND InitHelp( HAB hab, HWND hwnd )
     return hwndHelp ;
     }
 
-MRESULT EXPENTRY NewFrameWndProc (HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2)
-/*
-**  Subclasses top-level frame window to trap help & dde messages
-*/
-    {
-    PFNWP       pfnOldFrameWndProc ;
 
-    pfnOldFrameWndProc = (PFNWP) WinQueryWindowULong( hwnd, QWL_USER ) ;
-    switch( msg ) {
+MRESULT EXPENTRY
+NewFrameWndProc(HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2)
+/*
+**  Subclasses top-level frame window to trap help & dde messages, and add status bar
+*/
+{
+    PFNWP pfnOldFrameWndProc;
+    USHORT itemCount;
+
+    pfnOldFrameWndProc = (PFNWP) WinQueryWindowULong(hwnd, QWL_USER);
+    switch (msg) {
         default:
-            break ;
+            break;
 
         case HM_QUERY_KEYS_HELP:
-            return (MRESULT) IDH_KEYS ;
+            return (MRESULT) IDH_KEYS;
+
+        // *****  code derived from tutorial by Marc Mittelmeijer and Eric Slaats
+        case WM_QUERYFRAMECTLCOUNT:
+        {
+             // count frame controls and add one for new status bar
+            itemCount = SHORT1FROMMR((*pfnOldFrameWndProc)(hwnd, msg, mp1, mp2));
+            return MRFROMSHORT(itemCount + 1);
         }
-    return (*pfnOldFrameWndProc)(hwnd, msg, mp1, mp2) ;
+
+        case WM_FORMATFRAME:
+        {
+            USHORT usClient = 0;
+            USHORT usMenu   = 0;
+            PSWP   pSWP = (PSWP)PVOIDFROMMP(mp1);
+
+            itemCount = SHORT1FROMMR((*pfnOldFrameWndProc)(hwnd, msg, mp1, mp2));
+            while (pSWP[usClient].hwnd != WinWindowFromID(hwndFrame, FID_CLIENT))
+                ++usClient;
+            while (pSWP[usMenu].hwnd != WinWindowFromID(hwndFrame, FID_MENU))
+                ++usMenu;
+
+            pSWP[itemCount].hwnd = hwndStatus;
+            pSWP[itemCount].fl = SWP_SIZE | SWP_MOVE;
+            pSWP[itemCount].cy = pSWP[usMenu].cy; // size is menu size
+            pSWP[itemCount].cx = pSWP[usMenu].cx; //
+            pSWP[itemCount].x = pSWP[usClient].x; // position in frame window is
+            pSWP[itemCount].y = pSWP[usClient].y; //   lower left
+            pSWP[itemCount].hwndInsertBehind = HWND_TOP;
+            // Adjust client window size to accomodate status bar in order
+            // not to have the client window overlap the statusbar.
+            pSWP[usClient].cy = pSWP[usClient].cy - pSWP[itemCount].cy;
+            pSWP[usClient].y  = pSWP[itemCount].y + pSWP[itemCount].cy;
+            // return total number of frame controls
+            return MRFROMSHORT(itemCount + 1);
+        }
+        // *** end of derived code
     }
+    return (*pfnOldFrameWndProc)(hwnd, msg, mp1, mp2);
+}

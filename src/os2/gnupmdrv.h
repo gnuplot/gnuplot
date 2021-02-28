@@ -62,6 +62,7 @@
 #define GNUINI      "GNUPMDRV.INI"          /* ini filename */
 #define INITIAL_FONT "14.Helvetica"         /* initial font for plots */
 #define APP_NAME     "GnuplotPM"            /* application name */
+#define STATUSBAR    200
 
         /* profile (ini file) names  */
 #define INISHELLPOS  "PosShell"
@@ -79,9 +80,10 @@
 
 /*==== global data  ==========================================================*/
 
-HAB         hab ;               /* application anchor block handle */
-HWND        hApp ;              /* application window handle */
-HWND        hwndFrame ;         /* frame window handle */
+extern HAB  hab;                /* application anchor block handle */
+extern HWND hApp;               /* application window handle */
+extern HWND hwndFrame;          /* frame window handle */
+extern HWND hwndStatus;         /* status bar window handle */
 
 #define     FONTBUF   256       /* buffer for dropped font namesize */
 #define     GNUXPAGE  19500     /* width of plot area in 0.01 cm */
