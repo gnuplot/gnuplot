@@ -1123,6 +1123,18 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	/* resume plotting */
 	ulPauseReply = (ULONG) mp1;
 	DosPostEventSem(semPause);
+	/* notify gnuplot about end of pause */
+	{
+	    static HEV semGPPause = 0;
+	    ULONG rc;
+
+	    if (semGPPause == 0) {
+		char name[40];
+		sprintf(name, "\\SEM32\\GP%i_Pause_Ready", (int) ppidGnu);
+		rc = DosOpenEventSem(name, &semGPPause);
+	    }
+	    rc = DosPostEventSem(semGPPause);
+	}
 	return 0L;
 
     case DM_DRAGOVER:
@@ -2371,7 +2383,6 @@ ReadGnu(void* arg)
     unsigned char buff[2];
     HEV hev;
     static char *szPauseText = NULL;
-    ULONG ulPause;
     char *pszPipeName, *pszSemName;
     HPS hps;
     HAB hab;
@@ -2426,7 +2437,7 @@ ReadGnu(void* arg)
 
         DosRead(hRead, &ppidGnu, 4, &cbR);
 
-	sprintf(mouseShareMemName, "\\SHAREMEM\\GP%i_Mouse_Input",(int)ppidGnu);
+	sprintf(mouseShareMemName, "\\SHAREMEM\\GP%i_Mouse_Input", (int)ppidGnu);
 	if (DosGetNamedSharedMem(&input_from_PM_Terminal,
 				 mouseShareMemName,
 				 PAG_WRITE)) {
@@ -2697,7 +2708,8 @@ ReadGnu(void* arg)
 	    }
 	    break;
 
-	    case GR_PAUSE  :   /* pause */
+	    case GR_PAUSE :   /* pause */
+	    case GR_PAUSE_OLD :
 	    {
 		int len;
 
@@ -2706,17 +2718,32 @@ ReadGnu(void* arg)
 		len = (len + sizeof(int) - 1) / sizeof(int);
 		if (len > 0){  /* get pause text */
 		    DosEnterCritSec();
-		    szPauseText = malloc(len*sizeof(int));
+		    szPauseText = malloc(len * sizeof(int));
 		    DosExitCritSec();
 		    BufRead(hRead, szPauseText, len * sizeof(int), &cbR);
 		}
 		if (ulPauseMode != PAUSE_GNU) {
-		    /* pause and wait for semaphore to be cleared */
-		    DosResetEventSem(semPause, &ulPause);
-		    WinPostMsg(hApp, WM_PAUSEPLOT, (MPARAM) szPauseText, 0L);
-		    DosWaitEventSem(semPause, SEM_INDEFINITE_WAIT);
+		    ULONG ulPause;
+
+		    if (*buff == GR_PAUSE_OLD) {
+			/* pause and wait for event semaphore */
+			DosResetEventSem(semPause, &ulPause);
+			WinPostMsg(hApp, WM_PAUSEPLOT, (MPARAM) szPauseText, 0L);
+			WinWaitEventSem(semPause, SEM_INDEFINITE_WAIT);
+		    } else {
+			DosQueryEventSem(semPause, &ulPause);
+			if (ulPause == 0) {
+			    /* event semaphore not (yet) posted */
+			    if (ulPauseReply != 3)
+				WinPostMsg(hApp, WM_PAUSEPLOT, (MPARAM) szPauseText, 0L);
+			    /* let gnuplot know we are (still) pausing with a dialog/menu */
+			    ulPauseReply = 3;
+			} else {
+			    DosResetEventSem(semPause, &ulPause);
+			}
+		    }
 		} else {
-		    /* gnuplot handles pause */
+		    /* gnuplot should handle pause internally */
 		    ulPauseReply = 2;
 		}
 		DosEnterCritSec();
@@ -3669,7 +3696,7 @@ ReadGnu(void* arg)
 	    default :
 		/* This should not happen if the versions of gnuplot and gnupmdrv match. */
 #ifdef HAVE_PMPRINTF
-		PmPrintf("Unknown command: 0x(%02x) '%c'", *buff, *buff);
+		PmPrintf("Unknown command: 0x%02x '%c'", *buff, *buff);
 #endif
 		break;
 	    }

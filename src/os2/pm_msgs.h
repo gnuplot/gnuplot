@@ -64,7 +64,9 @@
 #define GR_RESET	'R'
 #define GR_TEXT		'T'
 #define GR_ENH_TEXT	'x'
-#define GR_PAUSE 	'P'
+#define GR_PAUSE	'3'
+#define GR_PAUSE_END	'4'
+#define GR_PAUSE_OLD 	'P'
 #define GR_HELP		'H'
 #define GR_MOUSECAPABLE 'm' /* PM: say gnupmdrv we are mouseable */
 #define PUT_TMPTEXT	't'

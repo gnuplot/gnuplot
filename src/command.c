@@ -106,10 +106,11 @@ int paused_for_mouse = 0;
 # include <os2.h>
 static char *input_line_SharedMem = NULL; /* pointer to the shared memory for mouse messages */
 static HEV semInputReady = 0;      /* mouse event semaphore */
+static HEV semPause = 0;           /* pause event semaphore */
 static TBOOLEAN thread_rl_Running = FALSE;  /* running status */
 static int thread_rl_RetCode = -1; /* return code from readline input thread */
 static int thread_pause_RetCode = -1; /* return code from pause input thread */
-static TBOOLEAN pause_internal; /* flag to indicate not to use a dialog box */
+static TBOOLEAN pause_internal;    /* flag to indicate not to use a dialog box */
 #endif /* OS2_IPC */
 
 #ifndef _WIN32
@@ -265,6 +266,13 @@ thread_pause(void *arg)
 	    junk = fgetc(stdin);
 	} while (junk != EOF && junk != '\r' && junk != '\n');
 	thread_pause_RetCode = (junk == EOF) ? 0 : 1;
+    } if (rc == 3) {
+	/* dialog/menu active, wait for event semaphore */
+	ULONG u;
+	DosResetEventSem(semPause, &u);
+	DosWaitEventSem(semPause, SEM_INDEFINITE_WAIT);
+	/* now query result */
+	thread_pause_RetCode = PM_pause(NULL);
     } else {
 	/* rc==1: OK; rc==0: cancel */
 	thread_pause_RetCode = rc;
@@ -277,19 +285,24 @@ void
 os2_ipc_setup(void)
 {
     APIRET rc;
-    char semInputReadyName[40];
-    char mouseSharedMemName[40];
+    char name[40];
 
     /* create input event semaphore */
-    sprintf(semInputReadyName, "\\SEM32\\GP%i_Input_Ready", getpid());
-    rc = DosCreateEventSem(semInputReadyName, &semInputReady, 0, 0);
+    sprintf(name, "\\SEM32\\GP%i_Input_Ready", getpid());
+    rc = DosCreateEventSem(name, &semInputReady, 0, 0);
+    if (rc != 0)
+	fputs("DosCreateEventSem error\n", stderr);
+
+    /* create pause event semaphore */
+    sprintf(name, "\\SEM32\\GP%i_Pause_Ready", getpid());
+    rc = DosCreateEventSem(name, &semPause, 0, 0);
     if (rc != 0)
 	fputs("DosCreateEventSem error\n", stderr);
 
     /* allocate shared memory */
-    sprintf(mouseSharedMemName, "\\SHAREMEM\\GP%i_Mouse_Input", getpid());
+    sprintf(name, "\\SHAREMEM\\GP%i_Mouse_Input", getpid());
     rc = DosAllocSharedMem((PPVOID) &input_line_SharedMem,
-		mouseSharedMemName, MAX_LINE_LEN,
+		name, MAX_LINE_LEN,
 		PAG_READ | PAG_WRITE | PAG_COMMIT);
     if (rc != 0)
 	fputs("DosAllocSharedMem ERROR\n", stderr);

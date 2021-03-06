@@ -1012,12 +1012,10 @@ PM_intc_cleanup(void)
 
 int
 PM_pause(char *str)
-/*
-** pause - using message box on PM screen
-*/
 {
-    if (PM_pipe == NULL)
-	return 2;
+    if (!PM_is_connected())
+	return 2;  /* handle pause command internally */
+
     PM_send_msg(GR_PAUSE);
     PM_send_str(str);
     PM_flush();
