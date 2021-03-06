@@ -402,7 +402,7 @@ static void     DrawMouseText(HPS hps, PPOINTL pt, char * text, LONG len);
 static void     DrawZoomBox(void);
 static void     DrawRuler(void);
 static void     DrawRulerLineTo(void);
-static void     modify_segment(HPS hps, unsigned seg, unsigned op);
+static BOOL     modify_segment(HPS hps, unsigned seg, unsigned op);
 
 #define IGNORE_MOUSE (!mouseTerminal || !useMouse || lock_mouse)
 /*  don't react to mouse in the event handler, and avoid some crashes */
@@ -669,6 +669,7 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 		}
 		plot = plot->next;
 	    }
+	    // enforce a redraw
 	    WinInvalidateRect(hWnd, NULL, TRUE);
 	} else {
 	    if (!IGNORE_MOUSE)
@@ -2279,12 +2280,16 @@ FlushPath(HPS hps, BOOL * bPath, int linewidth, LONG color, char * where)
 }
 
 
-static void
+static BOOL
 modify_segment(HPS hps, unsigned seg, unsigned op)
 {
-    LONG val;
+    LONG val, prev_val;
 
-    if (seg == 0) return;
+    if (seg == 0)
+	return FALSE;
+
+    // query visibilty first, so we don't need to redraw when nothing changes
+    prev_val = GpiQuerySegmentAttrs(hps, seg, ATTR_VISIBLE);
     switch (op) {
     default:
     case MODPLOTS_SET_VISIBLE:
@@ -2294,12 +2299,14 @@ modify_segment(HPS hps, unsigned seg, unsigned op)
 	val = ATTR_OFF;
 	break;
     case MODPLOTS_INVERT_VISIBILITIES:
-	val = GpiQuerySegmentAttrs(hps, seg, ATTR_VISIBLE);
-	val = (val == ATTR_ON) ? ATTR_OFF : ATTR_ON;
+	val = (prev_val == ATTR_ON) ? ATTR_OFF : ATTR_ON;
 	break;
     }
-    DEBUG_LAYER(("Set segment %i visibility to %i", seg, val));
-    GpiSetSegmentAttrs(hps, seg, ATTR_VISIBLE, val);
+    if (val != prev_val) {
+	DEBUG_LAYER(("Set segment %i visibility to %i", seg, val));
+	GpiSetSegmentAttrs(hps, seg, ATTR_VISIBLE, val);
+    }
+    return (val != prev_val);
 }
 
 
@@ -2610,6 +2617,7 @@ ReadGnu(void* arg)
 		unsigned int op;
 		int plotno;
 		plotlist * plot;
+		BOOL redraw = FALSE;
 
 		BufRead(hRead, &op, sizeof(int), &cbR);
 		BufRead(hRead, &plotno, sizeof(int), &cbR);
@@ -2618,14 +2626,16 @@ ReadGnu(void* arg)
 	        plot = plots;
 		while (plot != NULL) {
 		    if (plotno == plot->no || plotno < 0) {
-			modify_segment(hps, plot->plot, op);
-			modify_segment(hps, plot->plot1, op);
+			redraw |= modify_segment(hps, plot->plot, op);
+			redraw |= modify_segment(hps, plot->plot1, op);
 		    }
 		    plot = plot->next;
 		}
 
-		/* enforce a screen update */
-		WinInvalidateRect(WinWindowFromDC(hdcScreen), NULL, TRUE);
+		if (redraw) {
+		    /* enforce a screen update */
+		    WinInvalidateRect(WinWindowFromDC(hdcScreen), NULL, TRUE);
+		}
 		break;
 	    }
 
