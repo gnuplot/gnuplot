@@ -2200,6 +2200,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 		case W_polyline: {
 			POINTL * poly = (POINTL *) LocalLock(curptr->htext);
+			if (poly == NULL) break; // memory allocation failed
 			polyi = curptr->x;
 			if (polyi >= polymax) {
 				const int step = 200;
@@ -2920,6 +2921,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				char * image = (char *) LocalLock(curptr->htext);
 				unsigned int width = curptr->x;
 				unsigned int height = curptr->y;
+				if (image == NULL) break; // memory allocation failed
 				draw_image(lpgw, hdc, image, corners, width, height, color_mode);
 				LocalUnlock(curptr->htext);
 			}

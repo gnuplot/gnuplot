@@ -1473,6 +1473,7 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 
 		case W_polyline: {
 			POINTL * poly = reinterpret_cast<POINTL *>(LocalLock(curptr->htext));
+			if (poly == NULL) break; // memory allocation failed
 			polyi = curptr->x;
 			// FIXME: Test for zero-length segments
 			if (polyi == 2 && poly[0].x == poly[1].x && poly[0].y == poly[1].y) {
@@ -1569,6 +1570,7 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 				hr = d2dCreateStrokeStyle(static_cast<D2D1_DASH_STYLE>(cur_penstruct.lopnStyle), lpgw->rounded, &pStrokeStyle);
 			} else if (dt == DASHTYPE_CUSTOM) {
 				t_dashtype * dash = reinterpret_cast<t_dashtype *>(LocalLock(curptr->htext));
+				if (dash == NULL) break;
 				INT count = 0;
 				while ((dash->pattern[count] != 0.) && (count < DASHPATTERN_LENGTH)) count++;
 				hr = d2dCreateStrokeStyle(dash->pattern, count, lpgw->rounded, &pStrokeStyle);
@@ -2106,6 +2108,7 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 			} else {
 				/* The last OP contains the image and it's size */
 				BYTE * image = reinterpret_cast<BYTE *>(LocalLock(curptr->htext));
+				if (image == NULL) break; // memory allocation failed
 				UINT32 width = curptr->x;
 				UINT32 height = curptr->y;
 				D2D1_SIZE_U size = D2D1::SizeU(width, height);

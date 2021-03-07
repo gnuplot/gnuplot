@@ -782,6 +782,7 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 
 		case W_polyline: {
 			POINTL * poly = (POINTL *) LocalLock(curptr->htext);
+			if (poly == NULL) break; // memory allocation failed
 			polyi = curptr->x;
 			PointF * points = new PointF[polyi];
 			for (int i = 0; i < polyi; i++) {
@@ -874,6 +875,7 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 				gdiplusSetDashStyle(&pen, static_cast<DashStyle>(cur_penstruct.lopnStyle));
 			} else if (dt == DASHTYPE_CUSTOM) {
 				t_dashtype * dash = static_cast<t_dashtype *>(LocalLock(curptr->htext));
+				if (dash == NULL) break; // memory allocation failed
 				INT count = 0;
 				while ((dash->pattern[count] != 0.) && (count < DASHPATTERN_LENGTH)) count++;
 				pen.SetDashPattern(dash->pattern, count);
@@ -1419,6 +1421,7 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 			} else {
 				/* The last OP contains the image and it's size */
 				char * image = (char *) LocalLock(curptr->htext);
+				if (image == NULL) break; // memory allocation failed
 				unsigned int width = curptr->x;
 				unsigned int height = curptr->y;
 				if (image) {
