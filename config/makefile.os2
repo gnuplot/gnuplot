@@ -115,6 +115,10 @@ LUA=1
 # requires GNU readline library (static or DLL; not part of gnuplot)
 # GNU_RL=1
 
+# AMOS functions
+# requires the AMOS Fortran library
+AMOS=1
+
 # DEBUGging support
 # creates binaries suitable for debugging. Some bugs may come and go
 # as opposed to a production build since we lower the optimization level
@@ -328,6 +332,12 @@ endif
 ifdef ICONV
   CFLAGS  += -DHAVE_ICONV
   LIBS    += -liconv
+endif
+
+# AMOS function support (translated using f2c)
+ifdef AMOS
+  CFLAGS  += -DHAVE_AMOS
+  LIBS    += -lamos -lf2c
 endif
 
 ifdef DEBUG
