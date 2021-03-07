@@ -1,8 +1,11 @@
 /* config.h for mingw/Makefile
  *
  * Prepared according to config.h from ./configure and by means of
- * config_strip.sh as of gnuplot 5.1 in February 2016.
+ * config_strip.sh as of gnuplot 5.5 in February 2021.
  */
+
+/* Required to distinguish Mingw-w64 */
+#include <_mingw.h>
 
 /* Define to allow use of certain deprecated syntax. */
 /* #undef BACKWARDS_COMPATIBLE */
@@ -42,8 +45,9 @@
 /* Define if you want to use a newer version of libgrx under MSDOS/djgpp. */
 /* #undef GRX21 */
 
-/* Define to 1 if you have the <3dkit.h> header file. */
-/* #undef HAVE_3DKIT_H */
+/* define if you have a library of Amos special functions */
+/* #undef HAVE_AMOS */
+/* Don't change it here -- this define is set in config/mingw/Makefile. */
 
 /* Define to 1 if you have the `atexit' function. */
 #define HAVE_ATEXIT 1
@@ -54,6 +58,9 @@
 /* Define to 1 if you have the `bzero' function. */
 /* #undef HAVE_BZERO */
 
+/* Define to 1 if you have the `cabs' function. */
+#define HAVE_CABS 1
+
 /* libcairo support for eps (cairo >= 1.6) */
 /* #undef HAVE_CAIROEPS */
 /* Don't change it here -- this define is set in config/mingw/Makefile. */
@@ -62,9 +69,29 @@
 /* #undef HAVE_CAIROPDF */
 /* Don't change it here -- this define is set in config/mingw/Makefile. */
 
+/* define if you have Amos function cexint */
+/* #undef HAVE_CEXINT */
+/* Don't change it here -- this define is set in config/mingw/Makefile. */
+
+/* Define to 1 if you have the `cexp' function. */
+#define HAVE_CEXP 1
+
+/* Define to 1 if you have the `clog' function. */
+#define HAVE_CLOG 1
+
+/* Define to 1 if you have the <complex.h> header file. */
+#define HAVE_COMPLEX_H 1
+
+/* Define to 1 if you have the `csqrt' function. */
+#define HAVE_CSQRT 1
+
 /* Define to 1 if you have the declaration of `signgam', and to 0 if you
    don't. */
-#define HAVE_DECL_SIGNGAM 0
+#if defined(__MINGW64_VERSION_MAJOR)
+# define HAVE_DECL_SIGNGAM 1
+#else
+# define HAVE_DECL_SIGNGAM 0
+#endif
 
 /* Define to 1 if you have the <dirent.h> header file. */
 /* dirent.h is available, but we use our own encoding-aware versions
@@ -97,6 +124,9 @@
 
 /* Define to 1 if you have the `fdopen' function. */
 #define HAVE_FDOPEN 1
+
+/* Define to 1 if you have the <fenv.h> header file. */
+#define HAVE_FENV_H 1
 
 /* Define to 1 if you have the <float.h> header file. */
 #define HAVE_FLOAT_H 1
@@ -162,8 +192,10 @@
 /* #undef HAVE_LANGINFO_H */
 
 /* Define to 1 if you have the `lgamma' function. */
-/* #define HAVE_LGAMMA 1 */
 /* Comment: lgamma() is available in MingW 3.4.4, but without signgam required by f_gamma() */
+#if defined(__MINGW64_VERSION_MAJOR)
+# define HAVE_LGAMMA 1
+#endif
 
 /* Define if you have the caca library. */
 /* #undef HAVE_LIBCACA */
@@ -232,6 +264,9 @@
 
 /* Define to 1 if you have the `memset' function. */
 #define HAVE_MEMSET 1
+
+/* Define to include support for metapost terminal */
+/* #undef HAVE_METAPOST */
 
 /* Define to include support for mif terminal */
 /* #undef HAVE_MIF */
@@ -348,6 +383,12 @@
 /* Define to 1 if you have the `strstr' function. */
 #define HAVE_STRSTR 1
 
+/* Define to 1 if `tm_gmtoff' is a member of `struct tm'. */
+/* #undef HAVE_STRUCT_TM_TM_GMTOFF */
+
+/* Define to 1 if `__tm_gmtoff' is a member of `struct tm'. */
+/* #undef HAVE_STRUCT_TM___TM_GMTOFF */
+
 /* Define to 1 if you have the `sysinfo' function. */
 /* #undef HAVE_SYSINFO */
 
@@ -390,6 +431,12 @@
 /* Define to 1 if you have the <termios.h> header file. */
 /* #undef HAVE_TERMIOS_H */
 
+/* Define to 1 if you have the `tgamma' function. */
+#define HAVE_TGAMMA 1
+
+/* Define to include support for tgif terminal */
+/* #undef HAVE_TGIF */
+
 /* Define to 1 if you have the <time.h> header file. */
 #define HAVE_TIME_H 1
 
@@ -417,14 +464,15 @@
 /* Define to 1 if you have the `vfprintf' function. */
 #define HAVE_VFPRINTF 1
 
-/* Define to 1 if you have the <vgagl.h> header file. */
-/* #undef HAVE_VGAGL_H */
-
 /* Define to 1 if you have the <wchar.h> header file. */
 #define HAVE_WCHAR_H 1
 
 /* Define to 1 if you have the `wcwidth' function. */
 /* #undef HAVE_WCWIDTH */
+
+/* Define to build the webp terminal. */
+/* #undef HAVE_WEBP */
+/* Don't change it here -- this define is set in config/mingw/Makefile. */
 
 /* Define to 1 if `fork' works. */
 /* #undef HAVE_WORKING_FORK */
@@ -434,12 +482,6 @@
 
 /* Define to 1 if the system has the type `_Bool'. */
 #define HAVE__BOOL 1
-
-/* Define to enable handling point size in hidden3d code. */
-#define HIDDEN3D_VAR_PTSIZE 1
-
-/* Define if this is a Linux system with SuperVGA library. */
-/* #undef LINUXVGA */
 
 /* Define to 1 if malloc(0)==0 */
 /* #undef MALLOC_ZERO_RETURNS_ZERO */
@@ -459,9 +501,6 @@
 /* Define to disable terminals that depend on code in bitmap.c */
 #define NO_BITMAP_SUPPORT 1
 
-/* Define to 1 if your C compiler doesn't accept -c and -o together. */
-/* #undef NO_MINUS_C_MINUS_O */
-
 /* Name of package */
 #define PACKAGE "gnuplot"
 
@@ -476,6 +515,9 @@
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "gnuplot"
+
+/* Define to the home page for this package. */
+/* #undef PACKAGE_URL */
 
 /* Define to the version of this package. */
 #define PACKAGE_VERSION "5.5"
@@ -492,6 +534,7 @@
 
 /* Define if you want the Qt terminal. */
 /* #undef QTTERM */
+/* Don't change it here -- this define is set in config/mingw/Makefile. */
 
 /* Define if you want to use the included readline function. */
 /* #undef READLINE */
@@ -512,9 +555,6 @@
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
 
-/* Define if the 3dkit library is present. */
-/* #undef THREEDKIT */
-
 /* Define if your libcaca does not have caca_export_canvas_to_memory but the
    old caca_export_memory */
 /* #undef USE_CACA_EXPORT_MEMORY */
@@ -523,7 +563,7 @@
    RISK!). */
 /* #undef USE_CWDRC */
 
-/* Define if you want to use the experimental ggi driver. */
+/* Define this to build the General Graphics Interface (ggi) driver. */
 /* #undef USE_GGI_DRIVER */
 
 /* Define if you have interactive terminals that use mouse support. */
@@ -532,6 +572,11 @@
 
 /* Define to add support for generating a statistical summary of data */
 #define USE_STATS 1
+
+/* Enable GNU extensions on systems that have them.  */
+#ifndef _GNU_SOURCE
+# define _GNU_SOURCE 1
+#endif
 
 /* Define to enable multi-byte font support for x11 */
 /* #undef USE_X11_MULTIBYTE */
@@ -542,8 +587,9 @@
 /* The main version number */
 /* #undef VERSION_MAJOR */
 
-/* Define if the vgagl library is present. */
-/* #undef VGAGL */
+/* Define to include support for tektronix terminal emulators */
+/* #undef WITH_TEKTRONIX */
+/* Don't change it here -- this define is set in config/mingw/Makefile. */
 
 /* Define if you want the wxwidgets terminal. */
 /* #undef WXWIDGETS */
@@ -560,11 +606,6 @@
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 /* #undef _FILE_OFFSET_BITS */
-
-/* Enable GNU extensions on systems that have them.  */
-#ifndef _GNU_SOURCE
-# define _GNU_SOURCE 1
-#endif
 
 /* Define to 1 to make fseeko visible on some hosts (e.g. glibc 2.2). */
 /* #undef _LARGEFILE_SOURCE */
@@ -618,7 +659,6 @@
 
 /* MinGW32 does not have swprintf_s and only has a non-standard swprintf,
    like old versions of MSVC, which does not have a size parameter.  */
-#include <_mingw.h>
 #if defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR)
 # define swprintf_s(s, c, f, ...) swprintf(s, f, __VA_ARGS__)
 #endif

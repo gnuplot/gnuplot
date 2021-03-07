@@ -153,8 +153,12 @@ endif
 ICONV=1
 
 # Uncomment if you have libcerf
-# http://sourceforge.net/projects/libcerf/
+# https://jugit.fz-juelich.de/mlz/libcerf
 CERF=1
+
+# Uncomment if you have libopenspecfun
+# https://github.com/JuliaMath/openspecfun
+OPENSPECFUN=1
 
 # Uncomment if console mode gnuplot should use GNU readline
 # (not recommended)
@@ -519,6 +523,11 @@ endif
 ifdef CERF
 	CFLAGS += -DHAVE_LIBCERF -DNEED_CEXP
 	TERMLIBS += -lcerf -lm
+endif
+
+ifdef OPENSPECFUN
+	CFLAGS += -DHAVE_AMOS
+	TERMLIBS += -lopenspecfun_dll
 endif
 
 ifdef GNUREADLINE
