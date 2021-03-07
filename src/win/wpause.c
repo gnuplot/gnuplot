@@ -104,9 +104,19 @@ win_sleep(DWORD dwMilliSeconds)
 		else
 			rc = MsgWaitForMultipleObjects(0, NULL, FALSE, t1, QS_ALLINPUT);
 		if (rc != WAIT_TIMEOUT) {
-
 			if (strcmp(term->name, "caca") == 0)
 				CACA_process_events();
+# ifdef WGP_CONSOLE
+			else if (rc == WAIT_OBJECT_0) {
+				/* discard input from console / stdin */
+				if (!isatty(fileno(stdin))) {
+					unsigned char ch;
+					fread(&ch, 1, 1, stdin);
+				} else {
+					ConsoleReadCh();
+				}
+			}
+# endif
 #endif
 			WinMessageLoop();
 
@@ -238,15 +248,15 @@ PauseBox(LPPW lppw)
 
 	while (lppw->bPause && !ctrlc_flag) {
 	    if (term->waitforinput == NULL) {
-		/* Only handle message queue events */ 
+		/* Only handle message queue events */
 		WinMessageLoop();
-		if (lppw->bPause && !ctrlc_flag)
+		if (paused_for_mouse && !ctrlc_flag)
 		    WaitMessage();
 	    } else {
 		/* Call the non-blocking sleep function,
 		    which also handles console input (caca terminal)
 		    and mousing of the current terminal (e.g. qt) */
-		win_sleep(50);
+		win_sleep(200);
 	    }
 	}
 
@@ -258,20 +268,20 @@ PauseBox(LPPW lppw)
 	/* Don't show the pause "OK CANCEL" dialog for "pause mouse ..."
 	    Note: maybe gnuplot should display a message like
 		"gnuplot pausing (waiting for mouse click)"
-	    in the window status or title bar or somewhere else. 
+	    in the window status or title bar or somewhere else.
 	*/
 
 	while (paused_for_mouse && !ctrlc_flag) {
 	    if (term->waitforinput == NULL) {
-		/* Only handle message queue events */ 
+		/* Only handle message queue events */
 		WinMessageLoop();
-		if (paused_for_mouse && !ctrlc_flag)
+		if (lppw->bPause && !ctrlc_flag)
 		    WaitMessage();
 	    } else {
 		/* Call the non-blocking sleep function,
 		    which also handles console input (caca terminal)
 		    and mousing of the current terminal (e.g. qt) */
-		win_sleep(50);
+		win_sleep(200);
 	    }
 	}
 	return !ctrlc_flag;
