@@ -621,13 +621,8 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 	/* do the drawing */
 	blkptr = lpgw->gwopblk_head;
 	curptr = NULL;
-	if (blkptr != NULL) {
-		if (!blkptr->gwop)
-			blkptr->gwop = (struct GWOP *) GlobalLock(blkptr->hblk);
-		if (!blkptr->gwop)
-			return;
-		curptr = (struct GWOP *)blkptr->gwop;
-	}
+	if (blkptr != NULL)
+		curptr = blkptr->gwop;
 	if (curptr == NULL)
 		return;
 
@@ -1620,18 +1615,14 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 		ngwop++;
 		curptr++;
 		if ((unsigned)(curptr - blkptr->gwop) >= GWOPMAX) {
-			GlobalUnlock(blkptr->hblk);
-			blkptr->gwop = (struct GWOP *)NULL;
 			if ((blkptr = blkptr->next) == NULL)
 				/* If exact multiple of GWOPMAX entries are queued,
 				 * next will be NULL. Only the next GraphOp() call would
 				 * have allocated a new block */
 				break;
-			if (!blkptr->gwop)
-				blkptr->gwop = (struct GWOP *)GlobalLock(blkptr->hblk);
-			if (!blkptr->gwop)
+			if (blkptr->gwop == NULL)
 				break;
-			curptr = (struct GWOP *)blkptr->gwop;
+			curptr = blkptr->gwop;
 		}
 	} /* while (ngwop < lpgw->nGWOP) */
 

@@ -266,20 +266,16 @@ DestroyBlocks(LPGW lpgw)
 	this = lpgw->gwopblk_head;
 	while (this != NULL) {
 		next = this->next;
-		if (!this->gwop) {
-			this->gwop = (struct GWOP *)GlobalLock(this->hblk);
-		}
-		if (this->gwop) {
+		if (this->gwop != NULL) {
 			/* free all text strings etc. within this block */
 			gwop = this->gwop;
-			for (i = 0; i < GWOPMAX; i++) {
+			for (i = 0; i < this->used; i++) {
 				free(gwop->pdata);
 				gwop++;
 			}
 		}
-		GlobalUnlock(this->hblk);
-		GlobalFree(this->hblk);
-		LocalFreePtr(this);
+		free(this->gwop);
+		free(this);
 		this = next;
 	}
 	lpgw->gwopblk_head = NULL;
@@ -293,34 +289,25 @@ DestroyBlocks(LPGW lpgw)
 static BOOL
 AddBlock(LPGW lpgw)
 {
-	HGLOBAL hblk;
 	struct GWOPBLK *next, *this;
 
 	/* create new block */
-	next = (struct GWOPBLK *)LocalAllocPtr(LHND, sizeof(struct GWOPBLK) );
+	next = (struct GWOPBLK *) malloc(sizeof(struct GWOPBLK));
 	if (next == NULL)
 		return FALSE;
-	hblk = GlobalAlloc(GHND, GWOPMAX*sizeof(struct GWOP));
-	if (hblk == NULL)
+	next->gwop = (struct GWOP *) malloc(GWOPMAX * sizeof(struct GWOP));
+	if (next->gwop == NULL)
 		return FALSE;
-	next->hblk = hblk;
-	next->gwop = (struct GWOP *)NULL;
-	next->next = (struct GWOPBLK *)NULL;
+	next->next = NULL;
 	next->used = 0;
 
 	/* attach it to list */
 	this = lpgw->gwopblk_tail;
-	if (this == NULL) {
+	if (this == NULL)
 		lpgw->gwopblk_head = next;
-	} else {
+	else
 		this->next = next;
-		this->gwop = (struct GWOP *)NULL;
-		GlobalUnlock(this->hblk);
-	}
 	lpgw->gwopblk_tail = next;
-	next->gwop = (struct GWOP *)GlobalLock(next->hblk);
-	if (next->gwop == (struct GWOP *)NULL)
-		return FALSE;
 
 	return TRUE;
 }
@@ -2134,13 +2121,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	/* do the drawing */
 	blkptr = lpgw->gwopblk_head;
 	curptr = NULL;
-	if (blkptr != NULL) {
-		if (!blkptr->gwop)
-			blkptr->gwop = (struct GWOP *)GlobalLock(blkptr->hblk);
-		if (!blkptr->gwop)
-			return;
-		curptr = (struct GWOP *)blkptr->gwop;
-	}
+	if (blkptr != NULL)
+		curptr = blkptr->gwop;
 	if (curptr == NULL)
 		return;
 
@@ -3116,18 +3098,14 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		ngwop++;
 		curptr++;
 		if ((unsigned)(curptr - blkptr->gwop) >= GWOPMAX) {
-			GlobalUnlock(blkptr->hblk);
-			blkptr->gwop = (struct GWOP *)NULL;
 			if ((blkptr = blkptr->next) == NULL)
 				/* If exact multiple of GWOPMAX entries are queued,
 				 * next will be NULL. Only the next GraphOp() call would
 				 * have allocated a new block */
 				return;
-			if (!blkptr->gwop)
-				blkptr->gwop = (struct GWOP *)GlobalLock(blkptr->hblk);
-			if (!blkptr->gwop)
+			if (blkptr->gwop == NULL)
 				return;
-			curptr = (struct GWOP *)blkptr->gwop;
+			curptr = blkptr->gwop;
 		}
 	} /* while (ngwop < lpgw->nGWOP) */
 

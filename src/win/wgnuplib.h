@@ -265,8 +265,7 @@ struct GWOP {
 /* memory block for graph operations */
 struct GWOPBLK {			/* kept in local memory */
 	struct GWOPBLK *next;
-	HGLOBAL hblk;			/* handle to a global block */
-	struct GWOP *gwop;	/* pointer to global block if locked */
+	struct GWOP *gwop;		/* pointer to global block if locked */
 	UINT used;				/* number of GWOP's used */
 };
 
@@ -313,7 +312,7 @@ typedef struct tagGW {
 	/* window properties etc. */
 	HINSTANCE hInstance;	/* required */
 	HINSTANCE hPrevInstance;/* required */
-	int	Id;		/* plot number */
+	int	Id;				/* plot number */
 	LPTSTR	Title;		/* required */
 	LPTW	lptw;		/* associated text window, optional */
 	LPTSTR	IniFile;	/* optional */
@@ -355,7 +354,7 @@ typedef struct tagGW {
 	BOOL	color;		/* colored graph? */
 	BOOL	oversample;	/* oversampling? */
 	BOOL	gdiplus;	/* Use GDI+ only backend? */
-	BOOL	d2d;	/* Use Direct2D backend? */
+	BOOL	d2d;		/* Use Direct2D backend? */
 	BOOL	antialiasing;	/* anti-aliasing? */
 	BOOL	polyaa;		/* anti-aliasing for polygons ? */
 	BOOL	fastrotation;	/* rotate without anti-aliasing? */
@@ -398,10 +397,10 @@ typedef struct tagGW {
 	TCHAR	deffontname[MAXFONTNAME]; /* default font name */
 	int	deffontsize;	/* default font size */
 	TCHAR	fontname[MAXFONTNAME];	/* current font name */
-	int	fontsize;	/* current font size in pts */
-	int	angle;		/* text angle */
+	int	fontsize;		/* current font size in pts */
+	int	angle;			/* text angle */
 	BOOL	rotate;		/* can text be rotated? */
-	int	justify;	/* text justification */
+	int	justify;		/* text justification */
 	int	encoding_error; /* last unknown encoding */
 	enum set_encoding_id encoding;	/* text encoding */
 	LONG	tmHeight;	/* text metric of current font */

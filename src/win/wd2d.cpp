@@ -1305,13 +1305,8 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 	/* do the drawing */
 	blkptr = lpgw->gwopblk_head;
 	curptr = NULL;
-	if (blkptr != NULL) {
-		if (!blkptr->gwop)
-			blkptr->gwop = (struct GWOP *) GlobalLock(blkptr->hblk);
-		if (!blkptr->gwop)
-			return hr;
-		curptr = (struct GWOP *)blkptr->gwop;
-	}
+	if (blkptr != NULL)
+		curptr = blkptr->gwop;
 	if (curptr == NULL)
 		return hr;
 
@@ -2353,18 +2348,14 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 		ngwop++;
 		curptr++;
 		if ((unsigned)(curptr - blkptr->gwop) >= GWOPMAX) {
-			GlobalUnlock(blkptr->hblk);
-			blkptr->gwop = (struct GWOP *)NULL;
 			if ((blkptr = blkptr->next) == NULL)
 				/* If exact multiple of GWOPMAX entries are queued,
 				 * next will be NULL. Only the next GraphOp() call would
 				 * have allocated a new block */
 				break;
-			if (!blkptr->gwop)
-				blkptr->gwop = (struct GWOP *)GlobalLock(blkptr->hblk);
-			if (!blkptr->gwop)
+			if (blkptr->gwop == NULL)
 				break;
-			curptr = (struct GWOP *)blkptr->gwop;
+			curptr = blkptr->gwop;
 		}
 
 		if (FAILED(hr)) {
