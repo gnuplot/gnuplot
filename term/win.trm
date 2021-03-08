@@ -1005,15 +1005,15 @@ WIN_set_color(t_colorspec *colorspec)
 			/* Immediately translate palette index to RGB colour */
 			rgb255_color rgb255;
 			rgb255maxcolors_from_gray(colorspec->value, &rgb255);
-			GraphOp(graphwin, W_setcolor, (rgb255.g << 8) | rgb255.b, (rgb255.r), NULL);
+			GraphOp(graphwin, W_setcolorrgb, (rgb255.g << 8) | rgb255.b, (rgb255.r), NULL);
 			break;
 		}
 		case TC_RGB:
 			/* highest byte of colorspec->lt contains alpha */
-			GraphOp(graphwin, W_setcolor, (colorspec->lt) & 0xffff, (colorspec->lt >> 16) & 0xffff, NULL);
+			GraphOp(graphwin, W_setcolorrgb, (colorspec->lt) & 0xffff, (colorspec->lt >> 16) & 0xffff, NULL);
 			break;
 		case TC_LT:
-			GraphOp(graphwin, W_setcolor, colorspec->lt, 0, (void *) &WIN_set_color);
+			GraphOp(graphwin, W_setcolor, colorspec->lt, 0, NULL);
 			break;
 		default:
 			break;

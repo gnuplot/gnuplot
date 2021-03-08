@@ -354,6 +354,8 @@ d2dInit(LPGW lpgw)
 			ID2D1DeviceContext * pDirect2dDeviceContext = NULL;
 			if (SUCCEEDED(hr) && lpgw->pDirect2dDevice == NULL)
 				hr = g_pDirect2dFactory->CreateDevice(dxgiDevice, &pDirect2dDevice);
+			else
+				pDirect2dDevice = lpgw->pDirect2dDevice;
 			if (SUCCEEDED(hr))
 				lpgw->pDirect2dDevice = pDirect2dDevice;
 			if (SUCCEEDED(hr))
@@ -1451,7 +1453,7 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 		if (!(skipplot || (gridline && lpgw->hidegrid)) ||
 			keysample || (curptr->op == W_line_type) || (curptr->op == W_setcolor)
 			          || (curptr->op == W_pointsize) || (curptr->op == W_line_width)
-			          || (curptr->op == W_dash_type)) {
+			          || (curptr->op == W_dash_type) || (curptr->op == W_setcolorrgb)) {
 
 		/* special case hypertexts */
 		if ((hypertext != NULL) && (hypertype == TERM_HYPERTEXT_TOOLTIP)) {
@@ -1475,12 +1477,11 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 			break;
 
 		case W_polyline: {
-			POINTL * poly = reinterpret_cast<POINTL *>(LocalLock(curptr->htext));
+			POINTL * poly = reinterpret_cast<POINTL *>(curptr->pdata);
 			if (poly == NULL) break; // memory allocation failed
 			polyi = curptr->x;
 			// FIXME: Test for zero-length segments
 			if (polyi == 2 && poly[0].x == poly[1].x && poly[0].y == poly[1].y) {
-				LocalUnlock(poly);
 				break;
 			}
 			// FIXME: Test for double polylines (same start and end point)
@@ -1498,7 +1499,6 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 					points[i].y = rb - MulDiv(poly[i].y, rb - rt - 1, lpgw->ymax) + rt - 0.5;
 				}
 			}
-			LocalUnlock(poly);
 
 			if (pPolygonRenderTarget == NULL)
 				hr = d2dPolyline(pRenderTarget, pSolidBrush, pStrokeStyle, line_width, points, polyi);
@@ -1572,12 +1572,11 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 					lpgw->dashed ? lpgw->monopen[dt].lopnStyle : lpgw->colorpen[dt].lopnStyle;
 				hr = d2dCreateStrokeStyle(static_cast<D2D1_DASH_STYLE>(cur_penstruct.lopnStyle), lpgw->rounded, &pStrokeStyle);
 			} else if (dt == DASHTYPE_CUSTOM) {
-				t_dashtype * dash = reinterpret_cast<t_dashtype *>(LocalLock(curptr->htext));
+				t_dashtype * dash = reinterpret_cast<t_dashtype *>(curptr->pdata);
 				if (dash == NULL) break;
 				INT count = 0;
 				while ((dash->pattern[count] != 0.) && (count < DASHPATTERN_LENGTH)) count++;
 				hr = d2dCreateStrokeStyle(dash->pattern, count, lpgw->rounded, &pStrokeStyle);
-				LocalUnlock(curptr->htext);
 			}
 			break;
 		}
@@ -1588,7 +1587,7 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 
 		case W_put_text: {
 			char * str;
-			str = reinterpret_cast<char *>(LocalLock(curptr->htext));
+			str = reinterpret_cast<char *>(curptr->pdata);
 			if (str) {
 				LPWSTR textw = UnicodeText(str, lpgw->encoding);
 				if (textw) {
@@ -1645,12 +1644,11 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 					free(textw);
 				}
 			}
-			LocalUnlock(curptr->htext);
 			break;
 		}
 
 		case W_enhanced_text: {
-			char * str = reinterpret_cast<char *>(LocalLock(curptr->htext));
+			char * str = reinterpret_cast<char *>(curptr->pdata);
 			if (str) {
 				RECT extend;
 				draw_enhanced_init(lpgw, pRenderTarget, pSolidBrush, rect);
@@ -1676,18 +1674,16 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 				}
 #endif
 			}
-			LocalUnlock(curptr->htext);
 			break;
 		}
 
 		case W_hypertext:
 			if (interactive) {
 				/* Make a copy for future reference */
-				char * str = reinterpret_cast<char *>(LocalLock(curptr->htext));
+				char * str = reinterpret_cast<char *>(curptr->pdata);
 				free(hypertext);
 				hypertext = UnicodeText(str, lpgw->encoding);
 				hypertype = curptr->x;
-				LocalUnlock(curptr->htext);
 			}
 			break;
 
@@ -1933,7 +1929,7 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 
 		case W_font: {
 			int size = curptr->x;
-			char * fontname = reinterpret_cast<char *>(LocalLock(curptr->htext));
+			char * fontname = reinterpret_cast<char *>(curptr->pdata);
 #ifdef UNICODE
 			/* FIXME: Maybe this should be in win.trm instead. */
 			LPWSTR wfontname = UnicodeText(fontname, lpgw->encoding);
@@ -1942,7 +1938,6 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 #else
 			hr = d2dSetFont(pRenderTarget, rect, lpgw, fontname, size, &pWriteTextFormat);
 #endif
-			LocalUnlock(curptr->htext);
 			/* recalculate shifting of rotated text */
 			hshift = - sin(M_PI / 180. * lpgw->angle) * lpgw->tmHeight / 2.;
 			vshift = - cos(M_PI / 180. * lpgw->angle) * lpgw->tmHeight / 2.;
@@ -1973,11 +1968,12 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 			last_symbol = W_invalid_pointtype;
 			break;
 
-		case W_setcolor: {
+		case W_setcolor:
+		case W_setcolorrgb: {
 			COLORREF color;
 
 			/* distinguish gray values and RGB colors */
-			if (curptr->htext != NULL) {	/* TC_LT */
+			if (curptr->op == W_setcolor) {	/* TC_LT */
 				int pen = (int)curptr->x % WGNUMPENS;
 				color = (pen <= LT_NODRAW) ? lpgw->background : lpgw->colorpen[pen + 2].lopnColor;
 				if (!lpgw->color || !isColor) {
@@ -2110,7 +2106,7 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 				corners[seq - 1].y = ydash + 0.5;
 			} else {
 				/* The last OP contains the image and it's size */
-				BYTE * image = reinterpret_cast<BYTE *>(LocalLock(curptr->htext));
+				BYTE * image = reinterpret_cast<BYTE *>(curptr->pdata);
 				if (image == NULL) break; // memory allocation failed
 				UINT32 width = curptr->x;
 				UINT32 height = curptr->y;
@@ -2194,7 +2190,6 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 					pRenderTarget->PopAxisAlignedClip();
 					SafeRelease(&bitmap);
 				}
-				LocalUnlock(curptr->htext);
 			}
 			seq = (seq + 1) % 6;
 			break;

@@ -757,7 +757,7 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 		if (!(skipplot || (gridline && lpgw->hidegrid)) ||
 			keysample || (curptr->op == W_line_type) || (curptr->op == W_setcolor)
 			          || (curptr->op == W_pointsize) || (curptr->op == W_line_width)
-			          || (curptr->op == W_dash_type)) {
+			          || (curptr->op == W_dash_type) || (curptr->op == W_setcolorrgb)) {
 
 		/* special case hypertexts */
 		if ((hypertext != NULL) && (hypertype == TERM_HYPERTEXT_TOOLTIP)) {
@@ -781,7 +781,7 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 			break;
 
 		case W_polyline: {
-			POINTL * poly = (POINTL *) LocalLock(curptr->htext);
+			POINTL * poly = (POINTL *) curptr->pdata;
 			if (poly == NULL) break; // memory allocation failed
 			polyi = curptr->x;
 			PointF * points = new PointF[polyi];
@@ -795,7 +795,6 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 					points[i].Y = rb - MulDiv(poly[i].y, rb - rt - 1, lpgw->ymax) + rt - 1;
 				}
 			}
-			LocalUnlock(poly);
 			if (poly_graphics == NULL)
 				gdiplusPolyline(graphics, pen, points, polyi);
 			else
@@ -874,12 +873,11 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 					lpgw->dashed ? lpgw->monopen[dt].lopnStyle : lpgw->colorpen[dt].lopnStyle;
 				gdiplusSetDashStyle(&pen, static_cast<DashStyle>(cur_penstruct.lopnStyle));
 			} else if (dt == DASHTYPE_CUSTOM) {
-				t_dashtype * dash = static_cast<t_dashtype *>(LocalLock(curptr->htext));
+				t_dashtype * dash = static_cast<t_dashtype *>(curptr->pdata);
 				if (dash == NULL) break; // memory allocation failed
 				INT count = 0;
 				while ((dash->pattern[count] != 0.) && (count < DASHPATTERN_LENGTH)) count++;
 				pen.SetDashPattern(dash->pattern, count);
-				LocalUnlock(curptr->htext);
 			}
 			break;
 		}
@@ -890,7 +888,7 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 
 		case W_put_text: {
 			char * str;
-			str = (char *) LocalLock(curptr->htext);
+			str = (char *) curptr->pdata;
 			if (str) {
 				LPWSTR textw = UnicodeText(str, lpgw->encoding);
 				if (textw) {
@@ -943,12 +941,11 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 					free(textw);
 				}
 			}
-			LocalUnlock(curptr->htext);
 			break;
 		}
 
 		case W_enhanced_text: {
-			char * str = (char *) LocalLock(curptr->htext);
+			char * str = (char *) curptr->pdata;
 			if (str) {
 				RECT extend;
 				draw_enhanced_init(lpgw, graphics, solid_brush, rect);
@@ -974,18 +971,16 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 				}
 #endif
 			}
-			LocalUnlock(curptr->htext);
 			break;
 		}
 
 		case W_hypertext:
 			if (interactive) {
 				/* Make a copy for future reference */
-				char * str = (char *) LocalLock(curptr->htext);
+				char * str = (char *) curptr->pdata;
 				free(hypertext);
 				hypertext = UnicodeText(str, lpgw->encoding);
 				hypertype = curptr->x;
-				LocalUnlock(curptr->htext);
 			}
 			break;
 
@@ -1241,7 +1236,7 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 
 		case W_font: {
 			int size = curptr->x;
-			char * fontname = (char *) LocalLock(curptr->htext);
+			char * fontname = (char *) curptr->pdata;
 			delete font;
 #ifdef UNICODE
 			/* FIXME: Maybe this should be in win.trm instead. */
@@ -1251,7 +1246,6 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 #else
 			font = SetFont_gdiplus(graphics, rect, lpgw, fontname, size);
 #endif
-			LocalUnlock(curptr->htext);
 			/* recalculate shifting of rotated text */
 			hshift = - sin(M_PI / 180. * lpgw->angle) * lpgw->tmHeight / 2.;
 			vshift = - cos(M_PI / 180. * lpgw->angle) * lpgw->tmHeight / 2.;
@@ -1284,11 +1278,12 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 			last_symbol = W_invalid_pointtype;
 			break;
 
-		case W_setcolor: {
+		case W_setcolor:
+		case W_setcolorrgb: {
 			COLORREF color;
 
 			/* distinguish gray values and RGB colors */
-			if (curptr->htext != NULL) {	/* TC_LT */
+			if (curptr->op == W_setcolor) {	/* TC_LT */
 				int pen = (int)curptr->x % WGNUMPENS;
 				color = (pen <= LT_NODRAW) ? lpgw->background : lpgw->colorpen[pen + 2].lopnColor;
 				if (!lpgw->color || !isColor) {
@@ -1420,7 +1415,7 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 				corners[seq - 1].y = ydash + 0.5;
 			} else {
 				/* The last OP contains the image and it's size */
-				char * image = (char *) LocalLock(curptr->htext);
+				char * image = (char *) curptr->pdata;
 				if (image == NULL) break; // memory allocation failed
 				unsigned int width = curptr->x;
 				unsigned int height = curptr->y;
@@ -1476,7 +1471,6 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 					graphics.ResetClip();
 					graphics.SetPixelOffsetMode(PixelOffsetModeNone);
 				}
-				LocalUnlock(curptr->htext);
 			}
 			seq = (seq + 1) % 6;
 			break;

@@ -259,7 +259,7 @@ struct tooltips {
 struct GWOP {
 	UINT op;
 	UINT x, y;
-	HLOCAL htext;
+	void * pdata;
 };
 
 /* memory block for graph operations */
@@ -294,10 +294,10 @@ enum win_draw_commands {
 	W_endoflist = 0,
 	W_point = 9,
 	W_pointsize = 30,
-	W_setcolor,
+	W_setcolor, W_setcolorrgb,
 	W_polyline, W_line_type, W_dash_type, W_line_width,
 	W_put_text, W_enhanced_text, W_boxedtext,
-	 W_text_encoding, W_font, W_justify, W_text_angle,
+	  W_text_encoding, W_font, W_justify, W_text_angle,
 	W_filled_polygon_draw, W_filled_polygon_pt,
 	W_fillstyle,
 	W_move, W_boxfill,

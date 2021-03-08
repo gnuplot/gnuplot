@@ -38,7 +38,7 @@
 
 #include "syscfg.h"
 
-/* Enable following define to include the GDI backend */
+/* Enable the following define to include the GDI backend */
 //#define USE_WINGDI
 
 /* sanity check */
@@ -270,11 +270,10 @@ DestroyBlocks(LPGW lpgw)
 			this->gwop = (struct GWOP *)GlobalLock(this->hblk);
 		}
 		if (this->gwop) {
-			/* free all text strings within this block */
+			/* free all text strings etc. within this block */
 			gwop = this->gwop;
-			for (i=0; i<GWOPMAX; i++) {
-				if (gwop->htext)
-					LocalFree(gwop->htext);
+			for (i = 0; i < GWOPMAX; i++) {
+				free(gwop->pdata);
 				gwop++;
 			}
 		}
@@ -342,10 +341,9 @@ GraphOpSize(LPGW lpgw, UINT op, UINT x, UINT y, LPCSTR str, DWORD size)
 {
 	struct GWOPBLK *this;
 	struct GWOP *gwop;
-	char *npstr;
 
 	this = lpgw->gwopblk_tail;
-	if ( (this==NULL) || (this->used >= GWOPMAX) ) {
+	if ((this == NULL) || (this->used >= GWOPMAX)) {
 		/* not enough space so get new block */
 		if (!AddBlock(lpgw))
 			return;
@@ -355,13 +353,11 @@ GraphOpSize(LPGW lpgw, UINT op, UINT x, UINT y, LPCSTR str, DWORD size)
 	gwop->op = op;
 	gwop->x = x;
 	gwop->y = y;
-	gwop->htext = 0;
+	gwop->pdata = NULL;
 	if (str) {
-		gwop->htext = LocalAlloc(LHND, size);
-		npstr = LocalLock(gwop->htext);
-		if (gwop->htext && (npstr != (char *)NULL))
-			memcpy(npstr, str, size);
-		LocalUnlock(gwop->htext);
+		gwop->pdata = malloc(size);
+		if (gwop->pdata != NULL)
+			memcpy(gwop->pdata, str, size);
 	}
 	this->used++;
 	lpgw->nGWOP++;
@@ -2098,7 +2094,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	            || (GetDeviceCaps(hdc, TECHNOLOGY) == DT_PLOTTER)
 	            || (GetDeviceCaps(hdc, TECHNOLOGY) == DT_RASPRINTER));
 
-	ppt = (POINT *)LocalAllocPtr(LHND, (polymax+1) * sizeof(POINT));
+	ppt = (POINT *) malloc((polymax + 1) * sizeof(POINT));
 
 	rr = rect->right;
 	rl = rect->left;
@@ -2206,7 +2202,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		/* hide this layer? */
 		if (!(skipplot || (gridline && lpgw->hidegrid)) ||
 			keysample || (curptr->op == W_line_type) || (curptr->op == W_setcolor)
-			          || (curptr->op == W_pointsize) || (curptr->op == W_line_width)) {
+			          || (curptr->op == W_pointsize) || (curptr->op == W_line_width)
+			          || (curptr->op == W_dash_type) || (curptr->op == W_setcolorrgb)) {
 
 		/* special case hypertexts */
 		if ((hypertext != NULL) && (hypertype == TERM_HYPERTEXT_TOOLTIP)) {
@@ -2230,21 +2227,20 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			break;
 
 		case W_polyline: {
-			POINTL * poly = (POINTL *) LocalLock(curptr->htext);
+			POINTL * poly = (POINTL *) curptr->pdata;
 			if (poly == NULL) break; // memory allocation failed
 			polyi = curptr->x;
 			if (polyi >= polymax) {
 				const int step = 200;
 				polymax  = (polyi + step) / step;
 				polymax *= step;
-				ppt = (POINT *)LocalReAllocPtr(ppt, LHND, (polymax + 1) * sizeof(POINT));
+				ppt = (POINT *) realloc(ppt, (polymax + 1) * sizeof(POINT));
 			}
 			for (i = 0; i < polyi; i++) {
 				/* transform the coordinates */
 				ppt[i].x = MulDiv(poly[i].x, rr - rl - 1, lpgw->xmax) + rl;
 				ppt[i].y = rb - MulDiv(poly[i].y, rb - rt - 1, lpgw->ymax) + rt - 1;
 			}
-			LocalUnlock(poly);
 			Polyline(hdc, ppt, polyi);
 			if (keysample) {
 				draw_update_keybox(lpgw, plotno, ppt[0].x, ppt[0].y);
@@ -2320,7 +2316,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			break;
 
 		case W_put_text: {
-			char * str = (char *) LocalLock(curptr->htext);
+			char * str = (char *) curptr->pdata;
 			if (str) {
 				int dxl, dxr;
 				int slen, vsize;
@@ -2363,12 +2359,11 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				}
 #endif
 			}
-			LocalUnlock(curptr->htext);
 			break;
 		}
 
 		case W_enhanced_text: {
-			char * str = (char *) LocalLock(curptr->htext);
+			char * str = (char *) curptr->pdata;
 			if (str) {
 				RECT extend;
 
@@ -2394,18 +2389,16 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				}
 #endif
 			}
-			LocalUnlock(curptr->htext);
 			break;
 		}
 
 		case W_hypertext:
 			if (interactive) {
 				/* Make a copy for future reference */
-				char * str = LocalLock(curptr->htext);
+				char * str = curptr->pdata;
 				free(hypertext);
 				hypertext = UnicodeText(str, lpgw->encoding);
 				hypertype = curptr->x;
-				LocalUnlock(curptr->htext);
 			}
 			break;
 
@@ -2713,7 +2706,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 		case W_font: {
 			int size = curptr->x;
-			char * font = (char *) LocalLock(curptr->htext);
+			char * font = (char *) curptr->pdata;
 			/* GraphChangeFont already handles font==NULL and size==0,
 			   so the checks below are a bit paranoid...
 			*/
@@ -2728,7 +2721,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				font != NULL ? tfont : lpgw->deffontname,
 				size > 0 ? size : lpgw->deffontsize,
 				hdc, *rect);
-			LocalUnlock(curptr->htext);
 			SetFont(lpgw, hdc);
 			/* recalculate shifting of rotated text */
 			hshift = - sin(M_PI/180. * lpgw->angle) * lpgw->tmHeight / 2.;
@@ -2758,10 +2750,11 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			last_symbol = W_invalid_pointtype;
 			break;
 
-		case W_setcolor: {
+		case W_setcolor:
+		case W_setcolorrgb: {
 			COLORREF color;
 
-			if (curptr->htext != NULL) {	/* TC_LT */
+			if (curptr->op == W_setcolor) {	/* TC_LT */
 				int pen = (int)curptr->x % WGNUMPENS;
 				if (pen <= LT_NODRAW) {
 					color = lpgw->background;
@@ -2814,7 +2807,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			/* a point of the polygon is coming */
 			if (polyi >= polymax) {
 				polymax += 200;
-				ppt = (POINT *)LocalReAllocPtr(ppt, LHND, (polymax+1) * sizeof(POINT));
+				ppt = (POINT *) realloc(ppt, (polymax+1) * sizeof(POINT));
 			}
 			ppt[polyi].x = xdash;
 			ppt[polyi].y = ydash;
@@ -2867,7 +2860,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				}
 
 				/* now shift polygon points to upper left corner */
-				points = (POINT *)LocalAllocPtr(LHND, (polyi+1) * sizeof(POINT));
+				points = (POINT *) malloc((polyi + 1) * sizeof(POINT));
 				for (i = 0; i < polyi; i++) {
 					points[i].x = ppt[i].x - minx;
 					points[i].y = ppt[i].y - miny;
@@ -2927,7 +2920,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 						   memdc, 0, 0, width, height, ftn);
 
 				/* clean up */
-				LocalFreePtr(points);
+				free(points);
 				SelectObject(memdc, old_pen);
 				SelectObject(memdc, old_brush);
 				SelectObject(memdc, oldbmp);
@@ -2949,12 +2942,11 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				corners[seq-1].y = ydash;
 			} else {
 				/* The last OP contains the image and it's size */
-				char * image = (char *) LocalLock(curptr->htext);
+				char * image = (char *) curptr->pdata;
 				unsigned int width = curptr->x;
 				unsigned int height = curptr->y;
 				if (image == NULL) break; // memory allocation failed
 				draw_image(lpgw, hdc, image, corners, width, height, color_mode);
-				LocalUnlock(curptr->htext);
 			}
 			seq = (seq + 1) % 6;
 			}
@@ -3151,7 +3143,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		DeleteObject(lpgw->hcolorbrush);
 		lpgw->hcolorbrush = NULL;
 	}
-	LocalFreePtr(ppt);
+	free(ppt);
 }
 #endif // USE_WINGDI
 
