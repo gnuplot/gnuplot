@@ -115,6 +115,12 @@ LUA=1
 # requires GNU readline library (static or DLL; not part of gnuplot)
 # GNU_RL=1
 
+# Uncomment if you have libcerf
+# http://sourceforge.net/projects/libcerf/
+ifeq ($(ISKLIBC),1)
+CERF=1
+endif
+
 # AMOS functions
 # requires the AMOS Fortran library
 AMOS=1
@@ -332,6 +338,12 @@ endif
 ifdef ICONV
   CFLAGS  += -DHAVE_ICONV
   LIBS    += -liconv
+endif
+
+# cerf library support
+ifdef CERF
+  CFLAGS  += -DHAVE_LIBCERF
+  LIBS    += -lcerf
 endif
 
 # AMOS function support (translated using f2c)
