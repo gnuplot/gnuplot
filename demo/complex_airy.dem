@@ -52,6 +52,8 @@ splot '++' using 1:2:(imag(Ai(x + y*I))):(arg(Ai(x + y*I))) notitle with pm3d
 pause -1 "Hit return to continue"
 
 reset session
+save_encoding = GPVAL_ENCODING
+set encoding utf8
 set log cb
 set cbtics format "%.0t×10^{%T}"
 unset mcbtics
@@ -67,5 +69,6 @@ set title 'Modulus of Bi(z)'
 splot abs(Bi( x + y*{0,1} )) with pm3d
 pause -1 "Hit return to continue"
 
+set encoding save_encoding
 reset
 
