@@ -10633,6 +10633,7 @@ Ffigure_missing
 ?format cb
  The format of the tic-mark labels can be set with the `set format` command
  or with the `set tics format` or individual `set {axis}tics format` commands.
+ For information on using an explicit format for input data see `using format`.
 
  Syntax:
        set format {<axes>} {"<format-string>"} {numeric|timedate|geographic}
