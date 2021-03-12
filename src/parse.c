@@ -597,6 +597,10 @@ parse_primary_expression()
 		at_highest_column_used = a.v.int_val;
 	    add_action(DOLLARS)->v_arg = a;
 	}
+    } else if (equals(c_token, "$#")) {
+	struct value a = {INTGR, {DOLLAR_NCOLUMNS}};
+	c_token++;
+	add_action(DOLLARS)->v_arg = a;
     } else if (equals(c_token, "|")) {
 	struct udvt_entry *udv;
 	c_token++;

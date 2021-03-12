@@ -218,7 +218,10 @@ scanner(char **expressionp, size_t *expressionlenp)
 	    case ':':
 	    case '?':
 	    case ',':
-	    case '$':
+		break;
+	    case '$':		/* The # in $# is _not_ a comment */
+		if (expression[current + 1] == '#')
+		    APPEND_TOKEN;
 		break;
 	    case '}':		/* complex constants will not end up here */
 		curly_brace_count--;
