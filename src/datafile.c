@@ -1741,9 +1741,7 @@ plot_option_using(int max_using)
 	    } else {
 		int col = int_expression();
 
-		if (col == -3)	/* pseudocolumn -3 means "last column" */
-		    fast_columns = 0;
-		else if (col < -2)
+		if (col < -2)
 		    int_error(c_token, "Column must be >= -2");
 
 		use_spec[df_no_use_specs++].column = col;
@@ -2073,8 +2071,6 @@ df_readascii(double v[], int max)
 	    /* Restrict the column number to possible values */
 	    if (column_for_key_title > df_no_cols)
 		column_for_key_title = df_no_cols;
-	    if (column_for_key_title == -3)	/* last column in file */
-		column_for_key_title = df_no_cols;
 
 	    if (column_for_key_title > 0) {
 		df_key_title = gp_strdup(df_column[column_for_key_title-1].header);
@@ -2116,9 +2112,6 @@ df_readascii(double v[], int max)
 	    for (output = 0; output < limit; ++output) {
 		/* if there was no using spec, column is output+1 and at=NULL */
 		int column = use_spec[output].column;
-
-		if (column == -3) /* pseudocolumn -3 means "last column" */
-		    column = use_spec[output].column = df_no_cols;
 
 		/* Handle cases where column holds a meta-data string */
 		/* Axis labels, plot titles, etc.                     */
@@ -2703,8 +2696,6 @@ f_column(union argument *arg)
 	push(Ginteger(&a, line_count));
     else if (column == 0)       /* $0 = df_datum */
 	push(Gcomplex(&a, (double) df_datum, 0.0));
-    else if (column == -3)	/* pseudocolumn -3 means "last column" */
-	push(Gcomplex(&a, df_column[df_no_cols - 1].datum, 0.0));
     else if (column < 1 || column > df_no_cols) {
 	undefined = TRUE;
 	/* Nov 2014: This is needed in case the value is referenced */
@@ -2771,9 +2762,6 @@ f_stringcolumn(union argument *arg)
 	gpfree_string(&a);
     } else
 	column = (int) real(&a);
-
-    if (column == -3)	/* pseudocolumn -3 means "last column" */
-	column = df_no_cols;
 
     if (column == -2)	/* pseudocolumn -2 means "index" */ {
 	push(Gstring(&a, indexname));
