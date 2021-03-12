@@ -302,6 +302,9 @@ C
 4 Other new features
 ?new other
 #start
+#b The character sequence $# in a `using` specifier evaluates to the total
+## number of columns available in the current line of data.  For example
+## "plot FOO using 0:(column($# - 1))" plots the last-but-one field of each row.
 #b Function `palette(z)` returns the RGB palette color for z in cbrange. 
 #b Function `rgbcolor("name")` returns the 32bit ARGB value for a named color.
 #b Function `VP_fwhm(sigma,gamma)` returns the full width at half maximum
@@ -8166,8 +8169,14 @@ Ffigure_smooth_path
  If the entry is an expression in parentheses, then the function column(N) may
  be used to indicate the value in column N. That is, column(1) refers to the
  first item read, column(2) to the second, and so on.  The special symbols
- $1, $2, ... are shorthand for column(1), column(2) ...  The function `valid(N)`
- tests whether the value in the Nth column is a valid number.
+ $1, $2, ... are shorthand for column(1), column(2) ...
+
+ The special symbol $# evaluates to the total number of columns in the current
+ line of input, so column($#) or stringcolumn($#) always returns the content of
+ the final column even if the number of columns is unknown or different lines
+ in the file contain different numbers of columns.
+
+ The function `valid(N)` tests whether column N contains a valid number.
 =column
 =columnheader
  If each column of data in the input file contains a label in the first row
@@ -8295,6 +8304,10 @@ Ffigure_smooth_path
        column(-2)  Starts at 0 and increments on two sequential blank lines.
                    This is the index number of the current data set within a
                    file that contains multiple data sets.  See `index`.
+       column($#)  The special symbol $# evaluates to the total number of
+                   columns available, so column($#) refers to the last
+                   (rightmost) field in the current input line.
+                   column($# - 1) would refer to the last-but-one column, etc.
 5 key
 ?using key
 ?plot using key

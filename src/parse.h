@@ -117,4 +117,7 @@ t_iterator * cleanup_iteration(t_iterator *);
 
 void parse_link_via(struct udft_entry *);
 
+/* Magic number used instead of actual column number in $# */
+#define DOLLAR_NCOLUMNS -123
+
 #endif /* PARSE_H */
