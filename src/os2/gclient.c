@@ -628,18 +628,19 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 
     case WM_BUTTON1DOWN:
 	WinSetFocus(HWND_DESKTOP, hWnd);
-	if (! IGNORE_MOUSE)
-	    gp_exec_event(GE_buttonpress, mx, my, 1, 0, 0);
+	WinSetWindowPos(hwndFrame, HWND_TOP, 0,0,0,0, SWP_ACTIVATE|SWP_ZORDER);
 	return 0L;
 
     case WM_BUTTON2DOWN:
 	WinSetFocus(HWND_DESKTOP, hWnd);
+	WinSetWindowPos(hwndFrame, HWND_TOP, 0,0,0,0, SWP_ACTIVATE|SWP_ZORDER);
 	if (!IGNORE_MOUSE)
 	    gp_exec_event(GE_buttonpress, mx, my, 3, 0, 0);
 	return 0L;
 
     case WM_BUTTON3DOWN:
 	WinSetFocus(HWND_DESKTOP, hWnd);
+	WinSetWindowPos(hwndFrame, HWND_TOP, 0,0,0,0, SWP_ACTIVATE|SWP_ZORDER);
 	if (!IGNORE_MOUSE)
 	    gp_exec_event(GE_buttonpress, mx, my, 2, 0, 0);
 	return 0L;
@@ -2945,7 +2946,7 @@ ReadGnu(void* arg)
 		}
 		case SET_SPECIAL_RAISE: /* raise window */
 		    WinSetWindowPos(hwndFrame, HWND_TOP, 0,0,0,0, SWP_RESTORE|SWP_SHOW|SWP_ACTIVATE|SWP_ZORDER);
-		    WinSetFocus( HWND_DESKTOP, hApp );
+		    WinSetFocus(HWND_DESKTOP, hApp);
 		    break;
 		case SET_SPECIAL_LOWER: /* lower window */
 		    WinSetWindowPos(hwndFrame, HWND_BOTTOM, 0,0,0,0, SWP_ZORDER);
@@ -3232,7 +3233,7 @@ ReadGnu(void* arg)
 		// reset clip region
 		GpiSetClipPath(hps, 0, SCP_RESET);
 
-		/* We have to keep the image and the image header in memory since
+		/* We have to keep the image data and header in memory since
 		   we use retained graphics. */
 		ile = (image_list_entry *) malloc(sizeof(image_list_entry));
 		ile->next = image_list;
