@@ -741,10 +741,13 @@ GraphClose(LPGW lpgw)
 	Wnd_exec_event(lpgw, (LPARAM)0, GE_reset, 0);
 #endif
 	/* close window */
-	if (lpgw->hWndGraph)
-		DestroyWindow(lpgw->hWndGraph);
+	if (lpgw->hWndGraph != NULL) {
+		/* avoid recursive calls */
+		HWND hWndGraph = lpgw->hWndGraph;
+		lpgw->hWndGraph = NULL;
+		DestroyWindow(hWndGraph);
+	}
 	WinMessageLoop();
-	lpgw->hWndGraph = NULL;
 	lpgw->hGraph = NULL;
 	lpgw->hStatusbar = NULL;
 	lpgw->hToolbar = NULL;
@@ -5065,6 +5068,9 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 #endif
 		case WM_DESTROY:
+			/* close graph: we may not have received a WM_CLOSE message */
+			if (lpgw->hWndGraph != NULL)
+				GraphClose(lpgw);
 			lpgw->buffervalid = FALSE;
 			DeleteObject(lpgw->hBitmap);
 			lpgw->hBitmap = NULL;
