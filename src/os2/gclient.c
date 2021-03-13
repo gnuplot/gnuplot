@@ -650,6 +650,7 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	LONG     alSegTag[2];
 
 	WinSetFocus(HWND_DESKTOP, hWnd);
+	WinSetWindowPos(hwndFrame, HWND_TOP, 0,0,0,0, SWP_ACTIVATE|SWP_ZORDER);
 	// check if we are clicking on a key entry
 	pt.x = mx;
 	pt.y = my;
@@ -680,12 +681,14 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 
     case WM_BUTTON2DOWN:
 	WinSetFocus(HWND_DESKTOP, hWnd);
+	WinSetWindowPos(hwndFrame, HWND_TOP, 0,0,0,0, SWP_ACTIVATE|SWP_ZORDER);
 	if (!IGNORE_MOUSE)
 	    gp_exec_event(GE_buttonpress, mx, my, 3, 0, 0);
 	return 0L;
 
     case WM_BUTTON3DOWN:
 	WinSetFocus(HWND_DESKTOP, hWnd);
+	WinSetWindowPos(hwndFrame, HWND_TOP, 0,0,0,0, SWP_ACTIVATE|SWP_ZORDER);
 	if (!IGNORE_MOUSE)
 	    gp_exec_event(GE_buttonpress, mx, my, 2, 0, 0);
 	return 0L;
@@ -3234,7 +3237,7 @@ ReadGnu(void* arg)
 		}
 		case SET_SPECIAL_RAISE: /* raise window */
 		    WinSetWindowPos(hwndFrame, HWND_TOP, 0,0,0,0, SWP_RESTORE|SWP_SHOW|SWP_ACTIVATE|SWP_ZORDER);
-		    WinSetFocus( HWND_DESKTOP, hApp );
+		    WinSetFocus(HWND_DESKTOP, hApp);
 		    break;
 		case SET_SPECIAL_LOWER: /* lower window */
 		    WinSetWindowPos(hwndFrame, HWND_BOTTOM, 0,0,0,0, SWP_ZORDER);
@@ -3521,16 +3524,15 @@ ReadGnu(void* arg)
 		    pbmi2->argbColor[0xff].bGreen = 0xff;
 		    pbmi2->argbColor[0xff].bRed   = 0xff;
 #if 1
-		    /* Stamp out the mask first, then draw the image. */
-		    /* This actually relies on the color of transparent pixels being set to black,
+		    /* Stamp out the mask first, then draw the image.
+		       This actually relies on the color of transparent pixels being set to black,
 		       which we don't do. But source images are likely that way already. */
 		    hits = GpiDrawBits(hps, mask, pbmi2, 4, points, ROP_SRCAND, BBO_IGNORE);
 		    hits = GpiDrawBits(hps, image, pbmi, 4, points, ROP_SRCPAINT, BBO_IGNORE);
 #else
-		    /* Better version, which does not require image anipulation. But it is slower
+		    /* Better version, which does not require image manipulation. But it is slower
 		       and causes more flicker:
-		       XOR with image, stamp out mask, XOR with image again.
-		    */
+		       XOR with image, stamp out mask, XOR with image again. */
 		    hits = GpiDrawBits(hps, image, pbmi, 4, points, ROP_SRCINVERT, BBO_IGNORE);
 		    hits = GpiDrawBits(hps, mask, pbmi2, 4, points, ROP_SRCAND, BBO_IGNORE);
 		    hits = GpiDrawBits(hps, image, pbmi, 4, points, ROP_SRCINVERT, BBO_IGNORE);
@@ -3556,7 +3558,7 @@ ReadGnu(void* arg)
 		// reset clip region
 		GpiSetClipPath(hps, 0, SCP_RESET);
 
-		/* We have to keep the image and the image header in memory since
+		/* We have to keep the image data and header in memory since
 		   we use retained graphics. */
 		ile = (image_list_entry *) malloc(sizeof(image_list_entry));
 		ile->next = image_list;
