@@ -114,6 +114,7 @@ TERM_PUBLIC void PM_enhanced_flush(void);
 #define INCL_DOSSEMAPHORES
 #define INCL_DOSMISC
 #define INCL_DOSMODULEMGR
+#define INCL_DOSSESMGR
 #include <os2.h>
 #include "os2/pm_msgs.h"
 
@@ -370,30 +371,29 @@ PM_init(void)
 	rc = DosCreateEventSem(semname, &hev, 1, 0);
 	if (rc != 0)
 	    int_error(NO_CARET, "Cannot create semaphore !\n");
-#ifndef __KLIBC__
-	{
-	    int spawnmode = P_SESSION | P_DEFAULT;
-	    if (PM_optargs != 0)
-		spawnmode |= P_UNRELATED;
-	    pid = _spawnl(spawnmode, PM_path, PM_path, tempname, PM_opts, NULL);
-	    if (pid == -1)
-		int_error(NO_CARET, "Cannot spawn gnupmdrv.exe !\n");
-	}
-#else
-	/* kLIBC: spawn() and friends cannot execute WINAPI applications from WINCOMPAT
-	          apps. Use system() instead as a work-around. */
-	{
-	    char cmd[1024];
-	    int ierr;
 
-	    sprintf(cmd, "cmd /c \"start %s %s %s\"", PM_path, PM_opts, tempname);
-	    FPRINTF((stderr, "system command: %s\n", cmd));
-	    ierr = system(cmd);
-	    if (ierr == -1) // FIXME: correct return code?
-		int_error(NO_CARET, "Cannot start gnupmdrv.exe (%s)!\n", PM_path);
-	    DosSleep(200);
+	/* Originally, we used _spawnl() to start gnupmdrv. But with kLIBC this
+	   cannot execute WINAPI applications from WINCOMPAT apps. We use OS/2's
+	   DosStartSession() directly. */
+	{
+	    STARTDATA sd;
+	    PID pid;
+	    ULONG ulSession;
+	    APIRET rc;
+	    char params[256];
+
+	    memset(&sd, 0, sizeof(STARTDATA));
+	    sd.Length = sizeof(STARTDATA);
+	    sd.Related = (PM_optargs == 0) ? SSF_RELATED_CHILD : SSF_RELATED_INDEPENDENT;
+	    sd.PgmName = PM_path;
+	    snprintf(params, sizeof(params), "%s %s", tempname, PM_opts);
+	    sd.PgmInputs = params;
+	    sd.InheritOpt = SSF_INHERTOPT_PARENT;
+	    rc = DosStartSession(&sd, &ulSession, &pid);
+	    if (rc != 0)
+		int_error(NO_CARET, "Cannot start gnupmdrv.exe: rc = %ul\n", rc);
 	}
-#endif
+
 	DosGetInfoBlocks(&tib, &pib);
 	/* Wait for gnupmdrv to signal that the pipe is ready... */
 	rc = DosWaitEventSem(hev, 10000);
