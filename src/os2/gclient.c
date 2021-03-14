@@ -629,6 +629,8 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
     case WM_BUTTON1DOWN:
 	WinSetFocus(HWND_DESKTOP, hWnd);
 	WinSetWindowPos(hwndFrame, HWND_TOP, 0,0,0,0, SWP_ACTIVATE|SWP_ZORDER);
+	if (! IGNORE_MOUSE)
+	    gp_exec_event(GE_buttonpress, mx, my, 1, 0, 0);
 	return 0L;
 
     case WM_BUTTON2DOWN:
