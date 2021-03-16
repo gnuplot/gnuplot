@@ -6447,7 +6447,6 @@ Ffigure_zerror
  background for the 'practical guidelines'.
 4 statistical overview
 ?commands fit error statistical_overview
-?fit error statistical_overview
 ?statistical_overview
  The theory of non-linear least-squares (NLLS) is generally described in terms
  of a normal distribution of errors, that is, the input data is assumed to be
@@ -6478,7 +6477,7 @@ Ffigure_zerror
  If the data points have weights, `gnuplot` calculates the so-called p-value,
  i.e. one minus the cumulative distribution function of the
  chisquare-distribution for the number of degrees of freedom and the resulting
- chisquare, see `practical_guidelines`.
+ chisquare, see `fit practical_guidelines`.
  These values are exported to the variables
        FIT_NDF = Number of degrees of freedom
        FIT_WSSR = Weighted sum-of-squares residual
@@ -6513,9 +6512,8 @@ Ffigure_zerror
  the asymptotic standard error.
 4 practical guidelines
 ?commands fit error practical_guidelines
-?fit error practical_guidelines
-?practical_guidelines
-?guidelines
+?fit practical_guidelines
+?fit guidelines
  If you have a basis for assigning weights to each data point, doing so lets
  you make use of additional knowledge about your measurements, e.g., take into
  account that some points may be more reliable than others.  That may affect
@@ -6582,45 +6580,24 @@ Ffigure_zerror
 3 control
 ?commands fit control
 ?fit control
- There are a number of environment variables that can be defined to affect
- `fit` before starting `gnuplot`, see `fit control environment`. At run time
- adjustments to the `fit` command operation can be controlled by `set fit`.
- See `fit control variables`.
-4 control variables
-?commands fit control variables
-?fit control variables
-=FIT_LIMIT
-=FIT_MAXITER
-=FIT_START_LAMBDA
-=FIT_LAMBDA_FACTOR
- DEPRECATED in version 5.
- These user variables used to affect fit behaviour.
-
-     FIT_LIMIT - use `set fit limit <epsilon>`
-     FIT_MAXITER - use `set fit maxiter <number_of_cycles>`
-     FIT_START_LAMBDA - use `set fit start-lambda <value>`
-     FIT_LAMBDA_FACTOR - use `set fit lambda-factor <value>`
-     FIT_SKIP - use the datafile `every` modifier
-     FIT_INDEX - See `fit multi-branch`
-
-4 environment variables
-?commands fit control environment
-?fit control environment
 =FIT_LOG
 =FIT_SCRIPT
- The environment variables must be defined before `gnuplot` is executed; how
- to do so depends on your operating system.
+ There are two environment variables that can be defined to affect `fit`.
+ The environment variables must be defined before `gnuplot` is executed;
+ how to do so depends on your operating system.
 
        FIT_LOG
  changes the name (and/or path) of the file to which the fit log will be
- written from the default of "fit.log" in the working directory. The default
- value can be overwritten using the command `set fit logfile`.
+ written. The default is to write "fit.log" in the current working directory.
+ This can be overwritten at run time using the command `set fit logfile`.
 
        FIT_SCRIPT
  specifies a command that may be executed after an user interrupt. The default
  is `replot`, but a `plot` or `load` command may be useful to display a plot
- customized to highlight the progress of the fit. This setting can also be
- changed using `set fit script`.
+ customized to highlight the progress of the fit.
+ This can be changed at run time using `set fit script`.
+
+ For many other run time adjustments to way fit works, see `set fit`.
 3 multi-branch
 ?commands fit multi-branch
 ?fit multi-branch
