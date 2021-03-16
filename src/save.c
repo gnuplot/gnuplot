@@ -104,11 +104,8 @@ save_all(FILE *fp)
 	if (df_filename)
 	    fprintf(fp, "## Last datafile plotted: \"%s\"\n", df_filename);
 	fprintf(fp, "%s\n", replot_line);
-	if (wri_to_fil_last_fit_cmd(NULL)) {
-	    fputs("## ", fp);
-	    wri_to_fil_last_fit_cmd(fp);
-	    putc('\n', fp);
-	}
+	if (last_fit_command)
+	    fprintf(fp, "## Last fit command: \%s\"\n", last_fit_command);
 	fputs("#    EOF\n", fp);
 }
 

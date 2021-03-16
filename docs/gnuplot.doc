@@ -312,6 +312,10 @@ C
 #b Support XDG base directory for gnuplotrc configuration preferences.
 ## Reads initialization commands from $HOME/.config/gnuplot/gnuplotrc if present.
 ## See `environment`.
+#b New: Exception handling for the "fit" command.  Control always returns to the
+## next line of input, even in the case of errors.  On return, FIT_ERROR is
+## non-zero if an error occured. This allows scripted recovery from a bad fit.
+## See `fit error_recovery`.
 #end
 
 3 Features introduced in version 5.4
@@ -6598,6 +6602,26 @@ Ffigure_zerror
  This can be changed at run time using `set fit script`.
 
  For many other run time adjustments to way fit works, see `set fit`.
+3 error recovery
+?commands fit error_recovery
+?fit error_recovery
+ Starting with gnuplot version 5.5, the `fit` command always returns to the
+ next command input line regardless of the success or failure of fitting.
+ This allows scripted recovery from fit errors.  The variable FIT_ERROR is
+ set to 0 on success, non-zero on error.
+ Example:
+
+      do for [i=1:5] {
+          DATA = sprintf("Data_%05d.dat", i)
+          fit f(x) DATA via a,b,c
+          if (FIT_ERROR || !FIT_CONVERGED) {
+              continue
+          }
+          set output sprintf("dataset_%05.png", i)
+          plot DATA, f(x)
+          unset output
+      }
+
 3 multi-branch
 ?commands fit multi-branch
 ?fit multi-branch

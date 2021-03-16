@@ -34,6 +34,7 @@
 
 /* #if... / #include / #define collection: */
 
+#include <setjmp.h>
 #include "syscfg.h"
 #include "stdfn.h"
 #include "gp_types.h"
@@ -56,6 +57,9 @@ typedef enum e_verbosity_level {
 
 typedef char fixstr[MAX_ID_LEN+1];
 
+/* pointer to longjmp recovery point of "fit" command */
+extern JMP_BUF *fit_env;
+
 /* Exported Variables of fit.c */
 
 extern const char *FITLIMIT;
@@ -75,6 +79,7 @@ extern double epsilon_abs;  /* absolute convergence criterion */
 extern int maxiter;
 extern int fit_wrap;
 extern TBOOLEAN fit_v4compatible;
+extern char *last_fit_command;
 
 /* Prototypes of functions exported by fit.c */
 
@@ -89,7 +94,6 @@ void init_fit(void);
 void update(char *pfile, char *npfile);
 void save_fit(FILE *fp);
 void fit_command(void);
-size_t wri_to_fil_last_fit_cmd(FILE *fp);
 char *getfitlogfile(void);
 const char *getfitscript(void);
 

@@ -232,7 +232,7 @@ load_file(FILE *fp, char *name, int calltype)
     /* things to do after lf_push */
     inline_num = 0;
     /* go into non-interactive mode during load */
-    /* will be undone below, or in load_file_error */
+    /* will be undone below, or in reset_load_stack_after_error */
     interactive = FALSE;
 
     while (!stop) {	/* read all lines in file */
@@ -343,7 +343,8 @@ load_file(FILE *fp, char *name, int calltype)
 
 /* pop from load_file state stack
    FALSE if stack was empty
-   called by load_file and load_file_error */
+   called by load_file and reset_load_stack_after_error
+ */
 TBOOLEAN
 lf_pop()
 {
@@ -505,12 +506,10 @@ lf_top()
     return (lf_head->fp);
 }
 
-/* called from main */
+/* called from main to pop everything off the stack of loaded files */
 void
-load_file_error()
+reset_load_stack_after_error()
 {
-    /* clean up from error in load_file */
-    /* pop off everything on stack */
     while (lf_pop());
 }
 

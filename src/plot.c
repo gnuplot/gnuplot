@@ -192,7 +192,15 @@ inter(int anint)
 #endif
 }
 
-/* a wrapper for longjmp so we can keep everything local */
+/* Normally we return to the command line at a point equivalent
+ * to program entry, so most context is lost.  All loops and
+ * loaded command files are exited; open files are closed, etc.
+ *
+ * The exception to this is when an error is encountered during a
+ * "fit" command.  In this case the program returns to the same
+ * point it would have reached if the fit command had succeeded,
+ * possibly inside a loop or a loaded command file.
+ */
 void
 bail_to_command_line()
 {
@@ -200,7 +208,10 @@ bail_to_command_line()
     kill_pending_Pause_dialog();
     ctrlc_flag = FALSE;
 #endif
-    LONGJMP(command_line_env, TRUE);
+    if (fit_env)
+	LONGJMP(*fit_env, TRUE);
+    else
+	LONGJMP(command_line_env, TRUE);
 }
 
 #if defined(_WIN32)
@@ -515,9 +526,10 @@ main(int argc_orig, char **argv)
 	    rl_reset_after_signal ();
 	}
 #endif
-
-	load_file_error();	/* if we were in load_file(), cleanup */
 	SET_CURSOR_ARROW;
+	/* Reset bookkeeping for load stack and nested clauses. */
+	clause_reset_after_error();
+	reset_load_stack_after_error();
 
 #ifdef VMS
 	/* after catching interrupt */

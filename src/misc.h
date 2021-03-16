@@ -58,7 +58,7 @@ void load_file(FILE *fp, char *name, int calltype);
 FILE *lf_top(void);
 TBOOLEAN lf_pop(void);
 void lf_push(FILE *fp, char *name, char *cmdline);
-void load_file_error(void);
+void reset_load_stack_after_error(void);
 FILE *loadpath_fopen(const char *, const char *);
 void push_terminal(int is_interactive);
 void pop_terminal(void);

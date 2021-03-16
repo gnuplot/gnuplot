@@ -1191,7 +1191,6 @@ common_error_exit()
     /* the normal cleanup code. Reset any flags before bailing.   */
     df_reset_after_error();
     eval_reset_after_error();
-    clause_reset_after_error();
     parse_reset_after_error();
     pm3d_reset_after_error();
     set_iterator = cleanup_iteration(set_iterator);

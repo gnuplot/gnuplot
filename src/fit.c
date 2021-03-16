@@ -87,6 +87,8 @@
  * Karl Ratzsch, May 2014: Add a result variable reporting the number of
  * iterations
  *
+ * Ethan Merritt, Mar 2021:  Wrap the entire fit command in an exception
+ * handler so that a user script can recover from fit errors.
  */
 
 #include "fit.h"
@@ -176,6 +178,9 @@ typedef enum marq_res marq_res_t;
 
 /* externally visible variables: */
 
+/* pointer to longjmp recovery point of "fit" command */
+JMP_BUF *fit_env = NULL;
+
 /* fit control */
 char *fitlogfile = NULL;
 TBOOLEAN fit_suppress_log = FALSE;
@@ -187,6 +192,7 @@ TBOOLEAN fit_prescale = TRUE;
 char *fit_script = NULL;
 int fit_wrap = 0;
 TBOOLEAN fit_v4compatible = FALSE;
+char *last_fit_command = NULL;
 
 /* names of user control variables */
 const char * FITLIMIT = "FIT_LIMIT";
@@ -236,7 +242,6 @@ static t_value **par_udv;	/* array of pointers to the "via" variables */
 static fixstr *last_par_name = NULL;
 static int last_num_params = 0;
 static char *last_dummy_var[MAX_NUM_VAR];
-static char *last_fit_command = NULL;
 
 /* Mar 2014 - the single hottest call path in fit was looking up the
  * dummy parameters by name (4 billion times in fit.dem).
@@ -252,6 +257,8 @@ static udvt_entry *fit_dummy_udvs[MAX_NUM_VAR];
 static RETSIGTYPE ctrlc_handle(int an_int);
 #endif
 static void ctrlc_setup(void);
+
+static void fit_main(void);
 static marq_res_t marquardt(double a[], double **alpha, double *chisq, double *lambda);
 static void analyze(double a[], double **alpha, double beta[],
 				 double *chisq, double **deriv);
@@ -280,22 +287,35 @@ static char *get_next_word(char **s, char *subst);
 
 
 /*****************************************************************
-    Small function to write the last fit command into a file
-    Arg: Pointer to the file; if NULL, nothing is written,
-         but only the size of the string is returned.
+    Interface to the gnuplot "fit" command
 *****************************************************************/
-
-size_t
-wri_to_fil_last_fit_cmd(FILE *fp)
+void
+fit_command()
 {
-    if (last_fit_command == NULL)
-	return 0;
-    if (fp == NULL)
-	return strlen(last_fit_command);
-    else
-	return (size_t) fputs(last_fit_command, fp);
-}
+    /* Set up an exception handler for errors that occur during "fit".
+     * Normally these would return to the top level command parser via
+     * a longjmp from int_error() and bail_to_command_line().
+     * We introduce a separate jump point here so that a call to "fit"
+     * always returns to the call point regardless of success or error.
+     * The caller must then check for success.
+     */
+    static JMP_BUF fit_jumppoint;
+    fit_env = &fit_jumppoint;
+    if (SETJMP(*fit_env,1)) {
+	fit_env = NULL;
+	fprintf(stderr, "*** FIT ERROR ***\n");
+	free(last_fit_command);
+	last_fit_command = NULL;
+	while (!END_OF_COMMAND)
+	    c_token++;
+	Ginteger( &(add_udv_by_name("FIT_ERROR")->udv_value), 1);
+	return;
+    }
 
+    fit_main();
+    fit_env = NULL;
+    Ginteger( &(add_udv_by_name("FIT_ERROR")->udv_value), 0);
+}
 
 /*****************************************************************
     This is called when a SIGINT occurs during fit
@@ -355,7 +375,9 @@ getchx()
 
 
 /*****************************************************************
-    in case of fatal errors
+    Clean up data structures specfic to fatal errors during fit.
+    After this we invoke the generic int_error(),
+    which in turn returrns via longjmp to the start of this "fit".
 *****************************************************************/
 void
 error_ex(int t_num, const char *str, ...)
@@ -396,13 +418,14 @@ error_ex(int t_num, const char *str, ...)
     /* restore original SIGINT function */
     interrupt_setup();
 
-    /* FIXME: It would be nice to exit the "fit" command non-fatally, */
-    /* so that the script who called it can recover and continue.     */
-    /* int_error() makes that impossible.  But if we use int_warn()   */
-    /* instead the program tries to continue _inside_ the fit, which  */
-    /* generally then dies on some more serious error.                */
-
-    /* exit via int_error() so that it can clean up state variables */
+    /* Usually int_error() returns to the top level command parser
+     * via longjmp at a point equivalent to program entry.
+     * However in this case we introduced a nested handler at the
+     * start of command processing in fit_command() so that control
+     * returns after the "fit" command regardless of success or
+     * failure.  It is then up to the caller to continue or not
+     * after a failed "fit".
+     */
     int_error(t_num, buf);
 }
 
@@ -1566,11 +1589,11 @@ print_function_definitions(struct at_type *at, FILE * device)
 
 
 /*****************************************************************
-    Interface to the gnuplot "fit" command
+    The original "fit" command
 *****************************************************************/
 
 void
-fit_command()
+fit_main()
 {
     /* Backwards compatibility - these were the default names in 4.4 and 4.6	*/
     static const char *dummy_old_default[5] = {"x","y","t","u","v"};
