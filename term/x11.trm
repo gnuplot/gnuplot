@@ -262,7 +262,7 @@ parse_driver(const char *cmd)
     strcpy(X11_command_parsed, X11_command);
     ptr = X11_command_parsed;
 
-    while (*ptr != '\0' && nr < sizeof(optvec) / sizeof(char)) {
+    while (*ptr != '\0' && nr < sizeof(optvec) / sizeof(char *)) {
 
 	/* Strip whitespace.  Use nulls, so that
 	 * the previous argument is terminated
@@ -353,7 +353,7 @@ X11_args(int argc, char *argv[])
 		    optvec[i++] = *++xargv, ++argv;
 		    nx11++;
 		}
-		if (i >= (sizeof(optvec) / sizeof(char))) {
+		if (i >= (sizeof(optvec) / sizeof(char *))) {
 		    fprintf(stderr, "warning: X11 options will be truncated\n");
 		    free(xargv_orig);
 		    return nx11;	/* optvec is full */
