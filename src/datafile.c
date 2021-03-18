@@ -828,7 +828,7 @@ df_tokenise(char *s)
 	    if ((*s == '\0') || (*s == '\n'))	/* End of line; we're done */
 		break;
 	    /* step over field separator */
-		++s;
+	    ++s;
 	    /* skip whitespace at start of next field */
 	    while ((*s == ' ' || *s == '\t') && NOTSEP)
 		++s;

@@ -6667,26 +6667,26 @@ parse_label_options( struct text_label *this_label, int ndim)
 	pos = default_position;
 
     /* OK! copy the requested options into the label */
-	if (set_position)
-	    this_label->place = pos;
-	if (set_just)
-	    this_label->pos = just;
-	if (set_rot)
-	    this_label->rotate = rotate;
-	if (set_layer)
-	    this_label->layer = layer;
-	if (set_font) {
-	    free(this_label->font);
-	    this_label->font = font;
-	}
-	if (set_textcolor)
-	    this_label->textcolor = textcolor;
-	if ((loc_lp.flags & LP_NOT_INITIALIZED) == 0)
-	    this_label->lp_properties = loc_lp;
-	if (set_offset)
-	    this_label->offset = offset;
-	if (set_hypertext)
-	    this_label->hypertext = hypertext;
+    if (set_position)
+	this_label->place = pos;
+    if (set_just)
+	this_label->pos = just;
+    if (set_rot)
+	this_label->rotate = rotate;
+    if (set_layer)
+	this_label->layer = layer;
+    if (set_font) {
+	free(this_label->font);
+	this_label->font = font;
+    }
+    if (set_textcolor)
+	this_label->textcolor = textcolor;
+    if ((loc_lp.flags & LP_NOT_INITIALIZED) == 0)
+	this_label->lp_properties = loc_lp;
+    if (set_offset)
+	this_label->offset = offset;
+    if (set_hypertext)
+	this_label->hypertext = hypertext;
 
     /* Make sure the z coord and the z-coloring agree */
     if (this_label->textcolor.type == TC_Z)

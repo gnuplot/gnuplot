@@ -528,10 +528,10 @@ term_start_plot()
 	invalidate_palette();
 
     /* Set canvas size to full range of current terminal coordinates */
-	canvas.xleft  = 0;
-	canvas.xright = term->xmax - 1;
-	canvas.ybot   = 0;
-	canvas.ytop   = term->ymax - 1;
+    canvas.xleft  = 0;
+    canvas.xright = term->xmax - 1;
+    canvas.ybot   = 0;
+    canvas.ytop   = term->ymax - 1;
 
 }
 

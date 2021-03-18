@@ -466,7 +466,7 @@ place_objects(struct object *listhead, int layer, int dimensions)
 	    continue;
 
 	/* Extract line and fill style, but don't apply it yet */
-	    lpstyle = this_object->lp_properties;
+	lpstyle = this_object->lp_properties;
 
 	if (this_object->fillstyle.fillstyle == FS_DEFAULT
 	    && this_object->object_type == OBJ_RECTANGLE)
