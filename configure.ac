@@ -216,10 +216,7 @@ dnl _instead_ of -lm ...
 AC_CHECK_FUNC(sin,,[AC_CHECK_LIB(m,sin)])
 
 dnl Header files. ANSI first
-AC_HEADER_STDC
-
-dnl Header files
-dnl ANSI/ISO C, POSIX, others
+dnl AC_HEADER_STDC
 AC_CHECK_HEADERS(dirent.h errno.h float.h langinfo.h limits.h locale.h math.h \
   stdlib.h string.h time.h sys/time.h sys/types.h \
   sys/bsdtypes.h sys/ioctl.h sys/param.h sys/select.h sys/socket.h \
@@ -1206,8 +1203,9 @@ if test "$with_bitmap_terminals" == yes; then
 else
   AC_MSG_RESULT([  dot-matrix terminals: no (use --with-bitmap-terminals to enable)])
 fi
-AC_MSG_RESULT([    epson, nec, okidata, tandy, and seiko dp414 printers])
-AC_MSG_RESULT([    hp500c, hpdj, hpljii, hppj, pbm, sixel, starc])
+AC_MSG_RESULT([    printers: epson, nec, okidata, tandy, seiko dpu414 ])
+AC_MSG_RESULT([              hp500c, hpdj, hpljii, hppj, starc])
+AC_MSG_RESULT([    other:    block pbm sixel ])
 AC_MSG_RESULT([])
 
 if test "$with_tektronix" == no; then

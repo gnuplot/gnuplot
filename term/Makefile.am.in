@@ -1,6 +1,8 @@
 ## Process this file with automake to produce Makefile.in -*-Makefile-*-
 AUTOMAKE_OPTIONS = foreign
 
+DISTCLEANFILES = Makefile.am Makefile.in
+
 EXTRA_DIST = README Makefile.am.in driver.h impcodes.h \
 fig_defs.h post.h $(CORETERM) PostScript lua js write_png_image.c sixel.c \
 latex_old.h
@@ -34,4 +36,3 @@ Makefile.am: Makefile.am.in
 	sed -n '/^##trm-files-end/,$$p' $< >> $@t
 	chmod og-w $@t
 	mv $@t $@
-

@@ -6,6 +6,8 @@ soundfit.par temp.set fontfile.ps fontfile_latex.ps epslatex-inc.eps \
 epslatex-inc.pdf epslatex.aux epslatex.dvi epslatex.log epslatex.pdf \
 epslatex.ps epslatex.tex random.tmp stringvar.tmp fit.log fitmulti.dat
 
+DISTCLEANFILES = Makefile.am Makefile.in
+
 BINARY_FILES = binary1 binary2 binary3
 
 SUBDIRS = $(PLUGIN_DIR)
@@ -84,4 +86,3 @@ Makefile.am: Makefile.am.in
 	echo endif >> $@t
 	chmod og-w $@t
 	mv $@t $@
-
