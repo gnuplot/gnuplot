@@ -941,13 +941,6 @@ AS_IF([test "x${with_tgif}" = "xyes"],
   AC_DEFINE(HAVE_TGIF,1,
           [ Define to include support for tgif terminal ],))
 
-dnl  Allow to include mif (FrameMaker 3) terminal
-AC_ARG_WITH(mif,dnl
-[  --with-mif               mif terminal (FrameMaker 3)])
-AS_IF([test "x${with_mif}" = "xyes"],
-  AC_DEFINE(HAVE_MIF,1,
-          [ Define to include support for mif terminal ],))
-
 dnl  Allow to include metapost terminal
 AC_ARG_WITH(metapost,dnl
 [  --with-metapost          metapost terminal])
@@ -1241,12 +1234,6 @@ else
   AC_MSG_RESULT([    tgif terminal: no   (use --with-tgif to enable)])
 fi
 
-if test "$with_mif" == yes; then
-  AC_MSG_RESULT([    mif terminal (FrameMaker 3): yes])
-else
-  AC_MSG_RESULT([    mif terminal (FrameMaker 3): no   (use --with-mif to enable)])
-fi
-
 if test "$with_metapost" == yes; then
   AC_MSG_RESULT([    metapost terminal          : yes])
 else
@@ -1281,8 +1268,8 @@ fi
 
 AC_MSG_RESULT([])
 AC_MSG_RESULT([  Other terminals that can be enabled but have no ./configure option:])
-AC_MSG_RESULT([    eepic, emtex, hp2623a, hp2648, imagen, kyocera, latex, qms, tpic ])
-AC_MSG_RESULT([    pm (makefile.os2), be (BeOS), svga (MSDOS/djgpp), windows])
+AC_MSG_RESULT([    eepic, emtex, hp2623a, hp2648, imagen, kyocera, latex, mif, tpic ])
+AC_MSG_RESULT([    qms, pm (makefile.os2), be (BeOS), svga (MSDOS/djgpp), windows])
 
 dnl These are the most common interactive terminal options
 AC_MSG_RESULT([])

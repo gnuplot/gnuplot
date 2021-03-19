@@ -3287,29 +3287,22 @@ START_HELP(hpgl)
 "?terminal hpgl",
 "?term hpgl",
 "?hpgl",
-" The `hpgl` driver produces HPGL output for devices like the HP7475A plotter.",
+" Syntax:",
+"       set terminal hpgl {<number_of_pens>} {eject}",
+"",
+" The `hpgl` driver produces HPGL output for Hewlett Packard pen plotters",
+" like the HP7475A and many other plotters dating back to the 1970s.",
+" Also, HPGL graphics can be imported by many software packages.",
+" The HPGL command language was largely superseded in later printers by the",
+" PCL command language.  See `set term pcl`.",
+"",
 " There are two options which can be set: the number of pens and `eject`,",
 " which tells the plotter to eject a page when done.  The default is to use 6",
 " pens and not to eject the page when done.",
 "",
 " The international character sets ISO-8859-1 and CP850 are recognized via",
-" `set encoding iso_8859_1` or `set encoding cp850` (see `set encoding` for",
-" details).",
-"",
-" Syntax:",
-"       set terminal hpgl {<number_of_pens>} {eject}",
-"",
-" The selection",
-"",
-"       set terminal hpgl 8 eject",
-"",
-" is equivalent to the previous `hp7550` terminal, and the selection",
-"",
-"       set terminal hpgl 4",
-"",
-" is equivalent to the previous `hp7580b` terminal."
-"",
-" HPGL graphics can be imported by many software packages."
+" `set encoding iso_8859_1` or `set encoding cp850`.",
+""
 END_HELP(hpgl)
 
 START_HELP(pcl5)
@@ -3320,8 +3313,8 @@ START_HELP(pcl5)
 "?terminal pcl5",
 "?term pcl5",
 "?pcl5",
-" The `pcl5` driver supports PCL5e/PCL5c printers.  It (mostly) uses the"
-" HP-GL/2 vector format.",
+" The `pcl5` driver supports Hewlett Packard and other printers from the 1990s",
+" and later.",
 "",
 " Syntax:",
 "       set terminal pcl5 {<mode>} {{no}enhanced}",
@@ -3351,11 +3344,11 @@ START_HELP(pcl5)
 " `nopspoints`, or the same set of point types as provided by the postscript terminal",
 " by specifying `pspoints` (default).",
 "",
-" The `butt` option selects lines with butt ends and mitered joins (default),"
+" The `butt` option selects lines with butt ends and mitered joins (default),",
 " whereas `rounded` selects rounded line ends and joins.",
 "",
-" Line widths, and point and font sizes can be scaled using the `linewidth`,"
-" `pointscale`, or `fontscale` options, respectively."
+" Line widths, and point and font sizes can be scaled using the `linewidth`,",
+" `pointscale`, or `fontscale` options, respectively.",
 "",
 " `color` selects the number of pens <number_of_pens> used in plots.",
 " Default is 8, minimum 2.",
@@ -3379,7 +3372,7 @@ START_HELP(pcl5)
 "",
 " The support for UTF-8 is limited.  Lacking the label mode for UTF-8 output",
 " in HP-GL/2, the driver reverts to PCL for strings containing 8bit characters.",
-" UTF-8 text is limited to angles of 0, 90, 180, and 270 degrees. Also vertical"
+" UTF-8 text is limited to angles of 0, 90, 180, and 270 degrees. Also vertical",
 " alignment might be off depending on the font.",
 "",
 " Some enhanced text features (phantom box, overprinting) require using PCL",
