@@ -18,7 +18,7 @@
  *		incomplete beta function using continued fraction approximation
  *		#ifdef IBETA
  * -	igamma igamma_GL chisq_cdf
- *		incomplete gamma function (positive real domain only)
+ *		regularized lower incomplete gamma function (positive real domain only)
  *		#ifndef HAVE_COMPLEX_FUNCS
  * -	ranf
  *		random number generator
@@ -51,6 +51,9 @@
  * -	incbet incbd incbcf pseries
  *		Normalized incomplete beta function (cephes)
  *		#ifdef IBETA
+ * -	igamc
+ *		Regularized upper incomplete gamma integral (cephes)
+ *		positive real domain only
  * -	synchrotron function F
  *		Chebyshev approximation coefficients from
  *		MacLeod (2000) NuclInstMethPhysRes A443:540-545.
@@ -201,6 +204,7 @@ static double expint(double n, double x);
 static double igamma(double a, double x);
 static double igamma_GL(double a, double x);
 #endif
+static double igamc(double a, double x);
 #ifndef HAVE_LIBCERF
 static double humlik(double x, double y);
 #endif
@@ -729,6 +733,37 @@ void f_igamma(union argument *arg)
 	push(Gcomplex(&a, x, 0.0));
 }
 #endif /* no HAVE_COMPLEX_FUNCS */
+
+/*
+ * uigamma( a, x )
+ */
+void f_uigamma(union argument *arg)
+{
+    struct value a;
+    double x;
+    double arg1;
+
+    (void) arg;				/* avoid -Wunused warning */
+
+    pop(&a);
+    if (a.type == CMPLX && a.v.cmplx_val.imag != 0)
+	int_error(NO_CARET, "this copy of gnuplot does not support complex arguments to uigamma");
+    else
+	x = real(&a);
+
+    pop(&a);
+    if (a.type == CMPLX && a.v.cmplx_val.imag != 0)
+	int_error(NO_CARET, "this copy of gnuplot does not support complex arguments to uigamma");
+    else
+	arg1 = real(&a);
+
+    x = igamc(arg1, x);
+    if (x == -1.0) {
+	undefined = TRUE;
+	push(Ginteger(&a, 0));
+    } else
+	push(Gcomplex(&a, x, 0.0));
+}
 
 void f_gamma(union argument *arg)
 {
@@ -4322,9 +4357,11 @@ static void ikv_temme(double v, double x, double *Iv_p, double *Kv_p)
 
 /* NB: these are log(2**127) and log (2**-128)
  *      but this is very conservative for IEEE math
+ * #define MAXLOG  8.8029691931113054295988
+ * #define MINLOG -8.872283911167299960540
  */
-#define MAXLOG  8.8029691931113054295988
-#define MINLOG -8.872283911167299960540
+#define MAXLOG  708.396418532264106224   /* log(2**1022) */
+#define MINLOG -708.396418532264106224
 
 static double incbd( double a, double b, double x );
 static double incbcf( double a, double b, double x );
@@ -4711,6 +4748,124 @@ pseries( double a, double b, double x )
 /*
  * End of code supporting incbet(a,b,x)
  * ==================== INCBET =====================
+ */
+
+
+/*
+ * ==================== IGAMC =====================
+ * Start of code supporting igamc(a,x)
+ * the regularized upper incomplete gamma integral
+ *
+ * EAM March 2021
+ * modified cephes igam.c to be called from inside gnuplot
+ */
+/*							igamc()
+ *	Complemented incomplete gamma integral
+ *
+ * SYNOPSIS:
+ *
+ * double a, x, y, igamc();
+ *
+ * y = igamc( a, x );
+ *
+ * DESCRIPTION:
+ *
+ * The function is defined by
+ *
+ *
+ *  igamc(a,x)   =   1 - igam(a,x)
+ *
+ *                            inf.
+ *                              -
+ *                     1       | |  -t  a-1
+ *               =   -----     |   e   t   dt.
+ *                    -      | |
+ *                   | (a)    -
+ *                             x
+ *
+ *
+ * In this implementation both arguments must be positive.
+ * The integral is evaluated by either a power series or
+ * continued fraction expansion, depending on the relative
+ * values of a and x.
+ *
+ * ACCURACY:
+ *
+ * Tested at random a, x.
+ *                a         x                      Relative error:
+ * arithmetic   domain   domain     # trials      peak         rms
+ *    IEEE     0.5,100   0,100      200000       1.9e-14     1.7e-15
+ *    IEEE     0.01,0.5  0,100      200000       1.4e-13     1.6e-15
+ */
+/*
+Cephes Math Library Release 2.8:  June, 2000
+Copyright 1985, 1987, 2000 by Stephen L. Moshier
+*/
+
+static double
+igamc( double a, double x )
+{
+    double ans, ax, c, yc, r, t, y, z;
+    double pk, pkm1, pkm2, qk, qkm1, qkm2;
+
+    if( (x < 0) || ( a <= 0) )
+	return( -1.0 );
+
+    if( (x < 1.0) || (x < a) )
+	return( 1.0 - igamma(a, x) );
+
+    ax = a * log(x) - x - LGAMMA(a);
+    if( ax < -MAXLOG )
+	{
+	/* mtherr( "igamc", MTHERR_UNDERFLOW ); */
+	return( 0.0 );
+	}
+    ax = exp(ax);
+
+    /* continued fraction */
+    y = 1.0 - a;
+    z = x + y + 1.0;
+    c = 0.0;
+    pkm2 = 1.0;
+    qkm2 = x;
+    pkm1 = x + 1.0;
+    qkm1 = z * x;
+    ans = pkm1/qkm1;
+
+    do {
+	c += 1.0;
+	y += 1.0;
+	z += 2.0;
+	yc = y * c;
+	pk = pkm1 * z  -  pkm2 * yc;
+	qk = qkm1 * z  -  qkm2 * yc;
+	if( qk != 0 )
+		{
+		r = pk/qk;
+		t = fabs( (ans - r)/r );
+		ans = r;
+		}
+	else
+		t = 1.0;
+	pkm2 = pkm1;
+	pkm1 = pk;
+	qkm2 = qkm1;
+	qkm1 = qk;
+	if( fabs(pk) > big )
+		{
+		pkm2 *= biginv;
+		pkm1 *= biginv;
+		qkm2 *= biginv;
+		qkm1 *= biginv;
+		}
+
+    } while( t > MACHEP );
+
+    return( ans * ax );
+}
+/*
+ * End of code supporting igamc(a,x)
+ * ==================== IGAMC =====================
  */
 
 

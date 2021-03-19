@@ -57,6 +57,8 @@ void f_besin(union argument *x);
 #ifndef HAVE_COMPLEX_FUNCS
 void f_igamma(union argument *x);
 #endif
+void f_uigamma(union argument *x);
+
 double chisq_cdf(int dof, double chisqr);
 
 #ifndef HAVE_LIBCERF

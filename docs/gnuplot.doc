@@ -203,9 +203,11 @@ C
  This version of gnuplot provides a larger set of complex-valued functions and
  updated versions of some functions that were present in earlier versions.
 #start
-#b Updated incomplete gamma function with improved domain and precision.
+#b Updated lower incomplete gamma function with improved domain and precision.
 ## Complex arguments accepted.
 ## See `igamma`.
+#b New upper incomplete gamma function (real arguments only).
+## See `uigamma`.
 #b Updated incomplete beta function with improved domain and precision.
 ## See `ibeta`.
 #b New function for the inverse incomplete gamma function.
@@ -1451,6 +1453,7 @@ Ffigure_E0
 ^<tr>    <td>SynchrotronF(x)</td> <td>real</td> <td> Synchtrotron function F</td></tr>
 ^<tr>    <td>tan(x)</td>    <td>any</td>    <td>tan <i>x</i>, tangent of <i>x</i></td></tr>
 ^<tr>    <td>tanh(x)</td>    <td>any</td>    <td>tanh <i>x</i>, hyperbolic tangent of <i>x</i> in radians</td></tr>
+^<tr>    <td>uigamma(a,x)</td>    <td>real</td>    <td>uigamma(<i>a,x</i>), upper incomplete gamma function <a>a>0</a>,<i>x</i></td></tr>
 ^<tr>    <td>voigt(x,y)</td>    <td>real</td>    <td>convolution of Gaussian and Lorentzian</td></tr>
 ^</tbody>
 ^</table>
@@ -1966,6 +1969,9 @@ C ?expressions functions SynchrotronF
 %tanh(x)@ ~~ @$tanh~x$, hyperbolic tangent of $x$ in radians
  The `tanh(x)` function returns the hyperbolic tangent of its argument.  `tanh`
  expects its argument to be in radians.
+C 4 uigamma
+#uigamma(a,x) & real, real & & upper incompete gamma function $Q(a,x)=\frac{1}{\Gamma(x)}\intop_{x}^{\infty}t^{a-1}e^{-t}dt$ \\
+%uigamma(a,x)@ ~~ @$uigamma (a,x)$, upper incomplete gamma function of ($a$,$x$)
 4 voigt
 ?expressions functions voigt
 ?voigt
@@ -2543,8 +2549,9 @@ C 4 weekdata_cdc
 ?expressions functions igamma
 ?igamma
  `igamma(a, z)` returns the lower incomplete gamma function P(a, z),
- [Abramowitz and Stegun (6.5.1)].  If complex function support is present
- a and z may be complex values; real(a) > 0;
+ [Abramowitz and Stegun (6.5.1); NIST DLMF 8.2.4].  If complex function
+ support is present a and z may be complex values; real(a) > 0;
+ For the complementary upper incomplete gamma function, see `uigamma`.
 
 #TeX \quad\quad igamma$(a,z)=P(a,z) = z^a\gamma^*(a,z)$
 #TeX $=\frac{1}{\Gamma(z)}\intop_{0}^{z}t^{a-1}e^{-t}dt$
@@ -2785,6 +2792,22 @@ C 4 weekdata_cdc
 
  Chebyshev coefficients for approximation accurate to 1.E-15 are taken from
  MacLead (2000) NuclInstMethPhysRes A443:540-545.
+
+4 uigamma
+?expressions functions uigamma
+?uigamma
+ `uigamma(a, x)` returns the regularized upper incomplete gamma function Q(a, x),
+ NIST DLMF eq 8.2.4
+ For the complementary lower incomplete gamma function P(a,x), see`igamma`.
+ Q(a, x) + P(a, x) = 1.
+
+#TeX \quad\quad uigamma$(a,z)=Q(a,x) = 1-P(a,x)$
+#TeX $=\frac{1}{\Gamma(z)}\intop_{x}^{\infty}t^{a-1}e^{-t}dt$
+
+ The current implementation is from the Cephes library (Moshier 2000).
+ The domain is restricted to real a>0, real x>=0.
+ EXPERIMENTAL:
+ To be replaced by an implementation that handles complex arguments.
 
 4 value
 ?expressions functions value

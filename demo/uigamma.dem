@@ -1,0 +1,57 @@
+#
+# Excercise uigamma for large input values
+#
+save_encoding = GPVAL_ENCODING
+set encoding utf8
+
+set title "Upper incomplete gamma function"
+
+set label 1 at graph 0.6, 0.8
+set label 1 "uigamma(a,z) = {Γ^{-1}(a) {/*2 ∫@_{/*0.5 z}^{/*.5 ∞}} {/:Italic t^{a-1}e^{-t}dt}"
+
+set sample 1000
+set xrange [.99 : 1.01]
+set yrange [0:1]
+set tics nomirror
+set border 3 lt 0
+set key bottom left reverse
+set tics tc rgb "black"
+set ytics 1
+
+plot for [N=1:9] uigamma( 10.**N, x*10.**N ) lw 2 \
+         title sprintf("uigamma( 10^{%d}, x*10^{%d})",N,N)
+
+pause -1 "<cr> to continue"
+reset
+
+#
+# Show the need for a separate upper incomplete gamma function Q(a,x)
+# when the region of interest is such that P(a,x), the lower incomplete
+# gamma function, approaches 1 and thus  provides insufficient precision.
+# By definition  P(a,x) + Q(a,x) = 1.0
+# gnuplot provides P(a,x) as igamma
+#                  Q(a,x) as uigamma
+#
+unset key
+set title offset 0, -7
+set pointsize 0.5
+set grid x
+
+set multiplot layout 2,1 upwards margins 0.25, 0.95, 0.1, 0.95 spacing 0, screen .10
+set xrange [83. : 89.]
+set yrange [1. - 2.e-15 : 1.0]
+set format y "%.16f"
+set title "Lower incomplete gamma function:     igamma(23, x)"
+plot igamma(23., x) with points notitle
+
+set format y " %h"
+set auto y
+set yrange reverse
+set title "Upper incomplete gamma function:     uigamma(23,x)"
+plot uigamma(23., x) with points notitle
+
+unset multiplot
+
+pause -1 "<cr> to continue"
+reset
+set encoding save_encoding

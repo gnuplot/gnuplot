@@ -10,7 +10,7 @@ set label 1 at graph 0.1, 0.8
 set label 1 "igamma(a,z) = {Γ^{-1}(a) {/*2 ∫@_{/*0.5 0}^{/*.5 z}} {/:Italic t^{a-1}e^{-t}dt}"
 
 set sample 1000
-set xrange [.98:1.02]
+set xrange [.99 : 1.01]
 set yrange [0:1]
 set tics nomirror
 set border 3 lt 0

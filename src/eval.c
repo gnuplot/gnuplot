@@ -228,6 +228,7 @@ const struct ft_entry ft[] =
 #else
     {"igamma",  f_igamma},	/* Jos van der Woude 1992 */
 #endif
+    {"uigamma",  f_uigamma},	/* upper incomplete gamma */
 
 #ifdef HAVE_LIBCERF
     {"cerf", f_cerf},		/* complex error function */
