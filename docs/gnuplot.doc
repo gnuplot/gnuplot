@@ -2622,7 +2622,7 @@ C 4 weekdata_cdc
 ?expressions functions lnGamma
 ?lnGamma
  lnGamma(z) returns the natural log of the gamma function with complex domain
- and range.  Implemented using 15 term approximation following Lanczos [1964],
+ and range.  Implemented using 14 term approximation following Lanczos [1964],
  SIAM JNA 1:86-96.  The imaginary component of the result is phase-shifted to
  yield a continuous surface everywhere except the negative real axis.
 4 Random number generator

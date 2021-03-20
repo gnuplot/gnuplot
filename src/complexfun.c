@@ -294,7 +294,7 @@ LambertW(complex double z, int k)
  * references
  * C. Lanczos, SIAM JNA  1, 1964. pp. 86-96.
  * J. Spouge,  SIAM JNA 31, 1994. pp. 931.
- * W. Press et al, "Numerical Recipes" Section 6.1.
+ * W. Press et al, "Numerical Recipes 3rd Edition" Section 6.1.
  */
 
 void
@@ -366,7 +366,7 @@ lnGamma( complex double z )
     complex double f;
     int k;
 
-    /* 15 term Lanczos approximation */
+    /* 14 term Lanczos approximation */
     sum = coef[0];
     for (k=1; k<15; k++)
 	sum = sum + coef[k] / (z + k);
