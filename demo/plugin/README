@@ -1,0 +1,17 @@
+ How to build a dynamically loaded library from this source
+ ----------------------------------------------------------
+
+If you are configuringand building gnuplot from the top level of
+the source tree then autoconf/automake will create a Makefile for
+you and "make" should be sufficient.
+
+If you are building _only_ this plugin demo, then under linux
+a minimal build command is
+
+    gcc -shared -lm -o demo_plugin.so demo_plugin.c
+
+You should then be able to try the plugin demo using your
+existing gnuplot executable and the newly-built plugin library.
+
+	- Ethan
+
