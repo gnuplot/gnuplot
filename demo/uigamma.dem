@@ -6,6 +6,13 @@ set encoding utf8
 
 set title "Upper incomplete gamma function"
 
+if (GPVAL_VERSION < 5.5) {
+    uigamma(a,z) = 1.0 - igamma(a,z)
+    set title "Upper incomplete gamma function uigamma(a,z)\n".\
+    "prior to version 5.5 badly approximated as 1. - igamma(a,z)"
+}
+
+
 set label 1 at graph 0.6, 0.8
 set label 1 "uigamma(a,z) = {Γ^{-1}(a) {/*2 ∫@_{/*0.5 z}^{/*.5 ∞}} {/:Italic t^{a-1}e^{-t}dt}"
 

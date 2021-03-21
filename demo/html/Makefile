@@ -21,7 +21,7 @@ index.html: index.save
 animation.html: animation.html.save
 	cp animation.html.save animation.html
 
-special_functions: index.html showcase_plots complex_trig.html cerf.html elliptic.html expint.html ibeta.html igamma.html BesselK.html complex_airy.html Dawson.html Fresnel.html lambert.html lnGamma.html synchrotron.html
+special_functions: index.html showcase_plots complex_trig.html cerf.html elliptic.html expint.html ibeta.html igamma.html BesselK.html complex_airy.html Dawson.html Fresnel.html lambert.html lnGamma.html synchrotron.html uigamma.html
 	cp index.special_functions index.html
 
 circles.html: $(GNUPLOT_LIB)/hidden2.dem ./webify.pl

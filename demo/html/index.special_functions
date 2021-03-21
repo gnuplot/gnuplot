@@ -218,7 +218,8 @@
 	    <li><a href="elliptic.html">elliptic integrals</a></li>
 	    <li><a href="expint.html">exponential integral</a></li>
 	    <li><a href="ibeta.html">Incomplete Beta integral</a></li>
-	    <li><a href="igamma.html">Incomplete Gamma function</a></li>
+	    <li><a href="igamma.html">Incomplete Gamma function P(a,z)</a></li>
+	    <li><a href="uigamma.html">Incomplete Gamma function Q(a,z)</a></li>
 	    <li><a href="BesselK.html">Bessel functions </a></li>
 	    <li><a href="complex_airy.html">Airy functions</a></li>
 	    <li><a href="Dawson.html">Dawson's integral</a></li>
@@ -259,7 +260,7 @@
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated January 2021</i>
+    <i>This page generated March 2021</i>
     </td>
 
     <td>
