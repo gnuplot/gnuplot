@@ -46,8 +46,6 @@
 #include "stdfn.h"
 #include "util.h"
 
-#define ITMAX   200
-
 #ifdef FLT_EPSILON
 # define MACHEPS FLT_EPSILON	/* 1.0E-08 */
 #else
@@ -70,6 +68,14 @@
 
 /* AS239 value for igamma(a,x>=XBIG) = 1.0 */
 #define XBIG    1.0E+08
+
+/*
+ * EAM Mar 2021
+ * Back-port improved igamma function from development version
+ */
+#define IGAMMA_PRECISION 1.E-14
+#define IGAMMA_OVERFLOW  OFLOW
+#define ITMAX            2000
 
 /*
  * Mathematical constants
@@ -125,6 +131,7 @@ static double p1evl(double x, const double coef[], int N);
 static double confrac(double a, double b, double x);
 static double ibeta(double a, double b, double x);
 static double igamma(double a, double x);
+static double igamma_GL(double a, double x);
 static double ranf(struct value * init);
 static double inverse_error_func(double p);
 static double inverse_normal_func(double p);
@@ -991,15 +998,19 @@ confrac(double a, double b, double x)
  *   BUGS      Values 0 <= x <= 1 may lead to inaccurate results.
  *
  *   REFERENCE ALGORITHM AS239  APPL. STATIST. (1988) VOL. 37, NO. 3
+ *   B. L. Shea "Chi-Squared and Incomplete Gamma Integral"
  *
  * Copyright (c) 1992 Jos van der Woude, jvdwoude@hut.nl
  *
  * Note: this function was translated from the Public Domain Fortran
  *       version available from http://lib.stat.cmu.edu/apstat/239
  *
+ * EAM 2020 modified to use Gauss-Legendre quadrature when a and x
+ * are both large.
+ *
  */
 
-double
+static double
 igamma(double a, double x)
 {
     double arg;
@@ -1015,12 +1026,20 @@ igamma(double a, double x)
     /* Deal with special cases */
     if (x == 0.0)
 	return 0.0;
-    if (x > XBIG)
-	return 1.0;
 
     /* Check value of factor arg */
     arg = a * log(x) - x - LGAMMA(a + 1.0);
     arg = gp_exp(arg);
+
+    /* EAM 2020: For large values of a convergence fails.
+     * Use Gauss-Legendre quadrature instead.
+     */
+    if ((a > 100.) && (fabs(x-a)/a < 0.2))
+	return igamma_GL( a, x );
+
+    /* FIXME: This can be relaxed */
+    if (x > XBIG)
+	return 1.0;
 
     /* Choose infinite series or continued fraction. */
 
@@ -1050,7 +1069,7 @@ igamma(double a, double x)
 	    if (pn6 != 0.0) {
 
 		rn = pn5 / pn6;
-		if (fabs(rnold - rn) <= GPMIN(MACHEPS, MACHEPS * rn))
+		if (fabs(rnold - rn) <= GPMIN(IGAMMA_PRECISION, IGAMMA_PRECISION * rn))
 		    return 1.0 - arg * rn * a;
 
 		rnold = rn;
@@ -1061,12 +1080,12 @@ igamma(double a, double x)
 	    pn4 = pn6;
 
 	    /* Re-scale terms in continued fraction if terms are large */
-	    if (fabs(pn5) >= OFLOW) {
+	    if (fabs(pn5) >= IGAMMA_OVERFLOW) {
 
-		pn1 /= OFLOW;
-		pn2 /= OFLOW;
-		pn3 /= OFLOW;
-		pn4 /= OFLOW;
+		pn1 /= IGAMMA_OVERFLOW;
+		pn2 /= IGAMMA_OVERFLOW;
+		pn3 /= IGAMMA_OVERFLOW;
+		pn4 /= IGAMMA_OVERFLOW;
 	    }
 	}
     } else {
@@ -1077,11 +1096,61 @@ igamma(double a, double x)
 	    aa++;
 	    an *= x / aa;
 	    b += an;
-	    if (an < b * MACHEPS)
+	    if (an < b * IGAMMA_PRECISION)
 		return arg * b;
 	}
     }
+
+    /* Convergence failed */
     return -1.0;
+}
+
+/* icomplete gamma function evaluated by Gauss-Legendre quadrature
+ * as recommended for large values of a by Numerical Recipes (Sec 6.2).
+ */
+static double
+igamma_GL( double a, double x )
+{
+    static const double y[18] = {
+    0.0021695375159141994,
+    0.011413521097787704,0.027972308950302116,0.051727015600492421,
+    0.082502225484340941, 0.12007019910960293,0.16415283300752470,
+    0.21442376986779355, 0.27051082840644336, 0.33199876341447887,
+    0.39843234186401943, 0.46931971407375483, 0.54413605556657973,
+    0.62232745288031077, 0.70331500465597174, 0.78649910768313447,
+    0.87126389619061517, 0.95698180152629142 };
+
+    static const double w[18] = {
+    0.0055657196642445571,
+    0.012915947284065419,0.020181515297735382,0.027298621498568734,
+    0.034213810770299537,0.040875750923643261,0.047235083490265582,
+    0.053244713977759692,0.058860144245324798,0.064039797355015485,
+    0.068745323835736408,0.072941885005653087,0.076598410645870640,
+    0.079687828912071670,0.082187266704339706,0.084078218979661945,
+    0.085346685739338721,0.085983275670394821 };
+
+    double xu, t, ans;
+    double a1 = a - 1.0;
+    double lna1 = log(a1);
+    double sqrta1 = sqrt(a1);
+    double sum = 0.0;
+    int j;
+
+    if (x > a - 1.0)
+	xu = GPMAX( a1 + 11.5 * sqrta1,  x + 6.0 * sqrta1 );
+    else
+	xu = GPMIN( a1 - 7.5 * sqrta1, x - 5.0 * sqrta1 );
+    if (xu < 0)
+	xu = 0.0;
+
+    for (j=0; j<18; j++) {
+	t = x + (xu - x) * y[j];
+	sum += w[j] * exp( -(t-a1) + a1 * (log(t) - lna1));
+    }
+
+    ans = sum * (xu-x) * exp( a1 * (lna1-1.) - LGAMMA(a) );
+
+    return (x > a1) ? 1.0 - ans : -ans;
 }
 
 
