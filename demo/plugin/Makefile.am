@@ -12,4 +12,4 @@ demo_plugin_so_LDFLAGS = -shared
 # demo_plugin_so_CFLAGS = -KPIC -I$(top_srcdir)/src
 # demo_plugin_so_LDFLAGS = -G
 
-EXTRA_DIST = plugin.dem
+EXTRA_DIST = plugin.dem README
