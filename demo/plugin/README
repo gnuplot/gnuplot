@@ -1,0 +1,41 @@
+ How to build a dynamically loaded library from this source
+ ----------------------------------------------------------
+
+Source files are included here for two plugin libraries.
+
+demo_plugin.c provides three toy functions just for the purpose
+of running the unit test / demo "plugin.dem".
+
+uigamma_plugin.c provides an implementation of the regularized
+upper incomplete gamma function Q(a,x) [NIST DLMF eq. 8.2.4].
+This code is already built in to gnuplot version 5.5 and later,
+but may be useful to provide this function as a plugin for earlier
+gnuplot versions.
+
+If you are configuring and building gnuplot from the top level of
+the source tree then autoconf/automake will create a Makefile for
+you and "make" should be sufficient to build the demo plugin.
+
+If you are building _only_ this plugin demo, under linux a minimal
+build command is
+
+    gcc -shared -lm -o demo_plugin.so demo_plugin.c
+
+Under Windows + mingw it is
+
+    gcc -shared -lm -o newprogram.dll newprogram.c
+
+An equivalent build command should work for the uigamma plugin or
+one you have created yourself.
+
+    gcc -shared -lm -o uigamma_plugin.so uigamma_plugin.c
+
+Type "help import" in a gnuplot session for examples of how to
+load a function from a plugin library.  The suggested sequence
+of commands for uigamma is
+
+    gnuplot> import Q(a,x) from "uigamma_plugin"
+    gnuplot> uigamma(a,x) = ((x<1 || x<a) ? 1.0-igamma(a,x) : Q(a,x))
+
+	- Ethan
+

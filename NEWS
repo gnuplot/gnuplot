@@ -4,6 +4,7 @@ Changes since 5.4.1
 * NEW define on program entry:   I = sqrt(-1) = {0.,1.}
 * NEW support input data that uses epidemiological date-week formats
 * NEW optional fillcolor for "set key opaque"
+* NEW provide and document use of a plugin to provide uigamma function
 * CHANGE much improved domain and precision for igamma function
 * CHANGE generate only one key entry per multi-dataset input file Bug #2380
 * CHANGE (Windows): attempt to convert unicode on command line to UTF-8

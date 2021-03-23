@@ -12,9 +12,9 @@
  */
 
 #include "gnuplot_plugin.h"
-#include "math.h"
+#include <math.h>
 
-/* This funcstion returns the number of divisors of the first argument */
+/* This function returns the number of divisors of the first argument */
 
 DLLEXPORT struct value divisors(int nargs, struct value *arg, void *p)
 {
