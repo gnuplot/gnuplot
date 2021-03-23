@@ -4036,6 +4036,35 @@ Ffigure_newsyntax
  In `splot`, control over the scales and labels of the axes are the same as
  with `plot` except that there is also a z axis and labeling the x2 and y2 axes
  is possible only for pseudo-2D plots created using `set view map`.
+2 Plugins
+?plugins
+ The set of functions available for plotting or for evaluating expressions
+ can be extended through a plugin mechanism that imports executable functions
+ from a shared library.  For example, gnuplot versions through 5.4 do not
+ provide a built-in implementation of the upper incomplete gamma function
+ Q(a,x).
+#TeX \\ $Q(a,x)=\frac{1}{\Gamma(x)}\intop_{x}^{\infty}t^{a-1}e^{-t}dt$ .\quad\quad
+ You could define an approximation directly in gnuplot like this:
+       Q(a,x) = 1. - igamma(a,x)
+ However this has inherently limited precision as the value of Q approaches 1.
+ If you need a more accurate implementation, it would be better to provide one
+ via a plugin (see below).  Once imported, the function can be used just as any
+ other built-in or user-defined function in gnuplot.
+ See `import`.
+
+ The gnuplot distribution includes source code and instructions for creating
+ a plugin library in the directory demo/plugin.  You can modify the simple
+ example file `demo_plugin.c` by replacing one or more of the toy example
+ functions with an implementation of the function you are interested in.
+ This could include invocation of functions from an external mathematical
+ library.
+
+ The demo/plugin directory also contains source for a plugin that implements
+ Q(a,x). As noted above, this plugin allows earlier versions of gnuplot to
+ provide the same function `uigamma` as the current development version.
+      import Q(a,x) from "uigamma_plugin"
+      uigamma(a,x) = ((x<1 || x<a) ? 1.0-igamma(a,x) : Q(a,x))
+
 2 Start-up (initialization)
 ?startup
 ?start
@@ -6869,6 +6898,7 @@ Ffigure_zerror
 2 import
 ?commands import
 ?import
+=plugins
  The `import` command associates a user-defined function name with a function
  exported by an external shared object.  This constitutes a plugin mechanism
  that extends the set of functions available in gnuplot.
@@ -6890,7 +6920,7 @@ Ffigure_zerror
  ".dll" depending on the operating system, and searches for it first as a full
  path name and then as a path relative to the current directory. The operating
  system itself may also search any directories in LD_LIBRARY_PATH or
- DYLD_LIBRARY_PATH.
+ DYLD_LIBRARY_PATH.  See `plugins`.
 
 2 load
 ?commands load
@@ -17267,13 +17297,6 @@ Ffigure_walls
  "Success" even if there are no *.plt files because `tail` succeeds even if `ls`
  does not.
 
- The system command can be used to import external functions into gnuplot as
- shown below, however this will force creation of a separate subprocess every
- time the function is invoked. For functions that will be invoked many times
- it would be better to import a directly callable subroutine from a shared
- library.  See `import` and `plugin.dem`.
-
-       f(x) = real(system(sprintf("somecommand %f", x)))
 2 test
 ?commands test
 ?test palette
