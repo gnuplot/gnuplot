@@ -559,7 +559,7 @@ extern int current_x11_windowid;
 #define LAYER_BEHIND     -1
 #define LAYER_BACK        0
 #define LAYER_FRONT       1
-#define LAYER_FOREGROUND  2	/* not currently used */
+#define LAYER_FOREGROUND  2	/* used only for axis tic labels */
 #define LAYER_FRONTBACK   4	/* used only by grid walls */
 #define LAYER_DEPTHORDER  8	/* for objects to be included in pm3d depth sorting */
 #define LAYER_PLOT	 16	/* currently used only by fig.trm */

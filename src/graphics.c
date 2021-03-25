@@ -83,6 +83,9 @@ static double largest_polar_circle;
 static double spoke_x0, spoke_y0, spoke_x1, spoke_y1;
 static double spoke_dx, spoke_dy;
 
+/* Used to prevent tic labels from being drawn more than once */
+static int current_layer = 0;
+
 /*}}} */
 
 /* Status information for stacked histogram plots */
@@ -207,15 +210,11 @@ place_grid(int layer)
     term_apply_lp_properties(&border_lp);	/* border linetype */
     largest_polar_circle = 0;
 
-    /* We used to go through this process only once, drawing both the grid lines
-     * and the axis tic labels.  Now we allow for a separate pass that redraws only
-     * the labels if the user has chosen "set tics front".
-     * This guarantees that the axis tic labels lie on top of all grid lines.
-     */
+    /* This suppresses redrawing the grid lines */
     if (layer == LAYER_FOREGROUND)
 	grid_lp.l_type = mgrid_lp.l_type = LT_NODRAW;
 
-    if (!grid_tics_in_front || (layer == LAYER_FOREGROUND)) {
+    if (TRUE) {
 	/* select first mapping */
 	x_axis = FIRST_X_AXIS;
 	y_axis = FIRST_Y_AXIS;
@@ -705,6 +704,7 @@ do_plot(struct curve_points *plots, int pcount)
 	make_palette();
 
     /* Give a chance for background items to be behind everything else */
+    current_layer = LAYER_BEHIND;
     place_pixmaps(LAYER_BEHIND, 2);
     place_objects( first_object, LAYER_BEHIND, 2);
 
@@ -714,6 +714,7 @@ do_plot(struct curve_points *plots, int pcount)
     (term->layer)(TERM_LAYER_BACKTEXT);
 
     /* DRAW TICS AND GRID */
+    current_layer = LAYER_BACK;
     if (grid_layer == LAYER_BACK || grid_layer == LAYER_BEHIND)
 	place_grid(grid_layer);
 
@@ -1068,14 +1069,18 @@ do_plot(struct curve_points *plots, int pcount)
     }
 
     /* DRAW TICS AND GRID */
+    current_layer = LAYER_FRONT;
     if (grid_layer == LAYER_FRONT)
-	place_grid(grid_layer);
+	place_grid(LAYER_FRONT);
+
     if (raxis)
 	place_raxis();
 
     /* Redraw the axis tic labels and tic marks if "set tics front" */
-    if (grid_tics_in_front)
+    if (grid_tics_in_front) {
+	current_layer = LAYER_FOREGROUND;
 	place_grid(LAYER_FOREGROUND);
+    }
 
     /* DRAW ZERO AXES */
     /* redraw after grid so that axes linetypes are on top */
@@ -3549,6 +3554,10 @@ xtick2d_callback(
 	(*t->vector) (x, tic_mirror - ticsize);
     }
 
+    /* If grid_tics_in_front, defer tic labels until LAYER_FOREGROUND */
+    if (grid_tics_in_front && current_layer != LAYER_FOREGROUND)
+	return;
+
     if (text) {
 	/* get offset */
 	double offsetx_d, offsety_d;
@@ -3630,6 +3639,11 @@ ytick2d_callback(
 	(*t->move) (tic_mirror, y);
 	(*t->vector) (tic_mirror - ticsize, y);
     }
+
+    /* If grid_tics_in_front, defer tic labels until LAYER_FOREGROUND */
+    if (grid_tics_in_front && current_layer != LAYER_FOREGROUND)
+	return;
+
     if (text) {
 	/* get offset */
 	double offsetx_d, offsety_d;
@@ -3694,6 +3708,10 @@ ttick_callback(
     }
 
     draw_clip_line(xl, yl, xu, yu);
+
+    /* If grid_tics_in_front, defer tic labels until LAYER_FOREGROUND */
+    if (grid_tics_in_front && current_layer != LAYER_FOREGROUND)
+	return;
 
     if (text && !clip_point(xu, yu)) {
 	if (this_axis->ticdef.textcolor.type != TC_DEFAULT)

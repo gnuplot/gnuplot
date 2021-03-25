@@ -16,6 +16,7 @@ Changes since 5.4.1
 * FIX cairo terminals (Windows): ignore "text scaling" from user screen settings
 * FIX win: instabilities associated with changing window size Bug #2301 #2304
 * FIX clipping of filled polygons that have only 1 or 2 vertices Bug #2400
+* FIX "set tics front" unexpectedly made all grid lines invisible
 
 
 Changes in 5.4.1
