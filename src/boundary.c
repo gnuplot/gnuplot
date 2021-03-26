@@ -501,10 +501,13 @@ boundary(struct curve_points *plots, int count)
 
 	if (plot_bounds.xleft - ytic_width - ytic_textwidth < 0)
 	    plot_bounds.xleft = ytic_width + ytic_textwidth;
-	if (plot_bounds.xleft == t->xmax * xoffset)
-	    plot_bounds.xleft += t->h_char * 2;
+
+	if (plot_bounds.xleft < t->xmax * xoffset + t->h_char * 2)
+	    plot_bounds.xleft = t->xmax * xoffset + t->h_char * 2;
+
 	/* DBT 12-3-98  extra margin just in case */
 	plot_bounds.xleft += 0.5 * t->h_char;
+
     }
     /* Note: we took care of explicit 'set lmargin foo' at line 492 */
 
