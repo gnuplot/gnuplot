@@ -8642,6 +8642,7 @@ Ffigure_zerror
 ?set autoscale noextend
 ?set autoscale keepfix
 ?set autoscale fix
+?autoscale noextend
 ?noextend
 ?keepfix
 ?fix
@@ -12274,9 +12275,12 @@ Ffigure_multiple_keys
 ?show offsets
 ?offsets
 ?nooffsets
- Offsets provide a mechanism to put an empty boundary around the data inside
- an autoscaled graph.  The offsets only affect the x1 and y1 axes, and only in
- 2D `plot` commands.
+ Autoscaling sets the x and y axis ranges to match the coordinates of the data
+ that is plotted.  Offsets provide a mechanism to expand these ranges to leave
+ empty space between the data and the plot borders.  Autoscaling then further
+ extends each range to reach the next axis tic unless this has been suppressed
+ by `set autoscale noextend` or `set xrange noextend`.  See `noextend`.
+ Offsets affect only scaling for the x1 and y1 axes.
 
  Syntax:
        set offsets <left>, <right>, <top>, <bottom>
@@ -12293,18 +12297,15 @@ Ffigure_multiple_keys
  a positive bottom offset makes ymin more negative.  Negative offsets interact
  badly with autoscaling and clipping.
 
- To prevent the auto-scaling from further adjusting your axis ranges, it is
- useful to also specify "set auto fix" or "set xrange noextend".
-
  Example:
-       set auto fix
+       set autoscale noextend
        set offsets graph 0.05, 0, 2, 2
        plot sin(x)
 
- This graph of sin(x) will have a y range [-3:3] because the function
- will be autoscaled to [-1:1] and the vertical offsets are each two.
- The x range will be [-11:10] because the default is [-10:10] and it has
- been expanded to the left by 0.05 of that total range.
+ This graph of sin(x) will have y range [-3:3] because the function will be
+ autoscaled to [-1:1] and the vertical offsets add 2 at each end of the range.
+ The x range will be [-11:10] because the default is [-10:10] and it has been
+ expanded to the left by 0.05 of that total range.
 3 origin
 ?commands set origin
 ?commands show origin
@@ -15207,7 +15208,11 @@ Ffigure_walls
  the plot line will be used for that single `plot` command; a range given by
  a `set` command will be used for all subsequent plots that do not specify
  their own ranges.  The same holds true for `splot`.
-
+4 examples
+?commands set xrange examples
+?set xrange examples
+?set range examples
+?xrange examples
  Examples:
 
  To set the xrange to the default:
@@ -15234,7 +15239,16 @@ Ffigure_walls
 
  Make sure xmin is somewhere between -200 and 100:
        set xrange [-200<*<100:]
-
+4 extend
+?commands set xrange noextend
+?set xrange noextend
+?set range noextend
+?xrange noextend
+?set xrange extend
+?set range extend
+?xrange extend
+ `set xrange noextend` is the same as `set autoscale x noextend`.
+ See `noextend`.
 3 xtics
 ?commands set xtics
 ?commands unset xtics
