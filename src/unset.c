@@ -625,7 +625,6 @@ unset_command()
 	break;
     case S_RAXIS:
 	raxis = FALSE;
-	c_token++;
 	break;
     case S_XZEROAXIS:
 	unset_zeroaxis(FIRST_X_AXIS);
