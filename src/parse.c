@@ -1114,15 +1114,11 @@ parse_link_via( struct udft_entry *udf )
 static void
 parse_sum_expression()
 {
-    /* sum [<var>=<range>] <expr>
-     * - Pass a udf to f_sum (with action code (for <expr>) that is not added
-     *   to the global action table).
-     * - f_sum uses a newly created udv (<var>) to pass the current value of
-     *   <var> to <expr> (resp. its ac).
-     * - The original idea was to treat <expr> as function f(<var>), but there
-     *   was the following problem: Consider 'g(x) = sum [k=1:4] f(k)'. There
-     *   are two dummy variables 'x' and 'k' from different functions 'g' and
-     *   'f' which would require changing the parsing of dummy variables.
+    /* sum [<var>=<start>:<end>] <expr>
+     * - <var> pushed to stack *by name*
+     * - <start> and <end> expressions pushed to stack
+     * - A new action table for <expr> is created and passed to f_sum(arg)
+     *   via arg->udf_arg
      */
 
     char *errormsg = "Expecting 'sum [<var> = <start>:<end>] <expression>'\n";
@@ -1140,10 +1136,7 @@ parse_sum_expression()
     /* <var> */
     if (!isletter(c_token))
 	int_error(c_token, errormsg);
-    /* create a user defined variable and pass it to f_sum via PUSHC, since the
-     * argument of f_sum is already used by the udf */
     m_capture(&varname, c_token, c_token);
-    add_udv(c_token);
     arg = add_action(PUSHC);
     Gstring(&(arg->v_arg), varname);
     c_token++;
@@ -1166,8 +1159,9 @@ parse_sum_expression()
 	int_error(c_token, errormsg);
     c_token++;
 
-    /* parse <expr> and convert it to a new action table. */
-    /* modeled on code from temp_at(). */
+    /* parse <expr> and convert it to a new action table.
+     * modeled on code from temp_at().
+     */
     /* 1. save environment to restart parsing */
     save_at = at;
     save_at_size = at_size;

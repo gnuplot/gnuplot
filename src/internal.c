@@ -238,8 +238,9 @@ f_calln(union argument *x)
 
 /* Evaluate expression   sum [i=beg:end] f(i)
  * Return an integer if f(i) are all integral, complex otherwise.
+ * Save and restore value of i.
  * This is a change from versions 5.0 and 5.2 which always returned
- * a complex value.
+ * a complex value and clobbered the iteration variable.
  */
 void
 f_sum(union argument *arg)
@@ -249,6 +250,7 @@ f_sum(union argument *arg)
     udvt_entry *udv;                /* iteration variable */
     struct value result;            /* accummulated sum */
     struct value f_i;
+    struct value save_i;	    /* previous value of iteration variable */
     int i;
     intgr_t llsum;		    /* integer sum */
     TBOOLEAN integer_terms = TRUE;
@@ -263,9 +265,10 @@ f_sum(union argument *arg)
 
     if (beg.type != INTGR || end.type != INTGR)
 	int_error(NO_CARET, "range specifiers of sum must have integer values");
-    if ((varname.type != STRING) || !(udv = get_udv_by_name(varname.v.string_val)))
-	int_error(NO_CARET, "internal error: lost iteration variable for summation");
+
+    udv = add_udv_by_name(varname.v.string_val);
     gpfree_string(&varname);
+    save_i = udv->udv_value;
 
     udf = arg->udf_arg;
     if (!udf)
@@ -311,6 +314,9 @@ f_sum(union argument *arg)
 	push(Ginteger(&result, llsum));
     else
 	push(&result);
+
+    /* restore original value of iteration variable */
+    udv->udv_value = save_i;
 }
 
 
