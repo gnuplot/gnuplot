@@ -1,7 +1,37 @@
 /* GNUPLOT - complexfun.c */
 
+/*
+ * FILE CONTENTS
+ *
+ * -	BSD 2-clause license covering material in this file
+ *
+ * -	f_Sign
+ *		Sign(z) = z/|z| for complex z
+ *
+ * -	f_LambertW lambert_initial LambertW
+ *		Lambert W function for complex numbers
+ *
+ * -	f_lnGamma lnGamma
+ *		log Gamma for complex argument z
+ *	- 14 term Lancosz approximation
+ *
+ * -	f_Igamma Igamma Igamma_GL Igamma_negative_z Igamma_Poincare
+ *		lower incomplete gamma function P(a, z)
+ * 	- adapted from previous gnuplot real-valued function igamma(a,x)
+ *	- REFERENCE ALGORITHM AS239  APPL. STATIST. (1988) VOL. 37, NO. 3
+ *	  B. L. Shea "Chi-Squared and Incomplete Gamma Integral"
+ *	- Poincaré expansion for large z (not currently used) based on
+ *	  Gil et al (2016) ACM TOMS 43:3 Article 26
+ *	- Coefficients for Gauss-Legendre quadrature used for a > 100
+ *	  Press et al, Numerical Recipes (3rd Ed.) Section 6.2
+ *
+ * -	Riemann_zeta f_zeta
+ *		Riemann zeta function zeta(s) for general complex argument
+ *	polynomial series using	algorithm 3 from Borwein [2000] MR1777614
+ */
+
 /*[
- * Copyright Ethan A Merritt 2019
+ * Copyright Ethan A Merritt 2019-2021
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -41,7 +71,7 @@
 #include <fenv.h>
 #endif
 
-/* 
+/*
  * Various complex functions like cexp may set errno on underflow
  * We would prefer to return 0.0 rather than NaN
  */
@@ -119,14 +149,14 @@ f_Sign(union argument *arg)
  * Lambert W function for complex numbers
  *
  * W(z) is a multi-valued function with the defining property
- *               
+ * 
  *     z = W(z) exp(W(z))   for complex z
  *
- * LambertW( z, k ) is the kth branch of W 
+ * LambertW( z, k ) is the kth branch of W
  *
  * This implementation guided by C++ code by István Mező <istvanmezo81@gmail.com>
  * See also
- *   R. M. Corless, G. H. Gonnet, D. E. G. Hare, D. J. Jeffrey, and D. E. Knuth, 
+ *   R. M. Corless, G. H. Gonnet, D. E. G. Hare, D. J. Jeffrey, and D. E. Knuth,
  *   On the Lambert W function, Adv. Comput. Math. 5 (1996), no. 4, 329–359.
  *   DOI 10.1007/BF02124750.
  */
@@ -441,7 +471,7 @@ f_Igamma(union argument *arg)
  *   REFERENCE ALGORITHM AS239  APPL. STATIST. (1988) VOL. 37, NO. 3
  *   B. L. Shea "Chi-Squared and Incomplete Gamma Integral"
  *
- *   See also: 
+ *   See also:
  *   N. M. Temme (1994)
  *   Probability in the Engineering and Informational Sciences 8: 291-307.
  *
@@ -597,7 +627,7 @@ Igamma(complex double a, complex double z)
     return -1.0;
 }
 
-/* icomplete gamma function evaluated by Gauss-Legendre quadrature
+/* Incomplete gamma function evaluated by Gauss-Legendre quadrature
  * as recommended for large values of a by Numerical Recipes (Sec 6.2).
  */
 static double complex
@@ -735,6 +765,106 @@ Igamma_Poincare(double a, double complex z)
     return t;
 }
 #endif
+
+
+/*
+ * Riemann zeta function
+ *              ∞ 
+ *	ζ(s) =  Σ  1/k^s
+ *             k=1
+ *
+ * This is algorithm 3 from:
+ *
+ * "An Efficient Algorithm for the Riemann Zeta Function",
+ * Peter Borwein [2000] MR1777614,
+ * Canadian Mathematical Society, Conference Proceedings.
+ * See: http://www.cecm.sfu.ca/personal/pborwein/PAPERS/P155.pdf
+ *
+ * Convergence to nominal precision eps is achieved by n terms, where
+ *   n = ln(eps) / -2
+ * Thus eps = 1.e-16 corresponds to n = 18  terms in the series
+ *
+ * From the paper: "These algorithms do not compete with the Riemann-Siegel
+ * formula based algorithms or computations concerning zeros on the critical
+ * line Im(s) = 1/2."
+ *
+ */
+
+complex double
+Riemann_zeta( complex double s )
+{
+    int n = 18;				/* sufficient for IEEE double */
+    complex double two_n = 262144.;	/* 2^n */
+
+    complex double ej_sum, ej_term;
+    complex double ej_sign = 1;
+    complex double sum = 0.;
+    complex double t;
+    int j;
+
+    for (j = 0; j < n; j++) {
+       sum += ej_sign * -two_n / cpow( (complex double)(j + 1), s);
+       ej_sign = -ej_sign;
+    }
+
+    ej_sum = 1;
+    ej_term = 1;
+
+    for (j = n; j <= 2 * n - 1; j++) {
+       sum += ej_sign * (ej_sum - two_n) / cpow( (complex double)(j + 1), s);
+       ej_sign = -ej_sign;
+       ej_term *= 2 * n - j;
+       ej_term /= j - n + 1;
+       ej_sum += ej_term;
+    }
+
+    t = 1. - cpow(2., (1.-s));
+
+    return -sum / (two_n * t);
+}
+
+void
+f_zeta(union argument *arg)
+{
+    struct value result;
+    struct value tmp;
+    struct cmplx z;	/* gnuplot complex parameter z */
+    complex double s;	/* C99 _Complex equivalent */
+
+    pop(&tmp);		/* Complex argument z */
+    if (tmp.type == CMPLX)
+	z = tmp.v.cmplx_val;
+    else {
+	z.real = real(&tmp);
+	z.imag = 0;
+    }
+
+    s = z.real + I*z.imag;
+
+    /* Range limits for IEEE double */
+    if (creal(s) > 55.)
+	s = 1.0;
+    else if (creal(s) < -170.)
+	s = not_a_number();
+
+    else if (creal(s) < 0) {
+	/* Special case trivial zeros at negative even integers */
+	if ((cimag(s) == 0) && (creal(s) == trunc(creal(s)))) {
+	    int is = -trunc(creal(s));
+	    if ((is & 01) == 0) {
+		push(Gcomplex(&result, 0.0, 0.0));
+		return;
+	    }
+	}
+	/* Extend to Real(s)<0 by reflection */
+	s = cpow(2,s) * cpow(M_PI,s-1) * csin(M_PI*s/2) * cexp(lnGamma(1-s)) * Riemann_zeta(1-s);
+
+    /* General case for Real(s) >= 0 */
+    } else
+	s = Riemann_zeta( s );
+
+    push(Gcomplex(&result, creal(s), cimag(s)));
+}
 
 
 #endif /* HAVE_COMPLEX_FUNCS */

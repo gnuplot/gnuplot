@@ -225,6 +225,7 @@ const struct ft_entry ft[] =
     {"LambertW", f_LambertW},	/* Complex W(z,k) */
     {"lnGamma", f_lnGamma},	/* Complex lnGamma(z) */
     {"Sign", f_Sign},		/* Complex sign function */
+    {"zeta", f_zeta},		/* Riemann zeta function */
 #else
     {"igamma",  f_igamma},	/* Jos van der Woude 1992 */
 #endif
