@@ -203,6 +203,7 @@ C
  This version of gnuplot provides a larger set of complex-valued functions and
  updated versions of some functions that were present in earlier versions.
 #start
+#b New: Riemann zeta function with complex domain and range.  See `zeta`.
 #b Updated lower incomplete gamma function with improved domain and precision.
 ## Complex arguments accepted.
 ## See `igamma`.
@@ -240,6 +241,8 @@ C
 #b Complex Airy functions Ai(z), Bi(z).
 #b Complex exponential integral of order n. See `expint`.
 #b Fresnel integrals C(x) and S(x). See `FresnelC`.
+#b Function `VP_fwhm(sigma,gamma)` returns the full width at half maximum
+## of the Voigt profile. See `VP`, `VP_fwhm`.
 #end
 
 4 New plot styles and style options
@@ -287,7 +290,7 @@ C
  The Covid-19 pandemic of 2020/2021 generated increased interest in plotting
  epidemiological data, which is often tabulated using a "week date" reporting
  convention.  This revealed deficiencies with gnuplot support for this
- convention, including errors in time formats %W and %U.  This have now been
+ convention, including errors in time formats %W and %U.  These have now been
  remedied and support for week-date time extended.
 #start
 #b Time specifier format %W has been brought into accord with the
@@ -309,8 +312,6 @@ C
 ## "plot FOO using 0:(column($# - 1))" plots the last-but-one field of each row.
 #b Function `palette(z)` returns the RGB palette color for z in cbrange. 
 #b Function `rgbcolor("name")` returns the 32bit ARGB value for a named color.
-#b Function `VP_fwhm(sigma,gamma)` returns the full width at half maximum
-## of the Voigt profile. See `VP`, `VP_fwhm`, `libcerf`.
 #b Support XDG base directory for gnuplotrc configuration preferences.
 ## Reads initialization commands from $HOME/.config/gnuplot/gnuplotrc if present.
 ## See `environment`.
@@ -1455,6 +1456,7 @@ Ffigure_E0
 ^<tr>    <td>tanh(x)</td>    <td>any</td>    <td>tanh <i>x</i>, hyperbolic tangent of <i>x</i> in radians</td></tr>
 ^<tr>    <td>uigamma(a,x)</td>    <td>real</td>    <td>uigamma(<i>a,x</i>), upper incomplete gamma function <a>a>0</a>,<i>x</i></td></tr>
 ^<tr>    <td>voigt(x,y)</td>    <td>real</td>    <td>convolution of Gaussian and Lorentzian</td></tr>
+^<tr>    <td>zeta(s)</td>    <td>any</td>    <td>Riemann zeta function </td></tr>
 ^</tbody>
 ^</table>
 
@@ -1983,6 +1985,9 @@ C 4 uigamma
  one part in 10^4.  If the libcerf library is available, the re_w_of_z()
  routine is used to provide a more accurate value.
  Note that voigt(x,y) = real(faddeeva( x + y*{0,1} )).
+C 4 zeta
+#zeta(s) & complex & \gpCX & Riemann zeta function $\zeta(s) = \Sigma^{\infty}_{k=1} k^{-s}$\\
+%zeta(s)@complex@Riemann zeta function
 #\hline \end{longtable}
 #%% begin dummy tabular because the @end processing wants to end one
 #\begin{tabular}{|lcl|}
@@ -2669,6 +2674,19 @@ C 4 weekdata_cdc
  The complex exponential integral is provided by netlib or libamos but not by
  libopenspecfun.  See `expint`.
 
+4 Synchrotron function
+?expressions functions SynchrotronF
+?SynchrotronF
+ The synchrotron function SynchrotronF(x) describes the power distribution
+ spectrum of synchrotron radiation as a function of x given in units of the
+ critical photon energy (i.e. critical frequency vc).
+
+#TeX \quad\quad $F(x) = x\intop_{x}^{\infty}K_{\nicefrac{5}{3}}(\nu)~d\nu$
+#TeX where $K_{\nicefrac{5}{3}}$ is a modified Bessel function of the second kind.
+
+ Chebyshev coefficients for approximation accurate to 1.E-15 are taken from
+ MacLead (2000) NuclInstMethPhysRes A443:540-545.
+
 4 Time functions
 5 time
 ?expressions functions time
@@ -2779,20 +2797,6 @@ C 4 weekdata_cdc
  omitted, the time returned is the start of the week.
  See `tm_week` and `weekdate_iso`.
 
-
-4 Synchrotron function
-?expressions functions SynchrotronF
-?SynchrotronF
- The synchrotron function SynchrotronF(x) describes the power distribution
- spectrum of synchrotron radiation as a function of x given in units of the
- critical photon energy (i.e. critical frequency vc).
-
-#TeX \quad\quad $F(x) = x\intop_{x}^{\infty}K_{\nicefrac{5}{3}}(\nu)~d\nu$
-#TeX where $K_{\nicefrac{5}{3}}$ is a modified Bessel function of the second kind.
-
- Chebyshev coefficients for approximation accurate to 1.E-15 are taken from
- MacLead (2000) NuclInstMethPhysRes A443:540-545.
-
 4 uigamma
 ?expressions functions uigamma
 ?uigamma
@@ -2852,6 +2856,19 @@ C 4 weekdata_cdc
  and trailing whitespace.  This is useful for string comparisons of input
  data fields that may contain extra whitespace. For example
       plot FOO using 1:( trim(strcol(3)) eq "A" ? $2 : NaN )
+
+4 zeta
+?expressions functions zeta
+?zeta
+?Riemann
+ zeta(s) is the Riemann zeta function with complex domain and range.
+#TeX \quad\quad $\zeta(s) = \Sigma^{\infty}_{k=1}k^{-s}$
+
+ This implementation uses the polynomial series described in algorithm 3 of
+ P. Borwein [2000] Canadian Mathematical Society Conference Proceedings.
+ The nominal precision is 1.e-16 over the complex plane.  However note that
+ this does not guarantee that non-trivial zeros of the zeta function will
+ evaluate exactly to 0.
 
 3 Operators
 ?expressions operators
