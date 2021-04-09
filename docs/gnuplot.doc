@@ -2861,7 +2861,6 @@ C 4 weekdata_cdc
  complex arguments, unless otherwise noted.  The ** operator (exponentiation)
  is supported, as in FORTRAN.
 
- Parentheses may be used to change order of evaluation.
 4 Unary
 ?expressions operators unary
 ?operators unary

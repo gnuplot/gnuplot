@@ -3294,7 +3294,7 @@ START_HELP(hpgl)
 " like the HP7475A and many other plotters dating back to the 1970s.",
 " Also, HPGL graphics can be imported by many software packages.",
 " The HPGL command language was largely superseded in later printers by the",
-" PCL command language.  See `set term pcl`.",
+" PCL command language.  See `set term pcl5`.",
 "",
 " There are two options which can be set: the number of pens and `eject`,",
 " which tells the plotter to eject a page when done.  The default is to use 6",
