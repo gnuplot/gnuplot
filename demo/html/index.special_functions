@@ -206,7 +206,7 @@
 	</tr>
 
 	<tr valign=top>
-	<td align=center width=500 style="border-style: double none none none; border-color:#006600;">
+	<td width=500 style="border-style: double none none none; border-color:#006600;">
 	    <h4 align=left>Complex Functions and Special Functions</h4>
 	    <a href="BesselK.html">
 		<img src="BesselK.4.png" width="250" align=right>

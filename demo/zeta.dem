@@ -63,7 +63,7 @@ set cblabel "Phase Angle"
 set cblabel  offset -1, 0, 0  rotate
 set cbrange [ -3.14159 : 3.14159 ] noreverse writeback
 set cbtics   ("-π" -pi, "+π" pi)
-set pm3d corners2color c1
+set pm3d interp 1,1 nolighting corners2color c1
 set palette color model HSV defined ( 0 0 1 1, 1 1 1 1 )
 
 splot arg( zeta(x + I*y) ) with pm3d title "arg(ζ(s))"
@@ -71,6 +71,7 @@ pause -1 "<cr> to continue"
 
 unset colorbox
 set palette cubehelix negative
+set pm3d lighting specular 0.1
 set yrange [-10:50]
 set xrange [-3:3]
 set zrange [0:4]
