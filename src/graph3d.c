@@ -802,11 +802,12 @@ do_3dplot(
     if (splot_map) {
 	AXIS *X = &axis_array[FIRST_X_AXIS];
 	AXIS *Y = &axis_array[FIRST_Y_AXIS];
+	AXIS *Z = &axis_array[FIRST_Z_AXIS];
 	int xl, xr, yb, yt;
-	map3d_xy(X->min, Y->min, 0.0, &xl, &yb);
-	map3d_xy(X->max, Y->max, 0.0, &xr, &yt);
-	axis_set_scale_and_range(&axis_array[FIRST_X_AXIS], xl, xr);
-	axis_set_scale_and_range(&axis_array[FIRST_Y_AXIS], yb, yt);
+	map3d_xy(X->min, Y->min, Z->min, &xl, &yb);
+	map3d_xy(X->max, Y->max, Z->min, &xr, &yt);
+	axis_set_scale_and_range(X, xl, xr);
+	axis_set_scale_and_range(Y, yb, yt);
     }
 
     /* Initialize palette */
