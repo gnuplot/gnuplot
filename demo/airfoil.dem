@@ -152,8 +152,8 @@ set timestamp
 set yrange [-.2 : 1.8]
 set trange [0: 2*pi]
 set xrange [-.6:.6]
-zeta(t) = -eps + (a+eps)*exp(t*{0,1})
-eta(t) = zeta(t) + a*a/zeta(t)
+Zeta(t) = -eps + (a+eps)*exp(t*{0,1})
+eta(t) = Zeta(t) + a*a/Zeta(t)
 eps = 0.06
 a =.250
 set xlabel "eps = 0.06 real"
