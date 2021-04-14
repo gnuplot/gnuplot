@@ -3060,11 +3060,12 @@ df_set_key_title(struct curve_points *plot)
     if (plot->title_is_suppressed)
 	return;
 
-    /* Note: I think we can only get here for histogram labels */
-    free(plot->title);
-    plot->title = df_key_title;
-    df_key_title = NULL;
-    plot->title_no_enhanced = !keyT.enhanced;
+    /* Do not replace a title that was explicitly given in the plot command */
+    if (plot->title == NULL) {
+	plot->title = df_key_title;
+	df_key_title = NULL;
+	plot->title_no_enhanced = !keyT.enhanced;
+    }
 }
 
 /*
