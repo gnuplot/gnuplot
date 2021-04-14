@@ -549,6 +549,7 @@ set output out . 'figure_histerrorbar' . ext
 set title "Histogram with error bars" offset 0,-1
 set style fill solid border -1
 set style histogram errorbars lw 2
+set datafile separator tab columnhead
 plot demo . 'histerror.dat' using 2:3 fs solid 0.5 ti 'A', '' using 4:5 fs empty ti 'B'
 #
 set output out . 'figure_histrows' . ext

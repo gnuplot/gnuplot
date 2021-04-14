@@ -34,6 +34,7 @@ on mouse-coordinate tracking.
     <li><a href="candlesticks.html">candlesticks</a></li>
     <li><a href="errorbars.html">error bars</a></li>
     <li><a href="histograms.html">histograms</a> (<a href="histograms2.html">more</a>)</li>
+    <li><a href="histerror.html">histogram + errorbars</a></li>
     <li><a href="boxclusters.html">bar graphs</a>
     <li><a href="steps.html">step functions</a></li>
     <li><a href="multiaxis.html">multiple axis scales</a></li>
@@ -227,7 +228,7 @@ on mouse-coordinate tracking.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated October 2020</i>
+    <i>This page generated April 2021</i>
     </td>
 
     <td>
