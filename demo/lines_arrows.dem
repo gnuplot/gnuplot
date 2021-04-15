@@ -87,6 +87,22 @@ plot '+' using 1:(cos(x-1.))  with line lt -1 lw 1 title 'lw 1',  \
      '+' using 1:(cos(x-.6))  lt -1 pi -5 pt "☺" title 'pi -5', \
      '+' using 1:(cos(x+.2))  with line lt -1 lw 2 title 'lw 2'
 
+#
+pause -1 "Hit return to continue"
+
+set title "The pointnumber property is similar, but limits the total number of points"
+set style data linespoints
+set pointintervalbox 1.5
+unset xlabel
+myencoding = GPVAL_ENCODING
+set encoding utf8
+
+plot '+' using 1:(cos(x-1.))  with line lt -1 lc "blue" lw 2 title 'lines only',  \
+     '+' using 1:(cos(x-.8))  lt -1 pt 6 title 'linespoints default',\
+     '+' using 1:(cos(x-.6))  lt -1 pn -32 pt "✲" title 'pn 32',\
+     '+' using 1:(cos(x-.4))  lt -1 pn -8 pt "D" title 'pn 8',  \
+     '+' using 1:(cos(x-.2))  lt -1 pn -4 pt "C" title 'pn 4'
+
 pause -1 "Hit return to continue"
 
 set encoding myencoding
