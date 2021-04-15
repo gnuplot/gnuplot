@@ -328,6 +328,10 @@ print "********************** file vector.dem *********************"
 load "vector.dem"
 reset
 
+print "********************** file arrows.dem *********************"
+load "arrows.dem"
+reset
+
 print "********************** file short_vector.dem *********************"
 load "short_vector.dem"
 reset
