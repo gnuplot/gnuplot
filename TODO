@@ -13,6 +13,8 @@ DOCUMENTATION:
  -- More figures in the manual
  -- We no longer have a working build path for HTML documentation.
     Is there a suitable replacement?
+ -- The LaTeX tutorial is so out of date that it is useless.
+    Update or replace.
 
 PLATFORMS:
 ==========
@@ -45,8 +47,8 @@ Note: use
 => "Feature request" for feature requests.
 
 
-Lars' list
-==========
+Lars' list from way back when
+=============================
 
 - provide library of replacement functions instead of stdfn.c
 - completely rewrite the parser. Use yacc/bison if possible.
@@ -63,8 +65,7 @@ Lars' list
 - add more maintainer checks (eg. file permissions)
 - better documentation format; get rid of the doc2xxx utils
   [SGML. SGML. SGML]
-- tilde and variable expansion to be done by 
-  gp_fopen() - to be implemented
+- tilde and variable expansion to be done by a shared routine gp_fopen()
 
 HBB:
 ===
@@ -72,23 +73,14 @@ HBB:
 [Optional:] See if 16-bit compilations can be made to work again.
 
 
-Ethan's list of ideas for development series 5.3
+Ethan's list of ideas for development series 5.5
 ================================================
 
 Code cleanup
 ------------
-- remove all the original axis_log/delog macros
-- other obsolete macros?  HUGE? GPFAR?  MSDOS remnants?
 - refactor VMS conditionals so that all the code is in vms.c
-- use libm Bessel functions j0, j1, y0, y1, jn, yn if present
-  rather than the hard-coded ones in standard.c
-  NB: the ones in standard.c claim accuracy to 1e-13
-      the libm man page for j0 claims accuracy to 2e-16
-- Other libm functions?
 - matrix data should be stored as (double) not (float)
 - audit all FIXMEs, some must be out of date
-- further optimization of STORE_WITH_LOG_AND_UPDATE_RANGE
-  to increase speed and reduce code size
 
 Build system options
 --------------------
@@ -99,15 +91,28 @@ Build system options
 Terminals
 ---------
 - canvas terminal overhaul (use browser's font support)
-- gnuplot enhanced text --> LeTeX conversion
 - possible updates for
   dxy aquaterm 
+- outboard driver for wxt
+- libgd routines are used for core operations such as
+  "binary filetype=xxx" and pixmap.  Can these alternatively use cairo
+  or libpng instead, removing a dependence on libgd?
+  Direct use of libpng would allow input of 16bit or 32bit png data
+  without loss of precision (cairo and libgd only keep 8 bits on input).
+- webp animation (including yuv color space for better compression)
 
 Fitting
 -------
 - Patch #655 (Bastian Maerkisch) additional fit algorithms
+- Handle complex-valued functions
 
-Ideas for core extensions
--------------------------
-- 64-bit integer arithmetic
-- isosurfaces (3D contour of 4D data)
+Math
+----
+- improved support for special functions.
+  Better precision, extension to complex values wherever possible,
+  document algorithms used with citations and expected precision.
+- specfun.c has many lines of initializing constants for floating
+  point math on platforms that are no longer supported. Delete them?
+- consistent handling of NaN, +Inf, -Inf, and underflow.
+- Savitzky-Golay filtering
+
