@@ -265,30 +265,30 @@ edf_filetype_function(void)
 #define GD_PNG 1
 #define GD_GIF 2
 #define GD_JPEG 3
-void gd_filetype_function(int filetype);
+void gd_filetype_function(int filetype, char *filename);
 
 void
 png_filetype_function(void)
 {
-    gd_filetype_function(GD_PNG);
+    gd_filetype_function(GD_PNG, df_filename);
 }
 
 void
 gif_filetype_function(void)
 {
-    gd_filetype_function(GD_GIF);
+    gd_filetype_function(GD_GIF, df_filename);
 }
 
 void
 jpeg_filetype_function(void)
 {
-    gd_filetype_function(GD_JPEG);
+    gd_filetype_function(GD_JPEG, df_filename);
 }
 
 #ifndef HAVE_GD_PNG
 
 void
-gd_filetype_function(int type)
+gd_filetype_function(int type, char *filename)
 {
     int_error(NO_CARET, "This copy of gnuplot cannot read png/gif/jpeg images");
 }
@@ -309,7 +309,7 @@ df_read_pixmap( t_pixmap *pixmap )
 static gdImagePtr im = NULL;
 
 void
-gd_filetype_function(int filetype)
+gd_filetype_function(int filetype, char *filename)
 {
     FILE *fp;
     unsigned int M, N;
@@ -321,9 +321,9 @@ gd_filetype_function(int filetype)
     }
 
     /* read image into memory */
-    fp = loadpath_fopen(df_filename, "rb");
+    fp = loadpath_fopen(filename, "rb");
     if (!fp)
-	int_error(NO_CARET, "Can't open data file \"%s\"", df_filename);
+	int_error(NO_CARET, "Can't open data file \"%s\"", filename);
     
     switch(filetype) {
 	case GD_PNG:	im = gdImageCreateFromPng(fp); break;
@@ -341,7 +341,7 @@ gd_filetype_function(int filetype)
     fclose(fp);
     
     if (!im)
-	int_error(NO_CARET, "libgd doesn't recognize the format of \"%s\"", df_filename);
+	int_error(NO_CARET, "libgd doesn't recognize the format of \"%s\"", filename);
 
     /* check on image properties and complain if we can't handle them */
     M = im->sx;
@@ -423,9 +423,7 @@ df_read_pixmap( t_pixmap *pixmap )
     df_add_binary_records(1, DF_CURRENT_RECORDS);
 
     /* Open file and allocate space for image data */
-    df_filename = (char *) pixmap->filename;
-    gd_filetype_function(filetype);
-    df_filename = NULL;
+    gd_filetype_function(filetype, pixmap->filename);
     pixmap->ncols = df_bin_record[0].scan_dim[0];
     pixmap->nrows = df_bin_record[0].scan_dim[1];
     pixmap->image_data = gp_realloc( pixmap->image_data,

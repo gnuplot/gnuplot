@@ -88,6 +88,7 @@ write_png_image (unsigned m, unsigned n, coordval *image, t_imagecolor color_mod
   cairo_surface_t *image_surface;
   cairo_status_t cairo_stat;
   unsigned int *image255;
+  int retval = 0;
 
   image255 = gp_cairo_helper_coordval_to_chars(image, m, n, color_mode);
   image_surface = cairo_image_surface_create_for_data((unsigned char*) image255, CAIRO_FORMAT_ARGB32, m, n, 4*m);
@@ -95,9 +96,12 @@ write_png_image (unsigned m, unsigned n, coordval *image, t_imagecolor color_mod
   cairo_surface_destroy(image_surface);
   if (cairo_stat != CAIRO_STATUS_SUCCESS) {
     int_warn(NO_CARET, "write_png_image cairo: could not write image file '%s': %s.", filename, cairo_status_to_string(cairo_stat));
-    return 1;
+    retval = 1;
   } else
-    return 0;
+    retval = 0;
+
+  free(image255);
+  return retval;
 }
 
 cairo_status_t
@@ -133,6 +137,7 @@ write_png_base64_image (unsigned m, unsigned n, coordval *image, t_imagecolor co
     retval = piecemeal_write_base64_data_finish (b64);
 
   free(b64);
+  free(image255);
 
   return retval;
 }
