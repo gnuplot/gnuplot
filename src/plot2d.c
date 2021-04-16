@@ -3449,6 +3449,8 @@ eval_plots()
 		/* used below */
 		tp_ptr = &(this_plot->next);
 		this_plot = this_plot->next;
+		if (!this_plot)
+		    break;
 	    }
 
 	    if (in_parametric) {
