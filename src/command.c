@@ -2064,6 +2064,17 @@ print_set_output(char *name, TBOOLEAN datablock, TBOOLEAN append_p)
 	    return;
 	}
     } else {
+	/* Make sure we will not overwrite the current input. */
+	LFS *frame = lf_head;
+	for (frame = lf_head; frame; frame = frame->prev) {
+	    FPRINTF((stderr,"Comparing %s to %s\n", name, frame->name));
+	    if (!strcmp(name, frame->name)) {
+		free(name);
+		int_error(NO_CARET, "Attempt to set print output to overwrite input %s",
+			frame->name);
+	    }
+	}
+
 	print_out_var = add_udv_by_name(name);
 	if (!append_p)
 	    gpfree_datablock(&print_out_var->udv_value);
