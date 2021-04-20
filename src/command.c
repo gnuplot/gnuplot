@@ -382,44 +382,39 @@ com_line()
 int
 do_line()
 {
-    /* Line continuation has already been handled by read_line() */
-    char *inlptr;
-
-    /* Expand any string variables in the current input line */
+    /* Line continuation has already been handled by read_line().
+     * Expand any string variables in the current input line.
+     */
     string_expand_macros();
 
-    /* Skip leading whitespace */
-    inlptr = gp_input_line;
-    while (isspace((unsigned char) *inlptr))
-	inlptr++;
+    /* Remove leading whitespace */
+    {
+	char *inlptr = gp_input_line;
+	while (isspace((unsigned char) *inlptr))
+	    inlptr++;
+	if (inlptr != gp_input_line) {
+	    memmove(gp_input_line, inlptr, strlen(inlptr));
+	    gp_input_line[strlen(inlptr)] = NUL;
+	}
+    }
 
     /* Leading '!' indicates a shell command that bypasses normal gnuplot
      * tokenization and parsing.  This doesn't work inside a bracketed clause.
      */
-    if (is_system(*inlptr)) {
-	do_system(inlptr + 1);
+    if (is_system(*gp_input_line)) {
+	do_system(gp_input_line + 1);
 	return (0);
     }
 
     /* Strip off trailing comment */
-    FPRINTF((stderr,"doline( \"%s\" )\n", gp_input_line));
-    if (strchr(inlptr, '#')) {
+    if (strchr(gp_input_line, '#')) {
 	num_tokens = scanner(&gp_input_line, &gp_input_line_len);
 	if (gp_input_line[token[num_tokens].start_index] == '#')
 	    gp_input_line[token[num_tokens].start_index] = NUL;
     }
 
-    if (inlptr != gp_input_line) {
-	/* If there was leading whitespace, copy the actual
-	 * command string to the front. use memmove() because
-	 * source and target may overlap */
-	memmove(gp_input_line, inlptr, strlen(inlptr));
-	/* Terminate resulting string */
-	gp_input_line[strlen(inlptr)] = NUL;
-    }
-    FPRINTF((stderr, "  echo: \"%s\"\n", gp_input_line));
-
     if_depth = 0;
+
     num_tokens = scanner(&gp_input_line, &gp_input_line_len);
 
     /*
