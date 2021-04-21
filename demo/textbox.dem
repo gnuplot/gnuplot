@@ -4,6 +4,7 @@ set xrange [ -0.50 : 12.00 ]
 set yrange [ 30.00 : 110.0 ]
 unset ylabel
 set bmargin  3
+set border back
 unset key
 
 

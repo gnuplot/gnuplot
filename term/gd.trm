@@ -2262,22 +2262,11 @@ ENHGD_boxed_text(unsigned int x, unsigned int y, int option)
 	break;
     case TEXTBOX_OUTLINE:
 	/* Stroke the outline of the bounding box for previous text */
-	gdImageLine(png_state.image,
-		bounding_box[0]-bounding_xmargin, bounding_box[1]-bounding_ymargin,
-	 	bounding_box[0]-bounding_xmargin, bounding_box[3]+bounding_ymargin,
-		png_state.color);
-	gdImageLine(png_state.image,
-		bounding_box[0]-bounding_xmargin, bounding_box[3]+bounding_ymargin,
-		bounding_box[2]+bounding_xmargin, bounding_box[3]+bounding_ymargin,
-		png_state.color);
-	gdImageLine(png_state.image,
-		bounding_box[2]+bounding_xmargin, bounding_box[3]+bounding_ymargin,
-		bounding_box[2]+bounding_xmargin, bounding_box[1]-bounding_ymargin,
-		png_state.color);
-	gdImageLine(png_state.image,
-		bounding_box[2]+bounding_xmargin, bounding_box[1]-bounding_ymargin,
-		bounding_box[0]-bounding_xmargin, bounding_box[1]-bounding_ymargin,
-		png_state.color);
+	PNG_move  (bounding_box[0]-bounding_xmargin, Y(bounding_box[1]-bounding_ymargin));
+	PNG_vector(bounding_box[0]-bounding_xmargin, Y(bounding_box[3]+bounding_ymargin));
+	PNG_vector(bounding_box[2]+bounding_xmargin, Y(bounding_box[3]+bounding_ymargin));
+	PNG_vector(bounding_box[2]+bounding_xmargin, Y(bounding_box[1]-bounding_ymargin));
+	PNG_vector(bounding_box[0]-bounding_xmargin, Y(bounding_box[1]-bounding_ymargin));
 	break;
     case TEXTBOX_BACKGROUNDFILL:
 	/* Fill the box with current color. */
