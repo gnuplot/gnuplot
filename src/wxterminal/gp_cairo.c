@@ -1793,7 +1793,7 @@ void gp_cairo_boxed_text(plot_struct *plot, int x, int y, int option)
 		    cairo_fill(plot->cr);
 		} else {  /* option == TEXTBOX_OUTLINE */
 		    cairo_set_line_width(plot->cr,
-					 0.5*plot->linewidth*plot->oversampling_scale);
+					 plot->linewidth*plot->oversampling_scale);
 		    cairo_set_source_rgba(plot->cr, plot->color.r, plot->color.g,
 					  plot->color.b, 1. - plot->color.alpha);
 		    cairo_stroke(plot->cr);

@@ -2359,6 +2359,7 @@ exec_cmd(plot_struct *plot, char *command)
 		    boxing = TRUE;
 		    return;
 	case 'B':	/* Draw text bounding box */
+		    XSetLineAttributes(dpy, gc, plot->user_width, plot->type, CapProjecting, JoinBevel);
 		    bb[0] = bounding_box[0] - box_xmargin;
 		    bb[1] = bounding_box[1] - box_ymargin;
 		    bb[2] = bounding_box[2] + box_xmargin;
