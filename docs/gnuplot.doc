@@ -194,12 +194,18 @@ C
 ?new version_5.5
 ?new
 ?development version
+?version
  Version 5.5 is the current development version, built from a snapshot of the
  source files in the master branch of the git repository. New features
  introduced here will generally not appear in a supported release until
  version 5.6.  Details may change before that.
 
+ For a summary of new features in version 5.5 see `new`.
+ For more information about options present in this particular copy of gnuplot
+ see `show version long`.
+
 4 Special and complex-valued functions
+?new math
  This version of gnuplot provides a larger set of complex-valued functions and
  updated versions of some functions that were present in earlier versions.
 #start
@@ -264,7 +270,7 @@ C
 #end
 
 4 Multiple named palettes
-?new multiple_palettes
+?new colormaps
 #start
 #b The current palette can be saved to a named colormap for future use.
 ## See `set colormap`.
@@ -277,6 +283,7 @@ C
 #end
 
 4 New terminals and terminal options
+?new terminals
 #start
 #b New terminal `block` for text-mode pseudo-graphics uses Unicode
 ## block or Braille characters to offer improved resolution compared
@@ -287,6 +294,7 @@ C
 #end
 
 4 Week-date time support
+?new week-date time
  The Covid-19 pandemic of 2020/2021 generated increased interest in plotting
  epidemiological data, which is often tabulated using a "week date" reporting
  convention.  This revealed deficiencies with gnuplot support for this
@@ -322,8 +330,8 @@ C
 #end
 
 3 Features introduced in version 5.4
-?new version_5.4
 4 Support for 64-bit integer arithmetic
+?version_5.4
  New features in 5.4
 #start
 #b All evaluation of expressions and functions uses 64-integer arithmetic if
@@ -471,7 +479,6 @@ C
 #end
 
 3 Features introduced in version 5.2
-?new version_5.2
 4 New plot styles and style options
 #start
 #b 3D plot style `with zerrorfill`. See `zerrorfill`, `fenceplots` and
@@ -15339,6 +15346,7 @@ Ffigure_multiple_keys
  pseudofile "++". See `sampling 2D`.
 3 version
 ?show version
+?show version long
  The `show version` command lists the version of gnuplot being run, its last
  modification date, the copyright holders, and email addresses for the FAQ,
  the gnuplot-info mailing list, and reporting bugs--in short, the information
@@ -15347,9 +15355,8 @@ Ffigure_multiple_keys
  Syntax:
        show version {long}
 
- When the `long` option is given, it also lists the operating system, the
- compilation options used when `gnuplot` was installed, the location of the
- help file, and (again) the useful email addresses.
+ Show version `long` also lists the operating system, configuration and
+ compilation options used when this copy of `gnuplot` was built.
 3 vgrid
 ?commands set vgrid
 ?set vgrid
