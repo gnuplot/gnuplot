@@ -2074,6 +2074,7 @@ ENHX11_put_text(unsigned int x, unsigned int y, const char *str)
 {
     char *original_string = (char *)str;
     static char *initial_font = NULL;
+    char *fontcopy = NULL;
     double firstpass_fontsize = X11_default_fontsize;
     int pass = 1;
 
@@ -2111,7 +2112,6 @@ ENHX11_put_text(unsigned int x, unsigned int y, const char *str)
 PASS2:
 
     /* Make sure that we start out using the intended font.  	*/
-    /*	ENHx11_font = "DEFAULT";	This broke!		*/
 	ENHx11_font = "";
 	if (*X11_next_font_used) {
 	    int sep = strcspn(X11_next_font_used,",");
@@ -2130,8 +2130,9 @@ PASS2:
      * closing brace in the string. We increment past it (else
      * we get stuck in an infinite loop) and try again.
      */
+    fontcopy = strdup(ENHx11_font);
     while (*(str = enhanced_recursion((char *)str, TRUE,
-			ENHx11_font, firstpass_fontsize,
+			fontcopy, firstpass_fontsize,
 			0.0, TRUE, TRUE, 0))) {
 	(term->enhanced_flush)();
 
@@ -2143,6 +2144,7 @@ PASS2:
 
 	/* else carry on and process the rest of the string */
     }
+    free(fontcopy);
     X11_set_font("");
 
     /* Restore text justification flag after 2nd pass */
