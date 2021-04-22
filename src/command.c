@@ -1990,6 +1990,7 @@ plot_command()
     plot_token = c_token++;
     plotted_data_from_stdin = FALSE;
     refresh_nplots = 0;
+    plot_iterator = cleanup_iteration(plot_iterator);
     SET_CURSOR_WAIT;
 #ifdef USE_MOUSE
     plot_mode(MODE_PLOT);
@@ -2429,6 +2430,7 @@ splot_command()
     plot_token = c_token++;
     plotted_data_from_stdin = FALSE;
     refresh_nplots = 0;
+    plot_iterator = cleanup_iteration(plot_iterator);
     SET_CURSOR_WAIT;
 #ifdef USE_MOUSE
     plot_mode(MODE_SPLOT);
