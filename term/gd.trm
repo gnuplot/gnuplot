@@ -2170,6 +2170,7 @@ TERM_PUBLIC void
 ENHGD_put_text(unsigned int x, unsigned int y, const char *str)
 {
     char *original_string = (char *)str;
+    char *fontcopy;
 
     if (ignore_enhanced_text || !png_state.ttffont) {
 	PNG_put_text(x,y,str);
@@ -2213,8 +2214,9 @@ ENHGD_put_text(unsigned int x, unsigned int y, const char *str)
      * closing brace in the string. We increment past it (else
      * we get stuck in an infinite loop) and try again.
      */
+    fontcopy = strdup(ENHgd_font);
     while (*(str = enhanced_recursion((char *)str, TRUE,
-			ENHgd_font, ENHgd_fontsize * png_state.fontscale,
+			fontcopy, ENHgd_fontsize * png_state.fontscale,
 			0.0, TRUE, TRUE, 0))) {
 	(term->enhanced_flush)();
 
@@ -2226,6 +2228,7 @@ ENHGD_put_text(unsigned int x, unsigned int y, const char *str)
 
 	/* else carry on and process the rest of the string */
     }
+    free(fontcopy);
 
     /* We can do text justification by running the entire top level string */
     /* through 2 times, with the ENHgd_sizeonly flag set the first time.   */
