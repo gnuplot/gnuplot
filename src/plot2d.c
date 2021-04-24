@@ -2005,6 +2005,7 @@ eval_plots()
 
     int nbins = 0;
     double binlow = 0, binhigh = 0, binwidth = 0;
+    int binopt = 0;
 
     /* Histogram bookkeeping */
     double newhist_start = 0.0;
@@ -2315,6 +2316,21 @@ eval_plots()
 			    int_error(c_token, "expecting binwidth=<width>");
 			c_token++;
 			binwidth = real_expression();
+		    }
+		    binopt = 0;
+		    if (almost_equals(c_token, "binval$ue")) {
+			c_token++;
+			if (equals(c_token++, "=")) {
+			    if (equals(c_token, "avg"))
+				binopt = 1;
+			    else if (equals(c_token, "sum"))
+				binopt = 0;
+			    else
+				int_error(c_token, "expecting binvalue={sum|avg}");
+			    c_token++;
+			} else {
+			    int_error(c_token-2, "expecting binvalue={sum|avg}");
+			}
 		    }
 		    continue;
 		}
@@ -2983,7 +2999,7 @@ eval_plots()
 
 		/* If we are to bin the data, do that first */
 		if (this_plot->plot_smooth == SMOOTH_BINS) {
-		    make_bins(this_plot, nbins, binlow, binhigh, binwidth);
+		    make_bins(this_plot, nbins, binlow, binhigh, binwidth, binopt);
 		}
 
 		/* Restore auto-scaling prior to smoothing operation */

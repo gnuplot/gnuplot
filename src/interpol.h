@@ -49,7 +49,8 @@ void mcs_interp(struct curve_points *plot);
 void sort_points(struct curve_points *plot);
 void zsort_points(struct curve_points *plot);
 void cp_implode(struct curve_points *cp);
-void make_bins(struct curve_points *plot, int nbins, double binlow, double binhigh, double binwidth);
+void make_bins(struct curve_points *plot,
+		int nbins, double binlow, double binhigh, double binwidth, int binopt);
 void gen_3d_splines(struct surface_points *plot);
 void gen_2d_path_splines(struct curve_points *plot);
 

@@ -259,6 +259,7 @@ C
 ## or for 2D curves that are not monotonic on x. See `smooth path`.
 #b new keyword `period` for smoothing periodic data. See `smooth kdensity`.
 #b `set colorbox cbtics <linestyle>` affects cbtics but not other tics.
+#b keyword `binvalue=avg` plots average, rather than sum, of binned data.
 #end
 
 4 New commands and command options
@@ -7524,6 +7525,7 @@ Ffigure_zerror
  Syntax:
       plot 'DATA' using <XCOL> {:<YCOL>} bins{=<NBINS>}
            {binrange [<LOW>:<HIGH>]} {binwidth=<width>}
+           {binvalue={sum|avg}}
 
  The `bins` option to a `plot` command first assigns the original data to
  equal width bins on x and then plots a single value per bin.  The default
@@ -7557,6 +7559,10 @@ Ffigure_zerror
       plot 'DATA" using N bins=20
       set samples 20
       plot 'DATA' using (column(N)):(1)
+
+ By default the y value plotted for each bin is the sum of the y values over all
+ points in that bin.  This corresponds to option `binvalue=sum`.
+ The alternative `binvalue=avg` plots the mean y value for points in that bin.
 
  For related plotting styles see `smooth frequency` and `smooth kdensity`.
 4 columnheaders
