@@ -1680,6 +1680,7 @@ plot_steps(struct curve_points *plot)
 		    cliptorange(xr, xleft, xright);
 		    cliptorange(xl, xleft, xright);
 		    cliptorange(y, ybot, ytop);
+		    cliptorange(yprev, ybot, ytop);
 
 		    /* Entire box is out of range on x */
 		    if (xr == xl && (xr == xleft || xr == xright))
