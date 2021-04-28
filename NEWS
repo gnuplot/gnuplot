@@ -1,4 +1,4 @@
-Changes since 5.4.1
+Changes in 5.4.2
 ================
 * NEW in "using" context, $# means "number of columns in current data line"
 * NEW define on program entry:   I = sqrt(-1) = {0.,1.}
@@ -10,14 +10,18 @@ Changes since 5.4.1
 * CHANGE (Windows): attempt to convert unicode on command line to UTF-8
 * CHANGE clip `with image` to plot boundary in 2D plots
 * CHANGE In gprintf format "%c", add no space for a null prefix Bug #2266
+* CHANGE Make auto-placement of left border less sensitive to plot size Bug #2415
 * FIX time formats %U %W Bug #2390
 * FIX cairo terminals: Do not lose font info during multi-line enhanced text
 * FIX left-justification of titles in splot with user-specified key position
 * FIX cairo terminals (Windows): ignore "text scaling" from user screen settings
 * FIX win: instabilities associated with changing window size Bug #2301 #2304
+* FIX pm: better mousing and font handling
 * FIX clipping of filled polygons that have only 1 or 2 vertices Bug #2400
 * FIX "set tics front" unexpectedly made all grid lines invisible
 * FIX more terminals support requested linewidth for textbox borders
+* FIX indexing of multiple matrix data sets in a single input file
+* FIX do not inject extra '\n' into input stream after 'set term' Bug #2292
 
 
 Changes in 5.4.1
