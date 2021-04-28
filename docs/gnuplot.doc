@@ -6773,6 +6773,7 @@ Ffigure_zerror
  Syntax:
       plot 'DATA' using <XCOL> {:<YCOL>} bins{=<NBINS>}
            {binrange [<LOW>:<HIGH>]} {binwidth=<width>}
+           {binvalue={sum|avg}
 
  The `bins` option to a `plot` command first assigns the original data to
  equal width bins on x and then plots a single value per bin.  The default
@@ -6806,6 +6807,10 @@ Ffigure_zerror
       plot 'DATA" using N bins=20
       set samples 20
       plot 'DATA' using (column(N)):(1)
+
+ The y value plotted for each bin is the sum of the y values over all
+ points in that bin.  This corresponds to `binvalue=sum`.
+ EXPERIMENTAL: `binvalue=avg` instead plots the mean y value for that bin.
 
  For related plotting styles see `smooth frequency` and `smooth kdensity`.
 4 columnheaders

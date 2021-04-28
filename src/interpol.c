@@ -1338,14 +1338,19 @@ mcs_interp(struct curve_points *plot)
  *        xmax = binhigh + binwidth/2
  *    first bin holds points with (xmin =< x < xmin + binwidth)
  *    last bin holds points with (xmax-binwidth =< x < binhigh + binwidth)
+ *
+ *    binopt = 0 (default) return sum of y values for points in each bin
+ *    binopt = 1 return mean of y values for points in each bin
  */
 void
 make_bins(struct curve_points *plot, int nbins,
-          double binlow, double binhigh, double binwidth)
+          double binlow, double binhigh, double binwidth,
+	  int binopt)
 {
     int i, binno;
     double *bin;
     double bottom, top, range;
+    int *members;
     struct axis *xaxis = &axis_array[plot->x_axis];
     struct axis *yaxis = &axis_array[plot->y_axis];
     double ymax = 0;
@@ -1389,14 +1394,19 @@ make_bins(struct curve_points *plot, int nbins,
 	    nbins, bottom, top, binwidth));
 
     bin = gp_alloc(nbins*sizeof(double), "bins");
-    for (i=0; i<nbins; i++)
+    members = gp_alloc(nbins*sizeof(int), "bins");
+    for (i=0; i<nbins; i++) {
  	bin[i] = 0;
+	members[i] = 0;
+    }
     for (i=0; i<N; i++) {
 	if (plot->points[i].type == UNDEFINED)
 	    continue;
 	binno = floor(nbins * (plot->points[i].x - bottom) / range);
-	if (0 <= binno && binno < nbins)
+	if (0 <= binno && binno < nbins) {
 	    bin[binno] += plot->points[i].y;
+	    members[binno]++;
+	}
     }
 
     if (xaxis->autoscale & AUTOSCALE_MIN) {
@@ -1410,27 +1420,32 @@ make_bins(struct curve_points *plot, int nbins,
 
     /* Replace the original data with one entry per bin.
      * new x = midpoint of bin
-     * new y = number of points in the bin
+     * new y = sum of individual y values over all points in bin
+     * new z = number of points in the bin
      */
     plot->p_count = nbins;
     plot->points = gp_realloc( plot->points, nbins * sizeof(struct coordinate), "curve_points");
     for (i=0; i<nbins; i++) {
 	double bincent = bottom + (0.5 + (double)i) * binwidth;
+	double ybin = bin[i];
+	if ((binopt == 1) && (members[i] > 1))
+	    ybin = bin[i]/members[i];
+
 	plot->points[i].type = INRANGE;
 	plot->points[i].x     = bincent;
 	plot->points[i].xlow  = bincent - binwidth/2.;
 	plot->points[i].xhigh = bincent + binwidth/2.;
-	plot->points[i].y     = bin[i];
-	plot->points[i].ylow  = plot->points[i].y;
-	plot->points[i].yhigh = plot->points[i].y;
-	plot->points[i].z = 0;	/* FIXME: leave it alone? */
+	plot->points[i].y     = ybin;
+	plot->points[i].ylow  = ybin;
+	plot->points[i].yhigh = ybin;
+	plot->points[i].z     = members[i];
+
 	if (inrange(bincent, xaxis->min, xaxis->max)) {
-	    if (ymax < bin[i])
-		ymax = bin[i];
+	    if (ymax < ybin)
+		ymax = ybin;
 	} else {
 	    plot->points[i].type = OUTRANGE;
 	}
-	FPRINTF((stderr, "bin[%d] %g %g\n", i, plot->points[i].x, plot->points[i].y));
     }
 
     if (yaxis->autoscale & AUTOSCALE_MIN) {
