@@ -2455,6 +2455,18 @@ do_event(struct gp_event_t *ge)
     if (!term)
 	return;
 
+    /* FIXME
+     * Discarding events from a previous terminal here might or might not be good.
+     * Qt allows essentially buffers them and applies them when the terminal is
+     * re-enabled.  Wxt was crashing on replot/resize events, but that was fixed
+     * by discarding them in wxt-specific code.  Other terminals??
+	if (!term_initialised) {
+	    int_warn(NO_CARET, "do_event: ignoring event %s on uninitialised terminal",
+		    GE_evt_name(ge->type));
+	    return;
+	}
+     */
+
     /* disable `replot` when some data were sent through stdin */
     replot_disabled = plotted_data_from_stdin;
 
