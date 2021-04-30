@@ -90,6 +90,8 @@
 
 
 /* define DEBUG here to have debugging messages in stderr */
+/* #define DEBUG */
+
 #include "wxt_gui.h"
 
 /* frame icon composed of three icons of different resolutions */
@@ -876,8 +878,10 @@ void wxtFrame::OnSize( wxSizeEvent& event )
 	PositionStatusBar();
 #endif
 
-	/* Note: On some platforms OnSize() might get called before the settings have been initialized in wxt_init(). */
-	if (wxt_redraw == yes)
+	/* Note: On some platforms OnSize() might get called before
+	 * settings have been initialized in wxt_init().
+	 */
+	if (wxt_redraw == yes && term_initialised)
 		wxt_exec_event(GE_replot, 0, 0, 0 , 0, this->GetId());
 }
 
