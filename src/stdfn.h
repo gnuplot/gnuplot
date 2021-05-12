@@ -105,29 +105,12 @@ long atol();
 double strtod();
 #else /* HAVE_STDLIB_H */
 # include <stdlib.h>
-# ifndef VMS
-#  ifndef EXIT_FAILURE
+# ifndef EXIT_FAILURE
 #   define EXIT_FAILURE (1)
-#  endif
-#  ifndef EXIT_SUCCESS
+# endif
+# ifndef EXIT_SUCCESS
 #   define EXIT_SUCCESS (0)
-#  endif
-# else /* VMS */
-#  ifdef VAXC            /* replacement values suppress some messages */
-#   ifdef  EXIT_FAILURE
-#    undef EXIT_FAILURE
-#   endif
-#   ifdef  EXIT_SUCCESS
-#    undef EXIT_SUCCESS
-#   endif
-#  endif /* VAXC */
-#  ifndef  EXIT_FAILURE
-#   define EXIT_FAILURE  0x10000002
-#  endif
-#  ifndef  EXIT_SUCCESS
-#   define EXIT_SUCCESS  1
-#  endif
-# endif /* VMS */
+# endif
 #endif /* HAVE_STDLIB_H */
 
 /* Deal with varargs functions */
@@ -167,8 +150,13 @@ extern char *sys_errlist[];
 # include <sys/types.h>
 #endif
 
+#ifdef VMS
+# include "vms.h"
+#endif
+
 #ifdef HAVE_SYS_STAT_H
 # include <sys/stat.h>
+
 
 /* This is all taken from GNU fileutils lib/filemode.h */
 
@@ -259,11 +247,6 @@ extern char *sys_errlist[];
 
 #ifdef HAVE_SYS_TIME_H
 # include <sys/time.h> /* for gettimeofday() */
-#endif
-
-#if defined(PIPES) && defined(VMS)
-FILE *popen(char *, char *);
-int pclose(FILE *);
 #endif
 
 #ifdef HAVE_FLOAT_H
@@ -546,7 +529,7 @@ void gp_rewinddir(GPDIR *);
  }
 #else
 #define PATH_CONCAT(path,file) strcat(path,file)
-#endif
+#endif /* VMS */
 
 #ifndef inrange
 # define inrange(z,min,max) \

@@ -78,6 +78,8 @@
 # ifdef NO_GIH
    /* for show version long */
 #  define HELPFILE "GNUPLOT$HELP"
+# else
+#  define HELPFILE "sys$login:gnuplot.gih"
 # endif
 # if !defined(VAXCRTL) && !defined(DECCRTL)
 #  define VAXCRTL VAXCRTL_AND_DECCRTL_UNDEFINED
@@ -165,11 +167,7 @@ FILE * win_popen(const char *filename, const char *mode);
 #endif
 
 #ifndef HELPFILE
-#ifndef VMS
 # define HELPFILE "docs/gnuplot.gih"
-#else
-# define HELPFILE "sys$login:gnuplot.gih"
-#endif
 #endif
 
 #ifndef HOME
@@ -306,7 +304,6 @@ typedef double coordval;
 #ifdef VMS
 # define DEFAULT_COMMENTS_CHARS "#!"
 # define is_system(c) ((c) == '$')
-/* maybe configure could check this? */
 # define BACKUP_FILESYSTEM 1
 #else /* not VMS */
 # define DEFAULT_COMMENTS_CHARS "#"

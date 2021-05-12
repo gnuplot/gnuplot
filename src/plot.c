@@ -62,14 +62,13 @@
 #endif
 
 #ifdef VMS
+# include "vms.h"
 # ifndef __GNUC__
 #  include <unixio.h>
 # endif
 # include <smgdef.h>
 # include <ssdef.h>
-extern int vms_vkid;
 extern smg$create_virtual_keyboard();
-extern int vms_ktid;
 extern smg$create_key_table();
 #endif /* VMS */
 

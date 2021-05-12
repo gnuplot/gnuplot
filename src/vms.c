@@ -53,6 +53,9 @@
 
 static int something_in_this_file;
 
+int vms_vkid;	/* Virtual keyboard id */
+int vms_ktid;	/* key table id, for translating keystrokes */
+
 #ifdef PIPES
 
 /* (to aid porting) - how are errors dealt with */
@@ -579,3 +582,11 @@ fflush_binary()
 	fflush(gpoutfile);
     }
 }
+
+void
+done(int status)
+{
+    term_reset();
+    gp_exit(status);
+}
+

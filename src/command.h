@@ -187,9 +187,6 @@ void toggle_display_of_ipc_commands(void);
 int display_ipc_commands(void);
 void do_string_replot(const char* s);
 #endif
-#ifdef VMS                     /* HBB 990829: used only on VMS */
-void done(int status);
-#endif
 void define(void);
 
 void replotrequest(void); /* used in command.c & mouse.c */

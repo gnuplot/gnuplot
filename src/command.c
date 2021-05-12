@@ -139,11 +139,6 @@ static TBOOLEAN pause_internal;    /* flag to indicate not to use a dialog box *
 # include <conio.h>		/* for getch() */
 #endif
 
-#ifdef VMS
-int vms_vkid;			/* Virtual keyboard id */
-int vms_ktid;			/* key table id, for translating keystrokes */
-#endif /* VMS */
-
 typedef enum ifstate {IF_INITIAL=1, IF_TRUE, IF_FALSE} ifstate;
 
 /* static prototypes */
@@ -2863,15 +2858,6 @@ struct dsc$descriptor_s line_desc =
 
 $DESCRIPTOR(help_desc, Help);
 $DESCRIPTOR(helpfile_desc, "GNUPLOT$HELP");
-
-/* HBB 990829: confirmed this to be used on VMS, only --> moved into
- * the VMS-specific section */
-void
-done(int status)
-{
-    term_reset();
-    gp_exit(status);
-}
 
 /* VMS-only version of read_line */
 static int
