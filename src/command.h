@@ -78,7 +78,13 @@ extern FILE *print_out;
 extern struct udvt_entry * print_out_var;
 extern char *print_out_name;
 
+/* Points to structure holding dummy parameter values
+ * to be used during function evaluation
+ */
 extern struct udft_entry *dummy_func;
+
+/* dummy_func will point to this during function plotting */
+extern struct udft_entry plot_func;
 
 #ifndef STDOUT
 # define STDOUT 1

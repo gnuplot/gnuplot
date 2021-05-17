@@ -165,7 +165,13 @@ char *gp_input_line;
 size_t gp_input_line_len;
 int inline_num;			/* input line number */
 
+/* Points to structure holding dummy parameter values
+ * to be used during function evaluation
+ */
 struct udft_entry *dummy_func;
+
+/* dummy_func will point to this during function plotting */
+struct udft_entry plot_func;
 
 /* support for replot command */
 char *replot_line = NULL;

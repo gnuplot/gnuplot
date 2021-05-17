@@ -81,7 +81,6 @@ static void parse_kdensity_options(struct curve_points *this_plot);
 
 /* the curves/surfaces of the plot */
 struct curve_points *first_plot = NULL;
-static struct udft_entry plot_func;
 
 static double histogram_rightmost = 0.0;    /* Highest x-coord of histogram so far */
 static text_label histogram_title;          /* Subtitle for this histogram */
@@ -2188,7 +2187,11 @@ eval_plots()
 	    else
 		strcpy(c_dummy_var[0], orig_dummy_var);
 
-	    dummy_func = &plot_func;	/* needed by parsing code */
+	    /* If string_or_express finds a function, it will construct an
+	     * action table that retrieves its dummy parameters from plot_func.
+	     * Later we will store values there prior to function evaluation.
+	     */
+	    dummy_func = &plot_func;
 	    name_str = string_or_express(NULL);
 	    dummy_func = NULL;
 

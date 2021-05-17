@@ -110,7 +110,6 @@ typedef enum splot_component {
 
 /* the curves/surfaces of the plot */
 struct surface_points *first_3dplot = NULL;
-static struct udft_entry plot_func;
 
 int plot3d_num=0;
 
