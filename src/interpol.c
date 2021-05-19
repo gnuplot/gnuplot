@@ -1548,6 +1548,7 @@ make_bins(struct curve_points *plot, int nbins,
 
     /* Clean up */
     free(bin);
+    free(members);
 }
 
 
