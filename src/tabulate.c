@@ -234,7 +234,12 @@ print_table(struct curve_points *current_plot, int plot_num)
 		i++, point++) {
 
 		/* Reproduce blank lines read from original input file, if any */
-		if (!memcmp(point, &blank_data_line, sizeof(struct coordinate))) {
+		/* NB: complicated test is necessary because if struct coordinate
+		 *     is padded, the padding has not been initialized and memcmp
+		 *     chokes on uninitialized bytes (or anyhow valgrind thinks so)
+		 */
+		if (point->type == UNDEFINED
+		&&  !memcmp(&point->x, &blank_data_line.x, 7*sizeof(coordval))) {
 		    print_line("");
 		    continue;
 		}
