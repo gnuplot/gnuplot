@@ -722,7 +722,7 @@ file_variables( struct file_stats s, char *prefix )
 	t_value headers;
 	t_value *A = gp_alloc((s.columns+1) * sizeof(t_value), "column_headers");
 
-	A[0].v.int_val = s.columns;
+	Ginteger(&A[0], s.columns);
 	for (i = 1; i <= s.columns; i++)
 	    Gstring(&A[i], gp_strdup(df_retrieve_columnhead(i)));
 	headers.type = ARRAY;
