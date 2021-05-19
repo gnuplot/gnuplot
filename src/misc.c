@@ -160,14 +160,11 @@ prepare_call(int calltype)
     gpfree_string(&(udv->udv_value));
     Gstring(&(udv->udv_value), gp_strdup(lf_head->name));
 
-    udv = add_udv_by_name("ARGV");
-    free_value(&(udv->udv_value));
-
     argv_size = GPMIN(call_argc, 9);
-    udv->udv_value.type = ARRAY;
-    ARGV = udv->udv_value.v.value_array = gp_alloc((argv_size + 1) * sizeof(t_value), "array state");
-    ARGV[0].v.int_val = argv_size;
-    ARGV[0].type = NOTDEFINED;
+
+    udv = add_udv_by_name("ARGV");
+    init_array(udv, argv_size);
+    ARGV = udv->udv_value.v.value_array;
 
     for (argindex = 1; argindex <= 9; argindex++) {
 	char *argstring = call_args[argindex-1];
@@ -400,9 +397,8 @@ lf_pop()
 	    struct value *ARGV;
 	    int argv_size = lf->argv[0].v.int_val;
 
-	    gpfree_array(&(udv->udv_value));
-	    udv->udv_value.type = ARRAY;
-	    ARGV = udv->udv_value.v.value_array = gp_alloc((argv_size + 1) * sizeof(t_value), "array state");
+	    init_array(udv, argv_size);
+	    ARGV = udv->udv_value.v.value_array;
 	    for (argindex = 0; argindex <= argv_size; argindex++)
 		ARGV[argindex] = lf->argv[argindex];
 	}

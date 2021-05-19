@@ -485,6 +485,22 @@ gpfree_array(struct value *a)
     }
 }
 
+
+void
+init_array( struct udvt_entry *array, int size )
+{
+    struct value *A;
+    int i;
+
+    free_value(&array->udv_value);
+    array->udv_value.v.value_array = gp_alloc((size+1) * sizeof(t_value), "init_array");
+    array->udv_value.type = ARRAY;
+    A = array->udv_value.v.value_array;
+    A[0].v.int_val = size;
+    for (i = 0; i <= size; i++)
+	A[i].type = NOTDEFINED;
+}
+
 /* some machines have trouble with exp(-x) for large x
  * if E_MINEXP is defined at compile time, use gp_exp(x) instead,
  * which returns 0 for exp(x) with x < E_MINEXP

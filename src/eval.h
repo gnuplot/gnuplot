@@ -156,6 +156,8 @@ void free_value(struct value *a);
 void gpfree_string(struct value *a);
 void gpfree_array(struct value *a);
 
+void init_array( struct udvt_entry *array, int size );
+
 void reset_stack(void);
 void check_stack(void);
 TBOOLEAN more_on_stack(void);

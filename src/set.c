@@ -3917,21 +3917,12 @@ new_colormap(void)
     if (!isletter(++c_token))
 	int_error(c_token, "illegal colormap name");
     array = add_udv(c_token);
-    free_value(&array->udv_value);
     c_token++;
 
     /* Take size from current palette */
     if (sm_palette.use_maxcolors > 0 && sm_palette.use_maxcolors <= 256)
 	colormap_size = sm_palette.use_maxcolors;
-
-    array->udv_value.v.value_array = gp_alloc((colormap_size+1) * sizeof(t_value), "colormap");
-    array->udv_value.type = ARRAY;
-
-    /* Element zero of the new array is not visible but contains the size
-     */
-    A = array->udv_value.v.value_array;
-    A[0].v.int_val = colormap_size;
-    A[0].type = COLORMAP_ARRAY;
+    init_array(array, colormap_size);
 
     /* FIXME: Leverage the known structure of value.v as a union
      *        to overload both the colormap value as v.int_val
@@ -3941,6 +3932,8 @@ new_colormap(void)
      * Initialize to min = max = 0, which means use current cbrange.
      * A different min/max can be written later via set_colormap();
      */
+    A = array->udv_value.v.value_array;
+    A[0].type = COLORMAP_ARRAY;
     A[1].v.cmplx_val.imag = 0.0;	/* min */
     A[2].v.cmplx_val.imag = 0.0;	/* max */
 
