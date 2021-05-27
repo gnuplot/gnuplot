@@ -10399,7 +10399,7 @@ Ffigure_missing
  has ISO week date 2009-W01-2 (2nd day of week 1 of 2009).  Up to three days
  at the start of January may come before the Monday of ISO week 1;
  these days are assigned to the final week of the previous calendar year.
- E.g. Fri 1 Jan 2021 has ISO week date 2020-W53-05.
+ E.g. Fri 1 Jan 2021 has ISO week date 2020-W53-5.
 
  The US Center for Disease Control (CDC) epidemiological week is a similar
  week date convention that differs from the ISO standard by defining a week as
@@ -10419,7 +10419,7 @@ Ffigure_missing
  system is not necessarily the same as the calendar year.  The week is an
  integer from 1 to 53.  The day parameter is optional. If it is omitted
  or equal to 0 the time returned is the start of the week. Otherwise day
- is an integer from 1 (Monday) to 2 (Sunday).
+ is an integer from 1 (Monday) to 7 (Sunday).
  See `tm_week` for additional information on an inverse function that converts
  from calendar date to week number in the ISO standard convention.
 
@@ -10444,7 +10444,7 @@ Ffigure_missing
  the CDC/MMWR "epi week" format to the calendar date as a time in seconds since
  the epoch date 1 Jan 1970.  The CDC week date convention differs from the
  ISO week date in that it is defined in terms of each week running from
- day 1 = Sunday to day 6 = Saturday.  If the third parameter is 0 or is
+ day 1 = Sunday to day 7 = Saturday.  If the third parameter is 0 or is
  omitted, the time returned is the start of the week.
  See `tm_week` and `weekdate_iso`.
 
