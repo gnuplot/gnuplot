@@ -65,9 +65,14 @@ QtGnuplotWindow::QtGnuplotWindow(int id, QtGnuplotEventHandler* eventHandler, QW
 	m_pid = 0;
 	setWindowIcon(QIcon(":/images/gnuplot"));
 
-//	Setting this attribute causes an error to be reported to the user if a plot
-//	command is received after a plot command is closed.  Is this good or bad?
-//		setAttribute(Qt::WA_DeleteOnClose);
+//	This attribute is required in order for QtGnuplotApplication::windowDestroyed()
+//	to be called when a plot window is closed externally.  Without it, gnuplot_qt
+//	may be left as a zombie.  On the other hand, manually closing the last open
+//	window may cause warning messages (linux) or a program hang (Windows).
+//	We now work around this by instead checking for visible/invisible windows in
+//	QtGnuplotApplication::enterPersistMode() before exiting.
+//	History: Bugs #1554 #1753 #2188
+//	setAttribute(Qt::WA_DeleteOnClose);
 
 	// Register as the main event receiver if not already created
 	if (m_eventHandler == 0)

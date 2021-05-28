@@ -77,6 +77,17 @@ void QtGnuplotApplication::enterPersistMode()
 	// But if the plot window was already closed, this is our last chance to exit
 	if (m_windows.isEmpty())
 		quit();
+
+	// Also exit if none of the surviving windows are visible
+	bool still_showing = false;
+	QMap<int, QtGnuplotWindow*>::iterator i;
+	for (i = m_windows.begin(); i != m_windows.end(); ++i) {
+		if ((*i)->isVisible())
+			still_showing = true;
+	}
+	if (!still_showing)
+		quit();
+
 	// Some programs executing gnuplot -persist may be waiting for all default
 	// handles to be closed before they consider the sub-process finished.
 	// Using freopen() ensures that debug fprintf()s won't crash.
