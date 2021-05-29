@@ -665,15 +665,18 @@ term_apply_lp_properties(struct lp_style_type *lp)
     } else /* All normal lines will be solid unless a dashtype is given */
 	(*term->linetype) (LT_SOLID);
 
-    /* Version 5.3
-     * If the line is not wanted at all, setting dashtype and color can only hurt
+    /* Version 5.4.2
+     * If the line is not wanted at all, setting dashtype can only hurt.
+     * But we might still want to set a color so that points can use it.
      */
-    if (lt == LT_NODRAW)
-	return;
+    if (lt == LT_NODRAW) {
+	if (colorspec.type == TC_DEFAULT || (colorspec.type == TC_LT && colorspec.lt == LT_BLACK))
+	    return;
+    }
 
     /* Apply dashtype or user-specified dash pattern, which may override  */
     /* the terminal-specific dot/dash pattern belonging to this linetype. */
-    if (lt == LT_AXIS)
+    else if (lt == LT_AXIS)
 	; /* LT_AXIS is a special linetype that may incorporate a dash pattern */
     else if (dt == DASHTYPE_CUSTOM)
 	(*term->dashtype) (dt, &custom_dash_pattern);
