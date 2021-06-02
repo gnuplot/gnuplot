@@ -8,7 +8,12 @@ after downloading:
 
 	git clone -b branch-5-4-stable git://git.code.sf.net/p/gnuplot/gnuplot-main
 
-Release Notes date: 05-May-2021
+Known issue:
+    When run on Windows 10, gnuplot 5.4 does not work reliably with piped input
+Work-around:
+    Stick with version 5.2.8 on Windows 10.
+
+Release Notes date: 01-Jun-2021
 
 Changes in 5.4.2
 ================
@@ -35,6 +40,7 @@ Changes in 5.4.2
 * FIX pm: better mousing and font handling
 * FIX win: instabilities associated with changing window size Bug #2301 #2304
 * FIX wxt: use of multiple plot windows from single-threaded wxt terminal
+* FIX qt: prevent creation of zombie gnuplot_qt process Bug #2188
 
 
 Features introduced in 5.4.1
