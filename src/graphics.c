@@ -2375,7 +2375,7 @@ plot_points(struct curve_points *plot)
 	     * Swarm jitter y offset is in the original coordinate system.
 	     * vertical jitter y offset is a multiple of character heights.
 	     */
-	    if (jitter.spread > 0) {
+	    if (jitter.spread > 0 && !(plot->plot_smooth == SMOOTH_ZSORT)) {
 		x += plot->points[i].CRD_XJITTER * 0.7 * t->h_char;
 		switch (jitter.style) {
 		    case JITTER_ON_Y:

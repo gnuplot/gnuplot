@@ -105,10 +105,14 @@ void
 jitter_points(struct curve_points *plot)
 {
     int i, j;
-
-    /* The "x" and "xscale" stored in jitter are really along y */
     double xjit, ygap;
     struct position yoverlap;
+
+    /* Jitter is not compatible with zsort */
+    if (plot->plot_smooth == SMOOTH_ZSORT)
+	return;
+
+    /* The "x" and "xscale" stored in jitter are really along y */
     yoverlap.x = 0;
     yoverlap.y = jitter.overlap.x;
     yoverlap.scaley = jitter.overlap.scalex;
