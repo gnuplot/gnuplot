@@ -477,8 +477,10 @@ parse_assignment_expression()
     }
 
     /* Check for assignment to an array element Array[<expr>] = <expr> */
-    if (parse_array_assignment_expression())
-	return 1;
+    if (isletter(c_token) && (type_udv(c_token) == ARRAY)) {
+	if (parse_array_assignment_expression())
+	    return 1;
+    }
 
     return 0;
 }
@@ -495,21 +497,24 @@ static int
 parse_array_assignment_expression()
 {
     /* Check for assignment to an array element Array[<expr>] = <expr> */
-    if (isletter(c_token) && equals(c_token+1, "[")) {
+    if (equals(c_token+1, "[")) {
 	char *varname = NULL;
 	union argument *foo;
 	int save_action, save_token;
+	int i;
 
-	/* Quick check for the most common false positives */
+	/* Quick checks for the most common false positives */
 	/* i.e. other constructs that begin with "name["   */
 	/* FIXME: quicker than the full test below, but do we care? */
 	if (equals(c_token+3, "]") && !equals(c_token+4, "="))
 	    return 0;
 	if (equals(c_token+3, ":"))	/* substring s[foo:baz] */
 	    return 0;
-
-	/* Is this really a known array name? */
-	if (type_udv(c_token) != ARRAY)
+	for (i=c_token; i<num_tokens; i++) {
+	    if (equals(i,"]") && equals(i+1,"="))
+		break;
+	}
+	if (i == num_tokens)
 	    return 0;
 
 	/* Save state of the action table and the command line */
@@ -527,8 +532,12 @@ parse_array_assignment_expression()
 	parse_expression();
 
 	/* If this wasn't really an array element assignment, back out. */
-	/* NB: Depending on what we just parsed, this may leak memory.  */
 	if (!equals(c_token, "]") || !equals(c_token+1, "=")) {
+	    int i;
+	    for (i=save_action+1; i<at->a_count; i++) {
+		struct at_entry *a = &(at->actions[i]);
+		free_action_entry(a);
+	    }
 	    c_token = save_token;
 	    at->a_count = save_action;
 	    free(varname);

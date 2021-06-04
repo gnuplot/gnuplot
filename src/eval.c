@@ -744,6 +744,24 @@ evaluate_at(struct at_type *at_ptr, struct value *val_ptr)
 }
 
 void
+free_action_entry(struct at_entry *a)
+{
+    /* if union a->arg is used as a->arg.v_arg free potential string */
+    if ( a->index == PUSHC || a->index == DOLLARS )
+	gpfree_string(&(a->arg.v_arg));
+    /* a summation contains its own action table wrapped in a private udf */
+    if (a->index == SUM) {
+	real_free_at(a->arg.udf_arg->at);
+	free(a->arg.udf_arg);
+    }
+#ifdef HAVE_EXTERNAL_FUNCTIONS
+    /* external function calls contain a parameter list */
+    if (a->index == CALLE)
+	free(a->arg.exf_arg);
+#endif
+}
+
+void
 real_free_at(struct at_type *at_ptr)
 {
     int i;
@@ -753,19 +771,7 @@ real_free_at(struct at_type *at_ptr)
         return;
     for (i=0; i<at_ptr->a_count; i++) {
 	struct at_entry *a = &(at_ptr->actions[i]);
-	/* if union a->arg is used as a->arg.v_arg free potential string */
-	if ( a->index == PUSHC || a->index == DOLLARS )
-	    gpfree_string(&(a->arg.v_arg));
-	/* a summation contains its own action table wrapped in a private udf */
-	if (a->index == SUM) {
-	    real_free_at(a->arg.udf_arg->at);
-	    free(a->arg.udf_arg);
-	}
-#ifdef HAVE_EXTERNAL_FUNCTIONS
-	/* external function calls contain a parameter list */
-	if (a->index == CALLE)
-	    free(a->arg.exf_arg);
-#endif
+	free_action_entry(a);
     }
     free(at_ptr);
 }
