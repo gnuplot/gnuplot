@@ -94,6 +94,7 @@ void f_strptime(union argument *x);
 void f_time(union argument *x);
 void f_assign(union argument *x);
 void f_value(union argument *x);
+void f_lookup(union argument *x);
 void f_trim(union argument *x);
 
 #endif /* GNUPLOT_INTERNAL_H */

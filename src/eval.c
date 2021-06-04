@@ -271,6 +271,7 @@ const struct ft_entry ft[] =
     {"exist", f_exists},	/* exists("foo") replaces defined(foo) */
     {"exists", f_exists},	/* exists("foo") replaces defined(foo) */
     {"value", f_value},		/* retrieve value of variable known by name */
+    {"index", f_lookup},	/* retrieve index of array entry with known value */
 
     {"hsv2rgb", f_hsv2rgb},	/* color conversion */
     {"palette", f_palette},	/* palette color lookup */

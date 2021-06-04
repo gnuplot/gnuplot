@@ -2124,6 +2124,58 @@ f_value(union argument *arg)
 }
 
 /*
+ * retrieve index of array entry with known value
+ */
+void
+f_lookup(union argument *arg)
+{
+    struct value entry;
+    struct value a;
+    struct value *array;
+    int i, n;
+    int index = 0;
+
+    /* what entry are we looking for? */
+    pop(&entry);
+
+    /* what array is it in? */
+    pop(&a);
+    if (a.type != ARRAY)
+	int_error(NO_CARET, "index: expecting an array");
+    array = a.v.value_array;
+    n = array[0].v.int_val;
+
+    for (i=1; i<=n; i++) {
+	if (array[i].type != entry.type)
+	    continue;
+	switch (array[i].type) {
+	case INTGR:
+		if (array[i].v.int_val == entry.v.int_val)
+		    index = i;
+		break;
+	case CMPLX:
+		if (array[i].v.cmplx_val.real == entry.v.cmplx_val.real
+		&&  array[i].v.cmplx_val.imag == entry.v.cmplx_val.imag)
+		    index = i;
+		break;
+	case STRING:
+		if (!strcmp(array[i].v.string_val, entry.v.string_val))
+		    index = i;
+		break;
+	default:
+		break;
+	}
+	if (index != 0) /* Found it */
+	    break;
+    }
+    free_value(&entry);
+    if (array[0].type == TEMP_ARRAY)
+	gpfree_array(&a);
+
+    push(Ginteger(&a, index));
+}
+
+/*
  * remove leading and trailing whitespace from a string variable
  */
 void
