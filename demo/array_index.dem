@@ -1,0 +1,31 @@
+# Unit tests for array slices and index function
+#------------------------------------------------
+# The built-in function index(Array, value) searches through
+# Array to find an entry that matches value.
+# It returns the index of that entry.
+
+array A = [1, 2, 3.0, 4.0, "five", "six", 7*I, {8,8}, NaN]
+
+do for [ i = 1:|A| ] {
+    x = A[i]
+    k = index(A,x)
+    if (k > 0) {
+	print "A[", k, "] = ", A[i], "\t", "A[",i,":6] = ", A[i:6]
+    } else {
+	print "no member of A matches ", x
+    }
+}
+
+# Use of index to establish key/value pairs
+print "\nKey/value pairs\n"
+array key = [ "sky", "water", "dirt", "fire" ]
+array value = [ "blue", "blue", "brown", "red" ]
+
+water_value = value[index(key, "water")]
+dirt_value = value[index(key, "dirt")]
+sky = "sky"
+sky_value = value[index(key, sky)]
+
+print "water is ", water_value
+print "dirt is ", dirt_value
+print "sky is ", sky_value

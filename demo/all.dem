@@ -388,6 +388,7 @@ load "boxclusters.dem"
 
 print "********************** file array.dem *********************"
 load "array.dem"
+load "array_index.dem"
 reset
 
 print "**********************    Image formats    *********************"
