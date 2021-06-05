@@ -1213,10 +1213,12 @@ array_slice( struct value *full, int beg, int end)
     int i,j;
 
     /* Sanity checks */
-    if (beg < 1 || end < beg)
-	int_error(NO_CARET, "improper range for array slice");
+    if (beg < 1)
+	beg = 1;
     if (end > array[0].v.int_val)
 	end = array[0].v.int_val;
+    if (end < beg)
+	beg = 1, end = 0;
 
     slice = gp_alloc( (2 + end - beg) * sizeof(struct value), "array slice" );
     slice[0].type = TEMP_ARRAY;
