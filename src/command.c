@@ -917,6 +917,11 @@ array_command()
 		continue;
 	    }
 	    const_express(&A[i]);
+	    if (A[i].type == ARRAY) {
+		if (A[i].v.value_array[0].type == TEMP_ARRAY)
+		    gpfree_array(&(A[i]));
+		int_error(c_token, "Cannot nest arrays");
+	    }
 	    initializers++;
 	    if (equals(c_token, "]"))
 		break;

@@ -154,6 +154,12 @@ const_string_express(struct value *valptr)
     return (valptr);
 }
 
+/*
+ * const_express() may return a value of any type.
+ * NB: If the returned type is ARRAY, the caller must check for
+ * the TEMP_ARRAY flag and either free the structure after
+ * immediate use or call make_array_permanent().
+ */
 struct value *
 const_express(struct value *valptr)
 {
