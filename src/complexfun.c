@@ -512,7 +512,6 @@ Igamma(complex double a, complex double z)
 	 * Gil (2016) suggests using a Poincaré-like expansion when |z| > 50.
 	 * However in my tests this seemed worse than cases 1-3.
 	 */
-	if (debug == 5)
 	if (creal(z) < -50.)
 	    return Igamma_Poincare( creal(a), -z );
 #endif
@@ -520,7 +519,6 @@ Igamma(complex double a, complex double z)
 	/* Case 3:
 	 * Abramowitz & Stegum (6.5.29)
 	 */
-	if (debug != 3)
 	if (creal(a) < 75.)
 	    return Igamma_negative_z( creal(a), z );
 
@@ -531,7 +529,6 @@ Igamma(complex double a, complex double z)
      * Use Gauss-Legendre quadrature instead.
      */
     if ((cabs(a) > 100.) && (cabs(z-a)/cabs(a) < 0.2)) {
-	if (debug == 1) return NAN;
 	return Igamma_GL( a, z );
     }
 
@@ -553,8 +550,6 @@ Igamma(complex double a, complex double z)
 	complex double pn1, pn2, pn3, pn4, pn5, pn6;
 	complex double rn;
 	complex double rnold;
-
-	if (debug == 2) return NAN;
 
 	aa = 1.0 - a;
 	b = aa + z + 1.0;
@@ -605,8 +600,6 @@ Igamma(complex double a, complex double z)
 	 * Use Pearson's series expansion.
 	 */
 	complex double retval;
-
-	if (debug == 4) return NAN;
 
 	for (i = 0, aa = a, an = b = 1.0; i <= 1000; i++) {
 	    aa += 1.0;
