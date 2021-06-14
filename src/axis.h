@@ -81,7 +81,7 @@ typedef enum AXIS_INDEX {
 
 
 /* sample axis doesn't need mtics, so use the slot to hold sample interval */
-# define SAMPLE_INTERVAL mtic_freq
+# define SAMPLE_INTERVAL miniticscale
 
 /* What kind of ticmarking is wanted? */
 typedef enum en_ticseries_type {
@@ -123,17 +123,17 @@ typedef struct ticdef {
     TBOOLEAN logscaling;		/* place tics using old logscale algorithm */
 } t_ticdef;
 
-/* we want two auto modes for minitics - default where minitics are
- * auto for log/time and off for linear, and auto where auto for all
- * graphs I've done them in this order so that logscale-mode can
- * simply test bit 0 to see if it must do the minitics automatically.
- * similarly, conventional plot can test bit 1 to see if minitics are
- * required */
+/* Version 5.5 (Jun 2021)
+ * Default is AUTO for log scale, OFF otherwise
+ * New mode TIME only applies when axis or axis tics are set to time mode
+ * and the user has requested "set mxtics time <N> <units>".
+ */
 typedef enum en_minitics_status {
     MINI_OFF,
     MINI_DEFAULT,
     MINI_USER,
-    MINI_AUTO
+    MINI_AUTO,
+    MINI_TIME
 } t_minitics_status;
 
 /* Values to put in the axis_tics[] variables that decides where the
@@ -230,8 +230,9 @@ typedef struct axis {
     enum JUSTIFY tic_pos;	/* left/center/right tic label justification */
     TBOOLEAN gridmajor;		/* Grid lines wanted on major tics? */
     TBOOLEAN gridminor;		/* Grid lines for minor tics? */
-    t_minitics_status minitics;	/* minor tic mode (none/auto/user)? */
-    double mtic_freq;		/* minitic stepsize */
+    t_minitics_status minitics;	/* minor tic mode (none/auto/user/time) */
+    t_timelevel minitic_units;	/* in time mode, DAYS/MONTHS/etc */
+    int mtic_freq;		/* number of minitics per interval */
     double ticscale;		/* scale factor for tic marks (was (0..1])*/
     double miniticscale;	/* and for minitics */
     double ticstep;		/* increment used to generate tic placement */
@@ -276,7 +277,7 @@ typedef struct axis {
 	DEFAULT_AXIS_TICDEF,	/* tic series definition */		    \
 	0, CENTRE,	 	/* tic_rotate, horizontal justification */  \
 	FALSE, FALSE,	 	/* grid{major,minor} */			    \
-	MINI_DEFAULT, 10.,	/* minitics, mtic_freq */		    \
+	MINI_DEFAULT, 1, 10,	/* minitics, units, mtic_freq */	    \
 	1.0, 0.5, 0.0, TRUE,	/* ticscale, miniticscale, ticstep, tic_in */ \
 	DT_NORMAL, DT_NORMAL,	/* datatype for input, output */	    \
 	NULL, NULL,      	/* output format, another output format */  \

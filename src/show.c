@@ -2990,8 +2990,9 @@ show_mtics(struct axis *axis)
     case MINI_DEFAULT:
 	fprintf(stderr, "\
 \tminor %stics are off for linear scales\n\
+\tminor %stics are off for time axes\n\
 \tminor %stics are computed automatically for log scales\n",
-	name, name);
+	name, name, name);
 	break;
     case MINI_AUTO:
 	fprintf(stderr, "\tminor %stics are computed automatically\n", name);
@@ -2999,8 +3000,16 @@ show_mtics(struct axis *axis)
     case MINI_USER:
 	fprintf(stderr, "\
 \tminor %stics are drawn with %d subintervals between major xtic marks\n",
-		name, (int) axis->mtic_freq);
+		name, axis->mtic_freq);
 	break;
+    case MINI_TIME:
+	{
+	char *timelevel = clean_reverse_table_lookup(timelevels_tbl, axis->minitic_units);
+	fprintf(stderr, "\tminor %stics drawn every %d %s\n",
+		name, axis->mtic_freq, timelevel);
+	free(timelevel);
+	break;
+	}
     default:
 	int_error(NO_CARET, "Unknown minitic type in show_mtics()");
     }

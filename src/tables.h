@@ -239,6 +239,7 @@ int lookup_table_entry(const struct gen_table *tbl, const char *search_str);
 int lookup_table_nth(const struct gen_table *tbl, const char *search_str);
 int lookup_table_nth_reverse(const struct gen_table *tbl, int table_len, const char *search_str);
 const char * reverse_table_lookup(const struct gen_table *tbl, int entry);
+char * clean_reverse_table_lookup(const struct gen_table *tbl, int entry);
 
 
 #endif /* GNUPLT_TABLES_H */

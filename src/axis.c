@@ -176,6 +176,7 @@ static TBOOLEAN axis_position_zeroaxis(AXIS_INDEX);
 static void load_one_range(struct axis *axis, double *a, t_autoscale *autoscale, t_autoscale which );
 static double quantize_duodecimal_tics(double, int);
 static void get_position_type(enum position_type * type, AXIS_INDEX *axes);
+static void gen_time_minitics(struct axis *this, double start, double end, tic_callback callback);
 
 /* ---------------------- routines ----------------------- */
 
@@ -1205,9 +1206,15 @@ gen_tics(struct axis *this, tic_callback callback)
 		ministart = ministep = step / (this->base - 1);
 		miniend = step;
 	    } else if (this->tictype == DT_TIMEDATE) {
-		ministart = ministep =
-		    make_auto_time_minitics(this->timelevel, step);
-		miniend = step * 0.9;
+		/* CHANGE ver 5.5 (Jun 2021) */
+		if (minitics == MINI_DEFAULT) {
+		    minitics = MINI_OFF;
+		} else if (minitics != MINI_TIME) {
+		    /* This was the old (pre v5.5) default */
+		    ministart = ministep =
+			make_auto_time_minitics(this->timelevel, step);
+		    miniend = step * 0.9;
+		}
 	    } else if (minitics == MINI_AUTO) {
 		int k = fabs(step)/pow(10.,floor(log10(fabs(step))));
 
@@ -1373,6 +1380,10 @@ gen_tics(struct axis *this, tic_callback callback)
 		/* }}} */
 
 	    }
+	    if (minitics == MINI_TIME)
+		/* We will do time tics in a separate pass */
+		continue;
+
 	    if ((minitics != MINI_OFF) && (this->miniticscale != 0)) {
 		/* {{{  process minitics */
 		double mplace, mtic_user, mtic_internal;
@@ -1416,10 +1427,88 @@ gen_tics(struct axis *this, tic_callback callback)
 		/* }}} */
 	    }
 	}
+
+	/* Handle minitics on a time axis as a special case.
+	 * Calculate exact position in time units (may not be evenly spaced)
+	 */
+	if (minitics == MINI_TIME)
+	    gen_time_minitics( this, start, end, callback );
+
     }
 }
-
 /* }}} */
+
+/* 
+ * Calculate exact position in time units (may not be evenly spaced)
+ */
+static void
+gen_time_minitics(struct axis *this, double start, double end, tic_callback callback)
+{
+    struct tm tm;
+    double mtic_user;
+    struct lp_style_type mgrd = mgrid_lp;
+
+    if (!(this->gridminor))
+	mgrd.l_type = LT_NODRAW;
+
+    /* Find zero-point minitic (we won't draw this one) */
+    ggmtime(&tm, start);
+    switch (this->minitic_units) {
+    case TIMELEVEL_YEARS:
+		tm.tm_mon = 0; tm.tm_mday = 1; tm.tm_hour = tm.tm_min = tm.tm_sec = 0;
+		break;
+    case TIMELEVEL_MONTHS:
+		tm.tm_mday = 1; tm.tm_hour = tm.tm_min = tm.tm_sec = 0;
+		break;
+    case TIMELEVEL_WEEKS:
+    case TIMELEVEL_DAYS:
+		tm.tm_hour = tm.tm_min = tm.tm_sec = 0;
+		break;
+    case TIMELEVEL_HOURS:
+		tm.tm_min = tm.tm_sec = 0;
+		break;
+    case TIMELEVEL_MINUTES:
+		tm.tm_sec = 0;
+		break;
+    case TIMELEVEL_SECONDS:
+		break;
+    default:
+		int_error(NO_CARET, "unsupported minor tic time unit");
+		break;
+    }
+
+    mtic_user = gtimegm(&tm);
+
+    do {
+	/* Increment by requested number of time units */
+	switch (this->minitic_units) {
+	case TIMELEVEL_YEARS:
+		    tm.tm_year += this->mtic_freq;
+		    break;
+	case TIMELEVEL_MONTHS:
+		    tm.tm_mon += this->mtic_freq;
+		    break;
+	case TIMELEVEL_WEEKS:
+		    tm.tm_mday += 7 * this->mtic_freq;
+		    break;
+	case TIMELEVEL_DAYS:
+		    tm.tm_mday += this->mtic_freq;
+		    break;
+	case TIMELEVEL_HOURS:
+		    tm.tm_hour += this->mtic_freq;
+		    break;
+	case TIMELEVEL_MINUTES:
+		    tm.tm_min += this->mtic_freq;
+		    break;
+	case TIMELEVEL_SECONDS:
+		    tm.tm_sec += this->mtic_freq;
+		    break;
+	}
+	mtic_user = gtimegm(&tm);
+	(*callback) (this, mtic_user, NULL, 1, mgrd, NULL);
+
+    } while (mtic_user < end);
+}
 
 /* {{{ time_tic_just() */
 /* justify ticplace to a proper date-time value */

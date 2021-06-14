@@ -1360,7 +1360,7 @@ static void
 unset_minitics(struct axis *this_axis)
 {
     this_axis->minitics = MINI_OFF;
-    this_axis->mtic_freq = 10.0;
+    this_axis->mtic_freq = 10;
 }
 
 /*process 'unset {x|y|x2|y2|z}tics' command */

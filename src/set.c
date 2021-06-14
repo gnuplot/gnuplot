@@ -6031,10 +6031,20 @@ set_tic_prop(struct axis *this_axis)
 
     if (almost_equals(c_token, cmdptr)) {
 	c_token++;
-	if (END_OF_COMMAND) {
+	if (equals(c_token, "auto") || END_OF_COMMAND) {
 	    this_axis->minitics = MINI_AUTO;
 	} else if (almost_equals(c_token, "def$ault")) {
 	    this_axis->minitics = MINI_DEFAULT;
+	    ++c_token;
+	} else if (equals(c_token, "time")) {
+	    int timeunits;
+	    ++c_token;
+	    this_axis->mtic_freq = int_expression();
+	    timeunits = lookup_table(timelevels_tbl, c_token);
+	    if (timeunits <= 0)
+		int_error(c_token-2, "Expecting 'time <N> <units>'");
+	    this_axis->minitic_units = timeunits;
+	    this_axis->minitics = MINI_TIME;
 	    ++c_token;
 	} else {
 	    int freq = int_expression();

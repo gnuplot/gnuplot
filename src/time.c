@@ -44,6 +44,18 @@
 #include "util.h"
 #include "variable.h"
 
+const struct gen_table timelevels_tbl[] =
+{
+    { "sec$onds", TIMELEVEL_SECONDS },
+    { "min$utes", TIMELEVEL_MINUTES },
+    { "hour$s",   TIMELEVEL_HOURS },
+    { "day$s",    TIMELEVEL_DAYS },
+    { "week$s",   TIMELEVEL_WEEKS },
+    { "mon$ths",  TIMELEVEL_MONTHS },
+    { "year$s",   TIMELEVEL_YEARS },
+    { NULL, -1 }
+};
+
 static char *read_int(char *s, int nr, int *d);
 
 static char *
@@ -770,13 +782,49 @@ xstrftime(
 
 
 
-/* time_t  */
+/* Convert struct tm to seconds from epoch date.
+ * Modifies content of tm!
+ * NB:
+ *	Unlike POSIX mktime(), this code does not fully normalize the
+ *	content of tm.
+ *      I.e.  32 October becomes 1 November
+ *	      but tm_wday and tm_yday are not recalculated.
+ *	Time zone info is ignored - always returns GMT
+ */
 double
 gtimegm(struct tm *tm)
 {
     int i;
+    int mday;
+
     /* returns sec from year ZERO_YEAR in UTC, defined in gp_time.h */
     double dsec = 0.;
+
+    /* Partial normalization (at least make sure month does not overflow! */
+    if (tm->tm_sec >= 60) {
+	tm->tm_min += (tm->tm_sec / 60);
+	tm->tm_sec -= 60 * (tm->tm_sec / 60);
+    }
+    if (tm->tm_min >= 60) {
+	tm->tm_hour += (tm->tm_min / 60);
+	tm->tm_min -= 60 * (tm->tm_min / 60);
+    }
+    if (tm->tm_hour >= 24) {
+	tm->tm_mday += (tm->tm_hour / 24);
+	tm->tm_hour -= 24 * (tm->tm_hour / 24);
+    }
+    if (tm->tm_mon == 1 && gdysize(tm->tm_year) > 365)
+	mday = 29; /* Leap year! */
+    else
+	mday = mndday[ (tm->tm_mon/12) ];
+    if (tm->tm_mday > mday) {
+	tm->tm_mday -= mday;
+	tm->tm_mon += 1;
+    }
+    while (tm->tm_mon >= 12) {
+	tm->tm_mon -= 12;
+	tm->tm_year += 1;
+    }
 
     if (tm->tm_year < ZERO_YEAR) {
 	for (i = tm->tm_year; i < ZERO_YEAR; i++) {
@@ -974,7 +1022,7 @@ weekdate( int year, int week, int day, int standard )
     time_tm.tm_mon = 0;
     time = gtimegm(&time_tm);
 
-    /* Normalize (unlike mktime, gtimegm does not recalculation wday) */
+    /* Normalize (unlike mktime, gtimegm does not recalculate wday) */
     ggmtime(&time_tm, time);
 
     /* Add offset to nearest Sunday (ISO 8601) */

@@ -1260,7 +1260,7 @@ save_mtics(FILE *fp, struct axis *axis)
 {
     char *name = axis_name(axis->index);
 
-    switch(axis->minitics & TICS_MASK) {
+    switch (axis->minitics) {
     case 0:
 	fprintf(fp, "set nom%stics\n", name);
 	break;
@@ -1271,7 +1271,11 @@ save_mtics(FILE *fp, struct axis *axis)
 	fprintf(fp, "set m%stics default\n", name);
 	break;
     case MINI_USER:
-	fprintf(fp, "set m%stics %f\n", name, axis->mtic_freq);
+	fprintf(fp, "set m%stics %d\n", name, axis->mtic_freq);
+	break;
+    case MINI_TIME:
+	fprintf(fp, "set m%stics time %d %s\n", name, axis->mtic_freq, 
+		clean_reverse_table_lookup(timelevels_tbl, axis->minitic_units));
 	break;
     }
 }
@@ -1589,17 +1593,8 @@ save_pm3dcolor(FILE *fp, const struct t_colorspec *tc)
 void
 save_data_func_style(FILE *fp, const char *which, enum PLOT_STYLE style)
 {
-    char *answer = strdup(reverse_table_lookup(plotstyle_tbl, style));
-    char *idollar = strchr(answer, '$');
-    if (idollar) {
-	do {
-	    *idollar = *(idollar+1);
-	    idollar++;
-	} while (*idollar);
-
-    }
+    char *answer = clean_reverse_table_lookup(plotstyle_tbl, style);
     fputs(answer, fp);
-    free(answer);
 
     if (style == FILLEDCURVES) {
 	fputs(" ", fp);

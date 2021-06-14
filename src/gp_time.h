@@ -38,6 +38,7 @@
 #include "syscfg.h"
 #include "stdfn.h"
 #include "gp_types.h"
+#include "axis.h"	/* for TIMELEVEL values */
 
 /* Define the zero point for internal storage of time+date as some number of seconds */
 /* Through gnuplot version 4.6 this was taken as 1-jan-2000, i.e. 30 years off from  */
@@ -71,6 +72,7 @@
 /* Type definitions */
 
 /* Variables of time.c needed by other modules: */
+extern const struct gen_table timelevels_tbl[];
 
 /* Prototypes of functions exported by time.c */
 

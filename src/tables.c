@@ -859,3 +859,26 @@ reverse_table_lookup(const struct gen_table *tbl, int entry)
 	    return(tbl[k].key);
     return NULL;
 }
+
+/* Returns the key associated with this indexed value
+ * or NULL if the key/value pair is not found.
+ * The $ sign, if any, is removed first.
+ */
+char *
+clean_reverse_table_lookup(const struct gen_table *tbl, int entry)
+{
+    static char *match = NULL;
+    char *idollar;
+
+    free(match);
+    match = strdup(reverse_table_lookup(tbl, entry));
+    idollar = strchr(match, '$');
+    if (idollar) {
+	do {
+	    *idollar = *(idollar+1);
+	    idollar++;
+	} while (*idollar);
+    }
+    return match;
+}
+
