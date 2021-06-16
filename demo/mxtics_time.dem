@@ -1,0 +1,42 @@
+#
+# Play around with new options to auto-generate tics for time axes
+#
+
+set title "Compare old (top) and new (bottom)\nauto-generation of minor tics on time axis"
+set bmargin at screen 0.6
+
+timefmt = "%d-%b-%Y"
+set timefmt timefmt
+set mouse mouseformat 6
+
+SpY = 3600*24*365.
+
+set xdata time
+set x2data time
+set link x2
+set tics scale 0.1, 10.0
+set tics nomirror
+unset ytics
+set grid lt 1 lc "yellow" lw 4
+
+set xrange [ '01-Jan-1932' : '31-Dec-2004' ]
+
+#set xtics  time format "%d-%b-%Y\n%H:%M"
+set xtics  time format "%Y"
+set mxtics time 2 years
+
+set x2tics  time format ""
+set mx2tics 
+
+plot sin(x/SpY) with lines lt nodraw notitle
+
+pause -1
+
+
+set xrange [ "01-Jan-1932" : "05-Jun-1932" ]
+set mxtics time 1 week
+set xtics format "%d-%b"
+
+replot
+
+pause -1

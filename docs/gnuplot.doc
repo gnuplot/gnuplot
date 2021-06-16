@@ -336,6 +336,7 @@ C
 ## next line of input, even in the case of errors.  On return, FIT_ERROR is
 ## non-zero if an error occured. This allows scripted recovery from a bad fit.
 ## See `fit error_recovery`.
+#b Revised generation of minor tics along a time axis.  See `set mxtics time`.
 #end
 
 3 Features introduced in version 5.4
@@ -4485,7 +4486,7 @@ Ffigure_newsyntax
       print strftime("%H:%M:%.3S %d-%b-%Y",time(0.0))
       18:15:04.253 16-Apr-2011
 
- See `time_specifiers`.
+ See `time_specifiers`, `set xtics time`, `set mxtics time`.
 1 plotting styles
 ?plotting styles
 =plot styles
@@ -11178,6 +11179,7 @@ Ffigure_missing
        set format x                 # defaults to "12/25/76 \n 23:11"
        set format x "%A, %d %b %Y"  # "Saturday, 25 Dec 1976"
        set format x "%r %D"         # "11:11:11 pm 12/25/76"
+       set xtics time format "%B"   # "December"
 
  Examples of time format:
 
@@ -12660,18 +12662,23 @@ Ffigure_multiple_keys
  the other axes.
 
  Syntax:
-       set mxtics {<freq> | default}
+       set mxtics <freq>
+       set mxtics default
+       set mxtics time <N> <units>
        unset mxtics
        show mxtics
 
  The same syntax applies to `mytics`, `mztics`, `mx2tics`, `my2tics`, `mrtics`,
  `mttics` and `mcbtics`.
 
- <freq> is the number of sub-intervals (NOT the number of minor tics) between
- major tics (the default for a linear axis is either two or five
- depending on the major tics, so there are one or four minor
- tics between major tics). Selecting `default` will return the number of minor
- ticks to its default value.
+ <freq> is the number of sub-intervals (NOT the number of minor tic marks)
+ between major tics. The default for a linear axis is either 2 (one mark) or
+ 5 (four marks) depending on the spacing of the major tics.
+ 
+ `default` will return the number of minor ticks to its default value.
+
+ `set mxtics time <N> <units>` applies only when the major tics are set to
+ time mode. See `set mxtics time`.
 
  If the axis is logarithmic, the number of sub-intervals will be set to a
  reasonable number by default (based upon the length of a decade).  This will
@@ -12704,6 +12711,29 @@ Ffigure_multiple_keys
  By default, minor tics are off for linear axes and on for logarithmic axes.
  They inherit the settings for `axis|border` and `{no}mirror` specified for
  the major tics.  Please see `set xtics` for information about these.
+4 mxtics time
+?set mxtics time
+?mxtics time
+ Syntax:
+      set mxtics <N> {seconds|minutes|hours|days|weeks|months|years}
+
+ This is a new command option introduced in gnuplot version 5.5.
+ It places minor tic marks exactly at some integral number of time units
+ rather than at some fraction of the major tic interval.
+
+ The new default is that minor tics are not generated if the major tics are
+ in time mode (`set xdata time` or `set xtics time`).
+
+ `set mxtics` or `set mxtics <freq>` can restore the pre-version 5.5 behavior
+ but this was always problematic.  For example, automatic subdivision of a
+ 72-year span placed major tics at 12-year intervals and minor tics at
+ 5-year intervals.
+
+ Using `set mxtics time 2 years`, however, will place a minor tic mark exactly
+ at the start of alternate years. `set mxtics time 1 month` will place tic
+ marks exactly at 1 Jan, 1 Feb, 1 Mar, 1 Apr, ... even though those intervals
+ contain an unequal number of days.
+
 3 my2tics
 ?commands set my2tics
 ?commands unset my2tics
@@ -15669,15 +15699,15 @@ Ffigure_walls
  An analogous command acts on each of the other axes.
 
  Syntax:
-       set xdata time
+       set xdata {time}
        show xdata
 
  The same syntax applies to `ydata`, `zdata`, `x2data`, `y2data` and `cbdata`.
 
  The `time` option signals that data represents a time/date in seconds.
- The current version of gnuplot stores time to a millisecond precision.
+ The current version of gnuplot stores time to millisecond precision.
 
- If no option is specified, the data interpretation reverts to normal.
+ `set xdata` (with no `time` keyword) restores data interpretation to normal.
 4 time
 ?commands set xdata time
 ?set xdata time
@@ -16181,6 +16211,8 @@ Ffigure_walls
        set xtics ("01/12", "" "03/12", "05/12")
  Both of these will produce tics "Dec 1", "Dec 3", and "Dec 5", but in the
  second example the tic at "Dec 3" will be unlabeled.
+
+ There is also a special time mode for minor tics. See `set mxtics time`.
 4 geographic
 ?commands set xtics geographic
 ?set xtics geographic

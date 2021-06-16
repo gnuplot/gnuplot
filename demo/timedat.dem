@@ -45,6 +45,8 @@ set link x2
 set tics font ",8"
 set x2tics format "%D\n%R" time
 set xtics format "%tH:%tM:%tS" time
+set mxtics time 5 min
+set mx2tics time 5 min
 
 set yzeroaxis
 unset ytics
