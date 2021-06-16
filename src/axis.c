@@ -1521,6 +1521,16 @@ time_tic_just(t_timelevel level, double ticplace)
 	return (ticplace);
     }
     ggmtime(&tm, ticplace);
+
+    /* Version 5.5 (June 2021)
+     * For timescales of days or longer mark each day
+     * at the start (0 AM) of that same day.
+     * It used to round to nearest date but left hours/min/sec non-zero (?!)
+     */
+    if (level >= TIMELEVEL_DAYS) { /* units of days */
+	tm.tm_hour = tm.tm_min = tm.tm_sec = 0;
+    }
+
     if (level >= TIMELEVEL_MINUTES) { /* units of minutes */
 	if (tm.tm_sec > 55)
 	    tm.tm_min++;
@@ -1531,15 +1541,6 @@ time_tic_just(t_timelevel level, double ticplace)
 	    tm.tm_hour++;
 	tm.tm_min = 0;
     }
-    if (level >= TIMELEVEL_DAYS) { /* units of days */
-	if (tm.tm_hour > 22) {
-	    tm.tm_hour = 0;
-	    tm.tm_mday = 0;
-	    tm.tm_yday++;
-	    ggmtime(&tm, gtimegm(&tm));
-	}
-    }
-    /* skip it, I have not bothered with weekday so far */
     if (level >= TIMELEVEL_MONTHS) {/* units of month */
 	if (tm.tm_mday > 25) {
 	    tm.tm_mon++;
