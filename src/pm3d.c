@@ -1161,7 +1161,7 @@ pm3d_draw_one(struct surface_points *plot)
  * Also called by vplot_isosurface().
  */
 void
-pm3d_add_quadrangle(struct surface_points *plot, gpdPoint corners[4])
+pm3d_add_quadrangle(struct surface_points *plot, gpdPoint corners[])
 {
     pm3d_add_polygon(plot, corners, 4);
 }
@@ -1171,7 +1171,7 @@ pm3d_add_quadrangle(struct surface_points *plot, gpdPoint corners[4])
  * (plot == NULL) if we were called from do_polygon().
  */
 void
-pm3d_add_polygon(struct surface_points *plot, gpdPoint corners[4], int vertices)
+pm3d_add_polygon(struct surface_points *plot, gpdPoint corners[], int vertices)
 {
     quadrangle *q;
 
