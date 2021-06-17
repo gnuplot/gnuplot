@@ -63,6 +63,9 @@ int call_argc;
 char *call_args[10] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
 static char *argname[] = {"ARG0","ARG1","ARG2","ARG3","ARG4","ARG5","ARG6","ARG7","ARG8","ARG9"};
 
+/* Used to report failure on file open */
+static char *failed_file_name = NULL;
+
 /* Used by postscript terminal if a font file is found by loadpath_fopen() */
 char *loadpath_fontname = NULL;
 
@@ -209,8 +212,10 @@ load_file(FILE *fp, char *name, int calltype)
     if (calltype == 6)
 	datablock_input_line = get_datablock(name);
 
-    if (!fp && !datablock_input_line)
-	int_error(NO_CARET, "Cannot load input from '%s'", name);
+    if (!fp && !datablock_input_line) {
+	failed_file_name = name;
+	int_error(NO_CARET, "Cannot load input from '%s'", failed_file_name);
+    }
 
     /* Provide a user-visible copy of the current line number in the input file */
     gpval_lineno = add_udv_by_name("GPVAL_LINENO");
@@ -515,6 +520,8 @@ load_file_error()
 {
     /* clean up from error in load_file */
     /* pop off everything on stack */
+    free(failed_file_name);
+    failed_file_name = NULL;
     while (lf_pop());
 }
 
