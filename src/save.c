@@ -558,7 +558,7 @@ save_set_all(FILE *fp)
     if (key->front) {
 	fprintf(fp, "set key opaque");
 	if (key->fillcolor.lt != LT_BACKGROUND) {
-	    fprintf(fp, " lc ");
+	    fprintf(fp, " fc ");
 	    save_pm3dcolor(fp, &key->fillcolor);
 	}
 	fprintf(fp, "\n");
