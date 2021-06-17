@@ -577,7 +577,7 @@ imploded(curve_points *this_plot)
  * Called from plot2d.c (get_data) for "plot with table"
  */
 TBOOLEAN
-tabulate_one_line(double v[MAXDATACOLS], struct value str[MAXDATACOLS], int ncols)
+tabulate_one_line(double v[], struct value str[], int ncols)
 {
     int col;
     FILE *outfile = (table_outfile) ? table_outfile : gpoutfile;
