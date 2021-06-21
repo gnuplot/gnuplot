@@ -4193,13 +4193,22 @@ Ffigure_newsyntax
        plot plot title title
 3 substrings
 ?string substring
+?substrings
  Substrings can be specified by appending a range specifier to any string,
  string variable, or string-valued function.  The range specifier has the
  form [begin:end], where begin is the index of the first character of the
  substring and end is the index of the last character of the substring.
  The first character has index 1.  The begin or end fields may be empty, or
  contain '*', to indicate the true start or end of the original string.
- E.g.  str[:] and str[*:*] both describe the full string str.
+ Thus str[:] and str[*:*] both describe the full string str.
+ Example:
+      eos = strlen(file)
+      if (file[eos-3:*] eq ".dat") {
+          set output file[1:eos-4] . ".png"
+          plot file
+      }
+
+ There is also an equivalent function `substr( string, begin, end )`.
 3 string operators
 ?string operators
  Three binary operators require string operands: the string concatenation
