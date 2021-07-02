@@ -91,6 +91,9 @@ extern TBOOLEAN df_matrix;
 /* is this a binary file? */
 extern TBOOLEAN df_binary;
 
+/* will this need to be expanded into a fully populated grid? */
+extern TBOOLEAN df_sparse_matrix;
+
 /* was df_open called on something that turned out to be a voxel grid? */
 extern TBOOLEAN df_voxelgrid;
 
@@ -305,5 +308,7 @@ df_data_type df_get_read_type(int col);                     /* Type of data in t
 int df_get_read_size(int col);                              /* Size of data in the binary column. */
 int df_get_num_matrix_cols(void);
 void df_set_plot_mode(int);
+
+void populate_sparse_matrix(struct coordinate **points, int *p_count);
 
 #endif /* GNUPLOT_DATAFILE_H */

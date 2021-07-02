@@ -4636,6 +4636,9 @@ process_image(void *plot, t_procimg_action action)
     t_imagecolor pixel_planes;
     udvt_entry *private_colormap = NULL;	/* "fc palette <colormap>" */
 
+    TBOOLEAN rectangular_image = FALSE;
+    TBOOLEAN fallback = FALSE;
+
     /* Detours necessary to handle 3D plots */
     TBOOLEAN project_points = FALSE;		/* True if 3D plot */
     int image_x_axis, image_y_axis;
@@ -4812,9 +4815,8 @@ process_image(void *plot, t_procimg_action action)
     /* Check if the pixel grid is orthogonal and oriented with axes.
      * If so, then can use efficient terminal image routines.
      */
-    {
-    TBOOLEAN rectangular_image = FALSE;
-    TBOOLEAN fallback = FALSE;
+    rectangular_image = FALSE;
+    fallback = FALSE;
 
 #define SHIFT_TOLERANCE 0.01
     if ( ( (fabs(delta_x_grid[0]) < SHIFT_TOLERANCE*fabs(delta_x_grid[1]))
@@ -5208,8 +5210,6 @@ process_image(void *plot, t_procimg_action action)
 			if ((points[i_image].type == UNDEFINED)
 			||  (isnan(points[i_image].CRD_COLOR))) {
 			    /* EAM April 2012 Distinguish +/-Inf from NaN */
-			    FPRINTF((stderr,"undefined pixel value %g\n",
-				    points[i_image].CRD_COLOR));
 			    if (isnan(points[i_image].CRD_COLOR))
 				    goto skip_pixel;
 			}
@@ -5263,7 +5263,6 @@ skip_pixel:
 	}
 
 	(term->layer)(TERM_LAYER_END_IMAGE);
-    }
     }
 
 }

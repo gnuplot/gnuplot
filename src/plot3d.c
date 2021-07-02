@@ -2457,6 +2457,15 @@ eval_3dplots()
 			this_plot->plot_type, __LINE__);
 	    }
 
+	    if (this_plot->plot_style == IMAGE
+	    ||  this_plot->plot_style == RGBIMAGE
+	    ||  this_plot->plot_style == RGBA_IMAGE) {
+		if (df_sparse_matrix) {
+		    struct iso_curve *this_iso = this_plot->iso_crvs;
+		    populate_sparse_matrix( &(this_iso->points), &(this_iso->p_count) );
+		}
+	    }
+
 	    if (this_plot->plot_type == DATA3D && this_plot->plot_style == LINES
 	    &&  this_plot->plot_smooth != SMOOTH_NONE) {
 		gen_3d_splines(this_plot);

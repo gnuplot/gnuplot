@@ -51,6 +51,10 @@
  *    int df_datum        - increases with each data point
  *    int df_eof          - end of file
  *
+ * public information about the data file or format
+ *    TBOOLEAN df_matrix  - TRUE if splot matrix
+ *    TBOOLEAN df_binary  - binary data file format (maybe auto-generated)
+ *
  * functions
  *   int df_open(char *file_name, int max_using, plot_header *plot)
  *      parses index / using on command line
@@ -268,6 +272,8 @@ static char *df_arrayname = NULL;
 static unsigned int df_xpixels;
 static unsigned int df_ypixels;
 static TBOOLEAN df_transpose;
+static double df_image_origin[2];
+static double df_image_deltas[2];
 
 /* parsing stuff */
 struct use_spec_s use_spec[MAXDATACOLS];
@@ -323,6 +329,8 @@ struct at_type *df_plot_title_at;	/* used for deferred evaluation of plot title 
  * in the same format as "binary matrix", i.e. with explicit x and y coordinates.
  * EAM Jul 2014 - Add keywords "columnheaders" and "rowheaders" to indicate ascii
  * matrix data in the uniform grid format containing labels in row 1 and column 1.
+ * EAM Jul 2021 - Add keyword "sparse matrix" to indicate ascii matrix data
+ * provided as individual entries (x y value) in any order.
  */
 static TBOOLEAN df_read_binary;
 static TBOOLEAN df_nonuniform_matrix;
@@ -342,6 +350,7 @@ static void clear_binary_records(df_records_type);
 static void plot_option_binary_format(char *);
 static void plot_option_binary(TBOOLEAN, TBOOLEAN);
 static void plot_option_array(void);
+static void plot_option_sparse(void);
 static TBOOLEAN rotation_matrix_2D(double R[][2], double);
 static TBOOLEAN rotation_matrix_3D(double P[][3], double *);
 static int token2tuple(double *, int);
@@ -399,6 +408,7 @@ static df_byte_read_order_type byte_read_order(df_endianess_type);
 /* Logical variables indicating information about data file. */
 TBOOLEAN df_binary_file;
 TBOOLEAN df_matrix_file;
+TBOOLEAN df_sparse_matrix;
 TBOOLEAN df_voxelgrid;
 
 
@@ -1117,6 +1127,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     df_num_bin_records = 0;
     df_matrix = FALSE;
     df_nonuniform_matrix = FALSE;
+    df_sparse_matrix = FALSE;
     df_matrix_columnheaders = FALSE;
     df_matrix_rowheaders = FALSE;
     df_skip_at_front = 0;
@@ -1220,8 +1231,24 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	    df_matrix_file = TRUE;
 	    df_nonuniform_matrix = TRUE;
 	    fast_columns = 0;
-	    if (df_matrix_rowheaders || df_matrix_columnheaders)
+	    if (df_sparse_matrix || df_matrix_rowheaders || df_matrix_columnheaders)
 		duplication = TRUE;
+	    continue;
+	}
+
+	/* Jul 2021 - "sparse matrix" indicates an ascii data file
+	 * with individual [x y value] triples in any order
+	 */
+	if (equals(c_token, "sparse")) {
+	    c_token++;
+	    df_matrix_file = FALSE;
+	    df_sparse_matrix = TRUE;
+	    if (df_nonuniform_matrix || df_matrix_rowheaders || df_matrix_columnheaders)
+		duplication = TRUE;
+	    else
+		plot_option_sparse();
+	    if (plot)
+		plot->image_properties.fallback = TRUE;
 	    continue;
 	}
 
@@ -4112,7 +4139,10 @@ clear_binary_records(df_records_type records_type)
 
 
 /*
- * Syntax is:   array=(xdim,ydim):(xdim,ydim):CONST:(xdim) etc
+ * Syntax:
+ *	plot FOO binary array=(xdim,ydim)[:(xdim,ydim)[...]]
+ * or
+ *	plot FOO binary record=(xdim,ydim)[:(xdim,ydim)[...]]
  */
 static void
 plot_option_array(void)
@@ -4151,6 +4181,58 @@ plot_option_array(void)
     } while (equals(c_token, ":"));
 }
 
+/*
+ * Syntax:
+ *	plot FOO sparse matrix=(<ncols>,<nrows>) dx=<val> dy=<val> origin=(x0,y0)
+ * The size is required. Origin defaults to (0,0), dx default to 1,
+ * dy defaults to dx.
+ * This provides an alternative input format for matrix data
+ * that is neither "uniform matrix" nor "nonuniform matrix".
+ * The full matrix grid is defined in advance here, to be followed
+ * by input of individual entries one per line: x y value
+ */
+void
+plot_option_sparse()
+{
+    double dx = 1, dy = 0;
+    double image_xy[2];
+    const char *sparse_error_msg =
+	    "syntax:  sparse matrix=(<cols>,<rows>) [dx=<dx> dy=<dy> origin=(<x0>,<y0>)]";
+
+    if (!equals(c_token++, "matrix") || !equals(c_token++, "=") || !token2tuple(image_xy,2))
+	int_error(c_token, sparse_error_msg);
+    df_xpixels = image_xy[0];
+    df_ypixels = image_xy[1];
+
+    while (!END_OF_COMMAND) {
+	if (equals(c_token, "dx")) {
+	    c_token++;
+	    if (!equals(c_token++,"="))
+		int_error(c_token, sparse_error_msg);
+	    dx = real_expression();
+	} else if (equals(c_token, "dy")) {
+	    c_token++;
+	    if (!equals(c_token++,"="))
+		int_error(c_token, sparse_error_msg);
+	    dy = real_expression();
+	} else if (almost_equals(c_token, "ori$gin")) {
+	    c_token++;
+	    df_image_origin[0] = df_image_origin[1] = 0.0;
+	    if (!equals(c_token++, "=") || !token2tuple(df_image_origin,2))
+		int_error(c_token, sparse_error_msg);
+	} else
+	    break;
+    }
+
+    if (dx == 0)
+	int_error(c_token, sparse_error_msg);
+    if (dy == 0)
+	dy = dx;
+
+    /* Save for populate_sparse_matrix */
+    df_image_deltas[0] = dx;
+    df_image_deltas[1] = dy;
+}
 
 /* Evaluate a tuple of up to specified dimension. */
 #define TUPLE_SEPARATOR_CHAR ":"
@@ -5749,4 +5831,55 @@ axcol_for_ticlabel(enum COLUMN_TYPE type, int *axis)
 	}
 
     return axcol;
+}
+
+/* Expand sparse matrix to fill entire grid defined by
+ *   plot FOO sparse matrix=(cols,rows) origin=(x0,y0) dx=dx dy=dy
+ * Note: the extra level of indirection for points and p_count
+ *       is so that this can be called from either plot or splot.
+ */
+void
+populate_sparse_matrix(struct coordinate **points, int *p_count)
+{
+    struct coordinate *matrix;
+    struct coordinate empty = {UNDEFINED, 0, 0, 0, NAN, NAN, NAN, NAN};
+    int i,j,m;
+    int msize = df_ypixels * df_xpixels;
+    int noutside = 0;
+
+    /* Create a new an empty matrix, fill in coordinates, initialize to UNDEFINED */
+    matrix = gp_alloc(msize*sizeof(struct coordinate), "sparse matrix");
+    m = 0;
+    for (j=0; j<df_ypixels; j++)
+    for (i=0; i<df_xpixels; i++)
+    {
+	matrix[m] = empty;
+	matrix[m].x = df_image_origin[0] + i*df_image_deltas[0];
+	matrix[m].y = df_image_origin[1] + j*df_image_deltas[1];
+	m++;
+    }
+
+    /* Now copy each input point into the nearest grid entry
+     * (coordinates may not match exactly).
+     */
+    for (m = 0; m < *p_count; m++) {
+	struct coordinate *p = & ((*points)[m]);
+	i = round((p->x - df_image_origin[0]) / df_image_deltas[0]);
+	j = round((p->y - df_image_origin[1]) / df_image_deltas[1]);
+	if (i >= df_xpixels || j >= df_ypixels || i < 0 || j < 0)
+	    noutside++;
+	else
+	    matrix[ j*df_xpixels + i ] = *p;
+    }
+
+    fprintf(stderr, "Loaded %d points into %d x %d sparse matrix\n",
+	    *p_count-noutside, df_xpixels, df_ypixels);
+    if (noutside > 0)
+	fprintf(stderr, "       %d points outside defined matrix extent\n", noutside);
+
+    /* Replace the original data with the full sparse matrix */
+    free(*points);
+    *points = matrix;
+    *p_count = msize;
+
 }
