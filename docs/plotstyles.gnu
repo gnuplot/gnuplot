@@ -317,7 +317,7 @@ set view 45, 25, 1.0, 1.35
 set grid
 unset key
 set format z "%.1f"
-splot demo . 'blutux.rgb' binary array=128x128 flip=y format='%uchar%uchar%uchar' with rgbimage
+splot demo . 'blutux.rgb' binary array=(128,128) flip=y format='%uchar%uchar%uchar' with rgbimage
 
 #
 # Rescale image as plot element

@@ -4125,21 +4125,13 @@ plot_option_array(void)
     do {
 	c_token++;
 
-	/* Partial backward compatibility with syntax up to 4.2.4 */
+	/* Partial backward compatibility with syntax up to 4.2.4
+	 * Allow bare numbers; do not allow FOOxBAZ instead of (FOO,BAZ)
+	 */
 	if (isanumber(c_token)) {
 	    if (++number_of_records > df_num_bin_records)
 		df_add_binary_records(1, DF_CURRENT_RECORDS);
 	    df_bin_record[df_num_bin_records - 1].cart_dim[0] = int_expression();
-	    /* Handle the old syntax:  array=123x456 */
-	    if (!END_OF_COMMAND) {
-		char xguy[8]; int itmp=0;
-		copy_str(xguy, c_token, 6);
-		if (xguy[0] == 'x') {
-		    sscanf(&xguy[1],"%d",&itmp);
-		    df_bin_record[df_num_bin_records - 1].cart_dim[1] = itmp;
-		    c_token++;
-		}
-	    }
 	} else
 
 	if (equals(c_token, "(")) {
