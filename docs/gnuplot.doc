@@ -262,6 +262,15 @@ C
 #b keyword `binvalue=avg` plots average, rather than sum, of binned data.
 #end
 
+4 New data format
+?new data_format
+#start
+#b The `sparse matrix=(cols,rows)` option to `plot` and `splot` generates
+## a uniform pixel grid into which individual pixel values may be loaded in
+## any order.  This is useful for plotting heat maps from incomplete data.
+## See `sparse`.
+#end
+
 4 New built-in functions
 ?new built-in functions
 #start
@@ -5315,16 +5324,17 @@ Ffigure_newhist
 ?image
 ?rgbimage
 ?rgbalpha
+?heatmap
  The `image`, `rgbimage`, and `rgbalpha` plotting styles all project a
- uniformly sampled grid of data values onto a plane  in either 2D or 3D.
+ uniformly sampled grid of data values onto a plane in either 2D or 3D.
  The input data may be an actual bitmapped image, perhaps converted from a
  standard format such as PNG, or a simple array of numerical values.
+ These plot styles are often used to produce heatmaps.
 
-=heatmap
 Ffigure_heatmap
  This figure illustrates generation of a heat map from an array of scalar values.
  The current palette is used to map each value onto the color assigned to the
- corresponding pixel.
+ corresponding pixel. See also `sparse`.
        plot '-' matrix with image
        5 4 3 1 0
        2 2 0 0 1
@@ -5395,6 +5405,7 @@ Ffigure_scaled_image
 ?with image pixels
 ?image pixels
 ?pixels
+=heatmap
  Some terminals use device- or library-specific optimizations to render image
  data within a rectangular 2D area. This sometimes produces undesirable output,
  e.g. inter-pixel smoothing, bad clipping or missing edges. An example of this
@@ -5406,7 +5417,6 @@ Ffigure_scaled_image
  Example:
        plot 'data' with image pixels
 
-#TeX \newpage
 2 impulses
 ?plotting styles impulses
 ?style impulses
@@ -7495,7 +7505,7 @@ Ffigure_zerror
 
  Syntax:
        plot '<file_name>' {binary <binary list>}
-                          {{nonuniform} matrix}
+                          {{nonuniform|sparse} matrix}
                           {index <index list> | index "<name>"}
                           {every <every list>}
                           {skip <number-of-lines>}
@@ -16846,7 +16856,7 @@ Ffigure_walls
 
  Syntax:
        splot '<file_name>' {binary <binary list>}
-                           {{nonuniform} matrix}
+                           {{nonuniform|sparse} matrix}
                            {index <index list>}
                            {every <every list>}
                            {using <using list>}
@@ -16854,11 +16864,10 @@ Ffigure_walls
  The special filenames `""` and `"-"` are permitted, as in `plot`.
  See `special-filenames`.
 
- In brief, `binary` and `matrix` indicate that the data are in a special
- form, `index` selects which data sets in a multi-data-set file are to be
- plotted, `every` specifies which datalines (subsets) within a single data
- set are to be plotted, and `using` determines how the columns within a single
- record are to be interpreted.
+ Keywords `binary` and `matrix` indicate that the data are in a special form,
+ `index` selects which data sets in a multi-data-set file are plotted,
+ `every` specifies a subset of lines within a single data set,
+ `using` determines how the columns within a single record are interpreted.
 
  The options `index` and `every` behave the same way as with `plot`;  `using`
  does so also, except that the `using` list must provide three entries
@@ -16892,29 +16901,37 @@ Ffigure_walls
 ?splot datafile matrix
 ?binary matrix
 ?matrix
- Gnuplot can interpret matrix data input in two different ways.
+ Matrix data can be input in several formats (`uniform`, `nonuniform`, `sparse`)
+ from either text or binary files.
 
- The first of these assumes a uniform grid of x and y coordinates and assigns
+ The first variant assumes a uniform grid of x and y coordinates and assigns
  each value in the input matrix to one element M[i,j] of this uniform grid.
  The assigned x coordinates are the integers [0:NCOLS-1].
  The assigned y coordinates are the integers [0:NROWS-1].
  This is the default for text data input, but not for binary input.
- See `matrix uniform` for examples and additional keywords.
+ See `uniform` for examples and additional keywords.
 
- The second interpretation assumes a non-uniform grid with explicit x and y
+ The second variant handles a non-uniform grid with explicit x and y
  coordinates. The first row of input data contains the y coordinates;
- the first column of input data contains the x coordinates.  For binary input
- data, the first element of the first row must contain the number of columns.
- This is the default for `binary matrix` input, but requires an additional
- keyword `nonuniform` for text input data.
- See `matrix nonuniform` for examples.
+ the first column of input data contains the x coordinates.
+ For binary input data, the first element of the first row must contain the
+ number of columns.  This is the default for `binary matrix` input,
+ but requires an additional keyword `nonuniform` for text input data.
+ See `nonuniform` for examples.
 
-5 uniform
+ The `sparse matrix` variant is EXPERIMENTAL. It defines a uniform grid into
+ which any number of individual point values are read from the input file,
+ one per line, in any order. This is primarily intended for the generation of
+ heatmaps from incomplete data.
+ See `sparse` for examples.
+
+5 uniform matrix
 ?commands plot datafile matrix uniform
 ?commands splot datafile matrix uniform
 ?datafile matrix uniform
 ?matrix uniform
 ?binary matrix uniform
+?uniform
  Example commands for plotting uniform matrix data:
       splot 'file' matrix using 1:2:3          # text input
       splot 'file' binary general using 1:2:3  # binary input
@@ -16941,12 +16958,13 @@ Ffigure_walls
  data block.  You can select among the data blocks in a file by the `index`
  option to the `splot` command, as usual.  The columnheaders option, if present,
  is applied only to the first data block.
-5 nonuniform
+5 nonuniform matrix
 ?commands plot datafile matrix nonuniform
 ?commands splot datafile matrix nonuniform
 ?datafile matrix nonuniform
 ?matrix nonuniform
 ?binary matrix nonuniform
+?nonuniform
  The first row of input data contains the y coordinates.
  The first column of input data contains the x coordinates.
  For binary input data, the first field of the first row must contain the
@@ -16976,6 +16994,46 @@ Ffigure_walls
 
  These triplets are then converted into `gnuplot` iso-curves and then
  `gnuplot` proceeds in the usual manner to do the rest of the plotting.
+5 sparse matrix
+?datafile sparse matrix
+?sparse
+ Syntax:
+       sparse matrix=(cols,rows) origin=(x0,y0) dx=<delx> dy=<dely>
+ EXPERIMENTAL (version 5.5)
+#TeX \\
+ The `sparse` matrix variant defines a uniform grid as part of the
+ `plot` or `splot` command line.  The grid is initially empty.
+ Any number of individual points are then read from the input file,
+ one per line, and assigned to the nearest grid point.  I.e. a data line
+       x y value
+ is evaluated as
+       i = (x - x0) / delx
+       j = (y - y0) / dely
+       matrix[i,j] = value
+ The size of the matrix is required.
+ `origin` (optional) defaults to origin=(0,0).
+ `dx` (optional) defaults to dx=1.
+ `dy` (optional) defaults to dy=dx.
+
+ The intended use of this variant is to generate heatmaps from unordered,
+ possibly incomplete, data using the `image`, `rgbimage`, or `rgbalpha`
+ plot styles.  The example below generates a distance matrix in the form
+ of a 4x4 heatmap with only the upper triangle elements present:
+Ffigure_sparsematrix
+       $DATA << EOD
+       1 1 10
+       1 2 20
+       1 3 30
+       1 4 40
+       2 2 10
+       2 3 50
+       2 4 60
+       3 3 10
+       3 4 20
+       4 4 10
+       EOD
+       plot $DATA sparse matrix=(4,4) origin=(1,1) with image
+
 5 every
 ?datafile matrix every
 ?matrix every

@@ -320,6 +320,35 @@ set format z "%.1f"
 splot demo . 'blutux.rgb' binary array=(128,128) flip=y format='%uchar%uchar%uchar' with rgbimage
 
 #
+# Sparse matrix data
+#
+reset
+set output out . 'figure_sparsematrix' . ext
+$SPARSEDATA << EOD
+1 1 10
+1 2 20
+1 3 30
+1 4 40
+2 2 10
+2 3 50
+2 4 60
+3 3 10
+3 4 20
+4 4 10
+EOD
+set label 1 center at graph 0.75,0.1 "Intercity Transit"
+set tics scale 0
+set x2tics ("Atlantis" 1, "Finias" 2, "Ys" 3, "Erewhon" 4)
+set ytics  ("Atlantis" 1, "Finias" 2, "Ys" 3, "Erewhon" 4)
+set palette defined (0 "#DDDDDD", 0.3 "gold", 0.6 "orange", 1.0 "dark-blue")
+set palette maxcolors 6
+set cbrange [5:65]
+set cbtics format "\U+228D %g"   add (" Fare " 65)
+unset border; unset xtics; unset key
+set auto noextend
+plot $SPARSEDATA sparse matrix=(4,4) origin=(1,1) with image
+
+#
 # Rescale image as plot element
 # =============================
 #
