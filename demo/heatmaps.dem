@@ -73,6 +73,37 @@ plot $map1 matrix using 1:2:3 with image, \
 
 pause -1 "Hit return to continue"
 
+$sparsedata << EOD
+# incomplete data for a 5x5 grid
+0 0 5
+0 1 4
+0 2 3
+0 3 1
+2 3 1
+3 3 2
+3 4 3
+4 1 1
+4 2 2
+4 3 4
+4 4 3
+1 0 2
+1 1 2
+1 4 1
+EOD
+
+set title "Same data input as a sparse matrix (non-zero values only)"
+set palette maxcolors 6
+set cbtics 0,1,5 scale 2 offset -3.5, 1.5
+set cbrange [0:6]
+plot $sparsedata sparse matrix=(5,5) using 2:1:3 with image
+
+pause -1 "Hit return to continue"
+
+set title "Sparse matrix handling is also possible with splot"
+splot $sparsedata sparse matrix=(5,5) using 2:1:3 with image
+
+pause -1 "Hit return to continue"
+
 set title "Heat map from csv data with column and row labels"
 
 $map3 << EOD
@@ -95,6 +126,7 @@ pause -1
 # The `pixels` option forces pixel-by-pixel drawing with no smoothing.
 
 unset colorbox
+set palette maxcolors 0
 set format xy ""
 set multiplot layout 1,2 title "Compare 'image' and 'image pixels' modes" \
     margin screen 0.05, 0.95, 0.10, 0.85 spacing screen 0.05
