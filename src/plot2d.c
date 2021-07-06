@@ -2380,7 +2380,8 @@ eval_plots()
 			int_error(c_token, "\"with\" allowed only after parametric function fully specified");
 		    this_plot->plot_style = get_style();
 
-		    if (this_plot->plot_style == FILLEDCURVES) {
+		    if (this_plot->plot_style == FILLEDCURVES
+		    ||  this_plot->plot_style == FILLSTEPS) {
 			/* read a possible option for 'with filledcurves' */
 			get_filledcurves_style_options(&this_plot->filledcurves_options);
 		    }

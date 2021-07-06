@@ -1641,12 +1641,15 @@ plot_steps(struct curve_points *plot)
     int xleft, xright, ytop, ybot;	/* plot limits in terminal coords */
     int y0=0;				/* baseline */
     int style = 0;
+    int oneside = plot->filledcurves_options.oneside;	/* above/below */
 
     /* EAM April 2011:  Default to lines only, but allow filled boxes */
     if ((plot->plot_style & PLOT_STYLE_HAS_FILL) && t->fillbox) {
 	double ey = 0;
 	style = style_from_fill(&plot->fill_properties);
-	if (Y_AXIS.log)
+	if (plot->filledcurves_options.closeto == FILLEDCURVES_ATY1)
+	    ey = plot->filledcurves_options.at;
+	else if (Y_AXIS.log)
 	    ey = Y_AXIS.min;
 	else
 	    cliptorange(ey, Y_AXIS.min, Y_AXIS.max);
@@ -1684,12 +1687,12 @@ plot_steps(struct curve_points *plot)
 			break;
 
 		    /* Some terminals fail to completely color the join between boxes */
-		    if (style == FS_OPAQUE)
+		    if (style == FS_OPAQUE && oneside == 0)
 			draw_clip_line(xl, yprev, xl, y0);
 
-		    if (yprev - y0 < 0)
+		    if ((yprev - y0 < 0) && (oneside <= 0))
 			(*t->fillbox)(style, xl, yprev, (xr-xl), y0-yprev);
-		    else
+		    if ((yprev - y0 >= 0) && (oneside >= 0))
 			(*t->fillbox)(style, xl, y0, (xr-xl), yprev-y0);
 		} else {
 		    draw_clip_line(xprev, yprev, x, yprev);
