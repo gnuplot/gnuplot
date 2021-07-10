@@ -63,7 +63,7 @@ extern "C" {
 	#include "parse.h"     // for real_expression
 	#include "axis.h"
 #ifdef _WIN32
-	#include "win/winmain.h"  // for WinMessageLoop, ConsoleReadCh
+	#include "win/winmain.h"  // for WinMessageLoop, ConsoleReadCh, init_pipe_input
 	#include "win/wgnuplib.h" // for TextStartEditing, TextStopEditing
 	#include "win/wtext.h"    // for kbhit, getchar
 	#include <io.h>           // for isatty
@@ -1137,7 +1137,7 @@ int qt_waitforinput(int options)
 	if (options != TERM_ONLY_CHECK_MOUSING) { // NOTE: change this if used also for the caca terminal
 #ifdef WGP_CONSOLE
 		if (!isatty(fd))
-			h[0] = (HANDLE)_get_osfhandle(fd);
+			h[0] = init_pipe_input();
 		else
 #endif
 			h[0] = GetStdHandle(STD_INPUT_HANDLE);
@@ -1182,11 +1182,7 @@ int qt_waitforinput(int options)
 		if ((waitResult == idx_stdin) && (idx_stdin != -1)) { // console windows or caca terminal (TBD)
 #ifdef WGP_CONSOLE
 			if (!isatty(fd)) {
-				unsigned char ch;
-				if (fread(&ch, 1, 1, stdin) == 1)
-					c = ch;
-				else
-					c = EOF;
+				c = next_pipe_input();
 				quitLoop = true;
 			} else
 #endif
@@ -1263,8 +1259,6 @@ int qt_waitforinput(int options)
 	// This happens if neither the qt queue is alive, nor there is a console window.
 	if ((options != TERM_ONLY_CHECK_MOUSING) && !waitOK)
 		return getchar();
-#else
-	(void) waitOK;
 #endif
 	return c;
 #endif // _WIN32
