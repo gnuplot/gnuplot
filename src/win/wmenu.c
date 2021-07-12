@@ -207,12 +207,12 @@ SendMacro(LPTW lptw, UINT m)
 		for (i = 0; (*s >= 32) && (*s <= 126); i++)
 		    str[i] = *s++;	/* get dialog box title */
 		str[i] = NUL;
-		MultiByteToWideChar(CP_ACP, 0, str, MAXSTR + 1, szTitle, MAXSTR + 1);
+		MultiByteToWideChar(CP_UTF8, 0, str, MAXSTR + 1, szTitle, MAXSTR + 1);
 		s++;
 		for (i = 0; (*s >= 32) && (*s <= 126); i++)
 		    str[i] = *s++;	/* temporary copy of filter */
 		str[i++] = NUL;
-		MultiByteToWideChar(CP_ACP, 0, str, MAXSTR + 1, szFile, MAXSTR + 1);
+		MultiByteToWideChar(CP_UTF8, 0, str, MAXSTR + 1, szFile, MAXSTR + 1);
 		wcscpy(szFilter, L"Default (");
 		wcscat(szFilter, szFile);
 		wcscat(szFilter, L")");
@@ -288,7 +288,7 @@ SendMacro(LPTW lptw, UINT m)
 		for (i = 0; (*s >= 32 && *s <= 126); i++)
 		    str[i] = *s++;
 		str[i] = NUL;
-		MultiByteToWideChar(CP_ACP, 0, str, MAXSTR + 1, szTitle, MAXSTR + 1);
+		MultiByteToWideChar(CP_UTF8, 0, str, MAXSTR + 1, szTitle, MAXSTR + 1);
 
 		flag = 0;
 
@@ -602,7 +602,7 @@ LoadMacros(LPTW lptw)
 		goto errorcleanup;
 	    }
 	    hMenu[nMenuLevel] = CreateMenu();
-	    MultiByteToWideChar(CP_ACP, 0, buf, MAXSTR, wbuf, MAXSTR);
+	    MultiByteToWideChar(CP_UTF8, 0, buf, MAXSTR, wbuf, MAXSTR);
 	    AppendMenuW(hMenu[nMenuLevel > 0 ? nMenuLevel - 1 : 0],
 		    MF_STRING | MF_POPUP, (UINT_PTR)hMenu[nMenuLevel], wbuf);
 	} else if (!_stricmp(buf, "[EndMenu]")) {
@@ -718,7 +718,7 @@ LoadMacros(LPTW lptw)
 	    } else if (buf[0] == '|') {
 		AppendMenu(hMenu[nMenuLevel], MF_SEPARATOR | MF_MENUBARBREAK, 0, NULL);
 	    } else {
-		MultiByteToWideChar(CP_ACP, 0, buf, MAXSTR, wbuf, MAXSTR);
+		MultiByteToWideChar(CP_UTF8, 0, buf, MAXSTR, wbuf, MAXSTR);
 		AppendMenuW(hMenu[nMenuLevel], MF_STRING, lpmw->nCountMenu, wbuf);
 		if (!(nInc = GetLine(buf, MAXSTR, menufile))) {
 		    nLine += nInc;
