@@ -14,11 +14,7 @@ if (strstrt(GPVAL_TERMINALS, " windows ") == 0) {
 MANUAL_FIGURES = 1
 
 if (!exists("winhelp")) winhelp = 0
-if (winhelp == 0) {
-    set term pdfcairo mono font fontspec size 3.5,2.0 dashlength 0.2
-# pdfs that need colour have their own terminal setting, check below
-    out = "./"
-} else {
+if (winhelp > 0) {
 #   prefer pngcairo over gd based png
     if (strstrt(GPVAL_TERMINALS, " pngcairo ") > 0) {
         set term pngcairo font fontspec size 448,225 dashlength 0.2 fontscale 0.6
@@ -26,12 +22,20 @@ if (winhelp == 0) {
         set term png font fontspec size 448,225 dashlength 0.2 fontscale 0.6
     }
     out = "./windows/"
+} else if (GNUTERM eq "tikz") {
+    set term tikz color fontscale 0.75 clip size 3.0in, 1.7in
+    out = "./"
+} else {
+    set term pdfcairo mono font fontspec size 3.5,2.0 dashlength 0.2
+# pdfs that need colour have their own terminal setting, check below
+    out = "./"
 }
 
 demo = "../demo/"
 
 if (GPVAL_TERM eq "pngcairo" || GPVAL_TERM eq "png") ext=".png"
 if (GPVAL_TERM eq "pdfcairo" || GPVAL_TERM eq "pdf") ext=".pdf"
+if (GPVAL_TERM eq "tikz") ext=".tex"
 
 set encoding utf8
 
@@ -217,6 +221,8 @@ plot demo . 'ellipses.dat' u 1:2:3:4:5 with ellipses units xy title "with ellips
 #
 if (GPVAL_TERM eq "pdfcairo") \
     set term pdfcairo color font fontspec size 3.5,2.0 dashlength 0.2
+if (GNUTERM eq "tikz") \
+    set term tikz color fontscale 0.75 clip size 3.0in, 1.7in
 
 #
 # 2D heat map from an array of in-line data

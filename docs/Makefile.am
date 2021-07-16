@@ -1,5 +1,4 @@
 # Makefile.am for GNUPLOT documentation directory
-# based on Makefile.in as of 20-may-2012
 #
 # Note that the master file for generating documentation is gnuplot.doc.
 # See README.
@@ -12,8 +11,11 @@
 #       make pdf
 #	(requires pdflatex and also graphicx and picins packages)
 #     or
+#       make tikz 
+#	(requires pdflatex and also lua/tikz and wrapfig package)
+#     or
 #       make pdf_nofig
-#       (PDF without figures, e.g. if graphicx or picins are not present)
+#       (PDF without figures)
 #     or
 #       make ps
 #
@@ -90,15 +92,13 @@ windows/wgnuplot.hhk windows/wgnuplot.hhp windows/wgnuplot.stp windows/doc2html.
 
 ELCS = gnuplot-eldoc.elc
 
-MOSTLYCLEANFILES = gnuplot.aux gnuplot.ind gnuplot.log gnuplot.out	\
-gnuplot.toc figures.aux figures.log figures.toc figures.idx		\
-figures.ilg figures.ind figures.out nofigures.aux nofigures.log		\
-nofigures.toc nofigures.idx nofigures.ilg nofigures.ind nofigures.out	\
-pdffigures.tex pdffigures.aux wxhelp/doc2html.o
+MOSTLYCLEANFILES = gnuplot.aux gnuplot.log gnuplot.out gnuplot.toc	\
+gnuplot.ind gpinsetfigure.aux gpinsetfigure.tex figurestyle \
+no_figures tikz_figures pdf_figures \
+wxhelp/doc2html.o
 
-CLEANFILES = allterm.h gnuplot.dvi figures.tex nofigures.tex		\
-gnuplot.tex gnuplot.idx gnuplot.ilg gnuplot.ps 	\
-gnuplot.gih gnuplot.hlp gnuplot.info* gnuplot.ipf gnuplot.ms		\
+CLEANFILES = allterm.h gnuplot.dvi gnuplot.tex gnuplot.idx gnuplot.ilg	\
+gnuplot.ps gnuplot.gih gnuplot.hlp gnuplot.info* gnuplot.ipf gnuplot.ms	\
 gnuplot.rnh gnuplot.rtf gnuplot.nroff gnuplot.txt gnuplot-groff.dvi	\
 gnuplot-groff.ps gnuplot.tmp VERSION gnuplot.4tc gnuplot.4ct		\
 gnuplot.idv gnuplot.xref gnuplot.lg gnuplot.pdf wxhelp_figures		\
@@ -174,76 +174,78 @@ htmldocs/gnuplot.html: figures.tex wxhelp_figures pdf_figures
 	  echo latex2html not found - cannot build html file ; \
 	fi
 
-### PDF documentation
+### PDF documentation can inset figures using either tikz+wrapfig or pdf+picins
 pdf_figures: $(GNUPLOT_EXE) $(srcdir)/plotstyles.gnu
 	$(AM_V_at)GNUPLOT_LIB=$(top_srcdir)/demo $(GNUPLOT_EXE) $(srcdir)/plotstyles.gnu
+	  rm -f gpinsetfigure.tex ; \
+	  ( echo "\usepackage{graphicx}" > gpinsetfigure.tex ; \
+	    echo "\usepackage{picins}" >> gpinsetfigure.tex ; \
+	    echo "\newcommand{\gpinsetfigure}[1]{" >> gpinsetfigure.tex ; \
+	    echo "  \parpic[r][rt]{\includegraphics[width=3in,keepaspectratio]{#1}}" >> gpinsetfigure.tex ; \
+	    echo "}" >> gpinsetfigure.tex ; \
+	  ) ; \
 	$(AM_V_GEN)touch $@
+	$(AM_V_GEN)touch figurestyle
 
-figures.tex: allterm.h doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc
+tikz_figures: $(GNUPLOT_EXE) $(srcdir)/plotstyles.gnu
+	$(AM_V_at)GNUPLOT_LIB=$(top_srcdir)/demo GNUTERM=tikz $(GNUPLOT_EXE) $(srcdir)/plotstyles.gnu
+	  rm -f gpinsetfigure.tex ; \
+	  ( echo "\usepackage{gnuplot-lua-tikz}" > gpinsetfigure.tex ; \
+	    echo "\usepackage{wrapfig}" >> gpinsetfigure.tex ; \
+	    echo "\newcommand{\gpinsetfigure}[1]{" >> gpinsetfigure.tex ; \
+	    echo "    \begin{wrapfigure}[10]{r}{3.0in}" >> gpinsetfigure.tex ; \
+	    echo "    \vspace{-20pt} \input{#1} \vspace{-20pt}" >> gpinsetfigure.tex ; \
+	    echo "    \end{wrapfigure}" >> gpinsetfigure.tex ; \
+	    echo "}" >> gpinsetfigure.tex ; \
+	  ) ; \
+	$(AM_V_GEN)touch $@
+	$(AM_V_GEN)touch figurestyle
+
+no_figures:
+	  rm -f gpinsetfigure.tex ; \
+	  ( echo "\newcommand{\gpinsetfigure}[1]{}" > gpinsetfigure.tex ; \
+	  ) ; \
+	$(AM_V_GEN)touch $@
+	$(AM_V_GEN)touch figurestyle
+
+gpinsetfigure.tex: no_figures
+	$(AM_V_GEN) touch $@
+
+gnuplot.tex: allterm.h doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc
 	$(AM_V_GEN)./doc2tex$(EXEEXT) -figures $(srcdir)/gnuplot.doc $@
 
-nofigures.tex: allterm.h doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc
-	$(AM_V_GEN)./doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc $@
+pdf: pdf_figures gnuplot.pdf figurestyle
+	rm -f tikz_figures no_figures
+tikz: tikz_figures gnuplot.pdf figurestyle
+	rm -f pdf_figures no_figures
+pdf_nofig: no_figures gnuplot.pdf figurestyle
+	rm -f tikz_figures pdf_figures
 
-pdf: gnuplot.pdf
-pdf_nofig: nofigures.pdf
-
-gnuplot.pdf: figures.tex pdf_figures $(srcdir)/titlepag.tex $(srcdir)/toc_entr.sty
+gnuplot.pdf: gnuplot.tex $(srcdir)/titlepag.tex $(srcdir)/toc_entr.sty figurestyle
 	$(AM_V_GEN)if test $(PDFLATEX) != no ; then \
-	  rm -f figures.idx ; \
-	  touch figures.idx ; \
-	  rm -f pdffigures.tex ; \
-	  ( echo "\usepackage{graphicx}" > pdffigures.tex ; \
-	    echo "\usepackage{picins}" >> pdffigures.tex ; \
-	  ) ; \
 	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(PDFLATEX) $< ; \
 	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(PDFLATEX) $< ; \
 	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(PDFLATEX) $< ; \
-	  makeindex figures ; \
+	  makeindex gnuplot ; \
 	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(PDFLATEX) $< ; \
-	  mv figures.pdf $@ ; \
-	  rm -f pdffigurex.tex pdffigures.aux ; \
-	else \
-	  echo pdflatex not found - cannot build pdf file ; \
-	fi
-
-nofigures.pdf: nofigures.tex $(srcdir)/titlepag.tex $(srcdir)/toc_entr.sty
-	$(AM_V_GEN)if test $(PDFLATEX) != no ; then \
-	  rm -f nofigures.idx ; \
-	  touch nofigures.idx ; \
-	  rm -f pdffigures.tex ; \
-	  echo "" > pdffigures.tex ; \
-	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(PDFLATEX) $< ; \
-	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(PDFLATEX) $< ; \
-	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(PDFLATEX) $< ; \
-	  makeindex nofigures ; \
-	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(PDFLATEX) $< ; \
-	  rm -f pdffigurex.tex pdffigures.aux ; \
 	else \
 	  echo pdflatex not found - cannot build pdf file ; \
 	fi
 
 ### LaTeX documentation
 tex: gnuplot.tex
-gnuplot.tex: nofigures.tex
-	$(AM_V_GEN) $(LN_S) $< $@
 
 doc2tex_SOURCES = doc2tex.c termdoc.c
 doc2tex_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
 
-dvi: gnuplot.dvi
+dvi: no_figures gnuplot.dvi
 gnuplot.dvi: gnuplot.tex $(srcdir)/titlepag.tex $(srcdir)/toc_entr.sty
 	$(AM_V_GEN)if test $(LATEX) != no ; then \
-	  rm -f nofigures.idx ; \
-	  touch nofigures.idx ; \
-	  rm -f pdffigures.tex ; \
-	  echo "" > pdffigures.tex ; \
 	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(LATEX) $< ; \
 	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(LATEX) $< ; \
 	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(LATEX) $< ; \
 	  makeindex gnuplot ; \
 	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(LATEX) $< ; \
-	  rm -f pdffigurex.tex pdffigures.aux ; \
 	else \
 	  echo "latex not found - cannot build dvi file" ; \
 	fi
@@ -375,7 +377,7 @@ check-local: checkdoc$(EXEEXT)
 checkdoc_SOURCES = checkdoc.c termdoc.c gnuplot.doc
 
 clean-local:
-	$(AM_V_at)for f in figure*.pdf $(LUA_HELP); do \
+	$(AM_V_at)for f in figure*.pdf figure*.tex $(LUA_HELP); do \
 	   if [ "$$f" != "figure_missing.pdf" ]; then \
 	     rm -f $$f ; \
 	   else \

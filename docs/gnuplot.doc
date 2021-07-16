@@ -4557,6 +4557,7 @@ Ffigure_newsyntax
 ?beeswarm
 ?bee swarm
 =jitter
+#TeX ~
 Ffigure_jitter
  "Bee swarm" plots result from applying jitter to separate overlapping points.
  A typical use is to compare the distribution of y values exhibited by two or
@@ -4596,7 +4597,7 @@ Ffigure_boxerrorbars
  ylow to yhigh, depending on how many data columns are provided.
  The line style used for the error bar may be controlled using `set bars`.
  Otherwise the error bar will match the border of the box.
- 
+
  DEPRECATED:  The special case `boxwidth = -2.0` is for four-column data with
  y errors in the form "ylow yhigh".  In this case the boxwidth will be
  calculated so that each box touches the adjacent boxes.
@@ -5580,6 +5581,7 @@ Ffigure_parallel
  By default gnuplot will automatically determine the range and scale of the
  individual axes from the input data, but the usual `set axis range` commands
  can be used to customize this.  See `set paxis`.
+#TeX \newpage
 2 Polar plots
 =polar
 Ffigure_polar
@@ -5589,7 +5591,6 @@ Ffigure_polar
  Many, but not all, of the 2D plotting styles work in polar mode.
  The figure shows a combination of plot styles `lines` and `filledcurves`.
  See `set polar`, `set rrange`, `set size square`, `set theta`, `set ttics`.
-#TeX \newpage
 2 points
 ?plotting styles points
 ?style points
@@ -7986,7 +7987,7 @@ Ffigure_zerror
  each treating one coordinate x, y, or z as a function of a shared implicit
  trajectory path parameter. This is equivalent to the 2D `plot ... smooth path`
  option.
- 
+
  In the special case that the curve lies in the xz, yz, or xy plane then only a
  single set of spline coefficients is generated.  This allows you to generate a
  stack of smoothed curves in 3D where each one replicates the spline fit you
@@ -8162,7 +8163,7 @@ Ffigure_smooth_path
  taken from the second column.  A Gaussian is placed at the location of each
  point and the sum of all these Gaussians is plotted as a function.
  To obtain a normalized histogram, each weight should be 1/number-of-points.
- 
+
  Bandwidth:
  By default gnuplot calculates and uses the bandwidth which would be optimal
  for normally distributed data values.
@@ -12700,7 +12701,7 @@ Ffigure_multiple_keys
  <freq> is the number of sub-intervals (NOT the number of minor tic marks)
  between major tics. The default for a linear axis is either 2 (one mark) or
  5 (four marks) depending on the spacing of the major tics.
- 
+
  `default` will return the number of minor ticks to its default value.
 
  `set mxtics time <N> <units>` applies only when the major tics are set to
@@ -15591,7 +15592,7 @@ Ffigure_multiple_keys
  they are interpreted as "horizontal/vertical" rather than "x/y".
 
      set key top right at graph 0.95, graph 0.95     # works in any projection
- 
+
 3 vrange
 ?commands set vrange
 ?commands show vrange

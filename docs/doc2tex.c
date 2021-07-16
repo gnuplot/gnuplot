@@ -166,9 +166,9 @@ process_line( char *line, FILE *b)
     case 'F':			/* embedded figure */
 	    if (figures) {
 		line[strlen(line)-1]=NUL;
-		(void) fputs("\\parpic[r][rt]{\\includegraphics[width=3in,keepaspectratio]{",b);
+		(void) fputs("\\gpinsetfigure{",b);
 		fputs(line+1, b);
-		(void) fputs("}}\n",b);
+		(void) fputs("}\n",b);
 	    }
 	    break;
 
