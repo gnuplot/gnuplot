@@ -80,7 +80,7 @@ plot demo . 'silver.dat' u 1:($2-10.) title 'with fillsteps' with fillsteps, \
 set output out . 'figure_histeps' . ext
 plot demo . 'silver.dat' u 1:($2-10.) title 'with histeps' with histeps
 #
-symbol(z) = "●□+⊙♠♣♡♢"[int(z):int(z)]
+symbol(z) = "•□+⊙♠♣♡♢"[int(z):int(z)]
 set output out . 'figure_labels2' . ext
 plot demo . 'silver.dat' u 1:($2-10.):(symbol(1+int($0)%8)) \
      with labels font ",18" title "with labels"
@@ -349,7 +349,7 @@ set ytics  ("Atlantis" 1, "Finias" 2, "Ys" 3, "Erewhon" 4)
 set palette defined (0 "#DDDDDD", 0.3 "gold", 0.6 "orange", 1.0 "dark-blue")
 set palette maxcolors 6
 set cbrange [5:65]
-set cbtics format "\U+228D %g"   add (" Fare " 65)
+set cbtics format "⋎%g."   add (" Fare " 65)
 unset border; unset xtics; unset key
 set auto noextend
 plot $SPARSEDATA sparse matrix=(4,4) origin=(1,1) with image
@@ -862,10 +862,15 @@ reset
 # Plotting modulus and phase of complex functions
 #
 set output out.'figure_E0' . ext
-set label "{/:Italic E_0(z)}" at graph 0,0,1.1
 unset tics; unset key
 set xtics ("0\nReal(z)" 0) left out nomirror scale 1.5 offset 0,-0.3
 set ytics ("0\nImag(z)" 0) left out nomirror scale 1.5 offset 0,-0.3
+set zrange [0:50]
+if (GNUTERM eq "tikz") {
+    set ztics (50) format "$E_0(z)$" offset 6,1 scale 0
+} else {
+    set label "{/:Italic E_0(z)}" at graph 0,0,1.1
+}
 set view 60,35
 set palette model HSV start 0.3 defined (0 0 1 1, 1 1 1 1)
 set cbrange [-pi:pi]
