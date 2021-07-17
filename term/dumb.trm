@@ -54,6 +54,14 @@
  *
  *   Bastian Maerkisch Jul 2021
  *	Filled boxes.
+ *	(Partial) wide character support.
+ *	Wide characters are problematic as they would destroy the layout.  We
+ *	handle this by marking subsequent cells as "occupied" with NUL.  These
+ *	cells do not get printed.  Subsequent calls to set_pixel() also blank
+ *	the cell to the left, if the cell is marked as occupied, and the one to
+ *	the right if they overwrite a wide character.
+ *	Note that is_wide_char() uses the same incomplete logic as mbwidth in
+ *	readline.c and strwidth_utf8() in estimate.trm.
  *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
@@ -255,17 +263,38 @@ DUMB_options()
 }
 
 
+static TBOOLEAN
+is_wide_char(unsigned char *charpixel)
+{
+    // see also mbwidth() in readline.c
+    if (encoding == S_ENC_UTF8)
+	return (*charpixel >= 0xe3);
+    else
+	return FALSE;
+}
+
+
 static void
 dumb_set_pixel(int x, int y, int v)
 {
-    char *charpixel;
+    unsigned char *charpixel;
 
     if ((unsigned int) x <= dumb_xmax 	/* ie x>=0 && x<=dumb_xmax */
-    &&  (unsigned int) y <= dumb_ymax
-    )  {
-	charpixel = (char *)(&dumb_matrix[dumb_xmax * y + x]);
-	/* null-terminate single ascii character (needed for UTF-8) */
-	dumb_matrix[dumb_xmax * y + x] = 0;
+    &&  (unsigned int) y <= dumb_ymax) {
+	charpixel = (unsigned char *)(&DUMB_PIXEL(x, y));
+	if (*charpixel == NUL && (x > 0)) {
+	    // Also clear the wide character to the left
+	    unsigned char * c = (unsigned char *) &(DUMB_PIXEL((x - 1), y));
+	    DUMB_PIXEL((x - 1), y) = 0;
+	    *c = ' ';
+	} else if (is_wide_char(charpixel) && ((x + 1) <= dumb_xmax)) {
+	    // This is a wide character, clear the cell to the right.
+	    char * c = (char *) &(DUMB_PIXEL((x + 1), y));
+	    DUMB_PIXEL((x + 1), y) = 0;
+	    *c = ' ';
+	}
+	/* null-terminate single ASCII character (needed for UTF-8) */
+	DUMB_PIXEL(x, y) = 0;
 	*charpixel = v;
 #ifndef NO_DUMB_COLOR_SUPPORT
 	memcpy(&dumb_colors[dumb_xmax * y + x], &dumb_color, sizeof(t_colorspec));
@@ -464,11 +493,13 @@ DUMB_text()
 	    memcpy(&dumb_prev_color, color, sizeof(t_colorspec));
 #endif
 
-	    c = (char *)(&dumb_matrix[dumb_xmax*y + x]);
-	    /* The UTF-8 character might be four bytes long and so there's
-	       no guarantee that the charcell ends in a NUL. */
-	    for (i = 0; i < sizeof(charcell) && *c != NUL; i++, c++)
-		fputc(*c, gpoutfile);
+	    c = (char *)(&DUMB_PIXEL(x, y));
+	    if (*c != NUL) { /* Do not print cells occupied by wide characters. */
+		/* The UTF-8 character might be four bytes long and so there's
+		   no guarantee that the charcell ends in a NUL. */
+		for (i = 0; i < sizeof(charcell) && *c != NUL; i++, c++)
+		    fputc(*c, gpoutfile);
+	    }
 	}
 	if (dumb_feed || y > 0)
 	    putc('\n', gpoutfile);
@@ -670,6 +701,10 @@ DUMB_put_text(unsigned int x, unsigned int y, const char *str)
 #ifndef NO_DUMB_COLOR_SUPPORT
 	memcpy(&dumb_colors[dumb_xmax * y + x], &dumb_color, sizeof(t_colorspec));
 #endif
+	if (is_wide_char((unsigned char *)(&DUMB_PIXEL(x, y))) && (x + 1) < dumb_xmax) {
+	    DUMB_PIXEL(x + 1, y) = 0;  // mark as occupied
+	    x++;
+	}
     }
 }
 
