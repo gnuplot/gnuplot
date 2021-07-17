@@ -219,6 +219,7 @@ INT_PTR CALLBACK LineStyleDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lp
 
 static void	DestroyBlocks(LPGW lpgw);
 static BOOL	AddBlock(LPGW lpgw);
+static void AddHideButtons(LPGW lpgw, unsigned nbuttons);
 static void	StorePen(LPGW lpgw, int i, COLORREF ref, int colorstyle, int monostyle);
 static void	MakePens(LPGW lpgw, HDC hdc);
 static void	DestroyPens(LPGW lpgw);
@@ -406,8 +407,8 @@ GraphInitStruct(LPGW lpgw)
 		lpgw->maxkeyboxes = 0;
 		lpgw->keyboxes = 0;
 		lpgw->buffervalid = FALSE;
-		lpgw->maxhideplots = MAXPLOTSHIDE;
-		lpgw->hideplot = (BOOL *) calloc(MAXPLOTSHIDE, sizeof(BOOL));
+		lpgw->maxhideplots = 10;
+		lpgw->hideplot = (BOOL *) calloc(lpgw->maxhideplots, sizeof(BOOL));
 		/* init pens */
 #ifndef WIN_CUSTOM_PENS
 		StorePen(lpgw, 0, RGB(0, 0, 0), PS_SOLID, PS_SOLID);
@@ -511,10 +512,8 @@ GraphInit(LPGW lpgw)
 
 	if (lpgw->hToolbar != NULL) {
 		RECT rect;
-		int i;
 		TBBUTTON button;
 		BOOL ret;
-		TCHAR buttontext[10];
 		unsigned num = 0;
 		UINT dpi = GetDPI();
 		TBADDBITMAP bitmap = {0};
@@ -577,14 +576,7 @@ GraphInit(LPGW lpgw)
 		ret = SendMessage(lpgw->hToolbar, TB_INSERTBUTTON, (WPARAM)num++, (LPARAM)&button);
 
 		/* hide graphs */
-		for (i = 0; i < MAXPLOTSHIDE; i++) {
-			button.iBitmap = STD_CUT;
-			button.idCommand = M_HIDEPLOT + i;
-			wsprintf(buttontext, TEXT("%i"), i + 1);
-			button.iString = (UINT_PTR) buttontext;
-			button.dwData = i;
-			ret = SendMessage(lpgw->hToolbar, TB_INSERTBUTTON, (WPARAM)num++, (LPARAM)&button);
-		}
+		AddHideButtons(lpgw, 10);
 
 		/* silence compiler warning */
 		(void) ret;
@@ -717,6 +709,42 @@ GraphInit(LPGW lpgw)
 	if (lpgw->bDocked)
 		DockedUpdateLayout(lpgw->lptw);
 #endif
+}
+
+
+static void
+AddHideButtons(LPGW lpgw, unsigned nbuttons)
+{
+	unsigned i;
+	TBBUTTON button;
+	TCHAR buttontext[10];
+	BOOL ret;
+	LONG num;
+
+	if (lpgw->nhidebuttons + nbuttons >= MAXPLOTSHIDE)
+		nbuttons = MAXPLOTSHIDE - lpgw->nhidebuttons;
+	if (nbuttons == 0)
+		return;
+
+	ZeroMemory(&button, sizeof(button));
+	button.fsState = TBSTATE_ENABLED;
+	button.fsStyle = BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_NOPREFIX | BTNS_CHECK;
+	button.iBitmap = STD_CUT;
+	button.iString = (UINT_PTR) buttontext;
+
+	// index number for insertion
+	num = SendMessage(lpgw->hToolbar, TB_COMMANDTOINDEX, M_HIDEGRID, (LPARAM)0);
+	num += lpgw->nhidebuttons + 1;
+
+	for (i = lpgw->nhidebuttons; i < lpgw->nhidebuttons + nbuttons; i++) {
+		button.idCommand = M_HIDEPLOT + i;
+		wsprintf(buttontext, TEXT("%i"), i + 1);
+		button.dwData = i;
+		ret = SendMessage(lpgw->hToolbar, TB_INSERTBUTTON, (WPARAM)num++, (LPARAM)&button);
+	}
+	lpgw->nhidebuttons += nbuttons;
+
+	(void) ret;
 }
 
 
@@ -4521,7 +4549,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 						(y <= lpgw->keyboxes[i].top) &&
 						(y >= lpgw->keyboxes[i].bottom)) {
 						lpgw->hideplot[i] = ! lpgw->hideplot[i];
-						if (i < MAXPLOTSHIDE)
+						if (i < lpgw->nhidebuttons)
 							SendMessage(lpgw->hToolbar, TB_CHECKBUTTON, M_HIDEPLOT + i, (LPARAM)lpgw->hideplot[i]);
 						lpgw->buffervalid = FALSE;
 						GetClientRect(hwnd, &rect);
@@ -4886,8 +4914,8 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					UpdateWindow(hwnd);
 					return 0;
 			}
-			/* handle toolbar events  */
-			if ((LOWORD(wParam) >= M_HIDEPLOT) && (LOWORD(wParam) < (M_HIDEPLOT + MAXPLOTSHIDE))) {
+			/* handle toolbar events */
+			if ((LOWORD(wParam) >= M_HIDEPLOT) && (LOWORD(wParam) < (M_HIDEPLOT + lpgw->nhidebuttons))) {
 				unsigned button = LOWORD(wParam) - (M_HIDEPLOT);
 				if (button < lpgw->maxhideplots)
 					lpgw->hideplot[button] = SendMessage(lpgw->hToolbar, TB_ISBUTTONCHECKED, LOWORD(wParam), (LPARAM)0);
@@ -5074,6 +5102,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			lpgw->buffervalid = FALSE;
 			DeleteObject(lpgw->hBitmap);
 			lpgw->hBitmap = NULL;
+			lpgw->nhidebuttons = 0;
 			clear_tooltips(lpgw);
 			DestroyWindow(lpgw->hTooltip);
 			lpgw->hTooltip = NULL;
@@ -5408,19 +5437,26 @@ UpdateToolbar(LPGW lpgw)
 	if (lpgw->hToolbar == NULL)
 		return;
 
+	// update "hide grid" button
 	SendMessage(lpgw->hToolbar, TB_HIDEBUTTON, M_HIDEGRID, (LPARAM)!lpgw->hasgrid);
 	if (!lpgw->hasgrid) {
 		lpgw->hidegrid = FALSE;
 		SendMessage(lpgw->hToolbar, TB_CHECKBUTTON, M_HIDEGRID, (LPARAM)FALSE);
 	}
-	for (i = 0; i < GPMAX(MAXPLOTSHIDE, lpgw->maxhideplots); i++) {
+
+	// add new "toggle graph" buttons
+	if (lpgw->maxhideplots > lpgw->nhidebuttons)
+		AddHideButtons(lpgw, (lpgw->maxhideplots - lpgw->nhidebuttons));
+
+	// update "toggle graph" buttons
+	for (i = 0; i < GPMAX(lpgw->nhidebuttons, lpgw->maxhideplots); i++) {
 		if (i < lpgw->numplots) {
-			if (i < MAXPLOTSHIDE)
+			if (i < lpgw->nhidebuttons)
 				SendMessage(lpgw->hToolbar, TB_HIDEBUTTON, M_HIDEPLOT + i, (LPARAM)FALSE);
 		} else {
 			if (i < lpgw->maxhideplots)
 				lpgw->hideplot[i] = FALSE;
-			if (i < MAXPLOTSHIDE) {
+			if (i < lpgw->nhidebuttons) {
 				SendMessage(lpgw->hToolbar, TB_HIDEBUTTON, M_HIDEPLOT + i, (LPARAM)TRUE);
 				SendMessage(lpgw->hToolbar, TB_CHECKBUTTON, M_HIDEPLOT + i, (LPARAM)FALSE);
 			}

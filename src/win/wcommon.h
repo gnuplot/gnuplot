@@ -47,7 +47,7 @@
 #endif
 
 /* maximum number of plots which can be enabled/disabled via toolbar */
-#define MAXPLOTSHIDE 10
+#define MAXPLOTSHIDE 50
 
 #ifdef __cplusplus
 extern "C" {

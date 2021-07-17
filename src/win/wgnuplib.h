@@ -375,6 +375,7 @@ typedef struct tagGW {
 	BOOL	hidegrid;
 	BOOL	*hideplot;	/* array for handling hidden plots */
 	unsigned int maxhideplots;
+	unsigned int nhidebuttons;
 	LPRECT	keyboxes;
 	unsigned int maxkeyboxes;
 
