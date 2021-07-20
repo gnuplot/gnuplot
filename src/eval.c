@@ -1184,7 +1184,7 @@ make_array_permanent(struct value *array)
      * but the temporary flag must be cleared.
      */
     if (array->v.value_array[0].type == TEMP_ARRAY) {
-	array->v.value_array[0].type = UNDEFINED;
+	array->v.value_array[0].type = NOTDEFINED;
 	return;
     }
 
@@ -1198,7 +1198,7 @@ make_array_permanent(struct value *array)
 	if (copy[i].type == STRING)
 	    copy[i].v.string_val = strdup(copy[i].v.string_val);
     }
-    copy[0].type = UNDEFINED;
+    copy[0].type = NOTDEFINED;
     array->v.value_array = copy;
 }
 
