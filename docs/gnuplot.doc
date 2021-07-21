@@ -2757,7 +2757,6 @@ C 4 index
 #end
 5 tm_week
 ?expressions functions tm_week
-?functions tm_week
 ?time_specifiers tm_week
 ?tm_week
 ?epidemiological week
@@ -2786,7 +2785,6 @@ C 4 index
 
 5 weekdate_iso
 ?expressions functions weekdate_iso
-?functions weekdate_iso
 ?time_specifiers weekdate_iso
 ?weekdate_iso
  Syntax:
@@ -2812,7 +2810,6 @@ C 4 index
 
 5 weekdate_cdc
 ?expressions functions weekdate_cdc
-?functions weekdate_cdc
 ?time_specifiers weekdate_cdc
 ?weekdate_cdc
 =epidemiological week
@@ -3259,6 +3256,7 @@ C ... and restart the table:
 
 3 User-defined variables and functions
 ?expressions user-defined
+?functions user-defined
 ?user-defined variables
 ?user-defined
 ?variables
