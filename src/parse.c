@@ -815,7 +815,8 @@ parse_primary_expression()
 
 /* HBB 20010309: Here and below: can't store pointers into the middle
  * of at->actions[]. That array may be realloc()ed by add_action() or
- * express() calls!. Access via index savepc1/savepc2, instead. */
+ * express() calls!. Access via index savepc1/savepc2, instead.
+ */
 
 static void
 parse_conditional_expression()
@@ -825,11 +826,7 @@ parse_conditional_expression()
     if (equals(c_token, "?")) {
 	int savepc1, savepc2;
 
-	/* Fake same recursion level for alternatives
-	 *   set xlabel a>b ? 'foo' : 'bar' -1, 1
-	 * FIXME: This won't work:
-	 *   set xlabel a-b>c ? 'foo' : 'bar'  offset -1, 1
-	 */
+	/* Fake same recursion level for alternatives */
 	parse_recursion_level--;
 
 	c_token++;
