@@ -683,22 +683,18 @@ do_plot(struct curve_points *plots, int pcount)
     y_axis = FIRST_Y_AXIS;
     adjust_offsets();
 
-    /* EAM June 2003 - Although the comment below implies that font dimensions
-     * are known after term_initialise(), this is not true at least for the X11
-     * driver.  X11 fonts are not set until an actual display window is
-     * opened, and that happens in term->graphics(), which is called from
-     * term_start_plot().
-     */
     term_initialise();		/* may set xmax/ymax */
     term_start_plot();
 
     /* Figure out if we need a colorbox for this plot */
     set_plot_with_palette(0, MODE_PLOT); /* EAM FIXME - 1st parameter is a dummy */
 
-    /* compute boundary for plot (plot_bounds.xleft, plot_bounds.xright, plot_bounds.ytop, plot_bounds.ybot)
-     * also calculates tics, since xtics depend on plot_bounds.xleft
+    /* Compute boundary plot_bounds.{xleft|xright|ytop|ybot}.
+     * Also calculate tics, since xtics depend on plot_bounds.xleft
      * but plot_bounds.xleft depends on ytics. Boundary calculations depend
      * on term->v_char etc, so terminal must be initialised first.
+     * NB: For some terminals (e.g. x11) even though the terminal is intialized
+     *     the font dimensions are not known yet, so calculations are imperfect.
      */
     boundary(plots, pcount);
 

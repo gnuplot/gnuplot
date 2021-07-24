@@ -2680,10 +2680,6 @@ eval_plots()
 
 	    if (this_plot->plot_style == SPIDERPLOT && !spiderplot)
 		int_error(NO_CARET, "'with spiderplot' requires a previous 'set spiderplot'");
-#if (0)
-	    if (spiderplot && this_plot->plot_style != SPIDERPLOT)
-		int_error(NO_CARET, "only plots 'with spiderplot' are possible in spiderplot mode");
-#endif
 
 	    /* set default values for title if this has not been specified */
 	    this_plot->title_is_automated = FALSE;

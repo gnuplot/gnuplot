@@ -598,7 +598,6 @@ qnorm( double dist_x, double dist_y, int q )
 {
     double dist = 0.0;
 
-#if (1)
     switch (q) {
     case 1:
 	dist = pythag(dist_x, dist_y);
@@ -610,34 +609,6 @@ qnorm( double dist_x, double dist_y, int q )
 	dist = pow( pythag(dist_x, dist_y), q);
 	break;
     }
-#else	/* old code (versions 3.5 - 5.2) */
-    switch (q) {
-    case 1:
-	dist = dist_x + dist_y;
-	break;
-    case 2:
-	dist = dist_x * dist_x + dist_y * dist_y;
-	break;
-    case 4:
-	dist = dist_x * dist_x + dist_y * dist_y;
-	dist *= dist;
-	break;
-    case 8:
-	dist = dist_x * dist_x + dist_y * dist_y;
-	dist *= dist;
-	dist *= dist;
-	break;
-    case 16:
-	dist = dist_x * dist_x + dist_y * dist_y;
-	dist *= dist;
-	dist *= dist;
-	dist *= dist;
-	break;
-    default:
-	dist = pow(dist_x, (double)q ) + pow(dist_y, (double)q );
-	break;
-    }
-#endif
     return dist;
 }
 
