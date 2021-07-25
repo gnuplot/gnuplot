@@ -105,7 +105,7 @@ save_all(FILE *fp)
 	    fprintf(fp, "## Last datafile plotted: \"%s\"\n", df_filename);
 	fprintf(fp, "%s\n", replot_line);
 	if (last_fit_command)
-	    fprintf(fp, "## Last fit command: \%s\"\n", last_fit_command);
+	    fprintf(fp, "## Last fit command: \"%s\"\n", last_fit_command);
 	fputs("#    EOF\n", fp);
 }
 
@@ -402,7 +402,7 @@ save_set_all(FILE *fp)
       }
     }
 
-    /* Dummy variable names */ 
+    /* Dummy variable names */
     fprintf(fp, "set dummy %s", set_dummy_var[0]);
     for (axis=1; axis<MAX_NUM_VAR; axis++) {
 	if (*set_dummy_var[axis] == '\0')
@@ -702,7 +702,7 @@ set encoding %s\n\
     if (spiderplot) {
 	fprintf(fp, "set spiderplot\n");
 	save_style_spider(fp);
-    } else 
+    } else
 	fprintf(fp, "unset spiderplot\n");
 
     if (numeric_locale)
@@ -760,7 +760,7 @@ set isosamples %d, %d\n\
     }
 
     /* Contour label options */
-    fprintf(fp, "set cntrlabel %s format '%s' font '%s' start %d interval %d\n", 
+    fprintf(fp, "set cntrlabel %s format '%s' font '%s' start %d interval %d\n",
 	clabel_onecolor ? "onecolor" : "", contour_format,
 	clabel_font ? clabel_font : "",
 	clabel_start, clabel_interval);
@@ -933,7 +933,7 @@ set origin %g,%g\n",
 	    save_nonlinear(fp, &axis_array[axis]);
     }
 
-    /* These will only print something if the axis is, in fact, linked */    
+    /* These will only print something if the axis is, in fact, linked */
     save_link(fp, axis_array + SECOND_X_AXIS);
     save_link(fp, axis_array + SECOND_Y_AXIS);
 
@@ -994,7 +994,7 @@ set origin %g,%g\n",
     fputs("\n", fp);
 
     fprintf(fp, "set pm3d %s %s\n",
-		pm3d.clip == PM3D_CLIP_1IN ? "clip1in" : 
+		pm3d.clip == PM3D_CLIP_1IN ? "clip1in" :
 		pm3d.clip == PM3D_CLIP_4IN ? "clip4in" : "clip z",
 		pm3d.no_clipcb ? "noclipcb" : "");
 
@@ -1274,7 +1274,7 @@ save_mtics(FILE *fp, struct axis *axis)
 	fprintf(fp, "set m%stics %d\n", name, axis->mtic_freq);
 	break;
     case MINI_TIME:
-	fprintf(fp, "set m%stics time %d %s\n", name, axis->mtic_freq, 
+	fprintf(fp, "set m%stics time %d %s\n", name, axis->mtic_freq,
 		clean_reverse_table_lookup(timelevels_tbl, axis->minitic_units));
 	break;
     }
@@ -1298,7 +1298,7 @@ save_num_or_time_input(FILE *fp, double x, struct axis *this_axis)
 void
 save_axis_format(FILE *fp, AXIS_INDEX axis)
 {
-    fprintf(fp, 
+    fprintf(fp,
 	    (fp == stderr) ? "\t  %s-axis: \"%s\"%s\n" : "set format %s \"%s\" %s\n",
 	     axis_name(axis), conv_text(axis_array[axis].formatstring),
 	    axis_array[axis].tictype == DT_DMS ? "geographic" :
@@ -1380,7 +1380,7 @@ save_position(FILE *fp, struct position *pos, int ndim, TBOOLEAN offset)
 	if (pos->scaley != pos->scalex) fprintf(fp, "first ");
 	save_num_or_time_input(fp, pos->y, &axis_array[FIRST_Y_AXIS]);
     } else {
-	fprintf(fp, "%s%g", 
+	fprintf(fp, "%s%g",
 	    pos->scaley == pos->scalex ? "" : coord_msg[pos->scaley], pos->y);
     }
 
@@ -1393,7 +1393,7 @@ save_position(FILE *fp, struct position *pos, int ndim, TBOOLEAN offset)
 	if (pos->scalez != pos->scaley) fprintf(fp, "first ");
 	save_num_or_time_input(fp, pos->z, &axis_array[FIRST_Z_AXIS]);
     } else {
-	fprintf(fp, "%s%g", 
+	fprintf(fp, "%s%g",
 	    pos->scalez == pos->scaley ? "" : coord_msg[pos->scalez], pos->z);
     }
 }
@@ -1707,7 +1707,7 @@ save_bars(FILE *fp)
     fputs("\n",fp);
 }
 
-void 
+void
 save_histogram_opts (FILE *fp)
 {
     switch (histogram_opts.type) {
@@ -1747,7 +1747,7 @@ save_pixmaps(FILE *fp)
 	fprintf(fp, "  size ");
 	save_position(fp,&pixmap->extent, 2, FALSE);
 	fprintf(fp, " %s %s\n",
-		pixmap->layer == LAYER_FRONT ? "front" : 
+		pixmap->layer == LAYER_FRONT ? "front" :
 		pixmap->layer == LAYER_BACK ? "back" : "behind",
 		pixmap->center ? "center" : "");
     }
@@ -1849,7 +1849,7 @@ save_object(FILE *fp, int tag)
 				"back");
 	    if (this_object->clip == OBJ_NOCLIP)
 		fputs("noclip ", fp);
-	    else 
+	    else
 		fputs("clip ", fp);
 
 	    if (this_object->lp_properties.l_width)
