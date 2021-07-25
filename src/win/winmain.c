@@ -1245,12 +1245,12 @@ static int
 ConsolePutS(const char *str)
 {
     LPWSTR wstr = UnicodeText(str, encoding);
-    // Use standard file IO instead of Console API
-    // to enable word-wrapping on Windows 10 and
-    // allow for redirection of stdout/stderr.
-    //HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
-    //WriteConsoleW(h, wstr, wcslen(wstr), NULL, NULL);
-    fputws(wstr, stdout);
+    // Using standard (wide) file IO screws up UTF-8
+    // output, so use console IO instead. No idea why
+    // it does so, though.
+    // Word-wrapping on Windows 10 (now) works anyway.
+    HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+    WriteConsoleW(h, wstr, wcslen(wstr), NULL, NULL);
     free(wstr);
     return 0;
 }
@@ -1264,12 +1264,9 @@ ConsolePutCh(int ch)
 
     MultiByteAccumulate(ch, w, &count);
     if (count > 0) {
-	// Use standard file IO instead of Console API
-	// to enable word-wrapping on Windows 10.
-	//HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
-	//WriteConsoleW(h, w, count, NULL, NULL);
 	w[count] = 0;
-	fputws(w, stdout);
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+	WriteConsoleW(h, w, count, NULL, NULL);
     }
     return ch;
 }
