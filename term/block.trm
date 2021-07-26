@@ -101,6 +101,7 @@ enum BLOCK_id {
     BLOCK_ANSI, BLOCK_ANSI256, BLOCK_ANSIRGB, BLOCK_NOCOLOR,
     BLOCK_OPTIMIZE, BLOCK_NOOPTIMIZE,
     BLOCK_CHARPOINTS, BLOCK_GPPOINTS,
+    BLOCK_ATTRIBUTES, BLOCK_NOATTRIBUTES,
     BLOCK_SIZE,
     BLOCK_OTHER
 };
@@ -126,6 +127,8 @@ static struct gen_table BLOCK_opts[] =
     { "gps$ymbols", BLOCK_GPPOINTS },
     { "mono", BLOCK_NOCOLOR },
     { "siz$e", BLOCK_SIZE },
+    { "attr$ibutes", BLOCK_ATTRIBUTES },
+    { "noattr$ibutes", BLOCK_NOATTRIBUTES },
     { NULL, BLOCK_OTHER }
 };
 
@@ -176,6 +179,14 @@ BLOCK_options()
 	    dumb_colormode = 0;
 	    term->make_palette = NULL;
 	    term->flags |= TERM_MONOCHROME;
+	    break;
+	case BLOCK_ATTRIBUTES:
+	    c_token++;
+	    dumb_text_attributes = TRUE;
+	    break;
+	case BLOCK_NOATTRIBUTES:
+	    c_token++;
+	    dumb_text_attributes = FALSE;
 	    break;
 	case BLOCK_OPTIMIZE:
 	    c_token++;
@@ -447,6 +458,7 @@ BLOCK_text()
     unsigned nsets, set;
     const int * pattern;
     size_t bufsiz;
+    text_attr prev_text_attr;
 
     if (dumb_colormode > 0) {
 	fputs("\033[0;39m", gpoutfile); /* reset colors to default */
@@ -477,11 +489,14 @@ BLOCK_text()
     }
 #endif
 
-    // convert bitmap Unicode characters
+    // convert bitmap to Unicode characters
     // printf("vvvvvvvvvvvvvvvvvvvvvvvvvvvv\n");
     // FIXME: last row and column not handled properly!
     bufsiz = (term->xmax + 1) * 8;
     line = gp_alloc(bufsiz, "line buffer");
+    if (dumb_text_attributes)
+	memset(&prev_text_attr, 0, sizeof(text_attr));
+
     for (y = term->ymax - celly + 1; y >= 0; y -= celly) {
 	int yd = y / celly; // character cell coordinate
 
@@ -519,8 +534,20 @@ BLOCK_text()
 #endif
 		// Copy the character.
 		c = (char *)(&DUMB_PIXEL(xd, yd));
-		for (i = 0; i < sizeof(charcell) && *c != NUL; i++, c++, s++)
-		    *s = *c;
+		if (*c != NUL) { /* Do not print cells occupied by wide characters. */
+		    /* character attributes */
+		    if (dumb_text_attributes) {
+			text_attr * attr = &dumb_attributes[dumb_xmax*yd + xd];
+			const char * attrstring = dumb_attrstring(attr, &prev_text_attr);
+			if (attrstring[0] != NUL) {
+			    strcpy((char *) s, attrstring);
+			    s += strlen(attrstring);
+			    memcpy(&prev_text_attr, attr, sizeof(text_attr));
+			}
+		    }
+		    for (i = 0; i < sizeof(charcell) && *c != NUL; i++, c++, s++)
+			*s = *c;
+		}
 	    } else {
 		//
 		// No character. Print graphics.
@@ -640,6 +667,15 @@ BLOCK_text()
 		// Any pixel set within this charcell?
 		// Then average over the color over the charcell.
 		if (n != 0) {
+		    // first, reset text attributes
+		    if (dumb_text_attributes &&
+			(prev_text_attr.italic || prev_text_attr.bold)) {
+			const char tmp[] = "\033[22;23m"; /* reset attributes */
+			strcpy((char *) s, tmp);
+			s += strlen(tmp);
+			memset(&prev_text_attr, 0, sizeof(text_attr));
+		    }
+
 		    // average charcell color
 		    color.type = TC_RGB;
 		    color.lt = ((unsigned) sqrt(r / n) << 16) +
@@ -684,7 +720,6 @@ BLOCK_text()
 		// turn bg color off again
 		if (resetbg) {
 		    sprintf((char *) s, "\033[49m"); s += 5;
-		    sprintf((char *) s, "\033[49m"); s += 5;
 		}
 #endif
 	    }
@@ -695,10 +730,11 @@ BLOCK_text()
     }
     // printf("^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n");
 
+    if (dumb_text_attributes)
+	fputs("\033[22;23m", gpoutfile); /* reset attributes */
 #ifndef NO_DUMB_COLOR_SUPPORT
-    if (dumb_colormode > 0) {
+    if (dumb_colormode > 0)
 	fputs("\033[0;39;49m", gpoutfile); /* reset colors to default */
-    }
 #ifdef DEBUG_BLOCK_OPTI
     printf("full cells : %u (%3.1f\%)\n", nfullcells, 100 * ((float) nfullcells) / BLOCK_xchars / BLOCK_ychars);
     printf("optimisable: %u (%3.1f\%)\n", noptimisable, 100 * ((float) noptimisable) / nfullcells);
@@ -898,7 +934,7 @@ TERM_TABLE_START(block_driver)
     BLOCK_text, null_scale, BLOCK_graphics,
     b_move, b_vector, BLOCK_linetype,
     BLOCK_put_text, null_text_angle, null_justify_text,
-    BLOCK_point, do_arrow, set_font_null, 0,
+    BLOCK_point, do_arrow, DUMB_set_font, 0,
 #ifndef NO_DUMB_ENHANCED_SUPPORT
     TERM_MONOCHROME | TERM_ENHANCED_TEXT,
 #else
@@ -952,6 +988,7 @@ START_HELP(block)
 "                 {mono | ansi | ansi256 | ansirgb}",
 "                 {{no}optimize}",
 #endif
+"                 {[no]attributes}",
 "                 {charpoints | gppoints}",
 "",
 " `size` sets the terminal size in character cells.",
@@ -972,6 +1009,9 @@ START_HELP(block)
 " in the output to output colors.  Note that these might not be handled by",
 " your terminal.  Default is `mono`.  See `terminal dumb` for a list of",
 " escape sequences.",
+"",
+" The `attributes` option enables bold and italic text on terminals or",
+" emulators that support these escape sequences, see `terminal dumb`.",
 "",
 " Using block characters increases the pseudo-resolution of the bitmap.  But",
 " this is not the case for the color.  Multiple 'pixels' necessarily share the",
