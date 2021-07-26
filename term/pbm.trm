@@ -77,9 +77,9 @@ TERM_PUBLIC void PBM_linetype(int linetype);
 TERM_PUBLIC void PBM_point(unsigned int x, unsigned int y, int point);
 #endif /* TERM_PROTO */
 
-/* make XMAX and YMAX a multiple of 8 */
-#define PBM_XMAX (640)
-#define PBM_YMAX (480)
+/* make XMAX+1 and YMAX+1 a multiple of 8 */
+#define PBM_XMAX (640-1)
+#define PBM_YMAX (480-1)
 #define PBM_VCHAR (FNT5X9_VCHAR)
 #define PBM_HCHAR (FNT5X9_VCHAR)
 #define PBM_VTIC FNT5X9_HBITS
@@ -89,11 +89,6 @@ TERM_PUBLIC void PBM_point(unsigned int x, unsigned int y, int point);
 
 static int pbm_font = 1;	/* small font */
 static int pbm_mode = 0;	/* 0:monochrome 1:gray 2:color */
-
-/* Only needed for dubious backward compatibility with 'set size'
- * in pre-4.2 versions that didn't support 'set term size'
- */
-static TBOOLEAN PBM_explicit_size = FALSE;
 
 /* 7=black, 0=white */
 static int pgm_gray[] = { 7, 1, 6, 5, 4, 3, 2, 1, 7 };	/* grays  */
@@ -122,16 +117,8 @@ static struct gen_table PBM_opts[] =
 TERM_PUBLIC void
 PBM_options()
 {
-    int xpixels = PBM_XMAX;
-    int ypixels = PBM_YMAX;
-    struct value a;
-    pbm_font = 1;
-    pbm_mode = 0;
-
-    term_options[0] = NUL;
-
     while (!END_OF_COMMAND) {
-	switch(lookup_table(&PBM_opts[0],c_token)) {
+	switch (lookup_table(&PBM_opts[0], c_token)) {
 	case PBM_SMALL:
 	    pbm_font = 1;
 	    c_token++;
@@ -158,31 +145,20 @@ PBM_options()
 	    term->flags &= ~TERM_MONOCHROME;
 	    c_token++;
 	    break;
-	case PBM_SIZE:
+	case PBM_SIZE: {
+	    float width, height;
+
 	    c_token++;
-	    if (END_OF_COMMAND) {
-		term->xmax = PBM_XMAX;
-		term->ymax = PBM_YMAX;
-		PBM_explicit_size = FALSE;
-	    } else {
-		xpixels = real(const_express(&a));
-		if (equals(c_token, ",")) {
-		    c_token++;
-		    ypixels = real(const_express(&a));
-		}
-		PBM_explicit_size = TRUE;
+	    parse_term_size(&width, &height, PIXELS);
+	    if (width > 0 && height > 0) {
+		term->xmax = width - 1;
+		term->ymax = height - 1;
 	    }
-	    if (xpixels > 0)
-		term->xmax = xpixels;
-	    if (ypixels > 0)
-		term->ymax = ypixels;
 	    break;
+	}
 	case PBM_OTHER:
 	default:
-	    /* reset to default, since term is already set */
-	    pbm_font = 1;
-	    pbm_mode = 0;
-	    int_error(c_token, "expecting: {small, medium, large} and {monochrome, gray, color}");
+	    int_error(c_token, "unknown option");
 	    break;
 	}
     }
@@ -218,9 +194,8 @@ PBM_options()
 	break;
     }
 
-    if (PBM_explicit_size)
-	sprintf(term_options + strlen(term_options), " size %d,%d",
-	    term->xmax, term->ymax);
+    sprintf(term_options + strlen(term_options), " size %d,%d",
+	term->xmax + 1, term->ymax + 1);
 }
 
 
@@ -265,16 +240,8 @@ TERM_PUBLIC void
 PBM_graphics()
 {
     int numplanes = 1;
-    unsigned int xpixels = term->xmax;
-    unsigned int ypixels = term->ymax;
-
-    /* 'set size' should not affect the size of the canvas in pixels,
-     * but versions prior to 4.2 did not have a separate 'set term size'
-     */
-    if (!PBM_explicit_size) {
- 	xpixels *= xsize;
-	ypixels *= ysize;
-    }
+    unsigned int xpixels = term->xmax + 1;
+    unsigned int ypixels = term->ymax + 1;
 
     switch (pbm_mode) {
     case 1:
