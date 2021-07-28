@@ -134,6 +134,7 @@ const struct gen_table plot_smooth_tbl[] =
     { "fnor$mal", SMOOTH_FREQUENCY_NORMALISED },
     { "z$sort", SMOOTH_ZSORT },
     { "path", SMOOTH_PATH },
+    { "convex$hull", SMOOTH_CONVEX_HULL },
     { NULL, SMOOTH_NONE }
 };
 

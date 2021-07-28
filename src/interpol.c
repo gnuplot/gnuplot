@@ -139,8 +139,11 @@ static void do_cubic(struct curve_points * plot,
 			int first_point, int num_points, struct coordinate * dest);
 static void do_freq(struct curve_points *plot,	int first_point, int num_points);
 static int do_curve_cleanup(struct coordinate *point, int npoints);
-static int compare_points(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2);
+static int compare_x(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2);
 static int compare_z(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2);
+static int compare_xyz(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2);
+
+static void winnow_interior_points (struct curve_points *plot);
 
 
 /*
@@ -1101,7 +1104,7 @@ gen_interp(struct curve_points *plot)
  */
 
 static int
-compare_points(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)
+compare_x(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)
 {
     struct coordinate const *p1 = arg1;
     struct coordinate const *p2 = arg2;
@@ -1126,6 +1129,20 @@ compare_z(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)
     return (0);
 }
 
+static int
+compare_xyz(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)
+{
+    struct coordinate const *p1 = arg1;
+    struct coordinate const *p2 = arg2;
+    if (p1->x > p2->x) return  1;
+    if (p1->x < p2->x) return -1;
+    if (p1->y > p2->y) return  1;
+    if (p1->y < p2->y) return -1;
+    if (p1->z > p2->z) return  1;
+    if (p1->z < p2->z) return -1;
+    return 0;
+}
+
 void
 sort_points(struct curve_points *plot)
 {
@@ -1135,7 +1152,7 @@ sort_points(struct curve_points *plot)
     while ((num_points = next_curve(plot, &first_point)) > 0) {
 	/* Sort this set of points, does qsort handle 1 point correctly? */
 	qsort(plot->points + first_point, num_points,
-	      sizeof(struct coordinate), compare_points);
+	      sizeof(struct coordinate), compare_x);
 	first_point += num_points;
     }
     return;
@@ -1169,6 +1186,144 @@ zsort_points(struct curve_points *plot)
 	    plot->varcolor[i] = plot->points[i].CRD_COLOR;
     }
     return;
+}
+
+/*
+ * convex_hull() replaces the original set of points with a subset that
+ * delimits the convex hull of the original points.
+ * winnow_interior_points() is a helper routine that can greatly reduce
+ * processing time for large data sets but is otherwise not necessary.
+ * - Ethan A Merritt 2021
+ */
+#define CROSS(p1,p2,p3) \
+  ( ((p2)->x - (p1)->x) * ((p3)->y - (p2)->y) \
+  - ((p2)->y - (p1)->y) * ((p3)->x - (p2)->x) )
+
+void
+convex_hull(struct curve_points *plot)
+{
+    int i;
+    struct coordinate *points = plot->points;
+    struct coordinate **stack = NULL;
+    int np = plot->p_count;
+    int ntop;
+
+    /* Special cases */
+    if (np < 3)
+	return;
+    if (np == 3) {
+	points = gp_realloc( points, 4*sizeof(struct coordinate), "HULL" );
+	points[3] = points[0];
+	plot->points = points;
+	plot->p_count = 4;
+	return;
+    }
+
+    /* This is not strictly necessary, but greatly reduces the number
+     * of points to be sorted and tested for the hull boundary.
+     */
+    winnow_interior_points(plot);
+
+    /* Sort the remaining points (probably only need to sort on x?) */
+    qsort(plot->points, plot->p_count,
+	  sizeof(struct coordinate), compare_xyz);
+
+    /* Find hull points using a variant of Graham's algorithm.
+     * The path through the points is accumulated on a stack.
+     */
+    stack = gp_alloc( (np+1)*sizeof(void *), "Hull" );
+    /* Initialize stack with known start of top arc and first candidate point */
+    stack[0] = &points[0];
+    stack[1] = &points[1];
+    np = 2;
+    for (i=2; i<plot->p_count; i++) {
+	while ((np >= 2) && CROSS( stack[np-2], stack[np-1], &points[i] ) >= 0)
+		np--;
+	stack[np++] = &points[i];
+    }
+    /* push onto stack the first candidate point for lower arc */
+    i -= 2;
+    stack[np++] = &points[i];
+    ntop = np;
+    for (i--; i>=0; i--) {
+	while ( (np >= ntop) && CROSS( stack[np-2], stack[np-1], &points[i] ) >= 0)
+		np--;
+	stack[np++] = &points[i];
+    }
+
+    /* Replace the original list of points with the ordered path */
+    points = gp_alloc( np * sizeof(struct coordinate), "Hull" );
+    for (i=0; i<np; i++)
+	points[i] = *(stack[i]);
+    free(plot->points);
+    free(stack);
+    plot->points = points;
+    plot->p_count = np;
+}
+#undef CROSS
+
+/*
+ * winnow_interior_points() is an optional helper routine for convex_hull.
+ * It reduces the number of points to be sorted and processed by removing
+ * points in a quadrilateral bounded by the four points with max/min x/y.
+ */
+static void
+winnow_interior_points (struct curve_points *plot)
+{
+#define TOLERANCE -1.e-10
+
+    struct coordinate *p, *pp1, *pp2, *pp3, *pp4;
+    double xmin = VERYLARGE, xmax = -VERYLARGE;
+    double ymin = VERYLARGE, ymax = -VERYLARGE;
+    struct coordinate *points = plot->points;
+    double area;
+    int i, np;
+
+    /* Find maximal extent on x and y */
+    pp1 = pp2 = pp3 = pp4 = plot->points;
+    for (p = plot->points; p < &(plot->points[plot->p_count]); p++) {
+	if (p->x < xmin) { xmin = p->x; pp1 = p; }
+	if (p->x > xmax) { xmax = p->x; pp3 = p; }
+	if (p->y < ymin) { ymin = p->y; pp4 = p; }
+	if (p->y > ymax) { ymax = p->y; pp2 = p; }
+    }
+
+    /* Ignore any points that lie inside the clockwise triangle bounded by pp1 pp2 pp3 */
+    area = fabs(-pp2->y*pp3->x + pp1->y*(-pp2->x + pp3->x)
+		+ pp1->x*(pp2->y - pp3->y) + pp2->x*pp3->y);
+    area += TOLERANCE;
+    for (i=0; i<plot->p_count; i++) {
+	double px = points[i].x;
+	double py = points[i].y;
+	double s = (pp1->y*pp3->x - pp1->x*pp3->y + (pp3->y - pp1->y)*px + (pp1->x - pp3->x)*py);
+	double t = (pp1->x*pp2->y - pp1->y*pp2->x + (pp1->y - pp2->y)*px + (pp2->x - pp1->x)*py);
+	if ( (s < TOLERANCE) && (t < TOLERANCE) && (fabs(s+t) < area) )
+	    points[i].type = EXCLUDEDRANGE;
+    }
+
+    /* Also ignore points in the clockwise triangle bounded by pp3 pp4 pp1 */
+    area = fabs(-pp4->y*pp1->x + pp3->y*(-pp4->x + pp1->x)
+		+ pp3->x*(pp4->y - pp1->y) + pp4->x*pp1->y);
+    area += TOLERANCE;
+    for (i=0; i<plot->p_count; i++) {
+	double px = points[i].x;
+	double py = points[i].y;
+	double s = (pp3->y*pp1->x - pp3->x*pp1->y + (pp1->y - pp3->y)*px + (pp3->x - pp1->x)*py);
+	double t = (pp3->x*pp4->y - pp3->y*pp4->x + (pp3->y - pp4->y)*px + (pp4->x - pp3->x)*py);
+	if ( (s < TOLERANCE) && (t < TOLERANCE) && (fabs(s+t) < area) )
+	    points[i].type = EXCLUDEDRANGE;
+    }
+
+    /* Discard the interior points */
+    np = 0;
+    p = points;
+    for  (i=0; i<plot->p_count; i++) {
+	if (points[i].type == INRANGE)
+	    p[np++] = points[i];
+    }
+    plot->p_count = np;
+
+#undef TOLERANCE
 }
 
 
@@ -1302,7 +1457,7 @@ mcs_interp(struct curve_points *plot)
     for ( ; i<Ntot; i++)
 	new_points[i].x = xstart + (i-N)*xstep;
     /* Sort output x coords */
-    qsort(new_points, Ntot, sizeof(struct coordinate), compare_points);
+    qsort(new_points, Ntot, sizeof(struct coordinate), compare_x);
     /* Displace any collisions */
     for (i=1; i<Ntot-1; i++) {
 	double delta = new_points[i].x - new_points[i-1].x;
@@ -1425,6 +1580,8 @@ mcs_interp(struct curve_points *plot)
  *
  *    binopt = 0 (default) return sum of y values for points in each bin
  *    binopt = 1 return mean of y values for points in each bin
+ *
+ * Ethan A Merritt 2015
  */
 void
 make_bins(struct curve_points *plot, int nbins,
@@ -1554,6 +1711,8 @@ make_bins(struct curve_points *plot, int nbins,
 
 /*
  * spline approximation of 3D lines
+ *     do_3d_cubic gen_2d_path_splines gen_3d_splines
+ * Ethan A Merritt 2019
  */
 
 /*

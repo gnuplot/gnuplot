@@ -608,7 +608,8 @@ get_data(struct curve_points *current_plot)
 	if (current_plot->filledcurves_options.closeto == FILLEDCURVES_CLOSED) {
 	    if (current_plot->plot_smooth == SMOOTH_CSPLINES)
 		current_plot->plot_smooth = SMOOTH_PATH;
-	    if (current_plot->plot_smooth != SMOOTH_PATH) {
+	    if (current_plot->plot_smooth != SMOOTH_PATH
+	    &&  current_plot->plot_smooth != SMOOTH_SMOOTH_HULL) {
 		current_plot->plot_smooth = SMOOTH_NONE;
 		int_warn(NO_CARET, "only 'smooth path' or 'smooth cspline' is supported for closed curves");
 	    }
@@ -1056,6 +1057,9 @@ get_data(struct curve_points *current_plot)
 		    y2 = y1;
 		else
 		    y2 = current_plot->filledcurves_options.at;
+	    } else if (current_plot->plot_smooth == SMOOTH_SMOOTH_HULL
+	           ||  current_plot->plot_smooth == SMOOTH_CONVEX_HULL) {
+		y2 = y1;
 	    } else {
 		y2 = v[2];
 		if (current_plot->filledcurves_options.closeto == FILLEDCURVES_DEFAULT)
@@ -2338,7 +2342,16 @@ eval_plots()
 		    continue;
 		}
 
-		/*  deal with smooth */
+		/* "convexhull" is unsmoothed; "smooth convexhull is smoothed */
+		if (equals(c_token, "convexhull")) {
+		    set_smooth = TRUE; 
+		    this_plot->plot_smooth = SMOOTH_CONVEX_HULL;
+		    this_plot->filledcurves_options.closeto = FILLEDCURVES_CLOSED;
+		    c_token++;
+		    continue;
+		}
+
+		/* deal with smooth */
 		if (almost_equals(c_token, "s$mooth")) {
 		    int found_token;
 
@@ -2377,6 +2390,9 @@ eval_plots()
 		    case SMOOTH_ZSORT:
 			this_plot->plot_smooth = SMOOTH_ZSORT;
 			this_plot->plot_style = POINTSTYLE;
+			break;
+		    case SMOOTH_CONVEX_HULL:
+			this_plot->plot_smooth = SMOOTH_SMOOTH_HULL;
 			break;
 		    case SMOOTH_NONE:
 		    default:
@@ -3044,6 +3060,10 @@ eval_plots()
 		case SMOOTH_ZSORT:
 		    zsort_points(this_plot);
 		    break;
+		case SMOOTH_CONVEX_HULL:
+		case SMOOTH_SMOOTH_HULL:
+		    convex_hull(this_plot);
+		    break;
 		case SMOOTH_NONE:
 		case SMOOTH_PATH:
 		case SMOOTH_BEZIER:
@@ -3051,6 +3071,7 @@ eval_plots()
 		default:
 		    break;
 		}
+
 		switch (this_plot->plot_smooth) {
 		/* create new data set by evaluation of
 		 * interpolation routines */
@@ -3082,6 +3103,7 @@ eval_plots()
 		    mcs_interp(this_plot);
 		    break;
 		case SMOOTH_PATH:
+		case SMOOTH_SMOOTH_HULL:
 		    gen_2d_path_splines(this_plot);
 		    break;
 		case SMOOTH_NONE:

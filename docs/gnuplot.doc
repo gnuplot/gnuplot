@@ -251,15 +251,17 @@ C
 ## of the Voigt profile. See `VP`, `VP_fwhm`.
 #end
 
-4 New plot styles and style options
-?new plot_styles
+4 New data pre-processing filters
+?new filters
 #start
 #b cubic spline smoothing of 3D lines. See `splot smooth csplines`
 #b curve smoothing using along-path cubic splines suitable for closed curves
 ## or for 2D curves that are not monotonic on x. See `smooth path`.
 #b new keyword `period` for smoothing periodic data. See `smooth kdensity`.
-#b `set colorbox cbtics <linestyle>` affects cbtics but not other tics.
 #b keyword `binvalue=avg` plots average, rather than sum, of binned data.
+#b A cluster of 2D points can be replaced by its bounding polygon using the
+## new filter `convexhull`.  A path-smoothed bounding curve is produced by
+## `smooth convexhull`. See `convexhull`.
 #end
 
 4 New data format
@@ -338,6 +340,7 @@ C
 ## the original array. See `slice`.
 #b Function `palette(z)` returns the RGB palette color for z in cbrange.
 #b Function `rgbcolor("name")` returns the 32bit ARGB value for a named color.
+#b `set colorbox cbtics <linestyle>` affects cbtics but not other tics.
 #b Support XDG base directory for gnuplotrc configuration preferences.
 ## Reads initialization commands from $HOME/.config/gnuplot/gnuplotrc if present.
 ## See `environment`.
@@ -7863,7 +7866,7 @@ Ffigure_zerror
        smooth {unique | frequency | fnormal | cumulative | cnormal | bins
               | kdensity {bandwidth} {period}
               | csplines | acsplines | mcsplines | path | bezier | sbezier
-              | unwrap | zsort}
+              | convexhull | unwrap | zsort}
 
  The `unique`, `frequency`, `fnormal`, `cumulative` and `cnormal` options
  sort the data on x and then plot some aspect of the distribution of x values.
@@ -8185,13 +8188,30 @@ Ffigure_smooth_path
 ?plot smooth zsort
 ?smooth zsort
 ?zsort
- Syntax
+
       plot FOO using x:y:z:color smooth zsort with points lc palette
+
  The intended use is to filter presentation of 2D scatter plots with a
  huge number of points so that the distribution of high-scoring points
  remains evident. Sorting the points on z guarantees that points with
  a high z-value will not be obscured by points with lower z-values.
  Limited to plot style "with points".
+
+5 convexhull
+?commands plot datafile smooth convexhull
+?plot smooth convexhull
+?smooth convexhull
+?convexhull
+
+      plot FOO using x:y {smooth} convexhull
+
+ The points in dataset FOO are replaced by a subset of the original points
+ that constitute a bounding convex polygon.  The vertices of this polygon,
+ the convex hull, are generated in clockwise order to form a closed curve.
+ If the keyword `smooth` is present, the vertices are then used as guide
+ points to generate a smooth closed curve (see `smooth path`).
+ The first and last points of the generated curve are equal, making
+ it suitable for plotting `with lines` or `with filledcurves`.
 
 4 special-filenames
 ?special-filenames
