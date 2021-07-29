@@ -8202,9 +8202,9 @@ Ffigure_smooth_path
 ?plot smooth convexhull
 ?smooth convexhull
 ?convexhull
-
       plot FOO using x:y {smooth} convexhull
 
+Ffigure_convex_hull
  The points in dataset FOO are replaced by a subset of the original points
  that constitute a bounding convex polygon.  The vertices of this polygon,
  the convex hull, are generated in clockwise order to form a closed curve.

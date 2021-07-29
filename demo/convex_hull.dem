@@ -1,0 +1,28 @@
+#
+# Convex hulls
+#
+unset key
+set xrange [-30:30]
+set yrange [-30:30]
+set border 3
+set tics nomirror rangelimited
+set style fill transparent solid 0.1 border
+
+set title "Generation of convex hull bounding scattered points"
+
+set style line 1 lc "black" pt 6
+set style line 2 lc "forest-green" pt 7
+
+plot for [i=0:1] 'hull.dat' index i with points ls (i+1), \
+     for [i=0:1] '' index i convexhull with filledcurve ls (i+1)
+
+pause -1 "<cr> to continue"
+
+set title "Smooth convex hull"
+
+plot for [i=0:1] 'hull.dat' index i with points ls (i+1), \
+     for [i=0:1] '' index i smooth convexhull with filledcurve ls (i+1)
+
+pause -1 "<cr> to continue"
+
+reset

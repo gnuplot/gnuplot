@@ -689,6 +689,25 @@ set title "square"
 replot
 unset multiplot
 
+#
+# convex hulls
+#
+reset
+set output out . 'figure_convex_hull' . ext
+unset key
+set border 3
+set rmargin 0
+set tics nomirror rangelimited
+set style fill transparent solid 0.1 border
+set title "Convex hull bounding scattered points" offset 0,-1
+set style line 1 lc "black" pt 6 ps 0.5
+set style line 2 lc "forest-green" pt 7 ps 0.5
+set xrange [-30:30]
+set yrange [-30:30]
+
+plot for [i=0:1] 'hull.dat' index i with points ls (i+1), \
+     for [i=0:1] '' index i convexhull with filledcurve ls (i+1)
+
 # Custom key placement
 reset
 set output out . 'figure_multiple_keys' . ext
