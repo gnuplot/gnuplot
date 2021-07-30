@@ -65,6 +65,7 @@
     <li><a href="smooth_path.html">along-path splines</a></li>
     <li><a href="spline.html">explicit B-splines</a></li>
     <li><a href="airfoil.html">explicit Bezier splines</a></li>
+    <li><a href="convex_hull.html">convex hulls</a></li>
     </ul>
 
     <h4>Colors</h4>
@@ -246,7 +247,7 @@
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated April 2021</i>
+    <i>This page generated July 2021</i>
     </td>
 
     <td>
