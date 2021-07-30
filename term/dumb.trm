@@ -480,22 +480,25 @@ DUMB_text()
     int x, y, i;
 
     putc('\f', gpoutfile);
-    for (y = dumb_ymax - 1; y >= 0; y--) {
+
 #ifndef NO_DUMB_COLOR_SUPPORT
-	if (dumb_colormode > 0) {
-	    fputs("\033[0;39m", gpoutfile); /* reset colors to default */
-	    memset(&dumb_prev_color, 0, sizeof(t_colorspec));
-	}
+    if (dumb_colormode > 0) {
+	fputs("\033[0;39m", gpoutfile); /* reset colors to default */
+	memset(&dumb_prev_color, 0, sizeof(t_colorspec));
+    }
 #endif
+
+    for (y = dumb_ymax - 1; y >= 0; y--) {
 	for (x = 0; x < dumb_xmax; x++) {
 	    char *c;
 
 #ifndef NO_DUMB_COLOR_SUPPORT
 	    t_colorspec * color = &dumb_colors[dumb_xmax*y + x];
 	    const char * colorstring = ansi_colorstring(color, &dumb_prev_color);
-	    if (colorstring[0] != NUL)
+	    if (colorstring[0] != NUL) {
 		fputs(colorstring, gpoutfile);
-	    memcpy(&dumb_prev_color, color, sizeof(t_colorspec));
+		memcpy(&dumb_prev_color, color, sizeof(t_colorspec));
+	    }
 #endif
 
 	    c = (char *)(&DUMB_PIXEL(x, y));
