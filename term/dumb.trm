@@ -101,6 +101,9 @@ TERM_PUBLIC void ENHdumb_FLUSH(void);
 TERM_PUBLIC int DUMB_make_palette(t_sm_palette *palette);
 TERM_PUBLIC void DUMB_set_color(t_colorspec *);
 #endif
+TERM_PUBLIC void DUMB_fillbox(int style, unsigned int x, unsigned int y,
+			      unsigned int w, unsigned int h);
+TERM_PUBLIC void DUMB_filled_polygon(int points, gpiPoint *corners);
 
 #define DUMB_XMAX 79
 #define DUMB_YMAX 24
@@ -144,6 +147,8 @@ static int dumb_colormode = 0;
 #define DUMB_PIXEL(x,y) dumb_matrix[dumb_xmax*(y)+(x)]
 
 static void dumb_set_pixel(int x, int y, int v);
+static unsigned nearest_ansi(rgb255_color rgb255);
+static void dumb_rgb_color(rgb255_color rgb255, char * colorstring);
 
 enum DUMB_id { DUMB_FEED, DUMB_NOFEED, DUMB_ENH, DUMB_NOENH,
                DUMB_SIZE, DUMB_ASPECT,
@@ -327,7 +332,7 @@ DUMB_graphics()
     memset(dumb_colors, 0, size * sizeof(t_colorspec));
 #endif
 
-    for (i=0; i<size; i++) {
+    for (i = 0; i < size; i++) {
 	char *c = (char *)pm++;
 	*c = ' ';
     }
@@ -505,9 +510,8 @@ DUMB_text()
 	    putc('\n', gpoutfile);
     }
 #ifndef NO_DUMB_COLOR_SUPPORT
-    if (dumb_colormode > 0) {
+    if (dumb_colormode > 0)
 	fputs("\033[0;39;49m", gpoutfile); /* reset colors to default */
-    }
 #endif
     fflush(gpoutfile);
 }
@@ -799,7 +803,6 @@ ENHdumb_OPEN(
 	return;
     }
 
-
     if (!ENHdumb_opened_string) {
 	ENHdumb_opened_string = TRUE;
 	/* Start new text fragment */
@@ -862,7 +865,7 @@ ENHdumb_put_text(unsigned int x, unsigned int y, const char *str)
     /* If no enhanced text processing is needed, we can use the plain  */
     /* vanilla put_text() routine instead of this fancy recursive one. */
     if (ignore_enhanced_text || (!strpbrk(str, "{}^_@&~") && !contains_unicode(str))) {
-	DUMB_put_text(x,y,str);
+	DUMB_put_text(x, y, str);
 	return;
     }
 
@@ -875,7 +878,7 @@ ENHdumb_put_text(unsigned int x, unsigned int y, const char *str)
     /* Set up global variables needed by enhanced_recursion() */
     enhanced_fontscale = 1.0;
     ENHdumb_opened_string = FALSE;
-    strncpy(enhanced_escape_format,"%c",sizeof(enhanced_escape_format));
+    strncpy(enhanced_escape_format, "%c", sizeof(enhanced_escape_format));
 
     DUMB_move(x,y);
 
@@ -921,7 +924,7 @@ DUMB_set_color(t_colorspec *colorspec)
 
 
 TERM_PUBLIC void
-dumb_fillbox(int style, unsigned int x, unsigned int y, unsigned int w, unsigned int h)
+DUMB_fillbox(int style, unsigned int x, unsigned int y, unsigned int w, unsigned int h)
 {
     char save_pen;
     unsigned ny;
@@ -950,7 +953,7 @@ dumb_float_compare(const void * elem1, const void * elem2)
 
 /* adopted copy from caca.trm */
 TERM_PUBLIC void
-dumb_filled_polygon(int points, gpiPoint *corners)
+DUMB_filled_polygon(int points, gpiPoint *corners)
 {
     char save_pen;
 
@@ -1057,15 +1060,15 @@ TERM_TABLE_START(dumb_driver)
 #else
     TERM_CAN_MULTIPLOT,
 #endif
-    NULL, NULL, dumb_fillbox, NULL,
+    NULL, NULL, DUMB_fillbox, NULL,
 #ifdef USE_MOUSE
     NULL, NULL, NULL, NULL, NULL,
 #endif
     NULL,	/* Color support sets this to DUMB_make_palette */
     NULL, 	/* previous_palette */
     NULL,	/* Color support sets this to DUMB_set_color */
-    dumb_filled_polygon, /* filled_polygon */
-    NULL, /* image */
+    DUMB_filled_polygon,
+    NULL,	/* image */
 #ifndef NO_DUMB_ENHANCED_SUPPORT
     ENHdumb_OPEN, ENHdumb_FLUSH, do_enh_writec
 #endif /* NO_DUMB_ENHANCED_SUPPORT */
