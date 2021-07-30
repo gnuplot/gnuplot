@@ -76,6 +76,7 @@ static void parallel_range_fiddling(struct curve_points *plot);
 static int check_or_add_boxplot_factor(struct curve_points *plot, char* string, double x);
 static void add_tics_boxplot_factors(struct curve_points *plot);
 static void parse_kdensity_options(struct curve_points *this_plot);
+static void parse_hull_options(struct curve_points *this_plot);
 
 /* internal and external variables */
 
@@ -2393,6 +2394,7 @@ eval_plots()
 			break;
 		    case SMOOTH_CONVEX_HULL:
 			this_plot->plot_smooth = SMOOTH_SMOOTH_HULL;
+			parse_hull_options(this_plot);
 			break;
 		    case SMOOTH_NONE:
 		    default:
@@ -3102,8 +3104,11 @@ eval_plots()
 		case SMOOTH_MONOTONE_CSPLINE:
 		    mcs_interp(this_plot);
 		    break;
-		case SMOOTH_PATH:
 		case SMOOTH_SMOOTH_HULL:
+		    expand_hull(this_plot);
+		    gen_2d_path_splines(this_plot);
+		    break;
+		case SMOOTH_PATH:
 		    gen_2d_path_splines(this_plot);
 		    break;
 		case SMOOTH_NONE:
@@ -3774,7 +3779,8 @@ parametric_fixup(struct curve_points *start_plot, int *plot_num)
 
 
 /*
- * handle keyword options for "smooth kdensity {bandwidth <val>} {period <val>}
+ * handle optional keywords for
+ *	smooth kdensity {bandwidth <val>} {period <val>}
  */
 static void
 parse_kdensity_options(struct curve_points *this_plot)
@@ -3792,6 +3798,20 @@ parse_kdensity_options(struct curve_points *this_plot)
 	    this_plot->smooth_period = real_expression();
 	} else
 	    done = TRUE;
+    }
+}
+
+/*
+ * handle optional keyword for
+ *	smooth convexhull {expand <val>}
+ */
+static void
+parse_hull_options(struct curve_points *this_plot)
+{
+    this_plot->smooth_parameter = 0;
+    if (equals(c_token,"expand")) {
+	c_token++;
+	this_plot->smooth_parameter = real_expression();
     }
 }
 

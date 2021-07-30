@@ -1277,16 +1277,22 @@ winnow_interior_points (struct curve_points *plot)
     double ymin = VERYLARGE, ymax = -VERYLARGE;
     struct coordinate *points = plot->points;
     double area;
+    double xsum, ysum;
     int i, np;
 
-    /* Find maximal extent on x and y */
+    /* Find maximal extent on x and y, centroid */
     pp1 = pp2 = pp3 = pp4 = plot->points;
+    xsum = ysum = 0;
     for (p = plot->points; p < &(plot->points[plot->p_count]); p++) {
 	if (p->x < xmin) { xmin = p->x; pp1 = p; }
 	if (p->x > xmax) { xmax = p->x; pp3 = p; }
 	if (p->y < ymin) { ymin = p->y; pp4 = p; }
 	if (p->y > ymax) { ymax = p->y; pp2 = p; }
+	xsum += p->x;
+	ysum += p->y;
     }
+    plot->filledcurves_options.at = xsum / plot->p_count;
+    plot->filledcurves_options.aty = ysum / plot->p_count;
 
     /* Ignore any points that lie inside the clockwise triangle bounded by pp1 pp2 pp3 */
     area = fabs(-pp2->y*pp3->x + pp1->y*(-pp2->x + pp3->x)
@@ -1326,6 +1332,31 @@ winnow_interior_points (struct curve_points *plot)
 #undef TOLERANCE
 }
 
+/*
+ * expand_hull() "inflates" a smooth convex hull by pushing each
+ * perimeter point further away from the centroid of the bounded points.
+ * FIXME: The expansion value is currently interpreted as a scale
+ *        factor; i.e. 1.0 is no expansion.  It might be better to 
+ *	  instead accept a fixed value in user coordinates.
+ */
+void
+expand_hull(struct curve_points *plot)
+{
+    struct coordinate *points = plot->points;
+    double xcent = plot->filledcurves_options.at;
+    double ycent = plot->filledcurves_options.aty;
+    double scale = plot->smooth_parameter;
+    int i;
+
+    if (scale <=0 || scale == 1.0)
+	return;
+
+    for (i=0; i<plot->p_count; i++) {
+	points[i].x = xcent + scale * (points[i].x - xcent);
+	points[i].y = ycent + scale * (points[i].y - ycent);
+    }
+
+}
 
 /*
  * cp_implode() if averaging is selected this function computes the new

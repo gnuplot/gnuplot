@@ -267,11 +267,11 @@ typedef enum en_key_sample_positioning {
 
 typedef struct {
     enum filledcurves_opts_id closeto;	/* from list FILLEDCURVES_CLOSED, ... */
+    int oneside;   /* -1 if fill below bound only; +1 if fill above bound only */
     double at;	   /* value for FILLEDCURVES_AT... */
     double aty;	   /* the other value for FILLEDCURVES_ATXY */
-    int oneside;   /* -1 if fill below bound only; +1 if fill above bound only */
 } filledcurves_opts;
-#define EMPTY_FILLEDCURVES_OPTS { FILLEDCURVES_DEFAULT, 0.0, 0.0, 0 }
+#define EMPTY_FILLEDCURVES_OPTS { FILLEDCURVES_DEFAULT, 0, 0.0, 0.0 }
 
 typedef struct histogram_style {
     int type;		/* enum t_histogram_type */

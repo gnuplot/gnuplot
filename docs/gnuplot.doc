@@ -7864,9 +7864,10 @@ Ffigure_zerror
 
  Syntax:
        smooth {unique | frequency | fnormal | cumulative | cnormal | bins
-              | kdensity {bandwidth} {period}
               | csplines | acsplines | mcsplines | path | bezier | sbezier
-              | convexhull | unwrap | zsort}
+              | kdensity {bandwidth} {period}
+              | convexhull {expand}
+              | unwrap | zsort}
 
  The `unique`, `frequency`, `fnormal`, `cumulative` and `cnormal` options
  sort the data on x and then plot some aspect of the distribution of x values.
@@ -8198,20 +8199,30 @@ Ffigure_smooth_path
  Limited to plot style "with points".
 
 5 convexhull
-?commands plot datafile smooth convexhull
+?commands plot datafile convexhull
 ?plot smooth convexhull
+?plot convexhull
 ?smooth convexhull
 ?convexhull
-      plot FOO using x:y {smooth} convexhull
+      plot FOO using x:y convexhull
+      plot FOO using x:y smooth convexhull {expand <scale>}
 
 Ffigure_convex_hull
  The points in dataset FOO are replaced by a subset of the original points
  that constitute a bounding convex polygon.  The vertices of this polygon,
  the convex hull, are generated in clockwise order to form a closed curve.
- If the keyword `smooth` is present, the vertices are then used as guide
- points to generate a smooth closed curve (see `smooth path`).
  The first and last points of the generated curve are equal, making
  it suitable for plotting `with lines` or `with filledcurves`.
+
+ If the keyword `smooth` is present, the vertices are then used as guide
+ points to generate a smooth closed curve (see `smooth path`). By default
+ this smoothed curve runs through the bounding points.  The optional scale
+ factor shifts the guide points away from the centroid so that all data
+ points lie within the smoothed curve.
+
+ If a smooth non-convex hull is wanted, you might try contouring the result of
+ dgrid3d + gauss + kdensity.  This requires experimentation to find suitable
+ grids parameters and contour level.
 
 4 special-filenames
 ?special-filenames

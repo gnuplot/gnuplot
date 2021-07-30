@@ -54,5 +54,6 @@ void make_bins(struct curve_points *plot,
 void gen_3d_splines(struct surface_points *plot);
 void gen_2d_path_splines(struct curve_points *plot);
 void convex_hull(struct curve_points *plot);
+void expand_hull(struct curve_points *plot);
 
 #endif /* GNUPLOT_INTERPOL_H */

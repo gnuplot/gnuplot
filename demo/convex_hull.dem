@@ -25,4 +25,11 @@ plot for [i=0:1] 'hull.dat' index i with points ls (i+1), \
 
 pause -1 "<cr> to continue"
 
+set title "Smooth convex hull expanded by 5%"
+
+plot for [i=0:1] 'hull.dat' index i with points ls (i+1), \
+     for [i=0:1] '' index i smooth convexhull expand 1.05 with filledcurve ls (i+1)
+
+pause -1 "<cr> to continue"
+
 reset
