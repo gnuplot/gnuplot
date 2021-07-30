@@ -1043,10 +1043,20 @@ TERM_TABLE_START(dumb_driver)
     1, 2, /* account for typical aspect ratio of characters */
     DUMB_options, DUMB_init, DUMB_reset,
     DUMB_text, null_scale, DUMB_graphics, DUMB_move, DUMB_vector,
-    DUMB_linetype, DUMB_put_text, null_text_angle,
+    DUMB_linetype,
+#ifndef NO_DUMB_ENHANCED_SUPPORT
+    ENHdumb_put_text,
+#else
+    DUMB_put_text,
+#endif
+    null_text_angle,
     null_justify_text, DUMB_point, DUMB_arrow, set_font_null,
     NULL,				/* pointsize */
+#ifndef NO_DUMB_ENHANCED_SUPPORT
+    TERM_CAN_MULTIPLOT | TERM_ENHANCED_TEXT,
+#else
     TERM_CAN_MULTIPLOT,
+#endif
     NULL, NULL, dumb_fillbox, NULL,
 #ifdef USE_MOUSE
     NULL, NULL, NULL, NULL, NULL,
