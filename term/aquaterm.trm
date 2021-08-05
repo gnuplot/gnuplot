@@ -234,7 +234,6 @@ AQUA_options()
 	if (size > 0)
 	    AQUA_fontSizeDef = size;
 	AQUA_fontSizeCur = AQUA_fontSizeDef;
-	set_font_size(AQUA_fontSizeCur);
 
 	continue;
     }
@@ -250,7 +249,6 @@ AQUA_options()
 	if ((size = real_expression()) > 0)
 	    AQUA_fontSizeDef = size;
 	AQUA_fontSizeCur = AQUA_fontSizeDef;
-	set_font_size(AQUA_fontSizeCur);
 	continue;
     }
 
@@ -308,6 +306,7 @@ AQUA_options()
 
     int_error(c_token, "unexpected text at end of command");
   }
+  set_font_size(AQUA_fontSizeCur);
 
   if (AQUA_title[0]=='\0') /* always set title */
     sprintf(AQUA_title, "Figure %d", AQUA_plotRef);
