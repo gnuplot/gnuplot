@@ -214,7 +214,8 @@ gpinsetfigure.tex: no_figures
 gnuplot.tex: allterm.h doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc
 	$(AM_V_GEN)./doc2tex$(EXEEXT) -figures $(srcdir)/gnuplot.doc $@
 
-pdf: pdf_figures gnuplot.pdf figurestyle
+pdf: pdf_figures
+	$(MAKE) gnuplot.pdf
 	rm -f tikz_figures no_figures
 tikz: tikz_figures gnuplot.pdf figurestyle
 	rm -f pdf_figures no_figures
