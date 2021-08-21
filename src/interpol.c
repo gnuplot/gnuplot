@@ -1219,6 +1219,18 @@ convex_hull(struct curve_points *plot)
 	return;
     }
 
+    /* Find centroid (only used by "smooth convexhull") */
+    if (plot->plot_smooth == SMOOTH_SMOOTH_HULL) {
+	double xsum = 0;
+	double ysum = 0;
+	for (i = 0; i < plot->p_count; i++) {
+	    xsum += plot->points[i].x;
+	    ysum += plot->points[i].y;
+	}
+	plot->filledcurves_options.at = xsum / plot->p_count;
+	plot->filledcurves_options.aty = ysum / plot->p_count;
+    }
+
     /* This is not strictly necessary, but greatly reduces the number
      * of points to be sorted and tested for the hull boundary.
      */
@@ -1277,22 +1289,16 @@ winnow_interior_points (struct curve_points *plot)
     double ymin = VERYLARGE, ymax = -VERYLARGE;
     struct coordinate *points = plot->points;
     double area;
-    double xsum, ysum;
     int i, np;
 
     /* Find maximal extent on x and y, centroid */
     pp1 = pp2 = pp3 = pp4 = plot->points;
-    xsum = ysum = 0;
     for (p = plot->points; p < &(plot->points[plot->p_count]); p++) {
 	if (p->x < xmin) { xmin = p->x; pp1 = p; }
 	if (p->x > xmax) { xmax = p->x; pp3 = p; }
 	if (p->y < ymin) { ymin = p->y; pp4 = p; }
 	if (p->y > ymax) { ymax = p->y; pp2 = p; }
-	xsum += p->x;
-	ysum += p->y;
     }
-    plot->filledcurves_options.at = xsum / plot->p_count;
-    plot->filledcurves_options.aty = ysum / plot->p_count;
 
     /* Ignore any points that lie inside the clockwise triangle bounded by pp1 pp2 pp3 */
     area = fabs(-pp2->y*pp3->x + pp1->y*(-pp2->x + pp3->x)
