@@ -848,7 +848,7 @@ load_rcfile(int where)
 	PATH_CONCAT(rcfile, PLOTRC);
 	plotrc = fopen(rcfile, "r");
     } else if (where == 3) {
-#ifdef __unix__
+#ifdef USE_XDG_BASEDIR
 	char * XDGConfigHome = xdg_get_var(kXDGConfigHome);
 	size_t len = strlen(XDGConfigHome);
 	rcfile = gp_alloc(len + 1 + sizeof("gnuplot/gnuplotrc"), "rcfile");
