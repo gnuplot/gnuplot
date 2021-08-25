@@ -2,7 +2,7 @@
 #include "plot.h"
 #include "util.h"
 
-#ifdef __unix__
+#ifdef USE_XDG_BASEDIR
 
 #include <assert.h>
 #include <stdio.h>
@@ -57,4 +57,4 @@ char *xdg_get_var(const XDGVarType idx) {
     return XDGVar;
 }
 
-#endif /* __unix__ */
+#endif /* USE_XDG_BASEDIR */
