@@ -523,7 +523,7 @@ void gp_rewinddir(GPDIR *);
    p += strlen(path); \
    if (p!=path) p--; \
    if (*p && (*p != DIRSEP1) && (*p != DIRSEP2)) { \
-     if (*p) p++; *p++ = DIRSEP1; *p = NUL; \
+     if (*p) {p++;} *p++ = DIRSEP1; *p = NUL; \
    } \
    strcat (path, file); \
  }
