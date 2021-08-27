@@ -176,6 +176,9 @@ f_call(union argument *x)
 
     execute_at(udf->at);
     gpfree_string(&udf->dummy_values[0]);
+    if (udf->dummy_values[0].type == ARRAY
+    &&  udf->dummy_values[0].v.value_array[0].type == TEMP_ARRAY)
+	gpfree_array(&udf->dummy_values[0]);
     udf->dummy_values[0] = save_dummy;
 
     recursion_depth--;
