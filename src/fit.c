@@ -1619,6 +1619,7 @@ fit_main()
     int token1, token2, token3;
     int fit_token;
     char *tmp, *file_name;
+    char *viafile;
     TBOOLEAN zero_initial_value;
     AXIS *fit_xaxis, *fit_yaxis, *fit_zaxis;
 
@@ -2150,14 +2151,13 @@ fit_main()
      * input line.  If it were wrapped in lf_push()/lf_pop() we could use
      * the normal gnuplot parsing routines keyed off c_token.
      */
-    if (isstringvalue(c_token)) {	/* It's a parameter *file* */
+    if ((viafile = try_to_get_string())) {	/* It's a parameter *file* */
 	TBOOLEAN fixed;
 	double tmp_par;
 	char c='\0', *s;
 	char sstr[MAX_LINE_LEN + 1];
 
-	char *viafile = try_to_get_string();
-	if (!viafile || !(via_f = loadpath_fopen(viafile, "r")))
+	if (!(via_f = loadpath_fopen(viafile, "r")))
 	    Eex2("could not read parameter-file \"%s\"", viafile);
 	if (!fit_suppress_log)
 	    fprintf(log_f, "fitted parameters and initial values from file: %s\n\n", viafile);

@@ -1779,15 +1779,15 @@ double
 get_num_or_time(struct axis *axis)
 {
     double value = 0;
+    char *ss;
 
     if ((axis != NULL)
-    &&  (axis->datatype == DT_TIMEDATE) && isstringvalue(c_token)) {
+    &&  (axis->datatype == DT_TIMEDATE)
+    &&  (ss = try_to_get_string())) {
 	struct tm tm;
 	double usec;
-	char *ss;
-	if ((ss = try_to_get_string()))
-	    if (gstrptime(ss, timefmt, &tm,&usec, &value) == DT_TIMEDATE)
-		value = (double) gtimegm(&tm) + usec;
+	if (gstrptime(ss, timefmt, &tm,&usec, &value) == DT_TIMEDATE)
+	    value = (double) gtimegm(&tm) + usec;
 	free(ss);
     } else {
 	value = real_expression();
