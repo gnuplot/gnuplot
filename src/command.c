@@ -965,7 +965,7 @@ bind_command()
      */
     if (END_OF_COMMAND) {
 	; /* Fall through */
-    } else if (isstringvalue(c_token) && (lhs = try_to_get_string())) {
+    } else if ((lhs = try_to_get_string())) {
 	FPRINTF((stderr,"Got bind quoted lhs = \"%s\"\n",lhs));
     } else {
 	char *first = gp_input_line + token[c_token].start_index;
@@ -984,7 +984,7 @@ bind_command()
      */
     if (END_OF_COMMAND) {
 	; /* Fall through */
-    } else if (isstringvalue(c_token) && (rhs = try_to_get_string())) {
+    } else if ((rhs = try_to_get_string())) {
 	FPRINTF((stderr,"Got bind quoted rhs = \"%s\"\n",rhs));
     } else {
 	int save_token = c_token;

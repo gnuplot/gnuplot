@@ -1700,7 +1700,7 @@ set_encoding()
 	char *senc;
 
 	/* allow string variables as parameter */
-	if ((temp == S_ENC_INVALID) && isstringvalue(c_token) && (senc = try_to_get_string())) {
+	if ((temp == S_ENC_INVALID) && (senc = try_to_get_string())) {
 	    int i;
 	    for (i = 0; encoding_names[i] != NULL; i++)
 		if (strcmp(encoding_names[i], senc) == 0)
@@ -3031,7 +3031,7 @@ set_mouse()
 	    mouse_setting.label = 1;
 	    ++c_token;
 	    /* check if the optional argument "<label options>" is present */
-	    if (isstringvalue(c_token) && (ctmp = try_to_get_string())) {
+	    if ((ctmp = try_to_get_string())) {
 		free(mouse_setting.labelopts);
 		mouse_setting.labelopts = ctmp;
 	    }
@@ -3052,7 +3052,7 @@ set_mouse()
 	    ++c_token;
 	} else if (almost_equals(c_token, "fo$rmat")) {
 	    ++c_token;
-	    if (isstringvalue(c_token) && (ctmp = try_to_get_string())) {
+	    if ((ctmp = try_to_get_string())) {
 		if (mouse_setting.fmt != mouse_fmt_default)
 		    free(mouse_setting.fmt);
 		mouse_setting.fmt = ctmp;
@@ -3070,7 +3070,7 @@ set_mouse()
 		/* FIXME:  wants sanity check that this is a string-valued */
 		/*         function with parameters x and y */
 		mouse_mode = MOUSE_COORDINATES_FUNCTION;
-	    } else if (isstringvalue(c_token) && (ctmp = try_to_get_string())) {
+	    } else if ((ctmp = try_to_get_string())) {
 		free(mouse_alt_string);
 		mouse_alt_string = ctmp;
 		if (!strlen(mouse_alt_string)) {
