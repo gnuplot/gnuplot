@@ -468,11 +468,6 @@ parse_assignment_expression()
 	foo->v_arg.type = STRING;
 	foo->v_arg.v.string_val = varname;
 
-	/* push a dummy variable that would be the index if this were an array */
-	/* FIXME: It would be nice to hide this from "show at" */
-	foo = add_action(PUSHC);
-	foo->v_arg.type = NOTDEFINED;
-
 	/* push the expression whose value it will get */
 	c_token += 2;
 	parse_expression();
@@ -527,15 +522,17 @@ parse_array_assignment_expression()
 	save_action = at->a_count;
 	save_token = c_token;
 
-	/* push the array name */
+	/* Get the array name */
 	m_capture(&varname,c_token,c_token);
-	foo = add_action(PUSHC);
-	foo->v_arg.type = STRING;
-	foo->v_arg.v.string_val = varname;
 
 	/* push the index */
 	c_token += 2;
 	parse_expression();
+
+	/* push the array name */
+	foo = add_action(PUSHC);
+	foo->v_arg.type = STRING;
+	foo->v_arg.v.string_val = varname;
 
 	/* If this wasn't really an array element assignment, back out. */
 	if (!equals(c_token, "]") || !equals(c_token+1, "=")) {

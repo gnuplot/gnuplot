@@ -2073,7 +2073,6 @@ f_assign(union argument *arg)
     struct value a, b, index;
     (void) arg;
     (void) pop(&b);	/* new value */
-    (void) pop(&index);	/* index (only used if this is an array assignment) */
     (void) pop(&a);	/* name of variable */
 
     if (a.type != STRING)
@@ -2088,6 +2087,7 @@ f_assign(union argument *arg)
 
     if (udv->udv_value.type == ARRAY) {
 	int i;
+	pop(&index);
 	if (index.type == INTGR)
 	    i = index.v.int_val;
 	else if (index.type == CMPLX)
