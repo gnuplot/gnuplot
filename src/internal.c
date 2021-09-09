@@ -188,8 +188,18 @@ f_call(union argument *x)
     execute_at(udf->at);
 
     if (udf->dummy_values[0].type == ARRAY
-    &&  udf->dummy_values[0].v.value_array[0].type == ARRAY)
-	gpfree_array(&udf->dummy_values[0]);
+    &&  udf->dummy_values[0].v.value_array[0].type == ARRAY) {
+	/* Free TEMP_ARRAY passed as a parameter unless it is also the return value. */
+	struct value top_of_stack;
+	pop(&top_of_stack);
+	if (udf->dummy_values[0].type == top_of_stack.type
+	&&  udf->dummy_values[0].v.value_array == top_of_stack.v.value_array) {
+	    top_of_stack.v.value_array[0].type = TEMP_ARRAY;
+	} else {
+	    gpfree_array(&udf->dummy_values[0]);
+	}
+	push(&top_of_stack);
+    }
     gpfree_string(&udf->dummy_values[0]);
     udf->dummy_values[0] = save_dummy;
 
@@ -207,6 +217,7 @@ f_calln(union argument *x)
     int i;
     int num_pop;
     struct value num_params;
+    struct value top_of_stack;
 
     udf = x->udf_arg;
     if (!udf->at)		/* undefined */
@@ -244,13 +255,22 @@ f_calln(union argument *x)
 
     execute_at(udf->at);
 
+    /* Free TEMP_ARRAY passed as a parameter unless it is also the return value */
+    pop(&top_of_stack);
     for (i = 0; i < num_pop; i++) {
 	if (udf->dummy_values[i].type == ARRAY
-	&&  udf->dummy_values[i].v.value_array[0].type == ARRAY)
-	    gpfree_array(&udf->dummy_values[i]);
+	&&  udf->dummy_values[i].v.value_array[0].type == ARRAY) {
+	    if (udf->dummy_values[i].type == top_of_stack.type
+	    &&  udf->dummy_values[i].v.value_array == top_of_stack.v.value_array) {
+		top_of_stack.v.value_array[0].type = TEMP_ARRAY;
+	    } else {
+		gpfree_array(&udf->dummy_values[i]);
+	    }
+	}
 	gpfree_string(&udf->dummy_values[i]);
 	udf->dummy_values[i] = save_dummy[i];
     }
+    push(&top_of_stack);
 
     recursion_depth--;
 }
