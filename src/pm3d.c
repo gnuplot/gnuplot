@@ -55,6 +55,7 @@ typedef struct {
 } quadrangle;
 
 #define QUAD_TYPE_NORMAL   0
+#define QUAD_TYPE_SKIP    -1
 #define QUAD_TYPE_TRIANGLE 3
 #define QUAD_TYPE_4SIDES   4
 #define QUAD_TYPE_LARGEPOLYGON 5
@@ -96,6 +97,11 @@ static double light[3];
 
 static gpdPoint *get_polygon(int size);
 static void free_polygonlist(void);
+
+#define PM3D_INTERSECTING_SURFACES
+#ifdef PM3D_INTERSECTING_SURFACES
+static void split_intersecting_surface_tiles(void);
+#endif
 
 /*
  * Utility routines.
@@ -372,6 +378,10 @@ void pm3d_depth_queue_flush(void)
     if (pm3d.direction != PM3D_DEPTH && !track_pm3d_quadrangles)
 	return;
 
+#ifdef PM3D_INTERSECTING_SURFACES
+    split_intersecting_surface_tiles();
+#endif
+
     term->layer(TERM_LAYER_BEGIN_PM3D_FLUSH);
 
     if (current_quadrangle > 0 && quadrangles) {
@@ -419,6 +429,10 @@ void pm3d_depth_queue_flush(void)
 	qsort(quadrangles, current_quadrangle, sizeof (quadrangle), compare_quadrangles);
 
 	for (qp = quadrangles, qe = quadrangles + current_quadrangle; qp != qe; qp++) {
+
+	    /* skip this one (e.g. if it was removed by split_intersecting_surface_tiles) */
+	    if (qp->type == QUAD_TYPE_SKIP)
+		continue;
 
 	    /* set the color */
 	    if (qp->gray == PM3D_USE_COLORSPEC_INSTEAD_OF_GRAY)
@@ -1839,3 +1853,243 @@ pm3d_reset_after_error()
     pm3d_plot_at = 0;
     free_polygonlist();
 }
+
+#ifdef PM3D_INTERSECTING_SURFACES
+/*
+ * Ethan Merritt Sep 2021
+ * When two pm3d surfaces intersect, the intersection line is jagged because
+ * a decision is forced for each quadrangle it runs through.  One of the two 
+ * surfaces is treated as the "top" for the purpose of assigning a drawing
+ * order, and the entire tile is drawn, occluding part of the other one.
+ * This code implements a smoother treatment. Instead of picking one tile or
+ * the other, both are split into two pieces sharing the true intersection
+ * line as a new edge.
+ * NOTES:
+ * -	We only handle gridded surfaces where the intersecting rectangular
+ *	tiles share [x,y] coordinates at all four corners. Each such tile is
+ *	split into either two new rectangles or a triangle plus a pentagon.
+ */
+
+/*
+ * The sort on x/y is imperfect because we use the coords from only
+ * one of the four corners.  Remember that the other corners may
+ * be +/- one grid spacing.
+ */
+static int compare_xy_quad(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)
+{
+    const quadrangle* q1 = arg1;
+    const quadrangle* q2 = arg2;
+
+    if (q1->vertex.corners[0].x > q2->vertex.corners[0].x) return  1;
+    if (q1->vertex.corners[0].x < q2->vertex.corners[0].x) return -1;
+    if (q1->vertex.corners[0].y > q2->vertex.corners[0].y) return  1;
+    if (q1->vertex.corners[0].y < q2->vertex.corners[0].y) return -1;
+    return 0;
+}
+
+#define xy_same(q1,q2) \
+   ((fabs(q1->vertex.corners[0].x - q2->vertex.corners[0].x) < x_tolerance) \
+&&  (fabs(q1->vertex.corners[1].x - q2->vertex.corners[1].x) < x_tolerance) \
+&&  (fabs(q1->vertex.corners[2].x - q2->vertex.corners[2].x) < x_tolerance) \
+&&  (fabs(q1->vertex.corners[3].x - q2->vertex.corners[3].x) < x_tolerance) \
+&&  (fabs(q1->vertex.corners[0].y - q2->vertex.corners[0].y) < y_tolerance) \
+&&  (fabs(q1->vertex.corners[1].y - q2->vertex.corners[1].y) < y_tolerance) \
+&&  (fabs(q1->vertex.corners[2].y - q2->vertex.corners[2].y) < y_tolerance) \
+&&  (fabs(q1->vertex.corners[3].y - q2->vertex.corners[3].y) < y_tolerance))
+
+#define too_far(q1,q2) \
+    (fabs(q2->vertex.corners[0].x - q1->vertex.corners[0].x) > 2.*x_spacing)
+
+static void
+find_intersection( gpdPoint *v1, gpdPoint *v2, gpdPoint *v3, gpdPoint *v4,
+                   gpdPoint *intersection )
+{
+    double t = fabs((v3->z - v1->z) / ((v1->z - v2->z) - (v3->z -v4->z)));
+    intersection->x = v1->x + t * (v2->x - v1->x);
+    intersection->y = v1->y + t * (v2->y - v1->y);
+    intersection->z = v1->z + t * (v2->z - v1->z);
+}
+
+static void
+split_intersecting_surface_tiles()
+{
+    quadrangle *q1, *q2, *qnew;
+    int iq1, iq2;
+    int s0, s1, s2, s3;		/* -1 = bottom surface; 0 = intersection; 1 = top surface */
+    int nv1, nv2;		/* number of vertices in piece1, piece2 */
+    gpdPoint *ptlist[8];	/* list of 4 vertices of q1 plus possible intersections */
+    int side[8];		/* top/bottom/intersection status of points in ptlist */
+    gpdPoint intersection[2];	/* We know there are only two intersections */
+    gpdPoint piece1[5], piece2[5];
+    int pass;
+
+    /* These calculations all assume a simple grid shared by all plots in the superposition */
+    double x_spacing = fabs(axis_array[U_AXIS].max -axis_array[U_AXIS].min)/(samples_1-1);
+    double y_spacing = fabs(axis_array[V_AXIS].max -axis_array[V_AXIS].min)/(iso_samples_1-1);
+    double x_tolerance = x_spacing * 1.e-8;
+    double y_tolerance = y_spacing * 1.e-8;
+
+    if (!current_quadrangle || !quadrangles)
+	return;
+
+    /* Sort quadrangles on x and y */
+    qsort(quadrangles, current_quadrangle, sizeof(quadrangle), compare_xy_quad);
+
+    /* Step through the list of quadrangles.
+     * For each quadrangle look ahead to find another with the same [x,y] corners.
+     * Check this pair for intersection along z.
+     * If no, proceed to next in list.
+     * If yes, split each of them into two new 'quadrangles' (may be triangle or pentagon)
+     */
+    for (iq1 = 1; iq1 < current_quadrangle; iq1++) {
+	q1 = &(quadrangles[iq1]);
+	if (q1->type != QUAD_TYPE_NORMAL)
+	    continue;
+	for (iq2 = iq1+1; iq2 < current_quadrangle; iq2++) {
+	    q2 = &(quadrangles[iq2]);
+	    if (q2->type != QUAD_TYPE_NORMAL)
+		continue;
+	    if (too_far(q1,q2))
+		break;
+	    if (!xy_same(q1,q2))
+		continue;
+
+	    s0 = (q1->vertex.corners[0].z - q2->vertex.corners[0].z) >= 0 ? 1 : -1;
+	    s1 = (q1->vertex.corners[1].z - q2->vertex.corners[1].z) >= 0 ? 1 : -1;
+	    s2 = (q1->vertex.corners[2].z - q2->vertex.corners[2].z) >= 0 ? 1 : -1;
+	    s3 = (q1->vertex.corners[3].z - q2->vertex.corners[3].z) >= 0 ? 1 : -1;
+	    if (s0 > 0 && s1 > 0 && s2 > 0 && s3 > 0)
+		continue;
+	    if (s0 < 0 && s1 < 0 && s2 < 0 && s3 < 0)
+		continue;
+
+	    /* Found a pair of intersecting quadrangles!
+	     * Make sure the list is long enough to hold new pieces.
+	     */
+	    if (allocated_quadrangles < current_quadrangle + samples_1) {
+		allocated_quadrangles += 2 * samples_1;
+		quadrangles = gp_realloc(quadrangles,
+		allocated_quadrangles * sizeof(quadrangle), "pm3d_add_quadrangle");
+		q1 = &(quadrangles[iq1]);
+		q2 = &(quadrangles[iq2]);
+	    }
+
+	    /* Construct a list of pointers to the 4 original vertices of q1
+	     * and to the 2 intersection points.  We don't yet know which sides
+	     * the intersections lie on, so we leave room for 2 NULL pointers
+	     * corresponding to the sides with no intersection.
+	     */
+	    ptlist[1] = ptlist[3] = ptlist[5] = ptlist[7] = NULL;
+	    side[1] = side[3] = side[5] = side[7] = 0;
+	    side[0] = s0;
+	    side[2] = s1;
+	    side[4] = s2;
+	    side[6] = s3;
+
+	    for (pass = 1; pass <= 2; pass++) {
+		quadrangle *qt = (pass==1) ? q1 : q2;
+		quadrangle *qb = (pass==1) ? q2 : q1;
+		int next_int = 0;
+		int i;
+
+		ptlist[0] = &qt->vertex.corners[0];
+		ptlist[2] = &qt->vertex.corners[1];
+		ptlist[4] = &qt->vertex.corners[2];
+		ptlist[6] = &qt->vertex.corners[3];
+		if (s0*s1 != 1) {
+		    find_intersection(&(qb->vertex.corners[0]), &(qb->vertex.corners[1]),
+				      &(qt->vertex.corners[0]), &(qt->vertex.corners[1]),
+				      &intersection[next_int]);
+		    ptlist[1] = &intersection[next_int++];
+		}
+		if (s1*s2 != 1) {
+		    find_intersection(&(qb->vertex.corners[1]), &(qb->vertex.corners[2]),
+				      &(qt->vertex.corners[1]), &(qt->vertex.corners[2]),
+				      &intersection[next_int]);
+		    ptlist[3] = &intersection[next_int++];
+		}
+		if (s2*s3 != 1) {
+		    find_intersection(&(qb->vertex.corners[2]), &(qb->vertex.corners[3]),
+				      &(qt->vertex.corners[2]), &(qt->vertex.corners[3]),
+				      &intersection[next_int]);
+		    ptlist[5] = &intersection[next_int++];
+		}
+		if (s3*s0 != 1) {
+		    find_intersection(&(qb->vertex.corners[3]), &(qb->vertex.corners[0]),
+				      &(qt->vertex.corners[3]), &(qt->vertex.corners[0]),
+				      &intersection[next_int]);
+		    ptlist[7] = &intersection[next_int++];
+		}
+		/* Should never happen */
+		if (next_int != 2)
+		    int_error(NO_CARET, "calculation of surface intersection failed n=%d", next_int);
+
+		/* Copy the "top" vertices to piece1, "bottom" to piece2 */
+		nv1 = nv2 = 0;
+		for (i=0; i<8; i++) {
+		    if (ptlist[i] != NULL && side[i] >= 0)
+			piece1[nv1++] = *ptlist[i];
+		    if (ptlist[i] != NULL && side[i] <= 0)
+			piece2[nv2++] = *ptlist[i];
+		}
+
+		/* Add piece1 as a new quadrangle at the end of the list */
+		if (nv1 > 2) {
+		    qnew = quadrangles + current_quadrangle++;
+		    qnew->gray = qt->gray;
+		    qnew->fillstyle = qt->fillstyle;
+		    qnew->qcolor = qt->qcolor;
+
+		    qnew->vertex.corners[0] = piece1[0];
+		    qnew->vertex.corners[1] = piece1[1];
+		    qnew->vertex.corners[2] = piece1[2];
+		    qnew->vertex.corners[3] = piece1[3];
+		    qnew->type = QUAD_TYPE_4SIDES;
+		    if (nv1 == 3) {
+			qnew->vertex.corners[3] = piece1[2];
+			qnew->type = QUAD_TYPE_TRIANGLE;
+		    }
+		    if (nv1 == 5) {
+			gpdPoint *save_corners = get_polygon(nv1);
+			qnew->vertex.array_index = current_polygon;
+			memcpy(save_corners, piece1, nv1 * sizeof(gpdPoint));
+			save_corners[2].c = nv1;
+			qnew->type = QUAD_TYPE_LARGEPOLYGON;
+		    }
+		}
+
+		/* Add piece2 as a new quadrangle at the end of the list */
+		if (nv2 > 2) {
+		    qnew = quadrangles + current_quadrangle++;
+		    qnew->gray = qt->gray;
+		    qnew->fillstyle = qt->fillstyle;
+		    qnew->qcolor = qt->qcolor;
+
+		    qnew->vertex.corners[0] = piece2[0];
+		    qnew->vertex.corners[1] = piece2[1];
+		    qnew->vertex.corners[2] = piece2[2];
+		    qnew->vertex.corners[3] = piece2[3];
+		    qnew->type = QUAD_TYPE_4SIDES;
+		    if (nv2 == 3) {
+			qnew->vertex.corners[3] = piece2[2];
+			qnew->type = QUAD_TYPE_TRIANGLE;
+		    }
+		    if (nv2 == 5) {
+			gpdPoint *save_corners = get_polygon(nv2);
+			qnew->vertex.array_index = current_polygon;
+			qnew->type = QUAD_TYPE_LARGEPOLYGON;
+			memcpy(save_corners, piece2, nv2 * sizeof(gpdPoint));
+			save_corners[2].c = nv2;
+		    }
+		}
+	    }
+
+	    /* Mark original q1 and q2 as not to be drawn */
+	    q1->type = QUAD_TYPE_SKIP;
+	    q2->type = QUAD_TYPE_SKIP;
+	    break;
+	}
+    }
+
+}
+#endif /* PM3D_INTERSECTING_SURFACES */

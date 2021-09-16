@@ -1,0 +1,21 @@
+#
+# New in version 5.5 - smooth intersection of pm3d surfaces
+#
+set title "Smooth intersection of pm3d surfaces" 
+
+set border -1
+set grid x y z vertical
+unset key
+unset colorbox
+set view 57, 25, 1, 1
+set samples 13, 13
+set isosamples 7, 7
+set xyplane 0
+set xrange [ 0.0 : 10.0 ]
+set yrange [ 0.0 : 10.0 ]
+set zrange [ * : * ]
+set pm3d depthorder 
+set pm3d border lw 0.5
+
+splot (x*x+y*y) with pm3d fc "yellow", 100-(x*x+y*y) with pm3d fc "forest-green"
+pause -1 'hit <return> to continue'
