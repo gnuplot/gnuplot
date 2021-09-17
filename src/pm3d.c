@@ -35,7 +35,7 @@ TBOOLEAN track_pm3d_quadrangles;
 /*
   Global options for pm3d algorithm (to be accessed by set / show).
 */
-pm3d_struct pm3d;	/* Initialized via init_session->reset_command->reset_pm3d */
+pm3d_struct pm3d;	/* Initialized via init_session->reset_command->pm3d_reset */
 
 lighting_model pm3d_shade;
 
@@ -422,10 +422,7 @@ void pm3d_depth_queue_flush(void)
 		    z = out.z;
 	    }
 
-	    if (pm3d.zmean_sort)
-		qp->z = zmean / nv;
-	    else
-		qp->z = z;
+	    qp->z = zmean / nv;
 	}
 
 	qsort(quadrangles, current_quadrangle, sizeof (quadrangle), compare_quadrangles);
@@ -1125,7 +1122,6 @@ pm3d_reset()
     pm3d.no_clipcb = FALSE;
     pm3d.direction = PM3D_SCANS_AUTOMATIC;
     pm3d.base_sort = FALSE;
-    pm3d.zmean_sort = TRUE;	/* DEBUG: prior to Oct 2019 default sort used zmax */
     pm3d.implicit = PM3D_EXPLICIT;
     pm3d.which_corner_color = PM3D_WHICHCORNER_MEAN;
     pm3d.interp_i = 1;
