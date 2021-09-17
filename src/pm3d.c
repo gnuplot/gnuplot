@@ -95,6 +95,8 @@ static int clip_filled_polygon( gpdPoint *inpts, gpdPoint *outpts, int nv );
 static TBOOLEAN color_from_rgbvar = FALSE;
 static double light[3];
 
+static TBOOLEAN reserve_quadrangles(int needed, int chunk);
+
 static gpdPoint *get_polygon(int size);
 static void free_polygonlist(void);
 
@@ -396,7 +398,7 @@ void pm3d_depth_queue_flush(void)
 	if (pm3d.base_sort)
 	    cliptorange(zbase, Z_AXIS.min, Z_AXIS.max);
 
-	for (qp = quadrangles, qe = quadrangles + current_quadrangle; qp != qe; qp++) {
+	for (qp = quadrangles, qe = &quadrangles[current_quadrangle]; qp != qe; qp++) {
 	    double z = 0;
 	    double zmean = 0;
 
@@ -428,7 +430,7 @@ void pm3d_depth_queue_flush(void)
 
 	qsort(quadrangles, current_quadrangle, sizeof (quadrangle), compare_quadrangles);
 
-	for (qp = quadrangles, qe = quadrangles + current_quadrangle; qp != qe; qp++) {
+	for (qp = quadrangles, qe = &quadrangles[current_quadrangle]; qp != qe; qp++) {
 
 	    /* skip this one (e.g. if it was removed by split_intersecting_surface_tiles) */
 	    if (qp->type == QUAD_TYPE_SKIP)
@@ -601,18 +603,10 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 	}
 	needed_quadrangles *= (interp_i > 1) ? interp_i : 1;
 	needed_quadrangles *= (interp_j > 1) ? interp_j : 1;
-
-	if (needed_quadrangles > 0) {
-	    while (current_quadrangle + needed_quadrangles >= allocated_quadrangles) {
-		FPRINTF((stderr, "allocated_quadrangles = %d current = %d needed = %d\n",
-		    allocated_quadrangles, current_quadrangle, needed_quadrangles));
-		allocated_quadrangles = needed_quadrangles + 2*allocated_quadrangles;
-		quadrangles = (quadrangle*)gp_realloc(quadrangles,
-			    allocated_quadrangles * sizeof (quadrangle),
-			    "pm3d_plot->quadrangles");
-	    }
-	}
+	if (needed_quadrangles > 0)
+	    reserve_quadrangles(needed_quadrangles, 0);
     }
+
     /* pm3d_rearrange_scan_array(this_plot, (struct iso_curve***)0, (int*)0, &scan_array, &invert); */
 
 #if 0
@@ -1045,7 +1039,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 
 			if (pm3d.direction == PM3D_DEPTH) {
 			    /* copy quadrangle */
-			    quadrangle* qp = quadrangles + current_quadrangle;
+			    quadrangle* qp = &quadrangles[current_quadrangle];
 			    memcpy(qp->vertex.corners, corners, 4 * sizeof (gpdPoint));
 			    if (color_from_rgbvar || pm3d_shade.strength > 0) {
 				qp->gray = PM3D_USE_RGB_COLOR_INSTEAD_OF_GRAY;
@@ -1080,7 +1074,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		    filled_polygon(corners, plot_fillstyle, 4);
 		} else {
 		    /* copy quadrangle */
-		    quadrangle* qp = quadrangles + current_quadrangle;
+		    quadrangle* qp = &quadrangles[current_quadrangle];
 		    memcpy(qp->vertex.corners, corners, 4 * sizeof (gpdPoint));
 		    if (color_from_rgbvar || pm3d_shade.strength > 0) {
 			qp->gray = PM3D_USE_RGB_COLOR_INSTEAD_OF_GRAY;
@@ -1189,21 +1183,13 @@ pm3d_add_polygon(struct surface_points *plot, gpdPoint corners[], int vertices)
 {
     quadrangle *q;
 
-    /* FIXME: I have no idea how to estimate the number of facets for an isosurface */
-    if (!plot || (plot->plot_style == ISOSURFACE)) {
-	if (allocated_quadrangles < current_quadrangle + 100) {
-	    allocated_quadrangles += 1000.;
-	    quadrangles = gp_realloc(quadrangles,
-		allocated_quadrangles * sizeof(quadrangle), "pm3d_add_quadrangle");
-	}
-    } else
+    if (!plot || (plot->plot_style == ISOSURFACE))
+	/* FIXME: I have no idea how to estimate the number of facets for an isosurface */
+	reserve_quadrangles(100, 1000);
+    else
+	reserve_quadrangles(plot->iso_crvs->p_count, 0);
 
-    if (allocated_quadrangles < current_quadrangle + plot->iso_crvs->p_count) {
-	allocated_quadrangles += 2 * plot->iso_crvs->p_count;
-	quadrangles = gp_realloc(quadrangles,
-		allocated_quadrangles * sizeof(quadrangle), "pm3d_add_quadrangle");
-    }
-    q = quadrangles + current_quadrangle++;
+    q = &quadrangles[current_quadrangle++];
     memcpy(q->vertex.corners, corners, 4*sizeof(gpdPoint));
     if (plot)
 	q->fillstyle = style_from_fill(&plot->fill_properties);
@@ -1820,6 +1806,32 @@ pm3d_side( struct coordinate *p0, struct coordinate *p1, struct coordinate *p2)
 }
 
 /*
+ * Check required number of new quadrangles against current allocation.
+ * If necessary, reallocate list of quadrangles.
+ * By default extend to double the current list size, non-zero chunk
+ * provides a different extension increment.
+ */
+TBOOLEAN
+reserve_quadrangles( int needed, int chunk )
+{
+    int newsize = allocated_quadrangles;
+    int increment = (chunk > 0) ? chunk : allocated_quadrangles;
+
+    if (increment == 0)
+	increment = 100;
+
+    while (current_quadrangle + needed >= newsize)
+	newsize += increment;
+    if (newsize == allocated_quadrangles)
+	return FALSE;
+
+    quadrangles = gp_realloc(quadrangles, newsize * sizeof(quadrangle),
+			"extend_quadrangles");
+    allocated_quadrangles = newsize;
+    return TRUE;
+}
+
+/*
  * Returns a pointer into the list of polygon vertices.
  * If necessary reallocates the entire list to ensure there is enough
  * room for the requested number of vertices.
@@ -1966,10 +1978,7 @@ split_intersecting_surface_tiles()
 	    /* Found a pair of intersecting quadrangles!
 	     * Make sure the list is long enough to hold new pieces.
 	     */
-	    if (allocated_quadrangles < current_quadrangle + samples_1) {
-		allocated_quadrangles += 2 * samples_1;
-		quadrangles = gp_realloc(quadrangles,
-		allocated_quadrangles * sizeof(quadrangle), "pm3d_add_quadrangle");
+	    if (reserve_quadrangles(4, 4*samples_1)) {
 		q1 = &(quadrangles[iq1]);
 		q2 = &(quadrangles[iq2]);
 	    }
@@ -2035,7 +2044,7 @@ split_intersecting_surface_tiles()
 
 		/* Add piece1 as a new quadrangle at the end of the list */
 		if (nv1 > 2) {
-		    qnew = quadrangles + current_quadrangle++;
+		    qnew = &quadrangles[current_quadrangle++];
 		    qnew->gray = qt->gray;
 		    qnew->fillstyle = qt->fillstyle;
 		    qnew->qcolor = qt->qcolor;
@@ -2060,7 +2069,7 @@ split_intersecting_surface_tiles()
 
 		/* Add piece2 as a new quadrangle at the end of the list */
 		if (nv2 > 2) {
-		    qnew = quadrangles + current_quadrangle++;
+		    qnew = &quadrangles[current_quadrangle++];
 		    qnew->gray = qt->gray;
 		    qnew->fillstyle = qt->fillstyle;
 		    qnew->qcolor = qt->qcolor;
