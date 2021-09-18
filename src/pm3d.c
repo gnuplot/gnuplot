@@ -407,9 +407,8 @@ void pm3d_depth_queue_flush(void)
 		nv = gpdPtr[2].c;
 	    } else {
 		gpdPtr = qp->vertex.corners;
-		nv = 4;
+		nv = (qp->type == QUAD_TYPE_TRIANGLE) ? 3 : 4;
 	    }
-
 
 	    for (i = 0; i < nv; i++, gpdPtr++) {
 		/* 3D boxes want to be sorted on z of the base, not the mean z */
