@@ -281,7 +281,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		{
 			flushCurrentPointsItem();
 			QPen pen = Qt::NoPen;
-			if (m_currentBrush.style() == Qt::SolidPattern)
+			if (m_currentBrush.isOpaque())
 				pen = m_currentBrush.color();
 			clipPolygon(polygon, false);
 			QGraphicsPolygonItem *path;
