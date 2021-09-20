@@ -309,7 +309,7 @@ void QtGnuplotPoints::paint(QPainter* painter, const QStyleOptionGraphicsItem* o
 		{
 			QPen pen = Qt::NoPen;
 			QBrush& brush = m_filledPolygons[k].brush;
-			if (brush.style() == Qt::SolidPattern)
+			if (brush.isOpaque())
 				pen = brush.color();
 			painter->setPen(pen);
 			painter->setBrush(brush);
