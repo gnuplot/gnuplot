@@ -254,6 +254,16 @@ string_or_express(struct at_type **atptr)
 		str = val.v.string_val;
 	    }
 	}
+	if (!undefined && val.type == ARRAY) {
+	    /* This must be an array slice or a function returning an array,
+	     * because otherwise we would have caught it above.
+	     */
+	    df_array = add_udv_by_name("GPVAL_PLOT_ARRAY");
+	    free_value(&(df_array->udv_value));
+	    make_array_permanent(&val);
+	    df_array->udv_value = val;
+	    return array_placeholder;
+	}
     }
 
     /* prepare return */
