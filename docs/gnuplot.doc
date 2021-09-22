@@ -11464,6 +11464,10 @@ Ffigure_missing
  Syntax:
     set history {size <N>} {quiet|numbers} {full|trim} {default}
 
+ A log of recent gnuplot commands is kept by default in $HOME/.gnuplot_history.
+ If this file is not found and xdg desktop support is enabled, the program will
+ instead use $XDG_STATE_HOME/gnuplot_history.
+
  When leaving gnuplot the value of history size limits the number of lines
  saved to the history file. `set history size -1` allows an unlimited number
  of lines to be written to the history file.

@@ -495,7 +495,19 @@ main(int argc_orig, char **argv)
 	    expanded_history_filename = gp_strdup(GNUPLOT_HISTORY_FILE);
 	    gp_expand_tilde(&expanded_history_filename);
 #endif
-	    read_history(expanded_history_filename);
+	    if (read_history(expanded_history_filename)) {
+#ifdef USE_XDG_BASEDIR
+		/* use $XDG_STATE_DIR/gnuplot_history only if
+		 * $XDG_STATE_DIR exists or can be created */
+		char *xdgpath = xdg_get_path(kXDGStateHome, "gnuplot_history",
+				FALSE /* no subdir */, TRUE /* create */);
+		if (xdgpath) {
+		    free(expanded_history_filename);
+		    expanded_history_filename = xdgpath;
+		    read_history(expanded_history_filename);
+		}
+#endif /* USE_XDG_BASEDIR */
+	    }
 
 	    /*
 	     * It is safe to ignore the return values of 'atexit()' and
@@ -790,13 +802,10 @@ load_rcfile(int where)
 	plotrc = fopen(rcfile, "r");
     } else if (where == 3) {
 #ifdef USE_XDG_BASEDIR
-	char * XDGConfigHome = xdg_get_var(kXDGConfigHome);
-	size_t len = strlen(XDGConfigHome);
-	rcfile = gp_alloc(len + 1 + sizeof("gnuplot/gnuplotrc"), "rcfile");
-	strcpy(rcfile, XDGConfigHome);
-	PATH_CONCAT(rcfile, "gnuplot/gnuplotrc");
-	plotrc = fopen(rcfile, "r");
-	free(XDGConfigHome);
+	rcfile = xdg_get_path(kXDGConfigHome, "gnuplotrc",
+			TRUE /* use subdir */, FALSE /* not create */);
+	if (rcfile)
+	    plotrc = fopen(rcfile, "r");
 #endif
     }
 

@@ -75,7 +75,7 @@ extern int history_base;
 void using_history(void);
 void clear_history(void);
 void add_history(char *line);
-void read_history(char *);
+int read_history(char *);
 int write_history(char *);
 int where_history(void);
 int history_set_pos(int offset);
