@@ -88,11 +88,14 @@ write_history(char *filename)
 
 /* routine to read history entries from a file
  */
-void
+int
 read_history(char *filename)
 {
 #ifdef GNUPLOT_HISTORY
     gp_read_history(filename);
+    return gp_read_history(filename);
+#elseif
+    return 0;
 #endif
 }
 

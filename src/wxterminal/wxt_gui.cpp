@@ -120,6 +120,7 @@
 #include <wx/printdlg.h>
 
 extern "C" {
+#include "xdg.h"
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -328,13 +329,28 @@ bool wxtApp::OnInit()
 	/* application and vendor name are used by wxConfig to construct the name
 	 * of the config file/registry key and must be set before the first call
 	 * to Get() */
-	SetVendorName(wxT("gnuplot"));
-	SetAppName(wxT("gnuplot-wxt"));
-	wxConfigBase *pConfig = wxConfigBase::Get();
+	const wxString vendorName(wxT("gnuplot"));
+	const wxString appName(wxT("gnuplot-wxt"));
+	SetVendorName(vendorName);
+	SetAppName(appName);
+
+#ifdef USE_XDG_BASEDIR
+	if (!wxFileConfig::GetLocalFile(appName).Exists()) {
+		// Traditional config file (~/.gnuplot-wxt) does not exist.
+		// We will use $XDG_CONFIG_HOME/gnuplot/gnuplot-wxt.conf only if
+		// $XDG_CONFIG_HOME/gnuplot/ exists or can be created.
+		char *configFile = xdg_get_path(kXDGConfigHome, "gnuplot-wxt.conf",
+									TRUE /* subdir */, TRUE /* create */);
+		if (configFile) {
+			wxConfig::Set(new wxFileConfig(appName, vendorName, configFile));
+			free(configFile);
+		}
+	}
+#endif
 	/* this will force writing back of the defaults for all values
 	 * if they're not present in the config - this can give the user an idea
 	 * of all possible settings */
-	pConfig->SetRecordDefaults();
+	wxConfig::Get()->SetRecordDefaults();
 
 	FPRINTF((stderr, "OnInit finished\n"));
 
