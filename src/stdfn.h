@@ -363,7 +363,13 @@ void gp_atexit(void (*function)(void));
 /* Gnuplot replacement for exit(3). Calls the functions registered using
  * gp_atexit(). Always use this function instead of exit(3)!
  */
-void gp_exit(int status);
+#if defined(__GNUC__)
+    void gp_exit(int status) __attribute__((noreturn));
+#elif defined(_MSC_VER)
+    __declspec(noreturn) void gp_exit(int status);
+#else
+    void gp_exit(int status);
+#endif
 
 /* Calls the cleanup functions registered using gp_atexit().
  * Normally gnuplot should be exited using gp_exit(). In some cases, this is not
