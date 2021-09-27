@@ -1264,7 +1264,7 @@ parse_colorspec(struct t_colorspec *tc, int options)
 	c_token++;
 	tc->type = TC_LT;
 	tc->lt = LT_BLACK;
-    } else if (equals(c_token,"lt")) {
+    } else if (equals(c_token,"lt") || almost_equals(c_token, "linet$ype")) {
 	struct lp_style_type lptemp;
 	c_token++;
 	if (END_OF_COMMAND)
