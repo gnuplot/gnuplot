@@ -544,7 +544,9 @@ parse_array_assignment_expression()
 	foo->v_arg.type = STRING;
 	foo->v_arg.v.string_val = varname;
 
-	/* If this wasn't really an array element assignment, back out. */
+	/* If this wasn't really an array element assignment, back out.
+	 * NB: foo is on the action list, so varname will be freed in this loop.
+	 */
 	if (!equals(c_token, "]") || !equals(c_token+1, "=")) {
 	    int i;
 	    for (i=save_action+1; i<at->a_count; i++) {
@@ -553,7 +555,6 @@ parse_array_assignment_expression()
 	    }
 	    c_token = save_token;
 	    at->a_count = save_action;
-	    free(varname);
 	    return 0;
 	}
 

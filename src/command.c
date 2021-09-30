@@ -681,14 +681,14 @@ define()
 	    int_error(c_token, "Cannot set internal variables GPVAL_ GPFUN_ MOUSE_");
 	start_token = c_token;
 	c_token += 2;
-	udv = add_udv(start_token);
-	(void) const_express(&result);
+	const_express(&result);
 
 	/* Special handling needed to safely return an array */
 	if (result.type == ARRAY)
 	    make_array_permanent(&result);
 
 	/* Prevents memory leak if the variable name is re-used */
+	udv = add_udv(start_token);
 	free_value(&udv->udv_value);
 	udv->udv_value = result;
     }
@@ -920,6 +920,7 @@ array_command()
 	    if (A[i].type == ARRAY) {
 		if (A[i].v.value_array[0].type == TEMP_ARRAY)
 		    gpfree_array(&(A[i]));
+		A[i].type = NOTDEFINED;
 		int_error(c_token, "Cannot nest arrays");
 	    }
 	    initializers++;
@@ -997,6 +998,7 @@ is_array_assignment()
     if (newvalue.type == ARRAY) {
 	if (newvalue.v.value_array[0].type == TEMP_ARRAY)
 	    gpfree_array(&newvalue);
+	newvalue.type = NOTDEFINED;
 	int_error(c_token, "Cannot nest arrays");
     }
     free_value(&udv->udv_value.v.value_array[index]);
