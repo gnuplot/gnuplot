@@ -5211,7 +5211,7 @@ set_terminal()
      * size to zero.  I keep patching the individual terminals, but a generic
      * sanity check may at least prevent a crash due to mistyping.
      */
-    if (term->h_char <= 0 || term->v_char <= 0) {
+    if (!(term->h_char > 0) || !(term->v_char > 0)) {
 	int_warn(NO_CARET, "invalid terminal font size");
 	term->h_char = 10;
 	term->v_char = 10;
