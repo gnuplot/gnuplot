@@ -1189,9 +1189,9 @@ PS_options()
     }
 
     /* Sanity checks on fontsize */
-    if (ps_params->fontsize > 1000.)
+    if (!(ps_params->fontsize < 1000.))
 	ps_params->fontsize = 100.;
-    if (ps_params->fontsize <= 0)
+    if (!(ps_params->fontsize > 0))
 	ps_params->fontsize = 14.;
 
     switch (ps_params->terminal) {
