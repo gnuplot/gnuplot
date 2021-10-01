@@ -2240,6 +2240,9 @@ eval_plots()
 		else
 		    this_plot->sample_var2 = add_udv_by_name(c_dummy_var[1]);
 
+		if (this_plot->sample_var->udv_value.type == ARRAY)
+		    int_error(NO_CARET, "name conflict: dummy variable is an array");
+
 		/* Save prior value of sample variables so we can restore them later */
 		original_value_sample_var = this_plot->sample_var->udv_value;
 		original_value_sample_var2 = this_plot->sample_var2->udv_value;
