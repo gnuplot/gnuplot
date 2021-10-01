@@ -609,6 +609,8 @@ void
 vfill_command()
 {
     TBOOLEAN gridcoordinates = equals(c_token++, "vgfill");
+    if (!current_vgrid)
+	int_error(c_token, "No current voxel grid");
     vfill(current_vgrid->vdata, gridcoordinates);
 }
 
