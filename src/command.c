@@ -1001,7 +1001,7 @@ is_array_assignment()
 	newvalue.type = NOTDEFINED;
 	int_error(c_token, "Cannot nest arrays");
     }
-    free_value(&udv->udv_value.v.value_array[index]);
+    gpfree_string(&udv->udv_value.v.value_array[index]);
     udv->udv_value.v.value_array[index] = newvalue;
 
     return TRUE;

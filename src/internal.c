@@ -2213,7 +2213,7 @@ f_lookup(union argument *arg)
 	if (index != 0) /* Found it */
 	    break;
     }
-    free_value(&entry);
+    gpfree_string(&entry);
     if (array[0].type == TEMP_ARRAY)
 	gpfree_array(&a);
 

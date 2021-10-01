@@ -447,6 +447,8 @@ Gstring(struct value *a, char *s)
 
 /* Common interface for freeing data structures attached to a struct value.
  * Each of the type-specific routines will ignore values of other types.
+ * FIXME: It may be better to call gpfree_array only for TEMP_ARRAYs,
+ * otherwise an array passed in error as a function parameter may be wiped out.
  */
 void
 free_value(struct value *a)
