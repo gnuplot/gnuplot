@@ -597,6 +597,8 @@ f_voxel(union argument *arg)
 void
 vfill_command()
 {
+    if (!current_vgrid)
+	int_error(c_token, "No current voxel grid");
     c_token++;
     vfill(current_vgrid->vdata);
 }
