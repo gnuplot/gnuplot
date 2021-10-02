@@ -720,7 +720,6 @@ quantize_normal_tics(double arg, int guide)
 
 /* }}} */
 
-/* {{{ make_tics() */
 /* Implement TIC_COMPUTED case, i.e. automatically choose a usable
  * ticking interval for the given axis. For the meaning of the guide
  * parameter, see the comment on quantize_normal_tics() */
@@ -732,21 +731,24 @@ make_tics(struct axis *this_axis, int guide)
     xr = fabs(this_axis->min - this_axis->max);
     if (xr == 0)
 	return 1;	/* Anything will do, since we'll never use it */
-    if (xr >= VERYLARGE)
-	int_warn(NO_CARET,"%s axis range undefined or overflow",
-		axis_name(this_axis->index));
+    if (xr >= VERYLARGE) {
+	int_warn(NO_CARET, "%s axis range undefined or overflow, resetting to [0:0]",
+	    axis_name(this_axis->index));
+	/* FIXME: this used to be int_error but there were false positives
+	 * (bad range on unused axis).  However letting +/-VERYLARGE through
+	 * can overrun data structures for time conversions. Zero avoids this.
+	 */
+	this_axis->min = this_axis->max = 0;
+    }
+
     tic = quantize_normal_tics(xr, guide);
-    /* FIXME HBB 20010831: disabling this might allow short log axis
-     * to receive better ticking... */
     if (this_axis->log && tic < 1.0)
 	tic = 1.0;
-
     if (this_axis->tictype == DT_TIMEDATE)
-	return quantize_time_tics(this_axis, tic, xr, guide);
-    else
-	return tic;
+	tic = quantize_time_tics(this_axis, tic, xr, guide);
+
+    return tic;
 }
-/* }}} */
 
 /* {{{ quantize_duodecimal_tics */
 /* HBB 20020220: New function, to be used to properly tic axes with a
