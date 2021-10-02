@@ -1659,11 +1659,12 @@ histogram_range_fiddling(struct curve_points *plot)
 		}
 		if (axis_array[FIRST_X_AXIS].autoscale & AUTOSCALE_MAX) {
 		    /* FIXME - why did we increment p_count on UNDEFINED points? */
-		    while (plot->points[plot->p_count-1].type == UNDEFINED) {
+		    while (plot->p_count > 0
+			&& plot->points[plot->p_count-1].type == UNDEFINED) {
 			plot->p_count--;
-			if (!plot->p_count)
-			    int_error(NO_CARET,"All points in histogram UNDEFINED");
 		    }
+		    if (plot->p_count == 0)
+			int_error(NO_CARET,"No valid points in histogram");
 		    xhigh = plot->points[plot->p_count-1].x;
 		    xhigh += plot->histogram->start + 1.0;
 		    if (axis_array[FIRST_X_AXIS].max < xhigh)
