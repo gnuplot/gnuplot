@@ -1142,9 +1142,6 @@ do_3dplot(
 	    case XYERRORBARS:	/* ignored; treat like points */
 	    case BOXXYERROR:	/* HBB: ignore these as well */
 	    case ARROWS:
-	    case CANDLESTICKS:	/* HBB: ditto */
-	    case BOXPLOT:
-	    case FINANCEBARS:
 	    case CIRCLES:
 	    case ELLIPSES:
 	    case POINTSTYLE:
@@ -1215,9 +1212,6 @@ do_3dplot(
 		}
 		break;
 
-	    case HISTOGRAMS: /* Cannot happen */
-		break;
-
 	    case IMAGE:
 		/* Plot image using projection of 3D plot coordinates to 2D viewing coordinates. */
 		this_plot->image_properties.type = IC_PALETTE;
@@ -1237,6 +1231,11 @@ do_3dplot(
 
 	    case PARALLELPLOT:
 	    case SPIDERPLOT:
+	    case HISTOGRAMS:
+	    case CANDLESTICKS:
+	    case BOXPLOT:
+	    case FINANCEBARS:
+		/* These should have been caught in plot3d */
 		int_error(NO_CARET, "plot style not supported in 3D");
 		break;
 
@@ -1277,9 +1276,6 @@ do_3dplot(
 	    case XERRORBARS:	/* ignored; treat like points */
 	    case XYERRORBARS:	/* ignored; treat like points */
 	    case BOXXYERROR:	/* HBB: ignore these as well */
-	    case CANDLESTICKS:	/* HBB: ditto */
-	    case BOXPLOT:
-	    case FINANCEBARS:
 	    case ELLIPSES:
 	    case POINTSTYLE:
 		if (this_plot->plot_type == VOXELDATA) {
