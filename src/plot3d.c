@@ -2091,8 +2091,17 @@ eval_3dplots()
 	    if (this_plot->plot_style == TABLESTYLE)
 		int_error(NO_CARET, "use `plot with table` rather than `splot with table`"); 
 
-	    if (this_plot->plot_style == PARALLELPLOT)
-		int_error(NO_CARET, "plot style parallelaxes not supported in 3D");
+	    /* Various other non-supported styles can be treated as if they were POINTS.
+	     * These are styles whose data format is sufficiently different that it's
+	     * better to not even try.
+	     */
+	    if ((this_plot->plot_style == HISTOGRAMS)
+	    ||  (this_plot->plot_style == SPIDERPLOT)
+	    ||  (this_plot->plot_style == PARALLELPLOT)
+	    ||  (this_plot->plot_style == CANDLESTICKS)
+	    ||  (this_plot->plot_style == FINANCEBARS)
+	    ||  (this_plot->plot_style == BOXPLOT))
+		int_error(NO_CARET, "plot style not supported in 3D");
 
 	    /* set default values for title if this has not been specified */
 	    this_plot->title_is_automated = FALSE;
