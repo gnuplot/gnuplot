@@ -66,4 +66,18 @@ void plot3drequest(void);
 void refresh_3dbounds(struct surface_points *first_plot, int nplots);
 void sp_free(struct surface_points *sp);
 
+/*
+ * Conditional compilation option
+ * #define BOXERROR_3D to enable "splot with boxerrorbars"
+ * 4 column input:	x (y) z zerror
+ * 5 column input:	x (y) z zlow zhigh
+ * Used in combination with "set view projection xz", this produces a
+ * horizontal layout bar chart with error bars.
+ *
+ * Consider this work-in-progress.
+ * Can it be generalized to "splot with candlesticks" and/or 3D boxplots?
+ * General 3D view rather than limiting to xz projection?
+ */
+#undef BOXERROR_3D
+
 #endif /* GNUPLOT_PLOT3D_H */
