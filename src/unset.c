@@ -762,7 +762,7 @@ unset_pixmap(int i)
 	    free(pixmap->filename);
 	    free(pixmap->image_data);
 	    free(pixmap);
-	    pixmap = prev->next;
+	    pixmap = prev ? prev->next : NULL;
 	} else {
 	    prev = pixmap;
 	    pixmap = pixmap->next;
