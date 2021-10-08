@@ -74,8 +74,8 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
-pgf.REVISION = "114"
-pgf.REVISION_DATE = "2020/06/07 19:26:00"
+pgf.REVISION = "115"
+pgf.REVISION_DATE = "2021/10/08 22:39:00"
 
 pgf.styles = {}
 
@@ -1960,7 +1960,7 @@ term.options = function(opt_str, initial, t_count)
       get_next_token()
       if o_type == 'number' then
         fontscale = tonumber(o_next)
-        if fontscale < 0 then
+        if fontscale <= 0 then
           fontscale = 1.0
         end
       else

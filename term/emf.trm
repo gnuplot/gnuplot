@@ -908,11 +908,12 @@ EMF_set_font(const char *font)
 	;
 
     else if (font && *font) {
-	float tempsize;
+	float tempsize = emf_defaultfontsize;
 	int sep = strcspn(font,",");
 	if (sep > 0)
 	    safe_strncpy(emf_fontname, font, GPMIN(sep + 1, 32));
-	if (sep < strlen(font) && sscanf(font+sep+1, "%f", &tempsize))
+	if (sep < strlen(font) && sscanf(font+sep+1, "%f", &tempsize)
+	&&  (tempsize > 0))
 	    emf_fontsize = tempsize;
     } else {
 	strcpy(emf_fontname, emf_defaultfontname);
@@ -929,8 +930,8 @@ EMF_set_font(const char *font)
 	emf_last_fontsize = emf_fontsize;
     }
 
-    term->h_char = 0.6 * (emf_fontsize * EMF_PT2HM * emf_fontscale);
-    term->v_char = 1.3 * (emf_fontsize * EMF_PT2HM * emf_fontscale);
+    term->h_char = ceil(0.6 * (emf_fontsize * EMF_PT2HM * emf_fontscale));
+    term->v_char = ceil(1.3 * (emf_fontsize * EMF_PT2HM * emf_fontscale));
     EMF_setfont();
     return TRUE;
 }
