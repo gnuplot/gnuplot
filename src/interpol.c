@@ -787,13 +787,15 @@ do_cubic(
     xstart = this_points[0].x;
     xend = this_points[num_points - 1].x;
 #else
-    xstart = GPMAX(this_points[0].x, X_AXIS.min);
-    xend = GPMIN(this_points[num_points - 1].x, X_AXIS.max);
+    xstart = this_points[0].x;
+    xend = this_points[num_points-1].x;
+    cliptorange( xstart, X_AXIS.min, X_AXIS.max );
+    cliptorange( xend, X_AXIS.min, X_AXIS.max );
 
     if (xstart >= xend) {
 	/* This entire segment lies outside the current x range. */
 	for (i = 0; i < samples_1; i++)
-	    dest[i].type = OUTRANGE;
+	    dest[i].type = UNDEFINED;
 	return;
     }
 #endif
