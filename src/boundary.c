@@ -822,7 +822,6 @@ boundary(struct curve_points *plots, int count)
     /* Calculate limiting bounds of the key */
     do_key_bounds(key);
 
-
     /* Set default clipping to the plot boundary */
     clip_area = &plot_bounds;
 
@@ -843,7 +842,17 @@ do_key_bounds(legend_key *key)
 
     key_height = key_title_height + key_title_extra
 		+ key_rows * key_entry_height + key->height_fix * key_entry_height;
-    key_width = key_col_wth * key_cols;
+
+    if (key->user_width.x == 0)
+	key_width = key_col_wth * key_cols;
+    if (key->user_width.x > 0) {
+	if (key->user_width.scalex == screen)
+	    key_width = key->user_width.x * (double)(t->xmax-1);
+	else if (key->user_width.scalex == graph)
+	    key_width = key->user_width.x * (plot_bounds.xright - plot_bounds.xleft);
+	/* replace earlier estimate of column width */
+	key_col_wth = key_width / key_cols;
+    }
 
     /* Key inside plot boundaries */
     if (key->region == GPKEY_AUTO_INTERIOR_LRTBC
@@ -1017,51 +1026,57 @@ do_key_layout(legend_key *key)
     }
     key_point_offset = (key_sample_left + key_sample_right) / 2;
 
-    /* advance width for cols */
+    /* advance width for cols (initial estimate; may change) */
     key_col_wth = key_size_left + key_size_right;
 
-    key_rows = ptitl_cnt;
-    key_cols = 1;
+    /* New option "require columns <ncol>" */
+    if (key->user_cols > 0) {
+	key_cols = key->user_cols;
+	key_rows = ceil((double)ptitl_cnt / (double)key_cols);
 
-    /* calculate rows and cols for key */
-
-    if (key->stack_dir == GPKEY_HORIZONTAL) {
-	/* maximise no cols, limited by label-length */
-	key_cols = (int) (plot_bounds.xright - plot_bounds.xleft) / key_col_wth;
-	if (key->maxcols > 0 && key_cols > key->maxcols)
-	    key_cols = key->maxcols;
-	/* EAM Dec 2004 - Rather than turn off the key, try to squeeze */
-	if (key_cols == 0) {
-	    key_cols = 1;
-	    key_panic = TRUE;
-	    key_col_wth = (plot_bounds.xright - plot_bounds.xleft);
-	}
-	key_rows = (ptitl_cnt + key_cols - 1) / key_cols;
-	/* now calculate actual no cols depending on no rows */
-	key_cols = (key_rows == 0) ? 1 : (ptitl_cnt + key_rows - 1) / key_rows;
-	if (key_cols == 0) {
-	    key_cols = 1;
-	}
     } else {
-	/* maximise no rows, limited by plot_bounds.ytop-plot_bounds.ybot */
-	int i = (plot_bounds.ytop - plot_bounds.ybot - key->height_fix * key_entry_height
-		    - key_title_height - key_title_extra)
-		/ key_entry_height;
-	if (key->maxrows > 0 && i > key->maxrows)
-	    i = key->maxrows;
+	/* calculate rows and cols for key */
+	key_rows = ptitl_cnt;
+	key_cols = 1;
 
-	if (i == 0) {
-	    i = 1;
-	    key_panic = TRUE;
-	}
-	if (ptitl_cnt > i) {
-	    key_cols = (ptitl_cnt + i - 1) / i;
-	    /* now calculate actual no rows depending on no cols */
+	if (key->stack_dir == GPKEY_HORIZONTAL) {
+	    /* maximise no cols, limited by label-length */
+	    key_cols = (int) (plot_bounds.xright - plot_bounds.xleft) / key_col_wth;
+	    if (key->maxcols > 0 && key_cols > key->maxcols)
+		key_cols = key->maxcols;
+	    /* EAM Dec 2004 - Rather than turn off the key, try to squeeze */
 	    if (key_cols == 0) {
 		key_cols = 1;
 		key_panic = TRUE;
+		key_col_wth = (plot_bounds.xright - plot_bounds.xleft);
 	    }
 	    key_rows = (ptitl_cnt + key_cols - 1) / key_cols;
+	    /* now calculate actual no cols depending on no rows */
+	    key_cols = (key_rows == 0) ? 1 : (ptitl_cnt + key_rows - 1) / key_rows;
+	    if (key_cols == 0) {
+		key_cols = 1;
+	    }
+	} else {
+	    /* maximise no rows, limited by plot_bounds.ytop-plot_bounds.ybot */
+	    int i = (plot_bounds.ytop - plot_bounds.ybot - key->height_fix * key_entry_height
+			- key_title_height - key_title_extra)
+		    / key_entry_height;
+	    if (key->maxrows > 0 && i > key->maxrows)
+		i = key->maxrows;
+
+	    if (i == 0) {
+		i = 1;
+		key_panic = TRUE;
+	    }
+	    if (ptitl_cnt > i) {
+		key_cols = (ptitl_cnt + i - 1) / i;
+		/* now calculate actual no rows depending on no cols */
+		if (key_cols == 0) {
+		    key_cols = 1;
+		    key_panic = TRUE;
+		}
+		key_rows = (ptitl_cnt + key_cols - 1) / key_cols;
+	    }
 	}
     }
 
@@ -1071,7 +1086,8 @@ do_key_layout(legend_key *key)
 	if (key->title.font)
 	    t->set_font(key->title.font);
 	ytlen *= t->h_char;
-	if (ytlen > key_cols * key_col_wth)
+	if (ytlen > key_cols * key_col_wth
+	&&  key->user_width.x == 0)
 	    key_col_wth = ytlen / key_cols;
 	if (key->title.font)
 	    t->set_font("");
