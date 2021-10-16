@@ -148,6 +148,7 @@ static void show_range(AXIS_INDEX axis);
 static void show_link(void);
 static void show_nonlinear(void);
 static void show_xyzlabel(const char *name, const char *suffix, text_label * label);
+static void show_text_justification( JUSTIFY just );
 static void show_title(void);
 static void show_axislabel(AXIS_INDEX);
 static void show_data_is_timedate(AXIS_INDEX);
@@ -1858,9 +1859,11 @@ show_keytitle()
     legend_key *key = &keyT;
     SHOW_ALL_NL;
 
-    fprintf(stderr, "\tkey title is \"%s\"\n", conv_text(key->title.text));
+    fprintf(stderr, "\tkey title is \"%s\" ", conv_text(key->title.text));
     if (key->title.font && *(key->title.font))
-	fprintf(stderr,"\t  font \"%s\"\n", key->title.font);
+	fprintf(stderr,"font \"%s\" ", key->title.font);
+    show_text_justification(key->title.pos);
+    fprintf(stderr,"\n");
 }
 
 
@@ -1957,6 +1960,13 @@ show_key()
 	fprintf(stderr," \n");
     }
 
+    if (key->user_width.x > 0) {
+	fprintf(stderr, "\
+\tThe total key width is required to be ");
+	show_position(&(key->user_width), 1);
+	fprintf(stderr, "\n");
+    }
+
     fprintf(stderr, "\
 \tsample length is %g characters\n\
 \tvertical spacing is %g characters\n\
@@ -1972,11 +1982,15 @@ show_key()
 	    key->auto_titles == COLUMNHEAD_KEYTITLES
 	    ? "with column header" : "");
 
-    fputs("\tmaximum number of columns is ", stderr);
-    if (key->maxcols > 0)
-	fprintf(stderr, "%d for horizontal alignment\n", key->maxcols);
-    else
-	fputs("calculated automatically\n", stderr);
+    if (key->user_cols > 0) {
+	fprintf(stderr, "\trequired number of columns: %d\n", key->user_cols);
+    } else {
+	fputs("\tmaximum number of columns is ", stderr);
+	if (key->maxcols > 0)
+	    fprintf(stderr, "%d for horizontal alignment\n", key->maxcols);
+	else
+	    fputs("calculated automatically\n", stderr);
+    }
     fputs("\tmaximum number of rows is ", stderr);
     if (key->maxrows > 0)
 	fprintf(stderr, "%d for vertical alignment\n", key->maxrows);
@@ -2980,6 +2994,21 @@ show_range(AXIS_INDEX axis)
     save_prange(stderr, axis_array + axis);
 }
 
+static void
+show_text_justification( JUSTIFY just )
+{
+    switch (just) {
+    case LEFT:
+	fprintf(stderr, "left justified ");
+	break;
+    case RIGHT:
+	fprintf(stderr, "right justified ");
+	break;
+    case CENTRE:
+	fprintf(stderr, "center justified ");
+	break;
+    }
+}
 
 /* called by the functions below */
 static void
@@ -2989,9 +3018,7 @@ show_xyzlabel(const char *name, const char *suffix, text_label *label)
 	fprintf(stderr, "\t%s%s is \"%s\", offset at ", name, suffix,
 	    label->text ? conv_text(label->text) : "");
 	show_position(&label->offset, 3);
-	fprintf(stderr, label->pos == LEFT ? " left justified"
-			: label->pos == RIGHT ? " right justified"
-			: "");
+	show_text_justification(label->pos);
     } else
 	return;
 
@@ -3439,22 +3466,9 @@ show_ticdefp(struct axis *this_axis)
     if (this_axis->ticdef.rangelimited && !spiderplot)
 	fprintf(stderr, "\n\t  tics are limited to data range");
     fputs("\n\t  labels are ", stderr);
-    if (this_axis->manual_justify) {
-    	switch (this_axis->tic_pos) {
-    	case LEFT:{
-		fputs("left justified, ", stderr);
-		break;
-	    }
-    	case RIGHT:{
-		fputs("right justified, ", stderr);
-		break;
-	    }
-    	case CENTRE:{
-		fputs("center justified, ", stderr);
-		break;
-	    }
-    	}
-    } else
+    if (this_axis->manual_justify)
+	show_text_justification(this_axis->tic_pos);
+    else
         fputs("justified automatically, ", stderr);
     fprintf(stderr, "format \"%s\"", ticfmt);
     fprintf(stderr, "%s",

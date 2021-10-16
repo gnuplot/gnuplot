@@ -53,6 +53,7 @@
 
 static void save_functions__sub(FILE *);
 static void save_variables__sub(FILE *);
+static void save_key(FILE *);
 static void save_tics(FILE *, struct axis *);
 static void save_mtics(FILE *, struct axis *);
 static void save_zeroaxis(FILE *,AXIS_INDEX);
@@ -249,7 +250,6 @@ save_set_all(FILE *fp)
     struct arrow_def *this_arrow;
     struct linestyle_def *this_linestyle;
     struct arrowstyle_def *this_arrowstyle;
-    legend_key *key = &keyT;
     int axis;
 
     /* opinions are split as to whether we save term and outfile
@@ -426,103 +426,8 @@ save_set_all(FILE *fp)
     /* Save parallel axis state */
     save_style_parallel(fp);
 
-    if (key->title.text == NULL)
-	fprintf(fp, "set key notitle\n");
-    else {
-	fprintf(fp, "set key title \"%s\"", conv_text(key->title.text));
-	if (key->title.font)
-	    fprintf(fp, " font \"%s\" ", key->title.font);
-	save_justification(key->title.pos, fp);
-	fputs("\n", fp);
-    }
-
-    fputs("set key ", fp);
-    switch (key->region) {
-	case GPKEY_AUTO_INTERIOR_LRTBC:
-	    fputs(key->fixed ? "fixed" : "inside", fp);
-	    break;
-	case GPKEY_AUTO_EXTERIOR_LRTBC:
-	    fputs("outside", fp);
-	    break;
-	case GPKEY_AUTO_EXTERIOR_MARGIN:
-	    switch (key->margin) {
-	    case GPKEY_TMARGIN:
-		fputs("tmargin", fp);
-		break;
-	    case GPKEY_BMARGIN:
-		fputs("bmargin", fp);
-		break;
-	    case GPKEY_LMARGIN:
-		fputs("lmargin", fp);
-		break;
-	    case GPKEY_RMARGIN:
-		fputs("rmargin", fp);
-		break;
-	    }
-	    break;
-	case GPKEY_USER_PLACEMENT:
-	    fputs("at ", fp);
-	    save_position(fp, &key->user_pos, 2, FALSE);
-	    break;
-    }
-    if (!(key->region == GPKEY_AUTO_EXTERIOR_MARGIN
-	      && (key->margin == GPKEY_LMARGIN || key->margin == GPKEY_RMARGIN))) {
-	save_justification(key->hpos, fp);
-    }
-    if (!(key->region == GPKEY_AUTO_EXTERIOR_MARGIN
-	      && (key->margin == GPKEY_TMARGIN || key->margin == GPKEY_BMARGIN))) {
-	switch (key->vpos) {
-	    case JUST_TOP:
-		fputs(" top", fp);
-		break;
-	    case JUST_BOT:
-		fputs(" bottom", fp);
-		break;
-	    case JUST_CENTRE:
-		fputs(" center", fp);
-		break;
-	}
-    }
-    fprintf(fp, " %s %s %sreverse %senhanced %s ",
-		key->stack_dir == GPKEY_VERTICAL ? "vertical" : "horizontal",
-		key->just == GPKEY_LEFT ? "Left" : "Right",
-		key->reverse ? "" : "no",
-		key->enhanced ? "" : "no",
-		key->auto_titles == COLUMNHEAD_KEYTITLES ? "autotitle columnhead"
-		: key->auto_titles == FILENAME_KEYTITLES ? "autotitle"
-		: "noautotitle" );
-    if (key->box.l_type > LT_NODRAW) {
-	fputs("box", fp);
-	save_linetype(fp, &(key->box), FALSE);
-    } else
-	fputs("nobox", fp);
-
-    /* These are for the key entries, not the key title */
-    if (key->font)
-	fprintf(fp, " font \"%s\"", key->font);
-    if (key->textcolor.type != TC_LT || key->textcolor.lt != LT_BLACK)
-	save_textcolor(fp, &key->textcolor);
-
-    /* Put less common options on separate lines */
-    fprintf(fp, "\nset key %sinvert samplen %g spacing %g width %g height %g ",
-		key->invert ? "" : "no",
-		key->swidth, key->vert_factor, key->width_fix, key->height_fix);
-    fprintf(fp, "\nset key maxcolumns %d maxrows %d",key->maxcols,key->maxrows);
-    save_position(fp, &key->offset, 2, TRUE);
-    fputc('\n', fp);
-    if (key->front) {
-	fprintf(fp, "set key opaque");
-	if (key->fillcolor.lt != LT_BACKGROUND) {
-	    fprintf(fp, " fc ");
-	    save_pm3dcolor(fp, &key->fillcolor);
-	}
-	fprintf(fp, "\n");
-    } else {
-	fprintf(fp, "set key noopaque\n");
-    }
-
-    if (!(key->visible))
-	fputs("unset key\n", fp);
+    /* everything about the key */
+    save_key(fp);
 
     fputs("unset label\n", fp);
     for (this_label = first_label; this_label != NULL;
@@ -1211,6 +1116,120 @@ save_tics(FILE *fp, struct axis *this_axis)
 	fputs(")\n", fp);
     }
 
+}
+
+static void
+save_key(FILE *fp)
+{
+    legend_key *key = &keyT;
+
+    if (key->title.text == NULL)
+	fprintf(fp, "set key notitle\n");
+    else {
+	fprintf(fp, "set key title \"%s\"", conv_text(key->title.text));
+	if (key->title.font)
+	    fprintf(fp, " font \"%s\" ", key->title.font);
+	save_justification(key->title.pos, fp);
+	fputs("\n", fp);
+    }
+
+    fputs("set key ", fp);
+    switch (key->region) {
+	case GPKEY_AUTO_INTERIOR_LRTBC:
+	    fputs(key->fixed ? "fixed" : "inside", fp);
+	    break;
+	case GPKEY_AUTO_EXTERIOR_LRTBC:
+	    fputs("outside", fp);
+	    break;
+	case GPKEY_AUTO_EXTERIOR_MARGIN:
+	    switch (key->margin) {
+	    case GPKEY_TMARGIN:
+		fputs("tmargin", fp);
+		break;
+	    case GPKEY_BMARGIN:
+		fputs("bmargin", fp);
+		break;
+	    case GPKEY_LMARGIN:
+		fputs("lmargin", fp);
+		break;
+	    case GPKEY_RMARGIN:
+		fputs("rmargin", fp);
+		break;
+	    }
+	    break;
+	case GPKEY_USER_PLACEMENT:
+	    fputs("at ", fp);
+	    save_position(fp, &key->user_pos, 2, FALSE);
+	    break;
+    }
+    if (!(key->region == GPKEY_AUTO_EXTERIOR_MARGIN
+	      && (key->margin == GPKEY_LMARGIN || key->margin == GPKEY_RMARGIN))) {
+	save_justification(key->hpos, fp);
+    }
+    if (!(key->region == GPKEY_AUTO_EXTERIOR_MARGIN
+	      && (key->margin == GPKEY_TMARGIN || key->margin == GPKEY_BMARGIN))) {
+	switch (key->vpos) {
+	    case JUST_TOP:
+		fputs(" top", fp);
+		break;
+	    case JUST_BOT:
+		fputs(" bottom", fp);
+		break;
+	    case JUST_CENTRE:
+		fputs(" center", fp);
+		break;
+	}
+    }
+    fprintf(fp, " %s %s %sreverse %senhanced %s ",
+		key->stack_dir == GPKEY_VERTICAL ? "vertical" : "horizontal",
+		key->just == GPKEY_LEFT ? "Left" : "Right",
+		key->reverse ? "" : "no",
+		key->enhanced ? "" : "no",
+		key->auto_titles == COLUMNHEAD_KEYTITLES ? "autotitle columnhead"
+		: key->auto_titles == FILENAME_KEYTITLES ? "autotitle"
+		: "noautotitle" );
+    if (key->box.l_type > LT_NODRAW) {
+	fputs("box", fp);
+	save_linetype(fp, &(key->box), FALSE);
+    } else
+	fputs("nobox", fp);
+
+    /* These are for the key entries, not the key title */
+    if (key->font)
+	fprintf(fp, " font \"%s\"", key->font);
+    if (key->textcolor.type != TC_LT || key->textcolor.lt != LT_BLACK)
+	save_textcolor(fp, &key->textcolor);
+
+    /* Put less common options on separate lines */
+    fprintf(fp, "\nset key %sinvert samplen %g spacing %g width %g height %g\n",
+		key->invert ? "" : "no",
+		key->swidth, key->vert_factor, key->width_fix, key->height_fix);
+    if (key->user_width.x > 0 || key->user_cols > 0) {
+	fprintf(fp, "set key ");
+	if (key->user_cols > 0)
+	    fprintf(fp, "columns %d ", key->user_cols);
+	if (key->user_width.x > 0) {
+	    fprintf(fp, "keywidth ");
+	    save_position(fp, &key->user_width, 1, FALSE);
+	}
+	fprintf(fp, "\n");
+    }
+    fprintf(fp, "set key maxcolumns %d maxrows %d",key->maxcols,key->maxrows);
+    save_position(fp, &key->offset, 2, TRUE);
+    fprintf(fp, "\n");
+    if (key->front) {
+	fprintf(fp, "set key opaque");
+	if (key->fillcolor.lt != LT_BACKGROUND) {
+	    fprintf(fp, " fc ");
+	    save_pm3dcolor(fp, &key->fillcolor);
+	}
+	fprintf(fp, "\n");
+    } else {
+	fprintf(fp, "set key noopaque\n");
+    }
+
+    if (!(key->visible))
+	fputs("unset key\n", fp);
 }
 
 static void

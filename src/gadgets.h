@@ -352,6 +352,8 @@ typedef struct {
     t_key_region region;	/* if so: where? */
     t_key_ext_region margin;	/* if exterior: where outside? */
     struct position user_pos;	/* if user specified position, this is it */
+    struct position user_width;	/*    "require width <position>" */
+    int user_cols;		/*    "require columns <int>" */
     VERT_JUSTIFY vpos;		/* otherwise these guide auto-positioning */
     JUSTIFY hpos;
     TBOOLEAN fixed;		/* prevents key in 3D plot from rotating/scaling with plot */
@@ -382,11 +384,13 @@ extern legend_key keyT;
 #define DEFAULT_KEYBOX_LP {0, LT_NODRAW, 0, DASHTYPE_SOLID, 0, 0, 1.0, PTSZ_DEFAULT, DEFAULT_P_CHAR, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}
 
 #define DEFAULT_KEY_POSITION { graph, graph, graph, 0.9, 0.9, 0. }
+#define DEFAULT_KEY_WIDTH { graph, graph, graph, 0., 0., 0. }
 
 #define DEFAULT_KEY_PROPS \
 		{ TRUE, \
 		GPKEY_AUTO_INTERIOR_LRTBC, GPKEY_RMARGIN, \
 		DEFAULT_KEY_POSITION, \
+		DEFAULT_KEY_WIDTH, 0, \
 		JUST_TOP, RIGHT, TRUE, \
 		GPKEY_RIGHT, GPKEY_VERTICAL, \
 		4.0, 1.0, 0.0, 0.0, \
