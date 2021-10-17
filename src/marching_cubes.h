@@ -58,7 +58,7 @@ static const short cube_edge_flags[256]=
          First official public domain release
               Version 3.00 dated 8-6-94
  */
-static char triangle_table[256][13]=
+static signed char triangle_table[256][13]=
 {
     {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
     { 8, 3, 0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
