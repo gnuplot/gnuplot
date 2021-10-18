@@ -1072,13 +1072,18 @@ parse_unary_expression()
 	parse_unary_expression();
 	/* Collapse two operations PUSHC <pos-const> + UMINUS
 	 * into a single operation PUSHC <neg-const>
+	 * Oct 2021: invalid if the previous constant is the else part of a conditional
 	 */
 	previous = &(at->actions[at->a_count-1]);
-	if (previous->index == PUSHC &&  previous->arg.v_arg.type == INTGR) {
-	    previous->arg.v_arg.v.int_val = -previous->arg.v_arg.v.int_val;
-	} else if (previous->index == PUSHC &&  previous->arg.v_arg.type == CMPLX) {
-	    previous->arg.v_arg.v.cmplx_val.real = -previous->arg.v_arg.v.cmplx_val.real;
-	    previous->arg.v_arg.v.cmplx_val.imag = -previous->arg.v_arg.v.cmplx_val.imag;
+	if (previous->index == PUSHC
+	&&  (at->a_count < 2 || (at->actions[at->a_count-2]).index != JUMP)) {
+	    if (previous->arg.v_arg.type == INTGR) {
+		previous->arg.v_arg.v.int_val = -previous->arg.v_arg.v.int_val;
+	    } else if (previous->arg.v_arg.type == CMPLX) {
+		previous->arg.v_arg.v.cmplx_val.real = -previous->arg.v_arg.v.cmplx_val.real;
+		previous->arg.v_arg.v.cmplx_val.imag = -previous->arg.v_arg.v.cmplx_val.imag;
+	    } else
+		(void) add_action(UMINUS);
 	} else
 	    (void) add_action(UMINUS);
     } else if (equals(c_token, "+")) {	/* unary + is no-op */
