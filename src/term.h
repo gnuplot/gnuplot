@@ -349,7 +349,9 @@
 #include "texdraw.trm"
 
 /* METAFONT */
+#ifdef WITH_METAFONT
 #include "metafont.trm"
+#endif
 
 /* METAPOST */
 #ifdef WITH_METAPOST

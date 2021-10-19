@@ -941,6 +941,13 @@ AS_IF([test "x${with_tgif}" = "xyes"],
   AC_DEFINE(HAVE_TGIF,1,
           [ Define to include support for tgif terminal ],))
 
+dnl  Allow to include metafont terminal
+AC_ARG_WITH(metafont,dnl
+[  --with-metafont          metafont terminal])
+AS_IF([test "x${with_metafont}" = "xyes"],
+  AC_DEFINE(HAVE_METAFONT,1,
+          [ Define to include support for metafont terminal ],))
+
 dnl  Allow to include metapost terminal
 AC_ARG_WITH(metapost,dnl
 [  --with-metapost          metapost terminal])
@@ -1187,7 +1194,7 @@ AC_MSG_RESULT([])
 
 AC_MSG_RESULT([  Standalone terminals: yes (included by default)])
 AC_MSG_RESULT([    canvas, cgm, context, dumb, dxf, emf, epslatex,])
-AC_MSG_RESULT([    fig, hpgl, metafont, pcl5, postscript,])
+AC_MSG_RESULT([    fig, hpgl, pcl5, postscript,])
 AC_MSG_RESULT([    pict2e, pslatex, pstex, pstricks, svg, texdraw, tkcanvas])
 AC_MSG_RESULT([])
 
@@ -1232,6 +1239,12 @@ if test "$with_tgif" == yes; then
   AC_MSG_RESULT([    tgif terminal: yes])
 else
   AC_MSG_RESULT([    tgif terminal: no   (use --with-tgif to enable)])
+fi
+
+if test "$with_metafont" == yes; then
+  AC_MSG_RESULT([    metafont terminal          : yes])
+else
+  AC_MSG_RESULT([    metafont terminal          : no   (use --with-metafont to enable)])
 fi
 
 if test "$with_metapost" == yes; then

@@ -546,6 +546,7 @@ START_HELP(mf)
 "?term mf",
 "?mf",
 "?metafont",
+" Note: legacy terminal (not built by default).",
 " The `mf` terminal driver creates an input file to the METAFONT program.  Thus a",
 " figure may be used in the TeX document in the same way as is a character.",
 "",

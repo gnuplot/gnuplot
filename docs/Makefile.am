@@ -63,8 +63,7 @@ $(T)emf.trm $(T)epson.trm \
 $(T)estimate.trm $(T)fig.trm $(T)gd.trm $(T)ggi.trm \
 $(T)gpic.trm $(T)grass.trm $(T)hpgeneric.h $(T)hpgl.trm $(T)imagen.trm \
 $(T)linux-vgagl.trm $(T)latex_old.h \
-$(T)lua.trm $(T)metafont.trm \
-$(T)metapost.trm $(T)pbm.trm $(T)pict2e.trm \
+$(T)lua.trm $(T)pbm.trm $(T)pict2e.trm \
 $(T)pm.trm $(T)post.trm $(T)pslatex.trm \
 $(T)pstricks.trm $(T)qt.trm $(T)regis.trm \
 $(T)svg.trm $(T)t410x.trm $(T)tek.trm $(T)texdraw.trm $(T)tgif.trm \
@@ -72,6 +71,7 @@ $(T)tkcanvas.trm $(T)webp.trm $(T)win.trm $(T)wxt.trm $(T)x11.trm $(T)xlib.trm
 
 LEGACYTERM = $(T)latex.trm $(T)emtex.trm $(T)eepic.trm $(T)tpic.trm \
 $(T)corel.trm $(T)dxy.trm $(T)excl.trm $(T)kyo.trm $(T)mif.trm \
+$(T)metafont.trm $(T)metapost.trm \
 $(T)hp2648.trm $(T)hp26.trm $(T)hp500c.trm $(T)hpljii.trm $(T)hppj.trm \
 $(T)pc.trm $(T)pdf.trm $(T)qms.trm $(T)vws.trm
 
