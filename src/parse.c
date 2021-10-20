@@ -837,6 +837,7 @@ parse_conditional_expression()
 	at->actions[savepc1].arg.j_arg = at->a_count - savepc1;
 	parse_expression();
 	at->actions[savepc2].arg.j_arg = at->a_count - savepc2;
+	add_action(NOP);
 	parse_recursion_level++;
     }
 }
@@ -1073,10 +1074,10 @@ parse_unary_expression()
 	/* Collapse two operations PUSHC <pos-const> + UMINUS
 	 * into a single operation PUSHC <neg-const>
 	 * Oct 2021: invalid if the previous constant is the else part of a conditional
+	 *           NOP barrier hides the PUSHC to prevent this
 	 */
 	previous = &(at->actions[at->a_count-1]);
-	if (previous->index == PUSHC
-	&&  (at->a_count < 2 || (at->actions[at->a_count-2]).index != JUMP)) {
+	if (previous->index == PUSHC) {
 	    if (previous->arg.v_arg.type == INTGR) {
 		previous->arg.v_arg.v.int_val = -previous->arg.v_arg.v.int_val;
 	    } else if (previous->arg.v_arg.type == CMPLX) {

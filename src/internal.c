@@ -132,6 +132,14 @@ f_pop(union argument *x)
 }
 
 void
+f_nop(union argument *x)
+{
+    /* Presence of NOP in an action table serves as a barrier
+     * at the end of a ternary operation sequence.
+     */
+}
+
+void
 f_pushd2(union argument *x)
 {
     push(&(x->udf_arg->dummy_values[1]));

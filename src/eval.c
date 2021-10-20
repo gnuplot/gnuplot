@@ -96,6 +96,7 @@ const struct ft_entry ft[] =
     {"lnot",  f_lnot},
     {"bnot",  f_bnot},
     {"uminus",  f_uminus},
+    {"nop",  f_nop},
     {"lor",  f_lor},
     {"land",  f_land},
     {"bor",  f_bor},

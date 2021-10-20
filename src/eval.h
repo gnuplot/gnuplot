@@ -47,7 +47,7 @@
 enum operators {
     /* keep this in line with table in eval.c */
     PUSH, PUSHC, PUSHD1, PUSHD2, PUSHD, POP,
-    CALL, CALLN, SUM, LNOT, BNOT, UMINUS,
+    CALL, CALLN, SUM, LNOT, BNOT, UMINUS, NOP,
     LOR, LAND, BOR, XOR, BAND, EQ, NE, GT, LT, GE, LE, 
     LEFTSHIFT, RIGHTSHIFT, PLUS, MINUS,
     MULT, DIV, MOD, POWER, FACTORIAL, BOOLE,
