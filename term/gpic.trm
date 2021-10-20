@@ -298,6 +298,7 @@ START_HELP(gpic)
 "?terminal gpic",
 "?term gpic",
 "?gpic",
+" Note: Legacy terminal (present only if gnuplot was configured --with-gpic).",
 " The `gpic` terminal driver generates GPIC graphs in the Free Software",
 " Foundations's \"groff\" package.  The default size is 5 x 3 inches.  The only",
 " option is the origin, which defaults to (0,0).",
