@@ -850,6 +850,7 @@ parse_conditional_expression()
 	at->actions[savepc1].arg.j_arg = at->a_count - savepc1;
 	parse_expression();
 	at->actions[savepc2].arg.j_arg = at->a_count - savepc2;
+	add_action(NOP);
 	parse_recursion_level++;
     }
 }
@@ -1086,6 +1087,7 @@ parse_unary_expression()
 	/* Collapse two operations PUSHC <pos-const> + UMINUS
 	 * into a single operation PUSHC <neg-const>
 	 * Oct 2021: invalid if the previous constant is the else part of a conditional
+	 *           test for JUMP+PUSHC is fallible; NOP barrier hides PUSHC altogether
 	 */
 	previous = &(at->actions[at->a_count-1]);
 	if (previous->index == PUSHC

@@ -60,6 +60,7 @@ void f_bor(union argument *x);
 void f_xor(union argument *x);
 void f_band(union argument *x);
 void f_uminus(union argument *x);
+void f_nop(union argument *x);
 void f_eq(union argument *x);
 void f_ne(union argument *x);
 void f_gt(union argument *x);
