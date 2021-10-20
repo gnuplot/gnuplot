@@ -219,7 +219,6 @@ static void term_close_output(void);
 static void null_linewidth(double);
 static void do_point(unsigned int x, unsigned int y, int number);
 static void do_pointsize(double size);
-static void line_and_point(unsigned int x, unsigned int y, int number);
 static void do_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int headstyle);
 static void null_dashtype(int type, t_dashtype *custom_dash_pattern);
 
@@ -935,6 +934,7 @@ do_pointsize(double size)
 /*
  * general point routine
  */
+#if  defined(WITH_METAPOST) || defined(WITH_METAFONT) || defined(WITH_TEKTRONIX) || !defined(NO_BITMAP_SUPPORT)
 static void
 line_and_point(unsigned int x, unsigned int y, int number)
 {
@@ -944,6 +944,7 @@ line_and_point(unsigned int x, unsigned int y, int number)
     (*term->linetype) (NICE_LINE);
     do_point(x, y, number);
 }
+#endif
 
 /*
  * general arrow routine

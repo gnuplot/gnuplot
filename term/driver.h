@@ -41,14 +41,16 @@
 /* functions provided by term.c */
 
 static void do_point(unsigned int x, unsigned int y, int number);
-static void line_and_point(unsigned int x, unsigned int y, int number);
 static int null_text_angle(int ang);
 static int null_justify_text(enum JUSTIFY just);
 static int null_scale(double x, double y);
 static void options_null(void);
 static void UNKNOWN_null(void);
-/* static int set_font_null(const char *s);     */ /* unused */
+
 #define set_font_null NULL
+#if  defined(WITH_METAPOST) || defined(WITH_METAFONT) || defined(WITH_TEKTRONIX) || !defined(NO_BITMAP_SUPPORT)
+static void line_and_point(unsigned int x, unsigned int y, int number);
+#endif
 
 extern FILE *gpoutfile;
 extern struct termentry *term;
