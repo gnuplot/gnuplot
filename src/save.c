@@ -566,7 +566,7 @@ save_set_all(FILE *fp)
 	if (this_arrow->type == arrow_end_absolute) {
 	    fputs(" to ", fp);
 	    save_position(fp, &this_arrow->end, 3, FALSE);
-	} else if (this_arrow->type == arrow_end_absolute) {
+	} else if (this_arrow->type == arrow_end_relative) {
 	    fputs(" rto ", fp);
 	    save_position(fp, &this_arrow->end, 3, FALSE);
 	} else { /* type arrow_end_oriented */
