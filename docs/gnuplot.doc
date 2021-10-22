@@ -351,6 +351,7 @@ C
 #b Improved rendering of intersecting pm3d surfaces - overlapping surface tiles
 ## are split into two pieces along the line of intersection so that tiles
 ## from one surface do not incorrectly protrude though the other surface.
+#b New options to force total key width and number of columns. See `key layout`.
 #end
 
 3 Features introduced in version 5.4
@@ -11589,52 +11590,35 @@ Ffigure_missing
  turned off by using the `notitle` keyword in the corresponding plot command.
  The text of the titles is controlled by the `set key autotitle` option or by
  the `title` keyword of individual `plot` and `splot` commands.
- See `plot title` for more information.
+ Many options are available to control the placement and layout of the key.
 
  Syntax:
        set key {on|off} {default}
-             {{inside | outside | fixed} | {lmargin | rmargin | tmargin | bmargin}
-               | {at <position>}}
-             {left | right | center} {top | bottom | center}
-             {vertical | horizontal} {Left | Right}
              {{no}enhanced}
-             {{no}opaque {fc <colorspec>}}
-             {{no}reverse} {{no}invert}
-             {samplen <sample_length>} {spacing <line_spacing>}
-             {width <width_increment>} {height <height_increment>}
              {{no}autotitle {columnheader}}
-             {title {"<text>"} {{no}enhanced} {center | left | right}}
-             {font "<face>,<size>"} {textcolor <colorspec>}
-             {{no}box {linestyle <style> | linetype <type> | linewidth <width>}}
-             {maxcols {<max no. of columns> | auto}}
-             {maxrows {<max no. of rows> | auto}}
+             {{no}box {<line properties>}} {{no}opaque {fc <colorspec>}}
+             {width <width_increment>} {height <height_increment>}
        unset key
-       show key
-
- Elements within the key are stacked according to `vertical` or `horizontal`.
- In the case of `vertical`, the key occupies as few columns as possible.  That
- is, elements are aligned in a column until running out of vertical space at
- which point a new column is started.  The vertical space may be limited using
- 'maxrows'.  In the case of `horizontal`, the key occupies as few rows as
- possible.  The horizontal space may be limited using 'maxcols'.
 
  By default the key is placed in the upper right inside corner of the graph.
- The keywords `left`, `right`, `top`, `bottom`, `center`, `inside`, `outside`,
- `lmargin`, `rmargin`, `tmargin`, `bmargin` (, `above`, `over`, `below` and
- `under`) may be used to automatically place the key in other positions of the
- graph.  Also an `at <position>` may be given to indicate precisely where the
- plot should be placed.  In this case, the keywords `left`, `right`, `top`,
- `bottom` and `center` serve an analogous purpose for alignment.
- For more information, see `key placement`.
+ For placement options, see `key placement`.
 
- Justification of the plot titles within the key is controlled by `Left` or
- `Right` (default).  The text and sample can be reversed (`reverse`) and a
- box can be drawn around the key (`box {...}`) in a specified `linetype`
- and `linewidth`, or a user-defined `linestyle`.
+ Each component in a plot command is represented in the key by a single line
+ containing corresponding title text and a line or symbol or shape
+ representing the plot style.  The title text may be auto-generated or given
+ explicitly in the plot command as `title "text"`.  Using the keyword `notitle`
+ in the plot command will suppress generation of the entire line.
+ If you want to suppress the text only, use `title ""` in the plot command.
+ Contour plots generated additional entries in the key (see `cntrlabel`).
+ You can add extra lines to the key by inserting a dummy plot command that uses
+ the keyword `keyentry` rather than a filename or a function.  See `keyentry`.
+ For options to customize the layout of the titles and samples in the key
+ see `key layout`.
 
- The text in the key is set in `enhanced` mode by default, this can be changed
- with the `{no}enhanced` option, also independently for the key title only and
- for each individual plot.
+ A box can be drawn around the key (`box {...}`) with user-specified line
+ properties.  The `height` and `width` increments (specified in character units)
+ are added to or subtracted from the size of the key box.
+ This is useful mainly when you want larger borders around the key entries.
 
  By default the key is built up one plot at a time. That is, the key symbol and
  title are drawn at the same time as the corresponding plot.  That means newer
@@ -11644,39 +11628,14 @@ Ffigure_missing
  symbols and titles are written.
  The default can be restored by `set key noopaque`.
 
- By default the first plot label is at the top of the key and successive labels
- are entered below it. The `invert` option causes the first label to be placed
- at the bottom of the key, with successive labels entered above it. This option
- is useful to force the vertical ordering of labels in the key to match the
- order of box types in a stacked histogram.
+ The text in the key uses `enhanced` mode by default. This can be suppressed
+ by the `noenhanced` keyword applied to the entire key, to the key title only,
+ or to individual plot titles.
 
- The <height_increment> is a number of character heights to be added to or
- subtracted from the height of the key box.  This is useful mainly when you are
- putting a box around the key and want larger borders around the key entries.
-
- An overall title can be put on the key (`title "<text>"`)---see also `syntax`
- for the distinction between text in single- or double-quotes. The justification
- of the title defaults to center and can be changed by the keywords `right` or
- `left`
-
- The defaults for `set key` are `on`, `right`, `top`, `vertical`, `Right`,
- `noreverse`, `noinvert`, `samplen 4`, `spacing 1`, `notitle`, and
- `nobox`.  The default <linetype> is the same as that used for the plot
- borders.  Entering `set key default` returns the key to its default
- configuration.
-
- Each plot is represented in the key by a single line containing a line or
- symbol or shape representing the plot style and a corresponding title.
- Using the keyword `notitle` in the plot command will suppress generation of
- the line.  Contour plots generated additional entries in the key, one for
- each contour (see `cntrlabel`). You can add extra lines to the key by inserting
- a dummy plot command that uses the keyword `keyentry` rather than a filename
- or a function.  See `keyentry`.
-
- When using the TeX/LaTeX group of terminals or terminals in which formatting
- information is embedded in the string, `gnuplot` can only estimate the width
- of the string for key positioning.  If the key is to be positioned at the
- left, it may be convenient to use the combination `set key left Left reverse`.
+ `set key default` restores the default key configuration.
+      set key fixed right top vertical Right noreverse enhanced autotitle
+      set key nobox noopaque
+      set key noinvert samplen 4 spacing 1 width 0 height 0 
 
 4 3D key
 ?set key 3D
@@ -11686,11 +11645,10 @@ Ffigure_missing
 ?set key fixed
 ?key fixed
  Placement of the key for 3D plots (`splot`) by default uses the `fixed` option.
- Note: this is a change from gnuplot version 5.0 and earlier. `fixed` placement
- is very similar to `inside` placement with one important difference.  The plot
- boundaries of a 3D plot change as the view point is rotated or scaled.  If the
- key is positioned `inside` these boundaries then the key also moves when the
- view is changed. `fixed` positioning ignores changes to the view angles or
+ This is very similar to `inside` placement with one important difference.
+ The plot boundaries of a 3D plot change as the view point is rotated or scaled.
+ If the key is positioned `inside` these boundaries then the key also moves when
+ the view is changed. `fixed` positioning ignores changes to the view angles or
  scaling; i.e. the key remains fixed in one location on the canvas as the plot
  is rotated.
 
@@ -11705,19 +11663,16 @@ Ffigure_missing
  This places the key at the default location:
        set key default
 
- This disables the key:
-       unset key
+ This places a key at a specific place (upper right) on the screen:
+       set key at screen 0.85, 0.85
 
- This places a key at coordinates 2,3.5,2 in the default (first) coordinate
- system:
-       set key at 2,3.5,2
+ This places the key below the graph and minimizes the vertical space taken:
+       set key below horizontal
 
- This places the key below the graph:
-       set key below
-
- This places the key in the bottom left corner, left-justifies the text,
- gives it a title, and draws a box around it in linetype 3:
-       set key left bottom Left title 'Legend' box 3
+ This places the key in the bottom left corner of the plot,
+ left-justifies the text, gives the key box a title at the top,
+ and draws a box around it with a thick border:
+       set key left bottom Left title 'Legend' box lw 3
 
 Ffigure_keyentry
 4 extra key entries
@@ -11766,10 +11721,72 @@ Ffigure_keyentry
 
  In all cases an explicit `title` or `notitle` keyword in the plot command
  itself will override the default from `set key autotitle`.
+4 key layout
+?set key layout
+?key layout
+ Key layout options:
+      set key {vertical | horizontal}
+             {maxcols {<max no. of columns> | auto}}
+             {maxrows {<max no. of rows> | auto}}
+             {columns <exact no. of columns>}
+             {keywidth [screen|graph] <fraction>}
+             {Left | Right}
+             {{no}reverse} {{no}invert}
+             {samplen <sample_length>} {spacing <line_spacing>}
+             {width <width_increment>} {height <height_increment>}
+             {title {"<text>"} {{no}enhanced} {center | left | right}}
+             {font "<face>,<size>"} {textcolor <colorspec>}
+
+ Automatic arrangement of elements within the key into rows and columns is
+ affected by the keywords shown above.  The default is `vertical`, for which
+ the key uses the fewest columns possible.  Elements are aligned in a column
+ until there is no more vertical space, at which point a new column is started.
+ The vertical space may be limited using 'maxrows'.
+ In the case of `horizontal`, the key instead uses the fewest rows possible.
+ The horizontal space may be limited using 'maxcols'.
+
+ The auto-selected number of rows and columns may be unsatisfactory.
+ You can specify a definite number of columns using `set key columns <N>`.
+ In this case you may need to adjust the sample widths (`samplen`) and the
+ total key width (`keywidth`).
+
+ By default the first plot label is at the top of the key and successive labels
+ are entered below it. The `invert` option causes the first label to be placed
+ at the bottom of the key, with successive labels entered above it. This option
+ is useful to force the vertical ordering of labels in the key to match the
+ order of box types in a stacked histogram.
+
+ `set key title "text"` places an overall title at the top of the key.
+ Font, text justification, and other text properties specific to the title can
+ be specified by placing the required keywords immediately after the
+ `"text"` in this command.
+ Font or text properties specified elsewhere apply to all text in the key.
+
+ The default layout places a style sample (color, line, point, shape, etc) at
+ the left of the key entry line, and the title text at the right.
+ The text and sample positions can be swapped using the `reverse` keyword.
+ Text justification of the individual plot titles within the key is controlled
+ by `Left` or `Right` (default).
+ The horizontal extend of the style sample can be set to an approximate number
+ of character width (`samplen`).
+
+ When using the TeX/LaTeX group of terminals or terminals in which formatting
+ information is embedded in the string, `gnuplot` is bad at estimating the
+ amount of space required, so the automatic key layout may be poor.
+ If the key is to be positioned at the left, it may help to use the combination
+ `set key left Left reverse` and force the appropriate number of columns or
+ total key width.
+
 4 key placement
 ?commands set key placement
 ?set key placement
 ?key placement
+ Key placement options:
+       set key {inside | outside | fixed}
+               {lmargin | rmargin | tmargin | bmargin}
+               {at <position>}}
+               {left | right | center} {top | bottom | center}
+
  This section describes placement of the primary, auto-generated key.
  To construct a secondary key or place plot titles elsewhere, see
  `multiple keys`.
@@ -11848,9 +11865,9 @@ Ffigure_keyentry
 
  The length of the sample line can be controlled by `samplen`.  The sample
  length is computed as the sum of the tic length and <sample_length> times the
- character width.  `samplen` also affects the positions of point samples in
- the key since these are drawn at the midpoint of the sample line, even if
- the sample line itself is not drawn.
+ character width.  It also affects the positions of point samples in the key
+ since these are drawn at the midpoint of the sample line, even if the line
+ itself is not drawn.
 
  Key entry lines are single-spaced based on the current font size.
  This can be adjusted by `set key spacing <line-spacing>`.
@@ -11869,7 +11886,6 @@ Ffigure_multiple_keys
  It is possible to construct a legend/key manually rather than having the plot
  titles all appear in the auto-generated key. This allows, for example, creating
  a single legend for the component panels in a multiplot.
- Here is an example:
         set multiplot layout 3,2 columnsfirst
         set style data boxes
         plot $D using 0:6  lt 1 title at 0.75, 0.20
