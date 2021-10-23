@@ -270,6 +270,7 @@ find_maxl_keys3d(struct surface_points *plots, int count, int *kcnt)
 		mlen = len;
 	}
 	if (draw_contour && !clabel_onecolor && this_plot->contours != NULL
+	&&  !this_plot->title_is_suppressed
 	&&  this_plot->plot_style != LABELPOINTS) {
 	    len = find_maxl_cntr(this_plot->contours, &cnt);
 	    if (len > mlen)
