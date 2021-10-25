@@ -4693,6 +4693,10 @@ process_image(void *plot, t_procimg_action action)
      * function for images will be used.  Otherwise, the terminal function for
      * filled polygons are used to construct parallelograms for the pixel elements.
      */
+    /* Catch pathological cases */
+    if (points[0].type == UNDEFINED || points[p_count-1].type == UNDEFINED)
+	int_error(NO_CARET, "image coordinates undefined");
+
     if (project_points) {
 	map3d_xy_double(points[0].x, points[0].y, points[0].z,
 			&p_start_corner[0], &p_start_corner[1]);
