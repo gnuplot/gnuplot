@@ -850,8 +850,6 @@ do_key_bounds(legend_key *key)
 	    key_width = key->user_width.x * (double)(t->xmax-1);
 	else if (key->user_width.scalex == graph)
 	    key_width = key->user_width.x * (plot_bounds.xright - plot_bounds.xleft);
-	/* replace earlier estimate of column width */
-	key_col_wth = key_width / key_cols;
     }
 
     /* Key inside plot boundaries */

@@ -385,8 +385,6 @@ boundary3d(struct surface_points *plots, int count)
 		/* now calculate actual no cols depending on no rows */
 		key_cols = ((ptitl_cnt - 1)/ key_rows) + 1;
 		key_col_wth = (plot_bounds.xright - plot_bounds.xleft) / key_cols;
-	    } else {
-		key_rows = key_cols = key_col_wth = 0;
 	    }
 	}
     }
