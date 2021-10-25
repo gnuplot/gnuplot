@@ -667,6 +667,7 @@ evaluate_at(struct at_type *at_ptr, struct value *val_ptr)
      * so that the value on return reflects what really happened.
      */
     undefined = FALSE;
+    val_ptr->type = NOTDEFINED;
 
     errno = 0;
     reset_stack();
