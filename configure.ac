@@ -1221,62 +1221,63 @@ AC_MSG_RESULT([  Platform-specific, legacy, or specialized terminals omitted by 
 
 if test "$GGI_SUPPORT" = yes; then
   if test "$ac_cv_header_ggi_xmi_h" = yes; then
-    AC_MSG_RESULT([    ggi terminal: yes (with pm3d support)])
+    AC_MSG_RESULT([    ggi       : yes   (with pm3d support)])
   else
-    AC_MSG_RESULT([    ggi terminal: yes (no pm3d support, requires ggi xmi library)])
+    AC_MSG_RESULT([    ggi       : yes   (no pm3d support, requires ggi xmi library)])
   fi
 else
-  AC_MSG_RESULT([    ggi terminal:  no   (use --with-ggi to enable, requires libggi)])
+  AC_MSG_RESULT([    ggi       :  no   (use --with-ggi to enable, requires libggi)])
 fi
 
 if test "$with_gpic" == yes; then
-  AC_MSG_RESULT([    gpic terminal: yes])
+  AC_MSG_RESULT([    gpic      : yes])
 else
-  AC_MSG_RESULT([    gpic terminal: no   (use --with-gpic to enable)])
+  AC_MSG_RESULT([    gpic      :  no   (use --with-gpic to enable)])
 fi
 
 if test "$with_tgif" == yes; then
-  AC_MSG_RESULT([    tgif terminal: yes])
+  AC_MSG_RESULT([    tgif      : yes])
 else
-  AC_MSG_RESULT([    tgif terminal: no   (use --with-tgif to enable)])
+  AC_MSG_RESULT([    tgif      :  no   (use --with-tgif to enable)])
 fi
 
 if test "$with_metafont" == yes; then
-  AC_MSG_RESULT([    metafont terminal          : yes])
+  AC_MSG_RESULT([    metafont  : yes])
 else
-  AC_MSG_RESULT([    metafont terminal          : no   (use --with-metafont to enable)])
+  AC_MSG_RESULT([    metafont  :  no   (use --with-metafont to enable)])
 fi
 
 if test "$with_metapost" == yes; then
-  AC_MSG_RESULT([    metapost terminal          : yes])
+  AC_MSG_RESULT([    metapost  : yes])
 else
-  AC_MSG_RESULT([    metapost terminal          : no   (use --with-metapost to enable)])
+  AC_MSG_RESULT([    metapost  :  no   (use --with-metapost to enable)])
 fi
 
 if test "$with_regis" = yes; then
-  AC_MSG_RESULT([    ReGIS terminal: yes])
+  AC_MSG_RESULT([    ReGIS     : yes])
 else
-  AC_MSG_RESULT([    ReGIS terminal: no  (use --with-regis to enable)])
+  AC_MSG_RESULT([    ReGIS     :  no   (use --with-regis to enable)])
 fi
 
 if test "$is_msdos" = yes; then
-  AC_MSG_RESULT([    svga terminal (MSDOS/djgpp): yes])
+  AC_MSG_RESULT([    svga (djgpp): yes])
 fi
 
 if test "$build_src_beos_subdir" = yes; then
-  AC_MSG_RESULT([    be terminal (BeOS): yes])
+  AC_MSG_RESULT([    be (BeOS) : yes])
+
 fi
 
 if test "$with_caca" = yes; then
-  AC_MSG_RESULT([    caca terminal: yes (EXPERIMENTAL)])
+  AC_MSG_RESULT([    caca      : yes   (EXPERIMENTAL)])
 else
-  AC_MSG_RESULT([    caca terminal:  no   (use --with-caca to enable)])
+  AC_MSG_RESULT([    caca      :  no   (use --with-caca to enable)])
 fi
 
 if test "$gnuplot_framework_AquaTerm" = yes; then
-  AC_MSG_RESULT([    aqua terminal (OSX): yes])
+  AC_MSG_RESULT([    aqua (OSX): yes])
 else
-  AC_MSG_RESULT([    aqua terminal (OSX): no])
+  AC_MSG_RESULT([    aqua (OSX):  no])
 fi
 
 AC_MSG_RESULT([])
@@ -1288,9 +1289,9 @@ dnl These are the most common interactive terminal options
 AC_MSG_RESULT([])
 if test "$no_x" != yes; then
   if test "$enable_x11_mbfonts" = yes; then
-    AC_MSG_RESULT([  X Window System terminal: yes  (multi-byte fonts OK)])
+    AC_MSG_RESULT([  x11 (X Window System) : yes  (multi-byte fonts OK)])
   else
-    AC_MSG_RESULT([  X Window System terminal: yes  (multi-byte fonts not supported)])
+    AC_MSG_RESULT([  x11 (X Window System) : yes  (multi-byte fonts not supported)])
   fi
 
   if test "$enable_x11_external" = yes; then
@@ -1303,7 +1304,7 @@ if test "$no_x" != yes; then
     AC_MSG_RESULT([    (gnuplot_x11 can use KDE3/DCOP to raise konsole) ])
   fi
 else
-  AC_MSG_RESULT([  X Window System terminal: no (requires X libraries)])
+  AC_MSG_RESULT([  x11 (X Window System) : no (requires X libraries)])
 fi
 
 if test "$ac_cv_lib_gd_gdImageJpeg" = yes && 
