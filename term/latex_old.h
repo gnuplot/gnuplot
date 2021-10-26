@@ -26,7 +26,7 @@ START_HELP(latex)
 " Gnuplot provides a variety of terminals for use with TeX/LaTeX.",
 "",
 " (1) TeX/LaTeX compatible terminals based on use of PostScript",
-" See  `epslatex`, `pslatex`, `mp` (metapost),  and `pstricks`.",
+" See  `epslatex`, `pslatex`, and `pstricks`.",
 "",
 " (2) TeX/LaTeX compatible terminals based on cairo graphics",
 " See `cairolatex`.",
@@ -39,7 +39,7 @@ START_HELP(latex)
 " terminals `latex`, `emtex`, `eepic`, and `tpic` present in older versions",
 " of gnuplot. See `pict2e`.",
 "",
-" (5) Others, see `context`, `mf` (metafont).",
+" (5) Others, see `context`, legacy terminals mf (metafont) and mp (metapost).",
 ""
 END_HELP(latex)
 #endif
