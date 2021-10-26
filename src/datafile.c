@@ -2371,7 +2371,8 @@ df_readascii(double v[], int max)
 		    } else if ((column <= df_no_cols)
 			     && (df_column[column - 1].good == DF_MISSING)) {
 			v[output] = not_a_number();
-			if (missing_val && df_current_plot->plot_style == TABLESTYLE) {
+			if (missing_val
+			&&  df_current_plot && df_current_plot->plot_style == TABLESTYLE) {
 			    df_strings[output].type = STRING;
 			    df_strings[output].v.string_val = gp_strdup(missing_val);
 			}
