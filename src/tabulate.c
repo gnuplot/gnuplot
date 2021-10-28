@@ -62,7 +62,7 @@ char *table_sep = NULL;
 struct at_type *table_filter_at = NULL;
 
 static char *expand_newline(const char *in);
-static TBOOLEAN imploded(curve_points *this_plot);
+static TBOOLEAN blanks_needed(curve_points *this_plot);
 
 static FILE *outfile;
 
@@ -225,7 +225,7 @@ print_table(struct curve_points *current_plot, int plot_num)
 	} else {
 	    int plotstyle = current_plot->plot_style;
 	    int type;
-	    TBOOLEAN replace_undefined_with_blank = imploded(current_plot);
+	    TBOOLEAN replace_undefined_with_blank = blanks_needed(current_plot);
 
 	    if (plotstyle == HISTOGRAMS && current_plot->histogram->type == HT_ERRORBARS)
 		plotstyle = YERRORBARS;
@@ -548,8 +548,14 @@ expand_newline(const char *in)
     return tmpstr;
 }
 
+/* Some plot styles depend on an internal convention that a data point
+ * with type UNDEFINED indicates the break between separate curves within
+ * a single plot.  The equivalent convention on input is a blank line.
+ * This routine tests for styles that should convert the UNDEFINED point
+ * to a blank line on output.
+ */
 static TBOOLEAN
-imploded(curve_points *this_plot)
+blanks_needed(curve_points *this_plot)
 {
     switch (this_plot->plot_smooth) {
 	/* These smooth styles called cp_implode() */
@@ -567,6 +573,12 @@ imploded(curve_points *this_plot)
 	case SMOOTH_NONE:
 	case SMOOTH_BEZIER:
 	case SMOOTH_KDENSITY:
+	case SMOOTH_CONVEX_HULL:
+	    break;
+	/* These smooth styles also use the UNDEFINED point convention */
+	case SMOOTH_SMOOTH_HULL:
+	case SMOOTH_PATH:
+	    return TRUE;
 	default:
 	    break;
     }
