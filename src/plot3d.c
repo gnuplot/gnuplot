@@ -895,6 +895,11 @@ get_3ddata(struct surface_points *this_plot)
 	    track_pm3d_quadrangles = TRUE;
 	}
 
+	if (this_plot->plot_style == POLYGONMASK) {
+	    this_plot->has_grid_topology = FALSE;
+	    this_plot->opt_out_of_dgrid3d = TRUE;
+	}
+
 	/* If the user has set an explicit locale for numeric input, apply it */
 	/* here so that it affects data fields read from the input file.      */
 	set_numeric_locale();
@@ -1627,6 +1632,9 @@ eval_3dplots()
      */
     n_complex_values = 0;
 
+    /* No mask active */
+    mask_3Dpolygon_set = NULL;
+
     /* Normally we only need to initialize pm3d quadrangles if pm3d mode is active */
     /* but there are a few special cases that use them outside of pm3d mode.       */
     track_pm3d_quadrangles = pm3d_objects() ? TRUE : FALSE;
@@ -1682,6 +1690,7 @@ eval_3dplots()
 	    TBOOLEAN set_fillstyle = FALSE;
 	    TBOOLEAN set_fillcolor = FALSE;
 	    t_colorspec fillcolor = DEFAULT_COLORSPEC;
+	    TBOOLEAN set_smooth = FALSE;
 
 	    int u_sample_range_token, v_sample_range_token;
 	    t_value original_value_u, original_value_v;
@@ -1938,19 +1947,38 @@ eval_3dplots()
 		if (save_token != c_token)
 		    continue;
 
-		/* EXPERIMENTAL smoothing options for splot with lines */
+		/* EXPERIMENTAL smoothing options for splot */
 		if (equals(c_token, "smooth")) {
+		    if (set_smooth)
+			duplication = TRUE;
+		    set_smooth = TRUE;
 		    c_token++;
 		    if (almost_equals(c_token, "c$splines")
 		    ||  equals(c_token, "path")) {
 			c_token++;
 			this_plot->plot_smooth = SMOOTH_CSPLINES;
+			this_plot->plot_style = LINES;
 		    } else if (almost_equals(c_token, "acs$plines")) {
 			c_token++;
 			this_plot->plot_smooth = SMOOTH_ACSPLINES;
+			this_plot->plot_style = LINES;
+		    } else if (equals(c_token, "none")) {
+			c_token++;
 		    } else
-			int_error(c_token, "only cspline or acsplines possible here");
-		    this_plot->plot_style = LINES;
+			int_error(c_token, "this smoothing option not supported");
+		    continue;
+		}
+
+		/* "mask" is currently implemented as if it were a smoothing
+		 * option, but giving it a separate keyword will make it easier
+		 * to separate later.
+		 */
+		if (equals(c_token, "mask")) {
+		    if (set_smooth)
+			duplication = TRUE;
+		    set_smooth = TRUE;
+		    c_token++;
+		    this_plot->plot_smooth = SMOOTH_MASK;
 		    continue;
 		}
 
@@ -2367,6 +2395,12 @@ eval_3dplots()
 			    this_plot->plot_type = NODATA;
 			    goto SKIPPED_EMPTY_FILE;
 			}
+		    }
+
+		    /* If this was mask data, store a pointer for later use */
+		    if (this_plot->plot_type == DATA3D
+		    &&  this_plot->plot_style == POLYGONMASK) {
+			mask_3Dpolygon_set = this_plot->iso_crvs;
 		    }
 
 		    /* okay, we have read a surface */
@@ -3023,4 +3057,3 @@ count_3dpoints(struct surface_points *plot, int *ntotal, int *ninrange, int *nun
 	icrvs = icrvs->next;
     }
 }
-

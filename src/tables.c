@@ -135,6 +135,7 @@ const struct gen_table plot_smooth_tbl[] =
     { "z$sort", SMOOTH_ZSORT },
     { "path", SMOOTH_PATH },
     { "convex$hull", SMOOTH_CONVEX_HULL },
+    { "mask", SMOOTH_MASK },
     { NULL, SMOOTH_NONE }
 };
 
@@ -748,6 +749,7 @@ const struct gen_table plotstyle_tbl[] =
     { "spider$plot", SPIDERPLOT },
     { "table", TABLESTYLE },
     { "zerror$fill", ZERRORFILL },
+    { "mask", POLYGONMASK },
     { NULL, PLOT_STYLE_NONE }
 };
 

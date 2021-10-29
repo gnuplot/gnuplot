@@ -600,6 +600,9 @@ get_data(struct curve_points *current_plot)
     case SMOOTH_ACSPLINES:
 	max_cols++;
 	break;
+    case SMOOTH_MASK:
+	/* warn about limitations? currently only implemented for image styles */
+	break;
     default:
 	if (df_no_use_specs > 2 && current_plot->plot_style != FILLEDCURVES)
 	    int_warn(NO_CARET, "extra columns ignored by smoothing option");
@@ -1274,6 +1277,13 @@ get_data(struct curve_points *current_plot)
 	case ZERRORFILL:
 	case ISOSURFACE:
 	    int_error(NO_CARET, "This plot style only available for splot");
+	    break;
+
+	/* "with mask" indicates a polygon data set that is to be read in
+	 * but saved for use as a mask rather than being plotted itself
+	 */
+	case POLYGONMASK:
+	    store2d_point(current_plot, i++, v[0], v[1], v[0], v[0], v[1], v[1], 0);
 	    break;
 
 	/* If anybody hits this it is because we missed handling a plot style above.
@@ -2057,6 +2067,9 @@ eval_plots()
     /* Track complex values so that we can warn about trying to plot them */
     n_complex_values = 0;
 
+    /* No mask active */
+    construct_2D_mask_set(NULL, 0);
+
     /* ** First Pass: Read through data files ***
      * This pass serves to set the xrange and to parse the command, as well
      * as filling in every thing except the function data. That is done after
@@ -2406,6 +2419,19 @@ eval_plots()
 			break;
 		    }
 		    set_smooth = TRUE;
+		    continue;
+		}
+
+		/* "mask" is currently implemented as if it were a smoothing
+		 * category, but giving it a separate keyword will make it
+		 * easier to separate later.
+		 */
+		if (equals(c_token, "mask")) {
+		    c_token++;
+		    if (set_smooth)
+			duplication = TRUE;
+		    set_smooth = TRUE;
+		    this_plot->plot_smooth = SMOOTH_MASK;
 		    continue;
 		}
 

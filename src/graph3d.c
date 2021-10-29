@@ -1269,6 +1269,11 @@ do_3dplot(
 	    case TABLESTYLE:
 		/* cannot happen */
 		break;
+
+	    case POLYGONMASK:
+		/* nothing needed here */
+		break;
+
 	    }			/* switch(plot-style) plot proper */
 
 	    /* Next draw the key sample */

@@ -215,6 +215,14 @@ int current_x11_windowid = 0;
 
 textbox_style textbox_opts[NUM_TEXTBOX_STYLES];
 
+/*
+ * Image data or pm3d quadrangles can be masked by first loading a set
+ * of masking polygons via dummy plotting style "with mask".
+ */
+struct iso_curve *mask_2Dpolygon_set = NULL;
+struct iso_curve *mask_3Dpolygon_set = NULL;
+static TBOOLEAN interior(double x, double y, struct coordinate *mask, int nv);
+
 /*****************************************************************/
 /* Routines that deal with global objects defined in this module */
 /*****************************************************************/
@@ -1117,5 +1125,101 @@ place_title(int title_x, int title_y)
 	/* NB: write_label applies text color but does not reset it */
 	write_label(title_x, title_y, &title);
 	reset_textcolor(&(title.textcolor));
+    }
+}
+
+/*
+ * Image pixels or pm3d quadrangles can be filtered by masking against
+ * a set of polygons that was stored in mask_XXpolygon_set by a previous
+ * plot/splot command with style POLYGONMASK ("with mask").
+ * These routines implement a test based on the Jordan curve theorem:
+ * If a line through a point intersects the bounding curve of a polygon
+ * an even number of times, the point is exterior. If the line intersects
+ * the bounding curve an odd number of times, the point is interior.
+ *
+ * interior(x,y,<polygon>) returns TRUE if the point is interior to
+ * the polygon defined by a list of vertices.
+ *
+ * masked(x,y,<polygon set>) returns TRUE if the point is *not*
+ * interior to any of the polygons in the set.
+ */
+static TBOOLEAN
+interior( double x, double y, struct coordinate *mask, int mask_vertices )
+{
+    int count = 0;
+    int i, j;
+
+    if (mask == NULL)
+	return FALSE;
+
+    for (i = 0, j = mask_vertices-1; i < mask_vertices; j = i++) {
+	if ( ((mask[i].y > y) != (mask[j].y > y))
+	&&   (x < (mask[j].x-mask[i].x) * (y-mask[i].y) / (mask[j].y-mask[i].y) + mask[i].x)
+	) {
+	    count++;
+	}
+    }
+
+    return (count & 0x1);
+}
+
+TBOOLEAN
+masked( double x, double y, struct iso_curve *mask_set )
+{
+    struct iso_curve *mask;
+
+    if (!mask_set)
+	return FALSE;
+    for (mask = mask_set; mask; mask = mask->next) {
+	if (interior(x, y, mask->points, mask->p_count))
+	    return FALSE;
+    }
+    return TRUE;
+}
+
+/*
+ * The 2D input stage places polygons in a single list of vertices
+ * with an UNDEFINED point acting as a separator between polygons.
+ * construct_2D_mask_set() creates a linked list of iso_curves,
+ * each pointing to one of the polygons in the original list.
+ * This allows both the 2D and 3D code to use the same masking tests.
+ */
+void
+construct_2D_mask_set( struct coordinate *points, int p_count )
+{
+    struct iso_curve *mask = mask_2Dpolygon_set;
+    struct coordinate *polygon;
+    struct coordinate *end_of_list;
+    int nv;
+
+    /* Free previous mask set, if any */
+    while (mask) {
+	struct iso_curve *temp = mask;
+	mask = mask->next;
+	free(temp);
+    }
+    mask_2Dpolygon_set = NULL;
+    if (points == NULL || p_count < 3)
+	return;
+
+    /* point type UNDEFINED separates multiple polygons */
+    end_of_list = &points[p_count];
+    polygon = &points[0];
+    nv = 0;
+    while (&polygon[nv] < end_of_list) {
+	for (nv = 1; &polygon[nv] < end_of_list; nv++) {
+	    if (polygon[nv].type == UNDEFINED)
+		break;
+	}
+	mask = gp_alloc( sizeof(struct iso_curve), "2D mask set");
+	mask->next = mask_2Dpolygon_set;
+        mask->points = polygon;
+	mask->p_count = nv;
+	mask->p_max = 0;
+	mask_2Dpolygon_set = mask;
+	polygon = &polygon[nv];
+	nv = 0;
+	if (polygon < end_of_list)
+	    polygon++;
     }
 }

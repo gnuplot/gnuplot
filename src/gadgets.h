@@ -695,4 +695,12 @@ TBOOLEAN pm3d_objects(void);
 
 void place_title(int title_x, int title_y);
 
+/* Image data or pm3d quadrangles can be masked by first loading a set
+ * of masking polygons via dummy plotting style "with mask".
+ */
+extern struct iso_curve *mask_2Dpolygon_set;
+extern struct iso_curve *mask_3Dpolygon_set;
+extern void construct_2D_mask_set(struct coordinate *points, int p_count);
+extern TBOOLEAN masked(double x, double y, struct iso_curve *mask_polygon_set);
+
 #endif /* GNUPLOT_GADGETS_H */

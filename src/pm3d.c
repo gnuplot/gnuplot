@@ -950,6 +950,11 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			    corners[0].x, corners[0].y, corners[1].x, corners[1].y,
 			    corners[2].x, corners[2].y, corners[3].x, corners[3].y));
 
+			/* Is this quadrangle masked? */
+			if (this_plot->plot_smooth == SMOOTH_MASK)
+			    if (masked(corners[0].x, corners[0].y, mask_3Dpolygon_set))
+				continue;
+
 			/* If the colors are given separately, we already loaded them above */
 			if (color_from_column) {
 			    cb1 = corners[0].c;
@@ -1066,6 +1071,12 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		    }
 		}
 	    } else { /* thus (interp_i == 1 && interp_j == 1) */
+
+		/* Is this quadrangle masked? */
+		if (this_plot->plot_smooth == SMOOTH_MASK)
+		    if (masked(corners[0].x, corners[0].y, mask_3Dpolygon_set))
+			continue;
+
 		if (pm3d.direction != PM3D_DEPTH) {
 		    filled_polygon(corners, plot_fillstyle, 4);
 		} else {

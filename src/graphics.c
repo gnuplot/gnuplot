@@ -1025,6 +1025,10 @@ do_plot(struct curve_points *plots, int pcount)
 		plot_spiderplot(this_plot);
 		break;
 
+	    case POLYGONMASK:
+		construct_2D_mask_set(this_plot->points, this_plot->p_count);
+		break;
+
 	    default:
 		int_error(NO_CARET, "unknown plot style");
 	    }
@@ -4638,6 +4642,10 @@ process_image(void *plot, t_procimg_action action)
     TBOOLEAN rectangular_image = FALSE;
     TBOOLEAN fallback = FALSE;
 
+    /* Bookkeeping for "with mask" */
+    struct iso_curve *mask_polygon_set = NULL;
+    TBOOLEAN masking = FALSE;
+
     /* Detours necessary to handle 3D plots */
     TBOOLEAN project_points = FALSE;		/* True if 3D plot */
     int image_x_axis, image_y_axis;
@@ -4657,6 +4665,8 @@ process_image(void *plot, t_procimg_action action)
 	pixel_planes = ((struct surface_points *)plot)->image_properties.type;
 	ncols = ((struct surface_points *)plot)->image_properties.ncols;
 	nrows = ((struct surface_points *)plot)->image_properties.nrows;
+	masking = (((struct surface_points *)plot)->plot_smooth == SMOOTH_MASK);
+	mask_polygon_set = mask_3Dpolygon_set;
 	image_x_axis = FIRST_X_AXIS;
 	image_y_axis = FIRST_Y_AXIS;
     } else {
@@ -4665,6 +4675,8 @@ process_image(void *plot, t_procimg_action action)
 	pixel_planes = ((struct curve_points *)plot)->image_properties.type;
 	ncols = ((struct curve_points *)plot)->image_properties.ncols;
 	nrows = ((struct curve_points *)plot)->image_properties.nrows;
+	masking = (((struct curve_points *)plot)->plot_smooth == SMOOTH_MASK);
+	mask_polygon_set = mask_2Dpolygon_set;
 	image_x_axis = ((struct curve_points *)plot)->x_axis;
 	image_y_axis = ((struct curve_points *)plot)->y_axis;
     }
@@ -4853,6 +4865,10 @@ process_image(void *plot, t_procimg_action action)
 
     /* Also use generic code if the pixels are of unequal size, e.g. log scale */
     if (X_AXIS.log || Y_AXIS.log)
+	fallback = TRUE;
+
+    /* Also use generic pixel-by-pixel code if masking is requested */
+    if (masking)
 	fallback = TRUE;
 
     view_port_x[0] = (X_AXIS.set_autoscale & AUTOSCALE_MIN) ? X_AXIS.min : X_AXIS.set_min;
@@ -5245,6 +5261,12 @@ process_image(void *plot, t_procimg_action action)
 			for (k=0; k<N_corners; k++)
 			    clipped[k] = corners[k];
 			clip_polygon(clipped, corners, N_corners, &N_corners);
+		    }
+
+		    /* Apply mask */
+		    if (masking) {
+			if (masked(p_corners[0].x, p_corners[0].y, mask_polygon_set))
+			    goto skip_pixel;
 		    }
 
 		    if (rectangular_image && term->fillbox
