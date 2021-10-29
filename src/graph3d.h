@@ -106,6 +106,7 @@ typedef struct surface_points {
     TBOOLEAN opt_out_of_hidden3d; /* set by "nohidden" option to splot command */
     TBOOLEAN opt_out_of_contours; /* set by "nocontours" option to splot command */
     TBOOLEAN opt_out_of_surface;  /* set by "nosurface" option to splot command */
+    TBOOLEAN opt_out_of_dgrid3d;  /* set by "nogrid" option to splot command */
     TBOOLEAN pm3d_color_from_column;
     TBOOLEAN has_grid_topology;
     int hidden3d_top_linetype;	/* before any calls to load_linetype() */

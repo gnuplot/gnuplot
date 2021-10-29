@@ -659,6 +659,10 @@ grid_nongrid_data(struct surface_points *this_plot)
     double *xx = NULL, *yy = NULL, *zz = NULL, *b = NULL;
     int numpoints = 0;
 
+    /* nothing to grid */
+    if (this_plot->num_iso_read == 0)
+	return;
+
     /* Version 5.3 - allow gridding of separate color column so long as
      * we don't need to generate splines for it
      */
@@ -906,6 +910,7 @@ get_3ddata(struct surface_points *this_plot)
 
 	if (this_plot->plot_style == POLYGONS) {
 	    this_plot->has_grid_topology = FALSE;
+	    this_plot->opt_out_of_dgrid3d = TRUE;
 	    track_pm3d_quadrangles = TRUE;
 	}
 
@@ -1257,7 +1262,7 @@ get_3ddata(struct surface_points *this_plot)
 				this_plot->noautoscale, goto come_here_if_undefined);
 	    }
 
-	    if (dgrid3d) {
+	    if (dgrid3d && !this_plot->opt_out_of_dgrid3d) {
 		/* No point in auto-scaling before we re-grid the data */
 		cp->z = z;
 		cp->CRD_COLOR = (pm3d_color_from_column) ? color : z;
@@ -1394,9 +1399,8 @@ get_3ddata(struct surface_points *this_plot)
 	/*}}} */
     }
 
-    if (dgrid3d && this_plot->num_iso_read > 0)
+    if (dgrid3d && !(this_plot->opt_out_of_dgrid3d))
 	grid_nongrid_data(this_plot);
-
 
     if (this_plot->num_iso_read <= 1)
 	this_plot->has_grid_topology = FALSE;
@@ -1716,6 +1720,7 @@ eval_3dplots()
 
 		/* FIXME: additional fields may need to be reset */
 		this_plot->opt_out_of_hidden3d = FALSE;
+		this_plot->opt_out_of_dgrid3d = FALSE;
 		this_plot->title_is_suppressed = FALSE;
 
 		/* Mechanism for deferred evaluation of plot title */
@@ -1809,6 +1814,7 @@ eval_3dplots()
 		this_plot->num_iso_read = iso_samples_2;
 		/* FIXME: additional fields may need to be reset */
 		this_plot->opt_out_of_hidden3d = FALSE;
+		this_plot->opt_out_of_dgrid3d = FALSE;
 		this_plot->title_is_suppressed = FALSE;
 		/* ignore it for now */
 		some_functions = TRUE;
@@ -1939,6 +1945,13 @@ eval_3dplots()
 		if (almost_equals(c_token, "nohidden$3d")) {
 		    c_token++;
 		    this_plot->opt_out_of_hidden3d = TRUE;
+		    continue;
+		}
+
+		/* "set dgrid3d" tries to grid *everything*, which isn't always wanted */
+		if (equals(c_token, "nogrid")) {
+		    c_token++;
+		    this_plot->opt_out_of_dgrid3d = TRUE;
 		    continue;
 		}
 
@@ -2733,6 +2746,7 @@ eval_3dplots()
 		new_plot->hidden3d_top_linetype = LT_NODRAW;
 		new_plot->plot_type = DATA3D;
 		new_plot->opt_out_of_hidden3d = FALSE;
+		new_plot->opt_out_of_dgrid3d = FALSE;
 
 		/* Compute the geometry of the phantom */
 		process_image(this_plot, IMG_UPDATE_CORNERS);
