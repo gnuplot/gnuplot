@@ -49,6 +49,9 @@ print "****************** file convex_hull.dem ********************"
 load "convex_hull.dem"
 reset
 
+print "****************** file mask_pm3d.dem ********************"
+load "mask_pm3d.dem"
+reset
 
 print "******************** file errorbars.dem ********************"
 load "errorbars.dem"

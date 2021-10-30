@@ -1,0 +1,60 @@
+#
+# Demonstrate using a set of polygons to mask selected
+# regions of an image in 2D or 3D.
+#
+# Set of polygons to use as a mask
+$CURVES << EOD
+1   2
+1.5 2
+2   2.5
+3   5
+2.5 5
+1.5 4
+
+3   3
+3.5 3.1
+3.8 3.2
+4.2 4.7
+3.5 5.0
+3.2 3.5
+3   3
+
+1 5
+2 5
+3 6
+1 5
+EOD
+
+set xrange [0:6]
+set yrange [0:6]
+unset tics
+unset border
+unset key
+set view map
+set margins screen .2, screen .8, screen .2, screen .8
+
+set title "Image with polygons that will be applied as a mask\nNote that one is not closed; that's OK"
+plot 'blutux.rgb' binary array=(128,128) dx=.05 dy=.05 flipy format="%uchar" with rgbimage, \
+     $CURVES with linespoints lc "yellow" lw 2
+
+pause -1 "<cr> to continue"
+
+set title "Mask of 3 polygons applied in 2D"
+plot $CURVES with mask, 'blutux.rgb' binary array=(128,128) dx=.05 dy=.05 flipy format="%uchar" mask with rgbimage
+
+pause -1 "<cr> to continue" 
+
+set title "Same mask of 3 polygons applied in 3D"
+splot $CURVES using 1:2:(0) with mask, 'blutux.rgb' binary array=(128,128) dx=.05 dy=.05 flipy format="%uchar" mask with rgbimage
+
+pause -1 "<cr> to continue"
+
+set table $MASK
+plot $CURVES using 1:2 smooth path with polygons title "smooth path with polygons"
+unset table
+
+set title "Construct mask from smooth path fit to polygons"
+splot $MASK using 1:2:(0) with mask, 'blutux.rgb' binary array=(128,128) dx=.05 dy=.05 flipy format="%uchar" mask with rgbimage
+
+pause -1 "<cr> to continue"
+
