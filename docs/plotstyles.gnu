@@ -230,7 +230,7 @@ if (GNUTERM eq "tikz") \
 #
 reset
 set output out . 'figure_heatmap' . ext
-set title "2D Heat map from in-line array of values" offset 0,-1
+set title "2D Heat map from in-line array of values" offset 0,0
 $HEATMAP << EOD
 5 4 3 1 0
 2 2 0 0 1
@@ -239,10 +239,12 @@ $HEATMAP << EOD
 EOD
 unset key
 set bmargin 1
+set rmargin at screen 0.9
 set tmargin 3
 set tics scale 0
 unset cbtics
 unset xtics
+unset colorbox
 set xrange  [-0.5:4.5]
 set x2range [-0.5:4.5]
 set yrange  [3.5:-0.5]
@@ -902,6 +904,40 @@ set sample 51; set isosample 51
 set xyplane 0
 
 splot '++' using 1:2:(abs(E0(x+I*y))):(arg(E0(x+I*y))) with pm3d
+reset
+
+# Convex hull used to mask a pm3d surface
+# 
+set output out.'figure_mask' . ext
+
+set view map
+set palette rgb 33,13,10
+set xrange [-30:25]
+set yrange [-30:25]
+
+set dgrid3d 100,100 gauss 5
+set pm3d explicit
+
+unset key
+unset tics
+unset colorbox
+unset border
+
+set table $HULL
+plot 'mask_pm3d.dat' using 1:2 convexhull with lines title "Convex hull"
+unset table
+
+set multiplot layout 1,2 spacing 0.0 margins 0.05,0.95,0.0,0.85
+set title "Cluster of points\n defining the mask region"
+splot  'mask_pm3d.dat' using 1:2:3 with pm3d, \
+       'mask_pm3d.dat' using 1:2:(0) nogrid with points pt 7 ps .5 lc "black"
+
+set pm3d interp 3,3
+set title "pm3d surface masked by\nconvex hull of the cluster"
+splot  $HULL using 1:2:(0) with mask, \
+       'mask_pm3d.dat' using 1:2:3 mask with pm3d
+
+unset multiplot
 reset
 
 # close last file
