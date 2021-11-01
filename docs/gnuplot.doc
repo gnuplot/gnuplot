@@ -279,7 +279,7 @@ C
 4 New built-in functions
 ?new built-in functions
 #start
-#b `stats <non-existant file>` yields a testable value. See `stats test`.
+#b `stats <non-existent file>` yields a testable value. See `stats test`.
 #b `stats $vgrid` finds min/max/mean/stddev of voxels in grid
 #b `if ... else if ... else ...`
 #b `palette(z)` returns the current RGB palette color mapping z into cbrange.
@@ -350,7 +350,7 @@ C
 ## See `environment`.
 #b Exception handling for the "fit" command.  Control always returns to the
 ## next line of input, even in the case of fit errors.  On return, FIT_ERROR is
-## non-zero if an error occured. This allows scripted recovery from a bad fit.
+## non-zero if an error occurred. This allows scripted recovery from a bad fit.
 ## See `fit error_recovery`.
 #b Revised generation of minor tics along a time axis.  See `set mxtics time`.
 #b Improved rendering of intersecting pm3d surfaces - overlapping surface tiles
@@ -883,9 +883,8 @@ C
        set output "figure.png"
        plot "data" with lines
 
- These commands produce an output file "figure.png" that is 600 pixels
- wide and 400 pixels tall. The plot will fill the lower left quarter of this
- canvas.  This is consistent with the way multiplot mode has always worked.
+ These commands produce an output file "figure.png" that is 600 pixels wide
+ and 400 pixels tall. The plot will fill the lower left quarter of this canvas.
 
 2 Command-line-editing
 ?line-editing
@@ -1264,7 +1263,7 @@ C  need @ in table, so end and restart the table !
  Starting with version 5.2 the entire string in GNUTERM is passed to
  "set term" so that terminal options may be included.  E.g.
       GNUTERM="postscript eps color size 5in, 3in"
- This can be overridden by the ~/.gnuplot (or equivalent) start-up file
+ This can be overridden by a system or personal initialization file
  (see `startup`) and of course by later explicit `set term` commands.
 
  GNUHELP may be defined to be the pathname of the HELP file (gnuplot.gih).
@@ -1283,10 +1282,10 @@ C  need @ in table, so end and restart the table !
  On Unix, PAGER is used as an output filter for help messages.
 
  On Unix, SHELL is used for the `shell` command.  On MS-DOS and OS/2, COMSPEC
- is used for the `shell` command.
+ is used.
 
- `FIT_SCRIPT` may be used to specify a `gnuplot` command to be executed when a
- fit is interrupted---see `fit`.  `FIT_LOG` specifies the default filename of the
+ FIT_SCRIPT may be used to specify a `gnuplot` command to be executed when a
+ fit is interrupted---see `fit`.  FIT_LOG specifies the default filename of the
  logfile maintained by fit.
 
  GNUPLOT_LIB may be used to define additional search directories for data
@@ -1861,7 +1860,7 @@ C 4 ibeta
  The `inverf(x)` function returns the inverse error function of the real part
  of its argument.   See `erf` and `invnorm`.
 C 4 igamma
-#igamma(a,z) & complex, $\Re(a)>0$ & \gpCX & incompete gamma function $P(a,z)=\frac{1}{\Gamma(z)}\intop_{0}^{z}t^{a-1}e^{-t}dt$ \\
+#igamma(a,z) & complex, $\Re(a)>0$ & \gpCX & incomplete gamma function $P(a,z)=\frac{1}{\Gamma(z)}\intop_{0}^{z}t^{a-1}e^{-t}dt$ \\
 %igamma(a,z)@ ~~ @$igamma (a,z)$, lower incomplete gamma function of ($a$,$z$)
 4 imag
 ?expressions functions imag
@@ -2010,7 +2009,7 @@ C ?expressions functions SynchrotronF
  The `tanh(x)` function returns the hyperbolic tangent of its argument.  `tanh`
  expects its argument to be in radians.
 C 4 uigamma
-#uigamma(a,x) & real, real & & upper incompete gamma function $Q(a,x)=\frac{1}{\Gamma(x)}\intop_{x}^{\infty}t^{a-1}e^{-t}dt$ \\
+#uigamma(a,x) & real, real & & upper incomplete gamma function $Q(a,x)=\frac{1}{\Gamma(x)}\intop_{x}^{\infty}t^{a-1}e^{-t}dt$ \\
 %uigamma(a,x)@ ~~ @$uigamma (a,x)$, upper incomplete gamma function of ($a$,$x$)
 4 voigt
 ?expressions functions voigt
@@ -2506,7 +2505,7 @@ C 4 index
  `Ai(z)` and `Bi(z)` are the Airy functions of complex argument z, computed
  in terms of the modified Bessel functions K and I.
  Supported via an external library containing routines by Donald E. Amos,
- Sandia National Laboratoris, SAND85-1018 (1985).
+ Sandia National Laboratories, SAND85-1018 (1985).
 
 #TeX \quad\quad Ai$(z) = \frac{1}{\pi}\sqrt{\frac{z}{3}} K_{\nicefrac{1}{3}}(\zeta)$
 #TeX \quad\quad\quad $\zeta = \frac{2}{3}z^{\nicefrac{3}{2}}$
@@ -2519,28 +2518,28 @@ C 4 index
  `BesselJ(nu,z)` is the Bessel function of the first kind J_nu
  for real argument nu and complex argument z.
  Supported via external library containing routines by Donald E. Amos,
- Sandia National Laboratoris, SAND85-1018 (1985).
+ Sandia National Laboratories, SAND85-1018 (1985).
 
 ?expressions functions BesselY
 ?BesselY
  `BesselY(nu,z)` is the Bessel function of the second kind Y_nu
  for real argument nu and complex argument z.
  Supported via external library containing routines by Donald E. Amos,
- Sandia National Laboratoris, SAND85-1018 (1985).
+ Sandia National Laboratories, SAND85-1018 (1985).
 
 ?expressions functions BesselI
 ?BesselI
  `BesselI(nu,z)` is the modified Bessel function of the first kind I_nu
  for real argument nu and complex argument z.
  Supported via external library containing routines by Donald E. Amos,
- Sandia National Laboratoris, SAND85-1018 (1985).
+ Sandia National Laboratories, SAND85-1018 (1985).
 
 ?expressions functions BesselK
 ?BesselK
  `BesselK(nu,z)` is the modified Bessel function of the second kind K_nu
  for real argument nu and complex argument z.
  Supported via external library containing routines by Donald E. Amos,
- Sandia National Laboratoris, SAND85-1018 (1985).
+ Sandia National Laboratories, SAND85-1018 (1985).
 
 ?expressions functions BesselH1
 ?expressions functions BesselH2
@@ -2554,7 +2553,7 @@ C 4 index
      H2(nu,z) = J(nu,z) - iY(nu,z)
  for real argument nu and complex argument z.
  Supported via external library containing routines by Donald E. Amos,
- Sandia National Laboratoris, SAND85-1018 (1985).
+ Sandia National Laboratories, SAND85-1018 (1985).
 
 4 Expint
 ?expressions functions expint
@@ -3435,13 +3434,16 @@ C ... and restart the table:
 
 3 cairo (pdfcairo, pngcairo, epscairo, wxt terminals)
 ?fonts cairo
+?fontconfig
+?fonts fontconfig
 =fonts
 =pdf
 =png
 =wxt
- These terminals find and access fonts using the external fontconfig tool set.
- Please see the
-^ <a href="http://fontconfig.org/fontconfig-user.html"> fontconfig user manual.
+ Some terminals, including all the cairo-based terminals,  access fonts via the
+ fontconfig system library.  Please see the
+^ <a href="http://fontconfig.org/fontconfig-user.html">
+ fontconfig user manual.
 ^ </a>
  It is usually sufficient in gnuplot to request a font by a generic name and
  size, letting fontconfig substitute a similar font if necessary. The following
@@ -3459,15 +3461,17 @@ C ... and restart the table:
 =gif
 =sixel
  Font handling for the png, gif, jpeg, and sixelgd terminals is done by the
- library libgd.  Five basic fonts are provided directly by libgd. These are
- `tiny` (5x8 pixels), `small` (6x12 pixels), `medium`, (7x13 Bold), `large`
- (8x16) or `giant` (9x15 pixels). These fonts cannot be scaled or rotated.
+ libgd library.  At a minimum it provides five basic fonts named `tiny`,
+ `small`, `medium`, `large`, and `giant` that cannot be scaled or rotated.
  Use one of these keywords instead of the `font` keyword. E.g.
       set term png tiny
 
- On most systems libgd also provides access to Adobe Type 1 fonts (*.pfa) and
- TrueType fonts (*.ttf). You must give the name of the font file, not the name
- of the font inside it, in the form "<face> {,<pointsize>}".
+ On many systems libgd can also use generic font handling provided by the
+ fontconfig tools (see `fontconfig`).
+
+ On most systems without fontconfig, libgd provides access to Adobe fonts
+ (*.pfa *.pfb) and to TrueType fonts (*.ttf).  You must give the name of the
+ font file, not the name of the font inside it, in the form "<face> {,<size>}".
  <face> is either the full pathname to the font file, or the first part of a
  filename in one of the directories listed in the GDFONTPATH environmental
  variable. That is, 'set term png font "Face"' will look for a font file named
@@ -3483,8 +3487,7 @@ C ... and restart the table:
 
  Both TrueType and Adobe Type 1 fonts are fully scalable and rotatable.
  If no specific font is requested in the "set term" command, gnuplot checks
- the environmental variable GNUPLOT_DEFAULT_GDFONT to see if there is a
- preferred default font.
+ the environmental variable GNUPLOT_DEFAULT_GDFONT.
 3 postscript  (also encapsulated postscript *.eps)
 ?fonts postscript
 =fonts
@@ -3510,7 +3513,7 @@ C ... and restart the table:
  On the other hand
       set term postscript eps font "Garamond-Premier-Pro-Italic"
  will produce a valid PostScript output file, but since it refers to a
- specialized font, only some printers or viewers will be able to display the
+ specialized font only some printers or viewers will be able to display the
  exact font that was requested.  Most will substitute a different font.
 
  However, it is possible to embed a specific font in the output file so that
@@ -3520,49 +3523,30 @@ C ... and restart the table:
  See `postscript fontfile` for more detailed description and examples.
 2 Glossary
 ?glossary
- Throughout this document an attempt has been made to maintain consistency of
- nomenclature.  This cannot be wholly successful because as `gnuplot` has
- evolved over time, certain command and keyword names have been adopted that
- preclude such perfection.  This section contains explanations of the way
- some of these terms are used.
+=terminal
+=screen
+=record
+=block
+ As `gnuplot` has evolved over more than 30 years, the meaning of certain words
+ used in commands and in the documentation may have diverged from current common
+ usage.  This section explains how some of these terms are used in `gnuplot`.
+
+ The term "terminal" refers to an output mode, not to the thing you are typing
+ on.  For example, the command `set terminal pdf` means that subsequent plotting
+ commands will produce pdf ouput.  Usually you would want to accompany this with
+ a `set output "filename"` command to control where the pdf output is written.
 
  A "page" or "screen" or "canvas" is the entire area addressable by `gnuplot`.
  On a desktop it is a full window; on a plotter, it is a single sheet of paper.
 
- A screen may contain one or more "plots".  A plot is defined by an abscissa
- and an ordinate, although these need not actually appear on it, as well as
- the margins and any text written therein.
+ When discussing data files, the term "record" denotes a single line of text in
+ the file, that is, the characters between newline or end-of-record characters.
+ A "point" is the datum extracted from a single record.
+ A "block" of data is a set of consecutive records delimited by blank lines.
+ A line, when referred to in the context of a data file, is a subset of a block.
+ Note that the term "data block" may also be used to refer to a named block
+ of inline data (see `datablocks`).
 
- A plot contains one "graph".  A graph is defined by an abscissa and an
- ordinate, although these need not actually appear on it.
-
- A graph may contain one or more "lines".  A line is a single function or
- data set.  "Line" is also a plotting style.  The word will also be used in
- sense "a line of text".  Presumably the context will remove any ambiguity.
-
- The lines on a graph may have individual names.  These may be listed
- together with a sample of the plotting style used to represent them in
- the "key", sometimes also called the "legend".
-
- The word "title" occurs with multiple meanings in `gnuplot`.  In this
- document, it will always be preceded by the adjective "plot", "line", or
- "key" to differentiate among them.
- A 2D graph may have up to four labeled `axes`.  The names of the four axes
- are "x" for the axis along the bottom border of the plot, "y" for the axis
- along the left border, "x2" for the top border, and "y2" for the right border.
- See `axes`.
-
- A 3D graph may have up to three labeled `axes` -- "x", "y" and "z".  It is
- not possible to say where on the graph any particular axis will fall because
- you can change the direction from which the graph is seen with `set view`.
-
- When discussing data files, the term "record" will be resurrected and used
- to denote a single line of text in the file, that is, the characters between
- newline or end-of-record characters.  A "point" is the datum extracted from
- a single record.  A "block" of data is a set of consecutive records delimited
- by blank records.  A line, when referred to in the context of a data file,
- is a subset of a block.  Note that the term "data block" may also be used to
- refer to a named block inline data (see `datablocks`).
 2 inline data and datablocks
 ?inline data
 ?inline
@@ -5635,7 +5619,6 @@ Ffigure_parallel
  By default gnuplot will automatically determine the range and scale of the
  individual axes from the input data, but the usual `set axis range` commands
  can be used to customize this.  See `set paxis`.
-#TeX \newpage
 2 Polar plots
 =polar
 Ffigure_polar
@@ -5645,6 +5628,7 @@ Ffigure_polar
  Many, but not all, of the 2D plotting styles work in polar mode.
  The figure shows a combination of plot styles `lines` and `filledcurves`.
  See `set polar`, `set rrange`, `set size square`, `set theta`, `set ttics`.
+#TeX \newpage
 2 points
 ?plotting styles points
 ?style points
@@ -9846,7 +9830,7 @@ Ffigure_convex_hull
  Gnuplot assigns each element of a `plot` or `splot` command a new set of line
  properties taken from a predefined sequence.  The default is to distinguish
  successive lines by a change in color.  The alternative selected by 
- `set monochrome` uses a sequence of black lines distinguishd by linewidth or
+ `set monochrome` uses a sequence of black lines distinguished by linewidth or
  dot/dash pattern.  The `set color` command exits this alternative monochrome
  mode and restores the previous set of default color lines.
  See `set monochrome`, `set linetype`, and `set colorsequence`.
@@ -17365,7 +17349,7 @@ Ffigure_sparsematrix
  or suppressed altogether using the `nooutput` option.
 
  If the file cannot be found or cannot be read, a non-fatal warning is issued.
- This can be used to test for the existance of a file without generating a
+ This can be used to test for the existence of a file without generating a
  program error. See `stats test`.
 
  In addition to printed output, the program stores the individual statistics
