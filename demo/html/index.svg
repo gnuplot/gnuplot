@@ -70,7 +70,6 @@ on mouse-coordinate tracking.
     <li><a href="smooth_path.html">along-path splines</a></li>
     <li><a href="spline.html">explicit B-splines</a></li>
     <li><a href="airfoil.html">explicit Bezier splines</a></li>
-    <li><a href="convex_hull.html">convex hulls</a></li>
     </ul>
 
     <h4>Colors</h4>
@@ -107,11 +106,17 @@ on mouse-coordinate tracking.
     <li><a href="hidden_compare.html">hidden3d v. pm3d</a></li>
     </ul>
 
-    <h4>Volume plots (new!)</h4>
+    <h4>Volume plots</h4>
     <ul>
     <li><a href="voxel.html">voxel-dependent coloring</a></li>
     <li><a href="vplot.html">3D representation of voxels</a></li>
     <li><a href="isosurface.html">3D isosurface</a></li>
+    </ul>
+
+    <h4 align=left>Hulls and Masks (new!)</h4>
+    <ul align=left>
+    <li><a href="convex_hull.html">convex hulls</a></li>
+    <li><a href="mask_pm3d.html">masked pm3d surface</a></li>
     </ul>
 
     <h4>Coordinate and<br> axis transforms</h4>
@@ -229,7 +234,7 @@ on mouse-coordinate tracking.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated July 2021</i>
+    <i>This page generated November 2021</i>
     </td>
 
     <td>

@@ -90,6 +90,9 @@
 		  background: #AADDFF;
 		  text-align: center;
 		}
+ div.newitem	{ border-left-style: double; border-color: #006600;
+		  text-align: left; text-indent: 0px;
+		}
  div.color1	{ border: none;  background: #AADDFF; padding: 0.5em; }
  div.footer	{ border: solid; border-width: thin; 
  		  margin-top: 20px; 

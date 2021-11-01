@@ -5,17 +5,10 @@
 #    https://stackoverflow.com/questions/68507660/
 #
 
-# From the query
-# start
 set view map
 set palette rgb 33,13,10
 set xrange [-30:25]
 set yrange [-30:25]
-set xtic 5
-set ytic 5
-
-set dgrid3d 100,100 gauss 5
-# end
 
 set margins screen 0.2, screen 0.8, screen 0.1, screen 0.9
 unset key
@@ -28,12 +21,15 @@ plot  'mask_pm3d.dat' using 1:2:3 with points lc palette pt 7 ps 2, \
 set table $HULL
 plot 'mask_pm3d.dat' using 1:2 convexhull with lines title "Convex hull"
 unset table
-
 print $HULL
 
 pause -1 "<cr> to continue"
 
+#
+# Show the convex hull polygon and the full (unmasked pm3d surface)
+#
 set pm3d explicit
+set dgrid3d 100,100 gauss 5
 
 set title "pm3d surface generated from points by dgrid3d"
 splot  'mask_pm3d.dat' using 1:2:3 with pm3d, \
@@ -41,8 +37,13 @@ splot  'mask_pm3d.dat' using 1:2:3 with pm3d, \
 
 pause -1 "<cr> to continue"
 
+#
+# Now we use the convex hull polygon to mask the surface
+#
+
 set title "pm3d surface masked by convex hull"
 set pm3d interp 3,3
+
 splot  $HULL using 1:2:(0) with mask, \
        'mask_pm3d.dat' using 1:2:3 mask with pm3d
 
