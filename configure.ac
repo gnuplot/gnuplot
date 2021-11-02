@@ -1205,7 +1205,7 @@ else
 fi
 AC_MSG_RESULT([    printers: epson, nec, okidata, tandy, seiko dpu414 ])
 AC_MSG_RESULT([              hp500c, hpdj, hpljii, hppj, starc])
-AC_MSG_RESULT([    other:    block pbm sixel ])
+AC_MSG_RESULT([    other:    block pbm ])
 AC_MSG_RESULT([])
 
 if test "$with_tektronix" == no; then
@@ -1311,12 +1311,12 @@ if test "$ac_cv_lib_gd_gdImageJpeg" = yes &&
    test "$ac_cv_lib_gd_gdImagePng" = yes && 
    test "$ac_cv_lib_gd_gdImageGif" = yes; then
     if test "$ac_cv_lib_gd_gdImageGifAnimBegin" = yes; then
-      AC_MSG_RESULT([  libgd-based png, jpeg, and gif terminals: yes (with animated gif)])
+      AC_MSG_RESULT([  libgd-based png, jpeg, gif, and sixel terminals: yes (with animated gif)])
     else
-      AC_MSG_RESULT([  libgd-based png, jpeg, and gif terminals: yes (no animated gif)])
+      AC_MSG_RESULT([  libgd-based png, jpeg, gif, and sixel terminals: yes (no animated gif)])
     fi
 else
-    AC_MSG_RESULT([  libgd-based png, jpeg, and gif terminals: no (requires libgd,  see config.log) ])
+    AC_MSG_RESULT([  libgd-based png, jpeg, gif, and sixel terminals: no (requires libgd,  see config.log) ])
 fi
 
 if test "$with_cairo" = yes; then
