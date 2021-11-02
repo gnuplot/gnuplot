@@ -4055,7 +4055,7 @@ Ffigure_newsyntax
  It has no effect on non-interactive terminal output.
  For example if you issue the command
 
-      gnuplot -persist -e 'plot [-5:5] sinh(x)'
+      gnuplot -persist -e 'plot sinh(x)'
 
  gnuplot will open a display window, draw the plot into it, and then exit,
  leaving the display window containing the plot on the screen.
@@ -8693,10 +8693,10 @@ Ffigure_convex_hull
 ?splot ranges
 ?ranges
  This section describes only the optional axis ranges that may appear as the
- very first items in a `plot` command.  If present, these ranges override any
- range limits established by a previous `set range` statement.  For optional
- ranges elsewhere in a `plot` command that limit sampling of an individual
- plot component see `sampling`.
+ very first items in a `plot` or `splot` command.  If present, these ranges
+ override any range limits established by a previous `set range` statement.
+ For optional ranges elsewhere in a `plot` command that limit sampling of an
+ individual plot component, see `sampling`.
 
  Syntax:
        [{<dummy-var>=}{{<min>}:{<max>}}]
@@ -8774,7 +8774,8 @@ Ffigure_convex_hull
 
  This establishes a total range on x running from 0 to 1000 and then plots
  data from a file and two functions each spanning a portion of the total range:
-       plot [0:1000] 'datafile', [0:200] func1(x), [200:500] func2(x)
+       set xrange [0:1000]
+       plot 'datafile', [0:200] func1(x), [200:500] func2(x)
 
  This is similar except that the total range is established by the contents
  of the data file. In this case the sampled functions may or may not be
@@ -8782,8 +8783,8 @@ Ffigure_convex_hull
        set autoscale x
        plot 'datafile', [0:200] func1(x), [200:500] func2(x)
 
- This command is ambiguous. The initial range will be interpreted as applying to
- the entire plot, not solely to the sampling of the first function as was
+ This command is ambiguous. The initial range will be interpreted as applying
+ to the entire plot, not solely to the sampling of the first function as was
  probably the intent:
        plot [0:10] f(x), [10:20] g(x), [20:30] h(x)
 
@@ -8792,7 +8793,8 @@ Ffigure_convex_hull
        plot sample [0:10] f(x), [10:20] g(x), [20:30] h(x)
 
  This example shows one way of tracing out a helix in a 3D plot
-       splot [-2:2][-2:2] sample [h=1:10] '+' using (cos(h)):(sin(h)):(h)
+       set xrange [-2:2]; set yrange [-2:2]
+       splot sample [h=1:10] '+' using (cos(h)):(sin(h)):(h)
 
 4 2D sampling (u and v axes)
 ?sampling 2D
@@ -9078,7 +9080,7 @@ Ffigure_convex_hull
        plot x w points, x**2
 
  This plots tan(x) with the default function style, file "data.1" with lines:
-       plot [ ] [-2:5] tan(x), 'data.1' with l
+       plot tan(x), 'data.1' with l
 
  This plots "leastsq.dat" with impulses:
        plot 'leastsq.dat' w i
@@ -14356,9 +14358,11 @@ Ffigure_multiple_keys
 ?set samples
 ?show samples
 ?samples
- The default sampling rate of functions, or for interpolating data, may be
+ Function plots are constructed by sampling the function at a given number of x
+ values and drawing line segments to connect the values f(x0)..f(x1)..f(x2)...
+ The default sampling rate for functions, or for interpolating data, may be
  changed by the `set samples` command.  To change the sampling range for a
- particular plot, see `plot sampling`.
+ particular component of a `plot` or `splot` command, see `plot sampling`.
 
  Syntax:
        set samples <samples_1> {,<samples_2>}
@@ -14367,8 +14371,7 @@ Ffigure_multiple_keys
  By default, sampling is set to 100 points.  A higher sampling rate will
  produce more accurate plots, but will take longer.  This parameter has no
  effect on data file plotting unless one of the interpolation/approximation
- options is used.  See `plot smooth` re 2D data and `set cntrparam` and
- `set dgrid3d` re 3D data.
+ options is used.  See `plot smooth`, `set cntrparam` and `set dgrid3d`.
 
  When a 2D graph is being done, only the value of <samples_1> is relevant.
 
@@ -14376,8 +14379,8 @@ Ffigure_multiple_keys
  value of samples specifies the number of samples that are to be evaluated for
  the isolines.  Each iso-v line will have <sample_1> samples and each iso-u
  line will have <sample_2> samples.  If you only specify <samples_1>,
- <samples_2> will be set to the same value as <samples_1>.  See also
- `set isosamples`.
+ <samples_2> will be set equal to <samples_1>.
+ See also `set isosamples`.
 3 size
 ?commands set size
 ?commands show size
