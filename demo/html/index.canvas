@@ -30,6 +30,7 @@
     <li><a href="candlesticks.html">candlesticks</a></li>
     <li><a href="errorbars.html">error bars</a></li>
     <li><a href="histograms.html">histograms</a> (<a href="histograms2.html">more</a>)</li>
+    <li><a href="histerror.html">histogram + errorbars</a></li>
     <li><a href="boxclusters.html">bar graphs</a>
     <li><a href="steps.html">step functions</a></li>
     <li><a href="multiaxis.html">multiple axis scales</a></li>
@@ -97,7 +98,7 @@
     <li><a href="pm3d_lighting.html">lighting model</a></li>
     </ul>
 
-    <h4>Volumn plots (new!)</h4>
+    <h4>Volume plots (new!)</h4>
     <ul>
     <li><a href="voxel.html">voxel-dependent coloring</a></li>
     <li><a href="isosurface.html">3D isosurface</a></li>
@@ -169,6 +170,7 @@
     <li><a href="walls.html">walls</a></li>
     <li><a href="rectangle.html">rectangles</a></li>
     <li><a href="custom_key.html">customized key</a></li>
+    <li><a href="keyentry.html">extra key entries</a></li>
     </ul>
 
     <h4>Styles</h4>
@@ -242,7 +244,7 @@
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated January 2020</i>
+    <i>This page generated November 2021</i>
     </td>
 
     <td>
