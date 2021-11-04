@@ -100,7 +100,7 @@
     <li><a href="pm3d_lighting.html">lighting model</a></li>
     </ul>
 
-    <h4>Volumn plots</h4>
+    <h4>Volume plots</h4>
     <ul>
     <li><a href="voxel.html">voxel-dependent coloring</a></li>
     <li><a href="isosurface.html">3D isosurface</a></li>
