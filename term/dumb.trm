@@ -828,15 +828,19 @@ ENHdumb_FLUSH()
 {
     char *str = enhanced_text;	/* The fragment to print */
     int x = dumb_x;		/* The current position  */
-    int y = dumb_y + (int)ENHdumb_base;
+    int y = dumb_y;
     int i, len;
 
     if (ENHdumb_opened_string) {
 	*enhanced_cur_text = '\0';
 	len = gp_strlen(str);
 
-	/* print the string fragment, perhaps invisibly */
 	/* NB: base expresses offset from current y pos */
+	i = ENHdumb_base;
+	cliptorange(i, -1, 1);
+	y += i;
+
+	/* print the string fragment, perhaps invisibly */
 	if (ENHdumb_show && y < dumb_ymax) {
 	    for (i = 0; i < len && x < dumb_xmax; i++, x++) {
 		utf8_copy_one( (char *)(&DUMB_PIXEL(x, y)), gp_strchrn(str,i));
