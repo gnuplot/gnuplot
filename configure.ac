@@ -535,20 +535,30 @@ AC_ARG_WITH(gd,dnl
 if test "$with_gd" != no; then
   PKG_CHECK_MODULES_NOFAIL(libgd, [gdlib])
   AC_PATH_PROG([GDLIB_CONFIG], [gdlib-config])
+
+  # If pkg-config did return libgd configuration then
+  # libgd_{CFLAGS,LDFLAGS,LIBS} is set
+  # If gdlib-config executable is found then GDLIB_CONFIG is set
   if test $pkg_failed == no && test -n "$GDLIB_CONFIG"; then
-    libgd_CPPFLAGS=`$GDLIB_CONFIG --cflags`
+    # If pkg-config did succeed and we have gdlib-config then the later takes
+    # priority
+    libgd_CFLAGS=`$GDLIB_CONFIG --cflags`
     libgd_LDFLAGS=`$GDLIB_CONFIG --ldflags`
     libgd_LIBS=`$GDLIB_CONFIG --libs`
   elif test -d "$with_gd"; then
-    libgd_CPPFLAGS="-I$with_gd/include"
+    # pkg-config did NOT succeed, we do NOT have gdlib-config but user
+    # specified --with-gd=
+    libgd_CFLAGS="-I$with_gd/include"
     libgd_LDFLAGS="-L$with_gd/lib"
     libgd_LIBS="-ljpeg -lpng -lfreetype -lz"
   fi
 
+  # Verify that libgd works, but backup the previous compilation variables to
+  # be able to revert in the case that libgd is not functional
   _cppflags="$CPPFLAGS"
   _ldflags="$LDFLAGS"
   _libs="$LIBS"
-  CPPFLAGS="$CPPFLAGS $libgd_CPPFLAGS"
+  CPPFLAGS="$CPPFLAGS $libgd_CFLAGS"
   LDFLAGS="$LDFLAGS $libgd_LDFLAGS"
   LIBS="$LIBS $libgd_LIBS"
 
