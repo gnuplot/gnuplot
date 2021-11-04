@@ -10565,19 +10565,19 @@ Ffigure_missing
  row/col_size parameters is created for plotting and contouring.  The grid
  is equally spaced in x (rows) and in y (columns); the z values are computed
  as weighted averages or spline interpolations of the scattered points' z
- values. In other words, a regularly spaced grid is created and the a smooth
- approximation to the raw data is evaluated for all grid points. This
- approximation is plotted in place of the raw data.
+ values. In other words, a regularly spaced grid is created and then a smooth
+ approximation to the raw data is evaluated for each grid point.
+ This approximation is plotted in place of the raw data.
 
  The number of columns defaults to the number of rows, which defaults to 10.
 
  Several algorithms are available to calculate the approximation from the
  raw data. Some of these algorithms can take additional parameters.
- These interpolations are such the closer the data point is to a grid point,
- the more effect it has on that grid point.
+ These interpolations are such that the closer the data point is to a grid
+ point, the more effect it has on that grid point.
 
- The `splines` algorithm calculates an interpolation based on "thin plate
- splines". It does not take additional parameters.
+ The `splines` algorithm calculates an interpolation based on thin plate
+ splines. It does not take additional parameters.
 
  The `qnorm` algorithm calculates a weighted average of the input data at
  each grid point. Each data point is weighted by the inverse of its distance
@@ -10619,10 +10619,10 @@ Ffigure_missing
  function (one of the five defined above) is placed at each data point,
  the sum of these kernels is evaluated at every grid point, and this smooth
  surface is plotted instead of the original data. This is similar in
- principle to + what the `smooth kdensity` option does to 1D datasets.
+ principle to what the `smooth kdensity` option does to 1D datasets.
  (See kdensity2d.dem for usage demo)
 
- A slightly different syntax is also supported for reasons of backwards
+ DEPRECATED: A slightly different syntax is also supported for backwards
  compatibility. If no interpolation algorithm has been explicitly selected,
  the `qnorm` algorithm is assumed. Up to three comma-separated, optional
  parameters can be specified, which are interpreted as the the number of
@@ -10633,13 +10633,13 @@ Ffigure_missing
  to this problem exist and should be used to preprocess the data outside
  `gnuplot` if this simple solution is found inadequate.
 
- See also
+ See also the online
 ^ <a href="http://www.gnuplot.info/demo/dgrid3d.html">
- dgrid3d.dem: dgrid3d demo.
+ dgrid3d demo
 ^ </a>
  and
 ^ <a href="http://www.gnuplot.info/demo/scatter.html">
- scatter.dem: dgrid3d demo.
+ scatter demo
 ^ </a>
 
 3 dummy
