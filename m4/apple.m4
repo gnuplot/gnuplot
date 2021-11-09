@@ -33,13 +33,19 @@ AC_DEFUN([GP_APPLE],[
 AC_DEFUN([GP_HAVE_FRAMEWORK],[
   AC_MSG_CHECKING([for $1 framework presence])
   ac_gnuplot_save_LDFLAGS="$LDFLAGS"
-  LDFLAGS="$LDFLAGS -framework Foundation -framework $1"
+  LDFLAGS="$LDFLAGS -framework Foundation -framework $1 -F/Library/Frameworks"
+  ac_gnuplot_save_CFLAGS="$CFLAGS"
+  CFLAGS="$CFLAGS -F/Library/Frameworks"
+  ac_gnuplot_save_CXXFLAGS="$CXXFLAGS"
+  CXXFLAGS="$CXXFLAGS -F/Library/Frameworks"
   AC_LANG_PUSH(Objective C)
   AC_LINK_IFELSE([AC_LANG_PROGRAM([$2], [$3])],
                  eval "gnuplot_framework_$1=yes",
                  eval "gnuplot_framework_$1=no")
   AC_LANG_POP(Objective C)
   LDFLAGS="$ac_gnuplot_save_LDFLAGS"
+  CFLAGS="$ac_gnuplot_save_CFLAGS"
+  CXXFLAGS="$ac_gnuplot_save_CXXFLAGS"
   if test "$gnuplot_framework_$1" = yes; then
     AC_DEFINE(m4_toupper(HAVE_FRAMEWORK_$1),1,[Define to 1 if you're using the $1 framework on Mac OS X])
     AC_MSG_RESULT([yes])
