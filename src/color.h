@@ -218,6 +218,7 @@ typedef struct {
 /* GLOBAL VARIABLES */
 
 extern t_sm_palette sm_palette;
+extern int enable_reset_palette;
 
 
 /* ROUTINES */
@@ -231,9 +232,12 @@ void init_color(void);  /* call once to initialize variables */
   Put number of allocated colours into sm_palette.colors
 */
 int make_palette(void);
+void reset_palette(void);
 
 void invalidate_palette(void);
 void check_palette_gradient_type(void);
+
+void set_palette(void);
 
 /*
    Send current colour to the terminal

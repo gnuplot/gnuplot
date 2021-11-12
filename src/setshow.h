@@ -55,8 +55,6 @@ void delete_dashtype(struct custom_dashtype_def *, struct custom_dashtype_def *)
 /* void delete_arrowstyle(struct arrowstyle_def *, struct arrowstyle_def *); */
 void reset_key(void);
 void free_marklist(struct ticmark * list);
-extern int enable_reset_palette;
-void reset_palette(void);
 void reset_bars(void);
 void rrange_to_xy(void);
 void unset_monochrome(void);
