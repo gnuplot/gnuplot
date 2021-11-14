@@ -932,6 +932,8 @@ set origin %g,%g\n",
 	fprintf(fp," noborder");
     } else {
 	fprintf(fp," border");
+	if (pm3d.border.l_type == LT_DEFAULT)
+	    fprintf(fp," retrace");
 	save_linetype(fp, &(pm3d.border), FALSE);
     }
     fputs(" corners2color ", fp);
