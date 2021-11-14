@@ -1811,7 +1811,7 @@ SVG_layer(t_termlayer syncpoint)
 		if (SVG_hypertext_text && *SVG_hypertext_text)
 		    fprintf(gpoutfile, "><title>%s</title>\n", SVG_hypertext_text);
 		else
-		    fprintf(gpoutfile, "><title>%s_plot_%d%s</title>\n", name,SVG_plotno,panel);
+		    fprintf(gpoutfile, " fill=\"none\"><title>%s_plot_%d%s</title>\n", name,SVG_plotno,panel);
 		free(SVG_hypertext_text);
 		SVG_hypertext_text = NULL;
 		SVG_LineType = LT_UNDEFINED; /* Force a new group on next stroke */
