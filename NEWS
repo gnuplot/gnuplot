@@ -1,12 +1,18 @@
 Changes in 5.4.6
 ================
-* NEW	set key {columns <exact no of columns>}
-	set key {keywidth <exact width>}
-* NEW	XDG support
-	 startup file:      $XDG_CONFIG_HOME/gnuplot/gnuplotrc
-	 history file:      $XDG_STATE_HOME/gnuplot_history
-	 wxt configuration: $XDG_CONFIG_HOME/gnuplot/gnuplot-wxt.conf
-* FIX	windows: various problems mixing piped input and stdin Bug #2491
+* NEW    set key {columns <exact no of columns>}
+	 set key {keywidth <exact width>}
+* NEW    XDG support
+	   startup file:      $XDG_CONFIG_HOME/gnuplot/gnuplotrc
+	   history file:      $XDG_STATE_HOME/gnuplot_history
+	   wxt configuration: $XDG_CONFIG_HOME/gnuplot/gnuplot-wxt.conf
+* CHANGE remove "alldoc" build target
+* CHANGE plot with polygons fillstyle empty really does mean empty
+* FIX    windows: various problems mixing piped input and stdin        Bug #2491
+* FIX    x11: bad interactions of lt nodraw, bgnd and dash pattern     Bug #2572
+* FIX    wxt: export-to-file widget should preserve line properties
+* FIX	 svg: set initial default fill to "none"
+* FIX    variable pointtype, pointsize in plot style yerrorlines
 
 Changes in 5.4.5
 ================
