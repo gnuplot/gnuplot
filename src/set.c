@@ -4207,9 +4207,15 @@ set_pm3d()
 		}
 		/* fall through */
 	    case S_PM3D_BORDER: /* border {linespec} */
-		c_token++;
 		pm3d.border = default_pm3d_border;
+		c_token++;
+		if (equals(c_token, "retrace")) {
+		    pm3d.border.l_type = LT_DEFAULT;
+		    c_token++;
+		}
 		lp_parse(&pm3d.border, LP_ADHOC, FALSE);
+		if (pm3d.border.l_type == LT_DEFAULT)
+		    pm3d.border.pm3d_color.type = TC_DEFAULT;
 		c_token--;
 		continue;
 	    case S_PM3D_NOHIDDEN:

@@ -2597,7 +2597,8 @@ show_pm3d()
     if (pm3d.border.l_type == LT_NODRAW) {
 	fprintf(stderr,"\tpm3d quadrangles will have no border\n");
     } else {
-	fprintf(stderr,"\tpm3d quadrangle borders will default to ");
+	fprintf(stderr,"\tpm3d quadrangle borders will be %s with",
+		pm3d.border.l_type == LT_DEFAULT ? "retraced" : "drawn");
 	save_linetype(stderr, &(pm3d.border), FALSE);
 	fprintf(stderr,"\n");
     }

@@ -201,8 +201,8 @@ C
  version 5.6.  Details may change before that.
 
  For a summary of new features in version 5.5 see `new`.
- For more information about options present in this particular copy of gnuplot
- see `show version long`.
+ For more information about optional features built into the particular copy
+ of gnuplot you are running, type `show version long`.
 
 4 Special and complex-valued functions
 ?new math
@@ -288,7 +288,7 @@ C
 ## Array[i] is equal to element.  See `arrays`.
 #end
 
-4 Multiple named palettes
+4 Named palettes
 ?new colormaps
 #start
 #b The current palette can be saved to a named colormap for future use.
@@ -357,6 +357,10 @@ C
 ## are split into two pieces along the line of intersection so that tiles
 ## from one surface do not incorrectly protrude though the other surface.
 #b New options to force total key width and number of columns. See `key layout`.
+#b `set pm3d border retrace` draws a border around each pm3d quadrangle in the
+## same color as the filled area.  In principle this should have no visible
+## effect, but it prevents some display modes like glitchy pdf or postscript
+## viewers from introducing antialiasing artifacts.
 #end
 
 3 Features introduced in version 5.4
@@ -13833,7 +13837,7 @@ Ffigure_multiple_keys
                   { {no}lighting
                     {primary <fraction>} {specular <fraction>} {spec2 <fraction>}
                   }
-                  { border {<linestyle-options>}}
+                  { {no}border {retrace} {<linestyle-options>}}
                   { implicit | explicit }
                   { map }
                 }
@@ -14095,20 +14099,18 @@ Ffigure_multiple_keys
 ?pm3d hidden3d
 ?set pm3d border
 ?pm3d border
- The option `set pm3d border {line-properties}` draws bounding lines around each
- quadrangle as it is rendered. Normally this is used in conjunction with the
- `depthorder` option to approximate hidden line removal.
- Note that the global option `set hidden3d` has no effect on pm3d plots.
- Default line properties (color, width) optionally follow the keyword `border`.
- These defaults can be overridden later in an splot command.
+      set pm3d border {retrace} {line-properties}
+      set pm3d noborder
 
- Example of recommended usage:
+ This option draws bounding lines around each pm3d quadrangle as it is rendered.
+ Additional line properties (linetype, color, linewidth) are optional.
+ By default the border is drawn as a solid black line with width 1.
 
-       set pm3d at s depthorder border lw 0.2 lt black
-       unset hidden3d
-       unset surf
-       splot x*x+y*y linecolor rgb "blue"   # otherwise it would be black
-
+ `set pm3d border retrace` causes a border to be drawn in the same color as the
+ quadrangle.  In principle this should give the same result as `noborder`, but
+ some output modes can suffer from antialiasing artifacts between adjacent
+ filled quadrangles. Retracing the border hides these artifacts, at the cost of
+ a larger output file.
 4 fillcolor
 ?pm3d fillcolor
       splot FOO with pm3d fillcolor <colorspec>
