@@ -1533,6 +1533,7 @@ set_palette()
 		if (model == C_MODEL_XYZ)
 		    int_warn(c_token,"CIE/XYZ not supported");
 		sm_palette.cmodel = model;
+		sm_palette.HSV_offset = 0.0;
 		if (model == C_MODEL_HSV && equals(c_token+1,"start")) {
 		    c_token += 2;
 		    sm_palette.HSV_offset = real_expression();

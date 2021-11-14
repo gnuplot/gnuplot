@@ -229,6 +229,7 @@ gnuplot.pdf: gnuplot.tex $(srcdir)/titlepag.tex $(srcdir)/toc_entr.sty figuresty
 	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(PDFLATEX) $< ; \
 	  makeindex gnuplot ; \
 	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(PDFLATEX) $< ; \
+	  rm -f gnuplot.idx gnuplot.ilg gnuplot.ind ; \
 	else \
 	  echo pdflatex not found - cannot build pdf file ; \
 	fi

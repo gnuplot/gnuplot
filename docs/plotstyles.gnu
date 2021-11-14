@@ -940,7 +940,53 @@ splot  $HULL using 1:2:(0) with mask, \
 unset multiplot
 reset
 
+# illustrate "set palette" options
+# First set: default white->red cubehelix viridis
+#
+set output out.'figure_palette1' . ext
+set view map
+unset colorbox; unset key; unset tics; set margins 0,0,0,0
+set pm3d border retrace lw .1
+set xrange [0:1]
+set samples 129; set isosamples 2
+set title offset 0,-0.6
+
+set multiplot layout 4,1 margins 0, 1, .0, .9 spacing 0, .2
+set title "set palette rgbformulae 7,5,15  (this is the default)"
+set palette
+splot x with pm3d
+set title 'set palette defined (0 "white", 1 "dark-red")'
+set palette defined (0 "white", 1 "dark-red")
+splot x with pm3d
+set title "set palette cubehelix"
+set palette cubehelix
+splot x with pm3d
+set title "set palette viridis"
+set palette viridis
+splot x with pm3d
+unset multiplot
+
+# Second set: ocean, rainbow, AFM hot, HSV color cycle
+set output out.'figure_palette2' . ext
+
+set multiplot layout 4,1 margins 0.2, 1, .0, .9 spacing 0, .2
+set title "ocean"
+set palette rgbformulae 23,28,3
+splot x with pm3d
+set title "rainbow"
+set palette rgbformulae 33,13,10
+splot x with pm3d
+set title "AFM hot"
+set palette rgbformulae 34,35,36
+splot x with pm3d
+set title "set palette model HSV rgbformulae 3,2,2"
+set palette model HSV start 0.0 rgbformulae 3,2,2
+splot x with pm3d
+unset multiplot
+
+reset
+
 # close last file
-unset outp
+unset output
 
 reset
