@@ -25,8 +25,7 @@
 enum color_models_id {
     C_MODEL_RGB = 'r',
     C_MODEL_HSV = 'h',
-    C_MODEL_CMY = 'c',
-    C_MODEL_XYZ = 'x'
+    C_MODEL_CMY = 'c'
 };
 
 

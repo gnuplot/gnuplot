@@ -3808,8 +3808,6 @@ set_palette()
 		model = lookup_table(&color_model_tbl[0],c_token);
 		if (model == -1)
 		    int_error(c_token,"unknown color model");
-		if (model == C_MODEL_XYZ)
-		    int_warn(c_token,"CIE/XYZ not supported");
 		sm_palette.cmodel = model;
 		continue;
 	    }

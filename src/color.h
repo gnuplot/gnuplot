@@ -172,10 +172,10 @@ typedef struct {
    * Then a truncated gray value may miss the gradient it belongs in. */
   double smallest_gradient_interval;
 
-  /* the used color model: RGB, HSV, XYZ, etc. */
+  /* the used color model: RGB, HSV, CMY */
   int cmodel;
 
-  /* Three mapping function for gray->RGB/HSV/XYZ/etc. mapping
+  /* Three mapping function for gray->RGB/HSV/CMY mapping
    * used if colorMode == SMPAL_COLOR_MODE_FUNCTIONS */
   struct udft_entry Afunc;  /* R for RGB, H for HSV, C for CMY, ... */
   struct udft_entry Bfunc;  /* G for RGB, S for HSV, M for CMY, ... */

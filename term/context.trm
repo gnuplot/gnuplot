@@ -1586,16 +1586,11 @@ CONTEXT_write_palette(t_sm_palette *palette)
 		return;
 
 /* TODO
-	// Color models: RGB, HSV, CMY, XYZ
+	// Color models: RGB, HSV, CMY
 	//
 	// RGB: Red, Green, Blue
 	// HSV: Hue, Saturation, Value
-	// CMY
-	//
-	// two models that gnuplot uses, but which probably won't be supported by this terminal:
-	// XYZ: three primary colors of the color model defined by the 'Commission Internationale de l'Eclairage' (CIE)
-	// http://www.cs.rit.edu/~ncs/color/glossary.htm
-	// http://cs.fit.edu/wds/classes/cse5255/cse5255/davis/index.html
+	// CMY: Cyan, Magenta, Yellow
 */
 	fprintf(gpoutfile, "gp_make_palette(");
 	switch (sm_palette.colorMode) {
