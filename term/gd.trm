@@ -3043,7 +3043,7 @@ START_HELP(sixelgd)
 "",
 " The sixel terminal is also useful for displaying gnuplot graphics on the",
 " linux console when no windowing system or graphics display manager is active.",
-" See `linux`.",
+" See `linux console`.",
 "",
 " `transparent` instructs the driver to make the background color transparent.",
 " Default is `notransparent`.",

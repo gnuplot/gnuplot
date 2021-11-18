@@ -3663,15 +3663,15 @@ Ffigure_newsyntax
 
  In general, colors can be specified using named colors, rgb (red, green, blue)
  components, hsv (hue, saturation, value) components, or a coordinate along the
- current pm3d palette.
+ current pm3d palette.  The keyword `linecolor` may be abbreviated to `lc`.
 
  Examples:
 
-      plot sin(x) lt rgb "violet"       # one of gnuplot's named colors
-      plot sin(x) lt rgb "#FF00FF"      # explicit RGB triple in hexadecimal
-      plot sin(x) lt palette cb -45     # whatever color corresponds to -45
+      plot sin(x) lc rgb "violet"       # use one of gnuplot's named colors
+      plot sin(x) lc rgb "#FF00FF"      # explicit RGB triple in hexadecimal
+      plot sin(x) lc palette cb -45     # whatever color corresponds to -45
                                         # in the current cbrange of the palette
-      plot sin(x) lt palette frac 0.3   # fractional value along the palette
+      plot sin(x) lc palette frac 0.3   # fractional value along the palette
 
  See `colorspec`, `show colornames`, `hsv`, `set palette`, `cbrange`.
  See also `set monochrome`.
@@ -3758,7 +3758,7 @@ Ffigure_newsyntax
       # background color
       set term wxt background rgb "gray75"
       set object 1 rectangle from x0,y0 to x1,y1 fillstyle solid fillcolor bgnd
-      # This will draw an "invisible" line along the x axis
+      # Draw an "invisible" line at y=0, erasing whatever was underneath
       plot 0 lt bgnd
 4 linecolor variable
 ?linecolor variable
@@ -3893,6 +3893,30 @@ Ffigure_newsyntax
       # linewidth 3, and associated point type 6 (a circle with a dot in it).
       set style line 5 lt rgb "cyan" lw 3 pt 6
       plot sin(x) with linespoints ls 5          # user-defined line style 5
+
+3 special linetypes
+?linetypes special linetypes
+?nodraw
+=bgnd
+=background
+=black
+ A few special (non-numerical) linetypes are recognized.
+
+ `lt black` specifies a solid black line.
+
+ `lt bgnd` specifies a solid line with the background color of the current
+ terminal. See `background`.
+
+ `lt nodraw` skips drawing the line altogether.  This is useful in conjunction
+ with plot style `linespoints`.  It allows you to suppress the line component
+ of the plot while retaining point properties that are available only in this
+ plot style.  For example
+      plot f(x) with linespoints lt nodraw pointinterval -3
+ will draw only every third point and will isolate it by placing a small
+ circle of background color underneath it.  See `linespoints`.
+ `lt nodraw` may also be used to suppress a particular set of lines that would
+ otherwise be drawn automatically. For example you could suppress certain
+ contour levels in a contour plot by setting their linetype to `nodraw`.
 
 2 layers
 ?layers
@@ -5508,7 +5532,7 @@ Ffigure_lines
       1 column:   z       # implicit x from row, y from index
       3 columns:  x  y  z
 
- See also `linetype`, `linewidth`, and `linestyle`.
+ See also `linetypes`, `linewidth`, and `linestyle`.
 2 linespoints
 ?plotting styles linespoints
 ?style linespoints
@@ -5643,7 +5667,7 @@ Ffigure_polar
 Ffigure_points
  The `points` style displays a small symbol at each point. The command `set
  pointsize` may be used to change the default size of all points. The point type
- defaults to that of the linetype. See `linetype`.  If no `using` spec is found
+ defaults to that of the linetype. See `linetypes`.  If no `using` spec is found
  in the plot command, input data columns are interpreted implicitly in the order
       x y pointsize pointtype color
  Any columns beyond the first two (x and y) are optional; they correspond to
@@ -9055,7 +9079,7 @@ Ffigure_convex_hull
  coordinate provided in an optional additional `using` column.
  Color values may be treated either as a fraction of the palette range
  (`palette frac`) or as a coordinate value mapped onto the colorbox range
- (`palette` or `palette z`).  See `colorspec`, `set palette`, `linetype`.
+ (`palette` or `palette z`).  See `colorspec`, `set palette`, `linetypes`.
 
  The keyword `nohidden3d` applies only to plots made with the `splot` command.
  Normally the global option `set hidden3d` applies to all plots in the graph.
@@ -12137,7 +12161,6 @@ Ffigure_multiple_keys
 ?commands show linetype
 ?set linetype
 ?show linetype
-?linetype
  The `set linetype` command allows you to redefine the basic linetypes used
  for plots.  The command options are identical to those for "set style line".
  Unlike line styles, redefinitions by `set linetype` are persistent;  they
