@@ -1328,8 +1328,14 @@ get_pm3d_at_option(char *pm3d_where)
     return 0;
 }
 
-/* Set flag plot_has_palette to TRUE if there is any element on the graph
- * which requires palette of continuous colors.
+/* Set flag plot_has_palette to TRUE if there is any element in the
+ * plot that requires the palette.   The program will test this when
+ * deciding whether to draw the colorbox.
+ * Nov 2021
+ * We used to check also for objects or labels (but not arrows, ...)
+ * because otherwise they could not use palette coloring.
+ * Now we allow them to use palette coloring regardless, so there is
+ * no reason to set the flag just because of an object or label.
  */
 void
 set_plot_with_palette(int plot_num, int plot_mode)
@@ -1337,8 +1343,6 @@ set_plot_with_palette(int plot_num, int plot_mode)
     struct surface_points *this_3dplot = first_3dplot;
     struct curve_points *this_2dplot = first_plot;
     int surface = 0;
-    struct text_label *this_label = first_label;
-    struct object *this_object;
 
     plot_has_palette = TRUE;
 
@@ -1392,29 +1396,6 @@ set_plot_with_palette(int plot_num, int plot_mode)
 	    this_3dplot = this_3dplot->next_sp;
 	}
     }
-
-#define TC_USES_PALETTE(tctype) (tctype==TC_Z) || (tctype==TC_CB) || (tctype==TC_FRAC)
-
-    /* Any label with 'textcolor palette'? */
-    for (; this_label != NULL; this_label = this_label->next) {
-	if (TC_USES_PALETTE(this_label->textcolor.type))
-	    return;
-    }
-    /* Any of title, xlabel, ylabel, zlabel, ... with 'textcolor palette'? */
-    if (TC_USES_PALETTE(title.textcolor.type)) return;
-    if (TC_USES_PALETTE(axis_array[FIRST_X_AXIS].label.textcolor.type)) return;
-    if (TC_USES_PALETTE(axis_array[FIRST_Y_AXIS].label.textcolor.type)) return;
-    if (TC_USES_PALETTE(axis_array[SECOND_X_AXIS].label.textcolor.type)) return;
-    if (TC_USES_PALETTE(axis_array[SECOND_Y_AXIS].label.textcolor.type)) return;
-    if (plot_mode == MODE_SPLOT)
-	if (TC_USES_PALETTE(axis_array[FIRST_Z_AXIS].label.textcolor.type)) return;
-    if (TC_USES_PALETTE(axis_array[COLOR_AXIS].label.textcolor.type)) return;
-    for (this_object = first_object; this_object != NULL; this_object = this_object->next) {
-	if (TC_USES_PALETTE(this_object->lp_properties.pm3d_color.type))
-	    return;
-    }
-
-#undef TC_USES_PALETTE
 
     /* Palette with continuous colors is not used. */
     plot_has_palette = FALSE; /* otherwise it stays TRUE */
