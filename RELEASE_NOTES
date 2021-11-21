@@ -1,4 +1,4 @@
-		Gnuplot Version 5.4.2 Release Notes
+		Gnuplot Version 5.4.3 Release Notes
 		===================================
 
 This release contains bug fixes and a few new features back-ported from the
@@ -8,40 +8,33 @@ after downloading:
 
 	git clone -b branch-5-4-stable git://git.code.sf.net/p/gnuplot/gnuplot-main
 
-Known issue:
-    When run on Windows 10, gnuplot 5.4 does not work reliably with piped input
-Work-around:
-    Stick with version 5.2.8 on Windows 10.
+Release Notes date: 21-Nov-2021
 
-Release Notes date: 01-Jun-2021
-
-Changes in 5.4.2
+Changes in 5.4.3
 ================
+* NEW "set pm3d border retrace" will use quadrangle color for the border
+* NEW "nogrid" flag for plots to opt out of dgrid3d processing
+* NEW option "above|below y=<val>" for "plot with fillsteps"
+* FIX contours were incorrectly allocated space in the key even if "notitle"
+* FIX evaluation of unary minus in front of ternary operator Bug #2468
+* FIX arm and s390 require "signed char" Bugs #2467 #2450
+* FIX range errors if "smooth csplines" applied with x-axis reversed Bug #2465
+* FIX handle various corner cases found by fuzzing
+* FIX textcolor should accept "linetype N"  Bug #2459
+* FIX Windows:  handling of Window messages for piped input Bugs #2204 #2412
+* FIX aquaterm: auto-configuration use of Frameworks  Bug #2419
+* FIX qt:       pm3d quadrangle borders for transparent surfaces
+* FIX png/gif:  gdlib auto-configuration issues
+* FIX dumb:     limit enhanced text markup to single-line vertical displacement
+
+
+Features introduced in 5.4.2
+============================
 * NEW in "using" context, $# means "number of columns in current data line"
 * NEW define on program entry:   I = sqrt(-1) = {0.,1.}
 * NEW support input data that uses epidemiological date-week formats
 * NEW optional fillcolor for "set key opaque"
 * NEW provide and document use of a plugin to provide uigamma function
-* CHANGE much improved domain and precision for igamma function
-* CHANGE generate only one key entry per multi-dataset input file Bug #2380
-* CHANGE (Windows): attempt to convert unicode on command line to UTF-8
-* CHANGE clip `with image` to plot boundary in 2D plots
-* CHANGE In gprintf format "%c", add no space for a null prefix Bug #2266
-* CHANGE Make auto-placement of left border less sensitive to plot size Bug #2415
-* FIX time formats %U %W Bug #2390
-* FIX left-justification of titles in splot with user-specified key position
-* FIX clipping of filled polygons that have only 1 or 2 vertices Bug #2400
-* FIX "set tics front" unexpectedly made all grid lines invisible
-* FIX more terminals support requested linewidth for textbox borders
-* FIX indexing of multiple matrix data sets in a single input file
-* FIX do not inject extra '\n' into input stream after 'set term' Bug #2292
-* FIX cairo terminals: Do not lose font info during multi-line enhanced text
-* FIX cairo terminals (Windows): ignore "text scaling" from user screen settings
-* FIX pm: better mousing and font handling
-* FIX win: instabilities associated with changing window size Bug #2301 #2304
-* FIX wxt: use of multiple plot windows from single-threaded wxt terminal
-* FIX qt: prevent creation of zombie gnuplot_qt process Bug #2188
-
 
 Features introduced in 5.4.1
 ============================
@@ -265,7 +258,7 @@ Installation instructions are available in the source itself; the short
 version for linux/unix-like systems is to unpack the tarball and then
 <PRE>
 build it:
-      cd gnuplot-5.4.2 ; ./configure ; make
+      cd gnuplot-5.4.3 ; ./configure ; make
 test it:
       make check
 install it:

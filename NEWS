@@ -1,3 +1,20 @@
+Changes in 5.4.3
+================
+* NEW "set pm3d border retrace" will use quadrangle color for the border
+* NEW "nogrid" flag for plots to opt out of dgrid3d processing
+* NEW option "above|below y=<val>" for "plot with fillsteps"
+* FIX contours were incorrectly allocated space in the key even if "notitle"
+* FIX evaluation of unary minus in front of ternary operator Bug #2468
+* FIX arm and s390 require "signed char" Bugs #2467 #2450
+* FIX range errors if "smooth csplines" applied with x-axis reversed Bug #2465
+* FIX handle various corner cases found by fuzzing
+* FIX textcolor should accept "linetype N"  Bug #2459
+* FIX Windows:  handling of Window messages for piped input Bugs #2204 #2412
+* FIX aquaterm: auto-configuration use of Frameworks  Bug #2419
+* FIX qt:       pm3d quadrangle borders for transparent surfaces
+* FIX png/gif:  gdlib auto-configuration issues
+* FIX dumb:     limit enhanced text markup to single-line vertical displacement
+
 Changes in 5.4.2
 ================
 * NEW in "using" context, $# means "number of columns in current data line"
