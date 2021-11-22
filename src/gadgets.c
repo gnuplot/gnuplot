@@ -788,11 +788,6 @@ apply_pm3dcolor(struct t_colorspec *tc)
     if (tc->type == TC_VARIABLE)
 	return;
 
-    if (!is_plot_with_palette()) {
-	t->set_color(&black);
-	return;
-    }
-
     switch (tc->type) {
 	case TC_Z:
 		set_color(cb2gray(tc->value));
