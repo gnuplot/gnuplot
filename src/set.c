@@ -6176,9 +6176,10 @@ parse_label_options( struct text_label *this_label, int ndim)
 }
 
 
-/* <histogramstyle> = {clustered {gap <n>} | rowstacked | columnstacked */
-/*                     errorbars {gap <n>} {linewidth <lw>}}            */
-/*                    {title <title_options>}                           */
+/* <histogramstyle> = {clustered {gap <n>} | rowstacked | columnstacked
+ *                     errorbars {gap <n>} {linewidth <lw>}}
+ *                    {title <title_options>} {nokeyseparators}
+ */
 static void
 parse_histogramstyle( histogram_style *hs,
 		t_histogram_type def_type,
@@ -6189,6 +6190,7 @@ parse_histogramstyle( histogram_style *hs,
     /* Set defaults */
     hs->type  = def_type;
     hs->gap   = def_gap;
+    hs->keyentry = TRUE;
 
     if (END_OF_COMMAND)
 	return;
@@ -6230,6 +6232,9 @@ parse_histogramstyle( histogram_style *hs,
 	    hs->bar_lw = real_expression();
 	    if (hs->bar_lw <= 0)
 		hs->bar_lw = 1;
+	} else if (almost_equals(c_token,"nokey$separators")) {
+	    c_token++;
+	    hs->keyentry = FALSE;
 	} else
 	    /* We hit something unexpected */
 	    break;

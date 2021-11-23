@@ -1167,7 +1167,9 @@ find_maxl_keys(struct curve_points *plots, int count, int *kcnt)
 	/* Check for new histogram here and save space for divider */
 	if (this_plot->plot_style == HISTOGRAMS
 	&&  previous_plot_style == HISTOGRAMS
-	&&  this_plot->histogram_sequence == 0 && cnt > 1)
+	&&  this_plot->histogram_sequence == 0
+	&&  this_plot->histogram->keyentry
+	&&  cnt > 1)
 	    cnt++;
 
 	/* Check for column-stacked histogram with key entries.

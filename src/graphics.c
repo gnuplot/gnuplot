@@ -800,7 +800,9 @@ do_plot(struct curve_points *plots, int pcount)
 	/* Skip a line in the key between histogram clusters */
 	if (this_plot->plot_style == HISTOGRAMS
 	&&  previous_plot_style == HISTOGRAMS
-	&&  this_plot->histogram_sequence == 0 && !at_left_of_key()) {
+	&&  this_plot->histogram_sequence == 0
+	&&  this_plot->histogram->keyentry
+	&& !at_left_of_key()) {
 	    key_count++;
 	    advance_key(TRUE);	/* correct for inverted key */
 	    advance_key(0);
