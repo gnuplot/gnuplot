@@ -276,6 +276,7 @@ typedef struct histogram_style {
     int type;		/* enum t_histogram_type */
     int gap;		/* set style hist gap <n> (space between clusters) */
     int clustersize;	/* number of datasets in this histogram */
+    TBOOLEAN keyentry;	/* FALSE suppresses extra blank line in key */
     double start;	/* X-coord of first histogram entry */
     double end;		/* X-coord of last histogram entry */
     int startcolor;	/* LT_UNDEFINED or explicit color for first entry */
@@ -291,7 +292,7 @@ typedef enum histogram_type {
 	HT_CLUSTERED,
 	HT_ERRORBARS
 } t_histogram_type;
-#define DEFAULT_HISTOGRAM_STYLE { HT_CLUSTERED, 2, 1, 0.0, 0.0, LT_UNDEFINED, LT_UNDEFINED, 0, NULL, EMPTY_LABELSTRUCT }
+#define DEFAULT_HISTOGRAM_STYLE { HT_CLUSTERED, 2, 1, TRUE, 0.0, 0.0, LT_UNDEFINED, LT_UNDEFINED, 0, NULL, EMPTY_LABELSTRUCT }
 
 typedef enum en_boxplot_factor_labels {
 	BOXPLOT_FACTOR_LABELS_OFF,

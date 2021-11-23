@@ -4406,6 +4406,10 @@ Ffigure_histeps
  If a plot contains both histograms and other plot styles, the non-histogram
  plot elements may use either the x1 or the x2 axis.
 
+ One additional style option `set style histogram nokeyseparators`
+ is relevant only to plots that contain multiple histograms.
+ See `newhistogram` for additional discussion of this case.
+
  Examples:
 Ffigure_histclust
  Suppose that the input file contains data values in columns 2, 4, 6, ...
@@ -4501,6 +4505,12 @@ Ffigure_histcols
  Similarly you can force the next histogram to begin with a specified fillstyle.
  If the fillstyle is set to `pattern`, then the pattern used for filling will
  be incremented automatically.
+
+ Starting a new histogram will normally add a blank entry to the key, so that
+ titles from this set of histogram components will be separated from those of
+ the previous histogram.  This blank line may be undesirable if the components
+ have no individual titles.  It can be suppressed by modifying the style with
+ `set style histogram nokeyseparators`.
 
 Ffigure_newhist
  The `at <x-coord>` option sets the x coordinate position of the following

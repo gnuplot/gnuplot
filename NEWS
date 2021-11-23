@@ -3,6 +3,7 @@ Changes in 5.4.3
 * NEW "set pm3d border retrace" will use quadrangle color for the border
 * NEW "nogrid" flag for plots to opt out of dgrid3d processing
 * NEW option "above|below y=<val>" for "plot with fillsteps"
+* NEW "set style histogram nokeyseparators" suppress blank key entries Bug #2473
 * FIX contours were incorrectly allocated space in the key even if "notitle"
 * FIX evaluation of unary minus in front of ternary operator Bug #2468
 * FIX arm and s390 require "signed char" Bugs #2467 #2450

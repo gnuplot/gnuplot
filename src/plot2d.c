@@ -2050,7 +2050,7 @@ eval_plots()
 		fs.border_color = default_fillstyle.border_color;
 		parse_fillstyle(&fs);
 
-		} while (c_token != previous_token);
+	    } while (c_token != previous_token);
 
 	    newhist_pattern = fs.fillpattern;
 	    if (!equals(c_token,","))
