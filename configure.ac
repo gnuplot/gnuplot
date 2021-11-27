@@ -744,6 +744,14 @@ if test "$with_cwdrc" = yes; then
                [ Define if you want to read .gnuplot from current directory (SECURITY RISK!).])
 fi
 
+dnl without-extra-coordinate may leave a hole in "struct coordinate"
+AC_ARG_WITH(extra-coordinate,dnl
+[  --without-extra-coordinate    leave possible hole in struct coordinate],,)
+if test "$with_extra_coordinate" != no; then
+     AC_DEFINE(WITH_EXTRA_COORDINATE,1,
+               [ Define to make use of otherwise empty space in struct coordinate ])
+fi
+
 dnl Sort help/subtopic tables by row or column
 AC_ARG_WITH(row-help,dnl
 [  --with-row-help         format help and subtopic tables by row (default)

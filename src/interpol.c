@@ -533,8 +533,9 @@ cp_approx_spline(
      * of x,y,z,... is needed by specifying an index 0-6
      */
     struct gen_coord {
-	enum coord_type type;
 	coordval dimension[7];
+	enum coord_type type;
+	EXTRA_COORDINATE
     };
     struct gen_coord *this_point;
 
@@ -675,8 +676,9 @@ cp_tridiag(
      * of x,y,z,... is needed by specifying an index 0-6
      */
     struct gen_coord {
-	enum coord_type type;
 	coordval dimension[7];
+	enum coord_type type;
+	EXTRA_COORDINATE
     };
     struct gen_coord *this_point;
 

@@ -448,7 +448,7 @@ int df_max_num_bin_records = 0, df_num_bin_records, df_bin_record_count;
 int df_max_num_bin_records_default = 0, df_num_bin_records_default;
 
 /* Used to mark the location of a blank line in the original data input file */
-struct coordinate blank_data_line = {UNDEFINED, -999, -999, -999, -999, -999, -999, -999};
+const struct coordinate blank_data_line = {-999, -999, -999, -999, -999, -999, -999, UNDEFINED};
 
 static void gpbin_filetype_function(void);
 static void raw_filetype_function(void);
@@ -5853,8 +5853,8 @@ axcol_for_ticlabel(enum COLUMN_TYPE type, int *axis)
 void
 populate_sparse_matrix(struct coordinate **points, int *p_count)
 {
+    static const struct coordinate empty = {0, 0, 0, NAN, NAN, NAN, NAN, UNDEFINED};
     struct coordinate *matrix;
-    struct coordinate empty = {UNDEFINED, 0, 0, 0, NAN, NAN, NAN, NAN};
     int i,j,m;
     int msize = df_ypixels * df_xpixels;
     int noutside = 0;

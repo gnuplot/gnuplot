@@ -1106,9 +1106,23 @@ show_version(FILE *fp)
     /* show version long */
     if (almost_equals(c_token, "l$ong")) {
 
+	/* We will use this to test for packing holes in struct coordinate */
+	struct gen_coord { coordval dummy[7]; enum coord_type type; };
+
 	c_token++;
 	fprintf(stderr, "\nCompile options:\n%s", compile_options);
 	fprintf(stderr, "    %d-bit integer arithmetic\n",(int)sizeof(intgr_t)*8);
+
+#ifdef WITH_EXTRA_COORDINATE
+	fprintf(stderr, "    sizeof(struct coordinate) = %d with extra coordinate\n",
+		(int)(sizeof(struct coordinate)));
+	if (sizeof(struct coordinate) > sizeof(struct gen_coord))
+	    fprintf(stderr, "\tThis is a waste of space. "\
+	    "You should reconfigure using --without-extra-coordinate\n");
+#else
+	fprintf(stderr, "    sizeof(struct coordinate) = %d without extra coordinate\n",
+		(int)(sizeof(struct coordinate)));
+#endif
 
 #ifdef X11
 	{

@@ -205,12 +205,23 @@ typedef enum coord_type {
 #define CRD_PATH xhigh     /* Used by 3D spline code to hold path coordinate */
 #define PATHCOORD 6        /*    must match sequence order of field CRD_PATH */
 
+/*
+ * If the C compiler pads struct coordinate to an 8-byte boundary
+ * (true for all the compilers I have tested) then there is a hole
+ * that we might as well use to hold an extra coordinate property.
+ */
+#ifdef WITH_EXTRA_COORDINATE
+  #define EXTRA_COORDINATE int extra;
+#else
+  #define EXTRA_COORDINATE
+#endif
 
 typedef struct coordinate {
-    enum coord_type type;	/* see above */
     coordval x, y, z;
     coordval ylow, yhigh;	/* ignored in 3d */
     coordval xlow, xhigh;	/* also ignored in 3d */
+    enum coord_type type;	/* INRANGE/OUTRANGE/UNDEFINED */
+    EXTRA_COORDINATE		/* otherwise unused space in structure */
 } coordinate;
 
 typedef enum lp_class {
