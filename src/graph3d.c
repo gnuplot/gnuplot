@@ -2689,7 +2689,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		    ang = atan2(angy1-angy0, angx1-angx0) / DEG2RAD;
 		    if (ang < -90) ang += 180;
 		    if (ang > 90) ang -= 180;
-		    X_AXIS.label.rotate = (ang > 0) ? floor(ang + 0.5) : floor(ang - 0.5);
+		    X_AXIS.label.rotate = ang;
 		}
 
 		if (X_AXIS.ticmode & TICS_ON_AXIS) {
@@ -2770,7 +2770,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		(surface_rot_x > 90 && FRONTGRID != whichgrid) ||
 		splot_map) {
 		int x1, y1;
-		int save_rotate = Y_AXIS.label.rotate;
+		float save_rotate = Y_AXIS.label.rotate;
 
 		if (splot_map) { /* case 'set view map' */
 		    /* copied from ytick_callback(): baseline of tics labels */
@@ -2803,7 +2803,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 			ang = atan2(angy1-angy0, angx1-angx0) / DEG2RAD;
 			if (ang < -90) ang += 180;
 			if (ang > 90) ang -= 180;
-			Y_AXIS.label.rotate = (ang > 0) ? floor(ang + 0.5) : floor(ang - 0.5);
+			Y_AXIS.label.rotate = ang;
 		    } else if (!yz_projection) {
 			/* The 2D default state (ylabel rotate) is not wanted in 3D */
 			Y_AXIS.label.rotate = 0;
@@ -2948,7 +2948,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	    ang = atan2(angy1-angy0, angx1-angx0) / DEG2RAD;
 	    if (ang < -90) ang += 180;
 	    if (ang > 90) ang -= 180;
-	    Z_AXIS.label.rotate = (ang > 0) ? floor(ang + 0.5) : floor(ang - 0.5);
+	    Z_AXIS.label.rotate = ang;
 	}
 
 	write_label(x, y, &Z_AXIS.label);
@@ -3032,7 +3032,7 @@ xtick_callback(
     if (text) {
 	int just;
 	int x2, y2;
-	int angle;
+	float angle;
 	int offsetx, offsety;
 
 	/* Skip label if we've already written a user-specified one here */
@@ -3167,7 +3167,7 @@ ytick_callback(
     if (text) {
 	int just;
 	int x2, y2;
-	int angle;
+	float angle;
 	int offsetx, offsety;
 
 	/* Skip label if we've already written a user-specified one here */

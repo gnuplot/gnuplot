@@ -47,7 +47,7 @@ struct TERMENTRY {
 
 /* optional entries */
 
-    int (*text_angle)(int);
+    int (*text_angle)(float);		/* Changed from (int) to (double) in 2021 (v5.5) */
     int (*justify_text)(enum JUSTIFY);
     void (*point)(unsigned int, unsigned int,int);
     void (*arrow)(unsigned int, unsigned int, unsigned int, unsigned int, int);
@@ -245,6 +245,7 @@ _text_angle(ang)  Called to rotate the text angle when placing the y label.
 Ang is the rotation angle in degrees. If ang = 0 then text is horizontal.  
 Returns TRUE if text can be rotated, FALSE otherwise.
 [But you must return TRUE if called with ang=0]
+Mar 2021 (development version 5.5):  ang is now (float) rather than (int).
 
 _justify_text(mode)  Called to justify text left, right or centre.
 If mode = LEFT then text placed by _put_text is flushed left against (x,y).

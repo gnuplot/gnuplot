@@ -2612,7 +2612,7 @@ void wxt_linewidth(double lw)
 	wxt_command_push(temp_command);
 }
 
-int wxt_text_angle(int angle)
+int wxt_text_angle(float angle)
 {
 	if (wxt_status != STATUS_OK)
 		return 1;

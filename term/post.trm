@@ -105,7 +105,7 @@ TERM_PUBLIC void PS_dashtype(int type, t_dashtype *custom_dash_type);
 TERM_PUBLIC void PS_move(unsigned int x, unsigned int y);
 TERM_PUBLIC void PS_vector(unsigned int x, unsigned int y);
 TERM_PUBLIC void PS_put_text(unsigned int x, unsigned int y, const char *str);
-TERM_PUBLIC int PS_text_angle(int ang);
+TERM_PUBLIC int PS_text_angle(float ang);
 TERM_PUBLIC int PS_justify_text(enum JUSTIFY mode);
 TERM_PUBLIC void PS_point(unsigned int x, unsigned int y, int number);
 TERM_PUBLIC int PS_set_font(const char * font);
@@ -283,7 +283,7 @@ static int  ENHPS_initialized;
 
 static int ps_page = 0;		/* page count */
 static int ps_path_count = 0; 	/* count of lines in path */
-static int ps_ang = 0;			/* text angle */
+static float ps_ang = 0;	/* text angle */
 static enum JUSTIFY ps_justify = LEFT;	/* text is flush left */
 
 static void delete_ps_fontfile(struct ps_fontfile_def *, struct ps_fontfile_def *);
@@ -2225,7 +2225,7 @@ PS_put_text(unsigned int x, unsigned int y, const char *str)
 	return;
 
     if (PS_in_textbox > 0) {
-	int save_ang = ps_ang;
+	float save_ang = ps_ang;
 	PS_in_textbox = -1;
 	/* Write once with no rotation and no actual "show" command */
 	ps_ang = 0;
@@ -2241,7 +2241,7 @@ PS_put_text(unsigned int x, unsigned int y, const char *str)
 	PS_move(x,y);
 
     if (ps_ang != 0)
-	fprintf(gppsfile,"currentpoint gsave translate %d rotate 0 0 M\n", ps_ang);
+	fprintf(gppsfile,"currentpoint gsave translate %g rotate 0 0 M\n", ps_ang);
     else if (PS_in_textbox > 0)
 	fprintf(gppsfile,"gsave currentpoint translate\n");
 
@@ -2369,7 +2369,7 @@ PS_put_text(unsigned int x, unsigned int y, const char *str)
 
 
 TERM_PUBLIC int
-PS_text_angle(int ang)
+PS_text_angle(float ang)
 {
     ps_ang = ang;
     return TRUE;
@@ -2769,7 +2769,7 @@ ENHPS_put_text(unsigned int x, unsigned int y, const char *str)
     PS_FLUSH_PATH;
 
     if (PS_in_textbox > 0) {
-	int save_ang = ps_ang;
+	float save_ang = ps_ang;
 	PS_in_textbox = -1;
 	/* Write once with no rotation and no actual "show" command */
 	ps_ang = 0;
@@ -2799,7 +2799,7 @@ ENHPS_put_text(unsigned int x, unsigned int y, const char *str)
 	PS_move(x,y);
 
     if (ps_ang != 0)
-	fprintf(gppsfile,"currentpoint gsave translate %d rotate 0 0 moveto\n", ps_ang);
+	fprintf(gppsfile,"currentpoint gsave translate %g rotate 0 0 moveto\n", ps_ang);
     else if (PS_in_textbox > 0)
 	fprintf(gppsfile,"gsave currentpoint translate\n");
 

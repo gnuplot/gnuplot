@@ -104,7 +104,7 @@ TERM_PUBLIC void MIF_linetype(int linetype);
 TERM_PUBLIC void MIF_move(unsigned int x, unsigned int y);
 TERM_PUBLIC void MIF_vector(unsigned int x, unsigned int y);
 TERM_PUBLIC void MIF_put_text(unsigned int x, unsigned int y, const char *str);
-TERM_PUBLIC int MIF_text_angle(int ang);
+TERM_PUBLIC int MIF_text_angle(float ang);
 TERM_PUBLIC void MIF_reset(void);
 TERM_PUBLIC void MIF_options(void);
 TERM_PUBLIC int MIF_justify_text(enum JUSTIFY mode);
@@ -719,7 +719,7 @@ MIF_linetype(int linetype)
 
 /* Allow arbitrary text rotation */
 TERM_PUBLIC int
-MIF_text_angle(int ang)
+MIF_text_angle(float ang)
 {
     mif_text_ang = ang;
     return (TRUE);

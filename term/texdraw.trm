@@ -79,7 +79,7 @@ TERM_PUBLIC void TEXDRAW_arrow(unsigned int sx, unsigned int sy,
 				int head);
 TERM_PUBLIC void TEXDRAW_put_text(unsigned int x, unsigned int y, const char str[]);
 TERM_PUBLIC int TEXDRAW_justify_text(enum JUSTIFY mode);
-TERM_PUBLIC int TEXDRAW_text_angle(int ang);
+TERM_PUBLIC int TEXDRAW_text_angle(float ang);
 TERM_PUBLIC void TEXDRAW_set_color(t_colorspec *colorspec);
 TERM_PUBLIC int TEXDRAW_make_palette(t_sm_palette *);
 TERM_PUBLIC void TEXDRAW_set_color(t_colorspec *);
@@ -727,8 +727,9 @@ TEXDRAW_justify_text(enum JUSTIFY mode)
 
 
 TERM_PUBLIC int
-TEXDRAW_text_angle(int ang)
+TEXDRAW_text_angle(float dang)
 {
+    int ang = dang;
     while (ang < 0) ang += 360;
     ang %= 360;
     TEXDRAW_angle = ang;

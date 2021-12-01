@@ -222,7 +222,7 @@ static void do_pointsize(double size);
 static void do_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int headstyle);
 static void null_dashtype(int type, t_dashtype *custom_dash_pattern);
 
-static int null_text_angle(int ang);
+static int null_text_angle(float ang);
 static int null_justify_text(enum JUSTIFY just);
 static int null_scale(double x, double y);
 static void null_layer(t_termlayer layer);
@@ -770,7 +770,7 @@ write_multiline(
     char *text,
     JUSTIFY hor,                /* horizontal ... */
     VERT_JUSTIFY vert,          /* ... and vertical just - text in hor direction despite angle */
-    int angle,                  /* assume term has already been set for this */
+    float angle,               /* assume term has already been set for this */
     const char *font)           /* NULL or "" means use default */
 {
     struct termentry *t = term;
@@ -1226,7 +1226,7 @@ do_arc(
    * 1 is vertical bottom to top (90 deg rotate)
  */
 static int
-null_text_angle(int ang)
+null_text_angle(float ang)
 {
     return (ang == 0);
 }

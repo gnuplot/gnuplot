@@ -92,7 +92,7 @@ TERM_PUBLIC void CGM_linecolor(int color);
 TERM_PUBLIC void CGM_dashtype(int dashtype);
 TERM_PUBLIC void CGM_linewidth(double width);
 TERM_PUBLIC void CGM_put_text(unsigned int x, unsigned int y, const char *str);
-TERM_PUBLIC int CGM_text_angle(int ang);
+TERM_PUBLIC int CGM_text_angle(float ang);
 TERM_PUBLIC int CGM_justify_text(enum JUSTIFY mode);
 TERM_PUBLIC int CGM_set_font(const char *font);
 TERM_PUBLIC void CGM_point(unsigned int x, unsigned int y, int number);
@@ -1466,7 +1466,7 @@ CGM_put_text(unsigned int x, unsigned int y, const char str[])
 }
 
 TERM_PUBLIC int
-CGM_text_angle(int ang)
+CGM_text_angle(float ang)
 {
     if (cgm_rotate) {
 	cgm_next.angle = ang * M_PI_2 / 90.;

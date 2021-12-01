@@ -99,7 +99,7 @@ TERM_PUBLIC void LATEX_point(unsigned int x, unsigned int y, int number);
 TERM_PUBLIC void LATEX_vector(unsigned int ux, unsigned int uy);
 TERM_PUBLIC void LATEX_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head);
 TERM_PUBLIC int LATEX_justify_text(enum JUSTIFY mode);
-TERM_PUBLIC int LATEX_text_angle(int ang);
+TERM_PUBLIC int LATEX_text_angle(float ang);
 TERM_PUBLIC void LATEX_reset(void);
 TERM_PUBLIC void LATEX_fillbox(int style, unsigned int x1, unsigned int y1,
 				unsigned int width, unsigned int height);
@@ -971,7 +971,7 @@ LATEX_justify_text(enum JUSTIFY mode)
 }
 
 TERM_PUBLIC int
-LATEX_text_angle(int ang)
+LATEX_text_angle(float ang)
 {
     /* Without the rotate option, we can't write text vertically,
        but we will put the ylabel centred at the left of the plot,

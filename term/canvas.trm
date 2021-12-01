@@ -69,7 +69,7 @@ TERM_PUBLIC void CANVAS_vector(unsigned int x, unsigned int y);
 TERM_PUBLIC void CANVAS_point(unsigned int x, unsigned int y, int number);
 TERM_PUBLIC void CANVAS_pointsize(double size);
 TERM_PUBLIC void CANVAS_put_text(unsigned int x, unsigned int y, const char *str);
-TERM_PUBLIC int CANVAS_text_angle(int ang);
+TERM_PUBLIC int CANVAS_text_angle(float ang);
 TERM_PUBLIC void CANVAS_filled_polygon(int, gpiPoint *);
 TERM_PUBLIC void CANVAS_set_color(t_colorspec *colorspec);
 TERM_PUBLIC int CANVAS_make_palette(t_sm_palette *palette);
@@ -1079,7 +1079,7 @@ CANVAS_pointsize(double ptsize)
 
 
 TERM_PUBLIC int
-CANVAS_text_angle(int ang)
+CANVAS_text_angle(float ang)
 {
     canvas_text_angle = -1 * ang;
     return TRUE;

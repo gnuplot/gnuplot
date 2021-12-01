@@ -107,7 +107,7 @@ boundary(struct curve_points *plots, int count)
     legend_key *key = &keyT;
 
     struct termentry *t = term;
-    int can_rotate = (*t->text_angle) (TEXT_VERTICAL);
+    TBOOLEAN can_rotate = (*t->text_angle) (TEXT_VERTICAL);
 
     int xtic_textheight=0;	/* height of xtic labels */
     int x2tic_textheight=0;	/* height of x2tic labels */

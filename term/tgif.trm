@@ -88,7 +88,7 @@ TERM_PUBLIC void TGIF_move(unsigned int ux, unsigned int uy);
 TERM_PUBLIC void TGIF_vector(unsigned int ux, unsigned int uy);
 TERM_PUBLIC void TGIF_linetype(int linetype);
 TERM_PUBLIC void TGIF_put_text(unsigned int ux, unsigned int uy, const char *str);	/* ref point and text */
-TERM_PUBLIC int TGIF_text_angle(int ang);
+TERM_PUBLIC int TGIF_text_angle(float ang);
 TERM_PUBLIC int TGIF_justify_text(enum JUSTIFY mode);
 TERM_PUBLIC void TGIF_point(unsigned int ux, unsigned int uy, int number);
 TERM_PUBLIC int TGIF_set_font(const char *font);
@@ -664,8 +664,9 @@ text('%s',%u,%u,'%s',0,%u,1,%u,%u,1,55,119,%u,0,15,4,0,0,0,0,[\n\t\"%s\"]).\n",
 /*}}}  */
 /***************************************************************************/
 TERM_PUBLIC int
-TGIF_text_angle(int ang)
+TGIF_text_angle(float dang)
 {
+    int ang = dang;
     switch (ang) {
 	case -270:
 	case   90:	uActAngle = 3; break;

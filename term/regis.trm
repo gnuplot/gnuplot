@@ -62,7 +62,7 @@ TERM_PUBLIC void REGIS_linetype(int linetype);
 TERM_PUBLIC void REGIS_move(unsigned int x, unsigned int y);
 TERM_PUBLIC void REGIS_vector(unsigned int x, unsigned int y);
 TERM_PUBLIC void REGIS_put_text(unsigned int x, unsigned int y, const char *str);
-TERM_PUBLIC int REGIS_text_angle(int ang);
+TERM_PUBLIC int REGIS_text_angle(float ang);
 TERM_PUBLIC void REGIS_reset(void);
 TERM_PUBLIC void REGIS_options(void);
 
@@ -205,7 +205,7 @@ REGIS_put_text(unsigned int x, unsigned int y, const char *str)
 
 
 TERM_PUBLIC int
-REGIS_text_angle(int ang)
+REGIS_text_angle(float ang)
 {
     REGISang = (ang ? 1 : 0);
     if (REGISang == 1)

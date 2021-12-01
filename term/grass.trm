@@ -70,7 +70,7 @@ TERM_PUBLIC void GRASS_text(void);
 TERM_PUBLIC void GRASS_vector(unsigned int x, unsigned int y);
 TERM_PUBLIC void GRASS_linetype(int lt);
 TERM_PUBLIC void GRASS_put_text(unsigned int x, unsigned int y, const char *str);
-TERM_PUBLIC int GRASS_text_angle(int ang);
+TERM_PUBLIC int GRASS_text_angle(float ang);
 TERM_PUBLIC int GRASS_justify_text(enum JUSTIFY mode);
 TERM_PUBLIC void GRASS_point(unsigned int x, unsigned int y, int point);
 TERM_PUBLIC int GRASS_set_font(const char *font);
@@ -342,7 +342,7 @@ GRASS_put_text(unsigned int x, unsigned int y, const char *str)
 }
 
 TERM_PUBLIC int
-GRASS_text_angle (int ang)
+GRASS_text_angle (float ang)
 {
   extern int R_text_rotation();
 

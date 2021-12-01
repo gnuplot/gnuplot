@@ -1801,7 +1801,7 @@ show_label(int tag)
 		}
 	    }
 	    if (this_label->rotate)
-	    	fprintf(stderr, " rotated by %d degrees (if possible)", this_label->rotate);
+	    	fprintf(stderr, " rotated by %g degrees (if possible)", this_label->rotate);
 	    else
 	    	fprintf(stderr, " not rotated");
 	    fprintf(stderr, " %s ", this_label->layer ? "front" : "back");
@@ -3113,7 +3113,7 @@ show_xyzlabel(const char *name, const char *suffix, text_label *label)
     if (label->tag == ROTATE_IN_3D_LABEL_TAG)
 	fprintf(stderr, ", parallel to axis in 3D plots");
     else if (label->rotate)
-	fprintf(stderr, ", rotated by %d degrees in 2D plots", label->rotate);
+	fprintf(stderr, ", rotated by %g degrees in 2D plots", label->rotate);
 
     if (label->textcolor.type)
 	save_textcolor(stderr, &label->textcolor);
@@ -3564,7 +3564,7 @@ show_ticdefp(struct axis *this_axis)
 	fprintf(stderr,"  noenhanced");
     if (this_axis->tic_rotate) {
 	fprintf(stderr," rotated");
-	fprintf(stderr," by %d",this_axis->tic_rotate);
+	fprintf(stderr," by %g",this_axis->tic_rotate);
 	fputs(" in 2D mode, terminal permitting,\n\t", stderr);
     } else
 	fputs(" and are not rotated,\n\t", stderr);

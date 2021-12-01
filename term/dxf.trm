@@ -63,7 +63,7 @@ TERM_PUBLIC void DXF_linetype(int linetype);
 TERM_PUBLIC void DXF_move(unsigned int x, unsigned int y);
 TERM_PUBLIC void DXF_vector(unsigned int ux, unsigned int uy);
 TERM_PUBLIC void DXF_put_text(unsigned int x, unsigned int y, const char str[]);
-TERM_PUBLIC int DXF_text_angle(int ang);
+TERM_PUBLIC int DXF_text_angle(float ang);
 TERM_PUBLIC int DXF_justify_text(enum JUSTIFY mode);
 TERM_PUBLIC void DXF_reset(void);
 
@@ -361,7 +361,7 @@ DXF_put_text(unsigned int x, unsigned int y, const char str[])
 }
 
 TERM_PUBLIC int
-DXF_text_angle(int ang)
+DXF_text_angle(float ang)
 {
     dxf_angle = (ang ? 90.0 : 0.0);
     return (TRUE);

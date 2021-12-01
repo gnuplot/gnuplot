@@ -114,8 +114,8 @@ TERM_PUBLIC void HPGL_vector(unsigned int x, unsigned int y);
 TERM_PUBLIC void HPGL2_move(unsigned int x, unsigned int y);
 TERM_PUBLIC void HPGL2_vector(unsigned int x, unsigned int y);
 TERM_PUBLIC void HPGL2_encode(int d);
-TERM_PUBLIC int HPGL_text_angle(int ang);
-TERM_PUBLIC int HPGL2_text_angle(int ang);
+TERM_PUBLIC int HPGL_text_angle(float ang);
+TERM_PUBLIC int HPGL2_text_angle(float ang);
 TERM_PUBLIC void HPGL_reset(void);
 /* TERM_PUBLIC void HPGL2_reset(void); */
 TERM_PUBLIC void PCL_reset(void);
@@ -1527,8 +1527,10 @@ HPGL2_end_poly()
 }
 
 TERM_PUBLIC int
-HPGL_text_angle(int ang)
+HPGL_text_angle(float dang)
 {
+    int ang = dang;
+
     if (ang == -90 || ang == 270)
 	HPGL_ang = -1;
     else
@@ -1544,8 +1546,9 @@ HPGL_text_angle(int ang)
 }
 
 TERM_PUBLIC int
-HPGL2_text_angle(int ang)
+HPGL2_text_angle(float dang)
 {
+    int ang = dang;
     HPGL2_end_poly();
 
     while (ang < 0) {

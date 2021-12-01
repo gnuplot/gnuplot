@@ -127,7 +127,7 @@ TERM_PUBLIC void PNG_vector(unsigned int x, unsigned int y);
 TERM_PUBLIC void PNG_put_text(unsigned int x, unsigned int y, const char str[]);
 TERM_PUBLIC int PNG_justify_text(enum JUSTIFY mode);
 TERM_PUBLIC void PNG_point(unsigned int x, unsigned int y, int number);
-TERM_PUBLIC int PNG_text_angle(int ang);
+TERM_PUBLIC int PNG_text_angle(float ang);
 TERM_PUBLIC void PNG_reset(void);
 TERM_PUBLIC int PNG_set_font(const char *fontname);
 TERM_PUBLIC void PNG_pointsize(double ptsize);
@@ -222,7 +222,7 @@ static struct {
     int n_colors;
     int color_table[PNG_MAX_COLORS];
     int rgb_table[PNG_MAX_COLORS];
-    int angle;
+    float angle;
     enum JUSTIFY justify;
     int flags;
     int linetype;
@@ -1753,14 +1753,14 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
 	/* then draw it again, centered.                             */
 	err = gdImageStringFT(NULL, brect, png_state.color,
 			png_state.ttffont, png_state.ttfsize*png_state.fontscale,
-			(double)png_state.angle * M_PI_2 / 90. ,
+			png_state.angle * M_PI_2 / 90. ,
 			x, Y(y), (char *)string);
 	if (err) {
 	    fprintf(stderr,"gdImageStringFT: %s while printing string %s with font %s\n",
 		err,string,png_state.ttffont);
 	} else {
-	    x += sin((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/4.;
-	    y -= cos((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/4.;
+	    x += sin(png_state.angle * M_PI_2/90.) * (float)png_state.charh/4.;
+	    y -= cos(png_state.angle * M_PI_2/90.) * (float)png_state.charh/4.;
 	    switch (png_state.justify) {
 		case RIGHT:
 				x -= (brect[2]-brect[0]);
@@ -1775,7 +1775,7 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
 	    }
 	    err = gdImageStringFT(png_state.image, brect, png_state.color,
 			png_state.ttffont, png_state.ttfsize*png_state.fontscale,
-			(double)png_state.angle * M_PI_2 / 90.,
+			png_state.angle * M_PI_2 / 90.,
 			x, Y(y), (char *)string);
 	    if (err)
 		fprintf(stderr,"gdImageStringFT: %s while printing string %s with font %s\n",
@@ -1845,7 +1845,7 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
 
 
 TERM_PUBLIC int
-PNG_text_angle(int ang)
+PNG_text_angle(float ang)
 {
     while (ang < -180) ang += 360;	/* Should not be needed, but reported to */
     while (ang > 180) ang -= 360;	/* avoid a bug in some libgd versions    */
@@ -2095,10 +2095,10 @@ ENHGD_FLUSH()
 
     x = png_state.x;
     y = png_state.y;
-    x -= sin((double)png_state.angle * M_PI_2/90.) * ENHgd_base;
-    y += cos((double)png_state.angle * M_PI_2/90.) * ENHgd_base;
-    x += sin((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/4.;
-    y -= cos((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/4.;
+    x -= sin(png_state.angle * M_PI_2/90.) * ENHgd_base;
+    y += cos(png_state.angle * M_PI_2/90.) * ENHgd_base;
+    x += sin(png_state.angle * M_PI_2/90.) * (float)png_state.charh/4.;
+    y -= cos(png_state.angle * M_PI_2/90.) * (float)png_state.charh/4.;
 
     /* First try the old GDFONTPATH mechanism for locating fonts */
     (void)gdUseFontConfig(0);
@@ -2116,14 +2116,14 @@ ENHGD_FLUSH()
 		(ENHgd_show && !ENHgd_sizeonly) ? png_state.image : NULL,
 		brect, png_state.color,
 		ENHgd_font, ENHgd_fontsize,
-		(double)png_state.angle * M_PI_2/90.,
+		png_state.angle * M_PI_2/90.,
 		x, Y(y), fragment, &PNG_FONT_INFO);
     if (err && gdUseFontConfig(1)) {
 	err = gdImageStringFTEx(
 		(ENHgd_show && !ENHgd_sizeonly) ? png_state.image : NULL,
 		brect, png_state.color,
 		ENHgd_font, ENHgd_fontsize,
-		(double)png_state.angle * M_PI_2/90.,
+		png_state.angle * M_PI_2/90.,
 		x, Y(y), fragment, &PNG_FONT_INFO);
     }
 #else
@@ -2131,14 +2131,14 @@ ENHGD_FLUSH()
 		(ENHgd_show && !ENHgd_sizeonly) ? png_state.image : NULL,
 		brect, png_state.color,
 		ENHgd_font, ENHgd_fontsize,
-		(double)png_state.angle * M_PI_2/90.,
+		png_state.angle * M_PI_2/90.,
 		x, Y(y), fragment);
     if (err && gdUseFontConfig(1)) {
 	err = gdImageStringFT(
 		(ENHgd_show && !ENHgd_sizeonly) ? png_state.image : NULL,
 		brect, png_state.color,
 		ENHgd_font, ENHgd_fontsize,
-		(double)png_state.angle * M_PI_2/90.,
+		png_state.angle * M_PI_2/90.,
 		x, Y(y), fragment);
     }
 #endif

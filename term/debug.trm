@@ -67,7 +67,7 @@ TERM_PUBLIC void DEBUG_vector(unsigned int x, unsigned int y);
 TERM_PUBLIC void DEBUG_put_text(unsigned int x, unsigned int y, const char *str);
 TERM_PUBLIC void DEBUG_reset(void);
 TERM_PUBLIC int DEBUG_justify_text(enum JUSTIFY mode);
-TERM_PUBLIC int DEBUG_text_angle(int ang);
+TERM_PUBLIC int DEBUG_text_angle(float ang);
 TERM_PUBLIC void DEBUG_point(unsigned int x, unsigned int y, int pointstyle);
 TERM_PUBLIC void DEBUG_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head);
 TERM_PUBLIC int DEBUG_set_font(const char *font);
@@ -212,9 +212,9 @@ DEBUG_justify_text(enum JUSTIFY mode)
 }
 
 TERM_PUBLIC int
-DEBUG_text_angle(int ang)
+DEBUG_text_angle(float ang)
 {
-    fprintf(gpoutfile, "text_angle %d:", ang);
+    fprintf(gpoutfile, "text_angle %.1f:", ang);
     switch (ang) {
     case 0:
 	fputs(": horizontal\n", gpoutfile);

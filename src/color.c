@@ -809,7 +809,7 @@ draw_color_smooth_box(int plot_mode)
     if (CB_AXIS.label.text) {
 	int x, y;
 	int len;
-	int save_rotation = CB_AXIS.label.rotate;
+	float save_rotation = CB_AXIS.label.rotate;
 	apply_pm3dcolor(&(CB_AXIS.label.textcolor));
 	if (color_box.rotation == 'h') {
 	    len = CB_AXIS.ticscale * (CB_AXIS.tic_in ? 1 : -1) * (term->v_tic);

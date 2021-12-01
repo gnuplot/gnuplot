@@ -225,9 +225,9 @@ typedef struct axis {
 
 /* ticmark control variables */
     int ticmode;		/* tics on border/axis? mirrored? */
-    struct ticdef ticdef;	/* tic series definition */
-    int tic_rotate;		/* ticmarks rotated by this angle */
     enum JUSTIFY tic_pos;	/* left/center/right tic label justification */
+    struct ticdef ticdef;	/* tic series definition */
+    float tic_rotate;		/* ticmarks rotated by this angle */
     TBOOLEAN gridmajor;		/* Grid lines wanted on major tics? */
     TBOOLEAN gridminor;		/* Grid lines for minor tics? */
     t_minitics_status minitics;	/* minor tic mode (none/auto/user/time) */
@@ -274,8 +274,9 @@ typedef struct axis {
 	NULL, NULL,		/* linked_to_primary, linked_to_secondary */\
 	NULL,      		/* link function */                         \
 	NO_TICS,		/* tic output positions (border, mirror) */ \
+	CENTRE,		 	/* horizontal justification */		    \
 	DEFAULT_AXIS_TICDEF,	/* tic series definition */		    \
-	0, CENTRE,	 	/* tic_rotate, horizontal justification */  \
+	0.0,			/* tic_rotate */			    \
 	FALSE, FALSE,	 	/* grid{major,minor} */			    \
 	MINI_DEFAULT, 1, 10,	/* minitics, units, mtic_freq */	    \
 	1.0, 0.5, 0.0, TRUE,	/* ticscale, miniticscale, ticstep, tic_in */ \

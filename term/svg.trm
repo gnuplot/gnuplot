@@ -89,7 +89,7 @@ TERM_PUBLIC void SVG_vector(unsigned int x, unsigned int y);
 TERM_PUBLIC void SVG_put_text(unsigned int x, unsigned int y, const char *str);
 TERM_PUBLIC void SVG_reset(void);
 TERM_PUBLIC int SVG_justify_text(enum JUSTIFY mode);
-TERM_PUBLIC int SVG_text_angle(int ang);
+TERM_PUBLIC int SVG_text_angle(float ang);
 TERM_PUBLIC void SVG_point(unsigned int x, unsigned int y, int pointstyle);
 TERM_PUBLIC int SVG_set_font(const char *font);
 /* TERM_PUBLIC void SVG_pointsize(double pointsize); */
@@ -163,7 +163,7 @@ static double SVG_LineWidth = 1.0; /* current line width*/
 static double SVG_linewidth_factor = 1.0; /* Multiplier for linewidths */
 static double SVG_dashlength = 1.0; /* Multiplier for dash patterns */
 static t_linecap SVG_linecap = BUTT; /* linejoin and linecap */
-static int SVG_TextAngle = 0;	/* current text orientation*/
+static float SVG_TextAngle = 0;	/* current text orientation*/
 static enum JUSTIFY SVG_TextJust = LEFT; /* current text justification*/
 
 /* default text font family: */
@@ -1510,7 +1510,7 @@ SVG_justify_text (enum JUSTIFY mode)
 	SVG_text_angle
 ------------------------------------------------------------------------------------------------------------------------------------*/
 TERM_PUBLIC int
-SVG_text_angle (int ang)
+SVG_text_angle (float ang)
 {
     /* Can only do pure horizontal or vertical */
     SVG_TextAngle = ang;
@@ -1553,7 +1553,7 @@ SVG_put_text (unsigned int x, unsigned int y, const char *str)
 
     fprintf (gpoutfile, "\t<g transform=\"translate(%.*f,%.*f)", PREC, X(h), PREC, Y(v));
     if (SVG_TextAngle)
-	fprintf (gpoutfile, " rotate(%i)", -SVG_TextAngle);
+	fprintf (gpoutfile, " rotate(%.2f)", -SVG_TextAngle);
     fprintf (gpoutfile, "\" stroke=\"none\" fill=\"");
 
     if (SVG_color_mode == TC_RGB)

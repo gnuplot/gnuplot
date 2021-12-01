@@ -895,7 +895,7 @@ void qt_linewidth(double lw)
 	qt->out << GELineWidth << lw * qt_optionLineWidth;
 }
 
-int qt_text_angle(int angle)
+int qt_text_angle(float angle)
 {
 	qt->out << GETextAngle << double(angle);
 	return 1; // 1 means we can rotate

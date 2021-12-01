@@ -63,7 +63,7 @@ TERM_PUBLIC void VWS_move(unsigned int x, unsigned int y);
 TERM_PUBLIC void VWS_vector(unsigned int x, unsigned int y);
 TERM_PUBLIC void VWS_linetype(int lt);
 TERM_PUBLIC void VWS_put_text(unsigned int x, unsigned int y, const char *str);
-TERM_PUBLIC int VWS_text_angle(int ang);
+TERM_PUBLIC int VWS_text_angle(float ang);
 TERM_PUBLIC int VWS_justify_text(enum JUSTIFY mode);
 TERM_PUBLIC void VWS_point(unsigned int x, unsigned int y, int point);
 TERM_PUBLIC void VWS_arrow(unsigned int sx, unsigned int sy,
@@ -420,7 +420,7 @@ VWS_put_text(unsigned int x, unsigned int y, const char *str)
 }
 /****************************************************************************/
 TERM_PUBLIC int
-VWS_text_angle(int ang)
+VWS_text_angle(float ang)
 {
     float degrees;
     int text_attr = TEXT_ATTR;

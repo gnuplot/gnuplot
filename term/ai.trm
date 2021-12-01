@@ -72,7 +72,7 @@ TERM_PUBLIC void AI_linetype(int linetype);
 TERM_PUBLIC void AI_move(unsigned int x, unsigned int y);
 TERM_PUBLIC void AI_vector(unsigned int x, unsigned int y);
 TERM_PUBLIC void AI_put_text(unsigned int x, unsigned int y, const char *str);
-TERM_PUBLIC int AI_text_angle(int ang);
+TERM_PUBLIC int AI_text_angle(float ang);
 TERM_PUBLIC void AI_reset(void);
 TERM_PUBLIC void AI_options(void);
 TERM_PUBLIC int AI_justify_text(enum JUSTIFY mode);
@@ -453,7 +453,7 @@ AI_put_text(unsigned int x, unsigned int y, const char *str)
 }
 
 TERM_PUBLIC int
-AI_text_angle(int ang)
+AI_text_angle(float ang)
 {
     ai_ang = ang;
     return TRUE;

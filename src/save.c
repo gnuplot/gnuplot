@@ -262,7 +262,7 @@ save_axis_label_or_title(FILE *fp, char *name, char *suffix,
     else if (label->rotate == TEXT_VERTICAL)
 	fprintf(fp, " rotate");
     else if (label->rotate)
-	fprintf(fp, " rotate by %d", label->rotate);
+	fprintf(fp, " rotate by %g", label->rotate);
     else
 	fprintf(fp, " norotate");
 
@@ -489,7 +489,7 @@ save_set_all(FILE *fp)
 
 	save_justification(this_label->pos, fp);
 	if (this_label->rotate)
-	    fprintf(fp, " rotate by %d", this_label->rotate);
+	    fprintf(fp, " rotate by %g", this_label->rotate);
 	else
 	    fprintf(fp, " norotate");
 	if (this_label->font != NULL)
@@ -1087,7 +1087,7 @@ save_tics(FILE *fp, struct axis *this_axis)
 	    (this_axis->ticmode & TICS_MIRROR) ? "" : "no",
 	    this_axis->tic_rotate ? "rotate" : "norotate");
     if (this_axis->tic_rotate)
-	fprintf(fp,"by %d ",this_axis->tic_rotate);
+	fprintf(fp,"by %g ",this_axis->tic_rotate);
     save_position(fp, &this_axis->ticdef.offset, 3, TRUE);
     if (this_axis->manual_justify)
 	save_justification(this_axis->tic_pos, fp);

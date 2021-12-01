@@ -143,7 +143,7 @@ TERM_PUBLIC void EMF_linecolor(int color);
 TERM_PUBLIC void EMF_load_dashtype(int dashtype);
 TERM_PUBLIC void EMF_linewidth(double width);
 TERM_PUBLIC void EMF_put_text(unsigned int x, unsigned int y, const char *str);
-TERM_PUBLIC int EMF_text_angle(int ang);
+TERM_PUBLIC int EMF_text_angle(float ang);
 TERM_PUBLIC int EMF_justify_text(enum JUSTIFY mode);
 TERM_PUBLIC void EMF_point(unsigned int x, unsigned int y, int number);
 TERM_PUBLIC void EMF_set_pointsize(double size);
@@ -1446,26 +1446,22 @@ EMF_put_text(unsigned int x, unsigned int y, const char str[])
 }
 
 TERM_PUBLIC int
-EMF_text_angle(int ang)
+EMF_text_angle(float ang)
 {
     /* Win GDI rotation is scaled in tenth of degrees, so... */
-    switch (ang) {
-    case 0:			/* left right */
+    if (ang == 0.0) {		/* horizontal */
 	if (emf_vert_text != 0) {
 	    emf_vert_text = 0;
 	    EMF_setfont();
 	}
-	break;
-    case TEXT_VERTICAL:		/* bottom up */
+    } else if (ang == TEXT_VERTICAL) { /* bottom up */
 	if (emf_vert_text != 900) {
 	    emf_vert_text = 900;
 	    EMF_setfont();
 	}
-	break;
-    default:			/* the general case */
+    } else {			/* the general case */
     	emf_vert_text = 10 * ang;
 	EMF_setfont();
-	break;
     }
     return TRUE;
 }

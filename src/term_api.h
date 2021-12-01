@@ -75,7 +75,7 @@
  * text corresponding to old keyword "rotate", which produced the equivalent
  * of "rotate by 90 right-justified".
  */
-#define TEXT_VERTICAL (-270)
+#define TEXT_VERTICAL (-270.)
 
 
 /* Type definitions */
@@ -303,7 +303,7 @@ typedef struct TERMENTRY {
     void (*linetype)(int);
     void (*put_text)(unsigned int, unsigned int, const char*);
     /* the following are optional. set term ensures they are not NULL */
-    int (*text_angle)(int);
+    int (*text_angle)(float);	/* Changed from int to double in version 5.5 */
     int (*justify_text)(enum JUSTIFY);
     void (*point)(unsigned int, unsigned int, int);
     void (*arrow)(unsigned int, unsigned int, unsigned int, unsigned int, int headstyle);
@@ -473,7 +473,7 @@ void term_check_multiplot_okay(TBOOLEAN);
 void init_monochrome(void);
 struct termentry *change_term(const char *name, int length);
 
-void write_multiline(int, int, char *, JUSTIFY, VERT_JUSTIFY, int, const char *);
+void write_multiline(int, int, char *, JUSTIFY, VERT_JUSTIFY, float, const char *);
 int estimate_strlen(const char *length, double *estimated_fontheight);
 char *estimate_plaintext(char *);
 void list_terms(void);

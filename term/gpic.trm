@@ -70,7 +70,7 @@ TERM_PUBLIC void GPIC_arrow(unsigned int sx, unsigned int sy,
 			     int head);
 TERM_PUBLIC void GPIC_put_text(unsigned int x, unsigned int y, const char str[]);
 TERM_PUBLIC int GPIC_justify_text(enum JUSTIFY mode);
-TERM_PUBLIC int GPIC_text_angle(int ang);
+TERM_PUBLIC int GPIC_text_angle(float ang);
 TERM_PUBLIC void GPIC_reset(void);
 #define GPIC_DOTS_PER_INCH (300)
 
@@ -258,7 +258,7 @@ GPIC_justify_text(enum JUSTIFY mode)
 }
 
 TERM_PUBLIC int
-GPIC_text_angle(int ang)
+GPIC_text_angle(float ang)
 {
     (void) ang;
     GPIC_close_line();

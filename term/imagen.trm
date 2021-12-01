@@ -72,7 +72,7 @@ TERM_PUBLIC void IMAGEN_text(void);
 TERM_PUBLIC void IMAGEN_linetype(int lt);
 TERM_PUBLIC void IMAGEN_move(unsigned int x, unsigned int y);
 TERM_PUBLIC void IMAGEN_vector(unsigned int ux, unsigned int uy);
-TERM_PUBLIC int IMAGEN_text_angle(int ang);
+TERM_PUBLIC int IMAGEN_text_angle(float ang);
 TERM_PUBLIC int IMAGEN_justify_text(enum JUSTIFY mode);
 TERM_PUBLIC void IMAGEN_put_text(unsigned int x, unsigned int y, const char str[]);
 TERM_PUBLIC void IMAGEN_reset(void);
@@ -448,8 +448,10 @@ IMAGEN_setpos(int ux, int uy)
 }
 
 TERM_PUBLIC int
-IMAGEN_text_angle(int ang)
+IMAGEN_text_angle(float dang)
 {
+    int ang = dang;
+
     if (IM_vecpos) {
 	/* fprintf(stderr,"text_angle, draw path\n"); */
 	IMAGEN_draw_path();

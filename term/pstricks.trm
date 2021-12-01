@@ -100,7 +100,7 @@ TERM_PUBLIC void PSTRICKS_arrow(unsigned int sx, unsigned int sy, unsigned int e
 TERM_PUBLIC void PSTRICKS_pointsize(double pointsize);
 TERM_PUBLIC void PSTRICKS_put_text(unsigned int x, unsigned int y, const char str[]);
 TERM_PUBLIC int PSTRICKS_justify_text(enum JUSTIFY mode);
-TERM_PUBLIC int PSTRICKS_text_angle(int ang);
+TERM_PUBLIC int PSTRICKS_text_angle(float ang);
 TERM_PUBLIC void PSTRICKS_reset(void);
 TERM_PUBLIC void PSTRICKS_linewidth(double linewidth);
 TERM_PUBLIC int PSTRICKS_make_palette(t_sm_palette *);
@@ -909,7 +909,7 @@ PSTRICKS_justify_text(enum JUSTIFY mode)
 
 
 TERM_PUBLIC int
-PSTRICKS_text_angle(int ang)
+PSTRICKS_text_angle(float ang)
 {
     PSTRICKS_angle = ang;
     while (PSTRICKS_angle < 0)

@@ -47,7 +47,7 @@ TERM_PUBLIC void PDF_vector(unsigned int x, unsigned int y);
 TERM_PUBLIC void PDF_put_text(unsigned int x, unsigned int y, const char *str);
 TERM_PUBLIC void PDF_reset(void);
 TERM_PUBLIC int PDF_justify_text(enum JUSTIFY mode);
-TERM_PUBLIC int PDF_text_angle(int ang);
+TERM_PUBLIC int PDF_text_angle(float ang);
 TERM_PUBLIC void PDF_point(unsigned int x, unsigned int y, int pointstyle);
 TERM_PUBLIC int PDF_set_font(const char *font);
 TERM_PUBLIC void PDF_boxfill(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height);
@@ -1184,7 +1184,7 @@ PDF_justify_text (enum JUSTIFY mode)
 
 
 TERM_PUBLIC int
-PDF_text_angle (int ang)
+PDF_text_angle (float ang)
 {
     PDF_TextAngle = ang;
     return (TRUE);

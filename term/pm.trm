@@ -64,7 +64,7 @@ TERM_PUBLIC void PM_move(unsigned int x, unsigned int y);
 TERM_PUBLIC void PM_vector(unsigned int x, unsigned int y);
 TERM_PUBLIC void PM_linetype(int lt);
 TERM_PUBLIC void PM_dashtype(int dt, t_dashtype *custom_dash_pattern);
-TERM_PUBLIC int PM_text_angle(int ang);
+TERM_PUBLIC int PM_text_angle(float ang);
 TERM_PUBLIC void PM_put_text(unsigned int x, unsigned int y, const char *str);
 TERM_PUBLIC int PM_justify_text(enum JUSTIFY mode);
 TERM_PUBLIC int PM_set_font(const char *font);
@@ -859,8 +859,10 @@ PM_dashtype(int dt, t_dashtype *custom_dash_pattern)
 
 
 TERM_PUBLIC int
-PM_text_angle(int ang)
+PM_text_angle(float dang)
 {
+    int ang = dang;
+
     PM_send_msg(SET_ANGLE);
     PM_send_int(ang);
 #ifndef PM_OLD_ENHANCED_TEXT

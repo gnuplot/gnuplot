@@ -61,7 +61,7 @@ TERM_PUBLIC void cairotrm_reset(void);
 TERM_PUBLIC int cairotrm_justify_text(enum JUSTIFY mode);
 TERM_PUBLIC void cairotrm_point(unsigned int x, unsigned int y, int pointstyle);
 TERM_PUBLIC void cairotrm_linewidth(double linewidth);
-TERM_PUBLIC int cairotrm_text_angle(int ang);
+TERM_PUBLIC int cairotrm_text_angle(float ang);
 TERM_PUBLIC void cairotrm_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height);
 TERM_PUBLIC int cairotrm_set_font(const char *font);
 TERM_PUBLIC void cairotrm_pointsize(double ptsize);
@@ -1262,10 +1262,10 @@ void cairotrm_linewidth(double lw)
 	gp_cairo_set_linewidth(&plot, lw);
 }
 
-int cairotrm_text_angle(int angle)
+int cairotrm_text_angle(float angle)
 {
 	/* a double is needed to compute cos, sin, etc. */
-	gp_cairo_set_textangle(&plot, (double) angle);
+	gp_cairo_set_textangle(&plot, angle);
 
 	return 1; /* 1 means we can rotate */
 }

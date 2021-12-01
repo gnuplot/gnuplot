@@ -80,7 +80,7 @@ TERM_PUBLIC void X11_pointsize(double ps);
 TERM_PUBLIC void X11_linetype(int lt);
 TERM_PUBLIC void X11_dashtype(int type, t_dashtype *custom_dash_type);
 TERM_PUBLIC void X11_put_text(unsigned int x, unsigned int y, const char str[]);
-TERM_PUBLIC int X11_text_angle(int i);
+TERM_PUBLIC int X11_text_angle(float i);
 TERM_PUBLIC int X11_justify_text(enum JUSTIFY mode);
 TERM_PUBLIC void X11_point(unsigned int x, unsigned int y, int number);
 TERM_PUBLIC void X11_fillbox(int style, unsigned int x, unsigned int y, unsigned int width, unsigned int height);
@@ -1642,9 +1642,9 @@ X11_put_text(unsigned int x, unsigned int y, const char str[])
 }
 
 TERM_PUBLIC int
-X11_text_angle(int ang)
+X11_text_angle(float ang)
 {
-    PRINT1("A%d\n", ang);
+    PRINT1("A%.2f\n", ang);
     return TRUE;
 }
 

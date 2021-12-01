@@ -119,7 +119,7 @@ TERM_PUBLIC void CONTEXT_vector(unsigned int x, unsigned int y);
 TERM_PUBLIC void CONTEXT_linetype(int lt);
 TERM_PUBLIC void CONTEXT_put_text(unsigned int x, unsigned int y, const char *str);
 
-TERM_PUBLIC  int CONTEXT_text_angle(int ang);
+TERM_PUBLIC  int CONTEXT_text_angle(float ang);
 TERM_PUBLIC  int CONTEXT_justify_text(enum JUSTIFY mode);
 TERM_PUBLIC void CONTEXT_point(unsigned int x, unsigned int y, int number);
 TERM_PUBLIC void CONTEXT_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head);
@@ -1222,7 +1222,7 @@ CONTEXT_put_text(unsigned int x, unsigned int y, const char str[])
  * Saves text angle to be used for text labels.
  */
 TERM_PUBLIC int
-CONTEXT_text_angle(int ang)
+CONTEXT_text_angle(float ang)
 {
 	CONTEXT_ang = ang;
 	return TRUE;

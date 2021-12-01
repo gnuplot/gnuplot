@@ -118,7 +118,8 @@ TERM_PUBLIC char *epslatex_header = NULL;
 #include "post.h"
 
 struct pstex_text_command {
-    int x, y, angle, justify;
+    int x, y, justify;
+    float angle;
     char *label;
     struct pstex_text_command *next;
 };
@@ -375,7 +376,7 @@ PSTEX_text()
         if ((ps_params->rotate) && (tc->angle != 0))
             fprintf(gpoutfile, "\
 %%\n  \\special{ps: gsave currentpoint currentpoint translate\n\
-%d rotate neg exch neg exch translate}%%\n  ", 360 - tc->angle);
+%.2f rotate neg exch neg exch translate}%%\n  ", 360 - tc->angle);
         if ((ps_params->terminal == PSTERM_PSLATEX) &&
             ((tc->label[0] == '{') || (tc->label[0] == '['))) {
             fprintf(gpoutfile, "\\makebox(0,0)%s", tc->label);
@@ -754,7 +755,7 @@ EPSLATEX_put_text(unsigned int x, unsigned int y, const char *str)
 	} else {
 	    fprintf(gpoutfile, "      \\put(%d,%d){", x, y);
 	    if (ps_ang)
-		fprintf(gpoutfile,"\\rotatebox{%d}{", ps_ang);
+		fprintf(gpoutfile,"\\rotatebox{%.2f}{", ps_ang);
 	    if (((str[0] == '{') || (str[0] == '['))) {
 		fprintf(gpoutfile, "\\makebox(0,0)%s", str);
 	    } else {

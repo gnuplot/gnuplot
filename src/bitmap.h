@@ -93,7 +93,7 @@ void b_linewidth(double linewidth);
 void b_move(unsigned int, unsigned int);
 void b_vector(unsigned int, unsigned int);
 void b_put_text(unsigned int, unsigned int, const char *);
-int b_text_angle(int);
+int b_text_angle(float);
 int b_justify_text(enum JUSTIFY mode);
 void b_boxfill(int, unsigned int, unsigned int, unsigned int, unsigned int);
 void b_filled_polygon(int points, gpiPoint *corners);

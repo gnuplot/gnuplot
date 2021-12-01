@@ -62,7 +62,7 @@ TERM_PUBLIC void CACA_put_text(unsigned int x, unsigned int y,	const char *str);
 TERM_PUBLIC void CACA_arrow(unsigned int sx, unsigned int sy,
 				     unsigned int ex, unsigned int ey,
 				     int head);
-TERM_PUBLIC int  CACA_text_angle(int ang);
+TERM_PUBLIC int  CACA_text_angle(float ang);
 TERM_PUBLIC void CACA_fillbox(int style, unsigned int x, unsigned int y, unsigned int w, unsigned int h);
 #ifdef USE_MOUSE
 TERM_PUBLIC int  CACA_waitforinput(int);
@@ -1724,7 +1724,7 @@ CACA_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, i
 
 
 TERM_PUBLIC int
-CACA_text_angle(int ang)
+CACA_text_angle(float ang)
 {
 	CACA_ang = ang;
 	while (CACA_ang < 0)

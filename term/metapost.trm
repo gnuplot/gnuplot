@@ -74,7 +74,7 @@ TERM_PUBLIC void MP_arrow(unsigned int sx, unsigned int sy,
 			   int head);
 TERM_PUBLIC void MP_put_text(unsigned int x, unsigned int y, const char str[]);
 TERM_PUBLIC int MP_justify_text(enum JUSTIFY mode);
-TERM_PUBLIC int MP_text_angle(int ang);
+TERM_PUBLIC int MP_text_angle(float ang);
 TERM_PUBLIC void MP_reset(void);
 TERM_PUBLIC int MP_set_font(const char *font);
 TERM_PUBLIC void MP_boxfill(int style, unsigned int x1,
@@ -791,7 +791,7 @@ MP_justify_text(enum JUSTIFY mode)
 }
 
 TERM_PUBLIC int
-MP_text_angle(int ang)
+MP_text_angle(float ang)
 {
     /* Metapost code does the conversion */
     MP_ang = ang;

@@ -93,7 +93,7 @@ TERM_PUBLIC void MF_init(void);
 TERM_PUBLIC void MF_graphics(void);
 TERM_PUBLIC void MF_text(void);
 TERM_PUBLIC int MF_justify_text(enum JUSTIFY mode);
-TERM_PUBLIC int MF_text_angle(int ang);
+TERM_PUBLIC int MF_text_angle(float ang);
 TERM_PUBLIC void MF_linetype(int linetype);
 TERM_PUBLIC void MF_move(unsigned int x, unsigned int y);
 TERM_PUBLIC void MF_vector(unsigned int x, unsigned int y);
@@ -356,7 +356,7 @@ MF_justify_text(enum JUSTIFY mode)
 
 
 TERM_PUBLIC int
-MF_text_angle(int ang)
+MF_text_angle(float ang)
 {
     if (ang > 0)
 	MF_ang = 90;

@@ -41,7 +41,7 @@
 /* functions provided by term.c */
 
 static void do_point(unsigned int x, unsigned int y, int number);
-static int null_text_angle(int ang);
+static int null_text_angle(float ang);
 static int null_justify_text(enum JUSTIFY just);
 static int null_scale(double x, double y);
 static void options_null(void);

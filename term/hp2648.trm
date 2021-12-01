@@ -63,7 +63,7 @@ TERM_PUBLIC void HP2648linetype(int linetype);
 TERM_PUBLIC void HP2648move(unsigned int x, unsigned int y);
 TERM_PUBLIC void HP2648vector(unsigned int x, unsigned int y);
 TERM_PUBLIC void HP2648put_text(unsigned int x, unsigned int y, const char *str);
-TERM_PUBLIC int HP2648_text_angle(int ang);
+TERM_PUBLIC int HP2648_text_angle(float ang);
 TERM_PUBLIC void HP2648reset(void);
 
 #define HP2648XMAX 720
@@ -152,7 +152,7 @@ HP2648put_text(unsigned int x, unsigned int y, const char *str)
 
 
 TERM_PUBLIC int
-HP2648_text_angle(int ang)
+HP2648_text_angle(float ang)
 {
 int hp_ang = (ang ? 1 : 0);
 

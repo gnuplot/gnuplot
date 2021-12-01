@@ -55,7 +55,7 @@ TERM_PUBLIC void LUA_vector(unsigned int ux, unsigned int uy);
 TERM_PUBLIC void LUA_linetype(int linetype);
 TERM_PUBLIC void LUA_dashtype(int type, t_dashtype *custom_dash_type);
 TERM_PUBLIC void LUA_put_text(unsigned int x, unsigned int y, const char str[]);
-TERM_PUBLIC int  LUA_text_angle(int ang);
+TERM_PUBLIC int  LUA_text_angle(float ang);
 TERM_PUBLIC int  LUA_justify_text(enum JUSTIFY mode);
 TERM_PUBLIC void LUA_point(unsigned int x, unsigned int y, int number);
 TERM_PUBLIC void LUA_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head);
@@ -1084,10 +1084,10 @@ LUA_justify_text(enum JUSTIFY mode)
 }
 
 TERM_PUBLIC int
-LUA_text_angle(int ang)
+LUA_text_angle(float ang)
 {
   if(LUA_init_luaterm_function("text_angle")) {
-    lua_pushinteger(L, ang);
+    lua_pushnumber(L, ang);
     LUA_call_report(lua_pcall(L, 1, 1, tb));
     lua_term_result = (int)lua_tonumber(L, -1);
     lua_pop(L, 1);

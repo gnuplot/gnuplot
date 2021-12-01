@@ -92,7 +92,7 @@ TERM_PUBLIC void EEPIC_arrow(unsigned int sx, unsigned int sy,
 			      int head);
 TERM_PUBLIC void EEPIC_put_text(unsigned int x, unsigned int y, const char str[]);
 TERM_PUBLIC int EEPIC_justify_text(enum JUSTIFY mode);
-TERM_PUBLIC int EEPIC_text_angle(int ang);
+TERM_PUBLIC int EEPIC_text_angle(float ang);
 TERM_PUBLIC void EEPIC_reset(void);
 TERM_PUBLIC void EEPIC_options(void);
 
@@ -433,7 +433,7 @@ EEPIC_justify_text(enum JUSTIFY mode)
 }
 
 TERM_PUBLIC int
-EEPIC_text_angle(int ang)
+EEPIC_text_angle(float ang)
 {
     eepic_angle = (ang ? 1 : 0);
     return (TRUE);

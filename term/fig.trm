@@ -118,7 +118,7 @@ TERM_PUBLIC void FIG_vector(unsigned int ux, unsigned int uy);
 TERM_PUBLIC void FIG_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head);
 TERM_PUBLIC void FIG_put_text(unsigned int x, unsigned int y, const char *str);
 TERM_PUBLIC int FIG_justify_text(enum JUSTIFY mode);
-TERM_PUBLIC int FIG_text_angle(int ang);
+TERM_PUBLIC int FIG_text_angle(float ang);
 TERM_PUBLIC void FIG_pointsize(double arg_pointsize);
 TERM_PUBLIC void FIG_linewidth(double linewidth);
 TERM_PUBLIC void FIG_reset(void);
@@ -884,7 +884,7 @@ FIG_justify_text(enum JUSTIFY mode)
 }
 
 TERM_PUBLIC int
-FIG_text_angle(int ang)
+FIG_text_angle(float ang)
 {
     FIG_angle = ang * M_PI_2 / 90. ;
     return (TRUE);

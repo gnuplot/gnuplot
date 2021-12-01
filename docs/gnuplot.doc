@@ -368,6 +368,7 @@ C
 ## viewers from introducing antialiasing artifacts.
 #b `set isotropic` adjusts the axis scaling in both 2D and 3D plots such that
 ## the x, y, and z axes all have the same scale.
+#b Change: Text rotation angle is not limited to integral degrees.
 #end
 
 3 Features introduced in version 5.4

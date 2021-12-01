@@ -93,7 +93,7 @@ TERM_PUBLIC void TPIC_move(unsigned int x, unsigned int y);
 TERM_PUBLIC void TPIC_vector(unsigned int ux, unsigned int uy);
 TERM_PUBLIC void TPIC_linetype(int linetype);
 TERM_PUBLIC void TPIC_put_text(unsigned int x, unsigned int y, const char *str);	/* ref point and text */
-TERM_PUBLIC int TPIC_text_angle(int ang);
+TERM_PUBLIC int TPIC_text_angle(float ang);
 TERM_PUBLIC int TPIC_justify_text(enum JUSTIFY mode);
 TERM_PUBLIC void TPIC_point(unsigned int x, unsigned int y, int number);
 TERM_PUBLIC void TPIC_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head);
@@ -544,7 +544,7 @@ TPIC_put_text(unsigned int x, unsigned int y, const char *str)
 }
 
 TERM_PUBLIC int
-TPIC_text_angle(int ang)
+TPIC_text_angle(float ang)
 {
     tpic_angle = (ang ? 1 : 0);
     return (TRUE);

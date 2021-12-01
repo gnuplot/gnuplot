@@ -75,7 +75,7 @@ typedef struct text_label {
     int tag;			/* identifies the label */
     t_position place;
     enum JUSTIFY pos;		/* left/center/right horizontal justification */
-    int rotate;
+    float rotate;
     int layer;
     int boxed;			/* 0 no box;  -1 default box props;  >0 boxstyle */
     char *text;

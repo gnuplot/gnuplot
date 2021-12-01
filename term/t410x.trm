@@ -77,7 +77,7 @@ TERM_PUBLIC void T410X_vector(unsigned int x, unsigned int y);
 TERM_PUBLIC void T410X_point(unsigned int x, unsigned int y, int number);
 TERM_PUBLIC void T410X_linetype(int linetype);
 TERM_PUBLIC void T410X_put_text(unsigned int x, unsigned int y, const char str[]);
-TERM_PUBLIC int T410X_text_angle(int ang);
+TERM_PUBLIC int T410X_text_angle(float ang);
 #define T410XXMAX 4095
 #define T410XYMAX 3131
 
@@ -225,7 +225,7 @@ T410X_put_text(unsigned int x, unsigned int y, const char str[])
 }
 
 TERM_PUBLIC int
-T410X_text_angle(int ang)
+T410X_text_angle(float ang)
 {
 
     T410X_angle = ang;

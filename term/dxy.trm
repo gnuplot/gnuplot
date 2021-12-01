@@ -64,7 +64,7 @@ TERM_PUBLIC void DXY_linetype(int linetype);
 TERM_PUBLIC void DXY_move(unsigned int x, unsigned int y);
 TERM_PUBLIC void DXY_vector(unsigned int x, unsigned int y);
 TERM_PUBLIC void DXY_put_text(unsigned int x, unsigned int y, const char *str);
-TERM_PUBLIC int DXY_text_angle(int ang);
+TERM_PUBLIC int DXY_text_angle(float ang);
 TERM_PUBLIC void DXY_reset(void);
 
 #define DXY_XMAX 2470
@@ -153,7 +153,7 @@ DXY_put_text(unsigned int x, unsigned int y, const char *str)
 
 
 TERM_PUBLIC int
-DXY_text_angle(int ang)
+DXY_text_angle(float ang)
 {
     dxy_angle = (ang ? 1 : 0);
     fprintf(gpoutfile, "Q%d\n", ang);

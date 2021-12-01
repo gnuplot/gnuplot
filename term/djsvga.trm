@@ -74,7 +74,7 @@ TERM_PUBLIC void DJSVGA_linetype(int linetype);
 TERM_PUBLIC void DJSVGA_dashtype(int type, t_dashtype *custom_dash_pattern);
 TERM_PUBLIC void DJSVGA_move(unsigned int x, unsigned int y);
 TERM_PUBLIC void DJSVGA_vector(unsigned int x, unsigned int y);
-TERM_PUBLIC int DJSVGA_angle(int ang);
+TERM_PUBLIC int DJSVGA_angle(float ang);
 TERM_PUBLIC int DJSVGA_justify_text(enum JUSTIFY mode);
 TERM_PUBLIC void DJSVGA_put_text(unsigned int x, unsigned int y,
 					  const char *str);
@@ -741,7 +741,7 @@ DJSVGA_flush_line(void)
 
 
 TERM_PUBLIC int
-DJSVGA_angle(int ang)
+DJSVGA_angle(float ang)
 {
     while (ang < 0)
 	ang += 360;

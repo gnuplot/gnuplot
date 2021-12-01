@@ -69,7 +69,7 @@ TERM_PUBLIC void PICT2E_text(void);
 TERM_PUBLIC void PICT2E_reset(void);
 
 TERM_PUBLIC int PICT2E_justify_text(enum JUSTIFY mode);
-TERM_PUBLIC int PICT2E_text_angle(int ang);
+TERM_PUBLIC int PICT2E_text_angle(float ang);
 TERM_PUBLIC void PICT2E_put_text(unsigned int x, unsigned int y, const char str[]);
 
 TERM_PUBLIC int PICT2E_make_palette(t_sm_palette *palette);
@@ -759,7 +759,7 @@ PICT2E_justify_text(enum JUSTIFY mode)
 
 
 TERM_PUBLIC int
-PICT2E_text_angle(int ang)
+PICT2E_text_angle(float ang)
 {
     pict2e_angle = ang;
     return TRUE;

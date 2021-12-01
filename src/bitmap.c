@@ -1226,7 +1226,7 @@ b_put_text(unsigned int x0, unsigned int y0, const char *str)
 
 
 int
-b_text_angle(int ang)
+b_text_angle(float ang)
 {
     b_angle = ang;
     return TRUE;

@@ -65,7 +65,7 @@ void wxt_reset(void);
 int wxt_justify_text(enum JUSTIFY mode);
 void wxt_point(unsigned int x, unsigned int y, int pointstyle);
 void wxt_linewidth(double linewidth);
-int wxt_text_angle(int ang);
+int wxt_text_angle(float ang);
 void wxt_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height);
 int wxt_set_font(const char *font);
 void wxt_pointsize(double ptsize);

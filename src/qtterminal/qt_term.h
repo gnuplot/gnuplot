@@ -63,7 +63,7 @@ void qt_vector(unsigned int x, unsigned int y);
 void qt_linetype(int linetype);
 void qt_dashtype (int type, t_dashtype *custom_dash_type);
 void qt_put_text(unsigned int x, unsigned int y, const char *str);
-int  qt_text_angle(int ang);
+int  qt_text_angle(float ang);
 int  qt_justify_text(enum JUSTIFY mode);
 void qt_point(unsigned int x, unsigned int y, int pointstyle);
 int  qt_set_font(const char *font);

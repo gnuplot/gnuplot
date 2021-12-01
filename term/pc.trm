@@ -78,7 +78,7 @@ TERM_PUBLIC void PC_enhanced_put_text(unsigned int x, unsigned int y, const char
 TERM_PUBLIC void PC_enhanced_open(char * fontname, double fontsize,
 					double base, TBOOLEAN widthflag, TBOOLEAN showflag, int overprint);
 TERM_PUBLIC void PC_enhanced_flush(void);
-TERM_PUBLIC int PC_text_angle(int ang);
+TERM_PUBLIC int PC_text_angle(float ang);
 TERM_PUBLIC int PC_set_font(const char *font);
 TERM_PUBLIC void PC_pointsize(double size);
 TERM_PUBLIC int PC_justify_text(enum JUSTIFY ang);
@@ -909,7 +909,7 @@ PC_vector(unsigned int x, unsigned int y)
 
 
 TERM_PUBLIC int
-PC_text_angle(int ang)
+PC_text_angle(float ang)
 {
     pc_text_dir = ang;
     return TRUE;

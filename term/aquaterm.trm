@@ -49,7 +49,7 @@ TERM_PUBLIC void AQUA_linetype(int linetype);
 TERM_PUBLIC void AQUA_dashtype(int type, t_dashtype *custom_dash_type);
 TERM_PUBLIC void AQUA_put_text(unsigned int x, unsigned int y,const char *str);
 /* Optional entries */
-TERM_PUBLIC int AQUA_text_angle(int);
+TERM_PUBLIC int AQUA_text_angle(float ang);
 TERM_PUBLIC int AQUA_justify_text(enum JUSTIFY);
 TERM_PUBLIC int AQUA_set_font(const char *font);  /* "font,size" */
 TERM_PUBLIC void AQUA_set_pointsize(double size); /* notification of set pointsize */
@@ -593,9 +593,9 @@ AQUA_justify_text (enum JUSTIFY mode)
 }
 
 TERM_PUBLIC int
-AQUA_text_angle (int angle)
+AQUA_text_angle (float angle)
 {
-  AQUA_TextAngle = (float)angle;
+  AQUA_TextAngle = angle;
   return (TRUE);
 }
 
