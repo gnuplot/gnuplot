@@ -351,6 +351,10 @@ C
 ## the title to reference quantities calculated while plotting.
 #b Built-in modified Bessel functions (besi0 besi1 besin)
 #b Built-in order N Bessel functions of the 1st and 2nd kind (besjn besyn)
+#b (5.4.2) in "using" context, $# means "number of columns in current data line"
+#b (5.4.2) "plot with fillsteps {above|below y=<value>}" analogous to filledcurves
+#b (5.4.3) "nogrid" flag allows splot components to opt out of dgrid3d processing
+#b (5.4.3) "set style histogram nokeyseparators" (see `newhistogram`)
 #end
 
 4 Changes
@@ -358,6 +362,8 @@ C
 #start
 #b `pm3d filled area quadrangles` are clipped smoothly to current zrange.
 ## This affects pm3d surfaces and also the faces of 3D boxes, polygons, etc.
+## `set pm3d border retrace` paints over potential antialiasing glitches between
+## adjacent pm3d quadrangles by drawing a same-color border.
 #b Revised syntax for plot style 'with parallelaxes'. See `parallel`.
 ## The histogram, parallelaxis, and spiderplot styles now use similar syntax
 ## that can iterate over plot elements:
@@ -372,6 +378,7 @@ C
 #b The `set fontpath` command is deprecated. The search path for fonts to be
 ## embedded in output from the postscript terminal has been revised.
 #end
+
 3 Features introduced in version 5.2
 4 New plot styles and style options
 #start
