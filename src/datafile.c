@@ -1185,6 +1185,8 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 
 	/* look for binary / matrix */
 	if (almost_equals(c_token, "bin$ary")) {
+	    if (df_filename[0] == '@')
+		int_error(c_token, "an array is not a binary file");
 	    if (df_filename[0] == '$')
 		int_error(c_token, "data blocks cannot be binary");
 	    if (!strcmp(df_filename,"+") || !strcmp(df_filename,"++"))
