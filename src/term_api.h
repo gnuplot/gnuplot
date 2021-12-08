@@ -531,4 +531,10 @@ void check_for_mouse_events(void);
 /* shared routined to add backslash in front of reserved characters */
 char *escape_reserved_chars(const char *str, const char *reserved);
 
+/* Attempt to recover from a variety of ways that garbage input may
+ * leave a non-positive or otherwise invalid font size in the
+ * terminal structure
+ */
+TBOOLEAN sanity_check_font_size(void);
+
 #endif /* GNUPLOT_TERM_API_H */
