@@ -235,6 +235,7 @@ static void UNKNOWN_null(void);
 static void MOVE_null(unsigned int, unsigned int);
 static void LINETYPE_null(int);
 static void PUTTEXT_null(unsigned int, unsigned int, const char *);
+static TBOOLEAN sanity_check_font_size(void);
 
 static int strlen_tex(const char *);
 
@@ -515,6 +516,8 @@ term_start_plot()
 	}
 	term_suspended = FALSE;
     }
+
+    sanity_check_font_size();
 
     if (multiplot)
 	multiplot_count++;
@@ -2929,4 +2932,23 @@ escape_reserved_chars(const char *str, const char *reserved)
 	escaped_str[newsize] = '\0';
 
     return escaped_str;
+}
+
+
+/* Sanity check:
+ * The most common program failure mode found by fuzzing is a divide-by-zero
+ * caused by initializing the basic unit of the current terminal character
+ * size to zero.  I keep patching individual terminals, but a generic
+ * sanity check may at least prevent a crash due to typos.
+ */
+static TBOOLEAN
+sanity_check_font_size()
+{
+    if (!(0 < term->v_char && term->v_char < term->ymax)
+    ||  !(0 < term->h_char && term->h_char < term->xmax)) {
+	int_warn(NO_CARET, "Invalid terminal font size");
+	term->v_char = term->h_char = 10;
+	return FALSE;
+    }
+    return TRUE;
 }
