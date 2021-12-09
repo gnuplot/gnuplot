@@ -4695,8 +4695,6 @@ set_terminal()
 	fprintf(stderr,"Options are '%s'\n",term_options);
     if ((term->flags & TERM_MONOCHROME))
 	init_monochrome();
-
-    sanity_check_font_size();
 }
 
 
