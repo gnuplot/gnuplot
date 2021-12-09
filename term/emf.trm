@@ -805,7 +805,7 @@ EMF_options()
 	new_defaultfontsize = real_expression();
     }
 
-    if (new_defaultfontsize > 0)
+    if ((0 < new_defaultfontsize) && (new_defaultfontsize < 999))
 	emf_defaultfontsize = new_defaultfontsize;
 
     sprintf(term_options, "%s %s font \"%s,%g\"",
