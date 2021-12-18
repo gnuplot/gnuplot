@@ -74,6 +74,8 @@ TERM_PUBLIC void PBM_graytext(void);
 TERM_PUBLIC void PBM_colortext(void);
 TERM_PUBLIC void PBM_text(void);
 TERM_PUBLIC void PBM_linetype(int linetype);
+TERM_PUBLIC void PBM_dashtype(int type, t_dashtype *custom_dash_type);
+TERM_PUBLIC void PBM_set_color(t_colorspec *color);
 TERM_PUBLIC void PBM_point(unsigned int x, unsigned int y, int point);
 #endif /* TERM_PROTO */
 
@@ -87,9 +89,6 @@ TERM_PUBLIC void PBM_point(unsigned int x, unsigned int y, int point);
 
 #ifdef TERM_BODY
 
-static int pbm_font = 1;	/* small font */
-static int pbm_mode = 0;	/* 0:monochrome 1:gray 2:color */
-
 /* 7=black, 0=white */
 static int pgm_gray[] = { 7, 1, 6, 5, 4, 3, 2, 1, 7 };	/* grays  */
 /* bit3=!intensify, bit2=!red, bit1=!green, bit0=!blue */
@@ -100,6 +99,10 @@ enum PBM_id {
     PBM_MONOCHROME, PBM_GRAY, PBM_COLOR, PBM_SIZE,
     PBM_OTHER
 };
+
+static int pbm_font = 1;	/* small font */
+static int pbm_mode = PBM_MONOCHROME;
+
 
 static struct gen_table PBM_opts[] =
 {
@@ -113,6 +116,7 @@ static struct gen_table PBM_opts[] =
     { "size", PBM_SIZE },
     { NULL, PBM_OTHER }
 };
+
 
 TERM_PUBLIC void
 PBM_options()
@@ -132,16 +136,16 @@ PBM_options()
 	    c_token++;
 	    break;
 	case PBM_MONOCHROME:
-	    pbm_mode = 0;
+	    pbm_mode = PBM_MONOCHROME;
 	    term->flags |= TERM_MONOCHROME;
 	    c_token++;
 	    break;
 	case PBM_GRAY:
-	    pbm_mode = 1;
+	    pbm_mode = PBM_GRAY;
 	    c_token++;
 	    break;
 	case PBM_COLOR:
-	    pbm_mode = 2;
+	    pbm_mode = PBM_COLOR;
 	    term->flags &= ~TERM_MONOCHROME;
 	    c_token++;
 	    break;
@@ -183,13 +187,13 @@ PBM_options()
     }
 
     switch (pbm_mode) {
-    case 0:
+    case PBM_MONOCHROME:
 	strcat(term_options, " monochrome");
 	break;
-    case 1:
+    case PBM_GRAY:
 	strcat(term_options, " gray");
 	break;
-    case 2:
+    case PBM_COLOR:
 	strcat(term_options, " color");
 	break;
     }
@@ -244,10 +248,10 @@ PBM_graphics()
     unsigned int ypixels = term->ymax + 1;
 
     switch (pbm_mode) {
-    case 1:
+    case PBM_GRAY:
 	numplanes = 3;
 	break;
-    case 2:
+    case PBM_COLOR:
 	numplanes = 4;
 	break;
     }
@@ -261,7 +265,7 @@ PBM_graphics()
     b_makebitmap(ypixels, xpixels, numplanes);
     b_rastermode = TRUE;
 
-    if (pbm_mode != 0)
+    if (pbm_mode != PBM_MONOCHROME)
 	b_setlinetype(0);	/* solid lines */
 }
 
@@ -284,6 +288,7 @@ PBM_monotext()
 
     b_freebitmap();
 }
+
 
 static void
 PBM_graytext()
@@ -325,6 +330,7 @@ P5\n\
 
     b_freebitmap();
 }
+
 
 static void
 PBM_colortext()
@@ -371,17 +377,18 @@ PBM_colortext()
     b_freebitmap();
 }
 
+
 TERM_PUBLIC void
 PBM_text()
 {
     switch (pbm_mode) {
-    case 0:
+    case PBM_MONOCHROME:
 	PBM_monotext();
 	break;
-    case 1:
+    case PBM_GRAY:
 	PBM_graytext();
 	break;
-    case 2:
+    case PBM_COLOR:
 	PBM_colortext();
 	break;
     }
@@ -391,33 +398,114 @@ PBM_text()
 TERM_PUBLIC void
 PBM_linetype(int linetype)
 {
-    if (linetype < -2)
-	linetype = LT_BLACK;
 
-    switch (pbm_mode) {
-    case 0:
-	b_setlinetype(linetype);
+    if (pbm_mode == PBM_MONOCHROME) {
+	b_setvalue(1);
+	b_setlinetype(linetype >= -2 ? linetype : LT_BLACK);
+	// PBM_dashtype(linetype, NULL);
+    } else {
+	t_colorspec color;
+	color.type = TC_LT;
+	color.lt = linetype;
+	PBM_set_color(&color);
+	b_setlinetype(0);
+    }
+}
+
+
+TERM_PUBLIC void
+PBM_dashtype(int type, t_dashtype *custom_dash_type)
+{
+    if (type >= 0)
+	;
+    else if (type == DASHTYPE_AXIS)
+	type = LT_AXIS;
+    else
+	type = LT_SOLID; /* solid, also for custom dash types */
+    b_setlinetype(type);
+}
+
+
+TERM_PUBLIC void
+PBM_set_color(t_colorspec *color)
+{
+    switch (color->type) {
+    case TC_LT: {
+	int linetype = color->lt;
+	if (linetype == LT_BACKGROUND)
+	    b_setvalue(0);
+	else switch (pbm_mode) {
+	    case PBM_MONOCHROME:
+		b_setvalue(1);
+		break;
+	    case PBM_GRAY:
+		if (linetype >= 7)
+		    linetype %= 7;
+		b_setvalue(pgm_gray[linetype + 2]);
+		break;
+	    case PBM_COLOR:
+		if (linetype >= 9)
+		    linetype %= 9;
+		b_setvalue(ppm_color[linetype + 2]);
+		break;
+	}
 	break;
-    case 1:
-	if (linetype >= 7)
-	    linetype %= 7;
-	b_setvalue(pgm_gray[linetype + 2]);
+    }
+    case TC_RGB:
+    case TC_FRAC: {
+	rgb255_color rgb255;
+
+	if (color->type == TC_FRAC) {
+	    rgb255maxcolors_from_gray(color->value, &rgb255);
+	} else {
+	    rgb255.r = (color->lt >> 16) & 0xff;
+	    rgb255.g = (color->lt >>  8) & 0xff;
+	    rgb255.b = (color->lt >>  0) & 0xff;
+	}
+	switch (pbm_mode) {
+	case PBM_MONOCHROME:
+	    b_setvalue(1);
+	    break;
+	case PBM_GRAY: {
+	    unsigned char gray = (unsigned)(rgb255.r * 0.30 + rgb255.g * 0.59 + rgb255.b * 0.11);
+	    gray = (gray + 4) >> 3;
+	    b_setvalue(gray);
+	    break;
+	}
+	case PBM_COLOR: {
+	    unsigned char val = 0x0f;
+
+	    rgb255.r = (rgb255.r + 43) / 85;
+	    rgb255.g = (rgb255.g + 43) / 85;
+	    rgb255.b = (rgb255.b + 43) / 85;
+	    if (rgb255.r > 1) val &= ~0x04;
+	    if (rgb255.g > 1) val &= ~0x02;
+	    if (rgb255.b > 1) val &= ~0x01;
+	    if ((rgb255.r == 3) || (rgb255.g == 3) || (rgb255.b == 3))
+		val &= ~0x08;
+	    b_setvalue(val);
+	    break;
+	}
+	}
 	break;
-    case 2:
-	if (linetype >= 9)
-	    linetype %= 9;
-	b_setvalue(ppm_color[linetype + 2]);
+    }
+    default:
+	// should never happen
 	break;
     }
 }
 
+
 TERM_PUBLIC void
 PBM_point(unsigned int x, unsigned int y, int point)
 {
-    if (pbm_mode == 0)
-	line_and_point(x, y, point);
-    else
-	do_point(x, y, point);
+    unsigned int mask = b_linemask;
+
+    b_setlinetype(0); /* solid lines */
+    do_point(x, y, point);
+
+    b_linemask = mask;
+    b_maskcount = 0;
 }
 
 #endif /* TERM_BODY */
@@ -439,8 +527,17 @@ TERM_TABLE_START(pbm_driver)
 #ifdef USE_MOUSE
     NULL, NULL, NULL, NULL, NULL,
 #endif
-    NULL /* make_palette */, NULL, NULL /* set_color */,
-    b_filled_polygon
+    NULL /* make_palette */, NULL, PBM_set_color,
+    b_filled_polygon,
+    NULL, /* image */
+    NULL, NULL, NULL, /* enhanced text */
+    NULL,
+    NULL,
+    0.,
+    NULL,
+    NULL, /* boxed_text */
+    NULL,
+    PBM_dashtype
 TERM_TABLE_END(pbm_driver)
 
 #undef LAST_TERM
