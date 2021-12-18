@@ -1370,17 +1370,15 @@ EMF_put_text(unsigned int x, unsigned int y, const char str[])
 	size_t wsize, wlen, mblen;
 	const char * str_start = str;
 	char * wstr_start;
-	char * FromEnc;
+	const char * from_enc = iconv_encoding_name(encoding);
 
 	nchars = strlen(str);
 	mblen = nchars;
 	wlen = wsize = 2 * mblen + 2;
 	wstr = gp_alloc(wlen, "iconv string");
 	wstr_start = wstr;
-	if (encoding == S_ENC_UTF8) FromEnc = "UTF-8";
-	else FromEnc = "Shift_JIS";
 
-	if ((cd = iconv_open("UTF-16LE", FromEnc)) == (iconv_t)-1)
+	if ((cd = iconv_open("UTF-16LE", from_enc)) == (iconv_t)-1)
 	    int_warn(NO_CARET, "iconv_open failed");
 	else {
 	    if (iconv(cd, (void *)&str_start, &mblen, &wstr_start, &wlen) == (size_t)-1)

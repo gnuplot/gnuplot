@@ -51,6 +51,10 @@ TERM_PUBLIC void BLOCK_set_color(t_colorspec *color);
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
 
+#ifdef HAVE_ICONV
+# include <iconv.h>
+#endif
+
 // default values for quadrants
 #define BLOCK_XMAX  (DUMB_XMAX)
 #define BLOCK_YMAX  (DUMB_YMAX)
@@ -463,6 +467,27 @@ BLOCK_text()
     const int * pattern;
     size_t bufsiz;
     text_attr prev_text_attr;
+#if defined(HAVE_ICONV) && !defined(_WIN32)
+    iconv_t cd = (iconv_t) -1;
+
+    {
+	enum set_encoding_id encoding = encoding_from_locale();
+	printf("enc %i, name %s, tty %i\n", encoding, iconv_encoding_name(encoding), isatty(fileno(gpoutfile)));
+	if (isatty(fileno(gpoutfile)) &&  /* only convert if output to terminal */
+	    encoding != S_ENC_UTF8 && encoding != S_ENC_DEFAULT &&
+	    iconv_encoding_name(encoding) != NULL) {
+	    char tocode [128];
+
+	    strcpy(tocode, iconv_encoding_name(encoding));
+# ifndef OS2
+	    strcat(tocode, "//TRANSLIT//IGNORE");
+# endif
+	    puts(tocode);
+	    if ((cd = iconv_open(tocode, "UTF-8")) == (iconv_t) -1)
+		int_warn(NO_CARET, "iconv_open failed");
+	}
+    }
+#endif
 
     if (dumb_colormode > 0) {
 #if defined(OS2) || defined(MSDOS)
@@ -738,6 +763,31 @@ BLOCK_text()
 	}
 	*s++ = '\n';
 	*s = NUL;
+
+#if defined(HAVE_ICONV) && !defined(_WIN32)
+	/* If the current screen encoding is not UTF-8, we attempt to convert.
+	   This is useful for half mode with CP850 or CP437. */
+	if (cd != (iconv_t) -1) {
+	    char * str_start = line;
+	    size_t len1 = strlen(line) + 1;
+	    size_t len2 = len1;
+	    char * iconv_string = gp_alloc(len2, "iconv string");
+	    char * stmp = iconv_string;
+
+	    if (iconv(cd, (void *)&str_start, &len1, &stmp, &len2) == (size_t) -1)
+		int_warn(NO_CARET, "iconv failed");
+	    else
+	       fputs(iconv_string, gpoutfile);
+	    free(iconv_string);
+	} else
+#elif defined _WIN32
+	if (isatty(fileno(gpoutfile)) && GetConsoleOutputCP() != 65001) {
+	    LPWSTR wline = UnicodeText(line, S_ENC_UTF8);
+	    HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+	    WriteConsoleW(h, wline, wcslen(wline), NULL, NULL);
+	    free(wline);
+	} else
+#endif
 	fputs(line, gpoutfile);
     }
     // printf("^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n");
@@ -761,6 +811,10 @@ BLOCK_text()
 
     free(line);
     (void) fflush(gpoutfile);	/* finish the graphics */
+#if defined(HAVE_ICONV) && !defined(_WIN32)
+    if (cd != (iconv_t) -1)
+	iconv_close(cd);
+#endif
 }
 
 
