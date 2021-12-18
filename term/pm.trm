@@ -380,7 +380,7 @@ PM_init(void)
 	    PID pid;
 	    ULONG ulSession;
 	    APIRET rc;
-	    char params[256];
+	    char params[288];
 
 	    memset(&sd, 0, sizeof(STARTDATA));
 	    sd.Length = sizeof(STARTDATA);
