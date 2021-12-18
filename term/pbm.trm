@@ -74,7 +74,6 @@ TERM_PUBLIC void PBM_graytext(void);
 TERM_PUBLIC void PBM_colortext(void);
 TERM_PUBLIC void PBM_text(void);
 TERM_PUBLIC void PBM_linetype(int linetype);
-TERM_PUBLIC void PBM_dashtype(int type, t_dashtype *custom_dash_type);
 TERM_PUBLIC void PBM_set_color(t_colorspec *color);
 TERM_PUBLIC void PBM_point(unsigned int x, unsigned int y, int point);
 #endif /* TERM_PROTO */
@@ -402,7 +401,6 @@ PBM_linetype(int linetype)
     if (pbm_mode == PBM_MONOCHROME) {
 	b_setvalue(1);
 	b_setlinetype(linetype >= -2 ? linetype : LT_BLACK);
-	// PBM_dashtype(linetype, NULL);
     } else {
 	t_colorspec color;
 	color.type = TC_LT;
@@ -410,19 +408,6 @@ PBM_linetype(int linetype)
 	PBM_set_color(&color);
 	b_setlinetype(0);
     }
-}
-
-
-TERM_PUBLIC void
-PBM_dashtype(int type, t_dashtype *custom_dash_type)
-{
-    if (type >= 0)
-	;
-    else if (type == DASHTYPE_AXIS)
-	type = LT_AXIS;
-    else
-	type = LT_SOLID; /* solid, also for custom dash types */
-    b_setlinetype(type);
 }
 
 
@@ -537,7 +522,7 @@ TERM_TABLE_START(pbm_driver)
     NULL,
     NULL, /* boxed_text */
     NULL,
-    PBM_dashtype
+    b_dashtype
 TERM_TABLE_END(pbm_driver)
 
 #undef LAST_TERM

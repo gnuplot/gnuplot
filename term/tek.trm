@@ -174,7 +174,6 @@ TERM_PUBLIC void SIXEL_reset(void);
 TERM_PUBLIC void SIXEL_text(void);
 TERM_PUBLIC void SIXEL_graphics(void);
 TERM_PUBLIC void SIXEL_linetype(int linetype);
-TERM_PUBLIC void SIXEL_dashtype(int type, t_dashtype *custom_dash_type);
 TERM_PUBLIC void SIXEL_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height);
 TERM_PUBLIC int SIXEL_make_palette (t_sm_palette *);
 TERM_PUBLIC void SIXEL_set_color(t_colorspec *colorspec);
@@ -515,7 +514,6 @@ static int SIXEL_mode = 1;  // mono=0, color=1
 static int SIXEL_font = 1;  // small=1,medium=2,large=3
 static int SIXEL_ncol = 16; // actual number of colors to be used
 static int SIXEL_lt;
-static int SIXEL_dt;
 static int SIXEL_fp, SIXEL_np;
 
 struct SIXEL_colorspec {
@@ -863,20 +861,6 @@ SIXEL_linetype(int linetype)
 	}
     }
     SIXEL_lt = linetype;
-}
-
-
-TERM_PUBLIC void
-SIXEL_dashtype(int type, t_dashtype *custom_dash_type)
-{
-    if (type >= 0)
-	SIXEL_dt = type;
-    else if (type == DASHTYPE_AXIS)
-	SIXEL_dt = 1;
-    else
-	SIXEL_dt = 0; /* solid, also for custom dash types */
-
-    b_setlinetype(SIXEL_dt);
 }
 
 
@@ -1347,7 +1331,7 @@ TERM_TABLE_START(sixel_driver)
     NULL,
     NULL,
     NULL,
-    SIXEL_dashtype
+    b_dashtype
 TERM_TABLE_END(sixel_driver)
 
 #undef LAST_TERM

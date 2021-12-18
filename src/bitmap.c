@@ -1146,6 +1146,19 @@ b_setlinetype(int linetype)
 }
 
 
+void
+b_dashtype(int type, t_dashtype *custom_dash_type)
+{
+    if (type >= 0)
+	;
+    else if (type == DASHTYPE_AXIS)
+	type = LT_AXIS;
+    else
+	type = LT_SOLID; /* solid, also for custom dash types */
+    b_setlinetype(type);
+}
+
+
 /*
  * set l_lw to linewidth
  */

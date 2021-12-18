@@ -34,7 +34,8 @@
 # define GNUPLOT_BITMAP_H
 
 #include "syscfg.h"
-#include <color.h>
+#include "color.h"
+#include "gadgets.h"	/* dashtype */
 
 /* allow up to 16 bit width for character array */
 typedef unsigned int char_row;
@@ -86,6 +87,7 @@ void b_charsize(unsigned int);
 void b_setvalue(unsigned int);
 
 void b_setlinetype(int);
+void b_dashtype(int type, t_dashtype *custom_dash_type);
 void b_linewidth(double linewidth);
 void b_move(unsigned int, unsigned int);
 void b_vector(unsigned int, unsigned int);

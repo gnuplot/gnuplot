@@ -44,7 +44,6 @@ TERM_PUBLIC void BLOCK_graphics(void);
 TERM_PUBLIC void BLOCK_put_text(unsigned int x, unsigned int y, const char *str);
 TERM_PUBLIC void BLOCK_point(unsigned int x, unsigned int y, int point);
 TERM_PUBLIC void BLOCK_linetype(int linetype);
-TERM_PUBLIC void BLOCK_dashtype(int type, t_dashtype *custom_dash_type);
 TERM_PUBLIC void BLOCK_set_color(t_colorspec *color);
 #endif
 
@@ -906,19 +905,6 @@ BLOCK_linetype(int linetype)
 
 
 TERM_PUBLIC void
-BLOCK_dashtype(int type, t_dashtype *custom_dash_type)
-{
-    if (type >= 0)
-	;
-    else if (type == DASHTYPE_AXIS)
-	type = LT_AXIS;
-    else
-	type = LT_SOLID; /* solid, also for custom dash types */
-    b_setlinetype(type);
-}
-
-
-TERM_PUBLIC void
 BLOCK_set_color(t_colorspec *color)
 {
     switch (color->type) {
@@ -1031,7 +1017,7 @@ TERM_TABLE_START(block_driver)
     NULL,
     NULL,
     NULL,
-    BLOCK_dashtype
+    b_dashtype
 TERM_TABLE_END(block_driver)
 
 #undef LAST_TERM
