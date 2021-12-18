@@ -141,6 +141,7 @@ PBM_options()
 	    break;
 	case PBM_GRAY:
 	    pbm_mode = PBM_GRAY;
+	    term->flags &= ~TERM_MONOCHROME;
 	    c_token++;
 	    break;
 	case PBM_COLOR:
