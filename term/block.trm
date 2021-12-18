@@ -79,7 +79,11 @@ static void to_rgb255(int v, rgb255_color * rgb255);
 static unsigned to_ansi256(rgb255_color *c);
 static const char * ansi_bg_colorstring(t_colorspec * color);
 
+#if defined(OS2) || defined(MSDOS)
+static int BLOCK_mode = BLOCK_MODE_HALF;
+#else
 static int BLOCK_mode = BLOCK_MODE_QUAD;
+#endif
 static int BLOCK_xchars = BLOCK_XMAX;
 static int BLOCK_ychars = BLOCK_YMAX;
 static TBOOLEAN BLOCK_optimize = TRUE;
@@ -461,7 +465,11 @@ BLOCK_text()
     text_attr prev_text_attr;
 
     if (dumb_colormode > 0) {
-	fputs("\033[0;39m", gpoutfile); /* reset colors to default */
+#if defined(OS2) || defined(MSDOS)
+	fputs("\033[0;37m", gpoutfile); /* reset foreground color to white */
+#else
+	fputs("\033[0;39m", gpoutfile); /* reset foreground color to default */
+#endif
 	memset(&dumb_prev_color, 0, sizeof(t_colorspec));
     }
 #endif
@@ -719,7 +727,11 @@ BLOCK_text()
 #ifndef NO_DUMB_COLOR_SUPPORT
 		// turn bg color off again
 		if (resetbg) {
-		    sprintf((char *) s, "\033[49m"); s += 5;
+#if defined(OS2) || defined(MSDOS)
+		    sprintf((char *) s, "\033[40m"); s += 5; /* reset background color to black */
+#else
+		    sprintf((char *) s, "\033[49m"); s += 5; /* reset background color to default */
+#endif
 		}
 #endif
 	    }
@@ -733,8 +745,13 @@ BLOCK_text()
     if (dumb_text_attributes)
 	fputs("\033[22;23m", gpoutfile); /* reset attributes */
 #ifndef NO_DUMB_COLOR_SUPPORT
-    if (dumb_colormode > 0)
+    if (dumb_colormode > 0) {
+#if defined(OS2) || defined(MSDOS)
+	fputs("\033[0;37;40m", gpoutfile); /* reset colors to white on black */
+#else
 	fputs("\033[0;39;49m", gpoutfile); /* reset colors to default */
+#endif
+    }
 #ifdef DEBUG_BLOCK_OPTI
     printf("full cells : %u (%3.1f\%)\n", nfullcells, 100 * ((float) nfullcells) / BLOCK_xchars / BLOCK_ychars);
     printf("optimisable: %u (%3.1f\%)\n", noptimisable, 100 * ((float) noptimisable) / nfullcells);
