@@ -503,7 +503,7 @@ TERM_TABLE_START(hp500c_driver)
     HP500C_75PPI_HCHAR, HP500C_75PPI_VTIC, HP500C_75PPI_HTIC, HP500C_options,
     HP500C_init, HP500C_reset, HP500C_text, null_scale,
     HP500C_graphics, b_move, b_vector, HP500C_linetype,
-    b_put_text, b_text_angle, null_justify_text, do_point,
+    b_put_text, b_text_angle, b_justify_text, do_point,
     do_arrow, set_font_null, 0, TERM_BINARY,
     0, 0, b_boxfill
 TERM_TABLE_END(hp500c_driver)

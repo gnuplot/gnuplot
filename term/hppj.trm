@@ -256,7 +256,7 @@ TERM_TABLE_START(hppj_driver)
     HPPJ_9x17_VCHAR, HPPJ_9x17_HCHAR, HPPJ_9x17_VTIC, HPPJ_9x17_HTIC,
     HPPJ_options, HPPJ_init, HPPJ_reset, HPPJ_text, null_scale, HPPJ_graphics,
     b_move, b_vector, HPPJ_linetype, b_put_text, b_text_angle,
-    null_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY,
+    b_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY,
     0, 0, b_boxfill
 TERM_TABLE_END(hppj_driver)
 

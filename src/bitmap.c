@@ -89,12 +89,12 @@ unsigned int b_planes;		/* number of color planes */
 unsigned int b_psize;		/* size of each plane */
 unsigned int b_rastermode;	/* raster mode rotates -90deg */
 unsigned int b_linemask = 0xffff; /* 16 bit mask for dotted lines */
-unsigned int b_angle;		/* rotation of text */
+         int b_angle;		/* rotation of text */
+enum JUSTIFY b_justify = LEFT;	/* text justification */
 
 int b_maskcount = 0;
 
 /* Local prototypes */
-static void b_putc(unsigned int, unsigned int, int, unsigned int);
 static GP_INLINE void b_setpixel(unsigned int x, unsigned int y, unsigned int value);
 static GP_INLINE void b_setmaskpixel(unsigned int x, unsigned int y, unsigned int value);
 static void b_line(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2);
@@ -1081,56 +1081,6 @@ b_charsize(unsigned int size)
 
 
 /*
- * put character c at (x,y) rotated by angle with color b_value.
- */
-static
-void b_putc(unsigned int x, unsigned int y, int c, unsigned int c_angle)
-{
-    unsigned int i, j, k;
-    char_row fc;
-
-    j = c - ' ';
-
-    if (j >= FNT_CHARS)
-	return;			/* unknown (top-bit-set ?) character */
-
-    for (i = 0; i < b_vbits; i++) {
-	fc = b_font[j][i];
-	if (c == '_') {		/* treat underline specially */
-	    if (fc) {		/* this this the underline row ? */
-		/* draw the under line for the full h_char width */
-		for (k = (b_hbits - b_hchar) / 2;
-		     k < (b_hbits + b_hchar) / 2; k++) {
-		    switch (c_angle) {
-		    case 0:
-			b_setpixel(x + k + 1, y + i, b_value);
-			break;
-		    case 1:
-			b_setpixel(x - i, y + k + 1, b_value);
-			break;
-		    }
-		}
-	    }
-	} else {
-	    /* draw character */
-	    for (k = 0; k < b_hbits; k++) {
-		if ((fc >> k) & 1) {
-		    switch (c_angle) {
-		    case 0:
-			b_setpixel(x + k + 1, y + i, b_value);
-			break;
-		    case 1:
-			b_setpixel(x - i, y + k + 1, b_value);
-			break;
-		    }
-		}
-	    }
-	}
-    }
-}
-
-
-/*
  * set b_linemask to b_pattern[linetype]
  */
 void
@@ -1209,21 +1159,58 @@ b_vector(unsigned int x, unsigned int y)
  * put text str at (x,y) with color b_value and rotation b_angle
  */
 void
-b_put_text(unsigned int x, unsigned int y, const char *str)
+b_put_text(unsigned int x0, unsigned int y0, const char *str)
 {
-    if (b_angle == 1)
-	x += b_vchar / 2;
-    else
-	y -= b_vchar / 2;
-    switch (b_angle) {
-    case 0:
-	for (; *str; ++str, x += b_hchar)
-	    b_putc(x, y, *str, b_angle);
+    int i, j, k;
+    float sa, ca, x, y;
+    char_row fc;
+    size_t l;
+
+    ca = cos(DEG2RAD * b_angle);
+    sa = sin(DEG2RAD * b_angle);
+
+    x = 0.5f + x0;
+    y = 0.5f + y0;
+
+    switch (b_justify) {
+    case LEFT:
+	x += sa * b_vchar / 2.f;
+	y -= ca * b_vchar / 2.f;
 	break;
-    case 1:
-	for (; *str; ++str, y += b_hchar)
-	    b_putc(x, y, *str, b_angle);
+    case CENTRE:
+	l = strlen(str);
+	x += sa * b_vchar / 2.f - ca * l * b_hchar / 2;
+	y -= ca * b_vchar / 2.f + sa * l * b_hchar / 2;
 	break;
+    case RIGHT:
+	l = strlen(str);
+	x += sa * b_vchar / 2.f - ca * l * b_hchar;
+	y -= ca * b_vchar / 2.f + sa * l * b_hchar;
+	break;
+    }
+
+    k = 0;
+    while (str[k]) {
+	char c = GPMAX(str[k], ' ') - ' ';
+	if (c >= FNT_CHARS) c = 0;
+	for (i = 0; i < b_vbits; i++) {
+	    fc = b_font[(unsigned char)c][i];
+	    if (c == '_' - ' ') {	/* treat underline specially */
+		if (fc) {		/* this this the underline row ? */
+		    /* draw the under line for the full h_char width */
+		    for (j = 0; j < b_hchar; j++)
+			b_setpixel(x + ca * j - sa * i, y + ca * i + sa * j, b_value);
+		}
+	    } else {
+		for (j = 0; j < b_hbits; j++) {
+		    if ((fc >> j) & 1)
+			b_setpixel(x + ca * j - sa * i, y + ca * i + sa * j, b_value);
+		}
+	    }
+	}
+	k++;
+	x += ca * b_hchar;
+	y += sa * b_hchar;
     }
 }
 
@@ -1231,8 +1218,16 @@ b_put_text(unsigned int x, unsigned int y, const char *str)
 int
 b_text_angle(int ang)
 {
-    b_angle = (unsigned int) (ang ? 1 : 0);
+    b_angle = ang;
     return TRUE;
+}
+
+
+int
+b_justify_text(enum JUSTIFY mode)
+{
+    b_justify = mode;
+    return 1;
 }
 
 

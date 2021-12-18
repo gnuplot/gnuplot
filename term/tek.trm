@@ -1316,7 +1316,7 @@ TERM_TABLE_START(sixel_driver)
     SIXEL_VTIC, SIXEL_HTIC, SIXEL_options, SIXEL_init, SIXEL_reset,
     SIXEL_text, null_scale, SIXEL_graphics, b_move, b_vector,
     SIXEL_linetype, b_put_text, b_text_angle,
-    null_justify_text, line_and_point, do_arrow, set_font_null,
+    b_justify_text, line_and_point, do_arrow, set_font_null,
     0, 0, 0, 0, SIXEL_fillbox, b_linewidth,
 #ifdef USE_MOUSE
     NULL, NULL, NULL, NULL, NULL,

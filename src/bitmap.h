@@ -74,7 +74,7 @@ extern unsigned int b_planes;	/* number of color planes */
 extern unsigned int b_psize;	/* size of each plane */
 extern unsigned int b_rastermode; /* raster mode rotates -90deg */
 extern unsigned int b_linemask;	/* 16 bit mask for dotted lines */
-extern unsigned int b_angle;	/* rotation of text */
+extern          int b_angle;	/* rotation of text */
 extern int b_maskcount;
 
 
@@ -93,6 +93,7 @@ void b_move(unsigned int, unsigned int);
 void b_vector(unsigned int, unsigned int);
 void b_put_text(unsigned int, unsigned int, const char *);
 int b_text_angle(int);
+int b_justify_text(enum JUSTIFY mode);
 void b_boxfill(int, unsigned int, unsigned int, unsigned int, unsigned int);
 void b_filled_polygon(int points, gpiPoint *corners);
 

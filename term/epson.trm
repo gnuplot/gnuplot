@@ -963,7 +963,7 @@ TERM_TABLE_START(epson180_driver)
     EPSON180VTIC, EPSON180HTIC, options_null, EPSON_init, EPSON_reset,
     EPS180_text, null_scale, EPS180_graphics, b_move, b_vector,
     b_setlinetype, b_put_text, b_text_angle,
-    null_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY,
+    b_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY,
     0, 0, b_boxfill
 TERM_TABLE_END(epson180_driver)
 
@@ -978,7 +978,7 @@ TERM_TABLE_START(epson60_driver)
     EPSONVTIC, EPSONHTIC, options_null, EPSON_init, EPSON_reset,
     EPS60_text, null_scale, EPS60_graphics, b_move, b_vector,
     b_setlinetype, b_put_text, b_text_angle,
-    null_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY,
+    b_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY,
     0, 0, b_boxfill
 TERM_TABLE_END(epson60_driver)
 
@@ -993,7 +993,7 @@ TERM_TABLE_START(epsonlx_driver)
     EPSONVTIC, EPSONHTIC, options_null, EPSON_init, EPSON_reset,
     EPSON_text, null_scale, EPSON_graphics, b_move, b_vector,
     b_setlinetype, b_put_text, b_text_angle,
-    null_justify_text, line_and_point, do_arrow, set_font_null, 0, TERM_BINARY,
+    b_justify_text, line_and_point, do_arrow, set_font_null, 0, TERM_BINARY,
     0, 0, b_boxfill
 TERM_TABLE_END(epsonlx_driver)
 
@@ -1008,7 +1008,7 @@ TERM_TABLE_END(epsonlx_driver)
     NECVTIC, NECHTIC, NEC_options, NEC_init, EPSON_reset,
     NEC_text, null_scale, NEC_graphics, b_move, b_vector,
     NEC_linetype, b_put_text, b_text_angle,
-    null_justify_text, line_and_point, do_arrow, set_font_null, 0, TERM_BINARY,
+    b_justify_text, line_and_point, do_arrow, set_font_null, 0, TERM_BINARY,
     0, 0, b_boxfill
 TERM_TABLE_END(nec_driver)
 
@@ -1023,7 +1023,7 @@ TERM_TABLE_START(okidata_driver)
     EPSONVTIC, EPSONHTIC, options_null, EPSON_init, EPSON_reset,
     OKIDATA_text, null_scale, EPS60_graphics, b_move, b_vector,
     b_setlinetype, b_put_text, b_text_angle,
-    null_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY,
+    b_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY,
     0, 0, b_boxfill
 TERM_TABLE_END(okidata_driver)
 
@@ -1038,7 +1038,7 @@ TERM_TABLE_START(starc_driver)
     STARCVTIC, STARCHTIC, options_null, STARC_init, EPSON_reset,
     STARC_text, null_scale, STARC_graphics, b_move, b_vector,
     STARC_linetype, b_put_text, b_text_angle,
-    null_justify_text, line_and_point, do_arrow, set_font_null, 0, TERM_BINARY,
+    b_justify_text, line_and_point, do_arrow, set_font_null, 0, TERM_BINARY,
     0, 0, b_boxfill
 TERM_TABLE_END(starc_driver)
 
@@ -1053,7 +1053,7 @@ TERM_TABLE_START(tandy60_driver)
     EPSONVTIC, EPSONHTIC, options_null, EPSON_init, EPSON_reset,
     TANDY60_text, null_scale, EPS60_graphics, b_move, b_vector,
     b_setlinetype, b_put_text, b_text_angle,
-    null_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY,
+    b_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY,
     0, 0, b_boxfill
 TERM_TABLE_END(tandy60_driver)
 
@@ -1068,7 +1068,7 @@ TERM_TABLE_START(dpu414_driver)
     DPU414VTIC, DPU414HTIC, DPU414_options, DPU414_init, EPSON_reset,
     DPU414_text, null_scale, DPU414_graphics, b_move, b_vector,
     b_setlinetype, b_put_text, b_text_angle,
-    null_justify_text, line_and_point, do_arrow, set_font_null, 0, TERM_BINARY,
+    b_justify_text, line_and_point, do_arrow, set_font_null, 0, TERM_BINARY,
     0, 0, b_boxfill
 TERM_TABLE_END(dpu414_driver)
 

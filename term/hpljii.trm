@@ -252,8 +252,7 @@ HPLJII_linetype(int linetype)
 TERM_PUBLIC void
 HPLJII_put_text(unsigned int x, unsigned int y, const char *str)
 {
-    switch (b_angle) {
-    case 0:
+    if (b_angle == 0) {
 	y -= HPLJII_VCHAR / 5;
 	HPLJII_POP_CURSOR;
 	HPLJII_PUSH_CURSOR;
@@ -263,13 +262,11 @@ HPLJII_put_text(unsigned int x, unsigned int y, const char *str)
 	fputs(str, gpoutfile);
 /*       for (; *str; ++str, x += HPLJII_HCHAR)
             HPLJII_putc (x, y, *str, b_angle);*/
-	break;
-    case 1:
+    } else {
 	y += (HPLJII_HCHAR - 2 * HPLJII_VCHAR) / 2;
 	y += (HPLJII_VCHAR + HPLJII_HCHAR) * strlen(str) / 2;
 	for (; *str; ++str, y -= HPLJII_VCHAR)
 	    HPLJII_putc(x, y, *str, b_angle);
-	break;
     }
 }
 
@@ -364,7 +361,7 @@ TERM_TABLE_START(hpljii_driver)
     HPLJII_75PPI_HCHAR, HPLJII_75PPI_VTIC, HPLJII_75PPI_HTIC, HPLJII_options,
     HPLJII_init, HPLJII_reset, HPLJII_text, null_scale,
     HPLJII_graphics, b_move, b_vector, HPLJII_linetype,
-    HPLJII_put_text, b_text_angle, null_justify_text, line_and_point,
+    HPLJII_put_text, b_text_angle, b_justify_text, line_and_point,
     do_arrow, set_font_null, 0, TERM_BINARY,
     0, 0, b_boxfill
 TERM_TABLE_END(hpljii_driver)
@@ -378,7 +375,7 @@ TERM_TABLE_START(hpdj_driver)
     HPLJII_75PPI_HCHAR, HPLJII_75PPI_VTIC, HPLJII_75PPI_HTIC, HPLJII_options,
     HPLJII_init, HPLJII_reset, HPDJ_text, null_scale,
     HPDJ_graphics, b_move, b_vector, HPLJII_linetype,
-    b_put_text, b_text_angle, null_justify_text, line_and_point,
+    b_put_text, b_text_angle, b_justify_text, line_and_point,
     do_arrow, set_font_null, 0, TERM_BINARY,
     0, 0, b_boxfill
 TERM_TABLE_END(hpdj_driver)

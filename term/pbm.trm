@@ -504,7 +504,7 @@ TERM_TABLE_START(pbm_driver)
     PBM_HCHAR, PBM_VTIC, PBM_HTIC, PBM_options,
     PBM_init, PBM_reset, PBM_text, null_scale,
     PBM_graphics, b_move, b_vector, PBM_linetype,
-    b_put_text, b_text_angle, null_justify_text, PBM_point,
+    b_put_text, b_text_angle, b_justify_text, PBM_point,
     do_arrow, set_font_null,
     0,				/* pointsize */
     TERM_CAN_MULTIPLOT | TERM_BINARY,
