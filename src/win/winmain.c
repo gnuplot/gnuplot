@@ -1261,11 +1261,12 @@ ConsolePutCh(int ch)
 {
     WCHAR w[4];
     int count;
+    HANDLE h;
 
     MultiByteAccumulate(ch, w, &count);
     if (count > 0) {
 	w[count] = 0;
-	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+	h = GetStdHandle(STD_OUTPUT_HANDLE);
 	WriteConsoleW(h, w, count, NULL, NULL);
     }
     return ch;
