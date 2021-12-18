@@ -745,6 +745,8 @@ BLOCK_text()
 		    // so we don't need a mapping.
 		    v = 0x2800 + i;
 		    break;
+		default:
+		    v = 0x0020;
 		}
 
 		s += ucs4toutf8(v, s);
