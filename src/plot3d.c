@@ -2490,7 +2490,8 @@ eval_3dplots()
 	    ||  this_plot->plot_style == RGBA_IMAGE) {
 		if (df_sparse_matrix) {
 		    struct iso_curve *this_iso = this_plot->iso_crvs;
-		    populate_sparse_matrix( &(this_iso->points), &(this_iso->p_count) );
+		    if (this_iso)
+			populate_sparse_matrix( &(this_iso->points), &(this_iso->p_count) );
 		}
 	    }
 
