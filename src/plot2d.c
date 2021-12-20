@@ -1943,7 +1943,6 @@ store_label(
 	    tl->lp_properties.pm3d_color = lptmp.pm3d_color;
 	}
     }
-    
 
     /* Check for null string (no label) */
     if (!string)
@@ -1972,7 +1971,7 @@ store_label(
     }
 
     /* Strip double quote from both ends */
-    if (string[0] == '"' && string[textlen-1] == '"')
+    if (string[0] == '"' && textlen > 1 && string[textlen-1] == '"')
 	textlen -= 2, string++;
 
     tl->text = gp_alloc(textlen+1,"labelpoint text");
