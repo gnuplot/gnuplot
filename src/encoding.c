@@ -510,14 +510,14 @@ void
 truncate_to_one_utf8_char(char *orig)
 {
     uint32_t codepoint;
-    char newchar[8];
+    char newchar[9];
     int length = 0;
 
     safe_strncpy(newchar, orig, sizeof(newchar));
 
     /* Check for unicode escape */
     if (!strncmp("\\U+", newchar, 3)) {
-	if (sscanf(&newchar[3], "%4x", &codepoint) == 1)
+	if (sscanf(&newchar[3], "%5x", &codepoint) == 1)
 	    length = ucs4toutf8(codepoint, (unsigned char *)newchar);
 	newchar[length] = '\0';
     }
