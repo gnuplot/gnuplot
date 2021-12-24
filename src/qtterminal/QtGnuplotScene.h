@@ -49,7 +49,13 @@
 
 #include <QGraphicsScene>
 #include <QGraphicsItemGroup>
-#include <QTime>
+
+#if (QT_VERSION < QT_VERSION_CHECK(4, 7, 0))
+# include <QTime>
+typedef QTime QElapsedTimer;
+#else
+# include <QElapsedTimer>
+#endif
 
 class QtGnuplotEnhanced;
 class QtGnuplotWidget;
@@ -104,7 +110,7 @@ private:
 	QPoint  m_currentBoxOrigin;
 	QPoint  m_textOffset;
 	double  m_currentZ;
-	QTime   m_watches[4];
+	QElapsedTimer   m_watches[4];
 	int     m_currentPlotNumber;
 	bool    m_inKeySample;
 	bool    m_preserve_visibility;
