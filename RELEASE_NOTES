@@ -8,7 +8,7 @@ after downloading:
 
 	git clone -b branch-5-4-stable git://git.code.sf.net/p/gnuplot/gnuplot-main
 
-Release Notes date: 21-Nov-2021
+Release Notes date: 24-Dec-2021
 
 Changes in 5.4.3
 ================
@@ -16,6 +16,7 @@ Changes in 5.4.3
 * NEW "nogrid" flag for plots to opt out of dgrid3d processing
 * NEW option "above|below y=<val>" for "plot with fillsteps"
 * NEW "set style histogram nokeyseparators" suppress blank key entries Bug #2473
+* CHANGE always allow palette color for non-plot elements of 2D plot
 * FIX contours were incorrectly allocated space in the key even if "notitle"
 * FIX evaluation of unary minus in front of ternary operator Bug #2468
 * FIX arm and s390 require "signed char" Bugs #2467 #2450
