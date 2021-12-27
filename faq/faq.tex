@@ -102,7 +102,7 @@
 \noindent
 This material describes \gnuplot version 5 (up to 5.4)
         \\
-FAQ version: July 2020
+FAQ version: December 2021
         \\
 PDF version of current document: {\http{www.gnuplot.info/faq/faq.pdf}.
 
@@ -203,7 +203,7 @@ flow control and iteration using familiar statements
 \Gnuplot{} is in widespread use on many platforms, including
 MS Windows, linux, unix, and OSX.  The current source code retains
 supports for older systems as well, including VMS, Ultrix, OS/2, and
-MS-DOS. 16-bit platforms are no longer supported.
+MS-DOS. However 16-bit platforms are no longer supported.
 
 You should be able to compile the \gnuplot source more or
 less out of the box in any reasonably standard (ANSI/ISO C, POSIX)
@@ -220,7 +220,9 @@ make any legal statement about the compliance or non-compliance of
 You can use or modify gnuplot as you like, however certain restrictions
 apply to further distribution of modified versions.
 Please read and abide by the modification and redistribution terms in
-the \textit{Copyright} file.
+the \textit{Copyright} file.  Some individual source files are explicitly
+dual-licensed;  in those cases alternative terms for redistribution of code
+in that specific file are listed at the head of the file.
 
 \subsection{Does \gnuplot have anything to do with the FSF and the GNU
 project?}
@@ -379,9 +381,9 @@ A more browser-oriented help forum may be found on StackOverflow
 \http{stackoverflow.com/questions/tagged/gnuplot}
 
 \item
-If all these fail, post a question to \news{comp.graphics.apps.gnuplot} or send mail
-to the gatewayed mailing list \mailto{gnuplot-info@lists.sourceforge.net}.
-Please note that due to the overwhelming amount of spam it would otherwise receive,
+If all these fail, send mail to the gatewayed mailing list
+\mailto{gnuplot-info@lists.sourceforge.net}.
+Please note that to reduce the amount of spam it would otherwise receive,
 you must subscribe before you can post to it. Subscription instructions
 may be found at
 \http{lists.sourceforge.net/lists/listinfo/gnuplot-info}.
@@ -684,11 +686,13 @@ set label Y norotate at graph 0.0, 0.5 offset -6
 
 \subsection{Animations}
 
-Only one \gnuplot terminal type (gif) directly outputs an animated file:
+\Gnuplot versions through release 5.4 support only one terminal type
+(gif) that directly outputs an animated file:
 \begin{verbatim}
 set terminal gif animate {delay <time>} {loop <N>} {optimize}
 \end{verbatim}
 
+The development version (5.5) also supports animation in webp format.
 Have a look at
 \http{gnuplot.sourceforge.net/demo/animate2.html}
 in the demo collection.
