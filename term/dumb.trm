@@ -64,6 +64,9 @@
  *	Note that is_wide_char() uses the same incomplete logic as mbwidth in
  *	readline.c and strwidth_utf8() in estimate.trm.
  *
+ *   Ethan A Merritt Dec 2021
+ *	fillchar
+ *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
  */
@@ -158,6 +161,7 @@ static int dumb_ymax = DUMB_YMAX;
 static TBOOLEAN dumb_feed = TRUE;
 static int dumb_colormode = 0;
 static TBOOLEAN dumb_text_attributes = FALSE;
+static char *dumb_fillchar = NULL;
 
 #define DUMB_PIXEL(x,y) dumb_matrix[dumb_xmax*(y)+(x)]
 
@@ -172,7 +176,7 @@ enum DUMB_id { DUMB_FEED, DUMB_NOFEED, DUMB_ENH, DUMB_NOENH,
                DUMB_SIZE, DUMB_ASPECT,
                DUMB_ANSI, DUMB_ANSI256, DUMB_ANSIRGB, DUMB_NOCOLOR,
                DUMB_ATTRIBUTES, DUMB_NOATTRIBUTES,
-               DUMB_OTHER };
+               DUMB_FILLCHAR, DUMB_OTHER };
 
 static struct gen_table DUMB_opts[] =
 {
@@ -188,6 +192,7 @@ static struct gen_table DUMB_opts[] =
     { "attr$ibutes", DUMB_ATTRIBUTES },
     { "noattr$ibutes", DUMB_NOATTRIBUTES },
     { "mono", DUMB_NOCOLOR },
+    { "fill$char", DUMB_FILLCHAR },
     { NULL, DUMB_OTHER }
 };
 
@@ -257,6 +262,22 @@ DUMB_options()
 	    c_token++;
 	    dumb_text_attributes = FALSE;
 	    break;
+	case DUMB_FILLCHAR:
+	    c_token++;
+	    free(dumb_fillchar);
+	    dumb_fillchar = NULL;
+	    if (equals(c_token, "solid")) {
+		c_token++;
+		/* We mimic the way a user would have typed it in gnuplot syntax,
+		 * not the C standard form "\u2588".
+		 */
+		dumb_fillchar = strdup("\\U+2588");
+	    } else {
+		dumb_fillchar = try_to_get_string();
+	    }
+	    if (dumb_fillchar)
+		truncate_to_one_utf8_char(dumb_fillchar);
+	    break;
 	case DUMB_SIZE:
 	    c_token++;
 	    /* Fall through */
@@ -285,6 +306,7 @@ DUMB_options()
 
     {
 	const char * coloropts[] = {"mono", "ansi", "ansi256", "ansirgb"};
+	char fillopt[24];
 
 	sprintf(term_options, "%sfeed %s size %d, %d aspect %i, %i %s %sattributes",
 	    dumb_feed ? "" : "no",
@@ -294,6 +316,10 @@ DUMB_options()
 	    coloropts[dumb_colormode == 0 ? 0 : dumb_colormode - DUMB_ANSI + 1],
 	    dumb_text_attributes ? "" : "no"
 	    );
+	if (dumb_fillchar && *dumb_fillchar) {
+	    sprintf(fillopt, " fillchar \"%s\"", dumb_fillchar);
+	    strcat(term_options, fillopt);
+	}
     }
 }
 
@@ -1035,20 +1061,13 @@ DUMB_set_color(t_colorspec *colorspec)
 TERM_PUBLIC void
 DUMB_fillbox(int style, unsigned int x, unsigned int y, unsigned int w, unsigned int h)
 {
-    char save_pen;
-    unsigned ny;
-
-    /* temporarily change pen */
-    save_pen = dumb_pen;
-    dumb_pen = DUMB_FILL_CONST;
+    unsigned int nx, ny;
+    char *fillchar = (dumb_fillchar) ? dumb_fillchar : "#";
 
     for (ny = y; ny < y + GPMAX(h, 1); ny++) {
-	DUMB_move(x, ny);
-	DUMB_vector(x + GPMAX(w, 1) - 1, ny);
+	for(nx = x; nx <= (x + GPMAX(w, 1) - 1); nx++)
+	    DUMB_put_text(nx, ny, fillchar);
     }
-
-    /* restore pen */
-    dumb_pen = save_pen;
 }
 
 
@@ -1064,18 +1083,12 @@ dumb_float_compare(const void * elem1, const void * elem2)
 TERM_PUBLIC void
 DUMB_filled_polygon(int points, gpiPoint *corners)
 {
-    char save_pen;
-
     /* Eliminate duplicate polygon points. */
     if ((corners[0].x == corners[points - 1].x) && (corners[0].y == corners[points - 1].y))
 	points--;
     /* Need at least three remaining points */
     if (points < 3)
 	return;
-
-    /* temporarily change pen */
-    save_pen = dumb_pen;
-    dumb_pen = DUMB_FILL_CONST;
 
     {
 	/* ----------------------------------------------------------------
@@ -1089,6 +1102,7 @@ DUMB_filled_polygon(int points, gpiPoint *corners)
 	int i, j;
 	int ymin = dumb_ymax, ymax = 0;
 	int xmin = dumb_xmax, xmax = 0;
+	char *fillchar = (dumb_fillchar) ? dumb_fillchar : "#";
 
 	/* Find bounding box */
 	for (i = 0; i < points; i++) {
@@ -1120,6 +1134,7 @@ DUMB_filled_polygon(int points, gpiPoint *corners)
 
 	   /* Fill the pixels between node pairs. */
 	   for (i = 0; i < nodes; i += 2) {
+		unsigned int nx;
 		if (nodeX[i] > xmax)
 		    break;
 		if (nodeX[i + 1] >= 0) {
@@ -1131,8 +1146,8 @@ DUMB_filled_polygon(int points, gpiPoint *corners)
 		    /* skip lines with zero length */
 		    if (nodeX[i + 1] - nodeX[i] < 0.5)
 			continue;
-		    DUMB_move((int)(nodeX[i] + 0.5), pixelY);
-		    DUMB_vector((int)(nodeX[i + 1]), pixelY);
+		    for (nx = (int)(nodeX[i] + 0.5); nx <= (int)(nodeX[i + 1]); nx++)
+			DUMB_put_text(nx, pixelY, fillchar);
 		}
 	    }
 	}
@@ -1141,9 +1156,6 @@ DUMB_filled_polygon(int points, gpiPoint *corners)
 	free(nodeX);
 	/* ---------------------------------------------------------------- */
     }
-
-    /* restore pen */
-    dumb_pen = save_pen;
 }
 
 #endif /* TERM_BODY */
@@ -1206,6 +1218,7 @@ START_HELP(dumb)
 #ifndef NO_DUMB_ENHANCED_SUPPORT
 "                         {[no]enhanced}",
 #endif
+"                         {fillchar {solid|\"<char>\"}}",
 "                         {[no]attributes}",
 #ifndef NO_DUMB_COLOR_SUPPORT
 "                         {mono|ansi|ansi256|ansirgb}",
@@ -1218,6 +1231,10 @@ START_HELP(dumb)
 " setting the length of the horizontal and vertical tic marks. Only integer",
 " values are allowed. Default is 2,1 -- corresponding to the aspect ratio of",
 " common screen fonts.",
+"",
+" The character \"#\" is used for area-fill. You can replace this with any",
+" character available in the terminal font.  `fillchar solid` is short for",
+" `fillchar \"\\U+2588\"` (unicode FULL BLOCK).",
 "",
 #ifndef NO_DUMB_COLOR_SUPPORT
 " The `ansi`, `ansi256`, and `ansirgb` options will include escape",
