@@ -3622,7 +3622,11 @@ eval_plots()
 	if (axis_array[FIRST_X_AXIS].max == -VERYLARGE ||
 	    axis_array[FIRST_X_AXIS].min == VERYLARGE)
 	    int_error(NO_CARET, "all points undefined!");
-	axis_check_range(FIRST_X_AXIS);
+	if (axis_array[FIRST_X_AXIS].log) {
+	    update_primary_axis_range(&axis_array[FIRST_X_AXIS]);
+	    extend_autoscaled_log_axis(&axis_array[FIRST_X_AXIS]);
+	} else
+	    axis_check_range(FIRST_X_AXIS);
     } else {
 	assert(uses_axis[SECOND_X_AXIS]);
     }
@@ -3630,7 +3634,11 @@ eval_plots()
 	if (axis_array[SECOND_X_AXIS].max == -VERYLARGE ||
 	    axis_array[SECOND_X_AXIS].min == VERYLARGE)
 	    int_error(NO_CARET, "all points undefined!");
-	axis_check_range(SECOND_X_AXIS);
+	if (axis_array[SECOND_X_AXIS].log) {
+	    update_primary_axis_range(&axis_array[SECOND_X_AXIS]);
+	    extend_autoscaled_log_axis(&axis_array[SECOND_X_AXIS]);
+	} else
+	    axis_check_range(SECOND_X_AXIS);
     } else {
 	assert(uses_axis[FIRST_X_AXIS]);
     }
@@ -3650,6 +3658,7 @@ eval_plots()
     } else if (uses_axis[FIRST_Y_AXIS] && nonlinear(&axis_array[FIRST_Y_AXIS])) {
 	axis_checked_extend_empty_range(FIRST_Y_AXIS, "all points y value undefined!");
 	update_primary_axis_range(&axis_array[FIRST_Y_AXIS]);
+	extend_autoscaled_log_axis(&axis_array[FIRST_Y_AXIS]);
     } else if (uses_axis[FIRST_Y_AXIS]) {
 	axis_checked_extend_empty_range(FIRST_Y_AXIS, "all points y value undefined!");
 	axis_check_range(FIRST_Y_AXIS);
@@ -3657,6 +3666,7 @@ eval_plots()
     if (uses_axis[SECOND_Y_AXIS] && axis_array[SECOND_Y_AXIS].linked_to_primary) {
 	axis_checked_extend_empty_range(SECOND_Y_AXIS, "all points y2 value undefined!");
 	update_primary_axis_range(&axis_array[SECOND_Y_AXIS]);
+	extend_autoscaled_log_axis(&axis_array[SECOND_Y_AXIS]);
     } else if (uses_axis[SECOND_Y_AXIS]) {
 	axis_checked_extend_empty_range(SECOND_Y_AXIS, "all points y2 value undefined!");
 	axis_check_range(SECOND_Y_AXIS);

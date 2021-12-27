@@ -2576,6 +2576,10 @@ void
 extend_primary_ticrange(AXIS *axis)
 {
     AXIS *primary = axis->linked_to_primary;
+    TBOOLEAN autoextend_min = (axis->autoscale & AUTOSCALE_MIN)
+	&& !(axis->autoscale & AUTOSCALE_FIXMIN);
+    TBOOLEAN autoextend_max = (axis->autoscale & AUTOSCALE_MAX)
+	&& !(axis->autoscale & AUTOSCALE_FIXMAX);
 
     if (axis->ticdef.logscaling) {
 	/* This can happen on "refresh" if the axis was unused */
@@ -2583,13 +2587,13 @@ extend_primary_ticrange(AXIS *axis)
 	    return;
 
 	/* NB: "zero" is the minimum non-zero value from "set zero" */
-	if ((primary->autoscale & AUTOSCALE_MIN)
-	||  fabs(primary->min - floor(primary->min)) < zero) {
+	if (autoextend_min
+	||  (fabs(primary->min - floor(primary->min)) < zero)) {
 	    primary->min = floor(primary->min);
 	    axis->min = eval_link_function(axis, primary->min);
 	}
-	if ((primary->autoscale & AUTOSCALE_MAX)
-	||  fabs(primary->max - ceil(primary->max)) < zero) {
+	if (autoextend_max
+	||  (fabs(primary->max - ceil(primary->max)) < zero)) {
 	    primary->max = ceil(primary->max);
 	    axis->max = eval_link_function(axis, primary->max);
 	}
@@ -2629,6 +2633,20 @@ update_secondary_axis_range(struct axis *primary)
        secondary->max = eval_link_function(secondary, primary->max);
        secondary->data_min = eval_link_function(secondary, primary->data_min);
        secondary->data_max = eval_link_function(secondary, primary->data_max);
+    }
+}
+
+/*
+ * range-extend autoscaled log axis
+ */
+void
+extend_autoscaled_log_axis(AXIS *primary)
+{
+    if (primary->log) {
+	extend_primary_ticrange(primary);
+	axis_invert_if_requested(primary);
+	check_log_limits(primary, primary->min, primary->max);
+	update_primary_axis_range(primary);
     }
 }
 
