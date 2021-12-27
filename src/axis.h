@@ -496,6 +496,7 @@ void extend_primary_ticrange(AXIS *axis);
 void update_primary_axis_range(struct axis *secondary);
 void update_secondary_axis_range(struct axis *primary);
 void reconcile_linked_axes(AXIS *primary, AXIS *secondary);
+void extend_autoscaled_log_axis(AXIS *primary);
 
 int map_x(double value);
 int map_y(double value);
