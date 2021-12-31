@@ -39,7 +39,7 @@ START_HELP(latex)
 " terminals `latex`, `emtex`, `eepic`, and `tpic` present in older versions",
 " of gnuplot. See `pict2e`.",
 "",
-" (5) Others, see `context`, legacy terminals mf (metafont) and mp (metapost).",
+" (5) Others, see `context`, legacy terminals texdraw and mp (metapost).",
 ""
 END_HELP(latex)
 #endif

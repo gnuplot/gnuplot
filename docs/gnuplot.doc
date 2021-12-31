@@ -475,7 +475,7 @@ C
 ## which are no longer built by default.
 #b The `texdraw` terminal has been extended to support text at arbitrary angles,
 ## variable line width, v5 dashed lines, and filled boxes and polygons. It can
-## now be used with plain TeX, too.
+## now be used with plain TeX, too.  It still does not support color.
 #b The previously experimental Direct2D variant of the `windows` terminal
 ## replaces the GDI and GDI+ variants. It now supports printing using D2D
 ## and color fonts.

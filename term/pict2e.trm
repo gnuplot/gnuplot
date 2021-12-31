@@ -52,7 +52,7 @@
  * backward-compatibility.
  */
 
-// transparency for pict2e width pdflatex and package "transparent"
+// transparency for pict2e with pdflatex and package "transparent"
 #define PICT2E_TRANSPARENT
 
 #ifdef TERM_REGISTER
@@ -1098,7 +1098,7 @@ START_HELP(pict2e)
 "?pict2e",
 " The `pict2e` terminal uses the LaTeX2e variant of the picture environment.",
 " It replaces terminals which were based on the original LaTeX picture",
-" environment: `latex`, `emtex`, `tpic`, and `eepic`. (EXPERIMENTAL)",
+" environment: `latex`, `emtex`, `tpic`, and `eepic`.",
 "",
 " Alternatives to this terminal with a more complete support of gnuplot's",
 " features are `tikz`, `pstricks`, `cairolatex`, `pslatex`, `epslatex`",
