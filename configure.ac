@@ -14,7 +14,7 @@ AC_CONFIG_HEADERS(config.h:config.hin)
 dnl The line below is for use during development
 dnl AC_DEFINE(DEVELOPMENT_VERSION,1,[Provide contact info for gnuplot develoment])
 dnl The line below is for packaging a release version
-AM_CONDITIONAL([DEVELOPMENT_VERSION], 0)
+AM_CONDITIONAL([DEVELOPMENT_VERSION], false)
 
 AM_INIT_AUTOMAKE([1.10 subdir-objects])
 
