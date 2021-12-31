@@ -1,4 +1,4 @@
-C corresponding original gnuplot.doc for 5.4.2 (2021-05-25)
+C corresponding original gnuplot.doc for 5.4.3 (2021-12-27)
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -408,8 +408,12 @@ C 行が長いのは、できればなんとかしたい
 #b 日時データ入力時に AM/PM の処理をする %p 書式を認識
 #b plot の title は、plot 実行前ではなく、実行後に評価します。これによ
 ## り、plot 時に計算する量を参照するタイトルを作れるようになります。
-#b 組み込み変形ベッセル関数 (bes10, besi1, besin)
+#b 組み込み変形ベッセル関数 (besi0, besi1, besin)
 #b 組み込み第 1 種、2 種 N 次ベッセル関数 (besjn, besyn)
+#b (5.4.2) "using" 指定内で $# は現在のデータ行の全列数を意味します。
+#b (5.4.2) filledcurves 同様の "plot with fillsteps {above|below y=<value>}"
+#b (5.4.3) splot の要素を dgrid3d 処理から外すフラグ "nogrid"
+#b (5.4.3) "set style histogram nokeyseparators" (以下参照: `newhistogram`)
 #end
 
 4 変更点 (Changes)
@@ -418,6 +422,8 @@ C 行が長いのは、できればなんとかしたい
 #b `pm3d filled area quadrangles` は、現在の zrange に従って滑らかにク
 ## リッピングします。これは、pm3d 曲面、そして 3 次元の boxes, polygons
 ## 等にも影響を与えます。
+#b `set pm3d border retrace` は、隣接する pm3d 四辺形同士を同じ色境界で
+## 塗ることで、内在するアンチエイリアスの副産物を解消します。
 #b 描画スタイル `with parallelaxes` の書式の改良。以下参照: `parallel`。
 ## histgram, parallelaxis, spiderplot スタイルでは、描画要素を繰返し出
 ## 力する書式を使用できます:
@@ -433,6 +439,7 @@ C 行が長いのは、できればなんとかしたい
 #b コマンド `set fontpath` は非推奨です。postscript 出力形式からの出力
 ## の中に埋め込まれるフォントの検索パスは改良されています。
 #end
+
 3 バージョン 5.2 で導入された機能 (Features introduced in version 5.2)
 4 新しい描画スタイルやスタイルオプション
 #start
@@ -4403,8 +4410,15 @@ Ffigure_fsteps
 ?style fillsteps
 ?with fillsteps
 ?fillsteps
- `fillsteps` スタイルは、`steps` とほぼ同じですが、曲線と y=0 との間の
- 領域を現在の fillstyle で塗り潰します。以下参照: `steps`。
+ 書式:
+      plot <data> with fillsteps [above|below] [y=<baseline>]
+
+ `fillsteps` スタイルは、`steps` とほぼ同じですが、曲線とベースライン
+ (デフォルトは y=0) との間の領域を現在の fillstyle で塗り潰します。以下
+ 参照: `steps`。
+
+ オプション `above` と `below` は、ベースラインの片方の部分のみ塗り潰し
+ ます。
 2 histeps
 ?plotting styles histeps
 ?style histeps
@@ -4502,6 +4516,10 @@ Ffigure_histeps
  を含む場合、histogram でない方は、x1 軸を使うか x2 軸を使うかを選択で
  きます。
 
+ 一つ追加のスタイルオプション `set style histogram nokeyseparators` は、
+ 複数のヒストグラムを含むグラフにのみ適切なものです。その場合の追加説明
+ については、以下参照: `newhistgram`。
+
  例:
 Ffigure_histclust
  入力ファイルは、2, 4, 6, ... の列にデータ値を持ち、3, 5, 7, ...  の列
@@ -4597,6 +4615,13 @@ Ffigure_histcols
  同様に、次のヒストグラムを指定した fillstyle で始めさせることが可能で
  す。その fillstyle を `pattern` にセットした場合、塗り潰しに使用される
  パターン番号は自動的に増加されていきます。
+
+ 新しいヒストラムの開始は、通常は凡例 (key) に空のエントリを追加し、そ
+ れによりそのヒストグラム要素の集合のタイトルは、それ以前のヒストグラム
+ のものと分離されることになります。しかしこの空行は、その要素が個々のタ
+ イトルを持たない場合は望ましいものではありません。これは、そのスタイル
+ を `set style histogram nokeyseparators` と変更することで、その空行の
+ 出力を抑制できます。
 
 Ffigure_newhist
  オプション `at <x-coord>` は、その後のヒストグラムの x 座標の位置を
@@ -9818,8 +9843,8 @@ Ffigure_missing
  いて、追加のパラメータを指定できるものもあります。これらの補間は、格子
  点に近いデータ点ほど、その格子点に対してより強い影響を与えます。
 
- `splines` アルゴリズムは、"薄いつぎ板" を元にした補間計算を行います。
- これは追加パラメータを取りません。
+ `splines` アルゴリズムは、薄いつぎ板を元にした補間計算を行います。これ
+ は追加パラメータを取りません。
 
  `qnorm` アルゴリズムは各格子点で入力データの重み付き平均を計算します。
  各点には、格子点からの距離の逆数のあるベキ乗で重み付けします。そのベキ
@@ -9860,23 +9885,23 @@ Ffigure_missing
  に対する `smooth kdensity` オプションが行うこととおおまかには同じです
  (使用例は kdensity2d.dem を参照してください)。
 
- 後方互換性のために、わずかに異なる書式もサポートされています。どのアル
- ゴリズムも明示的に選択しなかった場合、`qnorm` アルゴリズムが仮定され、
- 3 つ以下の、コンマ (,) 区切りのオプションパラメータを指定した場合は、
- それらをそれぞれ行数、列数、そして norm 値であると解釈します。
+ 非推奨: 後方互換性のため、わずかに異なる書式もサポートされています。ど
+ のアルゴリズムも明示的に選択しなかった場合、`qnorm` アルゴリズムが仮定
+ され、3 つ以下の、コンマ (,) 区切りのオプションパラメータを指定した場
+ 合は、それらをそれぞれ行数、列数、そして norm 値であると解釈します。
 
  オプション `dgrid3d` は、散在するデータを重み付き平均で規則的な格子に
  置き変える単純な仕組みに過ぎません。この問題に対するより洗練された手法
  が存在しますので、この単純な方法が不十分であれば、`gnuplot` の外でその
  ような方法でデータを前処理するべきでしょう。
 
- 以下も参照
+ オンライン上の以下も参照
 ^ <a href="http://www.gnuplot.info/demo/dgrid3d.html">
- dgrid3d.dem: dgrid3d のデモ
+ dgrid3d のデモ
 ^ </a>
  および
 ^ <a href="http://www.gnuplot.info/demo/scatter.html">
- scatter.dem: dgrid3d のデモ
+ scatter のデモ
 ^ </a>
 
 3 仮変数 (dummy)
@@ -13176,7 +13201,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
                     {primary <fraction>} {specular <fraction>}
                     {spec2 <fraction>}
                   }
-                  { border {<linestyle-options>}}
+                  { {no}border {retrace} {<linestyle-options>}}
                   { implicit | explicit }
                   { map }
                 }
@@ -13443,21 +13468,18 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 ?pm3d hidden3d
 ?set pm3d border
 ?pm3d border
- オプション `set pm3d border {line-properties}` は、各四角形の境界線を、
- 四角形が描画されてあるように描画します。通常これは、擬似的な隠線処理を
- 行うために、オプション `depthorder` とともに使用します。pm3d グラフで
- は、大域的なオプション `set hidden3d` は何の効果も生まないことに注意し
- てください。デフォルトの線の属性 (色、幅) を、キーワード border の後ろ
- にオプションとして後ろにつけます。そのデフォルト値は、その後の splot
- コマンドで変更できます。
+      set pm3d border {retrace} {line-properties}
+      set pm3d noborder
 
- 推奨する使用例:
+ このオプションは、各四角形の境界線を、四角形が描かれているように描画し
+ ます。追加の線属性 (線種、色、線幅) は任意で、デフォルトでは、幅 1 の
+ 黒の実線で境界を書きます。
 
-       set pm3d at s depthorder border lw 0.2 lt black
-       unset hidden3d
-       unset surf
-       splot x*x+y*y linecolor rgb "blue"   # こうしないと黒
-
+ `set pm3d border retrace` は、四辺形の塗るのと同じ色で境界を塗らせます。
+ これは、結果として `noborder` と同じことになりますが、出力モードによっ
+ ては、隣接した塗り潰し四辺形の間のアンチエイリアスによる副産物に苦しむ
+ かもしれません。境界を再描画 (retrace) することで、出力ファイルは大き
+ くなってしまいますが、これらの副産物を隠すことができます。
 4 fillcolor
 ?pm3d fillcolor
       splot FOO with pm3d fillcolor <colorspec>
