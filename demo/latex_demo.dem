@@ -1,0 +1,41 @@
+
+# set title "would be nice if this would automatically go into the caption!"
+set xtics 0.5 nomirror
+set tics format "%.1f"
+set margins -1,0,7,0
+set xrange [-1:1]
+set yrange [1:3]
+set key notitle invert under reverse Left left spacing 2 samplen 0.7
+
+Title_E = 'EllipticE$(k)=\int_0^{\pi/2} {\sqrt{1-k^2\sin^2\theta}}~d\theta$'
+Title_K = 'EllipticK$(k)=\int_0^{\pi/2} {\sqrt{1-k^2\sin^2\theta}~}^{-1}~d\theta$'
+
+set arrow 1 filled from graph 0.4, 0.7 to graph 0.6, 0.7
+set label 1 at graph 0.5, 0.75 "$k$" center
+
+set term dumb
+plot EllipticE(x) lw 3 title Title_E, \
+     EllipticK(x) lw 3 title Title_K
+
+
+set term pict2e color texarrows texpoints font "cmr,9" size 3.5in, 2.4in
+set output 'latex_pict2e.tex'
+replot
+unset output
+
+set term cairolatex color font "cmr,10" size 3.5in, 2.4in fontscale 0.7
+set output 'latex_cairo.tex'
+replot
+unset output
+
+set term tikz nogppoints size 3.5in, 2.4in
+set output 'latex_tikz.tex'
+replot
+unset output
+
+set term epslatex color 10 size 3.5in,2.4in standalone
+set output 'epslatex.tex'
+set margins -1,-1,7,-1
+replot
+unset output
+

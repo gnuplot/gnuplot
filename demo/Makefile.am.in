@@ -4,7 +4,9 @@ AUTOMAKE_OPTIONS = foreign
 CLEANFILES = binary1 binary2 binary3 defaults.ini equipo2.tmp field2xy.tmp \
 soundfit.par temp.set fontfile.ps fontfile_latex.ps epslatex-inc.eps \
 epslatex-inc.pdf epslatex.aux epslatex.dvi epslatex.log epslatex.pdf \
-epslatex.ps epslatex.tex random.tmp stringvar.tmp fit.log fitmulti.dat
+random.tmp stringvar.tmp fit.log fitmulti.dat \
+epslatex.ps epslatex.tex epslatex-oldstyle.tex epslatex-oldstyle-inc.eps \
+latex_demo.log latex_demo.aux latex_cairo.tex latex_pict2e.tex latex_tikz.tex
 
 DISTCLEANFILES = Makefile.am Makefile.in
 
@@ -68,6 +70,13 @@ epslatex:
 	fi
 	latex epslatex
 	dvips epslatex
+
+latex_demo:
+	( bdir=`pwd` ; PATH=$$bdir/../src:$$PATH \
+	  GNUPLOT_LIB=$(srcdir) $(GNUPLOT) latex_demo.dem )
+	latex epslatex
+	dvips -E epslatex -o latex_epslatex.eps
+	xelatex latex_demo
 
 ##m4-files-begin
 ##m4-files-end
