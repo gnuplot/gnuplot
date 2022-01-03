@@ -2,8 +2,9 @@
 		===================================
 
 This release contains bug fixes and a few new features back-ported from the
-development version.  Gnuplot development is tracked in a git repository on
-SourceForge.  You can generate a complete history of changes using "git log"
+development version.  The most notable fix improves handling of piped input
+on Windows.  Gnuplot development is tracked in a git repository on SourceForge.
+You can generate a complete history of changes using "git log"
 after downloading:
 
 	git clone -b branch-5-4-stable git://git.code.sf.net/p/gnuplot/gnuplot-main

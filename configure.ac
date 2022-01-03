@@ -5,7 +5,7 @@ dnl NB: Change version/patchlevel immediately below
 dnl     and also in PATCHLEVEL and src/version.c
 dnl
 
-AC_INIT(gnuplot, 5.4.3b)
+AC_INIT(gnuplot, 5.4.3)
 
 AC_CONFIG_SRCDIR(src/graphics.c)
 AC_PREREQ([2.69])
@@ -183,8 +183,6 @@ fi
 AM_CONDITIONAL(BUILD_GNUPLOT_X11, test "$no_x" != yes)
 
 dnl Operating systems.
-dnl FIXME AC_DEFINE(ISC22)
-dnl FIXME AC_DEFINE(KSR)
 dnl Check for MSDOS and djgpp, Apple MacOsX, BeOS
 GP_MSDOS
 GP_APPLE
@@ -195,14 +193,8 @@ AM_CONDITIONAL(BUILD_SRC_BEOS_SUBDIR, test x$build_beos_subdir = xyes)
 dnl _instead_ of -lm ...
 AC_CHECK_FUNC(sin,,[AC_CHECK_LIB(m,sin)])
 
-dnl Header files. ANSI first
-dnl We prefer that the absense of a macro is the norm, so in syscfg.h
-dnl configure's HAVE_XXXX defines are translated into NO_XXXX for ANSI
-dnl headers and functions
-AC_HEADER_STDC
-
 dnl Header files
-dnl ANSI/ISO C, POSIX, others
+dnl AC_HEADER_STDC
 AC_CHECK_HEADERS(dirent.h errno.h float.h langinfo.h limits.h locale.h math.h \
   stdlib.h string.h time.h sys/time.h sys/types.h \
   sys/bsdtypes.h sys/ioctl.h sys/param.h sys/select.h sys/socket.h \
