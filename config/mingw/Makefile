@@ -953,8 +953,11 @@ gnuplot.ps: gnuplot.dvi
 
 gnuplot.pdf: gnuplot-figures.tex $(TOP)/VERSION $(D)toc_entr.sty $(D)titlepag.tex
 	cp gnuplot-figures.tex gp_tex2.tex
-	echo "\usepackage{graphicx}" > pdffigures.tex
-	echo "\usepackage{picins}" >> pdffigures.tex
+	echo "\usepackage{graphicx}" > gpinsetfigure.tex
+	echo "\usepackage{picins}" >> gpinsetfigure.tex
+	echo "\newcommand{\gpinsetfigure}[1]{" >> gpinsetfigure.tex ; \
+	echo "  \parpic[r][rt]{\includegraphics[width=3in,keepaspectratio]{#1}}" >> gpinsetfigure.tex ; \
+	echo "}" >> gpinsetfigure.tex
 	# Call LaTeX three times to get the toc right.
 	TEXINPUTS=.:$(TOP):$(D):${TEXINPUTS}: pdflatex gp_tex2.tex
 	TEXINPUTS=.:$(TOP):$(D):${TEXINPUTS}: pdflatex gp_tex2.tex
