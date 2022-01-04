@@ -101,8 +101,10 @@ CLEANFILES = allterm.h gnuplot.dvi gnuplot.tex gnuplot.idx gnuplot.ilg	\
 gnuplot.ps gnuplot.gih gnuplot.hlp gnuplot.info* gnuplot.ipf gnuplot.ms	\
 gnuplot.rnh gnuplot.rtf gnuplot.nroff gnuplot.txt gnuplot-groff.dvi	\
 gnuplot-groff.ps gnuplot.tmp VERSION gnuplot.4tc gnuplot.4ct		\
-gnuplot.idv gnuplot.xref gnuplot.lg gnuplot.pdf wxhelp_figures		\
-wxhelp/*.html wxhelp/wgnuplot.hhc wxhelp/wgnuplot.hhk			\
+gnuplot.idv gnuplot.xref gnuplot.lg gnuplot.pdf		 		\
+ja.doc gnuplot-ja.ind gnuplot-ja.ilg gnuplot-ja.aux gnuplot-ja.toc	\
+gnuplot-ja.idx gnuplot-ja.out gnuplot-ja.tex				\
+wxhelp_figures wxhelp/*.html wxhelp/wgnuplot.hhc wxhelp/wgnuplot.hhk	\
 wxhelp/wgnuplot.htc wxhelp/doc2html$(EXEEXT) windows/wgnuplot.htk	\
 windows/*.png gnuplot.htb gnuplot.texi gnuplot-eldoc.el $(ELCS)
 
@@ -262,6 +264,29 @@ gnuplot.ps: gnuplot.dvi
 	else \
 	   echo "dvips not found - cannot build PS file" ; \
 	fi
+
+# Prepare PDF copy of User Manual in Japanese
+#
+# This procedure assumes use of luatex with package luatexja
+# Tested with TeX Live 2020
+# Known limitations:
+# - The title page is not completely translated.
+# - Only the original English keywords appear in the index.
+# - The internal hypertext links are not created (why?).
+# - I made no attempt to apply term-ja.diff so that terminal
+#   help text could be included in translation rather than
+#   in English.
+
+gnuplot-ja.pdf: gnuplot-ja.doc title-ja.tex pdf_figures
+	iconv -f EUC-JP -t UTF-8 gnuplot-ja.doc > ja.doc
+	doc2tex -figures ja.doc | sed 's/titlepag.tex/title-ja.tex/' > gnuplot-ja.tex
+	lualatex gnuplot-ja
+	lualatex gnuplot-ja
+	makeindex gnuplot-ja
+	lualatex gnuplot-ja
+	rm -f gnuplot-ja.ind gnuplot-ja.ilg gnuplot-ja.aux gnuplot-ja.toc
+	rm -f gnuplot-ja.idx gnuplot-ja.out
+	rm -f ja.doc gnuplot-ja.tex
 
 # this is how to make gnuplot.hlp
 hlp: gnuplot.hlp
