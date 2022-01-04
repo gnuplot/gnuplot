@@ -281,6 +281,11 @@ BLOCK_init()
     // FIXME: is this correct or should the -1 go?
     dumb_xmax = BLOCK_xchars - 1;
     dumb_ymax = BLOCK_ychars - 1;
+    // guide the aspect ratio calculation in the core layer
+    if (BLOCK_mode == BLOCK_MODE_QUAD || BLOCK_mode == BLOCK_MODE_DOT)
+	term->h_tic = BLOCK_HTIC * 2;
+    else
+	term->h_tic = BLOCK_HTIC;
     DUMB_init();
 }
 
