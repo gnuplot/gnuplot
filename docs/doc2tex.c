@@ -459,8 +459,10 @@ puttex( char *str, FILE *file)
     while ((ch = *str++) != NUL) {
 
 	/* Japanese documentation trigger for cross-reference link */
-	if (!strncmp( str, "以下参照", strlen("以下参照") ))
+	if (!strncmp( str, "参照", strlen("参照") ))
 	    ja_see = TRUE;
+	if (!strncmp( str, "。", strlen("。") ))
+	    ja_see = FALSE;
 
 	switch (ch) {
 	case '#':
@@ -509,7 +511,7 @@ puttex( char *str, FILE *file)
 	    break;
 	case '`':    /* backquotes mean boldface */
 	    if (inquote) {
-                if (see || ja_see){
+                if ((see || ja_see) && (*string != '$')) {
 		    char *index = string;
 		    char *s;
                     (void) fputs(" (p.~\\pageref{", file);
@@ -525,7 +527,6 @@ puttex( char *str, FILE *file)
 		    fputs(index,file);
 		    fputs("}",file);
 #endif
-		    ja_see = FALSE;
                     /* see = FALSE; */
                 }
                 (void) fputs("}", file);
@@ -568,6 +569,7 @@ puttex( char *str, FILE *file)
         case ')':
         case '.':
             see = FALSE;
+            ja_see = FALSE;
 	default:
 	    (void) fputc(ch, file);
 	    break;
