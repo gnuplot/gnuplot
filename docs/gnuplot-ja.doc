@@ -2330,12 +2330,10 @@ C C 4 FresnelS
 %_
 C C 4 time
 C ?expressions functions time
-?time
 #time(x) & 任意 & 現在のシステム時刻 (秒単位) \\
 %time(x)@任意@現在のシステム時刻 (秒単位)
 C C 4 timecolumn
 C ?expressions functions timecolumn
-?timecolumn
 #timecolumn(N,"timeformat") & 整数, 文字列 & 入力データの $N$ 列目からの書式化日時データ \\
 %timecolumn(N,"timeformat")@整数, 文字列@入力データの $N$ 列目からの書式化日時データ
 C C 4 tm_hour
@@ -8572,7 +8570,7 @@ C using の書式 (format)
  以下も参照: `datafile separator`。
 
  'scanf' 関数では色々なデータ形式の数値入力が使えますが、`gnuplot` は全
- ての入力データを倍精度浮動小数とみなしますから、`gnuplot` では `%lf`
+ ての入力データを倍精度浮動小数とみなしますから、`gnuplot` では "%lf"
  が本質的に唯一の数値入力指定、ということになります。その書式文字列には
  少なくとも一つ、そして 7 つ以下の、そのような入力指定子を入れる必要が
  あります。
