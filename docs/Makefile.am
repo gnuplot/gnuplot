@@ -277,9 +277,9 @@ gnuplot.ps: gnuplot.dvi
 #   help text could be included in translation rather than
 #   in English.
 
-gnuplot-ja.pdf: gnuplot-ja.doc title-ja.tex pdf_figures
+gnuplot-ja.pdf: gnuplot-ja.doc title-ja.tex pdf_figures allterm.h doc2tex$(EXEEXT)
 	iconv -f EUC-JP -t UTF-8 gnuplot-ja.doc > ja.doc
-	doc2tex -figures ja.doc | sed 's/titlepag.tex/title-ja.tex/' > gnuplot-ja.tex
+	./doc2tex$(EXEEXT) -figures ja.doc | sed 's/titlepag.tex/title-ja.tex/' > gnuplot-ja.tex
 	lualatex gnuplot-ja
 	lualatex gnuplot-ja
 	makeindex gnuplot-ja
