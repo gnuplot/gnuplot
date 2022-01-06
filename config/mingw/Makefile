@@ -330,13 +330,14 @@ VPATH = $(S):$(S)/wxterminal
 
 CFLAGS += -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" 
 TERMFLAGS = -DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\"
-TERMFLAGS += -I$(TOP)/term
 
 TERMLIBS =
 
 CFLAGS += -I. -I$(S) -I$(T) -DHAVE_CONFIG_H
 CFLAGS += -D__USE_MINGW_ANSI_STDIO=1
 CFLAGS += -DGNUPLOT_SHARE_DIR=\"$(GNUPLOT_SHARE_DIR)\"
+
+CFLAGS_DOCS = -I. -I$(S) -DHAVE_CONFIG_H
 
 ifndef RELEASE
   CFLAGS += -DDEVELOPMENT_VERSION
@@ -864,13 +865,13 @@ wgnuplot-ja.chm: $(JASRC) doc2html-ja.exe \
 doc2html.exe: $(CORETERM) $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c version.o $(LUA_HELP)
 	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI \
 	    -DVERSION_MAJOR='"$(MAINVERSION)"' -DPATCHLEVEL='"$(PATCHLEVEL)"' \
-	    $(CFLAGS) -I. -I$(D:/=) -I$(T:/=) \
+	    $(CFLAGS_DOCS) -I. -I$(D:/=) -I$(T:/=) \
 	    $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c
 
 doc2html-ja.exe: $(JASRC) $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c version.o $(LUA_HELP)
 	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI \
 	    -DVERSION_MAJOR='"$(MAINVERSION)"' -DPATCHLEVEL='"$(PATCHLEVEL)"' \
-	    -DJAPANESE_DOC $(CFLAGS) -I. -I$(JAD) -I$(JA)/term \
+	    -DJAPANESE_DOC $(CFLAGS_DOCS) -I. -I$(JAD) -I$(JA)/term \
 	    $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c
 
 doc2ms.exe: $(D)doc2ms.c $(D)termdoc.c $(D)xref.c version.o $(LUA_HELP)
