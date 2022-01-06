@@ -31,7 +31,7 @@ if (winhelp > 0) {
     out = "./"
 }
 
-demo = "../demo/"
+set loadpath '../demo'
 
 if (GPVAL_TERM eq "pngcairo" || GPVAL_TERM eq "png") ext=".png"
 if (GPVAL_TERM eq "pdfcairo" || GPVAL_TERM eq "pdf") ext=".pdf"
@@ -54,35 +54,35 @@ set rmargin screen 0.95
 set bmargin screen 0.05
 set tmargin screen 0.95
 
-plot demo . 'silver.dat' u 1:($2-10.) title 'with lines' with lines
+plot 'silver.dat' u 1:($2-10.) title 'with lines' with lines
 #
 set output out . 'figure_points' . ext
-plot demo . 'silver.dat' u 1:($2-10.):(1+rand(0)) title 'with points ps variable' \
+plot 'silver.dat' u 1:($2-10.):(1+rand(0)) title 'with points ps variable' \
      with points ps variable pt 6
 #
 set output out . 'figure_linespoints' . ext
 set key opaque height 1
 f(x) = 8 + 8*sin(x/20)
-plot demo . 'silver.dat' u 1:($2-10.) title 'with linespoints' \
+plot 'silver.dat' u 1:($2-10.) title 'with linespoints' \
      with linespoints pt 6 ps 1, \
      '' u 1:($2) title 'pointinterval -2' with lp pt 4 ps 1 pi -2, \
      '' u 1:($2+10.) with lp pt "α" pi -1 font ",18" title 'with lp pt "α" pi -1'
 set key noopaque
 #
 set output out . 'figure_fsteps' . ext
-plot demo . 'silver.dat' u 1:($2-10.) title 'with fsteps' with fsteps
+plot 'silver.dat' u 1:($2-10.) title 'with fsteps' with fsteps
 #
 set output out . 'figure_steps' . ext
 set style fill solid 0.25 noborder
-plot demo . 'silver.dat' u 1:($2-10.) title 'with fillsteps' with fillsteps, \
+plot 'silver.dat' u 1:($2-10.) title 'with fillsteps' with fillsteps, \
                       '' u 1:($2-10.) title 'with steps' with steps lw 3 dt solid
 #
 set output out . 'figure_histeps' . ext
-plot demo . 'silver.dat' u 1:($2-10.) title 'with histeps' with histeps
+plot 'silver.dat' u 1:($2-10.) title 'with histeps' with histeps
 #
 symbol(z) = "•□+⊙♠♣♡♢"[int(z):int(z)]
 set output out . 'figure_labels2' . ext
-plot demo . 'silver.dat' u 1:($2-10.):(symbol(1+int($0)%8)) \
+plot 'silver.dat' u 1:($2-10.):(symbol(1+int($0)%8)) \
      with labels font ",18" title "with labels"
 
 #
@@ -93,15 +93,15 @@ plot demo . 'silver.dat' u 1:($2-10.):(symbol(1+int($0)%8)) \
 set output out . 'figure_boxes' . ext
 set xzeroaxis
 set boxwidth 0.8 relative
-plot demo . 'silver.dat' u 1:($2-10.) with boxes title 'with boxes' fs solid 0.5
+plot 'silver.dat' u 1:($2-10.) with boxes title 'with boxes' fs solid 0.5
 #
 set output out . 'figure_boxerrorbars' . ext
 set boxwidth 0.8 relative
-plot demo . 'silver.dat' u 1:($2-10.):(3*rand(0)) with boxerrorbars title 'with boxerrorbars' fs solid 0.5 fc "blue"
+plot 'silver.dat' u 1:($2-10.):(3*rand(0)) with boxerrorbars title 'with boxerrorbars' fs solid 0.5 fc "blue"
 #
 set output out . 'figure_impulses' . ext
 set bmargin at screen .2
-plot demo . 'silver.dat' u 1:($2-10.) with impulses lw 2 title 'with impulses'
+plot 'silver.dat' u 1:($2-10.) with impulses lw 2 title 'with impulses'
 set bmargin at screen .05
 
 #
@@ -116,37 +116,37 @@ unset xzeroaxis
 unset offset
 #
 set output out . 'figure_candlesticks' . ext
-plot demo . 'candlesticks.dat' using 1:3:2:6:5 title 'with candlesticks' with candlesticks whiskerbar fs solid 0.5 fc "cyan"
+plot 'candlesticks.dat' using 1:3:2:6:5 title 'with candlesticks' with candlesticks whiskerbar fs solid 0.5 fc "cyan"
 #
 set output out . 'figure_financebars' . ext
 set bars 4
-plot demo . 'candlesticks.dat' using 1:3:2:6:5 title 'with financebars' with financebars
+plot 'candlesticks.dat' using 1:3:2:6:5 title 'with financebars' with financebars
 set bars 1
 #
 set output out . 'figure_yerrorbars' . ext
-plot demo . 'candlesticks.dat' using 1:4:3:5 with yerrorbars title 'with yerrorbars'
+plot 'candlesticks.dat' using 1:4:3:5 with yerrorbars title 'with yerrorbars'
 #
 set output out . 'figure_yerrorlines' . ext
-plot demo . 'candlesticks.dat' using 1:4:3:5 with yerrorlines title 'with yerrorlines'
+plot 'candlesticks.dat' using 1:4:3:5 with yerrorlines title 'with yerrorlines'
 #
 set output out . 'figure_boxxyerror' . ext
-plot demo . 'candlesticks.dat' using 1:4:($1-sin($1)/2.):($1+sin($1)/2.):3:5 \
+plot 'candlesticks.dat' using 1:4:($1-sin($1)/2.):($1+sin($1)/2.):3:5 \
      with boxxyerror title 'with boxxyerror' fs empty
 #
 set output out . 'figure_xyerrorbars' . ext
-plot demo . 'candlesticks.dat' using 1:4:($1-sin($1)/2.):($1+sin($1)/2.):3:5 \
+plot 'candlesticks.dat' using 1:4:($1-sin($1)/2.):($1+sin($1)/2.):3:5 \
      with xyerrorbars title 'with xyerrorbars'
 #
 set output out . 'figure_xyerrorlines' . ext
-plot demo . 'candlesticks.dat' using 1:4:($1-sin($1)/2.):($1+sin($1)/2.):3:5 \
+plot 'candlesticks.dat' using 1:4:($1-sin($1)/2.):($1+sin($1)/2.):3:5 \
      with xyerrorlines title 'with xyerrorlines'
 #
 set output out . 'figure_xerrorbars' . ext
-plot demo . 'candlesticks.dat' using 1:4:($1-sin($1)/2.):($1+sin($1)/2.) \
+plot 'candlesticks.dat' using 1:4:($1-sin($1)/2.):($1+sin($1)/2.) \
      with xerrorbars title 'with xerrorbars'
 #
 set output out . 'figure_xerrorlines' . ext
-plot demo . 'candlesticks.dat' using 1:4:($1-sin($1)/2.):($1+sin($1)/2.) \
+plot 'candlesticks.dat' using 1:4:($1-sin($1)/2.):($1+sin($1)/2.) \
      with xerrorlines title 'with xerrorlines'
 
 # 
@@ -165,7 +165,7 @@ set border 2
 set lmargin at screen 0.3
 unset key
 set style data boxplot
-plot demo . 'silver.dat' using (1):2:(.25) ps 0.3, \
+plot 'silver.dat' using (1):2:(.25) ps 0.3, \
      '' using (1.5):(5*$3):(.25) ps 0.3
      
 #
@@ -201,8 +201,8 @@ set xrange [-2.5:1.5]
 set yrange [-1:2.5]
 set xtics font ",10" format "%.1f" scale 0.5
 set ytics font ",10" format "%.1f" scale 0.5
-plot demo . 'optimize.dat' with circles lc rgb "gray" fs transparent solid 0.2 nobo,\
-     demo . 'optimize.dat' u 1:2 with linespoints lw 2 pt 7 ps 0.3 lc rgb "black"
+plot 'optimize.dat' with circles lc rgb "gray" fs transparent solid 0.2 nobo,\
+     'optimize.dat' u 1:2 with linespoints lw 2 pt 7 ps 0.3 lc rgb "black"
      
 #
 # Ellipses
@@ -212,7 +212,7 @@ reset
 set output out . 'figure_ellipses' . ext
 unset xtics; unset ytics
 
-plot demo . 'ellipses.dat' u 1:2:3:4:5 with ellipses units xy title "with ellipses",\
+plot 'ellipses.dat' u 1:2:3:4:5 with ellipses units xy title "with ellipses",\
      '' u 1:2:3:4:5 with ellipses units xx notitle,\
      '' u 1:2:3:4:5 with ellipses units yy notitle
 
@@ -325,7 +325,7 @@ set view 45, 25, 1.0, 1.35
 set grid
 unset key
 set format z "%.1f"
-splot demo . 'blutux.rgb' binary array=(128,128) flip=y format='%uchar%uchar%uchar' with rgbimage
+splot 'blutux.rgb' binary array=(128,128) flip=y format='%uchar%uchar%uchar' with rgbimage
 
 #
 # Sparse matrix data
@@ -376,10 +376,10 @@ set key box
 
 set xtics   ("NE" 72.0, "S" 42.0, "Downtown" 12.0, "Suburbs" 122.0)  scale 0.0
 
-plot demo . 'bldg.png' binary filetype=png origin=(0,0)  dx=0.5 dy=1.5 with rgbimage notitle, \
-     demo . 'bldg.png' binary filetype=png origin=(60,0) dx=0.5 dy=1 with rgbimage notitle, \
-     demo . 'bldg.png' binary filetype=png origin=(30,0) dx=0.5 dy=0.7 with rgbimage notitle, \
-     demo . 'bldg.png' binary filetype=png origin=(110,0) dx=0.5 dy=0.35 with rgbimage notitle
+plot 'bldg.png' binary filetype=png origin=(0,0)  dx=0.5 dy=1.5 with rgbimage notitle, \
+     'bldg.png' binary filetype=png origin=(60,0) dx=0.5 dy=1 with rgbimage notitle, \
+     'bldg.png' binary filetype=png origin=(30,0) dx=0.5 dy=0.7 with rgbimage notitle, \
+     'bldg.png' binary filetype=png origin=(110,0) dx=0.5 dy=0.35 with rgbimage notitle
 
 #
 # Demonstrates how to pull font size from a data file column
@@ -397,7 +397,7 @@ unset key
 set border 0
 set size square
 set datafile separator "\t"
-plot demo . 'cities.dat' using 5:4:($3 < 5000 ? "-" : CityName(1,3)) with labels
+plot 'cities.dat' using 5:4:($3 < 5000 ? "-" : CityName(1,3)) with labels
 
 #
 # Use of `keyentry` to construct a key
@@ -580,19 +580,19 @@ set tmargin 1
 #
 set output out . 'figure_histclust' . ext
 set style histogram clustered
-plot demo . 'histopt.dat' using 1 fs solid 0.5, '' using 2 fs empty
+plot 'histopt.dat' using 1 fs solid 0.5, '' using 2 fs empty
 #
 set output out . 'figure_histerrorbar' . ext
 set title "Histogram with error bars" offset 0,-1
 set style fill solid border -1
 set style histogram errorbars lw 2
 set datafile separator tab columnhead
-plot demo . 'histerror.dat' using 2:3 fs solid 0.5 ti 'A', '' using 4:5 fs empty ti 'B'
+plot 'histerror.dat' using 2:3 fs solid 0.5 ti 'A', '' using 4:5 fs empty ti 'B'
 #
 set output out . 'figure_histrows' . ext
 set style histogram rows
 set title "Rowstacked" offset 0,-1
-plot demo . 'histopt.dat' using 1 fs solid 0.5, '' using 2 fs empty
+plot 'histopt.dat' using 1 fs solid 0.5, '' using 2 fs empty
 #
 set output out . 'figure_newhist' . ext
 set style histogram cluster
@@ -601,9 +601,9 @@ unset title
 set key auto column noinvert
 set xtics 1 offset character 0,0.3
 plot newhistogram "Set A", \
-    demo . 'histopt.dat' u 1 t col, '' u 2 t col fs empty, \
+    'histopt.dat' u 1 t col, '' u 2 t col fs empty, \
     newhistogram "Set B" at 8, \
-    demo . 'histopt.dat' u 1 t col, '' u 2 t col fs empty
+    'histopt.dat' u 1 t col, '' u 2 t col fs empty
 #
 set output out . 'figure_histcols' . ext
 set style histogram columnstacked
@@ -659,7 +659,7 @@ set style fill solid 0.75 border -1
 set xrange [250:500]
 set auto y
 set key box title "with filledcurves"
-plot demo . 'silver.dat' u 1:2:($3+$1/50.) w filledcurves above title 'above' lc rgb "honeydew", \
+plot 'silver.dat' u 1:2:($3+$1/50.) w filledcurves above title 'above' lc rgb "honeydew", \
                '' u 1:2:($3+$1/50.) w filledcurves below title 'below' lc rgb "dark-violet", \
                '' u 1:2 w lines lt -1 lw 1 title 'curve 1', \
                '' u 1:($3+$1/50.) w lines lt -1 lw 4 title 'curve 2'
@@ -716,7 +716,7 @@ set output out . 'figure_multiple_keys' . ext
 set xtics font ",6"  offset 0,1
 set label 1 font ",10"
 set key font ",9" spacing 0.5
-load demo . 'custom_key.dem'
+load 'custom_key.dem'
 reset
 
 # zerrorfill demo
