@@ -7,6 +7,10 @@ set xrange [-1:1]
 set yrange [1:3]
 set key notitle invert under reverse Left left spacing 2 samplen 0.7
 
+# Explicitly set encoding to UTF-8. Otherwise cairolatex would attempt to
+# change the inputencoding, which won't work with xelatex and lualatex.
+set encoding utf8
+
 Title_E = 'EllipticE$(k)=\int_0^{\pi/2} {\sqrt{1-k^2\sin^2\theta}}~d\theta$'
 Title_K = 'EllipticK$(k)=\int_0^{\pi/2} {\sqrt{1-k^2\sin^2\theta}~}^{-1}~d\theta$'
 
