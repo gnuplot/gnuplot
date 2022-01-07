@@ -1,4 +1,5 @@
-C corresponding original gnuplot.doc at 2021-10-25
+C RCS $Id: gnuplot-ja.doc,v 1.746 2021-12-23 16:30:31+09 shige Exp $
+C corresponding original gnuplot.doc at 2021-12-23
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -258,9 +259,8 @@ C 行が長いのは、できればなんとかしたい
  導入された新しい機能は、一般には、バージョン 5.6 までの正式版に現れる
  ことはありませんし、細かい仕様は導入の前に変更される可能性があります。
 
- バージョン 5.5 の新しい機能の要約については、以下参照: `new`。
- 使用しているその gnuplot で有効なオプションに関する更なる情報について
- は、以下参照: `show version long`。
+ あなたが実行している gnuplot に組み込まれたオプション機能に関する更な
+ る情報については、以下参照: `show version long`。
 
 4 特殊関数と複素数値関数 (Special and complex-valued functions)
 ?new math
@@ -307,18 +307,20 @@ C 行が長いのは、できればなんとかしたい
 ## 参照: `VP`, `VP_fwhm`。
 #end
 
-4 新しいデータの前処理フィルタ
-?new filters
+4 凸包とマスク (Hulls and masks)
+?new hulls
 #start
-#b 3 次元曲線の 3 次スプライン平滑化。以下参照: `splot smooth csplines`
-#b 閉曲線や x に関して単調ではない 2 次元曲線向きの、パスに沿った 3 次
-## 元スプライン平滑化。以下参照: `smooth path`。
-#b 周期的データの平滑化用の新しいキーワード `period`。以下参照:
-## `smooth kdensity`。
-#b bin (箱) 用データの和でなく平均を描画するキーワード `binvalue=avg`
 #b 2 次元の点の集合を、その境界の多角形で置き換える新しいフィルタ
 ## `convexhull`。その境界の曲線を滑らかにするには、`smooth convexhull`
 ## が使えます。以下参照: `convexhull`。
+#b pm3d 曲面や image 描画の選択した一部分のみを表示するようマスクするの
+## に、凸包 (convex hull) や他の多角形 (polygon) を使用できます。新しい
+## 描画スタイル `with mask` (マスクを定義) や、キーワード `mask` (その
+## 後の描画要素にマスクを適用する) を参照してください。
+#b 閉曲線や x に関して単調ではない 2 次元曲線向きの、パスに沿った 3 次
+## 元スプライン平滑化。以下参照: `smooth path`。これは、凸包やマスクの
+## 平滑化も可能にします。
+#b 3 次元曲線の 3 次スプライン平滑化。以下参照: `splot smooth csplines`
 #end
 
 4 新しいデータ形式
@@ -333,7 +335,7 @@ C 行が長いのは、できればなんとかしたい
 4 新しい組み込み関数
 ?new built-in functions
 #start
-#b `stats <non-existant file>` はテスト可能な値を出力。以下参照:
+#b `stats <non-existent file>` はテスト可能な値を出力。以下参照:
 ## `stats test`.
 #b `stats $vgrid` で格子内のボクセルの最小/最大/平均/標準偏差を調査
 #b `if ... else if ... else ...`
@@ -343,7 +345,7 @@ C 行が長いのは、できればなんとかしたい
 ## `index( Array, element )`。以下参照: `arrays`。
 #end
 
-4 複数の名前付きパレット (Multiple named palettes)
+4 名前付きパレット (Named palettes)
 ?new colormaps
 #start
 #b 現在のパレットをその後の利用のため名前付きカラーマップに保存できます。
@@ -354,6 +356,7 @@ C 行が長いのは、できればなんとかしたい
 #b 名前付きパレットカラーマップは、32-bit ARGB 色値の配列として操作でき
 ## ます。これにより、アルファチャネル値を追加したり、コマンド
 ## `set palette` では簡単に指定できない他の修正を可能にします。
+#b 定義済みの新しい色機構 `set palette viridis`。
 #end
 
 4 新しい出力形式とオプション (New terminals and terminal options)
@@ -388,7 +391,7 @@ C 行が長いのは、できればなんとかしたい
 #end
 
 4 その他の新しい機能
-?new other
+?new features
 #start
 #b `using` 指定内での文字列 $# は、現在の入力データ行にある全列数と評価
 ## します。例えば、"plot FOO using 0:(column($# - 1))" は、各行の最後か
@@ -398,6 +401,9 @@ C 行が長いのは、できればなんとかしたい
 #b 配列名に範囲を指定することで部分配列を実現。
 ## Array[n] は単一の要素、Array[n:n+5] は元の配列の 6 要素を持つ部分配
 ## 列。以下参照: `slice`。
+#b 周期的データの平滑化用の新しいキーワード `period`。以下参照:
+## `smooth kdensity`。
+#b bin (箱) 用データの和でなく平均を描画するキーワード `binvalue=avg`
 #b cbtics 以外の軸には影響しない `set colorbox cbtics <linestyle>`
 #b gnuplotrc の設定選択用に XDG ベースディレクトリをサポート。初期化コ
 ## マンドは、$HOME/.config/gnuplot/gnuplotrc (もし存在すれば) から読み
@@ -411,6 +417,12 @@ C 行が長いのは、できればなんとかしたい
 ## 曲線に沿って 2 つの部分に分割し、一方の曲面のタイルが他方の曲面を通
 ## って不正に突き出てしまうことがないようにします。
 #b key の全体の幅と列数を固定する新規オプション。以下参照: `key layout`。
+#b `set pm3d border retrace` は、各 pm3d 四辺形の周りに、塗り潰し領域と
+## 同じ色で境界を描きます。これは、原理的に視覚効果はありませんが、あま
+## りよくない pdf や postscript ビューワのようなディスプレイモードで、
+## アンチエイリアスによる副産物が導入されないようにします。
+#b `set isotoropic` は、2 次元グラフと 3 次元グラフの両方で、x, y, z 軸
+## のすべてのスケールが同じになるようにスケールを合わせます。 
 #end
 
 3 バージョン 5.4 で導入された機能
@@ -962,7 +974,6 @@ C 行が長いのは、できればなんとかしたい
 
  このコマンドは、幅 600 ピクセル、高さ 400 ピクセルの出力ファイル
  "figure.png" を生成します。グラフはキャンバスの中の左下に置かれます。
- これは、multiplot モードが常に行ってきた方法と矛盾しません。
 
 2 コマンドライン編集 (Command-line-editing)
 ?line-editing
@@ -1345,9 +1356,9 @@ C  need @ in table, so end and restart the table !
  れます。バージョン 5.2 からは、GNUTERM の文字列全部が "set term" に渡
  されるので、そこに terminal オプションを入れることもできます。例:
       GNUTERM="postscript eps color size 5in, 3in"
- これは、~/.gnuplot (またはそれに相当する) 初期化ファイル (以下参照:
- `startup`) による指定や、もちろんその後の明示的な `set term` コマンド
- による指定で変更できます。
+ これは、システム、または個人的な初期化ファイルによる指定 (以下参照:
+ `startup`)。や、もちろんその後の明示的な `set term` コマンドによる指定
+ で変更できます。
 
  GNUHELP にヘルプファイル (gnuplot.gih) のパス名を定義しておくことがで
  きます。
@@ -1367,11 +1378,11 @@ C  need @ in table, so end and restart the table !
  れます。
 
  Unix では、SHELL が `shell` コマンドの際に使われます。MS-DOS, OS/2 で
- は COMSPEC が `shell` コマンドの際に使われます。
+ は COMSPEC が使われます。
 
- `FIT_SCRIPT` は、当てはめ (fit) が中断されたときに実行する `gnuplot`
- コマンドの指定に使われます。以下参照: `fit`。`FIT_LOG` は当てはめによ
- るログファイルのデフォルトのファイル名の指定に使われます。
+ FIT_SCRIPT は、当てはめ (fit) が中断されたときに実行する `gnuplot` コ
+ マンドの指定に使われます。以下参照: `fit`。FIT_LOG は当てはめによるロ
+ グファイルのデフォルトのファイル名の指定に使われます。
 
  GNUPLOT_LIB は、データやコマンドファイルの検索ディレクトリを追加定義す
  るのに使われます。その変数は、一つのディレクトリ名かまたは複数のディレ
@@ -2330,10 +2341,12 @@ C C 4 FresnelS
 %_
 C C 4 time
 C ?expressions functions time
+?time
 #time(x) & 任意 & 現在のシステム時刻 (秒単位) \\
 %time(x)@任意@現在のシステム時刻 (秒単位)
 C C 4 timecolumn
 C ?expressions functions timecolumn
+?timecolumn
 #timecolumn(N,"timeformat") & 整数, 文字列 & 入力データの $N$ 列目からの書式化日時データ \\
 %timecolumn(N,"timeformat")@整数, 文字列@入力データの $N$ 列目からの書式化日時データ
 C C 4 tm_hour
@@ -2574,8 +2587,8 @@ C C 4 weekdata_cdc
 ?Bi
  `Ai(z)` と `Bi(z)` は、複素引数 z のエアリー関数で、変形ベッセル関数 K
  と I を用いて計算されます。
- Donald E. Amos, Sandia National Laboratoris, SAND85-1018 (1985) による
- ルーチンを含む外部ライブラリによってサポートしています。
+ Donald E. Amos, Sandia National Laboratories, SAND85-1018 (1985) によ
+ るルーチンを含む外部ライブラリによってサポートしています。
 
 #TeX \quad\quad Ai$(z) = \frac{1}{\pi}\sqrt{\frac{z}{3}} K_{\nicefrac{1}{3}}(\zeta)$
 #TeX \quad\quad\quad $\zeta = \frac{2}{3}z^{\nicefrac{3}{2}}$
@@ -2587,29 +2600,29 @@ C C 4 weekdata_cdc
 ?BesselJ
  `BesselJ(nu,z)` は、実引数の nu と複素引数の z に対する第 1 種ベッセル
  関数 J_nu です。
- Donald E. Amos, Sandia National Laboratoris, SAND85-1018 (1985) による
- ルーチンを含む外部ライブラリによってサポートしています。
+ Donald E. Amos, Sandia National Laboratories, SAND85-1018 (1985) によ
+ るルーチンを含む外部ライブラリによってサポートしています。
 
 ?expressions functions BesselY
 ?BesselY
  `BesselY(nu,z)` は、実引数の nu と複素引数の z に対する第 2 種ベッセル
  関数 Y_nu です。
- Donald E. Amos, Sandia National Laboratoris, SAND85-1018 (1985) による
- ルーチンを含む外部ライブラリによってサポートしています。
+ Donald E. Amos, Sandia National Laboratories, SAND85-1018 (1985) によ
+ るルーチンを含む外部ライブラリによってサポートしています。
 
 ?expressions functions BesselI
 ?BesselI
  `BesselI(nu,z)` は、実引数の nu と複素引数の z に対する第 1 種変形ベッ
  セル関数 I_nu です。
- Donald E. Amos, Sandia National Laboratoris, SAND85-1018 (1985) による
- ルーチンを含む外部ライブラリによってサポートしています。
+ Donald E. Amos, Sandia National Laboratories, SAND85-1018 (1985) によ
+ るルーチンを含む外部ライブラリによってサポートしています。
 
 ?expressions functions BesselK
 ?BesselK
  `BesselK(nu,z)` は、実引数の nu と複素引数の z に対する第 2 種変形ベッ
  セル関数 K_nu です。
- Donald E. Amos, Sandia National Laboratoris, SAND85-1018 (1985) による
- ルーチンを含む外部ライブラリによってサポートしています。
+ Donald E. Amos, Sandia National Laboratories, SAND85-1018 (1985) によ
+ るルーチンを含む外部ライブラリによってサポートしています。
 
 ?expressions functions BesselH1
 ?expressions functions BesselH2
@@ -2621,8 +2634,8 @@ C C 4 weekdata_cdc
  数の z に対する第 1 種、第 2 種のハンケル関数です。
      H1(nu,z) = J(nu,z) + iY(nu,z)
      H2(nu,z) = J(nu,z) - iY(nu,z)
- Donald E. Amos, Sandia National Laboratoris, SAND85-1018 (1985) による
- ルーチンを含む外部ライブラリによってサポートしています。
+ Donald E. Amos, Sandia National Laboratories, SAND85-1018 (1985) によ
+ るルーチンを含む外部ライブラリによってサポートしています。
 
 4 Expint
 ?expressions functions expint
@@ -3499,12 +3512,14 @@ C ... and restart the table:
 
 3 cairo (pdfcairo, pngcairo, epscairo, wxt 出力形式)
 ?fonts cairo
+?fontconfig
+?fonts fontconfig
 =fonts
 =pdf
 =png
 =wxt
- これらの出力形式は、フォントの検索とアクセスに外部の fontconfig ツール
- 群を使用します。
+ 出力形式により (例えば cairo 系の出力形式すべて)、fontconfig システム
+ ライブラリを使ってフォントにアクセスします。
 ^ <a href="http://fontconfig.org/fontconfig-user.html">
  fontconfig ユーザマニュアル
 ^ </a>
@@ -3525,16 +3540,19 @@ C ... and restart the table:
 =gif
 =sixel
  png, gif, jpeg, sixelgd 出力形式のフォント処理は、外部ライブラリ libgd
- によって行われます。libgd は、次の 5 種類の基本フォントを直接提供して
- います: `tiny` (5x8 ピクセル), `small` (6x12 ピクセル), `medium`,
- (7x13 Bold), `large` (8x16), `giant` (9x15 ピクセル)。これらのフォント
- は大きさを変更したり回転したりすることはできません。使用する際は、
- `font` キーワードの代わりに上のキーワードを指定します。例:
+ が行います。これは、最低でも `tiny`, `small`, `medium`, `large`,
+ `giant` の 5 種類の基本フォントを提供しますが、これは伸縮させたり回転
+ したりはできません。これらの一つを使用する際は、`font` キーワードの代
+ わりに上のキーワードを指定します。例:
       set term png tiny
 
- 多くのシステムで、libgd は Adobe Type 1 フォント (*.pfa) と TrueType
- フォントへのアクセスも提供します。その場合フォント自身の名前ではなく、
- フォントファイルの名前を、"<face> {,<pointsize>}" の形式で与えます。
+ 多くのシステムで、libgd は、fontconfig ツールが提供する一般的なフォン
+ ト処理も使用できます。以下参照: `fontconfig`。
+
+ fontconfig のないシステム上では、大抵 Adobe フォント (*.pfa) と
+ TrueType フォント (*.ttf) へのアクセスを提供しています。その場合フォン
+ ト自身の名前ではなく、フォントファイルの名前を、"<face> {,<size>}" の
+ 形式で与えなければいけません。
  ここで、<face> はフォントファイルのフルパス名か、または環境変数
  GDFONTPATH で指示されるディレクトリの一つの中のファイル名の先頭部分、
  のいずれかです。よって、'set term png font "Face"' は、
@@ -3550,9 +3568,8 @@ C ... and restart the table:
       set term png font "arial,11"
 
  TrueType と Adobe Type 1 フォントは、完全に大きさの変更や回転が可能で
- す。"set term" コマンドでフォントを指定しなかった場合、gnuplot は別の
- デフォルトフォントの設定があるかどうかを調べるために環境変数
- GNUPLOT_DEFAULT_GDFONT を参照します。
+ す。"set term" コマンドでフォントを指定しなかった場合、gnuplot は環境
+ 変数 GNUPLOT_DEFAULT_GDFONT を参照します。
 3 postscript (カプセル化 postscript *.eps も)
 ?fonts postscript
 =fonts
@@ -3578,10 +3595,10 @@ C ... and restart the table:
 
  一方、
       set term postscript eps font "Garamond-Premier-Pro-Italic"
- は、正しい PostScript を含む出力ファイルを作成しますが、それは特殊なフ
- ォントを参照しますので、一部のプリンタや表示ソフトしか、要求したその特
- 定のフォントは表示できないでしょう。大抵の場合は別なフォントで代用され
- ます。
+ は、正しい PostScript 出力ファイルを作成しますが、それは特別な専用フォ
+ ントを参照しているので、要求されたその特定のフォントは一部のプリンタや
+ 表示ソフトでしか表示できないでしょう。大抵の場合は別なフォントで代用さ
+ れます。
 
  しかし、指定したフォントを出力ファイル中に埋め込んで、どんなプリンタで
  もそれを使うようにすることも可能です。これには、あなたのシステムに適切
@@ -3591,59 +3608,34 @@ C ... and restart the table:
  `postscript fontfile`。
 2 ヘルプの用語解説 (Glossary)
 ?glossary
- このドキュメント全体に渡って、用語に関する一貫性の維持が考えられていま
- す。しかしこの試みは完全には成功していません。それは `gnuplot` が時間
- をかけて進化してきたように、コマンドやキーワードの名前もそのような完全
- 性を排除するかのように採用されて来ているからです。このセクションでは、
- これらのキーワードのいくつかがどのように使われているかを説明します。
+=terminal
+=screen
+=record
+=block
+ `gnuplot` は 30 年以上かけて開発されているので、コマンドやこの文書で使
+ われている用語の意味は、現在の普通の用法とは違っているかもしれません。
+ この節では、`gnuplot` 内ではそれらの用語のいくつかをどのように使ってい
+ るかを説明します。
+
+ 用語 "出力形式 (terminal)" は、出力モードのことを意味し、あなたがキー
+ ボード入力するもの (ターミナル) を指しているのではありません。例えば、
+ コマンド `set terminal pdf` は、その後の描画コマンドが PDF 出力を生成
+ することを意味します。通常は、その PDF 出力を書き出す場所を指定するコ
+ マンド `set output "filename"` を一緒に使う必要があるでしょう。
 
  "ページ (page)"、"表示画面 (screen)"、"キャンバス (canvas)" は、
  `gnuplot` がアクセス可能な領域全体を指します。デスクトップではそれはウ
  ィンドウ全体を指し、プロッタでは、一枚の紙全体を指します。
 
- 表示画面は、一つ、またはそれ以上の "グラフ描画 (plot)" を含みます。グ
- ラフ描画は一つの横座標と一つの縦座標で定義されますが、余白 (margin) や
- その中に書かれる文字列 (text) 同様、それらは実際にその上に表示されてい
- る必要はありません。
+ データファイルに関する議論では、用語 "行 (record)" は、ファイルの一行
+ の文字列、すなわち、改行文字や行末文字同士に挟まれた文字列を指します。
+ "点 (point)" は、一行から取り出した一つのデータです。データの
+ "ブロック (block)" は、空行で区切られた連続した複数の行からなる集合で
+ す。データファイルの議論の中で "line" が参照される場合は、これはブロッ
+ クの部分集合を指します。"データのブロック (data block)" という言葉は、
+ インラインデータの名前付きブロックを指すのにも使われています。以下参照:
+ `datablocks`。
 
- グラフ描画は一つの "グラフ" を含みます。グラフは一つの横座標と一つの縦
- 座標で定義されますが、これらは実際にその上に表示されている必要はありま
- せん。
-
- グラフは一つまたはそれ以上の "曲線 (line)" を含みます。曲線は一つの関
- 数、またはデータ集合です。用語 "line" は描画スタイルとしても使われます。
- さらにこの用語は "文字列の一行 (a line of text)" のように使われること
- もあります。多分文脈からそれらは区別できるでしょう。
-
- 一つのグラフ上の複数の曲線はそれぞれ名前を持ちます。その名前は、その曲
- 線の表現に使われる描画スタイルのサンプルとともに "凡例 (key)" 内に一覧
- 表示されます。凡例は、時には "表題 (legend)" とも呼ばれます。
-
- 用語 "タイトル (title)" は `gnuplot` では複数の意味で使われます。この
- ドキュメントではそれらを区別するために、形容詞として "描画の (plot)"、
- "曲線の (line)"、"凡例の (key)" を頭につけたりもします。
- 2 次元のグラフは 4 つまでの見出し付けされる軸を持つことができます。こ
- れら 4 つの軸の名前はそれぞれ、グラフ描画の下の境界に沿う軸である "x"、
- 左の境界に沿う軸 "y"、上の境界に沿う軸 "x2"、右の境界に沿う軸 "y2" と
- なっています。以下参照: `axes`。
-
- 3 次元のグラフは  3 つまでの見出し付けされる軸 (`axes`) "x","y","z" を
- 持つことができます。どの特定の軸に関してもそれがグラフ上でどこに書かれ
- るかを述べることはできません。それは、`set view` でグラフを見る方向を
- 変更できるからです。
-
- データファイルに関する議論では、用語 "行 (record)" を復活し、ファイル
- の一行の文字列、すなわち、改行文字や行末文字同士の間の文字列、を指し示
- すのに使います。"点 (point)" は行から取り出した一つのデータです。デー
- タの "ブロック (block)" は、空行で区切られた連続した複数の行からなる集
- 合です。データファイルの議論の中で "line" が参照される場合は、これはブ
- ロックの部分集合を指します。"データのブロック (data block)" という言葉
- は、インラインデータの名前付きブロックを指すのにも使われています。以下
- 参照: `datablocks`。
-
- (訳注: この日本語訳の中ではここに書かれているような用語の統一は考慮さ
- れてはおらず、よって混乱を引き起こす可能性があります。厳密には原文を参
- 照すべきでしょう。)
 2 インラインデータとデータブロック (inline data and datablocks)
 ?inline data
 ?inline
@@ -3757,15 +3749,16 @@ Ffigure_newsyntax
       plot sin(x) linetype 4            # 線種色 4 を使用
 
  一般に、色の指定は、色の名前か、RGB (赤、緑、青) 成分か、HSV (色相、彩
- 度、明度) 成分か、現在の pm3d パレットに沿った座標で行います。
+ 度、明度) 成分か、現在の pm3d パレットに沿った座標で行います。キーワー
+ ド `linecolor` は、`lc` と省略できます。
 
  例:
 
-      plot sin(x) lt rgb "violet"       # gnuplot の持つ色名の一つ
-      plot sin(x) lt rgb "#FF00FF"      # 明示的な 16 進 RGB 3 つ組
-      plot sin(x) lt palette cb -45     # 現在のパレットの cbrange の
+      plot sin(x) lc rgb "violet"       # gnuplot 内の色名の一つを使用
+      plot sin(x) lc rgb "#FF00FF"      # 明示的な 16 進 RGB 3 つ組
+      plot sin(x) lc palette cb -45     # 現在のパレットの cbrange の
                                         # -45 に対応する色
-      plot sin(x) lt palette frac 0.3   # パレットに対応する小数値
+      plot sin(x) lc palette frac 0.3   # パレットに対応する小数値
 
  以下参照: `colorspec`, `show colornames`, `hsv`, `set palette`,
  `cbrange`。以下も参照: `monochrome`。
@@ -3855,7 +3848,7 @@ Ffigure_newsyntax
       # 以下はキャンバスの一部分を背景色で上書きすることで消去します。
       set term wxt background rgb "gray75"
       set object 1 rectangle from x0,y0 to x1,y1 fillstyle solid fillcolor bgnd
-      # 以下は x 軸に沿った「見えない」線を描きます。
+      # y=0 に「見えない」線を描き、その下のものをすべて消します。
       plot 0 lt bgnd
 4 linecolor variable
 ?linecolor variable
@@ -3992,6 +3985,29 @@ Ffigure_newsyntax
       # 点種 6 (丸の中に点) と定義
       set style line 5 lt rgb "cyan" lw 3 pt 6
       plot sin(x) with linespoints ls 5          # 定義スタイル 5 で
+
+3 特別な線種 (special linetypes)
+?linetypes special linetypes
+?nodraw
+=bgnd
+=background
+=black
+ 特別な (数値ではない) 線種 (linetype) がいくつか用意されています。
+
+ `lt black` は、黒い実線を意味します。
+
+ `lt bgnd` は、現在の出力形式の背景色の実線を意味します。以下参照:
+ `background`。
+
+ `lt nodraw` は、その曲線全体の描画をスキップします。これは、描画スタイ
+ ル `linespoints` と組み合わせて使うと便利です。すなわち、この描画スタ
+ イルのみに有効な点部分の属性を残しつつ、線部分を抑制することが可能にな
+ ります。例えば、
+      plot f(x) with linespoints lt nodraw pointinterval -3
+ は、3 点置きに描画し、その下に背景色の小さな円を置くことで孤立させます。
+ 以下参照: `linespoints`。`lt nodraw` は、自動的に描かれる線分の特別な
+ 集合を抑制するのにも使えます。例えば、等高線描画の中のあるレベルの等高
+ 線を、その線種に `nodraw` を設定することで、その描画を抑制できます。
 
 2 レイヤー (layers)
 ?layers
@@ -4167,7 +4183,7 @@ Ffigure_newsyntax
  これは、非対話型出力形式出力では何もしません。
  例えば、以下のコマンドを実行すると
 
-      gnuplot -persist -e 'plot [-5:5] sinh(x)'
+      gnuplot -persist -e 'plot sinh(x)'
 
  gnuplot は、表示ウィンドウを開き、その中にグラフを描き、そして終了し、
  表示ウィンドウはグラフをその中に持ったままスクリーンに残ります。
@@ -5313,6 +5329,10 @@ Ffigure_histeps
  を含む場合、histogram でない方は、x1 軸を使うか x2 軸を使うかを選択で
  きます。
 
+ 一つ追加のスタイルオプション `set style histogram nokeyseparators` は、
+ 複数のヒストグラムを含むグラフにのみ適切なものです。その場合の追加説明
+ については、以下参照: `newhistgram`。
+
  例:
 Ffigure_histclust
  入力ファイルは、2, 4, 6, ... の列にデータ値を持ち、3, 5, 7, ...  の列
@@ -5408,6 +5428,13 @@ Ffigure_histcols
  同様に、次のヒストグラムを指定した fillstyle で始めさせることが可能で
  す。その fillstyle を `pattern` にセットした場合、塗り潰しに使用される
  パターン番号は自動的に増加されていきます。
+
+ 新しいヒストラムの開始は、通常は凡例 (key) に空のエントリを追加し、そ
+ れによりそのヒストグラム要素の集合のタイトルは、それ以前のヒストグラム
+ のものと分離されることになります。しかしこの空行は、その要素が個々のタ
+ イトルを持たない場合は望ましいものではありません。これは、そのスタイル
+ を `set style histogram nokeyseparators` と変更することで、その空行の
+ 出力を抑制できます。
 
 Ffigure_newhist
  オプション `at <x-coord>` は、その後のヒストグラムの x 座標の位置を
@@ -5628,7 +5655,7 @@ Ffigure_lines
       1 列:  z       # x は暗黙の行番号、y は index から
       3 列:  x  y  z
 
- 以下も参照: `linetype`, `linewidth`, `linestyle`。
+ 以下も参照: `linetypes`, `linewidth`, `linestyle`。
 2 linespoints
 ?plotting styles linespoints
 ?style linespoints
@@ -5658,6 +5685,53 @@ Ffigure_linespoints
  gnuplot に指示します。点はそのデータ全体に渡って均等な間隔に取ります。
  `pi` 同様、負の値を指定すると、記号の下の線分の部分を消します。
 
+2 マスキング (masking)
+?plotting styles mask
+?plot with mask
+?with mask
+?masking
+ 描画スタイル `with mask` は、マスキング領域を定義するのに使います。こ
+ れは、同じ `plot`, `splot` コマンド上で後で指定した pm3d 曲面や画像に
+ 適用できます。入力データは、1 つ、または複数の多角形の頂点を定義する
+ [x,y] 座標列、または [x,y,z] 座標列として解釈します。描画スタイル
+ `with polygons` と同様に、多角形は空行で分離します。マスクが 3 次元描
+ 画コマンド (splot) の一部である場合、入力には z の値が必要ですが、しか
+ しそれは現在のところ全く使いません。
+
+ plot コマンド上にマスク定義がある場合、その後の同じコマンド上の image
+ 描画、pm3d 曲面が、キーワード `mask` を追加することでマスクされます。
+ マスクを定義していなければ、そのキーワードは無視します。
+
+ 以下の例は、点の集合を囲む凸包を使い、ある pm3d 曲面に対応する領域をマ
+ スクする方法を示します。
+Ffigure_mask
+    set table $HULL
+    plot $POINTS using 1:2 convexhull
+    unset table
+
+    set multiplot layout 1,2
+    splot $POINTS using 1:2:3 with pm3d, \
+          $POINTS using 1:2:(0) nogrid with points
+    splot $HULL using 1:2:(0) with mask, \
+          $POINTS using 1:2:3 mask with pm3d
+    unset multiplot
+ 最初のパネルに対するコマンド `splot` は、マスクされていない曲面と点の
+ 集合を、その順に描画します。2 つ目のパネルに対するコマンド `splot` は
+ マスクした曲面を描画します。マスクの定義 (描画スタイル `with mask`) は
+ 最初に行わなければならず、それを適用する pm3d 曲面はその後であることに
+ 注意してください (描画スタイル `with pm3d` にキーワード `mask` をつけ
+ て変更)。
+ この例のより完全な版は、デモ集合
+^ <a href="http://www.gnuplot.info/demo/mask_pm3d.html">
+ mask_pm3d.dem
+^ </a>
+ 内にあります。
+
+ ここには示しませんが、一つのマスクが複数の多角形領域を含み得ます。
+
+ マスキングコマンドは試験段階です。詳細は、安定リリース版に取り込まれる
+ 前に変更されるかもしれません。
+#TeX \newpage
 2 parallelaxes
 Ffigure_parallel
 ?plotting styles parallelaxes
@@ -5696,7 +5770,6 @@ Ffigure_parallel
  デフォルトでは、gnuplot は自動的に個々の軸の範囲、スケールを入力データ
  から決定しますが、通常の `set axis range` コマンドによってそれをカスタ
  マイズすることも可能です。以下参照: `set paxis`。
-#TeX \newpage
 2 極座標描画 (Polar plots)
 =polar
 Ffigure_polar
@@ -5707,6 +5780,7 @@ Ffigure_polar
  モードでも機能します。図は、描画スタイル `lines` と `filledcurves` の
  組み合わせを示しています。(訳注: 図が表示されている場合) 以下参照:
  `set polar`, `set rrange`, `set size square`, `set theta`, `set ttics`。
+#TeX \newpage
 2 points
 ?plotting styles points
 ?style points
@@ -5717,7 +5791,7 @@ Ffigure_polar
 Ffigure_points
  `points` スタイルは各点に小さな記号を表示します。すべての記号のデフォ
  ルトの大きさを変更するにはコマンド `set pointsize` を使います。デフォ
- ルトの点種は、線種と同じものになります。以下参照: `linetype`。plot コ
+ ルトの点種は、線種と同じものになります。以下参照: `linetypes`。plot コ
  マンドに `using` 指定がない場合は、入力データ列は暗黙のうちに
       x y pointsize pointtype color
  の順で解釈されます。最初の 2 つ (x, y) の後ろのすべての列は省略可能で、
@@ -7264,7 +7338,7 @@ Ffigure_zerror
 2 plot
 ?commands plot
 ?plot
- `plot` と `splot` は `gnuplot` で図を描くための基本的なコマンドです。 
+ `plot` と `splot` は `gnuplot` で図を描くための基本的なコマンドです。
  それらは関数やデータの、多くの種類のグラフ表現を提供します。`plot` は
  2 次元の関数やデータを描き、`splot` は 3 次元の曲面やデータの 2 次元投
  影を描きます。
@@ -7654,10 +7728,13 @@ Ffigure_zerror
                           {using <using list>}
                           {smooth <option>}
                           {bins <options>}
+                          {mask}
+                          {convexhull}
                           {volatile} {noautoscale}
 
- 修正子の `binary`, `index`, `every`, `skip`, `using`, `bins`, `smooth`
- をそれぞれに分けて説明します。簡単に言うと以下の通り。
+ 修正子の `binary`, `index`, `every`, `skip`, `using`, `smooth`, `bins`,
+ `mask`, `convexhull` をそれぞれに分けて説明します。簡単に言うと以下の
+ 通り。
 #start
 #b `skip N` は入力ファイルの先頭 N 行を無視するよう gnuplot に指示
 #b `binary` はファイルがテキストでなくバイナリデータを持つと指示
@@ -7666,8 +7743,13 @@ Ffigure_zerror
 #b `using` はファイルのどの列をどの順で使うかを指定
 #b `smooth` は描画の前にデータに単純なフィルタリング、補間、曲線補間を
 ## 実行
+#b `convexhull` 単独、または with `smooth` との組み合わせは、入力データ
+## 点集合を、その境界多角形の頂点を構成する新しい点集合に置き換えます。
 #b `bins` は個々の入力点を x 軸に沿う等幅の区間に仕分け、各区間毎の単
 ## 一の累積値として描画
+#b `mask` は、事前に定義されたマスクを通して、画像内のピクセルの選択さ
+## れた部分集合、または pm3d 曲面の選択された領域のみを描画するようフィ
+## ルタします。
 #b `volatile` はファイルの内容が後で再読み込みすることはできず、よって
 ## 再使用のためには内部に保持しておかなければいけないことを指示
 #end
@@ -8353,6 +8435,10 @@ Ffigure_smooth_path
 ?plot convexhull
 ?smooth convexhull
 ?convexhull
+
+ convexhull は描画スタイルではありません。これは、キーワードとして単独
+ で、またはキーワード `smooth` のオプションとして使います。
+
       plot FOO using x:y convexhull
       plot FOO using x:y smooth convexhull {expand <scale>}
 
@@ -8361,6 +8447,8 @@ Ffigure_convex_hull
  き換えます。この多角形の頂点集合、すなわち凸包 (convex hull) は、時計
  回りの閉曲線となるように生成します。よってその曲線の始点と終点は一致し、
  `with lines` や `with filledcurves` で適切に描画できるようにしています。
+ 凸包は、画像や元々のデータ点すべてを含む pm3d 曲面のある領域を選択的に
+ 描画する際にも便利に使えます。
 
  キーワード `smooth` をつけると、その頂点は滑らかな曲線を生成するための
  ガイド点として使います (以下参照: `smooth path`)。デフォルトでは、その
@@ -8570,7 +8658,7 @@ C using の書式 (format)
  以下も参照: `datafile separator`。
 
  'scanf' 関数では色々なデータ形式の数値入力が使えますが、`gnuplot` は全
- ての入力データを倍精度浮動小数とみなしますから、`gnuplot` では "%lf"
+ ての入力データを倍精度浮動小数とみなしますから、`gnuplot` では `%lf`
  が本質的に唯一の数値入力指定、ということになります。その書式文字列には
  少なくとも一つ、そして 7 つ以下の、そのような入力指定子を入れる必要が
  あります。
@@ -8798,11 +8886,11 @@ C using の書式 (format)
 ?plot ranges
 ?splot ranges
 ?ranges
- このセクションでは、コマンド `plot` の一番最初の項目として書く、軸の範
- 囲のオプションについてのみ説明します。これを指定すると、その範囲は、そ
- れ以前のどの `set range` による範囲の制限よりも優先して扱われます。コ
- マンド `plot` の別な場所に指定する、個々の描画要素の範囲の制限ためのオ
- プションについては以下参照: `sampling`。
+ このセクションでは、コマンド `plot`, `splot` の一番最初の項目として書
+ く、軸の範囲のオプションについてのみ説明します。これを指定すると、その
+ 範囲は、それ以前のどの `set range` による範囲の制限よりも優先して扱わ
+ れます。コマンド `plot` の別な場所に指定する、個々の描画要素の範囲の制
+ 限ためのオプションについては以下参照: `sampling`。
 
  書式:
        [{<dummy-var>=}{{<min>}:{<max>}}]
@@ -8885,7 +8973,8 @@ C using の書式 (format)
 
  以下は、x 全体の範囲を 0 から 1000 としてファイルのデータを描画し、2
  つの関数を全体の範囲の一部分だけそれぞれ描画します:
-       plot [0:1000] 'datafile', [0:200] func1(x), [200:500] func2(x)
+       set xrange [0:1000]
+       plot 'datafile', [0:200] func1(x), [200:500] func2(x)
 
  以下は、上とほぼ同様ですが、全体の範囲はデータファイルの内容によって決
  定します。この場合、標本化される関数は、全体がグラフ内に収まるかもしれ
@@ -8903,7 +8992,8 @@ C using の書式 (format)
        plot sample [0:10] f(x), [10:20] g(x), [20:30] h(x)
 
  以下の例は、3 次元グラフにらせんの曲線を描く一つの方法を提示します:
-       splot [-2:2][-2:2] sample [h=1:10] '+' using (cos(h)):(sin(h)):(h)
+       set xrange [-2:2]; set yrange [-2:2]
+       splot sample [h=1:10] '+' using (cos(h)):(sin(h)):(h)
 
 4 2 次元のサンプリング (u と v 軸) (2D sampling)
 ?sampling 2D
@@ -9120,14 +9210,17 @@ C using の書式 (format)
       boxxyerror    circles        fillsteps      pm3d        polygons
       isosurface    zerrorfill
  または
-      table
+      table         mask
 
  最初のグループのスタイルは、線、点、文字の属性を持ち、第 2 のグループ
  のスタイルは、さらに塗り潰し属性も持っています。以下参照: `fillstyle`。
  さらにサブスタイルを持つスタイルもあります。個々のスタイルの詳細につい
  ては、以下参照: `plotting styles`。
- スタイル `table` は、グラフの代わりに表形式の出力を生成します。以下参
- 照: `set table`。
+ 最後の特別なスタイル 2 つは、すぐに描画するものではありません。以下参
+ 照: `set table`, `with mask`。スタイル `table` は、表形式の出力をテキ
+ ストファイルかデータブロックの形で生成します。スタイルが `with mask`
+ である plot コマンドの要素は、多角形領域の集合を定義し、それはその
+ plot コマンドのその後に続く要素をマスクするのに使えます。
 
  デフォルトのスタイルは、`set style function` と `set style data` で選
  択できます。
@@ -9168,7 +9261,7 @@ C using の書式 (format)
  個別の色座標に対応します。色の値は、小数値 (`palette frac`) か、または
  カラーボックスの範囲へ対応づけられた座標値 (`palette` か `palette z`)
  のいずれかで指定できます。以下参照: `colorspec`, `set palette`,
- `linetype`。
+ `linetypes`。
 
  キーワード `nohidden3d` は、`splot` コマンドで生成される描画にのみ適用
  されます。通常、グローバルなオプション `set hidden3d` はグラフ上の全て
@@ -9197,7 +9290,7 @@ C using の書式 (format)
        plot x w points, x**2
 
  以下は、tan(x) を関数のデフォルトの方式で、"data.1" を折れ線で描画します:
-       plot [ ] [-2:5] tan(x), 'data.1' with l
+       plot tan(x), 'data.1' with l
 
  以下は、"leastsq.dat" を鉛直線で描画します:
        plot 'leastsq.dat' w i
@@ -10706,8 +10799,8 @@ Ffigure_missing
  いて、追加のパラメータを指定できるものもあります。これらの補間は、格子
  点に近いデータ点ほど、その格子点に対してより強い影響を与えます。
 
- `splines` アルゴリズムは、"薄いつぎ板" を元にした補間計算を行います。
- これは追加パラメータを取りません。
+ `splines` アルゴリズムは、薄いつぎ板を元にした補間計算を行います。これ
+ は追加パラメータを取りません。
 
  `qnorm` アルゴリズムは各格子点で入力データの重み付き平均を計算します。
  各点には、格子点からの距離の逆数のあるベキ乗で重み付けします。そのベキ
@@ -10748,23 +10841,23 @@ Ffigure_missing
  に対する `smooth kdensity` オプションが行うこととおおまかには同じです
  (使用例は kdensity2d.dem を参照してください)。
 
- 後方互換性のために、わずかに異なる書式もサポートされています。どのアル
- ゴリズムも明示的に選択しなかった場合、`qnorm` アルゴリズムが仮定され、
- 3 つ以下の、コンマ (,) 区切りのオプションパラメータを指定した場合は、
- それらをそれぞれ行数、列数、そして norm 値であると解釈します。
+ 非推奨: 後方互換性用に、わずかに異なる書式もサポートされています。どの
+ アルゴリズムも明示的に選択しなかった場合、`qnorm` アルゴリズムが仮定さ
+ れ、3 つ以下の、コンマ (,) 区切りのオプションパラメータを指定した場合
+ は、それらをそれぞれ行数、列数、そして norm 値であると解釈します。
 
  オプション `dgrid3d` は、散在するデータを重み付き平均で規則的な格子に
  置き変える単純な仕組みに過ぎません。この問題に対するより洗練された手法
  が存在しますので、この単純な方法が不十分であれば、`gnuplot` の外でその
  ような方法でデータを前処理するべきでしょう。
 
- 以下も参照
+ ネット上の以下も参照
 ^ <a href="http://www.gnuplot.info/demo/dgrid3d.html">
- dgrid3d.dem: dgrid3d のデモ
+ dgrid3d のデモ
 ^ </a>
  および
 ^ <a href="http://www.gnuplot.info/demo/scatter.html">
- scatter.dem: dgrid3d のデモ
+ scatter のデモ
 ^ </a>
 
 3 仮変数 (dummy)
@@ -11701,6 +11794,20 @@ Ffigure_missing
  hidden3d 曲面の場合と同じで、基本となる線種にオフセットの <n> を追加し
  た値を使用します。曲面の内側と外側の両方を同じ色で塗るには、
  `set isosurface noinsidecolor` を使用してください。
+3 isotropic
+?commands set isotropic
+?set isotropic
+?isotropic
+ 書式:
+      set isotropic
+      unset isotropic
+ `set isotropic` は、グラフのサイズとアスペクト比を、x, y, z 軸に沿う単
+ 位長さが全く同じになるように合わせます。これは次のコマンドと同値で、こ
+ れの代わりに使えます: `set size ratio -1; set view equal xyz`。
+ これは、2 次元、3 次元グラフの両方に影響します。
+ `unset isotoropic` は、2 次元、3 次元グラフの両方でその束縛を開放しま
+ す。これは以下の古いコマンドと同値ですが、覚えるにはこれの方が簡単でし
+ ょう: `set size noratio; set view noequal_axes`。
 3 jitter
 ?commands set jitter
 ?set jitter
@@ -11808,7 +11915,7 @@ Ffigure_missing
  `set key default` は、以下のデフォルトの key の設定を復帰します。
       set key fixed right top vertical Right noreverse enhanced autotitle
       set key nobox noopaque
-      set key noinvert samplen 4 spacing 1 width 0 height 0 
+      set key noinvert samplen 4 spacing 1 width 0 height 0
 
 4 3 次元グラフの凡例 (3D key)
 ?set key 3D
@@ -12257,7 +12364,6 @@ Ffigure_multiple_keys
 ?commands show linetype
 ?set linetype
 ?show linetype
-?linetype
  コマンド `set linetype` は各種描画に使用される基本的な線種 (linetype)
  を再定義することを可能にします。このコマンドのオプションは、
  "set style line" のものと全く同じです。ラインスタイルと違うところは、
@@ -12962,7 +13068,7 @@ Ffigure_multiple_keys
  す。
 
  `default` を指定すると小目盛りの数はデフォルトの値に戻ります。
- 
+
  `set mxtics time <N> <units>` は、大目盛りが時刻モードの場合にのみ適用
  します。以下参照: `set mxtics time`。
 
@@ -13015,7 +13121,7 @@ Ffigure_multiple_keys
  `set mxtics` や `set mxtics <freq>` で、5.5 より前のバージョンの挙動に
  戻せますが、これには常に問題を抱えていました。例えば、72 年間隔に対し
  て自動分割機能は大目盛りを 12 年間隔に、小目盛りを 5 年間隔にしてしま
- っていました。 
+ っていました。
 
  しかし `set mxtics time 2 years` を使えば、正確に 1 年置きの年始めのと
  ころに小目盛り刻みを置きます。`set mxtics time 1 month` は、各月の日数
@@ -13484,20 +13590,13 @@ Ffigure_multiple_keys
 ?set palette
 =palette
  パレットは、色の集合で、通常は一つ以上の段階的なグラデーションの形式で
- 順序づけられ、`pm3d` 曲面やその他のグラフ要素を z の値で色付けするのに
- 使われます。plot の z 座標か、追加のデータ列の灰色階調値が、現在のパレ
- ットの色に自動的に写像されます。パレットの色は、明示的な色指定でもアク
- セスできます (以下参照: `colorspec`)。
-#start
-#b 範囲 [0:1] 内の、パレット比 (`palette fraction`) ともいう灰色階調値
-## (`gray value`) として
-#b 描画要素の z 座標に対応する z 値 (`z value`) として
-#b 範囲 [cbmin:cbmax] 内のカラーボックス値 (`cb value`) として
-## (以下参照: `set cbrange`)
-#end
+ 順序づけられ、`pm3d` 曲面や温度分布図 (heatmap)、その他の描画要素を色
+ 付けするのに使われます。plot の z 座標か、追加のデータ列の灰色階調値が
+ 現在のパレットの色に自動的に写像されます。
  現在のパレットは、デフォルトでは描画スタイル `pm3d` を使用するグラフの
- 隣に別のカラーボックス (`colorbox`) として表示されます。そのカラーボッ
- クスは、手動で選択したり無効にしたりできます。以下参照: `set colorbox`。
+ 隣に別のカラーボックス (`colorbox`) として表示されます。カラーボックス
+ は、カスタマイズしたり無効にしたりできます。以下参照: `set colorbox`。
+ 以下も参照: `show palette`, `test palette`。
 
  書式:
        set palette
@@ -13511,70 +13610,53 @@ Ffigure_multiple_keys
                     | functions <R>,<G>,<B>
                   }
                   { cubehelix {start <val>} {cycles <val>} {saturation <val>} }
+                  { viridis }
                   { model { RGB | CMY | HSV {start <radians>} } }
                   { positive | negative }
                   { nops_allcF | ps_allcF }
                   { maxcolors <maxcolors> }
                 }
 
- `set palette` は (すなわちオプションなしでは) デフォルトの値を復帰しま
- す。それ以外の場合、オプションは任意の順に与えることができます。
+ パレットは、いくつかの方法で定義できます。
+Ffigure_palette1
+ - 赤、緑、青の要素に対する公式を、0 から 1 の灰色階調変数の関数として
+ 与えること。
+ `set palette rgbformulae` により、あらかじめ定義されている 36 個の公式
+ から選ぶことができます。`set palette functions` により、あなた自身の関
+ 数を定義することもできます。
+#TeX \\
+ - z の範囲全体を、部分的に 1 つ、または複数の滑らかなグラデーションで
+ 覆うよう指定するために `set palette defined` を使うこと。
+#TeX \\
+ - 事前に保存したパレットを、現在のパレットに読み込む (load) こと。
+ `set palette file` は、保存したパレットをファイルから読み込みます。
+ `set palette colormap` は、保存したカラーマップから RGB の成分を展開し
+ ます。
+#TeX \\
+ - 必要ならカスタマイズ用の追加パラメータ付きで名前付きパレットを指定。
+ 現在提供している名前付きパレットは、`cubehelix` (パターンの族でカスタ
+ マイズ可能) と `viridis` です。
 
- `show palette` は、現在のパレットの属性の一覧を表示します。
+ オプションのない `set palette` は、デフォルト値に戻します。
 
- `test palette` は、現在のパレットをスクリーン上に表示します。
+ `set palette negative` は、パレットの方向を逆転します。例えば、
+ `set palette viridis negative` は、青から黄色ではなく、黄色から青への
+ グラデーションを作成します。
 
- 以下のオプションは、色付けの属性を決定します。
+ `set palette gray` は、灰色階調のパレットに切り替えます。
+ `set palette color` は最も最近のカラーパレットに戻します。
 
  `pm3d` カラー曲面では、各微小四辺形の 4 つの角の z 座標の平均値を、範
  囲 [min_z, max_z] から灰色階調値の範囲 (常に [0:1]) への写像で変換する
- ことにより、その四辺形の灰色階調値が得られます。この値は、灰色階調の色
- 地図での灰色階調値として直接使うことができます。パレットは、その灰色階
+ ことにより、その四辺形の灰色階調値が得られます。パレットは、その灰色階
  調値から RGB 色への写像です。
 
- 基本的に、2 種類の異なる写像方式が利用可能です: 1 つは灰色からカラーへ
- の解析的な公式、もう一つは離散的な対応表の補間によるものです。
- `palette rgbformulae` と `palette functions` が解析的な公式用で、
- `palette defined` と `palette file` が補間表用です。`palette rgbformulae`
- は postscript 出力のサイズを小さくすることができます。
+ パレット色を、明示的な色指定でも言及できます (以下参照: `colorspec`)。
+ これは、オブジェクトかラベルにパレット色を割り当てるときに便利です。
 
- `set palette gray` は、灰色階調のみのパレットにし、
- `set palette rgbformulae`, `set palette defined`, `set palette file`,
- `set palette functions` はカラーパレットにします。灰色パレットから直前
- のカラーパレットへ、`set palette color` で簡単に復帰できます。
-
- `set palette gamma <gamma>` による自動的なガンマ補正は、灰色のパレット
- (`set palette gray`) と、`cubehelix` カラーパレット形式に行われます。
- gamma = 1 の場合は、線形の光度グラデーションを生成します。以下参照:
- `test palette`。
-
- 限定された色数しかサポートしていない出力形式もあります (例えば gif で
- は 256 個)。デフォルトの gnuplot の線種色を割り当てた後の残りの有効な
- 色領域は、デフォルトでは pm3d 用に保存されます。よって、複数のパレット
- を使用するような multiplot は、最初のパレットがすべての有効な色の配置
- として使用されてるので、失敗してしまうでしょう。このような制限は、十分
- 小さい値 N で `set palette maxcolors <N>` を使うことで緩和できます。こ
- のオプションは、N 個の離散的な色を、連続的なパレットから等間隔なサンプ
- リングで選択します。不等間隔な N 個の離散色を使いたい場合は、一つの連
- 続的なパレットの代わりに `set palette defined` を使用してください。
-
- RGB 色空間が作業を行うのに常にもっとも有用な色空間であるとは限らない、
- という理由で、色空間は `model` を使うことで、`RGB`, `HSV`, `CMY` のい
- ずれかに変更できます。RGB 以外の色空間では `set palette defined` の表
- で色名を使うと、それはおかしな色になります。全ての説明は RGB 色空間用
- に書きますが、それぞれの色空間で、例えば `R` は `H`, `C` のことを意味
- することに注意してください (`G`, `B` も同様)。
-
- 全ての色空間で、全ての値は [0,1] に制限されています。
-
- RGB は赤、緑、青を、CMY は水色 (Cyan)、紫 (Magenta)、黄 (Yellow) を、
- HSV は色相 (Hue)、彩度 (Saturation)、明度 (Value) をそれぞれ意味します。
- 色モデルのより詳しい情報については以下を参照してください:
-^ <a href="http://en.wikipedia.org/wiki/Color_space">
-           http://en.wikipedia.org/wiki/Color_space
-^ </a>
- 注意: 以前のバージョンの gnuplot では、YIQ と XYZ の色空間モデルもサポ
- ートしていましたが、その実装は完全ではないか、正しくありませんでした。
+ パレットは、3 種類の色空間 RGB, CMY, HSV のいずれでも定義できます。以
+ 下参照: `set palette model`。
+ いずれの色空間でも、その色成分はすべて [0,1] の範囲に制限されています。
 
 4 rgbformulae
 ?commands set palette rgbformulae
@@ -13582,33 +13664,28 @@ Ffigure_multiple_keys
 ?palette rgbformulae
 ?rgbformulae
 =colors
- `rgbformulae` 用には 3 つの適切な割り当て関数が選ばれる必要があります。
- この選択は `rgbformulae <r>,<g>,<b>` を通して行われます。使うことがで
- きる割り当て関数の一覧は `show palette rgbformulae` で見ることができま
- す。デフォルトは `7,5,15` で、他の例としては `3,11,6`, `21,23,3`,
- `3,23,21` などがあります。`3,-11,-6` のような負の値は、逆のカラーを意
- 味します (すなわち、1-gray をその関数に代入します)。
-C 下記の以下参照: オプション `positive`, `negative`)。
+      set palette rgbformulae <function 1>, <function 2>, <function 3>
+ この名前とは関係なく、このオプションは全ての色空間に適用されます。
+ あなたは、各色成分に対して、あらかじめ登録されている 36 個の割り当て関
+ 数のうちの一つを指定しなければいけません。有効な割り当て関数の一覧は、
+ `show palette rgbformulae` で見ることができます。デフォルトは、
+ `set palette rgbformulae 7,5,15` です。RGB の色空間では、これは 7 番の
+ 関数を赤の成分の写像に使用し、5 番の関数緑成分の写像、15 番の関数を青
+ 成分の写像に使用します。関数番号として負の値を使用すると、それは割り当
+ てを逆、すなわち f(gray) でなく、f(1-gray) の写像による成分にします。
 
+Ffigure_palette2
  RGB の色空間では、いくつかの良い割り当て公式があります:
-    7,5,15   ... 伝統的 pm3d (黒-青-赤-黄)
+    7,5,15   ... デフォルト (黒-青-赤-黄)
     3,11,6   ... 緑-赤-紫
-    23,28,3  ... 海 (緑-青-白); 他の組み合わせも試してみてください
+    23,28,3  ... 海 (緑-青-白)
     21,22,23 ... 温度色 (黒-赤-黄-白)
-    30,31,32 ... 白黒のカラー表示化 (黒-青-紫-黄-白)
+    30,31,32 ... 黒-青-紫-黄-白
     33,13,10 ... 虹 (青-緑-黄-赤)
     34,35,36 ... AFM 温度色 (黒-赤-黄-白)
 
  HSV 色空間でのフルカラーパレット:
     3,2,2    ... 赤-黄-緑-水色-青-紫-赤
-
- `rgbformulae` という名前で呼ばれていても、例の通り、それらの関数は実際
- には <H>,<S>,<V> または <X>,<Y>,<Z>, ... といった色の成分を決定するか
- もしれないということに注意してください。
-
- 図の色を反転させるには `positive` や `negative` を使ってください。
-^ <a name="positive"></a>
-^ <a name="negative"></a>
 
 4 defined
 ?commands set palette defined
@@ -13636,9 +13713,6 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  名 "red" は少し違ったものになるでしょう。使用できる色名は
  `show colornames` でその一覧を見ることができます。
 
- <r> と書いても、HSV 色空間ではそれは <H> 成分を、といったように選択さ
- れたカラーモデルに依存して意味が違うことに注意してください。
-
  <gray> の値は実数の昇順に並べる必要があります。その列の値は自動的に
  [0,1] に変換されます。
 
@@ -13653,13 +13727,10 @@ C 下記の以下参照: オプション `positive`, `negative`)。
        set palette model RGB
        set palette defined ( 0 "black", 1 "white" )
 
- 青黄赤のパレット (全てが等価の) を生成するには:
+ 青-黄-赤のパレット (全てが等価の) を生成するには:
        set palette defined ( 0 "blue", 1 "yellow", 2 "red" )
        set palette defined ( 0 0 0 1, 1 1 1 0, 2 1 0 0 )
        set palette defined ( 0 "#0000ff", 1 "#ffff00", 2 "#ff0000" )
-
- 虹のようなパレットを生成するには:
-       set palette defined ( 0 "blue", 3 "green", 6 "yellow", 10 "red" )
 
  HSV 色空間でのフルカラースペクトル:
        set palette model HSV
@@ -13669,10 +13740,6 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  赤以外のある色相で巻き進めた HSV フルカラースペクトル
        set palette model HSV start 0.15
        set palette defined ( 0 0 1 1, 1 1 1 1 )
-
- MATLAB で使われるデフォルトパレットの近似:
-       set pal defined (1 '#00008f', 8 '#0000ff', 24 '#00ffff', \
-                        40 '#ffff00', 56 '#ff0000', 64 '#800000')
 
  等間隔な少しの色だけのパレットを生成するには:
        set palette model RGB maxcolors 4
@@ -13688,12 +13755,12 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 ?commands set palette functions
 ?set palette functions
 ?palette functions
- 色の割り当ての R(gray), G(gray), B(gray) の 3 つの関数を与えるには
- `set palette functions <Rexpr>, <Gexpr>, <Bexpr>` を使ってください。
- それらの 3 つの関数の変数は、[0,1] の値を取る変数 `gray` であり、その
- 値も [0,1] の中に取る必要があります。
- <Rexpr> は、HSV 色空間が選択されている場合は、H の値を表す式でなければ
- いけないことに注意してください (他の式、または他の色空間でも同様です)。
+      set palette functions <f1(gray)>, <f2(gray)>, <f3(gray)>
+ このオプションは、`set palette rgbformulae` に似ていますが、各色成分に
+ 対して、定義済みの関数番号を指定する代わりに実際の関数を与えることが違
+ います。各関数のダミー変数が必要なら、それは "gray" としなければいけま
+ せん。関数は、[0,1] の範囲の gray の値を、[0,1] 内の値に写像しなればな
+ りません。
 
  例:
 
@@ -13705,8 +13772,8 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 
  ガンマ補正の白黒のパレット:
        gamma = 2.2
-       color(gray) = gray**(1./gamma)
-       set palette model RGB functions color(gray), color(gray), color(gray)
+       map(gray) = gray**(1./gamma)
+       set palette model RGB functions map(gray), map(gray), map(gray)
 4 gray
 ?commands set palette gray
 ?set palette gray
@@ -13720,8 +13787,8 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 ?set palette cubehelix
 ?cubehelix
  オプション "cubehelix" はあるパレット族を定義しますが、これは、灰色階
- 調値が 0 から 1 に増加するのに伴ない、正味の光度が単調に増加するのと同
- 時に、色相 (hue) が標準色相環に従って変化します。
+ 調値が 0 から 1 に増加すると正味の感覚光度が単調に増加する一方、そのパ
+ レットの色相 (hue) は標準色相環を回って変化します。
        D A Green (2011) http://arxiv.org/abs/1108.5083
  `start` は、色相環に沿った開始点をラジアン単位で決定します。
  `cycles` は、パレットの範囲を渡って色相環を何回回るかを決定します。
@@ -13731,6 +13798,18 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  デフォルト値は以下の通りです。
        set palette cubehelix start 0.5 cycles -1.5 saturation 1
        set palette gamma 1.5
+4 viridis
+?commands set palette viridis
+?set palette viridis
+?viridis
+       set palette viridis
+ パレット "viridis" は、色覚に障害のあるユーザ向けの青から黄色へのグラ
+ デーションです。viridis は、Ste'fan van der Walt と Nathaniel Smith に
+ より開発されました。それは、感覚的な明るさ (輝度) の近似的に線形なグラ
+ デーションとなります。gnuplot が使用するカラーマップ版は、以下に基づい
+ ています。
+       "Viridis - Colorblind-Friendly Color Maps for R", Garnier et al (2021)
+       https://CRAN.R-project.org/package=viridis
 4 colormap
 ?commands set palette colormap
 ?palette colormap
@@ -13751,9 +13830,6 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  タファイルとして読むので、全てのデータファイル修飾子が使えます。
  HSV 色空間が選択されている場合には、`R` は実際には `H` を指すことに注
  意してください。
-
- 例によって、<filename> が `'-'` の場合は、データがインライン形式で引き
- 続いて与えられ、一つの `e` のみの行でそれが終了することを意味します。
 
  グラデーションを表示するには `show palette gradient` を使用してくださ
  い。
@@ -13781,9 +13857,12 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 ?set palette gamma-correction
 ?palette gamma-correction
 ?gamma-correction
- 灰色の配色に対するガンマ補正は `set palette gamma <gamma>` で ON にで
- きます。<gamma> のデフォルトは 1.5 で、これは多くの出力形式に適切な値
- です。
+ `set palette gamma <gamma>` は灰色階調写像 (`set palette gray`) と
+ `cubehelix` のカラーパレット形式に対して自動的なガンマ補正を行います。
+ gamma = 1 は、線形の光度グラデーションを生成します。以下参照:
+ `test palette`。
+
+ 灰色階調写像に対して <gamma> のデフォルトは 1.5 で、通常は適切な値です。
 
  ガンマ補正は、cubehelix カラーパレット形式には適用されますが、他の色形
  式には適用されません。しかし、明示的な色関数にガンマ補正を実装するのは
@@ -13804,28 +13883,71 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 
  または、線形補間が "ガンマ補正" の補間に十分良く適合するまでより良い中
  間の点を探してください。
+4 最大色数 (maxcolors)
+?commands set palette maxcolors
+?set palette maxcolors
+?palette maxcolors
+ `set palette maxcolors <N>` はパレットを、連続なパレットの等間隔な区間
+ からサンプリングした N 個の離散的な色に制限します。離散的な N 個の色を
+ 不等間隔にしたい場合は、単一の連続パレットの代わりに
+ `set palette defined` を使ってください。
 
+ これの第一の使用目的は、離散的な色それぞれが値の範囲を代表するもので、
+ それによって温度分布図を生成することです。
+
+ 2 つ目の使用目的は、限定された色数 (例えば gif や sixel では 256 色)
+ しかサポートしない出力形式での処理です。gnuplot のデフォルトの線種色は
+ そのうちのいくつかまでを使用するので、パレットが利用できる色数はさらに
+ 制限されます。よって、複数のパレットを使用する multiplot では、最初の
+ パレットが利用可能な色位置を使い切ってしまって失敗します。これは、それ
+ ぞれのパレットで使用できる色数を制限することで、回避できます。
+4 色空間モデル (color model)
+?commands set palette model
+?set palette model
+?palette model
+?color model
+?HSV
+?RGB
+?CMY
+      set palette model { RGB | CMY | HSV {start <radians>} }
+ 色空間は、`model` を `RGB`, `HSV`, `CMY` とすることで変更できます。
+ RGB は、標準的な赤 (Red)、緑 (Green)、青 (Blue) に、CMY は水色 (Cyan)、
+ 紫 (Magenta)、黄色 (Yellow) に、HSV は 色相(Hue)、彩度 (Saturation)、
+ 明度 (Value) に基づく色空間です。HSV 色空間では、H が 0 から 1 に変化
+ するのに応じて色相環全体を一回りし、よって H=0 と H=1 は同じ色を示すこ
+ とになります。デフォルトでは、その回転の開始と終了位置は赤です。オプシ
+ ョンパラメータ `start` はそれをずらすので、よって
+ `set palette model HSV start 0.3` の後では、H=0 と H=1 はいずれも緑に
+ 対応します。
+
+ カラーモデルに関するさらなる情報については、以下を参照してください:
+^ <a href="http://en.wikipedia.org/wiki/Color_space">
+           http://en.wikipedia.org/wiki/Color_space
+^ </a>
+ (訳注: 日本語では "http://ja.wikipedia.org/wiki/色空間" があります。)
+
+ パレットオプションに関するマニュアルは、RGB 色空間について書かれていま
+ したが、例えばそれの `R` は「最初の色成分」を意味し、よって実際に使用
+ している色空間によっては `H`、`C` であることに注意してください。
 4 postscript
 ?commands set palette postscript
 ?set palette postscript
- postscript ファイルのサイズを小さくする目的で、灰色の輝度値、そして全
- てではないいくつかの計算された RGB の輝度値がそのファイル中に書かれま
- す。成分関数は postscript 言語で直接コード化され、pm3d の描画の直前に
- ヘッダとしておかれます。/g や /cF の定義を参照してください。通常その定
- 義をその中に書くことは、3 つの式のみが使われる場合に意味を持ちます。し
- かし、multiplot やその他の理由で postscript ファイル中のその変換関数を
- 直接手で編集したいと思うかも知れません。これがデフォルトのオプション
- `nops_allcF` です。オプション `ps_allcF` を使うと、全ての公式の定義が
- postscript ファイル中に書かれます。一つのグラフ中で、異なる曲面に異な
- るパレットを持たせたいという目的で postscript ファイルを編集したい場合
- に、このオプションに関心を持つでしょう。その機能は、`origin` と `size`
- を固定して `multiplot` を使うことで実現できるでしょう。
+ このセクションの内容は、`set term postscript color` からの出力のみに関
+ 連しています。パレットを `set palette rgbforumulae` で定義している場合、
+ gnuplot は要求した解析的な成分関数の postscript での実装を、pm3d の描
+ 画の直前にヘッダとして書きます。/g や /cF の定義を参照してください。通
+ 常は、palette が使用する 3 つの公式の定義のみを書き出せばそれでよくて、
+ それがデフォルトのオプション `nops_allcF` です。オプション `ps_allcF`
+ は、その代わりに 36 個の公式全ての定義を書き出します。これにより、一つ
+ のグラフ内で曲面毎に違うパレットを使うために postscript ファイルを編集
+ することが可能になります。
 
- pm3d 曲面を PostScript ファイルへ書いている場合、gnuplot に付属する
- awk スクリプト `pm3dCompress.awk` を使うことで、そのファイルサイズを
- 50% まで小さくできるかもしれません。データが四角形の格子状になっている
- 場合は、スクリプト `pm3dConvertToImage.awk` を使うことでより大きな圧縮
- 率が得られる可能性があります。
+ postscript ファイルに pm3d 曲面を書き出す場合、その後で gnuplot に付属
+ する awk スクリプト `pm3dCompress.awk` を実行するとそのファイルサイズ
+ を小さくできるかもしれません。データが四角形の格子状になっている場合は、
+ awk スクリプト `pm3dConvertToImage.awk` を使うことでより大きな圧縮率が
+ 得られる可能性があります。
+ いずれもスクリプトも gnuplot とともに配布されています。
  使用法:
      awk -f pm3dCompress.awk thefile.ps >smallerfile.ps
      awk -f pm3dConvertToImage.awk thefile.ps >smallerfile.ps
@@ -13987,7 +14109,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
                     {primary <fraction>} {specular <fraction>}
                     {spec2 <fraction>}
                   }
-                  { border {<linestyle-options>}}
+                  { {no}border {retrace} {<linestyle-options>}}
                   { implicit | explicit }
                   { map }
                 }
@@ -14257,21 +14379,18 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 ?pm3d hidden3d
 ?set pm3d border
 ?pm3d border
- オプション `set pm3d border {line-properties}` は、各四角形の境界線を、
- 四角形が描画されてあるように描画します。通常これは、擬似的な隠線処理を
- 行うために、オプション `depthorder` とともに使用します。pm3d グラフで
- は、大域的なオプション `set hidden3d` は何の効果も生まないことに注意し
- てください。デフォルトの線の属性 (色、幅) を、キーワード border の後ろ
- にオプションとして後ろにつけます。そのデフォルト値は、その後の splot
- コマンドで変更できます。
+      set pm3d border {retrace} {line-properties}
+      set pm3d noborder
 
- 推奨する使用例:
+ このオプションは、各四角形の境界線を、四角形が描かれているように描画し
+ ます。追加の線属性 (線種、色、線幅) は任意で、デフォルトでは、幅 1 の
+ 黒の実線で境界を書きます。
 
-       set pm3d at s depthorder border lw 0.2 lt black
-       unset hidden3d
-       unset surf
-       splot x*x+y*y linecolor rgb "blue"   # こうしないと黒
-
+ `set pm3d border retrace` は、四辺形の塗るのと同じ色で境界を塗らせます。
+ これは、結果として `noborder` と同じことになりますが、出力モードによっ
+ ては、隣接した塗り潰し四辺形の間のアンチエイリアスによる副産物に苦しむ
+ かもしれません。境界を再描画 (retrace) することで、出力ファイルは大き
+ くなってしまいますが、これらの副産物を隠すことができます。
 4 fillcolor
 ?pm3d fillcolor
       splot FOO with pm3d fillcolor <colorspec>
@@ -14521,9 +14640,12 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 ?set samples
 ?show samples
 ?samples
- 関数、またはデータの補間に関するデフォルトのサンプリング数は、コマンド
- `set samples` で変更できます。個々のグラフの描画範囲 (sampling range)
- の変更は、以下参照: `plot sampling`。
+ 関数のグラフは、与えられた個数の x の値での関数値のサンプリングと、そ
+ れらの値 f(x0)..f(x1)..f(x2).. を結ぶ線分を描画することで構成していま
+ す。関数、またはデータの補間に関するデフォルトのサンプリング数は、コマ
+ ンド `set samples` で変更できます。`plot` や `splot` コマンドの個々の
+ 要素のサンプリング範囲 (sampling range) を変更するには、以下参照:
+ `plot sampling`。
 
  書式:
        set samples <samples_1> {,<samples_2>}
@@ -14532,8 +14654,8 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  デフォルトではサンプル数は 100 点と設定されています。この値を増やすと
  より正確な描画が出来ますが遅くなります。このパラメータはデータファイル
  の描画には何の影響も与えませんが、補間/近似のオプションが使われている
- 場合はその限りではありません。2 次元描画については `plot smooth` を、
- 3 次元描画に関しては、以下参照: `set dgrid3d`。
+ 場合はその限りではありません。以下参照: `plot smooth`, `set cntrparam`,
+ `set dgrid3d`。
 
  2 次元のグラフ描画が行なわれるときは <samples_1> の値のみが関係します。
 
@@ -14582,10 +14704,12 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  長さの比)。
 
  <r> の値を負にするとその意味は違って来ます。<r>=-1 のとき、x 軸、y 軸
- の双方の単位 (つまり 1) の目盛りの長さが同一になるよう設定されます。こ
- れは、3 次元用のコマンド `set view equal xy` の 2 次元での同等物です。
+ の双方の単位 (つまり 1) の目盛りの長さが同一、すなわち等長 (isotoropic)
+ になるよう設定します。以下も参照: `set isotoropic`。
+ これは、3 次元用のコマンド `set view equal xy` の 2 次元での同等物です。
  <r>=-2 のとき、y 軸の単位目盛りの長さは x 軸の単位目盛りの長さの 2 倍
- に設定されます。<r> が負の値に関して以下同様です。
+ に設定されます。<r> が負の値に関して以下同様です。以下も参照:
+ `set isotoropic`。
 
  `gnuplot` が指定されたアスペクト比のグラフをちゃんと書けるかは選択され
  る出力形式に依存します。グラフの領域は出力の指定された部分にちゃんと収
@@ -15866,9 +15990,9 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  コマンド `set view equal xy` は x 軸と y 軸の単位の長さが強制的に等し
  くなるように縮尺を合わせ、グラフがページに丁度合うようにその縮尺を選択
  します。コマンド `set view equal xyz` は、さらに z 軸も x と y 軸に合
- うようにしますが、現在の z 軸の範囲が、描画境界の範囲に合う保証はあり
- ません。デフォルトでは、3 つの軸は独立に有効な領域を埋めるように伸縮さ
- れます。
+ うようにしますが、z 軸の範囲が、描画境界の範囲に合う保証はありません。
+ 以下も参照: `set isotropic`。デフォルトでは、3 つの軸は独立に有効な領
+ 域を埋めるように伸縮します。
 
  以下も参照: `set xyplane`。
 4 projection
