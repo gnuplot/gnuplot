@@ -932,12 +932,35 @@ doc2tex.exe: $(D)doc2tex.c $(D)termdoc.c $(LUA_HELP)
 	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI $(CFLAGS) -I. -I$(D) -I$(T) $^
 endif
 
+allterm-ja.h: $(JASRC) $(LUA_HELP)
+	@echo "Building Japanese allterm-ja.h"
+	@for e in `egrep "^[ 	]*START_HELP" $(subst $(T),$(JA)term/,$(CORETERM)) |\
+	     $(GNUSORT) -f -t':' -k2` ; do \
+	  f=`echo $$e |cut -d\: -f1` ; s=`echo $$e | cut -d\: -f2` ;\
+	  sed -n "/^[ 	]*$$s/,/^[ 	]*END_HELP/p" $$f ; \
+	done >allterm-jp.h
+	iconv -f EUC-JP -t UTF-8 allterm-jp.h > allterm-ja.h
+	rm allterm-jp.h
+
+doc2tex-ja.exe: allterm-ja.h $(D)doc2tex.c $(D)termdoc.c
+	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI \
+	    -DALL_TERM_DOC \
+	    -DVERSION_MAJOR='"$(MAINVERSION)"' -DPATCHLEVEL='"$(PATCHLEVEL)"' \
+	    -DJAPANESE_DOC $(CFLAGS_DOCS) -I. -I$(JAD) -I$(JA)/term \
+	    $(D)doc2tex.c $(D)termdoc.c
+
 gnuplot.tex: $(D)gnuplot.doc doc2tex.exe
 	./doc2tex $(D)gnuplot.doc gnuplot.tex
 
 gnuplot-figures.tex: $(D)gnuplot.doc doc2tex.exe $(TARGET)
 	GNUPLOT_LIB=$(M) ./$(TARGET) -d $(D)plotstyles.gnu
 	./doc2tex -figures $(D)gnuplot.doc gnuplot-figures.tex
+
+gnuplot-figures-ja.tex: $(D)gnuplot.doc doc2tex-ja.exe $(TARGET)
+	GNUPLOT_LIB=$(M) ./$(TARGET) -d $(D)plotstyles.gnu
+	iconv -f EUC-JP -t UTF-8 $(D)gnuplot-ja.doc > ja.doc
+	./doc2tex-ja -figures ja.doc | sed 's/titlepag.tex/title-ja.tex/' > gnuplot-figures-ja.tex
+	rm ja.doc
 
 gnuplot.dvi: gnuplot.tex $(D)toc_entr.sty $(D)titlepag.tex
 	cp gnuplot.tex gp_tex2.tex
@@ -951,13 +974,8 @@ gnuplot.dvi: gnuplot.tex $(D)toc_entr.sty $(D)titlepag.tex
 gnuplot.ps: gnuplot.dvi
 	dvips -o gnuplot.ps gnuplot.dvi
 
-gnuplot.pdf: gnuplot-figures.tex $(D)toc_entr.sty $(D)titlepag.tex
+gnuplot.pdf: gnuplot-figures.tex gpinsetfigure.tex $(D)toc_entr.sty $(D)titlepag.tex
 	cp gnuplot-figures.tex gp_tex2.tex
-	echo "\usepackage{graphicx}" > gpinsetfigure.tex
-	echo "\usepackage{picins}" >> gpinsetfigure.tex
-	echo "\newcommand{\gpinsetfigure}[1]{" >> gpinsetfigure.tex ; \
-	echo "  \parpic[r][rt]{\includegraphics[width=3in,keepaspectratio]{#1}}" >> gpinsetfigure.tex ; \
-	echo "}" >> gpinsetfigure.tex
 	# Call LaTeX three times to get the toc right.
 	TEXINPUTS=.:$(TOP):$(D):${TEXINPUTS}: pdflatex gp_tex2.tex
 	TEXINPUTS=.:$(TOP):$(D):${TEXINPUTS}: pdflatex gp_tex2.tex
@@ -967,6 +985,27 @@ gnuplot.pdf: gnuplot-figures.tex $(D)toc_entr.sty $(D)titlepag.tex
 	TEXINPUTS=.:$(TOP):$(D):${TEXINPUTS}: pdflatex gp_tex2.tex
 	mv gp_tex2.pdf gnuplot.pdf
 	rm -f gp_tex2.*
+
+# Prepare PDF copy of User Manual in Japanese
+# This procedure assumes use of luatex with package luatexja
+gnuplot-ja.pdf: gnuplot-figures-ja.tex gpinsetfigure.tex $(D)toc_entr.sty $(D)title-ja.tex
+	cp gnuplot-figures-ja.tex gp_tex2.tex
+	# Call LaTeX three times to get the toc right.
+	TEXINPUTS=.:$(TOP):$(D):${TEXINPUTS}: lualatex gp_tex2.tex
+	TEXINPUTS=.:$(TOP):$(D):${TEXINPUTS}: lualatex gp_tex2.tex
+	TEXINPUTS=.:$(TOP):$(D):${TEXINPUTS}: lualatex gp_tex2.tex
+	# now include index
+	makeindex gp_tex2
+	TEXINPUTS=.:$(TOP):$(D):${TEXINPUTS}: lualatex gp_tex2.tex
+	mv gp_tex2.pdf gnuplot-ja.pdf
+	rm -f gp_tex2.*
+
+gpinsetfigure.tex: Makefile
+	echo "\usepackage{graphicx}" > gpinsetfigure.tex
+	echo "\usepackage{picins}" >> gpinsetfigure.tex
+	echo "\newcommand{\gpinsetfigure}[1]{" >> gpinsetfigure.tex ; \
+	echo "  \parpic[r][rt]{\includegraphics[width=3in,keepaspectratio]{#1}}" >> gpinsetfigure.tex ; \
+	echo "}" >> gpinsetfigure.tex
 
 gnuplot.ms: doc2ms.exe $(D)gnuplot.doc
 	./doc2ms $(D)gnuplot.doc gnuplot.ms
@@ -1024,28 +1063,32 @@ faq.pdf: $(TOP)/faq/faq.tex
 
 # clean up temporary files
 clean:
-	$(RM) config.h wgnuplot.map wgnuplot.res
-	$(RM) *.o *.po *.co *.d *.cd *.pd *.map
-	$(RM) moc_*.cpp ui_*.h qrc_*.cpp
+	-$(RM) config.h wgnuplot.map wgnuplot.res
+	-$(RM) *.o *.po *.co *.d *.cd *.pd *.map
+	-$(RM) moc_*.cpp ui_*.h qrc_*.cpp
 	-$(RM) prntvpt.lib prntvpt.def
-	$(RM) doc2*.exe $(W)/wgnuplib.res wgnuplib.map wgnuplot.lib
-	$(RM) $(M)bf_test.exe demo_plugin.dll allterm.h allterm.c
-	$(RM) *.aux *.log *.dvi *.toc
-	$(RM) gnuplot.tex gnuplot-figures.tex pdffigures.tex figure_*.pdf
-	$(RM) titlepag.tex toc_entr.sty
-	$(RM) eg?.tex eg?.eps linepoin.tex test.tex test_tikz.tex
-	$(RM) $(D)windows/wgnuplot.log $(D)windows/wgnuplot.hhc
-	$(RM) $(D)windows/*.png $(D)windows/wgnuplot.html
+	-$(RM) doc2*.exe $(W)/wgnuplib.res wgnuplib.map wgnuplot.lib
+	-$(RM) $(M)bf_test.exe demo_plugin.dll allterm.h allterm.c
+	-$(RM) *.aux *.log *.dvi *.toc
+	-$(RM) gnuplot.tex gnuplot-figures.tex gpinsetfigure.tex figure_*.pdf
+	-$(RM) titlepag.tex toc_entr.sty
+	-$(RM) eg?.tex eg?.eps linepoin.tex test.tex test_tikz.tex
+	-$(RM) $(D)windows/wgnuplot.log $(D)windows/wgnuplot.hhc
+	-$(RM) $(D)windows/*.png $(D)windows/wgnuplot.html
+	-$(RM) doc2html.exe
 	-$(RM) timestamp.h *.tmp *.par
 	-$(RM) -rf ./dist/ ./gnuplot/
 	-$(RM) -rf $(JA)
+	-$(RM) allterm-ja.h gnuplot-figures-ja.tex
+	-$(RM) doc2html-ja.exe doc2tex-ja.exe
 
 realclean: veryclean
 veryclean: clean
 	$(RM) wgnuplot.exe wgnuplot_pipes.exe gnuplot.exe pgnuplot.exe
 	$(RM) gnuplot_qt.exe qtgnuplot_*.qm
-	$(RM) $(HELPFILE) $(HELPFILEJA) wgnuplot.chw wgnuplot.gid wgnuplot.mnu
+	-$(RM) $(HELPFILE) $(HELPFILEJA) wgnuplot.chw wgnuplot.gid wgnuplot.mnu
 	$(RM) gnuplot.ps gnuplot.pdf
+	-$(RM) gnuplot-ja.pdf
 	-$(RM) tutorial.pdf faq.pdf
 	$(RM) ps_fontfile_doc.pdf ps_fontfile_doc.ps ps_guide.pdf
 	$(RM) ps_symbols.ps ps_symbols.pdf

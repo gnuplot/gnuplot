@@ -62,7 +62,11 @@ extern char *termtext[];
 
 char *termtext[] = {
 # ifdef ALL_TERM_DOC
-#  include "allterm.h"
+#  ifndef JAPANESE_DOC
+#    include "allterm.h"
+#  else
+#    include "allterm-ja.h"
+#  endif
 # else
 #  include "term.h"
 # endif
