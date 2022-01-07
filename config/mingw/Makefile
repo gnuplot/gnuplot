@@ -1061,6 +1061,13 @@ faq.pdf: $(TOP)/faq/faq.tex
 	pdflatex $<
 	pdflatex $<
 
+latex_demo.pdf: gnuplot.exe $(M)/latex_demo.dem $(M)/latex_demo.tex
+	GNUTERM="dumb noenhanced" GNUPLOT_LIB=$(M) GNUPLOT_PS_DIR=$(T)/PostScript ./gnuplot latex_demo.dem
+	latex epslatex.tex
+	dvips -E epslatex -o latex_epslatex.eps
+	epstopdf latex_epslatex.eps
+	xelatex $(M)/latex_demo
+
 # clean up temporary files
 clean:
 	-$(RM) config.h wgnuplot.map wgnuplot.res
@@ -1081,6 +1088,9 @@ clean:
 	-$(RM) -rf $(JA)
 	-$(RM) allterm-ja.h gnuplot-figures-ja.tex
 	-$(RM) doc2html-ja.exe doc2tex-ja.exe
+	-$(RM) latex_epslatex.eps latex_epslatex.pdf epslatex.* epslatex-inc.eps
+	-$(RM) latex_cairo.pdf latex_cairo.tex latex_pict2e.tex latex_tikz.tex
+	-$(RM) latex_demo.aux latex_demo.log
 
 realclean: veryclean
 veryclean: clean
@@ -1095,6 +1105,7 @@ veryclean: clean
 	$(RM) $(M)binary[123] $(M)fit.log $(M)soundfit.par
 	$(RM) gnuplot-lua-tikz.sty gnuplot-lua-tikz.tex
 	$(RM) gnuplot-lua-tikz-common.tex t-gnuplot-lua-tikz.tex
+	$(RM) latex_demo.pdf
 
 # now move the whole stuff to its destination
 install:
