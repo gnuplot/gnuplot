@@ -7,3 +7,8 @@ binary?
 *.manifest
 *.tmp
 *.exe
+*.tex
+*latex*.tex
+latex_demo.*
+epslatex-inc.eps
+latex_cairo.pdf

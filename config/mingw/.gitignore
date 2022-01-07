@@ -1,4 +1,3 @@
-VERSION
 *.d
 *.cd
 *.pd
@@ -40,3 +39,7 @@ platforms
 obj
 bin
 *.help
+*latex*.tex
+latex_demo.*
+epslatex-inc.eps
+latex_cairo.pdf

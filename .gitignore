@@ -47,3 +47,4 @@ docs/figures.*
 docs/pdf_figures
 share/Gnuplot
 FAQ.pdf
+build*
