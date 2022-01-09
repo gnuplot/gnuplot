@@ -173,6 +173,7 @@ const struct ft_entry ft[] =
     {"abs",  f_abs},
     {"sgn",  f_sgn},
     {"sqrt",  f_sqrt},
+    {"cbrt",  f_cbrt},
     {"exp",  f_exp},
     {"log10",  f_log10},
     {"log",  f_log},

@@ -71,6 +71,7 @@ void f_void(union argument *x);
 void f_abs(union argument *x);
 void f_sgn(union argument *x);
 void f_sqrt(union argument *x);
+void f_cbrt(union argument *x);
 void f_exp(union argument *x);
 void f_log10(union argument *x);
 void f_log(union argument *x);

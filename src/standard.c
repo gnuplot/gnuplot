@@ -985,6 +985,24 @@ f_sqrt(union argument *arg)
 
 
 void
+f_cbrt(union argument *arg)
+{
+    struct value a;
+    double mag;
+
+    (void) arg;			/* avoid -Wunused warning */
+    (void) pop(&a);
+    if (imag(&a) == 0.0) {
+	mag = cbrt(real(&a));
+	push(Gcomplex(&a, mag, 0.0));
+    } else {
+	undefined = TRUE;
+	push(Gcomplex(&a, not_a_number(), 0.0));
+    }
+}
+
+
+void
 f_exp(union argument *arg)
 {
     struct value a;
