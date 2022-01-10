@@ -6990,7 +6990,7 @@ Ffigure_zerror
 ?history
  The `history` command prints or saves previous commands in the history list,
  or reexecutes a previous entry in the list.  To modify the behavior of this
- command, see `set history`.
+ command or the location of the saved history file, see `set history`.
 
  Input lines with `history` as their first command are not stored in the
  command history.
