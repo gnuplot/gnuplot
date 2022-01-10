@@ -1774,6 +1774,7 @@ C marker below is used to signal this to doc2html:
 #cbrt(x) & real & ~ & cube root of $x$ (domain and range both limited to real) \\
 %cbrt(x)@ real @ cube root of x (domain and range both limited to real)
  `cbrt(x)` returns the cube root of x. If x is not real, returns NaN.
+??
 C 4 ceil
 C ?expressions functions ceil
 #ceil(x) &  ~~  & ~ & $\lceil x \rceil$, smallest integer not less than the real part of $x$ \\
@@ -1845,9 +1846,11 @@ C ?expressions functions ceil
 %exp(x)@ ~~ @$e sup x$, exponential function of $x$
  The `exp(x)` function returns `e` raised to the power of x, which can be
  an integer, real, or complex value.
+??
 C 4 expint
 #expint(n,x) & int $n\ge0$, real $x\ge0$ & ~ & $E_n(x)=\int_1^\infty t^{-n} e^{-xt}\,dt$,  exponential integral of $x$ \\
 %expint(n,x)@ ~~ @$E sub n (x)$, exponential integral function of $x$
+??
 C 4 floor
 C ?expressions functions floor
 #floor(x) &  ~~  & ~ & $\lfloor x \rfloor$,  largest integer not greater
@@ -1862,6 +1865,7 @@ C ?expressions functions floor
  The `gamma(x)` function returns the gamma function of the real part of its
  argument.  For integer n, gamma(n+1) = n!.  If the argument is a complex
  value, the imaginary component is ignored. For complex arguments see `lnGamma`.
+??
 C 4 ibeta
 #ibeta(a,b,x) & $a,b>0$, $x \in [0:1]$ & ~ & $B(a,b,x)=\frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)}\intop_{0}^{x}t^{a-1}(1-t)^{b-1}dt$, incomplete beta \\
 %ibeta(a,b,x)@ ~~ @$ibeta ( roman real (a,b,x))$, ibeta function of real ($a$,$b$,$x$)
@@ -1872,6 +1876,7 @@ C 4 ibeta
 %inverf(x)@ ~~ @inverse error function real($x$)
  The `inverf(x)` function returns the inverse error function of the real part
  of its argument.   See `erf` and `invnorm`.
+??
 C 4 igamma
 #igamma(a,z) & complex, $\Re(a)>0$ & \gpCX & incomplete gamma function $P(a,z)=\frac{1}{\Gamma(z)}\intop_{0}^{z}t^{a-1}e^{-t}dt$ \\
 %igamma(a,z)@ ~~ @$igamma (a,z)$, lower incomplete gamma function of ($a$,$z$)
@@ -1882,6 +1887,7 @@ C 4 igamma
 %imag(x)@complex@imaginary part of $x$ as a real number
  The `imag(x)` function returns the imaginary part of its argument as a real
  number.
+??
 C 4 int
 C ?expressions functions int
 #int(x) & real & ~ &  integer part of $x$, truncated toward zero \\
@@ -1895,10 +1901,12 @@ C ?expressions functions int
  The `invnorm(x)` function returns the inverse cumulative normal (Gaussian)
  distribution function of the real part of its argument.  See `norm`.
 
+??
 C 4 invibeta
 #invibeta(a,b,p) & real & ~ &  inverse incomplete beta function  \\
 %invibeta(a,b,p)@ real @inverse incomplete beta function
 
+??
 C 4 invigamma
 #invigamma(a,p) & real & ~ &  inverse incomplete gamma function  \\
 %invigamma(a,p)@ real @inverse incomplete gamma function
@@ -1962,6 +1970,7 @@ C 4 invigamma
 #real(x) &  ~~  & ~ &  real part of $x$ \\
 %real(x)@ ~~ @real part of $x$
  The `real(x)` function returns the real part of its argument.
+??
 C 4 round
 C ?expressions functions round
 #round(x) &  ~~  & ~ & $\lfloor x \rceil$,  integer nearest to the real part of $x$ \\
@@ -2003,6 +2012,7 @@ C ?expressions functions round
  The `sqrt(x)` function returns the square root of its argument. If the
  x is a complex value, this always returns the root with positive real
  part.
+??
 C 4 SynchrotronF
 C ?expressions functions SynchrotronF
 #SynchrotronF(x) & real & ~ & $F(x) = x\intop_{x}^{\infty}K_{\frac{5}{3}}(\nu)~d\nu$ \\
@@ -2021,6 +2031,7 @@ C ?expressions functions SynchrotronF
 %tanh(x)@ ~~ @$tanh~x$, hyperbolic tangent of $x$ in radians
  The `tanh(x)` function returns the hyperbolic tangent of its argument.  `tanh`
  expects its argument to be in radians.
+??
 C 4 uigamma
 #uigamma(a,x) & real, real & & upper incomplete gamma function $Q(a,x)=\frac{1}{\Gamma(x)}\intop_{x}^{\infty}t^{a-1}e^{-t}dt$ \\
 %uigamma(a,x)@ ~~ @$uigamma (a,x)$, upper incomplete gamma function of ($a$,$x$)
@@ -2035,6 +2046,7 @@ C 4 uigamma
  one part in 10^4.  If the libcerf library is available, the re_w_of_z()
  routine is used to provide a more accurate value.
  Note that voigt(x,y) = real(faddeeva( x + y*{0,1} )).
+??
 C 4 zeta
 #zeta(s) & complex & \gpCX & Riemann zeta function $\zeta(s) = \Sigma^{\infty}_{k=1} k^{-s}$\\
 %zeta(s)@complex@Riemann zeta function
@@ -2087,9 +2099,11 @@ C 4 zeta
 #erfi(x)&real&~&imaginary error function $erf(x) = -i * erf(ix)$ \\
  Imaginary error function erfi(x) = -i * erf(ix)
  Requires external library libcerf.
+??
 C 4 FresnelC
 %FresnelC(x)@real@ C(x) = integral[0;x] cos(pi/2 t^2)dt
 #FresnelC(x)&real&~&Fresnel integral $C(x)=\int^{x}_{0}\cos(\frac{\pi}{2}t^2)dt$ \\
+??
 C 4 FresnelS
 %FresnelS(x)@real@ S(x) = integral[0;x] sin(pi/2 t^2)dt
 #FresnelS(x)&real&~&Fresnel integral $S(x)=\int^{x}_{0}\sin(\frac{\pi}{2}t^2)dt$ \\
@@ -2264,14 +2278,17 @@ C 4 FresnelS
 %c c l .
 %Function@Arguments@Returns
 %_
+??
 C 4 time
 C ?expressions functions time
 #time(x) & any & the current system time in seconds \\
 %time(x)@any@the current system time in seconds
+??
 C 4 timecolumn
 C ?expressions functions timecolumn
 #timecolumn(N,"timeformat") & int, string & formatted time data from column $N$ of input \\
 %timecolumn(N,"timeformat")@int, string@formatted time data from column $N$ of input
+??
 C 4 tm_hour
 ?expressions functions tm_hour
 ?tm_hour
@@ -2279,6 +2296,7 @@ C 4 tm_hour
 %tm_hour(t)@time in sec@the hour (0..23)
  The `tm_hour(t)` function interprets its argument as a time, in seconds from
  1 Jan 1970.  It returns the hour (an integer in the range 0--23) as a real.
+??
 C 4 tm_mday
 ?expressions functions tm_mday
 ?tm_mday
@@ -2287,6 +2305,7 @@ C 4 tm_mday
  The `tm_mday(t)` function interprets its argument as a time, in seconds from
  1 Jan 1970.  It returns the day of the month (an integer in the range 1--31)
  as a real.
+??
 C 4 tm_min
 ?expressions functions tm_min
 ?tm_min
@@ -2294,6 +2313,7 @@ C 4 tm_min
 %tm_min(t)@time in sec@the minute (0..59)
  The `tm_min(t)` function interprets its argument as a time, in seconds from
  1 Jan 1970.  It returns the minute (an integer in the range 0--59) as a real.
+??
 C 4 tm_mon
 ?expressions functions tm_mon
 ?tm_mon
@@ -2301,6 +2321,7 @@ C 4 tm_mon
 %tm_mon(t)@time in sec@the month (0..11)
  The `tm_mon(t)` function interprets its argument as a time, in seconds from
  1 Jan 1970.  It returns the month (an integer in the range 0--11) as a real.
+??
 C 4 tm_sec
 ?expressions functions tm_sec
 ?tm_sec
@@ -2308,6 +2329,7 @@ C 4 tm_sec
 %tm_sec(t)@time in sec@the second (0..59)
  The `tm_sec(t)` function interprets its argument as a time, in seconds from
  1 Jan 1970.  It returns the second (an integer in the range 0--59) as a real.
+??
 C 4 tm_wday
 ?expressions functions tm_wday
 ?tm_wday
@@ -2315,9 +2337,11 @@ C 4 tm_wday
 %tm_wday(t)@time in sec@the day of the week (Sun..Sat) as (0..6)
  The `tm_wday(t)` function interprets its argument as a time, in seconds from
  1 Jan 1970.  It returns the day of the week (Sun..Sat) as an integer (0..6).
+??
 C 4 tm_week
 #tm\_week(t) & time in sec & week of year in ISO8601 "week date" system (1..53)\\
 %tm_week(t)@time in sec@ISO 8601 week of year in ISO8601 "week date" system (1..53)
+??
 C 4 tm_yday
 ?expressions functions tm_yday
 ?tm_yday
@@ -2326,6 +2350,7 @@ C 4 tm_yday
  The `tm_yday(t)` function interprets its argument as a time, in seconds from
  1 Jan 1970.  It returns the day of the year (an integer in the range 0--365)
  as a real.
+??
 C 4 tm_year
 ?expressions functions tm_year
 ?tm_year
@@ -2333,9 +2358,11 @@ C 4 tm_year
 %tm_year(t)@time in sec@the year
  The `tm_year(t)` function interprets its argument as a time, in seconds from
  1 Jan 1970.  It returns the year (an integer) as a real.
+??
 C 4 weekdata_iso
 #weekdate\_iso(year,week,day) & int & time corresponding to ISO 8601 standard week date\\
 %weekdate_iso(year,week,day)@int@ time corresponding to ISO 8601 standard week date 
+??
 C 4 weekdata_cdc
 #weekdate\_cdc(year,week,day) & int & time corresponding to CDC epidemiological week date\\
 %weekdate_cdc(year,week,day)@int@ time corresponding to CDC epidemiological week date 
@@ -2381,6 +2408,7 @@ C 4 weekdata_cdc
 %hsv2rgb(h,s,v)@h,s,v in [0:1]@24bit RGB color value.
  The `hsv2rgb(h,s,v)` function converts HSV (Hue/Saturation/Value) triplet
  to an equivalent RGB value.
+??
 C 4 index
 #index(A,x) & array, any & integer i such that A[i] = x. 0 if no match.\\
 %index(A,x)@array, any@integer i such that A[i] = x. 0 if no match.

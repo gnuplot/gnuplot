@@ -259,6 +259,9 @@ LoadHelp(char *path)
 	head = firsthead;
 	while ((fgets(buf, MAX_LINE_LEN - 1, helpfp) != (char *) NULL)
 	       && (buf[0] != KEYFLAG)) {
+	    /* Ignore text for null key */
+	    if (key->key[0] == '?')
+		continue;
 	    /* save text line */
 	    head->next = storeline(buf);
 	    head = head->next;
