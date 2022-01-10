@@ -993,7 +993,14 @@ f_cbrt(union argument *arg)
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     if (imag(&a) == 0.0) {
+#if HAVE_CBRT
 	mag = cbrt(real(&a));
+#else
+	if (real(&a) >= 0.0)
+	    mag = pow(real(&a), 1.0/3.0);
+	else
+	    mag = -pow(-real(&a), 1.0/3.0);
+#endif
 	push(Gcomplex(&a, mag, 0.0));
     } else {
 	undefined = TRUE;
