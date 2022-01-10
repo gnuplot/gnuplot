@@ -1458,6 +1458,7 @@ Ffigure_E0
 ^<tr>    <td>besi0(x)</td>   <td>real</td>    <td>Modified Bessel function of order 0, <i>x</i> in radians</td></tr>
 ^<tr>    <td>besi1(x)</td>   <td>real</td>    <td>Modified Bessel function of order 1, <i>x</i> in radians</td></tr>
 ^<tr>    <td>besin(n,x)</td>   <td>int,real</td><td>Modified Bessel function of order n, <i>x</i> in radians</td></tr>
+^<tr>    <td>cbrt(x)</td>    <td>real</td>    <td>cube root of x, domain and range both real </td></tr>
 ^<tr>    <td>ceil(x)</td>    <td>any</td>    <td>&lceil;<i>x</i>&rceil;, smallest integer not less than <i>x</i> (real part)</td></tr>
 ^<tr>    <td>conj(x)</td>    <td>complex</td>    <td>complex conjugate of <i>x</i></td></tr>
 ^<tr>    <td>cos(x)</td>    <td>radians</td>    <td>cos <i>x</i>, cosine of <i>x</i></td></tr>
@@ -1767,6 +1768,12 @@ C marker below is used to signal this to doc2html:
 %besin(x)@int,real@ Modified Bessel function of order n, $x$ in radians
  `besin(n,x)` is the modified Bessel function or order n for integer n and
  x in radians.
+4 cbrt
+?expressions functions cbrt
+?cbrt
+#cbrt(x) & real & ~ & cube root of $x$ (domain and range both limited to real) \\
+%cbrt(x)@ real @ cube root of x (domain and range both limited to real)
+ `cbrt(x)` returns the cube root of x. If x is not real, returns NaN.
 C 4 ceil
 C ?expressions functions ceil
 #ceil(x) &  ~~  & ~ & $\lceil x \rceil$, smallest integer not less than the real part of $x$ \\
