@@ -320,6 +320,10 @@ plot3drequest()
     axis_init(&axis_array[U_AXIS], FALSE);
     axis_init(&axis_array[V_AXIS], FALSE);
     axis_init(&axis_array[COLOR_AXIS], TRUE);
+    if (splot_map) {
+	axis_init(&axis_array[SECOND_X_AXIS], FALSE);
+	axis_init(&axis_array[SECOND_Y_AXIS], FALSE);
+    }
 
     /* Always be prepared to restore the autoscaled values on "refresh"
      * Dima Kogan April 2018
@@ -2622,6 +2626,22 @@ eval_3dplots()
      */
     if (plot_num == 0 || first_3dplot == NULL) {
 	int_error(c_token, "no functions or data to plot");
+    }
+
+    /* In "set view map" mode it is possible for the x1/x2 or y1/y2 axes
+     * to be linked.  If so, reconcile their data limits before plotting.
+     */
+    if (splot_map) {
+	if (axis_array[FIRST_X_AXIS].linked_to_secondary) {
+	    AXIS *primary = &axis_array[FIRST_X_AXIS];
+	    AXIS *secondary = &axis_array[SECOND_X_AXIS];
+	    reconcile_linked_axes(primary, secondary);
+	}
+	if (axis_array[FIRST_Y_AXIS].linked_to_secondary) {
+	    AXIS *primary = &axis_array[FIRST_Y_AXIS];
+	    AXIS *secondary = &axis_array[SECOND_Y_AXIS];
+	    reconcile_linked_axes(primary, secondary);
+	}
     }
 
     if (nonlinear(&axis_array[FIRST_X_AXIS])) {
