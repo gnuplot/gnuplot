@@ -345,8 +345,11 @@ boundary3d(struct surface_points *plots, int count)
 
     if (rmargin.scalex == screen)
 	plot_bounds.xright = rmargin.x * (double)t->xmax + 0.5;
-    else /* No tic label on the right side, so ignore rmargin */
+    else if (splot_map && rmargin.x >= 0)
+	plot_bounds.xright = xsize * t->xmax - (rmargin.x * t->h_char + 0.5);
+    else
 	plot_bounds.xright = xsize * t->xmax - t->h_char * 2 - t->h_tic;
+    /* FIXME - allow space for y2tics */
 
     key_rows = ptitl_cnt;
     key_cols = 1;
@@ -409,8 +412,11 @@ boundary3d(struct surface_points *plots, int count)
 
     if (tmargin.scalex == screen)
 	plot_bounds.ytop = tmargin.x * (double)t->ymax + 0.5;
-    else /* FIXME: Why no provision for tmargin in terms of character height? */
+    else if (splot_map && tmargin.x >= 0)
+	plot_bounds.ytop = ysize * t->ymax - t->v_char * (titlelin + tmargin.x) - 1;
+    else
 	plot_bounds.ytop = ysize * t->ymax - t->v_char * (titlelin + 1.5) - 1;
+    /* FIXME - allow space for x2tics */
 
     if (key->visible)
     if (key->region == GPKEY_AUTO_INTERIOR_LRTBC
@@ -473,9 +479,9 @@ boundary3d(struct surface_points *plots, int count)
     yscaler = ((plot_bounds.ytop - plot_bounds.ybot) * 4L) / 7L;
 
     /* Allow explicit control via set {}margin screen */
-    if (tmargin.scalex == screen || bmargin.scalex == screen)
+    if (tmargin.scalex == screen && bmargin.scalex == screen)
 	yscaler = (plot_bounds.ytop - plot_bounds.ybot) / surface_scale;
-    if (rmargin.scalex == screen || lmargin.scalex == screen)
+    if (rmargin.scalex == screen && lmargin.scalex == screen)
 	xscaler = (plot_bounds.xright - plot_bounds.xleft) / surface_scale;
 
     /* prevent infinite loop or divide-by-zero if scaling is bad */
