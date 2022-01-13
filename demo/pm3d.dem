@@ -377,7 +377,6 @@ set key off
 unset xtics
 unset ytics
 unset colorbox
-set tmargin 0
 set bmargin 0
 
 # Note: no more space in the following multiplot to show demo for
