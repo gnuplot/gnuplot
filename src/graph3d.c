@@ -349,7 +349,6 @@ boundary3d(struct surface_points *plots, int count)
 	plot_bounds.xright = xsize * t->xmax - (rmargin.x * t->h_char + 0.5);
     else
 	plot_bounds.xright = xsize * t->xmax - t->h_char * 2 - t->h_tic;
-    /* FIXME - allow space for y2tics */
 
     key_rows = ptitl_cnt;
     key_cols = 1;
@@ -449,9 +448,17 @@ boundary3d(struct surface_points *plots, int count)
 	    plot_bounds.xleft += key_width;
     }
 
+    /* Make room for the colorbar to the right of the plot */
+    if (splot_map && is_plot_with_colorbox() && rmargin.scalex != screen) {
+	if ((color_box.where != SMCOLOR_BOX_NO) && (color_box.where != SMCOLOR_BOX_USER))
+	    plot_bounds.xright -= 0.1 * (plot_bounds.xright-plot_bounds.xleft);
+	color_box.xoffset = 0;
+    }
+
     /* Leave room for optional x2label and y2label in "set view map" mode.
      * These estimates are crude compared to the effort we make in 2D plots
      * but the user can adjust it with "offset" and "set rmargin".
+     * Later we will adjust the colorbox position by the same amount.
      */
     if (splot_map && axis_array[SECOND_X_AXIS].label.text)
 	plot_bounds.ytop -= 1.5 * t->v_char;
@@ -857,7 +864,6 @@ do_3dplot(
     memcpy(&page_bounds, &plot_bounds, sizeof(page_bounds));
 
     /* Clipping in 'set view map' mode should be like 2D clipping */
-    /* FIXME:  Wasn't this already done in boundary3d?            */
     if (splot_map) {
 	int map_x1, map_y1, map_x2, map_y2;
 	map3d_xy(X_AXIS.min, Y_AXIS.min, base_z, &map_x1, &map_y1);
@@ -2791,18 +2797,25 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	}
 
 	/* In "set view map" 2D projection there may also be y2 tics and label */
-	if (splot_map && axis_array[SECOND_Y_AXIS].ticmode)
-	    gen_tics(&axis_array[SECOND_Y_AXIS], ytick_callback);
-	if (splot_map && axis_array[SECOND_Y_AXIS].label.text) {
-	    int y2 = (plot_bounds.ytop + plot_bounds.ybot) / 2;
-	    int x2 = plot_bounds.xright + 2.5 * t->h_char;
+	if (splot_map) {
+	    int y2tic_textwidth = 0;      /* width of y2 tic labels */
+	    int y2label_width = 0;
 	    if (axis_array[SECOND_Y_AXIS].ticmode) {
-		/* calculate max length of y2tics labels */
+		gen_tics(&axis_array[SECOND_Y_AXIS], ytick_callback);
 		widest_tic_strlen = 0;
 		gen_tics(&axis_array[SECOND_Y_AXIS], widest_tic_callback);
-		x2 += (1.5 + widest_tic_strlen) * t->h_char;
+		y2tic_textwidth = (1.5 + widest_tic_strlen) * t->h_char;
 	    }
-	    write_label(x2, y2, &(axis_array[SECOND_Y_AXIS].label));
+	    if (axis_array[SECOND_Y_AXIS].label.text) {
+		int y2 = (plot_bounds.ytop + plot_bounds.ybot) / 2;
+		int x2 = plot_bounds.xright;
+		y2label_width = 2.5 * t->h_char;
+		x2 += y2tic_textwidth;
+		x2 += y2label_width;
+		write_label(x2, y2, &(axis_array[SECOND_Y_AXIS].label));
+	    }
+	    /* Jan 2022: this is at least one character width to the right of previous layout */
+	    color_box.xoffset = t->h_char + y2tic_textwidth + y2label_width;
 	}
     }
 
