@@ -429,7 +429,6 @@ boundary3d(struct surface_points *plots, int count)
 	plot_bounds.ytop = ysize * t->ymax - t->v_char * (titlelin + tmargin.x) - 1;
     else
 	plot_bounds.ytop = ysize * t->ymax - t->v_char * (titlelin + 1.5) - 1;
-    /* FIXME - allow space for x2tics */
 
     /* Automatic calculation of key columns and rows */
     if (key->visible && key->user_cols == 0) {
@@ -472,6 +471,15 @@ boundary3d(struct surface_points *plots, int count)
 	&&  (lmargin.scalex != screen))
 		plot_bounds.xleft += key_width;
     }
+
+    /* Leave room for optional x2label and y2label in "set view map" mode.
+     * These estimates are crude compared to the effort we make in 2D plots
+     * but the user can adjust it with "offset" and "set rmargin".
+     */
+    if (splot_map && axis_array[SECOND_X_AXIS].label.text)
+	plot_bounds.ytop -= 1.5 * t->v_char;
+    if (splot_map && axis_array[SECOND_Y_AXIS].label.text)
+	plot_bounds.xright -= 2.5 * t->h_char;
 
     if (!splot_map && aspect_ratio_3D > 0) {
 	int height = (plot_bounds.ytop - plot_bounds.ybot);
@@ -920,6 +928,10 @@ do_3dplot(
 	       tics is as given by character height: */
 	    x = ((map_x1 + map_x2) / 2);
 	    y = (map_y1 + tics_len + (titlelin + 0.5) * (t->v_char));
+	    if (splot_map && axis_array[SECOND_X_AXIS].ticmode)
+		y += 0.5 * t->v_char;
+	    if (splot_map && axis_array[SECOND_X_AXIS].label.text)
+		y += 1.0 * t->v_char;
 	} else { /* usual 3d set view ... */
 	    x = (plot_bounds.xleft + plot_bounds.xright) / 2;
 	    y = (plot_bounds.ytop + titlelin * (t->h_char));
@@ -2703,8 +2715,16 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	    }
 	}
 
+	/* In "set view map" 2D projection there may also be x2 tics and label */
 	if (splot_map && axis_array[SECOND_X_AXIS].ticmode)
 	    gen_tics(&axis_array[SECOND_X_AXIS], xtick_callback);
+	if (splot_map && axis_array[SECOND_X_AXIS].label.text) {
+	    int x2 = (plot_bounds.xright + plot_bounds.xleft) / 2;
+	    int y2 = plot_bounds.ytop + 1.0 * t->v_char;
+	    if (axis_array[SECOND_X_AXIS].ticmode)
+		y2 += 2.5 * t->h_char;
+	    write_label(x2, y2, &(axis_array[SECOND_X_AXIS].label));
+	}
     }
 
     /* y axis */
@@ -2813,8 +2833,20 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	    }
 	}
 
+	/* In "set view map" 2D projection there may also be y2 tics and label */
 	if (splot_map && axis_array[SECOND_Y_AXIS].ticmode)
 	    gen_tics(&axis_array[SECOND_Y_AXIS], ytick_callback);
+	if (splot_map && axis_array[SECOND_Y_AXIS].label.text) {
+	    int y2 = (plot_bounds.ytop + plot_bounds.ybot) / 2;
+	    int x2 = plot_bounds.xright + 2.5 * t->h_char;
+	    if (axis_array[SECOND_Y_AXIS].ticmode) {
+		/* calculate max length of y2tics labels */
+		widest_tic_strlen = 0;
+		gen_tics(&axis_array[SECOND_Y_AXIS], widest_tic_callback);
+		x2 += (1.5 + widest_tic_strlen) * t->h_char;
+	    }
+	    write_label(x2, y2, &(axis_array[SECOND_Y_AXIS].label));
+	}
     }
 
     /* do z tics */
