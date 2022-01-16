@@ -12487,6 +12487,11 @@ Ffigure_multiple_keys
  character (unicode U+00B5).  The byte sequence used to represent this character
  depends on the current encoding.  See `format specifiers`, `encoding`.
 
+ If the current encoding default is not satisfactory, you can provide a
+ character string that generates the desired representation.  This is mostly
+ useful for latex terminals, for example
+      set micro "{\textmu}"
+
  This command is EXPERIMENTAL. Implementation details may change.
 
 3 minussign

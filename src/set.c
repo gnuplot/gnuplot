@@ -2931,6 +2931,10 @@ set_micro()
 {
     c_token++;
     use_micro = TRUE;
+    free(micro_user);
+    micro_user = NULL;
+    if (!END_OF_COMMAND)
+	micro_user = try_to_get_string();
 }
 
 /* process 'set minus_sign' command */

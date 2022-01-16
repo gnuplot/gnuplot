@@ -63,6 +63,7 @@ extern const char *micro;
 extern const char *minus_sign;
 extern TBOOLEAN use_micro;
 extern TBOOLEAN use_minus_sign;
+extern char *micro_user;
 
 extern const char *current_prompt; /* needed by is_error() and friends */
 

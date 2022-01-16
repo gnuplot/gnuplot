@@ -62,6 +62,7 @@ const char *micro = NULL;
 const char *minus_sign = NULL;
 TBOOLEAN use_micro = FALSE;
 TBOOLEAN use_minus_sign = FALSE;
+char *micro_user = NULL;
 
 /* Holds the name of the current LC_NUMERIC as set by "set decimal locale" */
 char *numeric_locale = NULL;
@@ -876,7 +877,8 @@ gprintf_value(
 
 		    /* Replace u with micro character */
 		    if (use_micro && power == 6)
-			snprintf(dest, remaining_space, "%s%s", micro, &temp[2]);
+			snprintf(dest, remaining_space, "%s%s",
+				micro_user ? micro_user : micro, &temp[2]);
 
 		} else {
 		    /* please extend the range ! */
