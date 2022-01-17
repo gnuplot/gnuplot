@@ -142,6 +142,8 @@ process_line( char *line, FILE *b)
     switch (line[0]) {		/* control character */
     case '?':			/* interactive help entry */
                                 /* convert '?xxx' to '\label{xxx}' */
+	    if (line[1] == '?')
+		break;
 	    line[strlen(line)-1]=NUL;
             (void) fputs("\\label{",b);
 	    fputs(line+1, b);
