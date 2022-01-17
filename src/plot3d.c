@@ -1982,7 +1982,7 @@ eval_3dplots()
 			duplication = TRUE;
 		    set_smooth = TRUE;
 		    c_token++;
-		    this_plot->plot_smooth = SMOOTH_MASK;
+		    this_plot->plot_filter = FILTER_MASK;
 		    continue;
 		}
 

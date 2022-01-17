@@ -37,8 +37,7 @@
 
 /* This allows a natural interpretation of providing only a single column in 'using' */
 #define default_smooth_weight(option) \
- (option == SMOOTH_BINS || option == SMOOTH_KDENSITY || \
-  option == SMOOTH_FREQUENCY)
+ (option == SMOOTH_BINS || option == SMOOTH_KDENSITY || option == SMOOTH_FREQUENCY)
 
 /* Variables of plot2d.c needed by other modules: */
 

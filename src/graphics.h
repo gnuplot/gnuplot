@@ -71,6 +71,7 @@ typedef struct curve_points {
     int ellipseaxes_units;              /* Only used if plot_style == ELLIPSES */    
     struct histogram_style *histogram;	/* Only used if plot_style == HISTOGRAM */
     int histogram_sequence;	/* Ordering of this dataset within the histogram */
+    enum PLOT_FILTER plot_filter; /* which filter was specified? */
     enum PLOT_SMOOTH plot_smooth; /* which "smooth" method to be used? */
     double smooth_parameter;	/* e.g. optional bandwidth for smooth kdensity */
     double smooth_period;	/* e.g. 2pi for a circular function */

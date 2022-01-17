@@ -4667,7 +4667,7 @@ process_image(void *plot, t_procimg_action action)
 	pixel_planes = ((struct surface_points *)plot)->image_properties.type;
 	ncols = ((struct surface_points *)plot)->image_properties.ncols;
 	nrows = ((struct surface_points *)plot)->image_properties.nrows;
-	masking = (((struct surface_points *)plot)->plot_smooth == SMOOTH_MASK);
+	masking = (((struct surface_points *)plot)->plot_filter == FILTER_MASK);
 	mask_polygon_set = mask_3Dpolygon_set;
 	image_x_axis = FIRST_X_AXIS;
 	image_y_axis = FIRST_Y_AXIS;
@@ -4677,7 +4677,7 @@ process_image(void *plot, t_procimg_action action)
 	pixel_planes = ((struct curve_points *)plot)->image_properties.type;
 	ncols = ((struct curve_points *)plot)->image_properties.ncols;
 	nrows = ((struct curve_points *)plot)->image_properties.nrows;
-	masking = (((struct curve_points *)plot)->plot_smooth == SMOOTH_MASK);
+	masking = (((struct curve_points *)plot)->plot_filter == FILTER_MASK);
 	mask_polygon_set = mask_2Dpolygon_set;
 	image_x_axis = ((struct curve_points *)plot)->x_axis;
 	image_y_axis = ((struct curve_points *)plot)->y_axis;
