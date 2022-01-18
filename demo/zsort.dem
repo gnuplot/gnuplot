@@ -28,7 +28,7 @@ plot $DATA using 1:2:3 with points lc palette
 pause -1 "Hit return to continue"
 
 set title "Sort on z before plotting\nhigh-value points are toward the viewer"
-plot $DATA using 1:2:3:3 smooth zsort with points lc palette
+plot $DATA using 1:2:3:3 zsort with points lc palette
 
 pause -1 "Hit return to continue"
 

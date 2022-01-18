@@ -383,8 +383,7 @@ get_data(struct curve_points *current_plot)
 	    variable_color = TRUE;
 	if (current_plot->lp_properties.l_type == LT_COLORFROMCOLUMN)
 	    variable_color = TRUE;
-	if (current_plot->plot_smooth != SMOOTH_NONE
-	&&  current_plot->plot_smooth != SMOOTH_ZSORT) {
+	if (current_plot->plot_smooth != SMOOTH_NONE) {
 	    /* FIXME:  It would be possible to support smooth cspline lc palette */
 	    /* but it would require expanding and interpolating plot->varcolor   */
 	    /* in parallel with the y values.                                    */
@@ -592,16 +591,12 @@ get_data(struct curve_points *current_plot)
     switch (current_plot->plot_smooth) {
     case SMOOTH_NONE:
 	break;
-    case SMOOTH_ZSORT:
-	min_cols = 3;
-	if (current_plot->plot_style != POINTSTYLE)
-	    int_error(NO_CARET, "'smooth zsort' only possible in plots 'with points'");
-	break;
     case SMOOTH_ACSPLINES:
 	max_cols++;
 	break;
     default:
-	if (df_no_use_specs > 2 && current_plot->plot_style != FILLEDCURVES)
+	if (df_no_use_specs > 2 && current_plot->plot_style != FILLEDCURVES
+	&&  current_plot->plot_filter != FILTER_ZSORT)
 	    int_warn(NO_CARET, "extra columns ignored by smoothing option");
 	break;
     }
@@ -859,7 +854,7 @@ get_data(struct curve_points *current_plot)
 	    coordval var_ps = current_plot->lp_properties.p_size;
 	    coordval var_pt = current_plot->lp_properties.p_type;
 	    coordval var_char = 0;
-	    if (current_plot->plot_smooth == SMOOTH_ZSORT)
+	    if (current_plot->plot_filter == FILTER_ZSORT)
 		weight = v[var++];
 	    if (var_pt == PT_VARIABLE) {
 		if (isnan(v[var]) && df_tokens[var]) {
@@ -2404,8 +2399,8 @@ eval_plots()
 			this_plot->plot_style = LINES;	/* can override later */
 			break;
 		    case SMOOTH_ZSORT:
-			this_plot->plot_smooth = SMOOTH_ZSORT;
-			this_plot->plot_style = POINTSTYLE;
+			/* Jan 2022: same as filter "zsort" */
+			this_plot->plot_filter = FILTER_ZSORT;
 			break;
 		    case SMOOTH_SMOOTH_HULL:
 			this_plot->plot_smooth = SMOOTH_SMOOTH_HULL;
@@ -3048,13 +3043,16 @@ eval_plots()
 
 		/* Jan 2022: Filter operations are performed immediately after
 		 * reading in the data, before any smoothing.
-		 * As of now this includes "bins" "convexhull"
+		 * As of now this includes "bins" "convexhull" "zsort"
 		 */
 		if (this_plot->plot_filter == FILTER_BINS) {
 		    make_bins(this_plot, nbins, binlow, binhigh, binwidth, binopt);
 		}
 		if (this_plot->plot_filter == FILTER_CONVEX_HULL) {
 		    convex_hull(this_plot);
+		}
+		if (this_plot->plot_filter == FILTER_ZSORT) {
+		    zsort_points(this_plot);
 		}
 
 		/* Restore auto-scaling prior to smoothing operation */
@@ -3097,8 +3095,6 @@ eval_plots()
 		    cp_implode(this_plot);
 		    break;
 		case SMOOTH_ZSORT:
-		    zsort_points(this_plot);
-		    break;
 		case SMOOTH_SMOOTH_HULL:
 		case SMOOTH_NONE:
 		case SMOOTH_PATH:

@@ -1254,8 +1254,9 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	    continue;
 	}
 
-	/* Jul 2014 - "matrix columnheaders" indicates an ascii data file
-	 * in uniform grid format but with column labels in row 1 */
+	/* "matrix columnheaders" indicates an ascii data file
+	 * in uniform grid format but with column labels in row 1
+	 */
 	if (almost_equals(c_token, "columnhead$ers")) {
 	    c_token++;
 	    df_matrix_file = TRUE;
@@ -1265,8 +1266,9 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	    continue;
 	}
 
-	/* Jul 2014 - "matrix rowheaders" indicates an ascii data file
-	 * in uniform grid format but with row labels in column 1 */
+	/* "matrix rowheaders" indicates an ascii data file
+	 * in uniform grid format but with row labels in column 1
+	 */
 	if (almost_equals(c_token, "rowhead$ers")) {
 	    c_token++;
 	    df_matrix_file = TRUE;
@@ -1323,6 +1325,13 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	    c_token++;
 	    if (plot)
 		plot->noautoscale = TRUE;
+	    continue;
+	}
+
+	/* zsort filter will be applied to this data */
+	if (equals(c_token, "zsort")) {
+	    c_token++;
+	    plot->plot_filter = FILTER_ZSORT;
 	    continue;
 	}
 
