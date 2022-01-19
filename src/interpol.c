@@ -1161,8 +1161,7 @@ sort_points(struct curve_points *plot)
 }
 
 /*
- * Sort on z rather than x
- * used by "smooth zsort"
+ * Sort points on z rather than x
  */
 void
 zsort_points(struct curve_points *plot)
@@ -1188,6 +1187,25 @@ zsort_points(struct curve_points *plot)
 	    plot->varcolor[i] = plot->points[i].CRD_COLOR;
     }
     return;
+}
+
+/* Apply zrange to stored points */
+void
+zrange_points(struct curve_points *plot)
+{
+    int i;
+    struct coordinate *point;
+    struct axis *axis = &axis_array[FIRST_Z_AXIS];
+
+    if ((axis->set_autoscale & AUTOSCALE_BOTH) == AUTOSCALE_BOTH) 
+	return;
+
+    for (i = 0, point = plot->points; i < plot->p_count; i++, point++) {
+	if (!(axis->set_autoscale & AUTOSCALE_MIN) && point->z < axis->min)
+	    point->type = EXCLUDEDRANGE;
+	if (!(axis->set_autoscale & AUTOSCALE_MAX) && point->z > axis->max)
+	    point->type = EXCLUDEDRANGE;
+    }
 }
 
 /*

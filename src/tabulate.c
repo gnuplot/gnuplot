@@ -341,7 +341,8 @@ print_table(struct curve_points *current_plot, int plot_num)
 		type = current_plot->points[i].type;
 
 		snprintf(buffer, BUFFERSIZE, " %c",
-			type == INRANGE ? 'i' : type == OUTRANGE ? 'o' : 'u');
+			type == INRANGE ? 'i' : type == OUTRANGE ? 'o' : 
+			type == EXCLUDEDRANGE ? 'e' : 'u');
 		strappend(&line, &size, len, buffer);
 
 		/* cp_implode() inserts dummy undefined point between curves */

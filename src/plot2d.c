@@ -401,7 +401,11 @@ get_data(struct curve_points *current_plot)
      * Set it to NO_AXIS to account for that. For styles that use
      * the z coordinate as a real coordinate (i.e. not a width or
      * 'delta' component, change the setting inside the switch: */
-    current_plot->z_axis = NO_AXIS;
+    if (current_plot->plot_filter == FILTER_ZSORT) {
+	current_plot->z_axis = FIRST_Z_AXIS;
+	axis_init(&axis_array[FIRST_Z_AXIS], TRUE);
+    } else
+	current_plot->z_axis = NO_AXIS;
 
     /* HBB NEW 20060427: if there's only one, explicit using column,
      * it's y data.  df_axis[] has to reflect that, so df_readline()
@@ -3043,7 +3047,6 @@ eval_plots()
 
 		/* Jan 2022: Filter operations are performed immediately after
 		 * reading in the data, before any smoothing.
-		 * As of now this includes "bins" "convexhull" "zsort"
 		 */
 		if (this_plot->plot_filter == FILTER_BINS) {
 		    make_bins(this_plot, nbins, binlow, binhigh, binwidth, binopt);
@@ -3053,6 +3056,7 @@ eval_plots()
 		}
 		if (this_plot->plot_filter == FILTER_ZSORT) {
 		    zsort_points(this_plot);
+		    zrange_points(this_plot);
 		}
 
 		/* Restore auto-scaling prior to smoothing operation */
