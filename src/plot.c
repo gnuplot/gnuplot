@@ -316,6 +316,16 @@ main(int argc_orig, char **argv)
     history_init();
 #endif
 #endif
+
+#if defined(HAVE_LIBREADLINE) && defined(RL_VERSION_MAJOR)
+    /* Starting with readline v8.1 bracketed paste mode is on by default.
+     * This breaks multi-line pasted input to gnuplot because it looks like
+     * one long run-on line.
+     */
+    if (RL_VERSION_MAJOR >= 8)
+	rl_variable_bind ("enable-bracketed-paste", "off");
+#endif
+
 #if defined(HAVE_LIBREADLINE) && !defined(MISSING_RL_TILDE_EXPANSION)
     rl_complete_with_tilde_expansion = 1;
 #endif
