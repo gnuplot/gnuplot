@@ -1072,14 +1072,14 @@ void wxtPanel::DrawToDC(wxDC &dc, wxRegion &region)
 	/* fill in gray when the aspect ratio conservation has let empty space in the panel */
 	if (plot.device_xmax*plot.ymax > plot.device_ymax*plot.xmax) {
 		dc.SetPen( *wxTRANSPARENT_PEN );
-		dc.SetBrush( wxBrush( wxT("LIGHT GREY"), wxSOLID ) );
+		dc.SetBrush( wxBrush( wxT("LIGHT GREY"), wxBRUSHSTYLE_SOLID ) );
 		dc.DrawRectangle((int) (plot.xmax/plot.oversampling_scale*plot.xscale),
 				0,
 				plot.device_xmax - (int) (plot.xmax/plot.oversampling_scale*plot.xscale),
 				plot.device_ymax);
 	} else if (plot.device_xmax*plot.ymax < plot.device_ymax*plot.xmax) {
 		dc.SetPen( *wxTRANSPARENT_PEN );
-		dc.SetBrush( wxBrush( wxT("LIGHT GREY"), wxSOLID ) );
+		dc.SetBrush( wxBrush( wxT("LIGHT GREY"), wxBRUSHSTYLE_SOLID ) );
 		dc.DrawRectangle(0,
 				(int) (plot.ymax/plot.oversampling_scale*plot.yscale),
 				plot.device_xmax,
@@ -1088,7 +1088,7 @@ void wxtPanel::DrawToDC(wxDC &dc, wxRegion &region)
 
 #ifdef USE_MOUSE
 	if (wxt_zoombox) {
-		tmp_pen = wxPen(wxT("black"), 1, wxSOLID);
+		tmp_pen = wxPen(wxT("black"), 1, wxPENSTYLE_SOLID);
 		tmp_pen.SetCap( wxCAP_ROUND );
 		dc.SetPen( tmp_pen );
 #ifndef __WXOSX_COCOA__
@@ -1102,7 +1102,7 @@ void wxtPanel::DrawToDC(wxDC &dc, wxRegion &region)
 		dc.DrawLine( mouse_x, mouse_y, zoom_x1, mouse_y );
 		dc.DrawLine( zoom_x1, mouse_y, zoom_x1, zoom_y1 );
 		dc.SetPen( *wxTRANSPARENT_PEN );
-		dc.SetBrush( wxBrush( wxT("LIGHT BLUE"), wxSOLID ) );
+		dc.SetBrush( wxBrush( wxT("LIGHT BLUE"), wxBRUSHSTYLE_SOLID ) );
 		dc.SetLogicalFunction( wxAND );
 		dc.DrawRectangle( zoom_x1, zoom_y1, mouse_x -zoom_x1, mouse_y -zoom_y1);
 		dc.SetLogicalFunction( wxCOPY );
@@ -1127,7 +1127,7 @@ void wxtPanel::DrawToDC(wxDC &dc, wxRegion &region)
 	}
 
 	if (wxt_ruler) {
-		tmp_pen = wxPen(wxT("black"), 1, wxSOLID);
+		tmp_pen = wxPen(wxT("black"), 1, wxPENSTYLE_SOLID);
 		tmp_pen.SetCap(wxCAP_BUTT);
 		dc.SetPen( tmp_pen );
 #ifndef __WXOSX_COCOA__
@@ -1146,7 +1146,7 @@ void wxtPanel::DrawToDC(wxDC &dc, wxRegion &region)
 	}
 
 	if (wxt_ruler && wxt_ruler_lineto) {
-		tmp_pen = wxPen(wxT("black"), 1, wxSOLID);
+		tmp_pen = wxPen(wxT("black"), 1, wxPENSTYLE_SOLID);
 		tmp_pen.SetCap(wxCAP_BUTT);
 		dc.SetPen( tmp_pen );
 #ifndef __WXOSX_COCOA__

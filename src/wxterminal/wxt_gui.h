@@ -197,6 +197,12 @@ extern "C" {
 #  include <gtk/gtk.h>
 # endif
 
+/* wxWidgets 3.0 -> 2.8 compatibility */
+#if (wxMAJOR_VERSION < 3)
+#define wxBRUSHSTYLE_SOLID wxSOLID
+#define wxPENSTYLE_SOLID wxSOLID
+#endif
+
 # ifdef _WIN32
 #  include <cairo-win32.h>
 # endif
