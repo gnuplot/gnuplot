@@ -911,7 +911,7 @@ regress_finalize(int iter, double chisq, double last_chisq, double lambda, doubl
     }
     if (fit_covarvariables) {
 	/* first, remove all previous covariance variables */
-	del_udv_by_name("FIT_COV_*", TRUE);
+	del_udv_by_name("FIT_COV_", TRUE);
 	for (i = 0; i < num_params; i++) {
 	    for (j = 0; j < i; j++) {
 		setvarcovar(par_name[i], par_name[j], 0.0);
