@@ -78,11 +78,13 @@ FREETYPE=1
 # ICONV library
 ICONV=1
 
-# cairo/pango terminals:  pdfcairo, pngcairo, cairolatex
+# cairo/pango terminals:  pdfcairo, pngcairo, cairolatex, webp
 # requires pango / cairo
 # Note that cairo/pango are only available for newer gcc/kLIBC, not EMX.
+# WARNING: The pango binary library is BROKEN (it cannot locate any plugins).
+#          So let's not include cairo/pango terminals by default.
 ifeq ($(ISKLIBC),1)
-CAIRO=1
+# CAIRO=1
 endif
 
 # webp terminal
