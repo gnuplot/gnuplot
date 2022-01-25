@@ -64,6 +64,7 @@ udvt_entry *df_array = NULL;
 /* Iteration structures used for bookkeeping */
 t_iterator * plot_iterator = NULL;
 t_iterator * set_iterator = NULL;
+t_iterator * print_iterator = NULL;
 
 /* Internal prototypes: */
 

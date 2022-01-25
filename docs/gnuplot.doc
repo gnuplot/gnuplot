@@ -7189,7 +7189,6 @@ Ffigure_zerror
  <time> may be any constant or floating-point expression.  `pause -1` will wait
  until a carriage return is hit, zero (0) won't pause at all, and a positive
  number will wait the specified number of seconds.
- `pause 0` is synonymous with `print`.
 
  If the current terminal supports `mousing`, then `pause mouse` will terminate
  on either a mouse click or on ctrl-C.  For all other terminals, or if mousing
@@ -9233,20 +9232,33 @@ Ffigure_smooth_path
 2 print
 ?commands print
 ?print
- The `print` command prints the value of <expression> to the screen.  It is
- synonymous with `pause 0`.  <expression> may be anything that `gnuplot` can
- evaluate that produces a number, or it can be a string.
-
  Syntax:
        print <expression> {, <expression>, ...}
 
- See `expressions`.  The output file can be set with `set print`.
- See also `printerr`.
+ The `print` command prints the value of one or more expressions.
+ Output is to the screen unless the it has been redirected using the
+ `set print` command.  See `expressions`.  See also `printerr`.
+
+ An <expression> may be any valid gnuplot expression, including numeric
+ or string constants, a function returning a number or string, an array,
+ or the name of a variable.  It is also possible to print a datablock.
+
+ You can use iteration within a print command to include multiple values
+ on a single line of output.
+
+ Examples:
+      print 123 + 456
+      print sinh(pi/2)
+      print "The value of FIT_ERROR is ", FIT_ERROR
+      print "Array A": ", A
+      print "Individual elements of array A: ", for [i=1:|A|] A[i]
+      print $DATA
+
 2 printerr
 ?commands printerr
 ?printerr
- `printerr` is the same as print except that output is always sent to stderr
- even if a prior `set print` command remains in effect.
+ `printerr` is the same as `print` except that output is always sent to stderr
+ even while redirection from a prior `set print` command remains in effect.
 2 pwd
 ?commands pwd
 ?pwd
@@ -14391,7 +14403,7 @@ Ffigure_palette2
 ?commands show print
 ?set print
 ?show print
- The `set print` command redirects the output of the `print` command to a file.
+ The `set print` command redirects the output of the `print` command.
 
  Syntax:
        set print
@@ -14408,7 +14420,7 @@ Ffigure_palette2
  The destination for `print` commands can also be a named data block. Data
  block names start with '$', see also `inline data`.
  When printing a string to a data block, embedded newline characters are
- expanded to generate multiple data block entries.  This is a CHANGE.
+ expanded to generate multiple data block entries.
 3 psdir
 ?commands set psdir
 ?commands show psdir

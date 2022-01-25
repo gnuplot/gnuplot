@@ -159,6 +159,7 @@ save_variables__sub(FILE *fp)
 		    fprintf(fp,"array %s[%d] = ", udv->udv_name,
 			(int)(udv->udv_value.v.value_array[0].v.int_val));
 		    save_array_content(fp, udv->udv_value.v.value_array);
+		    fprintf(fp,"\n");
 		}
 	    } else if (strncmp(udv->udv_name,"GPVAL_",6)
 		 && strncmp(udv->udv_name,"GPFUN_",6)
@@ -189,6 +190,7 @@ save_colormaps(FILE *fp)
 		    fprintf(fp,"array %s[%d] colormap = ", udv->udv_name,
 			(int)(udv->udv_value.v.value_array[0].v.int_val));
 		    save_array_content(fp, udv->udv_value.v.value_array);
+		    fprintf(fp,"\n");
 		    get_colormap_range(udv, &cm_min, &cm_max);
 		    if (cm_min != cm_max)
 			fprintf(fp,"set colormap %s range [%g:%g]\n",
@@ -213,7 +215,7 @@ save_array_content(FILE *fp, struct value *array)
 	if (i < size)
 	    fprintf(fp, ",");
     }
-    fprintf(fp, "]\n");
+    fprintf(fp, "]");
 }
 
 /* HBB 19990823: new function 'save term'. This will be mainly useful

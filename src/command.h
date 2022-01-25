@@ -77,6 +77,7 @@ extern int paused_for_mouse;	/* Flag the end condition we are paused until */
 extern FILE *print_out;
 extern struct udvt_entry * print_out_var;
 extern char *print_out_name;
+extern char *print_sep;
 
 /* Points to structure holding dummy parameter values
  * to be used during function evaluation

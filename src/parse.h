@@ -107,6 +107,7 @@ typedef struct iterator {
 
 extern t_iterator * plot_iterator;	/* Used for plot and splot */
 extern t_iterator * set_iterator;	/* Used by set/unset commands */
+extern t_iterator * print_iterator;	/* Used by print command */
 
 /* These are used by the iteration code */
 t_iterator * check_for_iteration(void);
