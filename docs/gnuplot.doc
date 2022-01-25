@@ -4190,7 +4190,7 @@ Ffigure_newsyntax
 #TeX \\ $Q(a,x)=\frac{1}{\Gamma(x)}\intop_{x}^{\infty}t^{a-1}e^{-t}dt$ .\quad\quad
  You could define an approximation directly in gnuplot like this:
        Q(a,x) = 1. - igamma(a,x)
- However this has inherently limited precision as the value of Q approaches 1.
+ However this has inherently limited precision as igamma(a,x) approaches 1.
  If you need a more accurate implementation, it would be better to provide one
  via a plugin (see below).  Once imported, the function can be used just as any
  other built-in or user-defined function in gnuplot.
