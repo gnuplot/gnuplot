@@ -2020,9 +2020,12 @@ void
 printerr_command()
 {
     FILE *save_print_out = print_out;
+    struct udvt_entry *save_print_out_var = print_out_var;
 
     print_out = stderr;
+    print_out_var = NULL;
     print_command();
+    print_out_var = save_print_out_var;
     print_out = save_print_out;
 }
 
@@ -2031,8 +2034,9 @@ void
 print_command()
 {
     struct value a;
-    /* space printed between two expressions only */
+    /* space is not needed for the first entry */
     TBOOLEAN need_space = FALSE;
+
     char *dataline = NULL;
     size_t size = 256;
     size_t len = 0;
@@ -2053,6 +2057,8 @@ print_command()
 	    /* Printing a datablock into itself would cause infinite recursion */
 	    if (print_out_var && !strcmp(datablock_name, print_out_name))
 		continue;
+	    if (need_space && !print_out_var)
+		fprintf(print_out, "\n");
 
 	    while (line && *line) {
 		if (print_out_var != NULL)
@@ -2061,11 +2067,35 @@ print_command()
 		    fprintf(print_out, "%s\n", *line);
 		line++;
 	    }
+	    need_space = FALSE;
 	    continue;
 	}
+
+	/* All entries other than the first one on a line */
+	if (need_space) {
+	    if (dataline != NULL)
+		len = strappend(&dataline, &size, len, " ");
+	    else
+		fputs(" ", print_out);
+	}
+	need_space = TRUE;
+
 	if (type_udv(c_token) == ARRAY && !equals(c_token+1, "[")) {
-	    udvt_entry *array = add_udv(c_token++);
-	    save_array_content(print_out, array->udv_value.v.value_array);
+	    struct value *array = add_udv(c_token++)->udv_value.v.value_array;
+	    if (dataline != NULL) {
+		int i;
+		int arraysize = array[0].v.int_val;
+		len = strappend(&dataline, &size, len, "[");
+		for (i = 1; i <= arraysize; i++) {
+		    if (array[i].type != NOTDEFINED)
+			len = strappend(&dataline, &size, len, value_to_str(&array[i], TRUE));
+		    if (i < arraysize)
+			len = strappend(&dataline, &size, len, ",");
+		}
+		len = strappend(&dataline, &size, len, "]");
+	    } else {
+		save_array_content(print_out, array);
+	    }
 	    continue;
 	}
 	const_express(&a);
@@ -2075,19 +2105,11 @@ print_command()
 	    else
 		fputs(a.v.string_val, print_out);
 	    gpfree_string(&a);
-	    need_space = FALSE;
 	} else {
-	    if (need_space) {
-		if (dataline != NULL)
-		    len = strappend(&dataline, &size, len, " ");
-		else
-		    putc(' ', print_out);
-	    }
 	    if (dataline != NULL)
 		len = strappend(&dataline, &size, len, value_to_str(&a, FALSE));
 	    else
 		disp_value(print_out, &a, FALSE);
-	    need_space = TRUE;
 	}
 
     } while (!END_OF_COMMAND && equals(c_token, ","));

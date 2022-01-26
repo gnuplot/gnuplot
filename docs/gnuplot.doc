@@ -6270,7 +6270,6 @@ Ffigure_zerror
  <time> may be any constant or floating-point expression.  `pause -1` will wait
  until a carriage return is hit, zero (0) won't pause at all, and a positive
  number will wait the specified number of seconds.
- `pause 0` is synonymous with `print`.
 
  If the current terminal supports `mousing`, then `pause mouse` will terminate
  on either a mouse click or on ctrl-C.  For all other terminals, or if mousing
@@ -8255,15 +8254,25 @@ Ffigure_zerror
 2 print
 ?commands print
 ?print
- The `print` command prints the value of <expression> to the screen.  It is
- synonymous with `pause 0`.  <expression> may be anything that `gnuplot` can
- evaluate that produces a number, or it can be a string.
-
  Syntax:
        print <expression> {, <expression>, ...}
 
- See `expressions`.  The output file can be set with `set print`.
- See also `printerr`.
+ The `print` command prints the value of one or more expressions.
+ Output is to the screen unless it has been redirected using a prior
+ `set print` command.  See `expressions`.  See also `printerr`.
+
+ An <expression> may be any valid gnuplot expression, including numeric
+ or string constants, a function returning a number or string, an array,
+ or the name of a variable.  It is also possible to print a datablock.
+ The sprintf and gprintf functions can be used in conjunction with `print`
+ for additional flexibility in formmating output.
+
+ Examples:
+      print 123 + 456
+      print sinh(pi/2)
+      print "rms of residuals (FIT_STDFIT) is ", FIT_STDFIT
+      print sprintf("rms of residuals is %.3f after fit.", FIT_STDFIT)
+      print $DATA
 2 printerr
 ?commands printerr
 ?printerr
@@ -13404,7 +13413,7 @@ Ffigure_multiple_keys
 ?commands show print
 ?set print
 ?show print
- The `set print` command redirects the output of the `print` command to a file.
+ The `set print` command redirects the output of the `print` command.
 
  Syntax:
        set print
