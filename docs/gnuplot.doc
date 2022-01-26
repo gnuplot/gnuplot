@@ -9236,12 +9236,14 @@ Ffigure_smooth_path
        print <expression> {, <expression>, ...}
 
  The `print` command prints the value of one or more expressions.
- Output is to the screen unless the it has been redirected using the
+ Output is to the screen unless it has been redirected using the
  `set print` command.  See `expressions`.  See also `printerr`.
 
  An <expression> may be any valid gnuplot expression, including numeric
  or string constants, a function returning a number or string, an array,
  or the name of a variable.  It is also possible to print a datablock.
+ The sprintf and gprintf functions can be used in conjunction with `print`
+ for additional flexibility in formatting the output.
 
  You can use iteration within a print command to include multiple values
  on a single line of output.
@@ -9249,7 +9251,8 @@ Ffigure_smooth_path
  Examples:
       print 123 + 456
       print sinh(pi/2)
-      print "The value of FIT_ERROR is ", FIT_ERROR
+      print "rms of residuals (FIT_STDFIT) is ", FIT_STDFIT
+      print sprintf("rms of residuals is %.3f after fit", FIT_STDFIT)
       print "Array A": ", A
       print "Individual elements of array A: ", for [i=1:|A|] A[i]
       print $DATA
