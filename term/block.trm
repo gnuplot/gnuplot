@@ -940,8 +940,33 @@ BLOCK_point(unsigned int x, unsigned int y, int point)
 	    0x2b20, 0x2b1f, /* empty/full pentagon */
 	};
 
+    // Draw the smallest bitmap point symbols possible.
+    //
+    // These symbols are still too large and maybe only useful in combination
+    // with error bars.
+    //
     if (!BLOCK_charpoints) {
-	do_point(x, y, point);
+	if (point < 0) { // dot
+	    b_putpixel(x, y);
+	} else {
+	    const int point_pat[] = {
+		0x0ba, /* + */
+		0x155, /* X */
+		0x0aa, /* diamond */
+		0x1ef, /* square */
+		0x0af, /* triangle */
+		0x1ea  /* downward triangle */
+	    };
+	    const int npat = sizeof(point_pat) / sizeof(int);
+	    int pat = point_pat[point % npat];
+	    int dx, dy;
+	    for (dy = -1; dy <= 1; dy ++) {
+		for (dx = -1; dx <= 1; dx ++) {
+		    if (pat & 1) b_putpixel(x + dx, y + dy);
+		    pat >>= 1;
+		}
+	    }
+	}
 	return;
     }
 
@@ -955,8 +980,8 @@ BLOCK_point(unsigned int x, unsigned int y, int point)
 	memcpy(&dumb_colors[dumb_xmax * yd + xd], &dumb_color, sizeof(t_colorspec));
 #endif
     } else {
-	b_move(x, y);
-	b_vector(x + 1, y);
+	// Draw dots on the bitmap
+	b_putpixel(x, y);
     }
 }
 

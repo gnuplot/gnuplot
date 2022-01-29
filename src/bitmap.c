@@ -799,6 +799,16 @@ b_setpixel(unsigned int x, unsigned int y, unsigned int value)
 
 
 /*
+ * set pixel (x, y) to the set value
+ */
+void
+b_putpixel(unsigned int x, unsigned int y)
+{
+    b_setpixel(x, y, b_value);
+}
+
+
+/*
  * get pixel (x,y) value
  */
 unsigned int

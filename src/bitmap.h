@@ -80,6 +80,7 @@ extern int b_maskcount;
 
 /* Prototypes from file "bitmap.c" */
 
+void b_putpixel(unsigned int, unsigned int);
 unsigned int b_getpixel(unsigned int, unsigned int);
 void b_makebitmap(unsigned int, unsigned int, unsigned int);
 void b_freebitmap(void);
