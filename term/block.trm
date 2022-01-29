@@ -469,11 +469,6 @@ BLOCK_text()
     size_t bufsiz;
     text_attr prev_text_attr;
 #ifndef NO_DUMB_COLOR_SUPPORT
-#ifdef DEBUG_BLOCK_OPTI
-    unsigned nfullcells = 0;
-    unsigned noptimisable = 0;
-    unsigned noptimised = 0;
-#endif
     unsigned nsets, set;
     const int * pattern;
 #if defined(HAVE_ICONV) && !defined(_WIN32)
@@ -619,16 +614,6 @@ BLOCK_text()
 		}
 
 #ifndef NO_DUMB_COLOR_SUPPORT
-#ifdef DEBUG_BLOCK_OPTI
-		if (n == cellx * celly) {
-		    TBOOLEAN issame = TRUE;
-		    nfullcells++;
-		    for (int kk = 1; kk < (cellx*celly); kk++)
-			issame &= (cell[0] == cell[kk]);
-		    if (!issame)
-			noptimisable++;
-		}
-#endif
 		// In case all pixels of the charcell are set, we do try to optimize
 		// changing both, fore- and background colors. This always
 		// works for half-blocks, mostly for quadrants, but is increasingly
@@ -668,9 +653,6 @@ BLOCK_text()
 
 			r = g = b = 0;
 			n = i = 0;
-#ifdef DEBUG_BLOCK_OPTI
-			noptimised++;
-#endif
 			if (BLOCK_mode == BLOCK_MODE_HALF ||
 			    BLOCK_mode == BLOCK_MODE_HALFH)
 			    mask = 0x01;
@@ -811,11 +793,6 @@ BLOCK_text()
 	fputs("\033[0;39;49m", gpoutfile); /* reset colors to default */
 #endif
     }
-#ifdef DEBUG_BLOCK_OPTI
-    printf("full cells : %u (%3.1f\%)\n", nfullcells, 100 * ((float) nfullcells) / BLOCK_xchars / BLOCK_ychars);
-    printf("optimisable: %u (%3.1f\%)\n", noptimisable, 100 * ((float) noptimisable) / nfullcells);
-    printf("optimised  : %u (%3.1f\%)\n", noptimised, 100 * ((float) noptimised) / noptimisable);
-#endif
 #endif
 
     free(line);
