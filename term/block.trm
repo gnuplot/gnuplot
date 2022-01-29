@@ -91,7 +91,9 @@ static int BLOCK_xchars = BLOCK_XMAX;
 static int BLOCK_ychars = BLOCK_YMAX;
 static TBOOLEAN BLOCK_optimize = TRUE;
 static TBOOLEAN BLOCK_charpoints = FALSE;
-static BLOCK_modeinfo_entry BLOCK_modeinfo[6] = {
+#define BLOCK_BGTRANSPARENT 0xffffffff
+static uint32_t BLOCK_background = BLOCK_BGTRANSPARENT;
+static BLOCK_modeinfo_entry BLOCK_modeinfo[] = {
     { BLOCK_MODE_DOT,     1, 1 },
     { BLOCK_MODE_HALF,    1, 2 },
     { BLOCK_MODE_QUAD,    2, 2 },
@@ -108,7 +110,7 @@ enum BLOCK_id {
     BLOCK_OPTIMIZE, BLOCK_NOOPTIMIZE,
     BLOCK_CHARPOINTS, BLOCK_GPPOINTS,
     BLOCK_ATTRIBUTES, BLOCK_NOATTRIBUTES,
-    BLOCK_SIZE,
+    BLOCK_SIZE, BLOCK_BACKGROUND, BLOCK_TRANSPARENT,
     BLOCK_OTHER
 };
 
@@ -134,6 +136,8 @@ static struct gen_table BLOCK_opts[] =
     { "siz$e", BLOCK_SIZE },
     { "attr$ibutes", BLOCK_ATTRIBUTES },
     { "noattr$ibutes", BLOCK_NOATTRIBUTES },
+    { "back$ground", BLOCK_BACKGROUND },
+    { "transp$arent", BLOCK_TRANSPARENT },
     { NULL, BLOCK_OTHER }
 };
 
@@ -219,6 +223,14 @@ BLOCK_options()
 	    BLOCK_ychars = height;
 	    break;
 	}
+	case BLOCK_BACKGROUND:
+	    c_token++;
+	    BLOCK_background = parse_color_name();
+	    break;
+	case BLOCK_TRANSPARENT:
+	    c_token++;
+	    BLOCK_background = BLOCK_BGTRANSPARENT;
+	    break;
 	case BLOCK_OTHER:
 	default:
 	    int_error(c_token, "unknown option");
@@ -236,11 +248,17 @@ BLOCK_options()
 	    { "dot", "half", "quadrants", "sextants", "braille" };
 	const char * color_strings[] =
 	    {"mono", "ansi", "ansi256", "ansirgb"};
+	char bg_str[32];
 
-	sprintf(term_options, "%s %s %soptimize %senhanced %sattributes %spoints size %d,%d",
+	if (BLOCK_background == BLOCK_BGTRANSPARENT)
+	    strcpy(bg_str, "transparent");
+	else
+	    sprintf(bg_str, "background rgb \"0x%06X\"", BLOCK_background);
+	sprintf(term_options, "%s %s %s %soptimize %senhanced %sattributes %spoints size %d,%d",
 	    mode_strings[BLOCK_mode],
 	    color_strings[dumb_colormode == 0 ? 0 : dumb_colormode - DUMB_ANSI + 1],
-	    (BLOCK_optimize ? "" : "no"),
+	    bg_str,
+	    (BLOCK_optimize && (BLOCK_mode != BLOCK_MODE_BRAILLE)? "" : "no"),
 	    (term->flags & TERM_ENHANCED_TEXT) ? "" : "no",
 	    (dumb_text_attributes ? "" : "no"),
 	    (BLOCK_charpoints ? "char" : "gp"),
@@ -419,7 +437,7 @@ ansi_bg_colorstring(t_colorspec * color)
 	rgb255.g = (color->lt >>  8) & 0xff;
 	rgb255.b = (color->lt >>  0) & 0xff;
 	n = nearest_ansi(rgb255);
-	if (n <= 8) {
+	if (n < 8) {
 	    sprintf(colorstring, "\033[%im", 40 + (n % 8));
 	} else {
 	    // For color >= 8, we try to set both, the (dark) background color,
@@ -462,6 +480,7 @@ BLOCK_text()
 #ifndef NO_DUMB_COLOR_SUPPORT
     unsigned nsets, set;
     const int * pattern;
+    char bg_str[32] = "";
 #if defined(HAVE_ICONV) && !defined(_WIN32)
     iconv_t cd = (iconv_t) -1;
 
@@ -512,6 +531,14 @@ BLOCK_text()
 	pattern = sext_pat;
 	break;
     }
+
+    // Generate background string once
+    if (BLOCK_background != BLOCK_BGTRANSPARENT) {
+	t_colorspec color;
+	color.type = TC_RGB,
+	color.lt = BLOCK_background;
+	strcpy(bg_str, ansi_bg_colorstring(&color));
+    }
 #endif
 
     // convert bitmap to Unicode characters
@@ -526,6 +553,15 @@ BLOCK_text()
 	int yd = y / celly; // character cell coordinate
 
 	s = (unsigned char *) line;
+
+#ifndef NO_DUMB_COLOR_SUPPORT
+	// Set background color.
+	if (bg_str[0] != NUL) {
+	    strcpy((char *) s, bg_str);
+	    s += strlen(bg_str);
+	}
+#endif
+
 	for (x = 0; x <= term->xmax; x += cellx) {
 	    int xd = x / cellx;  // character cell coordinate
 	    int i = 0;  // index to character map
@@ -557,6 +593,7 @@ BLOCK_text()
 		}
 		memcpy(&dumb_prev_color, color, sizeof(t_colorspec));
 #endif
+
 		// Copy the character.
 		c = (char *)(&DUMB_PIXEL(xd, yd));
 		if (*c != NUL) { /* Do not print cells occupied by wide characters. */
@@ -666,7 +703,7 @@ BLOCK_text()
 				   ((unsigned) sqrt(g2 / m) <<  8) +
 				   ((unsigned) sqrt(b2 / m));
 			c = ansi_bg_colorstring(&color);
-			if (c != NULL) {
+			if (c != NULL && strcmp(bg_str, c) != 0) {
 			    strcpy((char *) s, c);
 			    s += strlen(c);
 			    resetbg = TRUE;
@@ -728,15 +765,32 @@ BLOCK_text()
 #ifndef NO_DUMB_COLOR_SUPPORT
 		// turn bg color off again
 		if (resetbg) {
+		    if (bg_str[0] != NUL) {
+			strcpy((char *) s, bg_str);
+			s += strlen(bg_str);
+		    } else {
 #if defined(OS2) || defined(MSDOS)
-		    sprintf((char *) s, "\033[40m"); s += 5; /* reset background color to black */
+			strcpy((char *) s, "\033[40m"); s += 5; /* reset background color to black */
 #else
-		    sprintf((char *) s, "\033[49m"); s += 5; /* reset background color to default */
+			strcpy((char *) s, "\033[49m"); s += 5; /* reset background color to default */
 #endif
+		    }
 		}
 #endif
 	    }
 	}
+
+#ifndef NO_DUMB_COLOR_SUPPORT
+	// turn bg color off again
+	if (bg_str[0] != NUL) {
+#if defined(OS2) || defined(MSDOS)
+	    strcpy((char *) s, "\033[40m"); s += 5; /* reset background color to black */
+#else
+	    strcpy((char *) s, "\033[49m"); s += 5; /* reset background color to default */
+#endif
+	}
+#endif
+
 	*s++ = '\n';
 	*s = NUL;
 
@@ -793,7 +847,6 @@ TERM_PUBLIC void
 BLOCK_graphics()
 {
     b_boxfill(FS_EMPTY, 0, 0, term->xmax, term->ymax);
-
     DUMB_graphics();
 
     /* kludge: fix keybox size */

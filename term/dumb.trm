@@ -503,7 +503,11 @@ ansi_colorstring(t_colorspec * color, t_colorspec * prev_color)
 	n = color->lt + 1;
 	/* map line type to colors */
 	if (n <= 0) {
-	    sprintf(colorstring, "\033[0;39m");  /* normal foreground color */
+#if defined(OS2) || defined(MSDOS)
+	    sprintf(colorstring, "\033[22;37m");  /* foreground color white */
+#else
+	    sprintf(colorstring, "\033[22;39m");  /* normal foreground color */
+#endif
 	} else {
 	    if (n > 15) n = ((n - 1) % 15) + 1;
 	    sprintf(colorstring, "\033[%i;%im", n >= 8 ? 1 : 22, 30 + (n % 8));
