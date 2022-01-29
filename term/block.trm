@@ -4,7 +4,7 @@
 
 /*
 
-Copyright (c) 2020 Bastian Maerkisch. All rights reserved.
+Copyright (c) 2020-2022 Bastian Maerkisch. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
@@ -123,6 +123,7 @@ static struct gen_table BLOCK_opts[] =
     { "quad$rants", BLOCK_QUADRANTS },
     { "sex$tants", BLOCK_SEXTANTS },
     { "br$aille", BLOCK_BRAILLE },
+    { "mono", BLOCK_NOCOLOR },
     { "ansi", BLOCK_ANSI },
     { "ansi256", BLOCK_ANSI256 },
     { "pal$ette", BLOCK_ANSI256 },
@@ -130,9 +131,8 @@ static struct gen_table BLOCK_opts[] =
     { "tru$ecolor", BLOCK_ANSIRGB },
     { "opt$imize", BLOCK_OPTIMIZE },
     { "noopt$imize", BLOCK_NOOPTIMIZE },
-    { "chars$ymbols", BLOCK_CHARPOINTS },
-    { "gps$ymbols", BLOCK_GPPOINTS },
-    { "mono", BLOCK_NOCOLOR },
+    { "charp$oints", BLOCK_CHARPOINTS },
+    { "gpp$oints", BLOCK_GPPOINTS },
     { "siz$e", BLOCK_SIZE },
     { "attr$ibutes", BLOCK_ATTRIBUTES },
     { "noattr$ibutes", BLOCK_NOATTRIBUTES },
@@ -169,17 +169,19 @@ BLOCK_options()
 	case BLOCK_ANSI:
 	case BLOCK_ANSI256:
 	case BLOCK_ANSIRGB:
-	    c_token++;
+#ifndef NO_DUMB_COLOR_SUPPORT
 	    if (cmd == BLOCK_ANSI)
 		dumb_colormode = DUMB_ANSI;
 	    else if (cmd == BLOCK_ANSI256)
 		dumb_colormode = DUMB_ANSI256;
 	    else
 		dumb_colormode = DUMB_ANSIRGB;
-#ifndef NO_DUMB_COLOR_SUPPORT
 	    term->make_palette = DUMB_make_palette;
 	    term->flags &= ~TERM_MONOCHROME;
+#else
+	    int_warn(c_token, "block terminal built without color support");
 #endif
+	    c_token++;
 	    break;
 	case BLOCK_NOCOLOR:
 	    c_token++;
@@ -232,16 +234,19 @@ BLOCK_options()
 
     // init options string
     {
+	//Note: These need to be in the same order as the corresponding definitions.
 	const char * mode_strings[] =
 	    { "dot", "half", "halfh", "quadrants", "sextants", "braille" };
 	const char * color_strings[] =
 	    {"mono", "ansi", "ansi256", "ansirgb"};
 
-	sprintf(term_options, "%s %s %soptimize %senhanced size %d,%d",
+	sprintf(term_options, "%s %s %soptimize %senhanced %sattributes %spoints size %d,%d",
 	    mode_strings[BLOCK_mode],
 	    color_strings[dumb_colormode == 0 ? 0 : dumb_colormode - DUMB_ANSI + 1],
 	    (BLOCK_optimize ? "" : "no"),
 	    (term->flags & TERM_ENHANCED_TEXT) ? "" : "no",
+	    (dumb_text_attributes ? "" : "no"),
+	    (BLOCK_charpoints ? "char" : "gp"),
 	    BLOCK_xchars, BLOCK_ychars);
     }
 }
@@ -461,6 +466,8 @@ BLOCK_text()
     const int idx_braille[8]   = { 0x40, 0x80, 0x04, 0x20, 0x02, 0x10, 0x01, 0x08 };
     const int * idx_list[6] = { idx_dot, idx_half, idx_half, idx_quadrants,
 			        idx_sextants, idx_braille };
+    size_t bufsiz;
+    text_attr prev_text_attr;
 #ifndef NO_DUMB_COLOR_SUPPORT
 #ifdef DEBUG_BLOCK_OPTI
     unsigned nfullcells = 0;
@@ -469,14 +476,11 @@ BLOCK_text()
 #endif
     unsigned nsets, set;
     const int * pattern;
-    size_t bufsiz;
-    text_attr prev_text_attr;
 #if defined(HAVE_ICONV) && !defined(_WIN32)
     iconv_t cd = (iconv_t) -1;
 
     {
 	enum set_encoding_id encoding = encoding_from_locale();
-	printf("enc %i, name %s, tty %i\n", encoding, iconv_encoding_name(encoding), isatty(fileno(gpoutfile)));
 	if (isatty(fileno(gpoutfile)) &&  /* only convert if output to terminal */
 	    encoding != S_ENC_UTF8 && encoding != S_ENC_DEFAULT &&
 	    iconv_encoding_name(encoding) != NULL) {
@@ -486,7 +490,6 @@ BLOCK_text()
 # ifndef OS2
 	    strcat(tocode, "//TRANSLIT//IGNORE");
 # endif
-	    puts(tocode);
 	    if ((cd = iconv_open(tocode, "UTF-8")) == (iconv_t) -1)
 		int_warn(NO_CARET, "iconv_open failed");
 	}
