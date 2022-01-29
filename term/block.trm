@@ -55,14 +55,13 @@ TERM_PUBLIC void BLOCK_set_color(t_colorspec *color);
 # include <iconv.h>
 #endif
 
-// default values for quadrants
+// default values for quadrants, the default mode
 #define BLOCK_XMAX  (DUMB_XMAX)
 #define BLOCK_YMAX  (DUMB_YMAX)
 #define BLOCK_VCHAR (2)
 #define BLOCK_HCHAR (2)
-// we want really small point symbols
-// FIXME: Should we go for 1, 2? Aspect ratio?
-#define BLOCK_VTIC  (2)
+// We want really small tics. Approximate aspect ratio.
+#define BLOCK_VTIC  (1)
 #define BLOCK_HTIC  (2)
 
 enum BLOCK_modes {
@@ -318,14 +317,20 @@ BLOCK_init()
 
     term->h_char = BLOCK_modeinfo[BLOCK_mode].cellx;
     term->v_char = BLOCK_modeinfo[BLOCK_mode].celly;
-    // FIXME: is this correct or should the -1 go?
     dumb_xmax = BLOCK_xchars - 1;
     dumb_ymax = BLOCK_ychars - 1;
+
     // guide the aspect ratio calculation in the core layer
-    if (BLOCK_mode == BLOCK_MODE_QUAD || BLOCK_mode == BLOCK_MODE_DOT)
-	term->h_tic = BLOCK_HTIC * 2;
-    else // BLOCK_MODE_HALF, BLOCK_MODE_OCT, BLOCK_MODE_BRAILLE
+    if (BLOCK_mode == BLOCK_MODE_QUAD || BLOCK_mode == BLOCK_MODE_DOT) {
 	term->h_tic = BLOCK_HTIC;
+	term->v_tic = BLOCK_VTIC;
+    } else if (BLOCK_mode == BLOCK_MODE_SEXT) {
+	term->h_tic = BLOCK_HTIC * 3 / 2;
+	term->v_tic = BLOCK_VTIC * 2;
+    } else { // BLOCK_MODE_HALF, BLOCK_MODE_OCT, BLOCK_MODE_BRAILLE
+	term->h_tic = BLOCK_HTIC / 2;
+	term->v_tic = BLOCK_VTIC;
+    }
 
     DUMB_init();
 }
