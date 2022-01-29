@@ -278,7 +278,7 @@ BLOCK_options()
 	    mode_strings[BLOCK_mode],
 	    color_strings[dumb_colormode == 0 ? 0 : dumb_colormode - DUMB_ANSI + 1],
 	    bg_str,
-	    (BLOCK_optimize && (BLOCK_mode != BLOCK_MODE_BRAILLE)? "" : "no"),
+	    (BLOCK_optimize && (BLOCK_mode != BLOCK_MODE_BRAILLE) ? "" : "no"),
 	    (term->flags & TERM_ENHANCED_TEXT) ? "" : "no",
 	    (dumb_text_attributes ? "" : "no"),
 	    pointtype_strings[BLOCK_pointtype],
@@ -648,6 +648,43 @@ BLOCK_text()
 #ifndef NO_DUMB_COLOR_SUPPORT
 		// Handle the character's color first.
 		t_colorspec * color;
+		int n = 0; // number of set pixels in charcell
+		int r = 0, g = 0, b = 0;  // color components
+		int k;
+		rgb255_color col;
+
+		// Text "transparency": if all pixels are set, we average over
+		// the cell to set the background color.
+		if ((dumb_colormode > 0) && BLOCK_optimize && (BLOCK_mode != BLOCK_MODE_BRAILLE)) {
+		    // get all pixels within charcell
+		    for (k = 0; k < (cellx * celly); k++) {
+			v = b_getpixel(x + (k % cellx), y + (k / cellx));
+			// Is the pixel set? (first plane is "opacity")
+			if (v & 1) {
+			    // sum up RGB colors
+			    to_rgb255(v >> 1, &col);
+			    r += USQR(col.r);
+			    g += USQR(col.g);
+			    b += USQR(col.b);
+			    n++;
+			}
+		    }
+		    if (n == cellx * celly) {
+			t_colorspec color;
+			color.type = TC_RGB;
+			color.lt = ((unsigned) sqrt(r / n) << 16) +
+				   ((unsigned) sqrt(g / n) <<  8) +
+				   ((unsigned) sqrt(b / n));
+			c = ansi_bg_colorstring(&color);
+			if (c != NULL && strcmp(bg_str, c) != 0) {
+			    strcpy((char *) s, c);
+			    s += strlen(c);
+			    resetbg = TRUE;
+			}
+		    }
+		}
+
+		// Set color _after_ the background color.
 		color = &dumb_colors[dumb_xmax * yd + xd];
 		c = ansi_colorstring(color, &dumb_prev_color);
 		if (c[0] != NUL) {
@@ -833,23 +870,23 @@ BLOCK_text()
 		}
 
 		s += ucs4toutf8(v, s);
+	    }
 
 #ifndef NO_DUMB_COLOR_SUPPORT
-		// turn bg color off again
-		if (resetbg) {
-		    if (bg_str[0] != NUL) {
-			strcpy((char *) s, bg_str);
-			s += strlen(bg_str);
-		    } else {
+	    // turn bg color off again
+	    if (resetbg) {
+		if (bg_str[0] != NUL) {
+		    strcpy((char *) s, bg_str);
+		    s += strlen(bg_str);
+		} else {
 #if defined(OS2) || defined(MSDOS)
-			strcpy((char *) s, "\033[40m"); s += 5; /* reset background color to black */
+		    strcpy((char *) s, "\033[40m"); s += 5; /* reset background color to black */
 #else
-			strcpy((char *) s, "\033[49m"); s += 5; /* reset background color to default */
+		    strcpy((char *) s, "\033[49m"); s += 5; /* reset background color to default */
 #endif
-		    }
 		}
-#endif
 	    }
+#endif
 	}
 
 #ifndef NO_DUMB_COLOR_SUPPORT
