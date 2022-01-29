@@ -90,7 +90,16 @@ static int BLOCK_mode = BLOCK_MODE_QUAD;
 static int BLOCK_xchars = BLOCK_XMAX;
 static int BLOCK_ychars = BLOCK_YMAX;
 static TBOOLEAN BLOCK_optimize = TRUE;
-static TBOOLEAN BLOCK_charpoints = FALSE;
+
+enum BLOCK_pointtypes {
+    BLOCK_POINT_CHAR, BLOCK_POINT_NUM, BLOCK_POINT_GP
+};
+#if defined(OS2) || defined(MSDOS)
+static int BLOCK_pointtype = BLOCK_POINT_CHAR;
+#else
+static int BLOCK_pointtype = BLOCK_POINT_NUM;
+#endif
+
 #define BLOCK_BGTRANSPARENT 0xffffffff
 static uint32_t BLOCK_background = BLOCK_BGTRANSPARENT;
 static BLOCK_modeinfo_entry BLOCK_modeinfo[] = {
@@ -109,7 +118,7 @@ enum BLOCK_id {
       BLOCK_SEXTANTS, BLOCK_OCTANTS, BLOCK_BRAILLE,
     BLOCK_ANSI, BLOCK_ANSI256, BLOCK_ANSIRGB, BLOCK_NOCOLOR,
     BLOCK_OPTIMIZE, BLOCK_NOOPTIMIZE,
-    BLOCK_CHARPOINTS, BLOCK_GPPOINTS,
+    BLOCK_CHARPOINTS, BLOCK_GPPOINTS, BLOCK_NUMPOINTS,
     BLOCK_ATTRIBUTES, BLOCK_NOATTRIBUTES,
     BLOCK_SIZE, BLOCK_BACKGROUND, BLOCK_TRANSPARENT,
     BLOCK_OTHER
@@ -134,6 +143,7 @@ static struct gen_table BLOCK_opts[] =
     { "opt$imize", BLOCK_OPTIMIZE },
     { "noopt$imize", BLOCK_NOOPTIMIZE },
     { "charp$oints", BLOCK_CHARPOINTS },
+    { "nump$oints", BLOCK_NUMPOINTS },
     { "gpp$oints", BLOCK_GPPOINTS },
     { "siz$e", BLOCK_SIZE },
     { "attr$ibutes", BLOCK_ATTRIBUTES },
@@ -211,11 +221,15 @@ BLOCK_options()
 	    break;
 	case BLOCK_CHARPOINTS:
 	    c_token++;
-	    BLOCK_charpoints = TRUE;
+	    BLOCK_pointtype = BLOCK_POINT_CHAR;
+	    break;
+	case BLOCK_NUMPOINTS:
+	    c_token++;
+	    BLOCK_pointtype = BLOCK_POINT_NUM;
 	    break;
 	case BLOCK_GPPOINTS:
 	    c_token++;
-	    BLOCK_charpoints = FALSE;
+	    BLOCK_pointtype = BLOCK_POINT_GP;
 	    break;
 	case BLOCK_SIZE: {
 	    float width, height;
@@ -251,6 +265,8 @@ BLOCK_options()
 	    { "dot", "half", "quadrants", "sextants", "octants", "braille" };
 	const char * color_strings[] =
 	    {"mono", "ansi", "ansi256", "ansirgb"};
+	const char * pointtype_strings[] =
+	    {"char", "num", "gp"};
 	char bg_str[32];
 
 	if (BLOCK_background == BLOCK_BGTRANSPARENT)
@@ -264,7 +280,7 @@ BLOCK_options()
 	    (BLOCK_optimize && (BLOCK_mode != BLOCK_MODE_BRAILLE)? "" : "no"),
 	    (term->flags & TERM_ENHANCED_TEXT) ? "" : "no",
 	    (dumb_text_attributes ? "" : "no"),
-	    (BLOCK_charpoints ? "char" : "gp"),
+	    pointtype_strings[BLOCK_pointtype],
 	    BLOCK_xchars, BLOCK_ychars);
     }
 }
@@ -928,24 +944,15 @@ BLOCK_put_text(unsigned int x, unsigned int y, const char *str)
 TERM_PUBLIC void
 BLOCK_point(unsigned int x, unsigned int y, int point)
 {
-    int xd = x / BLOCK_modeinfo[BLOCK_mode].cellx;
-    int yd = y / BLOCK_modeinfo[BLOCK_mode].celly;
-    const uint32_t pointtypes[] = {
-	    '+', 'x' /* cross */, '*',
-	    0x25a1, 0x25a0, /* empty/full square */
-	    0x25cb, 0x25cf, /* empty/full circle */
-	    0x25b3, 0x25b2, /* empty/full upward triangle */
-	    0x25bd, 0x25bc, /* empty/full downward triangle */
-	    0x25c7, 0x25c6, /* empty/full diamond */
-	    0x2b20, 0x2b1f, /* empty/full pentagon */
-	};
+    if ((signed) x < 0 || (signed) y < 0)
+	return;
 
     // Draw the smallest bitmap point symbols possible.
     //
     // These symbols are still too large and maybe only useful in combination
     // with error bars.
     //
-    if (!BLOCK_charpoints) {
+    if (BLOCK_pointtype == BLOCK_POINT_GP) {
 	if (point < 0) { // dot
 	    b_putpixel(x, y);
 	} else {
@@ -970,12 +977,60 @@ BLOCK_point(unsigned int x, unsigned int y, int point)
 	return;
     }
 
-    if ((signed) x < 0 || (signed) y < 0)
-	return;
-
+    // Draw point symbols using Unicode characters.
+    //
+    // The original idea was to use the corresponding character representations
+    // listed below. The drawback is that they are not well-aligned with the
+    // bitmap graph, as the cell-box resolution is smaller.
+    // Instead, we now use super- or subscript numerals 1-9 as point symbols.
+    // This results in double the resolution in vertical direction, but still
+    // only matches the bitmap resolution in "half" mode. Note that we still
+    // cannot overlay two characters in the same cell-box.
+    //
     if (point >= 0) {
+	// character position
+	int xd = x / BLOCK_modeinfo[BLOCK_mode].cellx;
+	int yd = y / BLOCK_modeinfo[BLOCK_mode].celly;
+
 	DUMB_PIXEL(xd, yd) = 0;
-	ucs4toutf8(pointtypes[point % 15], (unsigned char *) &DUMB_PIXEL(xd, yd));
+	if (BLOCK_pointtype == BLOCK_POINT_CHAR) {
+	    // correct character point symbols
+	    const uint32_t pointtypes[] = {
+		    '+', 'x' /* cross */, '*',
+#if defined(OS2) || defined(MSDOS)
+		    0x25a0, 0x25b2, 0x25bc
+#else
+		    0x25a1, 0x25a0, /* empty/full square */
+		    0x25cb, 0x25cf, /* empty/full circle */
+		    0x25b3, 0x25b2, /* empty/full upward triangle */
+		    0x25bd, 0x25bc, /* empty/full downward triangle */
+		    0x25c7, 0x25c6, /* empty/full diamond */
+		    0x2b20, 0x2b1f, /* empty/full pentagon */
+#endif
+		};
+	    const int npointtypes = sizeof(pointtypes) / sizeof(uint32_t);
+
+	    ucs4toutf8(pointtypes[point % npointtypes], (unsigned char *) &DUMB_PIXEL(xd, yd));
+	} else {
+	    // super-/subscript numerals
+	    // Some superscripts numerals are defined in latin-1, so we use a mapping table.
+	    // Subscripts numerals have continuous code-points.
+	    const uint32_t upoints[9] = {
+		0x00B9, 0x00B2, 0x00B3, 0x2074, 0x2075,
+		0x2076, 0x2077, 0x2078, 0x2079
+	    };
+
+	    unsigned ypos = (y % BLOCK_modeinfo[BLOCK_mode].celly);
+	    if ((BLOCK_mode == BLOCK_MODE_SEXT && ypos == 1) ||
+	        (BLOCK_mode == BLOCK_MODE_DOT)) {
+		// special case: vertical center
+		ucs4toutf8(('1' + (point % 9)), (unsigned char *) &DUMB_PIXEL(xd, yd));
+	    } else {
+		// y-position in upper half of the character box?
+		bool upper = (ypos >= (BLOCK_modeinfo[BLOCK_mode].celly / 2));
+		ucs4toutf8(upper ? upoints[point % 9] : (0x2081 + (point % 9)), (unsigned char *) &DUMB_PIXEL(xd, yd));
+	    }
+	}
 #ifndef NO_DUMB_COLOR_SUPPORT
 	memcpy(&dumb_colors[dumb_xmax * yd + xd], &dumb_color, sizeof(t_colorspec));
 #endif
@@ -1138,7 +1193,7 @@ START_HELP(block)
 " The `block` terminal generates pseudo-graphic output using Unicode block or",
 " Braille characters to increase the resolution.  It is an alternative for",
 " terminal graphics.  It requires a UTF-8 capable terminal or viewer.  Drawing",
-" uses the old internal bitmap code.  Text is printed on top of the graphics",
+" uses the internal bitmap code.  Text is printed on top of the graphics",
 " using the `dumb` terminal's routines.",
 "",
 " Syntax:",
@@ -1151,7 +1206,7 @@ START_HELP(block)
 "                 {{no}optimize}",
 #endif
 "                 {[no]attributes}",
-"                 {charpoints | gppoints}",
+"                 {numpoints | charpoints | gppoints}",
 "",
 " `size` sets the terminal size in character cells.",
 "",
@@ -1187,9 +1242,15 @@ START_HELP(block)
 " For `braille` this cannot be used.",
 #endif
 "",
-" `gppoints` aims to draw point symbols using graphics commands. Due to the",
-" low resolution of the terminal this is mostly viable for `braille` mode.",
+" `gppoints` draws point symbols using graphics commands. Due to the low",
+" resolution of the terminal, this is mostly viable for `braille` mode and",
+" probably most useful for error bars.",
 " `charpoints` uses Unicode symbol characters instead.  Note that these",
-" are also always drawn on top of the graphics."
+" are also always drawn on top of the graphics.",
+" `numpoints` uses super- and subscript numerals to double the vertical",
+" resolution. For `sextants`, points in the character cell's center position",
+" have to be drawn using ordinary numerals, though. Note that the bitmap",
+" resolution is still different and lines and symbols in general do not align",
+" exactly when using `charpoints` or `numpoints`."
 END_HELP(block)
 #endif
