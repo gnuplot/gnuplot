@@ -65,8 +65,8 @@ TERM_PUBLIC void BLOCK_set_color(t_colorspec *color);
 #define BLOCK_HTIC  (2)
 
 enum BLOCK_modes {
-    BLOCK_MODE_DOT, BLOCK_MODE_HALF, BLOCK_MODE_HALFH,
-    BLOCK_MODE_QUAD, BLOCK_MODE_SEXT, BLOCK_MODE_BRAILLE
+    BLOCK_MODE_DOT, BLOCK_MODE_HALF, BLOCK_MODE_QUAD,
+    BLOCK_MODE_SEXT, BLOCK_MODE_BRAILLE
 };
 
 typedef struct {
@@ -94,7 +94,6 @@ static TBOOLEAN BLOCK_charpoints = FALSE;
 static BLOCK_modeinfo_entry BLOCK_modeinfo[6] = {
     { BLOCK_MODE_DOT,     1, 1 },
     { BLOCK_MODE_HALF,    1, 2 },
-    { BLOCK_MODE_HALFH,   2, 1 },
     { BLOCK_MODE_QUAD,    2, 2 },
     { BLOCK_MODE_SEXT,    2, 3 },
     { BLOCK_MODE_BRAILLE, 2, 4 }
@@ -103,8 +102,8 @@ static BLOCK_modeinfo_entry BLOCK_modeinfo[6] = {
 enum BLOCK_id {
     BLOCK_ENH, BLOCK_NOENH,
     // The code relies on those having the same order as the modes.
-    BLOCK_DOT, BLOCK_HALF, BLOCK_HALFH,
-      BLOCK_QUADRANTS, BLOCK_SEXTANTS, BLOCK_BRAILLE,
+    BLOCK_DOT, BLOCK_HALF, BLOCK_QUADRANTS,
+      BLOCK_SEXTANTS, BLOCK_BRAILLE,
     BLOCK_ANSI, BLOCK_ANSI256, BLOCK_ANSIRGB, BLOCK_NOCOLOR,
     BLOCK_OPTIMIZE, BLOCK_NOOPTIMIZE,
     BLOCK_CHARPOINTS, BLOCK_GPPOINTS,
@@ -119,7 +118,6 @@ static struct gen_table BLOCK_opts[] =
     { "noe$nhanced", BLOCK_NOENH },
     { "dot", BLOCK_DOT },
     { "half", BLOCK_HALF },
-    { "halfh", BLOCK_HALFH },
     { "quad$rants", BLOCK_QUADRANTS },
     { "sex$tants", BLOCK_SEXTANTS },
     { "br$aille", BLOCK_BRAILLE },
@@ -159,7 +157,6 @@ BLOCK_options()
 #endif
 	case BLOCK_DOT:
 	case BLOCK_HALF:
-	case BLOCK_HALFH:
 	case BLOCK_QUADRANTS:
 	case BLOCK_SEXTANTS:
 	case BLOCK_BRAILLE:
@@ -236,7 +233,7 @@ BLOCK_options()
     {
 	//Note: These need to be in the same order as the corresponding definitions.
 	const char * mode_strings[] =
-	    { "dot", "half", "halfh", "quadrants", "sextants", "braille" };
+	    { "dot", "half", "quadrants", "sextants", "braille" };
 	const char * color_strings[] =
 	    {"mono", "ansi", "ansi256", "ansirgb"};
 
@@ -291,6 +288,7 @@ BLOCK_init()
 	term->h_tic = BLOCK_HTIC * 2;
     else
 	term->h_tic = BLOCK_HTIC;
+
     DUMB_init();
 }
 
@@ -308,13 +306,6 @@ BLOCK_reset()
 */
 static uint32_t block_half_map[4] = {
     0x00A0, 0x2580, 0x2584, 0x2588
-};
-
-/*
-  Halfblocks, horizontal:
-*/
-static uint32_t block_halfh_map[4] = {
-    0x00A0, 0x2590, 0x258D, 0x2588
 };
 
 /*
@@ -464,7 +455,7 @@ BLOCK_text()
     const int idx_quadrants[4] = { 0x04, 0x08, 0x01, 0x02 };
     const int idx_sextants[6]  = { 0x10, 0x20, 0x04, 0x08, 0x01, 0x02 };
     const int idx_braille[8]   = { 0x40, 0x80, 0x04, 0x20, 0x02, 0x10, 0x01, 0x08 };
-    const int * idx_list[6] = { idx_dot, idx_half, idx_half, idx_quadrants,
+    const int * idx_list[] = { idx_dot, idx_half, idx_quadrants,
 			        idx_sextants, idx_braille };
     size_t bufsiz;
     text_attr prev_text_attr;
@@ -508,7 +499,6 @@ BLOCK_text()
 #ifndef NO_DUMB_COLOR_SUPPORT
     switch (BLOCK_mode) {
     case BLOCK_MODE_HALF:
-    case BLOCK_MODE_HALFH:
     default:
 	nsets = 0;
 	pattern = NULL;
@@ -619,8 +609,7 @@ BLOCK_text()
 		// works for half-blocks, mostly for quadrants, but is increasingly
 		// difficult for sextants. We cannot do that for Braille symbols.
 		if ((dumb_colormode > 0) && BLOCK_optimize &&
-		    ((((BLOCK_mode == BLOCK_MODE_HALF) ||
-		       (BLOCK_mode == BLOCK_MODE_HALFH))& (n == 2) &&
+		    (((BLOCK_mode == BLOCK_MODE_HALF) && (n == 2) &&
 		       !(cell[0] == cell[1])) ||
 		     ((BLOCK_mode == BLOCK_MODE_QUAD) && (n == 4) &&
 		      !(cell[0] == cell[1] && cell[1] == cell[2] && cell[2] == cell[3])) ||
@@ -653,8 +642,7 @@ BLOCK_text()
 
 			r = g = b = 0;
 			n = i = 0;
-			if (BLOCK_mode == BLOCK_MODE_HALF ||
-			    BLOCK_mode == BLOCK_MODE_HALFH)
+			if (BLOCK_mode == BLOCK_MODE_HALF)
 			    mask = 0x01;
 			else
 			    mask = pattern[set - 1];
@@ -719,9 +707,6 @@ BLOCK_text()
 		    break;
 		case BLOCK_MODE_HALF:
 		    v = block_half_map[i];
-		    break;
-		case BLOCK_MODE_HALFH:
-		    v = block_halfh_map[i];
 		    break;
 		case BLOCK_MODE_QUAD:
 		    v = block_quadrant_map[i];
