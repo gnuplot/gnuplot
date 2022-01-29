@@ -87,6 +87,7 @@ static int BLOCK_mode = BLOCK_MODE_HALF;
 #else
 static int BLOCK_mode = BLOCK_MODE_QUAD;
 #endif
+static TBOOLEAN BLOCK_animate = FALSE;
 static int BLOCK_xchars = BLOCK_XMAX;
 static int BLOCK_ychars = BLOCK_YMAX;
 static TBOOLEAN BLOCK_optimize = TRUE;
@@ -121,6 +122,7 @@ enum BLOCK_id {
     BLOCK_CHARPOINTS, BLOCK_GPPOINTS, BLOCK_NUMPOINTS,
     BLOCK_ATTRIBUTES, BLOCK_NOATTRIBUTES,
     BLOCK_SIZE, BLOCK_BACKGROUND, BLOCK_TRANSPARENT,
+    BLOCK_ANIMATE, BLOCK_NOANIMATE,
     BLOCK_OTHER
 };
 
@@ -150,6 +152,8 @@ static struct gen_table BLOCK_opts[] =
     { "noattr$ibutes", BLOCK_NOATTRIBUTES },
     { "back$ground", BLOCK_BACKGROUND },
     { "transp$arent", BLOCK_TRANSPARENT },
+    { "anim$ate", BLOCK_ANIMATE },
+    { "noanim$ate", BLOCK_NOANIMATE },
     { NULL, BLOCK_OTHER }
 };
 
@@ -248,6 +252,14 @@ BLOCK_options()
 	    c_token++;
 	    BLOCK_background = BLOCK_BGTRANSPARENT;
 	    break;
+	case BLOCK_ANIMATE:
+	    c_token++;
+	    BLOCK_animate = TRUE;
+	    break;
+	case BLOCK_NOANIMATE:
+	    c_token++;
+	    BLOCK_animate = FALSE;
+	    break;
 	case BLOCK_OTHER:
 	default:
 	    int_error(c_token, "unknown option");
@@ -273,7 +285,7 @@ BLOCK_options()
 	    strcpy(bg_str, "transparent");
 	else
 	    sprintf(bg_str, "background rgb \"0x%06X\"", BLOCK_background);
-	sprintf(term_options, "%s %s %s %soptimize %senhanced %sattributes %spoints size %d,%d",
+	sprintf(term_options, "%s %s %s %soptimize %senhanced %sattributes %spoints size %d,%d %s",
 	    mode_strings[BLOCK_mode],
 	    color_strings[dumb_colormode == 0 ? 0 : dumb_colormode - DUMB_ANSI + 1],
 	    bg_str,
@@ -281,7 +293,8 @@ BLOCK_options()
 	    (term->flags & TERM_ENHANCED_TEXT) ? "" : "no",
 	    (dumb_text_attributes ? "" : "no"),
 	    pointtype_strings[BLOCK_pointtype],
-	    BLOCK_xchars, BLOCK_ychars);
+	    BLOCK_xchars, BLOCK_ychars,
+	    BLOCK_animate ? "animate" : "");
     }
 }
 
@@ -982,6 +995,10 @@ BLOCK_text()
     }
 #endif
 
+    // Move cursor up to start over.
+    if (BLOCK_animate)
+	fprintf(gpoutfile, "\033[%iA", BLOCK_ychars);
+
     free(line);
     (void) fflush(gpoutfile);	/* finish the graphics */
 #if defined(HAVE_ICONV) && !defined(_WIN32)
@@ -1307,6 +1324,7 @@ START_HELP(block)
 #endif
 "                 {[no]attributes}",
 "                 {numpoints | charpoints | gppoints}",
+"                 {[no]animate}",
 "",
 " `size` sets the terminal size in character cells.",
 "",
@@ -1351,6 +1369,12 @@ START_HELP(block)
 " resolution. For `sextants`, points in the character cell's center position",
 " have to be drawn using ordinary numerals, though. Note that the bitmap",
 " resolution is still different and lines and symbols in general do not align",
-" exactly when using `charpoints` or `numpoints`."
+" exactly when using `charpoints` or `numpoints`.",
+"",
+" The `animate` option resets the cursor position to the top left of the plot",
+" after every plot so that successive plots overwrite the same area on the",
+" screen rather than having earlier plots scroll off the top. This may be",
+" desirable in order to create an in-place animation.",
+""
 END_HELP(block)
 #endif
