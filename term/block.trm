@@ -387,6 +387,9 @@ static uint32_t block_sextant_map[64] = {
 };
 
 /* optimization bit patterns */
+// half blocks: 1
+const int half_pat[] = { 0x01 };
+const int nhalf_pats = 1;
 // quadrants: 4!/3! + 4!/(2!+2!) = 4 + 6 = 10
 const int quad_pat[] = {
     0x0e, 0x0d, 0x0b, 0x07,              // 3 bits
@@ -576,10 +579,13 @@ BLOCK_text()
     idx = idx_list[BLOCK_mode];
 #ifndef NO_DUMB_COLOR_SUPPORT
     switch (BLOCK_mode) {
-    case BLOCK_MODE_HALF:
     default:
 	nsets = 0;
 	pattern = NULL;
+	break;
+    case BLOCK_MODE_HALF:
+	nsets = nhalf_pats;
+	pattern = half_pat;
 	break;
     case BLOCK_MODE_QUAD:
 	nsets = nquad_pats;
@@ -723,6 +729,7 @@ BLOCK_text()
 #endif
 
 		// get all pixels within charcell
+		i = 0;
 		for (k = 0; k < (cellx * celly); k++) {
 		    cell[k] = v = b_getpixel(x + (k % cellx), y + (k / cellx));
 		    // Is the pixel set? (first plane is "opacity")
@@ -757,36 +764,26 @@ BLOCK_text()
 		      !(cell[0] == cell[1] && cell[1] == cell[2] && cell[2] == cell[3] &&
 		        cell[3] == cell[4] && cell[4] == cell[5] && cell[5] == cell[6] &&
 		        cell[6] == cell[7])) )) {
-		    TBOOLEAN found = (n == 2);
-		    unsigned mask, first;
+		    int wmin = INT_MAX;
+		    int r2, g2, b2, m;
+		    int ropt = 0, gopt = 0, bopt = 0;
+		    int r2opt = 0, g2opt = 0, b2opt = 0;
+		    int nopt = 0, mopt = 0, iopt;
 
-		    for (set = 0; set < nsets && !found; set++) {
-			// The pattern list entries really are bit-maps of the
-			// pixel combinations to test.
-			mask = pattern[set];
-			// look for the first pixel set
-			first = 0;
-			while ((mask & 1) == 0) {
-			    mask >>= 1;
-			    first++;
-			}
-			// now test the others for equality
-			for (k = first + 1, found = TRUE; k < cellx*celly; k++) {
-			    mask >>= 1;
-			    if (mask & 1)
-				found &= (cell[first] == cell[k]);
-			}
-		    }
-		    if (found) {
-			int r2 = 0, g2 = 0, b2 = 0;
-			int m = 0;
+		    // Find optimum average color combination for fore- and background.
+		    i = 0;
+		    // Loop over all pixel patterns.
+		    for (set = 0; set < nsets; set++) {
+			unsigned mask;
+			int rm, gm, bm;
+			int rm2, gm2, bm2;
+			int w;
 
+			// Determine color averages for fore- and background.
 			r = g = b = 0;
-			n = i = 0;
-			if (BLOCK_mode == BLOCK_MODE_HALF)
-			    mask = 0x01;
-			else
-			    mask = pattern[set - 1];
+			r2 = g2 = b2 = 0;
+			n = m = i = 0;
+			mask = pattern[set];
 			for (k = 0; k < cellx*celly; k++) {
 			    if (mask & 1) {
 				r += USQR(col[k].r);
@@ -802,16 +799,53 @@ BLOCK_text()
 			    }
 			    mask >>= 1;
 			}
-			color.type = TC_RGB;
-			color.lt = ((unsigned) sqrt(r2 / m) << 16) +
-				   ((unsigned) sqrt(g2 / m) <<  8) +
-				   ((unsigned) sqrt(b2 / m));
-			c = ansi_bg_colorstring(&color);
-			if (c != NULL && strcmp(bg_str, c) != 0) {
-			    strcpy((char *) s, c);
-			    s += strlen(c);
-			    resetbg = TRUE;
+			rm = sqrt(r / n); gm = sqrt(g / n); bm = sqrt(b / n);
+			rm2 = sqrt(r2 / m); gm2 = sqrt(g2 / m); bm2 = sqrt(b2 / m);
+
+			// Determine weight of this combination.
+			mask = pattern[set];
+			w = 0;
+			for (k = 0; k < cellx * celly; k++) {
+			    if (mask & 1) {
+				w += USQR(col[k].r - rm);
+				w += USQR(col[k].g - gm);
+				w += USQR(col[k].b - bm);
+			    } else {
+				w += USQR(col[k].r - rm2);
+				w += USQR(col[k].g - gm2);
+				w += USQR(col[k].b - bm2);
+			    }
+			    mask >>= 1;
 			}
+
+			// Did we find a new optimum?
+			if (w < wmin) {
+			    wmin = w;
+			    nopt = n;
+			    ropt = r; gopt = g; bopt = b;
+			    mopt = m;
+			    r2opt = r2; g2opt = g2; b2opt = b2;
+			    iopt = i;
+			}
+		    }
+
+		    // Use optimum values.
+		    n = nopt;
+		    r = ropt; g = gopt; b = bopt;
+		    m = mopt;
+		    r2 = r2opt; g2 = g2opt; b2 = b2opt;
+		    i = iopt;
+
+		    // Set background color.
+		    color.type = TC_RGB;
+		    color.lt = ((unsigned) sqrt(r2 / m) << 16) +
+			       ((unsigned) sqrt(g2 / m) <<  8) +
+			       ((unsigned) sqrt(b2 / m));
+		    c = ansi_bg_colorstring(&color);
+		    if (c != NULL && strcmp(bg_str, c) != 0) {
+			strcpy((char *) s, c);
+			s += strlen(c);
+			resetbg = TRUE;
 		    }
 		}
 
