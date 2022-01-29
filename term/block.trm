@@ -43,6 +43,7 @@ TERM_PUBLIC void BLOCK_text(void);
 TERM_PUBLIC void BLOCK_graphics(void);
 TERM_PUBLIC void BLOCK_put_text(unsigned int x, unsigned int y, const char *str);
 TERM_PUBLIC void BLOCK_point(unsigned int x, unsigned int y, int point);
+TERM_PUBLIC void BLOCK_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head);
 TERM_PUBLIC void BLOCK_linetype(int linetype);
 TERM_PUBLIC void BLOCK_set_color(t_colorspec *color);
 #endif
@@ -1042,6 +1043,29 @@ BLOCK_point(unsigned int x, unsigned int y, int point)
 
 
 TERM_PUBLIC void
+BLOCK_arrow(unsigned int sx, unsigned int sy,
+	    unsigned int ex, unsigned int ey,
+	    int head)
+{
+    // Enforce minimally sized arrows, but take three head variants into account:
+    if (curr_arrow_headlength <= 0 || curr_arrow_headangle <= 80) {
+	curr_arrow_headangle = 45;
+	curr_arrow_headlength = 2;
+    } else if (curr_arrow_headangle <= 100) {
+	curr_arrow_headangle = 90;
+	curr_arrow_headlength = (sx == ex) || (sy == ey) ? 1 : 2;
+    } else {
+	curr_arrow_headangle = 135;
+	curr_arrow_headlength = 2;
+    }
+    curr_arrow_headbackangle = 90;
+    curr_arrow_headfilled = AS_NOFILL;
+
+    do_arrow(sx, sy, ex, ey, head);
+}
+
+
+TERM_PUBLIC void
 BLOCK_linetype(int linetype)
 {
     t_colorspec color;
@@ -1151,7 +1175,7 @@ TERM_TABLE_START(block_driver)
     BLOCK_text, null_scale, BLOCK_graphics,
     b_move, b_vector, BLOCK_linetype,
     BLOCK_put_text, null_text_angle, null_justify_text,
-    BLOCK_point, do_arrow, DUMB_set_font, 0,
+    BLOCK_point, BLOCK_arrow, DUMB_set_font, 0,
 #ifndef NO_DUMB_ENHANCED_SUPPORT
     TERM_MONOCHROME | TERM_ENHANCED_TEXT,
 #else
