@@ -473,7 +473,7 @@ dumb_rgb_color(rgb255_color rgb255, char * colorstring)
     switch (dumb_colormode) {
     case DUMB_ANSI: {
 	unsigned color = nearest_ansi(rgb255);
-	sprintf(colorstring, "\033[%i;%im", color >= 8 ? 22 : 1, 30 + (color % 8));
+	sprintf(colorstring, "\033[%i;%im", color >= 8 ? 1 : 22, 30 + (color % 8));
 	break;
     }
     case DUMB_ANSI256:
@@ -506,7 +506,7 @@ ansi_colorstring(t_colorspec * color, t_colorspec * prev_color)
 	    sprintf(colorstring, "\033[0;39m");  /* normal foreground color */
 	} else {
 	    if (n > 15) n = ((n - 1) % 15) + 1;
-	    sprintf(colorstring, "\033[%i;%im", n > 8 ? 22 : 1, 30 + (n % 8));
+	    sprintf(colorstring, "\033[%i;%im", n >= 8 ? 1 : 22, 30 + (n % 8));
 	}
 	break;
     }
