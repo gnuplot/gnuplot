@@ -1233,6 +1233,17 @@ int_warn(int t_num, const char str[], va_dcl)
     fprintf(stderr, str, a1, a2, a3, a4, a5, a6, a7, a8);
 #endif /* VA_START */
     putc('\n', stderr);
+
+#if defined(_WIN32) || defined(__KLIBC__)
+    /* Check asynchronously for Ctrl-C */
+    if (ctrlc_flag) {
+	ctrlc_flag = FALSE;
+	term_reset();
+	putc('\n', stderr);
+	fprintf(stderr, "Ctrl-C detected!\n");
+	bail_to_command_line();	/* return to prompt */
+    }
+#endif
 }
 
 /*}}} */
