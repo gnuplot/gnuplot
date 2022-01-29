@@ -1250,11 +1250,11 @@ b_boxfill(
     case FS_SOLID:
 	/* use halftone fill pattern according to filldensity */
 	/* filldensity is from 0..100 percent */
-	idx = (int) ((style >> 4) * (fill_halftone_num - 1) / 100 );
-	if( idx < 0 )
+	idx = (int) (((style >> 4) * (fill_halftone_num - 1) + 50) / 100 );
+	if (idx < 0)
 	    idx = 0;
-	if( idx >= fill_halftone_num )
-	    idx = fill_halftone_num-1;
+	if (idx >= fill_halftone_num)
+	    idx = fill_halftone_num - 1;
 	fillbitmap = fill_halftone_bitmaps[idx];
 	pixcolor = b_value;
 	break;
@@ -1264,7 +1264,7 @@ b_boxfill(
     case FS_PATTERN:
 	/* use fill pattern according to fillpattern */
 	idx = (style >> 4);  /* fillpattern is enumerated */
-	if( idx < 0 )
+	if (idx < 0)
 	    idx = 0;
 	idx %= fill_pattern_num;
 	fillbitmap = fill_pattern_bitmaps[idx];
@@ -1317,7 +1317,7 @@ b_filled_polygon(int points, gpiPoint *corners)
     case FS_SOLID:
 	/* use halftone fill pattern according to filldensity */
 	/* filldensity is from 0..100 percent */
-	idx = GPMAX((int) ((style >> 4) * (fill_halftone_num - 1) / 100), 0);
+	idx = GPMAX((int) (((style >> 4) * (fill_halftone_num - 1) + 50) / 100), 0);
 	if (idx >= fill_halftone_num)
 	    idx = fill_halftone_num - 1;
 	fillbitmap = fill_halftone_bitmaps[idx];
