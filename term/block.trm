@@ -1077,7 +1077,7 @@ TERM_TABLE_START(block_driver)
 #else
     TERM_MONOCHROME,
 #endif
-    0, 0, b_boxfill, b_linewidth,
+    0, 0, b_boxfill, NULL,
 #ifdef USE_MOUSE
     NULL, NULL, NULL, NULL, NULL,
 #endif
