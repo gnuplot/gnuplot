@@ -1130,6 +1130,12 @@ compare_z(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)
 	return (1);
     if (p1->z < p2->z)
 	return (-1);
+#ifdef WITH_EXTRA_COORDINATE
+    if (p1->extra > p2->extra)
+	return (1);
+    if (p1->extra < p2->extra)
+	return (-1);
+#endif
     return (0);
 }
 
@@ -1175,6 +1181,12 @@ zsort_points(struct curve_points *plot)
 	for (i = 0; i < plot->p_count; i++)
 	    plot->points[i].CRD_COLOR = plot->varcolor[i];
     }
+
+#ifdef WITH_EXTRA_COORDINATE
+    /* preserve original sequence order within equal z */
+    for (i = 0; i < plot->p_count; i++)
+	plot->points[i].extra = i;
+#endif
 
     first_point = 0;
     while ((num_points = next_curve(plot, &first_point)) > 0) {
