@@ -12,7 +12,7 @@ Surfaces can be plotted as a mesh fitting the specified function, floating
 in the 3-d coordinate space, or as a contour plot on the x-y plane.
 For 2-d plots, there are also many plot styles including lines, points,
 boxes, heat maps, stacked histograms, and contoured projections of 3D data.
-Graphs may be labelled with arbitrary labels and arrows, axis labels,
+Graphs may be labeled with arbitrary labels and arrows, axis labels,
 a title, date and time, and a key.
 
 
@@ -90,16 +90,11 @@ provided you check the corresponding options:
 * Extract this package (or parts thereof) in a directory of your choice, e.g.
   C:\Program Files\gnuplot etc.
 
-* Create shortcut icons to wgnuplot on your desktop and (on Windows XP and
-  Vista) within the Quick-Lauch area. Additionally, a menu is added to the
-  startup menu with links to the programs, help and documentation,
+* Create shortcut icons to wgnuplot on your desktop.  Additionally, a menu is
+  added to the startup menu with links to the programs, help and documentation,
   gnuplot's internet site and the demo scripts.
 
-* The extensions *.gp, *.gpl, *.plt will be associated to be opened with
-  wgnuplot. To change file associations in Windows 7 or later, go to
-  "Control Panel", "Control Panel Home", "Default Programs",
-  "Set Associations". Select a file type in the list and click
-  "Change Program".
+* The extensions *.gp *.gpl *.plt will be associated with application wgnuplot.
 
 * The path to the gnuplot binaries is added to the PATH environment variable.
   That way you can start gnuplot by typing `gnuplot' or `wgnuplot' on a command
@@ -110,6 +105,11 @@ provided you check the corresponding options:
 
 * You may select your default terminal of preference (wxt/windows/qt) and the
   installer will update the GNUTERM environment variable accordingly.
+  Alternatively, you can later add
+    set term windows
+  or
+    set term wxt
+  to your gnuplot.ini, see `help startup`.
 
 * If you install the demo scripts, the directory containing the demos is
   included in the GNUPLOT_LIB search path, see below.
@@ -127,9 +127,9 @@ Fonts
 graphical text window (wgnuplot.exe):
   You can change the font of the terminal window by selecting "Options..." -
   "Choose Font..." via the toolbar or the context (right-click) menu. We
-  strongly encourage you to use a modern Truetype font like e.g. "Consolas"
-  instead of the old "Terminal" font, which was the default until gnuplot
-  version 4.4. Make sure to "Update wgnuplot.ini" to make this change
+  strongly encourage you to use a modern outline font like e.g. "Consolas"
+  instead of the old "Terminal" raster font, which was the default until
+  gnuplot version 4.4. Make sure to "Update wgnuplot.ini" to make this change
   permanent.
 
 console window (gnuplot.exe):
@@ -142,13 +142,13 @@ console window (gnuplot.exe):
 Encodings
 ---------
 
-On Windows, version 5.2 or later support command line input using all encodings
-supported by gnuplot, including UTF-8, see `help encoding`.  By default gnuplot
-will use an encoding which matches the system's ANSI codepage, if supported.
-We recommend to add `set encoding utf8` to your gnuplot.ini file, see below.
-Note that while Unicode input on the command line is limited to the Basic
-Multilingual Plane (BMP), scripts may contain all characters (as in previous
-versions).
+On Windows, gnuplot version 5.2 or later support command line input using all
+encodings supported by gnuplot, including UTF-8, see `help encoding`.
+By default gnuplot will use an encoding which matches the system's ANSI codepage,
+if supported.  We recommend to add `set encoding utf8` to your gnuplot.ini file,
+see below.  Note that while Unicode input on the command line is limited to the
+Basic Multilingual Plane (BMP), scripts may contain all characters (as in
+previous versions).
 
 
 Localisation
@@ -175,13 +175,7 @@ Environmental variables
 -----------------------
 
 For a list of environment variables supported, type `help environment`
-in gnuplot.
-
-To set/change environment variables go to "Control panel", "System",
-("Advanced"), "Environmental variables" on Windows NT/2000/XP/Vista, or Right
-click on the Computer icon on your Desktop and choose Properties option,
-"System", "Advanced system settings", "Advanced", "Environmental variables"
-on Windows 7.
+in gnuplot. Below, we list some important ones:
 
 * If GNUTERM is defined, it is used as the name of the terminal type to be
   used. This overrides any terminal type sensed by gnuplot on start-up, but is
@@ -191,8 +185,8 @@ on Windows 7.
 * Variable GNUPLOT_LIB may be used to define additional search directories for
   data and command files. The variable may contain a single directory name, or
   a list of directories separated by a path separator ';'. The contents of
-  GNUPLOT_LIB are appended to the `loadpath` variable, but not saved with the
-  `save` and `save set` commands. See 'help loadpath' for more details.
+  GNUPLOT_LIB are appended to the `loadpath`, but not saved with the `save`
+  or `save set` commands. See 'help loadpath' for more details.
 
 
 Known bugs
@@ -206,4 +200,4 @@ for an up-to-date bug tracking system.
 
 --------------------------------------------------------------------------------
 
-The gnuplot team, April 2020
+The gnuplot team, January 2022
