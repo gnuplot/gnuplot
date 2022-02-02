@@ -185,6 +185,9 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
 
+/* Define if Bessel functions are available from some library */
+#define HAVE_JN 1
+
 /* Define if you want to use kpsexpand (TeX). */
 /* #undef HAVE_KPSEXPAND */
 
@@ -215,7 +218,7 @@
 /* #undef HAVE_LIBGD */
 /* Don't change it here -- this define is set in config/mingw/Makefile. */
 
-/* Define to 1 if you have the `m' library (-lm). */
+/* Define to 1 if building requires linking to math library libm */
 /* #undef HAVE_LIBM */
 
 /* Define to 1 if you have the `pdf' library (-lpdf). */

@@ -293,7 +293,7 @@ AC_CHECK_FUNCS(atexit memcpy memmove memset \
   getcwd poll pclose popen fdopen select sleep stpcpy \
   strcspn strdup strndup strnlen strcasecmp stricmp strncasecmp strnicmp \
   sysinfo tcgetattr vfprintf doprnt uname usleep \
-  cbrt
+  cbrt jn
 )
 
 dnl HBB 20030624: see if signgam is declared by math.h
