@@ -267,7 +267,7 @@ AC_CHECK_FUNCS(atexit memcpy memmove memset \
   on_exit bcopy bzero \
   setvbuf strerror strchr strrchr strstr \
   index rindex \
-  erf erfc gamma lgamma tgamma \
+  erf erfc gamma lgamma tgamma jn \
   getcwd poll pclose popen fdopen select sleep stpcpy \
   strcspn strdup strndup strnlen strcasecmp stricmp strncasecmp strnicmp \
   sysinfo tcgetattr vfprintf doprnt uname usleep
