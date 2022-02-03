@@ -21,7 +21,7 @@ set samples 200
 plot [-3:5] asin(x),acos(x)
 pause -1 "Hit return to continue"
 
-plot [-30:20] besj0(x)*0.12e1 with impulses, (x**besj0(x))-2.5 with points
+plot [-30:20] besj0(x)*0.12e1 with impulses, [0:*] (x**besj0(x))-2.5 with points
 pause -1 "Hit return to continue"
 
 set samples 400

@@ -275,6 +275,7 @@ load "expint.dem"
 reset
 
 print "********************** special functions *************************"
+load "BesselJ.dem"
 load "elliptic.dem"
 load "lnGamma.dem"
 load "igamma.dem"

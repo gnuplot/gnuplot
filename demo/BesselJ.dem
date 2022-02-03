@@ -1,0 +1,17 @@
+# Exercise Bessel function jn( nu, x )
+#
+set border 2 front
+set style data lines
+set xzeroaxis
+set xtics axis mirror
+set ytics border nomirror rangelimited
+set xrange [ 0. : 20. ] 
+
+set tmargin 4
+set key title "Bessel functions of the first kind\n"
+set key columns 3
+
+plot for [i=0:8] besjn(i,x) lw 2 title sprintf("J_%d(x)",i)
+
+pause -1 "<cr> to continue"
+reset
