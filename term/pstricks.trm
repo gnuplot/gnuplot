@@ -977,8 +977,10 @@ PSTRICKS_make_palette(t_sm_palette *palette)
 	    }
 	}
     }
+#ifdef PSTRICKS_SHORTER_FILE
     /* use the following macro to shorten the file size */
     fputs("\\def\\polypmIIId#1{\\pspolygon[linestyle=none,fillstyle=solid,fillcolor=PST@COLOR#1]}\n\n", gpoutfile);
+#endif
     return 0;
 }
 
