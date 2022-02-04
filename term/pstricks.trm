@@ -77,6 +77,7 @@
  * point size and line width, point symbols in line with other terminals,
  * boxed text, more arrow features, standalone (LaTeX) mode (including
  * text encoding support), transparency.  (BM, March/April 2018)
+ * compatibility with plain TeX. (BM, Feb 2022)
  *
  */
 
@@ -863,7 +864,7 @@ PSTRICKS_put_text(unsigned int x, unsigned int y, const char str[])
 	if (!PST_colortext || (strcmp(PSTRICKS_linecolor, "black") == 0))
 	    fprintf(gpoutfile, "{%s}\n", str);
 	else
-	    fprintf(gpoutfile, "{\\color{%s} %s}\n", PSTRICKS_linecolor, str);
+	    fprintf(gpoutfile, "{\\%s %s}\n", PSTRICKS_linecolor, str);
     }
 }
 
@@ -902,7 +903,7 @@ PSTRICKS_reset()
 TERM_PUBLIC void
 PSTRICKS_linewidth(double linewidth)
 {
-	linewidth *= PSTRICKS_lw_scale;
+    linewidth *= PSTRICKS_lw_scale;
     if (linewidth * 0.0015 != PSTRICKS_lw) {
 	PSTRICKS_endline();
 	PSTRICKS_lw = linewidth * 0.0015;
@@ -1293,7 +1294,7 @@ START_HELP(pstricks)
 "?term pstricks",
 "?pstricks",
 " The `pstricks` driver is intended for use with the \"pstricks.sty\" macro",
-" package for LaTeX.  It is an alternative to the `eepic` and `latex` drivers.",
+" package for TeX or LaTeX.",
 " You need \"pstricks.sty\", and, of course, a printer that understands",
 " PostScript, or a converter such as Ghostscript.",
 "",
