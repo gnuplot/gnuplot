@@ -77,7 +77,7 @@
  * point size and line width, point symbols in line with other terminals,
  * boxed text, more arrow features, standalone (LaTeX) mode (including
  * text encoding support), transparency.  (BM, March/April 2018)
- * compatibility with plain TeX. (BM, Feb 2022)
+ * compatibility with plain TeX, and pdflatex/lualatex. (BM, Feb 2022)
  *
  */
 
@@ -136,6 +136,7 @@ static void PSTRICKS_apply_linecolor(void);
 
 /* mode */
 static TBOOLEAN PST_standalone = FALSE;
+static TBOOLEAN PST_pdftricks2 = FALSE;
 
 /* plot size */
 static TBOOLEAN PST_unit_plot = FALSE;	/* Unit-sized plot off */
@@ -256,6 +257,7 @@ static const char * PSTRICKS_patterns[] = {
 };
 #define PSTRICKS_NUMPATTERN (sizeof(PSTRICKS_patterns) / sizeof(char *))
 
+
 /*  BOXED TEXT */
 static TBOOLEAN PSTRICKS_in_textbox = FALSE;
 static TBOOLEAN PSTRICKS_textbox_fill;
@@ -275,6 +277,7 @@ enum PSTRICKS_id { PSTRICKS_DEFAULTOPTIONS,
 	PSTRICKS_SIZE,
 	PSTRICKS_UNIT, PSTRICKS_NOUNIT,
 	PSTRICKS_STANDALONE, PSTRICKS_INPUT,
+	PSTRICKS_PSTRICKS, PSTRICKS_PDFTRICKS2,
 	PSTRICKS_BLACKTEXT, PSTRICKS_COLORTEXT,
 	PSTRICKS_ROUNDED, PSTRICKS_BUTT,
 	PSTRICKS_LINEWIDTH, PSTRICKS_POINTSCALE,
@@ -302,6 +305,8 @@ static struct gen_table PSTRICKS_opts[] =
     { "ps", PSTRICKS_POINTSCALE },
     { "psarrows", PSTRICKS_PSARROWS },
     { "gparrows", PSTRICKS_GPARROWS },
+    { "pst$ricks", PSTRICKS_PSTRICKS },
+    { "pdf$tricks2", PSTRICKS_PDFTRICKS2 },
     { NULL, PSTRICKS_OTHER }
 };
 
@@ -316,6 +321,7 @@ PSTRICKS_options()
 	case PSTRICKS_DEFAULTOPTIONS:
 	    PST_unit_plot = FALSE;
 	    PST_standalone = FALSE;
+	    PST_pdftricks2 = FALSE;
 	    PSTRICKS_size_x = 5.;
 	    PSTRICKS_size_y = 3.;
 	    break;
@@ -407,6 +413,14 @@ PSTRICKS_options()
 	    c_token++;
 	    PST_psarrows = TRUE;
 	    break;
+	case PSTRICKS_PSTRICKS:
+	    c_token++;
+	    PST_pdftricks2 = FALSE;
+	    break;
+	case PSTRICKS_PDFTRICKS2:
+	    c_token++;
+	    PST_pdftricks2 = TRUE;
+	    break;
 	default:
 	    int_error(c_token, "Unknown terminal option");
 	}
@@ -421,8 +435,8 @@ PSTRICKS_options()
 
     // update terminal option string
     snprintf(term_options, MAX_LINE_LEN + 1,
-	"%s %s linewidth %.1f pointscale %.1f %s "
-	"background \"#%02x%02x%02x\" %sarrows %s",
+	"%s %s linewidth %.1f pointscale %.1f %s " \
+	"background \"#%02x%02x%02x\" %sarrows %s %s",
 	PST_unit_plot ? "unit" : size_str,
 	PST_rounded ? "rounded" : "butt",
 	PSTRICKS_lw_scale, PSTRICKS_ps,
@@ -431,7 +445,8 @@ PSTRICKS_options()
 	(int) floor(PSTRICKS_background.g * 255 + 0.5),
 	(int) floor(PSTRICKS_background.b * 255 + 0.5),
 	PST_psarrows ? "ps" : "gp",
-	PST_standalone ? "standalone" : "input");
+	PST_standalone ? "standalone" : "input",
+	PST_pdftricks2 ? "pdftricks2" : "pstricks");
 }
 
 
@@ -445,9 +460,12 @@ PSTRICKS_init()
 
 	/* multiple standalone graphs */
 	fputs("\\documentclass[a4paper]{article}\n"
-	      "\\usepackage[T1]{fontenc}\n"
-	      "\\usepackage{pstricks}\n",
+	      "\\usepackage[T1]{fontenc}\n",
 	      gpoutfile);
+	if (PST_pdftricks2)
+	    fputs("\\usepackage{pdftricks2}\n", gpoutfile);
+	else
+	    fputs("\\usepackage{pstricks}\n", gpoutfile);
 
 	if (inputenc != NULL) {
 	    if (encoding == S_ENC_UTF8)
@@ -475,6 +493,9 @@ PSTRICKS_graphics()
     if (PST_standalone) {
 	fputs("\\begin{figure}\n", gpoutfile);
     }
+
+    if (PST_pdftricks2)
+	fputs("\\begin{configpsblock}\n", gpoutfile);
 
     fputs("\
 % Define new PST objects, if not already defined\n\
@@ -517,6 +538,9 @@ PSTRICKS_graphics()
 \\catcode`@=12\n\n\
 \\fi\n", gpoutfile);
 
+    if (PST_pdftricks2)
+	fputs("\\end{configpsblock}\n", gpoutfile);
+
     /* background color */
     PSTRICKS_have_bg = FALSE;
     if (PSTRICKS_background.r != 1. || PSTRICKS_background.g != 1. || PSTRICKS_background.b != 1.) {
@@ -530,13 +554,18 @@ PSTRICKS_graphics()
     if (!PST_unit_plot) {
 	// Choose 5in as unit for historical reasons only.
 	fputs("\\psset{unit=5.0in}\n", gpoutfile);
-	fprintf(gpoutfile, "\
-\\pspicture%s(%f,%f)(%f,%f)\n\
-\\ifx\\nofigs\\undefined\n\
-\\catcode`@=11\n\n",
+	fprintf(gpoutfile,
+	    PST_pdftricks2 ?
+		"\\begin{pspicture*}%s(%f,%f)(%f,%f)\n" :
+		"\\pspicture%s(%f,%f)(%f,%f)\n",
 	    background,
 	    0., 0.,
 	    PSTRICKS_size_x / 5., PSTRICKS_size_y / 5.
+	);
+	fputs("\
+\\ifx\\nofigs\\undefined\n\
+\\catcode`@=11\n\n",
+	    gpoutfile
 	);
     } else {
 	fprintf(gpoutfile, "\
@@ -567,8 +596,10 @@ PSTRICKS_text()
     PSTRICKS_endline();
     fputs("\
 \\catcode`@=12\n\
-\\fi\n\
-\\endpspicture\n", gpoutfile);
+\\fi\n", gpoutfile);
+    fputs(PST_pdftricks2 ?
+	"\\end{pspicture*}\n" : "\\endpspicture\n",
+	gpoutfile);
 
     if (PST_standalone) {
 	fputs("\\end{figure}\n", gpoutfile);
@@ -1314,6 +1345,7 @@ START_HELP(pstricks)
 "                      {pointscale <ps>}",
 "                      {psarrows | gparrows}",
 "                      {background <rgbcolor>}",
+"                      {pstricks | pdftricks2}",
 "",
 " The `unit` option produces a plot with internal dimensions 1x1. The default",
 " is a plot of `size 5in,3in`.",
@@ -1334,6 +1366,11 @@ START_HELP(pstricks)
 " `psarrows` draws `arrow`s using PSTricks commands which are shorter but do",
 " not offer all options. `gparrows` selects drawing arrows using gnuplot's own",
 " routine for full functionality instead.",
+"",
+" With the option `pdftricks2` you can create output for the `pdftricks2`",
+" macro package, which can be used with pdflatex/lualatex. Otherwise, output",
+" for the `pstricks` package with traditional tex/latex or xelatex is",
+" produced.",
 "",
 " The old `hacktext` option has been replaced by the new default format (%h),",
 " see `format specifiers`.",
