@@ -1307,9 +1307,6 @@ get_data(struct curve_points *current_plot)
     /* We are finished reading user input; return to C locale for internal use */
     reset_numeric_locale();
 
-    /* Deferred evaluation of plot title now that we know column headers */
-    reevaluate_plot_title(current_plot);
-
     return ngood;                   /* 0 indicates an 'empty' file */
 }
 
@@ -3165,6 +3162,11 @@ eval_plots()
 		    process_image(this_plot, IMG_UPDATE_AXES);
 		}
 
+		/* Feb 2022: Deferred evaluation of plot title
+		 * now that we know column headers (loaded in get_data)
+		 * and potentially stats from filters, smoothing and image processing.
+		 */
+		reevaluate_plot_title(this_plot);
 	    }
 
 	    SKIPPED_EMPTY_FILE:
