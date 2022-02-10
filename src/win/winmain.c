@@ -122,6 +122,7 @@ void WinExit(void);
 static void WinCloseHelp(void);
 int CALLBACK ShutDown(void);
 #ifdef WGP_CONSOLE
+static char * ConsoleGetS(char * str, unsigned int size);
 static int ConsolePutS(const char *str);
 static int ConsolePutCh(int ch);
 #endif
@@ -817,23 +818,7 @@ MyFGetS(char *str, unsigned int size, FILE *file)
 	    return str;
 	return NULL;
 #else
-	unsigned int i;
-	int c;
-
-	c = ConsoleGetch();
-	if (c == EOF)
-	    return NULL;
-
-	for (i = 1; i < size - 1; i++) {
-	    c = ConsoleGetch();
-	    if (str[i] == EOF)
-		break;
-	     str[i] = c;
-	    if (str[i] == '\n')
-		break;
-	}
-	str[i] = NUL;
-	return str;
+	return ConsoleGetS(str, size);
 #endif
     }
     return fgets(str,size,file);
@@ -1240,6 +1225,41 @@ ConsoleReadCh(void)
 }
 
 #ifdef WGP_CONSOLE
+
+static char *
+ConsoleGetS(char * str, unsigned int size)
+{
+    char * next = str;
+
+    while (--size > 0) {
+	switch (*next = ConsoleGetch()) {
+	case EOF:
+	    *next = 0;
+	    if (next == str)
+		return NULL;
+	    return str;
+	case '\r':
+	    *next = '\n';
+	    /* intentionally fall through */
+	case '\n':
+	    ConsolePutCh(*next);
+	    *(next + 1) = 0;
+	    return str;
+	case 0x08:
+	case 0x7f:
+	    ConsolePutCh(*next);
+	    if (next > str)
+		--next;
+	    break;
+	default:
+	    ConsolePutCh(*next);
+	    ++next;
+	}
+    }
+    *next = 0;
+    return str;
+}
+
 
 static int
 ConsolePutS(const char *str)
