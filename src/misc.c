@@ -475,7 +475,14 @@ lf_push(FILE *fp, char *name, char *cmdline)
 	lf->argv[0].v.int_val = 0;
 	lf->argv[0].type = NOTDEFINED;
 	if ((udv = get_udv_by_name("ARGV")) && udv->udv_value.type == ARRAY) {
+	    /* When called from the command line (-c option) call_argc correctly
+	     * enumerates the entities on the command line, but they were not
+	     * previously saved in ARGV.
+	     */
+	    int saved_args = udv->udv_value.v.value_array[0].v.int_val;
 	    for (argindex = 0; argindex <= call_argc; argindex++) {
+		if (argindex > saved_args)
+		    break;
 		lf->argv[argindex] = udv->udv_value.v.value_array[argindex];
 		if (lf->argv[argindex].type == STRING)
 		    lf->argv[argindex].v.string_val =
