@@ -463,7 +463,7 @@ static void
 accept_multiplicative_expression()
 {
     parse_unary_expression();			/* - things */
-    parse_multiplicative_expression();			/* * / % */
+    parse_multiplicative_expression();		/* * / % */
 }
 
 static int
@@ -484,12 +484,13 @@ parse_assignment_expression()
 	parse_expression();
 
 	/* push the actual assignment operation */
-	(void) add_action(ASSIGN);
+	foo = add_action(ASSIGN);
+	foo->v_arg.type = 0;	/* could be anything but ARRAY */
 	return 1;
     }
 
     /* Check for assignment to an array element Array[<expr>] = <expr> */
-    if (isletter(c_token) && (type_udv(c_token) == ARRAY)) {
+    if (isletter(c_token) && equals(c_token+1,"[")) {
 	if (parse_array_assignment_expression())
 	    return 1;
     }
@@ -564,7 +565,8 @@ parse_array_assignment_expression()
 	parse_expression();
 
 	/* push the actual assignment operation */
-	(void) add_action(ASSIGN);
+	foo = add_action(ASSIGN);
+	foo->v_arg.type = ARRAY;	/* actually means "array element" */
 	return 1;
     }
 

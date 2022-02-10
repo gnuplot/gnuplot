@@ -2107,11 +2107,17 @@ f_assign(union argument *arg)
 	int_error(NO_CARET, "attempt to assign to something other than a named variable");
     if (!strncmp(a.v.string_val,"GPVAL_",6) || !strncmp(a.v.string_val,"MOUSE_",6))
 	int_error(NO_CARET, "attempt to assign to a read-only variable");
-    if (b.type == ARRAY)
-	int_error(NO_CARET, "unsupported array operation");
 
     udv = add_udv_by_name(a.v.string_val);
     gpfree_string(&a);
+
+    if (b.type == ARRAY) {
+	if (arg->v_arg.type == ARRAY)	/* Actually flags assignment to an array element */
+	    int_error(NO_CARET, "cannot nest arrays");
+	free_value(&(udv->udv_value));
+	udv->udv_value = b;
+	make_array_permanent(&b);
+    } else
 
     if (udv->udv_value.type == ARRAY) {
 	int i;
