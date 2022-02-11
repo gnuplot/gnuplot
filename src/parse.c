@@ -471,10 +471,22 @@ parse_assignment_expression()
 {
     /* Check for assignment operator Var = <expr> */
     if (isletter(c_token) && equals(c_token + 1, "=")) {
-
-	/* push the variable name */
-	union argument *foo = add_action(PUSHC);
+	union argument *foo;
 	char *varname = NULL;
+
+	/* We're going to push the name of the variable receiving a new value,
+	 * but if it's a dummy variable in a function definition that can't work.
+	 */
+	if (dummy_func) {
+	    int i;
+	    for (i = 0; i < MAX_NUM_VAR; i++) {
+		if (equals(c_token, c_dummy_var[i]))
+		    int_error(c_token, "Cannot assign to a dummy variable");
+	    }
+	}
+
+	/* Push the name of the variable */
+	foo = add_action(PUSHC);
 	m_capture(&varname,c_token,c_token);
 	foo->v_arg.type = STRING;
 	foo->v_arg.v.string_val = varname;
@@ -500,7 +512,7 @@ parse_assignment_expression()
 
 /*
  * If an array assignment is the first thing on a command line it is handled by
- * the separate routine array_assignment().
+ * the separate routine is_array_assignment().
  * Here we catch assignments that are embedded in an expression.
  * Examples:
  *	print A[2] = foo
@@ -514,6 +526,7 @@ parse_array_assignment_expression()
 	char *varname = NULL;
 	union argument *foo;
 	int save_action, save_token;
+	TBOOLEAN standard_at;
 	int i;
 
 	/* Quick checks for the most common false positives */
@@ -541,17 +554,40 @@ parse_array_assignment_expression()
 	c_token += 2;
 	parse_expression();
 
-	/* push the array name */
-	foo = add_action(PUSHC);
-	foo->v_arg.type = STRING;
-	foo->v_arg.v.string_val = varname;
-
-	/* If this wasn't really an array element assignment, back out.
-	 * NB: foo is on the action list, so varname will be freed in this loop.
+	/* Now it gets tricky.  If the name we just saw is a dummy parameter
+	 * rather than a true variable name we can't use the standard action table
+	 * 	PUSH index; PUSH "name"; PUSH <value>; ASSIGN
+	 * we must either treat this as an error or invent a new sequence
+	 *	PUSH index; PUSHDn; PUSH <value>; ASSIGN
+	 * with corresponding code in f_assign() that recognizes it must replace
+	 * the entry via a pointer to it in the array stored in dummy_var[].
 	 */
+	standard_at = TRUE;
+	if (dummy_func) {
+	    for (i = 0; i < MAX_NUM_VAR; i++) {
+		if (equals(save_token, c_dummy_var[i])) {
+		    foo = add_action(PUSHC);
+		    foo->v_arg.type = INTGR;
+		    foo->v_arg.v.int_val = i;
+		    add_action(PUSHD)->udf_arg = dummy_func;
+		    standard_at = FALSE;
+		    break;
+		}
+	    }
+	}
+
+	if (standard_at) {
+	    /* push the array name */
+	    foo = add_action(PUSHC);
+	    foo->v_arg.type = STRING;
+	    foo->v_arg.v.string_val = varname;
+	} else {
+	    free(varname);
+	}
+
+	/* If this wasn't really an array element assignment, back out. */
 	if (!equals(c_token, "]") || !equals(c_token+1, "=")) {
-	    int i;
-	    for (i=save_action+1; i<at->a_count; i++) {
+	    for (i = save_action; i < at->a_count; i++) {
 		struct at_entry *a = &(at->actions[i]);
 		free_action_entry(a);
 	    }
@@ -566,7 +602,14 @@ parse_array_assignment_expression()
 
 	/* push the actual assignment operation */
 	foo = add_action(ASSIGN);
-	foo->v_arg.type = ARRAY;	/* actually means "array element" */
+
+	/* This is a flag to indicate to f_assign that the assignment is
+	 * to an element of an array, rather than to a named array variable.
+	 * The ASSIGN action->v_arg is not itself an array so make sure
+	 * no one will ever try to dereference it.
+	 */
+	foo->v_arg.type = ARRAY;
+	foo->v_arg.v.value_array = NULL;
 	return 1;
     }
 
@@ -597,7 +640,6 @@ parse_primary_expression()
 	c_token++;
     } else if (equals(c_token, "$")) {
 	struct value a;
-
 	c_token++;
 	if (!isanumber(c_token)) {
 	    if (equals(c_token+1, "[")) {

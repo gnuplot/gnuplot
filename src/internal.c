@@ -2099,27 +2099,34 @@ f_assign(union argument *arg)
 {
     struct udvt_entry *udv;
     struct value a, b, index;
+    struct value *dest;
     (void) arg;
     (void) pop(&b);	/* new value */
-    (void) pop(&a);	/* name of variable */
+    dest = pop(&a);	/* name of variable or pointer to array content */
 
-    if (a.type != STRING)
-	int_error(NO_CARET, "attempt to assign to something other than a named variable");
-    if (!strncmp(a.v.string_val,"GPVAL_",6) || !strncmp(a.v.string_val,"MOUSE_",6))
-	int_error(NO_CARET, "attempt to assign to a read-only variable");
+    if (dest->type == ARRAY) {
+	/* FIXME:  This is supposed to work but it is new relatively untested code */
+	// int_warn(NO_CARET, "unsupported array assignment");
 
-    udv = add_udv_by_name(a.v.string_val);
-    gpfree_string(&a);
+    } else {
+	if (dest->type != STRING)
+	    int_error(NO_CARET, "attempt to assign to something other than a named variable");
+	if (!strncmp(dest->v.string_val,"GPVAL_",6) || !strncmp(dest->v.string_val,"MOUSE_",6))
+	    int_error(NO_CARET, "attempt to assign to a read-only variable");
+
+	udv = add_udv_by_name(a.v.string_val);
+	gpfree_string(&a);
+	dest = &(udv->udv_value);
+    }
 
     if (b.type == ARRAY) {
 	if (arg->v_arg.type == ARRAY)	/* Actually flags assignment to an array element */
 	    int_error(NO_CARET, "cannot nest arrays");
-	free_value(&(udv->udv_value));
-	udv->udv_value = b;
-	make_array_permanent(&b);
-    } else
+	free_value(dest);
+	*dest = b;
+	make_array_permanent(dest);
 
-    if (udv->udv_value.type == ARRAY) {
+    } else if (dest->type == ARRAY) {
 	int i;
 	pop(&index);
 	if (index.type == INTGR)
@@ -2128,13 +2135,14 @@ f_assign(union argument *arg)
 	    i = floor(index.v.cmplx_val.real);
 	else
 	    int_error(NO_CARET, "non-numeric array index");
-	if (i <= 0 || i > udv->udv_value.v.value_array[0].v.int_val)
+	if (i <= 0 || i > dest->v.value_array[0].v.int_val)
 	    int_error(NO_CARET, "array index out of range");
-	gpfree_string(&udv->udv_value.v.value_array[i]);
-	udv->udv_value.v.value_array[i] = b;
+	gpfree_string(&dest->v.value_array[i]);
+	dest->v.value_array[i] = b;
+
     } else {
-	gpfree_string(&(udv->udv_value));
-	udv->udv_value = b;
+	gpfree_string(dest);
+	*dest = b;
     }
 
     push(&b);
