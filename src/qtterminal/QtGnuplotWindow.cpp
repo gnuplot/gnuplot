@@ -308,6 +308,21 @@ void QtGnuplotWindow::processEvent(QtGnuplotEventType type, QDataStream& in)
 		in >> m_ctrl;
 		m_widget->setCtrlQ(m_ctrl);
 	}
+	else if (type == GESetRounded)
+	{
+		in >> m_rounded;
+		m_widget->setRounded(m_rounded);
+	}
+	else if (type == GESetAntiAlias)
+	{
+		in >> m_antialias;
+		m_widget->setAntialias(m_antialias);
+	}
+	else if (type == GESetReplotOnResize)
+	{
+		in >> m_replotOnResize;
+		m_widget->setReplotOnResize(m_replotOnResize);
+	}
 	else if (type == GESetPosition)
 	{
 		QPoint pos;

@@ -91,6 +91,9 @@ private:
 
 private:
 	bool m_ctrl;
+	bool m_rounded;
+	bool m_antialias;
+	bool m_replotOnResize;
 	int m_id;
 	bool m_statusBarActive;
 	QStatusBar* m_statusBar;

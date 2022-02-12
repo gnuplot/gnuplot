@@ -177,6 +177,9 @@ void QtGnuplotEventReceiver::swallowEvent(QtGnuplotEventType type, QDataStream& 
 	else if (type == GEStatusText)       in >> string;   // 1005
 	else if (type == GETitle)            in >> string;   // 1006
 	else if (type == GESetCtrl)          in >> b;        // 1007
+	else if (type == GESetRounded)       in >> b;
+	else if (type == GESetAntiAlias)     in >> b;
+	else if (type == GESetReplotOnResize) in >> b;
 	else if (type == GECursor)           in >> i;        // 1009
 	else if (type == GEZoomStart)        in >> string;   // 1022
 	else if (type == GEZoomStop)         in >> string;   // 1023
