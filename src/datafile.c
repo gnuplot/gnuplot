@@ -5861,7 +5861,7 @@ axcol_for_ticlabel(enum COLUMN_TYPE type, int *axis)
 void
 populate_sparse_matrix(struct coordinate **points, int *p_count)
 {
-    static const struct coordinate empty = {0, 0, 0, NAN, NAN, NAN, NAN, UNDEFINED};
+    const struct coordinate empty = {0, 0, 0, NAN, NAN, NAN, NAN, UNDEFINED};
     struct coordinate *matrix;
     int i,j,m;
     int msize = df_ypixels * df_xpixels;
