@@ -294,7 +294,7 @@ main(int argc_orig, char **argv)
 		*s = NUL;
 	}
     }
-#endif /* DJGPP */
+#endif /* MSDOS || OS2 */
 
 #if (defined(PIPE_IPC) || defined(_WIN32)) && (defined(HAVE_LIBREADLINE) || (defined(HAVE_LIBEDITLINE) && defined(X11)))
     /* Editline needs this to be set before the very first call to readline(). */
