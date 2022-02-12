@@ -398,16 +398,14 @@ ms_snprintf(char *str, size_t size, const char * format, ...)
 
 
 /* Implement portable generation of a NaN value. */
-/* NB: Supposedly DJGPP V2.04 can use atof("NaN"), but... */
 
 double
 not_a_number(void)
 {
-#if defined (_MSC_VER) || defined (DJGPP) || defined(__DJGPP__) || defined(__MINGW32__)
-	unsigned long lnan[2]={0xffffffff, 0x7fffffff};
-    return *( double* )lnan;
+#ifdef NAN
+    return NAN; /* C99 define */
 #else
-	return atof("NaN");
+    return atof("NaN");
 #endif
 }
 
@@ -415,9 +413,9 @@ not_a_number(void)
 #ifdef NEED_CEXP
 double _Complex cexp(double _Complex z)
 {
-	double x = creal(z);
-	double y = cimag(z);
-	return exp(x) * (cos(y) + I*sin(y));
+    double x = creal(z);
+    double y = cimag(z);
+    return exp(x) * (cos(y) + I*sin(y));
 }
 #endif
 
