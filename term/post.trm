@@ -4258,8 +4258,17 @@ PS_dump_prologue_file(char *name)
     FILE *prologue_fd = PS_open_prologue_file(name);
 
     if (prologue_fd) {
-	while (fgets(buf, sizeof(buf), prologue_fd))
+	while (fgets(buf, sizeof(buf), prologue_fd)) {
+#if defined(_WIN32) || defined(OS2) || defined(MSDOS)
+	    /* The prologue file actually may use CRLF as line terminators,
+	       but the PostScript output is binary and requires CR only.
+	       So we remove any extra line terminator. */
+	    char * last = buf + strlen(buf) - 1;
+	    if (*last == '\n')
+		*last = NUL;
+#endif
 	    fputs(buf, gppsfile);
+	}
 	fclose(prologue_fd);
     }
 }
