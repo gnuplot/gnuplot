@@ -1441,14 +1441,14 @@ Ffigure_E0
 ^<tr>    <td>abs(x)</td>    <td>int or real</td>    <td>|<i>x</i>|, absolute value of <i>x</i>; same type</td></tr>
 ^<tr>    <td>abs(x)</td>    <td>complex</td>    <td>length of <i>x</i>, &radic;( Re(<i>x</i>)<sup>2</sup> + Im(<i>x</i>)<sup>2</sup> )</td></tr>
 ^<tr>    <td>acos(x)</td>    <td>any</td>    <td>cos<sup>-1</sup> <i>x</i> (inverse cosine)</td></tr>
-^<tr>    <td>acosh(x)</td>    <td>any</td>    <td>cosh<sup>-1</sup> <i>x</i> (inverse hyperbolic cosine) in radians</td></tr>
+^<tr>    <td>acosh(x)</td>    <td>any</td>    <td>cosh<sup>-1</sup> <i>x</i> (inverse hyperbolic cosine) </td></tr>
 ^<tr>    <td>airy(x)</td>    <td>real</td>    <td>Airy function Ai(<i>x</i>) for real x</td></tr>
 ^<tr>    <td>arg(x)</td>    <td>complex</td>    <td>the phase of <i>x</i></td></tr>
 ^<tr>    <td>asin(x)</td>    <td>any</td>    <td>sin<sup>-1</sup> <i>x</i> (inverse sin)</td></tr>
-^<tr>    <td>asinh(x)</td>    <td>any</td>    <td>sinh<sup>-1</sup> <i>x</i> (inverse hyperbolic sin) in radians</td></tr>
+^<tr>    <td>asinh(x)</td>    <td>any</td>    <td>sinh<sup>-1</sup> <i>x</i> (inverse hyperbolic sin) </td></tr>
 ^<tr>    <td>atan(x)</td>    <td>any</td>    <td>tan<sup>-1</sup> <i>x</i> (inverse tangent)</td></tr>
 ^<tr>    <td>atan2(y,x)</td>    <td>int or real</td>    <td>tan<sup>-1</sup>(<i>y/x</i>) (inverse tangent)</td></tr>
-^<tr>    <td>atanh(x)</td>    <td>any</td>    <td>tanh<sup>-1</sup> <i>x</i> (inverse hyperbolic tangent) in radians</td></tr>
+^<tr>    <td>atanh(x)</td>    <td>any</td>    <td>tanh<sup>-1</sup> <i>x</i> (inverse hyperbolic tangent) </td></tr>
 ^<tr>    <td>besj0(x)</td>    <td>real</td>    <td><i>J</i><sub>0</sub> Bessel function of <i>x</i> in radians</td></tr>
 ^<tr>    <td>besj1(x)</td>    <td>real</td>    <td><i>J</i><sub>1</sub> Bessel function of <i>x</i> in radians</td></tr>
 ^<tr>    <td>besjn(n,x)</td>    <td>int,real</td>    <td><i>J</i><sub>n</sub> Bessel function of <i>x</i> in radians</td></tr>
@@ -1649,10 +1649,10 @@ C marker below is used to signal this to doc2html:
 4 acosh
 ?expressions functions acosh
 ?acosh
-#acosh(x) &  ~~   & \gpCX & $\cosh^{-1} x$ (inverse hyperbolic cosine) in radians \\
-%acosh(x)@ ~~ @$cosh sup -1 x$ (inverse hyperbolic cosine) in radians
+#acosh(x) &  ~~   & \gpCX & $\cosh^{-1} x$ (inverse hyperbolic cosine) \\
+%acosh(x)@ ~~ @$cosh sup -1 x$ (inverse hyperbolic cosine)
  The `acosh(x)` function returns the inverse hyperbolic cosine of its argument
- in radians.
+ in radians or degrees, as selected by `set angles`.
 4 airy
 ?expressions functions airy
 ?airy
@@ -1680,10 +1680,10 @@ C marker below is used to signal this to doc2html:
 4 asinh
 ?expressions functions asinh
 ?asinh
-#asinh(x) &  ~~   & \gpCX & $\sinh^{-1} x$ (inverse hyperbolic sin) in radians \\
-%asinh(x)@ ~~ @$sinh sup -1 x$ (inverse hyperbolic sin) in radians
+#asinh(x) &  ~~   & \gpCX & $\sinh^{-1} x$ (inverse hyperbolic sin) \\
+%asinh(x)@ ~~ @$sinh sup -1 x$ (inverse hyperbolic sin) 
  The `asinh(x)` function returns the inverse hyperbolic sin of its argument in
- radians.
+ radians or degrees, as selected by `set angles`.
 4 atan
 ?expressions functions atan
 ?atan
@@ -1703,10 +1703,10 @@ C marker below is used to signal this to doc2html:
 4 atanh
 ?expressions functions atanh
 ?atanh
-#atanh(x) &  ~~   & \gpCX & $\tanh^{-1} x$ (inverse hyperbolic tangent) in radians \\
-%atanh(x)@ ~~ @$tanh sup -1 x$ (inverse hyperbolic tangent) in radians
+#atanh(x) &  ~~   & \gpCX & $\tanh^{-1} x$ (inverse hyperbolic tangent) \\
+%atanh(x)@ ~~ @$tanh sup -1 x$ (inverse hyperbolic tangent) 
  The `atanh(x)` function returns the inverse hyperbolic tangent of its
- argument in radians.
+ argument in radians or degrees, as selected by `set angles`.
 4 besj0
 ?expressions functions besj0
 ?besj0
