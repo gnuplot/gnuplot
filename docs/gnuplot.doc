@@ -1256,14 +1256,14 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>abs(x)</td>    <td>any</td>    <td>|<i>x</i>|, absolute value of <i>x</i>; same type</td></tr>
 ^<tr>    <td>abs(x)</td>    <td>complex</td>    <td>length of <i>x</i>, &radic;( Re(<i>x</i>)<sup>2</sup> + Im(<i>x</i>)<sup>2</sup> )</td></tr>
 ^<tr>    <td>acos(x)</td>    <td>any</td>    <td>cos<sup>-1</sup> <i>x</i> (inverse cosine)</td></tr>
-^<tr>    <td>acosh(x)</td>    <td>any</td>    <td>cosh<sup>-1</sup> <i>x</i> (inverse hyperbolic cosine) in radians</td></tr>
+^<tr>    <td>acosh(x)</td>    <td>any</td>    <td>cosh<sup>-1</sup> <i>x</i> (inverse hyperbolic cosine) </td></tr>
 ^<tr>    <td>airy(x)</td>    <td>any</td>    <td>Airy function Ai(<i>x</i>)</td></tr>
 ^<tr>    <td>arg(x)</td>    <td>complex</td>    <td>the phase of <i>x</i></td></tr>
 ^<tr>    <td>asin(x)</td>    <td>any</td>    <td>sin<sup>-1</sup> <i>x</i> (inverse sin)</td></tr>
-^<tr>    <td>asinh(x)</td>    <td>any</td>    <td>sinh<sup>-1</sup> <i>x</i> (inverse hyperbolic sin) in radians</td></tr>
+^<tr>    <td>asinh(x)</td>    <td>any</td>    <td>sinh<sup>-1</sup> <i>x</i> (inverse hyperbolic sin) </td></tr>
 ^<tr>    <td>atan(x)</td>    <td>any</td>    <td>tan<sup>-1</sup> <i>x</i> (inverse tangent)</td></tr>
 ^<tr>    <td>atan2(y,x)</td>    <td>int or real</td>    <td>tan<sup>-1</sup>(<i>y/x</i>) (inverse tangent)</td></tr>
-^<tr>    <td>atanh(x)</td>    <td>any</td>    <td>tanh<sup>-1</sup> <i>x</i> (inverse hyperbolic tangent) in radians</td></tr>
+^<tr>    <td>atanh(x)</td>    <td>any</td>    <td>tanh<sup>-1</sup> <i>x</i> (inverse hyperbolic tangent) </td></tr>
 ^<tr>    <td>EllipticK(k)</td>    <td>real k in (-1:1)</td>    <td><i>K(k)</i> complete elliptic integral of the first kind</td></tr>
 ^<tr>    <td>EllipticE(k)</td>    <td>real k in [-1:1]</td>    <td><i>E(k)</i> complete elliptic integral of the second kind</td></tr>
 ^<tr>    <td>EllipticPi(n,k)</td>    <td> real n&lt;1, real k in (-1:1)</td>    <td> &Pi;(<i>n,k</i>) complete elliptic integral of the third kind</td></tr>
@@ -1278,7 +1278,7 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>besin(n,x)</td>   <td>int,real</td><td>Modified Bessel function of order n, <i>x</i> in radians</td></tr>
 ^<tr>    <td>ceil(x)</td>    <td>any</td>    <td>&lceil;<i>x</i>&rceil;, smallest integer not less than <i>x</i> (real part)</td></tr>
 ^<tr>    <td>cos(x)</td>    <td>radians</td>    <td>cos <i>x</i>, cosine of <i>x</i></td></tr>
-^<tr>    <td>cosh(x)</td>    <td>any</td>    <td>cosh <i>x</i>, hyperbolic cosine of <i>x</i> in radians</td></tr>
+^<tr>    <td>cosh(x)</td>    <td>any</td>    <td>cosh <i>x</i>, hyperbolic cosine of <i>x</i> </td></tr>
 ^<tr>    <td>erf(x)</td>    <td>any</td>    <td>erf(Re(<i>x</i>)), error function of real(<i>x</i>)</td></tr>
 ^<tr>    <td>erfc(x)</td>    <td>any</td>    <td>erfc(Re(<i>x</i>)), 1.0 - error function of real(<i>x</i>)</td></tr>
 ^<tr>    <td>exp(x)</td>    <td>any</td>    <td><i>e<sup>x</sup></i>, exponential function of <i>x</i></td></tr>
@@ -1300,10 +1300,10 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>real(x)</td>    <td>any</td>    <td>Re(<i>x</i>), real part of <i>x</i></td></tr>
 ^<tr>    <td>sgn(x)</td>    <td>any</td>    <td>1 if <i>x</i> &gt; 0,  -1 if <i>x</i> &lt; 0,  0 if <i>x</i> = 0. &image;(<i>x</i>) ignored</td></tr>
 ^<tr>    <td>sin(x)</td>    <td>any</td>    <td>sin <i>x</i>, sine of <i>x</i></td></tr>
-^<tr>    <td>sinh(x)</td>    <td>any</td>    <td>sinh <i>x</i>, hyperbolic sine of <i>x</i> in radians</td></tr>
+^<tr>    <td>sinh(x)</td>    <td>any</td>    <td>sinh <i>x</i>, hyperbolic sine of <i>x</i> </td></tr>
 ^<tr>    <td>sqrt(x)</td>    <td>any</td>    <td>&radic;<i>x</i>, square root of <i>x</i></td></tr>
 ^<tr>    <td>tan(x)</td>    <td>any</td>    <td>tan <i>x</i>, tangent of <i>x</i></td></tr>
-^<tr>    <td>tanh(x)</td>    <td>any</td>    <td>tanh <i>x</i>, hyperbolic tangent of <i>x</i> in radians</td></tr>
+^<tr>    <td>tanh(x)</td>    <td>any</td>    <td>tanh <i>x</i>, hyperbolic tangent of <i>x</i> </td></tr>
 ^<tr>    <td>voigt(x,y)</td>    <td>real</td>    <td>convolution of Gaussian and Lorentzian</td></tr>
 ^</tbody>
 ^</table>
@@ -1431,10 +1431,10 @@ C marker below is used to signal this to doc2html:
 4 acosh
 ?expressions functions acosh
 ?acosh
-#acosh(x) & any  & $\cosh^{-1} x$ (inverse hyperbolic cosine) in radians \\
-%acosh(x)@any@$cosh sup -1 x$ (inverse hyperbolic cosine) in radians
+#acosh(x) & any  & $\cosh^{-1} x$ (inverse hyperbolic cosine) \\
+%acosh(x)@any@$cosh sup -1 x$ (inverse hyperbolic cosine) 
  The `acosh(x)` function returns the inverse hyperbolic cosine of its argument
- in radians.
+ in radians or degrees, as selected by `set angles`.
 4 airy
 ?expressions functions airy
 ?airy
@@ -1462,10 +1462,10 @@ C marker below is used to signal this to doc2html:
 4 asinh
 ?expressions functions asinh
 ?asinh
-#asinh(x) & any  & $\sinh^{-1} x$ (inverse hyperbolic sin) in radians \\
-%asinh(x)@any@$sinh sup -1 x$ (inverse hyperbolic sin) in radians
+#asinh(x) & any  & $\sinh^{-1} x$ (inverse hyperbolic sin) \\
+%asinh(x)@any@$sinh sup -1 x$ (inverse hyperbolic sin) 
  The `asinh(x)` function returns the inverse hyperbolic sin of its argument in
- radians.
+ radians or degress, as selected by `set angles`.
 4 atan
 ?expressions functions atan
 ?atan
@@ -1485,10 +1485,10 @@ C marker below is used to signal this to doc2html:
 4 atanh
 ?expressions functions atanh
 ?atanh
-#atanh(x) & any  & $\tanh^{-1} x$ (inverse hyperbolic tangent) in radians \\
-%atanh(x)@any@$tanh sup -1 x$ (inverse hyperbolic tangent) in radians
+#atanh(x) & any  & $\tanh^{-1} x$ (inverse hyperbolic tangent) \\
+%atanh(x)@any@$tanh sup -1 x$ (inverse hyperbolic tangent) 
  The `atanh(x)` function returns the inverse hyperbolic tangent of its
- argument in radians.
+ argument in radians or degrees, as selected by `set angles`.
 ?expressions functions EllipticK
 ?EllipticK
 4 EllipticK
