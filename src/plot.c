@@ -676,9 +676,9 @@ RECOVER_FROM_ERROR_IN_DASH:
 		    gp_exit(EXIT_FAILURE);
 		}
 		call_argc = GPMIN(9, argc - 1);
-		for (i=0; i<=call_argc; i++) {
+		for (i = 0; i < call_argc; i++) {
 		    /* Need to stash argv[i] somewhere visible to load_file() */
-		    call_args[i] = gp_strdup(argv[i+1]);
+		    call_args[i] = gp_strdup(argv[i + 1]);
 		}
 
 		load_file(loadpath_fopen(*argv, "r"), gp_strdup(*argv), 5);
