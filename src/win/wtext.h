@@ -96,6 +96,10 @@ extern "C" {
 #define cputs dontuse_cputs
 #define cscanf dontuse_cscanf
 #define ungetch dontuse_ungetch
+#ifdef WGP_CONSOLE
+#define kbhit dontuse_kbhit
+#define getche dontuse_getche
+#endif
 
 /* Windows pipe emulation by using temporary files */
 #ifdef USE_FAKEPIPES
