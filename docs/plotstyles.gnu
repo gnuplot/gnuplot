@@ -22,6 +22,9 @@ if (winhelp > 0) {
         set term png font fontspec size 448,225 dashlength 0.2 fontscale 0.6
     }
     out = "./windows/"
+} else if (GNUTERM eq "svg") {
+    set term svg font 'arial,10' size 600,400
+    out = "./html/"
 } else if (GNUTERM eq "tikz") {
     set term tikz color fontscale 0.75 clip size 3.0in, 1.7in
     out = "./"
@@ -35,6 +38,7 @@ set loadpath '../demo'
 
 if (GPVAL_TERM eq "pngcairo" || GPVAL_TERM eq "png") ext=".png"
 if (GPVAL_TERM eq "pdfcairo" || GPVAL_TERM eq "pdf") ext=".pdf"
+if (GPVAL_TERM eq "svg") ext=".svg"
 if (GPVAL_TERM eq "tikz") ext=".tex"
 
 set encoding utf8

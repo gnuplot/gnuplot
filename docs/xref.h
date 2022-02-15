@@ -57,6 +57,8 @@ EXTERN struct LIST *lookup(char *);
 EXTERN struct LIST *lkup_by_number(int line);
 EXTERN void list_free(void);
 EXTERN void refs(int l, FILE * f, char *start, char *end, char *format);
+EXTERN void reftable(int l, FILE * f, char *start, char *end, char *format,
+                     int maxrows, char *newcolumn);
 
 void *xmalloc(size_t size);
 

@@ -19,6 +19,12 @@
 #     or
 #       make ps
 #
+#   For HTML
+#	make wxhelp/wgnuplot.html (windows / wxt help system)
+#     or
+#	make webdocs (HTML for web site)
+#
+#
 #   For groff (GNU troff}
 #       make grotxt
 #       (print or view gnuplot.txt)
@@ -48,7 +54,7 @@ gih_DATA = gnuplot.gih
 gihdir = @GIHDIR@
 
 noinst_PROGRAMS = checkdoc doc2ipf doc2tex doc2gih doc2rnh doc2hlp	\
-                  doc2rtf doc2ms alldoc2gih doc2wxhtml
+                  doc2rtf doc2ms alldoc2gih doc2wxhtml doc2web
 
 AM_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/term
 
@@ -78,7 +84,7 @@ $(T)pc.trm $(T)pdf.trm $(T)qms.trm $(T)vws.trm
 # DIST_COMMON = README
 
 SOURCES = checkdoc.c doc2gih.c doc2hlp.c doc2ipf.c doc2ms.c doc2rnh.c	\
-doc2rtf.c doc2tex.c windows/doc2html.c termdoc.c xref.c
+doc2rtf.c doc2tex.c windows/doc2html.c doc2web.c termdoc.c xref.c
 
 TERM_H = $(top_srcdir)/src/term.h
 
@@ -88,7 +94,8 @@ EXTRA_DIST = Makefile.in doc2texi.el figure_missing.pdf gnuplot.doc \
 titlepag.ipf titlepag.ms titlepag.tex	\
 toc_entr.sty psdoc gnuplot-ja.doc README.ja	\
 term-ja.diff plotstyles.gnu gnuplot.pdf \
-windows/wgnuplot.hhk windows/wgnuplot.hhp windows/wgnuplot.stp windows/doc2html.c
+windows/wgnuplot.hhk windows/wgnuplot.hhp windows/wgnuplot.stp windows/doc2html.c \
+html/gnuplot_docs.css
 
 ELCS = gnuplot-eldoc.elc
 
@@ -106,6 +113,7 @@ ja.doc gnuplot-ja.ind gnuplot-ja.ilg gnuplot-ja.aux gnuplot-ja.toc	\
 gnuplot-ja.idx gnuplot-ja.out gnuplot-ja.tex				\
 wxhelp_figures wxhelp/*.html wxhelp/wgnuplot.hhc wxhelp/wgnuplot.hhk	\
 wxhelp/wgnuplot.htc wxhelp/doc2html$(EXEEXT) windows/wgnuplot.htk	\
+web_figures html/*.html html/*.svg html/*.hhc html/*.hhk                \
 windows/*.png gnuplot.htb gnuplot.texi gnuplot-eldoc.el $(ELCS)
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(DOCHEADERS) $(EXTRA_DIST)
@@ -166,15 +174,6 @@ gnuplot.ms: doc2ms$(EXEEXT) $(srcdir)/gnuplot.doc
 doc2ms_SOURCES = doc2ms.c termdoc.c
 doc2ms_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
 
-### html
-html: htmldocs/gnuplot.html
-htmldocs/gnuplot.html: figures.tex wxhelp_figures pdf_figures
-	$(AM_V_GEN)if test $(LATEX2HTML) != no ; then \
-	  mkdir -p htmldocs ; \
-	  $(LATEX2HTML) -dir htmldocs -local_icons $< ; \
-	else \
-	  echo latex2html not found - cannot build html file ; \
-	fi
 
 ### PDF documentation can inset figures using either tikz+wrapfig or pdf+picins
 pdf_figures: $(GNUPLOT_EXE) $(srcdir)/plotstyles.gnu
@@ -331,6 +330,24 @@ wxhelp_figures: $(GNUPLOT_EXE) $(srcdir)/plotstyles.gnu
 	$(AM_V_at) [ -d windows ] || mkdir -p windows
 	$(AM_V_at) GNUPLOT_LIB=$(top_srcdir)/demo $(GNUPLOT_EXE) -e "winhelp=1;" $(srcdir)/plotstyles.gnu
 	$(AM_V_GEN)touch $@
+
+### HTML documentation for web site
+##  I gave up on doc -> tex -> html 
+#
+doc2web_SOURCES = doc2web.c termdoc.c xref.c allterm.h
+doc2web_CPPFLAGS = -DALL_TERM_DOC -I../src $(AM_CPPFLAGS)
+
+html: allterm.h doc2web$(EXEEXT) $(srcdir)/gnuplot.doc web_figures
+	$(AM_V_at) [ -d html ] || mkdir -p html
+	$(AM_V_GEN)doc2web$(EXEEXT) $(srcdir)/gnuplot.doc html
+	$(AM_V_GEN) sort -k 3 html/index.hhk > html/index.html
+
+web_figures: $(GNUPLOT_EXE) $(srcdir)/plotstyles.gnu
+	$(AM_V_at) [ -d html ] || mkdir -p html
+	$(AM_V_at) GNUPLOT_LIB=$(top_srcdir)/demo GNUTERM=svg $(GNUPLOT_EXE) $(srcdir)/plotstyles.gnu
+	$(AM_V_GEN)touch $@
+
+
 
 ### GNU info format
 info: gnuplot.info

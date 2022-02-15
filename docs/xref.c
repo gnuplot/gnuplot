@@ -331,3 +331,73 @@ refs( int l, FILE *f, char *start, char *end, char *format)
     if (inlist && end)		/* trailer */
 	fprintf(f, "%s", end);
 }
+
+
+/*
+ * Same as refs() but writes a multi-column table.
+ * Two additional parameters
+ *	maxrows = insert a column break after this many entries
+ *	char *newcolumn inserted after every maxrows to start a new column
+ *
+ * The whole menu is bracketed by start ... end as with refs().
+ */
+void
+reftable( int l, FILE *f, char *start, char *end, char *format,
+      int maxrows, char *newcolumn)
+{
+    int curlevel, i;
+    char *c;
+    int inlist = FALSE;
+    int entries = 0;	/* entries (so far) in this column */
+
+    /* find current line */
+    list = head;
+    while (list->line != l)
+	list = list->next;
+    curlevel = list->level;
+    list = list->next;		/* look at next element before going on */
+
+    if ((start != NULL) && (list != NULL) && (list->level > curlevel)) {
+	/* don't write start if there's no menu at all */
+	inlist = TRUE;
+	fprintf(f, "%s", start);
+    }
+    while (list != NULL) {
+	/* we are onto the next topic so stop */
+	if (list->level <= curlevel)
+	    break;
+	/* these are the next topics down the list */
+	if (list->level == curlevel + 1) {
+	    c = list->string;
+	    while (isspace((int)(*c)))
+		c++;		/* strip leading whitespace */
+
+	    if (format != NULL) {
+		for (i = 0; format[i] != '%' && format[i] != '\0'; i++);
+		if (format[i] != '\0') {
+		    if (format[i + 1] == 'd') {
+			/* line number has to be printed first */
+			fprintf(f, format, list->line, c);
+		    }
+		    else {
+			++i;
+			for (; format[i] != '%' && format[i] != '\0'; i++);
+			if (format[i] != '\0')	/* line number is second */
+			    fprintf(f, format, c, list->line);
+			else	/* no line number at all */
+			    fprintf(f, format, c);
+		    }
+		}
+		if (++entries >= maxrows && newcolumn) {
+		    fprintf(f, newcolumn);
+		    entries = 0;
+		}
+	    }
+	}
+	list = list->next;
+    }
+    if (inlist && end)		/* trailer */
+	fprintf(f, "%s", end);
+}
+
+

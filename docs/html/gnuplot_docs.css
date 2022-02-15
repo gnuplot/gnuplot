@@ -1,0 +1,53 @@
+ H1, H2, H3, H4, H5, H6, P, OL, DIR, MENU, DIV, 
+ DT, DD, ADDRESS, BLOCKQUOTE, PRE, HR, FORM, DL 
+      { 
+	margin-left: 0%;
+	display: block ;
+      }
+
+ BODY { 
+ 	background-color:white; 
+ 	margin-left: 10%; margin-right: 10%; 
+      }
+
+ P    { 
+        margin-top:  1em; margin-bottom:   0%;
+        margin-left:  0%; 
+      }
+
+ TABLE	{
+	margin-top: 3%;
+	}
+
+ table.center {
+	margin-left: auto;
+	margin-right: auto;
+	width: 100%;
+	text-align: center;
+	}
+
+ TH	{
+	text-align: center;
+	column-span: 3;
+	}
+ TD	{
+	text-align: left;
+	vertical-align: top;
+	}
+ LISTING, UL
+      { 
+	margin-left: 0%;
+	text-align: top;
+	display: block ;
+      }
+
+ H1   { text-align: center; }
+
+ IMG  { border-style: none; }
+
+ object.sidebar
+	{
+	height: 25em;
+	margin-right: 15;
+	max-width: 90%;
+	}
