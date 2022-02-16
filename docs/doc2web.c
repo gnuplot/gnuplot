@@ -61,6 +61,7 @@ static char path[PATH_MAX];
 static const char name[] = "gnuplot5";
 static char *sectionname = "";
 static TBOOLEAN collapsing_terminal_docs = FALSE;
+static TBOOLEAN processing_title_page = FALSE;
 static TBOOLEAN file_has_sidebar = FALSE;
 
 void convert(FILE *, FILE *, FILE *);
@@ -109,6 +110,7 @@ main (int argc, char **argv)
 	exit(EXIT_FAILURE);
     } else {
 	char line[80];
+	// fprintf(stderr,"Opening %s for output\n", filename);
 	sprintf(line, "gnuplot %s", VERSION_MAJOR);
 	header(outfile, line);
 	fprintf(outfile, "<h1 align=\"center\">gnuplot %s</h1>\n", VERSION_MAJOR);
@@ -335,6 +337,17 @@ process_line(char *line, FILE *b, FILE *d)
             } else if (inhlink) {
                 inhlink = FALSE;
 	        fputs(line + 2, b);	/* copy directly */
+
+
+	    } else if (processing_title_page && !strncmp(&line[1], "<!-- end", 8)) {
+		    /* Reached the end of the title page records.
+		     * Jump to approximately where we would have been if there
+		     * were no title records.
+		     */
+		    // fprintf(stderr, "Reached end of Title\n");
+		    startpage = TRUE;
+		    goto end_of_titlepage;
+
             } else {
                 if (line[2] == '!') { /* hack for function sections */
                     const char magic[] = "<!-- INCLUDE_NEXT_TABLE -->";
@@ -434,9 +447,10 @@ process_line(char *line, FILE *b, FILE *d)
 		if (newlevel == 1) {
 		    startpage = TRUE;
 		    intable = FALSE;
-		    if (!strncmp(&line[2], "Gnuplot", 7))
+		    if (!strncmp(&line[2], "Gnuplot", 7)) {
+			processing_title_page = TRUE;
 			sectionname = "Overview";
-		    else if (!strncmp(&line[2], "Plot", 4))
+		    } else if (!strncmp(&line[2], "Plot", 4))
 			sectionname = "Plotting_Styles";
 		    else if (!strncmp(&line[2], "Commands", 4))
 			sectionname = "Commands";
@@ -462,7 +476,7 @@ process_line(char *line, FILE *b, FILE *d)
                     sprintf(location, "loc%d", line_count);
 
 		/* add list of subtopics */
-		if (!collapsing_terminal_docs) {
+		if (!collapsing_terminal_docs && !processing_title_page) {
 		    reftable(last_line, b,
 			"<table class=\"center\"><th colspan=3>Subtopics</th><tr><td width=33%><ul>\n",
 		    "</ul></td></tr></table>\n",
@@ -470,19 +484,29 @@ process_line(char *line, FILE *b, FILE *d)
 		    14,
 		    "</ul></td><td width=33%><ul>\n");
 		}
-
 		last_line = line_count;
-		fprintf(b, "\n");
 
-		if (collapsing_terminal_docs)
+		if (processing_title_page) {
+		    /* Nothing to do here */
+
+		} else if (collapsing_terminal_docs) {
 		    collapsing_terminal_docs = FALSE;
-		else
 
-		/* split contents manually */
-		{
+		} else {
+                    /* close current file and start a new one */
 		    char newfile[PATH_MAX] = "";
 
-                    /* close current file */
+    end_of_titlepage:
+
+		    /* If we got here via "goto end_of_titlepage"
+		     * dummy up the environment that would have been there if
+		     * it were not for that detour past the titlepage records.
+		     */
+		    if (processing_title_page) {
+			processing_title_page = FALSE;
+			last_line = 1;
+		    }
+
 #ifdef CREATE_INDEX
 		    if (file_has_sidebar) {
 			sidebar(b, 0);
@@ -497,24 +521,25 @@ process_line(char *line, FILE *b, FILE *d)
 		    strncat(newfile,location,PATH_MAX-strlen(newfile)-6);
 		    strcat(newfile,".html");
                     if (!(b = fopen(newfile, "w"))) {
-                        fprintf(stderr, "%s: Can't open %s for writing\n",
-                            "doc2html", newfile);
+                        fprintf(stderr, "doc2web: Can't open %s for writing\n",
+                            newfile);
                         exit(EXIT_FAILURE);
                     }
-		    header(b, &line2[2]);
 		    if (startpage) {
+			// fprintf(stderr,"Opening %s for output\n",newfile);
+			header(b, sectionname);
 #ifdef CREATE_INDEX
 			sidebar(b, 1);
 			file_has_sidebar = TRUE;
 #endif
-			fprintf(b, "<h1>%s</h1>\n", &line2[2]);
+			fprintf(b, "<h1>%s</h1>\n", sectionname);
 		    } else {
+			header(b, &line2[2]);
 			fprintf(b, "<h2>%s</h2>\n", &line2[2]);
 		    }
 		}
 
 		if (startpage && !strncmp(sectionname,"Terminals",8)) {
-		    fprintf(stderr,">> I will try to collapse the Terminals section\n");
 		    collapsing_terminal_docs = TRUE;
 		}
                 startpage = FALSE;

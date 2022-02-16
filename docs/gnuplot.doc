@@ -27,6 +27,7 @@ C
 ^      Mailing list for bug reports: <tt>gnuplot-bugs@lists.sourceforge.net</tt><br>
 ^      Web access (preferred): <tt>http://sourceforge.net/projects/gnuplot</tt></p>
 ^<p align="center"> This manual was originally prepared by Dick Crawford</p>
+^<!-- end of titlepage -->
 2 Copyright
 ?copyright
 ?license
