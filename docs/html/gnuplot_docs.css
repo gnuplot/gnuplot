@@ -25,6 +25,13 @@
 	width: 100%;
 	text-align: center;
 	}
+ th.center {
+	background-color: DDDDDD;
+	text-align: center
+	}
+ td.center {
+	text-align: center
+	}
 
  TH	{
 	text-align: center;
@@ -40,6 +47,11 @@
 	text-align: top;
 	display: block ;
       }
+
+ li.shortlist
+	{
+	margin-top: 0.5em;
+	}
 
  H1   { text-align: center; }
 

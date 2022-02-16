@@ -6086,9 +6086,9 @@ Ffigure_surface+contours
  The `splot` command can also calculate and draw contour lines corresponding
  to constant Z values. These contour lines may be drawn onto the surface
  itself, or projected onto the XY plane. See `set contour`.
-Ffigure_mapcontours
 3 2D projection (set view map)
 ?2D projection (set view map)
+Ffigure_mapcontours
  An important special case of the `splot` command is to map the Z coordinate
  onto a 2D surface by projecting the plot along the Z axis onto the xy plane.
  See `set view map`.  This plot mode is useful for contour plots and heat maps.
@@ -9284,9 +9284,8 @@ Ffigure_smooth_path
        raise {plot_window_id}
        lower {plot_window_id}
 
- The `raise` and `lower` commands function only for a some terminal types and
+ The `raise` and `lower` commands function for only a few terminal types and
  may depend also on your window manager and display preference settings.
- An example of use is shown here
        set term wxt 123     # create first plot window
        plot $FOO
        lower                # lower the only plot window that exists so far
@@ -17942,12 +17941,18 @@ Ffigure_sparsematrix
  options. See `set terminal`.
 
  This document may describe terminal types that are not available to you
- because they were not configured or installed on your system. To see a list of
- terminals available on a particular gnuplot installation, type 'set terminal'
- with no modifiers.
-
+ because they were not configured or installed on your system.
  Terminals marked `legacy` are not built by default in recent gnuplot versions
  and may not actually work.
+ To see a list of terminals available in a particular gnuplot session,
+ type 'set terminal' with no modifiers.
+
+ Several gnuplot are designed for use with TeX/LaTeX document preparation.
+ A summary of TeX-friendly terminals is available here:
+^ <a href="http://www.gnuplot.info/docs/latex_demo.pdf">
+           http://www.gnuplot.info/docs/latex_demo.pdf
+^ </a>
+
 <3 -- all terminal stuff is pulled from the .trm files
 1 Bugs
 ?bugs

@@ -23,7 +23,7 @@ if (winhelp > 0) {
     }
     out = "./windows/"
 } else if (GNUTERM eq "svg") {
-    set term svg font 'arial,10' size 600,400
+    set term svg font 'Calisto,14' size 600,400
     out = "./html/"
 } else if (GNUTERM eq "tikz") {
     set term tikz color fontscale 0.75 clip size 3.0in, 1.7in
@@ -255,7 +255,7 @@ set yrange  [3.5:-0.5]
 set x2tics 0,1
 set ytics  0,1
 set palette rgbformula -3,-3,-3
-plot $HEATMAP matrix with image
+plot $HEATMAP matrix with image pixels
 #
 # 3D Plot styles
 # ==============
@@ -300,11 +300,11 @@ unset surface
 unset grid
 set xlabel "X axis" offset 0,2 
 set ylabel "Y axis" rotate
-set tmargin
-set rmargin
+set rmargin 0
 set lmargin at screen .1
+set tmargin 0
 set bmargin at screen .15
-set title "projected contours using 'set view map'" offset 0,-1
+set title "projected contours using 'set view map'" offset 0,0
 
 set output out . 'figure_mapcontours' . ext
 set style textbox opaque noborder margins 0.25,0.25
@@ -390,7 +390,7 @@ plot 'bldg.png' binary filetype=png origin=(0,0)  dx=0.5 dy=1.5 with rgbimage no
 # ==========================================================
 #
 reset
-Scale(size) = 0.25*sqrt(sqrt(column(size)))
+Scale(size) = 0.33*sqrt(sqrt(column(size)))
 CityName(String,Size) = sprintf("{/=%d %s}", Scale(Size), stringcolumn(String))
 
 set termoption enhanced

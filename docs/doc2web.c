@@ -149,12 +149,13 @@ header(FILE *a, char * title)
     fprintf(a, "</head>\n");
     fprintf(a, "<body>\n");
     fputs( 
-"<table class=\"center\" style=\"font-size:200%;\" width=\"80%\" ><tr>\n"
-"<td><a href=\"Overview.html\">Overview</a></td>\n"
-"<td><a href=\"Plotting_Styles.html\">Plotting Styles</a></td>\n"
-"<td><a href=\"Commands.html\">Commands</a></td>\n"
-"<td><a href=\"Terminals.html\">Terminals</a></td>\n"
-"</tr></table>\n", a);
+"<table class=\"center\" style=\"font-size:150%;\" width=\"80%\" >\n"
+"<th class=\"center\"><a href=\"gnuplot5.html\">Credits</a></td>\n"
+"<th class=\"center\"><a href=\"Overview.html\">Overview</a></td>\n"
+"<th class=\"center\"><a href=\"Plotting_Styles.html\">Plotting Styles</a></td>\n"
+"<th class=\"center\"><a href=\"Commands.html\">Commands</a></td>\n"
+"<th class=\"center\"><a href=\"Terminals.html\">Terminals</a></td>\n"
+"</th></table>\n", a);
 }
 
 
@@ -257,7 +258,11 @@ process_line(char *line, FILE *b, FILE *d)
 		while ((line[k] != '`') && (line[k] != NUL))
 		    topic[l++] = line[k++];
 		topic[l] = NUL;
-		klist = lookup(topic);
+		/* Do not turn `gnuplot` in to a self-reference hyperlink */
+		if (!strcmp(&topic[1],"nuplot"))
+		    klist = 0;
+		else
+		    klist = lookup(topic);
 		if (klist && (k = klist->line) > 0 && (k != last_line)) {
                     char hyplink1[MAX_LINE_LEN+1];
 		    (void)klink;	/* Otherwise compiler warning about unused variable */
@@ -359,10 +364,12 @@ process_line(char *line, FILE *b, FILE *d)
             }
 	    break;		/* ignore */
 	}
-    case 'F':			/* latex embedded figure */
-            if (para) fprintf(b, "</p><p align=\"justify\">\n");
+    case 'F':			/* embedded figure */
+            if (para) fprintf(b, "</p>");
+            fprintf(b, "<p align=\"center\">\n");
             fprintf(b, "<img src=\"%s.svg\" alt=\"%s\">\n", line2+1, line2+1);
-            if (para) fprintf(b, "</p><p align=\"justify\">\n");
+            fprintf(b, "</p>");
+            if (para) fprintf(b, "<p align=\"justify\">\n");
             break;
     case '#':{			/* latex table entry */
 	    if (!intable) {  /* HACK: we just handle itemized lists */
@@ -373,7 +380,7 @@ process_line(char *line, FILE *b, FILE *d)
 		    (void) fputs("</ul>\n", b);
 		else if (line[1] == 'b') {
 		    /* Bullet */
-		    fprintf(b, "<li>%s\n", line2+2);
+		    fprintf(b, "<li class=\"shortlist\">%s\n", line2+2);
 		}
 		else if (line[1] == '#') {
 		    /* Continuation of bulleted line */
@@ -532,7 +539,7 @@ process_line(char *line, FILE *b, FILE *d)
 			sidebar(b, 1);
 			file_has_sidebar = TRUE;
 #endif
-			fprintf(b, "<h1>%s</h1>\n", sectionname);
+			fprintf(b, "<h1>Gnuplot %s %s</h1>\n", VERSION_MAJOR, sectionname);
 		    } else {
 			header(b, &line2[2]);
 			fprintf(b, "<h2>%s</h2>\n", &line2[2]);
