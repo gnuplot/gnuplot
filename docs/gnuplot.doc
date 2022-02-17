@@ -4731,6 +4731,7 @@ Ffigure_boxes
  box with four sides and a top by setting a non-zero extent on y.
  See `set boxdepth`.
 
+Ffigure_3Dboxes
  3D boxes are processed as pm3d quadrangles rather than as surfaces. Because of
  this the front/back order of drawing is not affected by `set hidden3d`.
  Similarly if you want each box face to have a border you must use

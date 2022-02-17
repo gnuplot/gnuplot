@@ -40,6 +40,11 @@ START_HELP(latex)
 " of gnuplot. See `pict2e`.",
 "",
 " (5) Others, see `context`, legacy terminals texdraw and mp (metapost).",
+"",
+" A summary of TeX-friendly terminals is available here:",
+"^ <a href=\"http://www.gnuplot.info/docs/latex_demo.pdf\">",
+"           http://www.gnuplot.info/docs/latex_demo.pdf",
+"^ </a>",
 ""
 END_HELP(latex)
 #endif

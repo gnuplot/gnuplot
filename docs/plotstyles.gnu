@@ -314,6 +314,32 @@ set style textbox opaque noborder margins 0.25,0.25
 set cntrlabel font ",8"
 splot sin(x) * cos(y), sin(x) * cos(y) with labels boxed
 
+reset
+
+set output out . 'figure_3Dboxes' . ext
+set title "Full treatment: 3D boxes with pm3d depth sorting and lighting" 
+set boxwidth 0.4 absolute
+set boxdepth 0.3
+set style fill   solid 1.00 border
+set grid xtics ytics ztics
+set grid vertical layerdefault   lt 0 lw 1,  lt 0 lw 1
+unset key
+set wall z0  fc  rgb "slategrey"  fillstyle  transparent solid 0.50 border lt -1
+set view 59, 24, 1, 1
+set bmargin screen 0
+set xyplane at 0
+set xtics 1; set xtics add ("" 0, "" 11)
+set ytics add ("" 0, "" 6)
+set xrange [ 0.0 : 11.0 ]
+set yrange [ 0.0 : 6.0 ]
+set pm3d depthorder base
+set pm3d interpolate 1,1 border lw 1.000 dashtype solid
+set pm3d lighting primary 0.5 specular 0.2 spec2 0
+rgbfudge(x) = x*51*32768 + (11-x)*51*128 + int(abs(5.5-x)*510/9.)
+#ti(col) = sprintf("%d",col)
+#
+splot for [col=1:5] 'candlesticks.dat' using 1:(col):(col*column(col)):(rgbfudge($1))       with boxes fc rgb variable
+
 #
 # RGB image mapping
 # =================
