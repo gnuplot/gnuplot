@@ -23,7 +23,7 @@ if (winhelp > 0) {
     }
     out = "./windows/"
 } else if (GNUTERM eq "svg") {
-    set term svg font 'Calisto,14' size 600,400
+    set term svg font 'Calisto MT,14' size 600,400
     out = "./html/"
 } else if (GNUTERM eq "tikz") {
     set term tikz color fontscale 0.75 clip size 3.0in, 1.7in
@@ -734,6 +734,7 @@ set zrange [1:*]
 set log z
 set border 127
 set pm3d depth base
+set style fill transparent solid 0.5
 set xyplane at 1
 set key opaque box
 
@@ -915,7 +916,19 @@ splot '++' using 1:2:(abs(E0(x+I*y))):(arg(E0(x+I*y))) with pm3d
 reset
 
 # Convex hull used to mask a pm3d surface
+# (this comes out unreasonably large as an svg file)
 # 
+if (GNUTERM eq "svg") {
+
+    # make a blank dummy file instead
+    set output out.'figure_mask' . ext
+    set term svg font ',2' size 12,12
+    clear
+    unset output
+    set term svg font 'Calisto MT,14' size 600,400
+
+} else {
+
 set output out.'figure_mask' . ext
 
 set view map
@@ -947,6 +960,8 @@ splot  $HULL using 1:2:(0) with mask, \
 
 unset multiplot
 reset
+
+} # end (GNUTERM ne "svg")
 
 # illustrate "set palette" options
 # First set: default white->red cubehelix viridis

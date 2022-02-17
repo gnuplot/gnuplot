@@ -783,31 +783,6 @@ C
  the corresponding gnuplot script can be downloaded to serve as a model for
  generating similar plots.
 
-2 Animation
-?animation
- Any of gnuplot's interactive terminals (qt win wxt x11 aqua) can be used
- to display an animation by plotting successive frames from the command line
- or from a script.
-
- Several non-mousing terminals also support some form of animation.
- See `term sixelgd animate`, `term domterm animate`.
-
- Two terminals can save an animation to a file for later playback locally
- or by embedding it a web page.  See `term gif animate`, `term webp`.
-
- Example:
-
-      unset border; unset tics; unset key; set view equal xyz
-      set pm3d border linecolor "black"
-
-      set term webp animate delay 50
-      set output 'spinning_d20.webp'
-      do for [ang=1:360:2] {
-          set view 60, ang
-          splot 'icosahedron.dat' with polygons fc "gold"
-      }
-      unset output
-
 2 Batch/Interactive Operation
 ?batch/interactive
  `Gnuplot` may be executed in either batch or interactive modes, and the two
@@ -5635,6 +5610,10 @@ Ffigure_linespoints
  This example illustrates using the convex hull circumscribing a set of points
  to mask the corresponding region of a pm3d surface.
 Ffigure_mask
+^<p align="center"><picture>
+^   <source srcset="figure_mask.webp" type="image/webp">
+^   <img src="figure_mask.png" alt="figure_mask">
+^   </picture><p>
     set table $HULL
     plot $POINTS using 1:2 convexhull
     unset table
@@ -6184,6 +6163,37 @@ Ffigure_zerror
       splot for [k=1:5] datafile[k] with zerrorfill lt black fc lt (k+1)
 
  This plot style can also be used to create fence plots. See `fenceplots`.
+
+2 Animation
+?animation
+ Any of gnuplot's interactive terminals (qt win wxt x11 aqua) can be used
+ to display an animation by plotting successive frames from the command line
+ or from a script.
+
+ Several non-mousing terminals also support some form of animation.
+ See `term sixelgd animate`, `term domterm animate`.
+
+ Two terminals can save an animation to a file for later playback locally
+ or by embedding it a web page.  See `term gif animate`, `term webp`.
+
+^    <p align="center">
+^	<picture>
+^	  <source srcset="figure_spinning_d20.webp" type="image/webp">
+^	  <img src="figure_static_d20.png">
+^	</picture>
+
+ Example:
+
+      unset border; unset tics; unset key; set view equal xyz
+      set pm3d border linecolor "black"
+
+      set term webp animate delay 50
+      set output 'spinning_d20.webp'
+      do for [ang=1:360:2] {
+          set view 60, ang
+          splot 'icosahedron.dat' with polygons fc "gold"
+      }
+      unset output
 
 1 Commands
 ?commands

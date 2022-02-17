@@ -114,6 +114,7 @@ gnuplot-ja.idx gnuplot-ja.out gnuplot-ja.tex				\
 wxhelp_figures wxhelp/*.html wxhelp/wgnuplot.hhc wxhelp/wgnuplot.hhk	\
 wxhelp/wgnuplot.htc wxhelp/doc2html$(EXEEXT) windows/wgnuplot.htk	\
 svg_figures html/*.html html/*.svg html/*.hhc html/*.hhk                \
+webp_figures html/*.webp html/*.png                                     \
 windows/*.png gnuplot.htb gnuplot.texi gnuplot-eldoc.el $(ELCS)
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(DOCHEADERS) $(EXTRA_DIST)
@@ -337,7 +338,7 @@ wxhelp_figures: $(GNUPLOT_EXE) $(srcdir)/plotstyles.gnu
 doc2web_SOURCES = doc2web.c termdoc.c xref.c allterm.h
 doc2web_CPPFLAGS = -DALL_TERM_DOC -I../src $(AM_CPPFLAGS)
 
-html: allterm.h doc2web$(EXEEXT) $(srcdir)/gnuplot.doc svg_figures
+html: allterm.h doc2web$(EXEEXT) $(srcdir)/gnuplot.doc svg_figures webp_figures
 	$(AM_V_at) [ -d html ] || mkdir -p html
 	$(AM_V_GEN)doc2web$(EXEEXT) $(srcdir)/gnuplot.doc html
 	$(AM_V_GEN) sort -k 3 html/index.hhk > html/index.html
@@ -347,6 +348,10 @@ svg_figures: $(GNUPLOT_EXE) $(srcdir)/plotstyles.gnu
 	$(AM_V_at) GNUPLOT_LIB=$(top_srcdir)/demo GNUTERM=svg $(GNUPLOT_EXE) $(srcdir)/plotstyles.gnu
 	$(AM_V_GEN)touch $@
 
+webp_figures: $(GNUPLOT_EXE) $(srcdir)/webp_figures.gnu
+	$(AM_V_at) [ -d html ] || mkdir -p html
+	$(AM_V_at) GNUPLOT_LIB=$(top_srcdir)/demo $(GNUPLOT_EXE) $(srcdir)/webp_figures.gnu
+	$(AM_V_GEN)touch $@
 
 
 ### GNU info format
