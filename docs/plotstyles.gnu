@@ -74,15 +74,18 @@ plot 'silver.dat' u 1:($2-10.) title 'with linespoints' \
 set key noopaque
 #
 set output out . 'figure_fsteps' . ext
-plot 'silver.dat' u 1:($2-10.) title 'with fsteps' with fsteps
+plot 'silver.dat' u 1:($2-10.) title 'with fsteps' with fsteps, \
+               '' u 1:($2-10.) with points pt 7 ps 0.5 lc "black" title 'data points'
 #
 set output out . 'figure_steps' . ext
 set style fill solid 0.25 noborder
 plot 'silver.dat' u 1:($2-10.) title 'with fillsteps' with fillsteps, \
-                      '' u 1:($2-10.) title 'with steps' with steps lw 3 dt solid
+               '' u 1:($2-10.) title 'with steps' with steps lw 3 dt solid, \
+               '' u 1:($2-10.) with points pt 7 ps 0.5 lc "black" title 'data points'
 #
 set output out . 'figure_histeps' . ext
-plot 'silver.dat' u 1:($2-10.) title 'with histeps' with histeps
+plot 'silver.dat' u 1:($2-10.) title 'with histeps' with histeps, \
+               '' u 1:($2-10.) with points pt 7 ps 0.5 lc "black" title 'data points'
 #
 symbol(z) = "•□+⊙♠♣♡♢"[int(z):int(z)]
 set output out . 'figure_labels2' . ext
@@ -773,11 +776,12 @@ set wall x0
 set wall y1
 set wall z0
 set xyplane 0
-#set border 31 front
+set sample 21; set isosample 21
+set tmargin 0; set bmargin 0
 unset title
-set pm3d interp 2,2 noborder
+set pm3d interp 1,2 border lt -1 lw 0.5
 set style fill solid 1.0
-splot f(x,y) with pm3d
+splot f(x,y) with pm3d fc "goldenrod"
 reset
 
 # Fence plot
