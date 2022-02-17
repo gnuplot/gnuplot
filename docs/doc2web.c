@@ -332,7 +332,9 @@ process_line(char *line, FILE *b, FILE *d)
 	    break;
 	}
     case '^':{			/* html link escape */
-            if ((!inhlink) && (line[3] == 'a') && (line[5] == 'h')) {
+	    if (!strncmp(line,"^figure_",8)) {
+		/* Catch this again below */
+            } else if ((!inhlink) && (line[3] == 'a') && (line[5] == 'h')) {
                 char *str;
                 inhlink = TRUE;
                 /* remove trailing newline etc */
@@ -362,7 +364,10 @@ process_line(char *line, FILE *b, FILE *d)
                 inhlink = FALSE;
 	        fputs(line + 1, b);	/* copy directly */
             }
-	    break;		/* ignore */
+	    if (!strncmp(line,"^figure_",8))
+		; /* Fall through to embedded figure */
+	    else
+		break;
 	}
     case 'F':			/* embedded figure */
             if (para) fprintf(b, "</p>");
