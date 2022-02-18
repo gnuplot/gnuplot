@@ -11,6 +11,7 @@ doc2ms
 doc2rnh
 doc2rtf
 doc2tex
+doc2web
 doc2wxhtml
 gnuplot-tikz.help
 gnuplot.gih
@@ -34,6 +35,8 @@ gnuplot.cm
 gnuplot.op
 gnuplot.tm
 pdffigures.tex
+webp_figures
+svg_figures
 *.aux
 *.bmp
 *.dvi
