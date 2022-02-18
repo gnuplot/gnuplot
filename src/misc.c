@@ -1199,8 +1199,7 @@ parse_fillstyle(struct fill_style_type *fs)
 			fs->fillpattern = int_expression();
 			if (fs->fillpattern < 0)
 			    fs->fillpattern = 0;
-		    } else
-			int_error(c_token, "this fill style does not have a parameter");
+		    }
 		}
 		continue;
 	}
