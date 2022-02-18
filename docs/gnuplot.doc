@@ -4310,15 +4310,16 @@ Ffigure_fsteps
 ?style fillsteps
 ?with fillsteps
 ?fillsteps
- Syntax:
       plot <data> with fillsteps [above|below] [y=<baseline>]
 
- The `fillsteps` style is exactly like `steps` except that the area between
+Ffigure_steps
+ The `fillsteps` style is only relvant to 2D plotting.
+ It is exactly like the style `steps` except that the area between
  the curve and the baseline (default y=0)  is filled in the current fill style.
- See `steps`.
-
  The options `above` and `below` fill only the portion to one side of the
- baseline.
+ baseline. Note that in moving from one data point to the next, both `steps`
+ and `fillsteps` first trace the change in x coordinate and then the change
+ in y coordinate.  See `steps`.
 2 histeps
 ?plotting styles histeps
 ?style histeps
