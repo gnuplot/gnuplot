@@ -1,8 +1,8 @@
-# This file will serve as the datafile used in demonstrating the 
-# "plot with steps" option.   Here is a gnuplot input file
-# which uses "plot with steps", inverse error function, normal
-# distribution function, and the inverse normal distribution
-# function.
+# Illustrate three variants of step plots
+#    plot with steps 
+#    plot with fsteps 
+#    plot with histeps 
+#    plot with fillsteps 
 
 set title "Compare steps, fsteps and histeps"
 plot [0:12][0:13] "steps.dat" notitle with points,  \
@@ -19,21 +19,6 @@ plot 'hemisphr.dat' u (floor($1*20)):(1) smooth frequency with histeps
 pause -1 "Hit return to see the same plot with fillsteps"
 set style fill solid 1.0
 plot 'hemisphr.dat' u (floor($1*20)):(1) smooth freq with fillsteps title "with fillsteps"
-
-pause -1 "Hit return for normal distribution function."
-
-set title "Normal Distribution Function"
-unset xlabel
-unset ylabel
-plot [-3:3][0:1] norm(x)
-
-pause -1 "Hit return for inverse error function."
-set title "Inverse Error Function"
-plot [-1:1] inverf(x)
-
-pause -1 "Hit return for inverse normal distribution function."
-set title "Inverse Normal Distribution Function"
-plot [0:1] invnorm(x)
 
 pause -1 "Press return to continue"
 reset

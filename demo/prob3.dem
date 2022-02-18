@@ -1,0 +1,25 @@
+# Here is a gnuplot input file that exercises the
+# normal distribution function, the inverse normal distribution function
+# and the inverse error function
+
+set sample 250
+unset xlabel
+unset ylabel
+set xzeroaxis
+set yzeroaxis
+set key left width 6 title " "
+
+set title "Normal Distribution Function"
+plot [-3:3] norm(x) lw 2
+
+pause -1 "Hit return for inverse error function."
+set yrange [*:5]
+set title "Inverse Error Function"
+plot [-1:1] inverf(x) lw 2
+
+pause -1 "Hit return for inverse normal distribution function."
+set title "Inverse Normal Distribution Function"
+plot [0:1] invnorm(x) lw 2
+
+pause -1 "Press return to continue"
+reset
