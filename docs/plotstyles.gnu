@@ -452,7 +452,7 @@ set style fill solid border lc "black"
 set key outside right center reverse Left samplen 1
 set key title "Outcomes" left
 
-plot $HEATMAP matrix with image notitle, \
+plot $HEATMAP matrix with image pixels notitle, \
     keyentry with boxes fc palette cb 0 title "no effect", \
     keyentry with boxes fc palette cb 1 title "threshold", \
     keyentry with boxes fc palette cb 3 title "typical range", \

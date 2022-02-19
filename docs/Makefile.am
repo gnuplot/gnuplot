@@ -114,7 +114,7 @@ gnuplot-ja.idx gnuplot-ja.out gnuplot-ja.tex				\
 wxhelp_figures wxhelp/*.html wxhelp/wgnuplot.hhc wxhelp/wgnuplot.hhk	\
 wxhelp/wgnuplot.htc wxhelp/doc2html$(EXEEXT) windows/wgnuplot.htk	\
 svg_figures html/*.html html/*.svg html/*.hhc html/*.hhk                \
-webp_figures html/*.webp html/*.png                                     \
+webp_figures html/*.webp                                                \
 windows/*.png gnuplot.htb gnuplot.texi gnuplot-eldoc.el $(ELCS)
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(DOCHEADERS) $(EXTRA_DIST)

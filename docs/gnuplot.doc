@@ -2858,7 +2858,7 @@ C 4 index
 ?uigamma
  `uigamma(a, x)` returns the regularized upper incomplete gamma function Q(a, x),
  NIST DLMF eq 8.2.4
- For the complementary lower incomplete gamma function P(a,x), see`igamma`.
+ For the complementary lower incomplete gamma function P(a,x), see `igamma`.
  Q(a, x) + P(a, x) = 1.
 
 #TeX \quad\quad uigamma$(a,z)=Q(a,x) = 1-P(a,x)$
@@ -4568,6 +4568,7 @@ Ffigure_newsyntax
 ?style arrows
 ?with arrows
 ?arrows
+^figure_vectors
  The 2D `arrows` style draws an arrow with specified length and orientation
  angle at each point (x,y).  Additional input columns may be used to provide
  variable (per-datapoint) color information or arrow style.
@@ -8225,7 +8226,6 @@ Ffigure_convex_hull
  FN Fritsch & RE Carlson (1980) "Monotone Piecewise Cubic Interpolation",
  SIAM Journal on Numerical Analysis 17: 238–246.
 
-Ffigure_smooth_path
 5 path
 ?commands path datafile smooth path
 ?plot datafile smooth path
@@ -8233,6 +8233,8 @@ Ffigure_smooth_path
 ?smooth path
 ?datafile smooth path
 ?path
+#TeX ~
+Ffigure_smooth_path
  The `smooth path` option generates cubic splines to fit points in the order
  they are presented in the input data; i.e. they are not first sorted on x.
  This generates a smooth spline through a closed curve or along a trajectory
@@ -10500,6 +10502,7 @@ Ffigure_smooth_path
 
  The example below shows differences between gnuplot version 4 and version 5.
 Ffigure_missing
+^<table class="center"><tr><td>
  Example:
        set style data linespoints
        plot '-' title "(a)"
@@ -10531,6 +10534,7 @@ Ffigure_missing
           4 40
           5 50
           e
+^ </td><td><img src="figure_missing.png"></td></tr></table>
 
  Plot (a) differs in gnuplot 4 and gnuplot 5 because the third line contains
  only one valid number.  Version 4 switched to a single-datum-on-a-line
@@ -11879,10 +11883,11 @@ Ffigure_missing
  and draws a box around it with a thick border:
        set key left bottom Left title 'Legend' box lw 3
 
-Ffigure_keyentry
+#TeX \newpage
 4 extra key entries
 ?key entries
 ?keyentry
+Ffigure_keyentry
  Normally each plot autogenerates a single line entry in the key.  If you need
  more control over what appears in the key you can use the `keyentry` keyword
  in the `plot` or `splot` command to insert extra lines.  Instead of providing
@@ -12270,6 +12275,12 @@ Ffigure_multiple_keys
 
  For the wxt and qt terminals, left-click on a hypertext anchor after the
  text has appeared will copy the hypertext to the clipboard.
+
+^ <br><table class="button"><tr><td>
+^     <a href="http://www.gnuplot.info/demo_svg_5.5/hypertext.html"
+^      class="button">
+^ click to see hypertext demo </a>
+^ </td></tr></table>
 
  EXPERIMENTAL (implementation details may change)
  Text of the form "image{<xsize>,<ysize>}:<filename>{\n<caption text>}" will

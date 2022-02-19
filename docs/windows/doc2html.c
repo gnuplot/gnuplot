@@ -368,6 +368,9 @@ process_line(char *line, FILE *b, FILE *c, FILE *d)
             } else if (inhlink) {
                 inhlink = FALSE;
 	        fputs(line + 2, b);	/* copy directly */
+	    } else if (!strncmp(line,"^figure_",8)) {
+		/* or fall through to embedded figure as in doc2web? */
+		;
             } else {
                 if (line[2] == '!') { /* hack for function sections */
                     const char magic[] = "<!-- INCLUDE_NEXT_TABLE -->";
