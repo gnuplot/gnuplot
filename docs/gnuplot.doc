@@ -22,6 +22,7 @@ C
 ^<p align="center">  Copyright (C) 1986 - 1993, 1998 - 2004   Thomas Williams, Colin Kelley<br>
 ^     Copyright (C) 2004 - 2022 various authors</p>
 ^<p align="center">   Mailing list for comments: <tt>gnuplot-info@lists.sourceforge.net</tt><br>
+^   Gnuplot <a href="http://gnuplot.info"> home page </a><br>
 ^      Issue trackers: &nbsp;
 ^<a href="https://sourceforge.net/p/gnuplot/bugs"> bugs </a> &nbsp;&nbsp;
 ^<a href="https://sourceforge.net/p/gnuplot/feature-requests"> feature requests </a>
@@ -846,7 +847,7 @@ C
  titles, key, etc.  NB: For information about the HTML5 canvas terminal
  see `set term canvas`.
 
- In earlier versions of gnuplot, some terminal types used the values from
+ In early versions of gnuplot, some terminal types used the values from
  `set size` to control also the size of the output canvas; others did not.
  The use of 'set size' for this purpose was deprecated in version 4.
  Almost all terminals now behave as follows:
@@ -3958,6 +3959,13 @@ Ffigure_newsyntax
       arrows in numerical order
  In the case of multiple plots on a single page (multiplot mode) this order
  applies separately to each component plot, not to the multiplot as a whole.
+
+ An exception to this is that several TeX-based terminals (e.g. pslatex,
+ cairolatex) accumulate all text elements in one output stream and graphics
+ in a separate output stream;  the text and graphics are then combined to
+ yield the final figure. In general this leaves each text element either
+ completely behind or completely in front of the graphics.
+
 2 mouse input
 ?mouse input
  Many terminals allow interaction with the current plot using the mouse. Some
@@ -17805,9 +17813,10 @@ Ffigure_sparsematrix
  useful things supported by the `terminal` you are currently using.
 
  `test palette` plots profiles of R(z),G(z),B(z), where 0<=z<=1. These are the
- RGB components of the current color `palette`. It also plots the apparent net
- intensity as calculated using NTSC coefficients to map RGB onto a grayscale.
- The profile values are also loaded into a datablock named $PALETTE.
+ RGB components of the current color palette as defined by `set palette`.
+ It also plots the apparent net intensity as calculated using NTSC coefficients
+ to map RGB onto a grayscale.  The command also loads the profile values into a
+ datablock named $PALETTE.
 2 toggle
 ?commands toggle
 ?toggle
