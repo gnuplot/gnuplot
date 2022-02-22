@@ -81,7 +81,7 @@ extern "C" {
 # include <cairo.h>
 
 /* oversampling scale */
-#define GP_CAIRO_SCALE 20
+#define GP_CAIRO_SCALE 200
 
 typedef struct rgba_color {
 	double r;
