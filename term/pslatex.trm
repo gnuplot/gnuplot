@@ -427,7 +427,9 @@ EPSLATEX_common_init()
     PSLATEX_pagesize_y = term->ymax * ysize;
 
     /* cairo terminals use a different convention for xmax/ymax */
-    if (!strcmp(term->name,"cairolatex")) {
+    if (ISCAIROTERMINAL) {
+	PSLATEX_pagesize_x *= (double)(2*PS_SC)/(double)GP_CAIRO_SCALE;
+	PSLATEX_pagesize_y *= (double)(2*PS_SC)/(double)GP_CAIRO_SCALE;
 	PSLATEX_pagesize_x += 2*PS_SC * xsize;
 	PSLATEX_pagesize_y += 2*PS_SC * ysize;
     }
@@ -725,6 +727,11 @@ TERM_PUBLIC void
 EPSLATEX_put_text(unsigned int x, unsigned int y, const char *str)
 {
     if (gpoutfile) {
+	if (ISCAIROTERMINAL) {
+	    x *= 2. * (double)PS_SC /  (double)GP_CAIRO_SCALE;
+	    y *= 2. * (double)PS_SC /  (double)GP_CAIRO_SCALE;
+	}
+
 	if (!tex_color_synced) {
 	    fputs(tex_current_color, gpoutfile);
 	    fputs("%%\n", gpoutfile);
