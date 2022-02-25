@@ -5187,7 +5187,7 @@ process_image(void *plot, t_procimg_action action)
 		    gpiPoint corners[8];  /* At most 5 corners. */
 		    gpiPoint clipped[8];  /* used during clipping */
 
-		    corners[0].style = FS_SOLID;
+		    corners[0].style = FS_OPAQUE;
 
 		    if (corners_in_view > 0) {
 			int i_corners;
@@ -5237,6 +5237,11 @@ process_image(void *plot, t_procimg_action action)
 			if (private_colormap) {
 			    double gray = map2gray(points[i_image].CRD_COLOR,
 							     private_colormap);
+			    int alpha = ((int)(points[i_image].CRD_COLOR) >> 24) & 0xff;
+			    if (alpha && (term->flags & TERM_ALPHA_CHANNEL)) {
+				alpha = alpha * 100./255.;
+				corners[0].style = FS_TRANSPARENT_SOLID + (alpha<<4);
+			    }
 			    set_rgbcolor_var(rgb_from_colormap(gray, private_colormap));
 			} else {
 			    set_color( cb2gray(points[i_image].CRD_COLOR) );

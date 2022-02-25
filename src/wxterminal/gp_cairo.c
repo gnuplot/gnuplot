@@ -1694,7 +1694,6 @@ void gp_cairo_fill(plot_struct *plot, int fillstyle, int fillpar)
 	double red = 0, green = 0, blue = 0, fact = 0;
 
 	switch (fillstyle) {
-	default:
 	case FS_SOLID: /* solid fill */
 		if (plot->color.alpha > 0) {
 			fillpar = 100. * (1. - plot->color.alpha);
@@ -1734,6 +1733,10 @@ void gp_cairo_fill(plot_struct *plot, int fillstyle, int fillpar)
 	case FS_EMPTY: /* fill with background plot->color */
 		cairo_set_source_rgb(plot->cr, plot->background.r, plot->background.g, plot->background.b);
 		FPRINTF((stderr,"empty\n"));
+		return;
+	default:
+		cairo_set_source_rgb(plot->cr, plot->color.r, plot->color.g, plot->color.b);
+		FPRINTF((stderr,"default %lf %lf %lf\n",plot->color.r, plot->color.g, plot->color.b));
 		return;
 	}
 }
