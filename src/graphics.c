@@ -5187,7 +5187,7 @@ process_image(void *plot, t_procimg_action action)
 		    gpiPoint corners[8];  /* At most 5 corners. */
 		    gpiPoint clipped[8];  /* used during clipping */
 
-		    corners[0].style = FS_DEFAULT;
+		    corners[0].style = FS_SOLID;
 
 		    if (corners_in_view > 0) {
 			int i_corners;
