@@ -529,7 +529,7 @@ boundary3d(struct surface_points *plots, int count)
     }
 
     /* For anything that really wants to be the same on x and y */
-    xyscaler = sqrt(xscaler*yscaler);
+    xyscaler = sqrt((double)xscaler * (double)yscaler);
 
     /* This one is used to scale circles in 3D plots */
     radius_scaler = xscaler * surface_scale / (X_AXIS.max - X_AXIS.min);
