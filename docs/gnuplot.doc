@@ -1213,7 +1213,7 @@ C  need @ in table, so end and restart the table !
  `enhanced_utf8.dem`
 ^ </a>
 
-3 Escape sequences
+3 escape sequences
 ?escape sequences
 ?enhanced text escape sequences
 ?unicode
@@ -2927,7 +2927,7 @@ C 4 index
  this does not guarantee that non-trivial zeros of the zeta function will
  evaluate exactly to 0.
 
-3 Operators
+3 operators
 ?expressions operators
 ?operators
  The operators in `gnuplot` are the same as the corresponding operators in the
@@ -3224,7 +3224,7 @@ C ... and restart the table:
        plot 'file' using 1:( $4<0 ? 1/0 : ($2+$3)/2 )
 
  For an explanation of the `using` syntax, please see `plot datafile using`.
-3 Summation
+3 summation
 ?expressions operators summation
 ?operators summation
 ?summation
@@ -3348,7 +3348,7 @@ C ... and restart the table:
 
  See `show functions`, `functions`, `gnuplot-defined variables`, `macros`,
  `value`.
-3 Arrays
+3 arrays
 ?arrays
 =cardinality
  Arrays are implemented as indexed lists of user variables.  The elements in an
@@ -4440,7 +4440,7 @@ Ffigure_newsyntax
  Curly braces are used in the syntax for enhanced text mode and to delimit
  blocks in if/then/else statements.  They are also used to denote complex
  numbers: {3,2} = 3 + 2i.
-3 Quote Marks
+3 quote Marks
 ?quotes
 ?syntax quotes
  Gnuplot uses three forms of quote marks for delimiting text strings,
@@ -6065,7 +6065,7 @@ Ffigure_yerrorlines
  be used in 3D by providing an extra column of data containing z coordinate.
  Some plot types (pm3d coloring, surfaces, contours) must be generated using the
  `splot` command even if only a 2D projection is wanted.
-3 Surface plots
+3 surface plots
 ?surface plots
 =surface
 Ffigure_surface+contours
@@ -9984,7 +9984,7 @@ Ffigure_smooth_path
  dot/dash pattern.  The `set color` command exits this alternative monochrome
  mode and restores the previous set of default color lines.
  See `set monochrome`, `set linetype`, and `set colorsequence`.
-3 Colormap
+3 colormap
 ?commands set colormap
 ?set colormap
 ?colormap
