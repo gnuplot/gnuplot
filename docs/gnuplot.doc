@@ -1584,7 +1584,7 @@ Ffigure_E0
 ^<tr>    <td>palette(z)</td>    <td>real</td>    <td> 24bit RGB palette color mapped to z</td></tr>
 ^<tr>    <td>rgbcolor("name")</td>    <td>string</td>    <td> 32bit ARGB color from name</td></tr>
 ^<tr>    <td>stringcolumn(x)</td>    <td>int</td>    <td> content column <i>x</i> as a string.</td></tr>
-^<tr>    <td>valid(x)</td>    <td>int</td>    <td> test validity of column(<i>x</i>) during datafile manip.</td></tr>
+^<tr>    <td>valid(x)</td>    <td>int</td>    <td> test validity of column <i>x</i> during datafile input</td></tr>
 ^<tr>    <td>value("name")</td>    <td>string</td>    <td> returns the current value of the named variable.</td></tr>
 ^</tbody>
 ^</table>
@@ -2355,22 +2355,13 @@ C 4 weekdata_cdc
 %c c l .
 %Function@Arguments@Returns
 %_
-4 column
-?expressions functions column
-?column
-#column(x) & int or string & column $x$ during datafile manipulation. \\
-%column(x)@int or string@column $x$ during datafile manipulation.
- `column(x)` may be used only as part of a plot, splot, or stats command.
- It evaluates to the numerical value of the content of column x.
- See `plot datafile using`.
-4 columnhead
-?expressions functions columnhead
-?columnhead
+??
+#column(x) & int or string & numerical value of column $x$ during datafile input \\
+%column(x)@int or string@numerical value of column $x$ during datafile input
+??
 #columnhead(x) & int & string containing first entry of column $x$ in datafile. \\
 %columnhead(x)@int@string containing first entry of column $x$ in datafile.
- `columnhead(x)` may only be used as part of a plot, splot, or stats command.
- It evaluates to a string containing the content of column x in the first line
- of a data file. See `plot datafile using`.
+??
 4 exists
 ?expressions functions exists
 ?exists
@@ -2388,7 +2379,6 @@ C 4 weekdata_cdc
  The `hsv2rgb(h,s,v)` function converts HSV (Hue/Saturation/Value) triplet
  to an equivalent RGB value.
 ??
-C 4 index
 #index(A,x) & array, any & integer i such that A[i] = x. 0 if no match.\\
 %index(A,x)@array, any@integer i such that A[i] = x. 0 if no match.
 4 palette
@@ -2410,25 +2400,13 @@ C 4 index
  This can be used to read a color name from a data file or to add an alpha
  channel to a named color in the upper byte of the returned value.
  See `colorspec`.
-4 stringcolumn
-?expressions functions stringcolumn
-?stringcolumn
-?expressions functions strcol
-?strcol
-#stringcolumn(x) & int or string & content of column $x$ as a string. \\
+??
+#stringcolumn(x) & int or string & content of column $x$ as a string \\
 %stringcolumn(x)@int or string@content column $x$ as a string.
- `stringcolumn(x)` may be used only in expressions as part of `using` manipulations
- to fits or datafile plots.  It returns the content of column x as a string variable.
- `strcol(x)` is shorthand for `stringcolumn(x)`.
- See `plot datafile using`.
-4 valid
-?expressions functions valid
-?valid
-#valid(x) & int & test validity of $\mbox{column}(x)$ during datafile manip.\\
-%valid(x)@int@test validity of column($x$) during datafile manip.
- `valid(x)` may be used only in expressions as part of `using` manipulations
- to fits or datafile plots.  See `plot datafile using`.
-
+??
+#valid(x) & int & test validity of column $x$ during datafile input\\
+%valid(x)@int@test validity of column $x$  during datafile input.
+??
 #value("name") & string & returns the value of the named variable.\\
 %value("name")@string@returns the current value of the named variable.
 4 voxel
@@ -2860,6 +2838,7 @@ C 4 index
  `uigamma(a, x)` returns the regularized upper incomplete gamma function Q(a, x),
  NIST DLMF eq 8.2.4
  For the complementary lower incomplete gamma function P(a,x), see `igamma`.
+#TeX \\
  Q(a, x) + P(a, x) = 1.
 
 #TeX \quad\quad uigamma$(a,z)=Q(a,x) = 1-P(a,x)$
@@ -2869,6 +2848,61 @@ C 4 index
  The domain is restricted to real a>0, real x>=0.
  EXPERIMENTAL:
  To be replaced by an implementation that handles complex arguments.
+
+4 using specifier functions
+ These functions are valid only in the context of data input.  Usually this
+ means use in an expression that provides an input field of the `using`
+ specifier in a `plot`, `splot`, `fit`, or `stats` command.  However the
+ scope of the functions is actually the full clause of the plot command,
+ including for example use of `columnhead` in constructing the plot title.
+
+5 column
+?expressions functions column
+?column
+ The `column(x)` function may be used only in the `using` specifier 
+ of a plot, splot, fit, or stats command.
+ It evaluates to the numerical value of the content of column x.
+ If the column is expected to hold a string, use instead stringcolumn(x)
+ or timecolumn(x, "timeformat").
+ See `plot datafile using`, `stringcolumn`, `timecolumn`.
+5 columnhead
+?expressions functions columnhead
+?columnhead
+ The `columnhead(x)` function may only be used as part of a plot, splot,
+ or stats command.  It evaluates to a string containing the content of
+ column x in the first line of a data file.  This is typically used to
+ extract the column header for use in a plot title.
+ See `plot datafile using`.
+ Example:
+      set datafile columnheader
+      plot for [i=2:4] DATA using 1:i title columnhead(i)
+5 stringcolumn
+?expressions functions stringcolumn
+?stringcolumn
+?expressions functions strcol
+?strcol
+ The `stringcolumn(x)` function may be used only in the `using` specification
+ of a data plot or `fit` command.  It returns the content of column x as a
+ string.  `strcol(x)` is shorthand for `stringcolumn(x)`.
+ If the string is to be interpreted as a time or date, use instead
+ timecolumn(x, "timeformat").  See `plot datafile using`.
+5 valid
+?expressions functions valid
+?valid
+ The `valid(x)` function may be used only in expressions that are part of a
+ `using` specification.  It can be used to detect explicit NaN values or
+ unexpected garbage in a field of the input stream, perhaps to substitute
+ a default value or to prevent further arithmetic operations using NaN.
+ Both "missing" and NaN (not-a-number) data values are considered to be
+ invalid, but it is important to note that if the program recognizes that a
+ field is truly missing or contains a "missing" flag then the input line is
+ discarded before the expression invoking valid() would be called.
+ See `plot datafile using`, `missing`.
+
+ Example:
+      # Treat an unrecognized bin value as contributing some constant
+      # prior expectation to the bin total rather than ignoring it.
+      plot DATA using 1 : (valid(2) ? $2 : prior) smooth unique
 
 4 value
 ?expressions functions value
@@ -2948,7 +2982,7 @@ C 4 index
        ~           ~a        * one's complement
        !           !a        * logical negation
        !           a!        * factorial
-       $           $3        * call arg/column during `using` manipulation
+       $           $3        * data column in `using` specifier
        ||          |A|         cardinality of array A
 =factorial
 =negation
@@ -2963,7 +2997,7 @@ C 4 index
 #\verb@~@ & \verb@~a@ & * one's complement \\
 #\verb@!@ & \verb@!a@ & * logical negation \\
 #\verb@!@ & \verb@a!@ & * factorial \\
-#\verb@$@ & \verb@$3@ & * call arg/column during `using` manipulation \\
+#\verb@$@ & \verb@$3@ & * data column in `using` specifier \\
 #\verb@|@ & \verb@|A|@ & cardinality of array A \\
 C ugly hack: doc2ms uses $ as delimiter for eqn's so it doesn't seem to
 C be able to print them. So we have to typeset this table without using
@@ -2987,7 +3021,7 @@ C ... and restart the table:
 %~@~a@* one's complement
 %!@!a@* logical negation
 %!@a!@* factorial
-%$@$3@* call arg/column during `using` manipulation
+%$@$3@* data column in `using` specifier
 %|@|A|@cardinality of array A
 @end table
 
@@ -3006,7 +3040,7 @@ C ... and restart the table:
 ^<tr>    <td><tt>~</tt></td>    <td><tt>~a</tt></td>    <td>* one's complement</td></tr>
 ^<tr>    <td><tt>!</tt></td>    <td><tt>!a</tt></td>    <td>* logical negation</td></tr>
 ^<tr>    <td><tt>!</tt></td>    <td><tt>a!</tt></td>    <td>* factorial</td></tr>
-^<tr>    <td><tt>$</tt></td>    <td><tt>$3</tt></td>    <td>* call arg/column during `using` manipulation</td></tr>
+^<tr>    <td><tt>$</tt></td>    <td><tt>$3</tt></td>    <td>* data column in `using` specifier</td></tr>
 ^<tr>    <td><tt>|</tt></td>    <td><tt>|A|</tt></td>   <td>cardinality of array A</td></tr>
 ^</tbody>
 ^</table>
@@ -8555,6 +8589,7 @@ Ffigure_smooth_path
  in the file contain different numbers of columns.
 
  The function `valid(N)` tests whether column N contains a valid number.
+ It returns 0 if the column value is missing, uninterpretable, or NaN.
 =column
 =columnheader
  If each column of data in the input file contains a label in the first row
@@ -10558,13 +10593,16 @@ Ffigure_missing
 ^ <a href="http://www.gnuplot.info/demo/mgr.html">
  imageNaN demo.
 ^ </a>
- Similarly gnuplot 5.4 will notice the missing value flag in column N whether
- the plot command specifies `using N` or `using ($N)` or `using (func($N))`.
- However if the "missing" value is encountered during evaluation of some more
- complicated expression, e.g. `using (column(strcol(1))`, it may evaluate to
- NaN and be treated as invalid data rather than as a missing data point.
- If you nevertheless want to treat this as missing data, use the command
- `set datafile missing NaN`.
+
+ Starting with version 5.4, gnuplot notices a missing value flag in column N
+ when the plot command specifies `using N`, `using ($N)` or `using (func($N))`.
+ In these cases the program treats the entire input data line as if it were
+ not present at all.  However if the "missing" value is encountered during
+ evaluation of a more complicated expression, e.g. `using (column(strcol(1))`,
+ it may evaluate to NaN and be treated as invalid data rather than as a
+ missing data point.  If you nevertheless want to treat this as missing data,
+ use the command `set datafile missing NaN`.
+
 4 set datafile separator
 ?set datafile separator
 ?show datafile separator
