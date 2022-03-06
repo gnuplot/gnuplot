@@ -314,6 +314,9 @@ static TBOOLEAN df_already_got_headers = FALSE;
 char *df_key_title = NULL;		/* filled in from column header if requested */
 struct at_type *df_plot_title_at;	/* used for deferred evaluation of plot title */
 
+/* last resort mechanism to catch missing data */
+static TBOOLEAN df_missing_data_in_expression = FALSE;
+
 
 /* Binary *read* variables used by df_readbinary().
  * There is a confusing difference between the ascii and binary "matrix" keywords.
@@ -1734,13 +1737,17 @@ plot_option_using(int max_using)
 		if (no_cols < at_highest_column_used)
 		    no_cols = at_highest_column_used;
 
-		/* Try to detect dependence on a particular column so that
-		 * if it contains a "missing value" placeholder we can skip
-		 * evaluation altogether.
+		/* An imperfect test for dependence on particular columns
+		 * so that we do not try to evaluate this expression if a
+		 * column it refers to contains a "missing value" placeholder.
 		 */
 		for (i = 0; i < spec->at->a_count; i++) {
 		    if (spec->at->actions[i].index == DOLLARS)
 			spec->depends_on_column = (int)spec->at->actions[i].arg.v_arg.v.int_val;
+		    if ((spec->at->actions[i].index == COLUMN)
+		    &&  (spec->at->actions[i-1].index == PUSHC)
+		    &&  (spec->at->actions[i-1].arg.v_arg.type == INTGR))
+			spec->depends_on_column = (int)spec->at->actions[i-1].arg.v_arg.v.int_val;
 		}
 
 		/* Catch at least the simplest case of 'autotitle columnhead' using an expression */
@@ -2219,18 +2226,23 @@ df_readascii(double v[], int max)
 			}
 		    }
 
+		    df_missing_data_in_expression = FALSE;
 		    a.type = NOTDEFINED;
 		    evaluate_inside_using = TRUE;
 		    evaluate_at(use_spec[output].at, &a);
 		    evaluate_inside_using = FALSE;
-		    /* If column N contains the "missing" flag and is referenced by
-		     * 'using N' or 'using (func($N)) then we caught it already.
-		     * Here we check for indirect references like 'using "header_of_N"'.
+
+		    /* We tried to avoid evaluating this expression at all if its
+		     * dependence on a data column N was obvious (e.g. 'using ($N)')
+		     * and that column was seen to be missing from this input line.
+		     * Here we check whether actual evaluation tripped over missing
+		     * data values referenced indirectly (e.g. 'using (column($1))'.
 		     */
-		    if ((a.type == CMPLX) && isnan(a.v.cmplx_val.real)
-		    && (a.v.cmplx_val.imag == DF_MISSING)) {
-			return_value = DF_MISSING;
+		    if (df_missing_data_in_expression) {
+			FPRINTF((stderr,
+			    "df_readascii: hit missing data value during evaluation\n"));
 			v[output] = not_a_number();
+			return_value = DF_MISSING;
 			continue;
 		    }
 
@@ -2735,16 +2747,16 @@ f_column(union argument *arg)
 	push(Ginteger(&a, line_count));
     else if (column == 0)       /* $0 = df_datum */
 	push(Gcomplex(&a, (double) df_datum, 0.0));
-    else if (column == DOLLAR_NCOLUMNS)	/* $# returns actual number of columns in this line */
+    else if (column == DOLLAR_NCOLUMNS)	{
+	/* $# returns actual number of columns in this line */
 	push(Gcomplex(&a, (double)df_no_cols, 0.0));
-    else if (column < 1 || column > df_no_cols) {
+    } else if (column < 1 || column > df_no_cols) {
 	undefined = TRUE;
-	/* Nov 2014: This is needed in case the value is referenced */
-	/* in an expression inside a 'using' clause.		    */
 	push(Gcomplex(&a, not_a_number(), 0.0));
     } else if (df_column[column-1].good == DF_MISSING) {
 	/* Doesn't set undefined to TRUE although perhaps it should */
 	push(Gcomplex(&a, not_a_number(), (double)DF_MISSING));
+	df_missing_data_in_expression = TRUE;
     } else if (df_column[column-1].good != DF_GOOD) {
 	undefined = TRUE;
 	push(Gcomplex(&a, not_a_number(), 0.0));

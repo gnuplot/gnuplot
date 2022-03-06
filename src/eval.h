@@ -63,7 +63,8 @@ enum operators {
 #endif
 
     /* functions specific to using spec */
-    COLUMN, STRINGCOLUMN, STRCOL, COLUMNHEAD
+    COLUMN, STRINGCOLUMN, STRCOL, COLUMNHEAD, COLUMNHEADER,
+    VALID, TIMECOLUMN
 };
 #define is_jump(operator) \
     ((operator) >=(int)JUMP && (operator) <(int)SF_START)
