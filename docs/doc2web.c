@@ -493,7 +493,7 @@ process_line(char *line, FILE *b, FILE *d)
 			"<table class=\"center\"><th colspan=3>Subtopics</th><tr><td width=33%><ul>\n",
 		    "</ul></td></tr></table>\n",
 		    "\t<li><a href=\"loc%d.html\">%s</a></li>\n",
-		    14,
+		    3,   /* number of columns */
 		    "</ul></td><td width=33%><ul>\n");
 		}
 		last_line = line_count;

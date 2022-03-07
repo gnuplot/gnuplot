@@ -31,7 +31,7 @@
 ]*/
 
 /*
- * this file is used by doc2ipf, doc2html, doc2rtf and doc2info
+ * this file is used by doc2ipf, doc2html, doc2rtf, doc2info, and doc2web
  *
  * MUST be included after termdoc.c (since termdoc.c redefines fgets() )
  *
@@ -336,26 +336,41 @@ refs( int l, FILE *f, char *start, char *end, char *format)
 /*
  * Same as refs() but writes a multi-column table.
  * Two additional parameters
- *	maxrows = insert a column break after this many entries
+ *	ncolumns = split table of subtopics into this many columns
  *	char *newcolumn inserted after every maxrows to start a new column
  *
  * The whole menu is bracketed by start ... end as with refs().
  */
 void
 reftable( int l, FILE *f, char *start, char *end, char *format,
-      int maxrows, char *newcolumn)
+      int ncolumns, char *newcolumn)
 {
     int curlevel, i;
     char *c;
     int inlist = FALSE;
     int entries = 0;	/* entries (so far) in this column */
+    int maxrows = 1;
+    struct LIST *savehead;
 
     /* find current line */
     list = head;
     while (list->line != l)
 	list = list->next;
     curlevel = list->level;
-    list = list->next;		/* look at next element before going on */
+    list = list->next;	/* look at next element before going on */
+    savehead = list;
+
+    /* Count number of subtopics in advance so we know how many to leave room for */
+    for (entries = 0; list != NULL; list = list->next) {
+	if (list->level <= curlevel)
+	    break;
+	if (list->level == curlevel + 1)
+	    ++entries;
+    }
+    /* Find size of columns */
+    maxrows = 1 + (entries / ncolumns);
+    list = savehead;
+    entries = 0;
 
     if ((start != NULL) && (list != NULL) && (list->level > curlevel)) {
 	/* don't write start if there's no menu at all */
@@ -388,7 +403,7 @@ reftable( int l, FILE *f, char *start, char *end, char *format,
 			    fprintf(f, format, c);
 		    }
 		}
-		if (++entries >= maxrows && newcolumn) {
+		if ((++entries >= maxrows) && (newcolumn != NULL)) {
 		    fprintf(f, newcolumn);
 		    entries = 0;
 		}
