@@ -1387,7 +1387,7 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>tm_yday(t)</td>    <td>time in sec</td>    <td>the day of the year</td></tr>
 ^<tr>    <td>tm_year(t)</td>    <td>time in sec</td>    <td>the year</td></tr>
 ^<tr>    <td>time(x)</td>    <td>any</td>    <td>the current system time</td></tr>
-^<tr>    <td>valid(x)</td>    <td>int</td>    <td> test validity of column(<i>x</i>) during datafile manip.</td></tr>
+^<tr>    <td>valid(x)</td>    <td>int</td>    <td> test validity of column <i>x</i> during datafile input</td></tr>
 ^<tr>    <td>value("name")</td>    <td>string</td>    <td> returns the current value of the named variable.</td></tr>
 ^</tbody>
 ^</table>
@@ -1963,22 +1963,10 @@ C marker below is used to signal this to doc2html:
 %c c l .
 %Function@Arguments@Returns
 %_
-4 column
-?expressions functions column
-?column
-#column(x) & int or string & column $x$ during datafile manipulation. \\
-%column(x)@int or string@column $x$ during datafile manipulation.
- `column(x)` may be used only as part of a plot, splot, or stats command.
- It evaluates to the numerical value of the content of column x.
- See `plot datafile using`.
-4 columnhead
-?expressions functions columnhead
-?columnhead
+#column(x) & int or string & column $x$ during datafile input \\
+%column(x)@int or string@column $x$ during datafile input
 #columnhead(x) & int & string containing first entry of column $x$ in datafile. \\
 %columnhead(x)@int@string containing first entry of column $x$ in datafile.
- `columnhead(x)` may only be used as part of a plot, splot, or stats command.
- It evaluates to a string containing the content of column x in the first line
- of a data file. See `plot datafile using`.
 4 exists
 ?expressions functions exists
 ?exists
@@ -2002,29 +1990,11 @@ C marker below is used to signal this to doc2html:
 %palette(z)@double@RGB palette color mapped to z.
  `palette(z)` returns the RGB representation of the palette color mapped to z
   given the current extremes of cbrange.
-4 stringcolumn
-?expressions functions stringcolumn
-?stringcolumn
-?expressions functions strcol
-?strcol
+??
 #stringcolumn(x) & int or string & content of column $x$ as a string. \\
 %stringcolumn(x)@int or string@content column $x$ as a string.
- `stringcolumn(x)` may be used only in expressions as part of `using` manipulations
- to fits or datafile plots.  It returns the content of column x as a string variable.
- `strcol(x)` is shorthand for `stringcolumn(x)`.
- See `plot datafile using`.
-4 timecolumn
-?expressions functions timecolumn
-?timecolumn
 #timecolumn(N,"timeformat") & int, string & time data from column $N$ during data input. \\
 %timecolumn(N,"timeformat")@int, string@time data from column $N$ during data input.
- `timecolumn(N,"timeformat")` may be used only in expressions as part of `using`
- manipulations to fits or datafile plots.   See `plot datafile using`.
-
- It reads string data starting at column N as a time/date value and uses "timeformat"
- to interpret this as "seconds since the epoch" to millisecond precision.
- If no format parameter is given, the format defaults to the string from 
- `set timefmt`.
 4 tm_hour
 ?expressions functions tm_hour
 ?tm_hour
@@ -2101,14 +2071,9 @@ C marker below is used to signal this to doc2html:
  real and may include fractional seconds.  If the argument is a string,
  it is assumed to be a format and  is passed to `strftime` to provide a
  formatted time string.  See also `time_specifiers` and `timefmt`.
-4 valid
-?expressions functions valid
-?valid
-#valid(x) & int & test validity of $\mbox{column}(x)$ during datafile manip.\\
-%valid(x)@int@test validity of column($x$) during datafile manip.
- `valid(x)` may be used only in expressions as part of `using` manipulations
- to fits or datafile plots.  See `plot datafile using`.
-
+??
+#valid(x) & int & test validity of $\mbox{column}(x)$ during datafile input\\
+%valid(x)@int@test validity of column($x$) during datafile input
 #value("name") & string & returns the value of the named variable.\\
 %value("name")@string@returns the current value of the named variable.
 4 voxel
@@ -2155,6 +2120,70 @@ C marker below is used to signal this to doc2html:
                    to x.
        rand({x,y}) for integer 0 < x,y < 2^31-1 sets seed1 to x and
                    seed2 to y.
+
+4 using specifier functions
+ These functions are valid only in the context of data input.  Usually this
+ means use in an expression that provides an input field of the `using`
+ specifier in a `plot`, `splot`, `fit`, or `stats` command.  However the
+ scope of the functions is actually the full clause of the plot command,
+ including for example use of `columnhead` in constructing the plot title.
+
+5 column
+?expressions functions column
+?column
+ The `column(x)` function may be used only in the `using` specifier
+ of a plot, splot, fit, or stats command.
+ It evaluates to the numerical value of the content of column x.
+ If the column is expected to hold a string, use instead stringcolumn(x)
+ or timecolumn(x, "timeformat").
+ See `plot datafile using`, `stringcolumn`, `timecolumn`.
+5 columnhead
+?expressions functions columnhead
+?columnhead
+ The `columnhead(x)` function may only be used as part of a plot, splot,
+ or stats command.  It evaluates to a string containing the content of
+ column x in the first line of a data file.  This is typically used to
+ extract the column header for use in a plot title.
+ See `plot datafile using`.
+ Example:
+      set datafile columnheader
+      plot for [i=2:4] DATA using 1:i title columnhead(i)
+5 stringcolumn
+?expressions functions stringcolumn
+?stringcolumn
+?expressions functions strcol
+?strcol
+ The `stringcolumn(x)` function may be used only in the `using` specification
+ of a data plot or `fit` command.  It returns the content of column x as a
+ string.  `strcol(x)` is shorthand for `stringcolumn(x)`.
+ If the string is to be interpreted as a time or date, use instead
+ timecolumn(x, "timeformat").  See `plot datafile using`.
+5 timecolumn
+?expressions functions timecolumn
+?timecolumn
+ `timecolumn(N,"timeformat")` reads string data starting at column N as a time/date
+ value and uses "timeformat" to interpret this as "seconds since the epoch" to
+ millisecond precision.  If no format parameter is given, the format defaults
+ to the string from `set timefmt`.  This function is valid only in the `using`
+ specification of a plot or stats command.  See `plot datafile using`.
+5 valid
+?expressions functions valid
+?valid
+ The `valid(x)` function may be used only in expressions that are part of a
+ `using` specification.  It can be used to detect explicit NaN values or
+ unexpected garbage in a field of the input stream, perhaps to substitute
+ a default value or to prevent further arithmetic operations using NaN.
+ Both "missing" and NaN (not-a-number) data values are considered to be
+ invalid, but it is important to note that if the program recognizes that a
+ field is truly missing or contains a "missing" flag then the input line is
+ discarded before the expression invoking valid() would be called.
+ See `plot datafile using`, `missing`.
+
+ Example:
+      # Treat an unrecognized bin value as contributing some constant
+      # prior expectation to the bin total rather than ignoring it.
+      plot DATA using 1 : (valid(2) ? $2 : prior) smooth unique
+
 4 value
 ?expressions functions value
 ?value
