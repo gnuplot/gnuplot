@@ -75,9 +75,6 @@ loadpath_handler(int action, char *path)
     /* index pointer, end of loadpath,
      * env section of loadpath, current limit, in that order */
     static char *p, *last, *envptr, *limit;
-#ifdef X11
-    char *appdir;
-#endif
 
     switch (action) {
     case ACTION_CLEAR:
@@ -152,16 +149,12 @@ loadpath_handler(int action, char *path)
 	fprintf(stderr,"\tgnuplotrc is read from %s\n",GNUPLOT_SHARE_DIR);
 #endif
 #ifdef X11
-	if ((appdir = getenv("XAPPLRESDIR"))) {
+	{
+	char *appdir;
+	if ((appdir = getenv("XAPPLRESDIR")))
 	    fprintf(stderr,"\tenvironmental path for X11 application defaults: \"%s\"\n",
 		appdir);
 	}
-#ifdef XAPPLRESDIR
-	else {
-	    fprintf(stderr,"\tno XAPPLRESDIR found in the environment,\n");
-	    fprintf(stderr,"\t    falling back to \"%s\"\n", XAPPLRESDIR);
-	}
-#endif
 #endif
 	break;
     case ACTION_SAVE:

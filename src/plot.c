@@ -341,9 +341,6 @@ main(int argc_orig, char **argv)
 
 	} else if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
 	    printf( "Usage: gnuplot [OPTION] ... [FILE]\n"
-#ifdef X11
-		    "for X11 options see 'help X11->command-line-options'\n"
-#endif
 		    "  -V, --version\n"
 		    "  -h, --help\n"
 		    "  -p  --persist\n"

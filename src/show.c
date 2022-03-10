@@ -1060,11 +1060,7 @@ show_version(FILE *fp)
 	p += sizeof(prefix) - 1;
     } else {
 #ifdef BINDIR
-# ifdef X11
-	fprintf(fp, "#!%s/gnuplot -persist\n#\n", BINDIR);
-#  else
 	fprintf(fp, "#!%s/gnuplot\n#\n", BINDIR);
-# endif				/* not X11 */
 #endif /* BINDIR */
     }
 
@@ -1124,15 +1120,13 @@ show_version(FILE *fp)
 		(int)(sizeof(struct coordinate)));
 #endif
 
-#ifdef X11
 	{
 	    char *driverdir = getenv("GNUPLOT_DRIVER_DIR");
 
-	    if (driverdir == NULL)
-		driverdir = X11_DRIVER_DIR;
+	    if (!driverdir)
+		driverdir = GNUPLOT_DRIVER_DIR;
 	    fprintf(stderr, "GNUPLOT_DRIVER_DIR = \"%s\"\n", driverdir);
 	}
-#endif
 
 	{
 	    char *psdir = getenv("GNUPLOT_PS_DIR");

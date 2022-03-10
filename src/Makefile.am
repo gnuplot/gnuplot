@@ -10,8 +10,8 @@ EMAIL = gnuplot-bugs@lists.sourceforge.net
 # Default help file location
 HELPFILE=@GIHDIR@/gnuplot.gih
 
-# Location of X11 app defaults
-XAPPLRESDIR=@X11_APPDEFAULTS_DIR@
+# Generic default driver location
+GNUPLOT_DRIVER_DIR=$(pkglibexecdir)
 
 # Default X11 driver location
 X11_DRIVER_DIR=$(pkglibexecdir)
@@ -40,7 +40,7 @@ binonly: $(bin_PROGRAMS)
 transform = @program_transform_name@
 GNUPLOT_X11 = `echo gnuplot_x11 | sed '$(transform)'`$(EXEEXT)
 
-AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DX11_DRIVER_DIR=\"$(X11_DRIVER_DIR)\" -DQT_DRIVER_DIR=\"$(QT_DRIVER_DIR)\" -DGNUPLOT_SHARE_DIR=\"$(GNUPLOT_SHARE_DIR)\" -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\" -DGNUPLOT_LUA_DIR=\"$(GNUPLOT_LUA_DIR)\"  -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\" -DGNUPLOT_X11=\"$(GNUPLOT_X11)\" -DXAPPLRESDIR=\"$(XAPPLRESDIR)\"
+AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DX11_DRIVER_DIR=\"$(X11_DRIVER_DIR)\" -DQT_DRIVER_DIR=\"$(QT_DRIVER_DIR)\" -DGNUPLOT_SHARE_DIR=\"$(GNUPLOT_SHARE_DIR)\" -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\" -DGNUPLOT_LUA_DIR=\"$(GNUPLOT_LUA_DIR)\"  -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\" -DGNUPLOT_X11=\"$(GNUPLOT_X11)\" -DGNUPLOT_DRIVER_DIR=\"$(GNUPLOT_DRIVER_DIR)\"
 
 gnuplot_SOURCES = alloc.c alloc.h amos_airy.c amos_airy.h axis.c axis.h \
 breaders.c breaders.h bitmap.h  boundary.c boundary.h \
