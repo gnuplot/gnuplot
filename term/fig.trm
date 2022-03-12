@@ -232,7 +232,7 @@ enum FIG_id {
     FIG_SMALL, FIG_BIG,
     FIG_PORTRAIT, FIG_LANDSCAPE,
     FIG_SIZE, FIG_FONT, FIG_FONTSIZE,
-    FIG_THICKNESS, FIG_DEPTH,
+    FIG_THICKNESS, FIG_DEPTH, FIG_POINTSMAX,
     FIG_SOLID, FIG_DASHED,
     FIG_NORMALTEXT, FIG_SPECIALTEXT, FIG_HIDDENTEXT, FIG_RIGIDTEXT,
     FIG_VERSION, FIG_OTHER
@@ -250,6 +250,7 @@ static struct gen_table FIG_opts[] =
     { "fs", FIG_FONTSIZE },
     { "land$scape", FIG_LANDSCAPE },
     { "mono$chrome", FIG_MONOCHROME },
+    { "poi$ntsmax", FIG_POINTSMAX },
     { "portrait", FIG_PORTRAIT },
     { "size", FIG_SIZE },
     { "small", FIG_SMALL },
@@ -405,6 +406,17 @@ FIG_options()
 	    /* V5.3 - depth is now based on TERM_LAYER */
 	    (void) int_expression();
 	    break;
+	case FIG_POINTSMAX:
+	    {
+	    int temp;
+	    c_token++;
+	    temp= int_expression();
+	    if (inrange(temp, 2, FIG_MAX_POINTS+1))
+		FIG_poly_vec_max = temp - 1;
+	    else
+		int_error(c_token, "pointsmax out of range");
+	    break;
+	    }
 	case FIG_OTHER:
 	default:
 	    parse_error = TRUE;
@@ -423,10 +435,10 @@ FIG_options()
                );
     }
 
-    sprintf(term_options, "%s %s %s %s \"%s,%d\" linewidth %.1f",
+    sprintf(term_options, "%s %s pointsmax %d %s %s \"%s,%d\" linewidth %.1f",
 	    FIG_use_color ? "color" : "monochrome",
 	    FIG_portrait ? "portrait" : "landscape",
-	    text_flags,
+	    FIG_poly_vec_max+1, text_flags,
 	    "font", FIG_fonts[FIG_font_id].key, FIG_font_s,
 	    FIG_linewidth_factor
            );
@@ -1308,6 +1320,7 @@ START_HELP(fig)
 "       set terminal fig {monochrome | color}",
 "                        {small | big | size <xsize>{in|cm},<ysize>{in|cm}}",
 "                        {landscape | portrait}",
+"                        {pointsmax <max_points>}",
 "                        {font \"<fontname>{,<fontsize>}\"} {fontsize <size>}",
 "                        {textnormal | {textspecial texthidden textrigid}}",
 "                        {{linewidth|lw} <multiplier>}",
@@ -1319,6 +1332,10 @@ START_HELP(fig)
 " inches (default) or centimeters. The default is `size 5in,3in`.",
 " `small` is shorthand for `size 5in,3in` (3in,5in in portrait mode).",
 " `big` is shorthand for `size 8in,5in`.",
+"",
+" `pointsmax` sets the maximum number of vertices in a polyline; longer ",
+" polylines will be broken into segments.",
+" (Note: this option was not present in versions 5.2.7 through 5.4.3).",
 "",
 " `font` sets the text font face to <fontname> and its size to <fontsize>",
 " points. Choice is limited to the 35 standard PostScript fonts.",
