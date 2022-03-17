@@ -1122,10 +1122,12 @@ show_version(FILE *fp)
 
 	{
 	    char *driverdir = getenv("GNUPLOT_DRIVER_DIR");
-
+#ifdef GNUPLOT_DRIVER_DIR
 	    if (!driverdir)
 		driverdir = GNUPLOT_DRIVER_DIR;
-	    fprintf(stderr, "GNUPLOT_DRIVER_DIR = \"%s\"\n", driverdir);
+#endif
+	    fprintf(stderr, "GNUPLOT_DRIVER_DIR = \"%s\"\n",
+		    driverdir ? driverdir : "");
 	}
 
 	{
