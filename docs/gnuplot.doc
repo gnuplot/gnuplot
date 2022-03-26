@@ -253,7 +253,7 @@ C
 ## of the Voigt profile. See `VP`, `VP_fwhm`.
 #end
 
-4 Hulls and masks
+4 Hulls, masks, and smoothing
 ?new hulls
 #start
 #b A cluster of 2D points can be replaced by its bounding polygon using the
@@ -267,6 +267,7 @@ C
 ## or for 2D curves that are not monotonic on x. See `smooth path`.
 ## This allows smoothing of hulls and masks.
 #b cubic spline smoothing of 3D lines. See `splot smooth csplines`
+#b Smoothing options apply to `splot with filledcurves {above|below|between}`.
 #end
 
 4 New data format
