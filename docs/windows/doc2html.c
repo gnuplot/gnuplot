@@ -363,13 +363,13 @@ process_line(char *line, FILE *b, FILE *c, FILE *d)
                 inhlink = TRUE;
                 /* remove trailing newline etc */
                 str = line + strlen(line) - 1;
-                while (*str=='\r' || *str=='\n') *str-- = NUL;
+                while (*str == '\r' || *str == '\n') *str-- = NUL;
                 fprintf(b, "%s", line + 2);
             } else if (inhlink) {
                 inhlink = FALSE;
 	        fputs(line + 2, b);	/* copy directly */
-	    } else if (!strncmp(line,"^figure_",8)) {
-		/* or fall through to embedded figure as in doc2web? */
+	    } else if (strncmp(line, "^figure_", 8) == 0) {
+		/* fall through to embedded figure as in doc2web */
 		;
             } else {
                 if (line[2] == '!') { /* hack for function sections */
@@ -380,7 +380,10 @@ process_line(char *line, FILE *b, FILE *c, FILE *d)
                 inhlink = FALSE;
 	        fputs(line + 1, b);	/* copy directly */
             }
-	    break;		/* ignore */
+	    if (strncmp(line, "^figure_", 8) == 0)
+		; /* Fall through to embedded figure */
+	    else
+		break;
 	}
     case 'F':			/* latex embedded figure */
             if (para) fprintf(b, "</p><p align=\"justify\">\n");
