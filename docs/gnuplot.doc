@@ -611,7 +611,7 @@ C
 #start
 #b An additional rotation angle `azimuth` affects the orientation of 3D plots.
 ## This can be set from the command line (see `set view azimuth`) or by dragging
-## with the right mouse button.
+## with the right mouse button. Hotkey `z` resets azimuth to 0.
 #b gnuplot running under Windows can interpret Unicode (BMP) input scripts by
 ## converting them to the current encoding from `set encoding`, including UTF-8
 #b Textboxes can be assigned a border color and fill color (see `set style textbox`)
@@ -15907,6 +15907,7 @@ Ffigure_palette2
  along the screen vertical.  Non-zero azimuth rotates the plot about the line
  of sight through the origin so that a projection of the z axis is no longer
  vertical.  When azimuth = 90 the z axis is horizontal rather than vertical.
+ During interactive viewing, hot-key `z` resets azimuth to 0.
 4 equal_axes
 ?set view equal_axes
 ?set view equal xyz
