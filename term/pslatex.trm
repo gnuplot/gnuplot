@@ -139,6 +139,7 @@ TERM_PUBLIC void cairotrm_set_color(t_colorspec *colorspec);
 TERM_PUBLIC void cairotrm_linetype(int lt);
 #else
 #define ISCAIROTERMINAL (FALSE)
+#define GP_CAIRO_SCALE 1.0
 #endif
 
 /* State variables for boxed text */
