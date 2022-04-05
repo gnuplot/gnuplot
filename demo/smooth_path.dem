@@ -24,7 +24,7 @@ $CURVES << EOD
 EOD
 
 set xrange [0:6]
-set yrange [0:6]
+set yrange [0:6.2]
 set border 3
 set tics nomirror
 set style fill transparent solid 0.2 border lt 8

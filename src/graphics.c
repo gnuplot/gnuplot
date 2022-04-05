@@ -1147,7 +1147,7 @@ recheck_ranges(struct curve_points *plot)
     int i;			/* point index */
 
     for (i = 0; i < plot->p_count; i++) {
-	if (plot->noautoscale && plot->points[i].type != UNDEFINED) {
+	if (plot->points[i].type != UNDEFINED) {
 	    plot->points[i].type = INRANGE;
 	    if (!inrange(plot->points[i].x, axis_array[plot->x_axis].min, axis_array[plot->x_axis].max))
 		plot->points[i].type = OUTRANGE;
@@ -1224,6 +1224,10 @@ plot_lines(struct curve_points *plot)
     /* If all the lines are invisible, don't bother to draw them */
     if (plot->lp_properties.l_type == LT_NODRAW)
 	return;
+
+    /* Along-path smoothing wiped out the flags for INRANGE/OUTRANGE */
+    if (plot->plot_smooth == SMOOTH_PATH || plot->plot_smooth == SMOOTH_SMOOTH_HULL)
+	recheck_ranges(plot);
 
     for (i = 0; i < plot->p_count; i++) {
 	xnow = plot->points[i].x;
