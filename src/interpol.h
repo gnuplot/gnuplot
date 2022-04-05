@@ -39,6 +39,18 @@
 
 /* Type definitions */
 
+/* If gnuplot ever gets a subsystem to do clustering, this would belong there.
+ * As of now, however, the only clustering operations are outlier detection
+ * and finding a convex hull, for which the code in in interpol.c.
+ */
+typedef struct cluster {
+    int npoints;
+    double cx;		/* x coordinate of center-of-mass */
+    double cy;		/* y coordinate of center-of-mass */
+    double rmsd;	/* root mean square distance from center of mass */
+    double threshold;	/* criterion for outlier detection */
+} t_cluster;
+
 /* Variables of interpol.c needed by other modules: */
 
 /* Prototypes of functions exported by interpol.c */

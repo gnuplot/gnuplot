@@ -77,12 +77,6 @@
  *  sort_points()
  *  cp_implode()
  *
- * BUGS and TODO
- *  I would really have liked to use Gershon Elbers contouring code for
- *  all the stuff done here, but I failed. So I used my own code.
- *  If somebody is able to consolidate Gershon's code for this purpose
- *  a lot of gnuplot users would be very happy - due to memory problems.
- *
  **************************************************************************
  *
  * HISTORY
@@ -97,6 +91,12 @@
  *  Dec 2019 EAM
  *	move solve_tri_diag from contour.c to here
  *	generalize cp_tridiag to work on any coordinate dimension
+ *  Feb/Mar/Apr 2020 EAM
+ *	along-path smoothing for nonmonotonic 2D curves
+ *	cspline smoothing for "with filledcurves {between|above|below}"
+ *  Jul 2021 EAM
+ *	convex hull support
+ * 
  */
 
 #include "interpol.h"
@@ -144,6 +144,7 @@ static int compare_z(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2);
 static int compare_xyz(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2);
 
 static void winnow_interior_points (struct curve_points *plot);
+static int find_cluster_outliers (struct coordinate *points, t_cluster *cluster);
 
 
 /*
@@ -1144,6 +1145,8 @@ compare_xyz(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)
 {
     struct coordinate const *p1 = arg1;
     struct coordinate const *p2 = arg2;
+    if (p1->type == EXCLUDEDRANGE) return  1;
+    if (p2->type == EXCLUDEDRANGE) return -1;
     if (p1->x > p2->x) return  1;
     if (p1->x < p2->x) return -1;
     if (p1->y > p2->y) return  1;
@@ -1253,16 +1256,18 @@ convex_hull(struct curve_points *plot)
 	return;
     }
 
-    /* Find centroid (only used by "smooth convexhull") */
+    /* Find centroid (used by "smooth convexhull").
+     * Flag and remove outliers.
+     */
     if (plot->plot_smooth == SMOOTH_SMOOTH_HULL) {
-	double xsum = 0;
-	double ysum = 0;
-	for (i = 0; i < plot->p_count; i++) {
-	    xsum += plot->points[i].x;
-	    ysum += plot->points[i].y;
+	t_cluster cluster;
+	/* FIXME:  Needs a set option or a plot keyword to choose threshold */
+	cluster.threshold = 0.0;
+	cluster.npoints = plot->p_count;
+	while (find_cluster_outliers(plot->points, &cluster) > 0) {
+	    plot->filledcurves_options.at = cluster.cx;
+	    plot->filledcurves_options.aty = cluster.cy;
 	}
-	plot->filledcurves_options.at = xsum / plot->p_count;
-	plot->filledcurves_options.aty = ysum / plot->p_count;
     }
 
     /* This is not strictly necessary, but greatly reduces the number
@@ -1328,6 +1333,8 @@ winnow_interior_points (struct curve_points *plot)
     /* Find maximal extent on x and y, centroid */
     pp1 = pp2 = pp3 = pp4 = plot->points;
     for (p = plot->points; p < &(plot->points[plot->p_count]); p++) {
+	if (p->type == EXCLUDEDRANGE)	/* e.g. outlier or category mismatch */
+	    continue;
 	if (p->x < xmin) { xmin = p->x; pp1 = p; }
 	if (p->x > xmax) { xmax = p->x; pp3 = p; }
 	if (p->y < ymin) { ymin = p->y; pp4 = p; }
@@ -1360,11 +1367,11 @@ winnow_interior_points (struct curve_points *plot)
 	    points[i].type = EXCLUDEDRANGE;
     }
 
-    /* Discard the interior points */
+    /* Discard the interior points and outliers */
     np = 0;
     p = points;
     for  (i=0; i<plot->p_count; i++) {
-	if (points[i].type == INRANGE)
+	if (points[i].type != EXCLUDEDRANGE)
 	    p[np++] = points[i];
     }
     plot->p_count = np;
@@ -1373,10 +1380,60 @@ winnow_interior_points (struct curve_points *plot)
 }
 
 /*
+ * Find center of mass of plot->points.
+ * All points not marked EXCLUDEDRANGE are assumend to be in a single cluster.
+ * If a threshold has been set for cluster outlier detection (not yet implented)
+ * then flag any points whose distance from the center of mass is greater than
+ * threshold * cluster.rmsd.
+ * Return the number of outliers found.
+ */
+static int
+find_cluster_outliers( struct coordinate *points, t_cluster *cluster )
+{
+    double xsum = 0;
+    double ysum = 0;
+    double d2 = 0;
+    int i;
+    int outliers = 0;
+
+    for (i = 0; i < cluster->npoints; i++) {
+	xsum += points[i].x;
+	ysum += points[i].y;
+    }
+    cluster->cx = xsum / cluster->npoints;
+    cluster->cy = ysum / cluster->npoints;
+
+    if (cluster->threshold <= 0)
+	return 0;
+
+    for (i = 0; i < cluster->npoints; i++) {
+	if (points[i].type == EXCLUDEDRANGE)
+	    continue;
+	d2 += (points[i].x - cluster->cx) * (points[i].x - cluster->cx)
+	    + (points[i].y - cluster->cy) * (points[i].y - cluster->cy);
+    }
+    cluster->rmsd = sqrt(d2 / cluster->npoints);
+    for (i = 0; i < cluster->npoints; i++) {
+	if (points[i].type == EXCLUDEDRANGE)
+	    continue;
+	d2 = (points[i].x - cluster->cx) *(points[i].x - cluster->cx)
+	   + (points[i].y - cluster->cy) *(points[i].y - cluster->cy);
+	if (sqrt(d2) > cluster->rmsd * cluster->threshold) {
+	    points[i].type = EXCLUDEDRANGE;
+	    outliers++;
+	}
+    }
+
+    FPRINTF((stderr, "find_cluster_outliers: rmsd = %g, %d outliers\n",
+	    cluster->rmsd, outliers));
+    return outliers;
+}
+
+/*
  * expand_hull() "inflates" a smooth convex hull by pushing each
  * perimeter point further away from the centroid of the bounded points.
  * FIXME: The expansion value is currently interpreted as a scale
- *        factor; i.e. 1.0 is no expansion.  It might be better to 
+ *        factor; i.e. 1.0 is no expansion.  It might be better to
  *	  instead accept a fixed value in user coordinates.
  */
 void
@@ -2012,7 +2069,7 @@ gen_2d_path_splines( struct curve_points *plot )
 	TBOOLEAN closed = FALSE;
 
 	/* Make a copy of the original points so that we don't corrupt the
-	 * list by adding up to three new ones. 
+	 * list by adding up to three new ones.
 	 */
 	old_points = gp_realloc( old_points, (num_points + 3) * sizeof(struct coordinate),
 				"spline points");
