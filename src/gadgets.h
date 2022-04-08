@@ -1,7 +1,3 @@
-/*
- * gadgets.h,v 1.1.3.1 2000/05/03 21:47:15 hbb Exp
- */
-
 /* GNUPLOT - gadgets.h */
 
 /*[
@@ -41,13 +37,11 @@
 
 #include "term_api.h"
 
-/* Types and variables concerning graphical plot elements that are not
- * *terminal-specific, are used by both* 2D and 3D plots, and are not
- * *assignable to any particular * axis. I.e. they belong to neither
- * *term_api, graphics, graph3d, nor * axis .h files.
+/* The files gadgets.* are for types and variables describing graphical plot
+ * elements that are not terminal-specific, are used by both 2D and 3D plots,
+ * and are not assignable to any particular axis. I.e. they do not belong in
+ * any of {term_api.h graphics.h graph3d.h axis.h}.
  */
-
-/* #if... / #include / #define collection: */
 
 /* Default point size is taken from the global "pointsize" variable */
 #define PTSZ_DEFAULT    (-2)
