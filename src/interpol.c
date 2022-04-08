@@ -96,6 +96,8 @@
  *	cspline smoothing for "with filledcurves {between|above|below}"
  *  Jul 2021 EAM
  *	convex hull support
+ *  Apr 2022 EAM
+ *	find_cluster_outliers (EXPERIMENTAL, undocumented)
  * 
  */
 
@@ -144,6 +146,11 @@ static int compare_z(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2);
 static int compare_xyz(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2);
 
 static void winnow_interior_points (struct curve_points *plot);
+
+/*
+ * EXPERIMENTAL
+ * find outliers (distance from centroid > FOO * rmsd) in a cluster of points
+ */
 static int find_cluster_outliers (struct coordinate *points, t_cluster *cluster);
 
 
@@ -1230,7 +1237,14 @@ zrange_points(struct curve_points *plot)
  * delimits the convex hull of the original points.
  * winnow_interior_points() is a helper routine that can greatly reduce
  * processing time for large data sets but is otherwise not necessary.
+ * expand_hull() pushes the hull points away from the centroid for the
+ *	purpose of drawing a smooth bounding curve.
  * - Ethan A Merritt 2021
+ *
+ * find_cluster_outliers() calculates the centroid of plot->points,
+ *	and if cluster_outlier_threshold > 0 calculates the rmsd distance
+ *	of all points to the centroid so that outliers can be flagged.
+ * - Ethan A Merritt 2022
  */
 #define CROSS(p1,p2,p3) \
   ( ((p2)->x - (p1)->x) * ((p3)->y - (p2)->y) \
@@ -1259,15 +1273,20 @@ convex_hull(struct curve_points *plot)
     /* Find centroid (used by "smooth convexhull").
      * Flag and remove outliers.
      */
-    if (plot->plot_smooth == SMOOTH_SMOOTH_HULL) {
+    if (plot->plot_filter == FILTER_CONVEX_HULL) {
 	t_cluster cluster;
+	int outliers = 0;
 	/* FIXME:  Needs a set option or a plot keyword to choose threshold */
-	cluster.threshold = 0.0;
+	if (debug)
+	    cluster.threshold = 3.0;
+	else
+	    cluster.threshold = 0.0;
 	cluster.npoints = plot->p_count;
-	while (find_cluster_outliers(plot->points, &cluster) > 0) {
+	do {
+	    outliers = find_cluster_outliers(plot->points, &cluster);
 	    plot->filledcurves_options.at = cluster.cx;
 	    plot->filledcurves_options.aty = cluster.cy;
-	}
+	} while (outliers > 0);
     }
 
     /* This is not strictly necessary, but greatly reduces the number
@@ -1380,10 +1399,36 @@ winnow_interior_points (struct curve_points *plot)
 }
 
 /*
+ * expand_hull() "inflates" a smooth convex hull by pushing each
+ * perimeter point further away from the centroid of the bounded points.
+ * FIXME: The expansion value is currently interpreted as a scale
+ *        factor; i.e. 1.0 is no expansion.  It might be better to
+ *	  instead accept a fixed value in user coordinates.
+ */
+void
+expand_hull(struct curve_points *plot)
+{
+    struct coordinate *points = plot->points;
+    double xcent = plot->filledcurves_options.at;
+    double ycent = plot->filledcurves_options.aty;
+    double scale = plot->smooth_parameter;
+    int i;
+
+    if (scale <=0 || scale == 1.0)
+	return;
+
+    for (i=0; i<plot->p_count; i++) {
+	points[i].x = xcent + scale * (points[i].x - xcent);
+	points[i].y = ycent + scale * (points[i].y - ycent);
+    }
+
+}
+
+/*
  * Find center of mass of plot->points.
  * All points not marked EXCLUDEDRANGE are assumend to be in a single cluster.
- * If a threshold has been set for cluster outlier detection (not yet implented)
- * then flag any points whose distance from the center of mass is greater than
+ * If a threshold has been set for cluster outlier detection, then flag
+ * any points whose distance from the center of mass is greater than
  * threshold * cluster.rmsd.
  * Return the number of outliers found.
  */
@@ -1427,32 +1472,6 @@ find_cluster_outliers( struct coordinate *points, t_cluster *cluster )
     FPRINTF((stderr, "find_cluster_outliers: rmsd = %g, %d outliers\n",
 	    cluster->rmsd, outliers));
     return outliers;
-}
-
-/*
- * expand_hull() "inflates" a smooth convex hull by pushing each
- * perimeter point further away from the centroid of the bounded points.
- * FIXME: The expansion value is currently interpreted as a scale
- *        factor; i.e. 1.0 is no expansion.  It might be better to
- *	  instead accept a fixed value in user coordinates.
- */
-void
-expand_hull(struct curve_points *plot)
-{
-    struct coordinate *points = plot->points;
-    double xcent = plot->filledcurves_options.at;
-    double ycent = plot->filledcurves_options.aty;
-    double scale = plot->smooth_parameter;
-    int i;
-
-    if (scale <=0 || scale == 1.0)
-	return;
-
-    for (i=0; i<plot->p_count; i++) {
-	points[i].x = xcent + scale * (points[i].x - xcent);
-	points[i].y = ycent + scale * (points[i].y - ycent);
-    }
-
 }
 
 /*
