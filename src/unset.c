@@ -1245,6 +1245,36 @@ delete_object(struct object *prev, struct object *this)
     }
 }
 
+/*
+ * delete dashtype from linked list started by first_custom_dashtype.
+ */
+void
+delete_dashtype(struct custom_dashtype_def *prev, struct custom_dashtype_def *this)
+{
+    if (this != NULL) {		/* there really is something to delete */
+	if (this == first_custom_dashtype)
+	    first_custom_dashtype = this->next;
+	else
+	    prev->next = this->next;
+	free(this);
+    }
+}
+
+/*
+ * delete linestyle from linked list started by *head.
+ */
+void
+delete_linestyle(struct linestyle_def **head, struct linestyle_def *prev, struct linestyle_def *this)
+{
+    if (this != NULL) {		/* there really is something to delete */
+	if (this == *head)
+	    *head = this->next;
+	else
+	    prev->next = this->next;
+	free(this);
+    }
+}
+
 
 /* process 'unset loadpath' command */
 static void

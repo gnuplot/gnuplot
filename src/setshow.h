@@ -52,7 +52,6 @@ void set_colorsequence(int option);
 char *conv_text(const char *s);
 void delete_linestyle(struct linestyle_def **, struct linestyle_def *, struct linestyle_def *);
 void delete_dashtype(struct custom_dashtype_def *, struct custom_dashtype_def *);
-/* void delete_arrowstyle(struct arrowstyle_def *, struct arrowstyle_def *); */
 void reset_key(void);
 void free_marklist(struct ticmark * list);
 void reset_bars(void);

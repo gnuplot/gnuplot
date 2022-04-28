@@ -1503,21 +1503,6 @@ set_dashtype()
     }
 }
 
-/*
- * Delete dashtype from linked list.
- */
-void
-delete_dashtype(struct custom_dashtype_def *prev, struct custom_dashtype_def *this)
-{
-    if (this != NULL) {		/* there really is something to delete */
-	if (this == first_custom_dashtype)
-	    first_custom_dashtype = this->next;
-	else
-	    prev->next = this->next;
-	free(this);
-    }
-}
-
 /* process 'set dgrid3d' command */
 static void
 set_dgrid3d()
@@ -5652,24 +5637,6 @@ set_linestyle(struct linestyle_def **head, lp_class destination_class)
     if (!END_OF_COMMAND)
 	int_error(c_token,"Extraneous arguments to set %s",
 		head == &first_perm_linestyle ? "linetype" : "style line");
-}
-
-/*
- * Delete linestyle from linked list.
- * Called with pointers to the head of the list,
- * to the previous linestyle (not strictly necessary),
- * and to the linestyle to delete.
- */
-void
-delete_linestyle(struct linestyle_def **head, struct linestyle_def *prev, struct linestyle_def *this)
-{
-    if (this != NULL) {		/* there really is something to delete */
-	if (this == *head)
-	    *head = this->next;
-	else
-	    prev->next = this->next;
-	free(this);
-    }
 }
 
 
