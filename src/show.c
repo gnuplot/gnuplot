@@ -1056,6 +1056,13 @@ show_version(FILE *fp)
 		"-FUNCTIONBLOCKS ";
 #endif
 
+	    const char *chi_shapes =
+#if defined(WITH_CHI_SHAPES)
+		"+CHI_SHAPES ";
+#else
+		"-CHI_SHAPES ";
+#endif
+
 	    const char *unicodebuild =
 #if defined(_WIN32) && defined(UNICODE)
 		"+UNICODE  ";
@@ -1064,12 +1071,12 @@ show_version(FILE *fp)
 #endif
 
 	    sprintf(compile_options,
-		    "    %s%s\n    %s%s\n    %s%s%s%s\n    %s\n    %s%s%s%s\n    %s\n",
+		    "    %s%s\n    %s%s\n    %s%s%s%s\n    %s\n    %s%s%s%s\n    %s%s\n",
 		    rdline, gnu_rdline, unicodebuild, plotoptions,
 		    complexfunc, libcerf, libamos, have_cexint,
 		    libgd,
 		    nocwdrc, x11, use_mouse, hiddenline,
-		    fblocks
+		    fblocks, chi_shapes
 		    );
 	}
 
