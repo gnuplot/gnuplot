@@ -741,6 +741,14 @@ if test "$with_extra_coordinate" != no; then
                [ Define to make use of otherwise empty space in struct coordinate ])
 fi
 
+dnl EXPERIMENTAL support for concave hulls via Delaunay triangulation and chi-shapes
+AC_ARG_ENABLE(chi-shapes,dnl
+[  --disable-chi-shapes    no support for Delaunay triangulation or chi-shapes],,)
+if test "$enable_chi_shapes" != no; then
+    AC_DEFINE(WITH_CHI_SHAPES,1,
+              [ Define to support Delaunay triangulation and chi-shapes ])
+fi
+
 dnl Whether we want to create the LaTeX tutorial
 dnl TUTORIAL=notutorial
 dnl AC_ARG_WITH(tutorial,dnl
@@ -1487,6 +1495,12 @@ if test "$enable_function_blocks" = yes; then
   AC_MSG_RESULT([  Support function blocks:                         yes])
 else
   AC_MSG_RESULT([  Support function blocks:                         no (--enable-function-blocks to enable)])
+fi
+
+if test "$enable_chi_shapes" != no; then
+  AC_MSG_RESULT([  Support concave hulls:                           yes])
+else
+  AC_MSG_RESULT([  Support concave hulls:                           no (--enable-chi-shapes to enable)])
 fi
 
 

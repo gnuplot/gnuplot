@@ -18,7 +18,6 @@ typedef struct cluster {
     double cx;		/* x coordinate of center-of-mass */
     double cy;		/* y coordinate of center-of-mass */
     double rmsd;	/* root mean square distance from center of mass */
-    double threshold;	/* criterion for outlier detection */
 } t_cluster;
 
 /* Exported functions */
@@ -31,5 +30,16 @@ void gen_2d_path_splines(struct curve_points *plot);
 void convex_hull(struct curve_points *plot);
 void expand_hull(struct curve_points *plot);
 void sharpen(struct curve_points *plot);
+
+#ifdef WITH_CHI_SHAPES
+void delaunay_triangulation( struct curve_points *plot );
+void save_delaunay_triangles( struct curve_points *plot );
+void concave_hull( struct curve_points *plot );
+void reset_hulls();
+
+extern double chi_shape_default_length;
+#else
+#define reset_hulls() /* NOOP */
+#endif /* WITH_CHI_SHAPES */
 
 #endif /* GNUPLOT_FILTERS_H */

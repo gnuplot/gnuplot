@@ -692,6 +692,16 @@ set_command()
 	    set_ticslevel();
 	    break;
 	default:
+#ifdef WITH_CHI_SHAPES
+	    /* DEBUG undocumented "set chi_shape fraction <value>" */
+	    if (almost_equals(c_token,"chi$_shape")
+	    &&  equals(++c_token,"fraction")) {
+		extern double chi_shape_default_length;
+		c_token++;
+		chi_shape_default_length = real_expression();
+		break;
+	    }
+#endif
 	    int_error(c_token, "unrecognized option - see 'help set'.");
 	    break;
 	}

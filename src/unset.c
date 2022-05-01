@@ -37,6 +37,7 @@
 #include "contour.h"
 #include "datablock.h"
 #include "datafile.h"
+#include "filters.h"
 #include "fit.h"
 #include "gp_hist.h"
 #include "gplocale.h"
@@ -2237,6 +2238,7 @@ reset_command()
     prefer_line_styles = FALSE;
 #endif
 
+    reset_hulls();
     reset_watches();
 
 #ifdef USE_MOUSE
