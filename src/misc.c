@@ -41,7 +41,6 @@
 #include "tables.h"
 #include "util.h"
 #include "variable.h"
-#include "axis.h"
 #include "scanner.h"		/* so that scanner() can count curly braces */
 #include "setshow.h"
 #ifdef _WIN32

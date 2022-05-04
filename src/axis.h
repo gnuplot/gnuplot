@@ -35,7 +35,6 @@
 # define nonlinear(axis) ((axis)->linked_to_primary != NULL && (axis)->link_udf->at != NULL)
 # define invalid_coordinate(x,y) ((unsigned)(x)==intNaN || (unsigned)(y)==intNaN)
 
-#include <stddef.h>		/* for offsetof() */
 #include "gp_types.h"		/* for TBOOLEAN */
 
 #include "gadgets.h"

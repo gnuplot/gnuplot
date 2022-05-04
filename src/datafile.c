@@ -108,7 +108,6 @@
 #include "datablock.h"
 
 #include "alloc.h"
-#include "axis.h"
 #include "command.h"
 #include "eval.h"
 #include "gp_time.h"

@@ -39,7 +39,6 @@
 #include "setshow.h"
 
 #include "alloc.h"
-#include "axis.h"
 #include "breaders.h"	/* for df_read_pixmap */
 #include "command.h"
 #include "contour.h"

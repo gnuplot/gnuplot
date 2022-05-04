@@ -2,7 +2,6 @@
 # define GNUPLOT_JITTER_H
 
 #include "syscfg.h"
-#include "axis.h"
 #include "command.h"
 #include "gp_types.h"
 #include "gadgets.h"

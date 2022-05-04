@@ -93,7 +93,6 @@
 
 #include "fit.h"
 #include "alloc.h"
-#include "axis.h"
 #include "command.h"
 #include "datablock.h"
 #include "datafile.h"

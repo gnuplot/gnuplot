@@ -247,6 +247,10 @@ FILE * win_popen(const char *filename, const char *mode);
 # endif
 #endif
 
+/* ISO C allows for NULL to be implementation defined */
+/* POSIX says put the definition in stddef.h */
+#include <stddef.h>
+
 /* LFS support */
 #if !defined(HAVE_FSEEKO) || !defined(HAVE_OFF_T)
 # if defined(_MSC_VER)

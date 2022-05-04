@@ -39,7 +39,6 @@
 #include "setshow.h"
 
 #include "alloc.h"
-#include "axis.h"
 #include "command.h"
 #include "contour.h"
 #include "datablock.h"
