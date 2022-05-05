@@ -114,6 +114,7 @@ extern double wxt_dashlength;
 extern double wxt_lw;
 extern int wxt_background;
 extern rgb_color wxt_rgb_background;
+extern TBOOLEAN wxt_dark_background;
 extern int wxt_persist;
 extern int wxt_raise;
 extern int wxt_ctrl;

@@ -1088,15 +1088,11 @@ void wxtPanel::DrawToDC(wxDC &dc, wxRegion &region)
 
 #ifdef USE_MOUSE
 	if (wxt_zoombox) {
-		tmp_pen = wxPen(wxT("black"), 1, wxPENSTYLE_SOLID);
+		tmp_pen = wxPen( wxt_dark_background ? wxT("white") : wxT("black") );
+
 		tmp_pen.SetCap( wxCAP_ROUND );
 		dc.SetPen( tmp_pen );
-#ifndef __WXOSX_COCOA__
-		/* wx 2.9 Cocoa bug workaround, which has no logical functions support */
-#if (GTK_MAJOR_VERSION < 3)
-		dc.SetLogicalFunction( wxINVERT );
-#endif
-#endif
+
 		dc.DrawLine( zoom_x1, zoom_y1, mouse_x, zoom_y1 );
 		dc.DrawLine( mouse_x, zoom_y1, mouse_x, mouse_y );
 		dc.DrawLine( mouse_x, mouse_y, zoom_x1, mouse_y );
@@ -1127,15 +1123,9 @@ void wxtPanel::DrawToDC(wxDC &dc, wxRegion &region)
 	}
 
 	if (wxt_ruler) {
-		tmp_pen = wxPen(wxT("black"), 1, wxPENSTYLE_SOLID);
+		tmp_pen = wxPen( wxt_dark_background ? wxT("white") : wxT("black") );
 		tmp_pen.SetCap(wxCAP_BUTT);
 		dc.SetPen( tmp_pen );
-#ifndef __WXOSX_COCOA__
-		/* wx 2.9 Cocoa bug workaround, which has no logical functions support */
-#if (GTK_MAJOR_VERSION < 3)
-		dc.SetLogicalFunction( wxINVERT );
-#endif
-#endif
 #ifdef __WXMSW__
 		dc.DrawLine(0, (int)wxt_ruler_y, plot.device_xmax, (int)wxt_ruler_y);
 		dc.DrawLine((int)wxt_ruler_x, 0, (int)wxt_ruler_x, plot.device_ymax);
@@ -1146,15 +1136,9 @@ void wxtPanel::DrawToDC(wxDC &dc, wxRegion &region)
 	}
 
 	if (wxt_ruler && wxt_ruler_lineto) {
-		tmp_pen = wxPen(wxT("black"), 1, wxPENSTYLE_SOLID);
+		tmp_pen = wxPen( wxt_dark_background ? wxT("white") : wxT("black") );
 		tmp_pen.SetCap(wxCAP_BUTT);
 		dc.SetPen( tmp_pen );
-#ifndef __WXOSX_COCOA__
-		/* wx 2.9 Cocoa bug workaround, which has no logical functions support */
-#if (GTK_MAJOR_VERSION < 3)
-		dc.SetLogicalFunction( wxINVERT );
-#endif
-#endif
 		dc.DrawLine((int)wxt_ruler_x, (int)wxt_ruler_y, mouse_x, mouse_y);
 		dc.SetLogicalFunction( wxCOPY );
 	}

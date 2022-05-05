@@ -60,6 +60,7 @@ double wxt_dashlength = 1.0;
 double wxt_lw = 1.0;
 int wxt_background = 0xffffff;
 rgb_color wxt_rgb_background = {1.,1.,1.};
+TBOOLEAN wxt_dark_background = FALSE;
 int wxt_persist = UNSET;
 int wxt_raise = UNSET;
 int wxt_ctrl = UNSET;
@@ -301,10 +302,14 @@ TERM_PUBLIC void wxt_options()
 			break;
 		case WXT_BACKGROUND:
 			{
+			double ntsc;
 			wxt_background = parse_color_name();
 			wxt_rgb_background.r = (double)((wxt_background >> 16) & 0xff) / 255.;
 			wxt_rgb_background.g = (double)((wxt_background >>  8) & 0xff) / 255.;
 			wxt_rgb_background.b = (double)( wxt_background        & 0xff) / 255.;
+			ntsc = 0.299 * wxt_rgb_background.r + 0.587 * wxt_rgb_background.g
+			     + 0.114 * wxt_rgb_background.b;
+			wxt_dark_background = (ntsc < 0.5);
 			break;
 			}
 		case WXT_NOBACKGROUND:
@@ -313,6 +318,7 @@ TERM_PUBLIC void wxt_options()
 			wxt_rgb_background.r = 1.0;
 			wxt_rgb_background.g = 1.0;
 			wxt_rgb_background.b = 1.0;
+			wxt_dark_background = FALSE;
 			break;
 			}
 		case WXT_OTHER:
