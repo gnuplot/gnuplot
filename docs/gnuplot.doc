@@ -9686,27 +9686,30 @@ Ffigure_smooth_path
  the flag `noautoscale` in the plot command.  See `datafile`.
 
  Syntax:
-       set autoscale {<axes>{|min|max|fixmin|fixmax|fix} | fix | keepfix}
+       set autoscale {<axis>{|min|max|fixmin|fixmax|fix} | fix | keepfix}
        set autoscale noextend
-       unset autoscale {<axes>}
+       unset autoscale {<axis>}
        show autoscale
 
- where <axes> is either `x`, `y`, `z`, `cb`, `x2`, `y2`, `xy`, or `paxis <p>`.
- A keyword with `min` or `max` appended (this cannot be done with `xy`) tells
- `gnuplot` to autoscale just the minimum or maximum of that axis.
- If no keyword is given, all axes are autoscaled.
+ where <axis> is `x`, `y`, `z`, `cb`, `x2`, `y2`, `xy`, or `paxis <p>`.
+ Appending `min` or `max` to the axis name tells `gnuplot` to autoscale only
+ the minimum or maximum of that axis.
 
- When autoscaling, the axis range is automatically computed and the dependent
- axis (y for a `plot` and z for `splot`) is scaled to include the range of the
- function or data being plotted.
+ If no axis name is given, all axes are autoscaled.
 
- Autoscaling the independent axes (x for `plot` and x,y for `splot`) is a
- request to set the range for these axes to match the data being plotted.
- If the plot contains only functions (no input data), autoscaling these axes
- has no effect.
+ Autoscaling the independent axes (x for `plot` and x,y for `splot`) adjusts
+ the axis range to match the data being plotted.  If the plot contains only
+ functions (no input data), autoscaling these axes has no effect.
 
- If autoscaling of the dependent axis (y or z) is not set, the current y or z
- range is used. Please see `set xrange` for additional information about ranges.
+ Autoscaling the dependent axis (y for a `plot` and z for `splot`) adjusts the
+ axis range to match the data or function being plotted.
+
+ Adjustment of the axis range includes extending it to the next tic mark;
+ i.e. unless the extreme data coordinate exactly matches a tic mark, there
+ will be some blank space between the data and the plot border.
+ Addition of this extra space can be suppressed by `noextend`.
+ It can be further increased by the command `set offset`.
+ Please see `set xrange` and `set offsets` for additional information.
 
  The behavior of autoscaling remains consistent in parametric mode, (see
  `set parametric`).  However, there are more dependent variables and hence more
