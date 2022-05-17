@@ -3415,7 +3415,7 @@ df_bin_default_columns default_style_cols[] = {
     {XYERRORLINES, 3, 1},
     {FILLEDCURVES, 1, 1},
     {PM3DSURFACE, 1, 2},
-    {LABELPOINTS, 2, 1},
+    {LABELPOINTS, 1, 1},
     {HISTOGRAMS, 1, 0},
     {IMAGE, 1, 2},
     {RGBIMAGE, 3, 2},
@@ -5009,8 +5009,9 @@ df_readbinary(double v[], int max)
 	    this_record->memory_data = memory_data;
 
 	    FPRINTF((stderr,"Fast matrix code:\n"));
-	    FPRINTF((stderr,"\t\t skip %d bytes, read %ld bytes as %d x %d array\n",
-		    record_skip, bytes_total, scan_size[0], scan_size[1]));
+	    FPRINTF((stderr,"\t\t %d binary columns\n", df_no_bin_cols));
+	    FPRINTF((stderr,"\t\t skip %ld bytes, read %ld bytes per point %ld total as %d x %d array\n",
+		    record_skip, bytes_per_point, bytes_total, scan_size[0], scan_size[1]));
 
 	    /* Do the actual slurping */
 	    fread_ret = fread(memory_data, 1, bytes_total, data_fp);

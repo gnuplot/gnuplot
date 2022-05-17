@@ -16,6 +16,7 @@ Changes in 5.4.4
 * FIX windows: redirected output of printf() Bug #2490
 * FIX allow variable point style and point type in plot "with yerrorbars"
 * FIX plots "with labels point pt variable" were off-by-one in choosing point type
+* FIX contour "with labels" from binary data
 
 Changes in 5.4.3
 ================
