@@ -374,6 +374,9 @@ get_data(struct curve_points *current_plot)
 	    variable_color = TRUE;
 	if (current_plot->lp_properties.l_type == LT_COLORFROMCOLUMN)
 	    variable_color = TRUE;
+	if ((current_plot->plot_style == VECTOR || current_plot->plot_style == ARROWS)
+	&&  (current_plot->arrow_properties.tag == AS_VARIABLE))
+	    variable_color = TRUE;
 	if (current_plot->plot_smooth != SMOOTH_NONE
 	&&  current_plot->plot_smooth != SMOOTH_ZSORT) {
 	    /* FIXME:  It would be possible to support smooth cspline lc palette */
@@ -458,10 +461,10 @@ get_data(struct curve_points *current_plot)
 	    df_axis[2] = df_axis[3] = df_axis[1];
 	break;
 
-    case VECTOR:	/* x, y, dx, dy, variable color or arrow style */
-    case ARROWS:	/* x, y, len, ang, variable color or arrow style */
+    case VECTOR:	/* x, y, dx, dy, variable arrow style and/or variable color */
+    case ARROWS:	/* x, y, len, ang, variable arrow style and/or variable color */
 	min_cols = 4;
-	max_cols = 5;
+	max_cols = 6;
 	break;
 
     case XERRORLINES:
@@ -738,6 +741,9 @@ get_data(struct curve_points *current_plot)
 	    case VECTOR:
 	    case ARROWS:
 			    if (j < 5) int_error(NO_CARET,errmsg);
+			    /* j can be 5 if the variable styles have constant color */
+			    if (j == 5 && current_plot->arrow_properties.tag == AS_VARIABLE)
+				v[j++] = 0;
 			    break;
 	    case LABELPOINTS:
 	    case BOXERROR:
@@ -1084,25 +1090,24 @@ get_data(struct curve_points *current_plot)
 	}
 
 	case VECTOR:
-	{   /* 4 columns:	x y xdelta ydelta [arrowstyle variable] */
+	{   /* 	x y xdelta ydelta [arrowstyle variable] */
 	    coordval xlow  = v[0];
 	    coordval xhigh = v[0] + v[2];
 	    coordval ylow  = v[1];
 	    coordval yhigh = v[1] + v[3];
-	    coordval arrowstyle = (j == 5) ? v[4] : 0.0;
-
+	    coordval arrowstyle = (j >= 5) ? v[4] : 0.0;
 	    store2d_point(current_plot, i++, v[0], v[1],
 			  xlow, xhigh, ylow, yhigh, arrowstyle);
 	    break;
 	}
 
 	case ARROWS:
-	{   /* 4 columns:	x y len ang [arrowstyle variable] */
+	{   /* 	x y length angle [arrowstyle variable] */
 	    coordval xlow  = v[0];
 	    coordval ylow  = v[1];
 	    coordval len = v[2];
 	    coordval ang = v[3];
-	    coordval arrowstyle = (j == 5) ? v[4] : 0.0;
+	    coordval arrowstyle = (j >= 5) ? v[4] : 0.0;
 	    store2d_point(current_plot, i++, v[0], v[1],
 			  xlow, len, ylow, ang, arrowstyle);
 	    break;
