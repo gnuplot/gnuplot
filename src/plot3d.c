@@ -901,6 +901,7 @@ get_3ddata(struct surface_points *this_plot)
 	double xtail, ytail, ztail;
 	double zlow = VERYLARGE, zhigh = -VERYLARGE;
 	double color = VERYLARGE;
+	int arrowstyle = 0;
 	int pm3d_color_from_column = FALSE;
 #define color_from_column(x) pm3d_color_from_column = x
 
@@ -1180,8 +1181,10 @@ get_3ddata(struct surface_points *this_plot)
 		xtail = x + v[3];
 		ytail = y + v[4];
 		ztail = z + v[5];
+		/* variable color is always last but there can be intervening variable styles */
+		arrowstyle = v[6];
 		if (j >= 7) {
-		    color = v[6];
+		    color = v[j-1];
 		    color_from_column(TRUE);
 		} else {
 		    color = z;
@@ -1327,8 +1330,11 @@ get_3ddata(struct surface_points *this_plot)
 				this_plot->noautoscale, goto come_here_if_undefined);
 
 		if (pm3d_color_from_column) {
-		    if (this_plot->plot_style == VECTOR)
+		    if (this_plot->plot_style == VECTOR) {
 			cphead->CRD_COLOR = color;
+			cphead->CRD_ASTYLE = arrowstyle;
+			cp->CRD_ASTYLE = arrowstyle;
+		    }
 		} else {
 		    color = z;
 		}

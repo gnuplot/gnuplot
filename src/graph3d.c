@@ -3751,13 +3751,16 @@ plot3d_vectors(struct surface_points *plot)
 
 	/* variable arrow style read from extra data column */
 	if (plot->arrow_properties.tag == AS_VARIABLE) {
-	    int as= heads[i].CRD_COLOR;
+	    int as = heads[i].CRD_ASTYLE;
 	    arrow_use_properties(&ap, as);
 	    term_apply_lp_properties(&ap.lp_properties);
 	    apply_head_properties(&ap);
-	} else {
-	    check3d_for_variable_color(plot, &heads[i]);
+	    /* copy to plot lp_properties so check for variable color can see it */
+	    plot->lp_properties = ap.lp_properties;
 	}
+
+	/* variable color read from extra data column */
+	check3d_for_variable_color(plot, &heads[i]);
 
 	/* The normal case: both ends in range */
 	if (heads[i].type == INRANGE && tails[i].type == INRANGE) {
