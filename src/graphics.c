@@ -2626,7 +2626,7 @@ plot_dots(struct curve_points *plot)
 }
 
 /* plot_vectors:
- * Plot the curves in VECTORS style
+ * Plot the curves in VECTORS style (used also for ARROWS)
  */
 static void
 plot_vectors(struct curve_points *plot)
@@ -2684,6 +2684,8 @@ plot_vectors(struct curve_points *plot)
 	    arrow_use_properties(&ap, as);
 	    term_apply_lp_properties(&ap.lp_properties);
 	    apply_head_properties(&ap);
+	    /* Over-write plot lp_properties so the check for variable color works */
+	    plot->lp_properties = ap.lp_properties;
 	}
 
 	/* variable color read from extra data column. */
