@@ -193,13 +193,15 @@ typedef enum coord_type {
 #define CRD_G xlow         /* Used by splot styles RGBIMAGE and RGBA_IMAGE */
 #define CRD_B xhigh        /* Used by splot styles RGBIMAGE and RGBA_IMAGE */
 #define CRD_A ylow         /* Used by splot styles RGBIMAGE and RGBA_IMAGE */
+#define CRD_ASTYLE ylow    /* Used by splot styles VECTOR and ARROWS */
+#define CRD_ZLOW xlow      /* Used by splot style ZERRORFILL */
+#define CRD_ZHIGH xhigh    /* Used by splot style ZERRORFILL */
 #define CRD_COLOR yhigh    /* Used by all splot styles with variable color */
+
 #define CRD_ROTATE ylow    /* Used by "with labels" */
 #define CRD_PTSIZE xlow    /* Used by "with points|linespoints|labels" */
 #define CRD_PTTYPE xhigh   /* Used by "with points|linespoints|labels" */
 #define CRD_PTCHAR ylow    /* Used by "with points pt variable */
-#define CRD_ZLOW xlow      /* Used by splot style ZERRORFILL */
-#define CRD_ZHIGH xhigh    /* Used by splot style ZERRORFILL */
 #define CRD_XJITTER xlow   /* Used to hold jitter offset on x */
 #define CRD_YJITTER yhigh  /* Used to hold jitter offset on y */
 #define CRD_PATH xhigh     /* Used by 3D spline code to hold path coordinate */
