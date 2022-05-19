@@ -5921,20 +5921,21 @@ Ffigure_vectors
       4 columns:  x  y  xdelta  ydelta
       6 columns:  x  y  z  xdelta  ydelta  zdelta
 
- The keywords "with vectors" may be followed by an inline arrow style
- specifications, a reference to a predefined arrow style, or a request to read
- the index of the desired arrow style for each vector from a separate column.
- Note: If you choose "arrowstyle variable" it will fill in all arrow properties
- at the time the corresponding vector is drawn; you cannot mix this keyword with
- other line or arrow style qualifiers in the plot command.
+ The keywords "with vectors" may be followed by inline arrow style properties,
+ by reference to a predefined arrow style, or by a request to read the index
+ of the desired arrow style for each vector from a separate input column.
+ See the first three examples below.
 
-      plot ... with vectors filled heads
-      plot ... with vectors arrowstyle 3
+ Examples:
+
+      plot ... using 1:2:3:4 with vectors filled heads
+      plot ... using 1:2:3:4 with vectors arrowstyle 3
       plot ... using 1:2:3:4:5 with vectors arrowstyle variable
+      splot 'file.dat' using 1:2:3:(1):(1):(1) with vectors filled head lw 2
 
- Example:
-       plot 'file.dat' using 1:2:3:4 with vectors head filled lt 2
-       splot 'file.dat' using 1:2:3:(1):(1):(1) with vectors filled head lw 2
+ Notes:  You cannot mix the `arrowstyle` keyword with other line style
+ qualifiers in the plot command. An additional column of color values is
+ required if the arrow style includes `lc variable` or `lc rgb variable`.
 
  splot with vectors is supported only for `set mapping cartesian`.
  `set clip one` and `set clip two` affect vectors drawn in 2D.
@@ -14762,6 +14763,12 @@ Ffigure_palette2
  If the linestyle <index> already exists, only the given parameters are
  changed while all others are preserved.  If not, all undefined values are
  set to the default values.
+
+ An arrow style invoked from a `plot` or `splot` command can include a
+ data-dependent linecolor (`lc variable` or `lc rgb variable`) that consumes
+ an additional column of data in the corresponding `using` specification.
+ In this case the style is probably not useful for individual arrows created
+ by `set arrow`.
 
  Specifying `nohead` produces arrows drawn without a head---a line segment.
  This gives you yet another way to draw a line segment on the plot.  By
