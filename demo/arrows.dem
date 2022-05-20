@@ -20,3 +20,13 @@ plot '++' using 1:2:(sqrt($1+$2)):($1 + $2*3) with arrows as 1
 
 pause -1 "Hit <cr> to continue"
 
+set style arrow 2 noborder lw 2 lc palette z
+set cbrange [0:12]
+set palette cubehelix
+f(x,y) = sqrt((x-150)*(x-150)/400. + (y-6)*(y-6))
+
+set title "plot ... using x:y:len:angle:as:color with arrows arrowstyle variable"
+plot '++' using 1:2:(sqrt($1+$2)):($1 + $2*3):(2):(f($1,$2)) with arrows as variable
+
+pause -1 "Hit <cr> to continue"
+
