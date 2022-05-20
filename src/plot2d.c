@@ -628,7 +628,7 @@ get_data(struct curve_points *current_plot)
     }
 
     if (df_no_use_specs > max_cols)
-	int_error(NO_CARET, "Too many using specs for this style");
+	int_warn(NO_CARET, "more using specs than expected for this style");
 
     if (df_no_use_specs > 0 && df_no_use_specs < min_cols)
 	int_error(NO_CARET, "Not enough columns for this style");
