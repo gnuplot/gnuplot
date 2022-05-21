@@ -241,6 +241,10 @@ print "********************** file varcolor.dem *********************"
 load "varcolor.dem"
 reset
 
+print "********************** file pt_variable.dem *********************"
+load "pt_variable.dem"
+reset
+
 print "********************** file pm3d.dem *********************"
 load "pm3d.dem"
 reset
