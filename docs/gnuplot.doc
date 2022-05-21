@@ -5959,8 +5959,7 @@ Ffigure_xerrorbars
       3 columns:  x  y  xdelta
       4 columns:  x  y  xlow  xhigh
 
- An additional input column (4th or 5th) may be used to provide information
- such as variable point color.
+ An additional input column (4th or 5th) may be used to provide variable color.
 
 2 xyerrorbars
 ?plotting styles xyerrorbars
@@ -6004,8 +6003,7 @@ Ffigure_xerrorlines
       3 columns:  x  y  xdelta
       4 columns:  x  y  xlow  xhigh
 
- An additional input column (4th or 5th) may be used to provide information
- such as variable point color.
+ An additional input column (4th or 5th) may be used to provide variable color.
 
 #TeX \newpage
 2 xyerrorlines
@@ -6050,14 +6048,15 @@ Ffigure_yerrorbars
  At each point (x,y), a line is drawn from (x,y-ydelta) to (x,y+ydelta) or
  from (x,ylow) to (x,yhigh), depending on how many data columns are provided.
  The appearance of the tic mark at the ends of the bar is controlled by
- `set errorbars`.
+ `set errorbars`.  The clearance between the point and the error bars is 
+ controlled by `set pointintervalbox`.
 
       2 columns:  [implicit x] y ydelta
       3 columns:  x  y  ydelta
       4 columns:  x  y  ylow  yhigh
 
- An additional input column (4th or 5th) may be used to provide information
- such as variable point color.
+ Additional input columns may be used to provide information such as variable
+ point size, point type, or color.
 
  See also
 ^ <a href="http://www.gnuplot.info/demo/mgr.html">
@@ -6085,8 +6084,7 @@ Ffigure_yerrorlines
       3 columns:  x  y  ydelta
       4 columns:  x  y  ylow  yhigh
 
- An additional input column (4th or 5th) may be used to provide information
- such as variable point color.
+ An additional input column (4th or 5th) may be used to provide variable color.
 
  See also
 ^ <a href="http://www.gnuplot.info/demo/mgr.html">
