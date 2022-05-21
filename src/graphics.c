@@ -2418,7 +2418,8 @@ plot_points(struct curve_points *plot)
 		/* implementing a special point type, but that would require    */
 		/* modification to all terminal drivers. It might be worth it.  */
 		/* term_apply_lp_properties will restore the point type and size*/
-		if (plot->plot_style == LINESPOINTS && interval < 0) {
+		if ((plot->plot_style == LINESPOINTS && interval < 0)
+		||  (plot->plot_style == YERRORBARS)) {
 		    (*t->set_color)(&background_fill);
 		    (*t->pointsize)(pointsize * pointintervalbox);
 		    (*t->point) (x, y, 6);

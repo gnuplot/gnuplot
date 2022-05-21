@@ -4,12 +4,12 @@
 
 $DATA << EOD
 # size pointtype color
-  1    12	0xff0000
-  2    11	0x00ee00
+  1    12	0xee0000
+  2    11	0x00dd00
   3    10	0x0000ee
   4     9	0xee00ee
-  5     8	0xeebb00
-  6     7	0x00eeee
+  5     8	0xddaa00
+  6     7	0x00dddd
 EOD
 
 unset tics
@@ -19,7 +19,7 @@ set lmargin at screen 0.1
 set rmargin at screen 0.8
 set bmargin at screen 0.1
 set yrange [0:6]
-set xrange [0:6]
+set xrange [-0.1:6]
 set link y2
 unset key
 
@@ -41,6 +41,7 @@ unset multiplot
 pause -1 "<cr> to continue"
 
 set style data yerrorbars
+set pointintervalbox 2
 
 set multiplot \
  title "Column 1 (size) should increase from left to right\n".\
