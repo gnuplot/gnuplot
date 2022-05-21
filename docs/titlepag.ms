@@ -40,7 +40,7 @@ Thomas Williams & Colin Kelley
   Alex Woo,  James R. Van Zandt,  Johannes Zellner
 .br
   Copyright (C) 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
-  Copyright (C) 2004 - 2020  various authors
+  Copyright (C) 2004 - 2022  various authors
 .AI
    Mailing list for comments: gnuplot-info@lists.sourceforge.net
 .br
