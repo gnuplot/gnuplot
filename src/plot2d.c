@@ -866,6 +866,8 @@ get_data(struct curve_points *current_plot)
 	    coordval var_char = 0;
 	    if (current_plot->plot_filter == FILTER_ZSORT)
 		weight = v[var++];
+	    if (var_ps == PTSZ_VARIABLE)
+		var_ps = v[var++];
 	    if (var_pt == PT_VARIABLE) {
 		if (isnan(v[var]) && df_tokens[var]) {
 		    safe_strncpy( (char *)(&var_char), df_tokens[var], sizeof(coordval));
@@ -873,8 +875,6 @@ get_data(struct curve_points *current_plot)
 		}
 		var_pt = v[var++];
 	    }
-	    if (var_ps == PTSZ_VARIABLE)
-		var_ps = v[var++];
 	    if (var > j)
 		int_error(NO_CARET, "Not enough using specs");
 	    if (var_pt < 0)
@@ -896,10 +896,10 @@ get_data(struct curve_points *current_plot)
 
 	    if (current_plot->labels->tag == VARIABLE_ROTATE_LABEL_TAG)
 		var_rotation = v[var++];
-	    if (var_pt == PT_VARIABLE)
-		var_pt = v[var++];
 	    if (var_ps == PTSZ_VARIABLE)
 		var_ps = v[var++];
+	    if (var_pt == PT_VARIABLE)
+		var_pt = v[var++] - 1;
 	    if (var > j)
 		int_error(NO_CARET, "Not enough using specs");
 
@@ -982,6 +982,11 @@ get_data(struct curve_points *current_plot)
 		coordval var_pt = current_plot->lp_properties.p_type;
 		coordval var_ps = current_plot->lp_properties.p_size;
 
+		if (var_ps == PTSZ_VARIABLE) {
+		    if (var >= j)
+			int_error(NO_CARET, "Not enough using specs");
+		    var_ps = v[var++];
+		}
 		if (var_pt == PT_VARIABLE) {
 		    if (var >= j)
 			int_error(NO_CARET, "Not enough using specs");
@@ -989,11 +994,6 @@ get_data(struct curve_points *current_plot)
 		}
 		if (!(var_pt > 0)) /* Catches CRD_PTCHAR (NaN) also */
 		    var_pt = 0;
-		if (var_ps == PTSZ_VARIABLE) {
-		    if (var >= j)
-			int_error(NO_CARET, "Not enough using specs");
-		    var_ps = v[var++];
-		}
 		store2d_point(current_plot, i++, v[0], v[1],
 					    var_ps, var_pt, ylow, yhigh, -1.0);
 	    }

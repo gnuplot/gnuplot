@@ -1148,7 +1148,7 @@ get_3ddata(struct surface_points *this_plot)
 		    if (cp->CRD_PTSIZE == PTSZ_VARIABLE)
 			cp->CRD_PTSIZE = v[varcol++];
 		    if (cp->CRD_PTTYPE == PT_VARIABLE)
-			cp->CRD_PTTYPE = v[varcol++];
+			cp->CRD_PTTYPE = v[varcol++] - 1;
 		    if (j < varcol)
 			int_error(NO_CARET, "Not enough input columns");
 		    if (j == varcol) {
