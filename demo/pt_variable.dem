@@ -1,0 +1,77 @@
+#
+# Exercise variable pointsize and variable pointtype
+#
+
+$DATA << EOD
+# size pointtype color
+  1    12	0xff0000
+  2    11	0x00ee00
+  3    10	0x0000ee
+  4     9	0xee00ee
+  5     8	0xeebb00
+  6     7	0x00eeee
+EOD
+
+unset tics
+unset border
+set view map
+set lmargin at screen 0.1
+set rmargin at screen 0.8
+set bmargin at screen 0.1
+set yrange [0:6]
+set xrange [0:6]
+set link y2
+unset key
+
+set style data points
+
+set multiplot \
+ title "Column 1 (size) should increase from left to right\n".\
+       "Column 2 (type) should decrease from left to right"
+
+set y2tics ("ps var" 5, "pt var" 4, "ps var pt var" 3, "3D ps var pt var" 2)
+set xlabel "with points"
+plot $DATA  using 0:(5):1   ps var
+unset y2tics; unset xlabel
+plot $DATA  using 0:(4):2   pt var ps 3
+plot $DATA  using 0:(3):1:2   ps var pt var
+splot $DATA using 0:(1):(0):1:2   ps var pt var
+unset multiplot
+
+pause -1 "<cr> to continue"
+
+set style data yerrorbars
+
+set multiplot \
+ title "Column 1 (size) should increase from left to right\n".\
+       "Column 2 (type) should decrease from left to right"
+
+set y2tics ("ps var" 5, "pt var" 4, "ps var pt var" 3, "3D ps var pt var" 2)
+set xlabel "with yerrorbars"
+plot $DATA  using 0:(5):(4.75):(5.25):1:3 ps var lc rgb var
+unset y2tics; unset xlabel
+plot $DATA  using 0:(4):(3.75):(4.25):2:3 pt var ps 3 lc rgb var
+plot $DATA  using 0:(3):(2.75):(3.25):1:2:3 ps var pt var lc rgb var
+splot $DATA using 0:(1):(0):1:2:3 with points ps var pt var lc rgb var
+unset multiplot
+
+pause -1 "<cr> to continue"
+
+set style data labels
+
+set multiplot \
+ title "Column 1 (size) should increase from left to right\n".\
+       "Column 2 (type) should decrease from left to right"
+
+set y2tics ("ps var" 5, "pt var" 4, "ps var pt var" 3, "3D ps var pt var" 2)
+set xlabel "with labels"
+plot $DATA  using 0:(5):("Label"):1       left offset 0,1 point ps var
+unset y2tics; unset xlabel
+plot $DATA  using 0:(4):("Label"):2       left offset 0,1 point pt var ps 3
+plot $DATA  using 0:(3):("Label"):1:2     left offset 0,1 point ps var pt var
+splot $DATA using 0:(1):(0):("Label"):1:2 left offset 0,1 point ps var pt var
+unset multiplot
+
+pause -1 "<cr> to continue"
+
+reset
