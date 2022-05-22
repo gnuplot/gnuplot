@@ -334,6 +334,13 @@ main(int argc_orig, char **argv)
 	if (!argv[i])
 	    continue;
 
+	if (!strcmp(argv[i], "-c")) {
+	    /* The rest of the command line is a scriptfile and its arguments.
+	     * Do not try to interpret them here (ignore -V, --help, etc).
+	     */
+	    break;
+	}
+
 	if (!strcmp(argv[i], "-V") || !strcmp(argv[i], "--version")) {
 	    printf("gnuplot %s patchlevel %s\n",
 		    gnuplot_version, gnuplot_patchlevel);
