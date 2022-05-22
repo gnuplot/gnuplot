@@ -10,6 +10,7 @@ Changes in 5.4.4
 * CHANGE fig: restore terminal option "pointsmax <N>" Bug #2509
 * CHANGE always add a space between items in a "print" command Bug #2488
 * CHANGE consistent ordering of input columns for "plot ... ps var pt var" Bug #2524
+* CHANGE gnuplot -c script.gp A B -C ... will pass A B -C ... without interpretation
 * FIX handle combination of axis properties logscale + autoscale + reverse Bug #2347
 * FIX mis-handled arguments at start-up of "gnuplot -c script arg1 ..." Bug #2493
 * FIX windows: redirected output of printf() Bug #2490
