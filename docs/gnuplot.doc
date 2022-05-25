@@ -7353,7 +7353,7 @@ Ffigure_zerror
  huge number of points so that the distribution of high-scoring points
  remains evident. Sorting the points on z guarantees that points with
  a high z-value will not be obscured by points with lower z-values.
- Limited to plot style "with points".
+ Limited to plot styles "with points" and "with linespoints".
 
 4 special-filenames
 ?special-filenames

@@ -581,8 +581,9 @@ get_data(struct curve_points *current_plot)
 	break;
     case SMOOTH_ZSORT:
 	min_cols = 3;
-	if (current_plot->plot_style != POINTSTYLE)
-	    int_error(NO_CARET, "'smooth zsort' only possible in plots 'with points'");
+	if (current_plot->plot_style != POINTSTYLE
+	&&  current_plot->plot_style != LINESPOINTS)
+	    int_error(NO_CARET, "'smooth zsort' only supported for point plots");
 	break;
     case SMOOTH_ACSPLINES:
 	max_cols = 3;
@@ -2358,7 +2359,6 @@ eval_plots()
 			break;
 		    case SMOOTH_ZSORT:
 			this_plot->plot_smooth = SMOOTH_ZSORT;
-			this_plot->plot_style = POINTSTYLE;
 			break;
 		    case SMOOTH_NONE:
 		    default:
