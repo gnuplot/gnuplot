@@ -50,14 +50,16 @@ print "foo          = ",foo
 print "strlen(foo)  = ",strlen(foo)
 print "substr(foo,3,4) = ",substr(foo,3,4)
 print ""
-if (!iswindows && !isos2) {
+
+if (1) {
+  haystack = time("%H:%M %d %B %Y")
+} else if (!iswindows && !isos2) {
   haystack = system("date")
-} else { if (iswindows) {
+} else  if (iswindows) {
   haystack = system("date /T") . " " . system("time /T")
 } else {
-  # no system program to retrieve time and date required
   haystack = time("%D %T")
-}}
+}
 needle = ":"
 S = strstrt(haystack,needle)
 print "haystack     = \`date\`"
@@ -66,10 +68,6 @@ print "needle       = ",needle
 print "S = strstrt(haystack,needle) = ",S
 print "haystack[S-2:S+2] = ",haystack[S-2:S+2]
 print "It is now " . haystack[S-2:S+2]
-#
-print ""
-print "words(haystack)   = ",words(haystack)
-print "word(haystack,5)  = ",word(haystack,5)
 #
 print ""
 #
