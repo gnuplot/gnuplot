@@ -2994,17 +2994,11 @@ plot_c_bars(struct curve_points *plot)
 	/* Some users prefer bars at the end of the whiskers */
 	if (plot->plot_style == BOXPLOT
 	||  plot->arrow_properties.head == BOTH_HEADS) {
-	    int d;
+	    int d = 0;
 	    if (plot->plot_style == BOXPLOT) {
-		if (bar_size < 0)
-		    d = 0;
-		else
+		if (bar_size > 0)
 		    d = (xhighM-xlowM)/2. - (bar_size * term->h_tic);
-	    } else {
-		double frac = plot->arrow_properties.head_length;
-		d = (frac <= 0) ? 0 : (xhighM-xlowM)*(1.-frac)/2.;
 	    }
-
 	    draw_clip_line(xlowM+d, yhighM, xhighM-d, yhighM);
 	    draw_clip_line(xlowM+d, ylowM, xhighM-d, ylowM);
 	}
