@@ -442,26 +442,14 @@ GetAnnotateString(char *s, double x, double y, int mode, char *fmt)
 	strcat(format, "]");
 	sprintf(s, format, xDateTimeFormat(x, buf, mode), y);
     } else if (mode == MOUSE_COORDINATES_FRACTIONAL) {
-	double xrange = axis_array[FIRST_X_AXIS].max - axis_array[FIRST_X_AXIS].min;
-	double yrange = axis_array[FIRST_Y_AXIS].max - axis_array[FIRST_Y_AXIS].min;
-	/* calculate fractional coordinates.
-	 * prevent division by zero */
-	if (xrange) {
-	    char format[0xff] = "/";
-	    strcat(format, mouse_setting.fmt);
-	    sprintf(s, format, (x - axis_array[FIRST_X_AXIS].min) / xrange);
-	} else {
-	    sprintf(s, "/(undefined)");
-	}
+	struct axis *x_axis = &axis_array[FIRST_X_AXIS];
+	struct axis *y_axis = &axis_array[FIRST_Y_AXIS];
+	sprintf(s, "/ %5.3f, %5.3f",
+		(double)(mouse_x - x_axis->term_lower)
+		/ (double)(x_axis->term_upper - x_axis->term_lower),
+		(double)(mouse_y - y_axis->term_lower)
+		/ (double)(y_axis->term_upper - y_axis->term_lower));
 	s += strlen(s);
-	if (yrange) {
-	    char format[0xff] = ", ";
-	    strcat(format, mouse_setting.fmt);
-	    strcat(format, "/");
-	    sprintf(s, format, (y - axis_array[FIRST_Y_AXIS].min) / yrange);
-	} else {
-	    sprintf(s, ", (undefined)/");
-	}
     } else if (mode == MOUSE_COORDINATES_REAL1) {
 	sprintf(s, xy_format(), x, y);	/* w/o brackets */
     } else if ((mode == MOUSE_COORDINATES_ALT) && polar) {
@@ -572,6 +560,16 @@ mkstr(char *sp, double x, AXIS_INDEX axis)
 	    *(strchr(format,'\n')) = ' ';
 	gstrftime(sp, 40, format, x);
 
+    } else if (mouse_mode == MOUSE_COORDINATES_FRACTIONAL) {
+	if (axis == FIRST_X_AXIS || axis == SECOND_X_AXIS) {
+	    struct axis *x_axis = &axis_array[FIRST_X_AXIS];
+	    sprintf(sp, "%5.3f", (double)(mouse_x - x_axis->term_lower)
+			    / (double)(x_axis->term_upper - x_axis->term_lower));
+	} else if (axis == FIRST_Y_AXIS || axis == SECOND_Y_AXIS) {
+	    struct axis *y_axis = &axis_array[FIRST_Y_AXIS];
+	    sprintf(sp, "%5.3f", (double)(mouse_y - y_axis->term_lower)
+			    / (double)(y_axis->term_upper - y_axis->term_lower));
+	}
     } else {
 	sprintf(sp, mouse_setting.fmt ,x);
     }
