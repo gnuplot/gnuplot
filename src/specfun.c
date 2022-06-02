@@ -132,7 +132,7 @@ static double ibeta(double a, double b, double x);
  *   Convergence fails at about a=1.e08 with ITMAX=20000
  * Development plan:
  *   Why limit to x>0 a>0?   E.g. A&S Fig 6.3 p261 shows full plane
- *   Complex values?
+ *   Superseded by complex Igamma implementation in complexfun.c
  */
 #define IGAMMA_PRECISION 1.E-14
 #define IGAMMA_OVERFLOW  FLT_MAX
@@ -220,13 +220,15 @@ static double erf(double a);
 static double erfc(double a);
 #endif
 
-/* Macros to configure routines taken from CEPHES: */
-
-/* Unknown arithmetic, invokes coefficients given in
- * normal decimal format.  Beware of range boundary
- * problems (MACHEP, MAXLOG, etc. in const.c) and
- * roundoff problems in pow.c:
- * (Sun SPARCstation)
+/* Macros to configure 64-bit floating point constants for routines from CEPHES
+ *
+ * DEC:   Digital Equipment PDP-11 and VAX "D-floating point" (56 bit mantissa)
+ * IBMPC: little-endian IEEE 754-1985
+ * MIEEE: big-endian IEEE 754-1985
+ *
+ * UNK:   decimal radix ascii representation to be interpreted by the compiler
+ *        These are given to 21 digit precision, hence >80 bits of mantissa
+ *        as in C99/C11 "long double".
  */
 #define UNK 1
 #define MACHEP DBL_EPSILON
