@@ -321,7 +321,7 @@ real(struct value *val)
 	return ((double) val->v.int_val);
     case CMPLX:
 	return (val->v.cmplx_val.real);
-    case STRING:              /* is this ever used? */
+    case STRING:    /* FIXME is this ever used? */
 	return (atof(val->v.string_val));
     case NOTDEFINED:
 	return not_a_number();
@@ -562,35 +562,44 @@ pop(struct value *x)
 /*
  * Allow autoconversion of string variables to floats if they
  * are dereferenced in a numeric context.
+ * Jun 2022: Stricter error checking for non-numeric string.
  */
 struct value *
 pop_or_convert_from_string(struct value *v)
 {
-    (void) pop(v);
+    pop(v);
 
     /* FIXME: Test for INVALID_VALUE? Other corner cases? */
     if (v->type == INVALID_NAME)
 	int_error(NO_CARET, "invalid dummy variable name");
 
     if (v->type == STRING) {
-	char *eov;
+	char *string = v->v.string_val;
+	char *eov = string;
+	char trailing = *eov;
 
-	if (*(v->v.string_val)
-	&&  strspn(v->v.string_val,"0123456789 ") == strlen(v->v.string_val)) {
-	    long long li = atoll(v->v.string_val);
-	    gpfree_string(v);
+	/* If the string contains no decimal point, try to interpret it as an integer.
+	 * strtoll handles decimal, octal, and hexadecimal.
+	 */
+	if (strcspn(string, ".") == strlen(string)) {
+	    long long li = strtoll( string, &eov, 0 );
+	    trailing = *eov;
 	    Ginteger(v, li);
-	} else {
-	    double d = strtod(v->v.string_val,&eov);
-	    if (v->v.string_val == eov) {
-		gpfree_string(v);
-		int_error(NO_CARET,"Non-numeric string found where a numeric expression was expected");
-		/* Note: This also catches syntax errors like "set term ''*0 " */
-	    }
-	    gpfree_string(v);
-	    Gcomplex(v, d, 0.);
-	    FPRINTF((stderr,"converted string to CMPLX value %g\n",real(v)));
 	}
+	/* Successful interpretation as an integer leaves (eov != string).
+	 * Otherwise try again as a floating point, including oddball cases like
+	 * "NaN" or "-Inf" that contain no decimal point.
+	 */
+	if (eov == string) {
+	    double d = strtod(string, &eov);
+	    trailing = *eov;
+	    Gcomplex(v, d, 0.);
+	}
+	free(string);	/* NB: invalidates dereference of eov */
+	if (eov == string)
+	    int_error(NO_CARET,"Non-numeric string found where a numeric expression was expected");
+	if (trailing && !isspace(trailing))
+	    int_error(NO_CARET,"Trailing characters after numeric expression");
     }
     return(v);
 }
