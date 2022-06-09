@@ -1030,6 +1030,11 @@ do_3dplot(
     } else						\
 	yl -= key_entry_height;                         \
     } while (0)
+#define INVERT_KEY()					\
+    do {						\
+	yl = key->bounds.ybot + (yl_ref - yl) + (key_entry_height/2); \
+    } while (0)
+
     key_count = 0;
     yl_ref = yl -= key_entry_height / 2;	/* centralise the keys */
 
@@ -3479,6 +3484,9 @@ key_text(int xl, int yl, char *text)
 {
     legend_key *key = &keyT;
 
+    if (key->invert)
+	INVERT_KEY();
+
     (term->layer)(TERM_LAYER_BEGIN_KEYSAMPLE);
     if (key->just == GPKEY_LEFT) {
 	write_multiline(xl + key_text_left, yl, text, LEFT, JUST_TOP, 0, key->font);
@@ -3496,6 +3504,7 @@ key_text(int xl, int yl, char *text)
 static void
 key_sample_line(int xl, int yl)
 {
+    legend_key *key = &keyT;
     BoundingBox *clip_save = clip_area;
 
     /* Clip against canvas */
@@ -3503,6 +3512,9 @@ key_sample_line(int xl, int yl)
 	clip_area = NULL;
     else
 	clip_area = &canvas;
+
+    if (key->invert)
+	INVERT_KEY();
 
     (term->layer)(TERM_LAYER_BEGIN_KEYSAMPLE);
     draw_clip_line(xl + key_sample_left, yl, xl + key_sample_right, yl);
@@ -3514,6 +3526,7 @@ key_sample_line(int xl, int yl)
 static void
 key_sample_point(struct surface_points *this_plot, int xl, int yl, int pointtype)
 {
+    legend_key *key = &keyT;
     BoundingBox *clip_save = clip_area;
 
     /* Clip against canvas */
@@ -3521,6 +3534,10 @@ key_sample_point(struct surface_points *this_plot, int xl, int yl, int pointtype
 	clip_area = NULL;
     else
 	clip_area = &canvas;
+
+
+    if (key->invert)
+	INVERT_KEY();
 
     (term->layer)(TERM_LAYER_BEGIN_KEYSAMPLE);
     if (!clip_point(xl + key_point_offset, yl)) {
@@ -3541,12 +3558,18 @@ key_sample_point(struct surface_points *this_plot, int xl, int yl, int pointtype
 static void
 key_sample_fill(int xl, int yl, struct surface_points *this_plot)
 {
+    legend_key *key = &keyT;
     struct fill_style_type *fs = &this_plot->fill_properties;
     int style = style_from_fill(fs);
     int x = xl + key_sample_left;
     int y = yl - key_entry_height/4;
     int w = key_sample_right - key_sample_left;
     int h = key_entry_height/2;
+
+    if (key->invert) {
+	INVERT_KEY();
+	y = yl - key_entry_height/4;
+    }
 
     if (!(term->fillbox))
 	return;
@@ -3617,6 +3640,7 @@ get_surface_cbminmax(struct surface_points *plot, double *cbmin, double *cbmax)
 static void
 key_sample_line_pm3d(struct surface_points *plot, int xl, int yl)
 {
+    legend_key *key = &keyT;
     int steps = GPMIN(24, abs(key_sample_right - key_sample_left));
     /* don't multiply by key->swidth --- could be >> palette.maxcolors */
     int x_to = xl + key_sample_right;
@@ -3648,6 +3672,9 @@ key_sample_line_pm3d(struct surface_points *plot, int xl, int yl)
     gray_to = cb2gray(cbmax);
     gray_step = (gray_to - gray_from)/steps;
 
+    if (key->invert)
+	INVERT_KEY();
+
     clip_move(x1, yl);
     x2 = x1;
     while (i <= steps) {
@@ -3671,6 +3698,7 @@ key_sample_point_pm3d(
     int xl, int yl,
     int pointtype)
 {
+    legend_key *key = &keyT;
     BoundingBox *clip_save = clip_area;
     int x_to = xl + key_sample_right;
     int i = 0, x1 = xl + key_sample_left, x2;
@@ -3711,6 +3739,9 @@ key_sample_point_pm3d(
 	clip_area = NULL;
     else
 	clip_area = &canvas;
+
+    if (key->invert)
+	INVERT_KEY();
 
     while (i <= steps) {
 	/* if (i>0) set_color( i==steps ? gray_to : (i-0.5)/steps ); ... range [0:1] */
