@@ -911,10 +911,10 @@ fill_gpval_complex(char *var, double areal, double aimag)
 static void
 update_plot_bounds(void)
 {
-    fill_gpval_integer("GPVAL_TERM_XMIN", axis_array[FIRST_X_AXIS].term_lower / term->tscale);
-    fill_gpval_integer("GPVAL_TERM_XMAX", axis_array[FIRST_X_AXIS].term_upper / term->tscale);
-    fill_gpval_integer("GPVAL_TERM_YMIN", axis_array[FIRST_Y_AXIS].term_lower / term->tscale);
-    fill_gpval_integer("GPVAL_TERM_YMAX", axis_array[FIRST_Y_AXIS].term_upper / term->tscale);
+    fill_gpval_float("GPVAL_TERM_XMIN", (double)axis_array[FIRST_X_AXIS].term_lower / term->tscale);
+    fill_gpval_float("GPVAL_TERM_XMAX", (double)axis_array[FIRST_X_AXIS].term_upper / term->tscale);
+    fill_gpval_float("GPVAL_TERM_YMIN", (double)axis_array[FIRST_Y_AXIS].term_lower / term->tscale);
+    fill_gpval_float("GPVAL_TERM_YMAX", (double)axis_array[FIRST_Y_AXIS].term_upper / term->tscale);
     fill_gpval_integer("GPVAL_TERM_XSIZE", canvas.xright+1);
     fill_gpval_integer("GPVAL_TERM_YSIZE", canvas.ytop+1);
     fill_gpval_integer("GPVAL_TERM_SCALE", term->tscale);
