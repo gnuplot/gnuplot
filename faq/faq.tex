@@ -102,7 +102,7 @@
 \noindent
 This material describes \gnuplot version 5 (up to 5.4)
         \\
-FAQ version: December 2021
+FAQ version: June 2022
         \\
 PDF version of current document: {\http{www.gnuplot.info/faq/faq.pdf}.
 
@@ -796,9 +796,10 @@ y axes to be defined.
 \subsection{How to draw a solid made of triangular facets?}
 
 Version 5.4: plot style \textit{with polygons} can handle polygonal faces
-(triangles, rectangles, octagons, ...).
-In earlier versions the best you can do is to describe colored facets of a
-3D object in a file organized like this:
+(triangles, rectangles, octagons, ...) in either 2D or 3D plots.
+
+In older versions the best you can do is to describe colored quadrangles
+that are facets of a 3D object using a file organized like this:
 \small
 \begin{verbatim}
 # triangle 1
@@ -815,19 +816,19 @@ x y z
 \end{verbatim}
 \normalsize
 
-Notice the single and double blank lines. Also notice that the triangle
+Notice the single and double blank lines. Also notice that each triangle
 really has four vertices of which two are identical.  This is because the
 pm3d code only knows how to deal with quadrangles.
 \textit{<cN>} is an optional color.
 
-Then plot it by (either of splot's):
+Then plot it:
 \small
 \begin{verbatim}
 set pm3d
 set style data pm3d
 set pm3d depthorder
-splot 'facets.dat'
-splot 'facets_with_color.dat' using 1:2:3:4
+splot 'facets.dat' using 1:2:3 title "default coloring"
+splot 'facets_with_color.dat' using 1:2:3:4 title "explicit colors"
 \end{verbatim}
 \normalsize
 
@@ -919,7 +920,7 @@ Unfortunately there are some circumstances where it very cumbersome to use,
 notably in generating PostScript output.
 If you are working in a UTF-8 computing environment, you probably do not have to
 do anything special in gnuplot to use it.
-If you are not, then you can still tell gnuplot to use UTF-8 when creating output:
+If you are not, then you can still tell gnuplot to use UTF-8 for output:
 {\em set encoding utf8}.
 
 If you cannot enter UTF-8 characters on your keyboard you will have to solve
@@ -928,7 +929,7 @@ byte-by-byte, or (version 5.4) unicode escape sequences like
 {\em \verb&\U+221E&} ($\infty$).
 If your keyboard does generate UTF-8 but you don't know what keystrokes would
 produce a specific character, there are probably suitable character selection
-apps for your desktop (e.g. KDE {\em kcharselect}, or GNOME {\em Character Map}).
+apps for your desktop (e.g. KDE {\em kcharselect} or GNOME {\em Character Map}).
 
 \subsection{What if I need h-bar (Planck's constant)?}
 
@@ -1016,7 +1017,7 @@ italic styles within a plot.
 To see a list of the available graphic drivers for your installation of
 \gnuplot, type {\em set term}.
 
-Some graphics drivers are included in the normal distribution
+Some graphics drivers are included in the source distribution
 but are not built by default. If you want to use them, you'll
 have to recompile from source.
 
@@ -1165,9 +1166,9 @@ or plot the datafile under a unixish platform by\\
 
 \subsection{Why does \gnuplot ignore my very small numbers?}
 
-For some purposes \Gnuplot{} treats numbers less than 1e-08 as being zero.
-Thus, if you are trying to plot a collection of very small
-numbers, they may be plotted as zero. Worse, if you're plotting
+For some purposes \Gnuplot{} treats numbers less than 1.e-08 as being zero.
+Thus if you are trying to plot a collection of very small numbers,
+they may be plotted as zero. Worse, if you're plotting
 on a log scale, they will be off scale. Or, if the whole set of
 numbers is "zero", your range may be considered empty:
 
@@ -1175,7 +1176,7 @@ numbers is "zero", your range may be considered empty:
 \begin{verbatim}
 gnuplot> plot 'test1'
 Warning: empty y range [4.047e-19:3e-11], adjusting to [-1:1]
-gnuplot> set yrange [4e-19:3e-11]
+gnuplot> set yrange [4e-19 : 3e-11]
 gnuplot> plot 'test1'
               ^
 y range is less than `zero`
