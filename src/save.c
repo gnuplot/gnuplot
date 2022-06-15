@@ -643,12 +643,15 @@ set encoding %s\n\
 
     fprintf(fp, "\n\
 set samples %d, %d\n\
-set isosamples %d, %d\n\
-%sset surface %s",
+set isosamples %d, %d",
 	    samples_1, samples_2,
-	    iso_samples_1, iso_samples_2,
-	    (draw_surface) ? "" : "un",
-	    (implicit_surface) ? "" : "explicit");
+	    iso_samples_1, iso_samples_2);
+
+    fprintf(fp, "\n\
+set surface %s\n\
+%sset surface",
+	    (implicit_surface) ? "implicit" : "explicit",
+	    (draw_surface) ? "" : "un");
 
     fprintf(fp, "\n\
 %sset contour", (draw_contour) ? "" : "un");
