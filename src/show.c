@@ -2798,8 +2798,11 @@ static void
 show_surface()
 {
     SHOW_ALL_NL;
-    fprintf(stderr, "\tsurface is %sdrawn %s\n",
-	draw_surface ? "" : "not ", implicit_surface ? "" : "only if explicitly requested");
+    if (!draw_surface)
+	fprintf(stderr, "\tsurface is not drawn\n");
+    else
+	fprintf(stderr, "\tsurface is drawn %s\n",
+	    implicit_surface ? "" : "only if explicitly requested");
 }
 
 
