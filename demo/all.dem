@@ -134,6 +134,10 @@ print "******************** file surface1.dem ********************"
 load "surface1.dem"
 reset
 
+print "******************** file surface_explicit.dem ********************"
+load "surface_explicit.dem"
+reset
+
 print "******************** file discrete.dem ********************"
 load "discrete.dem"
 reset

@@ -1,0 +1,56 @@
+#
+# Show mixing gridded surfaces and individual lines
+# by using "set surface explicit" together with plot styles
+# splot A with surface, B with lines
+#
+# This is supposed to work with or without hidden surface removal
+# but failed for hidden3d in gnuplot versions < 5.4.4
+#
+set view 98, 70
+unset border
+unset tics
+set sample 21,21
+set isosample 21,21
+
+sinc(x) = (x==0) ? 1.0 : sin(x) / x
+F(x,y) = 5. * sinc(sqrt(x*x + y*y))
+
+$DATA << EOD
+0 0 -3
+1 0  0
+2 0  3
+3 0  6
+
+0 1 -3
+1 1  0
+2 1  3
+3 1  6
+
+EOD
+
+set surface explicit
+set style data surface
+unset hidden3d
+
+set title "set surface explicit\nunset hidden3d"
+splot '++' using 1:2:(F($1,$2)) with surface title "with surface", \
+      $DATA using 1:($2+1):3 with lines lw 2 title "with lines", \
+      $DATA using 1:($2-3):3 with surface lw 2 lc 4 title "with surface"
+
+pause -1 "<cr> to continue"
+
+set hidden3d
+set title "set surface explicit\n  set hidden3d"
+splot '++' using 1:2:(F($1,$2)) with surface title "with surface", \
+      $DATA using 1:($2+1):3 with lines lw 2 title "with lines", \
+      $DATA using 1:($2-3):3 with surface lw 2 lc 4 title "with surface"
+
+pause -1 "<cr> to continue"
+
+reset
+
+
+
+
+
+
