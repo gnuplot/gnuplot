@@ -1165,10 +1165,12 @@ build_networks(struct surface_points *plots, int pcount)
 	    /* because hidden3d code mixes arrows from multiple plots. */
 	}
 
-	/* HBB 20000715: new initialization code block for non-grid
-	 * structured datasets. Sufficiently different from the rest
-	 * to warrant separate code, I think. */
-	if (! this_plot->has_grid_topology) {
+	/* HBB 20000715: Code block for non-grid structured datasets.
+	 * EAM Jun 2020: Individual line plots can opt out of grid processing
+	 * via the combination "set surface explicit; splot ... with lines".
+	 */
+	if ( !this_plot->has_grid_topology
+	||   (!implicit_surface && this_plot->plot_style != SURFACEGRID) ) {
 	    for (crv = 0, icrvs = this_plot->iso_crvs;
 		 icrvs;
 		 crv++, icrvs = icrvs->next) {
