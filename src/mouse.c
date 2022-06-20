@@ -1858,6 +1858,8 @@ static void
 zoom_around_mouse(int zoom_key)
 {
     double xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max;
+    double orig_x = real_x;
+    TBOOLEAN adjust = FALSE;
 
     if (is_mouse_outside_plot()) {
 	/* zoom in (factor of approximately 2^(.25), so four steps gives 2x larger) */
@@ -1881,11 +1883,27 @@ zoom_around_mouse(int zoom_key)
 	rescale_around_mouse(&ymin,  &ymax,  FIRST_Y_AXIS,  real_y,  yscale);
 	rescale_around_mouse(&x2min, &x2max, SECOND_X_AXIS, real_x2, xscale);
 	rescale_around_mouse(&y2min, &y2max, SECOND_Y_AXIS, real_y2, yscale);
+	adjust = TRUE;
     }
     retain_offsets = TRUE;
     do_zoom(xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max);
     if (display_ipc_commands())
 	fprintf(stderr, "zoom %s.\n", (zoom_key=='+' ? "in" : "out"));
+
+    /* If rescaling causes the y axis tic labels to gain or lose a decimal point,
+     * the position of the left border jumps and the nominal x coordinate of the
+     * current mouse position jumps with it. Try to detect and correct for the
+     * simplest (linear) case of this.  See Bug #1375.
+     */
+    if (adjust && !nonlinear(&axis_array[FIRST_X_AXIS])) {
+	double delta;
+	MousePosToGraphPosReal(mouse_x, mouse_y, &real_x, &real_y, &real_x2, &real_y2);
+	delta = real_x - orig_x;
+	if (fabs(delta / orig_x) > 1.e-7) {
+	    do_zoom(xmin-delta, ymin, x2min, y2min, xmax-delta, ymax, x2max, y2max);
+	    FPRINTF((stderr, "zoom adjust by %g \n", delta));
+	}
+    }
 }
 
 static void
