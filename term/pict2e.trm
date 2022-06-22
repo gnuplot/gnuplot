@@ -482,6 +482,8 @@ PICT2E_linetype(int linetype)
     /* all but axis lines are solid by default */
     if (linetype == LT_AXIS)
 	pict2e_dotspace = PICT2E_DOT_SPACE;
+    else if (linetype == LT_NODRAW)
+	pict2e_dotspace = LT_NODRAW;
     else
 	pict2e_dotspace = 0.0;
 }
@@ -575,8 +577,9 @@ PICT2E_vector(unsigned int ux, unsigned int uy)
 
     if (pict2e_dotspace == 0.0)
 	PICT2E_solid_line(pict2e_posx, (int) ux, pict2e_posy, (int) uy);
-    else
+    else if (pict2e_dotspace > 0.0)
 	PICT2E_dot_line(pict2e_posx, (int) ux, pict2e_posy, (int) uy);
+    /* else (pict2e_dotspace < 0) is LT_NODRAW */
 
     pict2e_posx = ux;
     pict2e_posy = uy;
