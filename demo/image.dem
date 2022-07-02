@@ -254,8 +254,8 @@ set origin 0.5,0.0
 set title 'Sultry evening'
 #set cbrange [0:400]
 plot 'blutux.rgb' binary array=(128,128) flip=y format='%uchar' using ($1 * 255./400.):($2 * 255./400.):($3 * 255./400.) with rgbimage, \
-'-' w points pt 7 ps 6 lt -2, \
- '-' w points pt 7 ps 0.65 lt -2
+'-' w points pt 7 ps 6 lc 'gray80', \
+ '-' w points pt 7 ps 0.65 lc 'gray90'
 110 100
 e
 10 95

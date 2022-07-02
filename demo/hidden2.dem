@@ -4,7 +4,7 @@
 # by drawing the surface twice, once "with pm3d" to produce the surface you
 # want to show, and once "with lines lt -2" to include the same surface in
 # hidden3d calculations but drawn with invisible lines.
-# Current gnuplot does the approximation for you so the extra copy of the 
+# gnuplot version 5 does the approximation for you so the extra copy of the
 # surface is no longer necessary.
 #
 set isosamples 25,25
