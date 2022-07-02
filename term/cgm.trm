@@ -1357,6 +1357,14 @@ CGM_dashed_vector(unsigned int ux, unsigned int uy)
 TERM_PUBLIC void
 CGM_solid_vector(unsigned int ux, unsigned int uy)
 {
+    if (cgm_linetype == LT_NODRAW) {
+	CGM_move(ux, uy);
+	return;
+    }
+
+    /* FIXME: this is not valid clipping!
+     * Fortunately proper clipping might have been done already.
+     */
     if (ux >= term->xmax)
 	ux = term->xmax;
     if (uy >= term->ymax)
