@@ -1018,11 +1018,15 @@ PSTRICKS_set_color(t_colorspec *colorspec)
     switch (colorspec->type) {
     case TC_FRAC:
 	PSTRICKS_color_type = colorspec->type;
-        if (sm_palette.use_maxcolors != 0)
-            gray = quantize_gray(gray);
-	new_color = (gray <= 0) ? 0 : (gray >= 1) ? sm_palette.colors - 1 : (int)(gray * sm_palette.colors);
-	if (new_color >= PSTRICKS_palette_size)
-	    new_color = PSTRICKS_palette_size - 1;
+	if (CHECK_SMPAL_IS_DISCRETE_GRADIENT) {
+	    new_color = index_from_gray(gray);
+        } else {
+	    if (sm_palette.use_maxcolors != 0)
+	        gray = quantize_gray(gray);
+	    new_color = (gray <= 0) ? 0 : (gray >= 1) ? sm_palette.colors - 1 : (int)(gray * sm_palette.colors);
+	    if (new_color >= PSTRICKS_palette_size)
+	        new_color = PSTRICKS_palette_size - 1;
+        }
 	if (PSTRICKS_palette_set == FALSE) {
 	    fputs("pstricks: Palette used before set!\n", stderr);
 	    fputs("% ERROR: Palette used before set!\n", gpoutfile);

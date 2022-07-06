@@ -54,6 +54,9 @@ double GetColorValueFromFormula(int formula, double x);
 
 extern const char *ps_math_color_formulae[];
 
+/* use gray value to find index of corresponding segment in discrete gradient palette */
+int index_from_gray (double gray);
+
 #endif /* GETCOLOR_H */
 
 /* eof getcolor.h */

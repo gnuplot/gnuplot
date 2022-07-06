@@ -149,7 +149,9 @@ make_palette()
     }
 
     /* set the number of colours to be used (allocated) */
-    if (sm_palette.use_maxcolors > 0) {
+    if (CHECK_SMPAL_IS_DISCRETE_GRADIENT) {
+	sm_palette.colors = sm_palette.gradient_num;
+    } else if (sm_palette.use_maxcolors > 0) {
 	if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRADIENT)
 	    sm_palette.colors = i;	/* EAM Sep 2010 - could this be a constant? */
 	else if (i > sm_palette.use_maxcolors)
@@ -179,10 +181,16 @@ make_palette()
     sm_palette.color = gp_alloc( sm_palette.colors * sizeof(rgb_color),
 				 "pm3d palette color");
 
-    /*  fill sm_palette.color[]  */
-    for (i = 0; i < sm_palette.colors; i++) {
-	gray = (double) i / (sm_palette.colors - 1);	/* rescale to [0;1] */
-	rgb1_from_gray( gray, &(sm_palette.color[i]) );
+    if (CHECK_SMPAL_IS_DISCRETE_GRADIENT) {
+	for (i = 0; i < sm_palette.colors; i++) {
+	    sm_palette.color[i] = sm_palette.gradient[i].col;
+	}
+    } else {
+	/*  fill sm_palette.color[]  */
+	for (i = 0; i < sm_palette.colors; i++) {
+	    gray = (double) i / (sm_palette.colors - 1);	/* rescale to [0;1] */
+	    rgb1_from_gray( gray, &(sm_palette.color[i]) );
+	}
     }
 
     /* let the terminal make the palette from the supplied RGB triplets */

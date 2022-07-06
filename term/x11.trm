@@ -154,7 +154,7 @@ static enum JUSTIFY X11_last_justification = LEFT;
 static void X11_atexit(void);
 static void X11_set_default_font(void);
 
-static void transmit_gradient(gradient_struct *gradient, int cnt);
+static void transmit_gradient(gradient_struct *gradient, int cnt, int type);
 
 /* Merged the old char X11_opts[] and int X11_optarg[]
  * into one array of structs.
@@ -1728,11 +1728,11 @@ X11_set_clipboard(const char s[])
 
 
 static void
-transmit_gradient(gradient_struct *gradient, int cnt)
+transmit_gradient(gradient_struct *gradient, int cnt, int type)
 {
     int i = 0;
 
-    fprintf(X11_ipc, "%d", cnt);
+    fprintf(X11_ipc, "%d %d", cnt, type);
     for(i=0; i<cnt; i++) {
         /* this %50 *must* match the corresponding %50 in gplt_x11.c  */
         if(i%50 == 0) {
@@ -1775,14 +1775,14 @@ X11_make_palette(t_sm_palette *palette)
 		 palette->formulaG, palette->formulaB);
 	break;
     case SMPAL_COLOR_MODE_GRADIENT:
-        transmit_gradient(palette->gradient, palette->gradient_num);
+        transmit_gradient(palette->gradient, palette->gradient_num, palette->gradient_type);
 	break;
     case SMPAL_COLOR_MODE_CUBEHELIX:
     case SMPAL_COLOR_MODE_FUNCTIONS: {
         int cnt=0;
 	gradient_struct *gradient;
 	gradient = approximate_palette(palette, -1, -1, &cnt);
-	transmit_gradient(gradient, cnt);
+	transmit_gradient(gradient, cnt, SMPAL_GRADIENT_TYPE_SMOOTH);
 	free(gradient);
 	break;
     }

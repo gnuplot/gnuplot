@@ -1037,11 +1037,15 @@ CGM_set_color(t_colorspec *colorspec)
 
     } else if (colorspec->type == TC_FRAC) {
 	 double gray = colorspec->value;
-	 /* map [0...1] to interval [0...cgm_smooth_colors-1], then add
-	    offset to get past the default colors */
-	 cgm_next.fill_color = (gray <= 0) ? 0 : (int)(gray * cgm_smooth_colors);
-	 if (cgm_next.fill_color >= cgm_smooth_colors)
-	     cgm_next.fill_color = cgm_smooth_colors - 1;
+	 if (CHECK_SMPAL_IS_DISCRETE_GRADIENT) {
+	      cgm_next.fill_color = index_from_gray(gray);
+	 } else {
+	      /* map [0...1] to interval [0...cgm_smooth_colors-1], then add
+	         offset to get past the default colors */
+	      cgm_next.fill_color = (gray <= 0) ? 0 : (int)(gray * cgm_smooth_colors);
+	      if (cgm_next.fill_color >= cgm_smooth_colors)
+	          cgm_next.fill_color = cgm_smooth_colors - 1;
+	 }
 	 cgm_next.fill_color += CGM_COLORS;
 
     } else if (colorspec->type == TC_RGB) {

@@ -857,4 +857,37 @@ hsv2rgb ( rgb_color *color )
 	    + ((unsigned int)(255.*color->b));
 }
 
+/*
+ * Get the index of the gradient segment corresponding to the gray value 
+ * from the discrete gradient palette.
+ */
+int
+index_from_gray (double gray)
+{
+    int idx, maxidx;
+
+    if (gray <= 0)
+	return 0;
+
+    maxidx = sm_palette.gradient_num;
+    if (gray >= 1) 
+	return maxidx - 1;
+
+    /* find index by bisecting */
+    idx = 0;
+    if (maxidx > 1) {
+        int topidx = maxidx - 1;
+        /* treat idx as though it is bottom index */
+        while (idx != topidx) {
+            int tmpidx = (idx + topidx) / 2;
+            if (sm_palette.gradient[tmpidx].pos < gray)
+                idx = tmpidx + 1;  /* round up */
+            else
+                topidx = tmpidx;
+        }
+    }
+
+    return idx-1;
+}
+
 /* eof getcolor.c */

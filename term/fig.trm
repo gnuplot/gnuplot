@@ -1124,11 +1124,15 @@ TERM_PUBLIC void FIG_set_color(t_colorspec *colorspec)
 	    break;
 
     case TC_FRAC:
-            if (sm_palette.use_maxcolors != 0)
-                gray = quantize_gray(gray);
-	    new_color = (gray <= 0) ? 0 : (gray >= 1) ? sm_palette.colors - 1 : (int)(gray * sm_palette.colors);
-	    if (new_color >= FIG_palette_size)
-		new_color = FIG_palette_size - 1;
+    	    if (CHECK_SMPAL_IS_DISCRETE_GRADIENT) {
+		new_color = index_from_gray(gray);
+    	    } else {
+	        if (sm_palette.use_maxcolors != 0)
+	            gray = quantize_gray(gray);
+		new_color = (gray <= 0) ? 0 : (gray >= 1) ? sm_palette.colors - 1 : (int)(gray * sm_palette.colors);
+		if (new_color >= FIG_palette_size)
+		    new_color = FIG_palette_size - 1;
+	    }
 	    if (FIG_palette_set == FALSE)
 		int_warn(NO_CARET,"fig: Palette used before set\n");
 	    new_color += FIG_palette_offst;

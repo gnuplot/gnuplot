@@ -83,6 +83,8 @@ typedef enum {
     SMPAL_GRADIENT_TYPE_MIXED    = 3, /* partially discrete palette */
 } palette_gradient_type;
 
+#define CHECK_SMPAL_IS_DISCRETE_GRADIENT (sm_palette.colorMode == SMPAL_COLOR_MODE_GRADIENT && sm_palette.gradient_type == SMPAL_GRADIENT_TYPE_DISCRETE)
+
 /* Contains a colour in RGB scheme.
    Values of  r, g and b  are all in range [0;1] */
 typedef struct {

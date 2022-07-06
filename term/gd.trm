@@ -1314,7 +1314,6 @@ TERM_PUBLIC int PNG_make_palette (t_sm_palette *palette)
     return 0;
 }
 
-
 TERM_PUBLIC
 void PNG_set_color (t_colorspec *colorspec)
 {
@@ -1354,11 +1353,15 @@ void PNG_set_color (t_colorspec *colorspec)
 	    return;
 	} else {
 	    int png_color;
-	    if (sm_palette.use_maxcolors > 0)
-		gray = quantize_gray(gray);
-	    png_color = (gray <= 0) ? 0 : (int)(gray * sm_palette.colors);
-	    if (png_color >= sm_palette.colors)
-		png_color = sm_palette.colors - 1;
+	    if (CHECK_SMPAL_IS_DISCRETE_GRADIENT) {
+		png_color = index_from_gray(gray);
+	    } else {
+		if (sm_palette.use_maxcolors > 0)
+		    gray = quantize_gray(gray);
+		png_color = (gray <= 0) ? 0 : (int)(gray * sm_palette.colors);
+	        if (png_color >= sm_palette.colors)
+		    png_color = sm_palette.colors - 1;
+	    }
 	    /* map [0;1] to interval [0;png_smooth_colors-1] */
 	    png_state.color = png_smooth_color[ png_color ];
 	}
