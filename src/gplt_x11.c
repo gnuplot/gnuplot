@@ -1344,9 +1344,13 @@ scan_palette_from_buf(void)
 	break;
     case SMPAL_COLOR_MODE_GRADIENT: {
 	static char frac[8] = {0,0,0,0,0,0,0,0};
-	int i=0;
+	int i=0, ierr=0;
 	read_input_line();
-	if (2 != sscanf( buf, "%d %d", &(tpal.gradient_num), &(tpal.gradient_type) )) {
+	ierr = sscanf( buf, "%d %d", &(tpal.gradient_num), &(tpal.gradient_type) );
+	/* Older gnuplots did not send a separate gradient type parameter */
+	if (ierr < 2)
+	    tpal.gradient_type = SMPAL_GRADIENT_TYPE_NONE;
+	if (ierr < 1) {
 	    fprintf( stderr, "%s:%d error in setting palette.\n",
 		     __FILE__, __LINE__);
 	    return;
