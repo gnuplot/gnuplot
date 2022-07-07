@@ -1503,6 +1503,8 @@ f_index(union argument *arg)
 	i = index.v.int_val;
     else if (index.type == CMPLX)
 	i = floor(index.v.cmplx_val.real);
+    else
+	int_error(NO_CARET, "non-numeric array index");
 
     if (array.type == ARRAY) {
 	if (i <= 0 || i > array.v.value_array[0].v.int_val)
