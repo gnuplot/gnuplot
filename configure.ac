@@ -561,7 +561,7 @@ if test "$with_gd" != no; then
   # If pkg-config did return libgd configuration then
   # libgd_{CFLAGS,LDFLAGS,LIBS} is set
   # If gdlib-config executable is found then GDLIB_CONFIG is set
-  if test $pkg_failed == no && test -n "$GDLIB_CONFIG"; then
+  if test $pkg_failed = no && test -n "$GDLIB_CONFIG"; then
     # If pkg-config did succeed and we have gdlib-config then the later takes
     # priority
     libgd_CFLAGS=`$GDLIB_CONFIG --cflags`
@@ -1217,7 +1217,7 @@ AC_MSG_RESULT([    fig, hpgl, pcl5, postscript,])
 AC_MSG_RESULT([    pict2e, pslatex, pstex, pstricks, svg, texdraw, tkcanvas])
 AC_MSG_RESULT([])
 
-if test "$with_bitmap_terminals" == yes; then
+if test "$with_bitmap_terminals" = yes; then
   AC_MSG_RESULT([  dot-matrix terminals: yes ( --without-bitmap-terminals to disable)])
 else
   AC_MSG_RESULT([  dot-matrix terminals: no (use --with-bitmap-terminals to enable)])
@@ -1227,7 +1227,7 @@ AC_MSG_RESULT([              hp500c, hpdj, hpljii, hppj, starc])
 AC_MSG_RESULT([    other:    block pbm ])
 AC_MSG_RESULT([])
 
-if test "$with_tektronix" == no; then
+if test "$with_tektronix" = no; then
   AC_MSG_RESULT([  tektronix terminal emulators: no ( --with-tektronix to enable)])
 else
   AC_MSG_RESULT([  tektronix terminal emulators: yes ( --without-tektronix to disable)])
@@ -1248,25 +1248,25 @@ else
   AC_MSG_RESULT([    ggi       :  no   (use --with-ggi to enable, requires libggi)])
 fi
 
-if test "$with_gpic" == yes; then
+if test "$with_gpic" = yes; then
   AC_MSG_RESULT([    gpic      : yes])
 else
   AC_MSG_RESULT([    gpic      :  no   (use --with-gpic to enable)])
 fi
 
-if test "$with_tgif" == yes; then
+if test "$with_tgif" = yes; then
   AC_MSG_RESULT([    tgif      : yes])
 else
   AC_MSG_RESULT([    tgif      :  no   (use --with-tgif to enable)])
 fi
 
-if test "$with_metafont" == yes; then
+if test "$with_metafont" = yes; then
   AC_MSG_RESULT([    metafont  : yes])
 else
   AC_MSG_RESULT([    metafont  :  no   (use --with-metafont to enable)])
 fi
 
-if test "$with_metapost" == yes; then
+if test "$with_metapost" = yes; then
   AC_MSG_RESULT([    metapost  : yes])
 else
   AC_MSG_RESULT([    metapost  :  no   (use --with-metapost to enable)])
