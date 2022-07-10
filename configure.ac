@@ -5,7 +5,7 @@ dnl NB: Change version/patchlevel immediately below
 dnl     and also in PATCHLEVEL and src/version.c
 dnl
 
-AC_INIT(gnuplot, 5.4.4alpha)
+AC_INIT(gnuplot, 5.4.4)
 
 AC_CONFIG_SRCDIR(src/graphics.c)
 AC_PREREQ([2.69])

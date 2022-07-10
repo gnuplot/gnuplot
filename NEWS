@@ -1,22 +1,27 @@
 Changes in 5.4.4
 ================
-* NEW allow plots to handle arrow styles that include "lc rgb variable" 
+* NEW plots can use arrow styles that specify "lc rgb variable" 
 * CHANGE make page layout of "set view map; splot" more like that of "plot"
 *        - honor "set rmargin" and "set tmargin" Bug #2484
 *        - display x2label and y2label Bug #2484
 *        - revised placement of color box Bug #2484
 *        - reconcile linked axis data and tic ranges Bug #2483
+*        - apply "set key invert" to splot Bug #2381
 * CHANGE cairo terminals: increase internal oversampling factor Bugs #2499 #2369
 * CHANGE fig: restore terminal option "pointsmax <N>" Bug #2509
 * CHANGE always add a space between items in a "print" command Bug #2488
 * CHANGE consistent ordering of input columns for "plot ... ps var pt var" Bug #2524
 * CHANGE gnuplot -c script.gp A B -C ... will pass A B -C ... without interpretation
+* CHANGE stricter error checks when promoting string to numeric value Bug #2527
+* CHANGE report GPVAL_TERM_XMIN and friends as floating point values
 * FIX handle combination of axis properties logscale + autoscale + reverse Bug #2347
 * FIX mis-handled arguments at start-up of "gnuplot -c script arg1 ..." Bug #2493
 * FIX windows: redirected output of printf() Bug #2490
 * FIX allow variable point style and point type in plot "with yerrorbars"
 * FIX plots "with labels point pt variable" were off-by-one in choosing point type
 * FIX contour "with labels" from binary data
+* FIX x/y fractional coordinate mouse readout for nonlinear axes Bug #2526
+* FIX Support combination of "set surface explicit; set hidden3d" Bug #2521
 
 Changes in 5.4.3
 ================
