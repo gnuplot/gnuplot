@@ -13084,7 +13084,7 @@ Ffigure_multiple_keys
 ?set mxtics time
 ?mxtics time
  Syntax:
-      set mxtics <N> {seconds|minutes|hours|days|weeks|months|years}
+      set mxtics time <N> {seconds|minutes|hours|days|weeks|months|years}
 
  This is a new command option introduced in gnuplot version 5.5.
  It places minor tic marks exactly at some integral number of time units
