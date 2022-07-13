@@ -1,4 +1,4 @@
-C corresponding original gnuplot.doc for 5.4.3 (2021-12-27)
+C corresponding original gnuplot.doc for 5.4.4 (2022-07)
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -28,7 +28,7 @@ C で書かれているが、それを HTML 名前参照形式に変更している。
 ^  James R. Van Zandt, Alex Woo, Johannes Zellner<br>
 ^</p>
 ^<p align="center">  Copyright (C) 1986 - 1993, 1998 - 2004   Thomas Williams, Colin Kelley<br>
-^     Copyright (C) 2004 - 2021 various authors</p>
+^     Copyright (C) 2004 - 2022 various authors</p>
 ^<p align="center">   Mailing list for comments: <tt>gnuplot-info@lists.sourceforge.net</tt><br>
 ^      Mailing list for bug reports: <tt>gnuplot-bugs@lists.sourceforge.net</tt><br>
 ^      Web access (preferred): <tt>http://sourceforge.net/projects/gnuplot</tt></p>
@@ -541,7 +541,7 @@ C 行が長いのは、できればなんとかしたい
 #start
 #b 3 次元グラフの向きに影響する追加回転角 `azimuth`。これは、コマンドラ
 ## インから (以下参照: `set view azimuth`)、または右マウスボタンのドラ
-## ッグで設定できます。
+## ッグで設定できます。ホットキー `z` は azimuth を 0 にリセットします。
 #b Windows 上の gnuplot では、Unicode (BMP) スクリプトの入力を、
 ## `set encoding` による現在のエンコード (UTF-8 を含む) に変換して解釈
 ## します。
@@ -1346,14 +1346,14 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>abs(x)</td>    <td>任意</td>    <td>|<i>x</i>|, <i>x</i> の絶対値; 同じ型</td></tr>
 ^<tr>    <td>abs(x)</td>    <td>複素数</td>    <td>length of <i>x</i>, &radic;( Re(<i>x</i>)<sup>2</sup> + Im(<i>x</i>)<sup>2</sup> )</td></tr>
 ^<tr>    <td>acos(x)</td>    <td>任意</td>    <td>cos<sup>-1</sup> <i>x</i> (アークコサイン)</td></tr>
-^<tr>    <td>acosh(x)</td>    <td>任意</td>    <td>ラジアンでの cosh<sup>-1</sup> <i>x</i> (逆双曲余弦)</td></tr>
+^<tr>    <td>acosh(x)</td>    <td>任意</td>    <td>cosh<sup>-1</sup> <i>x</i> (逆双曲余弦)</td></tr>
 ^<tr>    <td>airy(x)</td>    <td>任意</td>    <td>エアリー (Airy) 関数 Ai(<i>x</i>)</td></tr>
 ^<tr>    <td>arg(x)</td>    <td>複素数</td>    <td><i>x</i> の偏角</td></tr>
 ^<tr>    <td>asin(x)</td>    <td>任意</td>    <td>sin<sup>-1</sup> <i>x</i> (アークサイン)</td></tr>
-^<tr>    <td>asinh(x)</td>    <td>任意</td>    <td>ラジアンでの sinh<sup>-1</sup> <i>x</i> (逆双曲正弦)</td></tr>
+^<tr>    <td>asinh(x)</td>    <td>任意</td>    <td>sinh<sup>-1</sup> <i>x</i> (逆双曲正弦)</td></tr>
 ^<tr>    <td>atan(x)</td>    <td>任意</td>    <td>tan<sup>-1</sup> <i>x</i> (アークタンジェント)</td></tr>
 ^<tr>    <td>atan2(y,x)</td>    <td>整数または実数</td>    <td>tan<sup>-1</sup>(<i>y/x</i>) (アークタンジェント)</td></tr>
-^<tr>    <td>atanh(x)</td>    <td>任意</td>    <td>ラジアンでの tanh<sup>-1</sup> <i>x</i> (逆双曲正接)</td></tr>
+^<tr>    <td>atanh(x)</td>    <td>任意</td>    <td>tanh<sup>-1</sup> <i>x</i> (逆双曲正接)</td></tr>
 ^<tr>    <td>EllipticK(k)</td>    <td>(-1:1) 内の実数 k</td>    <td><i>K(k)</i> 第 1 種完全楕円積分</td></tr>
 ^<tr>    <td>EllipticE(k)</td>    <td>[-1:1] 内の実数 k</td>    <td><i>E(k)</i> 第 2 種完全楕円積分</td></tr>
 ^<tr>    <td>EllipticPi(n,k)</td>    <td>実数 n&lt;1, (-1:1) 内の実数 k</td>    <td> &Pi;(<i>n,k</i>) 第 3 種完全楕円積分</td></tr>
@@ -1368,7 +1368,7 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>besin(n,x)</td>   <td>整数, 実数</td> <td>ラジアンでの <i>I</i><sub>n</sub> 変形ベッセル関数 (n 次変形ベッセル関数</td></tr>
 ^<tr>    <td>ceil(x)</td>    <td>任意</td>    <td>&lceil;<i>x</i>&rceil;, <i>x</i> (の実部) 以上の最小の整数</td></tr>
 ^<tr>    <td>cos(x)</td>    <td>radians</td>    <td>cos <i>x</i>, <i>x</i> のコサイン</td></tr>
-^<tr>    <td>cosh(x)</td>    <td>任意</td>    <td>cosh <i>x</i>, ラジアンでの <i>x</i> のハイパボリックコサイン</td></tr>
+^<tr>    <td>cosh(x)</td>    <td>任意</td>    <td>cosh <i>x</i>, <i>x</i> のハイパボリックコサイン</td></tr>
 ^<tr>    <td>erf(x)</td>    <td>任意</td>    <td>erf(Re(<i>x</i>)), <i>x</i> の実部の誤差関数</td></tr>
 ^<tr>    <td>erfc(x)</td>    <td>任意</td>    <td>erfc(Re(<i>x</i>)), 1.0 - (<i>x</i> の実部の誤差関数)</td></tr>
 ^<tr>    <td>exp(x)</td>    <td>任意</td>    <td><i>e<sup>x</sup></i>, <i>x</i> の指数関数</td></tr>
@@ -1390,10 +1390,10 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>real(x)</td>    <td>任意</td>    <td>Re(<i>x</i>), <i>x</i> の実数部分</td></tr>
 ^<tr>    <td>sgn(x)</td>    <td>任意</td>    <td><i>x</i> &gt; 0 なら 1, <i>x</i> &lt; 0 なら -1, <i>x</i> = 0 なら 0. <i>x</i> の虚部は無視</td></tr>
 ^<tr>    <td>sin(x)</td>    <td>任意</td>    <td>sin <i>x</i>, <i>x</i> のサイン</td></tr>
-^<tr>    <td>sinh(x)</td>    <td>任意</td>    <td>sinh <i>x</i>,ラジアンでの <i>x</i> のハイパボリックサイン</td></tr>
+^<tr>    <td>sinh(x)</td>    <td>任意</td>    <td>sinh <i>x</i>, <i>x</i> のハイパボリックサイン</td></tr>
 ^<tr>    <td>sqrt(x)</td>    <td>任意</td>    <td>&radic;<i>x</i>, <i>x</i> の平方根</td></tr>
 ^<tr>    <td>tan(x)</td>    <td>任意</td>    <td>tan <i>x</i>, <i>x</i> のタンジェント</td></tr>
-^<tr>    <td>tanh(x)</td>    <td>任意</td>    <td>tanh <i>x</i>, ラジアンでの <i>x</i> のハイパボリックタンジェント</td></tr>
+^<tr>    <td>tanh(x)</td>    <td>任意</td>    <td>tanh <i>x</i>, <i>x</i> のハイパボリックタンジェント</td></tr>
 ^<tr>    <td>voigt(x,y)</td>    <td>実数</td>    <td>ガウス関数とローレンツ関数の畳みこみ</td></tr>
 ^</tbody>
 ^</table>
@@ -1477,7 +1477,7 @@ C  need @ in table, so end and restart the table !
 ^<tr>    <td>tm_yday(t)</td>    <td>秒数による時刻</td>    <td>その年の何日目</td></tr>
 ^<tr>    <td>tm_year(t)</td>    <td>秒数による時刻</td>    <td>西暦</td></tr>
 ^<tr>    <td>time(x)</td>    <td>任意</td>    <td>現在のシステム時刻</td></tr>
-^<tr>    <td>valid(x)</td>    <td>整数</td>    <td> データ中の column(<i>x</i>) の正当性</td></tr>
+^<tr>    <td>valid(x)</td>    <td>整数</td>    <td> データ入力中の <i>x</i> 列の正当性</td></tr>
 ^<tr>    <td>value("name")</td>    <td>文字列</td>    <td> 名前 name の変数の現在の値</td></tr>
 ^</tbody>
 ^</table>
@@ -1519,10 +1519,10 @@ C マーカを doc2html へのこのシグナルとして使用します。
 4 acosh
 ?expressions functions acosh
 ?acosh
-#acosh(x) & 任意 & ラジアンでの $\cosh^{-1} x$ (逆双曲余弦)\\
-%acosh(x)@任意@$ラジアンでの cosh sup -1 x$ (逆双曲余弦)
- 関数 `acosh(x)` は逆ハイパボリックコサイン (逆双曲余弦) の値をラジアン
- で返します。
+#acosh(x) & 任意 & $\cosh^{-1} x$ (逆双曲余弦)\\
+%acosh(x)@任意@$cosh sup -1 x$ (逆双曲余弦)
+ 関数 `acosh(x)` は逆ハイパボリックコサイン (逆双曲余弦) の値を、
+ `set angles` に従ってラジアンか度で返します。
 4 airy
 ?expressions functions airy
 ?airy
@@ -1548,10 +1548,10 @@ C マーカを doc2html へのこのシグナルとして使用します。
 4 asinh
 ?expressions functions asinh
 ?asinh
-#asinh(x) & 任意  & ラジアンでの $\sinh^{-1} x$ (逆双曲正弦)\\
-%asinh(x)@任意@$ラジアンでの sinh sup -1 x$ (逆双曲正弦)
- 関数 `asinh(x)` は逆ハイパボリックサイン (逆双曲正弦) の値をラジアンで
- 返します。
+#asinh(x) & 任意  & $\sinh^{-1} x$ (逆双曲正弦)\\
+%asinh(x)@任意@$sinh sup -1 x$ (逆双曲正弦)
+ 関数 `asinh(x)` は逆ハイパボリックサイン (逆双曲正弦) の値を、
+ `set angles` に従ってラジアンか度で返します。
 4 atan
 ?expressions functions atan
 ?atan
@@ -1571,10 +1571,10 @@ C マーカを doc2html へのこのシグナルとして使用します。
 4 atanh
 ?expressions functions atanh
 ?atanh
-#atanh(x) & 任意  & ラジアンでの $\tanh^{-1} x$ (逆双曲正接)\\
-%atanh(x)@任意@ラジアンでの $tanh sup -1 x$ (逆双曲正接)
- 関数 `atanh(x)` は逆ハイパボリックタンジェント (逆双曲正接) の値をラジ
- アンで返します。
+#atanh(x) & 任意  & $\tanh^{-1} x$ (逆双曲正接)\\
+%atanh(x)@任意@$tanh sup -1 x$ (逆双曲正接)
+ 関数 `atanh(x)` は逆ハイパボリックタンジェント (逆双曲正接) の値を、
+ `set angles` に従ってラジアンか度で返します。
 ?expressions functions EllipticK
 ?EllipticK
 4 EllipticK
@@ -2039,22 +2039,10 @@ C マーカを doc2html へのこのシグナルとして使用します。
 %c c l .
 %関数@引数@返り値
 %_
-4 column
-?expressions functions column
-?column
-#column(x) & 整数か文字列 & データファイル処理中の $x$ 列目 \\
-%column(x)@整数か文字列@データファイル処理中の $x$ 列目
- `column(x)` は、plot, splot, stats コマンドの一部としてのみ使います。
- これは、$x$ 列目の内容を数値として評価します。以下参照:
- `plot datafile using`。
-4 columnhead
-?expressions functions columnhead
-?columnhead
+#column(x) & 整数か文字列 & データファイル入力中の $x$ 列目 \\
+%column(x)@整数か文字列@データファイル入力中の $x$ 列目
 #columnhead(x) & 整数 & データファイルの最初の $x$ 列目中の文字列 \\
 %columnhead(x)@整数@データファイルの最初の $x$ 列目中の文字列
- `columnhead(x)` は、plot, splot, stats コマンドの一部としてのみ使いま
- す。これは、データファイルの最初の行の $x$ 列目の内容を文字列として評
- 価します。以下参照: `plot datafile using`。
 4 exists
 ?expressions functions exists
 ?exists
@@ -2077,31 +2065,11 @@ C マーカを doc2html へのこのシグナルとして使用します。
 %palette(z)@実数@z に割り当てられた RGB パレット色
  `palette(z)` は cbrange の現在の範囲で z に割り当てられるパレット色の
  RGB 表現を返します。
-4 stringcolumn
-?expressions functions stringcolumn
-?stringcolumn
-?expressions functions strcol
-?strcol
+??
 #stringcolumn(x) & 整数か文字列 & 文字列としての $x$ 列目の内容 \\
 %stringcolumn(x)@整数か文字列@文字列としての $x$ 列目の内容
- `stringcolumn(x)` は fit あるいはデータファイルプロットでの `using` の
- 操作の数式の一部としてのみ使われます。これは $x$ 列目の内容を文字列変
- 数として返します。`strcol(x)` は、`stringcolumn(x)` の省略形です。
- 以下も参照: `plot datafile using`。
-4 timecolumn
-?expressions functions timecolumn
-?timecolumn
 #timecolumn(N,"timeformat") & 整数, 文字列 & データ入力中の $N$ 列目の日時データ \\
 %timecolumn(N,"timeformat")@整数, 文字列@データファイル入力中の $N$ 列目の日時データ
- `timecolumn(N,"timeformat")` は fit、あるいはデータファイル描画での
- `using` 処理の数式の一部としてのみ使います。以下参照:
- `plot datafile using`。
-
- これは、N 列目から始まる文字列データを日時データ値として読み、これをミ
- リ秒精度の "Unix エポック (1970 年 1 月 1 日) からの秒数" として解釈す
- るために "timeformat" を使用します。
- 書式パラメータの指定がない場合、デフォルトの `set timefmt` による文字
- 列を使います。
 4 tm_hour
 ?expressions functions tm_hour
 ?tm_hour
@@ -2174,14 +2142,9 @@ C マーカを doc2html へのこのシグナルとして使用します。
  が文字列ならば、それを書式文字列であるとみなし、書式化された日時文字列
  を提供するようそれを `strftime` に渡します。以下参照:
  `time_specifiers`, `timefmt`。
-4 valid
-?expressions functions valid
-?valid
-#valid(x) & 整数 & データ中の $\mbox{column}(x)$ の正当性\\
-%valid(x)@整数@データ中の column($x$) の正当性
- `valid(x)` は、データ描画か fit における `using` の式の中でしか使われ
- ません。以下参照: `plot datafile using`。
-
+??
+#valid(x) & 整数 & データ入力中の $\mbox{column}(x)$ の正当性\\
+%valid(x)@整数@データ入力中の column($x$) の正当性
 #value("name") & 文字列 & 名前 name の変数の現在の値\\
 %value("name")@文字列@名前 name の変数の現在の値
 4 voxel
@@ -2225,6 +2188,71 @@ C マーカを doc2html へのこのシグナルとして使用します。
        rand(x)     0 < x < 2^31-1 の整数なら種の両方を x に設定する
        rand({x,y}) 0 < x,y < 2^31-1 の整数なら seed1 を x に seed2 を y
                    に設定する
+
+4 using 指定用関数 (using specifier functions)
+ 以下の関数は、データ入力時のみ有効です。通常それは、`plot`, `splot`,
+ `fit`, `stats` のいずれかのコマンド上の `using` 指定の入力列を使用する
+ 数式内で使用します。しかしその関数の適用範囲は、実際の plot コマンド文
+ 全体であり、例えばグラフタイトルの作成時の `columnhead` の使用も含まれ
+ ます。
+
+5 column
+?expressions functions column
+?column
+ 関数 `column(x)` は、plot, splot, stats コマンドの一部としてのみ使いま
+ す。これは、$x$ 列目の内容を数値として評価します。
+ 文字列を持つと思われる列の場合は、代わりに stringcolumn(x) か、
+ timecolumn(x, "timeformat") を使用してください。
+ 以下参照: `plot datafile using`, `stringcolumn`, `timecolumn`。
+5 columnhead
+?expressions functions columnhead
+?columnhead
+ 関数 `columnhead(x)` は、plot, splot, stats コマンドの一部としてのみ使
+ います。これは、データファイルの最初の行の $x$ 列目の内容を文字列とし
+ て評価します。典型的には、これは先頭行をグラフタイトルとして展開するの
+ に使用します。
+ 以下参照: `plot datafile using`。
+ 例:
+      set datafile columnheader
+      plot for [i=2:4] DATA using 1:i title columnhead(i)
+5 stringcolumn
+?expressions functions stringcolumn
+?stringcolumn
+?expressions functions strcol
+?strcol
+ 関数 `stringcolumn(x)` は、データ描画か fit における `using` 指定での
+ み使います。これは $x$ 列目の内容を文字列として返します。`strcol(x)`
+ は、`stringcolumn(x)` の省略形です。
+ その文字列を、時間や日付と認識させたい場合は、代わりに
+ timecolumn(x, "timeformat") を使用してください。以下参照:
+ `plot datafile using`。
+5 timecolumn
+?expressions functions timecolumn
+?timecolumn
+ `timecolumn(N,"timeformat")` は、N 列目から始まる文字列データを日時デ
+ ータ値として読み、"timeformat" を使用して、それを "Unix エポック (1970
+ 年 1 月 1 日) からの秒数" としてミリ秒精度で解釈します。書式パラメータ
+ の指定がない場合、デフォルトの `set timefmt` による文字列を使います。
+ この関数は、plot か stats コマンドでの `using` 指定でのみ有効です。以
+ 下参照: `plot datafile using`。
+5 valid
+?expressions functions valid
+?valid
+ 関数 `valid(x)` は、データ描画か fit における `using` 指定の式の中でし
+ か使いません。これは、明らかな NaN 値や、入力列内の予期せぬゴミを検出
+ したり、多分デフォルト値に置き換えたり、NaN を使ってさらに計算をするこ
+ とを避けたりするのに使えます。欠損値 ("missing") と NaN (非数値) デー
+ タ値はどちらも不正と認識されますが、以下は重要ですが、gnuplot がその列
+ を本当に欠損値であると認識するか、または欠損値フラグを含んでいると認識
+ した場合、valid() を使用する数式が呼び出される前に、その入力行は捨てら
+ れてしまう、ということに注意してください。
+ 以下参照: `plot datafile using`, `missing`。
+
+ 例:
+      # 箱のある認識できない値を、無視する代わりに、期待値である定数
+      # prior として、箱全体に寄与するように扱う。
+      plot DATA using 1 : (valid(2) ? $2 : prior) smooth unique
+
 4 value
 ?expressions functions value
 ?value
@@ -3462,10 +3490,10 @@ Ffigure_newsyntax
 #TeX \\ $Q(a,x)=\frac{1}{\Gamma(x)}\intop_{x}^{\infty}t^{a-1}e^{-t}dt$ .\quad\quad
  これは、gnuplot 内で直接以下のようにして近似的に定義できます。
        Q(a,x) = 1. - igamma(a,x)
- しかし、これは、1 の近くの Q の値の精度に実質的な限界があります。より
- 正確な値を返す実装が欲しい場合、プラグインを通して用意するのがいいでし
- ょう (下を参照)。一度取り込めば、関数は、gnuplot 内の他の組み込み関数、
- ユーザ定義関数と全く同様に利用できます。
+ しかし、これは、igamma(a,x) が 1 に近いときの精度に実質的な限界があり
+ ます。より正確な値を返す実装が欲しい場合、プラグインを通して用意するの
+ がいいでしょう (下を参照)。一度取り込めば、関数は、gnuplot 内の他の組
+ み込み関数、ユーザ定義関数と全く同様に利用できます。
  以下参照: `import`。
 
  gnuplot の配布物のディレクトリ demo/plugin には、プラグインライブラリ
@@ -4410,15 +4438,16 @@ Ffigure_fsteps
 ?style fillsteps
 ?with fillsteps
 ?fillsteps
- 書式:
       plot <data> with fillsteps [above|below] [y=<baseline>]
 
- `fillsteps` スタイルは、`steps` とほぼ同じですが、曲線とベースライン
- (デフォルトは y=0) との間の領域を現在の fillstyle で塗り潰します。以下
- 参照: `steps`。
-
- オプション `above` と `below` は、ベースラインの片方の部分のみ塗り潰し
- ます。
+Ffigure_steps
+ `fillsteps` スタイルは 2 次元描画でのみ利用可能です。
+ これは、`steps` とほぼ同じですが、曲線とベースライン (デフォルトは y=0)
+ との間の領域を現在の fillstyle で塗り潰します。オプション `above` と
+ `below` は、ベースラインの片方の部分のみ塗り潰します。一つのデータ点か
+ ら次の点への移動の際に、`steps` と `fillsteps` はいずれもまず x 座標の
+ 変化の線を引き、その後 y 座標の変化の線を引くことに注意してください。
+ 以下参照: `steps`。
 2 histeps
 ?plotting styles histeps
 ?style histeps
@@ -5092,21 +5121,21 @@ Ffigure_vectors
       4 列:  x  y  xdelta  ydelta
       6 列:  x  y  z  xdelta  ydelta  zdelta
 
- キーワード "with vectors" は、その後ろに、インラインの arrow スタイル
- 指定や、あらかじめ定義されている arrow スタイルの参照、あるいは列から
- 各ベクトルに対する必要な arrow スタイルのインデックスを読むような指定
- を伴うことができます。注意: "arrowstyle variable" を使用する場合、対応
- するベクトルが描画される際にはそれが arrow の属性値すべてを埋めるので
- その plot コマンド内に他の線属性や arrow スタイル指定をこのキーワード
- と混在させることはできません。
-
-      plot ... with vectors filled heads
-      plot ... with vectors arrowstyle 3
-      plot ... using 1:2:3:4:5 with vectors arrowstyle variable
+ キーワード "with vectors" は、その後ろに、arrow スタイル属性を直接書い
+ たり、事前に定義した arrow スタイルを参照したり、あるいは別の入力列か
+ ら各ベクトルに対する適用したい arrow スタイルのインデックスを読むよう
+ 指定したりすることができます。下の最初の 3 つの例を見てください。
 
  例:
-       plot 'file.dat' using 1:2:3:4 with vectors head filled lt 2
-       splot 'file.dat' using 1:2:3:(1):(1):(1) with vectors filled head lw 2
+
+      plot ... using 1:2:3:4 with vectors filled heads
+      plot ... using 1:2:3:4 with vectors arrowstyle 3
+      plot ... using 1:2:3:4:5 with vectors arrowstyle variable
+      splot 'file.dat' using 1:2:3:(1):(1):(1) with vectors filled head lw 2
+
+ 注意: plot コマンド内にキーワード `arrowstyle` と他の線属性を混在させ
+ ることはできません。arrow スタイルに `lc variable` か `lc rgb variable`
+ がある場合、色の値用の追加列が必要です。
 
  vectors スタイルを使っての splot は `set mapping cartesian` のみでサポ
  ートされています。
@@ -5132,8 +5161,7 @@ Ffigure_xerrorbars
       3 列:  x  y  xdelta
       4 列:  x  y  xlow  xhigh
 
- 入力列を追加 (4,5 列目) すると、それらは点の variable color 情報として
- 使われます。
+ 入力列を追加 (4,5 列目) すると、variable color として使われます。
 
 2 xyerrorbars
 ?plotting styles xyerrorbars
@@ -5178,14 +5206,15 @@ Ffigure_yerrorbars
  る以外は `points` に似ています。各点 (x,y) において (x,y-ydelta) から
  (x,y+ydelta) まで、または (x,ylow) から (x,yhigh) までの線分が引かれま
  すが、これらはいくつのデータ列が与えられるかによって変わります。誤差指
- 示線の端の刻みの印の見た目は、`set errorbars` で制御できます。
+ 示線の端の刻みの印の見た目は、`set errorbars` で制御できます。点と誤差
+ 線との隙間は `set pointintervalbox` で制御します。
 
       2 列:  [暗黙の x]  y  ydelta
       3 列:  x  y  ydelta
       4 列:  x  y  ylow  yhigh
 
- 入力列を追加 (4,5 列目) すると、それらは点の variable color 情報として
- 使われます。
+ 入力列を追加すると、それらは可変 (variable) pointsize, 可変 pointtype,
+ 可変色 (variable color) の情報として使われます。
 
  以下も参照
 ^ <a href="http://www.gnuplot.info/demo/mgr.html">
@@ -5207,8 +5236,7 @@ Ffigure_xerrorlines
       3 列:  x  y  xdelta
       4 列:  x  y  xlow  xhigh
 
- 入力列を追加 (4,5 列目) すると、それらは点の variable color 情報として
- 使われます。
+ 入力列を追加 (4,5 列目) すると、variable color として使われます。
 
 2 xyerrorlines
 ?plotting styles xyerrorlines
@@ -6382,7 +6410,7 @@ Ffigure_zerror
 
  <time> は、任意の定数または実数値の式です。`pause -1` は改行キーが押さ
  されるまで待ち、0 を指定すると一切待たず、正の数を指定するとその秒数だ
- け待ちます。`pause 0` は `print` と同じです。
+ け待ちます。
 
  使用している出力形式が `mousing` (マウス機能) をサポートしている場合、
  `pause mouse` は、マウスクリックがあるか ctrl-C が押されるまで待つよう
@@ -7461,8 +7489,8 @@ Ffigure_zerror
  この機能は、とても膨大な点数データの 2 次元の散布図の表示を、高得点の
  分布がわかる形であり続けるようにフィルタするような使い方を意図していま
  す。z 保証値によるソートにより、高い z 値を持つような点が、低い z 値の
- 点で覆い隠されることはなくなります。これは、描画スタイル "with points"
- での描画に限定されています。
+ 点で覆い隠されることはなくなります。これは、描画スタイル "with points",
+ "with linespoints" での描画に限定されています。
 
 4 特別なファイル名 (special-filenames)
 ?special-filenames
@@ -8423,14 +8451,24 @@ Ffigure_zerror
 2 print
 ?commands print
 ?print
- `print` コマンドは <式> の値を画面に表示します。これは `pause 0` と同
- じです。<式> は、数を生成する `gnuplot` の数式か、または文字列です。
-
  書式:
        print <式> {, <式>, ...}
 
- 以下参照: `expressions`。出力ファイルは `set print` で設定できます。
- 以下も参照: `printerr`。
+ `print` コマンドは、1 つ、または複数の式の値を出力します。出力は、以前
+ のコマンド `set print` でリダイレクトされていない限り、画面へ行われま
+ す。以下参照: `expressions`。以下も参照: `printerr`。
+
+ <式> は、gnuplot で有効な任意の式で、数値でも、文字列定数でも、数字や
+ 文字列を返す関数でも、配列でも、または変数名でも入れることができます。
+ データブロックを出力することも可能です。`print` に sprintf や gprintf
+ 関数を組み合わせて、さらに柔軟な書式の出力を行うことも可能です。
+
+ 例:
+      print 123 + 456
+      print sinh(pi/2)
+      print "rms of residuals (FIT_STDFIT) is ", FIT_STDFIT
+      print sprintf("rms of residuals is %.3f after fit.", FIT_STDFIT)
+      print $DATA
 2 printerr
 ?commands printerr
 ?printerr
@@ -8802,32 +8840,32 @@ Ffigure_zerror
  以下参照: `datafile`。
 
  書式:
-       set autoscale {<axes>{|min|max|fixmin|fixmax|fix} | fix | keepfix}
+       set autoscale {<axis>{|min|max|fixmin|fixmax|fix} | fix | keepfix}
        set autoscale noextend
-       unset autoscale {<axes>}
+       unset autoscale {<axis>}
        show autoscale
 
- ここで、<axes> (軸) は `x`, `y`, `z`, `cb`, `x2`, `y2`, `xy`,
- `paxis {n}` のいずれかです。`min` または `max` を軸に追加指定すると
- (`xy` では使えませんが) それは `gnuplot` にその軸の最小値、または最大
- 値のみを自動縮尺させることになります。軸も何も指定されていない場合は全
- ての軸が対象となります。
+ ここで、<axs> (軸) は `x`, `y`, `z`, `cb`, `x2`, `y2`, `xy`, 
+ `paxis <p>` のいずれかです。軸名の後ろに `min` または `max` を追加する
+ と、それは `gnuplot` にその軸の最小値、または最大値のみを自動縮尺させ
+ ることになります。
 
- 自動縮尺機能を使うときは、描画範囲は自動的に割り出され、従属変数軸
- (`plot` のときは y 軸、`splot` のときは z 軸) は、関数やデータの値域が
- 収まるように設定されます。
-
- 従属変数軸 (y または z) の自動縮尺機能が指定されていない場合は、現在の
- y や z の描画範囲がそのまま使われます。
+ 軸名を指定しない場合は、全ての軸が自動縮尺の対象となります。
 
  独立変数軸 (`plot` のときは x 軸、`splot` のときは x,y 軸) の自動縮尺
- 機能が指定されている場合は、描画される全てのデータファイルの点が収まる
- ように定義域をとるようになります。データファイルが 1 つも指定されてい
- ない場合は、自動縮尺機能はなんの効果もありません。つまり、関数のみが
- 指定されていてデーターファイルを使わない場合は、x 軸の描画範囲
- (z = f(x,y) を描画しているときは y 軸も) は影響をうけません。
+ 機能は、描画されるデータに合うようにそれらの軸の範囲を調整します。描画
+ が関数のみ (入力データなし) の場合、これらの軸の自動縮尺機能は、なんの
+ 効果も持ちません。
 
- 範囲に関するより詳しい情報に関しては、以下参照: `set xrange`。
+ 従属変数軸 (`plot` のときは y 軸、`splot` のときは z 軸) の自動縮尺機
+ 能は、描画されるデータや関数に合うようにそれらの軸の範囲を調整します。
+
+ 軸の範囲の調整は、次の目盛り刻みへの延長を行うことがあります。例えば、
+ 端のデータの座標が目盛り刻みに丁度一致する場合、データと描画境界との間
+ には何もないスペースができることになります。`noextend` を使うことで、
+ この余計なスペースの作成を抑制できます。コマンド `set offset` を使うこ
+ とで、それをより増やすこともできます。さらなる情報については、以下参照:
+ `set xrange`, `set offsets`。
 
  媒介変数モード (parametric) でも自動縮尺機能は有効です (以下参照:
  `set parametric`)。この場合、より多くの従属変数があるので、x, y, z 各
@@ -13626,8 +13664,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 ?commands show print
 ?set print
 ?show print
- コマンド `set print` は `print` コマンドの出力をファイルにリダイレクト
- します。
+ コマンド `set print` は `print` コマンドの出力をリダイレクトします。
 
  書式:
        set print
@@ -13899,6 +13936,12 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  <index> の arrowstyle が既に存在する場合、他の全ては保存されたまま、与
  えられたパラメータのみが変更されます。<index> が存在しなければ、指定さ
  れなかった値はデフォルトの値になります。
+
+ コマンド `plot` または `splot` から呼び出した arrow スタイルには、デー
+ タ毎可変な線色 (`lc variable` や `lc rgb variable`) を入れることもでき、
+ それはそれに対応する `using` 指定によるデータの追加列が必要となります。
+ この場合、`set arrow` で作成する個別の arrow に対しては、そのスタイル
+ は多分有益なものではありません。
 
  `nohead` を指定することで、矢先のない矢、すなわち線分を書くこともでき
  ます。これは描画の上に線分を描く別な方法を与えます。デフォルトでは 1
@@ -15075,6 +15118,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  なります。0 でない azimuth は視界を原点に関して回転し、z 軸の射影は鉛
  直方向ではなくなります。azimuth = 90 では z 軸は鉛直方向ではなく、水平
  方向になります。
+ 対話型の表示の際、ホットキー `z` は azimuth を 0 にリセットします。
 4 equal_axes
 ?set view equal_axes
 ?set view equal xyz
