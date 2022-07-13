@@ -2,9 +2,10 @@
 		===================================
 
 This release contains bug fixes and a few changes back-ported from the
-development version.  The most noticeable is probably a set of changes that
-make page layout of "set view map; splot ..." more like the corresponding
-page layout of "plot ...".
+development version.  The most noticeable is probably a set of changes to
+make page layout of 3D plots after "set view map; splot ..." more like
+the corresponding page layout of 2D plots, including display of x2 and y2
+axis labels.
 
 Gnuplot development is tracked in a git repository on SourceForge.
 You can generate a complete history of changes using "git log"
