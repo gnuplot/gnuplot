@@ -3791,7 +3791,9 @@ PaletteMake(t_sm_palette * tpal)
 
 	if (tpal) {
 
-	    if (CHECK_SMPAL_IS_DISCRETE_GRADIENT) {
+	    if (tpal->colorMode == SMPAL_COLOR_MODE_GRADIENT &&
+	        tpal->gradient_type == SMPAL_GRADIENT_TYPE_DISCRETE) {
+		/* special treatment for discrete gradient palette */
 		max_colors = tpal->gradient_num;
 	    } else if (tpal->use_maxcolors > 0) {
 		max_colors = tpal->use_maxcolors;
