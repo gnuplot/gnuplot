@@ -1346,11 +1346,6 @@ set_plot_with_palette(int plot_num, int plot_mode)
 
     plot_has_palette = TRUE;
 
-    /* diagnose palette gradient type */
-    if (sm_palette.gradient_type == SMPAL_GRADIENT_TYPE_NONE) {
-        check_palette_gradient_type();
-    }
-
     /* Is pm3d switched on globally? */
     if (pm3d.implicit == PM3D_IMPLICIT)
 	return;

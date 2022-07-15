@@ -111,8 +111,8 @@ init_color()
   sm_palette.cmodel = C_MODEL_RGB;
   sm_palette.Afunc.at = sm_palette.Bfunc.at = sm_palette.Cfunc.at = NULL;
   sm_palette.colorMode = SMPAL_COLOR_MODE_RGB;
+  sm_palette.gradient_type = SMPAL_GRADIENT_TYPE_SMOOTH;
   sm_palette.gamma = 1.5;
-  sm_palette.gradient_type = SMPAL_GRADIENT_TYPE_NONE;
 }
 
 
@@ -1418,6 +1418,7 @@ set_palette()
 	    /* gray or rgb-coloured */
 	    case S_PALETTE_GRAY: /* "gray" */
 		sm_palette.colorMode = SMPAL_COLOR_MODE_GRAY;
+                sm_palette.gradient_type = SMPAL_GRADIENT_TYPE_SMOOTH;
 		continue;
 	    case S_PALETTE_GAMMA: /* "gamma" */
 		++c_token;
@@ -1429,6 +1430,7 @@ set_palette()
 		    sm_palette.colorMode = pm3d_last_set_palette_mode;
 		} else {
 		    sm_palette.colorMode = SMPAL_COLOR_MODE_RGB;
+                    sm_palette.gradient_type = SMPAL_GRADIENT_TYPE_SMOOTH;
 		}
 		continue;
 	    /* rgb color mapping formulae: rgb$formulae r,g,b (3 integers) */
@@ -1458,6 +1460,7 @@ set_palette()
 		sm_palette.formulaB = i;
 		c_token--;
 		sm_palette.colorMode = SMPAL_COLOR_MODE_RGB;
+                sm_palette.gradient_type = SMPAL_GRADIENT_TYPE_SMOOTH;
 		pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_RGB;
 		continue;
 	    } /* rgbformulae */
@@ -1467,6 +1470,7 @@ set_palette()
 		TBOOLEAN done = FALSE;
 		CHECK_TRANSFORM;
 		sm_palette.colorMode = SMPAL_COLOR_MODE_CUBEHELIX;
+                sm_palette.gradient_type = SMPAL_GRADIENT_TYPE_SMOOTH;
 		sm_palette.cmodel = C_MODEL_RGB;
 		sm_palette.cubehelix_start = 0.5;
 		sm_palette.cubehelix_cycles = -1.5;
@@ -1495,6 +1499,7 @@ set_palette()
 		CHECK_TRANSFORM;
 		set_palette_by_name(VIRIDIS);
 		sm_palette.colorMode = SMPAL_COLOR_MODE_GRADIENT;
+                sm_palette.gradient_type = SMPAL_GRADIENT_TYPE_SMOOTH;
 		pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_GRADIENT;
 		continue;
 	    }
@@ -1503,6 +1508,8 @@ set_palette()
 		++c_token;
 		set_palette_colormap();
 		sm_palette.colorMode = SMPAL_COLOR_MODE_GRADIENT;
+                sm_palette.gradient_type = SMPAL_GRADIENT_TYPE_SMOOTH;
+                check_palette_gradient_type();
 		pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_GRADIENT;
 		continue;
 	    }
@@ -1511,6 +1518,8 @@ set_palette()
 		++c_token;
 		named_color = set_palette_defined();
 		sm_palette.colorMode = SMPAL_COLOR_MODE_GRADIENT;
+                sm_palette.gradient_type = SMPAL_GRADIENT_TYPE_NONE;
+                check_palette_gradient_type();
 		pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_GRADIENT;
 		continue;
 	    }
@@ -1518,6 +1527,8 @@ set_palette()
 		CHECK_TRANSFORM;
 		set_palette_file();
 		sm_palette.colorMode = SMPAL_COLOR_MODE_GRADIENT;
+                sm_palette.gradient_type = SMPAL_GRADIENT_TYPE_NONE;
+                check_palette_gradient_type();
 		pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_GRADIENT;
 		--c_token;
 		continue;
@@ -1526,6 +1537,7 @@ set_palette()
 		CHECK_TRANSFORM;
 		set_palette_function();
 		sm_palette.colorMode = SMPAL_COLOR_MODE_FUNCTIONS;
+                sm_palette.gradient_type = SMPAL_GRADIENT_TYPE_SMOOTH;
 		pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_FUNCTIONS;
 		--c_token;
 		continue;
