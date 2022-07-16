@@ -1604,7 +1604,7 @@ save_pm3dcolor(FILE *fp, const struct t_colorspec *tc)
 		      const char *color = reverse_table_lookup(pm3d_color_names_tbl, tc->lt);
 		      if (tc->value < 0)
 		  	fprintf(fp," rgb variable ");
-		      else if (color)
+		      else if (*color)
 	    		fprintf(fp," rgb \"%s\" ", color);
 		      else
 	    		fprintf(fp," rgb \"#%6.6x\" ", tc->lt);

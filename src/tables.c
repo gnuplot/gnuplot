@@ -854,20 +854,21 @@ lookup_table_nth_reverse(
 }
 
 /* Returns the key associated with this indexed value
- * or NULL if the key/value pair is not found.
+ * or "" if the key/value pair is not found.
  */
 const char *
 reverse_table_lookup(const struct gen_table *tbl, int entry)
 {
+    static char *fail = "";
     int k = -1;
     while (tbl[++k].key)
 	if (tbl[k].value == entry)
 	    return(tbl[k].key);
-    return NULL;
+    return fail;
 }
 
 /* Returns the key associated with this indexed value
- * or NULL if the key/value pair is not found.
+ * or "" if the key/value pair is not found.
  * The $ sign, if any, is removed first.
  */
 char *
