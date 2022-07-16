@@ -5857,10 +5857,20 @@ load_tic_series(struct axis *this_axis)
 	incr = start;
 	start = -VERYLARGE;
 	end = VERYLARGE;
+	if (this_axis->tictype == DT_TIMEDATE) {
+	    this_axis->tic_units = lookup_table(timelevels_tbl, c_token);
+	    if (this_axis->tic_units != TIMELEVEL_DEFAULT)
+		c_token++;
+	}
     } else {
 	c_token++;
 	incr_token = c_token;
 	incr = get_num_or_time(this_axis);
+	if (this_axis->tictype == DT_TIMEDATE) {
+	    this_axis->tic_units = lookup_table(timelevels_tbl, c_token);
+	    if (this_axis->tic_units != TIMELEVEL_DEFAULT)
+		c_token++;
+	}
 
 	if (!equals(c_token, ",")) {
 	    /* only step and increment specified */

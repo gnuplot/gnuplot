@@ -103,6 +103,20 @@ const struct gen_table axisname_tbl[] =
     { NULL, -1}
 };
 
+/* If time axis tics are specified in units of minutes/hours/.../years
+ * we need to convert to seconds for tic generation
+ */
+const double approx_time_steps[] =
+{
+    1.0,	/* default to seconds */
+    1.0,	/* TIMELEVEL_SECONDS */
+    60.,	/* TIMELEVEL_MINUTES */
+    3600.,	/* TIMELEVEL_HOURS */
+    DAY_SEC,	/* TIMELEVEL_DAYS */
+    WEEK_SEC,	/* TIMELEVEL_WEEKS */
+    MON_SEC,	/* TIMELEVEL_MONTHS */
+    YEAR_SEC	/* TIMELEVEL_YEARS */
+};
 
 /* penalty for doing tics by callback in gen_tics is need for global
  * variables to communicate with the tic routines. Dont need to be
@@ -465,6 +479,7 @@ make_auto_time_minitics(t_timelevel tlevel, double incr)
     if ((int)tlevel < TIMELEVEL_SECONDS)
 	tlevel = TIMELEVEL_SECONDS;
     switch (tlevel) {
+    case TIMELEVEL_DEFAULT:
     case TIMELEVEL_SECONDS:
     case TIMELEVEL_MINUTES:
 	if (incr >= 5)
@@ -944,7 +959,12 @@ setup_tics(struct axis *this, int max)
      * We used to call quantize_time_tics, but that also caused strangeness.
      */
     if (this->tictype == DT_TIMEDATE && ticdef->type == TIC_SERIES) {
-	if      (tic >= 365*24*60*60.) this->timelevel = TIMELEVEL_YEARS;
+	if (this->tic_units != TIMELEVEL_DEFAULT) {
+		this->timelevel = this->tic_units;
+		this->ticstep = tic = 
+		    ticdef->def.series.incr * approx_time_steps[this->tic_units];
+	}
+	else if (tic >= 365*24*60*60.) this->timelevel = TIMELEVEL_YEARS;
 	else if (tic >=  28*24*60*60.) this->timelevel = TIMELEVEL_MONTHS;
 	else if (tic >=   7*24*60*60.) this->timelevel = TIMELEVEL_WEEKS;
 	else if (tic >=     24*60*60.) this->timelevel = TIMELEVEL_DAYS;
@@ -1139,6 +1159,9 @@ gen_tics(struct axis *this, tic_callback callback)
 		start = def->def.series.start;
 		step = def->def.series.incr;
 		end = def->def.series.end;
+		/* time increment was given in minutes/hours/days/... */
+		if (this->tictype == DT_TIMEDATE && this->tic_units > 1)
+		    step = def->def.series.incr * approx_time_steps[this->tic_units];
 		if (start == -VERYLARGE)
 		    start = step * floor(lmin / step);
 		if (end == VERYLARGE)
@@ -1503,6 +1526,7 @@ gen_time_minitics(struct axis *this, double start, double end, tic_callback call
 		    tm.tm_min += this->mtic_freq;
 		    break;
 	case TIMELEVEL_SECONDS:
+	case TIMELEVEL_DEFAULT:
 		    tm.tm_sec += this->mtic_freq;
 		    break;
 	}

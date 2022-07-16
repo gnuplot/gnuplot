@@ -53,7 +53,7 @@ const struct gen_table timelevels_tbl[] =
     { "week$s",   TIMELEVEL_WEEKS },
     { "mon$ths",  TIMELEVEL_MONTHS },
     { "year$s",   TIMELEVEL_YEARS },
-    { NULL, -1 }
+    { NULL,       TIMELEVEL_DEFAULT }
 };
 
 static char *read_int(char *s, int nr, int *d);

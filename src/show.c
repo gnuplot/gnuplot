@@ -3593,8 +3593,10 @@ show_ticdefp(struct axis *this_axis)
 		fputs(" from ", stderr);
 		save_num_or_time_input(stderr, this_axis->ticdef.def.series.start, this_axis);
 	    }
-	    fprintf(stderr, " by %g%s", this_axis->ticdef.def.series.incr,
-		    this_axis->datatype == DT_TIMEDATE ? " secs" : "");
+	    fprintf(stderr, " by %g %s", this_axis->ticdef.def.series.incr,
+		(this_axis->tictype == DT_TIMEDATE)
+		    ? clean_reverse_table_lookup(timelevels_tbl, this_axis->tic_units)
+		    : "");
 	    if (this_axis->ticdef.def.series.end != VERYLARGE) {
 		fputs(" until ", stderr);
 		save_num_or_time_input(stderr, this_axis->ticdef.def.series.end, this_axis);

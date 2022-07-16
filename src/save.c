@@ -1123,7 +1123,10 @@ save_tics(FILE *fp, struct axis *this_axis)
 			     this_axis);
 	    putc(',', fp);
 	}
-	fprintf(fp, "%g", this_axis->ticdef.def.series.incr);
+	fprintf(fp, "%g %s", this_axis->ticdef.def.series.incr,
+		(this_axis->tictype == DT_TIMEDATE)
+		    ? clean_reverse_table_lookup(timelevels_tbl, this_axis->tic_units)
+		    : "");
 	if (this_axis->ticdef.def.series.end != VERYLARGE) {
 	    putc(',', fp);
 	    save_num_or_time_input(fp,

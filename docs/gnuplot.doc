@@ -358,6 +358,8 @@ C
 ## non-zero if an error occurred. This allows scripted recovery from a bad fit.
 ## See `fit error_recovery`.
 #b Revised generation of minor tics along a time axis.  See `set mxtics time`.
+## Both major and minor tics along a time axis now accept tic intervals given
+## in units of minutes/hours/days/weeks/months/years.
 #b Improved rendering of intersecting pm3d surfaces - overlapping surface tiles
 ## are split into two pieces along the line of intersection so that tiles
 ## from one surface do not incorrectly protrude though the other surface.
@@ -16439,6 +16441,11 @@ Ffigure_walls
  Move xtics more closely to the plot.
        set xtics offset 0,graph 0.05
 
+ To change the relative order of drawing axis tics and the plot itself, use
+ the `set grid` command with options 'front', 'back' or 'layerdefault'.
+ There is no option to assign different axis tics or grid lines to different
+ layers.
+
  By default, tic labels are justified automatically depending on the axis and
  rotation angle to produce aesthetically pleasing results. If this is not
  desired, justification can be overridden with an explicit `left`, `right` or
@@ -16490,14 +16497,12 @@ Ffigure_walls
  Example:
        set xtics border offset 0,0.5 -5,1,5
  Fails with 'invalid expression' at the last comma.
+ Use instead
        set xtics border offset 0,0.5 0-5,1,5
  or
        set xtics offset 0,0.5 border -5,1,5
- Sets tics at the border, tics text with an offset of 0,0.5 characters, and
- sets the start, increment, and end to -5, 1, and 5, as requested.
-
- The `set grid` options 'front', 'back' and 'layerdefault' affect the drawing
- order of the xtics, too.
+ These place tics at the border, tics text with an offset of 0,0.5 characters,
+ and sets the start, increment, and end to -5, 1, and 5, as requested.
 
  Examples:
 
@@ -16567,11 +16572,8 @@ Ffigure_walls
  Times and dates are stored internally as a number of seconds.
 
  Input: Non-numeric time and date values are converted to seconds on input using
- the format specifier in `timefmt`.  Axis positions and range limits also may be
- given as quoted dates or times interpreted using `timefmt`.
- If the <start>, <incr>, <end> form is used, <incr> must be in seconds.
- Use of `timefmt` to interpret input data, range, and tic positions is triggered
- by `set xdata time`.
+ the format specifier in `timefmt`.  Axis range limits, tic placement, and plot
+ coordinates may be given as quoted dates or times interpreted using `timefmt`.
 
  Output: Axis tic labels are generated using a separate format specified either
  by `set format` or `set xtics format`.  By default the usual numeric format
@@ -16598,6 +16600,14 @@ Ffigure_walls
        set xtics ("01/12", "" "03/12", "05/12")
  Both of these will produce tics "Dec 1", "Dec 3", and "Dec 5", but in the
  second example the tic at "Dec 3" will be unlabeled.
+
+ If the <start>, <incr>, <end> form is used, <incr> defaults to seconds but an
+ explicit time unit of `minutes`, `hours`, `days`, `weeks`, `months`, or `years`
+ can be appended.  The same is true if only an interval <incr> is given.
+
+ Examples
+      set xtics time 5 years     # place labeled tics at five year intervals
+      set xtics "01-Jan-2000", 1 month, "01-Jan-2001"
 
  There is also a special time mode for minor tics. See `set mxtics time`.
 4 geographic
