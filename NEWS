@@ -1,3 +1,7 @@
+Changes in 5.4.5
+================
+* CHANGE hpgl: add terminal option "fontscale <value>"
+
 Changes in 5.4.4
 ================
 * NEW plots can use arrow styles that specify "lc rgb variable" 
