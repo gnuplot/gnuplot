@@ -634,6 +634,7 @@ static int HPGL_x = UNKNOWN;
 static int HPGL_y = UNKNOWN;
 static int HPGL_penstate = UNKNOWN;
 static int HPGL_pentype;
+static double HPGL_fontscale = 1.0;
 
 /* pen */
 static int HPGL2_pentype = LT_UNDEFINED;
@@ -673,11 +674,17 @@ HPGL_options()
 {
     HPGL_numpen = 6;		/* default to six pens */
     HPGL_eject = 0;		/* default to no eject */
+    HPGL_fontscale = 1.0;
 
     while (!END_OF_COMMAND) {
 	if (almost_equals(c_token, "eje$ct"))
 	    HPGL_eject = 1;
-	else if (isanumber(c_token)) {
+	else if (almost_equals(c_token, "fonts$cale")) {
+	    c_token++;
+	    HPGL_fontscale = real_expression();
+	    if (HPGL_fontscale <= 0)
+		HPGL_fontscale = 1.0;
+	} else if (isanumber(c_token)) {
 	    HPGL_numpen = (int) real(&token[c_token].l_val);
 	    if (HPGL_numpen <= 0) {
 		HPGL_numpen = 6;
@@ -691,6 +698,8 @@ HPGL_options()
 
     sprintf(term_options, "%d pens %s", HPGL_numpen,
 	    HPGL_eject ? "eject" : "noeject");
+    if (HPGL_fontscale != 1.0)
+	sprintf( &term_options[strlen(term_options)], " fontscale %.2f", HPGL_fontscale);
 }
 
 static int PCL_landscape = TRUE;
@@ -1024,14 +1033,18 @@ HPGL_graphics()
 */
     fprintf(gpoutfile,
 	    "IN;%s\nSC0,%d,0,%d;\nSR%f,%f;\n",
-	    ((encoding == S_ENC_CP850) || (encoding == S_ENC_ISO8859_1)) ?
-	    "CA7;" : "",
-	    HPGL_XMAX, HPGL_YMAX, ((double) (HPGL_HCHAR) * 200 / 3 / HPGL_XMAX), ((double) (HPGL_VCHAR) * 100 / 2 / HPGL_YMAX));
+	    ((encoding == S_ENC_CP850) || (encoding == S_ENC_ISO8859_1)) ?  "CA7;" : "",
+	    HPGL_XMAX, HPGL_YMAX,
+	    HPGL_fontscale * ((HPGL_HCHAR) * 200. / 3. / HPGL_XMAX),
+	    HPGL_fontscale * ((HPGL_VCHAR) * 100. / 2. / HPGL_YMAX));
 /*	 1    2             3
 	1. reset to power-up defaults
 	2. set SCaling
 	3. set character size
 */
+    term->v_char = HPGL_fontscale * HPGL_VCHAR;
+    term->h_char = HPGL_fontscale * HPGL_HCHAR;
+    HPGL_penstate = UP;
     HPGL_ang = 0;
 }
 
@@ -3291,7 +3304,7 @@ START_HELP(hpgl)
 "?term hpgl",
 "?hpgl",
 " Syntax:",
-"       set terminal hpgl {<number_of_pens>} {eject}",
+"       set terminal hpgl {<number_of_pens>} {eject} {fontscale <scale>}",
 "",
 " The `hpgl` driver produces HPGL output for Hewlett Packard pen plotters",
 " like the HP7475A and many other plotters dating back to the 1970s.",
@@ -3299,12 +3312,16 @@ START_HELP(hpgl)
 " The HPGL command language was largely superseded in later printers by the",
 " PCL command language.  See `set term pcl5`.",
 "",
-" There are two options which can be set: the number of pens and `eject`,",
-" which tells the plotter to eject a page when done.  The default is to use 6",
-" pens and not to eject the page when done.",
+" Terminal options control the number of pens used and whether or not the",
+" plotter ejects a page when done. The default is to use 6 pens and",
+" not eject the page.",
 "",
-" The international character sets ISO-8859-1 and CP850 are recognized via",
-" `set encoding iso_8859_1` or `set encoding cp850`.",
+" All text is drawn in a uniform size. The `fontscale` option applies",
+" a scale factor to make this size larger or smaller.",
+" If gnuplot's current encoding is set to either iso_8859_1 cp850,",
+" non-ascii characters are translated for handling by some printer models",
+" that support the corresponding character set.  If your printer model",
+" does not support this, do not set these encodings.",
 ""
 END_HELP(hpgl)
 
