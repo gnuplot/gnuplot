@@ -1,17 +1,20 @@
 %% Don't forget to change the paper format in the next line
 %
-% $Id: faq-ja.tex,v 1.36 2022-06-23 18:41:32+09 shige Exp $
 % translated to Japanese by Shigeharu TAKENO
 % Original: Id: faq.tex updated at 2022-06-14
 %
 %%%% \documentclass[a4paper,11pt]{article}
 %%% \documentclass[letter,11pt]{article}
-\documentclass[a4paper,11pt]{jarticle}
+%
+%\documentclass[a4paper,11pt]{jarticle} % for platex
+\documentclass[a4paper,11pt]{article} % for lualatex
 %% end Japanese
 \usepackage[margin=2cm]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage[hyphens]{url}
 \urlstyle{sf}
+
+\usepackage{luatexja} % for lualatex
 
 \parindent=0pt
 \parskip=5pt
@@ -20,7 +23,7 @@
     % latex or latex2html output
     \usepackage{times,mathptmx}
     \usepackage[
-        hypertex,
+%        hypertex, % commented out for lualatex
         hyperindex,
         bookmarks,
         bookmarksnumbered=true,
