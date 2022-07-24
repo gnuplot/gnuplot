@@ -2331,6 +2331,7 @@ show_palette_palette()
 	(sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY) ? "Gray" : "Color", colors);
     if (print_out_name)
 	fprintf(stderr," saved to \"%s\".", print_out_name);
+    fprintf(stderr,"\n");
 
     for (i = 0; i < colors; i++) {
 	char line[80];
