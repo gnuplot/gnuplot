@@ -1221,17 +1221,16 @@ set_palette_file()
 {
     double v[4];
     int i, j, actual_size;
-    char *file_name;
+    char *name_str;
 
     ++c_token;
 
-    /* get filename */
-    if (!(file_name = try_to_get_string()))
-	int_error(c_token, "missing filename");
+    /* WARNING: do NOT free name_str */
+    if (!(name_str = string_or_express(NULL)))
+	int_error(c_token, "expecting filename or datablock");
 
     df_set_plot_mode(MODE_QUERY);	/* Needed only for binary datafiles */
-    df_open(file_name, 4, NULL);
-    free(file_name);
+    df_open(name_str, 4, NULL);
 
     free(sm_palette.gradient);
     sm_palette.gradient = NULL;
