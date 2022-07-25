@@ -106,14 +106,17 @@ pause -1 "Hit return to continue"
 
 
 set title 'set palette file (2 columns: gray + packed RGB)'
-set palette file "-" using 1:(rgbcolor(strcol(2)))
-10 black
-20 blue
-40 green
-60 red
-70 white
-e
-splot f(x)
+set datafile columnhead
+$COLORS << EOD
+gray colorname
+10   black
+20   blue
+40   green
+60   red
+70   white
+EOD
+set palette file $COLORS using 1:(rgbcolor(strcol(2)))
+test palette
 pause -1 "Hit return to continue"
 
 
