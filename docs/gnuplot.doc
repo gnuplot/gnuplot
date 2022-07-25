@@ -13794,11 +13794,13 @@ Ffigure_palette2
 ?set palette file
 ?palette file
  `set palette file` is basically a `set palette defined (<gradient>)` where
- <gradient> is read from a datafile.  Select four columns (gray,R,G,B) or
- three columns (R,G,B) via the `using` specifier.
- In the three column case, the line number will be used as gray.
- The gray range is automatically rescaled to [0,1].  The file is read as a
- normal data file, so all datafile modifiers can be used.
+ <gradient> is read from a datafile or datablock.  The color values may be
+ provided either as a single 24-bit packed RGB integer (1 or 2 `using` columns)
+ or as three separate fractional R, G, B components (3 or 4 `using` columns).
+ If no explicit gray value is provided in the first input column, the line
+ number is used; this generates equal spacing along the color axis.
+
+ The file is read as a normal data file, so all datafile modifiers can be used.
  Please note that `R` might actually be `H` if HSV color space is selected.
 
  Use `show palette gradient` to display the gradient.
@@ -13809,11 +13811,19 @@ Ffigure_palette2
        set palette file 'some-palette' using ($1/255):($2/255):($3/255)
 
  Equidistant rainbow (blue-green-yellow-red) palette:
-       set palette model RGB file "-"
+       set palette model RGB file "-" using 1:2:3
        0 0 1
        0 1 0
        1 1 0
        1 0 0
+       e
+
+ Same thing using explicit gray intervals and packed RGB values:
+       set palette model RGB file "-" using 1:2
+       1  0x0000ff
+       2  0x00ff00
+       3  0xffff00
+       4  0xff0000
        e
 
  Binary palette files are supported as well, see `binary general`. Example:

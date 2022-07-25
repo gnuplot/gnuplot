@@ -1253,6 +1253,12 @@ set_palette_file()
 		sm_palette.gradient[i].col.b = (0xff & ((int)(v[0])))       / 255.;
 		sm_palette.gradient[i].pos = i;
 		break;
+	    case 2:
+		sm_palette.gradient[i].col.r = (0xff & ((int)(v[1]) >> 16)) / 255.;
+		sm_palette.gradient[i].col.g = (0xff & ((int)(v[1]) >> 8))  / 255.;
+		sm_palette.gradient[i].col.b = (0xff & ((int)(v[1])))       / 255.;
+		sm_palette.gradient[i].pos = v[0];
+		break;
 	    case 3:
 		sm_palette.gradient[i].col.r = clip_to_01(v[0]);
 		sm_palette.gradient[i].col.g = clip_to_01(v[1]);
@@ -1264,6 +1270,11 @@ set_palette_file()
 		sm_palette.gradient[i].col.g = clip_to_01(v[2]);
 		sm_palette.gradient[i].col.b = clip_to_01(v[3]);
 		sm_palette.gradient[i].pos = v[0];
+		break;
+	    case DF_UNDEFINED:
+	    case DF_MISSING:
+	    case DF_COLUMN_HEADERS:
+		continue;
 		break;
 	    default:
 		df_close();
