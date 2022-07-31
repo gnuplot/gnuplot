@@ -1,4 +1,4 @@
-    gnuplot.mouse_version = " 04 March 2018";
+    gnuplot.mouse_version = " 01 August 2022";
 
 // Mousing code for use with gnuplot's 'canvas' terminal driver.
 // The functions defined here assume that the javascript plot produced by
@@ -242,6 +242,15 @@ gnuplot.check_hypertext = function()
     if (delx < w && dely < w) {
 	if (i == gnuplot.on_hypertext)
 	    break;
+
+	// erase any previous hypertext boxes before drawing this one
+	if (gnuplot.on_hypertext >= 0) {
+	    gnuplot.on_hypertext = -1;
+	    ctx.clearRect(0,0,gnuplot.plot_term_xmax,gnuplot.plot_term_ymax);
+	    gnuplot.display_is_uptodate = false;
+	    gnuplot_canvas();
+	}
+
 	gnuplot.on_hypertext = i;
 	var text = gnuplot.hypertext_list[i].text;
 	var lines = text.split('\v');
