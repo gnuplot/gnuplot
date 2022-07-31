@@ -1232,8 +1232,8 @@ if test "$with_tektronix" = no; then
 else
   AC_MSG_RESULT([  tektronix terminal emulators: yes ( --without-tektronix to disable)])
 fi
-AC_MSG_RESULT([    tek410x tek40 vttek xterm kc_tek40 km_tek40 selanar sixeltek bitgraph])
-AC_MSG_RESULT([    note: not needed for sixel graphics output to vt100-series emulators])
+AC_MSG_RESULT([    tek410x tek40 vttek xterm kc_tek40 km_tek40 selanar bitgraph])
+AC_MSG_RESULT([    sixeltek (not needed for sixel graphics output to vt100-series emulators)])
 
 AC_MSG_RESULT([])
 AC_MSG_RESULT([  Platform-specific, legacy, or specialized terminals omitted by default:])
