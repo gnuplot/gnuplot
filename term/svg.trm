@@ -1227,14 +1227,15 @@ SVG_text ()
 	    fprintf(gpoutfile, "gnuplot_svg.plot_timeaxis_y = \"\";\n");
 
 	/* Hypertext font properties
-	 * NB: These will apply to all hypertext in the plot
-	 *     separate font for individual labels would require additional code
+	 * NB -	These will apply to all hypertext in the plot
+	 *	separate font for individual labels would require additional code
+	 *    -	We trimmed SVG_hypertext_fontName back to just the Family name
 	 */
 	fprintf(gpoutfile, "gnuplot_svg.hypertext_fontSize = %.1g;\n", SVG_hypertext_fontSize);
 	if (SVG_hypertext_fontName)
-	    fprintf(gpoutfile, "gnuplot_svg.hypertext_fontName = \"%s\";\n", SVG_hypertext_fontName);
+	    fprintf(gpoutfile, "gnuplot_svg.hypertext_fontFamily = \"%s\";\n", SVG_hypertext_fontName);
 	else
-	    fprintf(gpoutfile, "gnuplot_svg.hypertext_fontName = null;\n");
+	    fprintf(gpoutfile, "gnuplot_svg.hypertext_fontFamily = null;\n");
 	if (SVG_hypertext_fontStyle)
 	    fprintf(gpoutfile, "gnuplot_svg.hypertext_fontStyle = \"%s\";\n", SVG_hypertext_fontStyle);
 	else
@@ -2196,7 +2197,7 @@ SVG_hypertext( int type, const char *text )
 	if (!text || !(*text))
 	    break;
 
-	sep = strcspn(text, ",: ");
+	sep = strcspn(text, ",:");
 	if (sep > 0) {
 	    SVG_hypertext_fontName = gp_strdup(text);
 	    SVG_hypertext_fontName[sep] = '\0';
