@@ -1,5 +1,5 @@
 #
-# Exercise comples Airy functions Ai(z), Bi(z)
+# Exercise complex Airy functions Ai(z), Bi(z)
 #
 if (!strstrt(GPVAL_COMPILE_OPTIONS, "+AMOS")) {
     print "This copy of gnuplot does not support Ai, Bi"
