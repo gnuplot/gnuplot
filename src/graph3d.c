@@ -585,6 +585,13 @@ place_labels3d(struct text_label *listhead, int layer)
 
     term->pointsize(pointsize);
 
+    /* Hypertext labels? */
+    /* NB: currently svg is the only terminal that needs this extra step */
+    if (layer == LAYER_PLOTLABELS && listhead && listhead->hypertext
+    &&  term->hypertext) {
+	term->hypertext(TERM_HYPERTEXT_FONT, listhead->font);
+    }
+
     for (this_label = listhead;
 	 this_label != NULL;
 	 this_label = this_label->next) {
