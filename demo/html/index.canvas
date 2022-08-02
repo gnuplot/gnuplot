@@ -167,6 +167,7 @@
     <li><a href="cities.html">variable font size</a></li>
     <li><a href="canvas_utf8.html">utf8 math symbols</a></li>
     <li><a href="hypertext.html">hypertext</a></li>
+    <li><a href="hypertext_surface.html">hypertext on 3D surface</a></li>
     </ul>
 
     <h4>Page Layout</h4>
@@ -252,7 +253,7 @@
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated November 2021</i>
+    <i>This page generated August 2022</i>
     </td>
 
     <td>
