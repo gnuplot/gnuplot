@@ -1,0 +1,50 @@
+#
+# Each vertex of the surface is also a hypertext anchor point that
+# reports the complex values z and F(z)
+#
+save_encoding = GPVAL_ENCODING
+set encoding utf8
+set title offset 0,0
+set title "Hyperbolic tangent of complex variable z = x + iy\n\n"
+
+set label 1 at screen 0.08, 0.85 left
+set label 1 "Surface shows abs(atanh(z))\nMouse-over reports Real and Imaginary components"
+
+set xrange [ -pi/2 : pi/2 ]
+set yrange [ -pi/2 : pi/2 ]
+set urange [ -pi/2 : pi/2 ]
+set vrange [ -pi/2 : pi/2 ]
+set zrange [ 0 : pi/2 ]
+set xtics 1 offset 0,-0.5
+set ytics 1 offset 0,-0.5
+set xtics add ("0\nx" 0)
+set ytics add ("0\niy" 0)
+set ztics format "%.1f"
+set grid x y z vertical lw 1
+set bmargin screen 0.03
+
+set palette defined (0 "dark-blue", 0.5 "gold", 1 "dark-red")
+set cbrange [0:pi/2]
+unset colorbox
+unset key
+set sample 41
+set isosample 41
+set pm3d depthorder border lw 0.25 lighting spec2 0.4
+set pm3d explicit
+set view 45, 20, 1.0, 0.8
+set xyplane at 0
+set style textbox opaque noborder margin 2,6
+
+F(x,y) = atanh(x + I*y)
+surf(x,y) = abs(F(x,y))
+text(x,y) = imag(F(x,y)) < 0 \
+         ? sprintf(" %.2f - %.2f i ", real(F(x,y)), -imag(F(x,y))) \
+         : sprintf(" %.2f + %.2f i ", real(F(x,y)), imag(F(x,y))) \
+
+splot surf(x,y) with pm3d title "abs(atanh(z))", \
+      '++' using 1:2:(surf(x,y)):(text(x,y)) with labels hypertext font ":Italic" \
+           point lc rgb "0xff000000" pt 5 ps 2 notitle
+
+pause -1 "<cr> to continue"
+reset
+set encoding save_encoding
