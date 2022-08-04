@@ -170,9 +170,6 @@ int inline_num;			/* input line number */
  */
 struct udft_entry *dummy_func;
 
-/* dummy_func will point to this during function plotting */
-struct udft_entry plot_func;
-
 /* support for replot command */
 char *replot_line = NULL;
 int plot_token = 0;		/* start of 'plot' command */

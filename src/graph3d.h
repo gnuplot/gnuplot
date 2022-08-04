@@ -100,6 +100,7 @@ typedef struct surface_points {
     struct t_image image_properties;	/* only used if plot_style is IMAGE, RGBIMAGE or RGBA_IMAGE */
     struct udvt_entry *sample_var;	/* used by '+' if plot has private sampling range */
     struct udvt_entry *sample_var2;	/* used by '++' if plot has private sampling range */
+    struct udft_entry plot_function;	/* action table and dummy variables for function plot */
 
     /* 2D and 3D plot structure fields overlay only to this point */
 

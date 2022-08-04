@@ -267,9 +267,14 @@ string_or_express(struct at_type **atptr)
 	}
     }
 
-    /* prepare return */
-    if (atptr)
-	*atptr  = at;
+    /* The function for a function plot will be stored in the plot header. */
+    if (atptr && !str) {
+	size_t len = sizeof(struct at_type)
+		   + (at->a_count - MAX_AT_LEN) * sizeof(struct at_entry);
+	*atptr = (struct at_type *) realloc(at, len);
+	at = NULL;
+    }
+
     return str;
 }
 

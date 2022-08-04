@@ -181,6 +181,7 @@ cp_free(struct curve_points *cp)
 	if (cp->labels)
 	    free_labels(cp->labels);
 	cp->labels = NULL;
+	free_at(cp->plot_function.at);
 
 	free(cp);
 	cp = next;
@@ -2249,10 +2250,10 @@ eval_plots()
 		strcpy(c_dummy_var[0], orig_dummy_var);
 
 	    /* If string_or_express finds a function, it will construct an
-	     * action table that retrieves its dummy parameters from plot_func.
-	     * Later we will store values there prior to function evaluation.
+	     * action table for this plot.  Later we will store dummy variable
+	     * values for it prior to function evaluation.
 	     */
-	    dummy_func = &plot_func;
+	    dummy_func = &(this_plot->plot_function);
 	    name_str = string_or_express(NULL);
 	    dummy_func = NULL;
 
@@ -3383,7 +3384,7 @@ eval_plots()
 		if (!parametric && !polar)
 		    init_sample_range(axis_array + x_axis, FUNC);
 		sample_range_token = parse_range(SAMPLE_AXIS);
-		dummy_func = &plot_func;
+		dummy_func = &(this_plot->plot_function);
 
 		if (almost_equals(c_token, "newhist$ogram")) {
 		    /* Make sure this isn't interpreted as a function */
@@ -3412,7 +3413,8 @@ eval_plots()
 		    if (this_plot->plot_style == TABLESTYLE)
 			int_warn(NO_CARET, "'with table' requires a data source not a pure function");
 
-		    plot_func.at = at_ptr;
+		    /* Used to generate samples */
+		    this_plot->plot_function.at = at_ptr;
 
 		    if (!parametric && !polar) {
 			t_min = axis_array[SAMPLE_AXIS].min;
@@ -3448,8 +3450,8 @@ eval_plots()
 			}
 
 			x = t;
-			(void) Gcomplex(&plot_func.dummy_values[0], x, 0.0);
-			evaluate_at(plot_func.at, &a);
+			Gcomplex(&this_plot->plot_function.dummy_values[0], x, 0.0);
+			evaluate_at(this_plot->plot_function.at, &a);
 
 			if (undefined) {
 			    this_plot->points[i].type = UNDEFINED;

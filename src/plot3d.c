@@ -78,6 +78,7 @@ double boxdepth = 0.0;
 /* static prototypes */
 
 static void calculate_set_of_isolines(AXIS_INDEX value_axis, TBOOLEAN cross, struct iso_curve **this_iso,
+				      struct at_type *function_at, struct value *dummy_vars,
 				      AXIS_INDEX iso_axis, double iso_min, double iso_step, int num_iso_to_use,
 				      AXIS_INDEX sam_axis, double sam_min, double sam_step, int num_sam_to_use
 					       );
@@ -211,8 +212,6 @@ sp_replace(
  * sp_free() releases any memory which was previously malloc()'d to hold
  *   surface points.
  */
-/* HBB 20000506: don't risk stack havoc by recursion, use iterative list
- * cleanup instead */
 void
 sp_free(struct surface_points *sp)
 {
@@ -241,6 +240,8 @@ sp_free(struct surface_points *sp)
 	    free_labels(sp->labels);
 	    sp->labels = NULL;
 	}
+
+	free_at(sp->plot_function.at);
 
 	free(sp);
 	sp = next;
@@ -336,7 +337,6 @@ plot3drequest()
 
     /* Always be prepared to restore the autoscaled values on "refresh"
      * Dima Kogan April 2018
-     * FIXME: Could we fold this into axis_init?
      */
     for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++) {
 	AXIS *this_axis = &axis_array[axis];
@@ -445,7 +445,6 @@ refresh_3dbounds(struct surface_points *first_plot, int nplots)
 
 	    /* VECTOR plots consume two iso_crvs structures, one for heads and one for tails.
 	     * Only the first one has the true point count; the second one claims zero.
-	     * FIXME: Maybe we should change this?
 	     */
 	    int n_points;
 	    if (this_plot->plot_style == VECTOR)
@@ -1491,6 +1490,7 @@ calculate_set_of_isolines(
     AXIS_INDEX value_axis,
     TBOOLEAN cross,
     struct iso_curve **this_iso,
+    struct at_type *function_at, struct value *dummy_values,
     AXIS_INDEX iso_axis,
     double iso_min, double iso_step,
     int num_iso_to_use,
@@ -1511,7 +1511,7 @@ calculate_set_of_isolines(
 	else
 	    isotemp = iso;
 
-	(void) Gcomplex(&plot_func.dummy_values[cross ? 0 : 1], isotemp, 0.0);
+	(void) Gcomplex(&dummy_values[cross ? 0 : 1], isotemp, 0.0);
 
 	for (i = 0; i < num_sam_to_use; i++) {
 	    double sam = sam_min + i * sam_step;
@@ -1522,7 +1522,7 @@ calculate_set_of_isolines(
 		sam = eval_link_function(&axis_array[sam_axis], sam);
 	    temp = sam;
 
-	    (void) Gcomplex(&plot_func.dummy_values[cross ? 1 : 0], temp, 0.0);
+	    (void) Gcomplex(&dummy_values[cross ? 1 : 0], temp, 0.0);
 
 	    if (cross) {
 		points[i].x = iso;
@@ -1532,7 +1532,7 @@ calculate_set_of_isolines(
 		points[i].y = iso;
 	    }
 
-	    evaluate_at(plot_func.at, &a);
+	    evaluate_at(function_at, &a);
 
 	    if (undefined) {
 		points[i].type = UNDEFINED;
@@ -1717,6 +1717,14 @@ eval_3dplots()
 	    else
 		strcpy(c_dummy_var[1], orig_dummy_v_var);
 
+	    /* Make sure there is at least a minimal plot header */
+	    if (*tp_3d_ptr)
+		this_plot = *tp_3d_ptr;
+	    else {
+		this_plot = sp_alloc(0, 0, 0, 0);
+		*tp_3d_ptr = this_plot;
+	    }
+
 	    /* Determine whether this plot component is a
 	     *   function (name_str == NULL)
 	     *   data file (name_str is "filename")
@@ -1724,7 +1732,7 @@ eval_3dplots()
 	     *   voxel grid (name_str is "$gridname")
 	     *   key entry (keyword 'keyentry')
 	     */
-	    dummy_func = &plot_func;
+	    dummy_func = &this_plot->plot_function;
 	    name_str = string_or_express(NULL);
 	    dummy_func = NULL;
 	    if (equals(c_token, "keyentry"))
@@ -1760,13 +1768,6 @@ eval_3dplots()
 			axis_array[FIRST_Y_AXIS].max = -VERYLARGE;
 		    }
 		    some_data_files = TRUE;
-		}
-		if (*tp_3d_ptr)
-		    this_plot = *tp_3d_ptr;
-		else {		/* no memory malloc()'d there yet */
-		    /* Allocate enough isosamples and samples */
-		    this_plot = sp_alloc(0, 0, 0, 0);
-		    *tp_3d_ptr = this_plot;
 		}
 
 		this_plot->plot_type = DATA3D;
@@ -1804,7 +1805,6 @@ eval_3dplots()
 
 		/* for capture to key */
 		this_plot->token = end_token = c_token - 1;
-		/* FIXME: Is this really needed? */
 		this_plot->iteration = plot_iterator ? plot_iterator->iteration : 0;
 
 		/* this_plot->token is temporary, for errors in get_3ddata() */
@@ -1824,13 +1824,6 @@ eval_3dplots()
 	    case SP_KEYENTRY:
 		c_token++;
 		plot_num++;
-		if (*tp_3d_ptr)
-		    this_plot = *tp_3d_ptr;
-		else {		/* no memory malloc()'d there yet */
-		    /* Allocate enough isosamples and samples */
-		    this_plot = sp_alloc(0, 0, 0, 0);
-		    *tp_3d_ptr = this_plot;
-		}
 		this_plot->plot_type = KEYENTRY;
 		this_plot->plot_style = LABELPOINTS;
 		this_plot->token = end_token = c_token - 1;
@@ -1843,25 +1836,14 @@ eval_3dplots()
 		    /* +2 same as -1, but beats -ve problem */
 		    crnt_param = (crnt_param + 2) % 3;
 		}
-		if (*tp_3d_ptr) {
-		    this_plot = *tp_3d_ptr;
-		    if (!hidden3d)
-			sp_replace(this_plot, samples_1, iso_samples_1,
-				   samples_2, iso_samples_2);
-		    else
-			sp_replace(this_plot, iso_samples_1, 0,
-				   0, iso_samples_2);
 
-		} else {	/* no memory malloc()'d there yet */
-		    /* Allocate enough isosamples and samples */
-		    if (!hidden3d)
-			this_plot = sp_alloc(samples_1, iso_samples_1,
-					     samples_2, iso_samples_2);
-		    else
-			this_plot = sp_alloc(iso_samples_1, 0,
-					     0, iso_samples_2);
-		    *tp_3d_ptr = this_plot;
-		}
+		/* Allocate space for iso_crvs */
+		if (!hidden3d)
+		    sp_replace(this_plot, samples_1, iso_samples_1,
+			       samples_2, iso_samples_2);
+		else
+		    sp_replace(this_plot, iso_samples_1, 0,
+			       0, iso_samples_2);
 
 		this_plot->plot_type = FUNC3D;
 		this_plot->has_grid_topology = TRUE;
@@ -1878,13 +1860,6 @@ eval_3dplots()
 
 	    case SP_VOXELGRID:
 		plot_num++;
-		if (*tp_3d_ptr)
-		    this_plot = *tp_3d_ptr;
-		else {
-		    /* No actual space is needed since we will not store data */
-		    this_plot = sp_alloc(0, 0, 0, 0);
-		    *tp_3d_ptr = this_plot;
-		}
 		this_plot->vgrid = get_vgrid_by_name(name_str)->udv_value.v.vgrid;
 		this_plot->plot_type = VOXELDATA;
 		this_plot->opt_out_of_hidden3d = TRUE;
@@ -2287,8 +2262,9 @@ eval_3dplots()
 		    this_plot->lp_properties.p_size = 1;
 	    }
 
-	    /* FIXME: Leaving an explicit font in the label style for contour */
-	    /* labels causes a double-free segfault.  Clear it preemptively.  */
+	    /* Leaving an explicit font in the label style for contour labels
+	     * causes a double-free segfault.  Clear it preemptively.
+	     */
 	    if (this_plot->plot_style == LABELPOINTS
 	    &&  (draw_contour && !this_plot->opt_out_of_contours)) {
 		free(this_plot->labels->font);
@@ -2654,7 +2630,7 @@ eval_3dplots()
 		(void)parse_range(U_AXIS);
 		(void)parse_range(V_AXIS);
 
-		dummy_func = &plot_func;
+		dummy_func = &this_plot->plot_function;
 		name_str = string_or_express(&at_ptr);
 
 		if (equals(c_token, "keyentry")) {
@@ -2672,12 +2648,14 @@ eval_3dplots()
 		    if (parametric)
 			crnt_param = (crnt_param + 2) % 3;
 
-		    plot_func.at = at_ptr;
+		    /* Used to generate samples */
+		    this_plot->plot_function.at = at_ptr;
 
 		    num_iso_to_use = iso_samples_2;
 		    num_sam_to_use = hidden3d ? iso_samples_1 : samples_1;
-
 		    calculate_set_of_isolines(crnt_param, FALSE, &this_iso,
+					      this_plot->plot_function.at,
+					      &this_plot->plot_function.dummy_values[0],
 					      v_axis, v_min, v_isostep,
 					      num_iso_to_use,
 					      u_axis, u_min, u_step,
@@ -2688,6 +2666,8 @@ eval_3dplots()
 			num_sam_to_use = samples_2;
 
 			calculate_set_of_isolines(crnt_param, TRUE, &this_iso,
+						  this_plot->plot_function.at,
+						  &this_plot->plot_function.dummy_values[0],
 						  u_axis, u_min, u_isostep,
 						  num_iso_to_use,
 						  v_axis, v_min, v_step,

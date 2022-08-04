@@ -84,9 +84,6 @@ extern char *print_sep;
  */
 extern struct udft_entry *dummy_func;
 
-/* dummy_func will point to this during function plotting */
-extern struct udft_entry plot_func;
-
 #ifndef STDOUT
 # define STDOUT 1
 #endif
