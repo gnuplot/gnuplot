@@ -1023,9 +1023,14 @@ show_version(FILE *fp)
 	    const char *plotoptions=
 		"+OBJECTS  "
 #ifdef USE_STATS
-		"+STATS "
+		"+STATS  "
 #else
-		"-STATS "
+		"-STATS  "
+#endif
+#ifdef USE_WATCHPOINTS
+		"+WATCHPOINTS  "
+#else
+		"-WATCHPOINTS  "
 #endif
 #ifdef HAVE_EXTERNAL_FUNCTIONS
 		"+EXTERNAL_FUNCTIONS "

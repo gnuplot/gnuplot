@@ -1037,6 +1037,15 @@ AC_ARG_ENABLE(stats,dnl
                [ Define to add support for generating a statistical summary of data])
    )
 
+dnl Enable subsystem to set watchpoints that trigger during 2D plotting
+AC_ARG_ENABLE(watchpoints,dnl
+[  --enable-watchpoints    include support for setting watchpoints in 2D plots],
+  [if test "$enableval" == yes; then
+    AC_DEFINE(USE_WATCHPOINTS,1,
+               [ Define to support setting watchpoints in 2D plots])
+   fi],
+   )
+
 dnl Enable parsing of deprecated syntax
 dnl AC_ARG_ENABLE(backwards-compatibility,dnl
 dnl [  --enable-backwards-compatibility       enable deprecated syntax ],
@@ -1468,7 +1477,13 @@ dnl fi
 if test "$enable_stats" != no; then
   AC_MSG_RESULT([  Statistical summary of data ("stats" command): yes])
 else
-  AC_MSG_RESULT([  Statistical summary of data ("stats" command): no (use --enable-stats to enable)])
+  AC_MSG_RESULT([  Statistical summary of data ("stats" command): no (--enable-stats to enable)])
+fi
+
+if test "$enable_watchpoints" == yes; then
+  AC_MSG_RESULT([  Support watchpoints during 2D plotting:        yes])
+else
+  AC_MSG_RESULT([  Support watchpoints during 2D plotting:        no (--enable-watchpoints to enable)])
 fi
 
 
