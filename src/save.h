@@ -77,5 +77,6 @@ void save_num_or_time_input(FILE *, double x, struct axis *);
 void save_axis_format(FILE *fp, AXIS_INDEX axis);
 void save_bars(FILE *);
 void save_array_content(FILE *, struct value *);
+void save_label_style( FILE *fp, struct text_label *this_label );
 
 #endif /* GNUPLOT_SAVE_H */

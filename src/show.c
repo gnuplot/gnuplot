@@ -1783,49 +1783,7 @@ show_label(int tag)
 		    this_label->tag,
 		    (this_label->text==NULL) ? "" : conv_text(this_label->text));
 	    show_position(&this_label->place, 3);
-	    if (this_label->hypertext)
-		fprintf(stderr, " hypertext");
-	    switch (this_label->pos) {
-	    case LEFT:{
-		    fputs(" left", stderr);
-		    break;
-		}
-	    case CENTRE:{
-		    fputs(" centre", stderr);
-		    break;
-		}
-	    case RIGHT:{
-		    fputs(" right", stderr);
-		    break;
-		}
-	    }
-	    if (this_label->rotate)
-	    	fprintf(stderr, " rotated by %g degrees (if possible)", this_label->rotate);
-	    else
-	    	fprintf(stderr, " not rotated");
-	    fprintf(stderr, " %s ", this_label->layer ? "front" : "back");
-	    if (this_label->font != NULL)
-		fprintf(stderr, " font \"%s\"", this_label->font);
-	    if (this_label->textcolor.type)
-		save_textcolor(stderr, &this_label->textcolor);
-	    if (this_label->noenhanced)
-		fprintf(stderr, " noenhanced");
-	    if ((this_label->lp_properties.flags & LP_SHOW_POINTS) == 0)
-		fprintf(stderr, " nopoint");
-	    else {
-		fprintf(stderr, " point with color of");
-		save_linetype(stderr, &(this_label->lp_properties), TRUE);
-		fprintf(stderr, " offset ");
-		show_position(&this_label->offset, 3);
-	    }
-
-	    if (this_label->boxed) {
-		fprintf(stderr," boxed");
-		if (this_label->boxed > 0)
-		    fprintf(stderr," bs %d",this_label->boxed);
-	    }
-
-	    /* Entry font added by DJL */
+	    save_label_style(stderr, this_label);
 	    fputc('\n', stderr);
 	}
     }
