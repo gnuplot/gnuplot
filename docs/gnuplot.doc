@@ -339,6 +339,21 @@ C
 ## encoded through the WebPAnimEncoder API exported by libwebp and libwebpmux.
 #end
 
+4 Watchpoints
+?new watchpoints
+ Watchpoints are target values associated with individual plots.  As that plot
+ is drawn, its component line segments are monitored to see if they span a
+ match to the target value of a coordinate (x, y, or z) or function f(x,y).
+ If a match is found, the [x,y] coordinates of the match point are printed and
+ saved for later use. See `watchpoints`.  Possible uses include
+#start
+#b Find the intersection points of two curves
+#b Find zeros of a function
+#b Find and notate where a dependent variable (y or z) or function f(x,y)
+## crosses a threshold value
+#b Use the mouse to track values of multiple plots simultaneously
+#end
+
 4 Week-date time support
 ?new week-date time
  The Covid-19 pandemic of 2020/2021 generated increased interest in plotting
@@ -4668,7 +4683,93 @@ Ffigure_newsyntax
       18:15:04.253 16-Apr-2011
 
  See `time_specifiers`, `set xtics time`, `set mxtics time`.
-1 Plotting styles
+2 Watchpoints
+?watchpoints
+?watch
+ Support for watchpoints is present only if your copy of gnuplot was built
+ with configuration option --enable-watchpoints. This feature is EXPERIMENTAL
+ [details may change before it appears in a gnuplot release version].
+
+ Syntax:
+       plot FOO watch = {x|y|z|F(x,y)} = <value>
+       plot FOO watch mouse
+
+       set style watchpoints nolabels
+       set style watchpoints label <label-properties>
+
+ A watchpoint is a target value for the x, y, or z coordinate or for a function
+ f(x,y).  Each watchpoint is attached to a single plot within a `plot` command.
+ Watchpoints are tracked only for styles `with lines` and `with linespoints`.
+ Every component line segment of that plot is checked against all watchpoints
+ attached the plot to see whether one or more of the watchpoint targets is
+ satisfied at a point along that line segment. A list of points that satisfy the
+ the target condition ("hits") is accumulated as the plot is drawn.
+
+ For example, if there is a watchpoint with a target y=100, each line segment
+ is checked to see if the y coordinates of the two endpoints bracket the target
+ y value.  If so then at some point [x,y] on the line segment the condition
+ y = 100 must be satisfied.  This target point is then found by linear
+ interpolation or by iterative bisection.
+
+ Watchpoints within a single plot command are numbered successively.
+ More than one watchpoint per plot component may be specified.
+ Example:
+      plot DATA using 1:2 smooth cnormal watch y=0.25 watch y=0.5 wath y=0.75
+
+Ffigure_watchpoints
+ After executing this plot command, the coordinates of all points satisfying
+ the first watchpoint (y=0.25) are stored in an array WATCH_1, the points
+ satisfying (y=0.5) are stored in an array WATCH_2, and so on.
+ Each hit is stored as a complex number with x as the real component and
+ y as the imaginary component.  So the first hit of watchpoint 2 has
+ x = real(WATCH_2[1])  y = imag(WATCH_2[1]).  In this example only the
+ x coordinates of the hits are interesting, as the y coordinates will always
+ match the corresponding target y value.  However if the watchpoint target
+ is a z value or a function f(x,y), both the x and y coordinates of a hit
+ are unknown in advance.
+
+ Smoothing: Line segments are checked as they are drawn.  For unsmoothed data
+ plots this means only lines segments connecting two data points are checked.
+ If a data plot is smoothed, it is the line segments making up the smoothed
+ curve that are checked.
+
+ Accuracy: If the line segment was generated from a function plot, the exact
+ value of x such that f(x) = y is found by iterative bisection.
+ Otherwise the coordinates [x,y] are approximated by linear interpolation
+ along the line segment.
+
+3 watch mouse
+?watchpoints mouse
+?watch mouse
+
+ Using the current mouse x coordinate as a watch target generates a label
+ that moves along the line of the plot tracking the horizontal position of
+ the mouse.  This allows simultaneous readout of the y values of multiple
+ plot lines in the same graph.  The appearance of the point indicating the
+ current position and of the label can be modified by `set style watchpoint`
+ and `set style textbox`
+
+ Example:
+
+      set style watchpoint labels point pt 6 ps 2 boxstyle 1
+      set style textbox 1 lw 0.5 opaque
+      plot for [i=1:N] "file.dat" using 1:(column(i)) watch mouse
+
+3 watch labels
+?watchpoint labels
+?watch labels
+ By default, labels are always generated for the target "watch mouse".
+ You can turn labels on for other watch targets using the command
+ `set style watchpoint labels`.  The label text is "x : y", where x and
+ y are the coordinates of the point, formatted using the current settings
+ for the corresponding axes.
+
+ Example:
+      set y2tics format "%.2f°"
+      set style watchpoint labels point pt 6
+      plot FOO axes x1y2 watch mouse 
+
+1 plotting styles
 ?plotting styles
 =plot styles
 
