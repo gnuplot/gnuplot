@@ -1,0 +1,66 @@
+# Illustrate watchpoint mouse tracking
+# 2021 Weather data for Seattle Sand Point 
+#
+if (!strstrt(GPVAL_COMPILE_OPTIONS, "+WATCHPOINTS")) {
+    print "This copy of gnuplot does not support watchpoints"
+    exit  # return to caller
+}
+#
+# Watchpoints only work for style "with lines" and "with linespoints".
+# First show the easy way: each plot contains a watched line
+#
+
+set title "Seattle (USW00094290) weather data for 2021"
+
+set xdata time
+set timefmt "%Y-%m-%d"
+set datafile separator comma
+set datafile columnheaders
+
+set style data lines
+set style textbox opaque
+
+set ylabel "Temperature"
+set tics nomirror
+set xtics format "%b %d"
+set key reverse Left
+
+set yrange [0:*]
+set ytics 10, 10, 100
+set ytics format "%.3h°F"
+set offset 0, 0, 5, 0
+
+set y2range [0:3.5]
+set y2tics  0, 1, 2
+set my2tics 10
+set y2tics format "%.2g in"
+set y2label "Precipitation" offset 0, -4
+
+plot 'weather.csv' using 3:10 title "max temp" watch mouse, \
+     'weather.csv' using 3:11 title "min temp" watch mouse, \
+     '' using 3:6 axes x1y2 with lines lc "slategrey" title "precipitation" watch mouse
+
+pause -1 '<cr> to continue'
+
+#
+# Now we hide the actual lines being watched by setting them to "lt nodraw"
+# and use the plot styles we actually want the user to see.
+# In this case it is yerrorbars to show the temperature range
+# and filledcurves to show periods of rainfall.
+
+
+set errorbars 0.5
+set pointintervalbox 0.4
+
+plot keyentry with yerrorbars pt 6 ps 0.4 title "min/avg/max temp", \
+     'weather.csv' using 3:(($10+$11)/2):10:11 with yerrorbars pt 6 ps 0.4 notitle, \
+     'weather.csv' using 3:10 lt nodraw notitle watch mouse, \
+     'weather.csv' using 3:11 lt nodraw notitle watch mouse, \
+     '' using 3:6 axes x1y2 with filledcurve x1 fc "slategrey" title "precipitation", \
+     '' using 3:6 axes x1y2 lt nodraw notitle watch mouse
+
+pause -1 '<cr> to continue'
+
+reset
+
+

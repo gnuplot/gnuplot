@@ -538,6 +538,9 @@ load "isosurface.dem"
 #print "********************** file voxel.dem *********************"
 #load "voxel.dem"
 #
+print "*********************** file watchpoints.dem *********************"
+load "watchpoints.dem"
+
 pause 2
 print "**********************   all done   ************************"
 

@@ -1,0 +1,86 @@
+#
+# Illustrate uses of plotting with a watchpoint set
+#
+#
+if (!strstrt(GPVAL_COMPILE_OPTIONS, "+WATCHPOINTS")) {
+    print "This copy of gnuplot does not support watchpoints"
+    exit  # return to caller
+}
+
+# watchpoints are only active on plots "with lines" or "with linespoints"
+#
+set style data lines
+
+set key left Left reverse title "   "
+set border lw 1.2
+set tics nomirror
+set y2tics 0.25
+set link y2
+
+set title "Find threshold values on a derived curve"
+plot 'moli3.dat' using 0:(abs($2)*sin($0/6.)**2) smooth cnormal lt -1 lw 2 \
+     watch y=.25 watch y=.50 watch y=.75 \
+     title "plot FOO smooth cnormal\n watch y=.25 watch y=.50 watch y=.75"
+set obj 1 rect from real(WATCH_1[1]), imag(WATCH_1[1]) to graph 2, graph -2
+set obj 1 fs empty bo lc "red"
+set obj 2 rect from real(WATCH_2[1]), imag(WATCH_2[1]) to graph 2, graph -2
+set obj 2 fs empty bo lc "blue"
+set obj 3 rect from real(WATCH_3[1]), imag(WATCH_3[1]) to graph 2, graph -2
+set obj 3 fs empty bo lc "forest-green"
+
+replot
+
+pause -1 "<cr> to continue"
+
+set title "Same plot with auto-generated watchpoint hit labels"
+set style watchpoint label boxed
+set style textbox opaque margin 0,0 lw 0.5
+replot
+
+pause -1 "<cr> to continue"
+
+set title "Find and mark intersection of two curves"
+set key right reverse Left
+unset link y2
+set style watchpoint nolabel
+set grid
+set xrange [50:500]
+
+plot 'silver.dat' using 1:($2 - ($0+$3)) watch y=0.0 lt nodraw
+INTERSECT_X = WATCH_1[1]
+plot 'silver.dat' using 1:2, '' using 1:($0+$3) watch x=INTERSECT_X
+INTERSECT_Y = imag(WATCH_1[1])
+show var INTERSECT
+
+set label 1 at INTERSECT_X, INTERSECT_Y point pt 6 ps 3
+set arrow 1 from INTERSECT_X, 0.1*INTERSECT_Y to INTERSECT_X, 0.8*INTERSECT_Y noborder
+plot 'silver.dat' using 1:2 lw 2, '' using 1:($0+$3) lw 2, \
+     keyentry with point pt 6 lc "black" \
+     title sprintf("Intersection at  [%.1f, %.1f]", INTERSECT_X, INTERSECT_Y)
+
+pause -1 "<cr> to continue"
+
+reset
+unset key
+set title "Find y intercepts of a parametric function" offset 0,-1
+set xrange [-0.1 : 0.9]
+set yrange [ 0.0 : 0.85]
+set border 0
+set xzeroaxis
+set yzeroaxis
+set xtics axis
+set ytics axis
+set sample 250
+
+plot sample [t=-1:3.95] '+' using (FresnelC(t)) : (FresnelS(t)) with lines watch x=0.5 lt 3
+pause -1 "<cr> to replot with intercept labels constructed from WATCH_1 array"
+
+set title "Intercept labels constructed from WATCH_1 array values" noenhanced
+set for [i=1:|WATCH_1|] label i at real(WATCH_1[i]), imag(WATCH_1[i])
+set for [i=1:|WATCH_1|] label i point pt 7 ps 0.5
+set for [i=1:|WATCH_1|] label i sprintf("Hit %d at y = %.4f",i,imag(WATCH_1[i]))
+replot
+
+pause -1 "<cr> to continue"
+
+reset
