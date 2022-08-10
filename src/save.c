@@ -257,7 +257,7 @@ save_axis_label_or_title(FILE *fp, char *name, char *suffix,
     fprintf(fp, " font \"%s\"", label->font ? conv_text(label->font) : "");
     save_textcolor(fp, &(label->textcolor));
     if (savejust && (label->pos != CENTRE)) save_justification(label->pos,fp);
-    if (label->tag == ROTATE_IN_3D_LABEL_TAG)
+    if (label->tag == LABEL_TAG_ROTATE_IN_3D)
 	fprintf(fp, " rotate parallel");
     else if (label->rotate == TEXT_VERTICAL)
 	fprintf(fp, " rotate");

@@ -87,20 +87,20 @@ typedef struct text_label {
     TBOOLEAN hypertext;
 } text_label;
 
-/* This is the default state for the axis, timestamp, and plot title labels
- * indicated by tag = -2 */
-#define NONROTATING_LABEL_TAG -2
-#define ROTATE_IN_3D_LABEL_TAG -3
-#define VARIABLE_ROTATE_LABEL_TAG -4
+#define LABEL_TAG_NONROTATING     -2
+#define LABEL_TAG_ROTATE_IN_3D    -3
+#define LABEL_TAG_VARIABLE_ROTATE -4
+
+/* This is the default state for the axis, timestamp, and plot title labels */
 #define EMPTY_LABELSTRUCT \
-    {NULL, NONROTATING_LABEL_TAG, \
+    {NULL, LABEL_TAG_NONROTATING, \
      {character, character, character, 0.0, 0.0, 0.0}, CENTRE, 0, 0, \
      0, \
-     NULL, NULL, {TC_LT, -2, 0.0}, DEFAULT_LP_STYLE_TYPE, \
+     NULL, NULL, BLACK_COLORSPEC, DEFAULT_LP_STYLE_TYPE, \
      {character, character, character, 0.0, 0.0, 0.0}, FALSE, \
      FALSE}
 
-/* Datastructure for implementing 'set arrow' */
+/* Data structure for implementing 'set arrow' */
 typedef enum arrow_type {
     arrow_end_absolute,
     arrow_end_relative,

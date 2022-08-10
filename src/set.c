@@ -5944,7 +5944,7 @@ parse_label_options( struct text_label *this_label, int ndim)
 	set_rot = FALSE, set_font = FALSE, set_offset = FALSE,
 	set_layer = FALSE, set_textcolor = FALSE, set_hypertext = FALSE;
     int layer = LAYER_BACK;
-    TBOOLEAN axis_label = (this_label->tag <= NONROTATING_LABEL_TAG);
+    TBOOLEAN axis_label = (this_label->tag <= LABEL_TAG_NONROTATING);
     TBOOLEAN hypertext = FALSE;
     struct position offset = default_offset;
     t_colorspec textcolor = {TC_DEFAULT,0,0.0};
@@ -5990,16 +5990,16 @@ parse_label_options( struct text_label *this_label, int ndim)
 	    if (equals(c_token, "by")) {
 		c_token++;
 		rotate = real_expression();
-		if (this_label->tag == ROTATE_IN_3D_LABEL_TAG)
-		    this_label->tag = NONROTATING_LABEL_TAG;
+		if (this_label->tag == LABEL_TAG_ROTATE_IN_3D)
+		    this_label->tag = LABEL_TAG_NONROTATING;
 	    } else if (almost_equals(c_token,"para$llel")) {
 		if (this_label->tag >= 0)
 		    int_error(c_token,"invalid option");
 		c_token++;
-		this_label->tag = ROTATE_IN_3D_LABEL_TAG;
+		this_label->tag = LABEL_TAG_ROTATE_IN_3D;
 	    } else if (almost_equals(c_token,"var$iable")) {
 		if (ndim == 2)	/* only in 2D plot with labels */
-		    this_label->tag = VARIABLE_ROTATE_LABEL_TAG;
+		    this_label->tag = LABEL_TAG_VARIABLE_ROTATE;
 		else
 		    set_rot = FALSE;
 		c_token++;
@@ -6010,8 +6010,8 @@ parse_label_options( struct text_label *this_label, int ndim)
 	    rotate = 0;
 	    c_token++;
 	    set_rot = TRUE;
-	    if (this_label->tag == ROTATE_IN_3D_LABEL_TAG)
-		this_label->tag = NONROTATING_LABEL_TAG;
+	    if (this_label->tag == LABEL_TAG_ROTATE_IN_3D)
+		this_label->tag = LABEL_TAG_NONROTATING;
 	    continue;
 	}
 

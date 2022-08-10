@@ -2707,7 +2707,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		/* Default displacement with respect to baseline of tics labels */
 		y1 -= (1.5 * t->v_char);
 	    } else { /* usual 3d set view ... */
-		if (X_AXIS.label.tag == ROTATE_IN_3D_LABEL_TAG) {
+		if (X_AXIS.label.tag == LABEL_TAG_ROTATE_IN_3D) {
 		    double ang, angx0, angx1, angy0, angy1;
 		    map3d_xy_double(X_AXIS.min, xaxis_y, base_z, &angx0, &angy0);
 		    map3d_xy_double(X_AXIS.max, xaxis_y, base_z, &angx1, &angy1);
@@ -2821,7 +2821,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		    /* Default displacement with respect to baseline of tics labels */
 		    x1 -= (0.5 + widest_tic_strlen) * t->h_char;
 		} else { /* usual 3d set view ... */
-		    if (Y_AXIS.label.tag == ROTATE_IN_3D_LABEL_TAG) {
+		    if (Y_AXIS.label.tag == LABEL_TAG_ROTATE_IN_3D) {
 			double ang, angx0, angx1, angy0, angy1;
 			map3d_xy_double(yaxis_x, Y_AXIS.min, base_z, &angx0, &angy0);
 			map3d_xy_double(yaxis_x, Y_AXIS.max, base_z, &angx1, &angy1);
@@ -2966,7 +2966,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		x -= 7 * t->h_char;
 	}
 
-	if (Z_AXIS.label.tag == ROTATE_IN_3D_LABEL_TAG) {
+	if (Z_AXIS.label.tag == LABEL_TAG_ROTATE_IN_3D) {
 	    double ang, angx0, angx1, angy0, angy1;
 	    map3d_xy_double(zaxis_x, zaxis_y, Z_AXIS.min, &angx0, &angy0);
 	    map3d_xy_double(zaxis_x, zaxis_y, Z_AXIS.max, &angx1, &angy1);

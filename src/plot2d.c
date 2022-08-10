@@ -895,7 +895,7 @@ get_data(struct curve_points *current_plot)
 	    coordval var_ps = current_plot->labels->lp_properties.p_size;
 	    coordval var_pt = current_plot->labels->lp_properties.p_type;
 
-	    if (current_plot->labels->tag == VARIABLE_ROTATE_LABEL_TAG)
+	    if (current_plot->labels->tag == LABEL_TAG_VARIABLE_ROTATE)
 		var_rotation = v[var++];
 	    if (var_ps == PTSZ_VARIABLE)
 		var_ps = v[var++];

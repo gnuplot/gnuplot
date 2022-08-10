@@ -3113,7 +3113,7 @@ show_xyzlabel(const char *name, const char *suffix, text_label *label)
     if (label->font)
 	fprintf(stderr, ", using font \"%s\"", conv_text(label->font));
 
-    if (label->tag == ROTATE_IN_3D_LABEL_TAG)
+    if (label->tag == LABEL_TAG_ROTATE_IN_3D)
 	fprintf(stderr, ", parallel to axis in 3D plots");
     else if (label->rotate)
 	fprintf(stderr, ", rotated by %g degrees in 2D plots", label->rotate);
