@@ -63,6 +63,10 @@
 #include "hidden3d.h"
 #include "plot.h"	/* for interactive */
 
+#ifdef USE_WATCHPOINTS
+# include "watch.h"
+#endif
+
 #ifdef _WIN32
 # include "win/winmain.h"
 #endif
@@ -2392,6 +2396,14 @@ event_motion(struct gp_event_t *ge)
 	    sprintf(s, zoombox_format(), real_x, real_y);
 	    term->put_tmptext(2, s);
 	}
+#ifdef USE_WATCHPOINTS
+	else if (watch_mouse_active) {
+	    /* Trigger a redraw so that the watch points can be rechecked against
+	     * new mouse position. Should we replot immediately, or queue an event?
+	     */
+	    do_string_replot("");
+	}
+#endif
     }
 }
 
@@ -3246,6 +3258,16 @@ load_mouse_variables(double x, double y, TBOOLEAN button, int c)
 	Ginteger(&current->udv_value, modifier_mask & Mod_Ctrl);
     }
     return;
+}
+
+/* Mechanism for core code to query the last-known mouse coordinates.
+ * When called in the context of a plot, the coordinates are returned
+ * using the axes (x1/x2 y1/y2) of that plot.
+ */
+void get_last_mouse_xy( double *x, double *y )
+{
+    *x = (x_axis == SECOND_X_AXIS) ? real_x2 : real_x;
+    *y = (y_axis == SECOND_Y_AXIS) ? real_y2 : real_y;
 }
 
 #endif /* USE_MOUSE */

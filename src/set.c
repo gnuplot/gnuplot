@@ -66,6 +66,7 @@
 #endif
 #include "encoding.h"
 #include "voxelgrid.h"
+#include "watch.h"
 
 static void set_angles(void);
 static void set_arrow(void);
@@ -4572,6 +4573,11 @@ set_style()
     case SHOW_STYLE_SPIDERPLOT:
 	set_style_spiderplot();
 	break;
+#ifdef USE_WATCHPOINTS
+    case SHOW_STYLE_WATCHPOINT:
+	set_style_watchpoint();
+	break;
+#endif
     default:
 	int_error(c_token, "unrecognized option - see 'help set style'");
     }
@@ -5954,12 +5960,14 @@ parse_label_options( struct text_label *this_label, int ndim)
 	set_rot = FALSE, set_font = FALSE, set_offset = FALSE,
 	set_layer = FALSE, set_textcolor = FALSE, set_hypertext = FALSE;
     int layer = LAYER_BACK;
-    TBOOLEAN axis_label = (this_label->tag <= LABEL_TAG_NONROTATING);
+    TBOOLEAN axis_label = FALSE;
     TBOOLEAN hypertext = FALSE;
     struct position offset = default_offset;
     t_colorspec textcolor = {TC_DEFAULT,0,0.0};
     struct lp_style_type loc_lp = DEFAULT_LP_STYLE_TYPE;
     loc_lp.flags = LP_NOT_INITIALIZED;
+    if (this_label->tag == LABEL_TAG_ROTATE_IN_3D || this_label->tag == LABEL_TAG_VARIABLE_ROTATE)
+	axis_label = TRUE;
 
    /* Now parse the label format and style options */
     while (!END_OF_COMMAND) {

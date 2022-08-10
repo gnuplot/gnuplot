@@ -61,6 +61,7 @@
 #include "variable.h"
 #include "version.h"
 #include "voxelgrid.h"
+#include "watch.h"
 #ifdef USE_MOUSE
 # include "mouse.h"
 #endif
@@ -1591,6 +1592,10 @@ show_style()
 	show_style_ellipse();
 	c_token++;
 	break;
+    case SHOW_STYLE_WATCHPOINT:
+	show_style_watchpoint();
+	c_token++;
+	break;
     default:
 	/* show all styles */
 	show_styles("Data",data_style);
@@ -1600,6 +1605,7 @@ show_style()
 	show_increment();
 	show_histogram();
 	show_textbox();
+	show_style_watchpoint();
 	save_style_parallel(stderr);
 	show_arrowstyle(0);
 	show_boxplot();

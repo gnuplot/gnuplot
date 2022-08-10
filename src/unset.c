@@ -56,6 +56,7 @@
 #include "mouse.h"
 #endif
 #include "voxelgrid.h"
+#include "watch.h"
 
 static void unset_angles(void);
 static void unset_arrow(void);
@@ -2152,6 +2153,8 @@ reset_command()
     unset_histogram();
     unset_textbox_style();
     prefer_line_styles = FALSE;
+
+    reset_watches();
 
 #ifdef USE_MOUSE
     mouse_setting = default_mouse_setting;

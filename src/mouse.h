@@ -112,4 +112,7 @@ void event_reset(struct gp_event_t *ge);
 void bind_process(char* lhs, char* rhs, TBOOLEAN allwindows);
 void bind_remove_all(void);
 
+/* mechanism for the core code to query the last-known mouse coordinates */
+extern void get_last_mouse_xy( double *x, double *y );
+
 #endif /* !_HAVE_MOUSE_H */

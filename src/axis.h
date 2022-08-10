@@ -74,6 +74,7 @@ typedef enum AXIS_INDEX {
     V_AXIS,		/* Last index into axis_array[] */
     PARALLEL_AXES,	/* Parallel axis structures are allocated dynamically */
     THETA_index = 1234,	/* Used to identify THETA_AXIS */
+    MOUSE_PROXY_AXIS,	/* Used by watchpoints code */
 
     AXIS_ARRAY_SIZE = PARALLEL_AXES
 } AXIS_INDEX;

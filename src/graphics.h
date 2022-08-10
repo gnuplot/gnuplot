@@ -69,6 +69,7 @@ typedef struct curve_points {
     filledcurves_opts filledcurves_options;
     int base_linetype;		/* before any calls to load_linetype(), lc variable */
 				/* analogous to hidden3d_top_linetype in graph3d.h  */
+    struct watch_t *watchlist;	/* only used if watch conditions are active */
     int ellipseaxes_units;              /* Only used if plot_style == ELLIPSES */    
     struct histogram_style *histogram;	/* Only used if plot_style == HISTOGRAM */
     int histogram_sequence;	/* Ordering of this dataset within the histogram */

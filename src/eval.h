@@ -180,6 +180,7 @@ void real_free_at(struct at_type *at_ptr);
 void free_action_entry(struct at_entry *a);
 struct udvt_entry * add_udv_by_name(char *key);
 struct udvt_entry * get_udv_by_name(char *key);
+struct udft_entry * get_udf_by_token(int token);
 void del_udv_by_name( char *key, TBOOLEAN isWildcard );
 void clear_udf_list(void);
 

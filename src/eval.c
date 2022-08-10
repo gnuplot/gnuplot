@@ -864,6 +864,20 @@ del_udv_by_name(char *key, TBOOLEAN wildcard)
     }
 }
 
+#ifdef USE_WATCHPOINTS
+struct udft_entry *
+get_udf_by_token(int t_num)
+{
+    struct udft_entry **udf_ptr = &first_udf;
+    while (*udf_ptr) {
+	if (equals(t_num, (*udf_ptr)->udf_name))
+	    return *udf_ptr;
+	udf_ptr = &((*udf_ptr)->next_udf);
+    }
+    return NULL;
+}
+#endif
+
 /* Clear (delete) all user defined functions */
 void
 clear_udf_list()

@@ -52,6 +52,7 @@
 #include "term_api.h"
 #include "util.h"
 #include "variable.h" /* For locale handling */
+#include "watch.h"
 
 #ifndef _WIN32
 # include "help.h"
@@ -182,6 +183,8 @@ cp_free(struct curve_points *cp)
 	    free_labels(cp->labels);
 	cp->labels = NULL;
 	free_at(cp->plot_function.at);
+	free_watchlist(cp->watchlist);
+	cp->watchlist = NULL;
 
 	free(cp);
 	cp = next;
@@ -2079,6 +2082,9 @@ eval_plots()
     paxis_end = -1;
     paxis_current = -1;
 
+    /* Watch condition bookkeeping */
+    reset_watches();
+
     uses_axis[FIRST_X_AXIS] =
 	uses_axis[FIRST_Y_AXIS] =
 	uses_axis[SECOND_X_AXIS] =
@@ -2759,6 +2765,14 @@ eval_plots()
 			continue;
 		}
 
+#ifdef USE_WATCHPOINTS
+		/* Watch conditions (only supported for "plot with lines") */
+		if (equals(c_token, "watch")) {
+		    parse_watch(this_plot);
+		    continue;
+		}
+#endif
+
 		break; /* unknown option */
 
 	    } /* while (!END_OF_COMMAND) */
@@ -3413,7 +3427,7 @@ eval_plots()
 		    if (this_plot->plot_style == TABLESTYLE)
 			int_warn(NO_CARET, "'with table' requires a data source not a pure function");
 
-		    /* Used to generate samples */
+		    /* Used to generate samples and to optimize watchpoints */
 		    this_plot->plot_function.at = at_ptr;
 
 		    if (!parametric && !polar) {

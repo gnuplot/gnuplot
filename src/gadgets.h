@@ -85,12 +85,18 @@ typedef struct text_label {
     struct position offset;
     TBOOLEAN noenhanced;
     TBOOLEAN hypertext;
+    TBOOLEAN hidden;
 } text_label;
 
 #define LABEL_TAG_PLOTLABELS      -1
 #define LABEL_TAG_NONROTATING     -2
 #define LABEL_TAG_ROTATE_IN_3D    -3
 #define LABEL_TAG_VARIABLE_ROTATE -4
+#define LABEL_TAG_WATCH_MOUSE     -5
+#define LABEL_TAG_WATCH_X         -6
+#define LABEL_TAG_WATCH_Y         -7
+#define LABEL_TAG_WATCH_Z         -8
+#define LABEL_TAG_WATCH_FUNCTION  -9
 
 /* This is the default state for the axis, timestamp, and plot title labels */
 #define EMPTY_LABELSTRUCT \
@@ -98,8 +104,8 @@ typedef struct text_label {
      {character, character, character, 0.0, 0.0, 0.0}, CENTRE, 0, 0, \
      0, \
      NULL, NULL, BLACK_COLORSPEC, DEFAULT_LP_STYLE_TYPE, \
-     {character, character, character, 0.0, 0.0, 0.0}, FALSE, \
-     FALSE}
+     {character, character, character, 0.0, 0.0, 0.0}, \
+     FALSE, FALSE, FALSE}
 
 /* Data structure for implementing 'set arrow' */
 typedef enum arrow_type {
