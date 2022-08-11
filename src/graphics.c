@@ -1079,6 +1079,7 @@ do_plot(struct curve_points *plots, int pcount)
 		if (this_plot->labels) {
 		    x_axis = this_plot->x_axis;
 		    y_axis = this_plot->y_axis;
+		    term->linetype(LT_BLACK);	/* Used for default textbox border */
 		    place_labels( this_plot->labels, LAYER_PLOTLABELS, FALSE);
 		}
 	    }

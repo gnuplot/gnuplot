@@ -25,6 +25,7 @@ void watch_line(struct curve_points *plot, double x1, double y1, double z1,
 void init_watch(struct curve_points *plot);
 void free_watchlist(struct watch_t *watchlist);
 void reset_watches(void);
+void unset_watchpoint_style(void);
 void set_style_watchpoint(void);
 void show_style_watchpoint(void);
 
@@ -39,6 +40,7 @@ void show_style_watchpoint(void);
 #define parse_watch(p)
 #define free_watchlist(w)
 #define reset_watches()
+#define unset_watchpoint_style()
 #define show_style_watchpoint()
 
 #endif	/* USE_WATCHPOINTS */

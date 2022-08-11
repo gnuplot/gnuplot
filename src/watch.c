@@ -113,8 +113,8 @@
  *
  * Notes:
  * - If data smoothing options are in effect, the interpolation is done
- * along a line segment from the smoothed curve, _not_ interpolation between
- * two data points.
+ *   along a line segment from the smoothed curve, _not_ interpolation between
+ *   two data points.
  * - WATCH_* arrays are not created for "watch mouse" hits
  * 
  */
@@ -391,10 +391,40 @@ parse_watch(struct curve_points *plot)
     }
 }
 
+void
+free_watchlist(struct watch_t *watchlist)
+{
+    struct watch_t *temp;
+
+    while (watchlist) {
+	temp = watchlist;
+	watchlist = watchlist->next;
+	free(temp);
+    }
+}
+
 /*
- * Reset trigger counts to zero.
- * Called at the start of each plot being watchd.
+ * unset_watchpoint_style - called on program start, unset and reset commands
+ *	returns the styling to default
+ * reset_watches - called at the start of a plot command
+ *	resets count of active watches to 0
+ * init_watch called at the start of each plot being watched
+ *	resets hit count to zero
  */
+void
+unset_watchpoint_style()
+{
+    memcpy(&watchpoint_labelstyle, &default_labelstyle, sizeof(struct text_label));
+    watch_mouse_active = FALSE;
+}
+
+void
+reset_watches()
+{
+    number_of_watches = 0;
+    watch_mouse_active = FALSE;
+}
+
 void
 init_watch(struct curve_points *plot)
 {
@@ -408,29 +438,6 @@ init_watch(struct curve_points *plot)
 	init_array(array, 1);
 	watch->hits = 0;
     }
-}
-
-void
-free_watchlist(struct watch_t *watchlist)
-{
-    struct watch_t *temp;
-
-    while (watchlist) {
-	temp = watchlist;
-	watchlist = watchlist->next;
-	free(temp);
-    }
-}
-
-void
-reset_watches()
-{
-    number_of_watches = 0;
-    watch_mouse_active = FALSE;
-
-    /* Make sure some label style has been initialized */
-    if (watchpoint_labelstyle.tag == 0)
-	memcpy(&watchpoint_labelstyle, &default_labelstyle, sizeof(struct text_label));
 }
 
 /*
@@ -502,6 +509,7 @@ static struct text_label *
 mouse_hit_label(struct curve_points *plot, watch_t *target, double x, double y)
 {
     char *xlabel, *ylabel;
+    static char buffer[256];
     struct text_label *new_label = malloc( sizeof(struct text_label) );
     memcpy(new_label, &watchpoint_labelstyle, sizeof(struct text_label));
 
@@ -527,10 +535,10 @@ mouse_hit_label(struct curve_points *plot, watch_t *target, double x, double y)
     new_label->lp_properties.p_size = 3;
     new_label->place.x = x;
     new_label->place.y = y;
-    new_label->text = malloc( 64 );
     xlabel = strdup( apply_tic_format( &axis_array[x_axis], x));
     ylabel = strdup( apply_tic_format( &axis_array[y_axis], y));
-    sprintf(new_label->text, "%s : %s", xlabel, ylabel);
+    sprintf(buffer, "%s : %s", xlabel, ylabel);
+    new_label->text = strdup(buffer);
     free(xlabel);
     free(ylabel);
 
