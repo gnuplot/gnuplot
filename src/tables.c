@@ -374,6 +374,7 @@ const struct gen_table set_tbl[] =
     { "paxis", S_PAXIS },
 
     { "z$ero", S_ZERO },
+    { "watch$points", S_WATCH },
     { NULL, S_INVALID }
 };
 

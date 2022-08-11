@@ -96,7 +96,7 @@
  *
  * (2) The coordinates of each hit are formatted as a label and stored in
  * a list of labels attached to that plot.  The format of these labels
- * can be customized by "set style watchpoing labels <label-options>".
+ * can be customized by "set style watchpoint labels <label-options>".
  *
  * Example:
  *	set xrange [-10:10]
@@ -125,6 +125,7 @@
 #include "gp_time.h"
 #include "graphics.h"
 #include "mouse.h"
+#include "plot2d.h"
 #include "watch.h"
 #include "setshow.h"	/* for parse_label_options */
 #include "save.h"	/* for save_label_style */
@@ -185,7 +186,7 @@ watch_line(struct curve_points *plot, double x1, double y1, double z1, double x2
     for (t = plot->watchlist; t != NULL; t = t->next) {
 
 	switch (t->type) {
-#if USE_MOUSE
+#ifdef USE_MOUSE
 	case MOUSE_PROXY_AXIS:
 	    {
 	    /* Replace t->target with current mouse x position */
@@ -293,10 +294,10 @@ watch_line(struct curve_points *plot, double x1, double y1, double z1, double x2
 		continue;
 	}
 
-	/* DEBUG: keep a label list for non-mouse targets also
-	 *	  but do not display it unless asked.
+	/* Keep a label list for non-mouse targets also but
+	 * only display it if "set style watchpoints lagel" is selected.
 	 */
-	{
+	if (TRUE) {
 	    struct text_label *label;
 	    label = mouse_hit_label(plot, t, hit_x, hit_y);
 	    label->next = plot->labels;
@@ -312,8 +313,8 @@ watch_line(struct curve_points *plot, double x1, double y1, double z1, double x2
 	array->udv_value.v.value_array[0].v.int_val = t->hits;
 	Gcomplex(&array->udv_value.v.value_array[t->hits], hit_x, hit_y);
 
-	/* FIXME: not always wanted; should be configurable */
-	    fprintf(stderr, "watch %d hit %d at %g %g\n", t->watchno, t->hits, hit_x, hit_y);
+	/* Not always wanted; should be configurable */
+	FPRINTF((stderr, "watch %d hit %d at %g %g\n", t->watchno, t->hits, hit_x, hit_y));
 
     } /* End loop over active watchs */
 
@@ -356,8 +357,10 @@ parse_watch(struct curve_points *plot)
 	new_watch->type = FIRST_Z_AXIS;
     } else if (equals(c_token, "mouse")) {
 	c_token++;
+#ifdef USE_MOUSE
 	/* Ignore this request if no mousing is active */
 	if ((mouse_setting.on == 0) || (term->waitforinput == NULL))
+#endif
 	    return;
 	new_watch->type = MOUSE_PROXY_AXIS;
 	watch_mouse_active = TRUE;
@@ -435,7 +438,7 @@ init_watch(struct curve_points *plot)
     for (watch = plot->watchlist; watch; watch = watch->next) {
 	sprintf(array_name, "WATCH_%d", watch->watchno);
 	array = add_udv_by_name(array_name);
-	init_array(array, 1);
+	init_array(array, 0);
 	watch->hits = 0;
     }
 }
@@ -531,8 +534,6 @@ mouse_hit_label(struct curve_points *plot, watch_t *target, double x, double y)
     }
 
     new_label->lp_properties.flags = LP_SHOW_POINTS;
-    new_label->lp_properties.p_type = 5;
-    new_label->lp_properties.p_size = 3;
     new_label->place.x = x;
     new_label->place.y = y;
     xlabel = strdup( apply_tic_format( &axis_array[x_axis], x));
@@ -557,6 +558,9 @@ apply_tic_format( struct axis *axis, double hit )
 {
 #   define MAX_LABEL_SIZE 127
     static char buffer[MAX_LABEL_SIZE+1];
+
+    if (axis->ticfmt == NULL)
+	axis->ticfmt = copy_or_invent_formatstring(axis);
 
     if (axis->tictype == DT_TIMEDATE)
 	gstrftime(buffer, MAX_LABEL_SIZE, axis->ticfmt, hit);
@@ -610,6 +614,70 @@ show_style_watchpoint()
     else {
 	fprintf(stderr, "\tset style watchpoint label ");
 	save_label_style(stderr, &watchpoint_labelstyle);
+    }
+}
+
+/*
+ * Walk through previous plot command and print results of watchpoints
+ * to console.
+ */
+void
+show_watchpoints()
+{
+    struct curve_points *this_plot = NULL;
+    struct udvt_entry *array;
+    char array_name[12];
+    int hits;
+
+    for (this_plot = first_plot; this_plot; this_plot = this_plot->next) {
+	struct watch_t *this_watch;
+
+	if (!this_plot->watchlist)
+	    continue;
+
+	/* Found a plot with watchpoints */
+	fprintf(stderr, "Plot title:\t%s\n", this_plot->title ? this_plot->title : "(none)");
+
+	/* Loop over watchpoints attached to this plot */
+	for (this_watch = this_plot->watchlist; this_watch; this_watch = this_watch->next) {
+	    const char *type;
+	    int i;
+
+	    if (this_watch->type == MOUSE_PROXY_AXIS) {
+		fprintf(stderr, "\tWatch %d target mouse\n", this_watch->watchno);
+		continue;
+	    }
+	    type =  this_watch->type == FIRST_X_AXIS ? "x" :
+		    this_watch->type == FIRST_Y_AXIS ? "y" :
+		    this_watch->type == FIRST_Z_AXIS ? "z" :
+		    this_watch->type == SAMPLE_AXIS ? "F(x,y)" : NULL;
+	    if (!type)
+		continue;
+	    fprintf(stderr, "\tWatch %d target ", this_watch->watchno);
+	    fprintf(stderr, "%s = %.4g ", type, this_watch->target);
+	    fprintf(stderr, "\t(%d hits)\n", this_watch->hits);
+
+	    /* Loop over hits stored in the corresponding array */
+	    sprintf(array_name, "WATCH_%d", this_watch->watchno);
+	    array = get_udv_by_name(array_name);
+	    if (!array || array->udv_value.type != ARRAY)
+		int_error(NO_CARET, "error: cannot find array %s", array_name);
+	    hits = array->udv_value.v.value_array[0].v.int_val;
+	    if (hits != this_watch->hits)
+		int_error(NO_CARET, "error: wrong number of hits in %s", array_name);
+
+	    for (i = 1; i <= hits; i++) {
+		double x = array->udv_value.v.value_array[i].v.cmplx_val.real;
+		double y = array->udv_value.v.value_array[i].v.cmplx_val.imag;
+		char *xlabel = strdup( apply_tic_format( &axis_array[this_plot->x_axis], x));
+		char *ylabel = strdup( apply_tic_format( &axis_array[this_plot->y_axis], y));
+
+		fprintf(stderr, "\t\thit %d\tx %s  y %s\n", i, xlabel, ylabel);
+
+		free(xlabel);
+		free(ylabel);
+	    }
+	}
     }
 }
 

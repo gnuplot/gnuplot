@@ -676,6 +676,10 @@ show_command()
 		theta_origin == -90 ? "bottom" : "right");
 	break;
 
+    case S_WATCH:
+	show_watchpoints();
+	break;
+
     /* HBB 20010525: 'set commands' that don't have an
      * accompanying 'show' version, for no particular reason: */
     /* --- such case now, all implemented. */
