@@ -4521,7 +4521,12 @@ set_style()
 		    continue;
 		if (equals(c_token,"lt"))
 		    c_token--;
-		parse_colorspec(&textbox->border_color, TC_RGB);
+		/* Workaround/hack to prevent bare keyword "border" from 
+		 * complained about following keyword, e.g. "lw"
+		 */
+		if (equals(c_token,"lc") || almost_equals(c_token,"linec$olor")
+		||  equals(c_token,"rgb") || equals(c_token+1, "lt"))
+		    parse_colorspec(&textbox->border_color, TC_RGB);
 	    } else if (almost_equals(c_token,"linew$idth") || equals(c_token,"lw")) {
 		c_token++;
 		textbox->linewidth = real_expression();

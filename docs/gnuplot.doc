@@ -15314,7 +15314,7 @@ Ffigure_palette2
  Syntax:
          set style textbox {<boxstyle-index>}
                    {opaque|transparent} {fillcolor <color>}
-                   {{no}border {<bordercolor>}}{linewidth <lw>}
+                   {{no}border {linecolor <colorspec>}}{linewidth <lw>}
                    {margins <xmargin>,<ymargin>}
 
  This command controls the appearance of labels with the attribute 'boxed'.
