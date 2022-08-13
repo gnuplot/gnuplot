@@ -1907,6 +1907,13 @@ df_readascii(double v[], int max)
 		    return DF_EOF;
 		}
 
+		/* start of a new data block that might have column headers */
+		if (((&keyT)->auto_titles == COLUMNHEAD_KEYTITLES)
+		||  (df_columnheaders)) {
+		    parse_1st_row_as_headers = TRUE;
+		    df_already_got_headers = FALSE;
+		}
+
 		/* ignore line if current_index has just become
 		 * first required one - client doesn't want this
 		 * blank line. While we're here, check for <=
@@ -2047,6 +2054,7 @@ df_readascii(double v[], int max)
 		column_for_key_title = df_no_cols;
 
 	    if (column_for_key_title > 0) {
+		free(df_key_title);
 		df_key_title = gp_strdup(df_column[column_for_key_title-1].header);
 		if (!df_key_title) {
 		    FPRINTF((stderr,
