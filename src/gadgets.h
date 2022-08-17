@@ -87,6 +87,7 @@ typedef struct text_label {
     TBOOLEAN hypertext;
 } text_label;
 
+#define LABEL_TAG_PLOTLABELS      -1
 #define LABEL_TAG_NONROTATING     -2
 #define LABEL_TAG_ROTATE_IN_3D    -3
 #define LABEL_TAG_VARIABLE_ROTATE -4

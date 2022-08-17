@@ -2114,7 +2114,7 @@ eval_3dplots()
 			&& this_plot->lp_properties.p_type == PT_CHARACTER)) {
 		    int stored_token = c_token;
 		    if (this_plot->labels == NULL) {
-			this_plot->labels = new_text_label(-1);
+			this_plot->labels = new_text_label(LABEL_TAG_PLOTLABELS);
 			this_plot->labels->pos = CENTRE;
 			this_plot->labels->layer = LAYER_PLOTLABELS;
 		    }
@@ -2386,7 +2386,7 @@ eval_3dplots()
 		    if ((this_plot->plot_style == LABELPOINTS)
 		    ||  (this_plot->plot_style & PLOT_STYLE_HAS_POINT
 			    && this_plot->lp_properties.p_type == PT_CHARACTER)) {
-			this_plot->labels = new_text_label(-1);
+			this_plot->labels = new_text_label(LABEL_TAG_PLOTLABELS);
 			*(this_plot->labels) = *(first_dataset->labels);
 			this_plot->labels->next = NULL;
 		    }

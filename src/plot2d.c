@@ -2715,7 +2715,7 @@ eval_plots()
 		    int stored_token = c_token;
 
 		    if (this_plot->labels == NULL) {
-			this_plot->labels = new_text_label(-1);
+			this_plot->labels = new_text_label(LABEL_TAG_PLOTLABELS);
 			this_plot->labels->pos = CENTRE;
 			this_plot->labels->layer = LAYER_PLOTLABELS;
 		    }
@@ -2895,7 +2895,7 @@ eval_plots()
 	    if (this_plot->plot_style & PLOT_STYLE_HAS_POINT
 	    &&  this_plot->lp_properties.p_type == PT_CHARACTER) {
 		if (this_plot->labels == NULL) {
-		    this_plot->labels = new_text_label(-1);
+		    this_plot->labels = new_text_label(LABEL_TAG_PLOTLABELS);
 		    this_plot->labels->pos = CENTRE;
 		    parse_label_options(this_plot->labels, 2);
 		}
@@ -2904,7 +2904,7 @@ eval_plots()
 	    /* If we got this far without initializing the label list, do it now */
 	    if (this_plot->plot_style == LABELPOINTS) {
 		if (this_plot->labels == NULL) {
-		    this_plot->labels = new_text_label(-1);
+		    this_plot->labels = new_text_label(LABEL_TAG_PLOTLABELS);
 		    this_plot->labels->pos = CENTRE;
 		    this_plot->labels->layer = LAYER_PLOTLABELS;
 		}
@@ -2945,7 +2945,7 @@ eval_plots()
 	    /* Initialize the label list in case the BOXPLOT style needs it to store factors */
 	    if (this_plot->plot_style == BOXPLOT) {
 		if (this_plot->labels == NULL)
-		    this_plot->labels = new_text_label(-1);
+		    this_plot->labels = new_text_label(LABEL_TAG_PLOTLABELS);
 		/* We only use the list to store strings, so this is all we need here. */
 	    }
 
