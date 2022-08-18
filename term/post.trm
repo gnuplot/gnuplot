@@ -3095,7 +3095,12 @@ PS_make_header(t_sm_palette *palette)
 {
     /* write header for smooth colors */
     fputs("gsave % colour palette begin\n", gppsfile);
-    fprintf(gppsfile, "/maxcolors %i def\n", sm_palette.use_maxcolors);
+    if ( CHECK_SMPAL_IS_DISCRETE_GRADIENT ) {
+        fprintf(gppsfile, "/maxcolors %i def\n", 0);
+    }
+    else {
+        fprintf(gppsfile, "/maxcolors %i def\n", sm_palette.use_maxcolors);
+    }
     make_color_model_code();
 
     switch(sm_palette.colorMode) {

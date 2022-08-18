@@ -769,16 +769,21 @@ draw_color_smooth_box(int plot_mode)
 
     term->layer(TERM_LAYER_BEGIN_COLORBOX);
 
-    /* The PostScript terminal has an Optimized version */
-    if ((term->flags & TERM_IS_POSTSCRIPT) != 0)
-	draw_inside_color_smooth_box_postscript();
+    if (sm_palette.gradient_type == SMPAL_GRADIENT_TYPE_DISCRETE) {
+        draw_inside_colorbox_bitmap_discrete();
+    } 
     else {
-        if (sm_palette.gradient_type == SMPAL_GRADIENT_TYPE_SMOOTH) {
-	    draw_inside_colorbox_bitmap_smooth();
-        } else if (sm_palette.gradient_type == SMPAL_GRADIENT_TYPE_DISCRETE) {
-	    draw_inside_colorbox_bitmap_discrete();
-        } else {
-	    draw_inside_colorbox_bitmap_mixed();
+        /* The PostScript terminal has an Optimized version */
+        if ((term->flags & TERM_IS_POSTSCRIPT) != 0) {
+            draw_inside_color_smooth_box_postscript();
+        }
+        else {
+            if (sm_palette.gradient_type == SMPAL_GRADIENT_TYPE_SMOOTH) {
+                draw_inside_colorbox_bitmap_smooth();
+            }
+            else {
+                draw_inside_colorbox_bitmap_mixed();
+            }
         }
     }
 
