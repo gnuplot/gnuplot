@@ -5206,7 +5206,16 @@ df_readbinary(double v[], int max)
 	    {
 		int j;
 
-		df_datum = df_column[i].datum;
+		/* df_datum will be returned as column(0)
+		 * Aug 2022: CHANGE
+		 * I do not know why the original code set this to df_column[i].datum.
+		 * Returning the linear order in the matrix is more useful for both
+		 * ascii and binary nonuniform matrices.
+		 */
+		if (df_nonuniform_matrix)
+		    df_datum++;
+		else
+		    df_datum = df_column[i].datum;
 
 		/* Fill backward so that current read value is not
 		 * overwritten. */

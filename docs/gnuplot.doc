@@ -355,6 +355,10 @@ C
 #b (5.4.2) "plot with fillsteps {above|below y=<value>}" analogous to filledcurves
 #b (5.4.3) "nogrid" flag allows splot components to opt out of dgrid3d processing
 #b (5.4.3) "set style histogram nokeyseparators" (see `newhistogram`)
+#b (5.4.5) column(0) returns the linear ordering of nonuniform matrix elements.
+##         Thus for element A[i,j] in an MxN matrix,
+##         column(0) / M  gives the row index i
+##         column(0) % M  gives the column index j
 #end
 
 4 Changes

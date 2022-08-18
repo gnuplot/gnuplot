@@ -1,6 +1,10 @@
 Changes in 5.4.5
 ================
+* CHANGE re-order 3D labels to come after pm3d depthorder surfaces
 * CHANGE hpgl: add terminal option "fontscale <value>"
+* CHANGE for nonuniform matrix data, column(0) returns linear position in matrix
+* FIX    svg: hypertext font handling
+* FIX    track columnheaders of multiple data blocks in a single file Bug #2538
 
 Changes in 5.4.4
 ================
