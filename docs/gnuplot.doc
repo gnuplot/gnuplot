@@ -271,13 +271,16 @@ C
 #b New keyword `period` for smoothing periodic data. See `smooth kdensity`.
 #end
 
-4 New data format
-?new data_format
+4 New data formats
+?new data_formats
 #start
 #b The `sparse matrix=(cols,rows)` option to `plot` and `splot` generates
 ## a uniform pixel grid into which individual pixel values may be loaded in
 ## any order.  This is useful for plotting heat maps from incomplete data.
 ## See `sparse`.
+#b For non-uniform matrix data, column(0) now returns the linear ordering
+## of matrix elements.  I.e. for element A[i,j] in an MxN matrix A,
+## column(-1) gives the row index i, and column(0)%M gives the column index j.
 #end
 
 4 New built-in functions
@@ -8725,7 +8728,9 @@ Ffigure_smooth_path
        column(0)   The sequential order of each point within a data set.
                    The counter starts at 0, increments on each non-blank,
                    non-comment line, and is reset by two sequential blank
-                   records.  The shorthand form $0 is available.
+                   records. For data in non-uniform matrix format, column(0)
+                   is the linear order of each matrix element.
+                   The shorthand form $0 is available.
        column(-1)  This counter starts at 0, increments on a single blank line,
                    and is reset by two sequential blank lines.
                    This corresponds to the data line in array or grid data.
