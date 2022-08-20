@@ -729,6 +729,10 @@ parse_primary_expression()
 		    set_up_columnheader_parsing( &(at->actions[at->a_count-1]) );
 		}
 
+		/* split( "string" {, "sep"} ) has an optional 2nd parameter */
+		if (!strcmp(ft[whichfunc].f_name,"split"))
+		    add_action(PUSHC)->v_arg = num_params;
+
 		(void) add_action(whichfunc);
 
 	    } else {

@@ -2273,3 +2273,44 @@ f_trim(union argument *arg)
     a.v.string_val = trim;
     push(&a);
 }
+
+/*
+ * split ( "string", {"sep"} )
+ * Split string into an array of words.
+ * The second parameter is optional.
+ */
+void
+f_split(union argument *arg)
+{
+    struct value a;
+    char *string, *sep;
+    static char *whitespace = " ";
+
+    /* Determine number of parameters passed (1 or 2) */
+    (void)pop(&a);
+    if (a.v.int_val == 1) {
+	/* Separator defaults to whitespace, indicated by " " */
+	sep = whitespace;
+    } else if (a.v.int_val == 2) {
+	(void)pop(&a);
+	if (a.type != STRING)
+	    int_error(NO_CARET, nonstring_error);
+	sep = a.v.string_val;
+	if (*sep == '\0')
+	    sep = whitespace;
+    } else
+	int_error(NO_CARET, "too many parameters to split()");
+
+    (void)pop(&a);
+    if (a.type != STRING)
+	int_error(NO_CARET, nonstring_error);
+    string = a.v.string_val;
+
+    a.v.value_array = split(string, sep);
+    a.type = (a.v.value_array) ? ARRAY : NOTDEFINED;
+
+    if (sep != whitespace)
+	free(sep);
+    free(string);
+    push(&a);
+}
