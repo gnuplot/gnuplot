@@ -2314,3 +2314,55 @@ f_split(union argument *arg)
     free(string);
     push(&a);
 }
+
+/*
+ * join ( array, "sep" )
+ * Concatenate the string elements of array into a single longer string.
+ * The character sequence in "sep" is inserted between each element.
+ */
+void
+f_join(union argument *arg)
+{
+    struct value a;
+    struct value *array;
+    char *sep;
+    char *concatenation;
+    int i, n, size;
+
+    (void)pop(&a);
+    if (a.type != STRING)
+	int_error(NO_CARET, "join: expecting join(array, \"separator\")");
+    sep = a.v.string_val;
+
+    (void)pop(&a);
+    if (a.type != ARRAY)
+	int_error(NO_CARET, "join: expecting join(array, \"separator\")");
+
+    array = a.v.value_array;
+    n = array[0].v.int_val;
+    size = 0;
+    for (i=1; i<=n; i++) {
+	if (array[i].type == STRING)
+	    size += strlen(array[i].v.string_val);
+	size += strlen(sep);
+    }
+    concatenation = gp_alloc( size + 1, NULL );
+    *concatenation = '\0';
+    for (i=1; i<=n; i++) {
+	if (array[i].type == STRING)
+	    strcat(concatenation, array[i].v.string_val);
+	if (i<n)
+	    strcat(concatenation, sep);
+    }
+
+    if (array[0].type == TEMP_ARRAY)
+	gpfree_array(&a);
+
+    a.type = STRING; 
+    a.v.string_val = concatenation;
+    push(&a);
+
+    free(concatenation);
+    free(sep);
+}
+

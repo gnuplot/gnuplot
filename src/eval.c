@@ -258,6 +258,7 @@ const struct ft_entry ft[] =
     {"weekdate_iso", f_weekdate_iso},
     {"weekdate_cdc", f_weekdate_cdc},
 
+    {"join",  f_join},		/* create string from array */
     {"sprintf",  f_sprintf},	/* for string variables only */
     {"gprintf",  f_gprintf},	/* for string variables only */
     {"strlen",  f_strlen},	/* for string variables only */
