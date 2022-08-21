@@ -292,6 +292,11 @@ C
 #b `rgbcolor("name")` returns the 32bit ARGB value for a named color.
 #b `index( Array, element )` returns the first index `i` for which
 ## Array[i] is equal to element.  See `arrays`.
+#b `split("string", "separator")` unpacks the fields in a string into
+## an array of strings. See `split`.
+#b `join(array, "separator")` is the complement to `split`. It concatenates
+## the elements of a string array into a single string with field separators.
+## See `join`.
 #end
 
 4 Named palettes
@@ -1542,6 +1547,8 @@ Ffigure_E0
 ^<tr>    <td>strlen("string")</td>    <td>string</td>    <td>number of characters in string</td></tr>
 ^<tr>    <td>strstrt("string","key")</td>    <td>strings</td>    <td>int index of first character of substring "key"</td></tr>
 ^<tr>    <td>substr("string",beg,end)</td>    <td>multiple</td>    <td>string "string"[beg:end]</td></tr>
+^<tr>    <td>split("string","separator")</td>    <td>string</td>    <td>array containing individual fields of original string</td></tr>
+^<tr>    <td>join(array,"separator")</td>    <td>array,string</td>    <td>concatenates array elements into a string</td></tr>
 ^<tr>    <td>strftime("timeformat",t)</td>    <td>any</td>    <td>string result from applying gnuplot's time parser</td></tr>
 ^<tr>    <td>strptime("timeformat",s)</td>    <td>string</td>    <td>seconds since year 1970 as given in string s</td></tr>
 ^<tr>    <td>system("command")</td>    <td>string</td>    <td>string containing output stream of shell command</td></tr>
@@ -2214,6 +2221,26 @@ C 4 FresnelS
  beg through end of the original string. This is exactly equivalent to the
  expression "string"[beg:end] except that you do not have the option of
  omitting beg or end.
+
+4 split
+?
+#split("string","sep") & string & array of substrings \\
+%split("string","sep")@string@array of substrings
+ `split("string", "sep")` uses the character sequence in "sep" as a
+ field separator to split the content of "string" into individual fields.
+ It returns an array of strings, each corresponding to one field of the
+ original string. The second parameter "sep" is optional.  If "sep" is
+ omitted or if it contains a single space character the fields are split
+ by any amount of whitespace (space, tab, formfeed, newline, return).
+ Otherwise the full sequence of characters in "sep" must be matched.
+4 join
+?
+ `join(array, "sep")` concatenates the string elements of an array into a
+ single string containing fields delimited by the character sequence in "sep".
+ Non-string array elements generate an empty field.
+#join(array,"sep") & array,string & concatenate array elements into a string\\
+%join(array,"sep") @array,string@concatenate array elements into a string
+
 4 strftime
 ?expressions functions strftime
 ?strftime
@@ -2243,6 +2270,7 @@ C 4 FresnelS
  'f(x) = real(system(sprintf("somecommand %f", x)))'.
 4 trim
 =trim
+?expressions functions trim
 #trim(" string ") & string & string without leading or trailing whitespace \\
 %trim(" string ")@string@string without leading or trailing whitespace
  `trim("  padded string ")` returns the original string stripped of leading
@@ -2250,6 +2278,7 @@ C 4 FresnelS
  data fields that may contain extra whitespace. For example
       plot FOO using 1:( trim(strcol(3)) eq "A" ? $2 : NaN )
 4 word
+?word
 =word
 #word("string",n) & string, int & returns the nth word in "string" \\
 %word("string",n)@string, int@returns the nth word in "string"
@@ -2958,7 +2987,43 @@ C 4 weekdata_cdc
  Note, that in this last example the escaped quotes are necessary only for the
  string definition.
 
-?expressions functions trim
+=split
+?split
+?expressions functions split
+ `split("string", "sep")` uses the character sequence in "sep" as a
+ field separator to split the content of "string" into individual fields.
+ It returns an array of strings, each corresponding to one field of the
+ original string. The second parameter "sep" is optional.  If "sep" is
+ omitted or if it contains a single space character the fields are split
+ by any amount of whitespace (space, tab, formfeed, newline, return).
+ Otherwise the full sequence of characters in "sep" must be matched.
+
+ The three examples below each produce an array [ "A", "B", "C", "D" ]
+     t1 = split( "A B C D" )
+     t2 = split( "A B C D", " ")
+     t3 = split( "A;B;C;D", ";")
+
+ However the command
+     t4 = split( "A;B; C;D", "; " )
+ produces an array containing only two strings [ "A;B", "C;D" ] because
+ the two-character field separator sequence "; " is found only once.
+
+ Note: Breaking the string into an array of single characters using an empty
+ string for sep is not currently implemneted.  You can instead accomplish
+ this using single character substrings:     Array[i] = "string"[i:i]
+
+=join
+?join
+?expressions functions join
+ `join(array, "sep")` concatenates the string elements of an array into a
+ single string containing fields delimited by the character sequence in "sep".
+ Non-string array elements generate an empty field.
+ Example:
+     array A = ["A", "B", , 7, "E"]
+     print join(A,";")
+           A;B;;;E
+
+=trim
 ?trim
  `trim("  padded string ")` returns the original string stripped of leading
  and trailing whitespace.  This is useful for string comparisons of input
@@ -3451,6 +3516,7 @@ C ... and restart the table:
 ?arrays functions
 ?arrays slice
 ?slice
+=split
  Starting with gnuplot version 5.5, an array can be passed to a function or
  returned by a function.  For example a simple dot-product function acting on
  two equal-sized numerical arrays could be defined:
@@ -3460,15 +3526,17 @@ C ... and restart the table:
  Built-in functions that return an array include the slice operation
  array[min:max] and the index retrieval function index(Array,value).
 
-      array T = [ "A", "B", "C", "D", "E", "F" ]
+      T = split("A B C D E F")
       U = T[3:4]
+      print T
+         [ "A", "B", "C", "D", "E", "F" ]
       print U
          [ "C", "D" ]
       print index( T, "D" )
          4
 
- Note that in this example U is now an array, whether or not it was declared
- previously.
+ Note that T and U in this example are now arrays, whether or not they had been
+ previously declared.
 
 4 Array indexing
 ?arrays indexing
@@ -4325,7 +4393,7 @@ Ffigure_newsyntax
  Gnuplot provides several built-in functions that operate on strings.
  General formatting functions: see `gprintf` `sprintf`.
  Time formatting functions: see `strftime` `strptime`.
- String manipulation: see `substr` `strstrt` `trim` `word` `words`.
+ String manipulation: see `split`, `substr` `strstrt` `trim` `word` `words`.
 3 string encoding
 ?string encoding
 =utf8
