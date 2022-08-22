@@ -403,9 +403,10 @@ reset
 print "********************** file boxclusters.dem *********************"
 load "boxclusters.dem"
 
-print "********************** file array.dem *********************"
+print "**********************    Array functions   *********************"
 load "array.dem"
 load "array_index.dem"
+load "split.dem"
 reset
 
 print "**********************    Image formats    *********************"

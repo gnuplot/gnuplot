@@ -1,0 +1,20 @@
+# unit test for split and join functions
+# (also invokes index and trim)
+#
+
+term_array = split(GPVAL_TERMINALS)
+u_index = index(term_array, "unknown")
+u_name = word(GPVAL_TERMINALS, u_index)
+if (u_name eq "unknown") {
+    print "split: OK"
+} else {
+    print "split: failed"
+}
+
+term_names = join(term_array, " ")
+if (trim(term_names) eq trim(GPVAL_TERMINALS)) {
+    print "join: OK"
+} else {
+    print "join: failed"
+}
+ 
