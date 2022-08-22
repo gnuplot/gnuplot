@@ -2264,14 +2264,15 @@ f_trim(union argument *arg)
 	s++;
 
     /* Trim from back */
-    trim = strdup(s);
+    trim = s;
     s = &trim[strlen(trim)-1];
     while ((s > trim) && isspace((unsigned char) *s))
 	*(s--) = '\0';
 
-    free(a.v.string_val);
+    s = a.v.string_val;
     a.v.string_val = trim;
     push(&a);
+    free(s);
 }
 
 /*
