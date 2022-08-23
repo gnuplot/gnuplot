@@ -2427,10 +2427,12 @@ plot_points(struct curve_points *plot)
 		/* term_apply_lp_properties will restore the point type and size*/
 		if ((plot->plot_style == LINESPOINTS && interval < 0)
 		||  (plot->plot_style == YERRORBARS)) {
-		    (*t->set_color)(&background_fill);
-		    (*t->pointsize)(pointsize * pointintervalbox);
-		    (*t->point) (x, y, 6);
-		    term_apply_lp_properties(&(plot->lp_properties));
+		    if (pointintervalbox != 0) {
+			(*t->set_color)(&background_fill);
+			(*t->pointsize)(pointsize * pointintervalbox);
+			(*t->point) (x, y, 6);
+			term_apply_lp_properties(&(plot->lp_properties));
+		    }
 		}
 
 		/* rgb variable  -  color read from data column */
