@@ -4138,7 +4138,7 @@ set_pointintervalbox()
 	pointintervalbox = 1.0;
     else
 	pointintervalbox = real_expression();
-    if (pointintervalbox <= 0)
+    if (pointintervalbox < 0)
 	pointintervalbox = 1.0;
 }
 
