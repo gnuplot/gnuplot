@@ -144,6 +144,8 @@ process_line( char *line, FILE *b)
                                 /* convert '?xxx' to '\label{xxx}' */
 	    if (line[1] == '?')
 		break;
+	    if (line[1] == '\0' || strlen(line)<3)
+		break;
 	    line[strlen(line)-1]=NUL;
             (void) fputs("\\label{",b);
 	    fputs(line+1, b);
