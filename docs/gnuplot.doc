@@ -10835,16 +10835,14 @@ Ffigure_missing
 ?dgrid3d
 ?nodgrid3d
 =kdensity
- The `set dgrid3d` command enables, and can set parameters for, non-grid to
- grid data mapping.  See `splot grid_data` for more details about the grid data
- structure.
+ The `set dgrid3d` command enables and sets parameters for mapping non-grid data
+ onto a grid.  See `splot grid_data` for details about the grid data structure.
 
  Syntax:
-       set dgrid3d {<rows>} {,{<cols>}}
-                   { splines |
-                     qnorm {<norm>} |
-                     (gauss | cauchy | exp | box | hann)
-                       {kdensity} {<dx>} {,<dy>} }
+       set dgrid3d {<rows>} {,{<cols>}} splines
+       set dgrid3d {<rows>} {,{<cols>}} qnorm {<norm>}
+       set dgrid3d {<rows>} {,{<cols>}} {gauss | cauchy | exp | box | hann}
+                       {kdensity} {<dx>} {,<dy>}
        unset dgrid3d
        show dgrid3d
 
@@ -10901,7 +10899,7 @@ Ffigure_missing
  IN THE UNITS OF THE DATA ITSELF.
 
  The optional keyword `kdensity`, which must come after the name of the
- kernel, but before the (optional) scale parameters, modifies the algorithm
+ kernel, but before the optional scale parameters, modifies the algorithm
  so that the values calculated for the grid points are not divided by the
  sum of the weights ( z = Sum_i w(d_i) * z_i ). If all z_i are constant,
  this effectively plots a bivariate kernel density estimate: a kernel
@@ -10911,11 +10909,9 @@ Ffigure_missing
  principle to what the `smooth kdensity` option does to 1D datasets.
  (See kdensity2d.dem for usage demo)
 
- DEPRECATED: A slightly different syntax is also supported for backwards
- compatibility. If no interpolation algorithm has been explicitly selected,
- the `qnorm` algorithm is assumed. Up to three comma-separated, optional
- parameters can be specified, which are interpreted as the the number of
- rows, the number of columns, and the norm value, respectively.
+ DEPRECATED (do not use): For backward compatibility with old scripts,
+ the command "set dgrid3d <val1>,<vali2>,<vali3>" is interpreted to mean
+ "set dgrid3d <val1>, <vale> qnorm <val3>".
 
  The `dgrid3d` option is a simple scheme which replaces scattered data
  with weighted averages on a regular grid.  More sophisticated approaches

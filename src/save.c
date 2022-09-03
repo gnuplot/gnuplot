@@ -386,23 +386,16 @@ save_set_all(FILE *fp)
     }
 
     if (dgrid3d) {
-      if (dgrid3d_mode == DGRID3D_QNORM) {
-	fprintf(fp, "set dgrid3d %d,%d, %d\n",
-	  	dgrid3d_row_fineness,
-	  	dgrid3d_col_fineness,
-	  	dgrid3d_norm_value);
-      } else if (dgrid3d_mode == DGRID3D_SPLINES) {
-	fprintf(fp, "set dgrid3d %d,%d splines\n",
-	  	dgrid3d_row_fineness, dgrid3d_col_fineness );
-      } else {
-	fprintf(fp, "set dgrid3d %d,%d %s%s %f,%f\n",
-	  	dgrid3d_row_fineness,
-	  	dgrid3d_col_fineness,
-		reverse_table_lookup(dgrid3d_mode_tbl, dgrid3d_mode),
-		dgrid3d_kdensity ? " kdensity2d" : "",
-	  	dgrid3d_x_scale,
-	  	dgrid3d_y_scale );
-      }
+	fprintf(fp, "set dgrid3d %d,%d %s ",
+		dgrid3d_row_fineness, dgrid3d_col_fineness,
+		clean_reverse_table_lookup(dgrid3d_mode_tbl, dgrid3d_mode));
+	if (dgrid3d_mode == DGRID3D_QNORM)
+	    fprintf(fp, "%d\n", dgrid3d_norm_value);
+	else if (dgrid3d_mode == DGRID3D_SPLINES)
+	    /* no options */ ;
+	else
+	    fprintf(fp, "%s %g, %g\n", dgrid3d_kdensity ? " kdensity" : "",
+		dgrid3d_x_scale, dgrid3d_y_scale );
     }
 
     /* Dummy variable names */

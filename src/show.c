@@ -1448,7 +1448,7 @@ show_dgrid3d()
 		reverse_table_lookup(dgrid3d_mode_tbl, dgrid3d_mode),
 		dgrid3d_x_scale,
 		dgrid3d_y_scale,
-		dgrid3d_kdensity ? ", kdensity2d mode" : "" );
+		dgrid3d_kdensity ? ", kdensity mode" : "" );
       }
     else
 	fputs("\tdata grid3d is disabled\n", stderr);

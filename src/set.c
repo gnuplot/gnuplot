@@ -1502,84 +1502,89 @@ set_dashtype()
     }
 }
 
-/* process 'set dgrid3d' command */
+/*
+ * set dgrid3d {rows {, columns}} splines
+ * set dgrid3d {rows {, columns}} qnorm {<value>}
+ * set dgrid3d {rows {, columns}} {gauss|cauchy|exp|box|hann} {kdensity} {dx {,dy}}
+ */
 static void
 set_dgrid3d()
 {
-    int token_cnt = 0; /* Number of comma-separated values read in */
-
     int gridx     = dgrid3d_row_fineness;
     int gridy     = dgrid3d_col_fineness;
     int normval   = dgrid3d_norm_value;
     double scalex = dgrid3d_x_scale;
     double scaley = dgrid3d_y_scale;
-
-    /* dgrid3d has two different syntax alternatives: classic and new.
-       If there is a "mode" keyword, the syntax is new, otherwise it is classic.*/
-    dgrid3d_mode  = DGRID3D_DEFAULT;
-
     dgrid3d_kdensity = FALSE;
 
     c_token++;
-    while ( !(END_OF_COMMAND) ) {
+
+    /* Accommodate ancient deprecated syntax "set dgrid3d ,,<normval>" */
+    if (equals(c_token,",") && equals(c_token+1,",")) {
+	c_token += 2;
+	dgrid3d_mode = DGRID3D_QNORM;
+	dgrid3d_norm_value = int_expression();
+	dgrid3d = TRUE;
+	return;
+    }
+
+    if (might_be_numeric(c_token)) {
+	gridx = gridy = int_expression();
+	if (equals(c_token, ",")) {
+	    c_token++;
+	    gridy = int_expression();
+	    /* Deprecated syntax using 3 numeric parameters and no keywords */
+	    if (equals(c_token, ",")) {
+		c_token++;
+		normval = int_expression();
+	    }
+	}
+    }
+
+    while (!(END_OF_COMMAND)) {
 	int tmp_mode = lookup_table(&dgrid3d_mode_tbl[0],c_token);
+
 	if (tmp_mode != DGRID3D_OTHER) {
 	    dgrid3d_mode = tmp_mode;
 	    c_token++;
-	}
 
-	switch (tmp_mode) {
-	case DGRID3D_QNORM:
-				if (!(END_OF_COMMAND)) normval = int_expression();
-				break;
-	case DGRID3D_SPLINES:
-				break;
-	case DGRID3D_GAUSS:
-	case DGRID3D_CAUCHY:
-	case DGRID3D_EXP:
-	case DGRID3D_BOX:
-	case DGRID3D_HANN:
-				if (!(END_OF_COMMAND) && almost_equals( c_token, "kdens$ity2d" )) {
-					dgrid3d_kdensity = TRUE;
-					c_token++;
-				}
-				if (!(END_OF_COMMAND)) {
-					scalex = real_expression();
-					scaley = scalex;
-					if (equals(c_token, ",")) {
-						c_token++;
-						scaley = real_expression();
-					}
-				}
-				break;
-
-	default:		/* {rows}{,cols{,norm}}} */
-
-			if  ( equals( c_token, "," )) {
-				c_token++;
-				token_cnt++;
-			} else if (token_cnt == 0) {
-				gridx = int_expression();
-				gridy = gridx; /* gridy defaults to gridx, unless overridden below */
-			} else if (token_cnt == 1) {
-				gridy = int_expression();
-			} else if (token_cnt == 2) {
-				normval = int_expression();
-			} else
-				int_error(c_token,"Unrecognized keyword or unexpected value");
+	    switch (dgrid3d_mode) {
+	    case DGRID3D_QNORM:
+	    default:
+			if (might_be_numeric(c_token))
+			    normval = int_expression();
 			break;
-	}
-
+	    case DGRID3D_SPLINES:
+			/* No options */
+			break;
+	    case DGRID3D_GAUSS:
+	    case DGRID3D_CAUCHY:
+	    case DGRID3D_EXP:
+	    case DGRID3D_BOX:
+	    case DGRID3D_HANN:
+			if (almost_equals( c_token, "kdens$ity2d" )) {
+				dgrid3d_kdensity = TRUE;
+				c_token++;
+			} else {
+				dgrid3d_kdensity = FALSE;
+			}
+			if (might_be_numeric(c_token)) {
+				scaley = scalex = real_expression();
+				if (equals(c_token, ",")) {
+					c_token++;
+					scaley = real_expression();
+				}
+			}
+			break;
+	    }
+	} else 
+	    int_error(c_token,"Unrecognized keyword or unexpected value");
     }
 
-    /* we could warn here about floating point values being truncated... */
+    /* Sanity checks */
     if (gridx < 2 || gridx > 1000 || gridy < 2 || gridy > 1000)
 	int_error( NO_CARET,
 		   "Number of grid points must be in [2:1000] - not changed!");
-
-    /* no mode token found: classic format */
-    if (dgrid3d_mode == DGRID3D_DEFAULT)
-	dgrid3d_mode = DGRID3D_QNORM;
 
     if (scalex < 0.0 || scaley < 0.0)
 	int_error( NO_CARET,
