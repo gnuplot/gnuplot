@@ -6,6 +6,7 @@ gnuplot_qt
 gnuplot_x11
 gnuplot.gih
 gnupmdrv.hlp
+qt_embed_example
 *.ini
 bf_test
 html

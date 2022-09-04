@@ -185,7 +185,7 @@ gnuplot_qt_LDADD = $(QT_LIBS)
 #
 # embedded Qt widget example program
 # 
-bin_PROGRAMS += qt_embed_example
+noinst_PROGRAMS += qt_embed_example
 
 nodist_qt_embed_example_SOURCES = qtterminal/moc_qt_embed_example.cpp \
        qtterminal/moc_QtGnuplotInstance.cpp \
