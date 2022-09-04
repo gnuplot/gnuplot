@@ -752,10 +752,6 @@ do_plot(struct curve_points *plots, int pcount)
     /* Sync point for epslatex text positioning */
     (term->layer)(TERM_LAYER_FRONTTEXT);
 
-    /* Draw axis labels and timestamps */
-    /* Note: As of Dec 2012 these are drawn as "front" text. */
-    draw_titles();
-
     /* Draw the key, or at least reserve space for it (pass 1) */
     if (key->visible)
 	draw_key( key, key_pass);
@@ -1107,6 +1103,13 @@ do_plot(struct curve_points *plots, int pcount)
     /* REDRAW PLOT BORDER */
     if (draw_border && border_layer == LAYER_FRONT)
 	plot_border();
+
+    /* DRAW AXIS LABELS AND TIMESTAMPS
+     * Sep 2022:  These were always intended to be "front" text
+     *       but previously this was only true for TeX terminals.
+     *       Moving the call here makes it true for all terminals.
+     */
+    draw_titles();
 
     /* Add front colorbox if appropriate */
     if (is_plot_with_colorbox() && color_box.layer == LAYER_FRONT)
