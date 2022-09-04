@@ -1,4 +1,4 @@
-/* GNUPLOT - embed_example.h */
+/* GNUPLOT - qt_embed_example.h */
 
 /*[
  * Copyright 2009   Jérôme Lodewyck

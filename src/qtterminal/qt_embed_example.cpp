@@ -1,4 +1,4 @@
-/* GNUPLOT - embed_example.h */
+/* GNUPLOT - qt_embed_example.h */
 
 /*[
  * Copyright 2009   Jérôme Lodewyck
@@ -41,7 +41,7 @@
  * under either the GPL or the gnuplot license.
 ]*/
 
-#include "embed_example.h"
+#include "qt_embed_example.h"
 #include "QtGnuplotWidget.h"
 
 QMainWindow* mainWindow;

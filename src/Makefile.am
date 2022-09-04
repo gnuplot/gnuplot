@@ -182,21 +182,20 @@ qtterminal/QtGnuplotScene.cpp qtterminal/QtGnuplotItems.cpp \
 qtterminal/QtGnuplotEvent.cpp
 gnuplot_qt_LDADD = $(QT_LIBS)
 
-# embed example (uncomment to build it)
+#
+# embedded Qt widget example program
 # 
-# bin_PROGRAMS += embed_example
-# 
-# nodist_embed_example_SOURCES = qtterminal/moc_embed_example.cpp \
-#          qtterminal/moc_QtGnuplotInstance.cpp \
-#          qtterminal/moc_QtGnuplotWidget.cpp qtterminal/moc_QtGnuplotScene.cpp \
-#          qtterminal/moc_QtGnuplotEvent.cpp qtterminal/qrc_QtGnuplotResource.cpp
-# 
-# embed_example_SOURCES = qtterminal/embed_example.cpp \
-# qtterminal/QtGnuplotWidget.cpp qtterminal/QtGnuplotEvent.cpp \
-# qtterminal/QtGnuplotScene.cpp qtterminal/QtGnuplotItems.cpp \
-# qtterminal/QtGnuplotInstance.cpp
-# 
-# embed_example_LDADD = $(QT_LIBS)
+bin_PROGRAMS += qt_embed_example
+
+nodist_qt_embed_example_SOURCES = qtterminal/moc_qt_embed_example.cpp \
+       qtterminal/moc_QtGnuplotInstance.cpp \
+       qtterminal/moc_QtGnuplotWidget.cpp qtterminal/moc_QtGnuplotScene.cpp \
+       qtterminal/moc_QtGnuplotEvent.cpp qtterminal/qrc_QtGnuplotResource.cpp
+qt_embed_example_SOURCES = qtterminal/qt_embed_example.cpp \
+       qtterminal/QtGnuplotWidget.cpp qtterminal/QtGnuplotEvent.cpp \
+       qtterminal/QtGnuplotScene.cpp qtterminal/QtGnuplotItems.cpp \
+       qtterminal/QtGnuplotInstance.cpp
+qt_embed_example_LDADD = $(QT_LIBS)
 
 endif # build_qt
 

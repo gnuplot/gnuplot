@@ -21,6 +21,12 @@ Translation howto
 3/ run linguist to edit the .ts file
 4/ add an entry for a qm file in src/Makefile.am, section TRANSLATIONS
 
+Demo program
+============
+
+A program qt_embed_example is provided as an example of how to embed the
+gnuplot qt terminal window as a widget inside a Qt app.
+
 Known issues
 ============
 

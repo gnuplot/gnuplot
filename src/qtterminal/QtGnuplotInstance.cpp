@@ -49,8 +49,11 @@
 
 QtGnuplotInstance::QtGnuplotInstance(QtGnuplotWidget* widget, QString gnuplotPath)
 {
+	QStringList gnuplotArgs;
+	gnuplotArgs << "--slow";	// paranoia about font initialization
+
 	m_gnuplot.setProcessChannelMode(QProcess::MergedChannels);
-	m_gnuplot.start(gnuplotPath);
+	m_gnuplot.start(gnuplotPath, gnuplotArgs);
 	m_gnuplot.waitForStarted();
 	connect(&m_gnuplot, SIGNAL(readyReadStandardOutput()), this, SLOT(gnuplotDataReady()));
 
@@ -71,11 +74,10 @@ void QtGnuplotInstance::setWidget(QtGnuplotWidget* widget)
 
 	if (m_widget)
 	{
-		QByteArray command;
-		command.append("set term qt widget \"" + m_widget->serverName() + "\" size " +
+		QString command = "set term qt widget \"" + m_widget->serverName() + "\" size " +
 		               QString::number(m_widget->plotAreaSize().width()) + "," +
-		               QString::number(m_widget->plotAreaSize().height()) + "\n");
-		exec(command);
+		               QString::number(m_widget->plotAreaSize().height()) + "\n";
+		exec(command.toUtf8());
 	}
 }
 
@@ -119,7 +121,7 @@ QByteArray QtGnuplotInstance::execAndRead(const QByteArray& command, int msecs)
 QtGnuplotInstance& operator<<(QtGnuplotInstance& instance, const QString& command)
 {
 	QByteArray array;
-	array.append(command);
+	array.append(command.toUtf8());
 	instance.exec(array);
 
 	return instance;

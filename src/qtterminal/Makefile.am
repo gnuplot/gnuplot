@@ -6,5 +6,5 @@ EXTRA_DIST = qt_term.h qt_conversion.cpp QtGnuplot.pro QtGnuplotWindow.h \
 QtGnuplotApplication.h QtGnuplotWidget.h QtGnuplotScene.h QtGnuplotEvent.h \
 QtGnuplotItems.h QtGnuplotSettings.ui QtGnuplotResource.qrc \
 QtGnuplotInstance.cpp QtGnuplotInstance.h gnuplot_qt.cpp \
-README.Qt embed_example.cpp embed_example.h \
+README.Qt qt_embed_example.cpp qt_embed_example.h \
 images po
