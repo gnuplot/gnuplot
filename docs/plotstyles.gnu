@@ -1035,6 +1035,32 @@ unset multiplot
 
 reset
 
+#
+# watchpoint support might not be present
+#
+set output out.'figure_watchpoints' . ext
+
+if (!strstrt(GPVAL_COMPILE_OPTIONS, "+WATCHPOINTS")) {
+    clear
+} else {
+    set tics nomirror
+    set xrange noextend
+    unset ytics
+    set y2tics 0.25 format "%.2f"
+    set link y2
+    unset key
+    set lmargin 10
+    set grid y2
+
+    set title "Find quartile values on a ROC curve"
+    set style watchpoint label offset 1,0.3 point pt 6 ps 1 noboxed textcolor "blue"
+
+    plot 'moli3.dat' using 0:(abs($2)*sin($0/6.)**2) smooth cnormal lt -1 lw 2 \
+	 watch y=.25 watch y=.50 watch y=.75 \
+	 with lines
+}
+reset
+
 # close last file
 unset output
 
