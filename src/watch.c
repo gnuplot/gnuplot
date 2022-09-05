@@ -183,21 +183,30 @@ watch_line(struct curve_points *plot, double x1, double y1, double z1, double x2
     watch_t *t;
     struct value z;
 
+    if (polar)	/* Watchpoints not yet supported for polar plots */
+	return;
+
     for (t = plot->watchlist; t != NULL; t = t->next) {
 
 	switch (t->type) {
 #ifdef USE_MOUSE
 	case MOUSE_PROXY_AXIS:
-	    {
-	    /* Replace t->target with current mouse x position */
+		{
+		/* Replace t->target with current mouse x position */
 		double mouse_x, mouse_y;
 		get_last_mouse_xy(&mouse_x, &mouse_y);
 		if (!inrange(mouse_x, axis_array[x_axis].min, axis_array[x_axis].max))
 		    continue;
+		if (!inrange(mouse_x, x1, x2))
+		    continue;
+		/* No bisection, because function parameters may have changed
+		 * between when the plot was drawn and the time of mouse interaction
+		 */
 		t->target = mouse_x;
-	    /* Fall through to x axis case */
-		;
-	    }
+		hit_x = mouse_x;
+		hit_y = y1 + (y2 - y1) * (hit_x - x1)/(x2 - x1);
+		break;
+		}
 #endif
 	case FIRST_X_AXIS:
 		/* outrange line segment does not trigger a watch event */
@@ -365,8 +374,10 @@ parse_watch(struct curve_points *plot)
 	new_watch->type = MOUSE_PROXY_AXIS;
 	watch_mouse_active = TRUE;
     } else if ((new_watch->func = get_udf_by_token(c_token))) {
-	/* FIXME: verify that this is a function of 2 parameters */
-	/* skip over func(x,y) */
+	if (!new_watch->func->at)
+	    int_error(c_token, "undefined function: %s", new_watch->func->udf_name);
+	if (new_watch->func->dummy_num != 2)
+	    int_error(c_token, "%s is not a 2-parameter function", new_watch->func->udf_name);
 	c_token += 6;
 	if (equals(c_token++, "="))
 	    new_watch->target = real_expression();
@@ -375,6 +386,12 @@ parse_watch(struct curve_points *plot)
 	new_watch->type = SAMPLE_AXIS;
     } else
 	int_error(NO_CARET, "unrecognized watch request");
+
+    /* Watchpoints not yet supported for polar plots */
+    if (polar) {
+	int_warn(NO_CARET, "watchpoints ignored in polar mode");
+	return;
+    }
 
     /* New watch accepted; make a copy for the plot header */
     new_watch = gp_alloc(sizeof(struct watch_t), "new watch");
