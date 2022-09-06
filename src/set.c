@@ -4805,33 +4805,12 @@ static void
 set_tics()
 {
     int i;
-    TBOOLEAN global_opt = FALSE;
     int save_token = c_token;
 
-    /* There are a few options that set_tic_prop doesn't handle */
-    /* because they are global rather than per-axis.            */
-    while (!END_OF_COMMAND) {
-	if (equals(c_token, "front")) {
-	    grid_tics_in_front = TRUE;
-	    global_opt = TRUE;
-	} else if (equals(c_token, "back")) {
-	    grid_tics_in_front = FALSE;
-	    global_opt = TRUE;
-	} else if (almost_equals(c_token, "sc$ale")) {
-	    set_ticscale();
-	    global_opt = TRUE;
-	}
-	c_token++;
-    }
-
-    /* Otherwise we iterate over axes and apply the options to each */
-    for (i = 0; i < NUMBER_OF_MAIN_VISIBLE_AXES; i++) {
-	c_token = save_token;
-	set_tic_prop( &axis_array[i] );
-    }
-
-    /* if tics are off, reset to default (border) */
-    if (END_OF_COMMAND || global_opt) {
+    /* On a bare "set tics" command, reset the default on/off/placement/mirror
+     * state of the visible axes.
+     */
+    if (END_OF_COMMAND) {
 	for (i = 0; i < NUMBER_OF_MAIN_VISIBLE_AXES; ++i) {
 	    if ((axis_array[i].ticmode & TICS_MASK) == NO_TICS) {
 		if ((i == SECOND_X_AXIS) || (i == SECOND_Y_AXIS))
@@ -4841,6 +4820,25 @@ set_tics()
 		    axis_array[i].ticmode |= TICS_MIRROR;
 	    }
 	}
+	return;
+    }
+
+    /* There are a few options that set_tic_prop doesn't handle */
+    /* because they are global rather than per-axis.            */
+    while (!END_OF_COMMAND) {
+	if (equals(c_token, "front"))
+	    grid_tics_in_front = TRUE;
+	else if (equals(c_token, "back"))
+	    grid_tics_in_front = FALSE;
+	else if (almost_equals(c_token, "sc$ale"))
+	    set_ticscale();
+	c_token++;
+    }
+
+    /* Otherwise we iterate over axes and apply the options to each */
+    for (i = 0; i < NUMBER_OF_MAIN_VISIBLE_AXES; i++) {
+	c_token = save_token;
+	set_tic_prop( &axis_array[i] );
     }
 }
 
@@ -4874,6 +4872,13 @@ set_ticscale()
 	for (i = 0; i < NUMBER_OF_MAIN_VISIBLE_AXES; ++i) {
 	    axis_array[i].ticscale = lticscale;
 	    axis_array[i].miniticscale = lminiticscale;
+	    /* For backward compatibility, setting tic scale has the side
+	     * effect of reenabling display of tics that had been "unset".
+	     * This allows auto-extension of axes with tic scale 0.
+	     * NB: The old code also turned on mirroring; now we don't.
+	     */
+	    if (i != SECOND_X_AXIS && i != SECOND_Y_AXIS)
+		axis_array[i].ticmode = TICS_ON_BORDER;
 	}
 	ticlevel = 2;
 	while (equals(c_token, ",")) {
