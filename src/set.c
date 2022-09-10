@@ -2814,6 +2814,13 @@ set_logscale()
 		axis_array[axis].set_max = 10.;
 	    }
 
+	    /* Autoscaled minimum cannot work with log scale R */
+	    if ((axis == POLAR_AXIS) && (axis_array[axis].set_autoscale & AUTOSCALE_MIN)) {
+		axis_array[axis].set_autoscale &= ~AUTOSCALE_MIN;
+		axis_array[axis].set_min = 0.1;
+		axis_array[axis].min = 0.1;
+	    }
+
 	    if (newbase == 10.) {
 		sprintf(command, "set nonlinear %s via log10(%s) inv 10**%s",
 			axis_name(axis), dummy, dummy);

@@ -731,19 +731,23 @@ make_tics(struct axis *this_axis, int guide)
     xr = fabs(this_axis->min - this_axis->max);
     if (xr == 0)
 	return 1;	/* Anything will do, since we'll never use it */
-    if (xr >= VERYLARGE)
-	int_warn(NO_CARET,"%s axis range undefined or overflow",
-		axis_name(this_axis->index));
+    if (xr >= VERYLARGE) {
+	int_warn(NO_CARET, "%s axis range undefined or overflow, resetting to [0:0]",
+	    axis_name(this_axis->index));
+	/* FIXME: this used to be int_error but there were false positives
+	 * (bad range on unused axis).  However letting +/-VERYLARGE through
+	 * can overrun data structures for time conversions. min = max avoids this.
+	 */
+	this_axis->min = this_axis->max = 0;
+    }
+
     tic = quantize_normal_tics(xr, guide);
-    /* FIXME HBB 20010831: disabling this might allow short log axis
-     * to receive better ticking... */
     if (this_axis->log && tic < 1.0)
 	tic = 1.0;
-
     if (this_axis->tictype == DT_TIMEDATE)
-	return quantize_time_tics(this_axis, tic, xr, guide);
-    else
-	return tic;
+	tic = quantize_time_tics(this_axis, tic, xr, guide);
+
+    return tic;
 }
 /* }}} */
 
@@ -2675,7 +2679,7 @@ polar_to_xy( double theta, double r, double *x, double *y, TBOOLEAN update)
 		if (R_AXIS.autoscale & AUTOSCALE_MAX)	{
 		    if ((R_AXIS.max_constraint & CONSTRAINT_UPPER)
 		    &&  (R_AXIS.max_ub < r))
-			    R_AXIS.max = R_AXIS.max_ub;
+			R_AXIS.max = R_AXIS.max_ub;
 		    else
 			R_AXIS.max = r;
 		} else {
@@ -2689,8 +2693,11 @@ polar_to_xy( double theta, double r, double *x, double *y, TBOOLEAN update)
 	AXIS *shadow = R_AXIS.linked_to_primary;
 	if (R_AXIS.log && r <= 0)
 	    r = not_a_number();
-	else
+	else {
 	    r = eval_link_function(shadow, r) - shadow->min;
+	    if (update && (R_AXIS.autoscale & AUTOSCALE_MAX) && r > shadow->max)
+		shadow->max = r;
+	}
     } else if (inverted_raxis) {
 	r = R_AXIS.set_min - r;
     } else if ((R_AXIS.autoscale & AUTOSCALE_MIN)) {
