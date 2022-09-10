@@ -751,7 +751,7 @@ make_tics(struct axis *this_axis, int guide)
 	    axis_name(this_axis->index));
 	/* FIXME: this used to be int_error but there were false positives
 	 * (bad range on unused axis).  However letting +/-VERYLARGE through
-	 * can overrun data structures for time conversions. Zero avoids this.
+	 * can overrun data structures for time conversions. min = max avoids this.
 	 */
 	this_axis->min = this_axis->max = 0;
     }
@@ -2791,7 +2791,7 @@ polar_to_xy( double theta, double r, double *x, double *y, TBOOLEAN update)
 		if (R_AXIS.autoscale & AUTOSCALE_MAX)	{
 		    if ((R_AXIS.max_constraint & CONSTRAINT_UPPER)
 		    &&  (R_AXIS.max_ub < r))
-			    R_AXIS.max = R_AXIS.max_ub;
+			R_AXIS.max = R_AXIS.max_ub;
 		    else
 			R_AXIS.max = r;
 		} else {
@@ -2805,8 +2805,11 @@ polar_to_xy( double theta, double r, double *x, double *y, TBOOLEAN update)
 	AXIS *shadow = R_AXIS.linked_to_primary;
 	if (R_AXIS.log && r <= 0)
 	    r = not_a_number();
-	else
+	else {
 	    r = eval_link_function(shadow, r) - shadow->min;
+	    if (update && (R_AXIS.autoscale & AUTOSCALE_MAX) && r > shadow->max)
+		shadow->max = r;
+	}
     } else if (inverted_raxis) {
 	r = R_AXIS.set_min - r;
     } else if ((R_AXIS.autoscale & AUTOSCALE_MIN)) {
