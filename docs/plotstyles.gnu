@@ -1061,6 +1061,27 @@ if (!strstrt(GPVAL_COMPILE_OPTIONS, "+WATCHPOINTS")) {
 }
 reset
 
+# Polar grid support might not be present
+#
+set output out.'figure_polar_grid' . ext
+
+if (!strstrt(GPVAL_COMPILE_OPTIONS, "+POLARGRID")) {
+    clear
+} else {
+      set size square
+      set angle degrees
+      unset border; unset tics; unset key
+      unset colorbox
+      set rrange [0:200]
+      set rtics 50,50,200
+      set grid polar front lt -1 lw 0.2 lc "gray50"
+      set palette cubehelix negative gamma 0.8
+      set polar grid gauss kdensity scale 35
+      set polar grid theta [0:190]
+      plot 'silver.dat' with surface, '' with points pt 7 lc "black" ps 0.5
+}
+reset
+
 #
 # Extra width figures for some output formats
 #
@@ -1073,8 +1094,6 @@ if (GNUTERM eq "svg") {
 set output out . 'figure_colornames'. ext
 load 'colornames.dem'
 reset
-
-
 
 # close last file
 unset output

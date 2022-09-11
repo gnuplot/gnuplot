@@ -252,6 +252,16 @@ C
 ## of the Voigt profile. See `VP`, `VP_fwhm`.
 #end
 
+3 New plot style
+?new style
+#start
+#b The plot style `with surface` works in 2D polar coordinates to produce
+## a solid-fill gridded representation of the plane, colored by a weighted
+## contribution an arbitrary set of input points. This is analagous to
+## the use of `dgrid3d` and style `with pm3d` to produce a 3D gridded surface.
+## See `set polar grid` and `polar heatmap`.
+#end
+
 3 Hulls, masks, and smoothing
 ?new hulls
 #start
@@ -5674,12 +5684,13 @@ Ffigure_newhist
 ?image
 ?rgbimage
 ?rgbalpha
-?heatmap
+?heatmaps
  The `image`, `rgbimage`, and `rgbalpha` plotting styles all project a
  uniformly sampled grid of data values onto a plane in either 2D or 3D.
  The input data may be an actual bitmapped image, perhaps converted from a
  standard format such as PNG, or a simple array of numerical values.
  These plot styles are often used to produce heatmaps.
+ For 2D heatmaps in polar coordinates, see `set polar grid`.
 
 Ffigure_heatmap
  This figure illustrates generation of a heat map from an array of scalar values.
@@ -5755,7 +5766,7 @@ Ffigure_scaled_image
 ?with image pixels
 ?image pixels
 ?pixels
-=heatmap
+=heatmaps
  Some terminals use device- or library-specific optimizations to render image
  data within a rectangular 2D area. This sometimes produces undesirable output,
  e.g. inter-pixel smoothing, bad clipping or missing edges. An example of this
@@ -5983,6 +5994,20 @@ Ffigure_polar
  Many, but not all, of the 2D plotting styles work in polar mode.
  The figure shows a combination of plot styles `lines` and `filledcurves`.
  See `set polar`, `set rrange`, `set size square`, `set theta`, `set ttics`.
+
+?polar heatmap
+ Polar heatmaps can be generated using plot style `with surface` together with
+ `set polar grid`.
+Ffigure_polar_grid
+      set size square
+      set angle degrees
+      set rtics
+      set grid polar
+      set palette cubehelix negative gamma 0.8
+      set polar grid gauss kdensity scale 35
+      set polar grid theta [0:190]
+      plot DATA with surface, DATA with points pt 7
+ 
 #TeX \newpage
 2 points
 ?plotting styles points
@@ -6079,6 +6104,17 @@ Ffigure_polygons
       set pm3d border lc "black" lw 1.5
       splot 'icosahedron.dat' with polygons \
             fs transparent solid 0.8 fc bgnd
+
+2 rgbalpha
+?plotting styles rgbalpha
+?style rgbalpha
+?with rgbalpha
+ See `image`.
+2 rgbimage
+?plotting styles rgbimage
+?style rgbimage
+?with rgbimage
+ See `image`.
 2 spiderplot
 ?plotting styles spiderplot
 ?with spiderplot
@@ -6127,7 +6163,6 @@ Ffigure_spiderplot
       # Two polygons with 5 vertices
       plot for [i=1:5] 'A' using i, newspiderplot, for [j=1:5] 'B' using j
 
-#TeX \newpage
 2 steps
 ?plotting styles steps
 ?style steps
@@ -6146,16 +6181,24 @@ Ffigure_steps
  steps demo.
 ^ </a>
 
-2 rgbalpha
-?plotting styles rgbalpha
-?style rgbalpha
-?with rgbalpha
- See `image`.
-2 rgbimage
-?plotting styles rgbimage
-?style rgbimage
-?with rgbimage
- See `image`.
+2 surface
+?plotting styles surface
+?style surface
+?with surface
+ The plot style `with surface` has two uses.
+
+ In 3D plots, `with surface` always produces a surface.
+ If a 3D data set is recognizable as a mesh (grid) then by default the program
+ implicitly treats the plot style `with lines` as requesting a gridded surface,
+ making `with lines` a synonym for `with surface`.  However the command
+ `set surface explicit` suppresses this treatment, in which case `with surface`
+ and `with lines` become distinct styles that may be used in the same plot.
+
+ In 2D polar mode plots, `with surface` is used to produce a solid fill gridded
+ represention of the data. Generation of the surface is controlled using the
+ command `set polar grid`.
+
+#TeX \newpage
 2 vectors
 ?plotting styles vectors
 ?style vectors
@@ -6256,7 +6299,6 @@ Ffigure_xerrorlines
 
  An additional input column (4th or 5th) may be used to provide variable color.
 
-#TeX \newpage
 2 xyerrorlines
 ?plotting styles xyerrorlines
 ?style xyerrorlines
@@ -6284,6 +6326,7 @@ Ffigure_xyerrorlines
  An additional input column (5th or 7th) may be used to provide variable
  (per-datapoint) color information.
 
+#TeX \newpage
 2 yerrorbars
 ?plotting styles yerrorbars
 ?plotting styles errorbars
@@ -6314,7 +6357,6 @@ Ffigure_yerrorbars
  errorbar demo.
 ^ </a>
 
-#TeX \newpage
 2 yerrorlines
 ?plotting styles yerrorlines
 ?plotting styles errorlines
@@ -14726,6 +14768,7 @@ Ffigure_palette2
 
  Syntax:
        set polar
+       set polar grid <grid options>
        unset polar
        show polar
 
@@ -14736,8 +14779,8 @@ Ffigure_palette2
  The command `unset polar` changes the meaning of the plot back to the default
  rectangular coordinate system.
 
- The `set polar` command is not supported for `splot`s.  See the `set mapping`
- command for similar functionality for `splot`s.
+ The `set polar` command affects only 2D plotting.
+ See the `set mapping` command for analogous 3D functionality.
 
  While in polar coordinates the meaning of an expression in t is really
  r = f(t), where t is an angle of rotation.  The trange controls the domain
@@ -14773,6 +14816,52 @@ Ffigure_palette2
 ^ <a href="http://www.gnuplot.info/demo/poldat.html">
  polar data plot (poldat.dem).
 ^ </a>
+4 polar grid
+?commands set polar grid
+?set polar grid
+?polar grid
+ Syntax:
+       set polar grid {<theta_segments>, <radial_segments>}
+                      { qnorm {<power>} | gauss | cauchy | exp | box | hann }
+                      { kdensity } { scale <scale> }
+                      {theta [min:max]} {r [min:max]}
+
+ The polar grid settings are used in conjunction with the plot style
+ `with surface` to generate a heat map from a set of polar coordinate points.
+ The surface consists of a grid filling a circle divided into segments formed
+ by discrete ranges on theta and r.
+
+ Each segment is assigned a value derived from the input set of individual
+ scattered points [x,y,z] by applying a filter operation.
+ The default filter is `qnorm 1`, which averages each point's z value weighted
+ by the inverse of the point's distance from the center of that grid segment.
+
+ Alternative filter operations gauss, cauchy, exp, box, and hann are described
+ in more detail elsewhere.  See `dgrid3d`.
+
+ `kdensity`: This keyword tells the program to use the weighted sum of
+ contributions from all points rather than the weighted average.
+
+ `scale`: This scale facter (default 1.0) is applied to all distances prior to
+ using them in the weighting calculation.
+
+ Masking:  All input points are used to calculate grid values.
+ The full gridded surface always spans theta range [0:360] and the radial
+ defined by autoscaling or by a previous `set rrange` command.
+ However the portion of the surface that actually appears in the plot
+ can be restricted to a truncated wedge bounded by lower and upper
+ limits on theta and r.  Theta limits must be given in degrees.
+
+Ffigure_polar_grid
+ For example the following commands will generate a plot which is auto-scaled
+ in size to show all input points.  The contributions of all input points are
+ summed, not averaged (`kdensity`), and only a wedge of the resulting gridded
+ surface is displayed.
+
+      set rrange [0:*]
+      set polar grid qnorm kdensity theta [0:190]
+      plot DATA with surface, DATA with points
+
 3 print
 ?commands set print
 ?commands show print
@@ -16102,8 +16191,10 @@ Ffigure_palette2
  The range of the parametric variable t is useful in three contexts.
  1) In parametric mode `plot` commands it limits the range of sampling
     for both generating functions.  See `set parametric`, `set samples`.
- 2) In polar mode `plot` commands it limits or defines the range of the
-    angular parameter theta. See `polar`.
+ 2) In polar mode `plot` commands it limits or defines the acceptable
+    range of the angular parameter theta during input.  Data points
+    with theta value outside this range are excluded from the plot even
+    if they would otherwise lie inside the plot boundary. See `polar`.
  3) In `plot` or `splot` commands using 1-dimensional sampled data via
     the pseudofile "+".  See `sampling 1D`, `special-filenames`.
 3 ttics
