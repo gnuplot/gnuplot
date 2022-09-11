@@ -330,6 +330,8 @@ C
 ## next line of input, even in the case of fit errors.  On return, FIT_ERROR is
 ## non-zero if an error occurred. This allows scripted recovery from a bad fit.
 ## See `fit error_recovery`.
+#b The `load` and `call` commands can input commands from a datablock as an
+## alternative to reading them from a file.
 #b New syntax  `if ... else if ... else ...`
 #end
 
@@ -6484,6 +6486,7 @@ Ffigure_zerror
 ?call
  The `call` command is identical to the `load` command with one exception:
  the name of the file being loaded may be followed by up to nine parameters.
+ EXPERIMENTAL: Commands can be read from a datablock rather than a file.
 
       call "inputfile" <param-1> <param-2> <param-3> ... <param-9>
 

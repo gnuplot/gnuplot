@@ -84,7 +84,7 @@ prepare_call(int calltype)
     for (argindex = 0; argindex < 9; argindex++)
 	argval[argindex].type = NOTDEFINED;
 
-    if (calltype == 2) {
+    if (calltype == 2 || calltype == 7) {
 	call_argc = 0;
 	while (!END_OF_COMMAND && call_argc < 9) {
 	    call_args[call_argc] = try_to_get_string();
@@ -192,6 +192,7 @@ prepare_call(int calltype)
  * (4) to execute script files given on the command line (acts like "load")
  * (5) to execute a single script file given with -c (acts like "call")
  * (6) "load $datablock"
+ * (7) "call $datablock"
  */
 void
 load_file(FILE *fp, char *name, int calltype)
@@ -205,7 +206,7 @@ load_file(FILE *fp, char *name, int calltype)
     char **datablock_input_line = NULL;
 
     /* Support for "load $datablock" */
-    if (calltype == 6)
+    if (calltype == 6 || calltype == 7)
 	datablock_input_line = get_datablock(name);
 
     if (!fp && !datablock_input_line) {

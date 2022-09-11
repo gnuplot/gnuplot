@@ -154,6 +154,7 @@ static int find_clause(int *, int *);
 static void if_else_command(ifstate if_state);
 static void old_if_command(struct at_type *expr);
 static int report_error(int ierr);
+static void load_or_call_command( TBOOLEAN call );
 
 static int expand_1level_macros(void);
 
@@ -1104,24 +1105,6 @@ iteration_early_exit()
  * Command parser functions
  */
 
-/* process the 'call' command */
-void
-call_command()
-{
-    char *save_file = NULL;
-
-    c_token++;
-    save_file = try_to_get_string();
-
-    if (!save_file)
-	int_error(c_token, "expecting filename");
-    gp_expand_tilde(&save_file);
-
-    /* Argument list follows filename */
-    load_file(loadpath_fopen(save_file, "r"), save_file, 2);
-}
-
-
 /* process the 'cd' command */
 void
 changedir_command()
@@ -1690,17 +1673,30 @@ link_command()
 	rrange_to_xy();
 }
 
-/* process the 'load' command */
 void
 load_command()
 {
+    load_or_call_command( FALSE );
+}
 
+void
+call_command()
+{
+    load_or_call_command( TRUE );
+}
+
+/* The load and call commands are identical except that
+ * call may be followed by a bunch of command line arguments
+ */
+static void
+load_or_call_command( TBOOLEAN call )
+{
     c_token++;
     if (equals(c_token, "$") && isletter(c_token+1) && !equals(c_token+2,"[")) {
 	/* "load" a datablock rather than a file */
 	/* datablock_name will eventually be freed by lf_pop() */
 	char *datablock_name = gp_strdup(parse_datablock_name());
-	load_file(NULL, datablock_name, 6);
+	load_file(NULL, datablock_name, call ? 7 : 6);
     } else {
 	/* These need to be local so that recursion works. */
 	/* They will eventually be freed by lf_pop(). */
@@ -1709,8 +1705,11 @@ load_command()
 	if (!save_file)
 	    int_error(c_token, "expecting filename");
 	gp_expand_tilde(&save_file);
-	fp = strcmp(save_file, "-") ? loadpath_fopen(save_file, "r") : stdout;
-	load_file(fp, save_file, 1);
+	if (!call && !strcmp(save_file, "-"))
+	    fp = stdout;
+	else
+	    fp = loadpath_fopen(save_file, "r");
+	load_file(fp, save_file, call ? 2 : 1);
     }
 }
 
