@@ -278,7 +278,7 @@ place_grid(int layer)
     /* POLAR GRID tickmarks along the perimeter of the outer circle */
     if (THETA_AXIS.ticmode) {
 	term_apply_lp_properties(&border_lp);
-	if (largest_polar_circle <= 0)
+	if (draw_border & 0x1000)
 	    largest_polar_circle = polar_radius(R_AXIS.max);
 	copy_or_invent_formatstring(&THETA_AXIS);
 	gen_tics(&THETA_AXIS, ttick_callback);
@@ -4070,10 +4070,7 @@ plot_border()
 	    /* Full-width circular border is visually too heavy compared to the edges */
 	    polar_border.l_width = polar_border.l_width / 2.;
 	    term_apply_lp_properties(&polar_border);
-
-	    if (largest_polar_circle <= 0)
-		largest_polar_circle = polar_radius(R_AXIS.max);
-	    draw_polar_circle(largest_polar_circle);
+	    draw_polar_circle(polar_radius(R_AXIS.max));
 	    clip_area = clip_save;
 	}
 

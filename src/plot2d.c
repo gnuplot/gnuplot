@@ -1835,21 +1835,26 @@ histogram_range_fiddling(struct curve_points *plot)
  * resulting plot will not be centered at the origin.
  */
 void
-polar_range_fiddling(struct curve_points *plot)
+polar_range_fiddling(struct axis *xaxis, struct axis *yaxis)
 {
     if (axis_array[POLAR_AXIS].set_autoscale & AUTOSCALE_MAX) {
-	double plotmax_x, plotmax_y, plotmax;
-	plotmax_x = GPMAX(axis_array[plot->x_axis].max, -axis_array[plot->x_axis].min);
-	plotmax_y = GPMAX(axis_array[plot->y_axis].max, -axis_array[plot->y_axis].min);
+	double plotmax_x, plotmax_y, plotmax_r, plotmax;
+	plotmax_x = GPMAX(xaxis->max, -xaxis->min);
+	plotmax_y = GPMAX(yaxis->max, -yaxis->min);
 	plotmax = GPMAX(plotmax_x, plotmax_y);
 
-	if ((axis_array[plot->x_axis].set_autoscale & AUTOSCALE_BOTH) == AUTOSCALE_BOTH) {
-	    axis_array[plot->x_axis].max = plotmax;
-	    axis_array[plot->x_axis].min = -plotmax;
+	plotmax_r = (axis_array[POLAR_AXIS].log)
+		  ? axis_array[POLAR_AXIS].linked_to_primary->max
+		  : axis_array[POLAR_AXIS].max;
+	plotmax = GPMAX(plotmax, plotmax_r);
+
+	if ((xaxis->set_autoscale & AUTOSCALE_BOTH) == AUTOSCALE_BOTH) {
+	    xaxis->max = plotmax;
+	    xaxis->min = -plotmax;
 	}
-	if ((axis_array[plot->y_axis].set_autoscale & AUTOSCALE_BOTH) == AUTOSCALE_BOTH) {
-	    axis_array[plot->y_axis].max = plotmax;
-	    axis_array[plot->y_axis].min = -plotmax;
+	if ((yaxis->set_autoscale & AUTOSCALE_BOTH) == AUTOSCALE_BOTH) {
+	    yaxis->max = plotmax;
+	    yaxis->min = -plotmax;
 	}
     }
 }
@@ -3141,8 +3146,9 @@ eval_plots()
 		    boxplot_range_fiddling(this_plot);
 		if (this_plot->plot_style == IMPULSES)
 		    impulse_range_fiddling(this_plot);
+		/* FIXME: not sure this is necessary.  Only for x2 or y2 axes? */
 		if (polar)
-		    polar_range_fiddling(this_plot);
+		    polar_range_fiddling(&axis_array[this_plot->x_axis], &axis_array[this_plot->y_axis]);
 
 		/* sort */
 		switch (this_plot->plot_smooth) {
@@ -3640,7 +3646,7 @@ eval_plots()
 
 	/* This is the earliest that polar autoscaling can be done for function plots */
 	if (polar) {
-	    polar_range_fiddling(first_plot);
+	    polar_range_fiddling(&axis_array[first_plot->x_axis], &axis_array[first_plot->y_axis]);
 	}
 
     }   /* some_functions */

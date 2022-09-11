@@ -34,6 +34,9 @@
 # define GNUPLOT_PLOT2D_H
 
 #include "syscfg.h"
+#include "axis.h"
+#include "gp_types.h"
+#include "gadgets.h"
 
 /* This allows a natural interpretation of providing only a single column in 'using' */
 #define default_smooth_weight(option) \
@@ -47,13 +50,12 @@ extern struct curve_points *first_plot;
 
 void plotrequest(void);
 void refresh_bounds(struct curve_points *first_plot, int nplots);
+void polar_range_fiddling(struct axis *xaxis, struct axis *yaxis);
 
 /* internal and external variables */
 void cp_free(struct curve_points *cp);
 void cp_extend(struct curve_points *cp, int num);
 
-#include "gp_types.h"
-#include "gadgets.h"
 struct text_label *store_label(struct text_label *, struct coordinate *,
 				int i, char * string, double colorval);
 void parse_plot_title(struct curve_points *this_plot, 

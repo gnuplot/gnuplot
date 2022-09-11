@@ -35,6 +35,7 @@
 #include "alloc.h"
 #include "axis.h"
 #include "misc.h"
+#include "plot2d.h"
 #include "pm3d.h"	/* for is_plot_with_palette */
 
 #define ERRORBARTIC GPMAX((t->h_tic/2),1)
@@ -632,9 +633,14 @@ boundary(struct curve_points *plots, int count)
 	    R_AXIS.max = axis_array[FIRST_X_AXIS].max;
 	    int_warn(NO_CARET, "resetting rrange");
 	}
-	setup_tics(&axis_array[POLAR_AXIS], 10);
-    }
 
+	setup_tics(&axis_array[POLAR_AXIS], 10);
+
+	/* DEBUG: setup_tics may extend rrange to next tic, in which case the
+	 * previous x/y range limits from polar_range_fiddling are out of date.
+	 */
+	polar_range_fiddling(&axis_array[FIRST_X_AXIS], &axis_array[FIRST_Y_AXIS]);
+    }
 
     /* Modify the bounding box to fit the aspect ratio, if any was given */
     if (aspect_ratio != 0.0) {
