@@ -43,18 +43,6 @@
 
 /* Type definitions */
 
-typedef enum en_dgrid3d_mode {
-    DGRID3D_DEFAULT,
-    DGRID3D_QNORM,
-    DGRID3D_SPLINES,
-    DGRID3D_GAUSS,
-    DGRID3D_EXP,
-    DGRID3D_CAUCHY,
-    DGRID3D_BOX,
-    DGRID3D_HANN,
-    DGRID3D_OTHER
-} t_dgrid3d_mode;
-
 typedef enum en_contour_placement {
     /* Where to place contour maps if at all. */
     CONTOUR_NONE,

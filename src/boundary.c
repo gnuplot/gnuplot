@@ -1310,6 +1310,9 @@ do_key_sample(
 	    }
 	    free(key_ellipse);
 
+	} else if (this_plot->plot_style == SURFACEGRID) {
+	    (*t->fillbox)(style,x,y,w,h);
+
 	} else if (w > 0) {    /* All other plot types with fill */
 	    if (style != FS_EMPTY)
 		(*t->fillbox)(style,x,y,w,h);

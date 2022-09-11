@@ -75,6 +75,22 @@ static void add_tics_boxplot_factors(struct curve_points *plot);
 static void parse_kdensity_options(struct curve_points *this_plot);
 static void parse_hull_options(struct curve_points *this_plot);
 
+#ifdef USE_POLAR_GRID
+    static void grid_polar_data(struct curve_points *this_plot);
+    static double polar_dist( double t_data, double r_data, double t_grid, double r_grid );
+    static void store_polar_point(struct curve_points *, int i, double v[MAXDATACOLS]);
+
+    /* These could be consolidated into a structure */
+    int polar_grid_r_segments = 10;
+    int polar_grid_theta_segments = 24;
+    int polar_grid_norm_q = 1;
+    TBOOLEAN polar_grid_kdensity = FALSE;
+    t_dgrid3d_mode polar_grid_mode = DGRID3D_QNORM;
+    double polar_grid_scale = 1.0;
+    double polar_grid_rmin = 0.0;
+    double polar_grid_rmax = VERYLARGE;
+#endif /* USE_POLAR_GRID */
+
 /* internal and external variables */
 
 /* the curves/surfaces of the plot */
@@ -404,7 +420,8 @@ get_data(struct curve_points *current_plot)
      * Set it to NO_AXIS to account for that. For styles that use
      * the z coordinate as a real coordinate (i.e. not a width or
      * 'delta' component, change the setting inside the switch: */
-    if (current_plot->plot_filter == FILTER_ZSORT) {
+    if ((current_plot->plot_filter == FILTER_ZSORT)
+    ||  (current_plot->plot_style == SURFACEGRID)) {
 	current_plot->z_axis = FIRST_Z_AXIS;
 	axis_init(&axis_array[FIRST_Z_AXIS], TRUE);
     } else
@@ -586,6 +603,11 @@ get_data(struct curve_points *current_plot)
     case TABLESTYLE:
 	min_cols = 1;
 	max_cols = MAXDATACOLS;
+	break;
+
+    case SURFACEGRID:
+	min_cols = 3;
+	max_cols = 3;
 	break;
 
     default:
@@ -1309,9 +1331,21 @@ get_data(struct curve_points *current_plot)
 	    break;
 	}
 
+	case SURFACEGRID:
+	{   /* Avoid calling store2d_point(), which would convert to Cartesian coordinates. */
+	    if (!polar)
+		int_error(NO_CARET, "For non-polar gridded surfaces use splot");
+#ifdef USE_POLAR_GRID
+	    store_polar_point(current_plot, i++, v);
+#else
+	    int_error(NO_CARET,
+		"This copy of gnuplot was built without support for polar surfaces");
+#endif
+	    break;
+	}
+
 	/* These exist for 3D (splot) but not for 2D (plot) */
 	case PM3DSURFACE:
-	case SURFACEGRID:
 	case ZERRORFILL:
 	case ISOSURFACE:
 	    int_error(NO_CARET, "This plot style only available for splot");
@@ -2758,9 +2792,6 @@ eval_plots()
 			    this_plot->fill_properties = default_fillstyle;
 			this_plot->fill_properties.fillpattern = pattern_num;
 			parse_fillstyle(&this_plot->fill_properties);
-			if (this_plot->plot_style == FILLEDCURVES
-			&& this_plot->fill_properties.fillstyle == FS_EMPTY)
-			    this_plot->fill_properties.fillstyle = FS_SOLID;
 			set_fillstyle = TRUE;
 		    }
 		    if (equals(c_token,"fc") || almost_equals(c_token,"fillc$olor")) {
@@ -2884,6 +2915,7 @@ eval_plots()
 		case CIRCLES:
 		case YERRORBARS:
 		case YERRORLINES:
+		case SURFACEGRID:
 				break;
 		default:
 				int_error(NO_CARET, 
@@ -2904,8 +2936,11 @@ eval_plots()
 		  ||(this_plot->fill_properties.fillstyle == FS_TRANSPARENT_PATTERN))
 		    pattern_num = this_plot->fill_properties.fillpattern + 1;
 		if (this_plot->plot_style == FILLEDCURVES
-		&& this_plot->fill_properties.fillstyle == FS_EMPTY)
-		    this_plot->fill_properties.fillstyle = FS_SOLID;
+		||  this_plot->plot_style == SURFACEGRID)
+		    if (this_plot->fill_properties.fillstyle == FS_EMPTY) {
+			this_plot->fill_properties.fillstyle = FS_SOLID;
+			this_plot->fill_properties.filldensity = 100;
+		}
 	    }
 
 	    this_plot->x_axis = x_axis;
@@ -3024,8 +3059,13 @@ eval_plots()
 	    }
 
 	    /* Styles that use palette */
+	    if (this_plot->plot_style == SURFACEGRID) {
+		/* Used for the key sample, if nothing else */
+		t_colorspec mid_palette = {TC_FRAC, 0, 0.5};
+		this_plot->lp_properties.pm3d_color = mid_palette;
+	    }
 
-	    /* we can now do some checks that we deferred earlier */
+	    /* We can now do some checks that we deferred earlier */
 
 	    if (this_plot->plot_type == DATA) {
 		if (specs < 0) {
@@ -3125,6 +3165,11 @@ eval_plots()
 		    zsort_points(this_plot);
 		    zrange_points(this_plot);
 		}
+#ifdef USE_POLAR_GRID
+		if (this_plot->plot_style == SURFACEGRID) {
+		    grid_polar_data(this_plot);
+		}
+#endif
 
 		/* Restore auto-scaling prior to smoothing operation */
 		switch (this_plot->plot_smooth) {
@@ -4115,3 +4160,197 @@ reevaluate_plot_title(struct curve_points *this_plot)
     }
 }
 
+#ifdef USE_POLAR_GRID
+
+/*
+ * Alternative to store2d_point(), which would convert to Cartesian coordinates.
+ * Store theta in radians, r in user coordinates.
+ */
+static void
+store_polar_point(struct curve_points *current_plot, int i, double v[MAXDATACOLS])
+{
+    AXIS *r_axis = &axis_array[POLAR_AXIS];
+    coordval theta = v[0] * ang2rad;
+    coordval r = v[1];
+    current_plot->points[i].type = INRANGE;
+
+    /* Wrap theta to lie in [0:2pi].  Autoscale r */
+    if (theta < -630)
+	current_plot->points[i].type = OUTRANGE;
+    else
+	while (theta < 0) theta += 2*M_PI;
+    if (theta > 630)
+	current_plot->points[i].type = OUTRANGE;
+    else
+	while (theta > 2*M_PI) theta -= 2*M_PI;
+    if ((r_axis->set_autoscale & AUTOSCALE_MAX) && (r > r_axis->max))
+	r_axis->max = r;
+
+    current_plot->points[i].x = theta;
+    current_plot->points[i].y = r;
+    current_plot->points[i].z = v[2];
+}
+
+/*
+ * Replace original points with a polar grid.
+ * This code is modeled on the dgrid3d mode grid_nongrid_data().
+ */
+static void
+grid_polar_data(struct curve_points *this_plot)
+{
+    int i, j, k;
+    double t, r, z, w, dt, dr;
+    double tmin, tmax, rmin, rmax;
+    double zmin, zmax;
+    double dist;
+    AXIS *r_axis = &axis_array[POLAR_AXIS];
+    struct coordinate *old_points = this_plot->points;
+    struct coordinate *opoint;
+    int old_pcount = this_plot->p_count;
+    struct coordinate *point;
+
+    /* nothing to grid */
+    if (this_plot->p_count == 0)
+	return;
+
+    /* These limits are for the grid, not the data.
+     * All data points contribute to the grid values.
+     * Note that the grid theta is in degrees.
+     * The grid always uses rrange [0:rmax] and trange [0:360].
+     * The grid can be clipped to range later.
+     */
+    tmin = 0.0;
+    tmax = 360.0;
+    rmin = 0.0;
+    if (r_axis->log)
+	rmin = r_axis->set_min;
+    rmax = r_axis->max;
+
+    /* Extend the top segment a little beyond the last data point */
+    if (r_axis->set_autoscale & AUTOSCALE_MAX) {
+	dr = (rmax - rmin) / polar_grid_r_segments;
+	rmax += dr/4;
+	r_axis->max = rmax;
+    }
+
+    dr = (rmax - rmin) / polar_grid_r_segments;
+    dt = (tmax - tmin) / polar_grid_theta_segments;
+
+    /* Create the new grid structure and fill in grid point values
+     * derived from the original data point values.
+     */
+    this_plot->p_count = polar_grid_theta_segments * polar_grid_r_segments;
+    this_plot->points = gp_alloc( sizeof(coordinate) * this_plot->p_count, "polar grid");
+    point = this_plot->points;
+
+    for (i = 0, r = rmin; i < polar_grid_r_segments; i++, r += dr) {
+	for (j = 0, t = tmin; j < polar_grid_theta_segments; j++, t+=dt, point++) {
+	    opoint = old_points;
+	    z = w = 0.0;
+
+	    for (k = 0; k < old_pcount; k++, opoint++) {
+
+		if (opoint->type == UNDEFINED)
+		    continue;
+
+		/* Distance from data point to center of polar grid section */
+		dist=polar_dist(opoint->x, opoint->y, t + dt/2., r + dr/2.);
+
+		if (polar_grid_mode == DGRID3D_QNORM) {
+		    int q = polar_grid_norm_q;
+		    if (q == 2)
+			dist = dist*dist;
+		    if (q > 2)
+			dist = pow(dist,q);
+		    if (dist == 0.0) {
+			point->type = UNDEFINED;
+			z = opoint->z;
+			w = 1.0;
+			break;	/* out of loop over oldpoints */
+		    } else {
+			z += opoint->z / dist;
+			w += 1.0/dist;
+		    }
+
+		} else { /* not qnorm */
+		    double weight = 0.0;
+		    dist /= polar_grid_scale;
+
+		    if (polar_grid_mode == DGRID3D_GAUSS) {
+			weight = exp( -dist*dist );
+		    } else if (polar_grid_mode == DGRID3D_CAUCHY) {
+			weight = 1.0/(1.0 + dist*dist );
+		    } else if (polar_grid_mode == DGRID3D_EXP) {
+			weight = exp( -dist );
+		    } else if (polar_grid_mode == DGRID3D_BOX) {
+			weight = (dist<1.0) ? 1.0 : 0.0;
+		    } else if (polar_grid_mode == DGRID3D_HANN) {
+			if (dist < 1.0)
+			    weight = 0.5*(1+cos(M_PI*dist));
+		    } else
+			int_error(NO_CARET, "This gridding mode not supported in polar plots");
+		    z += opoint->z * weight;
+		    w += weight;
+		}
+	    }
+
+	    if (!polar_grid_kdensity) {
+		z = z / w;
+	    }
+
+	    /* We have looped over all contributing points.
+	     * Fill in the bounding region and value for this polar pixel.
+	     * Every pixel is marked INRANGE; clipping can be done later.
+	     */
+	    point->type = INRANGE;
+	    point->x = t;
+	    point->y = r;
+            point->xlow  = t;
+	    point->ylow  = r;
+            point->xhigh = t + dt;
+	    point->yhigh = r + dr;
+	    point->z = z;
+	}
+    }
+
+    /* Delete the original points */
+    free(old_points);
+
+    /* Autoscale z of gridded data */
+    zmin = VERYLARGE;
+    zmax = -VERYLARGE;
+    point = this_plot->points;
+    for (i = 0;  i < this_plot->p_count; i++, point++) {
+	if (zmin > point->z)
+	    zmin = point->z;
+	if (zmax < point->z)
+	    zmax = point->z;
+    }
+    autoscale_one_point((&axis_array[FIRST_Z_AXIS]), zmin);
+    autoscale_one_point((&axis_array[FIRST_Z_AXIS]), zmax);
+    autoscale_one_point((&axis_array[COLOR_AXIS]), zmin);
+    autoscale_one_point((&axis_array[COLOR_AXIS]), zmax);
+}
+
+static double
+polar_dist( double t_data, double r_data, double t_grid, double r_grid )
+{
+    double del_theta;
+    double dist;
+
+    /* Grid theta is always in degrees.
+     * Data is always in radians.  Assume it has been collapsed back into [0:2pi].
+     */
+    t_grid *= DEG2RAD;
+
+    del_theta = fabs(t_grid - t_data);
+    if (del_theta > M_PI)
+	del_theta = 2*M_PI - del_theta;
+
+    dist = sqrt(  (r_grid - r_data*cos(del_theta)) * (r_grid - r_data*cos(del_theta))
+		+ (r_data*sin(del_theta) * r_data*sin(del_theta)) );
+
+    return dist;
+}
+
+#endif /* USE_POLAR_GRID */

@@ -119,6 +119,7 @@ static void place_grid(int layer);
 static void place_raxis(void);
 static void place_parallel_axes(struct curve_points *plots, int layer);
 static void place_spiderplot_axes(struct curve_points *plots, int layer);
+static void plot_polar_grid(struct curve_points *plot);
 
 static void plot_steps(struct curve_points * plot);	/* JG */
 static void plot_fsteps(struct curve_points * plot);	/* HOE */
@@ -983,8 +984,11 @@ do_plot(struct curve_points *plots, int pcount)
 		plot_boxplot(this_plot, FALSE);
 		break;
 
-	    case PM3DSURFACE:
 	    case SURFACEGRID:
+		plot_polar_grid(this_plot);
+		break;
+
+	    case PM3DSURFACE:
 		int_warn(NO_CARET, "Can't use pm3d or surface for 2d plots");
 		break;
 
@@ -5524,3 +5528,77 @@ spidertick_callback(struct axis *axis, double place, char *text, int ticlevel,
 	    term_apply_lp_properties(&border_lp);
     }
 }
+
+
+#ifdef USE_POLAR_GRID
+/*
+ * Draw the polar grid elements that are within the requested
+ * range on theta and r.
+ * In this initial implementation each grid element is a quadrangle.
+ * If each wedge spans a large theta range (>10°? 5°?) it might be
+ * nice to subdivide into smaller wedges or expand the number of
+ * vertices along the top and bottom edges to make it smoother.
+ */
+static void
+plot_polar_grid(struct curve_points *plot)
+{
+    gpiPoint quad[4];	/* initial version uses only 4 vertices */
+    struct coordinate *p;
+    double x, y;
+    double tmin, tmax, rmin, rmax;
+    int fillstyle = style_from_fill(&plot->fill_properties);
+
+    /* Theta clipping limits */
+    tmin = THETA_AXIS.min;
+    tmax = THETA_AXIS.max;
+    if ((tmax - tmin) >= 360.) {
+	tmin = 0.;
+	tmax = 360.;
+    }
+
+    /* Radial clipping limits */
+    rmin = GPMAX(R_AXIS.min, polar_grid_rmin);
+    rmax = GPMIN(R_AXIS.max, polar_grid_rmax);
+
+    /* Initialize wedge polygon vertices */
+    memset(quad, 0, 4*sizeof(gpiPoint));
+    quad[0].style = fillstyle;
+
+    for (int i=0; i < plot->p_count; i++) {
+	p = &plot->points[i];
+
+	/* Clip segment on r */
+	if (p->yhigh < rmin || p->ylow > rmax)
+	    continue;
+	if (p->ylow < rmin)
+	    p->ylow = rmin;
+	if (p->yhigh > rmax)
+	    p->yhigh = rmax;
+
+	/* Clip segment on theta */
+	if (in_theta_wedge(p->xlow, tmin, tmax)) {
+	    if (!in_theta_wedge(p->xhigh, tmin, tmax))
+		p->xhigh = tmax;
+	} else if (in_theta_wedge(p->xhigh, tmin, tmax)) {
+	    if (!in_theta_wedge(p->xlow, tmin, tmax))
+		p->xlow = tmin;
+	} else {
+	    continue;
+	}
+
+	polar_to_xy( p->xlow,  p->ylow,  &x, &y, FALSE);
+	quad[0].x = map_x(x); quad[0].y = map_y(y);
+	polar_to_xy( p->xhigh, p->ylow,  &x, &y, FALSE);
+	quad[1].x = map_x(x); quad[1].y = map_y(y);
+	polar_to_xy( p->xhigh, p->yhigh, &x, &y, FALSE);
+	quad[2].x = map_x(x); quad[2].y = map_y(y);
+	polar_to_xy( p->xlow,  p->yhigh, &x, &y, FALSE);
+	quad[3].x = map_x(x); quad[3].y = map_y(y);
+
+	set_color(cb2gray(p->z));
+	term->filled_polygon(4, quad);
+    }
+}
+#else	/* USE_POLAR_GRID */
+static void plot_polar_grid(struct curve_points *plot) {}
+#endif

@@ -126,7 +126,7 @@ static void reset_colorbox(void);
 static void unset_colorbox(void);
 static void unset_pointsize(void);
 static void unset_pointintervalbox(void);
-static void unset_polar(void);
+static void unset_polar(TBOOLEAN grid);
 static void unset_print(void);
 static void unset_psdir(void);
 static void unset_samples(void);
@@ -411,7 +411,13 @@ unset_command()
 	unset_pointsize();
 	break;
     case S_POLAR:
-	unset_polar();
+#ifdef USE_POLAR_GRID
+	if (equals(c_token,"grid")) {
+	    c_token++;
+	    unset_polar(TRUE);
+	} else
+#endif
+	unset_polar(FALSE);
 	break;
     case S_PRINT:
 	unset_print();
@@ -1612,7 +1618,7 @@ unset_pointsize()
 
 /* process 'unset polar' command */
 static void
-unset_polar()
+unset_polar( TBOOLEAN grid )
 {
     if (polar) {
 	polar = FALSE;
@@ -1644,6 +1650,19 @@ unset_polar()
     THETA_AXIS.miniticscale = 0.5;
     THETA_AXIS.tic_in = TRUE;
     THETA_AXIS.tic_rotate = 0;
+
+#ifdef USE_POLAR_GRID
+    if (grid) {
+	polar_grid_r_segments = 10;
+	polar_grid_theta_segments = 24;
+	polar_grid_mode = DGRID3D_QNORM;
+	polar_grid_kdensity = FALSE;
+	polar_grid_norm_q = 1;
+	polar_grid_scale = 1.0;
+	polar_grid_rmin = 0.0;
+	polar_grid_rmax = VERYLARGE;
+    }
+#endif
 }
 
 
@@ -2060,7 +2079,7 @@ reset_command()
 
     /* 'polar', 'parametric' and 'dummy' are interdependent, so be
      * sure to keep the order intact */
-    unset_polar();
+    unset_polar(TRUE);
     unset_parametric();
     unset_dummy();
 

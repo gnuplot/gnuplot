@@ -2842,7 +2842,7 @@ set_logscale()
 		axis_array[axis].set_min = 0.1;
 
 	    /* Also forgive negative axis limits if we are currently autoscaling */
-	    if ((axis_array[axis].set_autoscale != AUTOSCALE_NONE)
+	    if (((axis_array[axis].set_autoscale && AUTOSCALE_BOTH) != AUTOSCALE_NONE)
 	    &&  (axis_array[axis].set_min <= 0 || axis_array[axis].set_max <= 0)) {
 		axis_array[axis].set_min = 0.1;
 		axis_array[axis].set_max = 10.;
@@ -3790,13 +3790,105 @@ set_pointsize()
 static void
 set_polar()
 {
+    TBOOLEAN was_already_polar = polar;
     c_token++;
-
-    if (polar)
-	return;
 
     polar = TRUE;
     raxis = TRUE;
+
+#ifdef USE_POLAR_GRID
+    /* set polar grid {<theta_segments>, <radial_segments>}
+     *                { qnorm {<power>} | gauss | cauchy | exp | box | hann }
+     *                { kdensity } { scale <scale> }
+     *                {theta [min:max]} {r [min:max]}
+     */
+    if (equals(c_token, "grid")) {
+	int val;
+	t_dgrid3d_mode scheme;
+	c_token++;
+	if (might_be_numeric(c_token)) {
+	    val = int_expression();
+	    if (val > 5 && val < 1000)
+		polar_grid_theta_segments = val;
+	    if (equals(c_token, ",")) {
+		c_token++;
+		val = int_expression();
+		if (val > 1 && val < 101)
+		    polar_grid_r_segments = val;
+	    }
+	}
+
+	while (!END_OF_COMMAND) {
+
+	    scheme = lookup_table(&dgrid3d_mode_tbl[0],c_token);
+	    if (scheme != DGRID3D_OTHER) {
+		switch (scheme) {
+		case DGRID3D_QNORM:
+					c_token++;
+					polar_grid_mode = scheme;
+					val = 1;
+					if (might_be_numeric(c_token))
+					    val = int_expression();
+					if (val > 0 && val < 25)
+					    polar_grid_norm_q = val;
+					break;
+		case DGRID3D_GAUSS:
+		case DGRID3D_CAUCHY:
+		case DGRID3D_EXP:
+		case DGRID3D_BOX:
+					c_token++;
+					polar_grid_mode = scheme;
+					break;
+		case DGRID3D_HANN:
+		case DGRID3D_SPLINES:
+		default:
+					int_warn(c_token, "unsupported weighting scheme");
+					break;
+		}
+		if (equals(c_token,"kdensity")) {
+		    polar_grid_kdensity = TRUE;
+		    c_token++;
+		} else
+		    polar_grid_kdensity = FALSE;
+		continue;
+	    }
+
+	    if (equals(c_token,"scale")) {
+		c_token++;
+		polar_grid_scale = real_expression();
+		if (polar_grid_scale <= 0)
+		    polar_grid_scale = 1.0;
+		continue;
+	    }
+
+	    if (equals(c_token,"theta")) {
+		int start_token = ++c_token;
+		if (!equals(c_token++,"["))
+		    int_error(start_token, "expecting [ theta_min : theta_max ]");
+		THETA_AXIS.min = parse_one_range_limit( 0.0 );
+		THETA_AXIS.max = parse_one_range_limit( 360. );
+		if (THETA_AXIS.max < 0)
+		    THETA_AXIS.max += 360;
+		continue;
+	    }
+
+	    if (equals(c_token,"r")) {
+		int start_token = ++c_token;
+		if (!equals(c_token++,"["))
+		    int_error(start_token, "expecting [ radius_min : radius_max ]");
+		polar_grid_rmin = parse_one_range_limit( 0.0 );
+		polar_grid_rmax = parse_one_range_limit( VERYLARGE );
+		continue;
+	    }
+
+	    int_error(c_token, "Unexpected token");
+
+	} /* while (!END_OF_COMMAND) */
+    }
+#endif /* USE_POLAR_GRID */
+
+    if (was_already_polar)
+	return;
 
     if (!parametric) {
 	if (interactive)
@@ -3809,7 +3901,7 @@ set_polar()
 	/* 360 if degrees, 2pi if radians */
 	axis_array[T_AXIS].set_max = 2 * M_PI / ang2rad;
     }
-    if (axis_array[POLAR_AXIS].set_autoscale != AUTOSCALE_BOTH)
+    if ((axis_array[POLAR_AXIS].set_autoscale & AUTOSCALE_BOTH) != AUTOSCALE_BOTH)
 	rrange_to_xy();
 }
 

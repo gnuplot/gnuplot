@@ -569,12 +569,31 @@ save_set_all(FILE *fp)
 set pointsize %g\n\
 set pointintervalbox %g\n\
 set encoding %s\n\
-%sset polar\n\
 %sset parametric\n",
 	    pointsize, pointintervalbox,
 	    encoding_names[encoding],
-	    (polar) ? "" : "un",
 	    (parametric) ? "" : "un");
+
+    if (polar) {
+	fprintf(fp, "set polar\n");
+#ifdef USE_POLAR_GRID
+	fprintf(fp, "set polar grid %d, %d %s ",
+		polar_grid_theta_segments, polar_grid_r_segments,
+		reverse_table_lookup(dgrid3d_mode_tbl, polar_grid_mode));
+	if (polar_grid_mode == DGRID3D_QNORM)
+	    fprintf(fp, "%d  ", polar_grid_norm_q);
+	else
+	    fprintf(fp, "%s scale %g  ",
+		polar_grid_kdensity ? "kdensity" : "", polar_grid_scale);
+	fprintf(fp, "theta [%g:%g]  ", THETA_AXIS.min, THETA_AXIS.max);
+	if (polar_grid_rmax < VERYLARGE)
+	    fprintf(fp, "r [%g:%g]\n", polar_grid_rmin, polar_grid_rmax);
+	else
+	    fprintf(fp, "r [%g:*]\n", polar_grid_rmin);
+#endif
+    } else {
+	fprintf(fp, "unset polar\n");
+    }
 
     if (spiderplot) {
 	fprintf(fp, "set spiderplot\n");

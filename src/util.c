@@ -1610,3 +1610,26 @@ texify_title(char *str, int plot_type)
 
     return latex_title;
 }
+
+#ifdef USE_POLAR_GRID
+
+/* This is equivalent to inrange(z, zmin, zmax) except that it
+ * handles comparison of angles in degrees against a range of
+ * theta values [tmin:tmax] for which the range either spans 0
+ * (tmin < 0) or 360 (tmax > 360).
+ */
+TBOOLEAN
+in_theta_wedge( double t, double tmin, double tmax )
+{
+    if (tmax - tmin >= 360)
+	return TRUE;
+    if (tmin >=0 && tmax <= 360)
+	return (tmin <= t && t <= tmax);
+    if ((tmin < 0) && ((t < tmax) || (t > tmin+360)))
+	return TRUE;
+    if ((tmax > 360) && ((t > tmin) || (t < tmax-360)))
+	return TRUE;
+    return FALSE;
+}
+
+#endif /* USE_POLAR_GRID */

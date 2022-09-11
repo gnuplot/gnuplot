@@ -141,4 +141,6 @@ char *texify_title(char *title, int plot_type);
 /* #define ALLOWED_8BITVAR(c) FALSE */
 #define ALLOWED_8BITVAR(c) ((c)&0x80)
 
+TBOOLEAN in_theta_wedge( double t, double tlow, double thigh );
+
 #endif /* GNUPLOT_UTIL_H */

@@ -484,6 +484,7 @@ void save_writeback_all_axes(void);
 int  parse_range(AXIS_INDEX axis);
 void parse_skip_range(void);
 void check_axis_reversed(AXIS_INDEX axis);
+double parse_one_range_limit( double default_value );
 
 /* set widest_tic_label: length of the longest tics label */
 void widest_tic_callback(struct axis *, double place, char *text, int ticlevel,

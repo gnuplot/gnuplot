@@ -330,6 +330,22 @@ typedef struct textbox_style {
 } textbox_style;
 #define DEFAULT_TEXTBOX_STYLE { FALSE, FALSE, 1.0, 1.0, 1.0, BLACK_COLORSPEC, BACKGROUND_COLORSPEC }
 
+/*
+ * Used by dgrid3d in 3D gridding
+ * and polar_grid in 2D polar gridding
+ */
+typedef enum en_dgrid3d_mode {
+    DGRID3D_DEFAULT,
+    DGRID3D_QNORM,
+    DGRID3D_SPLINES,
+    DGRID3D_GAUSS,
+    DGRID3D_EXP,
+    DGRID3D_CAUCHY,
+    DGRID3D_BOX,
+    DGRID3D_HANN,
+    DGRID3D_OTHER
+} t_dgrid3d_mode;
+
 /***********************************************************/
 /* Variables defined by gadgets.c needed by other modules. */
 /***********************************************************/

@@ -670,7 +670,7 @@ show_command()
 	break;
 
     case S_THETA:
-	fprintf(stderr,"Theta increases %s with origin at %s of plot\n",
+	fprintf(stderr,"\tTheta increases %s with origin at %s of plot\n",
 		theta_direction > 0 ? "counterclockwise" : "clockwise",
 		theta_origin == 180 ? "left" : theta_origin ==  90 ? "top" :
 		theta_origin == -90 ? "bottom" : "right");
@@ -1039,6 +1039,11 @@ show_version(FILE *fp)
 #endif
 #ifdef HAVE_EXTERNAL_FUNCTIONS
 		"+EXTERNAL_FUNCTIONS "
+#endif
+#ifdef USE_POLAR_GRID
+		"+POLARGRID "
+#else
+		"-POLARGRID "
 #endif
 	    "";
 
@@ -2790,7 +2795,27 @@ static void
 show_polar()
 {
     SHOW_ALL_NL;
-    fprintf(stderr, "\tpolar is %s\n", (polar) ? "ON" : "OFF");
+    fprintf(stderr, "\tpolar mode is %s\n", (polar) ? "ON" : "OFF");
+#ifdef USE_POLAR_GRID
+    if (1) {
+	fprintf(stderr,"\tpolar grid uses %d theta wedges and %d radial segments\n",
+		polar_grid_theta_segments, polar_grid_r_segments);
+	fprintf(stderr,"\tmasked by theta range [%g:%g] radial range [%g:",
+		THETA_AXIS.min, THETA_AXIS.max, polar_grid_rmin);
+	if (polar_grid_rmax < VERYLARGE)
+		fprintf(stderr,"%g]\n",polar_grid_rmax);
+	else
+		fprintf(stderr,"*]\n");
+	fprintf(stderr,"\tpolar gridding scheme %s ",
+		reverse_table_lookup(dgrid3d_mode_tbl, polar_grid_mode));
+	if (polar_grid_mode == DGRID3D_QNORM)
+		fprintf(stderr,"%d\n", polar_grid_norm_q);
+	else
+		fprintf(stderr,"%s scale %g\n",
+			polar_grid_kdensity ? "kdensity" : "", polar_grid_scale);
+    } else
+	fprintf(stderr,"\tno polar gridding\n");
+#endif /* USE_POLAR_GRID */
 }
 
 

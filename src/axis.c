@@ -1123,6 +1123,11 @@ gen_tics(struct axis *this, tic_callback callback)
 
 	reorder_if_necessary(lmin, lmax);
 
+	/* Clipping theta tics (ttics) based on theta range is undesireable */
+	if (this == &THETA_AXIS) {
+	    lmin = 0; lmax = 360;
+	}
+
 	/* {{{  choose start, step and end */
 	switch (def->type) {
 	case TIC_SERIES:
@@ -2807,7 +2812,7 @@ polar_to_xy( double theta, double r, double *x, double *y, TBOOLEAN update)
 	    r = not_a_number();
 	else {
 	    r = eval_link_function(shadow, r) - shadow->min;
-	    if (update && (R_AXIS.autoscale & AUTOSCALE_MAX) && r > shadow->max)
+	    if (update && (R_AXIS.autoscale & AUTOSCALE_MAX) && (r > shadow->max))
 		shadow->max = r;
 	}
     } else if (inverted_raxis) {
@@ -2955,3 +2960,29 @@ autoscale_one_point(struct axis *axis, double x)
 	    axis->max = x;
     }
 }
+
+#ifdef USE_POLAR_GRID
+
+/*
+ * read one of the limiting values in a range of the form:
+ *    [min:max] [*:*] [*:max] [min:*]
+ * advance past following separator
+ */
+double
+parse_one_range_limit( double default_value )
+{
+    double limit = default_value;
+
+    if (equals(c_token, "*"))
+	c_token++;
+    else if (equals(c_token, ":") || equals(c_token, "]"))
+	;
+    else
+	limit = real_expression();
+    c_token++;
+
+    return limit;
+}
+
+#endif /* USE_POLAR_GRID */
+	
