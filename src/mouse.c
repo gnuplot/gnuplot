@@ -761,8 +761,8 @@ apply_zoom(struct t_zoom *z)
 	zoom_now->y2max = axis_array[SECOND_Y_AXIS].set_max;
     }
 
-    /* EAM DEBUG - The autoscale save/restore was too complicated, and
-     * broke refresh. Just save the complete axis state and have done with it.
+    /* The autoscale save/restore was too complicated, and broke refresh.
+     * Just save the complete axis state and have done with it.
      */
     if (zoom_now == zoom_head && z != zoom_head) {
 	axis_array_copy = gp_realloc( axis_array_copy, sizeof(axis_array), "axis_array copy");

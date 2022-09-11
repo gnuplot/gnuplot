@@ -4686,7 +4686,7 @@ process_image(void *plot, t_procimg_action action)
     int i;
     double p_start_corner[2], p_end_corner[2]; /* Points used for computing hyperplane. */
     int K = 0, L = 0;                          /* Dimensions of image grid. K = <scan line length>, L = <number of scan lines>. */
-    unsigned int ncols, nrows;		        /* EAM DEBUG - intended to replace K and L above */
+    unsigned int ncols, nrows;		       /* These are intended to replace K and L above */
     double p_mid_corner[2];                    /* Point representing first corner found, i.e. p(K-1) */
     double delta_x_grid[2] = {0, 0};           /* Spacings between points, two non-orthogonal directions. */
     double delta_y_grid[2] = {0, 0};

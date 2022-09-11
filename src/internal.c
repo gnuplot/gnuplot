@@ -1155,7 +1155,7 @@ f_power(union argument *arg)
 		(void) Ginteger(&result, 1);
 		break;
 	    } else if (b.v.int_val > 0) {
-		/* DEBUG - deal with overflow by empirical check */
+		/* deal with overflow by empirical check */
 		intgr_t tprev, t;
 		intgr_t tmag = labs(a.v.int_val);
 		tprev = t = 1;

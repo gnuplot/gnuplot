@@ -1895,9 +1895,7 @@ df_readascii(double v[], int max)
     if (df_eof)
 	return DF_EOF;
 
-#if (1)
-    /* DEBUG FIXME
-     * Normally 'plot ARRAY ...' wants each array entry as a separate input "line".
+    /* Normally 'plot ARRAY ...' wants each array entry as a separate input "line".
      * However spiderplots want only a single line, not one line per array entry.
      * This code forces the single line but loses the content.
      * Is there a better solution?
@@ -1906,7 +1904,6 @@ df_readascii(double v[], int max)
      */
     if (spiderplot && df_array && df_datum >= 0)
 	return DF_EOF;
-#endif
 
     /*{{{  process line */
     while ((s = df_gets()) != NULL) {
@@ -2414,9 +2411,9 @@ df_readascii(double v[], int max)
 		    } else if ((df_current_plot && df_current_plot->plot_style == POLYGONS
 				&& df_no_use_specs
 				&& column == df_no_cols+1)) {
-			/* DEBUG - the idea here is to forgive a missing color value in
-			 *         polygon vertices after the first one. The test is not
-			 *         quite correct since we don't track the vertex number.
+			/* The idea here is to forgive a missing color value in
+			 * polygon vertices after the first one. The test is not
+			 * quite correct since we don't track the vertex number.
 			 */
 			v[output] = not_a_number();
 		    } else {
@@ -2883,7 +2880,7 @@ f_columnhead(union argument *arg)
 	}
 	parse_1st_row_as_headers = TRUE;
     } else {
-/* DEBUG */ int_error(NO_CARET,"Internal error: df_column[] not initialized\n");
+	int_error(NO_CARET,"Internal error: df_column[] not initialized\n");
     }
 }
 

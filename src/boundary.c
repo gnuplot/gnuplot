@@ -636,8 +636,8 @@ boundary(struct curve_points *plots, int count)
 
 	setup_tics(&axis_array[POLAR_AXIS], 10);
 
-	/* DEBUG: setup_tics may extend rrange to next tic, in which case the
-	 * previous x/y range limits from polar_range_fiddling are out of date.
+	/* If setup_tics extends rrange to next tic then the previous
+	 * x/y range limits from polar_range_fiddling are out of date.
 	 */
 	polar_range_fiddling(&axis_array[FIRST_X_AXIS], &axis_array[FIRST_Y_AXIS]);
     }
