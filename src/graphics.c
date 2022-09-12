@@ -256,7 +256,7 @@ place_grid(int layer)
     }
 
     /* POLAR GRID radial lines */
-    if (polar_grid_angle > 0) {
+    if (theta_grid_angle > 0) {
 	double theta = 0;
 	int ox = map_x(0);
 	int oy = map_y(0);
@@ -264,7 +264,7 @@ place_grid(int layer)
 	term_apply_lp_properties(&grid_lp);
 	if (largest_polar_circle <= 0)
 	    largest_polar_circle = polar_radius(R_AXIS.max);
-	for (theta = 0; theta < 6.29; theta += polar_grid_angle) {
+	for (theta = 0; theta < 6.29; theta += theta_grid_angle) {
 	    int x = map_x(largest_polar_circle * cos(theta));
 	    int y = map_y(largest_polar_circle * sin(theta));
 	    draw_clip_line(ox, oy, x, y);

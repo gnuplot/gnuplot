@@ -426,8 +426,8 @@ save_set_all(FILE *fp)
     if (! some_grid_selected())
 	fputs("unset grid\n", fp);
     else {
-	if (polar_grid_angle) 	/* set angle already output */
-	    fprintf(fp, "set grid polar %f\n", polar_grid_angle / ang2rad);
+	if (theta_grid_angle) 	/* set angle already output */
+	    fprintf(fp, "set grid polar %f\n", theta_grid_angle / ang2rad);
 	else
 	    fputs("set grid nopolar\n", fp);
 

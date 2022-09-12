@@ -1045,7 +1045,7 @@ unset_grid()
 	axis_array[i].gridmajor = FALSE;
 	axis_array[i].gridminor = FALSE;
     }
-    polar_grid_angle = 0;
+    theta_grid_angle = 0;
     grid_vertical_lines = FALSE;
     grid_spiderweb = FALSE;
 }
@@ -2159,7 +2159,7 @@ reset_command()
     unset_grid();
     grid_lp = default_grid_lp;
     mgrid_lp = default_grid_lp;
-    polar_grid_angle = 0;
+    theta_grid_angle = 0;
     grid_layer = LAYER_BEHIND;
     grid_tics_in_front = FALSE;
     for (i=0; i<5; i++)

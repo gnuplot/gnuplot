@@ -1711,7 +1711,7 @@ show_grid()
 
     /* HBB 20010806: new storage method for grid options: */
     fprintf(stderr, "\t%s grid drawn at",
-	    (polar_grid_angle != 0) ? "Polar" : "Rectangular");
+	    (theta_grid_angle != 0) ? "Polar" : "Rectangular");
 #define SHOW_GRID(axis)						\
     if (axis_array[axis].gridmajor)				\
 	fprintf(stderr, " %s", axis_name(axis));	\
@@ -1735,9 +1735,9 @@ show_grid()
     fputc('\n', stderr);
     if (grid_vertical_lines)
 	fprintf(stderr, "\tVertical grid lines in 3D plots\n");
-    if (polar_grid_angle)
+    if (theta_grid_angle)
 	fprintf(stderr, "\tGrid radii drawn every %f %s\n",
-		polar_grid_angle / ang2rad,
+		theta_grid_angle / ang2rad,
 		(ang2rad == 1.0) ? "radians" : "degrees");
     if (grid_spiderweb)
 	fprintf(stderr, "\tGrid shown in spiderplots\n");

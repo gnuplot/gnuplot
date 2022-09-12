@@ -1984,14 +1984,14 @@ set_grid()
 	} else if (almost_equals(c_token,"po$lar")) {
 	    /* Dec 2016 - zero or negative disables radial grid lines */
 	    axis_array[POLAR_AXIS].gridmajor = TRUE;	/* Enable both circles and radii */
-	    polar_grid_angle = 30*DEG2RAD;
+	    theta_grid_angle = 30*DEG2RAD;
 	    c_token++;
 	    if (might_be_numeric(c_token)) {
 		double ang = real_expression();
-		polar_grid_angle = (ang > 2.*M_PI) ? DEG2RAD*ang : ang2rad*ang;
+		theta_grid_angle = (ang > 2.*M_PI) ? DEG2RAD*ang : ang2rad*ang;
 	    }
 	} else if (almost_equals(c_token,"nopo$lar")) {
-	    polar_grid_angle = 0; /* not polar grid */
+	    theta_grid_angle = 0; /* not polar grid */
 	    c_token++;
 	} else if (almost_equals(c_token, "spider$plot")) {
 	    grid_spiderweb = TRUE;
@@ -2029,7 +2029,7 @@ set_grid()
 	/* no axis specified, thus select default grid */
 	if (polar) {
 	    axis_array[POLAR_AXIS].gridmajor = TRUE;
-	    polar_grid_angle = 30.*DEG2RAD;
+	    theta_grid_angle = 30.*DEG2RAD;
 	} else if (spiderplot) {
 	    grid_spiderweb = TRUE;
 	} else {

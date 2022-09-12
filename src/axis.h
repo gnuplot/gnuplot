@@ -364,7 +364,7 @@ extern int tic_text, rotate_tics, tic_hjust, tic_vjust;
 extern struct lp_style_type grid_lp; /* linestyle for major grid lines */
 extern struct lp_style_type mgrid_lp; /* linestyle for minor grid lines */
 
-extern double polar_grid_angle; /* angle step in polar grid in radians */
+extern double theta_grid_angle; /* angle step in polar grid in radians */
 extern double theta_origin;	/* 0 = right side of plot */
 extern double theta_direction;	/* 1 = counterclockwise -1 = clockwise */
 
