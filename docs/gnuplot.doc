@@ -5426,6 +5426,43 @@ Ffigure_histeps
  steps demo.
 ^ </a>
 
+#TeX \newpage
+2 heatmaps
+?heatmaps
+ Several of gnuplot's plot styles can be used to create heat maps. The choice
+ of which style to use is dictated by the type of data.
+
+Ffigure_sparsematrix
+ The pixel-based image styles require a regular rectangular grid of data values;
+ see `with image`.  However it is possible to deal with some missing grid values
+ (see `sparse`) and it is also possible to mask out only a portion of the grid
+ for display (see `masking`).  These pixel-based heat maps all have the property
+ that each pixel in the map corresponds exactly to one original data value.
+ Unless there are a large number of grid element, it is usually a good idea to
+ render each rectangular element separately (`with image pixels`) so that
+ smoothing or lossy compression is not applied to the resulting "image".
+
+Ffigure_mask
+ If the data points do not constitue a regular rectangular grid, they can often
+ be used to fit a gridded surface by interpolation or by splines. Alternatively
+ a point-density function can be mapped onto a gridded plane or smooth surface.
+ See `set dgrid3d`.  The gridded surface can then be plotted as a pm3d surface
+ (see `masking` example). In this case the points on the heat map do not retain
+ a one-to-one correspondance with the input data.  I.e. the validity of the heat
+ map represenation is only as good as the gridded approximation. 
+ The demo collection has examples of generating 2D heatmaps from a set of points
+^ <a href="http://www.gnuplot.info/demo/histogram_colors.html">
+ heatmap_points.dem
+^ </a>
+
+Ffigure_polar_grid
+ If your copy of gnuplot was built with the --enable-polar-grid option,
+ polar coordinate data points can be used to generate a 2D polar heat map in
+ which each "pixel" corresponded to a pre-determined range of theta and r.
+ See `set polar grid` and `with surface`.  This process is exactly analogous
+ to the use of `set dgrid3d` and `with pm3d` except that it operates in
+ 2D polar coordinate space.
+
 2 histograms
 ?style histograms
 ?with histograms
@@ -5684,7 +5721,6 @@ Ffigure_newhist
 ?image
 ?rgbimage
 ?rgbalpha
-?heatmaps
  The `image`, `rgbimage`, and `rgbalpha` plotting styles all project a
  uniformly sampled grid of data values onto a plane in either 2D or 3D.
  The input data may be an actual bitmapped image, perhaps converted from a
@@ -5926,17 +5962,18 @@ Ffigure_mask
     plot $POINTS using 1:2 convexhull
     unset table
 
+    set view map
     set multiplot layout 1,2
     splot $POINTS using 1:2:3 with pm3d, \
           $POINTS using 1:2:(0) nogrid with points
     splot $HULL using 1:2:(0) with mask, \
           $POINTS using 1:2:3 mask with pm3d
     unset multiplot
- The `splot` command for the first panel renders the unmasked surface and the
- set of points, plotted in that order.  The `splot` command for the second panel
- renders the masked surface.  Note that definition of the mask must come first
- (plot style `with mask`), followed by the pm3d surface it applies to
- (plot style `with pm3d` modified by the `mask` keyword).
+ The `splot` command for the first panel renders the unmasked surface created by
+ dgrid3d from the original points and then the points themselves, in that order.
+ The `splot` command for the second panel renders the masked surface.  Note that
+ definition of the mask must come first (plot `with mask`), followed by the pm3d
+ surface it applies to (plot style `with pm3d` modified by the `mask` keyword).
  A more complete version of this example is in the demo collection
 ^ <a href="http://www.gnuplot.info/demo/mask_pm3d.html">
  mask_pm3d.dem
@@ -5947,7 +5984,7 @@ Ffigure_mask
 
  The masking commands are EXPERIMENTAL. Details may change before inclusion
  in a stable release version.
-#TeX \newpage
+
 2 parallelaxes
 Ffigure_parallel
 ?plotting styles parallelaxes
@@ -6008,7 +6045,6 @@ Ffigure_polar_grid
       set polar grid theta [0:190]
       plot DATA with surface, DATA with points pt 7
  
-#TeX \newpage
 2 points
 ?plotting styles points
 ?style points
@@ -6198,7 +6234,6 @@ Ffigure_steps
  represention of the data. Generation of the surface is controlled using the
  command `set polar grid`.
 
-#TeX \newpage
 2 vectors
 ?plotting styles vectors
 ?style vectors
@@ -6237,6 +6272,8 @@ Ffigure_vectors
 
  See also the 2D plot style `with arrows` that is identical to `with vectors`
  except that each arrow is specified using x:y:length:angle.
+
+#TeX \newpage
 2 xerrorbars
 ?plotting styles xerrorbars
 ?style xerrorbars
@@ -6326,7 +6363,6 @@ Ffigure_xyerrorlines
  An additional input column (5th or 7th) may be used to provide variable
  (per-datapoint) color information.
 
-#TeX \newpage
 2 yerrorbars
 ?plotting styles yerrorbars
 ?plotting styles errorbars
@@ -11054,6 +11090,9 @@ Ffigure_missing
 =kdensity
  The `set dgrid3d` command enables and sets parameters for mapping non-grid data
  onto a grid.  See `splot grid_data` for details about the grid data structure.
+ Aside from its use in fitting 3D surfaces, this process can also be used to
+ generate 2D heatmaps, where the 'z' value of each point contributes to a local
+ weighted value.
 
  Syntax:
        set dgrid3d {<rows>} {,{<cols>}} splines
@@ -11124,24 +11163,23 @@ Ffigure_missing
  the sum of these kernels is evaluated at every grid point, and this smooth
  surface is plotted instead of the original data. This is similar in
  principle to what the `smooth kdensity` option does to 1D datasets.
- (See kdensity2d.dem for usage demo)
-
- DEPRECATED (do not use): For backward compatibility with old scripts,
- the command "set dgrid3d <val1>,<vali2>,<vali3>" is interpreted to mean
- "set dgrid3d <val1>, <vale> qnorm <val3>".
+ See kdensity2d.dem and heatmap_points.dem for usage example.
 
  The `dgrid3d` option is a simple scheme which replaces scattered data
  with weighted averages on a regular grid.  More sophisticated approaches
  to this problem exist and should be used to preprocess the data outside
  `gnuplot` if this simple solution is found inadequate.
 
- See also the online
+ See also the online demos for
 ^ <a href="http://www.gnuplot.info/demo/dgrid3d.html">
- dgrid3d demo
+ dgrid3d
+^ </a>
+^ <a href="http://www.gnuplot.info/demo/scatter.html">
+ scatter
 ^ </a>
  and
-^ <a href="http://www.gnuplot.info/demo/scatter.html">
- scatter demo
+^ <a href="http://www.gnuplot.info/demo/heatmap_points.html">
+ heatmap_points
 ^ </a>
 
 3 dummy
