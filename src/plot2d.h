@@ -47,16 +47,19 @@
 extern struct curve_points *first_plot;
 
 #ifdef USE_POLAR_GRID
-    extern int polar_grid_r_segments;
-    extern int polar_grid_theta_segments;
-    extern int polar_grid_norm_q;
-    extern TBOOLEAN polar_grid_kdensity;
-    extern t_dgrid3d_mode polar_grid_mode;
-    extern double polar_grid_scale;
-    extern double polar_grid_rmin;
-    extern double polar_grid_rmax;
+typedef struct pgrid {
+    t_dgrid3d_mode mode;
+    int theta_segments;
+    int r_segments;
+    int norm_q;
+    TBOOLEAN kdensity;
+    double scale;
+    double rmin;
+    double rmax;
+} pgrid;
+extern pgrid polar_grid;
+extern pgrid default_polar_grid;
 #endif
-
 
 /* prototypes from plot2d.c */
 

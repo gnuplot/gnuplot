@@ -2799,20 +2799,20 @@ show_polar()
 #ifdef USE_POLAR_GRID
     if (1) {
 	fprintf(stderr,"\tpolar grid uses %d theta wedges and %d radial segments\n",
-		polar_grid_theta_segments, polar_grid_r_segments);
+		polar_grid.theta_segments, polar_grid.r_segments);
 	fprintf(stderr,"\tmasked by theta range [%g:%g] radial range [%g:",
-		THETA_AXIS.min, THETA_AXIS.max, polar_grid_rmin);
-	if (polar_grid_rmax < VERYLARGE)
-		fprintf(stderr,"%g]\n",polar_grid_rmax);
+		THETA_AXIS.min, THETA_AXIS.max, polar_grid.rmin);
+	if (polar_grid.rmax < VERYLARGE)
+		fprintf(stderr,"%g]\n",polar_grid.rmax);
 	else
 		fprintf(stderr,"*]\n");
 	fprintf(stderr,"\tpolar gridding scheme %s ",
-		reverse_table_lookup(dgrid3d_mode_tbl, polar_grid_mode));
-	if (polar_grid_mode == DGRID3D_QNORM)
-		fprintf(stderr,"%d\n", polar_grid_norm_q);
+		reverse_table_lookup(dgrid3d_mode_tbl, polar_grid.mode));
+	if (polar_grid.mode == DGRID3D_QNORM)
+		fprintf(stderr,"%d\n", polar_grid.norm_q);
 	else
 		fprintf(stderr,"%s scale %g\n",
-			polar_grid_kdensity ? "kdensity" : "", polar_grid_scale);
+			polar_grid.kdensity ? "kdensity" : "", polar_grid.scale);
     } else
 	fprintf(stderr,"\tno polar gridding\n");
 #endif /* USE_POLAR_GRID */

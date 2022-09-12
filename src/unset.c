@@ -1653,14 +1653,7 @@ unset_polar( TBOOLEAN grid )
 
 #ifdef USE_POLAR_GRID
     if (grid) {
-	polar_grid_r_segments = 10;
-	polar_grid_theta_segments = 24;
-	polar_grid_mode = DGRID3D_QNORM;
-	polar_grid_kdensity = FALSE;
-	polar_grid_norm_q = 1;
-	polar_grid_scale = 1.0;
-	polar_grid_rmin = 0.0;
-	polar_grid_rmax = VERYLARGE;
+	polar_grid = default_polar_grid;
     }
 #endif
 }

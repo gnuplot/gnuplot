@@ -5557,8 +5557,8 @@ plot_polar_grid(struct curve_points *plot)
     }
 
     /* Radial clipping limits */
-    rmin = GPMAX(R_AXIS.min, polar_grid_rmin);
-    rmax = GPMIN(R_AXIS.max, polar_grid_rmax);
+    rmin = GPMAX(R_AXIS.min, polar_grid.rmin);
+    rmax = GPMIN(R_AXIS.max, polar_grid.rmax);
 
     /* Initialize wedge polygon vertices */
     memset(quad, 0, 4*sizeof(gpiPoint));

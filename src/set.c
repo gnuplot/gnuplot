@@ -3809,12 +3809,12 @@ set_polar()
 	if (might_be_numeric(c_token)) {
 	    val = int_expression();
 	    if (val > 5 && val < 1000)
-		polar_grid_theta_segments = val;
+		polar_grid.theta_segments = val;
 	    if (equals(c_token, ",")) {
 		c_token++;
 		val = int_expression();
 		if (val > 1 && val < 101)
-		    polar_grid_r_segments = val;
+		    polar_grid.r_segments = val;
 	    }
 	}
 
@@ -3825,19 +3825,19 @@ set_polar()
 		switch (scheme) {
 		case DGRID3D_QNORM:
 					c_token++;
-					polar_grid_mode = scheme;
+					polar_grid.mode = scheme;
 					val = 1;
 					if (might_be_numeric(c_token))
 					    val = int_expression();
 					if (val > 0 && val < 25)
-					    polar_grid_norm_q = val;
+					    polar_grid.norm_q = val;
 					break;
 		case DGRID3D_GAUSS:
 		case DGRID3D_CAUCHY:
 		case DGRID3D_EXP:
 		case DGRID3D_BOX:
 					c_token++;
-					polar_grid_mode = scheme;
+					polar_grid.mode = scheme;
 					break;
 		case DGRID3D_HANN:
 		case DGRID3D_SPLINES:
@@ -3846,18 +3846,18 @@ set_polar()
 					break;
 		}
 		if (equals(c_token,"kdensity")) {
-		    polar_grid_kdensity = TRUE;
+		    polar_grid.kdensity = TRUE;
 		    c_token++;
 		} else
-		    polar_grid_kdensity = FALSE;
+		    polar_grid.kdensity = FALSE;
 		continue;
 	    }
 
 	    if (equals(c_token,"scale")) {
 		c_token++;
-		polar_grid_scale = real_expression();
-		if (polar_grid_scale <= 0)
-		    polar_grid_scale = 1.0;
+		polar_grid.scale = real_expression();
+		if (polar_grid.scale <= 0)
+		    polar_grid.scale = 1.0;
 		continue;
 	    }
 
@@ -3876,8 +3876,8 @@ set_polar()
 		int start_token = ++c_token;
 		if (!equals(c_token++,"["))
 		    int_error(start_token, "expecting [ radius_min : radius_max ]");
-		polar_grid_rmin = parse_one_range_limit( 0.0 );
-		polar_grid_rmax = parse_one_range_limit( VERYLARGE );
+		polar_grid.rmin = parse_one_range_limit( 0.0 );
+		polar_grid.rmax = parse_one_range_limit( VERYLARGE );
 		continue;
 	    }
 

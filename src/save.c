@@ -578,18 +578,18 @@ set encoding %s\n\
 	fprintf(fp, "set polar\n");
 #ifdef USE_POLAR_GRID
 	fprintf(fp, "set polar grid %d, %d %s ",
-		polar_grid_theta_segments, polar_grid_r_segments,
-		reverse_table_lookup(dgrid3d_mode_tbl, polar_grid_mode));
-	if (polar_grid_mode == DGRID3D_QNORM)
-	    fprintf(fp, "%d  ", polar_grid_norm_q);
+		polar_grid.theta_segments, polar_grid.r_segments,
+		reverse_table_lookup(dgrid3d_mode_tbl, polar_grid.mode));
+	if (polar_grid.mode == DGRID3D_QNORM)
+	    fprintf(fp, "%d  ", polar_grid.norm_q);
 	else
 	    fprintf(fp, "%s scale %g  ",
-		polar_grid_kdensity ? "kdensity" : "", polar_grid_scale);
+		polar_grid.kdensity ? "kdensity" : "", polar_grid.scale);
 	fprintf(fp, "theta [%g:%g]  ", THETA_AXIS.min, THETA_AXIS.max);
-	if (polar_grid_rmax < VERYLARGE)
-	    fprintf(fp, "r [%g:%g]\n", polar_grid_rmin, polar_grid_rmax);
+	if (polar_grid.rmax < VERYLARGE)
+	    fprintf(fp, "r [%g:%g]\n", polar_grid.rmin, polar_grid.rmax);
 	else
-	    fprintf(fp, "r [%g:*]\n", polar_grid_rmin);
+	    fprintf(fp, "r [%g:*]\n", polar_grid.rmin);
 #endif
     } else {
 	fprintf(fp, "unset polar\n");

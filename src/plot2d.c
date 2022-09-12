@@ -80,15 +80,17 @@ static void parse_hull_options(struct curve_points *this_plot);
     static double polar_dist( double t_data, double r_data, double t_grid, double r_grid );
     static void store_polar_point(struct curve_points *, int i, double v[MAXDATACOLS]);
 
-    /* These could be consolidated into a structure */
-    int polar_grid_r_segments = 10;
-    int polar_grid_theta_segments = 24;
-    int polar_grid_norm_q = 1;
-    TBOOLEAN polar_grid_kdensity = FALSE;
-    t_dgrid3d_mode polar_grid_mode = DGRID3D_QNORM;
-    double polar_grid_scale = 1.0;
-    double polar_grid_rmin = 0.0;
-    double polar_grid_rmax = VERYLARGE;
+    struct pgrid default_polar_grid = {
+	.mode = DGRID3D_QNORM,
+	.theta_segments = 24,
+	.r_segments = 10,
+	.norm_q = 1,
+	.kdensity = FALSE,
+	.scale = 1.0,
+	.rmin = 0.0,
+	.rmax = VERYLARGE
+    };
+    struct pgrid polar_grid;
 #endif /* USE_POLAR_GRID */
 
 /* internal and external variables */
@@ -4228,23 +4230,23 @@ grid_polar_data(struct curve_points *this_plot)
 
     /* Extend the top segment a little beyond the last data point */
     if (r_axis->set_autoscale & AUTOSCALE_MAX) {
-	dr = (rmax - rmin) / polar_grid_r_segments;
+	dr = (rmax - rmin) / polar_grid.r_segments;
 	rmax += dr/4;
 	r_axis->max = rmax;
     }
 
-    dr = (rmax - rmin) / polar_grid_r_segments;
-    dt = (tmax - tmin) / polar_grid_theta_segments;
+    dr = (rmax - rmin) / polar_grid.r_segments;
+    dt = (tmax - tmin) / polar_grid.theta_segments;
 
     /* Create the new grid structure and fill in grid point values
      * derived from the original data point values.
      */
-    this_plot->p_count = polar_grid_theta_segments * polar_grid_r_segments;
+    this_plot->p_count = polar_grid.theta_segments * polar_grid.r_segments;
     this_plot->points = gp_alloc( sizeof(coordinate) * this_plot->p_count, "polar grid");
     point = this_plot->points;
 
-    for (i = 0, r = rmin; i < polar_grid_r_segments; i++, r += dr) {
-	for (j = 0, t = tmin; j < polar_grid_theta_segments; j++, t+=dt, point++) {
+    for (i = 0, r = rmin; i < polar_grid.r_segments; i++, r += dr) {
+	for (j = 0, t = tmin; j < polar_grid.theta_segments; j++, t+=dt, point++) {
 	    opoint = old_points;
 	    z = w = 0.0;
 
@@ -4256,8 +4258,8 @@ grid_polar_data(struct curve_points *this_plot)
 		/* Distance from data point to center of polar grid section */
 		dist=polar_dist(opoint->x, opoint->y, t + dt/2., r + dr/2.);
 
-		if (polar_grid_mode == DGRID3D_QNORM) {
-		    int q = polar_grid_norm_q;
+		if (polar_grid.mode == DGRID3D_QNORM) {
+		    int q = polar_grid.norm_q;
 		    if (q == 2)
 			dist = dist*dist;
 		    if (q > 2)
@@ -4274,17 +4276,17 @@ grid_polar_data(struct curve_points *this_plot)
 
 		} else { /* not qnorm */
 		    double weight = 0.0;
-		    dist /= polar_grid_scale;
+		    dist /= polar_grid.scale;
 
-		    if (polar_grid_mode == DGRID3D_GAUSS) {
+		    if (polar_grid.mode == DGRID3D_GAUSS) {
 			weight = exp( -dist*dist );
-		    } else if (polar_grid_mode == DGRID3D_CAUCHY) {
+		    } else if (polar_grid.mode == DGRID3D_CAUCHY) {
 			weight = 1.0/(1.0 + dist*dist );
-		    } else if (polar_grid_mode == DGRID3D_EXP) {
+		    } else if (polar_grid.mode == DGRID3D_EXP) {
 			weight = exp( -dist );
-		    } else if (polar_grid_mode == DGRID3D_BOX) {
+		    } else if (polar_grid.mode == DGRID3D_BOX) {
 			weight = (dist<1.0) ? 1.0 : 0.0;
-		    } else if (polar_grid_mode == DGRID3D_HANN) {
+		    } else if (polar_grid.mode == DGRID3D_HANN) {
 			if (dist < 1.0)
 			    weight = 0.5*(1+cos(M_PI*dist));
 		    } else
@@ -4294,7 +4296,7 @@ grid_polar_data(struct curve_points *this_plot)
 		}
 	    }
 
-	    if (!polar_grid_kdensity) {
+	    if (!polar_grid.kdensity) {
 		z = z / w;
 	    }
 
