@@ -2245,6 +2245,7 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 
 		/* Variable color */
 		if (plot->plot_style == BOXES || plot->plot_style == BOXXYERROR
+		    || plot->plot_style == HISTOGRAMS
 		    || plot->plot_style == BOXERROR) {
 		    check_for_variable_color(plot, &plot->varcolor[i]);
 		}
