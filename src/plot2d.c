@@ -2276,9 +2276,10 @@ eval_plots()
 		if (*name_str == '$' && !get_datablock(name_str))
 		    int_error(c_token-1, "cannot plot voxel data");
 
-		if (*tp_ptr)
+		if (*tp_ptr) {
 		    this_plot = *tp_ptr;
-		else {          /* no memory malloc()'d there yet */
+		    cp_extend(this_plot, MIN_CRV_POINTS);
+		} else {
 		    this_plot = cp_alloc(MIN_CRV_POINTS);
 		    *tp_ptr = this_plot;
 		}
@@ -3452,6 +3453,16 @@ eval_plots()
 
 			t_step = (t_max - t_min) / (samples_1 - 1);
 		    }
+
+		    /* If this plot structure was previously used to plot something
+		     * with only a few points, the storage space is not big enough.
+		     */
+		    if (samples_1 > this_plot->p_max) {
+			FPRINTF((stderr,"extending plot with space for %d points to hold %d\n",
+				this_plot->p_max, samples_1+1));
+			cp_extend(this_plot, samples_1 + 1);
+		    }
+
 		    for (i = 0; i < samples_1; i++) {
 			double x, temp;
 			struct value a;
