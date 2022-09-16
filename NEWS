@@ -1,10 +1,15 @@
 Changes in 5.4.5
 ================
+* NEW    data-driven histogram colors (variable color from 2nd using column)
 * CHANGE re-order 3D labels to come after pm3d depthorder surfaces
 * CHANGE hpgl: add terminal option "fontscale <value>"
 * CHANGE for nonuniform matrix data, column(0) returns linear position in matrix
+* CHANGE set pointintervalbox 0 disables drawing the background box Bug #2544
 * FIX    svg: hypertext font handling
 * FIX    track columnheaders of multiple data blocks in a single file Bug #2538
+* FIX    Clean up positioning of polar border, raxis, and theta tics Bug #2130
+* FIX    Autoscaling of logscaled raxis
+* FIX    memory corruption if a small plot structure is recycled Bug #2550
 
 Changes in 5.4.4
 ================
