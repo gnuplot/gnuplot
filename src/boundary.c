@@ -1158,6 +1158,8 @@ find_maxl_keys(struct curve_points *plots, int count, int *kcnt)
 	&&  !this_plot->title_position) {
 	    if (this_plot->plot_style == SPIDERPLOT && this_plot->plot_type != KEYENTRY)
 		; /* Nothing */
+	    if (this_plot->plot_style == HISTOGRAMS && this_plot->histogram->type == HT_STACKED_IN_TOWERS)
+		; /* These titles are placed as xtics rather than in the key */
 	    else {
 		ignore_enhanced(this_plot->title_no_enhanced);
 		len = estimate_strlen(this_plot->title, NULL);
