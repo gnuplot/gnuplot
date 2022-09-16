@@ -2109,12 +2109,14 @@ eval_plots()
 	    newhist_pattern = fs.fillpattern;
 	    if (!equals(c_token,","))
 		int_error(c_token,"syntax error");
+	    was_definition = FALSE;
 
 	} else if (almost_equals(c_token, "newspider$plot")) {
 	    c_token++;
 	    paxis_current = 0;
 	    if (!equals(c_token,","))
 		int_error(c_token,"syntax error (missing comma)");
+	    was_definition = FALSE;
 
 	} else if (is_definition(c_token)) {
 	    define();
