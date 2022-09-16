@@ -1,0 +1,68 @@
+#
+# Show how variable color can be used to histogram categorical data even
+# when the data sources are not completely parallel.  Each data file
+# (datablock in this demo) contains a column with a category identifier
+# and a column with the data value contributing to the histogram.
+# However not all categories are present in each file, so they are not
+# parallel in that the Nth line of two files may or may not belong to
+# the same category.
+# Therefore gnuplot's automatic color assignment would fail.
+# Instead we use the category identifier to assign colors.
+#
+$Set1 << EOD
+A 15
+B 21
+C 12
+D 9
+G 15
+L 12
+EOD
+$Set2 << EOD
+B 14
+C 12
+D 16
+E 8
+G 14
+H 19
+I 20
+EOD
+$Set3 << EOD
+D 13
+E 7
+F 14
+G 11
+H 15
+I 4
+L 11
+EOD
+
+unset border
+set tics nomirror
+unset ytics
+set boxwidth 0.8
+set key lmargin maxcol 1 invert
+set key title "  Category  "
+
+# Set up a range of 12 defined linetype colors
+set for [i=1:8] linetype 100+i lc i	# copy the default 8 colors
+set linetype 109 lc "gray50"		# then add a few more
+set linetype 110 lc "white"
+set linetype 111 lc "orchid"
+set linetype 112 lc "seagreen"
+
+alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+color(category) = 100 + strstrt(alphabet, category)
+
+set style data histogram
+set style histogram columns
+set style fill solid border lc "black"
+
+set title "Column-stacked histogram colored by data category"
+
+plot for [data in "$Set1 $Set2 $Set3"] \
+     data using 2:(color(strcol(1))) lc variable title data, \
+     for [i=1:12] keyentry with boxes lc color(alphabet[i:i]) title alphabet[i:i]
+
+pause -1 "<cr> to continue"
+
+reset

@@ -398,6 +398,7 @@ load "histograms.dem"
 load "histograms2.dem"
 load "histerror.dem"
 load "label_stacked_histograms.dem"
+load "histogram_colors.dem"
 reset
 
 print "********************** file boxclusters.dem *********************"

@@ -406,6 +406,7 @@ C
 #b Change: Text rotation angle is not limited to integral degrees.
 #b Special (non-numerical) linetypes `lt nodraw`, `lt black`, `lt bgnd`
 ## See `special_linetypes`.
+#b Data-driven color assignments in histogram plots. See `histograms colors`.
 #end
 
 3 Features introduced in version 5.4
@@ -5437,7 +5438,8 @@ Ffigure_histeps
  corresponding to the second entry in the respective data columns, and so on.
  The default gap width of 2 indicates that the empty space between clusters is
  equivalent to the width of 2 boxes.  All boxes derived from any one column
- are given the same fill color and/or pattern (see `set style fill`).
+ are given the same fill color and/or pattern; however see the subsection
+ `histograms colors`.
 
  Each cluster of boxes is derived from a single row of the input data file.
  It is common in such input files that the first element of each row is a
@@ -5470,10 +5472,10 @@ Ffigure_histeps
 
  The `columnstacked` style is similar, except that each stack of boxes is
  built up from a single data column. Each data value from the first specified
- column yields a box in the stack at x=1, each data value from the second
- specified column yields a box in the stack at x=2, and so on.  In this style
- the color of each box is taken from the row number, rather than the column
- number, of the corresponding data field.
+ data column yields a box in the stack at x=1, each data value from the second
+ specified data column yields a box in the stack at x=2, and so on.
+ In this style the color of each box is taken from the row number, rather than
+ the column number, of the corresponding data field.
 
  Box widths may be modified using the `set boxwidth` command.
  Box fill styles may be set using the `set style fill` command.
@@ -5613,6 +5615,47 @@ Ffigure_newhist
 
        set style histogram columnstacked
        plot for [i=3:8] "datafile" using i title columnhead
+3 histogram color assignments
+?with histograms colors
+?histograms colors
+ The program assigns a color to each component box in a histogram
+ automatically such that equivalent data values maintain a consistent
+ color wherever they appear in the rows or columns of the histogram.
+ The colors are taken from successive linetypes, starting either with
+ the next unused linetype or an initial linetype provided in a
+ `newhistogram` element.
+
+ In some cases this mechanism fails due to data sources that are not
+ truly parallel (i.e. some files contain incomplete data).  In other
+ cases there may be additional properties of the data that could be
+ visualized by, say, varying the intensity or saturation of their base
+ color.  As an alternative to the automatic color assigmnent, you can
+ provide an explicit color value for each data value in a second `using`
+ column via the `linecolor variable` or `rgb variable` mechanism. 
+ See `colorspec`. Depending on the layout of your data, the color category
+ might correspond to a row header or a column header or a data column.
+ Note that you will probably have to customize the key sample colors
+ to match (see `keyentry`).
+
+ Example: Suppose file_001.dat through file_008.dat contain one column with
+ a category identifier A, B, C, ... and a second column with a data value.
+ Not all of the files contain a line for every category, so they are not
+ truly parallel. The program would be wrong to assign the same color to the
+ value from line N in each file.  Instead we assign a color based on the
+ category in column 1.
+
+      file(i) = sprintf("data_%03d.dat",i)
+      array Category = ["A", "B", "C", "D", "E", "F"]
+      color(c) = index(Category, strcol(c))
+      set style data histogram
+      plot for [i=1:8] file(i) using 2:(color(1)) linecolor variable
+
+ A more complete example including generation of a custom key is in the
+ demo collection
+^ <a href="http://www.gnuplot.info/demo/histogram_colors.html">
+ histogram_colors.dem
+^ </a>
+
 2 image
 ?plotting styles image
 ?style image
@@ -5729,7 +5772,6 @@ Ffigure_impulses
       2 columns:  x  y     # line from [x,0] to [x,y]  (2D)
       3 columns:  x  y  z  # line from [x,y,0] to [x,y,z] (3D)
 
-#TeX \newpage
 2 labels
 ?plotting styles labels
 ?style labels
@@ -5783,7 +5825,6 @@ Ffigure_labels2
 
    plot $Data using 1:2:3:4:5 with labels tc variable rotate variable
 
-#TeX \newpage
 2 lines
 ?plotting styles lines
 ?style lines
