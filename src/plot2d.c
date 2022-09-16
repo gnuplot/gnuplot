@@ -1752,6 +1752,8 @@ histogram_range_fiddling(struct curve_points *plot)
 			    axis_array[plot->y_axis].min = ylow;
 		}
 		break;
+	default:
+		break;
     }
 }
 

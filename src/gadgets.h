@@ -272,8 +272,15 @@ typedef struct {
 } filledcurves_opts;
 #define EMPTY_FILLEDCURVES_OPTS { FILLEDCURVES_DEFAULT, 0.0, 0.0, 0 }
 
+typedef enum histogram_type {
+	HT_NONE,
+	HT_STACKED_IN_LAYERS,
+	HT_STACKED_IN_TOWERS,
+	HT_CLUSTERED,
+	HT_ERRORBARS
+} t_histogram_type;
 typedef struct histogram_style {
-    int type;		/* enum t_histogram_type */
+    t_histogram_type type;		/* enum t_histogram_type */
     int gap;		/* set style hist gap <n> (space between clusters) */
     int clustersize;	/* number of datasets in this histogram */
     TBOOLEAN keyentry;	/* FALSE suppresses extra blank line in key */
@@ -285,13 +292,6 @@ typedef struct histogram_style {
     struct histogram_style *next;
     struct text_label title;
 } histogram_style;
-typedef enum histogram_type {
-	HT_NONE,
-	HT_STACKED_IN_LAYERS,
-	HT_STACKED_IN_TOWERS,
-	HT_CLUSTERED,
-	HT_ERRORBARS
-} t_histogram_type;
 #define DEFAULT_HISTOGRAM_STYLE { HT_CLUSTERED, 2, 1, TRUE, 0.0, 0.0, LT_UNDEFINED, LT_UNDEFINED, 0, NULL, EMPTY_LABELSTRUCT }
 
 typedef enum en_boxplot_factor_labels {
