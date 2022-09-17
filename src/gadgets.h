@@ -374,6 +374,7 @@ typedef struct {
     int maxcols;		/* maximum no of columns for horizontal keys */
     int maxrows;		/* maximum no of rows for vertical keys */
     text_label title;		/* holds title line for the key as a whole */
+    struct position offset;	/* manual displacement of the entire key */
 } legend_key;
 
 extern legend_key keyT;
@@ -395,7 +396,9 @@ extern legend_key keyT;
 		NULL, {TC_LT, LT_BLACK, 0.0}, \
 		BACKGROUND_COLORSPEC, \
 		{0,0,0,0}, 0, 0, \
-		EMPTY_LABELSTRUCT}
+		EMPTY_LABELSTRUCT, \
+		{character, character, character, 0, 0, 0}, \
+		}
 
 
 /*

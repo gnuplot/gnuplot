@@ -508,6 +508,7 @@ save_set_all(FILE *fp)
 		key->invert ? "" : "no",
 		key->swidth, key->vert_factor, key->width_fix, key->height_fix);
     fprintf(fp, "\nset key maxcolumns %d maxrows %d",key->maxcols,key->maxrows);
+    save_position(fp, &key->offset, 2, TRUE);
     fputc('\n', fp);
     if (key->front) {
 	fprintf(fp, "set key opaque");

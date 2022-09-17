@@ -1,6 +1,7 @@
 Changes in 5.4.5
 ================
-* NEW    data-driven histogram colors (variable color from 2nd using column)
+* NEW    "set key offset <dx>, <dy>" tweaks placement of the key
+* NEW    data-driven histogram colors (variable color from extra using column)
 * CHANGE re-order 3D labels to come after pm3d depthorder surfaces
 * CHANGE hpgl: add terminal option "fontscale <value>"
 * CHANGE for nonuniform matrix data, column(0) returns linear position in matrix

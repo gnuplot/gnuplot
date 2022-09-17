@@ -394,6 +394,7 @@ const struct gen_table set_key_tbl[] =
     { "def$ault", S_KEY_DEFAULT },
     { "on", S_KEY_ON },
     { "off", S_KEY_OFF },
+    { "offset", S_KEY_OFFSET},
     { "t$op", S_KEY_TOP },
     { "b$ottom", S_KEY_BOTTOM },
     { "l$eft", S_KEY_LEFT },
