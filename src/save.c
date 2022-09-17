@@ -1269,7 +1269,9 @@ save_key(FILE *fp)
 	}
 	fprintf(fp, "\n");
     }
-    fprintf(fp, "set key maxcolumns %d maxrows %d\n",key->maxcols,key->maxrows);
+    fprintf(fp, "set key maxcolumns %d maxrows %d",key->maxcols,key->maxrows);
+    save_position(fp, &key->offset, 2, TRUE);
+    fprintf(fp, "\n");
     if (key->front) {
 	fprintf(fp, "set key opaque");
 	if (key->fillcolor.lt != LT_BACKGROUND) {

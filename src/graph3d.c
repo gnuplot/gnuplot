@@ -4216,6 +4216,7 @@ void
 do_3dkey_layout(legend_key *key, int *xinkey, int *yinkey)
 {
     struct termentry *t = term;
+    int dx, dy;
 
     /* NOTE: All of these had better not change after being calculated here! */
     if (key->reverse) {
@@ -4344,6 +4345,17 @@ do_3dkey_layout(legend_key *key, int *xinkey, int *yinkey)
 
     /* Center the key entries vertically, allowing for requested extra space */
     *yinkey -= (key->height_fix * t->v_char) / 2;
+
+    /* Regardless of how the key was nominally positioned,
+     * the result can be manually tweaked by "set key offset dx, dy"
+     */
+    map3d_position_r(&key->offset, &dx, &dy, "key");
+    key->bounds.ytop += dy;
+    key->bounds.ybot += dy;
+    key->bounds.xleft += dx;
+    key->bounds.xright += dx;
+    *xinkey += dx;
+    *yinkey += dy;
 }
 
 

@@ -845,6 +845,7 @@ void
 do_key_bounds(legend_key *key)
 {
     struct termentry *t = term;
+    double dx, dy;
 
     key_height = key_title_height + key_title_extra
 		+ key_rows * key_entry_height + key->height_fix * key_entry_height;
@@ -961,6 +962,15 @@ do_key_bounds(legend_key *key)
 	    key->bounds.ytop += key_height;
 	key->bounds.ybot = key->bounds.ytop - key_height;
     }
+
+    /* Regardless of how the key was nominally positioned,
+     * the result can be manually tweaked by "set key offset dx, dy"
+     */
+    map_position_r(&key->offset, &dx, &dy, "key");
+    key->bounds.ytop += dy;
+    key->bounds.ybot += dy;
+    key->bounds.xleft += dx;
+    key->bounds.xright += dx;
 }
 
 /* Calculate positioning of components that make up the key box */

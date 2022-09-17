@@ -2277,6 +2277,7 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 			break;
 		    case HT_CLUSTERED:
 		    case HT_ERRORBARS:
+		    case HT_NONE:
 			break;
 		    }
 		}

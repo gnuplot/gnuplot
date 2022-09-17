@@ -2602,6 +2602,12 @@ set_key()
 	    c_token--;  /* will be incremented again soon */
 	    break;
 
+	case S_KEY_OFFSET:
+	    c_token++;
+	    get_position_default(&key->offset, character, 2);
+	    c_token--;  /* will be incremented again soon */
+	    break;
+
 	case S_KEY_INVALID:
 	default:
 	    int_error(c_token, "unknown key option");

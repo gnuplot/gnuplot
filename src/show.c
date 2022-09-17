@@ -1935,6 +1935,8 @@ show_key()
 		break;
 	    }
 	}
+	fputs("  offset: ", stderr);
+	show_position(&key->offset, 2);
 	fputs("\n", stderr);
 	break;
     }

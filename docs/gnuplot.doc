@@ -407,6 +407,9 @@ C
 #b Special (non-numerical) linetypes `lt nodraw`, `lt black`, `lt bgnd`
 ## See `special_linetypes`.
 #b Data-driven color assignments in histogram plots. See `histograms colors`.
+#b The position of the key box can be manually tweaked by specifying an
+## offset to be added to whatever position the program would otherwise use.
+## See `set key offset`.
 #end
 
 3 Features introduced in version 5.4
@@ -12110,6 +12113,7 @@ Ffigure_missing
              {{no}autotitle {columnheader}}
              {{no}box {<line properties>}} {{no}opaque {fc <colorspec>}}
              {width <width_increment>} {height <height_increment>}
+             {offset <dx>,<dy>}
        unset key
 
  By default the key is placed in the upper right inside corner of the graph.
@@ -12364,6 +12368,14 @@ Ffigure_keyentry
  is given is to align the key as though it were text positioned using the
  label command, i.e., `left` means left align with key to the right of
  <position>, etc.
+4 key offset
+?commands set key offset
+?set key offset
+?key offset
+ Regardless of the key placement options chosen, the final position of the key
+ can be adjusted manually by specifying an offset.  As usual, the x and y
+ components of the offset may be given in character, graph, or screen
+ coordinates.
 4 key samples
 ?commands set key samples
 ?set key samples

@@ -41,6 +41,7 @@ set tics nomirror
 unset ytics
 set boxwidth 0.8
 set key lmargin maxcol 1 invert
+set key width 2 offset 2, 0
 set key title "  Category  "
 
 # Set up a range of 12 defined linetype colors
