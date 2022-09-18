@@ -1,0 +1,106 @@
+#
+# Draw a table of named colors
+#
+unset tics
+unset border
+set margins 0,0,0,0
+set key rmargin reverse Left
+set style fill solid
+
+plot 0 lt nodraw notitle,\
+ keyentry w boxes title "antiquewhite"       lc rgb 0xcdc0b0, \
+ keyentry w boxes title "aquamarine"         lc rgb 0x7fffd4, \
+ keyentry w boxes title "beige"              lc rgb 0xf5f5dc, \
+ keyentry w boxes title "bisque"             lc rgb 0xcdb79e, \
+ keyentry w boxes title "black"              lc rgb 0x000000, \
+ keyentry w boxes title "blue"               lc rgb 0x0000ff, \
+ keyentry w boxes title "brown4"             lc rgb 0x801414, \
+ keyentry w boxes title "brown"              lc rgb 0xa52a2a, \
+ keyentry w boxes title "chartreuse"         lc rgb 0x7cff40, \
+ keyentry w boxes title "coral"              lc rgb 0xff7f50, \
+ keyentry w boxes title "cyan"               lc rgb 0x00ffff, \
+ keyentry w boxes title "dark-blue"          lc rgb 0x00008b, \
+ keyentry w boxes title "dark-chartreuse"    lc rgb 0x408000, \
+ keyentry w boxes title "dark-cyan"          lc rgb 0x00eeee, \
+ keyentry w boxes title "dark-goldenrod"     lc rgb 0xb8860b, \
+ keyentry w boxes title "dark-gray"          lc rgb 0xa0a0a0, \
+ keyentry w boxes title "dark-green"         lc rgb 0x006400, \
+ keyentry w boxes title "dark-khaki"         lc rgb 0xbdb76b, \
+ keyentry w boxes title "dark-magenta"       lc rgb 0xc000ff, \
+ keyentry w boxes title "dark-olivegreen"    lc rgb 0x556b2f, \
+ keyentry w boxes title "dark-orange"        lc rgb 0xc04000, \
+ keyentry w boxes title "dark-pink"          lc rgb 0xff1493, \
+ keyentry w boxes title "dark-plum"          lc rgb 0x905040, \
+ keyentry w boxes title "dark-red"           lc rgb 0x8b0000, \
+ keyentry w boxes title "dark-salmon"        lc rgb 0xe9967a, \
+ keyentry w boxes title "dark-spring-green"  lc rgb 0x008040, \
+ keyentry w boxes title "dark-turquoise"     lc rgb 0x00ced1, \
+ keyentry w boxes title "dark-violet"        lc rgb 0x9400d3, \
+ keyentry w boxes title "dark-yellow"        lc rgb 0xc8c800, \
+ keyentry w boxes title "forest-green"       lc rgb 0x228b22, \
+ keyentry w boxes title "goldenrod"          lc rgb 0xffc020, \
+ keyentry w boxes title "gold"               lc rgb 0xffd700, \
+ keyentry w boxes title "gray0   (grey0)"    lc rgb 0x000000, \
+ keyentry w boxes title "gray10  (grey10)"   lc rgb 0x1a1a1a, \
+ keyentry w boxes title "gray20  (grey20)"   lc rgb 0x333333, \
+ keyentry w boxes title "gray30  (grey30)"   lc rgb 0x4d4d4d, \
+ keyentry w boxes title "gray40  (grey40)"   lc rgb 0x666666, \
+ keyentry w boxes title "gray50  (grey50)"   lc rgb 0x7f7f7f, \
+ keyentry w boxes title "gray60  (grey60)"   lc rgb 0x999999, \
+ keyentry w boxes title "gray70  (grey70)"   lc rgb 0xb3b3b3, \
+ keyentry w boxes title "gray80  (grey80)"   lc rgb 0xcccccc, \
+ keyentry w boxes title "gray90  (grey90)"   lc rgb 0xe5e5e5, \
+ keyentry w boxes title "gray100 (grey100)"  lc rgb 0xffffff, \
+ keyentry w boxes title "gray (grey)"        lc rgb 0xbebebe, \
+ keyentry w boxes title "green"              lc rgb 0x00ff00, \
+ keyentry w boxes title "greenyellow"        lc rgb 0xa0ff20, \
+ keyentry w boxes title "honeydew"           lc rgb 0xf0fff0, \
+ keyentry w boxes title "khaki1"             lc rgb 0xffff80, \
+ keyentry w boxes title "khaki"              lc rgb 0xf0e68c, \
+ keyentry w boxes title "lemonchiffon"       lc rgb 0xffffc0, \
+ keyentry w boxes title "light-blue"         lc rgb 0xadd8e6, \
+ keyentry w boxes title "light-coral"        lc rgb 0xf08080, \
+ keyentry w boxes title "light-cyan"         lc rgb 0xe0ffff, \
+ keyentry w boxes title "light-goldenrod"    lc rgb 0xeedd82, \
+ keyentry w boxes title "light-gray"         lc rgb 0xd3d3d3, \
+ keyentry w boxes title "light-green"        lc rgb 0x90ee90, \
+ keyentry w boxes title "light-magenta"      lc rgb 0xf055f0, \
+ keyentry w boxes title "light-pink"         lc rgb 0xffb6c1, \
+ keyentry w boxes title "light-red"          lc rgb 0xf03232, \
+ keyentry w boxes title "light-salmon"       lc rgb 0xffa070, \
+ keyentry w boxes title "light-turquoise"    lc rgb 0xafeeee, \
+ keyentry w boxes title "magenta"            lc rgb 0xff00ff, \
+ keyentry w boxes title "medium-blue"        lc rgb 0x0000cd, \
+ keyentry w boxes title "mediumpurple3"      lc rgb 0x8060c0, \
+ keyentry w boxes title "midnight-blue"      lc rgb 0x191970, \
+ keyentry w boxes title "navy"               lc rgb 0x000080, \
+ keyentry w boxes title "olive"              lc rgb 0xa08020, \
+ keyentry w boxes title "orange"             lc rgb 0xffa500, \
+ keyentry w boxes title "orangered4"         lc rgb 0x801400, \
+ keyentry w boxes title "orange-red"         lc rgb 0xff4500, \
+ keyentry w boxes title "orchid4"            lc rgb 0x804080, \
+ keyentry w boxes title "orchid"             lc rgb 0xff80ff, \
+ keyentry w boxes title "pink"               lc rgb 0xffc0c0, \
+ keyentry w boxes title "plum"               lc rgb 0xdda0dd, \
+ keyentry w boxes title "purple"             lc rgb 0xc080ff, \
+ keyentry w boxes title "red"                lc rgb 0xff0000, \
+ keyentry w boxes title "royalblue"          lc rgb 0x4169e1, \
+ keyentry w boxes title "salmon"             lc rgb 0xfa8072, \
+ keyentry w boxes title "sandybrown"         lc rgb 0xffa060, \
+ keyentry w boxes title "sea-green"          lc rgb 0x2e8b57, \
+ keyentry w boxes title "seagreen"           lc rgb 0xc1ffc1, \
+ keyentry w boxes title "sienna1"            lc rgb 0xff8040, \
+ keyentry w boxes title "sienna4"            lc rgb 0x804014, \
+ keyentry w boxes title "skyblue"            lc rgb 0x87ceeb, \
+ keyentry w boxes title "slateblue1"         lc rgb 0x8060ff, \
+ keyentry w boxes title "slategray"          lc rgb 0xa0b6cd, \
+ keyentry w boxes title "spring-green"       lc rgb 0x00ff7f, \
+ keyentry w boxes title "steelblue"          lc rgb 0x306080, \
+ keyentry w boxes title "tan1"               lc rgb 0xffa040, \
+ keyentry w boxes title "turquoise"          lc rgb 0x40e0d0, \
+ keyentry w boxes title "violet"             lc rgb 0xee82ee, \
+ keyentry w boxes title "web-blue"           lc rgb 0x0080ff, \
+ keyentry w boxes title "web-green"          lc rgb 0x00c000, \
+ keyentry w boxes title "white"              lc rgb 0xffffff, \
+ keyentry w boxes title "yellow4"            lc rgb 0x808000, \
+ keyentry w boxes title "yellow"             lc rgb 0xffff00

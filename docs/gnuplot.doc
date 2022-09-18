@@ -190,8 +190,7 @@ C
  A mailing list for those interested in the development version of gnuplot is:
            gnuplot-beta@lists.sourceforge.net
 
-2 New features
-3 Development version
+2 New features in this version
 ?new version_5.5
 ?new
 ?development version
@@ -204,7 +203,7 @@ C
  For more information about optional features built into the particular copy
  of gnuplot you are running, type `show version long`.
 
-4 Special and complex-valued functions
+3 Special and complex-valued functions
 ?new math
  This version of gnuplot provides a larger set of complex-valued functions and
  updated versions of some functions that were present in earlier versions.
@@ -253,7 +252,7 @@ C
 ## of the Voigt profile. See `VP`, `VP_fwhm`.
 #end
 
-4 Hulls, masks, and smoothing
+3 Hulls, masks, and smoothing
 ?new hulls
 #start
 #b A cluster of 2D points can be replaced by its bounding polygon using the
@@ -271,7 +270,7 @@ C
 #b New keyword `period` for smoothing periodic data. See `smooth kdensity`.
 #end
 
-4 New data formats
+3 New data formats
 ?new data_formats
 #start
 #b The `sparse matrix=(cols,rows)` option to `plot` and `splot` generates
@@ -283,7 +282,7 @@ C
 ## column(0)/M gives the row index i, and column(0)%M gives the column index j.
 #end
 
-4 New built-in functions and array operations
+3 New built-in functions and array operations
 ?new built-in functions
 #start
 #b `palette(z)` returns the current RGB palette color mapping z into cbrange.
@@ -304,7 +303,7 @@ C
 #b `stats $vgrid` finds min/max/mean/stddev of voxels in grid
 #end
 
-4 Named palettes
+3 Named palettes
 ?new colormaps
 #start
 #b The current palette can be saved to a named colormap for future use.
@@ -320,7 +319,7 @@ C
 ## either using fractional color components or 24-bit packed RGB values.
 #end
 
-4 Program control flow
+3 Program control flow
 ?control flow
 #start
 #b Support XDG base directory for gnuplotrc configuration preferences.
@@ -335,7 +334,7 @@ C
 #b New syntax  `if ... else if ... else ...`
 #end
 
-4 New terminals and terminal options
+3 New terminals and terminal options
 ?new terminals
 #start
 #b New terminal `block` for text-mode pseudo-graphics uses Unicode
@@ -346,7 +345,7 @@ C
 ## encoded through the WebPAnimEncoder API exported by libwebp and libwebpmux.
 #end
 
-4 Watchpoints
+3 Watchpoints
 ?new watchpoints
  Watchpoints are target values associated with individual plots in a graph.
  As that plot is drawn, each component line segment is monitored to see if
@@ -362,7 +361,7 @@ C
 #b Use the mouse to track values along multiple plots simultaneously
 #end
 
-4 Week-date time support
+3 Week-date time support
 ?new week-date time
  The Covid-19 pandemic of 2020/2021 generated increased interest in plotting
  epidemiological data, which is often tabulated using a "week date" reporting
@@ -381,7 +380,7 @@ C
 ## to calendar time.
 #end
 
-4 Other new features
+3 Other new features
 ?new features
 #start
 #b `Time units for setting major and minor tics.`
@@ -2255,11 +2254,13 @@ C 4 FresnelS
  omitted or if it contains a single space character the fields are split
  by any amount of whitespace (space, tab, formfeed, newline, return).
  Otherwise the full sequence of characters in "sep" must be matched.
+ For examples, see `counting_words`.
 4 join
 ?
  `join(array, "sep")` concatenates the string elements of an array into a
  single string containing fields delimited by the character sequence in "sep".
  Non-string array elements generate an empty field.
+ For examples, see `counting_words`.
 #join(array,"sep") & array,string & concatenate array elements into a string\\
 %join(array,"sep") @array,string@concatenate array elements into a string
 
@@ -2984,6 +2985,7 @@ C 4 weekdata_cdc
  value() returns NaN.
 
 4 Counting and extracting words
+?counting_words
 ?expressions functions word
 ?expressions functions words
 ?words
@@ -4784,7 +4786,7 @@ Ffigure_watchpoints
       set style watchpoint labels point pt 6
       plot FOO axes x1y2 watch mouse
 
-1 plotting styles
+1 Plotting styles
 ?plotting styles
 =plot styles
 
@@ -5557,7 +5559,9 @@ Ffigure_histcols
  but in different formats.
 3 newhistogram
 ?newhistogram
+?with histograms newhistogram
 ?histograms newhistogram
+?styles histograms newhistogram
 ?plotting styles histograms newhistogram
  Syntax:
 
@@ -5609,6 +5613,7 @@ Ffigure_newhist
  will position the second histogram to start at x=8.
 3 automated iteration over multiple columns
 ?automated
+?with histograms automated
 ?histograms automated
 ?styles histograms automated
 ?plotting styles histograms automated
@@ -5621,6 +5626,8 @@ Ffigure_newhist
 3 histogram color assignments
 ?with histograms colors
 ?histograms colors
+?styles histograms colors
+?plotting styles histograms colors
  The program assigns a color to each component box in a histogram
  automatically such that equivalent data values maintain a consistent
  color wherever they appear in the rows or columns of the histogram.
@@ -10642,14 +10649,19 @@ Ffigure_smooth_path
  See also help for `set pm3d`, `set palette`, and `set style line`.
 3 colornames
 ?colornames
+Ffigure_colornames
  Gnuplot knows a limited number of color names. You can use these to define
  the color range spanned by a pm3d palette, to assign a named color to a
  particular linetype or linestyle, or to define a gradient for the current
  color palette.
- To list the known color names, use the command `show colornames`.
+ Use the command `show colornames` to list the known color names together
+ with their RGB component definitions.
  Examples:
        set style line 1 linecolor "sea-green"
        set palette defined (0 "dark-red", 1 "white")
+       print sprintf("0x%06x", rgbcolor("dark-green"))
+             0x006400
+
 3 contour
 ?commands set contour
 ?commands unset contour
@@ -12203,6 +12215,7 @@ Ffigure_keyentry
  All the usual options for title font, text color, `at` coordinates, and
  enhanced text markup apply.
  Example:
+      set key outside right center title "Outcomes"
       plot $HEATMAP matrix with image notitle, \
            keyentry with boxes fc palette cb 0 title "no effect", \
            keyentry with boxes fc palette cb 1 title "threshold", \
@@ -17399,8 +17412,8 @@ Ffigure_walls
 ?commands show colornames
 ?show colornames
 ?show palette colornames
- Gnuplot knows about 100 colors by name. You can dump a list of these to the
- terminal by using the command `show colornames`.
+ Gnuplot knows about 100 colors by name (see `colornames`).  You can dump
+ a list of these to the terminal by using the command `show colornames`.
  There is currently no way to set new names.
 3 show functions
 ?commands show functions

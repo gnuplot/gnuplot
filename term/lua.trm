@@ -1522,7 +1522,7 @@ START_HELP(tikz)
 " This driver creates output for use with the TikZ package of graphics macros",
 " in TeX.  It is currently implemented via an external lua script, and ",
 " `set term tikz` is a short form of the command `set term lua tikz`.",
-" See `term lua` for more information.  Use the command `set term tikz help`",
-" to print terminal options."
+" See `term lua tikz` for a complete description.",
+" Use the command `set term tikz help` to print terminal options."
 END_HELP(tikz)
 #endif /* TERM_HELP */

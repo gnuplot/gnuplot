@@ -1061,6 +1061,21 @@ if (!strstrt(GPVAL_COMPILE_OPTIONS, "+WATCHPOINTS")) {
 }
 reset
 
+#
+# Extra width figures for some output formats
+#
+# Color names
+if (GNUTERM eq "svg") {
+    set term svg font 'Calisto MT,14' size 1200,600
+} else {
+    set key font ",7" spacing 0.9
+}
+set output out . 'figure_colornames'. ext
+load 'colornames.dem'
+reset
+
+
+
 # close last file
 unset output
 
