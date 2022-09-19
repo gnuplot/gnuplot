@@ -1278,7 +1278,7 @@ PDF_filled_polygon(int points, gpiPoint* corners)
 {
     int i;
     int fillpar = corners->style >> 4;
-    int style = corners->style &= 0xf;
+    int style = corners->style & 0xf;
 
     PDF_PathClose();
     PDF_save(myPDF);

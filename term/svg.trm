@@ -1725,7 +1725,7 @@ SVG_filled_polygon(int points, gpiPoint* corners)
 {
     int i;
     int fillpar = corners->style >> 4;
-    int style = corners->style &= 0xf;
+    int style = corners->style & 0xf;
 
     if (style == FS_PATTERN || style == FS_TRANSPARENT_PATTERN) {
 	/* make sure the pattern is defined (with the current stroke color)
