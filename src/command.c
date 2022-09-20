@@ -1835,12 +1835,17 @@ pause_command()
 		/* Use of fprintf() triggers a bug in MinGW + SJIS encoding */
 		fputs(buf, stderr); fputs("\n", stderr);
 	    }
-	    /* cannot use EAT_INPUT_WITH here */
-	    do {
-		junk = getch();
-		if (ctrlc_flag)
-		    bail_to_command_line();
-	    } while (junk != EOF && junk != '\n' && junk != '\r');
+	    /* Note: cannot use EAT_INPUT_WITH here
+	     * FIXME: probably term->waitforinput is always correct, not just for qt
+	     */
+	    if (!strcmp(term->name,"qt"))
+		term->waitforinput(0);
+	    else
+		do {
+		    junk = getch();
+		    if (ctrlc_flag)
+			bail_to_command_line();
+		} while (junk != EOF && junk != '\n' && junk != '\r');
 	} else /* paused_for_mouse */
 # endif /* !WGP_CONSOLE */
 	{
