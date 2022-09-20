@@ -581,10 +581,15 @@ pop_or_convert_from_string(struct value *v)
 	char trailing = *eov;
 
 	/* If the string contains no decimal point, try to interpret it as an integer.
-	 * strtoll handles decimal, octal, and hexadecimal.
+	 * We treat a string starting with "0x" as a hexadecimal; everything else
+	 * as decimal.  So int("010") promotes to 10, not 8.
 	 */
 	if (strcspn(string, ".") == strlen(string)) {
-	    long long li = strtoll( string, &eov, 0 );
+	    long long li;
+	    if (string[0] == '0' && string[1] == 'x')
+		li = strtoll( string, &eov, 16 );
+	    else
+		li = strtoll( string, &eov, 10 );
 	    trailing = *eov;
 	    Ginteger(v, li);
 	}
@@ -601,7 +606,7 @@ pop_or_convert_from_string(struct value *v)
 	if (eov == string)
 	    int_error(NO_CARET,"Non-numeric string found where a numeric expression was expected");
 	if (trailing && !isspace(trailing))
-	    int_error(NO_CARET,"Trailing characters after numeric expression");
+	    int_warn(NO_CARET,"Trailing characters after numeric expression");
     }
     return(v);
 }
