@@ -362,6 +362,10 @@ C
 #b (5.4.5) The position of the key box can be manually tweaked by giving an
 ##         offset added to whatever position the program would otherwise use.
 ##         See `set key offset`.
+#b (5.4.5) Component boxes in "plot with histograms" can be colored according to
+##         a separate column of category/color information. See `lc variable`.
+#b (5.4.5) Fix a regression in version 5.4.4 that caused string->int promotion
+##         to incorrectly assume a leading 0 implies an octal number
 #end
 
 4 Changes

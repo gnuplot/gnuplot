@@ -11,6 +11,9 @@ Changes in 5.4.5
 * FIX    Clean up positioning of polar border, raxis, and theta tics Bug #2130
 * FIX    Autoscaling of logscaled raxis
 * FIX    memory corruption if a small plot structure is recycled Bug #2550
+* FIX    Windows qt terminal:  "pause -1" should not block mousing Bug #2549
+* FIX    promotion of string to integer should not assume leading 0 means octal
+         The was a regression in 5.4.4                           Bug #2551
 
 Changes in 5.4.4
 ================
