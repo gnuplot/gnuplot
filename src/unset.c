@@ -1107,7 +1107,38 @@ unset_isotropic()
 void
 reset_key()
 {
-    legend_key temp_key = DEFAULT_KEY_PROPS;
+    legend_key temp_key = {
+	.visible = TRUE,
+	.region = GPKEY_AUTO_INTERIOR_LRTBC,
+	.margin = GPKEY_RMARGIN,
+	.user_pos = DEFAULT_KEY_POSITION,
+	.user_width = DEFAULT_KEY_WIDTH,
+	.user_cols = 0,
+	.vpos = JUST_TOP,
+	.hpos = RIGHT,
+	.fixed = TRUE,
+	.just = GPKEY_RIGHT,
+	.stack_dir = GPKEY_VERTICAL,
+	.swidth = 4.0,
+	.vert_factor = 1.0,
+	.width_fix = 0.0,
+	.height_fix = 0.0,
+	.auto_titles = FILENAME_KEYTITLES,
+	.front = FALSE,
+	.reverse = FALSE,
+	.invert = FALSE,
+	.enhanced = TRUE,
+	.box = DEFAULT_KEYBOX_LP,
+	.font = NULL,
+	.textcolor = {TC_LT, LT_BLACK, 0.0},
+	.fillcolor = BACKGROUND_COLORSPEC,
+	.bounds = {0,0,0,0},
+	.maxcols = 0,
+	.maxrows = 0,
+	.title = EMPTY_LABELSTRUCT,
+	.offset = {character, character, character, 0, 0, 0}
+    };
+
     free(keyT.font);
     free(keyT.title.text);
     free(keyT.title.font);

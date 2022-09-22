@@ -388,24 +388,6 @@ extern legend_key keyT;
 #define DEFAULT_KEY_POSITION { graph, graph, graph, 0.9, 0.9, 0. }
 #define DEFAULT_KEY_WIDTH { graph, graph, graph, 0., 0., 0. }
 
-#define DEFAULT_KEY_PROPS \
-		{ TRUE, \
-		GPKEY_AUTO_INTERIOR_LRTBC, GPKEY_RMARGIN, \
-		DEFAULT_KEY_POSITION, \
-		DEFAULT_KEY_WIDTH, 0, \
-		JUST_TOP, RIGHT, TRUE, \
-		GPKEY_RIGHT, GPKEY_VERTICAL, \
-		4.0, 1.0, 0.0, 0.0, \
-		FILENAME_KEYTITLES, \
-		FALSE, FALSE, FALSE, TRUE, \
-		DEFAULT_KEYBOX_LP, \
-		NULL, {TC_LT, LT_BLACK, 0.0}, \
-		BACKGROUND_COLORSPEC, \
-		{0,0,0,0}, 0, 0, \
-		EMPTY_LABELSTRUCT, \
-		{character, character, character, 0, 0, 0}, \
-		}
-
 
 /*
  * EAM Jan 2006 - Move colorbox structure definition to here from color.h

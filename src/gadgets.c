@@ -47,7 +47,7 @@
  * but better than mixing internal status and the user interface as we
  * used to have it, in set.c and setshow.h */
 
-legend_key keyT = DEFAULT_KEY_PROPS;
+legend_key keyT;
 
 /* Description of the color box associated with CB_AXIS */
 color_box_struct color_box; /* initialized in init_color() */
