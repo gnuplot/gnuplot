@@ -36,7 +36,6 @@
 #include "command.h"
 #include "datablock.h"
 #include "eval.h"
-#include "help.h"
 #include "util.h"
 
 /* Protection mechanism for trying to parse a string followed by a + or - sign.

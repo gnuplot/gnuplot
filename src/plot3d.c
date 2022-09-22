@@ -59,8 +59,6 @@
 
 #include "matrix.h" /* Used by thin-plate-splines in dgrid3d */
 
-#include "help.h"
-
 /* global variables exported by this module */
 
 t_data_mapping mapping3d = MAP3D_CARTESIAN;

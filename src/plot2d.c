@@ -54,10 +54,6 @@
 #include "variable.h" /* For locale handling */
 #include "watch.h"
 
-#ifndef _WIN32
-# include "help.h"
-#endif
-
 /* minimum size of points[] in curve_points */
 #define MIN_CRV_POINTS 100
 
