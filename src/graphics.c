@@ -184,13 +184,9 @@ get_arrow(
 	*ex += *sx;
 	*ey += *sy;
     } else if (arrow->type == arrow_end_oriented) {
-	double aspect = (double)term->v_tic / (double)term->h_tic;
+	double aspect = effective_aspect_ratio();
 	double radius;
 
-#ifdef _WIN32
-	if (strcmp(term->name, "windows") == 0)
-	    aspect = 1.;
-#endif
 	map_position_r(&arrow->end, &radius, NULL, "arrow");
 	*ex = *sx + cos(DEG2RAD * arrow->angle) * radius;
 	*ey = *sy + sin(DEG2RAD * arrow->angle) * radius * aspect;
@@ -2682,9 +2678,7 @@ plot_vectors(struct curve_points *plot)
 	} else {  /* ARROWS */
 	    double length;
 	    double angle = DEG2RAD * tail->yhigh;
-	    double aspect = (double)term->v_tic / (double)term->h_tic;
-	    if (strcmp(term->name, "windows") == 0)
-		aspect = 1.0;
+	    double aspect = effective_aspect_ratio();
 	    if (tail->xhigh > 0)
 		/* length > 0 is in x-axis coords */
 		length = map_x_double(tail->x + tail->xhigh) - x0;
@@ -4388,16 +4382,11 @@ do_ellipse( int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping )
     double A = e->extent.x / 2.0;	/* Major axis radius */
     double B = e->extent.y / 2.0;	/* Minor axis radius */
     struct position pos = e->extent;	/* working copy with axis info attached */
-    double aspect = (double)term->v_tic / (double)term->h_tic;
+    double aspect = effective_aspect_ratio();
 
     /* Choose how many segments to draw for this ellipse */
     int segments = 72;
     double ang_inc  =  M_PI / 36.;
-
-#ifdef _WIN32
-    if (strcmp(term->name, "windows") == 0)
-	aspect = 1.;
-#endif
 
     /* Find the center of the ellipse */
     /* If this ellipse is part of a plot - as opposed to an object -

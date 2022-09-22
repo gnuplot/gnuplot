@@ -695,5 +695,6 @@ int label_width(const char *, int *);
 TBOOLEAN pm3d_objects(void);
 
 void place_title(int title_x, int title_y);
+double effective_aspect_ratio(void);
 
 #endif /* GNUPLOT_GADGETS_H */
