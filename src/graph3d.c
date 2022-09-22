@@ -581,14 +581,10 @@ get_arrow3d(
 	*dex += *dsx;
 	*dey += *dsy;
     } else if (arrow->type == arrow_end_oriented) {
-	double aspect = (double)term->v_tic / (double)term->h_tic;
+	double aspect = effective_aspect_ratio();
 	double radius;
 	double junkw, junkh;
 
-#ifdef _WIN32
-	if (strcmp(term->name, "windows") == 0)
-	    aspect = 1.;
-#endif
 	if (arrow->end.scalex != screen && arrow->end.scalex != character && !splot_map)
 	    return FALSE;
 	map3d_position_r_double(&arrow->end, &junkw, &junkh, "arrow");

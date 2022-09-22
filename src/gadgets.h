@@ -681,6 +681,7 @@ int label_width(const char *, int *);
 TBOOLEAN pm3d_objects(void);
 
 void place_title(int title_x, int title_y);
+double effective_aspect_ratio(void);
 
 /* Image data or pm3d quadrangles can be masked by first loading a set
  * of masking polygons via dummy plotting style "with mask".

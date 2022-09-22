@@ -865,6 +865,16 @@ apply_head_properties(struct arrow_style_type *arrow_properties)
     }
 }
 
+/* Used by arrow-drawing code in graphics.c graph3d.c */
+double effective_aspect_ratio(void)
+{
+#ifdef _WIN32
+    if (strcmp(term->name, "windows") == 0)
+	return 1.0;
+#endif
+    return (double)term->v_tic / (double)term->h_tic;
+}
+
 void
 free_labels(struct text_label *label)
 {
