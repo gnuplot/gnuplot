@@ -1876,7 +1876,7 @@ f_gprintf(union argument *arg)
 }
 
 
-/* Output time given in seconds from year 2000 into string */
+/* Output time given in seconds from ZERO_YEAR into string */
 void
 f_strftime(union argument *arg)
 {
@@ -1922,7 +1922,7 @@ f_strftime(union argument *arg)
     free(buffer);
 }
 
-/* Convert string into seconds from year 2000 */
+/* Convert string into seconds from ZERO_YEAR */
 void
 f_strptime(union argument *arg)
 {
@@ -1958,7 +1958,7 @@ f_strptime(union argument *arg)
     push(Gcomplex(&val, result, 0.0));
 }
 
-/* Get current system time in seconds since 2000
+/* Get current system time in seconds since ZERO_YEAR.
  * The type of the value popped from the stack
  * determines what is returned.
  * If integer, the result is also an integer.
