@@ -1484,13 +1484,16 @@ do_command()
     } while (next_iteration(do_iterator));
     iteration_depth--;
 
+    /* FIXME:
+     * If any of the above exited via int_error() then this cleanup
+     * never happens and we leak memory for both clause and for the
+     * iterator itself.  But do_iterator cannot be static or global
+     * because do_command() can recurse.
+     */
     free(clause);
     end_clause();
     c_token = end_token;
 
-    /* FIXME:  If any of the above exited via int_error() then this	*/
-    /* cleanup never happens and we leak memory.  But do_iterator can	*/
-    /* not be static or global because do_command() can recurse.	*/
     do_iterator = cleanup_iteration(do_iterator);
     requested_break = FALSE;
     requested_continue = FALSE;
