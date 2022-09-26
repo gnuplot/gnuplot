@@ -2234,7 +2234,13 @@ print_command()
 	    else
 		disp_value(print_out, &a, FALSE);
 	}
-	free_value(&a);
+
+	/* Unlike arrays, datablocks are not dynamically duplicated prior to
+	 * return from the evaluation stack.  So if we see one here it is the
+	 * original and must not be destroyed.
+	 */
+	if (a.type != DATABLOCK)
+	    free_value(&a);
 
 	if (next_iteration(print_iterator)) {
 	    c_token = save_token;
