@@ -1,4 +1,5 @@
-C corresponding original gnuplot.doc for 5.4.4 (2022-07)
+C RCS $Id: gp540-j.doc,v 1.10 2022-09-26 18:39:10+09 shige Exp $
+C corresponding original gnuplot.doc for 5.4.5 (2022-09)
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -414,6 +415,19 @@ C 行が長いのは、できればなんとかしたい
 #b (5.4.2) filledcurves 同様の "plot with fillsteps {above|below y=<value>}"
 #b (5.4.3) splot の要素を dgrid3d 処理から外すフラグ "nogrid"
 #b (5.4.3) "set style histogram nokeyseparators" (以下参照: `newhistogram`)
+#b (5.4.5) 非一様な matrix データに対して column(0) は線形順序 (1 列の
+##         通し番号) を返します。よって MxN 行列の A[i,j] 要素に対して、
+##         column(0) / M は行番号 i になり
+##         column(0) % M は列番号 j になります。
+#b (5.4.5) 凡例 (key) の箱の位置は、gnuplot が他に行う仕組みによるどん
+##         な位置決めに対しても、オフセットを与えることで手動で調整でき
+##         ます。
+#b (5.4.5) "plot with histograms" の構成要素の箱は、種類/色の情報を示す
+##         別の列の値によって色付けすることができます。以下参照:
+##         `lc variable`。
+#b (5.4.5) 文字列から整数への変換機構が、0 につながる数字を 8 進数を意
+##         味すると誤って解釈するというバージョン 5.4.4 の仕組みを後退
+##         させることで修正
 #end
 
 4 変更点 (Changes)
@@ -11048,6 +11062,7 @@ Ffigure_missing
              {{no}box {linestyle <style> | linetype <type> | linewidth <width>}}
              {maxcols {<max no. of columns> | auto}}
              {maxrows {<max no. of rows> | auto}}
+             {offset <dx>, <dy>}
        unset key
        show key
 
@@ -11278,6 +11293,14 @@ Ffigure_keyentry
  label コマンドで配置される文字列の場合と同じように基準位置の位置揃えに
  使用されます。すなわち、`left` は凡例が <position> の右に置かれて左合
  わせで出力されます。他の場合も同様です。
+4 凡例の位置の微調整 (key offset)
+?commands set key offset
+?set key offset
+?key offset
+ 凡例 (key) の配置オプションとは無関係に、凡例の最終的な場所を、位置の
+ ずれ (offset) を指定することでも手動で位置合わせすることができます。
+ いつものように、ずれの x, y 成分は character, graph, screen のいずれの
+ 座標でも与えることができます。
 4 凡例のサンプル (key samples)
 ?commands set key samples
 ?set key samples
