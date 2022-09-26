@@ -451,6 +451,8 @@ Gstring(struct value *a, char *s)
 
 /* Common interface for freeing data structures attached to a struct value.
  * Each of the type-specific routines will ignore values of other types.
+ * NOTE: As it is we must not call gpfree_datablock because datablocks are
+ * passed on the evaluation stack by reference rather than by value.
  * FIXME: It may be better to call gpfree_array only for TEMP_ARRAYs,
  * otherwise an array passed in error as a function parameter may be wiped out.
  */
@@ -458,7 +460,6 @@ void
 free_value(struct value *a)
 {
     gpfree_string(a);
-    gpfree_datablock(a);
     gpfree_array(a);
     a->type = NOTDEFINED;
 }
