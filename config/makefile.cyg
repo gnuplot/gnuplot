@@ -357,7 +357,7 @@ ifdef SORT_TERMINALS
 # sort alphabetically all terminals (note: req. GNU sort, not from MS)
 allterm.h: $(CORETERM)
 	@echo "Building allterm.h"
-	@for e in `egrep "^[ 	]*START_HELP" $(CORETERM) |\
+	@for e in `grep -E "^[ 	]*START_HELP" $(CORETERM) |\
 	     $(GNUSORT) -f -t':' -k2` ; do \
 	  f=`echo $$e |cut -d\: -f1` ; s=`echo $$e | cut -d\: -f2` ;\
 	  sed -n "/^[ 	]*$$s/,/^[ 	]*END_HELP/p" $$f ; \
