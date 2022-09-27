@@ -121,7 +121,7 @@ LUA_HELP =
 endif
 
 allterm.h: $(CORETERM) $(LUA_HELP)
-	$(AM_V_GEN) for e in `egrep "^[ 	]*START_HELP" $(CORETERM) |\
+	$(AM_V_GEN) for e in `grep -E "^[ 	]*START_HELP" $(CORETERM) |\
 	     LC_ALL=C sort -f -t':' -k2` ; do \
 	  f=`echo $$e |cut -d\: -f1` ; s=`echo $$e | cut -d\: -f2` ;\
 	  sed -n "/^[ 	]*$$s/,/^[ 	]*END_HELP/p" $$f ; \
@@ -329,7 +329,7 @@ install-info: gnuplot.info
 	$(AM_V_at) $(top_srcdir)/mkinstalldirs $(DESTDIR)$(infodir)
 	$(AM_V_at) $(INSTALL_DATA) gnuplot.info $(DESTDIR)$(infodir)/gnuplot.info
 	$(AM_V_at) if (install-info --version && \
-	     install-info --version | fgrep -i -v debian) >/dev/null 2>&1; then \
+	     install-info --version | grep -F -i -v debian) >/dev/null 2>&1; then \
 	  install-info --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnuplot.info || : ;\
 	else : ; fi
 
