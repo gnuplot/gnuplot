@@ -288,6 +288,7 @@ C
 #b `palette(z)` returns the current RGB palette color mapping z into cbrange.
 #b `rgbcolor("name")` returns the 32bit ARGB value for a named color.
 #b `index( Array, element )` returns the first index `i` for which
+## Array[i] is equal to element. See `arrays`.
 #b User-defined functions allow an array as a parameter.
 ^<br>
 ## Example: dot(A,B) = sum [i=1:|A|] A[i]*B[i]
@@ -324,7 +325,7 @@ C
 #start
 #b Support XDG base directory for gnuplotrc configuration preferences.
 ## The program reads initial commands from $HOME/.config/gnuplot/gnuplotrc
-## if this file is founs. See `environment`.
+## if this file is found. See `environment`.
 #b Exception handling for the "fit" command.  Control always returns to the
 ## next line of input, even in the case of fit errors.  On return, FIT_ERROR is
 ## non-zero if an error occurred. This allows scripted recovery from a bad fit.
@@ -4584,7 +4585,7 @@ Ffigure_newsyntax
  Curly braces are used in the syntax for enhanced text mode and to delimit
  blocks in if/then/else statements.  They are also used to denote complex
  numbers: {3,2} = 3 + 2i.
-3 quote Marks
+3 quote marks
 ?quotes
 ?syntax quotes
  Gnuplot uses three forms of quote marks for delimiting text strings,
@@ -5654,7 +5655,7 @@ Ffigure_newhist
  value from line N in each file.  Instead we assign a color based on the
  category in column 1.
 
-      file(i) = sprintf("data_%03d.dat",i)
+      file(i) = sprintf("file_%03d.dat",i)
       array Category = ["A", "B", "C", "D", "E", "F"]
       color(c) = index(Category, strcol(c))
       set style data histogram
@@ -9571,7 +9572,7 @@ Ffigure_smooth_path
       print sinh(pi/2)
       print "rms of residuals (FIT_STDFIT) is ", FIT_STDFIT
       print sprintf("rms of residuals is %.3f after fit", FIT_STDFIT)
-      print "Array A": ", A
+      print "Array A: ", A
       print "Individual elements of array A: ", for [i=1:|A|] A[i]
       print $DATA
 
@@ -12050,7 +12051,7 @@ Ffigure_missing
       unset isotropic
  `set isotropic` adjusts the aspect ratio and size of the plot so that the
  unit length along the x, y, and z axes is the same.  It is equivalent to
- `set size ratio -1; set view equal xyz` and supercedes both of those commands.
+ `set size ratio -1; set view equal xyz` and supersedes both of those commands.
  This affects both 2D and 3D plots.
 
  `unset isotropic` relaxes both the 2D and 3D constraints. It is equivalent to
@@ -13920,8 +13921,8 @@ Ffigure_palette1
  You must specify one of 36 preset mapping functions by number for each color
  component.  The available functions are listed by `show palette rgbformulae`.
  The default is `set palette rgbformulae 7,5,15`.  In RGB space this uses
- function 7 to map the red component, function 5 to map the blue component,
- and function 15 to map the green component.  A negative function number
+ function 7 to map the red component, function 5 to map the green component,
+ and function 15 to map the blue component.  A negative function number
  inverts the sense of that component by mapping f(1-gray) rather than f(gray).
 
 Ffigure_palette2
@@ -18396,7 +18397,7 @@ Ffigure_sparsematrix
  To see a list of terminals available in a particular gnuplot session,
  type 'set terminal' with no modifiers.
 
- Several gnuplot are designed for use with TeX/LaTeX document preparation.
+ Several terminals are designed for use with TeX/LaTeX document preparation.
  A summary of TeX-friendly terminals is available here:
 ^ <a href="http://www.gnuplot.info/docs/latex_demo.pdf">
            http://www.gnuplot.info/docs/latex_demo.pdf
