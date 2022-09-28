@@ -416,7 +416,7 @@ void
 free_value(struct value *a)
 {
     gpfree_string(a);
-    gpfree_datablock(a);
+    /* gpfree_datablock(a); */
     gpfree_array(a);
 }
 

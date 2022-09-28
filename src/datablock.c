@@ -193,6 +193,7 @@ gpfree_datablock(struct value *datablock_value)
 	    free(stored_data[i]);
     free(stored_data);
     datablock_value->v.data_array = NULL;
+    datablock_value->type = NOTDEFINED;
 }
 
 /* count number of lines in a datablock */
