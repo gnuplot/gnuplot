@@ -14,6 +14,7 @@ Changes in 5.4.5
 * FIX    Windows qt terminal:  "pause -1" should not block mousing Bug #2549
 * FIX    promotion of string to integer should not assume leading 0 means octal
          The was a regression in 5.4.4                           Bug #2551
+* FIX    invalid free of active datablock
 
 Changes in 5.4.4
 ================

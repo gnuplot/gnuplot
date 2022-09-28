@@ -13,7 +13,7 @@ after downloading:
 
 	git clone -b branch-5-4-stable git://git.code.sf.net/p/gnuplot/gnuplot-main
 
-Release Notes date:  22-Sep-2022
+Release Notes date:  28-Sep-2022
 
 Changes in 5.4.5
 ================
@@ -31,6 +31,7 @@ Changes in 5.4.5
 * FIX    regression in 5.4.4 - promotion of string to integer should
          should not assume that a leading 0 means octal               Bug #2551
 * FIX    Windows qt: "pause -1" should not block mousing              Bug #2549
+* FIX    invalid free of active datablock
 
 Changes in 5.4.4
 ================
