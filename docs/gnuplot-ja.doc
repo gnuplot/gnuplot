@@ -1,5 +1,4 @@
-C RCS $Id: gnuplot-ja.doc,v 1.754 2022-05-24 15:58:13+09 shige Exp $
-C corresponding original gnuplot.doc at 2022-05-24
+C corresponding original gnuplot.doc at 2022-09-27
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -249,8 +248,7 @@ C 行が長いのは、できればなんとかしたい
  開発版に関するメーリングリスト:
            gnuplot-beta@lists.sourceforge.net
 
-2 新しい機能 (New features)
-3 開発版 (Development version)
+2 現在のバージョンの新しい機能 (New features in this version)
 ?new version_5.5
 ?new
 ?development version
@@ -263,7 +261,7 @@ C 行が長いのは、できればなんとかしたい
  あなたが実行している gnuplot に組み込まれたオプション機能に関する更な
  る情報については、以下参照: `show version long`。
 
-4 特殊関数と複素数値関数 (Special and complex-valued functions)
+3 特殊関数と複素数値関数 (Special and complex-valued functions)
 ?new math
  gnuplot のこのバージョンでは、沢山の複素数値関数と、以前のバージョンに
  あったいくつかの関数の改良版を提供します。
@@ -310,7 +308,7 @@ C 行が長いのは、できればなんとかしたい
 ## 参照: `VP`, `VP_fwhm`。
 #end
 
-4 凸包とマスクと平滑化 (Hulls, masks, and smoothing)
+3 凸包とマスクと平滑化 (Hulls, masks, and smoothing)
 ?new hulls
 #start
 #b 2 次元の点の集合を、その境界の多角形で置き換える新しいフィルタ
@@ -324,33 +322,48 @@ C 行が長いのは、できればなんとかしたい
 ## 元スプライン平滑化。以下参照: `smooth path`。これは、凸包やマスクの
 ## 平滑化も可能にします。
 #b 3 次元曲線の 3 次スプライン平滑化。以下参照: `splot smooth csplines`
-#b 平滑化オプションは `splot with filledcurves {above|below|between}`
-## にも適用します。
+#b 平滑化オプションは `with filledcurves {above|below|between}` での描
+## 画にも適用します。
+#b 周期的データの平滑化用の新しいキーワード `period`。以下参照:
+## `smooth kdensity`。
 #end
 
-4 新しいデータ形式
-?new data_format
+3 新しいデータ形式 (New data formats)
+?new data_formats
 #start
 #b オプション `sparse matrix=(cols,rows)` は、`plot` と `splot` に、個
 ## 々のピクセル値を任意の順番で読みだすことができるような一様なピクセル
 ## 格子を生成させます。これは、不完全なデータから温度分布図 (heatmap)
 ## を描画するような場合に有用です。以下参照: `sparse`。
+#b 非一様な matrix データの入力中、現在は column(0) はその matrix 要素
+## の線形順序を返します。すなわち、MxN matrix の A の要素 A[i,j] に対し
+## ては、column(0)/M が行番号 i に、column(0)%M が列番号 j になります。
 #end
 
-4 新しい組み込み関数
+3 新しい組み込み関数と配列操作 (New built-in functions and array operations)
 ?new built-in functions
 #start
-#b `stats <non-existent file>` はテスト可能な値を出力。以下参照:
-## `stats test`.
-#b `stats $vgrid` で格子内のボクセルの最小/最大/平均/標準偏差を調査
-#b `if ... else if ... else ...`
 #b cbrange 内の z に割当てる現在の RGB パレット色を返す関数 `palette(z)`
 #b 色名からその色の 32bit ARGB 値を返す関数 `rgbcolor("name")`
 #b 要素 Array[i] が element に等しい最初の添字 `i` を返す
 ## `index( Array, element )`。以下参照: `arrays`。
+#b 配列を引数とするユーザ定義関数の許可。
+^<br>
+## 例: dot(A,B) = sum [i=1:|A|] A[i]*B[i]
+#b 配列名に範囲を指定することで部分配列を実現。
+## Array[n] は単一の要素、Array[n:n+5] は元の配列の 6 要素を持つ部分配
+## 列。以下参照: `arrays`, `slice`。
+#b `split("string", "separator")` は、文字列 string に含まれるフィール
+## ド要素を、文字列の配列に詰めて返します。以下参照: `split`。
+#b `join(array, "separator")` は、`split` の逆で、文字列配列の要素を、
+## フィールド区切り文字 separator を間に挟んで結合して一つの文字列にし
+## たものを返します。以下参照: `join`。
+#b `stats <non-existent file>` はテスト可能な値を出力。以下参照:
+## `stats test`.
+#b `stats $vgrid` で格子内のボクセルの最小/最大/平均/標準偏差を調査
 #end
 
-4 名前付きパレット (Named palettes)
+3 名前付きパレット (Named palettes)
 ?new colormaps
 #start
 #b 現在のパレットをその後の利用のため名前付きカラーマップに保存できます。
@@ -362,9 +375,26 @@ C 行が長いのは、できればなんとかしたい
 ## ます。これにより、アルファチャネル値を追加したり、コマンド
 ## `set palette` では簡単に指定できない他の修正を可能にします。
 #b 定義済みの新しい色機構 `set palette viridis`。
+#b ファイルやデータブロックから読み込んだパレット (`set palette file`)
+## は、実数の色成分か、24bit 形式の RGB 値のいずれかで指定できます。
 #end
 
-4 新しい出力形式とオプション (New terminals and terminal options)
+3 プログラムの流れの制御 (Program control flow)
+?control flow
+#start
+#b gnuplotrc の設定選択用に XDG ベースディレクトリをサポート。gnuplot
+## は初期化コマンドを、$HOME/.config/gnuplot/gnuplotrc (もし存在すれば)
+## から読み込みます。以下参照: `environment`。
+#b コマンド "fit" に対する例外処理。fit エラーが起きた場合でも、制御を
+## 常に入力の次の行に返します。エラーが起きた場合は、返ったときに
+## FIT_ERROR がゼロでない値になります。これは、良くないフィッティングか
+## ら復帰するスクリプトを可能にします。以下参照: `fit error_recovery`。
+#b コマンド `load` と `call` は、入力コマンドをファイルから読む代わりに
+## データブロックからも読み込むことができます。
+#b 新しい構文 `if ... else if ... else ...`
+#end
+
+3 新しい出力形式とオプション (New terminals and terminal options)
 ?new terminals
 #start
 #b 新しい出力形式 `block` は、疑似グラフィックのテキストモード用のもの
@@ -376,7 +406,22 @@ C 行が長いのは、できればなんとかしたい
 ## コードを行います。
 #end
 
-4 週曜日のサポート (Week-date time support)
+3 ウォッチポイント (Watchpoints)
+?new watchpoints
+ ウォッチポイントは、グラフ内の個々の曲線に関連する対象値です。曲線が描
+ 画されるとき、各線分要素が、その両端点の間にウォッチポイント座標 (x, y
+ か z) か関数 f(x,y) の対象値を含んでいるかを確認します。それが見つかっ
+ た場合、そのマッチする点の座標 [x,y] を後で使用するために保存します。
+ 以下参照: `watchpoints`。
+#start
+#b 2 つの曲線の交点を見つけること
+#b 関数のゼロ点を見つけること
+#b 従属変数 (y か z) か、関数 f(x,y) が指定値と一致する場所を見つけ表示
+## すること
+#b マウスを使って複数のグラフに沿った値を同時に追跡すること
+#end
+
+3 週曜日のサポート (Week-date time support)
 ?new week-date time
  2020-2021 年に起きた新型コロナウィルス (Covid-19) の騒動では、疫学的デ
  ータのグラフ化の関心が高まりましたが、そこでは報告の慣習として、よく
@@ -395,30 +440,18 @@ C 行が長いのは、できればなんとかしたい
 ## カレンダー時刻に変換します。
 #end
 
-4 その他の新しい機能
+3 その他の新しい機能
 ?new features
 #start
+#b `時間軸の主目盛りと副目盛り用の時間単位`
+## 時間軸の主目盛りと副目盛りは、minutes/hours/days/weeks/months/years
+## を単位とする目盛り間隔指定を受け付けます。
+## 以下参照: `set xtics`, `set mxtics time`。
 #b `using` 指定内での文字列 $# は、現在の入力データ行にある全列数と評価
 ## します。例えば、"plot FOO using 0:(column($# - 1))" は、各行の最後か
 ## ら一つ手前の列を描画します。
-#b 配列を引数とするユーザ定義関数の許可。
-^<br>
-## 例: dot(A,B) = sum [i=1:|A|] A[i]*B[i]
-#b 配列名に範囲を指定することで部分配列を実現。
-## Array[n] は単一の要素、Array[n:n+5] は元の配列の 6 要素を持つ部分配
-## 列。以下参照: `slice`。
-#b 周期的データの平滑化用の新しいキーワード `period`。以下参照:
-## `smooth kdensity`。
 #b bin (箱) 用データの和でなく平均を描画するキーワード `binvalue=avg`
 #b cbtics 以外の軸には影響しない `set colorbox cbtics <linestyle>`
-#b gnuplotrc の設定選択用に XDG ベースディレクトリをサポート。初期化コ
-## マンドは、$HOME/.config/gnuplot/gnuplotrc (もし存在すれば) から読み
-## 込みます。以下参照: `environment`。
-#b コマンド "fit" に対する例外処理。fit エラーが起きた場合でも、制御を
-## 常に入力の次の行に返します。エラーが起きた場合は、返ったときに
-## FIT_ERROR がゼロでない値になります。これは、良くないフィッティングか
-## ら復帰するスクリプトを可能にします。以下参照: `fit error_recovery`。
-#b 時間軸用の小目盛り刻み作成方法の改良。以下参照: `set mxtics time`。
 #b 交差する pm3d 曲面のレンダリングの改良 - 重なる曲面のタイルを、交差
 ## 曲線に沿って 2 つの部分に分割し、一方の曲面のタイルが他方の曲面を通
 ## って不正に突き出てしまうことがないようにします。
@@ -430,6 +463,13 @@ C 行が長いのは、できればなんとかしたい
 #b `set isotoropic` は、2 次元グラフと 3 次元グラフの両方で、x, y, z 軸
 ## のすべてのスケールが同じになるようにスケールを合わせます。
 #b 変更: 文字の回転角が整数という制限はなくなりました。
+#b 特別な (非数値の) 線種 (linetype) `lt nodraw`, `lt black`, `lt bgnd`
+## 以下参照: `special_linetypes`。
+#b データ駆動型の histogram グラフの色割り当て。以下参照:
+## `histgrams colors`。
+#b 凡例 (key) の箱の位置は、gnuplot が他に行う仕組みによるどんな位置決
+## めに対しても、オフセットを与えることで手動で調整できます。以下参照:
+## `set key offset`
 #end
 
 3 バージョン 5.4 で導入された機能
@@ -1618,6 +1658,8 @@ Ffigure_E0
 ^<tr>    <td>strlen("string")</td>    <td>文字列</td>    <td>文字列の中の文字数</td></tr>
 ^<tr>    <td>strstrt("string","key")</td>    <td>文字列</td>    <td>部分文字列 "key" が現れる先頭位置</td></tr>
 ^<tr>    <td>substr("string",beg,end)</td>    <td>複数個</td>    <td>文字列 "string"[beg:end]</td></tr>
+^<tr>    <td>split("string","separator")</td>    <td>文字列</td>    <td>元の文字列の個々のフィールドを持つ配列</td></tr>
+^<tr>    <td>join(array,"separator")</td>    <td>配列, 文字列</td>    <td>配列要素を文字列に結合</td></tr>
 ^<tr>    <td>strftime("timeformat",t)</td>    <td>任意</td>    <td>gnuplot による時刻解析結果の文字列</td></tr>
 ^<tr>    <td>strptime("timeformat",s)</td>    <td>文字列</td>    <td>文字列 s を変換した 1970 年からの秒数</td></tr>
 ^<tr>    <td>system("command")</td>    <td>文字列</td>    <td>シェルコマンドの出力を持つ文字列</td></tr>
@@ -2224,6 +2266,7 @@ C C 4 FresnelS
 #\begin{tabular}{|lcl|}
 @end table
 
+#TeX \newpage
 ^<!-- INCLUDE_NEXT_TABLE -->
 @start table
 #\begin{longtable}{@{\extracolsep{\fill}}|lcl|@{}} \hline
@@ -2282,6 +2325,28 @@ C C 4 FresnelS
  `substr("string",beg,end)` は、元の文字列の beg から end 番目までの文
  字からなる文字列を返します。これは、"string"[beg:end] という式とほぼ同
  じですが、こちらはオプション beg, end を省略できません。
+
+4 split
+?
+#split("string","sep") & 文字列 & 部分文字列からなる配列 \\
+%split("string","sep")@文字列@部分文字列からなる配列
+ `split("string", "sep")` は、"sep" 内の文字をフィールドの区切りとして
+ 使用し、文字列 "string" の中身を個々のフィールドに切り分けます。これは、
+ その要素が元の文字列のフィールドにそれぞれ対応する文字列の配列を返しま
+ す。2 つ目のパラメータ "sep" はオプションで、"sep" を省略した場合、ま
+ たは空白文字一つである場合は、フィールド文字列を任意個のホワイトスペー
+ ス (スペース、タブ、改ページ、改行、復帰) で切り分けます。それ以外の場
+ 合は、区切りは "sep" 内の完全な文字列にマッチする必要があります。
+ 例えば、以下参照: `counting_words`。
+4 join
+?
+ `join(array, "sep")` は、配列の文字列要素を、"sep" の文字列で区切られ
+ たフィールドの列として一つの文字列に連結します。文字列でない配列要素は、
+ 空のフィールドを生成します。
+ 例えば、以下参照: `counting_words`。
+#join(array,"sep") & 配列, 文字列 & 配列要素を一つの文字列に結合\\
+%join(array,"sep") @配列,文字列@配列要素を一つの文字列に結合
+
 4 strftime
 ?expressions functions strftime
 ?strftime
@@ -2311,6 +2376,7 @@ C C 4 FresnelS
  て、外部関数の出力を gnuplot スクリプト内に取り込むのに利用できます。
 4 trim
 =trim
+?expressions functions trim
 #trim(" string ") & 文字列 & 前後につく空白を取り除いた文字列 \\
 %trim(" string ")@文字列@前後につく空白を取り除いた文字列
  `trim("  padded string ")` は、元々の文字列の前後につくホワイトスペー
@@ -2318,6 +2384,7 @@ C C 4 FresnelS
  みうる文字列を比較する際に有用です。例:
       plot FOO using 1:( trim(strcol(3)) eq "A" ? $2 : NaN )
 4 word
+?
 =word
 #word("string",n) & 文字列, 整数 & 文字列 "string" の n 番目の単語 \\
 %word("string",n)@文字列, 整数@文字列 "string" の n 番目の単語
@@ -2942,8 +3009,7 @@ C C 4 weekdata_cdc
  す。これは、$x$ 列目の内容を数値として評価します。
  文字列を持つと思われる列の場合は、代わりに stringcolumn(x) か、
  timecolumn(x, "timeformat") を使用してください。
- 以下参照: `plot datafile using`, `stringcolumn`,
- `timecolumn`。
+ 以下参照: `plot datafile using`, `stringcolumn`, `timecolumn`。
 5 columnhead
 ?expressions functions columnhead
 ?columnhead
@@ -2995,6 +3061,7 @@ C C 4 weekdata_cdc
  がない場合、value() は NaN を返します。
 
 4 単語の取り出しと単語数 (word, words)
+?counting_words
 ?expressions functions word
 ?expressions functions words
 ?words
@@ -3020,7 +3087,44 @@ C C 4 weekdata_cdc
  最後の例では、引用符のエスケープが文字列の定義時のみに必要であることに
  注意してください。
 
-?expressions functions trim
+=split
+?split
+?expressions functions split
+ `split("string", "sep")` は、
+ `split("string", "sep")` は、"sep" 内の文字をフィールドの区切りとして
+ 使用し、文字列 "string" の中身を個々のフィールドに切り分けます。これは、
+ その要素が元の文字列のフィールドにそれぞれ対応する文字列の配列を返しま
+ す。2 つ目のパラメータ "sep" はオプションで、"sep" を省略した場合、ま
+ たは空白文字一つである場合は、フィールド文字列を任意個のホワイトスペー
+ ス (スペース、タブ、改ページ、改行、復帰) で切り分けます。それ以外の場
+ 合は、区切りは "sep" 内の完全な文字列にマッチする必要があります。
+
+ 以下の 3 つの例は、いずれも配列 [ "A", "B", "C", "D" ] を生成します。
+     t1 = split( "A B C D" )
+     t2 = split( "A B C D", " ")
+     t3 = split( "A;B;C;D", ";")
+
+ しかし、以下のコマンド
+     t4 = split( "A;B; C;D", "; " )
+ は、2 つの文字列のみを持つ配列 [ "A;B", "C;D" ] を生成しますが、それは、
+ 2 文字のフィールド区切り文字列 "; " が 1 つしか見つからないからです。
+
+ 注意: 文字列を、1 文字ずつの配列に保存するために、区切りとして空文字を
+ 設定することは、現在は実装されていません。それは、代わりに 1 文字の部
+ 分文字列を使うことで実現できます:   Array[i] = "string"[i:i]
+
+=join
+?join
+?expressions functions join
+ `join(array, "sep")` は、配列の文字列要素を、"sep" の文字列で区切られ
+ たフィールドの列として一つの文字列に連結します。文字列でない配列要素は、
+ 空のフィールドを生成します。
+ 例:
+     array A = ["A", "B", , 7, "E"]
+     print join(A,";")
+           A;B;;;E
+
+=trim
 ?trim
  `trim("  padded string ")` は、元の文字列の前後にある空白部分を取り除
  いた文字列を返します。これは、余計な空白を持ちうる入力データ列の文字列
@@ -3511,6 +3615,7 @@ C ... and restart the table:
 ?arrays functions
 ?arrays slice
 ?slice
+=split
  gnuplot バージョン 5.5 より、配列を関数に渡すことも、返り値にすること
  もできるようになりました。例えば、2 つのサイズの同じ数値配列のドット積
  (内積) は以下のように定義できます。
@@ -3520,15 +3625,17 @@ C ... and restart the table:
  配列をやりとりする組み込み関数には、配列の分割操作 array[min:max] や添
  字取得関数 index(Array,value) があります。
 
-      array T = [ "A", "B", "C", "D", "E", "F" ]
+      T = split("A B C D E F")
       U = T[3:4]
+      print T
+         [ "A", "B", "C", "D", "E", "F" ]
       print U
          [ "C", "D" ]
       print index( T, "D" )
          4
 
- この例の U は、それが以前にどのように宣言されていたかどうかに関わらず
- 現在は配列になることに注意してください。
+ この例の T と U は、それが以前にどのように宣言されていたかどうかに関わ
+ らず、この例の時点では配列になることに注意してください。
 
 4 配列の添字付け (Array indexing)
 ?arrays indexing
@@ -4041,6 +4148,7 @@ Ffigure_newsyntax
 
 3 特別な線種 (special linetypes)
 ?linetypes special linetypes
+?special_linetypes
 ?nodraw
 =bgnd
 =background
@@ -4410,7 +4518,8 @@ Ffigure_newsyntax
  gnuplot は、文字列に作用する組み込み関数をいくつか持っています。
  汎用的な書式関数: 以下参照: `gprintf`, `sprintf`。
  時刻書式関数: 以下参照: `strftime`, `strptime`。
- 文字列操作: 以下参照: `substr`, `strstrt`, `trim`, `word`, `words`。
+ 文字列操作: 以下参照: `split`, `substr`, `strstrt`, `trim`, `word`,
+ `words`。
 3 文字列エンコード (string encoding)
 ?string encoding
 =utf8
@@ -4691,7 +4800,103 @@ Ffigure_newsyntax
       18:15:04.253 16-Apr-2011
 
  以下参照: `time_specifiers`, `set xtics time`, `set mxtics time`。
-1 描画スタイル (plotting styles)
+2 ウォッチポイント (Watchpoints)
+?watchpoints
+?watch
+ ウォッチポイントは、あなたが使用する gnuplot が configure 時にオプショ
+ ン --enable-watchpoints をつけて作られた場合にのみサポートされます。こ
+ の昨日は試験段階です (詳細は、リリース版が出る前に変更される可能性があ
+ ります)。
+
+ 書式:
+       plot FOO watch {x|y|z|F(x,y)} = <value>
+       plot FOO watch mouse
+
+       set style watchpoints nolabels
+       set style watchpoints label <label-properties>
+
+       unset style watchpoints      # デフォルトスタイルに戻す
+
+       show watchpoints    # 直前の plot コマンドからのすべてのウォッチ
+                           # ポイントを要約表示
+
+ 一つのウォッチポイントは、x, y, z 座標、または関数 f(x,y) に対する一つ
+ の対象値です。各ウォッチポイントは、コマンド `plot` 内の一つのグラフに
+ 付随します。ウォッチポイントは、`with lines` と `with linespoints` の
+ 描画スタイルでのみ機能します。その場合、そのグラフのすべての構成線分に
+ 対し、そのグラフに付随するすべてのウォッチポイントがチェックされ、一つ
+ 以上のウォッチポイントの対象がその線分上の点で満たされるかどうかを調べ
+ ます。対象条件を満たす (「ヒット」("hits") と呼びます) 点の一覧は、グ
+ ラフの描画毎に累積されます。
+
+ 例えば、対象値 y=100 のウォッチポイントがある場合、各線分に対して、そ
+ の両端点の y 座標がその対象値を挟んでいるかをチェックします。もしそう
+ なら、その線分上のある点 [x,y] が、対象条件 y=100 を完全に満たすことに
+ なります。そして線形補間、または 2 分反復法によりその対象点が見つかり
+ ます。
+
+ 一つの plot コマンド上の複数のウォッチポイントは、順番に番号づけします。
+ 各描画要素毎に、1 つ以上のウォッチポイントを指定できます。
+ 例:
+      plot DATA using 1:2 smooth cnormal watch y=0.25 watch y=0.5 \
+          watch y=0.75
+
+Ffigure_watchpoints
+ 直前の plot コマンドで対象にヒットしたウォッチポイントは、WATCH_n とい
+ う名前の配列に保存されます。直前の plot コマンドからヒットしたすべての
+ ウォッチポイントの要約を表示させることもできます。以下参照:
+ `show watipoints`。
+
+      gnuplot> show watchpoints
+      Plot title:     "DATA using 1:2 smooth cnormal"
+        Watch 1 target y = 0.25         (1 hits)
+                hit 1   x 49.7  y 0.25
+        Watch 2 target y = 0.5          (1 hits)
+                hit 1   x 63.1  y 0.5
+        Watch 3 target y = 0.75         (1 hits)
+                hit 1   x 67.8  y 0.75
+
+ 平滑化: 線分は、それらを描画する際にチェックします。平滑化しないデータ
+ 描画に対しては、これは、補間によって見つかる対象点は、2 つのデータ点を
+ 結ぶ線分の上に完全に乗ることを意味します。データグラフを平滑化する場合
+ は、ヒットする点は平滑化された曲線に対する線分の上にあります。それが平
+ 滑化しないデータに対する対象点よりも精度が良いか悪いかは、平滑化の当て
+ はめの質に依存します。
+
+ 精度: 線分が関数描画で生成されたものであれば、f(x) = y となる x の値は
+ 2 分反復法で見つけます。それ以外の場合は、その線分に沿う線形補間で座標
+ [x,y] を近似します。
+
+3 ウォッチマウス (watch mouse)
+?watchpoints mouse
+?watch mouse
+
+ 現在のマウス x 座標をウォッチ対象として使用すると、マウスの水平位置を
+ 追跡しながら、グラフの線に沿って移動するラベルを生成します。これにより
+ 同じグラフ上の複数の曲線の y の値を同時に表示することも可能です。現在
+ の位置を示す点とラベルの見た目は、`set style watchpoint` で変更できま
+ す。
+
+ 例:
+
+      set style watchpoint labels point pt 6 ps 2 boxstyle 1
+      set style textbox 1 lw 0.5 opaque
+      plot for [i=1:N] "file.dat" using 1:(column(i)) watch mouse
+
+3 ウォッチラベル (watch labels)
+?watchpoint labels
+?watch labels
+ デフォルトではラベルは、対象 "watch mouse" に対して常に生成します。他
+ の対象に対しても、コマンド `set style watchpoint labels` を使えばラベ
+ ルをオンにできます。ラベル文字列は "x : y" で、x, y は対象点の座標、そ
+ の書式化は対応する軸に対する現在の設定を使用します。
+
+ 例:
+      set y2tics format "%.2f<C2><B0>"
+      set style watchpoint labels point pt 6
+      plot FOO axes x1y2 watch mouse
+
+1 描画スタイル (Plotting styles)
 ?plotting styles
 =plot styles
 
@@ -5271,12 +5476,12 @@ Ffigure_financebars
 
 Ffigure_steps
  `fillsteps` スタイルは 2 次元描画でのみ利用可能です。
- `fillsteps` スタイルは、`steps` とほぼ同じですが、曲線とベースライン
- (デフォルトは y=0) との間の領域を現在の fillstyle で塗り潰します。オプ
- ション `above` と `below` は、ベースラインの片方の部分のみ塗り潰します。
- 一つのデータ点から次の点への移動の際に、`steps` と `fillsteps` はいず
- れもまず x 座標の変化の線を引き、その後 y 座標の変化の線を引くことに注
- 意してください。以下参照: `steps`。
+ これは、`steps` とほぼ同じですが、曲線とベースライン (デフォルトは y=0)
+ との間の領域を現在の fillstyle で塗り潰します。オプション `above` と
+ `below` は、ベースラインの片方の部分のみ塗り潰します。一つのデータ点か
+ ら次の点への移動の際に、`steps` と `fillsteps` はいずれもまず x 座標の
+ 変化の線を引き、その後 y 座標の変化の線を引くことに注意してください。
+ 以下参照: `steps`。
 2 fsteps
 ?plotting styles fsteps
 ?style fsteps
@@ -5344,7 +5549,7 @@ Ffigure_histeps
  行目) の値に対応する箱の固まりが x=2 を中心として置かれます。以下同様
  です。デフォルトの空白 (gap) 幅の 2 は、箱の固まり同士の間の空白が、箱
  2 つの幅に等しいことを意味します。同じ列に対する箱は全て同じ色または同
- じパターンで与えられます (以下参照: `set style fill`)。
+ じパターンで与えられます; しかし、以下も参照: `histograms colors`。
 
  箱の固まりそれぞれは、データファイルの 1 つの行から得られます。そのよ
  うな入力ファイルの各行の最初の項目が見出し (ラベル) でることは良くある
@@ -5378,10 +5583,11 @@ Ffigure_histeps
  ーンで与えられます (以下参照: `set style fill`)。
 
  スタイル `columnstacked` も同様ですが、こちらは各箱の積み上げは (各行
- のデータからではなく) 各列のデータからなります。最初に指定された列の各
- 行のデータが x=1 の箱の積み上げを生成し、2 番目に指定した列の各行のデ
- ータが x=2 の箱の積み上げ、などのようになります。このスタイルでは、各
- 箱の色は、各データ項目の (列番号ではなく) 行番号から決定されます。
+ のデータからではなく) 各列のデータからなります。最初に指定したデータ列
+ の各行のデータが x=1 の箱の積み上げを生成し、2 番目に指定したデータ列
+ の各行のデータが x=2 の箱の積み上げ、などのようになります。このスタイ
+ ルでは、各箱の色は、各データ項目の (列番号ではなく) 行番号から決定され
+ ます。
 
  箱の幅はコマンド `set boxwidth` で変更できます。
  箱の塗りつぶしスタイルはコマンド `set style fill` で設定できます。
@@ -5461,7 +5667,9 @@ Ffigure_histcols
  ることに注意してください。
 3 newhistogram
 ?newhistogram
+?with histograms newhistogram
 ?histograms newhistogram
+?styles histograms newhistogram
 ?plotting styles histograms newhistogram
  書式:
 
@@ -5514,6 +5722,7 @@ Ffigure_newhist
  この場合、2 つ目のヒストグラムの位置は x=8 から始まります。
 3 複数の列に渡る自動的な繰り返し (automated)
 ?automated
+?with histograms automated
 ?histograms automated
 ?styles histograms automated
 ?plotting styles histograms automated
@@ -5524,6 +5733,47 @@ Ffigure_newhist
 
        set style histogram columnstacked
        plot for [i=3:8] "datafile" using i title columnhead
+3 ヒストグラムの色の割り当て (histogram color assignments)
+?with histograms colors
+?histograms colors
+?styles histograms colors
+?plotting styles histograms colors
+ gnuplot は、ヒストグラム内の各要素の箱に自動的に色を割り当てますが、同
+ 値なデータには、それらがヒストグラムの行、または列にどこに現れたとして
+ も首尾一貫した色を保持するようにします。色は、連続する線種 (linetype)
+ の、まだ使用されていない次の線種、または `newhistogram` 命令の提示によ
+ って初期化される最初の線種のいずれかから始まるものが使われます。
+
+ この仕組みは、データソースが真に並列ではない (すなわち、いくつかのファ
+ イルのデータが不完全) ために失敗することがあります。または、基本色の光
+ 度や彩度を変えることにより視覚化するためのデータの追加属性を与えたいか
+ もしれません。自動的な色の割り当ての代わりに、各データ用の明示的な色の
+ 値を、2 番目の `using` 列で、`linecolor variable` か `rgb variable` の
+ 仕組みによって与えることができます。以下参照: `colorspec`。あなたのデ
+ ータのレイアウトによって、色のカテゴリは、行のヘッダか、列のヘッダか一
+ つのデータ列でありえます。多分、凡例 (key) のサンプルの色は、それに合
+ うようにカスタマイズする必要があることに注意してください (以下参照:
+ `keyentry`)。
+
+ 例: data_001.dat から data_008.dat は、1 列目はカテゴリ識別子の A, B,
+ C, ... で、2 列目がデータ値になっています。すべてのファイルがすべての
+ カテゴリに対する行を持っているとは限らず、よって完全な並列データ群では
+ ありません。この場合、gnuplot は、間違って各ファイルの N 行目の値に同
+ じ色を割り当てようとしてしまいます。その代わりに、1 列目のカテゴリに基
+ づいた色を割り当てる例です。
+
+      file(i) = sprintf("data_%03d.dat",i)
+      array Category = ["A", "B", "C", "D", "E", "F"]
+      color(c) = index(Category, strcol(c))
+      set style data histogram
+      plot for [i=1:8] file(i) using 2:(color(1)) linecolor variable
+
+ さらに key のカスタマイズの生成も含む完全な例が、デモの中の
+^ <a href="http://www.gnuplot.info/demo/histogram_colors.html">
+ histogram_colors.dem
+^ </a>
+ にあります。
+
 2 image
 ?plotting styles image
 ?style image
@@ -5698,6 +5948,7 @@ Ffigure_labels2
  ら取ることに注意してください。
 
    plot $Data using 1:2:3:4:5 with labels tc variable rotate variable
+
 2 lines
 ?plotting styles lines
 ?style lines
@@ -6080,8 +6331,7 @@ Ffigure_xerrorbars
       3 列:  x  y  xdelta
       4 列:  x  y  xlow  xhigh
 
- 入力列を追加 (4,5 列目) すると、それらは点の variable color 情報として
- 使われます。
+ 入力列を追加 (4,5 列目) すると、variable color として使われます。
 
 2 xyerrorbars
 ?plotting styles xyerrorbars
@@ -6127,8 +6377,7 @@ Ffigure_xerrorlines
       3 列:  x  y  xdelta
       4 列:  x  y  xlow  xhigh
 
- 入力列を追加 (4,5 列目) すると、それらは点の variable color 情報として
- 使われます。
+ 入力列を追加 (4,5 列目) すると、variable color として使われます。
 
 #TeX \newpage
 2 xyerrorlines
@@ -6418,6 +6667,7 @@ Ffigure_zerror
 ?call
  `call` コマンドは、読み込むファイル名の後ろに、9 つまでのパラメータを
  与えることができることを除けば `load` コマンドと等価です。
+ 試験段階: コマンドはファイル以外にデータブロックからも読み込めます。
 
       call "inputfile" <param-1> <param-2> <param-3> ... <param-9>
 
@@ -8160,8 +8410,10 @@ Ffigure_convex_hull
 ?datafile filters mask
 ?filters mask
 ?mask
- マスクを一度定義すると、image 描画から点の部分集合を選択するのにそれを
- 利用できます。
+      plot FOO using 1:2:3 mask with {pm3d|image}
+
+ マスクを一度定義すると、image 描画、または pm3d 描画から点の部分集合を
+ 選択するのにそれを利用できます。
  以下参照: `masking`。
 
 5 zsort
@@ -8567,6 +8819,7 @@ Ffigure_smooth_path
 ?data-file smooth kdensity
 ?datafile smooth kdensity
 ?plot kdensity
+?smooth kdensity period
 ?smooth kdensity
 ?kdensity
  オプション `smooth kdensity` は、描画された値集合の分布に対するガウス
@@ -8594,6 +8847,7 @@ Ffigure_smooth_path
 
 4 特別なファイル名 (special-filenames)
 ?special-filenames
+?special_filenames
 ?commands plot datafile special-filenames
 ?plot datafile special-filenames
 ?plot special-filenames
@@ -8871,7 +9125,9 @@ C using の書式 (format)
  ています。
        column(0)   データ集合内での各点の順番。順番は 0 から始まり、空
                    行やコメント行でない行で増え、2 行の連続する空行でリ
-                   セットされます。略記 $0 も使用可。
+                   セットされます。非一様な matrix データ形式では、
+                   column(0) は各 matrix 要素の線形順序になります。
+                   略記 $0 も使用可。
        column(-1)  この番号は 0 から始まり、1 行の空行で増え、2 行の連
                    続する空行でリセットされます。これは、行列、または格
                    子状データ内のデータ行に対応します。また、データ集合
@@ -10574,14 +10830,18 @@ C using の書式 (format)
  以下も参照: `set pm3d`, `set palette`, `set style line`。
 3 色名 (colornames)
 ?colornames
+Ffigure_colornames
  gnuplot は限定された個数の色の名前を持っています。これらは、pm3d パレ
  ットでつながれる色の範囲を定義するのに、あるいは個々の線種やラインスタ
  イルの色を定義しするのに、または現在のカラーパレットに対するグラデーシ
- ョンを定義するのに使えます。持っている色名の一覧を見るには、コマンド
- `show colornames` を使用してください。
+ ョンを定義するのに使えます。コマンド `show colornames` を使用すること
+ で、持っている色名の一覧とその RGB 成分の定義を見ることができます。
  例:
        set style line 1 linecolor "sea-green"
        set palette defined (0 "dark-red", 1 "white")
+       print sprintf("0x%06x", rgbcolor("dark-green"))
+             0x006400
+
 3 等高線 (contour)
 ?commands set contour
 ?commands unset contour
@@ -10938,16 +11198,15 @@ Ffigure_missing
 ?dgrid3d
 ?nodgrid3d
 =kdensity
- コマンド `set dgrid3d` は、非格子状データから格子状データへの写像機能を
- 有効にし、そのためのパラメータを設定します。格子状データの構造について
- の詳細は、以下参照: `splot grid_data`。
+ コマンド `set dgrid3d` は、非格子状データから格子状データへの写像機能
+ を有効にし、そのためのパラメータを設定します。格子状データの構造につい
+ ての詳細は、以下参照: `splot grid_data`。
 
  書式:
-       set dgrid3d {<rows>} {,{<cols>}}
-                   { splines |
-                     qnorm {<norm>} |
-                     (gauss | cauchy | exp | box | hann)
-                       {kdensity} {<dx>} {,<dy>} }
+       set dgrid3d {<rows>} {,{<cols>}} splines
+       set dgrid3d {<rows>} {,{<cols>}} qnorm {<norm>}
+       set dgrid3d {<rows>} {,{<cols>}} {gauss | cauchy | exp | box
+                       | hann} {kdensity} {<dx>} {,<dy>}
        unset dgrid3d
        show dgrid3d
 
@@ -10999,20 +11258,19 @@ Ffigure_missing
  dy は、データ点が格子点へ「データそれ自身の単位で」の寄与を行う範囲の
  制御を可能にします。
 
- オプションキーワード `kdensity` は、重み付け関数名の後ろで (オプション
- の) スケール変換のパラメータの前に置くもので、これはアルゴリズムを変更
- して、格子点用に計算する値を重みの和 ( z = Sum_i w(d_i) * z_i ) では割
- らないようにします。z_i がすべて定数の場合、これは事実上 2 変数の重み
- 付け評価を描画します: (上の 5 つのうちの一つの) 重み付け関数が各データ
- 点に置かれ、それらの重みの和がすべての格子点で評価され、そして元のデー
- タの代わりにこの滑らかな曲面が描画されます。これは、1 次元のデータ集合
- に対する `smooth kdensity` オプションが行うこととおおまかには同じです
- (使用例は kdensity2d.dem を参照してください)。
+ オプションキーワード `kdensity` は、重み付け関数名の後ろでオプションの
+ スケール変換のパラメータの前に置くもので、これはアルゴリズムを変更して、
+ 格子点用に計算する値を重みの和 ( z = Sum_i w(d_i) * z_i ) では割らない
+ ようにします。z_i がすべて定数の場合、これは事実上 2 変数の重み付け評
+ 価を描画します: (上の 5 つのうちの一つの) 重み付け関数が各データ点に置
+ かれ、それらの重みの和がすべての格子点で評価され、そして元のデータの代
+ わりにこの滑らかな曲面が描画されます。これは、1 次元のデータ集合に対す
+ る `smooth kdensity` オプションが行うこととおおまかには同じです (使用
+ 例は kdensity2d.dem を参照してください)。
 
- 非推奨: 後方互換性用に、わずかに異なる書式もサポートされています。どの
- アルゴリズムも明示的に選択しなかった場合、`qnorm` アルゴリズムが仮定さ
- れ、3 つ以下の、コンマ (,) 区切りのオプションパラメータを指定した場合
- は、それらをそれぞれ行数、列数、そして norm 値であると解釈します。
+ 非推奨 (使わないでください): 古いスクリプト用の後方互換性のため、コマ
+ ンド "set dgrid3d <val1>,<val2>,<val3>" は、次のものを意味すると解釈さ
+ れます: "set dgrid3d <val1>, <vale> qnorm <val3>"。
 
  オプション `dgrid3d` は、散在するデータを重み付き平均で規則的な格子に
  置き変える単純な仕組みに過ぎません。この問題に対するより洗練された手法
@@ -11973,6 +12231,7 @@ Ffigure_missing
  位長さが全く同じになるように合わせます。これは次のコマンドと同値で、こ
  れの代わりに使えます: `set size ratio -1; set view equal xyz`。
  これは、2 次元、3 次元グラフの両方に影響します。
+
  `unset isotoropic` は、2 次元、3 次元グラフの両方でその束縛を開放しま
  す。これは以下の古いコマンドと同値ですが、覚えるにはこれの方が簡単でし
  ょう: `set size noratio; set view noequal_axes`。
@@ -12047,6 +12306,7 @@ Ffigure_missing
              {{no}autotitle {columnheader}}
              {{no}box {<line properties>}} {{no}opaque {fc <colorspec>}}
              {width <width_increment>} {height <height_increment>}
+             {offset <dx>,<dy>}
        unset key
 
  デフォルトでは、凡例はグラフ領域の内側の右上の角に置きます。配置用のオ
@@ -12134,6 +12394,7 @@ Ffigure_keyentry
  に指定します。通常のタイトルフォント、文字色、`at` 座標、拡張文字列処
  理に対するオプションは、すべて適用します。
  例:
+      set key outside right center title "Outcomes"
       plot $HEATMAP matrix with image notitle, \
            keyentry with boxes fc palette cb 0 title "no effect", \
            keyentry with boxes fc palette cb 1 title "threshold", \
@@ -12300,6 +12561,14 @@ Ffigure_keyentry
  label コマンドで配置される文字列の場合と同じように基準位置の位置揃えに
  使用されます。すなわち、`left` は凡例が <position> の右に置かれて左合
  わせで出力されます。他の場合も同様です。
+4 凡例の位置の微調整 (key offset)
+?commands set key offset
+?set key offset
+?key offset
+ 凡例 (key) の配置オプションとは無関係に、凡例の最終的な場所を、位置の
+ ずれ (offset) を指定することでも手動で位置合わせすることができます。
+ いつものように、ずれの x, y 成分は character, graph, screen のいずれの
+ 座標でも与えることができます。
 4 凡例のサンプル (key samples)
 ?commands set key samples
 ?set key samples
@@ -12511,10 +12780,18 @@ Ffigure_multiple_keys
  プされますが、ハイパーテキストをサポートしない出力形式では、それは何も
  表示しません。ハイパーテキストを貼り付けるには、そのラベルの `point`
  属性を有効にする必要があります。
+ 拡張文字列制御書式は、ハイパーテキストラベルには適用されません。
  例:
        set label at 0,0 "Plot origin" hypertext point pt 1
        plot 'data' using 1:2:0 with labels hypertext point pt 7 \
             title 'mouse over point to see its order in data set'
+
+       # この pm3d 曲面上の任意の場所にマウスを置くとその Z 座標をハイ
+       # パーテキストとして表示
+       splot '++' using 1:2:(F($1,$2)) with pm3d, \
+             '++' using 1:2:(F($1,$2)):(sprintf("%.3f", F($1,$2))) \
+                   with labels \
+                   hypertext point lc rgb "0xff000000" notitle
 
  wxt と qt 出力形式では、文字列が表示されたあとにハイパーテキスト部分を
  左クリックするとそのハイパーテキストがクリップボードにコピーされます。
@@ -12525,7 +12802,7 @@ Ffigure_multiple_keys
 ^ hypertext demo を見るにはクリックしてください</a>
 ^ </td></tr></table>
 
- 試験段階の機能 (仕様の細かい部分は変更の可能性あり)
+ 試験段階の機能 (仕様の細かい部分は変更の可能性あり) -
  "image{<xsize>,<ysize>}:<filename>{\n<caption text>}" の形式の文字列は
  ポップアップボックス内で画像ファイルを表示させるようにします。サイズ指
  定によりデフォルトのサイズ 300x200 を変更できます。認識する画像ファイ
@@ -12534,6 +12811,7 @@ Ffigure_multiple_keys
  例:
        set label 7 "image:../figures/Fig7_inset.png\nFigure 7 caption..."
        set label 7 at 10,100 hypertext point pt 7
+
 3 線種 (linetype)
 ?commands set linetype
 ?commands show linetype
@@ -13289,7 +13567,7 @@ Ffigure_multiple_keys
 ?set mxtics time
 ?mxtics time
  書式:
-      set mxtics <N> {seconds|minutes|hours|days|weeks|months|years}
+      set mxtics time <N> {seconds|minutes|hours|days|weeks|months|years}
 
  これは、gnuplot バージョン 5.5 で導入された新しいコマンドオプションで
  す。これは、小目盛りの刻みを、大目盛り区間に対する分割位置ではなく、時
@@ -14003,13 +14281,16 @@ Ffigure_palette2
 ?set palette file
 ?palette file
  `set palette file` は基本的に `set palette defined (<gradient>)` と同
- じで、この <gradient> がデータファイルから読み込まれます。4 列 (gray,
- R,G,B) かまたは 3 列 (R,G,B) を `using` データファイル修飾子で選択して
- ください。3 列の場合、行番号を gray の値として使います。
- gray の範囲は自動的に [0,1] にスケール変換します。ファイルは通常のデー
- タファイルとして読むので、全てのデータファイル修飾子が使えます。
- HSV 色空間が選択されている場合には、`R` は実際には `H` を指すことに注
- 意してください。
+ じで、この <gradient> をデータファイル、またはデータブロックから読み込
+ みます。色の値は、単一の RGB 3 つ組の 24 ビット整数 (`using` 列が 1 つ
+ か 2 つの場合) か、または 3 つの別々な R, G, B 成分の実数値 (`using`
+ 列が 3 つか 4 つの場合) のいずれかで与えられます。最初の入力列に明示的
+ な灰色値が与えられない場合は、行番号をそれとして使います。これは、色軸
+ に沿って等間隔なパレットを生成します。
+
+ ファイルは通常のデータファイルとして読むので、全てのデータファイル修飾
+ 子が使えます。HSV 色空間が選択されている場合には、`R` は実際には `H`
+ を指すことに注意してください。
 
  グラデーションを表示するには `show palette gradient` を使用してくださ
  い。
@@ -14019,12 +14300,20 @@ Ffigure_palette2
  RGB のパレットを [0,255] の範囲で読み込む:
        set palette file 'some-palette' using ($1/255):($2/255):($3/255)
 
- 等距離の虹色 (青-緑-黄-赤) パレット:
-       set palette model RGB file "-"
+ 等間隔の虹色 (青-緑-黄-赤) パレット:
+       set palette model RGB file "-" using 1:2:3
        0 0 1
        0 1 0
        1 1 0
        1 0 0
+       e
+
+ 明示的な灰色値指定と RGB 値指定で同じことを:
+       set palette model RGB file "-" using 1:2
+       1  0x0000ff
+       2  0x00ff00
+       3  0xffff00
+       4  0xff0000
        e
 
  バイナリパレットファイルも同様にサポートされています。以下参照:
@@ -14958,6 +15247,7 @@ Ffigure_palette2
        set style line <n> <linestyle>
        set style rectangle <object options> <linestyle> <fillstyle>
        set style textbox {<n>} {opaque|transparent} {{no}border} {fillcolor}
+       set style watchpoint labels <label options>
 
 4 矢印スタイル設定 (set style arrow)
 ?commands set style arrow
@@ -15512,7 +15802,7 @@ Ffigure_palette2
  書式:
          set style textbox {<boxstyle-index>}
                    {opaque|transparent} {fillcolor <color>}
-                   {{no}border {<bordercolor>}}{linewidth <lw>}
+                   {{no}border {linecolor <colorspec>}}{linewidth <lw>}
                    {margins <xmargin>,<ymargin>}
 
  このコマンドは、属性 `boxed` による label の表示を制御します。箱付き文
@@ -15530,6 +15820,32 @@ Ffigure_palette2
       set style textbox 2 opaque fc "light-cyan" noborder
       set label 1 "I'm in a box" boxed
       set label 2 "I'm blue" boxed bs 2
+
+4 ウォッチポイントスタイル指定 (set style watchpoint)
+?commands set style watchpoint
+?commands show style watchpoint
+?set style watchpoint
+
+ 書式:
+      set style watchpoint nolabels
+      set style watchpoint labels {label-options}
+
+ ウォッチポイントの対象 "mouse" については常にグラフ上にラベルを出力し
+ ます。他のウォッチポイント対象には、スタイルが `label` か `nolabel` の
+ どちらに設定されているかによってラベルを表示、または非表示とします。
+
+ ウォッチポイントラベルの見た目は、他の gnuplot label のラベル属性にあ
+ るような全機能を使ってカスタマイズできます。例えばフォント、文字色や、
+ 実際の x,y 座標をマークする点の点種、点サイズを設定できます。以下参照:
+ `set label`。
+
+ 現在は、ラベルの文字列は、現在のグラフに対する軸の見出しに使用する書式
+ を使用して、常に文字列 " x-座標 : y-座標" を自動生成します。
+
+ 例:
+      set style watchpoint labels point pt 4 ps 2
+      set style watchpoint labels font ":Italic,6" textcolor "blue"
+      set style watchpoint labels boxed offset 1, 0.5
 
 3 曲面描画 (surface)
 ?commands set surface
@@ -16255,6 +16571,38 @@ Ffigure_walls
  例:
       set wall x0; set wall y1; set wall z0 fillstyle solid 1.0 fillcolor "gray"
       splot f(x,y) with pm3d fc "goldenrod"
+
+3 watchpoints
+?commands show watchpoints
+?show watchpoints
+
+ コマンド plot の各描画要素毎に、一つ以上のウォッチポイントを設定できま
+ す。コマンド `show watchpoints` で、すべてのウォッチポイント対象と直前
+ の plot コマンドでヒットした点の要約を見ることができます。
+
+ 例:
+      plot DATA using 1:2 smooth cnormal watch y=0.25 watch y=0.5 \
+           watch y=0.75
+      show watchpoints
+
+          Plot title:     "DATA using 1:2 smooth cnormal"
+            Watch 1 target y = 0.25         (1 hits)
+                    hit 1   x 50.6  y 0.25
+            Watch 2 target y = 0.5          (1 hits)
+                    hit 1   x 63.6  y 0.5
+            Watch 3 target y = 0.75         (1 hits)
+                    hit 1   x 68.3  y 0.75
+
+ 最初のウォッチポイント (y=0.25) を満たすすべての点の座標を配列 WATCH_1
+ に保存します。y=0.5 を満たす点は配列 WATCH_2 に保存し、以下同様です。
+
+ 各ヒット点は、x 座標を実数部分、y 座標を虚数部分とする複素数として保存
+ し、よってウォッチポイント 2 の最初のヒット点は、x = real(WATCH_2[1]),
+ y = imag(WATCH_2[1]) となります。この例では、ヒット点の x 座標のみが関
+ 心事で、y 座標は常に対象となる y の値に一致します。しかし、ウォッチポ
+ イント対象が関数 f(x,y) の z 値である場合、x, y 座標はどちらも事前には
+ わかりません。
+
 3 x2data
 ?commands set x2data
 ?commands show x2data
@@ -16696,6 +17044,11 @@ Ffigure_walls
  xtics をより描画に近づける:
        set xtics offset 0,graph 0.05
 
+ 軸の目盛りとグラフ自身の描画の相対的な順番を変更するには、コマンド
+ `set grid` に 'front', 'back', 'layerdefault' 等のオプションを使用して
+ ください。ただし、異なる軸の目盛りや格子線に異なるレイヤーを割り当てる
+ オプションはありません。
+
  デフォルトでは見出しラベルは、美しい結果を生むように、軸と回転角に依存
  した位置に自動的に揃えられますが、気にいらなければ、明示的に `left`,
  `right`, `center` のキーワードにより位置揃えを変更できます。
@@ -16749,15 +17102,13 @@ Ffigure_walls
  例:
        set xtics border offset 0,0.5 -5,1,5
  最後の ',' のところで失敗します。
+ 代わりに
        set xtics border offset 0,0.5 0-5,1,5
  か
        set xtics offset 0,0.5 border -5,1,5
- ならば、ちゃんと指示通りに、目盛りを境界に、目盛り見出し文字列を 0,0.5
- 文字分だけずらして、start, increment, end をそれぞれ -5,1,5 に設定しま
- す。
-
- `set grid` のオプション 'front', 'back', 'layerdefault' も、x 軸の目盛
- りの描画の順序に影響します。
+ のようにしてください。これらは、ちゃんと指示通りに、目盛りを境界に、目
+ 盛り見出し文字列を 0,0.5 文字分だけずらして、start, increment, end を
+ それぞれ -5,1,5 に設定します。
 
  例:
 
@@ -16828,11 +17179,8 @@ Ffigure_walls
  時間と日付は内部では秒数として保持されています。
 
  入力: 非数値の日時値は、入力時に `timefmt` で指定した書式を用いて秒数
- に変換します。軸に対する位置や軸の範囲も `timefmt` で解釈される日時で、
- 引用符で囲んで与えます。
- <start>, <incr>, <end> 形式を使う場合、<incr> は秒単位で与えなければい
- けません。入力データの解釈には `timefmt` を使ってください。軸の範囲と
- 目盛りの位置は、`set xdata time` で変更されます。
+ に変換します。軸の範囲、目盛りの配置、グラフの座標も `timefmt` で解釈
+ される日時で、引用符で囲んで与えることができます。
 
  出力: 軸の目盛りラベルは、`set format` か `set xtics format` のいずれ
  かで指定された、別の書式を使って生成します。デフォルトでは、それは通常
@@ -16860,6 +17208,15 @@ Ffigure_walls
        set xtics ("01/12", "" "03/12", "05/12")
  これらは両方とも "Dec 1", "Dec 3", "Dec 5", の目盛りを生成しますが、2
  番目の例 "Dec 3" の目盛りは見出し付けされません。
+
+ <start>, <incr>, <end> 形式を使う場合、<incr> はデフォルトでは秒単位で
+ すが、`minutes`, `hours`, `days`, `weeks`, `months`, `years` の明示的
+ な時間の単位を後ろに追加することもできます。これは、間隔 <incr> のみを
+ 指定する場合も同じです。
+
+ 例
+      set xtics time 5 years     # 5 年間隔で目盛りラベルを配置
+      set xtics "01-Jan-2000", 1 month, "01-Jan-2001"
 
  小目盛用の特別な時刻モードもあります。以下参照: `set mxtics time`。
 4 地理座標 (geographic)
@@ -17325,8 +17682,9 @@ C 度の記号は set encoding locale で出るようになると。
 ?commands show colornames
 ?show colornames
 ?show palette colornames
- gnuplot は 100 程度の色名を持っています。コマンド `show colornames` を
- 使えば、その出力形式に対する色名の一覧を出力できます。
+ gnuplot は 100 程度の色名を持っています (以下参照: `colornames`)。コマ
+ ンド `show colornames` を使えば、その出力形式に対する色名の一覧を出力
+ できます。
  新しい色名を設定する方法は今はありません。
 3 show functions
 ?commands show functions
