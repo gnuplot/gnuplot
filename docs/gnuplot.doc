@@ -314,6 +314,36 @@ C
 #b `stats $vgrid` finds min/max/mean/stddev of voxels in grid
 #end
 
+3 Function blocks and scoped variables
+?new function blocks
+ This version of gnuplot introduces a mechanism for invoking a block of
+ standard gnuplot commands as a callable function.  A function block can
+ accept from 0 to 9 parameters and returns a value.  Function blocks can be
+ used to calculate and assign a new value to a variable or otherwise combine
+ with other functions and operators to build up an expression.
+ There are three components to this mechanism.
+ See `local`, `scope`, `function blocks`, `return`.
+#start
+#b The `local` qualifier allows optional declaration of a variable or array
+## whose scope is limited to the duration of execution of the program unit in
+## which it is found. These units currently include `load`, `call`, function
+## block evaluation, and the code block in curly brackets following an `if`,
+## `else`, `do for`, or `while` statement.  If the name of a local variable
+## duplicates the name of a global variable, the global variable is shadowed 
+## until exit from the local scope.
+#b The `function` command declares a named function block (effectively an
+## array of strings) containing gnuplot commands.  When the function block
+## is invoked, commands are executely successively until the end of the block
+## or until a `return` command is encountered.
+#b The `return <expression>` command terminates execution of a function block.
+## The result of evaluating <expression> is returned as the value of the
+## function.  Anywhere outside a function block `return` acts like `exit`.
+#end
+
+ Please see `function_block.dem` for an example of using this mechanism
+ to define and plot a non-trivial function that is too complicated for a
+ simple one-line definition `f(x) = ...`.
+
 3 Named palettes
 ?new colormaps
 #start
@@ -3448,6 +3478,9 @@ C ... and restart the table:
        <func-name>( <dummy1> {,<dummy2>} ... {,<dummy12>} ) = <expression>
 
  where <expression> is defined in terms of <dummy1> through <dummy12>.
+ This form of function definition is limited to a single line.
+ More complicated multi-line functions can be defined using the function block
+ mechanism (new in version 5.5). See `function blocks`.
 
  User-defined variable syntax:
        <variable-name> = <constant-expression>
@@ -3785,15 +3818,8 @@ Ffigure_newsyntax
  In the second case <start>, <end>, and <increment> are integers or integer
  expressions.
 
-?scope
 =scope
- With one exception, gnuplot variables are global.
- There is a single, persistent, list of active variables indexed by name.
- Assignment to a variable creates or replaces an entry in that list.
- The only way to remove a variable from that list is the `undefine` command.
-
- The single exception to this is the variable used in an iteration specifier.
- The scope of the iteration variable is private to that iteration.
+ The scope of the iteration variable is private to that iteration. See `scope`.
  You cannot permanently change the value of the iteration variable inside the
  iterated clause.  If the iteration variable has a value prior to iteration,
  that value will be retained or restored at the end of the iteration.
@@ -4349,6 +4375,44 @@ Ffigure_newsyntax
  provide the same function `uigamma` as the current development version.
       import Q(a,x) from "uigamma_plugin"
       uigamma(a,x) = ((x<1 || x<a) ? 1.0-igamma(a,x) : Q(a,x))
+
+2 Scope of variables
+?scope
+?variables local
+=local
+=global
+ Gnuplot variables are global except in the special cases listed below.
+ There is a single persistent list of active variables indexed by name.
+ Assignment to a variable creates or replaces an entry in that list.
+ The only way to remove a variable from that list is the `undefine` command.
+
+ Exception 1: The scope of the variable used in an iteration specifier is
+ private to that iteration.  You cannot permanently change the value of the
+ iteration variable inside the iterated clause.
+ If the iteration variable has a value prior to iteration, that value will
+ be retained or restored at the end of the iteration.
+ For example, the following commands will print 1 2 3 4 5 6 7 8 9 10 A.
+
+      i = "A"
+      do for [i=1:10] { print i; i=10; }
+      print i
+
+ Exception 2: The parameter names used in defining a function are only
+ placeholders for the actual values that will be provided when the function
+ is called.  For example, any current or future values of x and y are not
+ relevant to the definition shown here, but A must exist as a global variable
+ when the function is later evaluated:
+
+      func(x,y) = A + (x+y)/2.
+
+ Exception 3: Variables declared with the `local` command.
+ The `local` qualifier (new in version 5.5) allows optional declaration of a
+ variable or array whose scope is limited to the execution of the code block
+ in which it is found.  This includes `load` and `call` operations,
+ evaluation of a function block, and the code in curly brackets that follows
+ an `if`, `else`, `do for`, or `while` condition.
+ If the name of a local variable duplicates the name of a global variable,
+ the global variable is shadowed until exit from the local scope.
 
 2 Start-up (initialization)
 ?startup
@@ -6774,11 +6838,11 @@ Ffigure_zerror
 2 evaluate
 ?commands evaluate
 ?evaluate
- The `evaluate` command executes the commands given as an argument string.
+ The `evaluate` command executes gnuplot commands contained in a string.
  Newline characters are not allowed within the string.
 
- Syntax:
-       eval <string expression>
+      evaluate "commands in a string constant"
+      evaluate <commands produced by a string-valued expression>
 
  This is especially useful for a repetition of similar commands.
 
@@ -6789,8 +6853,8 @@ Ffigure_zerror
        eval set_label(2., 1., 'two/one')
        eval set_label(1., 2., 'one/two')
 
- Please see `substitution macros` for another way to execute commands
- from a string.
+ Please see `function blocks` and `substitution macros` for other mechanisms
+ that construct or execute strings containing gnuplot commands.
 2 exit
 ?commands exit
 ?exit
@@ -7392,6 +7456,77 @@ Ffigure_zerror
 
  Finally, a nice quote from the manual of another fitting package (fudgit),
  that kind of summarizes all these issues:  "Nonlinear fitting is an art!"
+#TeX \newpage
+2 function blocks
+?commands function
+?function blocks
+?functionblocks
+ The `function` command signals the definition of a here-document containing
+ a named block of gnuplot code that can be called as a function.
+ As with data blocks, the name of a function block must begin with a '$'.
+ Once the function block is defined, you can invoke it as a function by
+ name anywhere that a normal function could be used.  Arguments to the
+ function passed from the command line are accessed inside the function block
+ as ARGV[1] etc, as would be the case for a `call` command.  See `ARGV`.
+
+ Example:
+      function $sinc << EOF
+          local x = ARGV[1]
+          if (x == 0) { return 1.0 }
+          return sin(x) / x
+      EOF
+
+      plot $sinc(x) with lines title "sinc(x) as a function block"
+
+ Obviously this simple case could have used a one-line definition
+      Mysinc(x) = (x==0) ? 1.0 : sin(x) / x
+ but the function block above illustrates use of the `local` and `return`
+ commands.  See also `scope`.
+
+ The primary motivation for function block support is to allow definition of
+ complicated functions directly in gnuplot.  Execution is of course slower
+ than if the same function were coded directly in C or Fortran, but this is
+ probably acceptable for many purposes.  If execution speed matters then
+ the function can be implemented as a plugin instead (see `plugins`).
+
+ A non-trivial example of using function blocks to implement and plot
+ a 15-term Lancosz approximation for the complex lngamma function is
+ provided in the demo collection as
+^ <a href="http://www.gnuplot.info/demo_5.5/function_block.html">
+      function_block.dem
+^ </a>
+ The function block implementation is slower by a factor of roughly 25 compared
+ to the built-in lnGamma function using the same algorithm coded directly in C.
+ Nevertheless it is still fast enough for 3D interactive rotation.
+#TeX The function definitions used in that demo are show below.
+#TeX \newline
+#TeX {\small
+#TeX \begin{verbatim}
+#TeX array coef[15] = [ ... ]
+#TeX 
+#TeX function $Lancosz << EOD
+#TeX     local z = ARGV[1]
+#TeX     local Sum = coef[1] + sum [k=2:15] coef[k] / (z + k - 1)
+#TeX     local temp = z + 671./128.
+#TeX     temp = (z + 0.5) * log(temp) - temp
+#TeX     temp = temp + log( sqrt(2*pi) * Sum/z )
+#TeX     return temp
+#TeX EOD
+#TeX 
+#TeX function $Reflect << EOD
+#TeX     local z = ARGV[1]
+#TeX     local w = $Lancosz(1.0 - z)
+#TeX     local temp = log( sin(pi * z) )
+#TeX     return log(pi) - (w + temp)
+#TeX EOD
+#TeX 
+#TeX my_lngamma(z) = (z == 0) ? NaN : (real(z) < 0.5) ? $Reflect(z) : $Lancosz(z)
+#TeX \end{verbatim}
+#TeX }
+
+ Use of function blocks is EXPERIMENTAL. Details may change before
+ inclusion in a release version.
+#TeX \newpage
 2 help
 ?commands help
 ?help
@@ -7560,6 +7695,43 @@ Ffigure_zerror
  The `load` command is performed implicitly on any file names given as
  arguments to `gnuplot`.  These are loaded in the order specified, and
  then `gnuplot` exits.
+2 local
+?local
+?commands local
+ Syntax:
+      local foo = <expression>
+      local array foo[size]
+
+ The `local` keyword introduces declaration of a variable whose scope
+ is limited to the execution of the code block in which it is declared.
+ Declaration is optional, but without it all variables are global.
+ If the name of a local variable duplicates the name of a global variable,
+ the global variable is shadowed until exit from the local scope.
+ See `scope`.
+
+ Local declarations may be used to prevent a global variable from being
+ unintentionally overwritten by a `call` or `load` statement.  They are
+ particularly useful inside a function block. The `local` command is also
+ also valid inside the code block in curly brackets following an `if`,
+ `else`, `do for`, or `while` statement.
+
+ Example: Suppose you want to write a script "plot_all_data.gp" containing
+ commands that plot a bunch of data sets.  You want to call this convenience
+ script from the command line or from other scripts without worrying that it
+ trashes any variables with names "file" or "files" or "dataset" or "outfile".
+ The variable "file" is inherently local because it is an iteration variable
+ (see `scope`) but the other three names need keyword `local` to protect them.
+ 
+ plot_all_data.gp:
+      local files = system("ls -1 *.dat")
+      do for [file in files] {
+         local dataset = file[1:strstrt(file,".dat")-1]
+         local outfile = dataset . ".png"
+         set output outfile
+         plot file with lines title dataset
+      }
+      unset output
+
 2 lower
  See `raise`.
 2 pause
@@ -9788,6 +9960,24 @@ Ffigure_smooth_path
 ?reset bind
 =bind
  `reset bind` restores all hotkey bindings to their default state.
+2 return
+?commands return
+?return
+ Syntax:
+      return <expression>
+
+ The `return` command acts the same way as the `exit` and `quit` commands in
+ that it terminates execution of the current code block or input stream.
+ The return value is meaningful only in the context of executing code in a
+ function block.  See `function blocks`.
+
+ Example:
+      function $myfun << EOF
+      local result = 0
+      if (error-condition) { return -1 }
+      ... body of function ...
+      return result
+      EOF
 2 save
 ?commands save
 ?save set
