@@ -97,6 +97,7 @@ static void parse_unary_expression(void);
 static void parse_sum_expression(void);
 static int  parse_assignment_expression(void);
 static int  parse_array_assignment_expression(void);
+static void parse_function_block(void);
 
 static void set_up_columnheader_parsing(struct at_entry *previous );
 
@@ -207,9 +208,16 @@ string_or_express(struct at_type **atptr)
     if (END_OF_COMMAND)
 	int_error(c_token, "expression expected");
 
-    /* parsing for datablocks */
-    if (equals(c_token,"$"))
-	return parse_datablock_name();
+    /* distinguish data blocks from function blocks */
+    if (equals(c_token,"$")) {
+	int save_token = c_token;
+	char *name = parse_datablock_name();
+	udvt_entry *udv = get_udv_by_name(name);
+	if (udv->udv_value.type == FUNCTIONBLOCK)
+	    c_token = save_token;
+	else
+	    return name;
+    }
 
     /* special keywords */
     if (equals(c_token,"keyentry"))
@@ -642,6 +650,8 @@ parse_primary_expression()
 	if (!equals(c_token, ")"))
 	    int_error(c_token, "')' expected");
 	c_token++;
+    } else if (equals(c_token, "$") && equals(c_token+2, "(")) {
+	parse_function_block();
     } else if (equals(c_token, "$")) {
 	struct value a;
 	c_token++;
@@ -1265,6 +1275,48 @@ parse_sum_expression()
     add_action(SUM)->udf_arg = udf;
 }
 
+/* create action table entries to execute a function block */
+#ifdef USE_FUNCTIONBLOCKS
+static void
+parse_function_block()
+{
+    /* $functionblock( arg1, ... )
+     * evaluation stack -> EVAL with pointer to function block udvt_entry
+     *                     num_params (including the block pointer)
+     *                     function params
+     */
+    struct udvt_entry *functionblock;
+    struct value num_params = {.type = INTGR};
+    int nparams;
+
+    functionblock = get_udv_by_name(parse_datablock_name());
+    if (!functionblock || functionblock->udv_value.type != FUNCTIONBLOCK)
+	int_error(c_token-1, "Not a function block");
+    c_token++;	/* skip '(' */
+    nparams = 0;
+    if (!equals(c_token,")")) {
+	parse_expression();
+	nparams++;
+	while (equals(c_token, ",")) {
+	    c_token++;
+	    parse_expression();
+	    nparams++;
+	}
+    }
+    if (!equals(c_token, ")"))
+	int_error(c_token, "')' expected");
+    num_params.v.int_val = nparams;
+    c_token++;
+    add_action(PUSHC)->v_arg = num_params;
+    add_action(EVAL)->udv_arg = functionblock;
+}
+#else	/* USE_FUNCTIONBLOCKS */
+static void parse_function_block()
+{
+    int_error(c_token, "This copy of gnuplot does not support function blocks");
+}
+
+#endif	/* USE_FUNCTIONBLOCKS */
 
 /* find or add value and return pointer */
 struct udvt_entry *

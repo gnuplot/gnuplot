@@ -147,6 +147,15 @@ prepare_call(int calltype)
 	    lf_head->call_args[argindex] = NULL;	/* just to be safe */
 	}
 
+#ifdef USE_FUNCTIONBLOCKS
+    } else if (calltype == 8) {
+	/* $functionblock(arg1, ...) */
+	memcpy(argval, eval_parameters, sizeof(argval));
+	call_argc = 0;
+	while ((call_argc < 9) && (argval[call_argc].type != NOTDEFINED))
+	    call_argc++;
+#endif
+
     } else {
 	/* "load" command has no arguments */
 	call_argc = 0;
@@ -159,15 +168,22 @@ prepare_call(int calltype)
     udv = add_udv_by_name("ARGC");
     Ginteger(&(udv->udv_value), call_argc);
 
+    udv = add_udv_by_name("ARGV");
+    argv_size = GPMIN(call_argc, 9);
+    init_array(udv, argv_size);
+    ARGV = udv->udv_value.v.value_array;
+
+#ifdef USE_FUNCTIONBLOCKS
+    if (calltype == 8) {
+	for (argindex = 1; argindex <= argv_size; argindex++)
+	    ARGV[argindex] = argval[argindex-1];
+	return;
+    }
+#endif
+
     udv = add_udv_by_name("ARG0");
     gpfree_string(&(udv->udv_value));
     Gstring(&(udv->udv_value), gp_strdup(lf_head->name));
-
-    argv_size = GPMIN(call_argc, 9);
-
-    udv = add_udv_by_name("ARGV");
-    init_array(udv, argv_size);
-    ARGV = udv->udv_value.v.value_array;
 
     for (argindex = 1; argindex <= 9; argindex++) {
 	char *argstring = call_args[argindex-1];
@@ -194,6 +210,7 @@ prepare_call(int calltype)
  * (5) to execute a single script file given with -c (acts like "call")
  * (6) "load $datablock"
  * (7) "call $datablock"
+ * (8) execute commands in function block (called from f_eval)
  */
 void
 load_file(FILE *fp, char *name, int calltype)
@@ -209,6 +226,15 @@ load_file(FILE *fp, char *name, int calltype)
     /* Support for "load $datablock" */
     if (calltype == 6 || calltype == 7)
 	datablock_input_line = get_datablock(name);
+
+#ifdef USE_FUNCTIONBLOCKS
+    /* Support for function blocks */
+    if (calltype == 8) {
+	udvt_entry *functionblock = (udvt_entry *)(name);
+	datablock_input_line = functionblock->udv_value.v.functionblock.data_array;
+	name = strdup(functionblock->udv_name);
+    }
+#endif
 
     if (!fp && !datablock_input_line) {
 	failed_file_name = name;

@@ -63,6 +63,7 @@ const struct gen_ftable command_ftbl[] =
     { "eval$uate", eval_command },
     { "ex$it", exit_command },
     { "f$it", fit_command },
+    { "function", functionblock_command },
     { "h$elp", help_command },
     { "?", help_command },
     { "hi$story", history_command },

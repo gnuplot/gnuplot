@@ -782,6 +782,9 @@ disp_at(struct at_type *curr_at, int level)
 	case DOLLARS:
 	    fprintf(stderr, " %d\n", (int)(arg->v_arg.v.int_val));
 	    break;
+	case EVAL:
+	    fprintf(stderr, " function block %s\n", arg->udv_arg->udv_name);
+	    break;
 	default:
 	    (void) putc('\n', stderr);
 	}

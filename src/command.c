@@ -2162,8 +2162,10 @@ print_set_output(char *name, TBOOLEAN datablock, TBOOLEAN append_p)
 	 * or (probably by mistake) a voxel grid (clear before use).
 	 */
 	print_out_var = add_udv_by_name(name);
-	if (!append_p)
+	if (!append_p) {
 	    gpfree_datablock(&print_out_var->udv_value);
+	    gpfree_functionblock(&print_out_var->udv_value);
+	}
 	if (print_out_var->udv_value.type != DATABLOCK) {
 	    free_value(&print_out_var->udv_value);
 	    gpfree_vgrid(print_out_var);
@@ -2225,9 +2227,18 @@ print_command()
     screen_ok = FALSE;
     do {
 	++c_token;
-	if (equals(c_token, "$") && isletter(c_token+1) && !equals(c_token+2,"[")) {
+	if (equals(c_token, "$") && isletter(c_token+1)
+	&&  !equals(c_token+2,"[") && !equals(c_token+2,"(")) {
+	    char **line;
 	    char *datablock_name = parse_datablock_name();
-	    char **line = get_datablock(datablock_name);
+	    struct udvt_entry *block = get_udv_by_name(datablock_name);
+
+	    if (!block)
+		int_error(c_token, "no block named %s", datablock_name);
+	    if (block->udv_value.type == FUNCTIONBLOCK)
+		line = block->udv_value.v.functionblock.data_array;
+	    else
+		line = block->udv_value.v.data_array;
 
 	    /* Printing a datablock into itself would cause infinite recursion */
 	    if (print_out_var && !strcmp(datablock_name, print_out_name))
@@ -2667,8 +2678,7 @@ $PALETTE u 1:2 t 'red' w l lt 1 lc rgb 'red',\
 
     /* Store R/G/B/Int curves in a datablock */
     datablock = add_udv_by_name("$PALETTE");
-    if (datablock->udv_value.type != NOTDEFINED)
-	gpfree_datablock(&datablock->udv_value);
+    free_value(&datablock->udv_value);
     datablock->udv_value.type = DATABLOCK;
     datablock->udv_value.v.data_array = NULL;
 

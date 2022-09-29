@@ -54,6 +54,7 @@ enum operators {
     DOLLARS,
     CONCATENATE, EQS, NES, RANGE, INDEX, CARDINALITY,
     ASSIGN,
+    EVAL,
     /* only jump operators go between jump and sf_start, for is_jump() */
     JUMP, JUMPZ, JUMPNZ, JTERN, SF_START,
 

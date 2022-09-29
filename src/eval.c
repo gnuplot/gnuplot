@@ -128,6 +128,7 @@ const struct ft_entry ft[] =
     {"[]",  f_index},			/* for array variables only */
     {"||",  f_cardinality},		/* for array variables only */
     {"assign", f_assign},		/* assignment operator '=' */
+    {"eval", f_eval},			/* function block */
     {"jump",  f_jump},
     {"jumpz",  f_jumpz},
     {"jumpnz",  f_jumpnz},
@@ -474,6 +475,9 @@ free_value(struct value *a)
 			break;
 	case DATABLOCK:
 			gpfree_datablock(a);
+			break;
+	case FUNCTIONBLOCK:
+			gpfree_functionblock(a);
 			break;
 	case VOXELGRID: /* Should not happen! */
 	default:	/* INVALID_VALUE INVALID_NAME */

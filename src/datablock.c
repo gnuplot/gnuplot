@@ -67,7 +67,17 @@
 #include "misc.h"
 #include "util.h"
 
+#ifdef USE_FUNCTIONBLOCKS
+/* Set by "return" command and pushed onto the evaluation stack by f_eval */
+struct value eval_return_value;
+
+/* Used by f_eval to pass parameters to a function block */
+struct value eval_parameters[9];
+#endif
+
+/* static function prototypes */
 static int enlarge_datablock(struct value *datablock_value, int extra);
+static void new_block( enum DATA_TYPES type );
 
 
 /*
@@ -86,27 +96,51 @@ static int enlarge_datablock(struct value *datablock_value, int extra);
 void
 datablock_command()
 {
+    new_block(DATABLOCK);
+}
+
+/*
+ * Function blocks are currently identical to data blocks except for
+ * the identifying type.
+ * function $FUNC << EOD
+ *     gnuplot commands
+ * EOD
+ */
+void
+functionblock_command()
+{
+    c_token++;	/* step past "function" command */
+    new_block(FUNCTIONBLOCK);
+}
+
+static void
+new_block( enum DATA_TYPES type )
+{
     FILE *fin;
     char *name, *eod;
     int nlines;
     int nsize = 4;
     struct udvt_entry *datablock;
     char *dataline = NULL;
+    char **data_array = NULL;
 
     if (!isletter(c_token+1))
-	int_error(c_token, "illegal datablock name");
+	int_error(c_token, "illegal block name");
 
     /* Create or recycle a datablock with the requested name */
     name = parse_datablock_name();
     datablock = add_udv_by_name(name);
 
     if (!equals(c_token, "<<") || !isletter(c_token+1))
-	int_error(c_token, "data block name must be followed by << EODmarker");
+	int_error(c_token, "block name must be followed by << EODmarker");
 
-    if (datablock->udv_value.type != NOTDEFINED)
-	gpfree_datablock(&datablock->udv_value);
-    datablock->udv_value.type = DATABLOCK;
-    datablock->udv_value.v.data_array = NULL;
+    free_value(&datablock->udv_value);
+    if (type == FUNCTIONBLOCK) {
+	datablock->udv_value.type = FUNCTIONBLOCK;
+	datablock->udv_value.v.functionblock.parnames = NULL;
+    } else {
+	datablock->udv_value.type = DATABLOCK;
+    }
 
     c_token++;
     eod = (char *) gp_alloc(token[c_token].length +2, "datablock");
@@ -125,19 +159,23 @@ datablock_command()
 	/* Allocate space for data lines plus at least 2 empty lines at the end. */
 	if (nlines >= nsize-4) {
 	    nsize *= 2;
-	    datablock->udv_value.v.data_array =
-		(char **) gp_realloc(datablock->udv_value.v.data_array,
+	    data_array = (char **) gp_realloc(data_array,
 			nsize * sizeof(char *), "datablock");
-	    memset(&datablock->udv_value.v.data_array[nlines], 0,
+	    memset(&data_array[nlines], 0,
 		    (nsize - nlines) * sizeof(char *));
 	}
 	/* Strip trailing newline character */
 	n = strlen(dataline);
 	if (n > 0 && dataline[n - 1] == '\n')
 	    dataline[n - 1] = NUL;
-	datablock->udv_value.v.data_array[nlines] = gp_strdup(dataline);
+	data_array[nlines] = gp_strdup(dataline);
     }
     inline_num += nlines + 1;	/* Update position in input file */
+
+    if (type == FUNCTIONBLOCK)
+	datablock->udv_value.v.functionblock.data_array = data_array;
+    else
+	datablock->udv_value.v.data_array = data_array;
 
     /* make sure that we can safely add lines to this datablock later on */
     enlarge_datablock(&datablock->udv_value, 0);
@@ -196,6 +234,30 @@ gpfree_datablock(struct value *datablock_value)
     datablock_value->type = NOTDEFINED;
 }
 
+void
+gpfree_functionblock(struct value *block_value)
+{
+    int i;
+    char **stored_data;
+
+    if (block_value->type != FUNCTIONBLOCK)
+	return;
+    stored_data = block_value->v.functionblock.data_array;
+    if (stored_data)
+	for (i=0; stored_data[i] != NULL; i++)
+	    free(stored_data[i]);
+    free(stored_data);
+    stored_data = block_value->v.functionblock.parnames;
+    if (stored_data)
+	for (i=0; stored_data[i] != NULL; i++)
+	    free(stored_data[i]);
+    free(stored_data);
+
+    block_value->v.functionblock.data_array = NULL;
+    block_value->v.functionblock.parnames = NULL;
+    block_value->type = NOTDEFINED;
+}
+
 /* count number of lines in a datablock */
 int
 datablock_size(struct value *datablock_value)
@@ -203,7 +265,10 @@ datablock_size(struct value *datablock_value)
     char **dataline;
     int nlines = 0;
 
-    dataline = datablock_value->v.data_array;
+    if (datablock_value->type == FUNCTIONBLOCK)
+	dataline = datablock_value->v.functionblock.data_array;
+    else
+	dataline = datablock_value->v.data_array;
     if (dataline) {
 	while (*dataline++)
 	    nlines++;
@@ -225,9 +290,17 @@ enlarge_datablock(struct value *datablock_value, int extra)
 
     /* only resize if necessary */
     if ((osize != nsize) || (extra == 0) || (nlines == 0)) {
-	datablock_value->v.data_array =
-	    (char **) gp_realloc(datablock_value->v.data_array,  nsize * sizeof(char *), "resize_datablock");
-	datablock_value->v.data_array[nlines] = NULL;
+	if (datablock_value->type == FUNCTIONBLOCK) {
+	    datablock_value->v.data_array =
+		(char **) gp_realloc(datablock_value->v.functionblock.data_array,
+					nsize * sizeof(char *), "resize_datablock");
+	    datablock_value->v.functionblock.data_array[nlines] = NULL;
+	} else {
+	    datablock_value->v.data_array =
+		(char **) gp_realloc(datablock_value->v.data_array,
+					nsize * sizeof(char *), "resize_datablock");
+	    datablock_value->v.data_array[nlines] = NULL;
+	}
     }
 
     return nlines;
@@ -281,3 +354,42 @@ append_multiline_to_datablock(struct value *datablock_value, const char *lines)
     }
 }
 
+#ifdef USE_FUNCTIONBLOCKS
+/* Internal version of eval() that can be called from the evaluation stack
+ * when a function block is invoked.
+ */
+void
+f_eval(union argument *arg)
+{
+    udvt_entry *functionblock;
+    struct value num_params;
+    int nparams, i;
+
+    nparams = pop(&num_params)->v.int_val;
+
+    functionblock = arg->udv_arg;
+    if (functionblock->udv_value.type != FUNCTIONBLOCK)
+	int_error(NO_CARET, "attempt to execute something other than a function block");
+
+    /* Clear any previous return value */
+    gpfree_string(&eval_return_value);
+    eval_return_value.type = NOTDEFINED;
+
+    /* Buffer any parameters for load_file to stuff in ARGV[] */
+    for (i = 0; i < 9; i++) {
+	if (i < nparams)
+	    pop( &eval_parameters[nparams - (i+1)] );
+	else
+	    eval_parameters[i].type = NOTDEFINED;
+    }
+
+    load_file( NULL, (void *)(functionblock), 8);
+    push(&eval_return_value);
+}
+#else	/* USE_FUNCTIONBLOCKS */
+void f_eval(union argument *arg)
+{
+    int_error(NO_CARET, "This copy of gnuplot does not support function blocks");
+}
+
+#endif	/* USE_FUNCTIONBLOCKS */

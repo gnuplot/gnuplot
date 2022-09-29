@@ -46,6 +46,7 @@ enum DATA_TYPES {
 	CMPLX,
 	STRING,
 	DATABLOCK,
+	FUNCTIONBLOCK,
 	ARRAY,
 			/* ARRAY subcategories are marked in array->value_array[0].type */
 	COLORMAP_ARRAY,	/*    Array containing packed ARGB values */
@@ -159,6 +160,11 @@ struct cmplx {
 	double real, imag;
 };
 
+struct fblock {
+	char **data_array;
+	char **parnames;
+};
+
 typedef struct value {
     enum DATA_TYPES type;
     union {
@@ -166,6 +172,7 @@ typedef struct value {
 	struct cmplx cmplx_val;
 	char *string_val;
 	char **data_array;
+	struct fblock functionblock;
 	struct value *value_array;
 	struct vgrid *vgrid;
     } v;

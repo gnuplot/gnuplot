@@ -1541,6 +1541,11 @@ value_to_str(struct value *val, TBOOLEAN need_quotes)
 	sprintf(s[j], "<%d line data block>", datablock_size(val));
 	break;
 	}
+    case FUNCTIONBLOCK:
+	{
+	sprintf(s[j], "<function block>");
+	break;
+	}
     case ARRAY:
 	{
 	sprintf(s[j], "<%d element array>", (int)(val->v.value_array->v.int_val));
