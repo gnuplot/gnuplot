@@ -82,6 +82,7 @@ const struct gen_ftable command_ftbl[] =
     { "rep$lot", replot_command },
     { "re$read", reread_command },
     { "res$et", reset_command },
+    { "return", return_command },
     { "sa$ve", save_command },
     { "scr$eendump", screendump_command },
     { "se$t", set_command },

@@ -2465,6 +2465,29 @@ reread_command()
     c_token++;
 }
 
+#ifdef USE_FUNCTIONBLOCKS
+/* 'return <expression>' clears or sets a return value and then acts
+ * like 'exit' to return to the caller immediately.  The only way that
+ * anything sees the return value is if the 'return' statement is
+ * executed inside a function block.
+ */
+void
+return_command()
+{
+    c_token++;
+    gpfree_string(&eval_return_value);
+    if (!END_OF_COMMAND) {
+	const_express(&eval_return_value);
+	if (eval_return_value.type == ARRAY) {
+	    make_array_permanent(&eval_return_value);
+	    eval_return_value.v.value_array[0].type = TEMP_ARRAY;
+	}
+    }
+    command_exit_requested = 1;
+}
+#else	/* USE_FUNCTIONBLOCKS */
+void return_command() {}
+#endif	/* USE_FUNCTIONBLOCKS */
 
 /* process the 'save' command */
 void

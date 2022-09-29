@@ -167,6 +167,7 @@ void refresh_request(void);
 void refresh_command(void);
 void replot_command(void);
 void reread_command(void);
+void return_command(void);
 void save_command(void);
 void screendump_command(void);
 void splot_command(void);
