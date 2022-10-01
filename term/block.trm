@@ -65,8 +65,11 @@ TERM_PUBLIC void BLOCK_set_color(t_colorspec *color);
 #define BLOCK_HTIC  (2)
 
 enum BLOCK_modes {
-    BLOCK_MODE_DOT, BLOCK_MODE_HALF, BLOCK_MODE_QUAD,
-    BLOCK_MODE_SEXT, BLOCK_MODE_OCT, BLOCK_MODE_BRAILLE
+    BLOCK_MODE_DOT, BLOCK_MODE_HALF,
+    BLOCK_MODE_QUAD,
+    BLOCK_MODE_SEXT, BLOCK_MODE_SEXT_PUA,
+    BLOCK_MODE_OCT, BLOCK_MODE_OCT_PUA,
+    BLOCK_MODE_BRAILLE
 };
 
 typedef struct {
@@ -108,7 +111,9 @@ static BLOCK_modeinfo_entry BLOCK_modeinfo[] = {
     { BLOCK_MODE_HALF,    1, 2 },
     { BLOCK_MODE_QUAD,    2, 2 },
     { BLOCK_MODE_SEXT,    2, 3 },
+    { BLOCK_MODE_SEXT_PUA,2, 3 },
     { BLOCK_MODE_OCT,     2, 4 },
+    { BLOCK_MODE_OCT_PUA, 2, 4 },
     { BLOCK_MODE_BRAILLE, 2, 4 }
 };
 
@@ -116,7 +121,9 @@ enum BLOCK_id {
     BLOCK_ENH, BLOCK_NOENH,
     // The code relies on those having the same order as the modes.
     BLOCK_DOT, BLOCK_HALF, BLOCK_QUADRANTS,
-      BLOCK_SEXTANTS, BLOCK_OCTANTS, BLOCK_BRAILLE,
+      BLOCK_SEXTANTS, BLOCK_SEXTANTS_PUA,
+      BLOCK_OCTANTS, BLOCK_OCTANTS_PUA,
+      BLOCK_BRAILLE,
     BLOCK_ANSI, BLOCK_ANSI256, BLOCK_ANSIRGB, BLOCK_NOCOLOR,
     BLOCK_OPTIMIZE, BLOCK_NOOPTIMIZE,
     BLOCK_CHARPOINTS, BLOCK_GPPOINTS, BLOCK_NUMPOINTS,
@@ -133,9 +140,13 @@ static struct gen_table BLOCK_opts[] =
     { "dot", BLOCK_DOT },
     { "half", BLOCK_HALF },
     { "quad$rants", BLOCK_QUADRANTS },
-    { "sex$tants", BLOCK_SEXTANTS },
-    { "br$aille", BLOCK_BRAILLE },
+    { "sext$ants", BLOCK_SEXTANTS },
+    { "sextpua", BLOCK_SEXTANTS_PUA },
+    { "sextantspua", BLOCK_SEXTANTS_PUA },
     { "oct$ants", BLOCK_OCTANTS },
+    { "octpua", BLOCK_OCTANTS_PUA },
+    { "octantspua", BLOCK_OCTANTS_PUA },
+    { "br$aille", BLOCK_BRAILLE },
     { "mono", BLOCK_NOCOLOR },
     { "ansi", BLOCK_ANSI },
     { "ansi256", BLOCK_ANSI256 },
@@ -179,8 +190,10 @@ BLOCK_options()
 	case BLOCK_HALF:
 	case BLOCK_QUADRANTS:
 	case BLOCK_SEXTANTS:
-	case BLOCK_BRAILLE:
+	case BLOCK_SEXTANTS_PUA:
 	case BLOCK_OCTANTS:
+	case BLOCK_OCTANTS_PUA:
+	case BLOCK_BRAILLE:
 	    BLOCK_mode = BLOCK_MODE_DOT + cmd - BLOCK_DOT;
 	    c_token++;
 	    break;
@@ -274,7 +287,7 @@ BLOCK_options()
     {
 	//Note: These need to be in the same order as the corresponding definitions.
 	const char * mode_strings[] =
-	    { "dot", "half", "quadrants", "sextants", "octants", "braille" };
+	    { "dot", "half", "quadrants", "sextants", "sextpua", "octants", "octpua", "braille" };
 	const char * color_strings[] =
 	    {"mono", "ansi", "ansi256", "ansirgb"};
 	const char * pointtype_strings[] =
@@ -337,10 +350,10 @@ BLOCK_init()
     if (BLOCK_mode == BLOCK_MODE_QUAD || BLOCK_mode == BLOCK_MODE_DOT) {
 	term->h_tic = BLOCK_HTIC;
 	term->v_tic = BLOCK_VTIC;
-    } else if (BLOCK_mode == BLOCK_MODE_SEXT) {
+    } else if (BLOCK_mode == BLOCK_MODE_SEXT || BLOCK_mode == BLOCK_MODE_SEXT_PUA) {
 	term->h_tic = BLOCK_HTIC * 3 / 2;
 	term->v_tic = BLOCK_VTIC * 2;
-    } else { // BLOCK_MODE_HALF, BLOCK_MODE_OCT, BLOCK_MODE_BRAILLE
+    } else { // BLOCK_MODE_HALF, BLOCK_MODE_OCT, BLOCK_MODE_OCT_PUA, BLOCK_MODE_BRAILLE
 	term->h_tic = BLOCK_HTIC / 2;
 	term->v_tic = BLOCK_VTIC;
     }
@@ -402,6 +415,48 @@ static uint32_t block_sextant_map[64] = {
     0x1FB31,  0x1FB32,  0x1FB33,  0x1FB34,  // 356, 1356, 2356, 12356
     0x1FB35,  0x1FB36,  0x1FB37,  0x1FB38,  // 456, 1456, 2456, 12456
     0x1FB39,  0x1FB3A,  0x1FB3B,   0x2588,  // 3456, 13456, 23456, *12345* (full)
+};
+
+/*
+  Octant map. Non-continuous.
+    1 2
+    3 4
+    5 6
+    7 8
+*/
+static uint32_t block_octant_map[256] = {
+    0x00A0,  0x1CEA8, 0x1CEAB, 0x1FB82, 0x1CD00, 0x2598,  0x1CD01, 0x1CD02,
+    0x1CD03, 0x1CD04, 0x259D,  0x1CD05, 0x1CD06, 0x1CD07, 0x1CD08, 0x2580,
+    0x1CD09, 0x1CD0A, 0x1CD0B, 0x1CD0C, 0x1FBE7, 0x1CD0D, 0x1CD0E, 0x1CD0F,
+    0x1CD10, 0x1CD11, 0x1CD12, 0x1CD13, 0x1CD14, 0x1CD15, 0x1CD16, 0x1CD17,
+    0x1CD18, 0x1CD19, 0x1CD1A, 0x1CD1B, 0x1CD1C, 0x1CD1D, 0x1CD1E, 0x1CD1F,
+    0x1FBE6, 0x1CD20, 0x1CD21, 0x1CD22, 0x1CD23, 0x1CD24, 0x1CD25, 0x1CD26,
+    0x1CD27, 0x1CD28, 0x1CD29, 0x1CD2A, 0x1CD2B, 0x1CD2C, 0x1CD2D, 0x1CD2E,
+    0x1CD2F, 0x1CD30, 0x1CD31, 0x1CD32, 0x1CD33, 0x1CD34, 0x1CD35, 0x1FB85,
+    0x1CEA3, 0x1CD36, 0x1CD37, 0x1CD38, 0x1CD39, 0x1CD3A, 0x1CD3B, 0x1CD3C,
+    0x1CD3D, 0x1CD3E, 0x1CD3F, 0x1CD40, 0x1CD41, 0x1CD42, 0x1CD43, 0x1CD44,
+    0x2596,  0x1CD45, 0x1CD46, 0x1CD47, 0x1CD48, 0x258C,  0x1CD49, 0x1CD4A,
+    0x1CD4B, 0x1CD4C, 0x259E,  0x1CD4D, 0x1CD4E, 0x1CD4F, 0x1CD50, 0x259B,
+    0x1CD51, 0x1CD52, 0x1CD53, 0x1CD54, 0x1CD55, 0x1CD56, 0x1CD57, 0x1CD58,
+    0x1CD59, 0x1CD5A, 0x1CD5B, 0x1CD5C, 0x1CD5D, 0x1CD5E, 0x1CD5F, 0x1CD60,
+    0x1CD61, 0x1CD62, 0x1CD63, 0x1CD64, 0x1CD65, 0x1CD66, 0x1CD67, 0x1CD68,
+    0x1CD69, 0x1CD6A, 0x1CD6B, 0x1CD6C, 0x1CD6D, 0x1CD6E, 0x1CD6F, 0x1CD70,
+    0x1CEA0, 0x1CD71, 0x1CD72, 0x1CD73, 0x1CD74, 0x1CD75, 0x1CD76, 0x1CD77,
+    0x1CD78, 0x1CD79, 0x1CD7A, 0x1CD7B, 0x1CD7C, 0x1CD7D, 0x1CD7E, 0x1CD7F,
+    0x1CD80, 0x1CD81, 0x1CD82, 0x1CD83, 0x1CD84, 0x1CD85, 0x1CD86, 0x1CD87,
+    0x1CD88, 0x1CD89, 0x1CD8A, 0x1CD8B, 0x1CD8C, 0x1CD8D, 0x1CD8E, 0x1CD8F,
+    0x2597,  0x1CD90, 0x1CD91, 0x1CD92, 0x1CD93, 0x259A,  0x1CD94, 0x1CD95,
+    0x1CD96, 0x1CD97, 0x2590,  0x1CD98, 0x1CD99, 0x1CD9A, 0x1CD9B, 0x259C,
+    0x1CD9C, 0x1CD9D, 0x1CD9E, 0x1CD9F, 0x1CDA0, 0x1CDA1, 0x1CDA2, 0x1CDA3,
+    0x1CDA4, 0x1CDA5, 0x1CDA6, 0x1CDA7, 0x1CDA8, 0x1CDA9, 0x1CDAA, 0x1CDAB,
+    0x2582,  0x1CDAC, 0x1CDAD, 0x1CDAE, 0x1CDAF, 0x1CDB0, 0x1CDB1, 0x1CDB2,
+    0x1CDB3, 0x1CDB4, 0x1CDB5, 0x1CDB6, 0x1CDB7, 0x1CDB8, 0x1CDB9, 0x1CDBA,
+    0x1CDBB, 0x1CDBC, 0x1CDBD, 0x1CDBE, 0x1CDBF, 0x1CDC0, 0x1CDC1, 0x1CDC2,
+    0x1CDC3, 0x1CDC4, 0x1CDC5, 0x1CDC6, 0x1CDC7, 0x1CDC8, 0x1CDC9, 0x1CDCA,
+    0x1CDCB, 0x1CDCC, 0x1CDCD, 0x1CDCE, 0x1CDCF, 0x1CDD0, 0x1CDD1, 0x1CDD2,
+    0x1CDD3, 0x1CDD4, 0x1CDD5, 0x1CDD6, 0x1CDD7, 0x1CDD8, 0x1CDD9, 0x1CDDA,
+    0x2584,  0x1CDDB, 0x1CDDC, 0x1CDDD, 0x1CDDE, 0x2599,  0x1CDDF, 0x1CDE0,
+    0x1CDE1, 0x1CDE2, 0x259F,  0x1CDE3, 0x2586,  0x1CDE4, 0x1CDE5, 0x2588
 };
 
 /* optimization bit patterns */
@@ -551,10 +606,11 @@ BLOCK_text()
     const int idx_half[2]      = { 0x02, 0x01 };
     const int idx_quadrants[4] = { 0x04, 0x08, 0x01, 0x02 };
     const int idx_sextants[6]  = { 0x10, 0x20, 0x04, 0x08, 0x01, 0x02 };
-    const int idx_braille[8]   = { 0x40, 0x80, 0x04, 0x20, 0x02, 0x10, 0x01, 0x08 };
     const int idx_octants[8]   = { 0x40, 0x80, 0x10, 0x20, 0x04, 0x08, 0x01, 0x02 };
+    const int idx_braille[8]   = { 0x40, 0x80, 0x04, 0x20, 0x02, 0x10, 0x01, 0x08 };
     const int * idx_list[] = { idx_dot, idx_half, idx_quadrants,
-			        idx_sextants, idx_octants, idx_braille };
+			        idx_sextants, idx_sextants,
+			        idx_octants, idx_octants, idx_braille };
     size_t bufsiz;
     text_attr prev_text_attr;
 #ifndef NO_DUMB_COLOR_SUPPORT
@@ -610,10 +666,12 @@ BLOCK_text()
 	pattern = quad_pat;
 	break;
     case BLOCK_MODE_SEXT:
+    case BLOCK_MODE_SEXT_PUA:
 	nsets = nsext_pats;
 	pattern = sext_pat;
 	break;
     case BLOCK_MODE_OCT:
+    case BLOCK_MODE_OCT_PUA:
 	nsets = noct_pats;
 	pattern = oct_pat;
 	break;
@@ -656,8 +714,8 @@ BLOCK_text()
 	    const char * c;
 	    t_colorspec color;
 
-	    // increase buffer size if necessary
-	    if (((char *)s - line) > (bufsiz - 50)) {
+	    // increase buffer size if necessary, assuming a maximum of 100 bytes per cell
+	    if (((char *)s - line) > (bufsiz - 100)) {
 		char * l;
 		bufsiz += (term->xmax + 1) * 8;
 		l = realloc(line, bufsiz);
@@ -775,10 +833,10 @@ BLOCK_text()
 		       !(cell[0] == cell[1])) ||
 		     ((BLOCK_mode == BLOCK_MODE_QUAD) && (n == 4) &&
 		      !(cell[0] == cell[1] && cell[1] == cell[2] && cell[2] == cell[3])) ||
-		     ((BLOCK_mode == BLOCK_MODE_SEXT) && (n == 6) &&
+		     ((BLOCK_mode == BLOCK_MODE_SEXT || BLOCK_mode == BLOCK_MODE_SEXT_PUA) && (n == 6) &&
 		      !(cell[0] == cell[1] && cell[1] == cell[2] && cell[2] == cell[3] &&
 		        cell[3] == cell[4] && cell[4] == cell[5])) ||
-		     ((BLOCK_mode == BLOCK_MODE_OCT) && (n == 8) &&
+		     ((BLOCK_mode == BLOCK_MODE_OCT || BLOCK_mode == BLOCK_MODE_OCT_PUA) && (n == 8) &&
 		      !(cell[0] == cell[1] && cell[1] == cell[2] && cell[2] == cell[3] &&
 		        cell[3] == cell[4] && cell[4] == cell[5] && cell[5] == cell[6] &&
 		        cell[6] == cell[7])) )) {
@@ -896,7 +954,7 @@ BLOCK_text()
 		switch (BLOCK_mode) {
 		case BLOCK_MODE_DOT:
 		    // v = (n > 0 ? '*' : ' ');
-		    v = (n > 0 ? 0x25CF : 0x00A0);
+		    v = (n > 0 ? 0x25cf : 0x00a0);
 		    break;
 		case BLOCK_MODE_HALF:
 		    v = block_half_map[i];
@@ -907,15 +965,23 @@ BLOCK_text()
 		case BLOCK_MODE_SEXT:
 		    v = block_sextant_map[i];
 		    break;
+		case BLOCK_MODE_SEXT_PUA:
+		    // Sextants in the KreativeKorp PUA are ordered and complete,
+		    // so no need for a mapping table.
+		    v = 0xf2c0 + i;
+		    break;
+		case BLOCK_MODE_OCT:
+		    v = block_octant_map[i];
+		    break;
+		case BLOCK_MODE_OCT_PUA:
+		    // Octants in the KreativeKorp PUA are ordered and complete,
+		    // so no need for a mapping table.
+		    v = 0xf300 + i;
+		    break;
 		case BLOCK_MODE_BRAILLE:
 		    // Braille characters are well-ordered,
 		    // so we don't need a mapping.
 		    v = 0x2800 + i;
-		    break;
-		case BLOCK_MODE_OCT:
-		    // Octants in the Fairfax PUA are ordered,
-		    // so no need for a mapping table.
-		    v = 0xf300 + i;
 		    break;
 		default:
 		    v = 0x0020;
@@ -1115,7 +1181,7 @@ BLOCK_point(unsigned int x, unsigned int y, int point)
 	    };
 
 	    unsigned ypos = (y % BLOCK_modeinfo[BLOCK_mode].celly);
-	    if ((BLOCK_mode == BLOCK_MODE_SEXT && ypos == 1) ||
+	    if (((BLOCK_mode == BLOCK_MODE_SEXT || BLOCK_mode == BLOCK_MODE_SEXT_PUA) && ypos == 1) ||
 	        (BLOCK_mode == BLOCK_MODE_DOT)) {
 		// special case: vertical center
 		ucs4toutf8(('1' + (point % 9)), (unsigned char *) &DUMB_PIXEL(xd, yd));
@@ -1315,7 +1381,8 @@ START_HELP(block)
 "",
 " Syntax:",
 "         set term block",
-"                 {dot | half | quadrants | sextants | braille | octants}",
+"                 {dot | half | quadrants | sextants | octants | braille |",
+"                   sextpua | octpua}",
 "                 {{no}enhanced}",
 "                 {size <x>, <y>}",
 #ifndef NO_DUMB_COLOR_SUPPORT
@@ -1333,14 +1400,17 @@ START_HELP(block)
 " while `half` uses half-block characters.  `quadrants` uses block characters",
 " which yield double resolution in both directions.  `sextants` uses 2x3 block",
 " characters, and `braille` uses Braille characters which give a 2x4",
-" pseudo-resolution.  `octants` uses the 2x4 block characters of the",
-" CreativeKorp PUA, which might be only available with their `FairfaxHD` and",
-" `KreativeSquare` fonts.",
+" pseudo-resolution.  `octants` uses the proposed 2x4 block characters.",
+" `sextpua` and `octpua` use the sextants or octants, respectively, in the",
+" CreativeKorp private-use-area (PUA) which might be only available with their",
+" `FairfaxHD` and `KreativeSquare` fonts.",
 "",
-" Note that the 2x3 block characters have only been included in Unicode 13.",
-" Hence, font support is still limited.  Similarly for Braille.  Usable fonts",
-" include e.g. `unscii`, `IBM 3270`, `GNU Unifont`, `DejaVu Sans`, and",
-" `FairfaxHD`. Support for octants is EXPERIMENTAL.",
+" Note that the 2x3 block characters ('sextants') have only been included in",
+" Unicode 13.  Hence, font support is still limited.  Similarly for Braille.",
+" Usable fonts include e.g. `unscii`, `IBM 3270`, `GNU Unifont`, `DejaVu Sans`,",
+" and, `FairfaxHD`.  2x4 block characters ('octants') have only been accepted",
+" for inclusion in a future Unicode standard in 2022 and are available in the",
+" `FairfaxHD` font.",
 #ifndef NO_DUMB_COLOR_SUPPORT
 "",
 " The `ansi`, `ansi256`, and `ansirgb` options will include escape sequences",
@@ -1356,13 +1426,13 @@ START_HELP(block)
 " same color.  This is dealt with by averaging the color of all pixels in a",
 " charcell.  With `optimize`, the terminal tries to improve by setting both,",
 " the background and foreground colors.  This trick works perfectly for the",
-" `half` mode, but is increasingly difficult for `quadrants` or `sextants`.",
-" For `braille` this cannot be used.",
+" `half` mode, but is increasingly difficult for `quadrants`, `sextants`,",
+" or `octants`. For `braille` this cannot be used.",
 #endif
 "",
 " `gppoints` draws point symbols using graphics commands. Due to the low",
-" resolution of the terminal, this is mostly viable for `braille` mode and",
-" probably most useful for error bars.",
+" resolution of the terminal, this is mostly viable for `braille` or",
+" `octant` mode, and probably most useful for error bars.",
 " `charpoints` uses Unicode symbol characters instead.  Note that these",
 " are also always drawn on top of the graphics.",
 " `numpoints` uses super- and subscript numerals to double the vertical",
