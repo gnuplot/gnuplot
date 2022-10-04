@@ -1027,7 +1027,7 @@ if test "${with_cairo}" = yes; then
 fi
 
 dnl Enable polar mode gridded surface plots
-AC_ARG_ENABLE(polargrid,dnl
+AC_ARG_ENABLE(polar-grid,dnl
 {  --enable-polar-grid   include support for gridded polar surface plots],
   [if test "$enableval" == yes; then
     AC_DEFINE(USE_POLAR_GRID,1,
