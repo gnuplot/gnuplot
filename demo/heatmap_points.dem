@@ -58,7 +58,7 @@ replot
 pause -1 "<cr> to continue"
 
 #
-# Heat map showing point density
+# Heat map of surface z value after fitting splines to points
 #
 
 set multiplot
