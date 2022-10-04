@@ -5,8 +5,14 @@
 # Current bugs:
 # - R_AXIS.min nonzero produces an odd plot
 #	although to be fair it matches existing polar plots
-# - polar border should be at rmax, not at the last ticmark (Bug #xxxx)
-# - polar border should not be clipped to xy border if border=0
+# - polar border should not be clipped by border if the border
+#	is not drawn (but this would break polar_quadrants.dem
+#
+
+if (!strstrt(GPVAL_COMPILE_OPTIONS, "+POLARGRID")) {
+    print "This copy of gnuplot does not support polar gridding"
+    exit  # return to caller
+}
 
 set key rmargin vertical top title "Polar gridded surface" font ":Bold"
 set key samplen 0.5

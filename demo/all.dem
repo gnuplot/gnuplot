@@ -88,6 +88,10 @@ print "******************** file poldat.dem ********************"
 load "poldat.dem"
 reset
 
+print "******************** file polargrid.dem ********************"
+load "polargrid.dem"
+reset
+
 print "******************** file polar_quadrants.dem ********************"
 load "polar_quadrants.dem"
 reset

@@ -5451,7 +5451,7 @@ Ffigure_mask
  a one-to-one correspondance with the input data.  I.e. the validity of the heat
  map represenation is only as good as the gridded approximation. 
  The demo collection has examples of generating 2D heatmaps from a set of points
-^ <a href="http://www.gnuplot.info/demo/histogram_colors.html">
+^ <a href="http://www.gnuplot.info/demo/heatmap_points.html">
  heatmap_points.dem
 ^ </a>
 
