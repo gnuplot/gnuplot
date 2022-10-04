@@ -160,6 +160,7 @@
     <li><a href="columnhead.html">points labeled by origin</a></li>
     <li><a href="label_stacked_histograms.html">label stacked histogram</a></li>
     <li><a href="heatmaps.html">2D and 3D heat maps</a></li>
+    <li><a href="heatmap_points.html">heat maps from scattered points</a></li>
     <li><a href="solar_path.html">solar path diagram</a></li>
     <li><a href="map_projection.html">map projections</a></li>
     <li><a href="violinplot.html">violin plot</a></li>
@@ -269,7 +270,7 @@
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated September 2022</i>
+    <i>This page generated October 2022</i>
     </td>
 
     <td>

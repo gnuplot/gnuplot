@@ -293,8 +293,9 @@ load "lambert.dem"
 load "synchrotron.dem"
 reset
 
-print "********************** file heatmaps.dem *********************"
+print "********************** file heatmaps *********************"
 load "heatmaps.dem"
+load "heatmap_points.dem"
 reset
 
 print "********************** file matrix_index.dem *********************"
