@@ -261,8 +261,9 @@ print "********************** file complex_trig.dem *********************"
 load "complex_trig.dem"
 reset
 
-print "********************** file heatmaps.dem *********************"
+print "**********************   heatmaps   ******************************"
 load "heatmaps.dem"
+load "heatmap_points.dem"
 reset
 
 print "********************** file matrix_index.dem *********************"
