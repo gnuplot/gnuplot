@@ -5548,6 +5548,10 @@ plot_polar_grid(struct curve_points *plot)
     double tmin, tmax, rmin, rmax;
     int fillstyle = style_from_fill(&plot->fill_properties);
 
+    /* This terminal cannot draw what we want */
+    if (!(term->filled_polygon))
+	return;
+
     /* Theta clipping limits */
     tmin = THETA_AXIS.min;
     tmax = THETA_AXIS.max;
