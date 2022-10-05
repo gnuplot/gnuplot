@@ -90,6 +90,7 @@
 #include "term_api.h"
 #include "util.h"
 #include "variable.h"
+#include "voxelgrid.h"
 #include "external.h"
 
 #ifdef USE_MOUSE
@@ -686,7 +687,13 @@ define()
 	if (result.type == ARRAY)
 	    make_array_permanent(&result);
 
-	/* Prevents memory leak if the variable name is re-used */
+	/* If the variable name was previously in use then depending on its
+	 * old type it may have attached memory that needs to be freed.
+	 * Note: supposedly the old variable type cannot be datablock because
+	 *       the syntax  $name = foo  is not accepted so we would not be here.
+	 *       However, weird cases like FOO = value($datablock) violate this rule
+	 *       and leave FOO as a datablock whose name does not start with $.
+	 */
 	udv = add_udv(start_token);
 	free_value(&udv->udv_value);
 	udv->udv_value = result;
@@ -2093,13 +2100,17 @@ print_set_output(char *name, TBOOLEAN datablock, TBOOLEAN append_p)
 	    }
 	}
 
+	/* We already know the name begins with $,
+	 * so the udv is either a new empty variable (no need to clear)
+	 * an existing datablock (append or clear according to flag)
+	 * or (probably by mistake) a voxel grid (clear before use).
+	 */
 	print_out_var = add_udv_by_name(name);
 	if (!append_p)
 	    gpfree_datablock(&print_out_var->udv_value);
-	/* If this is not an existing datablock to be appended */
-	/* then make it a new empty datablock */
 	if (print_out_var->udv_value.type != DATABLOCK) {
 	    free_value(&print_out_var->udv_value);
+	    gpfree_vgrid(print_out_var);
 	    print_out_var->udv_value.type = DATABLOCK;
 	    print_out_var->udv_value.v.data_array = NULL;
 	}
@@ -2209,6 +2220,7 @@ print_command()
 		len = strappend(&dataline, &size, len, a.v.string_val);
 	    else
 		fputs(a.v.string_val, print_out);
+	    gpfree_string(&a);
 	} else if (a.type == ARRAY) {
 	    struct value *array = a.v.value_array;
 	    if (dataline != NULL) {
@@ -2227,14 +2239,14 @@ print_command()
 	    }
 	    if (array[0].type == TEMP_ARRAY)
 		gpfree_array(&a);
-	    a.type = NOTDEFINED;  /* prevent free_value() below from clobbering a */
+	    a.type = NOTDEFINED;
 	} else {
 	    if (dataline != NULL)
 		len = strappend(&dataline, &size, len, value_to_str(&a, FALSE));
 	    else
 		disp_value(print_out, &a, FALSE);
 	}
-	free_value(&a);
+	/* Any other value types besides STRING and ARRAY that need memory freed? */
 
 	if (next_iteration(print_iterator)) {
 	    c_token = save_token;

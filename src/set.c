@@ -2655,10 +2655,10 @@ set_label()
 	if (a.type == STRING) {
 	    c_token = save_token;
 	    tag = assign_label_tag();
+	    gpfree_string(&a);
 	} else {
 	    tag = (int) real(&a);
 	}
-	free_value(&a);
     }
 
     if (tag <= 0)

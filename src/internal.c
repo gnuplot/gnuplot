@@ -207,6 +207,7 @@ f_call(union argument *x)
 	    gpfree_array(&udf->dummy_values[0]);
 	}
 	push(&top_of_stack);
+	gpfree_string(&top_of_stack);
     }
     gpfree_string(&udf->dummy_values[0]);
     udf->dummy_values[0] = save_dummy;
@@ -279,6 +280,7 @@ f_calln(union argument *x)
 	udf->dummy_values[i] = save_dummy[i];
     }
     push(&top_of_stack);
+    gpfree_string(&top_of_stack);
 
     recursion_depth--;
 }
@@ -2107,8 +2109,8 @@ f_assign(union argument *arg)
     dest = pop(&a);	/* name of variable or pointer to array content */
 
     if (dest->type == ARRAY) {
-	/* FIXME:  This is supposed to work but it is new relatively untested code */
-	// int_warn(NO_CARET, "unsupported array assignment");
+	/* It's an assignment to an array element. We don't know the index yet */
+	;
 
     } else {
 	if (dest->type != STRING)
@@ -2117,8 +2119,8 @@ f_assign(union argument *arg)
 	    int_error(NO_CARET, "attempt to assign to a read-only variable");
 
 	udv = add_udv_by_name(a.v.string_val);
-	gpfree_string(&a);
-	dest = &(udv->udv_value);
+	gpfree_string(&a);	    /* This frees the name string, not the variable it names */
+	dest = &(udv->udv_value);   /* Now dest points to where the new value will go */
     }
 
     if (b.type == ARRAY) {
@@ -2143,7 +2145,7 @@ f_assign(union argument *arg)
 	dest->v.value_array[i] = b;
 
     } else {
-	gpfree_string(dest);
+	free_value(dest);
 	*dest = b;
     }
 

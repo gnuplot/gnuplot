@@ -449,25 +449,42 @@ Gstring(struct value *a, char *s)
     return (a);
 }
 
-/* Common interface for freeing data structures attached to a struct value.
- * Each of the type-specific routines will ignore values of other types.
- * NOTE: As it is we must not call gpfree_datablock because datablocks are
- * passed on the evaluation stack by reference rather than by value.
- * FIXME: It may be better to call gpfree_array only for TEMP_ARRAYs,
- * otherwise an array passed in error as a function parameter may be wiped out.
+/* The rationale for introducing this routine was that multiple call sites
+ * wanted to write a new value to a variable that might already have one.
+ * free_value() was intended to consider all possible previous value types
+ * and free attached memory for types that had any.
+ *
+ * Caveat:  When freeing values popped from the evaluation stack,
+ * datablocks and permanent arrays must not be freed because these are
+ * calls by reference to a continuing global variable.
+ * So the caller must clear the type field before calling free_value.
  */
 void
 free_value(struct value *a)
 {
-    gpfree_string(a);
-    gpfree_array(a);
+    switch (a->type) {
+	case INTGR:
+	case CMPLX:
+			break;
+	case STRING:
+			gpfree_string(a);
+			break;
+	case ARRAY:
+			gpfree_array(a);
+			break;
+	case DATABLOCK:
+			gpfree_datablock(a);
+			break;
+	case VOXELGRID: /* Should not happen! */
+	default:	/* INVALID_VALUE INVALID_NAME */
+			break;
+    }
     a->type = NOTDEFINED;
 }
 
-/* It is always safe to call gpfree_string with a->type is INTGR or CMPLX.
- * However it would be fatal to call it with a->type = STRING if a->string_val
- * was not obtained by a previous call to gp_alloc(), or has already been freed.
- * Thus 'a->type' is set to NOTDEFINED afterwards to make subsequent calls safe.
+/* It would be fatal to call gpfree_string with a->type = STRING if
+ * a->string_val has already been freed.
+ * Setting 'a->type' to NOTDEFINED makes subsequent calls safe.
  */
 void
 gpfree_string(struct value *a)
@@ -501,8 +518,8 @@ init_array( struct udvt_entry *array, int size )
     int i;
 
     free_value(&array->udv_value);
-    array->udv_value.v.value_array = gp_alloc((size+1) * sizeof(t_value), "init_array");
     array->udv_value.type = ARRAY;
+    array->udv_value.v.value_array = gp_alloc((size+1) * sizeof(t_value), "init_array");
     A = array->udv_value.v.value_array;
     A[0].v.int_val = size;
     for (i = 0; i <= size; i++)
