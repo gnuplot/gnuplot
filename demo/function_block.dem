@@ -1,6 +1,6 @@
 #
 # Demonstrate use of function block definitions to
-# implement the complex lngamma( z ) function using a 15 term
+# implement the complex lngamma(z) function using a 15 term
 # Lancosz approximation valid on the half-plane with Real(z) > 0.
 # To deal with the other half plane we use the reflection formula
 #       Gamma(1-z) = (pi*z) / ( Gamma(1+z) * sin(pi*z) )
@@ -10,12 +10,12 @@
 # z = negative integer and adjustment of the imaginary component
 # by multiples of 2pi to produce a continuous 3D surface.
 #
-# After execution of this script, $Reflect, $Lancosz, and coef remain
-# visible globally.  The coefficient array could be declared local,
-# but then the routines defined here would fail to execute outside of
-# this script.  That is, "load eval_function.dem" works either way,
-# but a subsequent "replot" command outside the script would fail if 
-# the coefficients are not globally visible.
+# After execution of this script, $Reflect(z), $Lancosz(z), and coef remain
+# visible globally.  The coefficient array could be declared local, but then
+# the routines defined here would fail to execute outside of this script.
+# That is, "load eval_function.dem" works either way,  but a subsequent
+# "replot" command outside the script would fail if the coefficients are
+# not available globally.
 #
 # references
 #	C. Lanczos, SIAM JNA  1, 1964. pp. 86-96.
@@ -40,15 +40,13 @@ array coef[15] = [ \
        -0.16431810653676389022e-3, 0.84418223983852743293e-4, \
        -0.26190838401581408670e-4, 0.36899182659531622704e-5 ]
 
-function $Reflect << EOD
-    local z = ARGV[1]
+function $Reflect(z) << EOD
     local w = $Lancosz(1.0 - z)
     local temp = log( sin(pi * z) )
     return log(pi) - (w + temp)
 EOD
 
-function $Lancosz << EOD
-    local z = ARGV[1]
+function $Lancosz(z) << EOD
     local Sum = coef[1] + sum [k=2:15] coef[k] / (z + k - 1)
     local temp = z + 671./128.
     temp = (z + 0.5) * log(temp) - temp

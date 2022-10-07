@@ -50,7 +50,7 @@
 # endif
 #endif
 
-static void prepare_call(int calltype);
+static void prepare_call(int calltype, udvt_entry *functionblock);
 static void lf_exit_scope(int depth);
 
 /* State information for load_file(), to recover from errors
@@ -70,7 +70,7 @@ static char *failed_file_name = NULL;
 char *loadpath_fontname = NULL;
 
 static void
-prepare_call(int calltype)
+prepare_call(int calltype, udvt_entry *functionblock)
 {
     struct udvt_entry *udv;
     struct value *ARGV;
@@ -152,8 +152,21 @@ prepare_call(int calltype)
 	/* $functionblock(arg1, ...) */
 	memcpy(argval, eval_parameters, sizeof(argval));
 	call_argc = 0;
-	while ((call_argc < 9) && (argval[call_argc].type != NOTDEFINED))
+	while ((call_argc < 9) && (argval[call_argc].type != NOTDEFINED)) {
+	    /* Execute the equivalent of local paramN = ARGV[N] */
+	    if (functionblock->udv_value.v.functionblock.parnames) {
+		char *name = functionblock->udv_value.v.functionblock.parnames[call_argc];
+		if (name) {
+		    struct udvt_entry *udv = add_udv_by_name(name);
+		    shadow_one_variable(udv);
+		    udv->udv_value = eval_parameters[call_argc];
+		    if (udv->udv_value.type == STRING)
+			udv->udv_value.v.string_val = strdup(udv->udv_value.v.string_val);
+		    lf_head->local_variables = TRUE;
+		}
+	    }
 	    call_argc++;
+	}
 #endif
 
     } else {
@@ -222,6 +235,7 @@ load_file(FILE *fp, char *name, int calltype)
     int stop = FALSE;
     udvt_entry *gpval_lineno = NULL;
     char **datablock_input_line = NULL;
+    udvt_entry *functionblock = NULL;
 
     /* Support for "load $datablock" */
     if (calltype == 6 || calltype == 7)
@@ -230,7 +244,7 @@ load_file(FILE *fp, char *name, int calltype)
 #ifdef USE_FUNCTIONBLOCKS
     /* Support for function blocks */
     if (calltype == 8) {
-	udvt_entry *functionblock = (udvt_entry *)(name);
+	functionblock = (udvt_entry *)(name);
 	datablock_input_line = functionblock->udv_value.v.functionblock.data_array;
 	name = strdup(functionblock->udv_name);
     }
@@ -256,7 +270,7 @@ load_file(FILE *fp, char *name, int calltype)
     }
 
     /* We actually will read from a file */
-    prepare_call(calltype);
+    prepare_call(calltype, functionblock);
 
     /* things to do after lf_push */
     inline_num = 0;

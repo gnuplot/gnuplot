@@ -1813,28 +1813,10 @@ local_command()
 
     /* Has no effect if encountered at the top level */
     if (lf_head) {
-	struct udvt_entry *udv, *save_udv;
-	struct value save_value;
-	int save_name_len;
-	char *save_name;
+	struct udvt_entry *udv = add_udv(c_token);
 
 	/* Keep original value and clear it from its original location */
-	udv = add_udv(c_token);
-	save_value = udv->udv_value;
-	udv->udv_value.type = NOTDEFINED;
-
-	/* Create a shadow variable to hold the original state */
-	save_name_len = strlen(udv->udv_name) + strlen("GPLOCAL_xxx_") + 1;
-	save_name = gp_alloc(save_name_len, NULL);
-	snprintf(save_name, save_name_len, "GPLOCAL_%03d_%s",
-		lf_head->depth, udv->udv_name);
-	save_udv = add_udv_by_name(save_name);
-	free(save_name);
-
-	/* If there really was such a variable that is now shadowed,
-	 * save its original value. Otherwise the saved state is NOTDEFINED.
-	 */
-	save_udv->udv_value = save_value;
+	shadow_one_variable(udv);
 
 	/* flag that at least some local variables will go out of scope on lf_pop */
 	lf_head->local_variables = TRUE;
@@ -1847,6 +1829,43 @@ local_command()
     } else {
 	define();
     }
+}
+
+/* helper routine for local_command and for setting up the
+ * initial state of function block evaluation
+ */
+void
+shadow_one_variable(struct udvt_entry *udv)
+{
+    struct udvt_entry *save_udv;
+    struct value save_value;
+    int save_name_len;
+    char *save_name;
+
+    save_value = udv->udv_value;
+    udv->udv_value.type = NOTDEFINED;
+
+    /* Create a shadow variable to hold the original state */
+    save_name_len = strlen(udv->udv_name) + strlen("GPLOCAL_xxx_") + 1;
+    save_name = gp_alloc(save_name_len, NULL);
+    snprintf(save_name, save_name_len, "GPLOCAL_%03d_%s",
+	    lf_head->depth, udv->udv_name);
+    save_udv = add_udv_by_name(save_name);
+    free(save_name);
+
+    /* If this is a duplicate "local" instance at the same depth,
+     * the previous value at this depth is dropped.
+     */
+    if (save_udv->udv_value.type != NOTDEFINED) {
+	int_warn(NO_CARET, "Duplicate 'local' declaration for %s\n",
+		udv->udv_name);
+	free_value(&save_value);
+	return;
+    }
+    /* If there really was such a variable that is now shadowed,
+     * save its original value. Otherwise the saved state is NOTDEFINED.
+     */
+    save_udv->udv_value = save_value;
 }
 
 /* helper routine to multiplex mouse event handling with a timed pause command */
