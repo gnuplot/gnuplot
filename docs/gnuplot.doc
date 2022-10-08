@@ -319,18 +319,18 @@ C
  This version of gnuplot introduces a mechanism for invoking a block of
  standard gnuplot commands as a callable function.  A function block can
  accept from 0 to 9 parameters and returns a value.  Function blocks can be
- used to calculate and assign a new value to a variable or otherwise combine
- with other functions and operators to build up an expression.
+ used to calculate and assign a new value to a variable, to combine with other
+ functions and operators, or to perform a repetitive task preparing data.
  There are three components to this mechanism.
  See `local`, `scope`, `function blocks`, `return`.
 #start
 #b The `local` qualifier allows optional declaration of a variable or array
 ## whose scope is limited to the duration of execution of the program unit in
-## which it is found. These units currently include `load`, `call`, function
-## block evaluation, and the code block in curly brackets following an `if`,
-## `else`, `do for`, or `while` statement.  If the name of a local variable
-## duplicates the name of a global variable, the global variable is shadowed 
-## until exit from the local scope.
+## which it is found. These units currently include execution of a
+## `load` or `call` statement, function block evaluation, and the code block
+## in curly brackets following an `if`, `else`, `do for`, or `while` statement.
+## If the name of a local variable duplicates the name of a global variable,
+## the global variable is shadowed until exit from the local scope.
 #b The `function` command declares a named function block (effectively an
 ## array of strings) containing gnuplot commands.  When the function block
 ## is invoked, commands are executely successively until the end of the block
@@ -6712,12 +6712,14 @@ Ffigure_zerror
  by the caller are available via two mechanisms.  Each parameter is stored as a
  string in variables ARG1, ARG2, ... ARG9.  Each parameter is also stored as one
  element of the array ARGV[9]. Numerical values are stored as complex variables.
- All other values are stored as strings.  Thus after a call
+ All other values are stored as strings.  ARGC holds the number of parameters.
+ Thus after a call
 
       call 'routine_1.gp'  1 pi "title"
 
  The three arguments are available inside routine_1.gp as follows
 
+      ARGC = 3
       ARG1 = "1"         ARGV[1] = 1.0
       ARG2 = "3.14159"   ARGV[2] = 3.14159265358979...
       ARG3 = "title"     ARGV[3] = "title"
@@ -7464,30 +7466,46 @@ Ffigure_zerror
  The `function` command signals the definition of a here-document containing
  a named block of gnuplot code that can be called as a function.
  As with data blocks, the name of a function block must begin with a '$'.
- Once the function block is defined, you can invoke it as a function by
- name anywhere that a normal function could be used.  Arguments to the
- function passed from the command line are accessed inside the function block
- as ARGV[1] etc, as would be the case for a `call` command.  See `ARGV`.
+ Up to nine named parameters may be specified as part of the definition.
+ These names may be used inside the function block as local variables.
+ See `local` and `scope`.
+
+ Once the function block is defined, you can invoke it by name anywhere that
+ a normal function could be used.
 
  Example:
-      function $sinc << EOF
-          local x = ARGV[1]
-          if (x == 0) { return 1.0 }
-          return sin(x) / x
+      function $sinc(arg) << EOF
+          if (arg == 0) { return 1.0 }
+          return sin(arg) / arg
       EOF
 
-      plot $sinc(x) with lines title "sinc(x) as a function block"
+      gnuplot> plot $sinc(x) with lines title "sinc(x) as a function block"
 
- Obviously this simple case could have used a one-line definition
-      Mysinc(x) = (x==0) ? 1.0 : sin(x) / x
- but the function block above illustrates use of the `local` and `return`
- commands.  See also `scope`.
+ It is not necessary to specify a list of named arguments to a function block
+ at the time it is declared. Arguments to the function passed from the command
+ line can be also be accessed from inside the function block as ARGV[1] etc,
+ as they would be for a `call` command.  See `ARGV`.  This allows defining a
+ function block that can operate on a variable number of arguments.
+
+ Example:
+      function $max << EOF
+          local max = real("-Inf")
+          if (ARGC == 0) { return NaN }
+          do for [i=1:ARGC] {
+              if (max < ARGV[i]) {
+                  max = ARGV[i]
+              }
+          }
+          return max
+      EOF
+      gnuplot> foo = $max( f(A), 2.0, C, Array[3] )
+      gnuplot> baz = $max( foo, 100. )
 
  The primary motivation for function block support is to allow definition of
  complicated functions directly in gnuplot.  Execution is of course slower
  than if the same function were coded directly in C or Fortran, but this is
- probably acceptable for many purposes.  If execution speed matters then
- the function can be implemented as a plugin instead (see `plugins`).
+ acceptable for many purposes.  If execution speed matters then the function
+ can be implemented later as a plugin instead (see `plugins`).
 
  A non-trivial example of using function blocks to implement and plot
  a 15-term Lancosz approximation for the complex lngamma function is
@@ -7504,8 +7522,7 @@ Ffigure_zerror
 #TeX \begin{verbatim}
 #TeX array coef[15] = [ ... ]
 #TeX 
-#TeX function $Lancosz << EOD
-#TeX     local z = ARGV[1]
+#TeX function $Lancosz(z) << EOD
 #TeX     local Sum = coef[1] + sum [k=2:15] coef[k] / (z + k - 1)
 #TeX     local temp = z + 671./128.
 #TeX     temp = (z + 0.5) * log(temp) - temp
@@ -7513,8 +7530,7 @@ Ffigure_zerror
 #TeX     return temp
 #TeX EOD
 #TeX 
-#TeX function $Reflect << EOD
-#TeX     local z = ARGV[1]
+#TeX function $Reflect(z) << EOD
 #TeX     local w = $Lancosz(1.0 - z)
 #TeX     local temp = log( sin(pi * z) )
 #TeX     return log(pi) - (w + temp)
@@ -7524,8 +7540,8 @@ Ffigure_zerror
 #TeX \end{verbatim}
 #TeX }
 
- Use of function blocks is EXPERIMENTAL. Details may change before
- inclusion in a release version.
+ Use of function blocks is EXPERIMENTAL.
+ Details may change before inclusion in a release version.
 #TeX \newpage
 2 help
 ?commands help
