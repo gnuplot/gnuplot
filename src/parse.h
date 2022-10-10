@@ -118,6 +118,10 @@ TBOOLEAN empty_iteration (t_iterator *);
 TBOOLEAN forever_iteration (t_iterator *);
 t_iterator * cleanup_iteration(t_iterator *);
 
+/* These are used by the function block evaluation code */
+void cache_at( struct at_type **shadow_at, int *shadow_at_size);
+void uncache_at( struct at_type *shadow_at, int shadow_at_size);
+
 void parse_link_via(struct udft_entry *);
 
 /* Magic number used instead of actual column number in $# */

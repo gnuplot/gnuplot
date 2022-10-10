@@ -372,6 +372,29 @@ extend_at()
     FPRINTF((stderr, "Extending at size to %d\n", at_size));
 }
 
+#ifdef USE_FUNCTIONBLOCKS
+/* The f_eval operation supporting function blocks restarts command parsing
+ * inside an existing evaluation stack.
+ * In order to not corrupt that existing stack, we must save its action table,
+ * hide it from the parser,  and allow f_eval to restore it afterwards.
+ */
+void
+cache_at( struct at_type **shadow_at, int *shadow_at_size )
+{
+    *shadow_at = at;
+    *shadow_at_size = at_size;
+    at = NULL;
+}
+void
+uncache_at( struct at_type *shadow_at, int shadow_at_size )
+{
+    free_at(at);
+    at = shadow_at;
+    at_size = shadow_at_size;
+}
+#endif	/* USE_FUNCTIONBLOCKS */
+
+
 /* Add function number <sf_index> to the current action table */
 static union argument *
 add_action(enum operators sf_index)

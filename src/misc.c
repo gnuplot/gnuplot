@@ -150,6 +150,7 @@ prepare_call(int calltype, udvt_entry *functionblock)
 #ifdef USE_FUNCTIONBLOCKS
     } else if (calltype == 8) {
 	/* $functionblock(arg1, ...) */
+	cache_at(&lf_head->shadow_at, &lf_head->shadow_at_size);
 	memcpy(argval, eval_parameters, sizeof(argval));
 	call_argc = 0;
 	while ((call_argc < 9) && (argval[call_argc].type != NOTDEFINED)) {
@@ -476,6 +477,11 @@ lf_pop()
     if (lf->local_variables)
 	lf_exit_scope(lf->depth);
 
+#ifdef USE_FUNCTIONBLOCKS
+    if (lf->shadow_at)
+	uncache_at(lf->shadow_at, lf->shadow_at_size);
+#endif
+
     lf_head = lf->prev;
     free(lf);
     return (TRUE);
@@ -546,6 +552,10 @@ lf_push(FILE *fp, char *name, char *cmdline)
 			  "lf tokens");
     memcpy(lf->tokens, token, (num_tokens+1) * sizeof(struct lexical_unit));
     lf->input_line = gp_strdup(gp_input_line);
+
+    /* Only relevant for function block calls */
+    lf->shadow_at = NULL;
+    lf->shadow_at_size = 0;
 
     lf->prev = lf_head;		/* link to stack */
     lf_head = lf;
