@@ -765,7 +765,13 @@ evaluate_at(struct at_type *at_ptr, struct value *val_ptr)
     val_ptr->type = NOTDEFINED;
 
     errno = 0;
-    reset_stack();
+
+    /* Normally the stack is cleared prior to each and every expression
+     * evaluation.   However doing so during execution of a function block
+     * can make the stack invalid when the function block exits.
+     */
+    if (!evaluate_inside_functionblock)
+	reset_stack();
 
     if (!evaluate_inside_using || !df_nofpe_trap) {
 	if (SETJMP(fpe_env, 1))
@@ -786,7 +792,8 @@ evaluate_at(struct at_type *at_ptr, struct value *val_ptr)
      */
     if (s_p >= 0)
 	pop(val_ptr);
-    check_stack();
+    if (!evaluate_inside_functionblock)
+	check_stack();
 }
 
 void

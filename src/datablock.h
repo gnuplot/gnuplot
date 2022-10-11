@@ -19,6 +19,14 @@ extern struct value eval_return_value;
 
 /* Used by f_eval to pass parameters to a function block */
 extern struct value eval_parameters[9];
-#endif /* USE_FUNCTIONBLOCKS */
+
+/* Non-zero to allow values to remain on the evaluation stack
+ * across a call to f_eval()
+ */
+extern int evaluate_inside_functionblock;
+#else	/* USE_FUNCTIONBLOCKS */
+  #define  evaluate_inside_functionblock FALSE
+
+#endif	/* USE_FUNCTIONBLOCKS */
 
 #endif	/* GNUPLOT_DATABLOCK_H */

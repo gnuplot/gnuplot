@@ -168,6 +168,11 @@ prepare_call(int calltype, udvt_entry *functionblock)
 	    }
 	    call_argc++;
 	}
+	if (evaluate_inside_functionblock == 0) {
+	    evaluate_inside_functionblock = lf_head->depth;
+	    FPRINTF((stderr, "setting flag evaluate_inside_functionblock at level %d\n",
+		    lf_head->depth));
+	}
 #endif
 
     } else {
@@ -478,8 +483,14 @@ lf_pop()
 	lf_exit_scope(lf->depth);
 
 #ifdef USE_FUNCTIONBLOCKS
+    /* Restore action table context from which function block was called */
     if (lf->shadow_at)
 	uncache_at(lf->shadow_at, lf->shadow_at_size);
+    if (evaluate_inside_functionblock > lf->depth) {
+	evaluate_inside_functionblock = 0;
+	FPRINTF((stderr, "Clearing flag evaluate_inside_functionblock on return to depth %d\n",
+		lf->depth));
+    }
 #endif
 
     lf_head = lf->prev;

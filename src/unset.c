@@ -1993,6 +1993,9 @@ reset_command()
 
     c_token++;
 
+    /* This is the expression evaluation stack */
+    reset_stack();
+
     /* Reset session state as well as internal graphics state */
     if (equals(c_token, "session")) {
 	clear_udf_list();

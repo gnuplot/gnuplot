@@ -89,6 +89,7 @@ static int recursion_depth = 0;
 void
 eval_reset_after_error()
 {
+    reset_stack();
     recursion_depth = 0;
     undefined = FALSE;
 }

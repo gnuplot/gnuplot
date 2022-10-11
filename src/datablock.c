@@ -73,6 +73,13 @@ struct value eval_return_value;
 
 /* Used by f_eval to pass parameters to a function block */
 struct value eval_parameters[9];
+
+/* Non-zero to allow values to remain on the evaluation stack across
+ * a call to f_eval().  Set on entry to f_eval; cleared when control returns
+ * to the LFS depth just above that.  If you're not using function blocks
+ * then this is never set.
+ */
+int evaluate_inside_functionblock = 0;
 #endif
 
 /* static function prototypes */
