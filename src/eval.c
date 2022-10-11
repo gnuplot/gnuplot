@@ -780,10 +780,13 @@ evaluate_at(struct at_type *at_ptr, struct value *val_ptr)
 
     if (errno == EDOM || errno == ERANGE)
 	undefined = TRUE;
-    else if (!undefined) {
-	(void) pop(val_ptr);
-	check_stack();
-    }
+
+    /* Pop value even if it is undefined.
+     * That seems preferable to leaving garbage on the stack.
+     */
+    if (s_p >= 0)
+	pop(val_ptr);
+    check_stack();
 }
 
 void
