@@ -1028,11 +1028,13 @@ fi
 
 dnl Enable polar mode gridded surface plots
 AC_ARG_ENABLE(polar-grid,dnl
-{  --enable-polar-grid   include support for gridded polar surface plots],
-  [if test "$enableval" == yes; then
+[  --enable-polar-grid   include support for gridded polar surface plots],
+  [if test "$enableval" != no; then
     AC_DEFINE(USE_POLAR_GRID,1,
                [ Define to support polar gridded surface plots])
    fi],
+    AC_DEFINE(USE_POLAR_GRID,1,
+               [ Define to support polar gridded surface plots])
   )
 
 dnl Enable subsystem to generate statistical summary of file contents
@@ -1049,10 +1051,21 @@ AC_ARG_ENABLE(stats,dnl
 dnl Enable subsystem to set watchpoints that trigger during 2D plotting
 AC_ARG_ENABLE(watchpoints,dnl
 [  --enable-watchpoints    include support for setting watchpoints in 2D plots],
-  [if test "$enableval" == yes; then
+  [if test "$enableval" != no; then
     AC_DEFINE(USE_WATCHPOINTS,1,
                [ Define to support setting watchpoints in 2D plots])
    fi],
+    AC_DEFINE(USE_WATCHPOINTS,1,
+               [ Define to support setting watchpoints in 2D plots])
+   )
+
+dnl Enable callable blocks of gnuplot code treated as functions
+AC_ARG_ENABLE(function-blocks,dnl
+[  --enable-function-blocks include support for defining a function as a here document],
+  [if test "$enableval" = yes; then
+    AC_DEFINE(USE_FUNCTIONBLOCKS, 1,
+               [ Define to support defining a function as a here document])
+   fi]
    )
 
 dnl Enable parsing of deprecated syntax
@@ -1489,16 +1502,22 @@ else
   AC_MSG_RESULT([  Statistical summary of data ("stats" command): no (--enable-stats to enable)])
 fi
 
-if test "$enable_watchpoints" == yes; then
+if test "$enable_watchpoints" != no; then
   AC_MSG_RESULT([  Support watchpoints during 2D plotting:        yes])
 else
   AC_MSG_RESULT([  Support watchpoints during 2D plotting:        no (--enable-watchpoints to enable)])
 fi
 
-if test "$enable_polar_grid" == yes; then
+if test "$enable_polar_grid" != no; then
   AC_MSG_RESULT([  Support for polar gridded surfaces:            yes])
 else
   AC_MSG_RESULT([  Support for polar gridded surfaces:            no (--enable-polar-grid to enable)])
+fi
+
+if test "$enable_function_blocks" = yes; then
+  AC_MSG_RESULT([  Support function blocks:                       yes])
+else
+  AC_MSG_RESULT([  Support function blocks:                       no (--enable-function-blocks to enable)])
 fi
 
 

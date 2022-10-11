@@ -1047,6 +1047,13 @@ show_version(FILE *fp)
 #endif
 	    "";
 
+	    const char *fblocks =
+#if defined(USE_FUNCTIONBLOCKS)
+		"+FUNCTIONBLOCKS ";
+#else
+		"-FUNCTIONBLOCKS ";
+#endif
+
 	    const char *unicodebuild =
 #if defined(_WIN32) && defined(UNICODE)
 		"+UNICODE  ";
@@ -1054,11 +1061,13 @@ show_version(FILE *fp)
 		"";
 #endif
 
-	    sprintf(compile_options, "    %s%s\n    %s%s\n    %s%s%s%s\n    %s\n    %s%s%s%s\n",
+	    sprintf(compile_options,
+		    "    %s%s\n    %s%s\n    %s%s%s%s\n    %s\n    %s%s%s%s\n    %s\n",
 		    rdline, gnu_rdline, unicodebuild, plotoptions,
 		    complexfunc, libcerf, libamos, have_cexint,
 		    libgd,
-		    nocwdrc, x11, use_mouse, hiddenline
+		    nocwdrc, x11, use_mouse, hiddenline,
+		    fblocks
 		    );
 	}
 
