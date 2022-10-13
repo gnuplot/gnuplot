@@ -168,6 +168,10 @@ prepare_call(int calltype, udvt_entry *functionblock)
 	    }
 	    call_argc++;
 	}
+	if ((call_argc < 9)
+	&&  (functionblock->udv_value.v.functionblock.parnames != NULL)
+	&&  (functionblock->udv_value.v.functionblock.parnames[call_argc] != NULL))
+	    int_warn(c_token-1, "Not enough parameters for %s", lf_head->name);
 	if (evaluate_inside_functionblock == 0) {
 	    evaluate_inside_functionblock = lf_head->depth;
 	    FPRINTF((stderr, "setting flag evaluate_inside_functionblock at level %d\n",
