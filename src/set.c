@@ -1278,7 +1278,7 @@ set_cntrparam()
 
 	/*  RKC: I have modified the next two:
 	 *   to use commas to separate list elements as in xtics
-	 *   so that incremental lists start,incr[,end]as in "
+	 *   so that incremental lists start,incr[,end]
 	 */
 	if (almost_equals(c_token, "di$screte")) {
 	    contour_levels_kind = LEVELS_DISCRETE;
@@ -1327,9 +1327,9 @@ set_cntrparam()
 	    if (!END_OF_COMMAND)
 		contour_levels = int_expression();
 	} else {
-	    if (contour_levels_kind == LEVELS_DISCRETE)
-		int_error(c_token, "Levels type is discrete, ignoring new number of contour levels");
-	    contour_levels = int_expression();
+	    int new = int_expression();
+	    if (contour_levels_kind != LEVELS_DISCRETE)
+		contour_levels = new;
 	}
     } else if (almost_equals(c_token, "o$rder")) {
 	int order;
