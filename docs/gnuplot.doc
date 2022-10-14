@@ -4741,7 +4741,7 @@ Ffigure_newsyntax
       plot DATA using 1:2 smooth cnormal watch y=0.25 watch y=0.5 watch y=0.75
 
 Ffigure_watchpoints
- Watchpoint hits for each targets in the previous plot command are stored in
+ Watchpoint hits for each target in the previous plot command are stored in
  named arrays WATCH_n.  You can also display a summary of all watchpoint hits
  from the previous plot command;  see `show watchpoints`.
 

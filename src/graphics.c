@@ -1267,12 +1267,9 @@ plot_lines(struct curve_points *plot)
     for (i = 0; i < plot->p_count; i++) {
 	xnow = plot->points[i].x;
 	ynow = plot->points[i].y;
-
-#ifdef USE_WATCHPOINTS
 	znow = plot->points[i].z;
-#else
-	(void)zprev; /* prevents warnings about unused variable */
-#endif
+
+	(void)zprev; /* prevents unused variable warning #ifndef USE_WATCHPOINTS */
 
 	/* rgb variable  -  color read from data column */
 	check_for_variable_color(plot, &plot->varcolor[i]);
