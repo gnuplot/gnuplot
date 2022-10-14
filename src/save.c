@@ -392,7 +392,7 @@ save_set_all(FILE *fp)
 	if (dgrid3d_mode == DGRID3D_QNORM)
 	    fprintf(fp, "%d\n", dgrid3d_norm_value);
 	else if (dgrid3d_mode == DGRID3D_SPLINES)
-	    /* no options */ ;
+	    fprintf(fp, "\n");
 	else
 	    fprintf(fp, "%s %g, %g\n", dgrid3d_kdensity ? " kdensity" : "",
 		dgrid3d_x_scale, dgrid3d_y_scale );
