@@ -2254,9 +2254,19 @@ print_command()
 
 	    if (!block)
 		int_error(c_token, "no block named %s", datablock_name);
-	    if (block->udv_value.type == FUNCTIONBLOCK)
+#ifdef USE_FUNCTIONBLOCKS
+	    if (block->udv_value.type == FUNCTIONBLOCK
+	    &&  (print_out_var == NULL)) {
+		line = block->udv_value.v.functionblock.parnames;
+		fprintf(print_out, "function %s( ", datablock_name);
+		while (line && *line) {
+		    fprintf(print_out, "%s ", *line);
+		    line++;
+		}
+		fprintf(print_out, ")\n");
 		line = block->udv_value.v.functionblock.data_array;
-	    else
+	    } else
+#endif	/* USE_FUNCTIONBLOCKS */
 		line = block->udv_value.v.data_array;
 
 	    /* Printing a datablock into itself would cause infinite recursion */
