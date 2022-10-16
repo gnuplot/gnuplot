@@ -1688,29 +1688,33 @@ CACA_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, i
 	if ((head & HEADS_ONLY) == 0)
 		CACA_draw_thin_line(CACA_cv, sx, CACA_ymax - sy, ex, CACA_ymax - ey);
 	if ((head & BOTH_HEADS) != 0) {
+		const wchar_t ascii_arrows[] = L">+^+<+v+";
+		const wchar_t block_arrows[] = {
+			0x2192, 0x2192, 0x2191, 0x2191, 0x2190, 0x2190, 0x2193, 0x2193
+		}; /*  L"→→↑↑←←↓↓" */
+#ifndef _WIN32
+		const wchar_t unicode_arrows[] = {
+			0x2192, 0x2197, 0x2191, 0x2196, 0x2190, 0x2199, 0x2193, 0x2198
+		}; /*  L"→↗↑↖←↙↓↘" */
+#endif
 		wchar_t const * heads;
 		int dx = ex - sx;
 		int dy = ey - sy;
 		int idx = (int)(atan2(dy, dx) / M_PI * 4. + 8.5) % 8;
+
 		switch (CACA_charset) {
 			case CACA_ASCII:
-				heads = L">+^+<+v+";
+				heads = ascii_arrows;
 				break;
 			case CACA_BLOCKS:
 			default : {
-				const wchar_t block_arrows[] = {
-					0x2192, 0x2192, 0x2191, 0x2191, 0x2190, 0x2190, 0x2193, 0x2193
-				}; /*  L"→→↑↑←←↓↓" */
 				heads = block_arrows;
 				break;
 			}
 #ifndef _WIN32
 			case CACA_UNICODE: {
 				/* Windows: 45° arrows are not available in Lucida Console nor Consolas. */
- 				const wchar_t unicode_arrows[] = {
-					0x2192, 0x2197, 0x2191, 0x2196, 0x2190, 0x2199, 0x2193, 0x2198
-				}; /*  L"→↗↑↖←↙↓↘" */
-				heads = unicode_arrows; /* unicode simple arrows */
+				heads = unicode_arrows; /* Unicode simple arrows */
 				break;
 			}
 #endif
