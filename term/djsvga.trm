@@ -743,10 +743,8 @@ DJSVGA_flush_line(void)
 TERM_PUBLIC int
 DJSVGA_angle(float ang)
 {
-    while (ang < 0)
-	ang += 360;
-    ang %= 360;
-
+    ang = fmod(ang, 360);
+    if (ang < 0) ang += 360;
     dj_angle = ang;
 
     if (ang < 45 || ang > 315)
