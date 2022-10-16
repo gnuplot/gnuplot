@@ -170,6 +170,9 @@ OPENSPECFUN=1
 # Uncomment if you want to use polar grid
 #POLAR_GRID=1
 
+# Uncomment if you want to use functionblocks
+#FUNCTIONBLOCKS=1
+
 # Uncomment if you want to use Direct2D 1.1 (Windows 8 and Windows 7 Platform Update)
 DIRECT2D11=1
 
@@ -554,6 +557,10 @@ endif
 
 ifdef POLAR_GRID
 	CFLAGS += -DUSE_POLAR_GRID
+endif
+
+ifdef FUNCTIONBLOCKS
+	CFLAGS += -DUSE_FUNCTIONBLOCKS
 endif
 
 ifdef DIRECT2D11
