@@ -522,8 +522,8 @@ init_array( struct udvt_entry *array, int size )
     int i;
 
     free_value(&array->udv_value);
-    array->udv_value.type = ARRAY;
     array->udv_value.v.value_array = gp_alloc((size+1) * sizeof(t_value), "init_array");
+    array->udv_value.type = ARRAY;
     A = array->udv_value.v.value_array;
     A[0].v.int_val = size;
     for (i = 0; i <= size; i++)

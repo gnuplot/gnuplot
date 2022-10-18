@@ -213,7 +213,7 @@ string_or_express(struct at_type **atptr)
 	int save_token = c_token;
 	char *name = parse_datablock_name();
 	udvt_entry *udv = get_udv_by_name(name);
-	if (udv->udv_value.type == FUNCTIONBLOCK)
+	if (udv && (udv->udv_value.type == FUNCTIONBLOCK))
 	    c_token = save_token;
 	else
 	    return name;
