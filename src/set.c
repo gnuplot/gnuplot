@@ -2842,7 +2842,7 @@ set_logscale()
 		axis_array[axis].set_min = 0.1;
 
 	    /* Also forgive negative axis limits if we are currently autoscaling */
-	    if (((axis_array[axis].set_autoscale && AUTOSCALE_BOTH) != AUTOSCALE_NONE)
+	    if (((axis_array[axis].set_autoscale & AUTOSCALE_BOTH) != AUTOSCALE_NONE)
 	    &&  (axis_array[axis].set_min <= 0 || axis_array[axis].set_max <= 0)) {
 		axis_array[axis].set_min = 0.1;
 		axis_array[axis].set_max = 10.;
