@@ -1,6 +1,12 @@
 Changes in 5.4.6
 ================
-* NEW	set key {columns <exact no of columns>} {keywidth <exact width>}
+* NEW	set key {columns <exact no of columns>}
+	set key {keywidth <exact width>}
+* NEW	XDG support
+	 startup file:      $XDG_CONFIG_HOME/gnuplot/gnuplotrc
+	 history file:      $XDG_STATE_HOME/gnuplot_history
+	 wxt configuration: $XDG_CONFIG_HOME/gnuplot/gnuplot-wxt.conf
+* FIX	windows: various problems mixing piped input and stdin Bug #2491
 
 Changes in 5.4.5
 ================
