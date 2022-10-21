@@ -530,7 +530,7 @@ mouse_hit_label(struct curve_points *plot, watch_t *target, double x, double y)
 {
     char *xlabel, *ylabel;
     static char buffer[256];
-    struct text_label *new_label = malloc( sizeof(struct text_label) );
+    struct text_label *new_label = gp_alloc( sizeof(struct text_label), "watch label" );
     memcpy(new_label, &watchpoint_labelstyle, sizeof(struct text_label));
 
     switch (target->type) {
