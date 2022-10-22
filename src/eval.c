@@ -41,6 +41,7 @@
 #include "external.h"	/* for f_calle */
 #include "internal.h"
 #include "libcerf.h"
+#include "misc.h"	/* for called_from() */
 #include "specfun.h"
 #include "standard.h"
 #include "util.h"
@@ -883,6 +884,10 @@ del_udv_by_name(char *key, TBOOLEAN wildcard)
 
  	/* exact match */
 	else if (!wildcard && !strcmp(key, udv_ptr->udv_name)) {
+	    if (called_from(udv_ptr->udv_name)) {
+		FPRINTF((stderr, "cannot self-delete %s", udv_ptr->udv_name));
+		break;
+	    }
 	    gpfree_vgrid(udv_ptr);
 	    free_value(&(udv_ptr->udv_value));
 	    udv_ptr->udv_value.type = NOTDEFINED;
@@ -891,6 +896,10 @@ del_udv_by_name(char *key, TBOOLEAN wildcard)
 
 	/* wildcard match: prefix matches */
 	else if ( wildcard && !strncmp(key, udv_ptr->udv_name, strlen(key)) ) {
+	    if (called_from(udv_ptr->udv_name)) {
+		FPRINTF((stderr, "cannot self-delete %s", udv_ptr->udv_name));
+		break;
+	    }
 	    gpfree_vgrid(udv_ptr);
 	    free_value(&(udv_ptr->udv_value));
 	    udv_ptr->udv_value.type = NOTDEFINED;

@@ -412,7 +412,7 @@ f_eval(union argument *arg)
 #else	/* USE_FUNCTIONBLOCKS */
 void f_eval(union argument *arg)
 {
-    int_error(NO_CARET, "This copy of gnuplot does not support function blocks");
+    int_error(NO_CARET, "This copy of gnuplot does not support function block evaluation");
 }
 
 #endif	/* USE_FUNCTIONBLOCKS */

@@ -2166,13 +2166,9 @@ print_set_output(char *name, TBOOLEAN datablock, TBOOLEAN append_p)
 	}
     } else {
 	/* Make sure we will not overwrite the current input. */
-	LFS *frame = lf_head;
-	for (frame = lf_head; frame; frame = frame->prev) {
-	    if (frame->name && !strcmp(name, frame->name)) {
-		free(name);
-		int_error(NO_CARET, "Attempt to set print output to overwrite input %s",
-			frame->name);
-	    }
+	if (called_from(name)) {
+	    free(name);
+	    int_error(NO_CARET, "print output must not overwrite input");
 	}
 
 	/* We already know the name begins with $,

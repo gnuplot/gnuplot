@@ -585,6 +585,18 @@ lf_top()
     return (lf_head->fp);
 }
 
+/* Guard against deleting or overwriting a script we are running from */
+TBOOLEAN
+called_from(const char *name)
+{
+    LFS *frame = lf_head;
+    for (frame = lf_head; frame; frame = frame->prev) {
+	if (frame->name && !strcmp(name, frame->name))
+	    return TRUE;
+    }
+    return FALSE;
+}
+
 /* Clean up from error inside a "load" or "call" scope
  * (called from main).
  */

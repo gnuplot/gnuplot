@@ -62,6 +62,7 @@ void lf_reset_after_error(void);
 FILE *loadpath_fopen(const char *, const char *);
 void push_terminal(int is_interactive);
 void pop_terminal(void);
+TBOOLEAN called_from(const char *name);
 
 /* moved here, from setshow */
 enum PLOT_STYLE get_style(void);

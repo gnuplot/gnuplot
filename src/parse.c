@@ -1336,7 +1336,7 @@ parse_function_block()
 #else	/* USE_FUNCTIONBLOCKS */
 static void parse_function_block()
 {
-    int_error(c_token, "This copy of gnuplot does not support function blocks");
+    int_error(c_token, "This copy of gnuplot does not support function block evaluation");
 }
 
 #endif	/* USE_FUNCTIONBLOCKS */
