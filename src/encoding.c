@@ -557,7 +557,7 @@ truncate_to_one_utf8_char(char *orig)
 
     /* Check for unicode escape */
     if (!strncmp("\\U+", newchar, 3)) {
-	if (sscanf(&newchar[3], "%5x", &codepoint) == 1)
+	if (sscanf(&newchar[3], "%5" SCNx32, &codepoint) == 1)
 	    length = ucs4toutf8(codepoint, (unsigned char *)newchar);
 	newchar[length] = '\0';
     }
