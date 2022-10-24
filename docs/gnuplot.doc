@@ -795,7 +795,7 @@ C
  variables and thus may either be referenced directly or expanded as macros,
  e.g. @ARG1.  The contents of ARG0 ... ARG9 may alternatively be accessed as
  array elements ARGV[0] ... ARGV[ARGC].  An older gnuplot convention of
- referencing call parameters as tokens $0 ... $9 is deprecated.
+ referencing call parameters as tokens $0 ... $9 is deprecated in version 5.
 
  * The optional bandwidth for the kernel density smoothing option is taken from
  a keyword rather than a data column.  See `smooth kdensity`.
@@ -6684,10 +6684,6 @@ Ffigure_zerror
 
       call "inputfile" <param-1> <param-2> <param-3> ... <param-9>
 
- Previous versions of gnuplot performed macro-like substitution of the special
- tokens $0, $1, ... $9 with the literal contents of these parameters.
- This older mechanism is now deprecated (see `call old-style`).
-
  Gnuplot now provides a set of string variables ARG0, ARG1, ..., ARG9 and an
  integer variable ARGC. When a `call` command is executed ARG0 is set to the
  name of the input file, ARGC is set to the number of parameters present, and
@@ -6702,6 +6698,10 @@ Ffigure_zerror
 
  In parallel the string parameters ARG1 ... ARG9 the passed parameters are
  stored in an array ARGV[9].  See `argv`.
+
+ DEPRECATED: Versions prior to 5.0 performed macro-like substitution of the
+ special tokens $0, $1, ... $9 with the literal contents of <param-1> ...
+ That older mechanism is now deprecated.
 
  EXPERIMENTAL:  Function blocks (new in this version) provide a more flexible
  alternative to `call`.  See `function blocks`.
@@ -6757,38 +6757,6 @@ Ffigure_zerror
 
       gnuplot -persist -c "script1.gp" "sin(x)" 1.23 "This is a plot title"
 
-3 old-style
-?commands call old-style
-?call old-style
- [DEPRECATED] This describes the call mechanism used by old versions of gnuplot.
-
-       call "<input-file>" <param-0> <param-1> ... <param-9>
-
- The name of the input file must be enclosed in quotes.
- As each line is read from the input file, it is scanned for the following
- special character sequences: $0 $1 $2 $3 $4 $5 $6 $7 $8 $9 $#.  If found, the
- sequence `$`+digit is replaced by the corresponding parameter from the `call`
- command line. Quote characters are not copied and string variable substitution
- is not performed. The character sequence `$#` is replaced by the number of
- passed parameters. `$` followed by any other character is treated as an escape
- sequence; use `$$` to get a single `$`.
-
- Example:
-
- If the file 'calltest.gp' contains the line:
-       print "argc=$# p0=$0 p1=$1 p2=$2 p3=$3 p4=$4 p5=$5 p6=$6 p7=x$7x"
-
- entering the command:
-       call 'calltest.gp' "abcd" 1.2 + "'quoted'" -- "$2"
-
- will display:
-       argc=7 p0=abcd p1=1.2 p2=+ p3='quoted' p4=- p5=- p6=$2 p7=xx
-
- NOTES: This use of the `$` character conflicts both with gnuplot's own syntax
- for datafile columns and with the use of `$` to indicate environmental
- variables in a unix-like shell. The special sequence `$#` was mis-interpreted
- as a comment delimiter in gnuplot versions 4.5 through 4.6.3.  Quote characters
- are ignored during substitution, so string constants are easily corrupted.
 2 clear
 ?commands clear
 ?clear

@@ -2210,6 +2210,9 @@ show_palette_rgbformulae()
 }
 
 
+/*
+ * "show palette fit2rgbformulae" - DEPRECATED
+ */
 static void
 show_palette_fit2rgbformulae()
 {
