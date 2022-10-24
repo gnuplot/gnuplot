@@ -735,8 +735,6 @@ C
 #b The default format for axis labels is "% h" ("$%h$" for LaTeX terminals).
 ## This format is like the C standard format %g except that the exponential term,
 ## if present, is written using a superscript.  E.g. 1.2 x 10^5 rather than 1.2E05.
-#b Command scripts may place in-line data in a named data block for repeated
-## plotting. See `inline data`.
 #b Support for 32-bit Alpha channel + RGB color #AARRGGBB.  See `colorspec`.
 #b Support for HSV color space via a translation function hsv2rgb(H,S,V).
 #b Secondary axes (x2, y2) may be locked to the primary axis via a mapping
@@ -3782,8 +3780,11 @@ C ... and restart the table:
  other types of persistent variables.  The end-of-data delimiter (EOD in the
  example) may be any sequence of alphanumeric characters.
 
+ For a parallel mechanism that stores executable commands rather than data in
+ a named block, see `function blocks`.
+
  The storage associated with named data blocks can be released using `undefine`
- command. `undefine $*` frees all named data blocks at once.
+ command. `undefine $*` frees all named data and function blocks at once.
 2 iteration
 ?iteration
 ?iterate
@@ -6680,13 +6681,12 @@ Ffigure_zerror
 ?call
  The `call` command is identical to the `load` command with one exception:
  the name of the file being loaded may be followed by up to nine parameters.
- EXPERIMENTAL: Commands can be read from a datablock rather than a file.
 
       call "inputfile" <param-1> <param-2> <param-3> ... <param-9>
 
  Previous versions of gnuplot performed macro-like substitution of the special
  tokens $0, $1, ... $9 with the literal contents of these parameters.
- This mechanism is now deprecated (see `call old-style`).
+ This older mechanism is now deprecated (see `call old-style`).
 
  Gnuplot now provides a set of string variables ARG0, ARG1, ..., ARG9 and an
  integer variable ARGC. When a `call` command is executed ARG0 is set to the
@@ -6703,6 +6703,9 @@ Ffigure_zerror
  In parallel the string parameters ARG1 ... ARG9 the passed parameters are
  stored in an array ARGV[9].  See `argv`.
 
+ EXPERIMENTAL:  Function blocks (new in this version) provide a more flexible
+ alternative to `call`.  See `function blocks`.
+ 
 3 argv[ ]
 ?argv
 ?ARGV
@@ -6840,11 +6843,12 @@ Ffigure_zerror
 2 evaluate
 ?commands evaluate
 ?evaluate
- The `evaluate` command executes gnuplot commands contained in a string.
- Newline characters are not allowed within the string.
+ The `evaluate` command executes gnuplot commands contained in a string
+ or in a function block.  Newline characters are not allowed within the string.
 
       evaluate "commands in a string constant"
       evaluate <commands produced by a string-valued expression>
+      evaluate $functionblock( ... arguments ... )
 
  This is especially useful for a repetition of similar commands.
 
@@ -7471,7 +7475,9 @@ Ffigure_zerror
  See `local` and `scope`.
 
  Once the function block is defined, you can invoke it by name anywhere that
- a normal function could be used.
+ a normal function could be used.  If the return value is not relevent, the
+ function block may be invoked by an "evaluate" command rather than as part
+ of an assignment expression.
 
  Example:
       function $sinc(arg) << EOF
@@ -7685,10 +7691,9 @@ Ffigure_zerror
 ?load
  The `load` command executes each line of the specified input file as if it
  had been typed in interactively.  Files created by the `save` command can
- later be `load`ed.  Any text file containing valid commands can be created
- and then executed by the `load` command.  Files being `load`ed may themselves
- contain `load` or `call` commands.  To `load` with arguments, see `call`.
- EXPERIMENTAL: Commands can be read from a datablock rather than a file.
+ later be `load`ed.  Any text file containing valid gnuplot commands can be
+ executed by a `load` command.  Files being loaded may themselves contain
+ `load` or `call` commands.  To pass arguments to a loaded file, see `call`.
 
  Syntax:
        load "<input-file>"
@@ -7711,6 +7716,13 @@ Ffigure_zerror
  The `load` command is performed implicitly on any file names given as
  arguments to `gnuplot`.  These are loaded in the order specified, and
  then `gnuplot` exits.
+
+ EXPERIMENTAL:  It is also possible to execute commands from lines of text
+ stored internally. See `function blocks`. A function block may be defined
+ in-line or in an external file. Once the function block has been loaded
+ the commands may be executed repeatedly using `evaluate` on the internal
+ copy rather than reloading the file.
+
 2 local
 ?local
 ?commands local

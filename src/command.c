@@ -1159,6 +1159,12 @@ eval_command()
 {
     char *command;
     c_token++;
+#ifdef USE_FUNCTIONBLOCKS
+    if (equals(c_token, "$") && isletter(c_token+1) && equals(c_token+2,"(")) {
+	(void)int_expression();	/* throw away any actual return value */
+	return;
+    }
+#endif
     command = try_to_get_string();
     if (!command)
 	int_error(c_token, "Expected command string");
