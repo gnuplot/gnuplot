@@ -342,8 +342,8 @@ f_lnGamma(union argument *arg)
     z = a.v.cmplx_val;
 
     /* Negative integers are pole points */
-    if ( z.real < 0 && fabs(z.imag) < FLT_EPSILON
-    &&   fabs(z.real - round(z.real)) < FLT_EPSILON ) {
+    if ( z.real < 0 && fabs(z.imag) <= DBL_EPSILON
+    &&   fabs(z.real - round(z.real)) <= DBL_EPSILON ) {
 	push(Gcomplex(&result, VERYLARGE, 0.0));
 	return;
     }
