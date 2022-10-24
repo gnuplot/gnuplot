@@ -4002,7 +4002,7 @@ Ffigure_newsyntax
  `fillcolor palette <colormap>` maps the z coordinate of a plot element onto
  a previously saved named colormap instead of using the current palette.
  See `set colormap`.
- This option is EXPERIMENTAL. Details may change.
+
  If the colormap has a separate range associated with it, that range is used
  to map z values analogous to the use of cbrange to map the standard palette.
  If there is no separate range for this colormap then cbrange is used.
@@ -8696,7 +8696,6 @@ Ffigure_convex_hull
        plot 'data_file' using 1:2:(sw($3,100)) smooth acsplines
        splot 'data_file' using 1:2:3:(sw($4,100)) smooth acsplines
 
- EXPERIMENTAL:
  `splot ... smooth acsplines with lines` fits splines to the x, y, and z
  coordinates of successive data points.  Unlike the 2D case, the points are not
  sorted first so it is possible to fit splines to a trajectory containing loops.
@@ -13169,8 +13168,6 @@ Ffigure_multiple_keys
  useful for latex terminals, for example
       set micro "{\textmu}"
 
- This command is EXPERIMENTAL. Implementation details may change.
-
 3 minussign
 ?commands set minussign
 ?commands show minussign
@@ -13200,8 +13197,6 @@ Ffigure_multiple_keys
  It also is not necessary when using the postscript terminal because the
  postscript prologue output by gnuplot remaps the ascii hyphen code \055 to a
  different glyph named `minus`.
-
- This command is EXPERIMENTAL. Implementation details may change.
 
  Example (assumes utf8 locale):
 
@@ -17933,10 +17928,10 @@ Ffigure_walls
  but requires an additional keyword `nonuniform` for text input data.
  See `nonuniform` for examples.
 
- The `sparse matrix` variant is EXPERIMENTAL. It defines a uniform grid into
- which any number of individual point values are read from the input file,
- one per line, in any order. This is primarily intended for the generation of
- heatmaps from incomplete data.
+ The `sparse matrix` variant defines a uniform grid into which any number of
+ individual point values are read from the input file, one per line,
+ in any order. This is primarily intended for the generation of heatmaps from
+ incomplete data.
  See `sparse` for examples.
 
 5 uniform matrix
@@ -18013,7 +18008,6 @@ Ffigure_walls
 ?sparse
  Syntax:
        sparse matrix=(cols,rows) origin=(x0,y0) dx=<delx> dy=<dely>
- EXPERIMENTAL (version 5.5)
 #TeX \\
  The `sparse` matrix variant defines a uniform grid as part of the
  `plot` or `splot` command line.  The grid is initially empty.

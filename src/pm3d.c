@@ -749,8 +749,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		} else if (color_from_fillcolor) {
 		    /* color is set by "fc <rgbvalue>" */
 		    cb1 = cb2 = cb3 = cb4 = this_plot->fill_properties.border_color.lt;
-		    /* EXPERIMENTAL
-		     * pm3d fc linestyle N generates
+		    /* pm3d fc linestyle N generates
 		     * top/bottom color difference as with hidden3d
 		     */
 		    if (this_plot->fill_properties.border_color.type == TC_LINESTYLE) {
@@ -985,8 +984,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			if (color_from_fillcolor) {
 			    /* color is set by "fc <rgbval>" */
 			    gray = this_plot->fill_properties.border_color.lt;
-			    /* EXPERIMENTAL
-			     * pm3d fc linestyle N generates
+			    /* pm3d fc linestyle N generates
 			     * top/bottom color difference as with hidden3d
 			     */
 			    if (this_plot->fill_properties.border_color.type == TC_LINESTYLE) {
@@ -1758,7 +1756,7 @@ clip_filled_polygon( gpdPoint *inpts, gpdPoint *outpts, int nv )
 }
 
 
-/* EXPERIMENTAL
+/* 
  * returns 1 for top of pm3d surface towards the viewer
  *        -1 for bottom of pm3d surface towards the viewer
  * NB: the ordering of the quadrangle vertices depends on the scan direction.
