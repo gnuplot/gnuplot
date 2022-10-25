@@ -1198,7 +1198,6 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 	POINT corners[4];			/* image corners */
 	int color_mode = 0;			/* image color mode */
 
-#ifdef EAM_BOXED_TEXT
 	struct s_boxedtext {
 		TBOOLEAN boxing;
 		t_textbox_options option;
@@ -1207,7 +1206,6 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 		RECT  box;
 		int   angle;
 	} boxedtext;
-#endif
 
 	/* point symbols */
 	enum win_pointtypes last_symbol = W_invalid_pointtype;
@@ -1293,9 +1291,7 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 		lpgw->keyboxes[i].top = 0;
 	}
 
-#ifdef EAM_BOXED_TEXT
 	boxedtext.boxing = FALSE;
-#endif
 
 	/* do the drawing */
 	blkptr = lpgw->gwopblk_head;
@@ -1604,11 +1600,7 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 					D2D1_SIZE_F size;
 					int dxl, dxr;
 
-#ifndef EAM_BOXED_TEXT
-					if (keysample) {
-#else
 					if (keysample || boxedtext.boxing) {
-#endif
 						d2dMeasureText(pRenderTarget, textw, pWriteTextFormat, &size);
 						size.height = lpgw->tmHeight;
 						if (lpgw->justify == LEFT) {
@@ -1625,7 +1617,6 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 						d2d_update_keybox(lpgw, pRenderTarget, plotno, xdash - dxl, ydash - size.height / 2);
 						d2d_update_keybox(lpgw, pRenderTarget, plotno, xdash + dxr, ydash + size.height / 2);
 					}
-#ifdef EAM_BOXED_TEXT
 					if (boxedtext.boxing) {
 						if (boxedtext.box.left > (xdash - boxedtext.start.x - dxl))
 							boxedtext.box.left = xdash - boxedtext.start.x - dxl;
@@ -1638,7 +1629,6 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 						/* We have to remember the text angle as well. */
 						boxedtext.angle = lpgw->angle;
 					}
-#endif
 					free(textw);
 				}
 			}
@@ -1658,7 +1648,6 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 					d2d_update_keybox(lpgw, pRenderTarget, plotno, xdash - extend.left, ydash - extend.top);
 					d2d_update_keybox(lpgw, pRenderTarget, plotno, xdash + extend.right, ydash + extend.bottom);
 				}
-#ifdef EAM_BOXED_TEXT
 				if (boxedtext.boxing) {
 					if (boxedtext.box.left > (boxedtext.start.x - xdash - extend.left))
 						boxedtext.box.left = boxedtext.start.x - xdash - extend.left;
@@ -1671,7 +1660,6 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 					/* We have to store the text angle as well. */
 					boxedtext.angle = lpgw->angle;
 				}
-#endif
 			}
 			LocalUnlock(curptr->htext);
 			break;
@@ -1688,7 +1676,6 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 			}
 			break;
 
-#ifdef EAM_BOXED_TEXT
 		case W_boxedtext:
 			if (seq == 0) {
 				boxedtext.option = (t_textbox_options) curptr->x;
@@ -1800,7 +1787,6 @@ d2d_do_draw(LPGW lpgw, ID2D1RenderTarget * pRenderTarget, LPRECT rect, bool inte
 				break;
 			}
 			break;
-#endif
 
 		case W_fillstyle: {
 			// FIXME: resetting polyi here should not be necessary

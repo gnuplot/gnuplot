@@ -1991,7 +1991,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	POINT corners[4];			/* image corners */
 	int color_mode = 0;			/* image color mode */
 
-#ifdef EAM_BOXED_TEXT
 	struct s_boxedtext {
 		TBOOLEAN boxing;
 		t_textbox_options option;
@@ -2000,7 +1999,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		RECT  box;
 		int   angle;
 	} boxedtext;
-#endif
 
 	/* point symbols */
 	bool ps_caching = FALSE;
@@ -2100,9 +2098,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		lpgw->keyboxes[i].top = 0;
 	}
 
-#ifdef EAM_BOXED_TEXT
 	boxedtext.boxing = FALSE;
-#endif
 
 	SelectObject(hdc, lpgw->hapen); /* background brush */
 	SelectObject(hdc, lpgw->colorbrush[2]); /* first user pen */
@@ -2299,11 +2295,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 				/* shift correctly for rotated text */
 				draw_put_text(lpgw, hdc, xdash + hshift, ydash + vshift, str, FALSE);
-#ifndef EAM_BOXED_TEXT
-				if (keysample) {
-#else
 				if (keysample || boxedtext.boxing) {
-#endif
 					slen  = GraphGetTextLength(lpgw, hdc, str, FALSE);
 					vsize = MulDiv(lpgw->vchar, rb - rt, 2 * lpgw->ymax);
 					if (lpgw->justify == LEFT) {
@@ -2320,7 +2312,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					draw_update_keybox(lpgw, plotno, xdash - dxl, ydash - vsize);
 					draw_update_keybox(lpgw, plotno, xdash + dxr, ydash + vsize);
 				}
-#ifdef EAM_BOXED_TEXT
 				if (boxedtext.boxing) {
 					if (boxedtext.box.left > (xdash - boxedtext.start.x - dxl))
 						boxedtext.box.left = xdash - boxedtext.start.x - dxl;
@@ -2333,7 +2324,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					/* We have to remember the text angle as well. */
 					boxedtext.angle = lpgw->angle;
 				}
-#endif
 			}
 			LocalUnlock(curptr->htext);
 			break;
@@ -2351,7 +2341,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					draw_update_keybox(lpgw, plotno, xdash - extend.left, ydash - extend.top);
 					draw_update_keybox(lpgw, plotno, xdash + extend.right, ydash + extend.bottom);
 				}
-#ifdef EAM_BOXED_TEXT
 				if (boxedtext.boxing) {
 					if (boxedtext.box.left > (boxedtext.start.x - xdash - extend.left))
 						boxedtext.box.left = boxedtext.start.x - xdash - extend.left;
@@ -2364,7 +2353,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					/* We have to store the text angle as well. */
 					boxedtext.angle = lpgw->angle;
 				}
-#endif
 			}
 			LocalUnlock(curptr->htext);
 			break;
@@ -2381,7 +2369,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			}
 			break;
 
-#ifdef EAM_BOXED_TEXT
 		case W_boxedtext:
 			if (seq == 0) {
 				boxedtext.option = curptr->x;
@@ -2506,7 +2493,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				break;
 			}
 			break;
-#endif
 
 		case W_fillstyle:
 			/* HBB 20010916: new entry, needed to squeeze the many
