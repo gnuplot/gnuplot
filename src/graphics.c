@@ -785,12 +785,12 @@ do_plot(struct curve_points *plots, int pcount)
 	y_axis = this_plot->y_axis;
 
 	/* Crazy corner case handling Bug #3499425 */
-	if (this_plot->plot_style == HISTOGRAMS)
-	    if ((!key_pass && key->front) &&  (prefer_line_styles)) {
+	if (prefer_line_styles
+	&&  (this_plot->plot_style == HISTOGRAMS) && (!key_pass && key->front)) {
 		struct lp_style_type ls;
 		lp_use_properties(&ls, this_plot->lp_properties.l_type+1);
 		this_plot->lp_properties.pm3d_color = ls.pm3d_color;
-	    }
+	}
 
 	term_apply_lp_properties(&(this_plot->lp_properties));
 

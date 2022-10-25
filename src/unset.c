@@ -2207,7 +2207,10 @@ reset_command()
     unset_histogram();
     unset_textbox_style();
     unset_watchpoint_style();
+
+#ifdef BACKWARD_COMPATIBILITY
     prefer_line_styles = FALSE;
+#endif
 
     reset_watches();
 

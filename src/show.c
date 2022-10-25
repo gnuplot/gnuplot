@@ -1623,7 +1623,6 @@ show_style()
 	show_styles("Functions", func_style);
 	show_linestyle(0);
 	show_fillstyle();
-	show_increment();
 	show_histogram();
 	show_textbox();
 	show_style_watchpoint();
@@ -2915,11 +2914,15 @@ show_hidden3d()
 static void
 show_increment()
 {
+#ifdef BACKWARD_COMPATIBILITY
     fprintf(stderr,"\tPlot lines increment over ");
     if (prefer_line_styles)
 	fprintf(stderr, "user-defined line styles rather than default line types\n");
     else
 	fprintf(stderr, "default linetypes\n");
+#else
+    fprintf(stderr,"\t'set style increment' is deprecated\n");
+#endif
 }
 
 static void

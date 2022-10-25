@@ -15625,37 +15625,13 @@ Ffigure_polar_grid
        show style function
 4 set style increment
 ?commands set style increment
-?commands show style increment
 ?set style increment
-?show style increment
- `Note`:  This command has been deprecated.  Instead please use the newer
- command `set linetype`, which redefines the linetypes themselves rather
- than searching for a suitable temporary line style to substitute.
- See `set linetype`
-
- Syntax:
-       set style increment {default|userstyles}
-       show style increment
-
  By default, successive plots within the same graph will use successive
- linetypes from the default set for the current terminal type.
- However, choosing `set style increment user` allows you to step through
- the user-defined line styles rather than through the default linetypes.
+ linetypes.  `set style increment userstyles` changes this to step through
+ successive user-defined line styles instead.
 
- Example:
-
-       set style line 1 lw 2 lc rgb "gold"
-       set style line 2 lw 2 lc rgb "purple"
-       set style line 4 lw 1 lc rgb "sea-green"
-       set style increment user
-
-       plot f1(x), f2(x), f3(x), f4(x)
-
- should plot functions f1, f2, f4 in your 3 newly defined line styles.
- If a user-defined line style is not found then the corresponding default
- linetype is used instead.  E.g. in the example above, f3(x) will be plotted
- using the default linetype 3.
-
+ DEPRECATED.  Instead use `set linetype` to redefine a convenient range of
+ linetypes for the program to use.  See `set linetype`.
 4 set style line
 ?commands set style line
 ?commands unset style line
