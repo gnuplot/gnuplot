@@ -503,7 +503,6 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 	POINT corners[4];			/* image corners */
 	int color_mode = 0;			/* image color mode */
 
-#ifdef EAM_BOXED_TEXT
 	struct s_boxedtext {
 		TBOOLEAN boxing;
 		t_textbox_options option;
@@ -512,7 +511,6 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 		RECT  box;
 		int   angle;
 	} boxedtext;
-#endif
 
 	/* point symbols */
 	enum win_pointtypes last_symbol = W_invalid_pointtype;
@@ -614,9 +612,7 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 		lpgw->keyboxes[i].top = 0;
 	}
 
-#ifdef EAM_BOXED_TEXT
 	boxedtext.boxing = FALSE;
-#endif
 
 	/* do the drawing */
 	blkptr = lpgw->gwopblk_head;
@@ -899,11 +895,7 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 					}
 					RectF size;
 					int dxl, dxr;
-#ifndef EAM_BOXED_TEXT
-					if (keysample) {
-#else
 					if (keysample || boxedtext.boxing) {
-#endif
 						graphics.MeasureString(textw, -1, font, PointF(0,0), &stringFormat, &size);
 						if (lpgw->justify == LEFT) {
 							dxl = 0;
@@ -919,7 +911,6 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 						draw_update_keybox(lpgw, plotno, xdash - dxl, ydash - size.Height / 2);
 						draw_update_keybox(lpgw, plotno, xdash + dxr, ydash + size.Height / 2);
 					}
-#ifdef EAM_BOXED_TEXT
 					if (boxedtext.boxing) {
 						if (boxedtext.box.left > (xdash - boxedtext.start.x - dxl))
 							boxedtext.box.left = xdash - boxedtext.start.x - dxl;
@@ -932,7 +923,6 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 						/* We have to remember the text angle as well. */
 						boxedtext.angle = lpgw->angle;
 					}
-#endif
 					free(textw);
 				}
 			}
@@ -951,7 +941,6 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 					draw_update_keybox(lpgw, plotno, xdash - extend.left, ydash - extend.top);
 					draw_update_keybox(lpgw, plotno, xdash + extend.right, ydash + extend.bottom);
 				}
-#ifdef EAM_BOXED_TEXT
 				if (boxedtext.boxing) {
 					if (boxedtext.box.left > (boxedtext.start.x - xdash - extend.left))
 						boxedtext.box.left = boxedtext.start.x - xdash - extend.left;
@@ -964,7 +953,6 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 					/* We have to store the text angle as well. */
 					boxedtext.angle = lpgw->angle;
 				}
-#endif
 			}
 			break;
 		}
@@ -979,7 +967,6 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 			}
 			break;
 
-#ifdef EAM_BOXED_TEXT
 		case W_boxedtext:
 			if (seq == 0) {
 				boxedtext.option = (t_textbox_options) curptr->x;
@@ -1091,7 +1078,6 @@ do_draw_gdiplus(LPGW lpgw, Graphics &graphics, LPRECT rect, enum draw_target tar
 				break;
 			}
 			break;
-#endif
 
 		case W_fillstyle: {
 			/* HBB 20010916: new entry, needed to squeeze the many
