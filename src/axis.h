@@ -491,7 +491,8 @@ void widest_tic_callback(struct axis *, double place, char *text, int ticlevel,
 			struct lp_style_type grid, struct ticmark *);
 
 void get_position(struct position *pos);
-void get_position_default(struct position *pos, enum position_type default_type, int ndim);
+void get_position_default(struct position *pos, enum position_type default_type,
+			TBOOLEAN clear, int ndim);
 
 void gstrdms(char *label, char *format, double value);
 

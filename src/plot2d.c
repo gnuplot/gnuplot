@@ -4090,7 +4090,7 @@ parse_plot_title(struct curve_points *this_plot, char *xtitle, char *ytitle, TBO
 		this_plot->title_position->y = RIGHT;
 		c_token++;
 	    } else {
-		get_position_default(this_plot->title_position, screen, 2);
+		get_position_default(this_plot->title_position, screen, TRUE, 2);
 	    }
 	    if (save_token == c_token)
 		int_error(c_token, "expecting \"at {beginning|end|<xpos>,<ypos>}\"");

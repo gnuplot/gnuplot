@@ -2150,21 +2150,23 @@ get_position_type(enum position_type *type, AXIS_INDEX *axes)
 void
 get_position(struct position *pos)
 {
-    get_position_default(pos, first_axes, 3);
+    get_position_default(pos, first_axes, TRUE, 3);
 }
 
 /* get_position() - reads a position for label,arrow,key,...
  * with given default coordinate system
- * ndim = 2 only reads x,y
- * otherwise it reads x,y,z
+ * clear = TRUE  if 2nd or 3rd coordinate is missing, set it to zero
+ * ndim = 2 only reads x,y  otherwise it reads x,y,z
  */
 void
-get_position_default(struct position *pos, enum position_type default_type, int ndim)
+get_position_default(struct position *pos, enum position_type default_type,
+		TBOOLEAN clear, int ndim)
 {
     AXIS_INDEX axes;
     enum position_type type = default_type;
 
-    memset(pos, 0, sizeof(struct position));
+    if (clear)
+	memset(pos, 0, sizeof(struct position));
 
     get_position_type(&type, &axes);
     pos->scalex = type;
@@ -2175,7 +2177,7 @@ get_position_default(struct position *pos, enum position_type default_type, int 
 	get_position_type(&type, &axes);
 	pos->scaley = type;
 	GET_NUMBER_OR_TIME(pos->y, axes, FIRST_Y_AXIS);
-    } else {
+    } else if (clear) {
 	pos->y = 0;
 	pos->scaley = type;
     }
@@ -2191,7 +2193,7 @@ get_position_default(struct position *pos, enum position_type default_type, int 
 	}
 	pos->scalez = type;
 	GET_NUMBER_OR_TIME(pos->z, axes, FIRST_Z_AXIS);
-    } else {
+    } else if (clear) {
 	pos->z = 0;
 	pos->scalez = type;	/* same as y */
     }

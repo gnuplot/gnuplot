@@ -818,7 +818,7 @@ set_arrow()
 	    if (set_end) { duplication = TRUE; break; }
 	    this_arrow->type = arrow_end_oriented;
 	    c_token++;
-	    get_position_default(&this_arrow->end, first_axes, 1);
+	    get_position_default(&this_arrow->end, first_axes, TRUE, 1);
 	    set_end = TRUE;
 	    continue;
 	}
@@ -2593,7 +2593,7 @@ set_key()
 	case S_KEY_KEYWIDTH:
 	/* override automatic calculation of width */
 	    c_token++;
-	    get_position_default(&key->user_width, screen, 1);
+	    get_position_default(&key->user_width, screen, TRUE, 1);
 	    if (key->user_width.scalex != screen && key->user_width.scalex != graph) {
 		int_warn( c_token-2, "keywidth must be in graph or screen coordinates");
 		key->user_width.scalex = screen;
@@ -2604,7 +2604,7 @@ set_key()
 
 	case S_KEY_OFFSET:
 	    c_token++;
-	    get_position_default(&key->offset, character, 2);
+	    get_position_default(&key->offset, character, FALSE, 2);
 	    c_token--;  /* will be incremented again soon */
 	    break;
 
@@ -3553,7 +3553,7 @@ set_colorbox()
 		    int_error(c_token, "expecting screen value [0 - 1]");
 		} else {
 		    /* FIXME: should be 2 but old save files may have 3 */
-		    get_position_default(&color_box.origin, screen, 3);
+		    get_position_default(&color_box.origin, screen, FALSE, 3);
 		}
 		c_token--;
 		continue;
@@ -3564,7 +3564,7 @@ set_colorbox()
 		    int_error(c_token, "expecting screen value [0 - 1]");
 		} else {
 		    /* FIXME: should be 2 but old save files may have 3 */
-		    get_position_default(&color_box.size, screen, 3);
+		    get_position_default(&color_box.size, screen, FALSE, 3);
 		}
 		c_token--;
 		continue;
@@ -4089,7 +4089,7 @@ set_obj(int tag, int obj_type)
 			get_position(&this_rect->tr);
 		    } else if (equals(c_token,"rto")) {
 			c_token++;
-			get_position_default(&this_rect->tr, this_rect->bl.scalex, 2);
+			get_position_default(&this_rect->tr, this_rect->bl.scalex, TRUE, 2);
 			if (this_rect->bl.scalex != this_rect->tr.scalex
 			||  this_rect->bl.scaley != this_rect->tr.scaley)
 			    int_error(c_token,"relative coordinates must match in type");
@@ -4222,7 +4222,7 @@ set_obj(int tag, int obj_type)
 			} else /* "rto" */ {
 			    int v = this_polygon->type;
 			    get_position_default(&this_polygon->vertex[v],
-						  this_polygon->vertex->scalex, 2);
+						  this_polygon->vertex->scalex, TRUE, 2);
 			    if (this_polygon->vertex[v].scalex != this_polygon->vertex[v-1].scalex
 			    ||  this_polygon->vertex[v].scaley != this_polygon->vertex[v-1].scaley)
 				int_error(c_token,"relative coordinates must match in type");
@@ -5098,7 +5098,7 @@ set_timestamp()
 
 	if (almost_equals(c_token,"off$set")) {
 	    c_token++;
-	    get_position_default(&(timelabel.offset), character, 3);
+	    get_position_default(&(timelabel.offset), character, TRUE, 3);
 	    continue;
 	}
 
@@ -5488,7 +5488,7 @@ set_tic_prop(struct axis *this_axis)
 	    } else if (almost_equals(c_token, "off$set")) {
 		++c_token;
 		get_position_default(&this_axis->ticdef.offset,
-				     character, 3);
+				     character, TRUE, 3);
 	    } else if (almost_equals(c_token, "nooff$set")) {
 		++c_token;
 		this_axis->ticdef.offset = default_offset;
@@ -6238,7 +6238,7 @@ parse_label_options( struct text_label *this_label, int ndim)
 
 	if (! set_offset && almost_equals(c_token, "of$fset")) {
 	    c_token++;
-	    get_position_default(&offset, character, ndim);
+	    get_position_default(&offset, character, TRUE, ndim);
 	    set_offset = TRUE;
 	    continue;
 	}
