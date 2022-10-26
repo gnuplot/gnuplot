@@ -473,6 +473,7 @@ const struct gen_table set_colorbox_tbl[] =
     { "def$ault",	S_COLORBOX_DEFAULT },
     { "u$ser",		S_COLORBOX_USER },
     { "at",		S_COLORBOX_USER },
+    { "bot$tom",	S_COLORBOX_BOTTOM },
     { "bo$rder",	S_COLORBOX_BORDER },
     { "bd$efault",	S_COLORBOX_BDEFAULT },
     { "nobo$rder",	S_COLORBOX_NOBORDER },

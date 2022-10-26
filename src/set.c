@@ -3492,6 +3492,21 @@ set_colorbox()
 	    case S_COLORBOX_DEFAULT: /* "def$ault" */
 		color_box.where = SMCOLOR_BOX_DEFAULT;
 		continue;
+	    /* color box where: bottom of page */
+	    /* Translates to
+	     *  set colorbox horizontal
+	     *      user origin screen 0.1, 0.07 size screen 0.8, 0.03
+	     */
+	    case S_COLORBOX_BOTTOM:
+		{
+		struct position origin = {screen, screen, screen, 0.1, 0.07, 0.0};
+		struct position size =   {screen, screen, screen, 0.8, 0.03, 0.0};
+		color_box.where = SMCOLOR_BOX_USER;
+		color_box.rotation = 'h';
+		color_box.origin = origin;
+		color_box.size = size;
+		}
+		continue;
 	    /* color box where: position by user */
 	    case S_COLORBOX_USER: /* "u$ser" */
 		color_box.where = SMCOLOR_BOX_USER;

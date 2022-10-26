@@ -432,6 +432,7 @@ C
 ## number of columns available in the current line of data.  For example
 ## "plot FOO using 0:(column($# - 1))" plots the last-but-one field of each row.
 #b keyword `binvalue=avg` plots average, rather than sum, of binned data.
+#b `set colorbox bottom` places the color box underneath the plot.
 #b `set colorbox cbtics <linestyle>` affects cbtics but not other tics.
 #b Improved rendering of intersecting pm3d surfaces - overlapping surface tiles
 ## are split into two pieces along the line of intersection so that tiles
@@ -10859,14 +10860,14 @@ Ffigure_smooth_path
 ?unset colorbox
 ?colorbox
 
- The color scheme, i.e. the gradient of the smooth color with min_z and
- max_z values of `pm3d`'s `palette`, is drawn in a color box unless `unset
- colorbox`.
+ For plots that use palette coloring, in particular pm3d plots, the palette
+ gradient is drawn in a color box next to the plot unless it is switched off
+ by `unset colorbox`.
 
        set colorbox
        set colorbox {
                   { vertical | horizontal } {{no}invert}
-                  { default | user }
+                  { default | bottom | user }
                   { origin x, y }
                   { size x, y }
                   { front | back }
@@ -10875,19 +10876,22 @@ Ffigure_smooth_path
        show colorbox
        unset colorbox
 
- Color box position can be `default` or `user`.  If the latter is specified the
- values as given with the `origin` and `size` subcommands are used. The box
- can be drawn after (`front`) or before (`back`) the graph or the surface.
+ The orientation of the color gradient is set by `vertical` or `horizontal`.
 
- The orientation of the color gradient can be switched by options `vertical`
- and `horizontal`.
+ The color box position can be `default` or `bottom` or `user`.
+ The `bottom` keyword is a convenience short cut equivalent to
 
- `origin x, y` and `size x, y` are used only in combination with the `user`
- option. The x and y values are interpreted as screen coordinates by default,
- and this is the only legal option for 3D plots. 2D plots, including splot with
- `set view map`, allow any coordinate system to be specified.  Try for example:
-     set colorbox horiz user origin .1,.02 size .8,.04
- which will draw a horizontal gradient somewhere at the bottom of the graph.
+      set colorbox horizontal user origin screen 0.1, 0.07 size 0.8, 0.03.
+
+ If the colorbox is placed underneath the plot, as it is with `bottom`,
+ it may be useful to reserve additional space for it: `set bmargin screen 0.2`.
+ 
+ `origin x, y` and `size x, y` are used to tailor the exact placement in
+ `user` or `bottom` positioning.  The x and y values are interpreted as screen
+ coordinates by default, and this is the only legal option for 3D plots.
+ 2D plots, including splot with `set view map`, allow any coordinate system.
+
+ `back`/`front` control whether the color box is draw before or after the plot.
 
  `border` turns the border on (this is the default). `noborder` turns the border
  off. If an positive integer argument is given after `border`, it is used as a
