@@ -12387,19 +12387,25 @@ Ffigure_missing
  turned off by using the `notitle` keyword in the corresponding plot command.
  The text of the titles is controlled by the `set key autotitle` option or by
  the `title` keyword of individual `plot` and `splot` commands.
- Many options are available to control the placement and layout of the key.
 
- Syntax:
+ See `key placement` for syntax of options that affect where the key is placed.
+#TeX \\
+ See `key layout` for syntax of options that affect the content of the key.
+
+ Syntax (global options):
        set key {on|off} {default}
-             {{no}enhanced}
+             {font "<face>,<size>"} {{no}enhanced}
+             {{no}title "<text>" {<font or other text options>}}
              {{no}autotitle {columnheader}}
              {{no}box {<line properties>}} {{no}opaque {fc <colorspec>}}
              {width <width_increment>} {height <height_increment>}
-             {offset <dx>,<dy>}
        unset key
 
  By default the key is placed in the upper right inside corner of the graph.
- For placement options, see `key placement`.
+ The optional `font` becomes the default for all elements of the key.
+ You can provide an option title for the key as a whole that spans the full
+ width of the key at the top.  This title can use different font, color,
+ justification, and enhancement from individual plot titles.
 
  Each component in a plot command is represented in the key by a single line
  containing corresponding title text and a line or symbol or shape
@@ -12407,11 +12413,10 @@ Ffigure_missing
  explicitly in the plot command as `title "text"`.  Using the keyword `notitle`
  in the plot command will suppress generation of the entire line.
  If you want to suppress the text only, use `title ""` in the plot command.
+
  Contour plots generated additional entries in the key (see `cntrlabel`).
  You can add extra lines to the key by inserting a dummy plot command that uses
  the keyword `keyentry` rather than a filename or a function.  See `keyentry`.
- For options to customize the layout of the titles and samples in the key
- see `key layout`.
 
  A box can be drawn around the key (`box {...}`) with user-specified line
  properties.  The `height` and `width` increments (specified in character units)
@@ -12431,9 +12436,11 @@ Ffigure_missing
  or to individual plot titles.
 
  `set key default` restores the default key configuration.
-      set key fixed right top vertical Right noreverse enhanced autotitle
+      set key notitle
       set key nobox noopaque
+      set key fixed right top vertical Right noreverse enhanced autotitle
       set key noinvert samplen 4 spacing 1 width 0 height 0 
+      set key maxcolumns 0 maxrows 0
 
 4 3D key
 ?set key 3D
@@ -12472,7 +12479,6 @@ Ffigure_missing
  and draws a box around it with a thick border:
        set key left bottom Left title 'Legend' box lw 3
 
-#TeX \newpage
 4 extra key entries
 ?key entries
 ?keyentry
@@ -12586,6 +12592,7 @@ Ffigure_keyentry
                {lmargin | rmargin | tmargin | bmargin}
                {at <position>}}
                {left | right | center} {top | bottom | center}
+               {offset <dx>,<dy>}
 
  This section describes placement of the primary, auto-generated key.
  To construct a secondary key or place plot titles elsewhere, see
