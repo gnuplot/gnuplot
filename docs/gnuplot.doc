@@ -190,23 +190,22 @@ C
  A mailing list for those interested in the development version of gnuplot is:
            gnuplot-beta@lists.sourceforge.net
 
-2 New features in this version
-?new version_5.5
+2 New features in version 6
+?new version_6
 ?new
-?development version
 ?version
- Version 5.5 is the current development version, built from a snapshot of the
- source files in the master branch of the git repository. New features
- introduced here will generally not appear in a supported release until
- version 5.6.  Details may change before that.
+ Version 6 is the latest major release in a history of gnuplot development
+ dating back to 1986.  It is follows major version 5 (2015) with subsequent
+ minor version releases 5.2 (2017) and 5.4 (2020).  Development continues
+ in a separate unreleased branch in the project git repository on SourceForge.
 
  For more information about optional features built into the particular copy
  of gnuplot you are running, type `show version long`.
 
 3 Special and complex-valued functions
 ?new math
- This version of gnuplot provides a larger set of complex-valued functions and
- updated versions of some functions that were present in earlier versions.
+ Gnuplot 6 provides a larger set of complex-valued functions and updated
+ versions of some functions that were present in earlier versions.
 #start
 #b New: Riemann zeta function with complex domain and range.  See `zeta`.
 #b Updated lower incomplete gamma function with improved domain and precision.
@@ -454,392 +453,69 @@ C
 ## See `set key offset`.
 #end
 
-3 Features introduced in version 5.4
-4 Support for 64-bit integer arithmetic
+3 Brief list of features introduced in version 5
+4 New features in 5.4
 ?version_5.4
- New features in 5.4
 #start
-#b All evaluation of expressions and functions uses 64-integer arithmetic if
-## supported by the platform.
-#b Integer overflow is detected and handled according to user preference.
-## See `overflow`.
-#end
-
-4 Voxel grids
- Gnuplot now supports operations based on 3D grids of voxel data.
-
-#start
-#b `set vgrid $gridname size N` creates an NxNxN grid of voxels.
-#b `set vxrange [vxmin:vxmax]` together with `set vyrange` and `set vzrange`
-## define which region of space the grid occupies.  This may or may not be
-## identical to the xyz range of the plot.
-#b `voxel(x,y,z)` can be used in expressions to read or write an individual voxel.
-#b `vfill DATA_SOURCE using x:y:z:radius:(<expression>)` acts analogously to
-## a plot command except that instead of plotting it increments voxels near each
-## point in the input data.
-#b `vgfill` is a variant of `vfill` that uses grid coordinates rather than
-## user coordinates.
-#b `vclear $gridname` resets an existing voxel grid to contain all zero values.
-#b The current contents of one or more voxel grids can be referenced by
-## `splot` commands to assign colors or other properties of plot elements
-## by using the `voxel` function in using specifiers.
-## See demo `voxel.dem`.
-#b `show vgrid` reports basic statistics about all currently defined voxel grids.
-#b Voxel grids can also be plotted by name in `splot` commands with plot styles
-## `dots`, `points`, or `isosurface`.
-## See demo `vplot.dem`.
-#end
-
-4 New plot styles and style options
-#start
-#b 3D plot style `with polygons` reads polygon faces from a data file.
-## This can be used to create a surface or to construct a solid object.
-## See `with polygons`.
-#b `splot $voxelgrid with {dots|points}` marks all voxels whose value is above
-## a requested threshold level.
-#b `splot $voxelgrid with isosurface` creates a tessellated 3D surface enclosing
-## voxels above a requested threshold level. See `isosurface`.
-#b Voxel grid values can be referenced in the `using` specifiers for 3D plots.
-#b `set spiderplot` selects a new plotting mode allowing creation of spider plots
-## (also known as radar charts). These are essentially parallel axis plots where
-## the axes are arranged radially rather than vertically.
-## See `spiderplot`, `set style spiderplot`, `set paxis`.
-#b Plot style `with circles` can be used in 3D plots.
-#b Plot style `with boxes` can be used in 3D plots.
-#b 2D plot style `with arrows` is identical to `with vectors` except that each
-## arrow is specified using x:y:length:angle rather than x:y:xdelta:ydelta
-#b splot FOO with pm3d fillcolor <colorspec>
-#b pm3d surfaces can have individual fillstyle and separate top/bottom fillcolor
-#b pm3d option `noclipcb` causes quadrangles with palette color outside cbrange
-## to be skipped rather than being drawn with color clipped to cbmin or cbmax.
-#b Customized contour line types. See `set cntrparam`.
-#b The vertical lines connecting the base plane to the corners of a 3D surface
-## can be toggled on/off. See `set cornerpoles`.
-#end
-
-4 New data pre-processing filters
-#start
-#b `zsort` sorts 2D points on values in a third column. See `zsort`.
-## This is useful to bring a small number of salient points in a very large data
-## set to the front so that they are not occluded.
-#end
-
-4 New commands and command options
-#start
-#b Voxel grid commands. See `set vgrid`, `set vxrange`, `vclear`, `vfill`,
-## `vgfill`, and `voxel`.
-#b New options for showing the xy xz and yz planes in 3D plots.
-##See `set walls`, `set grid vertical`.
-#b `set table separator {tab|comma|"char"}` can be used to create csv files.
-##See `plot with table`.
-#b New options `set view projection {xy|xz|yz}` adjust view angles, axis tic
-##and label placement to generate a 2D projection of a 3D splot.
-##`set view projection xy` is equivalent to `set view map`.
-#b `set rgbmax <value>` controls interpretation of input RGB values.
-#b Array size can be implicit if an initializer is present, e.g. `Array A = [1,2,3]`.
-#b Optional radial clipping of line segments in polar mode. See `set clip`.
-#b Extra lines to customize the key can be added by substituting `keyentry` in
-## place of a filename or function in `plot` and `splot` commands.
-##This produces a line in the key without generating a corresponding plot.
-##See `keyentry`.
-#b User-specified translation of mouse coordinates (EXPERIMENTAL).
-##See map_projection demo.
-#b The `load` command can input commands from a datablock as an alternative to
-## reading them from a file.
-#b `set datafile columnheaders` causes first line of input to be read as strings
-## rather than as data values.  Equivalent to `set key autotitle columnheader`
-## except that it does not affect generation of key entries.  If this option is
-## in effect the `stats` command will generate an array of strings containing
-## the column headers found.
-#end
-
-4 New terminals and terminal options
-#start
-#b The `pcl5` terminal has been extended to support PCL5e/PCL5c printers and
-## many modern gnuplot features.
-#b The `pstricks` terminal has been extended to support many modern gnuplot
-## features including RGB colors and transparency, filled polygons, and boxes.
-#b New terminal `pict2e` to use the LaTeX2e pict2e environment.
-## It directly supersedes older terminals `latex`, `emtex`, `eepic`, and `tpic`,
-## which are no longer built by default.
-#b The `texdraw` terminal has been extended to support text at arbitrary angles,
-## variable line width, v5 dashed lines, and filled boxes and polygons. It can
-## now be used with plain TeX, too.  It still does not support color.
-#b The previously experimental Direct2D variant of the `windows` terminal
-## replaces the GDI and GDI+ variants. It now supports printing using D2D
-## and color fonts.
-#b The `dospc` and `svga` DOS terminals have been modernized and now support
-## interactive keyboard and mouse (svga only) input.
-#end
-
-4 Pixmaps as objects
-#start
-#b `set pixmap` allows import of an image in standard format (png jpeg gif) as
-## a pixmap that can be positioned anywhere in a plot or on the page.
-## Unlike plotting `with image`, pixmap objects retain their original aspect
-## ratio and size independent of axis scaling or rotation. See `pixmap`.
-#end
-
-4 Other new features
-#start
+#b Expressions and functions use 64-integer arithmetic if supported by the platform
+#b 3D grids of voxel data
+#b 2D plot styles `polygons`, `spiderplot`, `arrows`
+#b 3D plot style `boxes`, `circles`,  `polygons`, `isosurface` and
+## Other representations of gridded voxel data
+#b Data preprocessing filter `zsort`
+#b Construction of customized keys using `keyentry`
+#b New LaTeX terminal pict2e supersedes older terminals `latex`, `emtex`, `eepic`,
+## and `tpic`, which are no longer built by default
+#b `set pixmap` imports a png/jpeg/gif image as a pixmap that can be scaled and
+## positioned anywhere in a plot or on the page
 #b Enhanced text mode accepts \U+xxxx (xxxx is a 4 or 5 character hexadecimal)
-##as representing a Unicode code point that is converted to the corresponding
-##UTF-8 byte sequence on output.
+## as representing a Unicode code point that is converted to the corresponding
+## UTF-8 byte sequence on output
+#b pm3d filled area quadrangles are clipped smoothly to the current zrange
+#b Revised syntax for `with parallelaxes` allows convenient iteration inside the
+## plot command, similar to plot styles `histogram` and `spiderplot`
 #end
 
-4 Changes
+4 New features in 5.2
+?version_5.2
 #start
-#b `pm3d filled area quadrangles` are clipped smoothly to current zrange.
-## This affects pm3d surfaces and also the faces of 3D boxes, polygons, etc.
-#b Revised syntax for plot style 'with parallelaxes'. See `parallel`.
-## The histogram, parallelaxis, and spiderplot styles now use similar syntax
-## that can iterate over plot elements:
-##     `plot for [column=1:N] DATA using column`
-#b Imaginary values returned by the using specifier of a 2D plot are treated as
-##undefined values (NaN) rather than as real(value).  This was always true for
-##function plots and 3D data plots.  E.g. the following two plots are equivalent.
-##plot [-1:1] sqrt(x); plot [-1:1] '+' using 1:(sqrt($1)
-#b The `set fontpath` command is deprecated. The search path for fonts to be
-## embedded in output from the postscript terminal has been revised.
+#b Nonlinear coordinate systems (see `set nonlinear`).
+#b Automated binning of data (see `bins`).
+#b Greatly extended support for polar mode plots
+#b 2D beeswarm plots. See `set jitter`.
+#b 3D plot style `zerrorfill`.
+#b 3D lighting model provides shading and specular highlighted (see `lighting`).
+#b Array data type and associated commands, operators, etc.
+#b The symbol used for each point in a plot can be controlled by a data value.
+#b New terminals `sizelgd`, `domterm`.
+#b New format descriptors tH tM tS handle relative times (interval lengths).
+## See `time_specifiers`.
 #end
 
-3 Features introduced in version 5.2
-4 New plot styles and style options
+4 Features introduced in version 5.0
+?version_5.0
 #start
-#b 3D plot style `with zerrorfill`. See `zerrorfill`, `fenceplots` and
-^ <a href="http://gnuplot.info/demo_5.2/zerror.html">
-   zerror demo.
-^ </a>
-#b Beeswarm plots. See `set jitter`, `beeswarm` and
-^ <a href="http://gnuplot.info/demo_5.2/jitter.html">
-   beeswarm plot demo
-^ </a>
-#b The symbol used for individual points in a plot can be controlled by data values
-## (see `pointtype variable`)
-#end
-4 New data pre-processing filters
-#start
-#b Normalized frequency of occurrence in a data set (see `smooth fnormal`)
-#b Automated binning of data (see `bins`)
-#end
-4 Polar mode improvements and extensions
-#start
-#b Polar coordinates may be used in label, arrow, and object definitions
-#b `set [m]ttics` places ticmarks and labels on the perimeter of a polar plot. See
-^ <a href="http://gnuplot.info/demo_5.2/ttics.html"> polar axis and ticlabels demo
-^ </a>
-#b `set rlabel`  places a label above the r axis
-#b Inverted `rrange` (i.e. set rrange [90:0]) allows use of celestial horizontal
-## coordinates. See
-^ <a href="http://gnuplot.info/demo_5.2/solar_path.html"> solar path demo
-^ </a>
-#b `set border polar` draws a solid line around the perimeter of a polar plot
-#b `set theta` controls the position of theta = 0 around the perimeter of a
-## polar plot and the sense (clockwise or anti-clockwise) of increasing theta
-#end
-4 Nonlinear coordinates systems
-#start
-#b Any plot axis can be assigned a pair of functions, possibly nonlinear, that
-## describe the forward and reverse mapping to a linear range (see `set nonlinear`)
-^ <a href="http://gnuplot.info/demo_5.2/nonlinear3.html">
-   Nonlinear x/y axis demo
-^ </a>
-#b The familiar command `set logscale` has been reimplemented as a special case
-## nonlinear axis where the paired functions are log(x) and exp(x).
-#end
-4 New commands and command options
-#start
-#b Inside the bracketed clause of an iteration, `continue` jumps immediately
-## to the next iteration, `break` immediately exits from the iteration
-#b `toggle {<plotno> | "plottitle" | all}"` interactively enables or disables
-## display of one element of the current plot (see `toggle`)
-#b `save fit` replaces deprecated command `update`
-#b `set table "outfile.name" append` will append subsequent tabulated plots to
-## an existing text file rather replacing its contents
-#b `set pm3d lighting` describes a lighting model with specular highlighting
-## (see `lighting`)
-#b `set minussign` tells gnuplot to use a special symbol in the current
-## encoding to replace the ascii character '-' in negative numbers
-#b `set micro` tells gnuplot to use a special symbol in the current encoding to
-## replace the ascii character 'u' for the scientific notation prefix "micro"
-## The special typographic symbols for micro and minussign are used only in axis
-## tic labels and strings explicitly created with gprintf(). The byte sequence
-## used to represent these characters depends on the current encoding.
-#end
-4 New data type "array"
-#start
-#b This gnuplot version introduces a new data type `array name[size]`.
-## An array must be declared before use. Each array element A[i] may be a string,
-## an integer, a real number, or a complex value.  A single array may contain
-## elements with different types.  The cardinality operator |A| returns the size
-## of array A. See `arrays`.
-#end
-
-4 New terminals and terminal options
-#start
-#b See `sixelgd` for description of a new terminal that supports interleaving
-## plots with the command lines that generated them if gnuplot is run inside a
-## vt340-compatible terminal emulator
-#b The `domterm` terminal supports interleaving plots with the command lines
-## that generated them if gnuplot is run inside an svg-aware terminal emulator
-#b The `windows` terminal supports saving the current graph to a bitmap file
-#b The `windows` terminal graph window can be docked to the wgnuplot text window
-#b New (experimental) Direct2D/DirectWrite backend for the `windows` terminal
-#b The `wxt` terminal supports exporting to an EMF file or printer on Windows
-#b The `dumb` terminal supports ANSI colors for lines and fill area
-#b The `tkcanvas` terminal has been rewritten to support many more modern gnuplot
-## features, as well as new languages. (Since 5.0.3)
-#end
-
-4 Other new features
-#start
-#b An additional rotation angle `azimuth` affects the orientation of 3D plots.
-## This can be set from the command line (see `set view azimuth`) or by dragging
-## with the right mouse button. Hotkey `z` resets azimuth to 0.
-#b gnuplot running under Windows can interpret Unicode (BMP) input scripts by
-## converting them to the current encoding from `set encoding`, including UTF-8
-#b Textboxes can be assigned a border color and fill color (see `set style textbox`)
-#b Customized plot legends (see `plot title`, `set key`, `multiple keys`)
-#b A sampling range specifier for plotting with pseudofile '+' can include a
-## sampling interval.  For example:
-## plot sample [t=0:100:10] '+' using (t):(1):(label[t]) with labels
-#b Pseudo-file '++' generates samples on the u and v axes, rather than x and y.
-## This allows placement of multiple parametric surfaces in 3D that occupy
-## distinct regions of Cartesian space.  See `sampling.dem`.
-#b new formats descriptors tH tM tS handle relative times (interval lengths).
-##See `time_specifiers`.
-#b ^R initiates a reverse-search through the history for the built-in readline
-## which is used on Windows, too, see `command-line-editing`.
-#b Revised printing support on Windows using `set output "PRN"`,
-## see `windows printing`.
-#end
-
-3 Features introduced in version 5.0
-?Features introduced in version 5.0
-#start
-#b The dot-dash pattern of a line can now be specified independent of other
-## line properties. See `dashtype`, `set dashtype`, `set linetype`
+#b Terminal independent dash types.
 #b The default sequence of colors used for successive elements in a plot is
 ## more easily distinguished by users with color-vision defects.
-## The color sequence is under user control (see `set colorsequence`).
-## This mechanism can also be used to generate monochrome plots
-## (see `set monochrome`). In previous gnuplot versions `monochrome` could only
-## be selected when changing the current terminal via `set terminal`.
-#b New plot styles `with parallelaxes`, `with table`, and labeled contours.
-#b New data pre-processing filter for monotonic cubic splines (see `smooth mcsplines`)
-#b Text markup now supports bold and italic font settings in addition to
-## subscript, superscript, font size and other previously available properties.
-## Enhanced text mode is now enabled by default. See `enhanced text`.
-## Text elements can be enclosed in a box (see `set style textbox`).
-#b Interactive terminals support hypertext labels that only appear when the
-## mouse hovers over the label's anchor point.
-#b New coordinate system (Degrees, Minutes, Seconds). See `set xtics geographic`.
-#b The default format for axis labels is "% h" ("$%h$" for LaTeX terminals).
-## This format is like the C standard format %g except that the exponential term,
-## if present, is written using a superscript.  E.g. 1.2 x 10^5 rather than 1.2E05.
-#b Support for 32-bit Alpha channel + RGB color #AARRGGBB.  See `colorspec`.
-#b Support for HSV color space via a translation function hsv2rgb(H,S,V).
-#b Secondary axes (x2, y2) may be locked to the primary axis via a mapping
-## function.  In the simplest case this guarantees that the primary and secondary
-## axis ranges are identical.  In the general case it allows you to define a
-## non-linear axis, something that previously was possible only for log scaling.
-## See `set link`.
-#b Each function in a plot command may optionally be preceded by a sampling
-## range.  This does not affect the overall range of the plot, only the range
-## over which this function is sampled.  See `plot` and `piecewise.dem`.
-#b If the external library libcerf is available, it is used to provide complex
-## math routines cerf, cdawson, erfi, faddeeva, and the Voigt profile
-## VP(x,sigma,gamma).
-#b The `import` command attaches a user-defined function name to a function
-## provided by an external shared object (support is operating-system dependent).
-## A template header and example source and make files for creating a suitable
-## external shared object are provided in the demo collection.
-#b Previous commands in the history list of an interactive session can be
-## reexecuted by number.  For example, `history !5` will reexecute the command
-## numbered 5 in the `history` list.
-#b Bit-shift operators >> and <<.
-#b Shell invocation of gnuplot can pass parameters to a gnuplot script.
-## gnuplot -c scriptfile.gp ARG1 ARG2 ARG3 ...
+#b New plot types `with parallelaxes`, `with table`.
+#b Labels in plots or elsewhere can be hypertext activated by a mouse-over event.
+#b Explicit sampling ranges in 2D and 3D function plots and pseudofiles
+## '+' and '++'.
+#b Plugin support through new command `imprt` that attaches a user-defined
+## function name to a function provide by an external share object.
+#b Bit shift operators >> and <<.
 #end
 
-2 Differences between versions 4 and 5
-?changes
-?differences
- Some changes introduced in version 5 may cause certain scripts written
- for earlier versions of gnuplot to behave differently.
+2 Differences between versions 5 and 6
 
- * Revised handling of input data containing NaN, inconsistent number of data
- columns, or other unexpected content.  See Note under `missing` for examples
- and figures.
+ Some changes introduced in version 5 could cause certain scripts written
+ for earlier versions of gnuplot to fail or to behave differently.
+ There are very few such changes in version 6.
 
- * Time coordinates are stored internally as the number of seconds relative to
- the standard unix epoch 1-Jan-1970.  Earlier versions of gnuplot used a
- different epoch internally (1-Jan-2000). This change resolves inconsistencies
- introduced whenever time in seconds was generated externally.  The epoch
- convention used by a particular gnuplot installation can be determined using
- the command `print strftime("%F",0)`.  Time is now stored to at least
- millisecond precision.
-
- * The function `timecolumn(N,"timeformat")` now has 2 parameters. Because the
- new second parameter is not associated with any particular data axis, this
- allows using the `timecolumn` function to read time data for reasons other than
- specifying the x or y coordinate. This functionality replaces the command
- sequence `set xdata time; set timefmt "timeformat"`.  It allows combining time
- data read from multiple files with different formats within a single plot.
-
- * The `reverse` keyword of the `set [axis]range` command affects only
- autoscaling. It does not invert or otherwise alter the meaning of a command
- such as `set xrange [0:1]`.  If you want to reverse the direction of the
- x axis in such a case, say instead `set xrange [1:0]`.
-
- * The `call` command is provides a set of variables ARGC, ARG0, ..., ARG9.
- ARG0 holds the name of the script file being executed.  ARG1 to ARG9 are string
- variables and thus may either be referenced directly or expanded as macros,
- e.g. @ARG1.  The contents of ARG0 ... ARG9 may alternatively be accessed as
- array elements ARGV[0] ... ARGV[ARGC].  An older gnuplot convention of
- referencing call parameters as tokens $0 ... $9 is deprecated in version 5.
-
- * The optional bandwidth for the kernel density smoothing option is taken from
- a keyword rather than a data column.  See `smooth kdensity`.
-
-2 Deprecated syntax
+3 Deprecated syntax
 ?deprecated syntax
-?backwards compatibility
-?compatibility
- Gnuplot version 4 deprecated certain syntax used in earlier versions but
- provided a configuration option that allowed backward compatibility.
- Support for the old syntax has now been removed.
-
- Deprecated in version 4 and removed in version 5:
-       set title "Old" 0,-1
-       set data linespoints
-       plot 'file' thru f(x)
-       plot 1 2 4               # horizontal line at y=1
-       update
- Current equivalent:
-       TITLE = "New"
-       set title TITLE offset char 0, char -1
-       set style data linespoints
-       plot 'file' using 1:(f(column(2)))
-       plot 1 linetype 2 pointtype 4
-       save fit "filename"
- Deprecated in version 5
-       if (defined(VARNAME)) ...
-       set style increment user
-       call 'script' 1.23 ABC
-          (in script:  print $0, "$1", "number of args = $#")
-       set fontpath
-       set clabel
-       fit control variables FIT_*
- Current equivalent:
-       if (exists("VARNAME")) ...
-       set linetype
-       call 'script' 1.23 "ABC"
-          (in script:  print ARG1, ARG2, "number of args = ", ARGC
-       set cntrlabel
-       set fit <option> <value>
-
- Deprecated in version 5.4
+ Deprecated in version 5.4, removed in 6.0
        # use of a file containing `reread` to perform iteration
        N = 0;  load "file-containing-reread";
        file content:
@@ -852,6 +528,16 @@ C
            plot func(N, x)
            pause -1
        }
+
+ Deprecated in version 5.4, removed in 6.0
+       set dgrid3d ,,foo     # no keyword to indicate meaning of foo
+ Current equivalent
+       set dgrid3d qnorm foo # (example only; qnorm is not the only option)
+
+ Deprecated in version 5.0, removed in 6.0
+       set style increment user
+ Current equivalent (see `style increment`)
+       use "set linetype" to redefine a convenient range of linetypes
 
 2 Demos and Online Examples
 ?demos
@@ -15648,7 +15334,7 @@ Ffigure_polar_grid
 ?commands set style increment
 ?set style increment
  By default, successive plots within the same graph will use successive
- linetypes.  `set style increment userstyles` changes this to step through
+ linetypes.  `set style increment userstyles` changed this to step through
  successive user-defined line styles instead.
 
  DEPRECATED.  Instead use `set linetype` to redefine a convenient range of
