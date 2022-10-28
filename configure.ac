@@ -1,19 +1,26 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl this is actually major.minor ...
-dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
+dnl NB: Change version/patchlevel immediately below
+dnl     and also in PATCHLEVEL and src/version.c
 dnl
-AC_INIT([gnuplot],[5.5])
+
+AC_INIT(gnuplot, 6.0.0alpha)
+
 AC_CONFIG_SRCDIR(src/graphics.c)
 AC_PREREQ([2.69])
 AC_CONFIG_HEADERS(config.h:config.hin)
-AC_DEFINE(DEVELOPMENT_VERSION,1,[Provide contact info for gnuplot develoment])
+
+dnl The line below is for use during development
+dnl AC_DEFINE(DEVELOPMENT_VERSION,1,[Provide contact info for gnuplot develoment])
+dnl The line below is for packaging a release version
+AM_CONDITIONAL([DEVELOPMENT_VERSION], false)
+
 AM_INIT_AUTOMAKE([1.10 subdir-objects])
 
 AM_MAINTAINER_MODE
 
-VERSION_MAJOR="5.5"
+VERSION_MAJOR="6.0"
 PATCHLEVEL="`cat $srcdir/PATCHLEVEL`"
 AC_DEFINE_UNQUOTED(VERSION_MAJOR,["$VERSION_MAJOR"],[The main version number])
 AC_DEFINE_UNQUOTED(PATCHLEVEL,["$PATCHLEVEL"],[The patch level, a.k.a. micro version number])
